@@ -2981,11 +2981,12 @@ wall_write(const border * b, FILE * f)
 }
 
 static region *
-wall_move(const border * b, struct unit * u, struct region * from, struct region * to)
+wall_move(const border * b, struct unit * u, struct region * from, struct region * to, boolean routing)
 {
   wall_data * fd = (wall_data*)b->data;
-  int hp = dice(3, fd->force) * u->number;
+  if (routing) return to;
   if (fd->active) {
+    int hp = dice(3, fd->force) * u->number;
     hp = min (u->hp, hp);
     u->hp -= hp;
     if (u->hp) {
@@ -2998,8 +2999,7 @@ wall_move(const border * b, struct unit * u, struct region * from, struct region
       u->hp = u->number;
     }
   }
-  unused(from);
-  return to;
+  return NULL;
 }
 
 border_type bt_firewall = {
@@ -3094,12 +3094,13 @@ wisps_name(const border * b, const region * r, const faction * f, int gflags)
 }
 
 static region *
-wisps_move(const border * b, struct unit * u, struct region * from, struct region * next)
+wisps_move(const border * b, struct unit * u, struct region * from, struct region * next, boolean routing)
 {
   direction_t reldir = reldirection(from, next);
   wall_data * wd = (wall_data*)b->data;
   assert(reldir!=D_SPECIAL);
 
+  if (!routing) return NULL;
   if (wd->active) {
     /* pick left and right region: */
     region * rl = rconnect(from, (direction_t)((reldir+MAXDIRECTIONS-1)%MAXDIRECTIONS));

@@ -1070,7 +1070,7 @@ make_route(unit * u, order * ord, region_list ** routep)
     }
     while (b!=NULL) {
       if (b->type->move) {
-        region * rto = b->type->move(b, u, current, next);
+        region * rto = b->type->move(b, u, current, next, true);
         if (rto!=next) {
           /* the target region was changed (bt_wisps, for example). check the
            * new target region for borders */
@@ -1198,6 +1198,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
   while (iroute && iroute!=route_end) {
     region * next = iroute->data;
     direction_t reldir = reldirection(current, next);
+    border * b = get_borders(current, next);
 
     /* check if we are caught by guarding units */
     if (iroute!=route_begin && mode!=TRAVEL_RUNNING && mode!=TRAVEL_TRANSPORTED) {
@@ -1281,9 +1282,19 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
       }
     }
 
+    /* effect of borders */
+    while (b!=NULL) {
+      if (b->type->move) {
+        region * rto = b->type->move(b, u, current, next, false);
+        assert(rto==NULL); /* should return NULL when not routing */
+      }
+      b = b->next;
+    }
+
     current = next;
     iroute = iroute->next;
     ++steps;
+    if (u->number==0) break;
   }
 
   if (iroute!=route_begin) {
