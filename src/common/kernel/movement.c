@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.12 2001/02/18 12:20:37 corwin Exp $
+ *	$Id: movement.c,v 1.13 2001/02/19 16:22:02 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1997,7 +1997,8 @@ movement(void)
 				} else {
 					move(r, u, true);
 					set_string(&u->thisorder, "");
-					if (u==*up) up = &u->next;
+					up = &r->units;
+					/* if (u==*up) up = &u->next; Blödsinn */
 				}
 				break;
 			default:
