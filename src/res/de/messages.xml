@@ -57,7 +57,7 @@
 		</type>
 		<locale name="de">
 			<nr section="events">
-				<text>"$unit($unit) benutzt einen $resource($potion,1)trank."</text>
+				<text>"$unit($unit) benutzt einen $resource($potion,1)."</text>
 			</nr>
 		</locale>
 	</message>

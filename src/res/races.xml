@@ -809,7 +809,7 @@
 		<ai splitsize="1"></ai>
 		<attack type="1" damage="1d4"></attack>
 	</race>
-	<race name="mountainguard" magres="0.500000" maxaura="1.000000" regaura="0.500000" recruitcost="50000" maintenance="0" weight="10000" speed="0.000000" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove nolearn noteach noweapons>
+	<race name="mountainguard" magres="0.500000" maxaura="1.000000" regaura="0.500000" recruitcost="50000" maintenance="0" weight="10000" speed="0.000000" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove nolearn noteach noweapons canguard>
 		<ai splitsize="1"></ai>
 		<attack type="4" damage="2d40"></attack>
 	</race>

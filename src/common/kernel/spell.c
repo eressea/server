@@ -7053,6 +7053,7 @@ sp_earn_silver(castorder *co)
 	earned = min(rmoney(r), wanted);
 	rsetmoney(r, rmoney(r) - earned);
 	change_money(mage, earned);
+	/* TODO klären: ist das Silber damit schon reserviert? */
 
 	add_income(mage, IC_MAGIC, wanted, earned);
 	return cast_level;
@@ -8807,9 +8808,9 @@ spell spelldaten[] =
 		"und in der Folge entstehn dort Irrlichter. "
 		"Wer durch diese Nebel wandert, wird von Visionen geplagt und "
 		"in die Irre geleitet.",
-		"ZAUBERE \"Irrlichter\" <Richtung>",
+		"ZAUBERE [REGION x y] [STUFE n] \"Irrlichter\" <Richtung>",
 		"c",
-	 M_TRAUM, (SPELLLEVEL), 5, 7,
+	 M_TRAUM, (SPELLLEVEL | FARCASTING), 5, 7,
 	 {
 		 {R_AURA, 2, SPC_LEVEL},
 		 {0, 0, 0},
