@@ -1345,10 +1345,11 @@ cinfo_riot(void * obj, typ_t typ, curse *c, int self)
 /* cursedata */
 /* ------------------------------------------------------------- */
 /* typedef struct cursedata {
+ *   int id; (altlast für kompatibiliät)
+ *   char *name;
  *   int typ;
  *   int givemenacting;
  *   int mergeflags;
- *   char *name;
  *   char *info;
  *   void (*display)(void*,typ_t, curse*);
  *} cursedata;
