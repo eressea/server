@@ -1343,6 +1343,7 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 				}
 				if (pos!=cbuf) fputs(cbuf, F);
 			}
+			print_curses(F, f, r, TYP_REGION);
 			cr_borders(r, f, sd->mode, F);
 			if (sd->mode==see_unit && r->planep && r->planep->id == 1 && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
 			{
@@ -1362,7 +1363,6 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 				}
 			}
 
-			print_curses(F, f, r, TYP_REGION);
 			/* describe both passed and inhabited regions */
 			show_active_spells(r);
 			{
