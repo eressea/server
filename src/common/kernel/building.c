@@ -386,17 +386,17 @@ tagbegin(struct xml_stack * stack)
 			}
 		} else if (strcmp(tag->name, "maintenance")==0) {
 			size_t len = 0;
-			const resource_type * rtype;
-			maintenance * mt;
+			const resource_type * rtype = NULL;
+			maintenance * mt = bt->maintenance;
 			resource_t type = NORESOURCE;
-			if (bt->maintenance==NULL) {
-				mt = bt->maintenance = calloc(sizeof(maintenance), 2);
+			if (mt==NULL) {
+				mt = bt->maintenance = calloc(sizeof(struct maintenance), 2);
 				len = 0;
 			} else {
-				mt = bt->maintenance;
 				while (mt[len].number) ++len;
-				mt = realloc(mt, sizeof(maintenance)*(len+1));
+				mt = bt->maintenance = realloc(mt, sizeof(struct maintenance)*(len+2));
 			}
+			fprintf(stderr, "maintenance %s %d %u\n", bt->_name, len, sizeof(maintenance));
 			mt[len+1].number = 0;
 			mt[len].number = xml_ivalue(tag, "amount");
 			rtype = rt_find(xml_value(tag, "type"));
