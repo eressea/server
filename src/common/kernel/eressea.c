@@ -426,7 +426,7 @@ ufindhash (int i)
 #define FMAXHASH 2047
 faction * factionhash[FMAXHASH];
 
-static void
+void
 fhash(faction * f)
 {
 	int index = f->no % FMAXHASH;
@@ -434,7 +434,7 @@ fhash(faction * f)
 	factionhash[index] = f;
 }
 
-static void
+void
 funhash(faction * f)
 {
 	int index = f->no % FMAXHASH;

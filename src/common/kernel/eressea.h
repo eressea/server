@@ -1064,6 +1064,9 @@ void uhash(struct unit * u);
 void uunhash(struct unit * u);
 struct unit *ufindhash(int i);
 
+void fhash(struct faction * f);
+void funhash(struct faction * f);
+
 #ifndef NDEBUG
 const char *strcheck(const char *s, size_t maxlen);
 
