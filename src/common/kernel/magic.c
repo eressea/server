@@ -1958,14 +1958,14 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
     }
 	}
 
+  /* im Endeffekt waren es evtl. nur p parameter (wegen TEMP) */
+  par->length = p;
   if (fail) {
     cmistake(u, ord, 209, MSG_MAGIC);
     free_spellparameter(par);
     return NULL;
   }
 
-  /* im Endeffekt waren es evtl. nur p parameter (wegen TEMP) */
-	par->length = p;
 	return par;
 }
 
