@@ -381,6 +381,10 @@ game_done(void)
 
 #include "magic.h"
 
+#if (defined(_MSC_VER))
+# define MALLOCDBG 1
+#endif
+
 #if MALLOCDBG
 static void
 init_malloc_debug(void)
@@ -578,10 +582,12 @@ typedef struct lostdata {
 void
 confirm_newbies(void)
 {
-	const faction * f = factions;
+	faction * f = factions;
+	if (sqlstream==NULL) return;
 	while (f) {
-		if (f->age==0) {
+		if (!fval(f, FFL_DBENTRY)) {
 			fprintf(sqlstream, "UPDATE subscriptions SET status='ACTIVE', faction='%s' WHERE game=%d AND password='%s';\n", itoa36(f->no), GAME_ID, f->passw);
+			fset(f, FFL_DBENTRY);
 		}
 		f = f->next;
 	}

@@ -905,7 +905,8 @@ extern int max_unique_id;
 #define FFL_RESTART       (1<<2)
 #define FFL_OVERRIDE      (1<<27) /* Override-Passwort wurde benutzt */
 
-#define UFL_WERE					(1<<28)
+#define FFL_DBENTRY       (1<<28) /* Partei ist in Datenbank eingetragen */
+#define UFL_WERE          (1<<28)
 
 /* Flags, die gespeichert werden sollen: */
 #define UFL_SAVEMASK (FL_NOAID | FL_OWNER | FL_PARTEITARNUNG | FL_LOCKED | FL_HUNGER | FL_NOIDLEOUT | FL_TAKEALL | FL_UNNAMED)
