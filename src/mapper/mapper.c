@@ -383,6 +383,28 @@ dropout_region(region * r)
 	return 0;
 }
 
+static boolean
+highlight_region(region *r)
+{
+	if ((hl == -2 && r->units) ||
+			(hl == -3 && r->buildings) ||
+			(hl == -4 && r->ships) ||
+			(hl == -5 && has_laen(r)) ||
+			(hl == -6 && fval(r, RF_MALLORN)) ||
+			(hl == -7 && fval(r, RF_CHAOTIC)) ||
+			(hl == -8 && get_curse(r->attribs, ct_find("godcursezone"))) ||
+			(hl == -9 && newbie_region(r)) ||
+			(hl == -10 && dropout_region(r)) ||
+#ifdef ALLIANCES
+			(hl == -11 && alliancehere(r, hl_alliance)) ||
+#endif
+			(hl >= 0 && factionhere(r, hl))) {
+		return true;
+	}
+
+	return false;
+}
+
 void
 drawmap(boolean maponly) {
 	int x, x1, y1, y2, s, q;
@@ -479,24 +501,11 @@ drawmap(boolean maponly) {
 #ifdef COLOR
 				int rc = RegionColor(r);
 #endif
-				if ((hl == -2 && r->units) ||
-					 (hl == -3 && r->buildings) ||
-					 (hl == -4 && r->ships) ||
-					 (hl == -5 && has_laen(r)) ||
-					 (hl == -6 && fval(r, RF_MALLORN)) ||
-					 (hl == -7 && fval(r, RF_CHAOTIC)) ||
-					 (hl == -8 && get_curse(r->attribs, ct_find("godcursezone"))) ||
-					 (hl == -9 && newbie_region(r)) ||
-					 (hl == -10 && dropout_region(r)) ||
-#ifdef ALLIANCES
-					 (hl == -11 && alliancehere(r, hl_alliance)) ||
-#endif
-					 (hl >= 0 && factionhere(r, hl)) ||
-					 (x==tx && y1==ty))
+				if (highlight_region(r) || (x==tx && y1==ty)) {
 					addch(rs | A_REVERSE);
-				else if (is_tagged(r))
+				} else if (is_tagged(r)) {
 					addch(rs | A_BOLD);
-				else {
+				} else {
 #ifdef COLOR
 					attrset(rc | A_NORMAL);
 #endif
@@ -601,18 +610,16 @@ void unmark(int x, int y, int rx, int ry) {
 	movexy(x*2+6+(y&1)+(top&1),y+6);
 	addch(' ');
 	if (r) {
-		if ((hl == -2 && r->units) ||
-				(hl == -3 && r->buildings) ||
-				(hl == -4 && r->ships) ||
-				(hl >= 0 && factionhere(r, hl)) ||
-				(rx==tx && ry==ty))
+		if (highlight_region(r) || (rx==tx && ry==ty)) {
 			addch(rs | A_REVERSE);
-		else if (is_tagged(r))
+		} else if (is_tagged(r)) {
 			addch(rs | A_BOLD);
-		else
+		} else {
 			addch(rs);
-	} else
+		}
+	} else {
 		addch(rs);
+	}
 	addch(' ');
 	for (q=0; q<5; q++) {
 		movexy(x*2+7+(y&1)+(top&1),q+1);
@@ -1447,8 +1454,9 @@ movearound(int rx, int ry) {
 			}
 			drawmap(false);
 		}
-		if (!r || r->x != rx || r->y != ry)
+		if (!r || r->x != rx || r->y != ry) {
 			r=findregion(rx,ry);
+		}
 		if (ch < 999999 && ch > -9) {	/* Lange Regionsinfo nicht überschreiben */
 			showregion(r, 0);
 			DisplayRegList(1);
