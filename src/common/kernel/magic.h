@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: magic.h,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: magic.h,v 1.3 2001/02/18 09:21:11 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -388,6 +388,7 @@ extern struct unit * get_familiar_mage(const struct unit *u);
 extern struct attrib_type at_familiar;
 extern struct attrib_type at_familiarmage;
 extern void set_familiar(struct unit * mage, struct unit * familiar);
+extern void create_newfamiliar(struct unit * mage, struct unit * familiar);
 extern struct attrib *create_special_direction(struct region *r, int x, int y, int duration,
 		const char *desc, const char *keyword);
 

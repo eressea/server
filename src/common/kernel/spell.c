@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.c,v 1.10 2001/02/13 18:43:54 katze Exp $
+ *	$Id: spell.c,v 1.11 2001/02/18 09:21:11 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -633,7 +633,7 @@ make_familiar(unit *familiar, unit *mage)
 			break;
 	}
 #ifdef NEW_TRIGGER
-	set_familiar(mage, familiar);
+	create_newfamiliar(mage, familiar);
 #else
 	{
 		old_trigger *trig1, *trig2;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.26 2001/02/17 16:07:03 enno Exp $
+ *	$Id: korrektur.c,v 1.27 2001/02/18 09:21:11 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -179,49 +179,49 @@ fix_vertrautenmagie(void)
 
 				switch(u->race) {
 					case RC_PSEUDODRAGON:
-						addspell(u, SPL_FLEE);
-						addspell(u, SPL_SLEEP);
-						addspell(u, SPL_FRIGHTEN);
+						if(!getspell(u, SPL_FLEE)) addspell(u, SPL_FLEE);
+						if(!getspell(u, SPL_SLEEP)) addspell(u, SPL_SLEEP);
+						if(!getspell(u, SPL_FRIGHTEN)) addspell(u, SPL_FRIGHTEN);
 						break;
 					case RC_NYMPH:
-						addspell(u, SPL_SEDUCE);
-						addspell(u, SPL_CALM_MONSTER);
-						addspell(u, SPL_SONG_OF_CONFUSION);
-						addspell(u, SPL_DENYATTACK);
+						if(!getspell(u, SPL_SEDUCE)) addspell(u, SPL_SEDUCE);
+						if(!getspell(u, SPL_CALM_MONSTER)) addspell(u, SPL_CALM_MONSTER);
+						if(!getspell(u, SPL_SONG_OF_CONFUSION)) addspell(u, SPL_SONG_OF_CONFUSION);
+						if(!getspell(u, SPL_DENYATTACK)) addspell(u, SPL_DENYATTACK);
 						break;
 					case RC_UNICORN:
-						addspell(u, SPL_RESISTMAGICBONUS);
-						addspell(u, SPL_SONG_OF_PEACE);
-						addspell(u, SPL_CALM_MONSTER);
-						addspell(u, SPL_HERO);
-						addspell(u, SPL_HEALINGSONG);
-						addspell(u, SPL_DENYATTACK);
+						if(!getspell(u, SPL_RESISTMAGICBONUS)) addspell(u, SPL_RESISTMAGICBONUS);
+						if(!getspell(u, SPL_SONG_OF_PEACE)) addspell(u, SPL_SONG_OF_PEACE);
+						if(!getspell(u, SPL_CALM_MONSTER)) addspell(u, SPL_CALM_MONSTER);
+						if(!getspell(u, SPL_HERO)) addspell(u, SPL_HERO);
+						if(!getspell(u, SPL_HEALINGSONG)) addspell(u, SPL_HEALINGSONG);
+						if(!getspell(u, SPL_DENYATTACK)) addspell(u, SPL_DENYATTACK);
 						break;
 					case RC_WRAITH:
-						addspell(u, SPL_STEALAURA);
-						addspell(u, SPL_FRIGHTEN);
-						addspell(u, SPL_SUMMONUNDEAD);
+						if(!getspell(u, SPL_STEALAURA)) addspell(u, SPL_STEALAURA);
+						if(!getspell(u, SPL_FRIGHTEN)) addspell(u, SPL_FRIGHTEN);
+						if(!getspell(u, SPL_SUMMONUNDEAD)) addspell(u, SPL_SUMMONUNDEAD);
 						break;
 					case RC_IMP:
-						addspell(u, SPL_STEALAURA);
+						if(!getspell(u, SPL_STEALAURA)) addspell(u, SPL_STEALAURA);
 						break;
 					case RC_DREAMCAT:
-						addspell(u, SPL_ILL_SHAPESHIFT);
-						addspell(u, SPL_TRANSFERAURA_TRAUM);
+						if(!getspell(u, SPL_ILL_SHAPESHIFT)) addspell(u, SPL_ILL_SHAPESHIFT);
+						if(!getspell(u, SPL_TRANSFERAURA_TRAUM)) addspell(u, SPL_TRANSFERAURA_TRAUM);
 						break;
 					case RC_FEY:
-						addspell(u, SPL_DENYATTACK);
-						addspell(u, SPL_CALM_MONSTER);
-						addspell(u, SPL_SEDUCE);
+						if(!getspell(u, SPL_DENYATTACK)) addspell(u, SPL_DENYATTACK);
+						if(!getspell(u, SPL_CALM_MONSTER)) addspell(u, SPL_CALM_MONSTER);
+						if(!getspell(u, SPL_SEDUCE)) addspell(u, SPL_SEDUCE);
 						break;
 					/* kein break, ein Wyrm hat alle Drachensprüche */
 					case RC_WYRM:
-						addspell(u, SPL_WYRMODEM);
+						if(!getspell(u, SPL_WYRMODEM)) addspell(u, SPL_WYRMODEM);
 					case RC_DRAGON:
-						addspell(u, SPL_DRAGONODEM);
+						if(!getspell(u, SPL_DRAGONODEM)) addspell(u, SPL_DRAGONODEM);
 					case RC_FIREDRAGON:
 					case RC_SEASERPENT:
-						addspell(u, SPL_FIREDRAGONODEM);
+						if(!getspell(u, SPL_FIREDRAGONODEM)) addspell(u, SPL_FIREDRAGONODEM);
 						break;
 				}
 			}

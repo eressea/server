@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: magic.c,v 1.9 2001/02/17 15:02:49 enno Exp $
+ *	$Id: magic.c,v 1.10 2001/02/18 09:21:11 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2453,6 +2453,38 @@ set_familiar(unit * mage, unit * familiar)
 		a = a_add(&familiar->attribs, a_new(&at_familiarmage));
 		a->data.v = mage;
 	} else assert(!a->data.v || a->data.v == mage);
+}
+
+
+void
+create_newfamiliar(unit * mage, unit * familiar)
+{
+	/* if the skill modifier for the mage does not yet exist, add it */
+	attrib * a = a_find(mage->attribs, &at_skillmod);
+	while (a) {
+		skillmod_data * smd = (skillmod_data *)a->data.v;
+		if (smd->special==sm_familiar) break;
+		a = a->nexttype;
+	}
+	if (a==NULL) {
+		attrib * an = a_add(&mage->attribs, a_new(&at_skillmod));
+		skillmod_data * smd = (skillmod_data *)an->data.v;
+		smd->special = sm_familiar;
+		smd->skill=NOSKILL;
+	}
+
+	a = a_find(mage->attribs, &at_familiar);
+	if (a==NULL) {
+		a = a_add(&mage->attribs, a_new(&at_familiar));
+		a->data.v = familiar;
+	} else assert(!a->data.v || a->data.v == familiar);
+	/* TODO: Diese Attribute beim Tod des Familiars entfernen: */
+
+	a = a_find(familiar->attribs, &at_familiarmage);
+	if (a==NULL) {
+		a = a_add(&familiar->attribs, a_new(&at_familiarmage));
+		a->data.v = mage;
+	} else assert(!a->data.v || a->data.v == mage);
 
 	/* Wenn der Magier stirbt, dann auch der Vertraute */
 	add_trigger(&mage->attribs, "destroy", trigger_killunit(familiar));
@@ -2460,6 +2492,7 @@ set_familiar(unit * mage, unit * familiar)
 	add_trigger(&familiar->attribs, "destroy", trigger_shock(mage));
 
 }
+
 
 static void *
 resolve_familiar(void * data)
