@@ -1994,7 +1994,11 @@ set_passw(void)
 					} else {
 						i = (int) pow(2, o);
 						if (getparam(u->faction->locale) == P_NOT) {
-							u->faction->options = u->faction->options & ~i;
+							if(i == O_COMPRESS || i == O_BZIP2) {
+								cmistake(u, S->s, 305, MSG_EVENT);
+							} else {
+								u->faction->options = u->faction->options & ~i;
+							}
 						} else {
 							u->faction->options = u->faction->options | i;
 							if(i == O_COMPRESS) u->faction->options &= ~O_BZIP2;

@@ -4406,6 +4406,16 @@
 		<text locale="de">"$unit($unit) in $region($region): '$command' - Einheiten einer Partei, die noch immun gegen Angriffe ist, dürfen nicht bewachen."</text>
 		<text locale="en">"$unit($unit) in $region($region): '$command' - units of a faction that can't be attacked may not guard."</text>
 	</message>
+	
+	<message name="error305" section="errors">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Die Optionen ZIP und BZIP2 können nur um, nicht ausgeschaltet werden."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - options ZIP and BZIP2 can only be switched, not turned off."</text>
+	</message>
 
 	<message name="drown_on_ship">
 		<type>
