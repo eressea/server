@@ -1160,7 +1160,7 @@ randomevents(void)
 					}
 					bfind = true;
 				}
-				if (r->planep==0 || !fval(r->planep, PFL_NOFEED)) {
+				if (r->planep == NULL || !fval(r->planep, PFL_NOFEED)) {
 					int demons = u->number;
 					if (bauernblut>=demons) {
 						bauernblut -= demons;
@@ -1172,7 +1172,8 @@ randomevents(void)
 						peasantfood -= demons;
 						demons = 0;
 					} else {
-						demons-=peasantfood;
+						demons -= peasantfood;
+						peasantfood = 0;
 					}
 					if (demons > 0) {
 #ifdef DAEMON_HUNGER
