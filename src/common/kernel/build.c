@@ -714,8 +714,8 @@ build(unit * u, const construction * ctype, int completed, int want)
 
 int
 maxbuild(const unit * u, const construction * cons)
-		/* calculate maximum size that can be built from available material */
-		/* !! ignores maximum objectsize and improvements...*/
+	/* calculate maximum size that can be built from available material */
+	/* !! ignores maximum objectsize and improvements...*/
 {
 	int c;
 	int maximum = INT_MAX;

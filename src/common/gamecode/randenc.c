@@ -1427,7 +1427,7 @@ randomevents(void)
 
 			for (i=0;i < MAXSKILLS;i++) {
 				if (rc->bonus[i] >= 1) {
-					set_level(u, i, 1);
+					set_level(u, (skill_t)i, 1);
 				}
 			}
 			u->hp = unit_max_hp(u) * u->number;

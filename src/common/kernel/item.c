@@ -1132,7 +1132,7 @@ t_item itemdata[MAXITEMS] = {
 	},
 	{			/* I_FEENSTIEFEL 60 */
 		{"Feenstiefel", "Feenstiefel", "Feenstiefel", "Feenstiefel"}, G_M,
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
+		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_BIRTHDAYAMULET 69 */
 		{"Katzenamulett", "Katzenamulette", "Amulett", "Amulette"}, G_N,
