@@ -7181,6 +7181,11 @@ sp_createitem_trueseeing(castorder *co)
 {
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
+	unit *familiar = (unit *)co->familiar;
+
+	if (familiar){
+		mage = familiar;
+	}
 
 	change_item(mage,I_AMULET_OF_TRUE_SEEING,1);
 	creation_message(mage, I_AMULET_OF_TRUE_SEEING);
@@ -7195,6 +7200,11 @@ sp_createitem_invisibility(castorder *co)
 {
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
+	unit *familiar = (unit *)co->familiar;
+
+	if (familiar){
+		mage = familiar;
+	}
 
 	change_item(mage,I_RING_OF_INVISIBILITY,1);
 	creation_message(mage, I_RING_OF_INVISIBILITY);
@@ -7208,6 +7218,11 @@ sp_createitem_chastitybelt(castorder *co)
 {
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
+	unit *familiar = (unit *)co->familiar;
+
+	if (familiar){
+		mage = familiar;
+	}
 
 	change_item(mage,I_CHASTITY_BELT,1);
 	creation_message(mage, I_CHASTITY_BELT);
@@ -7222,6 +7237,11 @@ sp_createitem_power(castorder *co)
 {
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
+	unit *familiar = (unit *)co->familiar;
+
+	if (familiar){
+		mage = familiar;
+	}
 
 	change_item(mage,I_RING_OF_POWER,1);
 	creation_message(mage, I_RING_OF_POWER);
@@ -7235,6 +7255,11 @@ sp_createitem_runesword(castorder *co)
 {
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
+	unit *familiar = (unit *)co->familiar;
+
+	if (familiar){
+		mage = familiar;
+	}
 
 	change_item(mage,I_RUNESWORD,1);
 	creation_message(mage, I_RUNESWORD);
@@ -7250,6 +7275,11 @@ sp_createitem_aura(castorder *co)
 {
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
+	unit *familiar = (unit *)co->familiar;
+
+	if (familiar){
+		mage = familiar;
+	}
 
 	change_item(mage,I_AURAKULUM,1);
 	creation_message(mage, I_AURAKULUM);
@@ -7267,6 +7297,11 @@ sp_createitem_regeneration(castorder *co)
 {
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
+	unit *familiar = (unit *)co->familiar;
+
+	if (familiar){
+		mage = familiar;
+	}
 
 	change_item(mage,I_RING_OF_REGENERATION,1);
 	creation_message(mage, I_RING_OF_REGENERATION);
