@@ -177,6 +177,7 @@ game_init(void)
 #endif
 
   register_xmlreader();
+  enable_xml_gamecode();
   init_spells();
   init_data(xmlfile);
 

@@ -41,6 +41,13 @@ without prior permission by the authors of Eressea.
 #include <ctype.h>
 #include <string.h>
 
+static boolean gamecode_enabled = false;
+
+void
+enable_xml_gamecode(void)
+{
+  gamecode_enabled = true;
+}
 
 static void
 xml_readtext(xmlNodePtr node, struct locale ** lang, xmlChar **text)
@@ -539,41 +546,42 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
   }
   xmlXPathFreeObject(result);
 
-  /* reading item/function */
-  xpath->node = node;
-  result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-  for (k=0;k!=result->nodesetval->nodeNr;++k) {
-    xmlNodePtr node = result->nodesetval->nodeTab[k];
-    xmlChar * property;
-    pf_generic fun;
+  if (gamecode_enabled) {
+    /* reading item/function */
+    xpath->node = node;
+    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+    for (k=0;k!=result->nodesetval->nodeNr;++k) {
+      xmlNodePtr node = result->nodesetval->nodeTab[k];
+      xmlChar * property;
+      pf_generic fun;
 
-    property = xmlGetProp(node, BAD_CAST "value");
-    assert(property!=NULL);
-    fun = get_function((const char*)property);
-    if (fun==NULL) {
-      log_error(("unknown function name '%s' for item '%s'\n",
-        (const char*)property, rtype->_name[0]));
+      property = xmlGetProp(node, BAD_CAST "value");
+      assert(property!=NULL);
+      fun = get_function((const char*)property);
+      if (fun==NULL) {
+        log_error(("unknown function name '%s' for item '%s'\n",
+          (const char*)property, rtype->_name[0]));
+        xmlFree(property);
+        continue;
+      }
       xmlFree(property);
-      continue;
-    }
-    xmlFree(property);
 
-    property = xmlGetProp(node, BAD_CAST "name");
-    assert(property!=NULL);
-    if (strcmp((const char*)property, "give")==0) {
-      itype->give = (boolean (*)(const struct unit*, const struct unit*, const struct item_type *, int, struct order *))fun;
+      property = xmlGetProp(node, BAD_CAST "name");
+      assert(property!=NULL);
+      if (strcmp((const char*)property, "give")==0) {
+        itype->give = (boolean (*)(const struct unit*, const struct unit*, const struct item_type *, int, struct order *))fun;
+      }
+      else if (strcmp((const char*)property, "use")==0) {
+        itype->use = (int (*)(struct unit *, const struct item_type *, int, struct order *))fun;
+      } else {
+        log_error(("unknown function type '%s' for item '%s'\n",
+          (const char*)property, rtype->_name[0]));
+      }
+      xmlFree(property);
     }
-    else if (strcmp((const char*)property, "use")==0) {
-      itype->use = (int (*)(struct unit *, const struct item_type *, int, struct order *))fun;
-    } else {
-      log_error(("unknown function type '%s' for item '%s'\n",
-        (const char*)property, rtype->_name[0]));
-    }
-    xmlFree(property);
+    xmlXPathFreeObject(result);
   }
-  xmlXPathFreeObject(result);
 
-  xpath->node = node;
   return itype;
 }
 

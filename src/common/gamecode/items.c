@@ -2,8 +2,11 @@
 #include <kernel/eressea.h>
 #include "items.h"
 
+#include <kernel/curse.h>
+#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/magic.h>
 #include <kernel/message.h>
 #include <kernel/movement.h>
 #include <kernel/order.h>
@@ -16,6 +19,7 @@
 
 #include <util/attrib.h>
 #include <util/functions.h>
+#include <util/rand.h>
 
 /* BEGIN studypotion */
 #define MAXGAIN 15
@@ -86,9 +90,111 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
 }
 /* END speedsail */
 
+static int
+use_instantartsculpture(struct unit * u, const struct item_type * itype,
+                        int amount, struct order * ord)
+{
+  building *b;
+
+  if(u->region->land == NULL) {
+    cmistake(u, ord, 242, MSG_MAGIC);
+    return -1;
+  }
+
+  b = new_building(bt_find("artsculpture"), u->region, u->faction->locale);
+  b->size = 100;
+  sprintf(buf, "%s", LOC(u->faction->locale, "artsculpture"));
+  set_string(&b->name, buf);
+
+  ADDMSG(&u->region->msgs, msg_message("artsculpture_create", "unit region", 
+    u, u->region));
+
+  itype->rtype->uchange(u, itype->rtype, -1);
+
+  return 0;
+}
+
+static int
+use_instantartacademy(struct unit * u, const struct item_type * itype,
+                      int amount, struct order * ord)
+{
+  building *b;
+
+  if(u->region->land == NULL) {
+    cmistake(u, ord, 242, MSG_MAGIC);
+    return -1;
+  }
+
+  b = new_building(bt_find("artacademy"), u->region, u->faction->locale);
+  b->size = 100;
+  sprintf(buf, "%s", LOC(u->faction->locale, "artacademy"));
+  set_string(&b->name, buf);
+
+  ADDMSG(&u->region->msgs, msg_message(
+    "artacademy_create", "unit region", u, u->region));
+
+  itype->rtype->uchange(u, itype->rtype, -1);
+
+  return 0;
+}
+
+#define BAGPIPEFRACTION dice_rand("2d4+2")
+#define BAGPIPEDURATION dice_rand("2d10+4")
+
+static int
+use_bagpipeoffear(struct unit * u, const struct item_type * itype,
+                  int amount, struct order * ord)
+{
+  int money;
+
+  if(get_curse(u->region->attribs, ct_find("depression"))) {
+    cmistake(u, ord, 58, MSG_MAGIC);
+    return -1;
+  }
+
+  money = entertainmoney(u->region)/BAGPIPEFRACTION;
+  change_money(u, money);
+  rsetmoney(u->region, rmoney(u->region) - money);
+
+  create_curse(u, &u->region->attribs, ct_find("depression"),
+    20, BAGPIPEDURATION, 0, 0);
+
+  ADDMSG(&u->faction->msgs, msg_message("bagpipeoffear_faction",
+    "unit region command money", u, u->region, ord, money));
+
+  ADDMSG(&u->region->msgs, msg_message("bagpipeoffear_region",
+    "unit money", u, money));
+
+  return 0;
+}
+
+static int
+use_aurapotion50(struct unit * u, const struct item_type * itype,
+                 int amount, struct order * ord)
+{
+  if(!is_mage(u)) {
+    cmistake(u, ord, 214, MSG_MAGIC);
+    return -1;
+  }
+
+  change_spellpoints(u, 50);
+
+  ADDMSG(&u->faction->msgs, msg_message("aurapotion50",
+    "unit region command", u, u->region, ord));
+
+  itype->rtype->uchange(u, itype->rtype, -1);
+
+  return 0;
+}
+
+
 void
 register_itemimplementations(void)
 {
+  register_function((pf_generic)use_instantartsculpture, "use_instantartsculpture");
   register_function((pf_generic)use_studypotion, "use_studypotion");
 	register_function((pf_generic)use_speedsail, "use_speedsail");
+  register_function((pf_generic)use_instantartacademy, "use_instantartacademy");
+  register_function((pf_generic)use_bagpipeoffear, "use_bagpipeoffear");
+  register_function((pf_generic)use_aurapotion50, "use_aurapotion50");
 }

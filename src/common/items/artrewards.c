@@ -25,7 +25,6 @@
 #include <kernel/message.h>
 #include <kernel/magic.h>
 #include <kernel/ship.h>
-#include <kernel/building.h>
 
 /* util includes */
 #include <util/functions.h>
@@ -161,168 +160,6 @@ item_type it_trappedairelemental = {
 };
 
 
-static int
-use_aurapotion50(struct unit * u, const struct item_type * itype,
-                 int amount, struct order * ord)
-{
-  if(!is_mage(u)) {
-    cmistake(u, ord, 214, MSG_MAGIC);
-    return -1;
-  }
-
-  change_spellpoints(u, 50);
-
-  ADDMSG(&u->faction->msgs, msg_message("aurapotion50",
-    "unit region command", u, u->region, ord));
-  
-  itype->rtype->uchange(u, itype->rtype, -1);
-
-  return 0;
-}
-
-static resource_type rt_aurapotion50 = {
-  { "aurapotion50", "aurapotion50_p" },
-  { "aurapotion50", "aurapotion50_p" },
-  RTF_ITEM,
-  &res_changeitem
-};
-
-item_type it_aurapotion50 = {
-  &rt_aurapotion50,               /* resourcetype */
-    0, 1, 0,                        /* flags, weight, capacity */
-    NULL,                           /* construction */
-    &use_aurapotion50,
-    NULL,
-    NULL
-};
-
-#define BAGPIPEFRACTION dice_rand("2d4+2")
-#define BAGPIPEDURATION dice_rand("2d10+4")
-
-static int
-use_bagpipeoffear(struct unit * u, const struct item_type * itype,
-                  int amount, struct order * ord)
-{
-  int money;
-
-  if(get_curse(u->region->attribs, ct_find("depression"))) {
-    cmistake(u, ord, 58, MSG_MAGIC);
-    return -1;
-  }
-
-  money = entertainmoney(u->region)/BAGPIPEFRACTION;
-  change_money(u, money);
-  rsetmoney(u->region, rmoney(u->region) - money);
-
-  create_curse(u, &u->region->attribs, ct_find("depression"),
-    20, BAGPIPEDURATION, 0, 0);
-
-  ADDMSG(&u->faction->msgs, msg_message("bagpipeoffear_faction",
-    "unit region command money", u, u->region, ord, money));
-
-  ADDMSG(&u->region->msgs, msg_message("bagpipeoffear_region",
-    "unit money", u, money));
-
-  return 0;
-}
-
-static resource_type rt_bagpipeoffear = {
-  { "bagpipeoffear", "bagpipeoffear_p" },
-  { "bagpipeoffear", "bagpipeoffear_p" },
-  RTF_ITEM,
-  &res_changeitem
-};
-
-item_type it_bagpipeoffear = {
-  &rt_bagpipeoffear,              /* resourcetype */
-  0, 1, 0,                        /* flags, weight, capacity */
-  NULL,                           /* construction */
-  &use_bagpipeoffear,
-  NULL,
-  NULL
-};
-
-static int
-use_instantartacademy(struct unit * u, const struct item_type * itype,
-                    int amount, struct order * ord)
-{
-  building *b;
-
-  if(u->region->land == NULL) {
-    cmistake(u, ord, 242, MSG_MAGIC);
-    return -1;
-  }
-
-  b = new_building(bt_find("artacademy"), u->region, u->faction->locale);
-  b->size = 100;
-  sprintf(buf, "%s", LOC(u->faction->locale, "artacademy"));
-  set_string(&b->name, buf);
-
-  ADDMSG(&u->region->msgs, msg_message(
-    "artacademy_create", "unit region", u, u->region));
-  
-  itype->rtype->uchange(u, itype->rtype, -1);
-
-  return 0;
-}
-
-static resource_type rt_instantartacademy = {
-  { "instantartacademy", "instantartacademy_p" },
-  { "instantartacademy", "instantartacademy_p" },
-  RTF_ITEM,
-  &res_changeitem
-};
-
-item_type it_instantartacademy = {
-  &rt_instantartacademy,              /* resourcetype */
-  0, 1, 0,                        /* flags, weight, capacity */
-  NULL,                           /* construction */
-  &use_instantartacademy,
-  NULL,
-  NULL
-};
-
-static int
-use_instantartsculpture(struct unit * u, const struct item_type * itype,
-                    int amount, struct order * ord)
-{
-  building *b;
-
-  if(u->region->land == NULL) {
-    cmistake(u, ord, 242, MSG_MAGIC);
-    return -1;
-  }
-
-  b = new_building(bt_find("artsculpture"), u->region, u->faction->locale);
-  b->size = 100;
-  sprintf(buf, "%s", LOC(u->faction->locale, "artsculpture"));
-  set_string(&b->name, buf);
-
-  ADDMSG(&u->region->msgs, msg_message("artsculpture_create", "unit region", 
-    u, u->region));
-
-  itype->rtype->uchange(u, itype->rtype, -1);
-
-  return 0;
-}
-
-static resource_type rt_instantartsculpture = {
-  { "instantartsculpture", "instantartsculpture_p" },
-  { "instantartsculpture", "instantartsculpture_p" },
-  RTF_ITEM,
-  &res_changeitem
-};
-
-item_type it_instantartsculpture = {
-  &rt_instantartsculpture,              /* resourcetype */
-  0, 1, 0,                          /* flags, weight, capacity */
-  NULL,                                 /* construction */
-  &use_instantartsculpture,
-  NULL,
-  NULL
-};
-
-
 void
 register_artrewards(void)
 {
@@ -331,12 +168,4 @@ register_artrewards(void)
   register_function((pf_generic)use_hornofdancing, "usehornofdancing");
   it_register(&it_trappedairelemental);
   register_function((pf_generic)use_trappedairelemental, "trappedairelemental");
-  it_register(&it_aurapotion50);
-  register_function((pf_generic)use_aurapotion50, "aurapotion50");
-  it_register(&it_bagpipeoffear);
-  register_function((pf_generic)use_bagpipeoffear, "bagpipeoffear");
-  it_register(&it_instantartacademy);
-  register_function((pf_generic)use_instantartacademy, "instantartacademy");
-  it_register(&it_instantartsculpture);
-  register_function((pf_generic)use_instantartsculpture, "instantartsculpture");
 }
