@@ -8,7 +8,7 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: nrmessage.c,v 1.2 2001/02/25 20:10:43 enno Exp $
+ $Id: nrmessage.c,v 1.3 2001/02/28 22:14:59 enno Exp $
 */
 
 #include <config.h>
@@ -26,6 +26,8 @@ typedef struct nrmessage_type {
 	const char * string;
 	const char * vars;
 	struct nrmessage_type * next;
+	int level;
+	const char * section;
 } nrmessage_type;
 
 static nrmessage_type * messagetypes;
@@ -47,7 +49,7 @@ nrt_find(const struct locale * lang, const struct message_type * mtype)
 }
 
 void 
-nrt_register(const struct message_type * mtype, const struct locale * lang, const char * string)
+nrt_register(const struct message_type * mtype, const struct locale * lang, const char * string, int level, const char * section)
 {
 	nrmessage_type * nrt = messagetypes;
 	while (nrt && (nrt->lang!=lang || nrt->mtype!=mtype)) {
@@ -61,6 +63,8 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
 		nrt->lang = lang;
 		nrt->mtype = mtype;
 		nrt->next = messagetypes;
+		nrt->level=level;
+		nrt->section = strdup(section);
 		messagetypes = nrt;
 		nrt->string = strdup(string);
 		for (i=0;i!=mtype->nparameters;++i) {
@@ -68,7 +72,7 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
 			c+= strlen(strcpy(c, mtype->pnames[i]));
 		}
 		nrt->vars = strdup(zNames);
-		/* TODO: really necessary to strdup them all? here? better to extend va_translate! */
+		/* TODO: really necessary to strdup them all? here? better to extend the caller? hash? */
 	}
 }
 
@@ -83,4 +87,18 @@ nr_render(const struct message * msg, const struct locale * lang, char * buffer)
 		return 0;
 	}
 	return -1;
+}
+
+int 
+nr_level(const struct message *msg)
+{
+	nrmessage_type * nrt = nrt_find(NULL, msg->type);
+	return nrt->level;
+}
+
+const char * 
+nr_section(const struct message *msg)
+{
+	nrmessage_type * nrt = nrt_find(NULL, msg->type);
+	return nrt->section;
 }

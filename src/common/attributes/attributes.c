@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: attributes.c,v 1.9 2001/02/28 18:25:23 corwin Exp $
+ * $Id: attributes.c,v 1.10 2001/02/28 22:14:56 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -26,7 +26,9 @@
 #include "iceberg.h"
 #include "hate.h"
 #include "overrideroads.h"
-#include "option.h"
+#ifdef AT_OPTION
+# include "option.h"
+#endif
 
 /* util includes */
 #include <attrib.h>
@@ -56,5 +58,7 @@ init_attributes(void)
 	init_hate();
 	/* at_reduceproduction */
 	init_reduceproduction();
+#ifdef AT_OPTION
 	init_option();
+#endif
 }

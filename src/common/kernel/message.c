@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: message.c,v 1.8 2001/02/24 12:50:48 enno Exp $
+ *	$Id: message.c,v 1.9 2001/02/28 22:14:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -308,7 +308,7 @@ parse_message(char * b, const struct locale * deflocale)
 
 	/* add the messagetype */
 	mtype = mt_register(mt_new(name, args));
-	nrt_register(mtype, lang, message);
+	nrt_register(mtype, lang, message, level, section);
 	crt_register(mtype, lang);
 }
 
@@ -323,6 +323,12 @@ read_messages(FILE * F, const struct locale * lang)
 }
 
 #else
+void
+addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
+{
+	caddmessage(r, f, gc_add(strdup(translate_regions(s, f))), mtype, level);
+}
+
 void
 caddmessage(region * r, faction * f, char *s, msg_t mtype, int level)
 {
@@ -368,12 +374,6 @@ caddmessage(region * r, faction * f, char *s, msg_t mtype, int level)
 		fprintf(stderr, "Warnung: Ungültige Msg-Klasse!");
 	}
 	if (m) m->level = level;
-}
-
-void
-addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
-{
-	caddmessage(r, f, gc_add(strdup(translate_regions(s, f))), mtype, level);
 }
 
 static messagetype * messagetypes;

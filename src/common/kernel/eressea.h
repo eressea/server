@@ -22,6 +22,16 @@
 #define ERESSEA_H
 
 #ifndef NEW_MESSAGES
+#define MSG_LEVELS /* msg-levels wieder aktiviert */
+#define OLD_MESSAGES
+#define message_type messagetype
+#define message_list message
+#define report_section message
+#else
+#undef MSG_LEVELS
+#endif
+
+#ifndef NEW_MESSAGES
 #define OLD_MESSAGES
 #define message_type messagetype
 #define message_list message
@@ -89,7 +99,6 @@ struct building_type;
 #define DAEMON_HUNGER /* Dämonen hungern, statt mit 10% in ihre sphäre zurückzukehren */
 #define NO_FOREST /* Es gibt keinen Terraintyp "Wald" mehr */
 #define NEW_RECEIPIES /* Vereinfachte, besser verteilte Kräuterzutaten für Tränke */
-#define MSG_LEVELS /* msg-levels wieder aktiviert */
 #define NEW_TRIGGER
 #undef OLD_TRIGGER /* leave active for compatibility until conversion is implemented */
 #define NEW_TAVERN

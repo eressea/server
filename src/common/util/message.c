@@ -8,7 +8,7 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: message.c,v 1.1 2001/02/24 12:50:50 enno Exp $
+ $Id: message.c,v 1.2 2001/02/28 22:14:58 enno Exp $
 */
 
 #include <config.h>
@@ -30,8 +30,8 @@ mt_new(const char * name, const char * args[])
 
 	mtype->name = strdup(name);
 	mtype->nparameters = nparameters;
-	mtype->pnames = (char**)malloc(sizeof(char*) * nparameters);
-	mtype->types = (char**)malloc(sizeof(char*) * nparameters);
+	mtype->pnames = (const char**)malloc(sizeof(char*) * nparameters);
+	mtype->types = (const char**)malloc(sizeof(char*) * nparameters);
 	for (i=0;args[i];++i) {
 		const char * x = args[i];
 		const char * spos = strchr(x, ':');

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.18 2001/02/28 18:25:24 corwin Exp $
+ *	$Id: report.c,v 1.19 2001/02/28 22:14:56 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -30,7 +30,9 @@
 
 /* attributes includes */
 #include <attributes/overrideroads.h>
-#include <attributes/option.h>
+#ifdef AT_OPTION
+# include <attributes/option.h>
+#endif
 
 /* gamecode includes */
 #include "creation.h"
@@ -738,13 +740,22 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean
 #endif
 		while (m) {
 			boolean debug = viewer->options & want(O_DEBUG);
-			if (m->type->section!=category) continue;
 #ifdef MSG_LEVELS
 			if (!debug && get_msglevel(viewer->warnings, viewer->msglevels, m->type) < m->level) continue;
 #endif
 			/* messagetype * mt = m->type; */
-			if (m->receiver==NULL || !viewer || viewer==m->receiver) {
+#ifdef NEW_MESSAGES
+			if (strcmp(nr_section(m->msg), category->name)==0)
+#else
+			if (m->receiver==NULL || !viewer || viewer==m->receiver) 
+#endif
+			{
+#ifdef OLD_MESSAGES
 				const char * s = render(m, viewer->locale);
+#else
+				char buf[4096], *s = buf;
+				nr_render(m->msg, viewer->locale, s);
+#endif
 				if (!k && categorized) {
 					const char * name;
 					char cat_identifier[24];
@@ -771,6 +782,7 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean
 					strcpy(buf+indent, s);
 					s = buf;
 				}
+#ifdef MSG_LEVELS
 				if (debug) {
 					int mylevel = get_msglevel(viewer->warnings, viewer->msglevels, m->type);
 					int level = msg_level(m);
@@ -778,6 +790,7 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean
 					sprintf(buf+strlen(s), " [%d:%d(%d)]", m->type->hashkey, level, mylevel);
 					s = buf;
 				}
+#endif
 				rpsnr(F, s, 2);
 			}
 			m=m->next;
@@ -1791,6 +1804,7 @@ report(FILE *F, faction * f)
 		if (f->options & (int) pow(2, op)) {
 			scat(" ");
 			scat(options[op]);
+#ifdef AT_OPTION
 			if(op == O_NEWS) {
 				attrib *a = a_find(f->attribs, &at_option_news);
 				if(!a) {
@@ -1810,6 +1824,7 @@ report(FILE *F, faction * f)
 					scat(")");
 				}
 			}
+#endif
 			flag++;
 		}
 	}
@@ -3136,7 +3151,7 @@ writenewssubscriptions(void)
 	sprintf(zText, "%s/news-subscriptions", basepath());
 	F = cfopen(zText, "w");
 	if (!F) return;
-
+#ifdef AT_OPTION
 	for(f=factions; f; f=f->next) {
 		attrib *a = a_find(f->attribs, &at_option_news);
 		if(!a) {
@@ -3145,6 +3160,7 @@ writenewssubscriptions(void)
 			fprintf(F, "%s:%d\n", f->email, a->data.i);
 		}
 	}
+#endif
 	fclose(F);
 }
 

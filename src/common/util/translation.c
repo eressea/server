@@ -175,7 +175,7 @@ find_function(const char * symbol)
 }
 
 static const char * parse(const char* in);
-static const char * sample = "\"enno and $bool($if($eq($i,0),\"noone else\",\"$i other people\"))\"";
+/* static const char * sample = "\"enno and $bool($if($eq($i,0),\"noone else\",\"$i other people\"))\""; */
 
 static const char *
 parse_symbol(const char* in)

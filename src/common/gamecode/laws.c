@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.31 2001/02/28 18:31:49 corwin Exp $
+ *	$Id: laws.c,v 1.32 2001/02/28 22:14:56 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -64,8 +64,10 @@
 #include <goodies.h>
 #include <rand.h>
 
+#ifdef AT_OPTION
 /* attributes includes */
 #include <attributes/option.h>
+#endif
 
 /* libc includes */
 #include <stdio.h>
@@ -1692,7 +1694,7 @@ set_passw(void)
 				case K_SEND:
 					s = getstrtoken();
 					o = findoption(s);
-
+#ifdef AT_OPTION
 					/* Sonderbehandlung Zeitungsoption */
 					if (o == O_NEWS) {
 						attrib *a = a_find(u->faction->attribs, &at_option_news);
@@ -1714,7 +1716,7 @@ set_passw(void)
 						}
 						break;
 					}
-
+#endif
 					if (o == -1) {
 						cmistake(u, S->s, 135, MSG_EVENT);
 					} else {

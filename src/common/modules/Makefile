@@ -10,7 +10,7 @@ include $(ERESSEA)/Makefile.include
 
 ## more definitions
 
-INCLUDES  += -I../util -I../kernel -I../gamecode -I..
+INCLUDES  += -I../gamecode -I../kernel -I../util -I..
 
 # library:
 $(BUILD_DIR)/$(LIBRARY):: $(BUILD_DIR) $(OBJECTS)
