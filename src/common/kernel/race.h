@@ -71,7 +71,7 @@ typedef struct race_type {
 	race_t familiars[MAXMAGIETYP];
 	const char *(*generate_name) (const struct unit *);
 	void (*age_function)(struct unit *u);
-	boolean (*move_allowed)(struct region *, struct region *);
+	boolean (*move_allowed)(const struct region *, const struct region *);
 	struct attrib * attribs;
 } racetype;
 

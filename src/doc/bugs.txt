@@ -911,3 +911,6 @@ o Leuchttürme schauen mindestens eine Region zu weit. (Größe 10
 + Fliehende Einheiten nehmen kein Silber mehr mit (Katja, 28.12.2000)
 
 + Magiebegabte Vertraute haben keine Zauber mehr
+
+- lmsreward funktioiniert nicht (curse wird nicht gesetzt)
+
