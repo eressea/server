@@ -1141,6 +1141,7 @@ randomevents(void)
 	/* Talente von Dämonen verschieben sich und Dämonen fressen Bauern */
 
 	for (r = regions; r; r = r->next) {
+		int peasantfood = rpeasants(r)*10;
 		int bauernblut = 0;
 		boolean bfind = false;
 		for (u = r->units; u; u = u->next) {
@@ -1168,7 +1169,7 @@ randomevents(void)
 					bfind = true;
 				}
 				if (r->planep && !fval(r->planep, PFL_NOFEED)) {
-					unfed = (u->number - bauernblut) - rpeasants(r);
+					unfed = (u->number - bauernblut) - peasantfood;
 					if (unfed > 0) {
 #ifdef DAEMON_HUNGER
 						hunger(u, unfed); /* nicht gefütterte dämonen hungern */
@@ -1189,10 +1190,9 @@ randomevents(void)
 					}
 				}
 				dc = max(u->number - bauernblut, 0);
-				dc = min(dc, rpeasants(r));
-				dc = rpeasants(r) - max(u->number - bauernblut, 0);
+				dc = min(dc, peasantfood);
+				dc = peasantfood - max(u->number - bauernblut, 0);
 				dc = max(0, dc);
-				rsetpeasants(r, dc);
 #if SKILLPOINTS
 				for (sk = 0; sk != MAXSKILLS; sk++) {
 					if (get_skill(u, sk) && rand() % 100 < 25) {
@@ -1219,6 +1219,7 @@ randomevents(void)
 #endif
 			}
 		}
+		rsetpeasants(r, peasantfood/10);
 	}
 
 	for (r = regions; r; r = r->next) {
