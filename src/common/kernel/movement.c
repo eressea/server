@@ -906,6 +906,8 @@ roadto(const region * r, const region * r2)
 
 	for (i = 0; i != MAXDIRECTIONS; i++)
 		if (rconnect(r, i) == r2) {
+			if (terrain[rterrain(r)].roadreq==0) return false;
+			if (terrain[rterrain(r2)].roadreq==0) return false;
 			if (rroad(r, i) < terrain[rterrain(r)].roadreq) return false;
 			if (rroad(r2, back[i]) < terrain[rterrain(r2)].roadreq) return false;
 			return true;
