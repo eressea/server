@@ -1388,15 +1388,13 @@ update_gms(void)
 	for (f=factions;f;f=f->next) {
 		attrib * permissions = a_find(f->attribs, &at_permissions);
 		if (permissions) {
+			const char * keys[] = { "gmgate", "gmmsgr", "gmmsgu", NULL };
+			int k;
 			item_t i;
-			if (!find_key((attrib*)permissions->data.v, atoi36("gmgate"))) {
-				a_add((attrib**)&permissions->data.v, make_key(atoi36("gmgate")));
-			}
-			if (!find_key((attrib*)permissions->data.v, atoi36("gmmsgr"))) {
-				a_add((attrib**)&permissions->data.v, make_key(atoi36("gmmsgr")));
-			}
-			if (!find_key((attrib*)permissions->data.v, atoi36("gmmsgu"))) {
-				a_add((attrib**)&permissions->data.v, make_key(atoi36("gmmsgu")));
+			for (k=0;keys[k];++k) {
+				if (!find_key((attrib*)permissions->data.v, atoi36(keys[k]))) {
+					a_add((attrib**)&permissions->data.v, make_key(atoi36(keys[k])));
+				}
 			}
 			for (i=I_GREATSWORD;i!=I_KEKS;++i) {
 				attrib * a = a_find(permissions, &at_gmcreate);
@@ -1405,6 +1403,44 @@ update_gms(void)
 			}
 		}
 	}
+}
+
+static int
+fix_gms(void)
+{
+	faction * f;
+	for (f=factions;f;f=f->next) {
+		attrib * permissions = a_find(f->attribs, &at_permissions);
+		if (permissions) {
+			const char * keys[] = { "gmgate", "gmmsgr", "gmmsgr", "gmmsgu", NULL };
+			int k;
+			item_t i;
+			for (k=0;keys[k];++k) {
+				attrib * a = find_key((attrib*)permissions->data.v, atoi36("gmgate"));
+				if (a) {
+					attrib ** ap = &a->nexttype;
+					while (*ap) {
+						attrib * an = *ap;
+						if (a->data.i==an->data.i) a_remove(ap, an);
+						else ap = &an->next;
+					}
+				}
+			}
+			for (i=I_GREATSWORD;i!=I_KEKS;++i) {
+				attrib * a = a_find(permissions, &at_gmcreate);
+				while (a && a->data.v!=(void*)olditemtype[i]) a=a->nexttype;
+				if (a) {
+					attrib ** ap = &a->nexttype;
+					while (*ap) {
+						attrib * an = *ap;
+						if (a->data.v==an->data.v) a_remove(ap, an);
+						else ap = &an->next;
+					}
+				}
+			}
+		}
+	}
+	return 0;
 }
 
 #if 1
@@ -2779,11 +2815,13 @@ heal_all(void)
 	return 0;
 }
 
-static void
+static int
 fix_astralplane(void)
 {
 	plane * astralplane = getplanebyname("Astralraum");
 	freset(astralplane, PFL_NOCOORDS);
+	set_ursprung(findfaction(MONSTER_FACTION), astralplane->id, 0, 0);
+	return 0;
 }
 
 void
@@ -2828,6 +2866,7 @@ korrektur(void)
 
 	do_once("grat", fix_ratfamiliar());
 	do_once("fdmd", fix_demand());
+	do_once("fgms", fix_gms());
 #if NEW_RESOURCEGROWTH
 	do_once("rndr", randomized_resources());
 #endif

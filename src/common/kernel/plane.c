@@ -97,8 +97,8 @@ getplaneid(const region *r)
 	return 0;
 }
 
-int
-ursprung_x(const faction *f, const plane *pl)
+static int
+ursprung_x(const faction *f, const plane *pl, const region * rdefault)
 {
 	ursprung *ur;
 	int id = 0;
@@ -113,11 +113,13 @@ ursprung_x(const faction *f, const plane *pl)
 		if(ur->id == id)
 			return ur->x;
 	}
-	return 0;
+	if (!rdefault) return 0;
+	set_ursprung((faction*)f, pl->id, rdefault->x - plane_center_x(pl), rdefault->y - plane_center_y(pl));
+	return rdefault->x - plane_center_x(pl);
 }
 
-int
-ursprung_y(const faction *f, const plane *pl)
+static int
+ursprung_y(const faction *f, const plane *pl, const region * rdefault)
 {
 	ursprung *ur;
 	int id = 0;
@@ -132,7 +134,9 @@ ursprung_y(const faction *f, const plane *pl)
 		if(ur->id == id)
 			return ur->y;
 	}
-	return 0;
+	if (!rdefault) return 0;
+	set_ursprung((faction*)f, id, rdefault->x - plane_center_x(pl), rdefault->y - plane_center_y(pl));
+	return rdefault->y - plane_center_y(pl);
 }
 
 int
@@ -159,7 +163,7 @@ region_x(const region *r, const faction *f)
 	plane *pl;
 
 	pl = getplane(r);
-	return r->x - ursprung_x(f, pl) - plane_center_x(pl);
+	return r->x - ursprung_x(f, pl, r) - plane_center_x(pl);
 }
 
 int
@@ -168,7 +172,7 @@ region_y(const region *r, const faction *f)
 	plane *pl;
 
 	pl = getplane(r);
-	return r->y - ursprung_y(f, pl) - plane_center_y(pl);
+	return r->y - plane_center_y(pl) - ursprung_y(f, pl, r);
 }
 
 void
@@ -220,9 +224,9 @@ rel_to_abs(const struct plane *pl, const struct faction * f, int rel, unsigned c
 	assert(index == 0 || index == 1);
 
 	if(index == 0)
-		return (rel + ursprung_x(f,pl) + plane_center_x(pl));
+		return (rel + ursprung_x(f, pl, NULL) + plane_center_x(pl));
 
-	return (rel + ursprung_y(f,pl) + plane_center_y(pl));
+	return (rel + ursprung_y(f, pl, NULL) + plane_center_y(pl));
 }
 
 

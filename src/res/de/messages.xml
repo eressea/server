@@ -3,7 +3,7 @@
 		<type>
 			<arg name="turns" type="int"></arg>
 		</type>
-		<text locae="de">"Deine Partei ist noch $int($turns) Wochen immun gegen Angriffe."</text>
+		<text locale="de">"Deine Partei ist noch $int($turns) Wochen immun gegen Angriffe."</text>
 	</message>
 
 	<message name="giverestriction" section="errors">
@@ -7280,6 +7280,15 @@
 		</type>
 		<text locale="de">"Ein Hauch des Lebens liegt über der Welt und alle Wesen fühlen sich frisch und erholt."</text>
 		<text locale="en">"Life itself touches the world and all beings are healed."</text>
+	</message>
+
+	<message name="showitem" section="events">
+		<type>
+			<arg name="item" type="item"></arg>
+			<arg name="description" type="string"></arg>
+		</type>
+		<text locale="de">"$resource($item,1): $description"</text>
+		<text locale="en">"$resource($item,1): $description"</text>
 	</message>
 
 </messages>

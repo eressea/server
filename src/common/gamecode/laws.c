@@ -2093,8 +2093,7 @@ display_item(faction *f, unit *u, const item_type * itype)
 		}
 		if (!fp) return false;
 
-		sprintf(buf, "%s: ", LOC(f->locale, name));
-
+		buf[0]='\0';
 		while (fgets(t, NAMESIZE, fp) != NULL) {
 			if (t[strlen(t) - 1] == '\n') {
 				t[strlen(t) - 1] = 0;
@@ -2104,7 +2103,7 @@ display_item(faction *f, unit *u, const item_type * itype)
 		fclose(fp);
 		name = buf;
 	}
-	addmessage(0, f, name, MSG_EVENT, ML_IMPORTANT);
+	ADDMSG(&f->msgs, msg_message("displayitem", "item description", itype, name));
 
 	return true;
 }

@@ -250,7 +250,7 @@ init_oldweapons(void)
 		item_type * itype = olditemtype[weapontable[w].item];
 		int minskill = 1, wflags = WTF_NONE;
 		weapon_mod * modifiers = NULL;
-		int (*attack)(const troop *, int * deaths) = NULL;
+		int (*attack)(const troop *, int * deaths, int row) = NULL;
 
 		switch (w) {
 		case WP_RUNESWORD:
