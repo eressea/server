@@ -1180,6 +1180,9 @@ extern int AllianceRestricted(void); /* flags restricted to allied factions */
 extern struct order * default_order(const struct locale * lang);
 extern int entertainmoney(const struct region * r);
 
+extern int freadstr(FILE * F, char * str, size_t size);
+extern int fwritestr(FILE * F, const char * str);
+
 #ifdef __cplusplus
 }
 #endif

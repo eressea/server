@@ -341,7 +341,7 @@ ri36(FILE * F)
 }
 
 #define MAXLINE 4096*16
-char *
+static char *
 getbuf(FILE * F)
 {
 	char lbuf[MAXLINE];
@@ -364,28 +364,29 @@ getbuf(FILE * F)
 
 		end = bp + strlen((const char *)bp);
 		if (*(end-1)=='\n') *(--end) = 0;
-		else {
-			while (bp && !lbuf[MAXLINE-1] && lbuf[MAXLINE-2]!='\n') {
-				/* wenn die zeile länger als erlaubt war,
-				 * wird der rest weggeworfen: */
-				bp = (unsigned char *)fgets(buf, 1024, F);
-				comment = false;
-			}
-			bp = (unsigned char *)lbuf;
-		}
+    else {
+      while (bp && !lbuf[MAXLINE-1] && lbuf[MAXLINE-2]!='\n') {
+        /* wenn die zeile länger als erlaubt war,
+        * wird der rest weggeworfen: */
+        bp = (unsigned char *)fgets(buf, 1024, F);
+        comment = false;
+      }
+      bp = (unsigned char *)lbuf;
+    }
 		cont = false;
 		while (cp!=buf+MAXLINE && (char*)bp!=lbuf+MAXLINE && *bp) {
 			if (isspace(*bp)) {
-				if (eatwhite)
-				{
+				if (eatwhite) {
 					do { ++bp; } while ((char*)bp!=lbuf+MAXLINE && isspace(*bp));
 					if (!quote && !start && !comment) *(cp++)=' ';
 				}
 				else {
-					do {
-						if (!comment) *(cp++)=SPACE_REPLACEMENT;
+          if (!comment) *(cp++)=*(bp++);
+					while (cp!=buf+MAXLINE && (char*)bp!=lbuf+MAXLINE && isspace(*bp)) {
+						if (!comment) *(cp++)=*bp;
 						++bp;
-					} while (cp!=buf+MAXLINE && (char*)bp!=lbuf+MAXLINE && isspace(*bp));
+					}
+          if (*bp==0) --cp;
 				}
 			}
 			else if (iscntrl(*bp)) {
@@ -400,6 +401,7 @@ getbuf(FILE * F)
 				else {
 					if (*bp=='"') {
 						quote = (boolean)!quote;
+            *cp++ = *bp;
 						eatwhite=true;
 					}
 					else if (*bp=='\\') cont=true;
@@ -1521,9 +1523,7 @@ readfaction(FILE * F)
 
   rds(F, &f->name);
 
-#ifndef AMIGA
   if (!quiet) printf("   - Lese Partei %s (%s)\n", f->name, factionid(f));
-#endif
 
   rds(F, &f->banner);
   rds(F, &f->email);
@@ -1941,9 +1941,6 @@ readgame(const char * filename, int backup)
   }
 #endif
   fclose(F);
-#ifdef AMIGA
-  fputs("Ok.", stderr);
-#endif
 
   /* Unaufgeloeste Zeiger initialisieren */
   printf("\n - Referenzen initialisieren...\n");
@@ -1964,23 +1961,20 @@ readgame(const char * filename, int backup)
   }
   resolve_IDs();
 
-#if 0
-  /* speziell für Runde 199->200 */
-  printf("Actions korrigieren...\n");
-  iuw_fix_rest();
-#endif
-
   for (r=regions;r;r=r->next) {
     building * b;
     for (b=r->buildings;b;b=b->next) update_lighthouse(b);
   }
   printf(" - Regionen initialisieren & verbinden...\n");
-  for (r = regions; r; r = r->next) {
-    for (u = r->units; u; u = u->next) {
-      u->faction->alive = 1;
+  for (f = factions; f; f = f->next) {
+    for (u = f->units; u; u = u->nextF) {
+      if (u->number>0) {
+        f->alive = 1;
+        break;
+      }
     }
   }
-  if(findfaction(0)) {
+  if (findfaction(0)) {
     findfaction(0)->alive = 1;
   }
   if (loadplane || maxregions>=0) {

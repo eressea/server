@@ -83,13 +83,8 @@ extern char *datadir;
 extern struct unit *clipunit;
 extern struct region *clipregion;
 extern struct ship *clipship;
-#ifdef AMIGA
-#define SX (stdscr->_maxx)
-#define SY (stdscr->_maxy)
-#else
 #define SX (stdscr->_maxx-1)
 #define SY (stdscr->_maxy-1)
-#endif
 
 #define NL(S) adddbllist(&S," ")
 

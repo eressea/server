@@ -3876,7 +3876,7 @@ do_battle(void)
     /* Auswirkungen berechnen: */
     aftermath(b);
     /*
-    #if MALLOCDBG
+    #ifdef MALLOCDBG
     assert(_CrtCheckMemory());
     #endif
     */

@@ -6148,8 +6148,8 @@ sp_fetchastral(castorder *co)
   double power = co->force;
   int remaining_cap = (int)((power-3) * 1500);
   region_list * rtl = NULL;
-  region * rt = co->rt;
-  region * ro = NULL;
+  region * rt = co->rt; /* region to which we are fetching */
+  region * ro = NULL; /* region in which the target is */
 
   if (rplane(rt)!=get_normalplane()) {
     ADDMSG(&mage->faction->msgs, msg_message("error190", 
@@ -6174,9 +6174,12 @@ sp_fetchastral(castorder *co)
       /* this can happen several times if the units are from different astral
        * regions. Only possible on the intersections of schemes */
       region_list * rfind;
-      rt = u->region;
+      if (getplane(u->region) != get_astralplane()) {
+        cmistake(mage, co->order, 193, MSG_MAGIC);
+        continue;
+      }
       if (rtl!=NULL) free_regionlist(rtl);
-      rtl = astralregions(rt, NULL);
+      rtl = astralregions(u->region, NULL);
       for (rfind=rtl;rfind!=NULL;rfind=rfind->next) {
         if (rfind->data==mage->region) break;
       }
@@ -6186,7 +6189,7 @@ sp_fetchastral(castorder *co)
           "command region unit target", co->order, mage->region, mage, u));
         continue;
       }
-	  ro = u->region;
+      ro = u->region;
     }
 
     if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {

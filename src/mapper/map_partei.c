@@ -439,10 +439,8 @@ NeuePartei(region * r)
 
 	if(late) give_latestart_bonus(r, u, late);
 
-#ifndef AMIGA
 	sprintf(buf, "newuser %s", email);
 	system(buf);
-#endif
 }
 
 static void

@@ -86,14 +86,6 @@ hashstring(const char* s)
 	return key % 0x7FFFFFFF;
 }
 
-char *
-space_replace(char * str, char replace)
-{
-	char * c = str;
-	while (*c) {if (isspace(*(unsigned char*)c)) *c = replace; c++;}
-	return str;
-}
-
 const char *
 escape_string(const char * str, char * buffer, unsigned int len)
 {

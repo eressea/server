@@ -659,10 +659,10 @@ drifting_ships(region * r)
         fset(sh, SF_DRIFTED);
 
         if (rnext->terrain != T_OCEAN && !flying_ship(sh)) {
-		  sh->coast = reldirection(rnext, r);
-		} else {
-		  sh->coast = NODIRECTION;
-		}
+          sh->coast = reldirection(rnext, r);
+        } else {
+          sh->coast = NODIRECTION;
+        }
         damage_ship(sh, 0.02);
 
         if (sh->damage>=sh->size * DAMAGE_SCALE) {
@@ -2251,7 +2251,7 @@ movement(void)
               if (u->ship && fval(u, UFL_OWNER)) {
                 init_tokens(u->thisorder);
                 skip_token();
-                if (move(u, true)!=0) repeat = true;
+                if (move(u, false)!=0) repeat = true;
               }
             } else {
               if (u->ship==NULL || !fval(u, UFL_OWNER)) {

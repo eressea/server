@@ -55,15 +55,11 @@ extern "C" {
 #endif
 
 #if defined(_DEBUG) && defined(_MSC_VER)
-# ifndef MALLOCDBG
-#  define MALLOCDBG 1
+/* define MALLOCDBG in project settings, not here! */
+# ifdef MALLOCDBG
+#  include <crtdbg.h>
+#  define _CRTDBG_MAP_ALLOC
 # endif
-# include <crtdbg.h>
-# define _CRTDBG_MAP_ALLOC
-#endif
-
-#ifndef MALLOCDBG
-# define MALLOCDBG 0
 #endif
 
 /****                    ****

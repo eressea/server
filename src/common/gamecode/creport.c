@@ -378,8 +378,22 @@ cr_order(const void * v, char * buffer, const void * userdata)
 {
   order * ord = (order*)v;
   if (ord!=NULL) {
+    char * wp = buffer;
     char * cmd = getcommand(ord);
-    sprintf(buffer, "\"%s\"", cmd);
+    const char * rp = cmd;
+
+    *wp++ = '\"';
+    while (*rp) {
+      switch (*rp) {
+        case '\"':
+        case '\\':
+          *wp++ = '\\';
+        default:
+          *wp++ = *rp++;
+      }
+    }
+    *wp++ = '\"';
+    *wp++ = 0;
   }
   else strcpy(buffer, "\"\"");
   return 0;
