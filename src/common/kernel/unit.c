@@ -737,7 +737,7 @@ transfermen(unit * u, unit * u2, int n)
 		a = a_find(u->attribs, &at_effect);
 		while (a) {
 			effect_data * olde = (effect_data*)a->data.v;
-			change_effect(u2, olde->type, olde->value);
+			if (olde->value) change_effect(u2, olde->type, olde->value);
 			a = a->nexttype;
 		}
 		if (fval(u, FL_LONGACTION)) fset(u2, FL_LONGACTION);
