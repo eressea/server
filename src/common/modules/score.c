@@ -277,13 +277,14 @@ score(void)
 
 		sprintf(buf, "%s/score.alliances", basepath());
 		scoreFP = fopen(buf, "w");
-		fprintf(scoreFP, "# alliance:persons:score\n");
+		fprintf(scoreFP, "# alliance:factions:persons:score\n");
 
 		for (a = alliances; a; a = a->next) {
-			int alliance_score = 0, alliance_number = 0;
+			int alliance_score = 0, alliance_number = 0, alliance_faction = 0;
 
 			for (f = factions; f; f = f->next) {
 				if(f->alliance && f->alliance->id == a->id) {
+					alliance_faction++;
 					alliance_score  += f->score;
 					alliance_number += f->number;
 				}
