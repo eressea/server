@@ -90,8 +90,8 @@ def genpasswd():
 	newpasswd = newpasswd + choice(chars)
     return newpasswd
 
-Display("Derzeit ist wegen einer technischen Umstellung keine Anmeldung möglich")
-sys.exit(0)
+#Display("Derzeit ist wegen einer technischen Umstellung keine Anmeldung möglich")
+#sys.exit(0)
 
 Form = cgi.FieldStorage()
 
