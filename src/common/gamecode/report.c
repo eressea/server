@@ -2790,7 +2790,7 @@ reports(void)
 					fprintf(BAT, "zip -j -9 %d-%s.zip ../res/%s/%s/welcome.txt\n", turn, factionid(f), global.welcomepath, locale_name(f->locale));
 				} else {
 					fprintf(BAT, "ls %d-%s.nr %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
-						turn, factionid(f), turn, factionid(f), factionid(f));
+						turn, factionid(f), turn, factionid(f), turn, factionid(f));
 				}
 
 				fprintf(shfp, "eresseamail.zipped $addr \"%s %s\" \"%s-%d.zip\" "
@@ -2803,7 +2803,7 @@ reports(void)
 						" \\\n\t\"text/plain\" \"Willkommen\" ../res/%s/%s/welcome.txt", global.welcomepath, locale_name(f->locale));
 				}
 
-				fprintf(BAT, "bzip2 -9v `ls 5D-%s.nr %d-%s.cr`\n",
+				fprintf(BAT, "bzip2 -9v `ls %d-%s.nr %d-%s.cr`\n",
 					turn, factionid(f), turn, factionid(f));
 
 				fprintf(shfp, "eresseamail.bzip2 $addr \"%s %s\"", global.gamename, gamedate_short());
@@ -2834,7 +2834,7 @@ reports(void)
 
 				if (!nonr && f->options & wants_report)
 					fprintf(shfp,
-						" \\\n\t\"text/plain\" \"Report\" turn, %s.nr",
+						" \\\n\t\"text/plain\" \"Report\" turn, %d-%s.nr",
 						turn, factionid(f));
 
 				if (!nocr && (f->options & wants_computer_report || f->age<3))
