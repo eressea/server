@@ -55,7 +55,6 @@ read_triggers(FILE * F, trigger ** tp)
 				tp = &(*tp)->next;
 				break;
 			case AT_READ_FAIL:
-				log_warning(("reading trigger for %s failed\n", ttype->name));
 				t_free(*tp);
 				*tp = NULL;
 				break;
