@@ -274,6 +274,11 @@ show_newspells(void)
 	 * terminieren */
 
 	spellid_t newspellids[] = {
+		SPL_WDWPYRAMID_TRAUM,
+		SPL_WDWPYRAMID_ASTRAL,
+		SPL_WDWPYRAMID_DRUIDE,
+		SPL_WDWPYRAMID_BARDE,
+		SPL_WDWPYRAMID_CHAOS,
 		SPL_NOSPELL
 		};
 

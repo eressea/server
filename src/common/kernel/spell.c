@@ -88,6 +88,12 @@ attrib_type at_unitdissolve = {
 	"unitdissolve", NULL, NULL, NULL, a_writedefault, a_readdefault
 };
 
+#ifdef WDW_PYRAMIDSPELL
+attrib_type at_wdwpyramid = {
+	"wdwpyramid", NULL, NULL, NULL, a_writedefault, a_readdefault
+};
+#endif
+
 /* ----------------------------------------------------------------------- */
 
 #ifdef TODO
@@ -7218,6 +7224,43 @@ sp_becomewyrm(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
+/* Name:       WDW-Pyramidenfindezauber
+ * Stufe:      unterschiedlich
+ * Gebiet:     alle
+ * Wirkung:
+ * 	gibt an, ob sich der Magier in einer Pyramidenbauregion
+ * 	befindet.
+ *
+ * Flags:
+ */
+static int
+sp_wdwpyramid(castorder *co)
+{
+	region  *r         = co->rt;
+	unit    *mage      = (unit *)co->magician;
+	int     cast_level = co->level;
+
+	if(!(landregion(rterrain(r)))){
+		cmistake(mage, strdup(co->order), 186, MSG_MAGIC);
+		return 0;
+	}
+
+	if(a_find(r->attribs, &at_wdwpyramid) != NULL) {
+		add_message(&mage->faction->msgs, new_message(mage->faction,
+			"wdw_pyramidspell_found%u:mage%r:region%s:command",
+			mage, r, strdup(co->order)));
+
+	} else {
+		add_message(&mage->faction->msgs, new_message(mage->faction,
+			"wdw_pyramidspell_notfound%u:mage%r:region%s:command",
+			mage, r, strdup(co->order)));
+	}
+
+	return cast_level;
+}
+
+
+/* ------------------------------------------------------------- */
 /* Name:       Alltagszauber, hat je nach Gebiet anderen Namen
  * Stufe:      1
  * Gebiet:     alle
@@ -10389,6 +10432,83 @@ spell spelldaten[] =
 		(spell_f)sp_immolation, patzer
 	},
 
+#ifdef WDW_PYRAMIDSPELL
+	{SPL_WDWPYRAMID_TRAUM, "Traum von den Göttern",
+	 "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
+	 "Region für den Pyramidenbau geeignet ist.",
+		NULL,
+		NULL,
+		M_TRAUM, (0), 5, 4,
+	 {
+		{R_AURA, 2, SPC_FIX},
+		{R_PLAIN_3, 1, SPC_FIX},
+		{0, 0, 0},
+		{0, 0, 0},
+		{0, 0, 0}},
+	 (spell_f)sp_wdwpyramid, patzer
+	},
+	
+	{SPL_WDWPYRAMID_ASTRAL, "Göttliches Netz",
+	 "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
+	 "Region für den Pyramidenbau geeignet ist.",
+		NULL,
+		NULL,
+		M_ASTRAL, (0), 5, 3,
+	 {
+		{R_AURA, 4, SPC_FIX},
+		{R_WISE, 1, SPC_FIX},
+		{0, 0, 0},
+		{0, 0, 0},
+		{0, 0, 0}},
+	 (spell_f)sp_wdwpyramid, patzer
+	},
+	
+	{SPL_WDWPYRAMID_DRUIDE, "Kraft der Natur",
+	 "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
+	 "Region für den Pyramidenbau geeignet ist.",
+		NULL,
+		NULL,
+		M_DRUIDE, (0), 5, 5,
+	 {
+		{R_AURA, 3, SPC_FIX},
+		{R_MALLORN, 5, SPC_FIX},
+		{0, 0, 0},
+		{0, 0, 0},
+		{0, 0, 0}},
+	 (spell_f)sp_wdwpyramid, patzer
+	},
+	
+	{SPL_WDWPYRAMID_BARDE, "Gesang der Götter",
+	 "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
+	 "Region für den Pyramidenbau geeignet ist.",
+		NULL,
+		NULL,
+		M_BARDE, (0), 5, 4,
+	 {
+		{R_AURA, 2, SPC_FIX},
+		{R_HIGHLAND_3, 1, SPC_FIX},
+		{0, 0, 0},
+		{0, 0, 0},
+		{0, 0, 0}},
+	 (spell_f)sp_wdwpyramid, patzer
+	},
+	
+	{SPL_WDWPYRAMID_CHAOS, "Göttliche Macht",
+	 "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
+	 "Region für den Pyramidenbau geeignet ist.",
+		NULL,
+		NULL,
+		M_CHAOS, (0), 5, 5,
+	 {
+		{R_AURA, 1, SPC_FIX},
+		{R_PERMAURA, 1, SPC_FIX},
+		{0, 0, 0},
+		{0, 0, 0},
+		{0, 0, 0}},
+	 (spell_f)sp_wdwpyramid, patzer
+	},
+#endif
+
 /* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein*/
 
 	{SPL_NOSPELL, "Keiner", NULL, NULL, NULL, 0, 0, 0, 0,
@@ -10396,3 +10516,4 @@ spell spelldaten[] =
 	 NULL, NULL
 	}
 };
+

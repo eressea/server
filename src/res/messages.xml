@@ -5618,4 +5618,24 @@
 	<text locale="fr">"$int($votes) members of $alliance($alliance) tried to kick you out of the alliance."</text>
 	<text locale="en">"$int($votes) members of $alliance($alliance) tried to kick you out of the alliance."</text>
 </message>
+<message name="wdw_pyramidspell_found" section="events">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
+	<text locale="de">"$unit($unit) in $region($region): '$command' - In dieser Regione können Pyramiden gebaut werden."</text>
+	<text locale="en">"$unit($unit) in $region($region): '$command' - Pyramids may be build in this region."</text>
+	<text locale="fr">"$unit($unit) in $region($region): '$command' - Pyramids may be build in this region."</text>
+</message>
+<message name="wdw_pyramidspell_notfound" section="events">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
+	<text locale="de">"$unit($unit) in $region($region): '$command' - In dieser Regione können keine Pyramiden gebaut werden."</text>
+	<text locale="en">"$unit($unit) in $region($region): '$command' - No pyramids may be build in this region."</text>
+	<text locale="fr">"$unit($unit) in $region($region): '$command' - No pyramids may be build in this region."</text>
+</message>
 </messages>

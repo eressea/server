@@ -53,6 +53,7 @@
 #define AUTOALLIANCE (HELP_FIGHT)
 
 #define WDW_PHOENIX
+#define WDW_PYRAMIDSPELL
 #define NEW_STARTEQUIPMENT
 
 #define MAILITPATH	"/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"
