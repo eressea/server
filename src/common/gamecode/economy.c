@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: economy.c,v 1.7 2001/02/18 10:06:08 enno Exp $
+ *	$Id: economy.c,v 1.8 2001/02/25 19:31:38 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -827,7 +827,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 
 	/* if ((race[u->race].ec_flags & NOGIVE) || fval(u,FL_LOCKED)) {*/
 	if (race[u->race].ec_flags & NOGIVE) {
-		sprintf(buf, "%s geben nichts weg.", race[u->race].name[1]);
+		sprintf(buf, "%s geben nichts weg", race[u->race].name[1]);
 		mistake(u, S->s, buf, MSG_COMMERCE);
 		return;
 	}
@@ -840,7 +840,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 	/* Übergabe aller Kräuter */
 	if (findparam(s) == P_HERBS) {
 		if (!(race[u->race].ec_flags & GIVEITEM)) {
-			sprintf(buf, "%s geben nichts weg.", race[u->race].name[1]);
+			sprintf(buf, "%s geben nichts weg", race[u->race].name[1]);
 			mistake(u, S->s, buf, MSG_COMMERCE);
 			return;
 		}

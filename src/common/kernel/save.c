@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.22 2001/02/24 12:50:48 enno Exp $
+ *	$Id: save.c,v 1.23 2001/02/25 19:31:39 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -99,8 +99,6 @@ rns(FILE * f, char *c, size_t size)
 }
 
 extern unsigned int __at_hashkey(const char* s);
-
-/* ------------------------------------------------------------- */
 
 FILE *
 cfopen(const char *filename, const char *mode)
@@ -208,26 +206,20 @@ rsf(FILE * F, char *s, size_t len)
 static void
 rs(FILE * F, char *s)
 {
-	while (nextc != '"') {
-		if (nextc == EOF) {
-			puts("Die Datei bricht vorzeitig ab.");
-			abort();
-		}
+	boolean apos = false;
+	while (isspace(nextc)) rc(F);
+	if (nextc=='"') {
+		apos=true;
 		rc(F);
 	}
-
-	rc(F);
-
-	while (nextc != '"') {
-		if (nextc == EOF) {
-			puts("Die Datei bricht vorzeitig ab.");
-			abort();
-		}
+	for (;;) {
+		if (nextc=='"') {
+			rc(F);
+			break;
+		} else if (!apos && isspace(nextc)) break;
 		*s++ = (char)nextc;
 		rc(F);
 	}
-
-	rc(F);
 	*s = 0;
 }
 

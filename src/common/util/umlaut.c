@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: umlaut.c,v 1.7 2001/02/17 15:52:47 enno Exp $
+ *	$Id: umlaut.c,v 1.8 2001/02/25 19:31:39 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -63,7 +63,7 @@ addtoken(tnode * root, const char* str, void * id)
 		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c);
 		index = ((unsigned char)c) % 32;
 		next = root->next[index];
-		if (!root->flags) root->id = id;
+		if (!(root->flags & LEAF)) root->id = id;
 		while (next && next->c != c) next = next->nexthash;
 		if (!next) {
 			tref * ref;
@@ -121,10 +121,32 @@ findtoken(tnode * tk, const char * str, void **result)
 		tk = ref->node;
 	}
 	if (tk) {
-		if (tk->flags & LEAF || !(tk->flags & SHARED)) {
-			*result = tk->id;
-			return E_TOK_SUCCESS;
-		}
+		*result = tk->id;
+		return E_TOK_SUCCESS;
 	}
 	return E_TOK_NOMATCH;
 }
+
+#ifdef TEST_UMLAUT
+#include <stdio.h>
+tnode root;
+
+int
+main(int argc, char ** argv)
+{
+	char buf[1024];
+	int i = 0;
+	for (;;) {
+		int k;
+		fgets(buf, sizeof(buf), stdin);
+		buf[strlen(buf)-1]=0;
+		if (findtoken(&root, buf, (void**)&k)==0) {
+			printf("%s returned %d\n", buf, k);
+		} else {
+			addtoken(&root, buf, (void*)++i);
+			printf("added %s=%d\n", buf, i);
+		}
+	}
+	return 0;
+}
+#endif

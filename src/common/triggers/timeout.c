@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: timeout.c,v 1.3 2001/02/20 22:54:05 enno Exp $
+ *	$Id: timeout.c,v 1.4 2001/02/25 19:31:39 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -55,9 +55,10 @@ timeout_handle(trigger * t, void * data)
 	timeout_data * td = (timeout_data*)t->data.v;
 	if (--td->timer==0) {
 		handle_triggers(&td->triggers, NULL);
+		return -1;
 	}
 	unused(data);
-	return td->timer;
+	return 0;
 }
 
 static void

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: creport.c,v 1.10 2001/02/24 12:50:47 enno Exp $
+ *	$Id: creport.c,v 1.11 2001/02/25 19:31:38 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -53,6 +53,7 @@
 #include <skill.h>
 #include <teleport.h>
 #include <unit.h>
+#include <save.h>
 
 /* util includes */
 #include <goodies.h>
@@ -495,13 +496,7 @@ cr_output_unit(FILE * F, region * r,
 		fprintf(F, "COMMANDS\n");
 		if(u->lastorder[0]) fprintf(F, "\"%s\"\n", u->lastorder);
 		for (S = u->orders; S; S = S->next) {
-			switch (igetkeyword(S->s)) {
-			case K_LIEFERE:
-			case K_DEFAULT:
-			case K_RESERVE:
-			case K_KOMMENTAR:
-			case K_BUY:
-			case K_SELL:
+			if(is_persistent(S->s)) {
 				fprintf(F, "\"%s\"\n", S->s);
 			}
 		}

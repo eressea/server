@@ -483,6 +483,7 @@ enum {
 	P_BEFORE,
 	P_NUMBER,
 	P_ITEMS,
+	P_POTIONS,
 	MAXPARAMS,
 	NOPARAM = (param_t) - 1
 };

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.28 2001/02/20 22:54:05 enno Exp $
+ *	$Id: korrektur.c,v 1.29 2001/02/25 19:31:39 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -53,6 +53,7 @@
 
 /* util includes */
 #include <attrib.h>
+#include <event.h>
 #include <base36.h>
 #include <cvector.h>
 #include <resolve.h>
@@ -1927,7 +1928,8 @@ undo_deadpeasants(void)
 }
 #endif
 
-void
+#if 0
+static void
 fix_targetregion_resolve(void)
 {
 	region *r;
@@ -1941,18 +1943,71 @@ fix_targetregion_resolve(void)
 		}
 	}
 }
+#endif
 
-void
-fix_baumringel(void)
+static void
+fix_herbs(void)
 {
+	const char * plain_herbs[] = {"Flachwurz", "Würziger Wagemut", "Eulenauge", "Grüner Spinnerich", "Blauer Baumringel", "Elfenlieb"};
+	const herb_type * htypes[6];
+	int herbs[6];
+	int hneed[6];
 	region *r;
-  const item_type *itype = finditemtype("Blauer Baumringel", NULL);
-  const herb_type *htype = resource2herb(itype->rtype);
+	int i, hsum = 0, left = 0;
 
-	for(r=regions; r; r=r->next) {
-		if(rterrain(r) == T_PLAIN && rand()%6 == 5) {
-     	rsetherbtype(r, htype);
+	for (i=0;i!=6;++i) {
+		htypes[i] = resource2herb(finditemtype(plain_herbs[i], NULL)->rtype);
+		herbs[i] = 0;
+	}
+
+	for (r=regions; r; r=r->next) if (rterrain(r) == T_PLAIN) {
+		const herb_type *htype = rherbtype(r);
+		assert(htype);
+		for (i=0;i!=6;++i) if (htypes[i]==htype) break;
+		assert(i!=6);
+		herbs[i]++;
+		hsum++;
+	}
+
+	for (i=0;i!=6;++i) {
+		int hwant = hsum / (6-i);
+		hneed[i] = hwant - herbs[i];
+		if (hneed[i]>0) left += hneed[i];
+		hsum -= hwant;
+	}
+
+	for (r=regions; r; r=r->next) if (rterrain(r) == T_PLAIN) {
+		const herb_type *htype = rherbtype(r);
+		assert(htype);
+		for (i=0;i!=6;++i) if (htypes[i]==htype) break;
+		assert(i!=6);
+		if (hneed[i]<0) {
+			int p;
+			int k = rand() % left;
+			for (p=0;p!=6;++p) if (hneed[p]>0) {
+				k-=hneed[p];
+				if (k<0) break;
+			}
+			assert(p!=6);
+			hneed[p]--;
+			hneed[i]++;
+			left--;
+			rsetherbtype(r, htypes[p]);
 		}
+		hsum++;
+	}
+
+	for (i=0;i!=6;++i) herbs[i] = 0;
+
+	for (r=regions; r; r=r->next) if (rterrain(r) == T_PLAIN) {
+		const herb_type *htype = rherbtype(r);
+		assert(htype);
+		for (i=0;i!=6;++i) if (htypes[i]==htype) break;
+		assert(i!=6);
+		herbs[i]++;
+	}
+	for (i=0;i!=6;++i) {
+		fprintf(stderr, "%s : %d\n", locale_string(NULL, resourcename(htypes[i]->itype->rtype, 0)), herbs[i]);
 	}
 }
 
@@ -1972,6 +2027,108 @@ set_atgm(faction * f)
 }
 #endif
 
+#include <event.h>
+#include <triggers/timeout.h>
+#include <triggers/changerace.h>
+#include <triggers/changefaction.h>
+#include <triggers/createcurse.h>
+#include <triggers/createunit.h>
+#include <triggers/killunit.h>
+#include <triggers/giveitem.h>
+
+typedef struct handler_info {
+	char * event;
+	trigger * triggers;
+} handler_info;
+
+
+typedef struct timeout_data {
+	trigger * triggers;
+	int timer;
+	variant trigger_data;
+} timeout_data;
+
+trigger *
+get_timeout(trigger * td, trigger * tfind)
+{
+	trigger * t = td;
+	while (t) {
+		if (t->type==&tt_timeout) {
+			timeout_data * tdata = (timeout_data *)t->data.v;
+			trigger * tr = tdata->triggers;
+			while (tr) {
+				if (tr==tfind) break;
+				tr=tr->next;
+			}
+			if (tr==tfind) break;
+		}
+		t=t->next;
+	}
+	return t;
+}
+
+static void
+fix_timeouts(void)
+{
+	region * r;
+	for (r=regions;r;r=r->next) {
+		unit * u;
+		for (u=r->units;u;u=u->next) {
+			attrib * a = a_find(u->attribs, &at_eventhandler);
+			boolean toad = (u->race==RC_TOAD);
+			boolean keeper = (u->race==RC_IRONKEEPER);
+			while (a!=NULL) {
+				trigger * t;
+				handler_info * td = (handler_info *)a->data.v;
+				for (t=td->triggers;t;t=t->next) {
+					trigger ** tptr=&t->next;
+					while (*tptr) {
+						/* remove duplicates */
+						if ((*tptr)->type==t->type) {
+							*tptr = (*tptr)->next;
+						} else tptr = &(*tptr)->next;
+					}
+					if (t->type == &tt_changerace || 
+						t->type == &tt_changefaction || 
+						t->type == &tt_createcurse || 
+						t->type == &tt_createunit) 
+					{
+						trigger * timer = get_timeout(td->triggers, t);
+						if (toad && t->type == &tt_changerace) {
+							toad = false;
+						}
+						if (timer==NULL) {
+							add_trigger(&u->attribs, "timer", trigger_timeout(1+(rand()%2), t));
+						}
+					}
+					else if (t->type == &tt_killunit) {
+						if (u->race==RC_IRONKEEPER) {
+							trigger * timer = get_timeout(td->triggers, t);
+							keeper = false;
+							if (timer==NULL) {
+								add_trigger(&u->attribs, "timer", trigger_timeout(1+(rand()%2), t));
+							}
+						}
+					}
+				}
+				a = a->nexttype;
+			}
+			if (keeper) {
+				int duration = 1+ (rand() % 2);
+				trigger * tkill = trigger_killunit(u);
+				add_trigger(&u->attribs, "timer", trigger_timeout(duration, tkill));
+			}
+			if (toad) {
+				/* repair toad-only mage */
+				int duration = 1+ (rand() % 2);
+				trigger * trestore = trigger_changerace(u, u->faction->race, u->faction->race);
+				if (rand()%10>2) t_add(&trestore, trigger_giveitem(u, olditemtype[I_TOADSLIME], 1));
+				add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
+			}
+		}
+	}
+}
+
 void
 korrektur(void)
 {
@@ -1988,6 +2145,8 @@ korrektur(void)
 #endif
 	fix_migrants();
 	fix_allies();
+	do_once(atoi36("fhrb"), fix_herbs());
+	do_once(atoi36("ftos"), fix_timeouts());
 #ifndef SKILLFIX_SAVE
 	fix_skills();
 #endif

@@ -1,5 +1,5 @@
 # Kommentare sind erlaubt. Endlich.
-# $Id: messages.txt,v 1.3 2001/02/11 07:21:12 corwin Exp $
+# $Id: messages.txt,v 1.4 2001/02/25 19:31:40 enno Exp $
 
 # Fehlermeldungen:
 msg_errors;errors:0;de;{string}
@@ -284,6 +284,7 @@ error281;errors:0;de;{unit} in {region}: '{command}' - Gegen welche Rasse soll d
 error282;errors:0;de;{unit} in {region}: '{command}' - Gegen diese Rasse kann kein Jihad ausgerufen werden.
 error283;events:0;de;{unit} in {region}: '{command}' - Das Passwort darf nur Buchstaben und Ziffern enthalten.
 error284;errors:0;de;{unit} in {region}: '{command}' - Nur noch nicht gestärkte Untote können das Ziel dieses Zaubers sein.
+error285;errors:0;de;{unit} in {region}: '{command}' - Diese Einheit kennt keine Trankrezepte.
 
 # Meldungen und Ereignisse
 msg_event;events:0;de;{string}

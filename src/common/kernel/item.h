@@ -125,7 +125,6 @@ typedef struct item_type {
 	/* --- functions --- */
 	int (*use)(struct unit * user, const struct item_type * itype, const char * cmd);
 	int (*give)(const struct unit * src, const struct unit * dest, const struct item_type * itm, int number, const char * cmd);
-	/* --- pointers --- */
 	struct item_type * next;
 } item_type;
 
@@ -133,28 +132,25 @@ extern item_type * itemtypes;
 extern const item_type * finditemtype(const char * name, const struct locale * lang);
 
 typedef struct luxury_type {
+	struct luxury_type * next;
 	const item_type * itype;
 	int price;
-	/* --- pointers --- */
-	struct luxury_type * next;
 } luxury_type;
 extern luxury_type * luxurytypes;
 
 typedef struct herb_type {
+	struct herb_type * next;
 	const item_type * itype;
 	terrain_t terrain;
-	/* --- pointers --- */
-	struct herb_type * next;
 } herb_type;
 extern herb_type * herbtypes;
 
 typedef struct potion_type {
+	struct potion_type * next;
 	const item_type * itype;
 	int level;
 	const char * text;
 	int (*use)(struct unit *, const struct potion_type *, const char *);
-	/* --- pointers --- */
-	struct potion_type * next;
 } potion_type;
 extern potion_type * potiontypes;
 

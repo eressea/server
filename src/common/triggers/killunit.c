@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: killunit.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: killunit.c,v 1.3 2001/02/25 19:31:39 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -48,18 +48,13 @@ static void
 killunit_write(const trigger * t, FILE * F)
 {
 	unit * u = (unit*)t->data.v;
-	fprintf(F, "%s ", itoa36(u->no));
+	write_unit_reference(u, F);
 }
 
 static int
 killunit_read(trigger * t, FILE * F)
 {
-	char zId[10];
-	int i;
-	fscanf(F, "%s", zId);
-	i = atoi36(zId);
-	t->data.v = findunit(i);
-	if (t->data.v==NULL) ur_add((void*)i, &t->data.v, resolve_unit);
+	read_unit_reference((unit**)&t->data.v, F);
 	return 1;
 }
 

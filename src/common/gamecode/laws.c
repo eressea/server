@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.28 2001/02/18 19:07:31 katze Exp $
+ *	$Id: laws.c,v 1.29 2001/02/25 19:31:38 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1992,9 +1992,22 @@ instant_orders(void)
 					s = getstrtoken();
 
 					if(findparam(s) == P_ANY) {
-						s = getstrtoken();
-						if(findparam(s) == P_ZAUBER) {
+						param_t p = getparam();
+
+						if(p == P_ZAUBER) {
 							a_removeall(&u->faction->attribs, &at_seenspell);
+						} else if(p == P_POTIONS) {
+							int skill = effskill(u, SK_ALCHEMY);
+							potion_type *pt;
+							int c = 0;
+							for(pt = potiontypes; pt; pt=pt->next) {
+								if(pt->level * 2 <= skill) {
+									c += display_potion(u->faction, u, pt);
+								}
+							}
+							if(c == 0) {
+								cmistake(u, S->s, 285, MSG_EVENT);
+							}
 						} else {
 							cmistake(u, S->s, 222, MSG_EVENT);
 						}
@@ -3004,9 +3017,10 @@ processorders (void)
 	puts(" - Jihads setzen");
 	set_jihad();
 
-	puts(" - neue Nummern und Reihenfolge");
-	renumber();
+	puts(" - Einheiten Sortieren");
 	reorder();
+	puts(" - Neue Nummern");
+	renumber();
 
 	puts(" - GM Kommandos");
 	gmcommands();
