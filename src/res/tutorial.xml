@@ -1,21 +1,22 @@
-<eressea>
-	<include file="messages.xml"></include>
+<?xml version="1.0"?>
+<eressea xmlns:xi="http://www.w3.org/2001/XInclude">
+	<xi:include href="messages.xml"/>
 
 	<comment>Localization</comment>
-	<include file="de/strings.xml"></include>
-	<include file="en/strings.xml"></include>
-	<include file="fr/strings.xml"></include>
+	<xi:include href="de/strings.xml"/>
+	<xi:include href="en/strings.xml"/>
+	<xi:include file="fr/strings.xml"/>
 
-	<include file="races.xml"></include>
-	<include file="resources.xml"></include>
-	<include file="ships.xml"></include>
-	<include file="buildings.xml"></include>
+	<xi:include href="races.xml"/>
+	<xi:include href="resources.xml"/>
+	<xi:include href="ships.xml"/>
+	<xi:include href="buildings.xml"/>
 
 	<game name="Tutorial" welcome="tutorial">
 		<comment>Game specific</comment>
-		<order name="EMAIL" disable></order>
-		<order name="MEINUNG" disable></order>
-		<order name="MAGIEGEBIET" disable></order>
+		<order name="EMAIL" disable="yes"></order>
+		<order name="MEINUNG" disable="yes"></order>
+		<order name="MAGIEGEBIET" disable="yes"></order>
 		<param name="entertain.base" value="0"></param>
 		<param name="entertain.perlevel" value="20"></param>
 		<param name="nmr.timeout" value="2"></param>
@@ -25,11 +26,11 @@
 		<param name="hunger.long" value="1"></param>
 		<param name="MaxAge" value="8"></param>
 	</game>
-	<include file="tutorial/de/strings.xml"></include>
-	<include file="tutorial/en/strings.xml"></include>
-	<include file="eressea/races.xml"></include>
-	<include file="eressea/items.xml"></include>
-	<include file="eressea/dungeons.xml"></include>
+	<xi:include file="tutorial/de/strings.xml"/>
+	<xi:include file="tutorial/en/strings.xml"/>
+	<xi:include file="eressea/races.xml"/>
+	<xi:include file="eressea/items.xml"/>
+	<xi:include file="eressea/dungeons.xml"/>
 	<strings>
 		<string name="mailto">
 			<text>tutorial@eressea.upb.de</text>
