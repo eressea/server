@@ -150,12 +150,14 @@ struct xml_stack;
 #define GROWTREE_VERSION 305
 #define RANDOMIZED_RESOURCES_VERSION 306 /* should be the same, but doesn't work */
 #define NEWRACE_VERSION 307
-#define NEWSKILL_VERSION 308
+#define INTERIM_VERSION 309
+#define NEWSKILL_VERSION 309
+#define WATCHERS_VERSION 310
 
 #if SKILLPOINTS
-# define RELEASE_VERSION NEWRACE_VERSION
+# define RELEASE_VERSION INTERIM_VERSION
 #else
-# define RELEASE_VERSION NEWSKILL_VERSION
+# define RELEASE_VERSION WATCHERS_VERSION
 #endif
 #define UGROUPS_VERSION 400 /* nicht aktivieren, nicht fertig */
 

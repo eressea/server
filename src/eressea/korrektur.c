@@ -2470,7 +2470,7 @@ peasant_adjustment(void)
 	terrain_t ter;
 	int sum, avg, c;
 	double freeall, pool; /* long long is illegal */
-	long long s;
+	double s;
 	region *r;
 
 	s = 0;
@@ -2601,8 +2601,34 @@ static int
 fix_astralplane(void)
 {
 	plane * astralplane = getplanebyname("Astralraum");
-	freset(astralplane, PFL_NOCOORDS);
-	set_ursprung(findfaction(MONSTER_FACTION), astralplane->id, 0, 0);
+	if (astralplane) {
+		freset(astralplane, PFL_NOCOORDS);
+		set_ursprung(findfaction(MONSTER_FACTION), astralplane->id, 0, 0);
+	}
+	return 0;
+}
+
+static int
+fix_watchers(void)
+{
+	plane * p = getplanebyid (59034966);
+	if (p) {
+		faction * f = findfaction(atoi36("gm04"));
+		watcher * w = calloc(sizeof(watcher), 1);
+		w->faction = f;
+		w->mode = see_unit;
+		w->next = p->watchers;
+		p->watchers	= w;
+	}
+	p = getplanebyid(1137);
+	if (p) {
+		faction * f = findfaction(atoi36("rr"));
+		watcher * w = calloc(sizeof(watcher), 1);
+		w->faction = f;
+		w->mode = see_unit;
+		w->next = p->watchers;
+		p->watchers = w;
+	}
 	return 0;
 }
 
@@ -2654,6 +2680,7 @@ korrektur(void)
 	/* fix_unitrefs(); */
 	stats();
 	do_once("sql2", dump_sql());
+	do_once("fw01", fix_watchers());
 #if NEW_RESOURCEGROWTH
 	/* do not remove do_once calls - old datafiles need them! */
 	do_once("rgrw", convert_resources());

@@ -2606,12 +2606,23 @@ prepare_report(faction * f)
 	for (r = firstregion(f); r != end; r = r->next) {
 		attrib *ru;
 		unit * u;
+		plane * p = rplane(r);
 		unsigned char mode = see_none;
 		boolean dis = false;
 #if DBG_CACHE
 		++ctries;
 #endif
-		for (u = r->units; u; u = u->next) {
+		if (p) {
+			watcher * w = p->watchers;
+			while (w) {
+				if (f==w->faction) {
+					mode = w->mode;
+					break;
+				}
+				w = w->next;
+			}
+		}
+		if (mode<see_unit) for (u = r->units; u; u = u->next) {
 			if (u->faction == f) {
 				if (u->race != new_race[RC_SPELL] || u->number == RS_FARVISION) {
 					mode = see_unit;
@@ -2623,7 +2634,7 @@ prepare_report(faction * f)
 			}
 		}
 
-		if (mode==see_none) for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+		if (mode<see_travel) for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
 			unit * u = (unit*)ru->data.v;
 			if (u->faction == f) {
 				mode = see_travel;
@@ -2631,7 +2642,7 @@ prepare_report(faction * f)
 			}
 		}
 
-		if (mode==see_none && rterrain(r) == T_OCEAN) {
+		if (mode<see_lighthouse && rterrain(r) == T_OCEAN) {
 			if (check_leuchtturm(r, f)) mode = see_lighthouse;
 		}
 

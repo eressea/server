@@ -863,6 +863,19 @@ readgame(boolean backup)
 		pl->miny = ri(F);
 		pl->maxy = ri(F);
 		pl->flags = ri(F);
+		if (global.data_version>WATCHERS_VERSION) {
+			char * s = NULL;
+			rds(F, &s);
+			while (strcmp(s, "end")!=0) {
+				watcher * w = calloc(sizeof(watcher),1);
+				int fno = ri36(F);
+				w->mode = (unsigned char)ri(F);
+				w->next = pl->watchers;
+				pl->watchers = w;
+				ur_add((void*)fno, &w->faction, resolve_faction);
+			}
+			free(s);
+		}
 		a_read(F, &pl->attribs);
 		addlist(&planes, pl);
 	}
@@ -1796,6 +1809,9 @@ writegame(char *path, char quiet)
 	wnl(F);
 
 	for(pl = planes; pl; pl=pl->next) {
+#if RELEASE_VERSION >= WATCHERS_VERSION
+		watcher * w;
+#endif
 		wi(F, pl->id);
 		ws(F, pl->name);
 		wi(F, pl->minx);
@@ -1803,6 +1819,17 @@ writegame(char *path, char quiet)
 		wi(F, pl->miny);
 		wi(F, pl->maxy);
 		wi(F, pl->flags);
+#if RELEASE_VERSION >= WATCHERS_VERSION
+		w = pl->watchers;
+		while (w) {
+			if (w->faction) {
+				wi36(F, w->faction->no);
+				wi(F, w->mode);
+			}
+			w = w->next;
+		}
+		ws(F, "end");
+#endif
 		a_write(F, pl->attribs);
 		wnl(F);
 	}
