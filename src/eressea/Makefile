@@ -26,10 +26,10 @@ endif
 ##
 
 INCLUDES  += \
-	-I../common \
-	-I../common/util \
+	-I../common/gamecode \
 	-I../common/kernel \
-	-I../common/gamecode
+	-I../common/util \
+	-I../common
 
 LIBNAMES      = \
 	e-triggers \

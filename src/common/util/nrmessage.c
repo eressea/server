@@ -8,7 +8,7 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: nrmessage.c,v 1.1 2001/02/24 12:50:50 enno Exp $
+ $Id: nrmessage.c,v 1.2 2001/02/25 20:10:43 enno Exp $
 */
 
 #include <config.h>
@@ -18,6 +18,7 @@
 #include "translation.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 typedef struct nrmessage_type {
 	const struct message_type * mtype;

@@ -11,7 +11,7 @@ include $(ERESSEA)/Makefile.include
 
 ## more definitions
 
-INCLUDES = -I../util -I../kernel -I..
+INCLUDES = -I../kernel -I.. -I../util
 
 # library:
 $(BUILD_DIR)/$(LIBRARY):: $(BUILD_DIR) $(OBJECTS)
