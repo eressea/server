@@ -8,6 +8,7 @@
 	<include file="en/strings.xml"></include>
 
 	<include file="races.xml"></include>
+	<include file="resources.xml"></include>
 	<include file="items.xml"></include>
 
 	<game name="Eressea" welcome="eressea">

@@ -119,8 +119,6 @@ typedef struct item_type {
 	unsigned int flags;
 	int weight;
 	int capacity;
-/*	int minskill;
-	skill_t skill; */
 	const struct construction * construction;
 	/* --- functions --- */
 	int (*use)(struct unit * user, const struct item_type * itype, const char * cmd);
@@ -185,7 +183,7 @@ typedef struct weapon_mod {
 
 typedef struct weapon_type {
 	const item_type * itype;
-	const char * damage[2];
+	char * damage[2];
 	unsigned int flags;
 	skill_t skill;
 	int minskill;
@@ -553,4 +551,7 @@ extern void init_resources(void);
 extern void init_items(void);
 
 extern const char* resname(resource_t res, int index);
+
+extern int xml_readresource(FILE * F, struct xml_stack * stack);
+
 #endif /* _ITEM_H */

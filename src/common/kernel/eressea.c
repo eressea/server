@@ -1251,28 +1251,6 @@ extern int fuzzy_hits;
 boolean enable_fuzzy = false;
 #endif /* FUZZY_BASE36 */
 
-static faction *
-	makemonsters(void)
-{
-	faction * f = calloc(sizeof(faction), 1);
-	f->next=factions;
-	f->race=new_race[RC_TEMPLATE];
-	f->alive=1;
-	f->email=strdup("");
-	f->lastorders=0;
-	f->locale=default_locale;
-	
-	factions=f;
-	f->options = Pow(O_REPORT);
-	f->no=MONSTER_FACTION;
-	register_faction_id(f->no);
-	f->unique_id = ++max_unique_id;
-	f->name=strdup("Monster");
-	f->passw=strdup("abc123");
-	fhash(f);
-	return f;
-}
-
 faction *
 findfaction (int n)
 {
@@ -2144,6 +2122,8 @@ parse_tagbegin(struct xml_stack *stack, void *data)
 				}
 			}
 		}
+	} else if (strcmp(tag->name, "resource")==0) {
+		xml_readresource(stack->stream, stack);
 	} else if (strcmp(tag->name, "races")==0) {
 		read_races(stack->stream, stack);
 	} else if (strcmp(tag->name, "strings")==0) {

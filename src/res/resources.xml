@@ -1,0 +1,37 @@
+<resource name="magicbox">
+	<comment>A magic box that increases the user's capacity by 10 WU</comment>
+	<item cursed weight="0" capacity="1000">
+	</item>
+</resource>
+<strings>
+	<string name="magicbox">
+		<text locale="de">Magische Kiste</text>
+		<text locale="en">magical box</text>
+	</string>
+	<string name="magicbox_p">
+		<text locale="de">Magische Kisten</text>
+		<text locale="en">magical boxes</text>
+	</string>
+</strings>
+
+<resource name="odinshammer">
+	<comment>Odin's Hammer, reward for a quest. Can't be traded or lost</comment>
+	<item cursed notlost weight="200">
+		<weapon minskill="7" skill="sk_melee" magres="0.15" blunt>
+			<modifier value="-1" riding against_riding against_walking offensive skill></modifier>
+			<modifier value="1" walking against_riding defensive skill></modifier>
+			<damage type="default" value="1d20+6"></damage>
+			<damage type="riding" value="1d10+6"></damage>
+		</weapon>
+	</item>
+</resource>
+<strings>
+	<string name="odinshammer">
+		<text locale="de">Odins Hammer</text>
+		<text locale="en">hammer of Odin</text>
+	</string>
+	<string name="odinshammer_p">
+		<text locale="de">Odins Hämmer</text>
+		<text locale="en">hammers of Odin</text>
+	</string>
+</strings>

@@ -253,8 +253,8 @@ new_weapontype(item_type * itype,
 
 	wtype = calloc(sizeof(weapon_type), 1);
 	if (damage) {
-		wtype->damage[0] = damage[0];
-		wtype->damage[1] = damage[1];
+		wtype->damage[0] = strdup(damage[0]);
+		wtype->damage[1] = strdup(damage[1]);
 	}
 	wtype->defmod = defmod;
 	wtype->flags |= wflags;
@@ -2566,4 +2566,126 @@ xml_writeitems(const char * file)
 	fputs("</weapons>\n\n", stream);
 	fclose(stream);
 	return 0;
+}
+
+#include <xml.h>
+
+typedef struct xml_state {
+	struct item_type * itype;
+	struct resource_type * rtype;
+	struct weapon_type * wtype;
+	int wmods;
+} xml_state;
+
+static int 
+tagend(struct xml_stack * stack, void * data)
+{
+	unused(stack);
+	unused(data);
+	return XML_OK;
+}
+
+static int 
+tagbegin(struct xml_stack * stack, void * data)
+{
+	xml_state * state = (xml_state*)data;
+	const xml_tag * tag = stack->tag;
+	if (strcmp(tag->name, "resource")==0) {
+		char *names[2], *appearance[2];
+		const char *tmp;
+		unsigned int flags = RTF_NONE;
+		if (xml_bvalue(tag, "pooled")) flags |= RTF_POOLED;
+		memset(state, 0, sizeof(xml_state));
+		tmp = xml_value(tag, "name");
+		assert(tmp || "resource needs a name");
+		names[0] = strdup(tmp);
+		names[1] = strcat(strcpy((char*)malloc(strlen(tmp)+3), tmp), "_p");
+		tmp = xml_value(tag, "appearance");
+		if (tmp!=NULL) {
+			appearance[0] = strdup(tmp);
+			appearance[1] = strcat(strcpy((char*)malloc(strlen(tmp)+3), tmp), "_p");
+			state->rtype = new_resourcetype(names, appearance, flags);
+			free(appearance[0]);
+			free(appearance[1]);
+		} else {
+			state->rtype = new_resourcetype(names, NULL, flags);
+		}
+		free(names[0]);
+		free(names[1]);
+	} else if (strcmp(tag->name, "item")==0) {
+		unsigned int flags = ITF_NONE;
+		int weight = xml_ivalue(tag, "weight");
+		int capacity = xml_ivalue(tag, "capacity");
+		assert(state->itype==NULL);
+		if (xml_bvalue(tag, "cursed")) flags |= ITF_CURSED;
+		if (xml_bvalue(tag, "notlost")) flags |= ITF_NOTLOST;
+		if (xml_bvalue(tag, "big")) flags |= ITF_BIG;
+		if (xml_bvalue(tag, "animal")) flags |= ITF_ANIMAL;
+		state->rtype->flags |= RTF_ITEM;
+		state->itype = new_itemtype(state->rtype, flags, weight, capacity);
+	} else if (strcmp(tag->name, "weapon")==0) {
+		skill_t skill = sk_find(xml_value(tag, "skill"));
+		int minskill = xml_ivalue(tag, "minskill");
+		int offmod = xml_ivalue(tag, "offmod");
+		int defmod = xml_ivalue(tag, "defmod");
+		int reload = xml_ivalue(tag, "reload");
+		double magres = xml_fvalue(tag, "magres");
+		unsigned int flags = WTF_NONE;
+		const char * damage[2] = { NULL, NULL };
+
+		assert(strcmp(stack->next->tag->name, "item")==0);
+		assert(state->itype!=NULL);
+		state->itype->flags |= ITF_WEAPON;
+		state->wtype = new_weapontype(state->itype,
+			flags, magres, damage, offmod, defmod, reload, skill, minskill);
+	} else if (strcmp(tag->name, "damage")==0) {
+		/* damage of a weapon */
+		int pos = 0;
+		const char * type = xml_value(tag, "type");
+
+		assert(strcmp(stack->next->tag->name, "weapon")==0);
+		if (strcmp(type, "default")!=0) pos = 1;
+		if (state->wtype->damage[pos]) free(state->wtype->damage[pos]);
+		state->wtype->damage[pos] = strdup(xml_value(tag, "value"));
+	} else if (strcmp(tag->name, "modifier")==0) {
+		int value = xml_ivalue(tag, "value");
+		assert(strcmp(stack->next->tag->name, "weapon")==0);
+		if (value!=0) {
+			int flags = 0;
+			weapon_mod * mods = calloc(sizeof(weapon_mod), state->wmods+2);
+
+			assert(state->wtype);
+			if (xml_bvalue(tag, "walking")) flags|=WMF_WALKING;
+			if (xml_bvalue(tag, "riding")) flags|=WMF_RIDING;
+			if (xml_bvalue(tag, "against_walking")) flags|=WMF_AGAINST_WALKING;
+			if (xml_bvalue(tag, "against_riding")) flags|=WMF_AGAINST_RIDING;
+			if (xml_bvalue(tag, "offensive")) flags|=WMF_OFFENSIVE;
+			if (xml_bvalue(tag, "defensive")) flags|=WMF_DEFENSIVE;
+			if (xml_bvalue(tag, "damage")) flags|=WMF_DAMAGE;
+			if (xml_bvalue(tag, "skill")) flags|=WMF_SKILL;
+			if (xml_bvalue(tag, "missile_target")) flags|=WMF_MISSILE_TARGET;
+			if (state->wmods) {
+				memcpy(mods, state->wtype->modifiers, sizeof(weapon_mod)*state->wmods);
+				free(state->wtype->modifiers);
+			}
+			mods[state->wmods].value = value;
+			mods[state->wmods].flags = flags;
+			state->wtype->modifiers = mods;
+			++state->wmods;
+		}
+	} else {
+		return XML_USERERROR;
+	}
+	return XML_OK;
+}
+
+static xml_callbacks xml_resource = {
+	NULL, tagbegin, tagend, NULL
+};
+
+int
+xml_readresource(FILE * F, struct xml_stack * stack)
+{
+	xml_state state;
+	return xml_parse(F, &xml_resource, &state, stack);
 }

@@ -134,33 +134,6 @@ make_gates(region * r)
 	add_trigger(&b->attribs, "timer", trigger_xmasgate(b));
 }
 
-static unit *
-make_santa(region * r)
-{
-	unit * santa = ufindhash(atoi36("xmas"));
-
-	while (santa && santa->race!=new_race[RC_ILLUSION]) {
-		uunhash(santa);
-		santa->no = newunitid();
-		uhash(santa);
-		santa = ufindhash(atoi36("xmas"));
-	}
-	if (!santa) {
-		faction * f = findfaction(atoi36("rr"));
-		if (f==NULL) return NULL;
-		f->alive = true;
-		santa = createunit(r, f, 1, new_race[RC_ILLUSION]);
-		uunhash(santa);
-		santa->no = atoi36("xmas");
-		uhash(santa);
-		fset(santa, FL_PARTEITARNUNG);
-		santa->irace = new_race[RC_GNOME];
-		set_string(&santa->name, "Ein dicker Gnom mit einem Rentierschlitten");
-		set_string(&santa->display, "hat: 12 Rentiere, Schlitten, Sack mit Geschenken, Kekse für Khorne");
-	}
-	return santa;
-}
-
 static void
 santa_comes_to_town(region * r)
 {
@@ -225,7 +198,7 @@ create_xmas2000(int x, int y)
 		if (n==NULL) n = new_region(x + delta_x[dir], y + delta_y[dir]);
 		terraform(n, T_OCEAN);
 	}
-	santa_comes_to_town(r);
+	santa_comes_to_town(r, make_santa(r), NULL);
 	for (f = factions; f != NULL; f = f->next) if (f->alive && f->units) {
 		char zText[128];
 		unit * u;
