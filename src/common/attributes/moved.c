@@ -28,7 +28,7 @@ age_moved(attrib * a)
 static void
 write_moved(const attrib * a, FILE * F)
 {
-	fprintf(F, "%d", a->data.i);
+	fprintf(F, "%d ", a->data.i);
 }
 
 static int

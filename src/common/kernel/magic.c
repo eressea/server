@@ -147,7 +147,7 @@ static void
 a_writeicastle(const attrib * a, FILE * f)
 {
 	icastle_data * data = (icastle_data*)a->data.v;
-	fprintf(f, "%s %d %d", data->type->_name, data->building->no, data->time);
+	fprintf(f, "%s %d %d ", data->type->_name, data->building->no, data->time);
 }
 
 static int
@@ -252,7 +252,7 @@ write_mage(const attrib * a, FILE * F) {
     fprintf (F, "%d ", sp->spellid);
     sp = sp->next;
   }
-  fprintf (F, "-1\n");
+  fprintf (F, "-1 ");
 }
 
 attrib_type at_mage = {

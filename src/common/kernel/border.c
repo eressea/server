@@ -487,7 +487,7 @@ write_borders(FILE * f)
       }
     }
   }
-  fputs("end", f);
+  fputs("end ", f);
 }
 
 void

@@ -305,5 +305,5 @@ a_write(FILE * f, const attrib * attribs)
 		}
 		na = na->next;
 	}
-	fprintf(f, "end");
+	fprintf(f, "end ");
 }

@@ -27,7 +27,7 @@ void
 write_of(const struct attrib * a, FILE* F)
 {
 	const faction * f = (faction*)a->data.v;
-	fprintf(F, "%d", f->no);
+	fprintf(F, "%d ", f->no);
 }
 
 int

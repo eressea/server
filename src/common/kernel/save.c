@@ -461,7 +461,7 @@ write_enemies(FILE * F, const faction_list * flist)
   while (flist) {
     fprintf(F, "%s ", itoa36(flist->data->no));
   }
-  fputs("end\n", F);
+  fputs("end \n", F);
 #endif
 }
 #endif
@@ -887,7 +887,7 @@ write_alliances(FILE * F)
 		al = al->next;
 		wnl(F);
 	}
-	fprintf(F, "end");
+	fprintf(F, "end ");
 	wnl(F);
 }
 #endif
@@ -1483,7 +1483,7 @@ writeregion(FILE * F, const region * r)
 			ws(F, resourcename(demand->type->itype->rtype, 0));
 			wi(F, demand->value);
 		}
-		fputs("end\n", F);
+		fputs("end \n", F);
 	}
 	a_write(F, r->attribs);
 	wnl(F);
@@ -1711,7 +1711,7 @@ writefaction(FILE * F, const faction * f)
 			wi(F, sf->status);
 		}
 	}
-	fprintf(F, "end");
+	fprintf(F, "end ");
 	wnl(F);
 	write_groups(F, f->groups);
 #ifdef REGIONOWNERS

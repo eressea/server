@@ -38,7 +38,6 @@ static int
 use_questkey(struct unit * u, const struct item_type * itype, int amount, const char * cmd)
 {
 	border *bo;
-	int key, key1, key2;
 	region *r1, *r2;
 	int lock, k;
 	message *m;

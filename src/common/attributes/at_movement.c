@@ -20,7 +20,7 @@
 static void
 write_movement(const attrib * a, FILE * F)
 {
-	fprintf(F, "%d", a->data.i);
+	fprintf(F, "%d ", a->data.i);
 }
 
 static int

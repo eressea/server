@@ -97,23 +97,23 @@ make_atpermissions(void)
 static void
 write_gmcreate(const attrib * a, FILE * F)
 {
-	const item_type * itype = (const item_type *)a->data.v;
-	assert(itype);
-	fprintf(F, "%s", resourcename(itype->rtype, 0));
+  const item_type * itype = (const item_type *)a->data.v;
+  assert(itype);
+  fprintf(F, "%s ", resourcename(itype->rtype, 0));
 }
 
 static int
 read_gmcreate(attrib * a, FILE * F)
 {
-	char zText[32];
-	const item_type ** p_itype = (const item_type **)&a->data.v;
-	fscanf(F, "%s", zText);
-	*p_itype = it_find(zText);
-	if (a->data.v==NULL) {
-		log_error(("unknown itemtype %s in gmcreate attribute\n", zText));
+  char zText[32];
+  const item_type ** p_itype = (const item_type **)&a->data.v;
+  fscanf(F, "%s", zText);
+  *p_itype = it_find(zText);
+  if (a->data.v==NULL) {
+    log_error(("unknown itemtype %s in gmcreate attribute\n", zText));
     return AT_READ_FAIL;
-	}
-	return AT_READ_OK;
+  }
+  return AT_READ_OK;
 }
 
 /* at_gmcreate specifies that the owner can create items of a particular type */

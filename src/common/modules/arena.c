@@ -259,7 +259,7 @@ age_hurting(attrib * a) {
 static void
 write_hurting(const attrib * a, FILE * F) {
 	building * b = a->data.v;
-	fprintf(F, "%d", b->no);
+	fprintf(F, "%d ", b->no);
 }
 
 static int
