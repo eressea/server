@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.30 2001/02/28 18:25:24 corwin Exp $
+ *	$Id: laws.c,v 1.31 2001/02/28 18:31:49 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1701,12 +1701,14 @@ set_passw(void)
 						while((s = getstrtoken())) {
 							if(findparam(s) == P_NOT) {
 								a_removeall(&u->faction->attribs, &at_option_news);
+								u->faction->options = u->faction->options & ~O_NEWS;
 								break;
 							} else {
 								int sec = atoi(s);
 								if(sec != 0) {
 									if(!a) a_add(&u->faction->attribs, a_new(&at_option_news));
 									a->data.i = a->data.i & (1<<(sec-1));
+									u->faction->options = u->faction->options | O_NEWS;
 								}
 							}
 						}
