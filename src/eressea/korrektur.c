@@ -1124,12 +1124,10 @@ fix_dissolve(unit * u, int value, char mode)
 {
   attrib * a = a_find(u->attribs, &at_unitdissolve);
 
-  unused(value);
-
   if (a!=NULL) return;
   a = a_add(&u->attribs, a_new(&at_unitdissolve));
   a->data.ca[0] = mode;
-  a->data.ca[1] = 100;
+  a->data.ca[1] = value;
   log_warning(("unit %s has race %s and no dissolve-attrib\n", unitname(u), rc_name(u->race, 0)));
 }
 

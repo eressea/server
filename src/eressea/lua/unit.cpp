@@ -5,6 +5,7 @@
 #include <attributes/racename.h>
 
 // kernel includes
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/item.h>
 #include <kernel/faction.h>
@@ -100,6 +101,21 @@ unit_setskill(unit& u, const char * skname, int level)
   return -1;
 }
 
+static const char *
+unit_getrace(const unit& u)
+{
+  return u.race->_name[0];
+}
+
+static void
+unit_setrace(unit& u, const char * rcname)
+{
+  race * rc = rc_find(rcname);
+  if (rc!=NULL) {
+    u.race = rc;
+  }
+}
+
 void
 bind_unit(lua_State * L) 
 {
@@ -109,6 +125,7 @@ bind_unit(lua_State * L)
 
     class_<struct unit>("unit")
     .def_readonly("name", &unit::name)
+    .def_readonly("size", &unit::number)
     .def_readonly("region", &unit::region)
     .def_readonly("faction", &unit::faction)
     .def_readonly("id", &unit::no)
@@ -119,5 +136,6 @@ bind_unit(lua_State * L)
     .def("set_skill", &unit_setskill)
     .def("set_racename", &unit_setracename)
     .property("number", &unit_getnumber, &unit_setnumber)
+    .property("race", &unit_getrace, &unit_setrace)
   ];
 }
