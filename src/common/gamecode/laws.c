@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.13 2001/02/11 12:10:58 enno Exp $
+ *	$Id: laws.c,v 1.14 2001/02/11 12:56:27 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2110,64 +2110,74 @@ resolve_ship(void * id) {
    return findship((int)id);
 }
 
-#if 0
 static void
 reorder_owners(region * r)
 {
-	unit ** up=&r->units;
+	unit ** up=&r->units, ** useek;
 	building * b=NULL;
 	ship * sh=NULL;
-	while (*up) {
-		unit * u = *up;
-		if (u->building!=b) {
-			/* if this is a new building */
-			b = u->building;
-			if (b && !fval(u, FL_OWNER)) {
-				/* if the first unit is not the owner, find the real one */
-				unit ** uo = &u->next;
-				while (*uo && (!fval((*uo), FL_OWNER) || (*uo)->building!=b)) {
-					uo=&(*uo)->next;
-				}
 
-				if (*uo && (*uo)->building==b) {
-					/* if successful, move *uo to the top */
-					*up = *uo;
-					*uo = (*uo)->next;
-					(*up)->next = u;
-				}
-				else {
-					fprintf(stderr, "WARNING: Gebäude %s hatte keinen Besitzer. Setze %s\n", buildingname(b), unitname(u));
-					fset(u, FL_OWNER);
-				}
-			}
-		}
-		if (u->ship!=sh) {
-			/* if this is a new ship */
-			sh = u->ship;
-			if (sh && !fval(u, FL_OWNER)) {
-				/* if the first unit is not the owner, find the real one */
-				unit ** uo = &u->next;
-				while (*uo && (!fval((*uo), FL_OWNER) || (*uo)->ship!=sh)) {
-					uo=&(*uo)->next;
-				}
+	for (b = r->buildings;b;b=b->next) {
+		unit ** ubegin = up;
+		unit ** uend = up;
 
-				if (*uo && (*uo)->ship==sh) {
-					/* if successful, move *uo to the top */
-					*up = *uo;
-					*uo = (*uo)->next;
-					(*up)->next = u;
+		useek = up;
+		while (*useek) {
+			unit * u = *useek;
+			if (u->building==b) {
+				unit ** insert;
+				if (fval(u, FL_OWNER)) insert=ubegin;
+				else insert = uend;
+				if (insert!=up) {
+					*useek = u->next; /* raus aus der liste */
+					u->next = *insert;
+					*insert = u;
 				}
-				else {
-					fprintf(stderr, "WARNING: Das Schiff %s hatte keinen Besitzer. Setze %s\n", shipname(sh), unitname(u));
-					fset(u, FL_OWNER);
-				}
+				if (insert==uend) uend=&u->next;
 			}
+			if (*useek==u) useek = &u->next;
 		}
-		up = &u->next;
+		up = uend;
+	}
+
+	useek=up;
+	while (*useek) {
+		unit * u = *useek;
+		assert(!u->building);
+		if (u->ship==NULL) {
+			assert(!fval(u, FL_OWNER));
+			*useek = u->next;
+			useek = &u->next;
+			u->next = *up;
+			up = &u->next;
+		} else useek=&u->next;
+	}
+
+	for (sh = r->ships;sh;sh=sh->next) {
+		unit ** ubegin = up;
+		unit ** uend = up;
+
+		useek = up;
+		while (*useek) {
+			unit * u = *useek;
+			if (u->ship==sh) {
+				unit ** insert;
+				if (fval(u, FL_OWNER)) insert=ubegin;
+				else insert = uend;
+				if (insert!=up) {
+					*useek = u->next; /* raus aus der liste */
+					u->next = *insert;
+					*insert = u;
+				}
+				if (insert==uend) uend=&u->next;
+			}
+			if (*useek==u) useek = &u->next;
+		}
+		up = uend;
 	}
 }
-#endif
 
+#if 0
 static void
 reorder_owners(region * r)
 {
@@ -2227,6 +2237,7 @@ reorder_owners(region * r)
 	}
 	*ui = NULL;
 }
+#endif
 
 static attrib_type at_number = {
 	"faction_renum", 
