@@ -2136,10 +2136,14 @@ attack(battle *b, troop ta, const att *a)
 			ta.fighter->action_counter++;
 		}
 		if (td.fighter->unit->ship) {
-			td.fighter->unit->ship->damage += DAMAGE_SCALE * dice_rand(a->data.dice);
+			if(a_find(td.fighter->unit->ship->attribs, &at_nodestroy) == NULL) {
+				td.fighter->unit->ship->damage += DAMAGE_SCALE * dice_rand(a->data.dice);
+			}
 		} else if (td.fighter->unit->building) {
-			damage_building(b, td.fighter->unit->building,
-											dice_rand(a->data.dice));
+			if(a_find(td.fighter->unit->building->attribs, &at_nodestroy) == NULL) {
+				damage_building(b, td.fighter->unit->building,
+													dice_rand(a->data.dice));
+			}
 		}
 	}
 

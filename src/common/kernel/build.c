@@ -370,6 +370,12 @@ destroy(region * r, unit * u, const char * cmd)
 
   if (u->building) {
     building *b = u->building;
+
+		if(a_find(b->attribs, &at_nodestroy)) {
+						cmistake(u, cmd, 14, MSG_EVENT);
+						return;
+		}
+
 #if 0
     con = b->type->construction;
     size = b->size;
@@ -394,6 +400,12 @@ destroy(region * r, unit * u, const char * cmd)
     }
   } else if (u->ship) {
     sh = u->ship;
+
+		if(a_find(sh->attribs, &at_nodestroy)) {
+						cmistake(u, cmd, 14, MSG_EVENT);
+						return;
+		}
+
 #if 0
     con = sh->type->construction;
     size = (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;

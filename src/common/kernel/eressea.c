@@ -1551,11 +1551,15 @@ getunit(const region * r, const faction * f)
 
 	if (n < 0) return 0;
 
+	return findunitr(r, n);
+
+	/* && u2->number>0 verhindert GIB TEMP u.ä.!
 	for (u2 = r->units; u2; u2 = u2->next) {
 		if (u2->no == n && u2->number>0) {
 			return u2;
 		}
 	}
+	*/
 
 	return 0;
 }
@@ -3122,6 +3126,7 @@ attrib_init(void)
 	at_register(&at_wdwpyramid);
 #endif
   at_register(&at_speedup);
+  at_register(&at_nodestroy);
 }
 
 void

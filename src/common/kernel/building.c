@@ -15,6 +15,7 @@
 #include <config.h>
 #include "eressea.h"
 #include "building.h"
+#include "attrib.h"
 
 /* kernel includes */
 #include "item.h"
@@ -38,6 +39,14 @@
 
 /* attributes includes */
 #include <attributes/matmod.h>
+
+attrib_type at_nodestroy = {
+	"nodestroy",
+	NULL, NULL, NULL,
+	a_writedefault, 
+	a_readdefault,
+	ATF_UNIQUE
+};
 
 building_typelist *buildingtypes;
 

@@ -139,6 +139,8 @@ extern struct building *findbuilding(int n);
 
 extern struct unit * buildingowner(const struct region * r, const struct building * b);
 
+extern attrib_type at_nodestroy;
+
 #ifdef __cplusplus
 }
 #endif
