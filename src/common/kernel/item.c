@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.6 2001/02/03 13:45:32 enno Exp $
+ *	$Id: item.c,v 1.7 2001/02/10 13:20:09 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -373,6 +373,8 @@ it_find(const char * name)
 
 	for (itype=itemtypes; itype; itype=itype->next)
 		if (itype->rtype->hashkey==hash && strcmp(itype->rtype->_name[0], name) == 0) break;
+	if (!itype) for (itype=itemtypes; itype; itype=itype->next)
+		if (strcmp(itype->rtype->_name[1], name) == 0) break;
 
 	return itype;
 }
@@ -1193,6 +1195,38 @@ use_oldtypes(region * r, const resource_type * rtype, int norders)
 	}
 }
 
+typedef const char* translate_t[5];
+static translate_t translation[] = {
+	{ "Holz", "log", "logs", "log", "logs" },
+	{ "Eisen", "iron", "irons", "iron", "irons" },
+	{ "Wagen", "cart", "carts", "cart", "carts" },
+	{ "Plattenpanzer", "plate", "plates", "plate", "plates" },
+	{ "Balsam", "balm", "balms", "balm", "balms" },
+	{ "Gewürz", "spice", "spices", "spice", "spices" },
+	{ "Myrrhe", "myrrh", "myrrhs", "myrrh", "myrrhs" },
+	{ "Öl", "oil", "oils", "oil", "oils" },
+	{ "Seide", "silk", "silks", "silk", "silks" },
+	{ "Weihrauch", "incense", "incenses", "incense", "incenses" },
+	{ "Bihänder", "greatsword", "greatswords", "greatsword", "greatswords" },
+	{ "Laen", "laen", "laens", "laen", "laens" },
+	{ "Goliathwasser", "p1", "p1s", NULL, NULL },
+	{ "Wasser des Lebens", "p2", "p2s", NULL, NULL },
+	{ "Bauernblut", "p5", "p5s", NULL, NULL },
+	{ "Gehirnschmalz", "p6", "p6s", NULL, NULL },
+	{ "Nestwärme", "p8", "p8s", NULL, NULL },
+	{ "Pferdeglück", "p9", "p9s", NULL, NULL },
+	{ "Berserkerblut", "p10", "p10s", NULL, NULL },
+	{ "Bauernlieb", "p11", "p11s", NULL, NULL },
+	{ "Heiltrank", "p14", "p14s", NULL, NULL },
+
+	{ "Flachwurz", "h0", "h0s", NULL, NULL },
+	{ "Elfenlieb", "h5", "h5s", NULL, NULL },
+	{ "Wasserfinder", "h9", "h9s", NULL, NULL },
+	{ "Windbeutel", "h12", "h12s", NULL, NULL },
+	{ "Steinbeißer", "h15", "h15s", NULL, NULL },
+	{ NULL, NULL, NULL, NULL, NULL }
+};
+
 static void
 init_olditems(void)
 {
@@ -1240,10 +1274,25 @@ init_olditems(void)
 		if (itemdata[i].flags & FL_ITEM_NOTINBAG) iflags |= ITF_BIG;
 		if (itemdata[i].typ == IS_LUXURY) iflags |= ITF_LUXURY;
 		if (itemdata[i].flags & FL_ITEM_ANIMAL) iflags |= ITF_ANIMAL;
-		name[0] = reverse_lookup(NULL, itemdata[i].name[0]);
-		name[1] = reverse_lookup(NULL, itemdata[i].name[1]);
-		appearance[0] = reverse_lookup(NULL, itemdata[i].name[2]);
-		appearance[1] = reverse_lookup(NULL, itemdata[i].name[3]);
+
+		name[0]=NULL;
+		{
+			int ci;
+			for (ci=0;translation[ci][0];++ci) {
+				if (!strcmp(translation[ci][0], itemdata[i].name[0])) {
+					name[0] = translation[ci][1];
+					name[1] = translation[ci][2];
+					appearance[0] = translation[ci][2];
+					appearance[1] = translation[ci][3];
+				}
+			}
+		}
+		if (name[0]==NULL) {
+			name[0] = reverse_lookup(NULL, itemdata[i].name[0]);
+			name[1] = reverse_lookup(NULL, itemdata[i].name[1]);
+			appearance[0] = reverse_lookup(NULL, itemdata[i].name[2]);
+			appearance[1] = reverse_lookup(NULL, itemdata[i].name[3]);
+		}
 		rtype = new_resourcetype(name, appearance, rflags);
 		itype = new_itemtype(rtype, iflags, weight, capacity, minskill, skill);
 
@@ -1377,8 +1426,20 @@ init_oldherbs(void)
 		terrain_t t;
 		resource_type * rtype;
 
-		names[0] = reverse_lookup(NULL, herbdata[0][h]);
-		names[1] = reverse_lookup(NULL, herbdata[1][h]);
+		names[0] = NULL;
+		{
+			int ci;
+			for (ci=0;translation[ci][0];++ci) {
+				if (!strcmp(translation[ci][0], herbdata[0][h])) {
+					names[0] = translation[ci][1];
+					names[1] = translation[ci][2];
+				}
+			}
+		}
+		if (!names[0]) {
+			names[0] = reverse_lookup(NULL, herbdata[0][h]);
+			names[1] = reverse_lookup(NULL, herbdata[1][h]);
+		}
 
 		rtype = new_resourcetype(names, appearance, RTF_ITEM);
 		itype = new_itemtype(rtype, ITF_HERB, 0, 0, 0, NOSKILL);
@@ -1765,8 +1826,20 @@ init_oldpotions(void)
 		con->maxsize = 1;
 		con->reqsize = 1;
 
-		names[0] = reverse_lookup(NULL, potionnames[0][p]);
-		names[1] = reverse_lookup(NULL, potionnames[1][p]);
+		names[0] = NULL;
+		{
+			int ci;
+			for (ci=0;translation[ci][0];++ci) {
+				if (!strcmp(translation[ci][0], potionnames[0][p])) {
+					names[0] = translation[ci][1];
+					names[1] = translation[ci][2];
+				}
+			}
+		}
+		if (!names[0]) {
+			names[0] = reverse_lookup(NULL, potionnames[0][p]);
+			names[1] = reverse_lookup(NULL, potionnames[1][p]);
+		}
 
 		rtype = new_resourcetype(names, appearance, RTF_ITEM);
 		if (p==P_FOOL) rtype->flags |= RTF_SNEAK;
@@ -2071,7 +2144,10 @@ rt_read(FILE * F)
 		}
 	}
 	rt_register(rt);
-	assert(rt->hashkey==hash);
+#ifndef NDEBUG
+	if (global.data_version >= NEWHASH_VERSION)
+		assert(rt->hashkey==hash);
+#endif
 	return rt;
 }
 

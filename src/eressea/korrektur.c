@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.17 2001/02/09 19:52:59 corwin Exp $
+ *	$Id: korrektur.c,v 1.18 2001/02/10 13:20:09 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1199,7 +1199,7 @@ fix_balsamfiasko(void)
 }
 #endif
 
-int
+static int
 count_demand(const region *r)
 {
 	struct demand *dmd;
@@ -1208,7 +1208,7 @@ count_demand(const region *r)
 	return c;
 }
 
-void
+static void
 fix_demand_region(const region *r)
 {
 	direction_t d;
@@ -1237,13 +1237,13 @@ fix_demand_region(const region *r)
 	}
 }
 
-void
+static void
 fix_demand(void)
 {
 	region *r;
 
-	for(r=regions; r; r=r->next) {
-		if(count_demand(r) != 7) fix_demand_region(r);
+	for (r=regions; r; r=r->next) if (r->land) {
+		if (count_demand(r) != 7) fix_demand_region(r);
 	}
 }
 
@@ -1314,7 +1314,7 @@ fix_allies(void) {
 extern boolean enable_fuzzy;
 #endif
 
-void
+static void
 fix_icastles(void)
 {
 	region * r;
