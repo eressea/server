@@ -2,6 +2,7 @@
 
 import sys
 import MySQLdb
+import os
 import cgi
 import re
 import string
@@ -15,6 +16,7 @@ MailTemplate="register.mail"
 DefaultTitle = "Eressea Anmeldung"
 dbname = "eressea"
 From = "accounts@eressea-pbem.de"
+locale="de"
 smtpserver = 'localhost'
 db=None
 
@@ -41,7 +43,7 @@ def Display(Content, Title=DefaultTitle):
 
 
 def Send(email, custid, firstname, password, position):
-    TemplateHandle = open(MailTemplate, "r")  # open in read only mode
+    TemplateHandle = open(MailTemplate+"."+locale, "r")  # open in read only mode
     # read the entire file as a string
     TemplateInput = TemplateHandle.read()
     TemplateHandle.close()                    # close the file
@@ -51,7 +53,7 @@ def Send(email, custid, firstname, password, position):
     SubResult = re.subn("<POSITION>", str(int(position)), SubResult[0])
     SubResult = re.subn("<CUSTID>", str(int(custid)), SubResult[0])
 
-    Msg="From: "+From+"\nTo: "+email+"\nSubject: Vinambar Passwort\n\n"
+    Msg="From: "+From+"\nTo: "+email+"\nSubject: Eressea Anmeldung\n\n"
     Msg=Msg+SubResult[0]
     server=smtplib.SMTP(smtpserver)
     server.sendmail(From, email, Msg)
@@ -66,6 +68,12 @@ def GetKey(Form, key):
 	    return value
     return None
 
+def ValidEmail(email):
+    if string.find(email, "@")==-1:
+	return 0
+    elif string.find(email, " ")!=-1:
+	return 0
+    return 1
 
 def genpasswd():                                                                               
     newpasswd=""                                                                                 
@@ -86,11 +94,18 @@ city=GetKey(Form, "city")
 country=GetKey(Form, "country")
 phone=GetKey(Form, "phone")
 race=GetKey(Form, "race")
+locale=GetKey(Form, "locale")
 
-if (lastname==None) or (race==None) or (firstname==None) or (address==None) or (city==None):
+referrer=GetKey(Form, "referrer")
+firsttime=GetKey(Form, "firsttime")
+
+if (locale==None) or (lastname==None) or (race==None) or (firstname==None) or (address==None) or (city==None):
     output="<p>Um Dich zu Eressea anzumelden musst Du das Formular vollständig ausfüllen.\n "
     for key in Form.keys():
-	output=output+"<br>"+str(key)+"="+str(Form[key])
+	output=output+"<br>"+key+": "+Form[key].value+"\n"
+    Display(output)
+elif ValidEmail(email)==0:
+    output="<p>Um Dich zu Eressea anzumelden musst Du eine gültige Email-Adresse angeben.\n "
     Display(output)
 else:
     db=MySQLdb.connect(db=dbname)
@@ -100,8 +115,8 @@ else:
 	Display('<p>Du stehst bereits auf der Warteliste')
     else:
 	password=genpasswd()
-	fields = "firstname, lastname, email, address, city, status, password"
-	values = "'"+firstname+"', '"+lastname+"', '"+email+"', '"+address+"', '"+city+"', 'WAITING', '"+password+"'"
+	fields = "firstname, lastname, locale, email, address, city, status, password"
+	values = "'"+firstname+"', '"+lastname+"', '"+locale+"', '"+email+"', '"+address+"', '"+city+"', 'WAITING', '"+password+"'"
 	if phone!=None:
 	    fields=fields+", phone"
 	    values=values+", '"+phone+"'"
@@ -111,9 +126,21 @@ else:
 	if country!=None:
 	    fields=fields+", country"
 	    values=values+", "+country+""
+	if referrer!=None:
+	    fields=fields+", referrer"
+	    values=values+", '"+referrer+"'"
+	if firsttime!=None:
+	    fields=fields+", firsttime"
+	    if firsttime=='yes':
+		values=values+", 1"
+	    else:
+		values=values+", 0"
 	cursor.execute("insert into users ("+fields+") VALUES ("+values+")")
 	cursor.execute("SELECT LAST_INSERT_ID() from dual")
 	custid=cursor.fetchone()[0]
+	if os.environ.has_key('REMOTE_ADDR'):
+	    ip=os.environ['REMOTE_ADDR']
+	    cursor.execute("REPLACE userips (ip, user) VALUES ('"+ip+"', "+str(int(custid))+")")
 	cursor.execute("insert into subscriptions (user, race, game, status) VALUES ("+str(int(custid))+", '"+race+"', 0, 'PENDING')")
 	cursor.execute("select count(*) from users")
 	Send(email, custid, firstname, password, cursor.fetchone()[0])

@@ -3,6 +3,7 @@
 import sys
 import MySQLdb
 import cgi
+import os
 import re
 
 # specify the filename of the template file
@@ -67,6 +68,9 @@ else:
     if exist==0:
 	Display('<p>Kundennummer oder Schlüssel falsch. Bitte beachte, dass Du beim Schlüssel auf Groß- und Kleinschreibung achten mußt.')
     else:
+	if os.environ.has_key('REMOTE_ADDR'):
+	    ip=os.environ['REMOTE_ADDR']
+	    cursor.execute("REPLACE userips (ip, user) VALUES ('"+ip+"', "+str(int(custid))+")")
 	cursor.execute("update users set status='CONFIRMED' where password='"+password+"' and id="+custid)
 	Display("<p>Deine Anmeldung wurde bestätigt.");
     db.close()
