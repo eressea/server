@@ -1162,7 +1162,7 @@ quit(void)
 						cmistake(u, S->s, 241, MSG_EVENT);
 						continue;
 					}
-					if (u->faction->age > 3 || fval(u->faction, FFL_RESTART)) {
+					if (u->faction->age > 3 && fval(u->faction, FFL_RESTART)) {
 						cmistake(u, S->s, 314, MSG_EVENT);
 						continue;
 					}
