@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# If (password, custid) exist in the database, and the user is in state
+# 'WAITING', he will be changed to 'CONFIRMED'.
+
 import sys
 import MySQLdb
 import cgi
@@ -64,7 +67,7 @@ if (password==None) or (custid==None):
 else:
     db=MySQLdb.connect(db=dbname)
     cursor=db.cursor()
-    exist=cursor.execute("select id from users where id="+custid+" and password='"+password+"'")
+    exist=cursor.execute("select id from users where id="+custid+" and status='WAITING' and password='"+password+"'")
     if exist==0:
 	Display('<p>Kundennummer oder Schlüssel falsch. Bitte beachte, dass Du beim Schlüssel auf Groß- und Kleinschreibung achten mußt.')
     else:

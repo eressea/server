@@ -62,7 +62,11 @@ def ShowPage():
     
     output=output+'</table>'
     output=output+'<p><table><tr><td>Kundennummer:</td><td><input name="user" size="4"></tr><tr><td>Passwort:</td><td><input name="pass" type="password" size="40"></td>'
-    output=output+'<tr><td><input name="save" type="submit" value="Abschicken"></td></tr></table>'
+    output=output+'<tr><td>'
+    output=output+'<input name="save" type="submit" value="Abschicken">'
+    output=output+'</td></tr></table>'
+#    output=output+'<p>Aus technischen Gründen wird diese Seite erst am Dienstag abend wieder benutzbar sein.'
+
     output=output+'</form></div>'
     Display(output)
     return

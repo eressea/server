@@ -52,8 +52,8 @@ def Send(email, custid, firstname, password, position):
     SubResult = re.subn("<PASSWORD>", password, SubResult[0])
     SubResult = re.subn("<POSITION>", str(int(position)), SubResult[0])
     SubResult = re.subn("<CUSTID>", str(int(custid)), SubResult[0])
-
-    Msg="From: "+From+"\nTo: "+email+"\nSubject: Eressea Anmeldung\n\n"
+    subject={"de":"Eressea Anmeldung","en":"Eressea Registration"}
+    Msg="From: "+From+"\nTo: "+email+"\nSubject: "+subject[locale]+"\n\n"
     Msg=Msg+SubResult[0]
     server=smtplib.SMTP(smtpserver)
     server.sendmail(From, email, Msg)
@@ -110,10 +110,19 @@ elif ValidEmail(email)==0:
 else:
     db=MySQLdb.connect(db=dbname)
     cursor=db.cursor()
-    exist=cursor.execute("select id from users where email='"+email+"' and (status='WAITING' or status='PENDING')")
-    if exist>0:
-	Display('<p>Du stehst bereits auf der Warteliste')
+    exist=cursor.execute("select id from users where email='"+email+"' and (status='WAITING' or status='CONFIRMED')")
+    if exist:
+	text={"de":"Du stehst bereits auf der Warteliste","en":"You are already on the waiting list"}
+	Display('<p>'+text[locale])
     else:
+	bans=cursor.execute('select regex, reason from bannedemails')
+	while bans:
+	    bans=bans-1
+	    regexp, reason = cursor.fetchone()
+	    if (re.match(regexp, email, re.IGNORECASE))!=None:
+		Display('Deine Email-Adresse ist für Eressea nicht zugelassen. '+reason)
+		sys.exit(0)
+
 	password=genpasswd()
 	fields = "firstname, lastname, locale, email, address, city, status, password"
 	values = "'"+firstname+"', '"+lastname+"', '"+locale+"', '"+email+"', '"+address+"', '"+city+"', 'WAITING', '"+password+"'"
@@ -138,11 +147,14 @@ else:
 	cursor.execute("insert into users ("+fields+") VALUES ("+values+")")
 	cursor.execute("SELECT LAST_INSERT_ID() from dual")
 	custid=cursor.fetchone()[0]
+	ip=None
 	if os.environ.has_key('REMOTE_ADDR'):
 	    ip=os.environ['REMOTE_ADDR']
+	if ip!=None:
 	    cursor.execute("REPLACE userips (ip, user) VALUES ('"+ip+"', "+str(int(custid))+")")
 	cursor.execute("insert into subscriptions (user, race, game, status) VALUES ("+str(int(custid))+", '"+race+"', 0, 'PENDING')")
 	cursor.execute("select count(*) from users where status='WAITING' or status='CONFIRMED'")
 	Send(email, custid, firstname, password, cursor.fetchone()[0])
-	Display("<p>Deine Anmeldung wurde bearbeitet. Eine EMail mit Hinweisen ist unterwegs zu Dir.")
+	text={"de":"Deine Anmeldung wurde bearbeitet. Eine EMail mit Hinweisen ist unterwegs zu Dir", "en":"Your application was processed. An email containing further instructions is being sent to you"}
+	Display("<p>"+text[locale]+".")
     db.close()
