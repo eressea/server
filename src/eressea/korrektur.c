@@ -943,12 +943,14 @@ fix_astralplane(void)
   plane * astralplane = get_astralplane();
   region * r;
   region_list * rlist = NULL;
+  faction * monsters = findfaction(MONSTER_FACTION);
 
-  if (astralplane) {
-    freset(astralplane, PFL_NOCOORDS);
-    freset(astralplane, PFL_NOFEED);
-    set_ursprung(findfaction(MONSTER_FACTION), astralplane->id, 0, 0);
-  }
+  if (astralplane==NULL || monsters==NULL) return 0;
+
+  freset(astralplane, PFL_NOCOORDS);
+  freset(astralplane, PFL_NOFEED);
+  set_ursprung(monsters, astralplane->id, 0, 0);
+
   for (r=regions;r;r=r->next) if (rplane(r)==astralplane) {
     region * ra = r_standard_to_astral(r);
     if (ra==NULL) continue;
