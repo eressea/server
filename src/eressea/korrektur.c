@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.13 2001/02/04 08:10:17 enno Exp $
+ *	$Id: korrektur.c,v 1.14 2001/02/04 11:18:27 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1771,6 +1771,22 @@ undo_deadpeasants(void)
 	}
 }
 
+void
+fix_targetregion_resolve(void)
+{
+	region *r;
+	unit *u;
+	attrib *a;
+
+	for(r=regions; r; r=r->next) {
+		for(u=r->units; u; u=u->next) {
+			a = a_find(u->attribs, &at_targetregion);
+			if(a) a->data.v = findregion(a->data.sa[0], a->data.sa[1]);
+		}
+	}
+}
+
+
 #include <modules/gmcmd.h>
 void setup_gm_faction(void);
 
@@ -1782,6 +1798,7 @@ korrektur(void)
 #endif
 	
 	/* Wieder entfernen! */
+	do_once(atoi36("trgr"), fix_targetregion_resolve())
 
 	/* fix_herbtypes(); */
 #ifdef CONVERT_TRIGGER

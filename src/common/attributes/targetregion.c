@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: targetregion.c,v 1.3 2001/01/27 19:30:07 enno Exp $
+ * $Id: targetregion.c,v 1.4 2001/02/04 11:18:26 corwin Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -32,7 +32,7 @@ read_targetregion(attrib * a, FILE * F)
 {
 	if (global.data_version < BASE36IDS_VERSION) {
 		a_readdefault(a, F);
-		a->data.v = findregion(a->data.sa[0], a->data.sa[1]);
+		/* a->data.v = findregion(a->data.sa[0], a->data.sa[1]); */
 	} else {
 		read_region_reference((region**)&a->data.v, F);
 	}
