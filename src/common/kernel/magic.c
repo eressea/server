@@ -1853,6 +1853,10 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
   int p = 0;
 	const char * c = syntax;
 	spellparameter *par;
+  int minlen = 0;
+
+  while (*c!=0) if (*c++!='+') ++minlen;
+  c = syntax;
 
 	/* mindestens ein Ziel (Ziellose Zauber werden nicht
 	 * geparst) */
@@ -1954,7 +1958,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
 
   /* im Endeffekt waren es evtl. nur p parameter (wegen TEMP) */
   par->length = p;
-  if (fail) {
+  if (fail || par->length<minlen) {
     cmistake(u, ord, 209, MSG_MAGIC);
     free_spellparameter(par);
     return NULL;
