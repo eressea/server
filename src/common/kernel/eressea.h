@@ -34,7 +34,6 @@
 
 /* Features currently in development (change makefile please): */
 /* #define MSG_LEVELS -- msg-levels active */
-/* #define RACE_ADJUSTMENTS */
 
 /* basic types used in the eressea "kernel" */
 typedef unsigned char order_t;

@@ -1200,7 +1200,7 @@ randomevents(void)
 	}
 
 	for (r = regions; r; r = r->next) {
-#ifndef RACE_ADJUSTMENTS
+#ifdef RACE_ADJUSTMENTS == 0
 	/* Elfen generieren Wald, Personen in Steinkreisen können Einhörner
 	 * bekommen. */
 
