@@ -240,7 +240,7 @@ expandorders(region * r, request * requests)
 }
 /* ------------------------------------------------------------- */
 
-
+#if SKILLPOINTS == 0
 static void
 change_level(unit * u, skill_t sk, int bylevel)
 {
@@ -252,6 +252,7 @@ change_level(unit * u, skill_t sk, int bylevel)
 		sv->learning = 0;
 	}
 }
+#endif
 
 static void
 expandrecruit(region * r, request * recruitorders)

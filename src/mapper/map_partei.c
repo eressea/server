@@ -286,13 +286,14 @@ SeedPartei(void)
 }
 
 static int
-level(int days)
+days2level(int days)
 {
 	int l = 0;
 	while (level_days(l)<=days) ++l;
 	return l-1;
 }
 
+#if SKILLPOINTS == 0
 static void
 change_level(unit * u, skill_t sk, int bylevel)
 {
@@ -304,11 +305,12 @@ change_level(unit * u, skill_t sk, int bylevel)
 		sv->learning = 0;
 	}
 }
+#endif
 
 static void
 give_latestart_bonus(region *r, unit *u, int b)
 {
-	int bsk = level(b*30);
+	int bsk = days2level(b*30);
 	change_level(u, SK_OBSERVATION, bsk);
 	change_money(u, 200*b);
 
