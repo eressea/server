@@ -16,15 +16,16 @@ import re
 from Graph import *
 
 class heer:
-	def __init__(self, rx, ry, f, o):
+	def __init__(self, rx, ry, f, p, o):
 		self.rx = rx
 		self.ry = ry
 		self.f  = f
+		self.part = p
 		self.o  = o
 		self.attacked = []
 
 	def toString(self):
-		return "("+self.f+","+str(self.rx)+","+str(self.ry)+")"
+		return "("+self.f+"/"+str(self.part)+","+str(self.rx)+","+str(self.ry)+")"
 
 
 def dist(x1, y1, x2, y2):
@@ -52,14 +53,11 @@ def is_neighbour(h, r1, r2):
 	return 0
 
 heere = [
-	Node(heer(0,-2, 'D', 'A->C:1,-3')),
-	Node(heer(1,-3, 'D', '')),
-	Node(heer(1,-2, 'D', '')),
-	Node(heer(2,-3, 'D', 'A->C:1,-3')),
-	Node(heer(1,-2, 'C', 'L->D')),
-	Node(heer(1,-3, 'C', 'A->D:1,-2')),
-	Node(heer(0, 0, 'A', '')),
-	Node(heer(0, 0, 'B', 'L->A'))
+	Node(heer(0,0,  'A', 1, 'A->B:-1,1')),
+	Node(heer(0,0,  'A', 2, 'A->B:0,1')),
+	Node(heer(-1,1, 'B', 1, '')),
+	Node(heer(1,-1, 'B', 1, '')),
+	Node(heer(0,1,  'B', 1, ''))
 ]
 
 def find_heer_node(x, y, f):

@@ -28,6 +28,7 @@
 #include "overrideroads.h"
 #include "otherfaction.h"
 #include "racename.h"
+#include "ugroup.h"
 #ifdef AT_OPTION
 # include "option.h"
 #endif
@@ -63,4 +64,5 @@ init_attributes(void)
 #ifdef AT_OPTION
 	init_option();
 #endif
+	init_ugroup();
 }

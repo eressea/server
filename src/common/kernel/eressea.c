@@ -203,7 +203,9 @@ const char *keywords[MAXKEYWORDS] =
 	"SORTIEREN",
 	"JIHAD",
 	"GM",
-	"INFO"
+	"INFO",
+	"JOINVERBAND",
+	"LEAVEVERBAND"
 };
 
 const char *report_options[MAX_MSG] =

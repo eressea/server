@@ -3762,6 +3762,74 @@
 	</locale>
 </message>
 
+<message name="error289">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
+	<locale name="de">
+		<nr section="errors">
+			<text>"$unit($unit) in $region($region): '$command' - Wie sollen wir uns tarnen?"</text>
+		</nr>
+	</locale>
+</message>
+
+<message name="error290">
+	<param name="unit" type="unit"></param>
+	<param name="region" type="region"></param>
+	<param name="command" type="string"></param>
+	<locale name="de">
+		<nr section="de">
+			<text>"$unit in $region: '$command' - Eine Einheit kann nur in einem Verband Mitglied sein."</text>
+		</nr>
+	</locale>
+</message>
+
+<message name="error291">
+	<param name="unit" type="unit"></param>
+	<param name="region" type="region"></param>
+	<param name="command" type="string"></param>
+	<locale name="de">
+		<nr section="de">
+			<text>"$unit in $region: '$command' - Die Einheit ist in keinem Verband."</text>
+		</nr>
+	</locale>
+</message>
+
+<message name="error292">
+	<param name="unit" type="unit"></param>
+	<param name="region" type="region"></param>
+	<param name="command" type="string"></param>
+	<locale name="de">
+		<nr section="de">
+			<text>"$unit in $region: '$command' - Mit sich selbst kann man keinen Verband bilden."</text>
+		</nr>
+	</locale>
+</message>
+
+<message name="error293">
+	<param name="unit" type="unit"></param>
+	<param name="region" type="region"></param>
+	<param name="command" type="string"></param>
+	<locale name="de">
+		<nr section="de">
+			<text>"$unit in $region: '$command' - Verbände können nur zwischen Einheiten derselben Partei gebildet werden."</text>
+		</nr>
+	</locale>
+</message>
+
+<message name="error294">
+	<param name="unit" type="unit"></param>
+	<param name="region" type="region"></param>
+	<param name="command" type="string"></param>
+	<locale name="de">
+		<nr section="de">
+			<text>"$unit in $region: '$command' - Die Einheiten müssen sich im selben Schiff oder Gebäude aufhalten."</text>
+		</nr>
+	</locale>
+</message>
+
 <message name="msg_event">
 	<type>
 		<arg name="string" type="string"></arg>
