@@ -716,9 +716,9 @@ sp_drainodem(fighter * fi, int level, double power, spell * sp)
 		assert(dt.fighter);
 		if (hits(at, dt, NULL)) {
 			drain_exp(dt.fighter->unit, 90);
-			drained++;
+			++drained;
+      killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
 		}
-		killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
 		--force;
 	}
 

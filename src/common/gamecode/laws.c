@@ -166,7 +166,6 @@ get_food(region *r)
 {
 	unit *u;
 	int peasantfood = rpeasants(r)*10;
-  unit * demon = r->units;
 
 	/* 1. Versorgung von eigenen Einheiten. Das vorhandene Silber
 	 * wird zunächst so auf die Einheiten aufgeteilt, dass idealerweise
@@ -238,33 +237,27 @@ get_food(region *r)
    */
 	for (u = r->units; u; u = u->next) {
 		if (u->race == new_race[RC_DAEMON]) {
+      unit * donor = r->units;
       int hungry = u->number;
 
-      while (demon!=NULL && hungry>0) {
+      while (donor!=NULL && hungry>0) {
         /* alwayy start with the first known uint that may have some blood */
         static const struct potion_type * pt_blood;
-        unit * ud = demon;
         if (pt_blood==NULL) pt_blood = pt_find("peasantblood");
-        demon = NULL; /* this will be re-set in the loop */
-        while (ud!=NULL) {
-          if (ud->race==new_race[RC_DAEMON]) {
-            if (get_effect(ud, pt_blood)) {
-              /* new best guess for first blood-donor: */
-              if (demon==NULL) demon = ud;
+        while (donor!=NULL) {
+          if (donor->race==new_race[RC_DAEMON]) {
+            if (get_effect(donor, pt_blood)) {
               /* if he's in our faction, drain him: */
-              if (ud->faction==u->faction) break;
+              if (donor->faction==u->faction) break;
             }
           }
-          ud=ud->next;
+          donor = donor->next;
         }
-        if (ud!=NULL) {
-          int blut = get_effect(ud, pt_blood);
+        if (donor != NULL) {
+          int blut = get_effect(donor, pt_blood);
           blut = min(blut, hungry);
-          change_effect(ud, pt_blood, -blut);
+          change_effect(donor, pt_blood, -blut);
           hungry -= blut;
-        } else {
-          break;
-          /* no more help for us */
         }
 			}
 			if (r->planep == NULL || !fval(r->planep, PFL_NOFEED)) {
@@ -276,7 +269,9 @@ get_food(region *r)
 					peasantfood = 0;
 				}
 				if (hungry > 0) {
-					hunger(hungry, u); /* nicht gefütterte dämonen hungern */
+          /* nicht gefütterte dämonen hungern */
+          if (hunger(hungry, u)) fset(u, UFL_HUNGER);
+					/* used to be: hunger(hungry, u); */
 				}
 			}
 		}

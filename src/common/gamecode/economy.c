@@ -2941,7 +2941,7 @@ produce(void)
           case K_SELL:
             /* sell returns true if the sale is not limited
              * by the region limit */
-            limited = !sell(u, &sellorders, ord) & limited;
+            limited &= !sell(u, &sellorders, ord);
             break;
           }
         }
@@ -3027,6 +3027,8 @@ produce(void)
 
     if (sellorders) {
       int limit = rpeasants(r) / TRADE_FRACTION;
+      if (rterrain(r) == T_DESERT && buildingtype_exists(r, bt_find("caravan")))
+        limit *= 2;
       expandselling(r, sellorders, limited?limit:INT_MAX);
     }
 

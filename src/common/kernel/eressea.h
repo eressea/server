@@ -840,7 +840,7 @@ enum {
 #define HELP_GUARD    16			/* Laesst Steuern eintreiben etc. */
 #define HELP_FSTEALTH 32			/* Parteitarnung anzeigen. */
 #define HELP_TRAVEL   64			/* Laesst Regionen betreten. */
-#define HELP_ALL    (127-HELP_OBSERVE)		/* Alle "positiven" HELPs zusammen */
+#define HELP_ALL    (127-HELP_TRAVEL-HELP_OBSERVE)		/* Alle "positiven" HELPs zusammen */
 /* HELP_OBSERVE deaktiviert */
 /* ------------------------------------------------------------- */
 /* Prototypen */

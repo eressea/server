@@ -994,7 +994,11 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	boolean magic = false;
 	int da = dice_rand(damage);
 
-	if(fval(au, UFL_WERE)) {
+#ifdef SHOW_KILLS
+  ++at.fighter->hits;
+#endif
+
+  if (fval(au, UFL_WERE)) {
 		int level = fspecial(du->faction, FS_LYCANTROPE);
 		da += level;
 	}
@@ -1188,13 +1192,14 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 		return false;
 	}
 #ifdef SHOW_KILLS
-	++at.fighter->kills;
+  ++at.fighter->kills;
+  assert(at.fighter->kills>=at.fighter->hits);
 #endif
 
 #ifdef SMALL_BATTLE_MESSAGES
-        if (b->small) {
-		strcat(smallbuf, ", die tödlich ist");
-	}
+  if (b->small) {
+    strcat(smallbuf, ", die tödlich ist");
+  }
 #endif
 
 	/* Sieben Leben */
@@ -1850,9 +1855,6 @@ hits(troop at, troop dt, weapon * awp)
 			strcat(smallbuf, " und trifft.");
 			battlerecord(b,smallbuf);
 		}
-#endif
-#ifdef SHOW_KILLS
-		++at.fighter->hits;
 #endif
 		return 1;
 	}

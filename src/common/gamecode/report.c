@@ -1690,7 +1690,7 @@ show_allies(const faction * f, const ally * allies)
 		hh = 0;
 		scat(factionname(sf->faction));
 		scat(" (");
-		if (mode == HELP_ALL) {
+		if ((mode & HELP_ALL) == HELP_ALL) {
 			scat("Alles");
 		} else
 			for (h = 1; h < HELP_ALL; h *= 2) {

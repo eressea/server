@@ -511,7 +511,7 @@ travel_route(const unit * u, region * r, region_list * route)
   /* kein travelthru in der letzten region! */
   while (route) {
     travelthru(u, r);
-	r = route->data;
+    r = route->data;
     route = route->next;
   }
 }
