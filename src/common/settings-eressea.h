@@ -34,7 +34,7 @@
 #define GUARD_DISABLES_PRODUCTION 1
 #define RESOURCE_QUANTITY 0.5
 #define RECRUITFRACTION 40		/* 100/RECRUITFRACTION% */
-#define CATAPULT_AMMUNITION 0	/* Gebaut werden kann sie auch mit 0! */
+#define CATAPULT_AMMUNITION 1	/* Gebaut werden kann sie auch mit 0! */
 #define CHANGED_CROSSBOWS 1
 #define COMBAT_TURNS 5
 
