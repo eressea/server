@@ -2123,7 +2123,7 @@ init_oldpotions(void)
 		if (p==P_FOOL) itype->useonother = &use_foolpotion;
 	}
 	oldpotiontype[P_WARMTH]->use = &use_warmthpotion;
-	oldpotiontype[P_WARMTH]->use = &use_healingpotion;
+	oldpotiontype[P_HEILWASSER]->use = &use_healingpotion;
 	oldpotiontype[P_BAUERNBLUT]->use = &use_bloodpotion;	
 }
 
