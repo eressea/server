@@ -74,8 +74,8 @@ static void
 removecurse_write(const trigger * t, FILE * F)
 {
 	removecurse_data * td = (removecurse_data*)t->data.v;
-	fprintf(F, "%s ", itoa36(td->target->no));
-	fprintf(F, "%d ", td->curse->no);
+	fprintf(F, "%s ", td->target?itoa36(td->target->no):0);
+	fprintf(F, "%d ", td->curse?td->curse->no:0);
 }
 
 static int
