@@ -586,6 +586,14 @@ ship_allowed(const struct ship_type * type, const region * r)
   return false;
 }
 
+static boolean
+flying_ship(const ship * sh)
+{
+  if (sh->type->flags & SFL_FLY) return true;
+  if (is_cursed(sh->attribs, C_SHIP_FLYING, 0)) return true;
+  return false;
+}
+
 static void
 drifting_ships(region * r)
 {
@@ -649,9 +657,11 @@ drifting_ships(region * r)
       if (sh!=NULL) {
         fset(sh, SF_DRIFTED);
 
-        if (rterrain(rnext) != T_OCEAN) {
-          sh->coast = dir_invert(d);
-        }
+        if (rnext->terrain != T_OCEAN && !flying_ship(sh)) {
+		  sh->coast = reldirection(rnext, r);
+		} else {
+		  sh->coast = NODIRECTION;
+		}
         damage_ship(sh, 0.02);
 
         if (sh->damage>=sh->size * DAMAGE_SCALE) {
@@ -1384,14 +1394,6 @@ check_takeoff(ship *sh, region *from, region *to)
   }
 
   return true;
-}
-
-static boolean
-flying_ship(const ship * sh)
-{
-  if (sh->type->flags & SFL_FLY) return true;
-  if (is_cursed(sh->attribs, C_SHIP_FLYING, 0)) return true;
-  return false;
 }
 
 static region_list *

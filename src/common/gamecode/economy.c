@@ -1298,6 +1298,7 @@ economics(void)
             break;
 
         }
+		if (u->orders==NULL) break;
       }
     }
     /* RECRUIT orders */
