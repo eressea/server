@@ -274,7 +274,7 @@ walkingcapacity(const struct unit * u)
 	n += min(personen, tmp) * (HORSECAPACITY - personcapacity(u));
   /* change_effect wird in ageing gemacht */
   tmp = get_item(u, I_TROLLBELT);
-	n += min(personen, tmp) * STRENGTHCAPACITY;
+	n += min(personen, tmp) * (STRENGTHMULTIPLIER-1) * personcapacity(u);
 
 	return n;
 }

@@ -359,7 +359,8 @@ extern void plagues(struct region * r, boolean ismagic);
 /* Man gibt in einer Taverne mehr Geld aus! */
 
 #define BAGCAPACITY		20000	/* soviel paﬂt in einen Bag of Holding */
-#define STRENGTHCAPACITY	50000	/* zus‰tzliche Tragkraft beim Kraftzauber */
+#define STRENGTHCAPACITY	50000	/* zus‰tzliche Tragkraft beim Kraftzauber (deprecated) */
+#define STRENGTHMULTIPLIER 50   /* multiplier for trollbelt */
 
 typedef struct ursprung {
 	struct ursprung *next;

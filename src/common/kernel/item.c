@@ -1495,6 +1495,10 @@ init_olditems(void)
 			itype->capacity = BAGCAPACITY;
 			break;
 		case I_TROLLBELT:
+			/* This is wrong. according to the item description it multiplies
+			 * the strength of the wearer by a factor of
+			 * 50 (STRENGTHMULTIPLIER), not add a fixed 50000 */
+			/* only used in battle.c for items of type ITF_ANIMAL */
 			itype->capacity = STRENGTHCAPACITY;
 			break;
 		default:
