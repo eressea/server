@@ -147,7 +147,9 @@ create_teleport_plane(void)
 	region *r;
 	int i;
 
-	if (!getplanebyid(1)) {
+	astral_plane = getplanebyid(1);
+
+	if (!astral_plane) {
 		astral_plane = create_new_plane(1, "Astralraum",
 			TE_CENTER_X-500, TE_CENTER_X+500,
 			TE_CENTER_Y-500, TE_CENTER_Y+500,
