@@ -1163,6 +1163,7 @@ randomevents(void)
 				}
 				if (r->planep==0 || !fval(r->planep, PFL_NOFEED)) {
 					unfed = (u->number - bauernblut) - peasantfood;
+					bauernblut = max(0, bauernblut-u->number);
 					if (unfed > 0) {
 #ifdef DAEMON_HUNGER
 						hunger(u, unfed); /* nicht gefütterte dämonen hungern */
