@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.7 2001/02/03 13:45:32 enno Exp $
+ *	$Id: eressea.c,v 1.8 2001/02/05 07:23:17 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1033,7 +1033,7 @@ update_lighthouse(building * lh)
 }
 
 int
-count_migrants (faction * f)
+count_migrants (const faction * f)
 {
 #ifndef NDEBUG
 	region *r;
@@ -1054,7 +1054,7 @@ count_migrants (faction * f)
 }
 
 int
-count_all (faction * f)
+count_all(const faction * f)
 {
 	int n = 0;
 	unit *u;
@@ -1067,11 +1067,11 @@ count_all (faction * f)
 }
 
 int
-count_maxmigrants (faction * f)
+count_maxmigrants(const faction * f)
 {
 	int x = 0;
 	if (f->race == RC_HUMAN) {
-		int x = (int)(log10(count_all(f) / 50.0) * 20);
+		x = (int)(log10(count_all(f) / 50.0) * 20);
 		if (x < 0) x = 0;
 	}
 	return x;
@@ -1631,6 +1631,9 @@ createunitid(region * r1, faction * f, int number, race_t race, int id, const ch
 	if(!is_undead(u)) {
 		f->no_units++;
 	}
+
+	/* Monster sind grundsätzlich parteigetarnt */
+	if(f->no <= 0) fset(u, FL_PARTEITARNUNG);
 
 	return u;
 }
