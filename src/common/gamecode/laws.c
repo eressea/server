@@ -3516,11 +3516,11 @@ processorders (void)
 	puts(" - Produzieren, Geldverdienen, Handeln, Anwerben");
 	produce();
 
-	puts(" - Schiffe sinken");
- 	sinkships();
-
 	puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (3.Versuch)");
 	do_misc(true);
+
+	puts(" - Schiffe sinken");
+ 	sinkships();
 
 	puts(" - Bewegungen");
 	movement();
