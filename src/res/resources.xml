@@ -100,7 +100,7 @@
   <resource name="halberd">
     <item weight="200">
       <construction skill="sk_weaponsmithing" minskill="3" reqsize="1">
-        <requirement type="wood" quantity="1"/>
+        <requirement type="log" quantity="1"/>
         <requirement type="iron" quantity="1"/>
       </construction>
       <weapon cut="true" skill="sk_polearm" offmod="-1" defmod="2" magres="0.0">

@@ -123,6 +123,7 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
 
     property = xmlGetProp(node, BAD_CAST "type");
     rtype = rt_find((const char*)property);
+    assert(rtype!=NULL);
     for (type=0;type!=MAX_RESOURCES;++type) {
       if (oldresourcetype[type]==rtype) {
         radd->type = type;
@@ -584,6 +585,8 @@ parse_resources(xmlDocPtr doc)
   xmlNodeSetPtr nodes;
   int i;
 
+  init_resources();
+
   /* reading eressea/resources/resource */
   resources = xmlXPathEvalExpression(BAD_CAST "/eressea/resources/resource", xpath);
   nodes = resources->nodesetval;
@@ -705,7 +708,6 @@ parse_resources(xmlDocPtr doc)
 
   xmlXPathFreeContext(xpath);
 
-  init_resources();
   return 0;
 }
 
