@@ -13,7 +13,7 @@ warnahead=2
 db=MySQLdb.connect(db=dbname)
 cursor=db.cursor()
 
-users = cursor.execute("select users.email, users.id, count(subscriptions.game) from users, subscriptions, games where users.id=subscriptions.user and subscriptions.game=games.id and games.status='RUNNING' GROUP BY users.id")
+users = cursor.execute("select users.email, users.id, count(subscriptions.game) from users, subscriptions, games where users.id=subscriptions.user and subscriptions.game=games.id user.id!=0 and games.status='RUNNING' GROUP BY users.id")
 server=smtplib.SMTP('localhost')
 while users > 0:
     users=users-1
