@@ -1610,6 +1610,7 @@ main(int argc, char *argv[])
 
 	sqlpatch = false;
 	setlocale(LC_ALL, "");
+	setlocale(LC_NUMERIC, "C");
 
 	fprintf(stderr, "\n	Mapper V" VERSION " Hex (" __DATE__ ")\n\n"
 		"Copyright © 1998/99 by Henning Peters  -  faroul@gmx.de\n"
