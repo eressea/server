@@ -327,10 +327,14 @@ boolean is_undead(const unit *u)
 boolean
 r_insectstalled(const region * r)
 {
-	if (rterrain(r)==T_GLACIER || rterrain(r)==T_ICEBERG_SLEEP
-			|| rterrain(r)==T_ICEBERG)
-		return true;
-
+  switch (rterrain(r)) {
+    case T_GLACIER:
+    case T_ICEBERG_SLEEP:
+    case T_ICEBERG:
+  		return true;
+    default:
+      break;
+  }
 	return false;
 }
 

@@ -405,6 +405,7 @@ cansail(const region * r, ship * sh)
 	}
 	if (n > shipcapacity(sh)) return false;
 	if (p > sh->type->cabins) return false;
+
 	return true;
 }
 
@@ -571,19 +572,44 @@ check_working_buildingtype(const region * r, const building_type * bt)
 }
 
 static boolean
-ship_allowed(const struct ship_type * type, const region * r)
+is_freezing(const unit * u) 
+{
+  if (old_race(u->race)!=RC_INSECT) return false;
+  if (is_cursed(u->attribs, C_KAELTESCHUTZ, 0)) return false;
+  return true;
+}
+
+static boolean
+ship_allowed(const struct ship * sh, const region * r)
 {
   int c = 0;
   terrain_t t = rterrain(r);
-
   static const building_type * bt_harbour=NULL;
+
   if (bt_harbour==NULL) bt_harbour=bt_find("harbour");
 
-  if (check_working_buildingtype(r, bt_harbour)) return true;
+  if (r_insectstalled(r)) {
+    /* insekten dürfen nicht hier rein. haben wir welche? */
+    unit * u;
 
-  for (c=0;type->coast[c]!=NOTERRAIN;++c) {
-    if (type->coast[c]==t) return true;
+    for (u=sh->region->units;u!=NULL;u=u->next) {
+      if (u->ship!=sh) continue;
+
+      if (is_freezing(u)) {
+        unit * captain = shipowner(sh);
+        ADDMSG(&captain->faction->msgs, msg_message("detectforbidden", 
+          "unit region", u, r));
+
+        return false;
+      }
+    }
   }
+
+  if (check_working_buildingtype(r, bt_harbour)) return true;
+  for (c=0;sh->type->coast[c]!=NOTERRAIN;++c) {
+    if (sh->type->coast[c]==t) return true;
+  }
+
   return false;
 }
 
@@ -640,7 +666,7 @@ drifting_ships(region * r)
       for (d = 0; d != MAXDIRECTIONS; ++d) {
         region * rn = rconnect(r, (direction_t)((d + d_offset) % MAXDIRECTIONS));
         terrain_t t = rterrain(rn);
-        if (rn!=NULL && (terrain[t].flags & SAIL_INTO) && ship_allowed(sh->type, rn)) {
+        if (rn!=NULL && (terrain[t].flags & SAIL_INTO) && ship_allowed(sh, rn)) {
           rnext = rn;
           if (t!=T_OCEAN) break;
         }
@@ -1234,8 +1260,7 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
         break;
       }
 
-      if (old_race(u->race) == RC_INSECT && r_insectstalled(next) && !is_cursed(u->attribs, C_KAELTESCHUTZ,0)) 
-      {
+      if (is_freezing(u)) {
         ADDMSG(&u->faction->msgs, msg_message("detectforbidden",
           "unit region", u, next));
         break;
@@ -1604,7 +1629,7 @@ sail(unit * u, region * next_point, boolean move_on_land)
         }
       }
     
-      if (!ship_allowed(sh->type, next_point)) {
+      if (!ship_allowed(sh, next_point)) {
         /* for some reason or another, we aren't allowed in there.. */
         if (check_leuchtturm(current_point, NULL)) {
           ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship", sh));
