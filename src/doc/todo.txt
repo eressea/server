@@ -1,0 +1,239 @@
+TODO, FEATURES, usw:
+
+- alte Artefakte sollten auch permanente Aura kosten
+
+- Traumauge auf 5 PA senken.
+
+- news.silly:
+  - Statistik der Regionen mit den meisten Gräbern
+  - Wahl zur unbeliebtesten Region der Welt (Wo Bauern am wenigsten gern sein
+  	wollen).
+
+- NEW_ITEMS:
+  - SILVERWEIGHT, silber nicth doppelt berechnen.
+  
+
+- Monster sollten die Runde nach dem Auftauchen nicht angreifen können.
+
+- Alchemie: Mehr als einen Trank/Runde brauen
+	Tränke aufwerte/billiger machen
+
+- items, die man selber benennen kann.
+  namen werden reserviert für eine partei, jede partei nur endlich viele.
+  derartige items wiegen nichts, können frei gehandelt werden
+  spezielle option, um solche items an beliebige einheiten zu übergeben
+  (amulett des treffens, u.ä.)
+
+- Tränke aufwerten,
+
+- Gebäude für Dämonen?
+
+- Parteiwissen
+
+- Mails "von Einheiten an Einheiten".
+
+- Neue Schiffstypen
+
+- Meditation / Trance?
+  langer Befehl, bringt doppelte Regeneration, braucht Heiligen Hain
+	oder Magierturm?
+
+- Linear Stufenabhängige Zauber ausbauen, ist wohl zu verwirrend, das
+  ein Zauber Stufenabhängig ist aber nicht in der Stufe variiert werden
+  kann.
+
+- parteigetarnte alliierte angreifbar machen. siehe mail an e-kom, enno, 29.8.00
+
+- Anmeldungen direkt in den mapper integrieren
+
++ HELFE-Gruppen
+
+
+- Wiederanmeldungen im Wochenbericht von Erstanmeldungen trennen
+
+- Nichtmeermenschen Piraterie einfacher machen. (20 Lerntage auf See?
+  Geringer Arbeitslohn?)
+
+- battle.c: evtl. kann man sich b->fighters sparen?
+
+- struct building: ein paar der variablen können auch attribute sein, siehe header
+
++ battle.c: b->see_matrix = calloc((max_fac_no+1), sizeof(boolean *));
+  (enno) die see_matrix ist als speichermethode ziemlich ineffizient,
+  da es eine sparse matrix ist. besser so machen wie in cansee()
+
+- battle.c: Drüber nachdenken, ob struct battle wirklich dynamisch angelegt werden sollte.
+ (enno) nein, eigentlich sollte sie das nicht...
+
+- mehr Geländeunterschiede. Vorschläge:
+	- Sumpf: bewegung -1
+
++ potion effects werden bei transfermen nicht skaliert.
+  spätestens im item-source wird das gefixt.
+
+- Durch übergeben kann man Silber vor Beklaue schützen
+
+- Botschaft an Einheit <nr> gibt als Meldung nur
+  'Eine Botschaft von xyz: "<nr>"'
+
+- Schiffeversenken gibt kaputte Meldung
+  Cef'az (c142) in Dór'Aglar (18,-16) versenkt die X~Lc^H~@~[c^H^X~Gc^Hm
+	(17).
+	(Das Schiff war die Cir'mor (1142), Langboot)
+
+- Monsterauseinanderlaufen klappt nicht.
+
++ cansee() fehlt in vielen Zaubern.
+
++ parser hat neuerdings ein umlautproblem (unter windows) (Öl->l)
+
++ gräber verwittern
+
+- kampfzauber im cr anzeigen.
+
+- umlautfix fixen.
+
++ Frubilaszat (Lhmc) findet 0 Blasenmorcheln.
+
++ schiffsfix fixen.
+
++ handel vereinfachen.
+
+? Durch Fahre/Transportiere können Nichtschwimmer/Nichtflieger über
+  Meerengen, wenn ein Schwimmer/Flieger sie transportiert. Rast auf
+  dem Meer ist für sie aber nicht möglich. Evt. kann man da tricksen,
+  muß überprüft werden.
+
+- Transportkapazität sollte in race[].
+
++ Lehre-Meldungen:
+  skill-Nummern werden nirgends definiert.
+  (enno) da muß eine liste her, in einem rules.cr
+  (enno) oder besser, wir geben die namen aus.
+
+- Fehler-beschreibungen sind inkonsistent:
+  > "Dusei-Endlager (cawk) ist mindestens gleich gut wie wir.";error
+  aber
+  > 65;errno
+  (statt "Die Lernkosten können nicht bezahlt werden")
+
+- Unterhalt-Zahlungen:
+  Es fehlt Unterscheidung zwischen Bezahlung und nicht-bezahlung,
+  sowie der Betrag.
+  (enno) ja, ist schwer, wegen der komplexen message.
+
++ Luxusgut-Ein-/Verkauf:
+  Warum auf 2 Messages aufspalten ?
+  (enno) warum nicht.
+  (corwin) Weil nur noch ne uninteressante Message mehr?
+
+? casualties-Messages nicht definiert. (Was soll die machen?)
+	(enno)
+		- Die sollen in render.c eine Spezialbehandlung bekommen.
+		+ Quickfix: Eine einfache Ausgabe für den NR.
+
++ hilfen für ehmv/vorlage im CR (NUMMER, TEMP)
+
+- Werte mit 0 wieder in den CR aufnehmen (angefangen)
+
++ lerntage -> lernpunkte (doku)
+
+
+- Eine Konstruktion der Form
+
+   new_message(...,"%s:bla",buf) funktioniert nicht. Es werden
+   Nonsens-Strings ausgegeben:
+
+   Nummer 5r94 (5r94) in Syvanrylfed (4,4) produziert 85 Schwerter aus
+   Optionen: AUSWERTUNG ZUGVORLAGE SILBERPOOL STATISTIK MERIAN ADRESSEN
+
+   Wird da evt. nur der Zeiger auf Buf gespeichert? Oha, dann haben
+   wir bei vielen Messages ein Problem.
+
+   -> (enno) stimmt. Der übergebene String darf nicht mehr verändert werden,
+   strdup() ist dein freund. Um das anders zu machen, könnte man in
+   new_message() einstrdup() machen, wenn der typ %s gefuden wird.
+
+   -> strings sollten allerdings eh selten sein, da ja meist locale-dependent.
+   ausnahmen sind eigentlich nur namen.
+
+	 -> passiert bei allen Zauberfehlermeldungen
+
+- Einordnung der Messages klappt scheinbar nicht, es stehen auch
+  Produktionsmessages unter Meldungen und Fehler.
+
+  -> Die Einordnung ist erst später dazugekommen, und wird noch kaum
+  irgendwo benutzt
+
++ Unterscheidung unitid(mage), "Jemand" in der Ausgabe ist z.B.
+  beim Zauber Erwecke Ents fehlerhaft. (Die zaubernde Partei bekommt
+  ein 'Jemand ...' in den Regionsmessages.) Fehler wohl erst beim
+  Rendering: v_mage_de bekommt i=0 obwohl bei allen Erzeugern ein
+  mage angegeben wird.
+	(katja) scheint zu funktionieren
+
+Implementationslücken:
+
+Es fehlen noch Sprüche für
+
+- Tybied (20):
+	Stufe 13
+		Artefakte zerstören (ist noch unsinnig, da es keine Artefakte mit
+		mehr als 1 Aura gibt)
+
+  zusätzlich wäre schön:
+	niedrigstufiger Combatspell
+	Stufe 11 Non-Combat
+	Stufe 12 Non-Combat
+
+
+- Illaun(15):
+	Stufe 1
+	Stufe 13
+	Stufe 14
+
+  Für diese Zauber fehlen noch Ideen
+
+	zusätzlich wäre schön:
+	Stufe 2 Non-Combat
+	Stufe 7 Non-Combat
+
+
+- Gwyrrd(27):
+	Stufe 11
+	Stufe 12
+
+  Hier sind noch einige nicht weiter ausgearbeitete Zauberideen
+  vorhanden
+
+- Cerddor(26):
+	Stufe 14
+
+  Hier sind noch einige nicht weiter ausgearbeitete Zauberideen
+  vorhanden, aber alles eher niedrigstufige
+
+
+- Draig(18):
+	Stufe 1
+	Stufe 13
+		Wahnsinn (Einheit, negativ)
+
+  Hier fehlt nur die Implementation
+
+	zusätzlich wäre schön:
+	Stufe 2 Non-Combat
+
+Dann gibt es für jedes Gebiet zu jeder Stufe kleiner 15 mindestens einen
+normalen Spruch.
+
+
+ Kristall des Schutzes
+	Der Kristall erhöht im Kampf die für die Berechnung der
+	Magieresistenz angesetzte Stufe von 500 Personen (wenn
+	Besitzer ein Magier) oder 200 Personen (wenn Besitzer kein
+	Magier) der eigenen Partei (oder, wenn alle Personen der eigenen
+	geschützt sind, von Alliierten) um 25%. Der Besitzer muß kein
+	Magier sein. Implementation über ein Flag, welches vor dem Kampf
+	gesetzt wird. Sollte teuer sein, da Wirkung ziemlich heftig.
+
+
