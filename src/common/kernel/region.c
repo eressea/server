@@ -169,7 +169,7 @@ a_agedirection(attrib *a)
 {
 	spec_direction *d = (spec_direction *)(a->data.v);
 
-	if(d->duration > 0) d->duration--;
+	if (d->duration > 0) d->duration--;
 	else d->duration = 0;
 
 	return d->duration;

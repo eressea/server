@@ -292,36 +292,37 @@ get_food(region *r)
 static void
 live(region * r)
 {
-	unit **up = &r->units;
+  unit **up = &r->units;
 
-	get_food(r);
+  get_food(r);
 
-	while (*up) {
+  while (*up) {
     unit * u = *up;
-		/* IUW: age_unit() kann u löschen, u->next ist dann
-		 * undefiniert, also müssen wir hier schon das nächste
-		 * Element bestimmen */
+    /* IUW: age_unit() kann u löschen, u->next ist dann
+    * undefiniert, also müssen wir hier schon das nächste
+    * Element bestimmen */
 
-		int effect = get_effect(u, oldpotiontype[P_FOOL]);
-		if (effect > 0) {	/* Trank "Dumpfbackenbrot" */
-			skill * sv = u->skills, * sb = NULL;
-			while (sv!=u->skills+u->skill_size) {
-				if (sb==NULL || skill_compare(sv, sb)>0) {
-					sb = sv;
-				}
-				++sv;
-			}				/* bestes Talent raussuchen */
-			if (sb!=NULL) {
-				int weeks = min(effect, u->number);
-				reduce_skill(u, sb, weeks);
-				ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
-					"unit weeks skill", u, weeks, (skill_t)sb->id));
-			}	/* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
+    int effect = get_effect(u, oldpotiontype[P_FOOL]);
+    if (effect > 0) {	/* Trank "Dumpfbackenbrot" */
+      skill * sv = u->skills, * sb = NULL;
+      while (sv!=u->skills+u->skill_size) {
+        if (sb==NULL || skill_compare(sv, sb)>0) {
+          sb = sv;
+        }
+        ++sv;
+      }
+      /* bestes Talent raussuchen */
+      if (sb!=NULL) {
+        int weeks = min(effect, u->number);
+        reduce_skill(u, sb, weeks);
+        ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
+          "unit weeks skill", u, weeks, (skill_t)sb->id));
+      }	/* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
       change_effect(u, oldpotiontype[P_FOOL], -effect);
-		}
+    }
     age_unit(r, u);
     if (*up==u) up=&u->next;
-	}
+  }
 }
 
 /*
