@@ -406,8 +406,9 @@ const char *keywords[MAXKEYWORDS] =
 	"WERWESEN",
 	"XONTORMIA",
   "ALLIANZ",
+  "BEANSPRUCHEN",
 #ifdef HEROES
-  "PROMOTION"
+  "PROMOTION",
 #endif
 };
 

@@ -3644,6 +3644,38 @@ use_cmd(unit * u, struct order * ord)
   return 0;
 }
 
+static int
+claim_cmd(unit * u, struct order * ord)
+{
+  const char * t;
+  int n;
+  const item_type * itype;
+
+  init_tokens(ord);
+  skip_token();
+
+  t = getstrtoken();
+  n = atoi(t);
+  if (n==0) {
+    n = 1;
+  } else {
+    t = getstrtoken();
+  }
+  itype = finditemtype(t, u->faction->locale);
+
+  if (itype!=NULL) {
+    item ** iclaim = i_find(&u->faction->items, itype);
+    if (iclaim!=NULL) {
+      n = min(n, (*iclaim)->number);
+      i_change(iclaim, itype, -n);
+      i_change(&u->items, itype, n);
+    }
+  } else {
+    cmistake(u, ord, 43, MSG_PRODUCE);
+  }
+  return 0;
+}
+
 void
 processorders (void)
 {
@@ -3666,6 +3698,7 @@ processorders (void)
   age_factions();
 
   puts(" - Benutzen");
+  parse(K_CLAIM, claim_cmd, false);
   parse(K_USE, use_cmd, false);
 
   puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (1.Versuch)");

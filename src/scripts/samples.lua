@@ -13,9 +13,6 @@ function test_sail()
   orc:add_order("NUMMER EINHEIT orc")
   orc:add_order("BENENNE EINHEIT Orks")
   orc:add_order("ZEIGEN \"Sonnensegel\"")
-
-  process_orders()
-  write_reports() 
 end
 
 function test_movement()
@@ -93,9 +90,6 @@ function test_movement()
   u2:add_order("NUMMER EINHEIT Last")
   u2:add_order("BENENNE EINHEIT Verfolger-Verfolger")
 
-
-  process_orders()
-  write_reports() 
 end
 
 
@@ -133,8 +127,6 @@ function test_handler()
   u:add_order("NUMMER PARTEI eviL")
   u:add_order(msg)
 
-  process_orders()
-  write_reports() 
 end
 
 function test_combat()
@@ -169,8 +161,6 @@ function test_combat()
   u:add_order("KAEMPFE")
   u:add_order(attack)
 
-  process_orders()
-  write_reports() 
 end
 
 function test_rewards()
@@ -238,8 +228,6 @@ function test_rewards()
   end
   u:add_order("NUMMER PARTEI eviL")
 
-  process_orders()
-  write_reports() 
 end
 
 function test_give()
@@ -256,16 +244,11 @@ function test_give()
   u:add_order("GIB TEMP eins ALLES silber")
   u:add_order("NUMMER PARTEI test")
   
-  process_orders()
-  write_reports() 
 end
 
 function test_write()
   read_game("24")
   read_orders("befehle")
-  process_orders()
-  write_reports() 
-  write_game("25")
 end
 
 function move_north(u)
@@ -291,7 +274,6 @@ function test_monsters()
 
   set_brain("braineater", move_north)
   plan_monsters()
-  process_orders()
 end
 
 function test_parser()
@@ -308,10 +290,6 @@ function test_parser()
   u:add_order("Nummer Partei test")
   u:add_order("BENENNE PARTEI \"Diese Partei heisst \\\"Enno's Schergen\\\".\"")
   u:add_order("BENENNE EINHEIT \"Mein Name ist \\\"Enno\\\".\"")
-
-  process_orders()
-  write_reports() 
-  write_game("parser")
 end
 
 function test_fail()
@@ -322,7 +300,19 @@ function test_fail()
   print(f)
 end
 
-test_sail()
+function run_scripts()
+  scripts = { 
+    "xmas2004.lua"
+  }
+  for index in scripts do
+    local script = scriptpath .. "/" .. scripts[index]
+    print("- loading " .. script)
+    if pcall(dofile, script)==0 then
+      print("Could not load " .. script)
+    end
+  end
+end
+
 -- test_movement()
 -- test_fail()
 -- test_handler()
@@ -332,5 +322,8 @@ test_sail()
 -- test_rewards()
 -- test_give()
 -- test_write()
--- read_game("test")
--- write_game("test")
+
+test_sail()
+run_scripts()
+process_orders()
+write_reports() 

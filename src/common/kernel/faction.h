@@ -97,6 +97,7 @@ typedef struct faction {
 		struct region * r;
 		struct message_list * msgs;
 	} * battles;
+  struct item * items; /* items this faction can claim */
 } faction;
 
 typedef struct faction_list {

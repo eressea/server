@@ -1848,6 +1848,10 @@
   <string name="BIETEN">
     <text locale="de">BIETEN</text>
   </string>
+  <string name="BEANSPRUCHEN">
+    <text locale="de">BEANSPRUCHEN</text>
+    <text locale="en">CLAIM</text>
+  </string>
   <string name="BEKLAUEN">
     <text locale="de">BEKLAUEN</text>
   </string>
@@ -6002,5 +6006,23 @@
       <text locale="en">star </text>
     </string>
   </namespace>
+
+  <string name="claimable">
+    <text locale="de">Einheiten können die folgenden Gegenstände beansprucht werden: </text>
+    <text locale="en">Units can claim the following items: </text>
+  </string>
+
+  <string name="santa2004">
+    <text locale="de">'Ho ho ho!' Ein dicker Gnom fliegt auf einem von
+    8 Jungdrachen gezogenen Schlitten durch die Nacht und vermacht Deiner
+    Partei ein Sonnensegel. (Um das Segel einer Einheit zu geben, gib
+    ihr den Befehl 'BEANSPRUCHE 1 Sonnensegel').</text>
+    <text locale="en">'Ho ho ho!' A fat little gnome Gnom on a sled
+    pulled by 8 young dragons flies through the stary night and presents
+    your faction with a solar sail. (To claim this item, one of your units
+    must issue the order 'CLAIM 1 solar sail'
+    Partei ein Sonnensegel. (Um das Segel einer Einheit zu geben, gib
+    ihr den Befehl 'BEANSPRUCHE 1 Sonnensegel').</text>
+  </string>
 
 </strings>

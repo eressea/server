@@ -5,6 +5,8 @@
 // kernel includes
 #include <kernel/alliance.h>
 #include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/message.h>
 #include <kernel/unit.h>
 
 // util includes
@@ -146,6 +148,24 @@ faction_delete_variable(faction& f, const char *key)
 	return delete_variable(&((&f)->attribs), key);
 }
 
+static int
+faction_additem(faction& f, const char * iname, int number)
+{
+  const item_type * itype = it_find(iname);
+  if (itype!=NULL) {
+    item * i = i_change(&f.items, itype, number);
+    return i?i->number:0;
+  } // if (itype!=NULL)
+  return -1;
+}
+
+static void
+faction_addnotice(faction& f, const char * str)
+{
+  str = LOC(f.locale, str);
+  ADDMSG(&f.msgs, msg_message("msg_event", "string", str));
+}
+
 void
 bind_faction(lua_State * L) 
 {
@@ -170,6 +190,8 @@ bind_faction(lua_State * L)
     .def_readwrite("age", &faction::age)
     .def_readwrite("subscription", &faction::subscription)
     .def_readwrite("lastturn", &faction::lastorders)
+    .def("add_item", &faction_additem)
+    .def("add_notice", &faction_addnotice)
     .property("locale", &faction_locale)
     .property("units", &faction_units, return_stl_iterator)
     .property("alliance", &faction_getalliance, &faction_setalliance)

@@ -18,6 +18,19 @@ function write_emails()
   end
 end
 
+function run_scripts()
+  scripts = { 
+    "xmas2004"
+  }
+  for index in scripts do
+    local script = scriptpath .. "/" .. scripts[index]
+    print("- loading " .. script)
+    if pcall(dofile, script)==0 then
+      print("Could not load " .. script)
+    end
+  end
+end
+
 function process(orders)
   file = "" .. get_turn()
   if read_game(file)~=0 then
@@ -33,12 +46,12 @@ function process(orders)
   add_equipment("money", 2000 + get_turn() * 10);
 
   -- run the turn:
-  read_orders(orders)
+  read_orders(orders)  
   plan_monsters()
 
-  -- igjarjuk gets called:
-  -- require("igjarjuk-call.lua")
-  -- call_igjarjuk()
+  -- load scripts:
+  run_scripts()
+
   u = get_unit(atoi36("50ki"))
   if u~=nil then
     u.region:set_flag(14, true)
@@ -46,12 +59,6 @@ function process(orders)
   --
   process_orders()
   
-  -- igjarjuk special
-  -- if get_turn() > 374 then
-  --  require("igjarjuk.lua")
-  --  wyrm()
-  -- end
-
   write_passwords()
   write_reports()
 

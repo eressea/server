@@ -746,6 +746,7 @@ cr_output_unit(FILE * F, const region * r,
       fputs("1;hero\n", F);
     }
 #endif
+
     if (fval(u, UFL_HUNGER) && (u->faction == f)) {
       fputs("1;hunger\n", F);
     }
@@ -753,7 +754,6 @@ cr_output_unit(FILE * F, const region * r,
       fprintf(F, "%d;Aura\n", get_spellpoints(u));
       fprintf(F, "%d;Auramax\n", max_spellpoints(u->region,u));
     }
-
     /* default commands */
     fprintf(F, "COMMANDS\n");
     if (u->lastorder) {
@@ -1085,6 +1085,7 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
                 const time_t report_time)
 {
 	int i;
+  item * itm;
   const char * prefix;
   region * r;
 	building *b;
@@ -1159,6 +1160,12 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
   fprintf(F, "\"%s\";Parteiname\n", f->name);
 	fprintf(F, "\"%s\";email\n", f->email);
 	fprintf(F, "\"%s\";banner\n", f->banner);
+  for (itm=f->items; itm; itm=itm->next) {
+    int in = itm->number;
+    const char * ic = LOC(f->locale, resourcename(itm->type->rtype, in));
+    if (itm==f->items) fputs("GEGENSTAENDE\n", F);
+    fprintf(F, "%d;%s\n", in, add_translation(ic, LOC(f->locale, ic)));
+  }
 	fputs("OPTIONEN\n", F);
 	for (i=0;i!=MAXOPTIONS;++i) {
 		fprintf(F, "%d;%s\n", (f->options&want(i))?1:0, options[i]);

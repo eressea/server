@@ -2016,7 +2016,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	if(dh > 0) centre(F, buf, true);
 	dh = 0;
 
-	if(f->karma > 0) {
+	if (f->karma > 0) {
 		sprintf(buf, "Deine Partei hat %d Karma.", f->karma);
 		centre(F, buf, true);
 	}
@@ -2064,6 +2064,24 @@ report(FILE *F, faction * f, const faction_list * addresses,
     }
   }
 #endif
+
+  if (f->items!=NULL) {
+    item * iclaim = f->items;
+    char * edit = buf;
+    strcpy(edit, LOC(f->locale, "claimable"));
+    edit += strlen(edit);
+    while (iclaim!=NULL) {
+      sprintf(edit, "%d %s", iclaim->number, 
+        LOC(f->locale, resourcename(iclaim->type->rtype, iclaim->number)));
+      iclaim = iclaim->next;
+      if (iclaim!=NULL) {
+        strcat(edit, ", ");
+      }
+      edit += strlen(edit);
+    }
+    rnl(F);
+    centre(F, buf, true);
+  }
 
 	if (f->age > 1 && f->lastorders != turn) {
 		rnl(F);
