@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: study.c,v 1.5 2001/02/04 13:20:12 corwin Exp $
+ *	$Id: study.c,v 1.6 2001/02/11 09:42:57 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -66,6 +66,20 @@ magic_t
 getmagicskill(void)
 {
 	return findmagicskill(getstrtoken());
+}
+
+/* ------------------------------------------------------------- */
+
+boolean
+is_migrant(unit *u)
+{
+	if (u->race == u->faction->race) return false;
+
+	if (is_familiar(u)) return false;
+
+	if (u->race == RC_TOAD) return false;
+
+	return true;
 }
 
 /* ------------------------------------------------------------- */
@@ -446,11 +460,11 @@ learn(void)
 							continue;
 						}
 					}
-					if (u->race != u->faction->race
+					if (is_migrant(u)
 						&& (i == SK_MAGIC || i == SK_ALCHEMY || i == SK_TACTICS
 							|| i == SK_HERBALISM || i == SK_SPY))
 					{
-						if (is_familiar(u) || (nonplayer(u) && get_skill(u, i) > 0)) {
+						if ((nonplayer(u) && get_skill(u, i) > 0)) {
 						} else {
 							sprintf(buf, "Migranten können keine kostenpflichtigen Talente lernen");
 							mistake(u, u->thisorder, buf, MSG_EVENT);
