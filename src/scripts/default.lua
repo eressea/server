@@ -20,7 +20,7 @@ end
 
 function process(orders)
   file = "" .. get_turn()
-  if read_game(file)~=0 then 
+  if read_game(file)~=0 then
     print("could not read game")
     return -1
   end
@@ -34,6 +34,12 @@ function process(orders)
 
   -- run the turn:
   read_orders(orders)
+
+  -- igjarjuk gets called:
+  require("igjarjuk-call.lua")
+  call_igjarjuk()
+  
+  --
   process_orders()
   
   -- igjarjuk special

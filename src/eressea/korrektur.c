@@ -229,7 +229,8 @@ no_teurefremde(boolean convert)
 
 	for(r=regions;r;r=r->next) {
 		for(u=r->units;u;u=u->next) {
-			if(u->faction->no != MONSTER_FACTION
+			if (u->faction->no != MONSTER_FACTION
+				&& playerrace(u->faction->race)
 					&& is_migrant(u)
 					&& kor_teure_talente(u))
 			{
@@ -854,18 +855,6 @@ setup_locales(void)
 #include <triggers/shock.h>
 #include <triggers/killunit.h>
 
-static void
-update_igjarjuk_quest(void)
-{
-	unit * u;
-	faction *f = findfaction(atoi36("rr"));
-
-	if (!f) return;
-	for (u=f->units;u;u=u->nextF) {
-		u->race = new_race[RC_TEMPLATE];
-	}
-}
-
 
 #if RESOURCE_CONVERSION
 extern struct attrib_type at_resources;
@@ -1175,7 +1164,6 @@ korrektur(void)
 #else
 	no_teurefremde(1);
 #endif
-	update_igjarjuk_quest();
 	fix_allies();
 	update_gmquests(); /* test gm quests */
 	/* fix_unitrefs(); */
