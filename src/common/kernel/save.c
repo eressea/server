@@ -187,18 +187,6 @@ typedef struct mapnode {
 
 static mapnode * subscriptions[HASHSIZE];
 
-static const char *
-dbrace(const struct race * rc)
-{
-  static char zText[32];
-  char * zPtr = zText;
-  strcpy(zText, LOC(find_locale("en"), rc_name(rc, 0)));
-  while (*zPtr) {
-    *zPtr = (char)toupper(*zPtr);
-    ++zPtr;
-  }
-  return zText;
-}
 void
 convertunique(faction * f)
 {
@@ -1303,10 +1291,12 @@ writegame(char *path, char quiet)
 
 	/* write_dynamictypes(); */
 
+#if 0 /* Already in common/gamecode/report.c, around line 3508 */
 	/* write turn number to file for use by external scripts */
 	F = fopen("turn","w");
 	fprintf(F, "%d", turn);
 	fclose(F);
+#endif
 
 	F = cfopen(path, "w");
 	if (F==NULL)
