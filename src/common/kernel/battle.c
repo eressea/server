@@ -152,6 +152,25 @@ static armor_type armordata[AR_NONE + 1] =
 	{ 0.00, 0.00, 0, 0, I_SWORD}
 };
 
+#ifndef NDEBUG
+static void
+validate_sides(battle * b)
+{
+  side* s;
+  cv_foreach(s, b->sides) {
+	int snumber = 0;
+    fighter *df;
+	cv_foreach(df, s->fighters) {
+	  unit *du = df->unit;
+	  snumber += du->number;
+	} cv_next(df);
+	assert(snumber==s->flee+s->healed+s->alive+s->dead);
+  } cv_next(s);
+}
+#else
+#define validate_sides(b) /**/
+#endif
+
 const troop no_troop = {0, 0};
 
 region *
@@ -2368,6 +2387,7 @@ aftermath(battle * b)
     /* Alle Fighter durchgehen, Mages suchen, Precombataura zurück */
   } cv_next(s);
 
+  /* validate_sides(b); */
   /* POSTCOMBAT */
   do_combatmagic(b, DO_POSTCOMBATSPELL);
 

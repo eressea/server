@@ -143,7 +143,7 @@ locale_setstring(locale * lang, const char * key, const char * value)
 		find->str = strdup(value);
 	}
 	else {
-	  if (strcmp(find->str, value)==0) {
+	  if (strcmp(find->str, value)!=0) {
 		log_error(("Duplicate key %s for '%s' and '%s'\n", key, value, find->str));
 	  }
 	  assert(!strcmp(find->str, value) || !"duplicate string for key");

@@ -941,7 +941,7 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
 		n = df->unit->number;
 
 		if (chance(power/n)) {
-			row = statusrow(df->status)+FIRST_ROW;
+			row = statusrow(df->status);
 			df->side->size[row] -= df->alive;
 			if (df->unit->race->battle_flags & BF_NOBLOCK) {
 				df->side->nonblockers[row] -= df->alive;
@@ -1747,12 +1747,12 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
         int hp = unit_max_hp(du);
         undead += j;
         df->side->casualties -= j;
+		df->side->dead -= j;
         if (j == du->number) {
           /* Einheit war vollständig tot und konnte vollständig zu
           * Untoten gemacht werden */
           int nr;
 
-          df->side->dead -= j;
           df->side->alive += j;
           du->race = new_race[RC_UNDEAD];
           setguard(du, GUARD_NONE);
