@@ -2296,30 +2296,55 @@ attrib_type at_showitem = {
 
 static local_names * inames;
 
+void
+init_itemnames(void)
+{
+  int i;
+  for (i=0;localenames[i];++i) {
+    const struct locale * lang = find_locale(localenames[i]);
+    const item_type * itl = itemtypes;
+    boolean exist = false;
+    local_names * in = inames;
+
+    while (in!=NULL) {
+      if (in->lang==lang) {
+        exist = true;
+        break;
+      }
+      in = in->next;
+    }
+    if (in==NULL) in = calloc(sizeof(local_names), 1);
+    in->next = inames;
+    in->lang = lang;
+    while (itl) {
+      void * result = NULL;
+      const char * iname = locale_string(lang, itl->rtype->_name[0]);
+      if (!exist || findtoken(&in->names, iname, &result)==E_TOK_NOMATCH || result!=itl) {
+        addtoken(&in->names, iname, (void*)itl);
+        addtoken(&in->names, locale_string(lang, itl->rtype->_name[1]), (void*)itl);
+      }
+      itl=itl->next;
+    }
+    inames = in;
+  }
+}
+
 const item_type *
 finditemtype(const char * name, const struct locale * lang)
 {
-	local_names * in = inames;
-	void * i;
+  local_names * in = inames;
+  void * i;
 
-	while (in) {
-		if (in->lang==lang) break;
-		in=in->next;
-	}
-	if (!in) {
-		const item_type * itl = itemtypes;
-		in = calloc(sizeof(local_names), 1);
-		in->next = inames;
-		in->lang = lang;
-		while (itl) {
-			addtoken(&in->names, locale_string(lang, itl->rtype->_name[0]), (void*)itl);
-			addtoken(&in->names, locale_string(lang, itl->rtype->_name[1]), (void*)itl);
-			itl=itl->next;
-		}
-		inames = in;
-	}
-	if (findtoken(&in->names, name, &i)==E_TOK_NOMATCH) return NULL;
-	return (const item_type*)i;
+  while (in!=NULL) {
+    if (in->lang==lang) break;
+    in=in->next;
+  }
+  if (in==NULL) {
+    init_itemnames();
+    for (in=inames;in->lang!=lang;in=in->next) ;
+  }
+  if (findtoken(&in->names, name, &i)==E_TOK_NOMATCH) return NULL;
+  return (const item_type*)i;
 }
 
 static void

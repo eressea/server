@@ -98,6 +98,13 @@ get_gamename(void)
   return global.gamename;
 }
 
+static void
+lua_setstring(const char * lname, const char * key, const char * str)
+{
+  struct locale * lang = find_locale(lname);
+  locale_setstring(lang, key, str);
+}
+
 void
 bind_eressea(lua_State * L)
 {
@@ -113,6 +120,7 @@ bind_eressea(lua_State * L)
     def("add_equipment", &lua_addequipment),
     def("get_turn", &get_turn),
     def("remove_empty_units", &remove_empty_units),
+    def("set_string", &lua_setstring),
 
     def("set_flag", &set_flag),
     def("get_flag", &get_flag),

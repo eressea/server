@@ -277,6 +277,7 @@ lua_init(void)
   bind_alliance(luaState);
 #endif
   bind_region(luaState);
+  bind_item(luaState);
   bind_faction(luaState);
   bind_unit(luaState);
   bind_ship(luaState);

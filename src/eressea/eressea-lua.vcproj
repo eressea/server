@@ -212,6 +212,9 @@
 				RelativePath="..\header.txt">
 			</File>
 			<File
+				RelativePath="..\scripts\item.lua">
+			</File>
+			<File
 				RelativePath="..\todo.txt">
 			</File>
 		</Filter>
@@ -268,6 +271,9 @@
 						Name="VCCLCompilerTool"
 						DisableLanguageExtensions="FALSE"/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\lua\item.cpp">
 			</File>
 			<File
 				RelativePath=".\lua\list.h">

@@ -1580,15 +1580,15 @@ sp_reanimate(fighter * fi, int level, double power, spell * sp)
 int
 sp_keeploot(fighter * fi, int level, double power, spell * sp)
 {
-	battle *b = fi->side->battle;
+  battle *b = fi->side->battle;
 
-	sprintf(buf, "%s zaubert %s.", unitname(fi->unit), 
-		spell_name(sp, default_locale));
-	battlerecord(b, buf);
+  sprintf(buf, "%s zaubert %s.", unitname(fi->unit), 
+    spell_name(sp, default_locale));
+  battlerecord(b, buf);
 
-	b->keeploot = (int)max(50, b->keeploot + 5*power);
+  b->keeploot = (int)max(25, b->keeploot + 5*power);
 
-	return level;
+  return level;
 }
 
 int

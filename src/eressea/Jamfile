@@ -22,6 +22,7 @@ LUASERVER_SOURCES =
  <lua>ship.cpp
  <lua>spell.cpp
  <lua>unit.cpp
+ <lua>item.cpp
  server.cpp
  korrektur.c
  console.c

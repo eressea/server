@@ -137,6 +137,7 @@ typedef struct item_type {
 
 extern item_type * itemtypes;
 extern const item_type * finditemtype(const char * name, const struct locale * lang);
+extern void init_itemnames(void);
 
 typedef struct luxury_type {
 	struct luxury_type * next;

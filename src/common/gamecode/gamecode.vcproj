@@ -196,13 +196,6 @@
 				RelativePath=".\randenc.h">
 			</File>
 		</Filter>
-		<Filter
-			Name="Spells"
-			Filter="">
-			<File
-				RelativePath="..\spells\alp.c">
-			</File>
-		</Filter>
 		<File
 			RelativePath=".\creation.c">
 		</File>

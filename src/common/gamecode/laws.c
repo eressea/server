@@ -3349,77 +3349,75 @@ canheal(const unit *u)
 static void
 monthly_healing(void)
 {
-	region *r;
-	unit *u;
-	int  p;
-	int healingcurse = 0;
-	curse *c = NULL;
-	static const curse_type * heal_ct;
-	heal_ct = ct_find("healingzone");
+  region *r;
+  static const curse_type * heal_ct = NULL;
+  if (heal_ct==NULL) heal_ct = ct_find("healingzone");
 
-	for (r = regions; r; r = r->next) {
-		if (heal_ct) {
-			/* bonus zurücksetzen */
-			healingcurse = 0;
-			c = get_curse(r->attribs, heal_ct);
-			if (c) {
-				healingcurse = curse_geteffect(c);
-			}
-		}
-		for (u = r->units; u; u = u->next) {
-			int umhp;
+  for (r = regions; r; r = r->next) {
+    unit *u;
+    int healingcurse = 0;
 
-			umhp = unit_max_hp(u) * u->number;
+    if (heal_ct!=NULL) {
+      /* bonus zurücksetzen */
+      curse * c = get_curse(r->attribs, heal_ct);
+      if (c!=NULL) {
+        healingcurse = curse_geteffect(c);
+      }
+    }
+    for (u = r->units; u; u = u->next) {
+      int umhp = unit_max_hp(u) * u->number;
+      int p;
 
-			/* hp über Maximum bauen sich ab. Wird zb durch Elixier der Macht
-			 * oder verändertes Ausdauertalent verursacht */
-			if (u->hp > umhp) {
-				u->hp -= (int) ceil((u->hp - umhp) / 2.0);
-				if (u->hp < umhp)
-					u->hp = umhp;
-			}
+      /* hp über Maximum bauen sich ab. Wird zb durch Elixier der Macht
+      * oder verändertes Ausdauertalent verursacht */
+      if (u->hp > umhp) {
+        u->hp -= (int) ceil((u->hp - umhp) / 2.0);
+        if (u->hp < umhp)
+          u->hp = umhp;
+      }
 
-			if((u->race->flags & RCF_NOHEAL) || fval(u, UFL_HUNGER) || fspecial(u->faction, FS_UNDEAD))
-				continue;
+      if((u->race->flags & RCF_NOHEAL) || fval(u, UFL_HUNGER) || fspecial(u->faction, FS_UNDEAD))
+        continue;
 
-			if(rterrain(r) == T_OCEAN && !u->ship && !(canswim(u)))
-				continue;
+      if(rterrain(r) == T_OCEAN && !u->ship && !(canswim(u)))
+        continue;
 
-			if(fspecial(u->faction, FS_REGENERATION)) {
-					u->hp = umhp;
-					continue;
-			}
+      if(fspecial(u->faction, FS_REGENERATION)) {
+        u->hp = umhp;
+        continue;
+      }
 
-			if (u->hp < umhp && (p=canheal(u)) > 0) {
-				/* Mind 1 HP wird pro Runde geheilt, weil angenommen wird,
-				   das alle Personen mind. 10 HP haben. */
-				int max_unit = max(umhp, u->number * 10);
+      p = canheal(u);
+      if (u->hp < umhp && p > 0) {
+        /* Mind 1 HP wird pro Runde geheilt, weil angenommen wird,
+        das alle Personen mind. 10 HP haben. */
+        int max_unit = max(umhp, u->number * 10);
 #ifdef NEW_TAVERN
-				struct building * b = inside_building(u);
-				const struct building_type * btype = b?b->type:NULL;
-				if (btype == bt_find("inn")) {
-					max_unit = max_unit * 3 / 2;
-				}
+        struct building * b = inside_building(u);
+        const struct building_type * btype = b?b->type:NULL;
+        if (btype == bt_find("inn")) {
+          max_unit = max_unit * 3 / 2;
+        }
 #endif
-				/* der healing curse verändert den Regenerationsprozentsatz.
-				 * Wenn dies für negative Heilung benutzt wird, kann es zu
-				 * negativen u->hp führen! */
-				if (healingcurse != 0) {
-					p += healingcurse;
-				}
+        /* der healing curse verändert den Regenerationsprozentsatz.
+        * Wenn dies für negative Heilung benutzt wird, kann es zu
+        * negativen u->hp führen! */
+        if (healingcurse != 0) {
+          p += healingcurse;
+        }
 
-				/* Aufaddieren der geheilten HP. */
-				u->hp = min(u->hp + max_unit*p/100, umhp);
-				if (u->hp < umhp && (rand() % 10 < max_unit % 10)){
-					++u->hp;
-				}
-				/* soll man an negativer regeneration sterben können? */ 
-				if (u->hp <= 0){
-					u->hp = 1;
-				}
-			}
-		}
-	}
+        /* Aufaddieren der geheilten HP. */
+        u->hp = min(u->hp + max_unit*p/100, umhp);
+        if (u->hp < umhp && (rand() % 10 < max_unit % 10)){
+          ++u->hp;
+        }
+        /* soll man an negativer regeneration sterben können? */ 
+        if (u->hp <= 0){
+          u->hp = 1;
+        }
+      }
+    }
+  }
 }
 
 static void
@@ -3518,7 +3516,8 @@ use(void)
 					itype = finditemtype(t, u->faction->locale);
 
 					if (itype!=NULL) {
-						use_item(u, itype, n, S->s);
+						int i = use_item(u, itype, n, S->s);
+                                                assert(i<=0);
 					} else {
 						cmistake(u, S->s, 43, MSG_PRODUCE);
 					}
