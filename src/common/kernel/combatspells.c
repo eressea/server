@@ -972,7 +972,7 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
 			if (df->unit->race->battle_flags & BF_NOBLOCK) {
 				df->side->nonblockers[row] += df->alive;
 			}
-			k++;
+			k+=df->alive;
 		}
 		power = max(0, power-n);
 	}

@@ -3679,12 +3679,12 @@ do_battle(void)
 
 						/* Versuche zu fliehen, wenn
 						 * - Kampfstatus fliehe
-						 * - schwer verwundet
+						 * - schwer verwundet und nicht erste kampfrunde
 						 * - in panik (Zauber)
 						 * aber nicht, wenn der Zaubereffekt Held auf dir liegt!
 						 */
 						if ((u->status == ST_FLEE
-									|| fig->person[dt.index].hp <= runhp
+									|| (b->turn>1 && fig->person[dt.index].hp <= runhp)
 									|| (fig->person[dt.index].flags & FL_PANICED))
 								&& !(fig->person[dt.index].flags & FL_HERO))
 						{

@@ -1181,7 +1181,7 @@
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
 	</type>
-	<text locale="de">"$unit($unit) in $region($region): '$command' - Die Region konnte nicht verzaubert werden."</text>
+	<text locale="de">"$unit($unit) in $region($region): '$command' - Die Region widersteht der Verzauberung."</text>
 	<text locale="fr">"$unit($unit) in $region($region): '$command' - The region could not be charmed."</text>
 	<text locale="en">"$unit($unit) in $region($region): '$command' - The region could not be charmed."</text>
 </message>
@@ -1192,7 +1192,7 @@
 		<arg name="command" type="string"></arg>
 		<arg name="id" type="int"></arg>
 	</type>
-	<text locale="de">"$unit($unit) in $region($region): '$command' - Schiff $int36($id) konnte nicht verzaubert werden."</text>
+	<text locale="de">"$unit($unit) in $region($region): '$command' - Schiff $int36($id) widersteht der Verzauberung."</text>
 	<text locale="fr">"$unit($unit) in $region($region): '$command' - Ship $int36($id) could not be charmed."</text>
 	<text locale="en">"$unit($unit) in $region($region): '$command' - Ship $int36($id) could not be charmed."</text>
 </message>
@@ -1203,7 +1203,7 @@
 		<arg name="command" type="string"></arg>
 		<arg name="id" type="int"></arg>
 	</type>
-	<text locale="de">"$unit($unit) in $region($region): '$command' - Geb‰ude $int36($id) konnte nicht verzaubert werden."</text>
+	<text locale="de">"$unit($unit) in $region($region): '$command' - Geb‰ude $int36($id) widersteht der Verzauberung."</text>
 	<text locale="fr">"$unit($unit) in $region($region): '$command' - Building $int36($id) could not be charmed."</text>
 	<text locale="en">"$unit($unit) in $region($region): '$command' - Building $int36($id) could not be charmed."</text>
 </message>
@@ -5672,5 +5672,13 @@
 	<text locale="de">"In $region($region) erscheint ein Wurmloch."</text>
 	<text locale="fr">"A wormhole appears in $region($region)."</text>
 	<text locale="en">"A wormhole appears in $region($region)."</text>
+</message>
+<message name="wormhole_dissolve" section="events">
+	<type>
+		<arg name="region" type="region"></arg>
+	</type>
+	<text locale="de">"Das Wurmloch in $region($region) schlieﬂt sich."</text>
+	<text locale="fr">"The wormhole in $region($region) disappears."</text>
+	<text locale="en">"The wormhole in $region($region) disappears."</text>
 </message>
 </messages>

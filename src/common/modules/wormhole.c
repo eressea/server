@@ -95,6 +95,7 @@ wormhole_age(struct attrib * a)
   /* it's important that destroy_building doesn't change b->region, because
    * otherwise the tunnel would no longer be bi-directional after this */
   destroy_building(data->entry);
+  ADDMSG(&r->msgs, msg_message("wormhole_dissolve", "region", r));
   assert(data->entry->region==r);
 
   /* age returns 0 if the attribute needs to be removed, !=0 otherwise */

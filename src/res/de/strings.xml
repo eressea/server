@@ -553,6 +553,10 @@
 	<string name="lighthouse">
 		<text locale="de">Leuchtturm</text>
 	</string>
+	<string name="wormhole">
+		<text locale="de">Wurmloch</text>
+		<text locale="en">wormhole</text>
+	</string>
 	<string name="mine">
 		<text locale="de">Bergwerk</text>
 	</string>
