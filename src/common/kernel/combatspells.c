@@ -906,7 +906,7 @@ sp_chaosrow(fighter * fi, int level, int force, spell * sp)
 			if (df->unit->race->battle_flags & BF_NOBLOCK) {
 				df->side->nonblockers[row] -= df->alive;
 			}
-			row = FIRST_ROW + (rand()%(NUMROWS-1));
+			row = FIRST_ROW + (rand()%(LAST_ROW-FIRST_ROW));
 			switch (row) {
 				case FIGHT_ROW:
 					df->status = ST_FIGHT;

@@ -4483,7 +4483,26 @@
 		<text locale="de">"$unit($unit) in $region($region): '$command' - Eine Partei kann nur einmal neu starten."</text>
 		<text locale="en">"$unit($unit) in $region($region): '$command' - Restart can only be used once."</text>
 	</message>
-
+	
+	<message name="error315">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Die Partei kann nur an eine Partei in derselben Allianz übergeben werden."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - The faction can only be given to a faction in the same alliance."</text>
+	</message>
+	
+	<message name="error316">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Die Partei möchte unsere Personen nicht aufnehmen."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - The faction does not want to take out people."</text>
+	</message>
 
 	<message name="drown_on_ship">
 		<type>

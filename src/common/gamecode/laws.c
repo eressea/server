@@ -1025,6 +1025,24 @@ inactivefaction(faction * f)
 	fclose(inactiveFILE);
 }
 
+#ifdef ENHANCED_QUIT
+static void
+transfer_faction(faction *f, faction *f2)
+{
+	unit *u, *un;
+	
+	for (u = f->units; u;) {
+		un = u->next;
+		if(!unit_has_cursed_item(u)
+				&& !has_skill(u, SK_MAGIC)
+				&& !has_skill(u, SK_ALCHEMY)) {
+			u_setfaction(u, f2);
+		}
+		u = un;
+	}
+}
+#endif
+
 void
 quit(void)
 {
@@ -1043,7 +1061,36 @@ quit(void)
 			for (S = u->orders; S; S = S->next) {
 				if (igetkeyword(S->s, u->faction->locale) == K_QUIT) {
 					if (checkpasswd(u->faction, getstrtoken())) {
+#ifdef ENHANCED_QUIT
+						int f2_id = getid();
+
+						if(f2_id > 0) {
+							faction *f2 = findfaction(f2_id);
+
+							f = u->faction;
+
+							if(f2 == NULL) {
+								cmistake(u, S->s, 66, MSG_EVENT);
+							} else if(f == f2) {
+								cmistake(u, S->s, 8, MSG_EVENT);
+#ifdef ALLIANCES
+							} else if(u->faction->alliance != f2->alliance) {
+								cmistake(u, S->s, 315, MSG_EVENT);
+#else
+#warning ENHANCED_QUIT defined without ALLIANCES
+#endif
+							} else if(alliedfaction(NULL, f, f2, HELP_MONEY)) {
+								cmistake(u, S->s, 316, MSG_EVENT);
+							} else {
+								transfer_faction(f,f2);
+								destroyfaction(f);
+							}
+						} else {
+							destroyfaction(u->faction);
+						}
+#else
 						destroyfaction(u->faction);
+#endif
 						break;
 					} else {
 						cmistake(u, S->s, 86, MSG_EVENT);
