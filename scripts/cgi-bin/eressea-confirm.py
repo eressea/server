@@ -15,6 +15,7 @@ HTMLTemplate = "eressea.html"
 DefaultTitle = "Eressea Anmeldung"
 dbname = "eressea"
 db=None
+tutorial_id=1 # the tuorial game has id 1
 
 # define a new function called Display
 # it takes one parameter - a string to Display
@@ -54,6 +55,9 @@ def genpasswd():
     return newpasswd                                                                             
 
 
+Display("Derzeit ist wegen einer technischen Umstellung keine Anmeldung möglich")
+sys.exit(0)
+
 Form = cgi.FieldStorage()
 
 custid=GetKey(Form, "custid")
@@ -67,13 +71,21 @@ if (password==None) or (custid==None):
 else:
     db=MySQLdb.connect(db=dbname)
     cursor=db.cursor()
-    exist=cursor.execute("select id from users where id="+custid+" and status in('WAITING','CONFIRMED') and password='"+password+"'")
+    exist=cursor.execute("select u.status, s.id, s.game from users u, subscriptions s where u.id="+custid+" and s.status in ('WAITING', 'CONFIRMED') and s.password='"+password+"'")
     if exist==0:
 	Display('<p>Kundennummer oder Schlüssel falsch. Bitte beachte, dass Du beim Schlüssel auf Groß- und Kleinschreibung achten mußt.')
     else:
+	status, sid, gid = cursor.fetchone()
 	if os.environ.has_key('REMOTE_ADDR'):
 	    ip=os.environ['REMOTE_ADDR']
 	    cursor.execute("REPLACE userips (ip, user) VALUES ('"+ip+"', "+str(int(custid))+")")
-	cursor.execute("update users set status='CONFIRMED' where password='"+password+"' and id="+custid)
+	if status=='NEW' or status=='TUTORIAL':
+	    if tutorial_id!=None and gid==tutorial_id:
+		# user confirms his tutorial participation
+		cursor.execute("update users set status='TUTORIAL' where id="+custid)
+	    else:
+		cursor.execute("update users set status='ACTIVE' where id="+custid)
+	cursor.execute("update subscriptions set status='CONFIRMED' where id="+str(sid))
+
 	Display("<p>Deine Anmeldung wurde bestätigt.");
     db.close()

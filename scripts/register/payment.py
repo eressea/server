@@ -27,7 +27,6 @@ def pay(db, userid, email, cash, date, reason='PAYMENT'):
     balance=cursor.fetchone()[0]
     if balance==None:
 	balance=0.0
-
     Msg = ("From: Vinyambar Buchhaltung <"+From+">\nTo: "+email+"\nSubject: Vinyambar Zahlungseingang.\n\n"+
       "Kundennummer:       "+str(userid)+"\n"+
       "Eingangsdatum:      "+date+"\n"+
@@ -146,7 +145,7 @@ def manual(dbname):
 	if len(sys.argv)>5:
 	    reason=sys.argv[5]
 
-	pay(db, int(userid), email, balance, date, reason)
+	pay(db, int(userid), email, cash, date, reason)
 	print 'New balance is '+str(balance+cash)+' EUR'
     return
 

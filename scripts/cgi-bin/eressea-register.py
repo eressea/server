@@ -22,6 +22,8 @@ From = "accounts@eressea-pbem.de"
 locale="de"
 smtpserver = 'localhost'
 db=None
+game_id=0  # Eressea Main game
+tutorial_id=None #
 
 # define a new function called Display
 # it takes one parameter - a string to Display
@@ -45,8 +47,11 @@ def Display(Content, Title=DefaultTitle):
     return
 
 
-def Send(email, custid, firstname, password, position):
-    TemplateHandle = open(MailTemplate+"."+locale, "r")  # open in read only mode
+def Send(email, custid, sid, firstname, password, game):
+    cursor=db.cursor()
+    cursor.execute("select count(*), g.name from games g, subscriptions s where g.id="+str(game)+" AND (s.status='WAITING' or s.status='CONFIRMED') AND g.id=s.game GROUP BY g.id")
+    position, name = cursor.fetchone()
+    TemplateHandle = open(MailTemplate+"."+string.lower(name)+"."+locale, "r")  # open in read only mode
     # read the entire file as a string
     TemplateInput = TemplateHandle.read()
     TemplateHandle.close()                    # close the file
@@ -54,15 +59,15 @@ def Send(email, custid, firstname, password, position):
     SubResult = re.subn("<FIRSTNAME>", firstname, TemplateInput)
     SubResult = re.subn("<PASSWORD>", password, SubResult[0])
     SubResult = re.subn("<POSITION>", str(int(position)), SubResult[0])
+    SubResult = re.subn("<GAME>", name, SubResult[0])
     SubResult = re.subn("<CUSTID>", str(int(custid)), SubResult[0])
-    subject={"de":"Eressea Anmeldung","en":"Eressea Registration"}
-    Msg="From: "+From+"\nTo: "+email+"\nSubject: "+subject[locale]+"\n\n"
+    subject={"de":"Anmeldung","en":"Registration"}
+    Msg="From: "+From+"\nTo: "+email+"\nSubject: "+name+" "+subject[locale]+"\n\n"
     Msg=Msg+SubResult[0]
     server=smtplib.SMTP(smtpserver)
     server.sendmail(From, email, Msg)
     server.close()
     return
-
 
 def GetKey(Form, key):
     if Form.has_key(key):
@@ -85,6 +90,8 @@ def genpasswd():
 	newpasswd = newpasswd + choice(chars)
     return newpasswd
 
+Display("Derzeit ist wegen einer technischen Umstellung keine Anmeldung möglich")
+sys.exit(0)
 
 Form = cgi.FieldStorage()
 
@@ -114,7 +121,8 @@ elif ValidEmail(email)==0:
 else:
     db=MySQLdb.connect(db=dbname)
     cursor=db.cursor()
-    exist=cursor.execute("select id from users where email='"+email+"' and (status='WAITING' or status='CONFIRMED')")
+    # check if he is already entered in the main game:
+    exist=cursor.execute("select u.id from users u, subscriptions s where s.user=u.id AND s.game="+str(game_id)+" AND u.email='"+email+"' and (s.status='WAITING' or s.status='CONFIRMED')")
     if exist:
 	text={"de":"Du stehst bereits auf der Warteliste","en":"You are already on the waiting list"}
 	Display('<p>'+text[locale])
@@ -128,9 +136,8 @@ else:
 		sys.exit(0)
 
 	# create a new user record
-	password=genpasswd()
-	fields = "firstname, lastname, locale, email, address, city, status, password"
-	values = "'"+firstname+"', '"+lastname+"', '"+locale+"', '"+email+"', '"+address+"', '"+city+"', 'WAITING', '"+password+"'"
+        fields = "firstname, lastname, locale, email, address, city"
+	values = "'"+firstname+"', '"+lastname+"', '"+locale+"', '"+email+"', '"+address+"', '"+city+"'"
 	if phone!=None:
 	    fields=fields+", phone"
 	    values=values+", '"+phone+"'"
@@ -149,9 +156,26 @@ else:
 		values=values+", 1"
 	    else:
 		values=values+", 0"
-	cursor.execute("insert into users ("+fields+") VALUES ("+values+")")
-	cursor.execute("SELECT LAST_INSERT_ID() from dual")
-	custid=cursor.fetchone()[0]
+	exist=cursor.execute("select password, status, id from users where email='"+email+"'")
+	custid=0
+	status='NEW'
+	if exist:
+	    # user exists, update his data
+	    password, status, custid=cursor.fetchone()
+	    if status=='BANNED':
+		Display('<em>Dein Account ist gesperrt.</em><br>Bitte wende Dich an <a href="mailto:accounts@eressea-pbem.de">accounts@eressea-pbem.de</a> falls Du Fragen zu dieser Meldung hast.')
+		sys.exit(0)
+	    fields=fields+", id, status"
+	    values=values+", "+str(custid)+", '"+status+"'"
+	    command="REPLACE"
+	    cursor.execute("REPLACE into users ("+fields+") VALUES ("+values+")")
+	else:
+	    password = genpasswd()
+	    fields=fields+", password, status"
+	    values=values+", '"+password+"', 'NEW'"
+	    cursor.execute("INSERT into users ("+fields+") VALUES ("+values+")")
+	    cursor.execute("SELECT LAST_INSERT_ID() from dual")
+	    custid=cursor.fetchone()[0]
 
 	# track IP addresses
 	ip=None
@@ -161,18 +185,22 @@ else:
 	    cursor.execute("REPLACE userips (ip, user) VALUES ('"+ip+"', "+str(int(custid))+")")
 	
 	# add a subscription record
-	values="'PENDING', '"+genpasswd()+"'"
+	password = genpasswd()
+	values="'WAITING', '"+password+"'"
 	fields="status, password"
+	game = game_id
+	if tutorial_id!=None and status!='ACTIVE':
+	    game=tutorial_id
 	if bonus!=None:
 	    fields=fields+", bonus"
 	    if bonus=='yes':
 		values=values+", 1"
 	    else:
 		values=values+", 0"
-	cursor.execute("insert into subscriptions (user, race, game, "+fields+") VALUES ("+str(int(custid))+", '"+race+"', 0, "+values+")")
-
-	cursor.execute("select count(*) from users where status='WAITING' or status='CONFIRMED'")
-	Send(email, custid, firstname, password, cursor.fetchone()[0])
+	cursor.execute("insert into subscriptions (user, race, game, "+fields+") VALUES ("+str(int(custid))+", '"+race+"', "+str(game)+", "+values+")")
+	cursor.execute("SELECT LAST_INSERT_ID() from dual")
+	sid = cursor.fetchone()[0]
+	Send(email, custid, sid, firstname, password, game)
 	text={"de":"Deine Anmeldung wurde bearbeitet. Eine EMail mit Hinweisen ist unterwegs zu Dir", "en":"Your application was processed. An email containing further instructions is being sent to you"}
 	Display("<p>"+text[locale]+".")
     db.close()
