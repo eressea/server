@@ -33,6 +33,8 @@
 #include <modules/museum.h>
 #include <modules/gmcmd.h>
 
+#include <util/base36.h>
+
 /* kernel includes */
 #include <item.h>
 #include <faction.h>
