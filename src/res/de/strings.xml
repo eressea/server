@@ -6,6 +6,31 @@
 </comment>
 
 <strings>
+	<string name="Tresen">
+		<text locale="de">Tresen</text>
+		<text locale="en">counter </text>
+	</string>
+	
+	<string name="wenige">
+		<text locale="de">wenige</text>
+		<text locale="en">few </text>
+	</string>
+	
+	<string name="viele">
+		<text locale="de">viele</text>
+		<text locale="en">many </text>
+	</string>
+	
+	<string name="relativ viele">
+		<text locale="de">relativ viele</text>
+		<text locale="en">rather many </text>
+	</string>
+	
+	<string name="sehr wenige">
+		<text locale="de">sehr wenige</text>
+		<text locale="en">very few </text>
+	</string>
+		
 	<string name="prefix_Dunkel">
 		<text locale="de">Dunkel</text>
 		<text locale="en">dark </text>
