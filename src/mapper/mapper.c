@@ -1396,12 +1396,33 @@ makemonsters(void)
 	return f;
 }
 
+#include "logging.h"
+
+static void
+log_newstuff(void)
+{
+	faction * f;
+	region * r;
+	for (f=factions;f;f=f->next) {
+		if (f->age==0) log_faction(f);
+	}
+	for (r=regions;r;r=r->next) {
+		unit * u;
+		if (r->age==0) log_region(r);
+		for (u=r->units;u;u=u->next) {
+			if (u->age==0) log_unit(u);
+		}
+	}
+}
+
 int
 main(int argc, char *argv[])
 {
 	int x = 0, y = 0, i;
 	char *s;
 	boolean backup = true;
+	boolean logging = false;
+	boolean readlog = false;
 
 	setlocale(LC_ALL, "");
 
@@ -1430,6 +1451,12 @@ main(int argc, char *argv[])
 				maxregions = (maxregions*81+80) / 81;
 				break;
 			case 'q': quiet = true; break;
+			case 'l':
+				logging = true;
+				break;
+			case 'R':
+				readlog = true;
+				break;
 			case 'n':
 				switch (argv[i][2]) {
 				case 'b' : backup = false; break;
@@ -1499,7 +1526,13 @@ main(int argc, char *argv[])
 	if (findfaction(MONSTER_FACTION)==NULL) {
 		makemonsters();
 	}
-
+	if (readlog) {
+		log_read("mapper.log");
+	}
+	if (logging) {
+		log_start("mapper.log");
+		log_newstuff();
+	}
 #ifdef OLD_ITEMS
 	make_xref();
 #endif
@@ -1515,6 +1548,7 @@ main(int argc, char *argv[])
 	Tagged=NULL;
 	movearound(x, y);
 
+	if (logging) log_stop();
 	if (modified) {
 		beep();
  		if (yes_no(0, "Daten wurden modifiziert! Abspeichern?", 'j')) {

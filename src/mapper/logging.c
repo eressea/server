@@ -29,8 +29,9 @@
 static FILE * log;
 
 void
-readlog(FILE * log)
+log_read(const char * filename)
 {
+	FILE * log = fopen(filename, "r");
 	faction **fp = &factions;
 	char buf[64];
 
@@ -67,14 +68,14 @@ readlog(FILE * log)
 void 
 log_faction(const struct faction * f)
 {
-	fprintf(log, "FACTION %s", factionid(f));
+	fprintf(log, "FACTION %s\n", factionid(f));
 	writefaction(log, f);
 }
 
 void 
 log_unit(const struct unit * u)
 {
-	fprintf(log, "UNIT %s %d %d", unitid(u), u->region->x, u->region->y);
+	fprintf(log, "UNIT %s %d %d\n", unitid(u), u->region->x, u->region->y);
 	writeunit(log, u);
 }
 

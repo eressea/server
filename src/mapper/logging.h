@@ -13,7 +13,7 @@
  without prior permission by the authors of Eressea.
 */
 
-extern void readlog(FILE * log);
+extern void log_read(const char * logname);
 extern void log_region(const struct region * r);
 extern void log_unit(const struct unit * r);
 extern void log_faction(const struct faction * f);
