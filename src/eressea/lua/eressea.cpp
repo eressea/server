@@ -54,8 +54,6 @@ write_game(const char *filename)
   return writegame(filename, 0);
 }
 
-extern int writepasswd(void);
-
 static int
 write_reports()
 {

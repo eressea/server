@@ -25,6 +25,7 @@
 extern "C" {
 #endif
 
+extern int writepasswd(void);
 int getoption(void);
 int wanderoff(struct region * r, int p);
 void demographics(void);
