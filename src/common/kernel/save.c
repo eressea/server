@@ -438,19 +438,10 @@ factionorders(void)
 	char b[16];
 	char * fid = strncpy(b, getstrtoken(), 16);
 	char * pass = getstrtoken();
-	int i36 = atoi36(fid);
-	int i10 = atoi(fid);
 	faction *f;
 
-	f = findfaction(i36);
+	f = findfaction(atoi36(fid));
 
-	if (f==NULL || !checkpasswd(f, pass)) {
-		faction * f2 = findfaction(i10);
-		if (f2!=NULL && !checkpasswd(f2, pass)) {
-			f = f2;
-			addstrlist(&f->mistakes, "Die Befehle wurden nicht als base36 eingeschickt!");
-		}
-	}
 	if (f!=NULL) {
 		/* Kontrolliere, ob das Passwort richtig eingegeben wurde. Es
 		 * muß in "Gänsefüßchen" stehen!! */
@@ -463,7 +454,7 @@ factionorders(void)
 		freestrlist(f->mistakes);
 		f->mistakes = 0;
 
-		if (!checkpasswd(f, pass)) {
+		if (checkpasswd(f, pass) == false) {
 			addstrlist(&f->mistakes, "Das Passwort wurde falsch eingegeben");
 			return 0;
 		}
