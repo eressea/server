@@ -47,7 +47,6 @@ char *gamedate(const struct locale *);
 char *gamedate2(void);
 
 struct summary;
-extern void report_computer(FILE * F, struct faction * f);
 extern void report_summary(struct summary * n, struct summary * o, boolean full);
 extern struct summary * make_summary(boolean count_new);
 

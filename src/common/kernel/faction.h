@@ -13,9 +13,13 @@
 #ifndef FACTION_H
 #define FACTION_H
 
+struct player;
+
 typedef struct faction {
 	struct faction *next;
 	struct faction *nexthash;
+
+	struct player *owner;
 	struct region *first;
 	struct region *last;
 	int no;

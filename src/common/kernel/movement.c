@@ -780,13 +780,13 @@ init_drive(void)
 		for(u=r->units; u; u=u->next) {
 			if(igetkeyword(u->thisorder, u->faction->locale) == K_DRIVE && !fval(u, FL_LONGACTION)) {
 				boolean found = false;
-				ut = getunit(r, u);
+				ut = getunit(r, u->faction);
 				if(!ut) {
 					cmistake(u, findorder(u, u->thisorder), 64, MSG_MOVE);
 					continue;
 				}
 				for (S = ut->orders; S; S = S->next) if (igetkeyword(S->s, u->faction->locale) == K_TRANSPORT) {
-					if(getunit(r, ut) == u) {
+					if(getunit(r, ut->faction) == u) {
 						found = true;
 						break;
 					}
@@ -809,11 +809,11 @@ init_drive(void)
 			w = 0;
 
 			for (S = u->orders; S; S = S->next) if(igetkeyword(S->s, u->faction->locale) == K_TRANSPORT) {
-				ut = getunit(r, u);
+				ut = getunit(r, u->faction);
 				if(!ut) continue;
 
 				if (igetkeyword(ut->thisorder, u->faction->locale) == K_DRIVE && !fval(ut, FL_LONGACTION)) {
-					u2 = getunit(r, u);
+					u2 = getunit(r, u->faction);
 					if(u2 == u) {
 						w += weight(ut);
 						break;
@@ -1153,12 +1153,12 @@ travel(region * first, unit * u, region * next, int flucht)
 
 		for (S = u->orders; S; S = S->next) {
 			if (igetkeyword(S->s, u->faction->locale) == K_TRANSPORT) {
-				ut = getunit(first, u);
+				ut = getunit(first, u->faction);
 				if (ut) {
 					boolean found = false;
 					if (igetkeyword(ut->thisorder, u->faction->locale) == K_DRIVE
 							&& !fval(ut, FL_LONGACTION)) {
-						u2 = getunit(first, ut);
+						u2 = getunit(first, ut->faction);
 						if(u2 == u) {
 							found = true;
 							add_message(&u->faction->msgs, new_message(
@@ -1500,7 +1500,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 		route[step] = dir;
 		last_point = current_point;
 		current_point = next_point;
-		tt[++step] = current_point;	/* travelthrough */
+		tt[step] = current_point;	/* travelthrough */
 		u->ship->moved = 1;
 		m++;
 

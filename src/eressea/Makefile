@@ -33,8 +33,8 @@ INCLUDES  += \
 
 LIBNAMES      = \
 	e-triggers \
-	e-modules \
 	e-gamecode \
+	e-modules \
 	e-kernel \
 	e-items \
 	e-spells \

@@ -1,6 +1,19 @@
+/* vi: set ts=2:
+ +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
+ |                   |  Enno Rehling <enno@eressea-pbem.de>
+ | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
+ | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
+ +-------------------+  Stefan Reich <reich@halbling.de>
+
+ This program may not be used, modified or distributed 
+ without prior permission by the authors of Eressea.
+ 
+ */
 #include <config.h>
 #include <eressea.h>
 #include "gmcmd.h"
+#include "command.h"
 
 #include <items/demonseye.h>
 #include <attributes/key.h>
@@ -19,30 +32,8 @@
 #include <attrib.h>
 
 /* libc includes */
-#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-
-typedef struct command {
-	struct command * next;
-	const char * key;
-	void (*perform)(const char *, unit *);
-} command;
-
-static command * g_cmds;
-static tnode g_keys;
-
-static void
-add_gmcommand(command ** cmds, const char * str, void(*fun)(const char*, struct unit *))
-{
-	command * nc = calloc(sizeof(command), 1);
-	nc->key = str;
-	nc->perform = fun;
-	nc->next = *cmds;
-	*cmds = nc;
-
-	addtoken(&g_keys, str, (void*)nc);
-}
 
 /**
  ** at_permissions
@@ -112,8 +103,9 @@ make_atgmcreate(const struct item_type * itype)
 }
 
 static void
-gm_create(const char * str, struct unit * u)
+gm_create(const char * str, void * data, const char * cmd)
 {
+	unit * u = (unit*)data;
 	int i;
 	attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 	if (permissions) permissions = (attrib*)permissions->data.v;
@@ -135,8 +127,9 @@ gm_create(const char * str, struct unit * u)
  ** requires: permission-key "gmterf"
  **/
 static void
-gm_terraform(const char * str, struct unit * u)
+gm_terraform(const char * str, void * data, const char * cmd)
 {
+	unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
 	int x = rel_to_abs(p, u->faction, atoi(igetstrtoken(str)), 0);
 	int y = rel_to_abs(p, u->faction, atoi(getstrtoken()), 1);
@@ -144,7 +137,7 @@ gm_terraform(const char * str, struct unit * u)
 	region * r = findregion(x, y);
 	terrain_t t;
 	if (r==NULL || p!=rplane(r)) {
-		mistake(u, str, "Diese Regon kann die Einheit nicht umwandeln.\n", 0);
+		mistake(u, cmd, "Diese Regon kann die Einheit nicht umwandeln.\n", 0);
 		return;
 	} else {
 		/* checking permissions */
@@ -162,8 +155,9 @@ gm_terraform(const char * str, struct unit * u)
  ** requires: permission-key "gmtele"
  **/
 static void
-gm_teleport(const char * str, struct unit * u)
+gm_teleport(const char * str, void * data, const char * cmd)
 {
+	unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
 	unit * to = findunit(atoi36(igetstrtoken(str)));
 	int x = rel_to_abs(p, u->faction, atoi(getstrtoken()), 0);
@@ -171,14 +165,16 @@ gm_teleport(const char * str, struct unit * u)
 	region * r = findregion(x, y);
 
 	if (r==NULL || p!=rplane(r)) {
-		mistake(u, str, "In diese Region kann die Einheit nicht teleportieren.\n", 0);
-	} if (to==NULL || (rplane(to->region)!=rplane(r) && !ucontact(to, u))) {
-		mistake(u, str, "Die Einheit wurde nicht gefunden, oder sie hat uns nicht kontaktiert.\n", 0);
+		mistake(u, cmd, "In diese Region kann die Einheit nicht teleportieren.\n", 0);
+	} else if (to==NULL) {
+		mistake(u, cmd, "Die Einheit wurde nicht gefunden.\n", 0);
+	} else if (rplane(to->region)!=rplane(r) && !ucontact(to, u)) {
+		mistake(u, cmd, "Die Einheit hat uns nicht kontaktiert.\n", 0);
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (!permissions || !find_key((attrib*)permissions->data.v, atoi36("gmtele"))) {
-			mistake(u, str, "Unzureichende Rechte für diesen Befehl.\n", 0);
+			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else move_unit(to, r, NULL);
 	}
@@ -189,23 +185,24 @@ gm_teleport(const char * str, struct unit * u)
  ** requires: permission-key "gmgive"
  **/
 static void
-gm_give(const char * str, struct unit * u)
+gm_give(const char * str, void * data, const char * cmd)
 {
+	unit * u = (unit*)data;
 	unit * to = findunit(atoi36(igetstrtoken(str)));
 	int num = atoi(getstrtoken());
 	const item_type * itype = finditemtype(getstrtoken(), u->faction->locale);
 
 	if (to==NULL || rplane(to->region) != rplane(u->region)) {
 		/* unknown or in another plane */
-		cmistake(u, str, 64, MSG_COMMERCE);
+		mistake(u, cmd, "Die Einheit wurde nicht gefunden.\n", 0);
 	} else if (itype==NULL || i_get(u->items, itype)==0) {
 		/* unknown or not enough */
-		mistake(u, str, "So einen Gegenstand hat die Einheit nicht.\n", 0);
+		mistake(u, cmd, "So einen Gegenstand hat die Einheit nicht.\n", 0);
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (!permissions || !find_key((attrib*)permissions->data.v, atoi36("gmgive"))) {
-			mistake(u, str, "Unzureichende Rechte für diesen Befehl.\n", 0);
+			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
 			int i = i_get(u->items, itype);
@@ -223,23 +220,24 @@ gm_give(const char * str, struct unit * u)
  ** requires: permission-key "gmtake"
  **/
 static void
-gm_take(const char * str, struct unit * u)
+gm_take(const char * str, void * data, const char * cmd)
 {
+	unit * u = (unit*)data;
 	unit * to = findunit(atoi36(igetstrtoken(str)));
 	int num = atoi(getstrtoken());
 	const item_type * itype = finditemtype(getstrtoken(), u->faction->locale);
 
 	if (to==NULL || rplane(to->region) != rplane(u->region)) {
 		/* unknown or in another plane */
-		cmistake(u, str, 64, MSG_COMMERCE);
+		mistake(u, cmd, "Die Einheit wurde nicht gefunden.\n", 0);
 	} else if (itype==NULL || i_get(to->items, itype)==0) {
 		/* unknown or not enough */
-		mistake(u, str, "So einen Gegenstand hat die Einheit nicht.\n", 0);
+		mistake(u, cmd, "So einen Gegenstand hat die Einheit nicht.\n", 0);
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (!permissions || !find_key((attrib*)permissions->data.v, atoi36("gmtake"))) {
-			mistake(u, str, "Unzureichende Rechte für diesen Befehl.\n", 0);
+			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
 			int i = i_get(to->items, itype);
@@ -257,48 +255,41 @@ gm_take(const char * str, struct unit * u)
  ** requires: permission-key "gmskil"
  **/
 static void
-gm_skill(const char * str, struct unit * u)
+gm_skill(const char * str, void * data, const char * cmd)
 {
+	unit * u = (unit*)data;
 	unit * to = findunit(atoi36(igetstrtoken(str)));
 	skill_t skill = findskill(getstrtoken(), u->faction->locale);
 	int num = atoi(getstrtoken());
 
 	if (to==NULL || rplane(to->region) != rplane(u->region)) {
 		/* unknown or in another plane */
-		cmistake(u, str, 64, MSG_COMMERCE);
+		mistake(u, cmd, "Die Einheit wurde nicht gefunden.\n", 0);
 	} else if (skill==NOSKILL || skill==SK_MAGIC || skill==SK_ALCHEMY) {
 		/* unknown or not enough */
-		mistake(u, str, "Dieses Talent ist unbekannt, oder kann nicht erhöht werden.\n", 0);
+		mistake(u, cmd, "Dieses Talent ist unbekannt, oder kann nicht erhöht werden.\n", 0);
 	} else if (num<0 || num>5000) {
 		/* sanity check failed */
-		mistake(u, str, "Der gewählte Wert ist nicht zugelassen.\n", 0);
+		mistake(u, cmd, "Der gewählte Wert ist nicht zugelassen.\n", 0);
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (!permissions || !find_key((attrib*)permissions->data.v, atoi36("gmskil"))) {
-			mistake(u, str, "Unzureichende Rechte für diesen Befehl.\n", 0);
+			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
-			set_skill(to, skill, num);
+			set_skill(to, skill, num*to->number);
 		}
 	}
 }
 
-static void
-gm_command(const char * cmd, struct unit * u)
-{
-	int i;
-	char zText[16];
-	const char * c;
-	command * cm;
+static struct command * g_cmds;
+static tnode g_keys;
 
-	while (isspace(*cmd)) ++cmd;
-	c = cmd;
-	while (isalnum(*c)) ++c;
-	i = min(16, c-cmd);
-	strncpy(zText, cmd, i);
-	zText[i]=0;
-	if (findtoken(&g_keys, zText, (void**)&cm)==E_TOK_SUCCESS && cm->perform) cm->perform(++c, u);
+static void
+gm_command(const char * str, void * data, const char * cmd)
+{
+	do_command(&g_keys, data, str);
 }
 
 void
@@ -306,13 +297,13 @@ init_gmcmd(void)
 {
 	at_register(&at_gmcreate);
 	at_register(&at_permissions);
-	add_gmcommand(&g_cmds, "gm", &gm_command);
-	add_gmcommand(&g_cmds, "terraform", &gm_terraform);
-	add_gmcommand(&g_cmds, "create", &gm_create);
-	add_gmcommand(&g_cmds, "give", &gm_give);
-	add_gmcommand(&g_cmds, "take", &gm_take);
-	add_gmcommand(&g_cmds, "teleport", &gm_teleport);
-	add_gmcommand(&g_cmds, "skill", &gm_skill);
+	add_command(&g_keys, &g_cmds, "gm", &gm_command);
+	add_command(&g_keys, &g_cmds, "terraform", &gm_terraform);
+	add_command(&g_keys, &g_cmds, "create", &gm_create);
+	add_command(&g_keys, &g_cmds, "give", &gm_give);
+	add_command(&g_keys, &g_cmds, "take", &gm_take);
+	add_command(&g_keys, &g_cmds, "teleport", &gm_teleport);
+	add_command(&g_keys, &g_cmds, "skill", &gm_skill);
 }
 
 /*
@@ -331,7 +322,7 @@ gmcommands(void)
 			strlist * order;
 			for (order = u->orders; order; order = order->next)
 				if (igetkeyword(order->s, u->faction->locale) == K_GM) {
-					gm_command(order->s, u);
+					do_command(&g_keys, u, order->s);
 				}
 			if (u==*up) up = &u->next;
 		}

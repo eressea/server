@@ -30,6 +30,7 @@
 
 /* gamecode includes */
 #include "creation.h"
+#include "creport.h"
 #include "economy.h"
 #include "monster.h"
 #include "laws.h"
@@ -71,6 +72,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 #include <math.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -1630,7 +1632,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 }
 
 static void
-report(FILE *F, faction * f)
+report(FILE *F, faction * f, const char * pzTime)
 {
 #ifndef NEW_ITEMS
 	potion_t potion;
@@ -1665,6 +1667,8 @@ report(FILE *F, faction * f)
 	else
 		printf(" - Schreibe Report\n");
 
+	sprintf(buf, "Report für %s, %s", global.gamename, pzTime);
+	centre(F, buf, true);
 	centre(F, gamedate(f->locale), true);
 	rnl(F);
 	sprintf(buf, "%s, %s/%s (%s)", factionname(f), LOC(f->locale, race[f->race].name[1]),
@@ -2536,7 +2540,9 @@ reports(void)
 	FILE *shfp, *F, *BAT;
 	int wants_report, wants_computer_report,
 		wants_compressed, wants_bzip2;
-
+	time_t ltime = time(NULL);
+	char * pzTime = strdup(asctime( localtime( &ltime ) ));
+    
 	nmr_warnings();
 #ifdef DMALLOC
 	assert(dmalloc_verify ( NULL ));
@@ -2559,6 +2565,7 @@ reports(void)
 	init_intervals();
 #endif
 	remove_empty_units();
+	log_printf("Report timestamp: %s", pzTime);
 	for (f = factions; f; f = f->next) {
 		attrib * a = a_find(f->attribs, &at_reportspell);
 		current_faction = f;
@@ -2575,7 +2582,7 @@ reports(void)
 			sprintf(buf, "%s/%s.nr", reportpath(), factionid(f));
 			F = cfopen(buf, "wt");
 			if (F) {
-				report(F, f);
+				report(F, f, pzTime);
 				fclose(F);
 				gotit = true;
 			}
@@ -2585,7 +2592,7 @@ reports(void)
 			sprintf(buf, "%s/%s.cr", reportpath(), factionid(f));
 			F = cfopen(buf, "wt");
 			if (F) {
-				report_computer(F, f);
+				report_computer(F, f, ltime);
 				fclose(F);
 				gotit = true;
 			}

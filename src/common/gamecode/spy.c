@@ -60,7 +60,7 @@ spy(region * r, unit * u)
 	unit *target;
 	int spy, observe;
 
-	target = getunit(r, u);
+	target = getunit(r, u->faction);
 
 	if (!target) {
 		cmistake(u, findorder(u, u->thisorder), 64, MSG_EVENT);

@@ -302,7 +302,7 @@ teach(region * r, unit * u)
 		for (j = count; j; j--)
 			getstrtoken();
 
-		u2 = getunit(r, u);
+		u2 = getunit(r, u->faction);
 
 		/* Falls keine Unit gefunden, abbrechen - außer es gibt überhaupt keine
 		 * Unit, dann gibt es zusätzlich noch einen Fehler */

@@ -156,7 +156,7 @@ destroy_unit(unit * u)
 }
 
 unit *
-findnewunit (region * r, faction *f, int n)
+findnewunit (const region * r, const faction *f, int n)
 {
 	unit *u2;
 

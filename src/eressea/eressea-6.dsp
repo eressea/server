@@ -150,6 +150,10 @@ SOURCE=..\common\modules\museum.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\attributes\otherfaction.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\modules\score.h
 # End Source File
 # Begin Source File
@@ -1528,6 +1532,10 @@ SOURCE=.\korrektur.c
 # Begin Source File
 
 SOURCE=.\main.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\attributes\otherfaction.c
 # End Source File
 # Begin Source File
 

@@ -67,7 +67,7 @@ extern char *buildingnames[MAXBUILDINGS];
 
 void destroy(struct region * r, struct unit * u, const char * cmd);
 
-boolean can_contact(struct region *r, struct unit *u, struct unit *u2);
+extern boolean can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
 
 void do_siege(void);
 void build_road(struct region * r, struct unit * u, int size, direction_t d);

@@ -24,6 +24,7 @@
 #include "laws.h"
 
 #include <modules/gmcmd.h>
+#include <modules/infocmd.h>
 
 #ifdef OLD_TRIGGER
 # include "old/trigger.h"
@@ -1324,7 +1325,7 @@ set_name(region * r, unit * u, strlist * S)
 
 	case P_UNIT:
 		if (foreign == true) {
-			unit *u2 = getunit(r, u);
+			unit *u2 = getunit(r, u->faction);
 			if (!u2 || !cansee(u->faction, r, u2, 0)) {
 				cmistake(u, S->s, 64, MSG_EVENT);
 				break;
@@ -2888,16 +2889,20 @@ processorders (void)
 	unit *u;
 	strlist *S;
 
-	puts(" - neue Einheiten erschaffen...");
 	if (turn == 0) srand(time((time_t *) NULL));
 	else srand(turn);
+
+	puts(" - neue Einheiten erschaffen...");
 	new_units();
+
 	puts(" - Monster KI...");
 	plan_monsters();
 	set_passw();		/* und pruefe auf illegale Befehle */
+
 	puts(" - Defaults und Instant-Befehle...");
 	setdefaults();
 	instant_orders();
+
 	mail();
 	puts(" - Altern");
 
@@ -2930,6 +2935,11 @@ processorders (void)
 
 	puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (1.Versuch)");
 	do_misc(0);
+
+	puts(" - GM Kommandos");
+	infocommands();
+	gmcommands();
+
 	puts(" - Verlassen");
 	do_leave();
 
@@ -3028,9 +3038,6 @@ processorders (void)
 	reorder();
 	puts(" - Neue Nummern");
 	renumber();
-
-	puts(" - GM Kommandos");
-	gmcommands();
 
 	for (r = regions;r;r=r->next) reorder_owners(r);
 

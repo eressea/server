@@ -1773,7 +1773,7 @@ struct racedata race[MAXRACES] =
 		1.0,    /* Magieresistenz (0=Normal) */
 		0.0,    /* Maximale Aura (1=Durchschnitt) */
 		0.0,    /* Auraregeneration (1=Durchschnitt) */
-		1, 0,   /* Rekrutierungskosten, Unterhalt pro Runde */
+		0, 0,   /* Rekrutierungskosten, Unterhalt pro Runde */
 		10000,  /* Splitsize */
 		0,      /* Gewicht */
 		10.0,   /* Multiplikator Geschwindigkeit */
@@ -1792,8 +1792,8 @@ struct racedata race[MAXRACES] =
 			/* Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wah,Ste,Aus, WlK */
 			     0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0,   0
 		},
-		true, /* Nonplayer (bei Gelegenheit entfernen) */
-		(RCF_SHAPESHIFTANY | RCF_SHAPESHIFT | RCF_FLY | RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM), /* flags */
+		false, /* Nonplayer (bei Gelegenheit entfernen) */
+		(RCF_SHAPESHIFTANY | RCF_SHAPESHIFT | RCF_FLY | RCF_SWIM | RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM), /* flags */
 		(BF_EQUIPMENT | BF_MAGIC_EQUIPMENT),                      /* battle  */
 		(ECF_REC_ETHEREAL | ECF_REC_UNLIMITED | CANGUARD | GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM),  /* economy */
 		/* Vertraute für den Zauber (Gen, Ill, Tyb, Cer, Gwy, Dra) */

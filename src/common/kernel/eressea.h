@@ -411,6 +411,7 @@ enum {
 	K_SORT,
 	K_SETJIHAD,
 	K_GM,          /* perform GM commands */
+	K_INFO,        /* set player-info */
 	MAXKEYWORDS,
 	NOKEYWORD = (keyword_t) - 1
 };
@@ -953,8 +954,9 @@ int newcontainerid(void);
 extern struct unit *createunit(struct region * r, struct faction * f, int number, race_t race);
 extern struct unit *createunitid(struct region * r1, struct faction * f, int number, race_t race, int id, const char * dname);
 extern boolean getunitpeasants;
-struct unit *getunit(struct region * r, struct unit * u);
-int read_unitid(struct faction * f, struct region * r);
+struct unit *getunitg(const struct region * r, const struct faction * f);
+struct unit *getunit(const struct region * r, const struct faction * f);
+int read_unitid(const struct faction * f, const struct region * r);
 
 int isallied(const struct plane * pl, const struct faction * f, const struct faction * f2, int mode);
 int allied(const struct unit * u, const struct faction * f, int mode);
@@ -964,7 +966,7 @@ struct faction *findfaction_unique_id(int unique_id);
 struct faction *getfaction(void);
 
 struct region *findregion(int x, int y);
-struct unit *findunitg(int n, struct region * hint);
+struct unit *findunitg(int n, const struct region * hint);
 struct unit *findunit(int n);
 
 struct unit *findunitr(const struct region * r, int n);

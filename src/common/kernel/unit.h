@@ -149,7 +149,7 @@ void usetpotionuse(struct unit * u, const struct potion_type * p); /* u benutzt 
 boolean ucontact(const struct unit * u, const struct unit * u2);
 void usetcontact(struct unit * u, const struct unit * c);
 
-struct unit * findnewunit (struct region * r, struct faction *f, int alias);
+struct unit * findnewunit (const struct region * r, const struct faction *f, int alias);
 
 #define upotions(u) fval(u, FL_POTIONS)
 extern const struct unit u_peasants;

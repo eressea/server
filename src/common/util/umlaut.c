@@ -102,13 +102,13 @@ addtoken(tnode * root, const char* str, void * id)
 }
 
 int
-findtoken(tnode * tk, const char * str, void **result)
+findtoken(const tnode * tk, const char * str, void **result)
 {
 	if (*str == 0) return E_TOK_NOMATCH;
 
 	while (*str) {
 		int index;
-		tref * ref;
+		const tref * ref;
 		char c = *str;
 
 /*		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c); */

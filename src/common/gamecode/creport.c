@@ -835,7 +835,7 @@ encode_region(faction * f, region * r) {
 
 /* main function of the creport. creates the header and traverses all regions */
 void
-report_computer(FILE * F, faction * f)
+report_computer(FILE * F, faction * f, const time_t report_time)
 {
 	int i;
 	region *r;
@@ -857,6 +857,7 @@ report_computer(FILE * F, faction * f)
 
 	fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
 	fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
+	fprintf(F, "%ld;date\n", report_time);
 	fprintf(F, "\"%s\";Spiel\n", global.gamename);
 	fprintf(F, "\"%s\";Konfiguration\n", "Standard");
 	fprintf(F, "\"%s\";Koordinaten\n", "Hex");

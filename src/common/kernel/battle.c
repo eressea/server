@@ -3444,7 +3444,7 @@ do_battle(void)
 						/* Ende Fehlerbehandlung Angreifer */
 
 						/* attackierte Einheit ermitteln */
-						u2 = getunit(r, u);
+						u2 = getunit(r, u->faction);
 
 						/* Beginn Fehlerbehandlung */
 						/* Fehler: "Die Einheit wurde nicht gefunden" */

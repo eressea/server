@@ -71,7 +71,7 @@
 /* ------------------------------------------------------------- */
 
 static int
-slipthru(region * r, unit * u, const building * b)
+slipthru(const region * r, const unit * u, const building * b)
 {
 	unit *u2;
 	int n, o;
@@ -105,7 +105,7 @@ slipthru(region * r, unit * u, const building * b)
 }
 
 boolean
-can_contact(region * r, unit * u, unit * u2)
+can_contact(const region * r, const unit * u, const unit * u2)
 {
 
 	/* hier geht es nur um die belagerung von burgen */
@@ -129,7 +129,7 @@ can_contact(region * r, unit * u, unit * u2)
 
 
 static void
-set_contact(region * r, unit * u, char try)
+set_contact(const region * r, unit * u, char try)
 {
 
 	/* unit u kontaktiert unit u2. Dies setzt den contact einfach auf 1 -
@@ -138,7 +138,7 @@ set_contact(region * r, unit * u, char try)
 	 * weitergegeben wird. dies wird fuer das auffinden von tempunits in
 	 * getnewunit () verwendet! */
 
-	unit *u2 = getunit(r, u);
+	unit *u2 = getunitg(r, u->faction);
 
 	if (u2) {
 

@@ -26,7 +26,7 @@ typedef struct tnode {
 	void * id;
 } tnode;
 
-int findtoken(struct tnode * tk, const char * str, void** result);
+int findtoken(const struct tnode * tk, const char * str, void** result);
 void addtoken(struct tnode * root, const char* str, void * id);
 
 #endif

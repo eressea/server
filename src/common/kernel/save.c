@@ -31,6 +31,7 @@
 #include "race.h"
 #include "attrib.h"
 #include "plane.h"
+#include "player.h"
 #include "movement.h"
 #include "alchemy.h"
 #include "region.h"
@@ -1539,6 +1540,48 @@ write_items(FILE *F, item *ilist)
 	fputs("end", F);
 }
 
+static void
+export_players(const char * path)
+{
+	FILE * F;
+	player * p = get_players();
+	if (p==NULL) return;
+
+	F = cfopen(path, "w");
+	if (F==NULL) return;
+
+	fputs("name;email;passwd;faction;info\n", F);
+	while (p) {
+		/* name */
+		fputc('\"', F);
+		if (p->name) fputs(p->name, F); 
+
+		/* email */
+		fputs("\";\"", F);
+		if (p->email) fputs(p->email, F);
+		else if (p->faction) fputs(p->faction->email, F); 
+		fputs("\";\"", F);
+
+		/* passwd */
+		fputs("\";\"", F);
+		if (p->faction) fputs(p->faction->passw, F);
+
+		/* faction */
+		fputs("\";\"", F);
+		if (p->faction) fputs(itoa36(p->faction->no), F);
+
+		/* info */
+		fputs("\";\"", F);
+		if (p->info) fputs(p->info, F);
+		else if (p->faction) fputs(p->faction->banner, F); 
+
+		fputs("\"\n", F);
+
+		p = next_player(p);
+	}
+	fclose(F);
+}
+
 void
 writegame(char *path, char quiet)
 {
@@ -1554,6 +1597,10 @@ writegame(char *path, char quiet)
 	strlist *S;
 	const herb_type *rht;
 	FILE * F;
+	char playerfile[MAX_PATH];
+
+	sprintf(buf, "%s/%d.players", datapath(), turn);
+	export_players(playerfile);
 
 	write_dynamictypes();
 

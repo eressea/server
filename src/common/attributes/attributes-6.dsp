@@ -7,19 +7,19 @@
 CFG=attributes - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "attributes-6.mak".
-!MESSAGE
+!MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "attributes-6.mak" CFG="attributes - Win32 Debug"
-!MESSAGE
+!MESSAGE 
 !MESSAGE Possible choices for configuration are:
-!MESSAGE
+!MESSAGE 
 !MESSAGE "attributes - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "attributes - Win32 Debug" (based on "Win32 (x86) Static Library")
-!MESSAGE
+!MESSAGE 
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -74,7 +74,7 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo
 
-!ENDIF
+!ENDIF 
 
 # Begin Target
 
@@ -114,6 +114,10 @@ SOURCE=.\key.h
 # Begin Source File
 
 SOURCE=.\matmod.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\otherfaction.h
 # End Source File
 # Begin Source File
 
@@ -163,6 +167,10 @@ SOURCE=.\matmod.c
 # Begin Source File
 
 SOURCE=.\orcification.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\otherfaction.c
 # End Source File
 # Begin Source File
 

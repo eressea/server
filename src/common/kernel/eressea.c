@@ -202,7 +202,8 @@ const char *keywords[MAXKEYWORDS] =
 	"BETEN",
 	"SORTIEREN",
 	"JIHAD",
-	"GM"
+	"GM",
+	"INFO"
 };
 
 const char *report_options[MAX_MSG] =
@@ -1280,7 +1281,7 @@ unit *findunit(int n)
 }
 
 unit *
-findunitg (int n, region * hint)
+findunitg (int n, const region * hint)
 {
 
 	/* Abfangen von Syntaxfehlern. */
@@ -1293,16 +1294,16 @@ findunitg (int n, region * hint)
 }
 
 unit *
-getnewunit (region * r, unit * u)
+getnewunit (const region * r, const faction * f)
 {
 	int n;
 	n = getid();
 
-	return findnewunit (r, u->faction, n);
+	return findnewunit (r, f, n);
 }
 
 int
-read_newunitid (faction * f, region * r)
+read_newunitid (const faction * f, const region * r)
 {
 	int n;
 	unit *u2;
@@ -1317,7 +1318,7 @@ read_newunitid (faction * f, region * r)
 }
 
 int
-read_unitid (faction * f, region * r)
+read_unitid (const faction * f, const region * r)
 {
 	char *s;
 
@@ -1339,13 +1340,31 @@ read_unitid (faction * f, region * r)
 /* exported symbol */
 boolean getunitpeasants;
 unit *
-getunit (region * r, unit * u)
+getunitg(const region * r, const faction * f)
+{
+	int n;
+	getunitpeasants = 0;
+
+	n = read_unitid(f, r);
+
+	if (n == 0) {
+		getunitpeasants = 1;
+		return NULL;
+	}
+
+	if (n < 0) return 0;
+
+	return findunit(n);
+}
+
+unit *
+getunit(const region * r, const faction * f)
 {
 	int n;
 	unit *u2;
 	getunitpeasants = 0;
 
-	n = read_unitid(u->faction, r);
+	n = read_unitid(f, r);
 
 	if (n == 0) {
 		getunitpeasants = 1;

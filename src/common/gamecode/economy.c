@@ -276,10 +276,10 @@ expandrecruit(region * r, request * recruitorders)
 				if ((race[rc].ec_flags & ECF_REC_ETHEREAL)==0) p--; /* use a peasant */
 				n++;
 			}
-			set_number(u, u->number + 1);
-			u->race = rc;
-			u->n++;
 		}
+		set_number(u, u->number + 1);
+		u->race = rc;
+		u->n++;
 	}
 
 	assert(p>=0 && h>=0);
@@ -367,16 +367,18 @@ recruit(region * r, unit * u, strlist * S,
 	}
 
 	recruitcost = race[u->faction->race].rekrutieren;
-	pl = getplane(r);
-	if (pl && fval(pl, PFL_NORECRUITS)) {
-		add_message(&u->faction->msgs,
-			new_message(u->faction, "error_pflnorecruit%s:command%u:unit%r:region", S->s, u, r));
-		return;
-	}
+	if (recruitcost) {
+		pl = getplane(r);
+		if (pl && fval(pl, PFL_NORECRUITS)) {
+			add_message(&u->faction->msgs,
+				new_message(u->faction, "error_pflnorecruit%s:command%u:unit%r:region", S->s, u, r));
+			return;
+		}
 
-	if (get_pooled(u, r, R_SILVER) < recruitcost) {
-		cmistake(u, S->s, 142, MSG_EVENT);
-		return;
+		if (get_pooled(u, r, R_SILVER) < recruitcost) {
+			cmistake(u, S->s, 142, MSG_EVENT);
+			return;
+		}
 	}
 	if (nonplayer(u) || idle(u->faction)) {
 		cmistake(u, S->s, 139, MSG_EVENT);
@@ -404,7 +406,7 @@ recruit(region * r, unit * u, strlist * S,
 		cmistake(u, S->s, 156, MSG_EVENT);
 		return;
 	}
-	n = min(n, get_pooled(u, r, R_SILVER) / recruitcost);
+	if (recruitcost) n = min(n, get_pooled(u, r, R_SILVER) / recruitcost);
 
 	u->wants = n;
 
@@ -764,7 +766,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 
 	if (liefere) notfound_error = 63;
 
-	u2 = getunit(r, u);
+	u2 = getunit(r, u->faction);
 
 	if (!u2 && !getunitpeasants) {
 		cmistake(u, S->s, notfound_error, MSG_COMMERCE);
