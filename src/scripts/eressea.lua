@@ -2,8 +2,7 @@ function run_scripts()
   scripts = { 
     "wedding-jadee.lua", 
     "eternath.lua",
-    "ponnuki.lua",
-    "xmas2004.lua"
+    "ponnuki.lua"
   }
   for index in scripts do
     local script = scriptpath .. "/" .. scripts[index]

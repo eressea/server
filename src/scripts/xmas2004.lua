@@ -7,7 +7,6 @@ function xmas2004()
       for f in factions() do
         f:add_item("speedsail", 1)
         f:add_notice("santa2004")
-        print(f)
       end
     end
   end
