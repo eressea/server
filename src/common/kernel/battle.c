@@ -513,11 +513,6 @@ get_unitrow(const fighter * af)
   int front = 0;
   size_t bsize;
 
-#ifdef FAST_GETUNITROW
-  if (!b->nonblockers && b->alive==af->row.alive) {
-    return af->row.cached;
-  }
-#endif
   bsize = cv_size(&b->sides);
 
   if (csize<bsize) {
@@ -528,7 +523,7 @@ get_unitrow(const fighter * af)
   else memset(counted, 0, bsize*sizeof(boolean));
   memset(size, 0, sizeof(size));
   for (line=FIRST_ROW;line!=NUMROWS;++line) {
-	int si;
+    int si;
     /* how many enemies are there in the first row? */
     for (si=0;af->side->enemies[si];++si) {
       side *s = af->side->enemies[si];
@@ -560,10 +555,6 @@ get_unitrow(const fighter * af)
   */
   result = max(FIRST_ROW, row - retreat);
 
-#ifdef FAST_GETUNITROW
-  af->row.alive = b->alive;
-  af->row.cached = result;
-#endif
   return result;
 }
 
@@ -1305,13 +1296,21 @@ count_side(const side * s, int minrow, int maxrow)
 {
   void **fi;
   int people = 0;
+  int unitrow[NUMROWS];
+  int i;
+
+  for (i=0;i!=NUMROWS;++i) unitrow[i] = -1;
 
   for (fi = s->fighters.begin; fi != s->fighters.end; ++fi) {
     const fighter *fig = *fi;
     int row;
 
     if (fig->alive - fig->removed <= 0) continue;
-    row = get_unitrow(fig);
+    row = statusrow(fig->status);
+    if (unitrow[row] == -1) {
+      unitrow[row] = get_unitrow(fig);
+    }
+    row = unitrow[row];
 
     if (row >= minrow && row <= maxrow) {
       people += fig->alive - fig->removed;
@@ -2975,9 +2974,6 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 	s1->size[SUM_ROW] += u->number;
 	if (u->race->battle_flags & BF_NOBLOCK) {
 		s1->nonblockers[statusrow(fig->status)] += u->number;
-#ifdef FAST_GETUNITROW
-		b->nonblockers = true;
-#endif
 	}
 
 	if (fig->unit->race->flags & RCF_HORSE) {

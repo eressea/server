@@ -17,9 +17,6 @@
 extern "C" {
 #endif
 
-  /** new code defines **/
-#undef FAST_GETUNITROW
-
   /** more defines **/
 #define FS_ENEMY 1
 #define FS_HELP  2
@@ -64,9 +61,6 @@ extern "C" {
     int     alive;
 #ifdef SMALL_BATTLE_MESSAGES
     boolean small;
-#endif
-#ifdef FAST_GETUNITROW
-    boolean nonblockers;
 #endif
   } battle;
 
@@ -180,12 +174,6 @@ extern "C" {
 #ifdef SHOW_KILLS
     int kills;
     int hits;
-#endif
-#ifdef FAST_GETUNITROW
-    struct {
-      int alive;
-      int cached;
-    } row;
 #endif
   } fighter;
 
