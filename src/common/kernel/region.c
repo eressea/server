@@ -614,7 +614,7 @@ rmoney(const region * r)
 }
 
 void
-rsethorses(region *r, int value)
+rsethorses(const region *r, int value)
 {
 	assert(value >= 0);
 	if(r->land)
@@ -622,7 +622,7 @@ rsethorses(region *r, int value)
 }
 
 int
-rhorses(region *r)
+rhorses(const region *r)
 {
 	return r->land?r->land->horses:0;
 }

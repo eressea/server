@@ -61,6 +61,8 @@
 #include <sql.h>
 #include <xml.h>
 
+#include <modules/xecmd.h>
+
 /* libc includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -2270,6 +2272,7 @@ attrib_init(void)
 	at_register(&at_germs);
 #endif
 	at_register(&at_laen); /* required for old datafiles */
+	at_register(&at_xontormiaexpress); /* required for old datafiles */
 }
 
 void
