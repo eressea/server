@@ -1,6 +1,6 @@
 /* vi: set ts=2 ai sw=2
  *
- *	$Id: filter.c,v 1.1 2001/01/25 09:37:56 enno Exp $
+ *	$Id: filter.c,v 1.2 2001/01/26 16:19:41 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1997-99
  *		Enno Rehling (rehling@usa.net)
  *		Christian Schlittchen (corwin@amber.kn-bremen.de)

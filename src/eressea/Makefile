@@ -3,7 +3,9 @@ SUBDIRS =
 LIBRARY = 
 BINARY = eressea
 
-SOURCES = $(wildcard *.c)
+## cheating: we link all attributes/items/etc for all the games. TODO - don't.
+#SOURCES = $(wildcard *.c)
+SOURCES = main.c korrektur.c
 OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
 
 include ../Makefile.include
@@ -11,29 +13,29 @@ include ../Makefile.include
 ## more definitions
 
 INCLUDES  += \
-	-I../util \
-	-I../kernel \
-	-I../items \
-	-I../spells \
-	-I../triggers \
-	-I../gamecode \
-	-I../races \
-	-I../attributes
+	-I../common \
+	-I../common/util \
+	-I../common/kernel \
+	-I../common/gamecode
 
-LIBS      += \
-	-le-triggers \
-	-le-modules \
-	-le-gamecode \
-	-le-kernel \
-	-le-items \
-	-le-spells \
-	-le-races \
-	-le-attributes \
-	-le-util \
-	-lm
+LIBNAMES      = \
+	e-triggers \
+	e-modules \
+	e-gamecode \
+	e-kernel \
+	e-items \
+	e-spells \
+	e-races \
+	e-attributes \
+	e-util
+
+LIBRARIES = $(LIBNAMES:%=$(PUBLISH_DIR)/lib%.a)
+
+LIBS += $(LIBNAMES:%=-l%) -lm
+
 
 # executable:
-$(BUILD_DIR)/$(BINARY):: $(BUILD_DIR) $(OBJECTS)
+$(BUILD_DIR)/$(BINARY):: $(BUILD_DIR) $(OBJECTS) $(LIBRARIES)
 	$(LD) -o $@ $(OBJECTS) $(LDFLAGS)
 	$(INSTALL) $@ $(PUBLISH_DIR)/
 

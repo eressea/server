@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: attrib.c,v 1.1 2001/01/25 09:37:58 enno Exp $
+ *	$Id: attrib.c,v 1.2 2001/01/26 16:19:41 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -44,7 +44,8 @@ at_register(attrib_type * at)
 	find = at_hash[at->hashkey % MAXATHASH];
 	while (find && at->hashkey!=find->hashkey) find = find->nexthash;
 	if (find && find==at) {
-		fprintf(stderr, "WARNING: attribute %s was registered more than once\n", at->name);
+		fprintf(stderr, "WARNING: attribute '%s' was registered more than once\n", at->name);
+		return;
 	} else {
 		assert(!find || !"hashkey is already in use");
 	}

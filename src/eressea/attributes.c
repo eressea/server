@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: attributes.c,v 1.1 2001/01/25 09:37:56 enno Exp $
+ * $Id: attributes.c,v 1.2 2001/01/26 16:19:41 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -17,12 +17,12 @@
 #include "attributes.h"
 
 /* attributes includes */
-#include "key.h"
-#include "targetregion.h"
-#include "reduceproduction.h"
-#include "follow.h"
-#include "iceberg.h"
-#include "hate.h"
+#include <attributes/key.h>
+#include <attributes/targetregion.h>
+#include <attributes/reduceproduction.h>
+#include <attributes/follow.h>
+#include <attributes/iceberg.h>
+#include <attributes/hate.h>
 
 /* util includes */
 #include <attrib.h>

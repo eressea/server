@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.1 2001/01/25 09:37:56 enno Exp $
+ *	$Id: main.c,v 1.2 2001/01/26 16:19:41 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -34,14 +34,15 @@
 #include <config.h>
 #include <eressea.h>
 
+/* initialization - TODO: init in separate module */
+#include <items/weapons.h>
+#include <attributes/attributes.h>
+
 /* modules includes */
 #include <modules/arena.h>
 #include <modules/museum.h>
 #include <modules/score.h>
 #include <modules/xmas2000.h>
-
-/* items includes - TODO: init in separate module */
-#include <items/weapons.h>
 
 /* gamecode includes */
 #include <creation.h>
@@ -104,6 +105,7 @@ init_game(void)
 
 	init_resources();
 	init_weapons();
+	init_attributes();
 
 	init_conversion();
 

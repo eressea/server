@@ -6,11 +6,11 @@ BINARY =
 SOURCES = $(wildcard *.c)
 OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
 
-include ../Makefile.include
+include $(ERESSEA)/Makefile.include
 
 ## more definitions
 
-INCLUDES  += -I../util -I../kernel -I../gamecode
+INCLUDES  += -I../util -I../kernel -I../gamecode -I..
 
 # library:
 $(BUILD_DIR)/$(LIBRARY):: $(BUILD_DIR) $(OBJECTS)

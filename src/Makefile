@@ -1,16 +1,10 @@
 TARGETS = subdirs
 
 SUBDIRS = \
-  util \
-  kernel \
-  gamecode \
-  triggers \
-  items \
-  attributes \
-  races \
-  spells \
-  modules \
+  common \
   eressea \
+#  askalon \
+#  tools \
   mapper
 
 include Makefile.include
