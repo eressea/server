@@ -33,7 +33,7 @@
 #include <attributes/attributes.h>
 #include <spells/spells.h>
 #include <triggers/triggers.h>
-#include <items/items.h>
+#include <items/itemtypes.h>
 
 /* modules includes */
 #include <modules/score.h>
@@ -54,10 +54,10 @@
 #endif
 
 /* gamecode includes */
-#include <economy.h>
-#include <goodies.h>
-#include <monster.h>
-#include <laws.h>
+#include <gamecode/economy.h>
+#include <gamecode/items.h>
+#include <gamecode/laws.h>
+#include <gamecode/monster.h>
 
 /* kernel includes */
 #include <kernel/xmlreader.h>
@@ -83,6 +83,7 @@
 /* util includes */
 #include <rand.h>
 #include <util/xml.h>
+#include <util/goodies.h>
 #include <log.h>
 #include <sql.h>
 #include <base36.h>
@@ -168,7 +169,8 @@ game_init(void)
 	register_resources();
 	register_buildings();
 	register_ships();
-	register_items();
+  register_itemimplementations();
+	register_itemtypes();
 	register_spells();
 #ifdef DUNGEON_MODULE
 	register_dungeon();
@@ -181,7 +183,7 @@ game_init(void)
   init_locales();
   init_attributes();
   init_races();
-  init_items();
+  init_itemtypes();
   init_races();
 	init_economy();
 #if NEW_RESOURCEGROWTH

@@ -12,7 +12,7 @@ SOURCES =
  birthday_firework.c
  catapultammo.c
  demonseye.c
- items.c
+ itemtypes.c
  questkeys.c
  racespoils.c
  seed.c

@@ -16,8 +16,8 @@
 extern "C" {
 #endif
 
-extern void register_items(void);
-extern void init_items(void);
+extern void register_itemtypes(void);
+extern void init_itemtypes(void);
 
 #ifdef __cplusplus
 }

@@ -27,8 +27,7 @@
 #include <spells/spells.h>
 #include <attributes/attributes.h>
 #include <triggers/triggers.h>
-#include <items/weapons.h>
-#include <items/items.h>
+#include <items/itemtypes.h>
 
 #include <modules/gmcmd.h>
 #include <modules/xmas.h>
@@ -1687,7 +1686,7 @@ main(int argc, char *argv[])
 	register_resources();
 	register_buildings();
 	register_ships();
-	register_items();
+	register_itemtypes();
 	register_spells();
 #ifdef MUSEUM_MODULE
 	register_museum();

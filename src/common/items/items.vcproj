@@ -133,7 +133,7 @@
 				RelativePath=".\demonseye.h">
 			</File>
 			<File
-				RelativePath=".\items.h">
+				RelativePath=".\itemtypes.h">
 			</File>
 			<File
 				RelativePath=".\questkeys.h">
@@ -164,7 +164,7 @@
 			RelativePath=".\demonseye.c">
 		</File>
 		<File
-			RelativePath=".\items.c">
+			RelativePath=".\itemtypes.c">
 		</File>
 		<File
 			RelativePath=".\questkeys.c">
@@ -174,18 +174,6 @@
 		</File>
 		<File
 			RelativePath=".\seed.c">
-		</File>
-		<File
-			RelativePath=".\speedsail.c">
-		</File>
-		<File
-			RelativePath=".\speedsail.h">
-		</File>
-		<File
-			RelativePath=".\studypotion.c">
-		</File>
-		<File
-			RelativePath=".\studypotion.h">
 		</File>
 		<File
 			RelativePath=".\weapons.c">

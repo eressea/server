@@ -184,6 +184,9 @@
 				RelativePath=".\economy.h">
 			</File>
 			<File
+				RelativePath=".\items.h">
+			</File>
+			<File
 				RelativePath=".\laws.h">
 			</File>
 			<File
@@ -204,6 +207,9 @@
 		</File>
 		<File
 			RelativePath=".\economy.c">
+		</File>
+		<File
+			RelativePath=".\items.c">
 		</File>
 		<File
 			RelativePath=".\laws.c">

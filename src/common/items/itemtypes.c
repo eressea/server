@@ -12,15 +12,13 @@
 
 #include <config.h>
 #include <eressea.h>
-#include "items.h"
+#include "itemtypes.h"
 
 #include "birthday_firework.h"
 #include "demonseye.h"
 #include "xerewards.h"
 #include "artrewards.h"
 #include "weapons.h"
-#include "speedsail.h"
-#include "studypotion.h"
 #include "racespoils.h"
 #if GROWING_TREES
 # include "seed.h"
@@ -29,7 +27,7 @@
 #include "catapultammo.h"
 
 void
-register_items(void)
+register_itemtypes(void)
 {
 	register_weapons();
 	register_demonseye();
@@ -44,12 +42,10 @@ register_items(void)
 	register_catapultammo();
 	register_racespoils();
   register_artrewards();
-  register_speedsail();
-  register_studypotion();
 }
 
 void
-init_items(void)
+init_itemtypes(void)
 {
 	init_weapons();
 }
