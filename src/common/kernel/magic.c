@@ -1551,6 +1551,7 @@ regeneration_magiepunkte(void)
 					reg_aura = (double)regeneration(u);
 
 					/* Magierturm erhöht die Regeneration um 75% */
+					/* Steinkreis erhöht die Regeneration um 50% */
 					if (btype) reg_aura *= btype->auraregen;
 
 					/* Bonus/Malus durch Zauber */
