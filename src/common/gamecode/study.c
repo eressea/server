@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: study.c,v 1.4 2001/02/04 07:52:30 katze Exp $
+ *	$Id: study.c,v 1.5 2001/02/04 13:20:12 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -525,6 +525,8 @@ learn(void)
 								 (int)(u->number * 30 * multi), a->data.i);
 					}
 #endif
+
+					change_skill(u, (skill_t)i, (int)((u->number * 30 + a->data.i) * multi));
 					if (a) {
 						a_remove(&u->attribs, a);
 						a = NULL;

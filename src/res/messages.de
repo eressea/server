@@ -1,5 +1,5 @@
 # Kommentare sind erlaubt. Endlich.
-# $Id: messages.de,v 1.6 2001/02/04 08:58:00 corwin Exp $
+# $Id: messages.de,v 1.7 2001/02/04 13:20:12 corwin Exp $
 
 # Fehlermeldungen:
 msg_errors;errors:0;de;{string}
@@ -516,4 +516,10 @@ wand_of_tears_usage;events:0;de;{unit} schwenkt sein Szepter und sorgt für Verwi
 drown_amphibian_nodead;events:1;de;{unit} nimmt Schaden auf dem Wasser.
 drown_amphibian_dead;events:0;de;{amount} Personen in {unit} ertrinken.
 drown;events:0;de;{unit} ertrinkt.
+
+# Spezialplanes
+error_pflnorecruit;errors:0;de;{unit} in {region}: '{command}' - In der Ebene der Herausforderung kann niemand rekrutiert werden.
+buildingcrash;events;0;de;In {region} stürzte {building} ein.{opfer}
+nomaintenance;events;0;de;Für das Gebäude {building} konnte die ganze Woche kein Unterhalt bezahlt werden. 
+unitmessage;events;0;de;Eine Botschaft von {unit} aus {region}: '{message}'"
 

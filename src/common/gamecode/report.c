@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.7 2001/02/04 08:38:14 enno Exp $
+ *	$Id: report.c,v 1.8 2001/02/04 13:20:12 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -814,8 +814,6 @@ prices(FILE * F, region * r, faction * f)
 		else if (dmd->value > 0) n++;
 	}
 	assert(sale!=NULL);
-
-	for (dmd=r->land->demands;dmd;dmd=dmd->next) if(dmd->value > 0) n++;
 
 	sprintf(buf, "Auf dem Markt wird für %s %d Silber verlangt.",
 		locale_string(f->locale, resourcename(sale->itype->rtype, GR_PLURAL)),
@@ -2638,18 +2636,16 @@ reports(void)
 			}
 		}
 		if (f->email && BAT) {
-			char nbuf[32];
-
-			sprintf(nbuf, "%s/%s.sh", reportpath(), factionid(f));
-			shfp = fopen(nbuf, "w");
+			sprintf(buf, "%s/%s.sh", reportpath(), factionid(f));
+			shfp = fopen(buf, "w");
 			fprintf(shfp,"#!/bin/sh\n\nPATH=%s\n\n",MAILITPATH);
 			fprintf(shfp,"if [ $# -ge 1 ]; then\n");
 			fprintf(shfp,"\taddr=$1\n");
 			fprintf(shfp,"else\n");
-			fprintf(shfp,"\taddr=%s\n", buf);
+			fprintf(shfp,"\taddr=%s\n", f->email);
 			fprintf(shfp,"fi\n\n");
 
-			fprintf(BAT, "\n\ndate;echo %s\n", buf);
+			fprintf(BAT, "\n\ndate;echo %s\n", f->email);
 
 			if (f->options & wants_compressed) {
 
@@ -2711,7 +2707,7 @@ reports(void)
 						factionid(f));
 			}
 
-			fprintf(BAT, ". %s.sh %s\n", factionid(f), buf);
+			fprintf(BAT, ". %s.sh %s\n", factionid(f), f->email);
 			fclose(shfp);
 		}
 
@@ -3139,7 +3135,7 @@ report_summary(summary * s, summary * o, boolean full)
 		if (full) {
 			sprintf(zText, "%s/parteien.full", basepath());
 		} else {
-			sprintf(zText, "%s/parteien.full", basepath());
+			sprintf(zText, "%s/parteien", basepath());
 		}
 		F = cfopen(zText, "w");
 		if (!F) return;
