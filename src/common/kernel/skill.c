@@ -337,7 +337,7 @@ reduce_skill(unit *u, skill * sv, int weeks)
 		reroll = true;
 	}
 	if (reroll) sv->weeks = (unsigned char)skill_weeks(sv->level);
-	assert(sv->level>=0 && sv->weeks>=0 && sv->weeks<=sv->level*2);
+	assert(sv->level>=0 && sv->weeks>=0 && sv->weeks<=sv->level*2+1);
 }
 
 int 
