@@ -153,6 +153,7 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
     property = xmlGetProp(node, BAD_CAST "skill");
     assert(property!=NULL);
     con->skill = sk_find((const char*)property);
+    assert(con->skill!=NOSKILL);
     xmlFree(property);
 
     con->maxsize = xml_ivalue(node, "maxsize", -1);
