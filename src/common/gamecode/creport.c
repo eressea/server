@@ -380,7 +380,8 @@ void
 creport_init(void)
 {
 	tsf_register("report", &cr_ignore);
-	tsf_register("string", &cr_string);
+        tsf_register("string", &cr_string);
+        tsf_register("order", &cr_string);
 	tsf_register("int", &cr_int);
 	tsf_register("unit", &cr_unit);
 	tsf_register("region", &cr_region);

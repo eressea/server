@@ -50,15 +50,18 @@ typedef struct item {
 #define NMF_PLURAL     0x01
 #define NMF_APPEARANCE 0x02
 
+typedef int (*rtype_uchange)(struct unit * user, const struct resource_type * rtype, int delta);
+typedef int (*rtype_uget)(const struct unit * user, const struct resource_type * rtype);
+typedef char * (*rtype_name)(const struct resource_type * rtype, int flags);
 typedef struct resource_type {
 	/* --- constants --- */
 	const char * _name[2]; /* wie es heißt */
 	const char * _appearance[2]; /* wie es für andere aussieht */
 	unsigned int flags;
 	/* --- functions --- */
-	int    (*uchange)(struct unit * user, const struct resource_type * rtype, int delta);
-	int    (*uget)(const struct unit * user, const struct resource_type * rtype);
-	char * (*name)(const struct resource_type * rtype, int flags);
+	rtype_uchange uchange;
+	rtype_uget uget;
+	rtype_name name;
 	/* --- pointers --- */
 	struct attrib * attribs;
 	struct resource_type * next;
@@ -85,9 +88,11 @@ extern const resource_type * findresourcetype(const char * name, const struct lo
 
 /* resource-limits for regions */
 extern struct attrib_type at_resourcelimit;
+typedef int (*rlimit_limit)(const struct region * r, const struct resource_type * rtype);
+typedef void (*rlimit_use)(struct region * r, const struct resource_type * rtype, int n);
 typedef struct resource_limit {
-	int (*limit)(const struct region * r, const struct resource_type * rtype);
-	void (*use)(struct region * r, const struct resource_type * rtype, int n);
+	rlimit_limit limit;
+	rlimit_use use;
 	int value;
 } resource_limit;
 

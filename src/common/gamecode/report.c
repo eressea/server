@@ -3610,6 +3610,14 @@ eval_int36(struct opstack ** stack, const void * userdata)
 	unused(userdata);
 }
 
+static void
+eval_string(struct opstack ** stack, const void * userdata)
+{
+  const char * c = opop(stack, const char*);
+  opush(stack, strcpy(balloc(strlen(c)+1), c));
+  unused(userdata);
+}
+
 void
 report_init(void)
 {
@@ -3622,6 +3630,7 @@ report_init(void)
 	add_function("faction", &eval_faction);
 	add_function("ship", &eval_ship);
 	add_function("unit", &eval_unit);
+        add_function("order", &eval_string);
 	add_function("unit.name", &eval_unitname);
 	add_function("unit.id", &eval_unitid);
 	add_function("building", &eval_building);

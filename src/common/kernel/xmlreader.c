@@ -545,6 +545,7 @@ parse_resources(xmlDocPtr doc)
     resource_type * rtype;
     unsigned int flags = RTF_NONE;
     xmlXPathObjectPtr result;
+    int k;
 
     if (xml_bvalue(node, "pooled", false)) flags |= RTF_POOLED;
 
@@ -568,6 +569,77 @@ parse_resources(xmlDocPtr doc)
     }
     free(names[0]);
     free(names[1]);
+
+    /* reading eressea/resources/resource/function */
+    xpath->node = node;
+    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+    for (k=0;k!=result->nodesetval->nodeNr;++k) {
+      xmlNodePtr node = result->nodesetval->nodeTab[k];
+      pf_generic fun;
+
+      property = xmlGetProp(node, BAD_CAST "value");
+      assert(property!=NULL);
+      fun = get_function((const char*)property);
+      if (fun==NULL) {
+        log_error(("unknown function name '%s' for resource %s\n",
+          (const char*)property, rtype->_name[0]));
+        xmlFree(property);
+        continue;
+      }
+      xmlFree(property);
+
+      property = xmlGetProp(node, BAD_CAST "name");
+      assert(property!=NULL);
+      if (strcmp((const char*)property, "change")==0) {
+        rtype->uchange = (rtype_uchange)fun;
+      } else if (strcmp((const char*)property, "get")==0) {
+        rtype->uget = (rtype_uget)fun;
+      } else if (strcmp((const char*)property, "name")==0) {
+        rtype->name = (rtype_name)fun;
+      } else {
+        log_error(("unknown function type '%s' for resource %s\n",
+          (const char*)property, rtype->_name[0]));
+      }
+      xmlFree(property);
+    }
+    xmlXPathFreeObject(result);
+
+    /* reading eressea/resources/resource/resourcelimit/function */
+    xpath->node = node;
+    result = xmlXPathEvalExpression(BAD_CAST "resourcelimit/function", xpath);
+    for (k=0;k!=result->nodesetval->nodeNr;++k) {
+      attrib * a = a_find(rtype->attribs, &at_resourcelimit);
+      xmlNodePtr node = result->nodesetval->nodeTab[k];
+      pf_generic fun;
+
+      property = xmlGetProp(node, BAD_CAST "value");
+      assert(property!=NULL);
+      fun = get_function((const char*)property);
+      if (fun==NULL) {
+        log_error(("unknown limit '%s' for resource %s\n",
+          (const char*)property, rtype->_name[0]));
+        xmlFree(property);
+        continue;
+      }
+      xmlFree(property);
+
+      if (a==NULL) a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
+
+      property = xmlGetProp(node, BAD_CAST "name");
+      assert(property!=NULL);
+      if (strcmp((const char*)property, "use")==0) {
+        resource_limit * rdata = (resource_limit*)a->data.v;
+        rdata->use = (rlimit_use)fun;
+      } else if (strcmp((const char*)property, "limit")==0) {
+        resource_limit * rdata = (resource_limit*)a->data.v;
+        rdata->limit = (rlimit_limit)fun;
+      } else {
+        log_error(("unknown limit '%s' for resource %s\n",
+          (const char*)property, rtype->_name[0]));
+      }
+      xmlFree(property);
+    }
+    xmlXPathFreeObject(result);
 
     /* reading eressea/resources/resource/item */
     xpath->node = node;
