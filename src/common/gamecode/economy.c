@@ -1807,7 +1807,7 @@ create_potion(unit * u, const potion_type * ptype, int want)
 	default:
 		i_change(&u->items, ptype->itype, built);
 		if (want==INT_MAX) want = built;
-		ADDMSG(&u->faction->msgs, msg_message(u->faction, "manufacture",
+		ADDMSG(&u->faction->msgs, msg_message("manufacture",
 			"unit region amount wanted resource", u, u->region, built, want, ptype->itype->rtype));
 		break;
 	}
