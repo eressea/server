@@ -3,10 +3,10 @@ SUBDIRS =
 LIBRARY = 
 BINARY = mapper
 
+include ../Makefile.include
+
 SOURCES = $(wildcard *.c)
 OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
-
-include ../Makefile.include
 
 ## more definitions
 
@@ -26,6 +26,16 @@ LIBS      += \
 	-le-util \
 	-lcurses \
 	-lm
+
+##
+## conversion code for old triggers - should only be used for free eressea,
+## and only for old datafiles.
+##
+ifeq ($(CONVERT_TRIGGERS), 1)
+ SUBDIRS += old
+ LIBRARIES += $(PUBLISH_DIR)/libe-compat.a
+ LIBS += -le-compat
+endif
 
 # executable:
 $(BUILD_DIR)/$(BINARY):: $(BUILD_DIR) $(OBJECTS)
