@@ -17,14 +17,15 @@ INCLUDES  += \
 	-I../common \
 	-I..
 
-LIBNAMES      += \
-	e-triggers \
+LIBNAMES      = \
 	e-kernel \
+	e-gamecode \
+	e-triggers \
+	e-modules \
+	e-attributes \
 	e-items \
 	e-spells \
 	e-races \
-	e-attributes \
-	e-modules \
 	e-util
 
 LIBS      += \
