@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.15 2001/02/12 22:39:57 enno Exp $
+ *	$Id: main.c,v 1.16 2001/02/14 01:38:51 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -119,6 +119,7 @@ print_potions(FILE * F)
 
 static char * orders = NULL;
 static int nowrite = 0;
+extern void debug_messagetypes(FILE * out);
 
 static void
 game_init(void)
@@ -137,7 +138,15 @@ game_init(void)
 	init_museum();
 	init_arena();
 	init_xmas2000();
+#ifdef REMOVE_THIS
 	render_init();
+	{
+		FILE * F = fopen("messagetypes.txt", "w");
+		debug_messagetypes(F);
+		fclose(F);
+		abort();
+	}
+#endif
 /*	print_potions(stdout);
 	exit(0); */
 }

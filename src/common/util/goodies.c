@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: goodies.c,v 1.6 2001/02/11 20:54:01 enno Exp $
+ *	$Id: goodies.c,v 1.7 2001/02/14 01:38:50 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -66,7 +66,7 @@ hashstring(const char* s)
 	while (i>0) {
 		key = (s[--i] + key*37);
 	}
-	return key;
+	return key % 0x7FFFFFFF;
 }
 
 char *

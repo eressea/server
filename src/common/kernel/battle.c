@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.11 2001/02/11 08:55:30 enno Exp $
+ *	$Id: battle.c,v 1.12 2001/02/14 01:38:50 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -295,15 +295,30 @@ fbattlerecord(faction * f, region * r, const char *s)
 boolean
 enemy(const side * as, const side * ds)
 {
+#ifdef FASTENEMY
+	switch(as->enemy[ds->index]) {
+	case E_ENEMY:
+	case E_ENEMY|E_ATTACKING:
+		return true;
+	default:
+		return false;
+	}
+#else
 	const struct enemy * e = as->enemies[ds->index % 16];
 	while (e && e->side!=ds) e=e->nexthash;
 	if (e) return true;
 	return false;
+#endif
 }
 
 static void
 set_enemy(side * as, side * ds, boolean attacking)
 {
+#ifdef FASTENEMY
+	ds->enemy[as->index] |= E_ENEMY;
+	as->enemy[ds->index] |= E_ENEMY;
+	if (attacking) as->enemy[ds->index] |= E_ATTACKING;
+#else
 	struct enemy * e = as->enemies[ds->index % 16];
 	while (e && e->side!=ds) e=e->nexthash;
 	if (e==NULL) {
@@ -319,6 +334,7 @@ set_enemy(side * as, side * ds, boolean attacking)
 		ds->enemies[as->index % 16] = e;
 	}
 	else e->attacking |= attacking;
+#endif
 }
 
 extern int alliance(const ally * sf, const faction * f, int mode);
@@ -2522,7 +2538,9 @@ print_stats(battle * b)
 
 		for (bf=b->factions;bf;bf=bf->next) {
 			faction * f = bf->faction;
+#ifndef FASTENEMY
 			struct enemy * e;
+#endif
 			fbattlerecord(f, b->region, " ");
 			sprintf(buf, "Heer %d: %s", side->index,
 					seematrix(f, side)
@@ -2546,6 +2564,20 @@ print_stats(battle * b)
 			fbattlerecord(f, b->region, buf);
 			strcpy(buf, "Attacke gegen:");
 			komma = false;
+#ifdef FASTENEMY
+			for_each(s2, b->sides) {
+				if (side->enemy[s2->index] & E_ATTACKING) {
+					if (seematrix(f, s2) == true) {
+						sprintf(buf, "%s%s Heer %d(%s)", buf, komma++ ? "," : "",
+								s2->index, abkz(s2->bf->faction->name, 3));
+					} else {
+						sprintf(buf, "%s%s Heer %d(Unb)", buf, komma++ ? "," : "",
+								s2->index);
+					}
+				}
+			}
+			next(s2);
+#else
 			for (i=0;i!=16;i++)
 			for (e=side->enemies[i]; e; e=e->nexthash) if (e->attacking) {
 				struct side * s2 = e->side;
@@ -2557,6 +2589,7 @@ print_stats(battle * b)
 							s2->index);
 				}
 			}
+#endif
 			fbattlerecord(f, b->region, buf);
 		}
 		buf[77] = (char)0;
@@ -2964,12 +2997,14 @@ make_battle(region * r)
 static void
 free_side(side * si)
 {
+#ifndef FASTENEMY
 	int i;
 	for (i=0;i!=16;++i) while (si->enemies[i]) {
 		struct enemy * e = si->enemies[i]->nexthash;
 		free(si->enemies[i]);
 		si->enemies[i] = e;
 	}
+#endif
 	cv_kill(&si->fighters);
 }
 
