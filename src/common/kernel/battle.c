@@ -2283,281 +2283,283 @@ seematrix(const faction * f, const side * s)
 static void
 aftermath(battle * b)
 {
-	int i;
-	region *r = b->region;
-	ship *sh;
-	side *s;
-	cvector *fighters = &b->fighters;
-	void **fi;
-	int is = 0;
-	bfaction * bf;
-	int dead_peasants;
-	boolean battle_was_relevant = (boolean)(b->turn+(b->has_tactics_turn?1:0)>2);
+  int i;
+  region *r = b->region;
+  ship *sh;
+  side *s;
+  cvector *fighters = &b->fighters;
+  void **fi;
+  int is = 0;
+  bfaction * bf;
+  int dead_peasants;
+  boolean battle_was_relevant = (boolean)(b->turn+(b->has_tactics_turn?1:0)>2);
 
 #ifdef TROLLSAVE
-	int *trollsave = calloc(2 * cv_size(&b->factions), sizeof(int));
+  int *trollsave = calloc(2 * cv_size(&b->factions), sizeof(int));
 #endif
 
-	for (fi = fighters->begin; fi != fighters->end; ++fi) {
-		fighter *df = *fi;
-		unit *du = df->unit;
-		int dead;
-		const attrib *a;
-		int pr_mercy = 0;
+  for (fi = fighters->begin; fi != fighters->end; ++fi) {
+    fighter *df = *fi;
+    unit *du = df->unit;
+    int dead;
+    const attrib *a;
+    int pr_mercy = 0;
 
-		for (a = a_find(du->attribs, &at_prayer_effect); a; a = a->nexttype) {
-			if (a->data.sa[0] == PR_MERCY) {
-				pr_mercy = a->data.sa[1];
-			}
-		}
+    for (a = a_find(du->attribs, &at_prayer_effect); a; a = a->nexttype) {
+      if (a->data.sa[0] == PR_MERCY) {
+        pr_mercy = a->data.sa[1];
+      }
+    }
 
-		dead = du->number - df->alive;
-		dead -= df->run.number;
+    dead = du->number - df->alive;
+    dead -= df->run.number;
 #ifdef TROLLSAVE
-		/* Trolle können regenerieren */
-		if (df->alive > 0 && dead && old_race(du->race) == RC_TROLL)
-			for (i = 0; i != dead; ++i) {
-				if (chance(TROLL_REGENERATION)) {
-					++df->alive;
-					++df->side->alive;
-					++df->side->battle->alive;
-				}
-			}
-		trollsave[df->side->index] += dead - du->number + df->alive;
+    /* Trolle können regenerieren */
+    if (df->alive > 0 && dead && old_race(du->race) == RC_TROLL)
+      for (i = 0; i != dead; ++i) {
+        if (chance(TROLL_REGENERATION)) {
+          ++df->alive;
+          ++df->side->alive;
+          ++df->side->battle->alive;
+        }
+      }
+      trollsave[df->side->index] += dead - du->number + df->alive;
 #endif
-		/* Regeneration durch PR_MERCY */
-		if (dead && pr_mercy)
-			for (i = 0; i != dead; ++i)
-				if (rand()%100 < pr_mercy) {
-					++df->alive;
-					++df->side->alive;
-					++df->side->battle->alive;
-				}
+      /* Regeneration durch PR_MERCY */
+      if (dead && pr_mercy)
+        for (i = 0; i != dead; ++i)
+          if (rand()%100 < pr_mercy) {
+            ++df->alive;
+            ++df->side->alive;
+            ++df->side->battle->alive;
+          }
 
-		/* Tote, die wiederbelebt werde können */
-		if (playerrace(df->unit->race)) {
-			df->side->casualties += dead;
-		}
+          /* Tote, die wiederbelebt werde können */
+          if (playerrace(df->unit->race)) {
+            df->side->casualties += dead;
+          }
 #ifdef SHOW_KILLS
-		if (df->hits + df->kills) {
-			struct message * m = new_message(du->faction, "killsandhits%u:unit%i:hits%i:kills", du, df->hits, df->kills);
-			brecord(du->faction, b->region, m);
-		}
+          if (df->hits + df->kills) {
+            struct message * m = new_message(du->faction, "killsandhits%u:unit%i:hits%i:kills", du, df->hits, df->kills);
+            brecord(du->faction, b->region, m);
+          }
 #endif
-	}
+  }
 
-	/* Wenn die Schlacht kurz war, dann gib Aura für den Präcombatzauber
-	 * zurück. Nicht logisch, aber die einzige Lösung, den Verlust der
-	 * Aura durch Dummy-Angriffe zu verhindern. */
+  /* Wenn die Schlacht kurz war, dann gib Aura für den Präcombatzauber
+  * zurück. Nicht logisch, aber die einzige Lösung, den Verlust der
+  * Aura durch Dummy-Angriffe zu verhindern. */
 
-	cv_foreach(s, b->sides) {
-		if (s->bf->lastturn+(b->has_tactics_turn?1:0)<=1) continue;
-		/* Prüfung, ob faction angegriffen hat. Geht nur über die Faction */
-		if (!s->bf->attacker) {
-			fighter *fig;
-			cv_foreach(fig, s->fighters) {
-				sc_mage * mage = get_mage(fig->unit);
-				if (mage)
-					mage->spellpoints += mage->precombataura;
-			} cv_next(fig);
-		}
-		/* Alle Fighter durchgehen, Mages suchen, Precombataura zurück */
-	} cv_next(s);
+  cv_foreach(s, b->sides) {
+    if (s->bf->lastturn+(b->has_tactics_turn?1:0)<=1) continue;
+    /* Prüfung, ob faction angegriffen hat. Geht nur über die Faction */
+    if (!s->bf->attacker) {
+      fighter *fig;
+      cv_foreach(fig, s->fighters) {
+        sc_mage * mage = get_mage(fig->unit);
+        if (mage)
+          mage->spellpoints += mage->precombataura;
+      } cv_next(fig);
+    }
+    /* Alle Fighter durchgehen, Mages suchen, Precombataura zurück */
+  } cv_next(s);
 
-	/* POSTCOMBAT */
-	do_combatmagic(b, DO_POSTCOMBATSPELL);
+  /* POSTCOMBAT */
+  do_combatmagic(b, DO_POSTCOMBATSPELL);
 
-	cv_foreach(s, b->sides) {
-	  int snumber = 0;
-		fighter *df;
-		boolean relevant = false; /* Kampf relevant für dieses Heer? */
-		if (s->bf->lastturn+(b->has_tactics_turn?1:0)>1) {
-			relevant = true;
-		}
-		s->flee = 0;
-		s->dead = 0;
+  cv_foreach(s, b->sides) {
+    int snumber = 0;
+    fighter *df;
+    boolean relevant = false; /* Kampf relevant für dieses Heer? */
+    if (s->bf->lastturn+(b->has_tactics_turn?1:0)>1) {
+      relevant = true;
+    }
+    s->flee = 0;
+    s->dead = 0;
 
-		cv_foreach(df, s->fighters) {
-			unit *du = df->unit;
-			int dead = du->number - df->alive - df->run.number;
-			int sum_hp = 0;
-			int n;
-		  snumber +=du->number;
-			if (relevant && df->action_counter >= du->number) {
-				ship * sh = du->ship?du->ship:leftship(du);
+    cv_foreach(df, s->fighters) {
+      unit *du = df->unit;
+      int dead = du->number - df->alive - df->run.number;
+      int sum_hp = 0;
+      int n;
+      snumber +=du->number;
+      if (relevant && df->action_counter >= du->number) {
+        ship * sh = du->ship?du->ship:leftship(du);
 
-				if (sh) fset(sh, SF_DAMAGED);
-				fset(du, UFL_LONGACTION);
-				/* TODO: das sollte hier weg sobald anderswo üb
-				 * erall UFL_LONGACTION getestet wird. */
-				set_string(&du->thisorder, "");
-			}
-			for (n = 0; n != df->alive; ++n) {
-				if (df->person[n].hp > 0)
-					sum_hp += df->person[n].hp;
-			}
+        if (sh) fset(sh, SF_DAMAGED);
+        fset(du, UFL_LONGACTION);
+        /* TODO: das sollte hier weg sobald anderswo üb
+        * erall UFL_LONGACTION getestet wird. */
+        set_string(&du->thisorder, "");
+      }
+      for (n = 0; n != df->alive; ++n) {
+        if (df->person[n].hp > 0)
+          sum_hp += df->person[n].hp;
+      }
 
-			s->dead += dead;
+      s->dead += dead;
 
-			if (df->alive == du->number) continue; /* nichts passiert */
+      if (df->alive == du->number) continue; /* nichts passiert */
 
-			/* die weggerannten werden später subtrahiert! */
-			assert(du->number >= 0);
+      /* die weggerannten werden später subtrahiert! */
+      assert(du->number >= 0);
 
-			if (df->run.hp) {
+      if (df->run.hp) {
 #ifndef NO_RUNNING
-				if (df->alive == 0) {
-					/* Report the casualties */
-					reportcasualties(b, df, dead);
+        if (df->alive == 0) {
+          /* Report the casualties */
+          reportcasualties(b, df, dead);
 
-					/* Zuerst dürfen die Feinde plündern, die mitgenommenen Items
-					 * stehen in fig->run.items. Dann werden die Fliehenden auf
-					 * die leere (tote) alte Einheit gemapt */
-					if (fval(df,FIG_NOLOOT)){
-						merge_fleeloot(df, du);
-					} else {
-						loot_items(df);
-						loot_fleeing(df, du);
-					}
-					scale_number(du, df->run.number);
-					du->hp = df->run.hp;
-					set_string(&du->thisorder, "");
-					setguard(du, GUARD_NONE);
-					fset(du, UFL_MOVED);
-					leave(du->region, du);
-					if (df->run.region) {
-                                          travel(du, df->run.region, 1, NULL);
-                                          df->run.region = du->region;
-					}
-				} else
+          /* Zuerst dürfen die Feinde plündern, die mitgenommenen Items
+          * stehen in fig->run.items. Dann werden die Fliehenden auf
+          * die leere (tote) alte Einheit gemapt */
+          if (fval(df,FIG_NOLOOT)){
+            merge_fleeloot(df, du);
+          } else {
+            loot_items(df);
+            loot_fleeing(df, du);
+          }
+          scale_number(du, df->run.number);
+          du->hp = df->run.hp;
+          set_string(&du->thisorder, "");
+          setguard(du, GUARD_NONE);
+          fset(du, UFL_MOVED);
+          leave(du->region, du);
+          if (df->run.region) {
+            travel(du, df->run.region, 1, NULL);
+            df->run.region = du->region;
+          }
+        } else
 #endif
-				{
-					/* nur teilweise geflohene Einheiten mergen sich wieder */
-					df->alive += df->run.number;
-				  s->alive += df->run.number;
-					sum_hp += df->run.hp;
+        {
+          /* nur teilweise geflohene Einheiten mergen sich wieder */
+          df->alive += df->run.number;
+          s->size[0] += df->run.number;
+          s->size[statusrow(df->status)] += df->run.number;
+          s->alive += df->run.number;
+          sum_hp += df->run.hp;
 #ifndef NO_RUNNING
-					merge_fleeloot(df, du);
+          merge_fleeloot(df, du);
 #endif
-					df->run.number = 0;
-					df->run.hp = 0;
-					/* df->run.region = NULL;*/
+          df->run.number = 0;
+          df->run.hp = 0;
+          /* df->run.region = NULL;*/
 
-					reportcasualties(b, df, dead);
+          reportcasualties(b, df, dead);
 
-					scale_number(du, df->alive);
-					du->hp = sum_hp;
-				}
-			} else {
-				if (df->alive==0) {
-					/* alle sind tot, niemand geflohen. Einheit auflösen */
-					df->run.number = 0;
-					df->run.hp = 0;
+          scale_number(du, df->alive);
+          du->hp = sum_hp;
+        }
+      } else {
+        if (df->alive==0) {
+          /* alle sind tot, niemand geflohen. Einheit auflösen */
+          df->run.number = 0;
+          df->run.hp = 0;
 #ifndef NO_RUNNING
-					df->run.region = NULL;
+          df->run.region = NULL;
 #endif
 
-					/* Report the casualties */
-					reportcasualties(b, df, dead);
+          /* Report the casualties */
+          reportcasualties(b, df, dead);
 
-					setguard(du, GUARD_NONE);
-					scale_number(du, 0);
-					/* Distribute Loot */
-					loot_items(df);
-				} else {
-					df->run.number = 0;
-					df->run.hp = 0;
+          setguard(du, GUARD_NONE);
+          scale_number(du, 0);
+          /* Distribute Loot */
+          loot_items(df);
+        } else {
+          df->run.number = 0;
+          df->run.hp = 0;
 
-					reportcasualties(b, df, dead);
+          reportcasualties(b, df, dead);
 
-					scale_number(du, df->alive);
-					du->hp = sum_hp;
-				}
-			}
-			s->flee += df->run.number;
+          scale_number(du, df->alive);
+          du->hp = sum_hp;
+        }
+      }
+      s->flee += df->run.number;
 
-			if (playerrace(du->race)) {
-				/* tote im kampf werden zu regionsuntoten:
-				 * for each of them, a peasant will die as well */
-				is += dead;
-			}
-			if (du->hp < du->number) {
-				log_error(("%s has less hitpoints (%u) than people (%u)\n",
-						  itoa36(du->no), du->hp, du->number));
-				du->hp=du->no;
-			}
-		} cv_next(df);
-	  s->alive+=s->healed;
-	  assert(snumber==s->flee+s->alive+s->dead);
-	} cv_next(s);
-	dead_peasants = min(rpeasants(r), (is*BATTLE_KILLS_PEASANTS)/100);
-	deathcounts(r, dead_peasants + is);
-	chaoscounts(r, dead_peasants / 2);
-	rsetpeasants(r, rpeasants(r) - dead_peasants);
+      if (playerrace(du->race)) {
+        /* tote im kampf werden zu regionsuntoten:
+        * for each of them, a peasant will die as well */
+        is += dead;
+      }
+      if (du->hp < du->number) {
+        log_error(("%s has less hitpoints (%u) than people (%u)\n",
+          itoa36(du->no), du->hp, du->number));
+        du->hp=du->no;
+      }
+    } cv_next(df);
+    s->alive+=s->healed;
+    assert(snumber==s->flee+s->alive+s->dead);
+  } cv_next(s);
+  dead_peasants = min(rpeasants(r), (is*BATTLE_KILLS_PEASANTS)/100);
+  deathcounts(r, dead_peasants + is);
+  chaoscounts(r, dead_peasants / 2);
+  rsetpeasants(r, rpeasants(r) - dead_peasants);
 
-	for (bf=b->factions;bf;bf=bf->next) {
-		faction * f = bf->faction;
-		fbattlerecord(f, r, " ");
-		cv_foreach(s, b->sides) {
-			if (seematrix(f, s)) {
-				sprintf(buf, "Heer %2d(%s): %d Tote, %d Geflohene, %d Überlebende",
-						s->index, sideabkz(s,false), s->dead, s->flee, s->alive);
-			} else {
-				sprintf(buf, "Heer %2d(Unb): %d Tote, %d Geflohene, %d Überlebende",
-						s->index, s->dead, s->flee, s->alive);
-			}
-			fbattlerecord(f, r, buf);
-		} cv_next(s);
-	}
-	/* Wir benutzen drifted, um uns zu merken, ob ein Schiff
-	 * schonmal Schaden genommen hat. (moved und drifted
-	 * sollten in flags überführt werden */
+  for (bf=b->factions;bf;bf=bf->next) {
+    faction * f = bf->faction;
+    fbattlerecord(f, r, " ");
+    cv_foreach(s, b->sides) {
+      if (seematrix(f, s)) {
+        sprintf(buf, "Heer %2d(%s): %d Tote, %d Geflohene, %d Überlebende",
+          s->index, sideabkz(s,false), s->dead, s->flee, s->alive);
+      } else {
+        sprintf(buf, "Heer %2d(Unb): %d Tote, %d Geflohene, %d Überlebende",
+          s->index, s->dead, s->flee, s->alive);
+      }
+      fbattlerecord(f, r, buf);
+    } cv_next(s);
+  }
+  /* Wir benutzen drifted, um uns zu merken, ob ein Schiff
+  * schonmal Schaden genommen hat. (moved und drifted
+  * sollten in flags überführt werden */
 
-	for (fi = fighters->begin; fi != fighters->end; ++fi) {
-		fighter *df = *fi;
-		unit *du = df->unit;
-		item * l;
+  for (fi = fighters->begin; fi != fighters->end; ++fi) {
+    fighter *df = *fi;
+    unit *du = df->unit;
+    item * l;
 
-		for (l=df->loot; l; l=l->next) {
-			const item_type * itype = l->type;
-			sprintf(buf, "%s erbeute%s %d %s.", unitname(du), du->number==1?"t":"n",
-				l->number, locale_string(default_locale, resourcename(itype->rtype, l->number!=1)));
-			fbattlerecord(du->faction, r, buf);
-			i_change(&du->items, itype, l->number);
-		}
+    for (l=df->loot; l; l=l->next) {
+      const item_type * itype = l->type;
+      sprintf(buf, "%s erbeute%s %d %s.", unitname(du), du->number==1?"t":"n",
+        l->number, locale_string(default_locale, resourcename(itype->rtype, l->number!=1)));
+      fbattlerecord(du->faction, r, buf);
+      i_change(&du->items, itype, l->number);
+    }
 
-		/* Wenn sich die Einheit auf einem Schiff befindet, wird
-		 * dieses Schiff beschädigt. Andernfalls ein Schiff, welches
-		 * evt. zuvor verlassen wurde. */
+    /* Wenn sich die Einheit auf einem Schiff befindet, wird
+    * dieses Schiff beschädigt. Andernfalls ein Schiff, welches
+    * evt. zuvor verlassen wurde. */
 
-		if (du->ship) sh = du->ship; else sh = leftship(du);
+    if (du->ship) sh = du->ship; else sh = leftship(du);
 
-		if (sh && fval(sh, SF_DAMAGED) && b->turn+(b->has_tactics_turn?1:0)>2) {
-			damage_ship(sh, 0.20);
-			freset(sh, SF_DAMAGED);
-		}
-	}
+    if (sh && fval(sh, SF_DAMAGED) && b->turn+(b->has_tactics_turn?1:0)>2) {
+      damage_ship(sh, 0.20);
+      freset(sh, SF_DAMAGED);
+    }
+  }
 
-	if (battle_was_relevant) {
-		ship **sp = &r->ships;
-		while (*sp) {
-			ship * sh = *sp;
-			freset(sh, SF_DAMAGED);
-			if (sh->damage >= sh->size * DAMAGE_SCALE) {
-				destroy_ship(sh, r);
-			}
-			if (*sp==sh) sp=&sh->next;
-		}
-	}
+  if (battle_was_relevant) {
+    ship **sp = &r->ships;
+    while (*sp) {
+      ship * sh = *sp;
+      freset(sh, SF_DAMAGED);
+      if (sh->damage >= sh->size * DAMAGE_SCALE) {
+        destroy_ship(sh, r);
+      }
+      if (*sp==sh) sp=&sh->next;
+    }
+  }
 #ifdef TROLLSAVE
-	free(trollsave);
+  free(trollsave);
 #endif
 
-	sprintf(buf, "The battle lasted %d turns, %s and %s.\n",
-			b->turn,
-			b->has_tactics_turn==true?"had a tactic turn":"had no tactic turn",
-			battle_was_relevant==true?"was relevant":"was not relevant.");
-	battledebug(buf);
+  sprintf(buf, "The battle lasted %d turns, %s and %s.\n",
+    b->turn,
+    b->has_tactics_turn==true?"had a tactic turn":"had no tactic turn",
+    battle_was_relevant==true?"was relevant":"was not relevant.");
+  battledebug(buf);
 }
 
 static void
