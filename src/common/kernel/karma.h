@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: karma.h,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: karma.h,v 1.3 2001/02/28 18:25:25 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -34,6 +34,7 @@ typedef enum {
 	FS_MAGICIMMUNE,
 	FS_VARIEDMAGIC,
 	FS_JIHAD,
+	FS_UNDEAD,
 	MAXFACTIONSPECIALS
 } fspecial_t;
 

@@ -528,7 +528,7 @@ enum {
 	O_STATISTICS,		/* 16 */
 	O_DEBUG,				/* 32 */
 	O_COMPRESS,			/* 64 */
-	O_MERIAN,				/* 128 */
+	O_NEWS,					/* 128 */
 	O_MATERIALPOOL,	/* 256 */
 	O_ADRESSEN,			/* 512 */
 	O_BZIP2,				/* 1024 - crkurz compatible flag */

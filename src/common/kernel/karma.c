@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: karma.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: karma.c,v 1.3 2001/02/28 18:25:25 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -238,6 +238,15 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Ein einmal erklärter Jihad kann nicht wieder rückgängig gemacht "
 		"werden.",
 		true
+	},
+	/* TODO: is_undead() und Sonderbehandlungen von Untoten */
+	{
+		"Untot",
+		"Personen einer Partei mit dieser Eigenschaft bekommen automatisch doppelt "
+		"soviele Trefferpunkte wie normale Angehörige der entsprechenden Rasse, "
+		"verlieren jedoch ihre Fähigkeit zur Regeneration erlittenen Schadens "
+		"komplett.",
+		false
 	}
 };
 

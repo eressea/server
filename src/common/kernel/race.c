@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: race.c,v 1.7 2001/02/24 12:50:48 enno Exp $
+ *	$Id: race.c,v 1.8 2001/02/28 18:25:25 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -39,6 +39,7 @@
 #include "pathfinder.h"
 #include "ship.h"
 #include "skill.h"
+#include "karma.h"
 
 /* util includes */
 #include <attrib.h>
@@ -1898,18 +1899,9 @@ unit_max_hp(const unit * u)
 	p = pow(effskill(u, SK_AUSDAUER) / 2.0, 1.5) * 0.2;
 	h += (int) (h * p + 0.5);
 
-	return h;
-}
-
-int
-unit_old_max_hp(unit * u)
-{
-	int h;
-	double p;
-	h = race[u->race].hitpoints / 2;
-
-	p = pow(effskill(u, SK_AUSDAUER) / 2.0, 1.5) * 0.2;
-	h += (int) (h * p + 0.5);
+	if(fspecial(u->faction, FS_UNDEAD)) {
+		h *= 2;
+	}
 
 	return h;
 }

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.17 2001/02/24 12:50:47 enno Exp $
+ *	$Id: report.c,v 1.18 2001/02/28 18:25:24 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -30,6 +30,7 @@
 
 /* attributes includes */
 #include <attributes/overrideroads.h>
+#include <attributes/option.h>
 
 /* gamecode includes */
 #include "creation.h"
@@ -1790,6 +1791,25 @@ report(FILE *F, faction * f)
 		if (f->options & (int) pow(2, op)) {
 			scat(" ");
 			scat(options[op]);
+			if(op == O_NEWS) {
+				attrib *a = a_find(f->attribs, &at_option_news);
+				if(!a) {
+					/* Zur Altlastenbeseitigung */
+					f->options = f->options & ~op;
+				} else {
+					int sec = a->data.i;
+					int i;
+					scat("(");
+					for(i=1; sec != 0; i *= 2) {
+						if(sec & i) {
+							icat(i);
+							sec = sec & ~i;
+							if(sec) scat(",");
+						}
+					}
+					scat(")");
+				}
+			}
 			flag++;
 		}
 	}
@@ -3092,17 +3112,37 @@ static void
 writeadresses(void)
 {
 	faction *f;
-	FILE * F;
+	FILE *F;
 	char zText[MAX_PATH];
 	sprintf(zText, "%s/adressen", basepath());
 	F = cfopen(zText, "w");
 	if (!F) return;
 
-	/* adressen liste */
-
 	for (f = factions; f; f = f->next) {
 		if (f->no != MONSTER_FACTION) {
 			fprintf(F, "%s:%s:%s\n", factionname(f), f->email, f->banner);
+		}
+	}
+	fclose(F);
+}
+
+static void
+writenewssubscriptions(void)
+{
+	char zText[MAX_PATH];
+	FILE *F;
+	faction *f;
+
+	sprintf(zText, "%s/news-subscriptions", basepath());
+	F = cfopen(zText, "w");
+	if (!F) return;
+
+	for(f=factions; f; f=f->next) {
+		attrib *a = a_find(f->attribs, &at_option_news);
+		if(!a) {
+			fprintf(F, "%s:0\n", f->email);
+		} else {
+			fprintf(F, "%s:%d\n", f->email, a->data.i);
 		}
 	}
 	fclose(F);
@@ -3258,6 +3298,7 @@ report_summary(summary * s, summary * o, boolean full)
 #endif
 		printf("Schreibe Liste der Adressen (adressen)...\n");
 		writeadresses();
+		writenewssubscriptions();
 		writeforward();
 
 		{

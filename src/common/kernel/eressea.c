@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.23 2001/02/25 19:31:39 enno Exp $
+ *	$Id: eressea.c,v 1.24 2001/02/28 18:25:24 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -240,7 +240,7 @@ const char *options[MAXOPTIONS] =
 	"STATISTIK",
 	"DEBUG",
 	"ZIPPED",
-	"MERIAN",
+	"ZEITUNG",				/* Option hat Sonderbehandlung! */
 	"MATERIALPOOL",
 	"ADRESSEN",
 	"BZIP2",

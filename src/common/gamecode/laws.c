@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.29 2001/02/25 19:31:38 enno Exp $
+ *	$Id: laws.c,v 1.30 2001/02/28 18:25:24 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -63,6 +63,9 @@
 #include <base36.h>
 #include <goodies.h>
 #include <rand.h>
+
+/* attributes includes */
+#include <attributes/option.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -1689,6 +1692,27 @@ set_passw(void)
 				case K_SEND:
 					s = getstrtoken();
 					o = findoption(s);
+
+					/* Sonderbehandlung Zeitungsoption */
+					if (o == O_NEWS) {
+						attrib *a = a_find(u->faction->attribs, &at_option_news);
+						if(a) a->data.i = 0;
+
+						while((s = getstrtoken())) {
+							if(findparam(s) == P_NOT) {
+								a_removeall(&u->faction->attribs, &at_option_news);
+								break;
+							} else {
+								int sec = atoi(s);
+								if(sec != 0) {
+									if(!a) a_add(&u->faction->attribs, a_new(&at_option_news));
+									a->data.i = a->data.i & (1<<(sec-1));
+								}
+							}
+						}
+						break;
+					}
+
 					if (o == -1) {
 						cmistake(u, S->s, 135, MSG_EVENT);
 					} else {
@@ -2791,7 +2815,7 @@ monthly_healing(void)
 		for (u = r->units; u; u = u->next) {
 			int umhp;
 
-			if((race[u->race].flags & RCF_NOHEAL) || fval(u, FL_HUNGER))
+			if((race[u->race].flags & RCF_NOHEAL) || fval(u, FL_HUNGER) || fspecial(u->faction, FS_UNDEAD))
 				continue;
 
 			if(rterrain(r) == T_OCEAN && !u->ship && !(race[u->race].flags & RCF_SWIM))
