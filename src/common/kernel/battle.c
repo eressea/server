@@ -1000,14 +1000,19 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	int ar, an, am;
 	int armor = select_armor(dt);
 	int shield = select_shield(dt);
-
-	int da = dice_rand(damage);
-	int rda, sk = 0, sd;
-	boolean magic = false;
-
+	
 	const weapon_type *dwtype = NULL;
 	const weapon_type *awtype = NULL;
 	const weapon * weapon;
+
+	int rda, sk = 0, sd;
+	boolean magic = false;
+	int da = dice_rand(damage);
+
+	if(fval(au, UFL_WERE)) {
+		int level = fspecial(du->faction, FS_LYCANTROPE);
+		da += level;
+	}
 
 	switch (type) {
 	case AT_STANDARD:
@@ -1030,20 +1035,28 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	sd = weapon_effskill(dt, at, weapon, false, false);
 	if (weapon!=NULL) dwtype=weapon->type;
 
-	/* Magischer Schaden durch Sprüche oder magische Waffen? */
-
 	ar = armordata[armor].prot;
 	ar += armordata[shield].prot;
+
 	/* natürliche Rüstung */
 	an = du->race->armor;
-	if(fval(du, UFL_WERE)) {
-		int level = fspecial(du->faction, FS_LYCANTROPE);
-		an += level;
-		da += level;
-	}
+
 	/* magische Rüstung durch Artefakte oder Sprüche */
-	/* Momentan nur Trollgürtel */
+	/* Momentan nur Trollgürtel und Werwolf-Eigenschaft */
 	am = select_magicarmor(dt);
+	if(fval(du, UFL_WERE)) {
+		/* this counts as magical armor */
+		int level = fspecial(du->faction, FS_LYCANTROPE);
+		am += level;
+	}
+
+#if CHANGED_CROSSBOWS == 1
+	if(fval(awtype,ARMORPIERCING)) {
+		/* crossbows */
+		ar /= 2;
+		an /= 2;
+	}
+#endif
 
 	/* natürliche Rüstung ist halbkumulativ */
 	if (ar>0) {

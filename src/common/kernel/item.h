@@ -181,6 +181,7 @@ typedef struct weapon_mod {
 #define WTF_CUT          0x08
 #define WTF_BLUNT        0x10
 #define WTF_BOW          0x20 /* elves like 'em */
+#define WTF_ARMORPIERCING 0x40 /* armor has only half value */
 
 typedef struct weapon_type {
 	const item_type * itype;

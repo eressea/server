@@ -84,11 +84,12 @@ enum {
 	RL_NONE
 };
 
-/* Schadenstypen */
+/* damage types */
 
-#define CUT     (1<<0)
-#define PIERCE  (1<<1)
-#define BASH    (1<<2)
+#define CUT           (1<<0)
+#define PIERCE        (1<<1)
+#define BASH          (1<<2)
+#define ARMORPIERCING (1<<3)
 
 typedef struct weapondata {
 	double magres;
@@ -124,7 +125,11 @@ static weapondata weapontable[WP_MAX + 1] =
 	/* Langbogen */
 	{0.00, "1d11+1", "1d11+1", I_LONGBOW, SK_LONGBOW, 0, 0, true, false, { RL_NONE, 0 }, PIERCE },
 	/* Armbrust */
+#if CHANGED_CROSSBOWS == 1
+	{0.00, "3d3+5", "3d3+5", I_CROSSBOW, SK_CROSSBOW, 0, 0, true, false, { RL_CROSSBOW, 2 }, PIERCE | ARMORPIERCING },
+#else
 	{0.00, "3d3+5", "3d3+5", I_CROSSBOW, SK_CROSSBOW, 0, 0, true, false, { RL_CROSSBOW, 1 }, PIERCE },
+#endif
 	/* Speer */
 	{0.00, "1d10+0", "1d12+2", I_SPEAR, SK_SPEAR, 0, 0, false, false, { RL_NONE, 0}, PIERCE },
 	/* Zweihänder */
@@ -304,6 +309,7 @@ init_oldweapons(void)
 		if (weapontable[w].damage_type & CUT) wflags |= WTF_CUT;
 		if (weapontable[w].damage_type & PIERCE) wflags |= WTF_PIERCE;
 		if (weapontable[w].damage_type & BASH) wflags |= WTF_BLUNT;
+		if (weapontable[w].damage_type & ARMORPIERCING) wflags |= WTF_ARMORPIERCING;
 
 		damage[0] = weapontable[w].damfoot;
 		damage[1] = weapontable[w].damhorse;
