@@ -1313,7 +1313,7 @@ parse_token(const char ** str)
     } else if (isspace(*ctoken)) {
       if (quotechar==0) break;
       *cursor++ = *ctoken++;
-    } else if (*ctoken=='"') {
+    } else if (*ctoken=='"' || *ctoken=='\'') {
       if (*ctoken==quotechar) {
         ++ctoken;
         break;

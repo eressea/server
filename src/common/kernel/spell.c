@@ -8688,7 +8688,7 @@ static spell spelldaten[] =
   },
   {
     SPL_ICASTLE, "icastle", NULL,
-    "ZAUBERE \'Traumschlößchen\' <Gebäude-Typ>",
+    "ZAUBERE \"Traumschlößchen\" <Gebäude-Typ>",
     "c",
     M_TRAUM, (0), 5, 3,
     {
