@@ -31,7 +31,9 @@ CCFLAGS += -Wwrite-strings
 
 rule iconv
 {
-  LINKLIBS on $(<) += -liconv ;
+  if $(LINK_ICONV) {
+    LINKLIBS on $(<) += -liconv ;
+  }
 }
 
 rule luabind
