@@ -378,6 +378,18 @@ cr_skill(const void * v, char * buffer, const void * userdata)
 }
 
 static int
+cr_order(const void * v, char * buffer, const void * userdata)
+{
+  order * ord = (order*)v;
+  if (ord!=NULL) {
+    char * cmd = getcommand(ord);
+    sprintf(buffer, "\"%s\"", cmd);
+  }
+  else strcpy(buffer, "\"\"");
+  return 0;
+}
+
+static int
 cr_spell(const void * v, char * buffer, const void * userdata)
 {
   const faction * report = (const faction*)userdata;
@@ -390,34 +402,34 @@ cr_spell(const void * v, char * buffer, const void * userdata)
 void
 creport_init(void)
 {
-	tsf_register("report", &cr_ignore);
-	tsf_register("string", &cr_string);
-	tsf_register("order", &cr_string);
-        tsf_register("spell", &cr_spell);
-	tsf_register("int", &cr_int);
-	tsf_register("unit", &cr_unit);
-	tsf_register("region", &cr_region);
-	tsf_register("faction", &cr_faction);
-	tsf_register("ship", &cr_ship);
-	tsf_register("building", &cr_building);
-	tsf_register("skill", &cr_skill);
-	tsf_register("resource", &cr_resource);
-	tsf_register("race", &cr_race);
-	tsf_register("direction", &cr_int);
+  tsf_register("report", &cr_ignore);
+  tsf_register("string", &cr_string);
+  tsf_register("order", &cr_order);
+  tsf_register("spell", &cr_spell);
+  tsf_register("int", &cr_int);
+  tsf_register("unit", &cr_unit);
+  tsf_register("region", &cr_region);
+  tsf_register("faction", &cr_faction);
+  tsf_register("ship", &cr_ship);
+  tsf_register("building", &cr_building);
+  tsf_register("skill", &cr_skill);
+  tsf_register("resource", &cr_resource);
+  tsf_register("race", &cr_race);
+  tsf_register("direction", &cr_int);
 #ifdef ALLIANCES
-	tsf_register("alliance", &cr_alliance);
+  tsf_register("alliance", &cr_alliance);
 #endif
 }
 
 void
 creport_cleanup(void)
 {
-	while (junkyard) {
-		translation * t = junkyard;
-		junkyard = junkyard->next;
-		free(t);
-	}
-	junkyard = 0;
+  while (junkyard) {
+    translation * t = junkyard;
+    junkyard = junkyard->next;
+    free(t);
+  }
+  junkyard = 0;
 }
 
 /*static int msgno; */
@@ -425,8 +437,8 @@ creport_cleanup(void)
 #define MTMAXHASH 1021
 
 static struct known_mtype {
-	const struct message_type * mtype;
-	struct known_mtype * nexthash;
+  const struct message_type * mtype;
+  struct known_mtype * nexthash;
 } * mtypehash[MTMAXHASH];
 
 static void
