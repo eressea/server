@@ -6001,14 +6001,14 @@ sp_fetchastral(castorder *co)
 
 			/* Meldungen in der Ausgangsregion */
 
-			for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
-			for(u2 = r->units; u2; u2 = u2->next ) {
+			for (u2 = ro->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+			for(u2 = ro->units; u2; u2 = u2->next ) {
 				if(!fval(u2->faction, FL_DH)) {
 					fset(u2->faction, FL_DH);
-					if(cansee(u2->faction, r, u, 0)) {
+					if(cansee(u2->faction, ro, u, 0)) {
 						sprintf(buf, "%s wird durchscheinend und verschwindet.",
 							unitname(u));
-						addmessage(r, u2->faction, buf, MSG_EVENT, ML_INFO);
+						addmessage(ro, u2->faction, buf, MSG_EVENT, ML_INFO);
 					}
 				}
 			}
