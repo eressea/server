@@ -192,6 +192,9 @@ void
 give_starting_equipment(struct region *r, struct unit *u)
 
 {
+	set_item(u, I_WOOD, 30);
+	set_item(u, I_STONE, 30);
+
 	switch(old_race(u->race)) {
 	case RC_DWARF:
 		set_skill(u, SK_SWORD, 30);
