@@ -7355,7 +7355,7 @@ spell spelldaten[] =
 		"werden, bevor die Aura sich verflüchtigt. "
 		"Jeder Golem hat jede Runde eine Chance von 10% zu Staub zu zerfallen. "
 		"Gibt man den Golems die Befehle MACHE BURG oder MACHE STRASSE, "
-		"so werden pro Golem 5 Steine verbaut und der Golem löst sich auf.",
+		"so werden pro Golem 4 Steine verbaut und der Golem löst sich auf.",
 		NULL,
 		NULL,
 		M_DRUIDE, (SPELLLEVEL), 4, 1,
