@@ -56,6 +56,7 @@
 #include <string.h>
 #include <time.h>
 
+extern const char * orderfile;
 extern char *reportdir;
 extern char *datadir;
 extern char *basedir;
@@ -1446,6 +1447,9 @@ main(int argc, char *argv[])
 					turn = atoi((char *)(argv[i] + 2));
 				else
 					turn = atoi(argv[++i]);
+				break;
+			case 'v':
+				orderfile = argv[++i];
 				break;
 			case 'x':
 				maxregions = atoi(argv[++i]);

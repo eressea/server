@@ -74,5 +74,6 @@ extern struct region * readregion(FILE * stream, int x, int y);
 
 extern void writefaction(FILE * stream, const struct faction * f);
 extern struct faction * readfaction(FILE * stream);
+extern char * getbuf(FILE * F);
 
 #endif

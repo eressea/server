@@ -121,16 +121,34 @@ study_cost(unit *u, int talent)
 
 /* ------------------------------------------------------------- */
 
+typedef struct teaching_info {
+	unit * teacher;
+	int value;
+} teaching_info;
+
+static void 
+init_learning(struct attrib * a)
+{
+	a->data.v = calloc(sizeof(teaching_info), 1);
+}
+
+static void 
+done_learning(struct attrib * a)
+{
+	free(a->data.v);
+}
+
 static const attrib_type at_learning = {
 	"learning",
-	NULL, NULL, NULL, NULL, NULL,
+	init_learning, done_learning, NULL, NULL, NULL,
 	ATF_UNIQUE
 };
 
 static int
-teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, 
+teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk, 
 			  boolean report, int * academy)
 {
+	teaching_info * teach = NULL;
 	attrib * a;
 	int n;
 
@@ -148,22 +166,27 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk,
 
 	n = student->number * 30;
 	a = a_find(student->attribs, &at_learning);
-	if (a!=NULL) n -= a->data.i;
+	if (a!=NULL) {
+		teach = (teaching_info*)a->data.v;
+		n -= teach->value;
+	}
 
-	n = min(n, teaching);
+	n = min(n, nteaching);
 
 	if (n != 0) {
 		struct building * b = inside_building(teacher);
 		const struct building_type * btype = b?b->type:NULL;
 
-		if (a==NULL) a = a_add(&student->attribs, a_new(&at_learning));
-		a->data.i += n;
+		if (teach==NULL) {
+			a = a_add(&student->attribs, a_new(&at_learning));
+			teach = (teaching_info*)a->data.v;
+		}
+		teach->teacher = teacher;
+		teach->value += n;
 
 		/* Solange Akademien größenbeschränkt sind, sollte Lehrer und
 		 * Student auch in unterschiedlichen Gebäuden stehen dürfen */
 		if (btype == &bt_academy
-/*		&& student->building==teacher->building
- *		&& inside_building(student)!=NULL) */
 			&& student->building && student->building->type == &bt_academy)
 		{
 			int j = study_cost(student, sk);
@@ -171,7 +194,7 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk,
 			/* kann Einheit das zahlen? */
 			if (get_pooled(student, student->region, R_SILVER) >= j) {
 				/* Jeder Schüler zusätzlich +10 Tage wenn in Uni. */
-				a->data.i += (n / 30) * 10; /* learning erhöhen */
+				teach->value += (n / 30) * 10; /* learning erhöhen */
 				/* Lehrer zusätzlich +1 Tag pro Schüler. */
 				if (academy) *academy += n;
 			}	/* sonst nehmen sie nicht am Unterricht teil */
@@ -206,16 +229,8 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk,
 		 * die Talentänderung (enno).
 		 */
 
-		teaching = max(0, teaching - student->number * 30);
+		nteaching = max(0, nteaching - student->number * 30);
 
-		if (report || teacher->faction != student->faction) {
-			add_message(&student->faction->msgs, msg_message("teach",
-				"teacher student skill", teacher, student, sk));
-			if (teacher->faction != student->faction) {
-				add_message(&teacher->faction->msgs, msg_message("teach",
-					"teacher student skill", teacher, student, sk));
-			}
-		}
 	}
 	return n;
 }
@@ -387,7 +402,7 @@ teach(region * r, unit * u)
 				msg_error(u, u->thisorder, "teach_nolearn", "student", u2));
 			continue;
 		}
-		if (eff_skill(u, sk, r) <= eff_skill(u2, sk, r)) {
+		if (eff_skill(u2, sk, r) + TEACHDIFFERENCE >= eff_skill(u, sk, r)) {
 			add_message(&u->faction->msgs,
 				msg_error(u, u->thisorder, "teach_asgood", "student", u2));
 			continue;
@@ -448,6 +463,7 @@ learn(void)
 			if (igetkeyword(u->thisorder, u->faction->locale) == K_STUDY) {
 				double multi = 1.0;
 				attrib * a = NULL;
+				teaching_info * teach = NULL;
 				int money = 0;
 				int maxalchemy = 0;
 				if (u->race == new_race[RC_INSECT] && r_insectstalled(r)
@@ -485,6 +501,9 @@ learn(void)
 
 				p = studycost = study_cost(u,i);
 				a = a_find(u->attribs, &at_learning);
+				if (a!=NULL) {
+					teach = (teaching_info*)a->data.v;
+				}
 
 				/* keine kostenpflichtigen Talente für Migranten. Vertraute sind
 				 * keine Migranten, wird in is_migrant abgefangen. Vorsicht,
@@ -597,7 +616,11 @@ learn(void)
 					}
 				}
 
-				if (a==NULL) a = a_add(&u->attribs, a_new(&at_learning));
+				if (teach==NULL) {
+					a = a_add(&u->attribs, a_new(&at_learning));
+					teach = (teaching_info*)a->data.v;
+					teach->teacher = NULL;
+				}
 				if (money>0) {
 					use_pooled(u, r, R_SILVER, money);
 					add_message(&u->faction->msgs, msg_message("studycost",
@@ -606,12 +629,12 @@ learn(void)
 
 				if (get_effect(u, oldpotiontype[P_WISE])) {
 					l = min(u->number, get_effect(u, oldpotiontype[P_WISE]));
-					a->data.i += l * 10;
+					teach->value += l * 10;
 					change_effect(u, oldpotiontype[P_WISE], -l);
 				}
 				if (get_effect(u, oldpotiontype[P_FOOL])) {
 					l = min(u->number, get_effect(u, oldpotiontype[P_FOOL]));
-					a->data.i -= l * 30;
+					teach->value -= l * 30;
 					change_effect(u, oldpotiontype[P_FOOL], -l);
 				}
 
@@ -621,10 +644,10 @@ learn(void)
 					   || i == SK_CATAPULT || i == SK_SWORD || i == SK_SPEAR
 					   || i == SK_AUSDAUER || i == SK_WEAPONLESS)
 					{
-						a->data.i += u->number * (5+warrior_skill*5);
+						teach->value += u->number * (5+warrior_skill*5);
 					} else {
-						a->data.i -= u->number * (5+warrior_skill*5);
-						a->data.i = max(0, a->data.i);
+						teach->value -= u->number * (5+warrior_skill*5);
+						teach->value = max(0, teach->value);
 					}
 				}
 
@@ -633,20 +656,20 @@ learn(void)
 					/* p ist Kosten ohne Uni, studycost mit; wenn
 					 * p!=studycost, ist die Einheit zwangsweise
 					 * in einer Uni */
-					a->data.i += u->number * 10;
+					teach->value += u->number * 10;
 				}
 				if (is_cursed(r->attribs,C_BADLEARN,0)) {
-					a->data.i -= u->number * 10;
+					teach->value -= u->number * 10;
 				}
 #ifdef SKILLFIX_SAVE
-				if (a && a->data.i) {
+				if (teach && teach->value) {
 					int skill = get_skill(u, (skill_t)i);
 					skillfix(u, (skill_t)i, skill,
-							 (int)(u->number * 30 * multi), a->data.i);
+							 (int)(u->number * 30 * multi), teach->value);
 				}
 #endif
 
-				days = (int)((u->number * 30 + a->data.i) * multi);
+				days = (int)((u->number * 30 + teach->value) * multi);
 				if (fval(u, FL_HUNGER)) days = days / 2;
 				while (days) {
 					if (days>=u->number*30) {
@@ -659,6 +682,16 @@ learn(void)
 					}
 				}
 				if (a) {
+					if (teach && teach->teacher) {
+						unit * teacher = teach->teacher;
+						if (teacher->faction != u->faction) {
+							add_message(&u->faction->msgs, msg_message("teach_student",
+								"teacher student skill", teacher, u, (skill_t)i));
+							add_message(&teacher->faction->msgs, msg_message("teach_teacher",
+								"teacher student skill level", teacher, u, (skill_t)i,
+								effskill(u, (skill_t)i)));
+						}
+					}
 					a_remove(&u->attribs, a);
 					a = NULL;
 				}
@@ -687,7 +720,6 @@ learn(void)
 		}
 	}
 }
-
 
 
 void

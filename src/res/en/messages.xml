@@ -3308,17 +3308,23 @@
 		</locale>
 	</message>
 
-	<message name="teach">
+	<message name="teach_student" section="study">
 		<type>
 			<arg name="teacher" type="unit"></arg>
 			<arg name="student" type="unit"></arg>
 			<arg name="skill" type="skill"></arg>
 		</type>
-		<locale name="en">
-			<nr section="none">
-				<text>"$unit($teacher) teaches $unit($student) $skill($skill)."</text>
-			</nr>
-		</locale>
+		<text locale="en">"$unit($teacher) teaches $unit($student) $skill($skill)."</text>
+	</message>
+
+	<message name="teach_teacher" section="study">
+		<type>
+			<arg name="teacher" type="unit"></arg>
+			<arg name="student" type="unit"></arg>
+			<arg name="skill" type="skill"></arg>
+			<arg name="level" type="int"></arg>
+		</type>
+		<text locale="en">"$unit($teacher) teaches $unit($student) $skill($skill) to level $int($level)."</text>
 	</message>
 
 	<message name="spydetect">

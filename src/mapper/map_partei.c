@@ -24,6 +24,7 @@
 #include <race.h>
 #include <region.h>
 #include <reports.h>
+#include <save.h>
 #include <study.h>
 #include <skill.h>
 #include <unit.h>
@@ -36,6 +37,8 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+
+const char * orderfile = NULL;
 
 void
 RemovePartei(void) {
@@ -153,11 +156,56 @@ give_latestart_bonus(region *r, unit *u, int b)
 typedef struct dropout {
 	struct dropout * next;
 	const struct race * race;
-	int x, y;
+	int x, y, fno;
 } dropout;
 
 static dropout * dropouts;
 static newfaction * newfactions;
+
+void
+read_orders(const char * filename)
+{
+	faction * f = NULL;
+	FILE * F = fopen(filename, "r");
+	char * b;
+	char buffer[16];
+
+	if (F==NULL) return;
+	b = getbuf(F);
+
+	for (;;) {
+		switch (igetparam(b, default_locale)) {
+		case P_GAMENAME:
+		case P_FACTION:
+			strncpy(buffer, getstrtoken(), 16);
+			f = findfaction(atoi36(buffer));
+			if (f) fset(f, FL_MARK);
+			break;
+
+		case P_NEXT:
+			f = NULL;
+			break;
+		}
+		b = getbuf(F);
+	}
+	fclose(F);
+	for (f=factions;f;f=f->next) {
+		if (!fval(f, FL_MARK) && f->age <=1) {
+			ursprung * ur = f->ursprung;
+			while (ur && ur->id!=0) ur=ur->next;
+			if (ur) {
+				dropout * drop = calloc(sizeof(dropout), 1);
+				drop->x = ur->x;
+				drop->y = ur->y;
+				drop->fno = f->no;
+				drop->race = f->race;
+				drop->next = dropouts;
+				dropouts = drop;
+			}
+		}
+		freset(f, FL_MARK);
+	}
+}
 
 void
 read_dropouts(const char * filename)
@@ -174,10 +222,12 @@ read_dropouts(const char * filename)
 			drop->race = rc_find(race);
 			drop->x = x;
 			drop->y = y;
+			drop->fno = -1;
 			drop->next = dropouts;
 			dropouts = drop;
 		}
 	}
+	fclose(F);
 }
 
 void
@@ -187,10 +237,12 @@ seed_dropouts(void)
 	while (*dropp) {
 		dropout *drop = *dropp;
 		region * r = findregion(drop->x, drop->y);
-		if (r && r->units==NULL) {
+		if (r) {
 			boolean found = false;
 			newfaction **nfp = &newfactions;
-			while (*nfp) {
+			unit * u;
+			for (u=r->units;u;u=u->next) if (u->faction->no==drop->fno) break;
+			if (u==NULL) while (*nfp) {
 				newfaction * nf = *nfp;
 				if (nf->race==drop->race) {
 					unit * u = addplayer(r, nf->email, nf->race, nf->lang);
@@ -202,7 +254,7 @@ seed_dropouts(void)
 				}
 				nfp = &nf->next;
 			}
-			if (found) dropp=&drop->next;
+			if (!found) dropp=&drop->next;
 		} else {
 			*dropp = drop->next;
 		}
