@@ -1745,10 +1745,7 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
         u->hp = u->number * unit_max_hp(du);
         assert(j<=df->side->casualties);
         df->side->casualties -= j;
-        /* tot sind sie eignetlich immer noch. Aber... was tun?
-           siehe http://eressea.upb.de/mantis/view.php?id=447 */
         df->side->dead -= j;
-        df->side->healed += j;
 
         /* counting total number of undead */
         undead += j;
