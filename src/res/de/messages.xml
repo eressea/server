@@ -116,6 +116,19 @@
 	</locale>
 </message>
 
+<message name="error292">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
+	<locale name="de">
+		<nr section="errors">
+			<text>"$unit($unit) in $region($region): '$command' - Die Einheit kann nicht unterrichtet werden ."</text>
+		</nr>
+	</locale>
+</message>
+
 <message name="error4">
 	<type>
 		<arg name="unit" type="unit"></arg>

@@ -608,6 +608,7 @@ is_persistent(const char *s, const struct locale *lang)
 	switch(igetkeyword(s, lang)) {
 		case K_BUY:
 		case K_SELL:
+		case K_CAST:
 		case K_KOMMENTAR:
 		case K_LIEFERE:
 		case K_RESERVE:

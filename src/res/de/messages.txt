@@ -290,6 +290,7 @@ error288;errors:0;de;{unit} in {region}: '{command}' - Wieviel sollen wir einrei
 error289;errors:0;de;{unit} in {region}: '{command}' - Tarne wie?
 error290;errors:0;de;{unit} in {region}: '{command}' - Hier wachsen keine Bäume.
 error291;errors:0;de;{unit} in {region}: '{command}' - Dies ist schon eine Mallornregion.
+error292;errors:0;de;{unit} in {region}: '{command}' - Die Einheit kann nicht unterrichtet werden.
 
 # Meldungen und Ereignisse
 msg_event;events:0;de;{string}

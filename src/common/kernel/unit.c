@@ -729,7 +729,8 @@ transfermen(unit * u, unit * u2, int n)
 		rsetpeasants(r, rpeasants(r) + n);
 }
 
-struct building * inside_building(const struct unit * u)
+struct building * 
+inside_building(const struct unit * u)
 {
 	if (u->building==NULL) return NULL;
 

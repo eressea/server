@@ -141,7 +141,7 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
 	 * von schon gelernten Tagen zum max(30 Tage pro Mann) betragen. */
 
 	if (magic_lowskill(student)){
-		cmistake(teacher, teacher->thisorder, 274, MSG_EVENT);
+		cmistake(teacher, teacher->thisorder, 292, MSG_EVENT);
 		return 0;
 	}
 
@@ -169,9 +169,10 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
  *		&& inside_building(student)!=NULL) */
 			&& student->building && student->building->type == &bt_academy)
 		{
-			int j = study_cost(teacher, sk);
+			int j = study_cost(student, sk);
 			j = max(50, j * 2);
-			if (get_pooled(teacher, teacher->region, R_SILVER) >= j) {		/* kann Einheit das zahlen? */
+			/* kann Einheit das zahlen? */
+			if (get_pooled(student, student->region, R_SILVER) >= j) {
 				/* Jeder Schüler zusätzlich +10 Tage wenn in Uni. */
 				a->data.i += (n / 30) * 10; /* learning erhöhen */
 				/* Lehrer zusätzlich +1 Tag pro Schüler. */
