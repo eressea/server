@@ -432,6 +432,7 @@ calculate_emigration(region *r)
 			w = 0;
 		} else {
 			w = rpeasants(rc) - maxworkingpeasants(rc);
+			w = max(0,w);
 			if(rterrain(rc) == T_VOLCANO || rterrain(rc) == T_VOLCANO_SMOKING) {
 				w = w/10;
 			} 
