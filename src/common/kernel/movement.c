@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.6 2001/02/04 09:46:47 corwin Exp $
+ *	$Id: movement.c,v 1.7 2001/02/07 20:42:31 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2082,9 +2082,9 @@ follow(void)
 						&& getparam() == P_UNIT) {
 					int id = read_unitid(u->faction, r);
 					if (id>0) {
-						unit * u = findunit(id);
+						unit * uf = findunit(id);
 						if (!a) {
-							a = a_add(&u->attribs, make_follow(u));
+							a = a_add(&u->attribs, make_follow(uf));
 						}
 					} else if (a) {
 						a_remove(&u->attribs, a);

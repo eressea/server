@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spy.c,v 1.3 2001/01/31 17:40:49 corwin Exp $
+ *	$Id: spy.c,v 1.4 2001/02/07 20:42:30 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -102,7 +102,7 @@ setstealth(unit * u, strlist * S)
 
 	/* Tarne ohne Parameter: Setzt maximale Tarnung */
 
-	if (*s == 0) {
+	if (s == NULL || *s == 0) {
 		u_seteffstealth(u, -1);
 		return;
 	}
