@@ -2470,10 +2470,16 @@ peasant_adjustment(void)
 	terrain_t ter;
 	int sum, avg, c;
 	double freeall, pool; /* long long is illegal */
+	long long s;
+	region *r;
+
+	s = 0;
+	for(r=regions; r; r=r->next) {
+		s += rpeasants(r);
+	}
+	log_printf("BAUERN vorher: %lld\n",s);
 
 	for(ter = 0; ter < MAXTERRAINS; ter++) {
-		region *r;
-
 		if(terrain[ter].production_max <= 0) continue;
 
 		c = 0;
@@ -2547,6 +2553,12 @@ peasant_adjustment(void)
 			assert(rpeasants(r) >= 0);
 		}
 	}
+	
+	s = 0;
+	for(r=regions; r; r=r->next) {
+		s += rpeasants(r);
+	}
+	log_printf("BAUERN nachher: %lld\n",s);
 
 	return 0;
 }

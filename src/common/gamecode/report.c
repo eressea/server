@@ -3312,13 +3312,22 @@ writeforward(void)
 	fclose(forwardFile);
 }
 
+static void
+out_faction(FILE *file, faction *f)
+{
+ 	fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
+		factionname(f), LOC(default_locale, rc_name(f->race, 0)),
+		neue_gebiete[f->magiegebiet], f->nunits, f->number, f->money,
+		turn - f->lastorders, turn - f->lastorders != 1 ? "NMRs" : "NMR ");
+}
+
 void
 report_summary(summary * s, summary * o, boolean full)
 {
 	FILE * F = NULL;
 	int i, newplayers = 0;
 	faction * f;
-	int nmrs[ORDERGAP];
+	int nmrs[ORDERGAP+1];
 
 	{
 		char zText[MAX_PATH];
@@ -3351,7 +3360,7 @@ report_summary(summary * s, summary * o, boolean full)
 		fprintf(F, "Aktive Vulkane:        %d\n\n", s->active_volcanos);
 	}
 
-	for (i = 0; i <= RC_AQUARIAN; i++) if (s->factionrace[i] && playerrace(new_race[i])) {
+	for (i = 0; i < MAXRACES; i++) if (s->factionrace[i] && playerrace(new_race[i])) {
 		fprintf(F, "%14svölker: %s\n",
 		LOC(default_locale, rc_name(new_race[i], 3)), pcomp(s->factionrace[i], o->factionrace[i]));
 	}
@@ -3379,7 +3388,7 @@ report_summary(summary * s, summary * o, boolean full)
 				rcomp(s->poprace[i],o->poprace[i]));
 		}
 	} else {
-		for (i = 0; i <= RC_AQUARIAN; i++) if (s->poprace[i] && playerrace(new_race[i])) {
+		for (i = 0; i < MAXRACES; i++) if (s->poprace[i] && playerrace(new_race[i])) {
 			fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(new_race[i], 1)),
 				rcomp(s->poprace[i],o->poprace[i]));
 		}
@@ -3410,7 +3419,7 @@ report_summary(summary * s, summary * o, boolean full)
 
 	fprintf(F, "\n\n");
 
-	for (i = 0; i != ORDERGAP; i++) {
+	for (i = 0; i != ORDERGAP+1; ++i) {
 		nmrs[i] = 0;
 	}
 
@@ -3418,13 +3427,17 @@ report_summary(summary * s, summary * o, boolean full)
 		if (f->age <= 1 && turn - f->lastorders == 1) {
 			newplayers++;
 		} else if (f->no != MONSTER_FACTION) {
-			nmrs[min(ORDERGAP-1,turn-f->lastorders)]++;
+			nmrs[min(ORDERGAP,turn-f->lastorders)]++;
 		}
 	}
 
-	for (i = 0; i != ORDERGAP; i++) {
-		fprintf(F, "%d %s:\t\t %d\n", i,
-			i != 1 ? "NMRs" : "NMR ", nmrs[i]);
+	for (i = 0; i != ORDERGAP+1; ++i) {
+		if(i == ORDERGAP) {
+			fprintf(F, "+ NMRs:\t\t %d\n", nmrs[i]);
+		} else {
+			fprintf(F, "%d %s:\t\t %d\n", i,
+				i != 1 ? "NMRs" : "NMR ", nmrs[i]);
+		}
 	}
 	if (age) {
 		if (age[2] != 0) {
@@ -3439,12 +3452,26 @@ report_summary(summary * s, summary * o, boolean full)
 	if (factions)
    		fprintf(F, "\nParteien:\n\n");
 
-	for (f = factions; f; f = f->next)
-    	fprintf(F, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
-			factionname(f), LOC(default_locale, rc_name(f->race, 0)), neue_gebiete[f->magiegebiet],
-			f->nunits, f->number, f->money,
-			turn - f->lastorders,
-			turn - f->lastorders != 1 ? "NMRs" : "NMR ");
+	for (f = factions; f; f = f->next) {
+		out_faction(F, f);
+	}
+
+	if(full) {
+		fprintf(F, "\n\nFactions with NMRs:\n");
+		for (i = ORDERGAP; i > 0; --i) {
+			for(f=factions; f; f=f->next) {
+				if(i == ORDERGAP) {
+					if(turn - f->lastorders >= i) {
+						out_faction(F, f);
+					}
+				} else {
+					if(turn - f->lastorders == i) {
+						out_faction(F, f);
+					}
+				}
+			}
+		}
+	}
 
 	fclose(F);
 
