@@ -2189,14 +2189,13 @@ do_attack(fighter * af)
           if (au->race->attack[a].type!=AT_STANDARD) continue;
           else {
             weapon * wp = preferred_weapon(ta, true);
-            if (wp->type->reload) continue;
+            if (wp!=NULL && wp->type->reload) continue;
           }
         }
-					attack(b, ta, &(au->race->attack[a]));
+        attack(b, ta, &(au->race->attack[a]));
 			}
 		}
 	}
-
 }
 
 void
