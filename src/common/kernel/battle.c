@@ -1340,6 +1340,7 @@ select_enemy(fighter * af, int minrow, int maxrow)
 		minrow = FIGHT_ROW;
 		maxrow = BEHIND_ROW;
 	}
+	minrow = max(minrow, FIGHT_ROW);
 
 	enemies = count_enemies(af->side, FS_ENEMY, minrow, maxrow);
 
@@ -1906,6 +1907,7 @@ attack(battle *b, troop ta, const att *a)
 	troop td;
 	unit *au = af->unit;
 	int row = get_unitrow(af);
+	int offset = row - FIGHT_ROW;
 
 	switch(a->type) {
 	case AT_STANDARD:		/* Waffen, mag. Gegenstände, Kampfzauber */
@@ -1940,10 +1942,15 @@ attack(battle *b, troop ta, const att *a)
 				}
 				if (standard_attack) {
 					boolean missile = false;
-					int offset = row-FIGHT_ROW;
 					if (wp && fval(wp->type, WTF_MISSILE)) missile=true;
-					if (missile) td = select_enemy(af, missile_range[0]-offset, missile_range[1]-offset);
-					else td = select_enemy(af, melee_range[0]-offset, melee_range[1]-offset);
+					if (missile) {
+						if (row<=BEHIND_ROW) td = select_enemy(af, missile_range[0], missile_range[1]);
+						else return;
+					}
+					else {
+						if (row<=FIGHT_ROW) td = select_enemy(af, melee_range[0], melee_range[1]);
+						else return;
+					}
 					if (!td.fighter) return;
 
 					if(td.fighter->person[td.index].last_action < b->turn) {
@@ -1975,7 +1982,7 @@ attack(battle *b, troop ta, const att *a)
 		do_extra_spell(ta, a);
 		break;
 	case AT_NATURAL:
-		td = select_enemy(af, row, row);
+		td = select_enemy(af, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
@@ -1990,7 +1997,7 @@ attack(battle *b, troop ta, const att *a)
 		}
 		break;
 	case AT_DRAIN_ST:
-		td = select_enemy(af, row, row);
+		td = select_enemy(af, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
@@ -2013,7 +2020,7 @@ attack(battle *b, troop ta, const att *a)
 		}
 		break;
 	case AT_DRAIN_EXP:
-		td = select_enemy(af, row, row);
+		td = select_enemy(af, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
@@ -2028,7 +2035,7 @@ attack(battle *b, troop ta, const att *a)
 		}
 		break;
 	case AT_DAZZLE:
-		td = select_enemy(af, row, row);
+		td = select_enemy(af, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
@@ -2043,7 +2050,7 @@ attack(battle *b, troop ta, const att *a)
 		}
 		break;
 	case AT_STRUCTURAL:
-		td = select_enemy(af, row, row);
+		td = select_enemy(af, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
 		if(ta.fighter->person[ta.index].last_action < b->turn) {
 			ta.fighter->person[ta.index].last_action = b->turn;
