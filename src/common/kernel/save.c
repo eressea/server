@@ -366,16 +366,19 @@ getbuf(FILE * F)
 		end = bp + strlen((const char *)bp);
 		if (*(end-1)=='\n') *(--end) = 0;
     else {
-      while (bp && !lbuf[MAXLINE-1] && lbuf[MAXLINE-2]!='\n') {
-        /* wenn die zeile länger als erlaubt war,
-        * wird der rest weggeworfen: */
-        bp = (unsigned char *)fgets(buf, 1024, F);
-        comment = false;
+      /* wenn die zeile länger als erlaubt war, ist sie ungültig,
+       * und wird mit dem rest weggeworfen: */
+      while (bp!=NULL) {
+        bp = (unsigned char *)fgets(lbuf, MAXLINE, F);
+        end = bp + strlen((const char *)bp);
+        if (*(end-1)=='\n') break;
+        lbuf[MAXLINE-1] = 0;
       }
-      bp = (unsigned char *)lbuf;
+      comment = false;
+      bp = NULL;
     }
 		cont = false;
-		while (cp!=buf+MAXLINE && (char*)bp!=lbuf+MAXLINE && *bp) {
+		while (bp!=NULL && *bp && cp!=buf+MAXLINE && (char*)bp!=lbuf+MAXLINE) {
 			if (isspace(*bp)) {
 				if (eatwhite) {
 					do { ++bp; } while ((char*)bp!=lbuf+MAXLINE && isspace(*bp));
