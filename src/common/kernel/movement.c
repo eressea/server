@@ -558,16 +558,18 @@ static void
 drifting_ships(region * r)
 {
   direction_t d;
-  ship *sh, *sh2;
-  unit *captain;
 
   if (rterrain(r) == T_OCEAN) {
-    for (sh = r->ships; sh;) {
-      sh2 = sh->next;
+    ship** shp = &r->ships;
+    while (*shp) {
+      ship * sh = *shp;
+      region * rnext = NULL;
+      unit * captain;
+      int d_offset;
 
       /* Schiff schon abgetrieben oder durch Zauber geschützt? */
       if (fval(sh, SF_DRIFTED) || is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
-        sh = sh2;
+        shp = &sh->next;
         continue;
       }
 
@@ -581,77 +583,51 @@ drifting_ships(region * r)
 
       assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
       if (captain && sh->size==sh->type->construction->maxsize && enoughsailors(r, sh) && cansail(r, sh)) {
-        sh = sh2;
+        shp = &sh->next;
         continue;
       }
 
       /* Leuchtturm: Ok. */
       if (check_leuchtturm(r, NULL)) {
-        sh = sh2;
+        shp = &sh->next;
         continue;
       }
 
       /* Auswahl einer Richtung: Zuerst auf Land, dann
       * zufällig. Falls unmögliches Resultat: vergiß es. */
-
-      for (d = 0; d != MAXDIRECTIONS; d++)
-        if (rconnect(r, d) && rterrain(rconnect(r, d)) != T_OCEAN)
-          break;
-
-      if (d == MAXDIRECTIONS)
-        d = (direction_t)(rand() % MAXDIRECTIONS);
-
-      if (!rconnect(r, d)) {
-        sh = sh2;
-        continue;
-      }
-      {
-        region * r2 = rconnect(r, d);
-        int c = 0;
-        while (sh->type->coast[c]!=NOTERRAIN) {
-          if (rterrain(r2) == sh->type->coast[c]) break;
-          ++c;
-        }
-        if (sh->type->coast[c]==NOTERRAIN) {
-          sh = sh2;
-          continue;
+      d_offset = rand() % MAXDIRECTIONS;
+      for (d = 0; d != MAXDIRECTIONS; ++d) {
+        region * rn = rconnect(r, (direction_t)((d + d_offset) % MAXDIRECTIONS));
+        terrain_t t = rterrain(rn);
+        if (rn!=NULL && (terrain[t].flags & SAIL_INTO)) {
+          rnext = rn;
+          if (t!=T_OCEAN) break;
         }
       }
-      if(!(terrain[rterrain(rconnect(r, d))].flags & SAIL_INTO)) {
-        sh = sh2;
+
+      if (rnext==NULL) {
+        shp = &sh->next;
         continue;
       }
 
       /* Das Schiff und alle Einheiten darin werden nun von r
-      * nach rconnect(r, d) verschoben. Danach eine Meldung. */
-      if (fval(sh, SF_DRIFTED)) {
-        region_list * route = NULL;
-        region * to = rconnect(r, d);
-        /* wenn schon einmal abgetrieben, dann durchreise eintragen */
-        add_regionlist(&route, r);
-        add_regionlist(&route, to);
-        sh = move_ship(sh, r, to, route);
-        free_regionlist(route);
-      } else sh = move_ship(sh, r, rconnect(r, d), NULL);
-      if (!sh) {
-        sh = sh2;
-        continue;
+      * nach rnext verschoben. Danach eine Meldung. */
+      sh = move_ship(sh, r, rnext, NULL);
+
+      if (sh!=NULL) {
+        fset(sh, SF_DRIFTED);
+
+        if (rterrain(rnext) != T_OCEAN) {
+          sh->coast = dir_invert(d);
+        }
+        damage_ship(sh, 0.02);
+
+        if (sh->damage>=sh->size * DAMAGE_SCALE) {
+          destroy_ship(sh, rnext);
+        }
       }
 
-      fset(sh, SF_DRIFTED);
-
-      if (rterrain(rconnect(r, d)) != T_OCEAN) {
-        /* Alle Attribute
-        * sicherheitshalber loeschen und
-        * gegebenenfalls neu setzen. */
-        sh->coast = dir_invert(d);
-      }
-      damage_ship(sh, 0.02);
-
-      if (sh->damage>=sh->size * DAMAGE_SCALE)
-        destroy_ship(sh, rconnect(r, d));
-
-      sh = sh2;
+      if (*shp != sh) shp = &sh->next;
     }
   }
 }
