@@ -701,7 +701,7 @@ fix_migrants(void) {
 		for (u=r->units;u;u=u->next) {
 			if (u->race == new_race[RC_HUMAN]) u->irace = u->race;
 			if (u->irace!=u->race && (u->race->flags & RCF_SHAPESHIFT)==0) {
-				log_warning(("[fix_migrants] %s ist ein %s, als %s getarnt\n", unitname(u), rc_name(u->race, 0), rc_name(u->irace, 0)));
+				log_warning(("[fix_migrants] %s ist ein %s, als %s getarnt\n", unitname(u), LOC(default_locale, rc_name(u->race, 0)), LOC(default_locale, rc_name(u->irace, 0))));
 			}
 		}
 	}

@@ -1,4 +1,158 @@
 <messages>
+	<message name="newbieimmunity">
+		<type>
+			<arg name="turns" type="int"></arg>
+		</type>
+		<locale name="de">
+			<nr section="events">
+				<text>"Deine Partei ist noch $int($turns) Wochen immun gegen Angriffe."</text>
+			</nr>
+		</locale>
+	</message>
+
+	<message name="error130">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<locale name="de">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - Syntax: MAGIEGEBIET [1-5]."</text>
+			</nr>
+		</locale>
+	</message>
+
+	<message name="error131">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<locale name="de">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - Um in Gletschern Straßen bauen zu können, muß zuerst ein Tunnel errichtet werden."</text>
+			</nr>
+		</locale>
+	</message>
+
+	<message name="pest">
+		<type>
+			<arg name="dead" type="int"></arg>
+		</type>
+		<locale name="de">
+			<nr section="events">
+				<text>"Hier wütete die Pest, und $int($dead) Bauern starben."</text>
+			</nr>
+		</locale>
+	</message>
+
+	<message name="usepotion">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="potion" type="resource"></arg>
+		</type>
+		<locale name="de">
+			<nr section="events">
+				<text>"$unit($unit) benutzt einen $resource($potion,1)."</text>
+			</nr>
+		</locale>
+	</message>
+
+	<message name="income_tradetax">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="amount" type="int"></arg>
+		</type>
+		<locale name="de">
+			<nr section="economy">
+				<text>"$unit($unit) verdient am Handel in $region($region) Steuern in Höhe von $int($amount) Silber."</text>
+			</nr>
+		</locale>
+	</message>
+
+	<message name="maintenance_late" section="economy">
+		<type>
+			<arg name="building" type="building"></arg>
+		</type>
+		<text locale="de">"Der Unterhalt von $building($building) konnte nur verspätet gezahlt werden, das Gebäude war diese Woche nicht funktionstüchtig."</text>
+		<text locale="en">"The upkeep for $building($building) was paid late, the building was not operational this week."</text>
+	</message>
+
+	<message name="maintenancefail">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="building" type="building"></arg>
+		</type>
+		<locale name="de">
+			<nr section="economy">
+				<text>"$unit($unit) kann den Unterhalt von $building($building) nicht bezahlen."</text>
+			</nr>
+		</locale>
+	</message>
+
+	<message name="maintenancespecialfail">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="item" type="resource"></arg>
+			<arg name="building" type="building"></arg>
+		</type>
+		<locale name="de">
+			<nr section="economy">
+				<text>"$unit($unit) fehlen $resource($item,0) für den Betrieb von $building($building)."</text>
+			</nr>
+		</locale>
+	</message>
+
+	<message name="maintenance">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="building" type="building"></arg>
+		</type>
+		<locale name="de">
+			<nr section="economy">
+				<text>"$unit($unit) bezahlt den Unterhalt von $building($building)."</text>
+			</nr>
+		</locale>
+	</message>
+
+	<message name="give">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="amount" type="int"></arg>
+			<arg name="resource" type="resource"></arg>
+			<arg name="target" type="unit"></arg>
+		</type>
+		<locale name="de">
+			<nr section="economy">
+				<text>"$unit($unit) übergibt $int($amount) $resource($resource,$amount) an $unit($target)."</text>
+			</nr>
+		</locale>
+	</message>
+
+	<message name="msg_economy">
+		<type>
+			<arg name="string" type="string"></arg>
+		</type>
+		<locale name="de">
+			<nr section="economy">
+				<text>"$string"</text>
+			</nr>
+		</locale>
+	</message>
+
+	<message name="msg_event">
+		<type>
+			<arg name="string" type="string"></arg>
+		</type>
+		<locale name="de">
+			<nr section="events">
+				<text>"$string"</text>
+			</nr>
+		</locale>
+	</message>
+
 	<message name="rm_stone">
 		<text locale="de">Steine</text>
 		<text locale="en">stones</text>
@@ -1944,32 +2098,6 @@
 		<locale name="de">
 			<nr section="errors">
 				<text>"$unit($unit) in $region($region): '$command' - So viele Leute kann die Partei nicht aufnehmen."</text>
-			</nr>
-		</locale>
-	</message>
-
-	<message name="error130">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="region" type="region"></arg>
-			<arg name="command" type="string"></arg>
-		</type>
-		<locale name="de">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Syntax: MAGIEGEBIET <1-5>."</text>
-			</nr>
-		</locale>
-	</message>
-
-	<message name="error131">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="region" type="region"></arg>
-			<arg name="command" type="string"></arg>
-		</type>
-		<locale name="de">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Um in Gletschern Straßen bauen zu können, muß zuerst ein Tunnel errichtet werden."</text>
 			</nr>
 		</locale>
 	</message>
@@ -4269,33 +4397,14 @@
 		</locale>
 	</message>
 
-	<message name="error304">
+	<message name="error304" section="errors">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<locale name="de">
-			<nr section="errors">
-							<text>"$unit($unit) in $region($region): '$command' - Einheiten einer Partei, die noch immun gegen Angriffe ist, dürfen nicht bewachen."</text>
-			</nr>
-		</locale>
-		<locale name="en">
-			<nr section="errors">
-							<text>"$unit($unit) in $region($region): '$command' - units of a faction that can't be attacked may not guard."</text>
-			</nr>
-		</locale>
-	</message>
-
-	<message name="msg_event">
-		<type>
-			<arg name="string" type="string"></arg>
-		</type>
-		<locale name="de">
-			<nr section="events">
-				<text>"$string"</text>
-			</nr>
-		</locale>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Einheiten einer Partei, die noch immun gegen Angriffe ist, dürfen nicht bewachen."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - units of a faction that can't be attacked may not guard."</text>
 	</message>
 
 	<message name="drown_on_ship">
@@ -4516,29 +4625,6 @@
 		</locale>
 	</message>
 
-	<message name="pest">
-		<type>
-			<arg name="dead" type="int"></arg>
-		</type>
-		<locale name="de">
-			<nr section="events">
-				<text>"Hier wütete die Pest, und $int($dead) Bauern starben."</text>
-			</nr>
-		</locale>
-	</message>
-
-	<message name="usepotion">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="potion" type="resource"></arg>
-		</type>
-		<locale name="de">
-			<nr section="events">
-				<text>"$unit($unit) benutzt einen $resource($potion,1)."</text>
-			</nr>
-		</locale>
-	</message>
-
 	<message name="spydetect">
 		<type>
 			<arg name="target" type="unit"></arg>
@@ -4618,17 +4704,6 @@
 		<locale name="de">
 			<nr section="events">
 				<text>"$unit($unit) wurde in $region($region) beklaut."</text>
-			</nr>
-		</locale>
-	</message>
-
-	<message name="newbieimmunity">
-		<type>
-			<arg name="turns" type="int"></arg>
-		</type>
-		<locale name="de">
-			<nr section="events">
-				<text>"Deine Partei ist noch $int($turns) Wochen immun gegen Angriffe."</text>
 			</nr>
 		</locale>
 	</message>
@@ -5546,31 +5621,6 @@
 		</locale>
 	</message>
 
-	<message name="msg_economy">
-		<type>
-			<arg name="string" type="string"></arg>
-		</type>
-		<locale name="de">
-			<nr section="economy">
-				<text>"$string"</text>
-			</nr>
-		</locale>
-	</message>
-
-	<message name="give">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="amount" type="int"></arg>
-			<arg name="resource" type="resource"></arg>
-			<arg name="target" type="unit"></arg>
-		</type>
-		<locale name="de">
-			<nr section="economy">
-				<text>"$unit($unit) übergibt $int($amount) $resource($resource,$amount) an $unit($target)."</text>
-			</nr>
-		</locale>
-	</message>
-
 	<message name="income">
 		<type>
 			<arg name="unit" type="unit"></arg>
@@ -5735,64 +5785,6 @@
 		<locale name="de">
 			<nr section="economy">
 				<text>"$unit($unit) verdient in $region($region) $int($amount) Silber durch den Verkauf von Luxusgütern."</text>
-			</nr>
-		</locale>
-	</message>
-
-	<message name="income_tradetax">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="region" type="region"></arg>
-			<arg name="amount" type="int"></arg>
-		</type>
-		<locale name="de">
-			<nr section="economy">
-				<text>"$unit($unit) verdient am Handel in $region($region) Steuern in Höhe von $int($amount) Silber."</text>
-			</nr>
-		</locale>
-	</message>
-
-	<message name="maintenance">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="building" type="building"></arg>
-		</type>
-		<locale name="de">
-			<nr section="economy">
-				<text>"$unit($unit) bezahlt den Unterhalt von $building($building)."</text>
-			</nr>
-		</locale>
-	</message>
-
-	<message name="maintenance_late" section="economy">
-		<type>
-			<arg name="building" type="building"></arg>
-		</type>
-		<text locale="de">"Der Unterhalt von $building($building) konnte nur verspätet gezahlt werden, das Gebäude war diese Woche nicht funktionstüchtig."</text>
-		<text locale="en">"The upkeep for $building($building) was paid late, the building was not operational this week."</text>
-	</message>
-
-	<message name="maintenancefail">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="building" type="building"></arg>
-		</type>
-		<locale name="de">
-			<nr section="economy">
-				<text>"$unit($unit) kann den Unterhalt von $building($building) nicht bezahlen."</text>
-			</nr>
-		</locale>
-	</message>
-
-	<message name="maintenancespecialfail">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="item" type="resource"></arg>
-			<arg name="building" type="building"></arg>
-		</type>
-		<locale name="de">
-			<nr section="economy">
-				<text>"$unit($unit) fehlen $resource($item,0) für den Betrieb von $building($building)."</text>
 			</nr>
 		</locale>
 	</message>
@@ -7351,7 +7343,7 @@
 	    <arg name="name" type="string"></arg>
 	  </type>
 	  <text locale="de">"Zur Feier des Geburtstags von ${name} wird in $region($region) ein großes Feuerwerk abgebrannt, welches noch hier zu bewundern ist. Kaskaden bunter Sterne, leuchtende Wasserfälle aus Licht und strahlende Feuerdrachen erhellen den Himmel."</text>
-	  <text locale="en">"A large firework in honor of ${name}, visible all over the sky, has been started in $region($region)."
+	  <text locale="en">"A large firework in honor of ${name}, visible all over the sky, has been started in $region($region)."</text>
 	</message>
 
 	<message name="birthday_firework_local">

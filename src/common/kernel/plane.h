@@ -31,7 +31,7 @@
 #define PFL_NOMAGIC       128  /* Zaubern ist unmöglich */
 #define PFL_NOSTEALTH     256  /* Tarnung außer Betrieb */
 #define PFL_NOTEACH       512  /* Lehre außer Betrieb */
-#define PFL_NOBUILD      1024  /* Lehre außer Betrieb */
+#define PFL_NOBUILD      1024  /* Bauen außer Betrieb */
 #define PFL_NOFEED       2048  /* Kein Unterhalt nötig TODO */
 #define PFL_FRIENDLY     4096  /* everyone is your ally */
 #define PFL_NOORCGROWTH  8192  /* orcs don't grow */

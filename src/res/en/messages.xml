@@ -1580,7 +1580,7 @@
 		</type>
 		<locale name="en">
 			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Syntax: MAGIC SPHERE <1-5>."</text>
+				<text>"$unit($unit) in $region($region): '$command' - Syntax: MAGIC SPHERE [1-5]."</text>
 			</nr>
 		</locale>
 	</message>

@@ -5,6 +5,1934 @@
 </comment>
 
 <strings>
+	<comment>Küsten</comment>
+	<string name="Nordwestküste">
+		<text locale="de">Nordwestküste</text>
+	</string>
+	<string name="Nordostküste">
+		<text locale="de">Nordostküste</text>
+	</string>
+	<string name="Ostküste">
+		<text locale="de">Ostküste</text>
+	</string>
+	<string name="Südostküste">
+		<text locale="de">Südostküste</text>
+	</string>
+	<string name="Südwestküste">
+		<text locale="de">Südwestküste</text>
+	</string>
+	<string name="Westküste">
+		<text locale="de">Westküste</text>
+	</string>
+
+	<comment>OPTION [x]</comment>
+	<string name="AUSWERTUNG">
+		<text locale="de">AUSWERTUNG</text>
+	</string>
+	<string name="COMPUTER">
+		<text locale="de">COMPUTER</text>
+	</string>
+	<string name="ZUGVORLAGE">
+		<text locale="de">ZUGVORLAGE</text>
+	</string>
+	<string name="SILBERPOOL">
+		<text locale="de">SILBERPOOL</text>
+	</string>
+	<string name="STATISTIK">
+		<text locale="de">STATISTIK</text>
+	</string>
+	<string name="DEBUG">
+		<text locale="de">DEBUG</text>
+	</string>
+	<string name="ZIPPED">
+		<text locale="de">ZIPPED</text>
+	</string>
+	<string name="ZEITUNG">
+		<text locale="de">ZEITUNG</text>
+	</string>
+	<string name="MATERIALPOOL">
+		<text locale="de">MATERIALPOOL</text>
+	</string>
+	<string name="ADRESSEN">
+		<text locale="de">ADRESSEN</text>
+	</string>
+	<string name="BZIP2">
+		<text locale="de">BZIP2</text>
+	</string>
+	<string name="PUNKTE">
+		<text locale="de">PUNKTE</text>
+	</string>
+
+	<comment>Schiffstypen</comment>
+	<string name="Karavelle">
+		<text locale="de">Karavelle</text>
+	</string>
+	<string name="Boot">
+		<text locale="de">Boot</text>
+	</string>
+	<string name="Langboot">
+		<text locale="de">Langboot</text>
+	</string>
+	<string name="Drachenschiff">
+		<text locale="de">Drachenschiff</text>
+	</string>
+	<string name="Trireme">
+		<text locale="de">Trireme</text>
+	</string>
+
+	<comment>Terraintypen</comment>
+	<string name="maelstrom">
+		<text locale="de">Mahlstrom</text>
+	</string>
+	<string name="ocean">
+		<text locale="de">Ozean</text>
+	</string>
+	<string name="plain">
+		<text locale="de">Ebene</text>
+	</string>
+	<string name="forest">
+		<text locale="de">Wald</text>
+	</string>
+	<string name="swamp">
+		<text locale="de">Sumpf</text>
+	</string>
+	<string name="desert">
+		<text locale="de">Wüste</text>
+	</string>
+	<string name="highland">
+		<text locale="de">Hochland</text>
+	</string>
+	<string name="mountain">
+		<text locale="de">Berge</text>
+	</string>
+	<string name="glacier">
+		<text locale="de">Gletscher</text>
+	</string>
+	<string name="firewall">
+		<text locale="de">Feuerwand</text>
+	</string>
+	<string name="grassland">
+		<text locale="de">Steppe</text>
+	</string>
+	<string name="volcano">
+		<text locale="de">Vulkan</text>
+	</string>
+	<string name="fog">
+		<text locale="de">Nebel</text>
+	</string>
+	<string name="iceberg">
+		<text locale="de">Eisberg</text>
+	</string>
+	<string name="thickfog">
+		<text locale="de">Dichter Nebel</text>
+	</string>
+	<string name="hell">
+		<text locale="de">Ebene aus Feuer und Dunkelheit</text>
+	</string>
+	<string name="activevolcano">
+		<text locale="de">Aktiver Vulkan</text>
+	</string>
+	<string name="hall1">
+		<text locale="de">Halle</text>
+	</string>
+	<string name="corridor1">
+		<text locale="de">Gang</text>
+	</string>
+	<string name="magicstorm">
+		<text locale="de">Magischer Sturm</text>
+	</string>
+
+	<string name="maelstrom_trail">
+		<text locale="de">ein %s</text>
+	</string>
+	<string name="ocean_trail">
+		<text locale="de">%s</text>
+	</string>
+	<string name="plain_trail">
+		<text locale="de">die Ebene von %s</text>
+	</string>
+	<string name="forest_trail">
+		<text locale="de">der Wald von %s</text>
+	</string>
+	<string name="swamp_trail">
+		<text locale="de">der Sumpf von %s</text>
+	</string>
+	<string name="desert_trail">
+		<text locale="de">die Wüste von %s</text>
+	</string>
+	<string name="highland_trail">
+		<text locale="de">das Hochland von %s</text>
+	</string>
+	<string name="mountain_trail">
+		<text locale="de">das Bergland von %s</text>
+	</string>
+	<string name="glacier_trail">
+		<text locale="de">der Gletscher von %s</text>
+	</string>
+	<string name="firewall_trail">
+		<text locale="de">eine %s</text>
+	</string>
+	<string name="grassland_trail">
+		<text locale="de">die Steppe von %s</text>
+	</string>
+	<string name="volcano_trail">
+		<text locale="de">der Vulkan von %s</text>
+	</string>
+	<string name="fog_trail">
+		<text locale="de">ein %s</text>
+	</string>
+	<string name="iceberg_trail">
+		<text locale="de">der Eisberg von %s</text>
+	</string>
+	<string name="thickfog_trail">
+		<text locale="de">%s</text>
+	</string>
+	<string name="hell_trail">
+		<text locale="de">eine %s</text>
+	</string>
+	<string name="activevolcano_trail">
+		<text locale="de">ein %s</text>
+	</string>
+	<string name="hall1_trail">
+		<text locale="de">die %s</text>
+	</string>
+	<string name="corridor1_trail">
+		<text locale="de">die %s</text>
+	</string>
+	<string name="magicstorm_trail">
+		<text locale="de">ein %s</text>
+	</string>
+
+	<string name="caldera">
+		<text locale="de">Krater</text>
+	</string>
+	<string name="xmas_exit">
+		<text locale="de">Pforte</text>
+	</string>
+	<string name="coal">
+		<text locale="de">Kohlenstück</text>
+	</string>
+	<string name="coal_p">
+		<text locale="de">Kohlenstücke</text>
+	</string>
+
+	<comment>Himmelsrichtungen</comment>
+	<string name="west">
+		<text locale="de">Westen</text>
+	</string>
+	<string name="northwest">
+		<text locale="de">Nordwesten</text>
+	</string>
+	<string name="northeast">
+		<text locale="de">Nordosten</text>
+	</string>
+	<string name="east">
+		<text locale="de">Osten</text>
+	</string>
+	<string name="southwest">
+		<text locale="de">Südwesten</text>
+	</string>
+	<string name="southeast">
+		<text locale="de">Südosten</text>
+	</string>
+
+	<string name="dir_nw">
+		<text locale="de">NW</text>
+	</string>
+	<string name="dir_ne">
+		<text locale="de">NO</text>
+	</string>
+	<string name="dir_east">
+		<text locale="de">Ost</text>
+	</string>
+	<string name="dir_se">
+		<text locale="de">SO</text>
+	</string>
+	<string name="dir_sw">
+		<text locale="de">SW</text>
+	</string>
+	<string name="dir_west">
+		<text locale="de">West</text>
+	</string>
+
+	<comment>Verschiedenes</comment>
+	<string name="unknownunit">
+		<text locale="de">eine unbekannte Einheit</text>
+	</string>
+
+	<comment>Meldungssektionen</comment>
+	<string name="section_events">
+		<text locale="de">Meldungen und Ereignisse</text>
+	</string>
+	<string name="section_errors">
+		<text locale="de">Warnungen und Fehler</text>
+	</string>
+	<string name="section_economy">
+		<text locale="de">Wirtschaft und Handel</text>
+	</string>
+	<string name="section_production">
+		<text locale="de">Rohstoffe und Produktion</text>
+	</string>
+	<string name="section_magic">
+		<text locale="de">Magie und Artefakte</text>
+	</string>
+	<string name="section_movement">
+		<text locale="de">Reisen und Bewegung</text>
+	</string>
+	<string name="section_study">
+		<text locale="de">Lehren und Lernen</text>
+	</string>
+	<string name="section_battle">
+		<text locale="de">Kämpfe</text>
+	</string>
+	<string name="section_none">
+		<text locale="de">Verschiedenes</text>
+	</string>
+	<string name="section_newspells">
+		<text locale="de">Neue Zauber</text>
+	</string>
+	<string name="section_newpotions">
+		<text locale="de">Neue Tränke</text>
+	</string>
+
+	<comment>Gebäudetypen</comment>
+	<string name="fortress_generic">
+		<text locale="de">Burg</text>
+	</string>
+	<string name="lighthouse">
+		<text locale="de">Leuchtturm</text>
+	</string>
+	<string name="mine">
+		<text locale="de">Bergwerk</text>
+	</string>
+	<string name="quarry">
+		<text locale="de">Steinbruch</text>
+	</string>
+	<string name="harbour">
+		<text locale="de">Hafen</text>
+	</string>
+	<string name="academy">
+		<text locale="de">Akademie</text>
+	</string>
+	<string name="magictower">
+		<text locale="de">Magierturm</text>
+	</string>
+	<string name="smithy">
+		<text locale="de">Schmiede</text>
+	</string>
+	<string name="sawmill">
+		<text locale="de">Sägewerk</text>
+	</string>
+	<string name="stables">
+		<text locale="de">Pferdezucht</text>
+	</string>
+	<string name="monument">
+		<text locale="de">Monument</text>
+	</string>
+	<string name="dam">
+		<text locale="de">Damm</text>
+	</string>
+	<string name="caravan">
+		<text locale="de">Karawanserei</text>
+	</string>
+	<string name="tunnel">
+		<text locale="de">Tunnel</text>
+	</string>
+	<string name="inn">
+		<text locale="de">Taverne</text>
+	</string>
+	<string name="stonecircle">
+		<text locale="de">Steinkreis</text>
+	</string>
+	<string name="blessedstonecircle">
+		<text locale="de">Gesegneter Steinkreis</text>
+	</string>
+	<string name="illusioncastle">
+		<text locale="de">Traumschlößchen</text>
+	</string>
+	<string name="genericbuilding">
+		<text locale="de">Struktur</text>
+	</string>
+
+	<comment>Testgebäude</comment>
+	<string name="temple">
+		<text locale="de">Tempel</text>
+	</string>
+
+	<comment>Testitem</comment>
+	<string name="wand">
+		<text locale="de">Zauberstab</text>
+	</string>
+	<string name="wand_p">
+		<text locale="de">Zauberstäbe</text>
+	</string>
+	<string name="wand_of_tears">
+		<text locale="de">Szepter der Tränen</text>
+	</string>
+	<string name="wand_of_tears_p">
+		<text locale="de">Szepter der Tränen</text>
+	</string>
+
+	<comment>Burgausbaustufen</comment>
+	<string name="site">
+		<text locale="de">Grundmauern</text>
+	</string>
+	<string name="tradepost">
+		<text locale="de">Handelsposten</text>
+	</string>
+	<string name="fortification">
+		<text locale="de">Befestigung</text>
+	</string>
+	<string name="tower">
+		<text locale="de">Turm</text>
+	</string>
+	<string name="castle">
+		<text locale="de">Burg</text>
+	</string>
+	<string name="fortress">
+		<text locale="de">Festung</text>
+	</string>
+	<string name="citadel">
+		<text locale="de">Zitadelle</text>
+	</string>
+
+	<comment>Items</comment>
+	<string name="herb">
+		<text locale="de">Kraut</text>
+	</string>
+	<string name="herbbag">
+		<text locale="de">Kräuterbeutel</text>
+	</string>
+	<string name="vial">
+		<text locale="de">Phiole</text>
+	</string>
+	<string name="vial_p">
+		<text locale="de">Phiolen</text>
+	</string>
+
+	<comment>Resourcen</comment>
+	<string name="money">
+		<text locale="de">Silber</text>
+	</string>
+	<string name="money_p">
+		<text locale="de">Silber</text>
+	</string>
+	<string name="hp">
+		<text locale="de">Trefferpunkt</text>
+	</string>
+	<string name="hp_p">
+		<text locale="de">Trefferpunkte</text>
+	</string>
+	<string name="aura">
+		<text locale="de">Aura</text>
+	</string>
+	<string name="aura_p">
+		<text locale="de">Aura</text>
+	</string>
+	<string name="permaura">
+		<text locale="de">permanente Aura</text>
+	</string>
+	<string name="permaura_p">
+		<text locale="de">permanente Aura</text>
+	</string>
+	<string name="peasant">
+		<text locale="de">Bauer</text>
+	</string>
+	<string name="peasant_p">
+		<text locale="de">Bauern</text>
+	</string>
+	<string name="unit">
+		<text locale="de">Einheit</text>
+	</string>
+	<string name="unit_p">
+		<text locale="de">Einheiten</text>
+	</string>
+	<string name="person">
+		<text locale="de">Person</text>
+	</string>
+	<string name="person_p">
+		<text locale="de">Personen</text>
+	</string>
+
+	<comment>items</comment>
+	<string name="runesword">
+		<text locale="de">Runenschwert</text>
+	</string>
+	<string name="runesword_p">
+		<text locale="de">Runenschwerter</text>
+	</string>
+	<string name="iron">
+		<text locale="de">Eisen</text>
+	</string>
+	<string name="iron_p">
+		<text locale="de">Eisen</text>
+	</string>
+	<string name="log">
+		<text locale="de">Holz</text>
+	</string>
+	<string name="log_p">
+		<text locale="de">Holz</text>
+	</string>
+	<string name="stone">
+		<text locale="de">Stein</text>
+	</string>
+	<string name="stone_p">
+		<text locale="de">Steine</text>
+	</string>
+	<string name="cart">
+		<text locale="de">Wagen</text>
+	</string>
+	<string name="cart_p">
+		<text locale="de">Wagen</text>
+	</string>
+	<string name="catapult">
+		<text locale="de">Katapult</text>
+	</string>
+	<string name="catapult_p">
+		<text locale="de">Katapulte</text>
+	</string>
+	<string name="sword">
+		<text locale="de">Schwert</text>
+	</string>
+	<string name="sword_p">
+		<text locale="de">Schwerter</text>
+	</string>
+	<string name="spear">
+		<text locale="de">Speer</text>
+	</string>
+	<string name="spear_p">
+		<text locale="de">Speere</text>
+	</string>
+	<string name="mallornspear">
+		<text locale="de">Mallornspeer</text>
+	</string>
+	<string name="mallornspear_p">
+		<text locale="de">Mallornspeere</text>
+	</string>
+	<string name="crossbow">
+		<text locale="de">Armbrust</text>
+	</string>
+	<string name="crossbow_p">
+		<text locale="de">Armbrüste</text>
+	</string>
+	<string name="mallorncrossbow">
+		<text locale="de">Mallornarmbrust</text>
+	</string>
+	<string name="mallorncrossbow_p">
+		<text locale="de">Mallornarmbrüste</text>
+	</string>
+	<string name="bow">
+		<text locale="de">Bogen</text>
+	</string>
+	<string name="bow_p">
+		<text locale="de">Bögen</text>
+	</string>
+	<string name="mallornbow">
+		<text locale="de">Mallornbogen</text>
+	</string>
+	<string name="mallornbow_p">
+		<text locale="de">Mallornbögen</text>
+	</string>
+	<comment>more items</comment>
+	<string name="chainmail">
+		<text locale="de">Kettenhemd</text>
+	</string>
+	<string name="chainmail_p">
+		<text locale="de">Kettenhemden</text>
+	</string>
+	<string name="plate">
+		<text locale="de">Plattenpanzer</text>
+	</string>
+	<string name="plate_p">
+		<text locale="de">Plattenpanzer</text>
+	</string>
+	<string name="balm">
+		<text locale="de">Balsam</text>
+	</string>
+	<string name="balm_p">
+		<text locale="de">Balsam</text>
+	</string>
+	<string name="spice">
+		<text locale="de">Gewürz</text>
+	</string>
+	<string name="spice_p">
+		<text locale="de">Gewürze</text>
+	</string>
+	<string name="jewel">
+		<text locale="de">Juwel</text>
+	</string>
+	<string name="jewel_p">
+		<text locale="de">Juwelen</text>
+	</string>
+	<string name="myrrh">
+		<text locale="de">Myrrhe</text>
+	</string>
+	<string name="myrrh_p">
+		<text locale="de">Myrrhe</text>
+	</string>
+	<string name="oil">
+		<text locale="de">Öl</text>
+	</string>
+	<string name="oil_p">
+		<text locale="de">Öl</text>
+	</string>
+	<string name="silk">
+		<text locale="de">Seide</text>
+	</string>
+	<string name="silk_p">
+		<text locale="de">Seide</text>
+	</string>
+	<string name="incense">
+		<text locale="de">Weihrauch</text>
+	</string>
+	<string name="incense_p">
+		<text locale="de">Weihrauch</text>
+	</string>
+	<string name="firesword">
+		<text locale="de">Flammenschwert</text>
+	</string>
+	<string name="firesword_p">
+		<text locale="de">Flammenschwerter</text>
+	</string>
+	<string name="shieldstone">
+		<text locale="de">Schildstein</text>
+	</string>
+	<string name="shieldstone_p">
+		<text locale="de">Schildsteine</text>
+	</string>
+	<string name="greatsword">
+		<text locale="de">Bihänder</text>
+	</string>
+	<string name="greatsword_p">
+		<text locale="de">Bihänder</text>
+	</string>
+	<string name="axe">
+		<text locale="de">Kriegsaxt</text>
+	</string>
+	<string name="axe_p">
+		<text locale="de">Kriegsäxte</text>
+	</string>
+	<string name="greatbow">
+		<text locale="de">Elfenbogen</text>
+	</string>
+	<string name="greatbow_p">
+		<text locale="de">Elfenbögen</text>
+	</string>
+	<string name="laensword">
+		<text locale="de">Laenschwert</text>
+	</string>
+	<string name="laensword_p">
+		<text locale="de">Laenschwerter</text>
+	</string>
+	<string name="laenshield">
+		<text locale="de">Laenschild</text>
+	</string>
+	<string name="laenshield_p">
+		<text locale="de">Laenschilde</text>
+	</string>
+	<string name="laenmail">
+		<text locale="de">Laenkettenhemd</text>
+	</string>
+	<string name="laenmail_p">
+		<text locale="de">Laenkettenhemden</text>
+	</string>
+	<string name="laen">
+		<text locale="de">Laen</text>
+	</string>
+	<string name="laen_p">
+		<text locale="de">Laen</text>
+	</string>
+	<string name="shield">
+		<text locale="de">Schild</text>
+	</string>
+	<string name="shield_p">
+		<text locale="de">Schilde</text>
+	</string>
+	<string name="halberd">
+		<text locale="de">Hellebarde</text>
+	</string>
+	<string name="halberd_p">
+		<text locale="de">Hellebarden</text>
+	</string>
+	<string name="lance">
+		<text locale="de">Lanze</text>
+	</string>
+	<string name="lance_p">
+		<text locale="de">Lanzen</text>
+	</string>
+	<string name="mallornlance">
+		<text locale="de">Mallornlanze</text>
+	</string>
+	<string name="mallornlance_p">
+		<text locale="de">Mallornlanzen</text>
+	</string>
+	<string name="mallorn">
+		<text locale="de">Mallorn</text>
+	</string>
+	<string name="mallorn_p">
+		<text locale="de">Mallorn</text>
+	</string>
+	<string name="cookie">
+		<text locale="de">Keks</text>
+	</string>
+	<string name="cookie_p">
+		<text locale="de">Kekse</text>
+	</string>
+	<string name="apple">
+		<text locale="de">Apfel</text>
+	</string>
+	<string name="apple_p">
+		<text locale="de">Äpfel</text>
+	</string>
+	<string name="nut">
+		<text locale="de">Nuß</text>
+	</string>
+	<string name="nut_p">
+		<text locale="de">Nüsse</text>
+	</string>
+	<string name="almond">
+		<text locale="de">Mandelkern</text>
+	</string>
+	<string name="almond_p">
+		<text locale="de">Mandelkerne</text>
+	</string>
+	<string name="dragonblood">
+		<text locale="de">Drachenblut</text>
+	</string>
+	<string name="dragonblood_p">
+		<text locale="de">Drachenblut</text>
+	</string>
+	<string name="fairyboot">
+		<text locale="de">Feenstiefel</text>
+	</string>
+	<string name="fairyboot_p">
+		<text locale="de">Feenstiefel</text>
+	</string>
+	<string name="healingpotion">
+		<text locale="de">Heiltrank</text>
+	</string>
+	<string name="healingpotion_p">
+		<text locale="de">Heiltränke</text>
+	</string>
+	<string name="antimagic">
+		<text locale="de">Antimagiekristall</text>
+	</string>
+	<string name="antimagic_p">
+		<text locale="de">Antimagiekristalle</text>
+	</string>
+	<string name="toadslime">
+		<text locale="de">Tiegel mit Krötenschleim</text>
+	</string>
+	<string name="toadslime_p">
+		<text locale="de">Tiegel mit Krötenschleim</text>
+	</string>
+	<string name="amulet">
+		<text locale="de">Amulett</text>
+	</string>
+	<string name="amulet_p">
+		<text locale="de">Amulette</text>
+	</string>
+	<string name="ao_daemon">
+		<text locale="de">Auge des Dämon</text>
+	</string>
+	<string name="ao_daemon_p">
+		<text locale="de">Augen des Dämon</text>
+	</string>
+	<string name="griphonwing">
+		<text locale="de">Schwinge des Greifen</text>
+	</string>
+	<string name="griphonwing_p">
+		<text locale="de">Schwingen des Greifen</text>
+	</string>
+	<string name="ao_chastity">
+		<text locale="de">Amulett der Keuschheit</text>
+	</string>
+	<string name="ao_chastity_p">
+		<text locale="de">Amulette der Keuschheit</text>
+	</string>
+	<string name="aoh">
+		<text locale="de">Amulett der Heilung</text>
+	</string>
+	<string name="aoh_p">
+		<text locale="de">Amulette der Heilung</text>
+	</string>
+	<string name="aog">
+		<text locale="de">Amulett des Treffens</text>
+	</string>
+	<string name="aog_p">
+		<text locale="de">Amulette des Treffens</text>
+	</string>
+	<string name="aots">
+		<text locale="de">Amulett des wahren Sehens</text>
+	</string>
+	<string name="aots_p">
+		<text locale="de">Amulette des wahren Sehens</text>
+	</string>
+	<string name="aoc">
+		<text locale="de">Katzenamulett</text>
+	</string>
+	<string name="aoc_p">
+		<text locale="de">Katzenamulette</text>
+	</string>
+	<string name="roi">
+		<text locale="de">Ring der Unsichtbarkeit</text>
+	</string>
+	<string name="roi_p">
+		<text locale="de">Ringe der Unsichtbarkeit</text>
+	</string>
+	<string name="rop">
+		<text locale="de">Ring der Macht</text>
+	</string>
+	<string name="rop_p">
+		<text locale="de">Ringe der Macht</text>
+	</string>
+	<string name="roqf">
+		<text locale="de">Ring der flinken Finger</text>
+	</string>
+	<string name="roqf_p">
+		<text locale="de">Ringe der flinken Finger</text>
+	</string>
+	<string name="horse">
+		<text locale="de">Pferd</text>
+	</string>
+	<string name="horse_p">
+		<text locale="de">Pferde</text>
+	</string>
+	<string name="magicherbbag">
+		<text locale="de">Magischer Kräuterbeutel</text>
+	</string>
+	<string name="magicherbbag_p">
+		<text locale="de">Magische Kräuterbeutel</text>
+	</string>
+	<string name="moneybag">
+		<text locale="de">Silberbeutel</text>
+	</string>
+	<string name="moneychest">
+		<text locale="de">Silberkassette</text>
+	</string>
+	<string name="dragonhoard">
+		<text locale="de">Drachenhort</text>
+	</string>
+	<string name="dragonhead">
+		<text locale="de">Drachenkopf</text>
+	</string>
+	<string name="dragonhead_p">
+		<text locale="de">Drachenköpfe</text>
+	</string>
+	<string name="eyeofdragon">
+		<text locale="de">Auge des Drachen</text>
+	</string>
+	<string name="eyeofdragon_p">
+		<text locale="de">Augen des Drachen</text>
+	</string>
+	<string name="rustysword">
+		<text locale="de">Schartiges Schwert</text>
+	</string>
+	<string name="rustysword_p">
+		<text locale="de">Schartige Schwerter</text>
+	</string>
+	<string name="rustyshield">
+		<text locale="de">Rostiges Schild</text>
+	</string>
+	<string name="rustyshield_p">
+		<text locale="de">Rostige Schilde</text>
+	</string>
+	<string name="rustychainmail">
+		<text locale="de">Rostiges Kettenhemd</text>
+	</string>
+	<string name="rustychainmail_p">
+		<text locale="de">Rostige Kettenhemden</text>
+	</string>
+	<string name="soc">
+		<text locale="de">Magischer Kräuterbeutel</text>
+	</string>
+	<string name="soc_p">
+		<text locale="de">Magische Kräuterbeutel</text>
+	</string>
+	<string name="ror">
+		<text locale="de">Ring der Regeneration</text>
+	</string>
+	<string name="ror_p">
+		<text locale="de">Ringe der Regeneration</text>
+	</string>
+	<string name="aod">
+		<text locale="de">Amulett der Dunkelheit</text>
+	</string>
+	<string name="aod_p">
+		<text locale="de">Amulette der Dunkelheit</text>
+	</string>
+	<string name="magicbag">
+		<text locale="de">Zauberbeutel</text>
+	</string>
+	<string name="magicbag_p">
+		<text locale="de">Zauberbeutel</text>
+	</string>
+	<string name="dreameye">
+		<text locale="de">Traumauge</text>
+	</string>
+	<string name="dreameye_p">
+		<text locale="de">Traumaugen</text>
+	</string>
+	<string name="seaserpenthead">
+		<text locale="de">Seeschlangenkopf</text>
+	</string>
+	<string name="seaserpenthead_p">
+		<text locale="de">Seeschlangenköpfe</text>
+	</string>
+	<string name="aurafocus">
+		<text locale="de">Aurafocus</text>
+	</string>
+	<string name="aurafocus_p">
+		<text locale="de">Aurafocuse</text>
+	</string>
+	<string name="presspass">
+		<text locale="de">Akkredition des Xontormia-Expreß</text>
+	</string>
+	<string name="presspass_p">
+		<text locale="de">Akkreditionen des Xontormia-Expreß</text>
+	</string>
+	<string name="trollbelt">
+		<text locale="de">Gürtel der Trollstärke</text>
+	</string>
+	<string name="trollbelt_p">
+		<text locale="de">Gürtel der Trollstärke</text>
+	</string>
+	<string name="elvenhorse">
+		<text locale="de">Elfenpferd</text>
+	</string>
+	<string name="elvenhorse_p">
+		<text locale="de">Elfenpferde</text>
+	</string>
+	<string name="pegasus">
+		<text locale="de">Pegasus</text>
+	</string>
+	<string name="pegasus_p">
+		<text locale="de">Pegasi</text>
+	</string>
+	<string name="dolphin">
+		<text locale="de">Delphin</text>
+	</string>
+	<string name="dolphin_p">
+		<text locale="de">Delphine</text>
+	</string>
+	<string name="museumticket">
+		<text locale="de">Eintrittskarte des Großen Museum</text>
+	</string>
+	<string name="museumticket_p">
+		<text locale="de">Eintrittskarten des Großen Museum</text>
+	</string>
+	<string name="museumexitticket">
+		<text locale="de">Rückkehrticket des Großen Museum</text>
+	</string>
+	<string name="museumexitticket_p">
+		<text locale="de">Rückkehrtickets des Großen Museum</text>
+	</string>
+	<string name="manacrystal">
+		<text locale="de">Astralkristall</text>
+	</string>
+	<string name="manacrystal_p">
+		<text locale="de">Astralkristalle</text>
+	</string>
+	<string name="skillpotion">
+		<text locale="de">Talenttrunk</text>
+	</string>
+	<string name="skillpotion_p">
+		<text locale="de">Talenttrünke</text>
+	</string>
+	<string name="seed">
+		<text locale="de">Same</text>
+	</string>
+	<string name="seed_p">
+		<text locale="de">Samen</text>
+	</string>
+	<string name="mallornseed">
+		<text locale="de">Mallornsame</text>
+	</string>
+	<string name="mallornseed_p">
+		<text locale="de">Mallornsamen</text>
+	</string>
+	<string name="birthday_firework">
+		<text locale="de">Feuerwerk</text>
+	</string>
+	<string name="birthday_firework_p">
+		<text locale="de">Feuerwerke</text>
+	</string>
+	<string name="lebkuchenherz">
+		<text locale="de">Lebkuchenherz mit der Aufschrift 'Erz und Stein, das ist fein'</text>
+	</string>
+	<string name="lebkuchenherz_p">
+		<text locale="de">Lebkuchenherzen mit der Aufschrift 'Erz und Stein, das ist fein'</text>
+	</string>
+
+	<comment>herb singular</comment>
+	<string name="h0">
+		<text locale="de">Flachwurz</text>
+	</string>
+	<string name="h1">
+		<text locale="de">Würziger Wagemut</text>
+	</string>
+	<string name="h2">
+		<text locale="de">Eulenauge</text>
+	</string>
+	<string name="h3">
+		<text locale="de">Grüner Spinnerich</text>
+	</string>
+	<string name="h4">
+		<text locale="de">Blauer Baumringel</text>
+	</string>
+	<string name="h5">
+		<text locale="de">Elfenlieb</text>
+	</string>
+	<string name="h6">
+		<text locale="de">Gurgelkraut</text>
+	</string>
+	<string name="h7">
+		<text locale="de">Knotiger Saugwurz</text>
+	</string>
+	<string name="h8">
+		<text locale="de">Blasenmorchel</text>
+	</string>
+	<string name="h9">
+		<text locale="de">Wasserfinder</text>
+	</string>
+	<string name="h10">
+		<text locale="de">Kakteenschwitz</text>
+	</string>
+	<string name="h11">
+		<text locale="de">Sandfäule</text>
+	</string>
+	<string name="h12">
+		<text locale="de">Windbeutel</text>
+	</string>
+	<string name="h13">
+		<text locale="de">Fjordwuchs</text>
+	</string>
+	<string name="h14">
+		<text locale="de">Alraune</text>
+	</string>
+	<string name="h15">
+		<text locale="de">Steinbeißer</text>
+	</string>
+	<string name="h16">
+		<text locale="de">Spaltwachs</text>
+	</string>
+	<string name="h17">
+		<text locale="de">Höhlenglimm</text>
+	</string>
+	<string name="h18">
+		<text locale="de">Eisblume</text>
+	</string>
+	<string name="h19">
+		<text locale="de">Weißer Wüterich</text>
+	</string>
+	<string name="h20">
+		<text locale="de">Schneekristall</text>
+	</string>
+
+	<comment>herb plural</comment>
+	<string name="h0_p">
+		<text locale="de">Flachwurz</text>
+	</string>
+	<string name="h1_p">
+		<text locale="de">Würzige Wagemut</text>
+	</string>
+	<string name="h2_p">
+		<text locale="de">Eulenaugen</text>
+	</string>
+	<string name="h3_p">
+		<text locale="de">Grüne Spinneriche</text>
+	</string>
+	<string name="h4_p">
+		<text locale="de">Blaue Baumringel</text>
+	</string>
+	<string name="h5_p">
+		<text locale="de">Elfenlieb</text>
+	</string>
+	<string name="h6_p">
+		<text locale="de">Gurgelkräuter</text>
+	</string>
+	<string name="h7_p">
+		<text locale="de">Knotige Saugwurze</text>
+	</string>
+	<string name="h8_p">
+		<text locale="de">Blasenmorcheln</text>
+	</string>
+	<string name="h9_p">
+		<text locale="de">Wasserfinder</text>
+	</string>
+	<string name="h10_p">
+		<text locale="de">Kakteenschwitze</text>
+	</string>
+	<string name="h11_p">
+		<text locale="de">Sandfäulen</text>
+	</string>
+	<string name="h12_p">
+		<text locale="de">Windbeutel</text>
+	</string>
+	<string name="h13_p">
+		<text locale="de">Fjordwuchse</text>
+	</string>
+	<string name="h14_p">
+		<text locale="de">Alraunen</text>
+	</string>
+	<string name="h15_p">
+		<text locale="de">Steinbeißer</text>
+	</string>
+	<string name="h16_p">
+		<text locale="de">Spaltwachse</text>
+	</string>
+	<string name="h17_p">
+		<text locale="de">Höhlenglimme</text>
+	</string>
+	<string name="h18_p">
+		<text locale="de">Eisblumen</text>
+	</string>
+	<string name="h19_p">
+		<text locale="de">Weiße Wüteriche</text>
+	</string>
+	<string name="h20_p">
+		<text locale="de">Schneekristalle</text>
+	</string>
+
+	<string name="p0">
+		<text locale="de">Siebenmeilentee</text>
+	</string>
+	<string name="p1">
+		<text locale="de">Goliathwasser</text>
+	</string>
+	<string name="p2">
+		<text locale="de">Wasser des Lebens</text>
+	</string>
+	<string name="p3">
+		<text locale="de">Schaffenstrunk</text>
+	</string>
+	<string name="p4">
+		<text locale="de">Wundsalbe</text>
+	</string>
+	<string name="p5">
+		<text locale="de">Bauernblut</text>
+	</string>
+	<string name="p6">
+		<text locale="de">Gehirnschmalz</text>
+	</string>
+	<string name="p7">
+		<text locale="de">Dumpfbackenbrot</text>
+	</string>
+	<string name="p8">
+		<text locale="de">Nestwärme</text>
+	</string>
+	<string name="p9">
+		<text locale="de">Pferdeglück</text>
+	</string>
+	<string name="p10">
+		<text locale="de">Berserkerblut</text>
+	</string>
+	<string name="p11">
+		<text locale="de">Bauernlieb</text>
+	</string>
+	<string name="p12">
+		<text locale="de">Trank der Wahrheit</text>
+	</string>
+	<string name="p13">
+		<text locale="de">Elixier der Macht</text>
+	</string>
+	<string name="p14">
+		<text locale="de">Heiltrank</text>
+	</string>
+
+	<string name="p0_p">
+		<text locale="de">Siebenmeilentees</text>
+	</string>
+	<string name="p1_p">
+		<text locale="de">Goliathwasser</text>
+	</string>
+	<string name="p2_p">
+		<text locale="de">Wasser des Lebens</text>
+	</string>
+	<string name="p3_p">
+		<text locale="de">Schaffenstrünke</text>
+	</string>
+	<string name="p4_p">
+		<text locale="de">Wundsalben</text>
+	</string>
+	<string name="p5_p">
+		<text locale="de">Bauernblut</text>
+	</string>
+	<string name="p6_p">
+		<text locale="de">Gehirnschmalz</text>
+	</string>
+	<string name="p7_p">
+		<text locale="de">Dumpfbackenbrote</text>
+	</string>
+	<string name="p8_p">
+		<text locale="de">Nestwärme</text>
+	</string>
+	<string name="p9_p">
+		<text locale="de">Pferdeglück</text>
+	</string>
+	<string name="p10_p">
+		<text locale="de">Berserkerblut</text>
+	</string>
+	<string name="p11_p">
+		<text locale="de">Bauernlieb</text>
+	</string>
+	<string name="p12_p">
+		<text locale="de">Tränke der Wahrheit</text>
+	</string>
+	<string name="p13_p">
+		<text locale="de">Elixiere der Macht</text>
+	</string>
+	<string name="p14_p">
+		<text locale="de">Heiltränke</text>
+	</string>
+
+	<comment>Spezialitems</comment>
+	<string name="lmsreward">
+		<text locale="de">Gürtel der Heldentaten</text>
+	</string>
+	<string name="lmsreward_p">
+		<text locale="de">Gürtel der Heldentaten</text>
+	</string>
+
+	<comment>Parameter</comment>
+	<string name="AGGRESSIV">
+		<text locale="de">AGGRESSIV</text>
+	</string>
+	<string name="ALLES">
+		<text locale="de">ALLES</text>
+	</string>
+	<string name="ANZAHL">
+		<text locale="de">ANZAHL</text>
+	</string>
+	<string name="AURA">
+		<text locale="de">AURA</text>
+	</string>
+	<string name="BAUERN">
+		<text locale="de">BAUERN</text>
+	</string>
+	<string name="BEISTAND">
+		<text locale="de">BEISTAND</text>
+	</string>
+	<string name="BEWACHE">
+		<text locale="de">BEWACHEN</text>
+	</string>
+	<string name="BURG">
+		<text locale="de">BURG</text>
+	</string>
+	<string name="DEFENSIV">
+		<text locale="de">DEFENSIV</text>
+	</string>
+	<string name="EINHEIT">
+		<text locale="de">EINHEIT</text>
+	</string>
+	<string name="ERESSEA">
+		<text locale="de">ERESSEA</text>
+	</string>
+	<string name="FLIEHE">
+		<text locale="de">FLIEHE</text>
+	</string>
+	<string name="FREMDES">
+		<text locale="de">FREMDES</text>
+	</string>
+	<string name="GEBÄUDE">
+		<text locale="de">GEBÄUDE</text>
+	</string>
+	<string name="GEGENSTÄNDE">
+		<text locale="de">GEGENSTÄNDE</text>
+	</string>
+	<string name="GIB">
+		<text locale="de">GIB</text>
+	</string>
+	<string name="GNADE">
+		<text locale="de">GNADE</text>
+	</string>
+	<string name="HELFE">
+		<text locale="de">HELFE</text>
+	</string>
+	<string name="HINTEN">
+		<text locale="de">HINTEN</text>
+	</string>
+	<string name="HINTER">
+		<text locale="de">HINTER</text>
+	</string>
+	<string name="KOMMANDO">
+		<text locale="de">KOMMANDO</text>
+	</string>
+	<string name="KRÄUTER">
+		<text locale="de">KRÄUTER</text>
+	</string>
+	<string name="KÄMPFE">
+		<text locale="de">KÄMPFE</text>
+	</string>
+	<string name="NICHT">
+		<text locale="de">NICHT</text>
+	</string>
+	<string name="NÄCHSTER">
+		<text locale="de">NÄCHSTER</text>
+	</string>
+	<string name="PARTEI">
+		<text locale="de">PARTEI</text>
+	</string>
+	<string name="PARTEITARNUNG">
+		<text locale="de">PARTEITARNUNG</text>
+	</string>
+	<string name="PAUSE">
+		<text locale="de">PAUSE</text>
+	</string>
+	<string name="PERSONEN">
+		<text locale="de">PERSONEN</text>
+	</string>
+	<string name="PRIVAT">
+		<text locale="de">PRIVAT</text>
+	</string>
+	<string name="REGION">
+		<text locale="de">REGION</text>
+	</string>
+	<string name="SCHIFF">
+		<text locale="de">SCHIFF</text>
+	</string>
+	<string name="SILBER">
+		<text locale="de">SILBER</text>
+	</string>
+	<string name="STRAßEN">
+		<text locale="de">STRAßEN</text>
+	</string>
+	<string name="STUFE">
+		<text locale="de">STUFE</text>
+	</string>
+	<string name="TEMPORÄRE">
+		<text locale="de">TEMPORÄRE</text>
+	</string>
+	<string name="TRÄNKE">
+		<text locale="de">TRÄNKE</text>
+	</string>
+	<string name="UM">
+		<text locale="de">UM</text>
+	</string>
+	<string name="VOR">
+		<text locale="de">VOR</text>
+	</string>
+	<string name="VORNE">
+		<text locale="de">VORNE</text>
+	</string>
+	<string name="ZAUBER">
+		<text locale="de">ZAUBER</text>
+	</string>
+
+	<comment>Talente:</comment>
+	<string name="sk_alchemy">
+		<text locale="de">Alchemie</text>
+	</string>
+	<string name="sk_crossbow">
+		<text locale="de">Armbrustschießen</text>
+	</string>
+	<string name="sk_stamina">
+		<text locale="de">Ausdauer</text>
+	</string>
+	<string name="sk_mining">
+		<text locale="de">Bergbau</text>
+	</string>
+	<string name="sk_bow">
+		<text locale="de">Bogenschießen</text>
+	</string>
+	<string name="sk_building">
+		<text locale="de">Burgenbau</text>
+	</string>
+	<string name="sk_trade">
+		<text locale="de">Handeln</text>
+	</string>
+	<string name="sk_melee">
+		<text locale="de">Hiebwaffen</text>
+	</string>
+	<string name="sk_forestry">
+		<text locale="de">Holzfällen</text>
+	</string>
+	<string name="sk_catapult">
+		<text locale="de">Katapultbedienung</text>
+	</string>
+	<string name="sk_herbalism">
+		<text locale="de">Kräuterkunde</text>
+	</string>
+	<string name="sk_magic">
+		<text locale="de">Magie</text>
+	</string>
+	<string name="sk_training">
+		<text locale="de">Pferdedressur</text>
+	</string>
+	<string name="sk_riding">
+		<text locale="de">Reiten</text>
+	</string>
+	<string name="sk_armorer">
+		<text locale="de">Rüstungsbau</text>
+	</string>
+	<string name="sk_shipcraft">
+		<text locale="de">Schiffbau</text>
+	</string>
+	<string name="sk_sailing">
+		<text locale="de">Segeln</text>
+	</string>
+	<string name="sk_espionage">
+		<text locale="de">Spionage</text>
+	</string>
+	<string name="sk_polearm">
+		<text locale="de">Stangenwaffen</text>
+	</string>
+	<string name="sk_quarrying">
+		<text locale="de">Steinbau</text>
+	</string>
+	<string name="sk_taxation">
+		<text locale="de">Steuereintreiben</text>
+	</string>
+	<string name="sk_roadwork">
+		<text locale="de">Straßenbau</text>
+	</string>
+	<string name="sk_tactics">
+		<text locale="de">Taktik</text>
+	</string>
+	<string name="sk_stealth">
+		<text locale="de">Tarnung</text>
+	</string>
+	<string name="sk_entertainment">
+		<text locale="de">Unterhaltung</text>
+	</string>
+	<string name="sk_weaponsmithing">
+		<text locale="de">Waffenbau</text>
+	</string>
+	<string name="sk_unarmed">
+		<text locale="de">Waffenloser Kampf</text>
+	</string>
+	<string name="sk_cartmaking">
+		<text locale="de">Wagenbau</text>
+	</string>
+	<string name="sk_perception">
+		<text locale="de">Wahrnehmung</text>
+	</string>
+
+	<comment>Befehle</comment>
+	<string name="//">
+		<text locale="de">//</text>
+	</string>
+	<string name="BANNER">
+		<text locale="de">BANNER</text>
+	</string>
+	<string name="ARBEITEN">
+		<text locale="de">ARBEITEN</text>
+	</string>
+	<string name="ATTACKIEREN">
+		<text locale="de">ATTACKIEREN</text>
+	</string>
+	<string name="BIETEN">
+		<text locale="de">BIETEN</text>
+	</string>
+	<string name="BEKLAUEN">
+		<text locale="de">BEKLAUEN</text>
+	</string>
+	<string name="BELAGERE">
+		<text locale="de">BELAGERE</text>
+	</string>
+	<string name="BENENNEN">
+		<text locale="de">BENENNEN</text>
+	</string>
+	<string name="BENUTZEN">
+		<text locale="de">BENUTZEN</text>
+	</string>
+	<string name="BESCHREIBE">
+		<text locale="de">BESCHREIBE</text>
+	</string>
+	<string name="BETRETEN">
+		<text locale="de">BETRETEN</text>
+	</string>
+	<string name="BEWACHEN">
+		<text locale="de">BEWACHEN</text>
+	</string>
+	<string name="BOTSCHAFT">
+		<text locale="de">BOTSCHAFT</text>
+	</string>
+	<string name="ENDE">
+		<text locale="de">ENDE</text>
+	</string>
+	<string name="FAHREN">
+		<text locale="de">FAHREN</text>
+	</string>
+	<string name="NUMMER">
+		<text locale="de">NUMMER</text>
+	</string>
+	<string name="FOLGEN">
+		<text locale="de">FOLGEN</text>
+	</string>
+	<string name="FORSCHEN">
+		<text locale="de">FORSCHEN</text>
+	</string>
+	<string name="HELFEN">
+		<text locale="de">HELFEN</text>
+	</string>
+	<string name="KÄMPFEN">
+		<text locale="de">KÄMPFEN</text>
+	</string>
+	<string name="KAMPFZAUBER">
+		<text locale="de">KAMPFZAUBER</text>
+	</string>
+	<string name="KAUFEN">
+		<text locale="de">KAUFEN</text>
+	</string>
+	<string name="KONTAKTIEREN">
+		<text locale="de">KONTAKTIEREN</text>
+	</string>
+	<string name="LEHREN">
+		<text locale="de">LEHREN</text>
+	</string>
+	<string name="LERNEN">
+		<text locale="de">LERNEN</text>
+	</string>
+	<string name="LIEFERE">
+		<text locale="de">LIEFERE</text>
+	</string>
+	<string name="MACHEN">
+		<text locale="de">MACHEN</text>
+	</string>
+	<string name="NACH">
+		<text locale="de">NACH</text>
+	</string>
+	<string name="PFLANZEN">
+		<text locale="de">PFLANZEN</text>
+	</string>
+	<string name="PRÄFIX">
+		<text locale="de">PRÄFIX</text>
+	</string>
+	<string name="SYNONYM">
+		<text locale="de">SYNONYM</text>
+	</string>
+	<string name="INFO">
+		<text locale="de">INFO</text>
+	</string>
+	<string name="PASSWORT">
+		<text locale="de">PASSWORT</text>
+	</string>
+	<string name="REKRUTIEREN">
+		<text locale="de">REKRUTIEREN</text>
+	</string>
+	<string name="RESERVIEREN">
+		<text locale="de">RESERVIEREN</text>
+	</string>
+	<string name="ROUTE">
+		<text locale="de">ROUTE</text>
+	</string>
+	<string name="SABOTIEREN">
+		<text locale="de">SABOTIEREN</text>
+	</string>
+	<string name="OPTION">
+		<text locale="de">OPTION</text>
+	</string>
+	<string name="SPIONIEREN">
+		<text locale="de">SPIONIEREN</text>
+	</string>
+	<string name="STIRB">
+		<text locale="de">STIRB</text>
+	</string>
+	<string name="TARNEN">
+		<text locale="de">TARNEN</text>
+	</string>
+	<string name="TRANSPORTIEREN">
+		<text locale="de">TRANSPORTIEREN</text>
+	</string>
+	<string name="TREIBEN">
+		<text locale="de">TREIBEN</text>
+	</string>
+	<string name="UNTERHALTEN">
+		<text locale="de">UNTERHALTEN</text>
+	</string>
+	<string name="VERKAUFEN">
+		<text locale="de">VERKAUFEN</text>
+	</string>
+	<string name="VERLASSEN">
+		<text locale="de">VERLASSEN</text>
+	</string>
+	<string name="VERGESSEN">
+		<text locale="de">VERGESSEN</text>
+	</string>
+	<string name="ZAUBERE">
+		<text locale="de">ZAUBERE</text>
+	</string>
+	<string name="ZEIGEN">
+		<text locale="de">ZEIGEN</text>
+	</string>
+	<string name="ZERSTÖREN">
+		<text locale="de">ZERSTÖREN</text>
+	</string>
+	<string name="ZÜCHTEN">
+		<text locale="de">ZÜCHTEN</text>
+	</string>
+	<string name="DEFAULT">
+		<text locale="de">DEFAULT</text>
+	</string>
+	<string name="REPORT">
+		<text locale="de">REPORT</text>
+	</string>
+	<string name="URSPRUNG">
+		<text locale="de">URSPRUNG</text>
+	</string>
+	<string name="EMAIL">
+		<text locale="de">EMAIL</text>
+	</string>
+	<string name="MEINUNG">
+		<text locale="de">MEINUNG</text>
+	</string>
+	<string name="MAGIEGEBIET">
+		<text locale="de">MAGIEGEBIET</text>
+	</string>
+	<string name="PIRATERIE">
+		<text locale="de">PIRATERIE</text>
+	</string>
+	<string name="LOCALE">
+		<text locale="de">LOCALE</text>
+	</string>
+	<string name="NEUSTART">
+		<text locale="de">NEUSTART</text>
+	</string>
+	<string name="GRUPPE">
+		<text locale="de">GRUPPE</text>
+	</string>
+	<string name="OPFERE">
+		<text locale="de">OPFERE</text>
+	</string>
+	<string name="BETEN">
+		<text locale="de">BETEN</text>
+	</string>
+	<string name="SORTIEREN">
+		<text locale="de">SORTIEREN</text>
+	</string>
+	<string name="JIHAD">
+		<text locale="de">JIHAD</text>
+	</string>
+	<string name="GM">
+		<text locale="de">GM</text>
+	</string>
+
+
+	<string name="Adler">
+		<text locale="de">Adler</text>
+	</string>
+	<string name="Drache">
+		<text locale="de">Drache</text>
+	</string>
+	<string name="Drachen">
+		<text locale="de">Drachen</text>
+	</string>
+	<string name="Dämon">
+		<text locale="de">Dämon</text>
+	</string>
+	<string name="Dämonen">
+		<text locale="de">Dämonen</text>
+	</string>
+	<string name="Einhorn">
+		<text locale="de">Einhorn</text>
+	</string>
+	<string name="Einhörner">
+		<text locale="de">Einhörner</text>
+	</string>
+	<string name="Elf">
+		<text locale="de">Elf</text>
+	</string>
+	<string name="Elfen">
+		<text locale="de">Elfen</text>
+	</string>
+	<string name="Eule">
+		<text locale="de">Eule</text>
+	</string>
+	<string name="Eulen">
+		<text locale="de">Eulen</text>
+	</string>
+	<string name="Geist">
+		<text locale="de">Geist</text>
+	</string>
+	<string name="Geister">
+		<text locale="de">Geister</text>
+	</string>
+	<string name="Goblin">
+		<text locale="de">Goblin</text>
+	</string>
+	<string name="Goblins">
+		<text locale="de">Goblins</text>
+	</string>
+	<string name="Halbling">
+		<text locale="de">Halbling</text>
+	</string>
+	<string name="Halblinge">
+		<text locale="de">Halblinge</text>
+	</string>
+	<string name="Hirntöter">
+		<text locale="de">Hirntöter</text>
+	</string>
+	<string name="Insekt">
+		<text locale="de">Insekt</text>
+	</string>
+	<string name="Insekten">
+		<text locale="de">Insekten</text>
+	</string>
+	<string name="Jungdrache">
+		<text locale="de">Jungdrache</text>
+	</string>
+	<string name="Jungdrachen">
+		<text locale="de">Jungdrachen</text>
+	</string>
+	<string name="Katze">
+		<text locale="de">Katze</text>
+	</string>
+	<string name="Katzen">
+		<text locale="de">Katzen</text>
+	</string>
+	<string name="Luchs">
+		<text locale="de">Luchs</text>
+	</string>
+	<string name="Luchse">
+		<text locale="de">Luchse</text>
+	</string>
+	<string name="Meermensch">
+		<text locale="de">Meermensch</text>
+	</string>
+	<string name="Meermenschen">
+		<text locale="de">Meermenschen</text>
+	</string>
+	<string name="Mensch">
+		<text locale="de">Mensch</text>
+	</string>
+	<string name="Menschen">
+		<text locale="de">Menschen</text>
+	</string>
+	<string name="Ork">
+		<text locale="de">Ork</text>
+	</string>
+	<string name="Orks">
+		<text locale="de">Orks</text>
+	</string>
+	<string name="Riesenschildkröte">
+		<text locale="de">Riesenschildkröte</text>
+	</string>
+	<string name="Riesenschildkröten">
+		<text locale="de">Riesenschildkröten</text>
+	</string>
+	<string name="Schablone">
+		<text locale="de">Schablone</text>
+	</string>
+	<string name="Schablonen">
+		<text locale="de">Schablonen</text>
+	</string>
+	<string name="Schattenritter">
+		<text locale="de">Schattenritter</text>
+	</string>
+	<string name="Seeschlange">
+		<text locale="de">Seeschlange</text>
+	</string>
+	<string name="Troll">
+		<text locale="de">Troll</text>
+	</string>
+	<string name="Trolle">
+		<text locale="de">Trolle</text>
+	</string>
+	<string name="Untote">
+		<text locale="de">Untote</text>
+	</string>
+	<string name="Untoter">
+		<text locale="de">Untoter</text>
+	</string>
+	<string name="Warg">
+		<text locale="de">Warg</text>
+	</string>
+	<string name="Warge">
+		<text locale="de">Warge</text>
+	</string>
+	<string name="Zombie">
+		<text locale="de">Zombie</text>
+	</string>
+	<string name="Zombies">
+		<text locale="de">Zombies</text>
+	</string>
+	<string name="Zwerg">
+		<text locale="de">Zwerg</text>
+	</string>
+	<string name="Zwerge">
+		<text locale="de">Zwerge</text>
+	</string>
+
+	<comment>races, future use:</comment>
+	<string name="rc_lynx">
+		<text locale="de">Luchse</text>
+	</string>
+	<string name="rc_unicorn_p">
+		<text locale="de">Einhörner</text>
+	</string>
+	<string name="rc_wolve_p">
+		<text locale="de">Warge</text>
+	</string>
+	<string name="rc_dragon_p">
+		<text locale="de">Drachen</text>
+	</string>
+	<string name="rc_catdragon_p">
+		<text locale="de">Katzendrachen</text>
+	</string>
+	<string name="rc_ghost_p">
+		<text locale="de">Geister</text>
+	</string>
+	<string name="rc_cat_p">
+		<text locale="de">Katzen</text>
+	</string>
+	<string name="rc_human_p">
+		<text locale="de">Menschen</text>
+	</string>
+	<string name="rc_cat">
+		<text locale="de">Katze</text>
+	</string>
+	<string name="rc_elf">
+		<text locale="de">Elf</text>
+	</string>
+	<string name="rc_human">
+		<text locale="de">Mensch</text>
+	</string>
+	<string name="rc_elve_p">
+		<text locale="de">Elfen</text>
+	</string>
+	<string name="rc_aquarian">
+		<text locale="de">Meermensch</text>
+	</string>
+	<string name="rc_dwarve_p">
+		<text locale="de">Zwerge</text>
+	</string>
+	<string name="rc_lynx_p">
+		<text locale="de">Luchs</text>
+	</string>
+	<string name="rc_unicorn">
+		<text locale="de">Einhorn</text>
+	</string>
+	<string name="rc_wolf">
+		<text locale="de">Warg</text>
+	</string>
+	<string name="rc_dragon">
+		<text locale="de">Drache</text>
+	</string>
+	<string name="rc_catdragon">
+		<text locale="de">Katzendrache</text>
+	</string>
+	<string name="rc_dwarf">
+		<text locale="de">Zwerg</text>
+	</string>
+	<string name="rc_aquarian_p">
+		<text locale="de">Meermenschen</text>
+	</string>
+	<string name="rc_insect_p">
+		<text locale="de">Insekten</text>
+	</string>
+	<string name="rc_insect">
+		<text locale="de">Insekt</text>
+	</string>
+	<string name="rc_ghost">
+		<text locale="de">Geist</text>
+	</string>
+	<string name="rc_halfling">
+		<text locale="de">Halbling</text>
+	</string>
+	<string name="rc_halfling_p">
+		<text locale="de">Halblinge</text>
+	</string>
+	<string name="rc_troll_p">
+		<text locale="de">Trolle</text>
+	</string>
+	<string name="rc_troll">
+		<text locale="de">Troll</text>
+	</string>
+	<string name="rc_undead">
+		<text locale="de">Untote</text>
+	</string>
+	<string name="rc_undead_p">
+		<text locale="de">Untoter</text>
+	</string>
+	<string name="rc_owl">
+		<text locale="de">Eule</text>
+	</string>
+	<string name="rc_giantturtle">
+		<text locale="de">Riesenschildkröte</text>
+	</string>
+	<string name="rc_orc_p">
+		<text locale="de">Orks</text>
+	</string>
+	<string name="rc_orc">
+		<text locale="de">Ork</text>
+	</string>
+	<string name="rc_zombie">
+		<text locale="de">Zombie</text>
+	</string>
+	<string name="rc_zombie_p">
+		<text locale="de">Zombies</text>
+	</string>
+	<string name="rc_shadowknight">
+		<text locale="de">Schattenritter</text>
+	</string>
+
+
+	<comment>NR generieren</comment>
+	<string name="nr_options">
+		<text locale="de">Optionen</text>
+	</string>
+	<string name="nr_level">
+		<text locale="de">Stufe</text>
+	</string>
+	<string name="nr_alliances">
+		<text locale="de">Aktueller Status</text>
+	</string>
+	<string name="nr_herbsrequired">
+		<text locale="de">Benötigte Kräuter</text>
+	</string>
+	<string name="nr_undercons">
+		<text locale="de">im Bau</text>
+	</string>
+	<string name="nr_damaged">
+		<text locale="de">beschädigt</text>
+	</string>
+	<string name="nr_youaredead">
+		<text locale="de">Unglücklicherweise wurde deine Partei ausgelöscht. Du kannst gerne an einer anderen Stelle wieder einsteigen. Melde Dich einfach wieder an.</text>
+	</string>
+	<string name="nr_skills">
+		<text locale="de">Talente</text>
+	</string>
+	<string name="nr_inventory">
+		<text locale="de">hat</text>
+	</string>
+	<string name="nr_size">
+		<text locale="de">Größe</text>
+	</string>
+	<string name="nr_spells">
+		<text locale="de">Zauber</text>
+	</string>
+	<string name="nr_combatspells">
+		<text locale="de">Kampfzauber</text>
+	</string>
+	<string name="nr_nospells">
+		<text locale="de">keiner</text>
+	</string>
+	<string name="nr_addresses">
+		<text locale="de">Liste aller Adressen</text>
+	</string>
+	<string name="anonymous">
+		<text locale="de">anonym</text>
+	</string>
+	<string name="b_attacke">
+		<text locale="de">Angriff</text>
+	</string>
+	<string name="b_defense">
+		<text locale="de">Verteidigung</text>
+	</string>
+	<string name="b_armor">
+		<text locale="de">Rüstung</text>
+	</string>
+	<string name="b_damage">
+		<text locale="de">Schaden</text>
+	</string>
+
+
+	<comment>report newbie info</comment>
+	<string name="nr_nmr">
+		<text locale="de">Deine Partei hat letzte Runde keinen Zug abgegeben!</text>
+	</string>
+
 	<namespace name="info">
 		<string name="mistletoe">
 			<text locale="de">Im Mistelzweig ruht eine magische Kraft

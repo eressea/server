@@ -596,6 +596,7 @@ main(int argc, char *argv[])
 		region **rp = &regions;
 
 		if ((i=readgame(false))!=0) return i;
+
 		lostf = findfaction(insertfaction);
 		lostf->lastorders = turn;
 		lostf->allies = NULL;
@@ -707,6 +708,7 @@ main(int argc, char *argv[])
 		return 0;
 	}
 	if ((i=readgame(false))!=0) return i;
+	make_dungeon(5, 5, NULL, NULL);
 	writepasswd();
 	if (g_killeiswald) {
 		region * r = findregion(0, 25);

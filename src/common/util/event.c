@@ -17,7 +17,6 @@
 
 /* util includes */
 #include "attrib.h"
-#include "resolve.h"
 
 /* libc includes */
 #include <assert.h>

@@ -22,15 +22,25 @@
 #include <string.h>
 #include <ctype.h>
 
+typedef struct xml_hierarchy {
+	const char * name;
+	unsigned int flags;
+	struct xml_callbacks * functions;
+	struct xml_hierarchy * next;
+	struct xml_hierarchy * children;
+	struct xml_hierarchy * parent;
+} xml_hierarchy;
+
 static int 
-__cberror(struct xml_stack * stack, const char* parsed, unsigned int line, int error, void *data)
+__cberror(struct xml_stack * stack, const char* parsed, unsigned int line, int error)
 {
 	struct xml_stack * s = stack;
-	unused(data);
-	log_printf("Error #%d in line %u while parsing \"%s\"\nXML stacktrace:\n", error, line, parsed);
+	log_error(("Error #%d in line %u while parsing \"%s\"\n", error, line, parsed));
 
+	log_printf("XML stacktrace:\n");
 	while (s) {
-		log_printf("\t%s\n", s->tag->name);
+		if (s->tag && s->tag->name) log_printf("\t%s\n", s->tag->name);
+		else log_printf("\t<unknown>\n");
 		s = s->next;
 	}
 	return error;
@@ -45,12 +55,16 @@ make_tag(const char * name)
 }
 
 static void
-push_tag(xml_stack ** ostack, xml_tag * tag, FILE * stream)
+push_tag(xml_stack ** ostack, xml_tag * tag)
 {
 	xml_stack * stack = calloc(sizeof(xml_stack), 1);
 	stack->next = *ostack;
-	stack->stream = stream;
 	stack->tag = tag;
+	if (*ostack) {
+		stack->stream = (*ostack)->stream;
+		stack->callbacks = (*ostack)->callbacks;
+		stack->state = (*ostack)->state;
+	}
 	*ostack = stack;
 }
 
@@ -93,9 +107,60 @@ pop_tag(xml_stack ** ostack)
 	return tag;
 }
 
-int
-xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * stack)
+static xml_hierarchy * callbacks;
+
+void 
+xml_register(struct xml_callbacks * cb, const char * path, unsigned int flags)
 {
+	xml_hierarchy ** node=&callbacks;
+	xml_hierarchy * parent = NULL;
+	size_t len = strlen(path);
+
+	for (;;) {
+		const char * nextspace = path;
+		while (*nextspace && !isspace(*nextspace)) ++nextspace;
+		if (*nextspace == '\0') {
+			/* advance to the last child: */
+			while (*node && strcmp((*node)->name, path)!=0) node=&(*node)->next;
+			if (*node == NULL) {
+				*node = calloc(sizeof(xml_hierarchy), 1);
+				(*node)->name = strdup(path);
+				(*node)->parent = parent;
+			} 
+			(*node)->flags = flags;
+			(*node)->functions = cb;
+			break;
+		} else {
+			size_t lpath = nextspace-path;
+			if (*node == NULL) {
+				/* adding path into graph */
+				*node = calloc(sizeof(xml_hierarchy), 1);
+				(*node)->name = strncpy(calloc(sizeof(char), 1+lpath), path, lpath);
+				(*node)->parent = parent;
+				(*node)->functions = NULL;
+				path = nextspace+1;
+				while (isspace(*path)) ++path;
+				assert(*path || !"trailing blanks in path");
+				parent = *node;
+				node=&parent->children;
+			} else if (strlen((*node)->name)==lpath && strncmp((*node)->name, path, lpath)==0) {
+				path = nextspace+1;
+				while (isspace(*path)) ++path;
+				assert(*path || !"trailing blanks in path");
+				parent = *node;
+				node=&parent->children;
+			} else {
+				node=&(*node)->next;
+				break;
+			}
+		}
+	}
+}
+
+static int
+xml_parse(xml_stack * stack)
+{
+	FILE * stream = stack->stream;
 	xml_stack * start = stack;
 	enum { TAG, ENDTAG, ATNAME, ATVALUE, PLAIN } state = PLAIN;
 	boolean startline = true;
@@ -105,12 +170,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 	unsigned int line = 0;
 	xml_tag * tag = NULL;
 	xml_attrib * attrib = NULL;
-	int (*cb_error)(struct xml_stack*, const char*, unsigned int, int, void*) = __cberror;
-	if (cb && cb->error) cb_error = cb->error;
-
-	if (stack && cb->tagbegin) {
-		cb->tagbegin(stack, data);
-	}
+	int (*cb_error)(struct xml_stack*, const char*, unsigned int, int) = __cberror;
 
 	for (;;) {
 		int reparse;
@@ -119,12 +179,15 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 			++line;
 		} else if (c==EOF) {
 			if (state==PLAIN) {
+				const xml_hierarchy * cb = stack->callbacks;
 				*pos='\0';
-				if (cb && cb->plaintext && pos!=tokbuffer) cb->plaintext(stack, tokbuffer, data);
+				if (cb && cb->functions->plaintext && pos!=tokbuffer) {
+					cb->functions->plaintext(stack, tokbuffer);
+				}
 				break;
 			} else {
 				*pos='\0';
-				return cb_error(stack, tokbuffer, line, XML_BROKENSTREAM, data);
+				return cb_error(stack, tokbuffer, line, XML_BROKENSTREAM);
 			}
 		}
 		do {
@@ -134,14 +197,14 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 				switch (c) {
 				case '<':
 					*pos='\0';
-					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
+					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
 				case '"':
 					quoted = !quoted;
 					break;
 				case '>':
 					if (quoted) {
 						*pos='\0';
-						return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
+						return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
 					}
 					state = TAG;
 					/* intentional fallthrough */
@@ -172,7 +235,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 				case '"':
 				case '/':
 					*pos='\0';
-					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
+					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
 				default:
 					if (isspace(c) || c == '>') {
 						*pos++='\0';
@@ -189,9 +252,12 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 			case PLAIN:
 				switch (c) {
 				case '<':
-					if (cb && cb->plaintext && pos!=tokbuffer) {
-						*pos = '\0';
-						cb->plaintext(stack, tokbuffer, data);
+					if (pos!=tokbuffer) {
+						const xml_hierarchy * cb = stack->callbacks;
+						if (cb && cb->functions->plaintext) {
+							*pos = '\0';
+							cb->functions->plaintext(stack, tokbuffer);
+						}
 					}
 					state = TAG;
 					tag = NULL;
@@ -199,7 +265,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 					break;
 				case '>':
 					*pos='\0';
-					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
+					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
 				case '\n':
 					/* ignore */
 					if (!startline) *pos++ = ' ';
@@ -222,15 +288,27 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 					if (pos==tokbuffer) state = ENDTAG;
 					else {
 						*pos='\0';
-						return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
+						return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
 					}
 					break;
 				case '>':
 					if (tag==NULL) {
 						*pos='\0';
-						push_tag(&stack, make_tag(tokbuffer), stream);
+						push_tag(&stack, tag = make_tag(tokbuffer));
 					}
-					if (cb && cb->tagbegin) cb->tagbegin(stack, data);
+					{
+						const xml_hierarchy * cnext = stack->callbacks?stack->callbacks->children:callbacks;
+						while (cnext && strcmp(cnext->name, tag->name)!=0) cnext=cnext->next;
+						if (cnext==NULL) {
+							/* unknown tag. assume same handler again: */
+							cnext = stack->callbacks;
+						} else if ((cnext->flags & XML_CB_IGNORE) == 0) {
+							stack->callbacks = cnext;
+						}
+						if (cnext->functions->tagbegin) {
+							cnext->functions->tagbegin(stack);
+						}
+					}
 					state = PLAIN;
 					startline = true;
 					pos = tokbuffer;
@@ -239,7 +317,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 					if (isspace(c)) {
 						if (tag==NULL) {
 							*pos='\0';
-							push_tag(&stack, tag = make_tag(tokbuffer), stream);
+							push_tag(&stack, tag = make_tag(tokbuffer));
 							state = ATNAME;
 							pos = tokbuffer;
 						}
@@ -257,13 +335,34 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 				switch (c) {
 				case '>':
 					*pos = '\0';
-					while (stack && strcmp(stack->tag->name, tokbuffer)!=0) free_tag(pop_tag(&stack));
-					if (stack==NULL) return cb_error(stack, tokbuffer, line, XML_NESTINGERROR, data);
-					if (cb && cb->tagend) cb->tagend(stack, data);
+					/* might be an unknown tag: */
+					if (stack->callbacks) {
+						/*  && strcmp(stack->callbacks->name, stack->tag->name)==0 */
+						const xml_hierarchy * cb = stack->callbacks;
+						if (strcmp(stack->tag->name, tokbuffer)!=0) {
+							xml_stack * top = stack;
+							cb_error(stack, tokbuffer, line, XML_NESTINGERROR);
+							while (top && strcmp(top->tag->name, tokbuffer)!=0) top = top->next;
+							if (top==NULL) return XML_NESTINGERROR;
+							while (stack && stack!=top) {
+								if (cb->functions->tagend) {
+									cb->functions->tagend(stack);
+								}
+								free_tag(pop_tag(&stack));
+								cb = stack->callbacks;
+							}
+						}
+						if (cb->functions->tagend) {
+							cb->functions->tagend(stack);
+						}
+						cb = cb->parent;
+					}
+					if (strcmp(stack->tag->name, tokbuffer)!=0) {
+						return XML_NESTINGERROR;
+					}
+					free_tag(pop_tag(&stack));
 					if (stack==start) {
 						return XML_OK;
-					} else {
-						free_tag(pop_tag(&stack));
 					}
 					state = PLAIN;
 					pos = tokbuffer;
@@ -273,7 +372,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 				case '=':
 				case '/':
 					*pos='\0';
-					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
+					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
 				default:
 					*pos++ = (char)c;
 				}
@@ -282,6 +381,25 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 		} while (reparse);
 	}  /* for(;;) */
 	return XML_OK; /* SUCCESS */
+}
+
+int
+xml_read(FILE * stream, xml_stack * stack)
+{
+	xml_stack root;
+	FILE * save;
+	if (!stack) {
+		stack = &root;
+		memset(stack, 0, sizeof(xml_stack));
+	}
+	save = stack->stream;
+	stack->stream = stream;
+	while (!feof(stream)) {
+		int i = xml_parse(stack);
+		if (i!=0) return i;
+	}
+	stack->stream = save;
+	return XML_OK;
 }
 
 const char * 

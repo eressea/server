@@ -606,168 +606,181 @@ typedef struct xml_state {
 } xml_state;
 
 static int 
-tagbegin(struct xml_stack * stack, void * data)
+tagbegin(struct xml_stack * stack)
 {
-	xml_state * state = (xml_state*)data;
 	const xml_tag * tag = stack->tag;
 	if (strcmp(tag->name, "races")==0) {
-		memset(state, 0, sizeof(xml_state));
-	} else if (strcmp(tag->name, "race")==0) {
-		const char * zName = xml_value(tag, "name");
-		race * rc;
-		
-		state->nextattack = 0;
-		state->nextfamiliar = 0;
+		stack->state = calloc(sizeof(xml_state), 1);
+	} else {
+		xml_state * state = (xml_state*)stack->state;
+		if (strcmp(tag->name, "race")==0) {
+			const char * zName = xml_value(tag, "name");
+			race * rc;
+			
+			state->nextattack = 0;
+			state->nextfamiliar = 0;
 
-		if (zName) {
-			rc = rc_find(zName);
-			if (rc==NULL) {
-				rc = rc_add(rc_new(zName));
+			if (zName) {
+				rc = rc_find(zName);
+				if (rc==NULL) {
+					rc = rc_add(rc_new(zName));
+				}
+			} else {
+				log_error(("missing required tag 'name'\n"));
+				return XML_USERERROR;
 			}
-		} else {
-			log_error(("missing required tag 'name'\n"));
-			return XML_USERERROR;
-		}
-		rc->magres = xml_fvalue(tag, "magres");
-		rc->maxaura = xml_fvalue(tag, "maxaura");
-		rc->regaura = xml_fvalue(tag, "regaura");
-		rc->recruitcost = xml_ivalue(tag, "recruitcost");
-		rc->maintenance = xml_ivalue(tag, "maintenance");
-		rc->weight = xml_ivalue(tag, "weight");
-		rc->speed = xml_fvalue(tag, "speed");
-		rc->hitpoints = xml_ivalue(tag, "hp");
-		rc->def_damage = strdup(xml_value(tag, "damage"));
-		rc->armor = (char)xml_ivalue(tag, "ac");
+			rc->magres = xml_fvalue(tag, "magres");
+			rc->maxaura = xml_fvalue(tag, "maxaura");
+			rc->regaura = xml_fvalue(tag, "regaura");
+			rc->recruitcost = xml_ivalue(tag, "recruitcost");
+			rc->maintenance = xml_ivalue(tag, "maintenance");
+			rc->weight = xml_ivalue(tag, "weight");
+			rc->speed = xml_fvalue(tag, "speed");
+			rc->hitpoints = xml_ivalue(tag, "hp");
+			rc->def_damage = strdup(xml_value(tag, "damage"));
+			rc->armor = (char)xml_ivalue(tag, "ac");
 
-		rc->at_default = (char)xml_ivalue(tag, "unarmedattack");
-		rc->df_default = (char)xml_ivalue(tag, "unarmeddefense");
-		rc->at_bonus = (char)xml_ivalue(tag, "attackmodifier");
-		rc->df_bonus = (char)xml_ivalue(tag, "defensemodifier");
+			rc->at_default = (char)xml_ivalue(tag, "unarmedattack");
+			rc->df_default = (char)xml_ivalue(tag, "unarmeddefense");
+			rc->at_bonus = (char)xml_ivalue(tag, "attackmodifier");
+			rc->df_bonus = (char)xml_ivalue(tag, "defensemodifier");
 
-		if (xml_bvalue(tag, "playerrace")) rc->flags |= RCF_PLAYERRACE;
-		if (xml_bvalue(tag, "scarepeasants")) rc->flags |= RCF_SCAREPEASANTS;
-		if (xml_bvalue(tag, "cannotmove")) rc->flags |= RCF_CANNOTMOVE;
-		if (xml_bvalue(tag, "fly")) rc->flags |= RCF_FLY;
-		if (xml_bvalue(tag, "swim")) rc->flags |= RCF_SWIM;
-		if (xml_bvalue(tag, "walk")) rc->flags |= RCF_WALK;
-		if (xml_bvalue(tag, "nolearn")) rc->flags |= RCF_NOLEARN;
-		if (xml_bvalue(tag, "noteach")) rc->flags |= RCF_NOTEACH;
-		if (xml_bvalue(tag, "horse")) rc->flags |= RCF_HORSE;
-		if (xml_bvalue(tag, "desert")) rc->flags |= RCF_DESERT;
-		if (xml_bvalue(tag, "absorbpeasants")) rc->flags |= RCF_ABSORBPEASANTS;
-		if (xml_bvalue(tag, "noheal")) rc->flags |= RCF_NOHEAL;
-		if (xml_bvalue(tag, "noweapons")) rc->flags |= RCF_NOWEAPONS;
-		if (xml_bvalue(tag, "shapeshift")) rc->flags |= RCF_SHAPESHIFT;
-		if (xml_bvalue(tag, "shapeshiftany")) rc->flags |= RCF_SHAPESHIFTANY;
-		if (xml_bvalue(tag, "illusionary")) rc->flags |= RCF_ILLUSIONARY;
-		if (xml_bvalue(tag, "undead")) rc->flags |= RCF_UNDEAD;
+			if (xml_bvalue(tag, "playerrace")) rc->flags |= RCF_PLAYERRACE;
+			if (xml_bvalue(tag, "scarepeasants")) rc->flags |= RCF_SCAREPEASANTS;
+			if (xml_bvalue(tag, "cannotmove")) rc->flags |= RCF_CANNOTMOVE;
+			if (xml_bvalue(tag, "fly")) rc->flags |= RCF_FLY;
+			if (xml_bvalue(tag, "swim")) rc->flags |= RCF_SWIM;
+			if (xml_bvalue(tag, "walk")) rc->flags |= RCF_WALK;
+			if (xml_bvalue(tag, "nolearn")) rc->flags |= RCF_NOLEARN;
+			if (xml_bvalue(tag, "noteach")) rc->flags |= RCF_NOTEACH;
+			if (xml_bvalue(tag, "horse")) rc->flags |= RCF_HORSE;
+			if (xml_bvalue(tag, "desert")) rc->flags |= RCF_DESERT;
+			if (xml_bvalue(tag, "absorbpeasants")) rc->flags |= RCF_ABSORBPEASANTS;
+			if (xml_bvalue(tag, "noheal")) rc->flags |= RCF_NOHEAL;
+			if (xml_bvalue(tag, "noweapons")) rc->flags |= RCF_NOWEAPONS;
+			if (xml_bvalue(tag, "shapeshift")) rc->flags |= RCF_SHAPESHIFT;
+			if (xml_bvalue(tag, "shapeshiftany")) rc->flags |= RCF_SHAPESHIFTANY;
+			if (xml_bvalue(tag, "illusionary")) rc->flags |= RCF_ILLUSIONARY;
+			if (xml_bvalue(tag, "undead")) rc->flags |= RCF_UNDEAD;
 
-		if (xml_bvalue(tag, "nogive")) rc->ec_flags |= NOGIVE;
-		if (xml_bvalue(tag, "giveitem")) rc->ec_flags |= GIVEITEM;
-		if (xml_bvalue(tag, "giveperson")) rc->ec_flags |= GIVEPERSON;
-		if (xml_bvalue(tag, "giveunit")) rc->ec_flags |= GIVEUNIT;
-		if (xml_bvalue(tag, "getitem")) rc->ec_flags |= GETITEM;
-		if (xml_bvalue(tag, "canguard")) rc->ec_flags |= CANGUARD;
-		if (xml_bvalue(tag, "recruithorses")) rc->ec_flags |= ECF_REC_HORSES;
-		if (xml_bvalue(tag, "recruitethereal")) rc->ec_flags |= ECF_REC_ETHEREAL;
-		if (xml_bvalue(tag, "recruitunlimited")) rc->ec_flags |= ECF_REC_UNLIMITED;
+			if (xml_bvalue(tag, "nogive")) rc->ec_flags |= NOGIVE;
+			if (xml_bvalue(tag, "giveitem")) rc->ec_flags |= GIVEITEM;
+			if (xml_bvalue(tag, "giveperson")) rc->ec_flags |= GIVEPERSON;
+			if (xml_bvalue(tag, "giveunit")) rc->ec_flags |= GIVEUNIT;
+			if (xml_bvalue(tag, "getitem")) rc->ec_flags |= GETITEM;
+			if (xml_bvalue(tag, "canguard")) rc->ec_flags |= CANGUARD;
+			if (xml_bvalue(tag, "recruithorses")) rc->ec_flags |= ECF_REC_HORSES;
+			if (xml_bvalue(tag, "recruitethereal")) rc->ec_flags |= ECF_REC_ETHEREAL;
+			if (xml_bvalue(tag, "recruitunlimited")) rc->ec_flags |= ECF_REC_UNLIMITED;
 
-		if (xml_bvalue(tag, "equipment")) rc->battle_flags |= BF_EQUIPMENT;
-		if (xml_bvalue(tag, "noblock")) rc->battle_flags |= BF_NOBLOCK;
-		if (xml_bvalue(tag, "invinciblenonmagic")) rc->battle_flags |= BF_INV_NONMAGIC;
-		if (xml_bvalue(tag, "resistbash")) rc->battle_flags |= BF_RES_BASH;
-		if (xml_bvalue(tag, "resistcut")) rc->battle_flags |= BF_RES_CUT;
-		if (xml_bvalue(tag, "resistpierce")) rc->battle_flags |= BF_RES_PIERCE;
+			if (xml_bvalue(tag, "equipment")) rc->battle_flags |= BF_EQUIPMENT;
+			if (xml_bvalue(tag, "noblock")) rc->battle_flags |= BF_NOBLOCK;
+			if (xml_bvalue(tag, "invinciblenonmagic")) rc->battle_flags |= BF_INV_NONMAGIC;
+			if (xml_bvalue(tag, "resistbash")) rc->battle_flags |= BF_RES_BASH;
+			if (xml_bvalue(tag, "resistcut")) rc->battle_flags |= BF_RES_CUT;
+			if (xml_bvalue(tag, "resistpierce")) rc->battle_flags |= BF_RES_PIERCE;
 
-		state->race = rc;
-	} else if (strcmp(tag->name, "ai")==0) {
-		race * rc = state->race;
-		rc->splitsize = xml_ivalue(tag, "splitsize");
+			state->race = rc;
+		} else if (strcmp(tag->name, "ai")==0) {
+			race * rc = state->race;
+			rc->splitsize = xml_ivalue(tag, "splitsize");
 
-		if (xml_bvalue(tag, "killpeasants")) rc->flags |= RCF_KILLPEASANTS;
-		if (xml_bvalue(tag, "attackrandom")) rc->flags |= RCF_ATTACKRANDOM;
-		if (xml_bvalue(tag, "moverandom")) rc->flags |= RCF_MOVERANDOM;
-		if (xml_bvalue(tag, "learn")) rc->flags |= RCF_LEARN;
+			if (xml_bvalue(tag, "killpeasants")) rc->flags |= RCF_KILLPEASANTS;
+			if (xml_bvalue(tag, "attackrandom")) rc->flags |= RCF_ATTACKRANDOM;
+			if (xml_bvalue(tag, "moverandom")) rc->flags |= RCF_MOVERANDOM;
+			if (xml_bvalue(tag, "learn")) rc->flags |= RCF_LEARN;
 
-	} else if (strcmp(tag->name, "skill")==0) {
-		race * rc = state->race;
-		const char * name = xml_value(tag, "name");
-		if (name) {
-			int mod = xml_ivalue(tag, "modifier");
-			if (mod!=0) {
-				skill_t sk = sk_find(name);
-				if (sk!=NOSKILL) {
-					rc->bonus[sk] = (char)mod;
+		} else if (strcmp(tag->name, "skill")==0) {
+			race * rc = state->race;
+			const char * name = xml_value(tag, "name");
+			if (name) {
+				int mod = xml_ivalue(tag, "modifier");
+				if (mod!=0) {
+					skill_t sk = sk_find(name);
+					if (sk!=NOSKILL) {
+						rc->bonus[sk] = (char)mod;
+					} else {
+						log_error(("unknown skill '%s'\n", name));
+					}
+				}
+			} else {
+				log_error(("missing required tag 'name'\n"));
+				return XML_USERERROR;
+			}
+		} else if (strcmp(tag->name, "attack")==0) {
+			race * rc = state->race;
+			const char * damage = xml_value(tag, "damage");
+			struct att * a = &rc->attack[state->nextattack++];
+			if (damage) {
+				a->data.dice = strdup(damage);
+			} else {
+				a->data.iparam = xml_ivalue(tag, "spell");
+			}
+			a->type = xml_ivalue(tag, "type");
+			a->flags = xml_ivalue(tag, "flags");
+		} else if (strcmp(tag->name, "function")==0) {
+			race * rc = state->race;
+			const char * name = xml_value(tag, "name");
+			const char * value = xml_value(tag, "value");
+			if (name && value) {
+				pf_generic fun = get_function(value);
+				if (fun==NULL) {
+					log_error(("unknown function value '%s=%s' for race %s\n", name, value, rc->_name[0]));
 				} else {
-					log_error(("unknown skill '%s'\n", name));
+					if (strcmp(name, "name")==0) {
+						rc->generate_name = (const char* (*)(const struct unit*))fun;
+					} else if (strcmp(name, "age")==0) {
+						rc->age = (void(*)(struct unit*))fun;
+					} else if (strcmp(name, "move")==0) {
+						rc->move_allowed = (boolean(*)(const struct region *, const struct region *))fun;
+					} else if (strcmp(name, "itemdrop")==0) {
+						rc->itemdrop = (struct item *(*)(const struct race *, int))fun;
+					} else if (strcmp(name, "initfamiliar")==0) {
+						rc->init_familiar = (void(*)(struct unit *))fun;
+					} else {
+						log_error(("unknown function type '%s=%s' for race %s\n", name, value, rc->_name[0]));
+					}
 				}
 			}
-		} else {
-			log_error(("missing required tag 'name'\n"));
-			return XML_USERERROR;
-		}
-	} else if (strcmp(tag->name, "attack")==0) {
-		race * rc = state->race;
-		const char * damage = xml_value(tag, "damage");
-		struct att * a = &rc->attack[state->nextattack++];
-		if (damage) {
-			a->data.dice = strdup(damage);
-		} else {
-			a->data.iparam = xml_ivalue(tag, "spell");
-		}
-		a->type = xml_ivalue(tag, "type");
-		a->flags = xml_ivalue(tag, "flags");
-	} else if (strcmp(tag->name, "function")==0) {
-		race * rc = state->race;
-		const char * name = xml_value(tag, "name");
-		const char * value = xml_value(tag, "value");
-		if (name && value) {
-			pf_generic fun = get_function(value);
-			if (fun==NULL) {
-				log_error(("unknown function value '%s=%s' for race %s\n", name, value, rc->_name[0]));
-			} else {
-				if (strcmp(name, "name")==0) {
-					rc->generate_name = (const char* (*)(const struct unit*))fun;
-				} else if (strcmp(name, "age")==0) {
-					rc->age = (void(*)(struct unit*))fun;
-				} else if (strcmp(name, "move")==0) {
-					rc->move_allowed = (boolean(*)(const struct region *, const struct region *))fun;
-				} else if (strcmp(name, "itemdrop")==0) {
-					rc->itemdrop = (struct item *(*)(const struct race *, int))fun;
-				} else if (strcmp(name, "initfamiliar")==0) {
-					rc->init_familiar = (void(*)(struct unit *))fun;
-				} else {
-					log_error(("unknown function type '%s=%s' for race %s\n", name, value, rc->_name[0]));
+		} else if (strcmp(tag->name, "familiar")==0) {
+			race * rc = state->race;
+			const char * zRace = xml_value(tag, "race");
+			if (zRace && rc) {
+				race * frc = rc_find(zRace);
+				if (frc == NULL) {
+					frc = rc_add(rc_new(zRace));
 				}
-			}
-		}
-	} else if (strcmp(tag->name, "familiar")==0) {
-		race * rc = state->race;
-		const char * zRace = xml_value(tag, "race");
-		if (zRace && rc) {
-			race * frc = rc_find(zRace);
-			if (frc == NULL) {
-				frc = rc_add(rc_new(zRace));
-			}
-			if (xml_bvalue(tag, "default")) {
-				rc->familiars[0] = frc;
+				if (xml_bvalue(tag, "default")) {
+					rc->familiars[0] = frc;
+				} else {
+					rc->familiars[++state->nextfamiliar] = frc;
+				}
 			} else {
-				rc->familiars[++state->nextfamiliar] = frc;
+				log_error(("missing required tag 'race'\n"));
+				return XML_USERERROR;
 			}
-		} else {
-			log_error(("missing required tag 'race'\n"));
-			return XML_USERERROR;
 		}
 	}
 	return XML_OK;
 }
 
 static int 
-tagend(struct xml_stack * stack, void * data)
+tagend(struct xml_stack * stack)
 {
-	xml_state * state = (xml_state*)data;
 	const xml_tag * tag = stack->tag;
-	if (strcmp(tag->name, "race")==0) {
+	if (strcmp(tag->name, "races")==0) {
+		int i;
+		for (i=0;i!=MAXRACES;++i) {
+			race * rc = rc_find(oldracenames[i]);
+			if (rc) {
+				new_race[i] = rc;
+				if (rc == new_race[RC_TROLL]) {
+					a_add(&rc->attribs, make_skillmod(NOSKILL, SMF_RIDING, NULL, 0.0, -1));
+				}
+			}
+		}
+	} else if (strcmp(tag->name, "race")==0) {
+		xml_state * state = (xml_state*)stack->state;
 		state->race = NULL;
 		state->nextfamiliar = 0;
 		state->nextattack = 0;
@@ -776,26 +789,8 @@ tagend(struct xml_stack * stack, void * data)
 }
 
 static xml_callbacks xml_races = {
-	NULL, tagbegin, tagend, NULL
+	tagbegin, tagend, NULL
 };
-
-int
-read_races(FILE * F, struct xml_stack * stack)
-{
-	xml_state state;
-	int i, err = xml_parse(F, &xml_races, &state, stack);
-
-	for (i=0;i!=MAXRACES;++i) {
-		race * rc = rc_find(oldracenames[i]);
-		if (rc) {
-			new_race[i] = rc;
-			if (rc == new_race[RC_TROLL]) {
-				a_add(&rc->attribs, make_skillmod(NOSKILL, SMF_RIDING, NULL, 0.0, -1));
-			}
-		}
-	}
-	return err;
-}
 
 void
 init_races(void)
@@ -831,4 +826,6 @@ init_races(void)
 	/* itemdrop functions */
 	register_function((pf_generic)dragon_drops, "dragondrops");
 	sprintf(zBuffer, "%s/races.xml", resourcepath());
+
+	xml_register(&xml_races, "eressea races", 0);
 }

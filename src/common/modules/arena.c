@@ -199,8 +199,8 @@ use_wand_of_tears(unit * user, const struct item_type * itype, const char * cmd)
 static void
 init_wand_of_tears(void)
 {
-	const char * names[2] = {"wand_of_tears", "wands_of_tears"};
-	const char * appearances[2] = {"wand", "wands"};
+	const char * names[2] = {"wand_of_tears", "wand_of_tears_p"};
+	const char * appearances[2] = {"wand", "wand_p"};
 	item_type * itype = it_find(names[0]);
 	int i;
 

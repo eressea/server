@@ -138,10 +138,10 @@ typedef struct xml_state {
 } xml_state;
 
 static int 
-parse_plaintext(struct xml_stack *stack, const char *str, void *data)
+parse_plaintext(struct xml_stack *stack, const char *str)
 {
-	xml_state * state = (xml_state*)data;
 	if (stack) {
+		xml_state * state = (xml_state*)stack->state;
 		const xml_tag * tag = stack->tag;
 		if (strcmp(tag->name, "text")==0) {
 			const xml_tag * tagparent = stack->next->tag;
@@ -156,159 +156,139 @@ parse_plaintext(struct xml_stack *stack, const char *str, void *data)
 }
 
 static int 
-parse_tagbegin(struct xml_stack *stack, void *data)
+parse_tagbegin(struct xml_stack *stack)
 {
-	xml_state * state = (xml_state*)data;
 	const xml_tag * tag = stack->tag;
-	if (strcmp(tag->name, "messages")==0) {
-		memset(state, 0, sizeof(xml_state));
+	if (strcmp(tag->name, "messages")==0 || strcmp(tag->name, "strings")==0) {
+		stack->state = calloc(sizeof(xml_state), 1);
 		return XML_OK;
-	} else if (strcmp(tag->name, "string")==0) {
-		const char * tname = xml_value(tag, "name");
-		if (tname) state->mtname = tname;
-		else {
-			state->mtname = NULL;
-			return XML_USERERROR;
-		}
-	} else if (strcasecmp(tag->name, "locale")==0) {
-		if (state->mtname!=NULL) {
-			const char * zName = xml_value(tag, "name");
-			if (zName) {
-				state->lang = find_locale(zName);
-				if (state->lang==NULL) state->lang = make_locale(zName);
+	} else {
+		xml_state * state = (xml_state*)stack->state;
+		if (strcasecmp(tag->name, "locale")==0) {
+			if (state->mtname!=NULL) {
+				const char * zName = xml_value(tag, "name");
+				if (zName) {
+					state->lang = find_locale(zName);
+					if (state->lang==NULL) state->lang = make_locale(zName);
+				}
+ 			}
+		} else if (strcmp(tag->name, "namespace")==0) {
+			const char * tname = xml_value(tag, "name");
+			if (tname) state->nspc = tname;
+			else state->nspc = NULL;
+		} else if (strcmp(tag->name, "string")==0) {
+			const char * tname = xml_value(tag, "name");
+			if (tname) state->mtname = tname;
+			else {
+				state->mtname = NULL;
+				return XML_USERERROR;
 			}
- 		}
-	} else if (strcmp(tag->name, "namespace")==0) {
-		const char * tname = xml_value(tag, "name");
-		if (tname) state->nspc = tname;
-		else state->nspc = NULL;
-	} else if (strcmp(tag->name, "string")==0) {
-		const char * tname = xml_value(tag, "name");
-		if (tname) state->nspc = tname;
-		else state->nspc = NULL;
-	} else if (strcmp(tag->name, "message")==0) {
-		const char * tname = xml_value(tag, "name");
-		const char * tsection = xml_value(tag, "section");
-		const char * tlevel = xml_value(tag, "level");
-		state->argc = 0;
-		if (tname) state->mtname = tname;
-		else {
-			state->mtname = NULL;
-			return XML_USERERROR;
-		}
-		if (!tsection) {
-			/* by default, put into events */
-			tsection = "events";
-		}
-		state->nrsection = tsection;
-		mc_add(tsection);
-		if (tlevel) state->nrlevel = atoi(tlevel);
-	} else if (strcasecmp(tag->name, "text")==0) {
-		const char * zLocale = xml_value(tag, "locale");
-		if (zLocale) {
-			state->lang = find_locale(zLocale);
-			if (state->lang==NULL) {
-				state->lang = make_locale(zLocale);
+		} else if (strcmp(tag->name, "message")==0) {
+			const char * tname = xml_value(tag, "name");
+			const char * tsection = xml_value(tag, "section");
+			const char * tlevel = xml_value(tag, "level");
+			state->argc = 0;
+			if (tname) state->mtname = tname;
+			else {
+				state->mtname = NULL;
+				return XML_USERERROR;
 			}
-		}
-	} else if (strcasecmp(tag->name, "arg")==0) {
-		if (state->mtname!=NULL) {
-			const char * zName = xml_value(tag, "name");
-			const char * zType = xml_value(tag, "type");
-			if (zName && zType) {
-				char zBuffer[128];
-				sprintf(zBuffer, "%s:%s", zName, zType);
-				state->argv[state->argc++] = strdup(zBuffer);
+			if (!tsection) {
+				/* by default, put into events */
+				tsection = "events";
+			}
+			state->nrsection = tsection;
+			mc_add(tsection);
+			if (tlevel) state->nrlevel = atoi(tlevel);
+		} else if (strcasecmp(tag->name, "text")==0) {
+			const char * zLocale = xml_value(tag, "locale");
+			if (zLocale) {
+				state->lang = find_locale(zLocale);
+				if (state->lang==NULL) {
+					state->lang = make_locale(zLocale);
+				}
+			}
+		} else if (strcasecmp(tag->name, "arg")==0) {
+			if (state->mtname!=NULL) {
+				const char * zName = xml_value(tag, "name");
+				const char * zType = xml_value(tag, "type");
+				if (zName && zType) {
+					char zBuffer[128];
+					sprintf(zBuffer, "%s:%s", zName, zType);
+					state->argv[state->argc++] = strdup(zBuffer);
+				}
+			} else {
+				return XML_USERERROR;
+			}
+		} else if (strcasecmp(tag->name, "nr")==0) {
+			if (state->mtname!=NULL) {
+				const char * zSection = xml_value(tag, "section");
+				const char * zLevel = xml_value(tag, "level");
+				if (zSection) {
+					state->nrsection = zSection;
+					mc_add(zSection);
+				}
+				if (zLevel) state->nrlevel = atoi(zLevel);
 			}
 		} else {
 			return XML_USERERROR;
 		}
-	} else if (strcasecmp(tag->name, "nr")==0) {
-		if (state->mtname!=NULL) {
-			const char * zSection = xml_value(tag, "section");
-			const char * zLevel = xml_value(tag, "level");
-			if (zSection) {
-				state->nrsection = zSection;
-				mc_add(zSection);
-			}
-			if (zLevel) state->nrlevel = atoi(zLevel);
-		}
-	} else {
-		return XML_USERERROR;
 	}
 	return XML_OK;
 }
 
 static int 
-parse_tagend(struct xml_stack *stack, void *data)
+parse_tagend(struct xml_stack *stack)
 {
-	xml_state * state = (xml_state*)data;
 	const xml_tag * tag = stack->tag;
 
-	if (strcasecmp(tag->name, "type")==0) {
-		const struct message_type * mtype;
+	if (strcmp(tag->name, "messages")==0 || strcmp(tag->name, "strings")==0) {
+		free(stack->state);
+	} else {
+		xml_state * state = (xml_state*)stack->state;
+		if (strcasecmp(tag->name, "type")==0) {
+			const struct message_type * mtype;
 
-		state->argv[state->argc]=0;
+			state->argv[state->argc]=0;
 
-		/* add the messagetype */
-		mtype = mt_find(state->mtname);
-		if (!mtype) mtype = mt_register(mt_new(state->mtname, (const char**)state->argv));
-		
-		while (state->argc--) {
-			free(state->argv[state->argc]); 
-		}
-		if (state->nrtext) {
-			free(state->nrtext);
-			state->nrtext = 0;
-		}
-		state->mtype = mtype;
-	} else if (strcasecmp(tag->name, "locale")==0) {
-		state->lang = NULL;
-	} else if (strcasecmp(tag->name, "namespace")==0) {
-		state->nspc = NULL;
-	} else if (strcasecmp(tag->name, "text")==0) {
-		const xml_tag * tagparent = stack->next->tag;
-		if (strcmp(tagparent->name, "string")!=0) {
-			/* todo: bad test */
-			if (state->argc) {
-				nrt_register(state->mtype, state->lang, state->nrtext, state->nrlevel, state->nrsection);
-				crt_register(state->mtype);
+			/* add the messagetype */
+			mtype = mt_find(state->mtname);
+			if (!mtype) mtype = mt_register(mt_new(state->mtname, (const char**)state->argv));
+			
+			while (state->argc--) {
+				free(state->argv[state->argc]); 
 			}
-			else locale_setstring(state->lang, state->mtname, state->nrtext);
+			if (state->nrtext) {
+				free(state->nrtext);
+				state->nrtext = 0;
+			}
+			state->mtype = mtype;
+		} else if (strcasecmp(tag->name, "locale")==0) {
+			state->lang = NULL;
+		} else if (strcasecmp(tag->name, "namespace")==0) {
+			state->nspc = NULL;
+		} else if (strcasecmp(tag->name, "text")==0) {
+			const xml_tag * tagparent = stack->next->tag;
+			if (strcmp(tagparent->name, "string")!=0) {
+				/* todo: bad test */
+				if (state->argc) {
+					nrt_register(state->mtype, state->lang, state->nrtext, state->nrlevel, state->nrsection);
+					crt_register(state->mtype);
+				}
+				else locale_setstring(state->lang, state->mtname, state->nrtext);
+			}
+		} else if (strcasecmp(tag->name, "message")==0) {
+			state->nrsection = NULL;
 		}
-	} else if (strcasecmp(tag->name, "message")==0) {
-		state->nrsection = NULL;
 	}
 	return XML_OK;
 }
 
-static xml_callbacks msgcallback = {
-	parse_plaintext,
+static xml_callbacks xml_messages = {
 	parse_tagbegin,
 	parse_tagend,
-	NULL
+	parse_plaintext
 };
-
-int
-read_messages(FILE * F, struct xml_stack * stack)
-{
-	xml_state state;
-	memset(&state, 0, sizeof(state));
-	return xml_parse(F, &msgcallback, &state, stack);
-}
-
-int
-load_messages(const char * filename)
-{
-	FILE * F = fopen(filename, "rt+");
-	if (F) {
-		int i = read_messages(F, NULL);
-		fclose(F);
-		return i;
-	}
-	return -1;
-}
-
 
 static void
 arg_set(void * args[], const message_type * mtype, const char * buffer, void * v)
@@ -692,4 +672,11 @@ read_msglevels(struct warning ** w, FILE * F)
 		}
 		fscanf(F, "%s", buf);
 	}
+}
+
+void
+init_messages(void)
+{
+	xml_register(&xml_messages, "eressea messages", 0);
+	xml_register(&xml_messages, "eressea strings", 0);
 }

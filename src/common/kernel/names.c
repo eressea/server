@@ -517,37 +517,34 @@ const char *
 drachen_name(const unit *u)
 {
 	static char name[NAMESIZE + 1];
-	region *r = u->region;
-	int anzahl = u->number;
-	char *t;
+	int rnd = rand() % DTITEL;
+	const char *t = dtitel[0][rnd];
+	int anzahl = 1;
 
-	switch (rterrain(r)) {
-	case T_PLAIN:
-		t = strdup(dtitel[1][rand() % DTITEL]);
-		break;
-	case T_MOUNTAIN:
-		t = strdup(dtitel[2][rand() % DTITEL]);
-		break;
-	case T_DESERT:
-		t = strdup(dtitel[3][rand() % DTITEL]);
-		break;
-	case T_SWAMP:
-		t = strdup(dtitel[4][rand() % DTITEL]);
-		break;
-	case T_GLACIER:
-		t = strdup(dtitel[5][rand() % DTITEL]);
-		break;
-	default:
-		t = strdup(dtitel[0][rand() % DTITEL]);
+	if (u) {
+		region *r = u->region;
+		anzahl = u->number;
+		switch (rterrain(r)) {
+		case T_PLAIN:
+			t = dtitel[1][rnd];
+			break;
+		case T_MOUNTAIN:
+			t = dtitel[2][rnd];
+			break;
+		case T_DESERT:
+			t = dtitel[3][rnd];
+			break;
+		case T_SWAMP:
+			t = dtitel[4][rnd];
+			break;
+		case T_GLACIER:
+			t = dtitel[5][rnd];
+			break;
+		}
 	}
 
 	if (anzahl > 1) {
-		t[0] = (char) toupper(t[0]);
-		t[1] = 'i';				/* in jedem Fall "Die" */
-		t[2] = 'e';
-		strcpy(name, t);
-		strcat(name, "n von ");
-		strcat(name, rname(r, NULL));
+		sprintf(name, "Die %sn von %s", t+4, rname(u->region, NULL));
 	} else {
 		char *n = malloc(32*sizeof(char));
 
@@ -555,24 +552,20 @@ drachen_name(const unit *u)
 		strcat(n, silbe2[rand() % SIL2]);
 		strcat(n, silbe3[rand() % SIL3]);
 		if (rand() % 5 > 2) {
-			strcpy(name, n);	/* "Name, der Titel" */
-			strcat(name, ", ");
-			strcat(name, t);
+			sprintf(name, "%s, %s", n, t);	/* "Name, der Titel" */
 		} else {
-			t[0] = (char) toupper(t[0]);
 			strcpy(name, t);	/* "Der Titel Name" */
+			name[0] = (char) toupper(name[0]);
 			strcat(name, " ");
 			strcat(name, n);
 		}
-		if (rand() % 6 > 3) {
+		if (u && (rand() % 3 == 0)) {
 			strcat(name, " von ");
-			strcat(name, rname(r, NULL));
+			strcat(name, rname(u->region, NULL));
 		}
 	}
 
-	free(t);
-
-	return (name);
+	return name;
 }
 
 /* Dracoide */
@@ -716,7 +709,7 @@ name_unit(unit *u)
 {
 	char name[16];
 
-	if(u->race->generate_name){
+	if (u->race->generate_name) {
 		set_string(&u->name, (u->race->generate_name(u)));
 	} else {
 		sprintf(name, "Nummer %s", itoa36(u->no));

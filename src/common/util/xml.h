@@ -12,10 +12,16 @@
 
 #include <stdio.h>
 
+struct xml_hierarchy;
+
+#define XML_CB_IGNORE  1<<0
+
 typedef struct xml_stack {
 	FILE * stream;
+	const struct xml_hierarchy * callbacks;
 	struct xml_stack * next;
 	struct xml_tag * tag;
+	void * state;
 } xml_stack;
 
 typedef struct xml_tag {
@@ -37,15 +43,15 @@ typedef struct xml_attrib {
 
 /* callbacks */
 typedef struct xml_callbacks {
-	int (*plaintext)(struct xml_stack *, const char*, void *);
-	int (*tagbegin)(struct xml_stack *, void *);
-	int (*tagend)(struct xml_stack *, void *);
-	int (*error)(struct xml_stack *, const char*, unsigned int, int, void *);
+	int (*tagbegin)(struct xml_stack *);
+	int (*tagend)(struct xml_stack *);
+	int (*plaintext)(struct xml_stack *, const char*);
 } xml_callbacks;
 
 /* parser */
 #include <stdio.h>
-extern int xml_parse(FILE * stream, struct xml_callbacks *, void *, struct xml_stack *);
+extern void xml_register(struct xml_callbacks * cb, const char * parent, unsigned int flags);
+extern int xml_read(FILE *, struct xml_stack * stack);
 extern const char * xml_value(const struct xml_tag * tag, const char * name);
 extern double xml_fvalue(const xml_tag * tag, const char * name);
 extern int xml_ivalue(const xml_tag * tag, const char * name);

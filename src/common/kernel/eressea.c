@@ -2085,16 +2085,16 @@ const char * locales[] = {
 	NULL
 };
 
-static int read_xml(const char * filename);
+static int read_xml(const char * filename, struct xml_stack *stack);
 
 static int 
-parse_tagbegin(struct xml_stack *stack, void *data)
+parse_tagbegin(struct xml_stack *stack)
 {
 	const xml_tag * tag = stack->tag;
 	if (strcmp(tag->name, "include")==0) {
 		const char * filename = xml_value(tag, "file");
 		if (filename) {
-			return read_xml(filename);
+			return read_xml(filename, stack);
 		} else {
 			log_printf("required tag 'file' missing from include");
 			return XML_USERERROR;
@@ -2112,7 +2112,6 @@ parse_tagbegin(struct xml_stack *stack, void *data)
 		if (maxunits!=0) {
 			global.maxunits = maxunits;
 		}
-	} else if (strcmp(tag->name, "game")==0) {
 	} else if (strcmp(tag->name, "order")==0) {
 		const char * name = xml_value(tag, "name");
 		if (xml_bvalue(tag, "disable")) {
@@ -2124,27 +2123,16 @@ parse_tagbegin(struct xml_stack *stack, void *data)
 				}
 			}
 		}
-	} else if (strcmp(tag->name, "resource")==0) {
-		xml_readresource(stack->stream, stack);
-	} else if (strcmp(tag->name, "races")==0) {
-		read_races(stack->stream, stack);
-	} else if (strcmp(tag->name, "strings")==0) {
-		return read_messages(stack->stream, stack);
-	} else if (strcmp(tag->name, "messages")==0) {
-		return read_messages(stack->stream, stack);
 	}
 	return XML_OK;
 }
 
-static xml_callbacks msgcallback = {
-	NULL,
-	parse_tagbegin,
-	NULL,
-	NULL
+static xml_callbacks xml_eressea = {
+	parse_tagbegin, NULL, NULL
 };
 
 static int
-read_xml(const char * filename)
+read_xml(const char * filename, xml_stack * stack)
 {
 	char zText[80];
 	FILE * F;
@@ -2156,7 +2144,7 @@ read_xml(const char * filename)
 		return XML_USERERROR;
 	}
 
-	i = xml_parse(F, &msgcallback, NULL, NULL);
+	i = xml_read(F, stack);
 	fclose(F);
 	return i;
 }
@@ -2164,8 +2152,12 @@ read_xml(const char * filename)
 int
 init_data(const char * filename)
 {
-	int l = read_xml(filename);
+	int l;
+	
+	xml_register(&xml_eressea, "eressea", 0);
+	xml_register(&xml_eressea, "eressea include", XML_CB_IGNORE);
 
+	l = read_xml(filename, NULL);
 	if (l) return l;
 
 	/* old stuff, for removal: */
@@ -2336,6 +2328,7 @@ kernel_init(void)
 	skill_init();
 	attrib_init();
 	translation_init();
+	init_messages();
 
 	if (!turn) turn = lastturn();
 	if (turn == 0)

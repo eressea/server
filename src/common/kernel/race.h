@@ -158,6 +158,4 @@ extern const struct race_syn race_synonyms[];
 extern void write_race_reference(const struct race * rc, FILE * F);
 extern void read_race_reference(const struct race ** rp, FILE * F);
 
-extern int read_races(FILE * F, struct xml_stack * stack);
-
 #endif

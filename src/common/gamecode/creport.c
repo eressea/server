@@ -76,7 +76,7 @@ extern const char *spelldata[];
 extern int quiet;
 
 /* globals */
-#define C_REPORT_VERSION 61
+#define C_REPORT_VERSION 62
 
 #define TAG_LOCALE "de"
 #ifdef TAG_LOCALE
@@ -1191,20 +1191,25 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 			/* describe both passed and inhabited regions */
 			show_active_spells(r);
 			{
-				boolean see = false;
+				boolean seeunits = false, seeships = false;
 				const attrib * ru;
-				/* show units pulled throuth region */
+				/* show units pulled through region */
 				for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
 					unit * u = (unit*)ru->data.v;
 					if (cansee_durchgezogen(f, r, u, 0) && r!=u->region) {
-						if (u->ship && !fval(u, FL_OWNER))
-							continue;
-						if (!see) fprintf(F, "DURCHREISE\n");
-						see = true;
-						if (u->ship)
-							fprintf(F, "\"%s\"\n", shipname(u->ship));
-						else
-							fprintf(F, "\"%s\"\n", unitname(u));
+						if (!u->ship || !fval(u, FL_OWNER)) continue;
+						if (!seeships) fprintf(F, "DURCHSCHIFFUNG\n");
+						seeships = true;
+						fprintf(F, "\"%s\"\n", shipname(u->ship));
+					}
+				}
+				for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+					unit * u = (unit*)ru->data.v;
+					if (cansee_durchgezogen(f, r, u, 0) && r!=u->region) {
+						if (u->ship) continue;
+						if (!seeunits) fprintf(F, "DURCHREISE\n");
+						seeunits = true;
+						fprintf(F, "\"%s\"\n", unitname(u));
 					}
 				}
 			}

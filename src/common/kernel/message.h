@@ -56,6 +56,7 @@ extern struct message * add_message(struct message_list** pm, struct message * m
 extern void free_messages(struct message_list * m);
 extern int load_messages(const char *);
 extern int read_messages(FILE * F, struct xml_stack * stack);
+extern void init_messages(void);
 
 /* message sections */
 extern struct messageclass * msgclasses;
