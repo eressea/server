@@ -7179,6 +7179,8 @@ sp_destroy_curse(castorder *co)
 			mage, mage->region, strdup(co->order)));
 	}
 
+	if(ts != NULL) free(ts);
+
 	return cast_level;
 }
 
