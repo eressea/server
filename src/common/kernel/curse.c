@@ -672,28 +672,6 @@ is_cursed_with(attrib *ap, curse *c)
 	return false;
 }
 /* ------------------------------------------------------------- */
-
-static int
-read_skill(FILE * F, curse * c)
-{
-	int skill;
-	if (global.data_version<CURSETYPE_VERSION) {
-		int men;
-		fscanf(F, "%d %d", &skill, &men);
-	} else {
-		fscanf(F, "%d", &skill);
-	}
-	c->data = (void*)skill;
-	return 0;
-}
-
-static int
-write_skill(FILE * F, const curse * c)
-{
-	fprintf(F, "%d ", (int)c->data);
-	return 0;
-}
-/* ------------------------------------------------------------- */
 /* cursedata */
 /* ------------------------------------------------------------- */
 /* 
@@ -709,28 +687,6 @@ write_skill(FILE * F, const curse * c)
  * 	int (*write)(FILE * F, const curse * c); 
  * } curse_type;
  */
-static struct curse_type ct_stormwind = { "stormwind",
-	CURSETYP_NORM, 0, NO_MERGE,
-	"",
-	NULL
-};
-static struct curse_type ct_flyingship = { "flyingship",
-	CURSETYP_NORM, 0, NO_MERGE,
-	"",
-	NULL
-};
-static struct curse_type ct_nodrift = { "nodrift",
-	CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-	"Der Zauber auf diesem Schiff ist aus den elementaren Magien der Luft "
-	"und des Wassers gebunden. Der dem Wasser verbundene Teil des Zaubers "
-	"läßt es leichter durch die Wellen gleiten und der der Luft verbundene "
-	"Teil scheint es vor widrigen Winden zu schützen."
-};
-static struct curse_type ct_shipdisorientation = { "shipdisorientation",
-	CURSETYP_NORM, 0, NO_MERGE,
-	"Dieses Schiff hat sich verfahren."
-};
-
 static struct curse_type ct_magicwalls = { "magicwalls",
 	CURSETYP_NORM, 0, NO_MERGE,
 	"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
@@ -757,82 +713,6 @@ static struct curse_type ct_nocostbuilding = { "nocostbuilding",
 	cinfo_region
 };
 
-static struct curse_type ct_auraboost = { "auraboost",
-	CURSETYP_NORM, CURSE_SPREADMODULO, (NO_MERGE),
-	"Dieser Zauber greift irgendwie in die Verbindung zwischen Magier "
-	"und Magischer Essenz ein. Mit positiver Ausrichtung kann er wohl "
-	"wie ein Fokus für Aura wirken, jedoch genauso für das Gegenteil "
-	"benutzt werden."
-};
-
-static struct curse_type ct_slavery = { "slavery",
-	CURSETYP_NORM, 0, NO_MERGE,
-	"Dieser mächtige Bann scheint die Einheit ihres freien Willens "
-	"zu berauben. Solange der Zauber wirkt, wird sie nur den Befehlen "
-	"ihres neuen Herrn gehorchen."
-};
-static struct curse_type ct_calmmonster = { "calmmonster",
-	CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
-	"Dieser Beeinflussungszauber scheint die Einheit einem ganz "
-	"bestimmten Volk wohlgesonnen zu machen."
-};
-static struct curse_type ct_oldrace = { "oldrace",
-	CURSETYP_NORM, CURSE_SPREADALWAYS, NO_MERGE,
-	"",
-	NULL
-};
-static struct curse_type ct_fumble = { "fumble",
-	CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
-	"Eine Wolke negativer Energie umgibt die Einheit."
-};
-static struct curse_type ct_speed = { "speed",
-	CURSETYP_UNIT, CURSE_SPREADNEVER, M_MEN,
-	"Diese Einheit bewegt sich doppelt so schnell."
-};
-static struct curse_type ct_orcish = { "orcish",
-	CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
-	"Dieser Zauber scheint die Einheit zu 'orkisieren'. Wie bei Orks "
-	"ist eine deutliche Neigung zur Fortpflanzung zu beobachten."
-};
-static struct curse_type ct_magicboost = { "magicboost",
-	CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
-	"",
-	NULL
-};
-static struct curse_type ct_insectfur = { "insectfur",
-	CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
-	"Dieser Zauber schützt vor den Auswirkungen der Kälte."
-};
-static struct curse_type ct_strength = { "strength",
-	CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
-	"Dieser Zauber vermehrt die Stärke der verzauberten Personen um ein "
-	"vielfaches."
-};
-static struct curse_type ct_worse = { "worse",
-	CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
-	""
-};
-static struct curse_type ct_magicresistance = { "magicresistance",
-	CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
-	"Dieser Zauber verstärkt die natürliche Widerstandskraft gegen eine "
-	"Verzauberung.",
-	NULL
-};
-static struct curse_type ct_itemcloak = { "itemcloak",
-	CURSETYP_UNIT, CURSE_SPREADNEVER, M_DURATION,
-	"Dieser Zauber macht die Ausrüstung unsichtbar."
-};
-static struct curse_type ct_sparkle = { "sparkle",
-	CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
-	"Dieser Zauber ist einer der ersten, den junge Magier in der Schule lernen."
-};
-static struct curse_type ct_skillmod = { "skillmod",
-	CURSETYP_NORM, CURSE_SPREADMODULO, M_MEN,
-	"",
-	cinfo_unit,
-	NULL,
-	read_skill, write_skill
-};
 
 void *
 resolve_curse(void * id)
@@ -843,30 +723,15 @@ resolve_curse(void * id)
 void
 register_curses(void)
 {
-	ct_register(&ct_auraboost);
-	ct_register(&ct_stormwind);
-	ct_register(&ct_flyingship);
-	ct_register(&ct_nodrift);
+	register_unitcurse();
+	register_regioncurse();
+	register_shipcurse();
+	register_buildingcurse();
+
 	ct_register(&ct_magicwalls);
 	ct_register(&ct_strongwall);
 	ct_register(&ct_magicrunes);
-	ct_register(&ct_slavery);
-	ct_register(&ct_shipdisorientation);
-	ct_register(&ct_calmmonster);
-	ct_register(&ct_oldrace);
-	ct_register(&ct_fumble);
 	ct_register(&ct_nocostbuilding);
-	ct_register(&ct_speed);
-	ct_register(&ct_orcish);
-	ct_register(&ct_magicboost);
-	ct_register(&ct_insectfur);
-	ct_register(&ct_strength);
-	ct_register(&ct_worse);
-	ct_register(&ct_magicresistance);
-	ct_register(&ct_itemcloak);
-	ct_register(&ct_sparkle);
-	ct_register(&ct_skillmod);
-
 }
 
 

@@ -36,6 +36,7 @@
 #include <assert.h>
 
 
+/* ------------------------------------------------------------- */
 int
 cinfo_unit(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
@@ -64,7 +65,7 @@ cinfo_unit_onlyowner(const struct locale * lang, const void * obj, typ_t typ, st
 	assert(typ == TYP_UNIT);
 	u = (struct unit *)obj;
 
-	if (self){
+	if (self != 0){
 		msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
 		nr_render(msg, lang, buf, sizeof(buf), NULL);
 		msg_release(msg);
@@ -73,9 +74,10 @@ cinfo_unit_onlyowner(const struct locale * lang, const void * obj, typ_t typ, st
 	return 0;
 }
 
-/* CurseInfo mit Spezialabfragen */
-
-/* C_AURA */
+/* ------------------------------------------------------------- */
+/* 
+ * C_AURA 
+ */
 /* erhöht/senkt regeneration und maxaura um effect% */
 static int
 cinfo_auraboost(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
@@ -85,7 +87,7 @@ cinfo_auraboost(const struct locale * lang, const void * obj, typ_t typ, struct 
 	assert(typ == TYP_UNIT);
 	u = (struct unit *)obj;
 
-	if (self){
+	if (self != 0){
 		if (c->effect > 100){
 			sprintf(buf, "%s fühlt sich von starken magischen Energien "
 				"durchströmt. (%s)", u->name, curseid(c));
@@ -97,8 +99,27 @@ cinfo_auraboost(const struct locale * lang, const void * obj, typ_t typ, struct 
 	}
 	return 0;
 }
+static struct curse_type ct_auraboost = { 
+	"auraboost",
+	CURSETYP_NORM, CURSE_SPREADMODULO, (NO_MERGE),
+	"Dieser Zauber greift irgendwie in die Verbindung zwischen Magier "
+	"und Magischer Essenz ein. Mit positiver Ausrichtung kann er wohl "
+	"wie ein Fokus für Aura wirken, jedoch genauso für das Gegenteil "
+	"benutzt werden.",
+	cinfo_auraboost
+};
+/* Magic Boost - Gabe des Chaos */
+static struct curse_type ct_magicboost = { 
+	"magicboost",
+	CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
+	"",
+	NULL
+};
 
-/* C_SLAVE */
+/* ------------------------------------------------------------- */
+/* 
+ * C_SLAVE 
+ */
 static int
 cinfo_slave(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
@@ -108,15 +129,25 @@ cinfo_slave(const struct locale * lang, const void * obj, typ_t typ, struct curs
 	assert(typ == TYP_UNIT);
 	u = (unit *)obj;
 
-	if (self){
+	if (self != 0){
 		sprintf(buf, "%s wird noch %d Woche%s unter unserem Bann stehen. (%s)",
 				u->name, c->duration, (c->duration == 1)? "":"n", curseid(c));
 		return 1;
 	}
 	return 0;
 }
+static struct curse_type ct_slavery = { "slavery",
+	CURSETYP_NORM, 0, NO_MERGE,
+	"Dieser mächtige Bann scheint die Einheit ihres freien Willens "
+	"zu berauben. Solange der Zauber wirkt, wird sie nur den Befehlen "
+	"ihres neuen Herrn gehorchen.",
+	cinfo_slave
+};
 
-/* C_CALM */
+/* ------------------------------------------------------------- */
+/* 
+ * C_CALM
+ */
 static int
 cinfo_calm(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
@@ -130,7 +161,7 @@ cinfo_calm(const struct locale * lang, const void * obj, typ_t typ, struct curse
 	if (c->magician){
 		rc = c->magician->irace;
 		f = c->magician->faction;
-		if (self) {
+		if (self != 0) {
 			sprintf(buf, "%s mag %s", u->name, factionname(f));
 		} else {
 			sprintf(buf, "%s scheint %s zu mögen", u->name, LOC(f->locale, rc_name(rc, 1)));
@@ -143,7 +174,17 @@ cinfo_calm(const struct locale * lang, const void * obj, typ_t typ, struct curse
 	}
 	return 0;
 }
-/* C_SPEED */
+static struct curse_type ct_calmmonster = { "calmmonster",
+	CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
+	"Dieser Beeinflussungszauber scheint die Einheit einem ganz "
+	"bestimmten Volk wohlgesonnen zu machen.",
+	cinfo_calm
+};
+
+/* ------------------------------------------------------------- */
+/* 
+ * C_SPEED
+ */
 static int
 cinfo_speed(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
@@ -155,7 +196,7 @@ cinfo_speed(const struct locale * lang, const void * obj, typ_t typ, struct curs
 	u = (unit *)obj;
 	cu = (curse_unit *)c->data;
 
-	if (self){
+	if (self != 0){
 		sprintf(buf, "%d Person%s von %s %s noch %d Woche%s beschleunigt. (%s)",
 				cu->cursedmen, (cu->cursedmen == 1)? "":"en", u->name,
 				(cu->cursedmen == 1)? "ist":"sind", c->duration,
@@ -165,7 +206,17 @@ cinfo_speed(const struct locale * lang, const void * obj, typ_t typ, struct curs
 	}
 	return 0;
 }
-/* C_ORC */
+static struct curse_type ct_speed = {
+	"speed",
+	CURSETYP_UNIT, CURSE_SPREADNEVER, M_MEN,
+	"Diese Einheit bewegt sich doppelt so schnell.",
+	cinfo_speed
+};
+
+/* ------------------------------------------------------------- */
+/*
+ * C_ORC
+ */
 static int
 cinfo_orc(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
@@ -176,7 +227,7 @@ cinfo_orc(const struct locale * lang, const void * obj, typ_t typ, struct curse 
 	assert(typ == TYP_UNIT);
 	u = (unit *)obj;
 
-	if (self){
+	if (self != 0){
 		msg = msg_message(mkname("curseinfo", c->type->cname), "unit id", u, c->no);
 		nr_render(msg, lang, buf, sizeof(buf), NULL);
 		msg_release(msg);
@@ -184,8 +235,18 @@ cinfo_orc(const struct locale * lang, const void * obj, typ_t typ, struct curse 
 	}
 	return 0;
 }
+static struct curse_type ct_orcish = {
+	"orcish",
+	CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
+	"Dieser Zauber scheint die Einheit zu 'orkisieren'. Wie bei Orks "
+	"ist eine deutliche Neigung zur Fortpflanzung zu beobachten.",
+	cinfo_orc
+};
 
-/* C_KAELTESCHUTZ */
+/* ------------------------------------------------------------- */
+/* 
+ * C_KAELTESCHUTZ
+ */
 static int
 cinfo_kaelteschutz(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
@@ -197,7 +258,7 @@ cinfo_kaelteschutz(const struct locale * lang, const void * obj, typ_t typ, stru
 	u = (unit *)obj;
 	cu = (curse_unit *)c->data;
 
-	if (self){
+	if (self != 0){
 		sprintf(buf, "%d Person%s von %s %s sich vor Kälte geschützt. (%s)",
 				cu->cursedmen, (cu->cursedmen == 1)? "":"en", u->name,
 				(cu->cursedmen == 1)? "fühlt":"fühlen",
@@ -206,8 +267,17 @@ cinfo_kaelteschutz(const struct locale * lang, const void * obj, typ_t typ, stru
 	}
 	return 0;
 }
+static struct curse_type ct_insectfur = {
+	"insectfur",
+	CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
+	"Dieser Zauber schützt vor den Auswirkungen der Kälte.",
+	cinfo_kaelteschutz
+};
 
-/* C_SPARKLE */
+/* ------------------------------------------------------------- */
+/*
+ * C_SPARKLE
+ */
 static int
 cinfo_sparkle(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
@@ -261,8 +331,16 @@ cinfo_sparkle(const struct locale * lang, const void * obj, typ_t typ, struct cu
 
 	return 1;
 }
+static struct curse_type ct_sparkle = { "sparkle",
+	CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
+	"Dieser Zauber ist einer der ersten, den junge Magier in der Schule lernen.",
+	NULL
+};
 
-/* C_STRENGTH */
+/* ------------------------------------------------------------- */
+/*
+ * C_STRENGTH
+ */
 static int
 cinfo_strength(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
@@ -272,14 +350,24 @@ cinfo_strength(const struct locale * lang, const void * obj, typ_t typ, struct c
 	assert(typ == TYP_UNIT);
 	unused(obj);
 
-	if (self){
+	if (self != 0){
 		sprintf(buf, "Die Leute strotzen nur so vor Kraft. (%s)",
 				curseid(c));
 		return 1;
 	}
 	return 0;
 }
-/* C_ALLSKILLS */
+static struct curse_type ct_strength = { "strength",
+	CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
+	"Dieser Zauber vermehrt die Stärke der verzauberten Personen um ein "
+	"vielfaches.",
+	NULL
+};
+
+/* ------------------------------------------------------------- */
+/*
+ * C_ALLSKILLS (Alp)
+ */
 static int
 cinfo_allskills(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
@@ -289,29 +377,24 @@ cinfo_allskills(const struct locale * lang, const void * obj, typ_t typ, struct 
 
 	assert(typ == TYP_UNIT);
 
-	if (self){
+	if (self != 0){
 		sprintf(buf, "Wird von einem Alp geritten. (%s)", curseid(c));
 		return 1;
 	}
 	return 0;
 }
-/* C_SKILL */
-static int
-cinfo_skill(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
-{
-	unit *u = (unit *)obj;
-	int sk = (int)c->data;
+static struct curse_type ct_worse = { 
+	"worse",
+	CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
+	"",
+	NULL
+};
 
-	unused(typ);
+/* ------------------------------------------------------------- */
 
-	if (self){
-		sprintf(buf, "%s ist in %s ungewöhnlich ungeschickt. (%s)", u->name,
-				skillname((skill_t)sk, u->faction->locale), curseid(c));
-		return 1;
-	}
-	return 0;
-}
-/* C_ITEMCLOAK */
+/*
+ * C_ITEMCLOAK
+ */
 static int
 cinfo_itemcloak(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
@@ -321,13 +404,20 @@ cinfo_itemcloak(const struct locale * lang, const void * obj, typ_t typ, struct 
 	assert(typ == TYP_UNIT);
 	u = (unit *)obj;
 
-	if (self) {
+	if (self != 0) {
 		sprintf(buf, "Die Ausrüstung von %s scheint unsichtbar. (%s)",
 				u->name, curseid(c));
 		return 1;
 	}
 	return 0;
 }
+static struct curse_type ct_itemcloak = {
+	"itemcloak",
+	CURSETYP_UNIT, CURSE_SPREADNEVER, M_DURATION,
+	"Dieser Zauber macht die Ausrüstung unsichtbar.",
+	cinfo_itemcloak
+};
+/* ------------------------------------------------------------- */
 
 static int
 cinfo_fumble(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
@@ -337,15 +427,85 @@ cinfo_fumble(const struct locale * lang, const void * obj, typ_t typ, struct cur
 
 	assert(typ == TYP_UNIT);
 
-	if (self){
-		sprintf(buf, "%s kann sich kaum konzentrieren.i (%s)",
+	if (self != 0){
+		sprintf(buf, "%s kann sich kaum konzentrieren. (%s)",
 				u->name, curseid(c));
 		return 1;
 	}
 	return 0;
 }
+static struct curse_type ct_fumble = {
+	"fumble",
+	CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
+	"Eine Wolke negativer Energie umgibt die Einheit.",
+	cinfo_fumble
+};
+/* ------------------------------------------------------------- */
 
 
+static struct curse_type ct_oldrace = { "oldrace",
+	CURSETYP_NORM, CURSE_SPREADALWAYS, NO_MERGE,
+	"",
+	NULL
+};
+static struct curse_type ct_magicresistance = { "magicresistance",
+	CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
+	"Dieser Zauber verstärkt die natürliche Widerstandskraft gegen eine "
+	"Verzauberung.",
+	NULL
+};
+
+
+/* ------------------------------------------------------------- */
+/*
+ * C_SKILL
+ */
+
+static int
+read_skill(FILE * F, curse * c)
+{
+	int skill;
+	if (global.data_version<CURSETYPE_VERSION) {
+		int men;
+		fscanf(F, "%d %d", &skill, &men);
+	} else {
+		fscanf(F, "%d", &skill);
+	}
+	c->data = (void*)skill;
+	return 0;
+}
+static int
+write_skill(FILE * F, const curse * c)
+{
+	fprintf(F, "%d ", (int)c->data);
+	return 0;
+}
+
+static int
+cinfo_skill(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
+{
+	unit *u = (unit *)obj;
+	int sk = (int)c->data;
+
+	unused(typ);
+
+	if (self != 0){
+		sprintf(buf, "%s ist in %s ungewöhnlich ungeschickt. (%s)", u->name,
+				skillname((skill_t)sk, u->faction->locale), curseid(c));
+		return 1;
+	}
+	return 0;
+}
+static struct curse_type ct_skillmod = {
+	"skillmod",
+	CURSETYP_NORM, CURSE_SPREADMODULO, M_MEN,
+	"",
+	cinfo_unit,
+	NULL,
+	read_skill, write_skill
+};
+
+/* ------------------------------------------------------------- */
 void
 register_unitcurse(void)
 {
@@ -362,4 +522,22 @@ register_unitcurse(void)
 	register_function((pf_generic)cinfo_skill, "curseinfo::skill");
 	register_function((pf_generic)cinfo_itemcloak, "curseinfo::itemcloak");
 	register_function((pf_generic)cinfo_fumble, "curseinfo::fumble");
+
+	ct_register(&ct_auraboost);
+	ct_register(&ct_magicboost);
+	ct_register(&ct_slavery);
+	ct_register(&ct_calmmonster);
+	ct_register(&ct_speed);
+	ct_register(&ct_orcish);
+	ct_register(&ct_insectfur);
+	ct_register(&ct_sparkle);
+	ct_register(&ct_strength);
+	ct_register(&ct_worse);
+	ct_register(&ct_skillmod);
+	ct_register(&ct_itemcloak);
+	ct_register(&ct_fumble);
+	ct_register(&ct_oldrace);
+	ct_register(&ct_magicresistance);
 }
+
+
