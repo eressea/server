@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: monster.c,v 1.5 2001/02/03 13:45:30 enno Exp $
+ *	$Id: monster.c,v 1.6 2001/02/04 08:01:06 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -323,7 +323,7 @@ void
 move_monster(region * r, unit * u)
 {
 	direction_t d = NODIRECTION;
-	strlist *S, **SP;
+	strlist *S;
 
 	switch(u->race) {
 	case RC_FIREDRAGON:
@@ -347,11 +347,9 @@ move_monster(region * r, unit * u)
 
 	sprintf(buf, "%s %s", keywords[K_MOVE], directions[d]);
 
-	SP = &u->orders;
 	S = makestrlist(buf);
-	addlist2(SP, S);
-	*SP = 0;
-
+	S->next = u->orders;
+        u->orders = S;
 }
 
 /* Wir machen das mal autoconf-style: */
