@@ -39,6 +39,7 @@
 #endif
 #include "moved.h"
 #include "aggressive.h"
+#include "variable.h"
 
 /* util includes */
 #include <attrib.h>
@@ -74,4 +75,5 @@ init_attributes(void)
 	init_ugroup();
 #endif
 	init_aggressive();
+	init_variable();
 }

@@ -12,6 +12,7 @@
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
+#include <luabind/object.hpp>
 
 using namespace luabind;
 
