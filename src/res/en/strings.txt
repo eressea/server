@@ -99,8 +99,8 @@ aots;en;amulet of true seeing
 aots_p;en;amulets of true seeing
 apple;en;apple
 apple_p;en;apples
-aurafocu_p;en;aurafocus
-aurafocuse_p;en;aurafocuses
+aurafocus;en;aurafocus
+aurafocus_p;en;aurafocuses
 axe;en;axe
 axe_p;en;axes
 bow;en;bow
@@ -177,8 +177,8 @@ museumticket;en;ticket to the grand museum
 museumticket_p;en;tickets to the grand museum
 nut;en;nut
 nut_p;en;nuts
-pegasi;en;pegasi
-pegasu_p;en;pegasus
+pegasus;en;pegasus
+pegasus_p;en;pegasi
 person;en;man
 person_p;en;men
 plate;en;plate
@@ -587,3 +587,10 @@ ZIPPED;en;ZIPPED
 BZIP2;en;BZIP2
 PUNKTE;en;SCORE
 INFO;en;INFO
+
+## Testitem
+wand;en;wand
+wand_p;en;wands
+wand_of_tears;en;wand of tears
+wands_of_tear_p;en;wands of tears
+

@@ -110,7 +110,7 @@ temple;de;Tempel
 ## Testitem
 wand;de;Zauberstab
 wand_p;de;Zauberstäbe
-wand_of_tear_p;de;Szepter der Tränen
+wand_of_tears;de;Szepter der Tränen
 wands_of_tear_p;de;Szepter der Tränen
 
 ## Burgausbaustufen
@@ -281,15 +281,15 @@ dreameye;de;Traumauge
 dreameye_p;de;Traumaugen
 seaserpenthead;de;Seeschlangenkopf
 seaserpenthead_p;de;Seeschlangenköpfe
-aurafocu_p;de;Aurafocus
-aurafocuse_p;de;Aurafocuse
+aurafocus;de;Aurafocus
+aurafocus_p;de;Aurafocuse
 presspass;de;Akkredition des Xontormia-Expreß
 presspass_p;de;Akkreditionen des Xontormia-Expreß
 trollbelt;de;Gürtel der Trollstärke
 elvenhorse;de;Elfenpferd
 elvenhorse_p;de;Elfenpferde
-pegasu_p;de;Pegasus
-pegasi;de;Pegasi
+pegasus;de;Pegasus
+pegasus_p;de;Pegasi
 dolphin;de;Delphin
 dolphin_p;de;Delphine
 museumticket;de;Eintrittskarte des Großen Museum

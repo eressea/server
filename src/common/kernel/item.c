@@ -418,9 +418,21 @@ rt_find(const char * name)
 	return rtype;
 }
 
-item_type *
-it_find(const char * name)
+static const char * it_aliases[2][2] = { { "Runenschwert", "runesword" }, { NULL, NULL } };
+static const char *
+it_alias(const char * zname)
 {
+	int i;
+	for (i=0;it_aliases[i][0];++i) {
+		if (strcasecmp(it_aliases[i][0], zname)==0) return it_aliases[i][1];
+	}
+	return zname;
+}
+
+item_type *
+it_find(const char * zname)
+{
+	const char * name = it_alias(zname);
 	unsigned int hash = hashstring(name);
 	item_type * itype;
 

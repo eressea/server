@@ -428,7 +428,6 @@ new_message(struct faction * receiver, const char* sig, ...)
 static void
 caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 {
-	const char * section = NULL;
 	message * m = NULL;
 
 	unused(level);

@@ -1385,6 +1385,14 @@ SOURCE=..\common\triggers\createunit.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\triggers\gate.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\triggers\gate.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\triggers\giveitem.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"

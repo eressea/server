@@ -78,6 +78,7 @@ static void
 write_gmcreate(const attrib * a, FILE * F)
 {
 	const item_type * itype = (const item_type *)a->data.v;
+	assert(itype);
 	fprintf(F, "%s", resourcename(itype->rtype, 0));
 }
 
@@ -88,6 +89,7 @@ read_gmcreate(attrib * a, FILE * F)
 	const item_type ** p_itype = (const item_type **)&a->data.v;
 	fscanf(F, "%s", zText);
 	*p_itype = it_find(zText);
+	assert(*p_itype);
 	return 1;
 }
 
