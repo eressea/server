@@ -2906,6 +2906,7 @@ typedef struct summary {
 	int schiffe;
 	int gebaeude;
 	int maxskill;
+  int heroes;
 	int inhabitedregions;
 	int peasants;
 	int nunits;
@@ -2994,6 +2995,9 @@ make_summary(boolean count_new)
 
 					s->nunits++;
 					s->playerpop += u->number;
+          if (u->flags & UFL_HERO) {
+            s->heroes += u->number;
+          }
 					s->spielerpferde += get_item(u, I_HORSE);
 					s->playermoney += get_money(u);
 					s->armed_men += armedmen(u);
@@ -3318,8 +3322,11 @@ report_summary(summary * s, summary * o, boolean full)
 			pcomp(s->playerpop, o->playerpop));
 	fprintf(F,   " davon bewaffnet:      %s\n",
 			pcomp(s->armed_men, o->armed_men));
+#ifdef HEROES
+  fprintf(F,   " Helden:               %s\n", pcomp(s->heroes, o->heroes));
+#endif
 
-	if (full) {
+  if (full) {
 		fprintf(F, "Regionen:              %d\n", listlen(regions));
 		fprintf(F, "Bewohnte Regionen:     %d\n", s->inhabitedregions);
 		fprintf(F, "Landregionen:          %d\n", s->landregionen);

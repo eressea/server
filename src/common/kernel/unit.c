@@ -1128,7 +1128,6 @@ unitlist_insert(struct unit_list **ul, struct unit *u)
   *ul = rl2;
 }
 
-#ifdef HEROES
 int 
 maxheroes(const struct faction * f)
 {
@@ -1146,4 +1145,3 @@ countheroes(const struct faction * f)
   }
   return n;
 }
-#endif
