@@ -1,19 +1,36 @@
-Status und Statusänderungen, USERS.STATUS
+** Status und Statusänderungen
 
-WAITING: Initialer Status, warten auf Bestätigung der Anmeldung. 
+* USERS.STATUS
+
+NEW: Initialer Status, warten auf Bestätigung der Anmeldung.
 Übergänge: 
--> CONFIRMED, wenn Anmeldung von Benutzer bestätigt wurde.
--> EXPIRED, falls bis zum ZAT keine Bestätigung eintraf.
+-> TUTORIAL, wenn Anmeldung von Benutzer bestätigt wurde.
+-> INVALID, BANNED (nur manuell)
 
-CONFIRMED: Emailadresse des Spielers ist korrekt, seine Anmeldung wurde in
-der laufenden Woche bestätigt.
+TUTORIAL: Emailadresse des Spielers ist korrekt, seine Anmeldung wurde
+bestätigt, und er muss ein Tutorial bestehen.
 Übergänge:
--> WAITING, wenn er zum ZAT nicht ausgesetzt wurde
--> ACTIVE, wenn er einen Report bekommen hat
+-> ACTIVE, wenn er ein Tutorial abgeschlossen hat
+-> INVALID, BANNED (nur manuell)
 
-ACTIVE: Spieler ist aktiv.
-Übergänge: (derzeit keine)
+ACTIVE: Spieler hat das Tutorial erfüllt, und kann sich für Partien anmelden
+Übergänge:
+-> INVALID, BANNED (nur manuell)
 
 INVALID: Spieler hat ungültige Daten übermittelt
 
 BANNED: Spieler ist aus dem Spiel ausgeschlossen worden.
+
+
+* SUBSCRIPTIONS.STATUS
+
+WAITING: Warten auf Bestätigung
+-> EXPIRED
+-> CONFIRMED
+
+CONFIRMED: Bestätigung eingetroffen
+-> WAITING
+-> ACTIVE
+
+ACTIVE: Spiel ist gestartet
+-> DEAD
