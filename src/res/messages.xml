@@ -2097,9 +2097,9 @@
     <type>
       <arg name="unit" type="unit"/>
       <arg name="amount" type="int"/>
-      <arg name="type" type="resource"/>
+      <arg name="rtype" type="resource"/>
     </type>
-    <text locale="de">"$unit($unit) $if($eq($amount,1),"schlieﬂt","schlieﬂen") sich $int($amount) $resource($type,$amount) an."</text>
+    <text locale="de">"$unit($unit) $if($eq($amount,1),"schlieﬂt","schlieﬂen") sich $int($amount) $resource($rtype,$amount) an."</text>
   </message>
   <message name="itemcloak" section="events">
     <type>

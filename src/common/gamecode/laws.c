@@ -3201,7 +3201,7 @@ age_building(building * b)
             }
             if (unicorns) {
               ADDMSG(&u->faction->msgs, msg_message("scunicorn", 
-                "unit amount type", u, unicorns, 
+                "unit amount rtype", u, unicorns, 
                 olditemtype[I_UNICORN]->rtype));
             }
           }
