@@ -335,6 +335,18 @@
 		<text locale="de">"$unit($unit) in $region($region): '$command' - Man benötigt mindestens $int($minskill) $skill($skill), um $resource($product,0) zu produzieren."</text>
 	</message>
 
+	<message name="plant_skills" section="production">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+			<arg name="skill" type="skill"></arg>
+			<arg name="minskill" type="int"></arg>
+			<arg name="product" type="resource"></arg>
+		</type>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Man benötigt mindestens $int($minskill) $skill($skill), um $resource($product,0) zu pflanzen."</text>
+	</message>
+
 	<message name="skill_needed">
 		<type>
 			<arg name="unit" type="unit"></arg>
@@ -2198,19 +2210,6 @@
 		</locale>
 	</message>
 
-	<message name="error150">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="region" type="region"></arg>
-			<arg name="command" type="string"></arg>
-		</type>
-		<locale name="de">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Zum Pflanzen braucht man mindestens Kräuterkunde 6."</text>
-			</nr>
-		</locale>
-	</message>
-
 	<message name="error151">
 		<type>
 			<arg name="unit" type="unit"></arg>
@@ -3283,16 +3282,6 @@
 				<text>"$unit($unit) in $region($region): '$command' - Einheiten in den hinteren Reihen können nicht angreifen."</text>
 			</nr>
 		</locale>
-	</message>
-
-	<message name="error227" section="errors">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="region" type="region"></arg>
-			<arg name="command" type="string"></arg>
-		</type>
-		<text locale="de">"$unit($unit) in $region($region): '$command' - Dafür braucht ein Einheit mindestens Kräuterkunde 7."</text>
-		<text locale="en">"$unit($unit) in $region($region): '$command' - A skill of herbalism 7 or higher is required."</text>
 	</message>
 
 	<message name="error228">

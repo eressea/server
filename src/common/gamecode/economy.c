@@ -2513,7 +2513,9 @@ plant(region *r, unit *u, int raw)
 	/* Skill prüfen */
 	skill = eff_skill(u, SK_HERBALISM, r);
 	if (skill < 6) {
-		cmistake(u, findorder(u, u->thisorder), 150, MSG_PRODUCE);
+		add_message(&u->faction->msgs,
+			msg_error(u, findorder(u, u->thisorder), "plant_skills",
+				"skill minskill product", SK_HERBALISM, 6, htype->itype->rtype, 1));
 		return;
 	}
 	/* Wasser des Lebens prüfen */
@@ -2570,9 +2572,18 @@ planttrees(region *r, unit *u, int raw)
 	/* Skill prüfen */
 	skill = eff_skill(u, SK_HERBALISM, r);
 	if (skill < 6) {
-		cmistake(u, findorder(u, u->thisorder), 150, MSG_PRODUCE);
+		add_message(&u->faction->msgs,
+			msg_error(u, findorder(u, u->thisorder), "plant_skills",
+				"skill minskill product", SK_HERBALISM, 6, itype->rtype, 1));
 		return;
 	}
+	if (fval(r, RF_MALLORN) && skill < 7 ) {
+		add_message(&u->faction->msgs,
+			msg_error(u, findorder(u, u->thisorder), "plant_skills", 
+				"skill minskill product", SK_HERBALISM, 7, itype->rtype, 1));
+		return;
+	}
+
 	n = new_get_pooled(u, itype->rtype, GET_DEFAULT);
 	/* Samen prüfen */
 	if (n==0) {
@@ -2599,6 +2610,65 @@ planttrees(region *r, unit *u, int raw)
 	ADDMSG(&u->faction->msgs, msg_message("plant", 
 		"unit region amount herb", u, r, planted, itype->rtype));
 }
+
+/* züchte bäume */
+void
+breedtrees(region *r, unit *u, int raw)
+{
+	int n, i, skill, planted = 0;
+	const item_type * itype;
+	int current_season = season(turn);
+	
+	/* Bäume züchten geht nur im Frühling */
+	if (current_season != SEASON_SPRING){
+		planttrees(r, u, raw);
+		return;
+	}
+
+	if (rterrain(r) == T_OCEAN) {
+		return;
+	}
+	
+	/* Mallornbäume kann man nur in Mallornregionen züchten */
+	if (fval(r, RF_MALLORN)) {
+		itype = &it_mallornseed;
+	} else {
+		itype = &it_seed;
+	}
+
+	/* Skill prüfen */
+	skill = eff_skill(u, SK_HERBALISM, r);
+	if (skill < 12) {
+		planttrees(r, u, raw);
+		return;
+	}
+	n = new_get_pooled(u, itype->rtype, GET_DEFAULT);
+	/* Samen prüfen */
+	if (n==0) {
+		add_message(&u->faction->msgs,
+			msg_error(u, findorder(u, u->thisorder), "resource_missing", "missing",
+				itype->rtype));
+		return;
+	}
+
+	/* wenn eine Anzahl angegeben wurde, nur soviel verbrauchen */
+	n = min(raw, n);
+	n = min(skill*u->number, n);
+
+	/* Für jeden Samen Talent*5% Erfolgschance. */
+	for(i = n; i>0; i--) {
+		if (rand()%100 < skill*5) planted++;
+	}
+	rsettrees(r, 1, rtrees(r, 1)+planted);
+	
+	/* Alles ok. Abziehen. */
+	produceexp(u, SK_HERBALISM, u->number);
+	new_use_pooled(u, itype->rtype, GET_DEFAULT, n);
+
+	add_message(&u->faction->msgs, new_message(u->faction,
+		"plant%u:unit%r:region%i:amount%X:herb", u, r, planted, itype->rtype));
+}
+
 #endif
 
 void
@@ -2633,78 +2703,18 @@ pflanze(region *r, unit *u)
 	}
 #if GROWING_TREES
 	else if (p==P_TREES){
-		planttrees(r, u, m);
+		breedtrees(r, u, m);
 		return;
 	}
 	else if (itype!=NULL){
 		if (itype==&it_mallornseed || itype==&it_seed){
-			planttrees(r, u, m);
+			breedtrees(r, u, m);
 			return;
 		}
 	}
 #endif
 }
 
-#if GROWING_TREES
-
-/* züchte bäume */
-void
-breedtrees(region *r, unit *u, int raw)
-{
-	int n, i, skill, planted = 0;
-	const item_type * itype;
-	int current_season = season(turn);
-	
-	/* Bäume züchten geht nur im Frühling */
-	if (current_season != SEASON_SPRING){
-		planttrees(r, u, raw);
-		return;
-	}
-
-	if (rterrain(r) == T_OCEAN) {
-		return;
-	}
-	
-	/* Mallornbäume kann man nur in Mallornregionen züchten */
-	if (fval(r, RF_MALLORN)) {
-		itype = &it_mallornseed;
-	} else {
-		itype = &it_seed;
-	}
-
-	/* Skill prüfen */
-	skill = eff_skill(u, SK_HERBALISM, r);
-	if (skill < 12) {
-		cmistake(u, findorder(u, u->thisorder), 150, MSG_PRODUCE);
-		return;
-	}
-	n = new_get_pooled(u, itype->rtype, GET_DEFAULT);
-	/* Samen prüfen */
-	if (n==0) {
-		add_message(&u->faction->msgs,
-			msg_error(u, findorder(u, u->thisorder), "resource_missing", "missing",
-				itype->rtype));
-		return;
-	}
-
-	/* wenn eine Anzahl angegeben wurde, nur soviel verbrauchen */
-	n = min(raw, n);
-	n = min(skill*u->number, n);
-
-	/* Für jeden Samen Talent*5% Erfolgschance. */
-	for(i = n; i>0; i--) {
-		if (rand()%100 < skill*5) planted++;
-	}
-	rsettrees(r, 1, rtrees(r, 1)+planted);
-	
-	/* Alles ok. Abziehen. */
-	produceexp(u, SK_HERBALISM, u->number);
-	new_use_pooled(u, itype->rtype, GET_DEFAULT, n);
-
-	add_message(&u->faction->msgs, new_message(u->faction,
-		"plant%u:unit%r:region%i:amount%X:herb", u, r, planted, itype->rtype));
-}
-#endif
 
 /* züchte pferde */
 void
@@ -3304,11 +3314,9 @@ produce(void)
 				zuechte(r, u);
 				break;
 
-#if GROWING_TREES
 			case K_PFLANZE:
-				planttrees(r, u, INT_MAX);
+				pflanze(r, u);
 				break;
-#endif
 
 			case K_RESEARCH:
 				research(r, u);

@@ -4388,4 +4388,18 @@
 		</locale>
 	</message>
 
+	<message name="plant_skills" section="production">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+			<arg name="skill" type="skill"></arg>
+			<arg name="minskill" type="int"></arg>
+			<arg name="product" type="resource"></arg>
+		</type>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - At least $skill($skill) $int($minskill) is needed for planting $resource($product,0)."</text>
+	</message>
+
+
+
 </messages>

@@ -538,9 +538,9 @@ peasants(region * r)
 	 * den Bauern genug für 11 Bauern pro Ebene ohne Wald. Der Wald
 	 * breitet sich nicht in Gebiete aus, die bebaut werden. */
 
-	int peasants, n, i;
+	int peasants, n, i, satiated, money;
 #if PEASANTS_DO_NOT_STARVE == 0
- 	int dead, satiated, money;
+ 	int dead;
 #endif
 	attrib * a;
 
