@@ -1093,7 +1093,7 @@
 		<familiar race="eagle"></familiar>
 		<familiar race="imp"></familiar>
 	</race>
-	<race name="goblin" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="40" maintenance="10" weight="900" speed="1.000000" hp="16" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="0" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
+	<race name="goblin" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="40" maintenance="10" weight="600" speed="1.000000" hp="16" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="0" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
 		<function name="initfamiliar" value="oldfamiliars"></function>
 		<skill name="sk_alchemy" modifier="1"></skill>
