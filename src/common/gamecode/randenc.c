@@ -1066,7 +1066,7 @@ randomevents(void)
 
 		plane * p = rplane(r);
 		for (u = r->units; u; u = u->next) {
-			if (is_cursed(u->attribs, C_ORC, 0))
+			if (is_cursed(u->attribs, C_ORC, 0)
 					&& !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
 				int increase = 0;
 				int num  = min(get_cursedmen(u->attribs, C_ORC, 0), u->number);
