@@ -359,11 +359,6 @@ destroy_cmd(unit * u, struct order * ord)
     return 0;
   }
 
-  if (!fval(u, UFL_OWNER)) {
-    cmistake(u, ord, 138, MSG_PRODUCE);
-    return 0;
-  }
-
   if (s && *s) {
     n = atoi(s);
     if(n <= 0) {
@@ -374,6 +369,11 @@ destroy_cmd(unit * u, struct order * ord)
 
   if (getparam(u->faction->locale) == P_ROAD) {
     destroy_road(u, n, ord);
+    return 0;
+  }
+
+  if (!fval(u, UFL_OWNER)) {
+    cmistake(u, ord, 138, MSG_PRODUCE);
     return 0;
   }
 
