@@ -640,7 +640,7 @@ print_curses(FILE *F, const void * obj, typ_t typ, const attrib *a, int self, in
 					(data->value==1 ? "t" : "en"),
 					data->value,
 					(data->value==1 ? "" : "en"),
-					LOC(NULL, resourcename(data->type->itype->rtype, 0)));
+					LOC(default_locale, resourcename(data->type->itype->rtype, 0)));
 			rnl(F);
 			rparagraph(F, buf, indent, 0);
 		}
