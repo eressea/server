@@ -1855,26 +1855,28 @@ static spellparameter *
 add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param, int size, struct order * ord)
 {
   boolean fail = false;
-	int i = 0;
+  int i = 0;
   int p = 0;
-	const char * c = syntax;
-	spellparameter *par;
+  const char * c;
+  spellparameter *par;
   int minlen = 0;
 
-  while (*c!=0) if (*c++!='+' && *c++!='k') ++minlen;
+  for (c=syntax;*c!=0;++c) {
+    if (*c!='+' && *c!='k') ++minlen;
+  }
   c = syntax;
 
-	/* mindestens ein Ziel (Ziellose Zauber werden nicht
-	 * geparst) */
-	if (size==0) {
-		/* Fehler: Ziel vergessen */
-		cmistake(u, ord, 203, MSG_MAGIC);
-		return 0;
-	}
+  /* mindestens ein Ziel (Ziellose Zauber werden nicht
+   * geparst) */
+  if (size==0) {
+    /* Fehler: Ziel vergessen */
+    cmistake(u, ord, 203, MSG_MAGIC);
+    return 0;
+  }
 
   par = malloc(sizeof(spellparameter));
   par->length = size;
-	par->param = malloc(size * sizeof(spllprm *));
+  par->param = malloc(size * sizeof(spllprm *));
 
   while (!fail && *c && i<size && param[i]!=NULL) {
     spllprm * spobj = NULL;
