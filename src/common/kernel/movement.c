@@ -235,7 +235,7 @@ static int
 ridingcapacity(unit * u)
 {
 	int n;
-	int wagen, pferde;
+	int wagen, pferde, unicorns;
 
 	n = 0;
 
@@ -243,13 +243,15 @@ ridingcapacity(unit * u)
 	 * tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
 	 * von zwei Pferden gezogen wird */
 
-	pferde = min(get_item(u, I_HORSE), effskill(u, SK_RIDING) * u->number * 2);
-	if(fval(u->race, RCF_HORSE)) pferde += u->number;
+  unicorns = get_item(u, I_UNICORN);
+  pferde = get_item(u, I_HORSE);
+  pferde = min(pferde, effskill(u, SK_RIDING) * u->number * 2);
+	if (fval(u->race, RCF_HORSE)) pferde += u->number;
 
 	/* maximal diese Pferde können zum Ziehen benutzt werden */
 	wagen = min(pferde / HORSESNEEDED, get_item(u, I_WAGON));
 
-	n = wagen * WAGONCAPACITY + pferde * HORSECAPACITY;
+	n = wagen * WAGONCAPACITY + (pferde + unicorns) * HORSECAPACITY;
 	return n;
 }
 
@@ -262,6 +264,7 @@ walkingcapacity(const struct unit * u)
 	 * die Leute tragen */
 
 	pferde = get_item(u, I_HORSE);
+  unicorns = get_item(u, I_UNICORN);
 	if (fval(u->race, RCF_HORSE)) {
 		pferde += u->number;
 		personen = 0;
@@ -292,6 +295,7 @@ walkingcapacity(const struct unit * u)
 	}
 
 	n += pferde * HORSECAPACITY;
+  n += unicorns * HORSECAPACITY;
 	n += personen * personcapacity(u);
 	/* Goliathwasser */
   tmp = get_effect(u, oldpotiontype[P_STRONG]);
@@ -355,7 +359,7 @@ canfly(unit *u)
 {
 	if (get_movement(&u->attribs, MV_CANNOTMOVE)) return false;
 
-	if(get_item(u, I_HORSE)) return false;
+	if(get_item(u, I_HORSE) || get_item(u, I_UNICORN)) return false;
 
 	if(get_item(u, I_PEGASUS) >= u->number && effskill(u, SK_RIDING) >= 4)
 		return true;
@@ -373,6 +377,7 @@ canswim(unit *u)
 	if (get_movement(&u->attribs, MV_CANNOTMOVE)) return false;
 
 	if (get_item(u, I_HORSE)) return false;
+  if (get_item(u, I_UNICORN)) return false;
 
 	if (get_item(u, I_DOLPHIN) >= u->number && effskill(u, SK_RIDING) >= 4)
 		return true;

@@ -1495,6 +1495,7 @@ init_olditems(void)
 
 		switch (i) {
 		case I_HORSE:
+    case I_UNICORN:
 			itype->capacity = HORSECAPACITY;
 			itype->give = give_horses;
 			break;
