@@ -9637,7 +9637,7 @@ static spell spelldaten[] =
     "ZAUBERE [STUFE n] \'Magie analysieren\' GEBÄUDE <Gebäude-Nr>\n"
     "ZAUBERE [STUFE n] \'Magie analysieren\' SCHIFF <Schiff-Nr>",
     "kc",
-    M_ASTRAL, (UNITSPELL | ONSHIPCAST | TESTCANSEE), 5, 1,
+    M_ASTRAL, (SPELLLEVEL | UNITSPELL | ONSHIPCAST | TESTCANSEE), 5, 1,
     {
       { R_AURA, 1, SPC_LEVEL },
       { 0, 0, 0 },
