@@ -36,7 +36,7 @@ print "Removing "+str(int(k))+" transfered subscriptions."
 k = cursor.execute("UPDATE subscriptions SET user=0 where game="+str(int(game))+" and status='CANCELLED' and updated<'"+date+"'")
 print "Removing "+str(int(k))+" cancelled subscriptions."
 
-k = cursor.execute("UPDATE subscriptions SET user=0 where game="+str(int(game))+" and status='DEAD' and updated<'"+date+"'")
+k = cursor.execute("UPDATE subscriptions SET user=0 where game="+str(int(game))+" and status='DEAD'")
 print "Removing "+str(int(k))+" dead subscriptions."
 
 k = cursor.execute("UPDATE subscriptions SET status='CANCELLED' where game="+str(int(game))+" and status='ACTIVE' and lastturn+3<="+str(lastturn))
