@@ -63,11 +63,12 @@ make_locale(const char * name)
 }
 
 static FILE * s_debug = NULL;
+static char * s_logfile = NULL;
 
 void
 debug_language(const char * log)
 {
-	s_debug = fopen(log, "w+");
+  s_logfile = strdup(log);
 }
 
 const char *
@@ -109,10 +110,13 @@ locale_string(const locale * lang, const char * key)
 			if (lang!=default_locale) {
 				s = locale_string(default_locale, key);
 			}
-			if (s_debug) {
-				fprintf(s_debug, "%s;%s;%s\n", key, lang->name, s);
-				fflush(s_debug);
-				locale_setstring((struct locale*)lang, key, s);
+			if (s_logfile) {
+        s_debug = s_debug?s_debug:fopen(s_logfile, "w+");
+        if (s_debug) {
+          fprintf(s_debug, "%s;%s;%s\n", key, lang->name, s);
+          fflush(s_debug);
+          locale_setstring((struct locale*)lang, key, s);
+        }
 			}
 			return s;
 		}

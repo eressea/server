@@ -575,7 +575,7 @@
     <attack type="3" damage="1d1"/>
     <attack type="4" damage="1d1"/>
   </race>
-  <race name="toad" magres="0.200000" maxaura="1.000000" regaura="1.000000" recruitcost="50" maintenance="0" weight="100" capacity="50" speed="1.000000" hp="10" ac="0" damage="1d2" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" cannotmove="yes" playerrace="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes">
+  <race name="toad" magres="0.200000" maxaura="1.000000" regaura="1.000000" recruitcost="50" maintenance="0" weight="100" capacity="50" speed="1.000000" hp="10" ac="0" damage="1d2" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" cannotmove="yes" playerrace="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes">
     <ai splitsize="1" attackrandom="yes" learn="yes"/>
     <skill name="sk_alchemy" modifier="-10"/>
     <skill name="sk_crossbow" modifier="-10"/>
