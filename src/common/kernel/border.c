@@ -81,80 +81,19 @@ get_borders(const region * r1, const region * r2)
   return *bp;
 }
 
-void
-write_borders(FILE * f)
-{
-	int i;
-	for (i=0;i!=BMAXHASH;++i) {
-		border * b;
-		for (b=borders[i];b;b=b->nexthash) {
-			if (b->type->valid && !b->type->valid(b)) continue;
-			fprintf(f, "%s %d %d %d %d %d ", b->type->__name, b->id, b->from->x, b->from->y, b->to->x, b->to->y);
-			if (b->type->write) b->type->write(b, f);
-			putc('\n', f);
-#if	RELEASE_VERSION>BORDER_VERSION
-			a_write(f, b->attribs);
-			putc('\n', f);
-#endif
-		}
-	}
-	fputs("end", f);
-}
-
-void
-read_borders(FILE * f)
-{
-	for (;;) {
-		int fx, fy, tx, ty;
-		unsigned int bid = 0;
-		char zText[32];
-		border * b;
-		region * from, * to;
-		border_type * type;
-
-		fscanf(f, "%s", zText);
-		if (!strcmp(zText, "end")) break;
-		fscanf(f, "%u %d %d %d %d", &bid, &fx, &fy, &tx, &ty);
-		type = find_bordertype(zText);
-		assert(type || !"border type not registered");
-		from = findregion(fx, fy);
-		if (from==NULL) {
-			log_error(("border for unknown region %d,%d\n", fx, fy));
-			from = new_region(fx, fy);
-		}
-		to = findregion(tx, ty);
-		if (to==NULL)  {
-			log_error(("border for unknown region %d,%d\n", tx, ty));
-			to = new_region(tx, ty);
-		}
-		if (to==from) {
-			direction_t dir = (direction_t) (rand() % MAXDIRECTIONS);
-			region * r = rconnect(from, dir);
-			log_error(("[read_borders] invalid %s in %s\n", type->__name, regionname(from, NULL)));
-			if (r!=NULL) to = r;
-		}
-		b = new_border(type, from, to);
-		nextborder--; /* new_border erhöht den Wert */
-		b->id = bid;
-		assert(bid<=nextborder);
-		if (type->read) type->read(b, f);
-		a_read(f, &b->attribs);
-	}
-}
-
 border *
 new_border(border_type * type, region * from, region * to)
 {
   border ** bp = get_borders_i(from, to);
   border * b = calloc(1, sizeof(struct border));
 
+  while (*bp) bp = &(*bp)->next;
+
+  *bp = b;
   b->type = type;
-  b->nexthash = *bp;
-  b->next = *bp;
   b->from = from;
   b->to = to;
   b->id = ++nextborder;
-  *bp = b;
 
   if (type->init) type->init(b);
   return b;
@@ -164,19 +103,26 @@ void
 erase_border(border * b)
 {
   border ** bp = get_borders_i(b->from, b->to);
-  border ** np = NULL;
   attrib ** ap = &b->attribs;
 
   while (*ap) a_remove(ap, *ap);
 
-  while (*bp && *bp != b) {
-    border * bprev = *bp;
-    if (bprev->next==b) np=&bprev->next;
-    bp = &bprev->next;
-  }
   assert(*bp!=NULL || !"error: border is not registered");
-  if (np!=NULL) *np = b->next;
-  *bp = b->nexthash;
+  if (*bp==b) {
+    /* it is the first in the list, so it is in the nexthash list */
+    if (b->next) {
+      *bp = b->next;
+      (*bp)->nexthash = b->nexthash;
+    } else {
+      *bp = b->nexthash;
+    }
+  } else {
+    while (*bp && *bp != b) {
+      bp = &(*bp)->next;
+    }
+    assert(*bp==b || !"error: border is not registered");
+    *bp = b->next;
+  }
   if (b->type->destroy) b->type->destroy(b);
   free(b);
 }
@@ -513,3 +459,63 @@ border_type bt_road = {
 	b_validroad /* valid */
 };
 
+void
+write_borders(FILE * f)
+{
+  int i;
+  for (i=0;i!=BMAXHASH;++i) {
+    border * b;
+    for (b=borders[i];b;b=b->nexthash) {
+      if (b->type->valid && !b->type->valid(b)) continue;
+      fprintf(f, "%s %d %d %d %d %d ", b->type->__name, b->id, b->from->x, b->from->y, b->to->x, b->to->y);
+      if (b->type->write) b->type->write(b, f);
+      putc('\n', f);
+#if	RELEASE_VERSION>BORDER_VERSION
+      a_write(f, b->attribs);
+      putc('\n', f);
+#endif
+    }
+  }
+  fputs("end", f);
+}
+
+void
+read_borders(FILE * f)
+{
+  for (;;) {
+    int fx, fy, tx, ty;
+    unsigned int bid = 0;
+    char zText[32];
+    border * b;
+    region * from, * to;
+    border_type * type;
+
+    fscanf(f, "%s", zText);
+    if (!strcmp(zText, "end")) break;
+    fscanf(f, "%u %d %d %d %d", &bid, &fx, &fy, &tx, &ty);
+    type = find_bordertype(zText);
+    assert(type || !"border type not registered");
+    from = findregion(fx, fy);
+    if (from==NULL) {
+      log_error(("border for unknown region %d,%d\n", fx, fy));
+      from = new_region(fx, fy);
+    }
+    to = findregion(tx, ty);
+    if (to==NULL)  {
+      log_error(("border for unknown region %d,%d\n", tx, ty));
+      to = new_region(tx, ty);
+    }
+    if (to==from) {
+      direction_t dir = (direction_t) (rand() % MAXDIRECTIONS);
+      region * r = rconnect(from, dir);
+      log_error(("[read_borders] invalid %s in %s\n", type->__name, regionname(from, NULL)));
+      if (r!=NULL) to = r;
+    }
+    b = new_border(type, from, to);
+    nextborder--; /* new_border erhöht den Wert */
+    b->id = bid;
+    assert(bid<=nextborder);
+    if (type->read) type->read(b, f);
+    a_read(f, &b->attribs);
+  }
+}
