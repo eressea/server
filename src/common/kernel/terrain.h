@@ -43,6 +43,7 @@ enum {
 	T_HALL1,
 	T_CORRIDOR1,
 	T_MAGICSTORM,
+	T_WALL1,
 	MAXTERRAINS,
 	NOTERRAIN = (terrain_t) - 1
 };

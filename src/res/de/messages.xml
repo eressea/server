@@ -7466,5 +7466,34 @@
 		<text locale="en">"$unit($unit) in $region($region) becomes a lycantrope."</text>
 	</message>
 
+	<message name="questportal_lock" section="events">
+		<type>
+			<arg name="region" type="region"></arg>
+			<arg name="unit" type="unit"></arg>
+			<arg name="key" type="int"></arg>
+		</type>
+		<text locale="de">"$unit($unit) verschließt eines der Schlösser in $region($region) mit $if($eq($key,1),"dem Achatenen Schlüssel","dem Saphirnen Schlüssel")."</text>
+		<text locale="de">"$unit($unit) locks one of the locks in $region($region) with $if($eq($key,1),"the Agate Key","the Sapphire Key")."</text>
+	</message>
+	
+	<message name="questportal_unlock" section="events">
+		<type>
+			<arg name="region" type="region"></arg>
+			<arg name="unit" type="unit"></arg>
+			<arg name="key" type="int"></arg>
+		</type>
+		<text locale="de">"$unit($unit) öffnet eines der Schlösser in $region($region) mit $if($eq($key,1),"dem Achatenen Schlüssel","dem Saphirnen Schlüssel")."</text>
+		<text locale="de">"$unit($unit) unlocks one of the locks in $region($region) with $if($eq($key,1),"the Agate Key","the Sapphire Key")."</text>
+	</message>
+
+	<message name="use_questkey_wrongregion" section="events">
+		<type>
+			<arg name="region" type="region"></arg>
+			<arg name="unit" type="unit"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Hier ist kein passendes Schloss."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - No fitting lock can be found here."</text>
+	</message>
 
 </messages>

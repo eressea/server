@@ -15,6 +15,8 @@
 #ifndef BORDER_H
 #define BORDER_H
 
+#define BMAXHASH 8191
+
 extern unsigned int nextborder;
 
 typedef struct border {
@@ -110,6 +112,7 @@ extern border_type bt_noway;
 extern border_type bt_wall;
 extern border_type bt_illusionwall;
 extern border_type bt_road;
+extern border_type bt_questportal;
 
 extern attrib_type at_countdown;
 

@@ -26,6 +26,7 @@
 #include <modules/xmas2000.h>
 #include <modules/xmas2001.h>
 #include <modules/museum.h>
+#include <items/questkeys.h>
 
 /* gamecode includes */
 #include <creation.h>
@@ -2725,6 +2726,26 @@ guard_conversion(void)
 	return 0;
 }
 
+static int
+questportal_init(void)
+{
+	region *r1 = findregion(43,-39);
+	region *r2 = findregion(44,-39);
+	border *bo;
+	unit *u;
+
+	if(r1 == NULL || r2 == NULL) return 0;
+	bo = new_border(&bt_questportal, r1, r2);
+	bo->data = (void *)3;
+
+	u = findunit(atoi36("L0sc"));
+	if(u) i_change(&u->items, &it_questkey1, 1);
+	
+	u = findunit(atoi36("xi7m"));
+	if(u) i_change(&u->items, &it_questkey2, 1);
+	return 0;
+}
+
 void
 korrektur(void)
 {
@@ -2775,6 +2796,7 @@ korrektur(void)
 	do_once("orc2", orc_conversion2());
 	do_once("witm", warn_items());
 	do_once("guac", guard_conversion());
+	do_once("qpoi", questportal_init());
 	warn_password();
 
 	/* seems something fishy is going on, do this just 

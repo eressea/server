@@ -24,8 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BMAXHASH 8191
-
 unsigned int nextborder = 0;
 
 border * borders[BMAXHASH];
@@ -378,6 +376,54 @@ border_type bt_illusionwall = {
 	b_write, /* write */
 	b_blocknone, /* block */
 	b_nameillusionwall, /* name */
+	b_rvisible, /* rvisible */
+	b_fvisible, /* fvisible */
+	b_uvisible, /* uvisible */
+};
+
+/***
+ * special quest door
+ ***/
+
+boolean b_blockquestportal(const border * b, const unit * u, const region * r) {
+	if((int)b->data > 0) return true;
+	return false;
+}
+
+static const char *
+b_namequestportal(const border * b, const region * r, const struct faction * f, int gflags)
+{
+	/* TODO: f->locale bestimmt die Sprache */
+	int lock = (int)b->data;
+	unused(b);
+	unused(r);
+
+	if (gflags & GF_ARTICLE) {
+		if(lock > 0) {
+			return "ein gewaltiges verschlossenes Tor";
+		} else {
+			return "ein gewaltiges offenes Tor";
+		}
+	} else {
+		if(lock > 0) {
+			return "gewaltiges verschlossenes Tor";
+		} else {
+			return "gewaltiges offenes Tor";
+		}
+	}
+
+	return "";
+}
+
+border_type bt_questportal = {
+	"questportal",
+	b_opaque,
+	NULL, /* init */
+	NULL, /* destroy */
+	b_read, /* read */
+	b_write, /* write */
+	b_blockquestportal, /* block */
+	b_namequestportal, /* name */
 	b_rvisible, /* rvisible */
 	b_fvisible, /* fvisible */
 	b_uvisible, /* uvisible */

@@ -2258,6 +2258,7 @@ attrib_init(void)
 	register_bordertype(&bt_firewall);
 	register_bordertype(&bt_wisps);
 	register_bordertype(&bt_road);
+	register_bordertype(&bt_questportal);
 
 	at_register(&at_jihad);
 	at_register(&at_skillmod);

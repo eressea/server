@@ -344,6 +344,9 @@
 	<string name="corridor1">
 		<text locale="de">Gang</text>
 	</string>
+	<string name="wall1">
+		<text locale="de">Wand</text>
+	</string>
 	<string name="magicstorm">
 		<text locale="de">Magischer Sturm</text>
 	</string>
@@ -404,6 +407,9 @@
 	</string>
 	<string name="corridor1_trail">
 		<text locale="de">die %s</text>
+	</string>
+	<string name="wall1_trail">
+		<text locale="de">eine mächtige Mauer</text>
 	</string>
 	<string name="magicstorm_trail">
 		<text locale="de">ein %s</text>
@@ -1170,6 +1176,22 @@
 	</string>
 	<string name="lebkuchenherz_p">
 		<text locale="de">Lebkuchenherzen mit der Aufschrift 'Erz und Stein, das ist fein'</text>
+	</string>
+	<string name="questkey1">
+		<text locale="de">Achatener Schlüssel</text>
+		<text locale="en">agate key</text>
+	</string>
+	<string name="questkey1_p">
+		<text locale="de">Achatene Schlüssel</text>
+		<text locale="en">agate keys</text>
+	</string>
+	<string name="questkey2">
+		<text locale="de">Saphirner Schlüssel</text>
+		<text locale="en">sapphire key</text>
+	</string>
+	<string name="questkey2_p">
+		<text locale="de">Saphirne Schlüssel</text>
+		<text locale="en">sapphire keys</text>
 	</string>
 
 	<comment>herb singular</comment>

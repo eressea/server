@@ -23,6 +23,7 @@
 # include "seed.h"
 #endif
 #include "birthday_firework.h"
+#include "questkeys.h"
 
 void
 register_items(void)
@@ -38,6 +39,7 @@ register_items(void)
 	register_birthday_firework();
 	register_lebkuchenherz();
 	register_catapultammo();
+	register_questkeys();
 }
 
 void

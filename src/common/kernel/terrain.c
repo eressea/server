@@ -277,7 +277,7 @@ const terraindata_t terrain[] = {
 	{
 		"hall1", '%',
 		NULL,
-		"in eine Halle",
+		NULL,
 		0,		/* Steine pro Runde */
 		0,		/* Steine fuer Strasse */
 		0, 		/* bewirtschaftbare Parzellen */
@@ -288,7 +288,7 @@ const terraindata_t terrain[] = {
 	{
 		"corridor1", '%',
 		NULL,
-		"in einen Gang",
+		NULL,
 		0,		/* Steine pro Runde */
 		0,		/* Steine fuer Strasse */
 		0, 		/* bewirtschaftbare Parzellen */
@@ -302,6 +302,17 @@ const terraindata_t terrain[] = {
 		"in einen gewaltigen magischen Sturm",
 		0,		/* Steine pro Runde */
 		-1,		/* Steine fuer Strasse */
+		0, 		/* bewirtschaftbare Parzellen */
+		FORBIDDEN_LAND,	/* Flags */
+		NULL
+	},
+	/* T_WALL1 */
+	{
+		"wall1", '#',
+		NULL,
+		NULL,
+		0,		/* Steine pro Runde */
+		0,		/* Steine fuer Strasse */
 		0, 		/* bewirtschaftbare Parzellen */
 		FORBIDDEN_LAND,	/* Flags */
 		NULL

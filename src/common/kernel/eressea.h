@@ -673,12 +673,12 @@ enum {
 	RC_GHOUL,
 	RC_GHOUL_LORD,
 
-	RC_MUS_SPIRIT,   /* 59 */
-	RC_GNOME,        /* 60 */
-	RC_TEMPLATE,     /* 61 */
-	RC_CLONE,        /* 62 */
+	RC_MUS_SPIRIT,   /* 60 */
+	RC_GNOME,        /* 61 */
+	RC_TEMPLATE,     /* 62 */
+	RC_CLONE,        /* 63 */
 	
-	RC_SHADOWDRAGON,
+	RC_SHADOWDRAGON, /* 64 */
 	RC_SHADOWBAT,
 	RC_NIGHTMARE,
 	RC_VAMPUNICORN,
