@@ -30,6 +30,9 @@
 #include <resources.h>
 #include <item.h>
 
+/* modules includes */
+#include <modules/alliance.h>
+
 /* util includes */
 #include <base36.h>
 
@@ -365,7 +368,15 @@ showregion(region * r, char full)
 		}
 		for (f = factions; f; f = f->next)
 			if (f->no_units) {
+#ifdef ALLIANCES
+				if(f->alliance != NULL) {
+					sprintf(buf, " %-26.26s (%s/%d)", f->name, factionid(f), f->alliance->id);
+				} else {
+					sprintf(buf, " %-26.26s (%s/-)", f->name, factionid(f));
+				}
+#else
 				sprintf(buf, " %-29.29s (%s)", f->name, factionid(f));
+#endif
 				adddbllist(&reglist, buf);
 				sprintf(buf, "  Einheiten: %d; Leute: %d %c",
 				   f->no_units, f->num_people, Tchar[old_race(f->race)]);
