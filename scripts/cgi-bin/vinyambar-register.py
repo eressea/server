@@ -12,7 +12,7 @@ from whrandom import choice
 # specify the filename of the template file
 scripturl="http://eressea.upb.de/~enno/cgi-bin/vinyambar-register.py"
 HTMLTemplate = "vinyambar.html"
-MailTemplate="register.mail"
+MailTemplate="vinyambar-register.mail"
 DefaultTitle = "Vinyambar Anmeldung"
 dbname = "vinyambar"
 From = "accounts@vinyambar.de"

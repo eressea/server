@@ -15,6 +15,7 @@ Errors = ""
 db = MySQLdb.connect(db=dbname)
 smtpserver='localhost'
 notify='accounts@vinyambar.de'
+minnmr=0
 
 # define a new function called Display
 # it takes one parameter - a string to Display
@@ -56,7 +57,7 @@ def ShowPage():
     while results>0:
 	results=results-1
 	gid, game, faction, lastturn, sid, race, info = cursor.fetchone()
-	if lastturn<maxturn[gid]:
+	if lastturn<=maxturn[gid]+minnmr:
 	    if info==None:
 		info='Keine Informationen'
 	    output=output+'<tr><td>'+ race + '</td><td>'+ game + '</td><td>' + str(int(maxturn[gid]-lastturn)) + '</td><td>' + info + '</td>'
