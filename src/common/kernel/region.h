@@ -98,6 +98,11 @@ typedef struct region {
 #endif
 } region;
 
+typedef struct region_list {
+  struct region_list * next;
+  struct region * data;
+} region_list;
+
 extern struct message_list * r_getmessages(const struct region * r, const struct faction * viewer);
 extern struct message * r_addmessage(struct region * r, const struct faction * viewer, struct message * msg);
 

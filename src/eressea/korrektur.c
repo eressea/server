@@ -2611,11 +2611,56 @@ static int
 fix_astralplane(void)
 {
 	plane * astralplane = getplanebyname("Astralraum");
+  region * r;
+  region_list * rlist = NULL;
+
 	if (astralplane) {
 		freset(astralplane, PFL_NOCOORDS);
 		freset(astralplane, PFL_NOFEED);
 		set_ursprung(findfaction(MONSTER_FACTION), astralplane->id, 0, 0);
 	}
+  for (r=regions;r;r=r->next) {
+    region * ra = r_standard_to_astral(r);
+    if (ra==NULL) continue;
+    if (r->terrain!=T_FIREWALL) continue;
+    if (ra->terrain==T_ASTRALB) continue;
+    if (ra->units!=NULL) {
+      region_list * rnew = malloc(sizeof(region_list));
+      rnew->data = ra;
+      rnew->next = rlist;
+      rlist = rnew;
+    }
+    terraform(ra, T_ASTRALB);
+  }
+  while (rlist) {
+    region_list * rnew = rlist;
+    region * r = rnew->data;
+    direction_t dir;
+    for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+      region * rnext = rconnect(r, dir);
+      if (rnext==NULL) continue;
+      if (rnext->terrain!=T_ASTRAL) continue;
+      while (r->units) {
+        unit * u = r->units;
+        move_unit(u, rnext, NULL);
+        if (u->faction->no==MONSTER_FACTION) {
+          set_number(u, 0);
+        }
+      }
+      break;
+    }
+    if (r->units!=NULL) {
+      unit * u;
+      for (u=r->units;u;u=u->next) {
+        if (u->faction->no!=MONSTER_FACTION) {
+          log_error(("Einheit %s in %u, %u steckt im Nebel fest.\n", 
+            unitname(u), r->x, r->y));
+        }
+      }
+    }
+    free(rnew);
+    rlist= rlist->next;
+  }
 	return 0;
 }
 
