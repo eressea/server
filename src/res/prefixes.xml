@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<prefixes>
+  <prefix>Dunkel</prefix>
+  <prefix>Licht</prefix>
+  <prefix>Klein</prefix>
+  <prefix>Hoch</prefix>
+  <prefix>Huegel</prefix>
+  <prefix>Berg</prefix>
+  <prefix>Wald</prefix>
+  <prefix>Sumpf</prefix>
+  <prefix>Schnee</prefix>
+  <prefix>Sonnen</prefix>
+  <prefix>Mond</prefix>
+  <prefix>See</prefix>
+  <prefix>Tal</prefix>
+  <prefix>Schatten</prefix>
+  <prefix>Hoehlen</prefix>
+  <prefix>Blut</prefix>
+  <prefix>Wild</prefix>
+  <prefix>Chaos</prefix>
+  <prefix>Nacht</prefix>
+  <prefix>Nebel</prefix>
+  <prefix>Grau</prefix>
+  <prefix>Frost</prefix>
+  <prefix>Finster</prefix>
+  <prefix>Duester</prefix>
+  <prefix>flame</prefix>
+  <prefix>ice</prefix>
+  <prefix>star</prefix>
+</prefixes>
