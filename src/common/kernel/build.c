@@ -304,13 +304,18 @@ destroy_road(unit *u, int n, const char *cmd)
 		int road = rroad(r, d);
 		region * r2 = rconnect(r,d);
 		willdo = min(willdo, road);
+		if (willdo==0) {
+			/* TODO: error message */
+		}
 #if 0
 		salvage = willdo / divy;
 		change_item(u, I_STONE, salvage);
 #endif
 		rsetroad(r, d, road - willdo);
-		add_message(&u->faction->msgs, new_message(
-			u->faction, "destroy_road%u:unit%r:from%r:to", u, r, r2));
+		if (road!=0 && road <= willdo) {
+			add_message(&u->faction->msgs, new_message(
+				u->faction, "destroy_road%u:unit%r:from%r:to", u, r, r2));
+		}
 	}
 }
 
