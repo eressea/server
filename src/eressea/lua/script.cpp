@@ -45,7 +45,7 @@ call_script(struct unit * u)
   if (a==NULL) a = a_findc(u->race->attribs, &at_script);
   if (a!=NULL && a->data.v!=NULL) {
     luabind::functor<void> * func = (luabind::functor<void> *)a->data.v;
-    func->operator()(*u);
+    func->operator()(u);
   }
   return -1;
 }
