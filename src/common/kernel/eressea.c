@@ -439,17 +439,19 @@ count_all_money(const region * r)
 int
 count_skill(faction * f, skill_t sk)
 {
-	int n = 0;
-	region *r;
-	unit *u;
-	region *last = lastregion(f);
-
-	for (r = firstregion(f); r != last; r = r->next)
-		for (u = r->units; u; u = u->next)
-			if (u->faction == f && has_skill(u, sk))
-				if (!is_familiar(u)) n += u->number;
-
-	return n;
+  int n = 0;
+  region *r;
+  unit *u;
+  region *last = f->last?f->last:lastregion(f);
+  
+  for (r =f->first?f->first:firstregion(f); r != last; r = r->next) {
+	for (u = r->units; u; u = u->next) {
+	  if (u->faction == f && has_skill(u, sk)) {
+		if (!is_familiar(u)) n += u->number;
+	  }
+	}
+  }
+  return n;
 }
 
 int quiet = 0;

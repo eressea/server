@@ -1556,7 +1556,7 @@ order_template(FILE * F, faction * f)
 	plane *pl;
 	unit *u;
 	int dh;
-	region *last = lastregion(f);
+	region *last = f->last?f->last:lastregion(f);
 
 	rps_nowrap(F, "");
 	rnl(F);
@@ -1579,7 +1579,7 @@ order_template(FILE * F, faction * f)
 	rps_nowrap(F, buf);
 	rnl(F);
 
-	for (r = firstregion(f); r != last; r = r->next) {
+	for (r = f->first?f->first:firstregion(f); r != last; r = r->next) {
 		dh = 0;
 		for (u = r->units; u; u = u->next)
 			if (u->faction == f && u->race != new_race[RC_SPELL]) {
@@ -1963,7 +1963,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	int dh;
 	int anyunits;
 	const struct region *r;
-  region * last = lastregion(f);
+  region * last = f->last?f->last:lastregion(f);
 	building *b;
 	ship *sh;
 	unit *u;
@@ -2203,7 +2203,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 
 	anyunits = 0;
 
-  for (r=firstregion(f);r!=last;r=r->next) {
+  for (r=f->first?f->first:firstregion(f);r!=last;r=r->next) {
 		boolean unit_in_region = false;
 		boolean durchgezogen_in_region = false;
 		int turm_sieht_region = false;
@@ -2796,10 +2796,10 @@ view_regatta(region * r, faction * f)
 static void
 prepare_report(faction * f)
 {
-	region * r;
-	region * end = lastregion(f);
+  region * r;
+  region * end = f->last?f->last:lastregion(f);
   seen_init();
-	for (r = firstregion(f); r != end; r = r->next) {
+  for (r = f->first?f->first:firstregion(f); r != end; r = r->next) {
 		attrib *ru;
 		unit * u;
 		plane * p = rplane(r);

@@ -856,16 +856,17 @@ visible_faction(const faction *f, const unit * u)
 faction_list *
 get_addresses(faction * f)
 {
+#if 0
 /* "TODO: travelthru" */
-	region *r, *last = lastregion(f);
-	const faction * lastf = NULL;
-	faction_list * flist = calloc(1, sizeof(faction_list));
-	flist->data = findfaction(f->no);
-	for (r=firstregion(f);r!=last;r=r->next) {
-		const unit * u = r->units;
+  region *r, *last = f->last?f->last:lastregion(f);
+  const faction * lastf = NULL;
+  faction_list * flist = calloc(1, sizeof(faction_list));
+  flist->data = findfaction(f->no);
+  for (r=f->first?f->first:firstregion(f);r!=last;r=r->next) {
+	const unit * u = r->units;
     const seen_region * sr = find_seen(r);
     if (sr==NULL) continue;
-		while (u!=NULL) {
+	while (u!=NULL) {
 			faction * sf = visible_faction(f, u);
 			boolean ballied = sf && sf!=f && sf!=lastf
 				&& !fval(u, UFL_PARTEITARNUNG) && cansee(f, r, u, 0);
@@ -904,5 +905,8 @@ get_addresses(faction * f)
 		}
 	}
 #endif
-	return flist;
+  return flist;
+#else
+  return NULL;
+#endif
 }
