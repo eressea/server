@@ -3386,6 +3386,7 @@ use(void)
 					const item_type * itype;
 					if (n==0) {
 						n = 1;
+					} else {
 						t = getstrtoken();
 					}
 					itype = finditemtype(t, u->faction->locale);
