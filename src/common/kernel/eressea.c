@@ -2474,10 +2474,14 @@ register_faction_id(int id)
 boolean
 faction_id_is_unused(int id)
 {
+#if 0
     if(used_faction_ids==NULL)
 		return(true);
 	return (boolean)(bsearch(&id, used_faction_ids, no_used_faction_ids,
 			sizeof(int), _cmp_int) == NULL);
+#else
+	return true;
+#endif
 }
 
 int
