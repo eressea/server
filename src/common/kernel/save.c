@@ -1026,7 +1026,11 @@ readunit(FILE * F)
 		if (f!=u->faction) u_setfaction(u, f);
 	}
 	rds(F, &u->name);
-	rds(F, &u->display);
+  rds(F, &u->display);
+#ifndef NDEBUG
+  if (strlen(u->name)>=NAMESIZE) u->name[NAMESIZE] = 0;
+  if (strlen(u->display)>=DISPLAYSIZE) u->name[DISPLAYSIZE] = 0;
+#endif
 	number = ri(F);
 	if (global.data_version<ITEMTYPE_VERSION)
 		set_money(u, ri(F));
@@ -1270,6 +1274,9 @@ readregion(FILE * F, int x, int y)
 	if (landregion(rterrain(r))) {
 		r->land = calloc(1, sizeof(land_region));
 		rds(F, &r->land->name);
+#ifndef NDEBUG
+    if (strlen(r->land->name)>=NAMESIZE) r->land->name[NAMESIZE] = 0;
+#endif
 	}
 	if (r->land) {
 		int i;
@@ -1518,10 +1525,14 @@ readfaction(FILE * F)
   }
 
   rds(F, &f->name);
+  rds(F, &f->banner);
+#ifndef NDEBUG
+  if (strlen(f->name)>=NAMESIZE) f->name[NAMESIZE] = 0;
+  if (strlen(f->banner)>=DISPLAYSIZE) f->banner[DISPLAYSIZE] = 0;
+#endif
 
   if (!quiet) printf("   - Lese Partei %s (%s)\n", f->name, factionid(f));
 
-  rds(F, &f->banner);
   rds(F, &email);
   if (set_email(&f->email, email)!=0) {
     log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
@@ -1850,6 +1861,10 @@ readgame(const char * filename, int backup)
       bhash(b);
       rds(F, &b->name);
       rds(F, &b->display);
+#ifndef NDEBUG
+      if (strlen(b->name)>=NAMESIZE) b->name[NAMESIZE] = 0;
+      if (strlen(b->display)>=DISPLAYSIZE) b->name[DISPLAYSIZE] = 0;
+#endif
       b->size = ri(F);
       if (global.data_version < TYPES_VERSION) {
         assert(!"data format is no longer supported");
@@ -1876,6 +1891,10 @@ readgame(const char * filename, int backup)
       shash(sh);
       rds(F, &sh->name);
       rds(F, &sh->display);
+#ifndef NDEBUG
+      if (strlen(sh->name)>=NAMESIZE) sh->name[NAMESIZE] = 0;
+      if (strlen(sh->display)>=DISPLAYSIZE) sh->name[DISPLAYSIZE] = 0;
+#endif
 
       rs(F, buf);
       sh->type = st_find(buf);

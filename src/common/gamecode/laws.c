@@ -1368,96 +1368,6 @@ ally_cmd(unit * u, struct order * ord)
   }
   return 0;
 }
-/* ------------------------------------------------------------- */
-
-static int
-display_cmd(unit * u, struct order * ord)
-{
-  char **s = NULL;
-  region * r = u->region;
-
-  init_tokens(ord);
-  skip_token();
-
-  switch (getparam(u->faction->locale)) {
-  case P_BUILDING:
-  case P_GEBAEUDE:
-    if (!u->building) {
-      cmistake(u, ord, 145, MSG_PRODUCE);
-      break;
-    }
-    if (!fval(u, UFL_OWNER)) {
-      cmistake(u, ord, 5, MSG_PRODUCE);
-      break;
-    }
-    if (u->building->type == bt_find("generic")) {
-      cmistake(u, ord, 279, MSG_PRODUCE);
-      break;
-    }
-    if (u->building->type == bt_find("monument") && u->building->display[0] != 0) {
-      cmistake(u, ord, 29, MSG_PRODUCE);
-      break;
-    }
-    if (u->building->type == bt_find("artsculpture") && u->building->display[0] != 0) {
-      cmistake(u, ord, 29, MSG_PRODUCE);
-      break;
-    }
-    s = &u->building->display;
-    break;
-
-  case P_SHIP:
-    if (!u->ship) {
-      cmistake(u, ord, 144, MSG_PRODUCE);
-      break;
-    }
-    if (!fval(u, UFL_OWNER)) {
-      cmistake(u, ord, 12, MSG_PRODUCE);
-      break;
-    }
-    s = &u->ship->display;
-    break;
-
-  case P_UNIT:
-    s = &u->display;
-    break;
-
-  case P_PRIVAT:
-    {
-      const char *d = getstrtoken();
-      if(d == NULL || *d == 0) {
-        usetprivate(u, NULL);
-      } else {
-        usetprivate(u, d);
-      }
-    }
-    break;
-
-  case P_REGION:
-    if (!u->building) {
-      cmistake(u, ord, 145, MSG_EVENT);
-      break;
-    }
-    if (!fval(u, UFL_OWNER)) {
-      cmistake(u, ord, 148, MSG_EVENT);
-      break;
-    }
-    if (u->building != largestbuilding(r,false)) {
-      cmistake(u, ord, 147, MSG_EVENT);
-      break;
-    }
-    s = &r->display;
-    break;
-
-  default:
-    cmistake(u, ord, 110, MSG_EVENT);
-    break;
-  }
-
-  if (!s) return 0;
-
-  set_string(&(*s), getstrtoken());
-  return 0;
-}
 
 static int
 prefix_cmd(unit * u, struct order * ord)
@@ -1548,16 +1458,110 @@ synonym_cmd(unit * u, struct order * ord)
 }
 
 static int
+display_cmd(unit * u, struct order * ord)
+{
+  char **s = NULL;
+  region * r = u->region;
+
+  init_tokens(ord);
+  skip_token();
+
+  switch (getparam(u->faction->locale)) {
+  case P_BUILDING:
+  case P_GEBAEUDE:
+    if (!u->building) {
+      cmistake(u, ord, 145, MSG_PRODUCE);
+      break;
+    }
+    if (!fval(u, UFL_OWNER)) {
+      cmistake(u, ord, 5, MSG_PRODUCE);
+      break;
+    }
+    if (u->building->type == bt_find("generic")) {
+      cmistake(u, ord, 279, MSG_PRODUCE);
+      break;
+    }
+    if (u->building->type == bt_find("monument") && u->building->display[0] != 0) {
+      cmistake(u, ord, 29, MSG_PRODUCE);
+      break;
+    }
+    if (u->building->type == bt_find("artsculpture") && u->building->display[0] != 0) {
+      cmistake(u, ord, 29, MSG_PRODUCE);
+      break;
+    }
+    s = &u->building->display;
+    break;
+
+  case P_SHIP:
+    if (!u->ship) {
+      cmistake(u, ord, 144, MSG_PRODUCE);
+      break;
+    }
+    if (!fval(u, UFL_OWNER)) {
+      cmistake(u, ord, 12, MSG_PRODUCE);
+      break;
+    }
+    s = &u->ship->display;
+    break;
+
+  case P_UNIT:
+    s = &u->display;
+    break;
+
+  case P_PRIVAT:
+    {
+      const char *d = getstrtoken();
+      if(d == NULL || *d == 0) {
+        usetprivate(u, NULL);
+      } else {
+        usetprivate(u, d);
+      }
+    }
+    break;
+
+  case P_REGION:
+    if (!u->building) {
+      cmistake(u, ord, 145, MSG_EVENT);
+      break;
+    }
+    if (!fval(u, UFL_OWNER)) {
+      cmistake(u, ord, 148, MSG_EVENT);
+      break;
+    }
+    if (u->building != largestbuilding(r,false)) {
+      cmistake(u, ord, 147, MSG_EVENT);
+      break;
+    }
+    s = &r->display;
+    break;
+
+  default:
+    cmistake(u, ord, 110, MSG_EVENT);
+    break;
+  }
+
+  if (s!=NULL) {
+    const char * s2 = getstrtoken();
+
+    if (strlen(s2)>=DISPLAYSIZE) {
+      char * s3 = strdup(s2);
+      s3[DISPLAYSIZE] = 0;
+      set_string(s, s3);
+      free(s3);
+    } else 
+    set_string(s, s2);
+  }
+
+  return 0;
+}
+
+static int
 name_cmd(unit * u, struct order * ord)
 {
   region * r = u->region;
-  char **s;
-  const char *s2;
-  int i;
+  char **s = NULL;
   param_t p;
   boolean foreign = false;
-
-  s = 0;
 
   init_tokens(ord);
   skip_token();
@@ -1791,23 +1795,29 @@ name_cmd(unit * u, struct order * ord)
     break;
   }
 
-  if (!s) return 0;
+  if (s!=NULL) {
+    const char * s2 = getstrtoken();
 
-  s2 = getstrtoken();
+    if (!s2[0]) {
+      cmistake(u, ord, 84, MSG_EVENT);
+      return 0;
+    }
 
-  if (!s2[0]) {
-    cmistake(u, ord, 84, MSG_EVENT);
-    return 0;
+    if (strchr(s2, '(')!=NULL) {
+      cmistake(u, ord, 112, MSG_EVENT);
+      return 0;
+    }
+
+    if (strlen(s2)>=NAMESIZE) {
+      char * s3 = strdup(s2);
+      s3[NAMESIZE] = 0;
+      set_string(s, s3);
+      free(s3);
+    } else 
+      set_string(s, s2);
+
   }
-  for (i = 0; s2[i]; i++)
-    if (s2[i] == '(')
-      break;
 
-  if (s2[i]) {
-    cmistake(u, ord, 112, MSG_EVENT);
-    return 0;
-  }
-  set_string(&(*s), s2);
   return 0;
 }
 /* ------------------------------------------------------------- */
