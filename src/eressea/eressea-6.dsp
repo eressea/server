@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /Za /W4 /GX /Z7 /O2 /I ".." /I "../common" /I "../common/util" /I "../common/kernel" /I "../common/gamecode" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "NDEBUG" /D "CONVERT_TRIGGER" /FR /YX /FD /c
+# ADD CPP /nologo /Za /W4 /GX /Z7 /O2 /I ".." /I "../common" /I "../common/util" /I "../common/kernel" /I "../common/gamecode" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "NDEBUG" /FR /YX /FD /c
 # ADD BASE RSC /l 0x407 /d "NDEBUG"
 # ADD RSC /l 0x407 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -68,7 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /Za /W4 /Gm /ZI /Od /I ".." /I "../common" /I "../common/util" /I "../common/kernel" /I "../common/gamecode" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /YX"stdafx.h" /FD /c
+# ADD CPP /nologo /Za /W4 /Gm /ZI /Od /I "../common/gamecode" /I "../common/kernel" /I "../common/util" /I ".." /I "../common" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /YX"stdafx.h" /FD /c
 # ADD BASE RSC /l 0x407 /d "_DEBUG"
 # ADD RSC /l 0x407 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -170,6 +170,8 @@ SOURCE=.\old\pointertags.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
 
+# PROP Exclude_From_Build 1
+
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
 # PROP Exclude_From_Build 1
@@ -189,6 +191,8 @@ SOURCE=.\old\pointertags.c
 SOURCE=.\old\pointertags.h
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
+
+# PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
@@ -210,6 +214,8 @@ SOURCE=.\old\relation.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
 
+# PROP Exclude_From_Build 1
+
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
 # PROP Exclude_From_Build 1
@@ -229,6 +235,8 @@ SOURCE=.\old\relation.c
 SOURCE=.\old\relation.h
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
+
+# PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
@@ -250,6 +258,8 @@ SOURCE=.\old\trigger.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
 
+# PROP Exclude_From_Build 1
+
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
 # PROP Exclude_From_Build 1
@@ -269,6 +279,8 @@ SOURCE=.\old\trigger.c
 SOURCE=.\old\trigger.h
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
+
+# PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 

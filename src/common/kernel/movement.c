@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.9 2001/02/14 07:44:57 enno Exp $
+ *	$Id: movement.c,v 1.10 2001/02/17 15:02:49 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1136,44 +1136,48 @@ travel(region * first, unit * u, region * next, int flucht)
 				ut = getunit(first, u);
 
 				if (ut) {
-					if (igetkeyword(ut->thisorder) == K_DRIVE) {
-						u2 = getunit(first, ut);
-						if (!u2) {
-							cmistake(ut, ut->thisorder, 64, MSG_MOVE);
-							continue;
-						} else {
-#ifndef NEW_DRIVE
-							restkapazitaet -= weight(ut);
-							if (restkapazitaet >= 0) {
-#endif
-								add_message(&u->faction->msgs, new_message(
-									u->faction, "transport%u:unit%u:target%r:start%r:end",
-									u, ut, first, current));
-
-								if(!(terrain[current->terrain].flags & WALK_INTO)
-										&& get_item(ut, I_HORSE)) {
-									cmistake(ut, ut->thisorder, 67, MSG_MOVE);
-									continue;
-								}
-								if(can_survive(ut, current)) {
-									for (i = 0; i != m; i++)
-										travelthru(ut, rv[i]);
-									move_unit(ut, current, NULL);
-								} else {
-									cmistake(ut, ut->thisorder, 230, MSG_MOVE);
-									continue;
-								}
-#ifndef NEW_DRIVE
+					boolean found = false;
+					strlist * ot;
+					for(ot=ut->orders;ot && !found;ot = ot->next) {
+						if (igetkeyword(ot->s) == K_DRIVE) {
+							u2 = getunit(first, ut);
+							if (!u2) {
+								cmistake(ut, ut->thisorder, 64, MSG_MOVE);
+								continue;
 							} else {
-								sprintf(buf, "Keine Transportkapazitäten"
-										" frei für %s und deren Gepäck.", unitname(ut));
-								mistake(u, u->thisorder, buf, MSG_MOVE);
-							}
+#ifndef NEW_DRIVE
+								restkapazitaet -= weight(ut);
+								if (restkapazitaet >= 0) {
 #endif
+									add_message(&u->faction->msgs, new_message(
+										u->faction, "transport%u:unit%u:target%r:start%r:end",
+										u, ut, first, current));
+
+									if(!(terrain[current->terrain].flags & WALK_INTO)
+											&& get_item(ut, I_HORSE)) {
+										cmistake(ut, ut->thisorder, 67, MSG_MOVE);
+										continue;
+									}
+									if(can_survive(ut, current)) {
+										for (i = 0; i != m; i++)
+											travelthru(ut, rv[i]);
+										move_unit(ut, current, NULL);
+									} else {
+										cmistake(ut, ut->thisorder, 230, MSG_MOVE);
+										continue;
+									}
+#ifndef NEW_DRIVE
+								} else {
+									sprintf(buf, "Keine Transportkapazitäten"
+											" frei für %s und deren Gepäck.", unitname(ut));
+									mistake(u, u->thisorder, buf, MSG_MOVE);
+								}
+#endif
+							}
+							found = true;
 						}
-					} else {
-						cmistake(u, u->thisorder, 90, MSG_MOVE);
 					}
+					if (!found) cmistake(u, u->thisorder, 90, MSG_MOVE);
 				} else {
 					if (ut) {
 						sprintf(buf,

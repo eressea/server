@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: magic.c,v 1.8 2001/02/15 02:41:46 enno Exp $
+ *	$Id: magic.c,v 1.9 2001/02/17 15:02:49 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -579,7 +579,7 @@ find_spellbyname(unit *u, char *s)
 		}
 	}
 
-	if (findtoken(&spellnames, s, (void**)&i) && getspell(u, spelldaten[i].id)) return &spelldaten[i];
+	if (findtoken(&spellnames, s, (void**)&i)==0 && getspell(u, spelldaten[i].id)) return &spelldaten[i];
 
 	return (spell *) NULL;
 }

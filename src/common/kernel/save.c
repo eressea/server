@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.18 2001/02/14 22:34:49 enno Exp $
+ *	$Id: save.c,v 1.19 2001/02/17 15:02:49 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -455,7 +455,10 @@ readfaction(void)
 		 * muß in "Gänsefüßchen" stehen!! */
 
 		/* War vorher in main.c:getgarbage() */
-		if (!quiet) { printf(" %4s;", factionid(f)); fflush(stdout); }
+		if (1 || !quiet) { 
+			printf(" %4s;", factionid(f));
+			fflush(stdout); 
+		}
 		freestrlist(f->mistakes);
 		f->mistakes = 0;
 
@@ -488,26 +491,27 @@ int
 readorders(const char *filename)
 {
 	FILE * F;
-	faction *f;
 	char *b;
-	int p;
+	int nfactions=0;
+	struct faction *f = NULL;
 
-	F = cfopen(filename, "r");
+	F = cfopen(filename, "rt");
 	if (F==NULL) return 0;
 
-	printf(" - lese Befehlsdatei...\n");
+	puts(" - lese Befehlsdatei...\n");
 
 	b = getbuf(F);
 
 	/* Auffinden der ersten Partei, und danach abarbeiten bis zur letzten
 	 * Partei */
 
-	f = 0;
-
 	while (b) {
+		int p;
+
 		switch (igetparam(b)) {
 		case P_FACTION:
 			f = readfaction();
+			if (f) ++nfactions;
 
 			b = getbuf(F);
 
@@ -541,7 +545,8 @@ readorders(const char *filename)
 	}
 
 	fclose(F);
-	printf("\n");
+	puts("\n");
+	printf("   %d Befehlsdateien gelesen\n", nfactions);
 	return 0;
 }
 /* ------------------------------------------------------------- */

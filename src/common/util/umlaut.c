@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: umlaut.c,v 1.5 2001/02/15 02:41:47 enno Exp $
+ *	$Id: umlaut.c,v 1.6 2001/02/17 15:02:50 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -119,14 +119,12 @@ findtoken(tnode * tk, const char * str, void **result)
 		++str;
 		if (!ref) return E_TOK_NOMATCH;
 		tk = ref->node;
-		if (tk && !(tk->flags & SHARED)) {
+	}
+	if (tk) {
+		if (tk->flags & LEAF || !(tk->flags & SHARED)) {
 			*result = tk->id;
 			return E_TOK_SUCCESS;
 		}
-	}
-	if (tk && (tk->flags & LEAF)) {
-		*result = tk->id;
-		return E_TOK_SUCCESS;
 	}
 	return E_TOK_NOMATCH;
 }
