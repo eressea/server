@@ -17,10 +17,11 @@
 #define BOOL_DEFINED
 /* wenn config.h nicht vor curses included wird, kompiliert es unter windows nicht */
 #include <config.h>
-#include <stdio.h>
 #include <curses.h>
 #include <eressea.h>
 #include "mapper.h"
+
+#include "autoseed.h"
 
 #include <spells/spells.h>
 #include <attributes/attributes.h>
@@ -52,6 +53,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include <locale.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -61,6 +63,7 @@ extern char *reportdir;
 extern char *datadir;
 extern char *basedir;
 extern int maxregions;
+extern boolean dirtyload;
 char datafile[256];
 
 /* -------------------- resizeterm ------------------------------------- */
@@ -1042,8 +1045,18 @@ movearound(int rx, int ry) {
 					make_ocean_block(rx, ry);
 					ch = -9;
 					break;
+				case 'a': 
+					if (r && r->land) {
+						regionlist * rlist = NULL;
+						add_regionlist(&rlist, r);
+						get_island(&rlist);
+						autoseed(rlist);
+						modified = 1;
+					}
+					break;
 				case 's':
 					seed_dropouts();
+					modified = 1;
 					break;
 				case 'S':
 					if (modified)
@@ -1466,6 +1479,9 @@ main(int argc, char *argv[])
 				break;
 			case 'v':
 				orderfile = argv[++i];
+				break;
+			case 'X':
+				dirtyload = true;
 				break;
 			case 'x':
 				maxregions = atoi(argv[++i]);

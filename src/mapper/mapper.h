@@ -43,15 +43,6 @@ typedef struct tagregion {
 	struct region *r;
 } tagregion;
 
-typedef struct newfaction {
-	struct newfaction * next;
-	const char * email;
-	const struct locale * lang;
-	const struct race * race;
-	int bonus;
-	boolean oldregions;
-} newfaction;
-
 extern tagregion *Tagged;
 
 void saddstr(char *s);

@@ -87,6 +87,10 @@ LINK32=link.exe
 # PROP Default_Filter "*.h"
 # Begin Source File
 
+SOURCE=.\autoseed.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\logging.h
 # End Source File
 # Begin Source File
@@ -110,6 +114,10 @@ SOURCE=..\common\triggers\triggers.h
 SOURCE=..\modules\weather.h
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\autoseed.c
+# End Source File
 # Begin Source File
 
 SOURCE=.\logging.c

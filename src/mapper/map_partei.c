@@ -17,6 +17,8 @@
 #include <eressea.h>
 #include "mapper.h"
 
+#include "autoseed.h"
+
 /* kernel includes */
 #include <faction.h>
 #include <item.h>
@@ -160,7 +162,6 @@ typedef struct dropout {
 } dropout;
 
 static dropout * dropouts;
-static newfaction * newfactions;
 
 void
 read_orders(const char * filename)
@@ -248,9 +249,10 @@ seed_dropouts(void)
 				if (nf->race==drop->race && !nf->bonus) {
 					unit * u = addplayer(r, nf->email, nf->race, nf->lang);
 					if (nf->bonus) give_latestart_bonus(r, u, nf->bonus);
-					*nfp = nf->next;
-					*dropp = drop->next;
 					found=true;
+					*dropp = drop->next;
+					*nfp = nf->next;
+					free(nf);
 					break;
 				}
 				nfp = &nf->next;
@@ -439,6 +441,7 @@ NeuePartei(region * r)
 		newfaction * nf = *nfp;
 		if (strcmp(email, nf->email)==0) {
 			*nfp = nf->next;
+			free(nf);
 		}
 		else nfp = &nf->next;
 	}

@@ -685,21 +685,37 @@ transfermen(unit * u, unit * u2, int n)
 
 		for (sk=0; sk!=MAXSKILLS; ++sk) {
 			double dlevel = 0.0;
-			int weeks, level;
+			int weeks, level = 0;
 
 			sv = get_skill(u, sk);
 			sn = get_skill(u2, sk);
 
 			if (sv==NULL && sn==NULL) continue;
-			if (sv && sv->level) dlevel += (sv->level + 1 - sv->weeks/(sv->level*2.0+1)) * n;
-			else dlevel += 0.5 * n;
-			if (sn && sn->level) dlevel += (sn->level + 1 - sn->weeks/(sn->level*2.0+1)) * u2->number;
-			else dlevel += 0.5 * u2->number;
+			if (sv && sv->level) {
+				dlevel += (sv->level + 1 - sv->weeks/(sv->level+1.0)) * n;
+				level += sv->level * n;
+			}
+			if (sn && sn->level) {
+				dlevel += (sn->level + 1 - sn->weeks/(sn->level+1.0)) * u2->number;
+				level += sn->level * u2->number;
+			}
 
 			dlevel = dlevel / (n + u2->number);
-			level = (int)dlevel;
-			weeks = (int)((level*2.0+1) * (1 - dlevel + level)+0.9999999);
-
+			level = level / (n + u2->number);
+			if (level<=dlevel) {
+				/* apply the remaining fraction to the number of weeks to go.
+				 * subtract the according number of weeks, getting closer to the
+				 * next level */
+				level = (int)dlevel;
+				weeks = (level+1) - (int)((dlevel - level) * (level+1));
+			} else {
+				/* make it harder to reach the next level. 
+				 * weeks+level is the max difficulty, 1 - the fraction between
+				 * level and dlevel applied to the number of weeks between this
+				 * and the previous level is the added difficutly */
+				level = (int)dlevel+1;
+				weeks = 1 + 2 * level - (int)((1 + dlevel - level) * level);
+			}
 			if (level) {
 				if (sn==NULL) sn = add_skill(u2, sk);
 				sn->level = (unsigned char)level;
@@ -784,6 +800,7 @@ u_setfaction(unit * u, faction * f)
 #endif
 	if (u->faction) {
 		set_number(u, 0);
+		--u->faction->no_units;
 		join_group(u, NULL);
 	}
 	if (u->prevF) u->prevF->nextF = u->nextF;
@@ -802,9 +819,11 @@ u_setfaction(unit * u, faction * f)
 	u->prevF = NULL;
 
 	u->faction = f;
-	if (cnt && f) set_number(u, cnt);
+	if (cnt && f) {
+		set_number(u, cnt);
+		++f->no_units;
+	}
 }
-
 /* vorsicht Sprüche können u->number == 0 (RS_FARVISION) haben! */
 void
 set_number(unit * u, int count)
