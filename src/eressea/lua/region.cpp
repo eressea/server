@@ -14,6 +14,7 @@
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
 
+#include <ostream>
 using namespace luabind;
 
 static eressea::list<region>
@@ -75,6 +76,19 @@ region_addnotice(region& r, const char * str)
   addmessage(&r, NULL, str, MSG_MESSAGE, ML_IMPORTANT);
 }
 
+static std::ostream& 
+operator<<(std::ostream& stream, region& r)
+{
+  stream << regionname(&r, NULL) << ", " << region_getterrain(r);
+  return stream;
+}
+
+static bool 
+operator==(const region& a, const region&b)
+{
+  return a.x==b.x && a.y==b.y;
+}
+
 void
 bind_region(lua_State * L) 
 {
@@ -83,6 +97,8 @@ bind_region(lua_State * L)
     def("get_region", &findregion),
 
     class_<struct region>("region")
+    .def(tostring(self))
+    .def(self == region())
     .property("name", &region_getname, &region_setname)
     .property("info", &region_getinfo, &region_setinfo)
     .property("terrain", &region_getterrain)

@@ -1,18 +1,14 @@
-function unitid(u)
-  return u.name .. " (" .. itoa36(u.id) .. ")"
-end
-
 function teleport_all(map, grave)
   print("- teleporting all quest members to the grave")
   local index
   for index in map do
     local r = map[index]
-	local u
-	for u in r.units do
-	  u.region = grave
-	  print ("  .teleported " .. unitid(u))
-	  grave:add_notice("Ein Portal öffnet sich, und " .. u.name .. " erscheint in " .. grave.name)
-	end
+    local u
+    for u in r.units do
+      u.region = grave
+      print ("  .teleported " .. u)
+      grave:add_notice("Ein Portal öffnet sich, und " .. u.name .. " erscheint in " .. grave.name)
+    end
   end
 end
 
@@ -32,7 +28,7 @@ function wyrm()
  for u in grave.units do
    if u.faction.id~=atoi36("rr") then
      teleport_all(map, grave)
-	 break
+     break
    end
  end
 
@@ -65,13 +61,13 @@ function write_emails()
   local key
   for key in locales do
     local locale = locales[key]
-	files[locale] = io.open(basepath .. "/emails." .. locale, "w")
+    files[locale] = io.open(basepath .. "/emails." .. locale, "w")
   end
 
   local faction
   for faction in factions() do
     -- print(faction.id .. " - " .. faction.locale)
-  	files[faction.locale]:write(faction.email .. "\n")
+    files[faction.locale]:write(faction.email .. "\n")
   end
 
   for key in files do
@@ -110,7 +106,6 @@ function process(orders)
     print("could not write game")
     return -1
   end
-  
 end
 
 

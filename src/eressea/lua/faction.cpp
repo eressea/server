@@ -9,11 +9,15 @@
 # include <modules/alliance.h>
 #endif
 
+// util includes
+#include <util/base36.h>
+
 // lua includes
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
 
+#include <ostream>
 using namespace luabind;
 
 static faction *
@@ -65,6 +69,19 @@ faction_locale(const faction& f)
   return locale_name(f.locale);
 }
 
+static std::ostream& 
+operator<<(std::ostream& stream, faction& f)
+{
+  stream << factionname(&f);
+  return stream;
+}
+
+static bool 
+operator==(const faction& a, const faction&b)
+{
+  return a.no==b.no;
+}
+
 void
 bind_faction(lua_State * L) 
 {
@@ -74,6 +91,8 @@ bind_faction(lua_State * L)
     def("add_faction", &add_faction),
 
     class_<struct faction>("faction")
+    .def(tostring(self))
+    .def(self == faction())
     .def_readonly("name", &faction::name)
     .def_readonly("password", &faction::passw)
     .def_readonly("email", &faction::email)

@@ -15,6 +15,7 @@
 #include <kernel/magic.h>
 #include <kernel/spell.h>
 
+// util includes
 #include <util/base36.h>
 
 // lua includes
