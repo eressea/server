@@ -2834,7 +2834,7 @@ reports(void)
 
 				if (!nonr && f->options & wants_report)
 					fprintf(shfp,
-						" \\\n\t\"text/plain\" \"Report\" turn, %d-%s.nr",
+						" \\\n\t\"text/plain\" \"Report\" %d-%s.nr",
 						turn, factionid(f));
 
 				if (!nocr && (f->options & wants_computer_report || f->age<3))
