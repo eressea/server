@@ -439,9 +439,7 @@ enum {
 #endif
 	K_PREFIX,
 	K_SYNONYM,
-#if GROWING_TREES
 	K_PFLANZE,
-#endif
 	MAXKEYWORDS,
 	NOKEYWORD = (keyword_t) - 1
 };
