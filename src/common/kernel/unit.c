@@ -108,7 +108,7 @@ destroy_unit(unit * u)
 		item ** p_item = &u->items;
 		unit * u3;
 
-		u->faction->no_units--;
+		/* u->faction->no_units--; */ /* happens in u_setfaction now */
 
 		if (r) for (u3 = r->units; u3; u3 = u3->next) {
 			if (u3 != u && u3->faction == u->faction && playerrace(u3->race)) {
