@@ -369,7 +369,7 @@ updatespelllist(unit * u)
 	/* Magier mit keinem bzw M_GRAU bekommen weder Sprüche angezeigt noch
 	 * neue Sprüche in ihre List-of-known-spells. Das sind zb alle alten
 	 * Drachen, die noch den Skill Magie haben */
-	if (gebiet == M_GRAU) return;
+	/* if (gebiet == M_GRAU) return; */
 
 	for (i = 0; spelldaten[i].id != SPL_NOSPELL; i++) {
 		boolean know = getspell(u, spelldaten[i].id);
