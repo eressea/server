@@ -2162,7 +2162,7 @@ tagbegin(struct xml_stack * stack)
 				if (!strcmp(semi, "flags")) it->flags=i;
 				break;
 			case 'g':
-				if (!strcmp(semi, "give")) it->give = (int (*)(const unit*, const unit*, const struct item_type *, int, const char *))get_function(s);
+				if (!strcmp(semi, "give")) it->give = (boolean (*)(const unit*, const unit*, const struct item_type *, int, const char *))get_function(s);
 				break;
 			case 'u':
 				if (!strcmp(semi, "use")) it->use = (int (*)(unit *, const struct item_type *, int, const char *))get_function(s);
@@ -2554,7 +2554,7 @@ it_read(FILE * F)
 			if (!strcmp(semi, "flags")) it->flags=i;
 			break;
 		case 'g':
-			if (!strcmp(semi, "give")) it->give = (int (*)(const unit*, const unit*, const struct item_type *, int, const char *))get_function(s);
+			if (!strcmp(semi, "give")) it->give = (boolean (*)(const unit*, const unit*, const struct item_type *, int, const char *))get_function(s);
 			break;
 		case 'u':
 			if (!strcmp(semi, "use")) it->use = (int (*)(unit *, const struct item_type *, int, const char *))get_function(s);

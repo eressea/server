@@ -352,8 +352,8 @@ curse_changevigour(attrib **ap, curse *c, int vigour)
 int
 curse_geteffect(const curse *c)
 {
-	assert(c);
-	return c->effect.i;
+	if (c) return c->effect.i;
+	return 0;
 }
 
 /* ------------------------------------------------------------- */
