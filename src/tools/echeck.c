@@ -1,6 +1,6 @@
 /* vi: set ts=2 ai sw=2:
  *
- * $Id: echeck.c,v 1.4 2001/02/03 23:29:26 corwin Exp $
+ * $Id: echeck.c,v 1.5 2001/02/05 21:17:14 faroul Exp $
  *
  *	Eressea PB(E)M host Copyright (C) 1997-2000
  *		Enno Rehling (rehling@usa.net)
@@ -24,17 +24,17 @@
 #endif
 
 #define MAINVERSION "3"
-#define MINVERSION	"10"
-#define PATCHLEVEL	"4"
+#define MINVERSION	"11"
+#define PATCHLEVEL	"0"
 
 #ifndef DEFAULT_PATH
-#if defined(unix)
-#define DEFAULT_PATH "/usr/local/lib/echeck:."
-#define PATH_DELIM ":"
-#else
-#define DEFAULT_PATH NULL
-#define PATH_DELIM ":"
-#endif
+# if defined(unix)
+#  define DEFAULT_PATH "/usr/local/lib/echeck:."
+#  define PATH_DELIM ":"
+# else
+#  define DEFAULT_PATH NULL
+#  define PATH_DELIM ";"
+# endif
 #endif
 	
 
@@ -191,6 +191,8 @@ char echo_it=0,						/* option: echo input lines */
  noroute=0,
  nolost=0,
  has_version=0,
+ at_cmd=0,
+ attack_warning=0,
  compile=0;								/* option: compiler-style warnings */
 int error_count=0,				/* counter: errors */
  warning_count=0;					/* counter: warnings */
@@ -928,9 +930,9 @@ ItemName(int i, int plural) {
 	return item->name->txt;
 }
 
+
 FILE *
-path_fopen(const char *path, const char *file, const char *mode)
-{
+path_fopen(const char *path, const char *file, const char *mode) {
 	FILE *f;
 	char *pathw = strdup(path);
 	char *token;
@@ -946,7 +948,6 @@ path_fopen(const char *path, const char *file, const char *mode)
 		}
 		token = strtok(NULL, PATH_DELIM);
 	}
-
 	free(pathw);
 	return NULL;
 }
@@ -959,9 +960,9 @@ readspells(void) {
 	char *file;
 
 	F = path_fopen(path, "zauber.txt", "r");
-	if(!F) {
-		fprintf(ERR, "Kann Datei 'zauber.txt' nicht lesen.\n", file);
-		fprintf(ERR, "Suchpfad ist '%s'\n", path);
+	if (!F) {
+		fprintf(ERR, "Kann Datei 'zauber.txt' nicht lesen.\n"
+				"Suchpfad ist '%s'\n", file, path);
 		return;
 	}
 
@@ -1009,9 +1010,9 @@ readskills(void) {
 	char *file;
 
 	F = path_fopen(path, "talente.txt", "r");
-	if(!F) {
-		fprintf(ERR, "Kann Datei 'talente.txt' nicht lesen.\n", file);
-		fprintf(ERR, "Suchpfad ist '%s'\n", path);
+	if (!F) {
+		fprintf(ERR, "Kann Datei 'talente.txt' nicht lesen.\n"
+				"Suchpfad ist '%s'\n", file, path);
 		return;
 	}
 
@@ -1055,8 +1056,8 @@ readitems(void) {
 	
 	F = path_fopen(path, "items.txt", "r");
 	if(!F) {
-		fprintf(ERR, "Kann Datei 'items.txt' nicht lesen.\n", file);
-		fprintf(ERR, "Suchpfad ist '%s'\n", path);
+		fprintf(ERR, "Kann Datei 'items.txt' nicht lesen.\n"
+				"Suchpfad ist '%s'\n", file, path);
 		return;
 	}
 
@@ -1106,7 +1107,10 @@ porder(void) {
 			for (i=0; i != indent; i++)
 				putc(' ',OUT);
 
-		if (does_default > 0)
+		if (at_cmd)
+			putc('@',OUT);
+		at_cmd=0;
+		if (does_default>0)
 			fprintf(OUT,"%s%s",checked_buf, does_default==2 ? "\"\n" : "");
 		else
 		{
@@ -1388,8 +1392,6 @@ newunit(int n, int t) {
 }
 
 
-/* - In/Output ------------------------------------------------- */
-
 int
 atoip(char *s) {
 	int n;
@@ -1449,12 +1451,19 @@ findstr(char **v, const char *s, int max) {
 
 int
 findtoken(const char *str, int type) {
-	tnode * tk = &tokens[type];
+	tnode *tk = &tokens[type];
+
+	if (*str=='@') {
+		str++;
+		at_cmd=1;
+	} else
+		at_cmd=0;
+
 	while (*str) {
-		char c = (char)tolower(*str);
-		int index = ((unsigned char)c) % 32;
-		tk = tk->next[index];
-		while (tk && tk->c!=c) tk = tk->nexthash;
+		char c=(char)tolower(*str);
+		int index=((unsigned char)c)%32;
+		tk=tk->next[index];
+		while (tk && tk->c!=c) tk=tk->nexthash;
 		++str;
 		if (!tk) return -1;
 	}
@@ -2053,12 +2062,11 @@ long_order(void) {
 			if (q) *q=0;	/* Den Befehl extrahieren */
 			i=findkeyword(s);
 			switch (i) {
-				case K_ATTACK:
 				case K_CAST:
 					if (this_command==i)
 						return;
-					/* ATTACKIERE und ZAUBERE sind zwar keine langen Befehle, aber man darf
-					 * auch keine anderen langen haben - darum ist bei denen long_order() */
+					/* ZAUBERE ist zwar kein langer Befehl, aber man darf auch
+					 * keine anderen langen haben - darum ist bei denen long_order() */
 				case K_SELL:
 				case K_BUY:
 					if (this_command==K_SELL || this_command==K_BUY)
@@ -3338,10 +3346,11 @@ checkanorder(char *Orders) {
 			scat(keywords[K_ATTACK]);
 			if (getaunit(NECESSARY)==3)
 				anerror("TEMP-Einheiten kann man nicht ATTACKIEREn");
-			long_order();
-					/* ATTACKIERE ist zwar kein langer Befehl, aber man darf auch keine
-						 anderen langen haben - darum ist bei ATTACKIERE long_order();
-						 Check in order_for_unit() */
+			if (!attack_warning) {
+				/* damit längere Angriffe nicht in Warnungs-Tiraden ausarten */
+				awarning("Längere Kämpfe schließen den langen Befehl aus",5);
+				attack_warning=1;
+			}
 			if (getaunit(42)==42) {
 				strcpy(warn_buf,"Pro Einheit muß ein ATTACKIERE-Befehl gegeben werden");
 				anerror(warn_buf);
@@ -3458,6 +3467,12 @@ checkanorder(char *Orders) {
 
 		case K_GIVE:
 		case K_LIEFERE:
+			if (this_command==K_LIEFERE && !empiria)
+			{
+				awarning("LIEFERE ist obsolet, bitte @GIB benutzen",3);
+				i=K_GIVE;
+				at_cmd=1;
+			}
 			checkgiving(i);
 			break;
 
@@ -3956,7 +3971,7 @@ readaunit(void) {
 		if (befehle_ende)
 			return;
 
-		/* Erst wenn wir sicher sind, dass kein Befehl eingegeben wurde, checken
+		/* Erst wenn wir sicher sind, daß kein Befehl eingegeben wurde, checken
 		 * wir, ob nun eine neue Einheit oder ein neuer Spieler drankommt */
 
 		if (igetkeyword(order_buf)==-1) {
@@ -4015,7 +4030,7 @@ help(const char *s) {
 	fprintf(ERR, "ECheck (Version "VERSION", "__DATE__
 			"), Zug-Checker für Eressea - Freeware!\n\n"
 			" Benutzung: %s [Optionen] Befehlsdatei\n"
-		/* Vorsicht, TABs! Neue Texte mit Tab-Width=8 rein */
+/***** Vorsicht, TABs! Neue Texte mit Tab-Width=8 rein *****/
 			"  -	Verwendet stdin anstelle einer Eingabedatei.\n"
 			"  -b	unterdrückt Warnungen und Fehler (brief)\n"
 			"  -q	erwartet keine Angaben zu Personen/Silber in [] bei EINHEIT\n"
@@ -4037,7 +4052,7 @@ help(const char *s) {
 			"	   lost   Einheit verliert Silber und Gegenstände\n"
 			"  -w[n]	Warnungen der Stufe n (default: 4=alle Warnungen)\n"
 			"  -x	Zeilenzählung ab PARTEI statt Dateianfang\n"
-			"  -Ppfad   Pfadangabe für items.txt und zauber.txt\n"
+			"  -Ppfad   Pfadangabe für items.txt, talente.txt und zauber.txt\n"
 			"  -vm.l   Mainversion.Level - für Test, ob richtige ECheck-Version\n"
 		, s);
 }
@@ -4330,6 +4345,7 @@ process_order_file(int *faction_count, int *unit_count) {
 			case P_REGION:
 				if (Regionen)
 					remove_temp();
+				attack_warning=0;
 				if (echo_it)
 				{
 					fputs(order_buf,OUT);
@@ -4377,7 +4393,7 @@ process_order_file(int *faction_count, int *unit_count) {
 				befehle_ende=0;
 				f=readafaction();
 				fprintf(ERR, "Befehle für Partei %s gefunden.\n", itob(f));
-				check_OPTION();	/* Nach PARTEI auf "; OPTION" / "; ECHECK" testen */
+				check_OPTION();	/* Nach PARTEI auf "; OPTION" bzw. "; ECHECK" testen */
 				if (befehle_ende) return;
 				fprintf(ERR, "Rekrutierungskosten auf %d Silber gesetzt, "
 								"Warning Level %d.\n", rec_cost, show_warnings);
@@ -4587,23 +4603,19 @@ main(int argc, char *argv[]) {
 	readitems();
 	readspells();
 	readskills();
+	if (!skilldata || !spells) {
+		fputs("Die Dateien 'talente.txt' und 'items.txt' müssen vorhanden sein\n",ERR);
+		return 5;
+	}
 	inittokens();
 	F=stdin;
 
-	for (i=1; i < argc; i++)
-		if (argv[i][0] != '-'
-#ifdef WIN32
-				&& argv[i][0] != '/'
-#endif
-				) {
+	for (i=1; i<argc; i++)
+		if (argv[i][0] != '-') {
 			F=fopen(argv[i], "r");
 			if (!F) {
 				fprintf(ERR, "Kann Datei `%s' nicht lesen.\n", argv[i]);
-#ifdef AMIGA
-				return 10;
-#else
 				return 2;
-#endif
 			} else {
 				filename=argv[i];
 				fprintf(ERR, "Verarbeite Datei `%s'.\n", argv[i]);
@@ -4620,15 +4632,15 @@ main(int argc, char *argv[]) {
 
 	if (unit_count==0) {
 		fputs("\nBitte überprüfe, ob Du die Befehle korrekt eingesandt hast.\n"
-			"Beachte dabei besonders, dass die Befehle nicht als HTML, Word-Dokument\n"
-			"oder als Attachment (Anlage) eingeschickt werden dürfen.\n", ERR);
+				"Beachte dabei besonders, daß die Befehle nicht als HTML, Word-Dokument\n"
+				"oder als Attachment (Anlage) eingeschickt werden dürfen.\n", ERR);
 		return -42;
 	}
 
 	if (!error_count && !warning_count && faction_count && unit_count)
 		fputs("Die Befehle scheinen in Ordnung zu sein.\n", ERR);
 
-	if (error_count > 1)
+	if (error_count>1)
 		fprintf(ERR, "Es wurden %d Fehler", error_count);
 	else if (error_count==1)
 		fputs("Es wurde ein Fehler", ERR);
@@ -4640,7 +4652,7 @@ main(int argc, char *argv[]) {
 			fputs("Es wurde", ERR);
 	}
 
-	if (warning_count > 1) {
+	if (warning_count>1) {
 		if (!error_count)
 			fputs("n", ERR);
 		fprintf(ERR," %d Warnungen", warning_count);
