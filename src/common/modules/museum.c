@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: museum.c,v 1.1 2001/01/27 11:32:32 enno Exp $
+ *	$Id: museum.c,v 1.2 2001/01/31 07:59:42 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -22,9 +22,6 @@
 
 #include <eressea.h>
 #include "museum.h"
-
-/* gamecode includes */
-#include <creation.h>
 
 /* kernel includes */
 #include "unit.h"

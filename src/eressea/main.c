@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.6 2001/01/30 23:16:17 enno Exp $
+ *	$Id: main.c,v 1.7 2001/01/31 07:59:43 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -422,7 +422,7 @@ main(int argc, char *argv[])
 		}
 		fclose(F);
 	} else {
-		char zText[PATH_MAX];
+		char zText[MAX_PATH];
 		strcat(strcpy(zText, basepath()), "/res/spells");
 		sprintf(buf, "fopen(%s): ", zText);
 		perror(buf);
@@ -450,7 +450,7 @@ main(int argc, char *argv[])
 		}
 		fclose(F);
 	} else {
-		char zText[PATH_MAX];
+		char zText[MAX_PATH];
 		strcat(strcpy(zText, basepath()), "/res/bonus");
 		sprintf(buf, "fopen(%s): ", zText);
 		perror(buf);
@@ -516,7 +516,7 @@ main(int argc, char *argv[])
 				break;
 			}
 	{
-		char zText[PATH_MAX];
+		char zText[MAX_PATH];
 		strcat(strcpy(zText, basepath()), "/res/timestrings");
 		read_datenames(zText);
 	}

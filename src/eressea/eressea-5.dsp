@@ -119,15 +119,19 @@ LINK32=link.exe
 # PROP Default_Filter "*.h"
 # Begin Source File
 
-SOURCE=..\modules\arena.h
+SOURCE=..\common\modules\arena.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\modules\museum.h
+SOURCE=.\attributes.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\modules\score.h
+SOURCE=..\common\modules\museum.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\modules\score.h
 # End Source File
 # Begin Source File
 
@@ -135,7 +139,7 @@ SOURCE=.\weapons.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\modules\xmas2000.h
+SOURCE=..\common\modules\xmas2000.h
 # End Source File
 # End Group
 # Begin Group "Conversion"
@@ -350,7 +354,7 @@ SOURCE=..\common\items\weapons.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\modules\arena.c
+SOURCE=..\common\modules\arena.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
 
@@ -365,7 +369,7 @@ SOURCE=..\modules\arena.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\modules\museum.c
+SOURCE=..\common\modules\museum.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
 
@@ -380,7 +384,7 @@ SOURCE=..\modules\museum.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\modules\oceannames.c
+SOURCE=..\common\modules\oceannames.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
 
@@ -395,7 +399,7 @@ SOURCE=..\modules\oceannames.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\modules\score.c
+SOURCE=..\common\modules\score.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
 
@@ -410,7 +414,7 @@ SOURCE=..\modules\score.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\modules\xmas2000.c
+SOURCE=..\common\modules\xmas2000.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
 
@@ -822,6 +826,14 @@ SOURCE=..\common\triggers\unitmessage.c
 
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\attributes.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\modules\gmcmd.c
+# End Source File
 # Begin Source File
 
 SOURCE=.\korrektur.c

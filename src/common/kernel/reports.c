@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: reports.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: reports.c,v 1.3 2001/01/31 07:59:42 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -68,7 +68,7 @@ const char *coasts[MAXDIRECTIONS] =
 const char * 
 reportpath(void)
 {
-	static char zText[PATH_MAX];
+	static char zText[MAX_PATH];
 	if (g_reportdir) return g_reportdir;
 	return strcat(strcpy(zText, basepath()), "/reports");
 }

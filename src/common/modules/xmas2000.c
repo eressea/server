@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: xmas2000.c,v 1.2 2001/01/28 08:01:52 enno Exp $
+ *	$Id: xmas2000.c,v 1.3 2001/01/31 07:59:42 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -15,9 +15,6 @@
 #include <config.h>
 #include <eressea.h>
 #include "xmas2000.h"
-
-/* gamecode includes */
-#include <creation.h>
 
 /* kernel includes */
 #include <plane.h>
