@@ -273,45 +273,43 @@ void
 battlerecord(battle * b, const char *s)
 {
 	bfaction * bf;
-#if 0
-	static char * lasts = NULL;
+	struct message * m = msg_message("msg_battle", "string", strdup(s));
+	plane * p = rplane(b->region);
+	watcher * w;
 
-	if (lasts!=s) {
-		battledebug(s);
-		lasts = s;
-	}
-#endif
-	s = gc_add(strdup(s));
 	for (bf = b->factions;bf;bf=bf->next) {
-		faction * f = bf->faction;
-		struct message * m = new_message(f, "msg_battle%s:string", s);
-		brecord(f, b->region, m);
+		brecord(bf->faction, b->region, m);
 	}
+	if (p) for (w=p->watchers;w;w=w->next) {
+		for (bf = b->factions;bf;bf=bf->next) if (bf->faction==w->faction) break;
+		if (bf==NULL) brecord(w->faction, b->region, m);
+	}
+	msg_release(m);
 }
 
 void
 battlemsg(battle * b, unit * u, const char * s)
 {
 	bfaction * bf;
+	struct message * m;
+	plane * p = rplane(b->region);
+	watcher * w;
 
 	sprintf(buf, "%s %s", unitname(u), s);
+	m = msg_message("msg_battle", "string", strdup(buf));
 	for (bf=b->factions;bf;bf=bf->next) {
-		faction * f = bf->faction;
-		brecord(f, u->region, new_message(f, "msg_battle%s:string", strdup(buf)));
+		brecord(bf->faction, u->region, m);
 	}
+	if (p) for (w=p->watchers;w;w=w->next) {
+		for (bf = b->factions;bf;bf=bf->next) if (bf->faction==w->faction) break;
+		if (bf==NULL) brecord(w->faction, b->region, m);
+	}
+	msg_release(m);
 }
 
 static void
 fbattlerecord(faction * f, region * r, const char *s)
 {
-#if 0
-	static char * lasts = NULL;
-
-	if (lasts!=s) {
-		battledebug(s);
-		lasts = s;
-	}
-#endif
 	s = gc_add(strdup(s));
 	brecord(f, r, new_message(f, "msg_battle%s:string", s));
 }
@@ -1181,7 +1179,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 
 	if (df->person[dt.index].hp > 0) {	/* Hat überlebt */
 		battledebug(debugbuf);
-		if (old_race(au->race) == RC_DAEMON) {
+		if (old_race(au->irace) == RC_DAEMON) {
 #ifdef TODO_RUNESWORD
 			if (select_weapon(dt, 0, -1) == WP_RUNESWORD) continue;
 #endif

@@ -7251,8 +7251,8 @@
 			<arg name="command" type="string"></arg>
 			<arg name="student" type="unit"></arg>
 		</type>
-		<text locale="de">"$unit($unit) in $region($region): '$command' - $unit($student) ist mindestens gleich gut wie wir."</text>
-		<text locale="en">"$unit($unit) in $region($region): '$command' - $unit($student) is at least as good as we are."</text>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - $unit($unit) muß mindestens 2 Stufen besser sein als $unit($student)."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - $unit($unit) needs to be at least 2 levels better than $unit($student)."</text>
 	</message>
 
 	<message name="battle_spacer" section="battle">

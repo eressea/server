@@ -143,7 +143,7 @@ warn_items(void)
 		for (u=r->units;u;u=u->next) {
 			item * itm;
 			for (itm=u->items;itm;itm=itm->next) {
-				if (itm->number>100000) {
+				if (itm->number>1000000) {
 					found = 1;
 					log_error(("Einheit %s hat %u %s\n", 
 						unitid(u), itm->number, 
@@ -1792,23 +1792,25 @@ secondfaction(faction * pf)
 static void
 update_gmquests(void)
 {
-	/* gm04 will keine Orks */
 	faction * f = findfaction(atoi36("gm04"));
 	if (f) {
 		unit * u = f->units;
 		potion_t p;
 		attrib * permissions = a_find(f->attribs, &at_permissions);
 
-		do_once("et02", secondfaction(f));
 		if (u!=NULL) {
 			plane * p = rplane(u->region);
+			/* gm04 will keine Orks */
 			if (p!=NULL) p->flags |= PFL_NOORCGROWTH;
+			/* gm04 will keine Monster */
+			if (p!=NULL) p->flags |= PFL_NOMONSTERS;
 		}
 		for (p=0;p!=MAX_POTIONS;++p) {
 			attrib * a = a_find(permissions, &at_gmcreate);
 			while (a && a->data.v!=(void*)oldpotiontype[p]->itype) a=a->nexttype;
 			if (!a) a_add((attrib**)&permissions->data.v, make_atgmcreate(oldpotiontype[p]->itype));
 		}
+		do_once("et02", secondfaction(f));
 	}
 	do_once("rq01", regatta_quest());
 }

@@ -785,7 +785,7 @@ init_drive(void)
 		 * doesn't seem to be an easy way to speed this up. */
 
 		for(u=r->units; u; u=u->next) {
-			if(igetkeyword(u->thisorder, u->faction->locale) == K_DRIVE && !fval(u, FL_LONGACTION)) {
+			if(igetkeyword(u->thisorder, u->faction->locale) == K_DRIVE && !fval(u, FL_LONGACTION) && !fval(u, FL_HUNGER)) {
 				boolean found = false;
 				ut = getunit(r, u->faction);
 				if(!ut) {
@@ -821,7 +821,7 @@ init_drive(void)
 				ut = getunit(r, u->faction);
 				if(!ut) continue;
 
-				if (igetkeyword(ut->thisorder, u->faction->locale) == K_DRIVE && !fval(ut, FL_LONGACTION)) {
+				if (igetkeyword(ut->thisorder, u->faction->locale) == K_DRIVE && !fval(ut, FL_LONGACTION) && !fval(ut, FL_HUNGER)) {
 					u2 = getunit(r, u->faction);
 					if(u2 == u) {
 						w += weight(ut);
@@ -1170,7 +1170,7 @@ travel(region * first, unit * u, region * next, int flucht)
 				if (ut) {
 					boolean found = false;
 					if (igetkeyword(ut->thisorder, u->faction->locale) == K_DRIVE
-							&& !fval(ut, FL_LONGACTION)) {
+							&& !fval(ut, FL_LONGACTION) && !fval(ut, FL_HUNGER)) {
 						u2 = getunit(first, ut->faction);
 						if(u2 == u) {
 							found = true;
