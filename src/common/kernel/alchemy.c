@@ -109,10 +109,10 @@ use_potion(unit * u, const item_type * itype, int amount, const char * cmd)
 		/* für die Aufforstung von Mallornwäldern braucht man Mallorn */
 		if (fval(r, RF_MALLORN)) {
 			holz = new_use_pooled(u, oldresourcetype[R_MALLORN], 
-					GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10);
+					GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10*amount);
 		} else {
 			holz = new_use_pooled(u, oldresourcetype[R_WOOD], 
-					GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10);
+					GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10*amount);
 		}
 #if GROWING_TREES
 		rsettrees(r, 1, rtrees(r, 1) + holz);
@@ -124,26 +124,27 @@ use_potion(unit * u, const item_type * itype, int amount, const char * cmd)
 	} else if (ptype==oldpotiontype[P_HEAL]) {
 		return EUNUSABLE;
 	} else if (ptype==oldpotiontype[P_HEILWASSER]) {
-		u->hp = min(unit_max_hp(u) * u->number, u->hp + 400);
+		u->hp = min(unit_max_hp(u) * u->number, u->hp + 400 * amount);
 	} else if (ptype==oldpotiontype[P_PEOPLE]) {
 		region * r = u->region;
 		attrib * a = (attrib*)a_find(r->attribs, &at_peasantluck);
 		if (!a) a = a_add(&r->attribs, a_new(&at_peasantluck));
-		++a->data.i;
+		a->data.i+=amount;
 	} else if (ptype==oldpotiontype[P_HORSE]) {
 		region * r = u->region;
 		attrib * a = (attrib*)a_find(r->attribs, &at_horseluck);
 		if (!a) a = a_add(&r->attribs, a_new(&at_horseluck));
-		++a->data.i;
+		a->data.i+=amount;
 	} else if (ptype==oldpotiontype[P_WAHRHEIT]) {
 		fset(u, FL_DISBELIEVES);
+		amount=1;
 	} else if (ptype==oldpotiontype[P_MACHT]) {
 		/* Verfünffacht die HP von max. 10 Personen in der Einheit */
-		u->hp += min(u->number, 10) * unit_max_hp(u) * 4;
+		u->hp += min(u->number, 10*amount) * unit_max_hp(u) * 4;
 	} else {
-		change_effect(u, ptype, 10);
+		change_effect(u, ptype, 10*amount);
 	}
-	new_use_pooled(u, ptype->itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1);
+	new_use_pooled(u, ptype->itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
 	usetpotionuse(u, ptype);
 
 	ADDMSG(&u->faction->msgs, msg_message("usepotion",
