@@ -890,13 +890,24 @@ sp_chaosrow(fighter * fi, int level, int force, spell * sp)
 
 		chance = 100 * force/n;
 		if (chance < 1 + rand()%100) {
-			row = df->status+FIRST_ROW;
+			row = statusrow(df->status)+FIRST_ROW;
 			df->side->size[row] -= df->alive;
 			if (df->unit->race->battle_flags & BF_NOBLOCK) {
-				df->side->nonblockers[df->status+FIRST_ROW] -= df->alive;
+				df->side->nonblockers[row] -= df->alive;
 			}
 			row = FIRST_ROW + (rand()% NUMROWS);
-			df->status = (status_t)row - FIRST_ROW;
+			switch (row) {
+				case FIGHT_ROW:
+					df->status = ST_FIGHT;
+				case BEHIND_ROW:
+					df->status = ST_CHICKEN;
+				case AVOID_ROW:
+					df->status = ST_AVOID;
+				case FLEE_ROW:
+					df->status = ST_FLEE;
+				default:
+					assert(!"unknown combatrow");
+			}
 			df->side->size[row] += df->alive;
 			if (df->unit->race->battle_flags & BF_NOBLOCK) {
 				df->side->nonblockers[row] += df->alive;
