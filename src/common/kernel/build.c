@@ -661,6 +661,9 @@ build(unit * u, const construction * ctype, int completed, int want)
 			n = min(want, n);
 		if (type->maxsize>0) {
 			n = min(type->maxsize-completed, n);
+			if (type->improvement==NULL) {
+				want = n;
+			}
 		}
 
 		if (type->materials) for (c=0;n>0 && type->materials[c].number;c++) {
