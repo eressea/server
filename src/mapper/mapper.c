@@ -34,6 +34,7 @@
 
 #include <item.h>
 #include <faction.h>
+#include <race.h>
 #include <region.h>
 #include <reports.h>
 #include <save.h>
@@ -1303,11 +1304,14 @@ main(int argc, char *argv[])
 	kernel_init();
 
 	init_triggers();
+
+	debug_language("locales.log");
+	init_locales();
+
+	init_races();
 	init_attributes();
 	init_spells();
-
 	init_resources();
-	/* init_weapons(); */
 	init_items();
 
 	init_museum();

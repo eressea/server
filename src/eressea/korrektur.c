@@ -1968,21 +1968,6 @@ fix_herbs(void)
 	}
 }
 
-#if 0
-#include <modules/gmcmd.h>
-#include <attributes/gm.h>
-void setup_gm_faction(void);
-static void
-set_atgm(faction * f)
-{
-	plane * p = planes;
-	if (!f) return;
-	while (p) {
-		a_add(&f->attribs, make_gm(p));
-		p = p->next;
-	}
-}
-#endif
 
 #include <event.h>
 #include <triggers/timeout.h>

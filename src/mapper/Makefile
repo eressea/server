@@ -14,7 +14,8 @@ INCLUDES  += \
 	-I../common/util \
 	-I../common/kernel \
 	-I../common/spells \
-	-I../common
+	-I../common \
+	-I..
 
 LIBS      += \
 	-le-modules \
@@ -26,6 +27,7 @@ LIBS      += \
 	-le-attributes \
 	-le-util \
 	-lm
+
 ifeq ($(NCURSES), 1)
  LIBS += -lncurses
 else

@@ -599,10 +599,11 @@ typus2race(unsigned char typus)
 }
 
 boolean
-is_persistent(const char *s, const struct locale *lang) 
+is_persistent(const char *s, const struct locale *lang)
 {
+	if (s==NULL) return false;
 #ifdef AT_PERSISTENT                                                          
-	if(*s == '@') return true;                                                  
+	if(*s == '@') return true;
 #endif      /* Nur kurze Befehle! */
 	switch(igetkeyword(s, lang)) {
 		case K_BUY:

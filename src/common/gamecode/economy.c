@@ -744,7 +744,7 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 		strlist * o = u->orders;
 		u->orders = o->next;
 		gc_add(o->s); /* delete it later */
-		free(o);
+		o->s = NULL;
 	}
 }
 
