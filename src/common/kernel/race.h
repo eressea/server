@@ -135,7 +135,6 @@ extern int rc_specialdamage(const race *, const race *, const struct weapon_type
 #define BF_INV_NONMAGIC (1<<5) /* Immun gegen nichtmagischen Schaden */
 
 extern void give_starting_equipment(struct region *r, struct unit *u);
-extern void give_latestart_bonus(struct region *r, struct unit *u, int b);
 extern int unit_old_max_hp(struct unit * u);
 extern const char * racename(const struct locale *lang, const struct unit *u, const race * rc);
 

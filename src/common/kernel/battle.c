@@ -104,8 +104,6 @@ boolean nobattledebug = false;
 #define MINSPELLRANGE 1
 #define MAXSPELLRANGE 7
 
-#define COMBATEXP         0
-
 #define COMBAT_TURNS			10
 
 static const double EFFECT_PANIC_SPELL = 0.25;
@@ -935,6 +933,30 @@ remove_troop(troop dt)
 }
 
 /* ------------------------------------------------------------- */
+
+#if SKILLPOINTS
+void
+drain_exp(unit *u, int n)
+{
+	skill_t sk = (skill_t)(rand() % MAXSKILLS);
+	skill_t ssk;
+
+	ssk = sk;
+
+	while(get_skill(u, sk) <= 0) {
+		sk++;
+		if (sk == MAXSKILLS)
+			sk = 0;
+		if (sk == ssk) {
+			sk = NOSKILL;
+			break;
+		}
+	}
+	if (sk != NOSKILL) {
+		change_skill(u, sk, -1);
+	}
+}
+#else
 void
 drain_exp(unit *u, int n)
 {
@@ -957,8 +979,7 @@ drain_exp(unit *u, int n)
 		change_skill(u, sk, -n);
 	}
 }
-
-/* ------------------------------------------------------------- */
+#endif
 
 const char *
 rel_dam(int dam, int hp)
@@ -2414,64 +2435,6 @@ aftermath(battle * b)
 			fbattlerecord(f, r, buf);
 		} next(s);
 	}
-#if COMBATEXP
-	for (fi = fighters->begin; fi != fighters->end; ++fi) {
-		fighter *df = *fi;
-		troop t;
-
-		t.fighter = df;
-		if (df->alive && df->side->bf->lastturn > 2) {
-			/* signifikanter Kampf, dann gibt es XP */
-			unit *du = df->unit;
-			cvector *tacs = &df->side->leader.fighters;
-
-			if (v_find(tacs->begin, tacs->end, df) != tacs->end)
-				change_skill(du, SK_TACTICS, du->number * COMBATEXP);
-			if (!fval(df, FIG_COMBATEXP)) {
-				t.index = df->alive;
-				while (t.index) {
-					--t.index;
-					change_skill(du, SK_AUSDAUER, COMBATEXP);
-
-					switch (select_weapon(t, 1, 1)) {
-					case WP_RUNESWORD:
-					case WP_GREATSWORD:
-					case WP_EOGSWORD:
-					case WP_SWORD:
-					case WP_AXE:
-						change_skill(du, SK_SWORD, COMBATEXP);
-						break;
-					case WP_SPEAR:
-					case WP_HALBERD:
-					case WP_LANCE:
-						change_skill(du, SK_SPEAR, COMBATEXP);
-						break;
-					case WP_CROSSBOW:
-						change_skill(du, SK_CROSSBOW, COMBATEXP);
-						break;
-					case WP_LONGBOW:
-					case WP_GREATBOW:
-						change_skill(du, SK_LONGBOW, COMBATEXP);
-						break;
-					case WP_CATAPULT:
-						change_skill(du, SK_CATAPULT, COMBATEXP);
-						break;
-					}
-
-					if (t.index < t.fighter->horses)
-						change_skill(du, SK_RIDING, COMBATEXP);
-
-				}
-
-				if (get_skill(du, SK_MAGIC) > 0)
-					change_skill(du, SK_MAGIC, COMBATEXP * du->number);
-
-				fset(df, FIG_COMBATEXP);
-			}
-		}
-	}
-#endif
-
 	/* Wir benutzen drifted, um uns zu merken, ob ein Schiff
 	 * schonmal Schaden genommen hat. (moved und drifted
 	 * sollten in flags überführt werden */
