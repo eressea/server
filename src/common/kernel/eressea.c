@@ -1701,7 +1701,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
 
 		/* Daemonentarnung */
 		set_racename(&u->attribs, get_racename(creator->attribs));
-		if (fval(creator->race, RCF_SHAPESHIFT)) {
+		if (fval(u->race, RCF_SHAPESHIFT) && fval(creator->race, RCF_SHAPESHIFT)) {
 			u->irace = creator->irace;
 		}
 

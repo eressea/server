@@ -195,7 +195,7 @@ setstealth(unit * u, strlist * S)
 		if (u->race->flags & RCF_SHAPESHIFT) {
 			if (playerrace(trace)) {
 				u->irace = trace;
-				if (u->race->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+				if ((u->race->flags & RCF_SHAPESHIFTANY) && get_racename(u->attribs))
 					set_racename(&u->attribs, NULL);
 			}
 		}
