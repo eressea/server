@@ -6034,4 +6034,14 @@
     <text locale="en">grails</text>
   </string>
 
+  <string name="studypotion">
+    <text locale="de">Lerntrank</text>
+    <text locale="en">brain boost</text>
+  </string>
+
+  <string name="studypotion_p">
+    <text locale="de">Lerntränke</text>
+    <text locale="en">brain boosts</text>
+  </string>
+
 </strings>

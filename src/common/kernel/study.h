@@ -12,8 +12,30 @@
  * prior permission by the authors of Eressea.
  */
 
-void teaching(void);
-void learn(void);
+#ifndef H_KRNL_STUDY
+#define H_KRNL_STUDY
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern void teaching(void);
+extern void learn(void);
 
 extern magic_t getmagicskill(void);
 extern boolean is_migrant(struct unit *u);
+extern int study_cost(struct unit *u, skill_t talent);
+
+#define MAXTEACHERS 4
+typedef struct teaching_info {
+  struct unit * teachers[MAXTEACHERS];
+  int value;
+} teaching_info;
+
+extern const struct attrib_type at_learning;
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

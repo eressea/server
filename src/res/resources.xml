@@ -21,6 +21,18 @@
     </item>
   </resource>
 
+  <resource name="studypotion">
+    <item weight="0">
+      <function name="use" value="use_studypotion"/>
+    </item>
+  </resource>
+
+  <resource name="speedsail">
+    <item weight="0">
+      <function name="use" value="use_speedsail"/>
+    </item>
+  </resource>
+
   <resource name="snowman">
     <!-- xmas gimmik -->
     <item notlost="yes" weight="1"/>

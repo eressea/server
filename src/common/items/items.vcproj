@@ -182,6 +182,12 @@
 			RelativePath=".\speedsail.h">
 		</File>
 		<File
+			RelativePath=".\studypotion.c">
+		</File>
+		<File
+			RelativePath=".\studypotion.h">
+		</File>
+		<File
 			RelativePath=".\weapons.c">
 		</File>
 		<File

@@ -8,6 +8,7 @@ SubDirHdrs $(SUBDIR)/.. ;
 SubDirHdrs $(SUBDIR)/../.. ;
 
 SOURCES =
+ artrewards.c
  birthday_firework.c
  catapultammo.c
  demonseye.c
@@ -15,10 +16,10 @@ SOURCES =
  questkeys.c
  racespoils.c
  seed.c
+ speedsail.c
+ studypotion.c
  weapons.c
  xerewards.c
- artrewards.c
- speedsail.c
  ;
 
 Library items : $(SOURCES) ;

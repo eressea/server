@@ -20,6 +20,7 @@
 #include "artrewards.h"
 #include "weapons.h"
 #include "speedsail.h"
+#include "studypotion.h"
 #include "racespoils.h"
 #if GROWING_TREES
 # include "seed.h"
@@ -44,6 +45,7 @@ register_items(void)
 	register_racespoils();
   register_artrewards();
   register_speedsail();
+  register_studypotion();
 }
 
 void

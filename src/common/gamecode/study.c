@@ -24,6 +24,7 @@
 
 #include <config.h>
 #include "eressea.h"
+#include "study.h"
 
 #include "alchemy.h"
 #include "building.h"
@@ -97,8 +98,8 @@ magic_lowskill(unit *u)
 
 /* ------------------------------------------------------------- */
 
-static int
-study_cost(unit *u, int talent)
+int
+study_cost(unit *u, skill_t talent)
 {
 	int stufe, k = 50;
 
@@ -122,12 +123,6 @@ study_cost(unit *u, int talent)
 
 /* ------------------------------------------------------------- */
 
-#define MAXTEACHERS 4
-typedef struct teaching_info {
-  unit * teachers[MAXTEACHERS];
-  int value;
-} teaching_info;
-
 static void 
 init_learning(struct attrib * a)
 {
@@ -140,7 +135,7 @@ done_learning(struct attrib * a)
 	free(a->data.v);
 }
 
-static const attrib_type at_learning = {
+const attrib_type at_learning = {
 	"learning",
 	init_learning, done_learning, NULL, NULL, NULL,
 	ATF_UNIQUE

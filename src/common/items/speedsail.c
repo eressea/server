@@ -17,17 +17,17 @@
 #include "speedsail.h"
 
 /* kernel includes */
-#include <faction.h>
-#include <item.h>
-#include <message.h>
-#include <movement.h>
-#include <plane.h>
-#include <region.h>
-#include <ship.h>
-#include <unit.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/message.h>
+#include <kernel/movement.h>
+#include <kernel/plane.h>
+#include <kernel/region.h>
+#include <kernel/ship.h>
+#include <kernel/unit.h>
 
 /* util includes */
-#include <functions.h>
+#include <util/functions.h>
 
 /* libc includes */
 #include <assert.h>
@@ -61,25 +61,8 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
   return EUNUSABLE;
 }
 
-static resource_type rt_speedsail = {
-	{ "speedsail", "speedsail_p" },
-	{ "speedsail", "speedsail_p" },
-	RTF_ITEM,
-	&res_changeitem
-};
-
-
-item_type it_speedsail = {
-	&rt_speedsail,           /* resourcetype */
-	0, 0, 0,       /* flags, weight, capacity */
-	NULL,                    /* construction */
-	&use_speedsail,
-	NULL,
-	NULL
-};
-
 void
 register_speedsail(void)
 {
-	it_register(&it_speedsail);
+	register_function((pf_generic)use_speedsail, "use_speedsail");
 }
