@@ -1492,7 +1492,7 @@
 	<string name="p11">
 		<text locale="de">Bauernlieb</text>
 	</string>
-	<string name="p12">
+	<string name="truthpotion">
 		<text locale="de">Trank der Wahrheit</text>
 	</string>
 	<string name="p13">
@@ -1505,7 +1505,7 @@
 	<string name="p0_p">
 		<text locale="de">Siebenmeilentees</text>
 	</string>
-	<string name="p1_p">
+	<string name="goliathwater">
 		<text locale="de">Goliathwasser</text>
 	</string>
 	<string name="p2_p">
@@ -1538,7 +1538,7 @@
 	<string name="p11_p">
 		<text locale="de">Bauernlieb</text>
 	</string>
-	<string name="p12_p">
+	<string name="truthpotion_p">
 		<text locale="de">Tränke der Wahrheit</text>
 	</string>
 	<string name="p13_p">
@@ -3573,6 +3573,27 @@
 		<string name="exhausted">
 			<text locale="de">erschöpft</text>
 			<text locale="en">exhausted</text>
+		</string>
+	</namespace>
+	<namespace name="potion">
+		<string name="truthpotion">
+			<text locale="en">
+				This simple but very potent brew sharpens the senses of anyone
+				that drinks of it and makes him able to see through even the
+				most complex illusions for one week.
+			</text>
+		</string>
+		<string name="goliathwater">
+			<text locale="en">
+				'First roast the Gurgelkraut quickly and add some Fjordwuchs to
+				spice it up. Let it all boil slowly until almost all liquid has
+				evaporated. Leave the mash over night and finally squeeze it
+				the next morning until a thick fluid drips out.' The liquid
+				thus produced, 'Goliath Water' as we call it, is enough for
+				10 men and gives each man the carrying capacity of a horse
+				for one week.
+			</text>
+			
 		</string>
 	</namespace>
 	<namespace name="spell">

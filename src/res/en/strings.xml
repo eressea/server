@@ -1085,7 +1085,7 @@
 	<string name="p0_p">
 		<text locale="en">seven mile teas</text>
 	</string>
-	<string name="p1">
+	<string name="goliathwater">
 		<text locale="en">goliath water</text>
 	</string>
 	<string name="p1_p">
@@ -1151,10 +1151,10 @@
 	<string name="p11_p">
 		<text locale="en">peasant love potion</text>
 	</string>
-	<string name="p12">
+	<string name="truthpotion">
 		<text locale="en">potion of truth</text>
 	</string>
-	<string name="p12_p">
+	<string name="truthpotion_p">
 		<text locale="en">potions of truth</text>
 	</string>
 	<string name="p13">

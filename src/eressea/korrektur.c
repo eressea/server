@@ -1812,6 +1812,30 @@ regatta_quest(void)
 }
 
 static int
+zero_quest(void)
+{
+	const char * name = "Sergint Saiquent";
+	plane * p = getplanebyname(name);
+#ifdef ZEROFOKS_QUESTE /* "gregorjochmann@gmx.de" */
+	if (p==NULL {
+		region * center;
+		p = gm_addplane(4, 0, name);
+		center = findregion(p->minx+(p->maxx-p->minx)/2, p->miny+(p->maxy-p->miny)/2);
+		gm_addfaction(ZEROFOKS_QUESTMASTER, p, center);
+	}
+#endif
+	if (p!=NULL) {
+		fset(p, PFL_NORECRUITS);
+		fset(p, PFL_NOMAGIC);
+		fset(p, PFL_NOFEED);
+		fset(p, PFL_NOSTEALTH);
+		fset(p, PFL_NOMONSTERS);
+		return resize_plane(p, 4);
+	}
+	return 0;
+}
+
+static int
 secondfaction(faction * pf)
 {
 	unit * u = findunit(atoi36("5q9w"));
@@ -1852,6 +1876,7 @@ update_gmquests(void)
 		do_once("et02", secondfaction(f));
 	}
 	do_once("rq02", regatta_quest());
+	do_once("zq01", zero_quest());
 	do_once("rq03", regatta_quest());
 	do_once("renm", fix_foreign());
 }
