@@ -2885,6 +2885,7 @@ make_fighter(battle * b, unit * u, boolean attack)
 			if (weapon_weight(fig->weapons+owp[oi], false)<=wpless) {
 				continue; /* we fight better with bare hands */
 			}
+			fig->person[i].melee = &fig->weapons[owp[oi]];
 			++fig->weapons[owp[oi]].used;
 		}
 		/* hand out missile weapons (from back to front, in case of mixed troops). */
