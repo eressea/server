@@ -628,7 +628,7 @@ show_newspells(void)
 	 * terminieren */
 
 	spellid_t newspellids[] = {
-		SPL_NOSPELL };
+		SPL_RUSTWEAPON };
 
 	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]
 	 * abgelegt */
