@@ -588,7 +588,9 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
       set_racename(&u2->attribs, get_racename(u->attribs));
       u2->race = u->race;
       u2->irace = u->irace;
-    } else if (u2) {
+    }
+    
+    if (u2) {
       /* Einheiten von Schiffen können nicht NACH in von
       * Nicht-alliierten bewachten Regionen ausführen */
       sh = leftship(u);
