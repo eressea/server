@@ -34,9 +34,6 @@ function run_wdw()
 
   -- siegbedingungen ausgeben
   dofile("wdw-standings.lua")
-  if 1 == 1 then
-    return -1
-  end
   
   -- write out the initial reports (no need to run a turn)
   write_passwords()

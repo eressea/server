@@ -19,12 +19,12 @@ function get_position(aid)
   local pos = positions[aid]
   
   -- hack, because i have no coordinates yet:
-  if pos.terrain ~= "ocean" then
+  if pos ~= nil and pos.terrain ~= "ocean" then
     return pos
   else
     -- find a region. let's use the region number 'aid' in the list, 
     -- so everyone gets their own
-    print("cannot place alliance " .. aid .. " at " .. pos.x .. ", " .. pos.y)
+    -- print("cannot place alliance " .. aid .. " at " .. pos.x .. ", " .. pos.y)
     for pos in regions() do
       if pos.terrain ~= "ocean" then
         if aid==0 then
@@ -72,6 +72,7 @@ function make_faction(position, alliance, number, email, race)
     u:add_item(get_gem(ano), numalliances-1)
     u:add_item(get_gem(ano+1), 2)
     u:add_item(get_gem(ano+2), 2)
+    u:add_item("log", 50)
   end
   
   local sk
