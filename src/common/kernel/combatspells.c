@@ -1718,13 +1718,6 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
   int n, undead = 0;
   int force = (int)get_force(power,0);
   double c = 0.50 + 0.02 * power;
-  side * s;
-
-  cv_foreach(s, b->sides) {
-    while (s->casualties) {
-
-    }
-  } cv_next(s);
 
   /* Liste aus allen Kämpfern */
   fgs = fighters(b, fi, minrow, maxrow,	FS_ENEMY | FS_HELP );
@@ -1743,7 +1736,7 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
       int j = 0;
 
       /* Wieviele Untote können wir aus dieser Einheit wecken? */
-      for (n = df->alive + df->run.number; n <= du->number; n++) {
+      for (n = df->alive + df->run.number; n != du->number; n++) {
         if (chance(c)) {
           ++j;
           if (--force<=0) break;
@@ -1767,6 +1760,7 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
         /* transfer dead people to new unit, set hitpoints to those of old unit */
         transfermen(du, u, j);
         u->hp = u->number * unit_max_hp(du);
+		assert(j<=df->side->casualties);
         df->side->casualties -= j;
         df->side->dead -= j;
 
