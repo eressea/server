@@ -71,8 +71,6 @@ function process(orders)
   
   autoseed(basepath .. "/newfactions")
 
-  autoseed(basepath .. "/newfactions")
-
   write_passwords()
   write_reports()
 
