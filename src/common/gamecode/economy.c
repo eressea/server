@@ -296,7 +296,7 @@ expandrecruit(region * r, request * recruitorders)
 				n++;
 			}
 		}
-		set_number(u, u->number + 1);
+/*		set_number(u, u->number + 1); */
 		u->race = rc;
 		u->n++;
 	}
