@@ -2,13 +2,14 @@
 <eressea xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="messages.xml"/>
 
-  <comment>Localization</comment>
-  <comment>Strings MUST always be read first</comment>
+  <!-- Localization -->
+  <!-- Strings MUST always be read first -->
 
   <xi:include href="de/strings.xml"/>
   <xi:include href="en/strings.xml"/>
 
   <xi:include href="races.xml"/>
+  <xi:include href="prefixes.xml"/>
   <xi:include href="resources.xml"/>
   <xi:include href="ships.xml"/>
   <xi:include href="buildings.xml"/>
