@@ -4651,17 +4651,19 @@
 			<text locale="en">The mentalist sends a dream to the
 				target of the spell.
 			</text>
-			<text locale="fr">Le mentaliste envoie un rêve à la 
+			<text locale="fr">Le mentaliste envoie un rêve à la
 				cible du sort.
 			</text>
 		</string>
 		<string name="illaunearnsilver">
-			<text locale="en">Personne n'interprète aussi bien les rêves que
-				les mages d'Illaum. Ils sont également versés dans
-				l'utillisation des objets utilisés pour prédire le futur
-				comme les boules de cristal, les cartes de tarot ou les
-				lignes de la main. Un mentaliste peut gagner 50 écus par
-				niveau et par semaine en proposant ses services aux paysans.
+			<text locale="fr">Personne n'interprète aussi bien les
+				rêves que les mages d'Illaun. Ils sont également
+				versés dans l'utilisation des objets utilisés
+				pour prédire le futur comme les boules de
+				cristal, les cartes de tarot ou les lignes de la
+				main. Un  mentaliste peut gagner 50 écus par
+				niveau et par semaine en proposant ses services
+				aux paysans.
 			</text>
 			<text locale="de">Niemand kann so gut die Träume deuten
 				wie ein Magier des Illaun. Auch die Kunst der
@@ -4690,10 +4692,10 @@
 				can't do real damage and are instantly destroyed
 				if wounded.
 			</text>
-			<text locale="fr">Ce sort crée des copies illusoires de troupes
-				alliées. Les guerriers illusoires ne peuvent faire de dégats
-				réels et sont instantanément détruits lorsqu' ils sont
-				blessés.
+			<text locale="fr">Ce sort crée des copies illusoires de
+				troupes alliées. Les guerriers illusoires ne
+				peuvent faire de dégats réels et sont
+				instantanément détruits lorsqu'ils sont blessés.
 			</text>
 		</string>
 		<string name="flee">
@@ -5107,6 +5109,10 @@
 		<text locale="en">JOIN</text>
 	</string>
 </strings>
+
+
+
+
 
 
 

@@ -181,17 +181,14 @@
 		</locale>
 	</message>
 
-	<message name="error18">
+	<message name="error18" section="errors">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<locale name="en">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - The ship is too heavily loaded to sail."</text>
-			</nr>
-		</locale>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - The ship is too heavily loaded to sail."</text>
+		<text locale="fr">"$unit($unit) en $region($region): '$command' - L'unité est trop chargée pour se déplacer."</text>
 	</message>
 
 	<message name="error19">
@@ -402,17 +399,14 @@
 		</locale>
 	</message>
 
-	<message name="error36">
+	<message name="error36" section="errors">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<locale name="en">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - The unit does not have this item."</text>
-			</nr>
-		</locale>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - The unit does not have this item."</text>
+		<text locale="fr">"$unit($unit) en $region($region): '$command' - L'unité ne possède pas cet objet."</text>
 	</message>
 
 	<message name="error37">
@@ -3269,17 +3263,14 @@
 		</locale>
 	</message>
 
-	<message name="regenaura">
+	<message name="regenaura" section="none">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="amount" type="int"></arg>
 			<arg name="region" type="region"></arg>
 		</type>
-		<locale name="en">
-			<nr section="none">
-				<text>"$unit($unit) regenerates $int($amount) aura in $region($region)."</text>
-			</nr>
-		</locale>
+		<text locale="en">"$unit($unit) regenerates $int($amount) aura in $region($region)."</text>
+		<text locale="fr">"$unit($unit) régénère $int($amount) aura en $region($region)."</text>
 	</message>
 
 	<message name="teach_student" section="study">
@@ -3376,7 +3367,8 @@
 		<type>
 			<arg name="turns" type="int"></arg>
 		</type>
-		<text locale="fr">"Votre faction est immunisée contre les aggressions durant $int($turns) semaines encore."</text>
+		<text locale="fr">"Votre faction est immunisée contre les agressions durant $int($turns) semaines encore."</text>
+		<text locale="en">"Your faction is immune against assaults for $int($turns) more weeks."</text>
 	</message>
 
 	<message name="changebanner">
@@ -3862,18 +3854,15 @@
 		</locale>
 	</message>
 
-	<message name="studycost">
+	<message name="studycost" section="none">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="cost" type="int"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="skill" type="skill"></arg>
 		</type>
-		<locale name="en">
-			<nr section="none">
-				<text>"$unit($unit) spends $int($cost) silver in $region($region) to study $skill($skill)."</text>
-			</nr>
-		</locale>
+		<text locale="en">"$unit($unit) spends $int($cost) silver in $region($region) to study $skill($skill)."</text>
+		<text locale="fr">"$unit($unit) dépense $int($cost) écus en $region($region) pour apprendre $skill($skill)."</text>
 	</message>
 
 	<message name="researchherb_none">
