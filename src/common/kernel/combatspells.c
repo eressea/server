@@ -179,7 +179,7 @@ sp_versteinern(fighter * fi, int level, double power, spell * sp)
 	sprintf(buf, "%s zaubert %s", unitname(fi->unit), 
 		spell_name(sp, default_locale));
 
-	force = lovar(get_force(power,0));
+	force = lovar(get_force(power, 0));
 
 	enemies = count_enemies(b, fi->side, minrow, maxrow);
 	if (!enemies) {
@@ -190,7 +190,7 @@ sp_versteinern(fighter * fi, int level, double power, spell * sp)
 	scat(":");
 	battlerecord(b, buf);
 
-	do {
+	while (force && stoned < enemies) {
 		troop dt = select_enemy(b, fi, minrow, maxrow);
 		fighter * df = dt.fighter;
 		unit * du = df->unit;
@@ -204,7 +204,7 @@ sp_versteinern(fighter * fi, int level, double power, spell * sp)
 			dt.fighter->person[(df->alive - df->removed)] = p;
 		}
 		--force;
-	} while (force && stoned < enemies);
+	}
 
 	sprintf(buf, "%d Personen %s versteinert.",
 			stoned, stoned == 1 ? "wurde" : "wurden");
@@ -250,7 +250,7 @@ sp_stun(fighter * fi, int level, double power, spell * sp)
 	battlerecord(b, buf);
 
 	stunned = 0;
-	do {
+	while (force && stunned < enemies) {
 		troop dt = select_enemy(b, fi, minrow, maxrow);
 		fighter * df = dt.fighter;
 		unit * du = df->unit;
@@ -260,7 +260,7 @@ sp_stun(fighter * fi, int level, double power, spell * sp)
 				df->person[dt.index].flags |= FL_STUNNED;
 				++stunned;
 		}
-	} while (force && stunned < enemies);
+	}
 
 	sprintf(buf, "%d Krieger %s für einen Moment benommen.",
 			stunned, stunned == 1 ? "ist" : "sind");
@@ -393,7 +393,7 @@ sp_sleep(fighter * fi, int level, double power, spell * sp)
 	scat(":");
 	battlerecord(b, buf);
 
-	do {
+	while (force && enemies) {
 		dt = select_enemy(b, fi, minrow, maxrow);
 		assert(dt.fighter);
 		du = dt.fighter->unit;
@@ -403,7 +403,7 @@ sp_sleep(fighter * fi, int level, double power, spell * sp)
 			--enemies;
 		}
 		--force;
-	} while (force && enemies);
+	}
 
 	sprintf(buf, "%d Krieger %s in Schlaf versetzt.",
 			k, k == 1 ? "wurde" : "wurden");
@@ -467,7 +467,7 @@ sp_speed(fighter * fi, int level, double power, spell * sp)
 	 * die Gefahr eine Endlosschleife*/
 	allies *= 2;
 
-	do {
+	while (force && allies) {
 		troop dt = select_ally_in_row(fi, minrow, maxrow);
 		fighter *df = dt.fighter;
 		--allies;
@@ -479,7 +479,7 @@ sp_speed(fighter * fi, int level, double power, spell * sp)
 				--force;
 			}
 		}
-	} while (force && allies);
+	}
 
 	sprintf(buf, "%d Krieger %s magisch beschleunigt.",
 			targets, targets == 1 ? "wurde" : "wurden");
@@ -539,7 +539,7 @@ sp_mindblast(fighter * fi, int level, double power, spell * sp)
   scat(":");
   battlerecord(b, buf);
 
-  do {
+  while (force && enemies) {
     dt = select_enemy(b, fi, minrow, maxrow);
     assert(dt.fighter);
     du = dt.fighter->unit;
@@ -559,7 +559,7 @@ sp_mindblast(fighter * fi, int level, double power, spell * sp)
       ++k;
     }
     --force;
-  } while (force && enemies);
+  }
 
   sprintf(buf, "%d Krieger %s Erinnerungen", k, k == 1 ? "verliert" : "verlieren");
 
@@ -613,12 +613,12 @@ sp_dragonodem(fighter * fi, int level, double power, spell * sp)
 	at.fighter = fi;
 	at.index = 0;
 
-	do {
+	while (force && killed < enemies) {
 		dt = select_enemy(b, fi, minrow, maxrow);
 		assert(dt.fighter);
 		--force;
 		killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
-	} while (force && killed < enemies);
+	}
 
 	sprintf(buf, "%d Personen %s getötet",
 			killed, killed == 1 ? "wurde" : "wurden");
@@ -662,12 +662,12 @@ sp_immolation(fighter * fi, int level, double power, spell * sp)
 	at.fighter = fi;
 	at.index = 0;
 
-	do {
+	while (force && killed < enemies) {
 		dt = select_enemy(b, fi, minrow, maxrow);
 		assert(dt.fighter);
 		--force;
 		killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
-	} while (force && killed < enemies);
+	}
 
 	sprintf(buf, "%d Personen %s getötet",
 			killed, killed == 1 ? "wurde" : "wurden");
@@ -711,7 +711,7 @@ sp_drainodem(fighter * fi, int level, double power, spell * sp)
 	at.fighter = fi;
 	at.index = 0;
 
-	do {
+	while (force && drained < enemies) {
 		dt = select_enemy(b, fi, minrow, maxrow);
 		assert(dt.fighter);
 		if (hits(at, dt, NULL)) {
@@ -720,7 +720,7 @@ sp_drainodem(fighter * fi, int level, double power, spell * sp)
 		}
 		killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
 		--force;
-	} while (force && drained < enemies);
+	}
 
 	sprintf(buf, "%d Person%s wurde ihre Lebenskraft entzogen",
 		drained, drained == 1 ? " wurde" : "en wurden");
@@ -1079,7 +1079,7 @@ sp_hero(fighter * fi, int level, double power, spell * sp)
 	 * die Gefahr eine Endlosschleife*/
 	allies *= 2;
 
-	do {
+	while (force && allies) {
 		troop dt = select_ally_in_row(fi, minrow, maxrow);
 		fighter *df = dt.fighter;
 		--allies;
@@ -1092,7 +1092,7 @@ sp_hero(fighter * fi, int level, double power, spell * sp)
 				--force;
 			}
 		}
-	} while (force && allies);
+	}
 
 	sprintf(buf, "%d Krieger %s moralisch gestärkt",
 			targets, targets == 1 ? "wurde" : "wurden");
@@ -1139,7 +1139,7 @@ sp_berserk(fighter * fi, int level, double power, spell * sp)
 	 * die Gefahr eine Endlosschleife*/
 	allies *= 2;
 
-	do {
+	while (force && allies) {
 		troop dt = select_ally_in_row(fi, minrow, maxrow);
 		fighter *df = dt.fighter;
 		--allies;
@@ -1153,7 +1153,7 @@ sp_berserk(fighter * fi, int level, double power, spell * sp)
 				--force;
 			}
 		}
-	} while (force && allies);
+	}
 
 	sprintf(buf, "%d Krieger %s in Blutrausch versetzt",
 			targets, targets == 1 ? "wurde" : "wurden");
@@ -1192,7 +1192,7 @@ sp_frighten(fighter * fi, int level, double power, spell * sp)
 	scat(":");
 	battlerecord(b, buf);
 
-	do {
+	while (force && enemies) {
 		troop dt = select_enemy(b, fi, minrow, maxrow);
 		fighter *df = dt.fighter;
 		--enemies;
@@ -1211,7 +1211,7 @@ sp_frighten(fighter * fi, int level, double power, spell * sp)
 			targets++;
 		}
 		--force;
-	} while (force && enemies);
+	}
 
 	sprintf(buf, "%d Krieger %s eingeschüchtert",
 			targets, targets == 1 ? "wurde" : "wurden");
@@ -1299,7 +1299,7 @@ sp_windshield(fighter * fi, int level, double power, spell * sp)
 		return 0;
 	}
 
-	do {
+	while (force && enemies) {
 		troop dt = select_enemy(b, fi, minrow, maxrow);
 		fighter *df = dt.fighter;
 		--enemies;
@@ -1313,7 +1313,7 @@ sp_windshield(fighter * fi, int level, double power, spell * sp)
 			df->person[dt.index].attack -= at_malus;
 			--force;
 		}
-	} while (force && enemies);
+	}
 
 	scat(": ");
 	scat("Ein Sturm kommt auf und die Schützen können kaum noch zielen.");
