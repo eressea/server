@@ -3176,7 +3176,7 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Schwimmer können keine Schiffe betreten."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieser Typ Einheit kann keine Schiffe betreten."</text>
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Swimmers cannot enter ships."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Swimmers cannot enter ships."</text>
   </message>
@@ -3186,9 +3186,9 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Schwimmer können keine Gebäude betreten."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Swimmers cannot enter a building."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Swimmers cannot enter a building."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieser Typ Einheit kann keine Gebäude betreten."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - this type of unit cannot enter a building."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - this type of unit cannot enter a building."</text>
   </message>
   <message name="error231" section="errors">
     <type>

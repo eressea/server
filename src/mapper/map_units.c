@@ -65,7 +65,6 @@ SpecialFunctionUnit(unit *u)
 			set_string(&sh->name, "Ballon");
 			set_string(&sh->display, "Eine große leuchtendrote Werbeaufschrift "
 					"für den Xontormia Express prangt auf einer Seite des Luftgefährts.");
-			freset(sh, FL_UNNAMED);
 			sh->size = 5;
 			leave(u->region, u);
 			u->ship = sh;

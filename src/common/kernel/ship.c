@@ -164,7 +164,7 @@ captain(ship *sh, region *r)
 
 
 ship *
-new_ship(const ship_type * stype, region * r)
+new_ship(const ship_type * stype, const struct locale * lang, region * r)
 {
 	static char buffer[7 + IDSIZE + 1];
 	ship *sh = (ship *) calloc(1, sizeof(ship));
@@ -174,10 +174,9 @@ new_ship(const ship_type * stype, region * r)
 	sh->type = stype;
 	sh->region = r;
 
-	sprintf(buffer, "Schiff %s", shipid(sh));
+	sprintf(buffer, "%s %s", LOC(lang, stype->name[0]), shipid(sh));
 	set_string(&sh->name, buffer);
 	set_string(&sh->display, "");
-	fset(sh, FL_UNNAMED);
 	shash(sh);
 	return sh;
 }

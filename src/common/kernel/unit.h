@@ -55,7 +55,7 @@ außer ARBEITE ausführen */
 #define UFL_WERE          (1<<28)
 
 /* Flags, die gespeichert werden sollen: */
-#define UFL_SAVEMASK (UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL | FL_UNNAMED)
+#define UFL_SAVEMASK (UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL)
 
 typedef struct unit {
 	struct unit *next; /* needs to be first entry, for region's unitlist */

@@ -879,7 +879,6 @@ typedef struct strlist {
 
 #define FL_MARK           (1<<23) /* für markierende algorithmen, die das hinterher auch wieder
 																		 löschen müssen! (Ist dafür nicht eigentlich FL_DH gedacht?) */
-#define FL_UNNAMED        (1<<26) /* Partei/Einheit/Gebäude/Schiff ist unbenannt */
 
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))

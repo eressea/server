@@ -1005,7 +1005,7 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want)
 	if (want>0) want = min(want, msize);
 	else want = msize;
 
-	sh = new_ship(newtype, r);
+	sh = new_ship(newtype, u->faction->locale, r);
 
 	addlist(&r->ships, sh);
 

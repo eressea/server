@@ -123,7 +123,6 @@ addfaction(const char *email, const char * password,
 
   sprintf(buf, "%s %s", LOC(loc, "factiondefault"), factionid(f));
   set_string(&f->name, buf);
-  fset(f, FL_UNNAMED);
 
   addlist(&factions, f);
 

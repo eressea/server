@@ -310,28 +310,6 @@ show_newspells(void)
   }
 }
 
-static int
-fix_foreign(void)
-{
-	region * r;
-	for (r=regions;r;r=r->next) {
-		struct locale * lang;
-		for (lang=locales;lang;lang=nextlocale(lang)) {
-			const char * udefault = LOC(lang, "unitdefault");
-			size_t udlen = strlen(udefault);
-			unit * u;
-			for (u=r->units;u;u=u->next) {
-				size_t unlen = strlen(u->name);
-				if (unlen<udlen) continue;
-				if (strncmp(u->name, udefault, udlen)==0) {
-					fset(u, FL_UNNAMED);
-				}
-			}
-		}
-	}
-	return 0;
-}
-
 extern plane * arena;
 
 static void
@@ -833,7 +811,6 @@ update_gmquests(void)
 		}
 		do_once("et02", secondfaction(f));
 	}
-	do_once("renm", fix_foreign());
 }
 
 #define TEST_LOCALES 0

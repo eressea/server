@@ -451,7 +451,6 @@ new_building(const struct building_type * btype, region * r, const struct locale
 
 	b->type = btype;
 	set_string(&b->display, "");
-	fset(b, FL_UNNAMED);
 	b->region = r;
 	addlist(&r->buildings, b);
 

@@ -715,6 +715,5 @@ name_unit(unit *u)
 	} else {
 		sprintf(name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
 		set_string(&u->name, name);
-		fset(u, FL_UNNAMED);
 	}
 }

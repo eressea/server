@@ -1587,11 +1587,19 @@ name_cmd(unit * u, struct order * ord)
       if (b->type == bt_find("generic")) {
         cmistake(u, ord, 278, MSG_EVENT);
         break;
-      }
-
-      if(!fval(b,FL_UNNAMED)) {
-        cmistake(u, ord, 246, MSG_EVENT);
-        break;
+      } else {
+        const struct locale * lang = locales;
+        for (;lang;lang=nextlocale(lang)) {
+          const char * bdname = LOC(lang, b->type->_name);
+          size_t bdlen = strlen(bdname);
+          if (strlen(b->name)>=bdlen && strncmp(b->name, bdname, bdlen)==0) {
+            break;
+          }
+        }
+        if (lang==NULL) {
+          cmistake(u, ord, 246, MSG_EVENT);
+          break;
+        }
       }
 
       uo = buildingowner(r, b);
@@ -1629,7 +1637,6 @@ name_cmd(unit * u, struct order * ord)
           break;
         }
         s = &u->building->name;
-        freset(u->building, FL_UNNAMED);
     }
     break;
 
@@ -1645,10 +1652,19 @@ name_cmd(unit * u, struct order * ord)
       if (f->age < 10) {
         cmistake(u, ord, 248, MSG_EVENT);
         break;
-      }
-      if (!fval(f,FL_UNNAMED)) {
-        cmistake(u, ord, 247, MSG_EVENT);
-        break;
+      } else {
+        const struct locale * lang = locales;
+        for (;lang;lang=nextlocale(lang)) {
+          const char * fdname = LOC(lang, "factiondefault");
+          size_t fdlen = strlen(fdname);
+          if (strlen(f->name)>=fdlen && strncmp(f->name, fdname, fdlen)==0) {
+            break;
+          }
+        }
+        if (lang==NULL) {
+          cmistake(u, ord, 247, MSG_EVENT);
+          break;
+        }
       }
       if (cansee(f, r, u, 0)) {
         add_message(&f->msgs, new_message(f,
@@ -1660,7 +1676,6 @@ name_cmd(unit * u, struct order * ord)
       s = &f->name;
     } else {
       s = &u->faction->name;
-      freset(u->faction, FL_UNNAMED);
     }
     break;
 
@@ -1672,10 +1687,26 @@ name_cmd(unit * u, struct order * ord)
       if (!sh) {
         cmistake(u, ord, 20, MSG_EVENT);
         break;
-      }
-      if (!fval(sh,FL_UNNAMED)) {
-        cmistake(u, ord, 245, MSG_EVENT);
-        break;
+      } else {
+        const struct locale * lang = locales;
+        for (;lang;lang=nextlocale(lang)) {
+          const char * sdname = LOC(lang, sh->type->name[0]);
+          size_t sdlen = strlen(sdname);
+          if (strlen(sh->name)>=sdlen && strncmp(sh->name, sdname, sdlen)==0) {
+            break;
+          }
+
+          sdname = LOC(lang, parameters[P_SHIP]);
+          sdlen = strlen(sdname);
+          if (strlen(sh->name)>=sdlen && strncmp(sh->name, sdname, sdlen)==0) {
+            break;
+          } 
+
+        }
+        if (lang==NULL) {
+          cmistake(u, ord, 245, MSG_EVENT);
+          break;
+        }
       }
       uo = shipowner(sh);
       if (uo) {
@@ -1698,20 +1729,24 @@ name_cmd(unit * u, struct order * ord)
         break;
       }
       s = &u->ship->name;
-      freset(u->ship, FL_UNNAMED);
     }
     break;
 
   case P_UNIT:
     if (foreign == true) {
       unit *u2 = getunit(r, u->faction);
+
       if (!u2 || !cansee(u->faction, r, u2, 0)) {
         cmistake(u, ord, 63, MSG_EVENT);
         break;
-      }
-      if (!fval(u,FL_UNNAMED)) {
-        cmistake(u, ord, 244, MSG_EVENT);
-        break;
+      } else {
+        const char * udefault = LOC(u2->faction->locale, "unitdefault");
+        size_t udlen = strlen(udefault);
+        size_t unlen = strlen(u2->name);
+        if (unlen>=udlen && strncmp(u2->name, udefault, udlen)!=0) {
+          cmistake(u2, ord, 244, MSG_EVENT);
+          break;
+        }
       }
       if (cansee(u2->faction, r, u, 0)) {
         add_message(&u2->faction->msgs, new_message(u2->faction,
@@ -1723,7 +1758,6 @@ name_cmd(unit * u, struct order * ord)
       s = &u2->name;
     } else {
       s = &u->name;
-      freset(u, FL_UNNAMED);
     }
     break;
 
