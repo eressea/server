@@ -144,7 +144,7 @@ SpecialFunction(region *r)
 
 	win = openwin(60, 5, "< Specials Regions >");
 	wmove(win, 1, 2);
-	wAddstr("1 - set Godcurse");
+	wAddstr("1 - set Godcurse (n.imm), 2 - set Peace-Curse (imm)");
 	wmove(win, 2, 2);
 	wrefresh(win);
 	switch(getch()) {
@@ -155,6 +155,12 @@ SpecialFunction(region *r)
 			set_curseflag(r->attribs, C_CURSED_BY_THE_GODS, 0, CURSE_ISNEW|CURSE_IMMUN);
 			modified = 1;
 			break;
+		}
+	case '2':
+		if(!is_cursed_internal(r->attribs, C_PEACE, 0)) {
+			create_curse(NULL, &r->attribs, C_PEACE, 0, 100, 1, 0, 0);
+			set_curseflag(r->attribs, C_PEACE, 0, CURSE_IMMUN);
+			modified = 1;
 		}
 	default:
 		break;
