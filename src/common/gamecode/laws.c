@@ -2808,7 +2808,7 @@ reorder(void)
 }
 
 #if 0
-
+/* Aus Gebäude weisen, VERBANNE */
 static void
 evict(void)
 {
@@ -2821,11 +2821,38 @@ evict(void)
 			for (S = u->orders; S; S = S->next) if (igetkeyword(S->s, u->faction->locale)==K_EVICT) {
 				/* Nur der Kapitän bzw Burgherr kann jemanden rausschmeißen */
 				if(!fval(u, FL_OWNER)) {
-					cmistake(u,S->s,146,MSG_EVENT);
+					/* Die Einheit ist nicht der Eigentümer */
+					cmistake(u,S->s,49,MSG_EVENT);
 					continue;
 				}
 				int id = getid();
 				unit *u2 = findunit(id);
+				if (!u2){
+					/* Einheit nicht gefunden */
+					cmistake(u,S->s,63,MSG_EVENT);
+					continue;
+				}
+
+				if (u->building){
+					/* in der selben Burg? */
+					if (u->building != u2->building){
+						/* nicht in Burg */
+						cmistake(u,S->s,33,MSG_EVENT);
+						continue;
+					}
+					leave_building(u2);
+					/* meldung an beide */
+				}
+
+				if (u->ship){
+					if (u->ship != u2->ship){
+						/* nicht an Bord */
+						cmistake(u,S->s,32,MSG_EVENT);
+						continue;
+					}
+					leave_ship(u2);
+					/* meldung an beide */
+				}
 			}
 		}
 	}

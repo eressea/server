@@ -187,7 +187,7 @@
 		<ai splitsize="20000" moverandom></ai>
 		<attack type="1" damage="1d1"></attack>
 	</race>
-	<race name="sea serpent" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" maintenance="0" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants swim noteach getitem canguard>
+	<race name="sea serpent" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" maintenance="0" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants swim noteach getitem canguard resistbash>
 		<ai splitsize="6" killpeasants attackrandom moverandom learn></ai>
 		<function name="name" value="namedragon"></function>
 		<function name="move" value="moveswimming"></function>
@@ -866,7 +866,7 @@
 		<attack type="4" damage="2d12"></attack>
 		<attack type="4" damage="2d12"></attack>
 	</race>
-	<race name="wyrm" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" maintenance="0" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants fly walk noteach getitem canguard>
+	<race name="wyrm" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" maintenance="0" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants fly walk noteach getitem canguard resistbash>
 		<ai splitsize="1" killpeasants attackrandom learn></ai>
 		<function name="name" value="namedragon"></function>
 		<function name="move" value="movedragon"></function>
@@ -879,7 +879,7 @@
 		<attack type="4" damage="5d30"></attack>
 		<attack type="6" spell="83"></attack>
 	</race>
-	<race name="dragon" magres="0.700000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" maintenance="0" weight="60000" capacity="30000" speed="1.500000" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants fly walk noteach getitem canguard>
+	<race name="dragon" magres="0.700000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" maintenance="0" weight="60000" capacity="30000" speed="1.500000" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants fly walk noteach getitem canguard resistbash>
 		<ai splitsize="2" killpeasants attackrandom learn></ai>
 		<function name="name" value="namedragon"></function>
 		<function name="age" value="agedragon"></function>
@@ -893,7 +893,7 @@
 		<attack type="4" damage="3d30"></attack>
 		<attack type="6" spell="82"></attack>
 	</race>
-	<race name="young dragon" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="10000" maintenance="0" weight="20000" capacity="10000" speed="1.000000" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants fly walk noteach getitem canguard>
+	<race name="young dragon" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="10000" maintenance="0" weight="20000" capacity="10000" speed="1.000000" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants fly walk noteach getitem canguard resistbash>
 		<ai splitsize="6" killpeasants attackrandom learn></ai>
 		<function name="name" value="namedragon"></function>
 		<function name="age" value="agefiredragon"></function>
@@ -1268,7 +1268,7 @@
 		<familiar race="wolf"></familiar>
 		<familiar race="demon"></familiar>
 	</race>
-	<race name="shadowdragon" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" maintenance="0" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants fly walk noteach getitem canguard>
+	<race name="shadowdragon" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" maintenance="0" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants fly walk noteach getitem canguard resistbash>
 		<ai splitsize="1" killpeasants attackrandom learn></ai>
 		<function name="name" value="namedragon"></function>
 		<function name="move" value="movedragon"></function>
