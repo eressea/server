@@ -32,17 +32,17 @@ newfaction * newfactions = NULL;
 static int regions_per_faction = 3;
 
 void
-get_island(regionlist ** rlist)
+get_island(region_list ** rlist)
 {
-	regionlist *rcurrent = *rlist;
-	regionlist **rnext = &rcurrent->next;
+	region_list *rcurrent = *rlist;
+	region_list **rnext = &rcurrent->next;
 	assert(rcurrent && *rnext==NULL);
 
-	fset(rcurrent->region, FL_MARK);
+	fset(rcurrent->data, FL_MARK);
 	while (rcurrent!=NULL) {
 		direction_t dir;
 		for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-			region * r = rconnect(rcurrent->region, dir);
+			region * r = rconnect(rcurrent->data, dir);
 			if (r!=NULL && r->land && !fval(r, FL_MARK)) {
 				fset(r, FL_MARK);
 				add_regionlist(rnext, r);
@@ -54,7 +54,7 @@ get_island(regionlist ** rlist)
 	rnext=rlist;
 	while (*rnext) {
 		rcurrent = *rnext;
-		freset(rcurrent->region, FL_MARK);
+		freset(rcurrent->data, FL_MARK);
 		rnext = &rcurrent->next;
 	}
 }
@@ -187,7 +187,7 @@ recalc(seed_t * seeds, int nseeds, int nplayers)
 extern int numnewbies;
 
 void
-autoseed(struct regionlist * rlist)
+autoseed(struct region_list * rlist)
 {
 	int nregions = listlen(rlist);
 	int nseeds = nregions;
@@ -204,7 +204,7 @@ autoseed(struct regionlist * rlist)
 
 	nf = newfactions;
 	for (i=0;i!=nseeds;++i) {
-		seeds[i].region = rlist->region;
+		seeds[i].region = rlist->data;
 		rlist = rlist->next;
 		if (i<nfactions) {
 			while (nf->bonus!=0) nf=nf->next;
@@ -288,7 +288,7 @@ mkisland(int nsize)
 {
 	int x = 0, y = 0;
 	region * r;
-	regionlist * rlist = NULL;
+	region_list * rlist = NULL;
 	int rsize, isize=0;
 
 #ifdef RANDOM_LOCATION
@@ -333,10 +333,10 @@ mkisland(int nsize)
 	rsize = 1;
 	while (nsize && rsize) {
 		int i = rand() % rsize;
-		regionlist ** rnext = &rlist;
+		region_list ** rnext = &rlist;
 		direction_t d;
 		while (i--) rnext=&(*rnext)->next;
-		r = (*rnext)->region;
+		r = (*rnext)->data;
 		*rnext = (*rnext)->next;
 		if (rsize==0) {
 			log_error(("Could not place all factions on the same island as requested\n"));
@@ -381,16 +381,16 @@ mkisland(int nsize)
 		}
 	}
 	if (rlist) {
-		regionlist ** rbegin = &rlist;
+		region_list ** rbegin = &rlist;
 		int i;
 #define MINOCEANDIST 3
 #define MAXFILLDIST 10
 		for (i=0;i!=MINOCEANDIST;++i) {
-			regionlist ** rend = rbegin;
+			region_list ** rend = rbegin;
 			while (*rend) rend=&(*rend)->next;
 			while (rbegin!=rend) {
 				direction_t d;
-				region * r = (*rbegin)->region;
+				region * r = (*rbegin)->data;
 				rbegin=&(*rbegin)->next;
 				for (d=0;d!=MAXDIRECTIONS;++d) {
 					region * rn = rconnect(r, d);
@@ -404,7 +404,7 @@ mkisland(int nsize)
 
 		}
 		while (*rbegin) {
-			region * r = (*rbegin)->region;
+			region * r = (*rbegin)->data;
 			direction_t d;
 			rbegin=&(*rbegin)->next;
 			for (d=0;d!=MAXDIRECTIONS;++d) if (rconnect(r, d)==NULL) {

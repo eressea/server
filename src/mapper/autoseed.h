@@ -13,7 +13,7 @@
 #ifndef _REGIONLIST_H
 #define _REGIONLIST_H
 
-struct regionlist;
+struct region_list;
 struct newfaction;
 
 typedef struct newfaction {
@@ -32,8 +32,8 @@ typedef struct newfaction {
 
 extern newfaction * newfactions;
 
-extern void autoseed(struct regionlist * rlist);
-extern void get_island(struct regionlist ** rlist);
+extern void autoseed(struct region_list * rlist);
+extern void get_island(struct region_list ** rlist);
 extern int mkisland(int nsize);
 
 #endif
