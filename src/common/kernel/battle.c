@@ -579,8 +579,10 @@ reportcasualties(battle * b, fighter * fig, int dead)
 	bfaction * bf;
 	if (fig->alive == fig->unit->number)
 		return;
-	if (fig->run.region == NULL)
-		fig->run.region = b->region;
+	if (fig->run.region == NULL) {
+		fig->run.region = fleeregion(fig->unit);
+		if (fig->run.region == NULL) fig->run.region = b->region;
+	}
 	fbattlerecord(fig->unit->faction, b->region, " ");
 	for (bf = b->factions;bf;bf=bf->next) {
 		faction * f = bf->faction;
