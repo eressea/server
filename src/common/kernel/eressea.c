@@ -3078,11 +3078,11 @@ produceexp(struct unit * u, skill_t sk, int n)
 {
 	if (n==0 || !playerrace(u->race)) return 0;
 #if SKILLPOINTS
-	change_skill(u, SK_HERBALISM, PRODUCEEXP * n);
+	change_skill(u, sk, PRODUCEEXP * n);
 	return 1;
 #else
-	if (learn_skill(u, SK_HERBALISM, PRODUCEEXP * n)) {
-		change_skill(u, SK_HERBALISM, n);
+	if (learn_skill(u, sk, PRODUCEEXP * n)) {
+		change_skill(u, sk, n);
 		return 1;
 	}
 	return 0;
