@@ -111,12 +111,12 @@ extern struct message_list * r_getmessages(const struct region * r, const struct
 extern struct message * r_addmessage(struct region * r, const struct faction * viewer, struct message * msg);
 
 typedef struct {
-	int  x;
-	int  y;
-	int  duration;
-        bool active;
-	char *desc;
-	char *keyword;
+  int  x;
+  int  y;
+  int  duration;
+  boolean active;
+  char *desc;
+  char *keyword;
 } spec_direction;
 
 typedef struct {
