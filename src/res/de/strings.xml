@@ -30,6 +30,11 @@
 		<text locale="de">sehr wenige</text>
 		<text locale="en">very few </text>
 	</string>
+	
+	<string name="sehr viele">
+		<text locale="de">sehr viele</text>
+		<text locale="en">a great many </text>
+	</string>
 		
 	<string name="prefix_Dunkel">
 		<text locale="de">Dunkel</text>

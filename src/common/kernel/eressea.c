@@ -796,31 +796,41 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 	int n;
 	boolean cansee = false;
 	unit *u2;
-	if (u->faction == f || omniscient(f)) cansee = true;
-	else if (old_race(u->race) == RC_SPELL || u->number == 0) return false;
-	else {
-		n = eff_stealth(u, r) - modifier;
-		for (u2 = r->units; u2; u2 = u2->next) {
-			if (u2->faction == f) {
-				int o;
 
-				if (getguard(u) || usiege(u) || u->building || u->ship) {
-					cansee = true;
-					break;
-				}
-				if (get_item(u, I_RING_OF_INVISIBILITY) >= u->number
-					&& !get_item(u2, I_AMULET_OF_TRUE_SEEING))
-					continue;
+	if (u->faction == f || omniscient(f)) {
+		return true;
+	} else if (old_race(u->race) == RC_SPELL) {
+		return false;
+	} else if (u->number == 0) {
+		attrib *a = a_find(u->attribs, &at_creator);
+		if(a) {	/* u is an empty temporary unit. In this special case
+							 we look at the creating unit. */
+			u = (unit *)a->data.v;
+		} else {
+			return false;
+		}
+	} 
+	n = eff_stealth(u, r) - modifier;
+	for (u2 = r->units; u2; u2 = u2->next) {
+		if (u2->faction == f) {
+			int o;
 
-				o = eff_skill(u2, SK_OBSERVATION, r);
+			if (getguard(u) || usiege(u) || u->building || u->ship) {
+				cansee = true;
+				break;
+			}
+			if (get_item(u, I_RING_OF_INVISIBILITY) >= u->number
+				&& !get_item(u2, I_AMULET_OF_TRUE_SEEING))
+				continue;
+
+			o = eff_skill(u2, SK_OBSERVATION, r);
 #if NIGHTEYES
-				if (u2->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
-					o = NIGHT_EYE_TALENT;
+			if (u2->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
+				o = NIGHT_EYE_TALENT;
 #endif
-				if (o >= n) {
-					cansee = true;
-					break;
-				}
+			if (o >= n) {
+				cansee = true;
+				break;
 			}
 		}
 	}
@@ -1615,6 +1625,11 @@ createunit(region * r, faction * f, int number, const struct race * rc)
 	return create_unit(r, f, number, rc, 0, NULL, NULL);
 }
 
+attrib_type at_creator = {
+	"creator"
+	/* Rest ist NULL; temporäres, nicht alterndes Attribut */
+};
+
 unit *
 create_unit(region * r, faction * f, int number, const struct race *urace, int id, const char * dname, unit *creator)
 {
@@ -1686,6 +1701,9 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
 		if (a) {
 			a_add(&u->attribs, make_otherfaction(get_otherfaction(a)));
 		}
+
+		a = a_add(&u->attribs, a_new(&at_creator));
+		a->data.v = creator;
 	}
 	/* Monster sind grundsätzlich parteigetarnt */
 	if(f->no <= 0) fset(u, FL_PARTEITARNUNG);

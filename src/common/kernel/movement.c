@@ -695,14 +695,14 @@ boolean
 is_guardian(unit * u2, unit *u, unsigned int mask)
 {
 	if (u2->faction != u->faction
-		&& getguard(u2)&mask
-		&& u2->number
-		&& !ucontact(u2, u) && !besieged(u2)
-		&& allied(u2, u->faction, HELP_GUARD)
-			!= HELP_GUARD
+			&& getguard(u2)&mask
+			&& u2->number
+			&& !ucontact(u2, u) && !besieged(u2)
+			&& allied(u2, u->faction, HELP_GUARD) != HELP_GUARD
 #ifdef WACH_WAFF
-		&& armedmen(u2)
+			&& armedmen(u2)
 #endif
+			&& cansee(u2->faction, u->region, u, 0)
 		) return true;
 
 	return false;

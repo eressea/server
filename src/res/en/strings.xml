@@ -955,13 +955,6 @@
 		<text locale="en">Belts of Heroic Legends</text>
 	</string>
 
-	<string name="viele">
-		<text locale="en">many</text>
-	</string>
-	<string name="sehr viele">
-		<text locale="en">a great many</text>
-	</string>
-
 	<comment>  intranslatables:</comment>
 	<string name="h0">
 		<text locale="en">Flachwurz</text>

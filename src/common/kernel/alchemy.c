@@ -33,6 +33,7 @@
 #include "race.h"
 #include "unit.h"
 #include "skill.h"
+#include "movement.h"
 
 /* util includes */
 #include <rand.h>
@@ -50,8 +51,14 @@ herbsearch(region * r, unit * u, int max)
 {
 	int herbsfound;
 	const herb_type * whichherb;
+
 	if (eff_skill(u, SK_HERBALISM, r) == 0) {
 		cmistake(u, u->thisorder, 59, MSG_PRODUCE);
+		return;
+	}
+
+	if(is_guarded(r, u, GUARD_PRODUCE)) {
+		cmistake(u, findorder(u, u->thisorder), 70, MSG_EVENT);
 		return;
 	}
 

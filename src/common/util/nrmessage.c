@@ -103,8 +103,7 @@ nr_render(const struct message * msg, const struct locale * lang, char * buffer,
 		if (m) {
 			strcpy(buffer, m);
 			return 0;
-		}
-		else {
+		} else {
 			log_error(("Couldn't render message %s\n", nrt->mtype->name));
 		}
 	}

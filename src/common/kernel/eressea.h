@@ -1107,6 +1107,7 @@ void cmistake(const struct unit * u, const char *cmd, int mno, int mtype);
 
 extern struct attrib_type at_guard;
 extern struct attrib_type at_lighthouse;
+extern struct attrib_type at_creator;
 
 #define GUARD_NONE 0
 #define GUARD_TAX 1
@@ -1123,6 +1124,8 @@ extern struct attrib_type at_lighthouse;
 	/* Verhindert Unterhaltung auf Schiffen */
 #define GUARD_RECRUIT 64
   /* Verhindert Rekrutieren */
+#define GUARD_PRODUCE 128
+	/* Verhindert Abbau von Resourcen mit RTF_LIMITED */
 #define GUARD_ALL 0xFFFF
 
 extern void setguard(struct unit * u, unsigned int flags);

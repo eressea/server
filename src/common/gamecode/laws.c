@@ -688,7 +688,7 @@ horses(region * r)
 		rsethorses(r, (int)(horses*0.9));
 	}	else if (maxhorses > 0) {
 		int i;
-		int growth = (HORSEGROWTH * 200 * (maxhorses-horses))/maxhorses;
+		int growth = (RESOURCE_QUANTITY * HORSEGROWTH * 200 * (maxhorses-horses))/maxhorses;
 
 		if(a_find(r->attribs, &at_horseluck)) growth *= 2;
 		/* printf("Horses: <%d> %d -> ", growth, horses); */
@@ -3028,6 +3028,7 @@ maxunits(faction *f)
 {
 	return (int) (global.maxunits * (1 + 0.4 * fspecial(f, FS_ADMINISTRATOR)));
 }
+
 
 static void
 new_units (void)

@@ -244,6 +244,6 @@ extern char * strdup(const char *s);
 #ifdef STRNCPY_HAS_ZEROTERMINATION
 # define strnzcpy(dst, src, len)  strncpy(dst, src, len) 
 #else
-# define strnzcpy(dst, src, len) (strncpy(dst, src, len), len?dst[len-1]=0:0, dst)
+# define strnzcpy(dst, src, len) (strncpy(dst, src, len), len?dst[len]=0:0, dst)
 #endif
 #endif
