@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.11 2001/02/10 22:02:10 enno Exp $
+ *	$Id: laws.c,v 1.12 2001/02/11 10:06:07 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2113,6 +2113,63 @@ resolve_ship(void * id) {
 static void
 reorder_owners(region * r)
 {
+	unit ** up=&r->units;
+	building * b=NULL;
+	ship * sh=NULL;
+	while (*up) {
+		unit * u = *up;
+		if (u->building!=b) {
+			/* if this is a new building */
+			b = u->building;
+			if (b && !fval(u, FL_OWNER)) {
+				/* if the first unit is not the owner, find the real one */
+				unit ** uo = &u->next;
+				while (*uo && (!fval((*uo), FL_OWNER) || (*uo)->building!=b)) {
+					uo=&(*uo)->next;
+				}
+
+				if (*uo && (*uo)->building==b) {
+					/* if successful, move *uo to the top */
+					*up = *uo;
+					*uo = (*uo)->next;
+					(*up)->next = u;
+				}
+				else {
+					fprintf(stderr, "WARNING: Gebäude %s hatte keinen Besitzer. Setze %s\n", buildingname(b), unitname(u));
+					fset(u, FL_OWNER);
+				}
+			}
+		}
+		if (u->ship!=sh) {
+			/* if this is a new ship */
+			sh = u->ship;
+			if (sh && !fval(u, FL_OWNER)) {
+				/* if the first unit is not the owner, find the real one */
+				unit ** uo = &u->next;
+				while (*uo && (!fval((*uo), FL_OWNER) || (*uo)->ship!=sh)) {
+					uo=&(*uo)->next;
+				}
+
+				if (*uo && (*uo)->ship==sh) {
+					/* if successful, move *uo to the top */
+					*up = *uo;
+					*uo = (*uo)->next;
+					(*up)->next = u;
+				}
+				else {
+					fprintf(stderr, "WARNING: Das Schiff %s hatte keinen Besitzer. Setze %s\n", shipname(sh), unitname(u));
+					fset(u, FL_OWNER);
+				}
+			}
+		}
+		up = &u->next;
+	}
+}
+
+#if 0
+static void
+reorder_owners(region * r)
+{
 	unit * us[4096];
 	unit * u, **ui = &r->units;
 	unit ** first;
@@ -2159,6 +2216,7 @@ reorder_owners(region * r)
 	}
 	*ui = NULL;
 }
+#endif
 
 static attrib_type at_number = {
 	"faction_renum", 
@@ -2238,7 +2296,6 @@ reorder(void)
 	for (r=regions;r;r=r->next) {
 		unit * u, ** up=&r->units;
 		boolean sorted=false;
-		for (u=r->units;u;u=u->next) freset(u, FL_DH);
 		while (*up) {
 			u = *up;
 			if (!fval(u, FL_MARK)) {
@@ -2285,7 +2342,7 @@ reorder(void)
 			}
 			if (u==*up) up=&u->next;
 		}
-		if (sorted) for (u=r->units;u;u=u->next) freset(u, FL_OWNER);
+		if (sorted) for (u=r->units;u;u=u->next) freset(u, FL_MARK);
 	}
 }
 

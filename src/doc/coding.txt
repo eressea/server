@@ -69,13 +69,22 @@ mit arbeit zu tun hat, keine boolean-variable die sagt ob man auf der
 arbeit ist.
 
 - faction::units
-Die Variable funktioniert und kann benutzt werden. folgendes: 
+Die Variable funktioniert und kann benutzt werden. folgendes:
 for (r=regions;r;r=r->next) for (u=r->units;u;u=u->next) if (u->faction==f) {}
 schreibt sich viel einfacher so:
 for (u=f->units;u;u=u->nextF) {}
-und ja, es wird garantiert, das das funktioiniert, und regionsreihenfolge einhalten tut es auch. weshalb wahlloses erzeugen von einheiten per calloc und ohne createunit() aufruf schon seit längerem ein NoNo ist.
+und ja, es wird garantiert, das das funktioiniert, und regionsreihenfolge
+einhalten tut es auch. weshalb wahlloses erzeugen von einheiten per calloc und
+ohne createunit() aufruf schon seit längerem ein NoNo ist.
 
 - buffer length
 Namen von attributen, hashcodes für items, usw. sollten kurz sein.
 schliesslich landen sie im Datenfile. Eine Funktion, die sie einlädt,
 sollte mit 32 byte speicherbedarf rechnen.
+
+- FL_MARK und FL_DH:
+Der unterschied zwischen diesen beiden Flags ist:
+FL_DH sollte man vor der Benutzung auf einen Wert setzen, den man coraussetzt
+(man kriegt keinen wert garanteirt).
+FL_MARK ist immer 0. jede routine die es setzt, muss es am ende wieder auf 0
+zurücksetzen. code-beispiel ist z.b. die SORTIERE-funktion.

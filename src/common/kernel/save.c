@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.15 2001/02/10 19:24:05 enno Exp $
+ *	$Id: save.c,v 1.16 2001/02/11 10:06:07 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -455,7 +455,7 @@ readfaction(void)
 		 * muß in "Gänsefüßchen" stehen!! */
 
 		/* War vorher in main.c:getgarbage() */
-		if (!quiet) { printf(" %s;", factionid(f)); fflush(stdout); }
+		if (!quiet) { printf(" %.4s;", factionid(f)); fflush(stdout); }
 		freestrlist(f->mistakes);
 		f->mistakes = 0;
 
