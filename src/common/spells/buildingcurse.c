@@ -22,7 +22,8 @@
 #include "curse.h"
 
 /* util includes */
-#include <message.h>
+#include <kernel/message.h>
+#include <util/message.h>
 
 /* libc includes */
 #include <string.h>
