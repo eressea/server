@@ -8455,8 +8455,7 @@ spell spelldaten[] =
 
 /* M_TRAUM */
 
-	{SPL_SPARKLE_DREAM, "Traumsenden",
-		"Der Zauberer sendet dem Ziel des Spruches einen Traum.",
+	{SPL_SPARKLE_DREAM, "sparkledream", NULL,
 		NULL,
 		"u",
 		M_TRAUM,
@@ -8471,10 +8470,7 @@ spell spelldaten[] =
 	 (spell_f)sp_sparkle, patzer
 	},
 
-	{SPL_ILLAUN_EARN_SILVER, "Wahrsagen",
-	"Niemand kann so gut die Träume deuten wie ein Magier des Illaun. Auch "
-	"die Kunst der Wahrsagerrei, des Kartenlegens und des Handlesens sind ihm "
-	"geläufig.  Dafür zahlen ihm die Bauern 50 Silber pro Stufe.",
+	{SPL_ILLAUN_EARN_SILVER, "illaunearnsilver", NULL,
 	NULL,
 	NULL,
 	 M_TRAUM, (SPELLLEVEL|ONSHIPCAST), 5, 1,
@@ -8487,10 +8483,7 @@ spell spelldaten[] =
 	 (spell_f)sp_earn_silver, patzer
 	},
 
-	{SPL_SHADOWKNIGHTS, "Schattenritter",
-		"Dieser Zauber vermag dem Gegner ein geringfügig versetztes Bild der "
-		"eigenen Truppen vorzuspiegeln. Die Schattenritter haben keinen "
-		"effektiven Angriff und Verwundungen im Kampf zerstören sie sofort.",
+	{SPL_SHADOWKNIGHTS, "shadowknights", NULL,
 		NULL,
 		NULL,
 	 M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 4, 1,
@@ -8503,10 +8496,7 @@ spell spelldaten[] =
 	 (spell_f)sp_shadowknights, patzer
 	},
 
-	{SPL_FLEE, "Grauen der Schlacht",
-		"Der Traumweber beschwört vor dem Kampf grauenerregende Trugbilder herauf, "
-		"die viele Gegner in Panik versetzen. Die Betroffenen werden versuchen, "
-		"vor den Trugbildern zu fliehen.",
+	{SPL_FLEE, "flee", NULL,
 		NULL,
 		NULL,
 	 M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 5, 2,
@@ -8519,13 +8509,7 @@ spell spelldaten[] =
 	 (spell_f)sp_flee, patzer
 	},
 
-	{SPL_PUTTOREST, "Seelenfrieden",
-		"Dieses magische Ritual beruhigt die gequälten Seelen der gewaltsam "
-		"zu Tode gekommenen und ermöglicht es ihnen so, ihre letzte Reise in "
-		"die Anderlande zu beginnen. Je Stufe des Zaubers werden ungefähr 50 "
-		"Seelen ihre Ruhe finden. Der Zauber vermag nicht, bereits wieder "
-		"auferstandene lebende Tote zu erlösen, da deren Bindung an diese "
-		"Welt zu stark ist.",
+	{SPL_PUTTOREST, "puttorest", NULL,
 		NULL,
 		NULL,
 	 M_TRAUM, (SPELLLEVEL), 5, 2,
@@ -8538,11 +8522,7 @@ spell spelldaten[] =
 	 (spell_f)sp_puttorest, patzer
 	},
 
-	{SPL_ICASTLE, "Traumschlößchen",
-		"Mit Hilfe dieses Zaubers kann der Traumweber die Illusion eines "
-		"beliebigen Gebäudes erzeugen. Die Illusion kann betreten werden, ist "
-		"aber ansonsten funktionslos und benötigt auch keinen Unterhalt. Sie "
-		"wird einige Wochen bestehen bleiben.",
+	{SPL_ICASTLE, "icastle", NULL,
 		"ZAUBERE \"Traumschlößchen\" <Gebäude-Typ>",
 		"c",
 	 M_TRAUM, (0), 5, 3,
@@ -8555,9 +8535,7 @@ spell spelldaten[] =
 	 (spell_f)sp_icastle, patzer
 	},
 
-	{SPL_TRANSFERAURA_TRAUM, "Traum der Magie",
-	 "Mit Hilfe dieses Zaubers kann der Traumweber eigene Aura im Verhältnis "
-	 "2:1 auf einen anderen Traumweber übertragen.",
+	{SPL_TRANSFERAURA_TRAUM, "transferauratraum", NULL,
 		"ZAUBERE \"Traum der Magie\" <Einheit-Nr> <investierte Aura>",
 		"ui",
 	 M_TRAUM, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 3,
@@ -8570,10 +8548,7 @@ spell spelldaten[] =
 	 (spell_f)sp_transferaura, patzer
 	},
 
-	{SPL_ILL_SHAPESHIFT, "Gestaltwandlung",
-		"Mit Hilfe dieses arkanen Rituals vermag der Traumweber die wahre "
-		"Gestalt einer Gruppe zu verschleiern. Unbedarften Beobachtern "
-		"erscheint sie dann als einer anderen Rasse zugehörig.",
+	{SPL_ILL_SHAPESHIFT, "shapeshift", NULL,
 		"ZAUBERE [STUFE n] \"Gestaltwandlung\" <Einheit-nr> <Rasse>",
 		"uc",
 	 M_TRAUM, (UNITSPELL|SPELLLEVEL|ONETARGET), 5, 3,
@@ -8586,9 +8561,7 @@ spell spelldaten[] =
 	 (spell_f)sp_illusionary_shapeshift, patzer
 	},
 
-	{SPL_DREAMREADING, "Traumlesen",
-	 "Dieser Zauber ermöglicht es dem Traumweber, in die Träume einer Einheit "
-	 "einzudringen und so einen Bericht über die Umgebung zu erhalten.",
+	{SPL_DREAMREADING, "dreamreading", NULL,
 		NULL,
 		"u",
 	 M_TRAUM, (FARCASTING | UNITSPELL | ONETARGET | TESTRESISTANCE), 5, 4,
@@ -8601,10 +8574,7 @@ spell spelldaten[] =
 	 (spell_f)sp_dreamreading, patzer
 	},
 
-	{SPL_TIREDSOLDIERS, "Schwere Glieder",
-	 "Dieser Kampfzauber führt dazu, dass einige Gegner im Kampf unter "
-	 "schwerer Müdigkeit leiden. Die Soldaten verschlafen manchmal ihren "
-	 "Angriff und verteidigen sich schlechter.",
+	{SPL_TIREDSOLDIERS, "tiredsoldiers", NULL,
 		NULL,
 		NULL,
 	 M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
@@ -8617,13 +8587,7 @@ spell spelldaten[] =
 	 (spell_f)sp_tiredsoldiers, patzer
 	},
 
-	{SPL_REANIMATE, "Wiederbelebung",
-		"Stirbt ein Krieger im Kampf so macht sich seine Seele auf die lange "
-		"Wanderung zu den Sternen. Mit Hilfe eines Rituals kann ein Traumweber "
-		"versuchen, die Seele wieder einzufangen und in den Körper des "
-		"Verstorbenen zurückzubringen. Zwar heilt der Zauber keine "
-		"körperlichen Verwundungen, doch ein Behandelter wird den Kampf "
-		"überleben.",
+	{SPL_REANIMATE, "reanimate", NULL,
 		NULL,
 		NULL,
 	 M_TRAUM, (POSTCOMBATSPELL | SPELLLEVEL), 4, 5,
@@ -8636,12 +8600,7 @@ spell spelldaten[] =
 	 (spell_f)sp_reanimate, patzer
 	},
 
-	{SPL_ANALYSEDREAM, "Traumbilder analysieren",
-		"Mit diesem Spruch kann der Traumweber versuchen, die Verzauberungen "
-		"einer einzelnen Einheit zu erkennen. Von allen Sprüchen, "
-		"die seine eigenen Fähigkeiten nicht überschreiten, wird er einen "
-		"Eindruck ihres Wirkens erhalten können. Bei stärkeren Sprüchen "
-		"benötigt er ein wenig Glück für eine gelungene Analyse.",
+	{SPL_ANALYSEDREAM, "analysedream", NULL,
 		NULL,
 		"u",
 	 M_TRAUM, (UNITSPELL | ONSHIPCAST | ONETARGET | TESTCANSEE), 5, 5,
@@ -8654,10 +8613,7 @@ spell spelldaten[] =
 	 (spell_f)sp_analysedream, patzer
 	},
 
-	{SPL_DISTURBINGDREAMS, "Schlechter Schlaf",
-	 "Dieser Zauber führt in der betroffenen Region für einige Wochen zu "
-	 "Schlaflosigkeit und Unruhe. Den Betroffenen fällt das Lernen deutlich "
-	 "schwerer.",
+	{SPL_DISTURBINGDREAMS, "disturbingdreams", NULL,
 		NULL,
 		NULL,
 	 M_TRAUM, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 6,
@@ -8670,12 +8626,7 @@ spell spelldaten[] =
 	 (spell_f)sp_disturbingdreams, patzer
 	},
 
-	{SPL_TRUESEEING_ILLAUN, "Erschaffe ein Amulett des wahren Sehens",
-		"Der Spruch ermöglicht es einem Magier, ein Amulett des Wahren Sehens "
-		"zu erschaffen. Das Amulett erlaubt es dem Träger, alle Einheiten, die "
-		"durch einen Ring der Unsichtbarkeit geschützt sind, zu sehen. Einheiten "
-		"allerdings, die sich mit ihrem Tarnungs-Talent verstecken, bleiben "
-		"weiterhin unentdeckt.",
+	{SPL_TRUESEEING_ILLAUN, "trueseeingillaun", NULL,
 		NULL,
 		NULL,
 		M_TRAUM, (ONSHIPCAST), 5, 6,
@@ -8688,11 +8639,7 @@ spell spelldaten[] =
 		(spell_f)sp_createitem_trueseeing, patzer_createitem
 	},
 
-	{SPL_INVISIBILITY_ILLAUN, "Erschaffe einen Ring der Unsichtbarkeit",
-		"Mit diesem Spruch kann der Zauberer einen Ring der Unsichtbarkeit "
-		"erschaffen. Der Träger des Ringes wird für alle Einheiten anderer "
-		"Parteien unsichtbar, egal wie gut ihre Wahrnehmung auch sein mag. In "
-		"einer unsichtbaren Einheit muss jede Person einen Ring tragen.",
+	{SPL_INVISIBILITY_ILLAUN, "invisibilityillaun", NULL,
 		NULL,
 		NULL,
 		M_TRAUM, (ONSHIPCAST), 5, 6,
@@ -8705,10 +8652,7 @@ spell spelldaten[] =
 		(spell_f)sp_createitem_invisibility, patzer_createitem
 	},
 
-	{SPL_SLEEP, "Schlaf",
-	 "Dieser Zauber läßt einige feindliche Kämpfer einschlafen. Schlafende "
-	 "Kämpfer greifen nicht an und verteidigen sich schlechter, sie wachen "
-	 "jedoch auf, sobald sie im Kampf getroffen werden.",
+	{SPL_SLEEP, "sleep", NULL,
 		NULL,
 		NULL,
 	 M_TRAUM, (COMBATSPELL | SPELLLEVEL ), 5, 7,
@@ -8738,11 +8682,7 @@ spell spelldaten[] =
 	 (spell_f)sp_wisps, patzer
 	},
 
-	{SPL_READMIND, "Traumdeuten",
-		"Mit diesem Zauber dringt der Traumweber in die Gedanken und Traumwelt "
-		"seines Opfers ein und kann so seine intimsten Geheimnisse ausspähen. "
-		"Seine Fähigkeiten, seinen Besitz und seine Parteizugehörigkeit wird "
-		"nicht länger ungewiss sein.",
+	{SPL_READMIND, "readmind", NULL,
 		NULL,
 		"u",
 	 M_TRAUM, (UNITSPELL | ONETARGET), 5, 7,
@@ -8755,10 +8695,7 @@ spell spelldaten[] =
 	 (spell_f)sp_readmind, patzer
 	},
 
-	{SPL_GOODDREAMS, "Schöne Träume",
-	 "Dieser Zauber ermöglicht es dem Traumweber, den Schlaf aller aliierten "
-	 "Einheiten in der Region so zu beeinflussen, dass sie für einige Zeit "
-	 "einen Bonus in allen Talenten bekommen.",
+	{SPL_GOODDREAMS, "gooddreams", NULL,
 		NULL,
 		NULL,
 		M_TRAUM,
@@ -8773,10 +8710,7 @@ spell spelldaten[] =
 	 (spell_f)sp_gooddreams, patzer
 	},
 
-	{SPL_ILLAUN_DESTROY_MAGIC, "Traumbilder entwirren",
-		"Dieser Zauber ermöglicht es dem Traumweber die natürlichen und "
-		"aufgezwungenen Traumbilder einer Person, eines Gebäudes, Schiffes "
-		"oder einer Region zu unterscheiden und diese zu entwirren.",
+	{SPL_ILLAUN_DESTROY_MAGIC, "illaundestroymagic", NULL,
 		"ZAUBERE [REGION x y] [STUFE n] \"Traumbilder entwirren\" REGION\n"
 		"ZAUBERE [REGION x y] [STUFE n] \"Traumbilder entwirren\" EINHEIT <Einheit-Nr>\n"
 		"ZAUBERE [REGION x y] [STUFE n] \"Traumbilder entwirren\" BURG <Burg-Nr>\n"
@@ -8795,10 +8729,7 @@ spell spelldaten[] =
 	 (spell_f)sp_destroy_magic, patzer
 	},
 
-	{SPL_ILLAUN_FAMILIAR, "Vertrauten rufen",
-		"Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein "
-		"ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem "
-		"Magier anschließen wird.",
+	{SPL_ILLAUN_FAMILIAR, "illaunfamiliar", NULL,
 		NULL,
 		NULL,
 	 M_TRAUM, (NOTFAMILIARCAST), 5, 9,
@@ -8850,12 +8781,7 @@ spell spelldaten[] =
 		(spell_f)sp_baddreams, patzer
 	},
 
-	{SPL_MINDBLAST, "Tod des Geistes",
-	 "Mit diesem Zauber greift der Magier direkt den Geist seiner Gegner "
-	 "an. Ein Schlag aus astraler und elektrischer Energie trifft die "
-	 "Gegner, wird die Magieresistenz durchbrochen, verliert ein Opfer "
-	 "permanent einen Teil seiner Erinnerungen. Wird es zu oft ein Opfer "
-	 "dieses Zaubers kann es daran sterben.",
+	{SPL_MINDBLAST, "mindblast", NULL,
 		NULL,
 		NULL,
 	 M_TRAUM, (COMBATSPELL | SPELLLEVEL), 5, 11,
@@ -8868,13 +8794,7 @@ spell spelldaten[] =
 	 (spell_f)sp_mindblast, patzer
 	},
 
-	{SPL_ORKDREAM, "Süße Träume",
-		"Dieser Zauber - dessen Anwendung in den meisten Kulturen streng "
-		"verboten ist - löst im Opfer ein unkontrollierbares Verlangen "
-		"nach körperlicher Liebe aus. Die betroffenen Personen werden sich "
-		"Hals über Kopf in ein Liebesabenteuer stürzen, zu blind vor "
-		"Verlangen, um an etwas anderes zu denken. Meistens bereuen sie "
-		"es einige Wochen später...",
+	{SPL_ORKDREAM, "orkdream", NULL,
 		NULL,
 		"u+",
 		M_TRAUM,

@@ -3766,6 +3766,94 @@
 			<text locale="de">Chaossog</text>
 			<text locale="en">Chaos Gate</text>
 		</string>
+		<string name="sparkledream">
+			<text locale="de">Traumsenden</text>
+			<text locale="en">Dream</text>
+		</string>
+		<string name="illaunearnsilver">
+			<text locale="de">Wahrsagen</text>
+			<text locale="en">Divination</text>
+		</string>
+		<string name="shadowknights">
+			<text locale="de">Schattenritter</text>
+			<text locale="en">Shadow Knights</text>
+		</string>
+		<string name="flee">
+			<text locale="de">Grauen der Schlacht</text>
+			<text locale="en">Unspeakable Horrors</text>
+		</string>
+		<string name="puttorest">
+			<text locale="de">Seelenfrieden</text>
+			<text locale="en">Eternal Rest</text>
+		</string>
+		<string name="icastle">
+			<text locale="de">Traumschlößchen</text>
+			<text locale="en">Castle Of Illusion</text>
+		</string>
+		<string name="transferauratraum">
+			<text locale="de">Traum der Magie</text>
+			<text locale="en">Dream Of Magic</text>
+		</string>
+		<string name="shapeshift">
+			<text locale="de">Gestaltwandlung</text>
+			<text locale="en">Shapeshift</text>
+		</string>
+		<string name="dreamreading">
+			<text locale="de">Traumlesen</text>
+			<text locale="en">Read Dreams</text>
+		</string>
+		<string name="tiredsoldiers">
+			<text locale="de">Schwere Glieder</text>
+			<text locale="en">Tiredness</text>
+		</string>
+		<string name="reanimate">
+			<text locale="de">Wiederbelebung</text>
+			<text locale="en">Ressurection</text>
+		</string>
+		<string name="analysedream">
+			<text locale="de">Traumbilder analysieren</text>
+			<text locale="en">Analyse Dreams</text>
+		</string>
+		<string name="disturbingdreams">
+			<text locale="de">Schlechter Schlaf</text>
+			<text locale="en">Insomnia</text>
+		</string>
+		<string name="trueseeingillaun">
+			<text locale="de">Erschaffe ein Amulett des wahren Sehens</text>
+			<text locale="en">Create An Amulet Of True Sight</text>
+		</string>
+		<string name="invisibilityillaun">
+			<text locale="de">Erschaffe einen Ring der Unsichtbarkeit</text>
+			<text locale="en">Create A Ring Of Invisibility</text>
+		</string>
+		<string name="sleep">
+			<text locale="de">Schlaf</text>
+			<text locale="en">Sleep</text>
+		</string>
+		<string name="readmind">
+			<text locale="de">Traumdeuten</text>
+			<text locale="en">Mind Probe</text>
+		</string>
+		<string name="gooddreams">
+			<text locale="de">Schöne Träume</text>
+			<text locale="en">Pleasant Dreams</text>
+		</string>
+		<string name="illaundestroymagic">
+			<text locale="de">Traumbilder entwirren</text>
+			<text locale="en">Remove Dreams</text>
+		</string>
+		<string name="illaunfamiliar">
+			<text locale="de">Vertrauten rufen</text>
+			<text locale="en">Call Familiar</text>
+		</string>
+		<string name="mindblast">
+			<text locale="de">Tod des Geistes</text>
+			<text locale="en">Mental Death</text>
+		</string>
+		<string name="orkdream">
+			<text locale="de">Süße Träume</text>
+			<text locale="en">Sweet Dreams</text>
+		</string>
 	</namespace>
 	<namespace name="spellinfo">
 		<string name="blessedharvest">
@@ -4711,6 +4799,304 @@
 				at the end of the following week.
 			</text>
 		</string>
+		<string name="sparkledream">
+			<text locale="de">Der Zauberer sendet dem Ziel des 
+				Spruches einen Traum.
+			</text>
+			<text locale="en">The mentalist send a dream to the 
+				target of the spell.
+			</text>
+		</string>
+		<string name="illaunearnsilver">
+			<text locale="de">Niemand kann so gut die Träume deuten 
+				wie ein Magier des Illaun. Auch die Kunst der 
+				Wahrsagerei, des Kartenlegens und des Handlesens sind 
+				ihm geläufig. Dafür zahlen ihm die Bauern 50 Silber 
+				pro Stufe.
+			</text>
+			<text locale="en">No one can read dreams as well as the 
+				mages of Illaun. Furthermore, they are also familiar 
+				with all other common means of foretelling the 
+				future like crystal balls, tarot cards or palms. A 
+				mentalist can earn 50 silver pieces per level and 
+				week for offering these services to peasants.
+			</text>
+		</string>
+		<string name="shadowknights">
+			<text locale="de">Dieser Zauber vermag dem Gegner ein 
+				geringfügig versetztes Bild der eigenen Truppen 
+				vorzuspiegeln. Die Schattenritter haben keinen 
+				effektiven Angriff und Verwundungen im Kampf 
+				zerstören sie sofort.
+			</text>
+			<text locale="en">This spell creates illusionary 
+				duplicates of allied troops. The shadow knights 
+				can't do real damage and are instantly destroyed 
+				if wounded.
+			</text>
+		</string>
+		<string name="flee">
+			<text locale="de">Der Traumweber beschwört vor dem 
+				Kampf grauenerregende Trugbilder herauf, die viele 
+				Gegner in Panik versetzen. Die Betroffenen werden 
+				versuchen, vor den Trugbildern zu fliehen.
+			</text>
+			<text locale="en">Before a battle the mentalist creates 
+				terrifying illusions of hideous creatures that will 
+				cause panic among the enemies. Those who believe in 
+				the illusions will try to flee from battle.
+			</text>
+		</string>
+		<string name="puttorest">
+			<text locale="de">Dieses magische Ritual beruhigt die 
+				gequälten Seelen der gewaltsam zu Tode gekommenen und 
+				ermöglicht es ihnen so, ihre letzte Reise in die 
+				Anderlande zu beginnen. Je Stufe des Zaubers werden 
+				ungefähr 50 Seelen ihre Ruhe finden. Der Zauber 
+				vermag nicht, bereits wieder auferstandene lebende 
+				Tote zu erlösen, da deren Bindung an diese Welt zu 
+				stark ist.
+			</text>
+			<text locale="en">This ritual calms the tortured souls of 
+				those who died a violent death and finally releases 
+				them to the Otherlands. About 50 souls per level of 
+				the spell will be released. The spell will not affect 
+				existing undead, because they are too strongly tied 
+				to the Material World.
+			</text>
+		</string>
+		<string name="icastle">
+			<text locale="de">Mit Hilfe dieses Zaubers kann der 
+				Traumweber die Illusion eines beliebigen Gebäudes 
+				erzeugen. Die Illusion kann betreten werden, ist aber 
+				ansonsten funktionslos und benötigt auch keinen 
+				Unterhalt. Sie wird einige Wochen bestehen bleiben.
+			</text>
+			<text locale="en">With this spell the mentalist can 
+				create the illusion of any building. The illusion can 
+				be entered, but it has no function and requires no 
+				maintenance. It will remain existing for several 
+				weeks.
+			</text>
+		</string>
+		<string name="transferauratraum">
+			<text locale="de">Mit Hilfe dieses Zaubers kann der 
+				Traumweber eigene Aura im Verhältnis 2:1 auf einen 
+				anderen Traumweber übertragen.
+			</text>
+			<text locale="en">With the help of this spell the 
+				mentalist can transfer mana at a ratio of 2:1 to 
+				another mentalist.
+			</text>
+		</string>
+		<string name="shapeshift">
+			<text locale="de">Mit Hilfe dieses arkanen Rituals vermag 
+				der Traumweber die wahre Gestalt einer Gruppe zu 
+				verschleiern. Unbedarften Beobachtern erscheint sie 
+				dann als einer anderen Rasse zugehörig.
+			</text>
+			<text locale="en">With the help of this ritual the 
+				mentalist is able to conceal the true form of a 
+				target unit. To unknowing observers all persons in 
+				the target unit appear to be of a different race.
+			</text>
+		</string>
+		<string name="dreamreading">
+			<text locale="de">Dieser Zauber ermöglicht es dem 
+				Traumweber, in die Träume einer Einheit einzudringen 
+				und so einen Bericht über die Umgebung zu erhalten.
+			</text>
+			<text locale="en">This spell enables the mentalist to 
+				penetrate the dreams of a target unit and gather 
+				information about that unit's surroundings. He will 
+				receive a report from the corresponding region.
+			</text>
+		</string>
+		<string name="tiredsoldiers">
+			<text locale="de">Dieser Kampfzauber führt dazu, dass 
+				einige Gegner im Kampf unter schwerer Müdigkeit 
+				leiden. Die Soldaten verschlafen manchmal ihren Angriff 
+				und verteidigen sich schlechter.
+			</text>
+			<text locale="en">This combat spell causes several enemies 
+				to suffer from an unnatural tiredness during combat. 
+				The soldiers will defend themselves worse than normal 
+				and sometimes sink into a slumber instead of attacking.
+			</text>
+		</string>
+		<string name="reanimate">
+			<text locale="de">Stirbt ein Krieger im Kampf so macht 
+				sich seine Seele auf die lange Wanderung zu den 
+				Sternen. Mit Hilfe eines Rituals kann ein Traumweber 
+				versuchen, die Seele wieder einzufangen und in den 
+				Körper des Verstorbenen zurückzubringen. Zwar heilt 
+				der Zauber keine körperlichen Verwundungen, doch ein 
+				Behandelter wird den Kampf überleben.
+			</text>
+			<text locale="en">When a warrior dies in a battle, his 
+				soul begins its long journey to the stars. With the 
+				help of this ritual, the mentalist can try to catch 
+				those escaping souls and bring them back to their 
+				bodies. The spell does not heal physical injuries, but 
+				an affected person will survive the battle.
+			</text>
+		</string>
+		<string name="analysedream">
+			<text locale="de">Mit diesem Spruch kann der Traumweber 
+				versuchen, die Verzauberungen einer einzelnen Einheit 
+				zu erkennen. Von allen Sprüchen, die seine eigenen 
+				Fähigkeiten nicht überschreiten, wird er einen 
+				Eindruck ihres Wirkens erhalten können. Bei stärkeren 
+				Sprüchen benötigt er ein wenig Glück für eine 
+				gelungene Analyse.
+			</text>
+			<text locale="en">With this spell the mentalist can 
+				attempt to detect enchantments on a target unit. He 
+				will get an idea of the effect of all spells that 
+				don't exceed his own abilities. If a spell is 
+				stronger, it takes a little luck for a successful 
+				analysis.
+			</text>
+		</string>
+		<string name="disturbingdreams">
+			<text locale="de">Dieser Zauber führt in der betroffenen 
+				Region für einige Wochen zu Schlaflosigkeit und 
+				Unruhe. Den Betroffenen fällt das Lernen deutlich 
+				schwerer.
+			</text>
+			<text locale="en">This spell causes insomnia and 
+				restlessness in a whole region for several weeks. All 
+				affected persons will learn much slower than normal.
+			</text>
+		</string>
+		<string name="trueseeingillaun">
+			<text locale="de">Der Spruch ermöglicht es einem Magier, 
+				ein Amulett des Wahren Sehens zu erschaffen. Das 
+				Amulett erlaubt es dem Träger, alle Einheiten, die 
+				durch einen Ring der Unsichtbarkeit geschützt sind, zu 
+				sehen. Einheiten allerdings, die sich mit ihrem 
+				Tarnungs-Talent verstecken, bleiben weiterhin 
+				unentdeckt.
+			</text>
+			<text locale="en">This spell enables the caster to create 
+				an Amulet Of True Sight. Wearing such an amulet, a 
+				person can discover anyone wearing a Ring of 
+				Invisibility. Anyway, units concealed by the use of 
+				their stealth skill will remain undiscovered.
+			</text>
+		</string>
+		<string name="invisibilityillaun">
+			<text locale="de">Mit diesem Spruch kann der Zauberer 
+				einen Ring der Unsichtbarkeit erschaffen. Der Träger 
+				des Ringes wird für alle Einheiten anderer Parteien 
+				unsichtbar, egal wie gut ihre Wahrnehmung auch sein 
+				mag. In einer unsichtbaren Einheit muss jede Person 
+				einen Ring tragen.
+			</text>
+			<text locale="en">With this spell the caster can create a 
+				Ring Of Invisibility. The wearer of this ring will be 
+				invisible to all units of other factions, no matter 
+				how good their perception skill may be. In an 
+				invisible unit, each person must wear a Ring Of 
+				Invisibility.
+			</text>
+		</string>
+		<string name="sleep">
+			<text locale="de">Dieser Zauber läßt einige feindliche 
+				Kämpfer einschlafen. Schlafende Kämpfer greifen nicht 
+				an und verteidigen sich schlechter, sie wachen jedoch 
+				auf, sobald sie im Kampf getroffen werden.
+			</text>
+			<text locale="en">This spell causes several enemies to 
+				fall asleep. Sleeping warriors don't attack and defend 
+				themselves worse than normal, but they'll wake up if 
+				they get hit during combat.
+			</text>
+		</string>
+		<string name="readmind">
+			<text locale="de">Mit diesem Zauber dringt der Traumweber 
+				in die Gedanken und Traumwelt seines Opfers ein und 
+				kann so seine intimsten Geheimnisse ausspähen. Seine 
+				Fähigkeiten, seinen Besitz und seine 
+				Parteizugehörigkeit wird nicht länger ungewiss sein.
+			</text>
+			<text locale="en">With this spell the mentalist penetrates 
+				the thoughts and dreams of his victim to reveal his 
+				most intimate secrets. The target's faction, skills 
+				and possessions will no longer be unknown.
+			</text>
+		</string>
+		<string name="gooddreams">
+			<text locale="de">Dieser Zauber ermöglicht es dem 
+				Traumweber, den Schlaf aller aliierten Einheiten in 
+				der Region so zu beeinflussen, dass sie für einige 
+				Zeit einen Bonus in allen Talenten bekommen.
+			</text>
+			<text locale="en">This spell allows the mentalist to 
+				influence the sleep of all allied units in a region 
+				in such a way that they will gain a bonus to all 
+				talents for some time.
+			</text>
+		</string>
+		<string name="illaundestroymagic">
+			<text locale="de">Dieser Zauber ermöglicht es dem 
+				Traumweber die natürlichen und aufgezwungenen 
+				Traumbilder einer Person, eines Gebäudes, Schiffes 
+				oder einer Region zu unterscheiden und diese zu 
+				entwirren.
+			</text>
+			<text locale="en">This spell allows the mentalist to 
+				distinguish between the natural and unnatural dreams 
+				of a person, a ship, a building or a region and 
+				remove those that are of magical origin.
+			</text>
+		</string>
+		<string name="illaunfamiliar">
+			<text locale="de">Einem erfahrenen Magier wird irgendwann 
+				auf seinen Wanderungen ein ungewöhnliches Exemplar 
+				einer Gattung begegnen, welches sich dem Magier 
+				anschließen wird.
+			</text>
+			<text locale="en">Once during his travels, the seasoned 
+				mage will meet an extraordinary creature of its 
+				species that will join him.
+			</text>
+		</string>
+		<string name="mindblast">
+			<text locale="de">Mit diesem Zauber greift der Magier 
+				direkt den Geist seiner Gegner an. Ein Schlag aus 
+				astraler und elektrischer Energie trifft die Gegner, 
+				wird die Magieresistenz durchbrochen, verliert ein 
+				Opfer permanent einen Teil seiner Erinnerungen. Wird 
+				es zu oft ein Opfer dieses Zaubers kann es daran 
+				sterben.
+			</text>
+			<text locale="en">With this spell the mentalist directly 
+				attacks his enemies' souls. A blast of astral and 
+				electrical energy strikes the foes. If a victim fails 
+				to resist the magic, he will permanently lose part of 
+				his memories. Being the target of this spell for too 
+				many times may result in death.
+			</text>
+		</string>
+		<string name="orkdream">
+			<text locale="de">Dieser Zauber - dessen Anwendung in den 
+				meisten Kulturen streng verboten ist - löst im Opfer 
+				ein unkontrollierbares Verlangen nach körperlicher 
+				Liebe aus. Die betroffenen Personen werden sich Hals 
+				über Kopf in ein Liebesabenteuer stürzen, zu blind 
+				vor Verlangen, um an etwas anderes zu denken. Meistens 
+				bereuen sie es einige Wochen später...
+			</text>
+			<text locale="en">This spell - whose use is forbidden in 
+				most cultures - creates an uncontrollable desire for 
+				physical love in the victim. The affected persons 
+				will rush head over heels into a love affair, unable 
+				to think of anything else. Most of them will regret 
+				this a few months later...
+			</text>
+		</string>
+
 	</namespace>
 </strings>
 
