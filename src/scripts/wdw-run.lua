@@ -10,7 +10,7 @@ function process(orders)
   read_orders(orders)
 
   -- set up the sphinx
-  init_sphinxhints()
+  -- init_sphinxhints()
   sphinx_handler()
   sphinx_weekly()
 

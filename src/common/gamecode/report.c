@@ -2694,19 +2694,35 @@ reports(void)
 			if (f->no > 0 && f->options & wants_compressed) {
 
 				if(f->age == 1) {
+#if KEEP_UNZIPPED == 1
+					fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -j -9 -@ %d-%s.zip\n",
+						turn, factionid(f), 
+            turn, factionid(f), 
+            turn, factionid(f), 
+            turn, factionid(f));
+#else
 					fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
 						turn, factionid(f), 
             turn, factionid(f), 
             turn, factionid(f), 
             turn, factionid(f));
+#endif
 					fprintf(BAT, "zip -j -9 %d-%s.zip ../res/%s/%s/welcome.txt\n", 
             turn, factionid(f), global.welcomepath, locale_name(f->locale));
 				} else {
+#if KEEP_UNZIPPED == 1
+					fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -j -9 -@ %d-%s.zip\n",
+						turn, factionid(f), 
+            turn, factionid(f), 
+            turn, factionid(f), 
+            turn, factionid(f));
+#else
 					fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
 						turn, factionid(f), 
             turn, factionid(f), 
             turn, factionid(f), 
             turn, factionid(f));
+#endif
 				}
 
 				fprintf(shfp, "eresseamail.zipped $addr \"%s %s\" \"%d-%s.zip\" "

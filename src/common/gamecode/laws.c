@@ -1830,6 +1830,65 @@ deliverMail(faction * f, region * r, unit * u, const char *s, unit * receiver)
 	}
 }
 
+static int
+prepare_mail_cmd(unit * u, struct order * ord)
+{
+	const char *s;
+	int n;
+
+	init_tokens(ord);
+	skip_token(); /* skip the keyword */
+	s = getstrtoken();
+  
+	/* Falls kein Parameter, ist das eine Einheitsnummer;
+  * das Füllwort "AN" muß wegfallen, da gültige Nummer! */
+
+  if (strcasecmp(s, "to") == 0) s = getstrtoken();
+  else if (strcasecmp(s, "an") == 0) s = getstrtoken();
+  
+	switch (findparam(s, u->faction->locale)) {
+  case P_REGION:				
+		break;
+	case P_FACTION:
+		break;
+	case P_UNIT:
+    {
+			region *r = u->region;
+  		unit *u2;
+ 	    boolean see = false;
+
+ 	    n = getid();
+
+ 	    for (u2=r->units; u2; u2=u2->next) {
+ 	      if (u2->no == n && cansee(u->faction, r, u2, 0)) {
+ 	        see = true;
+ 	        break;
+ 	      }
+ 	    }
+	
+ 	    if (see == false) {
+ 	      break;
+ 	    }
+	
+ 	    s = getstrtoken();
+ 	    if (!s[0]) {
+ 	      break;
+ 	    }
+	    u2 = findunitr(r,n);
+			if(u2 && cansee(u->faction, r, u2, 0)) {
+	 	    handle_event_va(&u2->attribs, "message", "string unit", s, u);
+			}
+		}
+		break;
+  case P_BUILDING:
+  case P_GEBAEUDE:
+		break;
+	case P_SHIP:
+		break;
+	}
+	return 0;
+}
+
 static void
 mailunit(region * r, unit * u, int n, struct order * ord, const char * s)
 {
@@ -1837,7 +1896,8 @@ mailunit(region * r, unit * u, int n, struct order * ord, const char * s)
 
 	if (u2 && cansee(u->faction, r, u2, 0)) {
 		deliverMail(u2->faction, r, u, s, u2);
-    handle_event_va(&u2->attribs, "message", "string unit", s, u);
+		/* now done in prepare_mail_cmd */
+    /* handle_event_va(&u2->attribs, "message", "string unit", s, u); */
 	}
   else {
     /* Immer eine Meldung - sonst könnte man so getarnte EHs enttarnen:
@@ -3689,6 +3749,7 @@ processorders (void)
 
   if (alliances!=NULL) alliancekick();
 
+	parse(K_MAIL, prepare_mail_cmd, false);
   parse(K_MAIL, mail_cmd, false);
 	puts(" - Altern");
 	age_factions();

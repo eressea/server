@@ -51,3 +51,6 @@
 #define WDW_PHOENIX
 #define WDW_PYRAMIDSPELL
 #define NEW_STARTEQUIPMENT
+
+#define KEEP_UNZIPPED 1
+
