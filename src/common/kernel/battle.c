@@ -104,7 +104,9 @@ boolean nobattledebug = false;
 #define MINSPELLRANGE 1
 #define MAXSPELLRANGE 7
 
-#define COMBAT_TURNS			10
+#ifndef COMBAT_TURNS
+# define COMBAT_TURNS 10
+#endif
 
 static const double EFFECT_PANIC_SPELL = 0.25;
 static const double TROLL_REGENERATION = 0.10;

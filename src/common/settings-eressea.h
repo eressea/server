@@ -36,5 +36,6 @@
 #define RECRUITFRACTION 40		/* 100/RECRUITFRACTION% */
 #define CATAPULT_AMMUNITION 0	/* Gebaut werden kann sie auch mit 0! */
 #define CHANGED_CROSSBOWS 1
+#define COMBAT_TURNS 5
 
 #define MAILITPATH	"/usr/sbin:$HOME/eressea/bin:/bin:/usr/bin:/usr/local/bin"
