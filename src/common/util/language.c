@@ -128,7 +128,7 @@ locale_setstring(locale * lang, const char * key, const char * value)
 	unsigned int id = hkey % SMAXHASH;
 	struct locale_string * find;
 
-	assert(lang);
+	if (lang==NULL) lang=default_locale;
 	find = lang->strings[id];
 	while (find) {
 		if (find->hashkey==hkey && !strcmp(key, find->key)) break;
