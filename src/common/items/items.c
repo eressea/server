@@ -18,6 +18,7 @@
 #include "demonseye.h"
 #include "weapons.h"
 #include "xerewards.h"
+#include "catapultammo.h"
 #if GROWING_TREES
 # include "seed.h"
 #endif
@@ -36,6 +37,7 @@ register_items(void)
 #endif
 	register_birthday_firework();
 	register_lebkuchenherz();
+	register_catapultammo();
 }
 
 void

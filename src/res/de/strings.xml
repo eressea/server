@@ -609,6 +609,14 @@
 	<string name="vial_p">
 		<text locale="de">Phiolen</text>
 	</string>
+	<string name="catapultammo">
+		<text locale="de">Katapultmunition</text>
+		<text locale="en">catapult ammunition</text>
+	</string>
+	<string name="catapultammo_p">
+		<text locale="de">Katapultmunition</text>
+		<text locale="en">catapult ammunition</text>
+	</string>
 
 	<comment>Resourcen</comment>
 	<string name="money">

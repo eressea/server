@@ -16,11 +16,14 @@
 #include <eressea.h>
 #include "weapons.h"
 
+#include "catapultammo.h"
+
 #include <unit.h>
 #include <build.h>
 #include <race.h>
 #include <item.h>
 #include <battle.h>
+#include <pool.h>
 
 /* util includes */
 #include <functions.h>
@@ -35,7 +38,7 @@ static weapon_mod wm_bow[] = {
 };
 
 static weapon_mod wm_catapult[] = {
-	{ 1, WMF_MISSILE_TARGET },
+	{ 4, WMF_MISSILE_TARGET },
 	{ 0, 0 }
 };
 
@@ -187,6 +190,8 @@ attack_firesword(const troop * at, int *casualties, int row)
 	return true;
 }
 
+#define CATAPULT_ATTACKS 6
+
 static boolean
 attack_catapult(const troop * at, int * casualties, int row)
 {
@@ -197,13 +202,20 @@ attack_catapult(const troop * at, int * casualties, int row)
 	int d = 0, n;
 	int minrow, maxrow;
 	weapon * wp = af->person[at->index].weapon;
-
+	
 	assert(row>=FIGHT_ROW);
 	if (row>BEHIND_ROW) return false; /* keine weiteren attacken */
-
+	
 	assert(wp->type->itype==olditemtype[I_CATAPULT]);
+	assert(af->person[at->index].reload==0);
 
-	assert (af->person[at->index].reload==0);
+#if CATAPULT_AMMUNITION
+	if(new_get_pooled(au, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE) <= 0) {
+		/* No ammo. Use other weapon if available. */
+		return true;
+	}
+#endif
+
 	if (af->catmsg == -1) {
 		int i, k=0;
 		for (i=0;i<=at->index;++i) {
@@ -215,7 +227,12 @@ attack_catapult(const troop * at, int * casualties, int row)
 	}
 	minrow = FIGHT_ROW;
 	maxrow = FIGHT_ROW;
-	n = min(10, count_enemies(b, af->side, FS_ENEMY, minrow, maxrow));
+
+	n = min(CATAPULT_ATTACKS, count_enemies(b, af->side, FS_ENEMY, minrow, maxrow));
+
+#if CATAPULT_AMMUNITION
+	new_use_pooled(au, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE, 1);
+#endif
 
 	while (--n >= 0) {
 		/* Select defender */

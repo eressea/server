@@ -34,3 +34,5 @@
 #define GUARD_DISABLES_PRODUCTION 1
 #define RESOURCE_QUANTITY 1.0
 #define RECRUITFRACTION 5
+#define CATAPULT_AMMUNITION 0	/* Gebaut werden kann sie auch mit 0! */
+
