@@ -55,6 +55,7 @@
 #include <spell.h>
 #include <alchemy.h>
 #include <study.h>
+#include <unit.h>
 
 /* util includes */
 #include <attrib.h>
@@ -2644,8 +2645,15 @@ convert_skills(void)
 				if (val) {
 					int lvl = level(val/u->number);
 					int days = val-level_days(lvl)*u->number;
-					int skip = level_days(lvl+1)-level_days(lvl);
-					set_skill(u, sk, lvl * u->number + days/skip);
+					set_skill(u, sk, lvl * u->number);
+					/* hat die Einheit mehr Lerntage als notwendig für den Skill,
+					 * bekommt sie einen Bonus Lernversuch (die chance ist umso
+					 * besser, je mehr tage sie hat) */
+					if (days) {
+						if (learn_skill(u, sk, days)){
+							change_skill(u,sk, u->number);
+						}
+					}
 				}
 			}
 		}
@@ -2704,9 +2712,6 @@ korrektur(void)
 	do_once("idlo", fix_idleout());
 	do_once("szip", set_zip());
 	do_once("heal", heal_all());
-#if PEASANT_ADJUSTMENT == 1
-	do_once("peas", peasant_adjustment());
-#endif
 
   /* trade_orders(); */
 	if (global.data_version < NEWROAD_VERSION) {
@@ -2741,6 +2746,10 @@ korrektur_end(void)
 #ifdef XMAS2001
 	do_once("2001", xmas2001());
 #endif
+#if PEASANT_ADJUSTMENT == 1
+	do_once("peas", peasant_adjustment());
+#endif
+
 }
 
 void

@@ -24,5 +24,7 @@
 #define REDUCED_PEASANTGROWTH 1
 #define RACE_ADJUSTMENTS 1
 
-/* Einmalig! */
+#define SKILLPOINTS 1
+#define TEACHDIFFERENCE 1
+
 #define PEASANT_ADJUSTMENT 1

@@ -124,6 +124,7 @@ report_failure(unit * mage, const char * sa) {
 void
 do_shock(unit *u, char *reason)
 {
+	skill_t sk;
 	if(u->number == 0) return;
 
 	/* HP - Verlust */
@@ -133,14 +134,23 @@ do_shock(unit *u, char *reason)
 	if(is_mage(u)) {
 		set_spellpoints(u, max_spellpoints(u->region,u)/10);
 	}
+
 	/* Evt. Talenttageverlust */
+#if SKILLPOINTS
 	if(rand()%10 < 2) {
-		skill_t sk;
-		int     n;
-		for(sk=0; sk < MAXSKILLS; sk++) {
-			if((n = get_skill(u, sk))!=0) set_skill(u, sk, (n*9)/10);
+		for (sk=0; sk < MAXSKILLS; sk++) {
+			int n = get_skill(u, sk);
+			if (n!=0) set_skill(u, sk, (n*9)/10);
 		}
 	}
+#else
+	for (sk=0; sk < MAXSKILLS; sk++) {
+		int n = get_skill(u, sk);
+		if (n!=0 && rand()%10 < 2) {
+			change_skill(u, sk, -1);
+		}
+	}
+#endif
 
 	/* Dies ist ein Hack, um das skillmod und familiar-Attribut beim Mage
 	 * zu löschen wenn der Familiar getötet wird. Da sollten wir über eine
@@ -1457,8 +1467,8 @@ sp_create_irongolem(castorder *co)
 	u2 = create_unit(r, mage->faction, force*8, new_race[RC_IRONGOLEM], 0, 
 		LOC(mage->faction->locale, rc_name(new_race[RC_IRONGOLEM], 1)), mage);
 
-	set_skill(u2, SK_ARMORER, 30*u2->number);
-	set_skill(u2, SK_WEAPONSMITH, 30*u2->number);
+	set_skill(u2, SK_ARMORER, skill_level(1)*u2->number);
+	set_skill(u2, SK_WEAPONSMITH, skill_level(1)*u2->number);
 
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 0;
@@ -1517,8 +1527,8 @@ sp_create_stonegolem(castorder *co)
 
 	u2 = create_unit(r, mage->faction, force*5, new_race[RC_STONEGOLEM], 0, 
 		LOC(mage->faction->locale, rc_name(new_race[RC_STONEGOLEM], 1)), mage);
-	set_skill(u2, SK_ROAD_BUILDING, 30*u2->number);
-	set_skill(u2, SK_BUILDING, 30*u2->number);
+	set_skill(u2, SK_ROAD_BUILDING, skill_level(1)*u2->number);
+	set_skill(u2, SK_BUILDING, skill_level(1)*u2->number);
 
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 0;
@@ -3372,10 +3382,10 @@ sp_summonshadow(castorder *co)
 		fset(u, FL_PARTEITARNUNG);
 
 	/* Bekommen Tarnung = (Magie+Tarnung)/2 und Wahrnehmung 1. */
-	val = (get_skill(mage, SK_MAGIC) + get_skill(mage, SK_STEALTH))/2;
+	val = (get_skill(mage, SK_MAGIC) + get_skill(mage, SK_STEALTH))/(2*mage->number);
 
 	set_skill(u, SK_STEALTH, u->number * val);
-	set_skill(u, SK_OBSERVATION, u->number * 30);
+	set_skill(u, SK_OBSERVATION, u->number * skill_level(1));
 
 	sprintf(buf, "%s beschwört %d Dämonen aus dem Reich der Schatten.",
 		unitname(mage), force*force);
@@ -3419,9 +3429,12 @@ sp_summonshadowlords(castorder *co)
 		fset(u, FL_PARTEITARNUNG);
 
 	/* Bekommen Tarnung = Magie und Wahrnehmung 5. */
-	set_skill(u, SK_STEALTH, u->number * (get_skill(mage, SK_MAGIC)-1));
-	set_skill(u, SK_OBSERVATION, u->number * 450);
-
+	set_skill(u, SK_STEALTH, (u->number * get_skill(mage, SK_MAGIC)/mage->number));
+#if SKILLPOINTS
+	set_skill(u, SK_OBSERVATION, u->number * level_days(5));
+#else
+	set_skill(u, SK_OBSERVATION, u->number * 5);
+#endif
 	sprintf(buf, "%s beschwört %d Schattenmeister.",
 		unitname(mage), force*force);
 	addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
@@ -4706,6 +4719,7 @@ sp_headache(castorder *co)
 
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
+	/* finde das größte Talent: */
 	for(i=0;i<MAXSKILLS;i++){
 		int t = get_skill(target, i);
 		if (sk_val < t){
@@ -4715,8 +4729,13 @@ sp_headache(castorder *co)
 	}
 	/* wirkt auf maximal 10 Personen */
 	days = min(10,target->number) * lovar(60);
-
+#if SKILLPOINTS
 	change_skill(target, sk, -days);
+#else
+	if (learn_skill(target, sk, days)) {
+		change_skill(target, sk, -1);
+	}
+#endif
 	set_string(&target->thisorder, "");
 
 	sprintf(buf, "%s verschafft %s einige feuchtfröhliche Stunden mit heftigen "
