@@ -1970,14 +1970,11 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	attrib *a;
 	message * m;
 	int wants_stats;
-	int wants_zugvorlage;
 	int ix;
 	unsigned char op;
 	char buf2[80];
 	ix = Pow(O_STATISTICS);
 	wants_stats = (f->options & ix);
-	ix = Pow(O_ZUGVORLAGE);
-	wants_zugvorlage = (f->options & ix);
 
 	if (quiet) {
 		printf(" NR");
@@ -2373,9 +2370,6 @@ report(FILE *F, faction * f, const faction_list * addresses,
 			rparagraph(F, LOC(f->locale, "nr_youaredead"), 0, 0);
 		} else {
 			list_address(F, f, addresses);
-			if (wants_zugvorlage) {
-				order_template(F, f);
-			}
 		}
 	}
 }
@@ -2884,7 +2878,7 @@ reports(void)
 	boolean gotit;
 	FILE *shfp, *F, *BAT;
 	int wants_report, wants_computer_report,
-		wants_compressed, wants_bzip2;
+		wants_compressed, wants_bzip2, wants_zugvorlage;
 	time_t ltime = time(NULL);
 	char pzTime[64];
 
@@ -2905,6 +2899,7 @@ reports(void)
 
 	BAT = openbatch();
 
+  wants_zugvorlage = 1 << O_ZUGVORLAGE;
 	wants_report = 1 << O_REPORT;
 	wants_computer_report = 1 << O_COMPUTER;
 	wants_compressed = 1 << O_COMPRESS;
@@ -2929,8 +2924,9 @@ reports(void)
 		else printf("%s\n", factionname(f));
 		prepare_report(f);
 		addresses = get_addresses(f);
-		if (!nonr && (f->options & wants_report))
-		{
+
+    /* NR schreiben: */
+		if (!nonr && (f->options & wants_report)) {
 			sprintf(buf, "%s/%d-%s.nr", reportpath(), turn, factionid(f));
 			F = cfopen(buf, "wt");
 			if (F) {
@@ -2939,8 +2935,17 @@ reports(void)
 				gotit = true;
 			}
 		}
-		if (!nocr && (f->options & wants_computer_report || f->age<3))
-		{
+    /* ZV schreiben: */
+    if (!nonr && (f->options & wants_zugvorlage)) {
+      sprintf(buf, "%s/%d-%s.txt", reportpath(), turn, factionid(f));
+      F = cfopen(buf, "wt");
+      if (F) {
+        order_template(F, f);
+        fclose(F);
+      }
+    }
+    /* CR schreiben: */
+		if (!nocr && (f->options & wants_computer_report || f->age<3)) {
 			sprintf(buf, "%s/%d-%s.cr", reportpath(), turn, factionid(f));
 			F = cfopen(buf, "wt");
 			if (F) {
@@ -2964,16 +2969,25 @@ reports(void)
 			if (f->no > 0 && f->options & wants_compressed) {
 
 				if(f->age == 1) {
-					fprintf(BAT, "ls %d-%s.nr %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
-						turn, factionid(f), turn, factionid(f), turn, factionid(f));
-					fprintf(BAT, "zip -j -9 %d-%s.zip ../res/%s/%s/welcome.txt\n", turn, factionid(f), global.welcomepath, locale_name(f->locale));
+					fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
+						turn, factionid(f), 
+            turn, factionid(f), 
+            turn, factionid(f), 
+            turn, factionid(f));
+					fprintf(BAT, "zip -j -9 %d-%s.zip ../res/%s/%s/welcome.txt\n", 
+            turn, factionid(f), global.welcomepath, locale_name(f->locale));
 				} else {
-					fprintf(BAT, "ls %d-%s.nr %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
-						turn, factionid(f), turn, factionid(f), turn, factionid(f));
+					fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
+						turn, factionid(f), 
+            turn, factionid(f), 
+            turn, factionid(f), 
+            turn, factionid(f));
 				}
 
 				fprintf(shfp, "eresseamail.zipped $addr \"%s %s\" \"%d-%s.zip\" "
-				    "%d-%s.zip\n", global.gamename, gamedate_short(f->locale), turn, factionid(f), turn, factionid(f));
+				    "%d-%s.zip\n", global.gamename, gamedate_short(f->locale), 
+            turn, factionid(f), 
+            turn, factionid(f));
 
 			} else if(f->options & wants_bzip2) {
 
@@ -2982,8 +2996,10 @@ reports(void)
 						" \\\n\t\"text/plain\" \"Willkommen\" ../res/%s/%s/welcome.txt", global.welcomepath, locale_name(f->locale));
 				}
 
-				fprintf(BAT, "bzip2 -9v `ls %d-%s.nr %d-%s.cr`\n",
-					turn, factionid(f), turn, factionid(f));
+				fprintf(BAT, "bzip2 -9v `ls %d-%s.nr %d-%s.txt %d-%s.cr`\n",
+					turn, factionid(f), 
+          turn, factionid(f), 
+          turn, factionid(f));
 
 				fprintf(shfp, "eresseamail.bzip2 $addr \"%s %s\"", global.gamename, gamedate_short(f->locale));
 
@@ -2991,6 +3007,11 @@ reports(void)
 					fprintf(shfp,
 						" \\\n\t\"application/x-bzip2\" \"Report\" %d-%s.nr.bz2",
 						turn,factionid(f));
+
+        if (!nonr && f->options & wants_zugvorlage)
+          fprintf(shfp,
+          " \\\n\t\"application/x-bzip2\" \"Report\" %d-%s.txt.bz2",
+          turn,factionid(f));
 
 				if (!nocr && (f->options & wants_computer_report || f->age<3))
 					fprintf(shfp,
