@@ -1355,7 +1355,7 @@ randomevents(void)
 			 * Lieber sammeln lassen, bis sie mindestens 5% der Bevölkerung sind, und
 			 * dann erst auferstehen. */
 			int undead = unburied / (rand() % 2 + 1);
-			const race * rc;
+			const race * rc = NULL;
 			int i;
 
 			if (!undead || r->age < 20) continue;
@@ -1395,7 +1395,7 @@ randomevents(void)
 				LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
 
 			{
-				message * msg = msg_message("undeadrise", "region amount", r, undead);
+				message * msg = msg_message("undeadrise", "region", r);
 				add_message(&r->msgs, msg);
 				for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
 				for (u=r->units;u;u=u->next) {
@@ -1474,7 +1474,7 @@ randomevents(void)
 
 				log_printf("%d Ents in %s.\n", u->number, regionname(r, NULL));
 
-				msg = msg_message("entrise", "region amount", r, u->number);
+				msg = msg_message("entrise", "region", r);
 				add_message(&r->msgs, msg);
 				for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
 				for (u=r->units;u;u=u->next) {

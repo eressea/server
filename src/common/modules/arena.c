@@ -14,6 +14,8 @@
 
 #include <config.h>
 #include <eressea.h>
+
+#ifdef ARENA_MODULE
 #include "arena.h"
 
 /* modules include */
@@ -546,3 +548,4 @@ register_arena(void)
 	tt_register(&tt_caldera);
 }
 
+#endif /* def ARENA_MODULE */

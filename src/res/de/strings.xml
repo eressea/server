@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<strings xmlns="http://eressea.upb.de/~eressea/xsd/strings.xsd">
 <comment>
 	_d: dativ (wir erklären allen /Trollen/ den Krieg)
 	_p: plural (13 /Trolle/)
@@ -5,7 +7,6 @@
 	_a: including article (ein Troll, a troll)
 </comment>
 
-<strings>
 	<string name="Tresen">
 		<text locale="de">Tresen</text>
 		<text locale="en">counter </text>
@@ -1917,9 +1918,6 @@
 		<text locale="de">ALLIANZ</text>
 		<text locale="en">ALLIANCE</text>
 	</string>
-	<string name="NACH">
-		<text locale="de">NACH</text>
-	</string>
 	<string name="PFLANZEN">
 		<text locale="de">PFLANZEN</text>
 	</string>
@@ -2098,7 +2096,6 @@
 	<string name="b_damage">
 		<text locale="de">Schaden</text>
 	</string>
-
 
 	<comment>report newbie info</comment>
 	<string name="nr_nmr">
@@ -3342,6 +3339,10 @@
 			<text locale="de">Schleieraura</text>
 			<text locale="en">Veil</text>
 		</string>
+		<string name="blessedharvest">
+			<text locale="de">Segen der Erde</text>
+			<text locale="en">Blessed Harvest</text>
+		</string>
 		<string name="gwyrrdearnsilver">
 			<text locale="de">Viehheilung</text>
 			<text locale="en">Cattle Healing</text>
@@ -3668,10 +3669,6 @@
 			<text locale="de">Schöne Träume</text>
 			<text locale="en">Pleasant Dreams</text>
 		</string>
-		<string name="blessedharvest">
-			<text locale="de">Segen der Erde</text>
-			<text locale="en">Blessed Harvest</text>
-		</string>
 		<string name="illaundestroymagic">
 			<text locale="de">Traumbilder entwirren</text>
 			<text locale="en">Remove Dreams</text>
@@ -3910,8 +3907,7 @@
 			</text>
 			<text locale="en">Combat medics are not the only ones
 				who can help those who got injured during a
-				battle. Druids are, with the help of a summons
-				of
+				battle. Druids are, with the help of a summons of
 				the Elemental Spirits Of Life, able to heal
 				wounds, mend broken bones or even regenerate
 				separated limbs as well.
@@ -4784,9 +4780,8 @@
 		</string>
 		<string name="shapeshift">
 			<text locale="de">Mit Hilfe dieses arkanen Rituals
-			vermag
-				der Traumweber die wahre Gestalt einer Gruppe zu
-				verschleiern. Unbedarften Beobachtern erscheint
+				vermag der Traumweber die wahre Gestalt einer Gruppe
+				zu verschleiern. Unbedarften Beobachtern erscheint
 				sie dann als einer anderen Rasse zugehörig.
 			</text>
 			<text locale="en">With the help of this ritual the
