@@ -506,7 +506,7 @@ ModifyPartei(faction * f)
 	wmove(win, 1, 2);
 	wprintw(win, (NCURSES_CONST char*)"Rasse: %s", f->race->_name[1]);
 	wmove(win, 2, 2);
-	wprintw(win, (NCURSES_CONST char*)"Einheiten: %d", f->nunits);
+	wprintw(win, (NCURSES_CONST char*)"Einheiten: %d", f->no_units);
 	wmove(win, 3, 2);
 	wprintw(win, (NCURSES_CONST char*)"Personen: %d", f->num_people);
 	wmove(win, 4, 2);

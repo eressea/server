@@ -445,17 +445,17 @@ create_region_menu(menulist ** menu, region * r)
 		addmenulist(menu, buf, 0);
 	} else {
 		for (f = factions; f; f = f->next)
-			f->num_people = f->nunits = 0;
+			f->num_people = f->no_units = 0;
 		for (u = r->units; u; u = u->next) {
-			u->faction->nunits++;
+			u->faction->no_units++;
 			u->faction->num_people += u->number;
 		}
 		addmenulist(menu, buf, 0);
 
 		for (f = factions; f; f = f->next) {
-			if (f->nunits) {
+			if (f->no_units) {
 				sprintf(buf, " %s: ", factionname(f));
-				sprintf(str, "Einheiten: %d; Leute: %d", f->nunits, f->num_people);
+				sprintf(str, "Einheiten: %d; Leute: %d", f->no_units, f->num_people);
 				sncat(buf, str, BUFSIZE);
 				addmenulist(menu, buf, 0);
 			}

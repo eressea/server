@@ -52,7 +52,6 @@ typedef struct faction {
 	struct strlist *mistakes; /* enno: das muß irgendwann noch ganz raus */
 	boolean alive; /* enno: sollte ein flag werden */
 	int nregions;
-	int nunits;	/* enno: unterschied zu no_units ? */
 	int number; /* enno: unterschied zu num_people ? */
 	int money;
 	int score;

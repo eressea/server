@@ -1197,7 +1197,7 @@ quit(void)
 		if (turn!=f->lastorders) {
 			char info[256];
 			sprintf(info, "%d Einheiten, %d Personen, %d Silber", 
-				f->nunits, f->number, f->money);
+				f->no_units, f->number, f->money);
 			fprintf(sqlstream, 
 				"UPDATE subscriptions SET lastturn=%d, password='%s', info='%s' "
 				"WHERE game=%d AND faction='%s';\n", 

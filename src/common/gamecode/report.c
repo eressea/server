@@ -3082,7 +3082,6 @@ make_summary(boolean count_new)
 		}
 		++plang->number;
 		f->nregions = 0;
-		f->nunits = 0;
 		f->number = 0;
 		f->money = 0;
 		if (count_new == true || f->age > 0) s->factions++;
@@ -3168,7 +3167,6 @@ make_summary(boolean count_new)
 					}
 				}
 
-				f->nunits++;
 				f->number += u->number;
 				f->money += get_money(u);
 				s->poprace[old_race(u->race)] += u->number;
@@ -3389,7 +3387,7 @@ out_faction(FILE *file, faction *f)
 {
  	fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
 		factionname(f), LOC(default_locale, rc_name(f->race, 0)),
-		neue_gebiete[f->magiegebiet], f->nunits, f->number, f->money,
+		neue_gebiete[f->magiegebiet], f->no_units, f->number, f->money,
 		turn - f->lastorders, turn - f->lastorders != 1 ? "NMRs" : "NMR ");
 }
 
@@ -3579,14 +3577,17 @@ report_summary(summary * s, summary * o, boolean full)
 		if (!F) return;
 		printf("Schreibe Spielerliste (players)...\n");
 		r = findregion(0, 0);
-		if (r) for (f=factions;f;f=f->next) {
+		fputs("id;name;email;info;age;x;y;nmr;score;race;magic;units;people;money", F);
+		if (r) {
 			fputs("id;name;email;info;age;x;y;nmr;score;race;magic;units;people;money", F);
-			fprintf(F, "%s;\"%s\";\"%s\";\"%s\";\"%s\";%d;%d;%d;%d;%d;"
-				"\"%s\";\"%s\";"
-				"%d;%d;%d\n",
-				factionid(f), f->name, f->email, f->banner, f->passw, f->age, region_x(r, f), region_y(r, f), turn-f->lastorders, f->score,
-				f->race->name[0], neue_gebiete[f->magiegebiet],
-				f->nunits, f->number, f->money);
+			for (f=factions;f;f=f->next) {
+				fprintf(F, "%s;\"%s\";\"%s\";\"%s\";\"%s\";%d;%d;%d;%d;%d;"
+					"\"%s\";\"%s\";"
+					"%d;%d;%d\n",
+					factionid(f), f->name, f->email, f->banner, f->passw, f->age, region_x(r, f), region_y(r, f), turn-f->lastorders, f->score,
+					f->race->name[0], neue_gebiete[f->magiegebiet],
+					f->no_units, f->number, f->money);
+			}
 		}
 		fclose(F);
 #endif

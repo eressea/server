@@ -355,20 +355,20 @@ showregion(region * r, char full)
 		adddbllist(&reglist, buf);
 
 		for (f = factions; f; f = f->next)
-			f->num_people = f->nunits = 0;
+			f->num_people = f->no_units = 0;
 		for (u = r->units; u; u = u->next) {
 			if (u->faction) {
-				u->faction->nunits++;
+				u->faction->no_units++;
 				u->faction->num_people += u->number;
 			} else
 				fprintf(stderr,"Unit %s hat keine faction!\n",unitid(u));
 		}
 		for (f = factions; f; f = f->next)
-			if (f->nunits) {
+			if (f->no_units) {
 				sprintf(buf, " %-29.29s (%s)", f->name, factionid(f));
 				adddbllist(&reglist, buf);
 				sprintf(buf, "  Einheiten: %d; Leute: %d %c",
-				   f->nunits, f->num_people, Tchar[old_race(f->race)]);
+				   f->no_units, f->num_people, Tchar[old_race(f->race)]);
 				adddbllist(&reglist, buf);
 			}
 
