@@ -325,7 +325,7 @@ read_newfactions(const char * filename)
 		if (fscanf(F, "%s %s %s %d %s %d %d", email, race, lang, &bonus, &subscription, password, &alliance)<=0) break;
 #else
 		/* email;race;locale;startbonus;subscription */
-		if (fscanf(F, "%s %s %s %d %s", email, race, lang, &bonus, &subscription, password)<=0) break;
+		if (fscanf(F, "%s %s %s %d %d %s", email, race, lang, &bonus, &subscription, password)<=0) break;
 #endif
 		while (f) {
 			if (strcmp(f->email, email)==0 && f->age==0) {
