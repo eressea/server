@@ -31,7 +31,7 @@ resource_type rt_elfspoil = {
 	&res_changeitem
 };
 
-item_type it_elvenspoil = {
+item_type it_elfspoil = {
 	&rt_elfspoil,  /* resourcetype */
 	0, 1, 0,       /* flags, weight, capacity */
 	NULL,	       /* construction */
@@ -192,7 +192,7 @@ item_type it_trollspoil = {
 void
 register_racespoils(void)
 {
-	it_register(&it_elvenspoil);
+	it_register(&it_elfspoil);
 	it_register(&it_demonspoil);
 	it_register(&it_goblinspoil);
 	it_register(&it_dwarfspoil);

@@ -534,7 +534,7 @@ elf_spoil(const struct race * rc, int size)
 {
 	item * itm = NULL;
 	if (rand()%100 < RACESPOILCHANCE){
-		i_add(&itm, i_new(&it_elvenspoil, size));
+		i_add(&itm, i_new(&it_elfspoil, size));
 	}
 	return itm;
 }

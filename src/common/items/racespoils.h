@@ -12,7 +12,7 @@
  * prior permission by the authors of Eressea.
  */
 
-extern struct item_type it_elvenspoil;
+extern struct item_type it_elfspoil;
 extern struct item_type it_demonspoil;
 extern struct item_type it_goblinspoil;
 extern struct item_type it_dwarfspoil;

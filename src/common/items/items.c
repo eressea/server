@@ -19,6 +19,7 @@
 #include "weapons.h"
 #include "xerewards.h"
 #include "catapultammo.h"
+#include "racespoils.h"
 #if GROWING_TREES
 # include "seed.h"
 #endif
@@ -40,6 +41,7 @@ register_items(void)
 	register_lebkuchenherz();
 	register_catapultammo();
 	register_questkeys();
+	register_racespoils();
 }
 
 void
