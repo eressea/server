@@ -1948,7 +1948,7 @@ use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int 
 		return ECUSTOM;
 	}
 	if (effskill(u, SK_STEALTH)<=effskill(target, SK_OBSERVATION)) {
-		cmistake(u, cmd, 63, MSG_EVENT);
+		cmistake(u, cmd, 64, MSG_EVENT);
 		return ECUSTOM;
 	}
 	ADDMSG(&u->faction->msgs, msg_message("givedumb", 
