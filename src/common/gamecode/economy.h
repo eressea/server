@@ -22,11 +22,6 @@
 #ifndef ECONOMY_H
 #define ECONOMY_H
 
-/* Wieviel ein Rekrut kostet, und welcher Teil (1/4) der Bauern rekrutiert
- * werden kann. */
-
-#define RECRUITFRACTION         20
-
 /* Welchen Teil des Silbers die Bauern fuer Unterhaltung ausgeben (1/20), und
  * wiviel Silber ein Unterhalter pro Talentpunkt bekommt. */
 
