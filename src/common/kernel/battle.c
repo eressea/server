@@ -1980,7 +1980,7 @@ make_heroes(battle * b)
 #endif
 
 static void
-attack(battle *b, troop ta, const att *a)
+attack(battle *b, troop ta, const att *a, int numattack)
 {
 	fighter *af = ta.fighter;
 	troop td;
@@ -2005,7 +2005,10 @@ attack(battle *b, troop ta, const att *a)
 				ta.fighter->person[ta.index].reload--;
 			} else {
 				boolean standard_attack = true;
-				if (wp && wp->type->attack) {
+
+        /* spezialattacken der waffe nur, wenn erste attacke in der runde.
+         * sonst helden mit feuerschwertern zu mächtig */
+				if (numattack==0 && wp && wp->type->attack) {
 					int dead = 0;
 					standard_attack = wp->type->attack(&ta, &dead, row);
 					af->catmsg += dead;
@@ -2193,7 +2196,7 @@ do_attack(fighter * af)
             if (wp!=NULL && wp->type->reload) continue;
           }
         }
-        attack(b, ta, &(au->race->attack[a]));
+        attack(b, ta, &(au->race->attack[a]), apr);
 			}
 		}
 	}
