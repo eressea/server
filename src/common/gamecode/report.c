@@ -795,7 +795,6 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 	char marker;
 	strlist *S;
 	int dh;
-	faction *fv;
 	boolean isbattle = (boolean)(mode == see_battle);
 #ifdef USE_UGROUPS
 	ugroup *ug = findugroup(u);
@@ -818,7 +817,6 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 	}
 
 	a_otherfaction = a_find(u->attribs, &at_otherfaction);
-	fv = visible_faction(f,u);
 
 	if(u->faction == f) {
 		marker = '*';

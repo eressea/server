@@ -621,10 +621,15 @@ cr_output_unit(FILE * F, const region * r,
 				/* faction info is hidden */
 				fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, FL_PARTEITARNUNG)));
 			} else {
+				const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
+				const faction * otherfaction = a_otherfaction?get_otherfaction(a_otherfaction):NULL;
 				/* other unit. show visible faction, not u->faction */
 				fprintf(F, "%d;Partei\n", sf->no);
 				if (sf == f) {
 					fprintf(F, "1;Verraeter\n");
+				}
+				if (a_otherfaction && alliedunit(u, f, HELP_FSTEALTH)) {
+					fprintf(F, "%d;Anderepartei\n", otherfaction->no);
 				}
 			}
 		}
