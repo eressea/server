@@ -946,6 +946,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	/* natürliche Rüstung */
 	an = race[du->race].armor;
 	/* magische Rüstung durch Artefakte oder Sprüche */
+	/* Momentan nur Trollgürtel */
 	am = select_magicarmor(dt);
 
 	/* natürliche Rüstung ist halbkumulativ */

@@ -13,7 +13,6 @@
 # 4) Innerhalb der Teilgraphen die 'Wer-schlägt-wen-Beziehung' aufbauen
 
 import re
-from Stack import *
 from Graph import *
 
 class heer:

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.14 2001/03/04 18:41:25 enno Exp $
+ *	$Id: item.c,v 1.15 2001/04/11 18:01:50 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1766,7 +1766,7 @@ const char *potiontext[MAXPOTIONS] =
 	"einen blauen Baumringel und etwas knotigen Saugwurz und koche das "
 	"ganze mit einem Eimer Wasser auf. Dann füge man etwas Sandfäule dazu "
 	"und lasse diesen Sud drei Tage lang ziehen. Letztlich gebe man es "
-	"den Pferden zu trinken, auf daß sich ca. 50 Pferde besser vermehren.",
+	"den Pferden zu trinken, auf daß sie sich doppelt so schnell vermehren.",
 
 	"Will man seine Krieger zu Höchstleistungen antreiben, sei das "
 	"Berserkerblut empfohlen. Um es herzustellen, braucht man einen "
