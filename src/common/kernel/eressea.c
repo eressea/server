@@ -2371,9 +2371,6 @@ remove_empty_factions(boolean writedropouts)
 		/* monster (0) werden nicht entfernt. alive kann beim readgame
 		 * () auf 0 gesetzt werden, wenn monsters keine einheiten mehr
 		 * haben. */
-#ifdef MAXAGE
-		if (f->age > MAXAGE) f->alive = 0;
-#endif
 		if (f->alive == 0 && f->no != MONSTER_FACTION) {
 			ursprung * ur = f->ursprung;
 			while (ur && ur->id!=0) ur=ur->next;
@@ -2430,7 +2427,10 @@ remove_empty_units_in_region(region *r)
 
 	while (*up) {
 		unit * u = *up;
-
+		faction * f = u->faction;
+#ifdef MAXAGE
+		if (f->age > MAXAGE) set_number(u, 0);
+#endif
 		if ((u->number <= 0 && u->race != new_race[RC_SPELL])
 		 	|| (u->age <= 0 && u->race == new_race[RC_SPELL])
 		 	|| u->number < 0) {

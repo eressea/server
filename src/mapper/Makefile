@@ -17,18 +17,23 @@ INCLUDES  += \
 	-I../common \
 	-I..
 
+LIBNAMES      += \
+	e-triggers \
+	e-modules \
+	e-kernel \
+	e-items \
+	e-spells \
+	e-races \
+	e-attributes \
+	e-util \
+	e-modules
+
 LIBS      += \
 	-L$(PUBLISH_DIR) \
-	-le-triggers \
-	-le-modules \
-	-le-kernel \
-	-le-items \
-	-le-spells \
-	-le-races \
-	-le-attributes \
-	-le-util \
-	-le-modules \
 	-lm
+
+LIBDEPS = $(LIBNAMES:%=../$(BUILD_DIR)/lib%.a)
+LIBS   += $(LIBNAMES:%=-l%)
 
 ifeq ($(NCURSES), 1)
  LIBS += -lncurses
@@ -47,7 +52,7 @@ ifeq ($(CONVERT_TRIGGERS), 1)
 endif
 
 # executable:
-$(BUILD_DIR)/$(BINARY):: $(BUILD_DIR) $(OBJECTS)
+$(BUILD_DIR)/$(BINARY):: $(BUILD_DIR) $(OBJECTS) $(LIBDEPS)
 	$(LD) -o $@ $(OBJECTS) $(LDFLAGS)
 	$(INSTALL) $@ $(PUBLISH_DIR)/
 
