@@ -909,6 +909,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 
 	/* Übergabe aller Kräuter */
 	if (findparam(s, u->faction->locale) == P_HERBS) {
+    boolean given = false;
 		if (!(u->race->ec_flags & GIVEITEM)) {
 			add_message(&u->faction->msgs,
 					msg_error(u, S->s, "race_nogive", "race", u->race));
@@ -925,22 +926,18 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 				return;
 			}
 		}
-		n = 0;
 		if (u->items) {
 			item **itmp=&u->items;
 			while (*itmp) {
 				const herb_type * htype = resource2herb((*itmp)->type->rtype);
 				if (htype && (*itmp)->number>0) {
-					/* give_item gibt bei erfolg 0 zurück
 					if (give_item((*itmp)->number, (*itmp)->type, u, u2, S->s)==0) continue;
-					*/
-					give_item((*itmp)->number, (*itmp)->type, u, u2, S->s);
-					n = 1;
+					given = true;
 				}
 				itmp = &(*itmp)->next;
 			}
 		}
-		if (!n) cmistake(u, S->s, 38, MSG_COMMERCE);
+		if (!given) cmistake(u, S->s, 38, MSG_COMMERCE);
 		return;
 	}
 	if (findparam(s, u->faction->locale) == P_ZAUBER) {
