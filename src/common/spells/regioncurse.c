@@ -81,6 +81,17 @@ cinfo_cursed_by_the_gods(const locale * lang, const void * obj, typ_t typ, curse
 
 	return 1;
 }
+static struct curse_type ct_godcursezone = {
+	"godcursezone",
+	CURSETYP_NORM, 0, (NO_MERGE),
+	"Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen "
+	"über die tote Erde, furchbare Kreaturen ziehen über das Land. Die Brunnen "
+	"sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz "
+	"überzogen. Niemand kann hier lange überleben.",
+	cinfo_cursed_by_the_gods,
+};
+
+
 /* --------------------------------------------------------------------- */
 /*
  * C_GBDREAM
@@ -105,6 +116,13 @@ cinfo_dreamcurse(const locale * lang, const void * obj, typ_t typ, curse *c, int
 
 	return 1;
 }
+static struct curse_type ct_gbdream = { 
+	"gbdream",
+	CURSETYP_NORM, 0, (NO_MERGE),
+	"",
+	cinfo_dreamcurse
+};
+
 /* --------------------------------------------------------------------- */
 /*
  * C_MAGICSTREET
@@ -237,12 +255,6 @@ static struct curse_type ct_fogtrap = {
 	"",
 	cinfo_region
 };
-static struct curse_type ct_gbdream = { 
-	"gbdream",
-	CURSETYP_NORM, 0, (NO_MERGE),
-	"",
-	cinfo_region
-};
 static struct curse_type ct_maelstrom = {
 	"maelstrom",
 	CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
@@ -347,16 +359,6 @@ static struct curse_type ct_holyground = {
 	"beschützen diese vor dem der dunklen Magie des lebenden Todes.",
 	cinfo_region
 };
-static struct curse_type ct_godcursezone = {
-	"godcursezone",
-	CURSETYP_NORM, 0, (NO_MERGE),
-	"Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen "
-	"über die tote Erde, furchbare Kreaturen ziehen über das Land. Die Brunnen "
-	"sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz "
-	"überzogen. Niemand kann hier lange überleben.",
-	cinfo_cursed_by_the_gods,
-};
-
 
 void 
 register_regioncurse(void)
