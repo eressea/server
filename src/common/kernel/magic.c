@@ -227,8 +227,11 @@ read_mage(attrib * a, FILE * F)
   }
   for (;;) {
     int spid;
+
     fscanf (F, "%d", &spid);
     if (spid < 0) break;
+    if (find_spellbyid((spellid_t)spid)==NULL) continue;
+
     *sp = calloc (sizeof(spell_ptr), 1);
     (*sp)->spellid = (spellid_t)spid;
     sp = &(*sp)->next;

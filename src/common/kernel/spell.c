@@ -6277,11 +6277,10 @@ sp_fetchastral(castorder *co)
 	return cast_level;
 }
 
-/* ------------------------------------------------------------- */
+#ifdef SHOWASTRAL_NOT_BORKED
 int
 sp_showastral(castorder *co)
 {
-#if 0
 	unit *u;
 	region *rt;
 	int n = 0;
@@ -6365,11 +6364,10 @@ sp_showastral(castorder *co)
 
 	free_regionlist(rl);
 	return cast_level;
-#else
 	unused(co);
 	return 0;
-#endif
 }
+#endif
 
 /* ------------------------------------------------------------- */
 int
@@ -7750,6 +7748,10 @@ find_spellbyid(spellid_t id)
   spell_list * slist;
 
   assert(id>=0);
+#ifndef SHOWASTRAL_NOT_BORKED
+  /* disabled spells */
+  if (id==SPL_SHOWASTRAL) return NULL;
+#endif
   if (id==SPL_NOSPELL) return NULL;
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell* sp = slist->data;
@@ -9725,6 +9727,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_fumbleshield, patzer
   },
+#ifdef SHOWASTRAL_NOT_BORKED
   {
     SPL_SHOWASTRAL, "Astraler Blick",
     "Der Magier kann kurzzeitig in die Astralebene blicken und erfährt "
@@ -9739,6 +9742,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_showastral, patzer
   },
+#endif
   {
     SPL_RESISTMAGICBONUS, "Schutzzauber",
     "Dieser Zauber verstärkt die natürliche Widerstandskraft gegen Magie. "
