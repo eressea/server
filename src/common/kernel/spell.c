@@ -371,6 +371,50 @@ destroy_curse(attrib **alist, int cast_level, int force,
 }
 
 /* ------------------------------------------------------------- */
+/* Report a spell's effect to the units in the region.
+*/
+static void
+report_effect(region * r, unit * mage, message * seen, message * unseen)
+{
+	unit * u;
+
+	/* melden, 1x pro Partei */
+	freset(mage->faction, FL_DH);
+	for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
+	for (u = r->units; u; u = u->next ) {
+		if (!fval(u->faction, FL_DH) ) {
+			fset(u->faction, FL_DH);
+
+			/* Bei Fernzaubern sieht nur die eigene Partei den Magier */
+			if (u->faction != mage->faction){
+				if (r == mage->region){
+					/* kein Fernzauber, prüfe, ob der Magier überhaupt gesehen
+					 * wird */
+					if (cansee(u->faction, r, mage, 0)) {
+						r_addmessage(r, u->faction, seen);
+					} else {
+						if (!unseen) unseen = msg_message("path_effect", "mage", NULL);
+						r_addmessage(r, u->faction, unseen);
+					}
+				} else { /* Fernzauber, fremde Partei sieht den Magier niemals */
+					if (!unseen) unseen = msg_message("path_effect", "mage", NULL);
+					r_addmessage(r, u->faction, unseen);
+				}
+			} else { /* Partei des Magiers, sieht diesen immer */
+				r_addmessage(r, u->faction, seen);
+			}
+		}
+	}
+	/* Ist niemand von der Partei des Magiers in der Region, dem Magier
+	 * nochmal gesondert melden */
+	if(!fval(mage->faction, FL_DH)) {
+		add_message(&mage->faction->msgs, seen);
+	}
+	msg_release(seen);
+	if (unseen) msg_release(unseen);
+}
+
+/* ------------------------------------------------------------- */
 /* Die Spruchfunktionen */
 /* ------------------------------------------------------------- */
 /* Meldungen:
@@ -386,15 +430,11 @@ destroy_curse(attrib **alist, int cast_level, int force,
  * Allgemein sichtbare Auswirkungen in der Region sollten als
  * Regionsereignisse auch dort auftauchen.
 
-	freset(mage->faction, FL_DH);
-	for(u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
-	for(u = r->units; u; u = u->next ) {
-		if (!fval(u->faction, FL_DH) ) {
-			fset(u->faction, FL_DH);
-			add_message(r, u->faction, buf,  MSG_EVENT, ML_WARN | ML_INFO);
-		}
+	{
+		message * seen = msg_message("harvest_effect", "mage", mage);
+		message * unseen = msg_message("harvest_effect", "mage", NULL);
+		report_effect(r, mage, seen, unseen);
 	}
-	Sonderbehandlung Magierpartei nicht vergessen!
 
  * Meldungen an den Magier über Erfolg sollten, wenn sie nicht als
  * Regionsereigniss auftauchen, als MSG_MAGIC level ML_INFO unter
@@ -982,7 +1022,6 @@ sp_magicstreet(castorder *co)
 	int power = co->force;
 	spellparameter *pa = co->par;
 	direction_t dir;
-	unit *u;
 
 	if(!(landregion(rterrain(r)))){
 		cmistake(mage, strdup(co->order), 186, MSG_MAGIC);
@@ -999,27 +1038,10 @@ sp_magicstreet(castorder *co)
 	create_curse(mage, &r->attribs, C_MAGICSTREET, 0, power, cast_level, 0, 0);
 
 	/* melden, 1x pro Partei */
-	freset(mage->faction, FL_DH);
 	{
-		message * seen = msg_message("path_effect", "mage region", mage, r);
-		message * unseen = NULL;
-		for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
-		for (u = r->units; u; u = u->next ) {
-			if (!fval(u->faction, FL_DH) ) {
-				fset(u->faction, FL_DH);
-				if (cansee(u->faction, r, mage, 0)) {
-					r_addmessage(r, u->faction, seen);
-				} else {
-					if (!unseen) unseen = msg_message("path_effect", "mage region", NULL, r);
-					r_addmessage(r, u->faction, unseen);
-				}
-			}
-		}
-		if(!fval(mage->faction, FL_DH)){
-			add_message(&mage->faction->msgs, seen);
-		}
-		msg_release(seen);
-		if (unseen) msg_release(unseen);
+		message * seen = msg_message("path_effect", "mage", mage);
+		message * unseen = msg_message("path_effect", "mage", NULL);
+		report_effect(r, mage, seen, unseen);
 	}
 
 	return cast_level;
@@ -1076,28 +1098,12 @@ sp_summonent(castorder *co)
 
 	rsettrees(r, rtrees(r) - ents);
 
+	/* melden, 1x pro Partei */
 	{
 		message * seen = msg_message("ent_effect", "mage amount", mage, ents);
-		message * unseen = NULL;
-		for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
-		for (u = r->units; u; u = u->next ) {
-			if (!fval(u->faction, FL_DH) ) {
-				fset(u->faction, FL_DH);
-				if (cansee(u->faction, r, mage, 0)) {
-					r_addmessage(r, u->faction, seen);
-				} else {
-					if (!unseen) unseen = msg_message("ent_effect", "mage amount", NULL, ents);
-					r_addmessage(r, u->faction, unseen);
-				}
-			}
-		}
-		if(!fval(mage->faction, FL_DH)){
-			add_message(&mage->faction->msgs, seen);
-		}
-		msg_release(seen);
-		if (unseen) msg_release(unseen);
+		message * unseen = msg_message("ent_effect", "mage amount", NULL, ents);
+		report_effect(r, mage, seen, unseen);
 	}
-
 	return cast_level;
 }
 
@@ -1166,7 +1172,6 @@ sp_blessstonecircle(castorder *co)
 static int
 sp_maelstrom(castorder *co)
 {
-	unit *u;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
@@ -1184,26 +1189,11 @@ sp_maelstrom(castorder *co)
 	create_curse(mage,&mage->attribs,C_MAELSTROM,0,power,power,power,0);
 	set_curseflag(r->attribs, C_MAELSTROM, 0, CURSE_ISNEW);
 
+	/* melden, 1x pro Partei */
 	{
 		message * seen = msg_message("maelstrom_effect", "mage", mage);
-		message * unseen = NULL;
-		for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
-		for (u = r->units; u; u = u->next ) {
-			if (!fval(u->faction, FL_DH) ) {
-				fset(u->faction, FL_DH);
-				if (cansee(u->faction, r, mage, 0)) {
-					r_addmessage(r, u->faction, seen);
-				} else {
-					if (!unseen) unseen = msg_message("maelstrom_effect", "mage", NULL);
-					r_addmessage(r, u->faction, unseen);
-				}
-			}
-		}
-		if(!fval(mage->faction, FL_DH)){
-			add_message(&mage->faction->msgs, seen);
-		}
-		msg_release(seen);
-		if (unseen) msg_release(unseen);
+		message * unseen = msg_message("maelstrom_effect", "mage", NULL);
+		report_effect(r, mage, seen, unseen);
 	}
 
 	return cast_level;
@@ -1223,7 +1213,6 @@ sp_maelstrom(castorder *co)
 static int
 sp_mallorn(castorder *co)
 {
-	unit *u;
 	region *r = co->rt;
 	int cast_level = co->level;
 	unit *mage = (unit *)co->magician;
@@ -1241,26 +1230,11 @@ sp_mallorn(castorder *co)
 	rsettrees(r, rtrees(r)/2);
 	fset(r, RF_MALLORN);
 
+	/* melden, 1x pro Partei */
 	{
 		message * seen = msg_message("mallorn_effect", "mage", mage);
-		message * unseen = NULL;
-		for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
-		for (u = r->units; u; u = u->next ) {
-			if (!fval(u->faction, FL_DH) ) {
-				fset(u->faction, FL_DH);
-				if (cansee(u->faction, r, mage, 0)) {
-					r_addmessage(r, u->faction, seen);
-				} else {
-					if (!unseen) unseen = msg_message("mallorn_effect", "mage", NULL);
-					r_addmessage(r, u->faction, unseen);
-				}
-			}
-		}
-		if(!fval(mage->faction, FL_DH)){
-			add_message(&mage->faction->msgs, seen);
-		}
-		msg_release(seen);
-		if (unseen) msg_release(unseen);
+		message * unseen = msg_message("mallorn_effect", "mage", NULL);
+		report_effect(r, mage, seen, unseen);
 	}
 
 	return cast_level;
@@ -1281,7 +1255,6 @@ sp_mallorn(castorder *co)
 static int
 sp_blessedharvest(castorder *co)
 {
-	unit *u;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
@@ -1294,25 +1267,10 @@ sp_blessedharvest(castorder *co)
 
 	{
 		message * seen = msg_message("harvest_effect", "mage", mage);
-		message * unseen = NULL;
-		for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
-		for (u = r->units; u; u = u->next ) {
-			if (!fval(u->faction, FL_DH) ) {
-				fset(u->faction, FL_DH);
-				if (cansee(u->faction, r, mage, 0)) {
-					r_addmessage(r, u->faction, seen);
-				} else {
-					if (!unseen) unseen = msg_message("harvest_effect", "mage", NULL);
-					r_addmessage(r, u->faction, unseen);
-				}
-			}
-		}
-		if(!fval(mage->faction, FL_DH)) {
-			add_message(&mage->faction->msgs, seen);
-		}
-		msg_release(seen);
-		if (unseen) msg_release(unseen);
+		message * unseen = msg_message("harvest_effect", "mage", NULL);
+		report_effect(r, mage, seen, unseen);
 	}
+
 	return cast_level;
 }
 
@@ -1333,7 +1291,6 @@ static int
 sp_hain(castorder *co)
 {
 	int trees;
-	unit *u;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
@@ -1342,26 +1299,11 @@ sp_hain(castorder *co)
 	trees = lovar(force * 10) + force;
 	rsettrees(r, rtrees(r) + trees);
 
+	/* melden, 1x pro Partei */
 	{
 		message * seen = msg_message("growtree_effect", "mage amount", mage, trees);
-		message * unseen = NULL;
-		for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
-		for (u = r->units; u; u = u->next ) {
-			if (!fval(u->faction, FL_DH) ) {
-				fset(u->faction, FL_DH);
-				if (cansee(u->faction, r, mage, 0)) {
-					r_addmessage(r, u->faction, seen);
-				} else {
-					if (!unseen) unseen = msg_message("growtree_effect", "mage amount", NULL, trees);
-					r_addmessage(r, u->faction, unseen);
-				}
-			}
-		}
-		if(!fval(mage->faction, FL_DH)) {
-			add_message(&mage->faction->msgs, seen);
-		}
-		msg_release(seen);
-		if (unseen) msg_release(unseen);
+		message * unseen = msg_message("growtree_effect", "mage amount", NULL, trees);
+		report_effect(r, mage, seen, unseen);
 	}
 
 	return cast_level;
@@ -1460,29 +1402,6 @@ sp_rosthauch(castorder *co)
 	return min(success, cast_level);
 }
 
-/* Report a spell's effect to the units in the region.
-*/
-static void
-report_effect(region * r, unit * mage, message * seen, message * unseen)
-{
-	unit * u;
-	for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
-	for (u = r->units; u; u = u->next ) {
-		if (!fval(u->faction, FL_DH) ) {
-			fset(u->faction, FL_DH);
-			if (cansee(u->faction, r, mage, 0)) {
-				r_addmessage(r, u->faction, seen);
-			} else if (unseen) {
-				r_addmessage(r, u->faction, unseen);
-			}
-		}
-	}
-	if(!fval(mage->faction, FL_DH)) {
-		add_message(&mage->faction->msgs, seen);
-	}
-	msg_release(seen);
-	if (unseen) msg_release(unseen);
-}
 
 /* ------------------------------------------------------------- */
 /* Name:       Kälteschutz
