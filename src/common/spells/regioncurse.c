@@ -50,7 +50,7 @@ cinfo_region(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 /* CurseInfo mit Spezialabfragen */
 
 static int
-cinfo_cursed_by_the_gods(void * obj, typ_t typ, curse *c, int self)
+cinfo_cursed_by_the_gods(const locale * lang,void * obj, typ_t typ, curse *c, int self)
 {
 	region *r;
 	message * msg;
@@ -72,7 +72,7 @@ cinfo_cursed_by_the_gods(void * obj, typ_t typ, curse *c, int self)
 }
 /* C_GBDREAM, */
 static int
-cinfo_dreamcurse(void * obj, typ_t typ, curse *c, int self)
+cinfo_dreamcurse(const locale * lang,void * obj, typ_t typ, curse *c, int self)
 {
 	unused(self);
 	unused(typ);
@@ -93,7 +93,7 @@ cinfo_dreamcurse(void * obj, typ_t typ, curse *c, int self)
 }
 /* C_MAGICSTREET */
 static int
-cinfo_magicstreet(void * obj, typ_t typ, curse *c, int self)
+cinfo_magicstreet(const locale * lang,void * obj, typ_t typ, curse *c, int self)
 {
 	unused(typ);
 	unused(self);

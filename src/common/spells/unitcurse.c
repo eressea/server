@@ -13,6 +13,7 @@
 
 #include <config.h>
 #include "eressea.h"
+#include "unitcurse.h"
 
 /* kernel includes */
 #include "message.h"
@@ -70,7 +71,7 @@ cinfo_unit_onlyowner(const locale * lang, void * obj, typ_t typ, curse *c, int s
 /* C_AURA */
 /* erhöht/senkt regeneration und maxaura um effect% */
 static int
-cinfo_auraboost(void * obj, typ_t typ, curse *c, int self)
+cinfo_auraboost(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	unit *u;
 	unused(typ);
@@ -92,7 +93,7 @@ cinfo_auraboost(void * obj, typ_t typ, curse *c, int self)
 
 /* C_SLAVE */
 static int
-cinfo_slave(void * obj, typ_t typ, curse *c, int self)
+cinfo_slave(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	unit *u;
 	unused(typ);
@@ -110,7 +111,7 @@ cinfo_slave(void * obj, typ_t typ, curse *c, int self)
 
 /* C_CALM */
 static int
-cinfo_calm(void * obj, typ_t typ, curse *c, int self)
+cinfo_calm(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	unit *u;
 	const race * rc;
@@ -137,7 +138,7 @@ cinfo_calm(void * obj, typ_t typ, curse *c, int self)
 }
 /* C_SPEED */
 static int
-cinfo_speed(void * obj, typ_t typ, curse *c, int self)
+cinfo_speed(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	unit *u;
 	curse_unit * cu;
@@ -159,7 +160,7 @@ cinfo_speed(void * obj, typ_t typ, curse *c, int self)
 }
 /* C_ORC */
 static int
-cinfo_orc(void * obj, typ_t typ, curse *c, int self)
+cinfo_orc(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	unit *u;
 	unused(typ);
@@ -177,7 +178,7 @@ cinfo_orc(void * obj, typ_t typ, curse *c, int self)
 
 /* C_KAELTESCHUTZ */
 static int
-cinfo_kaelteschutz(void * obj, typ_t typ, curse *c, int self)
+cinfo_kaelteschutz(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	unit *u;
 	curse_unit * cu;
@@ -199,7 +200,7 @@ cinfo_kaelteschutz(void * obj, typ_t typ, curse *c, int self)
 
 /* C_SPARKLE */
 static int
-cinfo_sparkle(void * obj, typ_t typ, curse *c, int self)
+cinfo_sparkle(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	const char * effects[] = {
 		NULL, /* end grau*/
@@ -254,7 +255,7 @@ cinfo_sparkle(void * obj, typ_t typ, curse *c, int self)
 
 /* C_STRENGTH */
 static int
-cinfo_strength(void * obj, typ_t typ, curse *c, int self)
+cinfo_strength(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	unused(c);
 	unused(typ);
@@ -271,7 +272,7 @@ cinfo_strength(void * obj, typ_t typ, curse *c, int self)
 }
 /* C_ALLSKILLS */
 static int
-cinfo_allskills(void * obj, typ_t typ, curse *c, int self)
+cinfo_allskills(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	unused(obj);
 	unused(typ);
@@ -287,7 +288,7 @@ cinfo_allskills(void * obj, typ_t typ, curse *c, int self)
 }
 /* C_SKILL */
 static int
-cinfo_skill(void * obj, typ_t typ, curse *c, int self)
+cinfo_skill(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	unit *u = (unit *)obj;
 	int sk = (int)c->data;
@@ -303,7 +304,7 @@ cinfo_skill(void * obj, typ_t typ, curse *c, int self)
 }
 /* C_ITEMCLOAK */
 static int
-cinfo_itemcloak(void * obj, typ_t typ, curse *c, int self)
+cinfo_itemcloak(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	unit *u;
 	unused(typ);
@@ -320,7 +321,7 @@ cinfo_itemcloak(void * obj, typ_t typ, curse *c, int self)
 }
 
 static int
-cinfo_fumble(void * obj, typ_t typ, curse *c, int self)
+cinfo_fumble(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	unit * u = (unit*)obj;
 	unused(typ);

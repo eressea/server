@@ -11,13 +11,8 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef _RCURSE_H
-#define _RCURSE_H
+#ifndef _BCURSE_H
+#define _BCURSE_H
 
-static int cinfo_region(const locale *, void *, typ_t, curse *, int);
 
-static int cinfo_cursed_by_the_gods(const locale *, void *, typ_t, curse *, int);
-static int cinfo_dreamcurse(const locale *, void *, typ_t, curse *, int);
-static int cinfo_magicstreet(const locale *, void *, typ_t, curse *, int);
-
-#endif /* _RCURSE_H */
+#endif /* _BCURSE_H */

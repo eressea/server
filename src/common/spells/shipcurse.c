@@ -13,7 +13,7 @@
 
 #include <config.h>
 #include "eressea.h"
-#include "regioncurse.h"
+#include "shipcurse.h"
 
 /* kernel includes */
 #include "message.h"
@@ -72,7 +72,7 @@ cinfo_ship_onlyowner(const locale * lang, void * obj, typ_t typ, curse *c, int s
 
 /* C_SHIP_NODRIFT */
 static int
-cinfo_shipnodrift(void * obj, typ_t typ, curse *c, int self)
+cinfo_shipnodrift(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	ship * sh;
 	unused(typ);

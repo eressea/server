@@ -208,7 +208,7 @@ typedef struct curse_unit {
 
 /* ------------------------------------------------------------- */
 
-typedef int (*cdesc_fun)(const void*, int, curse*, int);
+typedef int (*cdesc_fun)(const locale *, const void*, int, curse*, int);
 
 typedef struct curse_type {
 	const char *cname; /* Name der Zauberwirkung, Identifizierung des curse */
