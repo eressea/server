@@ -10,7 +10,6 @@ import os
 import re
 
 # specify the filename of the template file
-scripturl="http://eressea.upb.de/cgi-bin/eressea/eressea-confirm.py"
 HTMLTemplate = "eressea.html"
 DefaultTitle = "Eressea Anmeldung"
 dbname = "eressea"

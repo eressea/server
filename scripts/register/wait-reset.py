@@ -21,9 +21,10 @@ MailTemplate="templates/register.mail"
 smtpserver='localhost'
 server=smtplib.SMTP(smtpserver)
 patchdir='/home/eressea/eressea-rsync'
+game_id=0
 
 def Patch():
-    i = cursor.execute("select name, patch from games where id=0")
+    i = cursor.execute("select name, patch from games where id="+str(game_id))
     name, patch = cursor.fetchone()
     print "Auswertung für " + name + " Patch Level " + str(int(patch)) + ", Runde "+str(lastturn)
     while os.access(patchdir+'/patch-'+str(int(patch+1))+'.sql', os.F_OK):
@@ -50,13 +51,25 @@ def Send(email, custid, firstname, password, position, locale):
     return
 
 Patch()
-cursor.execute("update users set status='EXPIRED' where TO_DAYS(updated)<TO_DAYS('"+date+"') and status='WAITING'")
-cursor.execute("update users set status='WAITING' where TO_DAYS(updated)<TO_DAYS('"+date+"') and status='CONFIRMED'")
-users = cursor.execute("select firstname, locale, email, id, password from users where status='WAITING' order by id")
+print "must update this. only partially done"
+sys.exit(-1)
 
-position=0
+# remove all illegal and banned users:
+users = cursor.execute("SELECT s.id from users u, subscriptions s where u.id=s.user and u.status in ('BANNED', 'ILLEGAL')")
 while users:
     users=users-1
+    sid = cursor.fetchone()[0]
+    update.execute("UPDATE subscriptions set status='EXPIRED' WHERE id="+str(int(sid)))
+
+# espire all users without confirmation. reset waiting list.
+cursor.execute("update subscriptions set status='EXPIRED' where TO_DAYS(updated)<TO_DAYS('"+date+"') and status='WAITING'")
+cursor.execute("update subscriptions set status='WAITING' where TO_DAYS(updated)<TO_DAYS('"+date+"') and status='CONFIRMED'")
+
+# remind everyone who is left on the waiting list.
+waiting = cursor.execute("select firstname, locale, email, u.id, s.password from users u, subscriptions s where u.id=s.users and s.status='WAITING'")
+position=0
+while waiting:
+    waiting=waiting-1
     position=position+1
     firstname, locale, email, custid, password = cursor.fetchone()
     print "Sending reminder email to "+str(int(custid))+" "+email

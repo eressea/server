@@ -16,7 +16,7 @@ def genpasswd():
 	newpasswd = newpasswd + choice(chars)
     return newpasswd
 
-query = "select distinct u.email, s.id, s.password, r.name, u.locale, s.bonus from users u, races r, subscriptions s left join userips i on u.id=i.user left join bannedips b on i.ip=b.ip where s.user=u.id and b.ip is NULL and u.status='CONFIRMED' and r.race=s.race and s.game="+str(game_id)+" and r.locale='de' order by u.id"
+query = "select distinct u.email, s.id, s.password, r.name, u.locale, s.bonus from users u, races r, subscriptions s left join userips i on u.id=i.user left join bannedips b on i.ip=b.ip where s.user=u.id and b.ip is NULL and s.status='CONFIRMED' and r.race=s.race and s.game="+str(game_id)+" and r.locale='de' order by u.id"
 db=MySQLdb.connect(db=dbname)
 cursor = db.cursor()
 c = db.cursor()

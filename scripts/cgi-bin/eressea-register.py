@@ -13,7 +13,6 @@ import smtplib
 from whrandom import choice
 
 # specify the filename of the template file
-scripturl="http://eressea.upb.de/cgi-bin/eressea/eressea-register.py"
 HTMLTemplate = "eressea.html"
 MailTemplate="register.mail"
 DefaultTitle = "Eressea Anmeldung"
@@ -23,7 +22,7 @@ locale="de"
 smtpserver = 'localhost'
 db=None
 game_id=0  # Eressea Main game
-tutorial_id=None #
+tutorial_id=None # 1 to active, None to disable tutorials
 
 # define a new function called Display
 # it takes one parameter - a string to Display
