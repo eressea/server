@@ -3197,10 +3197,11 @@ monthly_healing(void)
 		for (u = r->units; u; u = u->next) {
 			int umhp;
 
+			/* dann wirkt bei Untoten das Elixier der Macht ewig */
 			if((u->race->flags & RCF_NOHEAL) || fval(u, FL_HUNGER) || fspecial(u->faction, FS_UNDEAD))
 				continue;
 
-			if(rterrain(r) == T_OCEAN && !u->ship && !(u->race->flags & RCF_SWIM))
+			if(rterrain(r) == T_OCEAN && !u->ship && !(canswim(u)))
 				continue;
 
 			umhp = unit_max_hp(u) * u->number;
