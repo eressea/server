@@ -175,6 +175,10 @@ SOURCE=.\viewrange.h
 # End Group
 # Begin Source File
 
+SOURCE=.\at_movement.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\attributes.c
 # End Source File
 # Begin Source File

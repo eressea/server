@@ -702,11 +702,7 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
 		if (attacking) {
 			skill += wtype->offmod;
 		} else {
-			/* Fernkämpfer haben im Nahkampf Talent 0 */
-			if (fval(wtype, WTF_MISSILE)) skill = 0;
-			else {
-				skill += wtype->defmod;
-			}
+			skill += wtype->defmod;
 		}
 	}
 
@@ -731,7 +727,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 		if (attacking) {
 			skill = w->offskill;
 		} else {
-			skill = w->defskill;
+			skill = missile?w->defmissile:w->defskill;
 		}
 		if (wtype->modifiers) {
 			/* Pferdebonus, Lanzenbonus, usw. */
@@ -2827,6 +2823,9 @@ make_fighter(battle * b, unit * u, boolean attack)
 			if (wtype==NULL || itm->number==0) continue;
 			weapons[w].offskill = weapon_skill(wtype, u, true);
 			weapons[w].defskill = weapon_skill(wtype, u, false);
+			weapons[w].defmissile = weapons[w].defskill;
+			/* Fernkämpfer haben im Nahkampf Talent/2 */
+			if (fval(wtype, WTF_MISSILE)) weapons[w].defskill/=2;
 			weapons[w].type = wtype;
 			weapons[w].used = 0;
 			weapons[w].count = itm->number;

@@ -96,8 +96,9 @@ typedef struct side {
 typedef struct weapon {
 	int count, used;
 	const struct weapon_type * type;
-	int offskill;
-	int defskill;
+	int offskill   : 8; /* offense skill */
+	int defskill   : 8; /* defense against melee attacks */
+	int defmissile : 8; /* defense against missiles - not div. by 2 yet */
 } weapon;
 
 /*** fighter::person::flags ***/
