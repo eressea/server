@@ -25,6 +25,22 @@
 	<text locale="fr">"($int36($id))"</text>
 	<text locale="en">"($int36($id))"</text>
 </message>
+<message name="curseinfo::goodmagicresistancezone" section="events">
+	<type>
+		<arg name="id" type="int"></arg>
+	</type>
+	<text locale="de">"Die natürliche Widerstandskraft gegen Verzauberung bestimmter Einheiten in dieser Region wurde gestärkt. ($int36($id))"</text>
+	<text locale="fr">"($int36($id))"</text>
+	<text locale="en">"($int36($id))"</text>
+</message>
+<message name="curseinfo::badmagicresistancezone" section="events">
+	<type>
+		<arg name="id" type="int"></arg>
+	</type>
+	<text locale="de">"Die natürliche Widerstandskraft gegen Verzauberung bestimmter Einheiten in dieser Region wurde geschwächt. ($int36($id))"</text>
+	<text locale="fr">"($int36($id))"</text>
+	<text locale="en">"($int36($id))"</text>
+</message>
 <message name="curseinfo::magicwalls" section="events">
 	<type>
 		<arg name="id" type="int"></arg>

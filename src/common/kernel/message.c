@@ -395,7 +395,7 @@ msg_message(const char * name, const char* sig, ...)
 	memset(args, 0, sizeof(args));
 
 	if (!mtype) {
-		log_error(("trying to create message of unknown type \"%s\"\n", name));
+		log_warning(("trying to create message of unknown type \"%s\"\n", name));
 		return NULL;
 	}
 

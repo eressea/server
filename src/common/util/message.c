@@ -14,6 +14,8 @@
 #include <config.h>
 #include "message.h"
 
+#include "goodies.h"
+
 /* libc includes */
 #include <assert.h>
 #include <stdlib.h>
@@ -109,31 +111,42 @@ msg_create_va(const struct message_type * type, ...)
 
 typedef struct messagetype_list {
 	struct messagetype_list * next;
-	const message_type * type;
+	const struct message_type * data;
 } messagetype_list;
 
-static messagetype_list * messagetypes;
-
-const message_type *
-mt_register(const message_type * type)
-{
-	messagetype_list * mtl = messagetypes;
-	while (mtl && mtl->type!=type) mtl=mtl->next;
-	if (mtl==NULL) {
-		mtl = malloc(sizeof(messagetype_list));
-		mtl->type = type;
-		mtl->next = messagetypes;
-		messagetypes = mtl;
-	}
-	return type;
-}
+#define MT_MAXHASH 1023
+static messagetype_list * messagetypes[MT_MAXHASH];
 
 const message_type *
 mt_find(const char * name)
 {
-	messagetype_list * mtl = messagetypes;
-	while (mtl && strcasecmp(mtl->type->name, name)!=0) mtl=mtl->next;
-	return mtl?mtl->type:NULL;
+  const struct message_type * found = NULL;
+  unsigned int hash = hashstring(name) % MT_MAXHASH;
+  messagetype_list * type = messagetypes[hash];
+  while (type) {
+    if (strcmp(type->data->name, name)==0) {
+      if (found==NULL) found = type->data;
+      break;
+    }
+    type = type->next;
+  }
+  return found;
+}
+
+
+const message_type *
+mt_register(const message_type * type)
+{
+  unsigned int hash = hashstring(type->name) % MT_MAXHASH;
+  messagetype_list * mtl = messagetypes[hash];
+	while (mtl && mtl->data!=type) mtl=mtl->next;
+	if (mtl==NULL) {
+		mtl = malloc(sizeof(messagetype_list));
+		mtl->data = type;
+		mtl->next = messagetypes[hash];
+		messagetypes[hash] = mtl;
+	}
+	return type;
 }
 
 void
