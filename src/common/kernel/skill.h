@@ -24,9 +24,9 @@ extern signed char skill_bonus(struct unit * u, struct region * r);
 
 typedef struct skill {
 	unsigned char id;
-	unsigned char level;
-	unsigned char weeks;
-	unsigned char old;
+	unsigned int level : 8;
+	unsigned int weeks : 8;
+	unsigned int old : 8;
 } skill;
 
 typedef struct skillmod_data {
@@ -50,7 +50,7 @@ extern int level_days(int level);
 extern int level(int days);
 
 #define skill_level(level) (level)
-extern void reduce_skill(struct unit *u, skill * sv, int change);
+extern void reduce_skill(struct unit *u, skill * sv, unsigned int change);
 extern int skill_weeks(int level);
 extern int skill_compare(const skill * sk, const skill * sc);
 

@@ -1294,10 +1294,9 @@ use_oldresource(region * r, const resource_type * rtype, int norders)
 #if GROWING_TREES
 		int avail_grownup = rtrees(r,2);
 		int avail_young   = rtrees(r,1);
-		int avail = avail_grownup + avail_young;
 		int wcount;
 
-		assert(norders <= avail);
+		assert(norders <= avail_grownup + avail_young);
 
 		if(norders <= avail_grownup) {
 			rsettrees(r, 2, avail_grownup-norders);

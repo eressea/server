@@ -887,6 +887,7 @@ get_addresses(const faction * f, const seen_region * seenregions)
 	}
 #ifdef ALLIANCES
 	if(f->alliance != NULL) {
+		faction * f2;
 		for(f2 = factions; f2; f2 = f2->next) {
 			if(f2->alliance != NULL && f2->alliance == f->alliance) {
 				faction_list ** fnew = &flist;

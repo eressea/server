@@ -1524,6 +1524,7 @@ readunit(FILE * F)
 	} else {
 		rs(F, buf);
 		if (strcmp(buf, "giant turtle")==0) strcpy(buf, "giantturtle");
+		if (strcmp(buf, "elf")==0) strcpy(buf, "demon");
 		u->race = rc_find(buf);
 		assert(u->race);
 		rs(F, buf);

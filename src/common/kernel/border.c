@@ -402,8 +402,6 @@ b_namequestportal(const border * b, const region * r, const struct faction * f, 
 			return "gewaltiges offenes Tor";
 		}
 	}
-
-	return "";
 }
 
 border_type bt_questportal = {

@@ -1049,7 +1049,6 @@ randomevents(void)
 	region *r;
 	building *b, *b2;
 	unit *u;
-	int unfed;
 
 	/* Eiseberge */
 	for (r=regions; r; r=r->next) freset(r, RF_DH);
@@ -1152,7 +1151,6 @@ randomevents(void)
 				 * sondern der Region zu gute kommt - und da ist der anwender schnuppe
 				 */
 				skill * sv;
-				int dc;
 				if (!bfind) {
 					unit * ud = u;
 					while (ud) {
@@ -1163,14 +1161,25 @@ randomevents(void)
 					bfind = true;
 				}
 				if (r->planep==0 || !fval(r->planep, PFL_NOFEED)) {
-					unfed = (u->number - bauernblut) - peasantfood;
-					bauernblut = max(0, bauernblut-u->number);
-					if (unfed > 0) {
+					int demons = u->number;
+					if (bauernblut>=demons) {
+						bauernblut -= demons;
+						demons = 0;
+					} else if (bauernblut) {
+						demons-=bauernblut;
+					}
+					if (peasantfood>=demons) {
+						peasantfood -= demons;
+						demons = 0;
+					} else {
+						demons-=peasantfood;
+					}
+					if (demons > 0) {
 #ifdef DAEMON_HUNGER
-						hunger(u, unfed); /* nicht gefütterte dämonen hungern */
+						hunger(u, demons); /* nicht gefütterte dämonen hungern */
 #else
 						c = 0;
-						for (n = 0; n < unfed; n++) {
+						for (n = 0; n != demons; n++) {
 							if (rand() % 100 < 10) {
 								c++;
 							}
@@ -1184,16 +1193,15 @@ randomevents(void)
 #endif
 					}
 				}
-				dc = max(u->number - bauernblut, 0);
-				dc = min(dc, peasantfood);
-				dc = peasantfood - max(u->number - bauernblut, 0);
-				dc = max(0, dc);
 				sv = u->skills;
 				while (sv!=u->skills+u->skill_size) {
 					if (sv->level>0 && rand() % 100 < 25) {
 						int weeks = 1+rand()%3;
-						if (rand() % 100 < 40) reduce_skill(u, sv, weeks);
-						else while (weeks--) learn_skill(u, sv->id, 1.0);
+						if (rand() % 100 < 40) {
+							reduce_skill(u, sv, weeks);
+						} else {
+							while (weeks--) learn_skill(u, sv->id, 1.0);
+						}
 					}
 					++sv;
 				}

@@ -278,25 +278,28 @@ skill_weeks(int level)
 }
 
 void 
-reduce_skill(unit *u, skill * sv, int weeks)
+reduce_skill(unit * u, skill * sv, unsigned int weeks)
 {
-	boolean reroll = false;
+	int reroll = false;
 	while (sv->level>0 && weeks>sv->level) {
 		weeks -= sv->level;
 		--sv->level;
 	}
 	if (sv->level*2+1<sv->weeks) reroll = true;
 	if (sv->level>0) {
-		if (rand()%sv->level < weeks) {
+		sv->weeks+=weeks;
+		while (sv->level!=0 && sv->weeks>sv->level) {
+			weeks = sv->weeks-sv->level;
 			--sv->level;
-			reroll = true;
+			sv->weeks = weeks;
 		}
-	} else {
-		reroll = true;
 	}
-	if (reroll) sv->weeks = (unsigned char)skill_weeks(sv->level);
-	assert(sv->weeks<=sv->level*2+1);
+	if (sv->level==0) {
+		/* reroll */
+		sv->weeks = (unsigned char)skill_weeks(sv->level);
+	}
 }
+
 
 int 
 skill_compare(const skill * sk, const skill * sc)

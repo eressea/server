@@ -109,7 +109,9 @@ read_gmcreate(attrib * a, FILE * F)
 	const item_type ** p_itype = (const item_type **)&a->data.v;
 	fscanf(F, "%s", zText);
 	*p_itype = it_find(zText);
-	assert(*p_itype);
+	if (a->data.v==NULL) {
+		log_error(("unknown itemtype %s in gmcreate attribute\n", zText));
+	}
 	return AT_READ_OK;
 }
 
