@@ -335,6 +335,8 @@ NeuePartei(region * r)
 	const struct race * frace;
 	int late;
 	unit *u;
+	int locale_nr;
+	faction * f;
 
 	if (!r->land) {
 		warnung(0, "Ungeeignete Region! <Taste>");
@@ -348,9 +350,12 @@ NeuePartei(region * r)
 		late = nf->bonus;
 		lang = nf->lang;
 		strcpy(email, nf->email);
+		if (late) {
+			WINDOW *win = openwin(SX - 10, 2, "< Neue Partei einfügen >");
+			late = (int) map_input(win, 2, 1, "Startbonus", -1, 99, 0);
+			delwin(win);
+		}
 	} else {
-		int locale_nr;
-		faction * f;
 		WINDOW *win = openwin(SX - 10, 12, "< Neue Partei einfügen >");
 
 		strcpy(buf, my_input(win, 2, 1, "EMail-Adresse (Leer->Ende): ", NULL));
