@@ -730,7 +730,7 @@ movearound(int rx, int ry) {
 					DisplayRegList(1);
 					ch = 999999;
 					break;
-				case 'W':
+				case '^w':
 					crwritemap();
 					break;
 				case 'q':
