@@ -461,7 +461,7 @@ free_units(void)
 void
 write_unit_reference(const unit * u, FILE * F)
 {
-	fprintf(F, "%s ", u?itoa36(u->no):"0");
+	fprintf(F, "%s ", (u!=NULL && u->no!=0)?itoa36(u->no):"0");
 }
 
 int

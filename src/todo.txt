@@ -1,57 +1,33 @@
-Status:
-    *=default
-    !=critical, muss diese Runde gemacht werden.
-    +=fixed, muss überprüft werden
-    v=verified, ist getestet
-	-=war kein Bug
+Messungen:
+  Messen, was CR alleine kostet.
+  Messen, was no-ZV bringt. Zugvorlage abstellen.
+  Conan:
+  Auswertung 0:30 h
+  Verpacken: 1:35 h
 
-Announcen:
-* Schattendämonen, Gewicht
+error handling in lua/luabind?
 
-Nächste Woche beachten:
-+ bei der auswertung auf die resourcenanzeige achten.
-+ Kräuterneuverteilung
-v Bauern in Bofintedlat aussetzen, bitte
+mapper: parteien sofort aussetzen.
 
-Bugfixes/Debugging:
-! TARNE PARTEI NICHT immer noch defekt?
-* Tragkraft von monstern unbegrenzt?
-* Unterhaltungsmaximum kann nicht ausgeschoepft werden (H. Bruns)
-* Schiff nicht abgelegt (Marc Albrecht)
-+ Antimagiekristall (Stefan Schwarz)
-+ NR und CR Diskrepanz: Strassen
-+ shock-Attribut (u. wahrscheinlich andere) mehrfach im Datenfile
-v Kampf und Bergung (W. Edel)
-- Lernkosten (W. Edel)
-! Schattendaemonen kann man mit RESERVIERE Gegenstaende abnehmen, aber sie
-  koennen kein GIB. was ist richtig?
-* Monsterroutinen nochmal anschauen, Clustering von Wyrmen
-v trigger anschauen. killunit::handle
-v Durchreiseregionen werden nicht angezeigt
-v Regionen nach Straßen werden nicht angezeigt
-+ Gewicht von Schattendämonen
-v remove_empty_factions darf kein free machen, weil noch attribute
-  auf die partei zeigen. Attribute mit faction 0 wurden nie eingelesen.
-* Parteien in Durchreise- und Leuchtturmregionen tauchen nicht als PARTEI Block auf
-* playerrace durch flags ersetzen
+english registration confirmation is deutsch!
 
-Features:
-* Bauernblut-Effekt an der Einheit speichern, wie bei anderen Traenken auch
-* cancelling von Parteien aus DB an Server weiterreichen
-* Automatisches Einsetzen im allgemeinen
-* buildings.xml hat keinen support fuer gebaeude mit mehreren ausbaustufen
-  (castle). nachtragen, und bt_castle aus dem source werfen
-- eigener messagetype für regions-/einheitenbotschaften (nicht string)
-* Werform in Reports anzeigen
+NO_RUNNING
 
-Webseiten, Mailinglisten:
-* mehr logging, vinyambar-accounts
-* mailman gate_news konfiguration
-* mailgate schickt postings von Arsenius nicht an die mailingliste.
-! Option fuer Start in alten Regionen im Webformular
-V Regel mit mindestens 0 NMR aus der parteiboerse (standin.py) nehmen.
-* Bei parteiübernahmen auf doppelspiel und kontostand achten.
+Cerrdor Zauber Übersetzungen
 
-Designideen zur Diskussion:
-* neue Waffen
-* Lernen in Astralebene unmöglich machen
+magiccreate_effect
+
+schattendämonen
+
+Make items in lua
+
+man kann strassen in ozeane bauen!
+
+Make asserts into fails!
+
+getstrtoken() - das static loswerden
+
+R_PERSON fix in vin2?
+
+calendar in XML
+

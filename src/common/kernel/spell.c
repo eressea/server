@@ -3298,7 +3298,7 @@ dc_age(struct attrib * a)
   unit * mage = data->mage;
   unit * u;
 
-  if (mage==NULL) {
+  if (mage==NULL || mage->number==0) {
     /* if the mage disappears, so does the spell. */
     return 0;
   }
