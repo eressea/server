@@ -18,6 +18,8 @@
 
 #include "alp.h"
 
+#include <curse.h>
+
 /*
 #include "firewall.h" 
 */
