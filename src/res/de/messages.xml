@@ -3956,18 +3956,18 @@
 
 <message name="donation">
 	<type>
-		<arg name="from" type="unit"></arg>
+		<arg name="from" type="faction"></arg>
 		<arg name="amount" type="int"></arg>
-		<arg name="to" type="unit"></arg>
+		<arg name="to" type="faction"></arg>
 	</type>
 	<locale name="de">
 		<nr section="events">
-			<text>"$unit($from) spendete $int($amount) Silber an $unit($to)."</text>
+			<text>"$faction($from) spendete $int($amount) Silber an $faction($to)."</text>
 		</nr>
 	</locale>
 	<locale name="en">
 		<nr section="none">
-			<text>"$unit($from) donates $int($amount) silver to $unit($to)."</text>
+			<text>"$faction($from) donates $int($amount) silver to $faction($to)."</text>
 		</nr>
 	</locale>
 </message>
