@@ -242,10 +242,10 @@ seed_dropouts(void)
 			boolean found = false;
 			newfaction **nfp = &newfactions;
 			unit * u;
-			for (u=r->units;u;u=u->next) if (u->faction->no==drop->fno) break;
+			for (u=r->units;u;u=u->next) if (u->faction->no!=drop->fno) break;
 			if (u==NULL) while (*nfp) {
 				newfaction * nf = *nfp;
-				if (nf->race==drop->race) {
+				if (nf->race==drop->race && !nf->bonus) {
 					unit * u = addplayer(r, nf->email, nf->race, nf->lang);
 					if (nf->bonus) give_latestart_bonus(r, u, nf->bonus);
 					*nfp = nf->next;
@@ -309,7 +309,7 @@ select_newfaction(const struct race * rc)
 	while (player) {
 		if (rc==NULL || player->race==rc) {
 			char str[80];
-			snprintf(str, 70, "%s %s", locale_string(default_locale, rc_name(player->race, 0)), player->email);
+			snprintf(str, 70, "%s %s %s", player->bonus?"!":" ", locale_string(default_locale, rc_name(player->race, 0)), player->email);
 			insert_selection(iinsert, prev, strdup(str), (void*)player);
 			prev = *iinsert;
 			iinsert = &prev->next;

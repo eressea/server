@@ -1448,6 +1448,10 @@ main(int argc, char *argv[])
 				else
 					turn = atoi(argv[++i]);
 				break;
+			case 'f':
+				firstx = atoi(argv[++i]);
+				firsty = atoi(argv[++i]);
+				break;
 			case 'v':
 				orderfile = argv[++i];
 				break;
