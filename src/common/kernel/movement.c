@@ -2347,6 +2347,7 @@ movement(void)
     region * r = regions;
     while (r!=NULL) {
       unit ** up = &r->units;
+      boolean repeat = false;
 
       while (*up) {
         unit *u = *up;
@@ -2381,13 +2382,17 @@ movement(void)
         if (u->region==r) {
           /* not moved, use next unit */
           up = &u->next;
-        } else if (*up && (*up)->region!=r) {
-          /* moved the upcoming unit along with u (units on ships or followers,
-           * for example). must start from the beginning again */
-          up = &r->units;
+        } else {
+          if (*up && (*up)->region!=r) {
+            /* moved the upcoming unit along with u (units on ships or followers,
+            * for example). must start from the beginning again immediately */
+            up = NULL;
+          }
+          repeat = true;
         }
         /* else *up is already the next unit */
       }
+      if (repeat) continue;
       if (ships==0) {
         /* Abtreiben von beschädigten, unterbemannten, überladenen Schiffen */
         drifting_ships(r);
