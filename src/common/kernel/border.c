@@ -57,17 +57,28 @@ resolve_borderid(void * id) {
    return (void*)find_border((unsigned int)id);
 }
 
+static border **
+get_borders_i(const region * r1, const region * r2)
+{
+  border ** bp;
+  int key = region_hashkey(r1);
+  int k2 = region_hashkey(r2);
+
+  key = min(k2, key) % BMAXHASH;
+  bp = &borders[key];
+  while (*bp) {
+    border * b = *bp;
+    if ((b->from==r1 && b->to==r2) || (b->from==r2 && b->to==r1)) break;
+    bp = &b->nexthash;
+  }
+  return bp;
+}
+
 border *
 get_borders(const region * r1, const region * r2)
 {
-	border * b;
-	int key = region_hashkey(r1);
-	int k2 = region_hashkey(r2);
-
-	key = min(k2, key) % BMAXHASH;
-	b = borders[key];
-	while (b && !((b->from==r1 && b->to==r2) || (b->from==r2 && b->to==r1))) b = b->nexthash;
-	return b;
+  border ** bp = get_borders_i(r1, r2);
+  return *bp;
 }
 
 void
@@ -134,54 +145,40 @@ read_borders(FILE * f)
 border *
 new_border(border_type * type, region * from, region * to)
 {
-	border ** bp, * b;
-	int key = region_hashkey(from);
-	int k2 = region_hashkey(to);
+  border ** bp = get_borders_i(from, to);
+  border * b = calloc(1, sizeof(struct border));
 
-	key = min(k2, key) % BMAXHASH;
-	bp = &borders[key];
-
-  /* find the first border across the same edge, so we can insert before it.
-   * if there's no border here yet, add the border to the end (this way, the
-   * b->next pointer will point to *bp, which is NULL).
-   */
-  while (*bp && ((*bp)->from!=from || (*bp)->to!=to)) {
-    bp = &(*bp)->nexthash;
-  }
-	b = calloc(1, sizeof(struct border));
-	b->type = type;
-	b->nexthash = *bp;
-	b->next = *bp;
-	b->from = from;
-	b->to = to;
-	b->id = ++nextborder;
-	*bp = b;
+  b->type = type;
+  b->nexthash = *bp;
+  b->next = *bp;
+  b->from = from;
+  b->to = to;
+  b->id = ++nextborder;
+  *bp = b;
 
   if (type->init) type->init(b);
-	return b;
+  return b;
 }
 
 void
 erase_border(border * b)
 {
-	border ** np = NULL, ** hp;
-	int key = region_hashkey(b->from);
-	int k2 = region_hashkey(b->to);
-	attrib ** ap = &b->attribs;
+  border ** bp = get_borders_i(b->from, b->to);
+  border ** np = NULL;
+  attrib ** ap = &b->attribs;
 
-	while (*ap) a_remove(ap, *ap);
-	key = min(k2, key) % BMAXHASH;
-	hp = &borders[key];
-  while (*hp && *hp != b) {
-    border * bp = *hp;
-    if (bp->next==b) np = &bp->next;
-    hp = &(*hp)->nexthash;
+  while (*ap) a_remove(ap, *ap);
+
+  while (*bp && *bp != b) {
+    border * bprev = *bp;
+    if (bprev->next==b) np=&bprev->next;
+    bp = &bprev->next;
   }
-	assert(*hp!=NULL || !"error: border is not registered");
-	if (np!=NULL) *np = b->next;
-	*hp = b->nexthash;
-	if (b->type->destroy) b->type->destroy(b);
-	free(b);
+  assert(*bp!=NULL || !"error: border is not registered");
+  if (np!=NULL) *np = b->next;
+  *bp = b->nexthash;
+  if (b->type->destroy) b->type->destroy(b);
+  free(b);
 }
 
 void
