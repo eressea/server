@@ -135,27 +135,52 @@ locale_check(void)
 	return true;
 }
 
+static int 
+spc_email_isvalid(const char *address) 
+{
+  int        count = 0;
+  const char *c, *domain;
+  static char *rfc822_specials = "()<>@,;:\\\"[]";
+
+  /* first we validate the name portion (name@domain) */
+  for (c = address;  *c;  c++) {
+    if (*c == '\"' && (c == address || *(c - 1) == '.' || *(c - 1) == 
+      '\"')) {
+        while (*++c) {
+          if (*c == '\"') break;
+          if (*c == '\\' && (*++c == ' ')) continue;
+          if (*c <= ' ' || *c >= 127) return 0;
+        }
+        if (!*c++) return 0;
+        if (*c == '@') break;
+        if (*c != '.') return 0;
+        continue;
+      }
+      if (*c == '@') break;
+      if (*c <= ' ' || *c >= 127) return 0;
+      if (strchr(rfc822_specials, *c)) return 0;
+  }
+  if (c == address || *(c - 1) == '.') return 0;
+
+  /* next we validate the domain portion (name@domain) */
+  if (!*(domain = ++c)) return 0;
+  do {
+    if (*c == '.') {
+      if (c == domain || *(c - 1) == '.') return 0;
+      count++;
+    }
+    if (*c <= ' ' || *c >= 127) return 0;
+    if (strchr(rfc822_specials, *c)) return 0;
+  } while (*++c);
+
+  return (count >= 1);
+}
+
 int 
 set_email(char** pemail, const char *newmail)
 {
-  int at = 0;
-  const char * s;
-
   if (newmail && *newmail) {
-    for (s=newmail;*s;++s) {
-      switch(*s) {
-        case ':':
-        case '"':
-        case ' ':
-          return -1;
-        case '@':
-          if (at) return -1;
-          at = 1;
-        default:
-          break;
-      }
-    }
-    if (!at) return -1;
+    if (spc_email_isvalid(newmail)<=0) return -1;
   }
   if (*pemail) free(*pemail);
   *pemail = 0;
