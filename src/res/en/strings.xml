@@ -744,10 +744,10 @@
 		<text locale="en">men</text>
 	</string>
 	<string name="plate">
-		<text locale="en">plate</text>
+		<text locale="en">platemail</text>
 	</string>
 	<string name="plate_p">
-		<text locale="en">plates</text>
+		<text locale="en">platemails</text>
 	</string>
 	<string name="presspass">
 		<text locale="en">presspass</text>
@@ -1110,7 +1110,7 @@
 		<text locale="en">ointments</text>
 	</string>
 	<string name="p5">
-		<text locale="en">peasant bood</text>
+		<text locale="en">peasant blood</text>
 	</string>
 	<string name="p5_p">
 		<text locale="en">peasant bloods</text>
