@@ -3565,9 +3565,9 @@
 		</string>
 	</namespace>
 	<namespace name="spell">
-		<string name="blessedharvest">
-			<text locale="de">Segen der Erde</text>
-			<text locale="en">Blessed Harvest</text>
+		<string name="generous">
+			<text locale="de">Hohes Lied der Gaukelei</text>
+			<text locale="en">Song of Genrosity</text>
 		</string>
 		<string name="gwyrrdearnsilver">
 			<text locale="de">Viehheilung</text>
@@ -3884,6 +3884,10 @@
 		<string name="gooddreams">
 			<text locale="de">Schöne Träume</text>
 			<text locale="en">Pleasant Dreams</text>
+		</string>
+		<string name="blessedharvest">
+			<text locale="de">Segen der Erde</text>
+			<text locale="en">Blessed Harvest</text>
 		</string>
 		<string name="illaundestroymagic">
 			<text locale="de">Traumbilder entwirren</text>

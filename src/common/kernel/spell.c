@@ -187,11 +187,11 @@ magicanalyse_region(region *r, unit *mage, int force)
 			if(c->flag & CURSE_NOAGE) {
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_region_noage%u:mage%r:region%s:spell",
-					mage, r, LOC(lang, c->type->cname)));
+					mage, r, LOC(lang, mkname("spell", c->type->cname))));
 			}else{
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_region_age%u:mage%r:region%s:spell%i:months",
-					mage, r, LOC(lang, c->type->cname), mon));
+					mage, r, LOC(lang, mkname("spell", c->type->cname)), mon));
 			}
 		} else {
 			add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -228,11 +228,11 @@ magicanalyse_unit(unit *u, unit *mage, int force)
 			if(c->flag & CURSE_NOAGE){
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_unit_noage%u:mage%u:unit%s:spell",
-					mage, u, LOC(lang, c->type->cname)));
+					mage, u, LOC(lang, mkname("spell", c->type->cname))));
 			}else{
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_unit_age%u:mage%u:unit%s:spell%i:months",
-					mage, u, LOC(lang, c->type->cname), mon));
+					mage, u, LOC(lang, mkname("spell", c->type->cname)), mon));
 			}
 		} else {
 			add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -269,11 +269,11 @@ magicanalyse_building(building *b, unit *mage, int force)
 			if(c->flag & CURSE_NOAGE){
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_building_age%u:mage%b:building%s:spell",
-					mage, b, LOC(lang, c->type->cname)));
+					mage, b, LOC(lang, mkname("spell", c->type->cname))));
 			}else{
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_building_age%u:mage%b:building%s:spell%i:months",
-					mage, b, LOC(lang, c->type->cname)));
+					mage, b, LOC(lang, mkname("spell", c->type->cname)), mon));
 			}
 		} else {
 			add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -311,11 +311,11 @@ magicanalyse_ship(ship *sh, unit *mage, int force)
 			if(c->flag & CURSE_NOAGE){
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_ship_noage%u:mage%h:ship%s:spell",
-					mage, sh, LOC(lang, c->type->cname)));
+					mage, sh, LOC(lang, mkname("spell", c->type->cname))));
 			}else{
 				add_message(&mage->faction->msgs, new_message(mage->faction,
-					"analyse_ship_age%u:mage%h:ship%s:spell",
-					mage, sh, LOC(lang, c->type->cname)));
+					"analyse_ship_age%u:mage%h:ship%s:spell%i:months",
+					mage, sh, LOC(lang, mkname("spell", c->type->cname)), mon));
 			}
 		} else {
 			add_message(&mage->faction->msgs, new_message(mage->faction,
