@@ -109,7 +109,7 @@ read_borders(FILE * f)
 			fscanf(f, "%d %d %d %d ", &fx, &fy, &tx, &ty);
 			bid = ++nextborder;
 		} else {
-			fscanf(f, "%ud %d %d %d %d", &bid, &fx, &fy, &tx, &ty);
+			fscanf(f, "%u %d %d %d %d", &bid, &fx, &fy, &tx, &ty);
 		}
 		type = find_bordertype(zText);
 		assert(type || !"border type not registered");

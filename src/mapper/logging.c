@@ -36,7 +36,7 @@ log_read(const char * filename)
 	char buf[64];
 
 	while (*fp) fp=&(*fp)->next;
-	fscanf(log, "LOGVERSION %ud\n", &global.data_version);
+	fscanf(log, "LOGVERSION %u\n", &global.data_version);
 	while (!feof(log)) {
 		if(fscanf(log, "%s", buf) == EOF) break;
 		if (strcmp(buf, "UNIT")==0) {
