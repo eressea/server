@@ -222,16 +222,18 @@ kor_teure_talente(unit *u)
 static void
 no_teurefremde(boolean convert)
 {
+  const curse_type * slave_ct = ct_find("slavery");
   region *r;
 
   for(r=regions;r;r=r->next) {
     unit *u;
 
     for(u=r->units;u;u=u->next) {
-      if (u->faction->no != MONSTER_FACTION
-        && playerrace(u->faction->race)
+      if (u->faction->no != MONSTER_FACTION && playerrace(u->faction->race)
         && is_migrant(u) && kor_teure_talente(u))
       {
+        if (slave_ct && curse_active(get_curse(u->attribs, slave_ct))) 
+          continue;
         log_warning(("Teurer Migrant: %s, Partei %s\n",
           unitname(u), factionname(u->faction)));
         if (convert) {
