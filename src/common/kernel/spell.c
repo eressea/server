@@ -7802,7 +7802,7 @@ spell spelldaten[] =
 	 (spell_f)sp_homestone, patzer
 	},
 
-	{SPL_WOLFHOWL, "Wolfsgeheul", NULL,
+	{SPL_WOLFHOWL, "wolfhowl", NULL,
 		NULL,
 		NULL,
 	 M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL ), 5, 7,
@@ -7815,12 +7815,7 @@ spell spelldaten[] =
 	 (spell_f)sp_wolfhowl, patzer
 	},
 
-	{SPL_VERSTEINERN, "Blick des Basilisken",
-		"Dieser schwierige, aber effektive Kampfzauber benutzt die "
-		"Elementargeister des Steins, um eine Reihe von Gegnern für "
-		"die Dauer des Kampfes in Stein zu verwandeln. Die betroffenen "
-		"Personen werden nicht mehr kämpfen, können jedoch auch nicht "
-		"verwundet werden.",
+	{SPL_VERSTEINERN, "versteinern", NULL,
 		NULL,
 		NULL,
 	 M_DRUIDE, (COMBATSPELL | SPELLLEVEL), 5, 8,
@@ -7833,11 +7828,7 @@ spell spelldaten[] =
 	 (spell_f)sp_versteinern, patzer
 	},
 
-	{SPL_STRONG_WALL, "Starkes Tor und feste Mauer",
-		"Mit dieser Formel bindet der Magier zu Beginn eines Kampfes einige "
-		"Elementargeister des Fels in die Mauern des Gebäudes, in dem er sich "
-		"gerade befindet. Das Gebäude bietet sodann einen besseren Schutz "
-		"gegen Angriffe mit dem Schwert wie mit Magie.",
+	{SPL_STRONG_WALL, "strongwall", NULL,
 		NULL,
 		NULL,
 	 M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
@@ -7850,13 +7841,7 @@ spell spelldaten[] =
 	 (spell_f)sp_strong_wall, patzer
 	},
 
-	{SPL_GWYRRD_DESTROY_MAGIC, "Geister bannen",
-		"Wie die alten Lehren der Druiden berichten, besteht das, was "
-		"die normalen Wesen Magie nennen aus Elementargeistern. Der Magier "
-		"beschwört und bannt diese in eine Form, um den gewünschten Effekt "
-		"zu erzielen. Dieses Ritual nun vermag es, in diese Welt gerufene "
-		"Elementargeister zu vertreiben, um so ein Objekt von Magie zu "
-		"befreien.",
+	{SPL_GWYRRD_DESTROY_MAGIC, "gwyrrddestroymagic", NULL,
 		"ZAUBERE [REGION x y] [STUFE n] \"Geister bannen\" REGION\n"
 		"ZAUBERE [REGION x y] [STUFE n] \"Geister bannen\" EINHEIT <Einheit-Nr>\n"
 		"ZAUBERE [REGION x y] [STUFE n] \"Geister bannen\" BURG <Burg-Nr>\n"
@@ -7875,11 +7860,7 @@ spell spelldaten[] =
 	 (spell_f)sp_destroy_magic, patzer
 	},
 
-	{SPL_TREEWALKENTER, "Weg der Bäume",
-	"Große Macht liegt in Orten, an denen das Leben pulsiert. Der "
-	"Druide kann diese Kraft sammeln und so ein Tor in die Welt "
-	"der Geistwesen erschaffen. Der Druide kann dann Stufe*5 "
-	"Gewichtseinheiten durch das Tor entsenden.",
+	{SPL_TREEWALKENTER, "treewalkenter", NULL,
 		NULL,
 		"u+",
 	 M_DRUIDE, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 7, 9,
@@ -7892,10 +7873,7 @@ spell spelldaten[] =
 	 (spell_f)sp_treewalkenter, patzer
 	},
 
-	{SPL_TREEWALKEXIT, "Sog des Lebens",
-		"Ein Druide, den es in die Welt der Geister verschlagen hat, kann "
-		"mit Hilfe dieses Zaubers Stufe*5 Gewichtseinheiten in einen Wald "
-		"auf der materiellen Welt zurückschicken.",
+	{SPL_TREEWALKEXIT, "treewalkexit", NULL,
 		"Zauber \"Sog des Lebens\" <Ziel-X> <Ziel-Y> <Einheit> [<Einheit> ..]",
 		"ru+",
 		M_DRUIDE, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 7, 9,
@@ -7908,11 +7886,7 @@ spell spelldaten[] =
 		(spell_f)sp_treewalkexit, patzer
 	},
 
-	{SPL_HOLYGROUND, "Heiliger Boden",
-		"Dieses Ritual beschwört verschiedene Naturgeister in den Boden der "
-		"Region, welche diese fortan bewachen. In einer so gesegneten Region "
-		"werden niemals wieder die Toten ihre Gräber verlassen, und anderswo "
-		"entstandene Untote werden sie wann immer möglich meiden.",
+	{SPL_HOLYGROUND, "holyground", NULL,
 		NULL,
 		NULL,
 		M_DRUIDE, (0), 5, 9,
@@ -7925,12 +7899,7 @@ spell spelldaten[] =
 		(spell_f)sp_holyground, patzer
 	},
 
-	{SPL_ARTEFAKT_SACK_OF_CONSERVATION, "Erschaffe einen magischen Kräuterbeutel",
-		"Der Druide nehme etwas präpäriertes Leder, welches er in einem großen "
-		"Ritual der Reinigung von allen unreinen Geistern befreie, und binde "
-		"dann einige kleine Geister der Luft und des Wassers in das Material. "
-		"Aus dem so vorbereiteten Leder fertige er nun ein kleines Beutelchen, "
-		"welches in ihm aufbewahrte Kräuter besser zu konservieren vermag.",
+	{SPL_ARTEFAKT_SACK_OF_CONSERVATION, "artefaktsackofconservation", NULL,
 		NULL,
 		NULL,
 		M_DRUIDE, (ONSHIPCAST), 5, 5,
@@ -7943,11 +7912,7 @@ spell spelldaten[] =
 		(spell_f)sp_create_sack_of_conservation, patzer
 	},
 
-	{SPL_SUMMONENT, "Erwecke Ents",
-		"Mit Hilfe dieses Zaubers weckt der Druide die in den Wälder der "
-		"Region schlummernden Ents aus ihrem äonenlangen Schlaf. Die wilden "
-		"Baumwesen werden sich ihm anschließen und ihm beistehen, jedoch "
-		"nach einiger Zeit wieder in Schlummer verfallen.",
+	{SPL_SUMMONENT, "summonent", NULL,
 		NULL,
 		NULL,
 	 M_DRUIDE, (SPELLLEVEL), 5, 10,
@@ -7960,10 +7925,7 @@ spell spelldaten[] =
 	 (spell_f)sp_summonent, patzer
 	},
 
-	{SPL_GWYRRD_FAMILIAR, "Vertrauten binden",
-	  "Einem erfahrenen Druidem wird irgendwann auf seinen Wanderungen ein "
-		"ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem "
-		"Druiden anschließen wird.",
+	{SPL_GWYRRD_FAMILIAR, "gwyrrdfamiliar", NULL,
 		NULL,
 		NULL,
 		M_DRUIDE, (NOTFAMILIARCAST), 5, 10,
@@ -7976,10 +7938,7 @@ spell spelldaten[] =
 	 (spell_f)sp_summon_familiar, patzer
 	},
 
-	{SPL_BLESSSTONECIRCLE, "Segne Steinkreis",
-		"Dieses Ritual segnet einen Steinkreis, der zuvor aus Steinen und "
-		"etwas Holz gebaut werden muss. Die Segnung des Druiden macht aus dem "
-		"Kreis eine mächtige Stätte magischen Wirkens.",
+	{SPL_BLESSSTONECIRCLE, "blessstonecircle", NULL,
 		NULL,
 		"b",
 		M_DRUIDE, (BUILDINGSPELL | ONETARGET), 5, 11,
