@@ -379,39 +379,37 @@ render_messages(FILE * F, faction * f, message_list *msgs)
 {
 	struct mlist* m = msgs->begin;
 	while (m) {
-		if(m->msg->receiver == NULL || m->msg->receiver == f) {
-			char crbuffer[1024*32]; /* gross, wegen spionage-messages :-( */
-			boolean printed = false;
-			const struct message_type * mtype = m->msg->type;
-			unsigned int hash = hashstring(mtype->name);
+		char crbuffer[1024*32]; /* gross, wegen spionage-messages :-( */
+		boolean printed = false;
+		const struct message_type * mtype = m->msg->type;
+		unsigned int hash = hashstring(mtype->name);
 #if RENDER_CRMESSAGES
-			char nrbuffer[1024*32];
-			nrbuffer[0] = '\0';
-			if (nr_render(m->msg, f->locale, nrbuffer, f)==0 && nrbuffer[0]) {
-				fprintf(F, "MESSAGE %d\n", ++msgno);
-				fprintf(F, "%d;type\n", hash);
-				fputs("\"", F);
-				fputs(nrbuffer, F);
-				fputs("\";rendered\n", F);
-				printed = true;
-			}
+		char nrbuffer[1024*32];
+		nrbuffer[0] = '\0';
+		if (nr_render(m->msg, f->locale, nrbuffer, f)==0 && nrbuffer[0]) {
+			fprintf(F, "MESSAGE %d\n", ++msgno);
+			fprintf(F, "%d;type\n", hash);
+			fputs("\"", F);
+			fputs(nrbuffer, F);
+			fputs("\";rendered\n", F);
+			printed = true;
+		}
 #endif
-			crbuffer[0] = '\0';
-			if (cr_render(m->msg, crbuffer, (const void*)f)==0 && crbuffer[0]) {
-				if (!printed) fprintf(F, "MESSAGE %d\n", ++msgno);
-				fputs(crbuffer, F);
-			}
-			else log_error(("could not render cr-message %p\n", m->msg));
-			if (printed) {
-				unsigned int ihash = hash % MTMAXHASH;
-				struct known_mtype * kmt = mtypehash[ihash];
-				while (kmt && kmt->mtype != mtype) kmt = kmt->nexthash;
-				if (kmt==NULL) {
-					kmt = (struct known_mtype*)malloc(sizeof(struct known_mtype));
-					kmt->nexthash = mtypehash[ihash];
-					kmt->mtype = mtype;
-					mtypehash[ihash] = kmt;
-				}
+		crbuffer[0] = '\0';
+		if (cr_render(m->msg, crbuffer, (const void*)f)==0 && crbuffer[0]) {
+			if (!printed) fprintf(F, "MESSAGE %d\n", ++msgno);
+			fputs(crbuffer, F);
+		}
+		else log_error(("could not render cr-message %p\n", m->msg));
+		if (printed) {
+			unsigned int ihash = hash % MTMAXHASH;
+			struct known_mtype * kmt = mtypehash[ihash];
+			while (kmt && kmt->mtype != mtype) kmt = kmt->nexthash;
+			if (kmt==NULL) {
+				kmt = (struct known_mtype*)malloc(sizeof(struct known_mtype));
+				kmt->nexthash = mtypehash[ihash];
+				kmt->mtype = mtype;
+				mtypehash[ihash] = kmt;
 			}
 		}
 		m = m->next;

@@ -752,8 +752,7 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean
 			if (!debug && get_msglevel(viewer->warnings, viewer->msglevels, m->type) < m->level) continue;
 #endif
 			/* messagetype * mt = m->type; */
-			if (strcmp(nr_section(m->msg), category->name)==0
-				&& (m->msg->receiver == NULL || m->msg->receiver == viewer))
+			if (strcmp(nr_section(m->msg), category->name)==0)
 			{
 				char buf[4096], *s = buf;
 				nr_render(m->msg, viewer->locale, s, viewer);
