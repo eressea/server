@@ -50,7 +50,7 @@ lc_age(struct attrib * a)
       return -1;
     }
     if (fun.type()!=LUA_TFUNCTION) {
-      log_error(("Lua global object %s is not a function\n", fname));
+      log_error(("Lua global object %s is not a function, type is %u\n", fname, fun.type()));
       return -1;
     }
   }
