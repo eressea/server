@@ -85,5 +85,6 @@ extern const char * factionname(const struct faction * f);
 extern void * resolve_faction(void * data);
 extern struct unit * addplayer(struct region *r, const char *email, const char* password, const struct race * frace, const struct locale *loc);
 extern boolean checkpasswd(const faction * f, const char * passwd);
+extern void destroyfaction(faction * f);
 
 #endif

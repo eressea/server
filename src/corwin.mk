@@ -4,12 +4,12 @@ ifndef ERESSEA
 endif
 
 # Hier definieren, damit nicht '@gcc'
-CC      = gcc-3.0 -D_GNU_SOURCE -ansi -pedantic
-DEPEND  = @gcc-3.0 -MM -MG -r
+CC      = gcc-3.2 -D_GNU_SOURCE -ansi -pedantic
+DEPEND  = @gcc-3.2 -MM -MG -r
 # CC      = gcc -D_GNU_SOURCE
 AR      = ar
 CTAGS   = ctags-exuberant
-LD      = gcc-3.0
+LD      = gcc-3.2
 INSTALL = cp
 CFLAGS  += -march=athlon -minline-all-stringops
 

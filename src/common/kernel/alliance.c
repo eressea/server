@@ -23,9 +23,6 @@
 #include <region.h>
 #include <unit.h>
 
-/* gamecode includes */
-#include <gamecode/laws.h> /* for destroyfaction */
-
 /* util includes */
 #include <umlaut.h>
 #include <base36.h>

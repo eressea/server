@@ -19,14 +19,13 @@ INCLUDES  += \
 
 LIBNAMES      += \
 	e-triggers \
-	e-modules \
 	e-kernel \
 	e-items \
 	e-spells \
 	e-races \
 	e-attributes \
-	e-util \
-	e-modules
+	e-modules \
+	e-util
 
 LIBS      += \
 	-L$(PUBLISH_DIR) \
