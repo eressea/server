@@ -302,8 +302,8 @@ use_instantartsculpture(struct unit * u, const struct item_type * itype,
   sprintf(buf, "%s", LOC(u->faction->locale, "artsculpture"));
   set_string(&b->name, buf);
 
-  ADDMSG(&u->region->msgs, msg_message(
-    "artsculpture_create", "unit region command", u, u->region, cm));
+  ADDMSG(&u->region->msgs, msg_message("artsculpture_create", "unit region", 
+    u, u->region));
 
   itype->rtype->uchange(u, itype->rtype, -1);
 
