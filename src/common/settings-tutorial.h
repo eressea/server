@@ -37,3 +37,5 @@
 #define CATAPULT_AMMUNITION 0
 #define CHANGED_CROSSBOWS 0
 #define MAXAGE 8
+
+#define MAILITPATH	"/usr/sbin:$HOME/tutorial/bin:/bin:/usr/bin:/usr/local/bin"

@@ -40,3 +40,4 @@
 #define VICTORY_CONDITION VICTORY_MURDER
 #define VICTORY_DELAY 4
 
+#define MAILITPATH	"/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"
