@@ -616,13 +616,9 @@ readorders(const char *filename)
 		switch (igetparam(b, lang)) {
 		case P_LOCALE:
 			s = getstrtoken();
-#define LOCALES
-#ifdef LOCALES
+#undef LOCALE_CHANGE
+#ifdef LOCALE_CHANGE
 			if (f && find_locale(s)) {
-				f->locale = find_locale(s);
-			}
-#else
-			if(strcmp(s, "de") == 0) {
 				f->locale = find_locale(s);
 			}
 #endif
