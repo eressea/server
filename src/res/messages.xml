@@ -2217,6 +2217,14 @@
     <type>
       <arg name="value" type="string"/>
     </type>
+    <text locale="de">"Die Reportadresse wurde nicht geändert, '${value}' ist keine gültige email."</text>
+    <text locale="fr">" Address not changed, '$value' is an invalid email."</text>
+    <text locale="en">" Address not changed, '$value' is an invalid email."</text>
+  </message>
+  <message name="changemail" section="events">
+    <type>
+      <arg name="value" type="string"/>
+    </type>
     <text locale="de">"Die Reportadresse wurde auf ${value} geändert."</text>
     <text locale="fr">" Address has been changed to '$value'."</text>
     <text locale="en">" Address has been changed to '$value'."</text>
