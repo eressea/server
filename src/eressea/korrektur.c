@@ -2636,7 +2636,7 @@ orc_conversion(void)
 						  || get_item(u, I_CHASTITY_BELT) >= u->number) {
 						u->race = new_race[RC_URUK];
 					} else {
-						u->race = new_race[RC_SNOT];
+						u->race = new_race[RC_SNOTLING];
 					}
 				}
 			}

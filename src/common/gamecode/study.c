@@ -474,7 +474,7 @@ learn(void)
 					continue;
 				}
 				/* snotlings können Talente nur bis T8 lernen */
-				if (u->race == new_race[RC_SNOT]){
+				if (u->race == new_race[RC_SNOTLING]){
 					if (get_level(u, i) >= 8){
 						cmistake(u, findorder(u, u->thisorder), 308, MSG_EVENT);
 						continue;

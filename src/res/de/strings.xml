@@ -3144,6 +3144,23 @@
 			<text locale="en">orc</text>
 		</string>
 
+		<string name="snotling">
+			<text locale="de">Snotling</text>
+			<text locale="en">snotling</text>
+		</string>
+		<string name="snotling_p">
+			<text locale="de">Snotlinge</text>
+			<text locale="en">snotlings</text>
+		</string>
+		<string name="snotling_d">
+			<text locale="de">Snotlingen</text>
+			<text locale="en">snotlings</text>
+		</string>
+		<string name="snotling_x">
+			<text locale="de">Snotling</text>
+			<text locale="en">snotling</text>
+		</string>
+
 		<string name="elf">
 			<text locale="de">Elf</text>
 			<text locale="en">elf</text>
