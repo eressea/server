@@ -71,6 +71,7 @@
 
 /* util includes */
 #include <rand.h>
+#include <sql.h>
 #include <base36.h>
 
 /* libc includes */
@@ -558,6 +559,18 @@ typedef struct lostdata {
 	int ship;
 } lostdata;
 
+void
+confirm_newbies(void)
+{
+	const faction * f = factions;
+	while (f) {
+		if (f->age==0) {
+			fprintf(sqlstream, "UPDATE subscriptions SET status='ACTIVE', faction='%s' WHERE game=%d;\n", itoa36(f->no), GAME_ID);
+		}
+		f = f->next;
+	}
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -603,6 +616,7 @@ main(int argc, char *argv[])
 #endif
 
 	if ((i=readgame(false))!=0) return i;
+	confirm_newbies();
 #ifdef BETA_CODE
 	if (dungeonstyles) {
 		struct dungeon * d = dungeonstyles;

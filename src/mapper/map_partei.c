@@ -307,7 +307,7 @@ read_newfactions(const char * filename)
 	if (F==NULL) return;
 	for (;;) {
 		faction * f = factions;
-		char race[20], email[64], lang[8], password[8];
+		char race[20], email[64], lang[8], password[16];
 		newfaction *nf;
 		int bonus;
 		/* email;race;locale;startbonus */
