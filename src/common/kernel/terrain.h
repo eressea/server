@@ -77,7 +77,7 @@ typedef struct terraindata_t {
 	 */
 	unsigned int flags;
 	const char ** herbs;
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	struct {
 		const struct rawmaterial_type * type;
 		const char *startlevel;

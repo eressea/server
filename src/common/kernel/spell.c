@@ -920,7 +920,7 @@ sp_summonent(castorder *co)
 	attrib *a;
 	int ents;
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	if(rtrees(r,2) == 0) {
 #else
 	if(rtrees(r) == 0) {
@@ -930,7 +930,7 @@ sp_summonent(castorder *co)
     return 0;
 	}
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	ents = min(power*power, rtrees(r,2));
 #else
 	ents = min(power*power, rtrees(r));
@@ -944,7 +944,7 @@ sp_summonent(castorder *co)
 	a_add(&u->attribs, a);
 	fset(u, FL_LOCKED);
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	rsettrees(r, 2, rtrees(r,2) - ents);
 #else
 	rsettrees(r, rtrees(r) - ents);
@@ -1082,7 +1082,7 @@ sp_mallorn(castorder *co)
 	}
 
 	/* half the trees will die */
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	rsettrees(r, 2, rtrees(r,2)/2);
 	rsettrees(r, 1, rtrees(r,1)/2);
 	rsettrees(r, 0, rtrees(r,0)/2);
@@ -1163,7 +1163,7 @@ sp_hain(castorder *co)
 	}
 
 	trees = lovar(force * 10) + force;
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	rsettrees(r, 1, rtrees(r,1) + trees);
 #else
 	rsettrees(r, rtrees(r) + trees);
@@ -1580,7 +1580,7 @@ sp_great_drought(castorder *co)
 
   /* sterben */
 	rsetpeasants(r, rpeasants(r)/2); /* evtl wuerfeln */
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	rsettrees(r, 2, rtrees(r,2)/2);
 	rsettrees(r, 1, rtrees(r,1)/2);
 	rsettrees(r, 0, rtrees(r,0)/2);
@@ -1613,7 +1613,7 @@ sp_great_drought(castorder *co)
 				break;
 
 			case T_GLACIER:
-#ifndef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH == 0
 				rsetiron(r, 0);
 				rsetlaen(r, -1);
 #endif
@@ -2097,7 +2097,7 @@ sp_drought(castorder *co)
 		c->duration = max(c->duration, power);
 	} else {
 		/* Baeume und Pferde sterben */
-#ifdef GROWING_TREES
+#if GROWING_TREES
 		rsettrees(r, 2, rtrees(r,2)/2);
 		rsettrees(r, 1, rtrees(r,1)/2);
 		rsettrees(r, 0, rtrees(r,0)/2);
@@ -2466,7 +2466,7 @@ sp_forest_fire(castorder *co)
 	unit *u;
 	region *nr;
 	int prozent, chance, vernichtet;
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	int vernichtet_schoesslinge;
 #endif
 	direction_t i;
@@ -2475,7 +2475,7 @@ sp_forest_fire(castorder *co)
 	int cast_level = co->level;
 
 	prozent = (rand() % 71) + 10; 	/* 10 - 80% */
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	vernichtet = rtrees(r,2) * prozent / 100;
 	vernichtet_schoesslinge = rtrees(r,1) * prozent / 100;
 #else
@@ -2487,7 +2487,7 @@ sp_forest_fire(castorder *co)
 		return 0;
 	}
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	rsettrees(r, 2, rtrees(r,2) - vernichtet);
 	rsettrees(r, 1, rtrees(r,1) - vernichtet_schoesslinge);
 #else
@@ -2510,7 +2510,7 @@ sp_forest_fire(castorder *co)
 		}
 	}
 	if(!fval(mage->faction, FL_DH)){
-#ifdef GROWING_TREES
+#if GROWING_TREES
 		sprintf(buf, "%s erzeugt eine verheerende Feuersbrunst.  %d %s "
 				"den Flammen zum Opfer.", unitname(mage), vernichtet+vernichtet_schoesslinge,
 				vernichtet+vernichtet_schoesslinge == 1 ? "Baum fiel" : "Bäume fielen");
@@ -2527,7 +2527,7 @@ sp_forest_fire(castorder *co)
 		assert(nr);
 		vernichtet = 0;
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 		if(rtrees(nr,2) + rtrees(nr,1) >= 800) {
 			if((rand() % 100) < chance ) {
 				vernichtet = rtrees(nr,2) * prozent / 200;

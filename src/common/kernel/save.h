@@ -62,7 +62,7 @@ extern int read_faction_reference(struct faction ** f, FILE * F);
 
 extern const char * datapath(void);
 
-#ifdef RESOURCE_FIX
+#if RESOURCE_CONVERSION
 extern struct attrib_type at_resources;
 #endif
 

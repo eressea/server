@@ -88,7 +88,7 @@ static region * current_region;
 
 int firstx = 0, firsty = 0;
 
-#ifdef RESOURCE_FIX
+#if RESOURCE_CONVERSION
 int laen_read(attrib * a, FILE * F)
 {
 	int laen;
@@ -728,7 +728,7 @@ read_items(FILE *F, item **ilist)
 	}
 }
 
-#ifdef RESOURCE_FIX
+#if RESOURCE_CONVERSION
 struct attrib_type at_resources = { 
 	"resources", NULL, NULL, NULL, NULL, NULL, ATF_UNIQUE 
 };
@@ -1120,7 +1120,7 @@ readgame(boolean backup)
 		}
 		if (global.data_version < MEMSAVE_VERSION || r->land) {
 			int i;
-#ifdef GROWING_TREES
+#if GROWING_TREES
 			if(global.data_version < GROWTREE_VERSION) {
 				i = ri(F); rsettrees(r, 2, i);
 			} else {
@@ -1132,10 +1132,10 @@ readgame(boolean backup)
 			i = ri(F); rsettrees(r, i);
 #endif
 			i = ri(F); rsethorses(r, i);
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 			if (global.data_version < NEWRESOURCE_VERSION) {
 				i = ri(F); 
-#ifdef RESOURCE_FIX
+#if RESOURCE_CONVERSION
 				if (i!=0) read_iron(r, i);
 #endif
 			} else {
@@ -1192,12 +1192,12 @@ readgame(boolean backup)
 				rsetherbs(r, (short)ri(F));
 			} else if (global.data_version<MEMSAVE_VERSION) {
 				int i = ri(F);
-#ifndef NEW_RESOURCEGROWTH
-				rsetlaen(r, i);
-#else
-#ifdef RESOURCE_FIX
+#if NEW_RESOURCEGROWTH
+#if RESOURCE_CONVERSION
 				if (i!=0) read_laen(r, i);
 #endif
+#else
+				rsetlaen(r, i);
 #endif
 				if (ri(F)) fset(r, RF_MALLORN);
 				if (ri(F)) fset(r, RF_ENCOUNTER);
@@ -1934,7 +1934,7 @@ writegame(char *path, char quiet)
 			struct demand * demand;
 			ws(F, r->land->name);
 			wspace(F);
-#ifdef GROWING_TREES
+#if GROWING_TREES
 			wi(F, rtrees(r,0));
 			wspace(F);
 			wi(F, rtrees(r,1));
@@ -1947,7 +1947,7 @@ writegame(char *path, char quiet)
 #endif
 			wi(F, rhorses(r));
 			wspace(F);
-#ifndef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH == 0
 			wi(F, riron(r));
 #elif RELEASE_VERSION>=NEWRESOURCE_VERSION
 			{

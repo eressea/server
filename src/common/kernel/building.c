@@ -179,7 +179,7 @@ findbuilding(int i)
 #ifdef NEW_BUILDINGS
 enum {
 	B_SITE,
-#ifdef LARGE_CASTLES
+#if LARGE_CASTLES
 	B_TRADEPOST,
 #endif
 	B_FORTIFICATION,
@@ -196,7 +196,7 @@ castle_name(int bsize)
 {
 	const char * fname[MAXBUILDINGS] = {
 	  "site",
-#ifdef LARGE_CASTLES
+#if LARGE_CASTLES
 		"tradepost",
 #endif
 	  "fortification",
@@ -221,7 +221,7 @@ static requirement castle_req[] = {
 	{ NORESOURCE, 0, 0.0 },
 };
 
-#ifdef LARGE_CASTLES
+#if LARGE_CASTLES
 static const construction castle_bld[MAXBUILDINGS] = {
 	{ SK_BUILDING, 1,     2, 1, castle_req, &castle_bld[1] },
 	{ SK_BUILDING, 1,     8, 1, castle_req, &castle_bld[2] },

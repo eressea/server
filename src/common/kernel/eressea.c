@@ -229,7 +229,7 @@ const char *keywords[MAXKEYWORDS] =
 #endif
 	"PRÄFIX",
 	"SYNONYM",
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	"PFLANZEN",
 #endif
 };
@@ -1732,7 +1732,7 @@ idle (faction * f)
 int
 maxworkingpeasants(const struct region * r)
 {
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	int i = production(r) * MAXPEASANTS_PER_AREA
 		- ((rtrees(r,2)+rtrees(r,1)/2) * TREESIZE);
 #else
@@ -2096,6 +2096,16 @@ parse_tagbegin(struct xml_stack *stack, void *data)
 			log_printf("required tag 'file' missing from include");
 			return XML_USERERROR;
 		}
+	} else if (strcmp(tag->name, "game")==0) {
+		const char * name = xml_value(tag, "name");
+		int maxunits = xml_ivalue(tag, "units");
+		if (name!=NULL) {
+			global.gamename = strdup(name);
+		}
+		if (maxunits!=0) {
+			global.maxunits = maxunits;
+		}
+	} else if (strcmp(tag->name, "game")==0) {
 	} else if (strcmp(tag->name, "order")==0) {
 		const char * name = xml_value(tag, "name");
 		if (xml_bvalue(tag, "disable")) {
@@ -2304,7 +2314,7 @@ attrib_init(void)
 #endif
 	at_register(&at_jihad);
 	at_register(&at_skillmod);
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	at_register(&at_germs);
 #endif
 	at_register(&at_laen); /* required for old datafiles */

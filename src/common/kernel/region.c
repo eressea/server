@@ -458,9 +458,8 @@ attrib_type at_travelunit = {
 	NO_READ
 };
 
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 extern int laen_read(attrib * a, FILE * F);
-
 # define LAEN_READ laen_read
 # define LAEN_WRITE NULL
 #else
@@ -555,7 +554,7 @@ rroad(const region * r, direction_t d)
 boolean
 r_isforest(const region * r)
 {
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	if (r->terrain==T_PLAIN && rtrees(r,2) + rtrees(r,1) >= 600) return true;
 #else
 	if (r->terrain==T_PLAIN && rtrees(r) >= 600) return true;
@@ -647,7 +646,7 @@ rname(const region * r, const locale * lang) {
 	return locale_string(lang, terrain[rterrain(r)].name);
 }
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 int
 rtrees(const region *r, int ageclass)
 {
@@ -797,7 +796,7 @@ void
 terraform(region * r, terrain_t t)
 {
 	const struct locale * locale_de = find_locale("de");
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	rawmaterial  **lrm;
 	int i;
 #endif
@@ -805,7 +804,7 @@ terraform(region * r, terrain_t t)
 	/* defaults: */
 	rsetterrain(r, t);
 
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	/* Resourcen, die nicht mehr vorkommen können, löschen */
 	lrm = &r->resources;
 	while (*lrm) {
@@ -822,7 +821,7 @@ terraform(region * r, terrain_t t)
 	}
 #endif
 
-#ifndef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH == 0
 	rsetlaen(r, -1);
 	rsetiron(r, 0);
 #endif
@@ -831,7 +830,7 @@ terraform(region * r, terrain_t t)
 			freeland(r->land);
 			r->land = NULL;
 		}
-#ifdef GROWING_TREES
+#if GROWING_TREES
 		rsettrees(r, 0, 0);
 		rsettrees(r, 1, 0);
 		rsettrees(r, 2, 0);
@@ -839,7 +838,7 @@ terraform(region * r, terrain_t t)
 		rsettrees(r, 0);
 #endif
 		rsethorses(r, 0);
-#ifndef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH == 0
 		rsetiron(r, 0);
 		rsetlaen(r, -1);
 #endif
@@ -938,7 +937,7 @@ terraform(region * r, terrain_t t)
 	case T_PLAIN:
 		rsethorses(r, rand() % (terrain[t].production_max / 5));
 		if(rand()%100 < 40) {
-#ifdef GROWING_TREES
+#if GROWING_TREES
 			rsettrees(r, 2, terrain[t].production_max * (30+rand()%40)/100);
 			rsettrees(r, 1, rtrees(r, 2)/4);
 			rsettrees(r, 0, rtrees(r, 2)/2);
@@ -948,14 +947,14 @@ terraform(region * r, terrain_t t)
 		}
 		break;
 	case T_MOUNTAIN:
-#ifndef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH == 0
 		rsetiron(r, IRONSTART);
 		if (rand() % 100 < 8) rsetlaen(r, 5 + rand() % 5);
 #endif
 		break;
 
 	case T_GLACIER:
-#ifndef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH == 0
 		if (riron(r) <= 0){
 			rsetiron(r, GLIRONSTART);
 		}
@@ -964,7 +963,7 @@ terraform(region * r, terrain_t t)
 
 	case T_ICEBERG_SLEEP:
 		/* Kann aus Gletscher entstehen und sollte diesem gleichen */
-#ifndef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH == 0
 		if (riron(r) <= 0){
 			rsetiron(r, GLIRONSTART);
 		}
@@ -976,7 +975,7 @@ terraform(region * r, terrain_t t)
 		break;
 	}
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	/* Initialisierung irgendwann über rm_-Mechamismus machen */
 	if(t != T_PLAIN && rand()%100 < 20) {
 		rsettrees(r, 2, terrain[t].production_max * (30 + rand() % 40) / 100);
@@ -985,7 +984,7 @@ terraform(region * r, terrain_t t)
 	}
 #endif
 
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	terraform_resources(r);
 #endif
 

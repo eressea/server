@@ -21,19 +21,20 @@
 #ifndef ERESSEA_H
 #define ERESSEA_H
 
-/* Features currently in development (change makefile please): */
-#ifndef MSG_LEVELS 
-# undef MSG_LEVELS /* msg-levels active */
-#endif
+/*
+ * Features enabled: 
+ * If you are lacking the settings.h, create a new file common/settings.h,
+ * and write #include <settings-eressea.h> (or whatever settings you want
+ * your game to use) in there.
+ * !!! DO NOT COMMIT THE SETTINGS.H FILE TO CVS !!!
+ */
+#include <settings.h>
 
-/* Features enabled: */
-#define  RESOURCE_FIX /* Should be removed soon! */
-#define NEW_RESOURCEGROWTH
-#define LARGE_CASTLES
-#define GROWING_TREES
 #define STEALTHFACTION
-#define AT_MOVED
-#undef  RACE_ADJUSTMENTS
+
+/* Features currently in development (change makefile please): */
+/* #define MSG_LEVELS -- msg-levels active */
+/* #define RACE_ADJUSTMENTS */
 
 /* basic types used in the eressea "kernel" */
 typedef unsigned char order_t;
@@ -167,7 +168,7 @@ struct xml_stack;
 #endif
 */
 
-#ifdef RESOURCE_FIX
+#if RESOURCE_CONVERSION
 extern void init_resourcefix(void);
 extern void read_iron(struct region * r, int iron);
 extern void read_laen(struct region * r, int laen);
@@ -299,9 +300,6 @@ extern void plagues(struct region * r, boolean ismagic);
 
 /* Schiffsbeschädigungen */
 #define SHIPDAMAGE
-
-/* Maximale Einheitenzahl */
-#define MAXUNITS 1000
 
 /* regionen im Report der Parteien werden nur einmal berechnet: */
 #define FAST_REGION
@@ -437,7 +435,7 @@ enum {
 #endif
 	K_PREFIX,
 	K_SYNONYM,
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	K_PFLANZE,
 #endif
 	MAXKEYWORDS,
@@ -1170,6 +1168,7 @@ extern const struct race * new_race[];
 /* globale settings des Spieles */
 typedef struct settings {
 	const char    *gamename;
+	unsigned int   maxunits;
 	struct attrib *attribs;
 	unsigned int   data_version;
 	boolean disabled[MAXKEYWORDS];

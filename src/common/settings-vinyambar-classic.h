@@ -10,30 +10,11 @@
  without prior permission by the authors of Eressea.
 */
 
-#include <config.h>
-#include <eressea.h>
-#include "items.h"
-
-#include "lmsreward.h"
-#include "demonseye.h"
-#include "weapons.h"
-#include "xerewards.h"
-#if GROWING_TREES
-# include "seed.h"
-#endif
-#include "birthday_firework.h"
-
-void
-register_items(void)
-{
-	register_weapons();
-	register_demonseye();
-	init_lmsreward();
-	register_xerewards();
-#if GROWING_TREES
-	init_seed();
-	init_mallornseed();
-#endif
-	register_birthday_firework();
-	register_lebkuchenherz();
-}
+/*
+ * Contains defines for the "classic" game (Vinyambar I) .
+ * Include this file from settings.h to make eressea work.
+ */
+#define RESOURCE_CONVERSION 0
+#define NEW_RESOURCEGROWTH 0
+#define LARGE_CASTLES 0
+#define GROWING_TREES 0

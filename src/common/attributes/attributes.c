@@ -36,9 +36,7 @@
 #ifdef AT_OPTION
 # include "option.h"
 #endif
-#ifdef AT_MOVED
-# include "moved.h"
-#endif
+#include "moved.h"
 
 /* util includes */
 #include <attrib.h>
@@ -65,9 +63,7 @@ init_attributes(void)
 	init_racename();
 	init_synonym();
 
-#ifdef AT_MOVED
 	init_moved();
-#endif
 #ifdef AT_OPTION
 	init_option();
 #endif

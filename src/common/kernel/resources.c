@@ -14,7 +14,7 @@
 #include "eressea.h"
 #include "resources.h"
 
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 /* kernel includes */
 #include "build.h"
 #include "item.h"

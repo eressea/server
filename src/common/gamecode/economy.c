@@ -73,7 +73,9 @@
 #include <attributes/racename.h>
 #include <attributes/orcification.h>
 
-#include <items/seed.h>
+#if GROWING_TREES
+# include <items/seed.h>
+#endif
 
 /* - static global symbols ------------------------------------- */
 typedef struct spende {
@@ -1606,7 +1608,7 @@ enum {
 	AFL_DONE = 1<<0,
 	AFL_LOWSKILL = 1<<1
 };
-#ifdef NEW_RESOURCEGROWTH
+
 static int
 required(int want, double save)
 {
@@ -1615,6 +1617,7 @@ required(int want, double save)
 	return norders;
 }
 
+#if NEW_RESOURCEGROWTH
 static void
 leveled_allocation(const allocator * self, region * r, allocation * alist)
 {
@@ -1737,7 +1740,7 @@ split_allocations(region * r)
 				i_change(&al->unit->items, itype, al->get);
 				change_skill(al->unit, itype->construction->skill,
 						al->unit->number * PRODUCEEXP);
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 				fset(r, RF_DH);
 #endif
 			}
@@ -2507,7 +2510,7 @@ plant(region *r, unit *u, int raw)
 		"plant%u:unit%r:region%i:amount%X:herb", u, r, planted, htype->itype->rtype));
 }
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 void
 planttrees(region *r, unit *u, int raw)
 {
@@ -2589,21 +2592,21 @@ pflanze(region *r, unit *u)
 		plant(r, u, m);
 		return;
 	}
+#if GROWING_TREES
 	else if (p==P_TREES){
 		planttrees(r, u, m);
 		return;
 	}
 	else if (itype!=NULL){
-#ifdef GROWING_TREES
 		if (itype==&it_mallornseed || itype==&it_seed){
 			planttrees(r, u, m);
 			return;
 		}
-#endif
 	}
+#endif
 }
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 
 /* züchte bäume */
 void
@@ -2725,9 +2728,11 @@ zuechte(region *r, unit *u)
 		case P_HERBS:
 			plant(r, u, m);
 			return;
+#if GROWING_TREES
 		case P_TREES:
 			breedtrees(r, u, m);
 			return;
+#endif
 		default:
 			breedhorses(r, u);
 			return;
@@ -3260,7 +3265,7 @@ produce(void)
 				zuechte(r, u);
 				break;
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 			case K_PFLANZE:
 				planttrees(r, u, INT_MAX);
 				break;
@@ -3309,11 +3314,11 @@ init_economy(void)
 	add_allocator(make_allocator(item2resource(olditemtype[I_HORSE]), attrib_allocation));
 	add_allocator(make_allocator(item2resource(olditemtype[I_WOOD]), attrib_allocation));
 	add_allocator(make_allocator(item2resource(olditemtype[I_MALLORN]), attrib_allocation));
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	add_allocator(make_allocator(item2resource(olditemtype[I_STONE]), leveled_allocation));
 	add_allocator(make_allocator(item2resource(olditemtype[I_IRON]), leveled_allocation));
 	add_allocator(make_allocator(item2resource(olditemtype[I_LAEN]), leveled_allocation));
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	add_allocator(make_allocator(&rt_seed, attrib_allocation));
 	add_allocator(make_allocator(&rt_mallornseed, attrib_allocation));
 #endif

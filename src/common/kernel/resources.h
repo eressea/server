@@ -9,7 +9,8 @@
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
 */
-#ifdef NEW_RESOURCEGROWTH
+#ifndef RESOURCES_H
+#if NEW_RESOURCEGROWTH
 
 enum {
 	RM_USED    = 1<<0, /* resource has been used */
@@ -55,4 +56,5 @@ extern struct rawmaterial_type rm_stones;
 extern struct rawmaterial_type rm_iron;
 extern struct rawmaterial_type rm_laen;
 
+#endif
 #endif

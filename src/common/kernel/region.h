@@ -53,7 +53,7 @@ typedef struct land_region {
 	} * demands;
 	const struct herb_type * herbtype;
 	short herbs;
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	int trees[3]; /* 0 -> Samen, 1 -> Sprößlinge, 2 -> Bäume */
 #else
 	int trees;
@@ -62,7 +62,7 @@ typedef struct land_region {
 	int peasants;
 	int newpeasants;
 	int money;
-#ifndef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH == 0
 	int iron;
 #endif
 } land_region;
@@ -90,7 +90,7 @@ typedef struct region {
 #ifdef WEATHER
 	weather_t weathertype;
 #endif
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	struct rawmaterial * resources;
 #endif
 } region;
@@ -159,7 +159,7 @@ void rsetroad(struct region * r, direction_t d, int value);
 
 int is_coastregion(struct region *r);
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 int rtrees(const struct region * r, int ageclass);
 int rsettrees(const struct region *r, int ageclass, int value);
 #else
@@ -177,7 +177,7 @@ void rsetmoney(struct region * r, int value);
 
 #define rbuildings(r) ((r)->buildings)
 
-#ifndef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH == 0
 #define riron(r) ((r)->land?(r)->land->iron:0)
 #define rsetiron(r, value) ((r)->land?((r)->land->iron=(value)):(value),0)
 

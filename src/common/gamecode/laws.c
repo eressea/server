@@ -579,7 +579,7 @@ migrate(region * r)
 		 * das hatte ich geändert. jemand hat es wieder gelöscht, toll.
 		 * ich habe es wieder aktiviert, muß getestet werden.
 		 */
-#ifndef GROWING_TREES
+#if GROWING_TREES == 0
 		rsettrees(r, rtrees(r) + m->trees);
 #endif
 		*hp = m->next;
@@ -643,7 +643,7 @@ horses(region * r)
 	assert(rhorses(r) >= 0);
 }
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 
 static int
 count_race(const region *r, const race *rc)
@@ -878,7 +878,7 @@ trees(region * r)
 }
 #endif
 
-#ifndef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH == 0
 extern attrib_type at_laen;
 static void
 iron(region * r)
@@ -909,7 +909,7 @@ void
 demographics(void)
 {
 	region *r;
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	int current_season = season(turn);
 	int last_weeks_season = season(turn-1);
 #endif
@@ -956,17 +956,17 @@ demographics(void)
 
 			r->age++;
 			horses(r);
-#ifdef GROWING_TREES
+#if GROWING_TREES
 			if(current_season != SEASON_WINTER) {
 				trees(r, current_season, last_weeks_season);
 			}
 #else
 			trees(r);
 #endif
-#ifndef NEW_RESOURCEGROWTH
-			iron(r);
-#else
+#if NEW_RESOURCEGROWTH
 			update_resources(r);
+#else
+			iron(r);
 #endif
 			migrate(r);
 		}
@@ -2859,7 +2859,7 @@ ageing(void)
 static int
 maxunits(faction *f)
 {
-	return MAXUNITS + 400 * fspecial(f, FS_ADMINISTRATOR);
+	return (int) (global.maxunits * (1 + 0.4 * fspecial(f, FS_ADMINISTRATOR)));
 }
 
 static void
@@ -2981,7 +2981,9 @@ setdefaults (void)
 				case K_TAX:
 				case K_TEACH:
 				case K_ZUECHTE:
+#if GROWING_TREES
 				case K_PFLANZE:
+#endif
 				case K_BIETE:
 				case K_PIRACY:
 					if (idle (u->faction)) {

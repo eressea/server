@@ -988,7 +988,7 @@ describe(FILE * F, region * r, int partial, faction * f)
 	boolean dh;
 	direction_t d;
 	int trees;
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	int ytrees;
 #endif
 	attrib *a;
@@ -1059,7 +1059,7 @@ describe(FILE * F, region * r, int partial, faction * f)
 
 	/* Bäume */
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	trees  = rtrees(r,2);
 	ytrees = rtrees(r,1);
 	if (production(r)) {
@@ -1101,7 +1101,7 @@ describe(FILE * F, region * r, int partial, faction * f)
 #endif
 
 	/* Eisen */
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	if (partial == 0 && f != (faction *) NULL) {
 		struct rawmaterial * res;
 		for (res=r->resources;res;res=res->next) {

@@ -42,7 +42,7 @@ extern void sinkships(void);
 void processorders(void);
 extern int count_migrants (const struct faction * f);
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 extern attrib_type at_germs;
 #endif
 

@@ -2346,7 +2346,7 @@ update_igjarjuk_quest(void)
 }
 
 
-#ifdef RESOURCE_FIX
+#if RESOURCE_CONVERSION
 extern struct attrib_type at_resources;
 void
 init_resourcefix(void)
@@ -2572,7 +2572,7 @@ fix_negpotion(void)
 	}
 }
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 int
 growing_trees(void)
 {
@@ -2689,6 +2689,7 @@ fix_ratfamiliar(void)
 	return 0;
 }
 
+#if NEW_RESOURCEGROWTH
 static int
 randomized_resources(void)
 {
@@ -2704,6 +2705,7 @@ randomized_resources(void)
 	}
 	return 0;
 }
+#endif
 
 void
 korrektur(void)
@@ -2773,21 +2775,22 @@ korrektur(void)
 	}
 
 	do_once("sql2", dump_sql());
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	/* do not remove do_once calls - old datafiles need them! */
 	do_once("rgrw", convert_resources());
 	do_once("rsfx", read_resfix());
 #endif
 	/* do_once("xepl", create_xe()); */
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	do_once("grtr", growing_trees());
 #endif
 
 	do_once("grat", fix_ratfamiliar());
 
 	do_once("fdmd", fix_demand());
+#if NEW_RESOURCEGROWTH
 	do_once("rndr", randomized_resources());
-
+#endif
 	{
 		/* Test der Message-Funktion. Ist leider noch nicht
 		 * Plane-übergreifend, deshalb die Waldelfen. */

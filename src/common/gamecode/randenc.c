@@ -125,7 +125,7 @@ dissolve_units(void)
 					break;
 				case 2:
 					if(r->land) {
-#ifdef GROWING_TREES
+#if GROWING_TREES
 						rsettrees(r, 2, rtrees(r,2) + n);
 #else
 						rsettrees(r, rtrees(r) + n);
@@ -733,7 +733,7 @@ volcano_outbreak(region *r)
 
 	/* Vulkan-Region verwüsten */
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	rsettrees(r, 2, 0);
 	rsettrees(r, 1, 0);
 	rsettrees(r, 0, 0);
@@ -777,7 +777,7 @@ volcano_outbreak(region *r)
 
 	if (rn) {
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 		rsettrees(r, 2, 0);
 		rsettrees(r, 1, 0);
 		rsettrees(r, 0, 0);
@@ -1205,7 +1205,7 @@ randomevents(void)
 	 * bekommen. */
 
 		if (r->land && !fval(r, RF_MALLORN)) {
-#ifdef GROWING_TREES
+#if GROWING_TREES
 			int trees = rtrees(r,2);
 #else
 			int trees = rtrees(r);
@@ -1221,7 +1221,7 @@ randomevents(void)
 					}
 				}
 			}
-#ifdef GROWING_TREES
+#if GROWING_TREES
 			rsettrees(r, 2, trees);
 #else
 			rsettrees(r, trees);
@@ -1479,7 +1479,7 @@ randomevents(void)
 	for (r = regions; r; r = r->next) {
 		if (fval(r, RF_CHAOTIC) ||(r->x >= -13  && r->x <= -6  && r->y >= 50 && r->y <= 57)) {
 			if (woodcount(r) >= 40 && rand()%100 < 33) {
-#ifdef GROWING_TREES
+#if GROWING_TREES
 				int trees = rtrees(r,2);
 #else
 				int trees = rtrees(r);
@@ -1490,7 +1490,7 @@ randomevents(void)
 				treemen = max(25, treemen);
 				woodcounts(r, -40);
 				trees = max(0, trees-treemen);
-#ifdef GROWING_TREES
+#if GROWING_TREES
 				rsettrees(r, 2, trees);
 #else
 				rsettrees(r, trees);

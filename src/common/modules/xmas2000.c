@@ -213,7 +213,7 @@ create_xmas2000(int x, int y)
 	r = new_region(x, y);
 	terraform(r, T_PLAIN);
 	set_string(&r->land->name, "Weihnachtsinsel");
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	rsettrees(r, 2, 1000);
 #else
 	rsettrees(r, 1000);

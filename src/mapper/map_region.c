@@ -173,7 +173,7 @@ showregion(region * r, char full)
 	faction *f;
 	int d,pp=0, ecount[MAXRACES], count[MAXRACES];
 	char str[256];
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	int iron = -1, ironlevel = -1,
 	    laen = -1, laenlevel = -1,
 			stone = -1, stonelevel = -1;
@@ -200,7 +200,7 @@ showregion(region * r, char full)
 		adddbllist(&reglist, buf);
 		sprintf(buf, " %d peasants, %d(%d) silver", rpeasants(r), rmoney(r), count_all_money(r));
 		adddbllist(&reglist, buf);
-#ifdef GROWING_TREES
+#if GROWING_TREES
 		sprintf(buf, " %d horses, %d/%d/%d ",
 				rhorses(r), rtrees(r,2), rtrees(r,1), rtrees(r,0));
 		if (fval(r,RF_MALLORN))
@@ -216,7 +216,7 @@ showregion(region * r, char full)
 #endif
 		adddbllist(&reglist, buf);
 
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 		for(res=r->resources;res;res=res->next) {
 			const item_type * itype = resource2item(res->type->rtype);
 			if(itype == olditemtype[I_IRON]) {

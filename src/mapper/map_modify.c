@@ -244,23 +244,23 @@ addmenulist(menulist ** SP, const char *s, int *val)
 
 static int peasants, money, trees, horses, iron, laen, chaotisch;
 
-#ifdef GROWING_TREES
+#if GROWING_TREES
 static int ytrees, seeds;
 #endif
 
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 static int ironlevel, laenlevel, stone, stonelevel;
 #endif
 
 static void
 get_region(region *r) {
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	struct rawmaterial *res;
 #endif
 
 	peasants  = rpeasants(r);
 	money     = rmoney(r);
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	trees     = rtrees(r,2);
 	ytrees    = rtrees(r,1);
 	seeds     = rtrees(r,0);
@@ -268,7 +268,7 @@ get_region(region *r) {
 	trees     = rtrees(r);
 #endif
 	horses    = rhorses(r);
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	iron = -1;
 	ironlevel = -1;
 	laen = -1;
@@ -297,13 +297,13 @@ get_region(region *r) {
 
 static void
 put_region(region *r) { 
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	struct rawmaterial *res;
 #endif
 
 	rsetpeasants(r, peasants);
 	rsetmoney(r,money);
-#ifdef GROWING_TREES
+#if GROWING_TREES
 	rsettrees(r,2,trees);
 	rsettrees(r,1,ytrees);
 	rsettrees(r,0,seeds);
@@ -311,7 +311,7 @@ put_region(region *r) {
 	rsettrees(r,trees);
 #endif
 	rsethorses(r, horses);
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	for (res=r->resources;res;res=res->next) {
 		const item_type * itype = resource2item(res->type->rtype);
 		if(itype == olditemtype[I_IRON]) {
@@ -347,19 +347,19 @@ create_region_menu(menulist ** menu, region * r)
 	addmenulist(menu, "Silver", &money);
 	if (fval(r, RF_MALLORN)) {
 		addmenulist(menu, "Mallorntrees", &trees);
-#ifdef GROWING_TREES
+#if GROWING_TREES
 		addmenulist(menu, "Mallornsprouts", &ytrees);
 		addmenulist(menu, "Mallornseeds", &seeds);
 #endif
 	} else {
 		addmenulist(menu, "Trees", &trees);
-#ifdef GROWING_TREES
+#if GROWING_TREES
 		addmenulist(menu, "Sprouts", &ytrees);
 		addmenulist(menu, "Seeds", &seeds);
 #endif
 	}
 	addmenulist(menu, "Horses", &horses);
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	if(iron != -1) {
 		addmenulist(menu, "Iron", &iron);
 		addmenulist(menu, "Ironlevel", &ironlevel);

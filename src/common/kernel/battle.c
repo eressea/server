@@ -66,9 +66,7 @@ typedef enum combatmagic {
 #include <attributes/key.h>
 #include <attributes/racename.h>
 #include <attributes/otherfaction.h>
-#ifdef AT_MOVED
-# include <attributes/moved.h>
-#endif
+#include <attributes/moved.h>
 
 /* libc includes */
 #include <assert.h>
@@ -78,10 +76,6 @@ typedef enum combatmagic {
 #include <message.h>
 #include <stdlib.h>
 #include <string.h>
-
-#if !defined(AT_MOVED) && defined(DELAYED_OFFENSE)
-# error "must define AT_MOVED to use combat option DELAYED_OFFENSE"
-#endif
 
 #ifdef HAVE_ZLIB
 # include <zlib.h>

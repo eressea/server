@@ -34,9 +34,7 @@
 #include "region.h"
 #include "ship.h"
 
-#ifdef AT_MOVED
-# include <attributes/moved.h>
-#endif
+#include <attributes/moved.h>
 
 /* util includes */
 #include <resolve.h>
@@ -684,9 +682,7 @@ move_unit(unit * u, region * r, unit ** ulist)
 	if (u->region == r) return;
 	if (!ulist) ulist = (&r->units);
 	if (u->region) {
-#ifdef AT_MOVED
 		set_moved(&u->attribs);
-#endif
 		setguard(u, GUARD_NONE);
 		fset(u, FL_MOVED);
 		if (u->ship || u->building) leave(u->region, u);

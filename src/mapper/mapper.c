@@ -261,6 +261,7 @@ factionhere(region * r, int f)
 	return false;
 }
 
+#if NEW_RESOURCEGROWTH
 static boolean
 has_laen(region *r)
 {
@@ -271,6 +272,7 @@ has_laen(region *r)
 	}
 	return false;
 }
+#endif
 
 void
 drawmap(boolean maponly) {
@@ -1362,7 +1364,7 @@ main(int argc, char *argv[])
 	init_resources();
 	register_items();
 	init_attributes();
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	init_rawmaterials();
 #endif 
 

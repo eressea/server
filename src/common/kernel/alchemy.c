@@ -114,7 +114,7 @@ use_potion(unit * u, const item_type * itype, const char * cmd)
 			holz = new_use_pooled(u, oldresourcetype[R_WOOD], 
 					GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10);
 		}
-#ifdef GROWING_TREES
+#if GROWING_TREES
 		rsettrees(r, 1, rtrees(r, 1) + holz);
 #else
 		rsettrees(r, rtrees(r) + holz);

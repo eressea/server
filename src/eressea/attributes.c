@@ -27,11 +27,9 @@
 #include <attributes/overrideroads.h>
 #include <attributes/racename.h>
 #include <attributes/otherfaction.h>
+#include <attributes/moved.h>
 #ifdef AT_OPTION
 # include <attributes/option.h>
-#endif
-#ifdef AT_MOVED
-# include <attributes/moved.h>
 #endif
 
 /* util includes */
@@ -51,9 +49,7 @@ init_attributes(void)
 	init_reduceproduction();
 	init_racename();
 	init_otherfaction();
-#ifdef AT_MOVED
 	init_moved();
-#endif
 #ifdef AT_OPTION
 	init_option();
 #endif

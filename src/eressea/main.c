@@ -120,6 +120,7 @@ static boolean g_killeiswald = false;
 
 struct settings global = {
 	"Eressea", /* gamename */
+	1000, /* maxunits */
 };
 
 static int
@@ -172,7 +173,7 @@ game_init(void)
 	init_attributes();
 
 	init_economy();
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 	init_rawmaterials();
 #endif
 

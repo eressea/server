@@ -30,7 +30,7 @@
 
 enum {
 	B_SITE,
-#ifdef LARGE_CASTLES
+#if LARGE_CASTLES
 	B_TRADEPOST,
 #endif
 	B_FORTIFICATION,

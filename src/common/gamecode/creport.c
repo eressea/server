@@ -1014,7 +1014,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 				fprintf(F, "\"%s\";Beschr\n", r->display);
 #endif
 			if (landregion(rterrain(r))) {
-#ifdef GROWING_TREES
+#if GROWING_TREES
 				int trees = rtrees(r,2);
 				int ytrees = rtrees(r,1);
 # ifdef RESOURCECOMPAT
@@ -1050,7 +1050,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 
 				if (seemode>=see_unit) {
 					struct demand * dmd = r->land->demands;
-#ifdef NEW_RESOURCEGROWTH
+#if NEW_RESOURCEGROWTH
 					struct rawmaterial * res = r->resources;
 
 					fprintf(F, "%d;Silber\n", rmoney(r));
