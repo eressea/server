@@ -9007,12 +9007,7 @@ spell spelldaten[] =
 		(spell_f)sp_sweetdreams, patzer
 	},
 
-	{SPL_INVISIBILITY2_ILLAUN, "Erschaffe eine Sphäre der Unsichtbarkeit",
-		"Mit diesem Spruch kann der Zauberer eine Sphäre der Unsichtbarkeit "
-		"erschaffen. Die Späre macht ihren Träger sowie neunundneunzig weitere "
-		"Personen in derselben Einheit unsichtbar.",
-		NULL,
-		NULL,
+	{ SPL_INVISIBILITY2_ILLAUN, "create_invisibility_sphere", NULL, NULL, NULL,
 		M_TRAUM, (ONSHIPCAST), 5, 13,
 		{
 			{R_AURA, 150, SPC_FIX},
@@ -9023,18 +9018,7 @@ spell spelldaten[] =
 		(spell_f)sp_createitem_invisibility2, patzer_createitem
 	},
 
-	{SPL_CREATE_TACTICCRYSTAL, "Erschaffe ein Traumauge",
-		"Ein mit diesem Zauber belegtes Drachenauge, welches zum Abendmahle "
-		"verzehrt wird, erlaubt es dem Benutzer, in die Träume einer anderen "
-		"Person einzudringen und diese zu lesen. Lange Zeit wurde eine solche "
-		"Fähigkeit für nutzlos erachtet, bis die ehemalige waldelfische "
-		"Magistra für Kampfmagie, Liarana Sonnentau von der Akademie Thall, "
-		"eine besondere Anwendung vorstellte: Feldherren träumen vor großen "
-		"Kämpfen oft unruhig und verraten im Traum ihre Pläne. Dies kann dem "
-		"Anwender einen großen Vorteil im kommenden Kampf geben. Aber Vorsicht: "
-		"Die Interpretation von Träumen ist eine schwierige Angelegenheit.",
-		NULL,
-		NULL,
+	{SPL_CREATE_TACTICCRYSTAL, "create_tacticcrystal", NULL, NULL, NULL,
 		M_TRAUM, (ONSHIPCAST), 5, 14,
 		{
 			{R_PERMAURA, 5, SPC_FIX},
@@ -9045,16 +9029,7 @@ spell spelldaten[] =
 	 (spell_f)sp_create_tacticcrystal, patzer_createitem
 	},
 
-	{SPL_SUMMON_ALP, "Alp",
-		"Der Magier beschwört ein kleines Monster, einen Alp.  Dieses bewegt sich "
-		"langsam auf sein Opfer zu (das sich an einem beliebigen Ort an der Welt "
-		"befinden kann, der Magier oder seine Partei braucht es nicht zu sehen). "
-		"Sobald das Opfer erreicht ist, wird es gnadenlos gequält, und nur durch "
-		"einen starken Gegenzauber oder den Tod des beschwörenden Magiers kann "
-		"das Opfer wieder Frieden finden. Bei der Beschwörung des Alps verliert "
-		"der Magier einen kleinen Teil seiner Aura für immer.",
-		NULL,
-		"u",
+	{SPL_SUMMON_ALP, "summon_alp", NULL, NULL, "u",
 		M_TRAUM,
 		(UNITSPELL | ONETARGET | SEARCHGLOBAL | TESTRESISTANCE),
 		5, 15,
@@ -9067,12 +9042,7 @@ spell spelldaten[] =
 		(spell_f)sp_summon_alp, patzer
 	},
 
-	{SPL_DREAM_OF_CONFUSION, "Schleier der Verwirrung",
-		"Der Magier erzeugt in allen Wald- und Ozeanregionen im Umkreis von "
-		"einigen Regionen einen magischen Schleier, der einige Wochen bestehen "
-		"bleibt. Personen innerhalb des Schleiers verlieren "
-		"leicht die Orientierung und haben große Schwierigkeiten, sich in "
-		"eine bestimmte Richtung zu bewegen.",
+	{SPL_DREAM_OF_CONFUSION, "dream_of_confusion", NULL,
 		NULL,
 		NULL,
 		M_TRAUM,

@@ -3873,6 +3873,22 @@
 			<text locale="de">Traumdeuten</text>
 			<text locale="en">Mind Probe</text>
 		</string>
+		<string name="dream_of_confusion">
+			<text locale="de">Schleier der Verwirrung</text>
+			<text locale="en">Fog of Confusion</text>
+		</string>
+		<string name="summon_alp">
+			<text locale="de">Alp</text>
+			<text locale="en">Nightmare</text>
+		</string>
+		<string name="create_tacticcrystal">
+			<text locale="de">Erschaffe ein Traumauge</text>
+			<text locale="en">Create a Visioneye</text>
+		</string>
+		<string name="create_invisibility_sphere">
+			<text locale="de">Erschaffe eine Sphäre der Unsichtbarkeit</text>
+			<text locale="en">Create a Sphere of Invisbility</text>
+		</string>
 		<string name="gooddreams">
 			<text locale="de">Schöne Träume</text>
 			<text locale="en">Pleasant Dreams</text>
@@ -5353,6 +5369,63 @@
 				target's faction, skills and possessions will no
 				longer be unknown.
 			</text>
+		</string>
+		<string name="dream_of_confusion">
+			<text locale="de">
+			Der Magier erzeugt in allen Wald- und Ozeanregionen im Umkreis von 
+			einigen Regionen einen magischen Schleier, der einige Wochen bestehen 
+			bleibt. Personen innerhalb des Schleiers verlieren 
+			leicht die Orientierung und haben große Schwierigkeiten, sich in 
+			eine bestimmte Richtung zu bewegen.
+			</text>
+			<text locale="en">
+			The mage creates a magic fog in every forrest and ocean region in a 
+			perimeter of some regions. The fog lasts some weeks and persons 
+			passing this fog have a chance to get lost,  moving to a certain
+			direction is difficult.
+			</text>
+		</string>
+		<string name="summon_alp">
+			<text locale="de">
+			Der Magier beschwört ein kleines Monster, einen Alp.  Dieses bewegt sich 
+			langsam auf sein Opfer zu (das sich an einem beliebigen Ort an der Welt 
+			befinden kann, der Magier oder seine Partei braucht es nicht zu sehen). 
+			Sobald das Opfer erreicht ist, wird es gnadenlos gequält, und nur durch 
+			einen starken Gegenzauber oder den Tod des beschwörenden Magiers kann 
+			das Opfer wieder Frieden finden. Bei der Beschwörung des Alps verliert 
+			der Magier einen kleinen Teil seiner Aura für immer.
+			</text>
+			<text locale="en">
+			The mage spawns a little monster, a nightmare. The nightmare slowly approaches its victim (which may be at an arbitrary place in eressea, it is not needed for the mage or his party  to see the victim). As soon as the victim is reached the nightmare starts to torment it  without mercy, only a powerfull counter spell or the death of the casting mage can redeem the victim. When spawning the nightmare the mage loses a small amount of his aura forever.
+			</text>
+		</string>
+		<string name="create_tacticcrystal">
+			<text locale="de">
+			Ein mit diesem Zauber belegtes Drachenauge, welches zum Abendmahle 
+			verzehrt wird, erlaubt es dem Benutzer, in die Träume einer anderen 
+			Person einzudringen und diese zu lesen. Lange Zeit wurde eine solche 
+			Fähigkeit für nutzlos erachtet, bis die ehemalige waldelfische 
+			Magistra für Kampfmagie, Liarana Sonnentau von der Akademie Thall, 
+			eine besondere Anwendung vorstellte: Feldherren träumen vor großen 
+			Kämpfen oft unruhig und verraten im Traum ihre Pläne. Dies kann dem 
+			Anwender einen großen Vorteil im kommenden Kampf geben. Aber Vorsicht: 
+			Die Interpretation von Träumen ist eine schwierige Angelegenheit.
+			</text>
+			<text locale="en">
+			An enchanted eye of a dragon gives the person who eats it for supper the power to see
+			other people's dreams. For a long time this abillity was counted as beeing useless until
+			the former elfish mistress for theurgy of war, Liarana Sonnentau from the academy Thall,
+			presented a special appliance for this artefact: Before a battle captains often have an
+			uncomfortable sleep and betray their plans in their dreams. This might give the user of
+			the artefact a small advantage in the upcoming battle, but be warned: Interpreting dreams
+			is a difficult exercise. 
+			</text>
+		</string>
+		<string name="create_invisibility_sphere">
+			<text locale="de">Mit diesem Spruch kann der Zauberer eine Sphäre der Unsichtbarkeit 
+			erschaffen. Die Späre macht ihren Träger sowie neunundneunzig weitere 
+			Personen in derselben Einheit unsichtbar.</text>
+			<text locale="en">Using this spell the mage can create a Sphere of Invisibility. This artefact hides the person bearing it and one hundred persons in the same unit.</text>
 		</string>
 		<string name="gooddreams">
 			<text locale="de">Dieser Zauber ermöglicht es dem
