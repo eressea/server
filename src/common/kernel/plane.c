@@ -35,6 +35,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+struct plane *planes;
+
 plane *
 getplane(const region *r)
 {
