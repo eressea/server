@@ -152,7 +152,7 @@ static armor_type armordata[AR_NONE + 1] =
 	{ 0.00, 0.00, 0, 0, I_SWORD}
 };
 
-#ifndef NDEBUG
+#if 0
 static void
 validate_sides(battle * b)
 {
