@@ -2810,7 +2810,7 @@ magic(void)
             }
             if (range > 1024) { /* (2^10) weiter als 10 Regionen entfernt */
               ADDMSG(&u->faction->msgs, msg_message("spellfail::nolevel",
-                "mage region order target", u, u->region, so->s, 
+                "mage region command target", u, u->region, so->s, 
                 gc_add(strdup(regionid(target_r)))));
               continue;
             }
@@ -2821,7 +2821,7 @@ magic(void)
             if (ilevel!=level) {
               level = ilevel;
               ADDMSG(&u->faction->msgs, msg_message("spellfail::nolevel",
-                "mage region order", u, u->region, so->s));
+                "mage region command", u, u->region, so->s));
             }
           }
           /* Vertrautenmagie */
