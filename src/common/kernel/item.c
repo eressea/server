@@ -901,7 +901,7 @@ t_item itemdata[MAXITEMS] = {
 	},
 	{			/* I_CATAPULT */
 		{"Katapult", "Katapulte", "Katapult", "Katapulte"}, G_N,
-		IS_PRODUCT, SK_CARTMAKER, 5, {0, 10, 0, 0, 0, 0}, 12000, 0, FL_ITEM_NOTINBAG, NULL
+		IS_PRODUCT, SK_CARTMAKER, 5, {0, 10, 0, 0, 0, 0}, 10000, 0, FL_ITEM_NOTINBAG, NULL
 	},
 	{			/* I_SWORD */
 		{"Schwert", "Schwerter", "Schwert", "Schwerter"}, G_N,
