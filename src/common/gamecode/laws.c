@@ -2068,7 +2068,7 @@ set_passw(void)
 							}
 						}
 						set_string(&u->faction->passw, pbuf);
-						fset(f, FFL_OVERRIDE);
+						fset(u->faction, FFL_OVERRIDE);
 						ADDMSG(&u->faction->msgs, msg_message("changepasswd", 
 							"value", gc_add(strdup(u->faction->passw))));
 					}
