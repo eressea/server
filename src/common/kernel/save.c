@@ -1863,9 +1863,27 @@ readregion(FILE * F, int x, int y)
 		if(global.data_version < GROWTREE_VERSION) {
 			i = ri(F); rsettrees(r, 2, i);
 		} else {
-			i = ri(F); rsettrees(r, 0, i);
-			i = ri(F); rsettrees(r, 1, i);
-			i = ri(F); rsettrees(r, 2, i);
+			i = ri(F);
+			if (i<0) {
+				log_error(("number of trees in %s is %d.\n", 
+						   regionname(r, NULL), i));
+				i=0;
+			}
+			rsettrees(r, 0, i);
+			i = ri(F); 
+			if (i<0) {
+				log_error(("number of young trees in %s is %d.\n", 
+						   regionname(r, NULL), i));
+				i=0;
+			}
+			rsettrees(r, 1, i);
+			i = ri(F); 
+			if (i<0) {
+				log_error(("number of seeds in %s is %d.\n", 
+						   regionname(r, NULL), i));
+				i=0;
+			}
+			rsettrees(r, 2, i);
 		}
 #else
 		i = ri(F); rsettrees(r, i);
@@ -1979,6 +1997,9 @@ writeregion(FILE * F, const region * r)
 		struct demand * demand;
 		ws(F, r->land->name);
 #if GROWING_TREES
+		assert(rtrees(r,0)>=0);
+		assert(rtrees(r,1)>=0);
+		assert(rtrees(r,2)>=0);
 		wi(F, rtrees(r,0));
 		wi(F, rtrees(r,1));
 		wi(F, rtrees(r,2));
