@@ -425,40 +425,40 @@ destroy_curse(attrib **alist, int cast_level, double force, curse * c)
 static void
 report_effect(region * r, unit * mage, message * seen, message * unseen)
 {
-	unit * u;
+  unit * u;
 
-	/* melden, 1x pro Partei */
-	freset(mage->faction, FL_DH);
-	for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
-	for (u = r->units; u; u = u->next ) {
-		if (!fval(u->faction, FL_DH) ) {
-			fset(u->faction, FL_DH);
+  /* melden, 1x pro Partei */
+  freset(mage->faction, FL_DH);
+  for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
+  for (u = r->units; u; u = u->next ) {
+    if (!fval(u->faction, FL_DH) ) {
+      fset(u->faction, FL_DH);
 
-			/* Bei Fernzaubern sieht nur die eigene Partei den Magier */
-			if (u->faction != mage->faction){
-				if (r == mage->region){
-					/* kein Fernzauber, prüfe, ob der Magier überhaupt gesehen
-					 * wird */
-					if (cansee(u->faction, r, mage, 0)) {
-						r_addmessage(r, u->faction, seen);
-					} else {
-						r_addmessage(r, u->faction, unseen);
-					}
-				} else { /* Fernzauber, fremde Partei sieht den Magier niemals */
-					r_addmessage(r, u->faction, unseen);
-				}
-			} else { /* Partei des Magiers, sieht diesen immer */
-				r_addmessage(r, u->faction, seen);
-			}
-		}
-	}
-	/* Ist niemand von der Partei des Magiers in der Region, dem Magier
-	 * nochmal gesondert melden */
-	if(!fval(mage->faction, FL_DH)) {
-		ADDMSG(&mage->faction->msgs, seen);
-	}
-	msg_release(seen);
-	if (unseen) msg_release(unseen);
+      /* Bei Fernzaubern sieht nur die eigene Partei den Magier */
+      if (u->faction != mage->faction){
+        if (r == mage->region){
+          /* kein Fernzauber, prüfe, ob der Magier überhaupt gesehen
+          * wird */
+          if (cansee(u->faction, r, mage, 0)) {
+            r_addmessage(r, u->faction, seen);
+          } else {
+            r_addmessage(r, u->faction, unseen);
+          }
+        } else { /* Fernzauber, fremde Partei sieht den Magier niemals */
+          r_addmessage(r, u->faction, unseen);
+        }
+      } else { /* Partei des Magiers, sieht diesen immer */
+        r_addmessage(r, u->faction, seen);
+      }
+    }
+  }
+  /* Ist niemand von der Partei des Magiers in der Region, dem Magier
+  * nochmal gesondert melden */
+  if (!fval(mage->faction, FL_DH)) {
+    add_message(&mage->faction->msgs, seen);
+  }
+  msg_release(seen);
+  if (unseen) msg_release(unseen);
 }
 
 /* ------------------------------------------------------------- */
@@ -1746,7 +1746,7 @@ sp_great_drought(castorder *co)
 			sprintf(buf, "%s ruft das Feuer der Sonne auf %s hinab.",
 					cansee(u->faction, r, mage, 0)? unitname(mage) : "Jemand",
 					regionid(r));
-			if(rterrain(r) != T_OCEAN){
+			if (rterrain(r) != T_OCEAN){
 				if(rterrain(r) == T_SWAMP && terraform){
 						scat(" Eis schmilzt und verwandelt sich in Morast. Reißende "
 								"Ströme spülen die mageren Felder weg und ersäufen "
@@ -1772,7 +1772,7 @@ sp_great_drought(castorder *co)
 			}
 		}
 	}
-	if(!fval(mage->faction, FL_DH)){
+	if (!fval(mage->faction, FL_DH)){
 		ADDMSG(&mage->faction->msgs, msg_message(
 			"drought_effect", "mage region", mage, r));
 	}
@@ -3004,11 +3004,10 @@ wall_move(const border * b, struct unit * u, const struct region * from, const s
     hp = min (u->hp, hp);
     u->hp -= hp;
     if (u->hp) {
-      ADDMSG(&u->faction->msgs,
-        msg_message( "firewall_damage", "region unit", from, u));
+      ADDMSG(&u->faction->msgs, msg_message("firewall_damage", 
+        "region unit", from, u));
     }
-    else ADDMSG(&u->faction->msgs,
-      msg_message( "firewall_death", "region unit", from, u));
+    else ADDMSG(&u->faction->msgs, msg_message("firewall_death", "region unit", from, u));
     if (u->number>u->hp) {
       scale_number(u, u->hp);
       u->hp = u->number;
@@ -3037,30 +3036,29 @@ border_type bt_firewall = {
 static int
 sp_firewall(castorder *co)
 {
-	unit * u;
-	border * b;
-	wall_data * fd;
+  border * b;
+  wall_data * fd;
   attrib * a;
-	region *r = co->rt;
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-	double force = co->force;
-	spellparameter *pa = co->par;
-	direction_t dir;
-	region * r2;
+  region *r = co->rt;
+  unit *mage = (unit *)co->magician;
+  int cast_level = co->level;
+  double force = co->force;
+  spellparameter *pa = co->par;
+  direction_t dir;
+  region * r2;
 
-	dir = finddirection(pa->param[0]->data.s, mage->faction->locale);
-	if (dir<MAXDIRECTIONS && dir!=NODIRECTION){
-		r2 = rconnect(r, dir);
-	} else {
-		report_failure(mage, co->order);
-		return 0;
-	}
+  dir = finddirection(pa->param[0]->data.s, mage->faction->locale);
+  if (dir<MAXDIRECTIONS && dir!=NODIRECTION){
+    r2 = rconnect(r, dir);
+  } else {
+    report_failure(mage, co->order);
+    return 0;
+  }
 
-	if (!r2 || r2==r) {
-		report_failure(mage, co->order);
-		return 0;
-	}
+  if (!r2 || r2==r) {
+    report_failure(mage, co->order);
+    return 0;
+  }
 
   b = get_borders(r, r2);
   while (b!=NULL) {
@@ -3086,23 +3084,14 @@ sp_firewall(castorder *co)
     a->data.i = max(a->data.i, cast_level);
   }
 
-	/* melden, 1x pro Partei */
-	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+  /* melden, 1x pro Partei */
+  {
+    message * seen = msg_message("firewall_effect", "mage region", mage, r);
+    message * unseen = msg_message("firewall_effect", "mage region", NULL, r);
+    report_effect(r, mage, seen, unseen);
+  }
 
-	for (u = r->units; u; u = u->next ) {
-		if(!fval(u->faction, FL_DH) ) {
-			fset(u->faction, FL_DH);
-			ADDMSG(&u->faction->msgs, msg_message(
-				"firewall_effect", "mage region",
-				cansee(u->faction, r, mage, 0) ? mage:NULL, r));
-		}
-	}
-	if(!fval(mage->faction, FL_DH)){
-		ADDMSG(&mage->faction->msgs, msg_message(
-			"firewall_effect", "mage region", mage, r));
-	}
-
-	return cast_level;
+  return cast_level;
 }
 
 /* ------------------------------------------------------------- */
@@ -3136,7 +3125,6 @@ border_type bt_wisps = {
 static int
 sp_wisps(castorder *co)
 {
-	unit * u;
 	border * b;
 	wall_data * fd;
 	region * r2;
@@ -3164,22 +3152,13 @@ sp_wisps(castorder *co)
 	a_add(&b->attribs, a_new(&at_countdown))->data.i = cast_level;
 
 	/* melden, 1x pro Partei */
-	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+        {
+          message * seen = msg_message("wisps_effect", "mage region", mage, r);
+          message * unseen = msg_message("wisps_effect", "mage region", NULL, r);
+          report_effect(r, mage, seen, unseen);
+        }
 
-	for(u = r->units; u; u = u->next ) {
-		if(!fval(u->faction, FL_DH) ) {
-			fset(u->faction, FL_DH);
-			ADDMSG(&u->faction->msgs, msg_message(
-				"wisps_effect", "mage region",
-				cansee(u->faction, r, mage, 0) ? mage:NULL, r));
-		}
-	}
-	if(!fval(mage->faction, FL_DH)){
-		ADDMSG(&mage->faction->msgs, msg_message(
-			"wisps_effect", "mage region", mage, r));
-	}
-
-	return cast_level;
+        return cast_level;
 }
 #endif
 
@@ -7299,8 +7278,7 @@ sp_becomewyrm(castorder *co)
 	mage->race = new_race[RC_WYRM];
 	addspell(mage, SPL_WYRMODEM);
 
-	ADDMSG(&mage->faction->msgs, msg_message(
-		"becomewyrm", "mage", mage));
+	ADDMSG(&mage->faction->msgs, msg_message("becomewyrm", "mage", mage));
 
 	return co->level;
 }

@@ -900,6 +900,7 @@
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
+      <arg name="extended" type="string"/>
     </type>
     <text locale="de">"$unit($mage) ruft das Feuer der Sonne auf $region($region) herab."</text>
   </message>
