@@ -516,7 +516,7 @@ give_peasants(int n, const item_type * itype, unit * src)
 	}
 }
 
-void
+int
 give_item(int want, const item_type * itype, unit * src, unit * dest, const char * cmd)
 {
 	short error = 0;
@@ -528,13 +528,13 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, const char
 	if (dest && src->faction != dest->faction && src->faction->age < GIVERESTRICTION) {
 		ADDMSG(&src->faction->msgs, msg_error(src, cmd, "giverestriction", 
 					"turns", GIVERESTRICTION));
-		return;
+		return -1;
 	} else if (n == 0) {
 		error = 36;
 	} else if (itype->flags & ITF_CURSED) {
 		error = 25;
 	} else if (itype->give && !itype->give(src, dest, itype, n, cmd)) {
-		return;
+		return -1;
 	} else {
 		int use = new_use_pooled(src, item2resource(itype), GET_SLACK, n);
 		if (use<n) use += new_use_pooled(src, item2resource(itype), GET_RESERVE|GET_POOLED_SLACK, n-use);
@@ -561,6 +561,8 @@ TODO: Einen Trigger benutzen!
 		}
 	}
 	add_give(src, dest, n, item2resource(itype), cmd, error);
+	if (error) return -1;
+	return;
 }
 
 	void
@@ -923,10 +925,10 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 			while (*itmp) {
 				const herb_type * htype = resource2herb((*itmp)->type->rtype);
 				if (htype && (*itmp)->number>0) {
-					give_item((*itmp)->number, (*itmp)->type, u, u2, S->s);
 					n = 1;
+					if (give_item((*itmp)->number, (*itmp)->type, u, u2, S->s)==0) continue;
 				}
-				else itmp = &(*itmp)->next;
+				itmp = &(*itmp)->next;
 			}
 		}
 		if (!n) cmistake(u, S->s, 38, MSG_COMMERCE);
@@ -972,9 +974,9 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 					if ((*itmp)->number > 0 
 							&& (*itmp)->number - new_get_resvalue(u, (*itmp)->type->rtype) > 0) {
 						n = (*itmp)->number - new_get_resvalue(u, (*itmp)->type->rtype);
-						give_item(n, (*itmp)->type, u, u2, S->s);
+						if (give_item(n, (*itmp)->type, u, u2, S->s)==0) continue;
 					}
-					else itmp = &(*itmp)->next;
+					itmp = &(*itmp)->next;
 				}
 			}
 			return;

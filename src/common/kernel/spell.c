@@ -6239,6 +6239,8 @@ sp_showastral(castorder *co)
 	int cast_level = co->level;
 	int power = co->force;
 
+	return 0;
+
 	switch(getplaneid(r)) {
 	case 0:
 		rt = r_standard_to_astral(r);

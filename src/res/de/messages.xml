@@ -5246,6 +5246,7 @@
 	<message name="undeadrise">
 		<type>
 			<arg name="region" type="region"></arg>
+			<arg name="amount" type="int"></arg>
 		</type>
 		<locale name="de">
 			<nr section="events">
