@@ -1278,7 +1278,10 @@ static void
 s_change(stats_t** s, const struct item_type * type, int count)
 {
 	while (*s && (*s)->type!=type) s=&(*s)->next;
-	if (*s==NULL) *s = calloc(1, sizeof(stats_t));
+	if (*s==NULL) {
+		*s = calloc(1, sizeof(stats_t));
+		(*s)->type = type;
+	}
 	(*s)->number += count;
 }
 
