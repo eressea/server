@@ -1,5 +1,7 @@
 /* vi: set ts=2 ai sw=2:
  *
+ * $Id: echeck.c,v 1.2 2001/01/30 15:22:49 corwin Exp $
+ *
  *	Eressea PB(E)M host Copyright (C) 1997-2000
  *		Enno Rehling (rehling@usa.net)
  *		Christian Schlittchen (corwin@amber.kn-bremen.de)
@@ -18,12 +20,12 @@
  */
 
 #ifdef _MSC_VER
-#pragma warning (disable: 4711)
+# pragma warning (disable: 4711)
 #endif
 
 #define MAINVERSION "3"
-#define MINVERSION	"8"
-#define PATCHLEVEL	"7"
+#define MINVERSION	"10"
+#define PATCHLEVEL	"3"
 
 #define VERSION MAINVERSION"."MINVERSION"."PATCHLEVEL
 
@@ -31,15 +33,16 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #ifdef DMALLOC
-#include <dmalloc.h>
+# include <dmalloc.h>
 #endif
 
 #if macintosh
-#include <console.h>   /* macintosh console handler zur eingabe von parametern
-													added 15.6.00 chartus */
-#define UMLAUTE
+# include <console.h>  /* macintosh console handler zur eingabe von parametern
+ 													added 15.6.00 chartus */
+# define UMLAUTE
 #endif
 
 enum {
@@ -54,6 +57,7 @@ enum {
 	UT_RACE,
 	UT_MAX
 };
+
 
 #if __STDC__
 /* strdup ist nicht ANSI */
@@ -92,6 +96,7 @@ a_isspace(char c) {
 	return (c==' ' || c=='\t' || c=='\f');
 }
 
+
 char
 a_tolower(char c) {
 	switch (c) {
@@ -101,6 +106,7 @@ a_tolower(char c) {
 		default: return (char) tolower(c);
 	}
 }
+
 
 int
 a_strncasecmp(const char *a, const char *b, size_t s) {
@@ -115,12 +121,13 @@ a_strncasecmp(const char *a, const char *b, size_t s) {
 	return i-j;
 }
 
-#define strncasecmp(x,y,n) a_strncasecmp(x,y,n)
-#define strcasecmp(x,y) a_strncasecmp(x,y,strlen(x))
-#ifdef tolower
-# undef tolower
-#endif
-#define tolower(x) a_tolower(x)
+
+# define strncasecmp(x,y,n) a_strncasecmp(x,y,n)
+# define strcasecmp(x,y) a_strncasecmp(x,y,strlen(x))
+# ifdef tolower
+#  undef tolower
+# endif
+# define tolower(x) a_tolower(x)
 
 #else
 # include <locale.h>
@@ -139,8 +146,6 @@ a_strncasecmp(const char *a, const char *b, size_t s) {
 #define INDENT_ORDERS				4
 #define INDENT_NEW_ORDERS		6
 
-#define ERR  (use_stderr ? stderr : stdout)
-
 #ifndef min
 # define min(a,b)	((a) < (b) ? (a) : (b))
 #endif
@@ -152,6 +157,8 @@ a_strncasecmp(const char *a, const char *b, size_t s) {
 #define MAXLINE	4096
 #define DISPLAYSIZE 4095
 #define NAMESIZE 127
+
+FILE *ERR, *OUT=0;
 
 int line_no,							/* count line number */
  MAXSPELLS,
@@ -252,12 +259,14 @@ enum {
 	K_PIRATERIE,
 	K_NEUSTART,
 	K_GRUPPE,
+	K_SORTIERE,
 		/* Empiria only: */
 	K_SEND,
 	K_FIND,
 	K_ADDRESS,
 	MAXKEYWORDS
 };
+
 
 static char *keywords[MAXKEYWORDS]={
 	"Arbeiten",
@@ -318,11 +327,13 @@ static char *keywords[MAXKEYWORDS]={
 	"Piraterie",
 	"Neustart",
 	"Gruppe",
+	"Sortiere",
 		/* Empiria only: */
 	"Sende",
 	"Finde",
 	"Adresse"
 };
+
 
 static char *magiegebiet[]={
 	"Illaun",
@@ -331,6 +342,7 @@ static char *magiegebiet[]={
 	"Gwyrrd",
 	"Draig"
 };
+
 
 enum {
 	P_ALLES,
@@ -365,6 +377,7 @@ enum {
 	MAXPARAMS
 };
 
+
 static char *parameters[MAXPARAMS]={
 	"Alles",
 	"Bauern",
@@ -397,6 +410,7 @@ static char *parameters[MAXPARAMS]={
 	"Fremdes"
 };
 
+
 static char *reports[]={	/* Fehler und Meldungen im Report */
 	"Kampf",
 	"Ereignisse",
@@ -410,6 +424,7 @@ static char *reports[]={	/* Fehler und Meldungen im Report */
 
 static const int MAXREPORTS=sizeof(reports)/sizeof(reports[0]);
 
+
 static char *message_levels[]={
 	"Wichtig",
 	"Debug",
@@ -419,6 +434,7 @@ static char *message_levels[]={
 };
 
 static const int ML_MAX=sizeof(message_levels)/sizeof(message_levels[0]);
+
 
 static char *options[]={
 	"Auswertung",
@@ -435,77 +451,6 @@ static char *options[]={
 
 static const int MAXOPTIONS=sizeof(options)/sizeof(options[0]);
 
-enum {
-	SK_ALCHEMY,
-	SK_CROSSBOW,
-	SK_AUSDAUER,
-	SK_LONGBOW,
-	SK_CATAPULT,
-	SK_HERBALISM,
-	SK_RIDING,
-	SK_TACTICS,
-	SK_MINING,
-	SK_BUILDING,
-	SK_TRADE,
-	SK_LUMBERJACK,
-	SK_MAGIC,
-	SK_HORSE_TRAINING,
-	SK_ARMORER,
-	SK_SAILING,
-	SK_QUARRYING,
-	SK_ROAD_BUILDING,
-	SK_STEALTH,
-	SK_ENTERTAINMENT,
-	SK_WEAPONSMITH,
-	SK_CARTMAKER,
-	SK_OBSERVATION,
-	SK_SPY,
-	SK_TAXING,
-	MAXSKILLS,
-		/* Talente, die in Empiria oder Eressea anders heißen */
-	SK_HIEBWAFFEN,		/* Eressea */
-	SK_STANGENWAFFEN,
-	SK_SHIPBUILDING,
-	SK_SWORD,					/* Empiria */
-	SK_SPEAR,
-	SK_SCHIFFSBAU,
-	MAX_LIST_SKILL
-};
-
-static char *skillnames[MAX_LIST_SKILL]={
-	"Alchemie",
-	"Armbrustschießen",
-	"Ausdauer",
-	"Bogenschießen",
-	"Katapultbedienung",
-	"Kräuterkunde",
-	"Reiten",
-	"Taktik",
-	"Bergbau",
-	"Burgenbau",
-	"Handeln",
-	"Holzfällen",
-	"Magie",
-	"Pferdedressur",
-	"Rüstungsbau",
-	"Segeln",
-	"Steinbau",
-	"Straßenbau",
-	"Tarnung",
-	"Unterhaltung",
-	"Waffenbau",
-	"Wagenbau",
-	"Wahrnehmung",
-	"Spionage",
-	"Steuereintreiben",
-	"",		/* Workaround */
-	"Hiebwaffen", 		/* Eressea */
-	"Stangenwaffen",
-	"Schiffbau",
-	"Schwertkampf",		/* Empiria */
-	"Speerkampf",
-	"Schiffsbau"
-};
 
 enum {
 	D_NORTH,
@@ -520,6 +465,7 @@ enum {
 	MAXDIRECTIONS
 };
 
+
 static char *directions[MAXDIRECTIONS]={
 	"Norden",
 	"Sueden",	/* Empiria hat keine Umlaute! */
@@ -531,6 +477,7 @@ static char *directions[MAXDIRECTIONS]={
 	"Südosten",
 	"Südwesten"
 };
+
 
 static char *Rassen[]={
 	"Menschen",
@@ -548,6 +495,7 @@ static char *Rassen[]={
 
 static const int R_MAX=sizeof(Rassen)/sizeof(Rassen[0]);
 
+
 static char *shiptypes[]={
 	"Boot",
 	"Langboot",
@@ -557,6 +505,7 @@ static char *shiptypes[]={
 };
 
 static const int MAXSHIPS=sizeof(shiptypes)/sizeof(shiptypes[0]);
+
 
 enum {
 	POT_FAST,
@@ -576,6 +525,7 @@ enum {
 	POT_HEAL,
 	MAXPOTIONS
 };
+
 
 enum {
 	H_PLAIN_1,
@@ -601,6 +551,7 @@ enum {
 	H_GLACIER_3,
 	MAXHERBS
 };
+
 
 static char *herbdata[2][MAXHERBS]={
 	{
@@ -651,17 +602,39 @@ static char *herbdata[2][MAXHERBS]={
 	}
 };
 
-typedef struct t_names {
+
+typedef struct _names {
 	char *txt;
-	struct t_names *next;
+	struct _names *next;
 } t_names;
 
-typedef struct t_item {
+
+typedef struct _item {
 	t_names *name;
-	struct t_item *next;
+	struct _item *next;
 } t_item;
 
 t_item *itemdata=NULL;
+
+
+typedef struct t_spell {
+	char *name;
+	int kosten;
+	char typ;
+	struct t_spell *next;
+} t_spell;
+
+t_spell *spells=NULL;
+
+
+typedef struct _skills {
+	char *name;
+	int kosten;
+	struct _skills *next;
+} t_skills;
+
+t_skills *skilldata=NULL;
+
 
 enum {
 	I_BALM,
@@ -673,6 +646,7 @@ enum {
 	I_INCENSE
 };
 
+
 #define isluxury(i)  (i<=I_INCENSE)
 
 #define SP_ZAUBER 1
@@ -681,15 +655,6 @@ enum {
 #define SP_PRAE		8
 #define SP_BATTLE	14	/* 2+4+8 */
 #define SP_ALL		15
-
-typedef struct t_spell {
-	char *name;
-	int kosten;
-	char typ;
-	struct t_spell *next;
-} t_spell;
-
-t_spell *spells=NULL;
 
 #define MAXPOTIONS 15
 
@@ -737,6 +702,7 @@ char* potionnames[2][MAXPOTIONS]={
 	}
 };
 
+
 static char* buildingtypes[]={
 	"Burg",
 	"Leuchtturm",
@@ -757,10 +723,12 @@ static char* buildingtypes[]={
 	NULL
 };
 
+
 enum {
 	POSSIBLE,
 	NECESSARY
 };
+
 
 /* --------------------------------------------------------------------- */
 
@@ -768,11 +736,13 @@ typedef struct list {
 	struct list *next;
 } list;
 
+
 typedef struct t_region {
 	struct t_region *next;
 	int personen, geld, x, y, line_no, reserviert;
 	char *name;
 } t_region;
+
 
 typedef struct unit {
 	struct unit *next;
@@ -801,11 +771,13 @@ typedef struct unit {
 	int spell;		/* Bit-Map: 2^Spell-Typ */
 } unit;
 
+
 typedef struct teach {
 	struct teach *next;
 	unit *teacher;
 	unit *student;
 } teach;
+
 
 teach *teachings=NULL;
 
@@ -823,6 +795,7 @@ typedef struct tnode {
 	struct tnode * nexthash;
 	struct tnode * next[32];
 } tnode;
+
 
 tnode tokens[UT_MAX];
 
@@ -845,6 +818,7 @@ cmalloc(int n) {
 	return p;
 }
 
+
 int
 Pow(int p) {
 	if (!p)
@@ -852,6 +826,7 @@ Pow(int p) {
 	else
 		return 2<<(p-1);
 }
+
 
 char nulls[]="\0\0\0\0\0\0\0\0";
 
@@ -879,6 +854,7 @@ itob(int i) {
 	return dst;
 }
 
+
 #define scat(X) strcat(checked_buf, X)
 #define Scat(X) scat(" ");scat(X)
 
@@ -896,12 +872,14 @@ qcat(char *s) {
 		scat("\"");
 }
 
+
 void
 icat(int n) {
 	static char s[10];
 	sprintf(s, " %d", n);
 	scat(s);
 }
+
 
 void
 bcat(int n) {
@@ -913,6 +891,7 @@ bcat(int n) {
 		scat(s);
 	}
 }
+
 
 char *
 ItemName(int i, int plural) {
@@ -938,8 +917,9 @@ ItemName(int i, int plural) {
 	return item->name->txt;
 }
 
+
 void
-readspells() {
+readspells(void) {
 	char *s,*x;
 	t_spell *it, *in;
 	char *file;
@@ -995,8 +975,61 @@ readspells() {
 	}	/* Abbruch oben */
 }
 
+
 void
-readitems() {
+readskills(void) {
+	char *s,*x;
+	t_skills *it, *in;
+	char *file;
+
+	if (path) {
+		char *x;
+		file=cmalloc(strlen(path)+12);
+		x=(char *)(path+strlen(path)-1);
+		if (*x=='/' || *x=='\\' || *x==':')	/* endet path auf /, \ oder : ? */
+			sprintf(file,"%stalente.txt",path);
+		else
+			sprintf(file,"%s/talente.txt",path);
+	} else
+		file=strdup("talente.txt");
+	F=fopen(file, "r");
+	if (!F) {
+		fprintf(ERR, "Kann Datei '%s' nicht lesen.\n", file);
+		return;
+	}
+	it=in=skilldata;
+	for (;;) {
+		do {
+			s=fgets(order_buf, MAXLINE, F);
+		} while (s && (*s=='#' || *s=='\n'));	/* Leer- und Kommentarzeilen überlesen */
+		if (!s) {
+			fclose(F);
+			return;
+		}
+		it=cmalloc(sizeof(t_skills));
+		x=strchr(s,';');
+		if (!x) x=strchr(s,',');
+		if (x) *x=0;
+		else {
+			x=strchr(s,'\n');
+			if (x) *x=0;
+			x=NULL;
+		}
+		it->name=strdup(s);
+		if (x) {
+			s=(char *)(x+1);
+			while (a_isspace(*s)) s++;
+			it->kosten=atoi(s);
+		}
+		if (in) in->next=it;
+		in=it;
+		if (!skilldata) skilldata=in;
+	}	/* Abbruch oben */
+}
+
+
+void
+readitems(void) {
 	char *s,*x;
 	t_item *it, *in;
 	t_names *n, *nn;
@@ -1054,26 +1087,29 @@ readitems() {
 	}	/* Abbruch oben */
 }
 
+
 void
-porder() {
+porder(void) {
 	int i;
 
 	if (echo_it) {
 		if (does_default != 2)
 			for (i=0; i != indent; i++)
-				putc(' ', stdout);
+				putc(' ',OUT);
 
 		if (does_default > 0)
-			printf("%s%s",checked_buf, does_default==2 ? "\"\n" : "");
+			fprintf(OUT,"%s%s",checked_buf, does_default==2 ? "\"\n" : "");
 		else
-			puts(checked_buf);
+		{
+			fputs(checked_buf,OUT);
+			putc('\n',OUT);
+		}
 	}
-
 	checked_buf[0]=0;
-
 	if (next_indent != indent)
 		indent=next_indent;
 }
+
 
 char *
 wrap(char *s) {
@@ -1088,7 +1124,7 @@ wrap(char *s) {
 	for (i=0, j=25; s[i]; i++, j++) {	/* j=25: "Warnung zur Zeile xyz:" */
 		if (j==MARGIN) {
 			for (k=i; !a_isspace(s[k]) && k>0; k--);
-				/* findet man eine leerstelle, wird sie durch '\n' ersetzt: */
+				/* findet man eine Leerstelle, wird sie durch '\n' ersetzt: */
 			if (k>0) {
 				message_buf[k]='\n';
 				j=i-k;
@@ -1098,26 +1134,28 @@ wrap(char *s) {
 				 einfach auf die nächste Leerstelle, ohne nach vorwärts zu suchen
 				 (das hat man ja schon einmal gemacht) */
 
-		if (j>MARGIN && a_isspace(s[i])) {
-			message_buf[i]='\n';
+			if (j>MARGIN && a_isspace(s[i])) {
+				message_buf[i]='\n';
 			j=0;
 		}
 	}
 	return message_buf;
 }
 
+
 void
-error(char *s, int l, char *o) {
+Error(char *s, int l, char *o) {
 	error_count++;
 	if (!brief) {
 		if (!compile)
-			fprintf(ERR, "Fehler in Zeile %d: %s.\n	`%s'\n", l, wrap(s), o);
+			fprintf(ERR, "Fehler in Zeile %d: %s.\n	`%s'\n\n", l, wrap(s), o);
 		else
 			fprintf(ERR, "%s(%d): Fehler: %s. `%s'\n", filename, l, s, o);
 	}
 }
 
-#define anerror(s)	error(s,line_no,order_buf)
+
+#define anerror(s)	Error(s,line_no,order_buf)
 
 int
 btoi(char *s) {
@@ -1151,6 +1189,7 @@ btoi(char *s) {
 	return i;
 }
 
+
 const char *
 uid(unit *u) {
 	static char *bf=NULL;
@@ -1158,6 +1197,7 @@ uid(unit *u) {
 	sprintf(bf,"%s%s", u->temp!=0 ? "TEMP " : "", itob(u->no));
 	return bf;
 }
+
 
 const char *
 Uid(int i) {
@@ -1167,13 +1207,14 @@ Uid(int i) {
 	if (!u) u=find_unit(i,1);
 	if (!u) {
 		sprintf(warn_buf,"Konnte Einheit %s nicht ermitteln",itob(i));
-		error(warn_buf,line_no,"<interner Check>");
+		Error(warn_buf,line_no,"<interner Check>");
 		u=newunit(-1,0);
 	}
 	if (!bf) bf=cmalloc(18);
 	sprintf(bf,"%s%s", u->temp!=0 ? "TEMP " : "", itob(u->no));
 	return bf;
 }
+
 
 void
 warn(char *s, int line_no, char level) {
@@ -1188,6 +1229,7 @@ warn(char *s, int line_no, char level) {
 	}
 }
 
+
 void
 warning(char *s, int l, char *o, char level) {
 	if (warn_off) return;
@@ -1195,11 +1237,12 @@ warning(char *s, int l, char *o, char level) {
 	warning_count++;
 	if (show_warnings && !brief) {
 		if (!compile)
-			fprintf(ERR, "Warnung zur Zeile %d: %s.\n	`%s'\n", l, wrap(s), o);
+			fprintf(ERR, "Warnung zur Zeile %d: %s.\n	`%s'\n\n", l, wrap(s), o);
 		else
 			fprintf(ERR, "%s(%d): Warnung (%d): %s. `%s'\n", filename, l, level, s, o);
 	}
 }
+
 
 #define awarning(s,level)	warning(s,line_no,order_buf,level)
 
@@ -1222,6 +1265,7 @@ checkstring(char *s, size_t l, int type) {
 	}
 }
 
+
 /* - Speicher und Listen Funktionen ---------------------------- */
 
 #define addlist(l,p)	(p->next=*l, *l=p)
@@ -1243,6 +1287,7 @@ find_unit(int i, int t) {
 			break;
 	return u;
 }
+
 
 
 t_region *
@@ -1272,6 +1317,7 @@ addregion(int x, int y, int pers) {
 	return r;
 }
 
+
 void
 addteach(unit *teacher, unit *student) {
 	teach *t, **teachlist=&teachings;
@@ -1295,6 +1341,7 @@ addteach(unit *teacher, unit *student) {
 	t->student=student;
 	addlist(teachlist, t);
 }
+
 
 unit *
 newunit(int n, int t) {
@@ -1331,6 +1378,7 @@ newunit(int n, int t) {
 	return u;
 }
 
+
 /* - In/Output ------------------------------------------------- */
 
 int
@@ -1342,6 +1390,7 @@ atoip(char *s) {
 		n=0;
 	return n;
 }
+
 
 char *
 igetstr(char *s1) {
@@ -1369,6 +1418,7 @@ igetstr(char *s1) {
 	return buf;
 }
 
+
 #define getstr()	igetstr(NULL)
 #define getb()	btoi(igetstr(NULL))
 #define geti()	atoi(igetstr(NULL))
@@ -1387,6 +1437,7 @@ findstr(char **v, const char *s, int max) {
 	return -1;
 }
 
+
 int
 findtoken(const char *str, int type) {
 	tnode * tk = &tokens[type];
@@ -1402,6 +1453,7 @@ findtoken(const char *str, int type) {
 	else return -1;
 }
 
+
 int
 findparam(const char *s) {
 	int p;
@@ -1414,6 +1466,7 @@ findparam(const char *s) {
 	return -1;
 }
 
+
 int
 isparam(char *s, int i, char print) {
 	if (i != findparam(s))
@@ -1424,6 +1477,7 @@ isparam(char *s, int i, char print) {
 	}
 	return 1;
 }
+
 
 t_spell *
 findspell(char *s) {
@@ -1437,10 +1491,23 @@ findspell(char *s) {
 	return NULL;
 }
 
+
+t_skills *
+findskill(char *s) {
+	int i;
+	t_skills *sk=skilldata;
+
+	i=findtoken(s, UT_SKILL);
+	if (i<0)
+		return NULL;
+	while (i--) sk=sk->next;
+	return sk;
+}
+
+
 #define findherb(s) findtoken(s, UT_HERB)
 #define findpotion(s) findtoken(s, UT_POTION)
 #define finditem(s) findtoken(s, UT_ITEM)
-#define findskill(s) findtoken(s, UT_SKILL)
 #define findbuildingtype(s) findtoken(s, UT_BUILDING)
 #define findreport(s) 	findstr(reports,s,MAXREPORTS)
 #define findoption(s) 	findstr(options,s,MAXOPTIONS)
@@ -1448,6 +1515,7 @@ findspell(char *s) {
 #define getskill()	findskill(getstr())
 #define getparam()	findparam(getstr())
 #define igetparam(s)	findparam(igetstr(s))
+
 
 int
 finddirection(char *s) {
@@ -1500,21 +1568,23 @@ finddirection(char *s) {
 	return uc;
 }
 
+
 #define getdirection()	finddirection(getstr())
 
 int
-getoption() {
+getoption(void) {
 	int i=findoption(getstr());
 	if (empiria && i>5)	/* Option ist Eressea only */
 		return -1;
 	return i;
 }
 
+
 #define findkeyword(s)	findtoken(s, UT_KEYWORD)
 #define igetkeyword(s)	findkeyword(igetstr(s))
 
 char *
-getbuf() {
+getbuf(void) {
 	char lbuf[MAXLINE];
 	bool cont = false;
 	bool quote = false;
@@ -1540,7 +1610,7 @@ getbuf() {
 			while (bp && !lbuf[MAXLINE-1] && lbuf[MAXLINE-2]!='\n')
 				bp=fgets(warn_buf, 1024, F);
 			sprintf(warn_buf, "%.30s", lbuf);
-			error("Zeile zu lang", line_no, warn_buf);
+			Error("Zeile zu lang", line_no, warn_buf);
 			bp=lbuf;
 		}
 		cont=false;
@@ -1582,20 +1652,21 @@ getbuf() {
 			if (!report) {
 				report=true;
 				sprintf(lbuf, "%.30s", warn_buf);
-				error("Zeile zu lang", line_no, lbuf);
+				Error("Zeile zu lang", line_no, lbuf);
 			}
 		}
 		*cp=0;
 	} while (cont || cp==warn_buf);
 
 	if (quote)
-		error("Fehlende \"",line_no,lbuf);
+		Error("Fehlende \"",line_no,lbuf);
 
 	return warn_buf;
 }
 
+
 void
-get_order() {
+get_order(void) {
 	char *buf;
 	bool ok=false;
 
@@ -1614,6 +1685,7 @@ get_order() {
 	}
 }
 
+
 void
 getafaction(char *s) {
 	int i;
@@ -1628,6 +1700,7 @@ getafaction(char *s) {
 		icat(i);
 	}
 }
+
 
 int
 getmoreunits(bool partei) {
@@ -1675,6 +1748,7 @@ getmoreunits(bool partei) {
 	}
 	return count;
 }
+
 
 int
 getaunit(int type) {
@@ -1731,6 +1805,7 @@ getaunit(int type) {
 	return 1;
 }
 
+
 void
 copy_unit(unit *from, unit *to) {
 	to->no=from->no;
@@ -1749,6 +1824,7 @@ copy_unit(unit *from, unit *to) {
 		to->order=strdup(from->order);
 	to->lernt=from->lernt;
 }
+
 
 char *
 netaddress(char *s) {
@@ -1780,8 +1856,9 @@ netaddress(char *s) {
 	return s1;
 }
 
+
 void
-checkemail() {
+checkemail(void) {
 	char *s, *addr;
 
 	scat(keywords[K_EMAIL]);
@@ -1802,8 +1879,9 @@ checkemail() {
 	scat(addr);
 }
 
+
 void
-checkaddr() {
+checkaddr(void) {
 	char *s, *addr;
 
 	scat(keywords[K_ADDRESS]);
@@ -1821,10 +1899,11 @@ checkaddr() {
 	}
 }
 
+
 /* Check auf langen Befehl usw. - aus ACheck.c 4.1 */
 
 void
-end_unit_orders() {
+end_unit_orders(void) {
 	if (!order_unit) /* Für die ersten Befehle der ersten Einheit. */
 		return;
 
@@ -1835,6 +1914,7 @@ end_unit_orders() {
 			 				order_unit->start_of_orders,2);
 	}
 }
+
 
 void
 orders_for_unit(int i, unit *u) {
@@ -1927,6 +2007,7 @@ orders_for_unit(int i, unit *u) {
 	addregion(Rx, Ry, u->people);
 }
 
+
 void
 orders_for_temp_unit(unit *u) {
 	if (u->start_of_orders_line && u->region==Regionen) {
@@ -1950,8 +2031,9 @@ orders_for_temp_unit(unit *u) {
 	order_unit=u;
 }
 
+
 void
-long_order() {
+long_order(void) {
 	char *s, *q;
 	int i;
 
@@ -1986,15 +2068,16 @@ long_order() {
 		sprintf(warn_buf, "Einheit %s hat schon einen langen Befehl in"
 				" Zeile %d (`%s')", uid(order_unit),
 				order_unit->long_order_line, order_unit->long_order);
-		anerror(warn_buf);
+		awarning(warn_buf,1);
 	} else {
 		order_unit->long_order=strdup(order_buf);
 		order_unit->long_order_line=line_no;
 	}
 }
 
+
 void
-checknaming() {
+checknaming(void) {
 	int i;
 	char *s;
 
@@ -2033,8 +2116,9 @@ checknaming() {
 	}
 }
 
+
 void
-checkdisplay() {
+checkdisplay(void) {
 	int i;
 
 	scat(keywords[K_DISPLAY]);
@@ -2060,8 +2144,9 @@ checkdisplay() {
 	}
 }
 
+
 void
-check_leave() {
+check_leave(void) {
 	unit *t,*T=NULL;
 	int s;
 
@@ -2076,8 +2161,9 @@ check_leave() {
 	}
 }
 
+
 void
-checkenter() {
+checkenter(void) {
 	int i,n;
 	unit *u;
 
@@ -2112,6 +2198,7 @@ checkenter() {
 		order_unit->ship=-n;
 	}
 }
+
 
 int
 getaspell(char *s, char spell_typ, unit *u, int turmzauber) {
@@ -2201,6 +2288,7 @@ getaspell(char *s, char spell_typ, unit *u, int turmzauber) {
 	return 1;
 }
 
+
 void
 checkgiving(int key) {
 	char *s;
@@ -2286,7 +2374,7 @@ checkgiving(int key) {
 								qcat(potionnames[n!=1][i]);
 							}
 						} else {
-							anerror("Objekt nicht erkannt");
+							awarning("Objekt nicht erkannt",1);
 						}
 					} else {
 						if (piping) {
@@ -2332,6 +2420,7 @@ checkgiving(int key) {
 		}
 	}
 }
+
 
 void getluxuries(int cmd) {
 	char *s;
@@ -2384,8 +2473,9 @@ void getluxuries(int cmd) {
 	}
 }
 
+
 void
-checkmake() {
+checkmake(void) {
 	int i, j=0, k=0;
 	char *s;
 
@@ -2516,6 +2606,7 @@ checkmake() {
 	/* es kam ja eine Meldung - evtl. kennt ECheck das nur nicht? */
 }
 
+
 void
 checkdirections(int key) {
 	int i, count=0, x, y, sx, sy, rx, ry;
@@ -2593,8 +2684,9 @@ checkdirections(int key) {
 	}
 }
 
+
 void
-check_sabotage() {
+check_sabotage(void) {
 	if (getparam() != P_SHIP) {
 		anerror("Bislang gibt es nur SABOTIERE SCHIFF");
 		return;
@@ -2603,8 +2695,9 @@ check_sabotage() {
 	return;
 }
 
+
 void
-checkmail() {
+checkmail(void) {
 	char *s;
 
 	scat(keywords[K_MAIL]);
@@ -2631,8 +2724,9 @@ checkmail() {
 	checkstring(s, 0, NECESSARY);
 }
 
+
 void
-reserve() {
+reserve(void) {
 	char *s;
 	int i,n;
 
@@ -2680,8 +2774,9 @@ reserve() {
 	}
 }
 
+
 void
-check_ally() {
+check_ally(void) {
 	int i;
 	char *s;
 
@@ -2711,39 +2806,33 @@ check_ally() {
 	}
 }
 
+
 int
-studycost(int talent) {
+studycost(t_skills *talent) {
 	if (does_default)
 		return 0;
-	switch (talent) {
-		case SK_MAGIC:
-			if (!empiria) {
-				int i;
-				char *s=getstr();
-				i=findstr(magiegebiet,s,5);
-				if (i>=0) {
-					fprintf(ERR,"Magiegebiet '%s' gewählt",magiegebiet[i]);
-					i=geti();		/* Lerne Magie 2000 -> Lernkosten=2000 Silber */
-				} else
-					i=atoi(s);
-				if (i<100) {
-					i=200;
-					awarning("Lernkosten mit 200 Silber angenommen",2);
-				}
-				return i;
-			}
-		case SK_ALCHEMY:
-		case SK_HERBALISM:
-		case SK_TACTICS:
-			return 200;
-		case SK_SPY:
-			return 100;
+	if (talent->kosten<0) {
+		int i;
+		/* Lerne Magie [gebiet] 2000 -> Lernkosten=2000 Silber */
+		char *s=getstr();
+		i=findstr(magiegebiet,s,5);
+		if (i>=0) {
+			fprintf(ERR,"Magiegebiet '%s' gewählt",magiegebiet[i]);
+			i=geti();
+		} else
+			i=atoi(s);
+		if (i<100) {
+			i=200;
+			awarning("Lernkosten mit 200 Silber angenommen",2);
+		}
+		return i;
 	}
-	return 0;
+	return talent->kosten;
 }
 
+
 void
-check_meinung() {
+check_meinung(void) {
 	int i;
 
 	scat(keywords[K_MEINUNG]);
@@ -2758,8 +2847,9 @@ check_meinung() {
 	checkstring(getstr(),DISPLAYSIZE,POSSIBLE);
 }
 
+
 void
-check_comment() {
+check_comment(void) {
 	char *s;
 	int m;
 
@@ -2816,6 +2906,7 @@ check_comment() {
 	}
 }
 
+
 void
 check_money(bool do_move) {	/* do_move=true: vor der Bewegung, anschließend */
 	unit *u, *t;							/* Bewegung ausführen, damit das Silber bewegt wird */
@@ -2836,7 +2927,7 @@ check_money(bool do_move) {	/* do_move=true: vor der Bewegung, anschließend */
 			if (u->temp && abs(u->temp)!=42) {
 				sprintf(warn_buf, "Einheit TEMP %s wurde nicht mit "
 								"MACHE TEMP generiert", itob(u->no));
-				error(warn_buf, u->line_no, u->order);
+				Error(warn_buf, u->line_no, u->order);
 			}
 			if (u->people<0) {
 				sprintf(warn_buf,"Einheit %s hat %d Personen!", uid(u), u->people);
@@ -2949,7 +3040,7 @@ check_money(bool do_move) {	/* do_move=true: vor der Bewegung, anschließend */
 						if (t->hasmoved>1) {	/* schon bewegt! */
 							sprintf(warn_buf, "Einheit %s auf Schiff %d hat sich schon bewegt",
 									uid(t),i);
-							error(warn_buf,t->line_no,t->long_order);
+							Error(warn_buf,t->line_no,t->long_order);
 						}
 						t->hasmoved=1;
 						t->newx=x;
@@ -2974,7 +3065,7 @@ check_money(bool do_move) {	/* do_move=true: vor der Bewegung, anschließend */
 		if (u->drive) {	/* FAHRE; in u->transport steht die transportierende Einheit */
 			if (u->hasmoved) {
 				sprintf(warn_buf,"Einheit %s hat sich bereits bewegt", uid(u));
-				error(warn_buf, u->line_no, u->long_order);
+				Error(warn_buf, u->line_no, u->long_order);
 			}
 			if (u->transport==0) {
 				t=find_unit(u->drive,0);
@@ -2982,7 +3073,7 @@ check_money(bool do_move) {	/* do_move=true: vor der Bewegung, anschließend */
 				if (t && t->lives) {
 					sprintf(warn_buf,"Einheit %s fährt mit Einheit %s, "
 							"diese transportiert aber nicht",uid(u),Uid(u->drive));
-					error(warn_buf,u->line_no,u->long_order);
+					Error(warn_buf,u->line_no,u->long_order);
 				} else {	/* unbekannte Einheit -> unbekanntes Ziel */
 					u->hasmoved=1;
 					u->newx=-9999;
@@ -3002,7 +3093,7 @@ check_money(bool do_move) {	/* do_move=true: vor der Bewegung, anschließend */
 			if (t && t->lives && t->drive != u->no) {
 				sprintf(warn_buf, "Einheit %s transportiert Einheit %s, "
 						"diese fährt aber nicht",Uid(u->transport),uid(u));
-				error(warn_buf,u->line_no,u->long_order);
+				Error(warn_buf,u->line_no,u->long_order);
 			}
 		}
 
@@ -3015,8 +3106,9 @@ check_money(bool do_move) {	/* do_move=true: vor der Bewegung, anschließend */
 	}
 }
 
+
 void
-check_living() {
+check_living(void) {
 	unit *u;
 	t_region *r;
 
@@ -3041,8 +3133,9 @@ check_living() {
 	}
 }
 
+
 void
-remove_temp() {
+remove_temp(void) {
 	/* Markiert das TEMP-Flag von Einheiten der letzten Region
 	 * -> falsche TEMP-Nummern bei GIB oder so fallen auf */
 	unit *u;
@@ -3051,8 +3144,9 @@ remove_temp() {
 		u->temp=-u->temp;
 }
 
+
 void
-check_teachings() {
+check_teachings(void) {
 	teach *t;
 	unit *u;
 	int n;
@@ -3116,10 +3210,12 @@ check_teachings() {
 	}
 }
 
+
 void
 checkanorder(char *Orders) {
 	int i, x;
 	char *s;
+	t_skills *sk;
 	unit *u;
 
 	s=strchr(Orders,';');
@@ -3151,8 +3247,9 @@ checkanorder(char *Orders) {
 			else {
 				scat(keywords[K_NUMMER]);
 				i=getparam();
-				if (!(i==P_UNIT || i==P_SHIP || i==P_GEBAEUDE || i==P_CASTLE)) {
-					anerror("NUMMER SCHIFF, NUMMER BURG oder NUMMER EINHEIT");
+				if (!(i==P_UNIT || i==P_SHIP || i==P_GEBAEUDE || i==P_CASTLE
+							|| i==P_FACTION)) {
+					anerror("NUMMER SCHIFF, NUMMER BURG, NUMMER PARTEI oder NUMMER EINHEIT");
 					break;
 				}
 				Scat(parameters[i]);
@@ -3442,28 +3539,27 @@ checkanorder(char *Orders) {
 
 		case K_VERGESSE:
 			scat(keywords[K_VERGESSE]);
-			i=getskill();
-			if (i==-1)
+			sk=getskill();
+			if (!sk)
 				anerror("Talent nicht erkannt");
 			else {
-				Scat(skillnames[i]);
+				Scat(sk->name);
 			}
 			break;
 
 		case K_STUDY:
 			scat(keywords[K_STUDY]);
-			i=getskill();
-			if (i==-1)
+			sk=getskill();
+			if (!sk)
 				anerror("Talent nicht erkannt");
 			else {
-				Scat(skillnames[i]);
-				if (!empiria && i==SK_MAGIC) {
+				Scat(sk->name);
+				if (!empiria && strcasecmp(sk->name,"Magie")==0)
 					if (order_unit->people>1)
 						anerror("Magiereinheiten dürfen nur eine Person haben");
-				}
 			}
 			if (!does_default) {
-				x=studycost(i)*order_unit->people;
+				x=studycost(sk)*order_unit->people;
 				if (x) {
 					order_unit->money-=x;
 					order_unit->reserviert-=x;
@@ -3794,6 +3890,24 @@ checkanorder(char *Orders) {
 			}
 			break;
 
+		case K_SORTIERE:
+			if (empiria)
+				anerror("Befehl nicht erkannt");
+			else {
+				s=getstr();
+				if (*s) {
+					if (strncasecmp(s, "VOR", strlen(s))==0 ||
+							strncasecmp(s, "HINTER", strlen(s))==0) {
+						Scat(s);
+						i=getaunit(NECESSARY);
+						if (i==1 || i==3)	/* normale oder TEMP-Einheit: ok */
+							break;
+					}
+				}
+				anerror("SORTIERE VOR oder HINTER <einheit>");
+			}
+			break;
+
 		default:
 			anerror("Befehl nicht erkannt");
 	}
@@ -3803,8 +3917,9 @@ checkanorder(char *Orders) {
 	}
 }
 
+
 void
-readaunit() {
+readaunit(void) {
 	int i;
 	unit *u;
 
@@ -3859,8 +3974,9 @@ readaunit() {
 	}
 }
 
+
 int
-readafaction() {
+readafaction(void) {
 	int i;
 	char *s;
 
@@ -3870,8 +3986,11 @@ readafaction() {
 	if (i) {
 		bcat(i);
 		s=getstr();
-		if (s[0]==0)
-			awarning("Kein Passwort",1);
+		if (s[0]==0) {
+			anerror("Kein Passwort");
+		} else if (strcmp(s, "hier_passwort_eintragen") == 0) {
+			anerror("Nicht das korrekte Passwort eingesetzt");
+		}
 		qcat(s);
 	} else
 		anerror("Keine Parteinummer");
@@ -3880,6 +3999,7 @@ readafaction() {
 	porder();
 	return i;
 }
+
 
 void
 help(const char *s) {
@@ -3893,7 +4013,9 @@ help(const char *s) {
 			"  -rnnn	Legt Rekrutierungskosten auf nnn Silber fest\n"
 			"  -c	schreibt die Warnungen und Fehler in einer Compiler-ähnlichen Form\n"
 			"  -e	schreibt die geprüfte Datei auf stdout, Fehler nach stderr\n"
-			"  -E	schreibt die geprüfte Datei auf stdout, Fehler auch nach stdout\n"
+			"  -E	schreibt die geprüfte Datei auf stdout, Fehler nach stdout\n"
+			"  -ofile	schreibt die geprüfte Datei in die Datei 'file'\n"
+			"  -Ofile	schreibt Fehler in die Datei 'file'\n"
 			"  -h	zeigt diese kleine Hilfe an\n"
 			"  -s	verwendet stderr für Warnungen, Fehler etc., nicht stdout\n"
 			"  -p	verkürzt einige Ausgaben für piping\n"
@@ -3911,6 +4033,7 @@ help(const char *s) {
 		, s);
 }
 
+
 void
 check_options(int argc, char *argv[], char dostop, char command_line) {
 	int i;
@@ -3924,12 +4047,27 @@ check_options(int argc, char *argv[], char dostop, char command_line) {
 		) {
 			switch (argv[i][1]) {
 				case 'P':
-					if (dostop && strlen(argv[i])>2)
+					if (dostop && strlen(argv[i])>2) {
 						/* bei Optionen via "; ECHECK" nicht mehr machen */
-						path=strdup((char *)(argv[i]+2));
+						if (argv[i][2]==0) {	/* -P path */
+							i++;
+							if (argv[i])
+								path=strdup((char *)(argv[i]+2));
+							else {
+								fputs("Leere Pfad-Angabe ungültig\n",stderr);
+								exit(0);
+							}
+						} else
+							path=strdup((char *)(argv[i]+2));
+					}
 					break;
 
 				case 'v':
+					if (argv[i][2]==0) {	/* -v version */
+						i++;
+						if (!argv[i])
+							break;
+					}
 					has_version=1;
 					x=strchr(argv[i],'.');
 					if (x) {
@@ -3938,7 +4076,7 @@ check_options(int argc, char *argv[], char dostop, char command_line) {
 							*x='.';
 							x++;
 							if (show_warnings>1 && strcmp(MINVERSION,x)!=0)
-								printf("Warnung, falsche ECheck-Version: %s\n",(char *)(argv[i]+2));
+								fprintf(stderr,"Warnung, falsche ECheck-Version: %s\n",argv[i]+2);
 							break;
 						}
 					}
@@ -3962,7 +4100,14 @@ check_options(int argc, char *argv[], char dostop, char command_line) {
 					break;
 
 				case 'r':
-					rec_cost=atoi(argv[i]+2);
+					if (argv[i][2]==0) { 	/* -r nnn */
+						i++;
+						if (argv[i])
+							rec_cost=atoi(argv[i]);
+						else
+							fprintf(stderr,"Fehlende Rekrutierungskosten, auf %d gesetzt",rec_cost);
+					} else
+						rec_cost=atoi(argv[i]+2);
 					break;
 
 				case 'c':
@@ -3972,14 +4117,59 @@ check_options(int argc, char *argv[], char dostop, char command_line) {
 				case 'E':
 					if (dostop)	{ /* bei Optionen via "; ECHECK" nicht mehr machen */
 						echo_it=1;
-						use_stderr=0;
+						OUT=stdout;
+						ERR=stdout;
 					}
 					break;
 
 				case 'e':
 					if (dostop)	{ /* bei Optionen via "; ECHECK" nicht mehr machen */
 						echo_it=1;
-						use_stderr=1;
+						OUT=stdout;
+						ERR=stderr;
+					}
+					break;
+
+				case 'O':
+					if (dostop)	{ /* bei Optionen via "; ECHECK" nicht mehr machen */
+						if (argv[i][2]==0) {	/* "-o file" */
+							i++;
+							x=argv[i];
+						} else							/* "-ofile" */
+							x=argv[i]+2;
+						if (!x) {
+							fputs("Keine Datei für Fehler-Texte, stderr benutzt\n",stderr);
+							ERR=stderr;
+							break;
+						}
+						ERR=fopen(x,"w");
+						if (!ERR) {
+							fprintf(stderr,"Kann Datei '%s' nicht schreiben:\n	%s",
+									x,strerror(errno));
+							exit(0);
+						}
+					}
+					break;
+
+				case 'o':
+					if (dostop)	{ /* bei Optionen via "; ECHECK" nicht mehr machen */
+						if (argv[i][2]==0) {	/* "-o file" */
+							i++;
+							x=argv[i];
+						} else							/* "-ofile" */
+							x=argv[i]+2;
+						echo_it=1;
+						if (!x) {
+							fputs("Leere Datei für geprüfte Datei, stdout benutzt\n",stderr);
+							OUT=stdout;
+							break;
+						}
+						OUT=fopen(x,"w");
+						if (!OUT) {
+							fprintf(stderr,"Kann Datei '%s' nicht schreiben:\n	%s",
+									x,strerror(errno));
+							exit(0);
+						}
 					}
 					break;
 
@@ -3992,24 +4182,38 @@ check_options(int argc, char *argv[], char dostop, char command_line) {
 					break;
 
 				case 'w':
-					if(command_line == 1 || warnings_cl == 0) {
+					if (command_line == 1 || warnings_cl == 0) {
 						if (argv[i][2])
 							show_warnings=(char)atoi(argv[i]+2);
-						else
-							show_warnings=0;
+						else {
+							if (argv[i+1] && isdigit(*argv[i+1])) {
+								i++;
+								show_warnings=atoi(argv[i]);
+							} else
+								show_warnings=0;
+						}
 					}
-					if (command_line == 1)
-						warnings_cl = 1;
+					if (command_line==1)
+						warnings_cl=1;
 					break;
 
 				case 's':
 					if (dostop)	/* bei Optionen via "; ECHECK" nicht mehr machen */
-						use_stderr=1;
+						ERR=stderr;
 					break;
 
 				case 'n':
 					if (strlen(argv[i])>2) {
-						switch (argv[i][3]) {
+						if (argv[i][3]==0) {	/* -no xxx */
+							i++;
+							x=argv[i];
+						} else
+							x=argv[i]+3;
+						if (!x) {
+							fputs("-no ???\n",stderr);
+							break;
+						}
+						switch (*x) {
 							case 's':
 								noship=1;
 								break;
@@ -4048,6 +4252,7 @@ check_options(int argc, char *argv[], char dostop, char command_line) {
 	}
 }
 
+
 void
 parse_options(char *p, char dostop) {
 	char *argv[10], **ap=argv, *vl, argc=0;
@@ -4061,8 +4266,9 @@ parse_options(char *p, char dostop) {
 	check_options(argc, argv, dostop, 0);
 }
 
+
 void
-check_OPTION() {
+check_OPTION(void) {
 	get_order();
 	if (befehle_ende) return;
 	if (strncmp(order_buf, "From ", 5)==0) {	/* es ist eine Mail */
@@ -4091,6 +4297,7 @@ check_OPTION() {
 		} while (order_buf[0]==COMMENT_CHAR);
 }
 
+
 void
 process_order_file(int *faction_count, int *unit_count) {
 	int f=0, next=0;
@@ -4115,7 +4322,10 @@ process_order_file(int *faction_count, int *unit_count) {
 				if (Regionen)
 					remove_temp();
 				if (echo_it)
-					puts(order_buf);
+				{
+					fputs(order_buf,OUT);
+					putc('\n',OUT);
+				}
 				x=getstr();
 				if (*x) {
 					Rx=atoi(x);
@@ -4164,17 +4374,14 @@ process_order_file(int *faction_count, int *unit_count) {
 								"Warning Level %d.\n", rec_cost, show_warnings);
 				if (silberpool)
 					fputs("Silberpool", ERR);
-				if (empiria) {
-					if (silberpool)
-						fputs(" und ", ERR);
+				else if (empiria)	/* Empipria hat keinen Silberpool */
 					fputs("Empiria-Modus", ERR);
-				}
 				if (empiria || silberpool)
 					fputs(" aktiviert.", ERR);
 				fputs("\n\n", ERR);
 				if (!has_version)
-					puts("\nHinweis: es wurde keine ECheck-Version angegeben (-v"
-							MAINVERSION"."MINVERSION")\n");
+					fputs("Hinweis: es wurde keine ECheck-Version angegeben (-v"
+							MAINVERSION"."MINVERSION")\n",ERR);
 				(*faction_count)++;
 				next=0;
 				break;
@@ -4245,8 +4452,9 @@ process_order_file(int *faction_count, int *unit_count) {
 	if (igetparam(order_buf)==P_NEXT)	/* diese Zeile wurde ggf. gelesen und dann kam */
 		next=1;													/* EOF -> kein Check mehr, next=0... */
 	if (f && !next)
-		awarning("NÄCHSTER fehlt",1);
+		anerror("NÄCHSTER fehlt");
 }
+
 
 void
 addtoken(tnode *root, const char *str, int id) {
@@ -4294,19 +4502,21 @@ addtoken(tnode *root, const char *str, int id) {
 	}
 }
 
+
 void
-inittokens() {
+inittokens(void) {
 	int i, k;
 	t_item *it;
 	t_names *n;
+	t_skills *s;
 
 	for (i=0,it=itemdata; it; it=it->next,++i)
 		for (n=it->name; n; n=n->next)
 			addtoken(&tokens[UT_ITEM], n->txt, i);
 	for (i=0; i!=MAXPARAMS; ++i)
 		addtoken(&tokens[UT_PARAM], parameters[i], i);
-	for (i=0; i!=MAXSKILLS; ++i)
-		addtoken(&tokens[UT_SKILL], skillnames[i], i);
+	for (i=0, s=skilldata; s; s=s->next,++i)
+		addtoken(&tokens[UT_SKILL], s->name, i);
 	for (i=0; i!=MAXKEYWORDS; ++i)
 		addtoken(&tokens[UT_KEYWORD], keywords[i], i);
 	k=0;
@@ -4329,6 +4539,7 @@ inittokens() {
 			addtoken(&tokens[UT_POTION], potionnames[k][i], i);
 }
 
+
 int
 main(int argc, char *argv[]) {
 	int i, faction_count=0, unit_count=0;
@@ -4338,9 +4549,11 @@ main(int argc, char *argv[]) {
 #endif
 
 #if macintosh
-	argc =ccommand(&argv);  /* consolenabruf der parameter fuer macintosh
-														 added 15.6.00 chartus*/
+	argc=ccommand(&argv);  /* consolenabruf der parameter fuer macintosh
+														added 15.6.00 chartus*/
 #endif
+
+	ERR=stdout;
 
 	if (argc <= 1) {
 		help(argv[0]);
@@ -4357,19 +4570,10 @@ main(int argc, char *argv[]) {
 	if (filename) parse_options(filename,1);
 
 	readitems();
-	inittokens();
 	readspells();
+	readskills();
+	inittokens();
 	F=stdin;
-
-	if (empiria) {
-		addtoken(&tokens[UT_SKILL], skillnames[SK_SWORD], SK_SWORD);
-		addtoken(&tokens[UT_SKILL], skillnames[SK_SPEAR], SK_SPEAR);
-		addtoken(&tokens[UT_SKILL], skillnames[SK_SCHIFFSBAU], SK_SCHIFFSBAU);
-	} else {
-		addtoken(&tokens[UT_SKILL], skillnames[SK_HIEBWAFFEN], SK_HIEBWAFFEN);
-		addtoken(&tokens[UT_SKILL], skillnames[SK_STANGENWAFFEN], SK_STANGENWAFFEN);
-		addtoken(&tokens[UT_SKILL], skillnames[SK_SHIPBUILDING], SK_SHIPBUILDING);
-	}
 
 	for (i=1; i < argc; i++)
 		if (argv[i][0] != '-'
@@ -4438,3 +4642,4 @@ main(int argc, char *argv[]) {
 #endif
 	return 0;
 }
+
