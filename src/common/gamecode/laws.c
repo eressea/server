@@ -136,14 +136,17 @@ destroyfaction(faction * f)
 			while (nf) {
 				unit * u2 = nf->unit;
 #ifdef NEW_ITEMS
-			  const item * itm;
-				for (itm=u->items;itm;itm=itm->next) {
+			  item * itm = u->items;
+				while(itm){
+					const item_type * itype = itm->type;
+					item * itn = itm->next;
 					int n = itm->number;
-					if (n<=0) continue;
 					n = n * nf->number / number;
-					if (n<=0) continue;
-					i_change(&u->items, itm->type, -n);
-					i_change(&u2->items, itm->type, n);
+					if (n>0) {
+						i_change(&u->items, itype, -n);
+						i_change(&u2->items, itype, n);
+					}
+					itm = itn;
 				}
 #else
 				resource_t res;
