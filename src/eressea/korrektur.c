@@ -2623,7 +2623,7 @@ orc_conversion(void)
 				if(u->race == new_race[RC_ORC]) {
 					/* convert to either uruk or snotling */
 					if(effskill(u, SK_MAGIC) >= 1
-							|| effskill(u, SK_ALCHEMY) >= 1)
+							|| effskill(u, SK_ALCHEMY) >= 1
 						  || get_item(u, I_CHASTITY_BELT) >= u->number) {
 						u->race = new_race[RC_URUK];
 					} else {
@@ -2632,6 +2632,8 @@ orc_conversion(void)
 				}
 			}
 		}
+
+		return 0;
 }
 #endif
 
