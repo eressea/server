@@ -138,7 +138,7 @@ typedef struct castorder {
   double force;          /* Stärke des Zaubers */
   struct region *rt;     /* Zielregion des Spruchs */
   int distance;          /* Entfernung zur Zielregion */
-  char *order;           /* Befehl */
+  struct order * order;           /* Befehl */
   struct spellparameter *par;  /* für weitere Parameter */
 } castorder;
 
@@ -278,7 +278,7 @@ int get_combatspelllevel(const struct unit *u, int nr);
 	 *  zurückzugeben. 0 = Maximum, -1 u ist kein Magier. */
 spell *get_combatspell(const struct unit *u, int nr);
 	/*	gibt den Kampfzauber nr [pre/kampf/post] oder NULL zurück */
-void set_combatspell(struct unit *u, spell *sp, const char * cmd, int level);
+void set_combatspell(struct unit *u, spell *sp, struct order * ord, int level);
 	/* 	setzt Kampfzauber */
 void unset_combatspell(struct unit *u, spell *sp);
 	/* 	löscht Kampfzauber */
@@ -311,14 +311,14 @@ int change_maxspellpoints(struct unit * u, int csp);
    /* verändert die maximalen Magiepunkte einer Einheit */
 
 /* Zaubern */
-extern double spellpower(struct region *r, struct unit *u, spell *spruch, int cast_level, const char * cmd);
+extern double spellpower(struct region *r, struct unit *u, spell *spruch, int cast_level, struct order * ord);
 	/*	ermittelt die Stärke eines Spruchs */
 boolean fumble (struct region *r, struct unit *u, spell *spruch, int cast_level);
 	/*	true, wenn der Zauber misslingt, bei false gelingt der Zauber */
 
 /* */
 castorder *new_castorder(void *u, struct unit *familiar, spell *sp, struct region *r,
-		int lev, double force, int distance, char *cmd, spellparameter *p);
+		int lev, double force, int distance, struct order * ord, spellparameter *p);
 	/* Zwischenspreicher für Zauberbefehle, notwendig für Prioritäten */
 void add_castorder(castorder **cll, castorder *co);
 	/* Hänge c-order co an die letze c-order von cll an */
@@ -333,7 +333,7 @@ int spellcost(struct unit *u, spell *spruch);
 	/*	gibt die für diesen Spruch derzeit notwendigen Magiepunkte auf der
 	 *	geringstmöglichen Stufe zurück, schon um den Faktor der bereits
 	 *	zuvor gezauberten Sprüche erhöht */
-boolean cancast (struct unit *u, spell *spruch, int eff_stufe, int distance, char *cmd);
+boolean cancast (struct unit *u, spell *spruch, int eff_stufe, int distance, struct order * ord);
 	/*	true, wenn Einheit alle Komponenten des Zaubers (incl. MP) für die
 	 *	geringstmögliche Stufe hat und den Spruch beherrscht */
 void pay_spell(struct unit *u, spell *spruch, int eff_stufe, int distance);

@@ -38,7 +38,6 @@ void remove_unequipped_guarded(void);
 #include "resolve.h"
 
 void processorders(void);
-extern int count_migrants (const struct faction * f);
 #if GROWING_TREES
 extern attrib_type at_germs;
 #endif

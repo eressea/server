@@ -34,30 +34,30 @@
 #include <attributes/gm.h>
 
 /* kernel includes */
-#include "message.h"
-#include "curse.h"
-#include "spell.h"
-#include "names.h"
-#include "faction.h"
-#include "item.h"
-#include "border.h"
-#include "plane.h"
 #include "alchemy.h"
-#include "unit.h"
-#include "save.h"
-#include "magic.h"
-#include "building.h"
 #include "battle.h"
-#include "race.h"
-#include "pool.h"
-#include "region.h"
-#include "unit.h"
-#include "skill.h"
-#include "objtypes.h"
-#include "ship.h"
-#include "karma.h"
+#include "border.h"
+#include "building.h"
+#include "curse.h"
+#include "faction.h"
 #include "group.h"
+#include "item.h"
+#include "karma.h"
+#include "magic.h"
+#include "message.h"
 #include "movement.h"
+#include "names.h"
+#include "objtypes.h"
+#include "order.h"
+#include "plane.h"
+#include "pool.h"
+#include "race.h"
+#include "region.h"
+#include "save.h"
+#include "ship.h"
+#include "skill.h"
+#include "spell.h"
+#include "unit.h"
 
 /* util includes */
 #include <base36.h>
@@ -319,6 +319,7 @@ const char *keywords[MAXKEYWORDS] =
 	"MAGIEGEBIET",
 	"PIRATERIE",
 	"NEUSTART",
+	"WARTEN",
 	"GRUPPE",
 	"OPFERE",
 	"BETEN",
@@ -610,25 +611,6 @@ stripfaction (faction * f)
 	while (f->attribs) a_remove (&f->attribs, f->attribs);
 	freelist(f->ursprung);
 	funhash(f);
-}
-
-void
-stripunit(unit * u)
-{
-	free(u->name);
-	free(u->display);
-	free(u->thisorder);
-	free(u->lastorder);
-	freestrlist(u->orders);
-	freestrlist(u->botschaften);
-	if(u->skills) free(u->skills);
-	while (u->items) {
-		item * it = u->items->next;
-		u->items->next = NULL;
-		i_free(u->items);
-		u->items = it;
-	}
-	while (u->attribs) a_remove (&u->attribs, u->attribs);
 }
 
 void
@@ -1189,6 +1171,27 @@ count_all(const faction * f)
 }
 
 int
+count_migrants (const faction * f)
+{
+#ifndef NDEBUG
+  unit *u = f->units;
+  int n = 0;
+  while (u) {
+    assert(u->faction == f);
+    if (u->race != f->race && u->race != new_race[RC_ILLUSION] && u->race != new_race[RC_SPELL]
+    && !!playerrace(u->race) && !(is_cursed(u->attribs, C_SLAVE, 0)))
+    {
+      n += u->number;
+    }
+    u = u->nextF;
+  }
+  if (f->num_migrants != n)
+    log_error(("Anzahl Migranten für (%s) ist falsch: %d statt %d.\n", factionid(f), f->num_migrants, n));
+#endif
+  return f->num_migrants;
+}
+
+int
 count_maxmigrants(const faction * f)
 {
 	int x = 0;
@@ -1204,54 +1207,127 @@ count_maxmigrants(const faction * f)
 /* GET STR, I zur Eingabe von Daten liest diese aus dem Buffer, der beim ersten
  * Aufruf inititialisiert wird? */
 
-const char *
-igetstrtoken(const char * initstr)
+static const unsigned char *current_token;
+
+void
+init_tokens_str(const char * initstr)
 {
-  static const unsigned char *s;
+  current_token = (const unsigned char *)initstr;
+}
+
+void
+init_tokens(const struct order * ord)
+{
+  init_tokens_str(getcommand(ord));
+}
+
+void 
+skip_token(void)
+{
+  char quotechar = 0;
+
+  while (isspace(*current_token)) ++current_token;
+  while (*current_token) {
+    if (isspace(*current_token) && quotechar==0) {
+      return;
+    } else {
+      switch(*current_token) {
+        case '"':
+        case '\'':
+          if (*current_token==quotechar) return;
+          quotechar = *current_token;
+          break;
+        case ESCAPE_CHAR:
+          ++current_token;
+          break;
+      }
+    }
+    ++current_token;
+  }
+}
+
+void
+parse(keyword_t kword, int (*dofun)(unit *, struct order *), boolean thisorder)
+{
+  region *r;
+
+  for (r = regions; r; r = r->next) {
+    unit **up = &r->units;
+    while (*up) {
+      unit * u = *up;
+      order ** ordp = &u->orders;
+      if (thisorder) ordp = &u->thisorder;
+      while (*ordp) {
+        order * ord = *ordp;
+        if (get_keyword(ord) == kword) {
+          if (dofun(u, ord)!=0) break;
+        }
+        if (thisorder) break;
+        if (*ordp==ord) ordp=&ord->next;
+      }
+      if (*up==u) up=&u->next;
+    }
+  }
+}
+
+const char * 
+parse_token(const char ** str)
+{
   static char lbuf[DISPLAYSIZE + 1];
   char * cursor = lbuf;
   char quotechar = 0;
   boolean escape = false;
+  const unsigned char * ctoken = (const unsigned char*)*str;
 
-  if (initstr!=NULL) s = (const unsigned char*)initstr;
+  assert(ctoken);
 
-  while (isspace(*s)) ++s;
-
-  while (*s && cursor-lbuf < DISPLAYSIZE) {
+  while (isspace(*ctoken)) ++ctoken;
+  while (*ctoken && cursor-lbuf < DISPLAYSIZE) {
     if (escape) {
-      *cursor++ = *s++;
-    } else if (isspace(*s)) {
+      *cursor++ = *ctoken++;
+    } else if (isspace(*ctoken)) {
       if (quotechar==0) break;
-      *cursor++ = *s++;
-    } else if (*s=='"' || *s=='\'') {
-      if (*s==quotechar) {
-        ++s;
+      *cursor++ = *ctoken++;
+    } else if (*ctoken=='"' || *ctoken=='\'') {
+      if (*ctoken==quotechar) {
+        ++ctoken;
         break;
       } else if (quotechar==0) {
-        quotechar = *s;
-        ++s;
+        quotechar = *ctoken;
+        ++ctoken;
       } else {
-        *cursor++ = *s++;
+        *cursor++ = *ctoken++;
       }
-    } else if (*s==SPACE_REPLACEMENT) {
+    } else if (*ctoken==SPACE_REPLACEMENT) {
       *cursor++ = ' ';
-      ++s;
-    } else if (*s==ESCAPE_CHAR) {
+      ++ctoken;
+    } else if (*ctoken==ESCAPE_CHAR) {
       escape = true;
-      ++s;
+      ++ctoken;
     } else {
-      *cursor++ = *s++;
+      *cursor++ = *ctoken++;
     }
   }
 
   *cursor = '\0';
+  *str = (const char *)ctoken;
   return lbuf;
+}
+
+const char *
+igetstrtoken(const char * initstr)
+{
+  if (initstr!=NULL) {
+    init_tokens_str(initstr);
+  }
+
+  return parse_token((const char**)&current_token);
 }
 
 const char *
 getstrtoken(void)
 {
-  return igetstrtoken (0);
+  return parse_token((const char**)&current_token);
 }
 
 int
@@ -1369,18 +1445,6 @@ findkeyword(const char *s, const struct locale * lang)
 	return (keyword_t) i;
 }
 
-keyword_t
-igetkeyword (const char *s, const struct locale * lang)
-{
-	return findkeyword (igetstrtoken (s), lang);
-}
-
-keyword_t
-getkeyword (const struct locale * lang)
-{
-	return findkeyword (getstrtoken (), lang);
-}
-
 param_t
 findparam(const char *s, const struct locale * lang)
 {
@@ -1397,11 +1461,6 @@ findparam(const char *s, const struct locale * lang)
   return (param_t)i;
 }
 
-param_t
-igetparam (const char *s, const struct locale *lang)
-{
-	return findparam (igetstrtoken (s), lang);
-}
 param_t
 getparam (const struct locale * lang)
 {
@@ -1567,22 +1626,15 @@ getunit(const region * r, const faction * f)
 
   return 0;
 }
+
 /* - String Listen --------------------------------------------- */
-
-strlist *
-makestrlist (const char *s)
-{
-	strlist *S;
-	S = malloc(sizeof(strlist));
-	S->s = strdup(s);
-	S->next = NULL;
-	return S;
-}
-
 void
 addstrlist (strlist ** SP, const char *s)
 {
-	addlist(SP, makestrlist(s));
+  strlist * slist = malloc(sizeof(strlist));
+  slist->next = NULL;
+  slist->s = strdup(s);
+  addlist(SP, slist);
 }
 
 void
@@ -1796,8 +1848,8 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
 
 	assert(f->alive);
 	u_setfaction(u, f);
-	set_string(&u->thisorder, "");
-	set_string(&u->lastorder, LOC(u->faction->locale, "defaultorder"));
+	set_order(&u->thisorder, NULL);
+	set_order(&u->lastorder, default_order(f->locale));
 	u_seteffstealth(u, -1);
 	u->race = urace;
 	u->irace = urace;
@@ -2109,30 +2161,13 @@ gc_add(void * p)
 	return p;
 }
 
-const char *
-findorder(const unit * u, const char * cmd)
-{
-	strlist * o;
-	char * c;
-	for (o=u->orders;o;o=o->next) {
-		if (!strcmp(cmd, o->s)) {
-			if (o->s==cmd)
-				return cmd;
-			return o->s;
-		}
-	}
-	c = strdup(cmd);
-	gc_add(c);
-	return c;
-}
-
 void
-use_birthdayamulet(region * r, unit * magician, strlist * cmdstrings)
+use_birthdayamulet(region * r, unit * magician, order * ord)
 {
 	region *tr;
 	direction_t d;
 
-	unused(cmdstrings);
+	unused(ord);
 	unused(magician);
 
 	for(d=0;d<MAXDIRECTIONS;d++) {
@@ -2188,7 +2223,7 @@ finddirection(const char *s, const struct locale * lang)
 }
 
 static void
-init_tokens(const struct locale * lang)
+init_locale(const struct locale * lang)
 {
 	struct lstr * lnames = get_lnames(lang);
 	int i;
@@ -2283,7 +2318,7 @@ init_locales(void)
 	int l;
 	for (l=0;localenames[l];++l) {
 		const struct locale * lang = find_locale(localenames[l]);
-		if (lang) init_tokens(lang);
+		if (lang) init_locale(lang);
 	}
 }
 
@@ -2521,7 +2556,7 @@ make_undead_unit(region * r, faction * f, int n, const struct race * rc)
 	unit *u;
 
 	u = createunit(r, f, n, rc);
-	set_string(&u->lastorder, "");
+	set_order(&u->lastorder, NULL);
 	name_unit(u);
 	fset(u, UFL_ISNEW);
 	return u;
@@ -3125,7 +3160,9 @@ attrib_init(void)
 	at_register(&at_germs);
 #endif
 	at_register(&at_laen); /* required for old datafiles */
+#ifdef XECMD_MODULE
 	at_register(&at_xontormiaexpress); /* required for old datafiles */
+#endif
 #ifdef WDW_PYRAMIDSPELL
 	at_register(&at_wdwpyramid);
 #endif
@@ -3151,3 +3188,24 @@ kernel_init(void)
 		sql_init(zBuffer);
 	}
 }
+
+order *
+default_order(const struct locale * lang)
+{
+	struct orders {
+		const struct locale * lang;
+		struct order * ord;
+		struct orders * next;
+	} * defaults = NULL;
+	struct orders * olist = NULL;
+	while (olist) {
+		if (olist->lang==lang) return olist->ord;
+		olist = olist->next;
+	}
+	olist = (struct orders*)malloc(sizeof(struct orders));
+	defaults = olist;
+	olist->next = defaults;
+	olist->lang = lang;
+	return olist->ord = parse_order(locale_string(lang, "defaultorder"), lang);
+}
+

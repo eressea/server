@@ -12,18 +12,22 @@
 
 #include <config.h>
 #include <eressea.h>
-#include <faction.h>
-#include <unit.h>
-#include <item.h>
+
+#ifdef XECMD_MODULE
+#include "xecmd.h"
+
 #include <items/xerewards.h>
 
 #include "xecmd.h"
 
 /* kernel includes */
-#include <item.h>
-#include <unit.h>
-#include <region.h>
-#include <ship.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/message.h>
+#include <kernel/order.h>
+#include <kernel/region.h>
+#include <kernel/ship.h>
+#include <kernel/unit.h>
 
 /* libc includes */
 #include <base36.h>
@@ -41,37 +45,37 @@ attrib_type at_xontormiaexpress = {
 };
 
 static void
-xe_givelaen(unit *u, char *cmd)
+xe_givelaen(unit *u, struct order * ord)
 {
 	unit *u2 =getunitg(u->region, u->faction);
 
 	if(!u2) {
-		cmistake(u, strdup(cmd), 63, MSG_EVENT);
+		cmistake(u, ord, 63, MSG_EVENT);
 		return;
 	}
 	i_change(&u2->items, olditemtype[I_LAEN], 5);
 }
 
 static void
-xe_givepotion(unit *u, char *cmd)
+xe_givepotion(unit *u, struct order *ord)
 {
 	unit *u2 =getunitg(u->region, u->faction);
 
 	if(!u2) {
-		cmistake(u, strdup(cmd), 63, MSG_EVENT);
+		cmistake(u, ord, 63, MSG_EVENT);
 		return;
 	}
 	i_change(&u2->items, &it_skillpotion, 1);
 }
 
 static void
-xe_giveballon(unit *u, char *cmd)
+xe_giveballon(unit *u, struct order *ord)
 {
 	unit *u2 =getunitg(u->region, u->faction);
 	ship *sh;
 
 	if(!u2) {
-		cmistake(u, strdup(cmd), 63, MSG_EVENT);
+		cmistake(u, ord, 63, MSG_EVENT);
 		return;
 	}
 
@@ -93,24 +97,27 @@ xecmd(void)
     if(a_find(f->attribs, &at_xontormiaexpress)) {
       unit *u;
       for(u=f->units; u; u=u->nextF) {
-				strlist *S;
-				for(S=u->orders; S; S=S->next) {
-				  if(findkeyword(igetstrtoken(S->s),f->locale) == K_XE) {
-				    switch(findparam(getstrtoken(),f->locale)) {
-						case P_XEPOTION:
-							xe_givepotion(u, S->s);
-							break;
-						case P_XEBALLOON:
-							xe_giveballon(u, S->s);
-							break;
-						case P_XELAEN:
-							xe_givelaen(u, S->s);
-							break;
-						}
-					}
-			  }
+        order * ord;
+        for (ord=u->orders; ord; ord=ord->next) {
+          if (get_keyword(ord) == K_XE) {
+            init_tokens(ord);
+            skip_token();
+            switch(findparam(getstrtoken(),f->locale)) {
+              case P_XEPOTION:
+                xe_givepotion(u, ord);
+                break;
+              case P_XEBALLOON:
+                xe_giveballon(u, ord);
+                break;
+              case P_XELAEN:
+                xe_givelaen(u, ord);
+                break;
+            }
+          }
+        }
       }
     }
   }
 }
 
+#endif

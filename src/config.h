@@ -157,7 +157,7 @@ extern "C" {
 # define HAVE_ACCESS
 
 /* MSVC has _strdup */
-# define strdup(s) _strdup(s)
+# define strdup _strdup
 # define HAVE_STRDUP
 
 # define stricmp(a, b) _stricmp(a, b)

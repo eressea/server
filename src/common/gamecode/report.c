@@ -38,30 +38,30 @@
 #include "laws.h"
 
 /* kernel includes */
-#include <alchemy.h>
-#include <border.h>
-#include <build.h>
-#include <building.h>
-#include <faction.h>
-#include <group.h>
-#include <item.h>
-#include <karma.h>
-#include <magic.h>
-#include <message.h>
-#include <movement.h>
-#include <objtypes.h>
-#include <plane.h>
-#include <pool.h>
-#include <race.h>
-#include <region.h>
-#include <render.h>
-#include <reports.h>
-#include <resources.h>
-#include <save.h>
-#include <ship.h>
-#include <skill.h>
-#include <teleport.h>
-#include <unit.h>
+#include <kernel/alchemy.h>
+#include <kernel/border.h>
+#include <kernel/build.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/group.h>
+#include <kernel/item.h>
+#include <kernel/karma.h>
+#include <kernel/message.h>
+#include <kernel/movement.h>
+#include <kernel/objtypes.h>
+#include <kernel/order.h>
+#include <kernel/plane.h>
+#include <kernel/pool.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/render.h>
+#include <kernel/reports.h>
+#include <kernel/resources.h>
+#include <kernel/save.h>
+#include <kernel/ship.h>
+#include <kernel/skill.h>
+#include <kernel/teleport.h>
+#include <kernel/unit.h>
 #ifdef USE_UGROUPS
 #  include <ugroup.h>
 #endif
@@ -688,10 +688,10 @@ print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int in
 	 * bei jedem curse gesondert behandelt. */
 	if (typ == TYP_SHIP){
 		ship * sh = (ship*)obj;
-		unit * owner;
+		unit * owner  = shipowner(sh);
 		a = sh->attribs;
 		r = sh->region;
-		if((owner = shipowner(r,sh)) != NULL){
+		if((owner) != NULL){
 			if (owner->faction == viewer){
 				self = 2;
 			} else { /* steht eine person der Partei auf dem Schiff? */
@@ -1552,12 +1552,9 @@ durchreisende(FILE * F, const region * r, const faction * f)
 static void
 order_template(FILE * F, faction * f)
 {
-	strlist *S2;
-	region *r;
-	plane *pl;
-	unit *u;
-	int dh;
-	region *last = f->last?f->last:lastregion(f);
+  region *r;
+  plane *pl;
+  region *last = f->last?f->last:lastregion(f);
 
   if (quiet) {
     printf(" ZV");
@@ -1565,105 +1562,108 @@ order_template(FILE * F, faction * f)
   }
   else
     printf(" - Schreibe Zugvorlage\n");
-	rps_nowrap(F, "");
-	rnl(F);
-	rps_nowrap(F, LOC(f->locale, "nr_template"));
-	rnl(F);
-	rps_nowrap(F, "");
-	rnl(F);
+  rps_nowrap(F, "");
+  rnl(F);
+  rps_nowrap(F, LOC(f->locale, "nr_template"));
+  rnl(F);
+  rps_nowrap(F, "");
+  rnl(F);
 
-	sprintf(buf, "%s %s \"%s\"", LOC(f->locale, "ERESSEA"), factionid(f), LOC(f->locale, "enterpasswd"));
-	rps_nowrap(F, buf);
-	rnl(F);
+  sprintf(buf, "%s %s \"%s\"", LOC(f->locale, "ERESSEA"), factionid(f), LOC(f->locale, "enterpasswd"));
+  rps_nowrap(F, buf);
+  rnl(F);
 
-	dh = (f->options & Pow(O_SILBERPOOL));
+  rps_nowrap(F, "");
+  rnl(F);
+  sprintf(buf, "; ECHECK %s-w4 -r%d -v%s", (f->options & Pow(O_SILBERPOOL)) ? "-l " : "",
+    f->race->recruitcost, ECHECK_VERSION);
+  /* -v3.4: ECheck Version 3.4.x */
+  rps_nowrap(F, buf);
+  rnl(F);
 
-	rps_nowrap(F, "");
-	rnl(F);
-	sprintf(buf, "; ECHECK %s-w4 -r%d -v%s", dh ? "-l " : "",
-			f->race->recruitcost, ECHECK_VERSION);
-					/* -v3.4: ECheck Version 3.4.x */
-	rps_nowrap(F, buf);
-	rnl(F);
+  for (r = f->first?f->first:firstregion(f); r != last; r = r->next) {
+    unit *u;
 
-	for (r = f->first?f->first:firstregion(f); r != last; r = r->next) {
-		dh = 0;
-		for (u = r->units; u; u = u->next)
-			if (u->faction == f && u->race != new_race[RC_SPELL]) {
-				if (!dh) {
-					rps_nowrap(F, "");
-					rnl(F);
-					pl = getplane(r);
-					if (pl && fval(pl, PFL_NOCOORDS)) {
-						sprintf(buf, "%s; %s", LOC(f->locale, parameters[P_REGION]), rname(r, f->locale));
-					} else if (pl && pl->id != 0) {
-						sprintf(buf, "%s %d,%d,%d ; %s", LOC(f->locale, parameters[P_REGION]), region_x(r,f),
-								region_y(r,f), pl->id, rname(r, f->locale));
-					} else {
-						sprintf(buf, "%s %d,%d ; %s", LOC(f->locale, parameters[P_REGION]), region_x(r,f),
-								region_y(r,f), rname(r, f->locale));
-					}
-					rps_nowrap(F, buf);
-					rnl(F);
-					sprintf(buf,"; ECheck Lohn %d", fwage(r,f,true));
-					rps_nowrap(F, buf);
-					rnl(F);
-					rps_nowrap(F, "");
-					rnl(F);
-				}
-				dh = 1;
+    int dh = 0;
+    for (u = r->units; u; u = u->next)
+      if (u->faction == f && u->race != new_race[RC_SPELL]) {
+        order * ord;
+        if (!dh) {
+          rps_nowrap(F, "");
+          rnl(F);
+          pl = getplane(r);
+          if (pl && fval(pl, PFL_NOCOORDS)) {
+            sprintf(buf, "%s; %s", LOC(f->locale, parameters[P_REGION]), rname(r, f->locale));
+          } else if (pl && pl->id != 0) {
+            sprintf(buf, "%s %d,%d,%d ; %s", LOC(f->locale, parameters[P_REGION]), region_x(r,f),
+              region_y(r,f), pl->id, rname(r, f->locale));
+          } else {
+            sprintf(buf, "%s %d,%d ; %s", LOC(f->locale, parameters[P_REGION]), region_x(r,f),
+              region_y(r,f), rname(r, f->locale));
+          }
+          rps_nowrap(F, buf);
+          rnl(F);
+          sprintf(buf,"; ECheck Lohn %d", fwage(r,f,true));
+          rps_nowrap(F, buf);
+          rnl(F);
+          rps_nowrap(F, "");
+          rnl(F);
+        }
+        dh = 1;
 
-				sprintf(buf, "%s %s;		%s [%d,%d$", LOC(u->faction->locale, parameters[P_UNIT]),
-						unitid(u), u->name, u->number, get_money(u));
-				if (u->building != NULL && fval(u, UFL_OWNER)) {
-					building * b = u->building;
-					int cost = buildingmaintenance(b, r_silver);
+        sprintf(buf, "%s %s;		%s [%d,%d$", LOC(u->faction->locale, parameters[P_UNIT]),
+          unitid(u), u->name, u->number, get_money(u));
+        if (u->building != NULL && fval(u, UFL_OWNER)) {
+          building * b = u->building;
+          int cost = buildingmaintenance(b, r_silver);
 
-					if (cost > 0) {
-						scat(",U");
-						icat(cost);
-					}
+          if (cost > 0) {
+            scat(",U");
+            icat(cost);
+          }
 #if TODO
-					if (buildingdaten[u->building->typ].spezial != 0) {
-						scat("+");
-					}
+          if (buildingdaten[u->building->typ].spezial != 0) {
+            scat("+");
+          }
 #endif
-				} else if (u->ship) {
-					if (fval(u, UFL_OWNER))
-						scat(",S");
-					else
-						scat(",s");
-					scat(shipid(u->ship));
-				}
-				if (lifestyle(u) == 0)
-					scat(",I");
-				scat("]");
+        } else if (u->ship) {
+          if (fval(u, UFL_OWNER))
+            scat(",S");
+          else
+            scat(",s");
+          scat(shipid(u->ship));
+        }
+        if (lifestyle(u) == 0)
+          scat(",I");
+        scat("]");
 
-				rps_nowrap(F, buf);
-				rnl(F);
+        rps_nowrap(F, buf);
+        rnl(F);
 
-				for (S2 = u->orders; S2; S2 = S2->next) {
-					if(is_persistent(S2->s, u->faction->locale)) {
-						sprintf(buf, "   %s", S2->s);
-						rps_nowrap(F, buf);
-						rnl(F);
-					}
-				}
+        for (ord = u->orders; ord; ord = ord->next) {
+          if (is_persistent(ord)) {
+            strcpy(buf, "   ");
+            write_order(ord, u->faction->locale, buf+2, sizeof(buf)-2);
+            rps_nowrap(F, buf);
+            rnl(F);
+          }
+        }
 
-				/* If the lastorder begins with an @ it should have
-				 * been printed in the loop before. */
-				if(u->lastorder[0] != 0 && u->lastorder[0] != '@') {
-					sprintf(buf, "   %s", u->lastorder);
-					rps_nowrap(F, buf);
-					rnl(F);
-				}
-			}
-	}
-	rps_nowrap(F, "");
-	rnl(F);
-	sprintf(buf, LOC(f->locale, parameters[P_NEXT]));
-	rps_nowrap(F, buf);
-	rnl(F);
+        /* If the lastorder begins with an @ it should have
+        * been printed in the loop before. */
+        if (u->lastorder && !is_persistent(u->lastorder)) {
+          strcpy(buf, "   ");
+          write_order(u->lastorder, u->faction->locale, buf+2, sizeof(buf)-2);
+          rps_nowrap(F, buf);
+          rnl(F);
+        }
+      }
+  }
+  rps_nowrap(F, "");
+  rnl(F);
+  sprintf(buf, LOC(f->locale, parameters[P_NEXT]));
+  rps_nowrap(F, buf);
+  rnl(F);
 }
 
 static void
@@ -3570,6 +3570,16 @@ eval_race(struct opstack ** stack, const void * userdata)
 }
 
 static void
+eval_order(struct opstack ** stack, const void * userdata) /* order -> string */
+{
+	const faction * report = (const faction*)userdata;
+	struct order * ord = opop(stack, struct order *);
+	static char buf[256];
+	write_order(ord, report->locale, buf, sizeof(buf));
+	opush(stack, strcpy(balloc(strlen(buf)+1), buf));
+}
+
+static void
 eval_direction(struct opstack ** stack, const void * userdata)
 {
 	const faction * report = (const faction*)userdata;
@@ -3601,14 +3611,6 @@ eval_int36(struct opstack ** stack, const void * userdata)
 	unused(userdata);
 }
 
-static void
-eval_string(struct opstack ** stack, const void * userdata)
-{
-  const char * c = opop(stack, const char*);
-  opush(stack, strcpy(balloc(strlen(c)+1), c));
-  unused(userdata);
-}
-
 void
 report_init(void)
 {
@@ -3621,15 +3623,18 @@ report_init(void)
 	add_function("faction", &eval_faction);
 	add_function("ship", &eval_ship);
 	add_function("unit", &eval_unit);
-        add_function("order", &eval_string);
-        add_function("spell", &eval_spell);
 	add_function("unit.name", &eval_unitname);
 	add_function("unit.id", &eval_unitid);
 	add_function("building", &eval_building);
 	add_function("skill", &eval_skill);
+	add_function("order", &eval_order);
 	add_function("direction", &eval_direction);
 	add_function("int36", &eval_int36);
 	add_function("trail", &eval_trail);
-	register_function((pf_generic)view_neighbours, "view_neighbours");
+  add_function("spell", &eval_spell);
+
+  register_argtype("string", free, (void*(*)(void*))strdup);
+  register_argtype("order", (void(*)(void*))free_order, (void*(*)(void*))copy_order);
+  register_function((pf_generic)view_neighbours, "view_neighbours");
 	register_function((pf_generic)view_regatta, "view_regatta");
 }

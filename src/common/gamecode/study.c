@@ -33,6 +33,7 @@
 #include "magic.h"
 #include "message.h"
 #include "movement.h"
+#include "order.h"
 #include "plane.h"
 #include "pool.h"
 #include "race.h"
@@ -253,10 +254,9 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
 }
 
 static void
-teach(region * r, unit * u)
+teach(unit * u, struct order * ord)
 {
-	/* Parameter r gebraucht, um kontrollieren zu können, daß die Ziel-Unit auch
-	 * in der selben Region ist (getunit). Lehren vor lernen. */
+  region * r = u->region;
 	static char order[BUFSIZE];
 	int teaching, i, j, count, academy=0;
 	unit *u2;
@@ -290,6 +290,10 @@ teach(region * r, unit * u)
 
 	u2 = 0;
 	count = 0;
+
+  init_tokens(ord);
+  skip_token();
+
 #if TEACH_ALL
 	if (getparam(u->faction->locale)==P_ANY) {
 		unit * student = r->units;
@@ -301,8 +305,10 @@ teach(region * r, unit * u)
 		} while (sk!=NOSKILL);
 		while (teaching && student) {
 			if (student->faction == u->faction && !fval(student, UFL_HUNGER)) {
-				if (igetkeyword(student->thisorder, student->faction->locale) == K_STUDY) {
-					/* Input ist nun von student->thisorder !! */
+				if (get_keyword(student->thisorder) == K_STUDY) {
+          /* Input ist nun von student->thisorder !! */
+          init_tokens(student->thisorder);
+          skip_token();
 					sk = getskill(student->faction->locale);
 					if (sk!=NOSKILL && teachskill[0]!=NOSKILL) {
 						for (i=0;teachskill[i]!=NOSKILL;++i) if (sk==teachskill[i]) break;
@@ -318,8 +324,10 @@ teach(region * r, unit * u)
 #if TEACH_FRIENDS
 		while (teaching && student) {
 			if (student->faction != u->faction && !fval(student, UFL_HUNGER) && alliedunit(u, student->faction, HELP_GUARD)) {
-				if (igetkeyword(student->thisorder, student->faction->locale) == K_STUDY) {
+				if (get_keyword(student->thisorder) == K_STUDY) {
 					/* Input ist nun von student->thisorder !! */
+          init_tokens(student->thisorder);
+          skip_token();
 					sk = getskill(student->faction->locale);
 					if (sk != NOSKILL && eff_skill_study(u, sk, r)-TEACHDIFFERENCE >= eff_skill(student, sk, r)) {
 						teaching -= teach_unit(u, student, teaching, sk, true, &academy);
@@ -332,118 +340,126 @@ teach(region * r, unit * u)
 	}
 	else
 #endif
-	for (;;) {
-		/* Da später in der Schleife igetkeyword (u2->thisorder) verwendet wird,
-		 * muß hier wieder von vorne gelesen werden. Also merken wir uns, an
-		 * welcher Stelle wir hier waren...
-		 *
-		 * Beispiel count = 1: LEHRE 101 102 103
-		 *
-		 * LEHRE und 101 wird gelesen (und ignoriert), und dann wird
-		 * getunit die einheit 102 zurück liefern. */
+          for (;;) {
+            /* Da später tokens aus (u2->thisorder) verwendet werden,
+            * muß hier wieder von vorne gelesen werden. Also merken wir uns, an
+            * welcher Stelle wir hier waren...
+            * TODO: Optimierung wäre hier wirklich sinnvoll
+            *
+            * Beispiel count = 1: LEHRE 101 102 103
+            *
+            * LEHRE und 101 wird gelesen (und ignoriert), und dann wird
+            * getunit die einheit 102 zurück liefern. */
 
-		igetkeyword(u->thisorder, u->faction->locale);
-		for (j = count; j; j--)
-			getstrtoken();
+            init_tokens(u->thisorder);
+            skip_token();
+            for (j = count; j; j--) getstrtoken();
 
-		u2 = getunit(r, u->faction);
+            u2 = getunit(r, u->faction);
 
-		/* Falls keine Unit gefunden, abbrechen - außer es gibt überhaupt keine
-		 * Unit, dann gibt es zusätzlich noch einen Fehler */
+            /* Falls keine Unit gefunden, abbrechen - außer es gibt überhaupt keine
+            * Unit, dann gibt es zusätzlich noch einen Fehler */
 
-		if (!u2) {
+            if (!u2) {
 
-			/* Finde den string, der den Fehler verursacht hat */
+              /* Finde den string, der den Fehler verursacht hat */
 
-			igetkeyword(u->thisorder, u->faction->locale);
-			for (j = count; j; j--)
-				getstrtoken();
+              init_tokens(u->thisorder);
+              skip_token();
+              for (j = count; j; j--) getstrtoken();
 
-			s = getstrtoken();
+              s = getstrtoken();
 
-			/* Falls es keinen String gibt, ist die Liste der Einheiten zuende */
+              /* Falls es keinen String gibt, ist die Liste der Einheiten zuende */
 
-			if (!s[0])
-				return;
+              if (!s[0])
+                return;
 
-			/* Beginne die Fehlermeldung */
+              /* Beginne die Fehlermeldung */
 
-			strcpy(buf, "Die Einheit '");
+              strcpy(buf, "Die Einheit '");
 
-			if (findparam(s, u->faction->locale) == P_TEMP) {
-				/* Für: "Die Einheit 'TEMP ZET' wurde nicht gefunden" oder "Die Einheit
-				 * 'TEMP' wurde nicht gefunden" */
+              if (findparam(s, u->faction->locale) == P_TEMP) {
+                /* Für: "Die Einheit 'TEMP ZET' wurde nicht gefunden" oder "Die Einheit
+                * 'TEMP' wurde nicht gefunden" */
 
-				scat(s);
-				s = getstrtoken();
-				if (s[0])
-					scat(" ");
+                scat(s);
+                s = getstrtoken();
+                if (s[0])
+                  scat(" ");
 
-				/* Um nachher weiter einlesen zu koennen */
-				count++;
-			}
-			scat(s);
-			scat("' wurde nicht gefunden");
-			mistake(u, u->thisorder, buf, MSG_EVENT);
+                /* Um nachher weiter einlesen zu koennen */
+                count++;
+              }
+              scat(s);
+              scat("' wurde nicht gefunden");
+              mistake(u, u->thisorder, buf, MSG_EVENT);
 
-			count++;
-			continue;
-		}
-		/* Defaultorder zusammenbauen. TEMP-Einheiten werden automatisch in
-		 * ihre neuen Nummern übersetzt. */
-		strcat(order, " ");
-		strcat(order, unitid(u2));
-		set_string(&u->lastorder, order);
+              count++;
+              continue;
+            }
+            /* Defaultorder zusammenbauen. TEMP-Einheiten werden automatisch in
+            * ihre neuen Nummern übersetzt. */
+            strcat(order, " ");
+            strcat(order, unitid(u2));
+            set_order(&u->lastorder, parse_order(order, u->faction->locale));
+            free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
 
-		/* Wir müssen nun hochzählen, wieviele Einheiten wir schon abgearbeitet
-		 * haben, damit mit getstrtoken() die richtige Einheit geholt werden kann.
-		 * Falls u2 ein Alias hat, ist sie neu, und es wurde ein TEMP verwendet, um
-		 * sie zu beschreiben. */
+            /* Wir müssen nun hochzählen, wieviele Einheiten wir schon abgearbeitet
+            * haben, damit mit getstrtoken() die richtige Einheit geholt werden kann.
+            * Falls u2 ein Alias hat, ist sie neu, und es wurde ein TEMP verwendet, um
+            * sie zu beschreiben. */
 
-		count++;
-		if (ualias(u2))
-			count++;
+            count++;
+            if (ualias(u2))
+              count++;
 
-		/* this is pointless, as there currently is no way to negativly influence
-		 * a unit by teaching it. */
-		/*
-		if (!ucontact(u2, u)) {
-			sprintf(buf, "Einheit %s hat keinen Kontakt mit uns aufgenommen",
-					unitid(u2));
-			mistake(u, u->thisorder, buf, MSG_EVENT);
-			continue;
-		}
-		*/
-		i = igetkeyword(u2->thisorder, u2->faction->locale);
+            /* this is pointless, as there currently is no way to negativly influence
+            * a unit by teaching it. */
+            /*
+            if (!ucontact(u2, u)) {
+            sprintf(buf, "Einheit %s hat keinen Kontakt mit uns aufgenommen",
+            unitid(u2));
+            mistake(u, u->thisorder, buf, MSG_EVENT);
+            continue;
+            }
+            */
+            if (get_keyword(u2->thisorder) != K_STUDY) {
+              add_message(&u->faction->msgs,
+                msg_feedback(u, u->thisorder, "teach_nolearn", "student", u2));
+              continue;
+            }
+            /* Input ist nun von u2->thisorder !! */
+            init_tokens(u2->thisorder);
+            skip_token();
+            sk = getskill(u2->faction->locale);
+            if (sk == NOSKILL) {
+              add_message(&u->faction->msgs,
+                msg_feedback(u, u->thisorder, "teach_nolearn", "student", u2));
+              continue;
+            }
 
-		/* Input ist nun von u2->thisorder !! */
+            /* u is teacher, u2 is student */
+            if (eff_skill_study(u2, sk, r) > eff_skill_study(u, sk, r)-TEACHDIFFERENCE) {
+              add_message(&u->faction->msgs,
+                msg_feedback(u, u->thisorder, "teach_asgood", "student", u2));
+              continue;
+            }
+            if (sk == SK_MAGIC) {
+              /* ist der Magier schon spezialisiert, so versteht er nur noch
+              * Lehrer seines Gebietes */
+              if (find_magetype(u2) != 0
+                && find_magetype(u) != find_magetype(u2))
+              {
+                sprintf(buf, "%s versteht unsere Art von Magie nicht", unitname(u2));
+                mistake(u, u->thisorder, buf, MSG_EVENT);
+                continue;
+              }
+            }
 
-		if (i != K_STUDY || ((sk = getskill(u2->faction->locale)) == NOSKILL)) {
-			add_message(&u->faction->msgs,
-				msg_error(u, u->thisorder, "teach_nolearn", "student", u2));
-			continue;
-		}
-		/* u is teacher, u2 is student */
-		if (eff_skill_study(u2, sk, r) > eff_skill_study(u, sk, r)-TEACHDIFFERENCE) {
-			add_message(&u->faction->msgs,
-				msg_error(u, u->thisorder, "teach_asgood", "student", u2));
-			continue;
-		}
-		if (sk == SK_MAGIC) {
-			/* ist der Magier schon spezialisiert, so versteht er nur noch
-			 * Lehrer seines Gebietes */
-			if (find_magetype(u2) != 0
-				&& find_magetype(u) != find_magetype(u2))
-			{
-				sprintf(buf, "%s versteht unsere Art von Magie nicht", unitname(u2));
-				mistake(u, u->thisorder, buf, MSG_EVENT);
-				continue;
-			}
-		}
+            teaching -= teach_unit(u, u2, teaching, sk, false, &academy);
 
-		teaching -= teach_unit(u, u2, teaching, sk, false, &academy);
-
-	}
+          }
 	if (academy) {
 		academy = academy/30;
 		learn_skill(u, sk, academy/30.0/TEACHNUMBER);
@@ -474,19 +490,20 @@ learn(void)
           continue;
         }
       }
-      if (igetkeyword(u->thisorder, u->faction->locale) == K_STUDY) {
+			if (get_keyword(u->thisorder) == K_STUDY) {
         double multi = 1.0;
         attrib * a = NULL;
         teaching_info * teach = NULL;
         int money = 0;
         skill_t sk;
         int maxalchemy = 0;
+
         if (u->race == new_race[RC_INSECT] && r_insectstalled(r)
           && !is_cursed(u->attribs, C_KAELTESCHUTZ,0)) {
             continue;
           }
           if (attacked(u)) {
-            cmistake(u, findorder(u, u->thisorder), 52, MSG_PRODUCE);
+					cmistake(u, u->thisorder, 52, MSG_PRODUCE);
             continue;
           }
           if ((u->race->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
@@ -495,25 +512,27 @@ learn(void)
             continue;
           }
 
+          init_tokens(u->thisorder);
+          skip_token();
           sk = getskill(u->faction->locale);
 
           if (sk < 0) {
-            cmistake(u, findorder(u, u->thisorder), 77, MSG_EVENT);
+					cmistake(u, u->thisorder, 77, MSG_EVENT);
             continue;
           }
           if (SkillCap(sk) && SkillCap(sk) <= effskill(u, sk)) {
-            cmistake(u, findorder(u, u->thisorder), 77, MSG_EVENT);
+						cmistake(u, u->thisorder, 77, MSG_EVENT);
             continue;
           }
           /* Hack: Talente mit Malus -99 können nicht gelernt werden */
           if (u->race->bonus[sk] == -99) {
-            cmistake(u, findorder(u, u->thisorder), 77, MSG_EVENT);
+            cmistake(u, u->thisorder, 77, MSG_EVENT);
             continue;
           }
           /* snotlings können Talente nur bis T8 lernen */
           if (u->race == new_race[RC_SNOTLING]){
             if (get_level(u, sk) >= 8){
-              cmistake(u, findorder(u, u->thisorder), 308, MSG_EVENT);
+              cmistake(u, u->thisorder, 308, MSG_EVENT);
               continue;
             }
           }
@@ -544,7 +563,7 @@ learn(void)
 
           if (sk == SK_MAGIC) {
             if (u->number > 1){
-              cmistake(u, findorder(u, u->thisorder), 106, MSG_MAGIC);
+              cmistake(u, u->thisorder, 106, MSG_MAGIC);
               continue;
             }
             if (is_familiar(u)){
@@ -573,7 +592,7 @@ learn(void)
                 } else {
                   /* Es wurde kein Magiegebiet angegeben und die Partei
                   * hat noch keins gewählt. */
-                  cmistake(u, findorder(u, u->thisorder), 178, MSG_MAGIC);
+                  cmistake(u, u->thisorder, 178, MSG_MAGIC);
                   continue;
                 }
               }
@@ -581,7 +600,7 @@ learn(void)
                 /* Es wurde versucht, ein anderes Magiegebiet zu lernen
                 * als das der Partei */
                 if (u->faction->magiegebiet != 0){
-                  cmistake(u, findorder(u, u->thisorder), 179, MSG_MAGIC);
+                  cmistake(u, u->thisorder, 179, MSG_MAGIC);
                   continue;
                 } else {
                   /* Lernt zum ersten mal Magie und legt damit das
@@ -596,7 +615,7 @@ learn(void)
                 /* die Partei hat noch kein Magiegebiet gewählt. */
                 mtyp = getmagicskill();
                 if (mtyp == M_NONE){
-                  cmistake(u, findorder(u, u->thisorder), 178, MSG_MAGIC);
+                  cmistake(u, u->thisorder, 178, MSG_MAGIC);
                   continue;
                 } else {
                   /* Legt damit das Magiegebiet der Partei fest */
@@ -625,10 +644,10 @@ learn(void)
             money = min(money, studycost);
             if (p>0 && money < studycost * u->number) {
 #ifdef PARTIAL_STUDY
-              cmistake(u, findorder(u, u->thisorder), 65, MSG_EVENT);
+              cmistake(u, u->thisorder, 65, MSG_EVENT);
               multi = money / (double)(studycost * u->number);
 #else
-              cmistake(u, findorder(u, u->thisorder), 65, MSG_EVENT);
+              cmistake(u, u->thisorder, 65, MSG_EVENT);
               continue;		/* nein, Silber reicht auch so nicht */
 #endif
             }
@@ -775,16 +794,14 @@ teaching(void)
 				continue;
 			}
 
-			switch (igetkeyword(u->thisorder, u->faction->locale)) {
-
+			switch (get_keyword(u->thisorder)) {
 			case K_TEACH:
 				if (attacked(u)){
-					cmistake(u, findorder(u, u->thisorder), 52, MSG_PRODUCE);
+					cmistake(u, u->thisorder, 52, MSG_PRODUCE);
 					continue;
 				}
-				teach(r, u);
+				teach(u, u->thisorder);
 				break;
-
 			}
 		}
 	}

@@ -54,26 +54,29 @@
 
 #include <attributes/otherfaction.h>
 
-void
-spy(region * r, unit * u)
+int
+spy_cmd(unit * u, struct order * ord)
 {
   unit *target;
   int spy, observe;
   double spychance, observechance;
+  region * r = u->region;
 
+  init_tokens(ord);
+  skip_token();
   target = getunit(r, u->faction);
 
   if (!target) {
-    cmistake(u, findorder(u, u->thisorder), 63, MSG_EVENT);
-    return;
+    cmistake(u, u->thisorder, 63, MSG_EVENT);
+    return 0;
   }
   if (!can_contact(r, u, target)) {
-    cmistake(u, findorder(u, u->thisorder), 24, MSG_EVENT);
-    return;
+    cmistake(u, u->thisorder, 24, MSG_EVENT);
+    return 0;
   }
   if (eff_skill(u, SK_SPY, r) < 1) {
-    cmistake(u, findorder(u, u->thisorder), 39, MSG_EVENT);
-    return;
+    cmistake(u, u->thisorder, 39, MSG_EVENT);
+    return 0;
   }
   /* Die Grundchance für einen erfolgreichen Spionage-Versuch ist 10%.
   * Für jeden Talentpunkt, den das Spionagetalent das Tarnungstalent
@@ -93,204 +96,204 @@ spy(region * r, unit * u)
     - (effskill(u, SK_STEALTH) + eff_skill(u, SK_SPY, r)/2);
 
 #if NEWATSROI == 0
-  if (invisible(u) >= u->number &&
-    get_item(target, I_AMULET_OF_TRUE_SEEING) == 0) {
-      observe = min(observe, 0);
-    }
+  if (invisible(u) >= u->number && get_item(target, I_AMULET_OF_TRUE_SEEING) == 0) {
+    observe = min(observe, 0);
+  }
 #endif
 
-    /* Anschließend wird - unabhängig vom Erfolg - gewürfelt, ob der
-    * Spionageversuch bemerkt wurde. Die Wahrscheinlich dafür ist (100 -
-    * SpionageSpion*5 + WahrnehmungOpfer*2)%. */
-    observechance = 1.0 - (eff_skill(u, SK_SPY, r) * 0.05)
-      + (eff_skill(target, SK_OBSERVATION, r) * 0.02);
+  /* Anschließend wird - unabhängig vom Erfolg - gewürfelt, ob der
+  * Spionageversuch bemerkt wurde. Die Wahrscheinlich dafür ist (100 -
+  * SpionageSpion*5 + WahrnehmungOpfer*2)%. */
+  observechance = 1.0 - (eff_skill(u, SK_SPY, r) * 0.05)
+    + (eff_skill(target, SK_OBSERVATION, r) * 0.02);
 
-    if (chance(observechance)){
-      add_message(&target->faction->msgs, new_message(target->faction,
-        "spydetect%u:spy%u:target", observe>0?u:NULL, target));
+  if (chance(observechance)){
+    add_message(&target->faction->msgs, new_message(target->faction,
+      "spydetect%u:spy%u:target", observe>0?u:NULL, target));
+  }
+  return 0;
+}
+
+int
+setwere_cmd(unit *u, struct order * ord)
+{
+  int level = fspecial(u->faction, FS_LYCANTROPE);
+  const char *s;
+
+  if (!level) {
+    cmistake(u, ord, 311, MSG_EVENT);
+    return 0;
+  }
+
+  init_tokens(ord);
+  skip_token();
+  s = getstrtoken();
+
+  if (s == NULL || *s == '\0') {
+    if(fval(u, UFL_WERE)) {
+      cmistake(u, ord, 309, MSG_EVENT);
+    } else if(rand()%100 < 35+(level-1)*20) { /* 35, 55, 75, 95% */
+      fset(u, UFL_WERE);
+    } else {
+      cmistake(u, ord, 311, MSG_EVENT);
     }
+  } else if (findparam(s, u->faction->locale) == P_NOT) {
+    if(fval(u, UFL_WERE)) {
+      cmistake(u, ord, 310, MSG_EVENT);
+    } else if(rand()%100 < 90-level*20) {	/* 70, 50, 30, 10% */
+      freset(u, UFL_WERE);
+    } else {
+      cmistake(u, ord, 311, MSG_EVENT);
+    }
+
+  }
+
+  return 0;
 }
 
-void
-setwere(unit *u, strlist *S)
+int
+setstealth_cmd(unit * u, struct order * ord)
 {
-	int level = fspecial(u->faction,FS_LYCANTROPE);
-	const char *s;
+  const char *s;
+  char level;
+  const race * trace;
+  attrib *a;
 
-	if(!level) {
-		cmistake(u, S->s, 311, MSG_EVENT);
-		return;
-	}
+  init_tokens(ord);
+  skip_token();
+  s = getstrtoken();
 
-	s = getstrtoken();
+  /* Tarne ohne Parameter: Setzt maximale Tarnung */
 
-	if(s == NULL || *s == '\0') {
-		if(fval(u, UFL_WERE)) {
-			cmistake(u, S->s, 309, MSG_EVENT);
-		} else if(rand()%100 < 35+(level-1)*20) { /* 35, 55, 75, 95% */
-			fset(u, UFL_WERE);
-		} else {
-			cmistake(u, S->s, 311, MSG_EVENT);
-		}
-		return;
-	}
+  if (s == NULL || *s == 0) {
+    u_seteffstealth(u, -1);
+    return 0;
+  }
 
-	if(findparam(s, u->faction->locale) == P_NOT) {
-		if(fval(u, UFL_WERE)) {
-			cmistake(u, S->s, 310, MSG_EVENT);
-		} else if(rand()%100 < 90-level*20) {	/* 70, 50, 30, 10% */
-			freset(u, UFL_WERE);
-		} else {
-			cmistake(u, S->s, 311, MSG_EVENT);
-		}
+  trace = findrace(s, u->faction->locale);
+  if (trace) {
+    /* Dämonen können sich nur als andere Spielerrassen tarnen */
+    if (u->race == new_race[RC_DAEMON]) {
+      race_t allowed[] = { RC_DWARF, RC_ELF, RC_ORC, RC_GOBLIN, RC_HUMAN, 
+        RC_TROLL, RC_DAEMON, RC_INSECT, RC_HALFLING, RC_CAT, RC_AQUARIAN,
+        RC_URUK, NORACE };
+      int i;
+      for (i=0;allowed[i]!=NORACE;++i) if (new_race[allowed[i]]==trace) break;
+      if (new_race[allowed[i]]==trace) {
+        u->irace = trace;
+        if (u->race->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+          set_racename(&u->attribs, NULL);
+      }
+      return 0;
+    }
 
-		return;
-	}
+    /* Pseudodrachen können sich nur als Drachen tarnen */
+    if (u->race == new_race[RC_PSEUDODRAGON] || u->race == new_race[RC_BIRTHDAYDRAGON]) {
+      if (trace==new_race[RC_PSEUDODRAGON]||trace==new_race[RC_FIREDRAGON]||trace==new_race[RC_DRAGON]||trace==new_race[RC_WYRM]) {
+        u->irace = trace;
+        if (u->race->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+          set_racename(&u->attribs, NULL);
+      }
+      return 0;
+    }
 
-	return;
-}
+    /* Dämomen und Illusionsparteien können sich als andere race tarnen */
+    if (u->race->flags & RCF_SHAPESHIFT) {
+      if (playerrace(trace)) {
+        u->irace = trace;
+        if ((u->race->flags & RCF_SHAPESHIFTANY) && get_racename(u->attribs))
+          set_racename(&u->attribs, NULL);
+      }
+    }
+    return 0;
+  }
 
-void
-setstealth(unit * u, strlist * S)
-{
-	const char *s;
-	char level;
-	const race * trace;
-	attrib *a;
+  switch(findparam(s, u->faction->locale)) {
+  case P_FACTION:
+    /* TARNE PARTEI [NICHT|NUMMER abcd] */
+    s = getstrtoken();
+    if(!s || *s == 0) {
+      fset(u, UFL_PARTEITARNUNG);
+    } else if (findparam(s, u->faction->locale) == P_NOT) {
+      freset(u, UFL_PARTEITARNUNG);
+    } else if (findkeyword(s, u->faction->locale) == K_NUMBER) {
+      const char *s2 = getstrtoken();
+      int nr = -1;
 
-	s = getstrtoken();
-
-	/* Tarne ohne Parameter: Setzt maximale Tarnung */
-
-	if (s == NULL || *s == 0) {
-		u_seteffstealth(u, -1);
-		return;
-	}
-
-	trace = findrace(s, u->faction->locale);
-	if (trace) {
-		/* Dämonen können sich nur als andere Spielerrassen tarnen */
-		if (u->race == new_race[RC_DAEMON]) {
-			race_t allowed[] = { RC_DWARF, RC_ELF, RC_ORC, RC_GOBLIN, RC_HUMAN, 
-				RC_TROLL, RC_DAEMON, RC_INSECT, RC_HALFLING, RC_CAT, RC_AQUARIAN,
-				RC_URUK, NORACE };
-			int i;
-			for (i=0;allowed[i]!=NORACE;++i) if (new_race[allowed[i]]==trace) break;
-			if (new_race[allowed[i]]==trace) {
-				u->irace = trace;
-				if (u->race->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
-					set_racename(&u->attribs, NULL);
-			}
-			return;
-		}
-
-		/* Pseudodrachen können sich nur als Drachen tarnen */
-		if (u->race == new_race[RC_PSEUDODRAGON] || u->race == new_race[RC_BIRTHDAYDRAGON]) {
-			if (trace==new_race[RC_PSEUDODRAGON]||trace==new_race[RC_FIREDRAGON]||trace==new_race[RC_DRAGON]||trace==new_race[RC_WYRM]) {
-				u->irace = trace;
-				if (u->race->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
-					set_racename(&u->attribs, NULL);
-			}
-			return;
-		}
-
-		/* Dämomen und Illusionsparteien können sich als andere race tarnen */
-		if (u->race->flags & RCF_SHAPESHIFT) {
-			if (playerrace(trace)) {
-				u->irace = trace;
-				if ((u->race->flags & RCF_SHAPESHIFTANY) && get_racename(u->attribs))
-					set_racename(&u->attribs, NULL);
-			}
-		}
-		return;
-	}
-
-	switch(findparam(s, u->faction->locale)) {
-	case P_FACTION:
-		/* TARNE PARTEI [NICHT|NUMMER abcd] */
-		s = getstrtoken();
-		if(!s || *s == 0) {
-			fset(u, UFL_PARTEITARNUNG);
-		} else if (findparam(s, u->faction->locale) == P_NOT) {
-			freset(u, UFL_PARTEITARNUNG);
-		} else if (findkeyword(s, u->faction->locale) == K_NUMBER) {
-			const char *s2 = getstrtoken();
-			int nr = -1;
-
-			if(s2) nr = atoi36(s2);
-			if(!s2 || *s2 == 0 || nr == u->faction->no) {
-				a_removeall(&u->attribs, &at_otherfaction);
-			} else {
-				struct faction * f = findfaction(nr);
-				/* TODO: Prüfung ob Partei sichtbar */
-				if(f==NULL) {
-					cmistake(u, S->s, 66, MSG_EVENT);
-				} else {
-					attrib *a;
-					a = a_find(u->attribs, &at_otherfaction);
-					if (!a) a = a_add(&u->attribs, make_otherfaction(f));
-					else a->data.v = f;
-				}
-			}
-		} else {
-			cmistake(u, S->s, 289, MSG_EVENT);
-		}
-		break;
-	case P_ANY:
-		/* TARNE ALLES (was nicht so alles geht?) */
-		u_seteffstealth(u, -1);
-		break;
-	case P_NUMBER:
-		/* TARNE ANZAHL [NICHT] */
-		if(!fspecial(u->faction, FS_HIDDEN)) {
-			cmistake(u, S->s, 277, MSG_EVENT);
-			return;
-		}
-		s = getstrtoken();
-		if (findparam(s, u->faction->locale) == P_NOT) {
-			a = a_find(u->attribs, &at_fshidden);
-			if(a) a->data.ca[0] = 0;
-			if(a->data.i == 0) a_remove(&u->attribs, a);
-		} else {
-			a = a_find(u->attribs, &at_fshidden);
-			if(!a) a = a_add(&u->attribs, a_new(&at_fshidden));
-			a->data.ca[0] = 1;
-		}
-		break;
-	case P_ITEMS:
-		/* TARNE GEGENSTÄNDE [NICHT] */
-		if(!fspecial(u->faction, FS_HIDDEN)) {
-			cmistake(u, S->s, 277, MSG_EVENT);
-			return;
-		}
-		if (findparam(s, u->faction->locale) == P_NOT) {
-			a = a_find(u->attribs, &at_fshidden);
-			if(a) a->data.ca[1] = 0;
-			if(a->data.i == 0) a_remove(&u->attribs, a);
-		} else {
-			a = a_find(u->attribs, &at_fshidden);
-			if(!a) a = a_add(&u->attribs, a_new(&at_fshidden));
-			a->data.ca[1] = 1;
-		}
-		break;
-	case P_NOT:
-		u_seteffstealth(u, -1);
-		break;
-	default:
-		if (isdigit(s[0])) {
-			/* Tarnungslevel setzen */
-			level = (char) atoip(s);
-			if (level > effskill(u, SK_STEALTH)) {
-				sprintf(buf, "%s kann sich nicht so gut tarnen.", unitname(u));
-				mistake(u, S->s, buf, MSG_EVENT);
-				return;
-			}
-			u_seteffstealth(u, level);
-		} else if (u->race->flags & RCF_SHAPESHIFTANY) {
-			set_racename(&u->attribs, s);
-		}
-	}
-	return;
+      if(s2) nr = atoi36(s2);
+      if(!s2 || *s2 == 0 || nr == u->faction->no) {
+        a_removeall(&u->attribs, &at_otherfaction);
+      } else {
+        struct faction * f = findfaction(nr);
+        /* TODO: Prüfung ob Partei sichtbar */
+        if(f==NULL) {
+          cmistake(u, ord, 66, MSG_EVENT);
+        } else {
+          attrib *a;
+          a = a_find(u->attribs, &at_otherfaction);
+          if (!a) a = a_add(&u->attribs, make_otherfaction(f));
+          else a->data.v = f;
+        }
+      }
+    } else {
+      cmistake(u, ord, 289, MSG_EVENT);
+    }
+    break;
+  case P_ANY:
+    /* TARNE ALLES (was nicht so alles geht?) */
+    u_seteffstealth(u, -1);
+    break;
+  case P_NUMBER:
+    /* TARNE ANZAHL [NICHT] */
+    if(!fspecial(u->faction, FS_HIDDEN)) {
+      cmistake(u, ord, 277, MSG_EVENT);
+      return 0;
+    }
+    s = getstrtoken();
+    if (findparam(s, u->faction->locale) == P_NOT) {
+      a = a_find(u->attribs, &at_fshidden);
+      if(a) a->data.ca[0] = 0;
+      if(a->data.i == 0) a_remove(&u->attribs, a);
+    } else {
+      a = a_find(u->attribs, &at_fshidden);
+      if(!a) a = a_add(&u->attribs, a_new(&at_fshidden));
+      a->data.ca[0] = 1;
+    }
+    break;
+  case P_ITEMS:
+    /* TARNE GEGENSTÄNDE [NICHT] */
+    if(!fspecial(u->faction, FS_HIDDEN)) {
+      cmistake(u, ord, 277, MSG_EVENT);
+      return 0;
+    }
+    if (findparam(s, u->faction->locale) == P_NOT) {
+      a = a_find(u->attribs, &at_fshidden);
+      if(a) a->data.ca[1] = 0;
+      if(a->data.i == 0) a_remove(&u->attribs, a);
+    } else {
+      a = a_find(u->attribs, &at_fshidden);
+      if(!a) a = a_add(&u->attribs, a_new(&at_fshidden));
+      a->data.ca[1] = 1;
+    }
+    break;
+  case P_NOT:
+    u_seteffstealth(u, -1);
+    break;
+  default:
+    if (isdigit(s[0])) {
+      /* Tarnungslevel setzen */
+      level = (char) atoip(s);
+      if (level > effskill(u, SK_STEALTH)) {
+        sprintf(buf, "%s kann sich nicht so gut tarnen.", unitname(u));
+        mistake(u, ord, buf, MSG_EVENT);
+        return 0;
+      }
+      u_seteffstealth(u, level);
+    } else if (u->race->flags & RCF_SHAPESHIFTANY) {
+      set_racename(&u->attribs, s);
+    }
+  }
+  return 0;
 }
 
 static int
@@ -492,15 +495,18 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 	vset_destroy(&survivors);
 }
 
-void
-sabotage(region * r, unit * u)
+int
+sabotage_cmd(unit * u, struct order * ord)
 {
 	const char *s;
 	int i;
 	ship *sh;
 	unit *u2;
 	char buffer[DISPLAYSIZE];
+  region * r = u->region;
 
+  init_tokens(ord);
+  skip_token();
 	s = getstrtoken();
 
 	i = findparam(s, u->faction->locale);
@@ -509,10 +515,10 @@ sabotage(region * r, unit * u)
 	case P_SHIP:
 		sh = u->ship;
 		if (!sh) {
-			cmistake(u, findorder(u, u->thisorder), 144, MSG_EVENT);
-			return;
+			cmistake(u, u->thisorder, 144, MSG_EVENT);
+			return 0;
 		}
-		u2 = shipowner(r, sh);
+		u2 = shipowner(sh);
 		strcat(strcpy(buffer, shipname(sh)), sh->type->name[0]);
 		if (try_destruction(u, u2, buffer, eff_skill(u, SK_SPY, r)
 						  - crew_skill(r, u2->faction, sh, SK_OBSERVATION))) {
@@ -520,10 +526,10 @@ sabotage(region * r, unit * u)
 		}
 		break;
 	default:
-		cmistake(u, findorder(u, u->thisorder), 9, MSG_EVENT);
-		return;
+		cmistake(u, u->thisorder, 9, MSG_EVENT);
+		return 0;
 	}
 
-	return;
+	return 0;
 }
 

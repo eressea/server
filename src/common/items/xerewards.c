@@ -34,7 +34,7 @@
 #include <stdlib.h>
 
 static int
-use_skillpotion(struct unit * u, const struct item_type * itype, int amount, const char *cm)
+use_skillpotion(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
 {
 	int i;
 	for (i=0;i!=amount;++i) {
@@ -70,7 +70,7 @@ item_type it_skillpotion = {
 
 
 static int
-use_manacrystal(struct unit * u, const struct item_type * itype, int amount, const char *cm)
+use_manacrystal(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
 {
 	int i, sp = 0;
 

@@ -16,8 +16,10 @@
 extern "C" {
 #endif
 
+#ifdef INFOCMD_MODULE
 extern void init_info(void);
 extern void infocommands(void);
+#endif
 
 #ifdef __cplusplus
 }

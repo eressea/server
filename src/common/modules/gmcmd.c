@@ -27,20 +27,22 @@
 #include <faction.h>
 #include <item.h>
 #include <message.h>
+#include <order.h>
 #include <plane.h>
 #include <region.h>
 #include <terrain.h>
 #include <unit.h>
 
 /* util includes */
-#include <attrib.h>
-#include <base36.h>
-#include <event.h>
-#include <umlaut.h>
+#include <util/attrib.h>
+#include <util/base36.h>
+#include <util/event.h>
+#include <util/umlaut.h>
 
 /* libc includes */
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 /**
  ** at_permissions
@@ -132,10 +134,10 @@ make_atgmcreate(const struct item_type * itype)
 }
 
 static void
-gm_create(const tnode * tnext, const char * str, void * data, const char * cmd)
+gm_create(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
-	int i;
+  unit * u = (unit*)data;
+  int i;
 	attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 	if (permissions) permissions = (attrib*)permissions->data.v;
 	if (!permissions) return;
@@ -145,13 +147,13 @@ gm_create(const tnode * tnext, const char * str, void * data, const char * cmd)
 		const char * iname = getstrtoken();
 		const item_type * itype = finditemtype(iname, u->faction->locale);
 		if (itype==NULL) {
-			mistake(u, cmd, "Unbekannter Gegenstand.\n", 0);
+			mistake(u, ord, "Unbekannter Gegenstand.\n", 0);
 		} else {
 			attrib * a = a_find(permissions, &at_gmcreate);
 
 			while (a && a->data.v!=(void*)itype) a=a->nexttype;
 			if (a) i_change(&u->items, itype, i);
-			else mistake(u, cmd, "Diesen Gegenstand darf deine Partei nicht machen.\n", 0);
+			else mistake(u, ord, "Diesen Gegenstand darf deine Partei nicht machen.\n", 0);
 		}
 	}
 }
@@ -168,17 +170,17 @@ has_permission(const attrib * permissions, unsigned int key)
  ** requires: permission-key "gmgate"
  **/
 static void
-gm_gate(const tnode * tnext, const char * str, void * data, const char * cmd)
+gm_gate(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
-	const struct plane * p = rplane(u->region);
-	int id = atoi36(igetstrtoken(str));
+  unit * u = (unit*)data;
+  const struct plane * p = rplane(u->region);
+  int id = atoi36(igetstrtoken(str));
 	int x = rel_to_abs(p, u->faction, atoi(getstrtoken()), 0);
 	int y = rel_to_abs(p, u->faction, atoi(getstrtoken()), 1);
 	region * r = findregion(x, y);
 	building * b = findbuilding(id);
 	if (b==NULL || r==NULL || p!=rplane(b->region) || p!=rplane(r)) {
-		mistake(u, cmd, "Dieses Gebäude kann die Einheit nicht umwandeln.\n", 0);
+		mistake(u, ord, "Dieses Gebäude kann die Einheit nicht umwandeln.\n", 0);
 		return;
 	} else {
 		/* checking permissions */
@@ -201,9 +203,9 @@ gm_gate(const tnode * tnext, const char * str, void * data, const char * cmd)
  ** requires: permission-key "gmterf"
  **/
 static void
-gm_terraform(const tnode * tnext, const char * str, void * data, const char * cmd)
+gm_terraform(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
+  unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
 	int x = rel_to_abs(p, u->faction, atoi(igetstrtoken(str)), 0);
 	int y = rel_to_abs(p, u->faction, atoi(getstrtoken()), 1);
@@ -211,7 +213,7 @@ gm_terraform(const tnode * tnext, const char * str, void * data, const char * cm
 	region * r = findregion(x, y);
 	terrain_t t;
 	if (r==NULL || p!=rplane(r)) {
-		mistake(u, cmd, "Diese Region kann die Einheit nicht umwandeln.\n", 0);
+		mistake(u, ord, "Diese Region kann die Einheit nicht umwandeln.\n", 0);
 		return;
 	} else {
 		/* checking permissions */
@@ -229,9 +231,9 @@ gm_terraform(const tnode * tnext, const char * str, void * data, const char * cm
  ** requires: permission-key "gmtele"
  **/
 static void
-gm_teleport(const tnode * tnext, const char * str, void * data, const char * cmd)
+gm_teleport(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
+  unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
 	unit * to = findunit(atoi36(igetstrtoken(str)));
 	int x = rel_to_abs(p, u->faction, atoi(getstrtoken()), 0);
@@ -239,16 +241,16 @@ gm_teleport(const tnode * tnext, const char * str, void * data, const char * cmd
 	region * r = findregion(x, y);
 
 	if (r==NULL || p!=rplane(r)) {
-		mistake(u, cmd, "In diese Region kann die Einheit nicht teleportieren.\n", 0);
+		mistake(u, ord, "In diese Region kann die Einheit nicht teleportieren.\n", 0);
 	} else if (to==NULL) {
-		mistake(u, cmd, "Die Einheit wurde nicht gefunden.\n", 0);
+		mistake(u, ord, "Die Einheit wurde nicht gefunden.\n", 0);
 	} else if (rplane(to->region)!=rplane(r) && !ucontact(to, u)) {
-		mistake(u, cmd, "Die Einheit hat uns nicht kontaktiert.\n", 0);
+		mistake(u, ord, "Die Einheit hat uns nicht kontaktiert.\n", 0);
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (!permissions || !has_permission(permissions, atoi36("gmtele"))) {
-			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+			mistake(u, ord, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else move_unit(to, r, NULL);
 	}
@@ -259,18 +261,18 @@ gm_teleport(const tnode * tnext, const char * str, void * data, const char * cmd
  ** requires: permission-key "gmmsgr"
  **/
 static void
-gm_messageplane(const tnode * tnext, const char * str, void * data, const char * cmd)
+gm_messageplane(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
+  unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
 	const char * zmsg = igetstrtoken(str);
 	if (p==NULL) {
-		mistake(u, cmd, "In diese Ebene kann keine Nachricht gesandt werden.\n", 0);
+		mistake(u, ord, "In diese Ebene kann keine Nachricht gesandt werden.\n", 0);
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
-			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+			mistake(u, ord, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
 			message * msg = msg_message("msg_event", "string", strdup(zmsg));
@@ -294,16 +296,16 @@ gm_messageplane(const tnode * tnext, const char * str, void * data, const char *
 }
 
 static void
-gm_messagefaction(const tnode * tnext, const char * str, void * data, const char * cmd)
+gm_messagefaction(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
-	int n = atoi36(igetstrtoken(str));
-	faction * f = findfaction(n);
+  unit * u = (unit*)data;
+  int n = atoi36(igetstrtoken(str));
+  faction * f = findfaction(n);
 	const char * msg = getstrtoken();
 	plane * p = rplane(u->region);
 	attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 	if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
-		mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+		mistake(u, ord, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		return;
 	}
 	if (f!=NULL) {
@@ -316,7 +318,7 @@ gm_messagefaction(const tnode * tnext, const char * str, void * data, const char
 			}
 		}
 	}
-	mistake(u, cmd, "An diese Partei kann keine Nachricht gesandt werden.\n", 0);
+	mistake(u, ord, "An diese Partei kann keine Nachricht gesandt werden.\n", 0);
 }
 
 /**
@@ -324,22 +326,22 @@ gm_messagefaction(const tnode * tnext, const char * str, void * data, const char
  ** requires: permission-key "gmmsgr"
  **/
 static void
-gm_messageregion(const tnode * tnext, const char * str, void * data, const char * cmd)
+gm_messageregion(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
-	const struct plane * p = rplane(u->region);
-	int x = rel_to_abs(p, u->faction, atoi(igetstrtoken(str)), 0);
+  unit * u = (unit*)data;
+  const struct plane * p = rplane(u->region);
+  int x = rel_to_abs(p, u->faction, atoi(igetstrtoken(str)), 0);
 	int y = rel_to_abs(p, u->faction, atoi(getstrtoken()), 1);
 	const char * msg = getstrtoken();
 	region * r = findregion(x, y);
 
 	if (r==NULL || p!=rplane(r)) {
-		mistake(u, cmd, "In diese Region kann keine Nachricht gesandt werden.\n", 0);
+		mistake(u, ord, "In diese Region kann keine Nachricht gesandt werden.\n", 0);
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
-			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+			mistake(u, ord, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
 			add_message(&r->msgs, msg_message("msg_event", "string", msg));
@@ -352,21 +354,21 @@ gm_messageregion(const tnode * tnext, const char * str, void * data, const char 
  ** requires: permission-key "gmkill"
  **/
 static void
-gm_killunit(const tnode * tnext, const char * str, void * data, const char * cmd)
+gm_killunit(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
-	const struct plane * p = rplane(u->region);
-	unit * target = findunit(atoi36(igetstrtoken(str)));
+  unit * u = (unit*)data;
+  const struct plane * p = rplane(u->region);
+  unit * target = findunit(atoi36(igetstrtoken(str)));
 	const char * msg = getstrtoken();
 	region * r = target->region;
 
 	if (r==NULL || p!=rplane(r)) {
-		mistake(u, cmd, "In dieser Region kann niemand getötet werden.\n", 0);
+		mistake(u, ord, "In dieser Region kann niemand getötet werden.\n", 0);
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (!permissions || !has_permission(permissions, atoi36("gmkill"))) {
-			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+			mistake(u, ord, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
 			char * zmsg = (char*)gc_add(strdup(msg));
@@ -383,16 +385,16 @@ gm_killunit(const tnode * tnext, const char * str, void * data, const char * cmd
  ** requires: permission-key "gmmsgr"
  **/
 static void
-gm_killfaction(const tnode * tnext, const char * str, void * data, const char * cmd)
+gm_killfaction(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
-	int n = atoi36(igetstrtoken(str));
-	faction * f = findfaction(n);
+  unit * u = (unit*)data;
+  int n = atoi36(igetstrtoken(str));
+  faction * f = findfaction(n);
 	const char * msg = getstrtoken();
 	plane * p = rplane(u->region);
 	attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 	if (!permissions || !has_permission(permissions, atoi36("gmkill"))) {
-		mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+		mistake(u, ord, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		return;
 	}
 	if (f!=NULL) {
@@ -410,7 +412,7 @@ gm_killfaction(const tnode * tnext, const char * str, void * data, const char * 
 			}
 		}
 	}
-	mistake(u, cmd, "Aus dieser Partei kann niemand gelöscht werden.\n", 0);
+	mistake(u, ord, "Aus dieser Partei kann niemand gelöscht werden.\n", 0);
 }
 
 /**
@@ -418,28 +420,28 @@ gm_killfaction(const tnode * tnext, const char * str, void * data, const char * 
  ** requires: permission-key "gmmsgr"
  **/
 static void
-gm_messageunit(const tnode * tnext, const char * str, void * data, const char * cmd)
+gm_messageunit(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
-	const struct plane * p = rplane(u->region);
-	unit * target = findunit(atoi36(igetstrtoken(str)));
+  unit * u = (unit*)data;
+  const struct plane * p = rplane(u->region);
+  unit * target = findunit(atoi36(igetstrtoken(str)));
 	const char * msg = getstrtoken();
 	region * r;
 
 	if (target == NULL) {
-		cmistake(u, cmd, 63, MSG_EVENT);
+		cmistake(u, ord, 63, MSG_EVENT);
 		return;
 	}
 
 	r = target->region;
 
 	if (r==NULL || p!=rplane(r)) {
-		mistake(u, cmd, "In diese Region kann keine Nachricht gesandt werden.\n", 0);
+		mistake(u, ord, "In diese Region kann keine Nachricht gesandt werden.\n", 0);
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (!permissions || !has_permission(permissions, atoi36("gmmsgu"))) {
-			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+			mistake(u, ord, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
 			char * m = (char*)gc_add(strdup(msg));
@@ -454,24 +456,24 @@ gm_messageunit(const tnode * tnext, const char * str, void * data, const char * 
  ** requires: permission-key "gmgive"
  **/
 static void
-gm_give(const tnode * tnext, const char * str, void * data, const char * cmd)
+gm_give(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
-	unit * to = findunit(atoi36(igetstrtoken(str)));
-	int num = atoi(getstrtoken());
+  unit * u = (unit*)data;
+  unit * to = findunit(atoi36(igetstrtoken(str)));
+  int num = atoi(getstrtoken());
 	const item_type * itype = finditemtype(getstrtoken(), u->faction->locale);
 
 	if (to==NULL || rplane(to->region) != rplane(u->region)) {
 		/* unknown or in another plane */
-		mistake(u, cmd, "Die Einheit wurde nicht gefunden.\n", 0);
+		mistake(u, ord, "Die Einheit wurde nicht gefunden.\n", 0);
 	} else if (itype==NULL || i_get(u->items, itype)==0) {
 		/* unknown or not enough */
-		mistake(u, cmd, "So einen Gegenstand hat die Einheit nicht.\n", 0);
+		mistake(u, ord, "So einen Gegenstand hat die Einheit nicht.\n", 0);
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (!permissions || !has_permission(permissions, atoi36("gmgive"))) {
-			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+			mistake(u, ord, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
 			int i = i_get(u->items, itype);
@@ -489,24 +491,24 @@ gm_give(const tnode * tnext, const char * str, void * data, const char * cmd)
  ** requires: permission-key "gmtake"
  **/
 static void
-gm_take(const tnode * tnext, const char * str, void * data, const char * cmd)
+gm_take(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
-	unit * to = findunit(atoi36(igetstrtoken(str)));
-	int num = atoi(getstrtoken());
+  unit * u = (unit*)data;
+  unit * to = findunit(atoi36(igetstrtoken(str)));
+  int num = atoi(getstrtoken());
 	const item_type * itype = finditemtype(getstrtoken(), u->faction->locale);
 
 	if (to==NULL || rplane(to->region) != rplane(u->region)) {
 		/* unknown or in another plane */
-		mistake(u, cmd, "Die Einheit wurde nicht gefunden.\n", 0);
+		mistake(u, ord, "Die Einheit wurde nicht gefunden.\n", 0);
 	} else if (itype==NULL || i_get(to->items, itype)==0) {
 		/* unknown or not enough */
-		mistake(u, cmd, "So einen Gegenstand hat die Einheit nicht.\n", 0);
+		mistake(u, ord, "So einen Gegenstand hat die Einheit nicht.\n", 0);
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (!permissions || !has_permission(permissions, atoi36("gmtake"))) {
-			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+			mistake(u, ord, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
 			int i = i_get(to->items, itype);
@@ -524,27 +526,27 @@ gm_take(const tnode * tnext, const char * str, void * data, const char * cmd)
  ** requires: permission-key "gmskil"
  **/
 static void
-gm_skill(const tnode * tnext, const char * str, void * data, const char * cmd)
+gm_skill(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	unit * u = (unit*)data;
-	unit * to = findunit(atoi36(igetstrtoken(str)));
-	skill_t skill = findskill(getstrtoken(), u->faction->locale);
+  unit * u = (unit*)data;
+  unit * to = findunit(atoi36(igetstrtoken(str)));
+  skill_t skill = findskill(getstrtoken(), u->faction->locale);
 	int num = atoi(getstrtoken());
 
 	if (to==NULL || rplane(to->region) != rplane(u->region)) {
 		/* unknown or in another plane */
-		mistake(u, cmd, "Die Einheit wurde nicht gefunden.\n", 0);
+		mistake(u, ord, "Die Einheit wurde nicht gefunden.\n", 0);
 	} else if (skill==NOSKILL || skill==SK_MAGIC || skill==SK_ALCHEMY) {
 		/* unknown or not enough */
-		mistake(u, cmd, "Dieses Talent ist unbekannt, oder kann nicht erhöht werden.\n", 0);
+		mistake(u, ord, "Dieses Talent ist unbekannt, oder kann nicht erhöht werden.\n", 0);
 	} else if (num<0 || num>30) {
 		/* sanity check failed */
-		mistake(u, cmd, "Der gewählte Wert ist nicht zugelassen.\n", 0);
+		mistake(u, ord, "Der gewählte Wert ist nicht zugelassen.\n", 0);
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (!permissions || !has_permission(permissions, atoi36("gmskil"))) {
-			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+			mistake(u, ord, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
 			set_level(to, skill, num);
@@ -588,20 +590,21 @@ void
 gmcommands(void)
 {
 	region ** rp = &regions;
-	while (*rp) {
-		region * r = *rp;
-		unit **up = &r->units;
-		while (*up) {
-			unit * u = *up;
-			strlist * order;
-			for (order = u->orders; order; order = order->next)
-				if (igetkeyword(order->s, u->faction->locale) == K_GM) {
-					do_command(&g_root, u, order->s);
-				}
-			if (u==*up) up = &u->next;
-		}
-		if (*rp==r) rp = &r->next;
-	}
+  while (*rp) {
+    region * r = *rp;
+    unit **up = &r->units;
+    while (*up) {
+      unit * u = *up;
+      struct order * ord;
+      for (ord = u->orders; ord; ord = ord->next) {
+        if (get_keyword(ord) == K_GM) {
+          do_command(&g_root, u, ord);
+        }
+      }
+      if (u==*up) up = &u->next;
+    }
+    if (*rp==r) rp = &r->next;
+  }
 }
 
 #define EXTENSION 10000

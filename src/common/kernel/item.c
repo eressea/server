@@ -621,7 +621,7 @@ i_new(const item_type * itype, int size)
 #include "region.h"
 
 static boolean
-give_horses(const unit * s, const unit * d, const item_type * itype, int n, const char * cmd)
+give_horses(const unit * s, const unit * d, const item_type * itype, int n, struct order * ord)
 {
 	if (d==NULL && itype == olditemtype[I_HORSE])
 		rsethorses(s->region, rhorses(s->region) + n);
@@ -736,7 +736,7 @@ get_potion(const unit * u, potion_t p)
 	return it?it->number:0;
 }
 
-void use_birthdayamulet(region * r, unit * magician, int amount, strlist * cmdstrings);
+void use_birthdayamulet(region * r, unit * magician, int amount, struct order * ord);
 
 enum {
 	IS_RESOURCE,
@@ -812,7 +812,7 @@ destroy_curse_crystal(attrib **alist, int cast_level, int force)
 /* Kann auch von Nichtmagiern benutzt werden, erzeugt eine
  * Antimagiezone, die zwei Runden bestehen bleibt */
 static void
-use_antimagiccrystal(region * r, unit * mage, int amount, strlist * cmdstrings)
+use_antimagiccrystal(region * r, unit * mage, int amount, struct order * ord)
 {
 	int i;
 	for (i=0;i!=amount;++i) {
@@ -820,7 +820,7 @@ use_antimagiccrystal(region * r, unit * mage, int amount, strlist * cmdstrings)
     double force;
 		spell *sp = find_spellbyid(SPL_ANTIMAGICZONE);
 		attrib ** ap = &r->attribs;
-		unused(cmdstrings);
+		unused(ord);
 
 		/* Reduziert die Stärke jedes Spruchs um effect */
 		effect = sp->level; 
@@ -868,7 +868,7 @@ use_antimagiccrystal(region * r, unit * mage, int amount, strlist * cmdstrings)
 /* Kann auch von Nichtmagier benutzt werden, modifiziert Taktik für diese
  * Runde um -1 - 4 Punkte. */
 static void
-use_tacticcrystal(region * r, unit * u, int amount, strlist * cmdstrings)
+use_tacticcrystal(region * r, unit * u, int amount, struct order * ord)
 {
 	int i;
 	for (i=0;i!=amount;++i) {
@@ -880,7 +880,7 @@ use_tacticcrystal(region * r, unit * u, int amount, strlist * cmdstrings)
 		curse * c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
 			duration, effect, u->number);
 		c->data = (void*)SK_TACTICS;
-		unused(cmdstrings);
+		unused(ord);
 	}
 	use_pooled(u, u->region, R_TACTICCRYSTAL, amount);
 	add_message(&u->faction->msgs,
@@ -1353,17 +1353,16 @@ use_oldresource(region * r, const resource_type * rtype, int norders)
 }
 
 static int
-use_olditem(struct unit * user, const struct item_type * itype, int amount, const char * cmd)
+use_olditem(struct unit * user, const struct item_type * itype, int amount, struct order * ord)
 {
-	item_t it;
-	for (it=0;it!=MAXITEMS;++it) {
-		if (olditemtype[it]==itype) {
-			strlist * s = makestrlist(cmd);
-			itemdata[it].benutze_funktion(user->region, user, amount, s);
-			return 0;
-		}
-	}
-	return EUNUSABLE;
+  item_t it;
+  for (it=0;it!=MAXITEMS;++it) {
+    if (olditemtype[it]==itype) {
+      itemdata[it].benutze_funktion(user->region, user, amount, ord);
+      return 0;
+    }
+  }
+  return EUNUSABLE;
 }
 
 typedef const char* translate_t[5];
@@ -1939,7 +1938,7 @@ heal(unit * user, int effect)
 }
 
 static int
-use_healingpotion(struct unit *user, const struct potion_type *ptype, int amount, const char *cmd)
+use_healingpotion(struct unit *user, const struct potion_type *ptype, int amount, struct order * ord)
 {
 	int effect = amount * 400;
 	unit * u = user->region->units;
@@ -1954,14 +1953,14 @@ use_healingpotion(struct unit *user, const struct potion_type *ptype, int amount
 }
 
 static int
-use_warmthpotion(struct unit *u, const struct potion_type *ptype, int amount, const char *cmd)
+use_warmthpotion(struct unit *u, const struct potion_type *ptype, int amount, struct order * ord)
 {
 	assert(ptype==oldpotiontype[P_WARMTH]);
 	if (old_race(u->faction->race) == RC_INSECT) {
 		fset(u, UFL_WARMTH);
 	} else {
 		/* nur für insekten: */
-		cmistake(u, cmd, 163, MSG_EVENT);
+		cmistake(u, ord, 163, MSG_EVENT);
 		return ECUSTOM;
 	}
 	unused(ptype);
@@ -1969,15 +1968,15 @@ use_warmthpotion(struct unit *u, const struct potion_type *ptype, int amount, co
 }
 
 static int
-use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int amount, const char *cmd)
+use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int amount, struct order * ord)
 {
 	unit * target = findunit(targetno);
 	if (target==NULL || u->region!=target->region) {
-		cmistake(u, cmd, 63, MSG_EVENT);
+		cmistake(u, ord, 63, MSG_EVENT);
 		return ECUSTOM;
 	}
 	if (effskill(u, SK_STEALTH)<=effskill(target, SK_OBSERVATION)) {
-		cmistake(u, cmd, 64, MSG_EVENT);
+		cmistake(u, ord, 64, MSG_EVENT);
 		return ECUSTOM;
 	}
 	ADDMSG(&u->faction->msgs, msg_message("givedumb", 
@@ -1989,7 +1988,7 @@ use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int 
 }
 
 static int
-use_bloodpotion(struct unit *u, const struct potion_type *ptype, int amount, const char *cmd)
+use_bloodpotion(struct unit *u, const struct potion_type *ptype, int amount, struct order * ord)
 {
 	assert(ptype==oldpotiontype[P_BAUERNBLUT]);
 	unused(ptype);
@@ -2003,7 +2002,7 @@ use_bloodpotion(struct unit *u, const struct potion_type *ptype, int amount, con
 #endif
 	} else {
 		/* bekommt nicht: */
-		cmistake(u, cmd, 165, MSG_EVENT);
+		cmistake(u, ord, 165, MSG_EVENT);
 		u->race = new_race[RC_GHOUL];
 		u_setfaction(u, findfaction(MONSTER_FACTION));
 	}
@@ -2012,13 +2011,13 @@ use_bloodpotion(struct unit *u, const struct potion_type *ptype, int amount, con
 
 #include <attributes/fleechance.h>
 static int
-use_mistletoe(struct unit * user, const struct item_type * itype, int amount, const char * cmd)
+use_mistletoe(struct unit * user, const struct item_type * itype, int amount, struct order * ord)
 {
 	int mtoes = new_get_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK);
 
 	if (user->number>mtoes) {
 		ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
-			"unit item region command", user, itype->rtype, user->region, cmd));
+			"unit item region command", user, itype->rtype, user->region, ord));
 		return -1;
 	}
 	new_use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
@@ -2030,13 +2029,13 @@ use_mistletoe(struct unit * user, const struct item_type * itype, int amount, co
 }
 
 static int
-use_magicboost(struct unit * user, const struct item_type * itype, int amount, const char * cmd)
+use_magicboost(struct unit * user, const struct item_type * itype, int amount, struct order * ord)
 {
   int mtoes = new_get_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK);
   faction * f = user->faction;
   if (user->number>mtoes) {
     ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
-      "unit item region command", user, itype->rtype, user->region, cmd));
+      "unit item region command", user, itype->rtype, user->region, ord));
     return -1;
   }
   if (!is_mage(user) || find_key(f->attribs, atoi36("mbst"))!=NULL) {
@@ -2055,7 +2054,7 @@ use_magicboost(struct unit * user, const struct item_type * itype, int amount, c
 }
 
 static int
-use_snowball(struct unit * user, const struct item_type * itype, int amount, const char * cmd)
+use_snowball(struct unit * user, const struct item_type * itype, int amount, struct order * ord)
 {
   return 0;
 }

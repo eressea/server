@@ -21,6 +21,7 @@
 
 #include <config.h>
 #include "eressea.h"
+#include "spell.h"
 
 /* kernel includes */
 /* FIXME: brauchen wir die wirklich alle? */
@@ -35,6 +36,7 @@
 #include "magic.h"
 #include "message.h"
 #include "objtypes.h"
+#include "order.h"
 #include "plane.h"
 #include "pool.h"
 #include "race.h"
@@ -46,8 +48,6 @@
 #include "teleport.h"
 #include "terrain.h"
 #include "unit.h"
-
-#include "spell.h"
 
 /* spells includes */
 #include <spells/alp.h>
@@ -116,9 +116,9 @@ report_failure(unit * mage, const strarray * sa) {
 }
 #else
 void
-report_failure(unit * mage, const char * sa) {
+report_failure(unit * mage, struct order * ord) {
 	/* Fehler: "Der Zauber schlägt fehl" */
-	cmistake(mage, strdup(sa), 180, MSG_MAGIC);
+	cmistake(mage, ord, 180, MSG_MAGIC);
 }
 #endif
 
@@ -587,7 +587,7 @@ sp_summon_familiar(castorder *co)
 	int dh, dh1;
 	direction_t d;
 	if (get_familiar(mage) != NULL ) {
-		cmistake(mage, strdup(co->order), 199, MSG_MAGIC);
+		cmistake(mage, co->order, 199, MSG_MAGIC);
 		return 0;
 	}
 	rc = select_familiar(mage->faction->race, mage->faction->magiegebiet);
@@ -596,7 +596,7 @@ sp_summon_familiar(castorder *co)
 		int coasts = is_coastregion(r);
 
 		if (coasts == 0) {
-			cmistake(mage, strdup(co->order), 229, MSG_MAGIC);
+			cmistake(mage, co->order, 229, MSG_MAGIC);
 			return 0;
 		}
 
@@ -740,11 +740,11 @@ sp_destroy_magic(castorder *co)
 	if (succ) {
 		ADDMSG(&mage->faction->msgs, msg_message(
 			"destroy_magic_effect", "unit region command succ target",
-			mage, mage->region, strdup(co->order), succ, strdup(ts)));
+			mage, mage->region, co->order, succ, strdup(ts)));
 	} else {
 		ADDMSG(&mage->faction->msgs, msg_message(
 			"destroy_magic_noeffect", "unit region command",
-			mage, mage->region, strdup(co->order)));
+			mage, mage->region, co->order));
 	}
 
 	return max(succ, 1);
@@ -793,14 +793,14 @@ sp_transferaura(castorder *co)
 
 	if(aura < 2) {
 /*		"Auraangabe fehlerhaft." */
-		cmistake(mage, strdup(co->order), 208, MSG_MAGIC);
+		cmistake(mage, co->order, 208, MSG_MAGIC);
 		return 0;
 	}
 
 	if(get_mage(mage)->magietyp != M_ASTRAL) {
 		if (!get_mage(u) || get_mage(u)->magietyp != get_mage(mage)->magietyp) {
 /*			"Zu dieser Einheit kann ich keine Aura übertragen." */
-			cmistake(mage, strdup(co->order), 207, MSG_MAGIC);
+			cmistake(mage, co->order, 207, MSG_MAGIC);
 			return 0;
 		}
 		gain = min(aura,get_mage(mage)->spellpoints)/2;
@@ -808,7 +808,7 @@ sp_transferaura(castorder *co)
 	} else {
 		if (!get_mage(u)) {
 /*			"Zu dieser Einheit kann ich keine Aura übertragen."); */
-			cmistake(mage, strdup(co->order), 207, MSG_MAGIC);
+			cmistake(mage, co->order, 207, MSG_MAGIC);
 			return 0;
 		}
 		if(get_mage(u)->magietyp == get_mage(mage)->magietyp) {
@@ -907,7 +907,7 @@ sp_magicstreet(castorder *co)
   unit *mage = (unit *)co->magician;
 
   if (!landregion(rterrain(r))) {
-    cmistake(mage, strdup(co->order), 186, MSG_MAGIC);
+    cmistake(mage, co->order, 186, MSG_MAGIC);
     return 0;
   }
 
@@ -955,7 +955,7 @@ sp_summonent(castorder *co)
 #else
 	if (rtrees(r) == 0) {
 #endif
-		cmistake(mage, strdup(co->order), 204, MSG_EVENT);
+		cmistake(mage, co->order, 204, MSG_EVENT);
 		/* nicht ohne bäume */
     return 0;
 	}
@@ -1018,17 +1018,14 @@ sp_blessstonecircle(castorder *co)
 	b = p->param[0]->data.b;
 
 	if(b->type != bt_find("stonecircle")) {
-		sprintf(buf, "%s in %s: 'ZAUBER %s': %s ist kein Steinkreis.",
-			unitname(mage), regionid(mage->region), co->order, buildingname(b));
-		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+		sprintf(buf, "%s ist kein Steinkreis.", buildingname(b));
+		mistake(mage, co->order, buf, MSG_MAGIC);
 		return 0;
 	}
 
 	if(b->size < b->type->maxsize) {
-		sprintf(buf, "%s in %s: 'ZAUBER %s': %s muss vor der Weihe "
-			"fertiggestellt sein.", unitname(mage), regionid(mage->region),
-			co->order, buildingname(b));
-		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+    sprintf(buf, "%s muss vor der Weihe  fertiggestellt sein.", buildingname(b));
+    mistake(mage, co->order, buf, MSG_MAGIC);
 		return 0;
 	}
 
@@ -1065,7 +1062,7 @@ sp_maelstrom(castorder *co)
 	int duration = (int)power+1;
 
 	if(rterrain(r) != T_OCEAN) {
-		cmistake(mage, strdup(co->order), 205, MSG_MAGIC);
+		cmistake(mage, co->order, 205, MSG_MAGIC);
 		/* nur auf ozean */
 		return 0;
 	}
@@ -1105,11 +1102,11 @@ sp_mallorn(castorder *co)
 	unit *mage = (unit *)co->magician;
 
 	if(!landregion(rterrain(r))) {
-		cmistake(mage, strdup(co->order), 290, MSG_MAGIC);
+		cmistake(mage, co->order, 290, MSG_MAGIC);
 		return 0;
 	}
 	if(fval(r, RF_MALLORN)) {
-		cmistake(mage, strdup(co->order), 291, MSG_MAGIC);
+		cmistake(mage, co->order, 291, MSG_MAGIC);
 		return 0;
 	}
 
@@ -1190,11 +1187,11 @@ sp_hain(castorder *co)
 	double force = co->force;
 
 	if(!r->land) {
-		cmistake(mage, strdup(co->order), 296, MSG_MAGIC);
+		cmistake(mage, co->order, 296, MSG_MAGIC);
 		return 0;
 	}
 	if (fval(r, RF_MALLORN)) {
-		cmistake(mage, strdup(co->order), 92, MSG_MAGIC);
+		cmistake(mage, co->order, 92, MSG_MAGIC);
 		return 0;
 	}
 
@@ -1237,11 +1234,11 @@ sp_mallornhain(castorder *co)
 	double force = co->force;
 
 	if(!r->land) {
-		cmistake(mage, strdup(co->order), 296, MSG_MAGIC);
+		cmistake(mage, co->order, 296, MSG_MAGIC);
 		return 0;
 	}
 	if (!fval(r, RF_MALLORN)) {
-		cmistake(mage, strdup(co->order), 91, MSG_MAGIC);
+		cmistake(mage, co->order, 91, MSG_MAGIC);
 		return 0;
 	}
 
@@ -1273,7 +1270,7 @@ patzer_ents(castorder *co)
 	double force = co->force;
 
 	if(!r->land) {
-		cmistake(mage, strdup(co->order), 296, MSG_MAGIC);
+		cmistake(mage, co->order, 296, MSG_MAGIC);
 		return;
 	}
 
@@ -1284,7 +1281,7 @@ patzer_ents(castorder *co)
 	/* 'Erfolg' melden */
 	ADDMSG(&mage->faction->msgs, msg_message(
 				"regionmagic_patzer", "unit region command unit", mage,
-				mage->region, strdup(co->order), mage));
+				mage->region, co->order, mage));
 
 	/* melden, 1x pro Partei */
 	{
@@ -1542,7 +1539,7 @@ sp_create_irongolem(castorder *co)
   if (number<1) number = 1;
 
   if (rterrain(r) == T_SWAMP){
-		cmistake(mage, strdup(co->order), 188, MSG_MAGIC);
+		cmistake(mage, co->order, 188, MSG_MAGIC);
 		return 0;
 	}
 
@@ -1559,7 +1556,7 @@ sp_create_irongolem(castorder *co)
 
 	ADDMSG(&mage->faction->msgs,
 		msg_message("magiccreate_effect", "region command unit amount object",
-		mage->region, strdup(co->order), mage, number,
+		mage->region, co->order, mage, number,
 		LOC(mage->faction->locale, rc_name(new_race[RC_IRONGOLEM], 1))));
 
 	return cast_level;
@@ -1604,7 +1601,7 @@ sp_create_stonegolem(castorder *co)
   if (number<1) number = 1;
 
 	if (rterrain(r) == T_SWAMP){
-		cmistake(mage, strdup(co->order), 188, MSG_MAGIC);
+		cmistake(mage, co->order, 188, MSG_MAGIC);
 		return 0;
 	}
 
@@ -1620,7 +1617,7 @@ sp_create_stonegolem(castorder *co)
 
 	ADDMSG(&mage->faction->msgs,
 		msg_message("magiccreate_effect", "region command unit amount object",
-		mage->region, strdup(co->order), mage, number,
+		mage->region, co->order, mage, number,
 		LOC(mage->faction->locale, rc_name(new_race[RC_STONEGOLEM], 1))));
 
 	return cast_level;
@@ -1668,7 +1665,7 @@ sp_great_drought(castorder *co)
 	int duration = 2;
 
 	if(rterrain(r) == T_OCEAN ) {
-		cmistake(mage, strdup(co->order), 189, MSG_MAGIC);
+		cmistake(mage, co->order, 189, MSG_MAGIC);
 		/* TODO: vielleicht einen netten Patzer hier? */
 		return 0;
 	}
@@ -1810,18 +1807,18 @@ sp_treewalkenter(castorder *co)
   int erfolg = 0;
 
   if (getplane(r) != 0) {
-    cmistake(mage, strdup(co->order), 190, MSG_MAGIC);
+    cmistake(mage, co->order, 190, MSG_MAGIC);
     return 0;
   }
 
   if (!r_isforest(r)) {
-    cmistake(mage, strdup(co->order), 191, MSG_MAGIC);
+    cmistake(mage, co->order, 191, MSG_MAGIC);
     return 0;
   }
 
   rt = r_standard_to_astral(r);
   if(!rt || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
-    cmistake(mage, strdup(co->order), 192, MSG_MAGIC);
+    cmistake(mage, co->order, 192, MSG_MAGIC);
     return 0;
   }
 
@@ -1839,12 +1836,12 @@ sp_treewalkenter(castorder *co)
     }
 
     if (!ucontact(u, mage)) {
-      cmistake(mage, strdup(co->order), 73, MSG_MAGIC);
+      cmistake(mage, co->order, 73, MSG_MAGIC);
     } else {
       int w;
       
       if (!can_survive(u, rt)) {
-        cmistake(mage, strdup(co->order), 231, MSG_MAGIC);
+        cmistake(mage, co->order, 231, MSG_MAGIC);
         continue;
       }
 
@@ -1901,11 +1898,11 @@ sp_treewalkexit(castorder *co)
   int cast_level = co->level;
 
   if(getplane(r) != get_astralplane()) {
-    cmistake(mage, strdup(co->order), 193, MSG_MAGIC);
+    cmistake(mage, co->order, 193, MSG_MAGIC);
     return 0;
   }
   if(is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
-    cmistake(mage, strdup(co->order), 192, MSG_MAGIC);
+    cmistake(mage, co->order, 192, MSG_MAGIC);
     return 0;
   }
 
@@ -1937,12 +1934,12 @@ sp_treewalkexit(castorder *co)
   free_regionlist(rl);
 
   if(!rt) {
-    cmistake(mage, strdup(co->order), 195, MSG_MAGIC);
+    cmistake(mage, co->order, 195, MSG_MAGIC);
     return 0;
   }
 
   if (!r_isforest(rt)) {
-    cmistake(mage, strdup(co->order), 196, MSG_MAGIC);
+    cmistake(mage, co->order, 196, MSG_MAGIC);
     return 0;
   }
 
@@ -1960,7 +1957,7 @@ sp_treewalkexit(castorder *co)
     } else {
       int w = weight(u);
       if(!can_survive(u, rt)) {
-        cmistake(mage, strdup(co->order), 231, MSG_MAGIC);
+        cmistake(mage, co->order, 231, MSG_MAGIC);
       } else if(remaining_cap - w < 0) {
         sprintf(buf, "%s ist zu schwer.", unitname(u));
         addmessage(r, mage->faction, buf,  MSG_MAGIC, ML_MISTAKE);
@@ -2080,7 +2077,7 @@ sp_homestone(castorder *co)
 	double force = co->force;
 
 	if(!mage->building || mage->building->type != bt_find("castle")){
-		cmistake(mage, strdup(co->order), 197, MSG_MAGIC);
+		cmistake(mage, co->order, 197, MSG_MAGIC);
 		return 0;
 	}
 
@@ -2088,7 +2085,7 @@ sp_homestone(castorder *co)
 			force*force, 1, 0, 0);
 
 	if (c==NULL) {
-		cmistake(mage, strdup(co->order), 206, MSG_MAGIC);
+		cmistake(mage, co->order, 206, MSG_MAGIC);
 		return 0;
 	}
 	curse_setflag(c, CURSE_NOAGE|CURSE_ONLYONE);
@@ -2142,7 +2139,7 @@ sp_drought(castorder *co)
 	int duration = (int)power+1;
 
 	if(rterrain(r) == T_OCEAN ) {
-		cmistake(mage, strdup(co->order), 189, MSG_MAGIC);
+		cmistake(mage, co->order, 189, MSG_MAGIC);
 		/* TODO: vielleicht einen netten Patzer hier? */
 		return 0;
 	}
@@ -2466,7 +2463,6 @@ patzer_peasantmob(castorder *co)
 	attrib *a;
 	region *r;
 	unit *mage = (unit *)co->magician;
-	strlist *S;
 
 	if (mage->region->land){
 		r = mage->region;
@@ -2475,26 +2471,27 @@ patzer_peasantmob(castorder *co)
 	}
 
 	if (r->land) {
-		anteil += rand() % 4;
-		n = rpeasants(r) * anteil / 10;
-		rsetpeasants(r, rpeasants(r) - n);
-		assert(rpeasants(r) >= 0);
+	  faction * f = findfaction(MONSTER_FACTION);
+	  const struct locale * lang = f->locale;
+	  
+	  anteil += rand() % 4;
+	  n = rpeasants(r) * anteil / 10;
+	  rsetpeasants(r, rpeasants(r) - n);
+	  assert(rpeasants(r) >= 0);
 
-		u = createunit(r, findfaction(MONSTER_FACTION), n, new_race[RC_PEASANT]);
-		set_string(&u->name, "Bauernmob");
-		/* guard(u, GUARD_ALL);  hier zu früh! Befehl BEWACHE setzten */
-		sprintf(buf, "BEWACHE");
-		S = makestrlist(buf);
-		addlist(&u->orders, S);
-		set_string(&u->thisorder, LOC(u->faction->locale, "defaultorder"));
-		a = a_new(&at_unitdissolve);
-		a->data.ca[0] = 1;  /* An rpeasants(r). */
-		a->data.ca[1] = 10; /* 10% */
-		a_add(&u->attribs, a);
-		a_add(&u->attribs, make_hate(mage));
-
-		sprintf(buf, "Ein Bauernmob erhebt sich und macht Jagd auf Schwarzmagier.");
-		addmessage(r, 0, buf, MSG_MAGIC, ML_INFO);
+	  u = createunit(r, f, n, new_race[RC_PEASANT]);
+	  set_string(&u->name, "Bauernmob");
+	  /* guard(u, GUARD_ALL);  hier zu früh! Befehl BEWACHE setzten */
+	  addlist(&u->orders, parse_order(LOC(lang, keywords[K_GUARD]), lang));
+	  set_order(&u->thisorder, default_order(lang));
+	  a = a_new(&at_unitdissolve);
+	  a->data.ca[0] = 1;  /* An rpeasants(r). */
+	  a->data.ca[1] = 10; /* 10% */
+	  a_add(&u->attribs, a);
+	  a_add(&u->attribs, make_hate(mage));
+	  
+	  sprintf(buf, "Ein Bauernmob erhebt sich und macht Jagd auf Schwarzmagier.");
+	  addmessage(r, 0, buf, MSG_MAGIC, ML_INFO);
 	}
 	return;
 }
@@ -2546,7 +2543,7 @@ sp_forest_fire(castorder *co)
 #endif
 
 	if (destroyed<1) {
-		cmistake(mage, strdup(co->order), 198, MSG_MAGIC);
+		cmistake(mage, co->order, 198, MSG_MAGIC);
 		return 0;
 	}
 
@@ -2719,7 +2716,7 @@ patzer_fumblecurse(castorder *co)
 	if (c!=NULL) {
 		ADDMSG(&mage->faction->msgs, msg_message(
 			"magic_fumble", "unit region command",
-			mage, mage->region, strdup(co->order)));
+			mage, mage->region, co->order));
 		curse_setflag(c, CURSE_ONLYONE);
 	}
 	return;
@@ -2810,7 +2807,7 @@ sp_summondragon(castorder *co)
 
 	ADDMSG(&mage->faction->msgs, msg_message(
 				"summondragon", "unit region command unit region",
-				mage, mage->region, strdup(co->order),mage, co->rt));
+				mage, mage->region, co->order,mage, co->rt));
 
 	free_regionlist(rl);
 	return cast_level;
@@ -3193,7 +3190,7 @@ sp_unholypower(castorder *co)
 			target_race = new_race[RC_GHOUL_LORD];
 			break;
 		default:
-			cmistake(mage, strdup(co->order), 284, MSG_MAGIC);
+			cmistake(mage, co->order, 284, MSG_MAGIC);
 			continue;
 		}
 		/* Untote heilen nicht, darum den neuen Untoten maximale hp geben
@@ -3215,7 +3212,7 @@ sp_unholypower(castorder *co)
 			 * wäre es, eine solche Konstruktion irgendwie zu kapseln. */
 			if(fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)
 					|| is_cursed(u->attribs, C_SLAVE, 0)) {
-				cmistake(mage, strdup(co->order), 74, MSG_MAGIC);
+				cmistake(mage, co->order, 74, MSG_MAGIC);
 				continue;
 			}
 			/* Verletzungsanteil der transferierten Personen berechnen */
@@ -3401,7 +3398,7 @@ patzer_deathcloud(castorder *co)
 
 	ADDMSG(&mage->faction->msgs, msg_message(
 		"magic_fumble", "unit region command",
-		mage, mage->region, strdup(co->order)));
+		mage, mage->region, co->order));
 
 	return;
 }
@@ -3587,7 +3584,7 @@ sp_chaossuction(castorder *co)
 
 	if (getplane(r)!=get_normalplane()) {
 		/* Der Zauber funktioniert nur in der materiellen Welt. */
-		cmistake(mage, strdup(co->order), 190, MSG_MAGIC);
+		cmistake(mage, co->order, 190, MSG_MAGIC);
 		return 0;
 	}
 
@@ -3595,7 +3592,7 @@ sp_chaossuction(castorder *co)
 
 	if (rt==NULL || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
 		/* Hier gibt es keine Verbindung zur astralen Welt.*/
-		cmistake(mage, strdup(co->order), 216, MSG_MAGIC);
+		cmistake(mage, co->order, 216, MSG_MAGIC);
 		return 0;
 	}
 
@@ -3676,7 +3673,7 @@ sp_magicboost(castorder *co)
 
 	ADDMSG(&mage->faction->msgs, msg_message(
 		"magicboost_effect", "unit region command",
-		mage, mage->region, strdup(co->order)));
+		mage, mage->region, co->order));
 
 	return cast_level;
 }
@@ -3739,7 +3736,7 @@ sp_bloodsacrifice(castorder *co)
 	ADDMSG(&mage->faction->msgs,
 		msg_message("sp_bloodsacrifice_effect",
 		"unit region command amount",
-		mage, mage->region, strdup(co->order), aura));
+		mage, mage->region, co->order, aura));
 	return cast_level;
 }
 
@@ -3897,7 +3894,7 @@ sp_babbler(castorder *co)
 
 	if (target->faction == mage->faction){
 		/* Die Einheit ist eine der unsrigen */
-		cmistake(mage, strdup(co->order), 45, MSG_MAGIC);
+		cmistake(mage, co->order, 45, MSG_MAGIC);
 	}
 
 	/* Magieresistenz Unit */
@@ -4056,7 +4053,7 @@ sp_charmingsong(castorder *co)
 	/* Auf eigene Einheiten versucht zu zaubern? Garantiert Tippfehler */
 	if (target->faction == mage->faction){
 		/* Die Einheit ist eine der unsrigen */
-		cmistake(mage, strdup(co->order), 45, MSG_MAGIC);
+		cmistake(mage, co->order, 45, MSG_MAGIC);
 	}
 
 	/* Magieresistensbonus für mehr als Stufe Personen */
@@ -4096,7 +4093,7 @@ sp_charmingsong(castorder *co)
 
 	/* setze Partei um und lösche langen Befehl aus Sicherheitsgründen */
 	u_setfaction(target,mage->faction);
-	set_string(&target->thisorder, "");
+	set_order(&target->thisorder, NULL);
 
 	/* setze Parteitarnung, damit nicht sofort klar ist, wer dahinter
 	 * steckt */
@@ -4138,7 +4135,7 @@ sp_song_resistmagic(castorder *co)
 	/* Erfolg melden */
 	ADDMSG(&mage->faction->msgs, msg_message(
 				"regionmagic_effect", "unit region command unit", mage,
-				mage->region, strdup(co->order), mage));
+				mage->region, co->order, mage));
 
 	return cast_level;
 }
@@ -4168,7 +4165,7 @@ sp_song_susceptmagic(castorder *co)
 
 	ADDMSG(&mage->faction->msgs, msg_message(
 				"regionmagic_effect", "unit region command unit", mage,
-				mage->region, strdup(co->order), mage));
+				mage->region, co->order, mage));
 
 	return cast_level;
 }
@@ -4319,7 +4316,7 @@ static int
 sp_migranten(castorder *co)
 {
   unit *target;
-  strlist *S;
+  order * ord;
   int kontaktiert = 0;
   region *r = co->rt;
   unit *mage = (unit *)co->magician;
@@ -4337,11 +4334,11 @@ sp_migranten(castorder *co)
     /* u ist von unserer Art, das Ritual wäre verschwendete Aura. */
     ADDMSG(&mage->faction->msgs, msg_message(
       "sp_migranten_fail1", "unit region command target", mage,
-      mage->region, strdup(co->order), target));
+      mage->region, co->order, target));
   }
   /* Auf eigene Einheiten versucht zu zaubern? Garantiert Tippfehler */
   if (target->faction == mage->faction){
-    cmistake(mage, strdup(co->order), 45, MSG_MAGIC);
+    cmistake(mage, co->order, 45, MSG_MAGIC);
   }
 
   /* Keine Monstereinheiten */
@@ -4373,32 +4370,28 @@ sp_migranten(castorder *co)
     /* Nun kommt etwas reichlich krankes, um den
     * KONTAKTIERE-Befehl des Ziels zu überprüfen. */
 
-    for (S = target->orders; S; S = S->next) {
-      if (strncasecmp("KON", S->s, 3) == 0) {
-        char *c;
-        int kontakt = -1;
+    for (ord = target->orders; ord; ord = ord->next) {
+      if (get_keyword(ord) == K_CONTACT) {
+        const char *c;
         /* So weit, so gut. S->s ist also ein KONTAKTIERE. Nun gilt es,
         * herauszufinden, wer kontaktiert wird. Das ist nicht trivial.
         * Zuerst muß der Parameter herausoperiert werden. */
         /* Leerzeichen finden */
 
-        for (c = S->s; *c != 0; c++) {
-          if (isspace((int)*c) != 0) {
-            break;
-          }
-        }
+        init_tokens(ord);
+        skip_token();
+        c = getstrtoken();
 
         /* Wenn ein Leerzeichen da ist, ist *c != 0 und zeigt auf das
         * Leerzeichen. */
 
-        if (*c == 0) {
-          continue;
-        }
-        kontakt = atoi36(c);
+        if (c!=NULL) {
+          int kontakt = atoi36(c);
 
-        if (kontakt == mage->no) {
-          kontaktiert = 1;
-          break;
+          if (kontakt == mage->no) {
+            kontaktiert = 1;
+            break;
+          }
         }
       }
     }
@@ -4406,16 +4399,16 @@ sp_migranten(castorder *co)
 
   if (kontaktiert == 0) {
     ADDMSG(&mage->faction->msgs, msg_message("spellfail::contact",
-      "mage region order target", mage, mage->region, strdup(co->order),
+      "mage region order target", mage, mage->region, co->order,
       target));
     return 0;
   }
   u_setfaction(target,mage->faction);
-  set_string(&target->thisorder, "");
+  set_order(&target->thisorder, NULL);
 
   /* Erfolg melden */
   ADDMSG(&mage->faction->msgs, msg_message("sp_migranten", 
-    "unit region command target", mage, mage->region, strdup(co->order), target));
+    "unit region command target", mage, mage->region, co->order, target));
 
   return target->number;
 }
@@ -4553,7 +4546,7 @@ sp_recruit(castorder *co)
 
 	rsetpeasants(r, rpeasants(r) - n);
 	u = create_unit(r, f, n, f->race, 0, (n == 1 ? "Bauer" : "Bauern"), mage);
-	set_string(&u->thisorder, locale_string(u->faction->locale, "defaultorder"));
+	set_order(&u->thisorder, default_order(f->locale));
 
 	sprintf(buf, "%s konnte %d %s anwerben", unitname(mage), n,
 			n == 1 ? "Bauer" : "Bauern");
@@ -4600,7 +4593,7 @@ sp_bigrecruit(castorder *co)
 
 	rsetpeasants(r, rpeasants(r) - n);
 	u = create_unit(r, f, n, f->race, 0, (n == 1 ? "Bauer" : "Bauern"), mage);
-	set_string(&u->thisorder, locale_string(u->faction->locale, "defaultorder"));
+	set_order(&u->thisorder, default_order(f->locale));
 
 	sprintf(buf, "%s konnte %d %s anwerben", unitname(mage), n,
 			n == 1 ? "Bauer" : "Bauern");
@@ -4881,7 +4874,7 @@ sp_headache(castorder *co)
 		int change = min(10, target->number) * (rand()%2+1) / target->number;
 		reduce_skill(target, smax, change);
 	}
-	set_string(&target->thisorder, "");
+	set_order(&target->thisorder, NULL);
 
 	sprintf(buf, "%s verschafft %s einige feuchtfröhliche Stunden mit heftigen "
 		"Nachwirkungen.", unitname(mage), unitname(target));
@@ -5035,7 +5028,7 @@ sp_dragonsong(castorder *co)
 
 	ADDMSG(&mage->faction->msgs, msg_message(
 				"summondragon", "unit region command unit region",
-				mage, mage->region, strdup(co->order),mage, co->rt));
+				mage, mage->region, co->order,mage, co->rt));
 
 	free_regionlist(rl);
 	return cast_level;
@@ -5067,7 +5060,7 @@ sp_songofAttraction(castorder *co)
 
 	ADDMSG(&mage->faction->msgs, msg_message(
 				"summon", "unit region command unit region",
-				mage, mage->region, strdup(co->order),mage, r));
+				mage, mage->region, co->order,mage, r));
 
 	return cast_level;
 }
@@ -5159,7 +5152,7 @@ sp_icastle(castorder *co)
 
 	ADDMSG(&mage->faction->msgs, msg_message(
 		"icastle_create", "unit region command", mage, mage->region,
-		strdup(co->order)));
+		co->order));
 
 	addmessage(r, 0,
 		"Verwundert blicken die Bauern auf ein plötzlich erschienenes Gebäude.",
@@ -5202,7 +5195,7 @@ sp_illusionary_shapeshift(castorder *co)
 
 	rc = findrace(pa->param[1]->data.s, mage->faction->locale);
 	if (rc == NULL) {
-		cmistake(mage, strdup(co->order), 202, MSG_MAGIC);
+		cmistake(mage, co->order, 202, MSG_MAGIC);
 		return 0;
 	}
 
@@ -5257,7 +5250,7 @@ sp_readmind(castorder *co)
 
 	if (target->faction == mage->faction){
 		/* Die Einheit ist eine der unsrigen */
-		cmistake(mage, strdup(co->order), 45, MSG_MAGIC);
+		cmistake(mage, co->order, 45, MSG_MAGIC);
 	}
 
 	/* Magieresistenz Unit */
@@ -5364,7 +5357,7 @@ sp_baddreams(castorder *co)
 	/* Erfolg melden*/
 	ADDMSG(&mage->faction->msgs, msg_message(
 				"regionmagic_effect", "unit region command unit", mage,
-				mage->region, strdup(co->order), mage));
+				mage->region, co->order, mage));
 
 	return cast_level;
 }
@@ -5401,7 +5394,7 @@ sp_gooddreams(castorder *co)
 	/* Erfolg melden*/
 	ADDMSG(&mage->faction->msgs, msg_message(
 				"regionmagic_effect", "unit region command unit", mage,
-				mage->region, strdup(co->order), mage));
+				mage->region, co->order, mage));
 
 	return cast_level;
 }
@@ -5427,7 +5420,7 @@ sp_clonecopy(castorder *co)
 	int cast_level = co->level;
 
 	if (get_clone(mage) != NULL ) {
-		cmistake(mage, strdup(co->order), 298, MSG_MAGIC);
+		cmistake(mage, co->order, 298, MSG_MAGIC);
 		return 0;
 	}
 
@@ -5473,7 +5466,7 @@ sp_dreamreading(castorder *co)
 	if (fval(u->race, RCF_UNDEAD|RCF_ILLUSIONARY)) {
 		ADDMSG(&mage->faction->msgs, msg_message(
 			"spellunitnotfound", "unit region command id",
-			mage, mage->region, strdup(co->order), strdup(itoa36(u->no))));
+			mage, mage->region, co->order, strdup(itoa36(u->no))));
 		return 0;
 	}
 
@@ -5859,7 +5852,7 @@ sp_enterastral(castorder *co)
 
 		w = weight(u);
 		if(!can_survive(u, rt)) {
-			cmistake(mage, strdup(co->order), 231, MSG_MAGIC);
+			cmistake(mage, co->order, 231, MSG_MAGIC);
 		} else if(remaining_cap - w < 0) {
 			addmessage(r, mage->faction, "Die Einheit ist zu schwer.",
 					MSG_MAGIC, ML_MISTAKE);
@@ -5986,7 +5979,7 @@ sp_pullastral(castorder *co)
       w = weight(u);
 
       if(!can_survive(u, rt)) {
-        cmistake(mage, strdup(co->order), 231, MSG_MAGIC);
+        cmistake(mage, co->order, 231, MSG_MAGIC);
       } else if(remaining_cap - w < 0) {
         addmessage(r, mage->faction, "Die Einheit ist zu schwer.",
           MSG_MAGIC, ML_MISTAKE);
@@ -6106,7 +6099,7 @@ sp_leaveastral(castorder *co)
     w = weight(u);
 
     if(!can_survive(u, rt)) {
-      cmistake(mage, strdup(co->order), 231, MSG_MAGIC);
+      cmistake(mage, co->order, 231, MSG_MAGIC);
     } else if(remaining_cap - w < 0) {
       addmessage(r, mage->faction, "Die Einheit ist zu schwer.",
         MSG_MAGIC, ML_MISTAKE);
@@ -6202,7 +6195,7 @@ sp_fetchastral(castorder *co)
     }
 
     if (!can_survive(u, rt)) {
-      cmistake(mage, strdup(co->order), 231, MSG_MAGIC);
+      cmistake(mage, co->order, 231, MSG_MAGIC);
       continue;
     } 
 
@@ -6264,7 +6257,7 @@ sp_showastral(castorder *co)
 		rt = r_standard_to_astral(r);
 		if(!rt) {
 			/* Hier gibt es keine Verbindung zur astralen Welt */
-			cmistake(mage, strdup(co->order), 216, MSG_MAGIC);
+			cmistake(mage, co->order, 216, MSG_MAGIC);
 			return 0;
 		}
 		break;
@@ -6273,7 +6266,7 @@ sp_showastral(castorder *co)
 		break;
 	default:
 		/* Hier gibt es keine Verbindung zur astralen Welt */
-		cmistake(mage, strdup(co->order), 216, MSG_MAGIC);
+		cmistake(mage, co->order, 216, MSG_MAGIC);
 		return 0;
 	}
 
@@ -6292,7 +6285,7 @@ sp_showastral(castorder *co)
 	if(n == 0) {
 		/* sprintf(buf, "%s kann niemanden im astralen Nebel entdecken.",
 			unitname(mage)); */
-		cmistake(mage, strdup(co->order), 220, MSG_MAGIC);
+		cmistake(mage, co->order, 220, MSG_MAGIC);
 	} else {
 
 		/* Ausgeben */
@@ -6349,13 +6342,13 @@ sp_viewreality(castorder *co)
 
   if(getplaneid(r) != 1) {
     /* sprintf(buf, "Dieser Zauber kann nur im Astralraum gezaubert werden."); */
-    cmistake(mage, strdup(co->order), 217, MSG_MAGIC);
+    cmistake(mage, co->order, 217, MSG_MAGIC);
     return 0;
   }
 
   if(is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
     /* sprintf(buf, "Die materielle Welt ist hier nicht sichtbar.");*/
-    cmistake(mage, strdup(co->order), 218, MSG_MAGIC);
+    cmistake(mage, co->order, 218, MSG_MAGIC);
     return 0;
   }
 
@@ -6395,7 +6388,7 @@ sp_disruptastral(castorder *co)
 		rt = r_standard_to_astral(r);
 		if(!rt) {
 			/* "Hier gibt es keine Verbindung zur astralen Welt." */
-			cmistake(mage, strdup(co->order), 216, MSG_MAGIC);
+			cmistake(mage, co->order, 216, MSG_MAGIC);
 			return 0;
 		}
 		break;
@@ -6404,7 +6397,7 @@ sp_disruptastral(castorder *co)
 		break;
 	default:
 		/* "Von hier aus kann man die astrale Ebene nicht erreichen." */
-		cmistake(mage, strdup(co->order), 215, MSG_MAGIC);
+		cmistake(mage, co->order, 215, MSG_MAGIC);
 		return 0;
 	}
 
@@ -6522,7 +6515,7 @@ sp_eternizewall(castorder *co)
 		power*power, 1, 0, 0);
 
 	if(c==NULL) {	/* ist bereits verzaubert */
-		cmistake(mage, strdup(co->order), 206, MSG_MAGIC);
+		cmistake(mage, co->order, 206, MSG_MAGIC);
 		return 0;
 	}
 
@@ -6588,7 +6581,7 @@ sp_permtransfer(castorder *co)
 	if(!is_mage(tu)) {
 /*		sprintf(buf, "%s in %s: 'ZAUBER %s': Einheit ist kein Magier."
 			, unitname(mage), regionid(mage->region),sa->strings[0]); */
-		cmistake(mage, strdup(co->order), 214, MSG_MAGIC);
+		cmistake(mage, co->order, 214, MSG_MAGIC);
 		return 0;
 	}
 
@@ -6726,13 +6719,13 @@ sp_flying_ship(castorder *co)
 
 	if(is_cursed(sh->attribs, C_SHIP_FLYING, 0) ) {
 /*		sprintf(buf, "Auf dem Schiff befindet liegt bereits so ein Zauber."); */
-		cmistake(mage, strdup(co->order), 211, MSG_MAGIC);
+		cmistake(mage, co->order, 211, MSG_MAGIC);
 		return 0;
 	}
 	if(is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0) ) {
 /*		sprintf(buf, "Es ist zu gefährlich, ein sturmgepeitschtes Schiff "
 				"fliegen zu lassen."); */
-		cmistake(mage, strdup(co->order), 210, MSG_MAGIC);
+		cmistake(mage, co->order, 210, MSG_MAGIC);
 		return 0;
 	}
 	/* mit C_SHIP_NODRIFT haben wir kein Problem */
@@ -6887,7 +6880,7 @@ sp_antimagiczone(castorder *co)
 	/* Erfolg melden*/
 	ADDMSG(&mage->faction->msgs, msg_message(
 				"regionmagic_effect", "unit region command unit", mage,
-				mage->region, strdup(co->order), mage));
+				mage->region, co->order, mage));
 
 	return cast_level;
 }
@@ -6947,7 +6940,7 @@ sp_magicrunes(castorder *co)
 			/* Erfolg melden */
 			ADDMSG(&mage->faction->msgs, msg_message(
 					"objmagic_effect", "unit region command target", mage,
-					mage->region, strdup(co->order), buildingname(b)));
+					mage->region, co->order, buildingname(b)));
 			break;
 		}
 		case SPP_SHIP:
@@ -6961,7 +6954,7 @@ sp_magicrunes(castorder *co)
 			/* Erfolg melden */
 			ADDMSG(&mage->faction->msgs, msg_message(
 					"objmagic_effect", "unit region command target", mage,
-					mage->region, strdup(co->order), shipname(sh)));
+					mage->region, co->order, shipname(sh)));
 			break;
 		}
 		default:
@@ -7082,7 +7075,7 @@ sp_q_antimagie(castorder *co)
 		}
 		default:
 			/* Das Zielobjekt wurde vergessen */
-			cmistake(mage, strdup(co->order), 203, MSG_MAGIC);
+			cmistake(mage, co->order, 203, MSG_MAGIC);
 		return 0;
 	}
 
@@ -7091,11 +7084,11 @@ sp_q_antimagie(castorder *co)
 	if(succ) {
 		ADDMSG(&mage->faction->msgs, msg_message(
 			"destroy_magic_effect", "unit region command succ target",
-			mage, mage->region, strdup(co->order), succ, strdup(ts)));
+			mage, mage->region, co->order, succ, strdup(ts)));
 	} else {
 		ADDMSG(&mage->faction->msgs, msg_message(
 			"destroy_magic_noeffect", "unit region command",
-			mage, mage->region, strdup(co->order)));
+			mage, mage->region, co->order));
 	}
 
 	return max(succ, 1);
@@ -7134,7 +7127,7 @@ sp_destroy_curse(castorder *co)
 
 	if(pa->length < 2){
 		/* Das Zielobjekt wurde vergessen */
-		cmistake(mage, strdup(co->order), 203, MSG_MAGIC);
+		cmistake(mage, co->order, 203, MSG_MAGIC);
 	}
 
 	obj = pa->param[0]->typ;
@@ -7144,7 +7137,7 @@ sp_destroy_curse(castorder *co)
 		/* Es wurde kein Ziel gefunden */
 		ADDMSG(&mage->faction->msgs, msg_message(
 					"spelltargetnotfound", "unit region command",
-					mage, mage->region, strdup(co->order)));
+					mage, mage->region, co->order));
 	} else {
 		switch(obj){
 		case SPP_REGION:
@@ -7175,7 +7168,7 @@ sp_destroy_curse(castorder *co)
 		}
 		default:
 			/* Das Zielobjekt wurde vergessen */
-			cmistake(mage, strdup(co->order), 203, MSG_MAGIC);
+			cmistake(mage, co->order, 203, MSG_MAGIC);
 			return 0;
 		}
 
@@ -7185,7 +7178,7 @@ sp_destroy_curse(castorder *co)
 			ADDMSG(&mage->faction->msgs,
 						msg_message(
 									"spelltargetnotfound", "unit region command",
-									mage, mage->region, strdup(co->order)));
+									mage, mage->region, co->order));
 		}
 
 		/* curse auflösen, wenn zauber stärker (force > vigour)*/
@@ -7196,12 +7189,12 @@ sp_destroy_curse(castorder *co)
 
 			ADDMSG(&mage->faction->msgs, msg_message(
 				"destroy_magic_effect", "unit region command id target",
-				mage, mage->region, strdup(co->order), strdup(pa->param[1]->data.s),
+				mage, mage->region, co->order, strdup(pa->param[1]->data.s),
 				strdup(ts)));
 		} else {
 			ADDMSG(&mage->faction->msgs, msg_message(
 				"destroy_magic_noeffect", "unit region command",
-				mage, mage->region, strdup(co->order)));
+				mage, mage->region, co->order));
 		}
 	}
 	if (ts != NULL) free(ts);
@@ -7224,7 +7217,7 @@ sp_becomewyrm(castorder *co)
 	if(a) wyrms_already_created = a->data.i;
 
 	if(wyrms_already_created >= wyrms_allowed) {
-		cmistake(mage, strdup(co->order), 262, MSG_MAGIC);
+		cmistake(mage, co->order, 262, MSG_MAGIC);
 		return 0;
 	}
 
@@ -7263,7 +7256,7 @@ sp_wdwpyramid(castorder *co)
 
 	if(a_find(r->attribs, &at_wdwpyramid) != NULL) {
 		ADDMSG(&mage->faction->msgs, msg_message("wdw_pyramidspell_found",
-			"unit region command", mage, r, strdup(co->order)));
+			"unit region command", mage, r, co->order));
 	} else {
 		region *r2;
 		int    mindist = -1;
@@ -7285,7 +7278,7 @@ sp_wdwpyramid(castorder *co)
 		maxshowdist = minshowdist + 4;
 
 		ADDMSG(&mage->faction->msgs, msg_message("wdw_pyramidspell_notfound",
-			"unit region command mindist maxdist", mage, r, strdup(co->order),
+			"unit region command mindist maxdist", mage, r, co->order,
 			max(1, minshowdist), maxshowdist));
 	}
 

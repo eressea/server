@@ -29,10 +29,10 @@ struct unit;
 struct region;
 struct strlist;
 
-void setwere(struct unit * u, struct strlist * S);
-void setstealth(struct unit * u, struct strlist * S);
-void spy(struct region * r, struct unit * u);
-void sabotage(struct region * r, struct unit * u);
+extern int setwere_cmd(struct unit * u, struct order * ord);
+extern int setstealth_cmd(struct unit * u, struct order * ord);
+extern int spy_cmd(struct unit * u, struct order * ord);
+extern int sabotage_cmd(struct unit * u, struct order * ord);
 void spy_message(int spy, struct unit *u, struct unit *target);
 
 #define OCEAN_SWIMMER_CHANCE 0.1

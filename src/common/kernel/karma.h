@@ -67,7 +67,7 @@ extern struct attrib_type at_jihad;
 extern struct fspecialdata fspecials[];
 
 extern int fspecial(const struct faction *f, fspecial_t special);
-extern void set_jihad(void);
+extern void karma(void);
 extern int jihad(struct faction *, const struct race *);
 extern void jihad_attacks(void);
 

@@ -22,6 +22,7 @@
 #include "region.h"
 #include "item.h"
 #include "group.h"
+#include "order.h"
 #include "pool.h"
 #include "skill.h"
 #include "faction.h"
@@ -304,7 +305,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 };
 
 void
-buy_special(unit *u, strlist *S, fspecial_t special)
+buy_special(unit *u, struct order * ord, fspecial_t special)
 {
 	int count = 0;
 	int cost;
@@ -323,7 +324,7 @@ buy_special(unit *u, strlist *S, fspecial_t special)
 	/* Prüfen, ob genug Karma vorhanden. */
 
 	if(f->karma < cost) {
-		cmistake(u, S->s, 250, MSG_EVENT);
+		cmistake(u, ord, 250, MSG_EVENT);
 		return;
 	}
 
@@ -335,7 +336,7 @@ buy_special(unit *u, strlist *S, fspecial_t special)
 			add_message(&f->msgs, new_message(f,
 				"new_fspecial_level%S:special%d:level", special, a2->data.sa[1]));
 		} else {
-			cmistake(u, S->s, 251, MSG_EVENT);
+			cmistake(u, ord, 251, MSG_EVENT);
 			return;
 		}
 	} else {
@@ -358,199 +359,184 @@ fspecial(const faction *f, fspecial_t special)
 	return 0;
 }
 
-void
-sacrificings(void)
+static int
+sacrifice_cmd(unit * u, struct order * ord)
 {
-	region *r;
-	unit *u;
+	region *r = u->region;
+  int   n = 1, karma;
+  const char *s;
+  
+  init_tokens(ord);
+  skip_token();
+  s = getstrtoken();
 
-	for(r=regions; r; r=r->next) {
-		for(u=r->units; u; u=u->next) {
-			if(igetkeyword(u->thisorder, u->faction->locale) == K_SACRIFICE) {
-				int   n = 1, karma;
-				const char *s = getstrtoken();
+  if (s && *s) n = atoi(s);
+  if (n <= 0) {
+    cmistake(u, ord, 252, MSG_EVENT);
+    return 0;
+  }
 
-				if(s && *s) n = atoi(s);
-				if(n <= 0) {
-					cmistake(u, u->thisorder, 252, MSG_EVENT);
-					continue;
-				}
+  s = getstrtoken();
 
-				s = getstrtoken();
+  switch(findparam(s, u->faction->locale)) {
+  case P_SILVER:
+    n = use_pooled(u, r, R_SILVER, n);
+    if(n < 10000) {
+      cmistake(u, ord, 51, MSG_EVENT);
+      return 0;
+    }
+    change_resource(u, R_SILVER, n);
+    karma = n/10000;
+    u->faction->karma += karma;
+    break;
 
-				switch(findparam(s, u->faction->locale)) {
-
-				case P_SILVER:
-					n = use_pooled(u, r, R_SILVER, n);
-					if(n < 10000) {
-						cmistake(u, u->thisorder, 51, MSG_EVENT);
-						continue;
-					}
-					change_resource(u, R_SILVER, n);
-					karma = n/10000;
-					u->faction->karma += karma;
-					break;
-
-				case P_AURA:
-					if(!is_mage(u)) {
-						cmistake(u, u->thisorder, 214, MSG_EVENT);
-						continue;
-					}
-					if (get_level(u, SK_MAGIC) < 10) {
-						cmistake(u, u->thisorder, 253, MSG_EVENT);
-						continue;
-					}
-					n = min(get_spellpoints(u), min(max_spellpoints(u->region, u), n));
-					if(n <= 0) {
-						cmistake(u, u->thisorder, 254, MSG_EVENT);
-						continue;
-					}
-					karma = n;
-					u->faction->karma += n;
-					change_maxspellpoints(u, -n);
-					break;
-				default:
-					cmistake(u, u->thisorder, 255, MSG_EVENT);
-				}
-			}
-		}
-	}
+  case P_AURA:
+    if(!is_mage(u)) {
+      cmistake(u, ord, 214, MSG_EVENT);
+      return 0;
+    }
+    if (get_level(u, SK_MAGIC) < 10) {
+      cmistake(u, ord, 253, MSG_EVENT);
+      return 0;
+    }
+    n = min(get_spellpoints(u), min(max_spellpoints(u->region, u), n));
+    if(n <= 0) {
+      cmistake(u, ord, 254, MSG_EVENT);
+      return 0;
+    }
+    karma = n;
+    u->faction->karma += n;
+    change_maxspellpoints(u, -n);
+    break;
+  default:
+    cmistake(u, u->thisorder, 255, MSG_EVENT);
+  }
+  return 0;
 }
 
-void
-prayers(void)
+static int
+prayer_cmd(unit * u, struct order * ord)
 {
-	region *r;
-	unit *u;
-	strlist *S;
+  region *r = u->region;
+  attrib *a, *a2;
+  unit *u2;
+  int karma_cost;
+  short mult = 1;
+  param_t p;
+  const char *s;
+  
+  init_tokens(ord);
+  skip_token();
+  s = getstrtoken();
 
-	for(r=regions; r; r=r->next) {
-		for(u=r->units; u; u=u->next) {
-			for(S = u->orders; S; S = S->next) if(igetkeyword(S->s, u->faction->locale) == K_PRAY) {
-				attrib *a, *a2;
-				unit *u2;
-				int karma_cost;
-				short mult = 1;
-				param_t p;
-				const char *s = getstrtoken();
+  if (findparam(s, u->faction->locale) == P_FOR) s = getstrtoken();
+  p = findparam(s, u->faction->locale);
 
-				if(findparam(s, u->faction->locale) == P_FOR) s = getstrtoken();
+  switch(p) {
+  case P_AURA:
+    if (!is_mage(u)) {
+      cmistake(u, ord, 214, MSG_EVENT);
+      return 0;
+    }
+  case P_AID:
+  case P_MERCY:
+    break;
+  default:
+    cmistake(u, ord, 256, MSG_EVENT);
+    return 0;
+  }
 
-				p = findparam(s, u->faction->locale);
-				switch(p) {
-				case P_AURA:
-					if(!is_mage(u)) {
-						cmistake(u, S->s, 214, MSG_EVENT);
-						continue;
-					}
-				case P_AID:
-				case P_MERCY:
-					break;
-				default:
-					cmistake(u, S->s, 256, MSG_EVENT);
-					continue;
-				}
+  a = a_find(u->faction->attribs, &at_prayer_timeout);
+  if (a) mult = (short)(2 * a->data.sa[1]);
+  karma_cost = 10 * mult;
 
-				a = a_find(u->faction->attribs, &at_prayer_timeout);
-				if (a) mult = (short)(2 * a->data.sa[1]);
-				karma_cost = 10 * mult;
+  if (u->faction->karma < karma_cost) {
+    cmistake(u, ord, 250, MSG_EVENT);
+    return 0;
+  }
 
-				if(u->faction->karma < karma_cost) {
-					cmistake(u, S->s, 250, MSG_EVENT);
-					continue;
-				}
+  u->faction->karma -= karma_cost;
 
-				u->faction->karma -= karma_cost;
+  add_message(&u->faction->msgs, new_message(u->faction,
+    "pray_success%u:unit",u));
 
-				add_message(&u->faction->msgs, new_message(u->faction,
-					"pray_success%u:unit",u));
+  switch (p) {
+  case P_AURA:
+    set_spellpoints(u, max_spellpoints(u->region, u));
+    break;
+  case P_AID:
+    for(u2 = r->units; u2; u2=u2->next) if(u2->faction == u->faction) {
+      a2 = a_add(&u->attribs, a_new(&at_prayer_effect));
+      a2->data.sa[0] = PR_AID;
+      a2->data.sa[1] = 1;
+    }
+    break;
+  case P_MERCY:
+    for(u2 = r->units; u2; u2=u2->next) if(u2->faction == u->faction) {
+      a2 = a_add(&u->attribs, a_new(&at_prayer_effect));
+      a2->data.sa[0] = PR_MERCY;
+      a2->data.sa[1] = 80;
+    }
+    break;
+  }
 
-				switch(p) {
-				case P_AURA:
-					set_spellpoints(u, max_spellpoints(u->region, u));
-					break;
-				case P_AID:
-					for(u2 = r->units; u2; u2=u2->next) if(u2->faction == u->faction) {
-						a2 = a_add(&u->attribs, a_new(&at_prayer_effect));
-						a2->data.sa[0] = PR_AID;
-						a2->data.sa[1] = 1;
-					}
-					break;
-				case P_MERCY:
-					for(u2 = r->units; u2; u2=u2->next) if(u2->faction == u->faction) {
-						a2 = a_add(&u->attribs, a_new(&at_prayer_effect));
-						a2->data.sa[0] = PR_MERCY;
-						a2->data.sa[1] = 80;
-					}
-					break;
-				}
-
-				if(!a) a = a_add(&u->faction->attribs, a_new(&at_prayer_timeout));
-				a->data.sa[0] = (short)(mult * 14);
-				a->data.sa[1] = (short)mult;
-			}
-		}
-	}
+  if(!a) a = a_add(&u->faction->attribs, a_new(&at_prayer_timeout));
+  a->data.sa[0] = (short)(mult * 14);
+  a->data.sa[1] = (short)mult;
+  return 0;
 }
 
-void
-set_jihad(void)
+static int
+jihad_cmd(unit * u, struct order * ord)
 {
-	region *r;
-	unit *u;
-	strlist *S;
+  faction *f = u->faction;
+  int can = fspecial(f, FS_JIHAD);
+  int has = 0;
+  const race * jrace;
+  race_t jrt;
+  attrib *a;
+  const char *s;
 
-	for(r=regions; r; r=r->next) {
-		for(u=r->units; u; u=u->next) {
-			for(S = u->orders; S; S=S->next) if(igetkeyword(S->s, u->faction->locale) == K_SETJIHAD) {
-				faction *f = u->faction;
-				int can = fspecial(f, FS_JIHAD);
-				int has = 0;
-				const race * jrace;
-				race_t jrt;
-				attrib *a;
-				const char *s;
+  for (a = a_find(f->attribs, &at_jihad); a; a = a->nexttype) {
+    has += a->data.sa[1];
+  }
 
-				for(a = a_find(f->attribs, &at_jihad); a; a = a->nexttype) {
-					has += a->data.sa[1];
-				}
+  if (has >= can) {
+    cmistake(u, ord, 280, MSG_EVENT);
+    return 0;
+  }
 
-				if(has >= can) {
-					cmistake(u, S->s, 280, MSG_EVENT);
-					continue;
-				}
+  init_tokens(ord);
+  skip_token();
+  s = getstrtoken();
 
-				s = getstrtoken();
-				if(!s || !*s) {
-					cmistake(u, S->s, 281, MSG_EVENT);
-					continue;
-				}
+  if (!s || !*s) {
+    cmistake(u, ord, 281, MSG_EVENT);
+    return 0;
+  }
 
-				jrace = rc_find(s);
-				jrt = old_race(jrace);
+  jrace = rc_find(s);
+  jrt = old_race(jrace);
 
-				if (!playerrace(jrace)) {
-					cmistake(u, S->s, 282, MSG_EVENT);
-					continue;
-				}
+  if (!playerrace(jrace)) {
+    cmistake(u, ord, 282, MSG_EVENT);
+    return 0;
+  }
 
-				for(a = a_find(f->attribs, &at_jihad); a; a = a->nexttype) {
-					if (a->data.sa[0] == jrt) break;
-				}
+  for (a = a_find(f->attribs, &at_jihad); a; a = a->nexttype) {
+    if (a->data.sa[0] == jrt) break;
+  }
 
-				if(a) {
-					a->data.sa[1]++;
-				} else {
-					a = a_add(&f->attribs, a_new(&at_jihad));
-					a->data.sa[0] = (short)jrt;
-					a->data.sa[1] = 1;
-				}
+  if (a) {
+    a->data.sa[1]++;
+  } else {
+    a = a_add(&f->attribs, a_new(&at_jihad));
+    a->data.sa[0] = (short)jrt;
+    a->data.sa[1] = 1;
+  }
 
-				add_message(&f->msgs, msg_message("setjihad", 
-					"race", jrace));
-			}
-		}
-	}
+  add_message(&f->msgs, msg_message("setjihad", "race", jrace));
+  return 0;
 }
 
 int
@@ -572,7 +558,6 @@ jihad_attacks(void)
 	faction *f;
 	region *r;
 	unit *u, *u2;
-	strlist *S;
 	attrib *a;
 	ally *sf, **sfp;
 
@@ -603,11 +588,17 @@ jihad_attacks(void)
 					if (sf) sf->status = sf->status & (HELP_ALL - HELP_FIGHT);
 
 					sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_ATTACK]), unitid(u));
-					S = makestrlist(buf);
-					addlist(&u2->orders, S);
+					addlist(&u2->orders, parse_order(buf, u->faction->locale));
 				}
 			}
 		}
 	}
 }
 
+void
+karma(void)
+{
+  parse(K_PRAY, prayer_cmd, false);
+  parse(K_SETJIHAD, jihad_cmd, false);
+  parse(K_SACRIFICE, sacrifice_cmd, true);
+}

@@ -201,6 +201,9 @@
 				RelativePath=".\faction.h">
 			</File>
 			<File
+				RelativePath=".\give.h">
+			</File>
+			<File
 				RelativePath=".\group.h">
 			</File>
 			<File
@@ -226,6 +229,9 @@
 			</File>
 			<File
 				RelativePath=".\objtypes.h">
+			</File>
+			<File
+				RelativePath=".\order.h">
 			</File>
 			<File
 				RelativePath=".\orders.h">
@@ -319,6 +325,9 @@
 			RelativePath=".\faction.c">
 		</File>
 		<File
+			RelativePath=".\give.c">
+		</File>
+		<File
 			RelativePath=".\group.c">
 		</File>
 		<File
@@ -341,6 +350,9 @@
 		</File>
 		<File
 			RelativePath=".\objtypes.c">
+		</File>
+		<File
+			RelativePath=".\order.c">
 		</File>
 		<File
 			RelativePath=".\orders.c">

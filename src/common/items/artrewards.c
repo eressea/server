@@ -59,7 +59,7 @@ static attrib_type at_peaceimmune = {
 
 static int
 use_hornofdancing(struct unit * u, const struct item_type * itype,
-                  int amount, const char *cm)
+                  int amount, struct order * ord)
 {
   region *r;
   int    regionsPacified = 0;
@@ -88,10 +88,10 @@ use_hornofdancing(struct unit * u, const struct item_type * itype,
 
   if(regionsPacified > 0) {
     ADDMSG(&u->faction->msgs, msg_message("hornofpeace_u_success",
-      "unit region command pacified", u, u->region, cm, regionsPacified));
+      "unit region command pacified", u, u->region, ord, regionsPacified));
   } else {
     ADDMSG(&u->faction->msgs, msg_message("hornofpeace_u_nosuccess",
-      "unit region command", u, u->region, cm));
+      "unit region command", u, u->region, ord));
   }
 
   return 0;
@@ -118,7 +118,7 @@ item_type it_hornofdancing = {
 
 static int
 use_trappedairelemental(struct unit * u, const struct item_type * itype,
-                        int amount, const char *cm)
+                        int amount, struct order * ord)
 {
   curse  *c;
   int    shipId;
@@ -126,13 +126,13 @@ use_trappedairelemental(struct unit * u, const struct item_type * itype,
 
   shipId = getshipid();
   if(shipId <= 0) {
-    cmistake(u, cm, 20, MSG_MOVE);
+    cmistake(u, ord, 20, MSG_MOVE);
     return -1;
   }
 
   sh = findshipr(u->region, shipId);
   if(!sh) {
-    cmistake(u, cm, 20, MSG_MOVE);
+    cmistake(u, ord, 20, MSG_MOVE);
     return -1;
   }
 
@@ -141,7 +141,7 @@ use_trappedairelemental(struct unit * u, const struct item_type * itype,
   curse_setflag(c, CURSE_NOAGE);
 
   ADDMSG(&u->faction->msgs, msg_message("trappedairelemental_success",
-    "unit region command ship", u, u->region, cm, sh));
+    "unit region command ship", u, u->region, ord, sh));
   
   itype->rtype->uchange(u, itype->rtype, -1);
 
@@ -167,17 +167,17 @@ item_type it_trappedairelemental = {
 
 static int
 use_aurapotion50(struct unit * u, const struct item_type * itype,
-                 int amount, const char *cm)
+                 int amount, struct order * ord)
 {
   if(!is_mage(u)) {
-    cmistake(u, cm, 214, MSG_MAGIC);
+    cmistake(u, ord, 214, MSG_MAGIC);
     return -1;
   }
 
   change_spellpoints(u, 50);
 
   ADDMSG(&u->faction->msgs, msg_message("aurapotion50",
-    "unit region command", u, u->region, cm));
+    "unit region command", u, u->region, ord));
   
   itype->rtype->uchange(u, itype->rtype, -1);
 
@@ -205,12 +205,12 @@ item_type it_aurapotion50 = {
 
 static int
 use_bagpipeoffear(struct unit * u, const struct item_type * itype,
-                  int amount, const char *cm)
+                  int amount, struct order * ord)
 {
   int money;
 
   if(get_curse(u->region->attribs, ct_find("depression"))) {
-    cmistake(u, cm, 58, MSG_MAGIC);
+    cmistake(u, ord, 58, MSG_MAGIC);
     return -1;
   }
 
@@ -222,7 +222,7 @@ use_bagpipeoffear(struct unit * u, const struct item_type * itype,
     20, BAGPIPEDURATION, 0, 0);
 
   ADDMSG(&u->faction->msgs, msg_message("bagpipeoffear_faction",
-    "unit region command money", u, u->region, cm, money));
+    "unit region command money", u, u->region, ord, money));
 
   ADDMSG(&u->region->msgs, msg_message("bagpipeoffear_region",
     "unit money", u, money));
@@ -248,12 +248,12 @@ item_type it_bagpipeoffear = {
 
 static int
 use_instantartacademy(struct unit * u, const struct item_type * itype,
-                    int amount, const char *cm)
+                    int amount, struct order * ord)
 {
   building *b;
 
   if(u->region->land == NULL) {
-    cmistake(u, cm, 242, MSG_MAGIC);
+    cmistake(u, ord, 242, MSG_MAGIC);
     return -1;
   }
 
@@ -288,12 +288,12 @@ item_type it_instantartacademy = {
 
 static int
 use_instantartsculpture(struct unit * u, const struct item_type * itype,
-                    int amount, const char *cm)
+                    int amount, struct order * ord)
 {
   building *b;
 
   if(u->region->land == NULL) {
-    cmistake(u, cm, 242, MSG_MAGIC);
+    cmistake(u, ord, 242, MSG_MAGIC);
     return -1;
   }
 

@@ -15,7 +15,7 @@ using namespace luabind;
 
 static int
 lua_useitem(struct unit * u, const struct item_type * itype,
-            int amount, const char *cmd)
+            int amount, struct order *ord)
 {
   char fname[64];
   lua_State * L = (lua_State *)global.vm_state;

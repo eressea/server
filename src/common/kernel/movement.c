@@ -32,6 +32,7 @@
 #include "karma.h"
 #include "magic.h"
 #include "message.h"
+#include "order.h"
 #include "plane.h"
 #include "race.h"
 #include "region.h"
@@ -228,8 +229,8 @@ ridingcapacity(unit * u)
 	return n;
 }
 
-static int
-walkingcapacity(unit * u)
+int
+walkingcapacity(const struct unit * u)
 {
 	int n, tmp, personen, pferde, pferde_fuer_wagen;
 	int wagen, wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
@@ -408,7 +409,7 @@ cansail(const region * r, ship * sh)
 }
 
 int
-enoughsailors(region * r, ship * sh)
+enoughsailors(const ship * sh, const region * r)
 {
 	int n;
 	unit *u;
@@ -622,7 +623,7 @@ drifting_ships(region * r)
       * Genügend leicht? Dann ist alles OK. */
 
       assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
-      if (captain && sh->size==sh->type->construction->maxsize && enoughsailors(r, sh) && cansail(r, sh)) {
+      if (captain && sh->size==sh->type->construction->maxsize && enoughsailors(sh, r) && cansail(r, sh)) {
         shp = &sh->next;
         continue;
       }
@@ -791,10 +792,13 @@ cycle_route(unit *u, int gereist)
 	boolean paused = false;
 	boolean pause;
 
-	if (igetkeyword(u->thisorder, u->faction->locale) != K_ROUTE) return;
+	if (get_keyword(u->thisorder) != K_ROUTE) return;
 	tail[0] = '\0';
 
 	strcpy(neworder, locale_string(u->faction->locale, keywords[K_ROUTE]));
+
+  init_tokens(u->thisorder);
+  skip_token();
 
 	for (cm=0;;++cm) {
 		const struct locale * lang = u->faction->locale;
@@ -827,71 +831,82 @@ cycle_route(unit *u, int gereist)
 	}
 
 	strcat(neworder, tail);
-	set_string(&u->lastorder, neworder);
+	set_order(&u->lastorder, parse_order(neworder, u->faction->locale));
+        free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
 }
 
 static void
 init_drive(void)
 {
-	region *r;
-	unit *u, *ut, *u2;
-	strlist *S;
-	int w;
+  region *r;
+  unit *u, *ut;
 
-	for (r=regions; r; r=r->next) {
-		/* This is just a simple check for non-corresponding K_TRANSPORT/
-		 * K_DRIVE. This is time consuming for an error check, but there
-		 * doesn't seem to be an easy way to speed this up. */
+  for (r=regions; r; r=r->next) {
+    /* This is just a simple check for non-corresponding K_TRANSPORT/
+    * K_DRIVE. This is time consuming for an error check, but there
+    * doesn't seem to be an easy way to speed this up. */
 
-		for(u=r->units; u; u=u->next) {
-			if(igetkeyword(u->thisorder, u->faction->locale) == K_DRIVE && !fval(u, UFL_LONGACTION) && !fval(u, UFL_HUNGER)) {
-				boolean found = false;
-				ut = getunit(r, u->faction);
-				if(!ut) {
-					cmistake(u, findorder(u, u->thisorder), 63, MSG_MOVE);
-					continue;
-				}
-				for (S = ut->orders; S; S = S->next) {
-					if (igetkeyword(S->s, u->faction->locale) == K_TRANSPORT) {
-						if (getunit(r, ut->faction) == u) {
-							found = true;
-							break;
-						}
-					}
-				}
-				if(found == false) {
-					if(cansee(u->faction, r, ut, 0)) {
-						cmistake(u, findorder(u, u->thisorder), 286, MSG_MOVE);
-					} else {
-						cmistake(u, findorder(u, u->thisorder), 63, MSG_MOVE);
-					}
-				}
-			}
-		}
+    for(u=r->units; u; u=u->next) {
+      if (get_keyword(u->thisorder) == K_DRIVE && !fval(u, UFL_LONGACTION) && !fval(u, UFL_HUNGER)) {
+        boolean found = false;
+        order * ord;
 
-		/* This calculates the weights of all transported units and
-		 * adds them to an internal counter which is used by travel() to
-		 * calculate effective weight and movement. */
+        init_tokens(u->thisorder);
+        skip_token();
+        ut = getunit(r, u->faction);
+        if (ut==NULL) {
+          cmistake(u, u->thisorder, 63, MSG_MOVE);
+          continue;
+        }
+        for (ord = ut->orders; ord; ord = ord->next) {
+          if (get_keyword(ord) == K_TRANSPORT) {
+            init_tokens(ord);
+            skip_token();
+            if (getunit(r, ut->faction) == u) {
+              found = true;
+              break;
+            }
+          }
+        }
+        if (found == false) {
+          if (cansee(u->faction, r, ut, 0)) {
+            cmistake(u, u->thisorder, 286, MSG_MOVE);
+          } else {
+            cmistake(u, u->thisorder, 63, MSG_MOVE);
+          }
+        }
+      }
+    }
 
-		for (u=r->units; u; u=u->next) {
-			w = 0;
+    /* This calculates the weights of all transported units and
+    * adds them to an internal counter which is used by travel() to
+    * calculate effective weight and movement. */
 
-			for (S = u->orders; S; S = S->next) if(igetkeyword(S->s, u->faction->locale) == K_TRANSPORT) {
-				ut = getunit(r, u->faction);
-				if(!ut) continue;
+    for (u=r->units; u; u=u->next) {
+      order * ord;
+      int w = 0;
 
-				if (igetkeyword(ut->thisorder, ut->faction->locale) == K_DRIVE && !fval(ut, UFL_LONGACTION) && !fval(ut, UFL_HUNGER)) {
-					u2 = getunit(r, u->faction);
-					if(u2 == u) {
-						w += weight(ut);
-						break;
-					}
-				}
-			}
+      for (ord = u->orders; ord; ord = ord->next) {
+        if (get_keyword(ord) == K_TRANSPORT) {
+          init_tokens(ord);
+          skip_token();
+          ut = getunit(r, u->faction);
+          if (ut==NULL) continue;
 
-			if(w > 0) a_add(&u->attribs, a_new(&at_driveweight))->data.i = w;
-		}
-	}
+          if (get_keyword(ut->thisorder) == K_DRIVE && !fval(ut, UFL_LONGACTION) && !fval(ut, UFL_HUNGER)) {
+            init_tokens(ut->thisorder);
+            skip_token();
+            if (getunit(r, ut->faction) == u) {
+              w += weight(ut);
+              break;
+            }
+          }
+        }
+      }
+
+      if(w > 0) a_add(&u->attribs, a_new(&at_driveweight))->data.i = w;
+    }
+  }
 }
 
 int  *storms;
@@ -957,7 +972,6 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
   region *current = u->region;
   int k, m = 0;
   double dk;
-  strlist *S;
   unit *ut, *u2;
   int gereist = 0;
   region_list *route = NULL;
@@ -984,38 +998,38 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
     && !(u->race->flags & RCF_FLY) && rterrain(next) != T_OCEAN)
   { /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
     if (!(u->race->flags & RCF_SWIM) && old_race(u->race) != RC_AQUARIAN) {
-      cmistake(u, findorder(u, u->thisorder), 44, MSG_MOVE);
+      cmistake(u, u->thisorder, 44, MSG_MOVE);
       return;
     } else {
       if (u->ship && get_item(u, I_HORSE) > 0) {
-        cmistake(u, findorder(u, u->thisorder), 67, MSG_MOVE);
+        cmistake(u, u->thisorder, 67, MSG_MOVE);
         return;
       }
     }
   } else if (rterrain(current)!=T_OCEAN) {
     /* An Land kein NACH wenn in dieser Runde Schiff VERLASSEN! */
     if (leftship(u) && is_guarded(current, u, GUARD_LANDING)) {
-      cmistake(u, findorder(u, u->thisorder), 70, MSG_MOVE);
+      cmistake(u, u->thisorder, 70, MSG_MOVE);
       return;
     }
     if (u->ship && !flucht && u->race->flags & RCF_SWIM) {
-      cmistake(u, findorder(u, u->thisorder), 143, MSG_MOVE);
+      cmistake(u, u->thisorder, 143, MSG_MOVE);
       return;
     }
   } else if (rterrain(next) == T_OCEAN && u->ship && fval(u->ship, SF_MOVED)) {
-    cmistake(u, findorder(u, u->thisorder), 13, MSG_MOVE);
+    cmistake(u, u->thisorder, 13, MSG_MOVE);
     return;
   }
 
   switch (canwalk(u)) {
     case 1:
-      cmistake(u, findorder(u, u->thisorder), 57, MSG_MOVE);
+      cmistake(u, u->thisorder, 57, MSG_MOVE);
       return;
     case 2:
-      cmistake(u, findorder(u, u->thisorder), 56, MSG_MOVE);
+      cmistake(u, u->thisorder, 56, MSG_MOVE);
       return;
     case 3:
-      cmistake(u, findorder(u, u->thisorder), 42, MSG_MOVE);
+      cmistake(u, u->thisorder, 42, MSG_MOVE);
       return;
   }
 
@@ -1194,6 +1208,8 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
 
   if (gereist) {
     int mode;
+    order * ord;
+
     setguard(u, GUARD_NONE);
     cycle_route(u, gereist);
 
@@ -1212,7 +1228,8 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
       attrib * ta = a_find(u->attribs, &at_targetregion);
       if (ta && current == (region*)ta->data.v) {
         a_remove(&u->attribs, ta);
-        set_string(&u->lastorder, "WARTEN");
+        set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
+        free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
       }
     }
 
@@ -1246,14 +1263,17 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
       "unit mode start end regions", u, mode, first, current, strdup(buf)));
 
     /* und jetzt noch die transportierten Einheiten verschieben */
-
-    for (S = u->orders; S; S = S->next) {
-      if (igetkeyword(S->s, u->faction->locale) == K_TRANSPORT) {
+    for (ord = u->orders; ord; ord = ord->next) {
+      if (get_keyword(ord) == K_TRANSPORT) {
+        init_tokens(ord);
+        skip_token();
         ut = getunit(first, u->faction);
         if (ut) {
           boolean found = false;
-          if (igetkeyword(ut->thisorder, ut->faction->locale) == K_DRIVE
+          if (get_keyword(ut->thisorder) == K_DRIVE
             && !fval(ut, UFL_LONGACTION) && !fval(ut, UFL_HUNGER)) {
+              init_tokens(ut->thisorder);
+              skip_token();
               u2 = getunit(first, ut->faction);
               if(u2 == u) {
                 found = true;
@@ -1278,25 +1298,26 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
             }
             if (!found) {
               if(cansee(u->faction, u->region, ut, 0)) {
-                cmistake(u, findorder(u, u->thisorder), 90, MSG_MOVE);
+                cmistake(u, u->thisorder, 90, MSG_MOVE);
               } else {
-                cmistake(u, findorder(u, u->thisorder), 63, MSG_MOVE);
+                cmistake(u, u->thisorder, 63, MSG_MOVE);
               }
             }
         } else {
           if (ut) {
-            cmistake(u, findorder(u, u->thisorder), 63, MSG_MOVE);
+            cmistake(u, u->thisorder, 63, MSG_MOVE);
           } else {
-            cmistake(u, findorder(u, u->thisorder), 99, MSG_MOVE);
+            cmistake(u, u->thisorder, 99, MSG_MOVE);
           }
         }
       }
     }
     move_unit(u, current, NULL);
   }
-  else if (flucht)
+  else if (flucht) {
     move_unit(u, current, NULL);
-  set_string(&u->thisorder, "");
+  }
+  set_order(&u->thisorder, NULL);
   fset(u, UFL_LONGACTION);
   setguard(u, GUARD_NONE);
 
@@ -1307,10 +1328,10 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
 }
 
 static boolean
-ship_ready(region * r, unit * u)
+ship_ready(const region * r, unit * u)
 {
 	if (!fval(u, UFL_OWNER)) {
-		cmistake(u, findorder(u, u->thisorder), 146, MSG_MOVE);
+		cmistake(u, u->thisorder, 146, MSG_MOVE);
 		return false;
 	}
 	if (eff_skill(u, SK_SAILING, r) < u->ship->type->cptskill) {
@@ -1322,20 +1343,20 @@ ship_ready(region * r, unit * u)
 	}
 	assert(u->ship->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
 	if (u->ship->size!=u->ship->type->construction->maxsize) {
-		cmistake(u, findorder(u, u->thisorder), 15, MSG_MOVE);
+		cmistake(u, u->thisorder, 15, MSG_MOVE);
 		return false;
 	}
-	if (!enoughsailors(r, u->ship)) {
-		cmistake(u, findorder(u, u->thisorder), 1, MSG_MOVE);
+	if (!enoughsailors(u->ship, r)) {
+		cmistake(u, u->thisorder, 1, MSG_MOVE);
 /*		mistake(u, u->thisorder,
 				"Auf dem Schiff befinden sich zuwenig erfahrene Seeleute.", MSG_MOVE); */
 		return false;
 	}
 	if (!cansail(r, u->ship)) {
 		if( is_cursed(u->ship->attribs, C_SHIP_FLYING, 0) )
-			cmistake(u, findorder(u, u->thisorder), 17, MSG_MOVE);
+			cmistake(u, u->thisorder, 17, MSG_MOVE);
 		else
-			cmistake(u, findorder(u, u->thisorder), 18, MSG_MOVE);
+			cmistake(u, u->thisorder, 18, MSG_MOVE);
 		return false;
 	}
 	return true;
@@ -1509,7 +1530,7 @@ sail(unit * u, region * next_point, boolean move_on_land)
         } else {
           if (check_takeoff(sh, current_point, next_point) == false) {
             /* Schiff kann nicht ablegen */
-            cmistake(u, findorder(u, u->thisorder), 182, MSG_MOVE);
+            cmistake(u, u->thisorder, 182, MSG_MOVE);
             break;
           }
         }
@@ -1525,7 +1546,7 @@ sail(unit * u, region * next_point, boolean move_on_land)
           }
           if (d==MAXDIRECTIONS) {
             /* Schiff kann nicht aufs offene Meer */
-            cmistake(u, findorder(u, u->thisorder), 249, MSG_MOVE);
+            cmistake(u, u->thisorder, 249, MSG_MOVE);
             break;
           }
         }
@@ -1584,7 +1605,7 @@ sail(unit * u, region * next_point, boolean move_on_land)
     /* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
     * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
     cycle_route(u, step);
-    set_string(&u->thisorder, "");
+    set_order(&u->thisorder, NULL);
     if (current_point->terrain != T_OCEAN && !is_cursed(sh->attribs, C_SHIP_FLYING, 0)) {
       sh->coast = reldirection(current_point, last_point);
     } else {
@@ -1674,16 +1695,17 @@ sail(unit * u, region * next_point, boolean move_on_land)
 }
 
 unit *
-kapitaen(region * r, ship * sh)
+get_captain(const ship * sh)
 {
-	unit *u;
+  const region * r = sh->region;
+  unit *u;
 
-	for (u = r->units; u; u = u->next) {
-		if (u->ship == sh && eff_skill(u, SK_SAILING, r) >= sh->type->cptskill)
-			return u;
-	}
+  for (u = r->units; u; u = u->next) {
+    if (u->ship == sh && eff_skill(u, SK_SAILING, r) >= sh->type->cptskill)
+      return u;
+  }
 
-	return NULL;
+  return NULL;
 }
 
 static const char *
@@ -1704,6 +1726,8 @@ direction_name(const region * from, const region * to, const struct locale * lan
 * to be done again because of followers that got new MOVE orders. 
 * Setting FL_LONGACTION will prevent a unit from being handled more than once
 * by this routine 
+*
+* the token parser needs to be initialized before calling this function!
 */
 static int
 move(unit * u, boolean move_on_land)
@@ -1713,7 +1737,7 @@ move(unit * u, boolean move_on_land)
   region * r2 = movewhere(r, u);
 
   if (r2==NULL) {
-    cmistake(u, findorder(u, u->thisorder), 71, MSG_MOVE);
+    cmistake(u, u->thisorder, 71, MSG_MOVE);
     return 0;
   }
   else if (u->ship && fval(u, UFL_OWNER)) {
@@ -1735,7 +1759,7 @@ move(unit * u, boolean move_on_land)
   }
 
   if (u->region!=r) fset(u, UFL_LONGACTION);
-  set_string(&u->thisorder, "");
+  set_order(&u->thisorder, NULL);
 
   if (fval(u, UFL_FOLLOWED) && route!=NULL) {
     int followers = 0;
@@ -1745,7 +1769,6 @@ move(unit * u, boolean move_on_land)
         const attrib * a = a_findc(up->attribs, &at_follow);
         if (a && a->data.v==u) {
           /* wir basteln ihm ein NACH */
-          int k;
           region_list * rlist = route;
           region * from = r;
 
@@ -1755,9 +1778,8 @@ move(unit * u, boolean move_on_land)
             from = rlist->data;
             rlist = rlist->next;
           }
-          set_string(&up->thisorder, buf);
-          k = igetkeyword(up->thisorder, up->faction->locale);
-          assert(k==K_MOVE);
+          set_order(&up->thisorder, parse_order(buf, up->faction->locale));
+          free_order(up->thisorder); /* parse_order & set_order have each increased the refcount */
           ++followers;
         }
       }
@@ -1805,7 +1827,7 @@ mk_piracy(const faction * f, direction_t target_dir)
 }
 
 static int
-piracy(unit *u)
+piracy_cmd(unit *u, struct order * ord)
 {
 	region *r = u->region;
 	ship *sh = u->ship, *sh2;
@@ -1818,12 +1840,12 @@ piracy(unit *u)
 	attrib      *a;
 
 	if (!sh) {
-		cmistake(u, findorder(u, u->thisorder), 144, MSG_MOVE);
+		cmistake(u, ord, 144, MSG_MOVE);
 		return 0;
 	}
 
 	if (!fval(u, UFL_OWNER)) {
-		cmistake(u, findorder(u, u->thisorder), 46, MSG_MOVE);
+		cmistake(u, ord, 46, MSG_MOVE);
 		return 0;
 	}
 
@@ -1832,6 +1854,8 @@ piracy(unit *u)
 
 	il = intlist_init();
 
+  init_tokens(ord);
+  skip_token();
 	s = getstrtoken();
 	while(s && *s) {
 		il = intlist_add(il, atoi(s));
@@ -1863,7 +1887,7 @@ piracy(unit *u)
 					&& check_takeoff(sh, r, rc) == true) {
 
 				for(sh2 = rc->ships; sh2; sh2 = sh2->next) {
-					unit * cap = shipowner(rc, sh2);
+					unit * cap = shipowner(sh2);
 					if (cap && (intlist_find(il, cap->faction->no) || all)) {
 						aff[dir]++;
 					}
@@ -1901,10 +1925,12 @@ piracy(unit *u)
 	/* Befehl konstruieren */
 	sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
 		locale_string(u->faction->locale, directions[target_dir]));
-	set_string(&u->thisorder, buf);
+	set_order(&u->thisorder, parse_order(buf, u->faction->locale));
+        free_order(u->thisorder); /* parse_order & set_order have each increased the refcount */
 
 	/* Bewegung ausführen */
-	igetkeyword(u->thisorder, u->faction->locale);	/* NACH ignorieren */
+  init_tokens(u->thisorder);
+  skip_token();
 	return move(u, true);
 }
 
@@ -1956,23 +1982,23 @@ hunt(unit *u)
   direction_t dir;
 
   if(!u->ship) {
-    cmistake(u, findorder(u, u->thisorder), 144, MSG_MOVE);
+    cmistake(u, u->thisorder, 144, MSG_MOVE);
     return 0;
   } else if(!fval(u, UFL_OWNER)) {
-    cmistake(u, findorder(u, u->thisorder), 146, MSG_MOVE);
+    cmistake(u, u->thisorder, 146, MSG_MOVE);
     return 0;
   } else if(attacked(u)) {
-    cmistake(u, findorder(u, u->thisorder), 52, MSG_MOVE);
+    cmistake(u, u->thisorder, 52, MSG_MOVE);
     return 0;
   } else if (!can_move(u)) {
-    cmistake(u, findorder(u, u->thisorder), 55, MSG_MOVE);
+    cmistake(u, u->thisorder, 55, MSG_MOVE);
     return 0;
   }
 
   id = getshipid();
 
   if (id <= 0) {
-    cmistake(u,  findorder(u, u->thisorder), 20, MSG_MOVE);
+    cmistake(u,  u->thisorder, 20, MSG_MOVE);
     return 0;
   }
 
@@ -1981,7 +2007,7 @@ hunt(unit *u)
   if (dir == NODIRECTION) {
     ship * sh = findship(id);
     if (sh==NULL || sh->region!=rc) {
-      cmistake(u, findorder(u, u->thisorder), 20, MSG_MOVE);
+      cmistake(u, u->thisorder, 20, MSG_MOVE);
     }
     return 0;
   }
@@ -2001,8 +2027,8 @@ hunt(unit *u)
 
   /* In command steht jetzt das NACH-Kommando. */
 
-  igetkeyword(command, u->faction->locale);	/* NACH ignorieren und Parsing initialisieren. */
-
+  /* NACH ignorieren und Parsing initialisieren. */
+  igetstrtoken(command);
   /* NACH ausführen */
   if (move(u, false)!=0) {
     /* niemand sollte auf einen kapitän direkt ein folge haben, oder? */
@@ -2103,40 +2129,42 @@ move_hunters(void)
 {
   region *r;
 
-	for (r = regions; r; r = r->next) {
-		unit * u;
-		for (u = r->units; u;) {
-			unit *u2 = u->next;
-			strlist *o;
-			param_t p;
+  for (r = regions; r; r = r->next) {
+    unit * u;
+    for (u = r->units; u;) {
+      unit *u2 = u->next;
+      order * ord;
+      param_t p;
 
-			for (o=u->orders;o;o=o->next) {
-				if(igetkeyword(o->s, u->faction->locale) == K_FOLLOW) {
-					if(attacked(u)) {
-						cmistake(u, o->s, 52, MSG_MOVE);
-						break;
-					} else if (!can_move(u)) {
-						cmistake(u, o->s, 55, MSG_MOVE);
-						break;
-					}
+      for (ord=u->orders;ord;ord=ord->next) {
+        if (get_keyword(ord) == K_FOLLOW) {
+          if (attacked(u)) {
+            cmistake(u, ord, 52, MSG_MOVE);
+            break;
+          } else if (!can_move(u)) {
+            cmistake(u, ord, 55, MSG_MOVE);
+            break;
+          }
 
-					p = getparam(u->faction->locale);
-					if(p != P_SHIP) {
-						if(p != P_UNIT) {
-							cmistake(u, o->s, 240, MSG_MOVE);
-						}
-						break;
-					}
+          init_tokens(ord);
+          skip_token();
+          p = getparam(u->faction->locale);
+          if (p != P_SHIP) {
+            if (p != P_UNIT) {
+              cmistake(u, ord, 240, MSG_MOVE);
+            }
+            break;
+          }
 
-					if (!fval(u, UFL_LONGACTION) && !fval(u, UFL_HUNGER) && hunt(u)) {
-						u2 = r->units;
-						break;
-					}
-				}
-			}
-			u = u2;
-		}
-	}
+          if (!fval(u, UFL_LONGACTION) && !fval(u, UFL_HUNGER) && hunt(u)) {
+            u2 = r->units;
+            break;
+          }
+        }
+      }
+      u = u2;
+    }
+  }
 }
 
 /** Piraten and Drift 
@@ -2156,8 +2184,8 @@ move_pirates(void)
     while (*up) {
       unit *u = *up;
 
-      if (!fval(u, UFL_LONGACTION) && igetkeyword(u->thisorder, u->faction->locale) == K_PIRACY) {
-        piracy(u);
+      if (!fval(u, UFL_LONGACTION) && get_keyword(u->thisorder) == K_PIRACY) {
+        piracy_cmd(u, u->thisorder);
         fset(u, UFL_LONGACTION);
       }
 
@@ -2197,24 +2225,28 @@ movement(void)
 
       while (*up) {
         unit *u = *up;
-        keyword_t kword = igetkeyword(u->thisorder, u->faction->locale);
+        keyword_t kword = get_keyword(u->thisorder);
 
         switch (kword) {
         case K_ROUTE:
         case K_MOVE:
           if (attacked(u)) {
-            cmistake(u, findorder(u, u->thisorder), 52, MSG_MOVE);
-            set_string(&u->thisorder, "");
+            cmistake(u, u->thisorder, 52, MSG_MOVE);
+            set_order(&u->thisorder, NULL);
           } else if (!can_move(u)) {
-            cmistake(u, findorder(u, u->thisorder), 55, MSG_MOVE);
-            set_string(&u->thisorder, "");
+            cmistake(u, u->thisorder, 55, MSG_MOVE);
+            set_order(&u->thisorder, NULL);
           } else {
             if (ships) {
               if (u->ship && fval(u, UFL_OWNER)) {
+                init_tokens(u->thisorder);
+                skip_token();
                 if (move(u, true)!=0) repeat = true;
               }
             } else {
               if (u->ship==NULL || !fval(u, UFL_OWNER)) {
+                init_tokens(u->thisorder);
+                skip_token();
                 if (move(u, true)!=0) repeat = true;
               }
             }
@@ -2245,59 +2277,63 @@ movement(void)
 void
 follow_unit(void)
 {
-	region * r;
+  region * r;
 
   for (r=regions;r;r=r->next) {
-		unit * u;
+    unit * u;
 
     for (u=r->units;u;u=u->next) {
-			attrib * a;
-			strlist * o;
+      attrib * a;
+      order * ord;
 
       if (fval(u, UFL_LONGACTION) || fval(u, UFL_HUNGER)) continue;
-			a = a_find(u->attribs, &at_follow);
-			for (o=u->orders;o;o=o->next) {
+      a = a_find(u->attribs, &at_follow);
+      for (ord=u->orders;ord;ord=ord->next) {
         const struct locale * lang = u->faction->locale;
-        
-        if (igetkeyword(o->s, lang) == K_FOLLOW && getparam(lang) == P_UNIT) {
-					int id = read_unitid(u->faction, r);
 
-          if (id>0) {
-						unit * uf = findunit(id);
-						if (!a) {
-							a = a_add(&u->attribs, make_follow(uf));
-						} else {
-							a->data.v = uf;
-						}
-					} else if (a) {
-						a_remove(&u->attribs, a);
-						a = NULL;
-					}
-				}
-			}
+        if (get_keyword(ord) == K_FOLLOW) {
+          init_tokens(ord);
+          skip_token();
+          if (getparam(lang) == P_UNIT) {
+            int id = read_unitid(u->faction, r);
 
-			if (a && !fval(u, UFL_MOVED)) {
-				unit * u2 = a->data.v;
+            if (id>0) {
+              unit * uf = findunit(id);
+              if (!a) {
+                a = a_add(&u->attribs, make_follow(uf));
+              } else {
+                a->data.v = uf;
+              }
+            } else if (a) {
+              a_remove(&u->attribs, a);
+              a = NULL;
+            }
+          }
+        }
+      }
 
-				if (!u2 || u2->region!=r || !cansee(u->faction, r, u2, 0))
-					continue;
-				for (o=u2->orders;o;o=o->next) {
-					switch (igetkeyword(o->s, u2->faction->locale)) {
-					case K_MOVE:
-					case K_ROUTE:
-					case K_DRIVE:
-					case K_FOLLOW:
-					case K_PIRACY:
-						fset(u, UFL_FOLLOWING);
-						fset(u2, UFL_FOLLOWED);
-						set_string(&u->thisorder, "");
-						break;
-					default:
-						continue;
-					}
-					break;
-				}
-			}
-		}
-	}
+      if (a && !fval(u, UFL_MOVED)) {
+        unit * u2 = a->data.v;
+
+        if (!u2 || u2->region!=r || !cansee(u->faction, r, u2, 0))
+          continue;
+        for (ord=u2->orders;ord;ord=ord->next) {
+          switch (get_keyword(ord)) {
+            case K_MOVE:
+            case K_ROUTE:
+            case K_DRIVE:
+            case K_FOLLOW:
+            case K_PIRACY:
+              fset(u, UFL_FOLLOWING);
+              fset(u2, UFL_FOLLOWED);
+              set_order(&u->thisorder, NULL);
+              break;
+            default:
+              continue;
+          }
+          break;
+        }
+      }
+    }
+  }
 }

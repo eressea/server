@@ -23,20 +23,21 @@
 #include "message.h"
 
 /* kernel includes */
-#include "plane.h"
-#include "faction.h"
-#include "unit.h"
-#include "region.h"
-#include "item.h"
 #include "building.h"
+#include "faction.h"
+#include "item.h"
+#include "order.h"
+#include "plane.h"
+#include "region.h"
+#include "unit.h"
 
 /* util includes */
-#include <base36.h>
-#include <goodies.h>
-#include <message.h>
-#include <nrmessage.h>
-#include <crmessage.h>
-#include <log.h>
+#include <util/base36.h>
+#include <util/goodies.h>
+#include <util/message.h>
+#include <util/nrmessage.h>
+#include <util/crmessage.h>
+#include <util/log.h>
 
 /* libc includes */
 #include <stddef.h>
@@ -92,20 +93,19 @@ translate_regions(const char *st, const faction * f)
 			cache_pl = getplane(r);
 		}
 
-		if (f == NULL)
-			f = findfaction(MONSTER_FACTION);
+		if (r!=NULL) {
+			const char *rn;
 
-		if(r) {
-			if (cache_pl && fval(cache_pl,PFL_NOCOORDS)) {
-				sprintf(t, "%s", rname(r, f->locale));
+      if (f!=NULL) {
+        rn = rname(r, f->locale);
 			} else {
-				const char *rn = rname(r, f->locale);
+        rn = rname(r, default_locale);
+      }
 				if(rn && *rn) {
 					sprintf(t, "%s (%d,%d)", rn, region_x(r, f), region_y(r, f));
 				} else {
 					sprintf(t, "(%d,%d)", region_x(r, f), region_y(r, f));
 				}
-			}
 		} else strcpy(t, "(Chaos)");
 
 		t += strlen(t);
@@ -115,16 +115,6 @@ translate_regions(const char *st, const faction * f)
 	if (s == temp)
 		strcat(t, p);
 	return s;
-}
-
-void
-free_messages(message_list * m)
-{
-	struct mlist * x = m->begin;
-	while (x) {
-		m->begin = x->next;
-		msg_release(x->msg);
-	}
 }
 
 messageclass * msgclasses;
@@ -165,15 +155,17 @@ arg_set(void * args[], const message_type * mtype, const char * buffer, void * v
 	for (i=0;i!=mtype->nparameters;++i) {
 		if (!strcmp(buffer, mtype->pnames[i])) break;
 	}
-	if (i!=mtype->nparameters) args[i] = v;
-	else {
+  if (i!=mtype->nparameters) {
+    assert(args[i]==NULL);
+    args[i] = v;
+  } else {
 		fprintf(stderr, "invalid parameter %s for message type %s\n", buffer, mtype->name);
 		assert(!"program aborted.");
 	}
 }
 
 struct message * 
-msg_error(const struct unit * u, const char * cmd, const char * name, const char* sig, ...)
+msg_feedback(const struct unit * u, struct order * ord, const char * name, const char* sig, ...)
 {
 	va_list marker;
 	const message_type * mtype = mt_find(name);
@@ -182,8 +174,7 @@ msg_error(const struct unit * u, const char * cmd, const char * name, const char
 	void * args[16];
 	memset(args, 0, sizeof(args));
 
-	if (cmd==NULL || cmd==u->thisorder) cmd = findorder(u, u->thisorder);
-	assert(cmd!=u->thisorder || !"only use entries from u->orders - memory corruption imminent.");
+	if (ord==NULL) ord = u->thisorder;
 
 	if (!mtype) {
 		log_error(("trying to create message of unknown type \"%s\"\n", name));
@@ -192,7 +183,7 @@ msg_error(const struct unit * u, const char * cmd, const char * name, const char
 
 	arg_set(args, mtype, "unit", (void*)u);
 	arg_set(args, mtype, "region", (void*)u->region);
-	arg_set(args, mtype, "command", (void*)cmd);
+	arg_set(args, mtype, "command", (void*)ord);
 
 	va_start(marker, sig);
 	while (*ic && !isalnum(*ic)) ic++;
@@ -391,33 +382,28 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 void
 addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 {
-	caddmessage(r, f, gc_add(strdup(translate_regions(s, f))), mtype, level);
-}
-
-static void
-xmistake(const unit * u, const char *s, const char *comment, int mtype)
-{
-	if (u->faction->no == MONSTER_FACTION) return;
-	add_message(&u->faction->msgs, msg_message("mistake",
-		"command error unit region", s, comment, u, u->region));
+  caddmessage(r, f, gc_add(strdup(translate_regions(s, f))), mtype, level);
 }
 
 void
-cmistake(const unit * u, const char *cmd, int mno, int mtype)
+mistake(const unit * u, struct order * ord, const char *comment, int mtype)
+{
+  if (u->faction->no != MONSTER_FACTION) {
+    char * cmt = strdup(translate_regions(comment, u->faction));
+    ADDMSG(&u->faction->msgs, msg_message("mistake",
+      "command error unit region", copy_order(ord), cmt, u, u->region));
+  }
+}
+
+void
+cmistake(const unit * u, struct order *ord, int mno, int mtype)
 {
 	static char ebuf[20];
 
 	if (u->faction->no == MONSTER_FACTION) return;
 	sprintf(ebuf, "error%d", mno);
-	add_message(&u->faction->msgs, msg_message(ebuf, 
-		"command unit region", cmd, u, u->region));
-}
-
-void
-mistake(const unit * u, const char *command, const char *comment, int mtype)
-{
-	if (u->faction->no == MONSTER_FACTION) return;
-	xmistake(u, command, gc_add(strdup(translate_regions(comment, u->faction))), mtype);
+	ADDMSG(&u->faction->msgs, msg_message(ebuf, 
+		"command unit region", copy_order(ord), u, u->region));
 }
 
 extern unsigned int new_hashstring(const char* s);
@@ -440,62 +426,4 @@ add_message(message_list** pm, message * m)
 	return m;
 }
 
-#ifdef MSG_LEVELS
-typedef struct warning {
-  struct warning * next;
-  const struct messageclass * section;
-  int level;
-} warning;
-
-void
-set_msglevel(struct warning ** warnings, const char * type, int level)
-{
-  struct warning ** w = warnings;
-  while (*w) {
-    if (!strcasecmp((*w)->section->name, type)) break;
-    w = &(*w)->next;
-  }
-  if (*w && level==-1){
-    struct warning * old = *w;
-    *w = old->next;
-    free(old);
-  } else if (level>=0) {
-    struct warning * x = calloc(sizeof(struct warning), 1);
-    x->next = *w;
-    x->level = level;
-    x->section = mc_find(type);
-    *w = x;
-  }
-}
-
-void
-write_msglevels(struct warning * warnings, FILE * F)
-{
-	/* hier ist ein bug? */
-	struct warning * w = warnings;
-	while (w) {
-		fprintf(F, "%s %d ", w->section->name, w->level);
-		w = w->next;
-	}
-	fputs("end ", F);
-}
-
-void
-read_msglevels(struct warning ** w, FILE * F)
-{
-	fscanf(F, "%s", buf);
-	while (strcmp("end", buf)) {
-		int level;
-		const messageclass * mc = mc_find(buf);
-		fscanf(F, "%d ", &level);
-		if (mc && level>=0) {
-			*w = calloc(sizeof(struct warning), 1);
-			(*w)->level = level;
-			(*w)->section = mc;
-			w = &(*w)->next;
-		}
-		fscanf(F, "%s", buf);
-	}
-}
-#endif
 

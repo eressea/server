@@ -34,7 +34,6 @@ struct skill;
 #define UFL_PARTEITARNUNG (1<<4)	/* 16 */
 #define UFL_DISBELIEVES   (1<<5)	/* 32 */
 #define UFL_WARMTH        (1<<6)	/* 64 */
-
 #define UFL_MOVED         (1<<8)
 #define UFL_FOLLOWING     (1<<9)
 #define UFL_FOLLOWED      (1<<10)
@@ -59,7 +58,7 @@ außer ARBEITE ausführen */
 #define UFL_SAVEMASK (UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL | FL_UNNAMED)
 
 typedef struct unit {
-	struct unit *next;
+	struct unit *next; /* needs to be first entry, for region's unitlist */
 	struct unit *nexthash;
 	struct unit *nextF; /* nächste Einheit der Partei */
 	struct unit *prevF; /* letzte Einheit der Partei */
@@ -73,8 +72,8 @@ typedef struct unit {
 	struct faction *faction;
 	struct building *building;
 	struct ship *ship;
-	char *thisorder;
-	char *lastorder;
+
+	/* skill data */
 	int skill_size;
 	struct skill *skills;
 	struct item * items;
@@ -83,13 +82,20 @@ typedef struct unit {
 		const struct resource_type * type;
 		int value;
 	} * reservations;
-	struct strlist *orders;
+
+	/* orders */
+	struct order *orders;
+	struct order * thisorder;
+	struct order * lastorder;
+
+	/* race and illusionary race */
+	const struct race * race;
+	const struct race * irace;
+
 	struct strlist *botschaften;
 	unsigned int flags;
 	struct attrib * attribs;
 	status_t status;
-	const struct race * race;
-	const struct race * irace;
 	int n;	/* enno: attribut? */
 	int wants;	/* enno: attribut? */
 } unit;

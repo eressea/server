@@ -561,10 +561,10 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     property = xmlGetProp(node, BAD_CAST "name");
     assert(property!=NULL);
     if (strcmp((const char*)property, "give")==0) {
-      itype->give = (boolean (*)(const struct unit*, const struct unit*, const struct item_type *, int, const char *))fun;
+      itype->give = (boolean (*)(const struct unit*, const struct unit*, const struct item_type *, int, struct order *))fun;
     }
     else if (strcmp((const char*)property, "use")==0) {
-      itype->use = (int (*)(struct unit *, const struct item_type *, int, const char *))fun;
+      itype->use = (int (*)(struct unit *, const struct item_type *, int, struct order *))fun;
     } else {
       log_error(("unknown function type '%s' for item '%s'\n",
         (const char*)property, rtype->_name[0]));

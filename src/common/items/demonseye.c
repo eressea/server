@@ -31,13 +31,13 @@
 #include <assert.h>
 
 static int
-summon_igjarjuk(struct unit * u, const struct item_type * itype, int amount, const char * cmd)
+summon_igjarjuk(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
 {
 	struct plane * p = rplane(u->region);
 	unused(amount);
 	unused(itype);
 	if (p!=NULL) {
-		ADDMSG(&u->faction->msgs, msg_error(u, cmd, "use_realworld_only", ""));
+		ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_realworld_only", ""));
 		return EUNUSABLE;
 	} else {
 		assert(!"not implemented");
@@ -54,11 +54,11 @@ static resource_type rt_demonseye = {
 
 
 boolean
-give_igjarjuk(const struct unit * src, const struct unit * d, const struct item_type * itype, int n, const char * cmd)
+give_igjarjuk(const struct unit * src, const struct unit * d, const struct item_type * itype, int n, struct order * ord)
 {
 	sprintf(buf, "Eine höhere Macht hindert %s daran, das Objekt zu übergeben. "
 			"'ES IST DEINS, MEIN KIND. DEINS GANZ ALLEIN'.", unitname(src));
-	mistake(src, cmd, buf, MSG_COMMERCE);
+	mistake(src, ord, buf, MSG_COMMERCE);
 	return false;
 }
 

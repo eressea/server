@@ -23,12 +23,13 @@
 #include "eressea.h"
 #include "pool.h"
 
-#include "unit.h"
 #include "faction.h"
 #include "item.h"
 #include "magic.h"
+#include "order.h"
 #include "region.h"
 #include "race.h"
+#include "unit.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -378,17 +379,19 @@ init_pool(void)
 	 * erweitert haben. */
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) {
-			strlist *s;
+			order * ord;
+      for (ord=u->orders; ord; ord=ord->next) {
+				if (u->number > 0 && (urace(u)->ec_flags & GETITEM) && get_keyword(ord) == K_RESERVE) {
+          int use, count = geti();
+          const resource_type * rtype;
 
-			list_foreach(strlist, u->orders, s) {
-				if (u->number > 0 && igetkeyword(s->s, u->faction->locale) == K_RESERVE
-						&& (urace(u)->ec_flags & GETITEM)) {
-					int count = geti();
-					int use;
-					const char *what = getstrtoken();
-					const resource_type * rtype = findresourcetype(what, u->faction->locale);
-					if (rtype == NULL)
-						list_continue(s);	/* nur mit resources implementiert */
+          init_tokens(ord);
+          skip_token();
+          count = geti();
+
+          rtype = findresourcetype(getstrtoken(), u->faction->locale);
+          if (rtype == NULL) continue;
+
 					new_set_resvalue(u, rtype, 0);	/* make sure the pool is empty */
 					use = new_use_pooled(u, rtype, GET_DEFAULT, count);
 					if (use) {
@@ -397,7 +400,6 @@ init_pool(void)
 					}
 				}
 			}
-			list_next(s);
 		}
 	}
 }

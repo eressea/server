@@ -86,6 +86,53 @@ mt_new_va(const char * name, ...)
 	return mt_new(name, args);
 }
 
+typedef struct arg_type {
+  struct arg_type * next;
+  const char * name;
+  void  (*free)(void*);
+  void* (*copy)(void*);
+} arg_type;
+
+arg_type * argtypes = NULL;
+
+void
+register_argtype(const char * name, void(*free_arg)(void*), void*(*copy_arg)(void*))
+{
+  arg_type * atype = malloc(sizeof(arg_type));
+  atype->name = name;
+  atype->next = argtypes;
+  atype->free = free_arg;
+  atype->copy = copy_arg;
+  argtypes = atype;
+}
+
+static arg_type *
+find_argtype(const char * name)
+{
+  arg_type * atype = argtypes;
+  while (atype!=NULL) {
+    if (strcmp(atype->name, name)==0) return atype;
+    atype = atype->next;
+  }
+  return NULL;
+}
+
+static void *
+copy_arg(const char * type, void * data)
+{
+  arg_type * atype = find_argtype(type);
+  if (atype==NULL) return data;
+  if (atype->copy==NULL) return data;
+  return atype->copy(data);
+}
+
+static void
+free_arg(const char * type, void * data)
+{
+  arg_type * atype = find_argtype(type);
+  if (atype && atype->free) atype->free(data);
+}
+
 message *
 msg_create(const struct message_type * type, void * args[])
 {
@@ -101,7 +148,7 @@ msg_create(const struct message_type * type, void * args[])
   msg->parameters = calloc(sizeof(void*), type->nparameters);
   msg->refcount=1;
   for (i=0;i!=type->nparameters;++i) {
-    msg->parameters[i] = args[i];
+    msg->parameters[i] = copy_arg(type->types[i], args[i]);
   }
   return msg;
 }
@@ -164,7 +211,11 @@ mt_register(const message_type * type)
 void
 msg_free(message *msg)
 {
+  int i;
   assert(msg->refcount==0);
+  for (i=0;i!=msg->type->nparameters;++i) {
+    free_arg(msg->type->types[i], msg->parameters[i]);
+  }
   free((void*)msg->parameters);
   free(msg);
 }

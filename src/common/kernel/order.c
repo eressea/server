@@ -10,26 +10,25 @@
 #include <string.h>
 
 keyword_t
-getkeyword(const order * ord)
+get_keyword(const order * ord)
 {
-	if (ord==NULL) {
-		return NOKEYWORD;
-	}
-	igetstrtoken(ord->str);
-	return ord->keyword;
+  if (ord==NULL) {
+    return NOKEYWORD;
+  }
+  return ord->_keyword;
 }
 
 const char * 
 getcommand(const order * ord)
 {
-	return ord->str;
+  return ord->_str;
 }
 
 void 
 free_order(order * ord)
 {
-	if (ord!=NULL && --ord->refcount==0) {
-		free(ord->str);
+	if (ord!=NULL && --ord->_refcount==0) {
+		free(ord->_str);
 		free(ord);
 	}
 }
@@ -37,15 +36,16 @@ free_order(order * ord)
 order *
 copy_order(order * ord)
 {
-	if (ord!=NULL) ++ord->refcount;
+	if (ord!=NULL) ++ord->_refcount;
 	return ord;
 }
 
 void 
 set_order(struct order ** destp, struct order * src)
 {
-	free_order(*destp);
-	*destp = copy_order(src);
+  if (*destp==src) return;
+  free_order(*destp);
+  *destp = copy_order(src);
 }
 
 void
@@ -61,21 +61,25 @@ free_orders(order ** olist)
 order * 
 parse_order(const char * s, const struct locale * lang)
 {
+  while (isspace(*s)) ++s;
+  if (*s==0) return NULL;
+  else {
 	order * ord = (order*)malloc(sizeof(order));
-	ord->keyword = igetkeyword(s, lang);
-	ord->refcount = 1;
-	ord->str = strdup(s);
+	ord->_str = strdup(s);
+	ord->_keyword = findkeyword(parse_token(&s), lang);
+	ord->_refcount = 1;
 	ord->next = NULL;
 	return ord;
+  }
 }
 
 boolean
 is_persistent(const order * cmd)
 {
 #ifdef AT_PERSISTENT
-	if (cmd->str[0] == '@') return true;
+	if (cmd->_str[0] == '@') return true;
 #endif      /* Nur kurze Befehle! */
-	switch (cmd->keyword) {
+	switch (cmd->_keyword) {
 	case K_KOMMENTAR:
 	case K_LIEFERE:
 		return true;
@@ -87,6 +91,13 @@ is_persistent(const order * cmd)
 char * 
 write_order(const order * cmd, const struct locale * lang, char * buffer, size_t size)
 {
-	assert(igetkeyword(cmd->str, lang)==cmd->keyword);
-	return strncpy(buffer, cmd->str, size);
+  if (cmd==0) {
+	buffer[0]=0;
+	return buffer;
+  }
+#ifndef NDEBUG
+  init_tokens_str(cmd->_str);
+  assert(findkeyword(getstrtoken(), lang)==cmd->_keyword);
+#endif
+  return strncpy(buffer, cmd->_str, size);
 }

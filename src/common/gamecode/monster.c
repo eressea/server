@@ -23,23 +23,36 @@
 #include "eressea.h"
 #include "monster.h"
 
+/* gamecode includes */
 #include "economy.h"
 
+/* triggers includes */
+#include <triggers/removecurse.h>
+
+/* attributes includes */
+#include <attributes/targetregion.h>
+#include <attributes/hate.h>
+#include <attributes/aggressive.h>
+
+/* spezialmonster */
+#include <spells/alp.h>
+
 /* kernel includes */
-#include <item.h>
-#include <reports.h>
-#include <message.h>
-#include <region.h>
-#include <faction.h>
-#include <movement.h>
-#include <race.h>
-#include <magic.h>
-#include <skill.h>
-#include <build.h>
-#include <pool.h>
-#include <names.h>
-#include <unit.h>
-#include <pathfinder.h>
+#include <kernel/build.h>
+#include <kernel/faction.h>
+#include <kernel/give.h>
+#include <kernel/item.h>
+#include <kernel/message.h>
+#include <kernel/movement.h>
+#include <kernel/names.h>
+#include <kernel/order.h>
+#include <kernel/pathfinder.h>
+#include <kernel/pool.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/reports.h>
+#include <kernel/skill.h>
+#include <kernel/unit.h>
 
 /* util includes */
 #include <attrib.h>
@@ -52,17 +65,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
-/* triggers includes */
-#include <triggers/removecurse.h>
-
-/* attributes includes */
-#include <attributes/targetregion.h>
-#include <attributes/hate.h>
-#include <attributes/aggressive.h>
-
-/* spezialmonster */
-#include <spells/alp.h>
 
 #ifdef HAVE_ZLIB
 #include <zlib.h>
@@ -84,7 +86,7 @@ static boolean
 is_waiting(const unit * u)
 {
 	if (fval(u, UFL_ISNEW)) return true;
-	if (strncasecmp(u->lastorder, "WARTEN", 6) == 0) return true;
+	if (get_keyword(u->lastorder)==K_WAIT) return true;
 
 	return false;
 }
@@ -93,7 +95,6 @@ static boolean
 monster_attack(unit * u, const unit * target)
 {
 	char zText[20];
-	strlist *S;
 
 	if (u->region!=target->region) return false;
 	if (!cansee(u->faction, u->region, target, 0)) return false;
@@ -101,18 +102,15 @@ monster_attack(unit * u, const unit * target)
 
 	sprintf(zText, "%s %s",
 		locale_string(u->faction->locale, keywords[K_ATTACK]), unitid(target));
-	S = makestrlist(zText);
-	addlist(&u->orders, S);
+	addlist(&u->orders, parse_order(zText, u->faction->locale));
 	return true;
 }
 
 void
 taxed_by_monster(unit * u)
 {
-	strlist *S;
-
-	S = makestrlist(locale_string(u->faction->locale, keywords[K_TAX]));
-	addlist(&u->orders, S);
+  const char * zText = locale_string(u->faction->locale, keywords[K_TAX]);
+  addlist(&u->orders, parse_order(zText, u->faction->locale));
 }
 
 static boolean
@@ -330,34 +328,31 @@ treeman_neighbour(region * r)
 static void
 move_monster(region * r, unit * u)
 {
-	direction_t d = NODIRECTION;
-	strlist *S;
+  direction_t d = NODIRECTION;
 
-	switch(old_race(u->race)) {
-	case RC_FIREDRAGON:
-	case RC_DRAGON:
-	case RC_WYRM:
-		d = richest_neighbour(r, 1);
-		break;
-	case RC_TREEMAN:
-		d = treeman_neighbour(r);
-		break;
-	default:
-		d = random_neighbour(r,u);
-		break;
-	}
+  switch(old_race(u->race)) {
+    case RC_FIREDRAGON:
+    case RC_DRAGON:
+    case RC_WYRM:
+      d = richest_neighbour(r, 1);
+      break;
+    case RC_TREEMAN:
+      d = treeman_neighbour(r);
+      break;
+    default:
+      d = random_neighbour(r,u);
+      break;
+  }
 
-	/* falls kein geld gefunden wird, zufaellig verreisen, aber nicht in
-	 * den ozean */
+  /* falls kein geld gefunden wird, zufaellig verreisen, aber nicht in
+  * den ozean */
 
-	if (d == NODIRECTION)
-		return;
+  if (d == NODIRECTION)
+    return;
 
-	sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), locale_string(u->faction->locale, directions[d]));
+  sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), locale_string(u->faction->locale, directions[d]));
 
-	S = makestrlist(buf);
-	S->next = u->orders;
-        u->orders = S;
+  addlist(&u->orders, parse_order(buf, u->faction->locale));
 }
 
 /* Wir machen das mal autoconf-style: */
@@ -479,16 +474,15 @@ set_movement_order(unit * u, const region * target, int moves, boolean (*allowed
 		fprintf(dragonlog, "%s wandert von %s nach %s: %s\n", unitname(u), f_regionid(r, u->faction), f_regionid(target, u->faction), buf);
 #endif
 	}
-	set_string(&u->lastorder, buf);
+	set_order(&u->lastorder, parse_order(buf, u->faction->locale));
+        free_order(u->lastorder); /* parse_order & set_order have both increased the refcount */
 	return true;
 }
-/* ------------------------------------------------------------- */
 
 static void
 monster_seeks_target(region *r, unit *u)
 {
 	direction_t d;
-	strlist *S, **SP;
 	unit *target = NULL;
 	int dist, dist2;
 	direction_t i;
@@ -545,12 +539,8 @@ monster_seeks_target(region *r, unit *u)
 	if( d == NODIRECTION )
 		return;
 	sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), locale_string(u->faction->locale, directions[d]));
-	SP = &u->orders;
-	S = makestrlist(buf);
-	addlist2(SP, S);
-	*SP = 0;
+	addlist(&u->orders, parse_order(buf, u->faction->locale));
 }
-/* ------------------------------------------------------------- */
 
 unit *
 random_unit(const region * r)
@@ -680,7 +670,7 @@ eaten_by_monster(unit * u)
 	}
 }
 
-void
+static void
 absorbed_by_monster(unit * u)
 {
 	int n;
@@ -854,8 +844,6 @@ static void ponnuki(unit * u)
 
 }
 
-extern void make_ponnuki(void);
-
 static void
 learn_monster(unit *u)
 {
@@ -880,7 +868,8 @@ learn_monster(unit *u)
 			if (++c == n) {
 				sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_STUDY]),
 					skillname(sv->id, u->faction->locale));
-				set_string(&u->thisorder, buf);
+				set_order(&u->thisorder, parse_order(buf, u->faction->locale));
+                                free_order(u->thisorder); /* parse_order & set_order have both increased the refcount */
 				break;
 			}
 		}
@@ -890,330 +879,281 @@ learn_monster(unit *u)
 void
 monsters_kill_peasants(void)
 {
-	region *r;
-	unit *u;
+  region *r;
+  unit *u;
 
-	for (r = regions; r; r = r->next) {
-		for (u = r->units; u; u = u->next) if(!fval(u, UFL_MOVED)) {
-			if(u->race->flags & RCF_SCAREPEASANTS) {
-				scared_by_monster(u);
-			}
-			if(u->race->flags & RCF_KILLPEASANTS) {
-				eaten_by_monster(u);
-			}
-			if(u->race->flags & RCF_ABSORBPEASANTS) {
-				absorbed_by_monster(u);
-			}
-		}
-	}
+  for (r = regions; r; r = r->next) {
+    for (u = r->units; u; u = u->next) if(!fval(u, UFL_MOVED)) {
+      if(u->race->flags & RCF_SCAREPEASANTS) {
+        scared_by_monster(u);
+      }
+      if(u->race->flags & RCF_KILLPEASANTS) {
+        eaten_by_monster(u);
+      }
+      if(u->race->flags & RCF_ABSORBPEASANTS) {
+        absorbed_by_monster(u);
+      }
+    }
+  }
 }
 
 static boolean
 check_overpopulated(unit *u)
 {
-	unit *u2;
-	int c = 0;
+  unit *u2;
+  int c = 0;
 
-	for(u2 = u->region->units; u2; u2 = u2->next) {
-		if(u2->race == u->race && u != u2) c += u2->number;
-	}
+  for(u2 = u->region->units; u2; u2 = u2->next) {
+    if(u2->race == u->race && u != u2) c += u2->number;
+  }
 
-	if(c > u->race->splitsize * 2) return true;
+  if(c > u->race->splitsize * 2) return true;
 
-	return false;
+  return false;
+}
+
+static void
+plan_dragon(unit * u)
+{
+  attrib *ta;
+  region * tr = NULL;
+  int horses = get_resource(u,R_HORSE);
+  int capacity = walkingcapacity(u);
+  item ** itmp = &u->items;
+
+  if (horses > 0) {
+    change_resource(u, R_HORSE, - min(horses,(u->number*2)));
+  }
+  while (capacity>0 && *itmp!=NULL) {
+    item * itm = *itmp;
+    if (itm->type->capacity<itm->type->weight) {
+      int weight = itm->number*itm->type->capacity;
+      if (weight > capacity) {
+        int error = give_item(itm->number, itm->type, u, NULL, NULL);
+        if (error!=0) break;
+      }
+    }
+    if (*itmp==itm) itmp=&itm->next;
+  }
+  if (rand() % 100 < 4) {
+    /* dragon gets bored and looks for a different place to go */
+    ta = set_new_dragon_target(u, u->region, DRAGON_RANGE);
+  }
+  else ta = a_find(u->attribs, &at_targetregion);
+  if (ta!=NULL) {
+    tr = (region *) ta->data.v;
+    if (tr==NULL || !path_exists(u->region, tr, DRAGON_RANGE, allowed_dragon)) {
+      ta = set_new_dragon_target(u, u->region, DRAGON_RANGE);
+      if (ta) tr = findregion(ta->data.sa[0], ta->data.sa[1]);
+    }
+  }
+  if (tr!=NULL) {
+    switch(old_race(u->race)) {
+    case RC_FIREDRAGON:
+      set_movement_order(u, tr, 4, allowed_dragon);
+      break;
+    case RC_DRAGON:
+      set_movement_order(u, tr, 3, allowed_dragon);
+      break;
+    case RC_WYRM:
+      set_movement_order(u, tr, 1, allowed_dragon);
+      break;
+    }
+    if (rand()%100 < 15) {
+      /* do a growl */
+      if (rname(tr, u->faction->locale)) {
+        sprintf(buf,
+          "botschaft an region %s~...~%s~etwas~in~%s.",
+          estring(random_growl()), u->number==1?"Ich~rieche":"Wir~riechen",
+          estring(rname(tr, u->faction->locale)));
+        addlist(&u->orders, parse_order(buf, u->faction->locale));
+      }
+    }
+  } else {
+    if (!get_money_for_dragon(u->region, u, income(u))) {
+      /* money is gone */
+      set_new_dragon_target(u, u->region, DRAGON_RANGE);
+    }
+    else if (u->race != new_race[RC_FIREDRAGON] && u->region->terrain!=T_OCEAN
+      && !(terrain[rterrain(u->region)].flags & FORBIDDEN_LAND)) {
+        int ra = 20 + rand() % 100;
+        if (get_money(u) > ra * 50 + 100 && rand() % 100 < 50)
+        {
+          const struct item_type * weapon = NULL;
+          unit *un;
+          un = createunit(u->region, findfaction(MONSTER_FACTION), ra, new_race[RC_DRACOID]);
+          name_unit(un);
+          change_money(u, -un->number * 50);
+
+          set_level(un, SK_SPEAR, (3 + rand() % 4));
+          set_level(un, SK_SWORD, (3 + rand() % 4));
+          set_level(un, SK_LONGBOW, (2 + rand() % 3));
+
+          switch (rand() % 3) {
+          case 0:
+            weapon = olditemtype[I_LONGBOW];
+            break;
+          case 1:
+            weapon = olditemtype[I_SWORD];
+            break;
+          default:
+            weapon = olditemtype[I_SPEAR];
+            break;
+          }
+          i_change(&un->items, weapon, un->number);
+          if (weapon->rtype->wtype->flags & WTF_MISSILE) un->status = ST_BEHIND;
+          else un->status = ST_FIGHT;
+          sprintf(buf, "%s \"%s\"", keywords[K_STUDY], skillname(weapon->rtype->wtype->skill, u->faction->locale));
+          set_order(&un->lastorder, parse_order(buf, default_locale));
+        }
+        if (is_waiting(u)) {
+          sprintf(buf, "%s \"%s\"", keywords[K_STUDY], skillname(SK_OBSERVATION, u->faction->locale));
+          set_order(&u->thisorder, parse_order(buf, default_locale));
+          set_order(&u->lastorder, u->thisorder);
+        }
+      }
+  }
 }
 
 void
 plan_monsters(void)
 {
-	region *r;
-	faction *f;
-	unit *u;
-	int ra;
-	attrib *ta;
-	strlist *S;
+  region *r;
+  faction *f;
+  unit *u;
+  attrib *ta;
 
-	if (!dragonlog) {
-		char zText[MAX_PATH];
+  if (!dragonlog) {
+    char zText[MAX_PATH];
 #ifdef HAVE_ZLIB
-		sprintf(zText, "%s/dragonlog.gz", basepath());
-		dragonlog = gzopen(zText, "w");
+    sprintf(zText, "%s/dragonlog.gz", basepath());
+    dragonlog = gzopen(zText, "w");
 #elif HAVE_BZ2LIB
-		sprintf(zText, "%s/dragonlog.bz2", basepath());
-		dragonlog = BZ2_bzopen(zText,"w");
+    sprintf(zText, "%s/dragonlog.bz2", basepath());
+    dragonlog = BZ2_bzopen(zText,"w");
 #else
-		sprintf(zText, "%s/dragonlog", basepath());
-		dragonlog = fopen(zText, "w");
+    sprintf(zText, "%s/dragonlog", basepath());
+    dragonlog = fopen(zText, "w");
 #endif
-	}
-	u = findunitg(atoi36("ponn"), NULL);
-	if (!u) make_ponnuki();
-	f = findfaction(MONSTER_FACTION);
-	if (!f)
-		return;
+  }
+  u = findunitg(atoi36("ponn"), NULL);
+  if (!u) make_ponnuki();
+  f = findfaction(MONSTER_FACTION);
+  if (!f)
+    return;
 
-	f->lastorders = turn;
+  f->lastorders = turn;
 
-	for (r = regions; r; r = r->next) {
-		for (u = r->units; u; u = u->next) {
-			region * tr = NULL;
-			boolean is_moving = false;
+  for (r = regions; r; r = r->next) {
+    for (u = r->units; u; u = u->next) {
+      region * tr = NULL;
+      boolean is_moving = false;
 
-			/* Ab hier nur noch Befehle für NPC-Einheiten. */
+      /* Ab hier nur noch Befehle für NPC-Einheiten. */
 
-			if (u->faction->no != MONSTER_FACTION) continue;
+      if (u->faction->no != MONSTER_FACTION) continue;
 
-			/* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
-			produceexp(u, SK_OBSERVATION, u->number);
+      /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
+      produceexp(u, SK_OBSERVATION, u->number);
 
-			ta = a_find(u->attribs, &at_hate);
-			if (ta && strncmp(u->lastorder, "WARTEN", 6) != 0) {
-				unit * tu = (unit *)ta->data.v;
-				if (tu && tu->region==r) {
-					sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_ATTACK]), itoa36(tu->no));
-					S = makestrlist(buf);
-					addlist(&u->orders, S);
-				} else if (tu) {
-					tu = findunitg(ta->data.i, NULL);
-					if (tu) set_movement_order(u, tu->region, 2, allowed_walk);
-				}
-				else a_remove(&u->attribs, ta);
-			}
-			ta = a_find(u->attribs, &at_targetregion);
-			if (ta!=NULL) {
-				tr = (region *) ta->data.v;
-				if (tr != r) is_moving = true;
-			}
+      ta = a_find(u->attribs, &at_hate);
+      if (ta && is_waiting(u)) {
+        unit * tu = (unit *)ta->data.v;
+        if (tu && tu->region==r) {
+          sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_ATTACK]), itoa36(tu->no));
+          addlist(&u->orders, parse_order(buf, u->faction->locale));
+        } else if (tu) {
+          tu = findunitg(ta->data.i, NULL);
+          if (tu) set_movement_order(u, tu->region, 2, allowed_walk);
+        }
+        else a_remove(&u->attribs, ta);
+      }
+      ta = a_find(u->attribs, &at_targetregion);
+      if (ta!=NULL) {
+        tr = (region *) ta->data.v;
+        if (tr != r) is_moving = true;
+      }
 
-			if (!(fval(u, UFL_ISNEW)) && r->terrain != T_OCEAN) { /* Monster bewachen immer */
-				strlist *S;
-				S = makestrlist(locale_string(u->faction->locale, keywords[K_GUARD]));
-				addlist(&u->orders, S);
-			}
+      if (!(fval(u, UFL_ISNEW)) && r->terrain != T_OCEAN) { /* Monster bewachen immer */
+        const char * cmd = locale_string(u->faction->locale, keywords[K_GUARD]);
+        addlist(&u->orders, parse_order(cmd, u->faction->locale));
+      }
 
-			/* Diese Verkettung ist krank und sollte durch eine 'vernünftige KI'
-			 * ersetzt werden. */
+      /* Diese Verkettung ist krank und sollte durch eine 'vernünftige KI'
+      * ersetzt werden. */
 
-			if( (u->race->flags & RCF_MOVERANDOM)
-					&& (rand()%100<MOVECHANCE || check_overpopulated(u))) {
-				move_monster(r, u);
-			} else {
-				boolean done = false;
-				if((u->race->flags & RCF_ATTACKRANDOM) && is_moving == false)
-				{
-					double probability;
-					attrib *a = a_find(u->attribs, &at_aggressive);
+      if( (u->race->flags & RCF_MOVERANDOM)
+        && (rand()%100<MOVECHANCE || check_overpopulated(u))) {
+          move_monster(r, u);
+        } else {
+          boolean done = false;
+          if((u->race->flags & RCF_ATTACKRANDOM) && is_moving == false)
+          {
+            double probability;
+            attrib *a = a_find(u->attribs, &at_aggressive);
 
-					if (a) {
-						probability = a->data.flt;
-					} else {
-						probability = MONSTERATTACK;
-					}
+            if (a) {
+              probability = a->data.flt;
+            } else {
+              probability = MONSTERATTACK;
+            }
 
-					if(chance(probability)) {
-						done = random_attack_by_monster(r, u);
-					}
-				}
-				if (!done) {
-					if(u->race == new_race[RC_SEASERPENT]) {
-						set_string(&u->thisorder, locale_string(u->faction->locale, keywords[K_PIRACY]));
-						set_string(&u->lastorder, locale_string(u->faction->locale, keywords[K_PIRACY]));
-					} else if(u->race->flags & RCF_LEARN) {
-						learn_monster(u);
-					}
-				}
-			}
+            if(chance(probability)) {
+              done = random_attack_by_monster(r, u);
+            }
+          }
+          if (!done) {
+            if(u->race == new_race[RC_SEASERPENT]) {
+              set_order(&u->thisorder, parse_order(keywords[K_PIRACY], default_locale));
+              set_order(&u->lastorder, u->thisorder);
+              free_order(u->lastorder); /* parse_order & set_order have both increased the refcount */
+            } else if(u->race->flags & RCF_LEARN) {
+              learn_monster(u);
+            }
+          }
+        }
 
-			/* Ab hier noch nicht generalisierte Spezialbehandlungen. */
+        /* Ab hier noch nicht generalisierte Spezialbehandlungen. */
 
-			switch (old_race(u->race)) {
-			case RC_ILLUSION:
-				if (u->no==atoi36("ponn")) ponnuki(u);
-				break;
-			/* Alp */
-			case RC_ALP:
-				monster_seeks_target(r, u);
-				break;
-			case RC_FIREDRAGON:
-			case RC_DRAGON:
-			case RC_WYRM:
-
-				{
-					int horses = get_resource(u,R_HORSE);
-					if (horses > 0) {
-						change_resource(u, R_HORSE, - min(horses,(u->number*2)));
-					}
-				}
-				set_item(u, I_STONE, 0);
-				set_item(u, I_WOOD, 0);
-				set_item(u, I_IRON, 0);
-				if (rand() % 100 < 4) {
-					/* dragon gets bored and looks for a different place to go */
-					ta = set_new_dragon_target(u, r, DRAGON_RANGE);
-				}
-				else ta = a_find(u->attribs, &at_targetregion);
-				if (ta!=NULL) {
-					tr = (region *) ta->data.v;
-					if (tr==NULL || !path_exists(r, tr, DRAGON_RANGE, allowed_dragon)) {
-						ta = set_new_dragon_target(u, r, DRAGON_RANGE);
-						if (ta) tr = findregion(ta->data.sa[0], ta->data.sa[1]);
-					}
-				}
-				if (tr!=NULL) {
-					switch(old_race(u->race)) {
-					case RC_FIREDRAGON:
-						set_movement_order(u, tr, 4, allowed_dragon);
-						break;
-					case RC_DRAGON:
-						set_movement_order(u, tr, 3, allowed_dragon);
-						break;
-					case RC_WYRM:
-						set_movement_order(u, tr, 1, allowed_dragon);
-						break;
-					}
-					if (rand()%100 < 15) {
-						/* do a growl */
-						if (rname(tr, u->faction->locale)) {
-							strlist *S;
-							sprintf(buf,
-								"botschaft an region %s~...~%s~etwas~in~%s.",
-								estring(random_growl()), u->number==1?"Ich~rieche":"Wir~riechen",
-								estring(rname(tr, u->faction->locale)));
-							S = makestrlist(buf);
-							addlist(&u->orders, S);
-						}
-					}
-				} else {
-					if (!get_money_for_dragon(r, u, income(u))) {
-						/* money is gone */
-						set_new_dragon_target(u, r, DRAGON_RANGE);
-					}
-					else if (u->race != new_race[RC_FIREDRAGON] && r->terrain!=T_OCEAN
-							&& !(terrain[rterrain(r)].flags & FORBIDDEN_LAND)) {
-						ra = 20 + rand() % 100;
-						if (get_money(u) > ra * 50 + 100 && rand() % 100 < 50)
-						{
-							unit *un;
-							un = createunit(r, findfaction(MONSTER_FACTION), ra, new_race[RC_DRACOID]);
-							name_unit(un);
-							change_money(u, -un->number * 50);
-
-							set_level(un, SK_SPEAR, (3 + rand() % 4));
-							set_level(un, SK_SWORD, (3 + rand() % 4));
-							set_level(un, SK_LONGBOW, (2 + rand() % 3));
-
-							switch (rand() % 3) {
-							case 0:
-								set_item(un, I_LONGBOW, un->number);
-								un->status = ST_BEHIND;
-								set_string(&un->lastorder, "LERNE BOGENSCHIESSEN");
-								break;
-							case 1:
-								set_item(un, I_SWORD, un->number);
-								un->status = ST_FIGHT;
-								set_string(&un->lastorder, "LERNE SCHWERTKAMPF");
-								break;
-							case 2:
-								set_item(un, I_SPEAR, un->number);
-								un->status = ST_FIGHT;
-								set_string(&un->lastorder, "LERNE SPEERKAMPF");
-								break;
-							}
-						}
-						if (is_waiting(u)) {
-							set_string(&u->thisorder, "LERNE WAHRNEHMUNG");
-							set_string(&u->lastorder, "LERNE WAHRNEHMUNG");
-						}
-					}
-				}
-				break;
-			}
-		}
-	}
-	if (dragonlog) {
+        switch (old_race(u->race)) {
+        case RC_ILLUSION:
+          if (u->no==atoi36("ponn")) ponnuki(u);
+          break;
+          /* Alp */
+        case RC_ALP:
+          monster_seeks_target(r, u);
+          break;
+        case RC_FIREDRAGON:
+        case RC_DRAGON:
+        case RC_WYRM:
+          plan_dragon(u);
+          break;
+        }
+    }
+  }
+  if (dragonlog) {
 #ifdef HAVE_ZLIB
-		gzclose(dragonlog);
+    gzclose(dragonlog);
 #elif HAVE_BZ2LIB
-		BZ2_bzclose(dragonlog);
+    BZ2_bzclose(dragonlog);
 #else
-		fclose(dragonlog);
+    fclose(dragonlog);
 #endif
-		dragonlog = NULL;
-	}
-}
-
-static void
-age_default(unit *u)
-{
+    dragonlog = NULL;
+  }
 }
 
 void
 age_unit(region * r, unit * u)
 {
-	if (u->race == new_race[RC_SPELL]) {
-		u->age--;
-		if (u->age <= 0)
-			destroy_unit(u);
-	} else {
-		u->age++;
-
-		if(u->race->age) {
-			u->race->age(u);
-		} else {
-			age_default(u);
-		}
-	}
-}
-
-static void
-split_unit(region * r, unit *u)
-{
-	unit *u2 = createunit(r, u->faction, 0, u->race);
-	int newsize = u->number/2;
-
-	set_string(&u2->name, u->name);
-	set_string(&u2->display, u->display);
-	set_string(&u2->thisorder, "WARTEN");
-	set_string(&u2->lastorder, "WARTEN");
-
-	transfermen(u, u2, newsize);
-}
-
-void
-check_split(void)
-{
-	region *r;
-	unit *u;
-
-	for(r=regions;r;r=r->next) {
-		for(u=r->units;u;u=u->next) {
-			if(u->faction->no == MONSTER_FACTION) {
-				if(u->number > u->race->splitsize) {
-						split_unit(r, u);
-				}
-			}
-		}
-	}
-}
-
-void
-monsters_leave(void)
-{
-	region *r;
-	unit *u;
-	int n;
-
-	for(r=regions;r;r=r->next) {
-		for(u=r->units;u;u=u->next) {
-			for(n = get_item(u, I_PEGASUS); n > 0; n--) {
-
-			}
-			for(n = get_item(u, I_UNICORN); n > 0; n--) {
-
-			}
-			for(n = get_item(u, I_DOLPHIN); n > 0; n--) {
-
-			}
-		}
-	}
+  if (u->race == new_race[RC_SPELL]) {
+    if (--u->age <= 0) {
+      destroy_unit(u);
+    }
+  } else {
+    ++u->age;
+    if (u->race->age) {
+      u->race->age(u);
+    }
+  }
 }

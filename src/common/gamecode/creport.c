@@ -38,26 +38,27 @@
 #include "economy.h"
 
 /* kernel includes */
-#include <alchemy.h>
-#include <border.h>
-#include <building.h>
-#include <faction.h>
-#include <group.h>
-#include <item.h>
-#include <karma.h>
-#include <magic.h>
-#include <message.h>
-#include <movement.h>
-#include <plane.h>
-#include <race.h>
-#include <region.h>
-#include <reports.h>
-#include <resources.h>
-#include <ship.h>
-#include <skill.h>
-#include <teleport.h>
-#include <unit.h>
-#include <save.h>
+#include <kernel/alchemy.h>
+#include <kernel/border.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/group.h>
+#include <kernel/item.h>
+#include <kernel/karma.h>
+#include <kernel/magic.h>
+#include <kernel/message.h>
+#include <kernel/movement.h>
+#include <kernel/order.h>
+#include <kernel/plane.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/reports.h>
+#include <kernel/resources.h>
+#include <kernel/ship.h>
+#include <kernel/skill.h>
+#include <kernel/teleport.h>
+#include <kernel/unit.h>
+#include <kernel/save.h>
 
 /* util includes */
 #include <util/message.h>
@@ -191,10 +192,10 @@ print_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
 	 * bei jedem curse gesondert behandelt. */
 	if (typ == TYP_SHIP){
 		ship * sh = (ship*)obj;
-		unit * owner;
+		unit * owner = shipowner(sh);
 		a = sh->attribs;
 		r = sh->region;
-		if((owner = shipowner(r,sh)) != NULL){
+		if(owner != NULL) {
 			if (owner->faction == viewer){
 				self = 2;
 			} else { /* steht eine person der Partei auf dem Schiff? */
@@ -591,7 +592,6 @@ cr_output_unit(FILE * F, const region * r,
 	building * b;
 	const char * pzTmp;
 	skill * sv;
-	strlist *S;
 	const attrib *a_fshidden = NULL;
 
 	assert(u);
@@ -678,6 +678,7 @@ cr_output_unit(FILE * F, const region * r,
 
 	/* additional information for own units */
 	if (u->faction == f || omniscient(f)) {
+          order * ord;
 		const char *c;
 		int i;
 		const attrib * a;
@@ -715,11 +716,11 @@ cr_output_unit(FILE * F, const region * r,
 
 		/* default commands */
 		fprintf(F, "COMMANDS\n");
-		if(u->lastorder[0] && u->lastorder[0] != '@') fprintf(F, "\"%s\"\n", u->lastorder);
-		for (S = u->orders; S; S = S->next) {
-			if(is_persistent(S->s, u->faction->locale)) {
-				fprintf(F, "\"%s\"\n", S->s);
-			}
+	  if (u->lastorder) fprintf(F, "\"%s\"\n", getcommand(u->lastorder));
+		for (ord = u->orders; ord; ord = ord->next) {
+                  if (is_persistent(ord) && ord!=u->lastorder) {
+                    fprintf(F, "\"%s\"\n", getcommand(ord));
+                  }
 		}
 
 		/* talents */
@@ -1407,7 +1408,7 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 			/* ships */
 			for (sh = r->ships; sh; sh = sh->next) {
 				int fno = -1;
-				u = shipowner(r, sh);
+				u = shipowner(sh);
 				if (u && !fval(u, UFL_PARTEITARNUNG)) {
 					const faction * sf = visible_faction(f,u);
 					fno = sf->no;

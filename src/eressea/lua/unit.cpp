@@ -6,14 +6,15 @@
 #include <attributes/racename.h>
 
 // kernel includes
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/magic.h>
+#include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/item.h>
-#include <kernel/faction.h>
 #include <kernel/skill.h>
-#include <kernel/unit.h>
-#include <kernel/magic.h>
 #include <kernel/spell.h>
+#include <kernel/unit.h>
 
 // util includes
 #include <util/base36.h>
@@ -273,6 +274,8 @@ unit_addorder(unit& u, const char * str)
   char buf[1024];
   char * s = buf;
   boolean quote = false;
+  order * ord;
+
   while (*str) {
     switch (*str) {
       case '"':
@@ -288,15 +291,15 @@ unit_addorder(unit& u, const char * str)
     ++str;
   }
   *s=0;
-  addstrlist(&u.orders, buf);
+  ord = parse_order(buf, u.faction->locale);
+  addlist(&u.orders, ord);
   u.faction->lastorders = turn;
 }
 
 static void
 unit_clearorders(unit& u)
 {
-  freestrlist(u.orders);
-  u.orders = NULL;
+  free_orders(&u.orders);
 }
 
 void

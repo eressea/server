@@ -1272,7 +1272,7 @@
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
-      <arg name="spell" type="string"/>
+      <arg name="spell" type="spell"/>
     </type>
     <text locale="de">"$unit($unit) unterläuft in $region($region) beim Zaubern von $spell ein Patzer:"</text>
     <text locale="en">"$unit($unit) fumbles while casting $spell in $region($region):"</text>
@@ -1281,9 +1281,9 @@
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
+      <arg name="spell" type="spell"/>
     </type>
-    <text locale="de">"Als $unit($unit) in $region($region) versucht, $order($command) zu zaubern, scheint plötzlich ein Beben durch die magische Essenz zu laufen und ein furchtbarer Sog versucht $unit($unit) in eine andere Dimension zu ziehen. Mit letzter Kraft gelingt es $unit($unit) sich zu retten."</text>
+    <text locale="de">"Als $unit($unit) in $region($region) versucht, $spell zu zaubern, scheint plötzlich ein Beben durch die magische Essenz zu laufen und ein furchtbarer Sog versucht $unit($unit) in eine andere Dimension zu ziehen. Mit letzter Kraft gelingt es $unit($unit) sich zu retten."</text>
   </message>
   <message name="patzer2" section="magic">
     <type>

@@ -18,6 +18,7 @@ extern "C" {
 
 struct tnode;
 struct locale;
+struct order;
 
 typedef struct syntaxtree {
 	const struct locale * lang;
@@ -25,13 +26,9 @@ typedef struct syntaxtree {
 	struct syntaxtree * next;
 } syntaxtree;
 
-typedef void (*parser)(const struct tnode *, const char*, void *, const char*);
-extern void add_command(struct tnode * troot, 
-								struct tnode * tnext, 
-								const char * str, 
-                        parser fun);
-extern void do_command(const struct tnode * troot, void * u, 
-							 const char * cmd);
+typedef void (*parser)(const struct tnode *, const char*, void *, struct order*);
+extern void add_command(struct tnode * troot, struct tnode * tnext, const char * str, parser fun);
+extern void do_command(const struct tnode * troot, void * u, struct order *);
 
 extern struct syntaxtree * stree_create(void);
 extern struct tnode * stree_find(const struct syntaxtree * stree, const struct locale * lang);

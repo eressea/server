@@ -29,13 +29,14 @@
 #include "karma.h"
 #include "magic.h"
 #include "message.h"
+#include "order.h"
+#include "plane.h"
 #include "race.h"
 #include "region.h"
 #include "ship.h"
 #include "skill.h"
-#include "unit.h"
 #include "spell.h"
-#include "plane.h"
+#include "unit.h"
 #ifdef USE_UGROUPS
 # include "ugroup.h"
 # include <attributes/ugroup.h>
@@ -405,9 +406,9 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
         }
       }
     }
-    if (!isbattle && u->lastorder[0]) {
+    if (!isbattle && u->lastorder) {
       scat(", \"");
-      scat(u->lastorder);
+      scat(getcommand(u->lastorder));
       scat("\"");
     }
   }

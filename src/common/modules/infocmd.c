@@ -13,15 +13,17 @@
 #include <config.h>
 #include <eressea.h>
 
+#ifdef INFOCMD_MODULE
 #include "infocmd.h"
 
 #include "command.h"
 
 /* kernel includes */
-#include <faction.h>
-#include <region.h>
-#include <unit.h>
-#include <save.h>
+#include <kernel/order.h>
+#include <kernel/faction.h>
+#include <kernel/region.h>
+#include <kernel/unit.h>
+#include <kernel/save.h>
 
 /* util includes */
 #include <base36.h>
@@ -33,40 +35,40 @@
 #include <stdlib.h>
 
 static void
-info_email(const tnode * tnext, const char * str, void * data, const char * cmd)
+info_email(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
 	unused(str);
 	unused(data);
-	unused(cmd);
+	unused(ord);
 }
 
 static void
-info_name(const tnode * tnext, const char * str, void * data, const char * cmd)
+info_name(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
 	unused(tnext);
         unused(str);
         unused(data);
-        unused(cmd);
+        unused(ord);
 	if (sqlstream!=NULL) {
 	}
 }
 
 static void
-info_address(const tnode * tnext, const char * str, void * data, const char * cmd)
+info_address(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
 	if (sqlstream!=NULL) {
 	}
 }
 
 static void
-info_phone(const tnode * tnext, const char * str, void * data, const char * cmd)
+info_phone(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
 	if (sqlstream!=NULL) {
 	}
 }
 
 static void
-info_vacation(const tnode * tnext, const char * str, void * data, const char * cmd)
+info_vacation(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
 
 	if (sqlstream!=NULL) {
@@ -98,18 +100,19 @@ infocommands(void)
 	while (*rp) {
 		region * r = *rp;
 		unit **up = &r->units;
-		while (*up) {
-			unit * u = *up;
-			strlist * order;
-			for (order = u->orders; order; order = order->next)
-				if (igetkeyword(order->s, u->faction->locale) == K_INFO) {
-					/* do_command(&g_keys, u, order->s); */
-				}
-			if (u==*up) up = &u->next;
-		}
-		if (*rp==r) rp = &r->next;
-	}
-	fflush(sqlstream);
+    while (*up) {
+      unit * u = *up;
+      order * ord;
+      for (ord = u->orders; ord; ord = ord->next) {
+        if (get_keyword(ord) == K_INFO) {
+          do_command(&g_keys, u, ord);
+        }
+      }
+      if (u==*up) up = &u->next;
+    }
+    if (*rp==r) rp = &r->next;
+  }
+  fflush(sqlstream);
 }
 
 void
@@ -123,3 +126,5 @@ init_info(void)
 	add_command(&g_info, NULL, "telefon", &info_phone);
 	add_command(&g_info, NULL, "urlaub", &info_vacation);
 }
+#endif /* INFOCMD_MODULE */
+

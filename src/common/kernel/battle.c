@@ -35,25 +35,25 @@ typedef enum combatmagic {
 
 #include "item.h"
 #include "alchemy.h"
-#include "plane.h"
-#include "magic.h"
-#include "faction.h"
-#include "reports.h"
 #include "build.h"
-#include "race.h"
-#include "movement.h"
+#include "building.h"
+#include "curse.h"
+#include "faction.h"
+#include "goodies.h"
+#include "karma.h"
+#include "magic.h"
+#include "message.h"
 #include "movement.h"
 #include "names.h"
+#include "order.h"
+#include "plane.h"
+#include "race.h"
 #include "region.h"
-#include "skill.h"
-#include "goodies.h"
-#include "unit.h"
-#include "message.h"
-#include "curse.h"
-#include "spell.h"
-#include "karma.h"
+#include "reports.h"
 #include "ship.h"
-#include "building.h"
+#include "skill.h"
+#include "spell.h"
+#include "unit.h"
 #include "group.h"
 
 /* attributes includes */
@@ -190,19 +190,6 @@ fleeregion(const unit * u)
 			!(u->race->flags & RCF_FLY)) {
 		return NULL;
 	}
-
-#ifdef FLEE_TO
-	/* Hat die Einheit ein NACH, wird die angegebene Richtung bevorzugt */
-	if (igetkeyword(u->thisorder) == K_MOVE
-				|| igetkeyword(u->thisorder) == K_ROUTE)
-	{
-		region *r2;
-		r2 = movewhere(r, u);
-		if (r2) {
-			return r2;
-		}
-	}
-#endif
 
 	for (i = 0; i != MAXDIRECTIONS; ++i) {
 		region * r2 = rconnect(r, i);
@@ -1513,6 +1500,7 @@ do_combatmagic(battle *b, combatmagic_t was)
       double power;
 			const struct locale * lang = mage->faction->locale;
 			char cmd[128];
+      order * ord;
 
 			switch(was) {
 			case DO_PRECOMBATSPELL:
@@ -1533,32 +1521,32 @@ do_combatmagic(battle *b, combatmagic_t was)
 			snprintf(cmd, 128, "%s \"%s\"",
 				LOC(lang, keywords[K_CAST]), spell_name(sp, lang));
 
-			if (cancast(mage, sp, 1, 1, cmd) == false)
-				continue;
+      ord = parse_order(cmd, lang);
+      if (cancast(mage, sp, 1, 1, ord) == false) {
+        free_order(ord);
+        continue;
+      }
 
 			level = eff_spelllevel(mage, sp, level, 1);
 			if (sl > 0) level = min(sl, level);
 			if (level < 0) {
-                          report_failed_spell(b, mage, sp);
-                          continue;
+        report_failed_spell(b, mage, sp);
+        free_order(ord);
+        continue;
 			}
 
-
-                        power = spellpower(r, mage, sp, level, cmd);
+      power = spellpower(r, mage, sp, level, ord);
+      free_order(ord);
 			if (power <= 0) {	/* Effekt von Antimagie */
-                          report_failed_spell(b, mage, sp);
-                          pay_spell(mage, sp, level, 1);
-                          continue;
-			}
-
-			if (fumble(r, mage, sp, sp->level) == true) {
-                          report_failed_spell(b, mage, sp);
-                          pay_spell(mage, sp, level, 1);
-                          continue;
-			}
-
-			co = new_castorder(fig, 0, sp, r, level, power, 0, 0, 0);
-			add_castorder(&cll[(int)(sp->rank)], co);
+        report_failed_spell(b, mage, sp);
+        pay_spell(mage, sp, level, 1);
+			} else if (fumble(r, mage, sp, sp->level) == true) {
+        report_failed_spell(b, mage, sp);
+        pay_spell(mage, sp, level, 1);
+      } else {
+        co = new_castorder(fig, 0, sp, r, level, power, 0, 0, 0);
+        add_castorder(&cll[(int)(sp->rank)], co);
+      }
 		}
 	}
 	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
@@ -1595,6 +1583,7 @@ do_combatspell(troop at, int row)
   double power;
   int fumblechance = 0;
   void **mg;
+  order * ord;
   int sl;
   char cmd[128];
   const struct locale * lang = mage->faction->locale;
@@ -1608,7 +1597,8 @@ do_combatspell(troop at, int row)
   }
   snprintf(cmd, 128, "%s \"%s\"",
     LOC(lang, keywords[K_CAST]), spell_name(sp, lang));
-  if (cancast(mage, sp, 1, 1, cmd) == false) {
+  ord = parse_order(cmd, lang);
+  if (cancast(mage, sp, 1, 1, ord) == false) {
     fi->magic = 0; /* Kann nicht mehr Zaubern, kämpft nichtmagisch weiter */
     return;
   }
@@ -1636,9 +1626,11 @@ do_combatspell(troop at, int row)
   if (rand()%100 < fumblechance) {
     report_failed_spell(b, mage, sp);
     pay_spell(mage, sp, level, 1);
+    free_order(ord);
     return;
   }
-  power = spellpower(r, mage, sp, level, cmd);
+  power = spellpower(r, mage, sp, level, ord);
+  free_order(ord);
   if (power <= 0) {	/* Effekt von Antimagie */
     report_failed_spell(b, mage, sp);
     pay_spell(mage, sp, level, 1);
@@ -2459,7 +2451,7 @@ aftermath(battle * b)
         fset(du, UFL_LONGACTION);
         /* TODO: das sollte hier weg sobald anderswo üb
         * erall UFL_LONGACTION getestet wird. */
-        set_string(&du->thisorder, "");
+        set_order(&du->thisorder, NULL);
       }
       for (n = 0; n != df->alive; ++n) {
         if (df->person[n].hp > 0)
@@ -2488,7 +2480,7 @@ aftermath(battle * b)
           }
           scale_number(du, df->run.number);
           du->hp = df->run.hp;
-          set_string(&du->thisorder, "");
+          set_order(&du->thisorder, NULL);
           setguard(du, GUARD_NONE);
           fset(du, UFL_LONGACTION);
           leave(du->region, du);
@@ -3486,24 +3478,25 @@ init_battle(region * r, battle **bp)
   for (u = r->units; u != NULL; u = u->next) {
     if (fval(u, UFL_LONGACTION)) continue;
     if (u->number > 0) {
-      strlist *sl;
-
-      list_foreach(strlist, u->orders, sl) {
+      order * ord;
+      
+      for (ord=u->orders;ord;ord=ord->next) {
         boolean init=false;
         static const curse_type * peace_ct, * slave_ct, * calm_ct;
+
         if (!init) {
           init = true;
           peace_ct = ct_find("peacezone");
           slave_ct = ct_find("slavery");
           calm_ct = ct_find("calmmonster");
         }
-        if (igetkeyword(sl->s, u->faction->locale) == K_ATTACK) {
+        if (get_keyword(ord) == K_ATTACK) {
           unit *u2;
           fighter *c1, *c2;
 
           if(r->planep && fval(r->planep, PFL_NOATTACK)) {
-            cmistake(u, sl->s, 271, MSG_BATTLE);
-            list_continue(sl);
+            cmistake(u, ord, 271, MSG_BATTLE);
+            continue;
           }
 
           /**
@@ -3512,83 +3505,85 @@ init_battle(region * r, battle **bp)
 #ifdef DELAYED_OFFENSE
           if (get_moved(&u->attribs) && !guarded_by(r, u->faction)) {
             add_message(&u->faction->msgs,
-              msg_message("no_attack_after_advance", "unit region command", u, u->region, sl->s));
+              msg_message("no_attack_after_advance", "unit region command", u, u->region, ord));
           }
 #endif
           if (fval(u, UFL_HUNGER)) {
-            cmistake(u, sl->s, 225, MSG_BATTLE);
-            list_continue(sl);
+            cmistake(u, ord, 225, MSG_BATTLE);
+            continue;
           }
 
           if (u->status == ST_AVOID || u->status == ST_FLEE) {
-            cmistake(u, sl->s, 226, MSG_BATTLE);
-            list_continue(sl);
+            cmistake(u, ord, 226, MSG_BATTLE);
+            continue;
           }
 
           /* ist ein Flüchtling aus einem andern Kampf */
-          if (fval(u, UFL_LONGACTION)) list_continue(sl);
+          if (fval(u, UFL_LONGACTION)) continue;
 
           if (peace_ct && curse_active(get_curse(r->attribs, peace_ct))) {
             sprintf(buf, "Hier ist es so schön friedlich, %s möchte "
               "hier niemanden angreifen.", unitname(u));
-            mistake(u, sl->s, buf, MSG_BATTLE);
-            list_continue(sl);
+            mistake(u, ord, buf, MSG_BATTLE);
+            continue;
           }
 
           if (slave_ct && curse_active(get_curse(u->attribs, slave_ct))) {
             sprintf(buf, "%s kämpft nicht.", unitname(u));
-            mistake(u, sl->s, buf, MSG_BATTLE);
-            list_continue(sl);
+            mistake(u, ord, buf, MSG_BATTLE);
+            continue;
           }
 
           /* Fehler: "Das Schiff muß erst verlassen werden" */
           if (u->ship != NULL && rterrain(r) != T_OCEAN) {
-            cmistake(u, sl->s, 19, MSG_BATTLE);
-            list_continue(sl);
+            cmistake(u, ord, 19, MSG_BATTLE);
+            continue;
           }
 
           if (leftship(u)) {
-            cmistake(u, sl->s, 234, MSG_BATTLE);
-            list_continue(sl);
+            cmistake(u, ord, 234, MSG_BATTLE);
+            continue;
           }
 
 
           /* Ende Fehlerbehandlung Angreifer */
 
+          init_tokens(ord);
+          skip_token();
           /* attackierte Einheit ermitteln */
           u2 = getunit(r, u->faction);
 
           /* Beginn Fehlerbehandlung */
           /* Fehler: "Die Einheit wurde nicht gefunden" */
           if (!u2 || u2->number == 0 || !cansee(u->faction, u->region, u2, 0)) {
-              cmistake(u, sl->s, 63, MSG_BATTLE);
-              list_continue(sl);
+              cmistake(u, ord, 63, MSG_BATTLE);
+              continue;
             }
             /* Fehler: "Die Einheit ist eine der unsrigen" */
             if (u2->faction == u->faction) {
-              cmistake(u, sl->s, 45, MSG_BATTLE);
-              list_continue(sl);
+              cmistake(u, ord, 45, MSG_BATTLE);
+              continue;
             }
             /* Fehler: "Die Einheit ist mit uns alliert" */
             if (alliedunit(u, u2->faction, HELP_FIGHT)) {
-              cmistake(u, sl->s, 47, MSG_BATTLE);
-              list_continue(sl);
+              cmistake(u, ord, 47, MSG_BATTLE);
+              continue;
             }
             /* xmas */
             if (u2->no==atoi36("xmas") && old_race(u2->irace)==RC_GNOME) {
               a_add(&u->attribs, a_new(&at_key))->data.i = atoi36("coal");
               sprintf(buf, "%s ist böse gewesen...", unitname(u));
-              mistake(u, sl->s, buf, MSG_BATTLE);
-              list_continue(sl);
+              mistake(u, ord, buf, MSG_BATTLE);
+              continue;
             } if (u2->faction->age < IMMUN_GEGEN_ANGRIFF) {
               add_message(&u->faction->msgs,
-                msg_error(u, findorder(u, u->thisorder), "newbie_immunity_error", "turns", IMMUN_GEGEN_ANGRIFF));
-              list_continue(sl);
+                msg_feedback(u, u->thisorder, "newbie_immunity_error", "turns", IMMUN_GEGEN_ANGRIFF));
+              continue;
             }
             /* Fehler: "Die Einheit ist mit uns alliert" */
             if (calm_ct && curse_active(get_cursex(u->attribs, calm_ct, (void*)u2->faction, cmp_curseeffect))) {
-              cmistake(u, sl->s, 47, MSG_BATTLE);
-              list_continue(sl);
+              cmistake(u, ord, 47, MSG_BATTLE);
+              continue;
             }
             /* Ende Fehlerbehandlung */
 
@@ -3622,7 +3617,6 @@ init_battle(region * r, battle **bp)
             }
         }
       }
-      list_next(sl);
     }
   }
   *bp = b;

@@ -193,7 +193,9 @@ game_init(void)
 #endif
 
   init_gmcmd();
+#ifdef INFOCMD_MODULE
   init_info();
+#endif
   init_conversion();
 
 #ifdef REMOVE_THIS

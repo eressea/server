@@ -158,7 +158,7 @@ verify_owners(boolean bOnce)
 				}
 			}
 			if (u->ship) {
-				unit * bo = shipowner(r, u->ship);
+				unit * bo = shipowner(u->ship);
 				if (!fval(bo, UFL_OWNER)) {
 					log_error(("[verify_owners] %u ist Besitzer von %s, hat aber UFL_OWNER nicht.\n", unitname(bo), shipname(u->ship)));
 					bFail = true;

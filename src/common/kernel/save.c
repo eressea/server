@@ -22,27 +22,27 @@
 #include "eressea.h"
 #include "save.h"
 
-#include "faction.h"
-#include "magic.h"
-#include "item.h"
-#include "unit.h"
-#include "building.h"
-#include "spell.h"
-#include "race.h"
-#include "attrib.h"
-#include "plane.h"
-#include "movement.h"
 #include "alchemy.h"
+#include "attrib.h"
+#include "border.h"
+#include "building.h"
+#include "faction.h"
+#include "item.h"
+#include "karma.h"
+#include "magic.h"
+#include "message.h"
+#include "movement.h"
+#include "objtypes.h"
+#include "order.h"
+#include "pathfinder.h"
+#include "plane.h"
+#include "race.h"
 #include "region.h"
 #include "resources.h"
-#include "unit.h"
-#include "skill.h"
-#include "message.h"
-#include "objtypes.h"
-#include "border.h"
-#include "karma.h"
 #include "ship.h"
-#include "pathfinder.h"
+#include "skill.h"
+#include "spell.h"
+#include "unit.h"
 #include "group.h"
 
 #ifdef USE_UGROUPS
@@ -459,79 +459,60 @@ write_enemies(FILE * F, const faction_list * flist)
 static unit *
 unitorders(FILE * F, struct faction * f)
 {
-	int i;
-	int p;
-	unit *u;
-	strlist *S, **SP;
+  int i;
+  unit *u;
 
-	if (!f) return NULL;
+  if (!f) return NULL;
 
-	i = getid();
-	u = findunitg(i, NULL);
+  i = getid();
+  u = findunitg(i, NULL);
 
-	if (u && old_race(u->race) == RC_SPELL) return NULL;
-	if (u && u->faction == f) {
-		/* SP zeigt nun auf den Pointer zur ersten StrListe. Auf die
-		 * erste StrListe wird mit u->orders gezeigt. Deswegen also
-		 * &u->orders, denn SP zeigt nicht auf die selbe stelle wie
-		 * u->orders, sondern auf die stelle VON u->orders! */
+  if (u && old_race(u->race) == RC_SPELL) return NULL;
+  if (u && u->faction == f) {
+    order ** ordp;
 
-		freestrlist(u->orders);
-		u->orders = 0;
+    free_orders(&u->orders);
+    u->orders = 0;
 
-		SP = &u->orders;
+    ordp = &u->orders;
 
-		for (;;) {
+    for (;;) {
+      const char * s;
+      /* Erst wenn wir sicher sind, dass kein Befehl
+      * eingegeben wurde, checken wir, ob nun eine neue
+      * Einheit oder ein neuer Spieler drankommt */
 
-			/* Erst wenn wir sicher sind, dass kein Befehl
-			 * eingegeben wurde, checken wir, ob nun eine neue
-			 * Einheit oder ein neuer Spieler drankommt */
+      if (!getbuf(F)) break;
 
-			if (!getbuf(F))
-				break;
+      init_tokens_str(buf);
+      s = getstrtoken();
 
-			if (igetkeyword(buf, u->faction->locale) == NOKEYWORD) {
-				p = igetparam(buf, u->faction->locale);
-				if (p == P_UNIT || p == P_FACTION || p == P_NEXT || p == P_GAMENAME)
-					break;
-			}
-			if (buf[0]) {
-				/* Nun wird eine StrListe S mit dem Inhalt buf2
-				 * angelegt. S->next zeigt nirgends hin. */
+      if (findkeyword(s, u->faction->locale) == NOKEYWORD) {
+        boolean quit = false;
+        switch (findparam(s, u->faction->locale)) {
+          case P_UNIT:
+          case P_FACTION:
+          case P_NEXT:
+          case P_GAMENAME:
+            quit = true;
+        }
+        if (quit) break;
+      }
+      if (buf[0]) {
+        /* Nun wird der Befehl erzeut und eingehängt */
+        *ordp = parse_order(buf, u->faction->locale);
+        ordp = &(*ordp)->next;
+      }
+    }
 
-				S = makestrlist(buf);
+    u->botschaften = NULL;	/* Sicherheitshalber */
 
-				/* Nun werden zwei Operationen ausgefuehrt
-				 * (addlist2 ist ein #definiertes macro!):
-				 * *SP = S       Der Pointer, auf den SP zeigte, zeigt nun auf S! Also
-				 * entweder u->orders oder S(alt)->next zeigen nun auf das neue S!
-				 *
-				 * SP = &S->next SP zeigt nun auf den Pointer S->next. Nicht auf
-				 * dieselbe Stelle wie S->next, sondern auf die Stelle VON S->next! */
-
-				addlist2(SP, S);
-
-				/* Und das letzte S->next darf natürlich nirgends mehr hinzeigen, es
-				 * wird auf null gesetzt. Warum das nicht bei addlist2 getan wird, ist
-				 * mir schleierhaft. So wie es jetzt implementiert ist, kann man es
-				 * (hier auf alle Fälle) hinter addlist2 schreiben, oder auch nur am
-				 * Ende einmal aufrufen - das wäre aber bei allen returns, und am ende
-				 * des for (;;) blockes. Grmpf. Dann lieber hier, immer, und dafür
-				 * sauberer... */
-
-				*SP = 0;
-			}
-		}
-
-		u->botschaften = NULL;	/* Sicherheitshalber */
-
-	} else {
-		/* cmistake(?, gc_add(strdup(buf)), 160, MSG_EVENT); */
-		return NULL;
-	}
-	return u;
+  } else {
+    /* cmistake(?, gc_add(strdup(buf)), 160, MSG_EVENT); */
+    return NULL;
+  }
+  return u;
 }
-/* ------------------------------------------------------------ */
 
 static faction *
 factionorders(void)
@@ -579,6 +560,12 @@ version(void)
 	return RELEASE_VERSION * 0.1;
 }
 /* ------------------------------------------------------------- */
+
+static param_t
+igetparam (const char *s, const struct locale *lang)
+{
+  return findparam (igetstrtoken (s), lang);
+}
 
 int
 readorders(const char *filename)
@@ -703,22 +690,6 @@ typus2race(unsigned char typus)
 {
 	if (typus>0 && typus <=11) return (race_t)(typus-1);
 	return NORACE;
-}
-
-boolean
-is_persistent(const char *s, const struct locale *lang)
-{
-	if (s==NULL) return false;
-#ifdef AT_PERSISTENT
-	if(*s == '@') return true;
-#endif      /* Nur kurze Befehle! */
-	switch(igetkeyword(s, lang)) {
-		case K_KOMMENTAR:
-		case K_LIEFERE:
-			return true;
-			break;
-	}
-	return false;
 }
 
 void
@@ -1016,6 +987,21 @@ write_faction_reference(const faction * f, FILE * F)
 	fprintf(F, "%s ", itoa36(f->no));
 }
 
+void
+fwrite_order(const order * ord, const struct locale * lang, FILE * F)
+{
+	write_order(ord, lang, buf, sizeof(buf));
+	fputs(buf, F);
+}
+
+static void
+writeorder(const order * ord, const struct locale * lang, FILE * F)
+{
+	fputc('\"', F);
+	fwrite_order(ord, lang, F);
+	fputs("\" ", F);
+}
+
 unit *
 readunit(FILE * F)
 {
@@ -1106,20 +1092,15 @@ readunit(FILE * F)
 	} else
 		u->flags = ri(F) & ~UFL_DEBUG;
 	/* Kurze persistente Befehle einlesen */
-	if (u->orders) {
-		freestrlist(u->orders);
-		u->orders = NULL;
-	}
+	free_orders(&u->orders);
 	rs(F, buf);
 	while(*buf != 0) {
-		strlist *S = makestrlist(buf);
-		addlist(&u->orders,S);
+          addlist(&u->orders, parse_order(buf, u->faction->locale));
 		rs(F, buf);
 	}
-	rds(F, &u->lastorder);
-	set_string(&u->thisorder, "");
-	if (global.data_version < EFFSTEALTH_VERSION)
-		u_seteffstealth(u, ri(F));
+        rs(F, buf);
+        u->lastorder = parse_order(buf, u->faction->locale);
+        set_order(&u->thisorder, NULL);
 
 	assert(u->number >= 0);
 	assert(u->race);
@@ -1199,7 +1180,7 @@ readunit(FILE * F)
 void
 writeunit(FILE * F, const unit * u)
 {
-	strlist *S;
+	order * ord;
 	int i;
 	wi36(F, u->no);
 	wi36(F, u->faction->no);
@@ -1217,13 +1198,12 @@ writeunit(FILE * F, const unit * u)
 	else wi36(F, 0);
 	wi(F, u->status);
 	wi(F, u->flags & UFL_SAVEMASK);
-	if (u->faction->no!=MONSTER_FACTION) for(S=u->orders; S; S=S->next) {
-		if (is_persistent(S->s, u->faction->locale)) {
-			ws(F, S->s);
-		}
+	wnl(F);
+	for (ord = u->orders; ord; ord=ord->next) {
+		if (is_persistent(ord)) writeorder(ord, u->faction->locale, F);
 	}
 	ws(F, ""); /* Abschluß der persistenten Befehle */
-	ws(F, u->lastorder);
+	writeorder(u->lastorder, u->faction->locale, F);
 	wnl(F);
 
 	assert(u->number >= 0);

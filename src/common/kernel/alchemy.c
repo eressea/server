@@ -58,7 +58,7 @@ herbsearch(region * r, unit * u, int max)
 	}
 
 	if(is_guarded(r, u, GUARD_PRODUCE)) {
-		cmistake(u, findorder(u, u->thisorder), 70, MSG_EVENT);
+		cmistake(u, u->thisorder, 70, MSG_EVENT);
 		return;
 	}
 
@@ -94,7 +94,7 @@ attrib_type at_bauernblut = {
 #endif
 
 int
-use_potion(unit * u, const item_type * itype, int amount, const char * cmd)
+use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 {
 	const potion_type * ptype = resource2potion(itype->rtype);
 	const potion_type * use = ugetpotionuse(u);
@@ -103,12 +103,12 @@ use_potion(unit * u, const item_type * itype, int amount, const char * cmd)
 	if (use != NULL && use!=ptype) {
 		ADDMSG(&u->faction->msgs,
 					msg_message("errusingpotion", "unit using command",
-          u, use->itype->rtype, cmd));
+          u, use->itype->rtype, ord));
 		return ECUSTOM;
 	}
 
 	if (ptype->use) {
-		int nRetval = ptype->use(u, ptype, amount, cmd);
+		int nRetval = ptype->use(u, ptype, amount, ord);
 		if (nRetval) return nRetval;
 	} else if (ptype==oldpotiontype[P_LIFE]) {
 		region * r = u->region;

@@ -22,23 +22,24 @@
 #include "eressea.h"
 #include "magic.h"
 
-#include "item.h"
-#include "pool.h"
-#include "message.h"
-#include "faction.h"
-#include "race.h"
-#include "spell.h"
-#include "ship.h"
-#include "curse.h"
 #include "building.h"
-#include "region.h"
+#include "curse.h"
+#include "faction.h"
 #include "goodies.h"
-#include "plane.h"
-#include "objtypes.h"
-#include "unit.h"
-#include "skill.h"
-#include "pathfinder.h"
+#include "item.h"
 #include "karma.h"
+#include "message.h"
+#include "objtypes.h"
+#include "order.h"
+#include "pathfinder.h"
+#include "plane.h"
+#include "pool.h"
+#include "race.h"
+#include "region.h"
+#include "ship.h"
+#include "skill.h"
+#include "spell.h"
+#include "unit.h"
 
 #include <triggers/timeout.h>
 #include <triggers/shock.h>
@@ -509,7 +510,7 @@ get_combatspell(const unit *u, int nr)
 }
 
 void
-set_combatspell(unit *u, spell *sp, const char * cmd, int level)
+set_combatspell(unit *u, spell *sp, struct order * ord, int level)
 {
 	sc_mage *m;
 
@@ -519,17 +520,17 @@ set_combatspell(unit *u, spell *sp, const char * cmd, int level)
 	/* knowsspell prüft auf ist_magier, ist_spruch, kennt_spruch */
 	if (knowsspell(u->region, u, sp) == false){
 		/* Fehler 'Spell not found' */
-		cmistake(u, cmd, 173, MSG_MAGIC);
+		cmistake(u, ord, 173, MSG_MAGIC);
 		return;
 	}
 	if (has_spell(u, sp) == false) {
 		/* Diesen Zauber kennt die Einheit nicht */
-		cmistake(u, cmd, 169, MSG_MAGIC);
+		cmistake(u, ord, 169, MSG_MAGIC);
 		return;
 	}
 	if (!(sp->sptyp & ISCOMBATSPELL)) {
 		/* Diesen Kampfzauber gibt es nicht */
-		cmistake(u, cmd, 171, MSG_MAGIC);
+		cmistake(u, ord, 171, MSG_MAGIC);
 		return;
 	}
 
@@ -902,7 +903,7 @@ knowsspell(const region * r, const unit * u, const spell * sp)
  */
 
 boolean
-cancast(unit * u, spell * sp, int level, int range, char * cmd)
+cancast(unit * u, spell * sp, int level, int range, struct order * ord)
 {
 	int k;
 	resource_t res;
@@ -911,13 +912,13 @@ cancast(unit * u, spell * sp, int level, int range, char * cmd)
 
 	if (knowsspell(u->region, u, sp) == false) {
 		/* Diesen Zauber kennt die Einheit nicht */
-		cmistake(u, strdup(cmd), 173, MSG_MAGIC);
+		cmistake(u, ord, 173, MSG_MAGIC);
 		return false;
 	}
 	/* reicht die Stufe aus? */
 	if (eff_skill(u, SK_MAGIC, u->region) < sp->level) {
 		/* die Einheit ist nicht erfahren genug für diesen Zauber */
-		cmistake(u, strdup(cmd), 169, MSG_MAGIC);
+		cmistake(u, ord, 169, MSG_MAGIC);
 		return false;
 	}
 
@@ -988,7 +989,7 @@ cancast(unit * u, spell * sp, int level, int range, char * cmd)
  */
 
 double
-spellpower(region * r, unit * u, spell * sp, int cast_level, const char * cmd)
+spellpower(region * r, unit * u, spell * sp, int cast_level, struct order * ord)
 {
   curse * c;
   double force = cast_level;
@@ -1009,7 +1010,7 @@ spellpower(region * r, unit * u, spell * sp, int cast_level, const char * cmd)
     unit * mage = c->magician;
     force -= curse_geteffect(c);
     curse_changevigour(&r->attribs, c, -cast_level);
-    cmistake(u, findorder(u, cmd), 185, MSG_MAGIC);
+    cmistake(u, ord, 185, MSG_MAGIC);
     if (force>0) {
       ADDMSG(&mage->faction->msgs, msg_message("reduce_spell", "self mage region", mage, u, r));
     } else {
@@ -1023,7 +1024,7 @@ spellpower(region * r, unit * u, spell * sp, int cast_level, const char * cmd)
     unit * mage = c->magician;
     force -= curse_geteffect(c);
     curse_changevigour(&u->attribs, c, -1);
-    cmistake(u, findorder(u, cmd), 185, MSG_MAGIC);
+    cmistake(u, ord, 185, MSG_MAGIC);
     if (force>0) {
       ADDMSG(&mage->faction->msgs, msg_message("reduce_spell", "self mage region", mage, u, r));
     } else {
@@ -1283,7 +1284,7 @@ do_fumble(castorder *co)
   const char * sp_name = spell_name(sp, u->faction->locale);
 
   ADDMSG(&u->faction->msgs, msg_message("patzer", "unit region spell",
-    u, r, sp_name));
+    u, r, sp));
   switch (rand() % 10) {
   case 0:
     /* wenn vorhanden spezieller Patzer, ansonsten nix */
@@ -1322,8 +1323,8 @@ do_fumble(castorder *co)
   case 4:
     /* Spruch schlägt fehl, alle Magiepunkte weg */
     set_spellpoints(u, 0);
-    ADDMSG(&u->faction->msgs, msg_message("patzer3", "unit region command",
-      u, r, sp_name));
+    ADDMSG(&u->faction->msgs, msg_message("patzer3", "unit region spell",
+      u, r, sp));
     break;
 
   case 5:
@@ -1486,7 +1487,7 @@ verify_targets(castorder *co)
 						failed++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, strdup(co->order),
+							mage, mage->region, co->order,
 							strdup(itoa36(spobj->data.i))));
 						break;
 					} else { /* Einheit wurde nun gefunden, pointer umsetzen */
@@ -1520,7 +1521,7 @@ verify_targets(castorder *co)
 									parameters[P_TEMP]), itoa36(spobj->data.i));
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, strdup(co->order), strdup(tbuf)));
+							mage, mage->region, co->order, strdup(tbuf)));
 						break;
 					} else {
 						/* Einheit wurde nun gefunden, pointer umsetzen */
@@ -1542,7 +1543,7 @@ verify_targets(castorder *co)
 						failed++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, strdup(co->order),
+							mage, mage->region, co->order,
 							strdup(itoa36(spobj->data.i))));
 						break;
 					}
@@ -1562,7 +1563,7 @@ verify_targets(castorder *co)
 						failed++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellbuildingnotfound%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
+							mage, mage->region, co->order, spobj->data.i));
 						break;
 					} else {
 						spobj->typ = SPP_BUILDING;
@@ -1585,7 +1586,7 @@ verify_targets(castorder *co)
 						failed++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellbuildingnotfound%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
+							mage, mage->region, co->order, spobj->data.i));
 						break;
 					}
 					break;
@@ -1604,7 +1605,7 @@ verify_targets(castorder *co)
 						failed++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellshipnotfound%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
+							mage, mage->region, co->order, spobj->data.i));
 						break;
 					} else {
 						spobj->typ = SPP_SHIP;
@@ -1627,7 +1628,7 @@ verify_targets(castorder *co)
 						failed++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellshipnotfound%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
+							mage, mage->region, co->order, spobj->data.i));
 						break;
 					}
 					break;
@@ -1661,7 +1662,7 @@ verify_targets(castorder *co)
 						spobj->flag = TARGET_NOTFOUND;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, strdup(co->order),
+							mage, mage->region, co->order,
 							strdup(itoa36(spobj->data.i))));
 						failed++;
 						break;
@@ -1676,7 +1677,7 @@ verify_targets(castorder *co)
 						resists++;
 						ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
               "unit region command target",
-							mage, mage->region, strdup(co->order), u));
+							mage, mage->region, co->order, u));
 						break;
 					}
 
@@ -1699,7 +1700,7 @@ verify_targets(castorder *co)
 						resists++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellbuildingresists%u:unit%r:region%s:command%d:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
+							mage, mage->region, co->order, spobj->data.i));
 						break;
 					}
 					success++;
@@ -1719,7 +1720,7 @@ verify_targets(castorder *co)
 						resists++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellshipresists%u:unit%r:region%s:command%d:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
+							mage, mage->region, co->order, spobj->data.i));
 						break;
 					}
 					success++;
@@ -1735,7 +1736,7 @@ verify_targets(castorder *co)
 						failed++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellregionresists%u:unit%r:region%s:command",
-							mage, mage->region, strdup(co->order)));
+							mage, mage->region, co->order));
 						break;
 					}
 					if ((sp->sptyp & TESTRESISTANCE)
@@ -1745,7 +1746,7 @@ verify_targets(castorder *co)
 						resists++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellregionresists%u:unit%r:region%s:command",
-							mage, mage->region, strdup(co->order)));
+							mage, mage->region, co->order));
 						break;
 					}
 					success++;
@@ -1784,7 +1785,7 @@ verify_targets(castorder *co)
 					/* Fehlermeldung */
 					add_message(&mage->faction->msgs, new_message(mage->faction,
 						"spellregionresists%u:unit%r:region%s:command",
-						mage, mage->region, strdup(co->order)));
+						mage, mage->region, co->order));
 					spobj->flag = TARGET_RESISTS;
 					resists++;
 				} else {
@@ -1846,8 +1847,7 @@ free_spellparameter(spellparameter *pa)
 
 
 static spellparameter *
-add_spellparameter(region *target_r, unit *u, const char *syntax,
-		char *s, int skip)
+add_spellparameter(region *target_r, unit *u, const char *syntax, struct order * ord, int skip)
 {
 	int i = 1;
 	int c = 0;
@@ -1859,7 +1859,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 	par = calloc(1, sizeof(spellparameter));
 
 	/* Temporären Puffer initialisieren */
-	tbuf = strdup(s);
+	tbuf = strdup(getcommand(ord));
 
 	/* Tokens zählen */
 	token = strtok(tbuf, " ");
@@ -1875,7 +1875,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 	 * geparst) */
 	if (par->length < 1) {
 		/* Fehler: Ziel vergessen */
-		cmistake(u, strdup(s), 203, MSG_MAGIC);
+		cmistake(u, ord, 203, MSG_MAGIC);
 		/* Aufräumen */
 		free(tbuf);
 		free(par);
@@ -1886,7 +1886,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 	par->param = calloc(par->length, sizeof(spllprm *));
 
 	/* Tokens zuweisen */
-	strcpy(tbuf, s);
+	strcpy(tbuf, getcommand(ord));
 	token = strtok (tbuf, " ");
 	while(token && syntax[c] != 0) {
 		if (i > skip) {
@@ -1918,7 +1918,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 							i++;
 							if (par->length < i - skip) {
 								/* Fehler: Ziel vergessen */
-								cmistake(u, strdup(s), 203, MSG_MAGIC);
+								cmistake(u, ord, 203, MSG_MAGIC);
 								/* Aufräumen */
 								free(tbuf);
 								free(spobj);
@@ -1936,7 +1936,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 							i++;
 							if (par->length < i - skip) {
 								/* Fehler: Ziel vergessen */
-								cmistake(u, strdup(s), 203, MSG_MAGIC);
+								cmistake(u, ord, 203, MSG_MAGIC);
 								/* Aufräumen */
 								free(tbuf);
 								free(spobj);
@@ -1972,7 +1972,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 					i++;
 					if (par->length < i - skip) {
 						/* Fehler: Zielregion vergessen */
-						cmistake(u, strdup(s), 194, MSG_MAGIC);
+						cmistake(u, ord, 194, MSG_MAGIC);
 						/* Aufräumen */
 						free(tbuf);
 						free(spobj);
@@ -1995,7 +1995,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 						spobj->data.r = rt;
 					} else {
 						/* Fehler: Zielregion vergessen */
-						cmistake(u, strdup(s), 194, MSG_MAGIC);
+						cmistake(u, ord, 194, MSG_MAGIC);
 						/* Aufräumen */
 						free(tbuf);
 						free(spobj);
@@ -2077,7 +2077,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 							i++;
 							if (par->length < i - skip) {
 								/* Fehler: Ziel vergessen */
-								cmistake(u, strdup(s), 203, MSG_MAGIC);
+								cmistake(u, ord, 203, MSG_MAGIC);
 								/* Aufräumen */
 								free(tbuf);
 								free(spobj);
@@ -2090,7 +2090,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 								i++;
 								if (par->length < i - skip) {
 									/* Fehler: Ziel vergessen */
-									cmistake(u, strdup(s), 203, MSG_MAGIC);
+									cmistake(u, ord, 203, MSG_MAGIC);
 									/* Aufräumen */
 									free(tbuf);
 									free(spobj);
@@ -2125,7 +2125,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 							i++;
 							if (par->length < i - skip) {
 								/* Fehler: Ziel vergessen */
-								cmistake(u, strdup(s), 203, MSG_MAGIC);
+								cmistake(u, ord, 203, MSG_MAGIC);
 								/* Aufräumen */
 								free(tbuf);
 								free(spobj);
@@ -2160,7 +2160,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 							i++;
 							if (par->length < i - skip) {
 								/* Fehler: Ziel vergessen */
-								cmistake(u, strdup(s), 203, MSG_MAGIC);
+								cmistake(u, ord, 203, MSG_MAGIC);
 								/* Aufräumen */
 								free(tbuf);
 								free(spobj);
@@ -2189,7 +2189,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 						}
 						default:
 							/* Syntax Error. */
-							cmistake(u, strdup(s), 209, MSG_MAGIC);
+							cmistake(u, ord, 209, MSG_MAGIC);
 							/* Aufräumen */
 							free(tbuf);
 							free(spobj);
@@ -2201,7 +2201,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 				}
 				default:
 					/* Syntax Error. */
-					cmistake(u, strdup(s), 209, MSG_MAGIC);
+					cmistake(u, ord, 209, MSG_MAGIC);
 					/* Aufräumen */
 					free(tbuf);
 					free(spobj);
@@ -2224,7 +2224,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 	 * sein, ansonsten fehlte ein Parameter */
 	if (syntax[c] != 0 && syntax[c] != '+' && syntax[c] != '?') {
 		/* Syntax Error. */
-		cmistake(u, strdup(s), 209, MSG_MAGIC);
+		cmistake(u, ord, 209, MSG_MAGIC);
 		/* Aufräumen */
 		free(tbuf);
 		free_spellparameter(par);
@@ -2241,7 +2241,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 
 castorder *
 new_castorder(void *u, unit *u2, spell *sp, region *r, int lev,
-		double force, int range, char *cmd, spellparameter *p)
+		double force, int range, struct order * ord, spellparameter *p)
 {
 	castorder *corder;
 
@@ -2253,7 +2253,7 @@ new_castorder(void *u, unit *u2, spell *sp, region *r, int lev,
 	corder->force = force;
 	corder->rt = r;
 	corder->distance = range;
-	corder->order = cmd;
+	corder->order = copy_order(ord);
 	corder->par = p;
 
 	return corder;
@@ -2289,7 +2289,7 @@ free_castorders(castorder *co)
 		if (co2->par) {
 			free_spellparameter(co2->par);
 		}
-		if (co2->order) free(co2->order);
+		if (co2->order) free_order(co2->order);
 		free(co2);
 	}
 	return;
@@ -2626,15 +2626,15 @@ get_clone_mage(const unit *u)
 static boolean
 is_moving_ship(const region * r, const ship *sh)
 {
-	const unit *u;
-	int todo;
+  const unit *u = shipowner(sh);
 
-	u = shipowner(r, sh);
-	todo = igetkeyword(u->thisorder, u->faction->locale);
-	if (todo == K_ROUTE || todo == K_MOVE || todo == K_FOLLOW){
-		return true;
-	}
-	return false;
+  switch (get_keyword(u->thisorder)) {
+    case K_ROUTE:
+    case K_MOVE:
+    case K_FOLLOW:
+      return true;
+  }
+  return false;
 }
 
 /* ------------------------------------------------------------- */
@@ -2665,7 +2665,6 @@ magic(void)
   unit *mage;        /* derjenige, der den Spruch am Ende zaubert */
   spell *sp;
   const char *s;
-  strlist *so;
   int spellrank;
   int range, t_x, t_y;
   int skiptokens;
@@ -2681,6 +2680,7 @@ magic(void)
     for (u = r->units; u; u = u->next) {
       int level;
       boolean casted = false;
+      order * ord;
 
       if (old_race(u->race) == RC_SPELL || fval(u, UFL_LONGACTION))
         continue;
@@ -2697,14 +2697,14 @@ magic(void)
         continue;
       }
 
-      for (so = u->orders; so; so = so->next) {
-        if (igetkeyword(so->s, u->faction->locale) == K_CAST) {
+      for (ord = u->orders; ord; ord = ord->next) {
+        if (get_keyword(ord) == K_CAST) {
           if (LongHunger() && fval(u, UFL_HUNGER)) {
-            cmistake(u, so->s, 224, MSG_MAGIC);
+            cmistake(u, ord, 224, MSG_MAGIC);
             continue;
           }
           if (r->planep && fval(r->planep, PFL_NOMAGIC)) {
-            cmistake(u, so->s, 269, MSG_MAGIC);
+            cmistake(u, ord, 269, MSG_MAGIC);
             continue;
           }
           casted = true;
@@ -2713,6 +2713,8 @@ magic(void)
           level = eff_skill(u, SK_MAGIC, r);
           familiar = NULL;
           skiptokens = 1;
+          init_tokens(ord);
+          skip_token();
           s = getstrtoken();
           /* für Syntax ' STUFE x REGION y z ' */
           if (findparam(s, u->faction->locale) == P_LEVEL) {
@@ -2722,7 +2724,7 @@ magic(void)
             skiptokens += 2;
             if (level < 1) {
               /* Fehler "Das macht wenig Sinn" */
-              cmistake(u, so->s, 10, MSG_MAGIC);
+              cmistake(u, ord, 10, MSG_MAGIC);
               continue;
             }
           }
@@ -2736,7 +2738,7 @@ magic(void)
             skiptokens += 3;
             if (!target_r) {
               /* Fehler "Es wurde kein Zauber angegeben" */
-              cmistake(u, so->s, 172, MSG_MAGIC);
+              cmistake(u, ord, 172, MSG_MAGIC);
               continue;
             }
           }
@@ -2749,13 +2751,13 @@ magic(void)
             skiptokens += 2;
             if (level < 1) {
               /* Fehler "Das macht wenig Sinn" */
-              cmistake(u, so->s, 10, MSG_MAGIC);
+              cmistake(u, ord, 10, MSG_MAGIC);
               continue;
             }
           }
           if (!s[0] || strlen(s) == 0) {
             /* Fehler "Es wurde kein Zauber angegeben" */
-            cmistake(u, so->s, 172, MSG_MAGIC);
+            cmistake(u, ord, 172, MSG_MAGIC);
             continue;
           }
           sp = find_spellbyname(u, s, u->faction->locale);
@@ -2771,7 +2773,7 @@ magic(void)
 
           if (sp == NULL) {
             /* Fehler 'Spell not found' */
-            cmistake(u, so->s, 173, MSG_MAGIC);
+            cmistake(u, ord, 173, MSG_MAGIC);
             continue;
           }
           /* um testen auf spruchnamen zu unterbinden sollte vor allen
@@ -2781,13 +2783,13 @@ magic(void)
           if (knowsspell(r, u, sp) == false){
             /* vorsicht! u kann der familiar sein */
             if (!familiar){
-              cmistake(u, so->s, 173, MSG_MAGIC);
+              cmistake(u, ord, 173, MSG_MAGIC);
               continue;
             }
           }
           if (sp->sptyp & ISCOMBATSPELL) {
             /* Fehler: "Dieser Zauber ist nur im Kampf sinnvoll" */
-            cmistake(u, so->s, 174, MSG_MAGIC);
+            cmistake(u, ord, 174, MSG_MAGIC);
             continue;
           }
           /* Auf dem Ozean Zaubern als quasi-langer Befehl können
@@ -2799,7 +2801,7 @@ magic(void)
               && !(sp->sptyp & OCEANCASTABLE)) {
                 /* Fehlermeldung */
                 ADDMSG(&u->faction->msgs, msg_message("spellfail_onocean",
-                  "unit region command", u, u->region, so->s));
+                  "unit region command", u, u->region, ord));
                 continue;
               }
               /* Auf bewegenden Schiffen kann man nur explizit als
@@ -2809,7 +2811,7 @@ magic(void)
               if (!(sp->sptyp & ONSHIPCAST)) {
                 /* Fehler: "Diesen Spruch kann man nicht auf einem sich
                 * bewegenden Schiff stehend zaubern" */
-                cmistake(u, so->s, 175, MSG_MAGIC);
+                cmistake(u, ord, 175, MSG_MAGIC);
                 continue;
               }
             }
@@ -2820,12 +2822,12 @@ magic(void)
             if (!(sp->sptyp & FARCASTING)) {
               /* Fehler "Diesen Spruch kann man nicht in die Ferne
               * richten" */
-              cmistake(u, so->s, 176, MSG_MAGIC);
+              cmistake(u, ord, 176, MSG_MAGIC);
               continue;
             }
             if (range > 1024) { /* (2^10) weiter als 10 Regionen entfernt */
               ADDMSG(&u->faction->msgs, msg_message("spellfail::nocontact",
-                "mage region command target", u, u->region, so->s, 
+                "mage region command target", u, u->region, ord, 
                 gc_add(strdup(regionid(target_r)))));
               continue;
             }
@@ -2836,7 +2838,7 @@ magic(void)
             if (ilevel!=level) {
               level = ilevel;
               ADDMSG(&u->faction->msgs, msg_message("spellfail::nolevel",
-                "mage region command", u, u->region, so->s));
+                "mage region command", u, u->region, ord));
             }
           }
           /* Vertrautenmagie */
@@ -2849,7 +2851,7 @@ magic(void)
           if (familiar || is_familiar(u)) {
             if ((sp->sptyp & NOTFAMILIARCAST)) {
               /* Fehler: "Diesen Spruch kann der Vertraute nicht zaubern" */
-              cmistake(u, so->s, 177, MSG_MAGIC);
+              cmistake(u, ord, 177, MSG_MAGIC);
               continue;
             }
             if (!knowsspell(r, u, sp)) { /* Magier zaubert durch Vertrauten */
@@ -2871,7 +2873,7 @@ magic(void)
               * der Spruchkosten nutzen, langen Befehl des Magiers
               * löschen, zaubern kann er noch */
               range *= 2;
-              set_string(&mage->thisorder, "");
+              set_order(&mage->thisorder, NULL);
               level = min(level, eff_skill(mage, SK_MAGIC, mage->region)/2);
               familiar = u;
             }
@@ -2880,7 +2882,7 @@ magic(void)
           if (sp->parameter) {
             ++skiptokens;
             args = add_spellparameter(target_r, mage, sp->parameter,
-              so->s, skiptokens);
+              ord, skiptokens);
             if (!args) {
               /* Syntax war falsch */
               continue;
@@ -2889,7 +2891,7 @@ magic(void)
             args = (spellparameter *) NULL;
           }
           co = new_castorder(mage, familiar, sp, target_r, level, 0, range,
-            strdup(so->s), args);
+            ord, args);
           add_castorder(&cll[(int)(sp->rank)], co);
         }
       }
@@ -2906,7 +2908,7 @@ magic(void)
 
   for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
     for (co = cll[spellrank]; co; co = co->next) {
-      char *cmd = co->order;
+      order * ord = co->order;
       int verify, cast_level = co->level;
       boolean fumbled = false;
       unit * u = (unit *)co->magician;
@@ -2918,7 +2920,7 @@ magic(void)
 
       if (co->level < 1) {
         /* Fehlermeldung mit Komponenten generieren */
-        cancast(u, sp, co->level, co->distance, cmd);
+        cancast(u, sp, co->level, co->distance, ord);
         continue;
       }
 
@@ -2935,12 +2937,12 @@ magic(void)
 
       /* Prüfen, ob die realen Kosten für die gewünschten Stufe bezahlt
       * werden können */
-      if (cancast(u, sp, co->level, co->distance, cmd) == false) {
+      if (cancast(u, sp, co->level, co->distance, ord) == false) {
         /* die Fehlermeldung wird in cancast generiert */
         continue;
       }
 
-      co->force = spellpower(target_r, u, sp, co->level, cmd);
+      co->force = spellpower(target_r, u, sp, co->level, ord);
       /* die Stärke kann durch Antimagie auf 0 sinken */
       if (co->force <= 0) {
         co->force = 0;

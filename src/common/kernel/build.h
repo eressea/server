@@ -61,7 +61,8 @@ typedef struct construction {
 		/* stores skill modifiers and other attributes */
 } construction;
 
-void destroy(struct region * r, struct unit * u, const char * cmd);
+extern int destroy_cmd(struct unit * u, struct order * ord);
+extern int leave_cmd(struct unit * u, struct order * ord);
 
 extern boolean can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
 
@@ -74,7 +75,6 @@ struct building * getbuilding(const struct region * r);
 struct ship *getship(const struct region * r);
 
 void remove_contacts(void);
-void do_leave(void);
 void do_misc(boolean tries);
 
 void reportevent(struct region * r, char *s);

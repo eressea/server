@@ -54,6 +54,7 @@ typedef short resource_t;
 typedef short spellid_t;
 
 struct plane;
+struct order;
 struct spell;
 struct region;
 struct region_list;
@@ -379,84 +380,85 @@ typedef struct ursprung {
 
 typedef int keyword_t;
 enum {
-	K_KOMMENTAR,
-	K_BANNER,
-	K_WORK,
-	K_ATTACK,
-	K_BIETE,
-	K_STEAL,
-	K_BESIEGE,
-	K_NAME,
-	K_USE,
-	K_DISPLAY,
-	K_ENTER,
-	K_GUARD,
-	K_MAIL,
-	K_END,
-	K_DRIVE,
-	K_NUMBER,
-	K_WAR,
-	K_PEACE,
-	K_FOLLOW,
-	K_RESEARCH,
-	K_GIVE,
-	K_ALLY,
-	K_STATUS,
-	K_COMBAT,
-	K_BUY,
-	K_CONTACT,
-	K_TEACH,
-	K_STUDY,
-	K_LIEFERE,
-	K_MAKE,
-	K_MOVE,
-	K_PASSWORD,
-	K_DUMMY,
-	K_RECRUIT,
-	K_RESERVE,
-	K_ROUTE,
-	K_SABOTAGE,
-	K_SEND,
-	K_SPY,
-	K_QUIT,
-	K_SETSTEALTH,
-	K_TRANSPORT,
-	K_TAX,
-	K_ENTERTAIN,
-	K_SELL,
-	K_LEAVE,
-	K_FORGET,
-	K_CAST,
-	K_RESHOW,
-	K_DESTROY,
-	K_ZUECHTE,
-	K_DEFAULT,
-	K_REPORT,
-	K_URSPRUNG,
-	K_EMAIL,
-	K_VOTE,
-	K_MAGIEGEBIET,
-	K_PIRACY,
-	K_RESTART,
-	K_GROUP,
-	K_SACRIFICE,
-	K_PRAY,
-	K_SORT,
-	K_SETJIHAD,
-	K_GM,          /* perform GM commands */
-	K_INFO,        /* set player-info */
+  K_KOMMENTAR,
+  K_BANNER,
+  K_WORK,
+  K_ATTACK,
+  K_BIETE,
+  K_STEAL,
+  K_BESIEGE,
+  K_NAME,
+  K_USE,
+  K_DISPLAY,
+  K_ENTER,
+  K_GUARD,
+  K_MAIL,
+  K_END,
+  K_DRIVE,
+  K_NUMBER,
+  K_WAR,
+  K_PEACE,
+  K_FOLLOW,
+  K_RESEARCH,
+  K_GIVE,
+  K_ALLY,
+  K_STATUS,
+  K_COMBAT,
+  K_BUY,
+  K_CONTACT,
+  K_TEACH,
+  K_STUDY,
+  K_LIEFERE,
+  K_MAKE,
+  K_MOVE,
+  K_PASSWORD,
+  K_DUMMY,
+  K_RECRUIT,
+  K_RESERVE,
+  K_ROUTE,
+  K_SABOTAGE,
+  K_SEND,
+  K_SPY,
+  K_QUIT,
+  K_SETSTEALTH,
+  K_TRANSPORT,
+  K_TAX,
+  K_ENTERTAIN,
+  K_SELL,
+  K_LEAVE,
+  K_FORGET,
+  K_CAST,
+  K_RESHOW,
+  K_DESTROY,
+  K_ZUECHTE,
+  K_DEFAULT,
+  K_REPORT,
+  K_URSPRUNG,
+  K_EMAIL,
+  K_VOTE,
+  K_MAGIEGEBIET,
+  K_PIRACY,
+  K_RESTART,
+  K_WAIT,
+  K_GROUP,
+  K_SACRIFICE,
+  K_PRAY,
+  K_SORT,
+  K_SETJIHAD,
+  K_GM,          /* perform GM commands */
+  K_INFO,        /* set player-info */
 #ifdef USE_UGROUPS
-	K_JOINUGROUP,
-	K_LEAVEUGROUP,
+  K_JOINUGROUP,
+  K_LEAVEUGROUP,
 #endif
-	K_PREFIX,
-	K_SYNONYM,
-	K_PFLANZE,
-	K_WEREWOLF,
-	K_XE,
-	K_ALLIANCE,
-	MAXKEYWORDS,
-	NOKEYWORD = (keyword_t) - 1
+  K_PREFIX,
+  K_SYNONYM,
+  K_PFLANZE,
+  K_WEREWOLF,
+  K_XE,
+  K_ALLIANCE,
+  MAXKEYWORDS,
+  NOKEYWORD = (keyword_t) - 1
 };
 
 extern const char *keywords[MAXKEYWORDS];
@@ -465,12 +467,12 @@ extern const char *keywords[MAXKEYWORDS];
 
 typedef int status_t;
 enum {
-	ST_AGGRO,
-	ST_FIGHT,
-	ST_BEHIND,
-	ST_CHICKEN,
-	ST_AVOID,
-	ST_FLEE
+  ST_AGGRO,
+  ST_FIGHT,
+  ST_BEHIND,
+  ST_CHICKEN,
+  ST_AVOID,
+  ST_FLEE
 };
 
 /* ----------------- Parameter --------------------------------- */
@@ -925,7 +927,6 @@ struct unit *make_undead_unit(struct region * r, struct faction * f, int n, cons
 extern struct region *regions;
 extern struct faction *factions;
 
-strlist *makestrlist(const char *s);
 void addstrlist(strlist ** SP, const char *s);
 
 int armedmen(const struct unit * u);
@@ -941,14 +942,16 @@ extern int findstr(const char **v, const char *s, unsigned char n);
 extern const char *igetstrtoken(const char *s);
 extern const char *getstrtoken(void);
 
+extern void init_tokens_str(const char * initstr); /* initialize token parsing */
+extern void init_tokens(const struct order * ord); /* initialize token parsing */
+extern void skip_token(void);
+extern const char * parse_token(const char ** str);
+
 extern skill_t findskill(const char *s, const struct locale * lang);
 
 extern keyword_t findkeyword(const char *s, const struct locale * lang);
-extern keyword_t igetkeyword(const char *s, const struct locale * lang);
-extern keyword_t getkeyword(const struct locale * lang);
 
 extern param_t findparam(const char *s, const struct locale * lang);
-extern param_t igetparam(const char *s, const struct locale * lang);
 extern param_t getparam(const struct locale * lang);
 
 extern int atoi36(const char * s);
@@ -1012,10 +1015,12 @@ char *xunitid(const struct unit * u);
 
 struct building *largestbuilding(const struct region * r, boolean img);
 
+extern int count_all(const struct faction * f);
+extern int count_migrants (const struct faction * f);
+extern int count_maxmigrants(const struct faction * f);
+
 extern boolean teure_talente(const struct unit * u);
-int count_all(const struct faction * f);
-int count_maxmigrants(const struct faction * f);
-const struct race * findrace(const char *, const struct locale *);
+extern const struct race * findrace(const char *, const struct locale *);
 
 int effstealth(const struct unit * u);
 int eff_stealth(const struct unit * u, const struct region * r);
@@ -1025,11 +1030,8 @@ int ispresent(const struct faction * f, const struct region * r);
 
 char * set_string(char **s, const char *neu);
 
-/* unterschied zu getkeyword(void) ist lediglich, daß in *str dynamisch der
- * neue string hineingeschrieben wird (speicher wird reserviert, falls *str zu
- * klein). enno. */
-
 int check_option(struct faction * f, int option);
+extern void parse(keyword_t kword, int (*dofun)(struct unit *, struct order *), boolean thisorder);
 
 /* Anzahl Personen in einer Einheit festlegen. NUR (!) mit dieser Routine,
  * sonst großes Unglück. Durch asserts an ein paar Stellen abgesichert. */
@@ -1064,17 +1066,13 @@ const char *strcheck(const char *s, size_t maxlen);
 #define strcheck(s, ml) (s)
 #endif
 
-const char * findorder(const struct unit * u, const char * cmd);
-
 #define attacked(u) (fval(u, UFL_LONGACTION))
 boolean idle(struct faction * f);
 boolean unit_has_cursed_item(struct unit *u);
 
 /* simple garbage collection: */
 void * gc_add(void * p);
-void mistake(const struct unit * u, const char *cmd, const char *text, int mtype);
 void addmessage(struct region * r, struct faction * f, const char *s, msg_t mtype, int level);
-void cmistake(const struct unit * u, const char *cmd, int mno, int mtype);
 
 /* grammatik-flags: */
 #define GF_NONE 0
@@ -1181,6 +1179,8 @@ extern int NMRTimeout(void);
 extern int LongHunger(void);
 extern boolean TradeDisabled(void);
 extern int SkillCap(skill_t sk);
+
+extern struct order * default_order(const struct locale * lang);
 
 #ifdef __cplusplus
 }

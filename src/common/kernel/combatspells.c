@@ -20,6 +20,7 @@
 #include "item.h"
 #include "magic.h"
 #include "message.h"
+#include "order.h"
 #include "region.h"
 #include "unit.h"
 #include "movement.h"
@@ -1359,20 +1360,23 @@ sp_denyattack(fighter * fi, int level, double power, spell * sp)
 	/* irgendwie den langen befehl sperren */
 	fset(fi, FIG_ATTACKED);
 
-	/* Hat der Magier ein NACH, wird die angegebene Richtung bevorzugt */
-	if (igetkeyword(mage->thisorder, mage->faction->locale) == K_MOVE
-				|| igetkeyword(mage->thisorder, mage->faction->locale) == K_ROUTE)
-	{
-		fi->run.region = movewhere(r, mage);
-		if (!fi->run.region) {
-			cmistake(mage, findorder(mage, mage->thisorder), 71, MSG_MOVE);
-			fi->run.region = fleeregion(mage);
-		}
-	} else {
-		fi->run.region = fleeregion(mage);
-	}
-	/* bewegung erst am Ende des Kampfes, zusammen mit den normalen
-	 * Flüchtlingen */
+  /* Hat der Magier ein NACH, wird die angegebene Richtung bevorzugt */
+  switch (get_keyword(mage->thisorder)) {
+  case K_MOVE:
+  case K_ROUTE:
+    init_tokens(mage->thisorder);
+    skip_token();
+    fi->run.region = movewhere(r, mage);
+    if (!fi->run.region) {
+      cmistake(mage, mage->thisorder, 71, MSG_MOVE);
+      fi->run.region = fleeregion(mage);
+    }
+    break;
+  default:
+    fi->run.region = fleeregion(mage);
+  }
+  /* bewegung erst am Ende des Kampfes, zusammen mit den normalen
+  * Flüchtlingen */
 	/* travel(r, mage, fi->run.region, 1); */
 
 	/* wir tun so, als wäre die Person geflohen */

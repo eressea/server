@@ -30,6 +30,7 @@
 #include "border.h"
 #include "item.h"
 #include "movement.h"
+#include "order.h"
 #include "plane.h"
 #include "race.h"
 #include "region.h"
@@ -810,10 +811,9 @@ u_setfaction(unit * u, faction * f)
 		set_number(u, 0);
 		--u->faction->no_units;
 		join_group(u, NULL);
-                freelist(u->orders);
-                u->orders = NULL;
-                set_string(&u->thisorder, "");
-                set_string(&u->lastorder, "");
+                free_orders(&u->orders);
+                set_order(&u->thisorder, NULL);
+                set_order(&u->lastorder, NULL);
 	}
 	if (u->prevF) u->prevF->nextF = u->nextF;
 	else if (u->faction) {
@@ -1087,6 +1087,24 @@ invisible(const unit *u)
 
 #endif
 }
+
+void
+stripunit(unit * u)
+{
+	free(u->name);
+	free(u->display);
+	free_orders(&u->orders);
+	freestrlist(u->botschaften);
+	if(u->skills) free(u->skills);
+	while (u->items) {
+		item * it = u->items->next;
+		u->items->next = NULL;
+		i_free(u->items);
+		u->items = it;
+	}
+	while (u->attribs) a_remove (&u->attribs, u->attribs);
+}
+
 
 void 
 unitlist_clear(struct unit_list **ul)

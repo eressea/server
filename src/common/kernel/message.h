@@ -47,18 +47,10 @@ typedef struct msglevel {
 	int level;
 } msglevel;
 
-#ifdef MSG_LEVELS
-struct warning;
-void write_msglevels(struct warning * warnings, FILE * F);
-void read_msglevels(struct warning ** w, FILE * F);
-void set_msglevel(struct warning ** warnings, const char * type, int level);
-#endif
-
 extern struct message * msg_message(const char * name, const char* sig, ...);
-extern struct message * msg_error(const struct unit *, const char *cmd, 
+extern struct message * msg_feedback(const struct unit *, struct order *cmd,
                                   const char * name, const char* sig, ...);
 extern struct message * add_message(struct message_list** pm, struct message * m);
-extern void free_messages(struct message_list * m);
 
 /* message sections */
 extern struct messageclass * msgclasses;
@@ -69,6 +61,9 @@ extern const struct messageclass * mc_find(const char * name);
 extern struct message * new_message(struct faction * receiver, const char * signature, ...);
 
 #define ADDMSG(msgs, mcreate) { message * m = mcreate; if (m) { assert(m->refcount>=1); add_message(msgs, m); msg_release(m); } }
+
+extern void cmistake(const struct unit * u, struct order *ord, int mno, int mtype);
+extern void mistake(const struct unit * u, struct order *ord, const char *text, int mtype);
 
 #ifdef __cplusplus
 }

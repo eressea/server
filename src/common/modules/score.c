@@ -190,7 +190,7 @@ score(void)
 			}
 		}
 		for (s = r->ships; s; s = s->next) {
-			if ((u = shipowner(r, s)) != 0) {
+			if ((u = shipowner(s)) != 0) {
 				u->faction->score += s->size * 2;
 			}
 		}

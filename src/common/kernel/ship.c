@@ -246,13 +246,14 @@ getshipweight(const ship * sh, int *sweight, int *scabins)
 }
 
 unit *
-shipowner(const region * r, const ship * sh)
+shipowner(const ship * sh)
 {
 	unit *u;
 	unit *first = NULL;
 
-	/* Prüfen ob Eigentümer am leben. */
+        const region * r = sh->region;
 
+        /* Prüfen ob Eigentümer am leben. */
 	for (u = r->units; u; u = u->next) {
 		if (u->ship == sh) {
 			if (!first && u->number > 0)

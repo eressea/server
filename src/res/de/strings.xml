@@ -1920,6 +1920,10 @@
   <string name="ARBEITEN">
     <text locale="de">ARBEITEN</text>
   </string>
+  <string name="WARTEN">
+    <text locale="de">WARTEN</text>
+    <text locale="en">WAIT</text>
+  </string>
   <string name="ATTACKIEREN">
     <text locale="de">ATTACKIEREN</text>
   </string>
@@ -4148,7 +4152,11 @@
       in schwierigen Situationen nicht die Flucht ergreifen
       und sein überlegtes Verhalten wird ihm manch Vorteil in
       der Verteidigung geben.</text>
-      <text locale="en"></text>
+      <text locale="en">This ancient battle chant lifts the
+	  spirit of your troops and helps them withstand even the
+	  fear-inspiring aura of demonic and undead beings. A
+	  fighter thus fortified against evil will not flee even
+	  in the face of terror, and his defenses will be strengthened.</text>
     </string>
     <string name="transfer_aura_song">
       <text locale="de">Mit Hilfe dieses Zaubers kann der

@@ -28,19 +28,20 @@
 #include <items/demonseye.h>
 
 /* kernel includes */
-#include <building.h>
-#include <faction.h>
-#include <item.h>
-#include <magic.h>
-#include <message.h>
-#include <movement.h>
-#include <plane.h>
-#include <pool.h>
-#include <race.h>
-#include <region.h>
-#include <reports.h>
-#include <skill.h>
-#include <unit.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/magic.h>
+#include <kernel/message.h>
+#include <kernel/movement.h>
+#include <kernel/order.h>
+#include <kernel/plane.h>
+#include <kernel/pool.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/reports.h>
+#include <kernel/skill.h>
+#include <kernel/unit.h>
 
 /* util include */
 #include <base36.h>
@@ -86,12 +87,12 @@ leave_fail(unit * u) {
 }
 
 static int
-leave_arena(struct unit * u, const struct item_type * itype, int amount, const char * cmd)
+leave_arena(struct unit * u, const struct item_type * itype, int amount, order * ord)
 {
 	if (!u->building && leave_fail(u)) return -1;
 	if (u->building!=arena_tower(u->faction->magiegebiet) && leave_fail(u)) return -1;
 	unused(amount);
-	unused(cmd);
+	unused(ord);
 	unused(itype);
 	assert(!"not implemented");
 	return 0;
@@ -121,13 +122,13 @@ enter_fail(unit * u) {
 }
 
 static int
-enter_arena(unit * u, const item_type * itype, int amount, const char * cmd)
+enter_arena(unit * u, const item_type * itype, int amount, order * ord)
 {
 	skill_t sk;
 	region * r = u->region;
 	unit * u2;
 	int fee = u->faction->score / 5;
-	unused(cmd);
+	unused(ord);
 	unused(amount);
 	unused(itype);
 	if (fee>2000) fee = 2000;
@@ -185,10 +186,10 @@ static item_type it_arenagate = {
  ***/
 
 static int
-use_wand_of_tears(unit * user, const struct item_type * itype, int amount, const char * cmd)
+use_wand_of_tears(unit * user, const struct item_type * itype, int amount, order * ord)
 {
 	int i;
-	unused(cmd);
+	unused(ord);
 	for (i=0;i!=amount;++i) {
 		unit * u;
 		for (u=user->region->units;u;u=u->next) {

@@ -33,7 +33,6 @@ void monsters_kill_peasants(void);
 void plan_monsters(void);
 void age_unit(struct region * r, struct unit * u);
 struct unit *random_unit(const struct region * r);
-void check_split(void);
 
 #ifdef __cplusplus
 }

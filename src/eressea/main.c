@@ -189,8 +189,10 @@ game_init(void)
 #endif
 
 	init_gmcmd();
+#ifdef INFOCMD_MODULE
 	init_info();
-	init_conversion();
+#endif
+  init_conversion();
 
 #ifdef MUSEUM_MODULE
 	register_museum();

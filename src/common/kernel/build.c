@@ -33,6 +33,7 @@
 #include "magic.h"
 #include "message.h"
 #include "movement.h"
+#include "order.h"
 #include "pool.h"
 #include "race.h"
 #include "region.h"
@@ -139,21 +140,23 @@ can_contact(const region * r, const unit * u, const unit * u2)
 
 
 static void
-set_contact(const region * r, unit * u, boolean tries)
+contact_cmd(unit * u, order * ord, boolean tries)
 {
-
 	/* unit u kontaktiert unit u2. Dies setzt den contact einfach auf 1 -
 	 * ein richtiger toggle ist (noch?) nicht noetig. die region als
 	 * parameter ist nur deswegen wichtig, weil er an getunit ()
 	 * weitergegeben wird. dies wird fuer das auffinden von tempunits in
 	 * getnewunit () verwendet! */
+	unit *u2;
+  region * r = u->region;
+  
+  init_tokens(ord);
+  skip_token();
+  u2 = getunitg(r, u->faction);
 
-	unit *u2 = getunitg(r, u->faction);
-
-	if (u2) {
-
+	if (u2!=NULL) {
 		if (!can_contact(r, u, u2)) {
-			if (tries) cmistake(u, findorder(u, u->thisorder), 23, MSG_EVENT);
+			if (tries) cmistake(u, u->thisorder, 23, MSG_EVENT);
 			return;
 		}
 		usetcontact(u, u2);
@@ -187,109 +190,113 @@ getship(const struct region * r)
 /* ------------------------------------------------------------- */
 
 static void
-siege(region * r, unit * u)
+siege_cmd(unit * u, order * ord)
 {
-	unit *u2;
-	building *b;
-	int d;
-	int bewaffnete, katapultiere = 0;
-	static boolean init = false;
-	static const curse_type * magicwalls_ct;
-	if (!init) { init = true; magicwalls_ct = ct_find("magicwalls"); }
-	/* gibt es ueberhaupt Burgen? */
+  region * r = u->region;
+  unit *u2;
+  building *b;
+  int d;
+  int bewaffnete, katapultiere = 0;
+  static boolean init = false;
+  static const curse_type * magicwalls_ct;
+  if (!init) { init = true; magicwalls_ct = ct_find("magicwalls"); }
+  /* gibt es ueberhaupt Burgen? */
 
-	b = getbuilding(r);
+  init_tokens(ord);
+  skip_token();
+  b = getbuilding(r);
 
-	if (!b) {
-		cmistake(u, u->thisorder, 31, MSG_BATTLE);
-		return;
-	}
+  if (!b) {
+    cmistake(u, ord, 31, MSG_BATTLE);
+    return;
+  }
 
-	if (!playerrace(u->race)) {
-		/* keine Drachen, Illusionen, Untote etc */
-		cmistake(u, u->thisorder, 166, MSG_BATTLE);
-		return;
-	}
-	/* schaden durch katapulte */
+  if (!playerrace(u->race)) {
+    /* keine Drachen, Illusionen, Untote etc */
+    cmistake(u, ord, 166, MSG_BATTLE);
+    return;
+  }
+  /* schaden durch katapulte */
 
-	d = min(u->number,
-		min(new_get_pooled(u, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK), get_item(u, I_CATAPULT)));
-	if (eff_skill(u, SK_CATAPULT, r) >= 1) {
-		katapultiere = d;
-		d *= eff_skill(u, SK_CATAPULT, r);
-	} else {
-		d = 0;
-	}
+  d = min(u->number,
+    min(new_get_pooled(u, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK), get_item(u, I_CATAPULT)));
+  if (eff_skill(u, SK_CATAPULT, r) >= 1) {
+    katapultiere = d;
+    d *= eff_skill(u, SK_CATAPULT, r);
+  } else {
+    d = 0;
+  }
 
-	if ((bewaffnete = armedmen(u)) == 0 && d == 0) {
-		/* abbruch, falls unbewaffnet oder unfaehig, katapulte zu benutzen */
-		cmistake(u, findorder(u, u->thisorder), 80, MSG_EVENT);
-		return;
-	}
+  if ((bewaffnete = armedmen(u)) == 0 && d == 0) {
+    /* abbruch, falls unbewaffnet oder unfaehig, katapulte zu benutzen */
+    cmistake(u, ord, 80, MSG_EVENT);
+    return;
+  }
 
-	if (!(getguard(u) & GUARD_TRAVELTHRU)) {
-		/* abbruch, wenn die einheit nicht vorher die region bewacht - als
-		 * warnung fuer alle anderen! */
-		cmistake(u, findorder(u, u->thisorder), 81, MSG_EVENT);
-		return;
-	}
-	/* einheit und burg markieren - spart zeit beim behandeln der einheiten
-	 * in der burg, falls die burg auch markiert ist und nicht alle
-	 * einheiten wieder abgesucht werden muessen! */
+  if (!(getguard(u) & GUARD_TRAVELTHRU)) {
+    /* abbruch, wenn die einheit nicht vorher die region bewacht - als
+    * warnung fuer alle anderen! */
+    cmistake(u, ord, 81, MSG_EVENT);
+    return;
+  }
+  /* einheit und burg markieren - spart zeit beim behandeln der einheiten
+  * in der burg, falls die burg auch markiert ist und nicht alle
+  * einheiten wieder abgesucht werden muessen! */
 
-	usetsiege(u, b);
-	b->besieged += max(bewaffnete, katapultiere);
+  usetsiege(u, b);
+  b->besieged += max(bewaffnete, katapultiere);
 
-	/* definitiver schaden eingeschraenkt */
+  /* definitiver schaden eingeschraenkt */
 
-	d = min(d, b->size - 1);
+  d = min(d, b->size - 1);
 
-	/* meldung, schaden anrichten */
-	if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {
-		b->size -= d;
-		new_use_pooled(u, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, d);
-		d = 100 * d / b->size;
-	} else d = 0;
+  /* meldung, schaden anrichten */
+  if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {
+    b->size -= d;
+    new_use_pooled(u, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, d);
+    d = 100 * d / b->size;
+  } else d = 0;
 
-	/* meldung fuer belagerer */
-	add_message(&u->faction->msgs,
-		new_message(u->faction, "siege%u:unit%b:building%i:destruction",
-		u, b, d));
+  /* meldung fuer belagerer */
+  add_message(&u->faction->msgs,
+    new_message(u->faction, "siege%u:unit%b:building%i:destruction",
+    u, b, d));
 
-	for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
-	fset(u->faction, FL_DH);
+  for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+  fset(u->faction, FL_DH);
 
-	/* Meldung fuer Burginsassen */
-	for (u2 = r->units; u2; u2 = u2->next) {
-		if (u2->building == b && !fval(u2->faction, FL_DH)) {
-			fset(u2->faction, FL_DH);
-			add_message(&u2->faction->msgs,
-				new_message(u2->faction, "siege%u:unit%b:building%i:destruction",
-				u, b, d));
-		}
-	}
+  /* Meldung fuer Burginsassen */
+  for (u2 = r->units; u2; u2 = u2->next) {
+    if (u2->building == b && !fval(u2->faction, FL_DH)) {
+      fset(u2->faction, FL_DH);
+      add_message(&u2->faction->msgs,
+        new_message(u2->faction, "siege%u:unit%b:building%i:destruction",
+        u, b, d));
+    }
+  }
 }
 
 void
 do_siege(void)
 {
-	region *r;
+  region *r;
 
-	for (r = regions; r; r = r->next) {
-		if (rterrain(r) != T_OCEAN) {
-			unit *u;
-
-			for (u = r->units; u; u = u->next) {
-				if (igetkeyword(u->thisorder, u->faction->locale) == K_BESIEGE)
-					siege(r, u);
-			}
-		}
-	}
+  for (r = regions; r; r = r->next) {
+    if (rterrain(r) != T_OCEAN) {
+      unit *u;
+      
+      for (u = r->units; u; u = u->next) {
+        if (get_keyword(u->thisorder) == K_BESIEGE) {
+          siege_cmd(u, u->thisorder);
+        }
+      }
+    }
+  }
 }
 /* ------------------------------------------------------------- */
 
 static void
-destroy_road(unit *u, int n, const char *cmd)
+destroy_road(unit *u, int n, struct order * ord)
 {
 	direction_t d = getdirection(u->faction->locale);
 	unit *u2;
@@ -298,13 +305,13 @@ destroy_road(unit *u, int n, const char *cmd)
 	for (u2=r->units;u2;u2=u2->next) {
 		if (u2->faction!=u->faction && getguard(u2)&GUARD_TAX &&
 			 	!alliedunit(u, u2->faction, HELP_GUARD)) {
-			cmistake(u, cmd, 70, MSG_EVENT);
+			cmistake(u, ord, 70, MSG_EVENT);
 			return;
 		}
 	}
 
 	if (d==NODIRECTION) {
-		cmistake(u, cmd, 71, MSG_PRODUCE);
+		cmistake(u, ord, 71, MSG_PRODUCE);
 	} else {
 #if 0
 		int salvage, divy = 2;
@@ -328,11 +335,12 @@ destroy_road(unit *u, int n, const char *cmd)
 	}
 }
 
-void
-destroy(region * r, unit * u, const char * cmd)
+int
+destroy_cmd(unit * u, struct order * ord)
 {
   ship *sh;
   unit *u2;
+  region * r = u->region;
 #if 0
   const construction * con = NULL;
   int size = 0;
@@ -341,40 +349,41 @@ destroy(region * r, unit * u, const char * cmd)
   int n = INT_MAX;
 
   if (u->number < 1)
-    return;
+    return 0;
 
+  init_tokens(ord);
+  skip_token();
   s = getstrtoken();
 
   if (findparam(s, u->faction->locale)==P_ROAD) {
-    destroy_road(u, INT_MAX, cmd);
-    return;
+    destroy_road(u, INT_MAX, ord);
+    return 0;
   }
 
   if (!fval(u, UFL_OWNER)) {
-    cmistake(u, cmd, 138, MSG_PRODUCE);
-    return;
+    cmistake(u, ord, 138, MSG_PRODUCE);
+    return 0;
   }
 
-  if(s && *s) {
+  if (s && *s) {
     n = atoi(s);
     if(n <= 0) {
-      cmistake(u, cmd, 288, MSG_PRODUCE);
-      return;
+      cmistake(u, ord, 288, MSG_PRODUCE);
+      return 0;
     }
   }
 
-  if(getparam(u->faction->locale) == P_ROAD) {
-    destroy_road(u, n, cmd);
-    return;
+  if (getparam(u->faction->locale) == P_ROAD) {
+    destroy_road(u, n, ord);
+    return 0;
   }
 
   if (u->building) {
     building *b = u->building;
-
-		if(a_find(b->attribs, &at_nodestroy)) {
-						cmistake(u, cmd, 14, MSG_EVENT);
-						return;
-		}
+    if (a_find(b->attribs, &at_nodestroy)) {
+      cmistake(u, ord, 14, MSG_EVENT);
+      return 0;
+    }
 
 #if 0
     con = b->type->construction;
@@ -400,11 +409,10 @@ destroy(region * r, unit * u, const char * cmd)
     }
   } else if (u->ship) {
     sh = u->ship;
-
-		if(a_find(sh->attribs, &at_nodestroy)) {
-						cmistake(u, cmd, 14, MSG_EVENT);
-						return;
-		}
+    if (a_find(sh->attribs, &at_nodestroy)) {
+      cmistake(u, ord, 14, MSG_EVENT);
+      return 0;
+    }
 
 #if 0
     con = sh->type->construction;
@@ -412,8 +420,8 @@ destroy(region * r, unit * u, const char * cmd)
 #endif
 
     if (rterrain(r) == T_OCEAN) {
-      cmistake(u, cmd, 14, MSG_EVENT);
-      return;
+      cmistake(u, ord, 14, MSG_EVENT);
+      return 0;
     }
 
     if(n >= (sh->size*100)/sh->type->construction->maxsize) {
@@ -441,7 +449,7 @@ destroy(region * r, unit * u, const char * cmd)
 #if 0
   /* Achtung: Nicht an ZERSTÖRE mit Punktangabe angepaßt! */
   if (con) {
-    /* Man sollte alle Materialien zurückkriegen können: */
+    /* TODO: ZERSTÖRE - Man sollte alle Materialien zurückkriegen können: */
     int c;
     for (c=0;con->materials[c].number;++c) {
       const requirement * rq = con->materials+c;
@@ -451,6 +459,7 @@ destroy(region * r, unit * u, const char * cmd)
     }
   }
 #endif
+  return 0;
 }
 /* ------------------------------------------------------------- */
 
@@ -460,16 +469,16 @@ build_road(region * r, unit * u, int size, direction_t d)
 	int n, dm, left;
 
 	if (!eff_skill(u, SK_ROAD_BUILDING, r)) {
-		cmistake(u, findorder(u, u->thisorder), 103, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 103, MSG_PRODUCE);
 		return;
 	}
 	if (besieged(u)) {
-		cmistake(u, findorder(u, u->thisorder), 60, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 60, MSG_PRODUCE);
 		return;
 	}
 
 	if (terrain[rterrain(r)].roadreq < 0) {
-		cmistake(u, findorder(u, u->thisorder), 94, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 94, MSG_PRODUCE);
 		return;
 	}
 
@@ -479,7 +488,7 @@ build_road(region * r, unit * u, int size, direction_t d)
 		if (!bt_dam) bt_dam = bt_find("dam");
 		assert(bt_dam);
 		if (!buildingtype_exists(r, bt_dam)) {
-			cmistake(u, findorder(u, u->thisorder), 132, MSG_PRODUCE);
+			cmistake(u, u->thisorder, 132, MSG_PRODUCE);
 			return;
 		}
 	}
@@ -489,7 +498,7 @@ build_road(region * r, unit * u, int size, direction_t d)
 		assert(bt_caravan);
 		/* wenn keine Karawanserei existiert */
 		if (!buildingtype_exists(r, bt_caravan)) {
-			cmistake(u, findorder(u, u->thisorder), 133, MSG_PRODUCE);
+			cmistake(u, u->thisorder, 133, MSG_PRODUCE);
 			return;
 		}
 	}
@@ -499,12 +508,12 @@ build_road(region * r, unit * u, int size, direction_t d)
 		assert(bt_tunnel);
 		/* wenn kein Tunnel existiert */
 		if (!buildingtype_exists(r, bt_tunnel)) {
-			cmistake(u, findorder(u, u->thisorder), 131, MSG_PRODUCE);
+			cmistake(u, u->thisorder, 131, MSG_PRODUCE);
 			return;
 		}
 	}
 	if (!get_pooled(u, r, R_STONE) && old_race(u->race) != RC_STONEGOLEM) {
-		cmistake(u, findorder(u, u->thisorder), 151, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 151, MSG_PRODUCE);
 		return;
 	}
 
@@ -772,7 +781,7 @@ maxbuild(const unit * u, const construction * cons)
 		int have = get_pooled(u, NULL, rtype);
 		int need = required(1, cons->reqsize, cons->materials[c].number);
 		if (have<need) {
-			cmistake(u, findorder(u, u->thisorder), 88, MSG_PRODUCE);
+			cmistake(u, u->thisorder, 88, MSG_PRODUCE);
 			return 0;
 		}
 		else maximum = min(maximum, have/need);
@@ -794,7 +803,7 @@ build_building(unit * u, const building_type * btype, int want)
 	const char *string2;
 
 	if (eff_skill(u, SK_BUILDING, r) == 0) {
-		cmistake(u, findorder(u, u->thisorder), 101, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 101, MSG_PRODUCE);
 		return;
 	}
 	
@@ -813,7 +822,7 @@ build_building(unit * u, const building_type * btype, int want)
 				b = u->building;
 			} else {
 				/* keine neue Burg anfangen wenn eine Nummer angegeben war */
-				cmistake(u, findorder(u, u->thisorder), 6, MSG_PRODUCE);
+				cmistake(u, u->thisorder, 6, MSG_PRODUCE);
 				return;
 			}
 		}
@@ -823,17 +832,17 @@ build_building(unit * u, const building_type * btype, int want)
 
 	if (b && fval(btype, BTF_UNIQUE) && buildingtype_exists(r, btype)) {
 		/* only one of these per region */
-		cmistake(u, findorder(u, u->thisorder), 93, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 93, MSG_PRODUCE);
 		return;
 	}
 	if (besieged(u)) {
 		/* units under siege can not build */
-		cmistake(u, findorder(u, u->thisorder), 60, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 60, MSG_PRODUCE);
 		return;
 	}
 	if (btype->flags & BTF_NOBUILD) {
 		/* special building, cannot be built */
-		cmistake(u, findorder(u, u->thisorder), 221, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 221, MSG_PRODUCE);
 		return;
 	}
 
@@ -858,7 +867,7 @@ build_building(unit * u, const building_type * btype, int want)
 	switch (built) {
 	case ECOMPLETE:
 		/* the building is already complete */
-		cmistake(u, findorder(u, u->thisorder), 4, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 4, MSG_PRODUCE);
 		return;
 	case ENOMATERIALS: {
 		/* something missing from the list of materials */
@@ -875,13 +884,13 @@ build_building(unit * u, const building_type * btype, int want)
 					);
 			ch = ch+strlen(ch);
 		}
-		msg_error(u, findorder(u,u->thisorder), "build_required", "required", buf);
+		msg_feedback(u, u->thisorder, "build_required", "required", buf);
 		return;
 	}
 	case ELOWSKILL:
 	case ENEEDSKILL:
 		/* no skill, or not enough skill points to build */
-		cmistake(u, findorder(u, u->thisorder), 50, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 50, MSG_PRODUCE);
 		return;
 	}
 
@@ -915,7 +924,8 @@ build_building(unit * u, const building_type * btype, int want)
 		strcpy(buffer, locale_string(u->faction->locale, "defaultorder"));
 	else
 		sprintf(buffer, "%s %d %s %s", locale_string(u->faction->locale, keywords[K_MAKE]), want-built, string2, buildingid(b));
-	set_string(&u->lastorder, buffer);
+	set_order(&u->lastorder, parse_order(buffer, u->faction->locale));
+        free_order(u->lastorder);
 
 	b->size += built;
 	update_lighthouse(b);
@@ -970,11 +980,11 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want)
 	const construction * cons = newtype->construction;
 
 	if (!eff_skill(u, SK_SHIPBUILDING, r)) {
-		cmistake(u, findorder(u, u->thisorder), 100, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 100, MSG_PRODUCE);
 		return;
 	}
 	if (besieged(u)) {
-		cmistake(u, findorder(u, u->thisorder), 60, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 60, MSG_PRODUCE);
 		return;
 	}
 
@@ -988,7 +998,7 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want)
 
 	msize = maxbuild(u, cons);
 	if (msize==0) {
-		cmistake(u, findorder(u, u->thisorder), 88, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 88, MSG_PRODUCE);
 		return;
 	}
 	if (want>0) want = min(want, msize);
@@ -1002,8 +1012,9 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want)
 	u->ship = sh;
 	fset(u, UFL_OWNER);
 	sprintf(buffer, "%s %s %s",
-			locale_string(u->faction->locale, keywords[K_MAKE]), locale_string(u->faction->locale, parameters[P_SHIP]), shipid(sh));
-	u->lastorder = set_string(&u->lastorder, buffer);
+    locale_string(u->faction->locale, keywords[K_MAKE]), locale_string(u->faction->locale, parameters[P_SHIP]), shipid(sh));
+	set_order(&u->lastorder, parse_order(buffer, u->faction->locale));
+  free_order(u->lastorder);
 
 	build_ship(u, sh, want);
 }
@@ -1016,7 +1027,7 @@ continue_ship(region * r, unit * u, int want)
 	int msize;
 
 	if (!eff_skill(u, SK_SHIPBUILDING, r)) {
-		cmistake(u, findorder(u, u->thisorder), 100, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 100, MSG_PRODUCE);
 		return;
 	}
 
@@ -1026,13 +1037,13 @@ continue_ship(region * r, unit * u, int want)
 	if (!sh) sh = u->ship;
 
 	if (!sh) {
-		cmistake(u, findorder(u, u->thisorder), 20, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 20, MSG_PRODUCE);
 		return;
 	}
 	cons = sh->type->construction;
 	assert(cons->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
 	if (sh->size==cons->maxsize && !sh->damage) {
-		cmistake(u, findorder(u, u->thisorder), 16, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 16, MSG_PRODUCE);
 		return;
 	}
 	if (eff_skill(u, cons->skill, r) < cons->minskill) {
@@ -1043,7 +1054,7 @@ continue_ship(region * r, unit * u, int want)
 	}
 	msize = maxbuild(u, cons);
 	if (msize==0) {
-		cmistake(u, findorder(u, u->thisorder), 88, MSG_PRODUCE);
+		cmistake(u, u->thisorder, 88, MSG_PRODUCE);
 		return;
 	}
 	if (want > 0) want = min(want, msize);
@@ -1069,11 +1080,9 @@ mayenter(region * r, unit * u, building * b)
 static int
 mayboard(const unit * u, const ship * sh)
 {
-	unit *u2 = shipowner(sh->region, sh);
+	unit *u2 = shipowner(sh);
 
-	return (!u2
-		|| ucontact(u2, u)
-		|| alliedunit(u2, u->faction, HELP_GUARD));
+	return (!u2 || ucontact(u2, u) || alliedunit(u2, u->faction, HELP_GUARD));
 
 }
 
@@ -1096,58 +1105,48 @@ remove_contacts(void)
 	}
 }
 
-void
-do_leave(void)
+int
+leave_cmd(unit * u, struct order * ord)
 {
-	region *r;
-	unit *u;
-	strlist *S;
+  region * r = u->region;
 
-	for (r = regions; r; r = r->next) {
-		for (u = r->units; u; u = u->next) {
-			for (S = u->orders; S; S = S->next) {
-				if(igetkeyword(S->s, u->faction->locale) == K_LEAVE) {
-					if (r->terrain == T_OCEAN && u->ship) {
-						if(!fval(u->race, RCF_SWIM)) {
-							cmistake(u, S->s, 11, MSG_MOVE);
-							break;
-						}
-						if(get_item(u, I_HORSE)) {
-							cmistake(u, S->s, 231, MSG_MOVE);
-							break;
-						}
-					}
-					if (!slipthru(r, u, u->building)) {
-						sprintf(buf, "%s wird belagert.", buildingname(u->building));
-						mistake(u, S->s, buf, MSG_MOVE);
-						break;
-					}
-					leave(r, u);
-					break;
-				}
-			}
-		}
-	}
+  if (r->terrain == T_OCEAN && u->ship) {
+    if(!fval(u->race, RCF_SWIM)) {
+      cmistake(u, ord, 11, MSG_MOVE);
+      return 0;
+    }
+    if(get_item(u, I_HORSE)) {
+      cmistake(u, ord, 231, MSG_MOVE);
+      return 0;
+    }
+  }
+  if (!slipthru(r, u, u->building)) {
+    sprintf(buf, "%s wird belagert.", buildingname(u->building));
+    mistake(u, ord, buf, MSG_MOVE);
+  } else {
+    leave(r, u);
+  }
+  return 0;
 }
 
 static boolean
-entership(unit * u, ship * sh, const char * cmd, boolean lasttry)
+entership(unit * u, ship * sh, struct order * ord, boolean lasttry)
 {
 	/* Muß abgefangen werden, sonst könnten Schwimmer an
 	 * Bord von Schiffen an Land gelangen. */
 	if( !fval(u->race, RCF_WALK) &&
 			!fval(u->race, RCF_FLY)) {
-		cmistake(u, cmd, 233, MSG_MOVE);
+		cmistake(u, ord, 233, MSG_MOVE);
 		return false;
 	}
 
 	if (!sh) {
-		if (lasttry) cmistake(u, cmd, 20, MSG_MOVE);
+		if (lasttry) cmistake(u, ord, 20, MSG_MOVE);
 		return false;
 	}
 	if (sh==u->ship) return true;
 	if (!mayboard(u, sh)) {
-		if (lasttry) cmistake(u, cmd, 34, MSG_MOVE);
+		if (lasttry) cmistake(u, ord, 34, MSG_MOVE);
 		return false;
 	}
 	if (CheckOverload()) {
@@ -1160,7 +1159,7 @@ entership(unit * u, ship * sh, const char * cmd, boolean lasttry)
 			scabins += u->number;
 
 			if (sweight > mweight || scabins > mcabins) {
-				if (lasttry) cmistake(u, cmd, 34, MSG_MOVE);
+				if (lasttry) cmistake(u, ord, 34, MSG_MOVE);
 				return false;
 			}
 		}
@@ -1169,7 +1168,7 @@ entership(unit * u, ship * sh, const char * cmd, boolean lasttry)
 	leave(u->region, u);
 	u->ship = sh;
 
-	if (shipowner(u->region, sh) == 0) {
+	if (shipowner(sh) == 0) {
 		fset(u, UFL_OWNER);
 	}
 	return true;
@@ -1179,7 +1178,6 @@ void
 do_misc(boolean lasttry)
 {
 	region *r;
-	strlist *S, *Snext;
 	ship *sh;
 	building *b;
 
@@ -1189,31 +1187,31 @@ do_misc(boolean lasttry)
 		unit *u;
 
 		for (u = r->units; u; u = u->next) {
-			for (S = u->orders; S; S = S->next) {
-				switch (igetkeyword(S->s, u->faction->locale)) {
+      order * ord;
+			for (ord = u->orders; ord; ord = ord->next) {
+				switch (get_keyword(ord)) {
 				case K_CONTACT:
-					set_contact(r, u, lasttry);
+					contact_cmd(u, ord, lasttry);
 					break;
 				}
 			}
 		}
 
 		for (u = r->units; u; u = u->next) {
-			for (S = u->orders; S;) {
-				Snext = S->next;
-
-				switch (igetkeyword(S->s, u->faction->locale)) {
-				case K_ENTER:
-
+      order ** ordp = &u->orders;
+      while (*ordp) {
+        order * ord = *ordp;
+        if (get_keyword(ord) == K_ENTER) {
+          init_tokens(ord);
+          skip_token();
 					switch (getparam(u->faction->locale)) {
 					case P_BUILDING:
 					case P_GEBAEUDE:
-
 						/* Schwimmer können keine Gebäude betreten, außer diese sind
 						 * auf dem Ozean */
 						if( !fval(u->race, RCF_WALK) && !fval(u->race, RCF_FLY)) {
 							if (rterrain(r) != T_OCEAN){
-								if (lasttry) cmistake(u, S->s, 232, MSG_MOVE);
+								if (lasttry) cmistake(u, ord, 232, MSG_MOVE);
 								break;
 							}
 						}
@@ -1221,12 +1219,12 @@ do_misc(boolean lasttry)
 						b = getbuilding(r);
 
 						if (!b) {
-							if(lasttry) cmistake(u, S->s, 6, MSG_MOVE);
+							if(lasttry) cmistake(u, ord, 6, MSG_MOVE);
 							break;
 						}
 						/* Gebäude auf dem Ozean sollte man betreten dürfen
 						if(rterrain(r) == T_OCEAN) {
-							if (lasttry) cmistake(u, S->s, 297, MSG_MOVE);
+							if (lasttry) cmistake(u, ord, 297, MSG_MOVE);
 							break;
 						}
 						*/
@@ -1234,14 +1232,14 @@ do_misc(boolean lasttry)
 							if(lasttry) {
 								sprintf(buf, "Der Eintritt in %s wurde verwehrt",
 										buildingname(b));
-								mistake(u, S->s, buf, MSG_MOVE);
+								mistake(u, ord, buf, MSG_MOVE);
 							}
 							break;
 						}
 						if (!slipthru(r, u, b)) {
 							if(lasttry) {
 								sprintf(buf, "%s wird belagert", buildingname(b));
-								mistake(u, S->s, buf, MSG_MOVE);
+								mistake(u, ord, buf, MSG_MOVE);
 							}
 							break;
 						}
@@ -1249,8 +1247,8 @@ do_misc(boolean lasttry)
 						/* Wenn wir hier angekommen sind, war der Befehl
 						 * erfolgreich und wir löschen ihn, damit er im
 						 * zweiten Versuch nicht nochmal ausgeführt wird. */
-						removelist(&u->orders, S);
-
+            *ordp = ord->next;
+            free_order(ord);
 						leave(r, u);
 						u->building = b;
 						if (buildingowner(r, b) == 0) {
@@ -1260,16 +1258,15 @@ do_misc(boolean lasttry)
 
 					case P_SHIP:
 						sh = getship(r);
-						entership(u, sh, S->s, lasttry);
+						entership(u, sh, ord, lasttry);
 						break;
 
 					default:
-						if(lasttry) cmistake(u, S->s, 79, MSG_MOVE);
+						if (lasttry) cmistake(u, ord, 79, MSG_MOVE);
 
 					}
 				}
-
-				S = Snext;
+        if (*ordp==ord) ordp = &ord->next;
 			}
 		}
 	}

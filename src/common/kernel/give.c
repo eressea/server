@@ -1,30 +1,33 @@
 /* vi: set ts=2:
-+-----------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
-| Eressea II host |  Enno Rehling <enno@eressea.de>
-| (c) 1998 - 2003 |  Katja Zedel <katze@felidae.kn-bremen.de>
-+-----------------+  
+ +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
+ |                   |  Enno Rehling <enno@eressea-pbem.de>
+ | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
+ +-------------------+  Stefan Reich <reich@halbling.de>
 
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
+ This program may not be used, modified or distributed 
+ without prior permission by the authors of Eressea.
 
+ */
 #include <config.h>
 #include "eressea.h"
 
 #include "give.h"
 
 /* kernel includes */
-#include "message.h"
-#include "reports.h"
-#include "unit.h"
-#include "pool.h"
 #include "faction.h"
-#include "region.h"
 #include "item.h"
+#include "magic.h"
+#include "message.h"
+#include "order.h"
+#include "pool.h"
+#include "race.h"
+#include "region.h"
+#include "reports.h"
+#include "ship.h"
 #include "skill.h"
-
-/* items includes */
-#include <items/money.h>
+#include "unit.h"
 
 /* attributes includes */
 #include <attributes/racename.h>
@@ -32,6 +35,7 @@ without prior permission by the authors of Eressea.
 
 /* util includes */
 #include <util/event.h>
+#include <util/base36.h>
 
 /* libc includes */
 #include <limits.h>
@@ -42,213 +46,307 @@ without prior permission by the authors of Eressea.
 
 static int 
 GiveRestriction(void) {
-	static int value = -1;
-	if (value<0) {
-		value = atoi(get_param(global.parameters, "GiveRestriction"));
-	}
-	return value;
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "GiveRestriction");
+    value = str?atoi(str):0;
+  }
+  return value;
 }
 
 static void
 add_give(unit * u, unit * u2, int n, const resource_type * rtype, struct order * ord, int error)
 {
-	if (error) {
-		cmistake(u, ord, error, MSG_COMMERCE);
-	} else if (!u2 || ufaction(u2)!=ufaction(u)) {
-		assert(rtype);
-		add_message(&ufaction(u)->msgs,
-			msg_message("give", "unit target resource amount",
-			u, u2?ucansee(ufaction(u), u2, u_unknown()):u_peasants(), rtype, n));
-		if (u2) {
-			add_message(&ufaction(u2)->msgs,
-				msg_message("give", "unit target resource amount",
-				ucansee(ufaction(u2), u, u_unknown()), u2, rtype, n));
-		}
-	}
+  if (error) {
+    cmistake(u, ord, error, MSG_COMMERCE);
+  }
+  else if (!u2 || u2->faction!=u->faction) {
+    assert(rtype);
+    add_message(&u->faction->msgs,
+      msg_message("give", "unit target resource amount",
+      u, u2?ucansee(u->faction, u2, u_unknown()):u_peasants(), rtype, n));
+    if (u2) {
+      add_message(&u2->faction->msgs,
+        msg_message("give", "unit target resource amount",
+        ucansee(u2->faction, u, u_unknown()), u2, rtype, n));
+    }
+  }
 }
 
 static void
 addgive(unit * u, unit * u2, int n, resource_t res, struct order * ord, int error)
 {
-	add_give(u, u2, n, oldresourcetype[res], ord, error);
+  add_give(u, u2, n, oldresourcetype[res], ord, error);
 }
 
 static void
 give_peasants(int n, const item_type * itype, unit * src)
 {
-	region *r = uregion(src);
+  region *r = src->region;
 
-	/* horses are given to the region via itype->give! */
+  /* horses are given to the region via itype->give! */
 
-	if (itype->rtype==itype_money->rtype) {
-		rsetmoney(r, rmoney(r) + n);
-	}
+  if (itype->rtype==r_silver) {
+    rsetmoney(r, rmoney(r) + n);
+  }
 }
 
 int
 give_item(int want, const item_type * itype, unit * src, unit * dest, struct order * ord)
 {
-	short error = 0;
-	int n;
+  short error = 0;
+  int n;
 
-	assert(itype!=NULL);
-	n = new_get_pooled(src, item2resource(itype), GET_DEFAULT);
-	n = min(want, n);
-	if (dest && src->faction != dest->faction && src->faction->age < GiveRestriction()) {
+  assert(itype!=NULL);
+  n = new_get_pooled(src, item2resource(itype), GET_DEFAULT);
+  n = min(want, n);
+  if (dest && src->faction != dest->faction && src->faction->age < GiveRestriction()) {
 		if (ord!=NULL) {
-			ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "giverestriction",
-				"turns", GiveRestriction()));
+    ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "giverestriction",
+      "turns", GiveRestriction()));
 		}
-		return -1;
-	} else if (n == 0) {
-		error = 36;
-	} else if (itype->flags & ITF_CURSED) {
-		error = 25;
-	} else if (itype->give && !itype->give(src, dest, itype, n, ord)) {
-		return -1;
-	} else {
-		int use = new_use_pooled(src, item2resource(itype), GET_SLACK, n);
-		if (use<n) use += new_use_pooled(src, item2resource(itype), GET_RESERVE|GET_POOLED_SLACK, n-use);
-		if (dest) {
-			u_changeitem(dest, itype, n);
+    return -1;
+  } else if (n == 0) {
+    error = 36;
+  } else if (itype->flags & ITF_CURSED) {
+    error = 25;
+  } else if (itype->give && !itype->give(src, dest, itype, n, ord)) {
+    return -1;
+  } else {
+    int use = new_use_pooled(src, item2resource(itype), GET_SLACK, n);
+    if (use<n) use += new_use_pooled(src, item2resource(itype), GET_RESERVE|GET_POOLED_SLACK, n-use);
+    if (dest) {
+      i_change(&dest->items, itype, n);
 #if RESERVE_DONATIONS
-			new_change_resvalue(dest, item2resource(itype), n);
+      new_change_resvalue(dest, item2resource(itype), n);
 #elif RESERVE_GIVE
-			if (src->faction==dest->faction) {
-				new_change_resvalue(dest, item2resource(itype), n);
-			}
+      if (src->faction==dest->faction) {
+        new_change_resvalue(dest, item2resource(itype), n);
+      }
 #endif
-			handle_event(&src->attribs, "give", dest);
-			handle_event(&dest->attribs, "receive", src);
+      handle_event(&src->attribs, "give", dest);
+      handle_event(&dest->attribs, "receive", src);
 #if defined(MUSEUM_MODULE) && defined(TODO)
 TODO: Einen Trigger benutzen!
-				if (a_find(dest->attribs, &at_warden)) {
-					/* warden_add_give(src, dest, itype, n); */
-				}
+        if (a_find(dest->attribs, &at_warden)) {
+          /* warden_add_give(src, dest, itype, n); */
+        }
 #endif
-		} else {
-			/* gib bauern */
-			give_peasants(use, itype, src);
-		}
-	}
-	add_give(src, dest, n, item2resource(itype), ord, error);
-	if (error) return -1;
-	return 0;
+    }else{
+      /* gib bauern */
+      give_peasants(use, itype, src);
+    }
+  }
+  add_give(src, dest, n, item2resource(itype), ord, error);
+  if (error) return -1;
+  return 0;
 }
 
 void
 givemen(int n, unit * u, unit * u2, struct order * ord)
 {
-	struct ship *sh;
-	int error = 0;
+  ship *sh;
+  int k = 0;
+  int error = 0;
 
-	if (u2 && ufaction(u) != ufaction(u2) && ufaction(u)->age < GiveRestriction()) {
-		ADDMSG(&ufaction(u)->msgs, msg_feedback(u, ord, "giverestriction",
-			"turns", GiveRestriction()));
-		return;
-	}
-	if (u2 && u2->number) {
-		/* kann keine personen an eine nicht-leere einheit geben */
-		error = 155;
-	} else if (fval(u, UFL_HERO) || (u2 && fval(u2, UFL_HERO))) {
-		/* heroes cannot be passed on */
-		error = 158;
-	} else if (u == u2) {
-		error = 10;
-	} else if (!u2 && u->race == new_race[RC_SNOTLING]) {
-		/* Snotlings können nicht an Bauern übergeben werden. */
-		error = 307;
-	} else if ((u && unit_has_cursed_item(u)) || (u2 && unit_has_cursed_item(u2))) {
-		error = 78;
-	} else if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER) || isslave(u)) {
-		error = 74;
-	} else if (u2 && (fval(u2, UFL_LOCKED) || isslave(u))) {
-		error = 75;
-	} else if (u2 != (unit *) NULL
-		&& ufaction(u2) != ufaction(u)
-		&& ucontact(u2, u) == 0) {
-			error = 73;
-		} else if (u2 && fval(u, UFL_WERE) != fval(u2, UFL_WERE)) {
-			error = 312;
-		} else {
-			if (n > u->number) n = u->number;
-			if (n == 0) {
-				error = 96;
-			} else if (u2 && ufaction(u) != ufaction(u2)) {
-				if (ufaction(u2)->newbies + n > MAXNEWBIES) {
-					error = 129;
-				} else if (u->race != ufaction(u2)->race) {
-					if (ufaction(u2)->race != new_race[RC_HUMAN]) {
-						error = 120;
-					} else if (count_migrants(ufaction(u2)) + n > count_maxmigrants(ufaction(u2))) {
-						error = 128;
-					} else if (u2->number!=0) {
-						error = 139;
-					}
-				}
-			}
-		}
-		if (!error) {
-			if (u2 && u2->number == 0) {
-				set_racename(&u2->attribs, get_racename(u->attribs));
-				u2->race = u->race;
-				u2->irace = u->irace;
-			} else if (u2 && u2->race != u->race) {
-				error = 139;
-			}
-		}
-		if (u2) {
-			skill * sv;
-			for (sv=u->skills;error==0 && sv!=u->skills+u->skill_size;++sv) {
-				boolean sk2 = has_skill(u2, sv->id);
-				if (!sk2 || ufaction(u2)!=ufaction(u)) {
-					const skill_type * skt = skt_get(sv->id);
-					int limit = skt->limit?skt->limit(ufaction(u2)):INT_MAX;
-					if (limit!=INT_MAX) {
-						int k = count_skill(ufaction(u2), sv->id);
-						if (ufaction(u)!=ufaction(u2)) k+=n;
-						if (!sk2) k+=u2->number;
-						if (k>limit) error = 156;
-					}
-				}
-			}
-			for (sv=u2->skills;error==0 && sv!=u2->skills+u2->skill_size;++sv) {
-				boolean sk1 = has_skill(u, sv->id);
-				if (!sk1 || ufaction(u2)!=ufaction(u)) {
-					const skill_type * skt = skt_get(sv->id);
-					int limit = skt->limit?skt->limit(ufaction(u2)):INT_MAX;
-					if (limit!=INT_MAX) {
-						int k = count_skill(ufaction(u2), sv->id) + n;
-						if (k>limit) error = 156;
-					}
-				}
-			}
-		}
-		if (!error) {
-			if (u2) {
-				/* Einheiten von Schiffen können nicht NACH in von
-				* Nicht-alliierten bewachten Regionen ausführen */
-				sh = leftship(u);
-				if (sh) set_leftship(u2, sh);
-
-				transfermen(u, u2, n);
-				if (ufaction(u) != ufaction(u2)) {
-					ufaction(u2)->newbies += n;
-				}
-			} else {
-				if (getunitpeasants) {
-#ifdef ORCIFICATION
-					if (u->race == new_race[RC_ORC] && !fval(uregion(u), RF_ORCIFIED)) {
-						attrib *a = a_find(uregion(u)->attribs, &at_orcification);
-						if (!a) a = a_add(&uregion(u)->attribs, a_new(&at_orcification));
-						a->data.i += n;
-					}
+  if (u2 && u->faction != u2->faction && u->faction->age < GiveRestriction()) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "giverestriction",
+      "turns", GiveRestriction()));
+    return;
+  } else if (u == u2) {
+    error = 10;
+#if RACE_ADJUSTMENTS
+  } else if (!u2 && u->race == new_race[RC_SNOTLING]) {
+    /* Snotlings können nicht an Bauern übergeben werden. */
+    error = 307;
 #endif
-					transfermen(u, NULL, n);
-				} else {
-					error = 159;
-				}
-			}
-		}
-		addgive(u, u2, n, R_PERSON, ord, error);
+  } else if ((u && unit_has_cursed_item(u)) || (u2 && unit_has_cursed_item(u2))) {
+    error = 78;
+  } else if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER) || is_cursed(u->attribs, C_SLAVE, 0)) {
+    error = 74;
+  } else if (u2 && (fval(u2, UFL_LOCKED)|| is_cursed(u2->attribs, C_SLAVE, 0))) {
+    error = 75;
+  } else if (u2 && u2->faction != u->faction && ucontact(u2, u) == 0) {
+    error = 73;
+  } else if (u2 && (has_skill(u, SK_MAGIC) || has_skill(u2, SK_MAGIC))) {
+    error = 158;
+  } else if (u2 && fval(u, UFL_WERE) != fval(u2, UFL_WERE)) {
+    error = 312;
+  } else if (u2 && u2->number!=0 && u2->race != u->race) {
+    log_warning(("Partei %s versucht %s an %s zu übergeben.\n",
+                 itoa36(u->faction->no), u->race->_name[0],
+                 u2->race->_name[1]));
+    error = 139;
+  } else {
+    if (n > u->number) n = u->number;
+    if (n == 0) {
+      error = 96;
+    } else if (u2 && u->faction != u2->faction) {
+      if (u2->faction->newbies + n > MAXNEWBIES) {
+        error = 129;
+      } else if (u->race != u2->faction->race) {
+        if (u2->faction->race != new_race[RC_HUMAN]) {
+          error = 120;
+        } else if (count_migrants(u2->faction) + n > count_maxmigrants(u2->faction)) {
+          error = 128;
+        }
+        else if (teure_talente(u) || teure_talente(u2)) {
+          error = 154;
+        } else if (u2->number!=0) {
+          error = 139;
+        }
+      }
+    }
+  }
+
+  if (u2 && (has_skill(u, SK_ALCHEMY) || has_skill(u2, SK_ALCHEMY))) {
+    k = count_skill(u2->faction, SK_ALCHEMY);
+
+    /* Falls die Zieleinheit keine Alchemisten sind, werden sie nun
+    * welche. */
+    if (!has_skill(u2, SK_ALCHEMY) && has_skill(u, SK_ALCHEMY))
+      k += u2->number;
+
+    /* Wenn in eine Alchemisteneinheit Personen verschoben werden */
+    if (has_skill(u2, SK_ALCHEMY) && !has_skill(u, SK_ALCHEMY))
+      k += n;
+
+    /* Wenn Parteigrenzen überschritten werden */
+    if (u2->faction != u->faction)
+      k += n;
+
+    /* wird das Alchemistenmaximum ueberschritten ? */
+
+    if (k > max_skill(u2->faction, SK_ALCHEMY)) {
+      error = 156;
+    }
+  }
+
+  if (error==0) {
+    if (u2 && u2->number == 0) {
+      set_racename(&u2->attribs, get_racename(u->attribs));
+      u2->race = u->race;
+      u2->irace = u->irace;
+    }
+    
+    if (u2) {
+      /* Einheiten von Schiffen können nicht NACH in von
+      * Nicht-alliierten bewachten Regionen ausführen */
+      sh = leftship(u);
+      if (sh) set_leftship(u2, sh);
+
+      transfermen(u, u2, n);
+      if (u->faction != u2->faction) {
+        u2->faction->newbies += n;
+      }
+    } else {
+      if (getunitpeasants) {
+#ifdef ORCIFICATION
+        if (u->race == new_race[RC_ORC] && !fval(u->region, RF_ORCIFIED)) {
+          attrib *a = a_find(u->region->attribs, &at_orcification);
+          if (!a) a = a_add(&u->region->attribs, a_new(&at_orcification));
+          a->data.i += n;
+        }
+#endif
+        transfermen(u, NULL, n);
+      } else {
+        error = 159;
+      }
+    }
+  }
+  addgive(u, u2, n, R_PERSON, ord, error);
+}
+
+void
+giveunit(unit * u, unit * u2, order * ord)
+{
+  region * r = u->region;
+  int n = u->number;
+
+  if (u && unit_has_cursed_item(u)) {
+    cmistake(u, ord, 78, MSG_COMMERCE);
+    return;
+  }
+
+  if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)) {
+    cmistake(u, ord, 74, MSG_COMMERCE);
+    return;
+  }
+
+  if (u2 == NULL) {
+    if (rterrain(r) == T_OCEAN) {
+      cmistake(u, ord, 152, MSG_COMMERCE);
+    } else if (getunitpeasants) {
+      unit *u3;
+
+      for(u3 = r->units; u3; u3 = u3->next)
+        if(u3->faction == u->faction && u != u3) break;
+
+      if(u3) {
+        while (u->items) {
+          item * iold = i_remove(&u->items, u->items);
+          item * inew = *i_find(&u3->items, iold->type);
+          if (inew==NULL) i_add(&u3->items, iold);
+          else {
+            inew->number += iold->number;
+            i_free(iold);
+          }
+        }
+      }
+      givemen(u->number, u, NULL, ord);
+      cmistake(u, ord, 153, MSG_COMMERCE);
+    } else {
+      cmistake(u, ord, 63, MSG_COMMERCE);
+    }
+    return;
+  }
+
+  if (ucontact(u2, u) == 0) {
+    cmistake(u, ord, 73, MSG_COMMERCE);
+    return;
+  }
+  if (u->number == 0) {
+    cmistake(u, ord, 105, MSG_COMMERCE);
+    return;
+  }
+  if (u2->faction->newbies + n > MAXNEWBIES) {
+    cmistake(u, ord, 129, MSG_COMMERCE);
+    return;
+  }
+  if (u->race != u2->faction->race) {
+    if (u2->faction->race != new_race[RC_HUMAN]) {
+      cmistake(u, ord, 120, MSG_COMMERCE);
+      return;
+    }
+    if (count_migrants(u2->faction) + u->number > count_maxmigrants(u2->faction)) {
+      cmistake(u, ord, 128, MSG_COMMERCE);
+      return;
+    }
+    if (teure_talente(u)) {
+      cmistake(u, ord, 154, MSG_COMMERCE);
+      return;
+    }
+  }
+  if (has_skill(u, SK_MAGIC)) {
+    if (count_skill(u2->faction, SK_MAGIC) + u->number >
+      max_skill(u2->faction, SK_MAGIC))
+    {
+      cmistake(u, ord, 155, MSG_COMMERCE);
+      return;
+    }
+    if (u2->faction->magiegebiet != find_magetype(u)) {
+      cmistake(u, ord, 157, MSG_COMMERCE);
+      return;
+    }
+  }
+  if (has_skill(u, SK_ALCHEMY)
+    && count_skill(u2->faction, SK_ALCHEMY) + u->number >
+    max_skill(u2->faction, SK_ALCHEMY))
+  {
+    cmistake(u, ord, 156, MSG_COMMERCE);
+    return;
+  }
+  add_give(u, u2, 1, r_unit, ord, 0);
+  u_setfaction(u, u2->faction);
+  u2->faction->newbies += n;
 }

@@ -62,8 +62,8 @@ add_command(struct tnode * keys, struct tnode * tnext,
 	addtoken(keys, str, (void*)cmd);
 }
 
-void
-do_command(const struct tnode * keys, void * u, const char * str)
+static void
+do_command_i(const struct tnode * keys, void * u, const char * str, struct order * ord)
 {
 	int i;
 	char zText[16];
@@ -79,11 +79,18 @@ do_command(const struct tnode * keys, void * u, const char * str)
 	if (findtoken(keys, zText, (void**)&cmd)==E_TOK_SUCCESS) {
 		if (cmd->nodes) {
 			assert(!cmd->fun);
-			do_command(cmd->nodes, u, ++c);
+			do_command_i(cmd->nodes, u, ++c, ord);
 			return;
 		}
 		assert(cmd->fun);
-		cmd->fun(cmd->nodes, ++c, u, str);
+		cmd->fun(cmd->nodes, ++c, u, ord);
 	}
-	return;
+}
+
+extern const char * getcommand(struct order * ord);
+
+void
+do_command(const struct tnode * keys, void * u, struct order * ord)
+{
+  do_command_i(keys, u, getcommand(ord), ord);
 }

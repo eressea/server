@@ -26,7 +26,7 @@ typedef struct message_type {
 
 typedef struct message {
 	const struct message_type * type;
-	const void ** parameters;
+	void ** parameters;
 	int refcount;
 } message;
 
@@ -48,6 +48,8 @@ extern const char * mt_name(const struct message_type* mtype);
 /** message_type registry (optional): **/
 extern const struct message_type * mt_register(const struct message_type *);
 extern const struct message_type * mt_find(const char *);
+
+extern void register_argtype(const char * name, void(*free_arg)(void*), void*(*copy_arg)(void*));
 
 #ifdef __cplusplus
 }

@@ -25,10 +25,11 @@ extern "C" {
  */
 
 typedef struct order {
-	struct order * next;
-	char * str;
-	keyword_t keyword;
-	int refcount;
+  struct order * next;
+  /* do not access this data: */
+  char * _str; 
+  keyword_t _keyword;
+  int _refcount;
 } order;
 
 /* constructor */
@@ -40,7 +41,7 @@ extern void free_order(struct order * ord);
 extern void free_orders(struct order ** olist);
 
 /* access functions for orders */
-extern keyword_t getkeyword(const struct order * ord);
+extern keyword_t get_keyword(const struct order * ord);
 extern void set_order(struct order ** destp, struct order * src);
 extern const char * getcommand(const struct order * ord);
 extern boolean is_persistent(const struct order *ord);

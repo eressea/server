@@ -16,8 +16,10 @@
 extern "C" {
 #endif
 
+#ifdef XECMD_MODULE
 extern attrib_type at_xontormiaexpress;
 void xecmd(void);
+#endif
 
 #ifdef __cplusplus
 }

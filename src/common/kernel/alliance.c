@@ -23,6 +23,7 @@
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/message.h>
+#include <kernel/order.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/item.h>
@@ -87,7 +88,7 @@ add_kick(attrib * a, const faction * f)
 }
 
 static void
-alliance_kick(const tnode * tnext, const char * str, void * data, const char * cmd)
+alliance_kick(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
 	unit * u = (unit*)data;
 	faction * f = findfaction(atoi36(igetstrtoken(str)));
@@ -104,7 +105,7 @@ alliance_kick(const tnode * tnext, const char * str, void * data, const char * c
 }
 
 static void
-alliance_join(const tnode * tnext, const char * str, void * data, const char * cmd)
+alliance_join(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
 	unit * u = (unit*)data;
 	alliance * al = findalliance(atoi36(igetstrtoken(str)));
@@ -129,10 +130,10 @@ execute(const struct syntaxtree * syntax)
 			unit * u = *up;
 			const struct locale * lang = u->faction->locale;
 			tnode * root = stree_find(syntax, lang);
-			strlist * order;
-			for (order = u->orders; order; order = order->next) {
-				if (igetkeyword(order->s, lang) == K_ALLIANCE) {
-					do_command(root, u, order->s);
+			order * ord;
+			for (ord = u->orders; ord; ord = ord->next) {
+				if (get_keyword(ord) == K_ALLIANCE) {
+					do_command(root, u, ord);
 				}
 			}
 			if (u==*up) up = &u->next;

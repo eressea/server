@@ -23,27 +23,30 @@
 #include "eressea.h"
 #include "randenc.h"
 
-#include "unit.h"
-#include "faction.h"
-#include "alchemy.h"
-#include "item.h"
-#include "plane.h"
 #include "economy.h"
-#include "building.h"
-#include "magic.h"
-#include "message.h"
-#include "race.h"
-#include "monster.h"
-#include "names.h"
-#include "pool.h"
-#include "movement.h"
-#include "curse.h"
-#include "region.h"
-#include "skill.h"
-#include "karma.h"
-#include "ship.h"
-#include "battle.h"
 #include "luck.h"
+#include "monster.h"
+
+/* kernel includes */
+#include <kernel/alchemy.h>
+#include <kernel/battle.h>
+#include <kernel/building.h>
+#include <kernel/curse.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/karma.h>
+#include <kernel/magic.h>
+#include <kernel/message.h>
+#include <kernel/movement.h>
+#include <kernel/names.h>
+#include <kernel/order.h>
+#include <kernel/plane.h>
+#include <kernel/pool.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/ship.h>
+#include <kernel/skill.h>
+#include <kernel/unit.h>
 
 /* attributes includes */
 #include <attributes/racename.h>
@@ -1009,36 +1012,68 @@ create_icebergs(void)
 void
 godcurse(void)
 {
-	region *r;
-	ship *sh, *shn;
+  region *r;
 
-	for(r=regions; r; r=r->next) {
-		if(is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
-			unit * u;
-			for(u=r->units; u; u=u->next) {
-				skill * sv = u->skills;
-				while (sv!=u->skills+u->skill_size) {
-					int weeks = 1+rand()%3;
-					reduce_skill(u, sv, weeks);
-					++sv;
-				}
-			}
-		}
-	}
+  for(r=regions; r; r=r->next) {
+    if(is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+      unit * u;
+      for(u=r->units; u; u=u->next) {
+        skill * sv = u->skills;
+        while (sv!=u->skills+u->skill_size) {
+          int weeks = 1+rand()%3;
+          reduce_skill(u, sv, weeks);
+          ++sv;
+        }
+      }
+    }
+  }
 
-	if (rterrain(r) == T_OCEAN) {
-		for (sh = r->ships; sh;) {
-			shn = sh->next;
-			damage_ship(sh, 0.10);
-			if (sh->damage>=sh->size * DAMAGE_SCALE) {
-				unit * u = shipowner(r, sh);
-				if (u) ADDMSG(&u->faction->msgs,
-					msg_message("godcurse_destroy_ship", "ship", sh));
-				destroy_ship(sh);
-			}
-			sh = shn;
-		}
-	}
+  if (rterrain(r) == T_OCEAN) {
+    ship *sh;
+    for (sh = r->ships; sh;) {
+      ship *shn = sh->next;
+      damage_ship(sh, 0.10);
+      if (sh->damage>=sh->size * DAMAGE_SCALE) {
+        unit * u = shipowner(sh);
+        if (u) ADDMSG(&u->faction->msgs,
+          msg_message("godcurse_destroy_ship", "ship", sh));
+        destroy_ship(sh);
+      }
+      sh = shn;
+    }
+  }
+}
+
+static void
+split_unit(region * r, unit *u)
+{
+  unit *u2 = createunit(r, u->faction, 0, u->race);
+  int newsize = u->number/2;
+
+  set_string(&u2->name, u->name);
+  set_string(&u2->display, u->display);
+  set_order(&u2->thisorder, parse_order(keywords[K_WAIT], u->faction->locale));
+  set_order(&u2->lastorder, u2->thisorder);
+  free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
+
+  transfermen(u, u2, newsize);
+}
+
+static void
+check_split(void)
+{
+  region *r;
+  unit *u;
+
+  for(r=regions;r;r=r->next) {
+    for(u=r->units;u;u=u->next) {
+      if(u->faction->no == MONSTER_FACTION) {
+        if(u->number > u->race->splitsize) {
+          split_unit(r, u);
+        }
+      }
+    }
+  }
 }
 
 void
@@ -1322,7 +1357,9 @@ randomevents(void)
 				LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
 
 			name_unit(u);
-			set_string(&u->lastorder, "WARTEN");
+			set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
+                        free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
+
 			/* add message to the region */
 			ADDMSG(&r->msgs,
 				   msg_message("sighting", "region race number", 
@@ -1388,7 +1425,8 @@ randomevents(void)
 			u->hp = unit_max_hp(u) * u->number;
 
 			deathcounts(r, -undead);
-			set_string(&u->lastorder, "WARTEN");
+                        set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
+                        free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
 			name_unit(u);
 
 			log_printf("%d %s in %s.\n", u->number,
@@ -1463,7 +1501,8 @@ randomevents(void)
 				rsettrees(r, trees);
 #endif
 				u = createunit(r, findfaction(MONSTER_FACTION),treemen, new_race[RC_TREEMAN]);
-				set_string(&u->lastorder, "WARTEN");
+                                set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
+                                free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
 				/* guard(u, GUARD_ALL); kein auto-guard! erst in monster.c! */
 
 				set_level(u, SK_OBSERVATION, 2);

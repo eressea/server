@@ -17,6 +17,7 @@ SOURCES =
  eressea.c
  faction.c
  group.c
+ give.c
  item.c
  karma.c
  magic.c
@@ -24,7 +25,7 @@ SOURCES =
  movement.c
  names.c
  objtypes.c
- orders.c
+ order.c
  pathfinder.c
  plane.c
  player.c

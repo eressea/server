@@ -35,7 +35,7 @@
 extern border *borders[];
 
 static int
-use_questkey(struct unit * u, const struct item_type * itype, int amount, const char * cmd)
+use_questkey(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
 {
 	border *bo;
 	region *r1, *r2;
@@ -44,7 +44,7 @@ use_questkey(struct unit * u, const struct item_type * itype, int amount, const 
 	unit *u2;
 
 	if(u->region->x != 43 || u->region->y != -39) {
-		ADDMSG(&u->faction->msgs, msg_error(u, cmd, "use_questkey_wrongregion", ""));
+		ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_questkey_wrongregion", ""));
 		return EUNUSABLE;
 	}
 

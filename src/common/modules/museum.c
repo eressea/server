@@ -25,14 +25,16 @@
 #include "museum.h"
 
 /* kernel includes */
-#include "unit.h"
-#include "region.h"
-#include "plane.h"
-#include "item.h"
-#include "terrain.h"
-#include "movement.h"
-#include "building.h"
-#include "save.h"
+#include <kernel/building.h>
+#include <kernel/item.h>
+#include <kernel/movement.h>
+#include <kernel/message.h>
+#include <kernel/order.h>
+#include <kernel/plane.h>
+#include <kernel/region.h>
+#include <kernel/save.h>
+#include <kernel/terrain.h>
+#include <kernel/unit.h>
 
 /* util includes */
 #include <attrib.h>
@@ -44,37 +46,6 @@
 #include <stdlib.h>
 
 #define PFL_MUSEUM PFL_NOMONSTERS | PFL_NOCOORDS | PFL_NORECRUITS | PFL_NOGIVE | PFL_NOATTACK | PFL_NOTERRAIN | PFL_NOMAGIC | PFL_NOSTEALTH | PFL_NOTEACH | PFL_NOBUILD | PFL_NOFEED
-
-static int use_museumticket(unit *, const struct item_type *, int, const char *);
-static int use_museumexitticket(unit *, const struct item_type *, int, const char *);
-
-resource_type rt_museumticket = {
-	{ "museumticket", "museumticket_p"},
-	{ "museumticket", "museumticket_p"},
-	RTF_ITEM,
-	&res_changeitem
-};
-
-item_type it_museumticket = {
-	&rt_museumticket,
-	ITF_NONE, 0, 0,
-	NULL,
-	&use_museumticket
-};
-
-resource_type rt_museumexitticket = {
-	{ "museumexitticket", "museumexitticket_p"},
-	{ "museumexitticket", "museumexitticket_p"},
-	RTF_ITEM,
-	&res_changeitem
-};
-
-item_type it_museumexitticket = {
-	&rt_museumexitticket,
-	ITF_CURSED, 0, 0,
-	NULL,
-	&use_museumexitticket
-};
 
 attrib_type at_museumexit = {
 	"museumexit", NULL, NULL, NULL, a_writedefault, a_readdefault
@@ -305,48 +276,7 @@ create_museum(void)
 }
 
 static int
-use_museumticket(unit *u, const struct item_type *itype, int amount, const char * cmd)
-{
-	attrib *a;
-	region *r = u->region;
-
-	unused(amount);
-
-	/* Prüfen ob in normaler Plane und nur eine Person */
-	if(r->planep != NULL) {
-		cmistake(u, cmd, 265, MSG_MAGIC);
-		return 0;
-	}
-	if(u->number != 1) {
-		cmistake(u, cmd, 267, MSG_MAGIC);
-		return 0;
-	}
-	if(get_item(u, I_HORSE)) {
-		cmistake(u, cmd, 272, MSG_MAGIC);
-		return 0;
-	}
-
-	/* In diesem Attribut merken wir uns, wohin die Einheit zurückgesetzt
-	 * wird, wenn sie das Museum verläßt. */
-
-	a = a_add(&u->attribs, a_new(&at_museumexit));
-	a->data.sa[0] = (short)r->x;
-	a->data.sa[1] = (short)r->y;
-
-	/* Benutzer in die Halle teleportieren */
-	move_unit(u, findregion(9525, 9525), NULL);
-
-	/* Ticket abziehen */
-	i_change(&u->items, &it_museumticket, -1);
-
-	/* Benutzer ein Exitticket geben */
-	i_change(&u->items, &it_museumexitticket, 1);
-
-	return 1;
-}
-
-static int
-use_museumexitticket(unit *u, const struct item_type *itype, int amount, const char * cmd)
+use_museumexitticket(unit *u, const struct item_type *itype, int amount, order * ord)
 {
 	attrib *a;
 	region *r;
@@ -357,7 +287,7 @@ use_museumexitticket(unit *u, const struct item_type *itype, int amount, const c
 
 	/* Prüfen ob in Eingangshalle */
 	if(u->region->x != 9525 || u->region->y != 9525) {
-		cmistake(u, cmd, 266, MSG_MAGIC);
+		cmistake(u, ord, 266, MSG_MAGIC);
 		return 0;
 	}
 
@@ -392,10 +322,79 @@ use_museumexitticket(unit *u, const struct item_type *itype, int amount, const c
 	move_unit(u, r, NULL);
 
 	/* Exitticket abziehen */
-	i_change(&u->items, &it_museumexitticket, -1);
+	i_change(&u->items, itype, -1);
 
 	return 1;
 }
+
+resource_type rt_museumexitticket = {
+  { "museumexitticket", "museumexitticket_p"},
+  { "museumexitticket", "museumexitticket_p"},
+  RTF_ITEM,
+  &res_changeitem
+};
+
+item_type it_museumexitticket = {
+  &rt_museumexitticket,
+    ITF_CURSED, 0, 0,
+    NULL,
+    &use_museumexitticket
+};
+
+static int
+use_museumticket(unit *u, const struct item_type *itype, int amount, order * ord)
+{
+  attrib *a;
+  region *r = u->region;
+
+  unused(amount);
+
+  /* Prüfen ob in normaler Plane und nur eine Person */
+  if(r->planep != NULL) {
+    cmistake(u, ord, 265, MSG_MAGIC);
+    return 0;
+  }
+  if(u->number != 1) {
+    cmistake(u, ord, 267, MSG_MAGIC);
+    return 0;
+  }
+  if(get_item(u, I_HORSE)) {
+    cmistake(u, ord, 272, MSG_MAGIC);
+    return 0;
+  }
+
+  /* In diesem Attribut merken wir uns, wohin die Einheit zurückgesetzt
+  * wird, wenn sie das Museum verläßt. */
+
+  a = a_add(&u->attribs, a_new(&at_museumexit));
+  a->data.sa[0] = (short)r->x;
+  a->data.sa[1] = (short)r->y;
+
+  /* Benutzer in die Halle teleportieren */
+  move_unit(u, findregion(9525, 9525), NULL);
+
+  /* Ticket abziehen */
+  i_change(&u->items, itype, -1);
+
+  /* Benutzer ein Exitticket geben */
+  i_change(&u->items, &it_museumexitticket, 1);
+
+  return 1;
+}
+
+resource_type rt_museumticket = {
+  { "museumticket", "museumticket_p"},
+  { "museumticket", "museumticket_p"},
+  RTF_ITEM,
+  &res_changeitem
+};
+
+item_type it_museumticket = {
+  &rt_museumticket,
+    ITF_NONE, 0, 0,
+    NULL,
+    &use_museumticket
+};
 
 void
 register_museum(void)
