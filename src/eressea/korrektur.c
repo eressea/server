@@ -2555,6 +2555,8 @@ peasant_adjustment(void)
 			sum += rpeasants(r);
 			for(u = r->units; u; u=u->next) {
 				if(lifestyle(u) > 0) sum += u->number;
+				/* Sonderregel Bauernmob */
+				if (u->race == new_race[RC_PEASANT]) sum += u->number;
 			}
 		}
 		if (c==0) continue;
@@ -2568,6 +2570,8 @@ peasant_adjustment(void)
 
 			for(u = r->units; u; u=u->next) {
 				if(lifestyle(u) > 0) playerp += u->number;
+				/* Sonderregel Bauernmob */
+				if (u->race == new_race[RC_PEASANT]) playerp += u->number;
 			}
 
 			soll = (int)((avg + playerp + rpeasants(r)) * WEIGHT);
@@ -2596,6 +2600,8 @@ peasant_adjustment(void)
 			
 			for(u = r->units; u; u=u->next) {
 				if(lifestyle(u) > 0) playerp += u->number;
+				/* Sonderregel Bauernmob */
+				if (u->race == new_race[RC_PEASANT]) playerp += u->number;
 			}
 
 			free = max(0,production(r) * MAXPEASANTS_PER_AREA
