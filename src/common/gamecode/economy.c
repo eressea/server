@@ -2512,6 +2512,7 @@ plant(region *r, unit *u, int raw)
 
 	/* Skill prüfen */
 	skill = eff_skill(u, SK_HERBALISM, r);
+	htype = rherbtype(r);
 	if (skill < 6) {
 		add_message(&u->faction->msgs,
 			msg_error(u, findorder(u, u->thisorder), "plant_skills",
@@ -2525,7 +2526,6 @@ plant(region *r, unit *u, int raw)
 				oldresourcetype[R_TREES]));
 		return;
 	}
-	htype = rherbtype(r);
 	n = new_get_pooled(u, htype->itype->rtype, GET_DEFAULT);
 	/* Kräuter prüfen */
 	if (n==0) {

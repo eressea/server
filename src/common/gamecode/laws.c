@@ -2062,7 +2062,7 @@ set_passw(void)
 								if(!isalnum(*c)) pwok = false;
 								c++;
 							}
-							if(pwok == false) {
+							if (pwok == false) {
 								cmistake(u, S->s, 283, MSG_EVENT);
 								for(i=0; i<6; i++) pbuf[i] = (char)(97 + rand() % 26);
 								pbuf[6] = 0;

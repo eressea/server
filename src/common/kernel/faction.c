@@ -82,7 +82,7 @@ unused_faction_id(void)
 }
 
 unit *
-addplayer(region *r, char *email, const struct race * frace, locale *loc)
+addplayer(region *r, const char *email, const struct race * frace, const locale *loc)
 {
 	int i;
 	unit *u;
@@ -93,6 +93,7 @@ addplayer(region *r, char *email, const struct race * frace, locale *loc)
 
 	for (i = 0; i < 6; i++) buf[i] = (char) (97 + rand() % 26); buf[i] = 0;
 	set_string(&f->passw, buf);
+
 	for (i = 0; i < 6; i++) buf[i] = (char) (97 + rand() % 26); buf[i] = 0;
 	set_string(&f->override, buf);
 

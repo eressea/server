@@ -30,6 +30,7 @@
 #endif
 #endif
 
+struct race;
 
 typedef struct dbllist dbllist;
 struct dbllist {
@@ -41,6 +42,15 @@ typedef struct tagregion {
 	struct tagregion *next;
 	struct region *r;
 } tagregion;
+
+typedef struct newfaction {
+	struct newfaction * next;
+	const char * email;
+	const struct locale * lang;
+	const struct race * race;
+	int bonus;
+	boolean oldregions;
+} newfaction;
 
 extern tagregion *Tagged;
 
@@ -93,8 +103,8 @@ extern struct ship *clipship;
 
 #define NL(S) adddbllist(&S," ")
 
-#define wAddstr(x) waddnstr(win,x,-1)
-#define Addstr(x) waddnstr(mywin,x,-1)
+#define wAddstr(x) waddnstr(win, (NCURSES_CONST char*)x,-1)
+#define Addstr(x) waddnstr(mywin, (NCURSES_CONST char*)x,-1)
 #define Movexy(x,y) wmove(mywin,y,x)
 #define movexy(x,y) move(y,x)
 /* move(zeile, spalte) ist "verkehrt"... */
@@ -120,6 +130,9 @@ typedef struct selection {
 struct selection * do_selection(struct selection * sel, const char * title, void (*perform)(struct selection *, void *), void * data);
 struct selection ** push_selection(struct selection ** p_sel, char * str, void * payload);
 void insert_selection(struct selection ** p_sel, struct selection * prev, char * str, void * payload);
+
+extern void read_newfactions(const char * filename);
+
 
 #define sncat(b, s, size) strncat ((b), s, size - strlen (b))
 

@@ -109,182 +109,6 @@ typedef struct island {
 	int age;
 } island;
 
-static region *
-goodregion(int trace)
-{
-#define AGEGROUP 3				/* In diesem Alter wird zusammengefasst */
-#define REGPERFAC 3				/* #Regionen pro faction auf einer insel */
-	region *r;
-	vmap *xmap = (vmap *) calloc(1, sizeof(vmap));
-	cvector islands;
-	void **i;
-	int maxage = 0;
-	island *best = 0;
-	int maxscore = 1000;
-	region *good = 0;
-
-	cv_init(&islands);
-	for (r = regions; r != 0; r = r->next) {
-		int x = (r->x + 999) / 9;
-		int y = (r->y + 999) / 9;
-		unsigned int xp = vmap_find(xmap, x);
-
-		if (xp == xmap->size) {
-			xp = vmap_insert(xmap, x, calloc(1, sizeof(vmap)));
-		} {
-			vmap *ymap = xmap->data[xp].value;
-			unsigned int yp = vmap_find(ymap, y);
-			island *is;
-			unit *u;
-
-			if (yp == ymap->size) {
-				is = calloc(1, sizeof(island));
-				is->x = x;
-				is->y = y;
-				cv_pushback(&islands, is);
-				yp = vmap_insert(ymap, y, is);
-			} else
-				is = ymap->data[yp].value;
-			if (rterrain(r) != T_OCEAN && rterrain(r) != T_GLACIER)
-				++is->land;
-
-			for (u = r->units; u != 0; u = u->next) {
-				faction *f = u->faction;
-				unsigned int pos = vmap_find(&is->factions, f->no);
-
-				if (pos == is->factions.size) {
-					int age = 1 + (f->age / AGEGROUP);
-
-					vmap_insert(&is->factions, f->no, f);
-					is->maxage = max(is->maxage, age);
-					is->age += age;
-					maxage = max(maxage, is->maxage);
-				}
-			}
-		}
-	}
-
-	for (i = islands.begin; i != islands.end; ++i) {
-		island *is = *i;
-
-		if (is->maxage > 6 || is->factions.size == 0)
-			continue;
-		if (is->land / REGPERFAC < is->factions.size)
-			continue;
-		if (is->age < maxscore) {
-			best = is;
-			maxscore = is->age;
-		}
-	}
-
-	if (!best) {
-		maxscore = 0;
-		for (i = islands.begin; i != islands.end; ++i) {
-			island *is = *i;
-			int x, y;
-			int score = 0;
-
-			if (is->land == 0 || is->age != 0)
-				continue;
-			/* insel leer. nachbarn zählen. */
-			for (x = is->x - 1; x <= is->x + 1; ++x) {
-				unsigned int p = vmap_find(xmap, x);
-				vmap *ymap;
-
-				if (p == xmap->size)
-					continue;
-				ymap = xmap->data[p].value;
-				for (y = is->y - 1; y <= is->y + 1; ++y) {
-					unsigned int p = vmap_find(ymap, y);
-					island *os;
-
-					if (p == ymap->size)
-						continue;
-					os = ymap->data[p].value;
-					if (os->age > 0)
-						score += maxage - os->maxage;
-				}
-			}
-			if (score > maxscore) {
-				maxscore = score;
-				best = is;
-			}
-		}
-	}
-	if (best) {
-		int a = best->x * 9 - 999;
-		int b = best->y * 9 - 999;
-		int x, y;
-
-		maxscore = 0;
-		for (x = a; x != a + 9; ++x) {
-			for (y = b; y != b + 9; ++y) {
-				region *r = findregion(x, y);
-				int score = 0;
-
-				if (r && r->units == 0 && rterrain(r) != T_OCEAN && rterrain(r) != T_GLACIER) {
-					direction_t con;
-					for (con = 0; con != MAXDIRECTIONS; ++con) {
-						region *c = rconnect(r, con);
-
-						if (!c || c->units == 0)
-							score += 2;
-						if (c && rterrain(c) != T_OCEAN)
-							++score;
-					}
-					if (score > maxscore) {
-						maxscore = score;
-						good = r;
-					}
-				}
-			}
-		}
-	}
-	/* cleanup */  {
-		void **i;
-		unsigned int x;
-
-		for (i = islands.begin; i != islands.end; ++i) {
-			free(*i);
-		}
-		for (x = 0; x != xmap->size; ++x) {
-			vmap *v = xmap->data[x].value;
-			free(v->data);
-			free(v);
-		}
-		free(xmap->data);
-		free(xmap);
-	}
-	return good;
-}
-
-region*
-SeedPartei(void)
-{
-	int i, q=0, y=3;
-	WINDOW *win;
-	race_t rc = 0;
-
-	do {
-		win = openwin(SX - 10, 6, "< Neue Partei einfügen >");
-		wmove(win, y, 4);
-		for (i = 1; i < MAXRACES; i++) if(playerrace(new_race[i]) && i != RC_ORC) {
-			sprintf(buf, "%d=%s; ", i, new_race[i]->_name[0]);
-			q += strlen(buf);
-			if (q > SX - 20) {
-				q = strlen(buf);
-				y++;
-				wmove(win, y, 4);
-			}
-			wAddstr(buf);
-		}
-		rc = (race_t) map_input(win, 2, 1, "Rasse", 0, MAXRACES-1, rc);
-
-		delwin(win);
-	} while(!playerrace(new_race[i]) || i == RC_ORC);
-	return goodregion(rc);
-}
-
 static int
 days2level(int days)
 {
@@ -326,88 +150,169 @@ give_latestart_bonus(region *r, unit *u, int b)
 	}
 }
 
+static newfaction * newfactions;
+
+void
+read_newfactions(const char * filename)
+{
+	FILE * F = fopen(filename, "r");
+	if (F==NULL) return;
+	for (;;) {
+		faction * f = factions;
+		char race[20], email[64], lang[8];
+		newfaction * nf;
+		int bonus;
+		/* email;race;locale;startbonus */
+		if (fscanf(F, "%s %s %s %d", email, race, lang, &bonus)<=0) break;
+		while (f) {
+			if (strcmp(f->email, email)==0 && f->age==0) {
+				break;
+			}
+			f = f->next;
+		}
+		if (f) continue; /* skip the ones we've already got */
+		nf = calloc(sizeof(newfaction), 1);
+		nf->email = strdup(email);
+		nf->race = rc_find(race);
+		nf->lang = find_locale(lang);
+		nf->bonus = bonus;
+		assert(nf->race && nf->email && nf->lang);
+		nf->next = newfactions;
+		newfactions = nf;
+	}
+	fclose(F);
+}
+
+newfaction *
+select_newfaction(const struct race * rc)
+{
+	selection *prev, *ilist = NULL, **iinsert;
+	selection *selected = NULL;
+	newfaction *player = newfactions;
+
+	if (!player) return NULL;
+	insert_selection(&ilist, NULL, strdup("new player"), NULL);
+	iinsert=&ilist->next;
+	prev = ilist;
+
+	while (player) {
+		if (rc==NULL || player->race==rc) {
+			char str[80];
+			snprintf(str, 70, "%s %s", locale_string(default_locale, rc_name(player->race, 0)), player->email);
+			insert_selection(iinsert, prev, strdup(str), (void*)player);
+			prev = *iinsert;
+			iinsert = &prev->next;
+		}
+		player=player->next;
+	}
+	selected = do_selection(ilist, "Partei", NULL, NULL);
+	if (selected==NULL) return NULL;
+	return (newfaction*)selected->data;
+}
+
 void
 NeuePartei(region * r)
 {
 	int i, q, y;
-	WINDOW *win;
 	char email[INPUT_BUFSIZE+1];
-	race_t frace;
+	newfaction * nf, **nfp;
+	const struct locale * lang;
+	const struct race * frace;
 	int late;
 	unit *u;
-	int locale_nr;
 
 	if (!r->land) {
 		warnung(0, "Ungeeignete Region! <Taste>");
 		return;
 	}
-	win = openwin(SX - 10, 12, "< Neue Partei einfügen >");
 
-	strcpy(buf, my_input(win, 2, 1, "EMail-Adresse (Leer->Ende): ", NULL));
-	if (!buf[0]) {
-		delwin(win);
-		return;
-	}
+	nf = select_newfaction(NULL);
 
-	strcpy(email, buf);
+	if (nf!=NULL) {
+		frace = nf->race;
+		late = nf->bonus;
+		lang = nf->lang;
+		strcpy(email, nf->email);
+	} else {
+		int locale_nr;
+		WINDOW *win = openwin(SX - 10, 12, "< Neue Partei einfügen >");
 
-	y = 3;
-	q = 0;
-	wmove(win, y, 4);
-	for (i = 0; i < MAXRACES; i++) if(playerrace(new_race[i])) {
-	  sprintf(buf, "%d=%s; ", i, new_race[i]->_name[0]);
-	  q += strlen(buf);
-	  if (q > SX - 20) {
-			q = strlen(buf);
-			y++;
-			wmove(win, y, 4);
-	  }
-	  wAddstr(buf);
-	}
-	wrefresh(win);
-
-	y++;
-	do {
-		frace = (char) map_input(win, 2, y, "Rasse", -1, MAXRACES-1, 0);
-	} while(!playerrace(new_race[frace]));
-	if(frace == -1) {
-		delwin(win);
-		return;
-	}
-
-	y++;
-	late = (int) map_input(win, 2, y, "Startbonus", -1, 99, 0);
-	if(late == -1) {
-		delwin(win);
-		return;
-	}
-
-	i = 0; q = 0; y++;
-	wmove(win, y, 4);
-	while(locales[i] != NULL) {
-		sprintf(buf, "%d=%s; ", i, locales[i]);
-		q += strlen(buf);
-		if (q > SX - 20) {
-			q = strlen(buf);
-			y++;
-			wmove(win, y, 4);
+		strcpy(buf, my_input(win, 2, 1, "EMail-Adresse (Leer->Ende): ", NULL));
+		if (!buf[0]) {
+			delwin(win);
+			return;
 		}
-		wAddstr(buf);
-		i++;
-	}
-	wrefresh(win);
 
-	y++;
-	locale_nr = map_input(win, 2, 8, "Locale", -1, i-1, 0);
-	if(locale_nr == -1) {
+		strcpy(email, buf);
+
+		y = 3;
+		q = 0;
+		wmove(win, y, 4);
+		for (i = 0; i < MAXRACES; i++) if(playerrace(new_race[i])) {
+		  sprintf(buf, "%d=%s; ", i, new_race[i]->_name[0]);
+		  q += strlen(buf);
+		  if (q > SX - 20) {
+				q = strlen(buf);
+				y++;
+				wmove(win, y, 4);
+		  }
+		  wAddstr(buf);
+		}
+		wrefresh(win);
+
+		y++;
+		do {
+			int nrace = (char) map_input(win, 2, y, "Rasse", -1, MAXRACES-1, 0);
+			if (nrace == -1) {
+				delwin(win);
+				return;
+			}
+			frace = new_race[nrace];
+		} while(!playerrace(frace));
+
+		y++;
+		late = (int) map_input(win, 2, y, "Startbonus", -1, 99, 0);
+		if(late == -1) {
+			delwin(win);
+			return;
+		}
+		i = 0; q = 0; y++;
+		wmove(win, y, 4);
+		while(locales[i] != NULL) {
+			sprintf(buf, "%d=%s; ", i, locales[i]);
+			q += strlen(buf);
+			if (q > SX - 20) {
+				q = strlen(buf);
+				y++;
+				wmove(win, y, 4);
+			}
+			wAddstr(buf);
+			i++;
+		}
+		wrefresh(win);
+
+		y++;
+		locale_nr = map_input(win, 2, 8, "Locale", -1, i-1, 0);
+		if(locale_nr == -1) {
+			delwin(win);
+			return;
+		}
+		lang = find_locale(locales[locale_nr]);
+
 		delwin(win);
-		return;
 	}
 
-	delwin(win);
+	/* remove duplicate email addresses */
+	nfp=&newfactions;
+	while (*nfp) {
+		newfaction * nf = *nfp;
+		if (strcmp(email, nf->email)==0) {
+			*nfp = nf->next;
+		}
+		else nfp = &nf->next;
+	}
 	modified = 1;
-
-	u = addplayer(r, email, new_race[frace], find_locale(locales[locale_nr]));
+	u = addplayer(r, email, frace, lang);
 
 	if(late) give_latestart_bonus(r, u, late);
 

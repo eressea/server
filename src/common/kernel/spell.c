@@ -586,7 +586,7 @@ sp_summon_familiar(castorder *co)
 
 	dh = 0;
 	dh1 = 0;
-	sprintf(buf, "%s ruft einen Vertrauten. %s kˆnnen ", 
+	sprintf(buf, "%s ruft einen Vertrauten. %s kˆnnen ",
 		unitname(mage), LOC(mage->faction->locale, rc_name(rc, 1)));
 	for(sk=0;sk<MAXSKILLS;sk++){
 		if(rc->bonus[sk] > -5) dh++;
@@ -1183,7 +1183,7 @@ sp_hain(castorder *co)
 	return cast_level;
 }
 /* ------------------------------------------------------------- */
-/* Name:       Segne Mallornstecken - Mallorn Hainzauber 
+/* Name:       Segne Mallornstecken - Mallorn Hainzauber
  * Stufe:      4
  * Kategorie:  Region, positiv
  * Gebiet:     Gwyrrd
@@ -1246,7 +1246,7 @@ patzer_ents(castorder *co)
 	}
 
 	ents = force*10;
-	u = create_unit(r, findfaction(MONSTER_FACTION), ents, new_race[RC_TREEMAN], 0, 
+	u = create_unit(r, findfaction(MONSTER_FACTION), ents, new_race[RC_TREEMAN], 0,
 		LOC(default_locale, rc_name(new_race[RC_TREEMAN], ents!=1)), NULL);
 
 	/* 'Erfolg' melden */
@@ -1505,7 +1505,7 @@ sp_create_irongolem(castorder *co)
 		return 0;
 	}
 
-	u2 = create_unit(r, mage->faction, force*8, new_race[RC_IRONGOLEM], 0, 
+	u2 = create_unit(r, mage->faction, force*8, new_race[RC_IRONGOLEM], 0,
 		LOC(mage->faction->locale, rc_name(new_race[RC_IRONGOLEM], 1)), mage);
 
 	set_level(u2, SK_ARMORER, 1);
@@ -1516,7 +1516,7 @@ sp_create_irongolem(castorder *co)
 	a->data.ca[1] = IRONGOLEM_CRUMBLE;
 	a_add(&u2->attribs, a);
 
-	add_message(&mage->faction->msgs, 
+	add_message(&mage->faction->msgs,
 		msg_message("magiccreate_effect", "region command unit amount object",
 		mage->region, strdup(co->order), mage, force*8,
 		LOC(mage->faction->locale, rc_name(new_race[RC_IRONGOLEM], 1))));
@@ -1566,7 +1566,7 @@ sp_create_stonegolem(castorder *co)
 		return 0;
 	}
 
-	u2 = create_unit(r, mage->faction, force*5, new_race[RC_STONEGOLEM], 0, 
+	u2 = create_unit(r, mage->faction, force*5, new_race[RC_STONEGOLEM], 0,
 		LOC(mage->faction->locale, rc_name(new_race[RC_STONEGOLEM], 1)), mage);
 	set_level(u2, SK_ROAD_BUILDING, 1);
 	set_level(u2, SK_BUILDING, 1);
@@ -1576,7 +1576,7 @@ sp_create_stonegolem(castorder *co)
 	a->data.ca[1] = STONEGOLEM_CRUMBLE;
 	a_add(&u2->attribs, a);
 
-	add_message(&mage->faction->msgs, 
+	add_message(&mage->faction->msgs,
 		msg_message("magiccreate_effect", "region command unit amount object",
 		mage->region, strdup(co->order), mage, force*5,
 		LOC(mage->faction->locale, rc_name(new_race[RC_STONEGOLEM], 1))));
@@ -2590,7 +2590,7 @@ sp_forest_fire(castorder *co)
 				vernichtet_schoesslinge = rtrees(nr,1) * prozent / 400;
 			}
 		}
-		
+
 		if(vernichtet > 0  || vernichtet_schoesslinge > 0) {
 			rsettrees(nr, 2, rtrees(nr,2) - vernichtet);
 			rsettrees(nr, 1, rtrees(nr,1) - vernichtet_schoesslinge);
@@ -3176,13 +3176,13 @@ sp_unholypower(castorder *co)
 
 		switch (old_race(u->race)) {
 		case RC_SKELETON:
-			target_race = new_race[RC_SKELETON_LORD]; 
+			target_race = new_race[RC_SKELETON_LORD];
 			break;
 		case RC_ZOMBIE:
-			target_race = new_race[RC_ZOMBIE_LORD]; 
+			target_race = new_race[RC_ZOMBIE_LORD];
 			break;
 		case RC_GHOUL:
-			target_race = new_race[RC_GHOUL_LORD]; 
+			target_race = new_race[RC_GHOUL_LORD];
 			break;
 		default:
 			cmistake(mage, strdup(co->order), 284, MSG_MAGIC);
@@ -3192,7 +3192,7 @@ sp_unholypower(castorder *co)
 		if(u->number <= n) {
 			n -= u->number;
 			u->race = target_race;
-			add_message(&co->rt->msgs, msg_message("unholypower_effect", 
+			add_message(&co->rt->msgs, msg_message("unholypower_effect",
 				"mage target race", mage, u, target_race));
 		} else {
 			unit *un;
@@ -3213,7 +3213,7 @@ sp_unholypower(castorder *co)
 				un->ship = u->ship;
 			}
 			transfermen(u, un, n);
-			add_message(&co->rt->msgs, msg_message("unholypower_limitedeffect", 
+			add_message(&co->rt->msgs, msg_message("unholypower_limitedeffect",
 				"mage target race amount",
 				mage, u, target_race, n));
 			n = 0;
@@ -5184,7 +5184,7 @@ sp_gooddreams(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       
+/* Name:
  * Stufe:      9
  * Kategorie:
  * Wirkung:
@@ -5217,7 +5217,7 @@ sp_clonecopy(castorder *co)
 	sprintf(buf, "Klon von %s", unitname(mage));
 	set_string(&clone->name, buf);
 	fset(clone, FL_LOCKED);
-	
+
 	create_newclone(mage, clone);
 
 	sprintf(buf, "%s erschafft einen Klon.", unitname(mage));
@@ -6907,7 +6907,7 @@ sp_destroy_curse(castorder *co)
 	int succ = 0;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
-	int cast_level = co->level; 
+	int cast_level = co->level;
 	int force = co->force;
 	spellparameter *pa = co->par;
 	char *ts;
@@ -6922,7 +6922,7 @@ sp_destroy_curse(castorder *co)
 	c = findcurse(atoi36(pa->param[1]->data.s));
 	if (!c){
 		/* Es wurde kein Ziel gefunden */
-		add_message(&mage->faction->msgs, new_message(mage->faction, 
+		add_message(&mage->faction->msgs, new_message(mage->faction,
 					"spelltargetnotfound%u:unit%r:region%s:command",
 					mage, mage->region, strdup(co->order)));
 	}
@@ -6963,7 +6963,7 @@ sp_destroy_curse(castorder *co)
 	/* ¸berpr¸fung, ob curse zu diesem objekt gehˆrt */
 	if (!is_cursed_with(*ap, c)){
 		/* Es wurde kein Ziel gefunden */
-		add_message(&mage->faction->msgs, new_message(mage->faction, 
+		add_message(&mage->faction->msgs, new_message(mage->faction,
 					"spelltargetnotfound%u:unit%r:region%s:command",
 					mage, mage->region, strdup(co->order)));
 	}
@@ -6971,7 +6971,7 @@ sp_destroy_curse(castorder *co)
 	/* curse auflˆsen, wenn zauber st‰rker (force > vigour)*/
 	succ = c->vigour - force;
 	c->vigour = max(0, succ);
-	
+
 	if(succ <= 0) {
 		remove_cursec(ap, c);
 
@@ -8796,7 +8796,7 @@ spell spelldaten[] =
 
 	{SPL_WISPS, "Irrlichter",
 		"Der Zauberer spricht eine Beschwˆrung ¸ber einen Teil der Region, "
-		"und in der Folge entstehn dort Irrlichter. "
+		"und in der Folgewoche entstehen dort Irrlichter. "
 		"Wer durch diese Nebel wandert, wird von Visionen geplagt und "
 		"in die Irre geleitet.",
 		"ZAUBERE [REGION x y] [STUFE n] \"Irrlichter\" <Richtung>",
@@ -8883,7 +8883,7 @@ spell spelldaten[] =
 			{0, 0, 0}},
 	 (spell_f)sp_summon_familiar, patzer
 	},
-	
+
 	{SPL_CLONECOPY, "Seelenkopie",
 		"Dieser m‰chtige Zauber kann einen Magier vor dem sicheren Tod "
 		"bewahren. Der Magier erschafft anhand einer kleinen Blutprobe einen "
@@ -10436,7 +10436,7 @@ spell spelldaten[] =
 			{0, 0, 0}},
 		(spell_f)sp_dragonodem, patzer
 	},
-	
+
 	{ SPL_DRAINODEM, "Schattenodem",
 		"Entzieht Talentstufen und macht Schaden wie Groﬂer Odem",
 		NULL,
@@ -10450,7 +10450,7 @@ spell spelldaten[] =
 			{0, 0, 0}},
 		(spell_f)sp_dragonodem, patzer
 	},
-	
+
 	{SPL_AURA_OF_FEAR, "Gesang der Furcht",
 		"Panik",
 		NULL,
@@ -10464,7 +10464,7 @@ spell spelldaten[] =
 			{0, 0, 0}},
 	 (spell_f)sp_flee, patzer
 	},
-	
+
 	{SPL_SHADOWCALL, "Schattenruf",
 		"Ruft Schattenwesen.",
 		NULL,

@@ -3443,7 +3443,7 @@
 		</type>
 		<locale name="en">
 			<nr section="none">
-				<text>"The password has been changed to '$value'."</text>
+				<text>"The password of this faction is '$value'."</text>
 			</nr>
 		</locale>
 	</message>

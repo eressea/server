@@ -165,7 +165,7 @@ input_string(const char * text, char * result, size_t len) {
 	werase(wn);
 	wmove(wn, 0, 0);
 	wattron(wn, A_BOLD);
-	waddstr(wn, text);
+	waddstr(wn, (char*)text);
 	waddstr(wn, ": ");
 	echo();
 	curs_set(1);
@@ -228,7 +228,6 @@ modify_items(unit * u)
 	}
 	return i_modif;
 }
-
 
 #if 0
 char
@@ -339,6 +338,7 @@ modify_talente(unit * u, region * r)
 {
 	int q, L;
 	item_t i;
+	skill_t sk;
 	unsigned char x;
 	char modif=0;
 	WINDOW *wn;
@@ -355,12 +355,12 @@ modify_talente(unit * u, region * r)
 	wborder(wn, 0, 0, 0, 0, 0, 0, 0, 0);
 	wmove(wn, 0, 3);
 	waddnstr(wn, "< Talente >", -1);
-	for (i = 0; i < MAXSKILLS; i++) {
-		sprintf(buf, "%s %d", skillname(i, NULL), eff_skill(u, i, r));
-		TL[i] = strdup(buf);
+	for (sk = 0; sk != MAXSKILLS; ++sk) {
+		sprintf(buf, "%s %d", skillname(sk, NULL), eff_skill(u, sk, r));
+		TL[sk] = strdup(buf);
 		if (L > 10) {
-			wmove(wn, i + 1, 4);
-			waddnstr(wn, TL[i], -1);
+			wmove(wn, sk + 1, 4);
+			waddnstr(wn, TL[sk], -1);
 		}
 	}
 

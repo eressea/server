@@ -1038,15 +1038,6 @@ movearound(int rx, int ry) {
 					RemovePartei();
 					ch = -9;
 					break;
-				case 's':
-					c = SeedPartei();
-					if (c) {
-						rx = c->x;
-						ry = c->y;
-						recalc_everything(&x, &y, &rx, &ry);
-						ch = -8;
-					}
-					break;
 				case 'P':
 					NeuePartei(r);
 					ch = -9;
@@ -1523,6 +1514,10 @@ main(int argc, char *argv[])
 		sprintf(datafile, "%s/%d", datapath(), turn);
 
 	readgame(backup);
+
+	sprintf(buf, "%s/newfactions.%d", basepath(), turn);
+	read_newfactions(buf);
+
 	if (findfaction(MONSTER_FACTION)==NULL) {
 		makemonsters();
 	}

@@ -1871,6 +1871,10 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	}
 
 	if (f->age <= 2) {
+		if (f->age <= 1) {
+			ADDMSG(&f->msgs, msg_message("changepasswd", 
+				"value", gc_add(strdup(buf))));
+		}
 		RENDER(f, buf, sizeof(buf), ("newbie_password", "password", f->passw));
 		rnl(F);
 		centre(F, buf, true);

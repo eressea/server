@@ -264,6 +264,7 @@ insert_selection(selection ** p_sel, selection * prev, char * str, void * payloa
 	} else {
 		*p_sel = sel;
 		sel->prev = prev;
+		if (prev) sel->index=prev->index+1;
 	}
 }
 

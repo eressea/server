@@ -4653,7 +4653,7 @@
 		</type>
 		<locale name="de">
 			<nr section="events">
-				<text>"Die Adresse wurde auf '$value' geändert."</text>
+				<text>"Die Reportadresse wurde auf ${value} geändert."</text>
 			</nr>
 		</locale>
 	</message>
@@ -4664,7 +4664,7 @@
 		</type>
 		<locale name="de">
 			<nr section="events">
-				<text>"Das Passwort wurde auf '$value' geändert."</text>
+				<text>"Das Passwort für diese Partei lautet ${value}."</text>
 			</nr>
 		</locale>
 	</message>

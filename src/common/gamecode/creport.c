@@ -562,14 +562,14 @@ cr_output_unit(FILE * F, const region * r,
 			fprintf(F, "%d;Partei\n", u->faction->no);
 			if (sf!=u->faction) fprintf(F, "%d;Verkleidung\n", sf->no);
 			if (fval(u, FL_PARTEITARNUNG))
-				fprintf(F, "%d;Parteitarnung\n", fval(u, FL_PARTEITARNUNG));
+				fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, FL_PARTEITARNUNG)));
 			if (a_otherfaction)
 				fprintf(F, "%d;Anderepartei\n", a_otherfaction->data.i);
 		} else {
 			const attrib * a = a_find(u->attribs, &at_group);
 			if (fval(u, FL_PARTEITARNUNG)) {
 				/* faction info is hidden */
-				fprintf(F, "%d;Parteitarnung\n", fval(u, FL_PARTEITARNUNG));
+				fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, FL_PARTEITARNUNG)));
 			} else {
 				/* other unit. show visible faction, not u->faction */
 				fprintf(F, "%d;Partei\n", sf->no);

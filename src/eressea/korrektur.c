@@ -67,6 +67,7 @@
 
 /* libc includes */
 #include <stdio.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -2551,36 +2552,64 @@ peasant_adjustment(void)
 }
 
 static int
-orc_conversion(void)
+orc_conversion2(void)
 {
-		faction *f;
-		unit *u;
-		region *r;
+	faction *f;
+	unit *u;
+	region *r;
 
-		for(f=factions; f; f=f->next) {
-			if(f->race == new_race[RC_ORC]) {
-				f->race = new_race[RC_URUK];
-			}
+	for(f=factions; f; f=f->next) {
+		if(f->race == new_race[RC_ORC]) {
+			f->race = new_race[RC_URUK];
 		}
+	}
 
-		for(r=regions; r; r=r->next) {
-			for(u=r->units; u; u=u->next) {
-				if(u->race == new_race[RC_ORC]) {
-					/* convert to either uruk or snotling */
-					if(effskill(u, SK_MAGIC) >= 1
-							|| effskill(u, SK_ALCHEMY) >= 1
-						  || get_item(u, I_CHASTITY_BELT) >= u->number) {
-						u->race = new_race[RC_URUK];
-						u->irace = new_race[RC_URUK];
-					} else {
-						u->race = new_race[RC_SNOTLING];
-						u->irace = new_race[RC_SNOTLING];
-					}
+	for(r=regions; r; r=r->next) {
+		for(u=r->units; u; u=u->next) {
+			if (u->race==new_race[RC_ORC] || u->race==new_race[RC_SNOTLING]) {
+				/* convert to either uruk or snotling */
+				if (has_skill(u, SK_MAGIC) || has_skill(u, SK_ALCHEMY)) {
+					u->race = new_race[RC_URUK];
+					u->irace = new_race[RC_URUK];
 				}
 			}
 		}
+	}
 
-		return 0;
+	return 0;
+}
+
+static int
+orc_conversion(void)
+{
+	faction *f;
+	unit *u;
+	region *r;
+
+	for(f=factions; f; f=f->next) {
+		if(f->race == new_race[RC_ORC]) {
+			f->race = new_race[RC_URUK];
+		}
+	}
+
+	for(r=regions; r; r=r->next) {
+		for(u=r->units; u; u=u->next) {
+			if(u->race == new_race[RC_ORC]) {
+				/* convert to either uruk or snotling */
+				if(effskill(u, SK_MAGIC) >= 1
+						|| effskill(u, SK_ALCHEMY) >= 1
+					  || get_item(u, I_CHASTITY_BELT) >= u->number) {
+					u->race = new_race[RC_URUK];
+					u->irace = new_race[RC_URUK];
+				} else {
+					u->race = new_race[RC_SNOTLING];
+					u->irace = new_race[RC_SNOTLING];
+				}
+			}
+		}
+	}
+
+	return 0;
 }
 #endif
 
@@ -2637,6 +2666,28 @@ fix_questcoors(void)
 				u=u->next;
 			}
 		}
+	}
+	return 0;
+}
+
+static int
+warn_password(void)
+{
+	faction * f = factions;
+	while (f) {
+		boolean pwok = true;
+		const char * c = f->passw;
+		while (*c) {
+			if (!isalnum(*c)) pwok = false;
+			c++;
+		}
+		if (pwok == false) {
+			ADDMSG(&f->msgs, msg_message("msg_errors", "string", 
+				"Dein Passwort enthält Zeichen, die bei der Nachsendung "
+				"von Reports Probleme bereiten können. Bitte wähle ein neues "
+				"Passwort, bevorzugt nur aus Buchstaben un Zahlen bestehend."));
+		}
+		f = f->next;
 	}
 	return 0;
 }
@@ -2701,6 +2752,8 @@ korrektur(void)
 	do_once("heal", heal_all());
 	do_once("fquc", fix_questcoors());
 	do_once("fsee", fix_seeds());
+	do_once("orc2", orc_conversion2());
+	warn_password();
 
 	/* seems something fishy is going on, do this just 
 	 * to be on the safe side: 
