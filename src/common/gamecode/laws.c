@@ -216,12 +216,28 @@ destroyfaction(faction * f)
 	}
 }
 
-void
+static void
 restart(unit *u, const race * rc)
 {
 	faction *f = addplayer(u->region, u->faction->email, rc, u->faction->locale)->faction;
+	unit * nu = f->units;
+	strlist ** o=&u->orders;
+
 	f->magiegebiet = u->faction->magiegebiet;
 	f->options = u->faction->options;
+	freestrlist(nu->orders);
+	nu->orders = u->orders;
+	u->orders = NULL;
+	while (*o) {
+		strlist * S = *o;
+		if (igetkeyword(S->s, u->faction->locale) == K_RESTART) {
+			*o = S->next;
+			S->next = NULL;
+			freestrlist(S);
+		} else {
+			o = &S->next;
+		}
+	}
 	destroyfaction(u->faction);
 }
 
@@ -1057,11 +1073,10 @@ quit(void)
 						continue;
 					}
 					if (u->faction->age < 100) {
-						cmistake(u, S->s, 241, MSG_EVENT);
-						continue;
+						frace = u->faction->race;
+					} else {
+						frace = findrace(getstrtoken(), u->faction->locale);
 					}
-
-					frace = findrace(getstrtoken(), u->faction->locale);
 
 					if (frace == NULL || !playerrace(frace)) {
 						cmistake(u, S->s, 243, MSG_EVENT);

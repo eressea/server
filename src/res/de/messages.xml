@@ -1,26 +1,29 @@
 <messages>
-	<message name="newbieimmunity">
+	<message name="newbieimmunity" section="events">
 		<type>
 			<arg name="turns" type="int"></arg>
 		</type>
-		<locale name="de">
-			<nr section="events">
-				<text>"Deine Partei ist noch $int($turns) Wochen immun gegen Angriffe."</text>
-			</nr>
-		</locale>
+		<text locae="de">"Deine Partei ist noch $int($turns) Wochen immun gegen Angriffe."</text>
 	</message>
 
-	<message name="error130">
+	<message name="giverestriction" section="errors">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+			<arg name="turns" type="int"></arg>
+		</type>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Deine Partei muss mindestens $int($turns) alt sein, um etwas an andere Parteien übergeben zu können."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - Your faction must be at least $int($turns) weeks old to give something to another faction."</text>
+	</message>
+
+	<message name="error130" section="errors">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<locale name="de">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Syntax: MAGIEGEBIET [1-5]."</text>
-			</nr>
-		</locale>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Syntax: MAGIEGEBIET [1-5]."</text>
 	</message>
 
 	<message name="error131">
@@ -4406,7 +4409,7 @@
 		<text locale="de">"$unit($unit) in $region($region): '$command' - Einheiten einer Partei, die noch immun gegen Angriffe ist, dürfen nicht bewachen."</text>
 		<text locale="en">"$unit($unit) in $region($region): '$command' - units of a faction that can't be attacked may not guard."</text>
 	</message>
-	
+
 	<message name="error305" section="errors">
 		<type>
 			<arg name="unit" type="unit"></arg>

@@ -674,9 +674,7 @@ learn(void)
 #else
 				days = (int)((u->number * 30 + a->data.i) * multi);
 #endif
-#if HUNGER_DISABLES_LONGORDERS
-				days = days / 2;
-#endif
+				if (fval(u, FL_HUNGER)) days = days / 2;
 				change_skill(u, (skill_t)i, days);
 				if (a) {
 					a_remove(&u->attribs, a);

@@ -491,8 +491,12 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, const char
 	assert(itype!=NULL);
 	n = new_get_pooled(src, item2resource(itype), GET_DEFAULT);
 	n = min(want, n);
-
-	if (n == 0) {
+#define GIVERESTRICTION 3
+	if (src->faction != dest->faction && src->faction->age < GIVERESTRICTION) {
+		ADDMSG(&src->faction->msgs, msg_error(src, cmd, "giverestriction", 
+			"turns", GIVERESTRICTION));
+		return;
+	} else if (n == 0) {
 		error = 36;
 	} else if (itype->flags & ITF_CURSED) {
 		error = 25;
@@ -527,13 +531,17 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, const char
 }
 
 void
-givemen(int n, unit * u, unit * u2, strlist * S)
+givemen(int n, unit * u, unit * u2, const char * cmd)
 {
 	ship *sh;
 	int k = 0;
 	int error = 0;
 
-	if (u == u2) {
+	if (u->faction != u2->faction && u->faction->age < GIVERESTRICTION) {
+		ADDMSG(&u->faction->msgs, msg_error(u, cmd, "giverestriction", 
+			"turns", GIVERESTRICTION));
+		return;
+	} else if (u == u2) {
 		error = 10;
 	} else if ((u && unit_has_cursed_item(u)) || (u2 && unit_has_cursed_item(u2))) {
 		error = 78;
@@ -625,7 +633,7 @@ givemen(int n, unit * u, unit * u2, strlist * S)
 			}
 		}
 	}
-	addgive(u, u2, n, R_PERSON, S->s, error);
+	addgive(u, u2, n, R_PERSON, cmd, error);
 }
 
 void
@@ -663,7 +671,7 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 					}
 				}
 			}
-			givemen(u->number, u, NULL, S);
+			givemen(u->number, u, NULL, S->s);
 			cmistake(u, S->s, 153, MSG_COMMERCE);
 		} else {
 			cmistake(u, S->s, 64, MSG_COMMERCE);
@@ -952,7 +960,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 				return;
 			}
 			n = u->number;
-			givemen(n, u, u2, S);
+			givemen(n, u, u2, S->s);
 			return;
 		}
 
@@ -995,7 +1003,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 				msg_error(u, S->s, "race_noregroup", "race", u->race));
 			return;
 		}
-		givemen(n, u, u2, S);
+		givemen(n, u, u2, S->s);
 		return;
 	}
 
