@@ -1133,6 +1133,7 @@
 	</race>
 	<race name="snotling" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="50" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<function name="itemdrop" value="orcspoil"></function>
 		<skill name="sk_alchemy" modifier="1"></skill>
 		<skill name="sk_mining" modifier="1"></skill>
 		<skill name="sk_building" modifier="1"></skill>
