@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 #ifndef MUSEUM_MODULE
-#warning "must define MUSEUM_MODULE to use this module"
+#error "must define MUSEUM_MODULE to use this module"
 #endif
 
 extern attrib_type at_warden;

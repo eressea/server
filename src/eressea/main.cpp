@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -24,23 +24,31 @@
 #undef LOCALE_CHECK
 #endif
 
+/* config includes */
 #include <config.h>
 #include <eressea.h>
 
 #include "korrektur.h"
 
 /* initialization - TODO: init in separate module */
-#include <races/races.h>
 #include <attributes/attributes.h>
+#include <spells/spells.h>
 #include <triggers/triggers.h>
 #include <items/items.h>
 
 /* modules includes */
+#ifdef DUNGEON_MODULE
 #include <modules/dungeon.h>
+#endif
 #include <modules/score.h>
+#include <modules/xmas.h>
 #include <modules/gmcmd.h>
-#ifdef INFOCMD_MODULE
-# include <modules/infocmd.h>
+#include <modules/infocmd.h>
+#ifdef MUSEUM_MODULE
+#include <modules/museum.h>
+#endif
+#ifdef ARENA_MODULE
+#include <modules/arena.h>
 #endif
 
 /* gamecode includes */
@@ -49,14 +57,13 @@
 #include <laws.h>
 
 /* kernel includes */
-#include <alchemy.h>
 #include <building.h>
+#include <creport.h>
 #include <faction.h>
 #include <message.h>
 #include <plane.h>
 #include <race.h>
 #include <skill.h>
-#include <technology.h>
 #include <teleport.h>
 #include <unit.h>
 #include <region.h>
@@ -70,11 +77,12 @@
 
 /* util includes */
 #include <rand.h>
+#include <log.h>
 #include <sql.h>
 #include <base36.h>
 
-#ifdef HAVE_LUA
 /* lua includes */
+#ifdef HAVE_LUA
 #include "lua/bindings.h"
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
@@ -88,18 +96,14 @@
 #include <ctime>
 #include <clocale>
 
-
 /**
  ** global variables we are importing from other modules
  **/
-
 extern "C" {
-#ifdef BETA_CODE
-extern int xml_writeitems(const char * filename);
-extern int xml_writeships(void);
-extern int xml_writebuildings(void);
-#endif
-
+extern char * g_reportdir;
+extern char * g_datadir;
+extern char * g_basedir;
+extern char * g_resourcedir;
 extern item_type * i_silver;
 
 extern boolean nonr;
@@ -108,26 +112,33 @@ extern boolean noreports;
 extern boolean nomer;
 extern boolean nomsg;
 extern boolean nobattle;
+extern boolean nomonsters;
 extern boolean nobattledebug;
 extern boolean dirtyload;
 
+extern int demonfix;
 extern int loadplane;
 
 extern void debug_messagetypes(FILE * out);
 extern void free_region(region * r);
 extern void render_init(void);
 extern void free_borders(void);
+extern boolean opt_cr_absolute_coords;
+
+#ifdef FUZZY_BASE36
+extern int fuzzy_hits;
+#endif /* FUZZY_BASE36 */
 }
 
-
 /**
- ** global variables wthat we are exporting
+ ** global variables that we are exporting
  **/
 static char * orders = NULL;
 static char * xmlfile = NULL;
 static int nowrite = 0;
 static boolean g_writemap = false;
 static boolean g_killeiswald = false;
+static boolean opt_reportonly = false;
 
 struct settings global = {
 	"Eressea", /* gamename */
@@ -143,7 +154,7 @@ crwritemap(void)
   for (r=regions;r;r=r->next) {
     plane * p = rplane(r);
     fprintf(F, "REGION %d %d %d\n", r->x, r->y, p?p->id:0);
-    fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale), LOC(default_locale, rterrain(r)->name));
+    fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale), LOC(default_locale, terrain[rterrain(r)].name));
   }
   fclose(F);
 	return 0;
@@ -153,31 +164,19 @@ static void
 game_init(void)
 {
 	init_triggers();
-
+	init_xmas();
 	report_init();
 	creport_init();
 
 	debug_language("locales.log");
-	register_skills();
-
-	register_raceclass();
 	register_races();
 	register_resources();
-	register_terrains();
 	register_buildings();
 	register_ships();
 	register_items();
-#ifdef MAGIC
 	register_spells();
-#endif
-  register_dungeon();
-	register_technology();
-	register_alchemy();
-#ifdef MUSEUM_MODULE
-	register_museum();
-#endif
-#ifdef ARENA_MODULE
-	register_arena();
+#ifdef DUNGEON_MODULE
+	register_dungeon();
 #endif
 
 	init_data(xmlfile?xmlfile:"eressea.xml");
@@ -187,14 +186,20 @@ game_init(void)
 	init_resources();
 	init_items();
 	init_economy();
+#if NEW_RESOURCEGROWTH
 	init_rawmaterials();
+#endif
 
 	init_gmcmd();
-#ifdef INFOCMD_MODULE
 	init_info();
-#endif
 	init_conversion();
 
+#ifdef MUSEUM_MODULE
+	register_museum();
+#endif
+#ifdef ARENA_MODULE
+	register_arena();
+#endif
 #ifdef REMOVE_THIS
 	render_init();
 	{
@@ -236,7 +241,7 @@ writefactiondata(void)
 {
 	FILE *F;
 	char zText[128];
-
+	
 	sprintf(zText, "%s/faction-data.xml", basepath());
 	F = cfopen(zText, "w");
 	if(F) {
@@ -271,12 +276,43 @@ writepasswd(void)
 		puts("Schreibe Passwörter...");
 
 		for (f = factions; f; f = f->next) {
-			fprintf(F, "%s:%s:%s:%s\n",
+			fprintf(F, "%s:%s:%s:%s\n", 
 				factionid(f), f->email, f->passw, f->override);
 		}
 		fclose(F);
 	}
 }
+
+#ifdef SHORTPWDS
+static void
+readshortpwds()
+{
+  FILE * F;
+  char zText[MAX_PATH];
+  sprintf(zText, "%s/%s.%u", basepath(), "shortpwds", turn);
+
+  F = fopen(zText, "r");
+  if (F==NULL) {
+    log_error(("could not open password file %s", zText));
+  } else {
+    while (!feof(F)) {
+      faction * f;
+      char passwd[16], faction[5], email[64];
+      fscanf(F, "%s %s %s\n", faction, passwd, email);
+      f = findfaction(atoi36(faction));
+      if (f!=NULL) {
+        shortpwd * pwd = (shortpwd*)malloc(sizeof(shortpwd));
+        pwd->email = strdup(email);
+        pwd->pwd = strdup(passwd);
+        pwd->used = false;
+        pwd->next = f->shortpwds;
+        f->shortpwds = pwd;
+      }
+    }
+    fclose(F);
+  }
+}
+#endif
 
 #ifdef HAVE_LUA
 lua_State * luaState;
@@ -287,7 +323,10 @@ lua_init(void)
   luaState = lua_open();
   luaopen_base(luaState);
   luabind::open(luaState);
+  bind_eressea(luaState);
+  bind_alliance(luaState);
   bind_region(luaState);
+  bind_faction(luaState);
   bind_unit(luaState);
   bind_ship(luaState);
   bind_building(luaState);
@@ -303,9 +342,12 @@ lua_done(void)
 static int
 processturn(char *filename)
 {
-  struct summary * begin, * end;
+	struct summary * begin, * end;
 	int i;
 
+#ifdef SHORTPWDS
+  readshortpwds("passwords");
+#endif
 	begin = make_summary(false);
 	printf(" - Korrekturen Runde %d\n", turn);
 	korrektur();
@@ -336,6 +378,11 @@ processturn(char *filename)
 	free(end);
 	free(begin);
 	writepasswd();
+#ifdef FUZZY_BASE36
+	fputs("==--------------------------==\n", stdout);
+	fprintf(stdout, "## fuzzy base10 hits: %5d ##\n", fuzzy_hits);
+	fputs("==--------------------------==\n", stdout);
+#endif /* FUZZY_BASE36 */
 	if (!nowrite) {
 		char ztext[64];
 		sprintf(ztext, "%s/%d", datapath(), turn);
@@ -410,13 +457,17 @@ game_done(void)
 }
 #endif
 
-#if MALLOCDBG
-static void
+#include "magic.h"
+
+#ifdef MALLOCDBG
+void
 init_malloc_debug(void)
 {
 #if (defined(_MSC_VER))
 # if MALLOCDBG == 2
 #  define CHECKON() _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF)
+# elif MALLOCDBG == 3
+#  define CHECKON() _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) & 0)
 # elif MALLOCDBG == 1
 #  define CHECKON() _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_DELAY_FREE_MEM_DF)
 # endif
@@ -437,7 +488,7 @@ write_stats(void)
 		for (i=0;spelldaten[i].id;++i) {
 			if (spelldaten[i].magietyp!=m) {
 				m=spelldaten[i].magietyp;
-				fprintf(F, "\n%s\n", magic_schools[m]);
+				fprintf(F, "\n%s\n", magietypen[m]);
 			}
 			fprintf(F, "%d\t%s\n", spelldaten[i].level, spelldaten[i].name);
 		}
@@ -490,13 +541,16 @@ usage(const char * prog, const char * arg)
 		"-t turn          : read this datafile, not the most current one\n"
 		"-o reportdir     : gibt das reportverzeichnis an\n"
 		"-l logfile       : specify an alternative logfile\n"
+		"-R               : erstellt nur die Reports neu\n"
 		"--noeiswald      : beruhigt ungemein\n"
 		"--nomsg          : keine Messages (RAM sparen)\n"
 		"--nobattle       : keine Kämpfe\n"
+		"--nomonsters     : keine monster KI\n"
 		"--nodebug        : keine Logfiles für Kämpfe\n"
 		"--debug          : schreibt Debug-Ausgaben in die Datei debug\n"
 		"--nocr           : keine CRs\n"
 		"--nonr           : keine Reports\n"
+		"--crabsolute     : absolute Koordinaten im CR\n"
 #ifdef USE_MERIAN
 		"--nomer          : keine Meriankarten\n"
 #endif
@@ -525,7 +579,9 @@ read_args(int argc, char **argv)
 			else if (strcmp(argv[i]+2, "nomsg")==0) nomsg = true;
 			else if (strcmp(argv[i]+2, "noeiswald")==0) g_killeiswald = true;
 			else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
+			else if (strcmp(argv[i]+2, "nomonsters")==0) nomonsters = true;
 			else if (strcmp(argv[i]+2, "nodebug")==0) nobattledebug = true;
+			else if (strcmp(argv[i]+2, "crabsolute")==0) opt_cr_absolute_coords = true;
 #ifdef USE_MERIAN
 			else if (strcmp(argv[i]+2, "nomer")==0) nomer = true;
 #endif
@@ -537,6 +593,9 @@ read_args(int argc, char **argv)
 			case 'o':
 				g_reportdir = argv[++i];
 				break;
+			case 'D': /* DEBUG */
+				demonfix = atoi(argv[++i]);
+				break;
 			case 'd':
 				g_datadir = argv[++i];
 				break;
@@ -545,6 +604,9 @@ read_args(int argc, char **argv)
 				break;
 			case 'b':
 				g_basedir = argv[++i];
+				break;
+			case 'i':
+				xmlfile = argv[++i];
 				break;
 			case 't':
 				turn = atoi(argv[++i]);
@@ -576,12 +638,21 @@ read_args(int argc, char **argv)
 			case 'w':
  				g_writemap = true;
 				break;
+			case 'R':
+				opt_reportonly = true;
+				break;
 			default:
 				usage(argv[0], argv[i]);
 		}
 	}
 	return 0;
 }
+
+#ifdef BETA_CODE
+extern int xml_writeitems(const char * filename);
+extern int xml_writeships(void);
+extern int xml_writebuildings(void);
+#endif
 
 typedef struct lostdata {
 	int x, y;
@@ -590,24 +661,53 @@ typedef struct lostdata {
 	int ship;
 } lostdata;
 
-static void
+void
 confirm_newbies(void)
 {
-	const faction * f = factions;
-	if (sqlstream) while (f) {
-		if (f->age==0) {
-			fprintf(sqlstream, "UPDATE subscriptions SET status='ACTIVE', faction='%s' WHERE game=%d AND password='%s';\n", itoa36(f->no), GAME_ID, f->passw);
+	faction * f = factions;
+	if (sqlstream==NULL) return;
+	while (f) {
+		if (!fval(f, FFL_DBENTRY)) {
+			if (f->subscription) {
+				fprintf(sqlstream, "UPDATE subscriptions SET status='ACTIVE', faction='%s', race='%s' WHERE id=%u;\n", itoa36(f->no), dbrace(f->race), f->subscription);
+				fset(f, FFL_DBENTRY);
+			}
 		}
 		f = f->next;
+	}
+}
+
+void
+update_subscriptions(void)
+{
+	FILE * F;
+	char zText[MAX_PATH];
+	faction * f;
+	strcat(strcpy(zText, basepath()), "/subscriptions");
+	F = fopen(zText, "r");
+	if (F==NULL) {
+		log_error(("could not open %s.\n", zText));
+		return;
+	}
+	for (;;) {
+		char zFaction[5];
+		int subscription, fno;
+		if (fscanf(F, "%d %s", &subscription, zFaction)<=0) break;
+		fno = atoi36(zFaction);
+		f = findfaction(fno);
+		if (f!=NULL) {
+			f->subscription=subscription;
+		}
 	}
 }
 
 int
 main(int argc, char *argv[])
 {
-  int i;
+	int i;
 	char zText[MAX_PATH];
 
+	sqlpatch = true;
 	updatelog = fopen("update.log", "w");
 	log_open("eressea.log");
 	printf("\n%s PBEM host\n"
@@ -622,7 +722,7 @@ main(int argc, char *argv[])
 		return -1;
 	}
 #endif
-#if MALLOCDBG
+#ifdef MALLOCDBG
 	init_malloc_debug();
 #endif
 
@@ -642,16 +742,32 @@ main(int argc, char *argv[])
   lua_init();
 #endif
 	game_init();
-#ifdef BETA_CODE
+#if defined(BETA_CODE)
 	/* xml_writeships(); */
 	/* xml_writebuildings(); */
-	/* xml_writeitems("items.xml"); */
+	xml_writeitems("items.xml");
 	return 0;
 #endif
 
 	if ((i=readgame(false))!=0) return i;
 	confirm_newbies();
-#ifdef BETA_CODE
+	update_subscriptions();
+	{
+		char zText[128];
+		FILE * F;
+		faction * f = factions;
+		sprintf(zText, "subscriptions.%u", turn);
+		F = fopen(zText, "w");
+		while (f!=NULL) {
+			fprintf(F, "%s:%u:%s:%s:%s:%u:\n",
+					itoa36(f->no), f->subscription, f->email, f->override,
+					dbrace(f->race), f->lastorders);
+			f = f->next;
+		}
+		fclose(F);
+	}
+
+#ifdef DUNGEON_MODULE
 	if (dungeonstyles) {
 		struct dungeon * d = dungeonstyles;
 		struct region * r = make_dungeon(d);
@@ -668,9 +784,19 @@ main(int argc, char *argv[])
 			for (u=r->units;u;u=u->next) scale_number(u, 1);
 		}
 	}
-	if (g_writemap) return crwritemap();
 
-	if ((i=processturn(orders))!=0) return i;
+	if (opt_reportonly) {
+		reports();
+		return 0;
+	}
+
+	if (g_writemap) {
+		return crwritemap(); 
+	}
+
+	if ((i=processturn(orders))!=0) {
+		return i;
+	}
 
 #ifdef CLEANUP_CODE
 	game_done();

@@ -760,9 +760,11 @@ void
 read_items(FILE *F, item **ilist)
 {
 	for (;;) {
+    const item_type * itype;
 		rs(F, buf);
 		if (!strcmp("end", buf)) break;
-		i_change(ilist, it_find(buf), ri(F));
+    itype = it_find(buf);
+		if (itype!=NULL) i_change(ilist, itype, ri(F));
 	}
 }
 

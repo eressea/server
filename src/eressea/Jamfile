@@ -7,10 +7,32 @@ SubDirHdrs $(SUBDIR)/../common/util ;
 SubDirHdrs $(SUBDIR)/../common ;
 SubDirHdrs $(SUBDIR)/.. ;
 
-SOURCES =
- korrektur.c
- main.c
- ;
+if $(HAVE_LUA) {
+ SubDirC++Flags -DHAVE_LUA ;
+ UsingLua ;
+ UsingLuabind ;
+ SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;
+}
+
+if $(HAVE_LUA) {
+ SOURCES =
+  <lua>alliance.cpp
+  <lua>building.cpp
+  <lua>eressea.cpp
+  <lua>faction.cpp
+  <lua>region.cpp
+  <lua>ship.cpp
+  <lua>unit.cpp
+  main.cpp
+  ;
+
+ LINKLIBS on eressea += -llua50 -llualib50 ;
+ LINKLIBS on eressea += -lluabind ;
+} else {
+ SOURCES = main.c ;
+}
+
+SOURCES += korrektur.c ;
 
 Main eressea : $(SOURCES) ;
 LinkLibraries eressea : 

@@ -25,9 +25,10 @@
 #include <region.h>
 #include <ship.h>
 
+/* libc includes */
 #include <base36.h>
-
 #include <stdlib.h>
+#include <string.h>
 
 attrib_type at_xontormiaexpress = {
 	"xontormiaexpress",

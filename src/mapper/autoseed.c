@@ -257,8 +257,8 @@ autoseed(struct regionlist * rlist)
 			newfaction ** nfp = &newfactions;
 			unit * u;
 			while (*nfp!=nf) nfp=&(*nfp)->next;
-			u = addplayer(seeds[i].region, nf->email, nf->password, nf->race, 
-				nf->lang, nf->subscription);
+			u = addplayer(seeds[i].region, addfaction(nf->email, nf->password, nf->race, 
+        nf->lang, nf->subscription));
 #ifdef ALLIANCES
 			u->faction->alliance = nf->allies;
 #endif
@@ -358,8 +358,8 @@ mkisland(int nsize)
 			unit * u;
 			terraform(r, preferred_terrain(nextf->race));
 			++isize;
-			u = addplayer(r, nextf->email, nextf->password, nextf->race, nextf->lang,
-				nextf->subscription);
+			u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race, nextf->lang,
+				nextf->subscription));
 #ifdef ALLIANCES
 			u->faction->alliance = nextf->allies;
 #endif

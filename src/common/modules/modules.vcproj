@@ -24,7 +24,7 @@
 				AdditionalIncludeDirectories="../kernel,../util,../..,.."
 				PreprocessorDefinitions="_WINDOWS,WIN32"
 				BasicRuntimeChecks="0"
-				RuntimeLibrary="5"
+				RuntimeLibrary="3"
 				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
@@ -76,7 +76,7 @@
 				AdditionalIncludeDirectories="../kernel,../util,../..,.."
 				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS"
 				StringPooling="TRUE"
-				RuntimeLibrary="4"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
 				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="2"
@@ -124,19 +124,10 @@
 				RelativePath=".\alliance.h">
 			</File>
 			<File
-				RelativePath=".\arena.h">
-			</File>
-			<File
-				RelativePath=".\dungeon.h">
-			</File>
-			<File
 				RelativePath=".\gmcmd.h">
 			</File>
 			<File
 				RelativePath=".\infocmd.h">
-			</File>
-			<File
-				RelativePath=".\museum.h">
 			</File>
 			<File
 				RelativePath=".\score.h">
@@ -155,19 +146,10 @@
 			RelativePath=".\alliance.c">
 		</File>
 		<File
-			RelativePath=".\arena.c">
-		</File>
-		<File
-			RelativePath=".\dungeon.c">
-		</File>
-		<File
 			RelativePath=".\gmcmd.c">
 		</File>
 		<File
 			RelativePath=".\infocmd.c">
-		</File>
-		<File
-			RelativePath=".\museum.c">
 		</File>
 		<File
 			RelativePath=".\score.c">

@@ -289,8 +289,8 @@ seed_dropouts(void)
 			if (u==NULL) while (*nfp) {
 				newfaction * nf = *nfp;
 				if (nf->race==drop->race && !nf->bonus) {
-					unit * u = addplayer(r, nf->email, nf->password, nf->race, nf->lang,
-						nf->subscription);
+					unit * u = addplayer(r, addfaction(nf->email, nf->password, nf->race, nf->lang,
+						nf->subscription));
 #ifdef ALLIANCES
 					u->faction->alliance = nf->allies;
 #endif
@@ -519,7 +519,7 @@ NeuePartei(region * r)
 		else nfp = &nf->next;
 	}
 	modified = 1;
-	u = addplayer(r, email, passwd, frace, lang, subscription);
+	u = addplayer(r, addfaction(email, passwd, frace, lang, subscription));
 	++numnewbies;
 
 	if(late) give_latestart_bonus(r, u, late);

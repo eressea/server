@@ -596,18 +596,6 @@ mistake(const unit * u, const char *command, const char *comment, int mtype)
 
 extern unsigned int new_hashstring(const char* s);
 
-static int
-old_hashstring(const char* s)
-{
-	int key = 0;
-	int i = strlen(s);
-	while (i) {
-		--i;
-		key = ((key >> 31) & 1) ^ (key << 1) ^ s[i];
-	}
-	return key & 0x7fff;
-}
-
 void
 set_msglevel(struct warning ** warnings, const char * type, int level)
 {

@@ -111,6 +111,7 @@ read_gmcreate(attrib * a, FILE * F)
 	*p_itype = it_find(zText);
 	if (a->data.v==NULL) {
 		log_error(("unknown itemtype %s in gmcreate attribute\n", zText));
+    return AT_READ_FAIL;
 	}
 	return AT_READ_OK;
 }

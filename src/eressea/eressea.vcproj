@@ -25,7 +25,7 @@
 				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
 				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE"
 				StringPooling="TRUE"
-				RuntimeLibrary="4"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
 				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="2"
@@ -42,6 +42,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies="luabind.lib lua50.lib lualib50.lib"
 				OutputFile=".\Release/eressea.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -148,8 +149,8 @@
 				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
 				PreprocessorDefinitions="_CONSOLE,WIN32"
 				BasicRuntimeChecks="0"
-				RuntimeLibrary="5"
-				DisableLanguageExtensions="TRUE"
+				RuntimeLibrary="3"
+				DisableLanguageExtensions="FALSE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
 				PrecompiledHeaderFile=".\Debug/eressea.pch"
@@ -165,6 +166,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies="luabindd.lib lua50d.lib lualib50d.lib"
 				OutputFile=".\Debug/eressea.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -212,14 +214,159 @@
 				RelativePath="..\todo.txt">
 			</File>
 		</Filter>
+		<Filter
+			Name="bindings"
+			Filter="">
+			<File
+				RelativePath=".\lua\alliance.cpp">
+			</File>
+			<File
+				RelativePath=".\lua\bindings.h">
+			</File>
+			<File
+				RelativePath=".\lua\building.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Profile|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\lua\eressea.cpp">
+			</File>
+			<File
+				RelativePath=".\lua\faction.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Profile|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\lua\list.h">
+			</File>
+			<File
+				RelativePath=".\lua\region.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Profile|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\lua\ship.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Profile|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\lua\unit.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Profile|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableLanguageExtensions="FALSE"/>
+				</FileConfiguration>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\korrektur.c">
+			<FileConfiguration
+				Name="Release|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					DisableLanguageExtensions="FALSE"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Profile|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					DisableLanguageExtensions="FALSE"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Debug|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					DisableLanguageExtensions="TRUE"/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\korrektur.h">
 		</File>
 		<File
-			RelativePath=".\main.c">
+			RelativePath=".\main.cpp">
+			<FileConfiguration
+				Name="Debug|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					DisableLanguageExtensions="FALSE"/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath="..\common\settings-eressea.h">
