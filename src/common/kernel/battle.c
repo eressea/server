@@ -1711,16 +1711,15 @@ attack_message(const troop at, const troop dt, const weapon * wp, int dist)
 		return smallbuf;
 	}
 
-	if (dist > 1) {
+	if (dist > 1 || wp->type->itype == olditemtype[I_CATAPULT]) {
 		sprintf(smallbuf, "%s schießt mit %s auf %s",
 			a_unit,
 			locale_string(default_locale, resourcename(wp->type->itype->rtype, GR_INDEFINITE_ARTICLE)), d_unit);
-		return smallbuf;
-	}
-
+	} else {
 		sprintf(smallbuf, "%s schlägt mit %s nach %s",
 			a_unit,
 			locale_string(default_locale, resourcename(wp->type->itype->rtype, GR_INDEFINITE_ARTICLE)), d_unit);
+	}
 
 	return smallbuf;
 }
@@ -3610,11 +3609,16 @@ do_battle(void)
 			fighter *fig = *fi;
 			b->dh += fig->unit->number;
 		}
+
+#if 0
 		if (b->dh <= 30) {
 			b->small = true;
 		} else {
 			b->small = false;
 		}
+#else
+		b->small = false;
+#endif
 
 		for (;battle_report(b) && b->turn<=COMBAT_TURNS;++b->turn) {
 			char lbuf[256];

@@ -642,13 +642,13 @@ static requirement inn_req[] = {
 };
 static const construction inn_bld = {
 	SK_BUILDING, 2,   /* skill, minskill */
-	10, 10, inn_req,    /* maxsize, reqsize, required for size */
+	-1, 10, inn_req,    /* maxsize, reqsize, required for size */
 	NULL              /* improvement */
 };
 building_type bt_inn = {
 	"inn",     /* _name */
 	BFL_NONE,     /* flags */
-	1, 10, -1,    /* capac/size, maxcapac, maxsize */
+	1, -1, -1,    /* capac/size, maxcapac, maxsize */
 	inn_keep,  /* maintenance */
 	&inn_bld,  /* construction */
 	NULL          /* name() */
