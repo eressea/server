@@ -2548,6 +2548,34 @@ view_regatta(region * r, faction * f)
 }
 
 static void
+global_report(const char * filename)
+{
+  FILE * F = fopen(filename, "w");
+  region * r;
+  faction * f;
+  faction * monsters = findfaction(MONSTER_FACTION);
+  faction_list * addresses = NULL;
+
+  if (!monsters) return;
+  if (!F) return;
+
+  seen_init();
+  for (r = regions; r; r = r->next) {
+    add_seen(r, see_unit, true);
+  }
+
+  for (f=factions;f;f=f->next) {
+    faction_list * flist = calloc(1, sizeof(faction_list));
+    flist->data = f;
+    flist->next = addresses;
+    addresses = flist;
+  }
+
+  report_computer(F, monsters, addresses, time(NULL));
+  fclose(F);
+}
+
+static void
 prepare_report(faction * f)
 {
   region * r;
@@ -2641,6 +2669,7 @@ reports(void)
 		wants_compressed, wants_bzip2;
 	time_t ltime = time(NULL);
 	char pzTime[64];
+  const char * str;
 
 #ifdef _GNU_SOURCE
 	strftime(pzTime, 64, "%A, %-e. %B %Y, %-k:%M", localtime(&ltime));
@@ -2830,10 +2859,16 @@ reports(void)
 			printf("\n");
 		freelist(addresses);
 	}
-	/* schliesst BAT und verschickt Zeitungen und Kommentare */
-	current_faction = NULL;
-	seen_done();
-	closebatch(BAT);
+
+  str = get_param(global.parameters, "globalreport"); 
+  if (str!=NULL) {
+    sprintf(buf, "%s/%s.%u.cr", reportpath(), str, turn);
+    global_report(buf);
+  }
+  /* schliesst BAT und verschickt Zeitungen und Kommentare */
+  closebatch(BAT);
+  current_faction = NULL;
+  seen_done();
 }
 
 void
