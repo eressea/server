@@ -114,11 +114,9 @@ parse_order(const char * s, const struct locale * lang)
     ord->next = NULL;
 
 #ifdef AT_PERSISTENT
-    if (*s=='@') {
+    while (*s=='@') {
       ord->_persistent = 1;
-#ifdef SHORT_STRINGS
       ++s;
-#endif
     }
 #endif
     sptr = s;
