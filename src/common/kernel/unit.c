@@ -940,9 +940,7 @@ learn_skill(unit * u, skill_t sk, double chance)
 		}
 		++sv;
 	}
-	++u->skill_size;
-	u->skills = realloc(u->skills, u->skill_size * sizeof(skill));
-	sv = (u->skills + u->skill_size - 1);
+	sv = add_skill(u, sk);
 	sk_set(sv, 1);
 	return true;
 }
