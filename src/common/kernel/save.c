@@ -149,7 +149,7 @@ rc(FILE * F)
 #define rc(F) (nextc = getc(F))
 #endif
 
-#define CONVERT_DBLINK
+#undef CONVERT_DBLINK
 #ifdef CONVERT_DBLINK
 
 typedef struct uniquenode {
@@ -1483,6 +1483,7 @@ curse_read(attrib * a, FILE * f) {
 	}
 	assert(ct!=NULL);
 
+#ifdef CONVERT_DBLINK
 	if (global.data_version<DBLINK_VERSION) {
 		static const curse_type * cmonster = NULL;
 		if (!cmonster) cmonster=ct_find("calmmonster");
@@ -1490,6 +1491,7 @@ curse_read(attrib * a, FILE * f) {
 			c->effect.v = uniquefaction(c->effect.i);
 		}
 	}
+#endif
 	c->type = ct;
 
 	/* beim Einlesen sind noch nicht alle units da, muss also

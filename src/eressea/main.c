@@ -586,12 +586,36 @@ confirm_newbies(void)
 	if (sqlstream==NULL) return;
 	while (f) {
 		if (!fval(f, FFL_DBENTRY)) {
-      if (f->subscription) {
-        fprintf(sqlstream, "UPDATE subscriptions SET status='ACTIVE', faction='%s', race='%s' WHERE id=%u;\n", itoa36(f->no), dbrace(f->race), f->subscription);
-		  fset(f, FFL_DBENTRY);
-      }
-    }
+			if (f->subscription) {
+				fprintf(sqlstream, "UPDATE subscriptions SET status='ACTIVE', faction='%s', race='%s' WHERE id=%u;\n", itoa36(f->no), dbrace(f->race), f->subscription);
+				fset(f, FFL_DBENTRY);
+			}
+		}
 		f = f->next;
+	}
+}
+
+void
+update_subscriptions(void)
+{
+	FILE * F;
+	char zText[MAX_PATH];
+	faction * f;
+	strcat(strcpy(zText, basepath()), "/subscriptions");
+	F = fopen(zText, "r");
+	if (F==NULL) {
+		log_error(("could not open %s.\n", zText));
+		return;
+	}
+	for (;;) {
+		char zFaction[5];
+		int subscription, fno;
+		if (fscanf(F, "%d %s", &subscription, zFaction)<=0) break;
+		fno = atoi36(zFaction);
+		f = findfaction(fno);
+		if (f!=NULL) {
+			f->subscription=subscription;
+		}
 	}
 }
 
@@ -642,6 +666,22 @@ main(int argc, char *argv[])
 
 	if ((i=readgame(false))!=0) return i;
 	confirm_newbies();
+	update_subscriptions();
+	{
+		char zText[128];
+		FILE * F;
+		faction * f = factions;
+		sprintf(zText, "subscriptions.%u", turn);
+		F = fopen(zText, "w");
+		while (f!=NULL) {
+			fprintf(F, "%s:%u:%s:%s:%s:%u:\n",
+					itoa36(f->no), f->subscription, f->email, f->override,
+					dbrace(f->race), f->lastorders);
+			f = f->next;
+		}
+		fclose(F);
+	}
+
 #ifdef BETA_CODE
 	if (dungeonstyles) {
 		struct dungeon * d = dungeonstyles;
