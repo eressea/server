@@ -1241,15 +1241,17 @@ showunits(region * r)
 						break;
 					case '\023':
 						sh = findship(f);
-						sprintf(lbuf, "Einheit auf%s als Eigner?", shipname(sh));
-						if (yes_no(0, lbuf, 'j')) {
-							for (x = r->units; x; x = x->next)
-								if (x->ship == sh && fval(x, FL_OWNER)) {
-									freset(x, FL_OWNER);
-									break;
-								}
-							u->ship = sh;
-							fset(u, FL_OWNER);
+						if (sh) {
+							sprintf(lbuf, "Einheit auf%s als Eigner?", shipname(sh));
+							if (yes_no(0, lbuf, 'j')) {
+								for (x = r->units; x; x = x->next)
+									if (x->ship == sh && fval(x, FL_OWNER)) {
+										freset(x, FL_OWNER);
+										break;
+									}
+								u->ship = sh;
+								fset(u, FL_OWNER);
+							}
 						}
 						break;
 					case '\025':

@@ -12,10 +12,10 @@
 	<include file="ships.xml"></include>
 	<include file="buildings.xml"></include>
 
-	<game name="Eressea" welcome="tutorial">
+	<game name="Tutorial" welcome="tutorial">
 		<comment>Game specific</comment>
-		<order name="MEINUNG" disable></order>
 		<order name="EMAIL" disable></order>
+		<order name="MEINUNG" disable></order>
 		<order name="MAGIEGEBIET" disable></order>
 	</game>
 	<include file="tutorial/de/strings.xml"></include>
