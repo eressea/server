@@ -18,14 +18,6 @@
 extern "C" {
 #endif
 
-#define res2item(res) ((item_t)((res)-R_MINITEM))
-#define res2herb(res) ((herb_t)((res)-R_MINHERB))
-#define res2potion(res) ((potion_t)((res)-R_MINPOTION))
-
-#define item2res(itm) (resource_t)(itm+R_MINITEM)
-#define herb2res(itm) (resource_t)(itm+R_MINHERB)
-#define potion2res(itm) (resource_t)(itm+R_MINPOTION)
-
 int get_pooled(const struct unit * u, const struct region * r, resource_t itm);
 int use_pooled(struct unit * u, struct region * r, resource_t itm, int count);
 int use_pooled_give(struct unit * u, struct region * r, resource_t itm, int count);

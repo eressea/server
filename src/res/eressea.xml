@@ -6,8 +6,8 @@
   <xi:include href="de/strings.xml"/>
   <xi:include href="en/strings.xml"/>
 
-  <xi:include href="races.xml"/>
   <xi:include href="resources.xml"/>
+  <xi:include href="races.xml"/>
   <xi:include href="ships.xml"/>
   <xi:include href="buildings.xml"/>
   <xi:include file="terrains.xml"/>

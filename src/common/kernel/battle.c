@@ -742,7 +742,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 		} else {
 			skill = w->defenseskill;
 		}
-		if (wtype->modifiers) {
+		if (wtype->modifiers!=NULL) {
 			/* Pferdebonus, Lanzenbonus, usw. */
 			int m;
 			unsigned int flags = WMF_SKILL|(attacking?WMF_OFFENSIVE:WMF_DEFENSIVE);
@@ -752,10 +752,18 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 			if (riding(enemy)) flags |= WMF_AGAINST_RIDING;
 			else flags |= WMF_AGAINST_WALKING;
 
-			for (m=0;wtype->modifiers[m].value;++m) {
-				if ((wtype->modifiers[m].flags & flags) == flags) {
-					skill += wtype->modifiers[m].value;
-				}
+                        for (m=0;wtype->modifiers[m].value;++m) {
+                          if ((wtype->modifiers[m].flags & flags) == flags) {
+                            race_list * rlist = wtype->modifiers[m].races;
+                            if (rlist!=NULL) {
+                              while (rlist) {
+                                if (rlist->data == tu->race) break;
+                                rlist = rlist->next;
+                              }
+                              if (rlist==NULL) continue;
+                            }
+                            skill += wtype->modifiers[m].value;
+                          }
 			}
 		}
 	}
@@ -1738,6 +1746,7 @@ skilldiff(troop at, troop dt, int dist)
 			int w;
 			for (w=0;awp->type->modifiers[w].value!=0;++w) {
 				if (awp->type->modifiers[w].flags & WMF_MISSILE_TARGET) {
+                                  /* skill decreases by targeting difficulty (bow -2, catapult -4) */
 					skdiff -= awp->type->modifiers[w].value;
 					break;
 				}
@@ -1770,10 +1779,10 @@ attack_message(const troop at, const troop dt, const weapon * wp, int dist)
 {
 	static char smallbuf[512];
 	char a_unit[NAMESIZE+8], d_unit[NAMESIZE+8];
-	const char *noweap_string[4] = {"schlägt nach",
-													"tritt nach",
-													"beißt nach",
-													"kratzt nach"};
+        const char *noweap_string[4] = {"schlägt nach",
+          "tritt nach",
+          "beißt nach",
+          "kratzt nach"};
 
 	if (at.fighter->unit->number > 1)
 		sprintf(a_unit, "%s/%d", unitname(at.fighter->unit), at.index);
@@ -1850,7 +1859,7 @@ hits(troop at, troop dt, weapon * awp)
 			unitid(du), dt.index,
 			(dwp != NULL) ?
 				locale_string(default_locale, resourcename(dwp->type->itype->rtype, 0)) : "unbewaffnet",
-			weapon_effskill(dt, at, dwp, true, dist>1),
+			weapon_effskill(dt, at, dwp, false, dist>1),
 			skdiff, dist);
 #ifdef SMALL_BATTLE_MESSAGES
 	if (b->small) {

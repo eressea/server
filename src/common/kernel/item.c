@@ -642,6 +642,10 @@ give_horses(const unit * s, const unit * d, const item_type * itype, int n, cons
 #define LASTLUXURY      (I_INCENSE +1)
 #define MAXLUXURIES (LASTLUXURY - FIRSTLUXURY)
 
+#define item2res(itm) (resource_t)(itm+R_MINITEM)
+#define herb2res(itm) (resource_t)(itm+R_MINHERB)
+#define potion2res(itm) (resource_t)(itm+R_MINPOTION)
+
 item_type * olditemtype[MAXITEMS+1];
 resource_type * oldresourcetype[MAXRESOURCES+1];
 herb_type * oldherbtype[MAXHERBS+1];
@@ -1050,10 +1054,6 @@ static t_item itemdata[MAXITEMS] = {
 		{"Kriegsaxt", "Kriegsäxte", "Kriegsaxt", "Kriegsäxte"}, G_F,
 		IS_PRODUCT, SK_WEAPONSMITH, 3, {1, 1, 0, 0, 0, 0}, 200, 0, 0, NULL
 	},
-	{			/* I_GREATBOW 37 */
-		{"Elfenbogen", "Elfenbögen", "Elfenbogen", "Elfenbögen"}, G_M,
-		IS_PRODUCT, SK_WEAPONSMITH, 5, {0, 0, 0, 0, 0, 1}, 100, 0, 0, NULL
-	},
 	{			/* I_LAENSWORD 38 */
 		{"Laenschwert", "Laenschwerter", "Laenschwert", "Laenschwerter"}, G_N,
 		IS_PRODUCT, SK_WEAPONSMITH, 8, {0, 0, 0, 0, 1, 0}, 100, 0, 0, NULL
@@ -1073,10 +1073,6 @@ static t_item itemdata[MAXITEMS] = {
 	{			/* I_SHIELD 42 */
 		{"Schild", "Schilde", "Schild", "Schilde"}, G_N,
 		IS_PRODUCT, SK_ARMORER, 2, {1, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
-	},
-	{			/* I_HALBERD 43 */
-		{"Hellebarde", "Hellebarden", "Hellebarde", "Hellebarden"}, G_F,
-		IS_PRODUCT, SK_WEAPONSMITH, 3, {1, 1, 0, 0, 0, 0}, 200, 0, 0, NULL
 	},
 	{			/* I_LANCE 44 */
 		{"Lanze", "Lanzen", "Lanze", "Lanzen"}, G_F,
@@ -1496,9 +1492,6 @@ init_olditems(void)
 			break;
 		case I_TROLLBELT:
 			itype->capacity = STRENGTHCAPACITY;
-			break;
-		case I_GREATBOW:
-			a = a_add(&con->attribs, make_skillmod(NOSKILL, SMF_PRODUCTION, mod_elves_only, 1.0, 0));
 			break;
 		default:
 			if (itemdata[i].flags & FL_ITEM_MOUNT) itype->capacity = HORSECAPACITY;
@@ -2064,7 +2057,7 @@ use_magicboost(struct unit * user, const struct item_type * itype, int amount, c
 static int
 use_snowball(struct unit * user, const struct item_type * itype, int amount, const char * cmd)
 {
-	return 0;
+  return 0;
 }
 
 static void
@@ -2391,208 +2384,28 @@ resname(resource_t res, int index)
 void
 register_resources(void)
 {
-	register_function((pf_generic)mod_elves_only, "mod_elves_only");
-	register_function((pf_generic)res_changeitem, "changeitem");
-	register_function((pf_generic)res_changeperson, "changeperson");
-	register_function((pf_generic)res_changepeasants, "changepeasants");
-	register_function((pf_generic)res_changepermaura, "changepermaura");
-	register_function((pf_generic)res_changehp, "changehp");
-	register_function((pf_generic)res_changeaura, "changeaura");
+  register_function((pf_generic)mod_elves_only, "mod_elves_only");
+  register_function((pf_generic)res_changeitem, "changeitem");
+  register_function((pf_generic)res_changeperson, "changeperson");
+  register_function((pf_generic)res_changepeasants, "changepeasants");
+  register_function((pf_generic)res_changepermaura, "changepermaura");
+  register_function((pf_generic)res_changehp, "changehp");
+  register_function((pf_generic)res_changeaura, "changeaura");
 
-	register_function((pf_generic)limit_oldtypes, "limit_oldtypes");
+  register_function((pf_generic)limit_oldtypes, "limit_oldtypes");
 
-	register_function((pf_generic)use_oldresource, "useoldresource");
-	register_function((pf_generic)use_olditem, "useolditem");
-	register_function((pf_generic)use_potion, "usepotion");
-	register_function((pf_generic)use_tacticcrystal, "usetacticcrystal");
-	register_function((pf_generic)use_birthdayamulet, "usebirthdayamulet");
-	register_function((pf_generic)use_antimagiccrystal, "useantimagiccrystal");
-	register_function((pf_generic)use_warmthpotion, "usewarmthpotion");
-	register_function((pf_generic)use_bloodpotion, "usebloodpotion");
-	register_function((pf_generic)use_foolpotion, "usefoolpotion");
+  register_function((pf_generic)use_oldresource, "useoldresource");
+  register_function((pf_generic)use_olditem, "useolditem");
+  register_function((pf_generic)use_potion, "usepotion");
+  register_function((pf_generic)use_tacticcrystal, "usetacticcrystal");
+  register_function((pf_generic)use_birthdayamulet, "usebirthdayamulet");
+  register_function((pf_generic)use_antimagiccrystal, "useantimagiccrystal");
+  register_function((pf_generic)use_warmthpotion, "usewarmthpotion");
+  register_function((pf_generic)use_bloodpotion, "usebloodpotion");
+  register_function((pf_generic)use_foolpotion, "usefoolpotion");
   register_function((pf_generic)use_mistletoe, "usemistletoe");
   register_function((pf_generic)use_magicboost, "usemagicboost");
-	register_function((pf_generic)use_snowball, "usesnowball");
+  register_function((pf_generic)use_snowball, "usesnowball");
 
-	register_function((pf_generic)give_horses, "givehorses");
+  register_function((pf_generic)give_horses, "givehorses");
 }
-
-#if 0
-static int
-xml_writeitems(const char * file)
-{
-	FILE * stream = fopen(file, "w+");
-	resource_type * rt = resourcetypes;
-	item_type * it = itemtypes;
-	weapon_type * wt = weapontypes;
-
-/*
-	luxury_type * lt = luxurytypes;
-	potion_type * pt = potiontypes;
-	herb_type * ht = herbtypes;
-*/
-
-	if (stream==NULL) return -1;
-	fputs("<resources>\n", stream);
-	while (rt) {
-		fprintf(stream, "\t<resource name=\"%s\"", rt->_name[0]);
-		if (fval(rt, RTF_SNEAK)) fputs(" sneak", stream);
-		if (fval(rt, RTF_LIMITED)) fputs(" limited", stream);
-		if (fval(rt, RTF_POOLED)) fputs(" pooled", stream);
-		fputs(">\n", stream);
-
-		if (rt->uchange) {
-			const char * name = get_functionname((pf_generic)rt->uchange);
-			assert(name);
-			fprintf(stream, "\t\t<function name=\"change\" value=\"%s\"></function>\n",
-				name);
-		}
-		if (rt->uget) {
-			const char * name = get_functionname((pf_generic)rt->uget);
-			assert(name);
-			fprintf(stream, "\t\t<function name=\"get\" value=\"%s\"></function>\n",
-				name);
-		}
-		if (rt->name) {
-			const char * name = get_functionname((pf_generic)rt->name);
-			assert(name);
-			fprintf(stream, "\t\t<function name=\"name\" value=\"%s\"></function>\n",
-				name);
-		}
-
-		fputs("\t</resource>\n", stream);
-		rt = rt->next;
-	}
-	fputs("</resources>\n\n", stream);
-
-	fputs("<items>\n", stream);
-	while (it) {
-		const construction *ic = it->construction;
-		if (ic && ic->improvement) {
-			log_printf("construction::improvement not implemented, not writing item '%s'", it->rtype->_name[0]);
-			it=it->next;
-			continue;
-		}
-		if (ic && ic->attribs) {
-			log_printf("construction::attribs not implemented, not writing item '%s'", it->rtype->_name[0]);
-			it=it->next;
-			continue;
-		}
-		fprintf(stream, "\t<item resource=\"%s\"", it->rtype->_name[0]);
-		if (it->weight) fprintf(stream, " weight=\"%d\"", it->weight);
-		if (it->capacity) fprintf(stream, " capacity=\"%d\"", it->capacity);
-	/*
-		if (fval(it, ITF_HERB)) fputs(" herb", stream);
-		if (fval(it, ITF_WEAPON)) fputs(" weapon", stream);
-		if (fval(it, ITF_LUXURY)) fputs(" luxury", stream);
-		if (fval(it, ITF_POTION)) fputs(" potion", stream);
-	*/
-		if (fval(it, ITF_CURSED)) fputs(" cursed", stream);
-		if (fval(it, ITF_NOTLOST)) fputs(" notlost", stream);
-		if (fval(it, ITF_BIG)) fputs(" big", stream);
-		if (fval(it, ITF_ANIMAL)) fputs(" animal", stream);
-		if (fval(it, ITF_NOBUILDBESIEGED)) fputs(" nobuildbesieged", stream);
-		if (fval(it, ITF_DYNAMIC)) fputs(" dynamic", stream);
-		fputs(">\n", stream);
-
-		if (ic) {
-			requirement * cm = ic->materials;
-			fputs("\t\t<construction", stream);
-			if (ic->skill!=NOSKILL) {
-				fprintf(stream, " sk=\"%s\"", skillname(ic->skill, NULL));
-				if (ic->minskill) fprintf(stream, " minskill=\"%d\"", ic->minskill);
-			}
-			if (ic->reqsize!=1) {
-				fprintf(stream, " reqsize=\"%d\"", ic->reqsize);
-			}
-			if (ic->maxsize!=-1) {
-				fprintf(stream, " maxsize=\"%d\"", ic->maxsize);
-			}
-			fputs(">\n", stream);
-			while (cm && cm->number) {
-#ifdef NO_OLD_ITEMS
-				resource_type * rtype = cm->rtype;
-#else
-				resource_type * rtype = oldresourcetype[cm->type];
-#endif
-				fprintf(stream, "\t\t\t<material resource=\"%s\" size=\"%d\"",
-					rtype->_name[0], cm->number);
-				if (cm->recycle!=0.0)
-					fprintf(stream, " recycle=\"%.2f\"", cm->recycle);
-				fputs("></material>\n", stream);
-				++cm;
-			}
-			fputs("\t\t</construction>\n", stream);
-		}
-		if (it->use) {
-			const char * name = get_functionname((pf_generic)it->use);
-			assert(name);
-			fprintf(stream, "\t\t<function name=\"use\" value=\"%s\"></function>\n",
-				name);
-		}
-		if (it->give) {
-			const char * name = get_functionname((pf_generic)it->give);
-			assert(name);
-			fprintf(stream, "\t\t<function name=\"give\" value=\"%s\"></function>\n",
-				name);
-		}
-
-		fputs("\t</item>\n", stream);
-		fflush(stream);
-		it = it->next;
-	}
-	fputs("</items>\n\n", stream);
-
-	fputs("<weapons>\n", stream);
-	while (wt) {
-		weapon_mod * wm = wt->modifiers;
-		fprintf(stream, "\t<weapon resource=\"%s\"", wt->itype->rtype->_name[0]);
-		if (wt->minskill) fprintf(stream, " minskill=\"%d\"", wt->minskill);
-		fprintf(stream, " sk=\"%s\"", skillname(wt->skill, NULL));
-		if (wt->defmod) fprintf(stream, " offmod=\"%d\"", wt->offmod);
-		if (wt->offmod) fprintf(stream, " defmod=\"%d\"", wt->defmod);
-		if (wt->reload!=0) fprintf(stream, " reload=\"%d\"", wt->reload);
-		if (wt->magres!=0.0) fprintf(stream, " magres=\"%.2f\"", wt->magres);
-
-		if (fval(wt, WTF_MISSILE)) fputs(" missile", stream);
-		if (fval(wt, WTF_MAGICAL)) fputs(" magical", stream);
-		if (fval(wt, WTF_PIERCE)) fputs(" pierce", stream);
-		if (fval(wt, WTF_CUT)) fputs(" cut", stream);
-		if (fval(wt, WTF_BLUNT)) fputs(" blunt", stream);
-		if (fval(wt, WTF_BOW)) fputs(" bow", stream);
-
-		fputs(">\n", stream);
-		while (wm && wm->value) {
-			fprintf(stream, "\t\t<modifier value=\"%d\"", wm->value);
-			if (fval(wm, WMF_WALKING)) fputs(" walking", stream);
-			if (fval(wm, WMF_RIDING)) fputs(" riding", stream);
-			if (fval(wm, WMF_AGAINST_RIDING)) fputs(" against_riding", stream);
-			if (fval(wm, WMF_AGAINST_WALKING)) fputs(" against_walking", stream);
-			if (fval(wm, WMF_OFFENSIVE)) fputs(" offensive", stream);
-			if (fval(wm, WMF_DEFENSIVE)) fputs(" defensive", stream);
-			if (fval(wm, WMF_DAMAGE)) fputs(" damage", stream);
-			if (fval(wm, WMF_SKILL)) fputs(" sk", stream);
-			fputs("></modifier>\n", stream);
-			++wm;
-		}
-		fprintf(stream, "\t\t<damage type=\"default\" value=\"%s\"></damage>\n", wt->damage[0]);
-		if (strcmp(wt->damage[0], wt->damage[1])!=0) {
-			fprintf(stream, "\t\t<damage type=\"riding\" value=\"%s\"></damage>\n", wt->damage[1]);
-		}
-
-		if (wt->attack) {
-			const char * name = get_functionname((pf_generic)wt->attack);
-			assert(name);
-			fprintf(stream, "\t\t<function name=\"attack\" value=\"%s\"></function>\n",
-				name);
-		}
-
-		fputs("\t</weapon>\n", stream);
-		fflush(stream);
-		wt = wt->next;
-	}
-	fputs("</weapons>\n\n", stream);
-	fclose(stream);
-	return 0;
-}
-#endif

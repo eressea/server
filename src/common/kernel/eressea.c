@@ -1552,7 +1552,7 @@ getunit(const region * r, const faction * f)
 	if (n < 0) return 0;
 
 	for (u2 = r->units; u2; u2 = u2->next) {
-		if (u2->no == n && !fval(u2, UFL_ISNEW)) {
+		if (u2->no == n && u2->number>0) {
 			return u2;
 		}
 	}

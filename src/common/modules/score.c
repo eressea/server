@@ -27,15 +27,16 @@
 #endif
 
 /* kernel includes */
-#include <building.h>
-#include <faction.h>
-#include <item.h>
-#include <magic.h>
-#include <race.h>
-#include <region.h>
-#include <ship.h>
-#include <skill.h>
-#include <unit.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/magic.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/ship.h>
+#include <kernel/skill.h>
+#include <kernel/unit.h>
+#include <kernel/pool.h>
 
 /* util includes */
 #include <base36.h>
@@ -44,106 +45,85 @@
 /* libc includes */
 #include <math.h>
 
-static attrib_type a_score = {
+static attrib_type at_score = {
 	"score"
 };
+
+static int 
+item_score(item_t i)
+{
+  const luxury_type * ltype;
+
+  switch (i) {
+    case I_IRON:
+    case I_WOOD:
+    case I_STONE:
+    case I_HORSE:
+      return 10;
+    case I_MALLORN:
+      return 30;
+    case I_LAEN:
+      return 100;
+    case I_WAGON:
+      return 60;
+    case I_SHIELD:
+      return 30;
+    case I_LAENSHIELD:
+    case I_LAENSWORD:
+      return 400;
+    case I_LAENCHAIN:
+      return 1000;
+    case I_CHAIN_MAIL:
+      return 40;
+    case I_PLATE_ARMOR:
+      return 60;
+    case I_BALM:
+    case I_SPICES:
+    case I_JEWELERY:
+    case I_MYRRH:
+    case I_OIL:
+    case I_SILK:
+    case I_INCENSE:
+      ltype = resource2luxury(olditemtype[i]->rtype);
+      if (ltype) return ltype->price / 5;
+      return 0;
+    case I_AMULET_OF_HEALING:
+    case I_AMULET_OF_TRUE_SEEING:
+    case I_RING_OF_INVISIBILITY:
+    case I_RING_OF_POWER:
+    case I_CHASTITY_BELT:
+    case I_TROLLBELT:
+    case I_RING_OF_NIMBLEFINGER:
+    case I_FEENSTIEFEL:
+      return 6000;
+    case I_ANTIMAGICCRYSTAL:
+      return 2000;
+  }
+  return 0;
+}
 
 void
 init_scores(void)
 {
-	int i;
+  item_t i;
 
-	for (i = 0;olditemtype[i];i++) {
-		const luxury_type * ltype;
-		const item_type * itype = olditemtype[i];
-		attrib * a = a_add(&itype->rtype->attribs, a_new(&a_score));
-		switch (i) {
-		case I_KEKS:
-		case I_APFEL:
-		case I_NUSS:
-		case I_MANDELKERN:
-			break;
-		case I_IRON:
-		case I_WOOD:
-		case I_STONE:
-		case I_HORSE:
-			a->data.i = 10;
-			break;
-		case I_MALLORN:
-			a->data.i = 30;
-			break;
-		case I_LAEN:
-			a->data.i = 100;
-			break;
-		case I_WAGON:
-			a->data.i = 60;
-			break;
-		case I_CATAPULT:
-			a->data.i = 200;
-			break;
-		case I_SWORD:
-		case I_SPEAR:
-		case I_CROSSBOW:
-		case I_LONGBOW:
-		case I_LANCE:
-		case I_HALBERD:
-		case I_GREATSWORD:
-		case I_AXE:
-		case I_SHIELD:
-			a->data.i = 20;
-			break;
-		case I_GREATBOW:
-			a->data.i = 50;
-			break;
-		case I_LAENSHIELD:
-		case I_LAENSWORD:
-			a->data.i = 400;
-			break;
-		case I_LAENCHAIN:
-			a->data.i = 1000;
-			break;
-		case I_CHAIN_MAIL:
-			a->data.i = 40;
-			break;
-		case I_PLATE_ARMOR:
-			a->data.i = 60;
-			break;
-		case I_BALM:
-		case I_SPICES:
-		case I_JEWELERY:
-		case I_MYRRH:
-		case I_OIL:
-		case I_SILK:
-		case I_INCENSE:
-			ltype = resource2luxury(itype->rtype);
-			if (ltype) a->data.i = ltype->price / 5;
-			break;
-#ifdef COMPATIBILITY
-		case I_AMULET_OF_DARKNESS:
-		case I_AMULET_OF_DEATH:
-		case I_SHIELDSTONE:
-		case I_STAFF_OF_FIRE:
-		case I_STAFF_OF_LIGHTNING:
-		case I_WAND_OF_TELEPORTATION:
-		case I_CLOAK_OF_INVULNERABILITY:
-#endif
-		case I_AMULET_OF_HEALING:
-		case I_AMULET_OF_TRUE_SEEING:
-		case I_RING_OF_INVISIBILITY:
-		case I_RING_OF_POWER:
-		case I_RUNESWORD:
-		case I_CHASTITY_BELT:
-		case I_FIRESWORD:
-		case I_TROLLBELT:
-		case I_RING_OF_NIMBLEFINGER:
-		case I_FEENSTIEFEL:
-			a->data.i = 6000;
-			break;
-		case I_ANTIMAGICCRYSTAL:
-			a->data.i = 2000;
-			break;
-		}
-	}
+  for (i = 0;olditemtype[i];i++) {
+    const item_type * itype = olditemtype[i];
+    attrib * a = a_add(&itype->rtype->attribs, a_new(&at_score));
+
+    if (itype->flags & ITF_WEAPON) {
+      int m;
+      if (itype->construction->materials==NULL) {
+        a->data.i = 6000;
+      } else for (m=0;itype->construction->materials[m].number;++m) {
+        const resource_type * rtype = oldresourcetype[itype->construction->materials[m].number];
+        const attrib * ascore = a_findc(rtype->attribs, &at_score);
+        int score = ascore?ascore->data.i:5;
+        a->data.i += 2*itype->construction->materials[m].number * score;
+      }
+    }
+    else a->data.i = item_score(i);
+  }
 }
 
 int
@@ -227,7 +207,7 @@ score(void)
 			}
 			f->score += get_money(u) / 50;
 			for (itm=u->items; itm; itm=itm->next) {
-				attrib * a = a_find(itm->type->rtype->attribs, &a_score);
+				attrib * a = a_find(itm->type->rtype->attribs, &at_score);
 				if (a!=NULL) f->score += itm->number * a->data.i / 10;
 			}
 

@@ -53,24 +53,17 @@ static weapon_mod wm_lance[] = {
 	{ 0, 0 }
 };
 
-static weapon_mod wm_halberd[] = {
-	{ 1, WMF_SKILL|WMF_WALKING|WMF_AGAINST_RIDING|WMF_DEFENSIVE },
-	{ 0, 0 }
-};
-
 enum {
 	WP_RUNESWORD,
 	WP_FIRESWORD,
 	WP_EOGSWORD,
 	WP_CATAPULT,
-	WP_GREATBOW,
 	WP_LONGBOW,
 	WP_CROSSBOW,
 	WP_SPEAR,
 	WP_GREATSWORD,
 	WP_SWORD,
 	WP_AXE,
-	WP_HALBERD,
 	WP_LANCE,
 	WP_RUSTY_SWORD,
 	WP_RUSTY_GREATSWORD,
@@ -113,7 +106,7 @@ typedef struct weapondata {
 
 static weapondata weapontable[WP_MAX + 1] =
 /* MagRes, Schaden/Fuﬂ, Schaden/Pferd, Item, Skill, OffMod, DefMod,
- * rear. is_magic */
+ * missile, is_magic */
 {
 	/* Runenschwert */
 	{0.00, "3d10+10", "3d10+10", I_RUNESWORD, SK_SWORD, 2, 2, false, true, { RL_NONE, 0}, CUT },
@@ -123,8 +116,6 @@ static weapondata weapontable[WP_MAX + 1] =
 	{0.30, "3d6+10", "3d6+10", I_LAENSWORD, SK_SWORD, 1, 1, false, false, { RL_NONE, 0}, CUT },
 	/* Katapult */
 	{0.00, "3d10+5", "3d10+5", I_CATAPULT, SK_CATAPULT, 0, 0, true, false, { RL_CATAPULT, 5 }, BASH },
-	/* Elfenbogen */
-	{0.00, "2d6+4", "2d6+4", I_GREATBOW, SK_LONGBOW, 0, 0, true, false, { RL_NONE, 0 }, PIERCE },
 	/* Langbogen */
 	{0.00, "1d11+1", "1d11+1", I_LONGBOW, SK_LONGBOW, 0, 0, true, false, { RL_NONE, 0 }, PIERCE },
 	/* Armbrust */
@@ -141,8 +132,6 @@ static weapondata weapontable[WP_MAX + 1] =
 	{0.00, "1d9+2", "1d9+2", I_SWORD, SK_SWORD, 0, 0, false, false, { RL_NONE, 0}, CUT },
 	/* Kriegsaxt */
 	{0.00, "2d6+4", "2d6+4", I_AXE, SK_SWORD, 1, -2, false, false, { RL_NONE, 0}, CUT },
-	/* Hellebarde */
-	{0.00, "2d6+3", "2d6+3", I_HALBERD, SK_SPEAR, -1, 2, false, false, { RL_NONE, 0}, CUT },
 	/* Lanze */
 	{0.00, "1d5", "2d6+5", I_LANCE, SK_SPEAR, 0, -2, false, false, { RL_NONE, 0}, PIERCE },
 	/* Rostiges Schwert */
@@ -299,12 +288,7 @@ init_oldweapons(void)
 		case WP_SPEAR:
 			modifiers = wm_spear;
 			break;
-		case WP_HALBERD:
-			modifiers = wm_halberd;
-			break;
 		case WP_LONGBOW:
-		case WP_GREATBOW:
-			wflags |= WTF_BOW;
 			modifiers = wm_bow;
 			break;
 		}
@@ -389,36 +373,6 @@ weapon_type wt_mallornlance = {
 };
 /** end mallornlance **/
 
-/** begin mallornbow **/
-resource_type rt_mallornbow = {
-	{ "mallornbow", "mallornbow_p" },
-	{ "mallornbow", "mallornbow_p" },
-	RTF_ITEM,
-	&res_changeitem
-};
-static requirement mat_mallornbow[] = {
-	{I_MALLORN, 1},
-	{0, 0}
-};
-static construction cons_mallornbow = {
-	SK_WEAPONSMITH, 5,     /* skill, minskill */
-	-1, 1, mat_mallornbow  /* maxsize, reqsize, materials */
-};
-item_type it_mallornbow = {
-	&rt_mallornbow,        /* resourcetype */
-	ITF_WEAPON, 100, 0,    /* flags, weight, capacity */
-	&cons_mallornbow       /* construction */
-};
-weapon_type wt_mallornbow = {
-	&it_mallornbow,         /* item_type */
-	{ "1d11+2", "1d11+2" }, /* on foot, on horse */
-	WTF_BOW|WTF_MISSILE|WTF_PIERCE, /* flags */
-	SK_LONGBOW, 5,          /* skill, minskill */
-	0, 0, 0.15, 0,           /* offmod, defmod, magres, reload */
-	wm_bow
-};
-/** end mallornbow **/
-
 /** begin mallorncrossbow **/
 resource_type rt_mallorncrossbow = {
 	{ "mallorncrossbow", "mallorncrossbow_p" },
@@ -457,10 +411,6 @@ register_weapons(void) {
 	rt_register(&rt_mallornlance);
 	it_register(&it_mallornlance);
 	wt_register(&wt_mallornlance);
-
-	rt_register(&rt_mallornbow);
-	it_register(&it_mallornbow);
-	wt_register(&wt_mallornbow);
 
 	rt_register(&rt_mallorncrossbow);
 	it_register(&it_mallorncrossbow);

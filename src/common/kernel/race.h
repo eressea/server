@@ -93,6 +93,14 @@ typedef struct race {
 	struct race * next;
 } race;
 
+typedef struct race_list {
+  struct race_list * next;
+  const struct race * data;
+} race_list;
+
+extern void racelist_clear(struct race_list **rl);
+extern void racelist_insert(struct race_list **rl, const struct race *r);
+
 extern struct race * races;
 
 extern struct race * rc_find(const char *);

@@ -112,7 +112,7 @@ attrib_type at_skillmod = {
 };
 
 attrib *
-make_skillmod(skill_t sk, unsigned int flags, int(*special)(const struct unit*, const struct region*, skill_t, int), double multiplier, int bonus)
+make_skillmod(skill_t sk, unsigned int flags, skillmod_fun special, double multiplier, int bonus)
 {
 	attrib * a = a_new(&at_skillmod);
 	skillmod_data * smd = (skillmod_data*)a->data.v;

@@ -1324,8 +1324,9 @@ sp_rosthauch(castorder *co)
 
 	/* fuer jede Einheit */
 	for (n = 0; n < pa->length; n++) {
-		if (!force)
-			break;
+          static const item_type * it_halberd = NULL;
+          if (it_halberd==NULL) it_halberd = it_find("halberd");
+          if (force<=0) break;
 
 		if(pa->param[n]->flag == TARGET_RESISTS
 				|| pa->param[n]->flag == TARGET_NOTFOUND)
@@ -1357,10 +1358,10 @@ sp_rosthauch(castorder *co)
 			force -= i;
 			ironweapon += i;
 		}
-		i = min(get_item(u, I_HALBERD), (int)force);
+		i = min(i_get(u->items, it_halberd), (int)force);
 		if (i > 0){
 			if(rand()%100 < 50){
-				change_item(u, I_HALBERD, -i);
+				i_change(&u->items, it_halberd, -i);
 				change_item(u, I_RUSTY_HALBERD, i);
 				force -= i;
 				ironweapon += i;
@@ -5351,7 +5352,6 @@ sp_baddreams(castorder *co)
 	region *r = co->rt;
 	curse * c;
 
-  return cast_level;
 	/* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
 	 * also duration+2 */
 	duration = (int)max(1, power/2); /* Stufe 1 macht sonst mist */
@@ -5391,7 +5391,6 @@ sp_gooddreams(castorder *co)
 	int cast_level = co->level;
 	double power = co->force;
 
-  return cast_level;
 	/* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
 	 * also duration+2 */
 	duration = (int)max(1, power/2); /* Stufe 1 macht sonst mist */

@@ -119,7 +119,7 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
     resource_t type;
 
     radd->number = xml_ivalue(node, "quantity", 0);
-    radd->recycle = xml_fvalue(node, "recycle", 0);
+    radd->recycle = xml_fvalue(node, "recycle", 0.0);
 
     property = xmlGetProp(node, BAD_CAST "type");
     rtype = rt_find((const char*)property);
@@ -145,6 +145,7 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
     xmlChar * property;
     construction * con;
     xmlXPathObjectPtr req;
+    int m;
 
     assert(*consPtr==NULL);
     con = *consPtr = calloc(sizeof(construction), 1);
@@ -158,10 +159,26 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
     con->minskill = xml_ivalue(node, "minskill", -1);
     con->reqsize = xml_ivalue(node, "reqsize", -1);
 
+    /* read construction/requirement */
     xpath->node = node;
     req = xmlXPathEvalExpression(BAD_CAST "requirement", xpath);
     xml_readrequirements(req->nodesetval->nodeTab,
       req->nodesetval->nodeNr, &con->materials);
+    xmlXPathFreeObject(req);
+
+    /* read construction/modifier */
+    xpath->node = node;
+    req = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
+    for (m=0;m!=req->nodesetval->nodeNr;++m) {
+      xmlNodePtr node = req->nodesetval->nodeTab[m];
+
+      property = xmlGetProp(node, BAD_CAST "function");
+      if (property!=NULL) {
+        pf_generic foo = get_function((const char*)property);
+        a_add(&con->attribs, make_skillmod(NOSKILL, SMF_PRODUCTION, (skillmod_fun)foo, 1.0, 0));
+      }
+
+    }
     xmlXPathFreeObject(req);
 
   }
@@ -403,6 +420,9 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
   int reload = xml_ivalue(node, "reload", 0);
   double magres = xml_fvalue(node, "magres", 0.0);
 
+  if (xml_bvalue(node, "armorpiercing", false)) flags |= WTF_ARMORPIERCING;
+  if (xml_bvalue(node, "magical", false)) flags |= WTF_MAGICAL;
+  if (xml_bvalue(node, "missile", false)) flags |= WTF_MISSILE;
   if (xml_bvalue(node, "pierce", false)) flags |= WTF_PIERCE;
   if (xml_bvalue(node, "cut", false)) flags |= WTF_CUT;
   if (xml_bvalue(node, "blunt", false)) flags |= WTF_BLUNT;
@@ -410,6 +430,7 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
   property = xmlGetProp(node, BAD_CAST "skill");
   assert(property!=NULL);
   sk = sk_find((const char*)property);
+  assert(sk!=NOSKILL);
   xmlFree(property);
 
   wtype = new_weapontype(itype, flags, magres, NULL, offmod, defmod, reload, sk, minskill);
@@ -423,11 +444,14 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     int pos = 0;
 
     property = xmlGetProp(node, BAD_CAST "type");
-    if (strcmp((const char *)property, "default")!=0) pos = 1;
+    if (strcmp((const char *)property, "footman")!=0) {
+      pos = 1;
+    }
     xmlFree(property);
 
     property = xmlGetProp(node, BAD_CAST "value");
     wtype->damage[pos] = gc_add(strdup((const char*)property));
+    if (k==0) wtype->damage[1-pos] = wtype->damage[pos];
     xmlFree(property);
   }
   xmlXPathFreeObject(result);
@@ -439,7 +463,8 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
   wtype->modifiers = calloc(sizeof(weapon_mod), result->nodesetval->nodeNr+1);
   for (k=0;k!=result->nodesetval->nodeNr;++k) {
     xmlNodePtr node = result->nodesetval->nodeTab[k];
-    int flags = 0;
+    xmlXPathObjectPtr races;
+    int r, flags = 0;
 
     if (xml_bvalue(node, "walking", false)) flags|=WMF_WALKING;
     if (xml_bvalue(node, "riding", false)) flags|=WMF_RIDING;
@@ -447,12 +472,29 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     if (xml_bvalue(node, "against_riding", false)) flags|=WMF_AGAINST_RIDING;
     if (xml_bvalue(node, "offensive", false)) flags|=WMF_OFFENSIVE;
     if (xml_bvalue(node, "defensive", false)) flags|=WMF_DEFENSIVE;
-    if (xml_bvalue(node, "damage", false)) flags|=WMF_DAMAGE;
-    if (xml_bvalue(node, "skill", false)) flags|=WMF_SKILL;
-    if (xml_bvalue(node, "missile_target", false)) flags|=WMF_MISSILE_TARGET;
-    wtype->modifiers[k].flags = flags;
 
+    property = xmlGetProp(node, BAD_CAST "type");
+    if (strcmp((const char*)property, "damage")==0) flags|=WMF_DAMAGE;
+    else if (strcmp((const char*)property, "skill")==0) flags|=WMF_SKILL;
+    else if (strcmp((const char*)property, "missile_target")==0) flags|=WMF_MISSILE_TARGET;
+    xmlFree(property);
+
+    wtype->modifiers[k].flags = flags;
     wtype->modifiers[k].value = xml_ivalue(node, "value", 0);
+
+    xpath->node = node;
+    races = xmlXPathEvalExpression(BAD_CAST "race", xpath);
+    for (r=0;r!=races->nodesetval->nodeNr;++r) {
+      xmlNodePtr node = races->nodesetval->nodeTab[r];
+
+      property = xmlGetProp(node, BAD_CAST "name");
+      if (property!=NULL) {
+        const race * rc = rc_find((const char*)property);
+        assert(rc!=NULL);
+        racelist_insert(&wtype->modifiers[k].races, rc);
+        xmlFree(property);
+      }
+    }
   }
   xmlXPathFreeObject(result);
 
@@ -477,6 +519,12 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
   if (xml_bvalue(node, "big", false)) flags |= ITF_BIG;
   if (xml_bvalue(node, "animal", false)) flags |= ITF_ANIMAL;
   itype = new_itemtype(rtype, flags, weight, capacity);
+
+  /* reading item/construction */
+  xpath->node = node;
+  result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
+  xml_readconstruction(xpath, result->nodesetval->nodeTab, result->nodesetval->nodeNr, &itype->construction);
+  xmlXPathFreeObject(result);
 
   /* reading item/weapon */
   xpath->node = node;
@@ -1114,8 +1162,8 @@ register_xmlreader(void)
   xml_register_callback(parse_strings);
   xml_register_callback(parse_messages);
 
+  xml_register_callback(parse_races);
   xml_register_callback(parse_resources);
   xml_register_callback(parse_buildings);
   xml_register_callback(parse_ships);
-  xml_register_callback(parse_races);
 }

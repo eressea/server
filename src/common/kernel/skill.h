@@ -30,9 +30,10 @@ typedef struct skill {
 	unsigned int old : 8;
 } skill;
 
+typedef int (*skillmod_fun)(const struct unit*, const struct region*, skill_t, int);
 typedef struct skillmod_data {
 	skill_t skill;
-	int (*special)(const struct unit * u, const struct region * r, skill_t sk, int value);
+	skillmod_fun special;
 	double multiplier;
 	int number;
 	int bonus;
@@ -43,7 +44,7 @@ extern int rc_skillmod(const struct race * rc, const struct region *r, skill_t s
 extern int skillmod(const attrib * a, const struct unit * u, const struct region * r, skill_t sk, int value, int flags);
 extern void skill_init(void);
 extern void skill_done(void);
-extern struct attrib * make_skillmod(skill_t sk, unsigned int flags, int(*special)(const struct unit*, const struct region*, skill_t, int), double multiplier, int bonus);
+extern struct attrib * make_skillmod(skill_t sk, unsigned int flags, skillmod_fun special, double multiplier, int bonus);
 
 extern const char * skillname(skill_t, const struct locale *);
 extern skill_t sk_find(const char * name);

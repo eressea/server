@@ -127,7 +127,7 @@ typedef struct item_type {
 	unsigned int flags;
 	int weight;
 	int capacity;
-	const struct construction * construction;
+	struct construction * construction;
 	/* --- functions --- */
 	int (*use)(struct unit * user, const struct item_type * itype, int amount, const char * cmd);
 	int (*useonother)(struct unit * user, int targetno, const struct item_type * itype, int amount, const char * cmd);
@@ -178,9 +178,11 @@ extern potion_type * potiontypes;
 #define WMF_SKILL           0x2000
 #define WMF_MISSILE_TARGET  0x4000
 
+struct race_list;
 typedef struct weapon_mod {
-	int value;
-	unsigned int flags;
+  int value;
+  unsigned int flags;
+  struct race_list * races;
 } weapon_mod;
 
 #define WTF_NONE         0x00
@@ -189,7 +191,6 @@ typedef struct weapon_mod {
 #define WTF_PIERCE       0x04
 #define WTF_CUT          0x08
 #define WTF_BLUNT        0x10
-#define WTF_BOW          0x20 /* elves like 'em */
 #define WTF_ARMORPIERCING 0x40 /* armor has only half value */
 
 typedef struct weapon_type {
@@ -332,13 +333,11 @@ enum {
 	I_CHASTITY_BELT, /* bleibt */
 	I_GREATSWORD,
 	I_AXE,
-	I_GREATBOW,
 	I_LAENSWORD,
 	I_LAENSHIELD,
 	I_LAENCHAIN,
 	I_LAEN,
 	I_SHIELD,
-	I_HALBERD,
 	I_LANCE,
 	I_MALLORN,
 	I_KEKS,
@@ -426,7 +425,6 @@ enum {
 	R_CHASTITY_BELT,
 	R_GREATSWORD,
 	R_AXE,
-	R_GREATBOW,
 	R_EOGSWORD,
 	R_EOGSHIELD,
 	R_EOGCHAIN,

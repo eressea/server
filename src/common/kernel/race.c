@@ -63,6 +63,27 @@
 /** external variables **/
 race * races;
 
+void 
+racelist_clear(struct race_list **rl)
+{
+  while (*rl) {
+    race_list * rl2 = (*rl)->next;
+    free(*rl);
+    *rl = rl2;
+  }
+}
+
+void 
+racelist_insert(struct race_list **rl, const struct race *r)
+{
+  race_list *rl2 = (race_list*)malloc(sizeof(race_list));
+
+  rl2->data = r;
+  rl2->next = *rl;
+
+  *rl = rl2;
+}
+
 race *
 rc_new(const char * zName)
 {
@@ -91,12 +112,14 @@ static const char * racealias[2][2] = {
 	{ "skeletton lord", "skeleton lord" },
 	{ NULL, NULL }
 };
+
 race *
 rc_find(const char * name)
 {
 	const char * rname = name;
 	race * rc = races;
 	int i;
+
 	for (i=0;racealias[i][0];++i) {
 		if (strcmp(racealias[i][0], name)==0) {
 			rname = racealias[i][1];
@@ -628,20 +651,33 @@ troll_spoil(const struct race * rc, int size)
 int
 rc_specialdamage(const race * ar, const race * dr, const struct weapon_type * wtype)
 {
-	race_t art = old_race(ar);
-	switch (art) {
-	case RC_ELF:
-		if (wtype!=NULL && fval(wtype, WTF_BOW)) {
-			return 1;
-		}
-		break;
-	case RC_HALFLING:
-		if (wtype!=NULL && dragonrace(dr)) {
-			return 5;
-		}
-		break;
-	}
-	return 0;
+  race_t art = old_race(ar);
+  int m, modifier = 0;
+
+  if (wtype!=NULL && wtype->modifiers!=NULL) for (m=0;wtype->modifiers[m].value;++m) {
+    /* weapon damage for this weapon, possibly by race */
+    if (wtype->modifiers[m].flags & WMF_DAMAGE) {
+      race_list * rlist = wtype->modifiers[m].races;
+      if (rlist!=NULL) {
+        while (rlist) {
+          if (rlist->data == ar) break;
+          rlist = rlist->next;
+        }
+        if (rlist==NULL) continue;
+      }
+      modifier += wtype->modifiers[m].value;
+    }
+  }
+  switch (art) {
+    case RC_HALFLING:
+      if (wtype!=NULL && dragonrace(dr)) {
+        modifier += 5;
+      }
+      break;
+    default:
+      break;
+  }
+  return modifier;
 }
 
 void
