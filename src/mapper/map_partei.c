@@ -231,54 +231,59 @@ read_newfactions(const char * filename)
   FILE * F = fopen(filename, "r");
   if (F==NULL) return;
   for (;;) {
-	faction * f = factions;
-	char race[20], email[64], lang[8], password[16];
-	newfaction *nf;
-	int bonus, subscription;
-	int alliance = 0;
-  
-  if (alliances!=NULL) {
-    /* email;race;locale;startbonus;subscription;alliance */
-    if (fscanf(F, "%s %s %s %d %d %s %d", email, race, lang, &bonus, &subscription, password, &alliance)<=0) break;
-  } else {
-    /* email;race;locale;startbonus;subscription */
-    if (fscanf(F, "%s %s %s %d %d %s", email, race, lang, &bonus, &subscription, password)<=0) break;
-  }
-  while (f) {
-    if (strcmp(f->email, email)==0 && f->subscription) {
-      break;
-    }
-    f = f->next;
-  }
-  if (f) continue; /* skip the ones we've already got */
-  for (nf=newfactions;nf;nf=nf->next) {
-    if (strcmp(nf->email, email)==0) break;
-  }
-  if (nf) continue;
-  nf = calloc(sizeof(newfaction), 1);
-  if (set_email(&nf->email, email)!=0) {
-    log_error(("Invalid email address for subscription %s: %s\n", itoa36(subscription), email));
-  }
-  nf->password = strdup(password);
-  nf->race = rc_find(race);
-  nf->subscription = subscription;
-  if (alliances!=NULL) {
-    struct alliance * al = findalliance(alliance);
-    if (al==NULL) {
-      char zText[64];
-      sprintf(zText, "Allianz %d", alliance);
-      al = makealliance(alliance, zText);
-    }
-    nf->allies = al;
-  } else {
-    nf->allies = NULL;
-  }
-  if (nf->race==NULL) nf->race = findrace(race, default_locale);
-  nf->lang = find_locale(lang);
-  nf->bonus = bonus;
-  assert(nf->race && nf->email && nf->lang);
-  nf->next = newfactions;
-  newfactions = nf;
+		faction * f = factions;
+		char race[20], email[64], lang[8], password[16];
+		newfaction *nf, **nfi;
+		int bonus, subscription;
+		int alliance = 0;
+		
+		if (alliances!=NULL) {
+			/* email;race;locale;startbonus;subscription;alliance */
+			if (fscanf(F, "%s %s %s %d %d %s %d", email, race, lang, &bonus, &subscription, password, &alliance)<=0) break;
+		} else {
+			/* email;race;locale;startbonus;subscription */
+			if (fscanf(F, "%s %s %s %d %d %s", email, race, lang, &bonus, &subscription, password)<=0) break;
+		}
+		while (f) {
+			if (strcmp(f->email, email)==0 && f->subscription) {
+				break;
+			}
+			f = f->next;
+		}
+		if (f) continue; /* skip the ones we've already got */
+		for (nf=newfactions;nf;nf=nf->next) {
+			if (strcmp(nf->email, email)==0) break;
+		}
+		if (nf) continue;
+		nf = calloc(sizeof(newfaction), 1);
+		if (set_email(&nf->email, email)!=0) {
+			log_error(("Invalid email address for subscription %s: %s\n", itoa36(subscription), email));
+		}
+		nf->password = strdup(password);
+		nf->race = rc_find(race);
+		nf->subscription = subscription;
+		if (alliances!=NULL) {
+			struct alliance * al = findalliance(alliance);
+			if (al==NULL) {
+				char zText[64];
+				sprintf(zText, "Allianz %d", alliance);
+				al = makealliance(alliance, zText);
+			}
+			nf->allies = al;
+		} else {
+			nf->allies = NULL;
+		}
+		if (nf->race==NULL) nf->race = findrace(race, default_locale);
+		nf->lang = find_locale(lang);
+		nf->bonus = bonus;
+		assert(nf->race && nf->email && nf->lang);
+		nfi = &newfactions;
+		while (*nfi) {
+			if ((*nfi)->race==nf->race) break;
+			nfi=&(*nfi)->next;
+		}
+		nf->next = *nfi;
+		*nfi = nf;
   }
   fclose(F);
 }
