@@ -683,8 +683,19 @@ build(unit * u, const construction * ctype, int completed, int want)
 			int have = get_pooled(u, NULL, rtype);
 			int prebuilt;
 			int canuse = have;
-			if (u->building)
-				canuse = matmod(u->building->type->attribs, u, oldresourcetype[rtype], canuse);
+			if (inside_building(u)) {
+			  canuse = matmod(u->building->type->attribs, u, oldresourcetype[rtype], canuse);
+#if 0
+			/* exploit-check */
+			} else if (u->building) {
+			  int abuse = matmod(u->building->type->attribs, u, oldresourcetype[rtype], canuse);
+			  if (abuse>canuse) {
+				log_printf("ABUSE: %s saves %u %s through exploit\n",
+						   itoa36(u->faction->no), abuse-canuse,
+						   oldresourcetype[rtype]->_name[0]);
+			  }
+#endif
+			}
 			if (canuse<0) return canuse; /* pass errors to caller */
 			canuse = matmod(type->attribs, u, oldresourcetype[rtype], canuse);
 			if (type->reqsize>1) {
