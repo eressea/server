@@ -2354,7 +2354,7 @@ kernel_done(void)
 	translation_done();
 	skill_done();
 	gc_done();
-	if (sqlstream!=NULL) sql_done();
+	sql_done();
 }
 
 const char * localenames[] = {
@@ -2494,14 +2494,12 @@ remove_empty_factions(boolean writedropouts)
 					}
 				}
 			}
-			if (f->subscription) fprintf(sqlstream, "UPDATE subscriptions set status='DEAD' where "
-				"id=%u\n;", f->subscription);
+			if (f->subscription) {
+        sql_print(("UPDATE subscriptions set status='DEAD' where id=%u\n;", 
+                   f->subscription));
+      }
 
 			*fp = f->next;
-/*			stripfaction(f);
- *			free(f);
- *		Wir können die nicht löschen, weil sie evtl. noch in attributen
- *    referenziert sind ! */
 		}
 		else fp = &(*fp)->next;
 	}

@@ -6,19 +6,28 @@ hellgate = nil
 peacegate = nil
 
 function gate_exchange(b1, b2)
-  local units = {}
+  local units1 = {}
+  local units2 = {}
   local u
   for u in b1.units do
-    units[u.no] = u
+    if u:get_flag("wdgt") then
+      units1[u.no] = u
+    end
   end
   for u in b2.units do
-    u.region = b1.region
-    u.building = b1
+    if u:get_flag("wdgt") then
+      units2[u.no] = u
+    end
   end
-  for id in units do
-    u = units[id]
+  for id in units1 do
+    u = units1[id]
     u.region = b2.region
     u.building = b2
+  end
+  for id in units2 do
+    u = units2[id]
+    u.region = b1.region
+    u.building = b1
   end
 end
 

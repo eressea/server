@@ -24,26 +24,42 @@
 
 #include "log.h"
 
-FILE * sqlstream;
+#include <stdarg.h>
+#include <stdio.h>
+
+static FILE * sqlstream = NULL;
+static char * sqlfilename = NULL;
 
 void
 sql_init(const char * filename)
 {
-	static boolean init = false;
-	if (!init) {
-		sqlstream = fopen(filename, "wt+");
-		if (sqlstream==NULL) {
-			log_error(("could not open file: %s\n", filename));
-		}
-		init = true;
-	}
+  if (sqlfilename!=NULL) free(sqlfilename);
+  sqlfilename = strdup(filename);
+}
+
+void 
+_sql_print(const char * format, ...)
+{
+  if (!sqlstream && sqlfilename) {
+    sqlstream=fopen(sqlfilename, "wt+");
+    free(sqlfilename);
+    sqlfilename=NULL;
+  }
+  if (sqlstream!=NULL) {
+    va_list marker;
+    va_start(marker, format);
+    vfprintf(sqlstream, format, marker);
+    va_end(marker);
+  }
 }
 
 void
 sql_done(void)
 {
 	if (sqlstream) fclose(sqlstream);
-	/* TODO */
+	if (sqlfilename) free(sqlfilename);
+  sqlstream=NULL;
+  sqlfilename=NULL;
 }
 
 const char * 

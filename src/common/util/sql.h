@@ -25,10 +25,12 @@
 extern "C" {
 #endif
 
-extern FILE * sqlstream;
-extern void sql_init(const char * filename);
-extern void sql_done(void);
-extern const char * sqlquote(const char * str);
+  extern void sql_init(const char * filename);
+  extern void sql_done(void);
+  extern const char * sqlquote(const char * str);
+  extern void _sql_print(const char * format, ...);
+
+#define sql_print(x) _sql_print x
 
 #ifdef __cplusplus
 }

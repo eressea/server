@@ -71,6 +71,7 @@ lc_write(const struct attrib * a, FILE* F)
 
   write_building_reference(b, F);
   fwritestr(F, fname);
+  fputc(' ', F);
 }
 
 static int

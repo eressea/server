@@ -49,30 +49,24 @@ info_name(const tnode * tnext, const char * str, void * data, struct order * ord
         unused(str);
         unused(data);
         unused(ord);
-	if (sqlstream!=NULL) {
-	}
 }
 
 static void
 info_address(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	if (sqlstream!=NULL) {
-	}
 }
 
 static void
 info_phone(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
-	if (sqlstream!=NULL) {
-	}
 }
 
 static void
 info_vacation(const tnode * tnext, const char * str, void * data, struct order * ord)
 {
 
-	if (sqlstream!=NULL) {
 #ifdef SQLOUTPUT
+	if (sqlstream!=NULL) {
 		unit * u = (unit*)data;
 		faction * f = u->faction;
 		const char * email = sqlquote(igetstrtoken(str));
@@ -86,8 +80,8 @@ info_vacation(const tnode * tnext, const char * str, void * data, struct order *
 			start.tm_year, start.tm_mon, start.tm_mday, itoa36(f->no));
 		fprintf(sqlstream, "UPDATE factions SET vacation_end = '%04d-%02d-%02d' WHERE id = '%s';\n",
 			end.tm_year, end.tm_mon, end.tm_mday, itoa36(f->no));
-#endif
 	}
+#endif
 }
 
 static tnode g_keys;
@@ -112,7 +106,6 @@ infocommands(void)
     }
     if (*rp==r) rp = &r->next;
   }
-  fflush(sqlstream);
 }
 
 void

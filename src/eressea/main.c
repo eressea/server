@@ -549,11 +549,11 @@ void
 confirm_newbies(void)
 {
 	faction * f = factions;
-	if (sqlstream==NULL) return;
 	while (f) {
 		if (!fval(f, FFL_DBENTRY)) {
 			if (f->subscription) {
-				fprintf(sqlstream, "UPDATE subscriptions SET status='ACTIVE', faction='%s', race='%s' WHERE id=%u;\n", itoa36(f->no), dbrace(f->race), f->subscription);
+				sql_print(("UPDATE subscriptions SET status='ACTIVE', faction='%s', race='%s' WHERE id=%u;\n", 
+                   itoa36(f->no), dbrace(f->race), f->subscription));
 				fset(f, FFL_DBENTRY);
 			}
 		}

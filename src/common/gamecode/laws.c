@@ -121,8 +121,10 @@ restart_race(unit *u, const race * rc)
 	order ** ordp = &u->orders;
   f->subscription = u->faction->subscription;
   fset(f, FFL_RESTART);
-  if (f->subscription) fprintf(sqlstream, "UPDATE subscriptions set faction='%s', race='%s' where id=%u;\n",
-    itoa36(f->no), dbrace(rc), f->subscription);
+  if (f->subscription) {
+    sql_print(("UPDATE subscriptions set faction='%s', race='%s' where id=%u;\n",
+               itoa36(f->no), dbrace(rc), f->subscription));
+  }
   f->magiegebiet = u->faction->magiegebiet;
   f->options = u->faction->options;
 	free_orders(&nu->orders);
@@ -1208,15 +1210,15 @@ parse_quit(void)
       char info[256];
       sprintf(info, "%d Einheiten, %d Personen, %d Silber", 
         f->no_units, f->number, f->money);
-      if (f->subscription) fprintf(sqlstream, 
-        "UPDATE subscriptions SET lastturn=%d, password='%s', info='%s' "
-        "WHERE id=%u;\n", 
-        f->lastorders, f->override, info, f->subscription);
+      if (f->subscription) {
+        sql_print(("UPDATE subscriptions SET lastturn=%d, password='%s', info='%s' WHERE id=%u;\n",
+                   f->lastorders, f->override, info, f->subscription));
+      }
     } else {
-      if (f->subscription) fprintf(sqlstream, 
-        "UPDATE subscriptions SET status='ACTIVE', lastturn=%d, password='%s' "
-        "WHERE id=%u;\n", 
-        f->lastorders, f->override, f->subscription);
+      if (f->subscription) {
+        sql_print(("UPDATE subscriptions SET status='ACTIVE', lastturn=%d, password='%s' WHERE id=%u;\n", 
+                   f->lastorders, f->override, f->subscription));
+      }
     }
 
     if (NMRTimeout()>0 && turn - f->lastorders >= (NMRTimeout() - 1)) {
@@ -2797,9 +2799,10 @@ renumber_factions(void)
 	for (rp=renum;rp;rp=rp->next) {
 		f = rp->faction;
 		a_remove(&f->attribs, rp->attrib);
-		if (f->subscription) fprintf(sqlstream, "UPDATE subscriptions set faction='%s' where "
-			"id=%u;\n", itoa36(rp->want), 
-			f->subscription);
+		if (f->subscription) {
+      sql_print(("UPDATE subscriptions set faction='%s' where id=%u;\n", 
+                 itoa36(rp->want), f->subscription));
+    }
 		f->no = rp->want;
 		register_faction_id(rp->want);
 		fset(f, FF_NEWID);

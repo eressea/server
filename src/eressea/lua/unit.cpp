@@ -8,6 +8,7 @@
 #include <attributes/key.h>
 
 // kernel includes
+#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
@@ -232,7 +233,7 @@ unit_getregion(const unit& u)
 static void
 unit_setbuilding(unit& u, building& b)
 {
-  leave(u.region, u);
+  leave(u.region, &u);
   u.building = &b;
 }
 

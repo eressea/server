@@ -77,7 +77,7 @@ unitmessage_write(const trigger * t, FILE * F)
 	unitmessage_data * td = (unitmessage_data*)t->data.v;
 	fprintf(F, "%s ", itoa36(td->target->no));
   fwritestr(F, td->string);
-	fprintf(F, "%d %d ", td->type, td->level);
+	fprintf(F, " %d %d ", td->type, td->level);
 }
 
 static int
