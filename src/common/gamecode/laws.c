@@ -1103,7 +1103,7 @@ inactivefaction(faction * f)
 	FILE *inactiveFILE;
 	char zText[128];
 
-	sprintf(zText, "%s/%s", datapath(), "/passwd");
+	sprintf(zText, "%s/%s", datapath(), "/inactive");
 	inactiveFILE = fopen(zText, "a");
 
 	fprintf(inactiveFILE, "%s:%s:%d:%d\n",

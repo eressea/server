@@ -179,7 +179,7 @@ writepasswd(void)
 	puts("Schreibe Passwörter...");
 
 	for (f = factions; f; f = f->next) {
-		fprintf(F, "%s:%s:%s\n", factionid(f), f->name, f->passw);
+		fprintf(F, "%s:%s:%s:%s\n", factionid(f), f->name, f->passw, f->override);
 	}
 	fclose(F);
 }
