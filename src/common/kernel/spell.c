@@ -1331,6 +1331,7 @@ sp_kaelteschutz(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int force = co->force;
+	int duration = max(cast_level, force);
 	spellparameter *pa = co->par;
 
 
@@ -1354,7 +1355,7 @@ sp_kaelteschutz(castorder *co)
 		}
 
 		create_curse(mage, &u->attribs, C_KAELTESCHUTZ, 0, cast_level,
-				cast_level, 1, men);
+				duration, 1, men);
 
 		force -= u->number;
 		add_message(&mage->faction->msgs, new_message(mage->faction,
