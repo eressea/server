@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.h,v 1.4 2001/01/30 16:14:16 corwin Exp $
+ *	$Id: eressea.h,v 1.5 2001/01/30 19:32:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -962,6 +962,7 @@ int forbiddenid(int id);
 int newcontainerid(void);
 
 char *getstrtoken(void);
+char *igetstrtoken(const char *s);
 param_t findparam(const char *s);
 param_t igetparam(const char *s);
 param_t getparam(void);

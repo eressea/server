@@ -1,32 +1,42 @@
 ## include this File in all Makefiles for Eressea
 
-default: debug
-
 ifndef ERESSEA
-	MAKEENV = echo "Missing ERESSEA environment variable." && exit 1
+	export ERESSEA=$(PWD)
 endif
 
-DEPEND  = g++ -MM -MG -r
-AR      = ar
+default: debug
+
+DEPEND  = @g++ -MM -MG -r
+AR      = @ar
+CTAGS   = @ctags
+CC      = @gcc
+LD      = @gcc
+INSTALL = @cp
+#INSTALL = install
+
+
 ARFLAGS = cr
-
-CTAGS      = ctags
 CTAGSFLAGS = --langmap=c:.c.h
-
-CC      ?= @gcc
-CFLAGS  ?= -I$(ERESSEA) -Wall -Wwrite-strings -Wstrict-prototypes \
+CFLAGS  = -I$(ERESSEA) -Wall -Wwrite-strings -Wstrict-prototypes \
            -Wpointer-arith -Werror-implicit-function-declaration \
 	   -Wno-char-subscripts \
        	   -march=pentiumpro -fPIC $(INCLUDES)
-
-LIBS    = -L$(PUBLISH_DIR)
-LD      = gcc
 LDFLAGS = $(LIBS)
 
-#INSTALL = install
-INSTALL = cp
+LIBS    = -L$(PUBLISH_DIR)
 
-ARCHITECTURE=Linux
+ARCHITECTURE = Linux
+
+##
+## user-defined makefiles
+##
+
+MKFILES = $(wildcard $(ERESSEA)/$(USER).mk $(ERESSEA)/$(OSTYPE).mk $(ERESSEA)/$(HOSTTYPE).mk $(ERESSEA)/$(ARCH).mk)
+ifeq ($(MKFILES), )
+else
+  include $(MKFILES)
+endif
+
 
 ##
 ## Architecture-Dependent Exe and Library Names
@@ -136,7 +146,7 @@ $(BUILD_DIR) $(PUBLISH_DIR):
 # object files:
 $(BUILD_DIR)/%:: $(BUILD_DIR)
 $(BUILD_DIR)/%.o:: %.c
-	@echo "Compiling $@"
+	@echo "Compiling $@ using $(MKFILES)"
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 ##
@@ -147,10 +157,4 @@ $(BUILD_DIR)/%.o:: %.c
 ifeq ($(CONVERT_TRIGGERS), 1)
  CFLAGS += -DCONVERT_TRIGGER
  INCLUDES += -I. -I$(ERESSEA)/eressea/old
-endif
-
-MKFILES = $(wildcard $(USER).mk $(OSTYPE).mk $(HOSTTYPE).mk $(ARCH).mk)
-ifeq ($(MKFILES), )
-else
-  include $(MKFILES)
 endif
