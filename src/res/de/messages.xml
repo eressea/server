@@ -7484,7 +7484,7 @@
 			<arg name="key" type="int"></arg>
 		</type>
 		<text locale="de">"$unit($unit) verschließt eines der Schlösser in $region($region) mit $if($eq($key,1),"dem Achatenen Schlüssel","dem Saphirnen Schlüssel")."</text>
-		<text locale="de">"$unit($unit) locks one of the locks in $region($region) with $if($eq($key,1),"the Agate Key","the Sapphire Key")."</text>
+		<text locale="en">"$unit($unit) locks one of the locks in $region($region) with $if($eq($key,1),"the Agate Key","the Sapphire Key")."</text>
 	</message>
 	
 	<message name="questportal_unlock" section="events">
@@ -7494,7 +7494,7 @@
 			<arg name="key" type="int"></arg>
 		</type>
 		<text locale="de">"$unit($unit) öffnet eines der Schlösser in $region($region) mit $if($eq($key,1),"dem Achatenen Schlüssel","dem Saphirnen Schlüssel")."</text>
-		<text locale="de">"$unit($unit) unlocks one of the locks in $region($region) with $if($eq($key,1),"the Agate Key","the Sapphire Key")."</text>
+		<text locale="en">"$unit($unit) unlocks one of the locks in $region($region) with $if($eq($key,1),"the Agate Key","the Sapphire Key")."</text>
 	</message>
 
 	<message name="use_questkey_wrongregion" section="events">
@@ -7505,6 +7505,83 @@
 		</type>
 		<text locale="de">"$unit($unit) in $region($region): '$command' - Hier ist kein passendes Schloss."</text>
 		<text locale="en">"$unit($unit) in $region($region): '$command' - No fitting lock can be found here."</text>
+	</message>
+	<message name="curseinfo::fogtrap">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Dichte Nebel bedecken diese Woche die Region. Keine Einheit schafft es, diese Nebel zu durchdringen und die Region zu verlassen. ($int36($id))"</text>
+		<text locale="en">"heavy fog makes it impossible to leave the region. ($int36($id))"</text>
+	</message>
+	<message name="curseinfo::nocostbuilding">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Der Zahn der Zeit kann diesen Mauern nichts anhaben. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::holyground">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Untote schrecken vor dieser Region zurück. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::blessedharvest">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"In dieser Gegend steht das Korn besonders gut im Feld. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::drought">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"In dieser Gegend herrscht eine Dürre. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::badlearn">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Alle Leute in der Region haben Schlafstörungen. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::depression">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Die Bauern sind unzufrieden. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::generous">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Es herrscht eine fröhliche und ausgelassene Stimmung. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::astralblock">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Etwas verhindert den Kontakt zur Realität. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::peacezone">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Die ganze Region ist von einer friedlichen Stimmung erfasst. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::disorientationzone">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Ein Schleier der Verwirrung liegt über der Region. ($int36($id))"</text>
+		<text locale="en">""</text>
 	</message>
 
 </messages>

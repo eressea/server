@@ -664,7 +664,7 @@ hat_in_region(item_t it, region * r, faction * f)
 }
 
 static void
-print_curses(FILE *F, const void * obj, typ_t typ, const attrib *a, int self, int indent)
+print_curses(FILE *F, const locale * lang, const void * obj, typ_t typ, const attrib *a, int self, int indent)
 {
 	for(;a;a=a->next) {
 		int dh = 0;
@@ -672,7 +672,7 @@ print_curses(FILE *F, const void * obj, typ_t typ, const attrib *a, int self, in
 		if (fval(a->type, ATF_CURSE)) {
 			curse *c = (curse *)a->data.v;
 			if (c->type->curseinfo)
-				dh = c->type->curseinfo(obj, typ, c, self);
+				dh = c->type->curseinfo(lang, obj, typ, c, self);
 			if (dh == 1) {
 				rnl(F);
 				rparagraph(F, buf, indent, 0);
@@ -775,11 +775,11 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 		if(ug) {
 			int i;
 			for(i=0; i<ug->members; i++) {
-				print_curses(F, u, TYP_UNIT, ug->unit_array[i]->attribs, (u->faction == f)? 1 : 0, indent);
+				print_curses(F, f->locale, u, TYP_UNIT, ug->unit_array[i]->attribs, (u->faction == f)? 1 : 0, indent);
 			}
 		} else
 #endif /* USE_UGROUPS */
-		print_curses(F, u, TYP_UNIT, u->attribs, (u->faction == f)? 1 : 0, indent);
+		print_curses(F, f->locale, u, TYP_UNIT, u->attribs, (u->faction == f)? 1 : 0, indent);
 	}
 
 #ifdef USE_UGROUPS
@@ -1281,7 +1281,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	n = 0;
 
 	/* Wirkungen permanenter Sprüche */
-	print_curses(F, r, TYP_REGION, r->attribs, 0, 0);
+	print_curses(F, f->locale, r, TYP_REGION, r->attribs, 0, 0);
 
 	/* Produktionsreduktion */
 	a = a_find(r->attribs, &at_reduceproduction);
@@ -1785,10 +1785,10 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 
 	/* Leere Burgen verursachten sonst segfault! */
 	if(buildingowner(r,b) != NULL){
-		print_curses(F, b, TYP_BUILDING, b->attribs,
+		print_curses(F, f->locale, b, TYP_BUILDING, b->attribs,
 				(buildingowner(r,b)->faction == f)? 1 : 0, 4);
 	} else {
-		print_curses(F, b, TYP_BUILDING, b->attribs, 0, 4);
+		print_curses(F, f->locale, b, TYP_BUILDING, b->attribs, 0, 4);
 	}
 
 	for (u = r->units; u; u = u->next)
@@ -2181,10 +2181,10 @@ report(FILE *F, faction * f, const faction_list * addresses,
 
 			/* Leere Schiffe verursachten sonst segfault! */
 			if(shipowner(r,sh) != NULL){
-				print_curses(F, sh, TYP_SHIP, sh->attribs,
+				print_curses(F, f->locale, sh, TYP_SHIP, sh->attribs,
 						(shipowner(r,sh)->faction == f)? 1 : 0, 4);
 			} else {
-				print_curses(F, sh, TYP_SHIP, sh->attribs, 0, 4);
+				print_curses(F, f->locale, sh, TYP_SHIP, sh->attribs, 0, 4);
 			}
 
 			for (u = r->units; u; u = u->next)

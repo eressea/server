@@ -172,7 +172,7 @@ cr_output_str_list(FILE * F, const char *title, const strlist * S, const faction
 #include "objtypes.h"
 
 static void
-print_curses(FILE * F, const void * obj, typ_t typ, const attrib *a, int self)
+print_curses(FILE * F, const locale * lang, const void * obj, typ_t typ, const attrib *a, int self)
 {
 	boolean header = false;
 	while (a) {
@@ -183,7 +183,7 @@ print_curses(FILE * F, const void * obj, typ_t typ, const attrib *a, int self)
 
 			c = (curse *)a->data.v;
 			if (c->type->curseinfo)
-				dh = c->type->curseinfo(obj, typ, c, self);
+				dh = c->type->curseinfo(lang, obj, typ, c, self);
 			if (dh == 1) {
 				if (!header) {
 					header = 1;
@@ -437,10 +437,10 @@ cr_output_buildings(FILE * F, building * b, unit * u, int fno, faction *f)
 	if (b->besieged)
 		fprintf(F, "%d;Belagerer\n", b->besieged);
 	if(bo != NULL){
-		print_curses(F, b, TYP_BUILDING, b->attribs,
+		print_curses(F, f->locale, b, TYP_BUILDING, b->attribs,
 				(bo->faction == f)? 1 : 0);
 	} else {
-		print_curses(F, b, TYP_BUILDING, b->attribs, 0);
+		print_curses(F, f->locale, b, TYP_BUILDING, b->attribs, 0);
 	}
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
@@ -483,10 +483,10 @@ cr_output_ship(FILE * F, const ship * s, const unit * u, int fcaptain, const fac
 		fprintf(F, "%d;Kueste\n", w);
 
 	if(shipowner(r, s) != NULL){
-		print_curses(F, s, TYP_SHIP, s->attribs,
+		print_curses(F, f->locale, s, TYP_SHIP, s->attribs,
 				(shipowner(r, s)->faction == f)? 1 : 0);
 	} else {
-		print_curses(F, s, TYP_SHIP, s->attribs, 0);
+		print_curses(F, f->locale, s, TYP_SHIP, s->attribs, 0);
 	}
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
@@ -731,7 +731,7 @@ cr_output_unit(FILE * F, const region * r,
 	if ((u->faction == f || omniscient(f)) && u->botschaften)
 		cr_output_str_list(F, "EINHEITSBOTSCHAFTEN", u->botschaften, f);
 
-	print_curses(F, u, TYP_UNIT, u->attribs, (u->faction == f)? 1 : 0);
+	print_curses(F, f->locale, u, TYP_UNIT, u->attribs, (u->faction == f)? 1 : 0);
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
@@ -1199,7 +1199,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 				}
 			}
 
-			print_curses(F, r, TYP_REGION, r->attribs, 0);
+			print_curses(F, f->locale, r, TYP_REGION, r->attribs, 0);
 			/* describe both passed and inhabited regions */
 			show_active_spells(r);
 			{

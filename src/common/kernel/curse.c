@@ -926,7 +926,7 @@ cinfo_astralblock(void * obj, typ_t typ, curse *c, int self)
 }
 /* C_PEACE */
 static int
-cinfo_peace(void * obj, typ_t typ, curse *c, int self)
+cinfo_peacezone(void * obj, typ_t typ, curse *c, int self)
 {
 	unused(typ);
 	unused(obj);
@@ -1420,7 +1420,7 @@ static curse_type cursedaten[MAXCURSE] =
 		CURSETYP_NORM, 0, NO_MERGE,
 		"Dieser machtvoller Beeinflussungszauber erstickt jeden Streit schon im "
 		"Keim.",
-		(cdesc_fun)cinfo_peace
+		(cdesc_fun)cinfo_peacezone
 	},
 	{  /* erschwert geordnete Bewegungen */
 		"disorientationzone",
