@@ -763,16 +763,16 @@ alliance(const ally * sf, const faction * f, int mode)
 int 
 alliedgroup(const struct plane * pl, const struct faction * f, const struct ally * sf, const struct faction * f2, int mode)
 {
-	return alliance(sf, f, mode) | (mode & autoalliance(pl, f, f2));
+	return alliance(sf, f2, mode) | (mode & autoalliance(pl, f, f2));
 }
 
 int
-alliedfaction(const struct plane * pl, const faction * sf, const faction * f2, int mode)
+alliedfaction(const struct plane * pl, const faction * f, const faction * f2, int mode)
 {
 #ifdef ALLIANCES
-	if (sf->alliance!=f2->alliance) return 0;
+	if (f->alliance!=f2->alliance) return 0;
 #endif
-	return alliedgroup(pl, sf, sf->allies, f2, mode);
+	return alliedgroup(pl, f, f->allies, f2, mode);
 }
 
 /* Die Gruppe von Einheit u hat helfe zu f2 gesetzt. */
