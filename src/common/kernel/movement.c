@@ -1081,7 +1081,7 @@ travel(region * first, unit * u, region * next, int flucht)
 				k -= BP_NORMAL;
 			if (k<0) break;
 			/* r2 -> Zielregion, r3 -> Momentane Region */
-			if (dir>=0 && move_blocked(u, current, dir)
+			if ((dir>=0 && move_blocked(u, current, dir))
 					|| curse_active(get_curse(current->attribs, fogtrap_ct)))
 			{
 				ADDMSG(&u->faction->msgs, msg_message("leavefail", 

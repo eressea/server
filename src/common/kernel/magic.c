@@ -203,18 +203,22 @@ free_mage(attrib * a)
 static int
 read_mage(attrib * a, FILE * F)
 {
-	int i;
+	int i, mtype;
 	sc_mage * mage = (sc_mage*)a->data.v;
 	spell_ptr ** sp = &mage->spellptr;
-	fscanf(F, "%d %d %d", &mage->magietyp, &mage->spellpoints, &mage->spchange);
+	fscanf(F, "%d %d %d", &mtype, &mage->spellpoints, &mage->spchange);
+  mage->magietyp = (magic_t)mtype;
 	for (i=0;i!=MAXCOMBATSPELLS;++i) {
-		fscanf (F, "%d %d", &mage->combatspell[i], &mage->combatspelllevel[i]);
+    int spid;
+		fscanf (F, "%d %d", &spid, &mage->combatspelllevel[i]);
+    mage->combatspell[i] = (spellid_t)spid;
 	}
 	for (;;) {
-		fscanf (F, "%d", &i);
-		if (i < 0) break;
-		*sp = calloc (sizeof(spell_ptr), 1);
-		(*sp)->spellid = (spellid_t)i;
+    int spid;
+		fscanf (F, "%d", &spid);
+		if (spid < 0) break;
+    *sp = calloc (sizeof(spell_ptr), 1);
+		(*sp)->spellid = (spellid_t)spid;
 		sp = &(*sp)->next;
 	}
 	return AT_READ_OK;
