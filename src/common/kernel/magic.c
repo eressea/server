@@ -1192,7 +1192,7 @@ magic_resistance(unit *target)
   double probability = target->race->magres;
 
 	/* Magier haben einen Resistenzbonus vom Magietalent * 5%*/
-	probability += effskill(target, SK_MAGIC)*0.5;
+	probability += effskill(target, SK_MAGIC)*0.05;
 
 	/* Auswirkungen von Zaubern auf der Einheit */
 	c = get_curse(target->attribs, ct_find("magicresistance"));
@@ -1237,7 +1237,7 @@ magic_resistance(unit *target)
 		/* gesegneter Steinkreis gibt 30% dazu */
 		if (btype) probability += btype->magresbonus * 0.01;
 	}
-	return (int)(probability*100);
+	return probability;
 }
 
 /* ------------------------------------------------------------- */
