@@ -66,10 +66,16 @@ if ! $(DEBUG) {
    DEBUG = 1 ;
 }
 
-if $(DEBUG) = 0 {
-   TARGET_PREFIX = Release ;
+if $(PROFILE) = 1 {
+   TARGET_PREFIX = Profile ;
 }
 else {
-   TARGET_PREFIX = Debug ;
+  if $(DEBUG) = 0 {
+    TARGET_PREFIX = Release ;
+  }
+  else {
+    TARGET_PREFIX = Debug ;
+  }
 }
+
 
