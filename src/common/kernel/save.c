@@ -2051,6 +2051,7 @@ writegame(char *path, char quiet)
 #else
 			for (i=0;i!=u->skill_size;++i) {
 				skill * sv = u->skills+i;
+				assert(sv->level>=0 && sv->learning>=0 && sv->learning<=sv->level*2);
 				if (sv->learning || sv->level) {
 					wi(F, sv->id);
 					wi(F, sv->level);

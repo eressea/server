@@ -259,26 +259,28 @@ level(int days)
 void 
 reduce_skill(skill * sv, int change)
 {
-	int weeks = (sv->level * sv->level - sv->level) / 2 + sv->learning;
 	if (sv->learning>=change) {
 		/* just forget a few weeks */
-		weeks -= change;
+		sv->learning = (unsigned char)(sv->learning-change);
 	} else {
+		int weeks;
 		change -= sv->learning;
 		while (change>=sv->level && sv->level > 0) {
 			change -= sv->level;
 			--sv->level;
 		}
-		if (change && change<sv->level) {
+		if (change && sv->level > 0 && change<sv->level) {
 			/* this is not an exact science... it would be better to set
 			 * sv->learning so that the average time to rise was = change.
 			 */
+			--sv->level;
 			weeks = (sv->level-change)*2;
 		} else {
 			weeks = 0;
 		}
+		sv->learning = (unsigned char)weeks;
 	}
-	sv->learning = (unsigned char)weeks;
+	assert(sv->level>=0 && sv->learning>=0 && sv->learning<=sv->level*2);
 }
 
 int 
