@@ -1,2 +1,5 @@
 Debug
 Debug
+*.log
+*.plg
+*.log
