@@ -8,12 +8,12 @@ CFG=kernel - Win32 Profile
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "kernel-6.mak".
+!MESSAGE NMAKE /f "kernel.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "kernel-6.mak" CFG="kernel - Win32 Profile"
+!MESSAGE NMAKE /f "kernel.mak" CFG="kernel - Win32 Profile"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -73,7 +73,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo /out:"Debug\kernel.lib"
+# ADD LIB32 /nologo
 
 !ELSEIF  "$(CFG)" == "kernel - Win32 Profile"
 
@@ -159,10 +159,6 @@ SOURCE=.\item.h
 # Begin Source File
 
 SOURCE=.\karma.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\laws.h
 # End Source File
 # Begin Source File
 

@@ -19,6 +19,7 @@ struct fighter;
 struct spell;
 struct border_type;
 struct attrib_type;
+struct curse_type;
 struct castorder;
 
 /* Sprüche. Neue NUR hinten anfügen, oder das Datenfile geht kaputt */

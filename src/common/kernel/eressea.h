@@ -353,7 +353,6 @@ extern void plagues(struct region * r, boolean ismagic);
 						 * von struct unitname, regionid, etc. zurückgegeben werden. ohne die 0 */
 #define CMDSIZE             (DISPLAYSIZE*2+1)
 #define STARTMONEY          5000
-#define ORDERGAP            4
 
 #define PRODUCEEXP          10
 #define MAINTENANCE         10

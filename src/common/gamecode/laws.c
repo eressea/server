@@ -70,6 +70,7 @@
 #include <base36.h>
 #include <goodies.h>
 #include <rand.h>
+#include <sql.h>
 #include <util/message.h>
 
 #ifdef AT_OPTION
@@ -239,6 +240,8 @@ restart(unit *u, const race * rc)
 	unit * nu = f->units;
 	strlist ** o=&u->orders;
 
+	fprintf(sqlstream, "UPDATE subscriptions set faction='%s' where faction"
+		"='%s' and game=%d;", itoa36(u->faction->no), itoa36(f->no), GAME_ID);
 	f->magiegebiet = u->faction->magiegebiet;
 	f->options = u->faction->options;
 	freestrlist(nu->orders);
@@ -266,7 +269,7 @@ checkorders(void)
 
 	puts(" - Warne späte Spieler...");
 	for (f = factions; f; f = f->next)
-		if (f->no!=MONSTER_FACTION && turn - f->lastorders == ORDERGAP - 1)
+		if (f->no!=MONSTER_FACTION && turn - f->lastorders == NMRTIMEOUT - 1)
 			addstrlist(&f->mistakes,
 				"Bitte sende die Befehle nächste Runde ein, "
 				   "wenn du weiterspielen möchtest.");
@@ -1194,19 +1197,24 @@ quit(void)
 
 	remove("inactive");
 
-	for (f = factions; f; f = f->next) if(!fval(f, FL_NOIDLEOUT)) {
-#if REMOVENMRTIMEOUT == 1
-		if (turn - f->lastorders >= ORDERGAP) {
+	for (f = factions; f; f = f->next) {
+		if(fval(f, FL_NOIDLEOUT)) f->lastorders = turn;
+#if NMRTIMEOUT
+		if (turn - f->lastorders >= NMRTIMEOUT) {
 			destroyfaction(f);
 			continue;
 		}
 #endif
-		if (turn - f->lastorders >= (ORDERGAP - 1)) {
+		fprintf(sqlstream, 
+			"UPDATE subscriptions SET lastturn=%d WHERE game=%d AND faction='%s';",
+			f->lastorders, GAME_ID, itoa36(f->no));
+
+		if (turn - f->lastorders >= (NMRTIMEOUT - 1)) {
 			inactivefaction(f);
 			continue;
 		}
 	}
-#if REMOVENMRNEWBIE == 1
+#if NMRTIMEOUT
 	puts(" - beseitige Spieler, die sich nach der Anmeldung nicht "
 		 "gemeldet haben...");
 
@@ -2722,6 +2730,9 @@ renumber_factions(void)
 			}
 		}
 		if (updatelog) fprintf(updatelog, "renum %s %s\n", itoa36(rp->faction->no), itoa36(rp->want));
+		fprintf(sqlstream, "UPDATE subscriptions set faction='%s' where "
+			"faction='%s' and game=%d;", itoa36(rp->want), 
+			itoa36(rp->faction->no), GAME_ID);
 		rp->faction->no = rp->want;
 		register_faction_id(rp->want);
 		fset(rp->faction, FF_NEWID);

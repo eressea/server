@@ -1044,13 +1044,15 @@ travel(region * first, unit * u, region * next, int flucht)
 			/* r2 -> Zielregion, r3 -> Momentane Region */
 			if (move_blocked(u, current, reldirection(current, next))
 					|| is_spell_active(current, C_FOGTRAP))
-				add_message(&u->faction->msgs, new_message(u->faction,
-					"leavefail%u:unit%r:region", u, next));
+			{
+				ADDMSG(&u->faction->msgs, msg_message("leavefail", 
+					"unit region", u, next));
+			}
 			if ((wache = bewegung_blockiert_von(u, current)) != (unit *) NULL
 				&& gereist != 0)
 			{
-				add_message(&u->faction->msgs, new_message(u->faction,
-					"moveblockedbyguard%u:unit%r:region%u:guard", u, current,
+				ADDMSG(&u->faction->msgs, msg_message("moveblockedbyguard", 
+					"unit region guard", u, current,
 					wache));
 				break;
 			}

@@ -1023,12 +1023,14 @@ readgame(boolean backup)
 		addlist2(fp, f);
 
 		if (f->age==1) {
-			fprintf(sqlstream, "INSERT INTO users (id, email) VALUES (%d, '%s');\n", 
-				f->unique_id, f->email);
-			fprintf(sqlstream, "INSERT INTO factions (id, user, name, password, race, locale, lastorders, banner, email) "
-				"VALUES ('%s', %d, '%s', '%s', '%s', '%s', %u, '%s', '%s');\n",
-				itoa36(f->no), f->unique_id, sqlquote(f->name), sqlquote(f->passw), f->race->_name[0],
-				locale_name(f->locale), f->lastorders, sqlquote(f->banner), f->email);
+/*
+ *			fprintf(sqlstream, "INSERT INTO users (id, email) VALUES (%d, '%s');\n", 
+ *				f->unique_id, f->email);
+ *			fprintf(sqlstream, "INSERT INTO subscriptions (id, user, name, race) "
+ *				"VALUES ('%s', %d, '%s', '%s', '%s', '%s', %u, '%s', '%s');\n",
+ *				itoa36(f->no), f->unique_id, sqlquote(f->name), sqlquote(f->passw), f->race->_name[0],
+ *				locale_name(f->locale), f->lastorders, sqlquote(f->banner), f->email);
+ */
 		}
 	}
 	*fp = 0;

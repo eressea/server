@@ -14,13 +14,18 @@
  * Contains defines for the "classic" game (Vinyambar I) .
  * Include this file from settings.h to make eressea work.
  */
+#define GAME_ID 1
 #define RESOURCE_CONVERSION 0
 #define NEW_RESOURCEGROWTH 0
 #define LARGE_CASTLES 0
 #define GROWING_TREES 0
 #define REMOVENMRNEWBIE 0
-#define REMOVENMRTIMEOUT 0
+#define NMRTIMEOUT 5
 #define HUNGER_DISABLES_LONGORDERS 1
 #define REDUCED_PEASANTGROWTH 0
 #define RACE_ADJUSTMENTS 0
 
+#define SKILLPOINTS 1
+#define TEACHDIFFERENCE 1
+
+#define PEASANT_ADJUSTMENT 0

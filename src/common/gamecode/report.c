@@ -3338,7 +3338,7 @@ report_summary(summary * s, summary * o, boolean full)
 	FILE * F = NULL;
 	int i, newplayers = 0;
 	faction * f;
-	int nmrs[ORDERGAP+1];
+	int nmrs[NMRTIMEOUT+1];
 
 	{
 		char zText[MAX_PATH];
@@ -3430,7 +3430,7 @@ report_summary(summary * s, summary * o, boolean full)
 
 	fprintf(F, "\n\n");
 
-	for (i = 0; i != ORDERGAP+1; ++i) {
+	for (i = 0; i != NMRTIMEOUT+1; ++i) {
 		nmrs[i] = 0;
 	}
 
@@ -3438,12 +3438,12 @@ report_summary(summary * s, summary * o, boolean full)
 		if (f->age <= 1 && turn - f->lastorders == 1) {
 			newplayers++;
 		} else if (f->no != MONSTER_FACTION) {
-			nmrs[min(ORDERGAP,turn-f->lastorders)]++;
+			nmrs[min(NMRTIMEOUT,turn-f->lastorders)]++;
 		}
 	}
 
-	for (i = 0; i != ORDERGAP+1; ++i) {
-		if(i == ORDERGAP) {
+	for (i = 0; i != NMRTIMEOUT+1; ++i) {
+		if(i == NMRTIMEOUT) {
 			fprintf(F, "+ NMRs:\t\t %d\n", nmrs[i]);
 		} else {
 			fprintf(F, "%d %s:\t\t %d\n", i,
@@ -3467,11 +3467,11 @@ report_summary(summary * s, summary * o, boolean full)
 		out_faction(F, f);
 	}
 
-	if(full) {
+	if (full && NMRTIMEOUT) {
 		fprintf(F, "\n\nFactions with NMRs:\n");
-		for (i = ORDERGAP; i > 0; --i) {
+		for (i = NMRTIMEOUT; i > 0; --i) {
 			for(f=factions; f; f=f->next) {
-				if(i == ORDERGAP) {
+				if(i == NMRTIMEOUT) {
 					if(turn - f->lastorders >= i) {
 						out_faction(F, f);
 					}
