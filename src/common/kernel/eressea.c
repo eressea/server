@@ -822,7 +822,7 @@ init_gms(void)
 static int
 autoalliance(const plane * pl, const faction * sf, const faction * f2)
 {
-  boolean init = false;
+  static boolean init = false;
   if (!init) {
     init_gms();
     init = true;
