@@ -50,4 +50,3 @@ cinfo_building(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 
 /* CurseInfo mit Spezialabfragen */
 
-

@@ -163,14 +163,16 @@ static int
 cinfo_orc(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	unit *u;
+	message * msg;
 	unused(typ);
 
 	assert(typ == TYP_UNIT);
 	u = (unit *)obj;
 
 	if (self){
-		sprintf(buf, "%s stürzt sich von einem amourösen Abenteuer ins "
-				"nächste. (%s)", u->name, curseid(c));
+		msg = msg_message(mkname("curseinfo", c->type->cname), "unit id", u, c->no);
+		nr_render(msg, lang, buf, sizeof(buf), NULL);
+		msg_release(msg);
 		return 1;
 	}
 	return 0;

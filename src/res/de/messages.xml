@@ -7597,5 +7597,56 @@
 		<text locale="de">"Diese Region wurde von den Göttern verflucht. Das Meer ist eine ekelige Brühe, braunschwarze, stinkende Gase steigen aus den unergründlichen Tiefen hervor, und untote Seeungeheuer, Schiffe zerfressend und giftige grüne Galle geifernd, sind der Schrecken aller Seeleute, die diese Gewässer durchqueren. Niemand kann hier lange überleben. ($int36($id))"</text>
 		<text locale="en">""</text>
 	</message>
+	<message name="curseinfo::gooddream">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Die Leute haben schöne Träume. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::baddream">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Albträume plagen die Leute. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::magicstreet">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Die Straßen sind erstaunlich trocken und gut begehbar. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::magicstreetwarn">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Die Straßen sind erstaunlich trocken und gut begehbar, doch an manchen Stellen bilden sich wieder die erste Schlammlöcher. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::buildingunknown">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Ein magischer Schimmer liegt auf diesen Mauern. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::magicstone">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Diese Mauern wirken, als wären sie direkt aus der Erde gewachsen und nicht erbaut. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+
+	<message name="curseinfo::orcish">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"$unit($unit) stürzt sich von einem amourösen Abenteuer ins nächste. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
 
 </messages>

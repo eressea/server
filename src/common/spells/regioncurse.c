@@ -74,6 +74,8 @@ cinfo_cursed_by_the_gods(const locale * lang,void * obj, typ_t typ, curse *c, in
 static int
 cinfo_dreamcurse(const locale * lang,void * obj, typ_t typ, curse *c, int self)
 {
+	message * msg;
+
 	unused(self);
 	unused(typ);
 	unused(obj);
@@ -81,10 +83,8 @@ cinfo_dreamcurse(const locale * lang,void * obj, typ_t typ, curse *c, int self)
 
 	if (c->effect > 0){
 		msg = msg_message("curseinfo::gooddream", "id", c->no);
-		sprintf(buf, "Die Leute haben schöne Träume. (%s)", curseid(c));
 	}else{
 		msg = msg_message("curseinfo::baddream", "id", c->no);
-		sprintf(buf, "Albträume plagen die Leute. (%s)", curseid(c));
 	}
 	nr_render(msg, lang, buf, sizeof(buf), NULL);
 	msg_release(msg);
@@ -95,20 +95,20 @@ cinfo_dreamcurse(const locale * lang,void * obj, typ_t typ, curse *c, int self)
 static int
 cinfo_magicstreet(const locale * lang,void * obj, typ_t typ, curse *c, int self)
 {
+	message * msg;
+
 	unused(typ);
 	unused(self);
 	unused(obj);
 
 	assert(typ == TYP_REGION);
 
-	sprintf(buf, "Die Straßen sind erstaunlich trocken und gut begehbar");
-	/* Warnung vor auflösung!*/
+	/* Warnung vor Auflösung */
 	if (c->duration <= 2){
-		scat(", doch an manchen Stellen bilden sich wieder die erste Schlammlöcher");
+		msg = msg_message("curseinfo::magicstreet", "id", c->no);
+	} else {
+		msg = msg_message("curseinfo::magicstreetwarn", "id", c->no);
 	}
-	scat(". (");
-	scat(itoa36(c->no));
-	scat(")");
 
 	return 1;
 }
