@@ -7106,9 +7106,8 @@ sp_destroy_curse(castorder *co)
 		add_message(&mage->faction->msgs, new_message(mage->faction,
 					"spelltargetnotfound%u:unit%r:region%s:command",
 					mage, mage->region, strdup(co->order)));
-	}
-
-	switch(obj){
+	} else {
+		switch(obj){
 		case SPP_REGION:
 			ap = &r->attribs;
 			set_string(&ts, regionname(r, mage->faction));
@@ -7138,36 +7137,37 @@ sp_destroy_curse(castorder *co)
 		default:
 			/* Das Zielobjekt wurde vergessen */
 			cmistake(mage, strdup(co->order), 203, MSG_MAGIC);
-		return 0;
+			return 0;
+		}
+
+		/* überprüfung, ob curse zu diesem objekt gehört */
+		if (!is_cursed_with(*ap, c)){
+			/* Es wurde kein Ziel gefunden */
+			add_message(&mage->faction->msgs, 
+						new_message(mage->faction,
+									"spelltargetnotfound%u:unit%r:region%s:command",
+									mage, mage->region, strdup(co->order)));
+		}
+
+		/* curse auflösen, wenn zauber stärker (force > vigour)*/
+		succ = c->vigour - force;
+		c->vigour = max(0, succ);
+
+		if(succ <= 0) {
+			remove_curse(ap, c);
+
+			add_message(&mage->faction->msgs, new_message(mage->faction,
+				"destroy_magic_effect%u:unit%r:region%s:command%i:id%s:target",
+				mage, mage->region, strdup(co->order), strdup(pa->param[1]->data.s),
+				strdup(ts)));
+		} else {
+			add_message(&mage->faction->msgs, new_message(mage->faction,
+				"destroy_magic_noeffect%u:unit%r:region%s:command",
+				mage, mage->region, strdup(co->order)));
+		}
 	}
-
-	/* überprüfung, ob curse zu diesem objekt gehört */
-	if (!is_cursed_with(*ap, c)){
-		/* Es wurde kein Ziel gefunden */
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-					"spelltargetnotfound%u:unit%r:region%s:command",
-					mage, mage->region, strdup(co->order)));
-	}
-
-	/* curse auflösen, wenn zauber stärker (force > vigour)*/
-	succ = c->vigour - force;
-	c->vigour = max(0, succ);
-
-	if(succ <= 0) {
-		remove_curse(ap, c);
-
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"destroy_magic_effect%u:unit%r:region%s:command%i:id%s:target",
-			mage, mage->region, strdup(co->order), strdup(pa->param[1]->data.s),
-			strdup(ts)));
-	} else {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"destroy_magic_noeffect%u:unit%r:region%s:command",
-			mage, mage->region, strdup(co->order)));
-	}
-
 	if(ts != NULL) free(ts);
-
+	
 	return cast_level;
 }
 
