@@ -114,7 +114,7 @@ ursprung_x(const faction *f, const plane *pl, const region * rdefault)
 			return ur->x;
 	}
 	if (!rdefault) return 0;
-	set_ursprung((faction*)f, pl->id, rdefault->x - plane_center_x(pl), rdefault->y - plane_center_y(pl));
+	set_ursprung((faction*)f, id, rdefault->x - plane_center_x(pl), rdefault->y - plane_center_y(pl));
 	return rdefault->x - plane_center_x(pl);
 }
 

@@ -857,6 +857,7 @@ faction_list *
 get_addresses(const faction * f, const seen_region * seenregions)
 {
 /* "TODO: travelthru" */
+	faction *f2;
 	const seen_region * sr = seenregions;
 	const faction * lastf = NULL;
 	faction_list * flist = calloc(1, sizeof(faction_list));
@@ -866,7 +867,8 @@ get_addresses(const faction * f, const seen_region * seenregions)
 		const unit * u = r->units;
 		while (u!=NULL) {
 			faction * sf = visible_faction(f, u);
-			if (sf && sf!=f && sf!=lastf && !fval(u, FL_PARTEITARNUNG) && cansee(f, r, u, 0)) {
+			if (sf && sf!=f && sf!=lastf && ((!fval(u, FL_PARTEITARNUNG) && cansee(f, r, u, 0))
+											|| (f->alliance != NULL && sf->alliance != NULL && f->alliance == sf->alliance))) {
 				faction_list ** fnew = &flist;
 				while (*fnew && (*fnew)->data->no < sf->no) {
 					fnew =&(*fnew)->next;
@@ -882,6 +884,22 @@ get_addresses(const faction * f, const seen_region * seenregions)
 			u = u->next;
 		}
 		sr = sr->next;
+	}
+	if(f->alliance != NULL) {
+		for(f2 = factions; f2; f2 = f2->next) {
+			if(f2->alliance != NULL && f2->alliance == f->alliance) {
+				faction_list ** fnew = &flist;
+				while (*fnew && (*fnew)->data->no < f2->no) {
+					fnew =&(*fnew)->next;
+				}
+				if ((*fnew==NULL) || (*fnew)->data!=f2) {
+					faction_list * finsert = malloc(sizeof(faction_list));
+					finsert->next = *fnew;
+					*fnew = finsert;
+					finsert->data = f2;
+				}
+			}
+		}
 	}
 	return flist;
 }

@@ -2924,15 +2924,23 @@ steal(region * r, unit * u, request ** stealorders)
 
 	if (u2->faction->age < IMMUN_GEGEN_ANGRIFF) {
 		add_message(&u->faction->msgs,
-				msg_error(u, findorder(u, u->thisorder), "newbie_immunity_error", "turns", IMMUN_GEGEN_ANGRIFF));
+				msg_error(u, findorder(u, u->thisorder), "newbie_immunity_error",
+										"turns", IMMUN_GEGEN_ANGRIFF));
+		return;
+	}
+
+	if(u->faction->alliance == u2->faction->alliance) {
+		cmistake(u, findorder(u, u->thisorder), 47, MSG_INCOME);
 		return;
 	}
 
 	assert(u->region==u2->region);
 	if (!can_contact(r, u, u2)) {
-		add_message(&u->faction->msgs, msg_error(u, findorder(u, u->thisorder), "error60", ""));
+		add_message(&u->faction->msgs, msg_error(u, findorder(u, u->thisorder),
+									"error60", ""));
 		return;
 	}
+
 	n = eff_skill(u, SK_STEALTH, r) - wahrnehmung(r, f);
 
 	if (n == 0) {
