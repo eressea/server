@@ -331,6 +331,18 @@ unit_setaura(unit& u, int points)
   return set_spellpoints(&u, points);
 }
 
+static faction *
+unit_getfaction(const unit& u)
+{
+  return u.faction;
+}
+
+static void
+unit_setfaction(unit& u, faction& f)
+{
+  u_setfaction(&u, &f);
+}
+
 static const char * 
 unit_getmagic(const unit& u)
 {
@@ -387,7 +399,7 @@ bind_unit(lua_State * L)
     .property("name", &unit_getname, &unit_setname)
     .property("info", &unit_getinfo, &unit_setinfo)
     .property("id", &unit_getid, &unit_setid)
-    .def_readonly("faction", &unit::faction)
+    .property("faction", &unit_getfaction, &unit_setfaction)
     .def_readwrite("hp", &unit::hp)
     .def_readwrite("status", &unit::status)
 

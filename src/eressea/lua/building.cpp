@@ -78,6 +78,20 @@ building_setname(building& b, const char * name)
   set_string(&b.name, name);
 }
 
+static region *
+building_getregion(const building& b)
+{
+  return b.region;
+}
+
+static void
+building_setregion(building& b, region& r)
+{
+	choplist(&b.region->buildings, &b);
+  addlist(&r.buildings, &b);
+  b.region = &r;
+}
+
 static std::ostream& 
 operator<<(std::ostream& stream, building& b)
 {
@@ -130,7 +144,7 @@ bind_building(lua_State * L)
     .property("name", &building_getname, &building_setname)
     .property("info", &building_getinfo, &building_setinfo)
     .property("units", &building_units, return_stl_iterator)
-    .def_readonly("region", &building::region)
+    .property("region", &building_getregion, &building_setregion)
     .def_readonly("id", &building::no)
     .def_readwrite("size", &building::size)
     .def("add_action", &building_addaction)
