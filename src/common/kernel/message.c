@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: message.c,v 1.10 2001/02/28 23:28:54 enno Exp $
+ *	$Id: message.c,v 1.11 2001/03/01 01:38:12 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -145,6 +145,7 @@ new_message(struct faction * receiver, const char* sig, ...)
 	const char * c = sig;
 	const char * args[16];
 
+	memset(args, 0, sizeof(args));
 	strncpy(buffer, sig, signature-sig);
 	buffer[signature-sig] = '\0';
 	mtype = mt_find(buffer);
@@ -183,8 +184,10 @@ new_message(struct faction * receiver, const char* sig, ...)
 		for (i=0;i!=mtype->nparameters;++i) {
 			if (!strcmp(buffer, mtype->pnames[i])) break;
 		}
-		assert(i!=mtype->nparameters || !"unknown parameter");
-
+		if (i==mtype->nparameters) {
+			log_error(("unknown message-parameter for %s: %s (%p)\n", mtype->name, buffer, va_arg(marker, void*)));
+			continue;
+		}
 		switch(type) {
 			case 's':
 				args[i] = va_arg(marker, const char *);
@@ -195,18 +198,26 @@ new_message(struct faction * receiver, const char* sig, ...)
 			case 'f':
 				args[i] = factionname(va_arg(marker, const struct faction*));
 				break;
-			case 'u':
-				args[i] = unitname(va_arg(marker, const struct unit*));
-				break;
-			case 'r':
-				args[i] = rname(va_arg(marker, const struct region*), receiver->locale);
-				break;
-			case 'h':
-				args[i] = shipname(va_arg(marker, const struct ship*));
-				break;
-			case 'b':
-				args[i] = buildingname(va_arg(marker, const struct building*));
-				break;
+			case 'u': {
+				const struct unit * u = va_arg(marker, const struct unit*);
+				if (u) args[i] = unitname(u);
+			}
+			break;
+			case 'r': {
+				const struct region * r = va_arg(marker, const struct region*);
+				if (r) args[i] = rname(r, receiver->locale);
+			}
+			break;
+			case 'h': {
+				const struct ship * sh = va_arg(marker, const struct ship*);
+				if (sh) args[i] = shipname(sh);
+			}
+			break;
+			case 'b': {
+				const struct building * b = va_arg(marker, const struct building*);
+				if (b) args[i] = buildingname(b);
+			}
+			break;
 			case 'X':
 				args[i] = resourcename(va_arg(marker, const resource_type *), 0);
 				break;
