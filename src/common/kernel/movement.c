@@ -1277,7 +1277,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
     /* effect of borders */
     while (b!=NULL) {
       if (b->type->move) {
-	b->type->move(b, u, current, next, false);
+        b->type->move(b, u, current, next, false);
       }
       b = b->next;
     }

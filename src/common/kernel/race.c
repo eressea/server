@@ -291,15 +291,7 @@ unit_max_hp(const unit * u)
 
 	return h;
 }
-/*
-boolean is_undead(const unit *u)
-{
-	return u->race == RC_UNDEAD || u->race == RC_SKELETON
-		|| u->race == RC_SKELETON_LORD || u->race == RC_ZOMBIE
-		|| u->race == RC_ZOMBIE_LORD || u->race == RC_GHOUL
-		|| u->race == RC_GHOUL_LORD;
-}
-*/
+
 boolean
 r_insectstalled(const region * r)
 {
