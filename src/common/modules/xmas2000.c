@@ -28,7 +28,7 @@
 #include <race.h>
 
 /* gamecode includes */
-#include <xmas.h>
+#include "xmas.h"
 
 /* util includes */
 #include <goodies.h>
