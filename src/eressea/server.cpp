@@ -177,13 +177,13 @@ game_init(void)
 #endif
 
   register_xmlreader();
+  init_spells();
   init_data(xmlfile);
 
   init_locales();
   /*  init_resources(); must be done inside the xml-read, because requirements use items */
 
   init_attributes();
-  init_spells();
   init_races();
   init_items();
   init_economy();

@@ -60,6 +60,7 @@
 
 /* kernel includes */
 #include <kernel/xmlreader.h>
+#include <kernel/spell.h>
 #include <building.h>
 #include <creport.h>
 #include <faction.h>
@@ -174,11 +175,11 @@ game_init(void)
 #endif
 
   register_xmlreader();
+  init_spells();
   init_data(xmlfile);
 
   init_locales();
   init_attributes();
-  init_spells();
   init_races();
   init_items();
   init_races();

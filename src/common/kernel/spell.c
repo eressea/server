@@ -7694,6 +7694,7 @@ register_spell(spell * sp)
   spell_list * slist = malloc(sizeof(spell_list));
   slist->next = spells;
   slist->data = sp;
+  spells = slist;
 }
 
 /* ------------------------------------------------------------- */
@@ -7784,6 +7785,8 @@ find_spellbyid(spellid_t id)
 {
   spell_list * slist;
 
+  assert(id>=0);
+  if (id==SPL_NOSPELL) return NULL;
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell* sp = slist->data;
     if (sp->id == id) return sp;

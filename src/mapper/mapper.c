@@ -47,6 +47,7 @@
 
 /* kernel includes */
 #include <kernel/xmlreader.h>
+#include <kernel/spell.h>
 #include <item.h>
 #include <faction.h>
 #include <race.h>
@@ -1720,11 +1721,11 @@ main(int argc, char *argv[])
 /*	register_dungeon(); */
 
   register_xmlreader();
+  init_spells();
   init_data(xmlfile);
 
   init_locales();
   init_attributes();
-  init_spells();
 
   init_resources();
 #if NEW_RESOURCEGROWTH
