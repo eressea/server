@@ -433,7 +433,7 @@ b_writeroad(const border * b, FILE *f)
 	x = (int)b->data;
 	y = x & 0xFFFF;
 	x = (x >> 16) & 0xFFFF;
-	fprintf(f, "%d %d", x, y);
+	fprintf(f, "%d %d ", x, y);
 }
 
 static boolean

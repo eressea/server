@@ -301,7 +301,6 @@ a_write(FILE * f, const attrib * attribs)
 			assert(na->type->hashkey || !"attribute not registered");
 			fprintf(f, "%s ", na->type->name);
 			na->type->write(na, f);
-			putc(' ',  f);
 		}
 		na = na->next;
 	}
