@@ -907,7 +907,7 @@ get_addresses(faction * f)
 }
 
 seen_region * reuse;
-#define MAXSEEHASH 4999
+#define MAXSEEHASH 10007
 seen_region * seehash[MAXSEEHASH];
 
 void 

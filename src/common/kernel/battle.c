@@ -347,24 +347,23 @@ fbattlerecord(battle * b, faction * f, const char *s)
   msg_release(m);
 }
 
-boolean
-enemy(const side * as, const side * ds)
-{
-	switch(as->enemy[ds->index]) {
-	case E_ENEMY:
-	case E_ENEMY|E_ATTACKING:
-		return true;
-	default:
-		return false;
-	}
-}
+#define enemy(as, ds) (as->enemy[ds->index]&E_ENEMY)
 
 static void
 set_enemy(side * as, side * ds, boolean attacking)
 {
-	ds->enemy[as->index] |= E_ENEMY;
-	as->enemy[ds->index] |= E_ENEMY;
-	if (attacking) as->enemy[ds->index] |= E_ATTACKING;
+  int i;
+  for (i=0;i!=128;++i) {
+	if (ds->enemies[i]==NULL) ds->enemies[i]=as;
+	if (ds->enemies[i]==as) break;
+  }
+  for (i=0;i!=128;++i) {
+	if (as->enemies[i]==NULL) as->enemies[i]=ds;
+	if (as->enemies[i]==ds) break;
+  }
+  ds->enemy[as->index] |= E_ENEMY;
+  as->enemy[ds->index] |= E_ENEMY;
+  if (attacking) as->enemy[ds->index] |= E_ATTACKING;
 }
 
 #ifdef ALLIANCES
@@ -506,7 +505,6 @@ get_unitrow(const fighter * af)
   static size_t csize = 0;
 
   battle * b = af->side->battle;
-  void **si;
   int enemyfront = 0;
   int line, result;
   int retreat = 0;
@@ -530,17 +528,16 @@ get_unitrow(const fighter * af)
   else memset(counted, 0, bsize*sizeof(boolean));
   memset(size, 0, sizeof(size));
   for (line=FIRST_ROW;line!=NUMROWS;++line) {
+	int si;
     /* how many enemies are there in the first row? */
-    for (si = b->sides.begin; si != b->sides.end; ++si) {
-      side *s = *si;
-      if (s->size[line] && enemy(s, af->side))
-      {
-        void ** sf;
+    for (si=0;af->side->enemies[si];++si) {
+      side *s = af->side->enemies[si];
+      if (s->size[line]>0) {
+        int ai;
         enemyfront += s->size[line]; /* - s->nonblockers[line] (nicht, weil angreifer) */
-        for (sf = b->sides.begin; sf != b->sides.end; ++sf) {
-          side * ally = *sf;
-          if (!counted[ally->index] && enemy(s, ally) && !enemy(ally, af->side))
-          {
+        for (ai=0;s->enemies[ai];++ai) {
+          side * ally = s->enemies[ai];
+          if (!counted[ally->index] && !enemy(ally, af->side)) {
             int i;
             counted[ally->index] = true;
             for (i=0;i!=NUMROWS;++i) size[i] += ally->size[i] - ally->nonblockers[i];
