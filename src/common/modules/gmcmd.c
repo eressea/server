@@ -378,7 +378,7 @@ gm_skill(const char * str, void * data, const char * cmd)
 	} else if (skill==NOSKILL || skill==SK_MAGIC || skill==SK_ALCHEMY) {
 		/* unknown or not enough */
 		mistake(u, cmd, "Dieses Talent ist unbekannt, oder kann nicht erhöht werden.\n", 0);
-	} else if (num<0 || num>30) {
+	} else if (num<0 || num>30+SKILLPOINTS*4970) {
 		/* sanity check failed */
 		mistake(u, cmd, "Der gewählte Wert ist nicht zugelassen.\n", 0);
 	} else {
@@ -388,7 +388,11 @@ gm_skill(const char * str, void * data, const char * cmd)
 			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
+#if SKILLPOINTS
+			set_skill(to, skill, num*to->number);
+#else
 			set_level(to, skill, num);
+#endif
 		}
 	}
 }

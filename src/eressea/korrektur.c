@@ -2659,7 +2659,7 @@ korrektur(void)
 	do_once("idlo", fix_idleout());
 	do_once("szip", set_zip());
 	do_once("heal", heal_all());
-	do_once("fqco", fix_questcoors());
+	do_once("fquc", fix_questcoors());
 
 	/* seems something fishy is going on, do this just 
 	 * to be on the safe side: 

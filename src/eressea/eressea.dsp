@@ -120,5 +120,21 @@ SOURCE=.\korrektur.h
 
 SOURCE=.\main.c
 # End Source File
+# Begin Source File
+
+SOURCE="..\common\settings-eressea.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\common\settings-vinyambar-classic.h"
+# End Source File
+# Begin Source File
+
+SOURCE="..\common\settings-vinyambar.h"
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\settings.h
+# End Source File
 # End Target
 # End Project
