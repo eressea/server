@@ -22,7 +22,7 @@
 				Optimization="0"
 				ImproveFloatingPointConsistency="TRUE"
 				AdditionalIncludeDirectories="../util,../kernel,../..,.."
-				PreprocessorDefinitions="_WINDOWS,WIN32,_DEBUG"
+				PreprocessorDefinitions="_WINDOWS,WIN32"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
 				DisableLanguageExtensions="TRUE"

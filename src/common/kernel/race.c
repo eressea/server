@@ -262,7 +262,6 @@ give_starting_equipment(struct region *r, struct unit *u)
 		{
 			ship *sh = new_ship(st_find("boat"), u->faction->locale, r);
 			sh->size = sh->type->construction->maxsize;
-			addlist(&r->ships, sh);
 			u->ship = sh;
 			fset(u, UFL_OWNER);
 		}

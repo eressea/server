@@ -1007,8 +1007,6 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want)
 
   sh = new_ship(newtype, u->faction->locale, r);
 
-  addlist(&r->ships, sh);
-
   leave(r, u);
   u->ship = sh;
   fset(u, UFL_OWNER);

@@ -82,7 +82,6 @@ xe_giveballon(unit *u, struct order *ord)
 	sh = new_ship(st_find("balloon"), u2->faction->locale, u2->region);
 	sh->size = 5;
 	set_string(&sh->name,"Xontormia-Ballon");
-	addlist(&u2->region->ships, sh);
 	leave(u2->region, u2);
 	u2->ship = sh;
 	fset(u2, UFL_OWNER);

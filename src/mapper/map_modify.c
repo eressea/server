@@ -531,8 +531,6 @@ NeuesSchiff(region * r)
 	wrefresh(win);
 
 	s = new_ship(stype[q], default_locale, r);
-	/* Ist das richtig so, Henning? */
-	addlist(&r->ships, s);
 	s->region = r;
 
 	strcpy(buf, my_input(win, 2, 2, "Name: ", NULL));

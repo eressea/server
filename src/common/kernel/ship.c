@@ -178,6 +178,7 @@ new_ship(const ship_type * stype, const struct locale * lang, region * r)
 	set_string(&sh->name, buffer);
 	set_string(&sh->display, "");
 	shash(sh);
+  addlist(&r->ships, sh);
 	return sh;
 }
 

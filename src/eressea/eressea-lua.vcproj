@@ -149,6 +149,7 @@
 				ImproveFloatingPointConsistency="TRUE"
 				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
 				PreprocessorDefinitions="_CONSOLE,WIN32"
+				StringPooling="TRUE"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
 				DisableLanguageExtensions="FALSE"

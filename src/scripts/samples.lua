@@ -2,6 +2,7 @@ function mkunit(f, r, num)
   u = add_unit(f, r)
   u.number = num
   u:add_item("money", num*10)
+  u:clear_orders()
   return u
 end
 
@@ -11,8 +12,8 @@ function test_movement()
 
   -- im westen ohne strassen
   ocean = terraform(-3, 0, "ocean")
-  terraform(-2, 0, "plain")
-  terraform(-1, 0, "plain")
+  w2 = terraform(-2, 0, "plain")
+  w1 = terraform(-1, 0, "plain")
 
   -- im osten mit strassen
   r0 = terraform(0, 0, "plain")
@@ -30,33 +31,64 @@ function test_movement()
   r3:set_road(east, 1.0)
   r4:set_road(west, 1.0)
 
-  orcs = add_faction("enno@eressea.de", "orc", "de")
+  orcs = add_faction("orcs@eressea.de", "orc", "de")
   orcs.age = 20
 
-  bugs = add_faction("enno@eressea.de", "insect", "de")
+  aqua = add_faction("aqua@eressea.de", "aquarian", "de")
+  aqua.age = 20
+
+  bugs = add_faction("bugz@eressea.de", "insect", "de")
   bugs.age = 20
 
   orc = mkunit(orcs, r0, 10)
   orc:add_item("horse", orc.number*3)
   orc:set_skill("sk_riding", 10)
 
+  -- schiffe zum abtreiben:
+  ships = {}
+  for i = 1, 100 do
+    ships[i] = add_ship("boat", ocean)
+  end
+
   foot = mkunit(orcs, r0, 1)
-
-  ship = add_ship("boat", r0)
-  sail = mkunit(orcs, r0, 1)
-  sail.ship = ship
-
-  bug = mkunit(bugs, r0, 1)
-
-  sail:clear_orders()
-  sail:add_order("NACH O")
-  sail:add_order("NUMMER EINHEIT saiL")
-
-  foot:clear_orders()
   foot:add_order("ROUTE W W")
   foot:add_order("NUMMER EINHEIT foot")
 
-  orc:clear_orders()
+  watch = mkunit(orcs, w2, 1)
+
+  ship = add_ship("boat", ocean)
+  cptn = mkunit(aqua, ocean, 1)
+  cptn.ship = ship
+  cptn:add_order("NACH O")
+  cptn:add_order("NUMMER EINHEIT cptn")
+  cptn:add_order("BENENNE EINHEIT Landungsleiter")
+  cptn:add_order("BENENNE PARTEI Meermenschen")
+
+  swim = mkunit(aqua, ocean, 1)
+  swim.ship = ship
+  swim:add_order("NACH O")
+  swim:add_order("NUMMER EINHEIT swim")
+  swim:add_order("BENENNE EINHEIT Landungstruppe")
+
+  -- ein schiff im landesinneren
+  ship = add_ship("boat", r0)
+  sail = mkunit(aqua, r0, 1)
+  sail.ship = ship
+
+  crew = mkunit(aqua, r0, 1)
+  crew.ship = ship
+
+  bug = mkunit(bugs, r0, 1)
+
+  crew:add_order("NACH O")
+  crew:add_order("NUMMER EINHEIT crew")
+  crew:add_order("BENENNE EINHEIT Aussteiger")
+  crew:add_order("NUMMER PARTEI aqua")
+
+  sail:add_order("NACH O")
+  sail:add_order("NUMMER EINHEIT saiL")
+  sail:add_order("BENENNE EINHEIT Aussteiger")
+
   orc:add_order("NUMMER PARTEI orcs")
   orc:add_order("NUMMER EINHEIT orc")
   orc:add_order("BENENNE EINHEIT Orks")
@@ -65,7 +97,6 @@ function test_movement()
   orc:add_order("GIB 0 ALLES Holz")
   orc:add_order("TRANSPORTIEREN " .. itoa36(bug.id))
 
-  bug:clear_orders()
   bug:add_order("NUMMER PARTEI bugs")
   bug:add_order("NUMMER EINHEIT bug")
   bug:add_order("BENENNE EINHEIT Käfer")
@@ -355,3 +386,25 @@ run_scripts()
 process_orders()
 write_reports() 
 
+if swim.region==ocean then
+  print "ERROR: Meermenschen können nicht anschwimmen"
+end
+if sail.region~=r0 then
+  print "ERROR: Kapitän kann Schiff mit NACH ohne VERLASSE verlassen"
+end
+if crew.region==r0 then
+  print "ERROR: Einheiten kann Schiff nicht mit NACH ohne VERLASSE verlassen"
+end
+drift = false
+for i = 1, 100 do
+  if ships[i].region ~= ocean then
+    drift = true
+    break
+  end
+end
+if not drift then
+  print "ERROR: Unbemannte Schiffe treiben nicht ab"
+end
+if foot.region ~= w1 then
+  print "ERROR: Fusseinheit hat ihr NACH nicht korrekt ausgeführt"
+end

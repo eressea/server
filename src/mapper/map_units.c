@@ -61,7 +61,6 @@ SpecialFunctionUnit(unit *u)
 	case 'B':
 		{
 			ship *sh = new_ship(st_find("balloon"), u->faction->locale, u->region);
-			addlist(&u->region->ships, sh);
 			set_string(&sh->name, "Ballon");
 			set_string(&sh->display, "Eine große leuchtendrote Werbeaufschrift "
 					"für den Xontormia Express prangt auf einer Seite des Luftgefährts.");
