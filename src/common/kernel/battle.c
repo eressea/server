@@ -3290,74 +3290,72 @@ battle_report(battle * b)
 static void
 join_allies(battle * b)
 {
-	region * r = b->region;
-	unit * u;
-	/* Die Anzahl der Teilnehmer kann sich in dieser Routine ändern.
-	 * Deshalb muß das Ende des Vektors vorher gemerkt werden, damit
-	 * neue Parteien nicht mit betrachtet werden:
-	 */
-	int size = cv_size(&b->sides);
-	for (u=r->units;u;u=u->next)
-		/* Was ist mit Schiffen? */
-		if (u->status != ST_FLEE && u->status != ST_AVOID && !fval(u, UFL_LONGACTION) && u->number > 0)
-	{
-		int si;
-		faction * f = u->faction;
-		fighter * c = NULL;
-		for (si = 0; si != size; ++si) {
-			int se;
-			side *s = b->sides.begin[si];
-			/* Wenn alle attackierten noch FFL_NOAID haben, dann kämpfe nicht mit. */
-			if (fval(s->bf->faction, FFL_NOAID)) continue;
-			if (s->bf->faction!=f) {
-				/* Wenn wir attackiert haben, kommt niemand mehr hinzu: */
-				if (s->bf->attacker) continue;
-				/* Wenn alliierte attackiert haben, helfen wir nicht mit: */
-				if (s->bf->faction!=f && s->bf->attacker) continue;
-				/* alliiert müssen wir schon sein, sonst ist's eh egal : */
-				if (!alliedunit(u, s->bf->faction, HELP_FIGHT)) continue;
-				/* wenn die partei verborgen ist, oder gar eine andere
-				 * vorgespiegelt wird, und er sich uns gegenüber nicht zu
-				 * erkennen gibt, helfen wir ihm nicht */
-				if (s->stealthfaction){
-					if(!allysfm(s, u->faction, HELP_FSTEALTH)) {
-						continue;
-					}
-				}
-			}
-			/* einen alliierten angreifen dürfen sie nicht, es sei denn, der
-			 * ist mit einem alliierten verfeindet, der nicht attackiert
-			 * hat: */
-			for (se = 0; se != size; ++se) {
-				side * evil = b->sides.begin[se];
-				if (u->faction==evil->bf->faction) continue;
-				if (alliedunit(u, evil->bf->faction, HELP_FIGHT) &&
-					!evil->bf->attacker) continue;
-				if (enemy(s, evil)) break;
-			}
-			if (se==size) continue;
-			/* Wenn die Einheit belagert ist, muß auch einer der Alliierten belagert sein: */
-			if (besieged(u)) {
-				void ** fi;
-				boolean siege = false;
-				for (fi = s->fighters.begin; !siege && fi != s->fighters.end; ++fi) {
-					fighter *ally = *fi;
-					if (besieged(ally->unit)) siege = true;
-				}
-				if (!siege) continue;
-			}
-			/* keine Einwände, also soll er mitmachen: */
-			if (!c) c = join_battle(b, u, false);
-			if (!c) continue;
-			/* Die Feinde meiner Freunde sind meine Feinde: */
-			for (se = 0; se != size; ++se) {
-				side * evil = b->sides.begin[se];
-				if (evil->bf->faction!=u->faction && enemy(s, evil)) {
-					set_enemy(evil, c->side, false);
-				}
-			}
-		}
-	}
+  region * r = b->region;
+  unit * u;
+  /* Die Anzahl der Teilnehmer kann sich in dieser Routine ändern.
+  * Deshalb muß das Ende des Vektors vorher gemerkt werden, damit
+  * neue Parteien nicht mit betrachtet werden:
+  */
+  int size = cv_size(&b->sides);
+  for (u=r->units;u;u=u->next)
+    /* Was ist mit Schiffen? */
+    if (u->status != ST_FLEE && u->status != ST_AVOID && !fval(u, UFL_LONGACTION) && u->number > 0)
+    {
+      int si;
+      faction * f = u->faction;
+      fighter * c = NULL;
+      for (si = 0; si != size; ++si) {
+        int se;
+        side *s = b->sides.begin[si];
+        /* Wenn alle attackierten noch FFL_NOAID haben, dann kämpfe nicht mit. */
+        if (fval(s->bf->faction, FFL_NOAID)) continue;
+        if (s->bf->faction!=f) {
+          /* Wenn wir attackiert haben, kommt niemand mehr hinzu: */
+          if (s->bf->attacker) continue;
+          /* alliiert müssen wir schon sein, sonst ist's eh egal : */
+          if (!alliedunit(u, s->bf->faction, HELP_FIGHT)) continue;
+          /* wenn die partei verborgen ist, oder gar eine andere
+          * vorgespiegelt wird, und er sich uns gegenüber nicht zu
+          * erkennen gibt, helfen wir ihm nicht */
+          if (s->stealthfaction){
+            if(!allysfm(s, u->faction, HELP_FSTEALTH)) {
+              continue;
+            }
+          }
+        }
+        /* einen alliierten angreifen dürfen sie nicht, es sei denn, der
+        * ist mit einem alliierten verfeindet, der nicht attackiert
+        * hat: */
+        for (se = 0; se != size; ++se) {
+          side * evil = b->sides.begin[se];
+          if (u->faction==evil->bf->faction) continue;
+          if (alliedunit(u, evil->bf->faction, HELP_FIGHT) &&
+            !evil->bf->attacker) continue;
+          if (enemy(s, evil)) break;
+        }
+        if (se==size) continue;
+        /* Wenn die Einheit belagert ist, muß auch einer der Alliierten belagert sein: */
+        if (besieged(u)) {
+          void ** fi;
+          boolean siege = false;
+          for (fi = s->fighters.begin; !siege && fi != s->fighters.end; ++fi) {
+            fighter *ally = *fi;
+            if (besieged(ally->unit)) siege = true;
+          }
+          if (!siege) continue;
+        }
+        /* keine Einwände, also soll er mitmachen: */
+        if (!c) c = join_battle(b, u, false);
+        if (!c) continue;
+        /* Die Feinde meiner Freunde sind meine Feinde: */
+        for (se = 0; se != size; ++se) {
+          side * evil = b->sides.begin[se];
+          if (evil->bf->faction!=u->faction && enemy(s, evil)) {
+            set_enemy(evil, c->side, false);
+          }
+        }
+      }
+    }
 }
 
 extern struct item_type * i_silver;

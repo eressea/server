@@ -117,8 +117,8 @@ faction_setpolicy(faction& a, faction& b, const char * flag, bool value)
 
   for (mode=0;helpmodes[mode].name!=NULL;++mode) {
     if (strcmp(flag, helpmodes[mode].name)==0) {
-      if (value) set_alliance(&a, &b, get_alliance(&a, &b) | mode);
-      else set_alliance(&a, &b, get_alliance(&a, &b) & ~mode);
+      if (value) set_alliance(&a, &b, get_alliance(&a, &b) | helpmodes[mode].status);
+      else set_alliance(&a, &b, get_alliance(&a, &b) & ~helpmodes[mode].status);
       break;
     }
   }
