@@ -73,10 +73,9 @@ age_undead(unit *u)
 		for (m = u->number; m; m--)
 			if (rand() % 100 < UNDEAD_BREAKUP_FRACTION)
 				n++;
-		u2 = make_undead_unit(r, findfaction(MONSTER_FACTION), 0, new_race[RC_UNDEAD]);
+		u2 = create_unit(r, findfaction(MONSTER_FACTION), 0, new_race[RC_UNDEAD], 0, NULL, u);
+    make_undead_unit(u2);
 		transfermen(u, u2, u->number - n);
-		u2->building = u->building;
-		u2->ship = u->ship;
 	}
 }
 

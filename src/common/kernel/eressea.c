@@ -2543,16 +2543,12 @@ init_used_faction_ids(void)
 }
 
 
-unit *
-make_undead_unit(region * r, faction * f, int n, const struct race * rc)
+void
+make_undead_unit(unit * u)
 {
-	unit *u;
-
-	u = createunit(r, f, n, rc);
 	set_order(&u->lastorder, NULL);
 	name_unit(u);
 	fset(u, UFL_ISNEW);
-	return u;
 }
 
 void

@@ -3817,7 +3817,6 @@ do_battle(void)
             */
             switch (u->status) {
               case ST_FLEE:
-                run = true;
                 break;
               default:
                 if ((fig->person[dt.index].flags & FL_HIT) == 0) continue;

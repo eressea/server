@@ -762,16 +762,13 @@ sp_shadowcall(fighter * fi, int level, double power, spell * sp)
 		break;
 	}
 	
-	u = createunit(r, mage->faction, force, rc);
+	u = create_unit(r, mage->faction, force, rc, 0, NULL, mage);
 	u->status = ST_FIGHT;
 
 	set_string(&u->name, racename(mage->faction->locale, u, u->race));
 	set_level(u, SK_WEAPONLESS, (int)(power/2));
 	set_level(u, SK_AUSDAUER, (int)(power/2));
 	u->hp = u->number * unit_max_hp(u);
-
-	if (fval(mage, UFL_PARTEITARNUNG))
-		fset(u, UFL_PARTEITARNUNG);
 
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 0;
@@ -793,7 +790,7 @@ sp_wolfhowl(fighter * fi, int level, double power, spell * sp)
 	unit *mage = fi->unit;
 	attrib *a;
 	int force = (int)(get_force(power, 3)/2);
-	unit *u = createunit(r, mage->faction, force, new_race[RC_WOLF]);
+	unit *u = create_unit(r, mage->faction, force, new_race[RC_WOLF], 0, NULL, mage);
 	unused(sp);
 
 	u->status = ST_FIGHT;
@@ -830,7 +827,7 @@ sp_shadowknights(fighter * fi, int level, double power, spell * sp)
 
 	unused(sp);
 
-	u = createunit(r, mage->faction, force, new_race[RC_SHADOWKNIGHT]);
+	u = create_unit(r, mage->faction, force, new_race[RC_SHADOWKNIGHT], 0, NULL, mage);
 	u->status = ST_FIGHT;
 
 	set_string(&u->name, "Schattenritter");
@@ -1730,7 +1727,7 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
       }
 
       if (j > 0) {
-        unit * u = createunit(r, mage->faction, 0, new_race[RC_UNDEAD]);
+        unit * u = create_unit(r, mage->faction, 0, new_race[RC_UNDEAD], 0, NULL, mage);
 
         /* new units gets some stats from old unit */
         set_string(&u->name, du->name);

@@ -248,7 +248,7 @@ expandrecruit(region * r, request * recruitorders)
 				u->hp = u->n * unit_max_hp(u);
 				unew = u;
 			} else {
-				unew = createunit(r, u->faction, u->n, u->race);
+				unew = create_unit(r, u->faction, u->n, u->race, 0, NULL, u);
 			}
 
 			if (unew->race == new_race[RC_URUK]) {

@@ -920,7 +920,7 @@ extern int findoption(const char *s, const struct locale * lang);
 extern char buf[BUFSIZE + 1];
 
 /* special units */
-struct unit *make_undead_unit(struct region * r, struct faction * f, int n, const struct race * rc);
+void make_undead_unit(struct unit *);
 
 extern struct region *regions;
 extern struct faction *factions;

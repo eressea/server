@@ -614,7 +614,7 @@ sp_summon_familiar(castorder *co)
 		target_region = rconnect(r,d);
 	}
 
-	familiar = createunit(target_region, mage->faction, 1, rc);
+	familiar = create_unit(target_region, mage->faction, 1, rc, 0, NULL, mage);
 	if (target_region==mage->region) {
 		familiar->building = mage->building;
 		familiar->ship = mage->ship;
@@ -3225,11 +3225,7 @@ sp_unholypower(castorder *co)
 			/* Verletzungsanteil der transferierten Personen berechnen */
 			wounds = wounds*n/u->number;
 
-			un = createunit(co->rt, u->faction, 0, target_race);
-			if (co->rt==u->region) {
-				un->building = u->building;
-				un->ship = u->ship;
-			}
+			un = create_unit(co->rt, u->faction, 0, target_race, 0, NULL, u);
 			transfermen(u, un, n);
 			un->hp = unit_max_hp(un)*n - wounds;
 			ADDMSG(&co->rt->msgs, msg_message("unholypower_limitedeffect",
@@ -3502,13 +3498,7 @@ sp_summonshadow(castorder *co)
 	unit *u;
 	int val;
 
-	u = createunit(r, mage->faction, (int)(force*force), new_race[RC_SHADOW]);
-	if (r==mage->region) {
-		u->building = mage->building;
-		u->ship = mage->ship;
-	}
-	if (fval(mage, UFL_PARTEITARNUNG))
-		fset(u, UFL_PARTEITARNUNG);
+	u = create_unit(r, mage->faction, (int)(force*force), new_race[RC_SHADOW], 0, NULL, mage);
 
 	/* Bekommen Tarnung = (Magie+Tarnung)/2 und Wahrnehmung 1. */
 	val = get_level(mage, SK_MAGIC) + get_level(mage, SK_STEALTH);
@@ -3549,13 +3539,7 @@ sp_summonshadowlords(castorder *co)
 	int cast_level = co->level;
 	double force = co->force;
 
-	u = createunit(r, mage->faction, (int)(force*force), new_race[RC_SHADOWLORD]);
-	if (r==mage->region) {
-		u->building = mage->building;
-		u->ship = mage->ship;
-	}
-	if (fval(mage, UFL_PARTEITARNUNG))
-		fset(u, UFL_PARTEITARNUNG);
+	u = create_unit(r, mage->faction, (int)(force*force), new_race[RC_SHADOWLORD], 0, NULL, mage);
 
 	/* Bekommen Tarnung = Magie und Wahrnehmung 5. */
 	set_level(u, SK_STEALTH, get_level(mage, SK_MAGIC));
@@ -3786,13 +3770,8 @@ sp_summonundead(castorder *co)
 		race = new_race[RC_GHOUL];
 	}
 
-	u = make_undead_unit(r, mage->faction, undead, race);
-	if (r==mage->region) {
-		u->building = mage->building;
-		u->ship = mage->ship;
-	}
-	if (fval(mage, UFL_PARTEITARNUNG))
-		fset(u, UFL_PARTEITARNUNG);
+	u = create_unit(r, mage->faction, undead, race, 0, NULL, mage);
+  make_undead_unit(u);
 
 	sprintf(buf, "%s erweckt %d Untote aus ihren Gräbern.",
 			unitname(mage), undead);
@@ -5432,14 +5411,9 @@ sp_clonecopy(castorder *co)
 		return 0;
 	}
 
-	clone = createunit(target_region, mage->faction, 1, new_race[RC_CLONE]);
-	if (target_region==mage->region) {
-		clone->building = mage->building;
-		clone->ship = mage->ship;
-	}
+  sprintf(buf, "Klon von %s", unitname(mage));
+	clone = create_unit(target_region, mage->faction, 1, new_race[RC_CLONE], 0, buf, mage);
 	clone->status = ST_FLEE;
-	sprintf(buf, "Klon von %s", unitname(mage));
-	set_string(&clone->name, buf);
 	fset(clone, UFL_LOCKED);
 
 	create_newclone(mage, clone);
@@ -5485,7 +5459,7 @@ sp_dreamreading(castorder *co)
       return 0;
   }
 
-  u2=createunit(u->region,mage->faction, RS_FARVISION, new_race[RC_SPELL]);
+  u2 = createunit(u->region,mage->faction, RS_FARVISION, new_race[RC_SPELL]);
   set_number(u2, 1);
   set_string(&u2->name, "sp_dreamreading");
   u2->age  = 2;   /* Nur für diese Runde. */
