@@ -1128,7 +1128,7 @@ unitlist_insert(struct unit_list **ul, struct unit *u)
   *ul = rl2;
 }
 
-#if HEROES == 1
+#ifdef HEROES
 int 
 maxheroes(const struct faction * f)
 {
