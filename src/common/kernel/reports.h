@@ -56,14 +56,6 @@ char *translate_regions(const char *st, const struct faction * f);
 
 char *replace_global_coords(const char *s, const struct faction * f);
 
-#ifdef USE_MERIAN
-#ifdef FAST_REGION
-void merian(FILE * out, struct faction *f);
-#else
-void merian(FILE * out, vset* regs, struct faction *f);
-#endif
-#endif
-
 char *f_regionid(const struct region *r, const struct faction *f);
 
 /* für fast_region und neuen CR: */

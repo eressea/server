@@ -25,6 +25,7 @@
 
 /* kernel includes */
 #include "border.h"
+#include "building.h"
 #include "curse.h"
 #include "faction.h"
 #include "item.h"
@@ -32,6 +33,7 @@
 #include "plane.h"
 #include "region.h"
 #include "resources.h"
+#include "unit.h"
 
 /* util includes */
 #include <resolve.h>
@@ -1090,4 +1092,24 @@ r_addmessage(struct region * r, const struct faction * viewer, struct message * 
 	return add_message(&imsg->msgs, msg);
 }
 
-
+struct unit * 
+region_owner(const struct region * r)
+{
+#ifdef REGIONOWNERS
+  struct unit * owner = NULL;
+  int maxsize = 0;
+  building * b = r->buildings;
+  for (;b!=NULL;b=b->next) {
+    if (b->size>maxsize) {
+      unit * u = buildingowner(r, b);
+      if (u) {
+        owner = u;
+        maxsize=b->size;
+      }
+    }
+  }
+  return owner;
+#else
+  return NULL;
+#endif
+}

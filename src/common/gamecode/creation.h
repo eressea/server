@@ -31,6 +31,5 @@ void listnames(void);
 void writemap(FILE * F, int mode);
 
 void regionspells(void);
-void moveunit(void);
 
 #endif

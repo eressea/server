@@ -143,6 +143,19 @@ static attrib_type at_driveweight = {
 	"driveweight", NULL, NULL, NULL, NULL, NULL
 };
 
+static boolean
+entrance_allowed(const struct unit * u, const struct region * r)
+{
+#ifdef REGIONOWNERS
+  unit * owner = region_owner(r);
+  if (owner==NULL || u->faction==owner->faction) return true;
+  if (alliedunit(owner, u->faction, HELP_TRAVEL)) return true;
+  if (is_enemy(u->faction, owner->faction)) return true;
+  return false;
+#endif
+  return true;
+}
+
 int
 personcapacity(const unit *u)
 {
@@ -1073,6 +1086,11 @@ travel(region * first, unit * u, region * next, int flucht)
 				ADDMSG(&u->faction->msgs, msg_message("leavefail", 
 					"unit region", u, next));
 			}
+      if (!entrance_allowed(u, next)) {
+				ADDMSG(&u->faction->msgs, msg_message("regionowned", 
+					"unit region target", u, current, next));
+				break;
+      }
 			if ((wache = bewegung_blockiert_von(u, current)) != (unit *) NULL
 				&& gereist != 0)
 			{

@@ -1182,7 +1182,14 @@ set_ally(unit * u, strlist * S)
 			sf->status = HELP_ALL;
 		break;
 
-	case P_GIB:
+	case P_TRAVEL:
+		if (not_kw == P_NOT)
+			sf->status = sf->status & (HELP_ALL - HELP_TRAVEL);
+		else
+			sf->status = sf->status | HELP_TRAVEL;
+		break;
+
+  case P_GIB:
 		if (not_kw == P_NOT)
 			sf->status = sf->status & (HELP_ALL - HELP_GIVE);
 		else

@@ -163,10 +163,16 @@ struct xml_stack;
 #define CURSETYPE_VERSION 312
 #define ALLIANCES_VERSION 313
 #define DBLINK_VERSION 314
+#define REGIONOWNERS_VERSION 315
 
 #define MIN_VERSION TYPES_VERSION
 #define UGROUPS_VERSION 400 /* nicht aktivieren, nicht fertig */
-#define RELEASE_VERSION ALLIANCES_VERSION
+
+#ifdef REGIONOWNERS
+# define RELEASE_VERSION REGIONOWNERS_VERSION
+#else
+# define RELEASE_VERSION DBLINK_VERSION
+#endif
 
 /*
 #if RELEASE_VERSION >= UGROUPS_VERSION
@@ -495,6 +501,7 @@ enum {
 	P_GEBAEUDE,
 	P_GIB,
 	P_KAEMPFE,
+  P_TRAVEL,
 	P_GUARD,
 	P_ZAUBER,
 	P_PAUSE,
@@ -828,8 +835,9 @@ enum {
 #define HELP_OBSERVE   4			/* Bei Wahrnehmung mithelfen */
 #define HELP_GIVE      8			/* Dinge annehmen ohne KONTAKTIERE */
 #define HELP_GUARD    16			/* Laesst Steuern eintreiben etc. */
-#define HELP_FSTEALTH 32			/* Laesst Steuern eintreiben etc. */
-#define HELP_ALL    (63-HELP_OBSERVE)		/* Alle "positiven" HELPs zusammen */
+#define HELP_FSTEALTH 32			/* Parteitarnung anzeigen. */
+#define HELP_TRAVEL   64			/* Laesst Regionen betreten. */
+#define HELP_ALL    (127-HELP_OBSERVE)		/* Alle "positiven" HELPs zusammen */
 /* HELP_OBSERVE deaktiviert */
 /* ------------------------------------------------------------- */
 /* Prototypen */

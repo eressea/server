@@ -5393,17 +5393,22 @@
 		</locale>
 	</message>
 
-	<message name="moveblockedbyguard">
+	<message name="regionowned" section="movement">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="target" type="region"></arg>
+		</type>
+		<text locale="de">"$unit($unit) konnte nicht von $region($region) nach $region($target) reisen, da der Besitzer der Region es verhinderte."</text>
+	</message>
+
+	<message name="moveblockedbyguard" section="movement">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="guard" type="unit"></arg>
 		</type>
-		<locale name="de">
-			<nr section="movement">
-				<text>"$unit($unit) wurde in $region($region) von $unit($guard) aufgehalten."</text>
-			</nr>
-		</locale>
+		<text locale="de">"$unit($unit) wurde in $region($region) von $unit($guard) aufgehalten."</text>
 	</message>
 
 	<message name="sailfail">
@@ -7730,20 +7735,12 @@
 		<text locale="en">"($int36($id))"</text>
 	</message>
 	
-	<message name="mallorn_effect">
+	<message name="mallorn_effect" section="magic">
 		<type>
 			<arg name="mage" type="unit"></arg>
 		</type>
-		<locale name="de">
-			<nr section="magic">
-				<text>"$unit($mage) läßt einen Teil seiner selbst in die Erde fliessen. Die Bäume, die Transformation überlebt haben, erscheinen nun viel kräftiger."</text>
-			</nr>
-		</locale>
-		<locale name="en">
-			<nr section="magic">
-				<text>"The power of $unit($mage) flows into the region and the trees which survived the spell appear stronger now."</text>
-			</nr>
-		</locale>
+		<text locale="de">"$unit($mage) läßt einen Teil seiner selbst in die Erde fliessen. Die Bäume, die Transformation überlebt haben, erscheinen nun viel kräftiger."</text>
+		<text locale="en">"The power of $unit($mage) flows into the region and the trees which survived the spell appear stronger now."</text>
 	</message>
 
 </messages>

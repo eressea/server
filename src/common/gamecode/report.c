@@ -12,7 +12,6 @@
  * prior permission by the authors of Eressea.
  */
 
-#define FAST_SEEN 0
 #define INDENT 0
 
 #include <config.h>
@@ -1672,6 +1671,10 @@ show_allies(const faction * f, const ally * allies)
 			for (h = 1; h < HELP_ALL; h *= 2) {
 				if ((mode & h) == h)
 					switch (h) {
+					case HELP_TRAVEL:
+						scat("Durchreise");
+						hh = 1;
+						break;
 					case HELP_MONEY:
 						scat("Silber");
 						hh = 1;
@@ -2574,52 +2577,6 @@ seen_done(void)
 	}
 }
 
-#if FAST_SEEN
-static void
-init_intervals()
-{
-	region * r;
-	for (r=regions;r;r=r->next) {
-		unit * u;
-		attrib * a;
-		for (a=a_find(r->attribs, &at_travelunit);a;a=a->nexttype) {
-			unit * v = (unit*)a->data.v;
-			faction * f = v->faction;
-			if (!f) continue;
-			if (!f->first)
-			{
-				assert(!f->last);
-				f->first = r;
-			}
-			f->last = r->next;
-		}
-		for (a=a_find(r->attribs, &at_lighthouse);a;a=a->nexttype) {
-			building * b = (building*)a->data.v;
-			region * br = b->region;
-			if (!b->region) continue;
-			for (u=br->units;u;u=u->next) {
-				faction * f = u->faction;
-				if (!f->first)
-				{
-					assert(!f->last);
-					f->first = r;
-				}
-				f->last = r->next;
-			}
-		}
-		for (u=r->units;u;u=u->next) {
-			faction * f = u->faction;
-			if (!f->first)
-			{
-				assert(!f->last);
-				f->first = r;
-			}
-			f->last = r->next;
-		}
-	}
-}
-#endif
-
 seen_region *
 find_seen(const region * r)
 {
@@ -2919,9 +2876,6 @@ reports(void)
 	printf("\n");
 
 	report_donations();
-#if FAST_SEEN
-	init_intervals();
-#endif
 	remove_empty_units();
 	log_printf("Report timestamp - %s\n", pzTime);
 	for (f = factions; f; f = f->next) {

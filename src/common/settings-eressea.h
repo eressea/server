@@ -43,6 +43,7 @@
 #define NEWATSROI 0
 
 #define CHECK_OVERLOAD_ON_ENTER
+#undef REGIONOWNERS
 
 #define MUSEUM_MODULE
 #define ARENA_MODULE

@@ -1626,6 +1626,10 @@
 	<string name="KRÄUTER">
 		<text locale="de">KRÄUTER</text>
 	</string>
+	<string name="DURCHREISE">
+		<text locale="de">DURCHREISE</text>
+		<text locale="en">TRAVEL</text>
+	</string>
 	<string name="KÄMPFE">
 		<text locale="de">KÄMPFE</text>
 	</string>

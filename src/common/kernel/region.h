@@ -218,4 +218,6 @@ extern int production(const struct region *r);
 extern int read_region_reference(struct region ** r, FILE * F);
 extern void write_region_reference(const struct region * r, FILE * F);
 
+extern struct unit * region_owner(const struct region * r);
+
 #endif /* _REGION_H */

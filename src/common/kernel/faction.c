@@ -289,3 +289,40 @@ destroyfaction(faction * f)
 	}
 }
 
+#ifdef REGIONOWNERS
+boolean
+is_enemy(const struct faction * f, const struct faction * enemy)
+{
+  struct faction_list * flist = f->enemies;
+  for (;flist!=NULL;flist=flist->next) {
+    if (flist->data==enemy) return true;
+  }
+  return false;
+}
+
+void
+add_enemy(struct faction * f, struct faction * enemy)
+{
+  if (!is_enemy(f, enemy)) {
+    struct faction_list * flist = malloc(sizeof(faction_list));
+    flist->next = f->enemies;
+    flist->data = enemy;
+    f->enemies = flist;
+  }
+}
+
+void
+remove_enemy(struct faction * f, const struct faction * enemy)
+{
+  struct faction_list **pflist = &f->enemies;
+  while (*pflist!=NULL) {
+    struct faction_list * flist = *pflist;
+    if (flist->data==enemy) {
+      *pflist = flist->next;
+      free(flist);
+    } else {
+      pflist = &flist->next;
+    }
+  }
+}
+#endif

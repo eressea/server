@@ -151,6 +151,7 @@ const char *parameters[MAXPARAMS] =
 	"GEBÄUDE",
 	"GIB",			/* Für HELFE */
 	"KÄMPFE",
+	"DURCHREISE",
 	"BEWACHE",
 	"ZAUBER",
 	"PAUSE",
@@ -478,9 +479,6 @@ stripfaction (faction * f)
 	free(f->passw);
 	free(f->override);
 	free(f->name);
-#ifndef FAST_REGION
-	vset_destroy(&f->regions);
-#endif
 	while (f->attribs) a_remove (&f->attribs, f->attribs);
 	freelist(f->ursprung);
 	funhash(f);

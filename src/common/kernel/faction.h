@@ -62,12 +62,12 @@ typedef struct faction {
 #ifdef VICTORY_DELAY
 	unsigned char victory_delay;
 #endif
-#ifndef FAST_REGION
-	vset regions;
-#endif
 	struct unit * units;
 	struct attrib *attribs;
 	struct message_list * msgs;
+#ifdef REGIONOWNERS
+  struct faction_list * enemies;
+#endif
 	struct bmsg {
 		struct bmsg * next;
 		struct region * r;
@@ -88,5 +88,11 @@ extern struct unit * addplayer(struct region *r, const char *email,
 															 const struct locale *loc, int subscription);
 extern boolean checkpasswd(const faction * f, const char * passwd);
 extern void destroyfaction(faction * f);
+
+#ifdef REGIONOWNERS
+extern boolean is_enemy(const struct faction * f, const struct faction * enemy);
+extern void add_enemy(struct faction * f, struct faction * enemy);
+extern void remove_enemy(struct faction * f, const struct faction * enemy);
+#endif
 
 #endif
