@@ -29,9 +29,10 @@ CCFLAGS += -Wwrite-strings
 		   -Wno-char-subscripts
 		   ;
 
+# this require the latet luabind from CVS
+C++FLAGS += -DHAVE_LUABIND_B7 ;
 if $(HOST) = "hamunaptra" {
   XMLHDRS = /homes2/info-f/enno/software/hamunaptra/include/libxml2 ;
-  C++FLAGS += -DHAVE_LUABIND_B7 ;
 } else {
   XMLHDRS = /usr/include/libxml2 ;
 }
@@ -66,7 +67,7 @@ rule UsingLuabind
 
 rule UsingLua
 {
-   SubDirHdrs $(LUA_ROOT)/include ;
+   SubDirHdrs /usr/include/lua50 ;
 }
 
 rule TargetDirectory

@@ -7,6 +7,7 @@
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/message.h>
+#include <kernel/race.h>
 #include <kernel/unit.h>
 
 // util includes
@@ -166,6 +167,22 @@ faction_addnotice(faction& f, const char * str)
   ADDMSG(&f.msgs, msg_message("msg_event", "string", str));
 }
 
+static const char *
+faction_getrace(const faction& f)
+{
+  return f.race->_name[0];
+}
+
+static void
+faction_setrace(faction& f, const char * rcname)
+{
+  race * rc = rc_find(rcname);
+  if (rc!=NULL) {
+    f.race = rc;
+  }
+}
+
+
 void
 bind_faction(lua_State * L) 
 {
@@ -195,5 +212,6 @@ bind_faction(lua_State * L)
     .property("locale", &faction_locale)
     .property("units", &faction_units, return_stl_iterator)
     .property("alliance", &faction_getalliance, &faction_setalliance)
+    .property("race", &faction_getrace, &faction_setrace)
   ];
 }
