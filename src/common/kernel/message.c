@@ -209,7 +209,7 @@ parse_tagend(const struct xml_stack *stack, void *data)
 
 		/* add the messagetype */
 		mtype = mt_find(state->mtname);
-		if (!mtype) mtype = mt_register(mt_new(state->mtname, state->argv));
+		if (!mtype) mtype = mt_register(mt_new(state->mtname, (const char**)state->argv));
 		
 		while (state->argc--) {
 			free(state->argv[state->argc]); 
@@ -246,7 +246,7 @@ read_messages(FILE * F, const locale * lang)
 }
 
 static void
-arg_set(void * args[], const message_type * mtype, char * buffer, void * v)
+arg_set(void * args[], const message_type * mtype, const char * buffer, void * v)
 {
 	int i;
 	for (i=0;i!=mtype->nparameters;++i) {
