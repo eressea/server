@@ -66,7 +66,7 @@ def ShowInfo(custid, Password):
 
 	output=output+"</table></div>"
 
-	query = ("select games.name, races.name, subscriptions.status "+
+	query = ("select games.name, races.name, subscriptions.status, subscriptions.faction "+
 	  "from races, games, subscriptions "+
 	  "where subscriptions.race=races.race and subscriptions.game=games.id "+
 	  "and subscriptions.user="+str(custid)+" ");
@@ -74,7 +74,7 @@ def ShowInfo(custid, Password):
 	results = cursor.execute(query);
 
 	output=output+"<h3>Anmeldungen</h3>\n<div align=left><table width=80% border>\n"
-	output=output+"<tr><th>Spiel</th><th>Rasse</th><th>Status</th></tr>\n"
+	output=output+"<tr><th>Spiel</th><th>Rasse</th><th>Status</th><th>Partei</th></tr>\n"
 	while results>0:
 	    results = results - 1
 	    row = cursor.fetchone()
@@ -82,6 +82,7 @@ def ShowInfo(custid, Password):
 	    line = line + "<td align=left>"+row[0]+"</td>\n"
 	    line = line + "<td align=left>"+row[1]+"</td>\n"
 	    line = line + "<td align=left>"+row[2]+"</td>\n"
+	    line = line + "<td align=left>"+row[3]+"</td>\n"
 	    line = line + "</tr>\n"
 	    output=output+line
 
