@@ -2256,6 +2256,8 @@ follow(void)
 					switch (igetkeyword(o->s, u2->faction->locale)) {
 					case K_MOVE:
 					case K_ROUTE:
+					case K_DRIVE:
+					case K_FOLLOW:
 					case K_PIRACY:
 						fset(u, FL_FOLLOWING);
 						fset(u2, FL_FOLLOWED);

@@ -4455,13 +4455,19 @@
 			<text locale="de">Dieses Ritual segnet einen Steinkreis,
 				der zuvor aus Steinen und etwas Holz gebaut werden
 				muss. Die Segnung des Druiden macht aus dem Kreis
-				eine mächtige Stätte magischen Wirkens.
+				eine mächtige Stätte magischen Wirkens, die Schutz 
+				vor Magie und erhöhte Aura-Regeneration bewirkt. Man
+				sagt, Jungfrauen seien in der Umgebung von Steinkreisen
+				seltsame Wesen begegnet.
 			</text>
 			<text locale="en">This ritual blesses a circle of stones
 				that has to be constructed from stones and some wood
 				before. The druid's blessing turns the circle into a
 				place of great magic that is suitable for rituals of
-				all kinds.
+				all kinds. It protects from hostile magic and improves
+				aura regeneration. Virgins are said to have been 
+				visited by strange creatures in the vicinity of these 
+				places.
 			</text>
 		</string>
 		<string name="sparklechaos">
