@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: gmcmd.h,v 1.2 2001/01/30 20:02:06 enno Exp $
+ * $Id: gmcmd.h,v 1.3 2001/01/30 20:26:03 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -15,10 +15,10 @@
 struct attrib;
 struct unit;
 
-void init_gmcmd(void);
+extern void init_gmcmd(void);
 /* initialize this module */
 
-void gmcommands(void);
+extern void gmcommands(void);
 /* execute commands */
 
 

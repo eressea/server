@@ -135,7 +135,7 @@ publish-debug:: subdirs-debug
 publish-release:: subdirs-release
 publish-profile:: subdirs-profile
 
-publish-debug publish-release publish-profile:: $(BUILD_DIR)/$(LIBRARY) $(BUILD_DIR)/$(BINARY)
+publish-debug publish-release publish-profile:: $(PUBLISH_DIR)/$(LIBRARY) $(PUBLISH_DIR)/$(BINARY)
 
 clean:: $(BUILD_DIR) $(PUBLISH_DIR)
 	rm -fr Release-$(ARCHITECTURE)/* Debug-$(ARCHITECTURE)/* Profile-$(ARCHITECTURE)/*

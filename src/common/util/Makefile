@@ -14,3 +14,6 @@ include $(ERESSEA)/Makefile.include
 $(BUILD_DIR)/$(LIBRARY):: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 	$(INSTALL) $@ $(PUBLISH_DIR)/
+
+$(PUBLISH_DIR)/$(LIBRARY): $(BUILD_DIR)/$(LIBRARY)
+	$(INSTALL) $< $@

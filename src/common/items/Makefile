@@ -17,6 +17,9 @@ $(BUILD_DIR)/$(LIBRARY):: $(BUILD_DIR) $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 	$(INSTALL) $@ $(PUBLISH_DIR)/
 
+$(PUBLISH_DIR)/$(LIBRARY): $(BUILD_DIR)/$(LIBRARY)
+	$(INSTALL) $< $@
+
 # executable:
 #$(BUILD_DIR)/$(BINARY):: $(OBJECTS)
 #	$(LD) $(LDFLAGS) -o $@ $(OBJECTS)

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.4 2001/01/28 08:20:05 enno Exp $
+ *	$Id: main.c,v 1.5 2001/01/30 20:26:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -43,6 +43,7 @@
 #include <modules/museum.h>
 #include <modules/score.h>
 #include <modules/xmas2000.h>
+#include <modules/gmcmd.h>
 
 /* gamecode includes */
 #include <creation.h>
@@ -107,6 +108,9 @@ init_game(void)
 	init_weapons();
 	init_attributes();
 
+#ifdef USE_GM_COMMANDS
+	init_gmcmd();
+#endif
 	init_conversion();
 
 	init_museum();

@@ -204,7 +204,7 @@ gmcommands(void)
 			strlist * order;
 			for (order = u->orders; order; order = order->next)
 				if (igetkeyword(order->s) == K_GM) {
-					gm_command(u, order->s);
+					gm_command(order->s, u);
 				}			
 			if (u==*up) up = &u->next;
 		}
