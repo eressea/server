@@ -60,7 +60,7 @@ extern struct unit *kapitaen(struct region * r, struct ship * sh);
 extern void travelthru(struct unit * u, struct region * r);
 extern struct ship * move_ship(struct ship * sh, struct region * from, struct region * to, struct region ** route);
 
-extern void follow(void);
+extern void follow_unit(void);
 
 struct building_type;
 boolean buildingtype_exists(const struct region * r, const struct building_type * bt);

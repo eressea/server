@@ -1161,11 +1161,11 @@ readgame(const char * filename, int backup)
 		remove_empty_factions(false);
 	}
 
+#if 0
+  /* what is this doing here? ageing happens at the end of the turn. goddamn it. */
 	/* Regionen */
 	for (r=regions;r;r=r->next) {
-		building ** bp;
-#if 0
-    /* what is this doing here? ageing happens at the end of the turn. goddamn it. */
+    building ** bp;
 		unit ** up;
 		ship ** sp;
 
@@ -1192,8 +1192,8 @@ readgame(const char * filename, int backup)
 			if (b==*bp) handle_event(&b->attribs, "create", b);
 			if (b==*bp) bp = &(*bp)->next;
 		}
-#endif
 	}
+#endif
 
 	return 0;
 }

@@ -3569,8 +3569,8 @@ processorders (void)
 	puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (2.Versuch)");
 	do_misc(false);
 
-	puts(" - Folge setzen");
-	follow();
+	puts(" - Folge auf Einheiten ersetzen");
+	follow_unit();
 
 	if (turn == 0) srand(time((time_t *) NULL));
 	else srand(turn);

@@ -45,6 +45,7 @@
 
 /* util includes */
 #include <util/goodies.h>
+#include <util/language.h>
 #include <util/rand.h>
 
 /* libc includes */
@@ -1489,7 +1490,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 				}
 			}
 
-			if(move_on_land == false && rterrain(next_point) != T_OCEAN) {
+			if (move_on_land == false && rterrain(next_point) != T_OCEAN) {
 				break;
 			}
 
@@ -1730,9 +1731,13 @@ kapitaen(region * r, ship * sh)
 	return NULL;
 }
 
-/* Segeln, Wandern, Reiten */
-
-static void
+/* Segeln, Wandern, Reiten 
+ * when this routine returns a non-zero value, movement for the region needs 
+ * to be done again because of followers that got new MOVE orders. 
+ * Setting FL_LONGACTION will prevent a unit from being handled more than once
+ * by this routine 
+ */
+static int
 move(region * r, unit * u, boolean move_on_land)
 {
 	region *r2;
@@ -1742,7 +1747,7 @@ move(region * r, unit * u, boolean move_on_land)
 
 	if (!r2) {
 		cmistake(u, findorder(u, u->thisorder), 71, MSG_MOVE);
-		return;
+		return 0;
 	}
 	else if (u->ship && fval(u, UFL_OWNER))
 		route = sail(r, u, r2, move_on_land);
@@ -1760,16 +1765,16 @@ move(region * r, unit * u, boolean move_on_land)
 			}
 		}
 	}
-	set_string(&u->thisorder, "");
-	/* Für den Silberpool: Bewegung ist fertig, Silber darf abgezogen werden */
-	if (fval(u, UFL_FOLLOWED) && route && route[0]!=NODIRECTION) {
-		unit *up=r->units;
 
-		while (up) {
-			unit *un = up->next;
+  if (u->region!=r) fset(u, UFL_LONGACTION);
+  set_string(&u->thisorder, "");
 
+  if (fval(u, UFL_FOLLOWED) && route && route[0]!=NODIRECTION) {
+    int followers = 0;
+		unit *up; 
+    for (up=r->units;up;up=up->next) {
 			if (fval(up, UFL_FOLLOWING) && !fval(up, UFL_LONGACTION)) {
-				attrib * a = a_find(up->attribs, &at_follow);
+				const attrib * a = a_findc(up->attribs, &at_follow);
 				if (a && a->data.v==u) {
 					/* wir basteln ihm ein NACH */
 					int k, i = 0;
@@ -1779,13 +1784,13 @@ move(region * r, unit * u, boolean move_on_land)
 					set_string(&up->thisorder, buf);
 					k = igetkeyword(up->thisorder, up->faction->locale);
 					assert(k==K_MOVE);
-					move(r, up, true);
+ 					++followers;
 				}
 			}
-			up = un;
-		}
 	}
-	if (u->region!=r) fset(u, UFL_LONGACTION);
+	return followers;
+	}
+	   return 0;
 }
 
 typedef struct piracy_data {
@@ -1824,7 +1829,7 @@ mk_piracy(const faction * f, direction_t target_dir)
   return a;
 }
 
-static void
+static int
 piracy(unit *u)
 {
 	region *r = u->region;
@@ -1837,14 +1842,14 @@ piracy(unit *u)
 	boolean     all = true;
 	attrib      *a;
 
-	if(!sh) {
+	if (!sh) {
 		cmistake(u, findorder(u, u->thisorder), 144, MSG_MOVE);
-		return;
+		return 0;
 	}
 
-	if(!fval(u, UFL_OWNER)) {
+	if (!fval(u, UFL_OWNER)) {
 		cmistake(u, findorder(u, u->thisorder), 46, MSG_MOVE);
-		return;
+		return 0;
 	}
 
 	/* Feststellen, ob schon ein anderer alliierter Pirat ein
@@ -1859,7 +1864,7 @@ piracy(unit *u)
 		s = getstrtoken();
 	}
 
-	for(a =  a_find(r->attribs, &at_piracy_direction); a; a=a->nexttype) {
+	for (a = a_find(r->attribs, &at_piracy_direction); a; a=a->nexttype) {
     piracy_data * data = a->data.v;
 		const faction *f = data->follow;
 
@@ -1908,10 +1913,10 @@ piracy(unit *u)
 	free(il);
 
 	/* Wenn kein Ziel gefunden, entsprechende Meldung generieren */
-	if(target_dir == NODIRECTION) {
+	if (target_dir == NODIRECTION) {
 		add_message(&u->faction->msgs,
 			new_message(u->faction, "piratenovictim%h:ship%r:region", sh, r));
-		return;
+		return 0;
 	}
 
 	/* Meldung generieren */
@@ -1925,7 +1930,7 @@ piracy(unit *u)
 
 	/* Bewegung ausführen */
 	igetkeyword(u->thisorder, u->faction->locale);	/* NACH ignorieren */
-	move(r, u, true);
+	return move(r, u, true);
 }
 
 static void
@@ -1960,6 +1965,14 @@ hunted_dir(attrib *at, int id)
 }
 
 static boolean
+can_move(const unit * u)
+{
+  if (u->race->flags & RCF_CANNOTMOVE) return false;
+  if (get_movement(&u->attribs, MV_CANNOTMOVE)) return false;
+  return true;
+}
+
+static int
 hunt(unit *u)
 {
 	region *rc = u->region;
@@ -1969,30 +1982,33 @@ hunt(unit *u)
 
 	if(!u->ship) {
 		cmistake(u, findorder(u, u->thisorder), 144, MSG_MOVE);
-		return false;
+		return 0;
 	} else if(!fval(u, UFL_OWNER)) {
 		cmistake(u, findorder(u, u->thisorder), 146, MSG_MOVE);
-		return false;
+		return 0;
 	} else if(attacked(u)) {
 		cmistake(u, findorder(u, u->thisorder), 52, MSG_MOVE);
-		return false;
-	} else if(u->race->flags & RCF_CANNOTMOVE) {
+		return 0;
+	} else if (!can_move(u)) {
 		cmistake(u, findorder(u, u->thisorder), 55, MSG_MOVE);
-		return false;
+		return 0;
 	}
 
 	id = getshipid();
 
-	if(id <= 0) {
-		cmistake(u,  findorder(u, u->thisorder), 20, MSG_MOVE);
-		return false;
+	if (id <= 0) {
+	  cmistake(u,  findorder(u, u->thisorder), 20, MSG_MOVE);
+	  return 0;
 	}
 
 	dir = hunted_dir(rc->attribs, id);
 
 	if(dir == NODIRECTION) {
-		cmistake(u,  findorder(u, u->thisorder), 20, MSG_MOVE);
-		return false;
+	  ship * sh = findship(id);
+	  if (sh->region!=rc) {
+		cmistake(u, findorder(u, u->thisorder), 20, MSG_MOVE);
+	  }
+	  return 0;
 	}
 
 	sprintf(command, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
@@ -2011,10 +2027,15 @@ hunt(unit *u)
 	/* In command steht jetzt das NACH-Kommando. */
 
 	igetkeyword(command, u->faction->locale);	/* NACH ignorieren und Parsing initialisieren. */
-	move(u->region, u, false);								/* NACH ausführen */
-	fset(u, UFL_LONGACTION);										/* Von Hand setzen, um Endlosschleife zu vermeiden, 
-																							wenn Verfolgung nicht erfolgreich */
-	return true;															/* true -> Einheitenliste von vorne durchgehen */
+  
+  /* NACH ausführen */
+  if (move(u->region, u, false)!=0) {
+    /* niemand sollte auf einen kapitän direkt ein folge haben, oder? */
+    assert(1==0);
+  }
+	fset(u, UFL_LONGACTION);								/* Von Hand setzen, um Endlosschleife zu vermeiden, 
+													 									wenn Verfolgung nicht erfolgreich */
+	return 1;   															/* true -> Einheitenliste von vorne durchgehen */
 }
 
 void
@@ -2097,78 +2118,15 @@ regain_orientation(region * r)
 
 /* Bewegung, Verfolgung, Piraterie */
 
-void
-movement(void)
+/** ships that folow other ships
+ * Dann generieren die jagenden Einheiten ihre Befehle und
+ * bewegen sich. 
+ * Following the trails of other ships.
+ */
+static void
+move_hunters(void)
 {
-	region *r;
-	int ships;
-
-	/* Initialize the additional encumbrance by transported units */
-	init_drive();
-
-	/* move ships in last phase, others first */
-	for (ships=0;ships<=1;++ships) for (r = regions; r; r = r->next) {
-		unit ** up = &r->units;
-		/* Bewegungen.
-		 *
-		 * Zuerst müssen sich alle Einheiten ohne u->target bewegen
-		 * (NACH), dann starten die Verfolger mit u->target (FOLGE) und
-		 * hören erst auf, wenn sie ihr Ziel erreicht haben.
-		 *
-		 * neue NEW_FOLLOW-Variante: Verfolger folgen sofort, FL_FOLLOW
-		 * ist bereits gesetzt.
-		 */
-		while (*up) {
-			unit *u = *up;
-			keyword_t kword;
-
-			if (fval(u, UFL_FOLLOWING)) {
-				/* skip all followers */
-				do {
-					u = u->next;
-				} while (u && fval(u, UFL_FOLLOWING));
-				up = &u;
-				if (u==NULL) break;
-			}
-			kword = igetkeyword(u->thisorder, u->faction->locale);
-			switch (kword) {
-			case K_ROUTE:
-			case K_MOVE:
-				if (attacked(u)) {
-					cmistake(u, findorder(u, u->thisorder), 52, MSG_MOVE);
-					set_string(&u->thisorder, "");
-					up = &u->next;
-				} else if ((u->race->flags & RCF_CANNOTMOVE) 
-						|| get_movement(&u->attribs, MV_CANNOTMOVE))
-				{
-					cmistake(u, findorder(u, u->thisorder), 55, MSG_MOVE);
-					set_string(&u->thisorder, "");
-					up = &u->next;
-				} else {
-					boolean moved = true;
-					if (ships) {
-						if (u->ship && fval(u, UFL_OWNER)) move(r, u, true);
-						else moved=false;
-					} else {
-						if (u->ship==NULL || !fval(u, UFL_OWNER)) move(r, u, true);
-						else moved=false;
-					}
-					if (moved) {
-						set_string(&u->thisorder, "");
-						up = &r->units;
-					} else {
-						up = &u->next;
-					}
-				}
-				break;
-			default:
-				up = &u->next;
-			}
-		}
-	}
-
-	/* Dann generieren die jagenden Einheiten ihre Befehle und
-	 * bewegen sich. */
+  region *r;
 
 	for (r = regions; r; r = r->next) {
 		unit * u;
@@ -2182,9 +2140,7 @@ movement(void)
 					if(attacked(u)) {
 						cmistake(u, o->s, 52, MSG_MOVE);
 						break;
-					} else if((u->race->flags & RCF_CANNOTMOVE)
-							|| get_movement(&u->attribs, MV_CANNOTMOVE))
-					{
+					} else if (!can_move(u)) {
 						cmistake(u, o->s, 55, MSG_MOVE);
 						break;
 					}
@@ -2206,63 +2162,132 @@ movement(void)
 			u = u2;
 		}
 	}
+}
 
-	/* Reguläre Verfolger starten */
+/** Piraten and Drift 
+ * 
+ */
+static void
+move_pirates(void)
+{
+  region * r;
 
-	for (r = regions; r; r = r->next) {
-		unit * u;
-		for (u = r->units; u;) {
-			unit * u2 = u->next;
-			if (utarget(u)
-				&& (igetkeyword(u->thisorder, u->faction->locale) == K_MOVE
-				|| igetkeyword(u->thisorder, u->faction->locale) == K_ROUTE)) {
-					if (attacked(u)) {
-						cmistake(u, findorder(u, u->thisorder), 52, MSG_PRODUCE);
-					} else if ((u->race->flags & RCF_CANNOTMOVE)
-							|| get_movement(&u->attribs, MV_CANNOTMOVE))
-					{
-						cmistake(u, findorder(u, u->thisorder), 55, MSG_PRODUCE);
-					} else
-						move(r, u, true);
-			}
-			u = u2;
-		}
+  for (r = regions; r; r = r->next) {
+    unit ** up = &r->units;
 
-		/* Abtreiben von beschädigten, unterbemannten, überladenen Schiffen */
+    /* Abtreiben von beschädigten, unterbemannten, überladenen Schiffen */
+    drifting_ships(r);
 
-		drifting_ships(r);
-	}
+    while (*up) {
+      unit *u = *up;
 
-	/* Piraten und Cleanup */
+      if (!fval(u, UFL_LONGACTION) && igetkeyword(u->thisorder, u->faction->locale) == K_PIRACY) {
+        piracy(u);
+        fset(u, UFL_LONGACTION);
+      }
 
-	for (r = regions; r; r = r->next) {
-		unit * u;
-		for(u = r->units; u;) {
-			unit *un = u->next;
-			if(igetkeyword(u->thisorder, u->faction->locale) == K_PIRACY) piracy(u);
-			u = un;
-		}
-		a_removeall(&r->attribs, &at_piracy_direction);
-		age_traveldir(r);
-	}
+      if (*up==u) {
+        /* not moved, use next unit */
+        up = &u->next;
+      } else if (*up && (*up)->region!=r) {
+        /* moved the previous unit along with u (units on same ship)
+        * must start from the beginning again */
+        up = &r->units;
+      }
+      /* else *up is already the next unit */
+    }
+
+    a_removeall(&r->attribs, &at_piracy_direction);
+    age_traveldir(r);
+  }
 }
 
 void
-follow(void)
+movement(void)
+{
+  int ships;
+
+  /* Initialize the additional encumbrance by transported units */
+  init_drive();
+
+  /* Move ships in last phase, others first 
+  * This is to make sure you can't land someplace and then get off the ship
+  * in the same turn.
+  */
+  for (ships=0;ships<=1;++ships) {
+    region * r = regions;
+    while (r!=NULL) {
+      unit ** up = &r->units;
+      boolean repeat = false;
+
+      while (*up) {
+        unit *u = *up;
+        keyword_t kword = igetkeyword(u->thisorder, u->faction->locale);
+
+        switch (kword) {
+        case K_ROUTE:
+        case K_MOVE:
+          if (attacked(u)) {
+            cmistake(u, findorder(u, u->thisorder), 52, MSG_MOVE);
+            set_string(&u->thisorder, "");
+          } else if (!can_move(u)) {
+            cmistake(u, findorder(u, u->thisorder), 55, MSG_MOVE);
+            set_string(&u->thisorder, "");
+          } else {
+            if (ships) {
+              if (u->ship && fval(u, UFL_OWNER)) {
+                if (move(r, u, true)!=0) repeat = true;
+              }
+            } else {
+              if (u->ship==NULL || !fval(u, UFL_OWNER)) {
+                if (move(r, u, true)!=0) repeat = true;
+              }
+            }
+          }
+          break;
+        }
+        if (*up==u) {
+          /* not moved, use next unit */
+          up = &u->next;
+        } else if (*up && (*up)->region!=r) {
+          /* moved the previous unit along with u (units on ships, for example)
+          * must start from the beginning again */
+          up = &r->units;
+        }
+        /* else *up is already the next unit */
+      }
+      if (!repeat) r = r->next;
+    }
+  }
+
+  move_hunters();
+  move_pirates();
+}
+
+/** Overrides long orders with a FOLLOW order if the target is moving.
+ * FOLLOW SHIP is a long order, and doesn't need to be treated in here.
+ */
+void
+follow_unit(void)
 {
 	region * r;
-	for (r=regions;r;r=r->next) {
+
+  for (r=regions;r;r=r->next) {
 		unit * u;
-		for (u=r->units;u;u=u->next) {
+
+    for (u=r->units;u;u=u->next) {
 			attrib * a;
 			strlist * o;
-			if (fval(u, UFL_LONGACTION) || fval(u, UFL_HUNGER)) continue;
+
+      if (fval(u, UFL_LONGACTION) || fval(u, UFL_HUNGER)) continue;
 			a = a_find(u->attribs, &at_follow);
 			for (o=u->orders;o;o=o->next) {
-				if (igetkeyword(o->s, u->faction->locale) == K_FOLLOW
-						&& getparam(u->faction->locale) == P_UNIT) {
+        const struct locale * lang = u->faction->locale;
+        
+        if (igetkeyword(o->s, lang) == K_FOLLOW && getparam(lang) == P_UNIT) {
 					int id = read_unitid(u->faction, r);
-					if (id>0) {
+
+          if (id>0) {
 						unit * uf = findunit(id);
 						if (!a) {
 							a = a_add(&u->attribs, make_follow(uf));
@@ -2275,8 +2300,10 @@ follow(void)
 					}
 				}
 			}
+
 			if (a && !fval(u, UFL_MOVED)) {
 				unit * u2 = a->data.v;
+
 				if (!u2 || u2->region!=r || !cansee(u->faction, r, u2, 0))
 					continue;
 				for (o=u2->orders;o;o=o->next) {

@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-extern boolean get_movement(attrib ** alist, int type);
+extern boolean get_movement(attrib * const * alist, int type);
 extern void set_movement(struct attrib ** alist, int type);
 extern void init_movement(void);
 
