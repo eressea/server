@@ -493,17 +493,20 @@ modify_block(void)
 	int c, s = 0;
 	region *r;
 	tagregion *t;
+	char *name;
 
 	win = openwin(70, 4, "< Tag-Regionen modifizieren >");
 	wmove(win, 1, 2);
-	wAddstr("Bauern, Pferde, Silber, Chaosstatus (b/p/s/c,q)?");
+	wAddstr("Name, Peasants, Horses, Silver, Chaos (n/p/h/s/c,q)?");
 	wrefresh(win);
 	c = getch();
 	if (c == 'q') {
 		delwin(win);
 		return;
 	}
-	if (c == 'c') {
+
+	switch(c) {
+	case 'c':
 		wmove(win, 2, 2);
 		wAddstr("Chaosstatus (s)etzen oder (l)öschen?");
 		wrefresh(win);
@@ -512,17 +515,23 @@ modify_block(void)
 		} else {
 			s = 0;
 		}
-	  c = 'c';
+		break;
+	case 'n':
+		name = my_input(win, 2, 2, "Name: ", NULL);
+		break;
 	}
 
 	for (t=Tagged; t; t=t->next) {
 		r=t->r;
 		if (production(r)) {
 			switch (c) {
-				case 'b':
-					rsetpeasants(r, production(r)*3+rand()%(production(r)*3));
+				case 'n': 
+					rsetname(r, name);
 					break;
 				case 'p':
+					rsetpeasants(r, production(r)*3+rand()%(production(r)*3));
+					break;
+				case 'h':
 					rsethorses(r, rand()%(production(r) / 10));
 					break;
 				case 's':
