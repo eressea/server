@@ -83,7 +83,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				ImproveFloatingPointConsistency="TRUE"
-				AdditionalIncludeDirectories="$(CURSES_ROOT)/include;../common/kernel,../common/gamecode,../common/util,../common,.."
+				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
 				PreprocessorDefinitions="_CONSOLE,WIN32"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
@@ -107,7 +107,7 @@
 				OutputFile=".\Debug/mapper.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="$(CURSES_ROOT)\lib"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\Debug/mapper.pdb"
 				SubSystem="1"/>

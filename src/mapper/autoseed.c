@@ -372,11 +372,14 @@ mkisland(int nsize)
 		}
 	}
 	if (rlist) {
-		region_list ** rbegin = &rlist;
-		int i;
 #define MINOCEANDIST 3
 #define MAXFILLDIST 10
-		for (i=0;i!=MINOCEANDIST;++i) {
+#define SPECIALCHANCE 80
+		region_list ** rbegin = &rlist;
+		int i;
+    int special = 1;
+
+    for (i=0;i!=MINOCEANDIST;++i) {
 			region_list ** rend = rbegin;
 			while (*rend) rend=&(*rend)->next;
 			while (rbegin!=rend) {
@@ -386,8 +389,15 @@ mkisland(int nsize)
 				for (d=0;d!=MAXDIRECTIONS;++d) {
 					region * rn = rconnect(r, d);
 					if (rn==NULL) {
+            terrain_t terrain = T_OCEAN;
 						rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
-						terraform(rn, T_OCEAN);
+            if (rand() % SPECIALCHANCE < special) {
+              terrain = (terrain_t)(1 + rand() % T_GLACIER);
+              special = SPECIALCHANCE / 3; /* 33% chance auf noch eines */
+            } else {
+              special = 1;
+            }
+						terraform(rn, terrain);
 						add_regionlist(rend, rn);
 					}
 				}

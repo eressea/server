@@ -85,7 +85,7 @@ terrain_create(int climate)
 	return terrain;
 }
 
-static char newblock[BLOCKSIZE][BLOCKSIZE];
+static terrain_t newblock[BLOCKSIZE][BLOCKSIZE];
 static int g_maxluxuries;
 
 void
