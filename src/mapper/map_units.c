@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_units.c,v 1.4 2001/02/18 10:06:10 enno Exp $
+ *	$Id: map_units.c,v 1.5 2001/04/13 14:39:56 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -830,6 +830,9 @@ mapper_spunit(dbllist ** SP, unit * u, int indent)
 			break;
 		case ST_FLEE:
 			sncat(buf, ", flieht", BUFSIZE);
+			break;
+		default:
+			sncat(buf, ", unbekannt", BUFSIZE);
 			break;
 	}
 

@@ -8,26 +8,25 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: graph.h,v 1.1 2001/04/11 17:28:07 corwin Exp $
  */
 
 #ifndef GRAPH_H
 #define GRAPH_H
 
-typedef struct {
+typedef struct node {
 	int  marker;
 	void *object;
 } node;
 
-typedef struct {
+typedef struct edge {
 	int  marker;
 	node *node1;
 	node *node2;
-} vertex;
+} edge;
 
-typedef struct {
-	vset *nodes;
-	vset *vertices;
+typedef struct graph {
+	vset nodes;
+	vset edges;
 } graph;
 
 #endif

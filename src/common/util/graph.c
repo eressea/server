@@ -8,7 +8,6 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: graph.c,v 1.1 2001/04/11 17:28:07 corwin Exp $
  */
 
 /* This is a very simple graph library. It is not optimized in any
@@ -21,57 +20,53 @@
 void
 graph_init(graph *g)
 {
-	g->nodes    = malloc(sizeof(vset));
-	g->vertices = malloc(sizeof(vset));
-	vset_init(g->nodes);
-	vset_init(g->vertices);
+	vset_init(&g->nodes);
+	vset_init(&g->edges);
 }
 
 void
 graph_free(graph *g)
 {
-	vset_destroy(g->nodes);
-	vset_destroy(g->vertices);
-	free(g->nodes);
-	free(g->vertices);
+	vset_destroy(&g->nodes);
+	vset_destroy(&g->edges);
 }
 
 void
 graph_add_node(graph *g, node *n)
 {
-	vset_add(g->nodes, n);
+	vset_add(&g->nodes, n);
 }
 
 void
-graph_add_vertex(graph *g, vertex *v)
+graph_add_edge(graph *g, edge *v)
 {
-	vset_add(g->nodes, v);
+	vset_add(&g->nodes, v);
 }
 
 void
 graph_remove_node(graph *g, node *n)
 {
-	int i;
+	unsigned int i;
 
-	for(i=0; i != g->vertices->size; ++i) {
-		vertex *v = g->vertices->data[i];
+	for(i=0; i != g->edges.size; ++i) {
+		edge *v = g->edges.data[i];
 		if(v->node1 == n || v->node2 == n) {
-			vset_erase(g->nodes, v);
+			vset_erase(&g->nodes, v);
 			i--;
 		}
 	}
-	vset_erase(g->nodes, n);
+	vset_erase(&g->nodes, n);
 }
 
 node *
 graph_find_node(graph *g, void *object)
 {
-	int i;
+	unsigned int i;
 
-	for(i=0; i != g->nodes->size; ++i) {
-	  	node *node = g->nodes->data[i];
+	for(i=0; i != g->nodes.size; ++i) {
+	  	node *node = g->nodes.data[i];
 		if(node->object == object) {
-			return g->nodes->data[i];
+			return g->nodes.data[i];
 		}
 	}
 	return NULL;
@@ -83,11 +78,11 @@ graph_find_node(graph *g, void *object)
 vset *
 graph_neighbours(graph *g, node *n)
 {
-	int i;
-	vset *vs = malloc(sizeof(vset));
+	unsigned int i;
+	vset * vs = malloc(sizeof(vs));
 	vset_init(vs);
-	for(i=0; i != g->vertices->size; ++i) {
-		vertex *v =  g->vertices->data[i];
+	for(i=0; i != g->edges.size; ++i) {
+		edge *v =  g->edges.data[i];
 		if(v->node1 == n && vset_count(vs, v->node2) == 0) {
 			vset_add(vs, v->node2);
 		} else if(v->node2 == n && vset_count(vs, v->node1) == 0) {
@@ -101,15 +96,15 @@ graph_neighbours(graph *g, node *n)
 void
 graph_resetmarkers(graph *g)
 {
-	int i;
+	unsigned int i;
 
-	for(i=0; i != g->nodes->size; ++i) {
-	  	node *node = g->nodes->data[i];
+	for(i=0; i != g->nodes.size; ++i) {
+	  	node *node = g->nodes.data[i];
 		node->marker = 0;
 	}
-	for(i=0; i != g->vertices->size; ++i) {
-	  	vertex *vertex = g->vertices->data[i];
-		vertex->marker = 0;
+	for(i=0; i != g->edges.size; ++i) {
+	  	edge *edge = g->edges.data[i];
+		edge->marker = 0;
 	}
 }
 
@@ -119,33 +114,32 @@ graph_resetmarkers(graph *g)
 vset *
 graph_connected_nodes(graph *g, node *n)
 {
-	vset *vs = malloc(sizeof(vset));
-	vset *s  = malloc(sizeof(vset));
+	vset * vs = malloc(sizeof(vset));
+	vset s;
 
 	vset_init(vs);
-	vset_init(s);
+	vset_init(&s);
 	graph_resetmarkers(g);
 	vset_add(vs, n);
 	n->marker = 1;
-	vset_add(s, n);
-	while(s->size > 0) {
-		node *n     = vset_pop(s);
+	vset_add(&s, n);
+	while(s.size > 0) {
+		node *n     = vset_pop(&s);
 		vset *vs_nb = graph_neighbours(g, n);
-		int  i;
+		unsigned int  i;
 		for(i=0; i != vs_nb->size; ++i) {
 			node *nb = vs_nb->data[i];
 			if(nb->marker == 0) {
-				nb->marker == 1;
+				nb->marker = 1;
 				vset_add(vs, nb);
-				vset_add(s, nb);
+				vset_add(&s, nb);
 			}
 		}
 		vset_destroy(vs_nb);
 		free(vs_nb);
 	}
 
-	vset_destroy(s);
-	free(s);
+	vset_destroy(&s);
 
 	return vs;
 }
@@ -156,33 +150,34 @@ graph_connected_nodes(graph *g, node *n)
 vset *
 graph_disjunct_graphs(graph *g)
 {
-  	vset *dg    = malloc(sizeof(vset));
-	vset *nodes = malloc(sizeof(vset));
+  	vset * dg = malloc(sizeof(vset));
+	vset nodes;
 
-	vset_init(nodes);
-	vset_concat(nodes, g->nodes);
+	vset_init(dg);
+	vset_init(&nodes);
+	vset_concat(&nodes, &g->nodes);
 	
-	while(nodes->size > 0) {
+	while(nodes.size > 0) {
 		graph *gt = malloc(sizeof(graph));
 		vset  s;
-		int   i;
+		unsigned int   i;
 		node  *start;
 
 		graph_init(gt);
-		start = vset_pop(nodes);
+		start = vset_pop(&nodes);
 		graph_resetmarkers(g);
 		graph_add_node(gt, start);
 		start->marker = 1;
 		vset_init(&s);
 		vset_add(&s,start);
 		while(s.size > 0) {
-			vset *nbs = graph_neighbours(g,vset_pop(&s));
+			vset * nbs = graph_neighbours(g,vset_pop(&s));
 			for(i=0; i != nbs->size; ++i) {
 				node *nb = nbs->data[i];
 				if(nb->marker == 0) {
 					nb->marker = 1;
 					graph_add_node(gt,nb);
-					vset_erase(nodes,nb);
+					vset_erase(&nodes,nb);
 					vset_add(&s,nb);
 				}
 			}
@@ -191,18 +186,17 @@ graph_disjunct_graphs(graph *g)
 
 		vset_destroy(&s);
 
-		for(i=0;i != g->vertices->size; ++i) {
-			vertex *v = g->vertices->data[i];
-			if(vset_count(g->nodes, v->node1)) {
-				graph_add_vertex(gt,v);
+		for(i=0;i != g->edges.size; ++i) {
+			edge *v = g->edges.data[i];
+			if(vset_count(&g->nodes, v->node1)) {
+				graph_add_edge(gt, v);
 			}
 		}
 
 		vset_add(dg, gt);
 	}
 
-	vset_destroy(nodes);
-	free(nodes);
+	vset_destroy(&nodes);
 
 	return dg;
 }

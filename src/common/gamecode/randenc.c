@@ -1137,8 +1137,8 @@ randomevents(void)
 					}
 					if (c) {
 						add_message(&u->faction->msgs, new_message(u->faction,
-							"scunicorn%u:unit%i:amount%s:type",u,c,
-							locale_string(u->faction->locale, resourcename(olditemtype[I_UNICORN]->rtype, c!=1?NMF_PLURAL:0))));
+							"scunicorn%u:unit%i:amount%X:type",u,c,
+							olditemtype[I_UNICORN]->rtype));
 					}
 				}
 			}

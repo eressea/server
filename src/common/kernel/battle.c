@@ -443,6 +443,47 @@ tactics_bonus(troop at, troop dt, boolean attacking)
 }
 #endif /* NEW_TACTICS */
 
+static int
+statusrow(int status) 
+{
+	switch (status) {
+	case ST_AGGRO:
+	case ST_FIGHT:
+		return FIGHT_ROW;
+	case ST_BEHIND:
+	case ST_CHICKEN:
+		return BEHIND_ROW;
+	case ST_AVOID:
+		return AVOID_ROW;
+	case ST_FLEE:
+		return FLEE_ROW;
+	default:
+		assert(!"unknown combatrow");
+	}
+	return FIGHT_ROW;
+}
+
+static double
+hpflee(int status) 
+	/* if hp drop below this percentage, run away */
+{
+	switch (status) {
+	case ST_AGGRO:
+		return 0.0;
+	case ST_FIGHT:
+	case ST_BEHIND:
+		return 0.2;
+	case ST_CHICKEN:
+	case ST_AVOID:
+		return 0.9;
+	case ST_FLEE:
+		return 1.0;
+	default:
+		assert(!"unknown combatrow");
+	}
+	return 0.0;
+}
+
 int
 get_unitrow(fighter * af)
 {
@@ -455,7 +496,7 @@ get_unitrow(fighter * af)
 	int line, result;
 	int retreat = 0;
 	int size[NUMROWS];
-	int row = af->status + FIRST_ROW;
+	int row = statusrow(af->status);
 	int front = 0;
 	size_t bsize;
 
@@ -808,11 +849,11 @@ rmtroop(troop dt)
 	df->person[dt.index] = df->person[df->alive - df->removed];
 	df->person[df->alive - df->removed].hp = 0;
 	--ds->size[SUM_ROW];
-	--ds->size[df->status + FIRST_ROW];
+	--ds->size[statusrow(df->status)];
 	/* z.B. Schattenritter */
 	if (race[df->unit->race].battle_flags & BF_NOBLOCK) {
 		--ds->nonblockers[SUM_ROW];
-		--ds->nonblockers[df->status + 1];
+		--ds->nonblockers[statusrow(df->status)];
 	}
 }
 
@@ -2838,10 +2879,10 @@ make_fighter(battle * b, unit * u, boolean attack)
 		battlerecord(b, buf);
 	}
 
-	s1->size[fig->status + FIGHT_ROW] += u->number;
+	s1->size[statusrow(fig->status)] += u->number;
 	s1->size[SUM_ROW] += u->number;
 	if (race[u->race].battle_flags & BF_NOBLOCK) {
-		s1->nonblockers[fig->status + FIGHT_ROW] += u->number;
+		s1->nonblockers[statusrow(fig->status)] += u->number;
 #ifdef FAST_GETUNITROW
 		b->nonblockers = true;
 #endif
@@ -3533,7 +3574,7 @@ do_battle(void)
 					troop dt;
 					int runners = 0;
 					/* Flucht nicht bei mehr als 600 HP. Damit Wyrme tötbar bleiben. */
-					int runhp = min(600,max(4, unit_max_hp(u)/5));
+					int runhp = min(600, max(4, (int)(unit_max_hp(u)*hpflee(u->status))));
 					side *side = fig->side;
 					region *r = NULL;
 					if (is_undead(u) || u->race == RC_SHADOWKNIGHT) continue;

@@ -58,6 +58,7 @@ static attrib_type at_lmsstory = {
 																	des Attributs kein curse * ist */
 };
 
+#if 0
 static int
 use_lmsreward(struct unit * u, const struct item_type * itype, const char * cmd)
 {
@@ -73,6 +74,7 @@ use_lmsreward(struct unit * u, const struct item_type * itype, const char * cmd)
 	unused(cmd);
 	return -1;
 }
+#endif
 
 static resource_type rt_lmsreward = {
 	{ "lmsreward", "lmsrewards" },

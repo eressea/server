@@ -123,6 +123,8 @@ const char *parameters[MAXPARAMS] =
 	"ZAUBERBUCH",
 	"PAUSE",
 	"VORNE",
+	"AGGRESSIV",
+	"DEFENSIV",
 	"STUFE",
 	"HELFE",
 	"FREMDES",
@@ -2559,4 +2561,96 @@ month(int offset)
 	month = r/weeks_per_month;
 
 	return month;
+}
+
+void
+reorder_owners(region * r)
+{
+	unit ** up=&r->units, ** useek;
+	building * b=NULL;
+	ship * sh=NULL;
+#ifndef NDEBUG
+	size_t len = listlen(r->units);
+#endif
+	for (b = r->buildings;b;b=b->next) {
+		unit ** ubegin = up;
+		unit ** uend = up;
+
+		useek = up;
+		while (*useek) {
+			unit * u = *useek;
+			if (u->building==b) {
+				unit ** insert;
+				if (fval(u, FL_OWNER)) {
+					unit * nu = *ubegin;
+					insert=ubegin;
+					if (nu!=u && nu->building==u->building && fval(nu, FL_OWNER)) {
+						log_error(("[reorder_owners] %s hat mehrere Besitzer mit FL_OWNER.\n", buildingname(nu->building)));
+						freset(nu, FL_OWNER);
+					}
+				}
+				else insert = uend;
+				if (insert!=useek) {
+					*useek = u->next; /* raus aus der liste */
+					u->next = *insert;
+					*insert = u;
+				}
+				if (insert==uend) uend=&u->next;
+			}
+			if (*useek==u) useek = &u->next;
+		}
+		up = uend;
+	}
+
+	useek=up;
+	while (*useek) {
+		unit * u = *useek;
+		assert(!u->building);
+		if (u->ship==NULL) {
+			if (fval(u, FL_OWNER)) {
+				log_warning(("[reorder_owners] Einheit %s war Besitzer von nichts.\n", unitname(u)));
+				freset(u, FL_OWNER);
+			}
+			if (useek!=up) {
+				*useek = u->next; /* raus aus der liste */
+				u->next = *up;
+				*up = u;
+			}
+			up = &u->next;
+		}
+		if (*useek==u) useek = &u->next;
+	}
+
+	for (sh = r->ships;sh;sh=sh->next) {
+		unit ** ubegin = up;
+		unit ** uend = up;
+
+		useek = up;
+		while (*useek) {
+			unit * u = *useek;
+			if (u->ship==sh) {
+				unit ** insert;
+				if (fval(u, FL_OWNER)) {
+					unit * nu = *ubegin;
+					insert = ubegin;
+					if (nu!=u && nu->ship==u->ship && fval(nu, FL_OWNER)) {
+						log_error(("[reorder_owners] %s hat mehrere Besitzer mit FL_OWNER.\n", shipname(nu->ship)));
+						freset(nu, FL_OWNER);
+					}
+				}
+				else insert = uend;
+				if (insert!=useek) {
+					*useek = u->next; /* raus aus der liste */
+					u->next = *insert;
+					*insert = u;
+				}
+				if (insert==uend) uend=&u->next;
+			}
+			if (*useek==u) useek = &u->next;
+		}
+		up = uend;
+	}
+#ifndef NDEBUG
+	assert(len==listlen(r->units));
+#endif
 }

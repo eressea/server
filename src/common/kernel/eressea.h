@@ -137,7 +137,7 @@ struct building_type;
 #define GLOBAL_ATTRIB_VERSION 196
 #define BASE36IDS_VERSION 197
 #define NEWSOURCE_VERSION 197
-#define NEWHASH_VERSION 198
+#define NEWSTATUS_VERSION 198
 #define LOCALE_VERSION 300 /* TODO */
 
 /* globale settings des Spieles */
@@ -148,7 +148,7 @@ typedef struct settings {
 } settings;
 extern settings global;
 
-#define RELEASE_VERSION NEWSOURCE_VERSION
+#define RELEASE_VERSION NEWSTATUS_VERSION
 #define ECHECK_VERSION "3.11"
 
 /* changes from->to: 72->73: struct unit::lock entfernt.
@@ -421,16 +421,10 @@ extern const char *keywords[MAXKEYWORDS];
 
 typedef int status_t;
 enum {
+	ST_AGGRO,
 	ST_FIGHT,
 	ST_BEHIND,
-#ifdef MULTIROWS
-	ST_BEHIND1,
-	ST_BEHIND2,
-	ST_BEHIND3,
-	ST_BEHIND4,
-	ST_BEHIND5,
-	ST_BEHIND6,
-#endif
+	ST_CHICKEN,
 	ST_AVOID,
 	ST_FLEE
 };
@@ -468,6 +462,8 @@ enum {
 	P_ZAUBER,
 	P_PAUSE,
 	P_VORNE,
+	P_AGGRO,
+	P_CHICKEN,
 	P_LEVEL,
 	P_HELP,
 	P_FOREIGN,
@@ -1114,6 +1110,8 @@ extern const char * basepath(void);
 extern const char * resourcepath(void);
 extern void kernel_init(void);
 extern void kernel_done(void);
+
+extern void reorder_owners(struct region * r);
 
 #define FIRST_TURN 184
 

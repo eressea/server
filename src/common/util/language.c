@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: language.c,v 1.5 2001/04/12 17:21:45 enno Exp $
+ *	$Id: language.c,v 1.6 2001/04/13 14:39:55 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -137,12 +137,13 @@ reverse_lookup(const locale * lang, const char * str)
 {
 	int i;
 	if (lang==NULL) lang = default_locale;
-	assert(lang!=NULL);
-	for (i=0;i!=SMAXHASH;++i) {
-		struct locale_string * ls;
-		for (ls=lang->strings[i];ls;ls=ls->nexthash) {
-			if (strcasecmp(ls->key, str)==0) return ls->key;
-			if (strcasecmp(ls->str, str)==0) return ls->key;
+	if (lang!=NULL) {
+		for (i=0;i!=SMAXHASH;++i) {
+			struct locale_string * ls;
+			for (ls=lang->strings[i];ls;ls=ls->nexthash) {
+				if (strcasecmp(ls->key, str)==0) return ls->key;
+				if (strcasecmp(ls->str, str)==0) return ls->key;
+			}
 		}
 	}
 	return str;

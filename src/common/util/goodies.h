@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: goodies.h,v 1.4 2001/04/12 17:21:45 enno Exp $
+ * $Id: goodies.h,v 1.5 2001/04/13 14:39:55 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -21,6 +21,7 @@ extern int *intlist_find(int *i_p, int i);
 extern unsigned int hashstring(const char* s);
 extern char *space_replace(char * str, char replace);
 extern const char *escape_string(const char * str, char * buffer, size_t len);
+extern boolean locale_check(void);
 /* grammar constants: */
 #define GR_PLURAL     0x01
 /* 0x02-0x08 left unused for individual use */

@@ -108,6 +108,10 @@ report_kampfstatus(const unit * u)
 	case ST_FLEE:
 		strcpy(fsbuf, ", flieht");
 		break;
+
+	default:
+		strcpy(fsbuf, ", unbekannt");
+		break;
 	}
 #ifdef NOAID
 	if(fval(u, FL_NOAID)) strcat(fsbuf, ", bekommt keine Hilfe");

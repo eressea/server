@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.20 2001/04/12 17:21:46 enno Exp $
+ *	$Id: main.c,v 1.21 2001/04/13 14:39:55 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -44,6 +44,7 @@
 
 /* gamecode includes */
 #include <creation.h>
+#include <goodies.h>
 #include <laws.h>
 
 /* kernel includes */
@@ -59,7 +60,6 @@
 #include <region.h>
 #include <save.h>
 #include <ship.h>
-#include <time.h>
 #include <border.h>
 #include <region.h>
 #include <item.h>
@@ -73,6 +73,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <time.h>
 #include <locale.h>
 
 /** 
@@ -91,6 +92,10 @@ extern boolean nobattle;
 extern boolean nobattledebug;
 static boolean printpotions;
 
+extern void debug_messagetypes(FILE * out);
+extern void freeland(land_region * lr);
+extern void render_init(void);
+
 #ifdef FUZZY_BASE36
 extern int fuzzy_hits;
 #endif /* FUZZY_BASE36 */
@@ -98,11 +103,12 @@ extern int fuzzy_hits;
 /** 
  ** global variables wthat we are exporting 
  **/
+static char * orders = NULL;
+static int nowrite = 0;
+
 struct settings global = {
 	"Eressea", /* gamename */
 };
-
-extern void render_init(void);
 
 static void
 print_potions(FILE * F)
@@ -117,10 +123,6 @@ print_potions(FILE * F)
 		}
 	}
 }
-
-static char * orders = NULL;
-static int nowrite = 0;
-extern void debug_messagetypes(FILE * out);
 
 static void
 game_init(void)
@@ -160,7 +162,7 @@ game_init(void)
 	}
 }
 
-void
+static void
 create_game(void)
 {
 	assert(regions==NULL || !"game is initialized");
@@ -197,8 +199,6 @@ getgarbage(void)
 	}
 #endif
 }
-
-int quickleave = 0;
 
 static void
 writepasswd(void)
@@ -264,8 +264,6 @@ processturn(char *filename)
 	}
 	return 0;
 }
-
-extern void freeland(land_region * lr);
 
 static void
 game_done(void)
@@ -335,33 +333,6 @@ game_done(void)
 }
 
 #include "magic.h"
-
-static boolean
-locale_check(void) 
-{
-	int i, errorlevel = 0;
-	unsigned char * umlaute = (unsigned char*)"äöüÄÖÜß";
-	/* E: das prüft, ob umlaute funktionieren. Wenn äöü nicht mit isalpha() true sind, kriegen wir ärger. */
-	for (i=0;i!=3;++i) {
-		if (toupper(umlaute[i])!=(int)umlaute[i+3]) {
-			++errorlevel;
-			fprintf(stderr, "error in locale[%d, %d]: toupper(%c)==%c\n", i, umlaute[i], umlaute[i], toupper(umlaute[i]));
-		}
-	}
-	for (i=0;umlaute[i]!=0;++i) {
-		if (!isalpha(umlaute[i]) || isspace(umlaute[i]) || iscntrl(umlaute[i])) {
-			++errorlevel;
-			if (!isalpha(umlaute[i]))
-				fprintf(stderr, "error in locale[%d, %d]: !isalpha(%c)\n", i, umlaute[i], umlaute[i]);
-			if (iscntrl(umlaute[i]))
-				fprintf(stderr, "error in locale(%d, %d]: iscntrl(%c)\n", i, umlaute[i], umlaute[i]);
-			if (isspace(umlaute[i]))
-				fprintf(stderr, "error in locale[%d, %d]: isspace(%c)\n", i, umlaute[i], umlaute[i]);
-		}
-	}
-	if (errorlevel) return false;
-	return true;
-}
 
 #if MALLOCDBG
 static void

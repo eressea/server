@@ -421,6 +421,15 @@ eval_localize(opstack ** stack, const void * userdata) /* (string, locale) -> st
 	unused(userdata);
 }
 
+static void
+eval_locale(opstack ** stack, const void * userdata) /* (string) -> locale */
+{
+	const char *c = opop(stack, const char *);
+	const struct locale *lang = find_locale(c);
+	opush(stack, lang);
+	unused(userdata);
+}
+
 void
 translation_init(void)
 {
@@ -429,6 +438,7 @@ translation_init(void)
 	add_function("add", &eval_add);
 	add_function("if", &eval_if);
 	add_function("localize", &eval_localize);
+	add_function("locale", &eval_locale);
 }
 
 void

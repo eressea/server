@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: economy.c,v 1.11 2001/04/12 17:21:42 enno Exp $
+ *	$Id: economy.c,v 1.12 2001/04/13 14:39:51 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2416,9 +2416,8 @@ research(region *r, unit *u)
 
 			if (rht != NULL) {
 				add_message(&u->faction->msgs, new_message(u->faction,
-					"researchherb%u:unit%r:region%s:amount%s:herb", u, r,
-					rough_amount(rherbs(r), 100), locale_string(u->faction->locale,
-				  resourcename(rht->itype->rtype, 1))));
+					"researchherb%u:unit%r:region%s:amount%X:herb", u, r,
+					rough_amount(rherbs(r), 100), rht->itype->rtype));
 			} else {
 				add_message(&u->faction->msgs, new_message(u->faction,
 					"researchherb_none%u:unit%r:region", u, r));

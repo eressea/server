@@ -15,6 +15,14 @@ section_study;en;Learning and Teaching
 section_battle;en;Battles
 section_none;en;Miscellaneous
 
+# Burgausbaustufen
+site;en;site
+fortification;en;fortification
+tower;en;tower
+castle;en;castle
+fortress;en;fortress
+citadel;en;citadel
+
 # Items
 herb;en;herb
 herbbag;en;herbbag

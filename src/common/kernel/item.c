@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.15 2001/04/11 18:01:50 corwin Exp $
+ *	$Id: item.c,v 1.16 2001/04/13 14:39:55 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2212,10 +2212,6 @@ rt_read(FILE * F)
 		}
 	}
 	rt_register(rt);
-#ifndef NDEBUG
-	if (global.data_version >= NEWHASH_VERSION)
-		assert(rt->hashkey==hash);
-#endif
 	return rt;
 }
 

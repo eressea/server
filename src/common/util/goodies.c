@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: goodies.c,v 1.8 2001/04/12 17:21:45 enno Exp $
+ *	$Id: goodies.c,v 1.9 2001/04/13 14:39:55 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -104,4 +104,24 @@ set_string (char **s, const char *neu)
 {
 	*s = realloc(*s, strlen(neu) + 1);
 	return strcpy(*s, neu);
+}
+
+boolean
+locale_check(void) 
+{
+	int i, errorlevel = 0;
+	unsigned char * umlaute = (unsigned char*)"äöüÄÖÜß";
+	/* E: das prüft, ob umlaute funktionieren. Wenn äöü nicht mit isalpha() true sind, kriegen wir ärger. */
+	for (i=0;i!=3;++i) {
+		if (toupper(umlaute[i])!=(int)umlaute[i+3]) {
+			++errorlevel;
+		}
+	}
+	for (i=0;umlaute[i]!=0;++i) {
+		if (!isalpha(umlaute[i]) || isspace(umlaute[i]) || iscntrl(umlaute[i])) {
+			++errorlevel;
+		}
+	}
+	if (errorlevel) return false;
+	return true;
 }

@@ -1296,6 +1296,15 @@ readgame(boolean backup)
 				}
 			}
 			u->status = (status_t) ri(F);
+			if (global.data_version < NEWSTATUS_VERSION) {
+				switch (u->status) {
+				case 0: u->status = ST_FIGHT; break;
+				case 1: u->status = ST_BEHIND; break;
+				case 2: u->status = ST_AVOID; break;
+				case 3: u->status = ST_FLEE; break;
+				default: assert(0);
+				}
+			}
 			if (global.data_version <= 73) {
 				if (ri(F)) {
 					guard(u, GUARD_ALL);

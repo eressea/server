@@ -3807,11 +3807,11 @@
 		<arg name="ship" type="ship"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="damage" type="int"></arg>
-		<arg name="sink" type="string"></arg>
+		<arg name="sink" type="int"></arg>
 	</type>
 	<locale name="de">
 		<nr section="events">
-			<text>"Die $ship($ship) fährt in den Mahlstrom von $region($region) und nimmt $int($damage) Schaden$sink."</text>
+				<text>"Die $ship($ship) fährt in den Mahlstrom von $region($region) und nimmt $int($damage) Schaden$if($sink," und sinkt","")."</text>
 		</nr>
 	</locale>
 </message>
@@ -3820,11 +3820,11 @@
 	<type>
 		<arg name="ship" type="ship"></arg>
 		<arg name="region" type="region"></arg>
-		<arg name="sink" type="string"></arg>
+		<arg name="sink" type="int"></arg>
 	</type>
 	<locale name="de">
 		<nr section="events">
-			<text>"Die $ship($ship) wird in $region($region) von Stürmen abgetrieben$sink."</text>
+			<text>"Die $ship($ship) wird in $region($region) von Stürmen abgetrieben$if($sink," und sinkt","")."</text>
 		</nr>
 	</locale>
 </message>
@@ -4243,11 +4243,11 @@
 	<type>
 		<arg name="unit" type="unit"></arg>
 		<arg name="amount" type="int"></arg>
-		<arg name="type" type="string"></arg>
+		<arg name="type" type="resource"></arg>
 	</type>
 	<locale name="de">
 		<nr section="events">
-			<text>"$unit($unit) schließen sich $int($amount) $type an."</text>
+			<text>"$unit($unit) $if($eq($amount,1),"schließt","schließen") sich $int($amount) $resource($type,$amount) an."</text>
 		</nr>
 	</locale>
 </message>
@@ -4292,13 +4292,18 @@
 <message name="researchherb">
 	<type>
 		<arg name="unit" type="unit"></arg>
-		<arg name="region" type="region"></arg>
-		<arg name="amount" type="int"></arg>
+		<arg name="amount" type="string"></arg>
 		<arg name="herb" type="resource"></arg>
+		<arg name="region" type="region"></arg>
 	</type>
 	<locale name="de">
 		<nr section="events">
-			<text>"$unit($unit) in $region($region) stellt fest, daß es hier $int($amount) $resource($herb,$amount) gibt."</text>
+			<text>"$unit($unit) in $region($region) stellt fest, daß es hier $localize($amount,$locale("en")) $resource($herb,$amount) gibt."</text>
+		</nr>
+	</locale>
+	<locale name="en">
+		<nr section="none">
+			<text>"$unit($unit) discovers that $localize($amount,$locale("en")) $resource($herb,$amount) grow in $region($region)."</text>
 		</nr>
 	</locale>
 </message>
@@ -6390,11 +6395,16 @@
 	<type>
 		<arg name="region" type="region"></arg>
 		<arg name="building" type="building"></arg>
-		<arg name="opfer" type="unit"></arg>
+		<arg name="opfer" type="int"></arg>
 	</type>
 	<locale name="de">
 		<nr section="events">
-			<text>"In $region($region) stürzte $building($building) ein.$unit($opfer)"</text>
+			<text>"In $region($region) stürzte $building($building) ein.$if($opfer," $int($opfer) Opfer sind zu beklagen.","")"</text>
+		</nr>
+	</locale>
+	<locale name="en">
+		<nr section="events">
+			<text>"$building($building) in $region($region) collapses.$if($opfer," There are $int($opfer) caualties.","")"</text>
 		</nr>
 	</locale>
 </message>
