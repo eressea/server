@@ -13,5 +13,16 @@ SOURCES =
  ;
 
 Main eressea : $(SOURCES) ;
-LinkLibraries eressea : kernel gamecode modules util items attributes spells races triggers ;
+LinkLibraries eressea : 
+ kernel 
+ gamecode 
+ items 
+ modules
+ attributes
+ spells
+ races
+ triggers 
+ util
+ ;
+ 
 LINKLIBS on eressea += -lm ;

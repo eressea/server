@@ -19,5 +19,15 @@ SOURCES =
  ;
 
 Main mapper : $(SOURCES) ;
-LinkLibraries mapper : kernel gamecode triggers spells items races attributes modules util ;
+LinkLibraries mapper :
+ kernel
+ gamecode 
+ items
+ modules 
+ attributes
+ spells
+ races
+ triggers
+ util ;
+ 
 LINKLIBS on mapper += -lm -lncurses ;
