@@ -509,9 +509,9 @@ give_peasants(int n, const item_type * itype, unit * src)
 {
 	region *r = src->region;
 
-	if (itype == olditemtype[I_HORSE]){
-		rsethorses(r, rhorses(r) + n);
-	} else if (itype->rtype==r_silver) {
+	/* horses are given to the region via itype->give! */
+
+	if (itype->rtype==r_silver) {
 		rsetmoney(r, rmoney(r) + n);
 	}
 }
