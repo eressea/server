@@ -73,9 +73,7 @@ enum {
 	see_neighbour,
 	see_lighthouse,
 	see_travel,
-#ifdef SEE_FAR
 	see_far,
-#endif
 	see_unit,
 	see_battle
 };

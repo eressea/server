@@ -23,6 +23,7 @@
 
 /* attributes includes */
 #include <attributes/overrideroads.h>
+#include <attributes/viewrange.h>
 #include <attributes/otherfaction.h>
 #ifdef AT_OPTION
 # include <attributes/option.h>
@@ -65,6 +66,7 @@
 #endif
 
 /* util includes */
+#include <functions.h>
 #include <goodies.h>
 #include <base36.h>
 #include <nrmessage.h>
@@ -1039,11 +1041,9 @@ describe(FILE * F, region * r, int partial, faction * f)
 	if (partial == 1) {
 		scat(" (durchgereist)");
 	}
-#ifdef SEE_FAR
 	else if (partial == 3) {
 		scat(" (benachbart)");
 	}
-#endif
 	else if (partial == 2) {
 		scat(" (vom Turm erblickt)");
 	}
@@ -2046,10 +2046,8 @@ report(FILE *F, faction * f, const faction_list * addresses,
 		case see_lighthouse:
 			turm_sieht_region = true;
 			break;
-#ifdef SEE_FAR
 		case see_far:
 			break;
-#endif
 		case see_travel:
 			durchgezogen_in_region = true;
 			break;
@@ -2072,13 +2070,11 @@ report(FILE *F, faction * f, const faction_list * addresses,
 			guards(F, r, f);
 			durchreisende(F, r, f);
 		}
-#ifdef SEE_FAR
 		else if (sd->mode==see_far) {
 			describe(F, r, 3, f);
 			guards(F, r, f);
 			durchreisende(F, r, f);
 		}
-#endif
 		else if (turm_sieht_region) {
 			describe(F, r, 2, f);
 			durchreisende(F, r, f);
@@ -2114,9 +2110,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 					if ((u->faction == f) ||
 					    (unit_in_region && cansee(f, r, u, 0)) ||
 					    (durchgezogen_in_region && cansee(f, r, u, -1)) ||
-#ifdef SEE_FAR
 					    (sd->mode==see_far && cansee(f, r, u, -2)) ||
-#endif
 					    (turm_sieht_region && cansee(f, r, u, -2)))
 					{
 						if (dh == 0 && !(rbuildings(r) || r->ships)) {
@@ -2595,6 +2589,93 @@ int chits = 0;
 int ctries = 0;
 #endif
 static void
+view_default(region *r, faction *f)
+{
+	direction_t dir;
+	for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+		region * r2 = rconnect(r, dir);
+		if (r2) {
+			border * b = get_borders(r, r2);
+			if (!b) add_seen(r2, see_neighbour, false);
+		}
+	}
+}
+
+static void
+view_neighbours(region * r, faction * f)
+{
+	direction_t dir;
+	for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+		region * r2 = rconnect(r, dir);
+		if (r2) {
+			border * b = get_borders(r, r2);
+			while (b) {
+				if (!b->type->transparent(b, f)) break;
+				b = b->next;
+			}
+			if (!b) {
+				if (add_seen(r2, see_far, false)) {
+					direction_t dir;
+					for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+						region * r3 = rconnect(r2, dir);
+						if (r3) {
+							border * b = get_borders(r2, r3);
+							while (b) {
+								if (!b->type->transparent(b, f)) break;
+								b = b->next;
+							}
+							if (!b) add_seen(r3, see_neighbour, false);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+static void
+recurse_regatta(region *center, region *r, faction *f, int maxdist)
+{
+	plane * p = rplane(center);
+	direction_t dir;
+	int dist = distance(center, r);
+	for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+		region * r2 = rconnect(r, dir);
+		if (r2) {
+			int ndist = distance(center, r2);
+			if (ndist>dist) {
+				border * b = get_borders(r, r2);
+				while (b) {
+					if (!b->type->transparent(b, f)) break;
+					b = b->next;
+				}
+				if (!b) {
+					if (ndist<maxdist) {
+						if (add_seen(r2, see_far, false)) {
+							recurse_regatta(center, r2, f, maxdist);
+						}
+					} else add_seen(r2, see_neighbour, false);
+				}
+			}
+		}
+	}
+}
+
+static void
+view_regatta(region * r, faction * f)
+{
+	unit *u;
+	int skill = 0;
+	for (u=r->units; u; u=u->next) {
+		if (u->faction==f) {
+			int es = effskill(u, SK_OBSERVATION);
+			if (es>skill) skill=es;
+		}
+	}
+	recurse_regatta(r, r, f, skill/2);
+}
+
+static void
 prepare_report(faction * f)
 {
 	region * r;
@@ -2659,38 +2740,12 @@ prepare_report(faction * f)
 		add_seen(r, mode, dis);
 		/* nicht, wenn Verwirrung herrscht: */
 		if (!is_cursed(r->attribs, C_REGCONF, 0)) {
-			direction_t dir;
-
-			for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-				region * r2 = rconnect(r, dir);
-				if (r2) {
-					border * b = get_borders(r, r2);
-					while (b) {
-						if (!b->type->transparent(b, f)) break;
-						b = b->next;
-					}
-#ifdef SEE_FAR
-					if (!b) {
-						if (add_seen(r2, see_far, false)) {
-							direction_t dir;
-							for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-								region * r3 = rconnect(r2, dir);
-								if (r3) {
-									border * b = get_borders(r2, r3);
-									while (b) {
-										if (!b->type->transparent(b, f)) break;
-										b = b->next;
-									}
-									if (!b) add_seen(r3, see_neighbour, false);
-								}
-							}
-						}
-					}
-#else
-					if (!b) add_seen(r2, see_neighbour, false);
-#endif
-				}
+			void (*view)(region * r, faction * f) = view_default;
+			if (p && fval(p, PFL_SEESPECIAL)) {
+				attrib * a = a_find(p->attribs, &at_viewrange);
+				if (a) view = (void (*)(region * r, faction * f))a->data.f;
 			}
+			view(r, f);
 		}
 	}
 #if DBG_CACHE
@@ -3669,4 +3724,6 @@ report_init(void)
 	add_function("direction", &eval_direction);
 	add_function("int36", &eval_int36);
 	add_function("trail", &eval_trail);
+	register_function((pf_generic)view_neighbours, "view_neighbours");
+	register_function((pf_generic)view_regatta, "view_regatta");
 }

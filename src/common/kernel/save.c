@@ -648,51 +648,6 @@ datapath(void)
 }
 
 void
-read_dynamictypes(void)
-{
-	FILE * F;
-	sprintf(buf, "%s/%d.dynamictypes", datapath(), turn);
-	F = fopen(buf, "rt+");
-	if (F==NULL) {
-		sprintf(buf, "%s/%d.buildingtypes", datapath(), turn);
-		F = fopen(buf, "rt+");
-	}
-	if (F==NULL) return;
-	while (!feof(F)) {
-		fscanf(F, "%s", buf);
-		if (!strcmp("BUILDINGTYPE", buf)) bt_read(F);
-	}
-	fclose(F);
-}
-
-void
-write_dynamictypes(void)
-{
-	const building_typelist * btl = buildingtypes;
-	const item_type * itype = itemtypes;
-	const resource_type * rtype = resourcetypes;
-	FILE * F;
-
-	sprintf(buf, "%s/%d.dynamictypes", datapath(), turn);
-	F = fopen(buf, "wt");
-	while (btl) {
-		if (btl->type->flags & BTF_DYNAMIC) bt_write(F, btl->type);
-		btl=btl->next;
-	}
-	fputs("\n", F);
-	while (rtype) {
-		if (rtype->flags & RTF_DYNAMIC) rt_write(F, rtype);
-		rtype=rtype->next;
-	}
-	fputs("\n", F);
-	while (itype) {
-		if (itype->flags & ITF_DYNAMIC) it_write(F, itype);
-		itype=itype->next;
-	}
-	fclose(F);
-}
-
-void
 read_items(FILE *F, item **ilist)
 {
 	for (;;) {
@@ -812,7 +767,7 @@ readgame(boolean backup)
 	}
 #endif
 	turn = ri(F);
-	read_dynamictypes();
+	/* read_dynamictypes(); */
 	if (global.data_version < NEWMAGIC) {
 		max_unique_id = 0;
 	} else {
@@ -1250,7 +1205,7 @@ writegame(char *path, char quiet)
 	sprintf(buf, "%s/%d.players", datapath(), turn);
 	export_players(playerfile);
 #endif
-	write_dynamictypes();
+	/* write_dynamictypes(); */
 
 	F = cfopen(path, "w");
 	if (F==NULL)

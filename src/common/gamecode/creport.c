@@ -336,26 +336,6 @@ static void
 report_crtypes(FILE * F, const struct locale* lang)
 {
 	int i;
-#ifdef OLD_MESSAGETYPES
-	fputs("MESSAGETYPES\n", F);
-	for (i=0;i!=MTMAXHASH;++i) {
-		struct known_mtype * kmt;
-		for (kmt=mtypehash[i];kmt;kmt=kmt->nexthash) {
-			const struct nrmessage_type * nrt = nrt_find(lang, kmt->mtype);
-			if (nrt) {
-				unsigned int hash = hashstring(mt_name(kmt->mtype));
-				fputc('\"', F);
-				fputs(escape_string(nrt_string(nrt), NULL, 0), F);
-				fprintf(F, "\";%d\n", hash);
-			}
-		}
-		while (mtypehash[i]) {
-			kmt = mtypehash[i];
-			mtypehash[i] = mtypehash[i]->nexthash;
-			free(kmt);
-		}
-	}
-#else
 	for (i=0;i!=MTMAXHASH;++i) {
 		struct known_mtype * kmt;
 		for (kmt=mtypehash[i];kmt;kmt=kmt->nexthash) {
@@ -375,7 +355,6 @@ report_crtypes(FILE * F, const struct locale* lang)
 			free(kmt);
 		}
 	}
-#endif
 }
 
 static void
@@ -1000,11 +979,9 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 
 		fprintf(F, "\"%s\";Terrain\n", add_translation(tname, locale_string(f->locale, tname)));
 		switch (seemode) {
-#ifdef SEE_FAR
 		case see_far:
 			fputs("\"neighbourhood\";visibility\n", F);
 			break;
-#endif
 		case see_lighthouse:
 			fputs("\"lighthouse\";visibility\n", F);
 			break;
@@ -1258,9 +1235,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 				case see_unit:
 					modifier=0;
 					break;
-#ifdef SEE_FAR
 				case see_far:
-#endif
 				case see_lighthouse:
 					modifier = -2;
 					break;

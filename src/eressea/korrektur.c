@@ -1811,6 +1811,7 @@ regatta_quest(void)
 {
 	plane * p = getplanebyname("Regatta");
 	if (p) {
+		fset(p, PFL_SEESPECIAL);
 		return resize_plane(p, 40);
 	} else {
 		region * center;

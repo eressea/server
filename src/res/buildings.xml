@@ -1,3 +1,9 @@
+<building name="temple" maxsize="50" maxcapacity=2 nobuild nodestroy unique>
+</building>
+
+<building name="xmas_exit" maxsize="10" maxcapacity=2 nobuild nodestroy unique>
+</building>
+
 <building name="caldera" capacity="1" nodestroy nobuild>
 </building>
 
