@@ -817,7 +817,7 @@ init_drive(void)
 				boolean found = false;
 				ut = getunit(r, u->faction);
 				if(!ut) {
-					cmistake(u, findorder(u, u->thisorder), 64, MSG_MOVE);
+					cmistake(u, findorder(u, u->thisorder), 63, MSG_MOVE);
 					continue;
 				}
 				for (S = ut->orders; S; S = S->next) {
@@ -832,7 +832,7 @@ init_drive(void)
 					if(cansee(u->faction, r, ut, 0)) {
 						cmistake(u, findorder(u, u->thisorder), 286, MSG_MOVE);
 					} else {
-						cmistake(u, findorder(u, u->thisorder), 64, MSG_MOVE);
+						cmistake(u, findorder(u, u->thisorder), 63, MSG_MOVE);
 					}
 				}
 			}
@@ -1243,12 +1243,12 @@ travel(region * first, unit * u, region * next, int flucht)
 						if(cansee(u->faction, u->region, ut, 0)) {
 							cmistake(u, findorder(u, u->thisorder), 90, MSG_MOVE);
 						} else {
-							cmistake(u, findorder(u, u->thisorder), 64, MSG_MOVE);
+							cmistake(u, findorder(u, u->thisorder), 63, MSG_MOVE);
 						}
 					}
 				} else {
 					if (ut) {
-						cmistake(u, findorder(u, u->thisorder), 64, MSG_MOVE);
+						cmistake(u, findorder(u, u->thisorder), 63, MSG_MOVE);
 					} else {
 						cmistake(u, findorder(u, u->thisorder), 99, MSG_MOVE);
 					}

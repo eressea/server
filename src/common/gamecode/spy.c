@@ -63,7 +63,7 @@ spy(region * r, unit * u)
 	target = getunit(r, u->faction);
 
 	if (!target) {
-		cmistake(u, findorder(u, u->thisorder), 64, MSG_EVENT);
+		cmistake(u, findorder(u, u->thisorder), 63, MSG_EVENT);
 		return;
 	}
 	if (!can_contact(r, u, target)) {

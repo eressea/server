@@ -1572,7 +1572,7 @@ set_name(region * r, unit * u, strlist * S)
 		if (foreign == true) {
 			unit *u2 = getunit(r, u->faction);
 			if (!u2 || !cansee(u->faction, r, u2, 0)) {
-				cmistake(u, S->s, 64, MSG_EVENT);
+				cmistake(u, S->s, 63, MSG_EVENT);
 				break;
 			}
 			if (!fval(u,FL_UNNAMED)) {
@@ -1677,7 +1677,7 @@ mailunit(region * r, unit * u, int n, strlist * S, const char * s)
 		deliverMail(u2->faction, r, u, s, u2);
 	}
 	else
-		cmistake(u, S->s, 64, MSG_MESSAGE);
+		cmistake(u, S->s, 63, MSG_MESSAGE);
 	/* Immer eine Meldung - sonst könnte man so getarnte EHs enttarnen:
 	 * keine Meldung -> EH hier. */
 }
@@ -1767,7 +1767,7 @@ distributeMail(region * r, unit * u, strlist * S)
 			}
 
 			if(see == false) {
-				cmistake(u, S->s, 64, MSG_MESSAGE);
+				cmistake(u, S->s, 63, MSG_MESSAGE);
 				return;
 			}
 

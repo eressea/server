@@ -1209,30 +1209,25 @@
 		</locale>
 	</message>
 
-	<message name="error63">
+	<message name="error63" section="errors">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<locale name="de">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Die Einheit wurde nicht gefunden."</text>
-			</nr>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Die Einheit wurde nicht gefunden."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - The unit could not be found."</text>
 		</locale>
 	</message>
 
-	<message name="error64">
+	<message name="error64" section="errors">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<locale name="de">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Die Einheit wurde nicht gefunden."</text>
-			</nr>
-		</locale>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - $unit($unit) ist nicht ausreichend getarnt."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - $unit($unit) is not sufficiently stealthy."</text>
 	</message>
 
 	<message name="use_realworld_only" section="errors">
@@ -6949,7 +6944,8 @@
 			<arg name="run" type="int"></arg>
 			<arg name="runto" type="region"></arg>
 		</type>
-		<text locale="de">"$unit($unit) verlor $int($fallen) Personen$if($alive,", $int($alive) überlebten","")$if($run," und $int($run) flohen nach $region($runto)","")."</text>
+		<text locale="de">"$unit($unit) verlor $int($fallen) Personen$if($alive,", $int($alive) überlebten","")$if($run," und $int($run) flohen$if($isnull($runto),""," nach $region($runto)"),"")."</text>
+		<text locale="en">"$unit($unit) lost $int($fallen) people: $int($alive) survived$if($run," and $int($run) fled$if($isnull($runto),""," to $region($runto)"),"")."</text>
 	</message>
 
 	<message name="new_fspecial">

@@ -584,15 +584,22 @@ reportcasualties(battle * b, fighter * fig, int dead)
 	bfaction * bf;
 	if (fig->alive == fig->unit->number)
 		return;
+#ifndef NO_RUNNING
 	if (fig->run.region == NULL) {
 		fig->run.region = fleeregion(fig->unit);
 		if (fig->run.region == NULL) fig->run.region = b->region;
 	}
+#endif
 	fbattlerecord(fig->unit->faction, b->region, " ");
 	for (bf = b->factions;bf;bf=bf->next) {
 		faction * f = bf->faction;
+#ifdef NO_RUNNING
+		struct message * m = msg_message("casualties", "unit runto run alive fallen",
+			fig->unit, NULL, fig->run.number, fig->alive, dead);
+#else
 		struct message * m = msg_message("casualties", "unit runto run alive fallen",
 			fig->unit, fig->run.region, fig->run.number, fig->alive, dead);
+#endif
 		brecord(f, b->region, m);
 		msg_release(m);
 	}
@@ -2251,6 +2258,7 @@ loot_items(fighter * corpse)
 	}
 }
 
+#ifndef NO_RUNNING
 static void
 loot_fleeing(fighter* fig, unit* runner)
 {
@@ -2266,6 +2274,7 @@ merge_fleeloot(fighter* fig, unit* u)
 {
 	i_merge(&u->items, &fig->run.items);
 }
+#endif
 
 static boolean
 seematrix(const faction * f, const side * s)
@@ -2398,8 +2407,8 @@ aftermath(battle * b)
 			assert(du->number >= 0);
 
 			if (df->run.hp) {
+#ifndef NO_RUNNING
 				if (df->alive == 0) {
-
 					/* Report the casualties */
 					reportcasualties(b, df, dead);
 
@@ -2422,11 +2431,15 @@ aftermath(battle * b)
 						travel(r, du, df->run.region, 1);
 						df->run.region = du->region;
 					}
-				} else {
+				} else
+#endif
+				{
 					/* nur teilweise geflohene Einheiten mergen sich wieder */
 					df->alive += df->run.number;
 					sum_hp += df->run.hp;
+#ifndef NO_RUNNING
 					merge_fleeloot(df, du);
+#endif
 					df->run.number = 0;
 					df->run.hp = 0;
 					/* df->run.region = NULL;*/
@@ -2441,7 +2454,9 @@ aftermath(battle * b)
 					/* alle sind tot, niemand geflohen. Einheit auflösen */
 					df->run.number = 0;
 					df->run.hp = 0;
+#ifndef NO_RUNNING
 					df->run.region = NULL;
+#endif
 
 					/* Report the casualties */
 					reportcasualties(b, df, dead);
@@ -3327,11 +3342,12 @@ void
 flee(const troop dt)
 {
 	fighter * fig = dt.fighter;
+#ifndef NO_RUNNING
 	unit * u = fig->unit;
 	int carry = personcapacity(u) - u->race->weight;
 	int money;
-
 	item ** ip = &u->items;
+
 	while (*ip) {
 		item * itm = *ip;
 		const item_type * itype = itm->type;
@@ -3370,6 +3386,7 @@ flee(const troop dt)
 		i_change(&u->items, i_silver, -money);
 		i_change(&fig->run.items, i_silver, +money);
 	}
+#endif
 
 	fig->run.hp += fig->person[dt.index].hp;
 	++fig->run.number;
@@ -3488,7 +3505,7 @@ do_battle(void)
 						/* Fehler: "Die Einheit wurde nicht gefunden" */
 						if (!u2 || fval(u2, FL_MOVED) || u2->number == 0
 								|| !cansee(u->faction, u->region, u2, 0)) {
-							cmistake(u, sl->s, 64, MSG_BATTLE);
+							cmistake(u, sl->s, 63, MSG_BATTLE);
 							list_continue(sl);
 						}
 						/* Fehler: "Die Einheit ist eine der unsrigen" */
@@ -3648,14 +3665,13 @@ do_battle(void)
 					/* Flucht nicht bei mehr als 600 HP. Damit Wyrme tötbar bleiben. */
 					int runhp = min(600,(int)(0.9+unit_max_hp(u)*hpflee(u->status)));
 					side *side = fig->side;
-					region *r = NULL;
 					if (fval(u->race, RCF_UNDEAD) || old_race(u->race) == RC_SHADOWKNIGHT) continue;
 					if (u->ship) continue;
 					dt.fighter = fig;
+#ifndef NO_RUNNING
 					if (!fig->run.region) fig->run.region = fleeregion(u);
-					r = fig->run.region;
-					if (!r)
-						continue;
+					if (!fig->run.region) continue;
+#endif
 					dt.index = fig->alive - fig->removed;
 					while (side->size[SUM_ROW] && dt.index != 0) {
 						--dt.index;

@@ -715,7 +715,7 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 			givemen(u->number, u, NULL, S->s);
 			cmistake(u, S->s, 153, MSG_COMMERCE);
 		} else {
-			cmistake(u, S->s, 64, MSG_COMMERCE);
+			cmistake(u, S->s, 63, MSG_COMMERCE);
 		}
 		return;
 	}
@@ -2921,7 +2921,7 @@ steal(region * r, unit * u, request ** stealorders)
 	}
 
 	if (!u2) {
-		cmistake(u, findorder(u, u->thisorder), 64, MSG_INCOME);
+		cmistake(u, findorder(u, u->thisorder), 63, MSG_INCOME);
 		return;
 	}
 

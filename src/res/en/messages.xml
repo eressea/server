@@ -727,32 +727,6 @@
 		</locale>
 	</message>
 
-	<message name="error63">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="region" type="region"></arg>
-			<arg name="command" type="string"></arg>
-		</type>
-		<locale name="en">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - The unit could not be found."</text>
-			</nr>
-		</locale>
-	</message>
-
-	<message name="error64">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="region" type="region"></arg>
-			<arg name="command" type="string"></arg>
-		</type>
-		<locale name="en">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - The unit could not be found."</text>
-			</nr>
-		</locale>
-	</message>
-
 	<message name="error65">
 		<type>
 			<arg name="unit" type="unit"></arg>
@@ -3900,21 +3874,6 @@
 		<locale name="en">
 			<nr section="none">
 				<text>"$unit($unit) destroys $building($building)."</text>
-			</nr>
-		</locale>
-	</message>
-
-	<message name="casualties">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="fallen" type="int"></arg>
-			<arg name="alive" type="int"></arg>
-			<arg name="run" type="int"></arg>
-			<arg name="runto" type="region"></arg>
-		</type>
-		<locale name="en">
-			<nr section="none">
-				<text>"$unit($unit) lost $int($fallen) people: $int($alive) survived and $int($run) fled to $region($runto)."</text>
 			</nr>
 		</locale>
 	</message>

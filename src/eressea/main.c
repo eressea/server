@@ -381,17 +381,15 @@ game_done(void)
 
 #include "magic.h"
 
-#if (defined(_MSC_VER))
-# define MALLOCDBG 1
-#endif
-
 #if MALLOCDBG
-static void
+void
 init_malloc_debug(void)
 {
 #if (defined(_MSC_VER))
 # if MALLOCDBG == 2
 #  define CHECKON() _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF)
+# elif MALLOCDBG == 3
+#  define CHECKON() _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) & 0)
 # elif MALLOCDBG == 1
 #  define CHECKON() _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_DELAY_FREE_MEM_DF)
 # endif
@@ -640,7 +638,7 @@ main(int argc, char *argv[])
 		return -1;
 	}
 #endif
-#if MALLOCDBG
+#if 0
 	init_malloc_debug();
 #endif
 

@@ -163,8 +163,10 @@ typedef struct fighter {
 	struct {
 		int number;  /* number of people who have flown */
 		int hp;      /* accumulated hp of fleeing people */
+#ifndef NO_RUNNING
 		struct region *region;  /* destination of fleeing people */
 		struct item * items; /* items they take */
+#endif
 	} run;
 	int action_counter;	/* number of active actions the struct unit did in the fight */
 #ifdef SHOW_KILLS

@@ -1947,7 +1947,10 @@ use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int 
 		cmistake(u, cmd, 63, MSG_EVENT);
 		return ECUSTOM;
 	}
-	/* TODO: wahrnehmung-check */
+	if (effskill(u, SK_STEALTH)<=effskill(target, SK_OBSERVATION)) {
+		cmistake(u, cmd, 63, MSG_EVENT);
+		return ECUSTOM;
+	}
 	ADDMSG(&u->faction->msgs, msg_message("givedumb", 
 		"unit recipient amount", u, target, amount));
 	assert(oldpotiontype[P_FOOL]->itype==itype);
