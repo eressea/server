@@ -312,8 +312,14 @@ expandrecruit(region * r, request * recruitorders)
 	for (u = r->units; u; u = u->next) {
 		if (u->n >= 0) {
 			unit * unew;
-			if (u->number==0) unew = u;
-			else unew = createunit(r, u->faction, u->n, u->race);
+			if (u->number==0) {
+				set_number(u, u->n);
+				u->hp = u->n * unit_max_hp(u);
+				unew = u;
+			} else {
+				unew = createunit(r, u->faction, u->n, u->race);
+			}
+
 			if (unew->race == new_race[RC_URUK]) {
 				change_level(unew, SK_SWORD, 1);
 				change_level(unew, SK_SPEAR, 1);
