@@ -280,6 +280,7 @@ preferred_terrain(const struct race * rc)
 #define REGIONS_PER_FACTION 2
 #define MINFACTIONS 1
 #define MAXAGEDIFF 5
+#define VOLCANO_CHANCE 100
 
 int
 mkisland(int nsize)
@@ -343,7 +344,9 @@ mkisland(int nsize)
 				++rsize;
 			}
 		}
-		if (rand() % REGIONS_PER_FACTION == 0 || rsize==0) {
+    if (rand() % VOLCANO_CHANCE == 0) {
+      terraform(r, T_VOLCANO);
+    } else if (rand() % REGIONS_PER_FACTION == 0 || rsize==0) {
 			newfaction ** nfp, * nextf = newfactions;
 			unit * u;
 			terraform(r, preferred_terrain(nextf->race));

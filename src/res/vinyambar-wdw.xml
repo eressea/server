@@ -42,6 +42,7 @@
   <xi:include href="vinyambar/wdw-strings.xml"/>
   <xi:include href="vinyambar/wdw-resources.xml" />
   <xi:include href="vinyambar/wdw-races.xml"/>
+  <xi:include href="vinyambar/items.xml"/>
   <xi:include href="vinyambar/de/strings.xml"/>
 
   <strings>

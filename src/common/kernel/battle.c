@@ -29,8 +29,8 @@
 #endif
 
 typedef enum combatmagic {
-	DO_PRECOMBATSPELL,
-	DO_POSTCOMBATSPELL
+  DO_PRECOMBATSPELL,
+  DO_POSTCOMBATSPELL
 } combatmagic_t;
 
 
