@@ -2282,13 +2282,6 @@ sp_ironkeeper(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 
-	if(rterrain(r) != T_MOUNTAIN  &&  rterrain(r) != T_GLACIER ) {
-		sprintf(buf, "%s in %s: Wächtergeister können nur in Bergen "
-			"und Gletschern beschworen werden.", unitname(mage),
-			regionid(mage->region));
-		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
-		return 0;
-	}
 	keeper = create_unit(r, mage->faction, 1, new_race[RC_IRONKEEPER], 0, "Bergwächter", mage);
 
 	/*keeper->age = cast_level + 2;*/
@@ -3635,28 +3628,26 @@ sp_bloodsacrifice(castorder *co)
 {
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
-	int aura, damage;
+	int aura;
 	int skill = eff_skill(mage, SK_MAGIC, mage->region);
-	int hp = mage->hp - 5; /* braucht noch 4 HP zum Bezahlen des
-																		 Spruchs, und 1 HP zum Überleben*/
+	int hp = co->force*4; 
 
 	if (hp <= 0){
 		report_failure(mage, co->order);
 		return 0;
 	}
 
-	damage = min(hp, dice_rand("4d12"));
+	aura = lovar(hp*2);
 
 	if (skill < 8) {
-		aura = damage / 4;
+		aura /= 4;
 	} else if (skill < 12){
-		aura = damage / 3;
+		aura /=  3;
 	} else if (skill < 15){
-		aura = damage / 2;
-	} else if (skill < 18){
-		aura = damage;
-	} else {
-		aura = damage * 2;
+		aura /= 2;
+	/* von 15 bis 17 ist hp = aura */
+	} else if (skill > 17){
+		aura *= 2;
 	}
 
 	if (aura <= 0){
@@ -3664,8 +3655,10 @@ sp_bloodsacrifice(castorder *co)
 		return 0;
 	}
 
+	/* sicherheitshalber gibs hier einen HP gratis. sonst schaffen es
+	 * garantiert ne ganze reihe von leuten ihren Magier damit umzubringen */
+	mage->hp++;
 	change_spellpoints(mage, aura);
-	use_pooled(mage, mage->region, R_HITPOINTS, damage);
 	ADDMSG(&mage->faction->msgs,
 		msg_message("sp_bloodsacrifice_effect",
 		"unit region command amount",
@@ -7483,7 +7476,7 @@ spell spelldaten[] =
 	},
 
 	{SPL_IRONKEEPER, "Bergwächter",
-		"Erschafft in Bergen oder Gletschern einen Wächtergeist, der Eisen- und "
+		"Erschafft einen Wächtergeist, der Eisen- und "
 		"Laenabbau durch nichtalliierte Parteien (HELFE BEWACHE) verhindert, "
 		"solange er die Region bewacht. Der Bergwächter ist an den Ort der "
 		"Beschwörung gebunden.",
@@ -8122,7 +8115,7 @@ spell spelldaten[] =
 		NULL,
 		M_CHAOS, (ONSHIPCAST), 1, 4,
 		{
-			{R_HITPOINTS, 12, SPC_FIX},
+			{R_HITPOINTS, 4, SPC_LEVEL},
 			{0, 0, 0},
 			{0, 0, 0},
 			{0, 0, 0},

@@ -578,12 +578,8 @@ show_newspells(void)
 	 * terminieren */
 
 	spellid_t newspellids[] = {
+		SPL_IRONKEEPER,
 		SPL_BLOODSACRIFICE,
-		SPL_DEATHCLOUD,
-		SPL_PLAGUE,
-		SPL_UNHOLYPOWER,
-		SPL_CHAOSSUCTION,
-		SPL_CHAOSROW,
 		SPL_NOSPELL };
 
 	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]

@@ -1116,13 +1116,13 @@ do_misc(char try)
 					case P_BUILDING:
 					case P_GEBAEUDE:
 
-						/* Sollte momentan nicht vorkommen, da Schwimmer nicht
-						 * an Land können, und es keine Gebäude auf See gibt. */
-
-						if( !fval(u->race, RCF_WALK) &&
-								!fval(u->race, RCF_FLY)) {
-							if (try) cmistake(u, S->s, 232, MSG_MOVE);
-							break;
+						/* Schwimmer können keine Gebäude betreten, außer diese sind
+						 * auf dem Ozean */
+						if( !fval(u->race, RCF_WALK) && !fval(u->race, RCF_FLY)) {
+							if (rterrain(r) != T_OCEAN){
+								if (try) cmistake(u, S->s, 232, MSG_MOVE);
+								break;
+							}
 						}
 
 						b = getbuilding(r);
@@ -1131,10 +1131,12 @@ do_misc(char try)
 							if(try) cmistake(u, S->s, 6, MSG_MOVE);
 							break;
 						}
+						/* Gebäude auf dem Ozean sollte man betreten dürfen
 						if(rterrain(r) == T_OCEAN) {
 							if (try) cmistake(u, S->s, 297, MSG_MOVE);
 							break;
 						}
+						*/
 						if (!mayenter(r, u, b)) {
 							if(try) {
 								sprintf(buf, "Der Eintritt in %s wurde verwehrt",
