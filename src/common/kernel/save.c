@@ -491,6 +491,7 @@ unitorders(FILE * F, struct faction * f)
         boolean quit = false;
         switch (findparam(s, u->faction->locale)) {
           case P_UNIT:
+          case P_REGION:
           case P_FACTION:
           case P_NEXT:
           case P_GAMENAME:
@@ -1201,8 +1202,9 @@ writeunit(FILE * F, const unit * u)
 	wi(F, u->flags & UFL_SAVEMASK);
 	wnl(F);
 	for (ord = u->orders; ord; ord=ord->next) {
-    if (is_persistent(ord) && get_keyword(ord)!=NOKEYWORD) {
-      writeorder(ord, u->faction->locale, F);
+	  if (is_persistent(ord)) {
+		writeorder(ord, u->faction->locale, F);
+	  }
 	}
 	ws(F, ""); /* Abschluß der persistenten Befehle */
 	writeorder(u->lastorder, u->faction->locale, F);

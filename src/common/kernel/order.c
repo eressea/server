@@ -161,11 +161,9 @@ write_order(const order * ord, const struct locale * lang, char * buffer, size_t
   if (ord==0 || ord->_keyword==NOKEYWORD) {
     buffer[0]=0;
   } else {
-#ifndef NDEBUG
-    const char * s = cmd->_str;
-    assert(findkeyword(parse_token(&s), lang)==cmd->_keyword);
-#endif
-    strncpy(buffer, cmd->_str, size);
+    char * s = getcommand(ord);
+    strncpy(buffer, s, size);
+	free(s);
   }
   return buffer;
 }

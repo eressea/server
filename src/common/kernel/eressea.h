@@ -412,7 +412,6 @@ enum {
   K_MAKE,
   K_MOVE,
   K_PASSWORD,
-  K_DUMMY,
   K_RECRUIT,
   K_RESERVE,
   K_ROUTE,
