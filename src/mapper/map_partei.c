@@ -31,6 +31,9 @@
 #include <skill.h>
 #include <unit.h>
 
+/* modules */
+#include <modules/alliance.h>
+
 /* util includes */
 #include <base36.h>
 #include <language.h>
@@ -285,6 +288,9 @@ seed_dropouts(void)
 				newfaction * nf = *nfp;
 				if (nf->race==drop->race && !nf->bonus) {
 					unit * u = addplayer(r, nf->email, nf->password, nf->race, nf->lang);
+#ifdef ALLIANCES
+					u->faction->alliance = nf->allies;
+#endif
 					++numnewbies;
 					if (nf->bonus) give_latestart_bonus(r, u, nf->bonus);
 					found=true;
@@ -312,8 +318,14 @@ read_newfactions(const char * filename)
 		char race[20], email[64], lang[8], password[16];
 		newfaction *nf;
 		int bonus;
+#ifdef ALLIANCES
+		int alliance;
+		/* email;race;locale;startbonus;alliance */
+		if (fscanf(F, "%s %s %s %d %s %d", email, race, lang, &bonus, password, &alliance)<=0) break;
+#else
 		/* email;race;locale;startbonus */
 		if (fscanf(F, "%s %s %s %d %s", email, race, lang, &bonus, password)<=0) break;
+#endif
 		while (f) {
 			if (strcmp(f->email, email)==0 && f->age==0) {
 				break;
@@ -329,6 +341,17 @@ read_newfactions(const char * filename)
 		nf->email = strdup(email);
 		nf->password = strdup(password);
 		nf->race = rc_find(race);
+#ifdef ALLIANCES
+		{
+			struct alliance * al = findalliance(alliance);
+			if (al==NULL) {
+				char zText[64];
+				sprintf(zText, "Allianz %d", alliance);
+				al = makealliance(alliance, zText);
+			}
+			nf->allies = al;
+		}
+#endif
 		if (nf->race==NULL) nf->race = findrace(race, default_locale);
 		nf->lang = find_locale(lang);
 		nf->bonus = bonus;
@@ -354,7 +377,11 @@ select_newfaction(const struct race * rc)
 	while (player) {
 		if (rc==NULL || player->race==rc) {
 			char str[80];
+#ifdef ALLIANCES
+			snprintf(str, 70, "%s %d %s %s", player->bonus?"!":" ", player->allies?player->allies->id:0, locale_string(default_locale, rc_name(player->race, 0)), player->email);
+#else
 			snprintf(str, 70, "%s %s %s", player->bonus?"!":" ", locale_string(default_locale, rc_name(player->race, 0)), player->email);
+#endif
 			insert_selection(iinsert, prev, strdup(str), (void*)player);
 			prev = *iinsert;
 			iinsert = &prev->next;

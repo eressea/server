@@ -24,6 +24,9 @@ typedef struct newfaction {
 	const struct race * race;
 	int bonus;
 	boolean oldregions;
+#ifdef ALLIANCES
+	struct alliance * allies;
+#endif
 } newfaction;
 
 extern newfaction * newfactions;

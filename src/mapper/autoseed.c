@@ -258,6 +258,9 @@ autoseed(struct regionlist * rlist)
 			unit * u;
 			while (*nfp!=nf) nfp=&(*nfp)->next;
 			u = addplayer(seeds[i].region, nf->email, nf->password, nf->race, nf->lang);
+#ifdef ALLIANCES
+			u->faction->alliance = nf->allies;
+#endif
 			++numnewbies;
 			*nfp = nf->next;
 			free(nf);
@@ -355,6 +358,9 @@ mkisland(int nsize)
 			terraform(r, preferred_terrain(nextf->race));
 			++isize;
 			u = addplayer(r, nextf->email, nextf->password, nextf->race, nextf->lang);
+#ifdef ALLIANCES
+			u->faction->alliance = nextf->allies;
+#endif
 
 			/* remove duplicate email addresses */
 			nfp=&newfactions;
