@@ -658,6 +658,69 @@ chaosfactor(region * r)
 	return ((double) a->data.i / 1000.0);
 }
 
+static int
+damage_unit(unit *u, const char *dam, boolean armor, boolean magic)
+{
+  int *hp = malloc(u->number * sizeof(int));
+  int   h;
+  int   i, dead = 0, hp_rem = 0, heiltrank;
+
+  if (u->number==0) return 0;
+  h = u->hp/u->number;
+  /* HP verteilen */
+  for (i=0; i<u->number; i++) hp[i] = h;
+  h = u->hp - (u->number * h);
+  for (i=0; i<h; i++) hp[i]++;
+
+  /* Schaden */
+  for (i=0; i<u->number; i++) {
+    int damage = dice_rand(dam);
+    if (magic) damage = (int)(damage * (1.0 - magic_resistance(u)));
+    if (armor) damage -= nb_armor(u, i);
+    hp[i] -= damage;
+  }
+
+  /* Auswirkungen */
+  for (i=0; i<u->number; i++) {
+    if (hp[i] <= 0){
+      heiltrank = 0;
+
+      /* Sieben Leben */
+      if (old_race(u->race) == RC_CAT && (chance(1.0 / 7))) {
+        hp[i] = u->hp/u->number;
+        hp_rem += hp[i];
+        continue;
+      }
+
+      /* Heiltrank */
+      if (get_effect(u, oldpotiontype[P_HEAL]) > 0) {
+        change_effect(u, oldpotiontype[P_HEAL], -1);
+        heiltrank = 1;
+      } else if (get_potion(u, P_HEAL) > 0) {
+        i_change(&u->items, oldpotiontype[P_HEAL]->itype, -1);
+        change_effect(u, oldpotiontype[P_HEAL], 3);
+        heiltrank = 1;
+      }
+      if (heiltrank && (chance(0.50))) {
+        hp[i] = u->hp/u->number;
+        hp_rem += hp[i];
+        continue;
+      }
+
+      dead++;
+    }	else {
+      hp_rem += hp[i];
+    }
+  }
+
+  scale_number(u, u->number - dead);
+  u->hp = hp_rem;
+
+  free(hp);
+
+  return dead;
+}
+
 void
 drown(region *r)
 {

@@ -2472,12 +2472,13 @@ aftermath(battle * b)
           sum_hp += df->person[n].hp;
       }
 
-      if (df->alive == du->number) continue; /* nichts passiert */
-
       /* die weggerannten werden später subtrahiert! */
       assert(du->number >= 0);
 
-      if (df->run.hp) {
+      if (df->alive == du->number) {
+        du->hp = sum_hp;
+        continue; /* nichts passiert */
+      } else if (df->run.hp) {
 #ifndef NO_RUNNING
         if (df->alive == 0) {
           /* Report the casualties */
@@ -3903,104 +3904,40 @@ do_battle(void)
   }
 }
 
-/* Funktionen, die außerhalb von battle.c verwendet werden. */
-static int
-nb_armor(unit *u, int index)
-{
-	int a, av = 0;
-	int geschuetzt = 0;
-
-	if (!(u->race->battle_flags & BF_EQUIPMENT)) return AR_NONE;
-
-	/* Normale Rüstung */
-
-	a = 0;
-	do {
-		if (armordata[a].shield == 0) {
-			geschuetzt += get_item(u, armordata[a].item);
-			if (geschuetzt > index)
-				av += armordata[a].prot;
-		}
-		++a;
-	}
-	while (a != AR_MAX);
-
-	/* Schild */
-
-	a = 0;
-	do {
-		if (armordata[a].shield == 1) {
-			geschuetzt += get_item(u, armordata[a].item);
-			if (geschuetzt > index)
-				av += armordata[a].prot;
-		}
-		++a;
-	}
-	while (a != AR_MAX);
-
-	return av;
-}
-
-
 int
-damage_unit(unit *u, const char *dam, boolean armor, boolean magic)
+nb_armor(const unit *u, int index)
 {
-	int *hp = malloc(u->number * sizeof(int));
-	int   h;
-	int   i, dead = 0, hp_rem = 0, heiltrank;
+  int a, av = 0;
+  int geschuetzt = 0;
 
-	if (u->number==0) return 0;
-	h = u->hp/u->number;
-	/* HP verteilen */
-	for (i=0; i<u->number; i++) hp[i] = h;
-	h = u->hp - (u->number * h);
-	for (i=0; i<h; i++) hp[i]++;
+  if (!(u->race->battle_flags & BF_EQUIPMENT)) return AR_NONE;
 
-	/* Schaden */
-	for (i=0; i<u->number; i++) {
-		int damage = dice_rand(dam);
-		if (magic) damage = (int)(damage * (1.0 - magic_resistance(u)));
-		if (armor) damage -= nb_armor(u, i);
-		hp[i] -= damage;
-	}
+  /* Normale Rüstung */
 
-	/* Auswirkungen */
-	for (i=0; i<u->number; i++) {
-		if (hp[i] <= 0){
-			heiltrank = 0;
+  a = 0;
+  do {
+    if (armordata[a].shield == 0) {
+      geschuetzt += get_item(u, armordata[a].item);
+      if (geschuetzt > index)
+        av += armordata[a].prot;
+    }
+    ++a;
+  }
+  while (a != AR_MAX);
 
-			/* Sieben Leben */
-			if (old_race(u->race) == RC_CAT && (chance(1.0 / 7))) {
-				hp[i] = u->hp/u->number;
-				hp_rem += hp[i];
-				continue;
-			}
+  /* Schild */
 
-			/* Heiltrank */
-			if (get_effect(u, oldpotiontype[P_HEAL]) > 0) {
-				change_effect(u, oldpotiontype[P_HEAL], -1);
-				heiltrank = 1;
-			} else if (get_potion(u, P_HEAL) > 0) {
-				i_change(&u->items, oldpotiontype[P_HEAL]->itype, -1);
-				change_effect(u, oldpotiontype[P_HEAL], 3);
-				heiltrank = 1;
-			}
-			if (heiltrank && (chance(0.50))) {
-				hp[i] = u->hp/u->number;
-				hp_rem += hp[i];
-				continue;
-			}
+  a = 0;
+  do {
+    if (armordata[a].shield == 1) {
+      geschuetzt += get_item(u, armordata[a].item);
+      if (geschuetzt > index)
+        av += armordata[a].prot;
+    }
+    ++a;
+  }
+  while (a != AR_MAX);
 
-		 	dead++;
-		}	else {
-			hp_rem += hp[i];
-		}
-	}
-
-	scale_number(u, u->number - dead);
-	u->hp = hp_rem;
-
-	free(hp);
-
-	return dead;
+  return av;
 }
+

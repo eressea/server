@@ -771,12 +771,10 @@ bewegung_blockiert_von(unit * reisender, region * r)
 			int sk = eff_skill(u, SK_OBSERVATION, r);
 			if (get_item(reisender, I_RING_OF_INVISIBILITY) >= reisender->number &&
 				!get_item(u, I_AMULET_OF_TRUE_SEEING)) continue;
-			if (u->faction==reisender->faction
-				|| ucontact(u, reisender)
-				|| alliedunit(u, reisender->faction, HELP_GUARD))
-			{
-				contact = true;
-			} else if (sk>=perception) {
+			if (u->faction==reisender->faction) contact = true;
+      else if (ucontact(u, reisender)) contact = true;
+			else if (alliedunit(u, reisender->faction, HELP_GUARD)) contact = true;
+			else if (sk>=perception) {
 				perception = sk;
 				guard = u;
 			}
@@ -2149,9 +2147,8 @@ regain_orientation(region * r)
 
 		if(r->terrain != T_OCEAN || rand() % 10 >= storms[month(0)]) {
 			remove_curse(&sh->attribs, C_DISORIENTATION, 0);
-			add_message(&cap->faction->msgs,
-				new_message(cap->faction, "shipnoconf%h:ship", sh));
-			continue;
+				ADDMSG(&cap->faction->msgs, msg_message("shipnoconf", "ship", sh));
+        continue;
 		}
 
 		for(u=r->units;u;u=u->next) {
@@ -2159,8 +2156,7 @@ regain_orientation(region * r)
 					&& allied(cap, u->faction, HELP_GUARD)
 					&& is_disorientated(u) == false) {
 				remove_curse(&sh->attribs, C_DISORIENTATION, 0);
-				add_message(&cap->faction->msgs,
-					new_message(cap->faction, "shipnoconf%h:ship", sh));
+				ADDMSG(&cap->faction->msgs, msg_message("shipnoconf", "ship", sh));
 				break;
 			}
 		}
