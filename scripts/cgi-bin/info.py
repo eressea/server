@@ -130,14 +130,16 @@ def Save(custid, Password):
     ShowInfo(custid, Password)
 #    Display("Noch nicht implementiert", "Daten speichern für Kunde #"+str(custid))
 
-def SendPass(custid):
+def SendPass(email):
     try:
 	db = MySQLdb.connect(db=dbname)
 	cursor=db.cursor()
 #	print custid
-	cursor.execute('select email, password from users where id='+str(custid))
-	email, password = cursor.fetchone()
-	Msg="From: "+From+"\nTo: "+email+"\nSubject: Vinambar Passwort\n\nDein Vinyambar-Passwort lautet: "+password+"\n"
+	cursor.execute("select id, email, password from users where email='"+email+"'")
+	custid, email, password = cursor.fetchone()
+	Msg="From: "+From+"\nTo: "+email+"\nSubject: Vinambar Passwort\n\n"
+	Msg=Msg+"Deine Kundennummer ist: "+str(int(custid))+"\n"
+	Msg=Msg+"Dein Vinyambar-Passwort lautet: "+password+"\n"
 	Msg=Msg+"\nDiese Mail wurde an Dich versandt, weil Du (oder jemand anders) \n"
 	Msg=Msg+"es im Formular auf http://www.vinyambar.de/accounts.shtml angefordert hat.\n"
 	server=smtplib.SMTP(smtpserver)
@@ -146,7 +148,7 @@ def SendPass(custid):
 	db.close()
 	Display('<div align="center">Das Passwort wurde verschickt</div>', 'Kundendaten #'+str(custid))
     except:
-	Display('<div align="center">Beim Versenden des Passwortes ist ein Fehler aufgetreten</div>', 'Kundendaten #'+str(custid))
+	Display('<div align="center">Beim Versenden des Passwortes ist ein Fehler aufgetreten.<br>Eventuell ist die email-Adresse unbekannt</div>', 'Kundendaten für '+email)
 
 Form = cgi.FieldStorage()
 
@@ -160,8 +162,12 @@ if Form.has_key("pass"):
 else:
     Password=""
 
-if Password=="":
-    SendPass(custid)
+if Form.has_key("sendpass"):
+    if Form.has_key("email"):
+	Email = Form["email"].value
+    else:
+	Email=""
+    SendPass(Email)
 elif Form.has_key("save"):
     Save(custid, Password)
 else:
