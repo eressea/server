@@ -1,4 +1,7 @@
 #!/usr/bin/python
+## This script is called when an email from the user arrives
+## in reply to the registration form's confirmation email.
+## It's the first time the user is added to the database.
 
 import MySQLdb
 import sys
@@ -81,7 +84,25 @@ matcholdrace=re.compile(
   re.IGNORECASE | re.DOTALL | re.VERBOSE)
 oldrace=0
 
+matchstandin=re.compile(
+  r""".*Stand-In:\s(on)\s*""",
+  re.IGNORECASE | re.DOTALL | re.VERBOSE)
+standin=0
+
+matchwaiting=re.compile(
+  r""".*Warteliste: on\s(on)\s*""",
+  re.IGNORECASE | re.DOTALL | re.VERBOSE)
+waiting=0
+
 for line in sys.stdin.readlines():
+  match=matchwaiting.match(line)
+  if (match!=None):
+    waiting=1
+    continue
+  match=matchstandin.match(line)
+  if (match!=None):
+    standin=1
+    continue
   match=matcholdrace.match(line)
   if (match!=None):
     oldrace=match.group(1)
@@ -129,38 +150,45 @@ oldrace=validrace(oldrace)
 newrace=validrace(newrace)
 
 if (email==None):
-  error("enno@eressea.upb.de",
-    "Es wurde keine Emailadresse angegeben: "+firstname+" "+lastname)
-elif (oldrace==None) & (newrace==None):
-  error(email, "Es wurde kein Spiel ausgewählt.")
+    error("enno@eressea.upb.de",
+      "Es wurde keine Emailadresse angegeben: "+firstname+" "+lastname)
+elif (oldrace==None) & (newrace==None) & (standin==0) & (waiting==0):
+    error(email, "Es wurde kein Spiel ausgewählt.")
 elif (firstname==None):
-  error(email, "Es wurde kein Vorname angegeben")
+    error(email, "Es wurde kein Vorname angegeben")
 elif (lastname==None):
-  error(email, "Es wurde kein Nachname angegeben")
+    error(email, "Es wurde kein Nachname angegeben")
 elif (address==None):
-  error(email, "Es wurde keine Adresse angegeben")
+    error(email, "Es wurde keine Adresse angegeben")
 elif (city==None):
-  error(email, "Es wurde kein Wohnort angegeben")
+    error(email, "Es wurde kein Wohnort angegeben")
 elif (country==None):
-  error(email, "Es wurde kein Land angegeben")
+    error(email, "Es wurde kein Land angegeben")
 else:
-  if (phone==None):
-    phone = "NULL"
+    if (phone==None):
+	phone = "NULL"
 
-  cursor=db.cursor()
-  cursor.execute("INSERT INTO users (firstname, lastname, email, address, city, phone, country, password) "+
-    "VALUES ('"+firstname+"', '"+lastname+"', '"+email+"', '"+address+"', '"+city+"', '"+phone+"', "+country+", '"+genpasswd()+"')")
+    cursor=db.cursor()
+    cursor.execute("INSERT INTO users (firstname, lastname, email, address, city, phone, country, password) "+
+      "VALUES ('"+firstname+"', '"+lastname+"', '"+email+"', '"+address+"', '"+city+"', '"+phone+"', "+country+", '"+genpasswd()+"')")
     
-  cursor.execute("SELECT LAST_INSERT_ID() from dual")
-  lastid=str(int(cursor.fetchone()[0]))
+    cursor.execute("SELECT LAST_INSERT_ID() from dual")
+    lastid=str(int(cursor.fetchone()[0]))
 
-  if (oldrace!=None):
-    cursor.execute("INSERT INTO subscriptions (user, race, game) "+
-      "VALUES ("+lastid+", '"+oldrace+"', 1)")
-
-  if (newrace!=None):
-    cursor.execute("INSERT INTO subscriptions (user, race, game) "+
-      "VALUES ("+lastid+", '"+newrace+"', 2)")
+    if (oldrace!=None):
+	error(email, "Derzeit wird kein Spiel nach alten Regeln angeboten")
+#	cursor.execute("INSERT INTO subscriptions (user, race, game) "+
+#	  "VALUES ("+lastid+", '"+oldrace+"', 1)")
+    if (newrace!=None):
+	error(email, "Derzeit wird kein Spiel nach neuen Regeln angeboten")
+#	cursor.execute("INSERT INTO subscriptions (user, race, game, status) "+
+#	  "VALUES ("+lastid+", '"+newrace+"', 2, 'WAITING')")
+    if waiting:
+	cursor.execute("INSERT INTO subscriptions (user, game, status) "+
+	  "VALUES ("+lastid+", 3, 'WAITING')")
+    if standin:
+	cursor.execute("INSERT INTO subscriptions (user, game, status) "+
+	  "VALUES ("+lastid+", 4, 'WAITING')")
 
 errors.close()
 unlock(sys.argv[1]+".err")

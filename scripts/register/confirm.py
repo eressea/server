@@ -11,7 +11,7 @@ From="accounts@vinyambar.de"
 server=smtplib.SMTP('localhost')
 
 cursor=db.cursor()
-records=cursor.execute("SELECT users.id, users.password, users.email, "+
+records=cursor.execute("SELECT users.id, users.password, users.email, users.balance, "+
     "races.name, "+
     "games.name, games.info, subscriptions.id "+
     "from users, games, subscriptions, races "+
@@ -20,17 +20,9 @@ records=cursor.execute("SELECT users.id, users.password, users.email, "+
     "AND subscriptions.status='NEW'")
 
 while (records>0):
-    row=cursor.fetchone()
     records = records - 1
-    customerid=row[0]
-    passwd=row[1]
-    email=row[2]
-    race=row[3]
-    gamename=row[4]
-    gameinfo=row[5]
-    subscription=row[6]
-
-    print "Sent confirmation to "+email+" for "+gamename+"."
+    customerid, passwd, email, balance, race, gamename, gameinfo, subscription = cursor.fetchone()
+    
     Msg = ("From: "+From+"\nTo: "+email+"\nSubject: Vinyambar Anmeldung angenommen.\n\n"+
         "Deine Anmeldung für '"+gamename+"' wurde akzeptiert.\n"
         "\n"+
@@ -39,16 +31,18 @@ while (records>0):
         "Auftragsnummer: " + str(int(subscription)) + "\n"+
         "Passwort:       " + passwd + "\n" +
         "Rasse:          " + race + "\n\n"+
+        "Kontostand:     " + str(balance) + " DEM\n\n"+
         "Bitte bewahre diese Mail sorgfältig auf, da Du deine Kundennummer und das\n"+
         "Passwort für das Spiel benötigst. Solltest Du noch Fragen zu Deiner \n"+
         "Anmeldung haben, wende Dich bitte an accounts@vinyambar.de.\n\n"+
         "Das Vinyambar-Team")
     try:
         server.sendmail(From, email, Msg)
+	print "Sent confirmation to "+email+" for "+gamename+"."
         update=db.cursor()
         update.execute("UPDATE subscriptions set status='CONFIRMED' WHERE id="+
             str(int(subscription)));
     except:
-        print "Could not send Error to "+To
+        print "Could not send Error to "+email
         print "Reason was: '"+Reason+"'"
         print "Exception is:", sys.exc_type, ":", sys.exc_value
