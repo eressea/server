@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.14 2001/02/11 12:56:27 enno Exp $
+ *	$Id: laws.c,v 1.15 2001/02/11 13:25:19 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2105,11 +2105,6 @@ sinkships(void)
 #include "eressea.h"
 #include "build.h"
 
-void *
-resolve_ship(void * id) {
-   return findship((int)id);
-}
-
 static void
 reorder_owners(region * r)
 {
@@ -2145,7 +2140,10 @@ reorder_owners(region * r)
 		unit * u = *useek;
 		assert(!u->building);
 		if (u->ship==NULL) {
-			assert(!fval(u, FL_OWNER));
+			if (fval(u, FL_OWNER)) {
+				fprintf(stderr, "WARNING: Einheit %s war Besitzer von nichts.\n", unitname(u));
+				freset(u, FL_OWNER);
+			}
 			*useek = u->next;
 			useek = &u->next;
 			u->next = *up;
