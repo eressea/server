@@ -500,7 +500,7 @@ static struct curse_type ct_skillmod = {
 	"skillmod",
 	CURSETYP_NORM, CURSE_SPREADMODULO, M_MEN,
 	"",
-	cinfo_unit,
+	cinfo_skill,
 	NULL,
 	read_skill, write_skill
 };
