@@ -93,7 +93,7 @@ academy;de;Akademie
 magictower;de;Magierturm
 smithy;de;Schmiede
 sawmill;de;Sägewerk
-stable;de;Pferdezucht
+stables;de;Pferdezucht
 monument;de;Monument
 dam;de;Damm
 caravan;de;Karawanserei
