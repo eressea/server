@@ -1202,7 +1202,7 @@ quit(void)
 		}
 #if defined(ALLIANCES) && !defined(ALLIANCEJOIN)
 		if (f->alliance==NULL) {
-			destroyfaction(f);
+			/* destroyfaction(f); */
 			continue;
 		}
 #endif
