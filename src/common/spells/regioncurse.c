@@ -21,6 +21,8 @@
 #include <nrmessage.h>
 #include <objtypes.h>
 #include <curse.h>
+#include <unit.h>
+#include <magic.h>
 
 /* util includes */
 #include <message.h>
@@ -50,11 +52,14 @@ cinfo_region(const struct locale * lang, const void * obj, typ_t typ, struct cur
 	return 1;
 }
 
-/* 
- * CurseInfo mit Spezialabfragen 
+
+/* --------------------------------------------------------------------- */
+/* CurseInfo mit Spezialabfragen 
  */
 
-/* godcursezone */
+/*
+ * godcursezone
+ */
 static int
 cinfo_cursed_by_the_gods(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
@@ -76,7 +81,10 @@ cinfo_cursed_by_the_gods(const locale * lang, const void * obj, typ_t typ, curse
 
 	return 1;
 }
-/* C_GBDREAM, */
+/* --------------------------------------------------------------------- */
+/*
+ * C_GBDREAM
+ */
 static int
 cinfo_dreamcurse(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
@@ -97,7 +105,11 @@ cinfo_dreamcurse(const locale * lang, const void * obj, typ_t typ, curse *c, int
 
 	return 1;
 }
-/* C_MAGICSTREET */
+/* --------------------------------------------------------------------- */
+/*
+ * C_MAGICSTREET
+ *  erzeugt Straßennetz
+ */
 static int
 cinfo_magicstreet(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
@@ -120,6 +132,17 @@ cinfo_magicstreet(const locale * lang, const void * obj, typ_t typ, curse *c, in
 
 	return 1;
 }
+static struct curse_type ct_magicstreet = {
+	"magicstreet",
+	CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
+	"Es scheint sich um einen elementarmagischen Zauber zu handeln, der alle "
+	"Pfade und Wege so gut festigt, als wären sie gepflastert. Wie auf einer "
+	"Straße kommt man so viel besser und schneller vorwärts.",
+	cinfo_magicstreet
+};
+
+/* --------------------------------------------------------------------- */
+
 static int
 cinfo_antimagiczone(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
@@ -131,8 +154,8 @@ cinfo_antimagiczone(const locale * lang, const void * obj, typ_t typ, curse *c, 
 
 	assert(typ == TYP_REGION);
 
-	/* Tybied Magier spüren eine Antimagiezone */
-	if (self != 0){
+	/* Magier spüren eine Antimagiezone */
+	if (self == 2 || self == 1){
 		msg = msg_message("curseinfo::antimagiczone", "id", c->no);
 		nr_render(msg, lang, buf, sizeof(buf), NULL);
 		msg_release(msg);
@@ -141,6 +164,42 @@ cinfo_antimagiczone(const locale * lang, const void * obj, typ_t typ, curse *c, 
 
 	return 0;
 }
+static struct curse_type ct_antimagiczone = { 
+	"antimagiczone",
+	CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
+	"Dieser Zauber scheint magische Energien irgendwie abzuleiten und "
+	"so alle in der Region gezauberten Sprüche in ihrer Wirkung zu "
+	"schwächen oder ganz zu verhindern.",
+	cinfo_antimagiczone
+};
+
+/* alle Magier können eine Antimagiezone wahrnehmen */
+static int
+cansee_antimagiczone(const struct faction *viewer, curse *c, const void * obj, typ_t typ, int self)
+{
+	region *r;
+	unit *u = NULL;
+	unit *mage = c->magician;
+
+	unused(typ);
+
+	assert(typ == TYP_REGION);
+	r = (region *)obj;
+	for (u = r->units; u; u = u->next) {
+		if (u->faction==viewer){
+			if (u==mage){
+				self = 2;
+				break;
+			}
+			if (is_mage(u)){
+				self = 1;
+			}
+		} 
+	}
+	return self;
+}
+
+/* --------------------------------------------------------------------- */
 static int
 cinfo_farvision(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
@@ -162,7 +221,13 @@ cinfo_farvision(const locale * lang, const void * obj, typ_t typ, curse *c, int 
 	return 0;
 }
 
-/* --------------------------------------------------------------------- */
+static struct curse_type ct_farvision = { 
+	"farvision",
+	CURSETYP_NORM, 0, (NO_MERGE),
+	"",
+	cinfo_farvision
+};
+
 
 /* --------------------------------------------------------------------- */
 
@@ -171,21 +236,6 @@ static struct curse_type ct_fogtrap = {
 	CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
 	"",
 	cinfo_region
-};
-
-static struct curse_type ct_antimagiczone = { 
-	"antimagiczone",
-	CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-	"Dieser Zauber scheint magische Energien irgendwie abzuleiten und "
-	"so alle in der Region gezauberten Sprüche in ihrer Wirkung zu "
-	"schwächen oder ganz zu verhindern.",
-	cinfo_antimagiczone
-};
-static struct curse_type ct_farvision = { 
-	"farvision",
-	CURSETYP_NORM, 0, (NO_MERGE),
-	"",
-	cinfo_farvision
 };
 static struct curse_type ct_gbdream = { 
 	"gbdream",
@@ -264,15 +314,6 @@ static struct curse_type ct_disorientationzone = {
 	"",
 	cinfo_region
 };
-/*  erzeugt Straßennetz */
-static struct curse_type ct_magicstreet = {
-	"magicstreet",
-	CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-	"Es scheint sich um einen elementarmagischen Zauber zu handeln, der alle "
-	"Pfade und Wege so gut festigt, als wären sie gepflastert. Wie auf einer "
-	"Straße kommt man so viel besser und schneller vorwärts.",
-	cinfo_magicstreet
-};
 /*  erniedigt Magieresistenz von nicht-aliierten Einheiten, wirkt nur 1x
  *  pro Einheit */
 static struct curse_type ct_badmagicresistancezone = {
@@ -323,6 +364,8 @@ register_regioncurse(void)
 	register_function((pf_generic)cinfo_cursed_by_the_gods, "curseinfo::cursed_by_the_gods");
 	register_function((pf_generic)cinfo_dreamcurse, "curseinfo::dreamcurse");
 	register_function((pf_generic)cinfo_magicstreet, "curseinfo::magicstreet");
+
+	register_function((pf_generic)cansee_antimagiczone, "cursecansee::antimagiczone");
 
 	ct_register(&ct_fogtrap);
 	ct_register(&ct_antimagiczone);
