@@ -30,7 +30,9 @@ Ein paar Tipps für den Anfang:
 Eressea ist ein komplexes Spiel mit einer Menge Regeln. Je besser Du sie
 verstehst, desto besser wirst Du das Spiel spielen können. Nimm Dir die
 Zeit, die Anleitung ausführlich zu lesen. Du findest sie unter
-http://eressea.upb.de/rules/
+http://eressea.upb.de/rules/. Wenn Du allgemeine Fragen hast, kannst Du auch
+auf unserem Forum vorbeischauen, das du unter http://eressea.upb.de/forum/
+findest.
 
 Eressea ist ein textuelles Spiel. Laß Dich nicht davon einschüchtern, das Du
 Befehle lernen mußt - so viele sind es nicht, und die meisten sind sehr

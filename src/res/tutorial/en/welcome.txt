@@ -13,7 +13,7 @@ The tutorial differs from Eressea in a few very important points:
 Tutorial:  tutorial@eressea.upb.de
 Eressea:   eressea-server@eressea.upb.de
 
-* Zugabgaberhytmus:
+* Frequency:
 Tutorial:  3x per Week, Monday, Wednesday and Saturday before 9 am CET.
 Eressea:   1x per Week, Sunday before 9 am CET.
 
@@ -24,7 +24,9 @@ Eressea:   open-ended
 
 Eressea is a complex game with a lot of rules. Unlike other games, you will
 not get very far if you haven't read the rules. Really. So if you haven't
-done it yet, head over to http://eressea.upb.de/rules/en/ and read them. 
+done it yet, head over to http://eressea.upb.de/rules/en/ and read them. If
+you want to talk to some other Eressea playes, visit our forums at
+http://eressea.upb.de/forum/
 
 Eressea is a text-based game. In these days when all games are 3D, a game
 that relies mostly on text may seem like an anachronism, but most of the
