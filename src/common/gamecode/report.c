@@ -2548,12 +2548,13 @@ find_seen(const region * r)
 	return NULL;
 }
 
+seen_region * last;
 static boolean
 add_seen(const struct region * r, unsigned char mode, boolean dis)
 {
 	seen_region * find = find_seen(r);
 	if (find==NULL) {
-		seen_region * insert;
+		seen_region * insert = NULL;
 		int index = abs((r->x & 0xffff) + ((r->y) << 16)) % MAXSEEHASH;
 		if (!reuse) reuse = (seen_region*)calloc(1, sizeof(struct seen_region));
 		find = reuse;
@@ -2562,26 +2563,40 @@ add_seen(const struct region * r, unsigned char mode, boolean dis)
 		seehash[index] = find;
 		find->r = r;
 
-		for (insert=last;insert;insert=insert->next) {
-			const region * rl;
-			seen_region * inext = insert->next;
-			for (rl=insert->r;rl && (!inext || rl!=inext->r);rl=rl->next) {
-				if (rl==r) break;
-			}
-			if (rl==r) break;
-		}
-		if (insert==0) {
-			for (insert=seen;insert!=last;insert=insert->next) {
-				const region * rl;
+		/* first attempt: try to put it between previous insertion point and 
+		 * last region known so far. It's quite likely to be here. */
+		if (last) {
+			for (insert=last;insert->next;insert=insert->next) {
+				region * rl;
 				seen_region * inext = insert->next;
-				for (rl=insert->r;rl && (!inext || rl!=inext->r);rl=rl->next) {
+				for (rl=insert->r->next;rl && rl!=inext->r;rl=rl->next) {
 					if (rl==r) break;
 				}
 				if (rl==r) break;
 			}
-			if (insert==last) insert=0;
+			/* if we did not find it, and mode is not see_neighbour, it *still* 
+			 * belongs at the end. otherwise, search more: */
+			if (insert->next==NULL && mode==see_neighbour) {
+				const region * rl = NULL;
+				seen_region * sprev;
+				for(sprev=seen;sprev!=last;sprev=sprev->next) {
+					seen_region * snext = sprev->next;
+					for (rl=sprev->r->next;rl!=snext->r;rl=rl->next) {
+						if (rl==r) break;
+					}
+					if (rl==r) break;
+				}
+				/* search it after the insertion point, all the way to the end */
+				if (rl==r) insert = sprev;
+				else {
+					for (rl=insert->r->next;rl;rl=rl->next) {
+						if (rl==r) break;
+					}
+					if (rl!=r) insert=NULL; /* in front */
+				}
+			}
 		}
-		last = find;
+		if (mode!=see_neighbour) last=find;
 		find->prev = insert;
 		if (insert!=0) {
 			find->next = insert->next;
