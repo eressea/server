@@ -7408,12 +7408,12 @@
 		</type>
 		<locale name="de">
 			<nr section="events">
-				<text>Diese Woche haben die Strahlen der Sonne Eresseas eine besondere heilende Kraft.</text>
+				<text>Ein Hauch des Lebens liegt über der Welt und alle Wesen fühlen sich frisch und erholt.</text>
 			</nr>
 		</locale>
 		<locale name="en">
 			<nr section="events">
-				<text>This week, the sun of Eressea has special healing powers.</text>
+				<text>Life itself touches the world and all beings are healed.</text>
 			</nr>
 		</locale>
 	</message>
