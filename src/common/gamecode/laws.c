@@ -3241,30 +3241,10 @@ update_spells(void)
 
 }
 
-void
-processorders (void)
+static void
+age_factions(void)
 {
 	faction *f;
-	region *r;
-	unit *u;
-	strlist *S;
-
-	if (turn == 0) srand(time((time_t *) NULL));
-	else srand(turn);
-
-	puts(" - neue Einheiten erschaffen...");
-	new_units();
-
-	puts(" - Monster KI...");
-	plan_monsters();
-	set_passw();		/* und pruefe auf illegale Befehle */
-
-	puts(" - Defaults und Instant-Befehle...");
-	setdefaults();
-	instant_orders();
-
-	mail();
-	puts(" - Altern");
 
 	for (f = factions; f; f = f->next) {
 		f->age = f->age + 1;
@@ -3273,8 +3253,14 @@ processorders (void)
 				"newbieimmunity%i:turns", IMMUN_GEGEN_ANGRIFF - f->age));
 		}
 	}
+}
 
-	puts(" - Benutzen");
+static void
+use(void)
+{
+	region *r;
+	unit *u;
+	strlist *S;
 
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) {
@@ -3292,6 +3278,33 @@ processorders (void)
 			}
 		}
 	}
+}
+
+void
+processorders (void)
+{
+	region *r;
+
+	if (turn == 0) srand(time((time_t *) NULL));
+	else srand(turn);
+
+	puts(" - neue Einheiten erschaffen...");
+	new_units();
+
+	puts(" - Monster KI...");
+	plan_monsters();
+	set_passw();		/* und pruefe auf illegale Befehle */
+
+	puts(" - Defaults und Instant-Befehle...");
+	setdefaults();
+	instant_orders();
+
+	mail();
+	puts(" - Altern");
+	age_factions();
+
+	puts(" - Benutzen");
+	use();
 
 	puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (1.Versuch)");
 	do_misc(0);
