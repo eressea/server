@@ -314,6 +314,7 @@ factionhere(region * r, int f)
 	return false;
 }
 
+#ifdef ALLIANCES
 static boolean
 alliancehere(region * r, int alliance)
 {
@@ -323,6 +324,7 @@ alliancehere(region * r, int alliance)
 			return true;
 	return false;
 }
+#endif
 
 #if NEW_RESOURCEGROWTH
 static boolean
@@ -428,7 +430,7 @@ drawmap(boolean maponly) {
 					addstr("Dropouts ");
 					break;
 				case -11:
-					addstr("Allianz ");
+					printw((NCURSES_CONST char*)"Allianz %d ", hl_alliance);
 					break;
 				default:
 					printw((NCURSES_CONST char*)"Partei %d ", hl);
@@ -737,7 +739,11 @@ SetHighlight(void)
 	wmove(win, 2, 2);
 	wAddstr("             A)nfängern, L)aen, C)haos, G)odcurse");
 	wmove(win, 3, 2);
+#ifdef ALLIANCES
 	wAddstr("             D)ropouts, Allian(Z) oder N)ichts?");
+#else
+	wAddstr("             D)ropouts oder N)ichts?");
+#endif
 	wrefresh(win);
 	c = tolower(getch());
 	switch (c) {
