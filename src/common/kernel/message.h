@@ -66,5 +66,5 @@ extern const struct messageclass * mc_find(const char * name);
 /* convenience, deprecated */
 extern struct message * new_message(struct faction * receiver, const char * signature, ...);
 
-#define ADDMSG(msgs, mcreate) { message * m = mcreate; add_message(msgs, m); msg_release(m); }
+#define ADDMSG(msgs, mcreate) { message * m = mcreate; if (m) { add_message(msgs, m); msg_release(m); } }
 #endif
