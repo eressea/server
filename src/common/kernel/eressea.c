@@ -2863,7 +2863,7 @@ movewhere(region * r, const unit *u)
 		return 0;
 	}
 
-	if (move_blocked(u, r, d) == true) {
+	if (move_blocked(u, r, r2)) {
 		add_message(&u->faction->msgs,
 			msg_message("moveblocked", "unit direction", u, d));
 		return NULL;
@@ -2883,18 +2883,23 @@ movewhere(region * r, const unit *u)
 }
 
 boolean
-move_blocked(const unit * u, const region *r, direction_t dir)
+move_blocked(const unit * u, const region *r, const region *r2)
 {
-	region * r2 = NULL;
-	border * b;
-	if (dir<MAXDIRECTIONS) r2 = rconnect(r, dir);
-	if (r2==NULL) return true;
-	b = get_borders(r, r2);
-	while (b) {
-		if (b->type->block && b->type->block(b, u, r)) return true;
-		b = b->next;
-	}
-	return false;
+  border * b;
+  curse * c;
+  static const curse_type * fogtrap_ct = NULL;
+
+  if (r2==NULL) return true;
+  b = get_borders(r, r2);
+  while (b) {
+    if (b->type->block && b->type->block(b, u, r)) return true;
+    b = b->next;
+  }
+
+  if (fogtrap_ct==NULL) fogtrap_ct = ct_find("fogtrap"); 
+  c = get_curse(r->attribs, fogtrap_ct);
+  if (curse_active(c)) return true;
+  return false;
 }
 
 void

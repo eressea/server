@@ -1131,7 +1131,7 @@ extern int maxworkingpeasants(const struct region * r);
 extern int wage(const struct region *r, const struct unit *u, boolean img);
 extern int fwage(const struct region *r, const struct faction *f, boolean img);
 extern struct region * movewhere(struct region * r, const struct unit *u);
-extern boolean move_blocked(const struct unit * u, const struct region *r, direction_t dir);
+extern boolean move_blocked(const struct unit * u, const struct region *src, const struct region *dest);
 extern void add_income(struct unit * u, int type, int want, int qty);
 
 extern int month(int offset);

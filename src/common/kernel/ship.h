@@ -94,6 +94,8 @@ extern const struct ship_type * findshiptype(const char *s, const struct locale 
 
 extern void register_ships(void);
 
+extern void destroy_ship(struct ship * s);
+
 #ifdef __cplusplus
 }
 #endif

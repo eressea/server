@@ -1280,7 +1280,7 @@ showunits(region * r)
 					modified = 1;
 					for (x = shipregion->units; x; x = x->next)
 						leave(shipregion, x);
-					destroy_ship(clipship, shipregion);
+					destroy_ship(clipship);
 					clipship = 0;
 					shipregion = 0;
 					for (pline = 0, tmp = eh; tmp != pointer; tmp = tmp->next)

@@ -82,8 +82,6 @@ void reportevent(struct region * r, char *s);
 void shash(struct ship * sh);
 void sunhash(struct ship * sh);
 
-void destroy_ship(struct ship * s, struct region * r);
-
 extern int build(struct unit * u, const construction * ctype, int completed, int want);
 extern int maxbuild(const struct unit *u, const construction *cons);
 

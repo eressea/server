@@ -592,7 +592,7 @@ chaos(region * r)
 						while (sh) {
 							ship * nsh = sh->next;
 							damage_ship(sh, 0.50);
-							if (sh->damage >= sh->size * DAMAGE_SCALE) destroy_ship(sh, r);
+							if (sh->damage >= sh->size * DAMAGE_SCALE) destroy_ship(sh);
 							sh = nsh;
 						}
 
@@ -932,7 +932,7 @@ move_iceberg(region *r)
 					if (sh->damage>=sh->size * DAMAGE_SCALE) {
 						if (u) ADDMSG(&u->faction->msgs, new_message(u->faction,
 							"overrun_by_iceberg_des%h:ship", sh));
-						destroy_ship(sh, r);
+						destroy_ship(sh);
 					} else {
 						if (u) ADDMSG(&u->faction->msgs, new_message(u->faction,
 							"overrun_by_iceberg%h:ship", sh));
@@ -1034,7 +1034,7 @@ godcurse(void)
 				unit * u = shipowner(r, sh);
 				if (u) ADDMSG(&u->faction->msgs,
 					msg_message("godcurse_destroy_ship", "ship", sh));
-				destroy_ship(sh, r);
+				destroy_ship(sh);
 			}
 			sh = shn;
 		}

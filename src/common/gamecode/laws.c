@@ -2655,7 +2655,7 @@ sinkships(void)
 				damage_ship(sh, 0.05);
 			}
 			if (sh->damage >= sh->size * DAMAGE_SCALE)
-				destroy_ship(sh, r);
+				destroy_ship(sh);
 		}
 		list_next(sh);
 	}

@@ -46,8 +46,6 @@ typedef obj_ID (*ID_fun)(void *obj);
 typedef void *(*find_fun)(obj_ID id);
 typedef char *(*desc_fun)(void *obj);
 typedef attrib **(*attrib_fun)(void *obj);
-typedef void (*destroy_fun)(void *obj);
-typedef void *(*deref_fun)(void *obj);
 typedef void (*set_fun)(void *ptrptr, void *obj);	/* 	*ptrptr = obj  */
 
 
@@ -56,8 +54,6 @@ typedef struct {
 	find_fun	find;		/* liefert struct unit* zu obj_ID  */
 	desc_fun	getname;	/* unitname() */
 	attrib_fun	getattribs;	/* liefert &u->attribs */
-	destroy_fun destroy;	/* destroy_unit() */
-	deref_fun	ppget;		/* liefert struct unit* aus struct unit**  */
 	set_fun		ppset;		/* setzt *(struct unit **) zu struct unit*  */
 } typdata_t;
 

@@ -414,7 +414,7 @@ destroy(region * r, unit * u, const char * cmd)
         }
         add_message(&u->faction->msgs, new_message(
           u->faction, "shipdestroy%u:unit%r:region%h:ship", u, r, sh));
-        destroy_ship(sh, r);
+        destroy_ship(sh);
     } else {
       /* partial destroy */
       sh->size -= (sh->type->construction->maxsize * n)/100;

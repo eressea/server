@@ -206,7 +206,7 @@ fleeregion(const unit * u)
 	for (i = 0; i != MAXDIRECTIONS; ++i) {
 		region * r2 = rconnect(r, i);
 		if (r2) {
-			if (can_survive(u,r2) && !move_blocked(u, r, i))
+			if (can_survive(u,r2) && !move_blocked(u, r, r2))
 				neighbours[c++] = r2;
 		}
 	}
@@ -2569,7 +2569,7 @@ aftermath(battle * b)
       ship * sh = *sp;
       freset(sh, SF_DAMAGED);
       if (sh->damage >= sh->size * DAMAGE_SCALE) {
-        destroy_ship(sh, r);
+        destroy_ship(sh);
       }
       if (*sp==sh) sp=&sh->next;
     }

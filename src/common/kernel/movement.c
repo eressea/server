@@ -18,8 +18,6 @@
  * permission from the authors.
  */
 
-#define SAFE_COASTS /* Schiffe an der Küste treiben nicht ab */
-
 #include <config.h>
 #include "eressea.h"
 #include "movement.h"
@@ -425,29 +423,30 @@ enoughsailors(region * r, ship * sh)
 }
 /* ------------------------------------------------------------- */
 
-static void
+static ship *
 do_maelstrom(region *r, unit *u)
 {
-	int damage;
+  int damage;
 
-	damage = rand()%150 - eff_skill(u, SK_SAILING, r)*5;
+  damage = rand()%150 - eff_skill(u, SK_SAILING, r)*5;
 
-	if(damage <= 0) {
-		add_message(&u->faction->msgs,
-			new_message(u->faction, "entermaelstrom%r:region%h:ship%i:damage%i:sink", r, u->ship, damage, 1));
-		return;
-	}
+  if(damage <= 0) {
+    add_message(&u->faction->msgs,
+      new_message(u->faction, "entermaelstrom%r:region%h:ship%i:damage%i:sink", r, u->ship, damage, 1));
+    return u->ship;
+  }
 
-	damage_ship(u->ship, 0.01*damage);
+  damage_ship(u->ship, 0.01*damage);
 
-	if (u->ship->damage >= u->ship->size * DAMAGE_SCALE) {
-		ADDMSG(&u->faction->msgs, msg_message("entermaelstrom",
-			"region ship damage sink", r, u->ship, damage, 1));
-		destroy_ship(u->ship, r);
-	} else {
-		ADDMSG(&u->faction->msgs, msg_message("entermaelstrom",
-			"region ship damage sink", r, u->ship, damage, 0));
-	}
+  if (u->ship->damage >= u->ship->size * DAMAGE_SCALE) {
+    ADDMSG(&u->faction->msgs, msg_message("entermaelstrom",
+      "region ship damage sink", r, u->ship, damage, 1));
+    destroy_ship(u->ship);
+    return NULL;
+  }
+  ADDMSG(&u->faction->msgs, msg_message("entermaelstrom",
+    "region ship damage sink", r, u->ship, damage, 0));
+  return u->ship;
 }
 
 /** sets a marker in the region telling that the unit has travelled through it
@@ -623,33 +622,13 @@ drifting_ships(region * r)
         damage_ship(sh, 0.02);
 
         if (sh->damage>=sh->size * DAMAGE_SCALE) {
-          destroy_ship(sh, rnext);
+          destroy_ship(sh);
         }
       }
 
       if (*shp != sh) shp = &sh->next;
     }
   }
-}
-
-static void
-ship_in_storm(unit *cap, region *next_point)
-{
-	int i;
-
-	if(is_cursed(cap->ship->attribs, C_SHIP_NODRIFT, 0)) return;
-
-	add_message(&cap->faction->msgs,
-		new_message(cap->faction, "storm%h:ship%r:region%i:sink",
-		cap->ship, next_point, cap->ship->damage>=cap->ship->size * DAMAGE_SCALE));
-
-	/* Veränderung der Drehrichtung */
-	i = rand()%2==0?1:-1;
-#if 0 /* make a temporary attribute for this */
-	cap->wants += i;
-#endif
-	/* Merken für Sperren des Anlandens. */
-	if(i) fset(cap, UFL_STORM);
 }
 
 static boolean
@@ -942,13 +921,11 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
   region_list **iroute = &route;
   static boolean init = false;
   static const curse_type * speed_ct;
-  static const curse_type * fogtrap_ct;
 
   if (routep) *routep = NULL;
   if (!init) { 
     init = true; 
     speed_ct = ct_find("speed"); 
-    fogtrap_ct = ct_find("fogtrap"); 
   }
 
   /* tech:
@@ -1094,9 +1071,7 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
       else k-=BP_NORMAL;
       if (k<0) break;
 
-      if ((reldir>=0 && move_blocked(u, current, reldir))
-        || curse_active(get_curse(current->attribs, fogtrap_ct)))
-      {
+      if (reldir>=0 && move_blocked(u, current, next)) {
         ADDMSG(&u->faction->msgs, msg_message("leavefail", 
           "unit region", u, next));
       }
@@ -1395,42 +1370,47 @@ check_takeoff(ship *sh, region *from, region *to)
 }
 
 static boolean
-ship_allowed(const struct ship_type * type, region * r)
+flying_ship(const ship * sh)
 {
-	int c = 0;
-	if (check_working_buildingtype(r, bt_find("harbour"))) return true;
-	for (c=0;type->coast[c]!=NOTERRAIN;++c) {
-		if (type->coast[c]==rterrain(r)) return true;
-	}
-	return false;
+  if (sh->type->flags & SFL_FLY) return true;
+  if (is_cursed(sh->attribs, C_SHIP_FLYING, 0)) return true;
+  return false;
+}
+
+static boolean
+ship_allowed(const struct ship_type * type, const region * r)
+{
+  int c = 0;
+  terrain_t t = rterrain(r);
+
+  static const building_type * bt_harbour=NULL;
+  if (bt_harbour==NULL) bt_harbour=bt_find("harbour");
+
+  if (check_working_buildingtype(r, bt_harbour)) return true;
+
+  for (c=0;type->coast[c]!=NOTERRAIN;++c) {
+    if (type->coast[c]==t) return true;
+  }
+  return false;
 }
 
 static region_list *
 sail(unit * u, region * next_point, boolean move_on_land)
 {
-  region * starting_point = u->region;
+  region *starting_point = u->region;
   region *current_point, *last_point;
-  unit *u2, *hafenmeister;
-  item * trans = NULL;
-  int st, first = 1;
   int k, step = 0;
-  int stormchance;
   region_list *route = NULL;
   region_list **iroute = &route;
-  static boolean init = false;
-  static const curse_type * fogtrap_ct;
-  if (!init) { 
-    init = true; 
-    fogtrap_ct = ct_find("fogtrap"); 
-  }
+  ship * sh = u->ship;
+  faction * f = u->faction;
 
-  if (!ship_ready(starting_point, u))
-    return NULL;
+  if (!ship_ready(starting_point, u)) return NULL;
 
   /* Wir suchen so lange nach neuen Richtungen, wie es geht. Diese werden
   * dann nacheinander ausgeführt. */
 
-  k = shipspeed(u->ship, u);
+  k = shipspeed(sh, u);
 
   last_point = starting_point;
   current_point = starting_point;
@@ -1442,145 +1422,153 @@ sail(unit * u, region * next_point, boolean move_on_land)
   * Durchlauf schon gesetzt (Parameter!). current_point ist die letzte gültige,
   * befahrene Region. */
 
-  while (current_point!=next_point && step < k && next_point)
-  {
+  while (current_point!=next_point && step < k && next_point) {
+    terrain_t tthis = rterrain(current_point);
+    /* these values need to be updated if next_point changes (due to storms): */
+    terrain_t tnext = rterrain(next_point); 
     direction_t dir = reldirection(current_point, next_point);
 
-    if(terrain[rterrain(next_point)].flags & FORBIDDEN_LAND) {
+    assert(sh==u->ship || !"ship has sunk, but we didn't notice it");
+
+    if (terrain[tnext].flags & FORBIDDEN_LAND) {
       plane *pl = getplane(next_point);
-      if(pl && fval(pl, PFL_NOCOORDS)) {
-        ADDMSG(&u->faction->msgs,  msg_message("sailforbiddendir", 
-          "ship direction", u->ship, dir));
+      if (pl && fval(pl, PFL_NOCOORDS)) {
+        ADDMSG(&f->msgs,  msg_message("sailforbiddendir", 
+          "ship direction", sh, dir));
       } else {
-        ADDMSG(&u->faction->msgs, msg_message("sailforbidden", 
-          "ship region", u->ship, next_point));
+        ADDMSG(&f->msgs, msg_message("sailforbidden", 
+          "ship region", sh, next_point));
       }
       break;
     }
 
-    if( !is_cursed(u->ship->attribs, C_SHIP_FLYING, 0)
-      && !(u->ship->type->flags & SFL_FLY)) {
-        if (rterrain(current_point) != T_OCEAN
-          && rterrain(next_point) != T_OCEAN) {
+    if (!flying_ship(sh)) {
+
+      /* storms should be the first thing we do. */
+      int stormchance = storms[month(0)] * 5 / shipspeed(sh, u);
+      if (check_leuchtturm(next_point, NULL)) stormchance /= 3;
+
+      if (rand()%10000 < stormchance && next_point->terrain == T_OCEAN) {
+        if (!is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
+          region * rnext = NULL;
+          boolean storm = true;
+          int d_offset = rand() % MAXDIRECTIONS;
+          direction_t d;
+          /* Sturm nur, wenn nächste Region Hochsee ist. */
+          for (d=0;d!=MAXDIRECTIONS;++d) {
+            direction_t dnext = (direction_t)((d + d_offset) % MAXDIRECTIONS);
+            region * rn = rconnect(current_point, dnext);
+
+            if (rn!=NULL) {
+              terrain_t t = rterrain(rn);
+
+              if (terrain[t].flags & FORBIDDEN_LAND) continue;
+              if (t!=T_OCEAN) {
+                storm = false;
+                break;
+              }
+              if (rn!=next_point) rnext = rn;
+            }
+          }
+          if (storm && rnext!=NULL) {
+            ADDMSG(&f->msgs, msg_message("storm", "ship region sink", 
+              sh, current_point, sh->damage>=sh->size * DAMAGE_SCALE));
+
+            /* damage the ship. we handle destruction in the end */
+            damage_ship(sh, 0.02);
+            if (sh->damage>=sh->size * DAMAGE_SCALE) break;
+
+            next_point = rnext;
+            /* these values need to be updated if next_point changes (due to storms): */
+            tnext = rterrain(next_point); 
+            dir = reldirection(current_point, next_point);
+          }
+        }
+      }
+
+      if (tthis != T_OCEAN) {
+        if (tnext != T_OCEAN) {
+          if (!move_on_land) {
+            /* check that you're not traveling from one land region to another. */
             plane *pl = getplane(next_point);
-            if (dir<MAXDIRECTIONS && pl && fval(pl, PFL_NOCOORDS)) {
+
+            if (pl!=NULL && fval(pl, PFL_NOCOORDS)) {
+              /* we don't have that case yet, but hey... */
               sprintf(buf, "Die %s entdeckt, daß im %s Festland ist.",
-                shipname(u->ship), locale_string(u->faction->locale, directions[dir]));
+                shipname(sh), locale_string(u->faction->locale, directions[dir]));
             } else {
               sprintf(buf, "Die %s entdeckt, daß (%d,%d) Festland ist.",
-                shipname(u->ship), region_x(next_point,u->faction),
+                shipname(sh), region_x(next_point,u->faction),
                 region_y(next_point,u->faction));
             }
             addmessage(0, u->faction, buf, MSG_MOVE, ML_WARN);
             break;
           }
-          if (!(u->ship->type->flags & SFL_OPENSEA) && rterrain(next_point) == T_OCEAN) {
-            direction_t d;
-            for (d=0;d!=MAXDIRECTIONS;++d) {
-              region * rc = rconnect(next_point, d);
-              if (rterrain(rc) != T_OCEAN) break;
-            }
-            if (d==MAXDIRECTIONS) {
-              /* Schiff kann nicht aufs offene Meer */
-              cmistake(u, findorder(u, u->thisorder), 249, MSG_MOVE);
-              break;
-            }
+        } else {
+          if (check_takeoff(sh, current_point, next_point) == false) {
+            /* Schiff kann nicht ablegen */
+            cmistake(u, findorder(u, u->thisorder), 182, MSG_MOVE);
+            break;
           }
-          if(rterrain(current_point) != T_OCEAN
-            && rterrain(next_point) == T_OCEAN) {
-              if(check_takeoff(u->ship, current_point, next_point) == false) {
-                /* Schiff kann nicht ablegen */
-                cmistake(u, findorder(u, u->thisorder), 182, MSG_MOVE);
-                break;
-              }
-            }
+        }
+      } else if (tnext==T_OCEAN) {
+        /* target region is an ocean, and we're not leaving a shore */
+        if (!(sh->type->flags & SFL_OPENSEA)) {
+          /* ship can only stay close to shore */
+          direction_t d;
+          
+          for (d=0;d!=MAXDIRECTIONS;++d) {
+            region * rc = rconnect(next_point, d);
+            if (rterrain(rc) != T_OCEAN) break;
+          }
+          if (d==MAXDIRECTIONS) {
+            /* Schiff kann nicht aufs offene Meer */
+            cmistake(u, findorder(u, u->thisorder), 249, MSG_MOVE);
+            break;
+          }
+        }
+      }
+    
+      if (!ship_allowed(sh->type, next_point)) {
+        /* for some reason or another, we aren't allowed in there.. */
+        if (check_leuchtturm(current_point, NULL)) {
+          ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship", sh));
+        } else {
+          damage_ship(sh, 0.10);
+          /* we handle destruction at the end */
+        }
+        break;
+      }
 
-            if (move_on_land == false && rterrain(next_point) != T_OCEAN) {
-              break;
-            }
+      if (is_cursed(next_point->attribs, C_MAELSTROM, 0)) {
+        if (do_maelstrom(next_point, u)==NULL) break;
+      }
 
-            /* Falls Blockade, endet die Seglerei hier */
+    } /* !flying_ship */
 
-            if (move_blocked(u, current_point, dir)
-              || curse_active(get_curse(current_point->attribs, fogtrap_ct))) {
-                add_message(&u->faction->msgs, new_message(u->faction,
-                  "sailfail%h:ship%r:region", u->ship, current_point));
-                break;
-              }
-              if (!ship_allowed(u->ship->type, next_point)) {
-                if(fval(u, UFL_STORM)) {
-                  if(!check_leuchtturm(current_point, NULL)) {
-                    add_message(&u->faction->msgs, new_message(u->faction,
-                      "sailnolandingstorm%h:ship", u->ship));
-                    damage_ship(u->ship, 0.10);
-                    if (u->ship->damage>=u->ship->size * DAMAGE_SCALE) {
-                      add_message(&u->faction->msgs, new_message(u->faction,
-                        "shipsink%h:ship", u->ship));
-                    }
-                  }
-                } else {
-                  add_message(&u->faction->msgs, new_message(u->faction,
-                    "sailnolanding%h:ship%r:region", u->ship, next_point));
-                  damage_ship(u->ship, 0.10);
-                  if (u->ship->damage>=u->ship->size * DAMAGE_SCALE) {
-                    add_message(&u->faction->msgs, new_message(u->faction,
-                      "shipsink%h:ship", u->ship));
-                  }
-                }
-                break;
-              }
-              if(terrain[rterrain(next_point)].flags & FORBIDDEN_LAND) {
-                plane *pl = getplane(next_point);
-                if(pl && fval(pl, PFL_NOCOORDS)) {
-                  add_message(&u->faction->msgs, new_message(u->faction,
-                    "sailforbiddendir%h:ship%i:direction",
-                    u->ship, dir));
-                  /*					sprintf(buf, "Die Mannschaft der %s weigert sich, in die Feuerwand "
-                  "im %s zu fahren.",
-                  shipname(u->ship), directions[dir]); */
-                } else {
-                  add_message(&u->faction->msgs, new_message(u->faction,
-                    "sailforbidden%h:ship%r:region", u->ship, next_point));
-                }
-                break;
-              }
+    /* Falls Blockade, endet die Seglerei hier */
+    if (move_blocked(u, current_point, next_point)) {
+      ADDMSG(&u->faction->msgs, msg_message("sailfail", "ship region", sh, current_point));
+      break;
+    }
 
-              if(is_cursed(next_point->attribs, C_MAELSTROM, 0)) {
-                do_maelstrom(next_point, u);
-              }
+    /* Falls kein Problem, eines weiter ziehen */
+    fset(sh, SF_MOVED);
+    add_regionlist(iroute, next_point);
+    iroute = &(*iroute)->next;
+    step++;
 
-              stormchance = storms[month(0)] * 5 / shipspeed(u->ship, u);
-              if(check_leuchtturm(next_point, NULL)) stormchance /= 3;
-#ifdef SAFE_COASTS
-              /* Sturm nur, wenn nächste Region Hochsee ist. */
-              if(rand()%10000 < stormchance) {
-                direction_t d;
-                for (d=0;d!=MAXDIRECTIONS;++d) {
-                  region * r = rconnect(next_point, d);
-                  if (rterrain(r)!=T_OCEAN) break;
-                }
-                if (d==MAXDIRECTIONS)
-                  ship_in_storm(u, next_point);
-              }
-#else
-              /* Sturm nur, wenn nächste Region keine Landregion ist. */
-              if(rand()%10000 < stormchance && next_point->terrain == T_OCEAN) {
-                ship_in_storm(u, next_point);
-              }
-#endif
-      } /* endif !flying */
+    last_point = current_point;
+    current_point = next_point;
 
-      /* Falls kein Problem, eines weiter ziehen */
-      fset(u->ship, SF_MOVED);
-      add_regionlist(iroute, next_point);
-      iroute = &(*iroute)->next;
-      step++;
+    if (rterrain(current_point) != T_OCEAN && !is_cursed(sh->attribs, C_SHIP_FLYING, 0)) break;
+    next_point = movewhere(current_point, u);
+  }
 
-      last_point = current_point;
-      current_point = next_point;
-
-      if (rterrain(current_point) != T_OCEAN && !is_cursed(u->ship->attribs, C_SHIP_FLYING, 0)) break;
-      next_point = movewhere(current_point, u);
+  if (sh->damage>=sh->size * DAMAGE_SCALE) {
+    ADDMSG(&f->msgs, msg_message("shipsink", "ship", sh));
+    destroy_ship(sh);
+    sh = NULL;
   }
 
   /* Nun enthält current_point die Region, in der das Schiff seine Runde
@@ -1589,8 +1577,8 @@ sail(unit * u, region * next_point, boolean move_on_land)
   * gekommen ist. Das ist nicht der Fall, wenn er von der Küste ins
   * Inland zu segeln versuchte */
 
-  if (fval(u->ship, SF_MOVED)) {
-    ship * sh = u->ship;
+  if (sh!=NULL && fval(sh, SF_MOVED)) {
+    unit * hafenmeister;
     /* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
     * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
     cycle_route(u, step);
@@ -1626,9 +1614,12 @@ sail(unit * u, region * next_point, boolean move_on_land)
     hafenmeister = owner_buildingtyp(current_point, bt_find("harbour"));
     if (sh && hafenmeister != NULL) {
       item * itm;
-      assert(trans==NULL);
+      unit * u2;
+      boolean first = true;
+      item * trans = NULL;
+
       for (u2 = current_point->units; u2; u2 = u2->next) {
-        if (u2->ship == u->ship &&
+        if (u2->ship == sh &&
           !alliedunit(hafenmeister, u->faction, HELP_GUARD)) {
 
 
@@ -1636,7 +1627,7 @@ sail(unit * u, region * next_point, boolean move_on_land)
               for (itm=u2->items; itm; itm=itm->next) {
                 const luxury_type * ltype = resource2luxury(itm->type->rtype);
                 if (ltype!=NULL && itm->number>0) {
-                  st = itm->number * effskill(hafenmeister, SK_TRADE) / 50;
+                  int st = itm->number * effskill(hafenmeister, SK_TRADE) / 50;
                   st = min(itm->number, st);
 
                   if (st > 0) {
@@ -1652,14 +1643,14 @@ sail(unit * u, region * next_point, boolean move_on_land)
       if (trans) {
         sprintf(buf, "%s erhielt ", hafenmeister->name);
         for (itm = trans; itm; itm=itm->next) {
-          if (first != 1) {
+          if (!first) {
             if (itm->next!=NULL && itm->next->next==NULL) {
               scat(" und ");
             } else {
               scat(", ");
             }
           }
-          first = 0;
+          first = false;
           icat(trans->number);
           scat(" ");
           if (itm->number == 1) {
@@ -2029,7 +2020,7 @@ destroy_damaged_ships(void)
 		for(sh=r->ships;sh;) {
 			shn = sh->next;
 			if (sh->damage>=sh->size * DAMAGE_SCALE) {
-				destroy_ship(sh, r);
+				destroy_ship(sh);
 			}
 			sh = shn;
 		}

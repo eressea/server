@@ -386,15 +386,18 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 	vset_init(&survivors);
 
 	/* figure out what a unit's chances of survival are: */
-	if (rterrain(r) != T_OCEAN)
-		probability = CANAL_SWIMMER_CHANCE;
-	else
-		for (d = 0; d != MAXDIRECTIONS; ++d)
-			if (rterrain(rconnect(r, d)) != T_OCEAN && !move_blocked(NULL, r, d)) {
-				safety = rconnect(r, d);
-				probability = OCEAN_SWIMMER_CHANCE;
-				break;
-			}
+        if (rterrain(r) != T_OCEAN) {
+          probability = CANAL_SWIMMER_CHANCE;
+        } else {
+          for (d = 0; d != MAXDIRECTIONS; ++d) {
+            region * rnext = rconnect(r, d);
+            if (rterrain(rnext) != T_OCEAN && !move_blocked(NULL, r, rnext)) {
+              safety = rnext;
+              probability = OCEAN_SWIMMER_CHANCE;
+              break;
+            }
+          }
+        }
 	for (ui = &r->units; *ui; ui = &(*ui)->next) {
 		unit *u = *ui;
 
@@ -484,7 +487,7 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 		}
 	}
 	/* finally, get rid of the ship */
-	destroy_ship(sh, r);
+	destroy_ship(sh);
 	vset_destroy(&informed);
 	vset_destroy(&survivors);
 }

@@ -183,20 +183,20 @@ new_ship(const ship_type * stype, region * r)
 }
 
 void
-destroy_ship(ship * s, region * r)
+destroy_ship(ship * sh)
 {
-	unit * u = r->units;
+  region * r = sh->region;
+  unit * u = r->units;
 
-	if(!findship(s->no)) return;
-	while (u) {
-		if (u->ship == s) {
-			leave_ship(u);
-		}
-		u = u->next;
-	}
-	sunhash(s);
-	choplist(&r->ships, s);
-	handle_event(&s->attribs, "destroy", s);
+  while (u) {
+    if (u->ship == sh) {
+      leave_ship(u);
+    }
+    u = u->next;
+  }
+  sunhash(sh);
+  choplist(&r->ships, sh);
+  handle_event(&sh->attribs, "destroy", sh);
 }
 
 const char *

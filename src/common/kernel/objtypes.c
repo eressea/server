@@ -159,8 +159,6 @@ typdata_t typdata[] = {
 		(find_fun)unit_find,
 		(desc_fun)unitname,
 		(attrib_fun)unit_attribs,
-		(destroy_fun)destroy_unit,
-		(deref_fun)unit_deref,
 		(set_fun)unit_set,
 	},
 	/* TYP_REGION */ {
@@ -168,8 +166,6 @@ typdata_t typdata[] = {
 		(find_fun)region_find,
 		(desc_fun)regionid,
 		(attrib_fun)region_attribs,
-		(destroy_fun)cannot_destroy,
-		(deref_fun)region_deref,
 		(set_fun)region_set,
 	},
 	/* TYP_BUILDING */ {
@@ -177,8 +173,6 @@ typdata_t typdata[] = {
 		(find_fun)building_find,
 		(desc_fun)buildingname,
 		(attrib_fun)building_attribs,
-		(destroy_fun)destroy_building,
-		(deref_fun)building_deref,
 		(set_fun)building_set,
 	},
 	/* TYP_SHIP */ {
@@ -186,8 +180,6 @@ typdata_t typdata[] = {
 		(find_fun)ship_find,
 		(desc_fun)shipname,
 		(attrib_fun)ship_attribs,
-		(destroy_fun)destroy_ship,
-		(deref_fun)ship_deref,
 		(set_fun)ship_set,
 	},
 	/* TYP_FACTION */ {
@@ -195,8 +187,6 @@ typdata_t typdata[] = {
 		(find_fun)faction_find,
 		(desc_fun)notimplemented_desc,
 		(attrib_fun)faction_attribs,
-		(destroy_fun)cannot_destroy,
-		(deref_fun)faction_deref,
 		(set_fun)faction_set,
 	},
 };
