@@ -1954,18 +1954,18 @@
   </message>
   <message name="renamed_notseen" section="events">
     <type>
-      <arg name="renamed" type="string"/>
+      <arg name="renamed" type="unit"/>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">"$renamed in $region($region) bekommt einen Spitznamen."</text>
+    <text locale="de">"$unit($renamed) in $region($region) bekommt einen Spitznamen."</text>
   </message>
   <message name="renamed_seen" section="events">
     <type>
-      <arg name="renamed" type="string"/>
+      <arg name="renamed" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="renamer" type="unit"/>
     </type>
-    <text locale="de">"$renamed in $region($region) bekommt von $unit($renamer) einen Spitznamen."</text>
+    <text locale="de">"$unit($renamed) in $region($region) bekommt von $unit($renamer) einen Spitznamen."</text>
   </message>
   <message name="phunger" section="events">
     <type>
