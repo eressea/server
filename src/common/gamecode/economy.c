@@ -900,17 +900,24 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 				msg_error(u, S->s, "race_nogive", "race", u->race));
 		return;
 	}
+	/* sperrt hier auch personenübergaben!
 	if (u2 && !(u2->race->ec_flags & GETITEM)) {
 		add_message(&u->faction->msgs,
 				msg_error(u, S->s, "race_notake", "race", u2->race));
 		return;
 	}
+	*/
 
 	/* Übergabe aller Kräuter */
 	if (findparam(s, u->faction->locale) == P_HERBS) {
 		if (!(u->race->ec_flags & GIVEITEM)) {
 			add_message(&u->faction->msgs,
 					msg_error(u, S->s, "race_nogive", "race", u->race));
+			return;
+		}
+		if (u2 && !(u2->race->ec_flags & GETITEM)) {
+			ADDMSG(&u->faction->msgs,
+					msg_error(u, S->s, "race_notake", "race", u2->race));
 			return;
 		}
 		if (!u2) {
@@ -966,6 +973,12 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 						msg_error(u, S->s, "race_nogive", "race", u->race));
 				return;
 			}
+			if (u2 && !(u2->race->ec_flags & GETITEM)) {
+				ADDMSG(&u->faction->msgs,
+						msg_error(u, S->s, "race_notake", "race", u2->race));
+				return;
+			}
+
 			/* für alle items einmal prüfen, ob wir mehr als von diesem Typ
 			 * reserviert ist besitzen und diesen Teil dann übergeben */
 			if (u->items) {
@@ -998,6 +1011,12 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 					msg_error(u, S->s, "race_nogive", "race", u->race));
 			return;
 		}
+		if (u2 && !(u2->race->ec_flags & GETITEM)) {
+			ADDMSG(&u->faction->msgs,
+					msg_error(u, S->s, "race_notake", "race", u2->race));
+			return;
+		}
+
 		itype = finditemtype(s, u->faction->locale);
 		if (itype!=NULL) {
 			item * i = *i_find(&u->items, itype);
@@ -1041,6 +1060,12 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 				msg_error(u, S->s, "race_nogive", "race", u->race));
 		return;
 	}
+	if (u2 && !(u2->race->ec_flags & GETITEM)) {
+		ADDMSG(&u->faction->msgs,
+				msg_error(u, S->s, "race_notake", "race", u2->race));
+		return;
+	}
+
 	itype = finditemtype(s, u->faction->locale);
 	if (itype!=NULL) {
 		give_item(n, itype, u, u2, S->s);
