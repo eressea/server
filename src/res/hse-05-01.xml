@@ -32,7 +32,7 @@
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="1"/>
     <param name="database.gameid" value="3"/>
-    <param name="globalreport" value="3"/>
+    <param name="globalreport" value="world"/>
     <param name="rules.check_overload" value="1"/>
     <param name="report.mailit" value="/usr/sbin:$HOME/eressea/bin:/bin:/usr/bin:/usr/local/bin"/>
   </game>
