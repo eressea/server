@@ -89,7 +89,7 @@ wormhole_age(struct attrib * a)
 
       move_unit(u, data->exit->region, NULL);
       maxtransport -= u->number;
-      m = msg_message("wormhole_exit", "unit region", u, data->exit);
+      m = msg_message("wormhole_exit", "unit region", u, r);
       add_message(&data->exit->region->msgs, m);
       add_message(&u->faction->msgs, m);
       msg_release(m);
