@@ -2226,7 +2226,7 @@
       <arg name="turns" type="int"/>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
-      <arg name="command" type="command"/>
+      <arg name="command" type="order"/>
     </type>
     <text locale="de">"Eine Partei muß mindestens $int($turns) Wochen alt sein, bevor sie angegriffen oder bestohlen werden kann."</text>
   </message>

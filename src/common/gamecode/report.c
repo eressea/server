@@ -2299,14 +2299,11 @@ report(FILE *F, faction * f, const faction_list * addresses,
 						w += weight(u);
 					}
 				}
-				sprintf(buf, "%s, %s %s, (%d/%d)",
-					shipname(sh),
-          LOC(f->locale, sh->type->name[0]),
-					(w + 99) / 100,	/* +99 weil sonst die Nachkommastellen ignoriert würden */
-					shipcapacity(sh) / 100);
+				sprintf(buf, "%s, %s, (%d/%d)",
+						shipname(sh), LOC(f->locale, sh->type->name[0]),
+						(w + 99) / 100, shipcapacity(sh) / 100);
 			} else {
-				sprintf(buf, "%s, %s", shipname(sh),
-					LOC(f->locale, sh->type->name[0]));
+				sprintf(buf, "%s, %s", shipname(sh), LOC(f->locale, sh->type->name[0]));
 			}
 
 			assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
