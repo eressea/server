@@ -73,25 +73,30 @@ static int
 wormhole_age(struct attrib * a)
 {
   wormhole_data * data = (wormhole_data*)a->data.v;
-  region * r = data->entry->region;
-  unit * u = r->units;
-  int maxtransport = 4;
+  int maxtransport = data->entry->size;
 
-  for (;u!=NULL && maxtransport!=0;u=u->next) {
-    message * m;
-    if (u->number>maxtransport) continue;
-    if (teure_talente(u)) continue;
-    if (u->building!=data->entry) continue;
+  if (data->entry->size==0) {
+    destroy_building(data->entry);
+  } else {
+    region * r = data->entry->region;
+    unit * u = r->units;
 
-    move_unit(u, data->exit->region, NULL);
-    maxtransport -= u->number;
-    m = msg_message("wormhole_exit", "unit region", u, data->exit);
-    add_message(&data->exit->region->msgs, m);
-    add_message(&u->faction->msgs, m);
-    msg_release(m);
+    for (;u!=NULL && maxtransport!=0;u=u->next) {
+      message * m;
+      if (u->number>maxtransport) continue;
+      if (teure_talente(u)) continue;
+      if (u->building!=data->entry) continue;
+
+      move_unit(u, data->exit->region, NULL);
+      maxtransport -= u->number;
+      m = msg_message("wormhole_exit", "unit region", u, data->exit);
+      add_message(&data->exit->region->msgs, m);
+      add_message(&u->faction->msgs, m);
+      msg_release(m);
+    }
+    data->entry->size = 0;
   }
 
-  destroy_building(data->entry);
   /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
   return -1;
 }
@@ -136,6 +141,8 @@ make_wormhole(region * r1, region * r2)
   wormhole_data * d2 = (wormhole_data*)a2->data.v;
   d1->entry = d2->exit = b1;
   d2->entry = d1->exit = b2;
+  b1->size = bt_wormhole.maxsize;
+  b2->size = bt_wormhole.maxsize;
   ADDMSG(&r1->msgs, msg_message("wormhole_appear", "region", r1));
   ADDMSG(&r2->msgs, msg_message("wormhole_appear", "region", r2));
 }
