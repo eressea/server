@@ -2615,16 +2615,18 @@ view_neighbours(region * r, faction * f)
 			}
 			if (!b) {
 				if (add_seen(r2, see_far, false)) {
-					direction_t dir;
-					for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-						region * r3 = rconnect(r2, dir);
-						if (r3) {
-							border * b = get_borders(r2, r3);
-							while (b) {
-								if (!b->type->transparent(b, f)) break;
-								b = b->next;
+					if (!(terrain[rterrain(r2)].flags & FORBIDDEN_LAND)) {
+						direction_t dir;
+						for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+							region * r3 = rconnect(r2, dir);
+							if (r3) {
+								border * b = get_borders(r2, r3);
+								while (b) {
+									if (!b->type->transparent(b, f)) break;
+									b = b->next;
+								}
+								if (!b) add_seen(r3, see_neighbour, false);
 							}
-							if (!b) add_seen(r3, see_neighbour, false);
 						}
 					}
 				}
@@ -2643,7 +2645,7 @@ recurse_regatta(region *center, region *r, faction *f, int maxdist)
 		region * r2 = rconnect(r, dir);
 		if (r2) {
 			int ndist = distance(center, r2);
-			if (ndist>dist) {
+			if (ndist>dist && r2->terrain==T_OCEAN) {
 				border * b = get_borders(r, r2);
 				while (b) {
 					if (!b->type->transparent(b, f)) break;
