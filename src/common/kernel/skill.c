@@ -307,6 +307,7 @@ sk_set(skill * sv, int level)
 void
 sk_set(skill * sv, int level)
 {
+	assert(level!=0);
 	sv->weeks = (unsigned char)skill_weeks(level);
 	sv->level = (unsigned char)level;
 }

@@ -2168,7 +2168,7 @@ display_item(faction *f, unit *u, const item_type * itype)
 	FILE *fp;
 	char t[NAMESIZE + 1];
 	char filename[MAX_PATH];
-	const char *name, *info;
+	const char *name;
 
 	if (u && *i_find(&u->items, itype) == NULL) return false;
 	/*

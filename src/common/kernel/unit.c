@@ -507,17 +507,21 @@ get_level(const unit * u, skill_t id)
 }
 
 void 
-set_level(unit * u, skill_t id, int value)
+set_level(unit * u, skill_t sk, int value)
 {
 	skill * sv = u->skills;
+	if (value==0) {
+		remove_skill(u, sk);
+		return;
+	}
 	while (sv != u->skills + u->skill_size) {
-		if (sv->id == id) {
+		if (sv->id == sk) {
 			sk_set(sv, value);
 			return;
 		}
 		++sv;
 	}
-	sk_set(add_skill(u, id), value);
+	sk_set(add_skill(u, sk), value);
 }
 
 static attrib_type at_leftship = {
@@ -698,7 +702,8 @@ transfermen(unit * u, unit * u2, int n)
 				sn->weeks = (unsigned char)weeks;
 				assert(sn->weeks>0 && sn->weeks<=sn->level*2+1);
 			} else if (sn) {
-				sk_set(sn, 0);
+				remove_skill(u2, sk);
+				sn = NULL;
 			}
 		}
 		a = a_find(u->attribs, &at_effect);
@@ -838,6 +843,22 @@ learn_skill(unit * u, skill_t sk, double chance)
 	sv = add_skill(u, sk);
 	sk_set(sv, 1);
 	return true;
+}
+
+void
+remove_skill(unit *u, skill_t sk)
+{
+	skill * sv = u->skills;
+	for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+		if (sv->id==sk) {
+			skill * sl = u->skills + u->skill_size - 1;
+			if (sl!=sv) {
+				*sv = *sl;
+			}
+			--u->skill_size;
+			return;
+		}
+	}
 }
 
 skill * 

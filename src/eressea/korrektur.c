@@ -1203,6 +1203,9 @@ stats(void)
 			for (u=r->units;u;u=u->next) {
 
 				for (itm=u->items;itm;itm=itm->next) {
+					if (itm->number>10000000) {
+						itm->number=1;
+					}
 					i_change(&items, itm->type, itm->number);
 				}
 			}

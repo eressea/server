@@ -111,6 +111,7 @@ extern const struct unit u_unknown;
 extern struct unit * udestroy;
 
 extern struct skill * add_skill(struct unit * u, skill_t id);
+extern void remove_skill(struct unit *u, skill_t sk);
 extern struct skill * get_skill(const struct unit * u, skill_t id);
 extern boolean has_skill(const unit* u, skill_t sk);
 

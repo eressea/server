@@ -728,7 +728,6 @@ volcano_outbreak(region *r)
 	attrib *a;
 	region *rn;
 	unit *u, **up;
-	int dead;
 	faction *f;
 
 	for (u=r->units; u; u=u->next) {
@@ -759,7 +758,7 @@ volcano_outbreak(region *r)
 
 	for (up=&r->units; *up;) {
 		unit * u = *up;
-		dead = damage_unit(u, "4d10", true, false);
+		int dead = damage_unit(u, "4d10", true, false);
 		if (dead) {
 			ADDMSG(&u->faction->msgs, new_message(u->faction,
 				"volcano_dead%u:unit%r:region%i:dead", u, r, dead));
@@ -802,7 +801,7 @@ volcano_outbreak(region *r)
 		/* Personen bekommen 3W10 Punkte Schaden. */
 		for (up=&rn->units; *up;) {
 			unit * u = *up;
-			dead = damage_unit(u, "3d10", true, false);
+			int dead = damage_unit(u, "3d10", true, false);
 			if (dead) {
 				ADDMSG(&u->faction->msgs, new_message(u->faction,
 					"volcano_dead%u:unit%r:region%i:dead", u, rn, dead));
@@ -1136,11 +1135,7 @@ randomevents(void)
 				 * Es ist auch deshalb fast egal, weil es ja im Grunde nicht dem Dämon,
 				 * sondern der Region zu gute kommt - und da ist der anwender schnuppe
 				 */
-#if SKILLPOINTS
-				skill_t sk;
-#else
 				skill * sv;
-#endif
 				int dc;
 				if (!bfind) {
 					unit * ud = u;
@@ -1178,8 +1173,8 @@ randomevents(void)
 				dc = max(0, dc);
 				sv = u->skills;
 				while (sv!=u->skills+u->skill_size) {
-					if (rand() % 100 < 25) {
-						int weeks = 0+rand()%3;
+					if (sv->level>0 && rand() % 100 < 25) {
+						int weeks = 1+rand()%3;
 						if (rand() % 100 < 40) reduce_skill(u, sv, weeks);
 						else while (weeks--) learn_skill(u, sv->id, 1.0);
 					}
