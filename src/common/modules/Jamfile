@@ -8,13 +8,11 @@ SubDirHdrs $(SUBDIR)/.. ;
 SubDirHdrs $(SUBDIR)/../.. ;
 
 SOURCES =
- alliance.c
  arena.c
  dungeon.c
  gmcmd.c
  infocmd.c
  museum.c
-# oceannames.c
  score.c
  victoryconditions.c
  weather.c
