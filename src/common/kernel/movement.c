@@ -489,12 +489,12 @@ leave_trail(unit * u, region * from, region_list *route)
 }
 
 static void
-travel_route(const unit * u, region_list * route)
+travel_route(const unit * u, region * r, region_list * route)
 {
   /* kein travelthru in der letzten region! */
-  while (route && route->next) {
-    region * r = route->data;
+  while (route) {
     travelthru(u, r);
+	r = route->data;
     route = route->next;
   }
 }
@@ -520,7 +520,7 @@ move_ship(ship * sh, region * from, region * to, region_list * route)
         leave_trail(u, from, route);
         trail = true;
       }
-      if (route!=NULL) travel_route(u, route);
+      if (route!=NULL) travel_route(u, from, route);
       if (from!=to) {
         u->ship = NULL;		/* damit move_unit() kein leave() macht */
         move_unit(u, to, ulist);
@@ -1204,20 +1204,24 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
 
     m--;
     if (m > 0) {
-      region_list *rlist;
+      region_list *rlist = route;
 
       travelthru(u, first);
-      for (rlist = route;rlist!=NULL;rlist=rlist->next) {
-        char * p;
+      while (rlist!=NULL) {
+		region * r = rlist->data;
 
-        if (rlist!=route) {
-          if (rlist->next==NULL) scat(" und ");
-          else scat(", ");
-        }
-        travelthru(u, rlist->data);
+        travelthru(u, r);
+		rlist=rlist->next;
+        if (rlist!=NULL) {
+		  char * p;
+		  if (r!=route->data) {
+			if (rlist->next==NULL) scat(" und ");
+			else scat(", ");
+		  }
 
-        p = buf+strlen(buf);
-        MSG(("travelthru_trail", "region", rlist->data), p, sizeof(buf)-strlen(buf), u->faction->locale, u->faction);
+		  p = buf+strlen(buf);
+		  MSG(("travelthru_trail", "region", r), p, sizeof(buf)-strlen(buf), u->faction->locale, u->faction);
+		}
       }
     }
     add_message(&u->faction->msgs, new_message(
@@ -1246,7 +1250,7 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
                     continue;
                   }
                   if (can_survive(ut, current)) {
-                    travel_route(ut, route);
+                    travel_route(ut, ut->region, route);
                     move_unit(ut, current, NULL);
                   } else {
                     cmistake(u, u->thisorder, 287, MSG_MOVE);
@@ -1751,7 +1755,7 @@ move(unit * u, boolean move_on_land)
           /* wir basteln ihm ein NACH */
           int k;
           region_list * rlist = route;
-          region * from = u->region;
+          region * from = r;
 
           strcpy(buf, locale_string(up->faction->locale, keywords[K_MOVE]));
           while (rlist!=NULL) {
