@@ -11,7 +11,7 @@
   <resource name="instantartacademy">
     <function name="change" value="changeitem"/>
     <item weight="1">
-      <function name="use" value="use_instantacademy"/>
+      <function name="use" value="use_instantartacademy"/>
     </item>
   </resource>
 
