@@ -126,7 +126,7 @@ temple;de;Tempel
 wand;de;Zauberstab
 wand_p;de;Zauberstäbe
 wand_of_tears;de;Szepter der Tränen
-wands_of_tear_p;de;Szepter der Tränen
+wand_of_tears_p;de;Szepter der Tränen
 
 ## Burgausbaustufen
 site;de;Grundmauern
@@ -232,6 +232,7 @@ lance_p;de;Lanzen
 mallornlance;de;Mallornlanze
 mallornlance_p;de;Mallornlanzen
 mallorn;de;Mallorn
+mallorn_p;de;Mallorn
 cookie;de;Keks
 cookie_p;de;Kekse
 apple;de;Apfel
@@ -241,12 +242,15 @@ nut_p;de;Nüsse
 almond;de;Mandelkern
 almond_p;de;Mandelkerne
 dragonblood;de;Drachenblut
+dragonblood_p;de;Drachenblut
 fairyboot;de;Feenstiefel
+fairyboot_p;de;Feenstiefel
 healingpotion;de;Heiltrank
 healingpotion_p;de;Heiltränke
 antimagic;de;Antimagiekristall
 antimagic_p;de;Antimagiekristalle
 toadslime;de;Tiegel mit Krötenschleim
+toadslime_p;de;Tiegel mit Krötenschleim
 amulet;de;Amulett
 amulet_p;de;Amulette
 ao_daemon;de;Auge des Dämon
@@ -293,6 +297,7 @@ ror_p;de;Ringe der Regeneration
 aod;de;Amulett der Dunkelheit
 aod_p;de;Amulette der Dunkelheit
 magicbag;de;Zauberbeutel
+magicbag_p;de;Zauberbeutel
 dreameye;de;Traumauge
 dreameye_p;de;Traumaugen
 seaserpenthead;de;Seeschlangenkopf
@@ -302,6 +307,7 @@ aurafocus_p;de;Aurafocuse
 presspass;de;Akkredition des Xontormia-Expreß
 presspass_p;de;Akkreditionen des Xontormia-Expreß
 trollbelt;de;Gürtel der Trollstärke
+trollbelt_p;de;Gürtel der Trollstärke
 elvenhorse;de;Elfenpferd
 elvenhorse_p;de;Elfenpferde
 pegasus;de;Pegasus
