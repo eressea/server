@@ -35,6 +35,7 @@ typedef struct shortpwd {
 #define FFL_OVERRIDE      (1<<27) /* Override-Passwort wurde benutzt */
 #define FFL_DBENTRY       (1<<28) /* Partei ist in Datenbank eingetragen */
 #define FFL_NOTIMEOUT     (1<<29) /* ignore MaxAge() */
+#define FFL_GM            (1<<30) /* eine Partei mit Sonderrechten */
 
 typedef struct faction {
 	struct faction *next;

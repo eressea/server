@@ -28,6 +28,7 @@
 #include <util/attrib.h>
 
 /* libc includes */
+#include <assert.h>
 #include <stdlib.h>
 
 static boolean
@@ -85,13 +86,16 @@ wormhole_age(struct attrib * a)
 
     move_unit(u, data->exit->region, NULL);
     maxtransport -= u->number;
-    m = msg_message("wormhole_exit", "unit region", u, r);
+    m = msg_message("wormhole_exit", "unit region", u, data->exit->region);
     add_message(&data->exit->region->msgs, m);
     add_message(&u->faction->msgs, m);
     msg_release(m);
   }
 
+  /* it's important that destroy_building doesn't change b->region, because
+   * otherwise the tunnel would no longer be bi-directional after this */
   destroy_building(data->entry);
+  assert(data->entry->region==r);
 
   /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
   return -1;

@@ -807,24 +807,42 @@ unit_has_cursed_item(unit *u)
 	return false;
 }
 
+static void
+init_gms(void)
+{
+  faction * f;
+
+  for (f=factions;f;f=f->next) {
+    const attrib * a = a_findc(f->attribs, &at_gm);
+
+    if (a!=NULL) fset(f, FFL_GM);
+  }
+}
+
 static int
 autoalliance(const plane * pl, const faction * sf, const faction * f2)
 {
-	int mode = 0;
-	attrib * a = a_find(f2->attribs, &at_gm);
+  boolean init = false;
+  if (!init) {
+    init_gms();
+    init = true;
+  }
+  if (pl && (pl->flags & PFL_FRIENDLY)) return HELP_ALL;
+  /* if f2 is a gm in this plane, everyone has an auto-help to it */
+  if (fval(f2, FFL_GM)) {
+    attrib * a = a_find(f2->attribs, &at_gm);
 
-	/* if f2 is a gm in this plane, everyone has an auto-help to it */
-	if (pl && pl->flags & PFL_FRIENDLY) return mode;
-	while (a) {
-		const plane * p = (const plane*)a->data.v;
-		if (p==pl) return HELP_ALL;
-		a=a->next;
-	}
+    while (a) {
+      const plane * p = (const plane*)a->data.v;
+      if (p==pl) return HELP_ALL;
+      a=a->next;
+    }
+  }
 #ifdef AUTOALLIANCE
-	if (sf->alliance==f2->alliance) mode |= AUTOALLIANCE;
+	if (sf->alliance==f2->alliance) return AUTOALLIANCE;
 #endif
 
-	return mode;
+	return 0;
 }
 
 static int
