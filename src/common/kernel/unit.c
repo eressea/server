@@ -606,10 +606,11 @@ set_level(unit * u, skill_t id, int value)
 	while (sv != u->skills + u->skill_size) {
 		if (sv->id == id) {
 			sk_set(sv, value);
-			break;
+			return;
 		}
 		++sv;
 	}
+	sk_set(add_skill(u, id), value);
 #endif
 }
 

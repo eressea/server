@@ -1558,7 +1558,7 @@ sp_create_irongolem(castorder *co)
  * Flag:
  *  (SPELLLEVEL)
  *
- * #define GOLEM_STONE 10
+ * #define GOLEM_STONE 5
  */
 static int
 sp_create_stonegolem(castorder *co)
