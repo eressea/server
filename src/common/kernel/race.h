@@ -32,8 +32,8 @@
 #define AT_COMBATSPELL 7
 #define AT_STRUCTURAL 8
 
-#define GOLEM_IRON   4          /* Anzahl Eisen in einem Eisengolem */
-#define GOLEM_STONE  4          /* Anzahl Steine in einem Steingolem */
+#define GOLEM_IRON   4 /* Anzahl Eisen in einem Eisengolem */
+#define GOLEM_STONE  4 /* Anzahl Steine in einem Steingolem */
 
 typedef struct att {
 	int type;

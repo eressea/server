@@ -1193,7 +1193,7 @@ sp_hain(castorder *co)
 		return 0;
 	}
 
-	trees = lovar(force * 10) + force;
+	trees = lovar(force * 10 * RESOURCE_QUANTITY) + force;
 #if GROWING_TREES
 	rsettrees(r, 1, rtrees(r,1) + trees);
 #else
@@ -1240,7 +1240,7 @@ sp_mallornhain(castorder *co)
 		return 0;
 	}
 
-	trees = lovar(force * 10) + force;
+	trees = lovar(force * 10 * RESOURCE_QUANTITY) + force;
 #if GROWING_TREES
 	rsettrees(r, 1, rtrees(r,1) + trees);
 #else
@@ -1532,7 +1532,7 @@ sp_create_irongolem(castorder *co)
 		return 0;
 	}
 
-	u2 = create_unit(r, mage->faction, force*8, new_race[RC_IRONGOLEM], 0,
+	u2 = create_unit(r, mage->faction, max(1,force*8*RESOURCE_QUANTITY), new_race[RC_IRONGOLEM], 0,
 		LOC(mage->faction->locale, rc_name(new_race[RC_IRONGOLEM], 1)), mage);
 
 	set_level(u2, SK_ARMORER, 1);
@@ -1593,7 +1593,7 @@ sp_create_stonegolem(castorder *co)
 		return 0;
 	}
 
-	u2 = create_unit(r, mage->faction, force*5, new_race[RC_STONEGOLEM], 0,
+	u2 = create_unit(r, mage->faction, max(1,force*5*RESOURCE_QUANTITY), new_race[RC_STONEGOLEM], 0,
 		LOC(mage->faction->locale, rc_name(new_race[RC_STONEGOLEM], 1)), mage);
 	set_level(u2, SK_ROAD_BUILDING, 1);
 	set_level(u2, SK_BUILDING, 1);
