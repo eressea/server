@@ -101,10 +101,6 @@ sp_summon_alp(struct castorder *co)
 	 * sobald der Alp sein Opfer erreicht hat.
 	 */
 	alp = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_ALP]);
-	if (r==mage->region) {
-		alp->building = mage->building;
-		alp->ship = mage->ship;
-	}
 	set_level(alp, SK_STEALTH, 7);
 	set_string(&alp->name, "Alp");
 	alp->status = ST_FLEE;	/* flieht */
