@@ -2623,20 +2623,26 @@ orc_conversion(void)
 {
 		faction *f;
 		unit *u;
+		region *r;
 
 		for(f=factions; f; f=f->next) {
 			if(f->race == new_race[RC_ORC]) {
 				f->race = new_race[RC_URUK];
 			}
-			for(u=f->units; u; u=u->next) {
+		}
+
+		for(r=regions; r; r=r->next) {
+			for(u=r->units; u; u=u->next) {
 				if(u->race == new_race[RC_ORC]) {
 					/* convert to either uruk or snotling */
 					if(effskill(u, SK_MAGIC) >= 1
 							|| effskill(u, SK_ALCHEMY) >= 1
 						  || get_item(u, I_CHASTITY_BELT) >= u->number) {
 						u->race = new_race[RC_URUK];
+						u->irace = new_race[RC_URUK];
 					} else {
 						u->race = new_race[RC_SNOTLING];
+						u->irace = new_race[RC_SNOTLING];
 					}
 				}
 			}
