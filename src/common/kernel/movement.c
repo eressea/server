@@ -2097,7 +2097,7 @@ movement(void)
 						break;
 					}
 
-					if (!fval(u, FL_LONGACTION) && hunt(u)) {
+					if (!fval(u, FL_LONGACTION) && !fval(u, FL_HUNGER) && hunt(u)) {
 						u2 = r->units;
 						break;
 					}
@@ -2154,7 +2154,7 @@ follow(void)
 		for (u=r->units;u;u=u->next) {
 			attrib * a;
 			strlist * o;
-			if (fval(u, FL_LONGACTION)) continue;
+			if (fval(u, FL_LONGACTION) || fval(u, FL_HUNGER) continue;
 			a = a_find(u->attribs, &at_follow);
 			for (o=u->orders;o;o=o->next) {
 				if (igetkeyword(o->s, u->faction->locale) == K_FOLLOW
