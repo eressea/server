@@ -18,6 +18,7 @@ SOURCES =
  score.c
  victoryconditions.c
  weather.c
+ wormhole.c
  xecmd.c
  xmas2000.c
  xmas2001.c
