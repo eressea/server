@@ -776,7 +776,7 @@ trees(region * r, const int current_season, const int last_weeks_season)
 		if(production(r) <= 0) return;
 
 		/* Grundchance 1.0% */
-		seedchance = FORESTGROWTH;
+		seedchance = FORESTGROWTH * RESOURCE_QUANTITY;
 		/* Jeder Elf in der Region erhöht die Chance um 0.0008%. */
 		seedchance += (min(elves, (production(r)*MAXPEASANTS_PER_AREA)/8)) * 8;
 		grownup_trees = rtrees(r, 2);
