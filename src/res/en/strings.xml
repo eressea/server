@@ -62,6 +62,29 @@
 	<string name="Trireme">
 		<text locale="en">trireme</text>
 	</string>
+	<string name="balloon">
+		<text locale="en">balloon</text>
+	</string>
+
+	<comment>Schiffstypen</comment>
+	<string name="caravel_a">
+		<text locale="en">a caravel</text>
+	</string>
+	<string name="boat_a">
+		<text locale="en">a boat</text>
+	</string>
+	<string name="longboat_a">
+		<text locale="en">a longboat</text>
+	</string>
+	<string name="balloon_a">
+		<text locale="en">a balloon</text>
+	</string>
+	<string name="dragonship_a">
+		<text locale="en">a dragonship</text>
+	</string>
+	<string name="trireme_a">
+		<text locale="en">a trireme</text>
+	</string>
 
 	<comment>  Terraintypen</comment>
 	<string name="activevolcano">

@@ -2,6 +2,7 @@
 	_d: dativ (wir erklären allen /Trollen/ den Krieg)
 	_p: plural (13 /Trolle/)
 	_x: preposition (15 /Troll/schwerter)
+	_a: including article (ein Troll, a troll)
 </comment>
 
 <strings>
@@ -194,19 +195,41 @@
 	</string>
 
 	<comment>Schiffstypen</comment>
-	<string name="Karavelle">
+	<string name="balloon_a">
+		<text locale="de">ein Ballon</text>
+	</string>
+	<string name="caravel_a">
+		<text locale="de">eine Karavelle</text>
+	</string>
+	<string name="boat_a">
+		<text locale="de">ein Boot</text>
+	</string>
+	<string name="longboat_a">
+		<text locale="de">ein Langboot</text>
+	</string>
+	<string name="dragonship_a">
+		<text locale="de">ein Drachenschiff</text>
+	</string>
+	<string name="Trireme_a">
+		<text locale="de">eine Trireme</text>
+	</string>
+
+	<string name="balloon">
+		<text locale="de">Ballon</text>
+	</string>
+	<string name="caravel">
 		<text locale="de">Karavelle</text>
 	</string>
-	<string name="Boot">
+	<string name="boat">
 		<text locale="de">Boot</text>
 	</string>
-	<string name="Langboot">
+	<string name="longboat">
 		<text locale="de">Langboot</text>
 	</string>
-	<string name="Drachenschiff">
+	<string name="dragonship">
 		<text locale="de">Drachenschiff</text>
 	</string>
-	<string name="Trireme">
+	<string name="trireme">
 		<text locale="de">Trireme</text>
 	</string>
 

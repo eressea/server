@@ -259,7 +259,7 @@ give_starting_equipment(struct region *r, struct unit *u)
 		break;
 	case RC_AQUARIAN:
 		{
-			ship *sh = new_ship(&st_boat, r);
+			ship *sh = new_ship(st_find("boat"), r);
 			sh->size = sh->type->construction->maxsize;
 			addlist(&r->ships, sh);
 			u->ship = sh;

@@ -222,7 +222,7 @@ static requirement castle_req[] = {
 };
 
 #if LARGE_CASTLES
-static const construction castle_bld[MAXBUILDINGS] = {
+static construction castle_bld[MAXBUILDINGS] = {
 	{ SK_BUILDING, 1,     2, 1, castle_req, &castle_bld[1] },
 	{ SK_BUILDING, 1,     8, 1, castle_req, &castle_bld[2] },
 	{ SK_BUILDING, 2,    40, 1, castle_req, &castle_bld[3] },
@@ -232,7 +232,7 @@ static const construction castle_bld[MAXBUILDINGS] = {
 	{ SK_BUILDING, 6,    -1, 1, castle_req, NULL }
 };
 #else
-static const construction castle_bld[MAXBUILDINGS] = {
+static construction castle_bld[MAXBUILDINGS] = {
 	{ SK_BUILDING, 1,    2, 1, castle_req, &castle_bld[1] },
 	{ SK_BUILDING, 2,    8, 1, castle_req, &castle_bld[2] },
 	{ SK_BUILDING, 3,   40, 1, castle_req, &castle_bld[3] },

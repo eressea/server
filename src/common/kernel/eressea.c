@@ -2233,6 +2233,7 @@ attrib_init(void)
 	bt_register(&bt_generic);
 	bt_register(&bt_caldera);
 
+#ifdef NOXMLBOATS
 	/* Schiffstypen registrieren: */
 	st_register(&st_boat);
 	st_register(&st_balloon);
@@ -2240,6 +2241,7 @@ attrib_init(void)
 	st_register(&st_dragonship);
 	st_register(&st_caravelle);
 	st_register(&st_trireme);
+#endif
 
 	/* disable: st_register(&st_transport); */
 

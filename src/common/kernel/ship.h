@@ -40,9 +40,9 @@ typedef struct ship_type {
 	int minskill; /* min. skill to sail this (crew) */
 	int sumskill; /* min. sum of crew+captain */
 
-	const terrain_t * coast; /* coast that this ship can land on */
+	terrain_t * coast; /* coast that this ship can land on */
 
-	const construction * construction; /* how to build a ship */
+	construction * construction; /* how to build a ship */
 } ship_type;
 
 typedef struct ship_typelist {
@@ -53,15 +53,15 @@ typedef struct ship_typelist {
 extern ship_typelist *shiptypes;
 
 /* Alte Schiffstypen: */
-
+#ifdef NOXMLBOATS
 extern const ship_type st_boat;
 extern const ship_type st_balloon;
 extern const ship_type st_longboat;
 extern const ship_type st_dragonship;
 extern const ship_type st_caravelle;
 extern const ship_type st_trireme;
-
 extern const ship_type st_transport;
+#endif
 
 extern const ship_type * st_find(const char* name);
 extern void st_register(const ship_type * type);
@@ -95,4 +95,5 @@ extern ship *findship(int n);
 
 extern const struct ship_type * findshiptype(const char *s, const struct locale * lang);
 
+extern void register_ships(void);
 #endif

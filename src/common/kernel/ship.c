@@ -20,10 +20,12 @@
 #include "unit.h"
 #include "item.h"
 #include "region.h"
+#include "skill.h"
 
 /* util includes */
 #include <base36.h>
 #include <event.h>
+#include <xml.h>
 #include <language.h>
 
 /* libc includes */
@@ -66,9 +68,9 @@ st_find(const char* name)
 {
 	const struct ship_typelist * stl = shiptypes;
 	while (stl && strcasecmp(stl->type->name[0], name)) stl = stl->next;
-	if (!stl) {
+	if (!stl) { /* compatibility for old datafiles */
 		stl = shiptypes;
-		while (stl && strncasecmp(stl->type->name[0], name, strlen(name))) stl = stl->next;
+		while (stl && strcasecmp(locale_string(default_locale, stl->type->name[0]), name)) stl = stl->next;
 	}
 	return stl?stl->type:NULL;
 }
@@ -80,16 +82,6 @@ st_register(const ship_type * type) {
 	stl->next = shiptypes;
 	shiptypes = stl;
 }
-
-static const terrain_t coast_large[] = {
-	T_OCEAN, T_PLAIN, NOTERRAIN
-};
-
-static const terrain_t coast_small[] = {
-	T_OCEAN, T_PLAIN, T_SWAMP, T_DESERT, T_HIGHLAND, T_MOUNTAIN, T_GLACIER,
-	T_GRASSLAND, T_VOLCANO, T_VOLCANO_SMOKING, T_ICEBERG_SLEEP, T_ICEBERG,
-	NOTERRAIN
-};
 
 #define SMAXHASH 8191
 ship *shiphash[SMAXHASH];
@@ -154,6 +146,17 @@ captain(ship *sh, region *r)
 }
 
 /* Alte Schiffstypen: */
+
+#ifdef NOXMLBOATS
+static const terrain_t coast_large[] = {
+	T_OCEAN, T_PLAIN, NOTERRAIN
+};
+
+static terrain_t coast_small[] = {
+	T_OCEAN, T_PLAIN, T_SWAMP, T_DESERT, T_HIGHLAND, T_MOUNTAIN, T_GLACIER,
+	T_GRASSLAND, T_VOLCANO, T_VOLCANO_SMOKING, T_ICEBERG_SLEEP, T_ICEBERG,
+	NOTERRAIN
+};
 
 static requirement boat_req[] = {
   {I_WOOD, 1},
@@ -263,6 +266,7 @@ const ship_type st_trireme = {
 	4, 1, 120, coast_large,
 	&trireme_bld
 };
+#endif
 
 ship *
 new_ship(const ship_type * stype, region * r)
@@ -342,4 +346,150 @@ shipowner(const region * r, const ship * sh)
 	if (first)
 		fset(first, FL_OWNER);
 	return first;
+}
+
+#ifdef NOXMLBOATS
+void
+xml_writeships(void)
+{
+	FILE * F = fopen("ships.xml", "w");
+	ship_typelist *stl= shiptypes;
+	while (stl) {
+		int i;
+		const ship_type * st = stl->type;
+		fprintf(F, "<ship name=\"%s\" range=\"%u\" storm=\"%.2f\" damage=\"%.2f\" cabins=\"%u\" cargo=\"%u\" cptskill=\"%u\" minskill=\"%u\" sumskill=\"%u\"",
+			locale_string(find_locale("en"), st->name[0]), st->range, st->storm, st->damage, st->cabins, st->cargo, 
+			st->cptskill, st->minskill, st->sumskill);
+		if (st->flags & SFL_OPENSEA) fputs(" opensea", F);
+		if (st->flags & SFL_FLY) fputs(" fly", F);
+		fputs(">\n", F);
+		for (i=0;st->coast[i]!=NOTERRAIN;++i) {
+			fprintf(F, "\t<coast terrain=\"%s\"></coast>\n", terrain[st->coast[i]].name);
+		}
+		fprintf(F, "\t<construction skill=\"%s\" minskill=\"%u\" maxsize=\"%u\" reqsize=\"%u\">\n", 
+			skillname(st->construction->skill, NULL), st->construction->minskill, 
+			st->construction->maxsize, st->construction->reqsize);
+		for (i=0;st->construction->materials[i].number!=0;++i) {
+			fprintf(F, "\t\t<requirement type=\"%s\" quantity=\"%d\"></requirement>\n", 
+				oldresourcetype[st->construction->materials[i].type]->_name[0], 
+				st->construction->materials[i].number);
+		}
+		fputs("\t</construction>\n", F);
+		fputs("</ship>\n\n", F);
+		stl=stl->next;
+	}
+	fclose(F);
+}
+#endif
+
+static int 
+tagend(struct xml_stack * stack)
+{
+	const xml_tag * tag = stack->tag;
+	if (strcmp(tag->name, "ship")==0) {
+		st_register((ship_type*)stack->state);
+		stack->state = 0;
+	}
+	return XML_OK;
+}
+
+static int 
+tagbegin(struct xml_stack * stack)
+{
+	ship_type * st = (ship_type *)stack->state;
+	const xml_tag * tag = stack->tag;
+	if (strcmp(tag->name, "ship")==0) {
+		const char * name = xml_value(tag, "name");
+		if (name!=NULL) {
+			st = stack->state = calloc(sizeof(ship_type), 1);
+			st->name[0] = strdup(name);
+			st->name[1] = strcat(strcpy(malloc(strlen(name)+3), name),"_a");
+			st->cabins = xml_ivalue(tag, "cabins");
+			st->cargo = xml_ivalue(tag, "cargo");
+			st->combat = xml_ivalue(tag, "combat");
+			st->cptskill = xml_ivalue(tag, "cptskill");
+			st->damage = xml_fvalue(tag, "damage");
+			if (xml_bvalue(tag, "fly")) st->flags |= SFL_FLY;
+			if (xml_bvalue(tag, "opensea")) st->flags |= SFL_OPENSEA;
+			st->minskill = xml_ivalue(tag, "minskill");
+			st->range = xml_ivalue(tag, "range");
+			st->storm = xml_fvalue(tag, "storm");
+			st->sumskill = xml_ivalue(tag, "sumskill");
+		}
+	} else if (st!=NULL) {
+		if (strcmp(tag->name, "coast")==0) {
+			int size=0;
+			terrain_t t;
+			terrain_t * add;
+			const char * tname = xml_value(tag, "terrain");
+			if (tname!=NULL) {
+				if (st->coast) {
+					terrain_t * tnew;
+					for (;st->coast[size++];);
+					tnew = malloc(sizeof(terrain_t) * (size+2));
+					memcpy(tnew, st->coast, size*sizeof(terrain_t));
+					free(st->coast);
+					st->coast = tnew;
+					add = st->coast+size;
+				} else {
+					st->coast = malloc(sizeof(terrain_t) * 2);
+					add = st->coast;
+				}
+				add[0] = NOTERRAIN;
+				for (t=0;t!=MAXTERRAINS;++t) if (strcmp(tname, terrain[t].name)==0) {
+					add[0] = t;
+					break;
+				}
+				add[1] = NOTERRAIN;
+			}
+		} else if (strcmp(tag->name, "construction")==0) {
+			construction * con = st->construction = calloc(sizeof(construction), 1);
+			con->maxsize = xml_ivalue(tag, "maxsize");
+			con->minskill = xml_ivalue(tag, "minskill");
+			con->reqsize = xml_ivalue(tag, "reqsize");
+			con->skill = sk_find(xml_value(tag, "skill"));
+		} else if (strcmp(tag->name, "requirement")==0) {
+			construction * con = st->construction;
+			if (con!=NULL) {
+				const resource_type * rtype;
+				resource_t type = NORESOURCE;
+				requirement * radd = con->materials;
+				if (radd) {
+					requirement * rnew;
+					int size;
+					for (size=0;radd[size++].number;);
+					rnew = malloc(sizeof(requirement) * (size+2));
+					memcpy(rnew, radd, size*sizeof(requirement));
+					free(radd);
+					con->materials = rnew;
+					radd = rnew+size;
+				} else {
+					radd = con->materials = calloc(sizeof(requirement), 2);
+				}
+				radd[0].number = xml_ivalue(tag, "quantity");
+				rtype = rt_find(xml_value(tag, "type"));
+				for (type=0;type!=MAX_RESOURCES;++type) {
+					if (oldresourcetype[type]==rtype) {
+						radd[0].type = type;
+						break;
+					}
+				}
+				radd[1].number = 0;
+				radd[1].type = 0;
+			}
+		}
+	}
+	return XML_OK;
+}
+
+static xml_callbacks xml_ships = {
+	tagbegin, tagend, NULL
+};
+
+void
+register_ships(void)
+{
+#ifndef NOXMLBOATS
+	xml_register(&xml_ships, "eressea ship", 0);
+#endif
 }

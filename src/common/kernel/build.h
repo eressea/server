@@ -113,7 +113,7 @@ typedef struct construction {
 	int reqsize;   /* size of object using up 1 set of requirement. */
 	requirement * materials; /* material req'd to build one object */
 
-	const struct construction * improvement;
+	struct construction * improvement;
 		/* next level, if upgradable. if more than one of these items
 		 * can be built (weapons, armour) per turn, must not be NULL,
 		 * but point to the same type again:

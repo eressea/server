@@ -9,6 +9,7 @@
 
 	<include file="races.xml"></include>
 	<include file="resources.xml"></include>
+	<include file="ships.xml"></include>
 
 	<game name="Eressea" welcome="eressea">
 		<comment>Game specific</comment>

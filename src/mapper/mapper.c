@@ -1467,6 +1467,7 @@ main(int argc, char *argv[])
 
 	register_races();
 	register_resources();
+	register_ships();
 	register_items();
 	register_spells();
 /*	register_dungeon(); */

@@ -164,6 +164,7 @@ game_init(void)
 	debug_language("locales.log");
 	register_races();
 	register_resources();
+	register_ships();
 	register_items();
 	register_spells();
 	register_dungeon();
@@ -582,7 +583,8 @@ main(int argc, char *argv[])
 	kernel_init();
 	game_init();
 #if defined(BETA_CODE) && 0
-	xml_writeitems("items.xml");
+	xml_writeships(); 
+	/* xml_writeitems("items.xml"); */
 	return 0;
 #endif
 
