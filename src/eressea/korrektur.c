@@ -2633,6 +2633,7 @@ level(int days)
 	return l-1;
 }
 
+#if SKILLPOINTS == 0
 int
 convert_skills(void)
 {

@@ -2793,8 +2793,8 @@ reports(void)
 						turn, factionid(f), turn, factionid(f), turn, factionid(f));
 				}
 
-				fprintf(shfp, "eresseamail.zipped $addr \"%s %s\" \"%s-%d.zip\" "
-				    "%s.zip\n", global.gamename, gamedate_short(), factionid(f), turn, factionid(f));
+				fprintf(shfp, "eresseamail.zipped $addr \"%s %s\" \"%d-%s.zip\" "
+				    "%d-%s.zip\n", global.gamename, gamedate_short(), turn, factionid(f), turn, factionid(f));
 
 			} else if(f->options & wants_bzip2) {
 
