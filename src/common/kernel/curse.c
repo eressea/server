@@ -554,6 +554,10 @@ create_curse(unit *magician, attrib **ap, curse_t id, int id2, int vigour,
 		int duration, int effect, int men)
 {
 	curse *c;
+
+	/* die Kraft eines Spruchs darf nicht 0 sein*/
+	assert(vigour >= 0);
+
 	c = get_curse(*ap, id, id2);
 
 	if(c && (c->flag & CURSE_ONLYONE)){
@@ -707,6 +711,9 @@ is_cursed(attrib *ap, curse_t id, int id2)
 		return false;
 
 	if (c->flag & CURSE_ISNEW)
+		return false;
+
+	if (c->vigour <= 0)
 		return false;
 
 	return true;

@@ -805,22 +805,44 @@ use_antimagiccrystal(region * r, unit * mage, int amount, strlist * cmdstrings)
 {
 	int i;
 	for (i=0;i!=amount;++i) {
-		int effect, power, duration = 2;
+		int effect, force, duration = 2;
 		spell *sp = find_spellbyid(SPL_ANTIMAGICZONE);
+		attrib ** ap = &r->attribs;
 		unused(cmdstrings);
 
 		/* Reduziert die Stärke jedes Spruchs um effect */
-		effect = sp->level*4; /* Stufe 5 =~ 15 */
+		effect = sp->level; 
 
 		/* Hält Sprüche bis zu einem summierten Gesamtlevel von power aus.
 		 * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
 		 * um seine Stufe */
-		power = sp->level * 20; /* Stufe 5 =~ 100 */
+		force = sp->level * 20; /* Stufe 5 =~ 100 */
 
-		power = destroy_curse(&r->attribs, effect, power, NULL);
+		/* Regionszauber auflösen */
+		while (*ap && force > 0) {
+			curse * c;
+			attrib * a = *ap;
+			if (!fval(a->type, ATF_CURSE)) {
+				do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
+				continue;
+			}
+			c = (curse*)a->data.v;
 
-		if(power) {
-			create_curse(mage, &r->attribs, C_ANTIMAGICZONE, 0, power, duration, effect, 0);
+			/* Immunität prüfen */
+			if (c->flag & CURSE_IMMUN) {
+				do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
+				continue;
+			}
+
+			force = destr_curse(c, effect, force);
+			if(c->vigour <= 0) {
+				a_remove(ap, a);
+			}
+			if(*ap) ap = &(*ap)->next;
+		}
+
+		if(force) {
+			create_curse(mage, &r->attribs, C_ANTIMAGICZONE, 0, force, duration, effect, 0);
 		}
 
 	}

@@ -3,19 +3,17 @@ ifndef ERESSEA
 	export ERESSEA=$(PWD)
 endif
 
-# CONVERT_TRIGGERS = 1
-
 # Hier definieren, damit nicht '@gcc'
-CC      = gcc -DNEW_RESOURCEGROWTH
+#CC      = gcc -DNEW_RESOURCEGROWTH
+CC      = gcc-3.0 -D_GNU_SOURCE
+DEPEND  = @gcc-3.0 -MM -MG -r
+
 AR      = ar
-CTAGS   = ctags
-CC      = gcc
-LD      = gcc
+CTAGS   = ctags-exuberant
+LD      = gcc-3.0
 INSTALL = cp
 
-CFLAGS += -DNEW_RESOURCEGROWTH
-
-# CFLAGS += -Wshadow
+CFLAGS += -minline-all-stringops
 
 #		 Ps = 0  -> Normal (default)
 #		 Ps = 1  -> Bold

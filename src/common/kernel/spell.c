@@ -332,6 +332,43 @@ magicanalyse_ship(ship *sh, unit *mage, int force)
 /* ------------------------------------------------------------- */
 /* Antimagie - curse auflösen */
 /* ------------------------------------------------------------- */
+
+/* Wenn der Curse schwächer ist als der cast_level, dann wird er
+ * aufgelöst, bzw seine Kraft (vigour) auf 0 gesetzt.
+ * Ist der cast_level zu gering, hat die Antimagie nur mit einer Chance
+ * von 100-20*Stufenunterschied % eine Wirkung auf den Curse. Dann wird
+ * die Kraft des Curse um die halbe Stärke der Antimagie reduziert. 
+ * Zurückgegeben wird der noch unverbrauchte Rest von force.
+ */
+int
+destr_curse(curse* c, int cast_level, int force)
+{
+	if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
+		int chance;
+		/* pro Stufe Unterschied -20% */
+		chance = (10 + (cast_level - c->vigour)*2);
+		if(rand()%10 >= chance){
+			force -= c->vigour;
+			if (c->type->change_vigour){
+				c->type->change_vigour(c, -(cast_level+1/2));
+			} else {
+				c->vigour -= cast_level+1/2;
+			}
+		}
+	} else { /* Zauber ist stärker als curse */
+		if (force >= c->vigour){ /* reicht die Kraft noch aus? */
+			force -= c->vigour;
+			if (c->type->change_vigour){
+				c->type->change_vigour(c, -c->vigour);
+			} else {
+				c->vigour = 0;
+			}
+
+		}
+	}
+	return force;
+}
+
 int
 destroy_curse(attrib **alist, int cast_level, int force,
 		const curse_type * ctype)
@@ -355,29 +392,19 @@ destroy_curse(attrib **alist, int cast_level, int force,
 			continue;
 		}
 
-		if(!ctype || c->type==ctype) { /* wirkt auf alle */
-			if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
-				int chance;
-				/* pro Stufe Unterschied -20% */
-				chance = (10 + (cast_level - c->vigour)*2);
-				if(rand()%10 >= chance){
-					if (c->type->change_vigour)
-						c->type->change_vigour(c, -2);
-					force -= c->vigour;
-					c->vigour -= 2;
-					if(c->vigour <= 0) {
-						a_remove(alist, a);
-					}
-					succ = cast_level;
-				}
-			} else { /* Zauber ist stärker als curse */
-				if (force >= c->vigour){ /* reicht die Kraft noch aus? */
-					force -= c->vigour;
-					if (c->type->change_vigour)
-						c->type->change_vigour(c, -c->vigour);
-					a_remove(alist, a);
-					succ = cast_level;
-				}
+		/* Wenn kein spezieller cursetyp angegeben ist, soll die Antimagie
+		 * auf alle Verzauberungen wirken. Ansonsten prüfe, ob der Curse vom
+		 * richtigen Typ ist. */
+		if(!ctype || c->type==ctype) {
+			int n;
+			n = destr_curse(c, cast_level, force);
+			if (n != force){
+				assert(n<force); /* force darf sich nur vermindert haben */
+				succ = cast_level;
+				force = n;
+			}
+			if(c->vigour <= 0) {
+				a_remove(ap, a);
 			}
 		}
 		if(*ap) ap = &(*ap)->next;

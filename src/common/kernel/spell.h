@@ -213,7 +213,8 @@ int use_item_power(struct region * r, struct unit * u);
 int use_item_regeneration(struct region * r, struct unit * u);
 void showspells(struct region *r, struct unit *u);
 int sp_antimagiczone(struct castorder *co);
-int destroy_curse(struct attrib **alist, int cast_level, int force, const struct curse_type * ctype);
+int destr_curse(struct curse* c, int cast_level, int force);
+	
 
 
 /* Kampfzauber */
