@@ -3,10 +3,11 @@
 #include "list.h"
 
 // kernel includes
-#include <region.h>
-#include <unit.h>
-#include <building.h>
-#include <ship.h>
+#include <kernel/plane.h>
+#include <kernel/region.h>
+#include <kernel/unit.h>
+#include <kernel/building.h>
+#include <kernel/ship.h>
 
 // lua includes
 #include <lua.hpp>
@@ -61,6 +62,13 @@ region_getinfo(const region& r) {
   return r.display;
 }
 
+static int 
+region_plane(const region& r)
+{
+  if (r.planep==NULL) return 0;
+  return r.planep->id;
+}
+
 void
 bind_region(lua_State * L) 
 {
@@ -75,6 +83,7 @@ bind_region(lua_State * L)
     .def_readonly("x", &region::x)
     .def_readonly("y", &region::y)
     .def_readwrite("age", &region::age)
+    .property("plane_id", &region_plane)
     .property("units", &region_units, return_stl_iterator)
     .property("buildings", &region_buildings, return_stl_iterator)
     .property("ships", &region_ships, return_stl_iterator)

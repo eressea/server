@@ -191,6 +191,18 @@ unit_hpmax(const unit& u)
   return unit_max_hp(&u);
 }
 
+static void
+unit_setregion(unit& u, region& r)
+{
+  move_unit(&u, &r, NULL);
+}
+
+static region *
+unit_getregion(const unit& u)
+{
+  return u.region;
+}
+
 void
 bind_unit(lua_State * L) 
 {
@@ -201,7 +213,6 @@ bind_unit(lua_State * L)
     class_<struct unit>("unit")
     .def_readonly("name", &unit::name)
     .def_readonly("size", &unit::number)
-    .def_readonly("region", &unit::region)
     .def_readonly("faction", &unit::faction)
     .def_readonly("id", &unit::no)
     .def_readwrite("hp", &unit::hp)
@@ -213,6 +224,7 @@ bind_unit(lua_State * L)
     .def("set_racename", &unit_setracename)
     .def("add_spell", &unit_addspell)
     .def("remove_spell", &unit_removespell)
+    .property("region", &unit_getregion, &unit_setregion)
     .property("is_familiar", &unit_isfamiliar)
     .property("spells", &unit_spells, return_stl_iterator)
     .property("familiarspells", &unit_familiarspells, return_stl_iterator)
