@@ -191,10 +191,10 @@ static const char *
 dbrace(const struct race * rc)
 {
   static char zText[32];
-  unsigned char * zPtr = (unsigned char*)zText;
+  char * zPtr = zText;
   strcpy(zText, LOC(find_locale("en"), rc_name(rc, 0)));
   while (*zPtr) {
-    *zPtr = (unsigned char)toupper(*(int*)zPtr); 
+    *zPtr = (char)toupper(*zPtr);
     ++zPtr;
   }
   return zText;
@@ -230,7 +230,7 @@ convertunique(faction * f)
 	while (mnode!=NULL && mnode->fno!=f->no) mnode = mnode->next;
 	if (mnode) f->subscription = mnode->subscription;
 	else {
-		log_printf("No subscription: faction %s email %s pass %s race %s\n",
+		log_printf("%s %s %s %s\n",
 				   itoa36(f->no), f->email, f->override, dbrace(f->race));
 	}
 }
