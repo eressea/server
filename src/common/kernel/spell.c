@@ -1820,12 +1820,10 @@ sp_treewalkenter(castorder *co)
   }
 
   rt = r_standard_to_astral(r);
-  if(!rt || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
+  if (rt==NULL || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
     cmistake(mage, co->order, 192, MSG_MAGIC);
     return 0;
   }
-
-  assert(rt != NULL);
 
   remaining_cap = (int)(power * 500);
 

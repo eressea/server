@@ -165,6 +165,35 @@ region_adddirection(region& r, region &rt, const char * name, const char * info)
   sd->active = 1;
 }
 
+static void
+region_remove(region& r)
+{
+  region ** rp = &regions;
+  while (*rp) {
+    if (*rp==&r) {
+      unit * u;
+      for (u=r.units;u;u=u->next) {
+        destroy_unit(u);
+      }
+      *rp = r.next;
+#ifdef FAST_CONNECT
+      direction_t dir;
+      for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+        region * rn = r.connect[dir];
+        if (rn) {
+          direction_t reldir = reldirection(rn, &r);
+          r.connect[dir] = NULL;
+          rn->connect[reldir] = NULL;
+        }
+      }
+      assert (dir>=0 && dir<MAXDIRECTIONS);
+#endif
+      break;
+    }
+    rp = &(*rp)->next;
+  }
+}
+
 void
 bind_region(lua_State * L) 
 {
@@ -184,6 +213,8 @@ bind_region(lua_State * L)
 
     .def("get_flag", &region_getflag)
     .def("set_flag", &region_setflag)
+
+    .def("remove", &region_remove)
 
     .def("get_road", &region_getroad)
     .def("set_road", &region_setroad)

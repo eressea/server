@@ -52,10 +52,6 @@ function process(orders)
   -- load scripts:
   run_scripts()
 
-  u = get_unit(atoi36("50ki"))
-  if u~=nil then
-    u.region:set_flag(14, true)
-  end
   --
   process_orders()
   
