@@ -5563,7 +5563,7 @@
 		</locale>
 	</message>
 
-	<message name="travel">
+	<message name="travel" section="movement">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="mode" type="int"></arg>
@@ -5571,11 +5571,8 @@
 			<arg name="end" type="region"></arg>
 			<arg name="regions" type="string"></arg>
 		</type>
-		<locale name="de">
-			<nr section="movement">
-				<text>"$unit($unit) $if($eq($mode,1),"reitet", "wandert") von $region($start) nach $region($end).$if($strlen($regions)," Dabei wurde $regions durchquert.","")"</text>
-			</nr>
-		</locale>
+		<text locale="de">"$unit($unit) $if($eq($mode,1),"reitet", "wandert") von $region($start) nach $region($end).$if($strlen($regions)," Dabei wurde $regions durchquert.","")"</text>
+		<text locale="fr">"$unit($unit) $if($eq($mode,1),"chevauche", "marche") de $region($start) vers $region($end).$regions"</text>
 	</message>
 
 	<message name="transport">
@@ -6000,18 +5997,15 @@
 		</locale>
 	</message>
 
-	<message name="studycost">
+	<message name="studycost" section="study">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="cost" type="int"></arg>
 			<arg name="skill" type="skill"></arg>
 		</type>
-		<locale name="de">
-			<nr section="study">
-				<text>"$unit($unit) in $region($region) verbraucht $int($cost) Silber für das Studium von $skill($skill)."</text>
-			</nr>
-		</locale>
+		<text locale="de">"$unit($unit) in $region($region) verbraucht $int($cost) Silber für das Studium von $skill($skill)."</text>
+		<text locale="fr">"$unit($unit) dépense $int($cost) écus en $region($region) pour apprendre $skill($skill)."</text>
 	</message>
 
 	<message name="msg_magic">
@@ -6032,6 +6026,7 @@
 			<arg name="amount" type="int"></arg>
 		</type>
 		<text locale="de">"$unit($unit) in $region($region) regeneriert $int($amount) Aura."</text>
+		<text locale="fr">"$unit($unit) régénère $int($amount) aura en $region($region)."</text>
 	</message>
 
 	<message name="effectstrength" section="magic">
