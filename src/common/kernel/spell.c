@@ -535,16 +535,22 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
 static const race *
 select_familiar(const race * magerace, magic_t magiegebiet)
 {
+  const race * retval = NULL;
 	int rnd = rand()%100;
 	assert(magerace->familiars[0]);
 
-	if (rnd < 3) {
-		/* RC_KRAKEN muß letzter Vertraute sein */
-		return new_race[(race_t)(RC_HOUSECAT + rand()%(RC_KRAKEN+1-RC_HOUSECAT))];
-	} else if (rnd < 80) {
-		return magerace->familiars[0];
-	}
-	return magerace->familiars[magiegebiet];
+  do {
+  	if (rnd < 3) {
+      /* RC_KRAKEN muß letzter Vertraute sein */
+      int rc = RC_HOUSECAT + rand()%(RC_KRAKEN+1-RC_HOUSECAT);
+      retval = new_race[rc];
+  	} else if (rnd < 80) {
+	  	retval = magerace->familiars[0];
+	  }
+	  retval = magerace->familiars[magiegebiet];
+  }
+  while (retval->init_familiar==NULL);
+  return retval;
 }
 
 /* ------------------------------------------------------------- */
