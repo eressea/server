@@ -1,0 +1,11 @@
+<strings>
+	<string name="newbie_info_1">
+		<text locale="de">Bitte denke daran, deine Befehle an vinyambar@eressea.amber.kn-bremen.de zu senden. Am besten, du verwendest die Befehlsvorlage am Ende des Reports.</text>
+	</string>
+	<string name="newbie_info_2">
+		<text locale="de">Weitere Informationen über das Spil findest Du unter htpp://www.vinyambar.de/</text>
+	</string>
+	<string name="newbie_info_3">
+		<text locale="de">Mit der ersten Auswertung bekommst du einen Computerreport, den du mit vielen der Tools auf http://www.eressea-pbem.de/download.html benutzen kannst. Wenn du ihn nicht bekommen möchtest, gib einer deiner Einheiten den Befehl OPTION COMPUTER NICHT.</text>
+	</string>
+</strings>

@@ -16,5 +16,6 @@
 		<order name="MAGIEGEBIET" disable></order>
 		<include file="eressea/races.xml"></include>
 		<include file="eressea/items.xml"></include>
+		<include file="eressea/de/strings.xml"></include>
 	</game>
 </eressea>

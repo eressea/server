@@ -1879,6 +1879,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 		rnl(F);
 		centre(F, LOC(f->locale, "newbie_info_2"), true);
 		if ((f->options & want(O_COMPUTER)) == 0) {
+			f->options |= want(O_COMPUTER);
 			rnl(F);
 			centre(F, LOC(f->locale, "newbie_info_3"), true);
 		}
