@@ -620,6 +620,17 @@ flying_ship(const ship * sh)
 }
 
 static void
+set_coast(ship * sh, region * r, region * rnext)
+{
+  if (rnext->terrain != T_OCEAN && !flying_ship(sh)) {
+    sh->coast = reldirection(rnext, r);
+    assert(rterrain(r)==T_OCEAN);
+  } else {
+    sh->coast = NODIRECTION;
+  }
+}
+
+static void
 drifting_ships(region * r)
 {
   direction_t d;
@@ -640,10 +651,12 @@ drifting_ships(region * r)
       }
 
       /* Kapitän bestimmen */
-      for (captain = r->units; captain; captain = captain->next)
-        if (captain->ship == sh
-          && eff_skill(captain, SK_SAILING, r) >= sh->type->cptskill)
+      for (captain = r->units; captain; captain = captain->next) {
+        if (captain->ship != sh) continue;
+        if (eff_skill(captain, SK_SAILING, r) >= sh->type->cptskill) {
           break;
+        }
+      }
       /* Kapitän da? Beschädigt? Genügend Matrosen?
       * Genügend leicht? Dann ist alles OK. */
 
@@ -679,6 +692,8 @@ drifting_ships(region * r)
       /* Das Schiff und alle Einheiten darin werden nun von r
       * nach rnext verschoben. Danach eine Meldung. */
       add_regionlist(&route, rnext);
+
+      set_coast(sh, r, rnext);
       sh = move_ship(sh, r, rnext, route);
       free_regionlist(route);
 
@@ -686,12 +701,6 @@ drifting_ships(region * r)
 
         fset(sh, SF_DRIFTED);
 
-        if (rnext->terrain != T_OCEAN && !flying_ship(sh)) {
-          sh->coast = reldirection(rnext, r);
-          assert(rterrain(r)==T_OCEAN);
-        } else {
-          sh->coast = NODIRECTION;
-        }
         damage_ship(sh, 0.02);
 
         if (sh->damage>=sh->size * DAMAGE_SCALE) {
@@ -1685,12 +1694,7 @@ sail(unit * u, region * next_point, boolean move_on_land)
     * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
     cycle_route(u, step);
     set_order(&u->thisorder, NULL);
-    if (current_point->terrain != T_OCEAN && !is_cursed(sh->attribs, C_SHIP_FLYING, 0)) {
-      sh->coast = reldirection(current_point, last_point);
-      assert(rterrain(last_point)==T_OCEAN);
-    } else {
-      sh->coast = NODIRECTION;
-    }
+    set_coast(sh, last_point, current_point);
 
     sprintf(buf, "Die %s ", shipname(sh));
     if( is_cursed(sh->attribs, C_SHIP_FLYING, 0) )
