@@ -48,6 +48,7 @@
 #include <plane.h>
 #include <teleport.h>
 #include <resources.h>
+#include <building.h>
 
 /* libc includes */
 #include <ctype.h>
