@@ -1017,7 +1017,7 @@ get_seen_interval(region ** first, region ** last)
   }
   while (r!=NULL) {
     if (find_seen(r)!=NULL) {
-      *last = r;
+      *last = r->next;
     }
     r = r->next;
   }
