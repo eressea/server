@@ -566,6 +566,7 @@ factionorders(void)
 		f->mistakes = 0;
 
 		if (checkpasswd(f, pass, true) == false) {
+		  log_warning(("Invalid password for faction %s\n", fid));
 			addstrlist(&f->mistakes, "Das Passwort wurde falsch eingegeben");
 			return 0;
 		}
