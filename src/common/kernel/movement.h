@@ -18,6 +18,14 @@ struct unit;
 struct ship;
 
 /* ------------------------------------------------------------- */
+/* die Zahlen sind genau äquivalent zu den race Flags */
+
+#define MV_CANNOTMOVE     (1<<5)
+#define MV_FLY            (1<<7)   /* kann fliegen */
+#define MV_SWIM           (1<<8)   /* kann schwimmen */
+#define MV_WALK           (1<<9)   /* kann über Land gehen */
+
+/* ------------------------------------------------------------- */
 
 /* Die tragekapaz. ist hardcodiert mit defines, da es bis jetzt sowieso nur 2
  * objecte gibt, die etwas tragen. */

@@ -56,6 +56,7 @@
 /* attributes includes */
 #include <attributes/follow.h>
 #include <attributes/targetregion.h>
+#include <attributes/at_movement.h>
 
 /* TODO: boder_type::move() must be able to change target (wisps) */
 extern border_type bt_wisps;
@@ -286,6 +287,8 @@ canwalk(unit * u)
 boolean
 canfly(unit *u)
 {
+	if (get_movement(&u->attribs, MV_CANNOTMOVE)) return false;
+
 	if(get_item(u, I_HORSE)) return false;
 
 	if(get_item(u, I_PEGASUS) >= u->number && effskill(u, SK_RIDING) >= 4)
@@ -293,12 +296,16 @@ canfly(unit *u)
 
 	if (fval(u->race, RCF_FLY)) return true;
 
+	if (get_movement(&u->attribs, MV_FLY)) return true;
+
 	return false;
 }
 
 boolean
 canswim(unit *u)
 {
+	if (get_movement(&u->attribs, MV_CANNOTMOVE)) return false;
+
 	if (get_item(u, I_HORSE)) return false;
 
 	if (get_item(u, I_DOLPHIN) >= u->number && effskill(u, SK_RIDING) >= 4)
@@ -309,6 +316,10 @@ canswim(unit *u)
 	if (u->race->flags & RCF_FLY) return true;
 
 	if (u->race->flags & RCF_SWIM) return true;
+
+	if (get_movement(&u->attribs, MV_FLY)) return true;
+
+	if (get_movement(&u->attribs, MV_SWIM)) return true;
 
 	return false;
 }
@@ -2087,7 +2098,9 @@ movement(void)
 					cmistake(u, findorder(u, u->thisorder), 52, MSG_MOVE);
 					set_string(&u->thisorder, "");
 					up = &u->next;
-				} else if (u->race->flags & RCF_CANNOTMOVE) {
+				} else if ((u->race->flags & RCF_CANNOTMOVE) 
+						|| get_movement(&u->attribs, MV_CANNOTMOVE))
+				{
 					cmistake(u, findorder(u, u->thisorder), 55, MSG_MOVE);
 					set_string(&u->thisorder, "");
 					up = &u->next;
@@ -2129,7 +2142,9 @@ movement(void)
 					if(attacked(u)) {
 						cmistake(u, o->s, 52, MSG_MOVE);
 						break;
-					} else if(u->race->flags & RCF_CANNOTMOVE) {
+					} else if((u->race->flags & RCF_CANNOTMOVE)
+							|| get_movement(&u->attribs, MV_CANNOTMOVE))
+					{
 						cmistake(u, o->s, 55, MSG_MOVE);
 						break;
 					}
@@ -2163,7 +2178,9 @@ movement(void)
 				|| igetkeyword(u->thisorder, u->faction->locale) == K_ROUTE)) {
 					if (attacked(u)) {
 						cmistake(u, findorder(u, u->thisorder), 52, MSG_PRODUCE);
-					} else if (u->race->flags & RCF_CANNOTMOVE) {
+					} else if ((u->race->flags & RCF_CANNOTMOVE)
+							|| get_movement(&u->attribs, MV_CANNOTMOVE))
+					{
 						cmistake(u, findorder(u, u->thisorder), 55, MSG_PRODUCE);
 					} else
 						move(r, u, true);
