@@ -27,7 +27,7 @@
     <order name="MAGIEGEBIET" disable="yes"/>
     <param name="entertain.base" value="15"/>
     <param name="entertain.perlevel" value="5"/>
-    <param name="nmr.timeout" value="9999"/>
+    <param name="nmr.timeout" value="20"/>
     <param name="nmr.removenewbie" value="0"/>
     <param name="GiveRestriction" value="3"/>
     <param name="NewbieImmunity" value="4"/>
@@ -45,8 +45,8 @@
   <xi:include href="eressea/temple.xml"/>
   <strings>
     <string name="mailto">
-      <text locale="de">hse-server@eressea.upb.de</text>
-      <text locale="en">hse-server@eressea.upb.de</text>
+      <text locale="de">hse-server@eressea.de</text>
+      <text locale="en">hse-server@eressea.de</text>
     </string>
     <string name="mailcmd">
       <text locale="de">ERESSEA BEFEHLE</text>

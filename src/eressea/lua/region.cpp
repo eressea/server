@@ -4,6 +4,7 @@
 
 // kernel includes
 #include <kernel/building.h>
+#include <kernel/item.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
@@ -104,6 +105,15 @@ region_setflag(region& r, int bit, bool set)
 {
   if (set) r.flags |= (1<<bit);
   else r.flags &= ~(1<<bit);
+}
+
+static int
+region_getresource(const region& r, const char * type)
+{
+	const resource_type * rtype = rt_find(type);
+  if (rtype==rt_find("money")) return rmoney(&r);
+  if (rtype==rt_find("peasant")) return rpeasants(&r);
+	return 0;
 }
 
 static void
@@ -249,6 +259,7 @@ bind_region(lua_State * L)
     .def("set_road", &region_setroad)
 
     .def("next", &region_next)
+    .def("get_resource", &region_getresource)
     .def_readonly("x", &region::x)
     .def_readonly("y", &region::y)
     .def_readwrite("age", &region::age)

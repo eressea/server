@@ -44,6 +44,12 @@ add_ship(const char * sname, region& r)
   return sh;
 }
 
+const char *
+ship_gettype(const ship& s) {
+  return s.type->name[0];
+}
+
+
 void
 bind_ship(lua_State * L) 
 {
@@ -54,6 +60,7 @@ bind_ship(lua_State * L)
     class_<struct ship>("ship")
     .def(self == ship())
     .def(tostring(self))
+    .property("type", &ship_gettype)
     .def_readonly("name", &ship::name)
     .def_readonly("region", &ship::region)
     .def_readonly("id", &ship::no)

@@ -1,7 +1,7 @@
 function run_scripts()
   scripts = { 
     "hse05-portals.lua",
-    "hse05-grails.lua"
+    "hse05-stats.lua"
   }
   for index in scripts do
     local script = scriptpath .. "/" .. scripts[index]
@@ -57,7 +57,7 @@ function process(orders)
     return -1
   end
 
-  write_grails("grails.txt")
+  write_stats("grails.txt")
 end
 
 

@@ -5,10 +5,11 @@ end
 buildings = {}
 
 function portal_exchange(b1, param)
-  b2 = buildings[param]
-  if buildings[param] == nil then
-    buildings[param] = b1
+  id = buildings[param]
+  if id == nil then
+    buildings[param] = b1.id
   else
+	  b2 = get_building(id)
     u1 = gate_units(b1, 100)
     u2 = gate_units(b2, 100)
     gate_travel(b1, u2)
