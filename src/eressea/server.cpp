@@ -687,11 +687,7 @@ main(int argc, char *argv[])
 #else
     try {
 #endif
-      if (lua_dofile(luaState, buf)!=0) {
-        std::string errmsg = "Unknown error executing lua_dofile";
-        if (lua_isstring(luaState, -1)) errmsg = lua_tostring(luaState, -1);
-        throw std::runtime_error(errmsg);
-      }
+      luabind::call_function<int>(luaState, "dofile", buf);
 #ifndef LUABIND_NO_EXCEPTIONS
     } 
     catch (std::runtime_error& rte) {

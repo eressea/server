@@ -213,7 +213,8 @@ function test_parser()
   write_game("parser")
 end
 
-test_handler()
+test_fail()
+-- test_handler()
 -- test_parser()
 -- test_monsters()
 -- test_combat()
