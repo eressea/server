@@ -51,8 +51,7 @@ write_game(const char *filename)
   free_units();
   remove_empty_factions(true);
 
-  writegame(filename, 0);
-  return 0;
+  return writegame(filename, 0);
 }
 
 extern int writepasswd(void);

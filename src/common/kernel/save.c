@@ -1303,7 +1303,7 @@ export_players(const char * path)
 }
 #endif
 
-void
+int
 writegame(const char *filename, char quiet)
 {
 	int i,n;
@@ -1325,10 +1325,9 @@ writegame(const char *filename, char quiet)
 
 	/* write_dynamictypes(); */
 
-  sprintf(buf, "%s/%s", datapath(), filename);
-	F = cfopen(buf, "w");
+	F = cfopen(filename, "w");
 	if (F==NULL)
-		return;
+		return -1;
 
 	if (!quiet)
 		printf("Schreibe die %d. Runde...\n", turn);
@@ -1458,6 +1457,7 @@ writegame(const char *filename, char quiet)
 #endif
 	fclose(F);
 	printf("\nOk.\n");
+	return 0;
 }
 /* ------------------------------------------------------------- */
 

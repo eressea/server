@@ -344,7 +344,7 @@ processturn(char *filename)
 	if (!nowrite) {
 		char ztext[64];
 		sprintf(ztext, "%s/%d", datapath(), turn);
-		writegame(ztext, 0);
+		return writegame(ztext, 0);
 	}
 	return 0;
 }
