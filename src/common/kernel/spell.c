@@ -6918,7 +6918,6 @@ sp_antimagiczone(castorder *co)
  * (ONSHIPCAST | TESTRESISTANCE)
  *
  * Syntax:
- *  ZAUBERE \"Runen des Schutzes\" BURG <Burg-nr>
  *  ZAUBERE \"Runen des Schutzes\" GEBÄUDE <Gebäude-Nr>
  *  ZAUBERE \"Runen des Schutzes\" SCHIFF <Schiff-Nr>
  * "kc"
@@ -7029,7 +7028,6 @@ sp_speed2(castorder *co)
  * Syntax:
  *  ZAUBERE \"Magiefresser\" REGION
  *  ZAUBERE \"Magiefresser\" EINHEIT <Einheit-Nr>
- *  ZAUBERE \"Magiefresser\" BURG <Burg-Nr>
  *  ZAUBERE \"Magiefresser\" GEBÄUDE <Gebäude-Nr>
  *  ZAUBERE \"Magiefresser\" SCHIFF <Schiff-Nr>
  *
@@ -7114,7 +7112,6 @@ sp_q_antimagie(castorder *co)
  * Syntax:
  *  ZAUBERE \"Fluch brechen\" REGION <Zauber-id>
  *  ZAUBERE \"Fluch brechen\" EINHEIT <Einheit-Nr> <Zauber-id>
- *  ZAUBERE \"Fluch brechen\" BURG <Burg-Nr> <Zauber-id>
  *  ZAUBERE \"Fluch brechen\" GEBÄUDE <Gebäude-Nr> <Zauber-id>
  *  ZAUBERE \"Fluch brechen\" SCHIFF <Schiff-Nr> <Zauber-id>
  *
@@ -8062,10 +8059,9 @@ static spell spelldaten[] =
   },
   {
     SPL_GWYRRD_DESTROY_MAGIC, "gwyrrddestroymagic", NULL,
-    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' REGIONn"
-    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' EINHEIT <Einheit-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' BURG <Burg-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' GEBÄUDE <Gebäude-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' REGION\n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' EINHEIT <Einheit-Nr>\n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' GEBÄUDE <Gebäude-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' SCHIFF <Schiff-Nr>",
     "kc",
     M_DRUIDE,
@@ -8545,10 +8541,9 @@ static spell spelldaten[] =
   {
     SPL_DRAIG_DESTROY_MAGIC, "draigdestroymagic", NULL,
     "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' REGIONn"
-    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' EINHEIT <Einheit-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' BURG <Burg-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' GEBÄUDE <Gebäude-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' SCHIFF <Schiff-Nr>",
+    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' EINHEIT <Einheit-Nr>\n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' GEBÄUDE <Gebäude-Nr>\n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' SCHIFF <Schiff-Nr>\",
     "kc",
     M_CHAOS,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
@@ -8900,10 +8895,9 @@ static spell spelldaten[] =
   },
   {
     SPL_ILLAUN_DESTROY_MAGIC, "illaundestroymagic", NULL,
-    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' REGIONn"
-    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' EINHEIT <Einheit-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' BURG <Burg-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' GEBÄUDE <Gebäude-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' REGION\n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' EINHEIT <Einheit-Nr>\n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' GEBÄUDE <Gebäude-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' SCHIFF <Schiff-Nr>",
     "kc",
     M_TRAUM,
@@ -9379,9 +9373,8 @@ static spell spelldaten[] =
     "Und so, wie wie aus dem Lebenslied einer Person erkannt werden kann, "
     "ob diese unter einem Zauber steht, so ist dies auch bei Burgen, "
     "Schiffen oder Regionen möglich.",
-    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' REGIONn"
-    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' BURG <Burg-nr>n"
-    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' GEBÄUDE <Gebäude-nr>n"
+    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' REGION\n"
+    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' GEBÄUDE <Gebäude-nr>\n"
     "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' SCHIFF <Schiff-nr>",
     "kc",
     M_BARDE, (SPELLLEVEL|ONSHIPCAST), 5, 8,
@@ -9399,10 +9392,9 @@ static spell spelldaten[] =
     "Jede Verzauberung beeinflußt das Lebenslied, schwächt und verzerrt es. "
     "Der kundige Barde kann versuchen, das Lebenslied aufzufangen und zu "
     "verstärken und die Veränderungen aus dem Lied zu tilgen.",
-    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' REGIONn"
-    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' EINHEIT <Einheit-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' BURG <Burg-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' GEBÄUDE <Gebäude-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' REGION\n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' EINHEIT <Einheit-Nr>\n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' GEBÄUDE <Gebäude-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' SCHIFF <Schiff-Nr>",
     "kc",
     M_BARDE,
@@ -9638,10 +9630,9 @@ static spell spelldaten[] =
   /* M_ASTRAL */
   {
     SPL_ANALYSEMAGIC, "analyze_magic", NULL,
-    "ZAUBERE [STUFE n] \'Magie analysieren\' REGIONn"
-    "ZAUBERE [STUFE n] \'Magie analysieren\' EINHEIT <Einheit-Nr>n"
-    "ZAUBERE [STUFE n] \'Magie analysieren\' BURG <Burg-Nr>n"
-    "ZAUBERE [STUFE n] \'Magie analysieren\' GEBÄUDE <Gebäude-Nr>n"
+    "ZAUBERE [STUFE n] \'Magie analysieren\' REGION\n"
+    "ZAUBERE [STUFE n] \'Magie analysieren\' EINHEIT <Einheit-Nr>\n"
+    "ZAUBERE [STUFE n] \'Magie analysieren\' GEBÄUDE <Gebäude-Nr>\n"
     "ZAUBERE [STUFE n] \'Magie analysieren\' SCHIFF <Schiff-Nr>",
     "kc",
     M_ASTRAL, (UNITSPELL | ONSHIPCAST | TESTCANSEE), 5, 1,
@@ -9857,10 +9848,9 @@ static spell spelldaten[] =
     SPL_TYBIED_DESTROY_MAGIC, "Magiefresser",
     "Dieser Zauber ermöglicht dem Magier, Verzauberungen einer Einheit, "
     "eines Schiffes, Gebäudes oder auch der Region aufzulösen.",
-    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' REGIONn"
-    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' EINHEIT <Einheit-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' BURG <Burg-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' GEBÄUDE <Gebäude-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' REGION\n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' EINHEIT <Einheit-Nr>\n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' GEBÄUDE <Gebäude-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' SCHIFF <Schiff-Nr>",
     "kc",
     M_ASTRAL,
@@ -9989,10 +9979,9 @@ static spell spelldaten[] =
     "Dieser Zauber ermöglicht dem Magier, gezielt eine bestimmte "
     "Verzauberung einer Einheit, eines Schiffes, Gebäudes oder auch "
     "der Region aufzulösen.",
-    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' REGION <Zauber-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' EINHEIT <Einheit-Nr> <Zauber-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' BURG <Burg-Nr> <Zauber-Nr>n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' GEBÄUDE <Gebäude-Nr> <Zauber-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' REGION <Zauber-Nr>\n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' EINHEIT <Einheit-Nr> <Zauber-Nr>\n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' GEBÄUDE <Gebäude-Nr> <Zauber-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' SCHIFF <Schiff-Nr> <Zauber-Nr>",
     "kcc",
     M_ASTRAL, (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE), 3, 7,
@@ -10035,7 +10024,7 @@ static spell spelldaten[] =
     "sich ihre Wirkung, doch ein hundertprozentiger Schutz läßt sich so "
     "nicht erreichen. Der Zauber hält mindestens drei Wochen an, je nach "
     "Talent des Magiers aber auch viel länger.",
-    "ZAUBERE \'Runen des Schutzes\' [BURG <Burg-nr> | GEBÄUDE <Gebäude-Nr> | "
+    "ZAUBERE \'Runen des Schutzes\' GEBÄUDE <Gebäude-Nr> | "
     "SCHIFF <Schiff-Nr>]",
     "kc",
     M_ASTRAL, (ONSHIPCAST | TESTRESISTANCE), 2, 8,
