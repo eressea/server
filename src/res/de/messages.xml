@@ -35,7 +35,7 @@
 	</type>
 	<locale name="de">
 		<nr section="production">
-			<text>"$unit($unit) in $region($region): '$command' - Dazu braucht man das Talent $skill"</text>
+			<text>"$unit($unit) in $region($region): '$command' - Dazu braucht man das Talent $skill($skill)"</text>
 		</nr>
 	</locale>
 </message>

@@ -55,7 +55,7 @@ tunnel;en;tunnel
 site;en;foundation
 fortification;en;fortification
 tower;en;tower
-castle;en;castle
+castle;en;stronghold
 fortress;en;fortress
 citadel;en;citadel
 
@@ -156,8 +156,8 @@ laensword;en;laen sword
 laensword_p;en;laen swords
 lance;en;lance
 lance_p;en;lances
-log;en;log
-log_p;en;logs
+log;en;wood
+log_p;en;wood
 magicbag;en;magic bag
 magicherbbag;en;bag of conservation
 mallorn;en;mallorn

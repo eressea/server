@@ -279,6 +279,7 @@ msg_error(const struct unit * u, const char * cmd, const char * name, const char
 	while (*ic && !isalnum(*ic)) ic++;
 	while (*ic) {
 		void * v = va_arg(marker, void *);
+		oc = buffer;
 		while (isalnum(*ic)) *oc++ = *ic++;
 		*oc = '\0';
 		arg_set(args, mtype, buffer, v);
@@ -309,6 +310,7 @@ msg_message(const char * name, const char* sig, ...)
 	while (*ic && !isalnum(*ic)) ic++;
 	while (*ic) {
 		void * v = va_arg(marker, void *);
+		oc = buffer;
 		while (isalnum(*ic)) *oc++ = *ic++;
 		*oc = '\0';
 		arg_set(args, mtype, buffer, v);
