@@ -3190,7 +3190,7 @@ make_summary(boolean count_new)
 		f->nregions = 0;
 		f->number = 0;
 		f->money = 0;
-		if (count_new == true || f->age > 0) s->factions++;
+		if (f->alive && (count_new || f->age > 0)) s->factions++;
 	}
 
 	/* Alles zählen */
@@ -3285,7 +3285,9 @@ make_summary(boolean count_new)
 	/* jetzt noch parteienweise zählen */
 	/* Problem mit Monsterpartei ... */
 	for (f = factions; f; f = f->next) if (f->no!=MONSTER_FACTION) {
-		if (count_new == true || f->age > 0) s->factionrace[old_race(f->race)]++;
+		if (f->alive && (count_new || f->age > 0)) {
+			s->factionrace[old_race(f->race)]++;
+		}
 	}
 	return s;
 }
