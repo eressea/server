@@ -257,7 +257,10 @@ get_food(region *r)
           blut = min(blut, hungry);
           change_effect(ud, pt_blood, -blut);
           hungry -= blut;
-				}
+        } else {
+          break;
+          /* no more help for us */
+        }
 			}
 			if (r->planep == NULL || !fval(r->planep, PFL_NOFEED)) {
 				if (peasantfood>=hungry) {
