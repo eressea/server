@@ -317,97 +317,21 @@ item_type it_instantartsculpture = {
   NULL
 };
 
-static int
-use_instantartacademy(struct unit * u, const struct item_type * itype,
-                    int amount, const char *cm)
-{
-  building *b;
-
-  if(u->region->land == NULL) {
-    cmistake(u, cm, 242, MSG_MAGIC);
-    return 0;
-  }
-
-  b = new_building(bt_find("artacademy"), u->region, u->faction->locale);
-  b->size = 100;
-  sprintf(buf, "%s", LOC(u->faction->locale, "artacademy"));
-  set_string(&b->name, buf);
-
-  ADDMSG(&u->region->msgs, msg_message(
-    "artacademy_create", "unit command", u, cm));
-
-  return 1;
-}
-
-static resource_type rt_instantartacademy = {
-	{ "instantartacademy", "instantartacademy_p" },
-	{ "instantartacademy", "instantartacademy_p" },
-	RTF_ITEM,
-	&res_changeitem
-};
-
-item_type it_instantartacademy = {
-	&rt_instantartacademy,              /* resourcetype */
-	0, 1, 0,		                    /* flags, weight, capacity */
-	NULL,                           /* construction */
-	&use_instantartacademy,
-	NULL,
-	NULL
-};
-
-static int
-use_instantartsculpture(struct unit * u, const struct item_type * itype,
-                    int amount, const char *cm)
-{
-  building *b;
-
-  if(u->region->land == NULL) {
-    cmistake(u, cm, 242, MSG_MAGIC);
-    return 0;
-  }
-
-  b = new_building(bt_find("artsculpture"), u->region, u->faction->locale);
-  b->size = 100;
-  sprintf(buf, "%s", LOC(u->faction->locale, "artsculpture"));
-  set_string(&b->name, buf);
-
-  ADDMSG(&u->region->msgs, msg_message(
-    "artsculpture_create", "unit region command", u, cm));
-
-  return 1;
-}
-
-static resource_type rt_instantartsculpture = {
-	{ "instantartsculpture", "instantartsculpture_p" },
-	{ "instantartsculpture", "instantartsculpture_p" },
-	RTF_ITEM,
-	&res_changeitem
-};
-
-item_type it_instantartsculpture = {
-	&rt_instantartsculpture,              /* resourcetype */
-	0, 1, 0,		                          /* flags, weight, capacity */
-	NULL,                                 /* construction */
-	&use_instantartsculpture,
-	NULL,
-	NULL
-};
-
 
 void
 register_artrewards(void)
 {
   at_register(&at_peaceimmune);
-	it_register(&it_hornofdancing);
-	register_function((pf_generic)use_hornofdancing, "usehornofdancing");
-	it_register(&it_trappedairelemental);
-	register_function((pf_generic)use_trappedairelemental, "trappedairelemental");
-	it_register(&it_aurapotion50);
-	register_function((pf_generic)use_aurapotion50, "aurapotion50");
-	it_register(&it_bagpipeoffear);
-	register_function((pf_generic)use_bagpipeoffear, "bagpipeoffear");
-	it_register(&it_instantartacademy);
-	register_function((pf_generic)use_instantartacademy, "instantartacademy");
-	it_register(&it_instantartsculpture);
-	register_function((pf_generic)use_instantartsculpture, "instantartsculpture");
+  it_register(&it_hornofdancing);
+  register_function((pf_generic)use_hornofdancing, "usehornofdancing");
+  it_register(&it_trappedairelemental);
+  register_function((pf_generic)use_trappedairelemental, "trappedairelemental");
+  it_register(&it_aurapotion50);
+  register_function((pf_generic)use_aurapotion50, "aurapotion50");
+  it_register(&it_bagpipeoffear);
+  register_function((pf_generic)use_bagpipeoffear, "bagpipeoffear");
+  it_register(&it_instantartacademy);
+  register_function((pf_generic)use_instantartacademy, "instantartacademy");
+  it_register(&it_instantartsculpture);
+  register_function((pf_generic)use_instantartsculpture, "instantartsculpture");
 }
