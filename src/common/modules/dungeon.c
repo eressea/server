@@ -24,6 +24,7 @@
 #include <plane.h>
 #include <race.h>
 #include <region.h>
+#include <skill.h>
 #include <unit.h>
 
 /* util includes */
@@ -32,6 +33,7 @@
 
 /* libc includes */
 #include <string.h>
+#include <limits.h>
 
 typedef struct treasure {
 	const struct item_type * itype;
@@ -49,10 +51,19 @@ typedef struct monster {
 	struct itemtype_list * weapons;
 } monster;
 
+typedef struct skilllimit {
+	skill_t skill;
+	int minskill;
+	int maxskill;
+	struct skilllimit * next;
+} skilllimit;
+
 typedef struct dungeon {
 	int level;
 	int radius;
 	int size;
+	int maxpeople;
+	struct skilllimit * limits;
 	double connect;
 	struct monster * boss;
 	struct monster * monsters;
@@ -71,6 +82,7 @@ make_dungeon(const dungeon * data)
 	const struct race * bossrace = data->boss->race;
 	char name[128];
 	int size = data->size;
+	int iterations = size * size;
 	unsigned int flags = PFL_NORECRUITS;
 	int n = 0;
 	struct faction * fmonsters = findfaction(MONSTER_FACTION);
@@ -87,7 +99,7 @@ make_dungeon(const dungeon * data)
 	terraform(center, T_HELL);
 	add_regionlist(&rlist, center);
 	rnext = r = center;
-	while (size>0) {
+	while (size>0 && iterations--) {
 		int d, o = rand() % 3;
 		for (d=0;d!=3;++d) {
 			int index = (d+o) % 3;
@@ -168,16 +180,37 @@ static int
 tagbegin(xml_stack *stack)
 {
 	xml_tag * tag = stack->tag;
-	if (strcmp(tag->name , "dungeon")) {
-		stack->state = calloc(sizeof(dungeon), 1);
+	if (strcmp(tag->name, "dungeon")==0) {
+		dungeon * d = (dungeon*)calloc(sizeof(dungeon), 1);
+		d->maxpeople = xml_ivalue(tag, "maxpeople");
+		if (d->maxpeople==0) d->maxpeople = INT_MAX;
+		d->level = xml_ivalue(tag, "level");
+		d->radius = xml_ivalue(tag, "radius");
+		d->connect = xml_fvalue(tag, "connect");
+		d->size = xml_ivalue(tag, "size");
+		stack->state = d;
 	} else {
 		dungeon * d = (dungeon*)stack->state;
-		if (strcmp(tag->name, "monster")) {
+		if (strcmp(tag->name, "skilllimit")==0) {
+			skill_t sk = sk_find(xml_value(tag, "name"));
+			if (sk!=NOSKILL) {
+				skilllimit * skl = calloc(sizeof(skilllimit), 1);
+				skl->skill = sk;
+				if (xml_value(tag, "max")!=NULL) {
+					skl->maxskill = xml_ivalue(tag, "max");
+				} else skl->maxskill = INT_MAX;
+				if (xml_value(tag, "min")!=NULL) {
+					skl->minskill = xml_ivalue(tag, "min");
+				} else skl->maxskill = INT_MIN;
+				skl->next = d->limits;
+				d->limits = skl;
+			}
+		} else if (strcmp(tag->name, "monster")==0) {
 			monster * m = calloc(sizeof(monster), 1);
 			m->race = rc_find(xml_value(tag, "race"));
 			m->chance = xml_fvalue(tag, "chance");
-			m->avgsize = xml_ivalue(tag, "avgsize");
-			m->maxunits = xml_ivalue(tag, "maxunits");
+			m->avgsize = max(1, xml_ivalue(tag, "size"));
+			m->maxunits = min(1, xml_ivalue(tag, "maxunits"));
 
 			if (m->race) {
 				if (xml_bvalue(tag, "boss")) {
@@ -187,7 +220,7 @@ tagbegin(xml_stack *stack)
 					d->monsters = m;
 				}
 			}
-		} else if (strcmp(tag->name, "weapon")) {
+		} else if (strcmp(tag->name, "weapon")==0) {
 			monster * m = d->monsters;
 			itemtype_list * w = calloc(sizeof(itemtype_list), 1);
 			w->type = it_find(xml_value(tag, "type"));

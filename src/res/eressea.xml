@@ -15,7 +15,8 @@
 		<order name="MEINUNG" disable></order>
 		<order name="MAGIEGEBIET" disable></order>
 	</game>
+	<include file="eressea/de/strings.xml"></include>
 	<include file="eressea/races.xml"></include>
 	<include file="eressea/items.xml"></include>
-	<include file="eressea/de/strings.xml"></include>
+	<include file="eressea/dungeons.xml"></include>
 </eressea>
