@@ -2018,10 +2018,10 @@
 		<text locale="de">Riesenschildkröte</text>
 	</string>
 	<string name="rc_orc_p">
-		<text locale="de">Orks</text>
+		<text locale="de">Altorks</text>
 	</string>
 	<string name="rc_orc">
-		<text locale="de">Ork</text>
+		<text locale="de">Altork</text>
 	</string>
 	<string name="rc_uruk_p">
 		<text locale="de">Orks</text>
@@ -3193,20 +3193,20 @@
 		</string>
 
 		<string name="orc">
-			<text locale="de">Ork</text>
-			<text locale="en">orc</text>
+			<text locale="de">Altork</text>
+			<text locale="en">oldorc</text>
 		</string>
 		<string name="orc_p">
-			<text locale="de">Orks</text>
-			<text locale="en">orcs</text>
+			<text locale="de">Altorks</text>
+			<text locale="en">oldorcs</text>
 		</string>
 		<string name="orc_d">
-			<text locale="de">Orks</text>
-			<text locale="en">orcs</text>
+			<text locale="de">Altorks</text>
+			<text locale="en">oldorcs</text>
 		</string>
 		<string name="orc_x">
-			<text locale="de">Ork</text>
-			<text locale="en">orc</text>
+			<text locale="de">Altork</text>
+			<text locale="en">oldorc</text>
 		</string>
 		
 		<string name="snotling">
