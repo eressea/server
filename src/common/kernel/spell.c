@@ -411,10 +411,10 @@ destroy_curse(attrib **alist, int cast_level, double force, curse * c)
 				force = remain;
 			}
 			if (c1->vigour <= 0) {
-				a_remove(ap, a);
+				a_remove(alist, a);
 			}
 		}
-		if (*ap) ap = &(*ap)->next;
+		if (*ap==a) ap = &a->next;
 	}
 	return succ;
 }
