@@ -658,11 +658,11 @@
 	</string>
 	<string name="catapultammo">
 		<text locale="de">Katapultmunition</text>
-		<text locale="en">catapult ammunition</text>
+		<text locale="en">ammunition</text>
 	</string>
 	<string name="catapultammo_p">
 		<text locale="de">Katapultmunition</text>
-		<text locale="en">catapult ammunition</text>
+		<text locale="en">ammunition</text>
 	</string>
 
 	<string name="elfspoil">
