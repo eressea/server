@@ -13,6 +13,9 @@
 struct region;
 struct plane;
 struct building;
+struct dungeon;
 
-extern void make_dungeon(int radius, int level, struct plane **, struct region **);
-extern void make_dungeongate(struct region * source, struct region * target, int level);
+extern struct dungeon * dungeonstyles;
+extern struct region * make_dungeon(const struct dungeon*);
+extern void make_dungeongate(struct region * source, struct region * target, const struct dungeon *);
+extern void register_dungeon(void);

@@ -85,6 +85,10 @@ LIB32=link.exe -lib
 # PROP Default_Filter "*.h"
 # Begin Source File
 
+SOURCE=..\spells\alp.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\changefaction.h
 # End Source File
 # Begin Source File
@@ -93,11 +97,19 @@ SOURCE=.\changerace.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\clonedied.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\createcurse.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\createunit.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\gate.h
 # End Source File
 # Begin Source File
 
@@ -117,11 +129,19 @@ SOURCE=.\shock.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\spells\spells.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\timeout.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\triggers.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\unguard.h
 # End Source File
 # Begin Source File
 
@@ -135,6 +155,10 @@ SOURCE=.\changefaction.c
 # Begin Source File
 
 SOURCE=.\changerace.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\clonedied.c
 # End Source File
 # Begin Source File
 
@@ -171,6 +195,10 @@ SOURCE=.\timeout.c
 # Begin Source File
 
 SOURCE=.\triggers.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\unguard.c
 # End Source File
 # Begin Source File
 

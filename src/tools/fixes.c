@@ -331,14 +331,15 @@ main(int argc, char *argv[])
 
 	init_triggers();
 
+	register_races();
+	register_spells();
+
 	debug_language("locales.log");
-	init_locales();
 	sprintf(zText, "%s/%s", resourcepath(), "eressea.xml");
 	init_data(zText);
+	init_locales();
 
-	init_races();
 	init_attributes();
-	init_spells();
 	init_resources();
 	register_items();
 

@@ -37,6 +37,7 @@
 
 /* modules includes */
 #include <modules/arena.h>
+#include <modules/dungeon.h>
 #include <modules/museum.h>
 #include <modules/score.h>
 #include <modules/xmas2000.h>
@@ -161,17 +162,18 @@ game_init(void)
 	creport_init();
 
 	debug_language("locales.log");
-	init_races();
-	init_items();
-	init_spells();
+	register_races();
+	register_resources();
+	register_items();
+	register_spells();
+	register_dungeon();
 
 	init_data(xmlfile?xmlfile:"eressea.xml");
 	init_locales();
 
-	init_resources();
-	register_items();
 	init_attributes();
-
+	init_resources();
+	init_items();
 	init_economy();
 #if NEW_RESOURCEGROWTH
 	init_rawmaterials();
@@ -529,9 +531,9 @@ read_args(int argc, char **argv)
 	return 0;
 }
 
-extern void write_races(const char * filename);
+#ifdef BETA_CODE
 extern int xml_writeitems(const char * filename);
-extern void write_racestrings(const char * filename);
+#endif
 
 typedef struct lostdata {
 	int x, y;
@@ -579,13 +581,8 @@ main(int argc, char *argv[])
 
 	kernel_init();
 	game_init();
-#ifdef BETA_CODE
+#if defined(BETA_CODE) && 0
 	xml_writeitems("items.xml");
-#endif
-
-#if 0
-	write_races("races.xml");
-	write_racestrings("racestrings.xml");
 	return 0;
 #endif
 
@@ -708,7 +705,11 @@ main(int argc, char *argv[])
 		return 0;
 	}
 	if ((i=readgame(false))!=0) return i;
-	make_dungeon(5, 5, NULL, NULL);
+	if (dungeonstyles) {
+		struct dungeon * d = dungeonstyles;
+		struct region * r = make_dungeon(d);
+		make_dungeongate(findregion(0, 0), r, d);
+	}
 	writepasswd();
 	if (g_killeiswald) {
 		region * r = findregion(0, 25);

@@ -355,15 +355,15 @@ free_regionlist(regionlist *rl)
 	}
 }
 
-regionlist *
-add_regionlist(regionlist *rl, region *r)
+void
+add_regionlist(regionlist **rl, region *r)
 {
-	regionlist *rl2 = calloc(1, sizeof(regionlist));
+	regionlist *rl2 = (regionlist*)malloc(sizeof(regionlist));
 
 	rl2->region = r;
-	rl2->next   = rl;
+	rl2->next   = *rl;
 
-	return rl2;
+	*rl = rl2;
 }
 
 #if AT_SALARY

@@ -142,7 +142,7 @@ typedef struct regionlist {
 } regionlist;
 
 void free_regionlist(regionlist *rl);
-regionlist *add_regionlist(regionlist *rl, struct region *r);
+void add_regionlist(regionlist **rl, struct region *r);
 
 int woodcount(const struct region * r);
 int deathcount(const struct region * r);

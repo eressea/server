@@ -7,19 +7,19 @@
 CFG=items - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "items-6.mak".
-!MESSAGE
+!MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "items-6.mak" CFG="items - Win32 Debug"
-!MESSAGE
+!MESSAGE 
 !MESSAGE Possible choices for configuration are:
-!MESSAGE
+!MESSAGE 
 !MESSAGE "items - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "items - Win32 Debug" (based on "Win32 (x86) Static Library")
-!MESSAGE
+!MESSAGE 
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -74,7 +74,7 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo
 
-!ENDIF
+!ENDIF 
 
 # Begin Target
 
@@ -85,6 +85,10 @@ LIB32=link.exe -lib
 # PROP Default_Filter "*.h"
 # Begin Source File
 
+SOURCE=.\birthday_firework.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\demonseye.h
 # End Source File
 # Begin Source File
@@ -93,9 +97,25 @@ SOURCE=.\items.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\lmsreward.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\seed.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\weapons.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\xerewards.h
+# End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\birthday_firework.c
+# End Source File
 # Begin Source File
 
 SOURCE=.\demonseye.c
@@ -110,7 +130,15 @@ SOURCE=.\lmsreward.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\seed.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\weapons.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\xerewards.c
 # End Source File
 # End Target
 # End Project

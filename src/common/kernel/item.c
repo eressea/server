@@ -2516,7 +2516,7 @@ resname(resource_t res, int index)
 }
 
 void
-init_items(void)
+register_resources(void)
 {
 	register_function((pf_generic)res_changeitem, "changeitem");
 	register_function((pf_generic)res_changeperson, "changeperson");
@@ -2541,6 +2541,7 @@ init_items(void)
 	xml_register(&xml_resource, "eressea resource", 0);
 }
 
+#ifdef BETA_CODE
 int
 xml_writeitems(const char * file)
 {
@@ -2716,3 +2717,4 @@ xml_writeitems(const char * file)
 	fclose(stream);
 	return 0;
 }
+#endif

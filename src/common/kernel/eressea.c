@@ -2391,8 +2391,6 @@ remove_empty_factions(void)
 	faction **fp, *f3;
 	FILE *dofp;
 	char zText[MAX_PATH];
-	FILE * log = fopen("update.log", "a");
-
 	sprintf(zText, "%s/dropouts", basepath());
 
 	dofp = fopen(zText, "a");

@@ -547,8 +547,8 @@ extern item_type * it_read(FILE * F);
 extern resource_type * rt_read(FILE * F);
 extern void it_write(FILE * F, const item_type * it);
 extern void rt_write(FILE * F, const resource_type * rt);
+extern void register_resources(void);
 extern void init_resources(void);
-extern void init_items(void);
 
 extern const char* resname(resource_t res, int index);
 

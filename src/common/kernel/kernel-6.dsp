@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Static Library" 0x0104
 
-CFG=kernel - Win32 Conversion
+CFG=kernel - Win32 Profile
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,13 +13,12 @@ CFG=kernel - Win32 Conversion
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "kernel-6.mak" CFG="kernel - Win32 Conversion"
+!MESSAGE NMAKE /f "kernel-6.mak" CFG="kernel - Win32 Profile"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "kernel - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "kernel - Win32 Debug" (based on "Win32 (x86) Static Library")
-!MESSAGE "kernel - Win32 Conversion" (based on "Win32 (x86) Static Library")
 !MESSAGE "kernel - Win32 Profile" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
@@ -76,29 +75,6 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo /out:"Debug\kernel.lib"
 
-!ELSEIF  "$(CFG)" == "kernel - Win32 Conversion"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "kernel___Win32_Conversion"
-# PROP BASE Intermediate_Dir "kernel___Win32_Conversion"
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Conversion"
-# PROP Intermediate_Dir "Conversion"
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /Za /W4 /Z7 /Od /I "../util" /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /YX"stdafx.h" /FD /c
-# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../util" /I "../.." /I ".." /D "CONVERT_TRIGGER" /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /FR /YX"stdafx.h" /FD /c
-# ADD BASE RSC /l 0x407
-# ADD RSC /l 0x407
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LIB32=link.exe -lib
-# ADD BASE LIB32 /nologo /out:"Debug\kernel.lib"
-# ADD LIB32 /nologo /out:"Debug\kernel.lib"
-
 !ELSEIF  "$(CFG)" == "kernel - Win32 Profile"
 
 # PROP BASE Use_MFC 0
@@ -128,7 +104,6 @@ LIB32=link.exe -lib
 
 # Name "kernel - Win32 Release"
 # Name "kernel - Win32 Debug"
-# Name "kernel - Win32 Conversion"
 # Name "kernel - Win32 Profile"
 # Begin Group "Header"
 
@@ -255,6 +230,10 @@ SOURCE=.\reports.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\resources.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\save.h
 # End Source File
 # Begin Source File
@@ -279,11 +258,19 @@ SOURCE=.\spy.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\study.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\teleport.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\terrain.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\ugroup.h
 # End Source File
 # Begin Source File
 
@@ -396,6 +383,10 @@ SOURCE=.\reports.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\resources.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\save.c
 # End Source File
 # Begin Source File
@@ -417,6 +408,10 @@ SOURCE=.\teleport.c
 # Begin Source File
 
 SOURCE=.\terrain.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\ugroup.c
 # End Source File
 # Begin Source File
 

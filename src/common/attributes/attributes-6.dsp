@@ -89,6 +89,10 @@ SOURCE=.\attributes.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\fleechance.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\follow.h
 # End Source File
 # Begin Source File
@@ -117,7 +121,31 @@ SOURCE=.\matmod.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\moved.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\option.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\orcification.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\otherfaction.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\overrideroads.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\racename.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\raceprefix.h
 # End Source File
 # Begin Source File
 
@@ -129,12 +157,24 @@ SOURCE=.\roadsoverride.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\synonym.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\targetregion.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\ugroup.h
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=.\attributes.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\fleechance.c
 # End Source File
 # Begin Source File
 
@@ -166,7 +206,19 @@ SOURCE=.\matmod.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\moved.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\option.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\orcification.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\otherfaction.c
 # End Source File
 # Begin Source File
 
@@ -178,11 +230,23 @@ SOURCE=.\racename.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\raceprefix.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\reduceproduction.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\synonym.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\targetregion.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\ugroup.c
 # End Source File
 # End Target
 # End Project

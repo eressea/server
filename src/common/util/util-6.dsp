@@ -4,24 +4,23 @@
 
 # TARGTYPE "Win32 (x86) Static Library" 0x0104
 
-CFG=util - Win32 Conversion
+CFG=util - Win32 Profile
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "util-6.mak".
-!MESSAGE
+!MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
-!MESSAGE
-!MESSAGE NMAKE /f "util-6.mak" CFG="util - Win32 Conversion"
-!MESSAGE
+!MESSAGE 
+!MESSAGE NMAKE /f "util-6.mak" CFG="util - Win32 Profile"
+!MESSAGE 
 !MESSAGE Possible choices for configuration are:
-!MESSAGE
+!MESSAGE 
 !MESSAGE "util - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "util - Win32 Debug" (based on "Win32 (x86) Static Library")
-!MESSAGE "util - Win32 Conversion" (based on "Win32 (x86) Static Library")
 !MESSAGE "util - Win32 Profile" (based on "Win32 (x86) Static Library")
-!MESSAGE
+!MESSAGE 
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -76,29 +75,6 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo /out:"Debug\util.lib"
 
-!ELSEIF  "$(CFG)" == "util - Win32 Conversion"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "util___Win32_Conversion"
-# PROP BASE Intermediate_Dir "util___Win32_Conversion"
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /Za /W4 /Z7 /Od /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /YX"stdafx.h" /FD /c
-# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /FR /YX"stdafx.h" /FD /c
-# ADD BASE RSC /l 0x407
-# ADD RSC /l 0x407
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LIB32=link.exe -lib
-# ADD BASE LIB32 /nologo /out:"Debug\util.lib"
-# ADD LIB32 /nologo /out:"Debug\util.lib"
-
 !ELSEIF  "$(CFG)" == "util - Win32 Profile"
 
 # PROP BASE Use_MFC 0
@@ -122,13 +98,12 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo
 
-!ENDIF
+!ENDIF 
 
 # Begin Target
 
 # Name "util - Win32 Release"
 # Name "util - Win32 Debug"
-# Name "util - Win32 Conversion"
 # Name "util - Win32 Profile"
 # Begin Group "Header"
 
@@ -140,6 +115,10 @@ SOURCE=.\attrib.h
 # Begin Source File
 
 SOURCE=.\base36.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\command.h
 # End Source File
 # Begin Source File
 
@@ -160,6 +139,10 @@ SOURCE=.\functions.h
 # Begin Source File
 
 SOURCE=.\goodies.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\graph.h
 # End Source File
 # Begin Source File
 
@@ -191,6 +174,10 @@ SOURCE=.\resolve.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\sql.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\translation.h
 # End Source File
 # Begin Source File
@@ -209,6 +196,10 @@ SOURCE=.\vset.h
 
 SOURCE=.\windir.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\xml.h
+# End Source File
 # End Group
 # Begin Source File
 
@@ -217,6 +208,14 @@ SOURCE=.\attrib.c
 # Begin Source File
 
 SOURCE=.\base36.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\command.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\crmessage.c
 # End Source File
 # Begin Source File
 
@@ -240,6 +239,10 @@ SOURCE=.\goodies.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\graph.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\language.c
 # End Source File
 # Begin Source File
@@ -252,11 +255,27 @@ SOURCE=.\log.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\message.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\nrmessage.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\rand.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\resolve.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\sql.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\translation.c
 # End Source File
 # Begin Source File
 
@@ -273,6 +292,10 @@ SOURCE=.\vset.c
 # Begin Source File
 
 SOURCE=.\windir.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\xml.c
 # End Source File
 # End Target
 # End Project

@@ -793,7 +793,7 @@ static xml_callbacks xml_races = {
 };
 
 void
-init_races(void)
+register_races(void)
 {
 	char zBuffer[MAX_PATH];
 	/* init_familiar functions */

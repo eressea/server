@@ -429,8 +429,13 @@ register_weapons(void) {
 	rt_register(&rt_mallorncrossbow);
 	it_register(&it_mallorncrossbow);
 	wt_register(&wt_mallorncrossbow);
-	init_oldweapons();
 
 	register_function((pf_generic)attack_catapult, "attack_catapult");
 	register_function((pf_generic)attack_firesword, "attack_firesword");
+}
+
+void
+init_weapons(void)
+{
+	init_oldweapons();
 }

@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Static Library" 0x0104
 
-CFG=gamecode - Win32 Conversion
+CFG=gamecode - Win32 Profile
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,13 +13,12 @@ CFG=gamecode - Win32 Conversion
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "gamecode-6.mak" CFG="gamecode - Win32 Conversion"
+!MESSAGE NMAKE /f "gamecode-6.mak" CFG="gamecode - Win32 Profile"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "gamecode - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "gamecode - Win32 Debug" (based on "Win32 (x86) Static Library")
-!MESSAGE "gamecode - Win32 Conversion" (based on "Win32 (x86) Static Library")
 !MESSAGE "gamecode - Win32 Profile" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
@@ -76,31 +75,6 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo /out:"Debug\gamecode.lib"
 
-!ELSEIF  "$(CFG)" == "gamecode - Win32 Conversion"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "gamecode__"
-# PROP BASE Intermediate_Dir "gamecode__"
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /MDd /Za /W4 /Z7 /Od /I ".." /I "../util" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR /FD /c
-# SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../util" /I "../kernel" /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /D "CONVERT_TRIGGER" /FR /FD /c
-# SUBTRACT CPP /YX
-# ADD BASE RSC /l 0x407
-# ADD RSC /l 0x407
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LIB32=link.exe -lib
-# ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo
-
 !ELSEIF  "$(CFG)" == "gamecode - Win32 Profile"
 
 # PROP BASE Use_MFC 0
@@ -130,7 +104,6 @@ LIB32=link.exe -lib
 
 # Name "gamecode - Win32 Release"
 # Name "gamecode - Win32 Debug"
-# Name "gamecode - Win32 Conversion"
 # Name "gamecode - Win32 Profile"
 # Begin Group "Header"
 
@@ -150,6 +123,14 @@ SOURCE=.\economy.h
 # Begin Source File
 
 SOURCE=.\laws.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\luck.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\monster.h
 # End Source File
 # Begin Source File
 
@@ -183,6 +164,10 @@ SOURCE=.\economy.c
 # Begin Source File
 
 SOURCE=.\laws.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\luck.c
 # End Source File
 # Begin Source File
 

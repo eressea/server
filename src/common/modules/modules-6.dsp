@@ -7,19 +7,19 @@
 CFG=modules - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "modules-6.mak".
-!MESSAGE
+!MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "modules-6.mak" CFG="modules - Win32 Debug"
-!MESSAGE
+!MESSAGE 
 !MESSAGE Possible choices for configuration are:
-!MESSAGE
+!MESSAGE 
 !MESSAGE "modules - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "modules - Win32 Debug" (based on "Win32 (x86) Static Library")
-!MESSAGE
+!MESSAGE 
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -74,7 +74,7 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo /out:"Debug\modules.lib"
 
-!ENDIF
+!ENDIF 
 
 # Begin Target
 
@@ -89,7 +89,23 @@ SOURCE=.\arena.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\command.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dungeon.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\gmcmd.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\infocmd.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\knowledge.h
 # End Source File
 # Begin Source File
 
@@ -109,7 +125,15 @@ SOURCE=.\weather.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\xmas.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\xmas2000.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\xmas2001.h
 # End Source File
 # End Group
 # Begin Source File
@@ -118,7 +142,23 @@ SOURCE=.\arena.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\command.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\dungeon.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\gmcmd.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\infocmd.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\knowledge.c
 # End Source File
 # Begin Source File
 
@@ -138,7 +178,15 @@ SOURCE=.\weather.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\xmas.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\xmas2000.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\xmas2001.c
 # End Source File
 # End Target
 # End Project

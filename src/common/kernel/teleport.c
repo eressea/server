@@ -103,7 +103,7 @@ all_in_range(region *r, int n)
 		for(y = r->y-n; y <= r->y+n; y++) {
 			if(koor_distance(r->x, r->y, x, y) <= n) {
 				r2 = findregion(x,y);
-				if(r2) rlist = add_regionlist(rlist, findregion(x,y));
+				if(r2) add_regionlist(&rlist, findregion(x,y));
 			}
 		}
 	}
@@ -192,7 +192,7 @@ allinhab_in_range(const region *r, int n)
 			if(koor_distance(r->x, r->y, x, y) <= n) {
 				r2 = findregion(x,y);
 				if (r2 && landregion(rterrain(r2)))
-					rlist = add_regionlist(rlist, findregion(x,y));
+					add_regionlist(&rlist, findregion(x,y));
 			}
 		}
 	}

@@ -1573,7 +1573,7 @@ void growlaen(void) {
 		if (!fval(r, RF_CHAOTIC) &&
 			rterrain(r) == T_MOUNTAIN)
 		{
-			Berge=add_regionlist(Berge,r);
+			add_regionlist(&Berge,r);
 			b++;
 		}
 	}

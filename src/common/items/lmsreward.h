@@ -13,4 +13,4 @@
  */
 
 extern struct item_type it_lmsreward;
-extern void init_lmsreward(void);
+extern void register_lmsreward(void);

@@ -28,12 +28,18 @@ register_items(void)
 {
 	register_weapons();
 	register_demonseye();
-	init_lmsreward();
+	register_lmsreward();
 	register_xerewards();
 #if GROWING_TREES
-	init_seed();
-	init_mallornseed();
+	register_seed();
+	register_mallornseed();
 #endif
 	register_birthday_firework();
 	register_lebkuchenherz();
+}
+
+void
+init_items(void)
+{
+	init_weapons();
 }

@@ -1465,8 +1465,8 @@ main(int argc, char *argv[])
 
 	debug_language("locales.log");
 
-	init_races();
-	init_spells();
+	register_races();
+	register_spells();
 	init_data("eressea.xml");
 	init_locales();
 

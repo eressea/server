@@ -37,7 +37,7 @@ struct castorder;
  */
 
 extern int sp_summon_alp(struct castorder *co);
-extern void init_alp(void);
+extern void register_alp(void);
 
 struct unit* alp_target(struct unit *alp);
 void alp_findet_opfer(struct unit *alp, struct region *r);

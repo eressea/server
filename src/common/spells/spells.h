@@ -12,4 +12,4 @@
  * prior permission by the authors of Eressea.
  */
 
-extern void init_spells(void);
+extern void register_spells(void);

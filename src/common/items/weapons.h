@@ -14,6 +14,7 @@
 #define WEAPONS_H
 
 extern void register_weapons(void);
+extern void init_weapons(void);
 
 extern struct item_type it_mallornspear;
 extern struct item_type it_mallornlance;

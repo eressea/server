@@ -18,7 +18,7 @@
 #include <spells/alp.h>
 
 void
-init_spells(void)
+register_spells(void)
 {
 	/* sp_summon_alp */
 	init_alp();

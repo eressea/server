@@ -94,7 +94,7 @@ item_type it_lmsreward = {
 };
 
 void
-init_lmsreward(void)
+register_lmsreward(void)
 {
 	it_register(&it_lmsreward);
 	at_register(&at_lmsstory);

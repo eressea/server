@@ -203,7 +203,7 @@ alp_findet_opfer(unit *alp, region *r)
 }
 
 void
-init_alp(void)
+register_alp(void)
 {
 	at_register(&at_alp);
 }

@@ -61,7 +61,7 @@ limit_seeds(const region * r, const resource_type * rtype)
 }
 
 void
-init_seed(void)
+register_seed(void)
 {
 	attrib * a;
 
@@ -119,7 +119,7 @@ limit_mallornseeds(const region * r, const resource_type * rtype)
 }
 
 void
-init_mallornseed(void)
+register_mallornseed(void)
 {
 	attrib * a;
 

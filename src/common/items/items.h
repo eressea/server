@@ -11,3 +11,4 @@
 */
 
 extern void register_items(void);
+extern void init_items(void);
