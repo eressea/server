@@ -3408,31 +3408,33 @@ report_summary(summary * s, summary * o, boolean full)
 	}
 	fprintf(F, "Neue Spieler:\t %d\n", newplayers);
 
-	if (factions)
-   		fprintf(F, "\nParteien:\n\n");
+	if (full) {
+    if (factions)
+      fprintf(F, "\nParteien:\n\n");
 
-	for (f = factions; f; f = f->next) {
-		out_faction(F, f);
-	}
+    for (f = factions; f; f = f->next) {
+      out_faction(F, f);
+    }
 
-	if (NMRTimeout() && full) {
-		fprintf(F, "\n\nFactions with NMRs:\n");
-		for (i = NMRTimeout(); i > 0; --i) {
-			for(f=factions; f; f=f->next) {
-				if(i == NMRTimeout()) {
-					if(turn - f->lastorders >= i) {
-						out_faction(F, f);
-					}
-				} else {
-					if(turn - f->lastorders == i) {
-						out_faction(F, f);
-					}
-				}
-			}
-		}
-	}
+    if (NMRTimeout() && full) {
+      fprintf(F, "\n\nFactions with NMRs:\n");
+      for (i = NMRTimeout(); i > 0; --i) {
+        for(f=factions; f; f=f->next) {
+          if(i == NMRTimeout()) {
+            if(turn - f->lastorders >= i) {
+              out_faction(F, f);
+            }
+          } else {
+            if(turn - f->lastorders == i) {
+              out_faction(F, f);
+            }
+          }
+        }
+      }
+    }
+  }
 
-	fclose(F);
+  fclose(F);
 
 	if (full) {
 		printf("Schreibe Liste der Adressen (adressen)...\n");

@@ -1209,14 +1209,14 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	/* Sieben Leben */
 	if (old_race(du->race) == RC_CAT && (chance(1.0 / 7))) {
 #ifdef SMALL_BATTLE_MESSAGES
-		if (b->small) {
-			strcat(smallbuf, ", doch die Katzengöttin ist gnädig");
-			battlerecord(b, smallbuf);
-		}
+    if (b->small) {
+      strcat(smallbuf, ", doch die Katzengöttin ist gnädig");
+      battlerecord(b, smallbuf);
+    }
 #endif
-                assert(dt.index>=0 && dt.index<du->number);
-		df->person[dt.index].hp = unit_max_hp(du);
-		return false;
+    assert(dt.index>=0 && dt.index<du->number);
+    df->person[dt.index].hp = unit_max_hp(du);
+    return false;
 	}
 
 	/* Heiltrank schluerfen und hoffen */
@@ -1235,15 +1235,15 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 			battlerecord(b, smallbuf);
 		} else 
 #endif
-                {
-                  message * m = msg_message("battle::potionsave", "unit", du);
-                  message_faction(b, du->faction, m);
-                  msg_release(m);
-		}
-		assert(dt.index>=0 && dt.index<du->number);
-		df->person[dt.index].hp = du->race->hitpoints;
-		return false;
-	}
+    {
+      message * m = msg_message("battle::potionsave", "unit", du);
+      message_faction(b, du->faction, m);
+      msg_release(m);
+    }
+    assert(dt.index>=0 && dt.index<du->number);
+    df->person[dt.index].hp = du->race->hitpoints;
+    return false;
+  }
 
 	strcat(debugbuf, ", tot");
 	battledebug(debugbuf);
@@ -1367,7 +1367,7 @@ static troop
 select_opponent(battle * b, troop at, int minrow, int maxrow)
 {
   fighter * af = at.fighter;
-  troop dt = af->person[at.index].opponent;
+  troop dt;
 
   if (af->unit->race->flags & RCF_FLY) {
     /* flying races ignore min- and maxrow and can attack anyone fighting
@@ -1377,6 +1377,8 @@ select_opponent(battle * b, troop at, int minrow, int maxrow)
   }
   minrow = max(minrow, FIGHT_ROW);
 
+#ifdef FIXED_OPPONENTS
+  dt = af->person[at.index].opponent;
   if (dt.fighter!=NULL && dt.index<dt.fighter->alive-dt.fighter->removed) {
     fighter * df = dt.fighter;
     int row = get_unitrow(df);
@@ -1388,7 +1390,9 @@ select_opponent(battle * b, troop at, int minrow, int maxrow)
       return dt;
     }
   }
+#endif
   dt = select_enemy(b, at.fighter, minrow, maxrow);
+#ifdef FIXED_OPPONENTS
   if (dt.fighter!=NULL) {
     fighter * df = dt.fighter;
     troop ot = df->person[dt.index].opponent;
@@ -1396,6 +1400,7 @@ select_opponent(battle * b, troop at, int minrow, int maxrow)
       df->person[dt.index].opponent = at;
     }
   }
+#endif
   return dt;
 }
 

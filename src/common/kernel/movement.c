@@ -62,7 +62,6 @@
 
 /* TODO: boder_type::move() must be able to change target (wisps) */
 extern border_type bt_wisps;
-extern item_type it_demonseye;
 /* ------------------------------------------------------------- */
 
 typedef struct traveldir {
@@ -82,19 +81,19 @@ static attrib_type at_traveldir = {
 
 
 static void
-a_traveldir_new_init(attrib *a)
+shiptrail_init(attrib *a)
 {
 	a->data.v = calloc(1, sizeof(traveldir));
 }
 
 static void
-a_traveldir_new_finalize(attrib *a)
+shiptrail_finalize(attrib *a)
 {
 	free(a->data.v);
 }
 
 static int
-a_traveldir_new_age(attrib *a)
+shiptrail_age(attrib *a)
 {
 	traveldir *t = (traveldir *)(a->data.v);
 
@@ -104,7 +103,7 @@ a_traveldir_new_age(attrib *a)
 }
 
 static int
-a_traveldir_new_read(attrib *a, FILE *f)
+shiptrail_read(attrib *a, FILE *f)
 {
 	traveldir *t = (traveldir *)(a->data.v);
 	int       no, age, dir;
@@ -117,19 +116,19 @@ a_traveldir_new_read(attrib *a, FILE *f)
 }
 
 static void
-a_traveldir_new_write(const attrib *a, FILE *f)
+shiptrail_write(const attrib *a, FILE *f)
 {
 	  traveldir *t = (traveldir *)(a->data.v);
 	  fprintf(f, "%d %d %d ", t->no, (int)t->dir, t->age);
 }
 
-attrib_type at_traveldir_new = {
+attrib_type at_shiptrail = {
 	"traveldir_new",
-	a_traveldir_new_init,
-	a_traveldir_new_finalize,
-	a_traveldir_new_age,
-	a_traveldir_new_write,
-	a_traveldir_new_read
+	shiptrail_init,
+	shiptrail_finalize,
+	shiptrail_age,
+	shiptrail_write,
+	shiptrail_read
 };
 
 static int
@@ -473,9 +472,8 @@ travelthru(const unit * u, region * r)
 }
 
 static void
-leave_trail(unit * u, region * from, region_list *route)
+leave_trail(ship * sh, region * from, region_list *route)
 {
-  ship * sh = u->ship;
   region * r = from;
   
   while (route!=NULL) {
@@ -486,7 +484,7 @@ leave_trail(unit * u, region * from, region_list *route)
     * if we use this kind of direction-attribute */
     if (dir<MAXDIRECTIONS && dir>=0) {
       traveldir * td = NULL;
-      attrib * a = a_find(r->attribs, &at_traveldir_new);
+      attrib * a = a_find(r->attribs, &at_shiptrail);
 
       while (a!=NULL) {
         td = (traveldir *)a->data.v;
@@ -495,7 +493,7 @@ leave_trail(unit * u, region * from, region_list *route)
       }
 
       if (a==NULL) {
-        a = a_add(&(r->attribs), a_new(&at_traveldir_new));
+        a = a_add(&(r->attribs), a_new(&at_shiptrail));
         td = (traveldir *)a->data.v;
         td->no = sh->no;
       }
@@ -536,7 +534,7 @@ move_ship(ship * sh, region * from, region * to, region_list * route)
 
     if (u->ship == sh) {
       if (!trail) {
-        leave_trail(u, from, route);
+        leave_trail(sh, from, route);
         trail = true;
       }
       if (route!=NULL) travel_route(u, from, route);
@@ -631,6 +629,7 @@ drifting_ships(region * r)
     while (*shp) {
       ship * sh = *shp;
       region * rnext = NULL;
+      region_list * route = NULL;
       unit * captain;
       int d_offset;
 
@@ -679,9 +678,12 @@ drifting_ships(region * r)
 
       /* Das Schiff und alle Einheiten darin werden nun von r
       * nach rnext verschoben. Danach eine Meldung. */
-      sh = move_ship(sh, r, rnext, NULL);
+      add_regionlist(&route, rnext);
+      sh = move_ship(sh, r, rnext, route);
+      free_regionlist(route);
 
       if (sh!=NULL) {
+
         fset(sh, SF_DRIFTED);
 
         if (rnext->terrain != T_OCEAN && !flying_ship(sh)) {
@@ -1814,19 +1816,7 @@ move(unit * u, boolean move_on_land)
     followers += travel(u, r2, 0, &route);
   }
 
-  if (i_get(u->items, &it_demonseye)) {
-    direction_t d;
-    for (d=0;d!=MAXDIRECTIONS;++d) {
-      region * rc = rconnect(r2,d);
-      if (rc) {
-        sprintf(buf, "Im %s ist eine ungeheure magische Präsenz zu verspüren.",
-          locale_string(u->faction->locale, directions[dir_invert(d)]));
-        addmessage(rc, NULL, buf, MSG_EVENT, ML_IMPORTANT);
-      }
-    }
-  }
-
-  if (u->region!=r) fset(u, UFL_LONGACTION);
+  fset(u, UFL_LONGACTION);
   set_order(&u->thisorder, NULL);
 
   if (fval(u, UFL_FOLLOWED) && route!=NULL) {
@@ -2000,7 +1990,7 @@ age_traveldir(region *r)
 static direction_t
 hunted_dir(attrib *at, int id)
 {
-  attrib *a = a_find(at, &at_traveldir_new);
+  attrib *a = a_find(at, &at_shiptrail);
 
   while (a!=NULL) {
     traveldir *t = (traveldir *)(a->data.v);
@@ -2234,9 +2224,6 @@ move_pirates(void)
   for (r = regions; r; r = r->next) {
     unit ** up = &r->units;
 
-    /* Abtreiben von beschädigten, unterbemannten, überladenen Schiffen */
-    drifting_ships(r);
-
     while (*up) {
       unit *u = *up;
 
@@ -2319,7 +2306,13 @@ movement(void)
         }
         /* else *up is already the next unit */
       }
-      if (!repeat) r = r->next;
+      if (!repeat) {
+        if (ships==0) {
+          /* Abtreiben von beschädigten, unterbemannten, überladenen Schiffen */
+          drifting_ships(r);
+        }
+        r = r->next;
+      }
     }
   }
 

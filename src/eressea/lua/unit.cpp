@@ -12,6 +12,7 @@
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/magic.h>
+#include <kernel/movement.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -71,6 +72,19 @@ public:
 static eressea::list<std::string, order *, bind_orders>
 unit_orders(const unit& u) {
   return eressea::list<std::string, order *, bind_orders>(u.orders);
+}
+
+class bind_items {
+public:
+  static item * next(item * node) { return node->next; }
+  static std::string value(item * node) { 
+    return std::string(node->type->rtype->_name[0]);
+  }
+};
+
+static eressea::list<std::string, item *, bind_items>
+unit_items(const unit& u) {
+  return eressea::list<std::string, item *, bind_items>(u.items);
 }
 
 static unit *
@@ -385,6 +399,17 @@ unit_setscript(struct unit& u, const functor<void>& f)
   setscript(&u.attribs, fptr);
 }
 
+static int
+unit_weight(const struct unit& u)
+{
+  return weight(&u);
+}
+
+static int
+unit_capacity(const struct unit& u)
+{
+  return walkingcapacity(&u);
+}
 
 void
 bind_unit(lua_State * L) 
@@ -402,22 +427,28 @@ bind_unit(lua_State * L)
     .property("faction", &unit_getfaction, &unit_setfaction)
     .def_readwrite("hp", &unit::hp)
     .def_readwrite("status", &unit::status)
+    .property("weight", &unit_weight)
+    .property("capacity", &unit_capacity)
 
     // orders:
     .def("add_order", &unit_addorder)
     .def("clear_orders", &unit_clearorders)
     .property("orders", &unit_orders, return_stl_iterator)
 
-    // key-attribute:
+    // key-attributes for named flags:
     .def("set_flag", &set_flag)
     .def("get_flag", &get_flag)
 
     // items:
     .def("get_item", &unit_getitem)
     .def("add_item", &unit_additem)
+    .property("items", &unit_items, return_stl_iterator)
+
+    // skills:
     .def("get_skill", &unit_getskill)
     .def("eff_skill", &unit_effskill)
     .def("set_skill", &unit_setskill)
+
     .def("set_brain", &unit_setscript)
     .def("set_racename", &unit_setracename)
     .def("add_spell", &unit_addspell)

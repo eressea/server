@@ -135,7 +135,6 @@ scramble(void *data, int n, size_t width)
 static void
 expandorders(region * r, request * requests)
 {
-	int i, j;
 	unit *u;
 	request *o;
 
@@ -147,32 +146,34 @@ expandorders(region * r, request * requests)
 
 	norders = 0;
 
-	for (o = requests; o; o = o->next)
-		if (o->qty > 0) {
-			norders += o->qty;
-		}
+  for (o = requests; o; o = o->next) {
+    if (o->qty > 0) {
+      norders += o->qty;
+    }
+	}
 
-		if (norders > 0) {
-			oa = (request *) calloc(norders, sizeof(request));
-			i = 0;
-			for (o = requests; o; o = o->next) {
-				if (o->qty > 0) {
-					for (j = o->qty; j; j--) {
-						oa[i] = *o;
-						oa[i].unit->n = 0;
-						i++;
-					}
+	if (norders > 0) {
+    int i = 0;
+		oa = (request *) calloc(norders, sizeof(request));
+		for (o = requests; o; o = o->next) {
+			if (o->qty > 0) {
+        int j;
+				for (j = o->qty; j; j--) {
+					oa[i] = *o;
+					oa[i].unit->n = 0;
+					i++;
 				}
 			}
-			scramble(oa, norders, sizeof(request));
-		} else {
-			oa = NULL;
 		}
-		while (requests) {
-			request * o = requests->next;
-			free(requests);
-			requests = o;
-		}
+		scramble(oa, norders, sizeof(request));
+	} else {
+		oa = NULL;
+	}
+	while (requests) {
+		request * o = requests->next;
+		free(requests);
+		requests = o;
+	}
 }
 /* ------------------------------------------------------------- */
 
@@ -333,74 +334,75 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 		return;
 	}
 
+  if (!(u->faction->race->ec_flags & ECF_REC_HORSES) && fval(r, RF_ORCIFIED)) {
 #if RACE_ADJUSTMENTS
-	if (fval(r, RF_ORCIFIED) && u->faction->race != new_race[RC_URUK] &&
+    if (u->faction->race != new_race[RC_URUK])
 #else
-	if (fval(r, RF_ORCIFIED) && u->faction->race != new_race[RC_ORC] &&
+    if (u->faction->race != new_race[RC_ORC])
 #endif
-		!(u->faction->race->ec_flags & ECF_REC_HORSES)) {
-			cmistake(u, ord, 238, MSG_EVENT);
+    {
+      cmistake(u, ord, 238, MSG_EVENT);
+      return;
+    }
+  }
+
+	recruitcost = u->faction->race->recruitcost;
+	if (recruitcost) {
+		pl = getplane(r);
+		if (pl && fval(pl, PFL_NORECRUITS)) {
+			add_message(&u->faction->msgs,
+				msg_feedback(u, ord, "error_pflnorecruit", ""));
 			return;
 		}
 
-
-		recruitcost = u->faction->race->recruitcost;
-		if (recruitcost) {
-			pl = getplane(r);
-			if (pl && fval(pl, PFL_NORECRUITS)) {
-				add_message(&u->faction->msgs,
-					msg_feedback(u, ord, "error_pflnorecruit", ""));
-				return;
-			}
-
-			if (get_pooled(u, r, R_SILVER) < recruitcost) {
-      cmistake(u, ord, 142, MSG_EVENT);
-				return;
-			}
+		if (get_pooled(u, r, R_SILVER) < recruitcost) {
+    cmistake(u, ord, 142, MSG_EVENT);
+			return;
 		}
-		if (!playerrace(u->race) || idle(u->faction)) {
+	}
+	if (!playerrace(u->race) || idle(u->faction)) {
+		cmistake(u, ord, 139, MSG_EVENT);
+		return;
+	}
+	/* snotlinge sollten hiermit bereits abgefangen werden, die
+	* parteirasse ist uruk oder ork*/
+	if (u->race != u->faction->race) {
+		if (u->number != 0) {
 			cmistake(u, ord, 139, MSG_EVENT);
 			return;
 		}
-		/* snotlinge sollten hiermit bereits abgefangen werden, die
-		* parteirasse ist uruk oder ork*/
-		if (u->race != u->faction->race) {
-			if (u->number != 0) {
-				cmistake(u, ord, 139, MSG_EVENT);
-				return;
-			}
-			else u->race = u->faction->race;
-		}
+		else u->race = u->faction->race;
+	}
 
-    init_tokens(ord);
-    skip_token();
-    n = geti();
+  init_tokens(ord);
+  skip_token();
+  n = geti();
 
-		if (has_skill(u, SK_MAGIC)) {
-			/* error158;de;{unit} in {region}: '{command}' - Magier arbeiten
-			* grundsätzlich nur alleine! */
-			cmistake(u, ord, 158, MSG_EVENT);
-			return;
-		}
-		if (has_skill(u, SK_ALCHEMY)
-			&& count_skill(u->faction, SK_ALCHEMY) + n >
-			max_skill(u->faction, SK_ALCHEMY))
-		{
-			cmistake(u, ord, 156, MSG_EVENT);
-			return;
-		}
-		if (recruitcost) n = min(n, get_pooled(u, r, R_SILVER) / recruitcost);
+	if (has_skill(u, SK_MAGIC)) {
+		/* error158;de;{unit} in {region}: '{command}' - Magier arbeiten
+		* grundsätzlich nur alleine! */
+		cmistake(u, ord, 158, MSG_EVENT);
+		return;
+	}
+	if (has_skill(u, SK_ALCHEMY)
+		&& count_skill(u->faction, SK_ALCHEMY) + n >
+		max_skill(u->faction, SK_ALCHEMY))
+	{
+		cmistake(u, ord, 156, MSG_EVENT);
+		return;
+	}
+	if (recruitcost) n = min(n, get_pooled(u, r, R_SILVER) / recruitcost);
 
-		u->wants = n;
+	u->wants = n;
 
-		if (!n) {
-			cmistake(u, ord, 142, MSG_EVENT);
-			return;
-		}
-		o = (request *) calloc(1, sizeof(request));
-		o->qty = n;
-		o->unit = u;
-		addlist(recruitorders, o);
+	if (!n) {
+		cmistake(u, ord, 142, MSG_EVENT);
+		return;
+	}
+	o = (request *) calloc(1, sizeof(request));
+	o->qty = n;
+	o->unit = u;
+	addlist(recruitorders, o);
 }
 /* ------------------------------------------------------------- */
 
@@ -1792,7 +1794,7 @@ static int tax_per_size[7] =
 {0, 6, 12, 18, 24, 30, 36};
 
 static void
-expandselling(region * r, request * sellorders)
+expandselling(region * r, request * sellorders, int limit)
 {
 	int money, price, j, max_products;
 	/* int m, n = 0; */
@@ -1872,6 +1874,7 @@ expandselling(region * r, request * sellorders)
 			i=0;
 			for (search=luxurytypes;search!=ltype;search=search->next) ++i;
 		}
+    if (counter[i]>=limit) continue;
 		if (counter[i]+1 > max_products && multi > 1) --multi;
 		price = ltype->price * multi;
 
@@ -1955,8 +1958,8 @@ expandselling(region * r, request * sellorders)
 		if (a==NULL) continue;
 		for (itm=(item*)a->data.v; itm; itm=itm->next) {
 			if (itm->number) {
-				add_message(&u->faction->msgs, new_message(u->faction,
-					"sellamount%u:unit%i:amount%X:resource", u, itm->number, itm->type->rtype));
+				ADDMSG(&u->faction->msgs, msg_message("sellamount", 
+          "unit amount resource", u, itm->number, itm->type->rtype));
 			}
 		}
 		a_remove(&u->attribs, a);
@@ -1964,19 +1967,19 @@ expandselling(region * r, request * sellorders)
 	}
 }
 
-static void
+static boolean
 sell(unit * u, request ** sellorders, struct order * ord)
 {
+  boolean unlimited = true;
 	const item_type * itype;
 	const luxury_type * ltype=NULL;
 	int n;
-	request *o;
   region * r = u->region;
 	const char *s;
 
 	if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
 		cmistake(u, ord, 69, MSG_INCOME);
-		return;
+		return false;
 	}
 	/* sellorders sind KEIN array, weil für alle items DIE SELBE resource
 	* (das geld der region) aufgebraucht wird. */
@@ -1986,18 +1989,19 @@ sell(unit * u, request ** sellorders, struct order * ord)
 	s = getstrtoken();
 
   if (findparam(s, u->faction->locale) == P_ANY) {
+    unlimited = false;
 		n = rpeasants(r) / TRADE_FRACTION;
 		if (rterrain(r) == T_DESERT && buildingtype_exists(r, bt_find("caravan")))
 			n *= 2;
 		if (n==0) {
 			cmistake(u, ord, 303, MSG_COMMERCE);
-			return;
+			return false;
 		}
 	} else {
 		n = atoi(s);
 		if (n==0) {
 			cmistake(u, ord, 27, MSG_COMMERCE);
-			return;
+			return false;
 		}
 	}
 	/* Belagerte Einheiten können nichts verkaufen. */
@@ -2005,19 +2009,19 @@ sell(unit * u, request ** sellorders, struct order * ord)
 	if (besieged(u)) {
 		add_message(&u->faction->msgs,
 			msg_feedback(u, ord, "error60", ""));
-		return;
+		return false;
 	}
 	/* In der Region muß es eine Burg geben. */
 
 	if (u->race == new_race[RC_INSECT]) {
 		if (rterrain(r) != T_SWAMP && rterrain(r) != T_DESERT && !rbuildings(r)) {
 			cmistake(u, ord, 119, MSG_COMMERCE);
-			return;
+			return false;
 		}
 	} else {
 		if (!rbuildings(r)) {
 			cmistake(u, ord, 119, MSG_COMMERCE);
-			return;
+			return false;
 		}
 	}
 
@@ -2027,21 +2031,23 @@ sell(unit * u, request ** sellorders, struct order * ord)
 
 	if (!n) {
 		cmistake(u, ord, 54, MSG_COMMERCE);
-		return;
+		return false;
 	}
 	s=getstrtoken();
 	itype = finditemtype(s, u->faction->locale);
 	if (itype!=NULL) ltype = resource2luxury(itype->rtype);
 	if (ltype==NULL) {
 		cmistake(u, ord, 126, MSG_COMMERCE);
-		return;
+		return false;
 	}
 	else {
 		attrib * a;
+    request *o;
 		int k, available;
+
 		if (!r_demand(r, ltype)) {
 			cmistake(u, ord, 263, MSG_COMMERCE);
-			return;
+			return false;
 		}
 		available = new_get_pooled(u, itype->rtype, GET_DEFAULT);
 
@@ -2058,7 +2064,7 @@ sell(unit * u, request ** sellorders, struct order * ord)
 
 		if (n <= 0) {
 			cmistake(u, ord, 264, MSG_COMMERCE);
-			return;
+			return false;
 		}
 		/* Hier wird request->type verwendet, weil die obere limit durch
 		* das silber gegeben wird (region->money), welches für alle
@@ -2089,6 +2095,7 @@ sell(unit * u, request ** sellorders, struct order * ord)
 		addlist(sellorders, o);
 
 		if (n) fset(u, UFL_TRADER);
+    return unlimited;
 	}
 }
 /* ------------------------------------------------------------- */
@@ -2897,6 +2904,7 @@ produce(void)
   * lehren vor lernen. */
 
   for (r = regions; r; r = r->next) {
+    boolean limited = true;
 
     assert(rmoney(r) >= 0);
     assert(rpeasants(r) >= 0);
@@ -2931,7 +2939,9 @@ produce(void)
             buy(u, &buyorders, ord);
             break;
           case K_SELL:
-            sell(u, &sellorders, ord);
+            /* sell returns true if the sale is not limited
+             * by the region limit */
+            limited = !sell(u, &sellorders, ord) & limited;
             break;
           }
         }
@@ -3014,7 +3024,11 @@ produce(void)
     * können. */
 
     if (buyorders) expandbuying(r, buyorders);
-    if (sellorders) expandselling(r, sellorders);
+
+    if (sellorders) {
+      int limit = rpeasants(r) / TRADE_FRACTION;
+      expandselling(r, sellorders, limited?limit:INT_MAX);
+    }
 
     /* Die Spieler sollen alles Geld verdienen, bevor sie beklaut werden
     * (expandstealing). */

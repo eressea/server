@@ -2388,7 +2388,7 @@ init_locales(void)
 
 /* TODO: soll hier weg */
 extern building_type bt_caldera;
-extern attrib_type at_traveldir_new;
+extern attrib_type at_shiptrail;
 
 attrib_type at_germs = {
 	"germs",
@@ -2460,7 +2460,7 @@ remove_empty_factions(boolean writedropouts)
 		/* monster (0) werden nicht entfernt. alive kann beim readgame
 		 * () auf 0 gesetzt werden, wenn monsters keine einheiten mehr
 		 * haben. */
-		if (f->alive == 0 && f->no != MONSTER_FACTION) {
+		if ((f->units==NULL || f->alive == 0) && f->no != MONSTER_FACTION) {
 			ursprung * ur = f->ursprung;
 			while (ur && ur->id!=0) ur=ur->next;
 			if (!quiet) printf("\t%s\n", factionname(f));
@@ -3157,7 +3157,7 @@ attrib_init(void)
 {
 	/* Alle speicherbaren Attribute müssen hier registriert werden */
 	at_register(&at_unitdissolve);
-	at_register(&at_traveldir_new);
+	at_register(&at_shiptrail);
 	at_register(&at_familiar);
 	at_register(&at_familiarmage);
 	at_register(&at_clone);
