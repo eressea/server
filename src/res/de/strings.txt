@@ -443,7 +443,7 @@ sk_polearm;de;Stangenwaffen
 sk_quarrying;de;Steinbau
 sk_taxation;de;Steuereintreiben
 sk_roadwork;de;Straßenbau
-sk_tactic_p;de;Taktik
+sk_tactics;de;Taktik
 sk_stealth;de;Tarnung
 sk_entertainment;de;Unterhaltung
 sk_weaponsmithing;de;Waffenbau

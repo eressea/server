@@ -904,7 +904,7 @@
 	</type>
 	<locale name="en">
 		<nr section="errors">
-			<text>"$unit($unit) in $region($region): '$command' - Talent could not be recognized."</text>
+			<text>"$unit($unit) in $region($region): '$command' - The skill could not be recognized."</text>
 		</nr>
 	</locale>
 </message>

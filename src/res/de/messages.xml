@@ -6031,11 +6031,11 @@
 		<arg name="command" type="string"></arg>
 		<arg name="unit" type="unit"></arg>
 		<arg name="amount" type="int"></arg>
-		<arg name="item" type="resource"></arg>
+		<arg name="item" type="string"></arg>
 	</type>
 	<locale name="de">
 		<nr section="magic">
-			<text>"$unit($unit) in $region($region): '$command' - $unit($unit) erschafft $int($amount) $resource($item,$amount)"</text>
+			<text>"$unit($unit) in $region($region): '$command' - $unit($unit) erschafft $int($amount) $item"</text>
 		</nr>
 	</locale>
 </message>
