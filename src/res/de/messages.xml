@@ -6943,7 +6943,7 @@
 			<arg name="run" type="int"></arg>
 			<arg name="runto" type="region"></arg>
 		</type>
-		<text locale="de">"$unit($unit) verlor $int($fallen) Personen$if($alive,", $int($alive) überlebten","") $if($run," und $int($run) flohen$if($isnull($runto),""," nach $region($runto)")","")."</text>
+		<text locale="de">"$unit($unit) verlor $int($fallen) Personen$if($alive,", $int($alive) überlebten","")$if($run," und $int($run) flohen$if($isnull($runto),""," nach $region($runto)")","")."</text>
 		<text locale="en">"$unit($unit) lost $int($fallen) people: $int($alive) survived$if($run," and $int($run) fled$if($isnull($runto),""," to $region($runto)"),"")."</text>
 	</message>
 
