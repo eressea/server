@@ -94,7 +94,11 @@ read_xml(const char * filename)
   xml_reader * reader = xmlReaders;
   xmlDocPtr doc;
 
+#ifdef XML_PARSE_XINCLUDE
   doc = xmlReadFile(filename, NULL, XML_PARSE_XINCLUDE);
+#else
+  doc = xmlParseFile(filename);
+#endif
   if (doc==NULL) {
     log_error(("could not open %s\n", filename));
     return -1;
