@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.9 2001/02/05 16:11:58 enno Exp $
+ *	$Id: eressea.c,v 1.10 2001/02/05 19:10:46 reich Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2471,7 +2471,7 @@ movewhere(region * r, const unit *u)
 	region * r2;
 
 	token = getstrtoken();
-	if(findparam(token) == P_PAUSE) return u->region;
+	if(findparam(token) == P_PAUSE) return r;
 
 	d = finddirection(token);
 	if (d == NODIRECTION)
