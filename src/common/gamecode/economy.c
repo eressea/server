@@ -357,6 +357,13 @@ recruit(region * r, unit * u, strlist * S,
 	request *o;
 	int recruitcost;
 
+#if GUARD_DISABLES_RECRUIT == 1
+	if(is_guarded(r, u, GUARD_RECRUIT)) {
+		cmistake(u, S->s, 70, MSG_EVENT);
+		return;
+	}
+#endif
+
 	if (u->faction->race == new_race[RC_INSECT]) {
 		if (month_season[month(0)] == 0 && rterrain(r) != T_DESERT) {
 #ifdef INSECT_POTION

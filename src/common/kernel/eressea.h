@@ -1121,6 +1121,8 @@ extern struct attrib_type at_lighthouse;
 	/* Verhindert Ausstieg + Weiterreise */
 #define GUARD_CREWS 32
 	/* Verhindert Unterhaltung auf Schiffen */
+#define GUARD_RECRUIT 64
+  /* Verhindert Rekrutieren */
 #define GUARD_ALL 0xFFFF
 
 extern void setguard(struct unit * u, unsigned int flags);

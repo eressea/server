@@ -211,7 +211,8 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Erdelementarist",
 		"Alle Gebäude dieser Partei sind von Erdelementaren beseelt und können "
 		"sich mit Hilfe eines speziellen Befehls jede Woche um eine Region "
-		"bewegen. Dies macht es den Bewohnern jedoch unmöglich, in dieser "
+		"bewegen. Dies macht es den Bewohnern - welche alle einer Partei mit "
+		"dieser Eigenschaft angehören müssen - jedoch unmöglich, in dieser "
 		"Woche ihren normalen Tätigkeiten nachzugehen.",
 		1
 	},

@@ -1551,7 +1551,7 @@ regeneration_magiepunkte(void)
 					reg_aura = (double)regeneration(u);
 
 					/* Magierturm erhöht die Regeneration um 75% */
-					if (btype) reg_aura*=btype->auraregen;
+					if (btype) reg_aura *= btype->auraregen;
 
 					/* Bonus/Malus durch Zauber */
 					n = get_curseeffect(u->attribs, C_AURA, 0);
