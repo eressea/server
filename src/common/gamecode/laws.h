@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.h,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: laws.h,v 1.3 2001/02/10 10:40:10 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -42,5 +42,6 @@ extern void sinkships(void);
 extern void * resolve_ship(void * data);
 
 void processorders(void);
+extern int count_migrants (const struct faction * f);
 
 #endif

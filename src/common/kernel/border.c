@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: border.c,v 1.3 2001/01/28 08:01:51 enno Exp $
+ *	$Id: border.c,v 1.4 2001/02/10 10:40:11 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -89,18 +89,20 @@ read_borders(FILE * f)
 	for (;;) {
 		int fx, fy, tx, ty;
 		unsigned int bid = 0;
+		char zText[32];
 		border * b;
 		region * from, * to;
 		border_type * type;
-		fscanf(f, "%s", buf);
-		if (!strcmp(buf, "end")) break;
+
+		fscanf(f, "%s", zText);
+		if (!strcmp(zText, "end")) break;
 		if (global.data_version<BORDERID_VERSION) {
 			fscanf(f, "%d %d %d %d ", &fx, &fy, &tx, &ty);
 			bid = ++nextborder;
 		} else {
 			fscanf(f, "%d %d %d %d %d", &bid, &fx, &fy, &tx, &ty);
 		}
-		type = find_bordertype(buf);
+		type = find_bordertype(zText);
 		assert(type || !"border type not registered");
 		from = findregion(fx, fy);
 		if (!from) {

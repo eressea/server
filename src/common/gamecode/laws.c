@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.8 2001/02/09 15:17:30 corwin Exp $
+ *	$Id: laws.c,v 1.9 2001/02/10 10:40:10 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2979,4 +2979,25 @@ processorders (void)
 #ifdef SKILLFIX_SAVE
 	write_skillfix();
 #endif
+}
+
+int
+count_migrants (const faction * f)
+{
+#ifndef NDEBUG
+	unit *u = f->units;
+	int n = 0;
+	while (u) {
+		assert(u->faction == f);
+		if (u->race != f->race && u->race != RC_ILLUSION && u->race != RC_SPELL 
+			&& !nonplayer(u) && !(is_cursed(u->attribs, C_SLAVE, 0)))
+		{
+			n += u->number;
+		}
+		u = u->nextF;
+	}
+	if (f->num_migrants != n)
+		puts("FEHLER: Anzahl Migranten falsch");
+#endif
+	return f->num_migrants;
 }

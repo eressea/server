@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: randenc.c,v 1.6 2001/02/03 13:45:30 enno Exp $
+ *	$Id: randenc.c,v 1.7 2001/02/10 10:40:10 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1305,7 +1305,10 @@ randomevents(void)
 		if(is_cursed(r->attribs, C_HOLYGROUND, 0)) continue;
 
 		/* Chance 0.1% * chaosfactor */
-		if (unburied && r->land && rand() % 10000 < (100 + 100 * chaosfactor(r))) {
+		if (r->land && unburied > r->land->peasants / 20 && rand() % 10000 < (100 + 100 * chaosfactor(r))) {
+			/* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen. 
+			 * Lieber sammeln lassen, bis sie mindestens 5% der Bevölkerung sind, und
+			 * dann erst auferstehen. */
 			int undead = unburied / (rand() % 2 + 1);
 			race_t rc;
 			int i;

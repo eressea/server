@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.8 2001/02/09 15:17:31 corwin Exp $
+ *	$Id: battle.c,v 1.9 2001/02/10 10:40:11 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2449,8 +2449,9 @@ print_fighters(battle * b, cvector * fighters)
 		int row = get_unitrow(df);
 
 		if (row != lastrow) {
-			sprintf(buf, "... in der %d. Kampflinie:", row);
-			battlerecord(b, buf);
+			char zText[32];
+			sprintf(zText, "... in der %d. Kampflinie:", row);
+			battlerecord(b, zText);
 			lastrow = row;
 		}
 		battle_punit(du, b);

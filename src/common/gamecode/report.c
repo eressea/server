@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.11 2001/02/05 16:11:57 enno Exp $
+ *	$Id: report.c,v 1.12 2001/02/10 10:40:10 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -23,42 +23,47 @@
 #define INDENT 0
 
 #include <config.h>
-#include "eressea.h"
-#include "reports.h"
+#include <eressea.h>
 
-#include "item.h"
-#include "alchemy.h"
-#include "faction.h"
-#include "region.h"
-#include "unit.h"
-#include "skill.h"
-#include "movement.h"
-#include "message.h"
-#include "ship.h"
-#include "building.h"
-#include "economy.h"
-#include "build.h"
-#include "creation.h"
-#include "save.h"
-#include "build.h"
-#include "magic.h"
-#include "race.h"
-#include "monster.h"
-#include "plane.h"
-#include "pool.h"
-#include "teleport.h"
-#include "border.h"
-#include "objtypes.h"
-#include "goodies.h"
-#include "karma.h"
-#include "render.h"
-#ifdef GROUPS
-#include "group.h"
-#endif
-
+/* modules includes */
 #include <modules/score.h>
 
+/* attributes includes */
+#include <attributes/overrideroads.h>
+
+/* gamecode includes */
+#include "creation.h"
+#include "economy.h"
+#include "monster.h"
+#include "laws.h"
+
+/* kernel includes */
+#include <alchemy.h>
+#include <border.h>
+#include <build.h>
+#include <building.h>
+#include <faction.h>
+#include <group.h>
+#include <item.h>
+#include <karma.h>
+#include <magic.h>
+#include <message.h>
+#include <movement.h>
+#include <objtypes.h>
+#include <plane.h>
+#include <pool.h>
+#include <race.h>
+#include <region.h>
+#include <render.h>
+#include <reports.h>
+#include <save.h>
+#include <ship.h>
+#include <skill.h>
+#include <teleport.h>
+#include <unit.h>
+
 /* util includes */
+#include <goodies.h>
 #include <base36.h>
 
 /* libc includes */
@@ -861,8 +866,6 @@ see_border(border * b, faction * f, region * r)
 	return cs;
 }
 
-extern attrib_type at_roads_override;
-
 static void
 describe(FILE * F, region * r, int partial, faction * f)
 {
@@ -1025,7 +1028,7 @@ describe(FILE * F, region * r, int partial, faction * f)
 	}
 
 	if (!is_cursed(r->attribs, C_REGCONF, 0)) {
-		attrib *a_do = a_find(r->attribs, &at_roads_override);
+		attrib *a_do = a_find(r->attribs, &at_overrideroads);
 		if(a_do) {
 			scat(" ");
 			scat((char *)a_do->data.v);

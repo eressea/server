@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.h,v 1.12 2001/02/05 16:11:58 enno Exp $
+ *	$Id: eressea.h,v 1.13 2001/02/10 10:40:11 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -995,7 +995,6 @@ char *shipname(const ship * sh);
 
 struct building *largestbuilding(const struct region * r, boolean img);
 
-int count_migrants(const struct faction * f);
 int count_all(const struct faction * f);
 int teure_talente(struct unit * u);
 int count_maxmigrants(const struct faction * f);

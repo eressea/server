@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: creport.c,v 1.5 2001/02/05 16:11:57 enno Exp $
+ *	$Id: creport.c,v 1.6 2001/02/10 10:40:10 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -20,33 +20,8 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <eressea.h>
 #include "creport.h"
-
-#include <reports.h>
-#include <plane.h>
-#include <render.h>
-#include "movement.h"
-#include "item.h"
-#include "faction.h"
-#include "alchemy.h"
-#include "magic.h"
-#include "race.h"
-#include "building.h"
-#include "economy.h"
-#include "goodies.h"
-#include "region.h"
-#include "unit.h"
-#include "skill.h"
-#include "message.h"
-#include "border.h"
-#include "teleport.h"
-#include "ship.h"
-#include "karma.h"
-#ifdef GROUPS
-#include "group.h"
-#endif
-
 
 /* modules include */
 #include <modules/score.h>
@@ -54,12 +29,37 @@
 /* attributes include */
 #include <attributes/follow.h>
 
+/* gamecode includes */
+#include "laws.h"
+#include "economy.h"
+
+/* kernel includes */
+#include <alchemy.h>
+#include <border.h>
+#include <building.h>
+#include <faction.h>
+#include <group.h>
+#include <item.h>
+#include <karma.h>
+#include <magic.h>
+#include <message.h>
+#include <movement.h>
+#include <plane.h>
+#include <race.h>
+#include <region.h>
+#include <render.h>
+#include <reports.h>
+#include <ship.h>
+#include <skill.h>
+#include <teleport.h>
+#include <unit.h>
+
+/* util includes */
+#include <goodies.h>
+
+/* libc includes */
 #include <math.h>
 #include <stdio.h>
-#ifdef WIN32
-#else
-#include <unistd.h>
-#endif
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>

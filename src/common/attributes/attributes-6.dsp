@@ -117,6 +117,10 @@ SOURCE=.\reduceproduction.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\roadsoverride.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\targetregion.h
 # End Source File
 # End Group
@@ -155,6 +159,10 @@ SOURCE=.\orcification.c
 # Begin Source File
 
 SOURCE=.\reduceproduction.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\roadsoverride.c
 # End Source File
 # Begin Source File
 

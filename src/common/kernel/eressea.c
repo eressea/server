@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.10 2001/02/05 19:10:46 reich Exp $
+ *	$Id: eressea.c,v 1.11 2001/02/10 10:40:11 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1026,27 +1026,6 @@ update_lighthouse(building * lh)
 			}
 		}
 	}
-}
-
-int
-count_migrants (const faction * f)
-{
-#ifndef NDEBUG
-	region *r;
-	unit *u;
-	int n = 0;
-	region *last = lastregion(f);
-	for (r = firstregion(f); r != last; r = r->next)
-		for (u = r->units; u; u = u->next)
-			if (u->faction == f && u->race != f->race
-				&& u->race != RC_ILLUSION && u->race != RC_SPELL
-				&& !nonplayer(u))
-				if(!(is_cursed(u->attribs, C_SLAVE, 0)))
-					n += u->number;
-	if (f->num_migrants != n)
-		puts("FEHLER: Anzahl Migranten falsch");
-#endif
-	return f->num_migrants;
 }
 
 int

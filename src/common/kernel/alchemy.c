@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: alchemy.c,v 1.4 2001/02/09 13:53:51 corwin Exp $
+ *	$Id: alchemy.c,v 1.5 2001/02/10 10:40:11 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -178,8 +178,9 @@ a_readeffect(attrib *a, FILE *f)
 		ptype = oldpotiontype[data.sa[0]];
 		power = data.sa[1];
 	} else {
-		fscanf(f, "%s %d", buf, &power);
-		ptype = pt_find(buf);
+		char zText[32];
+		fscanf(f, "%s %d", zText, &power);
+		ptype = pt_find(zText);
 	}
 	if (ptype==NULL || power==0) return 0;
 	edata->type = ptype;
