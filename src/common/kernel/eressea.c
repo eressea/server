@@ -2161,8 +2161,10 @@ update_intervals(void)
       struct watcher * w = p->watchers;
       while (w) {
         faction * f = w->faction;
-        if (f->first==NULL) f->first = r;
-        f->last = r->next;
+        if (f!=NULL) {
+          if (f->first==NULL) f->first = r;
+          f->last = r->next;
+        }
         w = w->next;
       }
     }
