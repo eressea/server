@@ -252,6 +252,9 @@
 				RelativePath=".\lua\eressea.cpp">
 			</File>
 			<File
+				RelativePath=".\lua\event.cpp">
+			</File>
+			<File
 				RelativePath=".\lua\faction.cpp">
 				<FileConfiguration
 					Name="Release|Win32">

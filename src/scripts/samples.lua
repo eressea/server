@@ -1,3 +1,41 @@
+function test_handler()
+
+  local function msg_handler(u, evt)
+    str = evt:get_string(0)
+    u2 = evt:get_unit(1)
+    print(u)
+    print(u2)
+    print(str)
+  end
+
+  plain = terraform(0, 0, "plain")
+  skill = 8
+
+  f = add_faction("enno@eressea.de", "orc", "de")
+  f.age = 20
+
+  u = add_unit(f, plain)
+  u.number = 1
+  u:add_item("money", u.number*100)
+  u:clear_orders()
+  u:add_order("NUMMER PARTEI test")
+  u:add_handler("message", msg_handler)
+  msg = "BOTSCHAFT EINHEIT " .. itoa36(u.id) .. " Du~Elf~stinken"
+
+  f = add_faction("enno@eressea.de", "elf", "de")
+  f.age = 20
+
+  u = add_unit(f, plain)
+  u.number = 1
+  u:add_item("money", u.number*100)
+  u:clear_orders()
+  u:add_order("NUMMER PARTEI eviL")
+  u:add_order(msg)
+
+  process_orders()
+  write_reports() 
+end
+
 function test_combat()
 
   plain = terraform(0, 0, "plain")
@@ -175,7 +213,8 @@ function test_parser()
   write_game("parser")
 end
 
-test_parser()
+test_handler()
+-- test_parser()
 -- test_monsters()
 -- test_combat()
 -- test_rewards()

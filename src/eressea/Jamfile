@@ -17,6 +17,7 @@ LUASERVER_SOURCES =
  <lua>alliance.cpp
  <lua>building.cpp
  <lua>eressea.cpp
+ <lua>event.cpp
  <lua>faction.cpp
  <lua>region.cpp
  <lua>script.cpp

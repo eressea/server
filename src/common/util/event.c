@@ -21,6 +21,7 @@
 
 /* libc includes */
 #include <assert.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -200,7 +201,29 @@ add_trigger(struct attrib ** ap, const char * event, struct trigger * t)
 }
 
 void
-handle_event(attrib ** attribs, const char * event, void * param)
+handle_event_va(attrib ** attribs, const char * event, const char * format, ...)
+{
+  event_arg args[9];
+  int argc = 0;
+  va_list marker;
+  char * toks = strdup(format);
+  char * tok = strtok(toks, " ");
+
+  va_start(marker, format);
+  while (tok && argc!=8) {
+    args[argc].data = va_arg(marker, void *);
+    args[argc].type = tok;
+    ++argc;
+    tok = strtok(NULL, " ");
+  }
+  args[argc].type=NULL;
+  va_end(marker);
+  handle_event(attribs, event, args);
+  free (toks);
+}
+
+void
+handle_event(attrib ** attribs, const char * event, void * data)
 {
 	while (*attribs) {
 		if ((*attribs)->type==&at_eventhandler) break;
@@ -213,7 +236,7 @@ handle_event(attrib ** attribs, const char * event, void * param)
 	}
 	if (*attribs) {
 		handler_info * tl = (handler_info*)(*attribs)->data.v;
-		handle_triggers(&tl->triggers, param);
+		handle_triggers(&tl->triggers, data);
 	}
 }
 

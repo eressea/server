@@ -12,5 +12,5 @@ extern void bind_alliance(struct lua_State * L);
 extern void bind_eressea(struct lua_State * L);
 extern void bind_spell(lua_State * L) ;
 extern void bind_item(struct lua_State * L);
-
+extern void bind_event(lua_State * L);
 #endif

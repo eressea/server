@@ -1838,17 +1838,17 @@ deliverMail(faction * f, region * r, unit * u, const char *s, unit * receiver)
 static void
 mailunit(region * r, unit * u, int n, struct order * ord, const char * s)
 {
-	unit *u2;		/* nur noch an eine Unit möglich */
-
-	u2=findunitr(r,n);
+	unit * u2 = findunitr(r,n);
 
 	if (u2 && cansee(u->faction, r, u2, 0)) {
 		deliverMail(u2->faction, r, u, s, u2);
+    handle_event_va(&u2->attribs, "message", "string unit", s, u);
 	}
-	else
-		cmistake(u, ord, 63, MSG_MESSAGE);
-	/* Immer eine Meldung - sonst könnte man so getarnte EHs enttarnen:
-	 * keine Meldung -> EH hier. */
+  else {
+    /* Immer eine Meldung - sonst könnte man so getarnte EHs enttarnen:
+    * keine Meldung -> EH hier. */
+    cmistake(u, ord, 63, MSG_MESSAGE);
+	}
 }
 
 static void
@@ -1927,14 +1927,14 @@ mail_cmd(unit * u, struct order * ord)
       boolean see = false;
       n = getid();
 
-      for(u2=r->units; u2; u2=u2->next) {
-        if(u2->no == n && cansee(u->faction, r, u2, 0)) {
+      for (u2=r->units; u2; u2=u2->next) {
+        if (u2->no == n && cansee(u->faction, r, u2, 0)) {
           see = true;
           break;
         }
       }
 
-      if(see == false) {
+      if (see == false) {
         cmistake(u, ord, 63, MSG_MESSAGE);
         break;
       }

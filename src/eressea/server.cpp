@@ -283,6 +283,7 @@ lua_init(void)
   bind_unit(luaState);
   bind_ship(luaState);
   bind_building(luaState);
+  bind_event(luaState);
   return luaState;
 }
 

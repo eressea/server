@@ -2,6 +2,7 @@
 #include <eressea.h>
 #include "list.h"
 #include "script.h"
+#include "event.h"
 
 // Atributes includes
 #include <attributes/racename.h>
@@ -22,6 +23,7 @@
 
 // util includes
 #include <util/base36.h>
+#include <util/event.h>
 
 // lua includes
 #include <lua.hpp>
@@ -405,6 +407,57 @@ unit_weight(const struct unit& u)
   return weight(&u);
 }
 
+typedef struct fctr_data {
+  unit * target;
+  luabind::functor<void> * fptr;
+} fctr_data;
+
+static int
+fctr_handle(trigger * t, void * data)
+{
+  event * evt = new event(NULL, (event_arg*)data);
+  fctr_data * fd = (fctr_data*)t->data.v;
+  fd->fptr->operator()(fd->target, evt);
+  delete evt;
+  return 0;
+}
+
+static void
+fctr_init(trigger * t)
+{
+  t->data.v = calloc(sizeof(fctr_data), 1);
+}
+
+static void
+fctr_done(trigger * t)
+{
+  free(t->data.v);
+}
+
+static struct trigger_type tt_functor = {
+  "functor",
+  fctr_init,
+  fctr_done,
+  fctr_handle
+};
+
+static trigger *
+trigger_functor(struct unit& u, const functor<void>& f)
+{
+  luabind::functor<void> * fptr = new luabind::functor<void>(f);
+  trigger * t = t_new(&tt_functor);
+  fctr_data * td = (fctr_data*)t->data.v;
+  td->target = &u;
+  td->fptr = fptr;
+  return t;
+}
+
+static void
+unit_addhandler(struct unit& u, const char * event, const functor<void>& f)
+{
+  add_trigger(&u.attribs, event, trigger_functor(u, f));
+}
+
 static int
 unit_capacity(const struct unit& u)
 {
@@ -449,6 +502,7 @@ bind_unit(lua_State * L)
     .def("eff_skill", &unit_effskill)
     .def("set_skill", &unit_setskill)
 
+    .def("add_handler", &unit_addhandler)
     .def("set_brain", &unit_setscript)
     .def("set_racename", &unit_setracename)
     .def("add_spell", &unit_addspell)

@@ -3357,6 +3357,9 @@ freadstr(FILE * F, char * start, size_t size)
   }
 }
 
+/** writes a quoted string to the file
+ * no trailing space, since this is used to make the creport.
+ */
 int
 fwritestr(FILE * F, const char * str)
 {
