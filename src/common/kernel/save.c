@@ -1578,11 +1578,9 @@ readfaction(FILE * F)
   freset(f, FFL_OVERRIDE);
 
   a_read(F, &f->attribs);
-#if RELEASE_VERSION>=CLAIM_VERSION
   if (global.data_version>=CLAIM_VERSION) {
     read_items(F, &f->items);
   }
-#endif
 #ifdef MSG_LEVELS
   read_msglevels(&f->warnings, F);
 #else
@@ -1675,10 +1673,10 @@ writefaction(FILE * F, const faction * f)
 	wi(F, f->flags);
 	a_write(F, f->attribs);
 	wnl(F);
-  if (global.data_version>=CLAIM_VERSION) {
-    write_items(F, f->items);
-    wnl(F);
-  }
+#if RELEASE_VERSION>=CLAIM_VERSION
+  write_items(F, f->items);
+  wnl(F);
+#endif
 #ifdef MSG_LEVELS
 	write_msglevels(f->warnings, F);
 #else
