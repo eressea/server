@@ -1194,14 +1194,27 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 	for (a=a_find(f->attribs, &at_showitem);a;a=a->nexttype) {
 		const potion_type * ptype = resource2potion(((const item_type*)a->data.v)->rtype);
 		requirement * m;
-		const char * ch;
-		if (ptype==NULL) continue;
+		const char * ch, * description;
+
+    if (ptype==NULL) continue;
 		m = ptype->itype->construction->materials;
 		ch = resourcename(ptype->itype->rtype, 0);
 		fprintf(F, "TRANK %d\n", hashstring(ch));
 		fprintf(F, "\"%s\";Name\n", add_translation(ch, locale_string(f->locale, ch)));
 		fprintf(F, "%d;Stufe\n", ptype->level);
-		fprintf(F, "\"%s\";Beschr\n", ptype->text);
+
+    description = ptype->text;
+    if (description==NULL || f->locale!=find_locale("de")) {
+      const char * pname = resourcename(ptype->itype->rtype, 0);
+      const char * potiontext = mkname("potion", pname);
+      description = LOC(f->locale, potiontext);
+      if (strcmp(description, potiontext)==0) {
+        /* string not found */
+        description = ptype->text;
+      }
+    }
+    
+    fprintf(F, "\"%s\";Beschr\n", description);
 		fprintf(F, "ZUTATEN\n");
 
 		while (m->number) {

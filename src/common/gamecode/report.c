@@ -2140,7 +2140,6 @@ report(FILE *F, faction * f, const faction_list * addresses,
 		requirement * m;
     if (ptype!=NULL) {
       const char * pname = resourcename(ptype->itype->rtype, 0);
-			const char * potiontext = mkname("potion", pname);
 		  m = ptype->itype->construction->materials;
 		  if (ch==0) {
 			  rnl(F);
@@ -2163,6 +2162,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 		  rnl(F);
       description = ptype->text;
       if (description==NULL || f->locale!=find_locale("de")) {
+        const char * potiontext = mkname("potion", pname);
         description = LOC(f->locale, potiontext);
         if (strcmp(description, potiontext)==0) {
           /* string not found */
