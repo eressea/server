@@ -1858,7 +1858,7 @@ create_item(unit * u, const item_type * itype, int want)
 	else {
 		const potion_type * ptype = resource2potion(itype->rtype);
 		if (ptype!=NULL) create_potion(u, ptype, want);
-		else if (itype->construction) manufacture(u, itype, want);
+		else if (itype->construction && itype->construction->materials) manufacture(u, itype, want);
 		else cmistake(u, findorder(u, u->thisorder), 125, MSG_PRODUCE);
 	}
 }

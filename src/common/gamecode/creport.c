@@ -543,23 +543,21 @@ cr_output_unit(FILE * F, const region * r,
 	{
 		/* print faction information */
 		const faction * sf = visible_faction(f,u);
+		const attrib *atyp = a_find(u->faction->attribs, &at_raceprefix);
+		const attrib *a = a_find(u->attribs, &at_group);
+		if (a) {
+			const attrib *agrp = a_find(((const group*)a->data.v)->attribs, &at_raceprefix);
+			if (agrp) atyp = agrp;
+		}
 		if (u->faction == f || omniscient(f)) {
 			const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
 			/* my own faction, full info */
-			const attrib * a = a_find(u->attribs, &at_group);
 			const attrib * ap = 0;
 			if (a) {
 				const group * g = (const group*)a->data.v;
 				ap = a_find(g->attribs, &at_raceprefix);
 				fprintf(F, "%d;gruppe\n", g->gid);
-			}
-			if (ap==NULL) {
-				ap = a_find(u->faction->attribs, &at_raceprefix);
-			}
-			if (ap) {
-				const char * name = (const char*)ap->data.v;
-				fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
-			}
+			} 
 			fprintf(F, "%d;Partei\n", u->faction->no);
 			if (sf!=u->faction) fprintf(F, "%d;Verkleidung\n", sf->no);
 			if (fval(u, FL_PARTEITARNUNG))
@@ -567,7 +565,6 @@ cr_output_unit(FILE * F, const region * r,
 			if (a_otherfaction)
 				fprintf(F, "%d;Anderepartei\n", a_otherfaction->data.i);
 		} else {
-			const attrib * a = a_find(u->attribs, &at_group);
 			if (fval(u, FL_PARTEITARNUNG)) {
 				/* faction info is hidden */
 				fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, FL_PARTEITARNUNG)));
@@ -578,19 +575,13 @@ cr_output_unit(FILE * F, const region * r,
 					fprintf(F, "1;Verraeter\n");
 				}
 			}
-			if (a) {
-				const attrib *agrp = a_find(((const group*)a->data.v)->attribs, &at_raceprefix);
-				if (agrp==NULL) {
-					agrp = a_find(u->faction->attribs, &at_raceprefix);
-				}
-				if (agrp) {
-					const char * name = (const char*)agrp->data.v;
-					fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
-				}
-			}
+		}
+		if (atyp) {
+			const char * name = (const char*)atyp->data.v;
+			fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
 		}
 	}
-	if(u->faction != f && a_fshidden
+	if (u->faction != f && a_fshidden
 			&& a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {
 		fprintf(F, "-1;Anzahl\n");
 	} else {

@@ -132,128 +132,28 @@ verify_owners(boolean bOnce)
 		if (fun == 0) a_add(&global.attribs, make_key(atoi36(magic))); \
 	} \
 }
-#if 0
-static void
-fix_vertrautenmagie(void)
+
+int
+warn_items(void)
 {
-	region *r;
-	for(r=regions; r; r=r->next) {
-		unit *u;
-		for(u=r->units;u;u=u->next) {
-			sc_mage *m = get_mage(u);
-			if (m != NULL) {
-
-				/* Vertraute und Monster haben alle Magiegebiet M_GRAU */
-				if (m->magietyp != M_GRAU) continue;
-
-				switch(u->race) {
-					case new_race[RC_PSEUDODRAGON]:
-						if(!getspell(u, SPL_FLEE)) addspell(u, SPL_FLEE);
-						if(!getspell(u, SPL_SLEEP)) addspell(u, SPL_SLEEP);
-						if(!getspell(u, SPL_FRIGHTEN)) addspell(u, SPL_FRIGHTEN);
-						break;
-					case new_race[RC_NYMPH]:
-						if(!getspell(u, SPL_SEDUCE)) addspell(u, SPL_SEDUCE);
-						if(!getspell(u, SPL_CALM_MONSTER)) addspell(u, SPL_CALM_MONSTER);
-						if(!getspell(u, SPL_SONG_OF_CONFUSION)) addspell(u, SPL_SONG_OF_CONFUSION);
-						if(!getspell(u, SPL_DENYATTACK)) addspell(u, SPL_DENYATTACK);
-						break;
-					case new_race[RC_UNICORN]:
-						if(!getspell(u, SPL_RESISTMAGICBONUS)) addspell(u, SPL_RESISTMAGICBONUS);
-						if(!getspell(u, SPL_SONG_OF_PEACE)) addspell(u, SPL_SONG_OF_PEACE);
-						if(!getspell(u, SPL_CALM_MONSTER)) addspell(u, SPL_CALM_MONSTER);
-						if(!getspell(u, SPL_HERO)) addspell(u, SPL_HERO);
-						if(!getspell(u, SPL_HEALINGSONG)) addspell(u, SPL_HEALINGSONG);
-						if(!getspell(u, SPL_DENYATTACK)) addspell(u, SPL_DENYATTACK);
-						break;
-					case new_race[RC_WRAITH]:
-						if(!getspell(u, SPL_STEALAURA)) addspell(u, SPL_STEALAURA);
-						if(!getspell(u, SPL_FRIGHTEN)) addspell(u, SPL_FRIGHTEN);
-						if(!getspell(u, SPL_SUMMONUNDEAD)) addspell(u, SPL_SUMMONUNDEAD);
-						break;
-					case new_race[RC_IMP]:
-						if(!getspell(u, SPL_STEALAURA)) addspell(u, SPL_STEALAURA);
-						break;
-					case new_race[RC_DREAMCAT]:
-						if(!getspell(u, SPL_ILL_SHAPESHIFT)) addspell(u, SPL_ILL_SHAPESHIFT);
-						if(!getspell(u, SPL_TRANSFERAURA_TRAUM)) addspell(u, SPL_TRANSFERAURA_TRAUM);
-						break;
-					case new_race[RC_FEY]:
-						if(!getspell(u, SPL_DENYATTACK)) addspell(u, SPL_DENYATTACK);
-						if(!getspell(u, SPL_CALM_MONSTER)) addspell(u, SPL_CALM_MONSTER);
-						if(!getspell(u, SPL_SEDUCE)) addspell(u, SPL_SEDUCE);
-						break;
-					/* kein break, ein Wyrm hat alle Drachensprüche */
-					case new_race[RC_WYRM]:
-						if(!getspell(u, SPL_WYRMODEM)) addspell(u, SPL_WYRMODEM);
-					case new_race[RC_DRAGON]:
-						if(!getspell(u, SPL_DRAGONODEM)) addspell(u, SPL_DRAGONODEM);
-					case new_race[RC_FIREDRAGON]:
-					case new_race[RC_SEASERPENT]:
-						if(!getspell(u, SPL_FIREDRAGONODEM)) addspell(u, SPL_FIREDRAGONODEM);
-						break;
+	boolean found = 0;
+	region * r;
+	for (r=regions;r;r=r->next) {
+		unit * u;
+		for (u=r->units;u;u=u->next) {
+			item * itm;
+			for (itm=u->items;itm;itm=itm->next) {
+				if (itm->number>100000) {
+					found = 1;
+					log_error(("Einheit %s hat %u %s\n", 
+						unitid(u), itm->number, 
+						resourcename(itm->type->rtype, 0)));
 				}
 			}
 		}
 	}
+	return found;
 }
-#endif
-
-#if 0
-static void
-addunitsilver(unit * u, int count, int mode)
-{
-	if (mode)
-		change_money(u, count * u->number);
-	else
-		u->money = count * u->number;
-}
-
-static void
-addunititems(unit * u, int count, char item, int mode)
-{
-	if (mode)
-		change_item(u, item, count * u->number);
-	else
-		set_item(u, item, count * u->number);
-}
-
-static void
-addfactionsilver(faction * f, int count, int mode)
-{
-	unit * u;
-	for (u=f->units;u;u=u->nextF) {
-		addunitsilver(u, count, mode);
-	}
-}
-
-static void
-addfactionitems(faction * f, int count, char item, int mode)
-{
-	unit * u;
-	for (u=f->units;u;u=u->nextF) {
-		addunititems(u, count, item, mode);
-	}
-}
-
-static void
-showallspells(void)
-{
-	faction * f;
-	for (f=factions;f;f=f->next) {
-		if (f->no==MONSTER_FACTION) continue;
-		a_removeall(&f->attribs, &at_seenspell);
-	}
-}
-
-
-static void
-add_magrathea(void)
-{
-	unit * tans = ufindhash(atoi36("tans"));
-	if (tans) u_setfaction(tans, findfaction(999));
-}
-#endif
 
 #ifdef XMAS1999
 #include "race.h"
@@ -2682,7 +2582,7 @@ warn_password(void)
 			ADDMSG(&f->msgs, msg_message("msg_errors", "string", 
 				"Dein Passwort enthält Zeichen, die bei der Nachsendung "
 				"von Reports Probleme bereiten können. Bitte wähle ein neues "
-				"Passwort, bevorzugt nur aus Buchstaben un Zahlen bestehend."));
+				"Passwort, bevorzugt nur aus Buchstaben und Zahlen bestehend."));
 		}
 		f = f->next;
 	}
@@ -2750,6 +2650,7 @@ korrektur(void)
 	do_once("fquc", fix_questcoors());
 	do_once("fsee", fix_seeds());
 	do_once("orc2", orc_conversion2());
+	do_once("witm", warn_items());
 	warn_password();
 
 	/* seems something fishy is going on, do this just 
