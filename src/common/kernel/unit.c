@@ -828,7 +828,9 @@ transfermen(unit * u, unit * u2, int n)
 		}
 	}
 	else if (r->land)
-		rsetpeasants(r, rpeasants(r) + n);
+		if(u->race != new_race[RC_DAEMON]) {
+			rsetpeasants(r, rpeasants(r) + n);
+		}
 }
 
 struct building * 

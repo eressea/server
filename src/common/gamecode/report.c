@@ -3399,7 +3399,7 @@ report_summary(summary * s, summary * o, boolean full)
 				rcomp(s->poprace[i],o->poprace[i]));
 		}
 	} else {
-		for (i = 0; i < MAXRACES; i++) if (s->poprace[i] && playerrace(new_race[i])) {
+		for (i = 0; i < MAXRACES; i++) if (s->poprace[i] && playerrace(new_race[i]) && i != RC_TEMPLATE) {
 			fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(new_race[i], 1)),
 				rcomp(s->poprace[i],o->poprace[i]));
 		}
