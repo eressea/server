@@ -7229,32 +7229,44 @@ sp_becomewyrm(castorder *co)
  * Stufe:      unterschiedlich
  * Gebiet:     alle
  * Wirkung:
- * 	gibt an, ob sich der Magier in einer Pyramidenbauregion
- * 	befindet.
+ *             gibt die ungefaehre Entfernung zur naechstgelegenen Pyramiden-
+ *             region an.
  *
  * Flags:
  */
 static int
 sp_wdwpyramid(castorder *co)
 {
-	region  *r         = co->rt;
-	unit    *mage      = (unit *)co->magician;
-	int     cast_level = co->level;
-
-	if(!(landregion(rterrain(r)))){
-		cmistake(mage, strdup(co->order), 186, MSG_MAGIC);
-		return 0;
-	}
+	region  *r          = co->rt;
+	unit    *mage       = (unit *)co->magician;
+	int     cast_level  = co->level;
 
 	if(a_find(r->attribs, &at_wdwpyramid) != NULL) {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"wdw_pyramidspell_found%u:mage%r:region%s:command",
-			mage, r, strdup(co->order)));
-
+		ADDMSG(&mage->faction->msgs, msg_message("wdw_pyramidspell_found",
+			"unit region command", mage, r, strdup(co->order)));
 	} else {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"wdw_pyramidspell_notfound%u:mage%r:region%s:command",
-			mage, r, strdup(co->order)));
+		region *r2;
+		int    mindist = -1;
+		int    minshowdist;
+		int    maxshowdist;
+
+		for(r2 = regions; r2; r2 = r2->next) {
+			if(a_find(r->attribs, &at_wdwpyramid) != NULL) {
+				short dist = distance(mage->region, r2);
+				if(dist < mindist) {
+					mindist = dist;
+				}
+			}
+		}
+
+		assert(mindist >= 1);
+
+		minshowdist = mindist - rand()%5;
+		maxshowdist = minshowdist + 4;
+
+		ADDMSG(&mage->faction->msgs, msg_message("wdw_pyramidspell_notfound",
+			"unit region command mindist maxdist", mage, r, strdup(co->order),
+			max(1, minshowdist), maxshowdist));
 	}
 
 	return cast_level;

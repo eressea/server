@@ -5633,9 +5633,11 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
+		<arg name="mindist" type="int"></arg>
+		<arg name="maxdist" type="int"></arg>
 	</type>
-	<text locale="de">"$unit($unit) in $region($region): '$command' - In dieser Regione können keine Pyramiden gebaut werden."</text>
-	<text locale="en">"$unit($unit) in $region($region): '$command' - No pyramids may be build in this region."</text>
-	<text locale="fr">"$unit($unit) in $region($region): '$command' - No pyramids may be build in this region."</text>
+	<text locale="de">"$unit($unit) in $region($region): '$command' - In dieser Region können keine Pyramiden gebaut werden. Die nächste Pyramidenregion ist zwischen $int($mindist) und $int($maxdist) Regionen entfernt."</text>
+	<text locale="en">"$unit($unit) in $region($region): '$command' - No pyramids may be build in this region. The closest region to build a pyramid in is between $int($mindist) and $int($maxdist) regions away."</text>
+	<text locale="fr">"$unit($unit) in $region($region): '$command' - No pyramids may be build in this region. The closest region to build a pyramid in is between $int($mindist) and $int($maxdist) regions away."</text>
 </message>
 </messages>
