@@ -37,7 +37,7 @@ while users > 0:
 	    "zugeführt.\n")
 	    print "CANCEL: "+email+", uid="+str(int(uid))+", balance="+str(balance)+", games="+str(int(games))
 	    if dryrun==0:
-		c2.execute("UPDATE subscriptions set user=0, status='CANCELLED' where user="+str(int(uid)))
+		c2.execute("UPDATE subscriptions set status='CANCELLED' where user="+str(int(uid)))
 	else:
 	    print "WARNING: "+email+", uid="+str(int(uid))+", balance="+str(balance)+", games="+str(int(games))
 	    Msg = Msg+"Subject: WARNUNG - Vinyambar Kontostand Kunde "+str(int(uid))+"\n\n"

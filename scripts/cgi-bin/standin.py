@@ -14,6 +14,7 @@ From = "accounts@vinyambar.de"
 Errors = ""
 db = MySQLdb.connect(db=dbname)
 smtpserver='localhost'
+notify='accounts@vinyambar.de'
 
 # define a new function called Display
 # it takes one parameter - a string to Display
@@ -55,10 +56,11 @@ def ShowPage():
     while results>0:
 	results=results-1
 	gid, game, faction, lastturn, sid, race, info = cursor.fetchone()
-	if info==None:
-	    info='Keine Informationen'
-	output=output+'<tr><td>'+ race + '</td><td>'+ game + '</td><td>' + str(int(maxturn[gid]-lastturn)) + '</td><td>' + info + '</td>'
-	output=output+'<td><input type="checkbox" name="accept_' + str(int(sid)) + '"> übernehmen</td></tr>\n'
+	if lastturn<maxturn[gid]:
+	    if info==None:
+		info='Keine Informationen'
+	    output=output+'<tr><td>'+ race + '</td><td>'+ game + '</td><td>' + str(int(maxturn[gid]-lastturn)) + '</td><td>' + info + '</td>'
+	    output=output+'<td><input type="checkbox" name="accept_' + str(int(sid)) + '"> übernehmen</td></tr>\n'
     
     output=output+'</table>'
     output=output+'<p><table><tr><td>Kundennummer:</td><td><input name="user" size="4"></tr><tr><td>Passwort:</td><td><input name="pass" type="password" size="40"></td>'
@@ -84,8 +86,8 @@ if Form.has_key("pass"):
 if (password!=None) & (custid!=None):
     cursor=db.cursor()
     output=""
-    if cursor.execute("select email, id from users where password='"+password+"' and id="+str(int(custid)))==1:
-	email, custid = cursor.fetchone()
+    if cursor.execute("select firstname, lastname, email, id from users where password='"+password+"' and id="+str(int(custid)))==1:
+	firstname, lastname, email, custid = cursor.fetchone()
 	c = cursor.execute("SELECT id, game, password, faction from subscriptions where status='CANCELLED'")
 	while c>0:
 	    c=c-1
@@ -94,15 +96,23 @@ if (password!=None) & (custid!=None):
 		update = db.cursor()
 		update.execute("UPDATE subscriptions set user=" + str(int(custid)) + ", status='ACTIVE' where id=" + str(int(sid)))
 		output=output+"Die Partei " + faction + " wurde Dir überschrieben. Eine Email mit dem Passwort und weiteren Hinweisen ist unterwegs zu Dir.<br>"
+		server=smtplib.SMTP(smtpserver)
+
 		Msg="From: "+From+"\nTo: "+email+"\nSubject: Vinambar Parteiuebernahme\n\n"
 		Msg=Msg+"Das Passwort für deine neue Vinyambar-Partei "+faction+" lautet\n"
 		Msg=Msg+"  "+newpass+"\n"
 		Msg=Msg+"\nUm den Report der letzten Woche zu erhalten, schicke eine Mail mit dem Betreff\n"
 		Msg=Msg+"VIN"+str(int(gid))+" REPORT "+faction+" \""+newpass+"\" an die Adresse "
 		Msg=Msg+"vinyambar@eressea.amber.kn-bremen.de"
-
-		server=smtplib.SMTP(smtpserver)
 		server.sendmail(From, email, Msg)
+
+		Msg="From: "+From+"\nTo: "+notify+"\nSubject: Vinambar Parteiuebernahme\n\n"
+		Msg=Msg+"Die Partei "+faction+" wurde übernommen.\n"
+		Msg=Msg+"  Spieler: "+str(int(custid))+"\n"
+		Msg=Msg+"  Name   : "+firstname+" "+lastname+"\n"
+		Msg=Msg+"  email  : "+email+"\n"
+		server.sendmail(From, notify, Msg)
+		
 		server.close()
     else:
 	output="<font color=red>Fehler in Passwort oder Kundennummer<br></font>"

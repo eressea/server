@@ -30,17 +30,21 @@ while os.access(patchdir+'/patch-'+str(int(patch+1))+'.sql', os.F_OK):
     os.system('mysql ' + dbname + ' < ' + patchdir+'/patch-'+str(int(patch))+'.sql')
     cursor.execute('update games set patch='+str(int(patch))+' where id='+str(game))
 
-k = cursor.execute("UPDATE subscriptions SET user=0 where game="+str(int(game))+" and status='TRANSFERED' and updated<'"+date+"'")
-print "Removing "+str(int(k))+" transfered subscriptions."
+k = cursor.execute("UPDATE subscriptions SET user=0, status='CANCELLED' where game="+str(int(game))+" and status='TRANSFERED' and updated<'"+date+"'")
+if k:
+    print "Removing untransfered subscriptions."
 
 k = cursor.execute("UPDATE subscriptions SET user=0 where game="+str(int(game))+" and status='CANCELLED' and updated<'"+date+"'")
-print "Removing "+str(int(k))+" cancelled subscriptions."
+if k:
+    print "Removing cancelled subscriptions."
 
 k = cursor.execute("UPDATE subscriptions SET user=0 where game="+str(int(game))+" and status='DEAD'")
-print "Removing "+str(int(k))+" dead subscriptions."
+if k:
+    print "Removing dead subscriptions."
 
 k = cursor.execute("UPDATE subscriptions SET status='CANCELLED' where game="+str(int(game))+" and status='ACTIVE' and lastturn+3<="+str(lastturn))
-print "Cancelling "+str(int(k))+" active subscriptions with 3+ NMRs."
+if k:
+    print "Cancelling subscriptions with 3+ NMRs."
 
 k = cursor.execute("SELECT users.id FROM users, subscriptions WHERE users.id=subscriptions.user and subscriptions.status='ACTIVE' and subscriptions.game="+str(game))
 while k!=0:
