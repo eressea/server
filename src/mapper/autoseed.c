@@ -304,7 +304,7 @@ mkisland(int nsize)
 
 	for (r=regions;r;r=r->next) {
 		struct plane * p = rplane(r);
-		if (p==NULL && (rmin==NULL || r->age<=MAXAGEDIFF)) {
+		if (r->terrain==T_OCEAN && p==NULL && (rmin==NULL || r->age<=MAXAGEDIFF)) {
 			direction_t d;
 			for (d=0;d!=MAXDIRECTIONS;++d) {
 				if (rconnect(r, d)==NULL) break;
