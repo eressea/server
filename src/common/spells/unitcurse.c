@@ -16,21 +16,27 @@
 #include "unitcurse.h"
 
 /* kernel includes */
-#include "message.h"
-#include "nrmessage.h"
-#include "objtypes.h"
-#include "curse.h"
+#include <message.h>
+#include <nrmessage.h>
+#include <race.h>
+#include <skill.h>
+#include <unit.h>
+#include <faction.h>
+#include <objtypes.h>
+#include <curse.h>
 
 /* util includes */
 #include <message.h>
+#include <base36.h>
+#include <functions.h>
 
 /* libc includes */
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 
-static int
-cinfo_unit(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+int
+cinfo_unit(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	message * msg;
 
@@ -47,15 +53,15 @@ cinfo_unit(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 }
 
 static int
-cinfo_unit_onlyowner(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_unit_onlyowner(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	message * msg;
-	unit *u;
+	struct unit *u;
 
 	unused(typ);
 
 	assert(typ == TYP_UNIT);
-	u = (unit *)obj;
+	u = (struct unit *)obj;
 
 	if (self){
 		msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
@@ -71,12 +77,12 @@ cinfo_unit_onlyowner(const locale * lang, void * obj, typ_t typ, curse *c, int s
 /* C_AURA */
 /* erhöht/senkt regeneration und maxaura um effect% */
 static int
-cinfo_auraboost(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_auraboost(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
-	unit *u;
+	struct unit *u;
 	unused(typ);
 	assert(typ == TYP_UNIT);
-	u = (unit *)obj;
+	u = (struct unit *)obj;
 
 	if (self){
 		if (c->effect > 100){
@@ -93,7 +99,7 @@ cinfo_auraboost(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 
 /* C_SLAVE */
 static int
-cinfo_slave(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_slave(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	unit *u;
 	unused(typ);
@@ -111,10 +117,10 @@ cinfo_slave(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 
 /* C_CALM */
 static int
-cinfo_calm(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_calm(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	unit *u;
-	const race * rc;
+	const struct race * rc;
 	faction *f;
 	unused(typ);
 
@@ -138,7 +144,7 @@ cinfo_calm(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 }
 /* C_SPEED */
 static int
-cinfo_speed(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_speed(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	unit *u;
 	curse_unit * cu;
@@ -160,7 +166,7 @@ cinfo_speed(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 }
 /* C_ORC */
 static int
-cinfo_orc(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_orc(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	unit *u;
 	message * msg;
@@ -180,7 +186,7 @@ cinfo_orc(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 
 /* C_KAELTESCHUTZ */
 static int
-cinfo_kaelteschutz(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_kaelteschutz(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	unit *u;
 	curse_unit * cu;
@@ -202,7 +208,7 @@ cinfo_kaelteschutz(const locale * lang, void * obj, typ_t typ, curse *c, int sel
 
 /* C_SPARKLE */
 static int
-cinfo_sparkle(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_sparkle(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	const char * effects[] = {
 		NULL, /* end grau*/
@@ -257,7 +263,7 @@ cinfo_sparkle(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 
 /* C_STRENGTH */
 static int
-cinfo_strength(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_strength(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	unused(c);
 	unused(typ);
@@ -274,7 +280,7 @@ cinfo_strength(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 }
 /* C_ALLSKILLS */
 static int
-cinfo_allskills(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_allskills(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	unused(obj);
 	unused(typ);
@@ -290,7 +296,7 @@ cinfo_allskills(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 }
 /* C_SKILL */
 static int
-cinfo_skill(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_skill(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	unit *u = (unit *)obj;
 	int sk = (int)c->data;
@@ -306,7 +312,7 @@ cinfo_skill(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 }
 /* C_ITEMCLOAK */
 static int
-cinfo_itemcloak(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_itemcloak(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	unit *u;
 	unused(typ);
@@ -323,7 +329,7 @@ cinfo_itemcloak(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 }
 
 static int
-cinfo_fumble(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_fumble(const struct locale * lang, void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	unit * u = (unit*)obj;
 	unused(typ);
@@ -338,3 +344,22 @@ cinfo_fumble(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 	return 0;
 }
 
+
+void
+register_unitcurse(void)
+{
+	register_function((pf_generic)register_function((pf_generic)cinfo_unit, "unit");, "cinfo::unit, "unit");");
+	register_function((pf_generic)register_function((pf_generic)cinfo_unit_onlyowner, "unit_onlyowner");, "cinfo::unit_onlyowner, "unit_onlyowner");");
+	register_function((pf_generic)register_function((pf_generic)cinfo_auraboost, "auraboost");, "cinfo::auraboost, "auraboost");");
+	register_function((pf_generic)register_function((pf_generic)cinfo_slave, "slave");, "cinfo::slave, "slave");");
+	register_function((pf_generic)register_function((pf_generic)cinfo_calm, "calm");, "cinfo::calm, "calm");");
+	register_function((pf_generic)register_function((pf_generic)cinfo_speed, "speed");, "cinfo::speed, "speed");");
+	register_function((pf_generic)register_function((pf_generic)cinfo_orc, "orc");, "cinfo::orc, "orc");");
+	register_function((pf_generic)register_function((pf_generic)cinfo_kaelteschutz, "kaelteschutz");, "cinfo::kaelteschutz, "kaelteschutz");");
+	register_function((pf_generic)register_function((pf_generic)cinfo_sparkle, "sparkle");, "cinfo::sparkle, "sparkle");");
+	register_function((pf_generic)register_function((pf_generic)cinfo_strength, "strength");, "cinfo::strength, "strength");");
+	register_function((pf_generic)register_function((pf_generic)cinfo_allskills, "allskills");, "cinfo::allskills, "allskills");");
+	register_function((pf_generic)register_function((pf_generic)cinfo_skill, "skill");, "cinfo::skill, "skill");");
+	register_function((pf_generic)register_function((pf_generic)cinfo_itemcloak, "itemcloak");, "cinfo::itemcloak, "itemcloak");");
+	register_function((pf_generic)register_function((pf_generic)cinfo_fumble, "fumble");, "cinfo::fumble, "fumble");");
+}

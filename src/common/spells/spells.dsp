@@ -90,6 +90,10 @@ SOURCE=.\alp.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\regioncurse.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\spells.h
 # End Source File
 # End Group
@@ -99,7 +103,19 @@ SOURCE=.\alp.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\regioncurse.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\shipcurse.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\spells.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\unitcurse.c
 # End Source File
 # End Target
 # End Project
