@@ -2891,11 +2891,16 @@ movement_error(unit * u, const char * token, order * ord, int error_code)
 int
 movewhere(const unit *u, const char * token, region * r, region** resultp)
 {
-  direction_t d = finddirection(token, u->faction->locale);
   region * r2;
+  direction_t d;
 
+  if (*token == '\0') {
+    *resultp = NULL;
+    return E_MOVE_OK;
+  }
+  
+  d = finddirection(token, u->faction->locale);
   switch (d) {
-
   case D_PAUSE:
     *resultp = r;
     break;

@@ -1082,20 +1082,14 @@ make_route(unit * u, order * ord, region_list ** routep)
 
     current = next;
     token = getstrtoken();
-    if (token[0]) {
-      error = movewhere(u, token, current, &next);
-      if (error) {
-        message * msg = movement_error(u, token, ord, error);
-        if (msg!=NULL) {
-          add_message(&u->faction->msgs, msg);
-          msg_release(msg);
-        }
-        next = NULL;
-        break;
+    error = movewhere(u, token, current, &next);
+    if (error) {
+      message * msg = movement_error(u, token, ord, error);
+      if (msg!=NULL) {
+        add_message(&u->faction->msgs, msg);
+        msg_release(msg);
       }
-    } else {
       next = NULL;
-      break;
     }
   }
 }
@@ -1478,7 +1472,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
   * Durchlauf schon gesetzt (Parameter!). current_point ist die letzte gültige,
   * befahrene Region. */
 
-  while (current_point!=next_point && step < k && next_point) {
+  while (next_point && current_point!=next_point && step < k) {
     const char * token;
     int error;
     terrain_t tthis = rterrain(current_point);
@@ -1624,13 +1618,13 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
     if (rterrain(current_point) != T_OCEAN && !is_cursed(sh->attribs, C_SHIP_FLYING, 0)) break;
     token = getstrtoken();
     error = movewhere(u, token, current_point, &next_point);
-    if (error) {
+    if (error || next_point==NULL) {
       message * msg = movement_error(u, token, ord, error);
       if (msg!=NULL) {
         add_message(&u->faction->msgs, msg);
         msg_release(msg);
       }
-      next_point=current_point;
+      next_point = current_point;
       break;
     }
   }
