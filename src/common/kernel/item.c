@@ -848,7 +848,7 @@ use_antimagiccrystal(region * r, unit * mage, int amount, strlist * cmdstrings)
 
 			force = destr_curse(c, effect, force);
 			if(c->vigour <= 0) {
-				a_remove(ap, a);
+				a_remove(&r->attribs, a);
 			}
 			if(*ap) ap = &(*ap)->next;
 		}

@@ -243,7 +243,7 @@ change_effect (unit * u, const potion_type * effect, int delta)
 		a=a->nexttype;
 	}
 	if (a!=NULL && data->value+delta==0) {
-		a_remove(ap, a);
+		a_remove(&u->attribs, a);
 		return 0;
 	} else if (a!=NULL) {
 		data->value += delta;

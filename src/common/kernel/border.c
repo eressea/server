@@ -108,7 +108,7 @@ erase_border(border * b)
   border ** bp = get_borders_i(b->from, b->to);
   attrib ** ap = &b->attribs;
 
-  while (*ap) a_remove(ap, *ap);
+  while (*ap) a_remove(&b->attribs, *ap);
 
   assert(*bp!=NULL || !"error: border is not registered");
   if (*bp==b) {
@@ -217,7 +217,7 @@ age_borders(void)
               deleted = bnew;
               break;
             }
-            a_remove(ap, a);
+            a_remove(&b->attribs, a);
           }
           else ap=&a->next;
         }

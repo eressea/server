@@ -1071,60 +1071,60 @@ farcasting(unit *magician, region *r)
 double
 magic_resistance(unit *target)
 {
-	attrib * a;
-	curse *c;
-	int n;
+  attrib * a;
+  curse *c;
+  int n;
 
   /* Bonus durch Rassenmagieresistenz */
   double probability = target->race->magres;
 
-	/* Magier haben einen Resistenzbonus vom Magietalent * 5%*/
-	probability += effskill(target, SK_MAGIC)*0.05;
+  /* Magier haben einen Resistenzbonus vom Magietalent * 5%*/
+  probability += effskill(target, SK_MAGIC)*0.05;
 
-	/* Auswirkungen von Zaubern auf der Einheit */
-	c = get_curse(target->attribs, ct_find("magicresistance"));
-	if (c) {
-		probability += 0.01 * curse_geteffect(c) * get_cursedmen(target, c);
-	}
+  /* Auswirkungen von Zaubern auf der Einheit */
+  c = get_curse(target->attribs, ct_find("magicresistance"));
+  if (c) {
+    probability += 0.01 * curse_geteffect(c) * get_cursedmen(target, c);
+  }
 
-	/* Unicorn +10 */
-	n = get_item(target, I_UNICORN);
-	if (n) probability += n*0.1/target->number;
+  /* Unicorn +10 */
+  n = get_item(target, I_UNICORN);
+  if (n) probability += n*0.1/target->number;
 
-	/* Auswirkungen von Zaubern auf der Region */
-	a = a_find(target->region->attribs, &at_curse);
-	while (a) {
-		curse *c = (curse*)a->data.v;
-		unit *mage = c->magician;
+  /* Auswirkungen von Zaubern auf der Region */
+  a = a_find(target->region->attribs, &at_curse);
+  while (a) {
+    curse *c = (curse*)a->data.v;
+    unit *mage = c->magician;
 
-		if (mage!=NULL) {
-			if (c->type == ct_find("goodmagicresistancezone")) {
-				if (alliedunit(mage, target->faction, HELP_GUARD)) {
-					probability += curse_geteffect(c)*0.01;
-					break;
-				}
-			}
-			else if (c->type == ct_find("badmagicresistancezone")) {
-				if (alliedunit(mage, target->faction, HELP_GUARD)) {
-					a = a->nexttype;
-					continue;
-				}
-			}
-		}
-		a = a->nexttype;
-	}
-	/* Bonus durch Artefakte */
-	/* TODO (noch gibs keine)*/
+    if (mage!=NULL) {
+      if (c->type == ct_find("goodmagicresistancezone")) {
+        if (alliedunit(mage, target->faction, HELP_GUARD)) {
+          probability += curse_geteffect(c)*0.01;
+          break;
+        }
+      }
+      else if (c->type == ct_find("badmagicresistancezone")) {
+        if (alliedunit(mage, target->faction, HELP_GUARD)) {
+          a = a->nexttype;
+          continue;
+        }
+      }
+    }
+    a = a->nexttype;
+  }
+  /* Bonus durch Artefakte */
+  /* TODO (noch gibs keine)*/
 
-	/* Bonus durch Gebäude */
-	{
-		struct building * b = inside_building(target);
-		const struct building_type * btype = b?b->type:NULL;
+  /* Bonus durch Gebäude */
+  {
+    struct building * b = inside_building(target);
+    const struct building_type * btype = b?b->type:NULL;
 
-		/* gesegneter Steinkreis gibt 30% dazu */
-		if (btype) probability += btype->magresbonus * 0.01;
-	}
-	return probability;
+    /* gesegneter Steinkreis gibt 30% dazu */
+    if (btype) probability += btype->magresbonus * 0.01;
+  }
+  return probability;
 }
 
 /* ------------------------------------------------------------- */
