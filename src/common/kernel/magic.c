@@ -2929,10 +2929,12 @@ magic(void)
 
 			for (so = u->orders; so; so = so->next) {
 				if (igetkeyword(so->s, u->faction->locale) == K_CAST) {
+#if HUNGER_DISABLES_LONGORDERS
 					if (fval(u, FL_HUNGER)) {
 						cmistake(u, so->s, 224, MSG_MAGIC);
 						continue;
 					}
+#endif
 					if (r->planep && fval(r->planep, PFL_NOMAGIC)) {
 						cmistake(u, so->s, 269, MSG_MAGIC);
 						continue;

@@ -455,6 +455,7 @@ learn(void)
 
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) {
+			int days;
 			if (rterrain(r) == T_OCEAN){
 				/* sonderbehandlung aller die auf Ozeanen lernen können */
 				if (u->race != new_race[RC_AQUARIAN]
@@ -666,13 +667,17 @@ learn(void)
 					lmod += 5;
 				}
 				learning = max(0, 30 + lmod);
-				change_skill(u, (skill_t)i, (int)((u->number * dice(2,learning) + a->data.i) * multi));
+				days = (int)((u->number * dice(2, learning) + a->data.i) * multi);
 #else
-				change_skill(u, (skill_t)i, (int)((u->number * dice(2,30) + a->data.i) * multi));
+				days = (int)((u->number * dice(2, 30) + a->data.i) * multi);
 #endif
 #else
-				change_skill(u, (skill_t)i, (int)((u->number * 30 + a->data.i) * multi));
+				days = (int)((u->number * 30 + a->data.i) * multi);
 #endif
+#if HUNGER_DISABLES_LONGORDERS
+				days = days / 2;
+#endif
+				change_skill(u, (skill_t)i, days);
 				if (a) {
 					a_remove(&u->attribs, a);
 					a = NULL;

@@ -1082,16 +1082,18 @@ quit(void)
 	remove("inactive");
 
 	for (f = factions; f; f = f->next) if(!fval(f, FL_NOIDLEOUT)) {
+#if REMOVENMRTIMEOUT
 		if (turn - f->lastorders >= ORDERGAP) {
 			destroyfaction(f);
 			continue;
 		}
+#endif
 		if (turn - f->lastorders >= (ORDERGAP - 1)) {
 			inactivefaction(f);
 			continue;
 		}
 	}
-#ifdef REMOVENMRNEWBIE
+#if REMOVENMRNEWBIE
 	puts(" - beseitige Spieler, die sich nach der Anmeldung nicht "
 		 "gemeldet haben...");
 
@@ -2957,6 +2959,7 @@ setdefaults (void)
 
 			set_string(&u->thisorder, u->lastorder);
 			for(S = u->orders; S; S = S->next) {
+				const char * cmd;
 				keyword_t keyword = igetkeyword(S->s, u->faction->locale);
 
 				switch (keyword) {
@@ -3010,11 +3013,13 @@ setdefaults (void)
 				case K_WORK:
 				case K_DRIVE:
 				case K_MOVE:
-					if(!global.disabled[K_WORK] && fval(u, FL_HUNGER)) {
-						set_string(&u->thisorder, locale_string(u->faction->locale, "defaultorder"));
-					} else {
-						set_string(&u->thisorder, S->s);
+					cmd = S->s;
+#if HUNGER_DISABLES_LONGORDERS
+					if (fval(u, FL_HUNGER)) {
+						cmd = locale_string(u->faction->locale, "defaultorder");
 					}
+#endif
+					set_string(&u->thisorder, cmd);
 					break;
 
 					/* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen

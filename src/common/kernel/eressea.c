@@ -1202,7 +1202,7 @@ findkeyword(const char *s, const struct locale * lang)
 	struct lstr * lnames = get_lnames(lang);
 	int i;
 #ifdef AT_PERSISTENT
-	if(*s == '@') s++;
+	if (*s == '@') s++;
 #endif
 	if (findtoken(&lnames->keywords, s, (void**)&i)==E_TOK_NOMATCH) return NOKEYWORD;
 	if (global.disabled[i]) return NOKEYWORD;
