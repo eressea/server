@@ -1,5 +1,5 @@
 # Kommentare sind erlaubt. Endlich.
-# $Id: messages.de,v 1.1 2001/01/25 09:37:56 enno Exp $
+# $Id: messages.de,v 1.2 2001/01/31 13:03:20 corwin Exp $
 
 # Fehlermeldungen:
 msg_errors;errors:0;de;{string}
@@ -480,6 +480,7 @@ sp_raisepeasantmob_effect;magic:0;de;{$mage mage} wiegelt in {region} die Bauern
 firewall_effect;magic:0;de;{mage} erschafft in {region} eine Wand aus Feuer.
 wisps_effect;magic:0;de;{mage} ruft Irrlichter in {region}.
 becomewyrm;magic;2;de;{mage} verwandelt sich in einen Wyrm.
+puttorest;magic;0;de;{mage} befreit die gequälten Seelen der Toten.
 
 # Kämpfe
 msg_battle;battle:0;de;{string}

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: spell.c,v 1.3 2001/01/31 13:03:18 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -4568,6 +4568,46 @@ sp_depression(castorder *co)
 /* TRAUM - Illaun */
 /* ------------------------------------------------------------- */
 
+/* Name:       Seelenfrieden
+ * Stufe:      2
+ * Kategorie:  Region, positiv
+ * Gebiet:     Illaun
+ * Wirkung:
+ * 	Reduziert Untotencounter
+ * Flag: (0)
+ */
+
+int
+sp_puttorest(castorder *co)
+{
+	region *r = co->rt;
+	unit *mage = (unit *)co->magician;
+	int laid_to_rest = 0;
+	unit *u;
+
+	laid_to_rest = dice(co->force * 2, 100);
+	laid_to_rest = max(laid_to_rest, deathcount(r));
+
+	deathcounts(r, -laid_to_rest);
+	
+	/* melden, 1x pro partei */
+	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+
+	for (u = r->units; u; u = u->next) {
+		if (!fval(u->faction, FL_DH)) {
+			fset(u->faction, FL_DH);
+			add_message(&r->msgs, new_message(u->faction,
+				"puttorest%u:mage", cansee(u->faction, r, mage, 0) ? mage:NULL));
+		}
+	}
+
+	if (!fval(mage->faction, FL_DH)){
+		add_message(&r->msgs, new_message(mage->faction,
+			"puttorest%u:mage", mage));
+	}
+	return co->level;
+}
+
 /* Name:       Traumschlößchen
  * Stufe:      3
  * Kategorie:  Region, Gebäude, positiv
@@ -7958,6 +7998,24 @@ spell spelldaten[] =
 		 {0, 0, 0},
 		 {0, 0, 0}},
 	 (spell_f)sp_flee, patzer
+	},
+
+	{SPL_PUTTOREST, "Seelenfrieden",
+		"Dieses magische Ritual beruhigt die gequälten Seelen der gewaltsam zu Tode "
+		"gekommenen und ermöglicht es ihnen so, ihre letzte Reise in die Anderlande "
+		"zu beginnen. Je Stufe des Zaubers werden ungefähr 50 Seelen ihre Ruhe "
+		"finden. Der Zauber vermag nicht, bereits wieder auferstandene lebende Tote "
+		"zu erlösen, da deren Bindung an diese Welt zu stark ist.",
+		NULL,
+		NULL,
+	 M_TRAUM, (0), 5, 2,
+	 {
+		 {R_AURA, 3, SPC_LEVEL},
+		 {R_TREES, 1, SPC_FIX},
+		 {0, 0, 0},
+		 {0, 0, 0},
+		 {0, 0, 0}},
+	 (spell_f)sp_puttorest, patzer
 	},
 
 	{SPL_ICASTLE, "Traumschlößchen",

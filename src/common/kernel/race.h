@@ -34,7 +34,7 @@
 #define AT_STRUCTURAL 8
 
 #define GOLEM_IRON   5          /* Anzahl Eisen in einem Eisengolem */
-#define GOLEM_STONE 10          /* Anzahl Steine in einem Steingolem */
+#define GOLEM_STONE  5          /* Anzahl Steine in einem Steingolem */
 
 typedef struct att {
 	int type;
