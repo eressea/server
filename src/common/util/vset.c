@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: vset.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: vset.c,v 1.3 2001/04/11 17:28:07 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -41,7 +41,7 @@ vset_destroy(vset * s)
 int
 vset_erase(vset * s, void *item)
 {
-	unsigned int i;
+	size_t i;
 
 	for (i = 0; i != s->size; ++i)
 		if (s->data[i] == item) {
@@ -51,10 +51,11 @@ vset_erase(vset * s, void *item)
 		}
 	return 0;
 }
+
 unsigned int
 vset_add(vset * s, void *item)
 {
-	unsigned int i;
+	size_t i;
 
 	if (!s->data) {
 		s->size = 0;
@@ -72,3 +73,35 @@ vset_add(vset * s, void *item)
 	++s->size;
 	return s->size - 1;
 }
+
+void *
+vset_pop(vset *s)
+{
+	if(s->size == 0) return NULL;
+	s->size--;
+	return data[s->size+1];
+}
+
+int
+vset_count(vset *s, void *item)
+{
+	size_t i;
+	int c = 0;
+	
+	for(i = 0; i != s->size; ++i) {
+		if(s->data[i] == item) c++;
+	}
+
+	return c;
+}
+
+void
+vset_concat(vset *to, vset *from)
+{
+	size_t i;
+
+	for(i=0; i != from->size; ++i) {
+		vset_add(to, from->data[i]);
+	}
+}
+

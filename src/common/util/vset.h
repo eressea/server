@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: vset.h,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: vset.h,v 1.3 2001/04/11 17:28:07 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -21,9 +21,12 @@ struct vset {
 	size_t size;
 	size_t maxsize;
 };
-void vset_init(vset * s);
-void vset_destroy(vset * s);
-unsigned int vset_add(vset * s, void *);
-int vset_erase(vset * s, void *);
+extern void vset_init(vset * s);
+extern void vset_destroy(vset * s);
+extern unsigned int vset_add(vset * s, void *);
+extern int vset_erase(vset * s, void *);
+extern int vset_count(vset *s, void *item);
+extern void *vset_pop(vset *s);
+extern void vset_concat(vset *to, vset *from);
 
 #endif
