@@ -1055,6 +1055,7 @@ movearound(int rx, int ry) {
 					break;
 				case 0x2:
 					make_ocean_block(rx, ry);
+					modified = 1;
 					ch = -9;
 					break;
 				case 'a': 

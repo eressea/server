@@ -1206,7 +1206,7 @@ showunits(region * r)
 				modified = 1;
 				if ((s = strchr(pointer->s, '('))!=NULL) {
 					s++;
-					f = atoi(s);
+					f = atoi36(s);
 					switch (pointer->s[0]) {
 					case '\002':
 						b = findbuilding(f);
@@ -1414,7 +1414,7 @@ showunits(region * r)
 							clipregion = r;
 							break;
 						case '\002':
-							f = atoi(s);
+							f = atoi36(s);
 							b = findbuilding(f);
 							for (x = r->units; x; x = x->next)
 								if (x->building == b && fval(x, FL_OWNER))

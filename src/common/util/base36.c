@@ -40,10 +40,11 @@ atoi36(const char * str)
 		if (isupper((int)*s)) i = i*36 + (*s)-'A' + 10;
 		else if (islower((int)*s)) i=i*36 + (*s)-'a' + 10;
 		else if (isdigit((int)*s)) i=i*36 + (*s)-'0';
-		else return 0;
+		else
+			break;
 		++s;
 	}
-	if (i<0 || (!isspace(*s) && *s!='\0')) return 0;
+	if (i<0) return 0;
 	return i;
 }
 

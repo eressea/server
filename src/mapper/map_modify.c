@@ -624,7 +624,7 @@ NeueBurg(region * r)
 
 	b = new_building(bt_find(oldbuildings[q]), r, NULL);
 
-	b->size = map_input(win, 2, 2, "Größe", 1, 999, 1);
+	b->size = map_input(win, 2, 2, "Grösse", 1, 99999, 1);
 
 	strcpy(buf, my_input(win, 2, 3, "Name: ", NULL));
 	if (strlen(buf) > 0)
