@@ -578,6 +578,8 @@ inner_world(region * r)
 }
 
 int maxregions = -1;
+int loadplane = 0;
+
 boolean dirtyload = false;
 
 enum {
@@ -843,6 +845,7 @@ readgame(boolean backup)
 		boolean skip = false;
 		int x = ri(F);
 		int y = ri(F);
+		plane * pl = findplane(x, y);
 
 		if (firstx && firsty) {
 			if (x!=firstx || y!=firsty) {
@@ -853,6 +856,7 @@ readgame(boolean backup)
 				if (rmax>0) rmax = min(n, rmax)-1;
 			}
 		}
+		if (loadplane && (!pl || pl->id!=loadplane)) skip = true;
 		if (rmax==0) {
 			if (dirtyload) break;
 			skip = true;
@@ -1037,7 +1041,7 @@ readgame(boolean backup)
 	if(findfaction(0)) {
 		findfaction(0)->alive = 1;
 	}
-	if (maxregions>=0) {
+	if (loadplane || maxregions>=0) {
 		remove_empty_factions(false);
 	}
 

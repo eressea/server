@@ -100,6 +100,8 @@ extern boolean nobattle;
 extern boolean nobattledebug;
 extern boolean dirtyload;
 
+extern int loadplane;
+
 extern void debug_messagetypes(FILE * out);
 extern void free_region(region * r);
 extern void render_init(void);
@@ -525,6 +527,9 @@ read_args(int argc, char **argv)
 			case 'v':
 				if (i<argc) orders = argv[++i];
 				else return usage(argv[0], argv[i]);
+				break;
+			case 'p':
+				loadplane = atoi(argv[++i]);
 				break;
 			case 'x':
 				maxregions = atoi(argv[++i]);
