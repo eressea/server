@@ -270,7 +270,7 @@ read_newfactions(const char * filename)
 	for (;;) {
 		faction * f = factions;
 		char race[20], email[64], lang[8];
-		newfaction * nf;
+		newfaction *nf;
 		int bonus;
 		/* email;race;locale;startbonus */
 		if (fscanf(F, "%s %s %s %d", email, race, lang, &bonus)<=0) break;
@@ -281,6 +281,10 @@ read_newfactions(const char * filename)
 			f = f->next;
 		}
 		if (f) continue; /* skip the ones we've already got */
+		for (nf=newfactions;nf;nf=nf->next) {
+			if (strcmp(nf->email, email)==0) break;
+		}
+		if (nf) continue;
 		nf = calloc(sizeof(newfaction), 1);
 		nf->email = strdup(email);
 		nf->race = rc_find(race);

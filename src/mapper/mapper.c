@@ -347,6 +347,18 @@ readfactions(void)
 	modified = 1;
 }
 
+int
+newbie_region(region * r)
+{
+	unit * u;
+	if (r==NULL || r->units==NULL) return 0;
+	for (u=r->units;u;u=u->next) {
+		if (u->faction->age>10) return 0;
+		if (u->faction->age==0) return 1;
+	}
+	return 0;
+}
+
 void
 drawmap(boolean maponly) {
 	int x, x1, y1, y2, s, q;
@@ -439,7 +451,7 @@ drawmap(boolean maponly) {
 					 (hl == -6 && fval(r, RF_MALLORN)) ||
 					 (hl == -7 && fval(r, RF_CHAOTIC)) ||
 					 (hl == -8 && is_cursed_internal(r->attribs, C_CURSED_BY_THE_GODS, 0)) ||
-					 (hl == -9 && r->units && r->units->faction->age==0) ||
+					 (hl == -9 && newbie_region(r)) ||
 					 (hl >= 0 && factionhere(r, hl)) ||
 					 (x==tx && y1==ty))
 					addch(rs | A_REVERSE);
