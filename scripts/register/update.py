@@ -12,7 +12,7 @@ db=MySQLdb.connect(db=dbname)
 cursor=db.cursor()
 
 matchrenum=re.compile(
-  r"""renum\s([^\s]+)\s(.*)\n""",
+  r"""\brenum\s([^\s]+)\s(.*)\n""",
   re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
 matchdropout=re.compile(

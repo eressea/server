@@ -5,11 +5,11 @@ import sys
 dbname=sys.argv[1]
 game=int(sys.argv[2])
 date=sys.argv[3]
-price=2.5
+price=1.25
 db=MySQLdb.connect(db=dbname)
 cursor=db.cursor()
 
-k = cursor.execute("SELECT users.id FROM users,subscriptions WHERE users.id=subscriptions.user and subscriptions.game="+str(game))
+k = cursor.execute("SELECT users.id FROM users, subscriptions WHERE users.id=subscriptions.user and subscriptions.status='ACTIVE' and subscriptions.game="+str(game))
 while k!=0:
     k=k-1
     user = int(cursor.fetchone()[0])
