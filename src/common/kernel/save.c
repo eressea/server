@@ -849,17 +849,15 @@ readgame(boolean backup)
 		pl->maxy = ri(F);
 		pl->flags = ri(F);
 		if (global.data_version>WATCHERS_VERSION) {
-			char * s = NULL;
-			rds(F, &s);
-			while (strcmp(s, "end")!=0) {
+			rs(F, buf);
+			while (strcmp(buf, "end")!=0) {
 				watcher * w = calloc(sizeof(watcher),1);
-				int fno = ri36(F);
+				int fno = atoi36(buf);
 				w->mode = (unsigned char)ri(F);
 				w->next = pl->watchers;
 				pl->watchers = w;
 				ur_add((void*)fno, (void**)&w->faction, resolve_faction);
 			}
-			free(s);
 		}
 		a_read(F, &pl->attribs);
 		addlist(&planes, pl);
