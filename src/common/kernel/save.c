@@ -1629,7 +1629,12 @@ readunit(FILE * F)
 		}
 	}
 	u->hp = ri(F);
-	/* assert(u->hp >= u->number); */
+	if (u->hp < u->number) {
+		log_error(("Einheit %s hat %u Personen, und %u Trefferpunkte\n", itoa36(u->no),
+				   u->number, u->hp));
+		u->hp=u->number;
+	}
+
 	if (global.data_version < MAGE_ATTRIB_VERSION) {
 		int i = ri(F);
 		if (i != -1){
