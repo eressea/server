@@ -2386,9 +2386,11 @@ movement(void)
           if (*up && (*up)->region!=r) {
             /* moved the upcoming unit along with u (units on ships or followers,
             * for example). must start from the beginning again immediately */
-            up = NULL;
+            up = &r->units;
+            repeat = false;
+          } else {
+            repeat = true;
           }
-          repeat = true;
         }
         /* else *up is already the next unit */
       }
