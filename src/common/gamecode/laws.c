@@ -3389,7 +3389,7 @@ processorders (void)
 	use();
 
 	puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (1.Versuch)");
-	do_misc(0);
+	do_misc(false);
 
 #ifdef ALLIANCES
 	puts(" - Testen der Allianzbedingungen");
@@ -3421,7 +3421,7 @@ processorders (void)
 	init_pool();
 
 	puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (2.Versuch)");
-	do_misc(1);
+	do_misc(false);
 
 	puts(" - Folge setzen");
 	follow();
@@ -3454,6 +3454,9 @@ processorders (void)
 
 	puts(" - Schiffe sinken");
  	sinkships();
+
+	puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (3.Versuch)");
+	do_misc(true);
 
 	puts(" - Bewegungen");
 	movement();

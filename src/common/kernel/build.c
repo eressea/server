@@ -1106,6 +1106,7 @@ entership(unit * u, ship * sh, const char * cmd, boolean lasttry)
 		if (lasttry) cmistake(u, cmd, 20, MSG_MOVE);
 		return false;
 	}
+	if (sh==u->ship) return true;
 	if (!mayboard(u, sh)) {
 		if (lasttry) cmistake(u, cmd, 34, MSG_MOVE);
 		return false;
@@ -1218,12 +1219,7 @@ do_misc(boolean lasttry)
 
 					case P_SHIP:
 						sh = getship(r);
-						if (entership(u, sh, S->s, lasttry)) {
-							/* Wenn wir hier angekommen sind, war der Befehl
-							 * erfolgreich und wir löschen ihn, damit er im
-							 * zweiten Versuch nicht nochmal ausgeführt wird. */
-							removelist(&u->orders, S);
-						}
+						entership(u, sh, S->s, lasttry);
 						break;
 
 					default:
