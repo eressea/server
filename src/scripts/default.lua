@@ -85,6 +85,14 @@ function process(orders)
     return -1
   end
 
+  -- Give out the rewards of the art contest
+  if get_gamename() == "Eressea" then
+    if get_flag("arts") == 0 then
+      require "artrewards.lua"
+      set_flag("arts")
+    end
+  end
+
   -- initialize starting equipment for new players
   -- probably not necessary, since mapper sets new players, not server
   add_equipment("conquesttoken", 1);
