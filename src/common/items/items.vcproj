@@ -136,9 +136,6 @@
 				RelativePath=".\items.h">
 			</File>
 			<File
-				RelativePath=".\lmsreward.h">
-			</File>
-			<File
 				RelativePath=".\questkeys.h">
 			</File>
 			<File
@@ -168,9 +165,6 @@
 		</File>
 		<File
 			RelativePath=".\items.c">
-		</File>
-		<File
-			RelativePath=".\lmsreward.c">
 		</File>
 		<File
 			RelativePath=".\questkeys.c">

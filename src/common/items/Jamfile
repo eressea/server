@@ -12,7 +12,6 @@ SOURCES =
  catapultammo.c
  demonseye.c
  items.c
- lmsreward.c
  questkeys.c
  racespoils.c
  seed.c

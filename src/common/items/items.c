@@ -15,7 +15,6 @@
 #include "items.h"
 
 #include "birthday_firework.h"
-#include "lmsreward.h"
 #include "demonseye.h"
 #include "xerewards.h"
 #include "artrewards.h"
@@ -32,7 +31,6 @@ register_items(void)
 {
 	register_weapons();
 	register_demonseye();
-	register_lmsreward();
 	register_xerewards();
 #if GROWING_TREES
 	register_seed();
