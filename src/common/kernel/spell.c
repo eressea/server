@@ -1550,10 +1550,10 @@ sp_create_irongolem(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double force = co->force;
-	/* hier fehlt noch ein wenig zufall */
-	int number = 1+(int)(force*8*RESOURCE_QUANTITY);
+  int number = lovar(force*8*RESOURCE_QUANTITY);
+  if (number<1) number = 1;
 
-	if (rterrain(r) == T_SWAMP){
+  if (rterrain(r) == T_SWAMP){
 		cmistake(mage, strdup(co->order), 188, MSG_MAGIC);
 		return 0;
 	}
@@ -1612,8 +1612,8 @@ sp_create_stonegolem(castorder *co)
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
-	double force = co->force;
-	int number = 1+(int)(force*5*RESOURCE_QUANTITY);
+  int number = lovar(co->force*5*RESOURCE_QUANTITY);
+  if (number<1) number = 1;
 
 	if (rterrain(r) == T_SWAMP){
 		cmistake(mage, strdup(co->order), 188, MSG_MAGIC);
@@ -8486,7 +8486,7 @@ spell spelldaten[] =
 	{SPL_UNHOLYPOWER, "unholypower", NULL,
 		NULL,
 		"u+",
-		M_CHAOS, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 10,
+		M_CHAOS, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 14,
 		{
 			{R_AURA, 10, SPC_LEVEL},
 			{R_PEASANTS, 5, SPC_LEVEL},
