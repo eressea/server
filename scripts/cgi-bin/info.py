@@ -231,7 +231,7 @@ def Save(custid, Password):
         game, sid, faction = cursor.fetchone()
         if Form.has_key("cancel_"+faction):
             update = db.cursor()
-	    update.execute("UPDATE subscriptions set status='CANCELLED' where id="+str(sid))
+	    update.execute("UPDATE subscriptions set status='CANCELLED' where id="+str(int(sid)))
 	elif Form.has_key("transfer_"+faction):
 	    newuser = int(Form["transfer_"+faction].value)
 	    TransferFaction(sid, faction, newuser, game)
@@ -242,7 +242,7 @@ def Save(custid, Password):
         game, sid, faction = cursor.fetchone()
         if Form.has_key("accept_"+faction):
             update = db.cursor()
-	    update.execute("UPDATE subscriptions set status='ACTIVE' where id="+str(sid))
+	    update.execute("UPDATE subscriptions set status='ACTIVE' where id="+str(int(sid)))
         nfactions = nfactions - 1
 
     nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='CANCELLED' and s.user="+str(custid) + " and s.game=g.id")
@@ -250,7 +250,7 @@ def Save(custid, Password):
         game, sid, faction = cursor.fetchone()
         if Form.has_key("activate_"+faction):
             update = db.cursor()
-	    update.execute("UPDATE subscriptions set status='ACTIVE' where id="+str(sid))
+	    update.execute("UPDATE subscriptions set status='ACTIVE' where id="+str(int(sid)))
         nfactions = nfactions - 1
 
     db.close()
