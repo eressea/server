@@ -25,12 +25,17 @@ extern "C" {
   typedef struct border {
     struct border_type * type; /* the type of this border */
     struct border * next; /* next border between these regions */
-    struct border * nexthash; /* for internal use only */
+    struct border * nexthash; /* next border between these regions */
     struct region * from, * to; /* borders can be directed edges */
     attrib * attribs;
     void * data;
     unsigned int id; /* unique id */
   } border;
+
+  typedef struct border_list {
+    struct border_list * next;
+    struct border * data;
+  } border_list;
 
   typedef struct border_type {
     const char* __name; /* internal use only */

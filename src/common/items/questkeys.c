@@ -51,18 +51,13 @@ use_questkey(struct unit * u, const struct item_type * itype, int amount, const 
 
 	r1   = findregion(43,-39);
 	r2   = findregion(44,-39);
-	key1 =  region_hashkey(r1);
-	key2 =  region_hashkey(r2);
+	bo = get_borders(r1, r2);
 
-	key = min(key2, key1) % BMAXHASH;
-
-	bo = borders[key];
-
-	while (bo && !((bo->from==r1 && bo->to==r2) || (bo->from==r2 && bo->to==r1))) {
+	while (bo!=NULL) {
 		if(bo->type == &bt_questportal) {
 			break;
 		}
-		bo = bo->nexthash;
+		bo = bo->next;
 	}
 
 	assert(bo != NULL);

@@ -477,32 +477,32 @@ fix_demand_region(region *r)
 static void
 fix_firewalls(void)
 {
-	region * r = regions;
-	while (r) {
-		direction_t d;
-		for (d=0;d!=MAXDIRECTIONS;++d) {
-			region * r2 = rconnect(r, d);
-			if (r2) {
-				border * b = get_borders(r, r2);
-				while (b) {
-					if (b->type==&bt_firewall) {
-						attrib * a = a_find(b->attribs, &at_countdown);
-						if (a==NULL || a->data.i <= 0) {
-							erase_border(b);
-							log_warning(("firewall between regions %s and %s was bugged. removed.\n",
-								regionid(r), regionid(r2)));
-							b = get_borders(r, r2);
-						} else {
-							b = b->next;
-						}
-					} else {
-						b = b->next;
-					}
-				}
-			}
-		}
-		r = r->next;
-	}
+  region * r = regions;
+  while (r) {
+    direction_t d;
+    for (d=0;d!=MAXDIRECTIONS;++d) {
+      region * r2 = rconnect(r, d);
+      if (r2) {
+        border * b = get_borders(r, r2);
+        while (b) {
+          if (b->type==&bt_firewall) {
+            attrib * a = a_find(b->attribs, &at_countdown);
+            if (a==NULL || a->data.i <= 0) {
+              erase_border(b);
+              log_warning(("firewall between regions %s and %s was bugged. removed.\n",
+                regionid(r), regionid(r2)));
+              b = get_borders(r, r2);
+            } else {
+              b = b->next;
+            }
+          } else {
+            b = b->next;
+          }
+        }
+      }
+    }
+    r = r->next;
+  }
 }
 
 extern attrib * make_atgmcreate(const struct item_type * itype);
@@ -1021,39 +1021,42 @@ extern border *borders[];
 static void
 fix_road_borders(void)
 {
-	border *delete[10000];
-	int hash;
-	int i = 0;
+  border *deleted[10000];
+  int hash;
+  int i = 0;
 
-	for(hash=0; hash<BMAXHASH; hash++) {
-		border * b;
-    for (b=borders[hash];b;b=b->next) {
-			if(b->type == &bt_road) {
-				int x1, x2, y1, y2;
-				region *r1, *r2;
+  for(hash=0; hash<BMAXHASH; hash++) {
+    border * bhash;
+    for (bhash=borders[hash];bhash;bhash=bhash->nexthash) {
+      border * b;
+      for (b=bhash;b;b=b->next) {
+        if (b->type == &bt_road) {
+          int x1, x2, y1, y2;
+          region *r1, *r2;
 
-				x1 = b->from->x;
-				y1 = b->from->y;
-				x2 = b->to->x;
-				y2 = b->to->y;
+          x1 = b->from->x;
+          y1 = b->from->y;
+          x2 = b->to->x;
+          y2 = b->to->y;
 
-				r1 = findregion(x1, y1);
-				r2 = findregion(x2, y2);
+          r1 = findregion(x1, y1);
+          r2 = findregion(x2, y2);
 
-				if(r1->land == NULL || r2->land == NULL
-						|| terrain[r1->terrain].roadreq == 0
-						|| terrain[r2->terrain].roadreq == 0) {
-					delete[i] = b;
-					i++;
-				}
-			}
-		}
-	}
+          if (r1->land == NULL || r2->land == NULL
+            || terrain[r1->terrain].roadreq == 0
+            || terrain[r2->terrain].roadreq == 0) 
+          {
+            deleted[i++] = b;
+          }
+        }
+      }
+    }
+  }
 
-	while(i>0) {
-		i--;
-		erase_border(delete[i]);
-	}
+  while (i>0) {
+    i--;
+    erase_border(deleted[i]);
+  }
 }
 
 #ifdef WDW_PHOENIX

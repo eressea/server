@@ -271,6 +271,7 @@ static void
 unit_addorder(unit& u, const char * str)
 {
   addstrlist(&u.orders, str);
+  u.faction->lastorders = turn;
 }
 
 static void

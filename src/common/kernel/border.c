@@ -42,14 +42,17 @@ free_borders(void)
 border *
 find_border(unsigned int id)
 {
-	int key;
-	for (key=0;key!=BMAXHASH;key++) {
-		border * b;
-		for (b=borders[key];b;b=b->next) {
-			if (b->id==id) return b;
-		}
-	}
-	return NULL;
+  int key;
+  for (key=0;key!=BMAXHASH;key++) {
+    border * bhash;
+    for (bhash=borders[key];bhash!=NULL;bhash=bhash->nexthash) {
+      border * b;
+      for (b=bhash;b;b=b->next) {
+        if (b->id==id) return b;
+      }
+    }
+  }
+  return NULL;
 }
 
 void *
@@ -195,33 +198,39 @@ attrib_type at_countdown = {
 void
 age_borders(void)
 {
-	int i;
+  border_list * deleted = NULL;
+  int i;
 
-	for (i=0;i!=BMAXHASH;++i) {
-		border ** bp = &borders[i];
-		while (*bp) {
-			border * b = *bp;
-			attrib ** ap = &b->attribs;
-			while (*ap) {
-				attrib * a = *ap;
-				if (a->type->age && a->type->age(a)==0) {
-					if (a->type == &at_countdown) {
-						erase_border(b);
-						b = NULL;
-						/* bp bleibt, wie es ist, da der
-						 * nächste border nun hier drin steht. */
-						break;
-					}
-					a_remove(ap, a);
-				}
-				else ap=&a->next;
-			}
-      if (b!=NULL) {
-        /* bei löschung zeigt bp bereits auf den nächsten */
-        bp=&b->nexthash;
+  for (i=0;i!=BMAXHASH;++i) {
+    border * bhash = borders[i];
+    for (;bhash;bhash=bhash->nexthash) {
+      border * b = bhash;
+      for (;b;b=b->next) {
+        attrib ** ap = &b->attribs;
+        while (*ap) {
+          attrib * a = *ap;
+          if (a->type->age && a->type->age(a)==0) {
+            if (a->type == &at_countdown) {
+              border_list * bnew = malloc(sizeof(border_list));
+              bnew->next = deleted;
+              bnew->data = b;
+              deleted = bnew;
+              break;
+            }
+            a_remove(ap, a);
+          }
+          else ap=&a->next;
+        }
       }
-		}
-	}
+    }
+  }
+  while (deleted) {
+    border_list * blist = deleted;
+    border * b = blist->data;
+    erase_border(b);
+    deleted = blist->next;
+    free(deleted);
+  }
 }
 
 /********
@@ -464,16 +473,18 @@ write_borders(FILE * f)
 {
   int i;
   for (i=0;i!=BMAXHASH;++i) {
-    border * b;
-    for (b=borders[i];b;b=b->nexthash) {
-      if (b->type->valid && !b->type->valid(b)) continue;
-      fprintf(f, "%s %d %d %d %d %d ", b->type->__name, b->id, b->from->x, b->from->y, b->to->x, b->to->y);
-      if (b->type->write) b->type->write(b, f);
-      putc('\n', f);
+    border * bhash;
+    for (bhash=borders[i];bhash;bhash=bhash->nexthash) {
+      border * b;
+      for (b=bhash;b!=NULL;b=b->next) {
+        if (b->type->valid && !b->type->valid(b)) continue;
+        fprintf(f, "%s %d %d %d %d %d ", b->type->__name, b->id, b->from->x, b->from->y, b->to->x, b->to->y);
+        if (b->type->write) b->type->write(b, f);
 #if	RELEASE_VERSION>BORDER_VERSION
-      a_write(f, b->attribs);
-      putc('\n', f);
+        a_write(f, b->attribs);
 #endif
+        putc('\n', f);
+      }
     }
   }
   fputs("end", f);
