@@ -28,6 +28,6 @@ bind_spell(lua_State * L)
     class_<struct spell>("spell")
       .def_readonly("name", &spell::sname)
       .def_readonly("level", &spell::level)
-      .def("school", &spell_getschool)
+      .property("school", &spell_getschool)
   ];
 }
