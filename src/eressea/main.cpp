@@ -76,10 +76,10 @@
 #include <item.h>
 
 /* util includes */
-#include <rand.h>
-#include <log.h>
-#include <sql.h>
-#include <base36.h>
+#include <util/rand.h>
+#include <util/log.h>
+#include <util/sql.h>
+#include <util/base36.h>
 
 /* lua includes */
 #include "lua/bindings.h"
@@ -561,7 +561,6 @@ usage(const char * prog, const char * arg)
 		"-o reportdir     : gibt das reportverzeichnis an\n"
 		"-l logfile       : specify an alternative logfile\n"
 		"-R               : erstellt nur die Reports neu\n"
-		"--noeiswald      : beruhigt ungemein\n"
 		"--nomsg          : keine Messages (RAM sparen)\n"
 		"--nobattle       : keine Kämpfe\n"
 		"--nomonsters     : keine monster KI\n"
@@ -657,7 +656,6 @@ read_args(int argc, char **argv, lua_State * luaState)
 			case 'v':
         if (i<argc) {
           orders = argv[++i];
-          setLuaString(luaState, "orderfile", orders);
         } else {
           return usage(argv[0], argv[i]);
         }
@@ -701,7 +699,15 @@ read_args(int argc, char **argv, lua_State * luaState)
 				usage(argv[0], argv[i]);
 		}
 	}
-	return 0;
+
+  /* add some more variables to the lua globals */
+  setLuaString(luaState, "datapath", datapath());
+  setLuaString(luaState, "basepath", basepath());
+  setLuaString(luaState, "reportpath", reportpath());
+  setLuaString(luaState, "resourcepath", resourcepath());
+  setLuaString(luaState, "orderfile", orders);
+
+  return 0;
 }
 
 #ifdef BETA_CODE

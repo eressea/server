@@ -1,13 +1,13 @@
 <eressea>
-	<include file="messages.xml"></include>
-
-	<include file="vinyambar/de/strings.xml"></include>
-	<include file="vinyambar/wdw-races.xml"></include>
-	<include file="vinyambar/wdw-resources.xml"></include>
-
 	<comment>Localization</comment>
+	<comment>Strings MUST always be read first</comment>
+	<include file="vinyambar/de/strings.xml"></include>
 	<include file="de/strings.xml"></include>
 	<include file="en/strings.xml"></include>
+	<include file="messages.xml"></include>
+
+	<include file="vinyambar/wdw-races.xml"></include>
+	<include file="vinyambar/wdw-resources.xml"></include>
 
 	<include file="races.xml"></include>
 	<include file="resources.xml"></include>

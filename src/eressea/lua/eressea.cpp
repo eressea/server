@@ -10,11 +10,17 @@
 #include <kernel/save.h>
 #include <kernel/unit.h>
 #include <util/language.h>
+#ifdef ALLIANCES
+# include <modules/alliance.h>
+#endif
 
 // lua includes
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
+
+// util includes
+#include <util/base36.h>
 
 using namespace luabind;
 
@@ -64,6 +70,8 @@ void
 bind_eressea(lua_State * L)
 {
   module(L)[
+    def("atoi36", &atoi36),
+    def("itoa36", &itoa36),
     def("read_game", &read_game),
     def("write_game", &write_game),
     def("write_passwords", &writepasswd),

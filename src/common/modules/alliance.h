@@ -44,6 +44,8 @@ extern void setalliance(struct faction * f, alliance * al);
 extern void alliancejoin(void);
 extern void alliancekick(void);
 extern void alliancevictory(void);
+
+extern int victorycondition(const alliance * al, const char * name);
 /* execute commands */
 
 #ifdef __cplusplus

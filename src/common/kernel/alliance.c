@@ -17,18 +17,22 @@
 #include "alliance.h"
 #include "command.h"
 
+#include <attributes/key.h>
+
 /* kernel includes */
-#include <building.h>
-#include <faction.h>
-#include <message.h>
-#include <region.h>
-#include <unit.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/message.h>
+#include <kernel/region.h>
+#include <kernel/unit.h>
+#include <kernel/item.h>
 
 /* util includes */
 #include <umlaut.h>
 #include <base36.h>
 
 /* libc includes */
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -276,4 +280,54 @@ alliancevictory(void)
 		al = al->next;
 	}
 }
+
+int
+victorycondition(const alliance * al, const char * name)
+{
+  const char * gems[] = { "opal", "diamond", "zaphire", "topaz", "beryl", "agate", "garnet", "emerald", NULL };
+  if (strcmp(name, "gems")==0) {
+    const char ** igem = gems;
+
+    for (;*igem;++igem) {
+      const struct item_type * itype = it_find(*igem);
+      faction_list * flist = al->members;
+      boolean found = false;
+
+      assert(itype!=NULL);
+      for (;flist && !found;flist=flist->next) {
+        unit * u = flist->data->units;
+
+        for (;u;u=u->nextF) {
+          if (i_get(u->items, itype)>0) {
+            found = true;
+            break;
+          }
+        }
+      }
+      if (!found) return 0;
+    }
+    return 1;
+  } else if (strcmp(name, "phoenix")==0) {
+    faction_list * flist = al->members;
+    for (;flist;flist=flist->next) {
+      faction * f = flist->data;
+      if (find_key(f->attribs, atoi36("phnx"))) {
+        return 1;
+      }
+    }
+    return 0;
+  } else if (strcmp(name, "pyramid")==0) {
+    faction_list * flist = al->members;
+    for (;flist;flist=flist->next) {
+      faction * f = flist->data;
+      if (find_key(f->attribs, atoi36("pyra"))) {
+        return 1;
+      }
+    }
+    return 0;
+  }
+  return -1;
+}
+
+
 #endif
