@@ -891,6 +891,7 @@ typedef struct skillvalue {
 #define FL_TAKEALL				(1<<25) /* Einheit nimmt alle Gegenstände an */
 #define FL_UNNAMED				(1<<26) /* Partei/Einheit/Gebäude/Schiff ist unbenannt */
 #define FL_RESTARTED				(1<<27) /* Partei hat schon einen Neustart gemacht */
+																		/* no longer used, may contain old data! */
 
 /* Flags, die gespeichert werden sollen: */
 #ifdef NOAID

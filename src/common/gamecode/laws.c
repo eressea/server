@@ -224,7 +224,6 @@ restart(unit *u, const race * rc)
 	strlist ** o=&u->orders;
 
 	f->magiegebiet = u->faction->magiegebiet;
-	fset(f, FL_RESTARTED);
 	f->options = u->faction->options;
 	freestrlist(nu->orders);
 	nu->orders = u->orders;
@@ -1072,28 +1071,40 @@ quit(void)
 							   factionid(u->faction), S->s);
 					}
 				} else if(igetkeyword(S->s, u->faction->locale) == K_RESTART && u->number > 0) {
+					char *s_race,*s_pass;
+
 					if (!landregion(rterrain(r))) {
 						cmistake(u, S->s, 242, MSG_EVENT);
 						continue;
 					}
-					if (fval(u->faction, FL_RESTARTED)) {
-						/* schon einmal neustart gemacht */
-						return;
-					}
-					frace = findrace(getstrtoken(), u->faction->locale);
-					if (!frace && u->faction->age < 100) {
+					s_race = getstrtoken();
+					frace = findrace(s_race, u->faction->locale);
+
+					if (!frace) {
 						frace = u->faction->race;
-					} else if (frace == NULL || !playerrace(frace)) {
+						s_pass = s_race;
+					} else {
+						s_pass = getstrtoken();
+					}
+						
+					if(frace != u->faction->race) {
+						if(u->faction->age < 81) {
+							cmistake(u, S->s, 241, MSG_EVENT);
+							continue;
+						}
+					} else {
+						if(u->faction->age < 9) {
+							cmistake(u, S->s, 305, MSG_EVENT);
+							continue;
+						}
+					}
+
+					if (!playerrace(frace)) {
 						cmistake(u, S->s, 243, MSG_EVENT);
 						continue;
 					}
 
-					if (frace == NULL || !playerrace(frace)) {
-						cmistake(u, S->s, 243, MSG_EVENT);
-						continue;
-					}
-
-					if (strcasecmp(getstrtoken(), u->faction->passw)) {
+					if (strcasecmp(s_pass, u->faction->passw)) {
 						cmistake(u, S->s, 86, MSG_EVENT);
 						printf("  Warnung: NEUSTART mit falschem Passwort für Partei %s: %s\n",
 							   factionid(u->faction), S->s);
