@@ -1144,7 +1144,13 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 		fprintf(F, "%d;Anzahl Immigranten\n", count_migrants(f));
 		fprintf(F, "%d;Max. Immigranten\n", count_maxmigrants(f));
 	}
-	fprintf(F, "\"%s\";Parteiname\n", f->name);
+
+  i = countheroes(f);
+  if (i>0) fprintf(F, "%d;heroes\n", i);
+  i = maxheroes(f);
+  if (i>0) fprintf(F, "%d;max_heroes\n", i);
+
+  fprintf(F, "\"%s\";Parteiname\n", f->name);
 	fprintf(F, "\"%s\";email\n", f->email);
 	fprintf(F, "\"%s\";banner\n", f->banner);
 	fputs("OPTIONEN\n", F);

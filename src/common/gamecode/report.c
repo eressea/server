@@ -2054,6 +2054,14 @@ report(FILE *F, faction * f, const faction_list * addresses,
 			count_migrants(f), maxmig);
 		centre(F, buf, true);
 	}
+  {
+    int maxh = maxheroes(f);
+    if (maxh) {
+      sprintf(buf, "Deine Partei hat %d Helden und kann maximal %d Helden ernennen.",
+        countheroes(f), maxh);
+      centre(F, buf, true);
+    }
+  }
 
 	if (f->age > 1 && f->lastorders != turn) {
 		rnl(F);
