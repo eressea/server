@@ -1256,6 +1256,8 @@ count_enemies(side * as, int mask, int minrow, int maxrow)
 	int i = 0;
 	void **si;
 
+	if (maxrow<FIRST_ROW) return 0;
+
 	for (si = b->sides.begin; si != b->sides.end; ++si) {
 		side *side = *si;
 		if (enemy(side, as))
@@ -1376,7 +1378,6 @@ do_combatmagic(battle *b, combatmagic_t was)
 	void **fi;
 	spell *sp;
 	fighter *fig;
-	unit *mage;
 	region *r = b->region;
 	castorder *co;
 	castorder *cll[MAX_SPELLRANK];
@@ -1389,64 +1390,65 @@ do_combatmagic(battle *b, combatmagic_t was)
 	}
 
 	for (fi = b->fighters.begin; fi != b->fighters.end; ++fi) {
-		fig = *fi;
-		mage = fig->unit;
+		fighter * fig = *fi;
+		unit * mage = fig->unit;
+		int row = get_unitrow(fig);
 
-		if (fig->alive > 0) { /* fighter kann im Kampf getötet worden sein */
+		if (row>BEHIND_ROW) continue;
+		if (fig->alive <= 0) continue; /* fighter kann im Kampf getötet worden sein */
 
-			level = eff_skill(mage, SK_MAGIC, r);
-			if (level > 0) {
-				char cmd[128];
+		level = eff_skill(mage, SK_MAGIC, r);
+		if (level > 0) {
+			char cmd[128];
 
-				switch(was) {
-				case DO_PRECOMBATSPELL:
-					sp = get_combatspell(mage, 0);
-					sl = get_combatspelllevel(mage, 0);
-					break;
-				case DO_POSTCOMBATSPELL:
-					sp = get_combatspell(mage, 2);
-					sl = get_combatspelllevel(mage, 2);
-					break;
-				default:
-					/* Fehler! */
-					return;
-				}
-				if (sp == NULL)
-					continue;
-
-				snprintf(cmd, 128, "ZAUBER %s", sp->name);
-
-				if (cancast(mage, sp, 1, 1, cmd) == false)
-					continue;
-
-				level = eff_spelllevel(mage, sp, level, 1);
-				if (sl > 0) level = min(sl, level);
-				if (level < 0) {
-					sprintf(buf, "%s versucht %s zu zaubern, doch der Zauber schlägt "
-							"fehl!", unitname(mage), sp->name);
-					battlerecord(b, buf);
-					continue;
-				}
-
-				power = spellpower(r, mage, sp, level);
-				if (power <= 0) {	/* Effekt von Antimagie */
-					sprintf(buf, "%s versucht %s zu zaubern, doch der Zauber schlägt "
-							"fehl!", unitname(mage), sp->name);
-					battlerecord(b, buf);
-					continue;
-				}
-
-				if (fumble(r, mage, sp, sp->level) == true) {
-					sprintf(buf, "%s versucht %s zu zaubern, doch der Zauber schlägt "
-							"fehl!", unitname(mage), sp->name);
-					battlerecord(b, buf);
-					pay_spell(mage, sp, level, 1);
-					continue;
-				}
-
-				co = new_castorder(fig, 0, sp, r, level, power, 0, 0, 0);
-				add_castorder(&cll[(int)(sp->rank)], co);
+			switch(was) {
+			case DO_PRECOMBATSPELL:
+				sp = get_combatspell(mage, 0);
+				sl = get_combatspelllevel(mage, 0);
+				break;
+			case DO_POSTCOMBATSPELL:
+				sp = get_combatspell(mage, 2);
+				sl = get_combatspelllevel(mage, 2);
+				break;
+			default:
+				/* Fehler! */
+				return;
 			}
+			if (sp == NULL)
+				continue;
+
+			snprintf(cmd, 128, "ZAUBER %s", sp->name);
+
+			if (cancast(mage, sp, 1, 1, cmd) == false)
+				continue;
+
+			level = eff_spelllevel(mage, sp, level, 1);
+			if (sl > 0) level = min(sl, level);
+			if (level < 0) {
+				sprintf(buf, "%s versucht %s zu zaubern, doch der Zauber schlägt "
+						"fehl!", unitname(mage), sp->name);
+				battlerecord(b, buf);
+				continue;
+			}
+
+			power = spellpower(r, mage, sp, level);
+			if (power <= 0) {	/* Effekt von Antimagie */
+				sprintf(buf, "%s versucht %s zu zaubern, doch der Zauber schlägt "
+						"fehl!", unitname(mage), sp->name);
+				battlerecord(b, buf);
+				continue;
+			}
+
+			if (fumble(r, mage, sp, sp->level) == true) {
+				sprintf(buf, "%s versucht %s zu zaubern, doch der Zauber schlägt "
+						"fehl!", unitname(mage), sp->name);
+				battlerecord(b, buf);
+				pay_spell(mage, sp, level, 1);
+				continue;
+			}
+
+			co = new_castorder(fig, 0, sp, r, level, power, 0, 0, 0);
+			add_castorder(&cll[(int)(sp->rank)], co);
 		}
 	}
 	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
@@ -1471,8 +1473,8 @@ do_combatmagic(battle *b, combatmagic_t was)
 }
 
 
-void
-do_combatspell(troop at)
+static void
+do_combatspell(troop at, int row)
 {
 	spell *sp;
 	fighter *fi = at.fighter;
@@ -1484,6 +1486,8 @@ do_combatspell(troop at)
 	void **mg;
 	int sl;
 	char cmd[128];
+
+	if (row>BEHIND_ROW) return;
 
 	sp = get_combatspell(mage, 1);
 	if (sp == NULL) {
@@ -1851,7 +1855,7 @@ attack(battle *b, troop ta, const att *a)
 	fighter *af = ta.fighter;
 	troop td;
 	unit *au = af->unit;
-	int row = get_unitrow(af) - 1;
+	int row = get_unitrow(af);
 
 	switch(a->type) {
 	case AT_STANDARD:		/* Waffen, mag. Gegenstände, Kampfzauber */
@@ -1860,7 +1864,7 @@ attack(battle *b, troop ta, const att *a)
 			/* Magier versuchen immer erstmal zu zaubern, erst wenn das
 			 * fehlschlägt, wird af->magic == 0 und  der Magier kämpft
 			 * konventionell weiter */
-			do_combatspell(ta);
+			do_combatspell(ta, row);
 		} else {
 			weapon * wp;
 
@@ -1873,7 +1877,7 @@ attack(battle *b, troop ta, const att *a)
 				boolean standard_attack = true;
 				if (wp && wp->type->attack) {
 					int dead;
-					standard_attack = wp->type->attack(&ta, &dead);
+					standard_attack = wp->type->attack(&ta, &dead, row);
 					af->catmsg += dead;
 					/* TODO: dies hier ist nicht richtig. wenn die katapulte/etc.
 					 * keinen gegner gefunden haben, sollte es nicht erhöht werden.
@@ -1886,9 +1890,10 @@ attack(battle *b, troop ta, const att *a)
 				}
 				if (standard_attack) {
 					boolean missile = false;
+					int offset = row-FIGHT_ROW;
 					if (wp && fval(wp->type, WTF_MISSILE)) missile=true;
-					if (missile) td = select_enemy(af, missile_range[0]-row, missile_range[1]-row);
-					else td = select_enemy(af, melee_range[0]-row, melee_range[1]-row);
+					if (missile) td = select_enemy(af, missile_range[0]-offset, missile_range[1]-offset);
+					else td = select_enemy(af, melee_range[0]-offset, melee_range[1]-offset);
 					if (!td.fighter) return;
 
 					if(td.fighter->person[td.index].last_action < b->turn) {
@@ -1920,7 +1925,7 @@ attack(battle *b, troop ta, const att *a)
 		do_extra_spell(ta, a);
 		break;
 	case AT_NATURAL:
-		td = select_enemy(af, FIGHT_ROW-row, FIGHT_ROW-row);
+		td = select_enemy(af, row, row);
 		if (!td.fighter) return;
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
@@ -1935,7 +1940,7 @@ attack(battle *b, troop ta, const att *a)
 		}
 		break;
 	case AT_DRAIN_ST:
-		td = select_enemy(af, FIGHT_ROW-row, FIGHT_ROW-row);
+		td = select_enemy(af, row, row);
 		if (!td.fighter) return;
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
@@ -1958,7 +1963,7 @@ attack(battle *b, troop ta, const att *a)
 		}
 		break;
 	case AT_DRAIN_EXP:
-		td = select_enemy(af, FIGHT_ROW-row, FIGHT_ROW-row);
+		td = select_enemy(af, row, row);
 		if (!td.fighter) return;
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
@@ -1973,7 +1978,7 @@ attack(battle *b, troop ta, const att *a)
 		}
 		break;
 	case AT_DAZZLE:
-		td = select_enemy(af, FIGHT_ROW-row, FIGHT_ROW-row);
+		td = select_enemy(af, row, row);
 		if (!td.fighter) return;
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
@@ -1988,7 +1993,7 @@ attack(battle *b, troop ta, const att *a)
 		}
 		break;
 	case AT_STRUCTURAL:
-		td = select_enemy(af, FIGHT_ROW-row, FIGHT_ROW-row);
+		td = select_enemy(af, row, row);
 		if (!td.fighter) return;
 		if(ta.fighter->person[ta.index].last_action < b->turn) {
 			ta.fighter->person[ta.index].last_action = b->turn;

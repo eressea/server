@@ -145,24 +145,25 @@ static weapondata weapontable[WP_MAX + 1] =
 weapon_type * oldweapontype[WP_MAX];
 
 static boolean
-attack_firesword(const troop * at, int *casualties)
+attack_firesword(const troop * at, int *casualties, int row)
 {
 	fighter *fi = at->fighter;
 	troop dt;
 	/* Immer aus der ersten Reihe nehmen */
 	int minrow = FIGHT_ROW;
 	int maxrow = FIGHT_ROW;
-	int enemies;
+	int enemies = 0;
 	int killed = 0;
 	const char *damage = "2d8";
 	int force  = 1+rand()%10;
 
-	enemies = count_enemies(fi->side, FS_ENEMY,
-		minrow, maxrow);
-
+	if (row==FIGHT_ROW) {
+		enemies = count_enemies(fi->side, FS_ENEMY,
+			minrow, maxrow);
+	}
 	if (!enemies) {
 		if (casualties) *casualties = 0;
-		return false; /* if no enemy found, no use doing standarad attack */
+		return true; /* if no enemy found, no use doing standarad attack */
 	}
 
 	if (fi->catmsg == -1) {
@@ -187,7 +188,7 @@ attack_firesword(const troop * at, int *casualties)
 }
 
 static boolean
-attack_catapult(const troop * at, int * casualties)
+attack_catapult(const troop * at, int * casualties, int row)
 {
 	fighter *af = at->fighter;
 	unit *au = af->unit;
@@ -196,8 +197,11 @@ attack_catapult(const troop * at, int * casualties)
 	int d = 0, n;
 	int minrow, maxrow;
 	weapon * wp = af->person[at->index].weapon;
-	assert(wp->type->itype==olditemtype[I_CATAPULT]);
 
+	assert(row>=FIGHT_ROW);
+	if (row>BEHIND_ROW) return false; /* keine weiteren attacken */
+
+	assert(wp->type->itype==olditemtype[I_CATAPULT]);
 
 	assert (af->person[at->index].reload==0);
 	if (af->catmsg == -1) {
@@ -233,7 +237,7 @@ attack_catapult(const troop * at, int * casualties)
 	}
 
 	if (casualties) *casualties = d;
-	return false;
+	return false; /* keine weitren attacken */
 }
 
 

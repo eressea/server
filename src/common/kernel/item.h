@@ -193,7 +193,7 @@ typedef struct weapon_type {
 	int reload; /* time to reload this weapon */
 	weapon_mod * modifiers;
 	/* --- functions --- */
-	boolean (*attack)(const struct troop *, int *deaths);
+	boolean (*attack)(const struct troop *, int *deaths, int row);
 	/* --- pointers --- */
 	struct weapon_type * next;
 } weapon_type;
