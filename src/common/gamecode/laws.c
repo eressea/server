@@ -101,19 +101,6 @@ extern int * age;
 boolean nobattle = false;
 /* ------------------------------------------------------------- */
 
-static const char *
-dbrace(const struct race * rc)
-{
-  static char zText[32];
-  unsigned char * zPtr = (unsigned char*)zText;
-  strcpy(zText, LOC(find_locale("en"), rc_name(rc, 0)));
-  while (*zPtr) {
-    *zPtr = (unsigned char)toupper(*(int*)zPtr); 
-    ++zPtr;
-  }
-  return zText;
-}
-
 static void
 restart(unit *u, const race * rc)
 {

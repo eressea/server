@@ -587,8 +587,8 @@ confirm_newbies(void)
 	while (f) {
 		if (!fval(f, FFL_DBENTRY)) {
       if (f->subscription) {
-        fprintf(sqlstream, "UPDATE subscriptions SET status='ACTIVE', faction='%s' WHERE id=%u;\n", itoa36(f->no), f->subscription);
-  			fset(f, FFL_DBENTRY);
+        fprintf(sqlstream, "UPDATE subscriptions SET status='ACTIVE', faction='%s', race='%s' WHERE id=%u;\n", itoa36(f->no), dbrace(f->race), f->subscription);
+		  fset(f, FFL_DBENTRY);
       }
     }
 		f = f->next;
