@@ -27,8 +27,9 @@ if $(HAVE_LUA) {
   main.cpp
   ;
 
- LINKLIBS on eressea += -llua50 -llualib50 ;
- LINKLIBS on eressea += -lluabind ;
+ LINKLIBS on $(BINARY) += -llua50 -llualib50 ;
+ LINKLIBS on $(BINARY) += -lluabind ;
+ LINKLIBS on $(BINARY) += -ldl -lstdc++ ;
 } else {
  BINARY = eressea ;
  SOURCES = main.c ;
