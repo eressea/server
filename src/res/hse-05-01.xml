@@ -38,7 +38,6 @@
   <xi:include href="eressea/de/strings.xml"/>
   <xi:include href="eressea/en/strings.xml"/>
   <xi:include href="eressea/races.xml"/>
-  <xi:include href="eressea/items.xml"/>
   <xi:include href="eressea/items-hse05.xml"/>
   <xi:include href="eressea/dungeons.xml"/>
   <xi:include href="eressea/temple.xml"/>
