@@ -95,6 +95,7 @@ ntimespprob(int n, double p, double mod)
 boolean
 chance(double x)
 {
+  if (x>=1.0) return true;
 	return (boolean) (rand() % RAND_MAX < RAND_MAX * x);
 }
 

@@ -3321,7 +3321,7 @@ sp_deathcloud(castorder *co)
 		/* Jede Person verliert 18 HP */
 		damage = 18 * u->number;
 		/* Reduziert durch Magieresistenz */
-		damage *= (100.0 - magic_resistance(u))/100.0;
+		damage *= (1.0 - magic_resistance(u));
 		change_hitpoints(u, -(int)damage);
 	}
 

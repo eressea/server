@@ -297,7 +297,7 @@ extern void plagues(struct region * r, boolean ismagic);
 /** Monster */
 
 /* Chance für Monsterangriff */
-#define MONSTERATTACK  40
+#define MONSTERATTACK  0.4
 
 /** Gebäude */
 /* Chance für Einsturz bei unversorgtem Gebaeude */

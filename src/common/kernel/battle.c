@@ -1152,7 +1152,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 		double res = 1.0;
 
 		/* magic_resistance gib x% Resistenzbonus zurück */
-		res -= (double)((double)magic_resistance(du)/100.0)*3.0;
+		res -= magic_resistance(du)*3.0;
 
 		if (du->race->battle_flags & BF_EQUIPMENT) {
 #ifdef TODO_RUNESWORD
@@ -1433,7 +1433,6 @@ do_combatmagic(battle *b, combatmagic_t was)
 {
 	void **fi;
 	spell *sp;
-	fighter *fig;
 	region *r = b->region;
 	castorder *co;
 	castorder *cll[MAX_SPELLRANK];
@@ -3838,7 +3837,7 @@ damage_unit(unit *u, const char *dam, boolean armor, boolean magic)
 	/* Schaden */
 	for (i=0; i<u->number; i++) {
 		int damage = dice_rand(dam);
-		if (magic) damage = (int)(damage * (100.0 - magic_resistance(u))/100.0);
+		if (magic) damage = (int)(damage * (1.0 - magic_resistance(u)));
 		if (armor) damage -= nb_armor(u, i);
 		hp[i] -= damage;
 	}

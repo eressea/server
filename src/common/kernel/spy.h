@@ -35,8 +35,8 @@ void spy(struct region * r, struct unit * u);
 void sabotage(struct region * r, struct unit * u);
 void spy_message(int spy, struct unit *u, struct unit *target);
 
-#define OCEAN_SWIMMER_CHANCE 10
-#define CANAL_SWIMMER_CHANCE 90
+#define OCEAN_SWIMMER_CHANCE 0.1
+#define CANAL_SWIMMER_CHANCE 0.9
 
 #ifdef __cplusplus
 }

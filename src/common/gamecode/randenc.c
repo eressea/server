@@ -1213,22 +1213,22 @@ randomevents(void)
 	for (r = regions; r; r = r->next) {
 		if (fval(r, RF_ORCIFIED)) {
 			direction_t dir;
-			int chance = 0;
+			double probability = 0.0;
 			for (dir = 0; dir < MAXDIRECTIONS; dir++) {
 				region *rc = rconnect(r, dir);
-				if (rc && rpeasants(rc) > 0 && !fval(rc, RF_ORCIFIED)) chance += 2;
+				if (rc && rpeasants(rc) > 0 && !fval(rc, RF_ORCIFIED)) probability += 0.02;
 			}
-			if (rand()%100 < chance) {
+			if (chance(probability)) {
 				ADDMSG(&r->msgs, msg_message("deorcified", "region", r));
 				freset(r, RF_ORCIFIED);
 			}
 		} else {
 			attrib *a = a_find(r->attribs, &at_orcification);
 			if (a!=NULL) {
-				int chance = 0;
+				double probability = 0.0;
 				if (rpeasants(r) <= 0) continue;
-				chance = (a->data.i*100)/rpeasants(r);
-				if (rand()%100 < chance) {
+				probability = a->data.i/(double)rpeasants(r);
+				if (chance(probability)) {
 					fset(r, RF_ORCIFIED);
 					a_remove(&r->attribs, a);
 					ADDMSG(&r->msgs, msg_message("orcified", "region", r));

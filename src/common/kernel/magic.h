@@ -146,6 +146,15 @@ struct spell_ptr {
 
 /* typedef struct fighter fighter; */
 
+/* irgendwelche zauber: */
+typedef void (*spell_f) (void*);
+/* normale zauber: */
+typedef int (*nspell_f)(castorder*);
+/* kampfzauber: */
+typedef int (*cspell_f) (struct fighter*, int, double, struct spell * sp);
+/* zauber-patzer: */
+typedef void (*pspell_f) (castorder *);
+
 typedef struct spell {
 	spellid_t id;
 	const char *sname;
@@ -157,7 +166,7 @@ typedef struct spell {
 	char rank;  /* Reihenfolge der Zauber */
 	int level;  /* Stufe des Zaubers */
 	resource_t komponenten[MAXINGREDIENT][3];
-	void (*sp_function) (void*);
+	spell_f sp_function;
 	void (*patzer) (castorder*);
 } spell;
 
@@ -181,15 +190,6 @@ struct castorder {
 };
 
 /* ------------------------------------------------------------- */
-
-/* irgendwelche zauber: */
-typedef void (*spell_f) (void*);
-/* normale zauber: */
-typedef int (*nspell_f)(castorder*);
-/* kampfzauber: */
-typedef int (*cspell_f) (struct fighter*, int, double, struct spell * sp);
-/* zauber-patzer: */
-typedef void (*pspell_f) (castorder *);
 
 /* besondere Spruchtypen */
 #define FARCASTING      (1<<0)	/* ZAUBER [struct region x y] */
@@ -364,7 +364,7 @@ int eff_spelllevel(struct unit *u, spell * sp, int cast_level, int distance);
 boolean is_magic_resistant(struct unit *magician, struct unit *target, int
 	resist_bonus);
 	/*	Mapperfunktion für target_resists_magic() vom Typ struct unit. */
-int magic_resistance(struct unit *target);
+extern double magic_resistance(struct unit *target);
 	/*	gibt die Chance an, mit der einem Zauber widerstanden wird. Je
 	 *	größer, desto resistenter ist da Opfer */
 boolean target_resists_magic(struct unit *magician, void *obj, int objtyp,

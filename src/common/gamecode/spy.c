@@ -42,7 +42,8 @@
 #include <attributes/racename.h>
 
 /* util includes */
-#include "vset.h"
+#include <util/vset.h>
+#include <util/rand.h>
 
 /* libc includes */
 #include <assert.h>
@@ -57,7 +58,8 @@ void
 spy(region * r, unit * u)
 {
 	unit *target;
-	int spy, spychance, observe, observechance;
+	int spy, observe;
+  double spychance, observechance;
 
 	target = getunit(r, u->faction);
 
@@ -77,9 +79,9 @@ spy(region * r, unit * u)
 	 * Für jeden Talentpunkt, den das Spionagetalent das Tarnungstalent
 	 * des Opfers übersteigt, erhöht sich dieses um 5%*/
 	spy = eff_skill(u, SK_SPY, r) - eff_skill(target, SK_STEALTH, r);
-	spychance = 10 + max(spy*5, 0);
+	spychance = 0.1 + max(spy*0.05, 0.0);
 
-	if (rand()%100 < spychance){
+	if (chance(spychance)) {
 		spy_message(spy, u, target);
 	} else {
 		add_message(&u->faction->msgs, new_message(u->faction,
@@ -101,10 +103,10 @@ spy(region * r, unit * u)
 	/* Anschließend wird - unabhängig vom Erfolg - gewürfelt, ob der
 	 * Spionageversuch bemerkt wurde. Die Wahrscheinlich dafür ist (100 -
 	 * SpionageSpion*5 + WahrnehmungOpfer*2)%. */
-	observechance = 100 - (eff_skill(u, SK_SPY, r) * 5)
-				+ (eff_skill(target, SK_OBSERVATION, r) * 2);
+	observechance = 1.0 - (eff_skill(u, SK_SPY, r) * 0.05)
+				+ (eff_skill(target, SK_OBSERVATION, r) * 0.02);
 
-	if (rand()%100 < observechance){
+	if (chance(observechance)){
 		add_message(&target->faction->msgs, new_message(target->faction,
 		"spydetect%u:spy%u:target", observe>0?u:NULL, target));
 	}
@@ -375,7 +377,7 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 	int i;
 	direction_t d;
 	unsigned int index;
-	int chance;
+	double probability = 0.0;
 	int money, count;
 	char buffer[DISPLAYSIZE + 1];
 	vset informed;
@@ -385,14 +387,13 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 	vset_init(&survivors);
 
 	/* figure out what a unit's chances of survival are: */
-	chance = 0;
 	if (rterrain(r) != T_OCEAN)
-		chance = CANAL_SWIMMER_CHANCE;
+		probability = CANAL_SWIMMER_CHANCE;
 	else
 		for (d = 0; d != MAXDIRECTIONS; ++d)
 			if (rterrain(rconnect(r, d)) != T_OCEAN && !move_blocked(NULL, r, d)) {
 				safety = rconnect(r, d);
-				chance = OCEAN_SWIMMER_CHANCE;
+				probability = OCEAN_SWIMMER_CHANCE;
 				break;
 			}
 	for (ui = &r->units; *ui; ui = &(*ui)->next) {
@@ -405,7 +406,7 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 
 			/* if this fails, I misunderstood something: */
 			for (i = 0; i != u->number; ++i)
-				if (rand() % 100 >= chance)
+				if (chance(probability))
 					++dead;
 
 			if (dead != u->number)

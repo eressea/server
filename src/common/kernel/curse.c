@@ -37,6 +37,7 @@
 /* util includes */
 #include <util/resolve.h>
 #include <util/base36.h>
+#include <util/rand.h>
 #include <util/goodies.h>
 
 /* libc includes */
@@ -590,14 +591,11 @@ do_transfer_curse(curse *c, unit * u, unit * u2, int n)
 			break;
 		}
 		case CURSE_SPREADCHANCE:
-		{
-			int chance = u2->number * 100 / (u2->number + n);
-			if (rand()%100 > chance ){
+			if (chance(u2->number/(double)(u2->number + n))) {
 				men = u2->number + n;
 				dogive = true;
 			}
 			break;
-		}
 		case CURSE_SPREADNEVER:
 			break;
 	}

@@ -40,16 +40,18 @@
 #include "pathfinder.h"
 #include "karma.h"
 
-/* util includes */
-#include <resolve.h>
-#include <base36.h>
-#include <event.h>
 #include <triggers/timeout.h>
 #include <triggers/shock.h>
 #include <triggers/killunit.h>
 #include <triggers/giveitem.h>
 #include <triggers/changerace.h>
 #include <triggers/clonedied.h>
+
+/* util includes */
+#include <util/resolve.h>
+#include <util/rand.h>
+#include <util/base36.h>
+#include <util/event.h>
 
 /* libc includes */
 #include <assert.h>
@@ -1179,29 +1181,28 @@ farcasting(unit *magician, region *r)
 
 /* allgemeine Magieresistenz einer Einheit,
  * reduziert magischen Schaden */
-int
+double
 magic_resistance(unit *target)
 {
 	attrib * a;
 	curse *c;
-	int chance;
 	int n;
 
-	/* Bonus durch Rassenmagieresistenz */
-	chance = (int)(target->race->magres * 100);
+  /* Bonus durch Rassenmagieresistenz */
+  double probability = target->race->magres;
 
 	/* Magier haben einen Resistenzbonus vom Magietalent * 5%*/
-	chance += effskill(target, SK_MAGIC)*5;
+	probability += effskill(target, SK_MAGIC)*0.5;
 
 	/* Auswirkungen von Zaubern auf der Einheit */
 	c = get_curse(target->attribs, ct_find("magicresistance"));
 	if (c) {
-		chance += curse_geteffect(c) * get_cursedmen(target, c);
+		probability += 0.01 * curse_geteffect(c) * get_cursedmen(target, c);
 	}
 
 	/* Unicorn +10 */
 	n = get_item(target, I_UNICORN);
-	if (n) chance += (10*n)/target->number;
+	if (n) probability += n*0.1/target->number;
 
 	/* Auswirkungen von Zaubern auf der Region */
 	a = a_find(target->region->attribs, &at_curse);
@@ -1212,7 +1213,7 @@ magic_resistance(unit *target)
 		if (mage!=NULL) {
 			if (c->type == ct_find("goodmagicresistancezone")) {
 				if (alliedunit(mage, target->faction, HELP_GUARD)) {
-					chance += curse_geteffect(c);
+					probability += curse_geteffect(c)*0.01;
 					break;
 				}
 			}
@@ -1234,9 +1235,9 @@ magic_resistance(unit *target)
 		const struct building_type * btype = b?b->type:NULL;
 
 		/* gesegneter Steinkreis gibt 30% dazu */
-		if (btype) chance += btype->magresbonus;
+		if (btype) probability += btype->magresbonus * 0.01;
 	}
-	return chance;
+	return (int)(probability*100);
 }
 
 /* ------------------------------------------------------------- */
@@ -1253,7 +1254,7 @@ magic_resistance(unit *target)
 boolean
 target_resists_magic(unit *magician, void *obj, int objtyp, int t_bonus)
 {
-	int chance = 0;
+	double probability = 0.0;
 
 	if (magician == NULL) return true;
 	if (obj == NULL) return true;
@@ -1274,47 +1275,39 @@ target_resists_magic(unit *magician, void *obj, int objtyp, int t_bonus)
 				}
 
 				/* Contest */
-				chance = 5*(pa+10 - at);
+				probability = 0.05 * (10 + pa - at);
 
-				chance += magic_resistance((unit *)obj);
+				probability += magic_resistance((unit *)obj);
 				break;
 			}
 
 		case TYP_REGION:
 			/* Bonus durch Zauber */
-			chance += get_curseeffect(((region *)obj)->attribs, C_RESIST_MAGIC, 0);
+			probability += 0.01 * get_curseeffect(((region *)obj)->attribs, C_RESIST_MAGIC, 0);
 			break;
 
 		case TYP_BUILDING:
 			/* Bonus durch Zauber */
-			chance += get_curseeffect(((building *)obj)->attribs, C_RESIST_MAGIC, 0);
+			probability += 0.01 * get_curseeffect(((building *)obj)->attribs, C_RESIST_MAGIC, 0);
 
 			/* Bonus durch Typ */
-			chance += ((building *)obj)->type->magres;
-
+			probability += 0.01 * ((building *)obj)->type->magres;
 
 			break;
 
 		case TYP_SHIP:
 			/* Bonus durch Zauber */
-			chance += get_curseeffect(((ship *)obj)->attribs, C_RESIST_MAGIC, 0);
+			probability += 0.01 * get_curseeffect(((ship *)obj)->attribs, C_RESIST_MAGIC, 0);
 			break;
-
-		case TYP_FACTION:
-		default:
-			chance = 0;
 	}
 
-	chance = max(2, chance + t_bonus);
-	chance = min(98, chance);
+	probability = max(0.02, probability + t_bonus*0.01);
+	probability = min(0.98, probability);
 
 	/* gibt true, wenn die Zufallszahl kleiner als die chance ist und
 	 * false, wenn sie gleich oder größer ist, dh je größer die
 	 * Magieresistenz (chance) desto eher gibt die Funktion true zurück */
-	if (rand()%100 < chance) {
-		return true;
-	}
-	return false;
+	return chance(probability);
 }
 
 /* ------------------------------------------------------------- */
@@ -3180,4 +3173,3 @@ spell_name(const struct spell * sp, const struct locale * lang)
 	}
 	return sp->sname;
 }
-

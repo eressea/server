@@ -777,10 +777,9 @@ destroy_curse_crystal(attrib **alist, int cast_level, int force)
 		if (c->flag & CURSE_IMMUN);
 
 		if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
-			int chance;
-			/* pro Stufe Unterschied -20% */
-			chance = (10 + (cast_level - c->vigour)*2);
-			if(rand()%10 >= chance){
+      /* pro Stufe Unterschied -20% */
+			double probability = 1 + (cast_level - c->vigour) * 0.2;
+			if (chance(probability)) {
 				if (c->type->change_vigour)
 					c->type->change_vigour(c, -2);
 				force -= c->vigour;

@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 extern struct attrib_type at_aggressive;
-extern struct attrib * make_aggressive(int chance);
+extern struct attrib * make_aggressive(double probability);
 extern void init_aggressive(void);
 
 #ifdef __cplusplus

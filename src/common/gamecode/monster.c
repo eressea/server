@@ -1004,16 +1004,16 @@ plan_monsters(void)
 				boolean done = false;
 				if((u->race->flags & RCF_ATTACKRANDOM) && is_moving == false)
 				{
-					int chance;
+					double probability;
 					attrib *a = a_find(u->attribs, &at_aggressive);
 
-					if(a) {
-						chance = a->data.i;
+					if (a) {
+						probability = a->data.flt;
 					} else {
-						chance = MONSTERATTACK;
+						probability = MONSTERATTACK;
 					}
 
-					if(rand()%100 < chance) {
+					if(chance(probability)) {
 						done = random_attack_by_monster(r, u);
 					}
 				}

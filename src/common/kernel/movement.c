@@ -44,7 +44,8 @@
 #include "unit.h"
 
 /* util includes */
-#include <goodies.h>
+#include <util/goodies.h>
+#include <util/rand.h>
 
 /* libc includes */
 #include <assert.h>
@@ -700,11 +701,11 @@ bewegung_blockiert_von(unit * reisender, region * r)
 		}
 	}
 	if (!contact && guard) {
-		int chance = 30; /* 30% base chance */
-		chance += 10 * (perception - eff_stealth(reisender, r));
-		chance += 10 * max(guard->number, get_item(guard, I_AMULET_OF_TRUE_SEEING));
+		double prob = 0.3; /* 30% base chance */
+		prob += 0.1 * (perception - eff_stealth(reisender, r));
+		prob += 0.1 * max(guard->number, get_item(guard, I_AMULET_OF_TRUE_SEEING));
 
-		if (rand() % 100 < chance) {
+		if (chance(prob)) {
 			return guard;
 		}
 	}

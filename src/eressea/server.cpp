@@ -234,34 +234,6 @@ getgarbage(void)
 #endif
 }
 
-#if 0
-static void
-writefactiondata(void)
-{
-	FILE *F;
-	char zText[128];
-
-	sprintf(zText, "%s/faction-data.xml", basepath());
-	F = cfopen(zText, "w");
-	if(F) {
-		faction *f;
-		for(f = factions; f; f=f->next) {
-			fprintf(F,"<faction>\n");
-			fprintf(F,"\t<id>%s</id>\n",itoa36(f->no));
-			fprintf(F,"\t<name>%s</name>\n",f->name);
-			fprintf(F,"\t<email>%s</email>\n",f->email);
-			fprintf(F,"\t<password>%s</password>\n",f->passw);
-			fprintf(F,"\t<race>%s</race>\n",rc_name(f->race,1));
-			fprintf(F,"\t<magic>%s</magic>\n",neue_gebiete[f->magiegebiet]);
-			fprintf(F,"\t<nmrs>%d</nmrs>\n",turn-f->lastorders);
-			fprintf(F,"\t<score>%d</score>\n",f->score);
-			fprintf(F,"</faction>\n");
-		}
-	}
-	fclose(F);
-}
-#endif
-
 #ifdef SHORTPWDS
 static void
 readshortpwds()
@@ -470,56 +442,6 @@ init_malloc_debug(void)
 #  define CHECKON() _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_DELAY_FREE_MEM_DF)
 # endif
 #endif
-}
-#endif
-
-#if 0
-static void
-write_stats(void)
-{
-	FILE * F;
-	char zText[MAX_PATH];
-	strcat(strcpy(zText, resourcepath()), "/spells");
-	F = fopen(zText, "wt");
-	if (F) {
-		int i, m = -1;
-		for (i=0;spelldaten[i].id;++i) {
-			if (spelldaten[i].magietyp!=m) {
-				m=spelldaten[i].magietyp;
-				fprintf(F, "\n%s\n", magietypen[m]);
-			}
-			fprintf(F, "%d\t%s\n", spelldaten[i].level, spelldaten[i].name);
-		}
-		fclose(F);
-	} else {
-		sprintf(buf, "fopen(%s): ", zText);
-		perror(buf);
-	}
-	strcat(strcpy(zText, resourcepath()), "/bonus");
-	F = fopen(buf, "wt");
-	if (F) {
-		race_t r;
-		for (r=0;r!=MAXRACES;++r) {
-			skill_t sk;
-			int i = 0;
-			fprintf(F, "const bonus %s_bonus = {\n\t", race[r].name[0]);
-			for (sk=0;sk!=MAXSKILLS;sk++) {
-				if (race[r].bonus[sk]) {
-					if (i==8) {
-						i = 0;
-						fputs("\n\t", F);
-					}
-					fprintf(F, "{ SK_%s, %d }, ", skillname(sk, NULL), race[r].bonus[sk]);
-					++i;
-				}
-			}
-			fputs("{ SK_NONE, 0 }\n};\n", F);
-		}
-		fclose(F);
-	} else {
-		sprintf(buf, "fopen(%s): ", zText);
-		perror(zText);
-	}
 }
 #endif
 

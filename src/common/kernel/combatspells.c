@@ -68,8 +68,8 @@ spell_damage(int sp)
 	}
 }
 
-static int
-get_force(int power, int formel)
+static double
+get_force(double power, int formel)
 {
 	switch (formel) {
 		case 0:
@@ -100,7 +100,7 @@ get_force(int power, int formel)
 
 /* Generischer Kampfzauber */
 int
-sp_kampfzauber(fighter * fi, int level, int power, spell * sp)
+sp_kampfzauber(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	troop dt;
@@ -165,7 +165,7 @@ sp_kampfzauber(fighter * fi, int level, int power, spell * sp)
 
 /* Versteinern */
 int
-sp_versteinern(fighter * fi, int level, int power, spell * sp)
+sp_versteinern(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
@@ -214,7 +214,7 @@ sp_versteinern(fighter * fi, int level, int power, spell * sp)
 
 /* Benommenheit: eine Runde kein Angriff */
 int
-sp_stun(fighter * fi, int level, int power, spell * sp)
+sp_stun(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
@@ -277,7 +277,7 @@ sp_stun(fighter * fi, int level, int power, spell * sp)
 
 /* Rosthauch */
 int
-sp_combatrosthauch(fighter * fi, int level, int power, spell * sp)
+sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	cvector *fgs;
@@ -367,7 +367,7 @@ sp_combatrosthauch(fighter * fi, int level, int power, spell * sp)
 }
 
 int
-sp_sleep(fighter * fi, int level, int power, spell * sp)
+sp_sleep(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
@@ -444,7 +444,7 @@ select_ally_in_row(fighter * af, int minrow, int maxrow)
 }
 
 int
-sp_speed(fighter * fi, int level, int power, spell * sp)
+sp_speed(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	int force;
@@ -513,7 +513,7 @@ random_skill(unit *u)
 }
 
 int
-sp_mindblast(fighter * fi, int level, int power, spell * sp)
+sp_mindblast(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
@@ -596,7 +596,7 @@ sp_mindblast(fighter * fi, int level, int power, spell * sp)
 }
 
 int
-sp_dragonodem(fighter * fi, int level, int power, spell * sp)
+sp_dragonodem(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	troop dt;
@@ -647,7 +647,7 @@ sp_dragonodem(fighter * fi, int level, int power, spell * sp)
 /* Feuersturm: Betrifft sehr viele Gegner (in der Regel alle), 
  * macht nur vergleichsweise geringen Schaden */
 int
-sp_immolation(fighter * fi, int level, int power, spell * sp)
+sp_immolation(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	troop dt;
@@ -695,7 +695,7 @@ sp_immolation(fighter * fi, int level, int power, spell * sp)
 }
 
 int
-sp_drainodem(fighter * fi, int level, int power, spell * sp)
+sp_drainodem(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	troop dt;
@@ -752,13 +752,13 @@ sp_drainodem(fighter * fi, int level, int power, spell * sp)
 /* PRECOMBAT */
 
 int
-sp_shadowcall(fighter * fi, int level, int power, spell * sp)
+sp_shadowcall(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	region *r = b->region;
 	unit *mage = fi->unit;
 	attrib *a;
-	int force = get_force(power, 3)/2;
+	double force = get_force(power, 3)/2;
 	const race *rc = NULL;
 	int num;
 	unit *u;
@@ -780,12 +780,12 @@ sp_shadowcall(fighter * fi, int level, int power, spell * sp)
 		break;
 	}
 	
-	u = createunit(r, mage->faction, force, rc);
+	u = createunit(r, mage->faction, (int)force, rc);
 	u->status = ST_FIGHT;
 
 	set_string(&u->name, racename(mage->faction->locale, u, u->race));
-	set_level(u, SK_WEAPONLESS, power/2);
-	set_level(u, SK_AUSDAUER, power/2);
+	set_level(u, SK_WEAPONLESS, (int)(power/2));
+	set_level(u, SK_AUSDAUER, (int)(power/2));
 	u->hp = u->number * unit_max_hp(u);
 
 	if (fval(mage, UFL_PARTEITARNUNG))
@@ -804,21 +804,21 @@ sp_shadowcall(fighter * fi, int level, int power, spell * sp)
 }
 
 int
-sp_wolfhowl(fighter * fi, int level, int power, spell * sp)
+sp_wolfhowl(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	region *r = b->region;
 	unit *mage = fi->unit;
 	attrib *a;
-	int force = get_force(power, 3)/2;
-	unit *u = createunit(r, mage->faction, force, new_race[RC_WOLF]);
+	double force = get_force(power, 3)/2;
+	unit *u = createunit(r, mage->faction, (int)force, new_race[RC_WOLF]);
 	unused(sp);
 
 	u->status = ST_FIGHT;
 
 	set_string(&u->name, racename(mage->faction->locale, u, u->race));
-	set_level(u, SK_WEAPONLESS, power/3);
-	set_level(u, SK_AUSDAUER, power/3);
+	set_level(u, SK_WEAPONLESS, (int)(power/3));
+	set_level(u, SK_AUSDAUER, (int)(power/3));
 	u->hp = u->number * unit_max_hp(u);
 
 	if (fval(mage, UFL_PARTEITARNUNG))
@@ -837,19 +837,18 @@ sp_wolfhowl(fighter * fi, int level, int power, spell * sp)
 }
 
 int
-sp_shadowknights(fighter * fi, int level, int power, spell * sp)
+sp_shadowknights(fighter * fi, int level, double power, spell * sp)
 {
 	unit *u;
 	battle *b = fi->side->battle;
 	region *r = b->region;
 	unit *mage = fi->unit;
 	attrib *a;
-	int force;
-	unused(sp);
+	double force = get_force(power, 3);
 
-	force = get_force(power, 3);
+  unused(sp);
 
-	u = createunit(r, mage->faction, force, new_race[RC_SHADOWKNIGHT]);
+	u = createunit(r, mage->faction, (int)force, new_race[RC_SHADOWKNIGHT]);
 	u->status = ST_FIGHT;
 
 	set_string(&u->name, "Schattenritter");
@@ -871,12 +870,12 @@ sp_shadowknights(fighter * fi, int level, int power, spell * sp)
 }
 
 int
-sp_strong_wall(fighter * fi, int level, int force, spell * sp)
+sp_strong_wall(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
 	building *burg;
-	int effect;
+	int effect = (int)(power/4);
 	static boolean init = false;
 	static const curse_type * strongwall_ct;
 	if (!init) { init = true; strongwall_ct = ct_find("strongwall"); }
@@ -891,11 +890,9 @@ sp_strong_wall(fighter * fi, int level, int force, spell * sp)
 	}
 	burg = mage->building;
 
-	effect = force/4;
-	if (rand()%4 < force%4)
-		effect++;
+	if (chance(power-effect)) ++effect;
 
-	create_curse(mage, &burg->attribs, strongwall_ct, force, 1, effect, 0);
+	create_curse(mage, &burg->attribs, strongwall_ct, power, 1, effect, 0);
 
 	sprintf(buf, "%s Mauern erglühen in einem unheimlichen magischen Licht.",
 			buildingname(burg));
@@ -904,14 +901,13 @@ sp_strong_wall(fighter * fi, int level, int force, spell * sp)
 }
 
 int
-sp_chaosrow(fighter * fi, int level, int force, spell * sp)
+sp_chaosrow(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
 	cvector *fgs;
 	void **fig;
 	int n, enemies, row;
-	int chance;
 	int k = 0;
 	int minrow = FIGHT_ROW;
 	int maxrow = NUMROWS;
@@ -919,12 +915,12 @@ sp_chaosrow(fighter * fi, int level, int force, spell * sp)
 	switch (sp->id) {
 		case SPL_CHAOSROW:
 			sprintf(buf, "%s murmelt eine düster klingende Formel", unitname(mage));
-			force *= 40;
+			power *= 40;
 			break;
 
 		case SPL_SONG_OF_CONFUSION:
 			sprintf(buf, "%s stimmt einen seltsamen Gesang an", unitname(mage));
-			force = get_force(force,5);
+			power = get_force(power, 5);
 			break;
 	}
 
@@ -942,18 +938,14 @@ sp_chaosrow(fighter * fi, int level, int force, spell * sp)
 	for (fig = fgs->begin; fig != fgs->end; ++fig) {
 		fighter *df = *fig;
 
-		if (!force)
-			break;
+		if (power<=0.0) break;
 		/* force sollte wegen des max(0,x) nicht unter 0 fallen können */
-		assert(force >= 0);
 
-		if (is_magic_resistant(mage, df->unit, 0))
-			continue;
+		if (is_magic_resistant(mage, df->unit, 0)) continue;
 
 		n = df->unit->number;
 
-		chance = 100 * force/n;
-		if (chance < 1 + rand()%100) {
+		if (chance(power/n)) {
 			row = statusrow(df->status)+FIRST_ROW;
 			df->side->size[row] -= df->alive;
 			if (df->unit->race->battle_flags & BF_NOBLOCK) {
@@ -982,14 +974,14 @@ sp_chaosrow(fighter * fi, int level, int force, spell * sp)
 			}
 			k++;
 		}
-		force = max(0, force-n);
+		power = max(0, power-n);
 	}
 	cv_kill(fgs);
 
 	scat("Ein plötzlicher Tumult entsteht");
 	if (k > 0) {
 		scat(" und bringt die Kampfaufstellung durcheinander.");
-	}else{
+	} else {
 		scat(", der sich jedoch schnell wieder legt.");
 	}
 	battlerecord(b, buf);
@@ -1000,7 +992,7 @@ sp_chaosrow(fighter * fi, int level, int force, spell * sp)
 /* Panik (Präkampfzauber) */
 
 int
-sp_flee(fighter * fi, int level, int power, spell * sp)
+sp_flee(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
@@ -1015,18 +1007,18 @@ sp_flee(fighter * fi, int level, int power, spell * sp)
 		case SPL_FLEE:
 			sprintf(buf, "%s zaubert %s", unitname(mage), 
 				spell_name(sp, default_locale));
-			force = get_force(power,4);
+			force = (int)get_force(power,4);
 			break;
 		case SPL_SONG_OF_FEAR:
 			sprintf(buf, "%s stimmt einen düsteren Gesang an", unitname(mage));
-			force = get_force(power,3);
+			force = (int)get_force(power,3);
 			break;
 		case SPL_AURA_OF_FEAR:
 			sprintf(buf, "%s ist von dunklen Schatten umgeben", unitname(mage));
-			force = get_force(power,5);
+			force = (int)get_force(power,5);
 			break;
 		default:
-			force = get_force(power,10);
+			force = (int)get_force(power,10);
 	}
 
 	if (!count_enemies(b, fi->side, FS_ENEMY, minrow, maxrow)) {
@@ -1072,7 +1064,7 @@ sp_flee(fighter * fi, int level, int power, spell * sp)
 
 /* Heldenmut */
 int
-sp_hero(fighter * fi, int level, int power, spell * sp)
+sp_hero(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
@@ -1088,13 +1080,13 @@ sp_hero(fighter * fi, int level, int power, spell * sp)
 		spell_name(sp, default_locale));
 	switch(sp->id) {
 		case SPL_HERO:
-			df_bonus = power/5;
-			force = lovar(get_force(power,4));
+			df_bonus = (int)(power/5);
+			force = lovar(get_force(power, 4));
 			break;
 
 		default:
 			df_bonus = 1;
-			force = power;
+			force = (int)power;
 	}
 	scat(":");
 	battlerecord(b, buf);
@@ -1128,7 +1120,7 @@ sp_hero(fighter * fi, int level, int power, spell * sp)
 }
 
 int
-sp_berserk(fighter * fi, int level, int power, spell * sp)
+sp_berserk(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
@@ -1148,13 +1140,13 @@ sp_berserk(fighter * fi, int level, int power, spell * sp)
 		case SPL_BLOODTHIRST:
 			at_bonus = max(1,level/3);
 			df_malus = 2;
-			force = get_force(power,2);
+			force = (int)get_force(power,2);
 			break;
 
 		default:
 			at_bonus = 1;
 			df_malus = 0;
-			force = power;
+			force = (int)power;
 	}
 	scat(":");
 	battlerecord(b, buf);
@@ -1189,7 +1181,7 @@ sp_berserk(fighter * fi, int level, int power, spell * sp)
 }
 
 int
-sp_frighten(fighter * fi, int level, int power, spell * sp)
+sp_frighten(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
@@ -1204,7 +1196,7 @@ sp_frighten(fighter * fi, int level, int power, spell * sp)
 
 	at_malus = max(1,level - 4);
 	df_malus = 2;
-	force = get_force(power, 2);
+	force = (int)get_force(power, 2);
 
 	sprintf(buf, "%s zaubert %s", unitname(mage), 
 		spell_name(sp, default_locale));
@@ -1249,13 +1241,12 @@ sp_frighten(fighter * fi, int level, int power, spell * sp)
 
 
 int
-sp_tiredsoldiers(fighter * fi, int level, int force, spell * sp)
+sp_tiredsoldiers(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
 	int n = 0;
-
-	force = force * force * 4;
+	int force = (int)(power * power * 4);
 
 	sprintf(buf, "%s zaubert %s", unitname(mage), 
 		spell_name(sp, default_locale));
@@ -1298,7 +1289,7 @@ sp_tiredsoldiers(fighter * fi, int level, int force, spell * sp)
 }
 
 int
-sp_windshield(fighter * fi, int level, int power, spell * sp)
+sp_windshield(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
@@ -1312,12 +1303,12 @@ sp_windshield(fighter * fi, int level, int power, spell * sp)
 		spell_name(sp, default_locale));
 	switch(sp->id) {
 		case SPL_WINDSHIELD:
-			force = get_force(power,4);
+			force = (int)get_force(power,4);
 			at_malus = level/4;
 			break;
 
 		default:
-			force = power;
+			force = (int)power;
 			at_malus = 2;
 	}
 	enemies = count_enemies(b, fi->side, FS_ENEMY,
@@ -1351,11 +1342,12 @@ sp_windshield(fighter * fi, int level, int power, spell * sp)
 }
 
 int
-sp_reeling_arrows(fighter * fi, int level, int force, spell * sp)
+sp_reeling_arrows(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
-	unused(force);
+
+  unused(power);
 
 	b->reelarrow = true;
 	sprintf(buf, "%s zaubert %s", unitname(mage), 
@@ -1367,7 +1359,7 @@ sp_reeling_arrows(fighter * fi, int level, int force, spell * sp)
 }
 
 int
-sp_denyattack(fighter * fi, int level, int power, spell * sp)
+sp_denyattack(fighter * fi, int level, double power, spell * sp)
 {
 /* Magier weicht dem Kampf aus. Wenn er sich bewegen kann, zieht er in
  * eine Nachbarregion, wobei ein NACH berücksichtigt wird. Ansonsten
@@ -1430,7 +1422,7 @@ do_meffect(fighter * af, int typ, int effect, int duration)
 }
 
 int
-sp_armorshield(fighter * fi, int level, int power, spell * sp)
+sp_armorshield(fighter * fi, int level, double power, spell * sp)
 {
 	int effect;
 	int duration;
@@ -1446,19 +1438,19 @@ sp_armorshield(fighter * fi, int level, int power, spell * sp)
 	switch(sp->id) {
 		case SPL_ARMORSHIELD:
 			effect = level/3;
-			duration = 20*power*power;
+			duration = (int)(20*power*power);
 			break;
 
 		default:
 			effect = level/4;
-			duration = power*power;
+			duration = (int)(power*power);
 	}
 	do_meffect(fi, SHIELD_ARMOR, effect, duration);
 	return level;
 }
 
 int
-sp_reduceshield(fighter * fi, int level, int power, spell * sp)
+sp_reduceshield(fighter * fi, int level, double power, spell * sp)
 {
 	int effect;
 	int duration;
@@ -1475,19 +1467,19 @@ sp_reduceshield(fighter * fi, int level, int power, spell * sp)
 	switch(sp->id) {
 		case SPL_REDUCESHIELD:
 			effect = 50;
-			duration = 50*power*power;
+			duration = (int)(50*power*power);
 			break;
 
 		default:
 			effect = level*3;
-			duration = get_force(power,5);
+			duration = (int)get_force(power,5);
 	}
 	do_meffect(fi, SHIELD_REDUCE, effect, duration);
 	return level;
 }
 
 int
-sp_fumbleshield(fighter * fi, int level, int power, spell * sp)
+sp_fumbleshield(fighter * fi, int level, double power, spell * sp)
 {
 	int effect;
 	int duration;
@@ -1536,27 +1528,25 @@ count_healable(battle *b, fighter *df)
 
 /* wiederbeleben */
 int
-sp_reanimate(fighter * fi, int level, int force, spell * sp)
+sp_reanimate(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
-	int healable, k, j=0;
-	double c;
+	int healable, j=0;
+	double c = 0.50;
+  double k = EFFECT_HEALING_SPELL * power;
 
 	switch(sp->id) {
 		case SPL_REANIMATE:
 			sprintf(buf, "%s beginnt ein Ritual der Wiederbelebung",
 					unitname(mage));
-			k = EFFECT_HEALING_SPELL*force;
-			c = 0.50 + 0.02 * force;
+			c += 0.02 * power;
 			break;
 
 		default:
 			sprintf(buf, "%s zaubert %s",
 					unitname(mage), 
 					spell_name(sp, default_locale));
-			k = EFFECT_HEALING_SPELL*force;
-			c = 0.50;
 	}
 	if (get_item(mage, I_AMULET_OF_HEALING) > 0) {
 		scat(" und benutzt das ");
@@ -1567,8 +1557,8 @@ sp_reanimate(fighter * fi, int level, int force, spell * sp)
 	}
 
 	healable = count_healable(b, fi);
-	k = min(k, healable);
-	while (k--) {
+	healable = (int)min(k, healable);
+	while (healable--) {
 		troop t = select_corpse(b, fi);
 		if (t.fighter
 				&& t.fighter->side->casualties > 0
@@ -1587,7 +1577,6 @@ sp_reanimate(fighter * fi, int level, int force, spell * sp)
 			++t.fighter->side->size[t.fighter->unit->status + 1];
 			++t.fighter->side->healed;
 			--t.fighter->side->casualties;
-			--healable;
 			++j;
 		}
 	}
@@ -1608,7 +1597,7 @@ sp_reanimate(fighter * fi, int level, int force, spell * sp)
 }
 
 int
-sp_keeploot(fighter * fi, int level, int force, spell * sp)
+sp_keeploot(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 
@@ -1616,13 +1605,13 @@ sp_keeploot(fighter * fi, int level, int force, spell * sp)
 		spell_name(sp, default_locale));
 	battlerecord(b, buf);
 
-	b->keeploot = max(50, b->keeploot + 5*force);
+	b->keeploot = (int)max(50, b->keeploot + 5*power);
 
 	return level;
 }
 
 int
-sp_healing(fighter * fi, int level, int force, spell * sp)
+sp_healing(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
@@ -1638,13 +1627,13 @@ sp_healing(fighter * fi, int level, int force, spell * sp)
 
 	/* bis zu 11 Personen pro Stufe (einen HP müssen sie ja noch
 	 * haben, sonst wären sie tot) können geheilt werden */
-	healhp = force * 200;
+	power *= 200;
 
 	if (get_item(mage, I_AMULET_OF_HEALING) > 0) {
 		scat(" und benutzt das ");
 		scat(locale_string(default_locale, resourcename(oldresourcetype[R_AMULET_OF_HEALING], 0)));
 		scat(", um die Heilzauber zu verstärken");
-		healhp *= 2;
+		power *= 2;
 	}
 
 	/* gehe alle denen wir helfen der reihe nach durch, heile verwundete,
@@ -1653,11 +1642,11 @@ sp_healing(fighter * fi, int level, int force, spell * sp)
 	fgs = fighters(b, fi, minrow, maxrow, FS_HELP);
 	v_scramble(fgs->begin, fgs->end);
 
+  healhp = (int)power;
 	for (fig = fgs->begin; fig != fgs->end; ++fig) {
 		fighter *df = *fig;
 
-		if (!healhp)
-			break;
+		if (healhp<=0) break;
 
 		/* wir heilen erstmal keine Monster */
 		if (!playerrace(df->unit->race))
@@ -1722,7 +1711,7 @@ sp_healing(fighter * fi, int level, int force, spell * sp)
 }
 
 int
-sp_undeadhero(fighter * fi, int level, int force, spell * sp)
+sp_undeadhero(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
@@ -1731,13 +1720,9 @@ sp_undeadhero(fighter * fi, int level, int force, spell * sp)
 	int maxrow = AVOID_ROW;
 	cvector *fgs;
 	void **fig;
-	int k, n, j;
-	int undead = 0;
-	double c;
-
-	/* maximal Stufe*4 Personen*/
-	k = get_force(force,0);
-	c = 0.50 + 0.02 * force;
+	int n, j, undead = 0;
+	int k = (int)get_force(power,0);
+	double c = 0.50 + 0.02 * power;
 
 	/* Liste aus allen Kämpfern */
 	fgs = fighters(b, fi, minrow, maxrow,	FS_ENEMY | FS_HELP );
