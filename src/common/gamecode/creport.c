@@ -1240,9 +1240,10 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 			for (b = rbuildings(r); b; b = b->next) {
 				int fno = -1;
 				u = buildingowner(r, b);
-				if (u && !fval(u, FL_PARTEITARNUNG))
-					fno = u->faction->no;
-
+				if (u && !fval(u, FL_PARTEITARNUNG)) {
+					const faction * sf = visible_faction(f,u);
+					fno = sf->no;
+				}
 				cr_output_buildings(F, b, u, fno, f);
 			}
 
@@ -1250,8 +1251,10 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 			for (sh = r->ships; sh; sh = sh->next) {
 				int fno = -1;
 				u = shipowner(r, sh);
-				if (u && !fval(u, FL_PARTEITARNUNG))
-					fno = u->faction->no;
+				if (u && !fval(u, FL_PARTEITARNUNG)) {
+					const faction * sf = visible_faction(f,u);
+					fno = sf->no;
+				}
 
 				cr_output_ship(F, sh, u, fno, f, r);
 			}
