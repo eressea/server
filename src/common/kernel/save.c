@@ -2177,6 +2177,11 @@ readfaction(FILE * F)
 	}
 	f->lastorders = ri(F);
 	f->age = ri(F);
+	if (sqlstream && f->age==0) {
+		fprintf(sqlstream, 
+			"UPDATE users SET status='ACTIVE' where email='%s';\n",
+			f->email);
+	}
 	if (global.data_version < NEWRACE_VERSION) {
 		race_t rc = (char) ri(F);
 		f->race = new_race[rc];

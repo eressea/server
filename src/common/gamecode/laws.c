@@ -1200,12 +1200,12 @@ quit(void)
 				f->nunits, f->number, f->money);
 			fprintf(sqlstream, 
 				"UPDATE subscriptions SET lastturn=%d, password='%s', info='%s' "
-				"WHERE game=%d AND faction='%s';", 
+				"WHERE game=%d AND faction='%s';\n", 
 				f->lastorders, f->override, info, GAME_ID, itoa36(f->no));
 		} else {
 			fprintf(sqlstream, 
-				"UPDATE subscriptions SET lastturn=%d, password='%s' "
-				"WHERE game=%d AND faction='%s';", 
+				"UPDATE subscriptions SET status='ACTIVE', lastturn=%d, password='%s' "
+				"WHERE game=%d AND faction='%s';\n", 
 				f->lastorders, f->override, GAME_ID, itoa36(f->no));
 		}
 
