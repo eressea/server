@@ -593,6 +593,7 @@ main(int argc, char *argv[])
 	int i;
 	char zText[MAX_PATH];
 
+	sqlpatch = true;
 	updatelog = fopen("update.log", "w");
 	log_open("eressea.log");
 	printf("\n%s PBEM host\n"

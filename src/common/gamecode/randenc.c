@@ -1291,9 +1291,11 @@ randomevents(void)
 	}
 
 	/* Vulkane qualmen, brechen aus ... */
-
 	for (r = regions; r; r = r->next) {
-		switch(rterrain(r)) {
+		if (rterrain(r)==T_VOLCANO_SMOKING && a_find(&r->attribs, &at_reduceproduction)) {
+			ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
+			rsetterrain(r, T_VOLCANO);
+		} else switch(rterrain(r)) {
 		case T_VOLCANO:
 			if (rand()%100 < 4) {
 				ADDMSG(&r->msgs, msg_message("volcanostartsmoke", "region", r));

@@ -1522,6 +1522,7 @@ main(int argc, char *argv[])
 	boolean readlog = false;
 	boolean autoseeding = false;
 
+	sqlpatch = false;
 	setlocale(LC_ALL, "");
 
 	fprintf(stderr, "\n	Mapper V" VERSION " Hex (" __DATE__ ")\n\n"

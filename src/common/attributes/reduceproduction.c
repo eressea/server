@@ -20,7 +20,10 @@
 static int
 age_reduceproduction(attrib *a)
 {
-	return --a->data.sa[1];
+	int reduce = 100 - (5 * --a->data.sa[1]);
+	if (reduce < 10) reduce = 10;
+	a->data.sa[0] = (short)reduce;
+	return a->data.sa[1];
 }
 
 attrib_type at_reduceproduction = {
@@ -37,7 +40,9 @@ attrib *
 make_reduceproduction(int percent, int time)
 {
 	attrib * a = a_new(&at_reduceproduction);
-	a->data.sa[0] = (short)percent;
+	int reduce = 100 - (5 * time);
+	if (reduce < 10) reduce = 10;
+	a->data.sa[0] = (short)reduce;
 	a->data.sa[1] = (short)time;
 	return a;
 }

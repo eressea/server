@@ -1206,4 +1206,5 @@ extern settings global;
 extern FILE * updatelog;
 extern int produceexp(struct unit * u, skill_t sk, int n);
 
+extern boolean sqlpatch;
 #endif

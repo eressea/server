@@ -83,6 +83,7 @@ char     buf[BUFSIZE + 1];
 FILE    *logfile;
 FILE    *updatelog;
 const struct race * new_race[MAXRACES];
+boolean sqlpatch = false;
 
 race_t 
 old_race(const struct race * rc)
@@ -2055,7 +2056,7 @@ kernel_done(void)
 	translation_done();
 	skill_done();
 	gc_done();
-	sql_done();
+	if (sqlstream!=NULL) sql_done();
 }
 
 static void
@@ -2311,9 +2312,10 @@ kernel_init(void)
 		srand(time((time_t *) NULL));
 	else
 		srand(turn);
-
-	sprintf(zBuffer, "%s/patch-%d.sql", datapath(), turn);
-	sql_init(zBuffer);
+	if (sqlpatch) {
+		sprintf(zBuffer, "%s/patch-%d.sql", datapath(), turn);
+		sql_init(zBuffer);
+	}
 }
 
 /*********************/
