@@ -2395,7 +2395,7 @@ aftermath(battle * b)
 			}
 		} next(df);
 	} next(s);
-	dead_peasants = min(rpeasants(r), is);
+	dead_peasants = min(rpeasants(r), (is*BATTLE_KILLS_PEASANTS)/100);
 	deathcounts(r, dead_peasants + is);
 	chaoscounts(r, dead_peasants / 2);
 	rsetpeasants(r, rpeasants(r) - dead_peasants);

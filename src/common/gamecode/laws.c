@@ -475,11 +475,12 @@ peasants(region * r)
 {
 
 	int glueck;
+
 	/* Das Geld, daß die Bauern erwirtschaftet haben unter expandwork, gibt
 	 * den Bauern genug für 11 Bauern pro Ebene ohne Wald. Der Wald
 	 * breitet sich nicht in Gebiete aus, die bebaut werden. */
 
-	int peasants, money, n, dead, satiated;
+	int peasants, money, n, i, dead, satiated;
 	attrib * a;
 
 	/* Bauern vermehren sich */
@@ -509,8 +510,10 @@ peasants(region * r)
 			glueck++;
 
 		if (glueck > 0) {		/* Doppelvermehrung */
-			if (rand() % 100 < PEASANTGROWTH)
-				peasants++;
+			for(i=0; i<PEASANTLUCK; i++) {
+				if (rand() % 10000 < PEASANTGROWTH)
+					peasants++;
+			}
 			glueck--;
 		}
 	}
