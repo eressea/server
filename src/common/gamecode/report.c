@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.3 2001/01/27 18:15:32 enno Exp $
+ *	$Id: report.c,v 1.4 2001/01/28 08:50:46 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2992,10 +2992,12 @@ writemonument(void)
 	for(i=0; i <= 6; i++) if(buildings[i]) {
 		fset(buildings[i], FL_DH);
 	}
-
-	F = cfopen("news-monument", "w");
-	if (!F) return;
-
+	{
+		char zText[MAX_PATH];
+		sprintf(zText, "%s/news-monument", basepath());
+		F = cfopen(zText, "w");
+		if (!F) return;
+	}
 	fprintf(F, "\n--- maintitle ---\n\n");
 	for(i = 0; i<=6; i++) {
 		if (buildings[i] != NULL) {
@@ -3035,7 +3037,12 @@ writemonument(void)
 	fclose(F);
 
 #ifdef OLD_ITEMS
-	if (!(F = cfopen("news-silly", "w"))) return;
+	{
+		char zText[MAX_PATH];
+		sprintf(zText, "%s/news-silly", basepath());
+		F = cfopen(zText, "w");
+		if (!F) return;
+	}
 	for (f=factions;f;f=f->next) {
 		unit * u;
 		int k;
@@ -3067,7 +3074,12 @@ writeforward(void)
 	region *r;
 	unit *u;
 
-	forwardFile = fopen("aliases", "w");
+	{
+		char zText[MAX_PATH];
+		sprintf(zText, "%s/aliases", basepath());
+		forwardFile = cfopen(zText, "w");
+		if (!forwardFile) return;
+	}
 
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) {
@@ -3088,13 +3100,16 @@ report_summary(summary * s, summary * o, boolean full)
 	faction * f;
 	int nmrs[ORDERGAP];
 
-	if (full) {
-		F = cfopen("parteien.full", "w");
-	} else {
-		F = cfopen("parteien", "w");
+	{
+		char zText[MAX_PATH];
+		if (full) {
+			sprintf(zText, "%s/parteien.full", basepath());
+		} else {
+			sprintf(zText, "%s/parteien.full", basepath());
+		}
+		F = cfopen(zText, "w");
+		if (!F) return;
 	}
-	if (!F) return;
-
 	printf("Schreibe Zusammenfassung (parteien)...\n");
 	fprintf(F,   "%s\n%s\n\n", global.gamename, gamedate2());
 	fprintf(F,   "Auswertung Nr:         %d\n", turn);
@@ -3199,21 +3214,31 @@ report_summary(summary * s, summary * o, boolean full)
 #ifdef PLAYER_CSV
 		region * r;
 #endif
-		FILE * F = cfopen("adressen", "w");
-
+		FILE * F;
+		char zText[MAX_PATH];
+		if (full) {
+			sprintf(zText, "%s/adressen", basepath());
+			F = cfopen(zText, "w");
+		}
 		if (!F) return;
 		printf("Schreibe Liste der Adressen (adressen)...\n");
 		writeadresses("adressen");
 		writeforward();
 		fclose(F);
 
-		F = cfopen("datum", "w");
+		{
+			sprintf(zText, "%s/datum", basepath());
+			F = cfopen(zText, "w");
+		}
 		if (!F) return;
 		printf("Schreibe Datum (datum)...\n");
 		fputs(gamedate2(), F);
 		fclose(F);
 #ifdef PLAYER_CSV
-		F = cfopen("players", "w");
+		{
+			strcpy(zText, "%s/players", basepath());
+			F = cfopen(zText, "w");
+		}
 		if (!F) return;
 		printf("Schreibe Spielerliste (players)...\n");
 		r = findregion(0, 0);

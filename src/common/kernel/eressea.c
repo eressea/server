@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.3 2001/01/27 18:15:32 enno Exp $
+ *	$Id: eressea.c,v 1.4 2001/01/28 08:50:46 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1940,8 +1940,11 @@ remove_empty_factions(void)
 {
 	faction **fp, *f3;
 	FILE *dofp;
+	char zText[MAX_PATH];
 
-	dofp = fopen("dropouts", "a");
+	sprintf(zText, "%s/dropouts", basepath());
+
+	dofp = fopen(zText, "a");
 
 	for (fp = &factions; *fp;) {
 		faction * f = *fp;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: config.h,v 1.2 2001/01/26 16:19:38 enno Exp $
+ *	$Id: config.h,v 1.3 2001/01/28 08:50:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -213,9 +213,9 @@ extern char * strdup(const char *s);
 #endif
 
 #ifdef WIN32
-# define PATH_MAX _MAX_PATH
-#elif !defined(PATH_MAX)
-# define PATH_MAX 1024
+# define MAX_PATH _MAX_PATH
+#elif !defined(MAX_PATH)
+# define MAX_PATH 1024
 #endif
 
 /****            ****

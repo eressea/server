@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: creport.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: creport.c,v 1.3 2001/01/28 08:50:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -793,7 +793,7 @@ report_computer(FILE * F, faction * f)
 	/* traverse all regions */
 	for (sd = seen; sd!=NULL; sd = sd->next) {
 		int modifier = 0;
-		char * tname;
+		const char * tname;
 
 		r = sd->r;
 

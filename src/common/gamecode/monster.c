@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: monster.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: monster.c,v 1.3 2001/01/28 08:50:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -837,12 +837,16 @@ plan_monsters(void)
 	strlist *S;
 
 	if (!dragonlog) {
+		char zText[MAX_PATH];
 #ifdef HAVE_ZLIB
-		dragonlog = gzopen("dragonlog.gz", "w");
+		sprintf(zText, "%s/dragonlog.gz", basepath());
+		dragonlog = gzopen(zText, "w");
 #elif HAVE_BZ2LIB
-		dragonlog = BZ2_bzopen("dragonlog.bz2","w");
+		sprintf(zText, "%s/dragonlog.bz2", basepath());
+		dragonlog = BZ2_bzopen(zText,"w");
 #else
-		dragonlog = fopen("dragonlog", "w");
+		sprintf(zText, "%s/dragonlog", basepath());
+		dragonlog = fopen(zText, "w");
 #endif
 	}
 	u = findunitg(atoi36("ponn"), NULL);
