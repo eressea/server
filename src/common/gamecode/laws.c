@@ -58,8 +58,9 @@
 #include <pool.h>
 #include <building.h>
 #include <group.h>
-#include <ugroup.h>
-
+#ifdef USE_UGROUPS
+#  include <ugroup.h>
+#endif
 /* attributes includes */
 #include <attributes/racename.h>
 
@@ -3035,8 +3036,10 @@ processorders (void)
 	puts(" - Jihads setzen");
 	set_jihad();
 
+#ifdef USE_UGROUPS
 	puts(" - Verbände bilden");
 	ugroups();
+#endif
 
 	puts(" - Einheiten Sortieren");
 	reorder();

@@ -32,7 +32,9 @@
 #include "ship.h"
 #include "race.h"
 #include "magic.h"
-#include "ugroup.h"
+#ifdef USE_UGROUPS
+# include "ugroup.h"
+#endif
 
 /* util includes */
 #include <base36.h>
@@ -440,7 +442,8 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
  * bekommen, alles andere ist darstellungsteschnisch kompliziert.
  */
 
-int
+#ifdef USE_UGROUPS
+ int
 bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 {
 	int i, dh;
@@ -587,7 +590,7 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 	}
 	return dh;
 }
-
+#endif
 
 void
 spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days)
@@ -656,6 +659,7 @@ spunit(struct strlist ** SP, const struct faction * f, const unit * u, int inden
        int mode)
 {
 	int dh;
+#ifdef USE_UGROUPS
 	ugroup *ug = findugroup(u);
 
 	if(ug) {
@@ -664,9 +668,9 @@ spunit(struct strlist ** SP, const struct faction * f, const unit * u, int inden
 		} else {
 			return;
 		}
-	} else {
+	} else
+#endif
 		dh = bufunit(f, u, indent, mode);
-	}
 	lparagraph(SP, buf, indent, (char) ((u->faction == f) ? '*' : (dh ? '+' : '-')));
 }
 

@@ -412,8 +412,10 @@ enum {
 	K_SETJIHAD,
 	K_GM,          /* perform GM commands */
 	K_INFO,        /* set player-info */
+#ifdef USE_UGROUPS
 	K_JOINUGROUP,
 	K_LEAVEUGROUP,
+#endif
 	MAXKEYWORDS,
 	NOKEYWORD = (keyword_t) - 1
 };

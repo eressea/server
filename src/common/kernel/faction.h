@@ -41,7 +41,9 @@ typedef struct faction {
 	int options;
 	int no_units;
 	int karma;
+#ifdef USE_UGROUPS
 	struct ugroup *ugroups;
+#endif
 	struct warning * warnings;
 	struct msglevel * msglevels;
 	struct ally *allies;

@@ -8,7 +8,7 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: ugroup.h,v 1.2 2001/04/28 15:39:13 corwin Exp $
+ $Id: ugroup.h,v 1.3 2001/04/29 19:27:42 enno Exp $
  */
 
 #ifndef UGROUP_H
@@ -26,8 +26,8 @@ typedef struct ugroup {
 	struct unit **unit_array;
 } ugroup;
 
-boolean is_ugroupleader(struct unit *u, struct ugroup *ug);
-ugroup *findugroup(struct unit *u);
+boolean is_ugroupleader(const struct unit *u, const struct ugroup *ug);
+ugroup *findugroup(const struct unit *u);
 void ugroups(void);
 
 #endif

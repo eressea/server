@@ -8,17 +8,22 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: ugroup.c,v 1.2 2001/04/28 15:39:13 corwin Exp $
+ $Id: ugroup.c,v 1.3 2001/04/29 19:27:42 enno Exp $
  */
 
 #include <config.h>
 #include "eressea.h"
+
+/* kernel includes */
 #include "unit.h"
 #include "region.h"
 #include "faction.h"
-#include <kernel/ugroup.h>
+#include "ugroup.h"
+
+/* attributes includes */
 #include <attributes/ugroup.h>
 
+/* libc includes */
 #include <stdlib.h>
 
 /* TODO:
@@ -31,15 +36,16 @@
 /* Nur die erste Einheit in der Liste 
 	(ugroup->unit_array[0] == u) kann NACH ausführen. */
 
+#ifdef USE_UGROUPS
 boolean
-is_ugroupleader(unit *u, ugroup *ug)
+is_ugroupleader(const unit *u, const ugroup *ug)
 {
 	if(ug->unit_array[0] == u) return true;
 	return false;
 }
 
 ugroup *
-findugroupid(faction *f, int id)
+findugroupid(const faction *f, int id)
 {
 	ugroup *ug;
 
@@ -50,7 +56,7 @@ findugroupid(faction *f, int id)
 }
 
 ugroup *
-findugroup(unit *u)
+findugroup(const unit *u)
 {
 	attrib *a = a_find(u->attribs, &at_ugroup);
 	if(!a) return NULL;
@@ -58,12 +64,10 @@ findugroup(unit *u)
 }
 
 static int
-ugroupfreeid(ugroup *ug)
+ugroupfreeid(const ugroup *ug)
 {
-	ugroup *ug2;
+	const ugroup *ug2 = ug;
 	int id = 0;
-
-	ug2 = ug;
 	
 	while(ug2) {
 		if(ug2->id == id) {
@@ -194,3 +198,4 @@ ugroups(void)
 	}
 }
 
+#endif /* USE_UGROUPS */

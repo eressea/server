@@ -58,7 +58,9 @@
 #include <skill.h>
 #include <teleport.h>
 #include <unit.h>
-#include <ugroup.h>
+#ifdef USE_UGROUPS
+#  include <ugroup.h>
+#endif
 
 /* util includes */
 #include <goodies.h>
@@ -682,10 +684,12 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 	strlist *S;
 	int dh;
 	boolean isbattle = (boolean)(mode == see_battle);
+#ifdef USE_UGROUPS
 	ugroup *ug = findugroup(u);
-
+#endif
 	if(u->race == RC_SPELL) return;
 
+#ifdef USE_UGROUPS
 	if(isbattle || ug) {
 		if(is_ugroupleader(u, ug)) {
 			rnl(F);
@@ -693,23 +697,27 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 		} else {
 			return;
 		}
-	} else {
+	} else
+#endif
+	{
 		rnl(F);
 		dh = bufunit(f, u, indent, mode);
 	}
 	rparagraph(F, buf, indent, (char) ((u->faction == f) ? '*' : (dh ? '+' : '-')));
 
 	if(!isbattle){
+#ifdef USE_UGROUPS
 		if(ug) {
 			int i;
 			for(i=0; i<ug->members; i++) {
 				print_curses(F, u, TYP_UNIT, ug->unit_array[i]->attribs, (u->faction == f)? 1 : 0, indent);
 			}
-		} else {
-			print_curses(F, u, TYP_UNIT, u->attribs, (u->faction == f)? 1 : 0, indent);
-		}
+		} else 
+#endif /* USE_UGROUPS */
+		print_curses(F, u, TYP_UNIT, u->attribs, (u->faction == f)? 1 : 0, indent);
 	}
 
+#ifdef USE_UGROUPS
 	if(ug) {
 		int i;
 		for(i=0; i<ug->members; i++) {
@@ -720,14 +728,14 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 				}
 			}
 		}
-	} else {
+	} else
+#endif
 		if (mode==see_unit && u->faction == f && u->botschaften) {
 			for (S = u->botschaften; S; S = S->next) {
 				rnl(F);
 				rparagraph(F, S->s, indent, 0);
 			}
 		}
-	}
 }
 
 static void

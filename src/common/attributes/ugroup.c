@@ -8,12 +8,15 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: ugroup.c,v 1.1 2001/04/28 12:03:12 corwin Exp $
+ $Id: ugroup.c,v 1.2 2001/04/29 19:27:41 enno Exp $
  */
 
 #include <config.h>
 #include "ugroup.h"
+
 #include <attrib.h>
+
+#ifdef USE_UGROUPS
 
 attrib_type at_ugroup = {
 	"ugroup", NULL, NULL, NULL, NULL, NULL, ATF_UNIQUE
@@ -24,3 +27,5 @@ init_ugroup(void)
 {
 	at_register(&at_ugroup);
 }
+
+#endif

@@ -204,8 +204,10 @@ const char *keywords[MAXKEYWORDS] =
 	"JIHAD",
 	"GM",
 	"INFO",
+#ifdef USE_UGROUPS
 	"JOINVERBAND",
 	"LEAVEVERBAND"
+#endif
 };
 
 const char *report_options[MAX_MSG] =
