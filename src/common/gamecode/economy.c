@@ -335,15 +335,8 @@ expandrecruit(region * r, request * recruitorders)
 					change_level(unew, SK_AUSDAUER, i);
 			}
 			if (unew!=u) {
-				faction * f = u->faction;
-				unit ** up=&u->next;
 				transfermen(unew, u, unew->number);
-				while (*up!=unew) up=&(*up)->next;
-				assert(unew->next==NULL);
-				*up = NULL;
-				if (f->units==unew) f->units = unew->nextF;
-				uunhash(unew);
-				free(unew);
+				destroy_unit(unew);
 			}
 			if (u->n < u->wants) {
 				ADDMSG(&u->faction->msgs, msg_message("recruit", 

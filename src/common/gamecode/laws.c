@@ -166,6 +166,7 @@ destroyfaction(faction * f)
 		set_number(u, 0);
 	}
 	f->alive = 0;
+/* no way!	f->units = NULL; */
 	handle_event(&f->attribs, "destroy", f);
 	for (ff = factions; ff; ff = ff->next) {
 		group *g;
