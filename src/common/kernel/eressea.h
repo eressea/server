@@ -1046,7 +1046,6 @@ void * gc_add(void * p);
 void gc_done(void);
 void mistake(const struct unit * u, const char *cmd, const char *text, int mtype);
 void addmessage(struct region * r, struct faction * f, const char *s, msg_t mtype, int level);
-void caddmessage(struct region * r, struct faction * f, char *s, msg_t mtype, int level);
 void cmistake(const struct unit * u, const char *cmd, int mno, int mtype);
 
 /* grammatik-flags: */

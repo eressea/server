@@ -644,6 +644,14 @@ SOURCE=..\common\modules\gmcmd.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\modules\infocmd.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\modules\infocmd.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\modules\museum.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
@@ -692,6 +700,10 @@ SOURCE=..\common\modules\oceannames.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\modules\oceannames.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\modules\score.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
@@ -713,6 +725,14 @@ SOURCE=..\common\modules\score.c
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\modules\weather.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\modules\weather.h
 # End Source File
 # Begin Source File
 
@@ -1108,19 +1128,6 @@ SOURCE=..\common\attributes\orcification.c
 # Begin Source File
 
 SOURCE=..\common\attributes\otherfaction.c
-
-!IF  "$(CFG)" == "eressea - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
-
-# PROP Intermediate_Dir "../common/attributes/Debug"
-
-!ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
-
-!ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -1271,6 +1278,10 @@ SOURCE=..\common\attributes\targetregion.h
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\attributes\ugroup.c
 # End Source File
 # End Group
 # Begin Group "Triggers"
@@ -1532,10 +1543,6 @@ SOURCE=.\korrektur.c
 # Begin Source File
 
 SOURCE=.\main.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\attributes\otherfaction.c
 # End Source File
 # Begin Source File
 

@@ -19,32 +19,36 @@
  * permission from the authors.
  */
 
+#define RESERVE_DONATIONS 0 /* shall we reserve objects given to us by other factions? */
+#define RESERVE_GIVE 1 /* reserve anything that's given from one unit to another? */
+#define TWOPASS_GIVE 1 /* give items in two passes: first to others, than to self */
+
 #include <config.h>
 #include "eressea.h"
 #include "economy.h"
 
-#include "ship.h"
-#include "unit.h"
-#include "building.h"
-#include "faction.h"
-#include "plane.h"
-#include "alchemy.h"
-#include "item.h"
-#include "magic.h"
-#include "build.h"
-#include "goodies.h"
-#include "study.h"
-#include "movement.h"
-#include "race.h"
-#include "spy.h"
-#include "build.h"
-#include "pool.h"
-#include "region.h"
-#include "unit.h"
-#include "skill.h"
-#include "message.h"
-#include "reports.h"
-#include "karma.h"
+#include <ship.h>
+#include <unit.h>
+#include <building.h>
+#include <faction.h>
+#include <plane.h>
+#include <alchemy.h>
+#include <item.h>
+#include <magic.h>
+#include <build.h>
+#include <goodies.h>
+#include <study.h>
+#include <movement.h>
+#include <race.h>
+#include <spy.h>
+#include <build.h>
+#include <pool.h>
+#include <region.h>
+#include <unit.h>
+#include <skill.h>
+#include <message.h>
+#include <reports.h>
+#include <karma.h>
 
 /* gamecode includes */
 #include "laws.h"
@@ -75,7 +79,6 @@ typedef struct spende {
 } spende;
 static spende *spenden;
 /* ------------------------------------------------------------- */
-#define FAST_WORK
 
 static request workers[1024];
 static request *nextworker;
@@ -315,8 +318,8 @@ expandrecruit(region * r, request * recruitorders)
 							u->n * level_days(i));
 			}
 			if (u->n < u->wants) {
-				add_message(&u->faction->msgs, new_message(u->faction,
-					"recruit%u:unit%r:region%i:amount%i:want", u, r, u->n, u->wants));
+				add_message(&u->faction->msgs, 
+					msg_message("recruit", "unit region amount want", u, r, u->n, u->wants));
 			}
 		}
 	}
@@ -371,7 +374,7 @@ recruit(region * r, unit * u, strlist * S,
 		pl = getplane(r);
 		if (pl && fval(pl, PFL_NORECRUITS)) {
 			add_message(&u->faction->msgs,
-				new_message(u->faction, "error_pflnorecruit%s:command%u:unit%r:region", S->s, u, r));
+				msg_error(u, S->s, "error_pflnorecruit", ""));
 			return;
 		}
 
@@ -436,18 +439,17 @@ void
 add_give(unit * u, unit * u2, int n, const resource_type * rtype, const char * cmd, int error)
 {
 	if (error)
-		cmistake(u, cmd, error, MSG_EVENT);
+		cmistake(u, cmd, error, MSG_COMMERCE);
 	else if (!u2 || u2->faction!=u->faction) {
 		assert(rtype);
 		add_message(&u->faction->msgs,
-			new_message(u->faction, "give%u:unit%u:target%X:resource%i:amount",
-			u,
-			u2?(cansee(u->faction, u->region, u2, 0)?u2:NULL):&u_peasants,
-			rtype, n));
-		if (u2) add_message(&u2->faction->msgs,
-			new_message(u2->faction, "give%u:unit%u:target%X:resource%i:amount",
-			u?(cansee(u2->faction, u2->region, u, 0)?u:NULL):&u_peasants,
-			u2, rtype, n));
+			msg_message("give", "unit target resource amount",
+			u, u2?ucansee(u->faction, u2, &u_unknown):&u_peasants, rtype, n));
+		if (u2) {
+			add_message(&u2->faction->msgs,
+				msg_message("give", "unit target resource amount",
+					ucansee(u2->faction, u, &u_unknown), u2, rtype, n));
+		}
 	}
 }
 
@@ -479,7 +481,13 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, const char
  		if (use<n) use += new_use_pooled(src, item2resource(itype), GET_RESERVE|GET_POOLED_SLACK, n-use);
 		if (dest) {
 			i_change(&dest->items, itype, n);
+#if RESERVE_DONATIONS
 			new_change_resvalue(dest, item2resource(itype), n);
+#elif RESERVE_GIVE
+			if (src->faction==dest->faction) {
+				new_change_resvalue(dest, item2resource(itype), n);
+			}
+#endif
 			handle_event(&src->attribs, "give", dest);
 			handle_event(&dest->attribs, "receive", src);
 #if defined(MUSEUM_PLANE) && defined(TODO)
@@ -491,13 +499,6 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, const char
 		}
 	}
 	add_give(src, dest, n, item2resource(itype), cmd, error);
-}
-
-void
-giveitem(int n, item_t it, unit * u, region * r, unit * u2, strlist * S)
-{
-	unused(r);
-	give_item(n, olditemtype[it], u, u2, S->s);
 }
 
 void
@@ -720,10 +721,7 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 		cmistake(u, S->s, 156, MSG_COMMERCE);
 		return;
 	}
-	add_message(&u2->faction->msgs,
-		new_message(u2->faction, "give%u:unit%u:target%X:resource%i:amount",
-		u?&u_peasants:(cansee(u2->faction, u->region, u, 0)?u:NULL),
-		u2, r_unit, 1));
+	add_give(u, u2, 1, r_unit, S->s, 0);
 	u_setfaction(u, u2->faction);
 	u2->faction->newbies += n;
 
@@ -732,31 +730,31 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 	 * Blödsinn, da Silberpool nicht auf geben wirkt. Aber Rekrutierungen,
 	 * teure Talente lernen und Gegenstände erschaffen! Kritisch sind:
 	 * BIETE, FORSCHEN, KAUFE, LERNE, REKRUTIERE, ZAUBERE,
-	 * HELFE, PASSWORT, STIRB (Katja) */
+	 * HELFE, PASSWORT, STIRB (Katja) 
+	 * Natürlich wirkt der Silberpool bei gib!
+	 * Und damit nicht irgendein zukünftiger Befehl vergessen wird,
+	 * löschen wir der Einfachheit halber alle! (Enno).
+	 */
 
-	for (S = u->orders; S; S = S->next) {
-		switch (igetkeyword(S->s, u->faction->locale)) {
-		case K_BIETE:
-		case K_RESEARCH:
-		case K_BUY:
-		case K_STUDY:
-		case K_RECRUIT:
-		case K_CAST:
-		case K_ALLY:
-		case K_PASSWORD:
-		case K_QUIT:
-			*S->s = 0;
-		}
+	/* freelist(u->orders); 
+    * FEHLER! Das darf nicht, weil es auf orders noch pointer geben kann! 
+    */
+	while (u->orders) {
+		/* dieser code _kennt_ die implementaion von strlists... */
+		strlist * o = u->orders;
+		u->orders = o->next;
+		gc_add(o->s); /* delete it later */
+		free(o);
 	}
-	add_message(&u->faction->msgs,
-		new_message(u->faction, "give%u:unit%u:target%X:resource%i:amount",
-		u, u2?&u_peasants:u2,
-		r_unit, 1));
 }
 
-
-void
-dogive(region * r, unit * u, strlist * S, boolean liefere)
+static void
+dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
+/*
+ * mode=0: give to any units
+ * mode=1: give to other units and peasants only
+ * mode=2: give to own units only
+ */
 {
 	unit *u2;
 	char *s;
@@ -768,6 +766,23 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 
 	u2 = getunit(r, u->faction);
 
+	switch (mode) {
+	case 0:
+		/* any destination is okay */
+		break;
+	case 1:
+		/* not to myself */
+		if (u2 && u2->faction==u->faction) return;
+		break;
+#if TWOPASS_GIVE
+	case 2:
+		/* not to peasants or others */
+		if (!u2 || u2->faction!=u->faction) return;
+		break;
+#endif
+	default:
+		assert(!"invalid mode for dogive");
+	}
 	if (!u2 && !getunitpeasants) {
 		cmistake(u, S->s, notfound_error, MSG_COMMERCE);
 		return;
@@ -821,16 +836,13 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 		freset(u, FL_OWNER);
 		fset(u2, FL_OWNER);
 
-		add_message(&u2->faction->msgs, new_message(
-			u2->faction, "givecommand%u:unit%u:receipient",
-			u,
-			u2?(cansee(u->faction, u->region, u2, 0)?u2:NULL):&u_peasants));
-		if (u->faction != u2->faction)
-			add_message(&u->faction->msgs, new_message(
-				u->faction, "givecommand%u:unit%u:receipient",
-				u?(cansee(u2->faction, u2->region, u, 0)?u:NULL):&u_peasants,
-				u2));
-
+		add_message(&u->faction->msgs, 
+			msg_message("givecommand", "unit receipient", u, u2));
+		if (u->faction != u2->faction) {
+			add_message(&u2->faction->msgs, 
+				msg_message("givecommand", "unit receipient", 
+					ucansee(u2->faction, u, &u_unknown), u2));
+		}
 		return;
 	}
 	if (u2 && u2->race == RC_SPELL) {
@@ -840,21 +852,21 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 
 	/* if ((race[u->race].ec_flags & NOGIVE) || fval(u,FL_LOCKED)) {*/
 	if (race[u->race].ec_flags & NOGIVE) {
-		sprintf(buf, "%s geben nichts weg", race[u->race].name[1]);
-		mistake(u, S->s, buf, MSG_COMMERCE);
+		add_message(&u->faction->msgs, 
+			msg_error(u, S->s, "race_nogive", "race", u->race));
 		return;
 	}
 	if (u2 && !(race[u2->race].ec_flags & GETITEM)) {
-		sprintf(buf, "%s nehmen nichts an", race[u2->race].name[1]);
-		mistake(u, S->s, buf, MSG_COMMERCE);
+		add_message(&u->faction->msgs, 
+			msg_error(u, S->s, "race_notake", "race", u->race));
 		return;
 	}
 
 	/* Übergabe aller Kräuter */
 	if (findparam(s, u->faction->locale) == P_HERBS) {
 		if (!(race[u->race].ec_flags & GIVEITEM)) {
-			sprintf(buf, "%s geben nichts weg", race[u->race].name[1]);
-			mistake(u, S->s, buf, MSG_COMMERCE);
+			add_message(&u->faction->msgs, 
+				msg_error(u, S->s, "race_nogive", "race", u->race));
 			return;
 		}
 		if (!u2) {
@@ -910,8 +922,8 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 		if (*s == 0) {
 			const item_type * itype;
 			if (!(race[u->race].ec_flags & GIVEITEM)) {
-				sprintf(buf, "%s geben nichts weg.", race[u->race].name[1]);
-				mistake(u, S->s, buf, MSG_COMMERCE);
+				add_message(&u->faction->msgs, 
+					msg_error(u, S->s, "race_nogive", "race", u->race));
 				return;
 			}
 			/* TODO: go through source unit's items only to speed this up */
@@ -928,8 +940,8 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 		i = findparam(s, u->faction->locale);
 		if (i == P_PERSON) {
 			if (!(race[u->race].ec_flags & GIVEPERSON)) {
-				sprintf(buf, "%s können nicht neu gruppiert werden.", unitname(u));
-				mistake(u, S->s, buf, MSG_COMMERCE);
+				add_message(&u->faction->msgs, 
+					msg_error(u, S->s, "race_noregroup", "race", u->race));
 				return;
 			}
 			n = u->number;
@@ -938,8 +950,8 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 		}
 
 		if (!(race[u->race].ec_flags & GIVEITEM)) {
-			sprintf(buf, "%s geben nichts weg.", race[u->race].name[1]);
-			mistake(u, S->s, buf, MSG_COMMERCE);
+				add_message(&u->faction->msgs, 
+					msg_error(u, S->s, "race_nogive", "race", u->race));
 			return;
 		}
 		itype = finditemtype(s, u->faction->locale);
@@ -972,8 +984,8 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 	i = findparam(s, u->faction->locale);
 	if (i == P_PERSON) {
 		if (!(race[u->race].ec_flags & GIVEPERSON)) {
-			sprintf(buf, "%s können nicht neu gruppiert werden.", unitname(u));
-			mistake(u, S->s, buf, MSG_COMMERCE);
+			add_message(&u->faction->msgs, 
+				msg_error(u, S->s, "race_noregroup", "race", u->race));
 			return;
 		}
 		givemen(n, u, u2, S);
@@ -981,8 +993,8 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 	}
 
 	if (!(race[u->race].ec_flags & GIVEITEM)) {
-		sprintf(buf, "%s geben nichts weg.", race[u->race].name[1]);
-		mistake(u, S->s, buf, MSG_COMMERCE);
+		add_message(&u->faction->msgs, 
+			msg_error(u, S->s, "race_nogive", "race", u->race));
 		return;
 	}
 	itype = finditemtype(s, u->faction->locale);
@@ -1145,8 +1157,11 @@ gebaeude_stuerzt_ein(region * r, building * b)
 	int n, i;
 	direction_t d;
 	int opfer = 0;
-
-	sprintf(buf, "%s stürzte ein.", buildingname(b));
+	int road = 0;
+	struct message * msg;
+	/*
+	"$building($crashed) stürzte ein.$if($road," Beim Einsturz wurde die halbe Straße vernichtet.","")$if($victims,"$int($victims) $if($eq($victims,1),"ist","sind"),"") zu beklagen."
+	*/
 
 	/* Falls Karawanserei, Damm oder Tunnel einstürzen, wird die schon
 	 * gebaute Straße zur Hälfte vernichtet */
@@ -1156,7 +1171,7 @@ gebaeude_stuerzt_ein(region * r, building * b)
 		 b->type == &bt_tunnel))
 	{
 		rsetroad(r, d, rroad(r, d) / 2);
-		sprintf(buf, " Beim Einsturz wurde die halbe Straße vernichtet.");
+		road = 1;
 	}
 	for (u = r->units; u; u = u->next) {
 		if (u->building == b) {
@@ -1176,24 +1191,13 @@ gebaeude_stuerzt_ein(region * r, building * b)
 		}
 	}
 
-	if (opfer > 0) {
-		buf[0]=' ';
-		strcpy(buf+1, itoa10(opfer));
-		scat(" Opfer ");
-		if (opfer == 1) {
-			scat("ist");
-		} else {
-			scat("sind");
-		}
-		scat(" zu beklagen.");
-	} else buf[0] = 0;
-	addmessage(r, 0, buf, MSG_EVENT, ML_IMPORTANT);
+	msg = msg_message("buildingcrash", "region building opfer road", r, b, opfer, road);
+	add_message(&r->msgs, msg);
 	for (u=r->units; u; u=u->next) {
 		faction * f = u->faction;
 		if (fval(f, FL_MARK)) {
 			freset(u->faction, FL_MARK);
-			add_message(&f->msgs,
-				new_message(f, "buildingcrash%r:region%b:building%s:opfer", r, b, buf));
+			add_message(&f->msgs, msg);
 		}
 	}
 	destroy_building(b);
@@ -1213,11 +1217,10 @@ maintain_buildings(boolean crash)
 					continue;
 				} else {
 					unit * u = buildingowner(r, b);
+					struct message * msg = msg_message("nomaintenance", "building", b);
 					if (u) {
-						add_message(&u->faction->msgs,
-							new_message(u->faction, "nomaintenance%b:building", b));
-						add_message(&r->msgs,
-							new_message(u->faction, "nomaintenance%b:building", b));
+						add_message(&u->faction->msgs, msg);
+						add_message(&r->msgs, msg);
 					}
 				}
 			}
@@ -1249,11 +1252,11 @@ economics(void)
 					break;
 
 				case K_GIVE:
-					dogive(r, u, S, S->s[0]=='@'?true:false);
+					dogive(r, u, S, S->s[0]=='@'?true:false, TWOPASS_GIVE);
 					break;
 
 				case K_LIEFERE:
-					dogive(r, u, S, true);
+					dogive(r, u, S, true, TWOPASS_GIVE);
 					break;
 
 				case K_FORGET:
@@ -1263,7 +1266,20 @@ economics(void)
 				}
 			}
 		}
-
+#if TWOPASS_GIVE
+		for (u = r->units; u; u = u->next) {
+			for (S = u->orders; S; S = S->next) {
+				switch (igetkeyword(S->s, u->faction->locale)) {
+				case K_GIVE:
+					dogive(r, u, S, S->s[0]=='@'?true:false, 2);
+					break;
+				case K_LIEFERE:
+					dogive(r, u, S, true, 2);
+					break;
+				}
+			}
+		}
+#endif
 		/* RECRUIT orders */
 
 		for (u = r->units; u; u = u->next) {
@@ -1307,11 +1323,11 @@ manufacture(unit * u, const item_type * itype, int want)
 	switch (n) {
 	case ENEEDSKILL:
 		add_message(&u->faction->msgs, 
-			msg_error(u, u->thisorder, "skill_needed", "skill", sk));
+			msg_error(u, findorder(u, u->thisorder), "skill_needed", "skill", sk));
 		return;
 	case ELOWSKILL:
 		add_message(&u->faction->msgs,
-			msg_error(u, u->thisorder, "manufacture_skills", "skill minskill product", 
+			msg_error(u, findorder(u, u->thisorder), "manufacture_skills", "skill minskill product", 
 			sk, minskill, itype->rtype, 1));
 		return;
 	case ENOMATERIALS:
@@ -1330,7 +1346,7 @@ manufacture(unit * u, const item_type * itype, int want)
 			  ch = ch+strlen(ch);
 			}
 			strcat(ch,".");
-			mistake(u, u->thisorder, buf, MSG_PRODUCE);
+			mistake(u, findorder(u, u->thisorder), buf, MSG_PRODUCE);
 			return;
 		}
 	}
@@ -1409,8 +1425,8 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 					&& armedmen(u2)
 #endif
 					) {
-				sprintf(buf, "%s bewacht die Region", unitname(u2));
-				mistake(u, u->thisorder, buf, MSG_PRODUCE);
+				add_message(&u->faction->msgs, 
+					msg_error(u, findorder(u, u->thisorder), "region_guarded", "guard", u2));
 				return;
 			}
 		}
@@ -1429,8 +1445,8 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 				&& !ucontact(u2, u)
 				&& !allied(u2, u->faction, HELP_GUARD))
 			{
-				sprintf(buf, "%s bewacht die Region", unitname(u2));
-				mistake(u, u->thisorder, buf, MSG_PRODUCE);
+				add_message(&u->faction->msgs, 
+					msg_error(u, findorder(u, u->thisorder), "region_guarded", "guard", u2));
 				return;
 			}
 		}
@@ -1441,13 +1457,13 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 	if (skill == 0) {
 		skill_t sk = itype->construction->skill;
 		add_message(&u->faction->msgs, 
-			msg_error(u, u->thisorder, "skill_needed", "skill", sk));
+			msg_error(u, findorder(u, u->thisorder), "skill_needed", "skill", sk));
 		return;
 	}
 	if (skill < itype->construction->minskill) {
 		skill_t sk = itype->construction->skill;
 		add_message(&u->faction->msgs,
-			msg_error(u, u->thisorder, "manufacture_skills", "skill minskill product", 
+			msg_error(u, findorder(u, u->thisorder), "manufacture_skills", "skill minskill product", 
 			sk, itype->construction->minskill, itype->rtype));
 		return;
 	} else {
@@ -1618,7 +1634,7 @@ create_potion(unit * u, const potion_type * ptype, int want)
 			  ch = ch+strlen(ch);
 			}
 			strcat(ch,".");
-			mistake(u, u->thisorder, buf, MSG_PRODUCE);
+			mistake(u, findorder(u, u->thisorder), buf, MSG_PRODUCE);
 			return;
 		}
 		break;
@@ -1640,7 +1656,7 @@ create_item(unit * u, const item_type * itype, int want)
 		const potion_type * ptype = resource2potion(itype->rtype);
 		if (ptype!=NULL) create_potion(u, ptype, want);
 		else if (itype->construction) manufacture(u, itype, want);
-		else cmistake(u, u->thisorder, 125, MSG_PRODUCE);
+		else cmistake(u, findorder(u, u->thisorder), 125, MSG_PRODUCE);
 	}
 }
 
@@ -1692,7 +1708,7 @@ make(region * r, unit * u)
 				return;
 			}
 			build_road(r, u, m, d);
-		} else cmistake(u, u->thisorder, 71, MSG_PRODUCE);
+		} else cmistake(u, findorder(u, u->thisorder), 71, MSG_PRODUCE);
 		return;
 	} else if (p == P_SHIP) {
 		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
@@ -1915,9 +1931,8 @@ buy(region * r, unit * u, request ** buyorders, const char * cmd)
 		}
 	}
 	if (r_demand(r, ltype)) {
-		sprintf(buf, "Dieses Luxusgut wird in %s nicht produziert",
-				regionid(r));
-		mistake(u, cmd, buf, MSG_COMMERCE);
+		add_message(&u->faction->msgs, 
+			msg_error(u, cmd, "luxury_notsold", ""));
 		return;
 	}
 	o = (request *) calloc(1, sizeof(request));
@@ -2137,8 +2152,8 @@ sell(region * r, unit * u, request ** sellorders, const char * cmd)
 	/* Belagerte Einheiten können nichts verkaufen. */
 
 	if (besieged(u)) {
-		sprintf(buf, "%s wird belagert.", unitname(u));
-		mistake(u, cmd, buf, MSG_COMMERCE);
+		add_message(&u->faction->msgs, 
+			msg_error(u, cmd, "error60", ""));
 		return;
 	}
 	/* In der Region muß es eine Burg geben. */
@@ -2293,18 +2308,18 @@ plant(region *r, unit *u)
 	}
 	/* Wasser des Lebens prüfen */
 	if (get_pooled(u, r, R_TREES) == 0) {
-		sprintf(buf, "Dazu braucht man %s.",
-				locale_string(u->faction->locale, resourcename(oldresourcetype[R_TREES], GR_PLURAL)));
-		mistake(u, u->thisorder, buf, MSG_PRODUCE);
+		add_message(&u->faction->msgs, 
+			msg_error(u, findorder(u, u->thisorder), "resource_missing", "missing", 
+				oldresourcetype[R_TREES]));
 		return;
 	}
 	htype = rherbtype(r);
 	n = new_get_pooled(u, htype->itype->rtype, GET_DEFAULT);
 	/* Kräuter prüfen */
 	if (n==0) {
-		sprintf(buf, "Dazu braucht man %s.",
-				locale_string(u->faction->locale, resourcename(htype->itype->rtype, GR_PLURAL)));
-		mistake(u, u->thisorder, buf, MSG_PRODUCE);
+		add_message(&u->faction->msgs, 
+			msg_error(u, findorder(u, u->thisorder), "resource_missing", "missing", 
+				htype->itype->rtype));
 		return;
 	}
 
@@ -2388,7 +2403,7 @@ research(region *r, unit *u)
 	if (findparam(s, u->faction->locale) == P_HERBS) {
 
 		if (eff_skill(u, SK_HERBALISM, r) < 7) {
-			cmistake(u, u->thisorder, 227, MSG_EVENT);
+			cmistake(u, findorder(u, u->thisorder), 227, MSG_EVENT);
 			return;
 		}
 
@@ -2464,16 +2479,14 @@ steal(region * r, unit * u, request ** stealorders)
 	}
 
 	if (u2->faction->age < IMMUN_GEGEN_ANGRIFF) {
-		sprintf(buf, "Eine Partei muß mindestens %d Wochen alt sein, bevor sie "
-			"bestohlen werden kann.", IMMUN_GEGEN_ANGRIFF);
-		mistake(u, u->thisorder, buf, MSG_INCOME);
+		add_message(&u->faction->msgs, 
+			msg_error(u, findorder(u, u->thisorder), "steal_immunity", "age", IMMUN_GEGEN_ANGRIFF));
 		return;
 	}
 
 	assert(u->region==u2->region);
 	if (!can_contact(r, u, u2)) {
-		sprintf(buf, "%s wird belagert.", unitname(u2));
-		mistake(u, u->thisorder, buf, MSG_INCOME);
+		add_message(&u->faction->msgs, msg_error(u, findorder(u, u->thisorder), "error60", ""));
 		return;
 	}
 	n = eff_skill(u, SK_STEALTH, r) - wahrnehmung(r, f);
@@ -2755,8 +2768,8 @@ tax(region * r, unit * u, request ** taxorders)
 
 	u2 = is_guarded(r, u, GUARD_TAX);
 	if (u2) {
-		sprintf(buf, "%s bewacht die Region.", unitname(u2));
-		mistake(u, u->thisorder, buf, MSG_INCOME);
+		add_message(&u->faction->msgs, 
+			msg_error(u, findorder(u, u->thisorder), "region_guarded", "guard", u2));
 		return;
 	}
 
@@ -2861,8 +2874,8 @@ produce(void)
 				if (!nonplayer(u))
 					work(r, u);
 				else if (u->faction->no > 0) {
-					sprintf(buf, "%s können nicht arbeiten", race[u->race].name[1]);
-					mistake(u, u->thisorder, buf, MSG_INCOME);
+					add_message(&u->faction->msgs, 
+						msg_error(u, findorder(u, u->thisorder), "race_cantwork", "race", u->race));
 				}
 				break;
 

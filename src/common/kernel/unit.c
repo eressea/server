@@ -55,7 +55,8 @@
 
 /* ------------------------------------------------------------- */
 
-const unit u_peasants = { NULL, NULL, NULL, NULL, NULL, 2, "Die Bauern" };
+const unit u_peasants = { NULL, NULL, NULL, NULL, NULL, 2, "die Bauern" };
+const unit u_unknown = { NULL, NULL, NULL, NULL, NULL, 1, "eine unbekannte Einheit" };
 
 #define DMAXHASH 8191
 typedef struct dead {

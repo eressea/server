@@ -2605,7 +2605,7 @@ reports(void)
 	init_intervals();
 #endif
 	remove_empty_units();
-	log_printf("Report timestamp - %s", pzTime);
+	log_printf("Report timestamp - %s\n", pzTime);
 	for (f = factions; f; f = f->next) {
 		attrib * a = a_find(f->attribs, &at_reportspell);
 		current_faction = f;

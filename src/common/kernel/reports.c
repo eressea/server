@@ -839,3 +839,9 @@ spy_message(int spy, unit *u, unit *target)
 	}
 }
 
+const struct unit *
+ucansee(const struct faction *f, const struct unit *u, const struct unit *x)
+{
+	if (cansee(f, u->region, u, 0)) return u;
+	return x;
+}

@@ -280,11 +280,11 @@ render_immediate(const message * m, const char * find, localizer * l)
 					} else {
 						var = "die Bevölkerung";
 					}
-				} else if(m->data[i] == NULL) {
+				} else if(m->data[i] == NULL || m->data[i] == &u_unknown) {
 					if (b == rbuf) {
-						var = "Eine unsichtbare Einheit";
+						var = "Eine unerkannte Einheit";
 					} else {
-						var = "eine unsichtbare Einheit";
+						var = "eine unerkannte Einheit";
 					}
 				} else {
 					var = unitname((unit*)m->data[i]);

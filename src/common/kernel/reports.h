@@ -46,6 +46,8 @@ void reports(void);
 char *gamedate(const struct locale *);
 char *gamedate2(void);
 
+extern const struct unit *ucansee(const struct faction *f, const struct unit *u, const struct unit *x);
+
 struct summary;
 extern void report_summary(struct summary * n, struct summary * o, boolean full);
 extern struct summary * make_summary(boolean count_new);

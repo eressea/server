@@ -198,10 +198,12 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
 		teaching = max(0, teaching - student->number * 30);
 
 		if (report || teacher->faction != student->faction) {
-			add_message(&student->faction->msgs, new_message(student->faction,
-				"teach%u:teacher%u:student%t:skill", teacher, student, sk));
-			add_message(&teacher->faction->msgs, new_message(teacher->faction,
-				"teach%u:teacher%u:student%t:skill", teacher, student, sk));
+			add_message(&student->faction->msgs, msg_message("teach",
+				"teacher student skill", teacher, student, sk));
+			if (teacher->faction != student->faction) {
+				add_message(&teacher->faction->msgs, msg_message("teach", 
+					"teacher student skill", teacher, student, sk));
+			}
 		}
 	}
 	return n;
@@ -236,8 +238,8 @@ teach(region * r, unit * u)
 		teaching -= i * 30;
 		change_effect(u, oldpotiontype[P_FOOL], -i);
 		j = teaching / 30;
-		add_message(&u->faction->msgs, new_message(u->faction,
-				"teachdumb%u:teacher%i:amount", u, j));
+		add_message(&u->faction->msgs, msg_message("teachdumb",
+			"teacher amount", u, j));
 	}
 	if (teaching == 0)
 		return;
@@ -570,10 +572,8 @@ learn(void)
 				if (a==NULL) a = a_add(&u->attribs, a_new(&at_learning));
 				if (money>0) {
 					use_pooled(u, r, R_SILVER, money);
-					add_message(&u->faction->msgs, 
-								new_message(u->faction,
-											"studycost%u:unit%r:region%i:cost%t:skill",
-											u, u->region, money, i));
+					add_message(&u->faction->msgs, msg_message("studycost",
+						"unit region cost skill", u, u->region, money, i));
 				}
 				
 				if (get_effect(u, oldpotiontype[P_WISE])) {

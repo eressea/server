@@ -184,5 +184,9 @@ SOURCE=.\reduceproduction.c
 
 SOURCE=.\targetregion.c
 # End Source File
+# Begin Source File
+
+SOURCE=.\ugroup.c
+# End Source File
 # End Target
 # End Project

@@ -143,6 +143,10 @@ SOURCE=.\base36.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\command.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\crmessage.h
 # End Source File
 # Begin Source File
@@ -160,6 +164,10 @@ SOURCE=.\functions.h
 # Begin Source File
 
 SOURCE=.\goodies.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\graph.h
 # End Source File
 # Begin Source File
 
@@ -224,6 +232,10 @@ SOURCE=.\base36.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\command.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\crmessage.c
 # End Source File
 # Begin Source File
@@ -245,6 +257,10 @@ SOURCE=.\functions.c
 # Begin Source File
 
 SOURCE=.\goodies.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\graph.c
 # End Source File
 # Begin Source File
 

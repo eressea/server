@@ -50,7 +50,7 @@ void read_msglevels(struct warning ** w, FILE * F);
 void set_msglevel(struct warning ** warnings, const char * type, int level);
 
 extern struct message * msg_message(const char * name, const char* sig, ...);
-extern struct message * msg_error(const struct unit *, const char *, 
+extern struct message * msg_error(const struct unit *, const char *cmd, 
 											 const char * name, const char* sig, ...);
 extern struct message * add_message(struct message_list** pm, struct message * m);
 extern void free_messages(struct message_list * m);

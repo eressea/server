@@ -564,7 +564,7 @@ nr_size;en;size
 nr_spells;en;spells
 nr_combatspells;en;combat spells
 nr_nospells;en;none
-nr_addresslist;en;Addresses
+nr_addresses;en;Addresses
 
 ##  Küsten
 Nordwestküste;en;northwest coast
@@ -586,3 +586,4 @@ ADRESSEN;en;ADDRESSES
 ZIPPED;en;ZIPPED
 BZIP2;en;BZIP2
 PUNKTE;en;SCORE
+INFO;en;INFO

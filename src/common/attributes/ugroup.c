@@ -8,7 +8,6 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: ugroup.c,v 1.2 2001/04/29 19:27:41 enno Exp $
  */
 
 #include <config.h>

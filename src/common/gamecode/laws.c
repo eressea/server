@@ -1759,8 +1759,8 @@ set_passw(void)
 
 				case K_MAGIEGEBIET:
 					if(u->faction->magiegebiet != 0) {
-						mistake(u, S->s, "Die Partei hat bereits ein Magiegebiet",
-							MSG_EVENT);
+						add_message(&u->faction->msgs, 
+							msg_error(u, S->s, "one_circle_only", ""));
 					} else {
 						mtyp = getmagicskill();
 						if(mtyp == M_NONE) {
@@ -1993,7 +1993,8 @@ instant_orders(void)
 
 					default:
 						if (strlen(param)) {
-							mistake(u, S->s, "unbekannter Kampfstatus", MSG_EVENT);
+							add_message(&u->faction->msgs, 
+								msg_error(u, S->s, "unknown_status", ""));
 						} else {
 							u->status = ST_FIGHT;
 						}
@@ -2138,8 +2139,8 @@ bewache_an(void)
 	strlist *S;
 
 	/* letzte schnellen befehle - bewache */
-	for (r = regions; r; r = r->next)
-		for (u = r->units; u; u = u->next)
+	for (r = regions; r; r = r->next) {
+		for (u = r->units; u; u = u->next) {
 			if (!fval(u, FL_MOVED)) {
 				for (S = u->orders; S; S = S->next) {
 					if (igetkeyword(S->s, u->faction->locale) == K_GUARD && getparam(u->faction->locale) != P_NOT) {
@@ -2147,8 +2148,8 @@ bewache_an(void)
 							if (!illusionary(u) && u->race != RC_SPELL) {
 #ifdef WACH_WAFF
 								if (!armedmen(u)) {
-									mistake(u, S->s,
-										"Die Einheit ist nicht bewaffnet und kampffähig", MSG_EVENT);
+									add_message(&u->faction->msgs, 
+										msg_error(u, S->s, "unit_unarmed", ""));
 									continue;
 								}
 #endif
@@ -2162,7 +2163,8 @@ bewache_an(void)
 					}
 				}
 			}
-
+		}
+	}
 }
 
 void

@@ -153,6 +153,7 @@ struct unit * findnewunit (const struct region * r, const struct faction *f, int
 
 #define upotions(u) fval(u, FL_POTIONS)
 extern const struct unit u_peasants;
+extern const struct unit u_unknown;
 
 int change_skill(struct unit * u, skill_t id, int byvalue);
 void set_skill(struct unit * u, skill_t id, int value);

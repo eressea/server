@@ -28,6 +28,7 @@
 
 /* libc includes */
 #include <stdlib.h>
+#include <string.h>
 
 extern const char *directions[];
 

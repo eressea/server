@@ -264,7 +264,10 @@ msg_error(const struct unit * u, const char * cmd, const char * name, const char
 	const char *ic = sig;
 	void * args[16];
 	memset(args, 0, sizeof(args));
-	if (cmd==NULL) cmd = u->thisorder;
+
+	assert(cmd!=u->thisorder || !"only use entries from u->orders - memory corruption imminent.");
+	if (cmd==NULL) cmd = findorder(u, u->thisorder);
+
 
 	if (!mtype) {
 		fprintf(stderr, "trying to create message of unknown type \"%s\"\n", name);
@@ -422,52 +425,53 @@ new_message(struct faction * receiver, const char* sig, ...)
 	return msg_create(mtype, (void**)args);
 }
 
-void
-addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
+static void
+caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 {
-	caddmessage(r, f, gc_add(strdup(translate_regions(s, f))), mtype, level);
-}
-
-void
-caddmessage(region * r, faction * f, char *s, msg_t mtype, int level)
-{
+	const char * section = NULL;
 	message * m = NULL;
+
+	unused(level);
 	switch (mtype) {
 	case MSG_INCOME:
 		assert(f);
-		m = add_message(&f->msgs, new_message(f, "msg_economy%s:string", s));
+		m = add_message(&f->msgs, msg_message("msg_economy", "string", s));
 		break;
 	case MSG_BATTLE:
 		assert(0 || !"battle-meldungen nicht über addmessage machen");
 		break;
 	case MSG_MOVE:
 		assert(f);
-		m = add_message(&f->msgs, new_message(f, "msg_movement%s:string", s));
+		m = add_message(&f->msgs, msg_message("msg_movement", "string", s));
 		break;
 	case MSG_COMMERCE:
 		assert(f);
-		m = add_message(&f->msgs, new_message(f, "msg_economy%s:string", s));
+		m = add_message(&f->msgs, msg_message("msg_economy", "string", s));
 		break;
 	case MSG_PRODUCE:
 		assert(f);
-		m = add_message(&f->msgs, new_message(f, "msg_production%s:string", s));
+		m = add_message(&f->msgs, msg_message("msg_production", "string", s));
 		break;
 	case MSG_MAGIC:
 	case MSG_COMMENT:
 	case MSG_MESSAGE:
 		/* Botschaften an REGION oder einzelne PARTEI */
-		if (!r)
-			m = add_message(&f->msgs, new_message(f, "msg_event%s:string", s));
+		if (!r) {
+			assert(f);
+			m = add_message(&f->msgs, msg_message("msg_event", "string", s));
+		}
 		else
-			m = add_message(&r->msgs, new_message(f, "msg_event%s:string", s));
+			m = add_message(&r->msgs, msg_message("msg_event", "string", s));
 		break;
 	case MSG_ORCVERMEHRUNG:
 	case MSG_EVENT:
 		/* Botschaften an REGION oder einzelne PARTEI */
-		if (!r)
-			m = add_message(&f->msgs, new_message(f, "msg_event%s:string", s));
+		if (!r) {
+			assert(f);
+			m = add_message(&f->msgs, msg_message("msg_event", "string", s));
+		}
 		else
-			m = add_message(&r->msgs, new_message(f, "msg_event%s:string", s));
+			m = add_message(&r->msgs, msg_message("msg_event", "string", s));
 		break;
 	default:
 		assert(!"Ungültige Msg-Klasse!");
@@ -475,20 +479,28 @@ caddmessage(region * r, faction * f, char *s, msg_t mtype, int level)
 }
 
 void
+addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
+{
+	caddmessage(r, f, gc_add(strdup(translate_regions(s, f))), mtype, level);
+}
+
+void
 xmistake(const unit * u, const char *s, const char *comment, int mtype)
 {
 	if (u->faction->no == MONSTER_FACTION) return;
-	add_message(&u->faction->msgs, new_message(u->faction, "mistake%s:command%s:error%u:unit%r:region", s, comment, u, u->region));
+	add_message(&u->faction->msgs, msg_message("mistake",
+		"command error unit region", s, comment, u, u->region));
 }
 
 void
 cmistake(const unit * u, const char *cmd, int mno, int mtype)
 {
-	static char lbuf[64];
+	static char ebuf[20];
+
 	if (u->faction->no == MONSTER_FACTION) return;
-	sprintf(lbuf, "error%d", mno);
-	strcat(lbuf, "%s:command%u:unit%r:region");
-	add_message(&u->faction->msgs, new_message(u->faction, lbuf, cmd, u, u->region));
+	sprintf(ebuf, "error%d", mno);
+	add_message(&u->faction->msgs, msg_message(ebuf, 
+		"command unit region", cmd, u, u->region));
 }
 
 void
