@@ -122,7 +122,8 @@ endif
 # Create dependencies
 depend:: $(SOURCES)
 	@echo "Creating dependencies in `pwd`/.depend";
-	$(DEPEND) $(CFLAGS) $(DEFINES) $(INCDIRS) $(SOURCES) >| .depend
+	@$(DEPEND) $(CFLAGS) $(DEFINES) $(INCDIRS) $(SOURCES) >| .depend
+	@perl -pe 's/(.*\.o)/Debug-$(ARCHITECTURE)\/\1 Release-$(ARCHITECTURE)\/\1/' -i .depend
 endif
 
 
