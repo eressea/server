@@ -829,9 +829,12 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 				cansee = true;
 				break;
 			}
+
+#if NEWATSROI == 0
 			if (invisible(u) >= u->number
 				&& !get_item(u2, I_AMULET_OF_TRUE_SEEING))
 				continue;
+#endif
 
 			o = eff_skill(u2, SK_OBSERVATION, r);
 #if NIGHTEYES
@@ -890,8 +893,11 @@ cansee(faction * f, region * r, unit * u, int modifier)
 				}
 				else
 					xcheck = true;
+
+#if NEWATSROI == 0
 				if (ring && !get_item(u2, I_AMULET_OF_TRUE_SEEING))
 					continue;
+#endif
 
 				o = eff_skill(u2, SK_OBSERVATION, r);
 #if NIGHTEYES
@@ -935,9 +941,12 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u, int mod
 					cansee = true;
 					break;
 				}
+
+#if NEWATSROI == 0
 				if (invisible(u) >= u->number
 						&& !get_item(u2, I_AMULET_OF_TRUE_SEEING))
 					continue;
+#endif
 
 				o = eff_skill(u2, SK_OBSERVATION, r);
 

@@ -33,6 +33,7 @@ typedef struct skillmod_data {
 	skill_t skill;
 	int (*special)(const struct unit * u, const struct region * r, skill_t sk, int value);
 	double multiplier;
+	int number;
 	int bonus;
 	int flags;
 } skillmod_data;

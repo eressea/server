@@ -33,5 +33,6 @@
 #define RECRUITFRACTION 20
 #define CATAPULT_AMMUNITION 0
 #define CHANGED_CROSSBOWS 0
+#define NEWATSROI 0
 
 #define MAILITPATH	"/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"

@@ -40,6 +40,11 @@
 #define RESOURCE_QUANTITY 0.5
 #define TEACHDIFFERENCE 2
 #define GIVERESTRICTION 0
+#define NEWATSROI 1
+#if NEWATSROI == 1
+#define ATSBONUS 2
+#define ROIBONUS 4
+#endif
 
 #define ALLIANCES
 #undef  ALLIANCEJOIN

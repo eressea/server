@@ -90,9 +90,12 @@ slipthru(const region * r, const unit * u, const building * b)
 
 	for (u2 = r->units; u2; u2 = u2->next)
 		if (usiege(u2) == b) {
+
+#if NEWATSROI == 0
 			if (invisible(u) >= u->number &&
 				!get_item(u2, I_AMULET_OF_TRUE_SEEING))
 				continue;
+#endif
 
 			o = eff_skill(u2, SK_OBSERVATION, r);
 

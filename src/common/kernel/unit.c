@@ -964,9 +964,24 @@ item_modification(const unit *u, skill_t sk, int val)
 	if(sk == SK_SPY && get_item(u, I_PRESSCARD) >= u->number) {
 		val = val * 2;
 	}
-	if(sk == SK_STEALTH && get_item(u, I_PRESSCARD) >= u->number) {
-		val = 0;
+	if(sk == SK_STEALTH) {
+#if NEWATSROI == 1
+		if(get_item(u, I_RING_OF_INVISIBILITY)
+				+ 100 * get_item(u, I_SPHERE_OF_INVISIBILITY) >= u->number) {
+			val += ROIBONUS;
+		}
+#endif
+		if(get_item(u, I_PRESSCARD) >= u->number) {
+			val = 0;
+		}
 	}
+#if NEWATSROI == 1
+	if(sk == SK_OBSERVATION) {
+		if(get_item(u, I_AMULET_OF_TRUE_SEEING) >= u->number) {
+			val += ATSBONUS;
+		}
+	}
+#endif
 	return val;
 }
 
@@ -1067,8 +1082,13 @@ eff_skill(const unit * u, skill_t sk, const region * r)
 int
 invisible(const unit *u)
 {
+#if NEWATSROI == 1
+	return 0;
+#else
 	return get_item(u, I_RING_OF_INVISIBILITY)
 		+ 100 * get_item(u, I_SPHERE_OF_INVISIBILITY);
+
+#endif
 }
 
 boolean

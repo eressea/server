@@ -41,5 +41,6 @@
 #define TEACHDIFFERENCE 2
 #define MAXAGE 8
 #define GIVERESTRICTION 3
+#define NEWATSROI 0
 
 #define MAILITPATH	"/usr/sbin:$HOME/tutorial/bin:/bin:/usr/bin:/usr/local/bin"

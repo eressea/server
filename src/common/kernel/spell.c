@@ -8854,7 +8854,7 @@ spell spelldaten[] =
 
 	{SPL_INVISIBILITY2_ILLAUN, "Erschaffe eine Sphäre der Unsichtbarkeit",
 		"Mit diesem Spruch kann der Zauberer eine Sphäre der Unsichtbarkeit "
-		"erschaffen. Die Späre macht ihren Träger sowie einhundert weitere "
+		"erschaffen. Die Späre macht ihren Träger sowie neunundneunzig weitere "
 		"Personen in derselben Einheit unsichtbar.",
 		NULL,
 		NULL,
