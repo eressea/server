@@ -2513,8 +2513,8 @@ peasant_adjustment(void)
 				p_weg = (int)(min(((playerp * PLWEIGHT) + rpeasants(r)) - soll, rpeasants(r)));
 				assert(p_weg >= 0);
 				if (p_weg > 0){
-					log_printf("BAUERN: war %d, minus %d, playerp %d\n",
-							rpeasants(r), p_weg, playerp);
+					log_printf("BAUERN %s: war %d, minus %d, playerp %d\n",
+							regionname(r, NULL), rpeasants(r), p_weg, playerp);
 				}
 				pool += p_weg;
 				rsetpeasants(r, rpeasants(r) - p_weg);
