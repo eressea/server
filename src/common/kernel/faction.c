@@ -300,8 +300,8 @@ is_enemy(const struct faction * f, const struct faction * enemy)
   return false;
 }
 
-void
-add_enemy(struct faction * f, struct faction * enemy)
+static void
+add_enemy_i(struct faction * f, struct faction * enemy)
 {
   if (!is_enemy(f, enemy)) {
     struct faction_list * flist = malloc(sizeof(faction_list));
@@ -312,7 +312,14 @@ add_enemy(struct faction * f, struct faction * enemy)
 }
 
 void
-remove_enemy(struct faction * f, const struct faction * enemy)
+add_enemy(struct faction * f, struct faction * enemy)
+{
+  add_enemy_i(f, enemy);
+/*  add_enemy_i(enemy, f); */
+}
+
+static void
+remove_enemy_i(struct faction * f, const struct faction * enemy)
 {
   struct faction_list **pflist = &f->enemies;
   while (*pflist!=NULL) {
@@ -325,4 +332,12 @@ remove_enemy(struct faction * f, const struct faction * enemy)
     }
   }
 }
+
+void
+remove_enemy(struct faction * f, struct faction * enemy)
+{
+  remove_enemy_i(f, enemy);
+/*  remove_enemy_i(enemy, f); */
+}
+
 #endif

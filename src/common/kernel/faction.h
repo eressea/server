@@ -92,7 +92,7 @@ extern void destroyfaction(faction * f);
 #ifdef REGIONOWNERS
 extern boolean is_enemy(const struct faction * f, const struct faction * enemy);
 extern void add_enemy(struct faction * f, struct faction * enemy);
-extern void remove_enemy(struct faction * f, const struct faction * enemy);
+extern void remove_enemy(struct faction * f, struct faction * enemy);
 #endif
 
 #endif

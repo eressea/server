@@ -64,6 +64,7 @@
 #include <goodies.h>
 #include <crmessage.h>
 #include <nrmessage.h>
+#include <base36.h>
 #include <language.h>
 
 /* libc includes */
@@ -821,7 +822,19 @@ show_allies(FILE * F, const faction * f, const ally * sf)
 		}
 	}
 }
-/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
+
+#ifdef REGIONOWNERS
+static void
+show_enemies(FILE * F, const faction_list* flist)
+{
+  for (;flist!=NULL;flist=flist->next) {
+    if (flist->data) {
+      int fno = flist->data->no;
+      fprintf(F, "ENEMY %u\n%d;partei\n", fno);
+    }
+  }
+}
+#endif
 
 /* prints all visible spells in a region */
 static void
@@ -1039,6 +1052,9 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 	for (i=0;i!=MAXOPTIONS;++i) {
 		fprintf(F, "%d;%s\n", (f->options&want(i))?1:0, options[i]);
 	}
+#ifdef REGIONOWNERS
+  show_enemies(F, f->enemies);
+#endif
 	show_allies(F, f, f->allies);
 	{
 		group * g;
@@ -1101,6 +1117,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 		const char * tname;
 		unsigned char seemode = sd->mode;
 		const region * r = sd->r;
+    unit * owner = region_owner(r);
 		sd = sd->next;
 
 		if (!rplane(r)) fprintf(F, "REGION %d %d\n", region_x(r, f), region_y(r, f));
@@ -1132,6 +1149,9 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 			fputs("\"travel\";visibility\n", F);
 			break;
 		}
+    if (owner) {
+      fprintf(F, "%d;owner\n", owner->faction->no);
+    }
 		if (seemode == see_neighbour) {
 			cr_borders(r, f, seemode, F);
 		} else {

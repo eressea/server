@@ -1279,7 +1279,16 @@ describe(FILE * F, const region * r, int partial, faction * f)
 			scat(".");
 	}
 
-	if (!is_cursed(r->attribs, C_REGCONF, 0)) {
+  {
+    const unit * u = region_owner(r);
+    if (u) {
+      scat(" Die Region ist im Besitz von ");
+      scat(factionname(u->faction));
+      scat(".");
+    }
+  }
+
+  if (!is_cursed(r->attribs, C_REGCONF, 0)) {
 		attrib *a_do = a_find(r->attribs, &at_overrideroads);
 		if(a_do) {
 			scat(" ");
@@ -1716,9 +1725,9 @@ show_allies(const faction * f, const ally * allies)
 }
 
 static void
-allies(FILE * F, faction * f)
+allies(FILE * F, const faction * f)
 {
-	group * g = f->groups;
+	const group * g = f->groups;
 	if (f->allies) {
 		if (!f->allies->next) {
 			strcpy(buf, "Wir helfen der Partei ");
@@ -1747,6 +1756,28 @@ allies(FILE * F, faction * f)
 	}
 }
 
+#ifdef REGIONOWNERS
+static void
+enemies(FILE * F, const faction * f)
+{
+  faction_list * flist = f->enemies;
+  if (flist!=NULL) {
+    strcpy(buf, "Wir liegen im Krieg mit ");
+    for (;flist!=NULL;flist = flist->next) {
+      const faction * enemy = flist->data;
+      scat(factionname(enemy));
+      if (flist->next) {
+        scat(", ");
+      } else {
+        scat(".");
+      }
+    }
+		rparagraph(F, buf, 0, 0);
+		rnl(F);
+  }
+}
+#endif
+
 static void
 guards(FILE * F, const region * r, const faction * see)
 {				/* die Partei  see  sieht dies; wegen
@@ -1762,7 +1793,7 @@ guards(FILE * F, const region * r, const faction * see)
 	boolean tarned = false;
 	/* Bewachung */
 
-	for (u = r->units; u; u = u->next)
+  for (u = r->units; u; u = u->next) {
 		if (getguard(u)) {
 			faction *f  = u->faction;
 			faction *fv = visible_faction(see, u);
@@ -1780,21 +1811,25 @@ guards(FILE * F, const region * r, const faction * see)
 				}
 			}
 		}
-	if (!nextguard && !tarned) return;
+  }
 
-	strcpy(buf, "Die Region wird von ");
-
+  if (nextguard || tarned) {
+    strcpy(buf, "Die Region wird von ");
+  } else {
+    return;
+  }
+  
 	for (i = 0; i!=nextguard+(tarned?1:0); ++i) {
 		if (i!=0) {
-			if (i == nextguard-(tarned?0:1))
-				scat(" und ");
-			else
-				scat(", ");
-		}
-		if (i<nextguard) scat(factionname(guardians[i]));
+  		if (i == nextguard-(tarned?0:1))
+	  		scat(" und ");
+		  else
+			  scat(", ");
+  	}
+	  if (i<nextguard) scat(factionname(guardians[i]));
 
-		else scat("unbekannten Einheiten");
-	}
+	  else scat("unbekannten Einheiten");
+  }
 	scat(" bewacht.");
 	rnl(F);
 	rparagraph(F, buf, 0, 0);
@@ -2120,6 +2155,9 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	centre(F, LOC(f->locale, "nr_alliances"), false);
 	rnl(F);
 
+#ifdef REGIONOWNERS
+  enemies(F, f);
+#endif
 	allies(F, f);
 
 	rpline(F);
@@ -2159,19 +2197,20 @@ report(FILE *F, faction * f, const faction_list * addresses,
 			guards(F, r, f);
 			durchreisende(F, r, f);
 		}
-		else if (sd->mode==see_far) {
-			describe(F, r, 3, f);
-			guards(F, r, f);
-			durchreisende(F, r, f);
-		}
-		else if (turm_sieht_region) {
-			describe(F, r, 2, f);
-			durchreisende(F, r, f);
-		} else {
-			describe(F, r, 1, f);
-			durchreisende(F, r, f);
-		}
-
+    else {
+      if (sd->mode==see_far) {
+			  describe(F, r, 3, f);
+			  guards(F, r, f);
+			  durchreisende(F, r, f);
+		  }
+		  else if (turm_sieht_region) {
+			  describe(F, r, 2, f);
+			  durchreisende(F, r, f);
+		  } else {
+			  describe(F, r, 1, f);
+			  durchreisende(F, r, f);
+		  }
+    }
 		/* Statistik */
 
 		if (wants_stats && unit_in_region == 1)

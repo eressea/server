@@ -5402,6 +5402,38 @@
 		<text locale="de">"$unit($unit) konnte nicht von $region($region) nach $region($target) reisen, da der Besitzer der Region es verhinderte."</text>
 	</message>
 
+	<message name="war_notify" section="events">
+		<type>
+			<arg name="enemy" type="faction"></arg>
+		</type>
+		<text locale="de">"$faction($faction) hat uns den Krieg erklärt."</text>
+		<text locale="en">"$faction($faction) has declared war on us."</text>
+	</message>
+
+	<message name="war_confirm" section="events">
+		<type>
+			<arg name="enemy" type="faction"></arg>
+		</type>
+		<text locale="de">"Wir haben $faction($faction) den Krieg erklärt."</text>
+		<text locale="en">"We declared war on $faction($faction)."</text>
+	</message>
+
+	<message name="peace_notify" section="events">
+		<type>
+			<arg name="enemy" type="faction"></arg>
+		</type>
+		<text locale="de">"$faction($faction) hat den Krieg mit uns beendet."</text>
+		<text locale="en">"$faction($faction) has declared peace with us."</text>
+	</message>
+
+	<message name="peace_confirm" section="events">
+		<type>
+			<arg name="enemy" type="faction"></arg>
+		</type>
+		<text locale="de">"Wir haben den Krieg mit $faction($faction) beendet."</text>
+		<text locale="en">"We declared peace with $faction($faction)."</text>
+	</message>
+
 	<message name="moveblockedbyguard" section="movement">
 		<type>
 			<arg name="unit" type="unit"></arg>

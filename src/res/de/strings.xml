@@ -1839,6 +1839,14 @@
 	<string name="NUMMER">
 		<text locale="de">NUMMER</text>
 	</string>
+	<string name="FRIEDEN">
+		<text locale="de">FRIEDEN</text>
+		<text locale="en">PEACE</text>
+	</string>
+	<string name="KRIEG">
+		<text locale="de">KRIEG</text>
+		<text locale="en">WAR</text>
+	</string>
 	<string name="FOLGEN">
 		<text locale="de">FOLGEN</text>
 	</string>

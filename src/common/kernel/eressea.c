@@ -197,6 +197,8 @@ const char *keywords[MAXKEYWORDS] =
 	"ENDE",
 	"FAHREN",
 	"NUMMER",
+  "KRIEG",
+  "FRIEDEN",
 	"FOLGEN",
 	"FORSCHEN",
 	"GIB",

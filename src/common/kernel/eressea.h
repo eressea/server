@@ -398,6 +398,8 @@ enum {
 	K_END,
 	K_DRIVE,
 	K_NUMBER,
+	K_WAR,
+	K_PEACE,
 	K_FOLLOW,
 	K_RESEARCH,
 	K_GIVE,

@@ -2740,6 +2740,63 @@ evict(void)
 }
 #endif
 
+#ifdef REGIONOWNERS
+static void
+declare_war(void)
+{
+  region *r;
+  for (r=regions;r;r=r->next) {
+    unit * u;
+    for (u=r->units;u;u=u->next) {
+      strlist *S;
+      faction * f = u->faction;
+      for (S = u->orders; S; S = S->next) {
+        switch (igetkeyword(S->s, f->locale)) {
+        case K_WAR:
+          for (;;) {
+            const char * s = getstrtoken();
+            if (s[0]==0) break;
+            else {
+              faction * enemy = findfaction(atoi36(s));
+              if (enemy) {
+                if (!is_enemy(f, enemy)) {
+                  add_enemy(f, enemy);
+                  ADDMSG(&enemy->msgs, msg_message("war_notify", "enemy", f));
+                  ADDMSG(&f->msgs, msg_message("war_confirm", "enemy", enemy));
+                }
+              } else {
+                ADDMSG(&f->msgs, msg_message("error66", "unit region command", u, r, S->s));
+              }
+            }
+          }
+          break;
+        case K_PEACE:
+          for (;;) {
+            const char * s = getstrtoken();
+            if (s[0]==0) break;
+            else {
+              faction * enemy = findfaction(atoi36(s));
+              if (enemy) {
+                if (is_enemy(f, enemy)) {
+                  remove_enemy(f, enemy);
+                  ADDMSG(&enemy->msgs, msg_message("peace_notify", "enemy", f));
+                  ADDMSG(&f->msgs, msg_message("peace_confirm", "enemy", enemy));
+                }
+              } else {
+                ADDMSG(&f->msgs, msg_message("error66", "unit region command", u, r, S->s));
+              }
+            }
+          }
+          break;
+        default:
+          break;
+        }
+      }
+    }
+  }
+}
+#endif
+
 static void
 renumber(void)
 {
@@ -2749,7 +2806,7 @@ renumber(void)
 	unit * u;
 	int i;
 
-	for (r=regions;r;r=r->next) {
+  for (r=regions;r;r=r->next) {
 		for (u=r->units;u;u=u->next) {
 			faction * f = u->faction;
 			for (S = u->orders; S; S = S->next) if (igetkeyword(S->s, u->faction->locale)==K_NUMBER) {
@@ -3520,6 +3577,10 @@ processorders (void)
 #endif
 #ifdef ALLIANCEJOIN
 	alliancejoin();
+#endif
+#ifdef REGIONOWNERS
+	puts(" - Krieg & Frieden");
+  declare_war();
 #endif
 	puts(" - Neue Nummern");
 	renumber();
