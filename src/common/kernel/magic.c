@@ -2489,7 +2489,7 @@ magic(void)
           if (sp == NULL && is_familiar(u)) {
             familiar = u;
             mage = get_familiar_mage(u);
-            sp = find_spellbyname(mage, s, mage->faction->locale);
+            if (mage!=NULL) sp = find_spellbyname(mage, s, mage->faction->locale);
           }
 
           if (sp == NULL) {

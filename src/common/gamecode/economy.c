@@ -190,7 +190,6 @@ static void
 expandrecruit(region * r, request * recruitorders)
 {
 	/* Rekrutierung */
-
 	int i, n, p = rpeasants(r), h = rhorses(r), uruks = 0;
 	int rfrac = p / RECRUITFRACTION;
 	unit * u;
@@ -293,6 +292,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 	plane * pl;
 	request *o;
 	int recruitcost;
+  const struct race * rc = u->faction->race;
 
 #if GUARD_DISABLES_RECRUIT == 1
 	/* this is a very special case because the recruiting unit may be empty
@@ -304,7 +304,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 	}
 #endif
 
-	if (u->faction->race == new_race[RC_INSECT]) {
+	if (rc == new_race[RC_INSECT]) {
 		if (month_season[month(0)] == 0 && rterrain(r) != T_DESERT) {
 #ifdef INSECT_POTION
 			boolean usepotion = false;
@@ -334,11 +334,11 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 		return;
 	}
 
-  if (!(u->faction->race->ec_flags & ECF_REC_HORSES) && fval(r, RF_ORCIFIED)) {
+  if (!(rc->ec_flags & ECF_REC_HORSES) && fval(r, RF_ORCIFIED)) {
 #if RACE_ADJUSTMENTS
-    if (u->faction->race != new_race[RC_URUK])
+    if (rc != new_race[RC_URUK])
 #else
-    if (u->faction->race != new_race[RC_ORC])
+    if (rc != new_race[RC_ORC])
 #endif
     {
       cmistake(u, ord, 238, MSG_EVENT);
@@ -346,7 +346,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
     }
   }
 
-	recruitcost = u->faction->race->recruitcost;
+	recruitcost = rc->recruitcost;
 	if (recruitcost) {
 		pl = getplane(r);
 		if (pl && fval(pl, PFL_NORECRUITS)) {
@@ -366,12 +366,12 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 	}
 	/* snotlinge sollten hiermit bereits abgefangen werden, die
 	* parteirasse ist uruk oder ork*/
-	if (u->race != u->faction->race) {
+	if (u->race != rc) {
 		if (u->number != 0) {
 			cmistake(u, ord, 139, MSG_EVENT);
 			return;
 		}
-		else u->race = u->faction->race;
+		else u->race = rc;
 	}
 
   init_tokens(ord);

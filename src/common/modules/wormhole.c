@@ -78,12 +78,14 @@ wormhole_age(struct attrib * a)
     if (teure_talente(u)) continue;
     if (u->building!=data->entry) continue;
 
-    move_unit(u, data->exit->region, NULL);
-    maxtransport -= u->number;
-    m = msg_message("wormhole_exit", "unit region", u, data->exit->region);
-    add_message(&data->exit->region->msgs, m);
-    add_message(&u->faction->msgs, m);
-    msg_release(m);
+    if (data->exit!=NULL) {
+      move_unit(u, data->exit->region, NULL);
+      maxtransport -= u->number;
+      m = msg_message("wormhole_exit", "unit region", u, data->exit->region);
+      add_message(&data->exit->region->msgs, m);
+      add_message(&u->faction->msgs, m);
+      msg_release(m);
+    }
   }
 
   /* it's important that destroy_building doesn't change b->region, because
