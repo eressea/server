@@ -7,47 +7,38 @@ SubDirHdrs $(SUBDIR)/../common/util ;
 SubDirHdrs $(SUBDIR)/../common ;
 SubDirHdrs $(SUBDIR)/.. ;
 
+LUASERVER = eressea-lua ;
+SERVER = eressea ;
+
+SERVER_SOURCES = main.c korrektur.c ;
+LUASERVER_SOURCES =
+ <lua>alliance.cpp
+ <lua>building.cpp
+ <lua>eressea.cpp
+ <lua>faction.cpp
+ <lua>region.cpp
+ <lua>ship.cpp
+ <lua>unit.cpp
+ server.cpp
+ korrektur.c
+ ;
+
+LinkLibraries $(SERVER) :
+ kernel gamecode items modules attributes spells races triggers util ;
+LinkLibraries $(LUASERVER) :
+ kernel gamecode items modules attributes spells races triggers util ;
+ 
+LINKLIBS on $(SERVER) += -lm ;
+LINKLIBS on $(LUASERVER) += -L$(LUABIND_ROOT)/lib -llua50 -llualib50 ;
+LINKLIBS on $(LUASERVER) += -lm -lluabind -ldl -lstdc++ ;
+
 if $(HAVE_LUA) {
+ SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;
  SubDirC++Flags -DHAVE_LUA ;
  UsingLua ;
  UsingLuabind ;
- SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;
+
+ Main $(LUASERVER) : $(LUASERVER_SOURCES) ;
 }
 
-if $(HAVE_LUA) {
- BINARY = eressea-lua ;
- SOURCES =
-  <lua>alliance.cpp
-  <lua>building.cpp
-  <lua>eressea.cpp
-  <lua>faction.cpp
-  <lua>region.cpp
-  <lua>ship.cpp
-  <lua>unit.cpp
-  server.cpp
-  ;
-
- LINKLIBS on $(BINARY) += -L$(LUABIND_ROOT)/lib -llua50 -llualib50 ;
- LINKLIBS on $(BINARY) += -lluabind ;
- LINKLIBS on $(BINARY) += -ldl -lstdc++ ;
-} else {
- BINARY = eressea ;
- SOURCES = main.c ;
-}
-
-SOURCES += korrektur.c ;
-
-Main $(BINARY) : $(SOURCES) ;
-LinkLibraries $(BINARY) :
- kernel 
- gamecode 
- items 
- modules
- attributes
- spells
- races
- triggers 
- util
- ;
- 
-LINKLIBS on $(BINARY) += -lm ;
+Main $(SERVER) : $(SERVER_SOURCES) ;

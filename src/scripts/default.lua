@@ -18,8 +18,6 @@ function process(orders)
   write_passwords()
   write_reports()
 
-  print(turn .. " " .. get_turn())
-
   file = "" .. get_turn()
   if write_game(file)~=0 then 
     print("could not write game")
@@ -38,3 +36,4 @@ if orderfile==nil then
 else
   process(orderfile)
 end
+
