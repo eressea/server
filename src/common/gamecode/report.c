@@ -481,9 +481,15 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
 		itemanz = sp->komponenten[k][1];
 		costtyp = sp->komponenten[k][2];
 		if(itemanz > 0){
-			sprintf(buf, "  %d %s", itemanz, LOC(lang, resname(res, itemanz!=1)));
-			if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR )
-				scat(" * Stufe");
+      if (sp->sptyp & SPELLLEVEL) {
+        sprintf(buf, "  %d %s", itemanz, LOC(lang, resname(res, itemanz!=1)));
+        if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR ) {
+          scat(" * Stufe");
+        }
+      } else {
+        itemanz *= sp->level;
+        sprintf(buf, "  %d %s", itemanz, LOC(lang, resname(res, itemanz!=1)));
+      }
 			rps(F, buf);
 		}
 	}

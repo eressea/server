@@ -8330,7 +8330,7 @@ static spell spelldaten[] =
   },
   {
     SPL_BLOODSACRIFICE, "bloodsacrifice", NULL, NULL, NULL,
-    M_CHAOS, (ONSHIPCAST | SPELLLEVEL), 1, 4,
+    M_CHAOS, (ONSHIPCAST), 1, 4,
     {
       { R_HITPOINTS, 4, SPC_LEVEL },
       { 0, 0, 0 },
