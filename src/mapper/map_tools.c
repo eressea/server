@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_tools.c,v 1.3 2001/02/03 13:45:34 enno Exp $
+ *	$Id: map_tools.c,v 1.4 2001/02/09 13:53:53 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -186,23 +186,34 @@ yes_no(WINDOW * win, const char *text, const char def)
 }
 
 char *
-my_input(WINDOW * win, int x, int y, const char *text)
+my_input(WINDOW * win, int x, int y, const char *text, const char *def)
 {
-	static char buf[INPUT_BUFSIZE+1];
+	static char lbuf[INPUT_BUFSIZE+1];
 	int val, ch, p, nw = 0;
+
 	if (!win) {
 		win = openwin(SX - 10, 3, 0);
 		y = nw = 1;
 		x = 2;
 	}
+
 	wmove(win, y, x);
 	wAddstr(text);
-	wmove(win, y, x + strlen(text));
+	if(def) {
+		strcpy(lbuf, def);
+		wAddstr(lbuf);
+		p = x + strlen(text);
+		val = strlen(lbuf);
+		wmove(win, y, p + val);
+	} else {
+		p = x + strlen(text);
+		wmove(win, y, p);
+		val = 0;
+	}
 	wrefresh(win);
 	curs_set(1);
 	wcursyncup(win);
-	p = strlen(text) + x;
-	val = 0;
+
 	do {
 		ch = getch();
 		if (ch == KEY_BACKSPACE || ch == KEY_LEFT) {
@@ -221,7 +232,7 @@ my_input(WINDOW * win, int x, int y, const char *text)
 			beep();
 		} else if (isprint(ch)) {
 			waddch(win, ch);
-			buf[val] = (char) ch;
+			lbuf[val] = (char) ch;
 			val++;
 		} else
 			beep();
@@ -230,8 +241,8 @@ my_input(WINDOW * win, int x, int y, const char *text)
 	if (nw)
 		delwin(win);
 	curs_set(0);
-	buf[val] = 0;
-	return buf;
+	lbuf[val] = 0;
+	return lbuf;
 }
 
 void

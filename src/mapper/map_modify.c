@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_modify.c,v 1.3 2001/02/03 13:45:34 enno Exp $
+ *	$Id: map_modify.c,v 1.4 2001/02/09 13:53:53 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -492,7 +492,7 @@ NeuesSchiff(region * r)
 	/* Ist das richtig so, Henning? */
 	addlist(&r->ships, s);
 
-	strcpy(buf, my_input(win, 2, 2, "Name: "));
+	strcpy(buf, my_input(win, 2, 2, "Name: ", NULL));
 	if (strlen(buf) > 0)
 		set_string(&s->name, buf);
 	if (clipunit) {
@@ -555,7 +555,7 @@ NeueBurg(region * r)
 
 	b->size = map_input(win, 2, 2, "Größe", 1, 999, 1);
 
-	strcpy(buf, my_input(win, 2, 3, "Name: "));
+	strcpy(buf, my_input(win, 2, 3, "Name: ", NULL));
 	if (strlen(buf) > 0)
 		set_string(&b->name, buf);
 	if (clipunit) {
@@ -722,7 +722,7 @@ modify_region(region * r)
 			bottom = line - 1;
 			break;
 		case '/':
-			suchtext = my_input(0, 0, 0, (char*)"Suchtext: ");
+			suchtext = my_input(0, 0, 0, (char*)"Suchtext: ", NULL);
 			such = eh;
 		case 'n':
 			line = 0;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.6 2001/02/05 16:11:57 enno Exp $
+ *	$Id: battle.c,v 1.7 2001/02/09 13:53:51 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -627,7 +627,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 		}
 		if (wtype->modifiers) {
 			/* Pferdebonus, Lanzenbonus, usw. */
-			int w;
+			int m;
 			unsigned int flags = WMF_SKILL|(attacking?WMF_OFFENSIVE:WMF_DEFENSIVE);
 
 			if (riding(t)) flags |= WMF_RIDING;
@@ -635,9 +635,9 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 			if (riding(enemy)) flags |= WMF_AGAINST_RIDING;
 			else flags |= WMF_AGAINST_WALKING;
 
-			for (w=0;wtype->modifiers[w].value;++w) {
-				if ((wtype->modifiers[w].flags & flags) == flags) {
-					skill += wtype->modifiers[w].value;
+			for (m=0;wtype->modifiers[m].value;++m) {
+				if ((wtype->modifiers[m].flags & flags) == flags) {
+					skill += wtype->modifiers[m].value;
 				}
 			}
 		}
@@ -2832,19 +2832,20 @@ make_fighter(battle * b, unit * u, boolean attack)
 #if TACTICS_RANDOM
 	if (t > 0) {
 		int bonus = 0;
-		int r;
 
 		for (i = 0; i < fig->alive; i++) {
 			int p_bonus = 0;
+			int rnd;
+
 			do {
-				r = rand()%100;
-				if (r >= 40 && r <= 69)
+				rnd = rand()%100;
+				if (rnd >= 40 && rnd <= 69)
 					p_bonus += 1;
-				else if (r <= 89)
+				else if (rnd <= 89)
 					p_bonus += 2;
 				else
 					p_bonus += 3;
-			} while(r >= 97);
+			} while(rnd >= 97);
 			bonus = max(p_bonus, bonus);
 		}
 		t += bonus;
@@ -3196,54 +3197,54 @@ do_battle(void)
 		for (u = r->units; u != NULL; u = u->next) {
 			if (fval(u, FL_HADBATTLE)) continue;
 			if (u->number > 0) {
-				strlist *s;
+				strlist *sl;
 
-				list_foreach(strlist, u->orders, s) {
-					if (igetkeyword(s->s) == K_ATTACK) {
+				list_foreach(strlist, u->orders, sl) {
+					if (igetkeyword(sl->s) == K_ATTACK) {
 						unit *u2;
 						fighter *c1, *c2;
 
 						if(r->planep && fval(r->planep, PFL_NOATTACK)) {
-							cmistake(u, s->s, 271, MSG_BATTLE);
-							list_continue(s);
+							cmistake(u, sl->s, 271, MSG_BATTLE);
+							list_continue(sl);
 						}
 
 						/* Fehlerbehandlung Angreifer */
 						if (is_spell_active(r, C_PEACE)) {
 							sprintf(buf, "Hier ist es so schön friedlich, %s möchte "
 									"hier niemanden angreifen.", unitname(u));
-							mistake(u, s->s, buf, MSG_BATTLE);
-							list_continue(s);
+							mistake(u, sl->s, buf, MSG_BATTLE);
+							list_continue(sl);
 						}
 
 						if (fval(u, FL_HUNGER)) {
-							cmistake(u, s->s, 225, MSG_BATTLE);
-							list_continue(s);
+							cmistake(u, sl->s, 225, MSG_BATTLE);
+							list_continue(sl);
 						}
 
 						if (u->status == ST_AVOID || u->status == ST_FLEE) {
-							cmistake(u, s->s, 226, MSG_BATTLE);
-							list_continue(s);
+							cmistake(u, sl->s, 226, MSG_BATTLE);
+							list_continue(sl);
 						}
 
 						/* ist ein Flüchtling aus einem andern Kampf */
-						if (fval(u, FL_MOVED)) list_continue(s);
+						if (fval(u, FL_MOVED)) list_continue(sl);
 
 						if (is_cursed(u->attribs, C_SLAVE, 0)) {
 							sprintf(buf, "%s kämpft nicht.", unitname(u));
-							mistake(u, s->s, buf, MSG_BATTLE);
-							list_continue(s);
+							mistake(u, sl->s, buf, MSG_BATTLE);
+							list_continue(sl);
 						}
 
 						/* Fehler: "Das Schiff muß erst verlassen werden" */
 						if (u->ship != NULL && rterrain(r) != T_OCEAN) {
-							cmistake(u, s->s, 19, MSG_BATTLE);
-							list_continue(s);
+							cmistake(u, sl->s, 19, MSG_BATTLE);
+							list_continue(sl);
 						}
 
 						if (leftship(u)) {
-							cmistake(u, s->s, 234, MSG_BATTLE);
-							list_continue(s);
+							cmistake(u, sl->s, 234, MSG_BATTLE);
+							list_continue(sl);
 						}
 
 						/* Ende Fehlerbehandlung Angreifer */
@@ -3255,36 +3256,36 @@ do_battle(void)
 						/* Fehler: "Die Einheit wurde nicht gefunden" */
 						if (!u2 || fval(u2, FL_MOVED) || u2->number == 0
 								|| !cansee(u->faction, u->region, u2, 0)) {
-							cmistake(u, s->s, 64, MSG_BATTLE);
-							list_continue(s);
+							cmistake(u, sl->s, 64, MSG_BATTLE);
+							list_continue(sl);
 						}
 						/* Fehler: "Die Einheit ist eine der unsrigen" */
 						if (u2->faction == u->faction) {
-							cmistake(u, s->s, 45, MSG_BATTLE);
-							list_continue(s);
+							cmistake(u, sl->s, 45, MSG_BATTLE);
+							list_continue(sl);
 						}
 						/* Fehler: "Die Einheit ist mit uns alliert" */
 						if (allied(u, u2->faction, HELP_FIGHT)) {
-							cmistake(u, s->s, 47, MSG_BATTLE);
-							list_continue(s);
+							cmistake(u, sl->s, 47, MSG_BATTLE);
+							list_continue(sl);
 						}
 						/* xmas */
 						if (u2->no==atoi36("xmas") && u2->irace==RC_GNOME) {
 							a_add(&u->attribs, a_new(&at_key))->data.i = atoi36("coal");
 							sprintf(buf, "%s ist böse gewesen...", unitname(u));
-							mistake(u, s->s, buf, MSG_BATTLE);
-							list_continue(s);
+							mistake(u, sl->s, buf, MSG_BATTLE);
+							list_continue(sl);
 						}if (u2->faction->age < IMMUN_GEGEN_ANGRIFF) {
 							sprintf(buf, "Eine Partei muß mindestens %d "
 									"Wochen alt sein, bevor sie angegriffen werden kann",
 									IMMUN_GEGEN_ANGRIFF);
-							mistake(u, s->s, buf, MSG_BATTLE);
-							list_continue(s);
+							mistake(u, sl->s, buf, MSG_BATTLE);
+							list_continue(sl);
 						}
 						/* Fehler: "Die Einheit ist mit uns alliert" */
 						if (is_cursed(u->attribs, C_CALM, u2->faction->unique_id)) {
-							cmistake(u, s->s, 47, MSG_BATTLE);
-							list_continue(s);
+							cmistake(u, sl->s, 47, MSG_BATTLE);
+							list_continue(sl);
 						}
 						/* Ende Fehlerbehandlung */
 
@@ -3315,7 +3316,7 @@ do_battle(void)
 						}
 					}
 				}
-				list_next(s);
+				list_next(sl);
 			}
 		}
 		if (!b)

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: reports.c,v 1.3 2001/01/31 07:59:42 enno Exp $
+ *	$Id: reports.c,v 1.4 2001/02/09 13:53:52 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -244,10 +244,10 @@ bufunit(const faction * f, const unit * u, int indent,
 	if (u->faction==f || telepath_see) {
 		attrib * a = a_find(u->attribs, &at_follow);
 		if (a) {
-			unit * u = (unit*)a->data.v;
-			if (u) {
+			unit * uf = (unit*)a->data.v;
+			if (uf) {
 				scat(", folgt ");
-				scat(itoa36(u->no));
+				scat(itoa36(uf->no));
 			}
 		}
 	}

@@ -1032,7 +1032,7 @@ sp_tiredsoldiers(fighter * fi, int level, int force, spell * sp)
 	unit *mage = fi->unit;
 	int n = 0;
 
-	force = force * force * 10;
+	force = force * force * 4;
 
 	sprintf(buf, "%s zaubert %s", unitname(mage), sp->name);
 	if (!count_enemies(fi->side, FS_ENEMY, FIGHT_ROW,

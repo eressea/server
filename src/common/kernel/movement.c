@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.7 2001/02/07 20:42:31 corwin Exp $
+ *	$Id: movement.c,v 1.8 2001/02/09 13:53:51 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -576,16 +576,16 @@ drifting_ships(region * r)
 char *
 coords_or_direction(region *r, faction *f, int dir)
 {
-	static char buf[32];
+	static char lbuf[32];
 	plane *pl = getplane(r);
 
 	if(fval(pl, PFL_NOCOORDS)) {
-		strcpy(buf, directions[dir]);
+		strcpy(lbuf, directions[dir]);
 	} else {
-		sprintf(buf, "(%d,%d)",region_x(r,f), region_y(r,f));
+		sprintf(lbuf, "(%d,%d)",region_x(r,f), region_y(r,f));
 	}
 
-	return buf;
+	return lbuf;
 }
 
 void
@@ -941,22 +941,22 @@ travel(region * first, unit * u, region * next, int flucht)
 		break;
 	default:
 		{
-			int m = 1;
+			int mp = 1;
 			if (get_effect(u, oldpotiontype[P_FAST]) >= u->number)
-				m *= 2; /* Siebenmeilentee */
+				mp *= 2; /* Siebenmeilentee */
 
 			if (u->number <= get_item(u, I_FEENSTIEFEL))
-				m *= 2;
+				mp *= 2;
 
 			/* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
 			 * Nicht kumulativ mit anderen Beschleunigungen! */
-			if ( m == 1 && getplane(next) == astral_plane && is_mage(u)) {
+			if ( mp == 1 && getplane(next) == astral_plane && is_mage(u)) {
 				if(get_mage(u)->magietyp == M_ASTRAL
 						|| get_mage(u)->magietyp == M_TRAUM) {
-					m *= 2;
+					mp *= 2;
 				}
 			}
-			k = (int)(dk*m*BP_WALKING);
+			k = (int)(dk*mp*BP_WALKING);
 		}
 		break;
 	}
@@ -986,10 +986,10 @@ travel(region * first, unit * u, region * next, int flucht)
 			if (b->type==&bt_wisps) {
 				region * rl = rconnect(current, (direction_t)((dir+MAXDIRECTIONS-1)%MAXDIRECTIONS));
 				region * rr = rconnect(current, (direction_t)((dir+1)%MAXDIRECTIONS));
-				int i = rand() % 3;
-				if (i==0) break;
-				else if (i==1 && rl && landregion(rterrain(rl))==landregion(rterrain(next))) next = rl;
-				else if (i==2 && rr && landregion(rterrain(rr))==landregion(rterrain(next))) next = rr;
+				int j = rand() % 3;
+				if (j==0) break;
+				else if (j==1 && rl && landregion(rterrain(rl))==landregion(rterrain(next))) next = rl;
+				else if (j==2 && rr && landregion(rterrain(rr))==landregion(rterrain(next))) next = rr;
 				break;
 			}
 			b = b->next;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: building.c,v 1.5 2001/02/03 18:46:15 enno Exp $
+ *	$Id: building.c,v 1.6 2001/02/09 13:53:51 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -827,17 +827,17 @@ bt_read(FILE * F)
 			if (!strcmp(semi, "name") && !bt->_name) bt->_name = strdup(s);
 		}
 		else {
-			int i = atoi(buf);
+			int j = atoi(buf);
 			switch (semi[0]) {
 			case 'c':
-				if (!strcmp(semi, "capacity")) bt->capacity=i;
+				if (!strcmp(semi, "capacity")) bt->capacity=j;
 				break;
 			case 'f':
-				if (!strcmp(semi, "flags")) bt->flags=i;
+				if (!strcmp(semi, "flags")) bt->flags=j;
 				break;
 			case 'm':
-				if (!strcmp(semi, "maxcapacity")) bt->maxcapacity=i;
-				else if (!strcmp(semi, "maxsize")) bt->maxsize=i;
+				if (!strcmp(semi, "maxcapacity")) bt->maxcapacity=j;
+				else if (!strcmp(semi, "maxsize")) bt->maxsize=j;
 				break;
 			}
 		}

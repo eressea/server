@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_partei.c,v 1.3 2001/02/03 13:45:34 enno Exp $
+ *	$Id: map_partei.c,v 1.4 2001/02/09 13:53:53 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -46,7 +46,7 @@ RemovePartei(void) {
 	region *r;
 	win = openwin(SX - 20, 5, "< Partei löschen >");
 
-	fac_nr36 = my_input(win, 2, 1, "Partei Nummer: ");
+	fac_nr36 = my_input(win, 2, 1, "Partei Nummer: ", NULL);
 
 	x = atoi36(fac_nr36);
 
@@ -361,7 +361,7 @@ NeuePartei(region * r)
 	}
 	win = openwin(SX - 10, 9, "< Neue Partei einfügen >");
 
-	strcpy(buf, my_input(win, 2, 1, "EMail-Adresse (Leer->Ende): "));
+	strcpy(buf, my_input(win, 2, 1, "EMail-Adresse (Leer->Ende): ", NULL));
 	if (!buf[0]) {
 		delwin(win);
 		return;
@@ -507,7 +507,7 @@ ModifyPartei(faction * f)
 			wrefresh(win);
 			break;
 		case 'e':
-			strcpy(buf, my_input(0, 0, 0, "Neue eMail: "));
+			strcpy(buf, my_input(0, 0, 0, "Neue eMail: ", NULL));
 			touchwin(stdscr);
 			touchwin(win);
 			if (strlen(buf)) {
@@ -675,7 +675,7 @@ ParteiListe(void)
 				x = -1;
 				break;
 			case '/':
-				strcpy(buf, my_input(0, 0, 0, "Partei Nr. oder Name: "));
+				strcpy(buf, my_input(0, 0, 0, "Partei Nr. oder Name: ", NULL));
 				touchwin(stdscr);	/* redraw erzwingen */
 				for (tmp = P; tmp; tmp = tmp->next) {
 					s = tmp->s;

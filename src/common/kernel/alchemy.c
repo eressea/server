@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: alchemy.c,v 1.3 2001/02/03 13:45:30 enno Exp $
+ *	$Id: alchemy.c,v 1.4 2001/02/09 13:53:51 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -220,8 +220,8 @@ set_effect (unit * u, const potion_type * effect, int value)
 		a=a->nexttype;
 	}
 	if (!a && value) {
-		attrib * a = a_add(ap, a_new(&at_effect));
-		data = (effect_data*)a->data.v;
+		attrib * an = a_add(ap, a_new(&at_effect));
+		data = (effect_data*)an->data.v;
 		data->type = effect;
 		data->value = value;
 	} else if (a && !value) {
@@ -252,8 +252,8 @@ change_effect (unit * u, const potion_type * effect, int delta)
 	} else if (a!=NULL) {
 		data->value += delta;
 	} else {
-		attrib * a = a_add(ap, a_new(&at_effect));
-		data = (effect_data*)a->data.v;
+		attrib * an = a_add(ap, a_new(&at_effect));
+		data = (effect_data*)an->data.v;
 		data->type = effect;
 		data->value = delta;
 	}

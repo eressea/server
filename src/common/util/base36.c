@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: base36.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: base36.c,v 1.3 2001/02/09 13:53:52 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -60,10 +60,10 @@ itoab(int i, int base)
 	int neg = 0;
 
 	if (!as) {
-		int i;
+		int j;
 		char * x = calloc(sizeof(char), 8*4);
 		as = calloc(sizeof(char*), 4);
-		for (i=0;i!=4;++i) as[i] = x+i*8;
+		for (j=0;j!=4;++j) as[j] = x+j*8;
 	}
 	s = as[index];
 	index = (index+1) % 4;

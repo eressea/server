@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: message.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: message.c,v 1.3 2001/02/09 13:53:51 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -179,11 +179,11 @@ xmistake(const unit * u, const char *s, const char *comment, int mtype)
 void
 cmistake(const unit * u, const char *cmd, int mno, int mtype)
 {
-	static char buf[64];
+	static char lbuf[64];
 	if (u->faction->no == MONSTER_FACTION) return;
-	sprintf(buf, "error%d", mno);
-	strcat(buf, "%s:command%i:errno%u:unit%r:region");
-	add_message(&u->faction->msgs, new_message(u->faction, buf, cmd, mno, u, u->region));
+	sprintf(lbuf, "error%d", mno);
+	strcat(lbuf, "%s:command%i:errno%u:unit%r:region");
+	add_message(&u->faction->msgs, new_message(u->faction, lbuf, cmd, mno, u, u->region));
 }
 
 void
@@ -205,10 +205,11 @@ new_messagetype(const char * name, int level, const char * section)
 	mt->hashkey = hashstring(mt->name);
 #ifndef NDEBUG
 	{
-		messagetype * mt = messagetypes;
-		while(mt && strcmp(mt->name, name)) mt = mt->next;
-		if (mt) {
-			fprintf(stderr, "duplicate hashkey for messagetype %s and %s", name, mt->name);
+		messagetype * mt2 = messagetypes;
+		while(mt2 && mt2->hashkey != mt->hashkey) mt2 = mt2->next;
+		if (mt2) {
+			fprintf(stderr, "duplicate hashkey for messagetype %s and %s\n",
+				name, mt2->name);
 		}
 	}
 #endif

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: build.c,v 1.6 2001/02/04 10:04:51 enno Exp $
+ *	$Id: build.c,v 1.7 2001/02/09 13:53:51 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -288,7 +288,6 @@ destroy(region * r, unit * u, const char * cmd)
 		return;
 	if (getparam()==P_ROAD) {
 		direction_t d = getdirection();
-		unit * u2;
 		for (u2=r->units;u2;u2=u2->next) {
 			if (u2->faction!=u->faction && getguard(u2)&GUARD_TAX &&
 				 	!allied(u, u2->faction, HELP_GUARD)) {

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_units.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: map_units.c,v 1.3 2001/02/09 13:53:53 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -31,6 +31,7 @@
 #include <ship.h>
 #include <skill.h>
 #include <unit.h>
+#include <base36.h>
 
 /* libc includes */
 #include <ctype.h>
@@ -47,20 +48,22 @@ make_new_unit(region * r)
 	unit *u;
 	faction *f;
 	WINDOW *win;
+	char *fac_nr36;
 	int i, p, anz, q, y;
 	win = openwin(SX - 10, 8, "< Neue Einheit erschaffen >");
 
+	if (r->units)
+		p = r->units->faction->no;
+	else
+		p = 0;
+
 	do {
-		if (r->units)
-			p = r->units->faction->no;
-		else
-			p = 0;
-		p = map_input(win, 2, 1, "Parteinummer", -1, 999, p);
-		if (p < 0) {
+		fac_nr36 = my_input(win, 2, 1, "Parteinummer: ", itoa36(p));
+		if(fac_nr36 == NULL || *fac_nr36 == 0) {
 			delwin(win);
 			return 0;
 		}
-		f = findfaction(p);
+		f = findfaction(atoi36(fac_nr36));
 	} while (!f);
 	wmove(win, 1, 2);
 	wclrtoeol(win);
@@ -102,7 +105,7 @@ make_new_unit(region * r)
 		}
 
 		buf[0] = 0;
-		strcpy(buf, my_input(win, 2, 4, "Name: "));
+		strcpy(buf, my_input(win, 2, 4, "Name: ", NULL));
 		if (buf[0])
 			set_string(&u->name, buf);
 		if (!strlen(u->name))
@@ -730,7 +733,7 @@ dblparagraph(dbllist ** SP, char *s, int indent, char mark)
 {
 	int i, j, width, delta = 0;
 	int firstline;
-	static char buf[128];
+	static char lbuf[128];
 	width = SX - 5 - indent;
 	firstline = 1;
 
@@ -753,7 +756,7 @@ dblparagraph(dbllist ** SP, char *s, int indent, char mark)
 		j = 0;
 		if (firstline) {
 			if (*s == '\025') {	/* \023 ist ^U => Unit-Kennung */
-				buf[0] = '\025';	/* Kennung nach vorne
+				lbuf[0] = '\025';	/* Kennung nach vorne
 							 * holen */
 				delta = 1;
 			}
@@ -761,16 +764,16 @@ dblparagraph(dbllist ** SP, char *s, int indent, char mark)
 			delta = 0;
 
 		for (j = 0; j != indent; j++)
-			buf[j + delta] = ' ';
+			lbuf[j + delta] = ' ';
 
 		if (firstline && mark)
-			buf[indent - 2 + delta] = mark;
+			lbuf[indent - 2 + delta] = mark;
 
 		for (j = 0; j != i - 1; j++)
-			buf[indent + j + delta] = s[j + delta];
-		buf[indent + j + delta] = 0;
+			lbuf[indent + j + delta] = s[j + delta];
+		lbuf[indent + j + delta] = 0;
 
-		adddbllist(SP, buf);
+		adddbllist(SP, lbuf);
 
 		if (!s[i - 1 + delta])
 			break;
@@ -849,17 +852,16 @@ mapper_spunit(dbllist ** SP, unit * u, int indent)
 	dh = 0;
 
 	for (itm = u->items;itm;itm=itm->next) {
-		int i = itm->number;
 		sncat(buf, ", ", BUFSIZE);
 
 		if (!dh) {
 			sncat(buf, "hat: ", BUFSIZE);
 			dh = 1;
 		}
-		if (i == 1)
+		if (itm->number == 1)
 			sncat(buf, locale_string(NULL, resourcename(itm->type->rtype, 0)), BUFSIZE);
 		else {
-			icat(i);
+			icat(itm->number);
 			sncat(buf, " ", BUFSIZE);
 			sncat(buf, locale_string(NULL, resourcename(itm->type->rtype, GR_PLURAL)), BUFSIZE);
 		}
@@ -910,7 +912,7 @@ showunits(region * r)
 	dbllist *eh = NULL, *unten, *oben, *hlp = NULL, *such = NULL, *tmp;
 	int line, ch, bottom, bot, f, f2;
 	size_t lt;
-	char *s = NULL, *txt, *suchtext = 0, str[45], buf[256];
+	char *s = NULL, *txt, *suchtext = 0, str[45], lbuf[256];
 
 	clear();
 	strncpy(str, rname(r, NULL), 44);
@@ -923,16 +925,16 @@ showunits(region * r)
 
 	for (b = r->buildings; b; b = b->next) {
 		if (b->type == &bt_castle) {
-			sprintf(buf, "\002%s, Größe %d, %s", buildingname(b), b->size, buildingtype(b, b->size, NULL));
+			sprintf(lbuf, "\002%s, Größe %d, %s", buildingname(b), b->size, buildingtype(b, b->size, NULL));
 		} else {
-			sprintf(buf, "\002%s, Größe %d, %s", buildingname(b),
+			sprintf(lbuf, "\002%s, Größe %d, %s", buildingname(b),
 					b->size, buildingtype(b, b->size, NULL));
 			if (b->type->maxsize > 0 &&
 					b->size < b->type->maxsize) {
-				sncat(buf, " (im Bau)", BUFSIZE);
+				sncat(lbuf, " (im Bau)", BUFSIZE);
 			}
 		}
-		adddbllist(&eh, buf);
+		adddbllist(&eh, lbuf);
 		adddbllist(&eh, " ");
 		for (u = r->units; u; u = u->next) {
 			if (u->building == b && fval(u, FL_OWNER)) {
@@ -950,20 +952,20 @@ showunits(region * r)
 		f=0;
 		for (u = r->units; u; u = u->next)
 			if (u->ship == sh) f += weight(u);
-			sprintf(buf, "\023%s, %s, (%d/%d)", shipname(sh), sh->type->name[0],
+			sprintf(lbuf, "\023%s, %s, (%d/%d)", shipname(sh), sh->type->name[0],
 					(f+99)/100, shipcapacity(sh)/100);
 		if (sh->size!=sh->type->construction->maxsize) {
 			f = 100 * (sh->size) / sh->type->construction->maxsize;
-			sncat(buf, ", im Bau (", BUFSIZE);
+			sncat(lbuf, ", im Bau (", BUFSIZE);
 			icat(f);
-			sncat(buf, "%) ", BUFSIZE);
+			sncat(lbuf, "%) ", BUFSIZE);
 		}
 		if (sh->damage) {
-			sncat(buf, ", ", BUFSIZE);
+			sncat(lbuf, ", ", BUFSIZE);
 			icat(sh->damage);
-			sncat(buf, "% beschädigt", BUFSIZE);
+			sncat(lbuf, "% beschädigt", BUFSIZE);
 		}
-		adddbllist(&eh, buf);
+		adddbllist(&eh, lbuf);
 		adddbllist(&eh, " ");
 		for (u = r->units; u; u = u->next) {
 			if (u->ship == sh && fval(u, FL_OWNER)) {
@@ -1084,7 +1086,7 @@ showunits(region * r)
 			f = -1;
 			break;
 		case '/':
-			suchtext = my_input(0, 0, 0, "Suchtext: ");
+			suchtext = my_input(0, 0, 0, "Suchtext: ", NULL);
 			such = eh;
 		case 'n':
 			if (suchtext) {
@@ -1175,8 +1177,8 @@ showunits(region * r)
 					switch (pointer->s[0]) {
 					case '\002':
 						b = findbuilding(f);
-						sprintf(buf, "Einheit in %s als Eigner?", BuildingName(b));
-						if (yes_no(0, buf, 'j')) {
+						sprintf(lbuf, "Einheit in %s als Eigner?", BuildingName(b));
+						if (yes_no(0, lbuf, 'j')) {
 							for (x = r->units; x; x = x->next)
 								if (x->building == b && fval(x, FL_OWNER)) {
 									freset(x, FL_OWNER);
@@ -1188,8 +1190,8 @@ showunits(region * r)
 						break;
 					case '\023':
 						sh = findship(f);
-						sprintf(buf, "Einheit auf%s als Eigner?", shipname(sh));
-						if (yes_no(0, buf, 'j')) {
+						sprintf(lbuf, "Einheit auf%s als Eigner?", shipname(sh));
+						if (yes_no(0, lbuf, 'j')) {
 							for (x = r->units; x; x = x->next)
 								if (x->ship == sh && fval(x, FL_OWNER)) {
 									freset(x, FL_OWNER);
@@ -1203,12 +1205,12 @@ showunits(region * r)
 						x = findunit(f, r);
 						if(x) {
 							if (x->building) {
-								sprintf(buf, "Einheit in %s rein?", buildingname(x->building));
-								if (yes_no(0, buf, 'j'))
+								sprintf(lbuf, "Einheit in %s rein?", buildingname(x->building));
+								if (yes_no(0, lbuf, 'j'))
 									u->building = x->building;
 							} else if (x->ship) {
-								sprintf(buf, "Einheit auf%s rauf?", shipname(x->ship));
-								if (yes_no(0, buf, 'j'))
+								sprintf(lbuf, "Einheit auf%s rauf?", shipname(x->ship));
+								if (yes_no(0, lbuf, 'j'))
 									u->ship = x->ship;
 							}
 						}
@@ -1228,8 +1230,8 @@ showunits(region * r)
 			if (!clipship)
 				beep();
 			else {
-				sprintf(buf, "Schiff%s löschen?", shipname(clipship));
-				if (yes_no(0, buf, 'n')) {
+				sprintf(lbuf, "Schiff%s löschen?", shipname(clipship));
+				if (yes_no(0, lbuf, 'n')) {
 					modified = 1;
 					for (x = shipregion->units; x; x = x->next)
 						leave(shipregion, x);
@@ -1248,8 +1250,8 @@ showunits(region * r)
 		case 's':
 			if (clipship && shipregion != r) {
 				unit *un;
-				sprintf(buf, "Schiff %s einfügen?", shipname(clipship));
-				if (yes_no(0, buf, 'j')) {
+				sprintf(lbuf, "Schiff %s einfügen?", shipname(clipship));
+				if (yes_no(0, lbuf, 'j')) {
 					boolean owner_set = false;
 
 					for (x = shipregion->units; x;) {
@@ -1294,8 +1296,8 @@ showunits(region * r)
 					if (f) {
 						b = findbuilding(f);
 						if (b) {
-							sprintf(buf, "Gebäude %s löschen?", BuildingName(b));
-							if (yes_no(0, buf, 'n')) {
+							sprintf(lbuf, "Gebäude %s löschen?", BuildingName(b));
+							if (yes_no(0, lbuf, 'n')) {
 								modified = 1;
 								for (x = r->units; x; x = x->next)
 									if (x->building == b)
@@ -1401,8 +1403,8 @@ showunits(region * r)
 			if (!clipunit)
 				beep();
 			else {
-				sprintf(buf, "Einheit %s löschen?", Unitid(clipunit));
-				if (yes_no(0, buf, 'n')) {
+				sprintf(lbuf, "Einheit %s löschen?", Unitid(clipunit));
+				if (yes_no(0, lbuf, 'n')) {
 					modified = 1;
 					destroy_unit(clipunit);
 					clipunit = 0;

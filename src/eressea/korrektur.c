@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.14 2001/02/04 11:18:27 corwin Exp $
+ *	$Id: korrektur.c,v 1.15 2001/02/09 13:53:53 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1785,7 +1785,6 @@ fix_targetregion_resolve(void)
 		}
 	}
 }
-
 
 #include <modules/gmcmd.h>
 void setup_gm_faction(void);

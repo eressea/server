@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: goodies.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: goodies.c,v 1.3 2001/02/09 13:53:52 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -68,6 +68,22 @@ hashstring(const char* s)
 		key = ((key >> 31) & 1) ^ (key << 1) ^ s[i];
 	}
 	return key & 0x7fff;
+}
+
+/* Standardfunktion aus Sedgewick: Algorithmen in C++ */
+
+#define HASH_MAX 100001
+int
+hashstring_new(const char* s)
+{
+	int key = 0;
+	int i = strlen(s);
+
+	while (i) {
+		--i;
+		key = (256 * key + s[i])%HASH_MAX;
+	}
+	return key /* & 0x7fffffff */;
 }
 
 char *

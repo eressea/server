@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: mapper.c,v 1.6 2001/02/05 16:11:58 enno Exp $
+ *	$Id: mapper.c,v 1.7 2001/02/09 13:53:53 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -498,7 +498,7 @@ SetHighlight(void)
 	c = tolower(getch());
 	switch (c) {
 	case 'p':
-		fac_nr36 = my_input(win, 2, 2, "Partei-Nummer: ");
+		fac_nr36 = my_input(win, 2, 2, "Partei-Nummer: ", NULL);
 		hl = atoi36(fac_nr36);
 		break;
 	case 'e':
@@ -741,7 +741,7 @@ movearound(int rx, int ry) {
 					switch(sel) {
 					case 'e':
 					case 'E':
-						q = atoi36(my_input(win, 2, 2, "Welche Einheit suchen: "));
+						q = atoi36(my_input(win, 2, 2, "Welche Einheit suchen: ", NULL));
 						if (q) {
 							u = findunitg(q, NULL);
 							if (!u) {
@@ -755,7 +755,7 @@ movearound(int rx, int ry) {
 						break;
 					case 'p':
 					case 'P':
-						q = atoi36(my_input(win, 2, 2, "Welche Partei suchen: "));
+						q = atoi36(my_input(win, 2, 2, "Welche Partei suchen: ", NULL));
 						if(q) {
 							u2 = NULL;
 							for(r2=regions; r2; r2=r2->next) {
@@ -773,7 +773,7 @@ movearound(int rx, int ry) {
 						break;
 					case 'r':
 					case 'R':
-						selc = my_input(win, 2, 2, "Welchen Regionsnamen suchen: ");
+						selc = my_input(win, 2, 2, "Welchen Regionsnamen suchen: ", NULL);
 						if(*selc) {
 							for(r2=regions; r2; r2=r2->next)
 								if(strcmp(selc, rname(r2, NULL)) == 0) break;

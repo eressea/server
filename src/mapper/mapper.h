@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: mapper.h,v 1.3 2001/02/03 13:45:34 enno Exp $
+ *	$Id: mapper.h,v 1.4 2001/02/09 13:53:53 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -56,7 +56,7 @@ void NeuesSchiff(struct region * r);
 void create_island(struct region *r, int n, terrain_t t);
 void make_new_block(int x, int y);
 void moveln(const int x);
-char *my_input(WINDOW * win, int x, int y, const char *text);
+char *my_input(WINDOW * win, int x, int y, const char *text, const char *def);
 void make_new_region(int x, int y);
 int map_input(WINDOW * win, int x, int y, const char *text, int mn, int mx, int pre);
 boolean yes_no(WINDOW * win, const char *text, const char def);
