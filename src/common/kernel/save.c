@@ -1638,16 +1638,9 @@ readgame(boolean backup)
 }
 /* ------------------------------------------------------------- */
 
-#ifndef NDEBUG
-int space=0;
-# define DOSPACE space=1;
-# define UNSPACE space=0;
-#endif
-
-#define wc(F, c) { putc(c, F); UNSPACE }
-#define wnl(F) { putc('\n', F); DOSPACE }
-/* #define wspace(F) { assert(space); putc(' ', F); DOSPACE } */ 
-#define whs(F, s) { fputs(s, F); putc(' ', F); DOSPACE }
+#define wc(F, c) putc(c, F);
+#define wnl(F) putc('\n', F);
+#define whs(F, s) fputs(s, F); putc(' ', F)
 
 void
 wsn(FILE * F, const char *s)
@@ -1663,20 +1656,18 @@ ws(FILE * F, const char *s)
 {
 	fputc('"', F);
 	wsn(F, s);
-	fputs("\" ", F); DOSPACE
+	fputs("\" ", F);
 }
 
 void
 wi(FILE * F, int n)
 {
 	fprintf(F, "%d ", n);
-	DOSPACE
 }
 
 void wi36(FILE * F, int n)
 {
 	fprintf(F, "%s ", itoa36(n));
-	DOSPACE
 }
 
 void
