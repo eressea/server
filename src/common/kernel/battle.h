@@ -221,7 +221,7 @@ extern "C" {
   extern boolean helping(struct side * as, struct side * ds);
   extern void rmfighter(fighter *df, int i);
   extern struct region * fleeregion(const struct unit * u);
-  extern struct troop select_corpse(struct battle * b, struct fighter * af);
+  extern struct fighter * select_corpse(struct battle * b, struct fighter * af);
   extern fighter * make_fighter(struct battle * b, struct unit * u, side * s, boolean attack);
   extern int statusrow(int status);
   extern void drain_exp(struct unit *u, int d);

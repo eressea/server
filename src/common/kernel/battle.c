@@ -391,7 +391,7 @@ allysf(const side * s, const faction * f)
 	return allysfm(s, f, HELP_FIGHT);
 }
 
-troop
+fighter *
 select_corpse(battle * b, fighter * af)
 /* Wählt eine Leiche aus, der af hilft. casualties ist die Anzahl der
  * Toten auf allen Seiten (im Array). Wenn af == NULL, wird die
@@ -399,8 +399,6 @@ select_corpse(battle * b, fighter * af)
  *
  * Untote werden nicht ausgewählt (casualties, not dead) */
 {
-	troop dt =
-	{0, 0};
 	int di, maxcasualties = 0;
 	fighter *df;
 	side *side;
@@ -421,14 +419,13 @@ select_corpse(battle * b, fighter * af)
 		if (af && !helping(af->side, df->side))
 			continue;
 		if (di < dead) {
-			dt.fighter = df;
-			dt.index = df->unit->number - di;
+			return df;
 			break;
 		}
 		di -= dead;
 	}
 	cv_next(df);
-	return dt;
+	return NULL;
 }
 
 boolean
@@ -571,28 +568,23 @@ sort_fighterrow(fighter ** elem1, fighter ** elem2)
 static void
 reportcasualties(battle * b, fighter * fig, int dead)
 {
-	bfaction * bf;
-	if (fig->alive == fig->unit->number)
-		return;
+  struct message * m;
+  if (fig->alive == fig->unit->number) return;
 #ifndef NO_RUNNING
-	if (fig->run.region == NULL) {
-		fig->run.region = fleeregion(fig->unit);
-		if (fig->run.region == NULL) fig->run.region = b->region;
-	}
+  if (fig->run.region == NULL) {
+    fig->run.region = fleeregion(fig->unit);
+    if (fig->run.region == NULL) fig->run.region = b->region;
+  }
 #endif
-	fbattlerecord(b, fig->unit->faction, " ");
-	for (bf = b->factions;bf;bf=bf->next) {
-		faction * f = bf->faction;
 #ifdef NO_RUNNING
-		struct message * m = msg_message("casualties", "unit runto run alive fallen",
-			fig->unit, NULL, fig->run.number, fig->alive, dead);
+  m = msg_message("casualties", "unit runto run alive fallen",
+    fig->unit, NULL, fig->run.number, fig->alive, dead);
 #else
-		struct message * m = msg_message("casualties", "unit runto run alive fallen",
-			fig->unit, fig->run.region, fig->run.number, fig->alive, dead);
+  m = msg_message("casualties", "unit runto run alive fallen",
+    fig->unit, fig->run.region, fig->run.number, fig->alive, dead);
 #endif
-		message_faction(b, f, m);
-		msg_release(m);
-	}
+  message_all(b, m);
+  msg_release(m);
 }
 
 
@@ -1370,7 +1362,7 @@ select_enemy(battle * b, fighter * af, int minrow, int maxrow)
       fighter * df = *fi;
       int dr;
 
-      ui = statusrow(df);
+      ui = statusrow(df->status);
       if (unitrow[ui]<0) {
         unitrow[ui] = get_unitrow(df);
       }

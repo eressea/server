@@ -1538,27 +1538,26 @@ sp_reanimate(fighter * fi, int level, double power, spell * sp)
 	healable = count_healable(b, fi);
 	healable = (int)min(k, healable);
 	while (healable--) {
-		troop t = select_corpse(b, fi);
-		if (t.fighter
-				&& t.fighter->side->casualties > 0
-				&& old_race(t.fighter->unit->race) != RC_DAEMON
-				&& (chance(c)))
+		fighter * tf = select_corpse(b, fi);
+		if (tf!=NULL && tf->side->casualties > 0
+                  && old_race(tf->unit->race) != RC_DAEMON
+                  && (chance(c)))
 		{
-			assert(t.fighter->alive < t.fighter->unit->number);
+			assert(tf->alive < tf->unit->number);
 			/* t.fighter->person[].hp beginnt mit t.index = 0 zu zählen,
 			 * t.fighter->alive ist jedoch die Anzahl lebender in der Einheit,
 			 * also sind die hp von t.fighter->alive
 			 * t.fighter->hitpoints[t.fighter->alive-1] und der erste Tote
-			 * oder weggelaufene ist t.fighter->hitpoints[t.fighter->alive] */
-			t.fighter->person[t.fighter->alive].hp = 2;
-			++t.fighter->alive;
-			++t.fighter->side->size[SUM_ROW];
-			++t.fighter->side->size[t.fighter->unit->status + 1];
-			++t.fighter->side->healed;
-			--t.fighter->side->casualties;
-                        assert(t.fighter->side->casualties>=0);
-                        --t.fighter->side->dead;
-                        assert(t.fighter->side->dead>=0);
+			 * oder weggelaufene ist t.fighter->hitpoints[tf->alive] */
+			tf->person[tf->alive].hp = 2;
+			++tf->alive;
+			++tf->side->size[SUM_ROW];
+			++tf->side->size[tf->unit->status + 1];
+			++tf->side->healed;
+			--tf->side->casualties;
+                        assert(tf->side->casualties>=0);
+                        --tf->side->dead;
+                        assert(tf->side->dead>=0);
 			++j;
 		}
 	}
