@@ -15,6 +15,7 @@
 #include "message.h"
 
 #include "goodies.h"
+#include "log.h"
 
 /* libc includes */
 #include <assert.h>
@@ -35,6 +36,11 @@ mt_new(const char * name, const char * args[])
   int i, nparameters = 0;
   message_type * mtype = (message_type *)malloc(sizeof(message_type));
 
+  assert(name!=NULL);
+  if (name!=NULL) {
+    log_error(("Trying to create message_type with name=0x0\n"));
+    return NULL;
+  }
   if (args!=NULL) for (nparameters=0;args[nparameters];++nparameters);
 
   mtype->name = strdup(name);
@@ -83,15 +89,21 @@ mt_new_va(const char * name, ...)
 message *
 msg_create(const struct message_type * type, void * args[])
 {
-	int i;
-	message * msg = (message *)malloc(sizeof(message));
-	msg->type = type;
-	msg->parameters = calloc(sizeof(void*), type->nparameters);
-	msg->refcount=1;
-	for (i=0;i!=type->nparameters;++i) {
-		msg->parameters[i] = args[i];
-	}
-	return msg;
+  int i;
+  message * msg = (message *)malloc(sizeof(message));
+
+  assert(type!=NULL);
+  if (type==NULL) {
+    log_error(("Trying to create message with type=0x0\n"));
+    return NULL;
+  }
+  msg->type = type;
+  msg->parameters = calloc(sizeof(void*), type->nparameters);
+  msg->refcount=1;
+  for (i=0;i!=type->nparameters;++i) {
+    msg->parameters[i] = args[i];
+  }
+  return msg;
 }
 
 message *
@@ -139,35 +151,37 @@ mt_register(const message_type * type)
 {
   unsigned int hash = hashstring(type->name) % MT_MAXHASH;
   messagetype_list * mtl = messagetypes[hash];
-	while (mtl && mtl->data!=type) mtl=mtl->next;
-	if (mtl==NULL) {
-		mtl = malloc(sizeof(messagetype_list));
-		mtl->data = type;
-		mtl->next = messagetypes[hash];
-		messagetypes[hash] = mtl;
-	}
-	return type;
+  while (mtl && mtl->data!=type) mtl=mtl->next;
+  if (mtl==NULL) {
+    mtl = malloc(sizeof(messagetype_list));
+    mtl->data = type;
+    mtl->next = messagetypes[hash];
+    messagetypes[hash] = mtl;
+  }
+  return type;
 }
 
 void
 msg_free(message *msg)
 {
-	assert(msg->refcount==0);
-	free((void*)msg->parameters);
-	free(msg);
+  assert(msg->refcount==0);
+  free((void*)msg->parameters);
+  free(msg);
 }
 
 void 
 msg_release(struct message * msg)
 {
-	if (--msg->refcount>0) return;
-	msg_free(msg);
+  assert(msg->refcount>0);
+  if (--msg->refcount>0) return;
+  msg_free(msg);
 }
 
 struct message * 
 msg_addref(struct message * msg)
 {
-	++msg->refcount;
-	return msg;
+  assert(msg->refcount>0);
+  ++msg->refcount;
+  return msg;
 }
 
