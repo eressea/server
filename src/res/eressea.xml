@@ -4,7 +4,6 @@
 
 	<comment>Localization</comment>
 	<xi:include href="de/strings.xml"/>
-	<xi:include href="de/strings-eressea.xml"/>
 	<xi:include href="en/strings.xml"/>
 
 	<xi:include href="races.xml"/>

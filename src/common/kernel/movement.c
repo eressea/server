@@ -447,14 +447,16 @@ travelthru(unit * u, region * r)
 }
 
 static void
-leave_trail(ship * sh, region **route)
+leave_trail(unit * u, region **route, region * to)
 {
   region **ri = route;
-
+  ship * sh = u->ship;
+  
   while (*ri) {
-    region *r = *ri;
-    direction_t dir = reldirection(*ri, *rn);
-    attrib * a = a_find((*ri)->attribs, &at_traveldir_new);
+    region * r = *ri++;
+	region * rn = *ri?*ri:to;
+    direction_t dir = reldirection(r, rn);
+    attrib * a = a_find(r->attribs, &at_traveldir_new);
     traveldir * td = NULL;
     
     while (a!=NULL) {
@@ -464,7 +466,7 @@ leave_trail(ship * sh, region **route)
     }
 
     if (a!=NULL) {
-      a = a_add(&((*ri)->attribs), a_new(&at_traveldir_new));
+      a = a_add(&(r->attribs), a_new(&at_traveldir_new));
       td = (traveldir *)a->data.v;
       td->no = sh->no;
     }
@@ -472,7 +474,6 @@ leave_trail(ship * sh, region **route)
     td->age = 2;
 
     travelthru(u, r);
-    ++ri;
   }
 }
 
@@ -481,8 +482,6 @@ move_ship(ship * sh, region * from, region * to, region ** route)
 {
   unit **iunit = &from->units;
   unit **ulist = &to->units;
-  direction_t dir;
-  attrib *a;
   boolean trail = (route==NULL);
 
   if (from!=to) {
@@ -496,7 +495,7 @@ move_ship(ship * sh, region * from, region * to, region ** route)
 
     if (u->ship == sh) {
       if (!trail) {
-        leave_trail(sh, from, to, route);
+        leave_trail(u, route, to);
         trail=true;
       }
       if (from!=to) {
