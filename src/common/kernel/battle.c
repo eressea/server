@@ -3586,7 +3586,7 @@ battle_stats(FILE * F, battle * b)
 {
   typedef struct stat_info {
     struct stat_info * next;
-    weapon * wp;
+    const weapon_type * wtype;
     int level;
     int number;
   } stat_info;
@@ -3603,22 +3603,23 @@ battle_stats(FILE * F, battle * b)
       for (dt.index=0;dt.index!=du->number;++dt.index) {
         weapon * wp = preferred_weapon(dt, true);
         int level = wp?wp->attackskill:0;
+        const weapon_type * wtype = wp?wp->type:NULL;
         stat_info ** slist = &stats;
 
-        if (slast && slast->wp==wp && slast->level==level) {
+        if (slast && slast->wtype==wtype && slast->level==level) {
           ++slast->number;
           continue;
         }
-        while (*slist && (*slist)->wp!=wp) {
+        while (*slist && (*slist)->wtype!=wtype) {
           slist = &(*slist)->next;
         }
-        while (*slist && (*slist)->wp==wp && (*slist)->level>level) {
+        while (*slist && (*slist)->wtype==wtype && (*slist)->level>level) {
           slist = &(*slist)->next;
         }
         stat = *slist;
-        if (stat==NULL || stat->wp!=wp || stat->level!=level) {
+        if (stat==NULL || stat->wtype!=wtype || stat->level!=level) {
           stat = calloc(1, sizeof(stat_info));
-          stat->wp = wp;
+          stat->wtype = wtype;
           stat->level = level;
           stat->next = *slist;
           *slist = stat;
@@ -3630,8 +3631,7 @@ battle_stats(FILE * F, battle * b)
 
     fprintf(F, "##STATS## Heer %u - %s:\n", s->index, factionname(s->bf->faction));
     for (stat=stats;stat!=NULL;stat=stat->next) {
-      const weapon_type * wtype = stat->wp?stat->wp->type:NULL;
-      fprintf(F, "%s %u : %u\n", wtype?wtype->itype->rtype->_name[0]:"none", stat->level, stat->number);
+      fprintf(F, "%s %u : %u\n", stat->wtype?stat->wtype->itype->rtype->_name[0]:"none", stat->level, stat->number);
     }
     freelist(stats);
   } cv_next(s);
