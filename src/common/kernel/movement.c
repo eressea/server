@@ -1786,14 +1786,41 @@ move(region * r, unit * u, boolean move_on_land)
 	if (u->region!=r) fset(u, UFL_LONGACTION);
 }
 
+typedef struct piracy_data {
+  const struct faction * follow;
+  direction_t dir;
+} piracy_data;
+
+static void 
+piracy_init(struct attrib * a)
+{
+  a->data.v = calloc(1, sizeof(piracy_data));
+}
+
+static void 
+piracy_done(struct attrib * a)
+{
+  free(a->data.v);
+}
+
 static attrib_type at_piracy_direction = {
 	"piracy_direction",
-	DEFAULT_INIT,
-	DEFAULT_FINALIZE,
+	piracy_init,
+	piracy_done,
 	DEFAULT_AGE,
 	NO_WRITE,
 	NO_READ
 };
+
+static attrib * 
+mk_piracy(const faction * f, direction_t target_dir)
+{
+  attrib * a = a_new(&at_piracy_direction);
+  piracy_data * data = a->data.v;
+  data->follow = f;
+  data->dir = target_dir;
+  return a;
+}
 
 static void
 piracy(unit *u)
@@ -1831,11 +1858,11 @@ piracy(unit *u)
 	}
 
 	for(a =  a_find(r->attribs, &at_piracy_direction); a; a=a->nexttype) {
-		faction *f = findfaction(a->data.sa[0]);
+    piracy_data * data = a->data.v;
+		const faction *f = data->follow;
 
-		if (alliedunit(u, f, HELP_FIGHT)
-				&& intlist_find(il, a->data.sa[1])) {
-			target_dir = (direction_t)a->data.sa[1];
+		if (alliedunit(u, f, HELP_FIGHT) && intlist_find(il, a->data.sa[1])) {
+			target_dir = data->dir;
 			break;
 		}
 	}
@@ -1872,9 +1899,7 @@ piracy(unit *u)
 				saff -= aff[dir];
 			}
 			target_dir = dir;
-			a = a_add(&r->attribs, a_new(&at_piracy_direction));
-			a->data.sa[0] = (short)u->faction->no;
-			a->data.sa[1] = (short)target_dir;
+      a = a_add(&r->attribs, mk_piracy(u->faction, target_dir));
 		}
 	}
 
