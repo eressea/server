@@ -22,4 +22,13 @@
 	<include file="eressea/races.xml"></include>
 	<include file="eressea/items.xml"></include>
 	<include file="eressea/dungeons.xml"></include>
+	<strings>
+		<string name="mailto">
+			<text>tutorial@eressea.upb.de</text>
+		</string>
+		<string name="mailcmd">
+			<text locale="de">ERESSEA BEFEHLE</text>
+			<text locale="en">ERESSEA ORDERS</text>
+		</string>
+	</strings>
 </eressea>

@@ -17,4 +17,12 @@
 	</game>
 	<include file="vinyambar/races.xml"></include>
 	<include file="vinyambar/de/strings.xml"></include>
+	<strings>
+		<string name="mailto">
+			<text>vinyambar@eressea.amber.kn-bremen.de</text>
+		</string>
+		<string name="mailcmd">
+			<text>VIN2 BEFEHLE</text>
+		</string>
+	</strings>
 </eressea>

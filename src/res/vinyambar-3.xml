@@ -18,4 +18,12 @@
 	</game>
 	<include file="vinyambar/de/strings.xml"></include>
 	<include file="vinyambar/stronghold.xml"></include>
+	<strings>
+		<string name="mailto">
+			<text>vinyambar@eressea.amber.kn-bremen.de</text>
+		</string>
+		<string name="mailcmd">
+			<text>VIN3 BEFEHLE</text>
+		</string>
+	</strings>
 </eressea>

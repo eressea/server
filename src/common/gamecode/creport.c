@@ -1017,6 +1017,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 	building *b;
 	ship *sh;
 	unit *u;
+	const char * mailto = locale_string(f->locale, "mailto");
 	const seen_region * sd = seen;
 	const attrib * a;
 
@@ -1039,6 +1040,10 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 	fprintf(F, "%d;Basis\n", 36);
 	fprintf(F, "%d;Runde\n", turn);
 	fputs("2;Zeitalter\n", F);
+	if (mailto!=NULL) {
+		fprintf(F, "\"%s\";mailto\n", mailto);
+		fprintf(F, "\"%s\";mailcmd\n", locale_string(NULL, "mailcmd"));
+	}
 	fprintf(F, "PARTEI %d\n", f->no);
 	fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
 	fprintf(F, "%d;Optionen\n", f->options);
