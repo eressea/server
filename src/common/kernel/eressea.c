@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.14 2001/02/13 02:58:51 enno Exp $
+ *	$Id: eressea.c,v 1.15 2001/02/15 02:41:46 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1109,16 +1109,20 @@ struct tnode cursenames;
 skill_t
 findskill(const char *s)
 {
-	return (skill_t)findtoken(&tokens[UT_SKILL], s)-1;
+	int i;
+	if (findtoken(&tokens[UT_SKILL], s, (void**)&i)==E_TOK_NOMATCH) return NOSKILL;
+	return (skill_t)i;
 }
 
 keyword_t
 findkeyword(const char *s)
 {
+	int i;
 #ifdef AT_PERSISTENT
 	if(*s == '@') s++;
 #endif
-	return (keyword_t) findtoken(&tokens[UT_KEYWORD], s)-1;
+	if (findtoken(&tokens[UT_KEYWORD], s, (void**)&i)==E_TOK_NOMATCH) return NOKEYWORD;
+	return (keyword_t) i;
 }
 
 keyword_t
@@ -1136,13 +1140,15 @@ getkeyword (void)
 param_t
 findparam(const char *s)
 {
-	int p;
 	const building_type * btype;
-	p = (int)findtoken(&tokens[UT_PARAM], s)-1;
-	if (p>=0) return (param_t)p;
-	btype = findbuildingtype(s, NULL);
-	if (btype!=NULL) return (param_t) P_BUILDING;
-	return NOPARAM;
+
+	int i;
+	if (findtoken(&tokens[UT_PARAM], s, (void**)&i)==E_TOK_NOMATCH) {
+		btype = findbuildingtype(s, NULL);
+		if (btype!=NULL) return (param_t) P_BUILDING;
+		return NOPARAM;
+	}
+	return (param_t)i;
 }
 
 param_t
@@ -1749,7 +1755,7 @@ use_birthdayamulet(region * r, unit * magician, strlist * cmdstrings)
 
 typedef struct t_umlaut {
 	const char *txt;
-	unsigned char id;
+	int id;
 	int typ;
 } t_umlaut;
 
@@ -1801,17 +1807,17 @@ init_tokens(void)
 {
 	int i;
 	for (i=0;i!=MAXPARAMS;++i)
-		addtoken(&tokens[UT_PARAM], parameters[i], (void*)(i+1));
+		addtoken(&tokens[UT_PARAM], parameters[i], (void*)i);
 	for (i=0;i!=MAXSKILLS;++i)
-		addtoken(&tokens[UT_SKILL], skillnames[i], (void*)(i+1));
+		addtoken(&tokens[UT_SKILL], skillnames[i], (void*)i);
 	for (i=0;i!=MAXKEYWORDS;++i)
-		addtoken(&tokens[UT_KEYWORD], keywords[i], (void*)(i+1));
+		addtoken(&tokens[UT_KEYWORD], keywords[i], (void*)i);
 	for (i=0;umlaut[i].txt;++i)
-		addtoken(&tokens[umlaut[i].typ], umlaut[i].txt, (void*)(umlaut[i].id+1));
+		addtoken(&tokens[umlaut[i].typ], umlaut[i].txt, (void*)umlaut[i].id);
 	for (i=0; spelldaten[i].id != SPL_NOSPELL; i++)
-		addtoken(&spellnames, spelldaten[i].name, (void*)(i+1));
+		addtoken(&spellnames, spelldaten[i].name, (void*)i);
 	for (i=0; i!=MAXCURSE; i++){
-		addtoken(&cursenames, cursedaten[i].name, (void*)(i+1));
+		addtoken(&cursenames, cursedaten[i].name, (void*)i);
 	}
 }
 
@@ -2096,44 +2102,46 @@ resolve2(void)
 
 #endif
 
+static void 
+init_directions(tnode * root)
+{
+	/* mit dieser routine kann man mehrere namen für eine direction geben,
+	 * das ist für die hexes ideal. */
+	const struct {
+		const char* name;
+		int direction;
+	} dirs [] = {
+		{ "no", D_NORTHEAST},
+		{ "nw", D_NORTHWEST},
+		{ "nordosten", D_NORTHEAST},
+		{ "nordwesten", D_NORTHWEST},
+		{ "so", D_SOUTHEAST},
+		{ "sw", D_SOUTHWEST},
+		{ "südosten", D_SOUTHEAST},
+		{ "südwesten", D_SOUTHWEST},
+		{ "osten", D_EAST },
+		{ "westen",D_WEST },
+		{ NULL, NODIRECTION}
+	};
+	int i;
+	for (i=0; dirs[i].direction!=NODIRECTION;++i) {
+		addtoken(root, dirs[i].name, (void*)dirs[i].direction);
+	}
+}
+
 direction_t
 finddirection(const char *s)
 {
-#define MAXDIRNAMES 12
-	static const char* dirs[MAXDIRNAMES] = {
-		"no",
-		"nw",
-		"nordosten",
-		"nordwesten",
-		"so",
-		"sw",
-		"suedosten",
-		"südosten",
-		"suedwesten",
-		"südwesten",
-		"osten",
-		"westen"
-		/* mit dieser routine kann man mehrere namen für eine direction geben,
-		 * das ist für die hexes ideal. */
-	};
-	static const direction_t dir_xref[MAXDIRNAMES] = {
-		D_NORTHEAST,
-		D_NORTHWEST,
-		D_NORTHEAST,
-		D_NORTHWEST,
-		D_SOUTHEAST,
-		D_SOUTHWEST,
-		D_SOUTHEAST,
-		D_SOUTHEAST,
-		D_SOUTHWEST,
-		D_SOUTHWEST,
-		D_EAST,
-		D_WEST
-	};
-	int uc = findstr(dirs, s, MAXDIRNAMES);
+	static boolean init = false;
+	static tnode dirnames;
+	int dir;
 
-	if (uc == -1) return NODIRECTION;
-	return dir_xref[uc];
+	if (!init) init_directions(&dirnames);
+
+	if (findtoken(&dirnames, s, (void**)&dir)==E_TOK_SUCCESS) {
+		return (direction_t)dir;
+	}
+	return NODIRECTION;
 }
 
 unit *

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: building.c,v 1.6 2001/02/09 13:53:51 corwin Exp $
+ *	$Id: building.c,v 1.7 2001/02/15 02:41:46 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -747,8 +747,7 @@ findbuildingtype(const char * name, const locale * lang)
 		}
 		bnames = bn;
 	}
-	i = findtoken(&bn->names, name);
-	if (i==E_TOK_NOMATCH) return NULL;
+	if (findtoken(&bn->names, name, &i)==E_TOK_NOMATCH) return NULL;
 	return (const building_type*)i;
 }
 

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.11 2001/02/14 07:44:57 enno Exp $
+ *	$Id: item.c,v 1.12 2001/02/15 02:41:46 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2031,8 +2031,8 @@ findresourcetype(const char * name, const locale * lang)
 		}
 		rnames = rn;
 	}
-	i = findtoken(&rn->names, name);
-	if (i==E_TOK_NOMATCH) return NULL;
+	
+	if (findtoken(&rn->names, name, &i)==E_TOK_NOMATCH) return NULL;
 	return (const resource_type*)i;
 }
 
@@ -2073,8 +2073,7 @@ finditemtype(const char * name, const locale * lang)
 		}
 		inames = in;
 	}
-	i = findtoken(&in->names, name);
-	if (i==E_TOK_NOMATCH) return NULL;
+	if (findtoken(&in->names, name, &i)==E_TOK_NOMATCH) return NULL;
 	return (const item_type*)i;
 }
 

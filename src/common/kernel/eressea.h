@@ -1105,7 +1105,7 @@ extern void guard(struct unit * u, unsigned int mask);
 typedef struct local_names {
 	struct local_names * next;
 	const struct locale * lang;
-	tnode names;
+	struct tnode names;
 } local_names;
 
 extern int maxworkingpeasants(const struct region * r);

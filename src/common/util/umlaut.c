@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: umlaut.c,v 1.4 2001/02/13 02:58:51 enno Exp $
+ *	$Id: umlaut.c,v 1.5 2001/02/15 02:41:47 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -27,6 +27,15 @@
 #include <string.h>
 #include <assert.h>
 
+typedef struct tref {
+	struct tref * nexthash;
+	char c;
+	struct tnode * node;
+} tref;
+
+#define LEAF 1 /* leaf node for a word. always matches */
+#define SHARED 2 /* at least two words share the node */
+
 void
 addtoken(tnode * root, const char* str, void * id)
 {
@@ -44,28 +53,43 @@ addtoken(tnode * root, const char* str, void * id)
 		{'ß', "ss"},
 		{ 0, 0 }
 	};
-	assert(id!=E_TOK_NOMATCH);
-	if (root->id!=E_TOK_NOMATCH && root->id!=id && !root->leaf) root->id=E_TOK_NOMATCH;
 	if (!*str) {
 		root->id = id;
-		root->leaf=1;
+		root->flags |= LEAF;
 	} else {
-		tnode * tk;
+		tref * next;
 		int index, i = 0;
 		char c = *str;
 		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c);
 		index = ((unsigned char)c) % 32;
-		tk = root->next[index];
-		if (root->id==E_TOK_NOMATCH) root->id = id;
-		while (tk && tk->c != c) tk = tk->nexthash;
-		if (!tk) {
-			tk = calloc(1, sizeof(tnode));
-			tk->id = E_TOK_NOMATCH;
-			tk->c = c;
-			tk->nexthash=root->next[index];
-			root->next[index] = tk;
+		next = root->next[index];
+		if (!root->flags) root->id = id;
+		while (next && next->c != c) next = next->nexthash;
+		if (!next) {
+			tref * ref;
+			char u = (char)toupper((unsigned char)c);
+			tnode * node = calloc(1, sizeof(tnode));
+
+			ref = malloc(sizeof(tref));
+			ref->c = c;
+			ref->node = node;
+			ref->nexthash=root->next[index];
+			root->next[index] = ref;
+			
+			if (u!=c) {
+				index = ((unsigned char)u) % 32;
+				ref = malloc(sizeof(tref));
+				ref->c = u;
+				ref->node = node;
+				ref->nexthash = root->next[index];
+				root->next[index] = ref;
+			}
+			next=ref;
+		} else {
+			next->node->flags |= SHARED;
+			if (next->node->flags & LEAF == 0) next->node->id = NULL;
 		}
-		addtoken(tk, str+1, id);
+		addtoken(next->node, str+1, id);
 		while (replace[i].str) {
 			if (*str==replace[i].c) {
 				strcat(strcpy(zText, replace[i].str), str+1);
@@ -77,22 +101,32 @@ addtoken(tnode * root, const char* str, void * id)
 	}
 }
 
-void *
-findtoken(tnode * tk, const char * str)
+int
+findtoken(tnode * tk, const char * str, void **result)
 {
-	if(*str == 0) return E_TOK_NOMATCH;
+	if (*str == 0) return E_TOK_NOMATCH;
 
 	while (*str) {
 		int index;
+		tref * ref;
 		char c = *str;
-		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c);
+
+/*		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c); */
 
 		index = ((unsigned char)c) % 32;
-		tk = tk->next[index];
-		while (tk && tk->c!=c) tk = tk->nexthash;
+		ref = tk->next[index];
+		while (ref && ref->c!=c) ref = ref->nexthash;
 		++str;
-		if (!tk) return E_TOK_NOMATCH;
+		if (!ref) return E_TOK_NOMATCH;
+		tk = ref->node;
+		if (tk && !(tk->flags & SHARED)) {
+			*result = tk->id;
+			return E_TOK_SUCCESS;
+		}
 	}
-	return tk->id;
+	if (tk && (tk->flags & LEAF)) {
+		*result = tk->id;
+		return E_TOK_SUCCESS;
+	}
+	return E_TOK_NOMATCH;
 }
-

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: umlaut.h,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: umlaut.h,v 1.3 2001/02/15 02:41:47 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -14,18 +14,19 @@
 
 #ifndef _UMLAUT_H
 #define _UMLAUT_H
-typedef struct tnode tnode;
-struct tnode {
-	struct tnode * nexthash;
-	struct tnode * next[32];
+
+#define E_TOK_NOMATCH (-1)
+#define E_TOK_SUCCESS 0
+
+struct tref;
+
+typedef struct tnode {
+	struct tref * next[32];
+	unsigned char flags;
 	void * id;
-	char c;
-	unsigned char leaf;
-};
+} tnode;
 
-#define E_TOK_NOMATCH NULL
-
-void * findtoken(struct tnode * tk, const char * str);
+int findtoken(struct tnode * tk, const char * str, void** result);
 void addtoken(struct tnode * root, const char* str, void * id);
 
 #endif

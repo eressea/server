@@ -169,8 +169,7 @@ gm_command(const char * cmd, struct unit * u)
 	i = min(16, c-cmd);
 	strncpy(zText, cmd, i);
 	zText[i]=0;
-	cm = (command*)findtoken(&g_keys, zText);
-	if (cm && cm->perform) cm->perform(++c, u);
+	if (findtoken(&g_keys, zText, (void**)&cm) && cm->perform) cm->perform(++c, u);
 }
 
 void
