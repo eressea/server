@@ -1142,7 +1142,7 @@ randomevents(void)
 					}
 					bfind = true;
 				}
-				if (r->planep && !fval(r->planep, PFL_NOFEED)) {
+				if (r->planep==0 || !fval(r->planep, PFL_NOFEED)) {
 					unfed = (u->number - bauernblut) - peasantfood;
 					if (unfed > 0) {
 #ifdef DAEMON_HUNGER
