@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.18 2001/02/18 12:20:37 corwin Exp $
+ *	$Id: eressea.c,v 1.19 2001/02/18 12:30:10 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -743,6 +743,15 @@ allied(const unit * u, const faction * f2, int mode)
 	pl = getplane(u->region);
 
 	if (pl && pl->flags & PFL_FRIENDLY) return mode;
+
+	/* if f2 is a gm in this plane, everyone has an auto-help to it */
+	a = a_find(f2->attribs, &at_gm);
+	while (a) {
+		plane * p = (plane*)a->data.v;
+		if (p==pl) return mode;
+		a=a->next;
+	}
+
 	if (mode != HELP_GIVE && pl && (pl->flags & PFL_NOALLIANCES))
 		return 0;
 	a = a_find(u->attribs, &at_group);
