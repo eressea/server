@@ -107,20 +107,6 @@ MagicPower(void)
   return value;
 }
 
-static building *
-findbuildingr(const region *r, int n)
-	/* Ein Gebäude in einer bestimmten Region finden: */
-{
-	building *b;
-
-	for (b = rbuildings(r); b; b = b->next) {
-		if (b->no == n) {
-			return b;
-		}
-	}
-	return 0;
-}
-
 static int
 a_readicastle(attrib * a, FILE * f)
 {
@@ -1573,6 +1559,8 @@ verify_targets(castorder *co)
 				case SPP_SHIP:
           if (!verify_ship(target_r, mage, sp, spobj, co->order)) ++failed;
           break;
+        default:
+          break;
 			}
 		}
 
@@ -1748,7 +1736,7 @@ free_spellparameter(spellparameter *pa)
 }
 
 static int
-addparam_string(const char ** param, spllprm ** spobjp)
+addparam_string(char ** param, spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   assert(param[0]);
@@ -1760,7 +1748,7 @@ addparam_string(const char ** param, spllprm ** spobjp)
 }
 
 static int
-addparam_int(const char ** param, spllprm ** spobjp)
+addparam_int(char ** param, spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   assert(param[0]);
@@ -1772,7 +1760,7 @@ addparam_int(const char ** param, spllprm ** spobjp)
 }
 
 static int
-addparam_ship(const char ** param, spllprm ** spobjp)
+addparam_ship(char ** param, spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   int id = atoi36(param[0]);
@@ -1784,7 +1772,7 @@ addparam_ship(const char ** param, spllprm ** spobjp)
 }
 
 static int
-addparam_building(const char ** param, spllprm ** spobjp)
+addparam_building(char ** param, spllprm ** spobjp)
 {
   spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
   int id = atoi36(param[0]);
@@ -1796,7 +1784,7 @@ addparam_building(const char ** param, spllprm ** spobjp)
 }
 
 static int
-addparam_region(const char ** param, spllprm ** spobjp, const unit * u, order * ord)
+addparam_region(char ** param, spllprm ** spobjp, const unit * u, order * ord)
 {
   assert(param[0]);
   if (param[1]==0) {
@@ -1826,7 +1814,7 @@ addparam_region(const char ** param, spllprm ** spobjp, const unit * u, order * 
 
 
 static int
-addparam_unit(const char ** param, spllprm ** spobjp, const unit * u, order * ord)
+addparam_unit(char ** param, spllprm ** spobjp, const unit * u, order * ord)
 {
   spllprm *spobj;
   int i = 0;

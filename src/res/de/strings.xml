@@ -7,7 +7,7 @@
     _a: including article (ein Troll, a troll)
    -->
 
-  <name="school">
+  <namespace name="school">
     <string name="none">
       <text locale="de">Kein Magiegebiet</text>
       <text locale="en">no magic school</text>

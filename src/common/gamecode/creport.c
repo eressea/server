@@ -381,19 +381,20 @@ cr_order(const void * v, char * buffer, const void * userdata)
     char * wp = buffer;
     char * cmd = getcommand(ord);
     const char * rp = cmd;
-
+    
     *wp++ = '\"';
     while (*rp) {
       switch (*rp) {
-        case '\"':
-        case '\\':
-          *wp++ = '\\';
-        default:
-          *wp++ = *rp++;
+      case '\"':
+      case '\\':
+        *wp++ = '\\';
+      default:
+        *wp++ = *rp++;
       }
     }
     *wp++ = '\"';
     *wp++ = 0;
+    /*	 sprintf(buffer, "\"%s\"", cmd); */
   }
   else strcpy(buffer, "\"\"");
   return 0;
@@ -459,8 +460,8 @@ report_crtypes(FILE * F, const struct locale* lang)
 			const struct nrmessage_type * nrt = nrt_find(lang, kmt->mtype);
 			if (nrt) {
 				unsigned int hash = hashstring(mt_name(kmt->mtype));
-				fprintf(F, "MESSAGETYPE %d\n", hash);
-				fputc('\"', F);
+        fprintf(F, "MESSAGETYPE %d\n", hash);
+        fputc('\"', F);
 				fputs(escape_string(nrt_string(nrt), NULL, 0), F);
 				fputs("\";text\n", F);
 				fprintf(F, "\"%s\";section\n", nrt_section(nrt));

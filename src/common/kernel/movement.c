@@ -2257,7 +2257,7 @@ movement(void)
               if (u->ship==NULL || !fval(u, UFL_OWNER)) {
                 init_tokens(u->thisorder);
                 skip_token();
-                if (move(u, true)!=0) repeat = true;
+                if (move(u, false)!=0) repeat = true;
               }
             }
           }
