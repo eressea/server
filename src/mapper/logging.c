@@ -48,11 +48,11 @@ log_read(const char * filename)
 			r = findregion(x, y);
 			assert(r);
 			if (u->region!=r) move_unit(u, r, NULL);
-		} else if (strcmp(buf, "REGION")) {
+		} else if (strcmp(buf, "REGION")==0) {
 			int x, y;
 			fscanf(log, "%d %d", &x, &y);
 			readregion(log, x, y);
-		} else if (strcmp(buf, "FACTION")) {
+		} else if (strcmp(buf, "FACTION")==0) {
 			faction * f;
 			fscanf(log, "%s", buf);
 			f = findfaction(atoi36(buf));
@@ -61,7 +61,7 @@ log_read(const char * filename)
 			} else {
 				*fp = readfaction(log);
 			}
-		}
+		} else assert(0);
 	}
 }
 
