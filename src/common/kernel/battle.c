@@ -2364,6 +2364,7 @@ aftermath(battle * b)
 	do_combatmagic(b, DO_POSTCOMBATSPELL);
 
 	cv_foreach(s, b->sides) {
+	  int snumber = 0;
 		fighter *df;
 		boolean relevant = false; /* Kampf relevant für dieses Heer? */
 		if (s->bf->lastturn+(b->has_tactics_turn?1:0)>1) {
@@ -2377,6 +2378,7 @@ aftermath(battle * b)
 			int dead = du->number - df->alive - df->run.number;
 			int sum_hp = 0;
 			int n;
+		  snumber +=du->number;
 			if (relevant && df->action_counter >= du->number) {
 				ship * sh = du->ship?du->ship:leftship(du);
 
@@ -2428,6 +2430,7 @@ aftermath(battle * b)
 				{
 					/* nur teilweise geflohene Einheiten mergen sich wieder */
 					df->alive += df->run.number;
+				  s->alive += df->run.number;
 					sum_hp += df->run.hp;
 #ifndef NO_RUNNING
 					merge_fleeloot(df, du);
@@ -2480,6 +2483,8 @@ aftermath(battle * b)
 				du->hp=du->no;
 			}
 		} cv_next(df);
+	  s->alive+=s->healed;
+	  assert(snumber==s->flee+s->alive+s->dead);
 	} cv_next(s);
 	dead_peasants = min(rpeasants(r), (is*BATTLE_KILLS_PEASANTS)/100);
 	deathcounts(r, dead_peasants + is);
