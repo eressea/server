@@ -1260,51 +1260,60 @@ maintain_buildings(boolean crash)
 void
 economics(void)
 {
-	region *r;
-	unit *u;
-	strlist *S;
+  region *r;
+  unit *u;
+  strlist *S;
 
-	/* Geben vor Selbstmord (doquit)! Hier alle unmittelbaren Befehle.
-	* Rekrutieren vor allen Einnahmequellen. Bewachen JA vor Steuern
-	* eintreiben. */
+  /* Geben vor Selbstmord (doquit)! Hier alle unmittelbaren Befehle.
+  * Rekrutieren vor allen Einnahmequellen. Bewachen JA vor Steuern
+  * eintreiben. */
 
-	for (r = regions; r; r = r->next) if (r->units) {
-		request *recruitorders = NULL;
+  for (r = regions; r; r = r->next) if (r->units) {
+    request *recruitorders = NULL;
 
-		for (u = r->units; u; u = u->next) {
-			for (S = u->orders; S; S = S->next) {
-				switch (igetkeyword(S->s, u->faction->locale)) {
+    for (u = r->units; u; u = u->next) {
+      for (S = u->orders; S; S = S->next) {
+        strlist ** slist = &S->next;
+        switch (igetkeyword(S->s, u->faction->locale)) {
+          case K_DESTROY:
+            destroy(r, u, S->s);
+            while (*slist) {
+              strlist * scur = *slist;
+              const char * cmd = scur->s;
+              if (igetkeyword(cmd, u->faction->locale)==K_DESTROY) {
+                *slist = scur->next;
+                scur->next = NULL;
+                freestrlist(scur);
+              } else slist = &scur->next;
+            }
+            break;
 
-					case K_DESTROY:
-						destroy(r, u, S->s);
-						break;
+          case K_GIVE:
+          case K_LIEFERE:
+            dogive(r, u, S, 0);
+            break;
 
-					case K_GIVE:
-					case K_LIEFERE:
-						dogive(r, u, S, 0);
-						break;
+          case K_FORGET:
+            forgetskill(u);
+            break;
 
-					case K_FORGET:
-						forgetskill(u);
-						break;
+        }
+      }
+    }
+    /* RECRUIT orders */
 
-				}
-			}
-		}
-		/* RECRUIT orders */
+    for (u = r->units; u; u = u->next) {
+      for (S = u->orders; S; S = S->next) {
+        if (igetkeyword(S->s, u->faction->locale) == K_RECRUIT) {
+          recruit(r, u, S, &recruitorders);
+          break;
+        }
+      }
+    }
 
-		for (u = r->units; u; u = u->next) {
-			for (S = u->orders; S; S = S->next) {
-				if (igetkeyword(S->s, u->faction->locale) == K_RECRUIT) {
-					recruit(r, u, S, &recruitorders);
-					break;
-				}
-			}
-		}
+    if (recruitorders) expandrecruit(r, recruitorders);
 
-		if (recruitorders) expandrecruit(r, recruitorders);
-
-	}
+  }
 }
 /* ------------------------------------------------------------- */
 
