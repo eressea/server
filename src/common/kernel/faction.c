@@ -138,7 +138,7 @@ addplayer(region *r, const char *email, const char * password, const struct race
 		while (urc == RC_DAEMON || !playerrace(new_race[urc]));
 		u->irace = new_race[urc];
 	}
-	fset(u, FL_PARTEITARNUNG);
+/*	fset(u, FL_PARTEITARNUNG); */
 
 	return u;
 }

@@ -1111,7 +1111,7 @@ movearound(int rx, int ry) {
 					modified = 1;
 					ch = -9;
 					break;
-				case 'a': 
+				case 'a':
 #if 0
 					if (r && r->land) {
 						regionlist * rlist = NULL;
