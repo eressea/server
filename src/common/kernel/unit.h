@@ -87,11 +87,6 @@ typedef struct unit {
 	struct strlist *botschaften;
 	unsigned int flags;
 	struct attrib * attribs;
-#ifndef NDEBUG
-	int debug_number;			/* Sollte immer == number sein. Wenn nicht, ist
-								 * * nicht mit createunit und set_number
-								 * * gearbeitet worden. */
-#endif
 	status_t status;
 	const struct race * race;
 	const struct race * irace;

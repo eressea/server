@@ -1707,7 +1707,6 @@ writeunit(FILE * F, const unit * u)
 	wi36(F, u->faction->no);
 	ws(F, u->name);
 	ws(F, u->display);
-	assert(old_race(u->race) == RC_SPELL || u->number == u->debug_number);
 	wi(F, u->number);
 	wi(F, u->age);
 	ws(F, u->race->_name[0]);
