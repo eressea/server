@@ -4,10 +4,3 @@ select u.id ID, left(concat(firstname,' ',lastname, ' <',email,'>'),43) Name, su
 	   		 and u.status!='CONFIRMED'
 	   GROUP BY u.id
 	   HAVING SUM(t.balance)<2.5;
-
-select count(users.status) Anzahl, subscriptions.status Status, games.name Spiel
-       from users, games, subscriptions
-       where games.id = subscriptions.game
-       	     and users.id = subscriptions.user
-       group by games.name, subscriptions.status
-	   order by subscriptions.game;
