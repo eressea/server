@@ -400,8 +400,8 @@ herbfound;production:2;de;{unit} in {region} findet {amount} {herb}.
 msg_economy;economy:0;de;{string}
 give;economy:0;de;{unit} übergibt {amount} {resource} an {target}.
 income;economy:0;de;{unit} verdient in {region} {amount} {$of wanted}.
-income_tax;economy:4;de;{unit} treibt in {region} {amount} Steuern ein.
-income_tax_reduced;economy:2;de;{unit} treibt in {region} {amount} statt {wanted} Steuern ein.
+income_tax;economy:4;de;{unit} treibt in {region} {amount} Silber an Steuern ein.
+income_tax_reduced;economy:2;de;{unit} treibt in {region} {amount} statt {wanted} Silber an Steuern ein.
 income_steal;economy:3;de;{unit} klaut in {region} {amount} Silber.
 income_steal_reduced;economy:1;de;{unit} klaut in {region} {amount} statt {wanted} Silber.
 income_magic;economy:3;de;{unit} verdient in {region} {amount} Silber durch Zauberei.

@@ -104,6 +104,7 @@ addtoken(tnode * root, const char* str, void * id)
 int
 findtoken(const tnode * tk, const char * str, void **result)
 {
+	if (!str) return E_TOK_NOMATCH;
 	if (*str == 0) return E_TOK_NOMATCH;
 
 	while (*str) {

@@ -1948,9 +1948,13 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 		par->length++;
 		token = strtok(NULL, " ");
 	}
+	/* length sollte nun nur noch die Anzahl der für den Zauber relevanten
+	 * Elemente enthalten */
 	par->length -= skip; /* Anzahl der Elemente ('temp 123' sind zwei!) */
 
-	if (par->length < 2) {
+	/* mindestens ein Ziel (Ziellose Zauber werden nicht
+	 * geparst) */
+	if (par->length < 1) {
 		/* Fehler: Ziel vergessen */
 		cmistake(u, strdup(s), 203, MSG_MAGIC);
 		/* Aufräumen */
@@ -1966,13 +1970,15 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 	strcpy(tbuf, s);
 	token = strtok (tbuf, " ");
 	while(token && syntax[c] != 0) {
-		if (i > skip) {
+		if (i >= skip) {
 			if (syntax[c] == '+') {
-				/* das vorhergehende Element kommt ein oder mehrmals vor */
+				/* das vorhergehende Element kommt ein oder mehrmals vor, wir
+				 * springen zum key zurück */
 				c--;
 			}
 			if (syntax[c] == '?') {
-				/* optionales Element vom Typ des nachfolgenden Zeichen */
+				/* optionales Element vom Typ des nachfolgenden Zeichen, wir
+				 * gehen ein Element weiter */
 				c++;
 			}
 			spobj = calloc(1, sizeof(spllprm));
@@ -2885,8 +2891,9 @@ magic(void)
 					}
 					/* Weitere Argumente zusammenbasten */
 					if (sp->parameter) {
+						++skiptokens;
 						args = add_spellparameter(target_r, mage, sp->parameter,
-							    so->s, skiptokens++);
+							    so->s, skiptokens);
 						if (!args) {
 							/* Syntax war falsch */
 							continue;
