@@ -696,79 +696,19 @@ write_skill(FILE * F, const curse * c)
 /* ------------------------------------------------------------- */
 /* cursedata */
 /* ------------------------------------------------------------- */
-/* typedef struct cursedata {
- *   int id; (altlast für kompatibiliät)
- *   char *name;
- *   int typ;
- *   spread_t spread;
- *   int mergeflags;
- *   char *info;
- *   void (*display)(void*,typ_t, curse*);
- *} cursedata;
+/* 
+ * typedef struct curse_type { 
+ * 	const char *cname; (Name der Zauberwirkung, Identifizierung des curse)
+ * 	int typ;
+ * 	spread_t spread;
+ * 	unsigned int mergeflags;
+ * 	const char *info_str;  Wirkung des curse, wird bei einer gelungenen Zauberanalyse angezeigt
+ * 	int (*curseinfo)(const struct locale*, const void*, int, curse*, int);
+ * 	void (*change_vigour)(curse*, int); 
+ * 	int (*read)(FILE * F, curse * c); 
+ * 	int (*write)(FILE * F, const curse * c); 
+ * } curse_type;
  */
-/* die Beschreibung wird bei einer gelungenen Zauberanalyse ausgegeben
- * und hat die Form:
- * Magier (xx) gelang es folgendes herauszufinden:
- * Unit (xyz) steht unter dem Einfluss des Zaubers %name,/ Auf
- * Region/Schiff/Burg (xy) liegt der Zauber %name,
- * der wohl noch etwa %s Wochen andauert.
- * %info, "Dieser Zauber blafalsel blub"
- */
-
-static struct curse_type ct_fogtrap = { "fogtrap",
-	CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-	"",
-	cinfo_region
-};
-static struct curse_type ct_antimagiczone = { "antimagiczone",
-	CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-	"Dieser Zauber scheint magische Energien irgendwie abzuleiten und "
-	"so alle in der Region gezauberten Sprüche in ihrer Wirkung zu "
-	"schwächen oder ganz zu verhindern.",
-	NULL
-};
-static struct curse_type ct_farvision = { "farvision",
-	CURSETYP_NORM, 0, (NO_MERGE),
-	"",
-	NULL
-};
-static struct curse_type ct_gbdream = { "gbdream",
-	CURSETYP_NORM, 0, (NO_MERGE),
-	"",
-	cinfo_region
-};
-static struct curse_type ct_auraboost = { "auraboost",
-	CURSETYP_NORM, CURSE_SPREADMODULO, (NO_MERGE),
-	"Dieser Zauber greift irgendwie in die Verbindung zwischen Magier "
-	"und Magischer Essenz ein. Mit positiver Ausrichtung kann er wohl "
-	"wie ein Fokus für Aura wirken, jedoch genauso für das Gegenteil "
-	"benutzt werden."
-};
-static struct curse_type ct_maelstrom = { "maelstrom",
-	CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-	"Dieser Zauber verursacht einen gigantischen magischen Strudel. Der "
-	"Mahlstrom wird alle Schiffe, die in seinen Sog geraten, schwer "
-	"beschädigen.",
-	NULL
-};
-static struct curse_type ct_blessedharvest = { "blessedharvest",
-	CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-	"Dieser Fruchtbarkeitszauber erhöht die Erträge der Felder.",
-	cinfo_region
-};
-static struct curse_type ct_drought = { "drought",
-	CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-	"Dieser Zauber strahlt starke negative Energien aus. Warscheinlich "
-	"ist er die Ursache der Dürre."	,
-	cinfo_region
-};
-static struct curse_type ct_badlearn = { "badlearn",
-	CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-	"Dieser Zauber scheint die Ursache für die Schlaflosigkeit und "
-	"Mattigkeit zu sein, unter der die meisten Leute hier leiden und "
-	"die dazu führt, das Lernen weniger Erfolg bringt. ",
-	cinfo_region
-};
 static struct curse_type ct_stormwind = { "stormwind",
 	CURSETYP_NORM, 0, NO_MERGE,
 	"",
@@ -786,15 +726,11 @@ static struct curse_type ct_nodrift = { "nodrift",
 	"läßt es leichter durch die Wellen gleiten und der der Luft verbundene "
 	"Teil scheint es vor widrigen Winden zu schützen."
 };
-static struct curse_type ct_depression = { "depression",
-	CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-	"Wie schon zu vermuten war, sind der ewig graue Himmel und die "
-	"depressive Stimmung in der Region nicht natürlich. Dieser Fluch "
-	"hat sich wie ein bleiernes Tuch auf die Gemüter der Bevölkerung "
-	"gelegt und eh er nicht gebrochen oder verklungen ist, wird keiner "
-	"sich an Gaukelleien erfreuen können.",
-	cinfo_region
+static struct curse_type ct_shipdisorientation = { "shipdisorientation",
+	CURSETYP_NORM, 0, NO_MERGE,
+	"Dieses Schiff hat sich verfahren."
 };
+
 static struct curse_type ct_magicwalls = { "magicwalls",
 	CURSETYP_NORM, 0, NO_MERGE,
 	"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
@@ -808,62 +744,32 @@ static struct curse_type ct_strongwall = { "strongwall",
 	"",
 	NULL
 };
-static struct curse_type ct_astralblock = { "astralblock",
-	CURSETYP_NORM, 0, NO_MERGE,
-	"",
-	cinfo_region
-};
-static struct curse_type ct_generous = { "generous",
-	CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR | M_MAXEFFECT ),
-	"Dieser Zauber beeinflusst die allgemeine Stimmung in der Region positiv. "
-	"Die gute Laune macht die Leute freigiebiger.",
-	cinfo_region
-};
-static struct curse_type ct_peacezone = { "peacezone",
-	CURSETYP_NORM, 0, NO_MERGE,
-	"Dieser machtvoller Beeinflussungszauber erstickt jeden Streit schon im "
-	"Keim.",
-	cinfo_region
-};
-static struct curse_type ct_disorientationzone = { "disorientationzone",
-	CURSETYP_NORM, 0, NO_MERGE,
-	"",
-	cinfo_region
-};
-static struct curse_type ct_magicstreet = { "magicstreet",
-	CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-	"Es scheint sich um einen elementarmagischen Zauber zu handeln, der alle "
-	"Pfade und Wege so gut festigt, als wären sie gepflastert. Wie auf einer "
-	"Straße kommt man so viel besser und schneller vorwärts."
-};
 static struct curse_type ct_magicrunes = { "magicrunes",
 	CURSETYP_NORM, 0, M_SUMEFFECT,
 	"Dieses Zauber verstärkt die natürliche Widerstandskraft gegen eine "
 	"Verzauberung."
 };
-static struct curse_type ct_badmagicresistancezone = { "badmagicresistancezone",
+static struct curse_type ct_nocostbuilding = { "nocostbuilding",
 	CURSETYP_NORM, 0, NO_MERGE,
-	"Dieses Lied, das irgendwie in die magische Essenz der Region gewoben "
-	"ist, schwächt die natürliche Widerstandskraft gegen eine "
-	"Verzauberung. Es scheint jedoch nur auf bestimmte Einheiten zu wirken.",
-	NULL
+	"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
+	"gebunden. Unbeeindruck vom Zahn der Zeit wird dieses Gebäude wohl "
+	"auf Ewig stehen.",
+	cinfo_region
 };
-static struct curse_type ct_goodmagicresistancezone = { "goodmagicresistancezone",
-	CURSETYP_NORM, 0, NO_MERGE,
-	"Dieser Lied, das irgendwie in die magische Essenz der Region gewoben "
-	"ist, verstärkt die natürliche Widerstandskraft gegen eine "
-	"Verzauberung. Es scheint jedoch nur auf bestimmte Einheiten zu wirken.",
-	NULL
+
+static struct curse_type ct_auraboost = { "auraboost",
+	CURSETYP_NORM, CURSE_SPREADMODULO, (NO_MERGE),
+	"Dieser Zauber greift irgendwie in die Verbindung zwischen Magier "
+	"und Magischer Essenz ein. Mit positiver Ausrichtung kann er wohl "
+	"wie ein Fokus für Aura wirken, jedoch genauso für das Gegenteil "
+	"benutzt werden."
 };
+
 static struct curse_type ct_slavery = { "slavery",
 	CURSETYP_NORM, 0, NO_MERGE,
 	"Dieser mächtige Bann scheint die Einheit ihres freien Willens "
 	"zu berauben. Solange der Zauber wirkt, wird sie nur den Befehlen "
 	"ihres neuen Herrn gehorchen."
-};
-static struct curse_type ct_shipdisorientation = { "shipdisorientation",
-	CURSETYP_NORM, 0, NO_MERGE,
-	"Dieses Schiff hat sich verfahren."
 };
 static struct curse_type ct_calmmonster = { "calmmonster",
 	CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
@@ -878,31 +784,6 @@ static struct curse_type ct_oldrace = { "oldrace",
 static struct curse_type ct_fumble = { "fumble",
 	CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
 	"Eine Wolke negativer Energie umgibt die Einheit."
-};
-static struct curse_type ct_riotzone = { "riotzone",
-	CURSETYP_NORM, 0, (M_DURATION),
-	"Eine Wolke negativer Energie liegt über der Region.",
-	cinfo_region
-};
-static struct curse_type ct_nocostbuilding = { "nocostbuilding",
-	CURSETYP_NORM, 0, NO_MERGE,
-	"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
-	"gebunden. Unbeeindruck vom Zahn der Zeit wird dieses Gebäude wohl "
-	"auf Ewig stehen.",
-	cinfo_region
-};
-static struct curse_type ct_holyground = { "holyground",
-	CURSETYP_NORM, 0, (M_VIGOUR_ADD),
-	"Verschiedene Naturgeistern sind im Boden der Region gebunden und "
-	"beschützen diese vor dem der dunklen Magie des lebenden Todes.",
-	cinfo_region
-};
-static struct curse_type ct_godcursezone = { "godcursezone",
-	CURSETYP_NORM, 0, (NO_MERGE),
-	"Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen "
-	"über die tote Erde, furchbare Kreaturen ziehen über das Land. Die Brunnen "
-	"sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz "
-	"überzogen. Niemand kann hier lange überleben."
 };
 static struct curse_type ct_speed = { "speed",
 	CURSETYP_UNIT, CURSE_SPREADNEVER, M_MEN,
@@ -962,38 +843,19 @@ resolve_curse(void * id)
 void
 register_curses(void)
 {
-	ct_register(&ct_fogtrap);
-	ct_register(&ct_antimagiczone);
-	ct_register(&ct_farvision);
-	ct_register(&ct_gbdream);
 	ct_register(&ct_auraboost);
-	ct_register(&ct_maelstrom);
-	ct_register(&ct_blessedharvest);
-	ct_register(&ct_drought);
-	ct_register(&ct_badlearn);
 	ct_register(&ct_stormwind);
 	ct_register(&ct_flyingship);
 	ct_register(&ct_nodrift);
-	ct_register(&ct_depression);
 	ct_register(&ct_magicwalls);
 	ct_register(&ct_strongwall);
-	ct_register(&ct_astralblock);
-	ct_register(&ct_generous);
-	ct_register(&ct_peacezone);
-	ct_register(&ct_disorientationzone);
-	ct_register(&ct_magicstreet);
 	ct_register(&ct_magicrunes);
-	ct_register(&ct_badmagicresistancezone);
-	ct_register(&ct_goodmagicresistancezone);
 	ct_register(&ct_slavery);
 	ct_register(&ct_shipdisorientation);
 	ct_register(&ct_calmmonster);
 	ct_register(&ct_oldrace);
 	ct_register(&ct_fumble);
-	ct_register(&ct_riotzone);
 	ct_register(&ct_nocostbuilding);
-	ct_register(&ct_holyground);
-	ct_register(&ct_godcursezone);
 	ct_register(&ct_speed);
 	ct_register(&ct_orcish);
 	ct_register(&ct_magicboost);
@@ -1004,6 +866,7 @@ register_curses(void)
 	ct_register(&ct_itemcloak);
 	ct_register(&ct_sparkle);
 	ct_register(&ct_skillmod);
+
 }
 
 
@@ -1066,3 +929,4 @@ oldcursename(int id)
 {
 	return oldnames[id];
 }
+
