@@ -1335,22 +1335,24 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
     m--;
     if (m > 0) {
       region_list *rlist = route;
+      char * p = buf;
 
       travelthru(u, first);
 
       while (rlist!=NULL) {
         region * r = rlist->data;
-        char * p;
 
-        travelthru(u, r);
-        if (rlist!=route) {
-          if (rlist->next==NULL) scat(" und ");
-          else scat(", ");
-        }
-
-        p = buf+strlen(buf);
-        MSG(("travelthru_trail", "region", r), p, sizeof(buf)-strlen(buf), u->faction->locale, u->faction);
         rlist = rlist->next;
+        if (rlist!=NULL) {
+          MSG(("travelthru_trail", "region", r), p, sizeof(buf) - (p-buf), 
+              u->faction->locale, u->faction);
+          if (rlist->next!=NULL) {
+            if (rlist->next->data==current) scat(" und ");
+            else scat(", ");
+          }
+          p += strlen(p);
+        }
+        travelthru(u, r);
       }
     }
     ADDMSG(&u->faction->msgs, msg_message("travel", 
