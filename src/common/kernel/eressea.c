@@ -3035,7 +3035,9 @@ attrib_init(void)
 #endif
 	at_register(&at_laen); /* required for old datafiles */
 	at_register(&at_xontormiaexpress); /* required for old datafiles */
+#ifdef WDW_PYRAMIDSPELL
 	at_register(&at_wdwpyramid);
+#endif
 }
 
 void

@@ -283,7 +283,9 @@ typedef struct wall_data {
 
 extern struct attrib_type at_cursewall;
 extern struct attrib_type at_unitdissolve;
+#ifdef WDW_PYRAMIDSPELL
 extern struct attrib_type at_wdwpyramid;
+#endif
 extern struct spell spelldaten[];
 
 #ifdef __cplusplus
