@@ -1119,13 +1119,17 @@ entership(unit * u, ship * sh, const char * cmd, boolean lasttry)
 #ifdef CHECK_OVERLOAD_ON_ENTER
 	{
 		int sweight, scabins;
-		getshipweight(sh, &sweight, &scabins);
-		sweight += weight(u);
-		scabins += u->number;
+		int mweight = shipcapacity(sh);
+		int mcabins = sh->type->cabins;
+		if (mweight>0 && mcabins>0) {
+			getshipweight(sh, &sweight, &scabins);
+			sweight += weight(u);
+			scabins += u->number;
 
-		if (sweight > shipcapacity(sh) || scabins > sh->type->cabins) {
-			if (lasttry) cmistake(u, cmd, 34, MSG_MOVE);
-			return false;
+			if (sweight > mweight || scabins > mcabins) {
+				if (lasttry) cmistake(u, cmd, 34, MSG_MOVE);
+				return false;
+			}
 		}
 	}
 #endif
