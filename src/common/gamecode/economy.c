@@ -19,9 +19,6 @@
 * permission from the authors.
 */
 
-#define RESERVE_DONATIONS 1 /* shall we reserve objects given to us by other factions? */
-#define RESERVE_GIVE 1 /* reserve anything that's given from one unit to another? */
-
 #include <config.h>
 #include "eressea.h"
 #include "economy.h"

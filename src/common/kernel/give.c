@@ -43,6 +43,9 @@
 
 /* Wieviel Fremde eine Partei pro Woche aufnehmen kann */
 #define MAXNEWBIES								5
+#define RESERVE_DONATIONS /* shall we reserve objects given to us by other factions? */
+#define RESERVE_GIVE /* reserve anything that's given from one unit to another? */
+
 
 static int 
 GiveRestriction(void) {
@@ -111,12 +114,14 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
     if (use<n) use += new_use_pooled(src, item2resource(itype), GET_RESERVE|GET_POOLED_SLACK, n-use);
     if (dest) {
       i_change(&dest->items, itype, n);
-#if RESERVE_DONATIONS
+#ifdef RESERVE_GIVE
+#ifdef RESERVE_DONATIONS
       new_change_resvalue(dest, item2resource(itype), n);
-#elif RESERVE_GIVE
+#else
       if (src->faction==dest->faction) {
         new_change_resvalue(dest, item2resource(itype), n);
       }
+#endif
 #endif
       handle_event(&src->attribs, "give", dest);
       handle_event(&dest->attribs, "receive", src);
