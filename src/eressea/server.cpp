@@ -283,6 +283,7 @@ lua_init(void)
   luaopen_io(luaState);
   luabind::open(luaState);
   bind_eressea(luaState);
+  bind_spell(luaState);
 #ifdef ALLIANCES
   bind_alliance(luaState);
 #endif
