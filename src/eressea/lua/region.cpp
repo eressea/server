@@ -197,6 +197,10 @@ region_remove(region& r)
 void
 region_move(region& r, int x, int y)
 {
+  if (findregion(x,y)) {
+    log_error(("Bei %d, %d gibt es schon eine Region.\n", x, y));
+    return;
+  }
 #ifdef FAST_CONNECT
   direction_t dir;
   for (dir=0;dir!=MAXDIRECTIONS;++dir) {
@@ -207,7 +211,7 @@ region_move(region& r, int x, int y)
     }
     rn = findregion(x+delta_x[dir], y+delta_y[dir]);
     if (rn!=NULL) {
-      direction_t reldir = reldirection(rn, &r);
+      direction_t reldir = (dir + 3) % MAXDIRECTIONS;
       rn->connect[reldir] = &r;
     }
     r.connect[dir] = rn;

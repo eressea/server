@@ -11,10 +11,6 @@
   <xi:include href="prefixes.xml"/>
   <xi:include href="ships.xml"/>
   <xi:include href="buildings.xml"/>
-  <xi:include href="terrains.xml"/>
-  <xi:include href="alchemy.xml"/>
-  <xi:include href="technologies.xml"/>
-  <xi:include href="skills.xml"/>
   <xi:include href="equipment.xml"/>
 
   <game name="Eressea" welcome="eressea">
