@@ -41,6 +41,9 @@ spell_damage(int sp)
 		case 2:
 			/* leicht verwundet 4-18 HP */
 			return "2d8+2";
+		case 3:
+			/* fast immer tödlich 30-50 HP */
+			return "5d5+25";
 		default:
 			/* schwer verwundet 14-34 HP */
 			return "4d6+10";
@@ -568,7 +571,7 @@ sp_dragonodem(fighter * fi, int level, int power, spell * sp)
 	const char *damage;
 
 	sprintf(buf, "%s zaubert %s", unitname(fi->unit), sp->name);
-	damage = spell_damage(10);
+	damage = spell_damage(0);
 	force = lovar(get_force(level,3));
 
 	enemies = count_enemies(fi->side, FS_ENEMY, minrow,
