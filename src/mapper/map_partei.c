@@ -220,6 +220,7 @@ read_dropouts(const char * filename)
 		if (age<=1) {
 			drop = calloc(sizeof(dropout), 1);
 			drop->race = rc_find(race);
+			if (drop->race==NULL) drop->race = findrace(race, default_locale);
 			drop->x = x;
 			drop->y = y;
 			drop->fno = -1;
