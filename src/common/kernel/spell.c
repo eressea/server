@@ -6178,19 +6178,20 @@ sp_fetchastral(castorder *co)
       if (rtl!=NULL) free_regionlist(rtl);
       rtl = astralregions(rt, NULL);
       for (rfind=rtl;rfind!=NULL;rfind=rfind->next) {
-        if (rfind->data==ro) break;
+        if (rfind->data==mage->region) break;
       }
       if (rfind==NULL) {
         /* the region r is not in the schemes of rt */
         ADDMSG(&mage->faction->msgs, msg_message("spellfail_distance", 
-          "command region unit target", co->order, ro, mage, u));
+          "command region unit target", co->order, mage->region, mage, u));
         continue;
       }
+	  ro = u->region;
     }
 
     if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
       ADDMSG(&mage->faction->msgs, msg_message("spellfail_distance", 
-        "command region unit", co->order, ro, mage));
+        "command region unit", co->order, mage->region, mage));
       continue;
     }
 
@@ -6202,7 +6203,7 @@ sp_fetchastral(castorder *co)
     w = weight(u);
     if (remaining_cap - w < 0) {
       ADDMSG(&mage->faction->msgs, msg_message("fail_tooheavy", 
-        "command region unit target", co->order, ro, mage, u));
+        "command region unit target", co->order, mage->region, mage, u));
       continue;
     }
 
@@ -6213,7 +6214,7 @@ sp_fetchastral(castorder *co)
         addmessage(rt, mage->faction, buf, MSG_MAGIC, ML_INFO);
         sprintf(buf, "%s wird von %s in eine andere Welt geschleudert.",
           unitname(u), unitname(mage));
-        addmessage(rt, u->faction, buf, MSG_EVENT, ML_WARN);
+        addmessage(ro, u->faction, buf, MSG_EVENT, ML_WARN);
       } else {
         sprintf(buf, "%s hat uns nicht kontaktiert und widersteht dem "
           "Zauber.", unitname(u));
