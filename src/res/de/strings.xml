@@ -8,6 +8,64 @@
    -->
 
   <namespace name="iteminfo">
+    <string name="toadslime">
+      <text locale="de">
+      Dieser Tiegel enthält die seltenste alchemistische Substanz
+      Eresseas, den Krötenschleim. Angeblich soll der Krötenschleim eine
+      aussergewöhnlich hohe magische Absorbtionskraft besitzen und deswegen
+      in obskuren magischen Ritualen Verwendung finden.
+      </text>
+    </string>
+    <string name="ao_daemon">
+      <text locale="de">
+      Glückwunsch, mein Kind. Du bist im Besitz des mächtigsten
+      Artefaktes Eresseas. Ein Fluch, sagt man, liege auf ihm, denn
+      niemand hat es bisher lange sein Eigen genannt...
+      </text>
+    </string>
+    <string name="toad">
+      <text locale="de">
+      Die Kröte ist eine der seltensten Rassen Eresseas. Man munkelt,
+      sie würde nur auf magische Weise entstehen. In einer uralten
+      Abhandlung über Magie aus der Bibliothek der Akademie von Xontormia
+      wird die Theorie aufgestellt, das die Kröte die ins morphische Feld
+      des Magiers übertragene Manifestation eines implodierten
+      Zauberfeldes sein könnte. Vieleicht deswegen ist die Kröte auch
+      gegen Zauber weitaus widerstandsfähiger als die normalen Rassen
+      Eresseas, leider aber auch weitaus unmagischer als diese. Die
+      Kröte kann schon aufgrund ihrer Größe und der fehlenden Hände
+      nur unter Schwierigkeiten normale Tätigkeiten ausüben. Der
+      einzige Vorteil ihrer geringen Größe ist, dass sie sich leichter
+      verstecken kann.
+      </text>
+    </string>
+    <string name="wand_of_tears">
+      <text locale="de">
+      Dieses magische Szepter, ein Geschenk Igjarjuks, sorgt für große
+      Verwirrung und Gedächtnisverlust. Syntax: BENUTZE "Szepter der
+      Tränen"
+      </text>
+    </string>
+    <string name="nut">
+      <text locale="de">
+      Nuß, im umgangssprachlichen Sinne alle trockenen, hartschaligen
+      Früchte oder Samen, die eine Schale besitzen, die sich leicht
+      vom inneren, eßbaren Kern entfernen läßt. In der botanischen
+      Terminologie beschränkt sich die Bezeichnung Nuß auf eine
+      einsamige Frucht, die aus einem Fruchtknoten (Ovarium)
+      entstanden ist, dessen äußere Wände sich verholzt haben und der
+      sich nicht öffnet, um seinen Samen zu entlassen. Solche echten
+      Nüsse können eßbar, aber auch ungenießbar sein. Bekannte
+      Beispiele sind Eicheln, Bucheckern, Kastanien und Haselnüsse.
+      Beispiele für Früchte oder Samen, die vom Volksmund fälschlich
+      als Nüsse bezeichnet werden, sind Mandeln und Walnüsse: Im
+      botanischen Sinne sind dies Steinfrüchte, denen die fleischige
+      äußere Schale entfernt wurde.  Andere Beispiele für unechte
+      Nüsse sind Erdnüsse - in Hülsen eingeschlossene Samen - sowie
+      Roßkastanien und Paranüsse, bei denen es sich um von Kapseln
+      umhüllte Samen handelt.
+      </text>
+    </string>
     <string name="speedsail">
       <text locale="de">
       Setzt eine Einheit dieses Segel auf einem Schiff, so erhöht
