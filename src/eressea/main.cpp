@@ -336,6 +336,40 @@ lua_done(lua_State * luaState)
   lua_close(luaState);
 }
 
+static void
+update_subscriptions(void)
+{
+  FILE * F;
+  char zText[MAX_PATH];
+  faction * f;
+  strcat(strcpy(zText, basepath()), "/subscriptions");
+  F = fopen(zText, "r");
+  if (F==NULL) {
+    log_error(("could not open %s.\n", zText));
+    return;
+  }
+  for (;;) {
+    char zFaction[5];
+    int subscription, fno;
+    if (fscanf(F, "%d %s", &subscription, zFaction)<=0) break;
+    fno = atoi36(zFaction);
+    f = findfaction(fno);
+    if (f!=NULL) {
+      f->subscription=subscription;
+    }
+  }
+  fclose(F);
+
+  sprintf(zText, "subscriptions.%u", turn);
+  F = fopen(zText, "w");
+  for (f=factions;f!=NULL;f=f->next) {
+    fprintf(F, "%s:%u:%s:%s:%s:%u:\n",
+      itoa36(f->no), f->subscription, f->email, f->override,
+      dbrace(f->race), f->lastorders);
+  }
+  fclose(F);
+}
+
 int
 process_orders()
 {
@@ -678,40 +712,6 @@ typedef struct lostdata {
 	int ship;
 } lostdata;
 
-void
-update_subscriptions(void)
-{
-	FILE * F;
-	char zText[MAX_PATH];
-	faction * f;
-	strcat(strcpy(zText, basepath()), "/subscriptions");
-	F = fopen(zText, "r");
-	if (F==NULL) {
-		log_error(("could not open %s.\n", zText));
-		return;
-	}
-	for (;;) {
-		char zFaction[5];
-		int subscription, fno;
-		if (fscanf(F, "%d %s", &subscription, zFaction)<=0) break;
-		fno = atoi36(zFaction);
-		f = findfaction(fno);
-		if (f!=NULL) {
-			f->subscription=subscription;
-		}
-	}
-	fclose(F);
-
-	sprintf(zText, "subscriptions.%u", turn);
-	F = fopen(zText, "w");
-	for (f=factions;f!=NULL;f=f->next) {
-		fprintf(F, "%s:%u:%s:%s:%s:%u:\n",
-				itoa36(f->no), f->subscription, f->email, f->override,
-				dbrace(f->race), f->lastorders);
-	}
-	fclose(F);
-}
-
 int
 main(int argc, char *argv[])
 {
@@ -722,7 +722,7 @@ main(int argc, char *argv[])
 	updatelog = fopen("update.log", "w");
 	log_open("eressea.log");
 	printf("\n%s PBEM host\n"
-		"Copyright (C) 1996-2001 C.Schlittchen, K.Zedel, E.Rehling, H.Peters.\n\n"
+		"Copyright (C) 1996-2003 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
 	   "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
 
 	setlocale(LC_ALL, "");

@@ -193,15 +193,32 @@ set_show_item(faction *f, item_t i)
 	a->data.v = (void*)olditemtype[i];
 }
 
+#ifdef NEW_STARTEQUIPMENT
+static item * equipment;
+void add_equipment(const item_type * itype, int number)
+{
+  if (itype!=NULL) i_change(&equipment, itype, number);
+}
+#endif
+
 void
 give_starting_equipment(struct region *r, struct unit *u)
 {
+#ifdef NEW_STARTEQUIPMENT
+  item * itm = equipment;
+  while (itm!=NULL) {
+    i_add(&u->items, i_new(itm->type, itm->number));
+    itm=itm->next;
+  }
+#else
   const item_type * token = it_find("conquesttoken");
   if (token!=NULL) {
     i_add(&u->items, i_new(token, 1));
   }
 	set_item(u, I_WOOD, 30);
 	set_item(u, I_STONE, 30);
+  set_money(u, 2000 + turn * 10);
+#endif
 
 	switch(old_race(u->race)) {
 	case RC_DWARF:
@@ -278,8 +295,6 @@ give_starting_equipment(struct region *r, struct unit *u)
 		rsethorses(r, 250+rand()%51+rand()%51);
 		break;
 	}
-
-	set_money(u, 2000 + turn * 10);
 }
 
 int

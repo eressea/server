@@ -1702,10 +1702,9 @@ main(int argc, char *argv[])
 
 	init_gmcmd();
 
-	if(!*datafile)
-		sprintf(datafile, "%s/%d", datapath(), turn);
+	if (!*datafile) ssprintf(datafile, "%u", turn);
 
-	readgame(backup);
+	readgame(datafile, backup);
 	for (f=factions;f;f=f->next) if (f->age==0) {
 		++numnewbies;
 	}

@@ -4,9 +4,11 @@
 
 // kernel includes
 #include <gamecode/laws.h>
+#include <kernel/race.h>
+#include <kernel/item.h>
+#include <kernel/reports.h>
 #include <kernel/save.h>
 #include <kernel/unit.h>
-#include <kernel/reports.h>
 #include <util/language.h>
 
 // lua includes
@@ -17,27 +19,35 @@
 using namespace luabind;
 
 static int
+lua_addequipment(const char * iname, int number)
+{
+  const struct item_type * itype = it_find(iname);
+  if (itype==NULL) return -1;
+  add_equipment(itype, number);
+  return 0;
+}
+
+static int
 get_turn(void)
 {
   return turn;
 }
 
 static int
-read_game(void)
+read_game(const char * filename)
 {
-  return readgame(false);
+  return readgame(filename, false);
 }
 
 static int
-write_game(void)
+write_game(const char *filename)
 {
   char ztext[64];
 
   free_units();
   remove_empty_factions(true);
 
-  sprintf(ztext, "%s/%d", datapath(), turn);
-  writegame(ztext, 0);
+  writegame(filename, 0);
   return 0;
 }
 
@@ -62,6 +72,7 @@ bind_eressea(lua_State * L)
     def("write_reports", &write_reports),
     def("read_orders", &readorders),
     def("process_orders", &process_orders),
+    def("add_equipment", &lua_addequipment),
     def("get_turn", &get_turn)
   ];
 }

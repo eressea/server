@@ -846,7 +846,7 @@ read_alliances(FILE * F)
 #endif
 
 int
-readgame(boolean backup)
+readgame(const char * filename, boolean backup)
 {
 	int i, n, p;
 	faction *f, **fp;
@@ -857,7 +857,7 @@ readgame(boolean backup)
 	FILE * F;
 	int rmax = maxregions;
 
-	sprintf(buf, "%s/%d", datapath(), turn);
+	sprintf(buf, "%s/%s", datapath(), filename);
 	if (backup) create_backup(buf);
 	F = cfopen(buf, "r");
 	if (F==NULL) {
@@ -1304,7 +1304,7 @@ export_players(const char * path)
 #endif
 
 void
-writegame(char *path, char quiet)
+writegame(const char *filename, char quiet)
 {
 	int i,n;
 	faction *f;
@@ -1325,7 +1325,8 @@ writegame(char *path, char quiet)
 
 	/* write_dynamictypes(); */
 
-	F = cfopen(path, "w");
+  sprintf(buf, "%s/%s", datapath(), filename);
+	F = cfopen(buf, "w");
 	if (F==NULL)
 		return;
 

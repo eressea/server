@@ -143,7 +143,6 @@ extern int rc_specialdamage(const race *, const race *, const struct weapon_type
 #define BF_RES_BASH     (1<<4) /* Halber Schaden durch BASH */
 #define BF_INV_NONMAGIC (1<<5) /* Immun gegen nichtmagischen Schaden */
 
-extern void give_starting_equipment(struct region *r, struct unit *u);
 extern int unit_old_max_hp(struct unit * u);
 extern const char * racename(const struct locale *lang, const struct unit *u, const race * rc);
 
@@ -167,6 +166,11 @@ extern void write_race_reference(const struct race * rc, FILE * F);
 extern int read_race_reference(const struct race ** rp, FILE * F);
 
 extern const char * raceprefix(const struct unit *u);
+
+#ifdef NEW_STARTEQUIPMENT
+extern void add_equipment(const struct item_type * itype, int number);
+#endif
+extern void give_starting_equipment(struct region *r, struct unit *u);
 
 #ifdef __cplusplus
 }

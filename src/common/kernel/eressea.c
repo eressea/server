@@ -2353,7 +2353,7 @@ faction_id_is_unused(int id)
 	return (boolean)(bsearch(&id, used_faction_ids, no_used_faction_ids,
 			sizeof(int), _cmp_int) == NULL);
 #else
-	return true;
+	return findfaction(id)==NULL;
 #endif
 }
 

@@ -41,6 +41,11 @@ region_setname(region& r, const char * name) {
 }
 
 static const char *
+region_getterrain(const region& r) {
+  return terrain[r.terrain].name;
+}
+
+static const char *
 region_getname(const region& r) {
   if (r.land) return r.land->name;
   return terrain[r.terrain].name;
@@ -66,6 +71,7 @@ bind_region(lua_State * L)
     class_<struct region>("region")
     .property("name", &region_getname, &region_setname)
     .property("info", &region_getinfo, &region_setinfo)
+    .property("terrain", &region_getterrain)
     .def_readonly("x", &region::x)
     .def_readonly("y", &region::y)
     .def_readwrite("age", &region::age)

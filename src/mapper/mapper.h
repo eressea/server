@@ -71,7 +71,6 @@ void NeuePartei(struct region * r);
 void RemovePartei(void);
 int ParteiListe(void);
 int koor_distance(int a, int b, int x, int y);
-int readgame(boolean backup);
 int create_backup(char *file);
 void SpecialFunction(struct region *r);
 
