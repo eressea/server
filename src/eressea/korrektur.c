@@ -1909,9 +1909,6 @@ update_gmquests(void)
 		}
 		do_once("et02", secondfaction(f));
 	}
-	do_once("rq02", regatta_quest());
-	do_once("zq01", zero_quest());
-	do_once("rq03", regatta_quest());
 	do_once("renm", fix_foreign());
 }
 
@@ -2901,8 +2898,9 @@ check_phoenix(void)
 	/* it is not, so we create it */
 	r = random_land_region();
 	phoenix = createunit(r, findfaction(MONSTER_FACTION), 1, phoenix_race);
+	phoenix->name = strdup("Der Phönix");
 
-	/* generate an appropriate region message */
+	/* TODO: generate an appropriate region message */
 }
 #endif
 
@@ -2937,35 +2935,6 @@ korrektur(void)
 	update_gmquests(); /* test gm quests */
 	/* fix_unitrefs(); */
 	stats();
-	do_once("pers", convert_orders());
-	do_once("sql2", dump_sql());
-	do_once("fw02", fix_watchers());
-	do_once("fxh4", fix_plainherbs());
-#if NEW_RESOURCEGROWTH
-	/* do not remove do_once calls - old datafiles need them! */
-	do_once("rgrw", convert_resources());
-	do_once("rsfx", read_resfix());
-#endif
-	/* do_once("xepl", create_xe()); */
-#if GROWING_TREES
-	do_once("grtr", growing_trees());
-#endif
-
-	do_once("fgms", fix_gms());
-#if NEW_RESOURCEGROWTH
-	do_once("rndr", randomized_resources());
-#endif
-	do_once("idlo", fix_idleout());
-	do_once("szip", set_zip());
-	do_once("heal", heal_all());
-	do_once("fquc", fix_questcoors());
-	do_once("fsee", fix_seeds());
-	do_once("orc2", orc_conversion2());
-	do_once("witm", warn_items());
-	do_once("guaf", guard_conversion());
-	do_once("qpoi", questportal_init());
-	do_once("xini", xe_init());
-	do_once("rest", fix_restart_flag());
 	warn_password();
 	fix_road_borders();
 	if (turn>1000) curse_emptiness(); /*** disabled ***/
@@ -3024,14 +2993,6 @@ astral_penger(void)
 void
 korrektur_end(void)
 {
-	/* fix_balsamfiasko(); */
-	do_once("peng", astral_penger());
-
-#if PEASANT_ADJUSTMENT == 1
-	do_once("peas", peasant_adjustment());
-	do_once("orcc", orc_conversion());
-#endif
-	do_once("camm", give_cammo());
 }
 
 void

@@ -5,7 +5,7 @@ function init_positions()
   positions = { 
     [11] = get_region(1,-12),
     [12] = get_region(10,-11),
-    [13] = get_region(7,-8),
+    [13] = get_region(-7,-8),
     [14] = get_region(13,1),
     [15] = get_region(5,10),
     [17] = get_region(-6,14),

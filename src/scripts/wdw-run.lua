@@ -1,39 +1,14 @@
-function list_empty(list)
-  -- trickfunktion, die rausfindet, ob es schon eine partei gibt.
-  local _foo, _state, var_1 = list()
-  local begin = _foo(_state, var_1)
-  return begin == nil
-end
-
 function run_wdw()
-  -- load 'wdw-start', if it exists. otherwise, load the latest turn, 
-  -- and make a backup called 'wdw-start'.
-  local file = "wdw-start"
-  local alliance, position, faction
-  if list_empty(factions) then
-    if read_game(file)~=0 then 
-      local turnfile = "" .. get_turn()
-      if read_game(turnfile)~=0 then 
-        print("could not read game")
-        return -1
-      end
-      if write_game(file)~=0 then 
-        print("could not write game")
-        return -1
-      end
-    end
+  local turnfile = "" .. get_turn()
+  if read_game(turnfile)~=0 then 
+    print("could not read game")
+    return -1
   end
   
-  local outfile="wdw-setup"
-  -- run the alliances setup
-  if list_empty(alliances) then
-    dofile("wdw-setup.lua")
-  else
   -- run the turn (not yet)
-    read_orders(orders)
-    process_orders()
-    outfile = "" .. get_turn()
-  end
+  read_orders(orderfile)
+  process_orders()
+  outfile = "" .. get_turn()
 
   -- siegbedingungen ausgeben
   dofile("wdw-standings.lua")

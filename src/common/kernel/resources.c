@@ -64,6 +64,7 @@ terraform_resources(region * r)
 			res->amount     = (int)(res->base * (1+(res->level-res->startlevel)*(res->divisor/100.0)));
 #ifdef RESOURCE_FACTOR
 			res->amount     = res->amount * RESOURCE_FACTOR;
+			if(res->amount == 0) res->amount = 1;
 #endif
 			assert(res->amount>0);
 			res->type->terraform(res, r);
