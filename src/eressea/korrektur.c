@@ -2367,14 +2367,6 @@ dump_sql(void)
 		if (f->unique_id==0) {
 			f->unique_id = ++max_unique_id;
 		}
-		if (f->age!=1 && f->no!=MONSTER_FACTION) {
-			fprintf(sqlstream, "INSERT INTO users (id, email) VALUES (%d, '%s');\n",
-				f->unique_id, f->email);
-			fprintf(sqlstream, "INSERT INTO factions (id, user, name, password, race, locale, lastorders, banner, email) "
-				"VALUES ('%s', %d, '%s', '%s', '%s', '%s', %u, '%s', '%s');\n",
-				itoa36(f->no), f->unique_id, sqlquote(f->name), sqlquote(f->passw), LOC(default_locale, rc_name(f->race, 1)),
-				locale_name(f->locale), f->lastorders, sqlquote(f->banner), f->email);
-		}
 	}
 	return 0;
 }
