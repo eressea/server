@@ -97,9 +97,9 @@ function process(orders)
   process_orders()
   
   -- igjarjuk special
-  if get_turn() > 374 then
-    wyrm()
-  end
+  -- if get_turn() > 374 then
+  --  wyrm()
+  -- end
 
   write_passwords()
   write_reports()
