@@ -101,6 +101,7 @@ extern boolean noreports;
 extern boolean nomer;
 extern boolean nomsg;
 extern boolean nobattle;
+extern boolean nomonsters;
 extern boolean nobattledebug;
 extern boolean dirtyload;
 
@@ -499,6 +500,7 @@ usage(const char * prog, const char * arg)
 		"--noeiswald      : beruhigt ungemein\n"
 		"--nomsg          : keine Messages (RAM sparen)\n"
 		"--nobattle       : keine Kämpfe\n"
+		"--nomonsters     : keine monster KI\n"
 		"--nodebug        : keine Logfiles für Kämpfe\n"
 		"--debug          : schreibt Debug-Ausgaben in die Datei debug\n"
 		"--nocr           : keine CRs\n"
@@ -533,6 +535,7 @@ read_args(int argc, char **argv)
 			else if (strcmp(argv[i]+2, "nomsg")==0) nomsg = true;
 			else if (strcmp(argv[i]+2, "noeiswald")==0) g_killeiswald = true;
 			else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
+			else if (strcmp(argv[i]+2, "nomonsters")==0) nomonsters = true;
 			else if (strcmp(argv[i]+2, "nodebug")==0) nobattledebug = true;
 #ifdef USE_MERIAN
 			else if (strcmp(argv[i]+2, "nomer")==0) nomer = true;

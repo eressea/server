@@ -98,6 +98,7 @@ extern int dropouts[2];
 extern int * age;
 /* - exported global symbols ----------------------------------- */
 boolean nobattle = false;
+boolean nomonsters = false;
 /* ------------------------------------------------------------- */
 
 static int 
@@ -3527,7 +3528,7 @@ processorders (void)
 	new_units();
 
 	puts(" - Monster KI...");
-	plan_monsters();
+	if (!nomonsters) plan_monsters();
 	set_passw();		/* und pruefe auf illegale Befehle */
 
 	puts(" - Defaults und Instant-Befehle...");
