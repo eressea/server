@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+extern boolean incomplete_data;
+
 unsigned int nextborder = 0;
 
 border * borders[BMAXHASH];
@@ -508,12 +510,12 @@ read_borders(FILE * f)
     assert(type || !"border type not registered");
     from = findregion(fx, fy);
     if (from==NULL) {
-      log_error(("border for unknown region %d,%d\n", fx, fy));
+      if (!incomplete_data) log_error(("border for unknown region %d,%d\n", fx, fy));
       from = new_region(fx, fy);
     }
     to = findregion(tx, ty);
     if (to==NULL)  {
-      log_error(("border for unknown region %d,%d\n", tx, ty));
+      if (!incomplete_data) log_error(("border for unknown region %d,%d\n", tx, ty));
       to = new_region(tx, ty);
     }
     if (to==from) {

@@ -84,6 +84,7 @@
 #undef XMAS2002
 
 extern void reorder_owners(struct region * r);
+extern int incomplete_data;
 
 static int
 curse_emptiness(void)
@@ -933,15 +934,17 @@ extern border *borders[];
 static void
 fix_road_borders(void)
 {
-  border *deleted[10000];
+#define MAXDEL 10000
+  border *deleted[MAXDEL];
   int hash;
   int i = 0;
 
-  for(hash=0; hash<BMAXHASH; hash++) {
+  if (incomplete_data) return;
+  for(hash=0; hash<BMAXHASH && i!=MAXDEL; hash++) {
     border * bhash;
-    for (bhash=borders[hash];bhash;bhash=bhash->nexthash) {
+    for (bhash=borders[hash];bhash && i!=MAXDEL;bhash=bhash->nexthash) {
       border * b;
-      for (b=bhash;b;b=b->next) {
+      for (b=bhash;b && i!=MAXDEL;b=b->next) {
         if (b->type == &bt_road) {
           int x1, x2, y1, y2;
           region *r1, *r2;

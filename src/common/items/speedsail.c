@@ -44,7 +44,7 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
 	} else {
     if (u->ship) {
       attrib * a = a_find(u->ship->attribs, &at_speedup);
-      if (a!=NULL) {
+      if (a==NULL) {
         a = a_add(&u->ship->attribs, a_new(&at_speedup));
         a->data.sa[0] = 50; /* speed */
         a->data.sa[1] = 50; /* decay */

@@ -1,4 +1,8 @@
-function eternath_travellers(b, maxsize)
+if gate_exchange==nil then
+  dofile("gates.lua")
+end
+
+local function eternath_travellers(b, maxsize)
   local size = maxsize
   local units = {}
   local u
@@ -17,28 +21,18 @@ function eternath_travellers(b, maxsize)
   return units
 end
 
-function eternath_exchange(b1, b2)
-  -- identify everyone who is travelling, first:
-  local units1 = eternath_travellers(b1, 10)
-  local units2 = eternath_travellers(b2, 10)
+local function eternath_exchange(b1, b2, size)
+  local units1 = eternath_travellers(b1, size)
+  local units2 = eternath_travellers(b2, size)
 
-  -- we've found which units we want to exchange, now swap them:
-  local u
-  for u in units1 do
-    u.region = b2.region
-    u.building = b2
-  end
-  for u in units2 do
-    u.region = b1.region
-    u.building = b1
-  end
+  gate_exchange(b1, units1, b2, units2)
 end
 
 function eternathgate_action(b)
   if eternathgate == nil then
     eternathgate = b
   else
-    eternath_exchange(eternathgate, b)
+    eternath_exchange(eternathgate, b, 10)
   end
   return 1
 end

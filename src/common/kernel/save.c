@@ -677,6 +677,7 @@ int maxregions = -1;
 int loadplane = 0;
 
 boolean dirtyload = false;
+boolean incomplete_data = false;
 
 enum {
 	U_MAN,
@@ -1828,7 +1829,9 @@ readgame(const char * filename, int backup)
   n = ri(F);
   if (rmax<0) rmax = n;
   printf(" - Einzulesende Regionen: %d/%d\r", rmax, n);
-
+  if (loadplane || dirtyload || firstx || firsty || maxregions>=0) {
+    incomplete_data = true;
+  }
   while (--n >= 0) {
     unit **up;
     boolean skip = false;

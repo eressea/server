@@ -18,6 +18,7 @@
 
 // util includes
 #include <util/base36.h>
+#include <util/log.h>
 
 using namespace luabind;
 
@@ -40,8 +41,26 @@ lc_age(struct attrib * a)
   assert(b!=NULL);
   if (fname==NULL) return -1;
 
-  luabind::object globals = luabind::get_globals(L);
-  if (globals.at(fname).type()!=LUA_TFUNCTION) return -1;
+  try {
+    luabind::object globals = luabind::get_globals(L);
+    luabind::object fun = globals.at(fname);
+    if (!fun.is_valid()) {
+      log_error(("Could not index function %s\n", fname));
+      return -1;
+    }
+    if (fun.type()!=LUA_TFUNCTION) {
+      log_error(("Lua global object %s is not a function\n", fname));
+      return -1;
+    }
+  }
+  catch (luabind::error& e) {
+    lua_State* L = e.state();
+    const char* error = lua_tostring(L, -1);
+    
+    log_error((error));
+    lua_pop(L, 1);
+    std::terminate();
+  }
 
   return luabind::call_function<int>(L, fname, *b);
 }
