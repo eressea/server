@@ -258,7 +258,7 @@ use_instantartacademy(struct unit * u, const struct item_type * itype,
   set_string(&b->name, buf);
 
   ADDMSG(&u->region->msgs, msg_message(
-    "artacademy_create", "unit command", u, cm));
+    "artacademy_create", "unit region", u, u->region));
 
   return 1;
 }
@@ -296,7 +296,7 @@ use_instantartsculpture(struct unit * u, const struct item_type * itype,
   set_string(&b->name, buf);
 
   ADDMSG(&u->region->msgs, msg_message(
-    "artsculpture_create", "unit region command", u, cm));
+    "artsculpture_create", "unit region command", u, u->region, cm));
 
   return 1;
 }
