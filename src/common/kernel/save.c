@@ -1468,9 +1468,6 @@ addally(const faction * f, ally ** sfp, int aid, int state)
   state &= ~HELP_TRAVEL;
 #endif
 
-  if (af==NULL) return sfp;
-  if (f->alliance==NULL || f->alliance!=af->alliance) state &= ~AllianceRestricted();
-  if (f->alliance==NULL || f->alliance==af->alliance) state |= AllianceAuto();
   if (state==0) return sfp;
 
   sf = calloc(1, sizeof(ally));
