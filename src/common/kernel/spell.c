@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.c,v 1.9 2001/02/10 14:18:00 enno Exp $
+ *	$Id: spell.c,v 1.10 2001/02/13 18:43:54 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -7952,7 +7952,7 @@ spell spelldaten[] =
 		"sich in untote Monster groﬂer Kraft.",
 		NULL,
 		"u+",
-		M_CHAOS, (SPELLLEVEL | TESTCANSEE), 5, 10,
+		M_CHAOS, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 10,
 		{
 			{R_AURA, 8, SPC_LEVEL},
 			{R_PEASANTS, 50, SPC_LEVEL},

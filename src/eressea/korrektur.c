@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.23 2001/02/12 23:13:14 enno Exp $
+ *	$Id: korrektur.c,v 1.24 2001/02/13 18:43:54 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1020,7 +1020,7 @@ show_newspells(void)
 	/* Alle geänderten Zauber in das array newspellids[]. mit SPL_NOSPELL
 	 * terminieren */
 
-	spellid_t newspellids[] = { SPL_NOSPELL };
+	spellid_t newspellids[] = { SPL_UNHOLYPOWER, SPL_NOSPELL };
 
 	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]
 	 * abgelegt */
