@@ -2638,7 +2638,6 @@ view_neighbours(region * r, faction * f)
 static void
 recurse_regatta(region *center, region *r, faction *f, int maxdist)
 {
-	plane * p = rplane(center);
 	direction_t dir;
 	int dist = distance(center, r);
 	for (dir=0;dir!=MAXDIRECTIONS;++dir) {

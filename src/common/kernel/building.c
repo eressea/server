@@ -218,6 +218,7 @@ init_smithy(struct building_type * bt)
 	a_add(&bt->attribs, make_skillmod(NOSKILL, SMF_PRODUCTION, sm_smithy, 0, 0));
 	a_add(&bt->attribs, make_matmod(mm_smithy));
 }
+
 static const char *
 castle_name(int bsize)
 {
@@ -247,6 +248,42 @@ castle_name(int bsize)
 	}
 	return fname[i];
 }
+
+static requirement castle_req[] = {
+	{ R_STONE, 1, 0.5 },
+	{ NORESOURCE, 0, 0.0 },
+};
+
+#if LARGE_CASTLES
+static construction castle_bld[MAXBUILDINGS] = {
+	{ SK_BUILDING, 1,     2, 1, castle_req, &castle_bld[1] },
+	{ SK_BUILDING, 1,     8, 1, castle_req, &castle_bld[2] },
+	{ SK_BUILDING, 2,    40, 1, castle_req, &castle_bld[3] },
+	{ SK_BUILDING, 3,   200, 1, castle_req, &castle_bld[4] },
+	{ SK_BUILDING, 4,  1000, 1, castle_req, &castle_bld[5] },
+	{ SK_BUILDING, 5,  5000, 1, castle_req, &castle_bld[6] },
+	{ SK_BUILDING, 6,    -1, 1, castle_req, NULL }
+};
+#else
+static construction castle_bld[MAXBUILDINGS] = {
+	{ SK_BUILDING, 1,    2, 1, castle_req, &castle_bld[1] },
+	{ SK_BUILDING, 2,    8, 1, castle_req, &castle_bld[2] },
+	{ SK_BUILDING, 3,   40, 1, castle_req, &castle_bld[3] },
+	{ SK_BUILDING, 4,  200, 1, castle_req, &castle_bld[4] },
+	{ SK_BUILDING, 5, 1000, 1, castle_req, &castle_bld[5] },
+	{ SK_BUILDING, 6,   -1, 1, castle_req, NULL }
+};
+#endif
+
+building_type bt_castle = {
+	"castle",
+	BFL_NONE,
+	1, 4, -1,
+	0, 0, 0, 0.0,
+	NULL,
+	&castle_bld[0],
+	castle_name
+};
 
 /* for finding out what was meant by a particular building string */
 
@@ -349,24 +386,28 @@ tagbegin(struct xml_stack * stack)
 			}
 		} else if (strcmp(tag->name, "maintenance")==0) {
 			size_t len = 0;
-			if (bt->maintenance) {
-				const resource_type * rtype;
-				maintenance * mt = (maintenance*)bt->maintenance;
-				resource_t type = NORESOURCE;
+			const resource_type * rtype;
+			maintenance * mt;
+			resource_t type = NORESOURCE;
+			if (bt->maintenance==NULL) {
+				mt = bt->maintenance = calloc(sizeof(maintenance), 2);
+				len = 0;
+			} else {
+				mt = bt->maintenance;
 				while (mt[len].number) ++len;
 				mt = realloc(mt, sizeof(maintenance)*(len+1));
-				mt[len+1].number = 0;
-				mt[len].number = xml_ivalue(tag, "amount");
-				rtype = rt_find(xml_value(tag, "type"));
-				for (type=0;type!=MAX_RESOURCES;++type) {
-					if (oldresourcetype[type]==rtype) {
-						mt[len].type = type;
-						break;
-					}
-				}
-				if (xml_bvalue(tag, "variable")) mt[len].flags |= MTF_VARIABLE;
-				if (xml_bvalue(tag, "vital")) mt[len].flags |= MTF_VITAL;
 			}
+			mt[len+1].number = 0;
+			mt[len].number = xml_ivalue(tag, "amount");
+			rtype = rt_find(xml_value(tag, "type"));
+			for (type=0;type!=MAX_RESOURCES;++type) {
+				if (oldresourcetype[type]==rtype) {
+					mt[len].type = type;
+					break;
+				}
+			}
+			if (xml_bvalue(tag, "variable")) mt[len].flags |= MTF_VARIABLE;
+			if (xml_bvalue(tag, "vital")) mt[len].flags |= MTF_VITAL;
 		} else if (strcmp(tag->name, "requirement")==0) {
 			construction * con = (construction *)bt->construction;
 			if (con!=NULL) {
@@ -411,6 +452,7 @@ register_buildings(void)
 	xml_register(&xml_buildings, "eressea building", 0);
 	register_function((pf_generic)init_smithy, "init_smithy");
 	register_function((pf_generic)castle_name, "castle_name");
+	bt_register(&bt_castle);
 }
 
 void
