@@ -743,15 +743,15 @@ caught_target(region * r, unit * u)
 	if (a) {
 		unit * target = (unit*)a->data.v;
 
-		if (!present(r, target)) {
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"followfail%u:unit%u:follower", target, u));
-		} else if (!alliedunit(target, u->faction, HELP_ALL)
-				   && cansee(target->faction, r, u, 0))
-		{
-			add_message(&target->faction->msgs, new_message(target->faction,
-				"followdetect%u:unit%u:follower", target, u));
-		}
+    if (!present(r, target)) {
+      ADDMSG(&u->faction->msgs, msg_message("followfail", "unit follower",
+        target, u));
+    } else if (!alliedunit(target, u->faction, HELP_ALL)
+      && cansee(target->faction, r, u, 0))
+    {
+      ADDMSG(&target->faction->msgs, msg_message("followdetect", 
+        "unit follower", target, u));
+    }
 	}
 }
 
@@ -2030,7 +2030,9 @@ hunt(unit *u)
   char command[256];
   direction_t dir;
 
-  if(!u->ship) {
+  if (fval(u, UFL_LONGACTION)) {
+    return 0;
+  } else if (u->ship==NULL) {
     cmistake(u, u->thisorder, 144, MSG_MOVE);
     return 0;
   } else if(!fval(u, UFL_OWNER)) {
