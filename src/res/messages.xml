@@ -1292,8 +1292,8 @@
       <arg name="region" type="region"/>
       <arg name="spell" type="spell"/>
     </type>
-    <text locale="de">"$unit($unit) unterläuft in $region($region) beim Zaubern von $spell($spell) ein Patzer:"</text>
-    <text locale="en">"$unit($unit) fumbles while casting $spell($spell) in $region($region):"</text>
+    <text locale="de">"$unit($unit) unterläuft in $region($region) beim Zaubern von $spell($spell) ein Patzer."</text>
+    <text locale="en">"$unit($unit) fumbles while casting $spell($spell) in $region($region)."</text>
   </message>
   <message name="patzer3" section="magic">
     <type>
