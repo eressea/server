@@ -48,7 +48,7 @@ def ShowPage():
 	lastturn, game = cursor.fetchone()
 	maxturn[game] = lastturn
     output='<p>Um eine der folgenden Parteien zu übernehmen, musst du zuerst ein <a href="register.php">Spielerkonto anlegen</a>. Wenn Du eines hast, markiere die Partei, die Du übernehmen willst, und trage Kundennummer und Kundenpasswort ein.'
-    query = "SELECT g.id, g.name, s.faction, s.lastturn, s.id, r.name, s.info from games g, subscriptions s, races r where s.game=g.id and s.race=r.race and s.status='CANCELLED'"
+    query = "SELECT g.id, g.name, s.faction, s.lastturn, s.id, r.name, s.info from games g, subscriptions s, races r where s.game=g.id and s.race=r.race and s.status='CANCELLED' order by s.lastturn DESC"
     results = cursor.execute(query)
     output=output+'<div align=center><form action="'+scripturl+'" method=post><table bgcolor="#e0e0e0" width="80%" border>\n'
     output=output+'<tr><th>Rasse</th><th>Spiel</th><th>NMRs</th><th>Informationen</th><th>Markieren</th></tr>'
@@ -82,20 +82,20 @@ if (password!=None) & (custid!=None):
     output=""
     if cursor.execute("select email, id from users where password='"+password+"' and id="+str(int(custid)))==1:
 	email, custid = cursor.fetchone()
-	c = cursor.execute("SELECT id, faction from subscriptions where status='CANCELLED'")
+	c = cursor.execute("SELECT id, game, password, faction from subscriptions where status='CANCELLED'")
 	while c>0:
 	    c=c-1
-	    sid, faction = cursor.fetchone()
+	    sid, gid, newpass, faction = cursor.fetchone()
 	    if Form.has_key("accept_"+str(int(sid))):
 		update = db.cursor()
 		update.execute("UPDATE subscriptions set user=" + str(int(custid)) + ", status='ACTIVE' where id=" + str(int(sid)))
 		output=output+"Die Partei " + faction + " wurde Dir überschrieben. Eine Email mit dem Passwort und weiteren Hinweisen ist unterwegs zu Dir.<br>"
 		Msg="From: "+From+"\nTo: "+email+"\nSubject: Vinambar Parteiuebernahme\n\n"
 		Msg=Msg+"Das Passwort für deine neue Vinyambar-Partei "+faction+" lautet\n"
-		Msg=Msg+"  "+password+"\n"
+		Msg=Msg+"  "+newpass+"\n"
 		Msg=Msg+"\nUm den Report der letzten Woche zu erhalten, schicke eine Mail mit dem Betreff\n"
-		Msg=Msg+"ERESSEA REPORT "+faction+" \""+password+"\" an die Adresse "
-		Msg=Msg+"eressea@eressea.amber.kn-bremen.de"
+		Msg=Msg+"VIN"+str(int(gid))+" REPORT "+faction+" \""+newpass+"\" an die Adresse "
+		Msg=Msg+"vinyambar@eressea.amber.kn-bremen.de"
 
 		server=smtplib.SMTP(smtpserver)
 		server.sendmail(From, email, Msg)

@@ -85,6 +85,11 @@ def ShowInfo(custid, Password):
     cursor.execute("select max(date), max(id) from transactions")
     lastdate, id = cursor.fetchone()
 
+    nraces = cursor.execute("select distinct race, name from races where locale='de'")
+    races=[('', 'Keine Anmeldung')]
+    while nraces>0:
+	nraces = nraces - 1
+	races.append(cursor.fetchone())
     query=("select firstname, lastname, email, address, city, country, phone, status "+
       "from users "+
       "where id="+str(custid)+" and password='"+Password+"' ")
@@ -130,24 +135,26 @@ def ShowInfo(custid, Password):
 	while games>0:
 	    games=games-1
 	    gid, game, status, info = cursor.fetchone()
-	    
+	    cself = db.cursor();
+	    sub = cself.execute("select s.race from subscriptions s, users u where game="+str(int(gid))+" and u.id=s.user and u.id="+str(int(custid)))
+	    prev=""
+	    if sub>0:
+		prev=cself.fetchone()[0]
+		if prev==None:
+		    prev=""
 	    line = '<table  bgcolor="#e0e0e0" width=80% border>\n<tr><th align=center><em>' + game + '</em>: ' + info + '</th></tr>'
 	    if status=='WAITING':
 		line = line+'<tr><td>'
 		line = line + 'Ich möchte an diesem Spiel teilnehmen, und bevorzuge folgende Rasse:<br>\n'
-		line = line + '<select name="oldrace" size=1>'
-		line = line + '<OPTION selected value="">Keine Anmeldung'
-		line = line + '<option value="GOBLIN">Goblin'
-		line = line + '<option value="DWARF">Zwerg'
-		line = line + '<option value="ELF">Elf'
-		line = line + '<option value="HALFLING">Halbling'
-		line = line + '<option value="INSECT">Insekt'
-		line = line + '<option value="AQUARIAN">Meermensch'
-		line = line + '<option value="HUMAN">Mensch'
-		line = line + '<option value="CAT">Katze'
-		line = line + '<option value="TROLL">Troll'
-		line = line + '<option value="ORC">Ork'
-		line = line + '<option value="DEMON">Dämon'
+		nraces=len(races)
+		line = line + '<select name="race_'+str(int(gid))+'" size="1">'
+		while nraces>0:
+		    nraces=nraces-1
+		    race=races[nraces]
+		    if prev == race[0]:
+			line = line + '<OPTION selected value="'+race[0]+'">'+race[1]+'\n'
+		    else:
+			line = line + '<OPTION value="'+race[0]+'">'+race[1]+'\n'
 		line = line + '</select>'
 		line = line+'</td></tr>'
 	    elif status=='RUNNING':
@@ -225,6 +232,27 @@ def Save(custid, Password):
     db = MySQLdb.connect(db=dbname)
     cursor=db.cursor()
     cursor.execute('UPDATE users SET '+values+' where id='+str(custid))
+
+    ngames = cursor.execute("select id from games where status='WAITING'")
+    while ngames > 0:
+	ngames=ngames - 1
+	gid = cursor.fetchone()[0]
+	key="race_"+str(int(gid))
+	if Form.has_key(key):
+	    update = db.cursor()
+	    newrace=Form[key].value
+	    if newrace=='':
+		newrace=None
+	    if newrace==None:
+		update.execute('delete from subscriptions where user='+str(int(custid))+' and game='+str(int(gid)))
+	    else:
+		exist=update.execute('select id, race from subscriptions where game='+str(int(gid))+' and user='+str(int(custid)))
+		if exist>0:
+		    sid, race = update.fetchone()
+		    if race!=newrace:
+			update.execute("update subscriptions  set race='"+newrace+"' where id="+str(int(sid)))
+		else:
+		    update.execute("insert subscriptions (race, user, status, game) values ('"+newrace+"', "+str(int(custid))+", 'WAITING', "+str(int(gid))+") where id="+str(int(sid)))
 
     nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='ACTIVE' and s.user="+str(custid) + " and s.game=g.id")
     while nfactions > 0:
