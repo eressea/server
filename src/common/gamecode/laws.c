@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.22 2001/02/13 00:41:15 enno Exp $
+ *	$Id: laws.c,v 1.23 2001/02/13 19:22:48 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1083,7 +1083,14 @@ set_display(region * r, unit * u, strlist * S)
 		break;
 
 	case P_PRIVAT:
-		usetprivate(u, getstrtoken());
+		{
+			char *d = getstrtoken();
+			if(d == NULL || *d == 0) {
+				usetprivate(u, NULL);
+			} else {
+				usetprivate(u, d);
+			}
+		}
 		break;
 
 	case P_REGION:
