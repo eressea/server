@@ -53,6 +53,7 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/goodies.h>
 #include <util/message.h>
 
 /* libs includes */
@@ -1503,6 +1504,7 @@ make_cmd(unit * u, struct order * ord)
 	int m;
 	const item_type * itype;
 	const char *s;
+  const struct locale * lang = u->faction->locale;
   
   init_tokens(ord);
   skip_token();
@@ -1522,12 +1524,6 @@ make_cmd(unit * u, struct order * ord)
 	/* MACHE TEMP kann hier schon gar nicht auftauchen, weil diese nicht in
 	* thisorder abgespeichert werden - und auf den ist getstrtoken() beim
 	* aufruf von make geeicht */
-
-	itype = finditemtype(s, u->faction->locale);
-	if (itype!=NULL) {
-		create_item(u, itype, m);
-		return;
-	}
 
 	if (p == P_ROAD) {
 		direction_t d;
@@ -1556,7 +1552,38 @@ make_cmd(unit * u, struct order * ord)
 		return;
 	}
 
-	stype = findshiptype(s, u->faction->locale);
+  /* since the string can match several objects, like in 'academy' and
+   * 'academy of arts', we need to figure out what the player meant.
+   * This is not 100% safe.
+   */
+	stype = findshiptype(s, lang);
+	btype = findbuildingtype(s, lang);
+	itype = finditemtype(s, lang);
+  
+  if (itype!=NULL && (btype!=NULL || stype!=NULL)) {
+    if (itype->construction==NULL) {
+      /* if the item cannot be made, we probably didn't mean to make it */
+      itype = NULL;
+    } else if (stype!=NULL) {
+      const char * sname = LOC(lang, stype->name[0]);
+      const char * iname = LOC(lang, resourcename(itype->rtype, 0));
+      if (strlen(iname)<strlen(sname)) stype = NULL;
+      else itype = NULL;
+    } else {
+      const char * bname = LOC(lang, btype->_name);
+      const char * iname = LOC(lang, resourcename(itype->rtype, 0));
+      if (strlen(iname)<strlen(bname)) btype = NULL;
+      else itype = NULL;
+    }
+  }
+
+  if (btype!=NULL && stype!=NULL) {
+    const char * bname = LOC(lang, btype->_name);
+    const char * sname = LOC(lang, stype->name[0]);
+    if (strlen(sname)<strlen(bname)) btype = NULL;
+    else stype = NULL;
+  }
+  
 	if (stype != NOSHIP) {
 		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
 			cmistake(u, u->thisorder, 276, MSG_PRODUCE);
@@ -1566,13 +1593,17 @@ make_cmd(unit * u, struct order * ord)
 		return;
 	}
 
-	btype = findbuildingtype(s, u->faction->locale);
 	if (btype != NOBUILDING) {
 		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
 			cmistake(u, u->thisorder, 94, MSG_PRODUCE);
 			return;
 		}
 		build_building(u, btype, m);
+		return;
+	}
+
+	if (itype!=NULL) {
+		create_item(u, itype, m);
 		return;
 	}
 
