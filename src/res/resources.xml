@@ -82,4 +82,37 @@
 	</string>
 </strings>
 
+<resource name="snowball">
+	<comment>xmas gimmik</comment>
+	<item notlost weight="0">
+		<function name="use" value="usesnowball"></function>
+	</item>
+</resource>
+<strings>
+	<string name="snowball">
+		<text locale="de">Schneeball</text>
+		<text locale="en">snowball</text>
+	</string>
+	<string name="snowball_p">
+		<text locale="de">Schneebälle</text>
+		<text locale="en">snowball</text>
+	</string>
+</strings>
+
+<resource name="snowman">
+	<comment>xmas gimmik</comment>
+	<item notlost weight="1">
+	</item>
+</resource>
+<strings>
+	<string name="snowman">
+		<text locale="de">Schneemann</text>
+		<text locale="en">snowman</text>
+	</string>
+	<string name="snowman_p">
+		<text locale="de">Schneemänner</text>
+		<text locale="en">snowmen</text>
+	</string>
+</strings>
+
 

@@ -34,8 +34,12 @@ presents(unit * senior)
 {
 	item_type * itype;
 	/* Geschenke für alle */
-	itype = olditemtype[(rand() % 4) + I_KEKS];
-	/* itype = it_find("mistletoe"); */
+	/* itype = olditemtype[(rand() % 4) + I_KEKS]; */
+	if (rand () % 4){
+		itype = it_find("snowball");
+	} else {
+		itype = it_find("snowman");
+	}
 	assert(itype!=NULL);
 	i_change(&senior->items, itype, 1);
 }

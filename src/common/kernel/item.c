@@ -1985,6 +1985,12 @@ use_mistletoe(struct unit * user, const struct item_type * itype, int amount, co
 	return 0;
 }
 
+static int
+use_snowball(struct unit * user, const struct item_type * itype, int amount, const char * cmd)
+{
+	return;
+}
+
 void
 init_oldpotions(void)
 {
@@ -2617,6 +2623,7 @@ register_resources(void)
 	register_function((pf_generic)use_bloodpotion, "usebloodpotion");
 	register_function((pf_generic)use_foolpotion, "usefoolpotion");
 	register_function((pf_generic)use_mistletoe, "usemistletoe");
+	register_function((pf_generic)use_snowball, "usesnowball");
 
 	register_function((pf_generic)give_horses, "givehorses");
 
