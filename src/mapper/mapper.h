@@ -61,6 +61,7 @@ void make_new_region(int x, int y);
 int map_input(WINDOW * win, int x, int y, const char *text, int mn, int mx, int pre);
 boolean yes_no(WINDOW * win, const char *text, const char def);
 void warnung(WINDOW * win, const char *text);
+FILE *mapperFopen(const char *defName, const char *mode);
 void adddbllist(dbllist ** S, const char *s);
 void ScrollRegList(int dir);
 void DisplayRegList(int neu);

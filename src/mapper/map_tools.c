@@ -146,7 +146,7 @@ void
 warnung(WINDOW * win, const char *text)
 {
 	if (!win) {
-		win = openwin(strlen(text) + 4, 3, "< WARNUNG >");
+		win = openwin(strlen(text) + 4, 3, "< WARNING >");
 		wmove(win, 1, 2);
 	}
 	wprintw(win, (NCURSES_CONST char*)"%s", text);
@@ -185,7 +185,8 @@ my_input(WINDOW * win, int x, int y, const char *text, const char *def)
 
 	if (!win) {
 		win = openwin(SX - 10, 3, 0);
-		y = nw = 1;
+		nw = 1;
+		y = 1;
 		x = 2;
 	}
 
@@ -230,8 +231,10 @@ my_input(WINDOW * win, int x, int y, const char *text, const char *def)
 			beep();
 		wrefresh(win);
 	} while (!(ch == '\n'));
-	if (nw)
+	if (nw) {
+		wclear(win);
 		delwin(win);
+	}
 	curs_set(0);
 	lbuf[val] = 0;
 	return lbuf;
@@ -367,3 +370,21 @@ do_selection(selection * sel, const char * title, void (*perform)(selection *, v
 		}
 	}
 }
+
+FILE *
+mapperFopen(const char *defName, const char *mode)
+{
+	char nameBuf[80];
+	FILE *fileP;
+
+	strncpy(nameBuf, my_input(0,0,0,"Ausgabe in File: ", defName), 79);
+	nameBuf[79] = 0;
+
+	fileP = fopen(nameBuf, mode);
+	if(!fileP) {
+		warnung(NULL, "Can't open file for writing");
+	}
+
+	return fileP;
+}
+

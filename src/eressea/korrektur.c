@@ -21,6 +21,8 @@
 #include <config.h>
 #include <eressea.h>
 
+/* misc includes */
+#include <attributes/key.h>
 #include <modules/xmas2000.h>
 #include <modules/museum.h>
 
@@ -1322,18 +1324,15 @@ extern attrib * make_atpermissions(void);
 extern struct attrib_type at_permissions;
 
 static void
-make_gms(void)
+update_gms(void)
 {
-	faction * f = findfaction(atoi36("rr"));
-	if (f) {
+	faction * f;
+	for (f=factions;f;f=f->next) {
 		attrib * a = a_find(f->attribs, &at_permissions);
-		if (!a) {
-			item_type * itype;
-			a = a_add(&f->attribs, make_atpermissions());
-			for (itype=itemtypes;itype;itype=itype->next) {
-				a_add((attrib**)&a->data.v, make_atgmcreate(itype));
+		if (a) {
+			if (!find_key((attrib*)a->data.v, atoi36("gmgate"))) {
+				a_add((attrib**)&a->data.v, make_key(atoi36("gmgate")));
 			}
-			a_add((attrib**)&a->data.v, make_key(atoi36("gmtf")));
 		}
 	}
 }
@@ -2245,8 +2244,7 @@ korrektur(void)
 #ifdef TEST_GM_COMMANDS
 	setup_gm_faction();
 #endif
-	make_gms();
-	/* Wieder entfernen! */
+	update_gms();
 	verify_owners(false);
 	/* fix_herbtypes(); */
 #ifdef CONVERT_TRIGGER

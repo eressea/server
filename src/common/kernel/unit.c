@@ -320,13 +320,13 @@ void
 a_writesiege(const attrib * a, FILE * f)
 {
 	struct building * b = (struct building*)a->data.v;
-	building_write(b, f);
+	write_building_reference(b, f);
 }
 
 int
 a_readsiege(attrib * a, FILE * f)
 {
-	return building_read((struct building**)&a->data.v, f);
+	return read_building_reference((struct building**)&a->data.v, f);
 }
 
 attrib_type at_siege = {

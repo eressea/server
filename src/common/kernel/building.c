@@ -881,13 +881,13 @@ resolve_building(void * id) {
 }
 
 void
-building_write(const struct building * b, FILE * F)
+write_building_reference(const struct building * b, FILE * F)
 {
 	fprintf(F, "%s ", b?itoa36(b->no):"0");
 }
 
 int
-building_read(struct building ** b, FILE * F)
+read_building_reference(struct building ** b, FILE * F)
 {
 	int id;
 	char zText[10];

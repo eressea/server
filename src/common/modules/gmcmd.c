@@ -8,17 +8,20 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- 
- */
+*/
+
 #include <config.h>
 #include <eressea.h>
 #include "gmcmd.h"
 #include "command.h"
 
+/* misc includes */
 #include <items/demonseye.h>
 #include <attributes/key.h>
+#include <triggers/gate.h>
 
 /* kernel includes */
+#include <building.h>
 #include <faction.h>
 #include <item.h>
 #include <plane.h>
@@ -27,9 +30,10 @@
 #include <unit.h>
 
 /* util includes */
-#include <base36.h>
-#include <umlaut.h>
 #include <attrib.h>
+#include <base36.h>
+#include <event.h>
+#include <umlaut.h>
 
 /* libc includes */
 #include <stdlib.h>
@@ -123,6 +127,34 @@ gm_create(const char * str, void * data, const char * cmd)
 }
 
 /**
+ ** GM: GATE <id> <x> <y>
+ ** requires: permission-key "gmgate"
+ **/
+static void
+gm_gate(const char * str, void * data, const char * cmd)
+{
+	unit * u = (unit*)data;
+	const struct plane * p = rplane(u->region);
+	int id = atoi36(igetstrtoken(str));
+	int x = rel_to_abs(p, u->faction, atoi(getstrtoken()), 0);
+	int y = rel_to_abs(p, u->faction, atoi(getstrtoken()), 1);
+	region * r = findregion(x, y);
+	building * b = findbuilding(id);
+	if (b==NULL || r==NULL || p!=rplane(b->region) || p!=rplane(r)) {
+		mistake(u, cmd, "Dieses Gebäude kann die Einheit nicht umwandeln.\n", 0);
+		return;
+	} else {
+		/* checking permissions */
+		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
+		if (!permissions || !find_key((attrib*)permissions->data.v, atoi36("gmgate"))) return;
+		else {
+			add_trigger(&u->attribs, "timer", trigger_gate(b, r));
+		}
+	}
+}
+
+
+/**
  ** GM: TERRAFORM <terrain> <x> <y>
  ** requires: permission-key "gmterf"
  **/
@@ -137,7 +169,7 @@ gm_terraform(const char * str, void * data, const char * cmd)
 	region * r = findregion(x, y);
 	terrain_t t;
 	if (r==NULL || p!=rplane(r)) {
-		mistake(u, cmd, "Diese Regon kann die Einheit nicht umwandeln.\n", 0);
+		mistake(u, cmd, "Diese Region kann die Einheit nicht umwandeln.\n", 0);
 		return;
 	} else {
 		/* checking permissions */
@@ -300,6 +332,7 @@ init_gmcmd(void)
 	add_command(&g_keys, &g_cmds, "gm", &gm_command);
 	add_command(&g_keys, &g_cmds, "terraform", &gm_terraform);
 	add_command(&g_keys, &g_cmds, "create", &gm_create);
+	add_command(&g_keys, &g_cmds, "gate", &gm_gate);
 	add_command(&g_keys, &g_cmds, "give", &gm_give);
 	add_command(&g_keys, &g_cmds, "take", &gm_take);
 	add_command(&g_keys, &g_cmds, "teleport", &gm_teleport);
@@ -403,6 +436,7 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	a = a_add(&f->attribs, a_new(&at_permissions));
 
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmterf")));
+	a_add((attrib**)&a->data.v, make_key(atoi36("gmgate")));
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmtele")));
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmgive")));
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmskil")));

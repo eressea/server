@@ -17,6 +17,7 @@
 #define BOOL_DEFINED
 /* wenn config.h nicht vor curses included wird, kompiliert es unter windows nicht */
 #include <config.h>
+#include <stdio.h>
 #include <curses.h>
 #include <eressea.h>
 #include "mapper.h"
@@ -763,6 +764,25 @@ movearound(int rx, int ry) {
 							tag = tag_next;
 						}
 						ch=-9;
+					} break;
+				case 'W':
+					if(Tagged) {
+						FILE *mapFile = mapperFopen("mapper.map","w");
+						const char *tname;
+						if(mapFile) {
+							tag=Tagged;
+							while(tag) {
+								fprintf(mapFile, "REGION %d %d\n",tag->r->x, tag->r->y);
+								if(r_isforest(tag->r)) {
+									tname = "forest";
+								} else {
+									tname = terrain[rterrain(tag->r)].name;
+								}
+								fprintf(mapFile, "\"%s\"; Terrain\n", locale_string(NULL, tname));
+								tag=tag->next;
+							}
+							fclose(mapFile);
+						}
 					} break;
 				case 'G':
 					rx=tx; ry=ty;

@@ -135,8 +135,8 @@ extern const struct building_type * oldbuildings[MAXBUILDINGTYPES];
 #define NOBUILDING NULL
 
 extern void * resolve_building(void * data);
-extern void building_write(const struct building * b, FILE * F);
-extern int building_read(struct building ** b, FILE * F);
+extern void write_building_reference(const struct building * b, FILE * F);
+extern int read_building_reference(struct building ** b, FILE * F);
 
 extern struct building *findbuilding(int n);
 
