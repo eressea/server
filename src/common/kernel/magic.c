@@ -1875,11 +1875,12 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
   while (!fail && *c && i<size && param[i]!=NULL) {
     spllprm * spobj = NULL;
     param_t pword;
-    int j = 0;
+    int j = -1;
     switch (*c) {
       case '+':
         /* das vorhergehende Element kommt ein oder mehrmals vor, wir
         * springen zum key zurück */
+        j = 0;
         --c;
         break;
       case 'u':
@@ -1913,38 +1914,42 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
       case 'k':
         ++c;
         pword = findparam(param[i++], u->faction->locale);
-        if (i>=size) pword = NOPARAM;
         switch (pword) {
           case P_REGION:
             spobj = malloc(sizeof(spllprm));
             spobj->flag = 0;
             spobj->typ = SPP_REGION;
             spobj->data.r = u->region;
+            j = 0;
             ++c;
             break;
           case P_UNIT:
-            j = addparam_unit(param+i, &spobj, u, ord);
-            ++c;
+            if (i<size) {
+              j = addparam_unit(param+i, &spobj, u, ord);
+              ++c;
+            }
             break;
           case P_BUILDING:
           case P_GEBAEUDE:
-            j = addparam_building(param+i, &spobj);
-            ++c;
+            if (i<size) {
+              j = addparam_building(param+i, &spobj);
+              ++c;
+            }
             break;
           case P_SHIP:
-            j = addparam_ship(param+i, &spobj);
-            ++c;
+            if (i<size) {
+              j = addparam_ship(param+i, &spobj);
+              ++c;
+            }
             break;
           default:
-            /* Syntax Error. */
-            cmistake(u, ord, 209, MSG_MAGIC);
             j = -1;
-					}
+            break;
+        }
         break;
       default:
-        /* Syntax Error. */
-        cmistake(u, ord, 209, MSG_MAGIC);
         j = -1;
+        break;
     }
     if (j<0) fail = true;
     else {
@@ -1954,6 +1959,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
 	}
 
   if (fail) {
+    cmistake(u, ord, 209, MSG_MAGIC);
     free_spellparameter(par);
     return NULL;
   }
