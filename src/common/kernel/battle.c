@@ -922,7 +922,9 @@ remove_troop(troop dt)
 	rmtroop(dt);
 	if (!df->alive && du->race->itemdrop) {
 		item * drops = du->race->itemdrop(du->race, du->number-df->run.number);
-		i_merge(&du->items, &drops);
+		if (drops != NULL){
+			i_merge(&du->items, &drops);
+		}
 	}
 }
 
