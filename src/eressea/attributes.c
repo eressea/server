@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: attributes.c,v 1.6 2001/02/10 11:38:29 enno Exp $
+ * $Id: attributes.c,v 1.7 2001/02/18 12:20:20 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -18,6 +18,7 @@
 
 /* attributes includes */
 #include <attributes/key.h>
+#include <attributes/gm.h>
 #include <attributes/orcification.h>
 #include <attributes/targetregion.h>
 #include <attributes/reduceproduction.h>
@@ -33,6 +34,8 @@ void
 init_attributes(void)
 {
 	at_register(&at_overrideroads);
+	/* at_gm */
+	init_gm();
 	/* at_iceberg */
 	init_iceberg();
 	/* at_key */

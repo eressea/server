@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: attributes.c,v 1.7 2001/02/10 12:31:42 corwin Exp $
+ * $Id: attributes.c,v 1.8 2001/02/18 12:20:20 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -18,6 +18,7 @@
 
 /* attributes includes */
 #include "key.h"
+#include "gm.h"
 #include "targetregion.h"
 #include "orcification.h"
 #include "reduceproduction.h"
@@ -42,6 +43,8 @@ init_attributes(void)
 	init_iceberg();
 	/* at_key */
 	init_key();
+	/* at_gm */
+	init_gm();
 	/* at_follow */
 	init_follow();
 	/* at_targetregion */
