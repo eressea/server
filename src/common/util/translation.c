@@ -335,7 +335,7 @@ parse(opstack ** stack, const char* inn, const void * userdata)
 }
 
 const char * 
-translate(const char* format, const void * userdata, const char* vars, const void* args[])
+translate(const char* format, const void * userdata, const char* vars, void* args[])
 {
 	int i = 0;
 	const char *ic = vars;

@@ -25,7 +25,7 @@ extern void opstack_push(struct opstack ** stack, void * data);
 extern void translation_init(void);
 extern void translation_done(void);
 extern const char * translate_va(const char* format, const void * userdata, const char* vars, ...);
-extern const char * translate(const char* format, const void * userdata, const char* vars, const void* args[]);
+extern const char * translate(const char* format, const void * userdata, const char* vars, void* args[]);
 
 /* eval_x functions */
 typedef void (*evalfun)(struct opstack ** stack, const void *);

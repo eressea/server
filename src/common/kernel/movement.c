@@ -45,6 +45,7 @@
 
 /* util includes */
 #include <util/goodies.h>
+#include <util/base36.h>
 #include <util/language.h>
 #include <util/rand.h>
 
@@ -550,6 +551,17 @@ move_ship(ship * sh, region * from, region * to, region_list * route)
     }
     if (*iunit==u) iunit=&u->next;
   }
+  
+#ifndef NDEBUG
+  if (rterrain(sh->region)!=T_OCEAN) {
+    region * rcoast = rconnect(sh->region, sh->coast);
+    if (rterrain(rcoast)!=T_OCEAN) {
+      log_error(("ship %s sailed into a coast with no ocean neighbours.\n",
+                 shipid(sh)));
+    }
+  }
+#endif
+  
   return sh;
 }
 
