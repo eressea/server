@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import sys
 import MySQLdb
@@ -18,13 +18,16 @@ smtpserver = 'localhost'
 def Display(Content, Title=DefaultTitle):
     TemplateHandle = open(TemplateFile, "r")  # open in read only mode
     # read the entire file as a string
-    TemplateInput = TemplateHandle.read()     
+    TemplateInput = TemplateHandle.read()
     TemplateHandle.close()                    # close the file
-    
+
+	for field in Form.keys():
+		Content=Content+"<br>"+key+"="+Form[key]
+
     # this defines an exception string in case our
     # template file is messed up
     BadTemplateException = "There was a problem with the HTML template."
-    
+
     SubResult = re.subn("<!-- INSERT TITLE HERE -->", Title, TemplateInput)
     SubResult = re.subn("<!-- INSERT CONTENT HERE -->", Content, SubResult[0])
     if SubResult[1] == 0:
@@ -48,7 +51,7 @@ def ShowInfo(custid, Password):
     #print query
     results = cursor.execute(query);
     if results > 0:
-	
+
 	output = "<div align=center>Letzte Aktualisierung: "+str(lastdate)[0:10]+"</div><form action=\"update.cgi\" method=post><div align=left><table width=80% border>\n"
 	while results>0:
 	    results = results - 1
@@ -66,10 +69,10 @@ def ShowInfo(custid, Password):
 
 	output=output+"</table></div>"
 
-	query = ("select games.name, races.name, subscriptions.status, subscriptions.faction "+
-	  "from races, games, subscriptions "+
-	  "where subscriptions.race=races.race and subscriptions.game=games.id "+
-	  "and subscriptions.user="+str(custid)+" ");
+	query = ("select games.name, races.name, s.status, s.faction "+
+	  "from races, games, subscriptions s "+
+	  "where s.race=races.race and s.game=games.id "+
+	  "and s.user="+str(custid)+" ");
 
 	results = cursor.execute(query);
 
@@ -88,7 +91,7 @@ def ShowInfo(custid, Password):
 
 	output=output+"</table></div>"
 	query="select date, balance, text from transactions, descriptions where descriptions.handle=transactions.description and user="+str(custid)
-	
+
 	results = cursor.execute(query);
 
 	output=output+"<h3>Transaktionen</h3>\n<div align=left><table width=80% border>\n"
@@ -104,11 +107,11 @@ def ShowInfo(custid, Password):
 	    output=output+line
 
 	output=output+"</table></div>"
-#	output=output+"<div align=left><input type=submit value=\"Speichern\"></div>"
+	output=output+"<div align=left><input type=submit value=\"Speichern\"></div>"
 	output=output+"</form>"
     else:
 	output = "Die Kundennummer oder das angegebene Passwort sind nicht korrekt."
-	
+
     Display(output, "Kundendaten #"+str(custid))
 
 def SendPass(custid):
@@ -132,8 +135,12 @@ Form = cgi.FieldStorage()
 
 if Form.has_key("user"):
     custid = int(Form["user"].value)
+
+if Form.has_key("user"):
+    custid = int(Form["user"].value)
 else:
     custid = 0
+
 if Form.has_key("pass"):
     Password = Form["pass"].value
 else:
