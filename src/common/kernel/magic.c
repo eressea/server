@@ -1199,6 +1199,7 @@ int
 magic_resistance(unit *target)
 {
 	attrib * a;
+	curse *c;
 	int chance;
 	int n;
 
@@ -1209,9 +1210,9 @@ magic_resistance(unit *target)
 	chance += effskill(target, SK_MAGIC)*5;
 
 	/* Auswirkungen von Zaubern auf der Einheit */
-	if (is_cursed(target->attribs, C_MAGICRESISTANCE, 0)) {
-		chance += get_curseeffect(target->attribs, C_MAGICRESISTANCE, 0) *
-			get_cursedmen(target->attribs, C_MAGICRESISTANCE, 0) / target->number;
+	c = get_curse(target->attribs, C_MAGICRESISTANCE, 0);
+	if (c) {
+		chance += get_curseeffect(target->attribs, C_MAGICRESISTANCE, 0) * get_cursedmen(target, c);
 	}
 
 	/* Unicorn +10 */

@@ -116,6 +116,7 @@ extern int rc_specialdamage(const race *, const race *, const struct weapon_type
 #define RCF_SHAPESHIFT     (1<<18)	/* Kann TARNE RASSE benutzen. */
 #define RCF_SHAPESHIFTANY  (1<<19)	/* Kann TARNE RASSE "string" benutzen. */
 #define RCF_UNDEAD         (1<<20)	/* Undead. */
+#define RCF_DRAGON         (1<<21)	/* Drachenart (für Zauber)*/
 
 /* Economic flags */
 #define NOGIVE         (1<<0)   /* gibt niemals nix */

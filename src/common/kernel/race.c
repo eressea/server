@@ -103,8 +103,6 @@ rc_find(const char * name)
 	return rc;
 }
 
-/* TODO: Tragkraft in die Struktur */
-
 /** dragon movement **/
 boolean
 allowed_dragon(const region * src, const region * target)
@@ -648,6 +646,7 @@ tagbegin(struct xml_stack * stack)
 			if (xml_bvalue(tag, "shapeshiftany")) rc->flags |= RCF_SHAPESHIFTANY;
 			if (xml_bvalue(tag, "illusionary")) rc->flags |= RCF_ILLUSIONARY;
 			if (xml_bvalue(tag, "undead")) rc->flags |= RCF_UNDEAD;
+			if (xml_bvalue(tag, "dragon")) rc->flags |= RCF_DRAGON;
 
 			if (xml_bvalue(tag, "nogive")) rc->ec_flags |= NOGIVE;
 			if (xml_bvalue(tag, "giveitem")) rc->ec_flags |= GIVEITEM;

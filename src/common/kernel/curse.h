@@ -179,8 +179,8 @@ enum {
 #define NO_MERGE      0 /* erzeugt jedesmal einen neuen Zauber */
 #define M_DURATION    1 /* Die Zauberdauer ist die maximale Dauer beider */
 #define M_SUMDURATION 2 /* die Dauer des Zaubers wird summiert */
-#define M_MAXEFFECT   4 /* der Effekt summiert sich */
-#define M_SUMEFFECT   8 /* der Effekt ist der maximale Effekt beider */
+#define M_MAXEFFECT   4 /* der Effekt ist der maximale Effekt beider */
+#define M_SUMEFFECT   8 /* der Effekt summiert sich */
 #define M_MEN        16 /* die Anzahl der betroffenen Personen summiert
 													 sich */
 #define M_VIGOUR     32 /* das Maximum der beiden Stärken wird die
@@ -193,8 +193,8 @@ enum {
 typedef struct curse {
 	struct curse *nexthash;
 	int no;            /* 'Einheitennummer' dieses Curse */
-	struct curse_type * type; /* Zeiger auf ein curse_type-struct */
 	curse_t cspellid;  /* Id des Cursezaubers */
+	const struct curse_type * type; /* Zeiger auf ein curse_type-struct */
 	int flag;          /* generelle Flags wie zb CURSE_ISNEW oder CURSE_NOAGE */
 	int duration;      /* Dauer der Verzauberung. Wird jede Runde vermindert */
 	int vigour;        /* Stärke der Verzauberung, Widerstand gegen Antimagie */
@@ -237,11 +237,11 @@ typedef int (*cdesc_fun)(const void*, int, curse*, int);
 /* ------------------------------------------------------------- */
 
 typedef struct curse_type {
+	curse_t cspellid;  /* Id des Cursezaubers */
+	const char *name; /* Name der Zauberwirkung, Identifizierung des curse */
 	int typ;
 	int givemenacting;
 	int mergeflags;
-	const char *name; /* Name der Zauberwirkung, wird bei gezielter Antimagie
-								 zur Identifizierung des curse genutzt */
 	const char *info;  /* Wirkung des curse, wird bei einer gelungenen
 								 Zauberanalyse angezeigt */
 	int (*curseinfo)(const void*, int, curse*, int);
@@ -309,7 +309,7 @@ void set_cursevigour(struct attrib *ap, curse_t id, int id2, int i);
 int change_cursevigour(struct attrib **ap, curse_t id, int id2, int i);
 	/* verändert die Stärke der Verzauberung um i */
 
-int get_cursedmen(struct attrib *ap, curse_t id, int id2);
+int get_cursedmen(struct unit *u, struct curse *c);
 	/* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
 	 * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
 int change_cursedmen(struct attrib **ap, curse_t id, int id2, int cursedmen);
@@ -365,5 +365,7 @@ extern boolean is_spell_active(const struct region * r, curse_t id);
 	/* prüft, ob ein bestimmter Zauber auf einer struct region liegt */
 
 extern boolean is_cursed_with(attrib *ap, curse *c);
+const curse_type * find_cursetype(curse_t id);
+	
 	
 #endif

@@ -371,23 +371,23 @@ destr_curse(curse* c, int cast_level, int force)
 
 int
 destroy_curse(attrib **alist, int cast_level, int force,
-		const curse_type * ctype)
+		curse * c)
 {
 	int succ = 0;
 /*	attrib **a = a_find(*ap, &at_curse); */
 	attrib ** ap = alist;
 
 	while (*ap && force > 0) {
-		curse * c;
+		curse * c1;
 		attrib * a = *ap;
 		if (!fval(a->type, ATF_CURSE)) {
 			do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
 			continue;
 		}
-		c = (curse*)a->data.v;
+		c1 = (curse*)a->data.v;
 
 		/* Immunität prüfen */
-		if (c->flag & CURSE_IMMUN) {
+		if (c1->flag & CURSE_IMMUN) {
 			do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
 			continue;
 		}
@@ -395,7 +395,7 @@ destroy_curse(attrib **alist, int cast_level, int force,
 		/* Wenn kein spezieller cursetyp angegeben ist, soll die Antimagie
 		 * auf alle Verzauberungen wirken. Ansonsten prüfe, ob der Curse vom
 		 * richtigen Typ ist. */
-		if(!ctype || c->type==ctype) {
+		if(!c || c==c1) {
 			int n;
 			n = destr_curse(c, cast_level, force);
 			if (n != force){
@@ -673,7 +673,7 @@ sp_destroy_magic(castorder *co)
 	int cast_level = co->level;
 	int force = co->force;
 	spellparameter *pa = co->par;
-	const curse_type * ctype;
+	curse * c = NULL;
 	char ts[80];
 	attrib **ap;
 	int obj;
@@ -685,7 +685,6 @@ sp_destroy_magic(castorder *co)
 
 	/* Objekt ermitteln */
 	obj = pa->param[0]->typ;
-	ctype = NULL;
 
 	switch(obj) {
 		case SPP_REGION:
@@ -723,7 +722,7 @@ sp_destroy_magic(castorder *co)
 			return 0;
 	}
 
-  succ = destroy_curse(ap, cast_level, force, ctype);
+  succ = destroy_curse(ap, cast_level, force, c);
 
 	if(succ) {
 		add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -4874,6 +4873,100 @@ sp_depression(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
+/* Name:       Hoher Gesang der Drachen
+ * Stufe:      14
+ * Gebiet:     Cerddor
+ * Kategorie:  Monster, Beschwörung, positiv
+ *
+ * Wirkung:
+ *  Erhöht HP-Regeneration in der Region und lockt drachenartige (Wyrm,
+ *  Drache, Jungdrache, Seeschlange, ...) aus der Umgebung an
+ *
+ * Flag:
+ *  (FARCASTING | REGIONSPELL | TESTRESISTANCE)
+ */
+/* TODO zur Aktivierung in Zauberliste aufnehmen*/
+
+static int
+sp_dragonsong(castorder *co)
+{
+	region *r = co->rt; /* Zauberregion */
+	unit *mage = (unit *)co->magician;
+	unit *u;
+	int cast_level = co->level;
+	int power = co->force;
+	regionlist *rl,*rl2;
+	faction *f;
+	int range;
+
+	/* TODO HP-Effekt */
+
+	f = findfaction(MONSTER_FACTION);
+
+	range = power;
+	rl = all_in_range(r, range);
+
+	for(rl2 = rl; rl2; rl2 = rl2->next) {
+		for(u = rl2->region->units; u; u = u->next) {
+			if (u->race->flags & RCF_DRAGON) {
+				attrib * a = a_find(u->attribs, &at_targetregion);
+				if (!a) {
+					a = a_add(&u->attribs, make_targetregion(r));
+				} else {
+					a->data.v = r;
+				}
+				sprintf(buf, "Kommt aus: %s, Will nach: %s", regionid(rl2->region), regionid(r));
+				usetprivate(u, buf);
+			}
+		}
+	}
+
+	add_message(&mage->faction->msgs, new_message(mage->faction,
+				"summondragon%u:unit%r:region%s:command%u:unit%r:region",
+				mage, mage->region, strdup(co->order),mage, co->rt));
+
+	free_regionlist(rl);
+	return cast_level;
+}
+
+/* ------------------------------------------------------------- */
+/* Name:       Hoher Gesang der Verlockung
+ * Stufe:      17
+ * Gebiet:     Cerddor
+ * Kategorie:  Monster, Beschwörung, positiv
+ *
+ * Wirkung:
+ *  Lockt Bauern aus den umliegenden Regionen her
+ *
+ * Flag:
+ *  (FARCASTING | REGIONSPELL | TESTRESISTANCE)
+ */
+/* TODO zur Aktivierung in Zauberliste aufnehmen*/
+
+static int
+sp_songofAttraction(castorder *co)
+{
+	region *r = co->rt; /* Zauberregion */
+	unit *mage = (unit *)co->magician;
+	unit *u;
+	int cast_level = co->level;
+	int power = co->force;
+	region *rn;
+	faction *f;
+	int range;
+
+	/* TODO Wander Effekt */
+
+	add_message(&mage->faction->msgs, new_message(mage->faction,
+				"summon%u:unit%r:region%s:command%u:unit%r:region",
+				mage, mage->region, strdup(co->order),mage, co->rt));
+
+	return cast_level;
+}
+
+
+
+/* ------------------------------------------------------------- */
 /* TRAUM - Illaun */
 /* ------------------------------------------------------------- */
 
@@ -6819,11 +6912,11 @@ sp_speed2(castorder *co)
  *   Kann eine bestimmte Verzauberung angreifen und auflösen. Die Stärke
  *   des Zaubers muss stärker sein als die der Verzauberung.
  * Syntax:
- *  ZAUBERE \"Magiefresser\" REGION [Zaubername]
- *  ZAUBERE \"Magiefresser\" EINHEIT <Einheit-Nr> [Zaubername]
- *  ZAUBERE \"Magiefresser\" BURG <Burg-Nr> [Zaubername]
- *  ZAUBERE \"Magiefresser\" GEBÄUDE <Gebäude-Nr> [Zaubername]
- *  ZAUBERE \"Magiefresser\" SCHIFF <Schiff-Nr> [Zaubername]
+ *  ZAUBERE \"Magiefresser\" REGION 
+ *  ZAUBERE \"Magiefresser\" EINHEIT <Einheit-Nr>
+ *  ZAUBERE \"Magiefresser\" BURG <Burg-Nr>
+ *  ZAUBERE \"Magiefresser\" GEBÄUDE <Gebäude-Nr>
+ *  ZAUBERE \"Magiefresser\" SCHIFF <Schiff-Nr>
  *
  *  "kc?c"
  * Flags:
@@ -6836,7 +6929,7 @@ sp_q_antimagie(castorder *co)
 {
 	attrib **ap;
 	int obj;
-	const curse_type * ctype;
+	curse * c = NULL;
 	int succ;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
@@ -6846,10 +6939,6 @@ sp_q_antimagie(castorder *co)
 	char *ts;
 
 	obj = pa->param[0]->typ;
-
-	ctype = NULL;
-	if(pa->length == 2)
-		ctype = ct_find(pa->param[1]->data.s);
 
 	switch(obj){
 		case SPP_REGION:
@@ -6884,7 +6973,7 @@ sp_q_antimagie(castorder *co)
 		return 0;
 	}
 
-	succ = destroy_curse(ap, cast_level, force, ctype);
+	succ = destroy_curse(ap, cast_level, force, c);
 
 	if(succ) {
 		add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -9940,6 +10029,27 @@ spell spelldaten[] =
 		(spell_f)sp_createitem_trueseeing, patzer_createitem
 	},
 
+	{SPL_TYBIED_DESTROY_MAGIC, "Magiefresser",
+		"Dieser Zauber ermöglicht dem Magier, Verzauberungen einer Einheit, "
+			"eines Schiffes, Gebäudes oder auch der Region aufzulösen.",
+		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" REGION\n"
+		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" EINHEIT <Einheit-Nr>\n"
+		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" BURG <Burg-Nr>\n"
+		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" GEBÄUDE <Gebäude-Nr>\n"
+		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" SCHIFF <Schiff-Nr>",
+		"kc",
+		M_ASTRAL,
+		(FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
+		2, 5,
+		{
+			{R_AURA, 4, SPC_LEVEL},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0}},
+		(spell_f)sp_destroy_magic, patzer
+	},
+
 	{SPL_PULLASTRAL, "Astraler Ruf",
 	 "Ein Magier, der sich in der astralen Ebene befindet, kann mit Hilfe "
 	 "dieses Zaubers andere Einheiten zu sich holen. Der Magier kann "
@@ -10050,27 +10160,24 @@ spell spelldaten[] =
 	 (spell_f)sp_create_antimagiccrystal, patzer_createitem
 	},
 
-	{SPL_Q_ANTIMAGIE, "Magiefresser",
+	{SPL_DESTROY_MAGIC, "Fluch brechen",
 		"Dieser Zauber ermöglicht dem Magier, gezielt eine bestimmte "
-		"Verzauberung einer Einheit, eines Schiffes, Gebäudes oder auch "
-		"der Region aufzulösen. Dazu muss er den Namen des Fluchs, "
-		"den er aufheben will, beim Zaubern angeben. Ist der Name ihm "
-		"unbekannt, so wird der Zauberspruch zufällig gegen irgendeine "
-		"Verzauberung des Ziels wirken.",
-		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" REGION [Zaubername]\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" EINHEIT <Einheit-Nr> [Zaubername]\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" BURG <Burg-Nr> [Zaubername]\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" GEBÄUDE <Gebäude-Nr> [Zaubername]\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" SCHIFF <Schiff-Nr> [Zaubername]",
-		"kc?c",
-	 M_ASTRAL, (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE), 3, 7,
-	 {
+			"Verzauberung einer Einheit, eines Schiffes, Gebäudes oder auch "
+			"der Region aufzulösen.",
+		"ZAUBERE [REGION x y] [STUFE n] \"Fluch brechen\" REGION <Zauber-Nr>\n"
+			"ZAUBERE [REGION x y] [STUFE n] \"Fluch brechen\" EINHEIT <Einheit-Nr> <Zauber-Nr>\n"
+			"ZAUBERE [REGION x y] [STUFE n] \"Fluch brechen\" BURG <Burg-Nr> <Zauber-Nr>\n" 
+			"ZAUBERE [REGION x y] [STUFE n] \"Fluch brechen\" GEBÄUDE <Gebäude-Nr> <Zauber-Nr>\n" 
+			"ZAUBERE [REGION x y] [STUFE n] \"Fluch brechen\" SCHIFF <Schiff-Nr> <Zauber-Nr>",
+		"kcc",
+		M_ASTRAL, (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE), 3, 7,
+		{
 			{R_AURA, 3, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_q_antimagie, patzer
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0}},
+		(spell_f)sp_destroy_curse, patzer
 	},
 
 	{SPL_ETERNIZEWALL, "Mauern der Ewigkeit",

@@ -423,6 +423,7 @@ calculate_emigration(region *r)
 	int overpopulation = rpeasants(r) - maxworkingpeasants(r);
 	int weight[MAXDIRECTIONS], weightall;
 
+	/* Bauern wandern nur bei Überbevölkerung, sonst gar nicht */
 	if(overpopulation <= 0) return;
 
 	weightall = 0;

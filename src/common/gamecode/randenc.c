@@ -1063,11 +1063,11 @@ randomevents(void)
 
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) {
-			if (is_cursed(u->attribs, C_ORC, 0)
-					&& !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
+			curse *c = get_curse(u->attribs, C_ORC, 0);
+			if (c && !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
 				int n;
 				int increase = 0;
-				int num  = min(get_cursedmen(u->attribs, C_ORC, 0), u->number);
+				int num  = get_cursedmen(u, c);
 				int prob = get_curseeffect(u->attribs, C_ORC, 0);
 
 				for (n = (num - get_item(u, I_CHASTITY_BELT)); n > 0; n--) {

@@ -959,10 +959,12 @@ travel(region * first, unit * u, region * next, int flucht)
 
 	dk = u->race->speed;
 
-	if(is_cursed(u->attribs, C_SPEED, 0)) {
-		int men = get_cursedmen(u->attribs, C_SPEED, 0);
-		men = max(u->number, men);
-		dk *= 1.0 + men/(double)u->number;
+	{
+		curse *c = get_curse(u->attribs, C_SPEED, 0);
+		if(c) {
+			int men = get_cursedmen(u, c);
+			dk *= 1.0 + (double)men/(double)u->number;
+		}
 	}
 
 	switch(canride(u)) {

@@ -166,9 +166,6 @@ ct_register(const curse_type * ct)
 const curse_type *
 ct_find(const char *c)
 {
-/* TODO: findet nur curse_types, die auch in curse_data sind.
- * da fehlt noch eine registrierung wie für attrib_type
- */
 	cursetype_list * ctl = cursetypes;
 	while (ctl) {
 		int k = min(strlen(c), strlen(ctl->type->name));
@@ -178,11 +175,28 @@ ct_find(const char *c)
 	return NULL;
 }
 
+const curse_type *
+find_cursetype(curse_t id)
+{
+	cursetype_list * ctl = cursetypes;
+
+	/* sollte eigendlich nie mit 0 aufgerufen werden */
+	if (!id) return NULL;
+
+	while (ctl) {
+		if(ctl->type->cspellid == id) return ctl->type;
+		ctl = ctl->next;
+	}
+	return NULL;
+}
+
 /* ------------------------------------------------------------- */
 boolean
 is_normalcurse(curse_t id)
 {
-	if (cursedaten[id].typ == CURSETYP_NORM)
+	const curse_type *ct = find_cursetype(id);
+
+	if (ct->typ == CURSETYP_NORM)
 		return true;
 
 	return false;
@@ -191,7 +205,9 @@ is_normalcurse(curse_t id)
 boolean
 is_curseunit(curse_t id)
 {
-	if (cursedaten[id].typ == CURSETYP_UNIT)
+	const curse_type *ct = find_cursetype(id);
+
+	if (ct->typ == CURSETYP_UNIT)
 		return true;
 
 	return false;
@@ -200,7 +216,20 @@ is_curseunit(curse_t id)
 boolean
 is_curseskill(curse_t id)
 {
-	if (cursedaten[id].typ == CURSETYP_SKILL)
+	const curse_type *ct = find_cursetype(id);
+
+	if (ct->typ == CURSETYP_SKILL)
+		return true;
+
+	return false;
+}
+
+boolean
+is_cursesecondid(curse_t id)
+{
+	const curse_type *ct = find_cursetype(id);
+
+	if (ct->typ == CURSETYP_SECONDID)
 		return true;
 
 	return false;
@@ -230,24 +259,21 @@ cmp_oldcurse(const attrib * a, const void * data)
 {
 	twoids * ti = (twoids*)data;
 	const curse * c = (const curse*)a->data.v;
-	if (a->type!=&at_curse || c->cspellid!=ti->id) return false;
-	switch(cursedaten[ti->id].typ) {
-	case CURSETYP_SKILL:
-		{
-			curse_skill * cc = (curse_skill*)c->data;
-			if (cc->skill == (skill_t) ti->id2) return true;
-		}
-	case CURSETYP_SECONDID:
-		{
-			curse_secondid * cc = (curse_secondid*)c->data;
-			if (cc->secondid == ti->id2) return true;
-		}
-	case CURSETYP_UNIT:
-	case CURSETYP_NORM:
+	const curse_type * ct;
+
+	if (a->type!=&at_curse) return false;
+	ct = c->type;
+
+	if (ct->cspellid != ti->id) return false;
+
+	if (is_curseskill(ti->id)){
+		curse_skill * cc = (curse_skill*)c->data;
+		if (cc->skill == (skill_t) ti->id2) return true;
+	} else if (is_cursesecondid(ti->id)) {
+		curse_secondid * cc = (curse_secondid*)c->data;
+		if (cc->secondid == ti->id2) return true;
+	} else {
 		return true;
-		break;
-	default:
-		assert(!"unbekannter cursetyp entdeckt");
 	}
 	return false;
 }
@@ -398,77 +424,65 @@ remove_cursemagepointer(unit *magician, attrib *ap_target)
 /* ------------------------------------------------------------- */
 
 int
-get_cursedmen(attrib *ap, curse_t id, int id2)
+get_cursedmen(unit *u, curse *c)
 {
-	switch (cursedaten[id].typ){
-		case CURSETYP_UNIT:
-		{
-			curse *c = get_curse(ap, id, id2);
-			if (c){
-				curse_unit * cc = (curse_unit*)c->data;
-				return cc->cursedmen;
-			}
-		}
-		case CURSETYP_SKILL:
-		{
-			curse *c = get_curse(ap, id, id2);
-			if (c){
-				curse_skill * cc = (curse_skill*)c->data;
-				return cc->cursedmen;
-			}
-		}
-		case CURSETYP_NORM:
-		default:
-			break;
+	int cursedmen = u->number;
+
+	if (!c) return 0;
+
+	/* je nach curse_type andere data struct */
+	if (c->type->typ == CURSETYP_UNIT){
+		curse_unit * cc = (curse_unit*)c->data;
+		cursedmen = cc->cursedmen;
 	}
-	return 0;
+	if (c->type->typ == CURSETYP_SKILL){
+		curse_skill * cc = (curse_skill*)c->data;
+		cursedmen = cc->cursedmen;
+	}
+	
+	return min(u->number, cursedmen);
 }
 
 void
 set_cursedmen(attrib *ap, curse_t id, int id2, int cursedmen)
 {
-	switch (cursedaten[id].typ){
-		case CURSETYP_UNIT:
-		{
-			curse *c = get_curse(ap, id, id2);
-			if (c){
-				curse_unit * cc = (curse_unit*)c->data;
-				cc->cursedmen = cursedmen;
-			}
-			break;
-		}
-		case CURSETYP_SKILL:
-		{
-			curse *c = get_curse(ap, id, id2);
-			if (c){
-				curse_skill * cc = (curse_skill*)c->data;
-				cc->cursedmen = cursedmen;
-			}
-			break;
-		}
-		case CURSETYP_NORM:
-		default:
-			break;
+	curse *c = get_curse(ap, id, id2);
+
+	if (!c) return;
+
+	/* je nach curse_type andere data struct */
+	if (c->type->typ == CURSETYP_UNIT) {
+		curse_unit * cc = (curse_unit*)c->data;
+		cc->cursedmen = cursedmen;
+	}
+	if (c->type->typ == CURSETYP_SKILL) {
+		curse_skill * cc = (curse_skill*)c->data;
+		cc->cursedmen = cursedmen;
 	}
 }
 
 int
 change_cursedmen(attrib **ap, curse_t id, int id2, int cursedmen)
 {
-	switch (cursedaten[id].typ){
-		case CURSETYP_UNIT:
-		case CURSETYP_SKILL:
-			cursedmen += get_cursedmen(*ap, id, id2);
-			if (cursedmen <= 0){
-				remove_curse(ap,id,id2);
-			} else {
-				set_cursedmen(*ap, id, id2, cursedmen);
-			}
-			break;
-		case CURSETYP_NORM:
-		default:
-			break;
+	curse *c = get_curse(*ap, id, id2);
+
+	if (!c) return 0;
+
+	/* je nach curse_type andere data struct */
+	if (c->type->typ == CURSETYP_UNIT) {
+		curse_unit * cc = (curse_unit*)c->data;
+		cursedmen +=  cc->cursedmen;
 	}
+	if (c->type->typ == CURSETYP_SKILL) {
+		curse_skill * cc = (curse_skill*)c->data;
+		cursedmen += cc->cursedmen;
+	}
+	if (cursedmen <= 0){
+		remove_curse(ap,id,id2);
+	} else {
+		set_cursedmen(*ap, id, id2, cursedmen);
+	}
+
 	return cursedmen;
 }
 
@@ -503,7 +517,7 @@ set_curse(unit *mage, attrib **ap, curse_t id, int id2, int vigour,
 	a_add(ap, a);
 	c = (curse*)a->data.v;
 
-	c->type = &cursedaten[id];
+	c->type = find_cursetype(id);
 	c->cspellid = id;
 	c->flag = (0);
 	c->vigour = vigour;
@@ -554,6 +568,7 @@ create_curse(unit *magician, attrib **ap, curse_t id, int id2, int vigour,
 		int duration, int effect, int men)
 {
 	curse *c;
+	const curse_type *ct;
 
 	/* die Kraft eines Spruchs darf nicht 0 sein*/
 	assert(vigour >= 0);
@@ -563,28 +578,34 @@ create_curse(unit *magician, attrib **ap, curse_t id, int id2, int vigour,
 	if(c && (c->flag & CURSE_ONLYONE)){
 		return NULL;
 	}
+	if(c){
+		ct = c->type;
+	} else {
+		ct = find_cursetype(id);
+	}
+	
 	/* es gibt schon eins diese Typs */
-	if (c && cursedaten[id].mergeflags != NO_MERGE) {
-		if(cursedaten[id].mergeflags & M_DURATION){
+	if (c && ct->mergeflags != NO_MERGE) {
+		if(ct->mergeflags & M_DURATION){
 			c->duration = max(c->duration, duration);
 		}
-		if(cursedaten[id].mergeflags & M_SUMDURATION){
+		if(ct->mergeflags & M_SUMDURATION){
 			c->duration += duration;
 		}
-		if(cursedaten[id].mergeflags & M_SUMEFFECT){
+		if(ct->mergeflags & M_SUMEFFECT){
 			c->effect += effect;
 		}
-		if(cursedaten[id].mergeflags & M_MAXEFFECT){
+		if(ct->mergeflags & M_MAXEFFECT){
 			c->effect = max(c->effect, effect);
 		}
-		if(cursedaten[id].mergeflags & M_VIGOUR){
+		if(ct->mergeflags & M_VIGOUR){
 			c->vigour = max(vigour, c->vigour);
 		}
-		if(cursedaten[id].mergeflags & M_VIGOUR_ADD){
+		if(ct->mergeflags & M_VIGOUR_ADD){
 			c->vigour = vigour + c->vigour;
 		}
-		if(cursedaten[id].mergeflags & M_MEN){
-			switch (cursedaten[id].typ) {
+		if(ct->mergeflags & M_MEN){
+			switch (ct->typ) {
 				case CURSETYP_UNIT:
 				{
 					curse_unit * cc = (curse_unit*)c->data;
@@ -621,8 +642,9 @@ do_transfer_curse(curse *c, unit * u, unit * u2, int n)
 	int cursedmen = 0;
 	int men = 0;
 	boolean dogive = false;
+	const curse_type *ct = c->type;
 
-	switch (cursedaten[id].typ) {
+	switch (ct->typ) {
 		case CURSETYP_UNIT:
 		{
 			curse_unit * cc = (curse_unit*)c->data;
@@ -640,7 +662,7 @@ do_transfer_curse(curse *c, unit * u, unit * u2, int n)
 			cursedmen = u->number;
 	}
 
-	switch (cursedaten[id].givemenacting){
+	switch (ct->givemenacting){
 		case CURSE_SPREADALWAYS:
 			dogive = true;
 			men = u2->number + n;
@@ -678,7 +700,7 @@ do_transfer_curse(curse *c, unit * u, unit * u2, int n)
 				effect, men);
 		set_curseflag(u2->attribs, id, id2, flag);
 
-		switch (cursedaten[id].typ){
+		switch (ct->typ){
 			case CURSETYP_UNIT:
 			case CURSETYP_SKILL:
 				set_cursedmen(u2->attribs, id, id2, men);
@@ -1353,95 +1375,100 @@ cinfo_riot(void * obj, typ_t typ, curse *c, int self)
 curse_type cursedaten[MAXCURSE] =
 {
 /* struct's vom typ curse: */
-	{ /* C_FOGTRAP, */
+	{ 
+		C_FOGTRAP,
+		"ct_fogtrap",
 		CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-		"",
 		"",
 		(cdesc_fun)cinfo_fogtrap
 	},
-	{ /* C_ANTIMAGICZONE, */
+	{ 
+		C_ANTIMAGICZONE,
+		"ct_antimagiczone",
 		CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-		"Magieschwächezone",
 		"Dieser Zauber scheint magische Energien irgendwie abzuleiten und "
 		"so alle in der Region gezauberten Sprüche in ihrer Wirkung zu "
 		"schwächen oder ganz zu verhindern.",
 		NULL
 	},
-	{ /* C_FARVISION, */
+	{ 
+		C_FARVISION,
+		"ct_farvision",
 		CURSETYP_NORM, 0, (NO_MERGE),
-		"",
 		"",
 		NULL
 	},
-	{ /* C_GBDREAM, */
+	{ 
+		C_GBDREAM,
+		"ct_gbdream",
 		CURSETYP_NORM, 0, (NO_MERGE),
-		"",
 		"",
 		(cdesc_fun)cinfo_dreamcurse
 	},
 
-	{ /* C_AURA, Verändert die max Aura und Regeneration um effect% */
+	{  /* Verändert die max Aura und Regeneration um effect% */
+		C_AURA,
+		"ct_auraboost",
 		CURSETYP_NORM, CURSE_SPREADMODULO, (NO_MERGE),
-		"Aurafokus",
 		"Dieser Zauber greift irgendwie in die Verbindung zwischen Magier "
 		"und Magischer Essenz ein. Mit positiver Ausrichtung kann er wohl "
 		"wie ein Fokus für Aura wirken, jedoch genauso für das Gegenteil "
 		"benutzt werden.",
 		(cdesc_fun)cinfo_auraboost
 	},
-	{ /* C_MAELSTROM, */
+	{ C_MAELSTROM,
+		"ct_maelstrom",
 		CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-		"Mahlstrom",
 		"Dieser Zauber verursacht einen gigantischen magischen Strudel. Der "
 		"Mahlstrom wird alle Schiffe, die in seinen Sog geraten, schwer "
 		"beschädigen.",
 		NULL
 	},
-	{ /* C_BLESSEDHARVEST, */
+	{ C_BLESSEDHARVEST,
+		"ct_blessedharvest",
 		CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-		"Segen der Felder",
 		"Dieser Fruchtbarkeitszauber erhöht die Erträge der Felder.",
 		(cdesc_fun)cinfo_blessedharvest
 	},
-	{ /* C_DROUGHT, */
+	{ C_DROUGHT,
+		"ct_drought",
 		CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-		"Dürre",
 		"Dieser Zauber strahlt starke negative Energien aus. Warscheinlich "
 		"ist er die Ursache der Dürre."	,
 		(cdesc_fun)cinfo_drought
 	},
-	{ /* C_BADLEARN, */
+	{ C_BADLEARN,
+		"ct_badlearn",
 		CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-		"",
 		"Dieser Zauber scheint die Ursache für die Schlaflosigkeit und "
 		"Mattigkeit zu sein, unter der die meisten Leute hier leiden und "
 		"die dazu führt, das Lernen weniger Erfolg bringt. ",
 		(cdesc_fun)cinfo_badlearn
 	},
-	{ /* C_SHIP_SPEEDUP, Sturmwind-Zauber, wirkt nur 1 Runde */
+	{ C_SHIP_SPEEDUP, /* Sturmwind-Zauber, wirkt nur 1 Runde */
+		"ct_stormwind",
 		CURSETYP_NORM, 0, NO_MERGE,
-		"Sturmwind",
 		"",
 		NULL
 	},
-	{ /* C_SHIP_FLYING, Luftschiff-Zauber, wirkt nur 1 Runde */
+	{ C_SHIP_FLYING, /* Luftschiff-Zauber, wirkt nur 1 Runde */
+		"ct_flyingship",
 		CURSETYP_NORM, 0, NO_MERGE,
-		"Luftschiff",
 		"",
 		NULL
 	},
-	{ /* C_SHIP_NODRIFT, GünstigeWinde-Zauber */
+	{ C_SHIP_NODRIFT, /* GünstigeWinde-Zauber */
+		"ct_nodrift",
 		CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-		"Günstige Winde",
 		"Der Zauber auf diesem Schiff ist aus den elementaren Magien der Luft "
 		"und des Wassers gebunden. Der dem Wasser verbundene Teil des Zaubers "
 		"läßt es leichter durch die Wellen gleiten und der der Luft verbundene "
 		"Teil scheint es vor widrigen Winden zu schützen.",
 		(cdesc_fun)cinfo_shipnodrift
 	},
-	{ /* C_DEPRESSION,  Trübsal-Zauber */
+	{ C_DEPRESSION, /*  Trübsal-Zauber */
+		"ct_depression",
 		CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
-		"Schwermut",
 		"Wie schon zu vermuten war, sind der ewig graue Himmel und die "
 		"depressive Stimmung in der Region nicht natürlich. Dieser Fluch "
 		"hat sich wie ein bleiernes Tuch auf die Gemüter der Bevölkerung "
@@ -1449,9 +1476,9 @@ curse_type cursedaten[MAXCURSE] =
 		"sich an Gaukelleien erfreuen können.",
 		(cdesc_fun)cinfo_depression
 	},
-	{ /* C_MAGICSTONE, Heimstein-Zauber */
+	{ C_MAGICSTONE, /* Heimstein-Zauber */
+		"ct_magicwalls",
 		CURSETYP_NORM, 0, NO_MERGE,
-		"Felsenmauern",
 		"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
 		"gebunden. Starke elementarmagische Kräfte sind zu spüren. "
 		"Vieleicht wurde gar ein Erdelementar in diese Mauern gebannt. "
@@ -1459,275 +1486,275 @@ curse_type cursedaten[MAXCURSE] =
 		"gefährden können.",
 		(cdesc_fun)cinfo_magicstone
 	},
-	{ /* C_STRONGWALL, Feste Mauer - Präkampfzauber, wirkt nur 1 Runde */
+	{ C_STRONGWALL, /* Feste Mauer - Präkampfzauber, wirkt nur 1 Runde */
+		"ct_strongwall",
 		CURSETYP_NORM, 0, NO_MERGE,
-		"Burgschutzzauber",
 		"",
 		NULL
 	},
-	{ /* C_ASTRALBLOCK, Astralblock, auf Astralregion */
+	{ C_ASTRALBLOCK, /* Astralblock, auf Astralregion */
+		"ct_astralblock",
 		CURSETYP_NORM, 0, NO_MERGE,
-		"",
 		"",
 		(cdesc_fun)cinfo_astralblock
 	},
-	{ /* C_GENEROUS, Unterhaltungsanteil vermehren */
+	{ C_GENEROUS, /* Unterhaltungsanteil vermehren */
+		"ct_generous",
 		CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR | M_MAXEFFECT ),
-		"Feierlaune",
 		"Dieser Zauber beeinflusst die allgemeine Stimmung in der Region positiv. "
 		"Die gute Laune macht die Leute freigiebiger.",
 		(cdesc_fun)cinfo_generous
 	},
-	{ /* C_PEACE, verhindert Attackiere regional */
+	{ C_PEACE, /* verhindert Attackiere regional */
+		"ct_peacezone",
 		CURSETYP_NORM, 0, NO_MERGE,
-		"Friedensbann",
 		"Dieser machtvoller Beeinflussungszauber erstickt jeden Streit schon im "
 		"Keim.",
 		(cdesc_fun)cinfo_peace
 	},
-	{ /* C_REGCONF,  erschwert geordnete Bewegungen */
+	{ C_REGCONF,  /* erschwert geordnete Bewegungen */
+		"ct_disorientationzone",
 		CURSETYP_NORM, 0, NO_MERGE,
-		"",
 		"",
 		(cdesc_fun)cinfo_regconf
 	},
-	{ /* C_MAGICSTREET,  erzeugt Straßennetz */
+	{ C_MAGICSTREET, /*  erzeugt Straßennetz */
+		"ct_magicstreet",
 		CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
-		"magische Pfade",
 		"Es scheint sich um einen elementarmagischen Zauber zu handeln, der alle "
 		"Pfade und Wege so gut festigt, als wären sie gepflastert. Wie auf einer "
 		"Straße kommt man so viel besser und schneller vorwärts.",
 		(cdesc_fun)cinfo_magicstreet
 	},
-	{ /* C_RESIST_MAGIC, */
+	{ C_RESIST_MAGIC,
+		"ct_magicresistance",
 		CURSETYP_NORM, 0, M_SUMEFFECT,
-		"Magieschutz",
 		"Dieses Zauber verstärkt die natürliche Widerstandskraft gegen eine "
 		"Verzauberung.",
 		(cdesc_fun)cinfo_magicrunes
 	},
-	{ /* C_SONG_BADMR,
-			 erniedigt Magieresistenz von nicht-aliierten Einheiten, wirkt nur
+	{ /*  erniedigt Magieresistenz von nicht-aliierten Einheiten, wirkt nur
 			 1x pro Einheit */
+		C_SONG_BADMR,
+		"ct_badmagicresistancezone",
 		CURSETYP_NORM, 0, NO_MERGE,
-		"Gesang des schwachen Geistes",
 		"Dieses Lied, das irgendwie in die magische Essenz der Region gewoben "
 		"ist, schwächt die natürliche Widerstandskraft gegen eine "
 		"Verzauberung. Es scheint jedoch nur auf bestimmte Einheiten zu wirken.",
 		NULL
 	},
-	{ /* C_SONG_GOODMR,
-			 erhöht Magieresistenz von aliierten Einheiten, wirkt nur 1x pro
+	{ /* erhöht Magieresistenz von aliierten Einheiten, wirkt nur 1x pro
 			 Einheit */
+		C_SONG_GOODMR,
+		"ct_goodmagicresistancezone",
 		CURSETYP_NORM, 0, NO_MERGE,
-		"Gesang des wachen Geistes",
 		"Dieser Lied, das irgendwie in die magische Essenz der Region gewoben "
 		"ist, verstärkt die natürliche Widerstandskraft gegen eine "
 		"Verzauberung. Es scheint jedoch nur auf bestimmte Einheiten zu wirken.",
 		NULL
 	},
-	{ /* C_SLAVE,
-			 dient fremder Partei. Zählt nicht zu Migranten, attackiert nicht */
+	{ /* dient fremder Partei. Zählt nicht zu Migranten, attackiert nicht */
+		C_SLAVE,
+		"ct_slavery",
 		CURSETYP_NORM, 0, NO_MERGE,
-		"Sklavenketten",
 		"Dieser mächtige Bann scheint die Einheit ihres freien Willens "
 		"zu berauben. Solange der Zauber wirkt, wird sie nur den Befehlen "
 		"ihres neuen Herrn gehorchen.",
 		(cdesc_fun)cinfo_slave
 	},
-	{ /* C_DISORIENTATION, */
+	{ C_DISORIENTATION,
+		"ct_shipdisorientation",
 		CURSETYP_NORM, 0, NO_MERGE,
-		"Irrfahrt",
 		"Dieses Schiff hat sich verfahren.",
 		(cdesc_fun)cinfo_disorientation
 	},
-	{ /* C_CALM, */
+	{ C_CALM,
+		"ct_calmmonster",
 		CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
-		"Besänftigen",
 		"Dieser Beeinflussungszauber scheint die Einheit einem ganz "
 		"bestimmten Volk wohlgesonnen zu machen.",
 		(cdesc_fun)cinfo_calm
 	},
-	{ /* C_OLDRACE,
-			 Merkt sich die alte 'richtige' Rasse einer gestalltwandelnden
+	{ /* Merkt sich die alte 'richtige' Rasse einer gestalltwandelnden
 			 Einheit */
+		C_OLDRACE,
+		"ct_oldrace",
 		CURSETYP_NORM, CURSE_SPREADALWAYS, NO_MERGE,
-		"",
 		"",
 		NULL
 	},
-	{ /* C_FUMBLE, */
+	{ C_FUMBLE,
+		"ct_fumble",
 		CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
-		"Tollpatschfluch",
 		"Eine Wolke negativer Energie umgibt die Einheit.",
 		(cdesc_fun)cinfo_fumble
 	},
-	{ /* C_RIOT, */
+	{ C_RIOT,
+		"ct_riotzone",
 		CURSETYP_NORM, 0, (M_DURATION),
-		"Aufruhr",
 		"Eine Wolke negativer Energie liegt über der Region.",
 		(cdesc_fun)cinfo_riot
 	},
-	{ /* C_NOCOST, Ewige Mauern-Zauber */
+	{ C_NOCOST, /* Ewige Mauern-Zauber */
+		"ct_nocostbuilding",
 		CURSETYP_NORM, 0, NO_MERGE,
-		"Ewige Mauern",
 		"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
 		"gebunden. Unbeeindruck vom Zahn der Zeit wird dieses Gebäude wohl "
 		"auf Ewig stehen.",
 		(cdesc_fun)cinfo_nocost
 	},
-	{ /* C_HOLYGROUND, */
+	{ C_HOLYGROUND,
+		"ct_holyground",
 		CURSETYP_NORM, 0, (M_VIGOUR_ADD),
-		"Heiliger Boden",
 		"Verschiedene Naturgeistern sind im Boden der Region gebunden und "
 		"beschützen diese vor dem der dunklen Magie des lebenden Todes.",
 		(cdesc_fun)cinfo_holyground
 	},
-	{ /* C_CURSED_BY_THE_GODS, */
+	{ C_CURSED_BY_THE_GODS,
+		"ct_goodcursezone",
 		CURSETYP_NORM, 0, (NO_MERGE),
-		"Verflucht von den Göttern",
 		"Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen "
 		"über die tote Erde, furchbare Kreaturen ziehen über das Land. Die Brunnen "
 		"sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz "
 		"überzogen. Niemand kann hier lange überleben.",
 		(cdesc_fun)cinfo_cursed_by_the_gods,
 	},
-	{ /* C_FREE_14, */
-		CURSETYP_NORM, 0, (NO_MERGE),
+	{ C_FREE_14,
 		"",
+		CURSETYP_NORM, 0, (NO_MERGE),
 		"",
 		NULL
 	},
-	{ /* C_FREE_15, */
-		CURSETYP_NORM, 0, (NO_MERGE),
+	{ C_FREE_15, 
 		"",
+		CURSETYP_NORM, 0, (NO_MERGE),
 		"",
 		NULL
 	},
-	{ /* C_FREE_16, */
-		CURSETYP_NORM, 0, (NO_MERGE),
+	{ C_FREE_16,
 		"",
+		CURSETYP_NORM, 0, (NO_MERGE),
 		"",
 		NULL
 	},
-	{ /* C_FREE_17, */
-		CURSETYP_NORM, 0, (NO_MERGE),
+	{ C_FREE_17,
 		"",
+		CURSETYP_NORM, 0, (NO_MERGE),
 		"",
 		NULL
 	},
-	{ /* C_FREE_18, */
-		CURSETYP_NORM, 0, (NO_MERGE),
+	{ C_FREE_18,
 		"",
+		CURSETYP_NORM, 0, (NO_MERGE),
 		"",
 		NULL
 	},
-	{ /* C_FREE_19, */
-		CURSETYP_NORM, 0, (NO_MERGE),
+	{ C_FREE_19,
 		"",
+		CURSETYP_NORM, 0, (NO_MERGE),
 		"",
 		NULL
 	},
 
 	/* struct's vom typ curse_unit: */
-	{ /* C_SPEED, */
-		CURSETYP_UNIT, CURSE_SPREADNEVER, M_MEN,
+	{ C_SPEED,
 		"Beschleunigen II",
+		CURSETYP_UNIT, CURSE_SPREADNEVER, M_MEN,
 		"Diese Einheit bewegt sich doppelt so schnell.",
 		(cdesc_fun)cinfo_speed
 	},
-	{ /* C_ORC, */
-		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
+	{ C_ORC,
 		"Orkfieber",
+		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"Dieser Zauber scheint die Einheit zu 'orkisieren'. Wie bei Orks "
 		"ist eine deutliche Neigung zur Fortpflanzung zu beobachten.",
 		(cdesc_fun)cinfo_orc
 	},
-	{ /* C_MBOOST, */
-		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
+	{ C_MBOOST,
 		"",
+		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"",
 		NULL
 	},
-	{ /* C_KAELTESCHUTZ, */
-		CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
+	{ C_KAELTESCHUTZ,
 		"Winterfell",
+		CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
 		"Dieser Zauber schützt vor den Auswirkungen der Kälte.",
 		(cdesc_fun)cinfo_kaelteschutz
 	},
-	{ /* C_STRENGTH, */
-		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
+	{ C_STRENGTH, /* */
 		"Trollstärke",
+		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"Dieser Zauber vermehrt die Stärke der verzauberten Personen um ein "
 		"vielfaches.",
 		(cdesc_fun)cinfo_strength
 	},
-	{ /* C_ALLSKILLS, Alp */
-		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
+	{ C_ALLSKILLS, /* Alp */
 		"",
+		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"",
 		(cdesc_fun)cinfo_allskills
 	},
-	{ /* C_MAGICRESISTANCE, */
-		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
+	{ C_MAGICRESISTANCE, /* */
 		"Magieschutz",
+		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"Dieser Zauber verstärkt die natürliche Widerstandskraft gegen eine "
 		"Verzauberung.",
 		NULL
 	},
-	{ /* C_ITEMCLOAK, */
-		CURSETYP_UNIT, CURSE_SPREADNEVER, M_DURATION,
+	{ C_ITEMCLOAK, /* */
 		"Schleieraura",
+		CURSETYP_UNIT, CURSE_SPREADNEVER, M_DURATION,
 		"Dieser Zauber macht die Ausrüstung unsichtbar.",
 		(cdesc_fun)cinfo_itemcloak
 	},
-	{ /* C_SPARKLE, */
-		CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
+	{ C_SPARKLE, /* */
 		"Leichte Verzauberung",
+		CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
 		"Dieser Zauber ist einer der ersten, den junge Magier in der Schule lernen.",
 		(cdesc_fun)cinfo_sparkle
 	},
-	{ /* C_FREE_22, */
-		CURSETYP_UNIT, 0, (NO_MERGE),
+	{ C_FREE_22, /* */
 		"",
+		CURSETYP_UNIT, 0, (NO_MERGE),
 		"",
 		NULL
 	},
-	{ /* C_FREE_23, */
-		CURSETYP_UNIT, 0, (NO_MERGE),
+	{ C_FREE_23, /* */
 		"",
+		CURSETYP_UNIT, 0, (NO_MERGE),
 		"",
 		NULL
 	},
-	{ /* C_FREE_24, */
-		CURSETYP_UNIT, 0, (NO_MERGE),
+	{ C_FREE_24, /* */
 		"",
+		CURSETYP_UNIT, 0, (NO_MERGE),
 		"",
 		NULL
 	},
 
 /* struct's vom typ curse_skill: */
-	{ /* C_SKILL, */
-		CURSETYP_SKILL, CURSE_SPREADMODULO, M_MEN,
+	{ C_SKILL, /* */
 		"",
+		CURSETYP_SKILL, CURSE_SPREADMODULO, M_MEN,
 		"",
 		(cdesc_fun)cinfo_skill
 	},
-	{ /* C_FREE_30, */
-		CURSETYP_UNIT, 0, (NO_MERGE),
+	{ C_FREE_30, /* */
 		"",
+		CURSETYP_UNIT, 0, (NO_MERGE),
 		"",
 		NULL
 	},
-	{ /* C_FREE_31, */
-		CURSETYP_UNIT, 0, (NO_MERGE),
+	{ C_FREE_31, /* */
 		"",
+		CURSETYP_UNIT, 0, (NO_MERGE),
 		"",
 		NULL
 	},
-	{ /* C_FREE_32, */
-		CURSETYP_UNIT, 0, (NO_MERGE),
+	{ C_FREE_32, /* */
 		"",
+		CURSETYP_UNIT, 0, (NO_MERGE),
 		"",
 		NULL
 	},

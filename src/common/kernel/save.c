@@ -1369,7 +1369,7 @@ curse_write(const attrib * a,FILE * f) {
 	fprintf(f, "%d %d %d %d %d %d %d ", c->no, (int)c->cspellid, flag,
 			c->duration, c->vigour, mage_no, c->effect);
 
-	switch(cursedaten[c->cspellid].typ){
+	switch(c->type->typ){
 		case CURSETYP_UNIT:
 		{
 			curse_unit * cc = (curse_unit*)c->data;
@@ -1409,9 +1409,8 @@ curse_read(attrib * a, FILE * f) {
 				&c->duration, &c->vigour, &mageid, &c->effect);
 	}
 
-	c->type = &cursedaten[cspellid];
+	c->type = find_cursetype((curse_t)cspellid);
 	c->cspellid = (curse_t)cspellid;
-
 
 	/* beim Einlesen sind noch nicht alle units da, muss also
 	 * zwischengespeichert werden. */
@@ -1421,7 +1420,7 @@ curse_read(attrib * a, FILE * f) {
 		ur_add((void*)mageid, (void**)&c->magician, resolve_unit);
 	}
 
-	switch(cursedaten[cspellid].typ){
+	switch(c->type->typ){
 		case CURSETYP_UNIT:
 		{
 			curse_unit * cc = calloc(1, sizeof(curse_unit));

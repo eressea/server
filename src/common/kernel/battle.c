@@ -2743,13 +2743,19 @@ make_fighter(battle * b, unit * u, boolean attack)
 	h = u->hp / u->number;
 	assert(h);
 	rest = u->hp % u->number;
-	speeded = get_cursedmen(u->attribs, C_SPEED, 0);
-	speed   = get_curseeffect(u->attribs, C_SPEED, 0);
+
+	/* Effekte von Sprüchen */
+	{
+		curse *c = get_curse(u->attribs, C_SPEED, 0);
+		if (c) {
+			speeded = get_cursedmen(u, c);
+			speed   = get_curseeffect(u->attribs, C_SPEED, 0);
+		}
+	}
 
 	/* Effekte von Alchemie */
 	berserk = get_effect(u, oldpotiontype[P_BERSERK]);
 
-	/* Effekte von Sprüchen */
 	/* Effekte von Artefakten */
 	strongmen = min(fig->unit->number, get_item(u, I_TROLLBELT));
 
