@@ -1758,8 +1758,8 @@
 		<arg name="guard" type="unit"></arg>
 	</type>
 	<text locale="de">"$unit($unit) wurde in $region($region) von $unit($guard) aufgehalten."</text>
-	<text locale="fr">"$unit($unit) was kept in $region($region) by $faction($faction)."</text>
-	<text locale="en">"$unit($unit) was kept in $region($region) by $faction($faction)."</text>
+	<text locale="fr">"$unit($unit) was kept in $region($region) by $unit($guard)."</text>
+	<text locale="en">"$unit($unit) was kept in $region($region) by $unit($guard)."</text>
 </message>
 <message name="peace_confirm" section="events">
 	<type>
