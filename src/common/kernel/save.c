@@ -2124,7 +2124,10 @@ writegame(char *path, char quiet)
 			wnl(F);
 			write_items(F, u->items);
 			wnl(F);
-			if(u->hp = 0) u->hp = 1;
+			if (u->hp == 0) {
+				log_error(("Einheit %s hat 0 Trefferpunkte\n", itoa36(u->no)));
+				u->hp = 1;
+			}
 			wi(F, u->hp);
 			wnl(F);
 #if RELEASE_VERSION < MAGE_ATTRIB_VERSION
