@@ -14,7 +14,7 @@
 
 enum {
 	RM_USED    = 1<<0, /* resource has been used */
-	RM_MALLORN = 1<<1, /* this is not wood. it's mallorn */
+	RM_MALLORN = 1<<1 /* this is not wood. it's mallorn */
 };
 
 typedef struct rawmaterial {

@@ -42,6 +42,7 @@ Features:
 * buildings.xml hat keinen support fuer gebaeude mit mehreren ausbaustufen
   (castle). nachtragen, und bt_castle aus dem source werfen
 - eigener messagetype für regions-/einheitenbotschaften (nicht string)
+* Werform in Reports anzeigen
 
 Webseiten, Mailinglisten:
 * mehr logging, vinyambar-accounts

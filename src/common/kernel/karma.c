@@ -291,7 +291,6 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		4
 	},
 	/* TODO: Noch nicht implementiert */
-	/* Einheitenlimit-Senkung sinnlos für alte Parteien. */
 	{
 		"Elite",
 		"Für eine Partei mit dieser Eigenschaft verdoppeln sich alle Boni- und "

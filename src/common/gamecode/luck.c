@@ -55,9 +55,8 @@
 
 const int STANDARD_LUCK = 2;
 
-extern struct item_type * i_silver;
+extern struct item_type *i_silver;
 
-#ifdef BAD_NON_ANSI_CODE
 static void
 lucky_silver(const unit *u)
 {
@@ -194,18 +193,15 @@ lucky_event(const faction *f)
 		break;
 	}
 }
-#endif
 
 void
 check_luck(void)
 {
-#ifdef BAD_NON_ANSI_CODE
 	faction *f;
 
   for(f=factions; f; f=f->next) {
     if(rand()%100 < STANDARD_LUCK+fspecial(f, FS_LUCKY)*8)
 			lucky_event(f);
 	}
-#endif
 }
 
