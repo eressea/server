@@ -3242,7 +3242,8 @@ battle_report(battle * b)
 				int l = FIGHT_ROW;
 				const char * abbrev = seematrix(fac, s)?sideabkz(s, false):"-?-";
 				const char * loc_army = LOC(fac->locale, "battle_army");
-				sprintf(buf, "%s%s %2d(%s): ", komma==true?", ":"", loc_army, abbrev);
+				sprintf(buf, "%s%s %2d(%s): ", (komma==true?", ":""), 
+						loc_army, s->index, abbrev);
 				for (r=FIGHT_ROW;r!=NUMROWS;++r) {
 					if (alive[r]) {
 						if (l!=FIGHT_ROW) scat("+");
