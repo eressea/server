@@ -1021,19 +1021,6 @@ roadto(const region * r, direction_t dir)
   return true;
 }
 
-static const char *
-direction_name(const region * from, const region * to, const struct locale * lang)
-{
-  direction_t dir = reldirection(from, to);
-  if (dir<MAXDIRECTIONS && dir>=0) return locale_string(lang, directions[dir]);
-  if (dir==D_SPECIAL) {
-    spec_direction *sd = special_direction(from, to);
-    return sd->keyword;
-  }
-  assert(!"invalid direction");
-  return NULL;
-}
-
 static region_list *
 cap_route(region * r, region_list * route, region_list * route_end, int speed)
 {
@@ -1840,7 +1827,6 @@ travel_i(unit * u, region_list * route_begin, region_list * route_end, order * o
 static void
 travel(unit * u, region_list ** routep)
 {
-  static boolean init = false;
   region * r = u->region;
   region_list * route_end;
   region_list * route_begin = NULL;

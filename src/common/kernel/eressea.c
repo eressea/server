@@ -2934,7 +2934,7 @@ movement_error(unit * u, const char * token, order * ord, int error_code)
       d = finddirection(token, u->faction->locale);
       return msg_message("moveblocked", "unit direction", u, d);
     case E_MOVE_NOREGION:
-      return msg_feedback(u, ord, "unknowndirection", "direction", token);
+      return msg_feedback(u, ord, "unknowndirection", "dirname", token);
   }
   return NULL;
 }
