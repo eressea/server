@@ -87,7 +87,7 @@
 
 extern void reorder_owners(struct region * r);
 
-#ifdef ALLIANCES
+#if 0
 #define MAXALLIANCES 3
 static void
 init_alliances(void)
@@ -118,7 +118,7 @@ curse_emptiness(void)
 		if (r->land==NULL) continue;
 		if (fval(r, RF_CHAOTIC)) continue;
 		if (r->terrain==T_GLACIER) continue;
-		if (r->age<=120) continue;
+		if (r->age<=200) continue;
 		if (get_curse(r->attribs, ct)) continue;
 		while (u && u->faction->no==MONSTER_FACTION) u=u->next;
 		if (u==NULL) fset(r, FL_MARK);
@@ -1121,7 +1121,7 @@ write_laenrepair(void) {
 
 #include "group.h"
 static void
-fix_allies(void) 
+fix_allies(void)
 {
 	faction * f;
 	for (f=factions;f;f=f->next) {
@@ -2911,7 +2911,7 @@ korrektur(void)
 	do_once("rest", fix_restart_flag());
 	warn_password();
 	fix_road_borders();
-	curse_emptiness();
+	if (turn>1000) curse_emptiness(); /*** disabled ***/
 #ifdef ALLIANCES
 	/* init_alliances(); */
 #endif
