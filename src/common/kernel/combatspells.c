@@ -703,7 +703,7 @@ sp_shadowcall(fighter * fi, int level, int power, spell * sp)
 	unit *mage = fi->unit;
 	attrib *a;
 	int force = get_force(power, 3)/2;
-	race *rc;
+	const race *rc;
 	int num;
 	unit *u;
 
