@@ -1876,7 +1876,7 @@ attack(battle *b, troop ta, const att *a)
 			} else {
 				boolean standard_attack = true;
 				if (wp && wp->type->attack) {
-					int dead;
+					int dead = 0;
 					standard_attack = wp->type->attack(&ta, &dead, row);
 					af->catmsg += dead;
 					/* TODO: dies hier ist nicht richtig. wenn die katapulte/etc.
