@@ -881,7 +881,7 @@ show_allies(FILE * F, const faction * f, const ally * sf)
 		if (mode!=0 && sf->status>0) {
 			fprintf(F, "ALLIANZ %d\n", sf->faction->no);
 			fprintf(F, "\"%s\";Parteiname\n", sf->faction->name);
-			fprintf(F, "%d;Status\n", sf->status);
+			fprintf(F, "%d;Status\n", sf->status & HELP_ALL);
 		}
 	}
 }

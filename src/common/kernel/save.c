@@ -1489,7 +1489,7 @@ addally(const faction * f, ally ** sfp, int aid, int state)
   sf = calloc(1, sizeof(ally));
   sf->faction = af;
   if (!sf->faction) ur_add((void*)aid, (void**)&sf->faction, resolve_faction);
-  sf->status = state;
+  sf->status = state & HELP_ALL;
 
   while (*sfp) sfp=&(*sfp)->next;
   *sfp = sf;
