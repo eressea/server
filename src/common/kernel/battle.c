@@ -1715,7 +1715,7 @@ hits(troop at, troop dt, weapon * awp)
 
 	if (!df->alive) return 0;
 	if (getreload(at)) return 0;
-	if (dist>1 && !fval(awp->type, WTF_MISSILE)) return 0;
+	if (dist>1 && (awp == NULL || !fval(awp->type, WTF_MISSILE))) return 0;
 	if (af->person[at.index].flags & FL_STUNNED) {
 			af->person[at.index].flags &= ~FL_STUNNED;
 		return 0;
