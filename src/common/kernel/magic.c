@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: magic.c,v 1.11 2001/02/18 10:06:09 enno Exp $
+ *	$Id: magic.c,v 1.12 2001/03/07 15:00:18 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1213,6 +1213,8 @@ target_resists_magic(unit *magician, void *obj, int objtyp, int t_bonus)
 				int at, pa = 0;
 				skill_t i;
 
+				if(fspecial(((unit *)obj)->faction, FS_MAGICIMMUNE)) return true;
+
 				at = effskill(magician, SK_MAGIC);
 
 				for (i=0;i<MAXSKILLS;i++) {
@@ -1445,6 +1447,8 @@ regeneration(unit * u)
 	double potenz = 1.5;
 	double divisor = 2.0;
 
+	if(fspecial(u->faction, FS_MAGICIMMUNE)) return 0;
+
 	sk = effskill(u, SK_MAGIC);
 	/* Rassenbonus/-malus */
 	d = (int)(pow(sk, potenz) * race[u->race].regaura / divisor);
@@ -1503,7 +1507,7 @@ regeneration_magiepunkte(void)
 				}
 				set_spellpoints(u, min(aura, auramax));
 
-				/* Zum letzten Mal Spruchliste aktualiesieren */
+				/* Zum letzten Mal Spruchliste aktualisieren */
 				updatespelllist(u);
 			}
 		}

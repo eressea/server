@@ -2565,7 +2565,7 @@ ageing(void)
 static int
 maxunits(faction *f)
 {
-	return MAXUNITS + 250 * fspecial(f, FS_ADMINISTRATOR);
+	return MAXUNITS + 400 * fspecial(f, FS_ADMINISTRATOR);
 }
 
 static void

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: karma.c,v 1.3 2001/02/28 18:25:25 corwin Exp $
+ *	$Id: karma.c,v 1.4 2001/03/07 15:00:18 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -88,7 +88,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		false
 	},
 	{
-		"Krieger",
+		"Barbar",
 		"Einheiten dieser Partei erhalten durch Lernen von Waffentalenten "
 		"(Taktik und Reiten zählen nicht dazu!) 40 statt 30 Lerntage. Weitere "
 		"Stufen erhöhen den Bonus um +5/+10. Die Fokussierung auf das "
@@ -133,9 +133,9 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 	{
 		"Administrator",
 		"Das Einheitenlimit einer Partei mit dieser Eigenschaft erhöht sich um "
-		"250 Einheiten. Leider verschlingt der Verwaltungsaufwand viel Silber, "
+		"400 Einheiten. Leider verschlingt der Verwaltungsaufwand viel Silber, "
 		"so dass sich der Unterhalt pro Person um 1 Silberstück erhöht. Weitere "
-		"Stufen der Eigenschaft erhöhen das Limit um weitere 250 Einheiten und "
+		"Stufen der Eigenschaft erhöhen das Limit um weitere 400 Einheiten und "
 		"den Unterhalt um ein weiteres Silberstück.",
 		true
 	},
@@ -190,9 +190,9 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 	{
 		"Versteckt",
 		"Eine Partei mit dieser Eigenschaft hat die Fähigkeit zu Tarnung "
-		"zur Perfektion getrieben. Jede Einheit mit mindestens Tarnung 2 "
+		"zur Perfektion getrieben. Jede Einheit mit mindestens Tarnung 3 "
 		"versteckt alle ihre Gegenstände so, daß sie von anderen Parteien "
-		"nicht mehr gesehen werden können. Jede Einheit mit mindestens Tarnung 5 "
+		"nicht mehr gesehen werden können. Jede Einheit mit mindestens Tarnung 6 "
 		"schafft es auch, die Zahl der in ihr befindlichen Personen zu verbergen. "
 		"Um diese Eigenschaft steuern zu können, stehen diesen Parteien die "
 		"Befehle TARNE ANZAHL [NICHT] und TARNE GEGENSTÄNDE [NICHT] zur "
@@ -208,7 +208,6 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Woche ihren normalen Tätigkeiten nachzugehen.",
 		false
 	},
-	/* TODO: Noch nicht implementiert */
 	{
 		"Magische Immunität",
 		"Eine Partei mit dieser Eigenschaft ist völlig immun gegen alle Arten "
@@ -224,7 +223,6 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"jeweils einem weiteren Magier das Lernen eines anderen Gebiets.",
 		true
 	},
-	/* TODO: Namen ändern, negative Eigenschaft implementieren */
 	{
 		"Jihad",
 		"Eine Partei mit dieser Eigenschaft kann eine (Spieler)-Rasse "
@@ -554,3 +552,4 @@ jihad_attacks(void)
 		}
 	}
 }
+

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: reports.c,v 1.7 2001/02/28 23:28:54 enno Exp $
+ *	$Id: reports.c,v 1.8 2001/03/07 15:00:18 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -207,7 +207,7 @@ bufunit(const faction * f, const unit * u, int indent,
 	}
 	scat(", ");
 	if(u->faction != f && a_fshidden
-			&& a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 5) {
+			&& a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {
 		scat("? ");
 	} else {
 		icat(u->number);
@@ -270,7 +270,7 @@ bufunit(const faction * f, const unit * u, int indent,
 	if (f == u->faction || telepath_see || u->faction->race==RC_ILLUSION) {
 		show = u->items;
 	} else if (!itemcloak && mode >= see_unit && !(a_fshidden
-			&& a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 2)) {
+			&& a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
 		show = NULL;
 		for (itm=u->items;itm;itm=itm->next) {
 			item * ishow;

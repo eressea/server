@@ -437,7 +437,7 @@ cr_output_unit(FILE * F, region * r,
 	}
 
 	if(u->faction != f && a_fshidden
-			&& a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 5) {
+			&& a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {
 		fprintf(F, "-1;Anzahl\n");
 	} else {
 		fprintf(F, "%d;Anzahl\n", u->number);
@@ -546,7 +546,7 @@ cr_output_unit(FILE * F, region * r,
 	if (f == u->faction || u->faction->race==RC_ILLUSION) {
 		show = u->items;
 	} else if (itemcloak==false && mode>=see_unit && !(a_fshidden
-			&& a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 2)) {
+			&& a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
 		show = NULL;
 		for (itm=u->items;itm;itm=itm->next) {
 			item * ishow;
