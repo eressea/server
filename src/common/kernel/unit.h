@@ -120,7 +120,9 @@ extern int get_level(const struct unit * u, skill_t id);
 extern void transfermen(struct unit * u, struct unit * u2, int n);
 
 extern int eff_skill(const struct unit * u, skill_t sk, const struct region * r);
-extern int get_modifier(const struct unit * u, skill_t sk, int lvl, const struct region * r);
+extern int eff_skill_study(const struct unit * u, skill_t sk, const struct region * r);
+
+extern int get_modifier(const struct unit * u, skill_t sk, int lvl, const struct region * r, boolean noitem);
 
 #undef DESTROY
 

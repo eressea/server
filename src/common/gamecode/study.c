@@ -291,7 +291,7 @@ teach(region * r, unit * u)
 						for (i=0;teachskill[i]!=NOSKILL;++i) if (sk==teachskill[i]) break;
 						sk = teachskill[i];
 					}
-					if (sk != NOSKILL && eff_skill(u, sk, r) > eff_skill(student, sk, r)) {
+					if (sk != NOSKILL && eff_skill_study(u, sk, r)-TEACHDIFFERENCE > eff_skill_study(student, sk, r)) {
 						teaching -= teach_unit(u, student, teaching, sk, true, &academy);
 					}
 				}
@@ -304,7 +304,7 @@ teach(region * r, unit * u)
 				if (igetkeyword(student->thisorder, student->faction->locale) == K_STUDY) {
 					/* Input ist nun von student->thisorder !! */
 					sk = getskill(student->faction->locale);
-					if (sk != NOSKILL && eff_skill(u, sk, r)-TEACHDIFFERENCE >= eff_skill(student, sk, r)) {
+					if (sk != NOSKILL && eff_skill_study(u, sk, r)-TEACHDIFFERENCE >= eff_skill(student, sk, r)) {
 						teaching -= teach_unit(u, student, teaching, sk, true, &academy);
 					}
 				}
@@ -407,7 +407,7 @@ teach(region * r, unit * u)
 			continue;
 		}
 		/* u is teacher, u2 is student */
-		if (eff_skill(u2, sk, r) > eff_skill(u, sk, r)-TEACHDIFFERENCE) {
+		if (eff_skill_study(u2, sk, r) > eff_skill_study(u, sk, r)-TEACHDIFFERENCE) {
 			add_message(&u->faction->msgs,
 				msg_error(u, u->thisorder, "teach_asgood", "student", u2));
 			continue;

@@ -633,7 +633,7 @@ spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, 
 		int diff;
 
 		if(skill->old > 0) {
-			oldeff = skill->old + get_modifier(u, sk, skill->old, u->region);
+			oldeff = skill->old + get_modifier(u, sk, skill->old, u->region, false);
 		}
 
 		oldeff = max(0, oldeff);

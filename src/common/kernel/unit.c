@@ -963,8 +963,7 @@ item_modification(const unit *u, skill_t sk, int val)
 	/* Presseausweis: *2 Spionage, 0 Tarnung */
 	if(sk == SK_SPY && get_item(u, I_PRESSCARD) >= u->number) {
 		val = val * 2;
-	}
-	if(sk == SK_STEALTH) {
+	} else if(sk == SK_STEALTH) {
 #if NEWATSROI == 1
 		if(get_item(u, I_RING_OF_INVISIBILITY)
 				+ 100 * get_item(u, I_SPHERE_OF_INVISIBILITY) >= u->number) {
@@ -1031,7 +1030,7 @@ att_modification(const unit *u, skill_t sk)
 }
 
 int
-get_modifier(const unit * u, skill_t sk, int level, const region * r)
+get_modifier(const unit *u, skill_t sk, int level, const region *r, boolean noitem)
 {
 	int bskill = level;
 	int skill = bskill;
@@ -1042,7 +1041,9 @@ get_modifier(const unit * u, skill_t sk, int level, const region * r)
 	skill += rc_skillmod(u->race, r, sk);
 	skill += att_modification(u, sk);
 
-	skill = item_modification(u, sk, skill);
+	if(noitem == false) {
+		skill = item_modification(u, sk, skill);
+	}
 	skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
 
 	if (fspecial(u->faction, FS_TELEPATHY)) {
@@ -1072,7 +1073,19 @@ eff_skill(const unit * u, skill_t sk, const region * r)
 {
 	int level = get_level(u, sk);
 	if (level>0) {
-		int mlevel = level + get_modifier(u, sk, level, r);
+		int mlevel = level + get_modifier(u, sk, level, r, false);
+
+		if (mlevel>0) return mlevel;
+	}
+	return 0;
+}
+
+int
+eff_skill_study(const unit * u, skill_t sk, const region * r)
+{
+	int level = get_level(u, sk);
+	if (level>0) {
+		int mlevel = level + get_modifier(u, sk, level, r, true);
 
 		if (mlevel>0) return mlevel;
 	}
