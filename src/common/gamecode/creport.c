@@ -1010,14 +1010,14 @@ get_seen_interval(region ** first, region ** last)
   region * r = regions;
   while (r!=NULL) {
     if (find_seen(r)!=NULL) {
-      first = r;
+      *first = r;
       break;
     }
     r = r->next;
   }
   while (r!=NULL) {
     if (find_seen(r)!=NULL) {
-      last = r;
+      *last = r;
     }
     r = r->next;
   }
@@ -1034,7 +1034,7 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 	ship *sh;
 	unit *u;
 	const char * mailto = locale_string(f->locale, "mailto");
-  region * first, * last;
+  region * first = NULL, * last = NULL;
 	const attrib * a;
 
   get_seen_interval(&first, &last);
