@@ -493,103 +493,13 @@ u_geteffstealth(const struct unit * u)
 	return (a?a->data.i:-1);
 }
 
-#if SKILLPOINTS
-int
-change_skill(unit * u, skill_t id, int byvalue)
-{
-	skill *i = u->skills;
-	int wounds = 0;
-
-	if (id == SK_AUSDAUER) {
-		wounds = unit_max_hp(u)*u->number - u->hp;
-	}
-	for (; i != u->skills + u->skill_size; ++i)
-		if (i->id == id) {
-			i->value = max(0, i->value + byvalue);
-			if (id == SK_AUSDAUER) {
-				u->hp = unit_max_hp(u)*u->number - wounds;
-			}
-			return i->value;
-		}
-
-	set_skill(u, id, byvalue);
-
-	if (id == SK_AUSDAUER) {
-		u->hp = unit_max_hp(u)*u->number - wounds;
-	}
-	return byvalue;
-}
-
-static int
-change_skill_transfermen(unit * u, skill_t id, int byvalue)
-{
-	skill * sv = u->skills;
-
-	while (sv != u->skills + u->skill_size) {
-		if (sv->id == id) {
-			sv->value = max(0, sv->value + byvalue);
-			return sv->value;
-		}
-		++sv;
-	}
-
-	set_skill(u, id, byvalue);
-
-	return byvalue;
-}
-
-int
-get_skill(const unit * u, skill_t id)
-{
-	skill *i = u->skills;
-
-	for (; i != u->skills + u->skill_size; ++i)
-		if (i->id == id)
-			return i->value;
-	return 0;
-}
-
-void
-set_skill(unit * u, skill_t id, int value)
-{
-	skill *i = u->skills;
-
-	assert(value>=0);
-	for (; i != u->skills + u->skill_size; ++i)
-		if (i->id == id) {
-			if (value)
-				i->value = value;
-			else {
-				*i = *(u->skills + u->skill_size - 1);
-				--u->skill_size;
-			}
-			return;
-		}
-	if (!value)
-		return;
-	++u->skill_size;
-	u->skills = realloc(u->skills, u->skill_size * sizeof(skill));
-	(u->skills + u->skill_size - 1)->value = value;
-	(u->skills + u->skill_size - 1)->id = id;
-}
-
-#endif
-
-#if SKILLPOINTS
-extern int level(int days);
-#endif
-
 int
 get_level(const unit * u, skill_t id)
 {
 	skill * sv = u->skills;
 	while (sv != u->skills + u->skill_size) {
 		if (sv->id == id) {
-#if SKILLPOINTS
-			return level(sv->value/u->number);
-#else
 			return sv->level;
-#endif
 		}
 		++sv;
 	}
@@ -599,9 +509,6 @@ get_level(const unit * u, skill_t id)
 void 
 set_level(unit * u, skill_t id, int value)
 {
-#if SKILLPOINTS
-	set_skill(u, id, level_days(value)*u->number);
-#else
 	skill * sv = u->skills;
 	while (sv != u->skills + u->skill_size) {
 		if (sv->id == id) {
@@ -611,7 +518,6 @@ set_level(unit * u, skill_t id, int value)
 		++sv;
 	}
 	sk_set(add_skill(u, id), value);
-#endif
 }
 
 static attrib_type at_leftship = {
@@ -756,9 +662,6 @@ move_unit(unit * u, region * r, unit ** ulist)
 void
 transfermen(unit * u, unit * u2, int n)
 {
-#if SKILLPOINTS
-	int skills[MAXSKILLS];
-#endif
 	const attrib * a;
 	int hp = u->hp;
 	region * r = u->region;
@@ -768,62 +671,36 @@ transfermen(unit * u, unit * u2, int n)
 	/* "hat attackiert"-status wird übergeben */
 
 	if (u2) {
-#if SKILLPOINTS
-		skill_t sk;
-		if (u->skills) {
-			for (sk = 0; sk < MAXSKILLS; ++sk) {
-				skills[sk] = get_skill(u, sk);
-			}
-		}
-#else
-		char has_skill[MAXSKILLS];
 		skill *sv, *sn;
-		skill_t i;
+		skill_t sk;
 		assert(u2->number+n>0);
 
-		for (i=0; i<MAXSKILLS; ++i) {
-			has_skill[i]=(char)0;
-		}
-		for (sv=u->skills;sv!=u->skills+u->skill_size;++sv) {
-			has_skill[sv->id]=(char)1;
-		}
-		for (sv=u2->skills;sv!=u2->skills+u2->skill_size;++sv) {
-			has_skill[sv->id]=(char)1;
-		}
-		for(i=0; i<MAXSKILLS; ++i) if(has_skill[i] == (char)1) {
-			int level;
-			int weeks;
+		for (sk=0; sk!=MAXSKILLS; ++sk) {
+			double dlevel = 0.0;
+			int weeks, level;
 
-			sv = get_skill(u, i);
-			sn = get_skill(u2, i);
+			sv = get_skill(u, sk);
+			sn = get_skill(u2, sk);
 
-			if(sn==NULL) sn = add_skill(u2, i);
+			if (sv==NULL && sn==NULL) continue;
+			if (sv && sv->level) dlevel += (sv->level + 1 - sv->weeks/(sv->level*2.0+1)) * n;
+			else dlevel += 0.5 * n;
+			if (sn && sn->level) dlevel += (sn->level + 1 - sn->weeks/(sn->level*2.0+1)) * u2->number;
+			else dlevel += 0.5 * u2->number;
 
-			if(sv==NULL) {
-				if(sn->level > 0) {
-					level = (sn->level*u2->number)/(u2->number+n);
-					weeks = (sn->weeks*u2->number*(level+1)/(sn->level+1)+u2->number+n-1)/(u2->number+n);
-					sn->level = (unsigned char)level;
-					sn->weeks = (unsigned char)weeks;
-				} else {
-					weeks = (sn->weeks*u2->number+u2->number+n-1)/(u2->number+n);
-					sn->weeks = (unsigned char)weeks;
-				}
-			} else {
-				if(sn->level != sv->level) {
-					level = (sv->level*n+sn->level*u2->number)/(u2->number+n);
-					weeks = (sv->weeks*n*(level+1)/(sv->level+1)+sn->weeks*u2->number*(level+1)/
-										(sn->level+1)+u2->number+n-1)/(u2->number+n);
-					sn->level = (unsigned char)level;
-					sn->weeks = (unsigned char)weeks;
-				} else {
-					weeks = (sv->weeks*n+sn->weeks*u2->number+u2->number+n-1)/(u2->number+n);
-					sn->weeks = (unsigned char)weeks;
-				}
+			dlevel = dlevel / (n + u2->number);
+			level = (int)dlevel;
+			weeks = (int)((level*2.0+1) * (1 - dlevel + level)+0.9999999);
+
+			if (level) {
+				if (sn==NULL) sn = add_skill(u2, sk);
+				sn->level = (unsigned char)level;
+				sn->weeks = (unsigned char)weeks;
+				assert(sn->level>=0 && sn->weeks>0 && sn->weeks<=sn->level*2+1);
+			} else if (sn) {
+				sk_set(sn, 0);
 			}
-			assert(sn->level>=0 && sn->weeks>=0 && sn->weeks<=sn->level*2+1);
 		}
-#endif
 		a = a_find(u->attribs, &at_effect);
 		while (a) {
 			effect_data * olde = (effect_data*)a->data.v;
@@ -837,19 +714,9 @@ transfermen(unit * u, unit * u2, int n)
 	}
 	scale_number(u, u->number - n);
 	if (u2) {
-#if SKILLPOINTS
-		skill_t sk;
-#endif
 		set_number(u2, u2->number + n);
 		hp -= u->hp;
 		u2->hp += hp;
-#if SKILLPOINTS
-		if (u->skills) {
-			for (sk = 0; sk < MAXSKILLS; ++sk) {
-				change_skill_transfermen(u2, sk, skills[sk] - get_skill(u, sk));
-			}
-		}
-#endif
 		/* TODO: Das ist schnarchlahm! und gehört ncht hierhin */
 		a = a_find(u2->attribs, &at_effect);
 		while (a) {
@@ -951,8 +818,6 @@ set_number(unit * u, int count)
 #endif
 }
 
-#if !SKILLPOINTS
-
 boolean
 learn_skill(unit * u, skill_t sk, double chance)
 {
@@ -974,33 +839,6 @@ learn_skill(unit * u, skill_t sk, double chance)
 	sk_set(sv, 1);
 	return true;
 }
-/*
-	int coins, heads = 0;
-	int level = 0;
-	int weeks = 0;
-	skill * sv;
-	assert (chance <= 1.0);
-	sv = get_skill(u, sk);
-	if (sv) {
-		level = sv->level;
-		weeks = sv->learning;
-	}
-	coins = level * 2;
-	heads = coins - weeks;
-	while (heads>0 && coins--) {
-		if (rand()%2==0) --heads;
-		if (heads>coins) break;
-	}
-	if (heads) {
-		++weeks;
-	} else {
-		++level;
-		weeks = 0;
-	}
-	set_skill(u, sk, level, weeks, false);
-	return heads==0;
-}
-*/
 
 skill * 
 add_skill(unit * u, skill_t id)
@@ -1045,8 +883,6 @@ has_skill(const unit * u, skill_t sk)
 	}
 	return false;
 }
-
-#endif
 
 static int
 item_modification(const unit *u, skill_t sk, int val)

@@ -23,6 +23,7 @@
 
 /* kernel includes */
 #include <building.h>
+#include <reports.h>
 #include <faction.h>
 #include <item.h>
 #include <message.h>
@@ -242,7 +243,7 @@ gm_messageplane(const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
-	const char * msg = igetstrtoken(str);
+	const char * zmsg = igetstrtoken(str);
 	if (p==NULL) {
 		mistake(u, cmd, "In diese Ebene kann keine Nachricht gesandt werden.\n", 0);
 	} else {
@@ -252,6 +253,7 @@ gm_messageplane(const char * str, void * data, const char * cmd)
 			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
+			message * msg = msg_message("msg_event", "string", strdup(zmsg));
 			faction * f;
 			region * r;
 			for (f=factions;f;f=f->next) {
@@ -263,9 +265,10 @@ gm_messageplane(const char * str, void * data, const char * cmd)
 				for (u=r->units;u;u=u->next) if (!fval(u->faction, FL_DH)) {
 					f = u->faction;
 					fset(f, FL_DH);
-					add_message(&f->msgs, msg_message("msg_event", "string", msg));
+					add_message(&f->msgs, msg);
 				}
 			}
+			msg_release(msg);
 		}
 	}
 }
@@ -604,6 +607,7 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	plane * p;
 	attrib * a;
 	unit * u;
+	watcher * w = calloc(sizeof(watcher), 1);
 	region * center;
 	boolean invalid = false;
 	int minx, miny, maxx, maxy, cx, cy;
@@ -664,6 +668,12 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 			}
 		}
 	}
+
+	/* watcher: */
+	w->faction = f;
+	w->mode = see_unit;
+	w->next = p->watchers;
+	p->watchers	= w;
 
 	/* generic permissions */
 	a = a_add(&f->attribs, a_new(&at_permissions));

@@ -442,22 +442,22 @@ calculate_emigration(region *r)
 		region *rc = rconnect(r,i);
 		int w;
 
-		if(rterrain(rc) == T_OCEAN) {
+		if (rc ==NULL || rterrain(rc) == T_OCEAN) {
 			w = 0;
 		} else {
 			w = rpeasants(rc) - maxworkingpeasants(rc);
+			if(rterrain(rc) == T_VOLCANO || rterrain(rc) == T_VOLCANO_SMOKING) {
+				w = w/10;
+			} 
 		}
-
-		if(rterrain(rc) == T_VOLCANO || rterrain(rc) == T_VOLCANO_SMOKING) {
-			w = w/10;
-		} 
 		weight[i]  = w;
 		weightall += w;
 	}
 	
-	for (i = 0; i != MAXDIRECTIONS; i++) {
+	if (weightall!=0) for (i = 0; i != MAXDIRECTIONS; i++) {
 		region *rc = rconnect(r,i);
 		int wandering_peasants = (overpopulation * weight[i])/weightall;
+		if (wandering_peasants==0 || rc==NULL) continue;
 
 		r->land->newpeasants -= wandering_peasants;
 		rc->land->newpeasants += wandering_peasants;
@@ -550,7 +550,10 @@ peasants(region * r)
 	 * den Bauern genug für 11 Bauern pro Ebene ohne Wald. Der Wald
 	 * breitet sich nicht in Gebiete aus, die bebaut werden. */
 
-	int peasants, money, n, i, dead, satiated;
+	int peasants, n, i;
+#if PEASANTS_DO_NOT_STARVE == 0
+ 	int dead, satiated, money;
+#endif
 	attrib * a;
 
 	/* Bauern vermehren sich */

@@ -1864,6 +1864,15 @@ fix_timeouts(void)
 #include <modules/gmcmd.h>
 
 static int
+regatta_quest(void)
+{
+	plane * p = gm_addplane(20, PFL_NORECRUITS, "Regatta");
+	region * center = findregion(p->minx+(p->maxx-p->minx)/2, p->miny+(p->maxy-p->miny)/2);
+	gm_addfaction("gregorjochmann@gmx.de", p, center);
+	return 0;
+}
+
+static int
 secondfaction(faction * pf)
 {
 	unit * u = findunit(atoi36("5q9w"));
@@ -1901,6 +1910,7 @@ update_gmquests(void)
 			if (!a) a_add((attrib**)&permissions->data.v, make_atgmcreate(oldpotiontype[p]->itype));
 		}
 	}
+	do_once("rq01", regatta_quest());
 }
 
 #if 0
@@ -1939,7 +1949,7 @@ create_xe(void)
 		 PFL_NOGIVE | PFL_NOATTACK | PFL_NOTERRAIN | PFL_NOMAGIC | 
 		 PFL_NOSTEALTH | PFL_NOTEACH | PFL_NOBUILD | PFL_NOFEED, 
 		 "Xontormia-Expreß");
-	 region * center = findregion((p->maxx-p->minx)/2, (p->maxy-p->miny)/2);
+	 region * center = findregion(p->minx+(p->maxx-p->minx)/2, p->miny+(p->maxy-p->miny)/2);
 	 faction * f = gm_addfaction("abeer@gmx.de", p, center);
 
 	 log_printf("Xe-Partei %s\n", factionname(f));
