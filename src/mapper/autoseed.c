@@ -327,16 +327,29 @@ mkisland(int nsize)
 	terraform(r, T_OCEAN);
 	add_regionlist(&rlist, r);
 	rsize = 1;
-	while (rlist && nsize && newfactions) {
+	while (nsize) {
 		int i = rand() % rsize;
 		regionlist ** rnext = &rlist;
 		direction_t d;
 		while (i--) rnext=&(*rnext)->next;
 		r = (*rnext)->region;
 		*rnext = (*rnext)->next;
+		if (rsize==0) {
+			log_error(("Could not place all factions on the same island as requested\n"));
+			break;
+		}
 		--rsize;
 		assert(r->terrain==T_OCEAN);
-		if (rand() % REGIONS_PER_FACTION == 0) {
+		for (d=0;d!=MAXDIRECTIONS;++d) {
+			region * rn = rconnect(r, d);
+			if (rn==NULL) {
+				rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
+				terraform(rn, T_OCEAN);
+				add_regionlist(&rlist, rn);
+				++rsize;
+			}
+		}
+		if (rand() % REGIONS_PER_FACTION == 0 || rsize==0) {
 			newfaction ** nfp, * nextf = newfactions;
 			unit * u;
 			terraform(r, preferred_terrain(nextf->race));
@@ -357,15 +370,6 @@ mkisland(int nsize)
 		}
 		else {
 			terraform(r, (terrain_t)((rand() % T_GLACIER)+1));
-		}
-		for (d=0;d!=MAXDIRECTIONS;++d) {
-			region * rn = rconnect(r, d);
-			if (rn==NULL) {
-				rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
-				terraform(rn, T_OCEAN);
-				add_regionlist(&rlist, rn);
-				++rsize;
-			}
 		}
 	}
 	if (rlist) {
