@@ -301,8 +301,9 @@ createspelllist(unit *u, magic_t mtyp)
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell * sp = slist->data;
     if (sp->magietyp == mtyp && sp->level <= sk) {
-      if (!has_spell(u, sp))
+      if (!has_spell(u, sp)) {
         addspell(u, sp->id);
+      }
     }
   }
 }
@@ -362,8 +363,7 @@ already_seen(const faction * f, spellid_t id)
 void
 updatespelllist(unit * u)
 {
-  int max = eff_skill(u, SK_MAGIC, u->region);
-  int sk = max;
+  int sk = eff_skill(u, SK_MAGIC, u->region);
   spell_list * slist;
   spell * sp;
   magic_t gebiet = find_magetype(u);
@@ -371,13 +371,13 @@ updatespelllist(unit * u)
 
   /* Nur Orkmagier bekommen den Keuschheitsamulettzauber */
   sp = find_spellbyid(SPL_ARTEFAKT_CHASTITYBELT);
-  if (old_race(u->race)==RC_ORC && !has_spell(u, sp) && sp->level<=max) {
+  if (old_race(u->race)==RC_ORC && !has_spell(u, sp) && sp->level<=sk) {
     addspell(u, SPL_ARTEFAKT_CHASTITYBELT);
   }
 
   /* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
   sp = find_spellbyid(SPL_BECOMEWYRM);
-  if (fspecial(u->faction, FS_WYRM) && !has_spell(u, sp) && sp->level<=max) {
+  if (fspecial(u->faction, FS_WYRM) && !has_spell(u, sp) && sp->level<=sk) {
     addspell(u, SPL_BECOMEWYRM);
   }
 
@@ -388,17 +388,17 @@ updatespelllist(unit * u)
       /* keine breaks! Wyrme sollen alle drei Zauber können.*/
     case RC_WYRM:
       sp = find_spellbyid(SPL_WYRMODEM);
-      if (sp!=NULL && !has_spell(u, sp) && sp->level<=max) {
+      if (sp!=NULL && !has_spell(u, sp) && sp->level<=sk) {
         addspell(u, sp->id);
       }
     case RC_DRAGON:
       sp = find_spellbyid(SPL_DRAGONODEM);
-      if (sp!=NULL && !has_spell(u, sp) && sp->level<=max) {
+      if (sp!=NULL && !has_spell(u, sp) && sp->level<=sk) {
         addspell(u, sp->id);
       }
     case RC_FIREDRAGON:
       sp = find_spellbyid(SPL_FIREDRAGONODEM);
-      if (sp!=NULL && has_spell(u, sp) && sp->level<=max) {
+      if (sp!=NULL && has_spell(u, sp) && sp->level<=sk) {
         addspell(u, sp->id);
       }
       break;
@@ -411,15 +411,17 @@ updatespelllist(unit * u)
 
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell * sp = slist->data;
-    boolean know = has_spell(u, sp);
+    if (sp->level<=sk) {
+      boolean know = has_spell(u, sp);
 
-    if (know || (gebiet!=M_GRAU && sp->magietyp == gebiet && sp->level <= sk)) {
-      faction * f = u->faction;
+      if (know || (gebiet!=M_GRAU && sp->magietyp == gebiet)) {
+        faction * f = u->faction;
 
-      if (!know) addspell(u, sp->id);
-      if (!ismonster && !already_seen(u->faction, sp->id)) {
-        a_add(&f->attribs, a_new(&at_reportspell))->data.i = sp->id;
-        a_add(&f->attribs, a_new(&at_seenspell))->data.i = sp->id;
+        if (!know) addspell(u, sp->id);
+        if (!ismonster && !already_seen(u->faction, sp->id)) {
+          a_add(&f->attribs, a_new(&at_reportspell))->data.i = sp->id;
+          a_add(&f->attribs, a_new(&at_seenspell))->data.i = sp->id;
+        }
       }
     }
   }
@@ -509,7 +511,7 @@ set_combatspell(unit *u, spell *sp, struct order * ord, int level)
 		cmistake(u, ord, 173, MSG_MAGIC);
 		return;
 	}
-	if (has_spell(u, sp) == false) {
+	if (!has_spell(u, sp)) {
 		/* Diesen Zauber kennt die Einheit nicht */
 		cmistake(u, ord, 169, MSG_MAGIC);
 		return;
@@ -865,12 +867,12 @@ knowsspell(const region * r, const unit * u, const spell * sp)
 		return false;
 	}
 	/* steht der Spruch in der Spruchliste? */
-	if (has_spell(u, sp) == false){
+	if (!has_spell(u, sp)) {
 		/* ist der Spruch aus einem anderen Magiegebiet? */
-		if (find_magetype(u) != sp->magietyp){
+		if (find_magetype(u) != sp->magietyp) {
 			return false;
 		}
-		if (eff_skill(u, SK_MAGIC, u->region) >= sp->level){
+		if (eff_skill(u, SK_MAGIC, u->region) >= sp->level) {
 			log_warning(("%s ist hat die erforderliche Stufe, kennt aber %s nicht.\n",
 				unitname(u), spell_name(sp, default_locale)));
 		}
@@ -2495,7 +2497,7 @@ magic(void)
           * fehlermeldungen die anzeigen das der magier diesen Spruch
           * nur in diese Situation nicht anwenden kann, noch eine
           * einfache Sicherheitsprüfung kommen */
-          if (knowsspell(r, u, sp) == false){
+          if (knowsspell(r, u, sp) == false) {
             /* vorsicht! u kann der familiar sein */
             if (!familiar){
               cmistake(u, ord, 173, MSG_MAGIC);
