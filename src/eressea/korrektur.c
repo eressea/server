@@ -2813,14 +2813,14 @@ give_cammo(void)
 
 #ifdef WDW_PHOENIX
 static region *
-random_region(void)
+random_land_region(void)
 {
 	region *r;
 	int c = 0;
 
 	/* count the available regions */
 	for(r=regions; r; r=r->next) {
-		if(rplane(r) == NULL && landregion(r)) c++;
+		if (r->land && rplane(r)==NULL) ++c;
 	}
 
 	/* choose one */
@@ -2828,9 +2828,7 @@ random_region(void)
 
 	/* this is a bit obfuscated, but should be correct */
 	for(r=regions; c > 0; r=r->next) {
-		if(rplane(r) == NULL && landregion(r)) {
-			--c;
-		}
+		if (r->land && rplane(r)==NULL) --c;
 	}
 
 	return(r);

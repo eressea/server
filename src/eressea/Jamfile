@@ -24,7 +24,7 @@ if $(HAVE_LUA) {
   <lua>region.cpp
   <lua>ship.cpp
   <lua>unit.cpp
-  main.cpp
+  server.cpp
   ;
 
  LINKLIBS on $(BINARY) += -llua50 -llualib50 ;

@@ -706,8 +706,8 @@ main(int argc, char *argv[])
 	return 0;
 #endif
 
-
-	if ((i=readgame(false))!=0) return i;
+  sprintf(buf, "%d", turn);
+  if ((i=readgame(buf, false))!=0) return i;
 
 #ifdef NEW_STARTEQUIPMENT
   add_equipment(it_find("conquesttoken"), 1);
