@@ -318,7 +318,15 @@ create_mage(unit * u, magic_t mtyp)
 	attrib *a;
 	int i;
 
-	mage = calloc(1, sizeof(sc_mage));
+  a = a_find(u->attribs, &at_mage);
+  if (a==NULL) {
+    a = a_add(&u->attribs, a_new(&at_mage));
+    mage = calloc(1, sizeof(sc_mage));
+    a->data.v = mage;
+  } else {
+    mage = a->data.v;
+    assert(mage->magietyp == mtyp);
+  }
 
 	mage->magietyp = mtyp;
 	mage->spellpoints = 0;
@@ -328,8 +336,6 @@ create_mage(unit * u, magic_t mtyp)
 		mage->combatspell[i] = SPL_NOSPELL;
 	}
 	mage->spellptr = NULL;
-	a = a_add(&u->attribs, a_new(&at_mage));
-	a->data.v = mage;
 	createspelllist(u, mtyp);
 	return mage;
 }
