@@ -173,7 +173,7 @@ read_orders(const char * filename)
 	if (F==NULL) return;
 	b = getbuf(F);
 
-	for (;;) {
+	while (b) {
 		switch (igetparam(b, default_locale)) {
 		case P_GAMENAME:
 		case P_FACTION:
