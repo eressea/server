@@ -804,7 +804,7 @@ trees(region * r, const int current_season, const int last_weeks_season)
 
 		/* Gesamtzahl der Samen:
 		 * bis zu 6% (FORESTGROWTH*3) der Bäume samen in die Nachbarregionen */
-		seeds = (rtrees(r, 2) * FORESTGROWTH * 3)/100;
+		seeds = (rtrees(r, 2) * FORESTGROWTH * 3)/1000000;
 		for (d=0;d!=MAXDIRECTIONS;++d) {
 			region * r2 = rconnect(r, d);
 			if (r2 && (terrain[r2->terrain].flags & WALK_INTO)) {
@@ -814,7 +814,7 @@ trees(region * r, const int current_season, const int last_weeks_season)
 				 * verfügbaren Fläche ab. In Gletschern gibt es weniger
 				 * Möglichkeiten als in Ebenen. */
 				sprout = 0;
-				seedchance = 100 * maxworkingpeasants(r2) / terrain[r2->terrain].production_max;
+				seedchance = (100 * maxworkingpeasants(r2)) / terrain[r2->terrain].production_max;
 				for(i=0; i<seeds/MAXDIRECTIONS; i++) {
 					if(rand()%10000 < seedchance) sprout++;
 				}
