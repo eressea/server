@@ -1397,30 +1397,30 @@ select_opponent(battle * b, troop at, int minrow, int maxrow)
 
   if (af->unit->race->flags & RCF_FLY) {
     /* flying races ignore min- and maxrow and can attack anyone fighting
-	 * them */
+    * them */
     minrow = FIGHT_ROW;
     maxrow = BEHIND_ROW;
   }
   minrow = max(minrow, FIGHT_ROW);
-  
-  if (dt.fighter!=NULL && dt.index<dt.fighter->alive) {
-	fighter * df = dt.fighter;
-	int row = get_unitrow(df);
-	if (row>=minrow && row<=maxrow) {
-	  troop ot = df->person[dt.index].opponent;
-	  if (ot.fighter==NULL || ot.index>=ot.fighter->alive) {
-		df->person[dt.index].opponent = at;
-	  }
-	  return dt;
-	}
+
+  if (dt.fighter!=NULL && dt.index<dt.fighter->alive-dt.fighter->removed) {
+    fighter * df = dt.fighter;
+    int row = get_unitrow(df);
+    if (row>=minrow && row<=maxrow) {
+      troop ot = df->person[dt.index].opponent;
+      if (ot.fighter==NULL || ot.index>=ot.fighter->alive-ot.fighter->removed) {
+        df->person[dt.index].opponent = at;
+      }
+      return dt;
+    }
   }
   dt = select_enemy(b, at.fighter, minrow, maxrow);
   if (dt.fighter!=NULL) {
-	fighter * df = dt.fighter;
-	troop ot = df->person[dt.index].opponent;
-	if (ot.fighter==NULL || ot.index>=ot.fighter->alive) {
-	  df->person[dt.index].opponent = at;
-	}
+    fighter * df = dt.fighter;
+    troop ot = df->person[dt.index].opponent;
+    if (ot.fighter==NULL || ot.index>=ot.fighter->alive-ot.fighter->removed) {
+      df->person[dt.index].opponent = at;
+    }
   }
   return dt;
 }
