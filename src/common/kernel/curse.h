@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -13,7 +13,10 @@
 
 #ifndef CURSE_H
 #define CURSE_H
-/* ------------------------------------------------------------- */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Sprueche in der struct region und auf Einheiten, Schiffen oder Burgen
  * (struct attribute)
  */
@@ -241,7 +244,7 @@ extern int curse_read(struct attrib * a,FILE * f);
 */
 
 curse * create_curse(struct unit *magician, struct attrib**ap, const curse_type * ctype,
-		int vigour, int duration, int effect, int men);
+		int vigour, int duration, int ceffect, int men);
 	/* Verzweigt automatisch zum passenden struct-typ. Sollte es schon
 	 * einen Zauber dieses Typs geben, so wird der neue dazuaddiert. Die
 	 * Zahl der verzauberten Personen sollte beim Aufruf der Funktion
@@ -251,10 +254,6 @@ curse * create_curse(struct unit *magician, struct attrib**ap, const curse_type 
 boolean is_cursed_internal(struct attrib *ap, const curse_type * ctype);
 	/* ignoriert CURSE_ISNEW */
 
-void remove_allcurse(struct attrib **ap, const void * data, boolean(*compare)(const attrib *, const void *));
-	/* löscht alle Curse dieses Typs */
-void remove_cursetype(struct attrib **ap, const curse_type *ct);
-	/* löscht den curse c, wenn dieser in ap steht */
 extern void remove_curse(struct attrib **ap, const curse * c);
 	/* löscht einen konkreten Spruch auf einem Objekt. 
 	 */
@@ -273,8 +272,6 @@ extern int curse_changevigour(struct attrib **ap, curse * c, int i);
 extern int get_cursedmen(struct unit *u, struct curse *c);
 	/* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
 	 * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
-extern int change_cursedmen(struct attrib **ap, curse * c, int cursedmen);
-	/* verändert die Anzahl der betroffenen Personen um cursedmen */
 
 extern void curse_setflag(curse * c, int flag);
 	/* setzt Spezialflag einer Verzauberung (zB 'dauert ewig') */
@@ -283,10 +280,6 @@ void transfer_curse(struct unit * u, struct unit * u2, int n);
 	/* sorgt dafür, das bei der Übergabe von Personen die curse-attribute
 	 * korrekt gehandhabt werden. Je nach internen Flag kann dies
 	 * unterschiedlich gewünscht sein
-	 * */
-void remove_cursemagepointer(struct unit *magician, attrib *ap_target);
-	/* wird von remove_empty_units verwendet um alle Verweise auf
-	 * gestorbene Magier zu löschen.
 	 * */
 
 extern curse * get_cursex(attrib *ap, const curse_type * ctype, void * data, 
@@ -300,17 +293,12 @@ extern curse * get_curse(struct attrib *ap, const curse_type * ctype);
 	 * */
 
 struct unit * get_tracingunit(struct attrib **ap, const curse_type * ct);
-struct unit * get_cursingmagician(struct attrib *ap, const curse_type * ctype);
-	/* gibt struct unit-pointer auf Magier zurück, oder einen Nullpointer
-	 * */
 int find_cursebyname(const char *c);
 const curse_type * ct_find(const char *c);
 void ct_register(const curse_type *);
 /* Regionszauber */
 
 curse * cfindhash(int i);
-void chash(curse *c);
-void cunhash(curse *c);
 
 curse * findcurse(int curseid);
 
@@ -322,11 +310,6 @@ extern boolean cmp_curse(const attrib * a, const void * data);
 extern boolean cmp_cursetype(const attrib * a, const void * data);
 extern boolean cmp_curseeffect(const curse * c, const void * data);
 extern boolean cmp_cursedata(const curse * c, const void * data);
-
-/* compatibility mode für katjas curses: 
-extern boolean cmp_oldcurse(const attrib * a, const void * data);
-extern struct twoids * packids(int id, int id2);
-*/
 
 extern void * resolve_curse(void * data);
 extern boolean is_cursed_with(attrib *ap, curse *c);
@@ -345,4 +328,7 @@ extern void register_curses(void);
 #define get_curseeffect(a, id, id2) \
 	curse_geteffect(get_curse(a, ct_find(oldcursename(id))))
 	
+#ifdef __cplusplus
+}
+#endif
 #endif

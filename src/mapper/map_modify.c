@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -393,7 +393,7 @@ create_region_menu(menulist ** menu, region * r)
 		for (b = r->buildings; b; b = b->next) {
 			sprintf(buf, " %s: ", Buildingid(b));
 			for (u = r->units; u; u = u->next)
-				if (u->building == b && fval(u, FL_OWNER)) {
+				if (u->building == b && fval(u, UFL_OWNER)) {
 					strncpy(str, u->name, 28);
 					str[28] = 0;
 					sncat(buf, str, BUFSIZE);
@@ -418,7 +418,7 @@ create_region_menu(menulist ** menu, region * r)
 			if (sh->size!=sh->type->construction->maxsize)
 				sncat(buf, "(im Bau) ", BUFSIZE);
 			for (u = r->units; u; u = u->next)
-				if (u->ship == sh && fval(u, FL_OWNER)) {
+				if (u->ship == sh && fval(u, UFL_OWNER)) {
 					strncpy(str, u->name, 28);
 					str[28] = 0;
 					sncat(buf, str, BUFSIZE);
@@ -548,7 +548,7 @@ NeuesSchiff(region * r)
 			if (r != clipregion)
 				translist(&clipregion->units, &r->units, clipunit);
 			clipunit->ship = s;
-			fset(clipunit, FL_OWNER);
+			fset(clipunit, UFL_OWNER);
 		}
 	}
 	delwin(win);
@@ -633,7 +633,7 @@ NeueBurg(region * r)
 			if (r != clipregion)
 				translist(&clipregion->units, &r->units, clipunit);
 			clipunit->building = b;
-			fset(clipunit, FL_OWNER);
+			fset(clipunit, UFL_OWNER);
 		}
 	}
 	delwin(win);

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -14,6 +14,9 @@
 
 #ifndef CVECTOR_H
 #define CVECTOR_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef WIN32
 #ifndef __cdecl
@@ -44,12 +47,15 @@ void v_scramble(void **begin, void **end);
 void cv_mergeunique(cvector * c, const cvector * a, const cvector * b, int (__cdecl * keyfun) (const void *));
 
 #define cv_remove(c, i) { void** x = v_find((c)->begin, (c)->end, (i)); if (x) { *x = *(c)->end; (c)->end--; } }
-#define for_each(item, vector) \
+#define cv_foreach(item, vector) \
 {	\
 	void **iterator;	\
 	for (iterator = (vector).begin; iterator<(vector).end; ++iterator)	\
 	{	\
 		(item) = *iterator;
-#define next(item) } }
+#define cv_next(item) } }
 
+#ifdef __cplusplus
+}
+#endif
 #endif

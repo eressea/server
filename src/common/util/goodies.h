@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  * 
- * Eressea PB(E)M host Copyright (C) 1998-2000
+ * Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -14,6 +14,9 @@
 
 #ifndef GOODIES_H
 #define GOODIES_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern int *intlist_init(void);
 extern int *intlist_add(int *i_p, int i);
@@ -31,4 +34,7 @@ extern char *fstrncat(char * buffer, const char * str, unsigned int size);
 #define GR_ARTICLE     0x10
 #define GR_INDEFINITE_ARTICLE     0x20
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* GOODIES_H */

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  * 
- * Eressea PB(E)M host Copyright (C) 1998-2000
+ * Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -14,6 +14,9 @@
 
 #ifndef ALP_H
 #define ALP_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct castorder;
 /* ------------------------------------------------------------- */
@@ -43,5 +46,7 @@ struct unit* alp_target(struct unit *alp);
 void alp_findet_opfer(struct unit *alp, struct region *r);
 	
 	
-
+#ifdef __cplusplus
+}
+#endif
 #endif

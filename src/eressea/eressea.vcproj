@@ -228,6 +228,12 @@
 			RelativePath="..\common\settings-tutorial.h">
 		</File>
 		<File
+			RelativePath="..\common\settings-vinyambar-3.h">
+		</File>
+		<File
+			RelativePath="..\common\settings-vinyambar-4.h">
+		</File>
+		<File
 			RelativePath="..\common\settings-vinyambar-classic.h">
 		</File>
 		<File

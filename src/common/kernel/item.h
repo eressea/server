@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -11,8 +11,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef _ITEM_H
-#define _ITEM_H
+#ifndef H_KRNL_ITEM
+#define H_KRNL_ITEM
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct unit;
 struct attrib;
@@ -139,7 +142,7 @@ extern luxury_type * luxurytypes;
 
 typedef struct herb_type {
 	struct herb_type * next;
-	const item_type * itype;
+	const struct item_type * itype;
 	terrain_t terrain;
 } herb_type;
 extern herb_type * herbtypes;
@@ -211,12 +214,6 @@ extern weapon_type * wt_find(const char * name);
 
 extern void it_register(item_type * it);
 extern void wt_register(weapon_type * wt);
-
-extern struct attrib_type at_weapon;
-extern struct attrib_type at_item;
-extern struct attrib_type at_herb;
-extern struct attrib_type at_luxury;
-extern struct attrib_type at_potion;
 
 extern const item_type * resource2item(const resource_type * rtype);
 extern const resource_type * item2resource(const item_type * i);
@@ -525,11 +522,11 @@ enum {
 	NORESOURCE = (resource_t) - 1
 };
 
-extern luxury_type * oldluxurytype[];
-extern potion_type * oldpotiontype[];
+extern struct luxury_type * oldluxurytype[];
+extern struct potion_type * oldpotiontype[];
 extern struct item_type * olditemtype[];
-extern resource_type * oldresourcetype[];
-extern herb_type * oldherbtype[];
+extern struct resource_type * oldresourcetype[];
+extern struct herb_type * oldherbtype[];
 
 int get_item(const struct unit *, item_t);
 int set_item(struct unit *, item_t, int);
@@ -560,4 +557,7 @@ extern const char* resname(resource_t res, int index);
 
 extern int xml_readresource(FILE * F, struct xml_stack * stack);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _ITEM_H */

@@ -195,9 +195,6 @@
 				RelativePath=".\curse.h">
 			</File>
 			<File
-				RelativePath=".\economy.h">
-			</File>
-			<File
 				RelativePath=".\eressea.h">
 			</File>
 			<File

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -14,6 +14,9 @@
 
 #ifndef TELEPORT_H
 #define TELEPORT_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define TE_CENTER_X	1000
 #define TE_CENTER_Y	1000
@@ -31,4 +34,7 @@ struct regionlist *allinhab_in_range(const struct region *r, int n);
 void create_teleport_plane(void);
 void set_teleport_plane_regiontypes(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

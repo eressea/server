@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -280,19 +280,10 @@ skill_weeks(int level)
 void 
 reduce_skill(unit * u, skill * sv, unsigned int weeks)
 {
-	int reroll = false;
-	while (sv->level>0 && weeks>sv->level) {
-		weeks -= sv->level;
+	sv->weeks+=weeks;
+	while (sv->level>0 && sv->level*2+1<sv->weeks) {
+		sv->weeks -= sv->level;
 		--sv->level;
-	}
-	if (sv->level*2+1<sv->weeks) reroll = true;
-	if (sv->level>0) {
-		sv->weeks+=weeks;
-		while (sv->level!=0 && sv->weeks>sv->level) {
-			weeks = sv->weeks-sv->level;
-			--sv->level;
-			sv->weeks = weeks;
-		}
 	}
 	if (sv->level==0) {
 		/* reroll */

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -21,7 +21,6 @@
 
 #define RESERVE_DONATIONS 1 /* shall we reserve objects given to us by other factions? */
 #define RESERVE_GIVE 1 /* reserve anything that's given from one unit to another? */
-#define TWOPASS_GIVE 0 /* give items in two passes: first to others, than to self */
 
 #include <config.h>
 #include "eressea.h"
@@ -98,6 +97,15 @@ static int entertaining;
 static int norders;
 static request *oa;
 
+static int 
+giverestriction() {
+	static int value = -1;
+	if (value<0) {
+		value = atoi(get_param(global.parameters, "GiveRestriction"));
+	}
+	return value;
+}
+
 int
 income(const unit * u)
 {
@@ -121,13 +129,13 @@ static struct scramble {
 	int rnd;
 } * vec;
 
-int
+static int
 scramblecmp(const void *p1, const void *p2)
 {
 	return ((struct scramble *)p1)->rnd - ((struct scramble *)p2)->rnd;
 }
 
-void
+static void
 scramble(void *data, int n, size_t width)
 {
 	int i;
@@ -348,7 +356,7 @@ expandrecruit(region * r, request * recruitorders)
 	}
 }
 
-void
+static void
 recruit(region * r, unit * u, strlist * S,
 		request ** recruitorders)
 {
@@ -374,7 +382,7 @@ recruit(region * r, unit * u, strlist * S,
 			unit *u2;
 
 			for (u2 = r->units; u2; u2 = u2->next)
-				if (fval(u2, FL_WARMTH)) {
+				if (fval(u2, UFL_WARMTH)) {
 					usepotion = true;
 					break;
 				}
@@ -467,7 +475,7 @@ recruit(region * r, unit * u, strlist * S,
 }
 /* ------------------------------------------------------------- */
 
-int
+static int
 count_max_migrants(faction * f)
 {
 	int x = (int)(log10(count_all(f) / 50.0) * 20);
@@ -476,7 +484,7 @@ count_max_migrants(faction * f)
 
 extern const char* resname(resource_t res, int i);
 
-void
+static void
 add_give(unit * u, unit * u2, int n, const resource_type * rtype, const char * cmd, int error)
 {
 	if (error)
@@ -494,7 +502,7 @@ add_give(unit * u, unit * u2, int n, const resource_type * rtype, const char * c
 	}
 }
 
-void
+static void
 addgive(unit * u, unit * u2, int n, resource_t res, const char * cmd, int error)
 {
 	add_give(u, u2, n, oldresourcetype[res], cmd, error);
@@ -504,7 +512,7 @@ addgive(unit * u, unit * u2, int n, resource_t res, const char * cmd, int error)
 
 /* Derzeit fallen nur Silber und Pferde an die Region
  * */
-void
+static void
 give_peasants(int n, const item_type * itype, unit * src)
 {
 	region *r = src->region;
@@ -516,17 +524,18 @@ give_peasants(int n, const item_type * itype, unit * src)
 	}
 }
 
-int
+static int
 give_item(int want, const item_type * itype, unit * src, unit * dest, const char * cmd)
 {
 	short error = 0;
 	int n;
+
 	assert(itype!=NULL);
 	n = new_get_pooled(src, item2resource(itype), GET_DEFAULT);
 	n = min(want, n);
-	if (dest && src->faction != dest->faction && src->faction->age < GIVERESTRICTION) {
+	if (dest && src->faction != dest->faction && src->faction->age < giverestriction()) {
 		ADDMSG(&src->faction->msgs, msg_error(src, cmd, "giverestriction",
-					"turns", GIVERESTRICTION));
+					"turns", giverestriction()));
 		return -1;
 	} else if (n == 0) {
 		error = 36;
@@ -564,16 +573,16 @@ TODO: Einen Trigger benutzen!
 	return 0;
 }
 
-void
+static void
 givemen(int n, unit * u, unit * u2, const char * cmd)
 {
 	ship *sh;
 	int k = 0;
 	int error = 0;
 
-	if (u2 && u->faction != u2->faction && u->faction->age < GIVERESTRICTION) {
+	if (u2 && u->faction != u2->faction && u->faction->age < giverestriction()) {
 		ADDMSG(&u->faction->msgs, msg_error(u, cmd, "giverestriction",
-					"turns", GIVERESTRICTION));
+					"turns", giverestriction()));
 		return;
 	} else if (u == u2) {
 		error = 10;
@@ -584,9 +593,9 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 #endif
 	} else if ((u && unit_has_cursed_item(u)) || (u2 && unit_has_cursed_item(u2))) {
 		error = 78;
-	} else if (fval(u, FL_LOCKED) || fval(u, FL_HUNGER) || is_cursed(u->attribs, C_SLAVE, 0)) {
+	} else if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER) || is_cursed(u->attribs, C_SLAVE, 0)) {
 		error = 74;
-	} else if (u2 && (fval(u2, FL_LOCKED)|| is_cursed(u2->attribs, C_SLAVE, 0))) {
+	} else if (u2 && (fval(u2, UFL_LOCKED)|| is_cursed(u2->attribs, C_SLAVE, 0))) {
 		error = 75;
 	} else if (u2 != (unit *) NULL
 			&& u2->faction != u->faction
@@ -687,7 +696,7 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 		return;
 	}
 
-	if (fval(u, FL_LOCKED) || fval(u, FL_HUNGER)) {
+	if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)) {
 		cmistake(u, S->s, 74, MSG_COMMERCE);
 		return;
 	}
@@ -793,7 +802,7 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 }
 
 static void
-dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
+dogive(region * r, unit * u, strlist * S, int mode)
 	/*
 	 * mode=0: give to any units
 	 * mode=1: give to other units and peasants only
@@ -816,12 +825,6 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 			/* not to myself */
 			if (u2 && u2->faction==u->faction) return;
 			break;
-#if TWOPASS_GIVE
-		case 2:
-			/* not to peasants or others */
-			if (!u2 || u2->faction!=u->faction) return;
-			break;
-#endif
 		default:
 			assert(!"invalid mode for dogive");
 	}
@@ -831,7 +834,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 	}
 
 	/* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
-	if (u2 && (!cansee(u->faction,r,u2,0) && !ucontact(u2, u) && !fval(u2, FL_TAKEALL))) {
+	if (u2 && (!cansee(u->faction,r,u2,0) && !ucontact(u2, u) && !fval(u2, UFL_TAKEALL))) {
 		cmistake(u, S->s, notfound_error, MSG_COMMERCE);
 		return;
 	}
@@ -840,9 +843,9 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 		return;
 	}
 
-	/* FL_TAKEALL ist ein grober Hack. Generalisierung tut not, ist aber nicht
+	/* UFL_TAKEALL ist ein grober Hack. Generalisierung tut not, ist aber nicht
 	 * wirklich einfach. */
-	if (r->planep && fval(r->planep, PFL_NOGIVE) && (!u2 || !fval(u2, FL_TAKEALL))) {
+	if (r->planep && fval(r->planep, PFL_NOGIVE) && (!u2 || !fval(u2, UFL_TAKEALL))) {
 		cmistake(u, S->s, 268, MSG_COMMERCE);
 		return;
 	}
@@ -866,7 +869,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 			cmistake(u, S->s, 32, MSG_EVENT);
 			return;
 		}
-		if (!fval(u, FL_OWNER)) {
+		if (!fval(u, UFL_OWNER)) {
 			cmistake(u, S->s, 49, MSG_EVENT);
 			return;
 		}
@@ -874,13 +877,13 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 			cmistake(u, S->s, 40, MSG_EVENT);
 			return;
 		}
-		freset(u, FL_OWNER);
-		fset(u2, FL_OWNER);
+		freset(u, UFL_OWNER);
+		fset(u2, UFL_OWNER);
 
-		add_message(&u->faction->msgs,
+    ADDMSG(&u->faction->msgs,
 				msg_message("givecommand", "unit receipient", u, u2));
 		if (u->faction != u2->faction) {
-			add_message(&u2->faction->msgs,
+      ADDMSG(&u2->faction->msgs,
 					msg_message("givecommand", "unit receipient",
 						ucansee(u2->faction, u, u_unknown()), u2));
 		}
@@ -891,15 +894,15 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 		return;
 	}
 
-	/* if ((u->race->ec_flags & NOGIVE) || fval(u,FL_LOCKED)) {*/
+  /* if ((u->race->ec_flags & NOGIVE) || fval(u,UFL_LOCKED)) {*/
 	if (u->race->ec_flags & NOGIVE && u2!=NULL) {
-		add_message(&u->faction->msgs,
+    ADDMSG(&u->faction->msgs,
 				msg_error(u, S->s, "race_nogive", "race", u->race));
 		return;
 	}
 	/* sperrt hier auch personenübergaben!
 	if (u2 && !(u2->race->ec_flags & GETITEM)) {
-		add_message(&u->faction->msgs,
+    ADDMSG(&u->faction->msgs,
 				msg_error(u, S->s, "race_notake", "race", u2->race));
 		return;
 	}
@@ -909,7 +912,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 	if (findparam(s, u->faction->locale) == P_HERBS) {
     boolean given = false;
 		if (!(u->race->ec_flags & GIVEITEM)) {
-			add_message(&u->faction->msgs,
+      ADDMSG(&u->faction->msgs,
 					msg_error(u, S->s, "race_nogive", "race", u->race));
 			return;
 		}
@@ -970,7 +973,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 
 		if (*s == 0) {
 			if (!(u->race->ec_flags & GIVEITEM)) {
-				add_message(&u->faction->msgs,
+        ADDMSG(&u->faction->msgs,
 						msg_error(u, S->s, "race_nogive", "race", u->race));
 				return;
 			}
@@ -998,7 +1001,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 		i = findparam(s, u->faction->locale);
 		if (i == P_PERSON) {
 			if (!(u->race->ec_flags & GIVEPERSON)) {
-				add_message(&u->faction->msgs,
+        ADDMSG(&u->faction->msgs,
 						msg_error(u, S->s, "race_noregroup", "race", u->race));
 				return;
 			}
@@ -1008,7 +1011,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 		}
 
 		if (!(u->race->ec_flags & GIVEITEM)) {
-			add_message(&u->faction->msgs,
+      ADDMSG(&u->faction->msgs,
 					msg_error(u, S->s, "race_nogive", "race", u->race));
 			return;
 		}
@@ -1048,7 +1051,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 	i = findparam(s, u->faction->locale);
 	if (i == P_PERSON) {
 		if (!(u->race->ec_flags & GIVEPERSON)) {
-			add_message(&u->faction->msgs,
+      ADDMSG(&u->faction->msgs,
 					msg_error(u, S->s, "race_noregroup", "race", u->race));
 			return;
 		}
@@ -1058,7 +1061,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 
   if (u2!=NULL) {
     if (!(u->race->ec_flags & GIVEITEM)) {
-      add_message(&u->faction->msgs,
+      ADDMSG(&u->faction->msgs,
         msg_error(u, S->s, "race_nogive", "race", u->race));
       return;
     }
@@ -1077,16 +1080,15 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 	cmistake(u, S->s, 123, MSG_COMMERCE);
 }
 /* ------------------------------------------------------------- */
-void
+static void
 forgetskill(unit * u)
 {
 	skill_t talent;
 	const char *s = getstrtoken();
 
 	if ((talent = findskill(s, u->faction->locale)) != NOSKILL) {
-		struct message * m = add_message(&u->faction->msgs,
+    ADDMSG(&u->faction->msgs,
 				msg_message("forget", "unit skill", u, talent));
-		msg_release(m);
 		set_level(u, talent, 0);
 	}
 }
@@ -1258,7 +1260,7 @@ gebaeude_stuerzt_ein(region * r, building * b)
 			int loss = 0;
 
 			fset(u->faction, FL_MARK);
-			freset(u, FL_OWNER);
+			freset(u, UFL_OWNER);
 			leave(r,u);
 			n = u->number;
 			for (i = 0; i < n; i++) {
@@ -1333,11 +1335,8 @@ economics(void)
 						break;
 
 					case K_GIVE:
-						dogive(r, u, S, S->s[0]=='@'?true:false, TWOPASS_GIVE);
-						break;
-
 					case K_LIEFERE:
-						dogive(r, u, S, true, TWOPASS_GIVE);
+            dogive(r, u, S, 0);
 						break;
 
 					case K_FORGET:
@@ -1347,20 +1346,6 @@ economics(void)
 				}
 			}
 		}
-#if TWOPASS_GIVE
-		for (u = r->units; u; u = u->next) {
-			for (S = u->orders; S; S = S->next) {
-				switch (igetkeyword(S->s, u->faction->locale)) {
-					case K_GIVE:
-						dogive(r, u, S, S->s[0]=='@'?true:false, 2);
-						break;
-					case K_LIEFERE:
-						dogive(r, u, S, true, 2);
-						break;
-				}
-			}
-		}
-#endif
 		/* RECRUIT orders */
 
 		for (u = r->units; u; u = u->next) {
@@ -1472,7 +1457,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 	int amount, skill;
 
 	/* momentan kann man keine ressourcen abbauen, wenn man dafür
-	 * materialverbruach hat: */
+   * Materialverbrauch hat: */
 	assert(itype!=NULL && itype->construction->materials==NULL);
 
 	if (itype == olditemtype[I_WOOD] && fval(r, RF_MALLORN)) {
@@ -2097,7 +2082,7 @@ attrib_type at_trades = {
 	NO_READ
 };
 
-void
+static void
 buy(region * r, unit * u, request ** buyorders, const char * cmd)
 {
 	int n, k;
@@ -2184,7 +2169,7 @@ buy(region * r, unit * u, request ** buyorders, const char * cmd)
 	o->qty = n;
 	addlist(buyorders, o);
 
-	if (n && !fval(u, FL_TRADER)) fset(u, FL_TRADER);
+  if (n) fset(u, UFL_TRADER);
 }
 /* ------------------------------------------------------------- */
 
@@ -2365,7 +2350,7 @@ expandselling(region * r, request * sellorders)
 	}
 }
 
-void
+static void
 sell(region * r, unit * u, request ** sellorders, const char * cmd)
 {
 	const item_type * itype;
@@ -2485,7 +2470,7 @@ sell(region * r, unit * u, request ** sellorders, const char * cmd)
 		o->type.ltype = ltype;
 		addlist(sellorders, o);
 
-		if (n && !fval(u, FL_TRADER)) fset(u, FL_TRADER);
+    if (n) fset(u, UFL_TRADER);
 	}
 }
 /* ------------------------------------------------------------- */
@@ -2528,7 +2513,7 @@ expandstealing(region * r, request * stealorders)
 			use_all(u, R_SILVER, n);
 			oa[i].unit->n = n;
 			change_money(oa[i].unit, n);
-			add_message(&u->faction->msgs, msg_message("stealeffect", "unit region amount", u, u->region, n));
+			ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount", u, u->region, n));
 		}
 		add_income(oa[i].unit, IC_STEAL, oa[i].unit->wants, oa[i].unit->n);
 	}
@@ -2536,7 +2521,7 @@ expandstealing(region * r, request * stealorders)
 }
 
 /* ------------------------------------------------------------- */
-void
+static void
 plant(region *r, unit *u, int raw)
 {
 	int n, i, skill, planted = 0;
@@ -2652,7 +2637,7 @@ planttrees(region *r, unit *u, int raw)
 }
 
 /* züchte bäume */
-void
+static void
 breedtrees(region *r, unit *u, int raw)
 {
 	int n, i, skill, planted = 0;
@@ -2711,7 +2696,7 @@ breedtrees(region *r, unit *u, int raw)
 
 #endif
 
-void
+static void
 pflanze(region *r, unit *u)
 {
 	int m;
@@ -2747,7 +2732,7 @@ pflanze(region *r, unit *u)
 		return;
 	}
 	else if (itype!=NULL){
-		if (itype==&it_mallornseed || itype==&it_seed){
+		if (itype==&it_mallornseed || itype==&it_seed) {
 			breedtrees(r, u, m);
 			return;
 		}
@@ -2757,7 +2742,7 @@ pflanze(region *r, unit *u)
 
 
 /* züchte pferde */
-void
+static void
 breedhorses(region *r, unit *u)
 {
 	int n, c;
@@ -2790,7 +2775,7 @@ breedhorses(region *r, unit *u)
 				"raised%u:unit%i:amount", u, gezuechtet));
 }
 
-void
+static void
 zuechte(region *r, unit *u)
 {
 	int m;
@@ -2879,7 +2864,7 @@ research(region *r, unit *u)
 	}
 }
 
-int
+static int
 wahrnehmung(region * r, faction * f)
 {
 	unit *u;
@@ -2900,7 +2885,7 @@ wahrnehmung(region * r, faction * f)
 	return w;
 }
 
-void
+static void
 steal(region * r, unit * u, request ** stealorders)
 {
 	int n, i, id;
@@ -3063,6 +3048,10 @@ entertain(region * r, unit * u)
 {
 	int max_e;
 	request *o;
+	static int entertainbase = 0;
+	static int entertainperlevel = 0;
+	if (!entertainbase) entertainbase = atoi(get_param(global.parameters, "entertain.base"));
+	if (!entertainperlevel) entertainperlevel = atoi(get_param(global.parameters, "entertain.perlevel"));
 
 	if (fval(u, UFL_WERE)) {
 		cmistake(u, findorder(u, u->thisorder), 58, MSG_INCOME);
@@ -3086,7 +3075,7 @@ entertain(region * r, unit * u)
 		return;
 	}
 
-	u->wants = u->number * (ENTERTAINBASE + effskill(u, SK_ENTERTAINMENT) * ENTERTAINPERLEVEL);
+	u->wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT) * entertainperlevel);
 	if ((max_e = geti()) != 0)
 		u->wants = min(u->wants,max_e);
 
@@ -3294,7 +3283,7 @@ produce(void)
 		for (u = r->units; u; u = u->next) {
 			strlist * s;
 
-			if (u->race == new_race[RC_SPELL] || fval(u, FL_LONGACTION))
+			if (u->race == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
 				continue;
 
 			if (u->race == new_race[RC_INSECT] && r_insectstalled(r) &&
@@ -3306,25 +3295,26 @@ produce(void)
 				continue;
 			}
 
-			for (s=u->orders;s;s=s->next) {
-				todo = igetkeyword(s->s, u->faction->locale);
-				switch (todo) {
+			if (!TradeDisabled()) {
+				for (s=u->orders;s;s=s->next) {
+					todo = igetkeyword(s->s, u->faction->locale);
+					switch (todo) {
 					case K_BUY:
 						buy(r, u, &buyorders, s->s);
 						break;
 					case K_SELL:
 						sell(r, u, &sellorders, s->s);
 						break;
+					}
 				}
-			}
-
-			if (fval(u, FL_TRADER)) {
-				attrib * a = a_find(u->attribs, &at_trades);
-				if (a && a->data.i) {
-					produceexp(u, SK_TRADE, u->number);
+				if (fval(u, UFL_TRADER)) {
+					attrib * a = a_find(u->attribs, &at_trades);
+					if (a && a->data.i) {
+						produceexp(u, SK_TRADE, u->number);
+					}
+					u->thisorder[0]=0;
+					continue;
 				}
-				u->thisorder[0]=0;
-				continue;
 			}
 
 			todo = igetkeyword(u->thisorder, u->faction->locale);
@@ -3383,11 +3373,11 @@ produce(void)
 			}
 		}
 
+		split_allocations(r);
 		/* Entertainment (expandentertainment) und Besteuerung (expandtax) vor den
 		 * Befehlen, die den Bauern mehr Geld geben, damit man aus den Zahlen der
 		 * letzten Runde berechnen kann, wieviel die Bauern für Unterhaltung
 		 * auszugeben bereit sind. */
-		split_allocations(r);
 		if (entertaining) expandentertainment(r);
 		expandwork(r);
 		if (taxorders) expandtax(r, taxorders);

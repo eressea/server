@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -69,7 +69,7 @@ SpecialFunctionUnit(unit *u)
 			sh->size = 5;
 			leave(u->region, u);
 			u->ship = sh;
-			fset(u, FL_OWNER);
+			fset(u, UFL_OWNER);
 		}
 		break;
 	case 'm':
@@ -481,7 +481,7 @@ modify_unit(region * r, unit * modunit)
 		Movexy(3, ++y);
 		wprintw(mywin, (NCURSES_CONST char*)"Silber: %d", get_money(u));
 		Movexy(3, ++y);
-		at = fval(modunit, FL_PARTEITARNUNG);
+		at = fval(modunit, UFL_PARTEITARNUNG);
 		wprintw(mywin, (NCURSES_CONST char*)"Parteitarnung: %s", at ? "an" : "aus");
 		Movexy(3, ++y);
 		Addstr("Dämonentarnung: ");
@@ -613,13 +613,13 @@ modify_unit(region * r, unit * modunit)
 				break;
 			case 'p':
 				q = (int) yes_no(0, "Parteitarnung?",
-							 (char) ((fval(modunit, FL_PARTEITARNUNG))
+							 (char) ((fval(modunit, UFL_PARTEITARNUNG))
 								 ? 'j' : 'n'));
 				if (at && !q) {
-					freset(modunit, FL_PARTEITARNUNG);
+					freset(modunit, UFL_PARTEITARNUNG);
 					modif = 1;
 				} else if (!at && q) {
-					fset(modunit, FL_PARTEITARNUNG);
+					fset(modunit, UFL_PARTEITARNUNG);
 					modif = 1;
 				}
 				break;
@@ -836,7 +836,7 @@ mapper_spunit(dbllist ** SP, unit * u, int indent)
 	sncat(buf, ", ", BUFSIZE);
 	sncat(buf, factionname(u->faction), BUFSIZE);
 
-	if (fval(u, FL_PARTEITARNUNG))
+	if (fval(u, UFL_PARTEITARNUNG))
 		sncat(buf, " (getarnt)", BUFSIZE);
 
 	sncat(buf, ", ", BUFSIZE);
@@ -967,13 +967,13 @@ showunits(region * r)
 		adddbllist(&eh, lbuf);
 		adddbllist(&eh, " ");
 		for (u = r->units; u; u = u->next) {
-			if (u->building == b && fval(u, FL_OWNER)) {
+			if (u->building == b && fval(u, UFL_OWNER)) {
 				mapper_spunit(&eh, u, 4);
 				break;
 			}
 		}
 		for (u = r->units; u; u = u->next) {
-			if (u->building == b && !fval(u, FL_OWNER)) {
+			if (u->building == b && !fval(u, UFL_OWNER)) {
 				mapper_spunit(&eh, u, 4);
 			}
 		}
@@ -998,13 +998,13 @@ showunits(region * r)
 		adddbllist(&eh, lbuf);
 		adddbllist(&eh, " ");
 		for (u = r->units; u; u = u->next) {
-			if (u->ship == sh && fval(u, FL_OWNER)) {
+			if (u->ship == sh && fval(u, UFL_OWNER)) {
 				mapper_spunit(&eh, u, 4);
 				break;
 			}
 		}
 		for (u = r->units; u; u = u->next) {
-			if (u->ship == sh && !fval(u, FL_OWNER))
+			if (u->ship == sh && !fval(u, UFL_OWNER))
 				mapper_spunit(&eh, u, 4);
 		}
 	}
@@ -1223,12 +1223,12 @@ showunits(region * r)
 						sprintf(lbuf, "Einheit in %s als Eigner?", BuildingName(b));
 						if (yes_no(0, lbuf, 'j')) {
 							for (x = r->units; x; x = x->next)
-								if (x->building == b && fval(x, FL_OWNER)) {
-									freset(x, FL_OWNER);
+								if (x->building == b && fval(x, UFL_OWNER)) {
+									freset(x, UFL_OWNER);
 									break;
 								}
 							u->building = b;
-							fset(u, FL_OWNER);
+							fset(u, UFL_OWNER);
 						}
 						break;
 					case '\023':
@@ -1237,12 +1237,12 @@ showunits(region * r)
 							sprintf(lbuf, "Einheit auf%s als Eigner?", shipname(sh));
 							if (yes_no(0, lbuf, 'j')) {
 								for (x = r->units; x; x = x->next)
-									if (x->ship == sh && fval(x, FL_OWNER)) {
-										freset(x, FL_OWNER);
+									if (x->ship == sh && fval(x, UFL_OWNER)) {
+										freset(x, UFL_OWNER);
 										break;
 									}
 								u->ship = sh;
-								fset(u, FL_OWNER);
+								fset(u, UFL_OWNER);
 							}
 						}
 						break;
@@ -1302,15 +1302,15 @@ showunits(region * r)
 					for (x = shipregion->units; x;) {
 						un = x->next;
 						if (x->ship == clipship) {
-							f = (int) fval(x, FL_OWNER);
+							f = (int) fval(x, UFL_OWNER);
 							leave(shipregion, x);
 							translist(&shipregion->units, &r->units, x);
 							x->ship = clipship;
 							if (owner_set == false && f) {
 								owner_set = true;
-								fset(x, FL_OWNER);
+								fset(x, UFL_OWNER);
 							} else {
-								freset(x, FL_OWNER);
+								freset(x, UFL_OWNER);
 							}
 						}
 						x = un;
@@ -1427,19 +1427,19 @@ showunits(region * r)
 							f = atoi36(s);
 							b = findbuilding(f);
 							for (x = r->units; x; x = x->next)
-								if (x->building == b && fval(x, FL_OWNER))
-									freset(x, FL_OWNER);
+								if (x->building == b && fval(x, UFL_OWNER))
+									freset(x, UFL_OWNER);
 							clipunit->building = b;
-							fset(clipunit, FL_OWNER);
+							fset(clipunit, UFL_OWNER);
 							break;
 						case '\023':
 							f = atoi(s);
 							sh = findship(f);
 							for (x = r->units; x; x = x->next)
-								if (x->ship == sh && fval(x, FL_OWNER))
-									freset(x, FL_OWNER);
+								if (x->ship == sh && fval(x, UFL_OWNER))
+									freset(x, UFL_OWNER);
 							clipunit->ship = sh;
-							fset(clipunit, FL_OWNER);
+							fset(clipunit, UFL_OWNER);
 							break;
 						}
 				}

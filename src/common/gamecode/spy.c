@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -25,7 +25,6 @@
 
 /* kernel includes */
 #include "build.h"
-#include "creation.h"
 #include "economy.h"
 #include "item.h"
 #include "karma.h"
@@ -210,9 +209,9 @@ setstealth(unit * u, strlist * S)
 		/* TARNE PARTEI [NICHT|NUMMER abcd] */
 		s = getstrtoken();
 		if(!s || *s == 0) {
-			fset(u, FL_PARTEITARNUNG);
+			fset(u, UFL_PARTEITARNUNG);
 		} else if (findparam(s, u->faction->locale) == P_NOT) {
-			freset(u, FL_PARTEITARNUNG);
+			freset(u, UFL_PARTEITARNUNG);
 		} else if (findkeyword(s, u->faction->locale) == K_NUMBER) {
 			const char *s2 = getstrtoken();
 			int nr = -1;

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -12,8 +12,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef WEATHER_H
-#define WEATHER_H
+#ifndef H_MOD_WEATHER_H
+#define H_MOD_WEATHER_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef WEATHER
 # error "the weather system is disabled"
@@ -41,4 +44,7 @@ weather *weathers;
 void     set_weather(void);
 void     move_weather(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

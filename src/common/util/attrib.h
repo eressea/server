@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -14,6 +14,9 @@
 
 #ifndef ATTRIB_H
 #define ATTRIB_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdio.h>
 
@@ -32,8 +35,8 @@ typedef struct attrib {
 		char ca[4];
 	} data;
 	/* internal data, do not modify: */
-	struct attrib * next;
-	struct attrib * nexttype;
+	struct attrib * next; /* next attribute in the list */
+	struct attrib * nexttype; /* next attribute of same type */
 } attrib;
 
 #define ATF_UNIQUE   (1<<0) /* only one per attribute-list */
@@ -47,7 +50,7 @@ typedef struct attrib_type {
 	int  (*age)(struct attrib *);
 	/* age returns 0 if the attribute needs to be removed, !=0 otherwise */
 	void (*write)(const struct attrib *, FILE*);
-	int  (*read)(struct attrib *, FILE*); /* return 1 on success, 0 if attrib needs removal */
+	int  (*read)(struct attrib *, FILE*); /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
 	unsigned int flags;
 	/* ---- internal data, do not modify: ---- */
 	struct attrib_type * nexthash;
@@ -65,6 +68,7 @@ extern void at_register(attrib_type * at);
 
 extern attrib * a_select(attrib * a, const void * data, boolean(*compare)(const attrib *, const void *));
 extern attrib * a_find(attrib * a, const attrib_type * at);
+extern const attrib * a_findc(const attrib * a, const attrib_type * at);
 extern attrib * a_add(attrib ** pa, attrib * at);
 extern int a_remove(attrib ** pa, attrib * at);
 extern void a_removeall(attrib ** a, const attrib_type * at);
@@ -86,4 +90,7 @@ extern void a_write(FILE * f, const attrib * attribs);
 #define AT_READ_OK 4711
 #define AT_READ_FAIL -4711
 
+#ifdef __cplusplus
+}
+#endif
 #endif

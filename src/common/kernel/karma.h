@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -10,8 +10,11 @@
  * This program may not be used, modified or distributed without
  * prior permission by the authors of Eressea.
  */
-#ifndef KARMA_H
-#define KARMA_H
+#ifndef H_KRNL_KARMA
+#define H_KRNL_KARMA
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct faction;
 
@@ -68,4 +71,7 @@ extern void set_jihad(void);
 extern int jihad(struct faction *, const struct race *);
 extern void jihad_attacks(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

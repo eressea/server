@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -14,6 +14,10 @@
 
 #ifndef WINDIR_H
 #define WINDIR_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdlib.h>
 #include <io.h>
 typedef struct DIR {
@@ -33,4 +37,7 @@ typedef struct dirent {
 DIR *opendir(const char *name);
 struct dirent *readdir(DIR * thedir);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

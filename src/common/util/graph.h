@@ -2,7 +2,7 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
@@ -12,6 +12,9 @@
 
 #ifndef GRAPH_H
 #define GRAPH_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct node {
 	int  marker;
@@ -29,4 +32,7 @@ typedef struct graph {
 	vset edges;
 } graph;
 
+#ifdef __cplusplus
+}
+#endif
 #endif

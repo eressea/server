@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -19,8 +19,19 @@
  * permission from the authors.
  */
 
+#ifndef H_UTIL_BASE36
+#define H_UTIL_BASE36
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern int atoi36(const char * s);
 extern const char* itoab(int i, int base);
 extern const char* itoa36(int i);
 extern const char* itoa10(int i);
 extern int i10toi36(int i);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

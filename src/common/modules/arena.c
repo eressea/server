@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -159,7 +159,7 @@ enter_arena(unit * u, const item_type * itype, int amount, const char * cmd)
 	new_use_pooled(u, &rt_gryphonwing, GET_SLACK|GET_RESERVE, 1);
 	use_pooled(u, r, R_SILVER, fee);
 	set_money(u, 109);
-	fset(u, FL_PARTEITARNUNG);
+	fset(u, UFL_PARTEITARNUNG);
 	move_unit(u, start_region[rand() % 6], NULL);
 	return 0;
 }
@@ -371,7 +371,7 @@ guardian_faction(plane * pl, int id)
 		set_item(u, I_RING_OF_INVISIBILITY, 1);
 		u->thisorder = calloc(1, sizeof(char));
 		u->lastorder = calloc(1, sizeof(char));
-		fset(u, FL_PARTEITARNUNG);
+		fset(u, UFL_PARTEITARNUNG);
 		set_money(u, 1000);
 	}
 }
@@ -534,7 +534,7 @@ create_arena(void)
 }
 
 void
-init_arena(void)
+register_arena(void)
 {
 	at_register(&at_hurting);
 	register_demonseye();

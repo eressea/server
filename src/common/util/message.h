@@ -2,7 +2,7 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
@@ -11,6 +11,10 @@
 */
 #ifndef UTIL_MESSAGE_H
 #define UTIL_MESSAGE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct locale;
 
 typedef struct message_type {
@@ -44,4 +48,8 @@ extern const char * mt_name(const struct message_type* mtype);
 /** message_type registry (optional): **/
 extern const struct message_type * mt_register(const struct message_type *);
 extern const struct message_type * mt_find(const char *);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -12,8 +12,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef SHOCK_H
-#define SHOCK_H
+#ifndef H_TRG_SHOCK_H
+#define H_TRG_SHOCK_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct trigger_type;
 struct trigger;
@@ -23,4 +26,7 @@ struct unit;
 extern struct trigger_type tt_shock;
 extern struct trigger * trigger_shock(struct unit * u);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

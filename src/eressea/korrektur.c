@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -25,16 +25,12 @@
 #include <attributes/key.h>
 #include <items/questkeys.h>
 #include <items/catapultammo.h>
-#include <modules/xmas2000.h>
-#include <modules/xmas2001.h>
-#include <modules/xmas2002.h>
 #include <modules/xecmd.h>
 #ifdef ALLIANCES
 #include <modules/alliance.h>
 #endif
 
 /* gamecode includes */
-#include <creation.h>
 #include <economy.h>
 
 /* kernel includes */
@@ -208,26 +204,26 @@ verify_owners(boolean bOnce)
 		for (u=r->units;u;u=u->next) {
 			if (u->building) {
 				unit * bo = buildingowner(r, u->building);
-				if (!fval(bo, FL_OWNER)) {
-					log_error(("[verify_owners] %u ist Besitzer von %s, hat aber FL_OWNER nicht.\n", unitname(bo), buildingname(u->building)));
+				if (!fval(bo, UFL_OWNER)) {
+					log_error(("[verify_owners] %u ist Besitzer von %s, hat aber UFL_OWNER nicht.\n", unitname(bo), buildingname(u->building)));
 					bFail = true;
 					if (bOnce) break;
 				}
-				if (bo!=u && fval(u, FL_OWNER)) {
-					log_error(("[verify_owners] %u ist NICHT Besitzer von %s, hat aber FL_OWNER.\n", unitname(u), buildingname(u->building)));
+				if (bo!=u && fval(u, UFL_OWNER)) {
+					log_error(("[verify_owners] %u ist NICHT Besitzer von %s, hat aber UFL_OWNER.\n", unitname(u), buildingname(u->building)));
 					bFail = true;
 					if (bOnce) break;
 				}
 			}
 			if (u->ship) {
 				unit * bo = shipowner(r, u->ship);
-				if (!fval(bo, FL_OWNER)) {
-					log_error(("[verify_owners] %u ist Besitzer von %s, hat aber FL_OWNER nicht.\n", unitname(bo), shipname(u->ship)));
+				if (!fval(bo, UFL_OWNER)) {
+					log_error(("[verify_owners] %u ist Besitzer von %s, hat aber UFL_OWNER nicht.\n", unitname(bo), shipname(u->ship)));
 					bFail = true;
 					if (bOnce) break;
 				}
-				if (bo!=u && fval(u, FL_OWNER)) {
-					log_error(("[verify_owners] %u ist NICHT Besitzer von %s, hat aber FL_OWNER.\n", unitname(u), shipname(u->ship)));
+				if (bo!=u && fval(u, UFL_OWNER)) {
+					log_error(("[verify_owners] %u ist NICHT Besitzer von %s, hat aber UFL_OWNER.\n", unitname(u), shipname(u->ship)));
 					bFail = true;
 					if (bOnce) break;
 				}
@@ -2360,11 +2356,11 @@ fix_idleout(void)
 
 	f = findfaction(0);
 	if(f){
-		fset(f, FL_NOIDLEOUT);
+		fset(f, FFL_NOIDLEOUT);
 	}
 	f = findfaction(atoi36("muse"));
 	if(f){
-		fset(f, FL_NOIDLEOUT);
+		fset(f, FFL_NOIDLEOUT);
 	}
 	return 0;
 }
@@ -2900,12 +2896,6 @@ korrektur_end(void)
 {
 	/* fix_balsamfiasko(); */
 	do_once("peng", astral_penger());
-#ifdef XMAS2001
-	do_once("2001", xmas2001());
-#endif
-#ifdef XMAS2002
-	do_once("2002", xmas2002());
-#endif
 
 #if PEASANT_ADJUSTMENT == 1
 	do_once("peas", peasant_adjustment());

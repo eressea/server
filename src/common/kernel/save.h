@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -21,8 +21,11 @@
 
 /* reading and writing the data files, reading the orders */
 
-#ifndef SAVE_H
-#define SAVE_H
+#ifndef H_KRNL_SAVE
+#define H_KRNL_SAVE
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 double version(void);
 
@@ -76,4 +79,7 @@ extern void writefaction(FILE * stream, const struct faction * f);
 extern struct faction * readfaction(FILE * stream);
 extern char * getbuf(FILE * F);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

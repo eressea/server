@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -12,8 +12,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef SPELLS_H
-#define SPELLS_H
+#ifndef H_KRNL_SPELLS
+#define H_KRNL_SPELLS
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct fighter;
 struct spell;
@@ -270,4 +273,7 @@ extern struct attrib_type at_cursewall;
 extern struct attrib_type at_unitdissolve;
 extern struct spell spelldaten[];
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -68,7 +68,7 @@ rc_new(const char * zName)
 {
 	char zBuffer[80];
 	race * rc = calloc(sizeof(race), 1);
-	sprintf(zBuffer, "%s", zName);
+	strcpy(zBuffer, zName);
 	rc->_name[0] = strdup(zBuffer);
 	sprintf(zBuffer, "%s_p", zName);
 	rc->_name[1] = strdup(zBuffer);
@@ -231,7 +231,7 @@ give_starting_equipment(struct region *r, struct unit *u)
 			building *b = new_building(bt_find("castle"), r, u->faction->locale);
 			b->size = 10;
 			u->building = b;
-			fset(u, FL_OWNER);
+			fset(u, UFL_OWNER);
 		}
 		break;
 	case RC_TROLL:
@@ -270,7 +270,7 @@ give_starting_equipment(struct region *r, struct unit *u)
 			sh->size = sh->type->construction->maxsize;
 			addlist(&r->ships, sh);
 			u->ship = sh;
-			fset(u, FL_OWNER);
+			fset(u, UFL_OWNER);
 		}
 		set_level(u, SK_SAILING, 1);
 		break;

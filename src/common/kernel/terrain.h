@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -21,6 +21,9 @@
 
 #ifndef TERRAIN_H
 #define TERRAIN_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define landregion(t) (t!=T_OCEAN && t!=T_FIREWALL && t!=T_ASTRAL && t!=T_ASTRALB && t!=T_FIREWALL && t!=T_HELL && t!=T_MAGICSTORM)
 enum {
@@ -91,4 +94,7 @@ typedef struct terraindata_t {
 
 extern const terraindata_t terrain[];
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* TERRAIN_H */

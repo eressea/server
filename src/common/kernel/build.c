@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -130,7 +130,7 @@ can_contact(const region * r, const unit * u, const unit * u2)
 
 
 static void
-set_contact(const region * r, unit * u, boolean try)
+set_contact(const region * r, unit * u, boolean tries)
 {
 
 	/* unit u kontaktiert unit u2. Dies setzt den contact einfach auf 1 -
@@ -144,7 +144,7 @@ set_contact(const region * r, unit * u, boolean try)
 	if (u2) {
 
 		if (!can_contact(r, u, u2)) {
-			if(try) cmistake(u, findorder(u, u->thisorder), 23, MSG_EVENT);
+			if (tries) cmistake(u, findorder(u, u->thisorder), 23, MSG_EVENT);
 			return;
 		}
 		usetcontact(u, u2);
@@ -279,7 +279,7 @@ do_siege(void)
 }
 /* ------------------------------------------------------------- */
 
-void
+static void
 destroy_road(unit *u, int n, const char *cmd)
 {
 	direction_t d = getdirection(u->faction->locale);
@@ -336,7 +336,7 @@ destroy(region * r, unit * u, const char * cmd)
 		return;
 	}
 
-	if (!fval(u, FL_OWNER)) {
+	if (!fval(u, UFL_OWNER)) {
 		cmistake(u, cmd, 138, MSG_PRODUCE);
 		return;
 	}
@@ -367,7 +367,7 @@ destroy(region * r, unit * u, const char * cmd)
 			for (u2 = r->units; u2; u2 = u2->next)
 				if (u2->building == b) {
 					u2->building = 0;
-					freset(u2, FL_OWNER);
+					freset(u2, UFL_OWNER);
 				}
 			add_message(&u->faction->msgs, new_message(
 				u->faction, "destroy%b:building%u:unit", b, u));
@@ -396,7 +396,7 @@ destroy(region * r, unit * u, const char * cmd)
 			for (u2 = r->units; u2; u2 = u2->next)
 				if (u2->ship == sh) {
 					u2->ship = 0;
-					freset(u2, FL_OWNER);
+					freset(u2, UFL_OWNER);
 				}
 			add_message(&u->faction->msgs, new_message(
 				u->faction, "shipdestroy%u:unit%r:region%h:ship", u, r, sh));
@@ -627,8 +627,7 @@ build(unit * u, const construction * ctype, int completed, int want)
 			break; /* completed */
 		}
 
-		/* ??? Was soll das (Stefan) ???
-		 *	Hier ist entweder maxsize == -1, oder completed < maxsize.
+		/*	Hier ist entweder maxsize == -1, oder completed < maxsize.
 		 *	Andernfalls ist das Datenfile oder sonstwas kaputt...
 		 *	(enno): Nein, das ist für Dinge, bei denen die nächste Ausbaustufe
 		 *  die gleiche wie die vorherige ist. z.b. gegenstände.
@@ -862,7 +861,7 @@ build_building(unit * u, const building_type * btype, int want)
 		/* Die Einheit befindet sich automatisch im Inneren der neuen Burg. */
 		leave(r, u);
 		u->building = b;
-		fset(u, FL_OWNER);
+		fset(u, UFL_OWNER);
 
 		newbuilding = 1;
 	}
@@ -965,7 +964,7 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want)
 
 	leave(r, u);
 	u->ship = sh;
-	fset(u, FL_OWNER);
+	fset(u, UFL_OWNER);
 	sprintf(buffer, "%s %s %s",
 			locale_string(u->faction->locale, keywords[K_MAKE]), locale_string(u->faction->locale, parameters[P_SHIP]), shipid(sh));
 	u->lastorder = set_string(&u->lastorder, buffer);
@@ -1034,8 +1033,7 @@ mayenter(region * r, unit * u, building * b)
 static int
 mayboard(const unit * u, const ship * sh)
 {
-	unit *u2;
-	u2 = shipowner(sh->region, sh);
+	unit *u2 = shipowner(sh->region, sh);
 
 	return (!u2
 		|| ucontact(u2, u)
@@ -1138,7 +1136,7 @@ entership(unit * u, ship * sh, const char * cmd, boolean lasttry)
 	u->ship = sh;
 
 	if (shipowner(u->region, sh) == 0) {
-		fset(u, FL_OWNER);
+		fset(u, UFL_OWNER);
 	}
 	return true;
 }
@@ -1222,7 +1220,7 @@ do_misc(boolean lasttry)
 						leave(r, u);
 						u->building = b;
 						if (buildingowner(r, b) == 0) {
-							fset(u, FL_OWNER);
+							fset(u, UFL_OWNER);
 						}
 						break;
 

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -18,8 +18,11 @@
  * permission from the authors.
  */
 
-#ifndef PLANES_H
-#define PLANES_H
+#ifndef H_KRNL_PLANES
+#define H_KRNL_PLANES
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define PFL_NOCOORDS        1
 #define PFL_NORECRUITS      2
@@ -74,4 +77,7 @@ extern void * resolve_plane(void * data);
 extern void write_plane_reference(const plane * p, FILE * F);
 extern int read_plane_reference(plane ** pp, FILE * F);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

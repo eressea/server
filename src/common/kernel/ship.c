@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -17,6 +17,7 @@
 #include "ship.h"
 
 /* kernel includes */
+#include "build.h"
 #include "unit.h"
 #include "item.h"
 #include "region.h"
@@ -140,7 +141,7 @@ captain(ship *sh, region *r)
 	unit *u;
 
 	for(u = r->units; u; u = u->next)
-		if(u->ship == sh && fval(u, FL_OWNER)) return u;
+		if(u->ship == sh && fval(u, UFL_OWNER)) return u;
 
 	return NULL;
 }
@@ -242,10 +243,10 @@ shipowner(const region * r, const ship * sh)
 		if (u->ship == sh) {
 			if (!first && u->number > 0)
 				first = u;
-			if (fval(u, FL_OWNER) && u->number > 0)
+			if (fval(u, UFL_OWNER) && u->number > 0)
 				return u;
 			if (u->number == 0)
-				freset(u, FL_OWNER);
+				freset(u, UFL_OWNER);
 		}
 	}
 
@@ -253,7 +254,7 @@ shipowner(const region * r, const ship * sh)
 	 * nehmen. */
 
 	if (first)
-		fset(first, FL_OWNER);
+		fset(first, UFL_OWNER);
 	return first;
 }
 

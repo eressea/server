@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- * Eressea PB(E)M host Copyright (C) 1998-2000
+ * Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -11,7 +11,15 @@
  * This program may not be used, modified or distributed without
  * prior permission by the authors of Eressea.
  */
-#ifdef ALLIANCES
+#ifndef H_MOD_ALLIANCE
+#define H_MOD_ALLIANCE
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef ALLIANCES
+#error "must define ALLIANCES to use this module"
+#endif
 struct plane;
 struct attrib;
 struct unit;
@@ -38,4 +46,7 @@ extern void alliancekick(void);
 extern void alliancevictory(void);
 /* execute commands */
 
+#ifdef __cplusplus
+}
+#endif
 #endif

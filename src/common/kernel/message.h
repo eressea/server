@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -12,8 +12,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef MESSAGE_H
-#define MESSAGE_H
+#ifndef H_KRNL_MESSAGE
+#define H_KRNL_MESSAGE
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <util/message.h>
 
@@ -67,4 +70,8 @@ extern const struct messageclass * mc_find(const char * name);
 extern struct message * new_message(struct faction * receiver, const char * signature, ...);
 
 #define ADDMSG(msgs, mcreate) { message * m = mcreate; if (m) { add_message(msgs, m); msg_release(m); } }
+
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -19,8 +19,11 @@
  * permission from the authors.
  */
 
-#ifndef SPY_H
-#define SPY_H
+#ifndef H_KRNL_SPY
+#define H_KRNL_SPY
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct unit;
 struct region;
@@ -35,4 +38,7 @@ void spy_message(int spy, struct unit *u, struct unit *target);
 #define OCEAN_SWIMMER_CHANCE 10
 #define CANAL_SWIMMER_CHANCE 90
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -2,7 +2,7 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
@@ -12,8 +12,9 @@
 
 #include <config.h>
 #include <eressea.h>
-#include "alliance.h"
+
 #ifdef ALLIANCES
+#include "alliance.h"
 #include "command.h"
 
 /* kernel includes */

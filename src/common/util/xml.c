@@ -2,7 +2,7 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
@@ -32,10 +32,11 @@ typedef struct xml_hierarchy {
 } xml_hierarchy;
 
 static int 
-__cberror(struct xml_stack * stack, const char* parsed, unsigned int line, int error)
+__cberror(struct xml_stack * stack, const char* parsed, unsigned int line, const char *filename, int error)
 {
 	struct xml_stack * s = stack;
-	log_error(("Error #%d in line %u while parsing \"%s\"\n", error, line, parsed));
+	log_error(("Error #%d in %s:%u while parsing element \"%s\"\n",
+		error, filename, line, parsed));
 
 	log_printf("XML stacktrace:\n");
 	while (s) {
@@ -157,7 +158,7 @@ xml_register(struct xml_callbacks * cb, const char * path, unsigned int flags)
 }
 
 static int
-xml_parse(xml_stack * stack)
+xml_parse(xml_stack * stack, const char *filename)
 {
 	FILE * stream = stack->stream;
 	xml_stack * start = stack;
@@ -169,7 +170,7 @@ xml_parse(xml_stack * stack)
 	unsigned int line = 0;
 	xml_tag * tag = NULL;
 	xml_attrib * attrib = NULL;
-	int (*cb_error)(struct xml_stack*, const char*, unsigned int, int) = __cberror;
+	int (*cb_error)(struct xml_stack*, const char*, unsigned int, const char *, int) = __cberror;
 
 	for (;;) {
 		int reparse;
@@ -186,7 +187,7 @@ xml_parse(xml_stack * stack)
 				break;
 			} else {
 				*pos='\0';
-				return cb_error(stack, tokbuffer, line, XML_BROKENSTREAM);
+				return cb_error(stack, tokbuffer, line, filename, XML_BROKENSTREAM);
 			}
 		}
 		do {
@@ -196,14 +197,14 @@ xml_parse(xml_stack * stack)
 				switch (c) {
 				case '<':
 					*pos='\0';
-					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
+					return cb_error(stack, tokbuffer, line, filename, XML_INVALIDCHAR);
 				case '"':
 					quoted = !quoted;
 					break;
 				case '>':
 					if (quoted) {
 						*pos='\0';
-						return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
+						return cb_error(stack, tokbuffer, line, filename, XML_INVALIDCHAR);
 					}
 					state = TAG;
 					/* intentional fallthrough */
@@ -234,7 +235,7 @@ xml_parse(xml_stack * stack)
 				case '"':
 				case '/':
 					*pos='\0';
-					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
+					return cb_error(stack, tokbuffer, line, filename, XML_INVALIDCHAR);
 				default:
 					if (isspace(c) || c == '>') {
 						*pos++='\0';
@@ -264,7 +265,7 @@ xml_parse(xml_stack * stack)
 					break;
 				case '>':
 					*pos='\0';
-					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
+					return cb_error(stack, tokbuffer, line, filename, XML_INVALIDCHAR);
 				case '\n':
 					/* ignore */
 					if (!startline) *pos++ = ' ';
@@ -287,7 +288,7 @@ xml_parse(xml_stack * stack)
 					if (pos==tokbuffer) state = ENDTAG;
 					else {
 						*pos='\0';
-						return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
+						return cb_error(stack, tokbuffer, line, filename, XML_INVALIDCHAR);
 					}
 					break;
 				case '>':
@@ -340,9 +341,9 @@ xml_parse(xml_stack * stack)
 						const xml_hierarchy * cb = stack->callbacks;
 						if (strcmp(stack->tag->name, tokbuffer)!=0) {
 							xml_stack * top = stack;
-							cb_error(stack, tokbuffer, line, XML_NESTINGERROR);
-							while (top && strcmp(top->tag->name, tokbuffer)!=0) top = top->next;
-							if (top==NULL) return XML_NESTINGERROR;
+							cb_error(stack, tokbuffer, line, filename, XML_NESTINGERROR);
+							while (top && top->tag && strcmp(top->tag->name, tokbuffer)!=0) top = top->next;
+							if (top==NULL || top->tag==NULL) return XML_NESTINGERROR;
 							while (stack && stack!=top) {
 								if (cb->functions->tagend) {
 									cb->functions->tagend(stack);
@@ -371,7 +372,7 @@ xml_parse(xml_stack * stack)
 				case '=':
 				case '/':
 					*pos='\0';
-					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
+					return cb_error(stack, tokbuffer, line, filename, XML_INVALIDCHAR);
 				default:
 					*pos++ = (char)c;
 				}
@@ -383,7 +384,7 @@ xml_parse(xml_stack * stack)
 }
 
 int
-xml_read(FILE * stream, xml_stack * stack)
+xml_read(FILE * stream, const char *filename, xml_stack * stack)
 {
 	xml_stack root;
 	FILE * save;
@@ -394,7 +395,7 @@ xml_read(FILE * stream, xml_stack * stack)
 	save = stack->stream;
 	stack->stream = stream;
 	while (!feof(stream)) {
-		int i = xml_parse(stack);
+		int i = xml_parse(stack, filename);
 		if (i!=0) return i;
 	}
 	stack->stream = save;

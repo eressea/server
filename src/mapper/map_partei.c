@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -151,7 +151,7 @@ give_latestart_bonus(region *r, unit *u, int b)
 		unit *u2 = createunit(r, u->faction, 1, u->race);
 		change_level(u2, SK_TACTICS, bsk);
 		u2->irace = u->irace;
-/*		fset(u2, FL_PARTEITARNUNG); */
+/*		fset(u2, UFL_PARTEITARNUNG); */
 	}
 
 	{
@@ -160,7 +160,7 @@ give_latestart_bonus(region *r, unit *u, int b)
 		change_level(u2, SK_TAXING, 3);
 		change_item(u2, I_SPEAR, u2->number);
 		u2->irace = u->irace;
-/*		fset(u2, FL_PARTEITARNUNG); */
+/*		fset(u2, UFL_PARTEITARNUNG); */
 	}
 }
 

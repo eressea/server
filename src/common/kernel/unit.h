@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -19,10 +19,44 @@
  * permission from the authors.
  */
 
-#ifndef UNIT_H
-#define UNIT_H
+#ifndef H_KRNL_UNIT_H
+#define H_KRNL_UNIT_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct skill;
+
+#define UFL_DEBUG         (1<<0)
+#define UFL_ISNEW         (1<<1)	/* 2 */
+#define UFL_LONGACTION    (1<<2)	/* 4 */
+#define UFL_OWNER         (1<<3)	/* 8 */
+#define UFL_PARTEITARNUNG (1<<4)	/* 16 */
+#define UFL_DISBELIEVES   (1<<5)	/* 32 */
+#define UFL_WARMTH        (1<<6)	/* 64 */
+
+#define UFL_MOVED         (1<<8)
+#define UFL_FOLLOWING     (1<<9)
+#define UFL_FOLLOWED      (1<<10)
+#define UFL_HUNGER        (1<<11) /* kann im Folgemonat keinen langen Befehl
+außer ARBEITE ausführen */
+#define UFL_SIEGE         (1<<12) /* speedup: belagert eine burg, siehe attribut */
+#define UFL_TARGET        (1<<13) /* speedup: hat ein target, siehe attribut */
+
+/* warning: von 512/1024 gewechslet, wegen konflikt mit NEW_FOLLOW */
+#define UFL_LOCKED        (1<<16) /* Einheit kann keine Personen aufnehmen oder weggeben, nicht rekrutieren. */
+
+#define UFL_STORM         (1<<19) /* Kapitän war in einem Sturm */
+#define UFL_TRADER        (1<<20) /* Händler, pseudolang */
+
+#define UFL_NOAID         (1<<22) /* Einheit hat Noaid-Status */
+
+#define UFL_TAKEALL       (1<<25) /* Einheit nimmt alle Gegenstände an */
+
+#define UFL_WERE          (1<<28)
+
+/* Flags, die gespeichert werden sollen: */
+#define UFL_SAVEMASK (UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL | FL_UNNAMED)
 
 typedef struct unit {
 	struct unit *next;
@@ -68,7 +102,6 @@ typedef struct unit {
 extern attrib_type at_alias;
 extern attrib_type at_siege;
 extern attrib_type at_target;
-extern attrib_type at_potion;
 extern attrib_type at_potionuser;
 extern attrib_type at_contact;
 extern attrib_type at_effect;
@@ -104,7 +137,7 @@ void usetcontact(struct unit * u, const struct unit * c);
 
 struct unit * findnewunit (const struct region * r, const struct faction *f, int alias);
 
-#define upotions(u) fval(u, FL_POTIONS)
+#define upotions(u) fval(u, UFL_POTIONS)
 extern const struct unit * u_peasants(void);
 extern const struct unit * u_unknown(void);
 
@@ -158,4 +191,7 @@ extern int invisible(const unit *u);
 
 extern boolean is_monstrous(const unit * u);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -14,6 +14,9 @@
 
 #ifndef VMAP_H
 #define VMAP_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct vmapentry vmapentry;
 struct vmapentry {
@@ -34,4 +37,7 @@ unsigned int vmap_find(const vmap * vm, const int key);
 unsigned int vmap_get(vmap * vm, const int key);
 void vmap_init(vmap * vm);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

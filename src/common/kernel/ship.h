@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -12,10 +12,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef SHIP_H
-#define SHIP_H
-
-#include "build.h"
+#ifndef H_KRNL_SHIP
+#define H_KRNL_SHIP
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define DAMAGE_SCALE 100 /* multiplier for sh->damage */
 
@@ -42,7 +43,7 @@ typedef struct ship_type {
 
 	terrain_t * coast; /* coast that this ship can land on */
 
-	construction * construction; /* how to build a ship */
+	struct construction * construction; /* how to build a ship */
 } ship_type;
 
 typedef struct ship_typelist {
@@ -91,4 +92,8 @@ extern ship *findship(int n);
 extern const struct ship_type * findshiptype(const char *s, const struct locale * lang);
 
 extern void register_ships(void);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -2,7 +2,7 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
@@ -69,7 +69,7 @@ make_santa(region * r)
 		uunhash(santa);
 		santa->no = atoi36("xmas");
 		uhash(santa);
-		fset(santa, FL_PARTEITARNUNG);
+		fset(santa, UFL_PARTEITARNUNG);
 		santa->irace = new_race[RC_GNOME];
 		set_string(&santa->name, "Ein dicker Gnom mit einem Rentierschlitten");
 		set_string(&santa->display, "hat: 12 Rentiere, Schlitten, Sack mit Geschenken, Kekse für Khorne");

@@ -2,7 +2,7 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
@@ -99,7 +99,7 @@ crt_register(const struct message_type * mtype)
 			crt->renderers = NULL;
 		}
 
-		/* TODO: can be scrapped for memory vs. speed */
+		/* can be scrapped for memory vs. speed */
 		for (i=0;i!=mtype->nparameters;++i) {
 			crt->renderers[i] = tsf_find(mtype->types[i]);
 		}

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -180,7 +180,7 @@ destroy_unit(unit * u)
 		a_remove(&u->attribs, a);
 		a = a_find(clone->attribs, &at_clonemage);
 		a_remove(&clone->attribs, a);
-		fset(u, FL_LONGACTION);
+		fset(u, UFL_LONGACTION);
 		set_number(clone, 0);
 		u = clone;
 		zombie = false;
@@ -279,23 +279,6 @@ usetprivate(unit * u, const char * str) {
 }
 
 /*********************/
-/*   at_potion       */
-/*********************/
-/* Einheit BESITZT einen Trank */
-attrib_type at_potion = {
-	"potion",
-	DEFAULT_INIT,
-	DEFAULT_FINALIZE,
-	DEFAULT_AGE,
-#if RELEASE_VERSION<ATTRIBFIX_VERSION
-	DEFAULT_WRITE,
-#else
-	NO_WRITE,
-#endif
-	DEFAULT_READ
-};
-
-/*********************/
 /*   at_potionuser   */
 /*********************/
 /* Einheit BENUTZT einen Trank */
@@ -338,7 +321,7 @@ attrib_type at_target = {
 unit *
 utarget(const unit * u) {
 	attrib * a;
-	if (!fval(u, FL_TARGET)) return NULL;
+	if (!fval(u, UFL_TARGET)) return NULL;
 	a = a_find(u->attribs, &at_target);
 	assert (a || !"flag set, but no target found");
 	return (unit*)a->data.v;
@@ -352,11 +335,11 @@ usettarget(unit * u, const unit * t)
 	if (a) {
 		if (!t) {
 			a_remove(&u->attribs, a);
-			freset(u, FL_TARGET);
+			freset(u, UFL_TARGET);
 		}
 		else {
 			a->data.v = (void*)t;
-			fset(u, FL_TARGET);
+			fset(u, UFL_TARGET);
 		}
 	}
 }
@@ -390,7 +373,7 @@ attrib_type at_siege = {
 struct building *
 usiege(const unit * u) {
 	attrib * a;
-	if (!fval(u, FL_SIEGE)) return NULL;
+	if (!fval(u, UFL_SIEGE)) return NULL;
 	a = a_find(u->attribs, &at_siege);
 	assert (a || !"flag set, but no siege found");
 	return (struct building *)a->data.v;
@@ -404,11 +387,11 @@ usetsiege(unit * u, const struct building * t)
 	if (a) {
 		if (!t) {
 			a_remove(&u->attribs, a);
-			freset(u, FL_SIEGE);
+			freset(u, UFL_SIEGE);
 		}
 		else {
 			a->data.v = (void*)t;
-			fset(u, FL_SIEGE);
+			fset(u, UFL_SIEGE);
 		}
 	}
 }
@@ -589,9 +572,9 @@ leave_ship(unit * u)
 	u->ship = NULL;
 	set_leftship(u, sh);
 
-	if (fval(u, FL_OWNER)) {
+	if (fval(u, UFL_OWNER)) {
 		unit *u2, *owner = NULL;
-		freset(u, FL_OWNER);
+		freset(u, UFL_OWNER);
 
 		for (u2 = u->region->units; u2; u2 = u2->next) {
 			if (u2->ship == sh) {
@@ -602,7 +585,7 @@ leave_ship(unit * u)
 				else if (owner==NULL) owner = u2;
 			}
 		}
-		if (owner!=NULL) fset(owner, FL_OWNER);
+		if (owner!=NULL) fset(owner, UFL_OWNER);
 	}
 }
 
@@ -613,9 +596,9 @@ leave_building(unit * u)
 	if (!b) return;
 	u->building = NULL;
 
-	if (fval(u, FL_OWNER)) {
+	if (fval(u, UFL_OWNER)) {
 		unit *u2, *owner = NULL;
-		freset(u, FL_OWNER);
+		freset(u, UFL_OWNER);
 
 		for (u2 = u->region->units; u2; u2 = u2->next) {
 			if (u2->building == b) {
@@ -626,7 +609,7 @@ leave_building(unit * u)
 				else if (owner==NULL) owner = u2;
 			}
 		}
-		if (owner!=NULL) fset(owner, FL_OWNER);
+		if (owner!=NULL) fset(owner, UFL_OWNER);
 	}
 }
 
@@ -679,7 +662,7 @@ move_unit(unit * u, region * r, unit ** ulist)
 		set_moved(&u->attribs);
 #endif
 		setguard(u, GUARD_NONE);
-		fset(u, FL_MOVED);
+		fset(u, UFL_MOVED);
 		if (u->ship || u->building) leave(u->region, u);
 		translist(&u->region->units, ulist, u);
 	} else
@@ -762,7 +745,7 @@ transfermen(unit * u, unit * u2, int n)
 			if (olde->value) change_effect(u2, olde->type, olde->value);
 			a = a->nexttype;
 		}
-		if (fval(u, FL_LONGACTION)) fset(u2, FL_LONGACTION);
+		if (fval(u, UFL_LONGACTION)) fset(u2, UFL_LONGACTION);
 		if (u->attribs) {
 			transfer_curse(u, u2, n);
 		}
@@ -825,9 +808,6 @@ u_setfaction(unit * u, faction * f)
 {
 	int cnt = u->number;
 	if (u->faction==f) return;
-#ifndef NDEBUG
-	assert(u->debug_number == u->number);
-#endif
 	if (u->faction) {
 		set_number(u, 0);
 		--u->faction->no_units;
@@ -860,7 +840,6 @@ set_number(unit * u, int count)
 {
 	assert (count >= 0);
 #ifndef NDEBUG
-	assert (u->debug_number == u->number);
 	assert (u->faction != 0 || u->number > 0);
 #endif
 	if (u->faction && u->race != u->faction->race && playerrace(u->race)
@@ -871,9 +850,6 @@ set_number(unit * u, int count)
 
 	u->faction->num_people += count - u->number;
 	u->number = count;
-#ifndef NDEBUG
-	u->debug_number = count;
-#endif
 }
 
 boolean
@@ -1061,7 +1037,7 @@ get_modifier(const unit *u, skill_t sk, int level, const region *r, boolean noit
 	}
 
 #ifdef HUNGER_REDUCES_SKILL
-	if (fval(u, FL_HUNGER)) {
+	if (fval(u, UFL_HUNGER)) {
 		skill = skill/2;
 	}
 #endif
@@ -1075,7 +1051,13 @@ eff_skill(const unit * u, skill_t sk, const region * r)
 	if (level>0) {
 		int mlevel = level + get_modifier(u, sk, level, r, false);
 
-		if (mlevel>0) return mlevel;
+		if (mlevel>0) {
+			int skillcap = SkillCap(sk);
+			if (skillcap && mlevel>skillcap) {
+				return skillcap;
+			}
+			return mlevel;
+		}
 	}
 	return 0;
 }

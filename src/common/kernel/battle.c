@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -56,12 +56,6 @@ typedef enum combatmagic {
 #include "building.h"
 #include "group.h"
 
-/* util includes */
-#include <base36.h>
-#include <cvector.h>
-#include <rand.h>
-#include <log.h>
-
 /* attributes includes */
 #include <attributes/key.h>
 #include <attributes/fleechance.h>
@@ -69,8 +63,19 @@ typedef enum combatmagic {
 #include <attributes/otherfaction.h>
 #include <attributes/moved.h>
 
+/* items includes */
+#include <items/demonseye.h>
+
 /* modules includes */
+#ifdef ALLIANCES
 #include <modules/alliance.h>
+#endif
+
+/* util includes */
+#include <base36.h>
+#include <cvector.h>
+#include <rand.h>
+#include <log.h>
 
 /* libc includes */
 #include <assert.h>
@@ -94,12 +99,11 @@ BZFILE *bdebug;
 FILE *bdebug;
 #endif
 
-/* TODO: header cleanup */
-extern int dice_rand(const char *s);
-extern item_type it_demonseye;
-
-int  obs_count = 0;
+/* external variables */
 boolean nobattledebug = false;
+
+/* globals */
+static int obs_count = 0;
 
 #define TACTICS_MALUS
 #undef  MAGIC_TURNS
@@ -372,14 +376,14 @@ select_corpse(battle * b, fighter * af)
 	fighter *df;
 	side *side;
 
-	for_each(side, b->sides) {
+	cv_foreach(side, b->sides) {
 		if (!af || (!enemy(af->side, side) && allysf(af->side, side->bf->faction)))
 			maxcasualties += side->casualties;
 	}
-	next(side);
+	cv_next(side);
 
 	di = rand() % maxcasualties;
-	for_each(df, b->fighters) {
+	cv_foreach(df, b->fighters) {
 		/* Geflohene haben auch 0 hp, d¸rfen hier aber nicht ausgew‰hlt
 		 * werden! */
 		int dead = df->unit->number - (df->alive + df->run.number);
@@ -394,7 +398,7 @@ select_corpse(battle * b, fighter * af)
 		}
 		di -= dead;
 	}
-	next(df);
+	cv_next(df);
 	return dt;
 }
 
@@ -416,11 +420,11 @@ countallies(side * as)
 	side *s;
 	int count = 0;
 
-	for_each(s, b->sides) {
+	cv_foreach(s, b->sides) {
 		if (!helping(as, s)) continue;
 		count += s->size[SUM_ROW];
 	}
-	next(s);
+	cv_next(s);
 	return count;
 }
 
@@ -440,7 +444,7 @@ tactics_bonus(troop at, troop dt, boolean attacking)
 	side *s;
 	int abest = 0, dbest = 0;
 
-	for_each(s, b->sides) {
+	cv_foreach(s, b->sides) {
 		if (!enemy(s, as) && allysf(s, as->bf->faction)) {
 			if (rand() % countallies(as) < support(&as->leader))
 				abest = max(s->leader.value, abest);
@@ -449,7 +453,7 @@ tactics_bonus(troop at, troop dt, boolean attacking)
 				dbest = max(s->leader.value, dbest);
 		}
 	}
-	next(s);
+	cv_next(s);
 	if (abest > dbest)
 		return attacking;
 	return 0;
@@ -814,7 +818,7 @@ select_armor(troop t)
 	/* Drachen benutzen keine R¸stungen */
 	if (!(t.fighter->unit->race->battle_flags & BF_EQUIPMENT))
 		return AR_NONE;
-	
+
 	/* ... und Werwˆlfe auch nicht */
 	if(fval(t.fighter->unit, UFL_WERE)) {
 		return AR_NONE;
@@ -1035,7 +1039,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	int ar, an, am;
 	int armor = select_armor(dt);
 	int shield = select_shield(dt);
-	
+
 	const weapon_type *dwtype = NULL;
 	const weapon_type *awtype = NULL;
 	const weapon * weapon;
@@ -1405,7 +1409,7 @@ fighters(battle *b, fighter *af, int minrow, int maxrow, int mask)
 	fightervp = malloc(sizeof(cvector));
 	cv_init(fightervp);
 
-	for_each(fig, b->fighters) {
+	cv_foreach(fig, b->fighters) {
 		if (!fig->alive) continue;
 
 		row = get_unitrow(fig);
@@ -1426,7 +1430,7 @@ fighters(battle *b, fighter *af, int minrow, int maxrow, int mask)
 			}
 
 		}
-	} next(fig);
+	} cv_next(fig);
 
 	return fightervp;
 }
@@ -1479,7 +1483,7 @@ do_combatmagic(battle *b, combatmagic_t was)
 			if (sp == NULL)
 				continue;
 
-			snprintf(cmd, 128, "%s \"%s\"", 
+			snprintf(cmd, 128, "%s \"%s\"",
 				LOC(lang, keywords[K_CAST]), spell_name(sp, lang));
 
 			if (cancast(mage, sp, 1, 1, cmd) == false)
@@ -1636,10 +1640,6 @@ skilldiff(troop at, troop dt, int dist)
 	int is_protected = 0, skdiff = 0, sk;
 	weapon * awp = select_weapon(at, true, dist>1);
 	weapon * dwp = select_weapon(dt, false, dist>1);
-
-	/* Effekte von Alchemie */
-	if (get_effect(au, oldpotiontype[P_BERSERK]) > at.index)
-		++skdiff;
 
 	if (df->person[dt.index].flags & FL_SLEEPING)
 		skdiff += 2;
@@ -1908,7 +1908,7 @@ damage_building(battle *b, building *bldg, int damage_abs)
 
 		bldg->sizeleft = bldg->size;
 
-		for_each(fi, b->fighters) {
+		cv_foreach(fi, b->fighters) {
 			if (fi->building == bldg) {
 				if (bldg->sizeleft >= fi->unit->number) {
 					fi->building = bldg;
@@ -1917,7 +1917,7 @@ damage_building(battle *b, building *bldg, int damage_abs)
 					fi->building = NULL;
 				}
 			}
-		} next(fi);
+		} cv_next(fi);
 	}
 }
 
@@ -2354,24 +2354,24 @@ aftermath(battle * b)
 	 * zur¸ck. Nicht logisch, aber die einzige Lˆsung, den Verlust der
 	 * Aura durch Dummy-Angriffe zu verhindern. */
 
-	for_each(s, b->sides) {
+	cv_foreach(s, b->sides) {
 		if (s->bf->lastturn+(b->has_tactics_turn?1:0)<=1) continue;
 		/* Pr¸fung, ob faction angegriffen hat. Geht nur ¸ber die Faction */
 		if (!s->bf->attacker) {
 			fighter *fig;
-			for_each(fig, s->fighters) {
+			cv_foreach(fig, s->fighters) {
 				sc_mage * mage = get_mage(fig->unit);
 				if (mage)
 					mage->spellpoints += mage->precombataura;
-			} next(fig);
+			} cv_next(fig);
 		}
 		/* Alle Fighter durchgehen, Mages suchen, Precombataura zur¸ck */
-	} next(s);
+	} cv_next(s);
 
 	/* POSTCOMBAT */
 	do_combatmagic(b, DO_POSTCOMBATSPELL);
 
-	for_each(s, b->sides) {
+	cv_foreach(s, b->sides) {
 		fighter *df;
 		boolean relevant = false; /* Kampf relevant f¸r dieses Heer? */
 		if (s->bf->lastturn+(b->has_tactics_turn?1:0)>1) {
@@ -2380,7 +2380,7 @@ aftermath(battle * b)
 		s->flee = 0;
 		s->dead = 0;
 
-		for_each(df, s->fighters) {
+		cv_foreach(df, s->fighters) {
 			unit *du = df->unit;
 			int dead = du->number - df->alive - df->run.number;
 			int sum_hp = 0;
@@ -2389,9 +2389,9 @@ aftermath(battle * b)
 				ship * sh = du->ship?du->ship:leftship(du);
 
 				if (sh) fset(sh, SF_DAMAGED);
-				fset(du, FL_LONGACTION);
+				fset(du, UFL_LONGACTION);
 				/* TODO: das sollte hier weg sobald anderswo ¸b
-				 * erall FL_LONGACTION getestet wird. */
+				 * erall UFL_LONGACTION getestet wird. */
 				set_string(&du->thisorder, "");
 			}
 			for (n = 0; n != df->alive; ++n) {
@@ -2425,7 +2425,7 @@ aftermath(battle * b)
 					du->hp = df->run.hp;
 					set_string(&du->thisorder, "");
 					setguard(du, GUARD_NONE);
-					fset(du, FL_MOVED);
+					fset(du, UFL_MOVED);
 					leave(du->region, du);
 					if (df->run.region) {
 						travel(r, du, df->run.region, 1);
@@ -2487,8 +2487,8 @@ aftermath(battle * b)
 						  itoa36(du->no), du->hp, du->number));
 				du->hp=du->no;
 			}
-		} next(df);
-	} next(s);
+		} cv_next(df);
+	} cv_next(s);
 	dead_peasants = min(rpeasants(r), (is*BATTLE_KILLS_PEASANTS)/100);
 	deathcounts(r, dead_peasants + is);
 	chaoscounts(r, dead_peasants / 2);
@@ -2497,7 +2497,7 @@ aftermath(battle * b)
 	for (bf=b->factions;bf;bf=bf->next) {
 		faction * f = bf->faction;
 		fbattlerecord(f, r, " ");
-		for_each(s, b->sides) {
+		cv_foreach(s, b->sides) {
 			if (seematrix(f, s)) {
 				sprintf(buf, "Heer %2d(%s): %d Tote, %d Geflohene, %d ‹berlebende",
 						s->index, sideabkz(s,false), s->dead, s->flee, s->alive);
@@ -2506,7 +2506,7 @@ aftermath(battle * b)
 						s->index, s->dead, s->flee, s->alive);
 			}
 			fbattlerecord(f, r, buf);
-		} next(s);
+		} cv_next(s);
 	}
 	/* Wir benutzen drifted, um uns zu merken, ob ein Schiff
 	 * schonmal Schaden genommen hat. (moved und drifted
@@ -2586,7 +2586,7 @@ print_fighters(battle * b, cvector * fighters)
 	fighter *df;
 	int lastrow = -1;
 
-	for_each(df, *fighters) {
+	cv_foreach(df, *fighters) {
 		unit *du = df->unit;
 
 		int row = get_unitrow(df);
@@ -2599,7 +2599,7 @@ print_fighters(battle * b, cvector * fighters)
 		}
 		battle_punit(du, b);
 	}
-	next(df);
+	cv_next(df);
 }
 
 static void
@@ -2648,7 +2648,7 @@ print_stats(battle * b)
 	side *s2;
 	side *side;
 	int i = 0;
-	for_each(side, b->sides) {
+	cv_foreach(side, b->sides) {
 		bfaction *bf;
 		char *k;
 		boolean komma;
@@ -2664,7 +2664,7 @@ print_stats(battle * b)
 			fbattlerecord(f, b->region, buf);
 			strcpy(buf, LOC(f->locale, "battle_opponents"));
 			komma = false;
-			for_each(s2, b->sides) {
+			cv_foreach(s2, b->sides) {
 				if (enemy(s2, side))
 				{
 					if (seematrix(f, s2) == true) {
@@ -2676,11 +2676,11 @@ print_stats(battle * b)
 					}
 				}
 			}
-			next(s2);
+			cv_next(s2);
 			fbattlerecord(f, b->region, buf);
 			strcpy(buf, "Attacke gegen:");
 			komma = false;
-			for_each(s2, b->sides) {
+			cv_foreach(s2, b->sides) {
 				if (side->enemy[s2->index] & E_ATTACKING) {
 					if (seematrix(f, s2) == true) {
 						sprintf(buf, "%s%s Heer %d(%s)", buf, komma++ ? "," : "",
@@ -2691,7 +2691,7 @@ print_stats(battle * b)
 					}
 				}
 			}
-			next(s2);
+			cv_next(s2);
 			fbattlerecord(f, b->region, buf);
 		}
 		buf[77] = (char)0;
@@ -2708,7 +2708,7 @@ print_stats(battle * b)
 		}
 		print_fighters(b, &side->fighters);
 	}
-	next(side);
+	cv_next(side);
 
 	battlerecord(b, " ");
 
@@ -2716,24 +2716,24 @@ print_stats(battle * b)
 
 	b->max_tactics = 0;
 
-	for_each(side, b->sides) {
+	cv_foreach(side, b->sides) {
 		if (cv_size(&side->leader.fighters))
 			b->max_tactics = max(b->max_tactics, side->leader.value);
-	} next(side);
+	} cv_next(side);
 
 	if (b->max_tactics > 0) {
-		for_each(side, b->sides) {
+		cv_foreach(side, b->sides) {
 			if (side->leader.value == b->max_tactics) {
 				fighter *tf;
-				for_each(tf, side->leader.fighters) {
+				cv_foreach(tf, side->leader.fighters) {
 					unit *u = tf->unit;
 					if (!fval(tf, FIG_ATTACKED))
 						battlemsg(b, u, "¸berrascht den Gegner.");
 					else
 						battlemsg(b, u, "konnte dem Gegner eine Falle stellen.");
-				} next(tf);
+				} cv_next(tf);
 			}
-		} next(side);
+		} cv_next(side);
 	}
 }
 
@@ -2764,7 +2764,7 @@ make_fighter(battle * b, unit * u, boolean attack)
 	int strongmen;
 	int speeded = 0, speed = 1;
 	boolean pr_aid = false;
-	boolean stealth = (boolean)((fval(u, FL_PARTEITARNUNG)!=0)?true:false);
+	boolean stealth = (boolean)((fval(u, UFL_PARTEITARNUNG)!=0)?true:false);
 	int rest;
 	const attrib * a = a_find(u->attribs, &at_group);
 	const group * g = a?(const group*)a->data.v:NULL;
@@ -2775,7 +2775,7 @@ make_fighter(battle * b, unit * u, boolean attack)
 	if (fval(u->race, RCF_ILLUSIONARY) || idle(u->faction))
 		return NULL;
 
-	for_each(s2, b->sides) {
+	cv_foreach(s2, b->sides) {
 		if (s2->bf->faction == u->faction
 				&& s2->stealth==stealth
 				&& s2->stealthfaction == stealthfaction
@@ -2785,7 +2785,7 @@ make_fighter(battle * b, unit * u, boolean attack)
 				break;
 			}
 		}
-	} next(s2);
+	} cv_next(s2);
 
 	/* aliances are moved out of make_fighter and will be handled later */
 	if (!s1) s1 = make_side(b, u->faction, g, stealth, stealthfaction);
@@ -2822,7 +2822,7 @@ make_fighter(battle * b, unit * u, boolean attack)
 	rest = u->hp % u->number;
 
 	/* Effekte von Spr¸chen */
-	
+
 	{
 		static const curse_type * speed_ct;
 		speed_ct = ct_find("speed");
@@ -3035,14 +3035,14 @@ join_battle(battle * b, unit * u, boolean attack)
 	fighter *c = NULL;
 	fighter *fig;
 
-	for_each(fig, b->fighters) {
+	cv_foreach(fig, b->fighters) {
 		if (fig->unit == u) {
 			c = fig;
 			if (attack) fset(fig, FIG_ATTACKED);
 			break;
 		}
 	}
-	next(fig);
+	cv_next(fig);
 	if (!c) c = make_fighter(b, u, attack);
 	return c;
 }
@@ -3162,22 +3162,22 @@ free_battle(battle * b)
 		max_fac_no = max(max_fac_no, f->no);
 	}
 
-	for_each(side, b->sides) {
+	cv_foreach(side, b->sides) {
 		free_side(side);
 		free(side);
 	}
-	next(side);
+	cv_next(side);
 	cv_kill(&b->sides);
-	for_each(fighter, b->fighters) {
+	cv_foreach(fighter, b->fighters) {
 		free_fighter(fighter);
 		free(fighter);
 	}
-	next(fighter);
+	cv_next(fighter);
 	cv_kill(&b->fighters);
-	for_each(meffect, b->meffects) {
+	cv_foreach(meffect, b->meffects) {
 		free(meffect);
 	}
-	next(meffect);
+	cv_next(meffect);
 	cv_kill(&b->meffects);
 /*
 	cv_kill(&b->factions);
@@ -3190,10 +3190,10 @@ get_alive(battle * b, side * s, faction * vf, boolean see)
 	static int alive[NUMROWS];
 	fighter *f;
 	memset(alive, 0, NUMROWS * sizeof(int));
-	for_each(f, s->fighters) {
+	cv_foreach(f, s->fighters) {
 		if (f->alive && seematrix(vf, s)==see)
 			alive[get_unitrow(f)] += f->alive;
-	} next(f);
+	} cv_next(f);
 	return alive;
 }
 
@@ -3208,16 +3208,16 @@ battle_report(battle * b)
 
 	buf[0] = 0;
 
-	for_each(s, b->sides) {
-		for_each(s2, b->sides) {
+	cv_foreach(s, b->sides) {
+		cv_foreach(s2, b->sides) {
 			if (s->alive-s->removed > 0 && s2->alive-s2->removed > 0 && enemy(s, s2))
 			{
 				cont = true;
 				s->bf->lastturn = b->turn;
 				s2->bf->lastturn = b->turn;
 			}
-		} next(s2);
-	} next(s);
+		} cv_next(s2);
+	} cv_next(s);
 
 	printf(" %d", b->turn);
 	fflush(stdout);
@@ -3233,7 +3233,7 @@ battle_report(battle * b)
 		fbattlerecord(fac, b->region, buf2);
 		buf2[0] = 0;
 		komma   = false;
-		for_each(s, b->sides) {
+		cv_foreach(s, b->sides) {
 			if (s->alive) {
 				int r, k = 0, * alive = get_alive(b, s, fac, seematrix(fac, s));
 				if (!seematrix(fac, s)) {
@@ -3261,7 +3261,7 @@ battle_report(battle * b)
 					komma = true;
 				}
 			}
-		} next(s);
+		} cv_next(s);
 		fbattlerecord(fac, b->region, buf2);
 	}
 	return cont;
@@ -3279,7 +3279,7 @@ join_allies(battle * b)
 	int size = cv_size(&b->sides);
 	for (u=r->units;u;u=u->next)
 		/* Was ist mit Schiffen? */
-		if (u->status != ST_FLEE && u->status != ST_AVOID && !fval(u, FL_MOVED) && u->number > 0)
+		if (u->status != ST_FLEE && u->status != ST_AVOID && !fval(u, UFL_MOVED) && u->number > 0)
 	{
 		int si;
 		faction * f = u->faction;
@@ -3287,8 +3287,8 @@ join_allies(battle * b)
 		for (si = 0; si != size; ++si) {
 			int se;
 			side *s = b->sides.begin[si];
-			/* Wenn alle attackierten noch FL_NOAIDF haben, dann k‰mpfe nicht mit. */
-			if (fval(s->bf->faction, FL_NOAIDF)) continue;
+			/* Wenn alle attackierten noch FFL_NOAID haben, dann k‰mpfe nicht mit. */
+			if (fval(s->bf->faction, FFL_NOAID)) continue;
 			if (s->bf->faction!=f) {
 				/* Wenn wir attackiert haben, kommt niemand mehr hinzu: */
 				if (s->bf->attacker) continue;
@@ -3342,7 +3342,7 @@ join_allies(battle * b)
 
 extern struct item_type * i_silver;
 
-void
+static void
 flee(const troop dt)
 {
 	fighter * fig = dt.fighter;
@@ -3384,7 +3384,6 @@ flee(const troop dt)
 	/* we will take money with us */
 	money = get_money(u);
 	/* nur ganzgeflohene/resttote Einheiten verlassen die Region */
-	/* money = min(money, MAINTENANCE); */
 	if (money > carry) money = carry;
 	if (money > 0) {
 		i_change(&u->items, i_silver, -money);
@@ -3426,12 +3425,12 @@ do_battle(void)
 		building *bu;
 
 		for (u = r->units; u != NULL; u = u->next) {
-			fset(u->faction, FL_NOAIDF);
+			fset(u->faction, FFL_NOAID);
 		}
 
 		/* list_foreach geht nicht, wegen flucht */
 		for (u = r->units; u != NULL; u = u->next) {
-			if (fval(u, FL_LONGACTION)) continue;
+			if (fval(u, UFL_LONGACTION)) continue;
 			if (u->number > 0) {
 				strlist *sl;
 
@@ -3462,7 +3461,7 @@ do_battle(void)
 								msg_message("no_attack_after_advance", "unit region command", u, u->region, sl->s));
 						}
 #endif
-						if (fval(u, FL_HUNGER)) {
+						if (fval(u, UFL_HUNGER)) {
 							cmistake(u, sl->s, 225, MSG_BATTLE);
 							list_continue(sl);
 						}
@@ -3473,7 +3472,7 @@ do_battle(void)
 						}
 
 						/* ist ein Fl¸chtling aus einem andern Kampf */
-						if (fval(u, FL_MOVED)) list_continue(sl);
+						if (fval(u, UFL_MOVED)) list_continue(sl);
 
 						if (peace_ct && curse_active(get_curse(r->attribs, peace_ct))) {
 							sprintf(buf, "Hier ist es so schˆn friedlich, %s mˆchte "
@@ -3507,7 +3506,7 @@ do_battle(void)
 
 						/* Beginn Fehlerbehandlung */
 						/* Fehler: "Die Einheit wurde nicht gefunden" */
-						if (!u2 || fval(u2, FL_MOVED) || u2->number == 0
+						if (!u2 || fval(u2, UFL_MOVED) || u2->number == 0
 								|| !cansee(u->faction, u->region, u2, 0)) {
 							cmistake(u, sl->s, 63, MSG_BATTLE);
 							list_continue(sl);
@@ -3549,7 +3548,7 @@ do_battle(void)
 						/* Hat die attackierte Einheit keinen Noaid-Status,
 						 * wird das Flag von der Faction genommen, andere
 						 * Einheiten greifen ein. */
-						if (!fval(u2, FL_NOAID)) freset(u2->faction, FL_NOAIDF);
+						if (!fval(u2, UFL_NOAID)) freset(u2->faction, FFL_NOAID);
 
 						if (c1 && c2) {
 							/* Merken, wer Angreifer ist, f¸r die R¸ckzahlung der
@@ -3621,10 +3620,10 @@ do_battle(void)
 		 * nach der Kampfreihe sortiert */
 		v_scramble(b->fighters.begin, b->fighters.end);
 		v_sort(b->fighters.begin, b->fighters.end, (v_sort_fun) sort_fighterrow);
-		for_each(s, b->sides) {
+		cv_foreach(s, b->sides) {
 			v_sort(s->fighters.begin, s->fighters.end, (v_sort_fun) sort_fighterrow);
 		}
-		next(side);
+		cv_next(side);
 
 		print_stats(b); /* gibt die Kampfaufstellung aus */
 		printf("%s (%d, %d) : ", rname(r, NULL), r->x, r->y);
@@ -3738,7 +3737,7 @@ do_battle(void)
 					side    *side;
 					boolean yes = false;
 
-					for_each(side, b->sides) {
+					cv_foreach(side, b->sides) {
 						if (b->max_tactics > 0
 							&& side->leader.value == b->max_tactics
 							&& helping(side, fig->side))
@@ -3746,7 +3745,7 @@ do_battle(void)
 							yes = true;
 							break;
 						}
-					} next(side);
+					} cv_next(side);
 					if (!yes)
 						continue;
 				}
@@ -3789,7 +3788,7 @@ do_battle(void)
 /* ------------------------------------------------------------- */
 
 /* Funktionen, die auﬂerhalb von battle.c verwendet werden. */
-int
+static int
 nb_armor(unit *u, int index)
 {
 	int a, av = 0;

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -13,11 +13,13 @@
  */
 
 
-#ifndef OBJTYPES_H
-#define OBJTYPES_H
+#ifndef H_KRNL_OBJTYPES
+#define H_KRNL_OBJTYPES
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdio.h>
-#include "attrib.h"
 
 typedef struct obj_ID {
 	int a, b;
@@ -63,5 +65,8 @@ typedef struct {
 
 extern typdata_t typdata[];
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -19,8 +19,11 @@
  * permission from the authors.
  */
 
-#ifndef REPORTS_H
-#define REPORTS_H
+#ifndef H_KRNL_REPORTS
+#define H_KRNL_REPORTS
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Alter, ab dem der Score angezeigt werden soll: */
 #define DISPLAYSCORE 12
@@ -108,4 +111,7 @@ extern struct faction * visible_faction(const struct faction *f, const struct un
 extern struct faction_list * get_addresses(const struct faction * f, const struct seen_region * seenregions);
 extern const char * trailinto(const struct region * r, const struct locale * lang);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

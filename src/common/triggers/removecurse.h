@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -14,6 +14,9 @@
 
 #ifndef REMOVECURSE_H
 #define REMOVECURSE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* all types we use are defined here to reduce dependencies */
 struct trigger_type;
@@ -26,4 +29,7 @@ extern struct trigger_type tt_removecurse;
 
 extern struct trigger * trigger_removecurse(struct curse * c, struct unit * target);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -21,6 +21,9 @@
 
 #ifndef LISTS_H
 #define LISTS_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stddef.h>
 
@@ -52,4 +55,7 @@ void invert_list(void * heap);
 
 void *listelem(void *l, int n);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

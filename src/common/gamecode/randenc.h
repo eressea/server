@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -19,10 +19,16 @@
  * permission from the authors.
  */
 
-#ifndef RANDENC_H
-#define RANDENC_H
+#ifndef H_GC_RANDENC
+#define H_GC_RANDENC
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern void encounters(void);
 extern void randomevents(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -139,9 +139,6 @@
 				RelativePath=".\museum.h">
 			</File>
 			<File
-				RelativePath=".\oceannames.h">
-			</File>
-			<File
 				RelativePath=".\score.h">
 			</File>
 			<File
@@ -152,12 +149,6 @@
 			</File>
 			<File
 				RelativePath=".\xmas.h">
-			</File>
-			<File
-				RelativePath=".\xmas2000.h">
-			</File>
-			<File
-				RelativePath=".\xmas2001.h">
 			</File>
 		</Filter>
 		<File
@@ -179,9 +170,6 @@
 			RelativePath=".\museum.c">
 		</File>
 		<File
-			RelativePath=".\oceannames.c">
-		</File>
-		<File
 			RelativePath=".\score.c">
 		</File>
 		<File
@@ -192,12 +180,6 @@
 		</File>
 		<File
 			RelativePath=".\xmas.c">
-		</File>
-		<File
-			RelativePath=".\xmas2000.c">
-		</File>
-		<File
-			RelativePath=".\xmas2001.c">
 		</File>
 	</Files>
 	<Globals>

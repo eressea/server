@@ -16,6 +16,14 @@
 		<order name="EMAIL" disable></order>
 		<order name="MEINUNG" disable></order>
 		<order name="MAGIEGEBIET" disable></order>
+		<param name="entertain.base" value="0"></param>
+		<param name="entertain.perlevel" value="20"></param>
+		<param name="nmr.timeout" value="2"></param>
+		<param name="nmr.removenewbie" value="1"></param>
+		<param name="GiveRestriction" value="3"></param>
+		<param name="database.gameid" value="1"></param>
+		<param name="hunger.long" value="1"></param>
+		<param name="MaxAge" value="8"></param>
 	</game>
 	<include file="tutorial/de/strings.xml"></include>
 	<include file="tutorial/en/strings.xml"></include>

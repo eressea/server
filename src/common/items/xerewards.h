@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  * 
- * Eressea PB(E)M host Copyright (C) 1998-2000
+ * Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -12,6 +12,17 @@
  * prior permission by the authors of Eressea.
  */
 
+#ifndef H_ITM_XEREWARDS
+#define H_ITM_XEREWARDS
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern struct item_type it_skillpotion;
 extern struct item_type it_astralcrystal;
 extern void register_xerewards(void);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * Eressea PB(E)M host Copyright (C) 1998-2000
+ * Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -13,6 +13,9 @@
 
 #ifndef _RCURSE_H
 #define _RCURSE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct curse;
 struct locale;
@@ -20,4 +23,7 @@ extern int cinfo_region(const struct locale * lang, const void * obj, typ_t typ,
 
 extern void register_regioncurse(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _RCURSE_H */

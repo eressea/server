@@ -2,7 +2,7 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
@@ -423,7 +423,7 @@ select_ally_in_row(fighter * af, int minrow, int maxrow)
 		return dt;
 	allies = rand() % allies;
 
-	for_each(df, b->fighters) {
+	cv_foreach(df, b->fighters) {
 		side *ds = df->side;
 		int dr = get_unitrow(df);
 
@@ -436,7 +436,7 @@ select_ally_in_row(fighter * af, int minrow, int maxrow)
 			allies -= df->alive;
 		}
 	}
-	next(df);
+	cv_next(df);
 	return dt;
 }
 
@@ -735,8 +735,8 @@ sp_shadowcall(fighter * fi, int level, int power, spell * sp)
 	set_level(u, SK_AUSDAUER, power/2);
 	u->hp = u->number * unit_max_hp(u);
 
-	if (fval(mage, FL_PARTEITARNUNG))
-		fset(u, FL_PARTEITARNUNG);
+	if (fval(mage, UFL_PARTEITARNUNG))
+		fset(u, UFL_PARTEITARNUNG);
 
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 0;
@@ -768,8 +768,8 @@ sp_wolfhowl(fighter * fi, int level, int power, spell * sp)
 	set_level(u, SK_AUSDAUER, power/3);
 	u->hp = u->number * unit_max_hp(u);
 
-	if (fval(mage, FL_PARTEITARNUNG))
-		fset(u, FL_PARTEITARNUNG);
+	if (fval(mage, UFL_PARTEITARNUNG))
+		fset(u, UFL_PARTEITARNUNG);
 
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 0;
@@ -802,8 +802,8 @@ sp_shadowknights(fighter * fi, int level, int power, spell * sp)
 	set_string(&u->name, "Schattenritter");
 	u->hp = u->number * unit_max_hp(u);
 
-	if (fval(mage, FL_PARTEITARNUNG))
-		fset(u, FL_PARTEITARNUNG);
+	if (fval(mage, UFL_PARTEITARNUNG))
+		fset(u, UFL_PARTEITARNUNG);
 
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 0;
@@ -1364,7 +1364,7 @@ sp_denyattack(fighter * fi, int level, int power, spell * sp)
 	return level;
 }
 
-void
+static void
 do_meffect(fighter * af, int typ, int effect, int duration)
 {
 	battle *b = af->side->battle;
@@ -1473,11 +1473,11 @@ count_healable(battle *b, fighter *df)
 	side *s;
 	int  healable = 0;
 
-	for_each(s, b->sides) {
+	cv_foreach(s, b->sides) {
 		if (helping(df->side, s)) {
 			healable += s->casualties;
 		}
-	} next(s);
+	} cv_next(s);
 	return healable;
 }
 
@@ -1726,8 +1726,8 @@ sp_undeadhero(fighter * fi, int level, int force, spell * sp)
 					du->race = new_race[RC_UNDEAD];
 					setguard(du, GUARD_NONE);
 					u_setfaction(du,mage->faction);
-					if (fval(mage, FL_PARTEITARNUNG))
-						fset(du, FL_PARTEITARNUNG);
+					if (fval(mage, UFL_PARTEITARNUNG))
+						fset(du, UFL_PARTEITARNUNG);
 					df->alive = du->number;
 					/* den Toten wieder volle Hitpoints geben */
 					for (nr = 0; nr != df->alive; ++nr) {
@@ -1746,8 +1746,8 @@ sp_undeadhero(fighter * fi, int level, int force, spell * sp)
 					set_string(&u->display, buf);
 					u->status = du->status;
 					setguard(u, GUARD_NONE);
-					if (fval(mage, FL_PARTEITARNUNG))
-						fset(u, FL_PARTEITARNUNG);
+					if (fval(mage, UFL_PARTEITARNUNG))
+						fset(u, UFL_PARTEITARNUNG);
 					set_string(&u->lastorder, du->lastorder);
 					/* den Toten volle Hitpoints geben */
 					u->hp = u->number * unit_max_hp(u);

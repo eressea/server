@@ -2,7 +2,7 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
@@ -12,8 +12,14 @@
  */
 #ifndef INFOCMD_H
 #define INFOCMD_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern void init_info(void);
 extern void infocommands(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

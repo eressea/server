@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -19,31 +19,31 @@
  * permission from the authors.
  */
 
-#ifndef LAWS_H
-#define LAWS_H
+#ifndef H_GC_LAWS
+#define H_GC_LAWS
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void quit(void);
 int getoption(void);
 int wanderoff(struct region * r, int p);
 void demographics(void);
-void instant_orders(void);
 void last_orders(void);
-void set_passw(void);
 void stripunit(struct unit * u);
-void mail(void);
 void find_address(void);
-void bewache_an(void);
 void remove_unequipped_guarded(void);
-extern void sinkships(void);
 
 /* eressea-specific. put somewhere else, please. */
 #include "resolve.h"
 
 void processorders(void);
 extern int count_migrants (const struct faction * f);
-
 #if GROWING_TREES
 extern attrib_type at_germs;
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

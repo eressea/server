@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -11,8 +11,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef BATTLE_H
-#define BATTLE_H
+#ifndef H_KRNL_BATTLE
+#define H_KRNL_BATTLE
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** new code defines **/
 #define FAST_GETUNITROW
@@ -221,14 +224,16 @@ extern struct cvector * fighters(struct battle *b, struct fighter *af, int minro
 extern int countallies(struct side * as);
 extern int get_unitrow(struct fighter * af);
 extern boolean helping(struct side * as, struct side * ds);
-extern void rmtroop(struct troop dt);
 extern void rmfighter(fighter *df, int i);
 extern struct region * fleeregion(const struct unit * u);
-extern boolean enemy (const struct side * a, const struct side * b);
 extern struct troop select_corpse(struct battle * b, struct fighter * af);
 extern fighter * make_fighter(struct battle * b, struct unit * u, boolean attack);
 extern int statusrow(int status);
-extern void flee(const troop dt);
 extern void drain_exp(struct unit *u, int d);
+extern void rmtroop(troop dt);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -1,19 +1,20 @@
 /* vi: set ts=2:
- *
- *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
- *      Christian Schlittchen (corwin@amber.kn-bremen.de)
- *      Katja Zedel (katze@felidae.kn-bremen.de)
- *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea-pbem.de)
- *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
- *
- * This program may not be used, modified or distributed without
- * prior permission by the authors of Eressea.
+ +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
+ |                   |  Enno Rehling <enno@eressea-pbem.de>
+ | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
+ +-------------------+  Stefan Reich <reich@halbling.de>
+
+ This program may not be used, modified or distributed
+ without prior permission by the authors of Eressea.
  */
 
-#ifndef SKILL_H
-#define SKILL_H
+#ifndef H_KRNL_SKILL
+#define H_KRNL_SKILL
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern signed char skill_bonus(struct unit * u, struct region * r);
 
@@ -58,4 +59,7 @@ extern int skill_compare(const skill * sk, const skill * sc);
 extern void sk_set(skill * sv, int level);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif

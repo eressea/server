@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -54,10 +54,44 @@
 
 
 /* ------------------------------------------------------------- */
-direction_t
-dirmirror(direction_t dir)
+
+#define MAXENTITYHASH 8191
+curse *cursehash[MAXENTITYHASH];
+
+void
+chash(curse *c)
 {
-	return (direction_t)((dir+MAXDIRECTIONS/2) % MAXDIRECTIONS);
+	curse *old = cursehash[c->no %MAXENTITYHASH];
+
+	cursehash[c->no %MAXENTITYHASH] = c;
+	c->nexthash = old;
+}
+
+static void
+cunhash(curse *c)
+{
+	curse **show;
+
+	for (show = &cursehash[c->no % MAXENTITYHASH]; *show; show = &(*show)->nexthash) {
+		if ((*show)->no == c->no)
+			break;
+	}
+	if (*show) {
+		assert(*show == c);
+		*show = (*show)->nexthash;
+		c->nexthash = 0;
+	}
+}
+
+curse *
+cfindhash(int i)
+{
+	curse *old;
+
+	for (old = cursehash[i % MAXENTITYHASH]; old; old = old->nexthash)
+		if (old->no == i)
+			return old;
+	return NULL;
 }
 
 /* ------------------------------------------------------------- */
@@ -91,6 +125,89 @@ curse_done(attrib * a) {
 	free(c);
 }
 
+/* ------------------------------------------------------------- */
+
+int
+curse_read(attrib * a, FILE * f) {
+	int mageid;
+	curse * c = (curse*)a->data.v;
+	const curse_type * ct;
+
+	if (global.data_version >= CURSETYPE_VERSION) {
+		char cursename[64];
+		fscanf(f, "%d %s %d %d %d %d %d ", &c->no, cursename, &c->flag,
+			&c->duration, &c->vigour, &mageid, &c->effect.i);
+		ct = ct_find(cursename);
+	} else {
+		int cspellid;
+		if (global.data_version < CURSE_NO_VERSION) {
+			fscanf(f, "%d %d %d %d %d %d ",&cspellid, &c->flag, &c->duration,
+				&c->vigour, &mageid, &c->effect.i);
+			c->no = newunitid();
+		} else {
+			fscanf(f, "%d %d %d %d %d %d %d ", &c->no, &cspellid, &c->flag,
+				&c->duration, &c->vigour, &mageid, &c->effect.i);
+		}
+		ct = ct_find(oldcursename(cspellid));
+	}
+	assert(ct!=NULL);
+
+#ifdef CONVERT_DBLINK
+	if (global.data_version<DBLINK_VERSION) {
+		static const curse_type * cmonster = NULL;
+		if (!cmonster) cmonster=ct_find("calmmonster");
+		if (ct==cmonster) {
+			c->effect.v = uniquefaction(c->effect.i);
+		}
+	}
+#endif
+	c->type = ct;
+
+	/* beim Einlesen sind noch nicht alle units da, muss also
+	 * zwischengespeichert werden. */
+	if (mageid == -1){
+		c->magician = (unit *)NULL;
+	} else {
+		ur_add((void*)mageid, (void**)&c->magician, resolve_unit);
+	}
+
+	if (c->type->read) c->type->read(f, c);
+	else if (c->type->typ==CURSETYP_UNIT) {
+		curse_unit * cc = calloc(1, sizeof(curse_unit));
+
+		c->data = cc;
+		fscanf(f, "%d ", &cc->cursedmen);
+	}
+	chash(c);
+
+	return AT_READ_OK;
+}
+
+void
+curse_write(const attrib * a, FILE * f) {
+	int flag;
+	int mage_no;
+	curse * c = (curse*)a->data.v;
+	const curse_type * ct = c->type;
+
+	flag = (c->flag & ~(CURSE_ISNEW));
+
+	if (c->magician){
+		mage_no = c->magician->no;
+	} else {
+		mage_no = -1;
+	}
+
+	fprintf(f, "%d %s %d %d %d %d %d ", c->no, ct->cname, flag,
+			c->duration, c->vigour, mage_no, c->effect.i);
+
+	if (c->type->write) c->type->write(f, c);
+	else if (c->type->typ == CURSETYP_UNIT) {
+		curse_unit * cc = (curse_unit*)c->data;
+		fprintf(f, "%d ", cc->cursedmen);
+	}
+}
+
 attrib_type at_curse =
 {
 	"curse",
@@ -101,49 +218,6 @@ attrib_type at_curse =
 	curse_read,
 	ATF_CURSE
 };
-
-
-/* ------------------------------------------------------------- */
-
-#define MAXENTITYHASH 8191
-curse *cursehash[MAXENTITYHASH];
-
-void
-chash(curse *c)
-{
-	curse *old = cursehash[c->no %MAXENTITYHASH];
-
-	cursehash[c->no %MAXENTITYHASH] = c;
-	c->nexthash = old;
-}
-
-void
-cunhash(curse *c)
-{
-	curse **show;
-
-	for (show = &cursehash[c->no % MAXENTITYHASH]; *show; show = &(*show)->nexthash) {
-		if ((*show)->no == c->no)
-			break;
-	}
-	if (*show) {
-		assert(*show == c);
-		*show = (*show)->nexthash;
-		c->nexthash = 0;
-	}
-}
-
-curse *
-cfindhash(int i)
-{
-	curse *old;
-
-	for (old = cursehash[i % MAXENTITYHASH]; old; old = old->nexthash)
-		if (old->no == i)
-			return old;
-	return NULL;
-}
-
 /* ------------------------------------------------------------- */
 /* Spruch identifizieren */
 
@@ -184,30 +258,6 @@ ct_find(const char *c)
 	 */
 	assert(!"unknown cursetype");
 	return NULL;
-}
-
-/* ------------------------------------------------------------- */
-boolean
-is_normalcurse(const curse_type * ct)
-{
-
-	if (!ct) return false;
-
-	if (ct->typ == CURSETYP_NORM)
-		return true;
-
-	return false;
-}
-
-boolean
-is_curseunit(const curse_type * ct)
-{
-	if (!ct) return false;
-
-	if (ct->typ == CURSETYP_UNIT)
-		return true;
-
-	return false;
 }
 
 /* ------------------------------------------------------------- */
@@ -282,17 +332,6 @@ findcurse(int cid)
 }
 
 /* ------------------------------------------------------------- */
-/* Normalerweise ist alles ausser der Id eines curse und dem
- * verzauberten Objekt nicht bekannt. Um den Zauber eindeutig zu
- * identifizieren benötigt man je nach Typ einen weiteren Identifier.
- */
-void
-remove_cursetype(attrib **ap, const curse_type *ct)
-{
-	attrib *a = a_select(*ap, ct, cmp_cursetype);
-	if (a) a_remove(ap, a);
-}
-
 void
 remove_curse(attrib **ap, const curse *c)
 {
@@ -357,7 +396,7 @@ curse_geteffect(const curse *c)
 }
 
 /* ------------------------------------------------------------- */
-void
+static void
 set_curseingmagician(struct unit *magician, struct attrib *ap_target, const curse_type *ct)
 {
 	curse * c = get_curse(ap_target, ct);
@@ -366,35 +405,7 @@ set_curseingmagician(struct unit *magician, struct attrib *ap_target, const curs
 	}
 }
 
-unit *
-get_cursingmagician(struct attrib *ap, const curse_type *ct)
-{
-	curse *c = get_curse(ap, ct);
-	if( !c )
-		return NULL;
-
-	return c->magician;
-}
-
-/* Wichtig! Alle struct curse<typ>, die den Verweis auf den zaubenden
- * Magier enthalten, müssen sie hier mit abgeprüft werden
- */
-void
-remove_cursemagepointer(unit *magician, attrib *ap_target)
-{
-	const attrib * a;
-
-	a = a_find(ap_target, &at_curse);
-	while (a) {
-		curse *c = (curse*)a->data.v;
-		if(c->magician == magician)
-			c->magician = (unit*)NULL;
-		a = a->nexttype;
-	}
-}
-
 /* ------------------------------------------------------------- */
-
 /* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
  * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
 int
@@ -424,25 +435,6 @@ set_cursedmen(curse *c, int cursedmen)
 		curse_unit * cc = (curse_unit*)c->data;
 		cc->cursedmen = cursedmen;
 	}
-}
-
-int
-change_cursedmen(attrib **ap, curse *c, int cursedmen)
-{
-	if (!c) return 0;
-
-	/* je nach curse_type andere data struct */
-	if (c->type->typ == CURSETYP_UNIT) {
-		curse_unit * cc = (curse_unit*)c->data;
-		cursedmen +=  cc->cursedmen;
-	}
-	if (cursedmen <= 0) {
-		remove_curse(ap, c);
-	} else {
-		set_cursedmen(c, cursedmen);
-	}
-
-	return cursedmen;
 }
 
 /* ------------------------------------------------------------- */

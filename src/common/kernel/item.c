@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -205,7 +205,7 @@ new_itemtype(resource_type * rtype,
 	return itype;
 }
 
-void
+static void
 lt_register(luxury_type * ltype)
 {
 #ifdef AT_LTYPE
@@ -273,7 +273,7 @@ new_weapontype(item_type * itype,
 }
 
 
-void
+static void
 pt_register(potion_type * ptype)
 {
 #ifdef AT_PTYPE
@@ -303,7 +303,7 @@ new_potiontype(item_type * itype,
 }
 
 
-void
+static void
 ht_register(herb_type * htype)
 {
 #ifdef AT_HTYPE
@@ -639,7 +639,7 @@ give_horses(const unit * s, const unit * d, const item_type * itype, int n, cons
 #define LASTLUXURY      (I_INCENSE +1)
 #define MAXLUXURIES (LASTLUXURY - FIRSTLUXURY)
 
-struct item_type * olditemtype[MAXITEMS+1];
+item_type * olditemtype[MAXITEMS+1];
 resource_type * oldresourcetype[MAXRESOURCES+1];
 herb_type * oldherbtype[MAXHERBS+1];
 luxury_type * oldluxurytype[MAXLUXURIES+1];
@@ -881,7 +881,7 @@ use_tacticcrystal(region * r, unit * u, int amount, strlist * cmdstrings)
 	return;
 }
 
-t_item itemdata[MAXITEMS] = {
+static t_item itemdata[MAXITEMS] = {
 	/* name[4]; typ; sk; minskill; material[6]; gewicht; preis;
 	 * benutze_funktion; */
 	{			/* I_IRON */
@@ -1430,6 +1430,10 @@ init_olditems(void)
 		construction * con = calloc(sizeof(construction), 1);
 
 		con->minskill = itemdata[i].minskill;
+		if (i==I_LAEN && SkillCap(SK_QUARRYING)) {
+			/* at least 4 levels on which you can mine laen */
+			con->minskill = SkillCap(SK_QUARRYING)-3;
+		}
 		con->skill = itemdata[i].skill;
 		con->maxsize = -1;
 		con->reqsize = 1;
@@ -1640,7 +1644,7 @@ init_oldherbs(void)
 	}
 }
 
-const char *potionnames[3][MAXPOTIONS] =
+static const char *potionnames[3][MAXPOTIONS] =
 {
 	{
 		/* Stufe 1: */
@@ -1804,7 +1808,7 @@ herb_t potionherbs[MAXPOTIONS][MAXHERBSPERPOTION] =
 };
 #endif
 
-const char *potiontext[MAXPOTIONS] =
+static const char *potiontext[MAXPOTIONS] =
 {
 	/* Stufe 1: */
 	"Für den Siebenmeilentee koche man einen Blauen Baumringel auf und "
@@ -1935,7 +1939,7 @@ use_warmthpotion(struct unit *u, const struct potion_type *ptype, int amount, co
 {
 	assert(ptype==oldpotiontype[P_WARMTH]);
 	if (old_race(u->faction->race) == RC_INSECT) {
-		fset(u, FL_WARMTH);
+		fset(u, UFL_WARMTH);
 	} else {
 		/* nur für insekten: */
 		cmistake(u, cmd, 163, MSG_EVENT);
@@ -2012,7 +2016,7 @@ use_snowball(struct unit * user, const struct item_type * itype, int amount, con
 	return 0;
 }
 
-void
+static void
 init_oldpotions(void)
 {
 	potion_t p;
@@ -2380,15 +2384,6 @@ attrib_type at_showitem = {
 	"showitem"
 };
 
-attrib_type at_seenitem = {
-	"showitem",
-	NULL,
-	NULL,
-	NULL,
-	a_writedefault,
-	a_readdefault
-};
-
 static local_names * inames;
 
 const item_type *
@@ -2624,8 +2619,6 @@ resname(resource_t res, int index)
 void
 register_resources(void)
 {
-
-	register_function((pf_generic)limit_oldtypes, "limit_oldtypes");
 	register_function((pf_generic)mod_elves_only, "mod_elves_only");
 	register_function((pf_generic)res_changeitem, "changeitem");
 	register_function((pf_generic)res_changeperson, "changeperson");
@@ -2633,6 +2626,8 @@ register_resources(void)
 	register_function((pf_generic)res_changepermaura, "changepermaura");
 	register_function((pf_generic)res_changehp, "changehp");
 	register_function((pf_generic)res_changeaura, "changeaura");
+
+	register_function((pf_generic)limit_oldtypes, "limit_oldtypes");
 
 	register_function((pf_generic)use_oldresource, "useoldresource");
 	register_function((pf_generic)use_olditem, "useolditem");
@@ -2652,7 +2647,8 @@ register_resources(void)
 	xml_register(&xml_resource, "eressea resource", 0);
 }
 
-int
+#if 0
+static int
 xml_writeitems(const char * file)
 {
 	FILE * stream = fopen(file, "w+");
@@ -2829,3 +2825,4 @@ xml_writeitems(const char * file)
 	fclose(stream);
 	return 0;
 }
+#endif

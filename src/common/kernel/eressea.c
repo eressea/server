@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -84,6 +84,57 @@ FILE    *logfile;
 FILE    *updatelog;
 const struct race * new_race[MAXRACES];
 boolean sqlpatch = false;
+int turn;
+
+static attrib_type at_creator = {
+	"creator"
+	/* Rest ist NULL; temporäres, nicht alterndes Attribut */
+};
+static int 
+MaxAge() {
+	static int value = -1;
+	if (value<0) {
+		value = atoi(get_param(global.parameters, "MaxAge"));
+	}
+	return value;
+}
+
+int
+LongHunger() {
+	static int value = -1;
+	if (value<0) {
+		value = atoi(get_param(global.parameters, "hunger.long"));
+	}
+	return value;
+}
+
+int
+SkillCap(skill_t sk) {
+	static int value = -1;
+	if (sk==SK_MAGIC) return 0; /* no caps on magic */
+	if (value<0) {
+		value = atoi(get_param(global.parameters, "skill.maxlevel"));
+	}
+	return value;
+}
+
+boolean
+TradeDisabled() {
+	static int value = -1;
+	if (value<0) {
+		value = (boolean)atoi(get_param(global.parameters, "trade.disabled"));
+	}
+	return value;
+}
+
+int 
+NMRTimeout() {
+	static int value = -1;
+	if (value<0) {
+		value = atoi(get_param(global.parameters, "nmr.timeout"));
+	}
+	return value;
+}
 
 race_t
 old_race(const struct race * rc)
@@ -119,12 +170,6 @@ dbrace(const struct race * rc)
 	}
 	return zText;
 }
-
-const char *gr_prefix[3] = {
-	"einem",
-	"einer",
-	"einem"
-};
 
 const char *parameters[MAXPARAMS] =
 {
@@ -791,7 +836,7 @@ alliedunit(const unit * u, const faction * f2, int mode)
 boolean
 seefaction(const faction * f, const region * r, const unit * u, int modifier)
 {
-	if (((f == u->faction) || !fval(u, FL_PARTEITARNUNG)) && cansee(f, r, u, modifier))
+	if (((f == u->faction) || !fval(u, UFL_PARTEITARNUNG)) && cansee(f, r, u, modifier))
 		return true;
 	return false;
 }
@@ -982,7 +1027,7 @@ strcheck (const char *s, size_t maxlen)
 }
 #endif
 
-attrib_type at_lighthouse = {
+static attrib_type at_lighthouse = {
 	"lighthouse"
 	/* Rest ist NULL; temporäres, nicht alterndes Attribut */
 };
@@ -1330,7 +1375,7 @@ getnewunit (const region * r, const faction * f)
 	return findnewunit (r, f, n);
 }
 
-int
+static int
 read_newunitid (const faction * f, const region * r)
 {
 	int n;
@@ -1548,7 +1593,7 @@ xunitid(const unit *u)
 
 extern faction * dfindhash(int i);
 
-const char* forbidden[] = { "t", "te", "tem", "temp", NULL };
+static const char* forbidden[] = { "t", "te", "tem", "temp", NULL };
 
 int
 forbiddenid(int id)
@@ -1613,7 +1658,7 @@ newcontainerid(void)
 	return random_no;
 }
 
-void
+static void
 createunitid(unit *u, int id)
 {
 	if (id<=0 || id > MAX_UNIT_NR || ufindhash(id) || dfindhash(id) || forbiddenid(id))
@@ -1628,11 +1673,6 @@ createunit(region * r, faction * f, int number, const struct race * rc)
 {
 	return create_unit(r, f, number, rc, 0, NULL, NULL);
 }
-
-attrib_type at_creator = {
-	"creator"
-	/* Rest ist NULL; temporäres, nicht alterndes Attribut */
-};
 
 unit *
 create_unit(region * r, faction * f, int number, const struct race *urace, int id, const char * dname, unit *creator)
@@ -1686,8 +1726,8 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
 		}
 
 		/* Temps von parteigetarnten Einheiten sind wieder parteigetarnt */
-		if (fval(creator, FL_PARTEITARNUNG))
-			fset(u, FL_PARTEITARNUNG);
+		if (fval(creator, UFL_PARTEITARNUNG))
+			fset(u, UFL_PARTEITARNUNG);
 
 		/* Daemonentarnung */
 		set_racename(&u->attribs, get_racename(creator->attribs));
@@ -1710,7 +1750,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
 		a->data.v = creator;
 	}
 	/* Monster sind grundsätzlich parteigetarnt */
-	if(f->no <= 0) fset(u, FL_PARTEITARNUNG);
+	if(f->no <= 0) fset(u, UFL_PARTEITARNUNG);
 
 	return u;
 }
@@ -1850,7 +1890,7 @@ void ** blk_list[1024];
 int list_index;
 int blk_index;
 
-void
+static void
 gc_done(void)
 {
 	int i, k;
@@ -1968,16 +2008,49 @@ init_tokens(const struct locale * lang)
 	}
 	for (i=0;i!=MAXPARAMS;++i)
 		addtoken(&lnames->tokens[UT_PARAM], LOC(lang, parameters[i]), (void*)i);
-	for (i=0;i!=MAXSKILLS;++i)
-		addtoken(&lnames->skillnames, skillname((skill_t)i, lang), (void*)i);
+	for (i=0;i!=MAXSKILLS;++i) {
+		if (i!=SK_TRADE || !TradeDisabled()) {
+			addtoken(&lnames->skillnames, skillname((skill_t)i, lang), (void*)i);
+		}
+	}
 	for (i=0;i!=MAXKEYWORDS;++i)
 		addtoken(&lnames->keywords, LOC(lang, keywords[i]), (void*)i);
 	for (i=0;i!=MAXOPTIONS;++i)
 		addtoken(&lnames->options, LOC(lang, options[i]), (void*)i);
-#if 0
-	for (i=0;umlaut[i].txt;++i)
-		addtoken(&lnames->tokens[umlaut[i].typ], umlaut[i].txt, (void*)umlaut[i].id);
-#endif
+}
+
+typedef struct param {
+	struct param * next;
+	char * name;
+	char * data;
+} param;
+
+const char *
+get_param(const struct param * p, const char * key)
+{
+	while (p!=NULL) {
+		if (strcmp(p->name, key)==0) return p->data;
+		p = p->next;
+	}
+	return "0";
+}
+
+
+void
+set_param(struct param ** p, const char * key, const char * data)
+{
+	while (*p!=NULL) {
+		if (strcmp((*p)->name, key)==0) {
+			free((*p)->data);
+			(*p)->data = strdup(data);
+			return;
+		}
+		p=&(*p)->next;
+	}
+	*p = malloc(sizeof(param));
+	(*p)->name = strdup(key);
+	(*p)->data = strdup(data);
+	(*p)->next = NULL;
 }
 
 void
@@ -2024,6 +2097,10 @@ parse_tagbegin(struct xml_stack *stack)
 		if (maxunits!=0) {
 			global.maxunits = maxunits;
 		}
+	} else if (strcmp(tag->name, "param")==0) {
+		const char * name = xml_value(tag, "name");
+		const char * value = xml_value(tag, "value");
+		set_param(&global.parameters, name, value);
 	} else if (strcmp(tag->name, "order")==0) {
 		const char * name = xml_value(tag, "name");
 		if (xml_bvalue(tag, "disable")) {
@@ -2056,7 +2133,7 @@ read_xml(const char * filename, xml_stack * stack)
 		return XML_USERERROR;
 	}
 
-	i = xml_read(F, stack);
+	i = xml_read(F, filename, stack);
 	fclose(F);
 	return i;
 }
@@ -2099,105 +2176,10 @@ attrib_type at_germs = {
 	ATF_UNIQUE
 };
 
-void
-attrib_init(void)
-{
-	/* Alle speicherbaren Attribute müssen hier registriert werden */
-	at_register(&at_unitdissolve);
-	at_register(&at_traveldir_new);
-	at_register(&at_familiar);
-	at_register(&at_familiarmage);
-	at_register(&at_clone);
-	at_register(&at_clonemage);
-	at_register(&at_eventhandler);
-	at_register(&at_stealth);
-	at_register(&at_mage);
-	at_register(&at_bauernblut);
-	at_register(&at_countdown);
-	at_register(&at_showitem);
-	at_register(&at_curse);
-	at_register(&at_cursewall);
-
-	at_register(&at_seenspell);
-	at_register(&at_reportspell);
-	at_register(&at_deathcloud);
-
-	/* neue REGION-Attribute */
-	at_register(&at_direction);
-	at_register(&at_moveblock);
-#if AT_SALARY
-	at_register(&at_salary);
-#endif
-	at_register(&at_horseluck);
-	at_register(&at_peasantluck);
-	at_register(&at_deathcount);
-	at_register(&at_chaoscount);
-	at_register(&at_woodcount);
-	at_register(&at_road);
-
-	/* neue UNIT-Attribute */
-	at_register(&at_alias);
-	at_register(&at_siege);
-	at_register(&at_target);
-	at_register(&at_potion);
-	at_register(&at_potionuser);
-	at_register(&at_contact);
-	at_register(&at_effect);
-	at_register(&at_private);
-
-	at_register(&at_icastle);
-	at_register(&at_guard);
-	at_register(&at_lighthouse);
-	at_register(&at_group);
-	at_register(&at_faction_special);
-	at_register(&at_prayer_timeout);
-	at_register(&at_prayer_effect);
-	at_register(&at_wyrm);
-	at_register(&at_building_generic_type);
-
-/* border-typen */
-	register_bordertype(&bt_noway);
-	register_bordertype(&bt_fogwall);
-	register_bordertype(&bt_wall);
-	register_bordertype(&bt_illusionwall);
-	register_bordertype(&bt_firewall);
-	register_bordertype(&bt_wisps);
-	register_bordertype(&bt_road);
-	register_bordertype(&bt_questportal);
-
-	at_register(&at_jihad);
-	at_register(&at_skillmod);
-#if GROWING_TREES
-	at_register(&at_germs);
-#endif
-	at_register(&at_laen); /* required for old datafiles */
-	at_register(&at_xontormiaexpress); /* required for old datafiles */
-}
-
-void
-kernel_init(void)
-{
-	char zBuffer[MAX_PATH];
-	skill_init();
-	attrib_init();
-	translation_init();
-	init_messages();
-
-	if (!turn) turn = lastturn();
-	if (turn == 0)
-		srand(time((time_t *) NULL));
-	else
-		srand(turn);
-	if (sqlpatch) {
-		sprintf(zBuffer, "%s/patch-%d.sql", datapath(), turn);
-		sql_init(zBuffer);
-	}
-}
-
 /*********************/
 /*   at_guard   */
 /*********************/
-attrib_type at_guard = {
+static attrib_type at_guard = {
 	"guard",
 	DEFAULT_INIT,
 	DEFAULT_FINALIZE,
@@ -2307,12 +2289,13 @@ void
 remove_empty_units_in_region(region *r)
 {
 	unit **up = &r->units;
+
 	while (*up) {
 		unit * u = *up;
-#ifdef MAXAGE
-		faction * f = u->faction;
-		if (!fval(f, FFL_NOTIMEOUT) && f->age > MAXAGE) set_number(u, 0);
-#endif
+		if (MaxAge()>0) {
+			faction * f = u->faction;
+			if (!fval(f, FFL_NOTIMEOUT) && f->age > MaxAge()) set_number(u, 0);
+		}
 		if ((u->number <= 0 && u->race != new_race[RC_SPELL])
 		 	|| (u->age <= 0 && u->race == new_race[RC_SPELL])
 		 	|| u->number < 0) {
@@ -2679,8 +2662,6 @@ fwage(const region *r, const faction *f, boolean img)
 	return wage;
 }
 
-
-
 static region *
 findspecialdirection(const region *r, const char *token)
 {
@@ -2803,9 +2784,11 @@ int months_per_year;
 int
 month(int offset)
 {
-	int t = turn - FIRST_TURN + offset;
+	int t = turn + offset;
 	int year, r, month;
-
+#ifdef FIRST_TURN
+	t -= FIRST_TURN;
+#endif
 	if (t<0) t = turn;
 
 	year  = t/(months_per_year * weeks_per_month) + 1;
@@ -2833,12 +2816,12 @@ reorder_owners(region * r)
 			unit * u = *useek;
 			if (u->building==b) {
 				unit ** insert;
-				if (fval(u, FL_OWNER)) {
+				if (fval(u, UFL_OWNER)) {
 					unit * nu = *ubegin;
 					insert=ubegin;
-					if (nu!=u && nu->building==u->building && fval(nu, FL_OWNER)) {
-						log_error(("[reorder_owners] %s hat mehrere Besitzer mit FL_OWNER.\n", buildingname(nu->building)));
-						freset(nu, FL_OWNER);
+					if (nu!=u && nu->building==u->building && fval(nu, UFL_OWNER)) {
+						log_error(("[reorder_owners] %s hat mehrere Besitzer mit UFL_OWNER.\n", buildingname(nu->building)));
+						freset(nu, UFL_OWNER);
 					}
 				}
 				else insert = uend;
@@ -2859,9 +2842,9 @@ reorder_owners(region * r)
 		unit * u = *useek;
 		assert(!u->building);
 		if (u->ship==NULL) {
-			if (fval(u, FL_OWNER)) {
+			if (fval(u, UFL_OWNER)) {
 				log_warning(("[reorder_owners] Einheit %s war Besitzer von nichts.\n", unitname(u)));
-				freset(u, FL_OWNER);
+				freset(u, UFL_OWNER);
 			}
 			if (useek!=up) {
 				*useek = u->next; /* raus aus der liste */
@@ -2882,12 +2865,12 @@ reorder_owners(region * r)
 			unit * u = *useek;
 			if (u->ship==sh) {
 				unit ** insert;
-				if (fval(u, FL_OWNER)) {
+				if (fval(u, UFL_OWNER)) {
 					unit * nu = *ubegin;
 					insert = ubegin;
-					if (nu!=u && nu->ship==u->ship && fval(nu, FL_OWNER)) {
-						log_error(("[reorder_owners] %s hat mehrere Besitzer mit FL_OWNER.\n", shipname(nu->ship)));
-						freset(nu, FL_OWNER);
+					if (nu!=u && nu->ship==u->ship && fval(nu, UFL_OWNER)) {
+						log_error(("[reorder_owners] %s hat mehrere Besitzer mit UFL_OWNER.\n", shipname(nu->ship)));
+						freset(nu, UFL_OWNER);
 					}
 				}
 				else insert = uend;
@@ -2926,4 +2909,96 @@ teure_talente (const struct unit * u)
 		return false;
 	}
 }
+void
+attrib_init(void)
+{
+	/* Alle speicherbaren Attribute müssen hier registriert werden */
+	at_register(&at_unitdissolve);
+	at_register(&at_traveldir_new);
+	at_register(&at_familiar);
+	at_register(&at_familiarmage);
+	at_register(&at_clone);
+	at_register(&at_clonemage);
+	at_register(&at_eventhandler);
+	at_register(&at_stealth);
+	at_register(&at_mage);
+	at_register(&at_bauernblut);
+	at_register(&at_countdown);
+	at_register(&at_showitem);
+	at_register(&at_curse);
+	at_register(&at_cursewall);
 
+	at_register(&at_seenspell);
+	at_register(&at_reportspell);
+	at_register(&at_deathcloud);
+
+	/* neue REGION-Attribute */
+	at_register(&at_direction);
+	at_register(&at_moveblock);
+#if AT_SALARY
+	at_register(&at_salary);
+#endif
+	at_register(&at_horseluck);
+	at_register(&at_peasantluck);
+	at_register(&at_deathcount);
+	at_register(&at_chaoscount);
+	at_register(&at_woodcount);
+	at_register(&at_road);
+
+	/* neue UNIT-Attribute */
+	at_register(&at_alias);
+	at_register(&at_siege);
+	at_register(&at_target);
+	at_register(&at_potionuser);
+	at_register(&at_contact);
+	at_register(&at_effect);
+	at_register(&at_private);
+
+	at_register(&at_icastle);
+	at_register(&at_guard);
+	at_register(&at_lighthouse);
+	at_register(&at_group);
+	at_register(&at_faction_special);
+	at_register(&at_prayer_timeout);
+	at_register(&at_prayer_effect);
+	at_register(&at_wyrm);
+	at_register(&at_building_generic_type);
+
+	/* border-typen */
+	register_bordertype(&bt_noway);
+	register_bordertype(&bt_fogwall);
+	register_bordertype(&bt_wall);
+	register_bordertype(&bt_illusionwall);
+	register_bordertype(&bt_firewall);
+	register_bordertype(&bt_wisps);
+	register_bordertype(&bt_road);
+	register_bordertype(&bt_questportal);
+
+	at_register(&at_jihad);
+	at_register(&at_skillmod);
+#if GROWING_TREES
+	at_register(&at_germs);
+#endif
+	at_register(&at_laen); /* required for old datafiles */
+	at_register(&at_xontormiaexpress); /* required for old datafiles */
+}
+
+void
+kernel_init(void)
+{
+	char zBuffer[MAX_PATH];
+	skill_init();
+	attrib_init();
+	translation_init();
+	init_messages();
+
+	if (!turn) turn = lastturn();
+	if (turn == 0)
+		srand(time((time_t *) NULL));
+	else
+		srand(turn);
+	if (sqlpatch) {
+		sprintf(zBuffer, "%s/patch-%d.sql", datapath(), turn);
+		sql_init(zBuffer);
+	}
+}

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -13,6 +13,9 @@
  */
 #ifndef MY_LOCALE_H
 #define MY_LOCALE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct locale;
 
@@ -38,4 +41,7 @@ extern struct locale * default_locale;
 extern struct locale * locales;
 extern struct locale * nextlocale(const struct locale * lang);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -12,8 +12,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef BORDER_H
-#define BORDER_H
+#ifndef H_KRNL_BORDER
+#define H_KRNL_BORDER
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define BMAXHASH 8191
 
@@ -116,4 +119,7 @@ extern border_type bt_questportal;
 
 extern attrib_type at_countdown;
 
+#ifdef __cplusplus
+}
+#endif
 #endif

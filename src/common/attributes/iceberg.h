@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  * 
- * Eressea PB(E)M host Copyright (C) 1998-2000
+ * Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -12,7 +12,19 @@
  * prior permission by the authors of Eressea.
  */
 
+#ifndef H_ATTRIBUTE_ICEBERG
+#define H_ATTRIBUTE_ICEBERG
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern struct attrib_type at_iceberg;
 
 extern struct attrib * make_iceberg(direction_t dir);
 extern void init_iceberg(void);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+

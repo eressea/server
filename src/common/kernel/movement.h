@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -11,8 +11,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef MOVE_H
-#define MOVE_H
+#ifndef H_KRNL_MOVEMENT
+#define H_KRNL_MOVEMENT
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct unit;
 struct ship;
@@ -52,17 +55,18 @@ extern void movement(void);
 extern direction_t * travel(struct region * r, struct unit * u, struct region * r2, int flucht);
 extern struct unit *is_guarded(struct region * r, struct unit * u, unsigned int mask);
 extern int enoughsailors(struct region * r, struct ship * sh);
-extern boolean cansail(const struct region * r, struct ship * sh);
 extern boolean canswim(struct unit *u);
 extern struct unit *kapitaen(struct region * r, struct ship * sh);
 extern void travelthru(struct unit * u, struct region * r);
 extern struct ship * move_ship(struct ship * sh, struct region * from, struct region * to, struct region ** route);
-
-extern attrib_type at_piracy_direction;
 
 extern void follow(void);
 
 struct building_type;
 boolean buildingtype_exists(const struct region * r, const struct building_type * bt);
 struct unit* owner_buildingtyp(const struct region * r, const struct building_type * bt);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

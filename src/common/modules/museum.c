@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -210,24 +210,6 @@ warden_add_give(unit *src, unit *u, const item_type *itype, int n)
 }
 
 void
-init_museum(void)
-{
-	at_register(&at_warden);
-	at_register(&at_museumexit);
-	at_register(&at_museumgivebackcookie);
-	at_register(&at_museumgiveback);
-
-	rt_register(&rt_museumticket);
-	it_register(&it_museumticket);
-
-	rt_register(&rt_museumexitticket);
-	it_register(&it_museumexitticket);
-
-	register_function((pf_generic)use_museumticket, "usemuseumticket");
-	register_function((pf_generic)use_museumexitticket, "usemuseumexitticket");
-}
-
-void
 create_museum(void)
 {
 	unsigned int museum_id = hashstring("museum");
@@ -413,3 +395,22 @@ use_museumexitticket(unit *u, const struct item_type *itype, int amount, const c
 
 	return 1;
 }
+
+void
+register_museum(void)
+{
+	at_register(&at_warden);
+	at_register(&at_museumexit);
+	at_register(&at_museumgivebackcookie);
+	at_register(&at_museumgiveback);
+
+	rt_register(&rt_museumticket);
+	it_register(&it_museumticket);
+
+	rt_register(&rt_museumexitticket);
+	it_register(&it_museumexitticket);
+
+	register_function((pf_generic)use_museumticket, "usemuseumticket");
+	register_function((pf_generic)use_museumexitticket, "usemuseumexitticket");
+}
+

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -34,7 +34,6 @@
 #include "message.h"
 #include "race.h"
 #include "monster.h"
-#include "creation.h"
 #include "names.h"
 #include "pool.h"
 #include "movement.h"
@@ -314,7 +313,7 @@ get_unit(region * r, unit * u)
 	set_string(&newunit->name, "Dorfbewohner");
 	set_money(newunit, (rand() % 26 + 10) * newunit->number);
 	fset(newunit, UFL_ISNEW);
-	if (fval(u, FL_PARTEITARNUNG)) fset(newunit, FL_PARTEITARNUNG);
+	if (fval(u, UFL_PARTEITARNUNG)) fset(newunit, UFL_PARTEITARNUNG);
 	switch (rand() % 4) {
 	case 0:
 		set_level(newunit, SK_MINING, 1);
@@ -467,7 +466,7 @@ get_allies(region * r, unit * u)
 	if(u->race->flags & RCF_SHAPESHIFT) {
 		newunit->irace = u->irace;
 	}
-	if (fval(u, FL_PARTEITARNUNG)) fset(newunit, FL_PARTEITARNUNG);
+	if (fval(u, UFL_PARTEITARNUNG)) fset(newunit, UFL_PARTEITARNUNG);
 	fset(u, UFL_ISNEW);
 
 	sprintf(buf, "Plötzlich stolper%c %s über einige %s. Nach kurzem "
@@ -1086,6 +1085,32 @@ randomevents(void)
 		}
 	}
 
+	/* Talentverschiebung: Talente von Dämonen verschieben sich */
+
+	for (r = regions; r; r = r->next) {
+		for (u = r->units; u; u = u->next) {
+			if (u->race == new_race[RC_DAEMON]) {
+				skill * sv = u->skills;
+				while (sv!=u->skills+u->skill_size) {
+					if (sv->level>0 && rand() % 100 < 25) {
+						int weeks = 1+rand()%3;
+						if (rand() % 100 < 40) {
+							reduce_skill(u, sv, weeks);
+						} else {
+							while (weeks--) learn_skill(u, sv->id, 1.0);
+						}
+						if (sv->old>sv->level) {
+							log_printf("%s dropped from %u to %u:%u in %s\n",
+									   unitname(u), sv->old, sv->level,
+									   sv->weeks, skillname(sv->id, NULL));
+						}
+					}
+					++sv;
+				}
+			}
+		}
+	}
+
 #if RACE_ADJUSTMENTS == 0
 	/* Orks vermehren sich */
 
@@ -1134,32 +1159,6 @@ randomevents(void)
 		}
 	}
 #endif
-
-	/* Talentverschiebung: Talente von Dämonen verschieben sich */
-
-	for (r = regions; r; r = r->next) {
-		for (u = r->units; u; u = u->next) {
-			if (u->race == new_race[RC_DAEMON]) {
-				skill * sv = u->skills;
-				while (sv!=u->skills+u->skill_size) {
-					if (sv->level>0 && rand() % 100 < 25) {
-						int weeks = 1+rand()%3;
-						if (rand() % 100 < 40) {
-							reduce_skill(u, sv, weeks);
-						} else {
-							while (weeks--) learn_skill(u, sv->id, 1.0);
-						}
-						if (sv->old>sv->level) {
-							log_printf("%s dropped from %u to %u:%u in %s\n",
-									   unitname(u), sv->old, sv->level,
-									   sv->weeks, skillname(sv->id, NULL));
-						}
-					}
-					++sv;
-				}
-			}
-		}
-	}
 
 	for (r = regions; r; r = r->next) {
 #if !RACE_ADJUSTMENTS

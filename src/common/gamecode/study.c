@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -283,7 +283,7 @@ teach(region * r, unit * u)
 			teachskill[i++]=sk;
 		} while (sk!=NOSKILL);
 		while (teaching && student) {
-			if (student->faction == u->faction && !fval(student, FL_HUNGER)) {
+			if (student->faction == u->faction && !fval(student, UFL_HUNGER)) {
 				if (igetkeyword(student->thisorder, student->faction->locale) == K_STUDY) {
 					/* Input ist nun von student->thisorder !! */
 					sk = getskill(student->faction->locale);
@@ -300,7 +300,7 @@ teach(region * r, unit * u)
 		}
 #if TEACH_FRIENDS
 		while (teaching && student) {
-			if (student->faction != u->faction && !fval(student, FL_HUNGER) && alliedunit(u, student->faction, HELP_GUARD)) {
+			if (student->faction != u->faction && !fval(student, UFL_HUNGER) && alliedunit(u, student->faction, HELP_GUARD)) {
 				if (igetkeyword(student->thisorder, student->faction->locale) == K_STUDY) {
 					/* Input ist nun von student->thisorder !! */
 					sk = getskill(student->faction->locale);
@@ -445,7 +445,7 @@ learn(void)
 	unit *u;
 	int p;
 	magic_t mtyp;
-	int i, l;
+	int l;
 	int warrior_skill;
 	int studycost;
 
@@ -466,6 +466,7 @@ learn(void)
 				attrib * a = NULL;
 				teaching_info * teach = NULL;
 				int money = 0;
+				skill_t sk;
 				int maxalchemy = 0;
 				if (u->race == new_race[RC_INSECT] && r_insectstalled(r)
 						&& !is_cursed(u->attribs, C_KAELTESCHUTZ,0)) {
@@ -479,28 +480,32 @@ learn(void)
 					sprintf(buf, "%s können nichts lernen", LOC(default_locale, rc_name(u->race, 1)));
 					mistake(u, u->thisorder, buf, MSG_EVENT);
 					continue;
-				} 
+				}
 
-				i = getskill(u->faction->locale);
+				sk = getskill(u->faction->locale);
 
-				if (i < 0) {
+				if (sk < 0) {
+					cmistake(u, findorder(u, u->thisorder), 77, MSG_EVENT);
+					continue;
+				}
+				if (SkillCap(sk) && SkillCap(sk) <= effskill(u, sk)) {
 					cmistake(u, findorder(u, u->thisorder), 77, MSG_EVENT);
 					continue;
 				}
 				/* Hack: Talente mit Malus -99 können nicht gelernt werden */
-				if (u->race->bonus[i] == -99) {
+				if (u->race->bonus[sk] == -99) {
 					cmistake(u, findorder(u, u->thisorder), 77, MSG_EVENT);
 					continue;
 				}
 				/* snotlings können Talente nur bis T8 lernen */
 				if (u->race == new_race[RC_SNOTLING]){
-					if (get_level(u, (skill_t)i) >= 8){
+					if (get_level(u, sk) >= 8){
 						cmistake(u, findorder(u, u->thisorder), 308, MSG_EVENT);
 						continue;
 					}
 				}
 
-				p = studycost = study_cost(u,i);
+				p = studycost = study_cost(u, sk);
 				a = a_find(u->attribs, &at_learning);
 				if (a!=NULL) {
 					teach = (teaching_info*)a->data.v;
@@ -525,7 +530,7 @@ learn(void)
 					}
 				}
 
-				if (i == SK_MAGIC) {
+				if (sk == SK_MAGIC) {
 					if (u->number > 1){
 						cmistake(u, findorder(u, u->thisorder), 106, MSG_MAGIC);
 						continue;
@@ -588,7 +593,7 @@ learn(void)
 						}
 					}
 				}
-				if (i == SK_ALCHEMY) {
+				if (sk == SK_ALCHEMY) {
 					maxalchemy = eff_skill(u, SK_ALCHEMY, r);
 					if (has_skill(u, SK_ALCHEMY)==0
 						&& count_skill(u->faction, SK_ALCHEMY) + u->number >
@@ -625,7 +630,7 @@ learn(void)
 				if (money>0) {
 					use_pooled(u, r, R_SILVER, money);
 					add_message(&u->faction->msgs, msg_message("studycost",
-						"unit region cost skill", u, u->region, money, i));
+						"unit region cost skill", u, u->region, money, sk));
 				}
 
 				if (get_effect(u, oldpotiontype[P_WISE])) {
@@ -641,9 +646,9 @@ learn(void)
 
 				warrior_skill = fspecial(u->faction, FS_WARRIOR);
 				if(warrior_skill > 0) {
-					if(i == SK_CROSSBOW || i == SK_LONGBOW
-					   || i == SK_CATAPULT || i == SK_SWORD || i == SK_SPEAR
-					   || i == SK_AUSDAUER || i == SK_WEAPONLESS)
+					if(sk == SK_CROSSBOW || sk == SK_LONGBOW
+					   || sk == SK_CATAPULT || sk == SK_SWORD || sk == SK_SPEAR
+					   || sk == SK_AUSDAUER || sk == SK_WEAPONLESS)
 					{
 						teach->value += u->number * (5+warrior_skill*5);
 					} else {
@@ -664,21 +669,21 @@ learn(void)
 				}
 #ifdef SKILLFIX_SAVE
 				if (teach && teach->value) {
-					int skill = get_skill(u, (skill_t)i);
-					skillfix(u, (skill_t)i, skill,
+					int skill = get_skill(u, sk);
+					skillfix(u, sk, skill,
 							 (int)(u->number * 30 * multi), teach->value);
 				}
 #endif
 
 				days = (int)((u->number * 30 + teach->value) * multi);
-				if (fval(u, FL_HUNGER)) days = days / 2;
+				if (fval(u, UFL_HUNGER)) days = days / 2;
 				while (days) {
 					if (days>=u->number*30) {
-						learn_skill(u, (skill_t)i, 1.0);
+						learn_skill(u, sk, 1.0);
 						days -= u->number*30;
 					} else {
 						double chance = (double)days/u->number/30;
-						learn_skill(u, (skill_t)i, chance);
+						learn_skill(u, sk, chance);
 						days = 0;
 					}
 				}
@@ -687,10 +692,10 @@ learn(void)
 						unit * teacher = teach->teacher;
 						if (teacher->faction != u->faction) {
 							add_message(&u->faction->msgs, msg_message("teach_student",
-								"teacher student skill", teacher, u, (skill_t)i));
+								"teacher student skill", teacher, u, sk));
 							add_message(&teacher->faction->msgs, msg_message("teach_teacher",
-								"teacher student skill level", teacher, u, (skill_t)i,
-								effskill(u, (skill_t)i)));
+								"teacher student skill level", teacher, u, sk,
+								effskill(u, sk)));
 						}
 					}
 					a_remove(&u->attribs, a);
@@ -700,7 +705,7 @@ learn(void)
 				/* Anzeigen neuer Tränke */
 				/* Spruchlistenaktualiesierung ist in Regeneration */
 
-				if (i == SK_ALCHEMY) {
+				if (sk == SK_ALCHEMY) {
 					const potion_type * ptype;
 					faction * f = u->faction;
 					int skill = eff_skill(u, SK_ALCHEMY, r);
@@ -738,7 +743,7 @@ teaching(void)
 
 		for (u = r->units; u; u = u->next) {
 
-			if (u->race == new_race[RC_SPELL] || fval(u, FL_LONGACTION))
+			if (u->race == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
 				continue;
 
 			if (rterrain(r) == T_OCEAN

@@ -2,7 +2,7 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
@@ -10,11 +10,17 @@
  without prior permission by the authors of Eressea.
 */
 
-#ifndef XECMD_H
-#define XECMD_H
+#ifndef H_MOD_XECMD_H
+#define H_MOD_XECMD_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern attrib_type at_xontormiaexpress;
 void xecmd(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 

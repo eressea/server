@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -11,6 +11,12 @@
  * This program may not be used, modified or distributed without
  * prior permission by the authors of Eressea.
  */
+
+#ifndef H_KRNL_PATHFINDER
+#define H_KRNL_PATHFINDER
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MAXDEPTH 1024
 
@@ -30,3 +36,7 @@ extern boolean path_exists(struct region *start, struct region *target, int t);
 extern boolean step(struct region *r, struct region *target, int t, int depth);
 #endif
 
+#ifdef __cplusplus
+}
+#endif
+#endif

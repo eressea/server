@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -12,8 +12,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef MAGIC_H
-#define MAGIC_H
+#ifndef H_KRNL_MAGIC
+#define H_KRNL_MAGIC
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "curse.h"
 struct fighter;
@@ -234,8 +237,6 @@ enum {
 /* Prototypen */
 
 void magic(void);
-int regeneration(struct unit * u);
-int farcasting(struct unit *magician, struct region *r);
 
 void regeneration_magiepunkte(void);
 
@@ -300,13 +301,8 @@ void unset_combatspell(struct unit *u, spell *sp);
 	/* 	löscht Kampfzauber */
 void addspell(struct unit *u, spellid_t spellid);
 	/* fügt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
-void removespell(struct unit *u, spellid_t spellid);
-	/* löscht den Spruch mit der Id spellid aus der Spruchliste der Einheit. */
 boolean getspell(const struct unit *u, spellid_t spellid);
 	/* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
-void createspelllist(struct unit *u, magic_t mtyp);
-	/* fügt alle Zauber des Magiegebiets mtyp, deren Stufe die des Magiers
-	 * nicht übersteigt, in die Spruchliste der Einheit ein */
 void updatespelllist(struct unit *u);
 	/* fügt alle Zauber des Magiegebietes der Einheit, deren Stufe kleiner
 	 * als das aktuelle Magietalent ist, in die Spruchliste der Einheit
@@ -330,11 +326,6 @@ int max_spellpoints(const struct region *r, const struct unit *u);
 	/*	gibt die aktuell maximal möglichen Magiepunkte der Einheit zurück */
 int change_maxspellpoints(struct unit * u, int csp);
    /* verändert die maximalen Magiepunkte einer Einheit */
-int get_spchange(const struct unit * u);
-	/*	gibt die Veränderung der maximalen Magiepunkte der Einheit zurück.
-	 *	Hier bietet sich die Möglichkeit, diese auch extern über
-	 *	Regionszauber oder andere Attribute zu beeinflussen.
-	 */
 
 /* Zaubern */
 int spellpower(struct region *r, struct unit *u, spell *spruch, int cast_level);
@@ -390,7 +381,6 @@ extern struct unit * get_clone(const struct unit *u);
 extern struct unit * get_clone_mage(const struct unit *u);
 extern struct attrib_type at_familiar;
 extern struct attrib_type at_familiarmage;
-extern void set_familiar(struct unit * mage, struct unit * familiar);
 extern void remove_familiar(struct unit * mage);
 extern void create_newfamiliar(struct unit * mage, struct unit * familiar);
 extern void create_newclone(struct unit * mage, struct unit * familiar);
@@ -403,4 +393,7 @@ extern struct plane * astral_plane;
 extern const char * spell_info(const struct spell * sp, const struct locale * lang);
 extern const char * spell_name(const struct spell * sp, const struct locale * lang);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

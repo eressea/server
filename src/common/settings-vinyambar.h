@@ -2,7 +2,7 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
@@ -14,15 +14,12 @@
  * Contains defines for the "modern" vinyambar game.
  * Include this file from settings.h to make eressea work.
  */
-#define GAME_ID 2
+#define ENTERTAINFRACTION 20
 #define IMMUN_GEGEN_ANGRIFF 8
 #define RESOURCE_CONVERSION 1
 #define NEW_RESOURCEGROWTH 1
 #define LARGE_CASTLES 1
 #define GROWING_TREES 1
-#define REMOVENMRNEWBIE 0
-#define NMRTIMEOUT 5
-#define HUNGER_DISABLES_LONGORDERS 0
 #define REDUCED_PEASANTGROWTH 0
 #define RACE_ADJUSTMENTS 0
 #define TEACHDIFFERENCE 1
@@ -34,5 +31,8 @@
 #define CATAPULT_AMMUNITION 0
 #define CHANGED_CROSSBOWS 0
 #define NEWATSROI 0
+#define COMBAT_TURNS 10
+#define PEASANTS_DO_NOT_STARVE 0
+#define NEW_MIGRATION 1
 
 #define MAILITPATH	"/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"

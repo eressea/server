@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -14,6 +14,9 @@
 
 #ifndef CREATECURSE_H
 #define CREATECURSE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* all types we use are defined here to reduce dependencies */
 struct curse_type;
@@ -27,4 +30,7 @@ extern struct trigger_type tt_createcurse;
 
 extern struct trigger * trigger_createcurse(struct unit * mage, struct unit * target, const struct curse_type * ct, int vigour, int duration, int effect, int men);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -32,7 +32,6 @@
 #endif
 
 /* gamecode includes */
-#include "creation.h"
 #include "creport.h"
 #include "economy.h"
 #include "monster.h"
@@ -180,7 +179,10 @@ int
 season(int turn)
 {
 	int year,month;
-	int t = turn - FIRST_TURN;
+	int t = turn;
+#ifdef FIRST_TURN
+	t -= FIRST_TURN;
+#endif
 
 	year  = t/(months_per_year * weeks_per_month) + 1;
 	month = (t - (year-1) * months_per_year * weeks_per_month)/weeks_per_month;
@@ -220,7 +222,10 @@ gamedate_season(const struct locale * lang)
 {
 	int year,month,week,r;
 	static char buf[256];
-	int t = turn - FIRST_TURN;
+	int t = turn;
+#ifdef FIRST_TURN
+	t -= FIRST_TURN;
+#endif
 
 	if (t<0) t = turn;
 	assert(lang);
@@ -244,7 +249,10 @@ gamedate2(const struct locale * lang)
 {
 	int year,month,week,r;
 	static char buf[256];
-	int t = turn - FIRST_TURN;
+	int t = turn;
+#ifdef FIRST_TURN
+	t -= FIRST_TURN;
+#endif
 
 	if (t<0) t = turn;
 
@@ -265,7 +273,10 @@ gamedate_short(const struct locale * lang)
 {
 	int year,month,week,r;
 	static char buf[256];
-	int t = turn - FIRST_TURN;
+	int t = turn;
+#ifdef FIRST_TURN
+	t -= FIRST_TURN;
+#endif
 
 	if (t<0) t = turn;
 
@@ -822,10 +833,10 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 		marker = '*';
 	} else {
 		if(a_otherfaction && f != u->faction && get_otherfaction(a_otherfaction) == f
-				&& !fval(u, FL_PARTEITARNUNG)) {
+				&& !fval(u, UFL_PARTEITARNUNG)) {
 			marker = '!';
 		} else {
-			if(dh && !fval(u, FL_PARTEITARNUNG)) {
+			if(dh && !fval(u, UFL_PARTEITARNUNG)) {
 				marker = '+';
 			} else {
 				marker = '-';
@@ -1448,14 +1459,16 @@ statistics(FILE * F, const region * r, const faction * f)
 				p / RECRUITFRACTION);
 		rps(F, buf);
 
-		if (buildingtype_exists(r, bt_find("caravan"))) {
-			sprintf(buf, "Luxusgüter zum angegebenen Preis: %d",
-				(p * 2) / TRADE_FRACTION);
-		} else {
-			sprintf(buf, "Luxusgüter zum angegebenen Preis: %d",
-				p / TRADE_FRACTION);
+		if (!TradeDisabled()) {
+			if (buildingtype_exists(r, bt_find("caravan"))) {
+				sprintf(buf, "Luxusgüter zum angegebenen Preis: %d",
+					(p * 2) / TRADE_FRACTION);
+			} else {
+				sprintf(buf, "Luxusgüter zum angegebenen Preis: %d",
+					p / TRADE_FRACTION);
+			}
+			rps(F, buf);
 		}
-		rps(F, buf);
 	}
 	/* Info über Einheiten */
 
@@ -1482,7 +1495,7 @@ durchreisende(FILE * F, const region * r, const faction * f)
 	for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
 		unit * u = (unit*)ru->data.v;
 		if (cansee_durchgezogen(f, r, u, 0) > 0 && r!=u->region) {
-			if (u->ship && !fval(u, FL_OWNER))
+			if (u->ship && !fval(u, UFL_OWNER))
 				continue;
 			wieviele++;
 		}
@@ -1499,7 +1512,7 @@ durchreisende(FILE * F, const region * r, const faction * f)
 	for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
 		unit * u = (unit*)ru->data.v;
 		if (cansee_durchgezogen(f, r, u, 0) > 0 && r!=u->region) {
-			if (u->ship && !fval(u, FL_OWNER))
+			if (u->ship && !fval(u, UFL_OWNER))
 				continue;
 			counter++;
 			if (u->ship != (ship *) NULL) {
@@ -1589,7 +1602,7 @@ order_template(FILE * F, faction * f)
 
 				sprintf(buf, "%s %s;		%s [%d,%d$", LOC(u->faction->locale, parameters[P_UNIT]),
 						unitid(u), u->name, u->number, get_money(u));
-				if (u->building != NULL && fval(u, FL_OWNER)) {
+				if (u->building != NULL && fval(u, UFL_OWNER)) {
 					building * b = u->building;
 					int cost = buildingmaintenance(b, R_SILVER);
 
@@ -1603,7 +1616,7 @@ order_template(FILE * F, faction * f)
 					}
 #endif
 				} else if (u->ship) {
-					if (fval(u, FL_OWNER))
+					if (fval(u, UFL_OWNER))
 						scat(",S");
 					else
 						scat(",s");
@@ -1800,7 +1813,7 @@ guards(FILE * F, const region * r, const faction * see)
 				f = fv;
 			}
 
-			if (f != see && fval(u, FL_PARTEITARNUNG)) {
+			if (f != see && fval(u, UFL_PARTEITARNUNG)) {
 				tarned=true;
 			} else {
 				for (i=0;i!=nextguard;++i) if (guardians[i]==f) break;
@@ -1923,12 +1936,12 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 	print_curses(F, f, b, TYP_BUILDING, 4);
 
 	for (u = r->units; u; u = u->next)
-		if (u->building == b && fval(u, FL_OWNER)) {
+		if (u->building == b && fval(u, UFL_OWNER)) {
 			rpunit(F, f, u, 6, mode);
 			break;
 		}
 	for (u = r->units; u; u = u->next)
-		if (u->building == b && !fval(u, FL_OWNER))
+		if (u->building == b && !fval(u, UFL_OWNER))
 			rpunit(F, f, u, 6, mode);
 }
 
@@ -2206,7 +2219,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 
 		if (unit_in_region) {
 			describe(F, r, 0, f);
-			if (rterrain(r) != T_OCEAN && rpeasants(r)/TRADE_FRACTION > 0) {
+			if (!TradeDisabled() && rterrain(r) != T_OCEAN && rpeasants(r)/TRADE_FRACTION > 0) {
 				rnl(F);
 				prices(F, r, f);
 			}
@@ -2278,7 +2291,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 			/* Gewicht feststellen */
 
 			for (u = r->units; u; u = u->next)
-				if (u->ship == sh && fval(u, FL_OWNER)) {
+				if (u->ship == sh && fval(u, UFL_OWNER)) {
 					of = u->faction;
 					break;
 				}
@@ -2330,12 +2343,12 @@ report(FILE *F, faction * f, const faction_list * addresses,
 			print_curses(F,f,sh,TYP_SHIP,4);
 
 			for (u = r->units; u; u = u->next)
-				if (u->ship == sh && fval(u, FL_OWNER)) {
+				if (u->ship == sh && fval(u, UFL_OWNER)) {
 					rpunit(F, f, u, 6, sd->mode);
 					break;
 				}
 			for (u = r->units; u; u = u->next)
-				if (u->ship == sh && !fval(u, FL_OWNER))
+				if (u->ship == sh && !fval(u, UFL_OWNER))
 					rpunit(F, f, u, 6, sd->mode);
 		}
 
@@ -2841,7 +2854,7 @@ prepare_report(faction * f)
 			if (u->faction == f) {
 				if (u->race != new_race[RC_SPELL] || u->number == RS_FARVISION) {
 					mode = see_unit;
-					if (fval(u, FL_DISBELIEVES)) {
+					if (fval(u, UFL_DISBELIEVES)) {
 						dis = true;
 						break;
 					}
@@ -3369,7 +3382,7 @@ writemonument(void)
 	for(i = 0; i<=6; i++) {
 		if (buildings[i] != NULL) {
 			fprintf(F, "In %s", rname(buildings[i]->region, NULL));
-			if ((owner=buildingowner(buildings[i]->region,buildings[i]))!=NULL && !fval(owner,FL_PARTEITARNUNG)) {
+			if ((owner=buildingowner(buildings[i]->region,buildings[i]))!=NULL && !fval(owner,UFL_PARTEITARNUNG)) {
 				fprintf(F, ", Eigentümer: %s", factionname(owner->faction));
 			}
 			fprintf(F, "\n\n");
@@ -3389,7 +3402,7 @@ writemonument(void)
 					j++;
 					if(j == ra) {
 						fprintf(F, "In %s", rname(b->region, NULL));
-						if ((owner=buildingowner(b->region,b))!=NULL && !fval(owner,FL_PARTEITARNUNG)) {
+						if ((owner=buildingowner(b->region,b))!=NULL && !fval(owner,UFL_PARTEITARNUNG)) {
 							fprintf(F, ", Eigentümer: %s", factionname(owner->faction));
 						}
 						fprintf(F, "\n\n");
@@ -3550,7 +3563,7 @@ report_summary(summary * s, summary * o, boolean full)
 	FILE * F = NULL;
 	int i, newplayers = 0;
 	faction * f;
-	int nmrs[NMRTIMEOUT+1];
+	int * nmrs = malloc(sizeof(int)*(NMRTimeout()+1));
 
 	{
 		char zText[MAX_PATH];
@@ -3644,7 +3657,7 @@ report_summary(summary * s, summary * o, boolean full)
 
 	fprintf(F, "\n\n");
 
-	for (i = 0; i != NMRTIMEOUT+1; ++i) {
+	for (i = 0; i != NMRTimeout()+1; ++i) {
 		nmrs[i] = 0;
 	}
 
@@ -3652,12 +3665,12 @@ report_summary(summary * s, summary * o, boolean full)
 		if (f->age <= 1 && turn - f->lastorders == 1) {
 			newplayers++;
 		} else if (f->no != MONSTER_FACTION) {
-			nmrs[min(NMRTIMEOUT,turn-f->lastorders)]++;
+			nmrs[min(NMRTimeout(),turn-f->lastorders)]++;
 		}
 	}
 
-	for (i = 0; i != NMRTIMEOUT+1; ++i) {
-		if(i == NMRTIMEOUT) {
+	for (i = 0; i != NMRTimeout()+1; ++i) {
+		if(i == NMRTimeout()) {
 			fprintf(F, "+ NMRs:\t\t %d\n", nmrs[i]);
 		} else {
 			fprintf(F, "%d %s:\t\t %d\n", i,
@@ -3681,12 +3694,11 @@ report_summary(summary * s, summary * o, boolean full)
 		out_faction(F, f);
 	}
 
-#if NMRTIMEOUT
-	if (full) {
+	if (NMRTimeout() && full) {
 		fprintf(F, "\n\nFactions with NMRs:\n");
-		for (i = NMRTIMEOUT; i > 0; --i) {
+		for (i = NMRTimeout(); i > 0; --i) {
 			for(f=factions; f; f=f->next) {
-				if(i == NMRTIMEOUT) {
+				if(i == NMRTimeout()) {
 					if(turn - f->lastorders >= i) {
 						out_faction(F, f);
 					}
@@ -3698,7 +3710,6 @@ report_summary(summary * s, summary * o, boolean full)
 			}
 		}
 	}
-#endif
 
 	fclose(F);
 
@@ -3739,6 +3750,7 @@ report_summary(summary * s, summary * o, boolean full)
 #endif
 		writemonument();
 	}
+	free(nmrs);
 }
 /******* end summary ******/
 

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -11,8 +11,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef BUILDING_H
-#define BUILDING_H
+#ifndef H_KRNL_BUILDING
+#define H_KRNL_BUILDING
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* maintenance::flags */
 #define MTF_NONE     0x00
@@ -55,7 +58,6 @@ typedef struct building_type {
 } building_type;
 
 extern const building_type * bt_find(const char* name);
-extern void bt_register(building_type * type);
 extern void register_buildings(void);
 
 typedef struct building_typelist {
@@ -115,8 +117,6 @@ void destroy_building(struct building * b);
 
 const struct building_type * findbuildingtype(const char * name, const struct locale * lang);
 
-extern struct building_type * bt_read(FILE * F);
-extern void bt_write(FILE * F, const building_type * bt);
 extern struct building_type * bt_make(const char * name, int flags, int capacity, int maxcapacity, int maxsize);
 
 #include "build.h"
@@ -130,4 +130,7 @@ extern struct building *findbuilding(int n);
 
 extern struct unit * buildingowner(const struct region * r, const struct building * b);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

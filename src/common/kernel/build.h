@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -18,8 +18,11 @@
  * permission from the authors.
  */
 
-#ifndef BUILD_H
-#define BUILD_H
+#ifndef H_KRNL_BUILD
+#define H_KRNL_BUILD
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Die enums fuer Gebauede werden nie gebraucht, nur bei der Bestimmung
  * des Schutzes durch eine Burg wird die Reihenfolge und MAXBUILDINGS
@@ -72,7 +75,7 @@ struct ship *getship(const struct region * r);
 
 void remove_contacts(void);
 void do_leave(void);
-void do_misc(boolean try);
+void do_misc(boolean tries);
 
 void reportevent(struct region * r, char *s);
 
@@ -92,5 +95,8 @@ extern void xml_readrequirement(const struct xml_tag * tag, construction * con);
 #define ECOMPLETE -3
 #define ENOMATERIALS -4
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 

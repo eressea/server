@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -143,7 +143,7 @@ use_potion(unit * u, const item_type * itype, int amount, const char * cmd)
 		if (!a) a = a_add(&r->attribs, a_new(&at_horseluck));
 		a->data.i+=amount;
 	} else if (ptype==oldpotiontype[P_WAHRHEIT]) {
-		fset(u, FL_DISBELIEVES);
+		fset(u, UFL_DISBELIEVES);
 		amount=1;
 	} else if (ptype==oldpotiontype[P_MACHT]) {
 		/* Verfünffacht die HP von max. 10 Personen in der Einheit */
@@ -225,31 +225,6 @@ get_effect(const unit * u, const potion_type * effect)
 		if (data->type==effect) return data->value;
 	}
 	return 0;
-}
-
-int
-set_effect (unit * u, const potion_type * effect, int value)
-{
-	attrib ** ap = &u->attribs, * a;
-	effect_data * data = NULL;
-	while (*ap && (*ap)->type!=&at_effect) ap=&(*ap)->next;
-	a = *ap;
-	while (a) {
-		data = (effect_data *)a->data.v;
-		if (data->type==effect) break;
-		a=a->nexttype;
-	}
-	if (!a && value) {
-		attrib * an = a_add(ap, a_new(&at_effect));
-		data = (effect_data*)an->data.v;
-		data->type = effect;
-		data->value = value;
-	} else if (a && !value) {
-		a_remove(ap, a);
-	} else if (a && value) {
-		data->value = value;
-	}
-	return value;
 }
 
 int

@@ -194,9 +194,6 @@
 			<File
 				RelativePath=".\randenc.h">
 			</File>
-			<File
-				RelativePath=".\study.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Spells"

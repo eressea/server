@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  * 
- * Eressea PB(E)M host Copyright (C) 1998-2000
+ * Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -37,16 +37,16 @@ namehash names[NMAXHASH];
 
 void nhash(const char * name);
 
-typedef struct name {
+typedef struct oceanname {
 	struct name * next;
 	struct faction_list * factions;
 	const char * name;
-} name;
+} oceanname;
 
 static void 
 free_names(attrib * a)
 {
-	name * data = (name*)a->data.v;
+	oceanname * data = (oceanname*)a->data.v;
 	while (a->data.v) {
 		a->data.v = data->next;
 		free(data);
@@ -56,11 +56,11 @@ free_names(attrib * a)
 struct attrib_type at_oceanname = { "names", NULL, free_names, NULL/*, write_names, read_names, ATF_UNIQUE */};
 
 const char * 
-oceanname(const struct region * r, const struct faction * f)
+get_oceanname(const struct region * r, const struct faction * f)
 {
 	attrib * a = a_find(r->attribs, &at_oceanname);
 	if (a) {
-		name * names = (name*)a->data.v;
+		oceanname * names = (oceanname*)a->data.v;
 		while (names) {
 			faction_list * fl = names->factions;
 			while (fl) {
@@ -81,7 +81,7 @@ nameocean(struct region *r, struct faction * f, const char * newname)
 	if (a) {
 		faction_list **oldf = NULL, **newf = NULL;
 		faction_list * fl = NULL;
-		name * names = (name*)a->data.v;
+		oceanname * names = (oceanname*)a->data.v;
 		while ((names && (!newf && newname)) || !oldf) {
 			faction_list ** fli = &names->factions;
 			if (oldf==NULL) while (*fli) {
@@ -109,11 +109,11 @@ nameocean(struct region *r, struct faction * f, const char * newname)
 			fl->next = *newf;
 			*newf = fl;
 		} else if (newname) {
-			name * nm = calloc(1, sizeof(name));
+			oceanname * nm = calloc(1, sizeof(oceanname));
 			nm->factions = fl;
 			fl->data = f;
 			fl->next = NULL;
-			nm->next = (name*)a->data.v;
+			nm->next = (oceanname*)a->data.v;
 			a->data.v = nm;
 		} else if (fl) {
 			free(fl);

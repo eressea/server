@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -19,8 +19,11 @@
  * permission from the authors.
  */
 
-#ifndef ECONOMY_H
-#define ECONOMY_H
+#ifndef H_GC_ECONOMY
+#define H_GC_ECONOMY
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Welchen Teil des Silbers die Bauern fuer Unterhaltung ausgeben (1/20), und
  * wiviel Silber ein Unterhalter pro Talentpunkt bekommt. */
@@ -44,7 +47,6 @@ extern int income(const struct unit * u);
 /* Wieviel Fremde eine Partei pro Woche aufnehmen kann */
 #define MAXNEWBIES								5
 
-void scramble(void *v1, int n, size_t width);
 void economics(void);
 void produce(void);
 extern int entertainmoney(const struct region * r);
@@ -55,4 +57,7 @@ extern void add_spende(struct faction * f1, struct faction * f2, int betrag, str
 void report_donations(void);
 extern void init_economy(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

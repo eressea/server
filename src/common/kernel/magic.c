@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -81,11 +81,6 @@ attrib_type at_reportspell = {
  ** TODO: separate castle-appearance from illusion-effects
  **/
 
-#ifdef FUZZY_BASE36
-int fuzzy_hits;
-extern boolean enable_fuzzy;
-#endif /* FUZZY_BASE36 */
-
 static ship *
 findshipr(const region *r, int n)
 	/* Ein Schiff in einer bestimmten Region finden: */
@@ -98,18 +93,6 @@ findshipr(const region *r, int n)
 			return sh;
 		}
 	}
-#ifdef FUZZY_BASE36
-	if(enable_fuzzy) {
-		n = atoi(itoa36(n));
-		if (n) for (sh = r->ships; sh; sh = sh->next) {
-			if (sh->no == n) {
-				++fuzzy_hits;
-				return sh;
-			}
-		}
-	}
-#endif
-
 	return 0;
 }
 
@@ -124,18 +107,6 @@ findbuildingr(const region *r, int n)
 			return b;
 		}
 	}
-#ifdef FUZZY_BASE36
-	if(enable_fuzzy) {
-		n = atoi(itoa36(n));
-		if (n) for (b = rbuildings(r); b; b = b->next) {
-			if (b->no == n) {
-				++fuzzy_hits;
-				return b;
-			}
-		}
-	}
-#endif
-
 	return 0;
 }
 
@@ -307,8 +278,33 @@ find_magetype(const unit * u)
 }
 
 /* ------------------------------------------------------------- */
-/* Erzeugen eines neuen Magiers */
+/* ein 'neuer' Magier bekommt von Anfang an alle Sprüche seines
+* Magiegebietes mit einer Stufe kleiner oder gleich seinem Magietalent
+* in seine List-of-known-spells. Ausgenommen mtyp 0 (M_GRAU) */
 
+static void
+createspelllist(unit *u, magic_t mtyp)
+{
+	int sk, i;
+	if (mtyp == M_GRAU)
+		return;
+
+	sk = effskill(u, SK_MAGIC);
+	if (sk == 0)
+		return;
+
+	for (i = 0; spelldaten[i].id != SPL_NOSPELL; i++) {
+		if (spelldaten[i].magietyp == mtyp
+			&& spelldaten[i].level <= sk)
+		{
+			if (!getspell(u, spelldaten[i].id))
+				addspell(u, spelldaten[i].id);
+		}
+	}
+}
+
+/* ------------------------------------------------------------- */
+/* Erzeugen eines neuen Magiers */
 sc_mage *
 create_mage(unit * u, magic_t mtyp)
 {
@@ -330,32 +326,6 @@ create_mage(unit * u, magic_t mtyp)
 	a->data.v = mage;
 	createspelllist(u, mtyp);
 	return mage;
-}
-
-/* ------------------------------------------------------------- */
-/* ein 'neuer' Magier bekommt von Anfang an alle Sprüche seines
- * Magiegebietes mit einer Stufe kleiner oder gleich seinem Magietalent
- * in seine List-of-known-spells. Ausgenommen mtyp 0 (M_GRAU) */
-
-void
-createspelllist(unit *u, magic_t mtyp)
-{
-	int sk, i;
-	if (mtyp == M_GRAU)
-		return;
-
-	sk = effskill(u, SK_MAGIC);
-	if (sk == 0)
-		return;
-
-	for (i = 0; spelldaten[i].id != SPL_NOSPELL; i++) {
-		if (spelldaten[i].magietyp == mtyp
-				&& spelldaten[i].level <= sk)
-		{
-			if (!getspell(u, spelldaten[i].id))
-				addspell(u, spelldaten[i].id);
-		}
-	}
 }
 
 /* ------------------------------------------------------------- */
@@ -506,25 +476,6 @@ addspell(unit *u, spellid_t spellid)
 	newsp->spellid = spellid;
 
 	addlist(&m->spellptr, newsp);
-	return;
-}
-
-void
-removespell(unit *u, spellid_t spellid)
-{
-	sc_mage *m;
-	spell_ptr *spt;
-
-	m = get_mage(u);
-	if (!m) {
-		return;
-	}
-	for (spt = m->spellptr; spt; spt = spt->next) {
-		if (spt->spellid == spellid) {
-			removelist(&m->spellptr, spt);
-		}
-	}
-
 	return;
 }
 
@@ -788,7 +739,7 @@ change_spellpoints(unit * u, int mp)
 /* bietet die Möglichkeit, die maximale Anzahl der Magiepunkte mit
  * Regionszaubern oder Attributen zu beinflussen
  */
-int
+static int
 get_spchange(const unit * u)
 {
 	sc_mage *m;
@@ -908,7 +859,7 @@ spellcost(unit *u, spell * sp)
  * nur SPC_FIX muss nur einmal vorhanden sein, ist also am
  * niedrigstwertigen und sollte von den beiden anderen Typen
  * überschrieben werden */
-int
+static int
 spl_costtyp(spell * sp)
 {
 	int k;
@@ -1182,7 +1133,7 @@ spellpower(region * r, unit * u, spell * sp, int cast_level)
 /* ------------------------------------------------------------- */
 /* farcasting() == 1 -> gleiche Region, da man mit Null nicht vernünfigt
  * rechnen kann */
-int
+static int
 farcasting(unit *magician, region *r)
 {
 	int dist;
@@ -1430,7 +1381,7 @@ fumble(region * r, unit * u, spell * sp, int cast_grade)
  * alle weiteren Folgen eines Patzers
  */
 
-void
+static void
 do_fumble(castorder *co)
 {
 	curse * c;
@@ -1520,7 +1471,7 @@ do_fumble(castorder *co)
 /* Ein Magier regeneriert pro Woche W(Stufe^1.5/2+1), mindestens 1
  * Zwerge nur die Hälfte
  */
-int
+static int
 regeneration(unit * u)
 {
 	int sk, aura, d;
@@ -1606,7 +1557,7 @@ regeneration_magiepunkte(void)
 
 /* gibt bei Misserfolg 0 zurück, bei Magieresistenz zumindeste eines
  * Objektes 1 und bei Erfolg auf ganzer Linie 2 */
-int
+static int
 verify_targets(castorder *co)
 {
 	unit *mage = (unit *)co->magician;
@@ -1977,7 +1928,7 @@ verify_targets(castorder *co)
 /* Hilfsstrukturen für ZAUBERE */
 /* ------------------------------------------------------------- */
 
-void
+static void
 free_spellparameter(spellparameter *pa)
 {
 	int i;
@@ -2001,7 +1952,7 @@ free_spellparameter(spellparameter *pa)
 }
 
 
-spellparameter *
+static spellparameter *
 add_spellparameter(region *target_r, unit *u, const char *syntax,
 		char *s, int skip)
 {
@@ -2395,63 +2346,6 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 
 /* ------------------------------------------------------------- */
 
-
-strarray *
-add_arglist(char *s, int skip)
-{
-	int i = 0;
-	char *tbuf, *token;
-	strarray *sa;
-
-	sa = calloc(1, sizeof(strarray));
-
-	/* Temporären Puffer initialisieren */
-	tbuf = strdup(s);
-
-	/* Tokens zählen */
-	token = strtok (tbuf, " ");
-	while(token) {
-		sa->length++;
-		token = strtok(NULL, " ");
-	}
-	sa->length -= skip;
-
-	/* Pointer allozieren */
-	sa->strings = calloc(sa->length, sizeof(char *));
-
-	/* Tokens zuweisen */
-	strcpy(tbuf, s);
-	token = strtok (tbuf, " ");
-	while(token) {
-		if (i >= skip)
-			sa->strings[i-skip] = strdup(token);
-		i++;
-		token = strtok(NULL, " ");
-	}
-
-	/* Aufräumen */
-	free(tbuf);
-
-	return sa;
-}
-
-void
-freestrarray(strarray *sa)
-{
-	int l = sa->length;
-	int i;
-
-	/* Elemente free'en */
-	for (i=0; i < l; i++) {
-		free(sa->strings[i]);
-	}
-
-	/* struct free'en */
-	free(sa);
-}
-
-/* ------------------------------------------------------------- */
-
 castorder *
 new_castorder(void *u, unit *u2, spell *sp, region *r, int lev,
 		int force, int range, char *cmd, spellparameter *p)
@@ -2544,7 +2438,7 @@ sm_familiar(const unit * u, const region * r, skill_t sk, int value) /* skillmod
 	}
 }
 
-void
+static void
 set_familiar(unit * mage, unit * familiar)
 {
 	/* if the skill modifier for the mage does not yet exist, add it */
@@ -2680,7 +2574,7 @@ create_newclone(unit * mage, unit * clone)
 	add_trigger(&clone->attribs, "destroy", trigger_clonedied(mage));
 }
 
-void
+static void
 set_clone(unit * mage, unit * clone)
 {
 	attrib *a;
@@ -2895,7 +2789,7 @@ magic(void)
 		for (u = r->units; u; u = u->next) {
 			boolean casted = false;
 
-			if (old_race(u->race) == RC_SPELL || fval(u, FL_LONGACTION))
+			if (old_race(u->race) == RC_SPELL || fval(u, UFL_LONGACTION))
 				continue;
 
 			if (old_race(u->race) == RC_INSECT && r_insectstalled(r) &&
@@ -2912,12 +2806,10 @@ magic(void)
 
 			for (so = u->orders; so; so = so->next) {
 				if (igetkeyword(so->s, u->faction->locale) == K_CAST) {
-#if HUNGER_DISABLES_LONGORDERS
-					if (fval(u, FL_HUNGER)) {
+					if (LongHunger() && fval(u, UFL_HUNGER)) {
 						cmistake(u, so->s, 224, MSG_MAGIC);
 						continue;
 					}
-#endif
 					if (r->planep && fval(r->planep, PFL_NOMAGIC)) {
 						cmistake(u, so->s, 269, MSG_MAGIC);
 						continue;
@@ -3114,7 +3006,7 @@ magic(void)
 					add_castorder(&cll[(int)(sp->rank)], co);
 				}
 			}
-			if (casted) fset(u, FL_LONGACTION);
+			if (casted) fset(u, UFL_LONGACTION);
 		}
 	}
 	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {

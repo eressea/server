@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -70,7 +70,7 @@ bt_find(const char* name)
 	return btl?btl->type:NULL;
 }
 
-void
+static void
 bt_register(building_type * type)
 {
 	struct building_typelist * btl = malloc(sizeof(building_type));
@@ -427,77 +427,6 @@ register_buildings(void)
 	bt_register(&bt_castle);
 }
 
-void
-bt_write(FILE * F, const building_type * bt)
-{
-	fprintf(F, "BUILDINGTYPE %s\n", bt->_name);
-	a_write(F, bt->attribs); /* scheisse, weil nicht CR-Format */
-	fputs("\n", F);
-	fprintf(F, "\"%s\";name\n", bt->_name);
-	fprintf(F, "%d;flags\n", bt->flags);
-	fprintf(F, "%d;capacity\n", bt->capacity);
-	fprintf(F, "%d;maxcapacity\n", bt->maxcapacity);
-	fprintf(F, "%d;maxsize\n", bt->maxsize);
-	if (bt->maintenance!=NULL) assert(!"not implemented");
-	if (bt->construction!=NULL) assert(!"not implemented");
-	if (bt->construction!=NULL) assert(!"not implemented");
-	if (bt->name!=NULL) assert(!"not implemented");
-	fputs("END BUILDINGTYPE\n", F);
-}
-
-building_type *
-bt_read(FILE * F)
-	/* this function is pretty picky */
-{
-	building_type * bt = calloc(sizeof(building_type), 1);
-	int i = fscanf(F, "%s\n", buf);
-	if (i==0 || i==EOF) {
-		free(bt);
-		return NULL;
-	}
-	bt->_name = strdup(buf);
-	a_read(F, &bt->attribs); /* scheisse, weil nicht CR. */
-	for (;;) {
-		char * semi = buf;
-		fgets(buf, sizeof(buf), F);
-		if (strlen(buf)==1) continue;
-		buf[strlen(buf)-1]=0;
-		for(;;) {
-			char * s = strchr(semi, ';');
-			if (s==NULL) break;
-			semi = s + 1;
-		}
-		if (semi==buf) {
-			assert(!strcmp(buf, "END BUILDINGTYPE"));
-			break;
-		}
-		*(semi-1)=0;
-		if (buf[0]=='\"') {
-			char * s = buf+1;
-			assert(*(semi-2)=='\"');
-			*(semi-2)=0;
-			if (!strcmp(semi, "name") && !bt->_name) bt->_name = strdup(s);
-		}
-		else {
-			int j = atoi(buf);
-			switch (semi[0]) {
-			case 'c':
-				if (!strcmp(semi, "capacity")) bt->capacity=j;
-				break;
-			case 'f':
-				if (!strcmp(semi, "flags")) bt->flags=j;
-				break;
-			case 'm':
-				if (!strcmp(semi, "maxcapacity")) bt->maxcapacity=j;
-				else if (!strcmp(semi, "maxsize")) bt->maxsize=j;
-				break;
-			}
-		}
-	}
-	bt_register(bt);
-	return bt;
-}
-
 building_type *
 bt_make(const char * name, int flags, int capacity, int maxcapacity, int maxsize)
 {
@@ -633,10 +562,10 @@ buildingowner(const region * r, const building * b)
 		if (u->building == b) {
 			if (!first && u->number > 0)
 				first = u;
-			if (fval(u, FL_OWNER) && u->number > 0)
+			if (fval(u, UFL_OWNER) && u->number > 0)
 				return u;
 			if (u->number == 0)
-				freset(u, FL_OWNER);
+				freset(u, UFL_OWNER);
 		}
 	}
 
@@ -644,7 +573,7 @@ buildingowner(const region * r, const building * b)
 	 * nehmen. */
 
 	if (first)
-		fset(first, FL_OWNER);
+		fset(first, UFL_OWNER);
 	return first;
 }
 

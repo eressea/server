@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -49,7 +49,6 @@
 #endif
 
 /* gamecode includes */
-#include <creation.h>
 #include <economy.h>
 #include <goodies.h>
 #include <laws.h>
@@ -179,12 +178,11 @@ game_init(void)
 	init_conversion();
 
 #ifdef MUSEUM_MODULE
-	init_museum();
+	register_museum();
 #endif
 #ifdef ARENA_MODULE
-	init_arena();
+	register_arena();
 #endif
-	init_xmas2000();
 #ifdef REMOVE_THIS
 	render_init();
 	{

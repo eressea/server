@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -170,7 +170,7 @@ get_money_for_dragon(region * r, unit * u, int wanted)
 	return true;
 }
 
-int
+static int
 money(region * r)
 {
 	unit *u;
@@ -182,7 +182,7 @@ money(region * r)
 	return m;
 }
 
-direction_t
+static direction_t
 richest_neighbour(region * r, int absolut)
 {
 
@@ -216,7 +216,7 @@ richest_neighbour(region * r, int absolut)
 	return d;
 }
 
-boolean
+static boolean
 room_for_race_in_region(region *r, const race * rc)
 {
 	unit *u;
@@ -232,7 +232,7 @@ room_for_race_in_region(region *r, const race * rc)
 	return true;
 }
 
-direction_t
+static direction_t
 random_neighbour(region * r, unit *u)
 {
 	direction_t i;
@@ -283,7 +283,7 @@ random_neighbour(region * r, unit *u)
 	return NODIRECTION;
 }
 
-direction_t
+static direction_t
 treeman_neighbour(region * r)
 {
 	direction_t i;
@@ -327,7 +327,7 @@ treeman_neighbour(region * r)
 	return NODIRECTION;
 }
 
-void
+static void
 move_monster(region * r, unit * u)
 {
 	direction_t d = NODIRECTION;
@@ -365,7 +365,7 @@ move_monster(region * r, unit * u)
 #define drand48() (((double)rand()) / RAND_MAX)
 #endif
 
-int
+static int
 dragon_affinity_value(region *r, unit *u)
 {
 	int m = count_all_money(r);
@@ -377,7 +377,7 @@ dragon_affinity_value(region *r, unit *u)
 	}
 }
 
-attrib *
+static attrib *
 set_new_dragon_target(unit * u, region * r, int range)
 {
 	region *r2;
@@ -472,7 +472,7 @@ set_movement_order(unit * u, const region * target, int moves, boolean (*allowed
 }
 /* ------------------------------------------------------------- */
 
-void
+static void
 monster_seeks_target(region *r, unit *u)
 {
 	direction_t d;
@@ -627,7 +627,7 @@ random_attack_by_monster(const region * r, unit * u)
 	return success;
 }
 
-void
+static void
 eaten_by_monster(unit * u)
 {
 	int n = 0;
@@ -690,7 +690,7 @@ absorbed_by_monster(unit * u)
 	}
 }
 
-int
+static int
 scareaway(region * r, int anzahl)
 {
 	int n, p, d = 0, emigrants[MAXDIRECTIONS];
@@ -723,7 +723,7 @@ scareaway(region * r, int anzahl)
 	return d;
 }
 
-void
+static void
 scared_by_monster(unit * u)
 {
 	int n;
@@ -756,7 +756,7 @@ scared_by_monster(unit * u)
 	}
 }
 
-const char *
+static const char *
 random_growl(void)
 {
 	switch(rand()%5) {
@@ -776,7 +776,7 @@ random_growl(void)
 
 extern attrib_type at_direction;
 
-void
+static void
 make_ponnuki(void)
 {
 	int ponn = atoi36("ponn");
@@ -802,7 +802,7 @@ make_ponnuki(void)
 	} while (u);
 }
 
-void ponnuki(unit * u)
+static void ponnuki(unit * u)
 {
 	const char* joke[] = {
 		"Ein Bummerang ist, wenn man ihn wegwirft und er kommt nicht wieder, dann war's keiner.",
@@ -859,7 +859,7 @@ void ponnuki(unit * u)
 
 extern void make_ponnuki(void);
 
-void
+static void
 learn_monster(unit *u)
 {
 	int c = 0;
@@ -897,7 +897,7 @@ monsters_kill_peasants(void)
 	unit *u;
 
 	for (r = regions; r; r = r->next) {
-		for (u = r->units; u; u = u->next) if(!fval(u, FL_MOVED)) {
+		for (u = r->units; u; u = u->next) if(!fval(u, UFL_MOVED)) {
 			if(u->race->flags & RCF_SCAREPEASANTS) {
 				scared_by_monster(u);
 			}
@@ -909,6 +909,21 @@ monsters_kill_peasants(void)
 			}
 		}
 	}
+}
+
+static boolean
+check_overpopulated(unit *u)
+{
+	unit *u2;
+	int c = 0;
+
+	for(u2 = u->region->units; u2; u2 = u2->next) {
+		if(u2->race == u->race && u != u2) c += u2->number;
+	}
+
+	if(c > u->race->splitsize * 2) return true;
+
+	return false;
 }
 
 void
@@ -1148,7 +1163,7 @@ plan_monsters(void)
 	}
 }
 
-void
+static void
 age_default(unit *u)
 {
 }
@@ -1171,7 +1186,7 @@ age_unit(region * r, unit * u)
 	}
 }
 
-void
+static void
 split_unit(region * r, unit *u)
 {
 	unit *u2 = createunit(r, u->faction, 0, u->race);
@@ -1183,21 +1198,6 @@ split_unit(region * r, unit *u)
 	set_string(&u2->lastorder, "WARTEN");
 
 	transfermen(u, u2, newsize);
-}
-
-boolean
-check_overpopulated(unit *u)
-{
-	unit *u2;
-	int c = 0;
-
-	for(u2 = u->region->units; u2; u2 = u2->next) {
-		if(u2->race == u->race && u != u2) c += u2->number;
-	}
-
-	if(c > u->race->splitsize * 2) return true;
-
-	return false;
 }
 
 void

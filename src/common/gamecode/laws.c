@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -27,7 +27,6 @@
 #include <modules/infocmd.h>
 
 /* gamecode includes */
-#include "creation.h"
 #include "economy.h"
 #include "monster.h"
 #include "randenc.h"
@@ -101,6 +100,15 @@ extern int * age;
 boolean nobattle = false;
 /* ------------------------------------------------------------- */
 
+static int 
+RemoveNMRNewbie() {
+	static int value = -1;
+	if (value<0) {
+		value = atoi(get_param(global.parameters, "nmr.removenewbie"));
+	}
+	return value;
+}
+
 static void
 restart(unit *u, const race * rc)
 {
@@ -138,7 +146,7 @@ checkorders(void)
 
 	puts(" - Warne späte Spieler...");
 	for (f = factions; f; f = f->next)
-		if (f->no!=MONSTER_FACTION && turn - f->lastorders == NMRTIMEOUT - 1)
+		if (f->no!=MONSTER_FACTION && turn - f->lastorders == NMRTimeout() - 1)
 			ADDMSG(&f->msgs, msg_message("turnreminder", ""));
 }
 /* ------------------------------------------------------------- */
@@ -159,7 +167,7 @@ get_food(region *r)
 		int need = lifestyle(u);
 
 		/* Erstmal zurücksetzen */
-		freset(u, FL_HUNGER);
+		freset(u, UFL_HUNGER);
 
 		need -= get_money(u);
 		if (need > 0) {
@@ -190,7 +198,8 @@ get_food(region *r)
 			unit *v;
 
 			for (v = r->units; need && v; v = v->next) {
-				if (v->faction != u->faction && alliedunit(v, u->faction, HELP_MONEY) && !is_monstrous(v)) {
+				if (v->faction != u->faction && alliedunit(v, u->faction, HELP_MONEY)
+           && !is_monstrous(v)) {
 					int give = lifestyle(v);
 					give = max(0, get_money(v) - give);
 					give = min(need, give);
@@ -210,7 +219,7 @@ get_food(region *r)
 				int lspp = lifestyle(u)/u->number;
 				if (lspp > 0) {
 					int number = (need+lspp-1)/lspp;
-					if (hunger(number, u)) fset(u, FL_HUNGER);
+					if (hunger(number, u)) fset(u, UFL_HUNGER);
 				}
 			}
 		}
@@ -322,8 +331,7 @@ live(region * r)
 #if NEW_MIGRATION == 1
 
 /* Arbeitsversion */
-
-void
+static void
 calculate_emigration(region *r)
 {
 	direction_t i;
@@ -1043,7 +1051,7 @@ transfer_faction(faction *f, faction *f2)
 }
 #endif
 
-void
+static void
 quit(void)
 {
 	region *r;
@@ -1147,13 +1155,11 @@ quit(void)
 	remove("inactive");
 
 	for (f = factions; f; f = f->next) {
-		if(fval(f, FL_NOIDLEOUT)) f->lastorders = turn;
-#if NMRTIMEOUT
-		if (turn - f->lastorders >= NMRTIMEOUT) {
+		if(fval(f, FFL_NOIDLEOUT)) f->lastorders = turn;
+		if (NMRTimeout()>0 && turn - f->lastorders >= NMRTimeout()) {
 			destroyfaction(f);
 			continue;
 		}
-#endif
 		if (fval(f, FFL_OVERRIDE)) {
 			free(f->override);
 			f->override = strdup(itoa36(rand()));
@@ -1173,7 +1179,7 @@ quit(void)
 				f->lastorders, f->override, f->subscription);
 		}
 
-		if (turn - f->lastorders >= (NMRTIMEOUT - 1)) {
+		if (NMRTimeout()>0 && turn - f->lastorders >= (NMRTimeout() - 1)) {
 			inactivefaction(f);
 			continue;
 		}
@@ -1183,8 +1189,7 @@ quit(void)
 
 	age = calloc(turn+1, sizeof(int));
 	for (f = factions; f; f = f->next) if (f->no != MONSTER_FACTION) {
-#if REMOVENMRNEWBIE
-		if(!fval(f, FL_NOIDLEOUT)) {
+		if (RemoveNMRNewbie() && !fval(f, FFL_NOIDLEOUT)) {
 			if (f->age>=0 && f->age <= turn) ++age[f->age];
 			if (f->age == 2 || f->age == 3) {
 				if (f->lastorders == turn - 2) {
@@ -1194,7 +1199,6 @@ quit(void)
 				}
 			}
 		}
-#endif
 #if defined(ALLIANCES) && !defined(ALLIANCEJOIN)
 		if (f->alliance==NULL) {
 			destroyfaction(f);
@@ -1351,7 +1355,7 @@ set_display(region * r, unit * u, strlist * S)
 			cmistake(u, S->s, 145, MSG_PRODUCE);
 			break;
 		}
-		if (!fval(u, FL_OWNER)) {
+		if (!fval(u, UFL_OWNER)) {
 			cmistake(u, S->s, 5, MSG_PRODUCE);
 			break;
 		}
@@ -1371,7 +1375,7 @@ set_display(region * r, unit * u, strlist * S)
 			cmistake(u, S->s, 144, MSG_PRODUCE);
 			break;
 		}
-		if (!fval(u, FL_OWNER)) {
+		if (!fval(u, UFL_OWNER)) {
 			cmistake(u, S->s, 12, MSG_PRODUCE);
 			break;
 		}
@@ -1398,7 +1402,7 @@ set_display(region * r, unit * u, strlist * S)
 			cmistake(u, S->s, 145, MSG_EVENT);
 			break;
 		}
-		if (!fval(u, FL_OWNER)) {
+		if (!fval(u, UFL_OWNER)) {
 			cmistake(u, S->s, 148, MSG_EVENT);
 			break;
 		}
@@ -1511,14 +1515,14 @@ set_synonym(unit * u, strlist *S)
 	return;
 }
 
-void
+static void
 set_group(unit * u)
 {
 	const char * s = getstrtoken();
 	join_group(u, s);
 }
 
-void
+static void
 set_name(region * r, unit * u, strlist * S)
 {
   char **s;
@@ -1574,7 +1578,7 @@ set_name(region * r, unit * u, strlist * S)
 				cmistake(u, S->s, 145, MSG_PRODUCE);
 				break;
 			}
-			if (!fval(u, FL_OWNER)) {
+			if (!fval(u, UFL_OWNER)) {
 				cmistake(u, S->s, 148, MSG_PRODUCE);
 				break;
 			}
@@ -1653,7 +1657,7 @@ set_name(region * r, unit * u, strlist * S)
 				cmistake(u, S->s, 144, MSG_PRODUCE);
 				break;
 			}
-			if (!fval(u, FL_OWNER)) {
+			if (!fval(u, UFL_OWNER)) {
 				cmistake(u, S->s, 12, MSG_PRODUCE);
 				break;
 			}
@@ -1692,7 +1696,7 @@ set_name(region * r, unit * u, strlist * S)
 			cmistake(u, S->s, 145, MSG_EVENT);
 			break;
 		}
-		if (!fval(u, FL_OWNER)) {
+		if (!fval(u, UFL_OWNER)) {
 			cmistake(u, S->s, 148, MSG_EVENT);
 			break;
 		}
@@ -1788,7 +1792,7 @@ mailfaction(unit * u, int n, strlist * S, const char * s)
 		cmistake(u, S->s, 66, MSG_MESSAGE);
 }
 
-void
+static void
 distributeMail(region * r, unit * u, strlist * S)
 {
 	unit *u2;
@@ -1933,7 +1937,7 @@ distributeMail(region * r, unit * u, strlist * S)
 	}
 }
 
-void
+static void
 mail(void)
 {
 	region *r;
@@ -1950,7 +1954,7 @@ mail(void)
 }
 /* ------------------------------------------------------------- */
 
-void
+static void
 report_option(unit * u, const char * sec, char *cmd)
 {
 	const messageclass * mc;
@@ -1969,7 +1973,7 @@ report_option(unit * u, const char * sec, char *cmd)
 		set_msglevel(&u->faction->warnings, mc->name, -1);
 }
 
-void
+static void
 set_passw(void)
 {
 	region *r;
@@ -2135,7 +2139,7 @@ set_passw(void)
 			}
 }
 
-boolean
+static boolean
 display_item(faction *f, unit *u, const item_type * itype)
 {
 	FILE *fp;
@@ -2179,7 +2183,7 @@ display_item(faction *f, unit *u, const item_type * itype)
 	return true;
 }
 
-boolean
+static boolean
 display_potion(faction *f, unit *u, const potion_type * ptype)
 {
 	attrib *a;
@@ -2202,7 +2206,7 @@ display_potion(faction *f, unit *u, const potion_type * ptype)
 	return true;
 }
 
-boolean
+static boolean
 display_race(faction *f, unit *u, const race * rc)
 {
 	FILE *fp;
@@ -2304,7 +2308,7 @@ display_race(faction *f, unit *u, const race * rc)
 	return true;
 }
 
-void
+static void
 instant_orders(void)
 {
 	region *r;
@@ -2421,9 +2425,9 @@ instant_orders(void)
 					case P_HELP:
 						param = getstrtoken();
 						if( findparam(param, u->faction->locale) == P_NOT) {
-							fset(u, FL_NOAID);
+							fset(u, UFL_NOAID);
 						} else {
-							freset(u, FL_NOAID);
+							freset(u, UFL_NOAID);
 						}
 						break;
 
@@ -2490,7 +2494,7 @@ instant_orders(void)
 						cmistake(u, S->s, 304, MSG_EVENT);
 						break;
 					}
-					if (fval(u, FL_HUNGER)) {
+					if (fval(u, UFL_HUNGER)) {
 						cmistake(u, S->s, 223, MSG_EVENT);
 						break;
 					}
@@ -2575,7 +2579,7 @@ remove_unequipped_guarded(void)
 		}
 }
 
-void
+static void
 bewache_an(void)
 {
 	region *r;
@@ -2585,7 +2589,7 @@ bewache_an(void)
 	/* letzte schnellen befehle - bewache */
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) {
-			if (!fval(u, FL_MOVED)) {
+			if (!fval(u, UFL_MOVED)) {
 				for (S = u->orders; S; S = S->next) {
 					if (igetkeyword(S->s, u->faction->locale) == K_GUARD && getparam(u->faction->locale) != P_NOT) {
 						if (rterrain(r) != T_OCEAN) {
@@ -2617,7 +2621,7 @@ bewache_an(void)
 	}
 }
 
-void
+static void
 sinkships(void)
 {
 	region *r;
@@ -2742,7 +2746,7 @@ reorder(void)
 							cmistake(u, o->s, 258, MSG_EVENT);
 						} else if (v->building != u->building || v->ship!=u->ship) {
 							cmistake(u, o->s, 259, MSG_EVENT);
-						} else if (fval(u, FL_OWNER)) {
+						} else if (fval(u, UFL_OWNER)) {
 							cmistake(u, o->s, 260, MSG_EVENT);
 						} else if (v == u) {
 							cmistake(u, o->s, 10, MSG_EVENT);
@@ -2754,7 +2758,7 @@ reorder(void)
 								v->next = u;
 								break;
 							case P_BEFORE:
-								if (fval(v, FL_OWNER)) {
+								if (fval(v, UFL_OWNER)) {
 									cmistake(u, o->s, 261, MSG_EVENT);
 								} else {
 									vp=&r->units;
@@ -2791,7 +2795,7 @@ evict(void)
 		for (u=r->units;u;u=u->next) {
 			for (S = u->orders; S; S = S->next) if (igetkeyword(S->s, u->faction->locale)==K_EVICT) {
 				/* Nur der Kapitän bzw Burgherr kann jemanden rausschmeißen */
-				if(!fval(u, FL_OWNER)) {
+				if(!fval(u, UFL_OWNER)) {
 					/* Die Einheit ist nicht der Eigentümer */
 					cmistake(u,S->s,49,MSG_EVENT);
 					continue;
@@ -2948,7 +2952,7 @@ renumber(void)
 						cmistake(u,S->s,144,MSG_EVENT);
 						continue;
 					}
-					if(!fval(u, FL_OWNER)) {
+					if(!fval(u, UFL_OWNER)) {
 						cmistake(u,S->s,146,MSG_EVENT);
 						continue;
 					}
@@ -2976,7 +2980,7 @@ renumber(void)
 						cmistake(u,S->s,145,MSG_EVENT);
 						continue;
 					}
-					if(!fval(u, FL_OWNER)) {
+					if(!fval(u, UFL_OWNER)) {
 						cmistake(u,S->s,148,MSG_EVENT);
 						continue;
 					}
@@ -3199,13 +3203,13 @@ setdefaults (void)
 					if (getparam(u->faction->locale) == P_TEMP) break;
 				case K_BESIEGE:
 				case K_ENTERTAIN:
-				case K_RESEARCH:
+				case K_TAX:
+	  		case K_RESEARCH:
 				case K_SPY:
 				case K_STEAL:
 				case K_SABOTAGE:
 				case K_STUDY:
-				case K_TAX:
-				case K_TEACH:
+		  	case K_TEACH:
 				case K_ZUECHTE:
 #if GROWING_TREES
 				case K_PFLANZE:
@@ -3224,11 +3228,9 @@ setdefaults (void)
 				case K_MOVE:
 				case K_WEREWOLF:
 					cmd = S->s;
-#if HUNGER_DISABLES_LONGORDERS
-					if (fval(u, FL_HUNGER)) {
+					if (LongHunger() && fval(u, UFL_HUNGER)) {
 						cmd = locale_string(u->faction->locale, "defaultorder");
 					}
-#endif
 					set_string(&u->thisorder, cmd);
 					break;
 
@@ -3242,7 +3244,7 @@ setdefaults (void)
 			 * werden. */
 
 			if(trade == true) {
-				/* fset(u, FL_LONGACTION); */
+				/* fset(u, UFL_LONGACTION); */
 				set_string(&u->thisorder, "");
 			}
 			/* thisorder kopieren wir nun nach lastorder. in lastorder steht
@@ -3360,7 +3362,7 @@ monthly_healing(void)
 					u->hp = umhp;
 			}
 
-			if((u->race->flags & RCF_NOHEAL) || fval(u, FL_HUNGER) || fspecial(u->faction, FS_UNDEAD))
+			if((u->race->flags & RCF_NOHEAL) || fval(u, UFL_HUNGER) || fspecial(u->faction, FS_UNDEAD))
 				continue;
 
 			if(rterrain(r) == T_OCEAN && !u->ship && !(canswim(u)))
@@ -3596,8 +3598,10 @@ processorders (void)
 	magic();
 	remove_empty_units();
 
-	puts(" - Lehren");
-	teaching();
+	if (!global.disabled[K_TEACH]) {
+		puts(" - Lehren");
+		teaching();
+	}
 
 	puts(" - Lernen");
 	learn();

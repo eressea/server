@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -590,12 +590,12 @@ version(void)
 int
 readorders(const char *filename)
 {
-	FILE * F;
+	FILE * F = NULL;
 	char *b;
 	int nfactions=0;
 	struct faction *f = NULL;
 
-	F = cfopen(filename, "rt");
+	if (filename) F = cfopen(filename, "rt");
 	if (F==NULL) return 0;
 
 	puts(" - lese Befehlsdatei...\n");
@@ -1323,13 +1323,6 @@ writegame(char *path, char quiet)
 
 	/* write_dynamictypes(); */
 
-#if 0 /* Already in common/gamecode/report.c, around line 3508 */
-	/* write turn number to file for use by external scripts */
-	F = fopen("turn","w");
-	fprintf(F, "%d", turn);
-	fclose(F);
-#endif
-
 	F = cfopen(path, "w");
 	if (F==NULL)
 		return;
@@ -1465,89 +1458,6 @@ writegame(char *path, char quiet)
 }
 /* ------------------------------------------------------------- */
 
-void
-curse_write(const attrib * a, FILE * f) {
-	int flag;
-	int mage_no;
-	curse * c = (curse*)a->data.v;
-	const curse_type * ct = c->type;
-
-	flag = (c->flag & ~(CURSE_ISNEW));
-
-	if (c->magician){
-		mage_no = c->magician->no;
-	} else {
-		mage_no = -1;
-	}
-
-	fprintf(f, "%d %s %d %d %d %d %d ", c->no, ct->cname, flag,
-			c->duration, c->vigour, mage_no, c->effect.i);
-
-	if (c->type->write) c->type->write(f, c);
-	else if (c->type->typ == CURSETYP_UNIT) {
-		curse_unit * cc = (curse_unit*)c->data;
-		fprintf(f, "%d ", cc->cursedmen);
-	}
-}
-
-int
-curse_read(attrib * a, FILE * f) {
-	int mageid;
-	curse * c = (curse*)a->data.v;
-	const curse_type * ct;
-
-	if (global.data_version >= CURSETYPE_VERSION) {
-		char cursename[64];
-		fscanf(f, "%d %s %d %d %d %d %d ", &c->no, cursename, &c->flag,
-			&c->duration, &c->vigour, &mageid, &c->effect.i);
-		ct = ct_find(cursename);
-	} else {
-		int cspellid;
-		if (global.data_version < CURSE_NO_VERSION) {
-			fscanf(f, "%d %d %d %d %d %d ",&cspellid, &c->flag, &c->duration,
-				&c->vigour, &mageid, &c->effect.i);
-			c->no = newunitid();
-		} else {
-			fscanf(f, "%d %d %d %d %d %d %d ", &c->no, &cspellid, &c->flag,
-				&c->duration, &c->vigour, &mageid, &c->effect.i);
-		}
-		ct = ct_find(oldcursename(cspellid));
-	}
-	assert(ct!=NULL);
-
-#ifdef CONVERT_DBLINK
-	if (global.data_version<DBLINK_VERSION) {
-		static const curse_type * cmonster = NULL;
-		if (!cmonster) cmonster=ct_find("calmmonster");
-		if (ct==cmonster) {
-			c->effect.v = uniquefaction(c->effect.i);
-		}
-	}
-#endif
-	c->type = ct;
-
-	/* beim Einlesen sind noch nicht alle units da, muss also
-	 * zwischengespeichert werden. */
-	if (mageid == -1){
-		c->magician = (unit *)NULL;
-	} else {
-		ur_add((void*)mageid, (void**)&c->magician, resolve_unit);
-	}
-
-	if (c->type->read) c->type->read(f, c);
-	else if (c->type->typ==CURSETYP_UNIT) {
-		curse_unit * cc = calloc(1, sizeof(curse_unit));
-
-		c->data = cc;
-		fscanf(f, "%d ", &cc->cursedmen);
-	}
-	chash(c);
-
-	return AT_READ_OK;
-}
-
-/* ------------------------------------------------------------- */
-
 struct fjord { int size; faction * f; } fjord[3];
 
 /* ------------------------------------------------------------- */
@@ -1674,9 +1584,9 @@ readunit(FILE * F)
 
 	if (global.data_version <= 73) {
 		if (ri(F)) {
-			fset(u, FL_OWNER);
+			fset(u, UFL_OWNER);
 		} else {
-			freset(u, FL_OWNER);
+			freset(u, UFL_OWNER);
 		}
 	}
 	u->status = (status_t) ri(F);

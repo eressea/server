@@ -2,7 +2,7 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
@@ -14,17 +14,17 @@
 #include <eressea.h>
 #include "items.h"
 
+#include "birthday_firework.h"
 #include "lmsreward.h"
 #include "demonseye.h"
-#include "weapons.h"
 #include "xerewards.h"
-#include "catapultammo.h"
+#include "weapons.h"
 #include "racespoils.h"
 #if GROWING_TREES
 # include "seed.h"
 #endif
-#include "birthday_firework.h"
 #include "questkeys.h"
+#include "catapultammo.h"
 
 void
 register_items(void)
@@ -39,8 +39,8 @@ register_items(void)
 #endif
 	register_birthday_firework();
 	register_lebkuchenherz();
-	register_catapultammo();
 	register_questkeys();
+	register_catapultammo();
 	register_racespoils();
 }
 

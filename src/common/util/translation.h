@@ -2,13 +2,19 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
 */
+
+#ifndef H_UTIL_TRANSLATION
+#define H_UTIL_TRANSLATION
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct opstack;
 extern void * opstack_pop(struct opstack ** stack);
@@ -28,3 +34,7 @@ extern void add_function(const char * symbol, evalfun parse);
 /* transient memory blocks */
 extern char * balloc(size_t size);
 
+#ifdef __cplusplus
+}
+#endif
+#endif

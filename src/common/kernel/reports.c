@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -105,7 +105,7 @@ report_kampfstatus(const unit * u, const struct locale * lang)
 		"status_avoid", "status_flee" };
 
 	strcpy(fsbuf, LOC(lang, azstatus[u->status]));
-	if (fval(u, FL_NOAID)) {
+	if (fval(u, UFL_NOAID)) {
 		strcat(fsbuf, ", ");
 		strcat(fsbuf, LOC(lang, "status_noaid"));
 	}
@@ -167,7 +167,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 {
 	int i, dh;
 	skill_t sk;
-	int getarnt = fval(u, FL_PARTEITARNUNG);
+	int getarnt = fval(u, UFL_PARTEITARNUNG);
 	faction *fv;
 	attrib *a_otherfaction;
 	const char *pzTmp;
@@ -266,10 +266,10 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 		const char * c = locale_string(f->locale, hp_status(u));
 		scat(", ");
 		scat(report_kampfstatus(u, f->locale));
-		if (c || fval(u, FL_HUNGER)) {
+		if (c || fval(u, UFL_HUNGER)) {
 			scat(" (");
 			if(c) scat(c);
-			if(fval(u, FL_HUNGER)) {
+			if(fval(u, UFL_HUNGER)) {
 				if (c) scat(", hungert");
 				else  scat("hungert");
 			}
@@ -449,7 +449,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 {
 	int i, dh;
-	int getarnt = fval(u, FL_PARTEITARNUNG);
+	int getarnt = fval(u, UFL_PARTEITARNUNG);
 	faction *fv;
 	const char *pzTmp;
 	boolean itemcloak = is_cursed(u->attribs, C_ITEMCLOAK, 0);
@@ -753,7 +753,7 @@ spy_message(int spy, unit *u, unit *target)
 			scat("Partei '");
 			scat(factionname(fv));
 			scat("'. ");
-		} else if (!fval(target, FL_PARTEITARNUNG)){
+		} else if (!fval(target, UFL_PARTEITARNUNG)){
 			scat("Partei '");
 			scat(factionname(target->faction));
 			scat("'. ");
@@ -867,7 +867,7 @@ get_addresses(const faction * f, const seen_region * seenregions)
 		while (u!=NULL) {
 			faction * sf = visible_faction(f, u);
 			boolean ballied = sf && sf!=f && sf!=lastf
-				&& !fval(u, FL_PARTEITARNUNG) && cansee(f, r, u, 0);
+				&& !fval(u, UFL_PARTEITARNUNG) && cansee(f, r, u, 0);
 			if (ballied || ALLIED(f, sf)) {
 				faction_list ** fnew = &flist;
 				while (*fnew && (*fnew)->data->no < sf->no) {

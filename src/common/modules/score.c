@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -22,20 +22,24 @@
 #include <config.h>
 #include "eressea.h"
 
-#include "magic.h"
-#include "item.h"
-#include "region.h"
-#include <faction.h>
-#include <building.h>
+#ifdef ALLIANCES
 #include "alliance.h"
-#include "race.h"
-#include "unit.h"
-#include "skill.h"
-#include "goodies.h"
-#include "ship.h"
+#endif
+
+/* kernel includes */
+#include <building.h>
+#include <faction.h>
+#include <item.h>
+#include <magic.h>
+#include <race.h>
+#include <region.h>
+#include <ship.h>
+#include <skill.h>
+#include <unit.h>
 
 /* util includes */
 #include <base36.h>
+#include <goodies.h>
 
 /* libc includes */
 #include <math.h>
@@ -51,7 +55,7 @@ init_scores(void)
 
 	for (i = 0;olditemtype[i];i++) {
 		const luxury_type * ltype;
-		item_type * itype = olditemtype[i];
+		const item_type * itype = olditemtype[i];
 		attrib * a = a_add(&itype->rtype->attribs, a_new(&a_score));
 		switch (i) {
 		case I_KEKS:

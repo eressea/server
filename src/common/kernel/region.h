@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -12,8 +12,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef _REGION_H
-#define _REGION_H
+#ifndef H_KRNL_REGION
+#define H_KRNL_REGION
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "language.h"
 #include <assert.h>
@@ -77,6 +80,7 @@ typedef struct region {
 	struct plane *planep;
 	char *display;
 	unsigned int flags;
+	unsigned short age;
 	struct message_list *msgs;
 	struct individual_message {
 		struct individual_message * next;
@@ -86,7 +90,6 @@ typedef struct region {
 	struct attrib *attribs;
 	struct region *nexthash;
 	terrain_t terrain;
-	unsigned short age;
 #ifdef WEATHER
 	weather_t weathertype;
 #endif
@@ -220,4 +223,7 @@ extern void write_region_reference(const struct region * r, FILE * F);
 
 extern struct unit * region_owner(const struct region * r);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _REGION_H */

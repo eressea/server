@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -14,6 +14,9 @@
 
 #ifndef RAND_H
 #define RAND_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern int dice_rand(const char *str);
 extern int dice(int count, int value);
@@ -21,4 +24,7 @@ extern double normalvariate(double mu, double sigma);
 extern int ntimespprob(int n, double p, double mod);
 extern boolean chance(double x);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -158,7 +158,7 @@ reset_translations(void)
 }
 
 /* implementation */
-void
+static void
 cr_output_str_list(FILE * F, const char *title, const strlist * S, const faction * f)
 {
 	char *s;
@@ -612,14 +612,14 @@ cr_output_unit(FILE * F, const region * r,
 			} 
 			fprintf(F, "%d;Partei\n", u->faction->no);
 			if (sf!=u->faction) fprintf(F, "%d;Verkleidung\n", sf->no);
-			if (fval(u, FL_PARTEITARNUNG))
-				fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, FL_PARTEITARNUNG)));
+			if (fval(u, UFL_PARTEITARNUNG))
+				fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_PARTEITARNUNG)));
 			if (otherfaction)
 				fprintf(F, "%d;Anderepartei\n", otherfaction->no);
 		} else {
-			if (fval(u, FL_PARTEITARNUNG)) {
+			if (fval(u, UFL_PARTEITARNUNG)) {
 				/* faction info is hidden */
-				fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, FL_PARTEITARNUNG)));
+				fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_PARTEITARNUNG)));
 			} else {
 				const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
 				const faction * otherfaction = a_otherfaction?get_otherfaction(a_otherfaction):NULL;
@@ -686,7 +686,7 @@ cr_output_unit(FILE * F, const region * r,
 			fprintf(F, "%d;alias\n", -i);
 		i = get_money(u);
 		fprintf(F, "%d;Kampfstatus\n", u->status);
-		if(fval(u, FL_NOAID)) {
+		if(fval(u, UFL_NOAID)) {
 			fputs("1;unaided\n", F);
 		}
 		i = u_geteffstealth(u);
@@ -698,7 +698,7 @@ cr_output_unit(FILE * F, const region * r,
 		c = hp_status(u);
 		if (c && *c && (u->faction == f || omniscient(f)))
 			fprintf(F, "\"%s\";hp\n", add_translation(c, locale_string(u->faction->locale, c)));
-		if (fval(u, FL_HUNGER) && (u->faction == f))
+		if (fval(u, UFL_HUNGER) && (u->faction == f))
 			fputs("1;hunger\n", F);
 		if (is_mage(u)) {
 			fprintf(F, "%d;Aura\n", get_spellpoints(u));
@@ -835,7 +835,7 @@ show_enemies(FILE * F, const faction_list* flist)
   for (;flist!=NULL;flist=flist->next) {
     if (flist->data) {
       int fno = flist->data->no;
-      fprintf(F, "ENEMY %u\n%d;partei\n", fno);
+      fprintf(F, "ENEMY %u\n%u;partei\n", fno, fno);
     }
   }
 }
@@ -1291,7 +1291,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 						fprintf(F, "%d;Laen\n", rlaen(r));
 #endif
 					/* trade */
-					if(rpeasants(r)/TRADE_FRACTION > 0) {
+					if (!TradeDisabled() && rpeasants(r)/TRADE_FRACTION > 0) {
 						fputs("PREISE\n", F);
 						while (dmd) {
 							const char * ch = resourcename(dmd->type->itype->rtype, 0);
@@ -1334,7 +1334,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 				for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
 					unit * u = (unit*)ru->data.v;
 					if (cansee_durchgezogen(f, r, u, 0) && r!=u->region) {
-						if (!u->ship || !fval(u, FL_OWNER)) continue;
+						if (!u->ship || !fval(u, UFL_OWNER)) continue;
 						if (!seeships) fprintf(F, "DURCHSCHIFFUNG\n");
 						seeships = true;
 						fprintf(F, "\"%s\"\n", shipname(u->ship));
@@ -1359,7 +1359,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 			for (b = rbuildings(r); b; b = b->next) {
 				int fno = -1;
 				u = buildingowner(r, b);
-				if (u && !fval(u, FL_PARTEITARNUNG)) {
+				if (u && !fval(u, UFL_PARTEITARNUNG)) {
 					const faction * sf = visible_faction(f,u);
 					fno = sf->no;
 				}
@@ -1370,7 +1370,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 			for (sh = r->ships; sh; sh = sh->next) {
 				int fno = -1;
 				u = shipowner(r, sh);
-				if (u && !fval(u, FL_PARTEITARNUNG)) {
+				if (u && !fval(u, UFL_PARTEITARNUNG)) {
 					const faction * sf = visible_faction(f,u);
 					fno = sf->no;
 				}

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * Eressea PB(E)M host Copyright (C) 1998-2000
+ * Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -11,9 +11,17 @@
  * prior permission by the authors of Eressea.
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct faction;
 struct attrib;
 extern struct attrib_type at_otherfaction;
 extern void init_otherfaction(void);
 extern struct faction * get_otherfaction(const struct attrib * a);
 extern struct attrib * make_otherfaction(struct faction * f);
+
+#ifdef __cplusplus
+extern "C" {
+#endif

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -19,9 +19,20 @@
  * permission from the authors.
  */
 
+#ifndef H_UTIL_SQL
+#define H_UTIL_SQL
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 
 extern FILE * sqlstream;
 extern void sql_init(const char * filename);
 extern void sql_done(void);
 extern const char * sqlquote(const char * str);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -13,6 +13,12 @@
  */
 
 
+#ifndef H_KRNL_NAMES
+#define H_KRNL_NAMES
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 const char *untoten_name(const struct unit * u);
 const char *skeleton_name(const struct unit * u);
 const char *zombie_name(const struct unit * u);
@@ -22,3 +28,8 @@ const char *dracoid_name(const struct unit *u);
 const char *shadow_name(const struct unit *u);
 const char *abkz(const char *s, size_t max);
 void name_unit(struct unit *u);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

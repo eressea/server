@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -18,9 +18,13 @@
  * permission from the authors.
  */
 
-#ifndef FACTYPES_H
-#define FACTYPES_H
-#include "magic.h"
+#ifndef H_KRNL_RACE_H
+#define H_KRNL_RACE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "magic.h" /* wegen MAXMAGIETYP */
 
 #define AT_NONE 0
 #define AT_STANDARD	1
@@ -162,4 +166,7 @@ extern const struct race_syn race_synonyms[];
 extern void write_race_reference(const struct race * rc, FILE * F);
 extern int read_race_reference(const struct race ** rp, FILE * F);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

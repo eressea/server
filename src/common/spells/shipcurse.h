@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * Eressea PB(E)M host Copyright (C) 1998-2000
+ * Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -13,10 +13,16 @@
 
 #ifndef _SCURSE_H
 #define _SCURSE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct locale;
 struct curse;
 extern int cinfo_ship(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self);
 extern void register_shipcurse(void);
 	
+#ifdef __cplusplus
+}
+#endif
 #endif /* _SCURSE_H */

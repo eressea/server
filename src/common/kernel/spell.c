@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- *  Eressea PB(E)M host Copyright (C) 1998-2000
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -608,8 +608,8 @@ sp_summon_familiar(castorder *co)
 	familiar->status = ST_FLEE;	/* flieht */
 	sprintf(buf, "Vertrauter von %s", unitname(mage));
 	set_string(&familiar->name, buf);
-	if (fval(mage, FL_PARTEITARNUNG)) fset(familiar, FL_PARTEITARNUNG);
-	fset(familiar, FL_LOCKED);
+	if (fval(mage, UFL_PARTEITARNUNG)) fset(familiar, UFL_PARTEITARNUNG);
+	fset(familiar, UFL_LOCKED);
 	make_familiar(familiar, mage);
 
 	dh = 0;
@@ -971,7 +971,7 @@ sp_summonent(castorder *co)
 	a->data.ca[0] = 2;	/* An r->trees. */
 	a->data.ca[1] = 5;	/* 5% */
 	a_add(&u->attribs, a);
-	fset(u, FL_LOCKED);
+	fset(u, UFL_LOCKED);
 
 #if GROWING_TREES
 	rsettrees(r, 2, rtrees(r,2) - ents);
@@ -2302,7 +2302,7 @@ sp_ironkeeper(castorder *co)
 	fset(keeper, UFL_ISNEW);
 	keeper->status = ST_AVOID;	/* kaempft nicht */
 	/* Parteitarnen, damit man nicht sofort weiß, wer dahinter steckt */
-	fset(keeper, FL_PARTEITARNUNG);
+	fset(keeper, UFL_PARTEITARNUNG);
 	{
 		trigger * tkill = trigger_killunit(keeper);
 		add_trigger(&keeper->attribs, "timer", trigger_timeout(cast_level+2, tkill));
@@ -2449,7 +2449,7 @@ sp_earthquake(castorder *co)
 			for(u = r->units; u; u = u->next ) {
 				if(u->building == burg ) {
 					u->building = 0;
-					freset(u, FL_OWNER);
+					freset(u, UFL_OWNER);
 				}
 			}
 			/* TODO: sollten die Insassen nicht Schaden nehmen? */
@@ -3242,7 +3242,7 @@ sp_unholypower(castorder *co)
 			 * vermutlich eine ganze Reihe von Stellen, wo das nicht
 			 * korrekt abgefangen wird. Besser (aber nicht gerade einfach)
 			 * wäre es, eine solche Konstruktion irgendwie zu kapseln. */
-			if(fval(u, FL_LOCKED) || fval(u, FL_HUNGER)
+			if(fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)
 					|| is_cursed(u->attribs, C_SLAVE, 0)) {
 				cmistake(mage, strdup(co->order), 74, MSG_MAGIC);
 				continue;
@@ -3453,8 +3453,8 @@ sp_summonshadow(castorder *co)
 		u->building = mage->building;
 		u->ship = mage->ship;
 	}
-	if (fval(mage, FL_PARTEITARNUNG))
-		fset(u, FL_PARTEITARNUNG);
+	if (fval(mage, UFL_PARTEITARNUNG))
+		fset(u, UFL_PARTEITARNUNG);
 
 	/* Bekommen Tarnung = (Magie+Tarnung)/2 und Wahrnehmung 1. */
 	val = get_level(mage, SK_MAGIC) + get_level(mage, SK_STEALTH);
@@ -3500,8 +3500,8 @@ sp_summonshadowlords(castorder *co)
 		u->building = mage->building;
 		u->ship = mage->ship;
 	}
-	if (fval(mage, FL_PARTEITARNUNG))
-		fset(u, FL_PARTEITARNUNG);
+	if (fval(mage, UFL_PARTEITARNUNG))
+		fset(u, UFL_PARTEITARNUNG);
 
 	/* Bekommen Tarnung = Magie und Wahrnehmung 5. */
 	set_level(u, SK_STEALTH, get_level(mage, SK_MAGIC));
@@ -3737,8 +3737,8 @@ sp_summonundead(castorder *co)
 		u->building = mage->building;
 		u->ship = mage->ship;
 	}
-	if (fval(mage, FL_PARTEITARNUNG))
-		fset(u, FL_PARTEITARNUNG);
+	if (fval(mage, UFL_PARTEITARNUNG))
+		fset(u, UFL_PARTEITARNUNG);
 
 	sprintf(buf, "%s erweckt %d Untote aus ihren Gräbern.",
 			unitname(mage), undead);
@@ -4049,7 +4049,7 @@ sp_charmingsong(castorder *co)
 
 	/* setze Parteitarnung, damit nicht sofort klar ist, wer dahinter
 	 * steckt */
-	fset(target, FL_PARTEITARNUNG);
+	fset(target, UFL_PARTEITARNUNG);
 
 	sprintf(buf, "%s gelingt es %s zu verzaubern. %s wird für etwa %d "
 			"Wochen unseren Befehlen gehorchen.", unitname(mage),
@@ -4887,8 +4887,8 @@ sp_raisepeasants(castorder *co)
 
 	u2 = create_unit(r,mage->faction, bauern, new_race[RC_PEASANT], 0,"Wilder Bauernmob",mage);
 
-	fset(u2, FL_LOCKED);
-	fset(u2, FL_PARTEITARNUNG);
+	fset(u2, UFL_LOCKED);
+	fset(u2, UFL_PARTEITARNUNG);
 
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 1;	/* An rpeasants(r). */
@@ -5398,7 +5398,7 @@ sp_clonecopy(castorder *co)
 	clone->status = ST_FLEE;
 	sprintf(buf, "Klon von %s", unitname(mage));
 	set_string(&clone->name, buf);
-	fset(clone, FL_LOCKED);
+	fset(clone, UFL_LOCKED);
 
 	create_newclone(mage, clone);
 
@@ -6276,7 +6276,7 @@ sp_showastral(castorder *co)
 						c++;
 						scat(unitname(u));
 						scat(" (");
-						if(!fval(u, FL_PARTEITARNUNG)) {
+						if(!fval(u, UFL_PARTEITARNUNG)) {
 							scat(factionname(u->faction));
 							scat(", ");
 						}

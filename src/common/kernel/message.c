@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -291,6 +291,47 @@ static xml_callbacks xml_messages = {
 	parse_plaintext
 };
 
+void
+free_messages(message_list * m)
+{
+	struct mlist * x = m->begin;
+	while (x) {
+		m->begin = x->next;
+		msg_release(x->msg);
+	}
+}
+
+messageclass * msgclasses;
+
+const messageclass *
+mc_find(const char * name)
+{
+	messageclass ** mcp = &msgclasses;
+	if (name==NULL) return NULL;
+	for (;*mcp;mcp=&(*mcp)->next) {
+		messageclass * mc = *mcp;
+		if (!strcmp(mc->name, name)) break;
+	}
+	return *mcp;
+}
+
+const messageclass *
+mc_add(const char * name)
+{
+	messageclass ** mcp = &msgclasses;
+	if (name==NULL) return NULL;
+	for (;*mcp;mcp=&(*mcp)->next) {
+		messageclass * mc = *mcp;
+		if (!strcmp(mc->name, name)) break;
+	}
+	if (!*mcp) {
+		messageclass * mc = calloc(sizeof(messageclass), 1);
+		mc->name = strdup(name);
+		*mcp = mc;
+	}
+	return *mcp;
+}
+
 static void
 arg_set(void * args[], const message_type * mtype, const char * buffer, void * v)
 {
@@ -527,7 +568,7 @@ addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 	caddmessage(r, f, gc_add(strdup(translate_regions(s, f))), mtype, level);
 }
 
-void
+static void
 xmistake(const unit * u, const char *s, const char *comment, int mtype)
 {
 	if (u->faction->no == MONSTER_FACTION) return;
@@ -555,7 +596,7 @@ mistake(const unit * u, const char *command, const char *comment, int mtype)
 
 extern unsigned int new_hashstring(const char* s);
 
-int
+static int
 old_hashstring(const char* s)
 {
 	int key = 0;
@@ -604,47 +645,6 @@ add_message(message_list** pm, message * m)
 		(*pm)->end=&mnew->next;
 	}
 	return m;
-}
-
-void
-free_messages(message_list * m)
-{
-	struct mlist * x = m->begin;
-	while (x) {
-		m->begin = x->next;
-		msg_release(x->msg);
-	}
-}
-
-messageclass * msgclasses;
-
-const messageclass *
-mc_add(const char * name)
-{
-	messageclass ** mcp = &msgclasses;
-	if (name==NULL) return NULL;
-	for (;*mcp;mcp=&(*mcp)->next) {
-		messageclass * mc = *mcp;
-		if (!strcmp(mc->name, name)) break;
-	}
-	if (!*mcp) {
-		messageclass * mc = calloc(sizeof(messageclass), 1);
-		mc->name = strdup(name);
-		*mcp = mc;
-	}
-	return *mcp;
-}
-
-const messageclass *
-mc_find(const char * name)
-{
-	messageclass ** mcp = &msgclasses;
-	if (name==NULL) return NULL;
-	for (;*mcp;mcp=&(*mcp)->next) {
-		messageclass * mc = *mcp;
-		if (!strcmp(mc->name, name)) break;
-	}
-	return *mcp;
 }
 
 void

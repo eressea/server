@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -12,8 +12,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef POOL_H
-#define POOL_H
+#ifndef H_KRNL_POOL_H
+#define H_KRNL_POOL_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define res2item(res) ((item_t)((res)-R_MINITEM))
 #define res2herb(res) ((herb_t)((res)-R_MINHERB))
@@ -111,4 +114,7 @@ void init_pool(void);
  * initialisiert den regionalen Pool.
  */
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -2,13 +2,19 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
 */
+
+#ifndef H_UTIL_XML
+#define H_UTIL_XML
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdio.h>
 
@@ -51,8 +57,13 @@ typedef struct xml_callbacks {
 /* parser */
 #include <stdio.h>
 extern void xml_register(struct xml_callbacks * cb, const char * parent, unsigned int flags);
-extern int xml_read(FILE *, struct xml_stack * stack);
+extern int xml_read(FILE *, const char *filename, struct xml_stack * stack);
 extern const char * xml_value(const struct xml_tag * tag, const char * name);
 extern double xml_fvalue(const xml_tag * tag, const char * name);
 extern int xml_ivalue(const xml_tag * tag, const char * name);
 extern boolean xml_bvalue(const xml_tag * tag, const char * name);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

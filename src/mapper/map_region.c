@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *	
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -291,7 +291,7 @@ showregion(region * r, char full)
 			for (b = r->buildings; b; b = b->next) {
 				adddbllist(&reglist, Buildingid(b));
 				for (u = r->units; u; u = u->next)
-					if (u->building == b && fval(u, FL_OWNER)) {
+					if (u->building == b && fval(u, UFL_OWNER)) {
 						strncpy(str, u->name, 27);
 						str[27] = 0;
 						sprintf(buf, "  %s (%s)", str, unitid(u));
@@ -324,7 +324,7 @@ showregion(region * r, char full)
 		for (sh = r->ships; sh; sh = sh->next) {
 			adddbllist(&reglist, Shipid(sh));
 			for (u = r->units; u; u = u->next)
-				if (u->ship == sh && fval(u, FL_OWNER)) {
+				if (u->ship == sh && fval(u, UFL_OWNER)) {
 					strncpy(str, u->name, 28);
 					str[28] = 0;
 					sprintf(buf, "  %s (%s)", str, unitid(u));

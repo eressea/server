@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -20,9 +20,12 @@
 
 #ifndef ERESSEA_H
 #define ERESSEA_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
- * Features enabled: 
+ * Features enabled:
  * If you are lacking the settings.h, create a new file common/settings.h,
  * and write #include <settings-eressea.h> (or whatever settings you want
  * your game to use) in there.
@@ -108,10 +111,9 @@ struct xml_stack;
 
 #define MONSTER_FACTION 0 /* Die Partei, in der die Monster sind. */
 
-#define FUZZY_BASE36 /* Fuzzy- Behandlung von Geb‰ude- und Schiffsnummern */
 #define FULL_BASE36
 
-/** 
+/**
  * heaps and heaps of unsupported versions:
 	#define RACES_VERSION 91
 	#define MAGIEGEBIET_VERSION 92
@@ -172,12 +174,6 @@ struct xml_stack;
 #else
 # define RELEASE_VERSION DBLINK_VERSION
 #endif
-
-/*
-#if RELEASE_VERSION >= UGROUPS_VERSION
-#define USE_UGROUPS
-#endif
-*/
 
 #if RESOURCE_CONVERSION
 extern void init_resourcefix(void);
@@ -554,14 +550,9 @@ enum {					/* Message-Level */
 	ML_MAX
 };
 
-extern const char *gr_prefix[3];
 extern const char *parameters[MAXPARAMS];
 
 /* --------------- Reports Typen ------------------------------- */
-
-extern const char *report_options[MAX_MSG];
-
-extern const char *message_levels[ML_MAX];
 
 enum {
 	O_REPORT,				/* 1 */
@@ -700,7 +691,7 @@ enum {
 	RC_GNOME,        /* 61 */
 	RC_TEMPLATE,     /* 62 */
 	RC_CLONE,        /* 63 */
-	
+
 	RC_SHADOWDRAGON, /* 64 */
 	RC_SHADOWBAT,
 	RC_NIGHTMARE,
@@ -869,56 +860,17 @@ typedef struct strlist {
 	char * s;
 } strlist;
 
-#define UFL_DEBUG         (1<<0)
-#define UFL_ISNEW         (1<<1)	/* 2 */
-#define FL_LONGACTION     (1<<2)	/* 4 */
-#define FL_OWNER          (1<<3)	/* 8 */
-#define FL_PARTEITARNUNG  (1<<4)	/* 16 */
-#define FL_DISBELIEVES    (1<<5)	/* 32 */
-#define FL_WARMTH         (1<<6)	/* 64 */
-#define FL_MOVED          (1<<8)
-
-#define FL_FOLLOWING      (1<<9)
-#define FL_FOLLOWED       (1<<10)
-
-#define FL_HUNGER         (1<<11) /* kann im Folgemonat keinen langen Befehl
-                                     auﬂer ARBEITE ausf¸hren */
-
-#define FL_SIEGE          (1<<12) /* speedup: belagert eine burg, siehe attribut */
-#define FL_TARGET         (1<<13) /* speedup: hat ein target, siehe attribut */
-
 #define FL_POTIONS        (1<<15) /* speedup: hat ein oder mehr tr‰nke, statt potionptr */
 
-/* warning: von 512/1024 gewechslet, wegen konflikt mit NEW_FOLLOW */
-#define FL_LOCKED         (1<<16) /* Einheit kann keine Personen aufnehmen oder weggeben, nicht rekrutieren. */
-
 #define FL_DH             (1<<18) /* ehemals f->dh, u->dh, r->dh, etc... */
-#define FL_STORM          (1<<19) /* Kapit‰n war in einem Sturm */
-#define FL_TRADER         (1<<20) /* H‰ndler, pseudolang */
 
 /* alle vierstelligen zahlen: */
 #define MAX_UNIT_NR (36*36*36*36-1)
 #define MAX_CONTAINER_NR (36*36*36*36-1)
 
-#define FL_NOAIDF         (1<<21) /* Hilfsflag Kampf */
-#define FL_NOAID          (1<<22) /* Einheit hat Noaid-Status */
-
 #define FL_MARK           (1<<23) /* f¸r markierende algorithmen, die das hinterher auch wieder
 																		 lˆschen m¸ssen! (Ist daf¸r nicht eigentlich FL_DH gedacht?) */
-#define FL_NOIDLEOUT      (1<<24) /* Partei stirbt nicht an NMRs */
-#define FL_TAKEALL        (1<<25) /* Einheit nimmt alle Gegenst‰nde an */
 #define FL_UNNAMED        (1<<26) /* Partei/Einheit/Geb‰ude/Schiff ist unbenannt */
-
-#define FFL_RESTART       (1<<2)
-#define FFL_OVERRIDE      (1<<27) /* Override-Passwort wurde benutzt */
-
-#define FFL_DBENTRY       (1<<28) /* Partei ist in Datenbank eingetragen */
-#define FFL_NOTIMEOUT     (1<<29) /* ignore MAXAGE */
-
-#define UFL_WERE          (1<<28)
-
-/* Flags, die gespeichert werden sollen: */
-#define UFL_SAVEMASK (FL_NOAID | FL_OWNER | FL_PARTEITARNUNG | FL_LOCKED | FL_HUNGER | FL_NOIDLEOUT | FL_TAKEALL | FL_UNNAMED)
 
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))
@@ -935,13 +887,12 @@ typedef struct request {
 	} type;
 } request;
 
-int turn;
+extern int turn;
 
 /* parteinummern */
 extern int *used_faction_ids;
 extern int no_used_faction_ids;
 extern void register_faction_id(int id);
-extern void init_used_faction_ids(void);
 extern boolean faction_id_is_unused(int);
 
 /* leuchtturm */
@@ -964,7 +915,7 @@ extern int findoption(const char *s, const struct locale * lang);
 extern char buf[BUFSIZE + 1];
 
 /* special units */
-struct unit *make_undead_unit(struct region * r, struct faction * f, int n, const struct race * race);
+struct unit *make_undead_unit(struct region * r, struct faction * f, int n, const struct race * rc);
 
 extern struct region *regions;
 extern struct faction *factions;
@@ -1026,15 +977,16 @@ extern struct unit *createunit(struct region * r, struct faction * f, int number
 extern struct unit *create_unit(struct region * r1, struct faction * f, int number, const struct race * rc, int id, const char * dname, struct unit *creator);
 extern void create_unitid(struct unit *u, int id);
 extern boolean getunitpeasants;
-struct unit *getunitg(const struct region * r, const struct faction * f);
-struct unit *getunit(const struct region * r, const struct faction * f);
-int read_unitid(const struct faction * f, const struct region * r);
+extern struct unit *getunitg(const struct region * r, const struct faction * f);
+extern struct unit *getunit(const struct region * r, const struct faction * f);
+
+extern int read_unitid(const struct faction * f, const struct region * r);
 
 extern int alliedunit(const struct unit * u, const struct faction * f2, int mode);
-extern int alliedfaction(const struct plane * pl, const struct faction * f, 
+extern int alliedfaction(const struct plane * pl, const struct faction * f,
                          const struct faction * f2, int mode);
-extern int alliedgroup(const struct plane * pl, const struct faction * f, 
-                       const struct faction * f2, const struct ally * sf, 
+extern int alliedgroup(const struct plane * pl, const struct faction * f,
+                       const struct faction * f2, const struct ally * sf,
                        int mode);
 
 struct faction *findfaction(int n);
@@ -1107,14 +1059,13 @@ const char *strcheck(const char *s, size_t maxlen);
 
 const char * findorder(const struct unit * u, const char * cmd);
 
-#define attacked(u) (fval(u, FL_LONGACTION))
+#define attacked(u) (fval(u, UFL_LONGACTION))
 boolean idle(struct faction * f);
 boolean unit_has_cursed_item(struct unit *u);
 struct region * rconnect(const struct region *, direction_t dir);
 
 /* simple garbage collection: */
 void * gc_add(void * p);
-void gc_done(void);
 void mistake(const struct unit * u, const char *cmd, const char *text, int mtype);
 void addmessage(struct region * r, struct faction * f, const char *s, msg_t mtype, int level);
 void cmistake(const struct unit * u, const char *cmd, int mno, int mtype);
@@ -1130,11 +1081,6 @@ void cmistake(const struct unit * u, const char *cmd, int mno, int mtype);
 	/* der, die, das vs. ein, eine */
 #define GF_DETAILED 32
 	/* mehr Informationen. z.b. straﬂe zu 50% */
-
-
-extern struct attrib_type at_guard;
-extern struct attrib_type at_lighthouse;
-extern struct attrib_type at_creator;
 
 #define GUARD_NONE 0
 #define GUARD_TAX 1
@@ -1170,10 +1116,10 @@ typedef struct local_names {
 	struct tnode names;
 } local_names;
 
-extern int maxworkingpeasants(const struct region * r);
 extern boolean hunger(int number, struct unit * u);
 extern int lifestyle(const struct unit*);
 extern int besieged(const struct unit * u);
+extern int maxworkingpeasants(const struct region * r);
 
 extern int wage(const struct region *r, const struct unit *u, boolean img);
 extern int fwage(const struct region *r, const struct faction *f, boolean img);
@@ -1190,12 +1136,6 @@ extern void kernel_done(void);
 extern void reorder_owners(struct region * r);
 
 extern const char *localenames[];
-
-/* FIRST_TURN is only used in eressea */
-
-#ifndef FIRST_TURN
-#define FIRST_TURN 0
-#endif
 
 #include <log.h>
 
@@ -1216,6 +1156,7 @@ typedef struct settings {
 	struct attrib *attribs;
 	unsigned int   data_version;
 	boolean disabled[MAXKEYWORDS];
+	struct param * parameters;
 } settings;
 extern settings global;
 
@@ -1224,4 +1165,16 @@ extern int produceexp(struct unit * u, skill_t sk, int n);
 
 extern boolean sqlpatch;
 extern const char * dbrace(const struct race * rc);
+
+extern void set_param(struct param ** p, const char * name, const char * data);
+extern const char* get_param(const struct param * p, const char * name);
+
+extern int NMRTimeout();
+extern int LongHunger();
+extern boolean TradeDisabled();
+extern int SkillCap(skill_t sk);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

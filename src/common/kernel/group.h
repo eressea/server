@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -11,8 +11,11 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifndef GROUP_H
-#define GROUP_H
+#ifndef H_KERNEL_GROUP
+#define H_KERNEL_GROUP
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* bitfield value for group::flags */
 #define GFL_ALIVE 0x01 /* There is at least one struct unit in the group */
@@ -36,4 +39,7 @@ extern void free_group(group * g);
 extern void write_groups(FILE * F, group * g);
 extern void read_groups(FILE * F, struct faction * f);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

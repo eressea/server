@@ -1,5 +1,8 @@
 #ifndef STRUCT_VARIANT_H
 #define STRUCT_VARIANT_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef union {
 	void *v;
@@ -11,4 +14,8 @@ typedef union {
 } variant;
 
 #define VAR(x) ()
+
+#ifdef __cplusplus
+}
+#endif
 #endif

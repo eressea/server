@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	Eressea PB(E)M host Copyright (C) 1998-2000
+ *	Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -18,8 +18,11 @@
  * permission from the authors.
  */
 
-#ifndef ALCHEMY_H
-#define ALCHEMY_H
+#ifndef H_KRNL_ALCHEMY
+#define H_KRNL_ALCHEMY_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum {
 	/* Stufe 1 */
@@ -83,7 +86,6 @@ void init_potions(void);
 extern struct attrib_type at_bauernblut;
 
 extern int get_effect(const struct unit * u, const struct potion_type * effect);
-extern int set_effect(struct unit * u, const struct potion_type * , int value);
 extern int change_effect(struct unit * u, const struct potion_type * effect, int value);
 extern attrib_type at_effect;
 
@@ -93,4 +95,7 @@ typedef struct effect_data {
 	int value;
 } effect_data;
 
+#ifdef __cplusplus
+}
+#endif
 #endif				/* ALCHEMY_H */

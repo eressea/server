@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
  *
- * Eressea PB(E)M host Copyright (C) 1998-2000
+ * Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -139,7 +139,6 @@ addplayer(region *r, const char *email, const char * password,
 		while (urc == RC_DAEMON || !playerrace(new_race[urc]));
 		u->irace = new_race[urc];
 	}
-/*	fset(u, FL_PARTEITARNUNG); */
 
 	return u;
 }
@@ -293,7 +292,7 @@ destroyfaction(faction * f)
 			if(!a) continue;
 			if (get_otherfaction(a) == f) {
 				a_removeall(&u->attribs, &at_otherfaction);
-				fset(u, FL_PARTEITARNUNG);
+				fset(u, UFL_PARTEITARNUNG);
 			}
 		}
 	}

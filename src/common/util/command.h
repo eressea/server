@@ -2,7 +2,7 @@
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea-pbem.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
@@ -10,8 +10,11 @@
  without prior permission by the authors of Eressea.
  
  */
-#ifndef COMMAND_H
-#define COMMAND_H
+#ifndef H_UTIL_COMMAND_H
+#define H_UTIL_COMMAND_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct tnode;
 struct locale;
@@ -33,4 +36,7 @@ extern void do_command(const struct tnode * troot, void * u,
 extern struct syntaxtree * stree_create(void);
 extern struct tnode * stree_find(const struct syntaxtree * stree, const struct locale * lang);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -3,7 +3,7 @@
  * Faster replacement for ISO-C strncpy, does not pad with zeros
  */
 
-#include <sys/types.h>
+#include <stddef.h>
 
 char *
 strncpy(char *to, const char *from, size_t size)
