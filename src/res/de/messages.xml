@@ -7347,5 +7347,14 @@
 		<text locale="de">"Achtung: $faction($faction) hat die Siegbedingungen erfüllt und wird in $if($eq($remain,1),"einer Woche","$int($remain) Wochen") zum Sieger erklärt werden."</text>
 		<text locale="en">"Attention: $faction($faction) has fulfilled the victory condition and will be declared winner in $if($eq($remain,1),"one week","$int($remain) weeks")."</text>
 	</message>
+	
+	<message name="victory_murder_complete" section="events">
+		<type>
+			<arg name="winners" type="string"></arg>
+			<arg name="n" type="int"></arg>
+		</type>
+		<text locale="de">"SIEG! $if($eq($n,1), "Die Partei $winners hat", "Die Parteien $winners haben") die Siegbedingung für die erforderliche Zeit erfüllt. Das Spiel ist damit beendet."</text>
+		<text locale="en">"VICTORY! $if($eq($n,1), "The faction $winners has", "The factions $winners have") fulfilled the victory condition for the necessary time. The game is over."</text>
+	</message>
 
 </messages>
