@@ -630,30 +630,38 @@ riding(const troop t) {
 }
 
 static weapon *
-select_weapon(const troop t, boolean attacking, boolean missile)
-	/* select the primary weapon for this trooper */
+preferred_weapon(const troop t, boolean attacking)
 {
-	weapon * weapon = NULL;
-
-
+	weapon * missile = t.fighter->person[t.index].missile;
+	weapon * melee = t.fighter->person[t.index].melee;
 	if (attacking) {
-		if (!missile) {
-			/* try your best weapon if it's melee */
-			weapon = t.fighter->person[t.index].preferred;
-		} else {
-			/* from the back rows, use your missile weapon */
-			weapon = t.fighter->person[t.index].missile;
+		if (melee==NULL || (missile && missile->attackskill>melee->attackskill)) {
+			return missile;
 		}
 	} else {
-		if (!missile) {
-			/* have to use your melee weapon if it's melee */
-			weapon = t.fighter->person[t.index].melee;
-		} else {
-			/* from the back rows, use your best skill */
-			weapon = t.fighter->person[t.index].preferred;
+		if (melee==NULL || (missile && missile->defenseskill>melee->defenseskill)) {
+			return missile;
 		}
 	}
-	return weapon;
+	return melee;
+}
+
+static weapon *
+select_weapon(const troop t, boolean attacking, boolean ismissile)
+	/* select the primary weapon for this trooper */
+{
+	if (attacking) {
+		if (ismissile) {
+			/* from the back rows, have to use your missile weapon */
+			return t.fighter->person[t.index].missile;
+		}
+	} else {
+		if (!ismissile) {
+			/* have to use your melee weapon if it's melee */
+			return t.fighter->person[t.index].melee;
+		}
+	}
+	return preferred_weapon(t, attacking);
 }
 
 /* ------------------------------------------------------------- */
@@ -1923,8 +1931,8 @@ attack(battle *b, troop ta, const att *a)
 			 * konventionell weiter */
 			do_combatspell(ta, row);
 		} else {
-			weapon * wp = ta.fighter->person[ta.index].preferred;
-			if (row!=FIGHT_ROW) wp = ta.fighter->person[ta.index].missile;
+			weapon * wp = ta.fighter->person[ta.index].missile;
+			if (row==FIGHT_ROW) wp = preferred_weapon(ta, true);
 			/* Sonderbehandlungen */
 
 			if (getreload(ta)) {
@@ -2877,7 +2885,6 @@ make_fighter(battle * b, unit * u, boolean attack)
 			if (weapon_weight(fig->weapons+owp[oi], false)<=wpless) {
 				continue; /* we fight better with bare hands */
 			}
-			fig->person[i].preferred = fig->person[i].melee = &fig->weapons[owp[oi]];
 			++fig->weapons[owp[oi]].used;
 		}
 		/* hand out missile weapons (from back to front, in case of mixed troops). */
@@ -2889,11 +2896,6 @@ make_fighter(battle * b, unit * u, boolean attack)
 			if (weapon_weight(fig->weapons+dwp[di], true)>0) {
 				fig->person[i].missile = &fig->weapons[dwp[di]];
 				++fig->weapons[dwp[di]].used;
-			}
-			if (fig->person[i].missile && (fig->person[i].melee==NULL ||
-				weapon_weight(fig->person[i].missile, true) > 
-				weapon_weight(fig->person[i].melee, false))) {
-				fig->person[i].preferred = fig->person[i].missile;
 			}
 		}
 	}

@@ -157,7 +157,6 @@ typedef struct fighter {
 		int reload      : 4;    /* Anzahl Runden, die die Waffe x noch laden muss.
 		                         * dahinter steckt ein array[RL_MAX] wenn er min. eine hat. */
 		int last_action : 8;		/* In welcher Runde haben wir zuletzt etwas getan */
-		struct weapon * preferred; /* weapon with best skill */
 		struct weapon * missile;   /* missile weapon */
 		struct weapon * melee;     /* melee weapon */
 	} * person;

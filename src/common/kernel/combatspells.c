@@ -335,14 +335,12 @@ sp_combatrosthauch(fighter * fi, int level, int power, spell * sp)
 						i_change(&df->unit->items, wp->type->itype, -n);
 						for (p=0;n && p!=df->unit->number;++p) {
 							if (df->person[p].missile==wp) {
-								df->person[p].preferred = df->person[p].melee;
 								df->person[p].missile = NULL;
 								--n;
 							}
 						}
 						for (p=0;n && p!=df->unit->number;++p) {
 							if (df->person[p].melee==wp) {
-								df->person[p].preferred = df->person[p].missile;
 								df->person[p].melee = NULL;
 								--n;
 							}
@@ -1286,7 +1284,8 @@ sp_windshield(fighter * fi, int level, int power, spell * sp)
 			break;
 		assert(!helping(fi->side, df->side));
 
-		if (df->person[dt.index].preferred && df->person[dt.index].preferred==df->person[dt.index].missile) {
+		if (df->person[dt.index].missile) {
+			/* this suxx... affects your melee weapon as well. */
 			df->person[dt.index].attack -= at_malus;
 			--force;
 		}
