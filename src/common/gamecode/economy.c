@@ -166,7 +166,7 @@ scramble(void *data, int n, size_t width)
 			buffer = temp;
 			do {
 				char * target = ((char*)data)+width*dest;
-				memcpy(buffer, target, width);
+				memmove(buffer, target, width);
 				memmove(target, src, width);
 				k = dest; /* wo das gerettete target hin soll */
 				dest = vec[dest].index;

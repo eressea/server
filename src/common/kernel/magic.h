@@ -170,11 +170,11 @@ struct castorder {
 	castorder *next;
 	void *magician;       /* Magier (kann vom Typ struct unit oder fighter sein) */
 	struct unit *familiar;       /* Vertrauter, gesetzt, wenn der Spruch durch
-													 den Vertrauten gezaubert wird */
+					den Vertrauten gezaubert wird */
 	struct spell *sp;            /* Spruch */
 	int level;            /* gewünschte Stufe oder Stufe des Magiers */
-	int force;            /* Stärke des Zaubers */
-	struct region *rt;           /* Zielregion des Spruchs */
+	float force;          /* Stärke des Zaubers */
+	struct region *rt;    /* Zielregion des Spruchs */
 	int distance;         /* Entfernung zur Zielregion */
 	char *order;          /* Befehl */
 	struct spellparameter *par;  /* für weitere Parameter */
@@ -328,7 +328,7 @@ int change_maxspellpoints(struct unit * u, int csp);
    /* verändert die maximalen Magiepunkte einer Einheit */
 
 /* Zaubern */
-int spellpower(struct region *r, struct unit *u, spell *spruch, int cast_level);
+double spellpower(struct region *r, struct unit *u, spell *spruch, int cast_level);
 	/*	ermittelt die Stärke eines Spruchs */
 boolean fumble (struct region *r, struct unit *u, spell *spruch, int cast_level);
 	/*	true, wenn der Zauber misslingt, bei false gelingt der Zauber */

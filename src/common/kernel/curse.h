@@ -193,7 +193,7 @@ typedef struct curse {
 	const struct curse_type * type; /* Zeiger auf ein curse_type-struct */
 	int flag;          /* generelle Flags wie zb CURSE_ISNEW oder CURSE_NOAGE */
 	int duration;      /* Dauer der Verzauberung. Wird jede Runde vermindert */
-	int vigour;        /* Stärke der Verzauberung, Widerstand gegen Antimagie */
+	double vigour;        /* Stärke der Verzauberung, Widerstand gegen Antimagie */
 	struct unit *magician;    /* Pointer auf den Magier, der den Spruch gewirkt hat */
 	variant effect;
 	void *data;        /* pointer auf spezielle curse-unterstructs*/
@@ -219,7 +219,7 @@ typedef struct curse_type {
 	const char *info_str;  /* Wirkung des curse, wird bei einer gelungenen
 								 Zauberanalyse angezeigt */
 	int (*curseinfo)(const struct locale*, const void*, typ_t, curse*, int);
-	void (*change_vigour)(curse*, int);
+	void (*change_vigour)(curse*, double);
 	int (*read)(FILE * F, curse * c);
 	int (*write)(FILE * F, const curse * c);
 	int (*cansee)(const struct faction*, const void*, typ_t, curse *, int);
@@ -244,7 +244,7 @@ extern int curse_read(struct attrib * a,FILE * f);
 */
 
 curse * create_curse(struct unit *magician, struct attrib**ap, const curse_type * ctype,
-		int vigour, int duration, int ceffect, int men);
+		double vigour, int duration, int ceffect, int men);
 	/* Verzweigt automatisch zum passenden struct-typ. Sollte es schon
 	 * einen Zauber dieses Typs geben, so wird der neue dazuaddiert. Die
 	 * Zahl der verzauberten Personen sollte beim Aufruf der Funktion
@@ -266,7 +266,7 @@ extern int curse_geteffect(const curse * c);
 	 */
 
 
-extern int curse_changevigour(struct attrib **ap, curse * c, int i);
+extern double curse_changevigour(struct attrib **ap, curse * c, double i);
 	/* verändert die Stärke der Verzauberung um i */
 
 extern int get_cursedmen(struct unit *u, struct curse *c);

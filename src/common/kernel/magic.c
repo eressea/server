@@ -1097,11 +1097,11 @@ cancast(unit * u, spell * sp, int level, int range, char * cmd)
  * Spruchfunktionsroutine ermittelt.
  */
 
-int
+double
 spellpower(region * r, unit * u, spell * sp, int cast_level)
 {
 	curse * c;
-	int force = cast_level;
+	double force = cast_level;
 	if (sp==NULL) {
 		return 0;
 	} else {
@@ -1130,7 +1130,7 @@ spellpower(region * r, unit * u, spell * sp, int cast_level)
 	}
 
 #ifdef MAGICPOWER
-	force = (int)(force * MAGICPOWER);
+	force = force * MAGICPOWER;
 #endif
 
 	return max(force, 0);
@@ -2785,7 +2785,8 @@ magic(void)
 	strlist *so;
 	int spellrank;
 	int level, success;
-	int force, range, t_x, t_y;
+	int range, t_x, t_y;
+	double force;
 	int skiptokens;
 	castorder *co;
 	castorder *cll[MAX_SPELLRANK];
@@ -3063,7 +3064,7 @@ magic(void)
 
 			/* die Stärke kann durch Antimagie auf 0 sinken */
 			force = spellpower(target_r, u, sp, level);
-			if (force < 1) {
+			if (force <= 0) {
 				sprintf(buf, "%s schafft es nicht genügend Kraft aufzubringen "
 						"um %s dennoch zu zaubern.", unitname(u), 
 						spell_name(sp, u->faction->locale));

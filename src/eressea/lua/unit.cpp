@@ -64,6 +64,7 @@ unit_getskill(const unit& u, const char * skname)
   skill_t sk = sk_find(skname);
   if (sk!=NOSKILL) {
     skill * sv = get_skill(&u, sk);
+    if (sv==NULL) return 0;
     return sv->level;
   }
   return -1;

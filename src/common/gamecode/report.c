@@ -412,7 +412,7 @@ rps(FILE * F, const char * src)
 	} else if(src != buf) {
 		s = strcpy(buf, src);
 	} else {
-		s = src;
+		s = (char *)src;
 	}
 	rpsnr(F, s, 0);
 }

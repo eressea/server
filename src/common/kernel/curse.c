@@ -133,23 +133,19 @@ curse_read(attrib * a, FILE * f) {
 	curse * c = (curse*)a->data.v;
 	const curse_type * ct;
 
-	if (global.data_version >= CURSETYPE_VERSION) {
-		char cursename[64];
-		fscanf(f, "%d %s %d %d %d %d %d ", &c->no, cursename, &c->flag,
+	char cursename[64];
+
+	if(global.data_version >= CURSEVIGOURISFLOAT_VERSION) {
+		fscanf(f, "%d %s %d %d %lf %d %d ", &c->no, cursename, &c->flag,
 			&c->duration, &c->vigour, &mageid, &c->effect.i);
-		ct = ct_find(cursename);
 	} else {
-		int cspellid;
-		if (global.data_version < CURSE_NO_VERSION) {
-			fscanf(f, "%d %d %d %d %d %d ",&cspellid, &c->flag, &c->duration,
-				&c->vigour, &mageid, &c->effect.i);
-			c->no = newunitid();
-		} else {
-			fscanf(f, "%d %d %d %d %d %d %d ", &c->no, &cspellid, &c->flag,
-				&c->duration, &c->vigour, &mageid, &c->effect.i);
-		}
-		ct = ct_find(oldcursename(cspellid));
+		int vigour;
+		fscanf(f, "%d %s %d %d %d %d %d ", &c->no, cursename, &c->flag,
+			&c->duration, &vigour, &mageid, &c->effect.i);
+		c->vigour = vigour;
 	}
+	ct = ct_find(cursename);
+
 	assert(ct!=NULL);
 
 #ifdef CONVERT_DBLINK
@@ -198,7 +194,7 @@ curse_write(const attrib * a, FILE * f) {
 		mage_no = -1;
 	}
 
-	fprintf(f, "%d %s %d %d %d %d %d ", c->no, ct->cname, flag,
+	fprintf(f, "%d %s %d %d %f %d %d ", c->no, ct->cname, flag,
 			c->duration, c->vigour, mage_no, c->effect.i);
 
 	if (c->type->write) c->type->write(f, c);
@@ -353,7 +349,7 @@ remove_allcurse(attrib **ap, const void * data, boolean(*compare)(const attrib *
 /* gibt die allgemeine Stärke der Verzauberung zurück. id2 wird wie
  * oben benutzt. Dies ist nicht die Wirkung, sondern die Kraft und
  * damit der gegen Antimagie wirkende Widerstand einer Verzauberung */
-static int
+static double
 get_cursevigour(const curse *c)
 {
 	if (c) return c->vigour;
@@ -362,7 +358,7 @@ get_cursevigour(const curse *c)
 
 /* setzt die Stärke der Verzauberung auf i */
 static void
-set_cursevigour(curse *c, int vigour)
+set_cursevigour(curse *c, double vigour)
 {
 	assert(c && vigour > 0);
 	c->vigour = vigour;
@@ -372,8 +368,8 @@ set_cursevigour(curse *c, int vigour)
  * Stärke zurück. Sollte die Zauberstärke unter Null sinken, löst er
  * sich auf.
  */
-int
-curse_changevigour(attrib **ap, curse *c, int vigour)
+double
+curse_changevigour(attrib **ap, curse *c, double vigour)
 {
 	vigour += get_cursevigour(c);
 
@@ -449,7 +445,7 @@ curse_setflag(curse *c, int flag)
  * dieses Typs geben, gibt es den bestehenden zurück.
  */
 curse *
-set_curse(unit *mage, attrib **ap, const curse_type *ct, int vigour,
+set_curse(unit *mage, attrib **ap, const curse_type *ct, double vigour,
 		int duration, int effect, int men)
 {
 	curse *c;
@@ -490,7 +486,7 @@ set_curse(unit *mage, attrib **ap, const curse_type *ct, int vigour,
  * passenden Typ verzweigt und die relevanten Variablen weitergegeben.
  */
 curse *
-create_curse(unit *magician, attrib **ap, const curse_type *ct, int vigour,
+create_curse(unit *magician, attrib **ap, const curse_type *ct, double vigour,
 		int duration, int effect, int men)
 {
 	curse *c;
@@ -550,7 +546,7 @@ do_transfer_curse(curse *c, unit * u, unit * u2, int n)
 {
 	int flag = c->flag;
 	int duration = c->duration;
-	int vigour = c->vigour;
+	double vigour = c->vigour;
 	unit *magician = c->magician;
 	int effect = c->effect.i;
 	int cursedmen = 0;
@@ -673,7 +669,7 @@ is_cursed_with(attrib *ap, curse *c)
  * 	unsigned int mergeflags;
  * 	const char *info_str;  Wirkung des curse, wird bei einer gelungenen Zauberanalyse angezeigt
  * 	int (*curseinfo)(const struct locale*, const void*, int, curse*, int);
- * 	void (*change_vigour)(curse*, int);
+ * 	void (*change_vigour)(curse*, double);
  * 	int (*read)(FILE * F, curse * c);
  * 	int (*write)(FILE * F, const curse * c);
  * } curse_type;

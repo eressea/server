@@ -15,7 +15,7 @@ function write_standings()
     local faction
     log(file, alliance.id .. ": " .. alliance.name)
     for faction in alliance.factions do
-      log(file, "- " .. faction.name .." (" .. faction.id .. ")")
+      log(file, "- " .. faction.name .." (" .. itoa36(faction.id) .. ")")
     end
     log (file, "")
   end
