@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: unit.c,v 1.7 2001/02/18 10:06:10 enno Exp $
+ *	$Id: unit.c,v 1.8 2001/02/19 16:45:23 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -649,13 +649,6 @@ move_unit(unit * u, region * r, unit ** ulist)
 	if (u->region == r) return;
 	if (!ulist) ulist = (&r->units);
 	if (u->region) {
-		/* Das sollte besser über block_type::move() abgewickelt werden! */
-		border * b = get_borders(u->region, r);
-		while (b) {
-			if (b->type->move) b->type->move(b, u, u->region, r);
-			b = b->next;
-		}
-/* END FIREWALLS */
 		setguard(u, GUARD_NONE);
 		fset(u, FL_MOVED);
 		if (u->ship || u->building) leave(u->region, u);

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.13 2001/02/19 16:22:02 corwin Exp $
+ *	$Id: movement.c,v 1.14 2001/02/19 16:45:23 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -983,6 +983,7 @@ travel(region * first, unit * u, region * next, int flucht)
 	while (next) {
 		direction_t dir = reldirection(current, next);
 		border * b = get_borders(current, next);
+
 		while (b) {
 			if (b->type==&bt_wisps) {
 				region * rl = rconnect(current, (direction_t)((dir+MAXDIRECTIONS-1)%MAXDIRECTIONS));
@@ -993,6 +994,7 @@ travel(region * first, unit * u, region * next, int flucht)
 				else if (j==2 && rr && landregion(rterrain(rr))==landregion(rterrain(next))) next = rr;
 				break;
 			}
+			if (b->type->move) b->type->move(b, u, current, next);
 			b = b->next;
 		}
 		if (current!=next) { /* !pause */
