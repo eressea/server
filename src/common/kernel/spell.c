@@ -6589,7 +6589,7 @@ sp_permtransfer(castorder *co)
 	if(pa->param[0]->flag == TARGET_RESISTS) return cast_level;
 
 	tu = pa->param[0]->data.u;
-	aura = pa->param[0]->data.i;
+	aura = pa->param[1]->data.i;
 
 	if(!is_mage(tu)) {
 /*		sprintf(buf, "%s in %s: 'ZAUBER %s': Einheit ist kein Magier."
@@ -6598,7 +6598,7 @@ sp_permtransfer(castorder *co)
 		return 0;
 	}
 
-  aura = min(get_spellpoints(mage)-spellcost(mage, sp),aura);
+  aura = min(get_spellpoints(mage)-spellcost(mage, sp), aura);
 
 	change_maxspellpoints(mage,-aura);
 	change_spellpoints(mage,-aura);
