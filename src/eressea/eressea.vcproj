@@ -78,7 +78,7 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				ImproveFloatingPointConsistency="TRUE"
-				AdditionalIncludeDirectories="..,../common,../common/util,../common/kernel,../common/gamecode"
+				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
 				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE"
 				StringPooling="TRUE"
 				RuntimeLibrary="4"
@@ -134,10 +134,11 @@
 				Optimization="0"
 				ImproveFloatingPointConsistency="TRUE"
 				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
-				PreprocessorDefinitions="_CONSOLE,WIN32,_DEBUG"
-				RuntimeLibrary="5"
+				PreprocessorDefinitions="_CONSOLE,WIN32"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="4"
 				DisableLanguageExtensions="TRUE"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
 				PrecompiledHeaderFile=".\Debug/eressea.pch"
 				AssemblerListingLocation=".\Debug/"
@@ -189,58 +190,6 @@
 			</File>
 			<File
 				RelativePath="..\todo.txt">
-			</File>
-		</Filter>
-		<Filter
-			Name="xml data"
-			Filter="">
-			<File
-				RelativePath="..\res\buildings.xml">
-			</File>
-			<File
-				RelativePath="..\res\buildings.xsd">
-			</File>
-			<File
-				RelativePath="..\res\eressea.xml">
-			</File>
-			<File
-				RelativePath="..\res\races.xml">
-			</File>
-			<File
-				RelativePath="..\res\races.xsd">
-			</File>
-			<File
-				RelativePath="..\res\resources.xml">
-			</File>
-			<File
-				RelativePath="..\res\resources.xsd">
-			</File>
-			<File
-				RelativePath="..\res\ships.xml">
-			</File>
-			<File
-				RelativePath="..\res\ships.xsd">
-			</File>
-			<File
-				RelativePath="..\res\skills.xml">
-			</File>
-			<File
-				RelativePath="..\res\skills.xsd">
-			</File>
-			<File
-				RelativePath="..\res\terrains.xml">
-			</File>
-			<File
-				RelativePath="..\res\terrains.xsd">
-			</File>
-			<File
-				RelativePath="..\res\tutorial.xml">
-			</File>
-			<File
-				RelativePath="..\res\vinyambar-classic.xml">
-			</File>
-			<File
-				RelativePath="..\res\vinyambar.xml">
 			</File>
 		</Filter>
 		<File

@@ -98,7 +98,6 @@ struct xml_stack;
 #define NEW_DRIVE     /* Neuer Algorithmus Transportiere/Fahre */
 #define PARTIAL_STUDY /* Wenn nicht genug Silber vorhanden, wird ein Talent anteilig gelernt */
 #define HUNGER_REDUCES_SKILL /* Hunger reduziert den Talentwert auf die Hälfte */
-#define DAEMON_HUNGER /* Dämonen hungern, statt mit 10% in ihre sphäre zurückzukehren */
 #define NEW_RECEIPIES /* Vereinfachte, besser verteilte Kräuterzutaten für Tränke */
 #define NEW_TAVERN
 #define GOBLINKILL
@@ -1170,7 +1169,7 @@ typedef struct local_names {
 } local_names;
 
 extern int maxworkingpeasants(const struct region * r);
-extern void hunger(struct unit * u, int moneyneeded);
+extern boolean hunger(int number, struct unit * u);
 extern int lifestyle(const struct unit*);
 extern int besieged(const struct unit * u);
 

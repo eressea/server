@@ -23,9 +23,10 @@
 				ImproveFloatingPointConsistency="TRUE"
 				AdditionalIncludeDirectories="../util,../kernel,../..,.."
 				PreprocessorDefinitions="_WINDOWS,WIN32,_DEBUG"
-				RuntimeLibrary="5"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="4"
 				DisableLanguageExtensions="TRUE"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
 				PrecompiledHeaderFile=".\Debug/triggers.pch"
 				AssemblerListingLocation=".\Debug/"
@@ -66,7 +67,7 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				ImproveFloatingPointConsistency="TRUE"
-				AdditionalIncludeDirectories="../kernel,../util,../..,.."
+				AdditionalIncludeDirectories="../util,../kernel,../..,.."
 				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS"
 				StringPooling="TRUE"
 				RuntimeLibrary="4"
@@ -79,8 +80,7 @@
 				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="1"
-				CompileAs="0"/>
+				DebugInformationFormat="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool

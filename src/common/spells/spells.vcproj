@@ -34,8 +34,7 @@
 				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="1"
-				CompileAs="0"/>
+				DebugInformationFormat="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -69,9 +68,10 @@
 				ImproveFloatingPointConsistency="TRUE"
 				AdditionalIncludeDirectories="../kernel,../util,../..,.."
 				PreprocessorDefinitions="_WINDOWS,WIN32,_DEBUG"
-				RuntimeLibrary="5"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="4"
 				DisableLanguageExtensions="TRUE"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
 				PrecompiledHeaderFile=".\Debug/spells.pch"
 				AssemblerListingLocation=".\Debug/"

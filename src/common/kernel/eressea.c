@@ -2594,24 +2594,20 @@ lifestyle(const unit * u)
 	return need;
 }
 
-void
-hunger(unit * u, int need)
+boolean
+hunger(int number, unit * u)
 {
 	region * r = u->region;
 	int dead = 0, hpsub = 0;
 	int hp = u->hp / u->number;
-	int lspp = lifestyle(u)/u->number;
 
-	if(lspp <= 0) return;
-
-	while(need > 0) {
+	while (number--) {
 		int dam = old_race(u->race)==RC_HALFLING?15+rand()%14:(13+rand()%12);
-		if(dam >= hp) {
+		if (dam >= hp) {
 			++dead;
 		} else {
 			hpsub += dam;
 		}
-		need -= lspp;
 	}
 
 	if (dead) {
@@ -2622,8 +2618,8 @@ hunger(unit * u, int need)
 
 		scale_number(u, u->number - dead);
 		deathcounts(r, dead);
-	}
-	if(hpsub > 0) {
+ 	}
+	if (hpsub > 0) {
 		/* Jetzt die Schäden der nicht gestorbenen abziehen. */
 		u->hp -= hpsub;
 		/* Meldung nur, wenn noch keine für Tote generiert. */
@@ -2633,9 +2629,7 @@ hunger(unit * u, int need)
 				"malnourish%u:unit%r:region", u, r));
 		}
 	}
-	if(dead || hpsub) {
-		fset(u, FL_HUNGER);
-	}
+	return (dead || hpsub);
 }
 
 void

@@ -68,10 +68,11 @@
 				Optimization="0"
 				ImproveFloatingPointConsistency="TRUE"
 				AdditionalIncludeDirectories="../util,../..,.."
-				PreprocessorDefinitions="_WINDOWS,WIN32,_DEBUG"
-				RuntimeLibrary="5"
+				PreprocessorDefinitions="_WINDOWS,WIN32"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="4"
 				DisableLanguageExtensions="TRUE"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
 				PrecompiledHeaderFile=".\Debug/kernel.pch"
 				AssemblerListingLocation=".\Debug/"
@@ -264,9 +265,6 @@
 				RelativePath=".\study.h">
 			</File>
 			<File
-				RelativePath=".\technology.h">
-			</File>
-			<File
 				RelativePath=".\teleport.h">
 			</File>
 			<File
@@ -371,9 +369,6 @@
 		</File>
 		<File
 			RelativePath=".\spell.c">
-		</File>
-		<File
-			RelativePath=".\technology.c">
 		</File>
 		<File
 			RelativePath=".\teleport.c">

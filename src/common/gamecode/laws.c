@@ -186,9 +186,8 @@ get_food(region *r)
 		if (need > 0) {
 			unit *v;
 
-			for (v = r->units; need && v; v = v->next)
-				if (v->faction != u->faction && alliedunit(v, u->faction, HELP_MONEY)
-						&& !is_monstrous(v)) {
+			for (v = r->units; need && v; v = v->next) {
+				if (v->faction != u->faction && alliedunit(v, u->faction, HELP_MONEY) && !is_monstrous(v)) {
 					int give = lifestyle(v);
 					give = max(0, get_money(v) - give);
 					give = min(need, give);
@@ -200,12 +199,64 @@ get_food(region *r)
 						add_spende(v->faction, u->faction, give, r);
 					}
 				}
+			}
 
 			/* Die Einheit hat nicht genug Geld zusammengekratzt und
 			 * nimmt Schaden: */
-
-			if (need) hunger(u, need);
+			if (need) {
+				int lspp = lifestyle(u)/u->number;
+				if (lspp > 0) {
+					int number = (need+lspp-1)/lspp;
+					if (hunger(number, u)) fset(u, FL_HUNGER);
+				}
+			}
 		}
+	}
+
+	for (r = regions; r; r = r->next) {
+		int peasantfood = rpeasants(r)*10;
+		int bauernblut = 0;
+		boolean bfind = false;
+		for (u = r->units; u; u = u->next) {
+			if (u->race == new_race[RC_DAEMON]) {
+				/* Alles Bauernblut der Region zählen.
+				* warnung: bauernblut einer partei hilft im moment der anderen
+				* so selten wie das benutzt wird, ist das erstmal wursht,
+				* aber ein TODO fürs BUGS File.
+				* Es ist auch deshalb fast egal, weil es ja im Grunde nicht dem Dämon,
+				* sondern der Region zu gute kommt - und da ist der anwender schnuppe
+				*/
+				if (!bfind) {
+					unit * ud = u;
+					while (ud) {
+						attrib * a = a_find(ud->attribs, &at_bauernblut);
+						if (a) bauernblut += a->data.i;
+						do { ud=ud->next; } while (ud && ud->race!=new_race[RC_DAEMON]);
+					}
+					bfind = true;
+				}
+				if (r->planep == NULL || !fval(r->planep, PFL_NOFEED)) {
+					int demons = u->number;
+					if (bauernblut>=demons) {
+						bauernblut -= demons;
+						demons = 0;
+					} else if (bauernblut) {
+						demons-=bauernblut;
+					}
+					if (peasantfood>=demons) {
+						peasantfood -= demons;
+						demons = 0;
+					} else {
+						demons -= peasantfood;
+						peasantfood = 0;
+					}
+					if (demons > 0) {
+						hunger(demons, u); /* nicht gefütterte dämonen hungern */
+					}
+				}
+			}
+		}
+		rsetpeasants(r, peasantfood/10);
 	}
 
 	/* 3. Von den überlebenden das Geld abziehen: */

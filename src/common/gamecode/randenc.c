@@ -1135,66 +1135,12 @@ randomevents(void)
 	}
 #endif
 
-	/* Talente von Dämonen verschieben sich und Dämonen fressen Bauern */
+	/* Talente von Dämonen verschieben sich */
 
 	for (r = regions; r; r = r->next) {
-		int peasantfood = rpeasants(r)*10;
-		int bauernblut = 0;
-		boolean bfind = false;
 		for (u = r->units; u; u = u->next) {
 			if (u->race == new_race[RC_DAEMON]) {
-				/* Alles Bauernblut der Region zählen.
-				 * warnung: bauernblut einer partei hilft im moment der anderen
-				 * so selten wie das benutzt wird, ist das erstmal wursht,
-				 * aber ein TODO fürs BUGS File.
-				 * Es ist auch deshalb fast egal, weil es ja im Grunde nicht dem Dämon,
-				 * sondern der Region zu gute kommt - und da ist der anwender schnuppe
-				 */
-				skill * sv;
-				if (!bfind) {
-					unit * ud = u;
-					while (ud) {
-						attrib * a = a_find(ud->attribs, &at_bauernblut);
-						if (a) bauernblut += a->data.i;
-						do { ud=ud->next; } while (ud && ud->race!=new_race[RC_DAEMON]);
-					}
-					bfind = true;
-				}
-				if (r->planep == NULL || !fval(r->planep, PFL_NOFEED)) {
-					int demons = u->number;
-					if (bauernblut>=demons) {
-						bauernblut -= demons;
-						demons = 0;
-					} else if (bauernblut) {
-						demons-=bauernblut;
-					}
-					if (peasantfood>=demons) {
-						peasantfood -= demons;
-						demons = 0;
-					} else {
-						demons -= peasantfood;
-						peasantfood = 0;
-					}
-					if (demons > 0) {
-#ifdef DAEMON_HUNGER
-						hunger(u, demons); /* nicht gefütterte dämonen hungern */
-#else
-						c = 0;
-						for (n = 0; n != demons; n++) {
-							if (rand() % 100 < 10) {
-								c++;
-							}
-						}
-						if (c) {
-							scale_number(u, u->number - c);
-							sprintf(buf, "%d Dämonen von %s sind hungrig in "
-								"ihre Sphäre zurückgekehrt.", c, unitname(u));
-							addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
-						}
-#endif
-					}
-				}
-				sv = u->skills;
+				skill * sv = u->skills;
 				while (sv!=u->skills+u->skill_size) {
 					if (sv->level>0 && rand() % 100 < 25) {
 						int weeks = 1+rand()%3;
@@ -1203,12 +1149,16 @@ randomevents(void)
 						} else {
 							while (weeks--) learn_skill(u, sv->id, 1.0);
 						}
+						if (sv->old>sv->level) {
+							log_printf("%s dropped from %u to %u:%u in %s\n",
+									   unitname(u), sv->old, sv->level,
+									   sv->weeks, skillname(sv->id, NULL));
+						}
 					}
 					++sv;
 				}
 			}
 		}
-		rsetpeasants(r, peasantfood/10);
 	}
 
 	for (r = regions; r; r = r->next) {
