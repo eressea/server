@@ -614,6 +614,19 @@ rmoney(const region * r)
 }
 
 void
+rsethorses(region *r, int value)
+{
+	assert(r->land != NULL && value >= 0);
+	r->land->horses = value;
+}
+
+int
+rhorses(region *r)
+{
+	return r->land?r->land->horses:0;
+}
+
+void
 rsetmoney(region * r, int value)
 {
 	((r)->land?((r)->land->money=(value)):(assert((value)>=0), (value)),0);

@@ -171,9 +171,8 @@ int rpeasants(const struct region * r);
 void rsetpeasants(struct region * r, int value);
 int rmoney(const struct region * r);
 void rsetmoney(struct region * r, int value);
-
-#define rhorses(r) ((r)->land?(r)->land->horses:0)
-#define rsethorses(r, value) ((r)->land?((r)->land->horses=(value)):(assert((value)>=0), (value)),0)
+int rhorses(struct region * r);
+void rsethorses(struct region * r, int value);
 
 #define rbuildings(r) ((r)->buildings)
 

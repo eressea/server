@@ -504,7 +504,7 @@ addgive(unit * u, unit * u2, int n, resource_t res, const char * cmd, int error)
 
 /* Derzeit fallen nur Silber und Pferde an die Region
  * */
-	void
+void
 give_peasants(int n, const item_type * itype, unit * src)
 {
 	region *r = src->region;
