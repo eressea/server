@@ -274,7 +274,7 @@ extern void read_laen(struct region * r, int laen);
 /* Seuchenwahrscheinlichkeit (siehe plagues()) */
 #define SEUCHE         10
 /* % Betroffene */
-#define SEUCHENOPFER   60
+#define SEUCHENOPFER   20
 extern void plagues(struct region * r, boolean ismagic);
 
 /** Healing **/

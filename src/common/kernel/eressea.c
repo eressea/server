@@ -2648,6 +2648,7 @@ plagues(region * r, boolean ismagic)
 	if (gestorben > 0) {
 		message * msg = add_message(&r->msgs, msg_message("pest", "dead", gestorben));
 		msg_release(msg);
+		deathcounts(r, gestorben);
 	}
 	rsetpeasants(r, peasants);
 }
