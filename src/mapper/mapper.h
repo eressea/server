@@ -117,7 +117,6 @@ struct selection ** push_selection(struct selection ** p_sel, char * str, void *
 void insert_selection(struct selection ** p_sel, struct selection * prev, char * str, void * payload);
 void block_create(int x1, int y1, int size, char chaotisch, int special, char terrain);
 
-extern void read_newfactions(const char * filename);
 extern void read_orders(const char * filename);
 extern void read_dropouts(const char *filename);
 extern void seed_dropouts(void);

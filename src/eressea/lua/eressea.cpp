@@ -4,6 +4,7 @@
 #include "script.h"
 
 #include <attributes/key.h>
+#include <modules/autoseed.h>
 
 // gamecode includes
 #include <gamecode/laws.h>
@@ -144,6 +145,19 @@ race_setscript(const char * rcname, const functor<void>& f)
   }
 }
 
+#define ISLANDSIZE 20
+static void 
+lua_autoseed(const char * filename)
+{
+  newfaction * players = read_newfactions(filename);
+  while (players) {
+    int n = listlen(players);
+    int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
+    k = n / k;
+    autoseed(&players, k);
+  }
+}
+
 #ifdef LUABIND_NO_EXCEPTIONS
 static void
 error_callback(lua_State * L)
@@ -179,6 +193,9 @@ bind_eressea(lua_State * L)
     /* scripted monsters */
     def("plan_monsters", &lua_planmonsters),
     def("set_brain", &race_setscript),
+
+    /* map making */
+    def("autoseed", lua_autoseed),
 
     /* string to enum */
     def("direction", &get_direction),

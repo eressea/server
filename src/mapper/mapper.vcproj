@@ -143,9 +143,6 @@
 			Name="Header"
 			Filter="*.h">
 			<File
-				RelativePath=".\autoseed.h">
-			</File>
-			<File
 				RelativePath=".\logging.h">
 			</File>
 			<File
@@ -164,9 +161,6 @@
 				RelativePath="..\modules\weather.h">
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\autoseed.c">
-		</File>
 		<File
 			RelativePath=".\logging.c">
 		</File>

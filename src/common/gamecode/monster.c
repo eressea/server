@@ -930,7 +930,7 @@ plan_monsters(void)
       /* Ab hier nur noch Befehle für NPC-Einheiten. */
       if (u->faction->no != MONSTER_FACTION) continue;
 
-      u->status = ST_AGGRO; /* all monsters fight like crazy */
+      if (u->status>ST_BEHIND) u->status = ST_FIGHT; /* all monsters fight */
       /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
       produceexp(u, SK_OBSERVATION, u->number);
 

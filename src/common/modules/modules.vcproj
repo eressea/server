@@ -124,6 +124,9 @@
 				RelativePath=".\arena.h">
 			</File>
 			<File
+				RelativePath=".\autoseed.h">
+			</File>
+			<File
 				RelativePath=".\dungeon.h">
 			</File>
 			<File
@@ -153,6 +156,9 @@
 		</Filter>
 		<File
 			RelativePath=".\arena.c">
+		</File>
+		<File
+			RelativePath=".\autoseed.c">
 		</File>
 		<File
 			RelativePath=".\dungeon.c">

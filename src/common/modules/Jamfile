@@ -9,6 +9,7 @@ SubDirHdrs $(SUBDIR)/../.. ;
 
 SOURCES =
  arena.c
+ autoseed.c
  dungeon.c
  gmcmd.c
  infocmd.c

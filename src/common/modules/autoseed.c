@@ -11,15 +11,20 @@
 */
 
 #include <config.h>
-#include <eressea.h>
+#include <kernel/eressea.h>
 #include "autoseed.h"
 
 /* kernel includes */
-#include <region.h>
-#include <plane.h>
-#include <faction.h>
-#include <race.h>
-#include <unit.h>
+#include <kernel/alliance.h>
+#include <kernel/region.h>
+#include <kernel/plane.h>
+#include <kernel/faction.h>
+#include <kernel/race.h>
+#include <kernel/unit.h>
+
+/* util includes */
+#include <util/base36.h>
+#include <util/goodies.h>
 
 /* libc includes */
 #include <limits.h>
@@ -27,36 +32,67 @@
 #include <string.h>
 #include <stdlib.h>
 
-newfaction * newfactions = NULL;
-
-static int regions_per_faction = 3;
-
-void
-get_island(region_list ** rlist)
+newfaction *
+read_newfactions(const char * filename)
 {
-	region_list *rcurrent = *rlist;
-	region_list **rnext = &rcurrent->next;
-	assert(rcurrent && *rnext==NULL);
+  newfaction * newfactions = NULL;
+  FILE * F = fopen(filename, "r");
+  if (F==NULL) return NULL;
+  for (;;) {
+    faction * f;
+    char race[20], email[64], lang[8], password[16];
+    newfaction *nf, **nfi;
+    int bonus, subscription;
+    int alliance = 0;
 
-	fset(rcurrent->data, FL_MARK);
-	while (rcurrent!=NULL) {
-		direction_t dir;
-		for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-			region * r = rconnect(rcurrent->data, dir);
-			if (r!=NULL && r->land && !fval(r, FL_MARK)) {
-				fset(r, FL_MARK);
-				add_regionlist(rnext, r);
-			}
-		}
-		rcurrent = *rnext;
-		rnext = &rcurrent->next;
-	}
-	rnext=rlist;
-	while (*rnext) {
-		rcurrent = *rnext;
-		freset(rcurrent->data, FL_MARK);
-		rnext = &rcurrent->next;
-	}
+    if (alliances!=NULL) {
+      /* email;race;locale;startbonus;subscription;alliance */
+      if (fscanf(F, "%s %s %s %d %d %s %d", email, race, lang, &bonus, &subscription, password, &alliance)<=0) break;
+    } else {
+      /* email;race;locale;startbonus;subscription */
+      if (fscanf(F, "%s %s %s %d %d %s", email, race, lang, &bonus, &subscription, password)<=0) break;
+    }
+    for (f=factions;f;f=f->next) {
+      if (strcmp(f->email, email)==0 && f->subscription) break;
+    }
+    if (f) continue; /* skip the ones we've already got */
+    for (nf=newfactions;nf;nf=nf->next) {
+      if (strcmp(nf->email, email)==0) break;
+    }
+    if (nf) continue;
+    nf = calloc(sizeof(newfaction), 1);
+    if (set_email(&nf->email, email)!=0) {
+      log_error(("Invalid email address for subscription %s: %s\n", itoa36(subscription), email));
+      continue;
+    }
+    nf->password = strdup(password);
+    nf->race = rc_find(race);
+    nf->subscription = subscription;
+    if (alliances!=NULL) {
+      struct alliance * al = findalliance(alliance);
+      if (al==NULL) {
+        char zText[64];
+        sprintf(zText, "Allianz %d", alliance);
+        al = makealliance(alliance, zText);
+      }
+      nf->allies = al;
+    } else {
+      nf->allies = NULL;
+    }
+    if (nf->race==NULL) nf->race = findrace(race, default_locale);
+    nf->lang = find_locale(lang);
+    nf->bonus = bonus;
+    assert(nf->race && nf->email && nf->lang);
+    nfi = &newfactions;
+    while (*nfi) {
+      if ((*nfi)->race==nf->race) break;
+      nfi=&(*nfi)->next;
+    }
+    nf->next = *nfi;
+    *nfi = nf;
+  }
+  fclose(F);
+  return newfactions;
 }
 
 typedef struct seed_t {
@@ -175,97 +211,11 @@ recalc(seed_t * seeds, int nseeds, int nplayers)
 			q += quality;
 		}
 	}
-/*
-	q = q / nplayers;
-	for (i=0;i!=nplayers;++i) {
-		quality -= (qarr[i]-q)*(qarr[i]-q);
-	}
- */
+
 	return quality + q;
 }
 
 extern int numnewbies;
-
-void
-autoseed(struct region_list * rlist)
-{
-	int nregions = listlen(rlist);
-	int nseeds = nregions;
-	double lastq;
-	seed_t * seeds = calloc(sizeof(seed_t), nseeds);
-	int i, nfactions = 0;
-	newfaction * nf = newfactions;
-
-	while (nf) {
-		if (nf->bonus==0) ++nfactions;
-		nf = nf->next;
-	}
-	nfactions = min(nfactions, nregions/regions_per_faction);
-
-	nf = newfactions;
-	for (i=0;i!=nseeds;++i) {
-		seeds[i].region = rlist->data;
-		rlist = rlist->next;
-		if (i<nfactions) {
-			while (nf->bonus!=0) nf=nf->next;
-			seeds[i].player = nf;
-			nf = nf->next;
-		}
-	}
-	for (i=0;i!=nseeds;++i) {
-		direction_t d;
-		for (d=0;d!=MAXDIRECTIONS;++d) {
-			region * r = rconnect(seeds[i].region, d);
-			if (r && r->land) {
-				int k;
-				for (k=i+1;k!=nseeds;++k) if (seeds[k].region==r) {
-					seeds[k].next[dir_invert(d)] = seeds+i;
-					seeds[i].next[d] = seeds+k;
-				}
-			}
-		}
-	}
-
-	lastq = recalc(seeds, nseeds, nfactions);
-	for (;;) {
-		double quality = lastq;
-		int i;
-		for (i=0;i!=nseeds;++i) {
-			int k;
-			for (k=i+1;k!=nseeds;++k) {
-				double q;
-				newfaction * player = seeds[k].player;
-				if (player==NULL && seeds[i].player==NULL) continue;
-				seeds[k].player = seeds[i].player;
-				seeds[i].player = player;
-				q = recalc(seeds, nseeds, nfactions);
-				if (q>quality) {
-					quality = q;
-				} else {
-					/* undo */
-					seeds[i].player = seeds[k].player;
-					seeds[k].player = player;
-				}
-			}
-		}
-		if (lastq==quality) break;
-		else lastq = quality;
-	}
-	for (i=0;i!=nseeds;++i) {
-		newfaction * nf = seeds[i].player;
-		if (nf) {
-			newfaction ** nfp = &newfactions;
-			unit * u;
-			while (*nfp!=nf) nfp=&(*nfp)->next;
-			u = addplayer(seeds[i].region, addfaction(nf->email, nf->password, nf->race,
-        nf->lang, nf->subscription));
-			u->faction->alliance = nf->allies;
-			++numnewbies;
-			*nfp = nf->next;
-			free(nf);
-		}
-	}
-}
 
 static terrain_t
 preferred_terrain(const struct race * rc)
@@ -283,7 +233,7 @@ preferred_terrain(const struct race * rc)
 #define VOLCANO_CHANCE 100
 
 int
-mkisland(int nsize)
+autoseed(newfaction ** players, int nsize)
 {
 	int x = 0, y = 0;
 	region * r;
@@ -317,7 +267,7 @@ mkisland(int nsize)
 		}
 	}
 
-  if (listlen(newfactions)<MINFACTIONS) return 0;
+  if (listlen(*players)<MINFACTIONS) return 0;
 	r = new_region(x, y);
 	terraform(r, T_OCEAN);
 	add_regionlist(&rlist, r);
@@ -347,7 +297,7 @@ mkisland(int nsize)
     if (rand() % VOLCANO_CHANCE == 0) {
       terraform(r, T_VOLCANO);
     } else if (rand() % REGIONS_PER_FACTION == 0 || rsize==0) {
-			newfaction ** nfp, * nextf = newfactions;
+			newfaction ** nfp, * nextf = *players;
 			unit * u;
 			terraform(r, preferred_terrain(nextf->race));
 			++isize;
@@ -356,7 +306,7 @@ mkisland(int nsize)
 			u->faction->alliance = nextf->allies;
 
 			/* remove duplicate email addresses */
-			nfp=&newfactions;
+			nfp = players;
 			while (*nfp) {
 				newfaction * nf = *nfp;
 				if (strcmp(nextf->email, nf->email)==0) {

@@ -68,6 +68,7 @@ lc_write(const struct attrib * a, FILE* F)
   write_building_reference(b, F);
   fwritestr(F, fname);
 #if RELEASE_VERSION>=BACTION_VERSION
+  fputc(' ', F);
   fwritestr(F, fparam?fparam:NULLSTRING);
 #endif
   fputc(' ', F);

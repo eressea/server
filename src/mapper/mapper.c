@@ -20,7 +20,7 @@
 #include <eressea.h>
 #include "mapper.h"
 
-#include "autoseed.h"
+#include <modules/autoseed.h>
 
 #include <spells/spells.h>
 #include <attributes/attributes.h>
@@ -138,6 +138,7 @@ boolean minimapx=false,minimapy=false;		/* Karte nicht vert./hor. scrollen */
 /* top, left => ? */
 /* hx, hy => ? */
 
+static newfaction * newfactions = NULL;
 static void 
 runautoseed(void)
 {
@@ -145,7 +146,7 @@ runautoseed(void)
 		int n = listlen(newfactions);
 		int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
 		k = n / k;
-		mkisland(k);
+		autoseed(&newfactions, k);
 	}
 }
 
@@ -1164,18 +1165,8 @@ movearound(int rx, int ry) {
 					ch = -9;
 					break;
 				case 'a':
-#if 0
-					if (r && r->land) {
-						regionlist * rlist = NULL;
-						add_regionlist(&rlist, r);
-						get_island(&rlist);
-						autoseed(rlist);
-						modified = 1;
-					}
-#else
 					runautoseed();
 					modified = 1;
-#endif
 				case 's':
 					seed_dropouts();
 					modified = 1;
@@ -1719,9 +1710,11 @@ main(int argc, char *argv[])
 	}
 
 	sprintf(buf, "%s/newfactions.%d", basepath(), turn);
-	read_newfactions(buf);
-	sprintf(buf, "%s/newfactions", basepath());
-	read_newfactions(buf);
+	newfactions = read_newfactions(buf);
+  if (newfactions==NULL) {
+    sprintf(buf, "%s/newfactions", basepath());
+    newfactions = read_newfactions(buf);
+  }
 	sprintf(buf, "%s/dropouts.%d", basepath(), turn);
 	read_dropouts(buf);
 

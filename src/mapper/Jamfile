@@ -10,7 +10,6 @@ SubDirHdrs $(SUBDIR)/.. ;
 SubDirHdrs $(XMLHDRS) ;
 
 SOURCES =
- autoseed.c
  logging.c
  map_modify.c
  map_partei.c

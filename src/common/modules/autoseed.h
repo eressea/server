@@ -12,6 +12,10 @@
 
 #ifndef _REGIONLIST_H
 #define _REGIONLIST_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 struct region_list;
 struct newfaction;
@@ -28,10 +32,10 @@ typedef struct newfaction {
 	struct alliance * allies;
 } newfaction;
 
-extern newfaction * newfactions;
+extern int autoseed(newfaction ** players, int nsize);
+extern newfaction * read_newfactions(const char * filename);
 
-extern void autoseed(struct region_list * rlist);
-extern void get_island(struct region_list ** rlist);
-extern int mkisland(int nsize);
-
+#ifdef __cplusplus
+}
+#endif
 #endif
