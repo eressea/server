@@ -333,7 +333,7 @@ count_skill(faction * f, skill_t skill)
 
 	for (r = firstregion(f); r != last; r = r->next)
 		for (u = r->units; u; u = u->next)
-			if (u->faction == f && get_skill(u, skill) > 0)
+			if (u->faction == f && get_skill(u, skill))
 				if(!is_familiar(u))
 					n += u->number;
 
@@ -502,7 +502,7 @@ stripunit(unit * u)
 }
 
 void
-verify_data (void)
+verify_data(void)
 {
 #ifndef NDEBUG
 	int lf = -1;
@@ -539,7 +539,7 @@ verify_data (void)
 }
 
 int
-get_skill (const unit * u, skill_t id)
+get_skill(const unit * u, skill_t id)
 {
 	skillvalue *i = u->skills;
 
@@ -550,7 +550,7 @@ get_skill (const unit * u, skill_t id)
 }
 
 int
-distribute (int old, int new_value, int n)
+distribute(int old, int new_value, int n)
 {
 	int i;
 	int t;
@@ -586,7 +586,7 @@ change_hitpoints (unit * u, int value)
 }
 
 int
-atoip (const char *s)
+atoip(const char *s)
 {
 	int n;
 
@@ -3072,3 +3072,20 @@ reorder_owners(region * r)
 	assert(len==listlen(r->units));
 #endif
 }
+
+int
+produceexp(struct unit * u, skill_t sk, int n)
+{
+	if (n==0 || !playerrace(u->race)) return 0;
+#if SKILLPOINTS
+	change_skill(u, SK_HERBALISM, PRODUCEEXP * n);
+	return 1;
+#else
+	if (learn_skill(u, SK_HERBALISM, PRODUCEEXP * n)) {
+		change_skill(u, SK_HERBALISM, n);
+		return 1;
+	}
+	return 0;
+#endif
+}
+
