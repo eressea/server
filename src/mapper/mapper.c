@@ -289,9 +289,9 @@ drawmap(boolean maponly) {
 	x1=left; y1=top;
 	if(maponly == false) {
 		movexy(SX-39, 0);
-		vline('|', SY+1);
+		vline(ACS_VLINE, SY+1);
 		movexy(SX-38, SY-2);
-		hline('-', 39);
+		hline(ACS_HLINE, 39);
 		if (hl != -1) {
 			movexy(SX-36,SY-2);
 			addstr(" High: ");
