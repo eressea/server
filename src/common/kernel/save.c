@@ -661,8 +661,6 @@ read_dynamictypes(void)
 	while (!feof(F)) {
 		fscanf(F, "%s", buf);
 		if (!strcmp("BUILDINGTYPE", buf)) bt_read(F);
-		else if (!strcmp("RESOURCETYPE", buf)) rt_read(F);
-		else if (!strcmp("ITEMTYPE", buf)) it_read(F);
 	}
 	fclose(F);
 }
@@ -814,7 +812,7 @@ readgame(boolean backup)
 	}
 #endif
 	turn = ri(F);
-	/* read_dynamictypes(); */
+	read_dynamictypes();
 	if (global.data_version < NEWMAGIC) {
 		max_unique_id = 0;
 	} else {
@@ -1260,7 +1258,7 @@ writegame(char *path, char quiet)
 	sprintf(buf, "%s/%d.players", datapath(), turn);
 	export_players(playerfile);
 #endif
-	/* write_dynamictypes(); */
+	write_dynamictypes();
 
 	F = cfopen(path, "w");
 	if (F==NULL)
