@@ -660,6 +660,7 @@ drifting_ships(region * r)
 
         if (rnext->terrain != T_OCEAN && !flying_ship(sh)) {
           sh->coast = reldirection(rnext, r);
+          assert(rterrain(r)==T_OCEAN);
         } else {
           sh->coast = NODIRECTION;
         }
@@ -1608,6 +1609,7 @@ sail(unit * u, region * next_point, boolean move_on_land)
     set_order(&u->thisorder, NULL);
     if (current_point->terrain != T_OCEAN && !is_cursed(sh->attribs, C_SHIP_FLYING, 0)) {
       sh->coast = reldirection(current_point, last_point);
+      assert(rterrain(last_point)==T_OCEAN);
     } else {
       sh->coast = NODIRECTION;
     }

@@ -3083,7 +3083,10 @@ join_battle(battle * b, unit * u, boolean attack)
 {
 	fighter *c = NULL;
 	fighter *fig;
-
+  attrib * a = a_find(u->attribs, &at_fleechance);
+  
+  if (a!=NULL) return NULL;
+  
 	cv_foreach(fig, b->fighters) {
 		if (fig->unit == u) {
 			c = fig;
