@@ -112,18 +112,34 @@ static int
 curse_emptiness(void)
 {
 	const curse_type * ct = ct_find("godcursezone");
-	region * r = regions;
-	while (r!=NULL) {
-		if (r->land && r->age>120 && !get_curse(r->attribs, ct)) {
-			unit * u = r->units;
-			while (u && u->faction->no==MONSTER_FACTION) u=u->next;
-			if (u==NULL) {
+	region * r;
+	for (r=regions;r!=NULL;r=r->next) {
+		unit * u = r->units;
+		if (r->land==NULL) continue;
+		if (fval(r, RF_CHAOTIC)) continue;
+		if (r->terrain==T_GLACIER) continue;
+		if (r->age<=120) continue;
+		if (get_curse(r->attribs, ct)) continue;
+		while (u && u->faction->no==MONSTER_FACTION) u=u->next;
+		if (u==NULL) fset(r, FL_MARK);
+	}
+	for (r=regions;r!=NULL;r=r->next) {
+		if (fval(r, FL_MARK)) {
+			direction_t d;
+			for (d=0;d!=MAXDIRECTIONS;++d) {
+				region * rn = rconnect(r,d);
+				if (rn==NULL) continue;
+				if (fval(rn, FL_MARK) || get_curse(rn->attribs, ct)) {
+					break;
+				}
+			}
+			if (d!=MAXDIRECTIONS) {
 				curse * c = create_curse(NULL, &r->attribs, ct,
-					100, 100, 0, 0);
+										 100, 100, 0, 0);
 				curse_setflag(c, CURSE_ISNEW|CURSE_IMMUNE);
 			}
+			freset(r, FL_MARK);
 		}
-		r = r->next;
 	}
 	return 0;
 }
