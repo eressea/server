@@ -69,6 +69,9 @@ typedef enum combatmagic {
 #include <attributes/otherfaction.h>
 #include <attributes/moved.h>
 
+/* modules includes */
+#include <modules/alliance.h>
+
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
@@ -2673,6 +2676,15 @@ print_stats(battle * b)
 		buf[77] = (char)0;
 		for (k = buf; *k; ++k) *k = '-';
 		battlerecord(b, buf);
+		if(side->bf->faction) {
+#ifdef ALLIANCES
+			sprintf(buf, "##### %s (%s/%d)", side->bf->faction->name, itoa36(side->bf->faction->no),
+				side->bf->faction->alliance?side->bf->faction->alliance->id:0);
+#else
+			sprintf(buf, "##### %s (%s)", side->bf->faction->name, itoa36(side->bf->faction->no));
+#endif
+			battledebug(buf);
+		}
 		print_fighters(b, &side->fighters);
 	}
 	next(side);
@@ -3058,7 +3070,7 @@ make_battle(region * r)
 #endif
 		if (!bdebug) log_error(("battles können nicht debugged werden\n"));
 		else {
-			dbgprintf((bdebug, "In %s findet ein Kampf statt:", rname(r, NULL)));
+			dbgprintf((bdebug, "In %s findet ein Kampf statt:\n", rname(r, NULL)));
 		}
 		obs_count++;
 	}

@@ -72,7 +72,6 @@ typedef struct side {
 	struct tactics leader;				/* der beste Taktiker des Heeres */
 	struct side * nextF; /* nächstes Heer der gleichen Partei */
 	struct battle * battle;
-	struct faction *faction;	/* Die Partei, die hier kämpft */
 	struct bfaction * bf; /* Die Partei, die hier kämpft */
 	const struct group * group;
 # define E_ENEMY 1
