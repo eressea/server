@@ -27,7 +27,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define NRT_MAXHASH 256
+#define NRT_MAXHASH 1023
 static nrmessage_type * messagetypes[NRT_MAXHASH];
 
 const char * 

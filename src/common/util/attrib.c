@@ -84,7 +84,7 @@ a_select(attrib * a, const void * data, boolean(*compare)(const attrib *, const 
 }
 
 attrib *
-a_find(attrib * a, const attrib_type * at) 
+a_find(attrib * a, const attrib_type * at)
 {
 	while (a && a->type!=at) a = a->next;
 	return a;

@@ -1865,8 +1865,8 @@ region *
 lastregion (faction * f)
 {
 	region *r = f->last;
-	if (!r && f->units) {
-		for (r = firstregion(f); r; r = r->next) {
+	if (r==NULL && f->units!=NULL) {
+		for (r = f->units->region; r; r = r->next) {
 			plane * p = rplane(r);
 			unit *u;
 			attrib *ru;
