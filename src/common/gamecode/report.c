@@ -712,7 +712,7 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 			for(i=0; i<ug->members; i++) {
 				print_curses(F, u, TYP_UNIT, ug->unit_array[i]->attribs, (u->faction == f)? 1 : 0, indent);
 			}
-		} else 
+		} else
 #endif /* USE_UGROUPS */
 		print_curses(F, u, TYP_UNIT, u->attribs, (u->faction == f)? 1 : 0, indent);
 	}
@@ -2019,18 +2019,18 @@ report(FILE *F, faction * f, const char * pzTime)
 					(w + 99) / 100,	/* +99 weil sonst die Nachkommastellen ignoriert würden */
 					shipcapacity(sh) / 100);
 			} else {
-				sprintf(buf, "%s, %s", shipname(sh), 
+				sprintf(buf, "%s, %s", shipname(sh),
 					LOC(f->locale, sh->type->name[0]));
 			}
 
 			assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
 			if (sh->size!=sh->type->construction->maxsize) {
-				sprintf(buf+strlen(buf), ", %s (%d/%d)", 
-					LOC(f->locale, "nr_undercons"), sh->size, 
+				sprintf(buf+strlen(buf), ", %s (%d/%d)",
+					LOC(f->locale, "nr_undercons"), sh->size,
 					sh->type->construction->maxsize);
 			}
 			if (sh->damage) {
-				sprintf(buf+strlen(buf), ", %d%% %s", 
+				sprintf(buf+strlen(buf), ", %d%% %s",
 					sh->damage*100/(sh->size*DAMAGE_SCALE),
 					LOC(f->locale, "nr_damaged"));
 			}
@@ -2580,9 +2580,9 @@ reports(void)
 #ifdef _GNU_SOURCE
 	strftime(pzTime, 64, "%A, %-e. %B %Y, %-k:%M", localtime(&ltime));
 #else
-	strftime(pzTime, 64, "%A, %e. %B %Y, %k:%M", localtime(&ltime));
+	strftime(pzTime, 64, "%A, %d. %B %Y, %H:%M", localtime(&ltime));
 #endif
-    
+
 	nmr_warnings();
 #ifdef DMALLOC
 	assert(dmalloc_verify ( NULL ));
