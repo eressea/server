@@ -1,7 +1,7 @@
 ## include this File in all Makefiles for Eressea
 
-ifndef ERESSEA
-	export ERESSEA=$(PWD)
+ifndef ERESSEA_SRC
+	export ERESSEA_SRC=$(PWD)
 endif
 
 .PHONY: tags
@@ -19,7 +19,7 @@ INSTALL = @cp
 
 ARFLAGS = crs
 CTAGSFLAGS = --c-types=cdefgmnstuv
-CFLAGS  = -I$(ERESSEA) -Wall -Wwrite-strings -Wstrict-prototypes \
+CFLAGS  = -I$(ERESSEA_SRC) -Wall -Wwrite-strings -Wstrict-prototypes \
            -Werror-implicit-function-declaration \
 		   -Wno-char-subscripts $(INCLUDES)
 LDFLAGS = $(LIBS)
@@ -42,7 +42,7 @@ MSG_SUBDIR  = "--> Making $@ in $$subdir"
 ## user-defined makefiles
 ##
 
-MKFILES = $(wildcard $(ERESSEA)/$(USER).mk $(ERESSEA)/$(OSTYPE).mk $(ERESSEA)/$(HOSTTYPE).mk $(ERESSEA)/$(ARCH).mk)
+MKFILES = $(wildcard $(ERESSEA_SRC)/$(USER).mk $(ERESSEA_SRC)/$(OSTYPE).mk $(ERESSEA_SRC)/$(HOSTTYPE).mk $(ERESSEA_SRC)/$(ARCH).mk)
 ifeq ($(MKFILES), )
 else
   include $(MKFILES)
@@ -106,7 +106,7 @@ endif
 # ifeq ($(CONFIG), lint)
 #  BUILD_DIR  = Lint-$(ARCHITECTURE)
 #  CC         = lint
-#  CFLAGS     = -I$(ERESSEA) $(INCLUDES) -booltype boolean -boolops
+#  CFLAGS     = -I$(ERESSEA_SRC) $(INCLUDES) -booltype boolean -boolops
 #  LDFLAGS    =
 #  LIBS       =
 # endif
@@ -132,10 +132,10 @@ endif
 #
 tags:
 	@echo "Creating tags in `pwd`/tags";
-	$(CTAGS) $(CTAGSFLAGS) --recurse=yes -f $(ERESSEA)/tags $(ERESSEA)
+	$(CTAGS) $(CTAGSFLAGS) --recurse=yes -f $(ERESSEA_SRC)/tags $(ERESSEA_SRC)
 
 
-PUBLISH_DIR = $(ERESSEA)/$(BUILD_DIR)
+PUBLISH_DIR = $(ERESSEA_SRC)/$(BUILD_DIR)
 
 env:
 	@$(MAKEENV)
@@ -180,7 +180,7 @@ clean:: $(BUILD_DIR) $(PUBLISH_DIR)
 	rm -fr Release-$(ARCHITECTURE)/* Debug-$(ARCHITECTURE)/* Profile-$(ARCHITECTURE)/* Dmalloc-$(ARCHITECTURE)/* Ccmalloc-$(ARCHITECTURE) Lint-$(ARCHITECTURE)/*
 
 lint::
-	$(LINT) -I$(ERESSEA) $(INCLUDES) $(LINTFLAGS) *.c
+	$(LINT) -I$(ERESSEA_SRC) $(INCLUDES) $(LINTFLAGS) *.c
 
 $(BUILD_DIR) $(PUBLISH_DIR):
 	@mkdir $@
@@ -199,6 +199,6 @@ $(BUILD_DIR)/%.o:: %.c
 
 ifeq ($(CONVERT_TRIGGERS), 1)
  CFLAGS += -DCONVERT_TRIGGER
- INCLUDES += -I. -I$(ERESSEA)/eressea/old
+ INCLUDES += -I. -I$(ERESSEA_SRC)/eressea/old
 endif
 

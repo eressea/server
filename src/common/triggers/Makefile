@@ -6,7 +6,7 @@ BINARY =
 SOURCES = $(wildcard *.c)
 OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
 
-include $(ERESSEA)/Makefile.include
+include $(ERESSEA_SRC)/Makefile.include
 
 ## more definitions
 
