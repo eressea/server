@@ -1,0 +1,55 @@
+Willkommen beim Eressea-Testspiel.
+
+Vorweg: Dieses ist NICHT deine zukünftige Eressea-Partei. Es ist ein
+Tutorial. Um sicherzustellen, das neue Spieler in Eressea ein gewisses
+Grundverständnis der Anleitung mitbringen, und nicht nach wochenlanger
+Wartezeit über einen einfachen Fehler stolpern, schicken wir jeden neuen
+Spieler in eine Probepartie, die 5 Runden dauert. Du kannst also mit dieser
+Partei tun was Du möchtest, und etwas herumexperimentieren, ohne das das auf
+Deine spätere Partei Auswirkungen hat. Einzig, das Du die 5 Runden
+überlebst, verlangen wir von Dir.
+
+Folgende Unterschiede gibt es zwischen diesem Testspiel und dem richtigen
+Eressea:
+
+* Email-Adresse für Züge
+Testspiel:  tutorial@eressea.upb.de
+Eressea:    eressea@eressea.amber.kn-bremen.de
+
+* Zugabgaberhytmus:
+Testspiel:  3x die Woche, Sonntag, Dienstag und Freitag um 09:00 Uhr morgens
+Eressea:    1x die Woche, Sonntags um 9:00 Uhr
+
+* Spieldauer:
+Testspiel: 5-10 Züge
+Eressea:   unbegrenzt
+
+
+Ein paar Tipps für den Anfang:
+
+Eressea ist ein komplexes Spiel mit einer Menge Regeln. Je besser Du sie
+verstehst, desto besser wirst Du das Spiel spielen können. Nimm Dir die
+Zeit, die Anleitung ausführlich zu lesen. Du findest sie unter
+http://eressea.upb.de/rules/
+
+Eressea ist ein textuelles Spiel. Laß Dich nicht davon einschüchtern, das Du
+Befehle lernen mußt - so viele sind es nicht, und die meisten sind sehr
+intuitiv. Vieles in Eressea passiert in deiner Phantasie, und das
+spannendste am Spiel sind die anderen Spieler und die Diplomatie mit ihnen.
+
+Die beiden anderen Dateien in dieser Mail enthalten den Report in zwei
+verschiedenen Formaten. Die Datei mit der Endung .nr ist eine normale
+Textdatei, und sie enthält deinen ersten Report in menschenlesbarer Form. Du
+kannst sie mit jedem Texteditor (zum Beispiel Notepad) lesen. Die zweite
+Datei mit der Endung .cr enthält den Report in einer Form, die von
+Eressea-Software gelesen werden kann, wie zum Beispiel Magellan, das Du
+unter http://eressea.upb.de/magellan/ findest. Ob Du lieber mit der
+Textversion oder mit einem Programm spielst, ist Dir überlassen.
+
+Solltest Du Fragen haben, die du mit der Anleitung nicht beantworten kannst,
+kannst du eine Mail an die Adresse eressea-help@eressea.kn-bremen.de
+schicken. Dort hilft man Dir gerne mit Fragen aller Art. Oder Du siehst Dir
+mal die Beispielzüge unter http://www.webfeed.de/eressea/ an.
+
+Viel Spaß mit Eressea wünscht Dir auf jeden Fall
+das Eressea-Team.

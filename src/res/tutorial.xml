@@ -12,13 +12,14 @@
 	<include file="ships.xml"></include>
 	<include file="buildings.xml"></include>
 
-	<game name="Eressea" welcome="eressea">
+	<game name="Eressea" welcome="tutorial">
 		<comment>Game specific</comment>
 		<order name="MEINUNG" disable></order>
+		<order name="EMAIL" disable></order>
 		<order name="MAGIEGEBIET" disable></order>
 	</game>
-	<include file="eressea/de/strings.xml"></include>
-	<include file="eressea/en/strings.xml"></include>
+	<include file="tutorial/de/strings.xml"></include>
+	<include file="tutorial/en/strings.xml"></include>
 	<include file="eressea/races.xml"></include>
 	<include file="eressea/items.xml"></include>
 	<include file="eressea/dungeons.xml"></include>
