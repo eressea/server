@@ -1,5 +1,5 @@
 extern "C" {
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
+#include <lua50/lua.h>
+#include <lua50/lauxlib.h>
+#include <lua50/lualib.h>
 }

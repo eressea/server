@@ -126,7 +126,7 @@ static int nowrite = 0;
 static boolean g_writemap = false;
 static boolean g_killeiswald = false;
 static boolean opt_reportonly = false;
-boolean opt_cr_absolute_coords = false;
+extern boolean opt_cr_absolute_coords;
 
 struct settings global = {
 	"Eressea", /* gamename */

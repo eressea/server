@@ -21,6 +21,7 @@
 #include <config.h>
 
 #include <eressea.h>
+#ifdef MUSEUM_MODULE
 #include "museum.h"
 
 /* kernel includes */
@@ -414,3 +415,4 @@ register_museum(void)
 	register_function((pf_generic)use_museumexitticket, "usemuseumexitticket");
 }
 
+#endif
