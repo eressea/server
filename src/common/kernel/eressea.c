@@ -2694,7 +2694,7 @@ wage(const region *r, const unit *u, boolean img)
 	curse * c;
 	int      wage;
 	attrib	 *a;
-  building_type *artsculpture_type = bt_find("artsculpture");
+  const building_type *artsculpture_type = bt_find("artsculpture");
 	static const curse_type * drought_ct, * blessedharvest_ct;
 	static boolean init;
 

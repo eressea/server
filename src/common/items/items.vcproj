@@ -121,6 +121,9 @@
 			Name="Header"
 			Filter="*.h">
 			<File
+				RelativePath=".\artrewards.h">
+			</File>
+			<File
 				RelativePath=".\birthday_firework.h">
 			</File>
 			<File
@@ -151,6 +154,9 @@
 				RelativePath=".\xerewards.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\artrewards.c">
+		</File>
 		<File
 			RelativePath=".\birthday_firework.c">
 		</File>

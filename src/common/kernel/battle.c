@@ -377,7 +377,9 @@ troop
 select_corpse(battle * b, fighter * af)
 /* Wählt eine Leiche aus, der af hilft. casualties ist die Anzahl der
  * Toten auf allen Seiten (im Array). Wenn af == NULL, wird die
- * Parteizugehörigkeit ignoriert, und irgendeine Leiche genommen. */
+ * Parteizugehörigkeit ignoriert, und irgendeine Leiche genommen. 
+ *
+ * Untote werden nicht ausgewählt (casualties, not dead) */
 {
 	troop dt =
 	{0, 0};
@@ -2307,16 +2309,17 @@ aftermath(battle * b)
 
 #ifdef TROLLSAVE
     /* Trolle können regenerieren */
-    if (df->alive > 0 && dead && old_race(du->race) == RC_TROLL) {
+    if (df->alive > 0 && dead>0 && old_race(du->race) == RC_TROLL) {
       for (i = 0; i != dead; ++i) {
         if (chance(TROLL_REGENERATION)) {
           ++df->alive;
           ++df->side->alive;
           ++df->side->battle->alive;
           ++trollsave[df->side->index];
-          --dead;
+          /* do not change dead here, or loop will not terminate! recalculate later */
         }
       }
+      dead = du->number - df->alive - df->run.number;
     }
 #endif
     /* Regeneration durch PR_MERCY */
@@ -2326,19 +2329,23 @@ aftermath(battle * b)
           ++df->alive;
           ++df->side->alive;
           ++df->side->battle->alive;
-          --dead;
+          /* do not change dead here, or loop will not terminate! recalculate later */
         }
       }
+      dead = du->number - df->alive - df->run.number;
     }
 
-    /* Tote, die wiederbelebt werde können */
+    /* tote insgesamt: */
+    df->side->dead += dead;
+    /* Tote, die wiederbelebt werde können: */
     if (playerrace(df->unit->race)) {
       df->side->casualties += dead;
     }
 #ifdef SHOW_KILLS
     if (df->hits + df->kills) {
-      struct message * m = new_message(du->faction, "killsandhits%u:unit%i:hits%i:kills", du, df->hits, df->kills);
+      struct message * m = msg_message("killsandhits", "unit hits kills", du, df->hits, df->kills);
       message_faction(b, du->faction, m);
+      msg_release(m);
     }
 #endif
   }
@@ -2372,7 +2379,6 @@ aftermath(battle * b)
       relevant = true;
     }
     s->flee = 0;
-    s->dead = 0;
 
     cv_foreach(df, s->fighters) {
       unit *du = df->unit;
@@ -2393,8 +2399,6 @@ aftermath(battle * b)
         if (df->person[n].hp > 0)
           sum_hp += df->person[n].hp;
       }
-
-      s->dead += dead;
 
       if (df->alive == du->number) continue; /* nichts passiert */
 

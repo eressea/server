@@ -941,7 +941,7 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
 		n = df->unit->number;
 
 		if (chance(power/n)) {
-			row = statusrow(df->status);
+			row = statusrow(df->status)+FIRST_ROW;
 			df->side->size[row] -= df->alive;
 			if (df->unit->race->battle_flags & BF_NOBLOCK) {
 				df->side->nonblockers[row] -= df->alive;
@@ -1569,6 +1569,9 @@ sp_reanimate(fighter * fi, int level, double power, spell * sp)
 			++t.fighter->side->size[t.fighter->unit->status + 1];
 			++t.fighter->side->healed;
 			--t.fighter->side->casualties;
+                        assert(t.fighter->side->casualties>=0);
+                        --t.fighter->side->dead;
+                        assert(t.fighter->side->dead>=0);
 			++j;
 		}
 	}
@@ -1712,8 +1715,8 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
   int maxrow = AVOID_ROW;
   cvector *fgs;
   void **fig;
-  int n, j, undead = 0;
-  int k = (int)get_force(power,0);
+  int n, undead = 0;
+  int force = (int)get_force(power,0);
   double c = 0.50 + 0.02 * power;
 
   /* Liste aus allen Kämpfern */
@@ -1724,42 +1727,38 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
     fighter *df = *fig;
     unit *du = df->unit;
 
-    if (!k)
-      break;
+    if (force<=0) break;
 
     /* keine Monster */
-    if (!playerrace(du->race))
-      continue;
+    if (!playerrace(du->race)) continue;
 
     if (df->alive + df->run.number < du->number) {
-      j = 0;
+      int j = 0;
 
       /* Wieviele Untote können wir aus dieser Einheit wecken? */
       for (n = df->alive + df->run.number; n <= du->number; n++) {
-        if (!k) break;
-
         if (chance(c)) {
-          undead++;
-          j++;
-          --df->side->casualties;
-          ++df->side->alive;
-          --k;
+          ++j;
+          if (--force<=0) break;
         }
       }
 
       if (j > 0) {
         int hp = unit_max_hp(du);
+        undead += j;
+        df->side->casualties -= j;
         if (j == du->number) {
           /* Einheit war vollständig tot und konnte vollständig zu
           * Untoten gemacht werden */
           int nr;
 
+          df->side->dead -= j;
+          df->side->alive += j;
           du->race = new_race[RC_UNDEAD];
           setguard(du, GUARD_NONE);
           u_setfaction(du,mage->faction);
           if (fval(mage, UFL_PARTEITARNUNG))
             fset(du, UFL_PARTEITARNUNG);
-          df->alive = du->number;
           /* den Toten wieder volle Hitpoints geben */
           for (nr = 0; nr != df->alive; ++nr) {
             df->person[nr].hp = hp;

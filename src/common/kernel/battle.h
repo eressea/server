@@ -92,7 +92,7 @@ extern "C" {
     int removed;  /* stoned */
     int flee;
     int dead;
-    int casualties;
+    int casualties; /* those dead that were real people, not undead! */
     int healed;
     boolean dh;
     boolean stealth;	/* Die Einheiten sind getarnt */
