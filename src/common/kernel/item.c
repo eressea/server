@@ -100,7 +100,7 @@ static int
 res_changepeasants(unit * u, const resource_type * rtype, int delta)
 {
 	assert(rtype!=NULL && u->region->land);
-	u->region->land->peasants-=delta;
+	u->region->land->peasants+=delta;
 	return 0;
 }
 
