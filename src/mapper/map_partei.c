@@ -32,7 +32,9 @@
 #include <unit.h>
 
 /* modules */
+#ifdef ALLIANCES
 #include <modules/alliance.h>
+#endif
 
 /* util includes */
 #include <base36.h>

@@ -31,7 +31,9 @@
 #include <item.h>
 
 /* modules includes */
-#include <modules/alliance.h>
+#ifdef ALLIANCES
+# include <modules/alliance.h>
+#endif
 
 /* util includes */
 #include <base36.h>
@@ -204,9 +206,9 @@ showregion(region * r, char full)
 	str[strlen(buf)+1] = 0;
 	adddbllist(&reglist, str);
 
+	sprintf(buf, " %hd turns old:", r->age);
+	adddbllist(&reglist, buf);
 	if (r->terrain != T_OCEAN && r->terrain!=T_FIREWALL) {
-		sprintf(buf, " %hd turns old:", r->age);
-		adddbllist(&reglist, buf);
 		sprintf(buf, " %d peasants, %d(%d) silver", rpeasants(r), rmoney(r), count_all_money(r));
 		adddbllist(&reglist, buf);
 #if GROWING_TREES

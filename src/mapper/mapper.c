@@ -30,7 +30,6 @@
 #include <items/weapons.h>
 #include <items/items.h>
 
-#include <modules/xmas2000.h>
 #include <modules/gmcmd.h>
 #ifdef ALLIANCES
 #include <modules/alliance.h>
@@ -367,9 +366,9 @@ newbie_region(region * r)
 	if (r==NULL || r->units==NULL) return 0;
 	for (u=r->units;u;u=u->next) {
 		if (u->faction->age>10) return 0;
-		if (u->faction->age==0) return 1;
+/*		if (u->faction->age==0) return 1; */
 	}
-	return 0;
+	return 1;
 }
 
 int
@@ -1557,6 +1556,36 @@ log_newstuff(void)
 	}
 }
 
+void
+frame_regions(void)
+{
+	region * r = regions;
+	int lastage=r->age;
+	while (r!=0) {
+		if (r->age<20) {
+			if (r->age+1<lastage) r->age = lastage;
+		}
+		lastage=r->age;
+		r = r->next;
+	}
+	r = regions;
+	while (r!=0) {
+		if (r->terrain==T_OCEAN) {
+			direction_t d;
+			for (d=0;d!=6;++d) {
+				region * rn = rconnect(r, d);
+				if (rn!=0 && rn->terrain==T_OCEAN) {
+					if ((rn->age+5)*2<r->age && r->age<50) {
+						if (rn->units) log_printf("Cannot terraform %s\n", regionname(rn, NULL));
+						else terraform(rn, T_FIREWALL);
+					}
+				}
+			}
+		}
+		r=r->next;
+	}
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -1665,6 +1694,12 @@ main(int argc, char *argv[])
 	register_ships();
 	register_items();
 	register_spells();
+#ifdef MUSEUM_MODULE
+	register_museum();
+#endif
+#ifdef ARENA_MODULE
+	register_arena();
+#endif
 /*	register_dungeon(); */
 
 	init_data(xmlfile?xmlfile:"eressea.xml");
@@ -1676,14 +1711,6 @@ main(int argc, char *argv[])
 #if NEW_RESOURCEGROWTH
 	init_rawmaterials();
 #endif
-
-#ifdef MUSEUM_MODULE
-	init_museum();
-#endif
-#ifdef ARENA_MODULE
-	init_arena();
-#endif
-	init_xmas2000();
 
 	init_gmcmd();
 
@@ -1718,6 +1745,7 @@ main(int argc, char *argv[])
 	setminmax();
 	srand(time((time_t *) NULL));
 
+	frame_regions();
 	if (autoseeding) {
 		runautoseed();
 		remove_empty_units();

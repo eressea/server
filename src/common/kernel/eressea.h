@@ -1169,9 +1169,9 @@ extern const char * dbrace(const struct race * rc);
 extern void set_param(struct param ** p, const char * name, const char * data);
 extern const char* get_param(const struct param * p, const char * name);
 
-extern int NMRTimeout();
-extern int LongHunger();
-extern boolean TradeDisabled();
+extern int NMRTimeout(void);
+extern int LongHunger(void);
+extern boolean TradeDisabled(void);
 extern int SkillCap(skill_t sk);
 
 #ifdef __cplusplus
