@@ -1,0 +1,22 @@
+SubDir TOP common gamecode ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/../kernel ;
+SubDirHdrs $(SUBDIR)/../util ;
+SubDirHdrs $(SUBDIR)/.. ;
+SubDirHdrs $(SUBDIR)/../.. ;
+
+SOURCES =
+ creation.c
+ creport.c
+ economy.c
+ laws.c
+ luck.c
+ monster.c
+ randenc.c
+ report.c
+ spy.c
+ study.c
+ ;
+
+Library gamecode : $(SOURCES) ;

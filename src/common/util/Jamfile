@@ -1,0 +1,35 @@
+SubDir TOP common util ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/.. ;
+SubDirHdrs $(SUBDIR)/../.. ;
+
+SOURCES =
+ attrib.c
+ base36.c
+ command.c
+ crmessage.c
+ cvector.c
+ dice.c
+ event.c
+ functions.c
+ goodies.c
+ graph.c
+ language.c
+ lists.c
+ log.c
+ message.c
+ nrmessage.c
+ rand.c
+ resolve.c
+ sql.c
+ strncpy.c
+ translation.c
+ umlaut.c
+ vmap.c
+ vset.c
+ windir.c
+ xml.c
+ ;
+
+Library util : $(SOURCES) ;

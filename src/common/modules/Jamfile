@@ -1,0 +1,28 @@
+SubDir TOP common modules ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/../gamecode ;
+SubDirHdrs $(SUBDIR)/../kernel ;
+SubDirHdrs $(SUBDIR)/../util ;
+SubDirHdrs $(SUBDIR)/.. ;
+SubDirHdrs $(SUBDIR)/../.. ;
+
+SOURCES =
+ alliance.c
+ arena.c
+ dungeon.c
+ gmcmd.c
+ infocmd.c
+ museum.c
+ oceannames.c
+ score.c
+ victoryconditions.c
+ weather.c
+ xecmd.c
+ xmas2000.c
+ xmas2001.c
+ xmas2002.c
+ xmas.c
+ ;
+
+Library modules : $(SOURCES) ;

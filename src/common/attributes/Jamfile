@@ -1,0 +1,36 @@
+SubDir TOP common attributes ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/../gamecode ;
+SubDirHdrs $(SUBDIR)/../kernel ;
+SubDirHdrs $(SUBDIR)/../util ;
+SubDirHdrs $(SUBDIR)/.. ;
+SubDirHdrs $(SUBDIR)/../.. ;
+
+SOURCES =
+ aggressive.c
+ at_movement.c
+ attributes.c
+ fleechance.c
+ follow.c
+ giveitem.c
+ gm.c
+ hate.c
+ iceberg.c
+ key.c
+ matmod.c
+ moved.c
+ option.c
+ orcification.c
+ otherfaction.c
+ overrideroads.c
+ racename.c
+ raceprefix.c
+ reduceproduction.c
+ synonym.c
+ targetregion.c
+ ugroup.c
+ viewrange.c
+ ;
+
+Library attributes : $(SOURCES) ;

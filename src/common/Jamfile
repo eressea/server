@@ -1,0 +1,11 @@
+SubDir TOP common ;
+
+SubInclude TOP common kernel ;
+SubInclude TOP common gamecode ;
+SubInclude TOP common spells ;
+SubInclude TOP common races ;
+SubInclude TOP common triggers ;
+SubInclude TOP common util ;
+SubInclude TOP common attributes ;
+SubInclude TOP common modules ;
+SubInclude TOP common items ;

@@ -1,0 +1,17 @@
+SubDir TOP eressea ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/../common/gamecode ;
+SubDirHdrs $(SUBDIR)/../common/kernel ;
+SubDirHdrs $(SUBDIR)/../common/util ;
+SubDirHdrs $(SUBDIR)/../common ;
+SubDirHdrs $(SUBDIR)/.. ;
+
+SOURCES =
+ korrektur.c
+ main.c
+ ;
+
+Main eressea : $(SOURCES) ;
+LinkLibraries eressea : kernel gamecode modules util items attributes spells races triggers ;
+LINKLIBS on eressea += -lm ;

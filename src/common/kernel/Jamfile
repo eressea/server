@@ -1,0 +1,46 @@
+SubDir TOP common kernel ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/../util ;
+SubDirHdrs $(SUBDIR)/.. ;
+SubDirHdrs $(SUBDIR)/../.. ;
+
+SOURCES =
+ alchemy.c
+ battle.c
+ border.c
+ build.c
+ building.c
+ combatspells.c
+ curse.c
+ eressea.c
+ faction.c
+ group.c
+ item.c
+ karma.c
+ magic.c
+ message.c
+ movement.c
+ names.c
+ objtypes.c
+ orders.c
+ pathfinder.c
+ plane.c
+ player.c
+ pool.c
+ race.c
+ region.c
+ render.c
+ reports.c
+ resources.c
+ save.c
+ ship.c
+ skill.c
+ spell.c
+ teleport.c
+ terrain.c
+ ugroup.c
+ unit.c
+ ;
+
+Library kernel : $(SOURCES) ;

@@ -1,0 +1,23 @@
+SubDir TOP mapper ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/../common/gamecode ;
+SubDirHdrs $(SUBDIR)/../common/kernel ;
+SubDirHdrs $(SUBDIR)/../common/util ;
+SubDirHdrs $(SUBDIR)/../common ;
+SubDirHdrs $(SUBDIR)/.. ;
+
+SOURCES =
+ autoseed.c
+ logging.c
+ map_modify.c
+ map_partei.c
+ mapper.c
+ map_region.c
+ map_tools.c
+ map_units.c
+ ;
+
+Main mapper : $(SOURCES) ;
+LinkLibraries mapper : kernel gamecode triggers spells items races attributes modules util ;
+LINKLIBS on mapper += -lm -lncurses ;

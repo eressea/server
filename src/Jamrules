@@ -1,0 +1,56 @@
+if ! $(DISTCC_HOSTS) {
+} else {
+  CC = distcc $(CC) ;
+  C++ = distcc $(C++) ;
+  Echo Compiling with distcc ;
+}
+
+if ! $(CCACHE_DIR) {
+} else {
+  CC = ccache $(CC) ;
+  C++ = ccache $(C++) ;
+  Echo Compiling with ccache ;
+}
+
+CCFLAGS += -Wall ;
+
+CCFLAGS += -Wwrite-strings 
+		   -Wstrict-prototypes 
+		   -Werror-implicit-function-declaration
+		   -Wno-char-subscripts 
+		   ;
+
+rule TargetDirectory
+{
+        # Now set up SEARCH_SOURCE, LOCATE_TARGET, SOURCE_GRIST
+        # These can be reset if needed.  For example, if the source
+        # directory should not hold object files, LOCATE_TARGET can
+        # subsequently be redefined.
+
+        local path = [ FDirName $(SUBDIR) $(TARGET_PREFIX) ] ;
+        SEARCH_SOURCE = $(SUBDIR) ;
+        LOCATE_SOURCE = $(ALL_LOCATE_TARGET) $(path) ;
+        LOCATE_TARGET = $(ALL_LOCATE_TARGET) $(path) ;
+        SOURCE_GRIST = $(path) ;
+        if $(DEBUG) = 1 {
+            SubDirCcFlags -g ;
+            SubDirC++Flags -g ;
+        }
+        else {
+            SubDirCcFlags -DNDEBUG ; 
+            SubDirC++Flags -DNDEBUG ;
+        }
+}
+
+if ! $(DEBUG) {
+   ECHO Assuming DEBUG=1 ;
+   DEBUG = 1 ;
+}
+
+if $(DEBUG) = 0 {
+   TARGET_PREFIX = Release ;
+}
+else {
+   TARGET_PREFIX = Debug ;
+}
+

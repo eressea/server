@@ -1,0 +1,23 @@
+SubDir TOP common items ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/../gamecode ;
+SubDirHdrs $(SUBDIR)/../kernel ;
+SubDirHdrs $(SUBDIR)/../util ;
+SubDirHdrs $(SUBDIR)/.. ;
+SubDirHdrs $(SUBDIR)/../.. ;
+
+SOURCES =
+ birthday_firework.c
+ catapultammo.c
+ demonseye.c
+ items.c
+ lmsreward.c
+ questkeys.c
+ racespoils.c
+ seed.c
+ weapons.c
+ xerewards.c
+ ;
+
+Library items : $(SOURCES) ;
