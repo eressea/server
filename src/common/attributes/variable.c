@@ -71,8 +71,8 @@ get_variable(attrib *a, const char *key)
 {
 	attrib *ap;
 
-	for(ap = a; ap; ap=ap->nexttype) {
-		if(strcmp(key, ((variable *)ap->data.v)->key)) {
+	for(ap = a_find(a, &at_variable); ap; ap=ap->nexttype) {
+		if(strcmp(key, ((variable *)ap->data.v)->key) == 0) {
 			break;
 		}
 	}
@@ -91,8 +91,8 @@ set_variable(attrib **app, const char *key, const char *value)
 
 	assert(value);
 
-	for(ap = *app; ap; ap=ap->nexttype) {
-		if(strcmp(key, ((variable *)ap->data.v)->key)) {
+	for(ap = a_find(*app, &at_variable); ap; ap=ap->nexttype) {
+		if(strcmp(key, ((variable *)ap->data.v)->key) == 0) {
 			break;
 		}
 	}
@@ -112,8 +112,8 @@ delete_variable(attrib **app, const char *key)
 {
 	attrib *ap;
 
-	for(ap = *app; ap; ap=ap->nexttype) {
-		if(strcmp(key, ((variable *)ap->data.v)->key)) {
+	for(ap = a_find(*app, &at_variable); ap; ap=ap->nexttype) {
+		if(strcmp(key, ((variable *)ap->data.v)->key) == 0) {
 			break;
 		}
 	}

@@ -16,7 +16,6 @@ function init_sphinxhints()
       end
     end
   end
-
 end
 
 init_sphinxhints()

@@ -412,12 +412,25 @@ typedef struct fctr_data {
   luabind::functor<void> * fptr;
 } fctr_data;
 
-static int
-fctr_handle(trigger * t, void * data)
+#include <exception>
+
+int __cdecl
+fctr_handle(struct trigger * tp, void * data)
 {
+  trigger * t = tp;
   event * evt = new event(NULL, (event_arg*)data);
   fctr_data * fd = (fctr_data*)t->data.v;
-  fd->fptr->operator()(fd->target, evt);
+  try {	
+    fd->fptr->operator()(fd->target, evt);
+  }
+  catch (luabind::error& e) {
+    lua_State* L = e.state();
+    const char* error = lua_tostring(L, -1);
+    log_error((error));
+    lua_pop(L, 1);
+    std::terminate();
+  }
+
   delete evt;
   return 0;
 }

@@ -406,7 +406,9 @@ const char *keywords[MAXKEYWORDS] =
 	"WERWESEN",
 	"XONTORMIA",
   "ALLIANZ",
+#ifdef HEROES
   "PROMOTION"
+#endif
 };
 
 const char *report_options[MAX_MSG] =
