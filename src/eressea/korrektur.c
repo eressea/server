@@ -2620,7 +2620,7 @@ orc_conversion(void)
 
 		for(f=factions; f; f=f->next) {
 			if(f->race == new_race[RC_ORC]) {
-				f->race == new_race[RC_URUK];
+				f->race = new_race[RC_URUK];
 			}
 			for(u=f->units; u; u=u->next) {
 				if(u->race == new_race[RC_ORC]) {
