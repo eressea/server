@@ -976,7 +976,9 @@ drain_exp(unit *u, int n)
 	}
 	if (sk != NOSKILL) {
 		n = min(n, get_skill(u, sk));
-		change_skill(u, sk, -1);
+		if (learn_skill(u, sk, n) {
+			change_skill(u, sk, -1);
+		}
 	}
 }
 #endif
