@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: mapper.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: mapper.c,v 1.3 2001/01/28 08:20:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -22,6 +22,7 @@
 #include <eressea.h>
 #include "mapper.h"
 
+#include <attributes/attributes.h>
 #include <triggers/triggers.h>
 #include <items/weapons.h>
 
@@ -1095,7 +1096,7 @@ Exit(int level)
 void
 usage(void)
 {
-	fprintf(stderr, "mapper [-d datafile] [-c x,y]\n");
+	fprintf(stderr, "mapper [-b basedir] [-d datadir] [-o datafile] [-c x,y]\n");
 	exit(0);
 }
 
@@ -1120,6 +1121,10 @@ setminmax(void)
 }
 
 extern boolean quiet;
+
+extern char * g_reportdir;
+extern char * g_datadir;
+extern char * g_basedir;
 
 int
 main(int argc, char *argv[])
@@ -1164,10 +1169,13 @@ main(int argc, char *argv[])
 				}
 				break;
 			case 'd':
-				if (argv[i][2])
-					strcpy(datafile, (char *) (argv[i] + 2));
-				else
-					strcpy(datafile, argv[++i]);
+				g_datadir = argv[++i];
+				break;
+			case 'o':
+				strcpy(datafile, argv[++i]);
+				break;
+			case 'b':
+				g_basedir = argv[++i];
 				break;
 			case 'c':
 				if (argv[i][2])
@@ -1188,6 +1196,7 @@ main(int argc, char *argv[])
 	initgame();
 	register_triggers();
 	init_locales();
+	init_attributes();
 
 	init_resources();
 	init_weapons();

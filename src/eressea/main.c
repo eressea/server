@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.3 2001/01/28 08:01:52 enno Exp $
+ *	$Id: main.c,v 1.4 2001/01/28 08:20:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -623,6 +623,7 @@ main(int argc, char *argv[])
 				break;
 			case 'f':
 				i++;
+			case 'b':
 			case 't':
 			case 'x':
 				i++;

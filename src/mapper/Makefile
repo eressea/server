@@ -11,14 +11,9 @@ include ../Makefile.include
 ## more definitions
 
 INCLUDES  += \
-	-I../util \
-	-I../kernel \
-	-I../spells \
-	-I../items \
-	-I../triggers \
-	-I../modules \
-	-I../races \
-	-I../attributes
+	-I../common/util \
+	-I../common/kernel \
+	-I../common
 
 LIBS      += \
 	-le-modules \
