@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.12 2001/02/11 10:06:07 enno Exp $
+ *	$Id: laws.c,v 1.13 2001/02/11 12:10:58 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2110,6 +2110,7 @@ resolve_ship(void * id) {
    return findship((int)id);
 }
 
+#if 0
 static void
 reorder_owners(region * r)
 {
@@ -2165,8 +2166,8 @@ reorder_owners(region * r)
 		up = &u->next;
 	}
 }
+#endif
 
-#if 0
 static void
 reorder_owners(region * r)
 {
@@ -2194,6 +2195,11 @@ reorder_owners(region * r)
 			}
 			us[i] = NULL;
 		}
+		u = buildingowner(r, b);
+		if (!fval(u, FL_OWNER)) {
+			fprintf(stderr, "WARNING: Gebäude %s hatte keinen Besitzer. Setze %s\n", buildingname(b), unitname(u));
+			fset(u, FL_OWNER);
+		}
 	}
 	for (i=0;i!=end;++i) if (us[i] && us[i]->ship==NULL) {
 		*ui = us[i];
@@ -2213,10 +2219,14 @@ reorder_owners(region * r)
 			}
 			us[i] = NULL;
 		}
+		u = shipowner(r, sh);
+		if (!fval(u, FL_OWNER)) {
+			fprintf(stderr, "WARNING: Das Schiff %s hatte keinen Besitzer. Setze %s\n", shipname(sh), unitname(u));
+			fset(u, FL_OWNER);
+		}
 	}
 	*ui = NULL;
 }
-#endif
 
 static attrib_type at_number = {
 	"faction_renum", 
@@ -3018,10 +3028,10 @@ processorders (void)
 	puts(" - neue Nummern und Reihenfolge");
 	renumber();
 	reorder();
-#ifdef USE_GM_COMMANDS
+
 	puts(" - GM Kommandos");
 	gmcommands();
-#endif
+
 	for (r = regions;r;r=r->next) reorder_owners(r);
 
 	puts(" - Attribute altern");
