@@ -11,17 +11,17 @@ From="accounts@vinyambar.de"
 server=smtplib.SMTP('localhost')
 
 cursor=db.cursor()
-records=cursor.execute("SELECT users.id, users.password, users.email, users.balance, "+
+records=cursor.execute("SELECT u.id, u.password, u.email, "+
     "races.name, "+
     "games.name, games.info, subscriptions.id "+
-    "from users, games, subscriptions, races "+
-    "where users.id = subscriptions.user AND games.id = subscriptions.game "+
+    "from users u, games, subscriptions, races "+
+    "where u.id = subscriptions.user AND games.id = subscriptions.game "+
     "AND races.race = subscriptions.race AND races.locale='de' "+
     "AND subscriptions.status='NEW'")
 
 while (records>0):
     records = records - 1
-    customerid, passwd, email, balance, race, gamename, gameinfo, subscription = cursor.fetchone()
+    customerid, passwd, email, race, gamename, gameinfo, subscription = cursor.fetchone()
     
     Msg = ("From: "+From+"\nTo: "+email+"\nSubject: Vinyambar Anmeldung angenommen.\n\n"+
         "Deine Anmeldung für '"+gamename+"' wurde akzeptiert.\n"
@@ -31,7 +31,6 @@ while (records>0):
         "Auftragsnummer: " + str(int(subscription)) + "\n"+
         "Passwort:       " + passwd + "\n" +
         "Rasse:          " + race + "\n\n"+
-        "Kontostand:     " + str(balance) + " DEM\n\n"+
         "Bitte bewahre diese Mail sorgfältig auf, da Du deine Kundennummer und das\n"+
         "Passwort für das Spiel benötigst. Solltest Du noch Fragen zu Deiner \n"+
         "Anmeldung haben, wende Dich bitte an accounts@vinyambar.de.\n\n"+

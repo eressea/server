@@ -15,3 +15,4 @@ while k!=0:
     user = int(cursor.fetchone()[0])
     update=db.cursor()
     update.execute("INSERT INTO transactions (user,date,balance,description) VALUES ("+str(user)+", '"+date+"', -"+str(price)+", 'ZAT-"+str(game)+"')")
+

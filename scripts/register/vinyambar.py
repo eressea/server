@@ -39,7 +39,7 @@ def show_detail():
     while count>0:
 	count = count-1
 	balance, description, date = cursor.fetchone()
-	custdetail.addstr(line, 2, str(date)[0:10]+' - '+description+' - '+str(balance)+' DEM')
+	custdetail.addstr(line, 2, str(date)[0:10]+' - '+description+' - '+str(balance)+' EUR')
 	line=line+1
     custdetail.refresh()
 

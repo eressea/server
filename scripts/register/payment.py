@@ -23,7 +23,7 @@ i=cursor.execute('SELECT sum(balance) from transactions WHERE user='+str(userid)
 balance=cursor.fetchone()[0]
 if balance==None:
     balance=0.0
-print 'Balance for '+firstname+' '+lastname+' is '+str(balance)+' DEM'
+print 'Balance for '+firstname+' '+lastname+' is '+str(balance)+' EUR'
 
 if len(sys.argv)>4:
     cash=float(sys.argv[3])
@@ -47,9 +47,9 @@ if len(sys.argv)>4:
       "Kundennummer:       "+str(userid)+"\n"+
       "Eingangsdatum:      "+date+"\n"+
       "Transaktionsnummer: "+str(lastid)+"\n"+
-      "Alter Kontostand:   "+str(balance)+" DEM\n"+
-      "Zahlungseingang:    "+str(cash)+" DEM\n"+
-      "Neuer Kontostand:   "+str(balance+cash)+" DEM\n"+
+      "Alter Kontostand:   "+str(balance)+" EUR\n"+
+      "Zahlungseingang:    "+str(cash)+" EUR\n"+
+      "Neuer Kontostand:   "+str(balance+cash)+" EUR\n"+
       "Verwendungszweck:   "+reason+"\n"+
       "\n"+
       "Deine Zahlung ist eingegangen und wurde auf dein Spielerkonto verbucht.\n")
@@ -65,5 +65,5 @@ cursor.execute("select count(*) from users u, transactions t where u.id=t.user g
 count = cursor.fetchone()[0]
 cursor.execute("select sum(transactions.balance) from transactions")
 balance = cursor.fetchone()[0]
-print str(balance)+ " DEM (" + str(balance/1.955830)+ " EUR) in " + str(int(count)) + " Konten"
+print str(balance)+ " EUR (" + str(balance*1.955830)+ " DEM) in " + str(int(count)) + " Konten"
 
