@@ -296,6 +296,35 @@ crwritemap(void)
 	return 0;
 }
 
+static void
+readfactions(void)
+{
+	FILE * F = fopen("factions.txt", "r");
+	region * r;
+	locale * german = find_locale("de");
+	while (!feof(F)) {
+		int x, y;
+		region * r;
+		unit * u;
+		const race * rc;
+		locale * lang;
+		char email[64];
+		char racename[32];
+		char langname[32];
+		fscanf(F, "%d %d %s %s %s\n", &x, &y, langname, racename, email);
+
+		rc = findrace(racename, german);
+		r = findregion(x, y);
+		lang = find_locale(langname);
+		assert(rc && r && lang);
+		u = addplayer(r, email, rc, lang);
+		assert(u);
+		i_change(&u->items, finditemtype("stein", german), 30);
+		i_change(&u->items, finditemtype("holz", german), 30);
+	}
+	fclose(F);
+	modified = 1;
+}
 
 void
 drawmap(boolean maponly) {
@@ -554,7 +583,7 @@ modify_block(void)
 		r=t->r;
 		if (production(r)) {
 			switch (c) {
-				case 'n': 
+				case 'n':
 					rsetname(r, name);
 					break;
 				case 'p':
@@ -732,7 +761,10 @@ movearound(int rx, int ry) {
 					DisplayRegList(1);
 					ch = 999999;
 					break;
-				case '':
+				case 18: /* ctrl-r*/
+					readfactions();
+					break;
+				case 23: /* ctrl-w*/
 					crwritemap();
 					break;
 				case 'q':
@@ -1020,7 +1052,7 @@ movearound(int rx, int ry) {
 						unit *u, *un;
 						region *target_r;
 						static int tx = 0, ty = 0;
-						
+
 						tx=map_input(0,0,0,"Versetzen nach X-Koordinate", MINX, MAXX, tx);
 						ty=map_input(0,0,0,"Versetzen nach Y-Koordinate", MINY, MAXY, ty);
 						target_r = findregion(tx,ty);
@@ -1310,6 +1342,7 @@ extern boolean quiet;
 
 extern char * g_reportdir;
 extern char * g_datadir;
+extern char * g_resourcedir;
 extern char * g_basedir;
 
 int
@@ -1354,6 +1387,9 @@ main(int argc, char *argv[])
 			case 'd':
 				g_datadir = argv[++i];
 				break;
+			case 'r':
+				g_resourcedir = argv[++i];
+				break;
 			case 'o':
 				strcpy(datafile, argv[++i]);
 				break;
@@ -1392,7 +1428,7 @@ main(int argc, char *argv[])
 	init_attributes();
 #if NEW_RESOURCEGROWTH
 	init_rawmaterials();
-#endif 
+#endif
 
 	init_museum();
 	init_arena();

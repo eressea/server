@@ -585,7 +585,11 @@ ParteiListe(void)
 				return 0;
 			case 13:
 			case 10:
-				ModifyPartei(findfaction(atoi(pointer->s)));
+				{
+					char fno[5];
+					strncpy(fno, pointer->s, 4);
+					ModifyPartei(findfaction(atoi36(fno)));
+				}
 				break;
 			case 'D':
 				RemovePartei();
