@@ -4245,6 +4245,7 @@ sp_raisepeasantmob(castorder *co)
 	assert(rpeasants(r) >= 0);
 
 	u = createunit(r, findfaction(MONSTER_FACTION), n, new_race[RC_PEASANT]);
+  set_string(&u->name, "Aufgebrachte Bauern");
 	guard(u, GUARD_ALL);
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 1;	/* An rpeasants(r). */
@@ -4897,6 +4898,7 @@ sp_raisepeasants(castorder *co)
 	rsetpeasants(r, rpeasants(r) - bauern);
 
 	u2 = create_unit(r,mage->faction, bauern, new_race[RC_PEASANT], 0,"Wilder Bauernmob",mage);
+  set_string(&u2->name, "Erzürnte Bauern");
 
 	fset(u2, UFL_LOCKED);
 	fset(u2, UFL_PARTEITARNUNG);

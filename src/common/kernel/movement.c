@@ -1720,65 +1720,65 @@ kapitaen(region * r, ship * sh)
 }
 
 /* Segeln, Wandern, Reiten 
- * when this routine returns a non-zero value, movement for the region needs 
- * to be done again because of followers that got new MOVE orders. 
- * Setting FL_LONGACTION will prevent a unit from being handled more than once
- * by this routine 
- */
+* when this routine returns a non-zero value, movement for the region needs 
+* to be done again because of followers that got new MOVE orders. 
+* Setting FL_LONGACTION will prevent a unit from being handled more than once
+* by this routine 
+*/
 static int
 move(region * r, unit * u, boolean move_on_land)
 {
-	region *r2;
-	direction_t * route;
+  region *r2;
+  direction_t * route;
 
-	r2 = movewhere(r, u);
+  r2 = movewhere(r, u);
 
-	if (!r2) {
-		cmistake(u, findorder(u, u->thisorder), 71, MSG_MOVE);
-		return 0;
-	}
-	else if (u->ship && fval(u, UFL_OWNER))
-		route = sail(r, u, r2, move_on_land);
-	else
-		route = travel(r, u, r2, 0);
+  if (!r2) {
+    cmistake(u, findorder(u, u->thisorder), 71, MSG_MOVE);
+    return 0;
+  }
+  else if (u->ship && fval(u, UFL_OWNER))
+    route = sail(r, u, r2, move_on_land);
+  else
+    route = travel(r, u, r2, 0);
 
-	if (i_get(u->items, &it_demonseye)) {
-		direction_t d;
-		for (d=0;d!=MAXDIRECTIONS;++d) {
-			region * rc = rconnect(r2,d);
-			if (rc) {
-				sprintf(buf, "Im %s ist eine ungeheure magische Präsenz zu verspüren.",
-						locale_string(u->faction->locale, directions[back[d]]));
-				addmessage(rc, NULL, buf, MSG_EVENT, ML_IMPORTANT);
-			}
-		}
-	}
+  if (i_get(u->items, &it_demonseye)) {
+    direction_t d;
+    for (d=0;d!=MAXDIRECTIONS;++d) {
+      region * rc = rconnect(r2,d);
+      if (rc) {
+        sprintf(buf, "Im %s ist eine ungeheure magische Präsenz zu verspüren.",
+          locale_string(u->faction->locale, directions[back[d]]));
+        addmessage(rc, NULL, buf, MSG_EVENT, ML_IMPORTANT);
+      }
+    }
+  }
 
   if (u->region!=r) fset(u, UFL_LONGACTION);
   set_string(&u->thisorder, "");
 
   if (fval(u, UFL_FOLLOWED) && route && route[0]!=NODIRECTION) {
     int followers = 0;
-		unit *up; 
+    unit *up; 
     for (up=r->units;up;up=up->next) {
-			if (fval(up, UFL_FOLLOWING) && !fval(up, UFL_LONGACTION)) {
-				const attrib * a = a_findc(up->attribs, &at_follow);
-				if (a && a->data.v==u) {
-					/* wir basteln ihm ein NACH */
-					int k, i = 0;
-					strcpy(buf, locale_string(up->faction->locale, keywords[K_MOVE]));
-					while (route[i]!=NODIRECTION)
-						strcat(strcat(buf, " "), locale_string(up->faction->locale, directions[route[i++]]));
-					set_string(&up->thisorder, buf);
-					k = igetkeyword(up->thisorder, up->faction->locale);
-					assert(k==K_MOVE);
- 					++followers;
-				}
-			}
-	}
-	return followers;
-	}
-	   return 0;
+      if (fval(up, UFL_FOLLOWING) && !fval(up, UFL_LONGACTION)) {
+        const attrib * a = a_findc(up->attribs, &at_follow);
+        if (a && a->data.v==u) {
+          /* wir basteln ihm ein NACH */
+          int k, i = 0;
+          strcpy(buf, locale_string(up->faction->locale, keywords[K_MOVE]));
+          while (route[i]!=NODIRECTION)
+            strcat(strcat(buf, " "), locale_string(up->faction->locale, directions[route[i++]]));
+          set_string(&up->thisorder, buf);
+          k = igetkeyword(up->thisorder, up->faction->locale);
+          assert(k==K_MOVE);
+          ++followers;
+        }
+      }
+    }
+    return followers;
+  }
+  return 0;
 }
 
 typedef struct piracy_data {
@@ -2235,7 +2235,7 @@ movement(void)
           }
           break;
         }
-        if (*up==u) {
+        if (u->region==r) {
           /* not moved, use next unit */
           up = &u->next;
         } else if (*up && (*up)->region!=r) {
