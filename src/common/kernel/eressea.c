@@ -1787,6 +1787,7 @@ lastregion (faction * f)
 	region *r = f->last;
 	if (!r && f->units) {
 		for (r = firstregion(f); r; r = r->next) {
+			plane * p = rplane(r);
 			unit *u;
 			attrib *ru;
 			for (u = r->units; u; u = u->next) {
@@ -1808,6 +1809,10 @@ lastregion (faction * f)
 				continue;
 			if (check_leuchtturm(r, f))
 				f->last = r->next;
+			if (p && is_watcher(p, f)) {
+				f->first = r;
+				return r;
+			}
 		}
 	}
 	return f->last;
@@ -1823,6 +1828,7 @@ firstregion (faction * f)
 	for (r = regions; r; r = r->next) {
 		attrib *ru;
 		unit *u;
+		plane * p = rplane(r);
 		for (u = r->units; u; u = u->next) {
 			if (u->faction == f) {
 				f->first = r;
@@ -1839,6 +1845,10 @@ firstregion (faction * f)
 			}
 		}
 		if (check_leuchtturm(r, f)) {
+			f->first = r;
+			return r;
+		}
+		if (p && is_watcher(p, f)) {
 			f->first = r;
 			return r;
 		}

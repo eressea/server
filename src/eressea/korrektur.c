@@ -1917,12 +1917,13 @@ regatta_quest(void)
 {
 	plane * p = getplanebyname("Regatta");
 	if (p) {
+		fset(p, PFL_NOMONSTERS);
 		fset(p, PFL_SEESPECIAL);
 		return resize_plane(p, 40);
 #ifdef REGATTA_QUESTMASTER /* "gregorjochmann@gmx.de" */
 	} else {
 		region * center;
-		p = gm_addplane(40, PFL_NORECRUITS, "Regatta");
+		p = gm_addplane(40, PFL_NORECRUITS|PFL_NOMONSTERS|PFL_SEESPECIAL, "Regatta");
 		center = findregion(p->minx+(p->maxx-p->minx)/2, p->miny+(p->maxy-p->miny)/2);
 		gm_addfaction(REGATTA_QUESTMASTER, p, center);
 #endif

@@ -255,3 +255,13 @@ read_plane_reference(plane ** pp, FILE * F)
 	if (*pp==NULL) ur_add((void*)i, (void**)pp, resolve_plane);
 	return AT_READ_OK;
 }
+
+boolean
+is_watcher(const struct plane * p, const struct faction * f)
+{
+	struct watcher * w;
+	if (!p) return false;
+	w = p->watchers;
+	while (w && w->faction!=f) w=w->next;
+	return (w!=NULL);
+}
