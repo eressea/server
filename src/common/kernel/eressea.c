@@ -738,32 +738,31 @@ autoalliance(const plane * pl, const faction * sf, const faction * f2)
 }
 
 static int
-alliance(const ally * sf, const faction * f, int mode)
+alliance(const ally * sf, int mode)
 {
-	int nmode = 0;
-	while (sf) {
-		if (sf->faction == f) {
-			nmode = sf->status & mode;
-			break;
-		}
-		sf = sf->next;
-	}
-	return nmode;
+  if (sf==NULL) return 0;
+	return sf->status & mode;
 }
 
 int
-alliedgroup(const struct plane * pl, const struct faction * f, const struct ally * sf, const struct faction * f2, int mode)
-{
-	return alliance(sf, f2, mode) | (mode & autoalliance(pl, f, f2));
-}
-
-int
-alliedfaction(const struct plane * pl, const faction * f, const faction * f2, int mode)
+alliedgroup(const struct plane * pl, const struct faction * f, 
+            const struct faction * f2, const struct ally * sf, int mode)
 {
 #ifdef ALLIANCES
 	if (f->alliance!=f2->alliance) return 0;
 #endif
-	return alliedgroup(pl, f, f->allies, f2, mode);
+  while (sf && sf->faction!=f2) sf=sf->next;
+  if (sf==NULL) {
+    return mode & autoalliance(pl, f, f2);
+  }
+  return alliance(sf, mode) | (mode & autoalliance(pl, f, f2));
+}
+
+int
+alliedfaction(const struct plane * pl, const struct faction * f, 
+              const struct faction * f2, int mode)
+{
+	return alliedgroup(pl, f, f2, f->allies, mode);
 }
 
 /* Die Gruppe von Einheit u hat helfe zu f2 gesetzt. */
@@ -786,7 +785,7 @@ alliedunit(const unit * u, const faction * f2, int mode)
 	sf = u->faction->allies;
 	a = a_find(u->attribs, &at_group);
 	if (a!=NULL) sf = ((group*)a->data.v)->allies;
-	return alliance(sf, f2, mode) | (mode & autoalliance(pl, u->faction, f2));
+	return alliance(sf, mode) | (mode & autoalliance(pl, u->faction, f2));
 }
 
 boolean

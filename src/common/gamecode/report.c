@@ -1635,76 +1635,80 @@ order_template(FILE * F, faction * f)
 }
 
 static void
-show_allies(const faction * f, const ally * sf)
+show_allies(const faction * f, const ally * allies)
 {
 	int allierte = 0;
 	int i=0, h, hh = 0;
 	int dh = 0;
-	const ally * sff;
-	for (sff = sf; sff; sff = sff->next) {
-		if (alliedfaction(NULL, f, sf->faction, HELP_ALL) && sff->status > 0 && sff->status <= HELP_ALL) {
-			allierte++;
-		}
+	const ally * sf;
+	for (sf = allies; sf; sf = sf->next) {
+    int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
+#ifdef ALLIANCES
+  	if (f->alliance!=sf->faction->alliance) continue;
+#endif
+		if (mode > 0) ++allierte;
 	}
 
-	while (sf) {
-		if (alliedfaction(NULL, f, sf->faction, HELP_ALL) && sf->status > 0) {
-			i++;
-			if (dh) {
-				if (i == allierte)
-					scat(" und ");
-				else
-					scat(", ");
-			}
-			dh = 1;
-			hh = 0;
-			scat(factionname(sf->faction));
-			scat(" (");
-			if (sf->status == HELP_ALL) {
-				scat("Alles");
-			} else
-				for (h = 1; h < HELP_ALL; h *= 2) {
-					if ((sf->status & h) == h)
-						switch (h) {
-						case HELP_MONEY:
-							scat("Silber");
-							hh = 1;
-							break;
-						case HELP_FIGHT:
-							if (hh)
-								scat(", ");
-							scat("Kämpfe");
-							hh = 1;
-							break;
-						case HELP_OBSERVE:
-							if (hh)
-								scat(", ");
-							scat("Wahrnehmung");
-							hh = 1;
-							break;
-						case HELP_GIVE:
-							if (hh)
-								scat(", ");
-							scat("Gib");
-							hh = 1;
-							break;
-						case HELP_GUARD:
-							if (hh)
-								scat(", ");
-							scat("Bewache");
-							hh = 1;
-							break;
-						case HELP_FSTEALTH:
-							if (hh)
-								scat(", ");
-							scat("Parteitarnung");
-							hh = 1;
-							break;
-						}
-				}
-			scat(")");
+	for (sf = allies; sf; sf = sf->next) {
+    int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
+#ifdef ALLIANCES
+  	if (f->alliance!=sf->faction->alliance) continue;
+#endif
+		if (mode <= 0) continue;
+		i++;
+		if (dh) {
+			if (i == allierte)
+				scat(" und ");
+			else
+				scat(", ");
 		}
-		sf = sf->next;
+		dh = 1;
+		hh = 0;
+		scat(factionname(sf->faction));
+		scat(" (");
+		if (mode == HELP_ALL) {
+			scat("Alles");
+		} else
+			for (h = 1; h < HELP_ALL; h *= 2) {
+				if ((mode & h) == h)
+					switch (h) {
+					case HELP_MONEY:
+						scat("Silber");
+						hh = 1;
+						break;
+					case HELP_FIGHT:
+						if (hh)
+							scat(", ");
+						scat("Kämpfe");
+						hh = 1;
+						break;
+					case HELP_OBSERVE:
+						if (hh)
+							scat(", ");
+						scat("Wahrnehmung");
+						hh = 1;
+						break;
+					case HELP_GIVE:
+						if (hh)
+							scat(", ");
+						scat("Gib");
+						hh = 1;
+						break;
+					case HELP_GUARD:
+						if (hh)
+							scat(", ");
+						scat("Bewache");
+						hh = 1;
+						break;
+					case HELP_FSTEALTH:
+						if (hh)
+							scat(", ");
+						scat("Parteitarnung");
+						hh = 1;
+						break;
+					}
+			}
+		scat(")");
 	}
 }
 

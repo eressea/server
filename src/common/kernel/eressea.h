@@ -1020,8 +1020,11 @@ struct unit *getunit(const struct region * r, const struct faction * f);
 int read_unitid(const struct faction * f, const struct region * r);
 
 extern int alliedunit(const struct unit * u, const struct faction * f2, int mode);
-extern int alliedfaction(const struct plane * pl, const struct faction * f, const struct faction * f2, int mode);
-extern int alliedgroup(const struct plane * pl, const struct faction * f, const struct ally * sf, const struct faction * f2, int mode);
+extern int alliedfaction(const struct plane * pl, const struct faction * f, 
+                         const struct faction * f2, int mode);
+extern int alliedgroup(const struct plane * pl, const struct faction * f, 
+                       const struct faction * f2, const struct ally * sf, 
+                       int mode);
 
 struct faction *findfaction(int n);
 struct faction *getfaction(void);

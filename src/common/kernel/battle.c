@@ -346,8 +346,10 @@ allysfm(const side * s, const faction * f, int mode)
 static int
 allysfm(const side * s, const faction * f, int mode)
 {
-	if (s->bf->faction==f) return true;
-	if (s->group) return alliedgroup(s->battle->plane, s->bf->faction, s->group->allies, f, mode);
+	if (s->bf->faction==f) return mode;
+  if (s->group) {
+    return alliedgroup(s->battle->plane, s->bf->faction, f, s->group->allies, mode);
+  }
 	return alliedfaction(s->battle->plane, s->bf->faction, f, mode);
 }
 #endif

@@ -86,6 +86,10 @@ LIB32=link.exe -lib
 # PROP Default_Filter "*.h"
 # Begin Source File
 
+SOURCE=.\aggressive.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\attributes.h
 # End Source File
 # Begin Source File
@@ -173,6 +177,10 @@ SOURCE=.\ugroup.h
 SOURCE=.\viewrange.h
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\aggressive.c
+# End Source File
 # Begin Source File
 
 SOURCE=.\at_movement.c
