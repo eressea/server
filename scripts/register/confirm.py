@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+# this script picks all NEW users from the database, (subscribed through 
+# the web interface), and sends them their customer-id and password
+# if the mail was sent cuccessfully, it sets the user to the 'WAITING'
+# state, meaning that we wait for his confirmation.
+
 import sys
 import MySQLdb
 import smtplib
@@ -39,14 +44,13 @@ while records>0:
 	"    http://www.vinyambar.de/accounts.shtml\n"+
 	"\n"+
         "Das Vinyambar-Team")
+    now = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
     try:
         server.sendmail(From, email, Msg)
-	print "Sent confirmation to "+email+"."
+	print "[%s] USER %d - UPDATE: status='WAITING' " % (now, customerid)
         update=db.cursor()
-        update.execute("UPDATE users set status='CONFIRMED' WHERE id="+
-            str(int(customerid)));
+        update.execute("UPDATE users set status='WAITING' WHERE id="+
+            str(int(customerid)))
     except:
-        print "Could not send Error to "+email
-        print "Reason was: '"+Reason+"'"
-        print "Exception is:", sys.exc_type, ":", sys.exc_value
+	print "[%s] USER %d - ERROR: could not send to %s: %s " % (now, customerid, email, sys.exc_indo())
 	sys.exit()
