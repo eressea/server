@@ -951,9 +951,8 @@ extern param_t findparam(const char *s, const struct locale * lang);
 extern param_t igetparam(const char *s, const struct locale * lang);
 extern param_t getparam(const struct locale * lang);
 
-#define BASE36_VERSION 93
 extern int atoi36(const char * s);
-#define getid() ((global.data_version<BASE36_VERSION)?geti():atoi36(getstrtoken()))
+#define getid() atoi36(getstrtoken())
 #define getstruct unitid() getid()
 #define unitid(x) itoa36((x)->no)
 

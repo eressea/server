@@ -134,20 +134,10 @@ cfopen(const char *filename, const char *mode)
 
 /* Dummy-Funktion für die Kompatibilität */
 
-#define rid(F) ((global.data_version<BASE36_VERSION)?ri(F):ri36(F))
+#define rid(F) ri36(F)
 
-int nextc;
-
-#ifdef OLD_RC
-void
-rc(FILE * F)
-{
-	nextc = getc(F);
-}
-
-#else
+static int nextc;
 #define rc(F) (nextc = getc(F))
-#endif
 
 #undef CONVERT_DBLINK
 #ifdef CONVERT_DBLINK
@@ -865,13 +855,14 @@ ws(FILE * F, const char *s)
 	fputs("\" ", F);
 }
 
-void
+static void
 wi(FILE * F, int n)
 {
 	fprintf(F, "%d ", n);
 }
 
-void wi36(FILE * F, int n)
+static void 
+wi36(FILE * F, int n)
 {
 	fprintf(F, "%s ", itoa36(n));
 }
@@ -897,8 +888,7 @@ write_items(FILE *F, item *ilist)
 {
 	item * itm;
 	for (itm=ilist;itm;itm=itm->next) if (itm->number) {
-		whs(F, resourcename(itm->type->rtype, 0));
-		wi(F, itm->number);
+    fprintf(F, "%s %i ", resourcename(itm->type->rtype, 0), itm->number);
 	}
 	fputs("end ", F);
 }

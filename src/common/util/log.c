@@ -113,11 +113,9 @@ _log_error(const char * format, ...)
       vfprintf(stderr, format, marker);
       va_end(marker);
     }
-    if (flags & LOG_FLUSH) {
-      log_flush();
+    log_flush();
     }
   }
-}
 
 void 
 _log_info(unsigned int flag, const char * format, ...)

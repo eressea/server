@@ -270,7 +270,25 @@ unit_setmagic(unit& u, const char * type)
 static void
 unit_addorder(unit& u, const char * str)
 {
-  addstrlist(&u.orders, str);
+  char buf[1024];
+  char * s = buf;
+  boolean quote = false;
+  while (*str) {
+    switch (*str) {
+      case '"':
+        quote=!quote;
+        break;
+      case ' ':
+        if (quote) *s++ = SPACE_REPLACEMENT;
+        else *s++ = ' ';
+        break;
+      default:
+        *s++ = *str;
+    }
+    ++str;
+  }
+  *s=0;
+  addstrlist(&u.orders, buf);
   u.faction->lastorders = turn;
 }
 

@@ -1101,9 +1101,12 @@ check_phoenix(void)
 		}
 	}
 
+        f = findfaction(MONSTER_FACTION);
+        if (f==NULL) return;
+
 	/* it is not, so we create it */
 	r = random_land_region();
-	phoenix = createunit(r, findfaction(MONSTER_FACTION), 1, phoenix_race);
+	phoenix = createunit(r, f, 1, phoenix_race);
 	phoenix->name = strdup("Der Phönix");
 
 	/* TODO: generate an appropriate region message */

@@ -61,10 +61,6 @@ obj_ID default_ID;
 /* die müssen schon ein value zurückliefern... */
 static char * notimplemented_desc(void *p) { unused(p); assert(0); return 0; }
 
-static void cannot_destroy(void *p) {
-	fprintf(stderr, "** destroy-method unzerstörbares Objekt <%p> aufgerufen! **\n", p);
-}
-
 /****** Unit ******/
 static obj_ID unit_ID(void *p) {
 	obj_ID id; id.a = p ? ((unit *)p)->no : 0; id.b = 0; return id;
@@ -74,9 +70,6 @@ static void * unit_find(obj_ID id) {
 }
 static attrib ** unit_attribs( void *p ) {
 	return &((unit *)p)->attribs;
-}
-static void * unit_deref( void *pp ) {
-	return (void *) (*((unit **)pp));
 }
 static void unit_set( void *pp, void *p ) {
 	*(unit **)pp = (unit *)p;
@@ -93,9 +86,6 @@ static void * region_find(obj_ID id) {
 static attrib ** region_attribs( void *p ) {
 	return &((region *)p)->attribs;
 }
-static void * region_deref( void *pp ) {
-	return (void *) (*((region **)pp));
-}
 static void region_set( void *pp, void *p ) {
 	*(region **)pp = (region *)p;
 }
@@ -109,9 +99,6 @@ static void * building_find(obj_ID id) {
 }
 static attrib ** building_attribs( void *p ) {
 	return &((building *)p)->attribs;
-}
-static void * building_deref( void *pp ) {
-	return (void *) (*((building **)pp));
 }
 static void building_set( void *pp, void *p ) {
 	*(building **)pp = (building *)p;
@@ -127,9 +114,6 @@ static obj_ID ship_ID(void *p) {
 static attrib ** ship_attribs( void *p ) {
 	return &((ship *)p)->attribs;
 }
-static void * ship_deref( void *pp ) {
-	return (void *) (*((ship **)pp));
-}
 static void ship_set( void *pp, void *p ) {
 	*(ship **)pp = (ship *)p;
 }
@@ -143,9 +127,6 @@ static obj_ID faction_ID(void *p) {
 }
 static attrib ** faction_attribs( void *p ) {
 	return &((faction *)p)->attribs;
-}
-static void * faction_deref( void *pp ) {
-	return (void *) (*((faction **)pp));
 }
 static void faction_set( void *pp, void *p ) {
 	*(faction **)pp = (faction *)p;

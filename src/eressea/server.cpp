@@ -627,6 +627,7 @@ main(int argc, char *argv[])
   int i;
   char zText[MAX_PATH];
 
+  global.data_version = RELEASE_VERSION;
   sqlpatch = true;
   log_open("eressea.log");
   printf("\n%s PBEM host\n"

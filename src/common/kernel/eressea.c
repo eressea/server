@@ -1205,43 +1205,53 @@ count_maxmigrants(const faction * f)
  * Aufruf inititialisiert wird? */
 
 const char *
-igetstrtoken (const char *s1)
+igetstrtoken(const char * initstr)
 {
-	int i;
-	static const char *s;
-	static char lbuf[DISPLAYSIZE + 1];
+  static const unsigned char *s;
+  static char lbuf[DISPLAYSIZE + 1];
+  char * cursor = lbuf;
+  char quotechar = 0;
+  boolean escape = false;
 
-	if (s1) s = s1;
-	while (*s == ' ')
-		s++;
-	i = 0;
+  if (initstr!=NULL) s = (const unsigned char*)initstr;
 
-	while (*s && *s != ' ' && i < DISPLAYSIZE) {
-		lbuf[i] = (*s);
+  while (isspace(*s)) ++s;
 
-		/* Hier wird space_replacement wieder in space zurueck
-		 * verwandelt, ausser wenn es nach einem escape_char kommt. Im
-		 * letzteren Fall wird escape_char durch space_replacement
-		 * ersetzt, statt den aktuellen char einfach dran zu haengen. */
+  while (*s && cursor-lbuf < DISPLAYSIZE) {
+    if (escape) {
+      *cursor++ = *s++;
+    } else if (isspace(*s)) {
+      if (quotechar==0) break;
+      *cursor++ = *s++;
+    } else if (*s=='"' || *s=='\'') {
+      if (*s==quotechar) {
+        ++s;
+        break;
+      } else if (quotechar==0) {
+        quotechar = *s;
+        ++s;
+      } else {
+        *cursor++ = *s++;
+      }
+    } else if (*s==SPACE_REPLACEMENT) {
+      *cursor++ = ' ';
+      ++s;
+    } else if (*s==ESCAPE_CHAR) {
+      escape = true;
+      ++s;
+    } else {
+      *cursor++ = *s++;
+    }
+  }
 
-		if (*s == SPACE_REPLACEMENT) {
-			if (i > 0 && lbuf[i - 1] == ESCAPE_CHAR)
-				lbuf[--i] = SPACE_REPLACEMENT;
-			else
-				lbuf[i] = ' ';
-		}
-		i++;
-		s++;
-	}
-
-	lbuf[i] = 0;
-	return lbuf;
+  *cursor = '\0';
+  return lbuf;
 }
 
 const char *
-getstrtoken (void)
+getstrtoken(void)
 {
-	return igetstrtoken (0);
+  return igetstrtoken (0);
 }
 
 int

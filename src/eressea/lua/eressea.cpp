@@ -105,6 +105,13 @@ lua_setstring(const char * lname, const char * key, const char * str)
   locale_setstring(lang, key, str);
 }
 
+static const char *
+lua_getstring(const char * lname, const char * key)
+{
+  struct locale * lang = find_locale(lname);
+  return locale_getstring(lang, key);
+}
+
 void
 bind_eressea(lua_State * L)
 {
@@ -120,7 +127,10 @@ bind_eressea(lua_State * L)
     def("add_equipment", &lua_addequipment),
     def("get_turn", &get_turn),
     def("remove_empty_units", &remove_empty_units),
+
+    /* localization: */
     def("set_string", &lua_setstring),
+    def("get_string", &lua_getstring),
 
     def("set_flag", &set_flag),
     def("get_flag", &get_flag),

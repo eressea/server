@@ -2629,9 +2629,6 @@ reports(void)
 #endif
 	makedir(reportpath(), 0700);
 
-	if (global.data_version<BASE36_VERSION) base36conversion();
-	/* öffnet file BAT (mailit batch file) */
-
 	BAT = openbatch();
 
 	wants_report = 1 << O_REPORT;
