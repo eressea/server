@@ -58,7 +58,7 @@ SpecialFunctionUnit(unit *u)
 	case 'b':
 	case 'B':
 		{
-			ship *sh = new_ship(&st_balloon, u->region);
+			ship *sh = new_ship(st_find("balloon"), u->region);
 			addlist(&u->region->ships, sh);
 			set_string(&sh->name, "Ballon");
 			set_string(&sh->display, "Eine groﬂe leuchtendrote Werbeaufschrift "

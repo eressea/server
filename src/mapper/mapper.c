@@ -40,6 +40,7 @@
 #include <region.h>
 #include <reports.h>
 #include <save.h>
+#include <ship.h>
 #include <unit.h>
 #include <plane.h>
 #include <teleport.h>
