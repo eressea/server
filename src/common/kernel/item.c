@@ -33,10 +33,15 @@
 #include "skill.h"
 #include "unit.h"
 
+/* triggers includes */
+#include <triggers/changerace.h>
+#include <triggers/timeout.h>
+
 /* util includes */
-#include <message.h>
-#include <functions.h>
-#include <goodies.h>
+#include <util/event.h>
+#include <util/functions.h>
+#include <util/goodies.h>
+#include <util/message.h>
 
 /* libc includes */
 #include <assert.h>

@@ -1290,6 +1290,7 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
                   if (can_survive(ut, current)) {
                     travel_route(ut, ut->region, route);
                     move_unit(ut, current, NULL);
+                    // FOLGE!
                   } else {
                     cmistake(u, u->thisorder, 287, MSG_MOVE);
                     cmistake(ut, ut->thisorder, 230, MSG_MOVE);

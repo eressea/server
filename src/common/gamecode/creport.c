@@ -245,13 +245,20 @@ print_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
 		if (fval(a->type, ATF_CURSE)) {
 
 			c = (curse *)a->data.v;
-			if (c->type->curseinfo){
-				if (c->type->cansee){
+			if (c->type->curseinfo) {
+				if (c->type->cansee) {
 					self = c->type->cansee(viewer, obj, typ, c, self);
 				}
 				dh = c->type->curseinfo(viewer->locale, obj, typ, c, self);
-			}
-			if (dh == 1) {
+      }
+      if (dh==0) {
+        if (c->type->info_str!=NULL) {
+          strcpy(buf, c->type->info_str);
+        } else {
+          sprintf(buf, "an unknown curse lies on the region. (%s)", itoa36(c->no));
+        }
+      }
+			if (dh==1) {
 				if (!header) {
 					header = 1;
 					fputs("EFFECTS\n", F);

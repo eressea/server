@@ -17,6 +17,14 @@
     <text locale="fr">"The power of $unit($mage) flows into the region and the trees which survived the spell appear stronger now."</text>
     <text locale="en">"The power of $unit($mage) flows into the region and the trees which survived the spell appear stronger now."</text>
   </message>
+  <message name="curseinfo::riotzone" section="events">
+    <type>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Eine Wolke negativer Energie liegt über der Region. ($int36($id))"</text>
+    <text locale="fr">"A fog of negative energy enshrouds the region. ($int36($id))"</text>
+    <text locale="en">"A fog of negative energy enshrouds the region. ($int36($id))"</text>
+  </message>
   <message name="curseinfo::orcish" section="events">
     <type>
       <arg name="unit" type="unit"/>

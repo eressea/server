@@ -49,9 +49,12 @@ cinfo_unit(const struct locale * lang, const void * obj, typ_t typ, struct curse
 	assert(typ == TYP_UNIT);
 
 	msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
-	nr_render(msg, lang, buf, sizeof(buf), NULL);
-	msg_release(msg);
-	return 1;
+  if (msg==NULL) {
+    nr_render(msg, lang, buf, sizeof(buf), NULL);
+    msg_release(msg);
+    return 1;
+  }
+  return 0;
 }
 
 static int

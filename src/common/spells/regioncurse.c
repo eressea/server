@@ -50,8 +50,10 @@ cinfo_region(const struct locale * lang, const void * obj, typ_t typ, struct cur
 	if (msg) {
 		nr_render(msg, lang, buf, sizeof(buf), NULL);
 		msg_release(msg);
-	}
-	return 1;
+    return 1;
+  }
+  log_warning(("There is no curseinfo for %s.\n", c->type->cname));
+  return 0;
 }
 
 
@@ -78,11 +80,15 @@ cinfo_cursed_by_the_gods(const struct locale * lang, const void * obj, typ_t typ
 	} else {
 		msg = msg_message("curseinfo::godcurseocean", "id", c->no);
 	}
-	nr_render(msg, lang, buf, sizeof(buf), NULL);
-	msg_release(msg);
+  if (msg!=NULL) {
+    nr_render(msg, lang, buf, sizeof(buf), NULL);
+    msg_release(msg);
 
-	return 1;
+    return 1;
+  }
+  return 0;
 }
+
 static struct curse_type ct_godcursezone = {
 	"godcursezone",
 	CURSETYP_NORM, 0, (NO_MERGE),
@@ -113,11 +119,14 @@ cinfo_dreamcurse(const struct locale * lang, const void * obj, typ_t typ, curse 
 	} else {
 		msg = msg_message("curseinfo::baddream", "id", c->no);
 	}
-	nr_render(msg, lang, buf, sizeof(buf), NULL);
-	msg_release(msg);
-
-	return 1;
+  if (msg!=NULL) {
+    nr_render(msg, lang, buf, sizeof(buf), NULL);
+    msg_release(msg);
+    return 1;
+  }
+  return 0;
 }
+
 static struct curse_type ct_gbdream = { 
 	"gbdream",
 	CURSETYP_NORM, 0, (NO_MERGE),
@@ -147,11 +156,14 @@ cinfo_magicstreet(const struct locale * lang, const void * obj, typ_t typ, curse
 	} else {
 		msg = msg_message("curseinfo::magicstreetwarn", "id", c->no);
 	}
-	nr_render(msg, lang, buf, sizeof(buf), NULL);
-	msg_release(msg);
-
-	return 1;
+  if (msg!=NULL) {
+    nr_render(msg, lang, buf, sizeof(buf), NULL);
+    msg_release(msg);
+    return 1;
+  }
+	return 0;
 }
+
 static struct curse_type ct_magicstreet = {
 	"magicstreet",
 	CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
@@ -351,7 +363,7 @@ static struct curse_type ct_goodmagicresistancezone = {
 static struct curse_type ct_riotzone = {
 	"riotzone",
 	CURSETYP_NORM, 0, (M_DURATION),
-	"Eine Wolke negativer Energie liegt über der Region.",
+	NULL,
 	cinfo_region
 };
 static struct curse_type ct_holyground = {

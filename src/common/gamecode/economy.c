@@ -2466,35 +2466,36 @@ static void
 research_cmd(unit *u, struct order * ord)
 {
   region *r = u->region;
-	const char *s = getstrtoken();
 
   init_tokens(ord);
   skip_token();
-	if (findparam(s, u->faction->locale) == P_HERBS) {
+  /*
+  const char *s = getstrtoken();
 
-		if (eff_skill(u, SK_HERBALISM, r) < 7) {
-			cmistake(u, ord, 227, MSG_EVENT);
-			return;
-		}
+  if (findparam(s, u->faction->locale) == P_HERBS) { */
 
-		produceexp(u, SK_HERBALISM, u->number);
+  if (eff_skill(u, SK_HERBALISM, r) < 7) {
+    cmistake(u, ord, 227, MSG_EVENT);
+    return;
+  }
 
-		if (rherbs(r) > 0) {
-			const herb_type *rht = rherbtype(r);
+  produceexp(u, SK_HERBALISM, u->number);
 
-			if (rht != NULL) {
-				add_message(&u->faction->msgs, new_message(u->faction,
-					"researchherb%u:unit%r:region%s:amount%X:herb", u, r,
-					rough_amount(rherbs(r), 100), rht->itype->rtype));
-			} else {
-				add_message(&u->faction->msgs, new_message(u->faction,
-					"researchherb_none%u:unit%r:region", u, r));
-			}
-		} else {
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"researchherb_none%u:unit%r:region", u, r));
-		}
-	}
+  if (rherbs(r) > 0) {
+    const herb_type *rht = rherbtype(r);
+
+    if (rht != NULL) {
+      add_message(&u->faction->msgs, new_message(u->faction,
+        "researchherb%u:unit%r:region%s:amount%X:herb", u, r,
+        rough_amount(rherbs(r), 100), rht->itype->rtype));
+    } else {
+      add_message(&u->faction->msgs, new_message(u->faction,
+        "researchherb_none%u:unit%r:region", u, r));
+    }
+  } else {
+    add_message(&u->faction->msgs, new_message(u->faction,
+      "researchherb_none%u:unit%r:region", u, r));
+  }
 }
 
 static int
