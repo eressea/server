@@ -178,7 +178,7 @@ game_init(void)
 	register_dungeon();
 #endif
 
-	init_data(xmlfile?xmlfile:"eressea.xml");
+	init_data(xmlfile);
 	init_locales();
 
 	init_attributes();

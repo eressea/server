@@ -164,7 +164,7 @@ game_init(void)
 	register_spells();
 	register_dungeon();
 
-	init_data(xmlfile?xmlfile:"eressea.xml");
+	init_data(xmlfile);
 	init_locales();
 
 	init_attributes();
@@ -501,8 +501,6 @@ static int
 read_args(int argc, char **argv)
 {
 	int i;
-
-	xmlfile = NULL;
 
 	for (i=1;i!=argc;++i) {
 		if (argv[i][0]!='-') {

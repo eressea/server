@@ -899,7 +899,7 @@ typedef struct request {
 } request;
 
 extern int turn;
-extern char *xmlfile;
+extern const char *xmlfile;
 
 /* parteinummern */
 extern int *used_faction_ids;

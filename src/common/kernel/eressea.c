@@ -79,7 +79,7 @@
 #include <errno.h>
 
 /* exported variables */
-char	*xmlfile;
+const char *xmlfile = "eressea.xml";
 region  *regions;
 faction *factions;
 settings global;

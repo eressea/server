@@ -1712,7 +1712,7 @@ main(int argc, char *argv[])
 #endif
 /*	register_dungeon(); */
 
-	init_data(xmlfile?xmlfile:"eressea.xml");
+	init_data(xmlfile);
 	init_locales();
 
 	init_resources();

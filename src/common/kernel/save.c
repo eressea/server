@@ -892,13 +892,12 @@ readgame(const char * filename, int backup)
 		const char *basearg = "(null)";
 
 		rs(F, basefile);
-		if (xmlfile != NULL) {
-			basearg = strrchr(xmlfile, '/');
-			if (basearg==NULL) {
-				basearg = xmlfile;
-			} else {
-				++basearg;
-			}
+		assert(xmlfile != NULL);
+		basearg = strrchr(xmlfile, '/');
+		if (basearg==NULL) {
+			basearg = xmlfile;
+		} else {
+			++basearg;
 		}
 		if (strcmp(basearg, basefile)!=0) {
 			printf("WARNING: xmlfile mismatch:\n");
