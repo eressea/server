@@ -1130,7 +1130,7 @@ spellpower(region * r, unit * u, spell * sp, int cast_level)
 	}
 
 #ifdef MAGICPOWER
-	force = force * MAGICPOWER;
+	force = (int)(force * MAGICPOWER);
 #endif
 
 	return max(force, 0);
@@ -1498,7 +1498,7 @@ regeneration(unit * u)
 	aura = (rand() % d + rand() % d)/2 + 1;
 
 #ifdef MAGICREGEN
-	aura = aura * MAGICREGEN;
+	aura = (int)(aura * MAGICREGEN);
 #endif
 
 	return aura;

@@ -86,6 +86,14 @@ const struct race * new_race[MAXRACES];
 boolean sqlpatch = false;
 int turn;
 
+char * 
+strnzcpy(char * dst, const char *src, size_t len)
+{
+  strncpy(dst, src, len);
+  dst[len]=0;
+  return dst;
+}
+
 static attrib_type at_creator = {
 	"creator"
 	/* Rest ist NULL; temporäres, nicht alterndes Attribut */
@@ -2066,7 +2074,7 @@ kernel_done(void)
 }
 
 const char * localenames[] = {
-	"de", "en", "fr",
+	"de", "en",
 	NULL
 };
 

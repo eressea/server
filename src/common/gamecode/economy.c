@@ -1144,7 +1144,7 @@ maintain(building * b, boolean first)
 	boolean paid = true, work = first;
 	unit * u;
 	if (fval(b, BLD_MAINTAINED)) return true;
-	if (b->type->maintenance==NULL) return true;
+	if (b->type==NULL || b->type->maintenance==NULL) return true;
 	if (is_cursed(b->attribs, C_NOCOST, 0)) {
 		fset(b, BLD_MAINTAINED);
 		fset(b, BLD_WORKING);

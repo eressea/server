@@ -1,5 +1,5 @@
-#ifndef LUA_BINDINGS_H
-#define LUA_BINDINGS_H
+#ifndef LUA_EXPORT_H
+#define LUA_EXPORT_H
 
 struct lua_State;
 
@@ -8,7 +8,5 @@ extern void bind_unit(struct lua_State * L);
 extern void bind_ship(struct lua_State * L);
 extern void bind_building(struct lua_State * L);
 extern void bind_faction(struct lua_State * L);
-extern void bind_alliance(struct lua_State * L);
-extern void bind_eressea(struct lua_State * L);
 
 #endif

@@ -150,20 +150,16 @@
 # define HAVE_SNPRINTF
 
 /* MSVC has _access */
-_CRTIMP int __cdecl _access(const char *, int);
 # define access(f, m) _access(f, m)
 # define HAVE_ACCESS
 
 /* MSVC has _strdup */
-_CRTIMP char *  __cdecl _strdup(const char *);
 # define strdup(s) _strdup(s)
 # define HAVE_STRDUP
 
-_CRTIMP int     __cdecl _stricmp(const char *, const char *);
 # define stricmp(a, b) _stricmp(a, b)
 # define HAVE_STRICMP
 
-_CRTIMP int     __cdecl _strnicmp(const char *, const char *, size_t);
 # define strnicmp(a, b, c) _strnicmp(a, b, c)
 # define HAVE_STRNICMP
 # undef HAVE_STRCASECMP
@@ -236,6 +232,7 @@ extern char * strdup(const char *s);
 # define true ((boolean)!false)
 #endif
 
-#define strnzcpy(dst, src, len) (strncpy(dst, src, len), len?dst[len]=0:0, dst)
+/* this function must be implemented in a .o file */
+extern char * strnzcpy(char * dst, const char *src, size_t len);
 #endif
 

@@ -1,6 +1,6 @@
 #include <config.h>
 #include <eressea.h>
-#include "bindings.h"
+#include "list.h"
 
 // kernel includes
 #include <region.h>
@@ -14,7 +14,6 @@
 #include <luabind/iterator_policy.hpp>
 
 using namespace luabind;
-using namespace eressea;
 
 static eressea::list<region>
 get_regions(void) {
@@ -44,25 +43,24 @@ region_setname(region& r, const char * name) {
 static const char *
 region_getname(const region& r) {
   if (r.land) return r.land->name;
-  return r.terrain->name;
+  return terrain[r.terrain].name;
 }
 
 static void
 region_setinfo(region& r, const char * info) {
-  if (r.land) set_string(&r.land->display, info);
+  set_string(&r.display, info);
 }
 
 static const char *
 region_getinfo(const region& r) {
-  if (r.land) return r.land->display;
-  return NULL;
+  return r.display;
 }
 
 void
 bind_region(lua_State * L) 
 {
   module(L)[
-    def("get_regions", &get_regions, return_stl_iterator),
+    def("regions", &get_regions, return_stl_iterator),
     def("get_region", &findregion),
 
     class_<struct region>("region")

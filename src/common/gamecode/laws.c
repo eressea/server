@@ -113,8 +113,8 @@ RemoveNMRNewbie(void) {
 static void
 restart(unit *u, const race * rc)
 {
-	faction *f = addplayer(u->region, u->faction->email, u->faction->passw, rc, u->faction->locale, u->faction->subscription)->faction;
-	unit * nu = f->units;
+	faction *f = addfaction(u->faction->email, u->faction->passw, rc, u->faction->locale, u->faction->subscription);
+  unit * nu = addplayer(u->region, f);
 	strlist ** o=&u->orders;
   f->subscription = u->faction->subscription;
 	fset(f, FFL_RESTART);

@@ -30,6 +30,7 @@
 
 /* libc includes */
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 const unit *
@@ -86,49 +87,56 @@ unused_faction_id(void)
 	return id;
 }
 
-unit *
-addplayer(region *r, const char *email, const char * password, 
-					const struct race * frace, const struct locale *loc,
-					int subscription)
+faction *
+addfaction(const char *email, const char * password, 
+           const struct race * frace, const struct locale *loc,
+           int subscription)
 {
-	int i;
+  int i;
+  faction *f;
+  assert(frace != new_race[RC_ORC]);
+  f = calloc(sizeof(faction), 1);
+
+  set_string(&f->email, email);
+
+  if (password) {
+    set_string(&f->passw, password);
+  } else {
+    for (i = 0; i < 6; i++) buf[i] = (char) (97 + rand() % 26); buf[i] = 0;
+    set_string(&f->passw, buf);
+  }
+  for (i = 0; i < 6; i++) buf[i] = (char) (97 + rand() % 26); buf[i] = 0;
+  set_string(&f->override, buf);
+
+  f->lastorders = turn;
+  f->alive = 1;
+  f->age = 0;
+  f->race = frace;
+  f->magiegebiet = 0;
+  f->locale = loc;
+  f->subscription = subscription;
+
+  f->options = Pow(O_REPORT) | Pow(O_ZUGVORLAGE) | Pow(O_SILBERPOOL) | Pow(O_COMPUTER) | Pow(O_COMPRESS) | Pow(O_ADRESSEN) | Pow(O_STATISTICS);
+
+  f->no = unused_faction_id();
+  register_faction_id(f->no);
+
+  sprintf(buf, "%s %s", LOC(loc, "factiondefault"), factionid(f));
+  set_string(&f->name, buf);
+  fset(f, FL_UNNAMED);
+
+  addlist(&factions, f);
+
+  return f;
+}
+
+unit *
+addplayer(region *r, faction * f)
+{
 	unit *u;
-	faction *f;
-	
-	assert(frace != new_race[RC_ORC]);
-	f = calloc(sizeof(faction), 1);
-	
-	set_string(&f->email, email);
-	
-	if (password) {
-		set_string(&f->passw, password);
-	} else {
-		for (i = 0; i < 6; i++) buf[i] = (char) (97 + rand() % 26); buf[i] = 0;
-		set_string(&f->passw, buf);
-	}
-	for (i = 0; i < 6; i++) buf[i] = (char) (97 + rand() % 26); buf[i] = 0;
-	set_string(&f->override, buf);
-	
-	f->lastorders = turn;
-	f->alive = 1;
-	f->age = 0;
-	f->race = frace;
-	f->magiegebiet = 0;
-	f->locale = loc;
-	f->subscription = subscription;
-	set_ursprung(f, 0, r->x, r->y);
-	
-	f->options = Pow(O_REPORT) | Pow(O_ZUGVORLAGE) | Pow(O_SILBERPOOL) | Pow(O_COMPUTER) | Pow(O_COMPRESS) | Pow(O_ADRESSEN) | Pow(O_STATISTICS);
-	
-	f->no = unused_faction_id();
-	register_faction_id(f->no);
 
-	sprintf(buf, "%s %s", LOC(loc, "factiondefault"), factionid(f));
-	set_string(&f->name, buf);
-	fset(f, FL_UNNAMED);
-	
-	addlist(&factions, f);
-
+  assert(f->units==NULL);
+  set_ursprung(f, 0, r->x, r->y);
 	u = createunit(r, f, 1, f->race);
 	give_starting_equipment(r, u);
 	fset(u, UFL_ISNEW);

@@ -30,6 +30,7 @@
 
 /* libc includes */
 #include <assert.h>
+#include <string.h>
 
 const int FIREWORK_RANGE=10;
 

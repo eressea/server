@@ -78,7 +78,7 @@
 extern const char *directions[];
 extern const char *spelldata[];
 extern int quiet;
-extern boolean opt_cr_absolute_coords;
+boolean opt_cr_absolute_coords = false;
 
 /* globals */
 #define C_REPORT_VERSION 64

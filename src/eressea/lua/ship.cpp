@@ -1,6 +1,5 @@
 #include <config.h>
 #include <eressea.h>
-#include "bindings.h"
 
 // kernel includes
 #include <ship.h>
@@ -12,7 +11,6 @@
 #include <luabind/iterator_policy.hpp>
 
 using namespace luabind;
-using namespace eressea;
 
 void
 bind_ship(lua_State * L) 

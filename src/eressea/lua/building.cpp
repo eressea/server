@@ -1,6 +1,6 @@
 #include <config.h>
+#include <cstring>
 #include <eressea.h>
-#include "bindings.h"
 
 // kernel includes
 #include <building.h>
@@ -11,7 +11,6 @@
 #include <luabind/iterator_policy.hpp>
 
 using namespace luabind;
-using namespace eressea;
 
 void
 bind_building(lua_State * L) 
