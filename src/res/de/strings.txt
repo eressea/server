@@ -118,7 +118,7 @@ site;de;Grundmauern
 fortification;de;Befestigung
 tower;de;Turm
 castle;de;Burg
-fortres_p;de;Festung
+fortres;de;Festung
 citadel;de;Zitadelle
 
 ## Items
