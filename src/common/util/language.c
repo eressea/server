@@ -103,31 +103,32 @@ locale_getstring(const locale * lang, const char * key)
 const char *
 locale_string(const locale * lang, const char * key)
 {
-	unsigned int hkey = hashstring(key);
-	unsigned int id = hkey % SMAXHASH;
-	struct locale_string * find;
-
-	if (key == NULL || *key==0) return NULL;
-	if (lang == NULL) return key;
-	find = lang->strings[id];
-	while (find) {
-		if (find->hashkey == hkey && !strcmp(key, find->key)) break;
-		find = find->nexthash;
-	}
-	if (!find) {
-		const char * s = key;
-		log_warning(("missing translation for \"%s\" in locale %s\n", key, lang->name));
-		if (lang!=default_locale) {
-			s = locale_string(default_locale, key);
-		}
-		if (s_debug) {
-			fprintf(s_debug, "%s;%s;%s\n", key, lang->name, s);
-			fflush(s_debug);
-			locale_setstring((struct locale*)lang, key, s);
-		}
-		return s;
-	}
+	if (key==NULL) return NULL;
 	else {
+		unsigned int hkey = hashstring(key);
+		unsigned int id = hkey % SMAXHASH;
+		struct locale_string * find;
+
+		if (key == NULL || *key==0) return NULL;
+		if (lang == NULL) return key;
+		find = lang->strings[id];
+		while (find) {
+			if (find->hashkey == hkey && !strcmp(key, find->key)) break;
+			find = find->nexthash;
+		}
+		if (!find) {
+			const char * s = key;
+			log_warning(("missing translation for \"%s\" in locale %s\n", key, lang->name));
+			if (lang!=default_locale) {
+				s = locale_string(default_locale, key);
+			}
+			if (s_debug) {
+				fprintf(s_debug, "%s;%s;%s\n", key, lang->name, s);
+				fflush(s_debug);
+				locale_setstring((struct locale*)lang, key, s);
+			}
+			return s;
+		}
 		return find->str;
 	}
 }

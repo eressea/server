@@ -148,7 +148,7 @@ personcapacity(const unit *u)
 
 	if (old_race(u->race) == RC_TROLL)
 		cap += 540;
-#ifdef RACE_ADJUSTMENTS
+#if RACE_ADJUSTMENTS
 	else if(old_race(u->race) == RC_GOBLIN)
 		cap -= 100;
 #endif
@@ -465,7 +465,7 @@ move_ship(ship * sh, region * from, region * to, region ** route)
 			ulist = &u->next;
 			u->ship = sh;
 			if (route && eff_skill(u, SK_SAILING, from) >= 1) {
-				change_skill(u, SK_SAILING, PRODUCEEXP * u->number);
+				produceexp(u, SK_SAILING, u->number);
 			}
 		}
 		u = nu;
@@ -486,7 +486,7 @@ drifting_ships(region * r)
 			sh2 = sh->next;
 
 			/* Schiff schon abgetrieben oder durch Zauber geschützt? */
-			if (sh->drifted == 1 || is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
+			if (fval(sh, SF_DRIFTED) || is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
 				sh = sh2;
 				continue;
 			}
@@ -549,7 +549,7 @@ drifting_ships(region * r)
 			for (f = factions; f; f = f->next)
 				freset(f, FL_DH);
 #endif
-			if (sh->drifted) {
+			if (fval(sh, SF_DRIFTED)) {
 				/* wenn schon einmal abgetrieben, dann durchreise eintragen */
 				route[0] = r;
 				sh = move_ship(sh, r, rconnect(r, d), route);
@@ -559,7 +559,7 @@ drifting_ships(region * r)
 				continue;
 			}
 
-			sh->drifted = 1;
+			fset(sh, SF_DRIFTED);
 
 			if (rterrain(rconnect(r, d)) != T_OCEAN) {
 				/* Alle Attribute
@@ -928,7 +928,7 @@ travel(region * first, unit * u, region * next, int flucht)
 			cmistake(u, findorder(u, u->thisorder), 143, MSG_MOVE);
 			return NULL;
 		}
-	} else if (rterrain(next) == T_OCEAN && u->ship && u->ship->moved == 1) {
+	} else if (rterrain(next) == T_OCEAN && u->ship && fval(u->ship, FL_MOVED)) {
 		cmistake(u, findorder(u, u->thisorder), 13, MSG_MOVE);
 		return NULL;
 	}
@@ -1119,7 +1119,7 @@ travel(region * first, unit * u, region * next, int flucht)
 			mode = 0;
 		else if (canride(u)) {
 			mode = 1;
-			change_skill(u, SK_RIDING, u->number * PRODUCEEXP);
+			produceexp(u, SK_RIDING, u->number);
 		} else
 			mode = 2;
 
@@ -1506,7 +1506,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 		/* Falls kein Problem, eines weiter ziehen */
 		route[step] = dir;
 		tt[step] = current_point;       /* travelthrough */
-		u->ship->moved = 1;
+		fset(u->ship, FL_MOVED);
 		step++;
 		m++;
 
@@ -1533,7 +1533,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 	 * gekommen ist. Das ist nicht der Fall, wenn er von der Küste ins
 	 * Inland zu segeln versuchte */
 
-	if (u->ship->moved) {
+	if (fval(u->ship, FL_MOVED)) {
 		ship * sh = u->ship;
 		/* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
 		 * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
@@ -1544,7 +1544,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 		} else {
 			sh->coast = NODIRECTION;
 		}
-		sh->moved = 1;
+		fset(sh, FL_MOVED);
 		sprintf(buf, "Die %s ", shipname(sh));
 		if( is_cursed(sh->attribs, C_SHIP_FLYING, 0) )
 			scat("fliegt");

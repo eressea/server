@@ -4543,16 +4543,22 @@
 		</locale>
 	</message>
 
-	<message name="spyfail">
+	<message name="spyreport" section="events">
+		<type>
+			<arg name="spy" type="unit"></arg>
+			<arg name="target" type="unit"></arg>
+			<arg name="report" type="string"></arg>
+		</type>
+		<text locale="de">"$unit($spy) gelang es Informationen über $unit(target) herauszubekommen: ${report}."</text>
+		<text locale="en">"$unit($spy) managed to gather Information about $unit(target): ${report}."</text>
+	</message>
+
+	<message name="spyfail" section="events">
 		<type>
 			<arg name="spy" type="unit"></arg>
 			<arg name="target" type="unit"></arg>
 		</type>
-		<locale name="de">
-			<nr section="events">
-				<text>"$unit($spy) gelang es nicht, etwas über $unit($target) herauszufinden."</text>
-			</nr>
-		</locale>
+		<text locale="de">"$unit($spy) gelang es nicht, etwas über $unit($target) herauszufinden."</text>
 	</message>
 
 	<message name="stealfail">

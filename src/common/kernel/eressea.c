@@ -1684,7 +1684,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
 		f->no_units++;
 	}
 
-	if (creator){
+	if (creator) {
 		attrib * a;
 
 		/* erbt Kampfstatus */

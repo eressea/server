@@ -68,6 +68,10 @@ extern void st_register(const ship_type * type);
 
 #define NOSHIP NULL
 
+#define SF_DRIFTED 1<<0
+#define SF_MOVED   1<<1
+#define SF_DAMAGED 1<<2 /* for use in combat */
+
 typedef struct ship {
 	struct ship *next;
 	struct ship *nexthash;
@@ -78,11 +82,9 @@ typedef struct ship {
 	struct attrib * attribs;
 	int size;
 	int damage; /* damage in 100th of a point of size */
-	int flags;
+	unsigned int flags;
 	const struct ship_type * type;
 	direction_t coast;
-	boolean moved;
-	boolean drifted;
 } ship;
 
 extern void damage_ship(ship *sh, double percent);

@@ -1043,6 +1043,7 @@ fix_demand_region(region *r)
 	}
 	for (rl=rlist;rl;rl=rl->next) {
 		region * r = rl->region;
+		log_warning(("fixing demand in %s\n", regionname(r, NULL)));
 		setluxuries(r, mlux[rand() % maxlux]);
 	}
 	while (rlist) {
@@ -2707,7 +2708,6 @@ korrektur(void)
 #endif
 
 	do_once("grat", fix_ratfamiliar());
-	do_once("fdmd", fix_demand());
 	do_once("fgms", fix_gms());
 #if NEW_RESOURCEGROWTH
 	do_once("rndr", randomized_resources());
@@ -2716,6 +2716,10 @@ korrektur(void)
 	do_once("szip", set_zip());
 	do_once("heal", heal_all());
 
+	/* seems something fishy is going on, do this just 
+	 * to be on the safe side: 
+	 */
+	fix_demand();
   /* trade_orders(); */
 	if (global.data_version < NEWROAD_VERSION) {
 		newroads();

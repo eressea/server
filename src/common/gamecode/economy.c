@@ -121,7 +121,6 @@ static struct scramble {
 	int rnd;
 } * vec;
 
-
 int
 scramblecmp(const void *p1, const void *p2)
 {
@@ -297,26 +296,27 @@ expandrecruit(region * r, request * recruitorders)
 			if (u->number)
 				u->hp += u->n * unit_max_hp(u);
 			if (u->race == new_race[RC_ORC]) {
-				change_skill(u, SK_SWORD, 30 * u->n);
-				change_skill(u, SK_SPEAR, 30 * u->n);
+				change_skill(u, SK_SWORD, skill_level(1) * u->n);
+				change_skill(u, SK_SPEAR, skill_level(1) * u->n);
 			}
 			if (u->race->ec_flags & ECF_REC_HORSES) {
-				change_skill(u, SK_RIDING, 30 * u->n);
+				change_skill(u, SK_RIDING, skill_level(1) * u->n);
 			}
 			i = fspecial(u->faction, FS_MILITIA);
 			if (i > 0) {
-				if (u->race->bonus[SK_SPEAR] >= 0) change_skill(u, SK_SPEAR,
-							u->n * level_days(i));
-				if (u->race->bonus[SK_SWORD] >= 0) change_skill(u, SK_SWORD,
-							u->n * level_days(i));
-				if (u->race->bonus[SK_LONGBOW] >= 0) change_skill(u, SK_LONGBOW,
-							u->n * level_days(i));
-				if (u->race->bonus[SK_CROSSBOW] >= 0) change_skill(u, SK_CROSSBOW,
-							u->n * level_days(i));
-				if (u->race->bonus[SK_RIDING] >= 0) change_skill(u, SK_RIDING,
-							u->n * level_days(i));
-				if (u->race->bonus[SK_AUSDAUER] >= 0) change_skill(u, SK_AUSDAUER,
-							u->n * level_days(i));
+				int ld = skill_level(i);
+				if (u->race->bonus[SK_SPEAR] >= 0) 
+					change_skill(u, SK_SPEAR, u->n * ld);
+				if (u->race->bonus[SK_SWORD] >= 0) 
+					change_skill(u, SK_SWORD, u->n * ld);
+				if (u->race->bonus[SK_LONGBOW] >= 0) 
+					change_skill(u, SK_LONGBOW, u->n * ld);
+				if (u->race->bonus[SK_CROSSBOW] >= 0) 
+					change_skill(u, SK_CROSSBOW, u->n * ld);
+				if (u->race->bonus[SK_RIDING] >= 0) 
+					change_skill(u, SK_RIDING, u->n * ld);
+				if (u->race->bonus[SK_AUSDAUER] >= 0) 
+					change_skill(u, SK_AUSDAUER, u->n * ld);
 			}
 			if (u->n < u->wants) {
 				add_message(&u->faction->msgs,
@@ -547,7 +547,7 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 		&& u2->faction != u->faction
 		&& ucontact(u2, u) == 0) {
 		error = 73;
-	} else if (u2 && (get_skill(u, SK_MAGIC) > 0 || get_skill(u2, SK_MAGIC) > 0)) {
+	} else if (u2 && (get_skill(u, SK_MAGIC) || get_skill(u2, SK_MAGIC))) {
 		error = 158;
 	} else {
 		if (n > u->number) n = u->number;
@@ -570,7 +570,7 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 			}
 		}
 	}
-	if (u2 && (get_skill(u, SK_ALCHEMY) > 0 || get_skill(u2, SK_ALCHEMY) > 0)) {
+	if (u2 && (get_skill(u, SK_ALCHEMY) || get_skill(u2, SK_ALCHEMY))) {
 
 		k = count_skill(u2->faction, SK_ALCHEMY);
 
@@ -580,7 +580,7 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 			k += u2->number;
 
 		/* Wenn in eine Alchemisteneinheit Personen verschoben werden */
-		if (get_skill(u2, SK_ALCHEMY) > 0 && !get_skill(u, SK_ALCHEMY))
+		if (get_skill(u2, SK_ALCHEMY) && !get_skill(u, SK_ALCHEMY))
 			k += n;
 
 		/* Wenn Parteigrenzen überschritten werden */
@@ -1546,7 +1546,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 		if (btype==&bt_mine)
 			al->save *= 0.5;
 		if (u->race == new_race[RC_DWARF])
-#ifdef RACE_ADJUSTMENTS
+#if RACE_ADJUSTMENTS
 			al->save *= 0.75;
 #else
 			al->save *= 0.5;
@@ -1556,7 +1556,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 		const struct building_type * btype = b?b->type:NULL;
 		if (btype==&bt_quarry)
 			al->save = al->save*0.5;
-#ifdef RACE_ADJUSTMENTS
+#if RACE_ADJUSTMENTS
 		if (u->race == new_race[RC_TROLL])
 			al->save = al->save*0.75;
 #endif
@@ -1740,8 +1740,7 @@ split_allocations(region * r)
 			if (al->get) {
 				assert(itype || !"not implemented for non-items");
 				i_change(&al->unit->items, itype, al->get);
-				change_skill(al->unit, itype->construction->skill,
-						al->unit->number * PRODUCEEXP);
+				produceexp(al->unit, itype->construction->skill, al->unit->number);
 #if NEW_RESOURCEGROWTH
 				fset(r, RF_DH);
 #endif
@@ -2502,7 +2501,7 @@ plant(region *r, unit *u, int raw)
 	for(i = n; i>0; i--) {
 		if (rand()%10 < skill) planted++;
 	}
-	change_skill(u, SK_HERBALISM, PRODUCEEXP * u->number);
+	produceexp(u, SK_HERBALISM, u->number);
 
 	/* Alles ok. Abziehen. */
 	new_use_pooled(u, oldresourcetype[R_TREES], GET_DEFAULT, 1);
@@ -2556,7 +2555,7 @@ planttrees(region *r, unit *u, int raw)
 	rsettrees(r, 0, rtrees(r, 0)+planted);
 	
 	/* Alles ok. Abziehen. */
-	change_skill(u, SK_HERBALISM, PRODUCEEXP * u->number);
+	produceexp(u, SK_HERBALISM, u->number);
 	new_use_pooled(u, itype->rtype, GET_DEFAULT, n);
 
 	add_message(&u->faction->msgs, new_message(u->faction,
@@ -2661,7 +2660,7 @@ breedtrees(region *r, unit *u, int raw)
 	rsettrees(r, 1, rtrees(r, 1)+planted);
 	
 	/* Alles ok. Abziehen. */
-	change_skill(u, SK_HERBALISM, PRODUCEEXP * u->number);
+	produceexp(u, SK_HERBALISM, u->number);
 	new_use_pooled(u, itype->rtype, GET_DEFAULT, n);
 
 	add_message(&u->faction->msgs, new_message(u->faction,
@@ -2695,8 +2694,9 @@ breedhorses(region *r, unit *u)
 		}
 	}
 
-	if (gezuechtet > 0)
-		change_skill(u, SK_HORSE_TRAINING, PRODUCEEXP * u->number);
+	if (gezuechtet > 0) {
+		produceexp(u, SK_HORSE_TRAINING, u->number);
+	}
 
 	add_message(&u->faction->msgs, new_message(u->faction,
 		"raised%u:unit%i:amount", u, gezuechtet));
@@ -2773,7 +2773,7 @@ research(region *r, unit *u)
 			return;
 		}
 
-		change_skill(u, SK_HERBALISM, PRODUCEEXP * u->number);
+		produceexp(u, SK_HERBALISM, u->number);
 
 		if (rherbs(r) > 0) {
 			const herb_type *rht = rherbtype(r);
@@ -2917,7 +2917,7 @@ steal(region * r, unit * u, request ** stealorders)
 
 	/* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
 
-	change_skill(u, SK_STEALTH, min(n, u->number) * PRODUCEEXP);
+	produceexp(u, SK_STEALTH, min(n, u->number));
 }
 /* ------------------------------------------------------------- */
 
@@ -2960,8 +2960,7 @@ expandentertainment(region * r)
 		entertaining -= u->n;
 
 		/* Nur soviel PRODUCEEXP wie auch tatsächlich gemacht wurde */
-
-		change_skill(u, SK_ENTERTAINMENT, PRODUCEEXP * min(u->n, u->number));
+		produceexp(u, SK_ENTERTAINMENT, min(u->n, u->number));
 		add_income(u, IC_ENTERTAIN, o->qty, u->n);
 	}
 }
@@ -3215,7 +3214,7 @@ produce(void)
 			if (fval(u, FL_TRADER)) {
 				attrib * a = a_find(u->attribs, &at_trades);
 				if (a && a->data.i) {
-					change_skill(u, SK_TRADE, u->number * PRODUCEEXP);
+					produceexp(u, SK_TRADE, u->number);	
 				}
 				u->thisorder[0]=0;
 				continue;

@@ -2350,16 +2350,15 @@ instant_orders(void)
 					case P_VORNE:
 						u->status = ST_FIGHT;
 						break;
-#ifdef NOAID
+
 					case P_HELP:
 						param = getstrtoken();
-						if(findparam(param, u->faction->locale) == P_NOT) {
-							freset(u, FL_NOAID);
-						} else {
+						if( findparam(param, u->faction->locale) == P_NOT) {
 							fset(u, FL_NOAID);
+						} else {
+							freset(u, FL_NOAID);
 						}
 						break;
-#endif
 
 					default:
 						if (strlen(param)) {
@@ -2391,6 +2390,7 @@ instant_orders(void)
 						level = max(0, level);
 						s = getstrtoken();
 					}
+					else level = 0;
 
 					spell = find_spellbyname(u, s);
 

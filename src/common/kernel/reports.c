@@ -28,6 +28,7 @@
 #include "item.h"
 #include "karma.h"
 #include "magic.h"
+#include "message.h"
 #include "race.h"
 #include "region.h"
 #include "ship.h"
@@ -103,12 +104,10 @@ report_kampfstatus(const unit * u, const struct locale * lang)
 		"status_avoid", "status_flee" };
 
 	strcpy(fsbuf, LOC(lang, azstatus[u->status]));
-#ifdef NOAID
-	if(fval(u, FL_NOAID)) {
+	if (fval(u, FL_NOAID)) {
 		strcat(fsbuf, ", ");
 		strcat(fsbuf, LOC(lang, "status_noaid"));
 	}
-#endif
 
 	return fsbuf;
 }
@@ -119,15 +118,15 @@ hp_status(const unit * u)
 	double p = (double) ((double) u->hp / (double) (u->number * unit_max_hp(u)));
 
 	if (p > 2.00)
-		return "sehr stark";
+		return "dmg_critical";
 	if (p > 1.50)
-		return "stark";
+		return "dmg_heavily";
 	if (p < 0.50)
-		return "schwer verwundet";
+		return "dmg_badly";
 	if (p < 0.75)
-		return "verwundet";
+		return "dmg_wounded";
 	if (p < 0.99)
-		return "erschöpft";
+		return "dmg_exhausted";
 
 	return NULL;
 }
@@ -265,7 +264,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 	/* status */
 
 	if (u->number && (u->faction == f || telepath_see || isbattle)) {
-		const char * c = hp_status(u);
+		const char * c = locale_string(f->locale, hp_status(u));
 		scat(", ");
 		scat(report_kampfstatus(u, f->locale));
 		if (c || fval(u, FL_HUNGER)) {
@@ -634,7 +633,7 @@ spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, 
 	}
 	sbuf += sprintf(sbuf, "%d", effskill(u, sk));
 
-#ifndef NOVISIBLESKILLPOINTS
+#if SKILLPOINTS
 	if (days) {
 		assert(u->number);
 		sbuf += sprintf(sbuf, " [%d]", d / u->number);
@@ -689,11 +688,7 @@ spy_message(int spy, unit *u, unit *target)
 {
 	const char *c;
 
-	change_skill(u, SK_SPY, PRODUCEEXP);
-
-	sprintf(buf, "%s gelang es, Informationen über ", unitname(u));
-	scat(unitname(target));
-	scat(" herauszubekommen: ");
+	produceexp(u, SK_SPY, u->number);
 
 	/* Infos:
 	 * - Kampfstatus
@@ -705,6 +700,7 @@ spy_message(int spy, unit *u, unit *target)
 	 */
 	/* mit spy=100 (magische Spionage) soll alles herausgefunden werden */
 
+	buf[0]='\0';
 	if (spy > 99){
 		/* magische Spionage */
 		/* Zauberwirkungen */
@@ -822,13 +818,14 @@ spy_message(int spy, unit *u, unit *target)
 	{ /* immer */
 		scat("Kampfstatus: ");
 		scat(report_kampfstatus(target, u->faction->locale));
-		c = hp_status(target);
+		c = locale_string(u->faction->locale, hp_status(target));
 		if (c && strlen(c))
 			sprintf(buf, "%s (%s)", buf, c);
 		scat(".");
 	}
 
-	addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
+	ADDMSG(&u->faction->msgs, msg_message("spyreport", 
+		"spy target report", u, target, strdup(buf)));
 }
 
 const struct unit *

@@ -84,9 +84,6 @@ struct xml_stack;
 #include <attrib.h>
 
 #define AT_PERSISTENT
-#undef RANDOMIZED_LEARNING
-#undef NOVISIBLESKILLPOINTS
-#undef SKILLMODIFIESLEARNING
 
 /* eressea-defined attribute-type flags */
 #define ATF_CURSE  ATF_USER_DEFINED
@@ -105,7 +102,6 @@ struct xml_stack;
 #define NEW_TAVERN
 #define GOBLINKILL
 #undef HELFE_WAHRNEHMUNG
-#define NOAID
 
 #define USE_FIREWALL 1
 #undef COMPATIBILITY
@@ -880,10 +876,8 @@ typedef struct skillvalue {
 #define MAX_UNIT_NR (36*36*36*36-1)
 #define MAX_CONTAINER_NR (36*36*36*36-1)
 
-#ifdef NOAID
 #define FL_NOAIDF					(1<<21) /* Hilfsflag Kampf */
 #define FL_NOAID					(1<<22) /* Einheit hat Noaid-Status */
-#endif
 
 #define FL_MARK           (1<<23) /* für markierende algorithmen, die das hinterher auch wieder
 																		 löschen müssen! (Ist dafür nicht eigentlich FL_DH gedacht?) */
@@ -892,13 +886,8 @@ typedef struct skillvalue {
 #define FL_UNNAMED				(1<<26) /* Partei/Einheit/Gebäude/Schiff ist unbenannt */
 #define FL_RESTARTED				(1<<27) /* Partei hat schon einen Neustart gemacht */
 																		/* no longer used, may contain old data! */
-
 /* Flags, die gespeichert werden sollen: */
-#ifdef NOAID
 #define FL_SAVEMASK (FL_NOAID | FL_RESTARTED | FL_OWNER | FL_PARTEITARNUNG | FL_LOCKED | FL_HUNGER | FL_NOIDLEOUT | FL_TAKEALL | FL_UNNAMED)
-#else
-#define FL_SAVEMASK (FL_RESTARTED | FL_OWNER | FL_PARTEITARNUNG | FL_LOCKED | FL_HUNGER | FL_NOIDLEOUT | FL_TAKEALL | FL_UNNAMED)
-#endif
 
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))
@@ -1191,4 +1180,6 @@ typedef struct settings {
 extern settings global;
 
 extern FILE * updatelog;
+extern int produceexp(struct unit * u, skill_t sk, int n);
+
 #endif

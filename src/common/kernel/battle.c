@@ -2329,9 +2329,12 @@ aftermath(battle * b)
 			int sum_hp = 0;
 			int n;
 			if (relevant && df->action_counter >= du->number) {
+				ship * sh = du->ship?du->ship:leftship(du);
+
+				if (sh) fset(sh, SF_DAMAGED);
 				fset(du, FL_LONGACTION);
 				/* TODO: das sollte hier weg sobald anderswo üb
-				 * erall HADBATTLE getestet wird. */
+				 * erall FL_LONGACTION getestet wird. */
 				set_string(&du->thisorder, "");
 			}
 			for (n = 0; n != df->alive; ++n) {
@@ -2441,8 +2444,6 @@ aftermath(battle * b)
 	 * schonmal Schaden genommen hat. (moved und drifted
 	 * sollten in flags überführt werden */
 
-	for (sh=r->ships; sh; sh=sh->next) sh->drifted = false;
-
 	for (fi = fighters->begin; fi != fighters->end; ++fi) {
 		fighter *df = *fi;
 		unit *du = df->unit;
@@ -2462,9 +2463,9 @@ aftermath(battle * b)
 
 		if (du->ship) sh = du->ship; else sh = leftship(du);
 
-		if (sh && sh->drifted == false && b->turn+(b->has_tactics_turn?1:0)>2) {
+		if (sh && fval(sh, SF_DAMAGED) && b->turn+(b->has_tactics_turn?1:0)>2) {
 			damage_ship(sh, 0.20);
-			sh->drifted = true;
+			freset(sh, SF_DAMAGED);
 		}
 	}
 
@@ -2472,7 +2473,7 @@ aftermath(battle * b)
 		ship **sp = &r->ships;
 		while (*sp) {
 			ship * sh = *sp;
-			sh->drifted = false;
+			freset(sh, SF_DAMAGED);
 			if (sh->damage >= sh->size * DAMAGE_SCALE) {
 				destroy_ship(sh, r);
 			}
@@ -3225,10 +3226,8 @@ join_allies(battle * b)
 		for (si = 0; si != size; ++si) {
 			int se;
 			side *s = b->sides.begin[si];
-#ifdef NOAID
 			/* Wenn alle attackierten noch FL_NOAIDF haben, dann kämpfe nicht mit. */
 			if (fval(s->bf->faction, FL_NOAIDF)) continue;
-#endif
 			if (s->bf->faction!=f) {
 				/* Wenn wir attackiert haben, kommt niemand mehr hinzu: */
 				if (s->bf->attacker) continue;
@@ -3361,14 +3360,13 @@ do_battle(void)
 		battle *b = NULL;
 		int sides = 0;
 		side *s;
+		ship * sh;
 		void **fi;
 		building *bu;
 
-#ifdef NOAID
 		for (u = r->units; u != NULL; u = u->next) {
 			fset(u->faction, FL_NOAIDF);
 		}
-#endif
 
 		/* list_foreach geht nicht, wegen flucht */
 		for (u = r->units; u != NULL; u = u->next) {
@@ -3515,12 +3513,11 @@ do_battle(void)
 						c1 = join_battle(b, u, true);
 						c2 = join_battle(b, u2, false);
 
-#ifdef NOAID
 						/* Hat die attackierte Einheit keinen Noaid-Status,
 						 * wird das Flag von der Faction genommen, andere
 						 * Einheiten greifen ein. */
 						if (!fval(u2, FL_NOAID)) freset(u2->faction, FL_NOAIDF);
-#endif
+
 						if (c1 && c2) {
 							/* Merken, wer Angreifer ist, für die Rückzahlung der
 							 * Präcombataura bei kurzem Kampf. */
@@ -3567,6 +3564,9 @@ do_battle(void)
 			bu->sizeleft = bu->size;
 		}
 		list_next(bu);
+
+		/* make sure no ships are damaged initially */
+		for (sh=r->ships; sh; sh=sh->next) freset(sh, SF_DAMAGED);
 
 		/* Gibt es eine Taktikrunde ? */
 		b->turn = 1;

@@ -547,14 +547,17 @@ cr_output_unit(FILE * F, const region * r,
 			const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
 			/* my own faction, full info */
 			const attrib * a = a_find(u->attribs, &at_group);
+			const attrib * ap = 0;
 			if (a) {
 				const group * g = (const group*)a->data.v;
-				const attrib *a = a_find(g->attribs, &at_raceprefix);
+				ap = a_find(g->attribs, &at_raceprefix);
 				fprintf(F, "%d;gruppe\n", g->gid);
-				if (a) {
-					const char * name = (const char*)a->data.v;
-					fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
-				}
+			} else {
+				ap = a_find(u->faction->attribs, &at_raceprefix);
+			}
+			if (ap) {
+				const char * name = (const char*)a->data.v;
+				fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
 			}
 			fprintf(F, "%d;Partei\n", u->faction->no);
 			if (sf!=u->faction) fprintf(F, "%d;Verkleidung\n", sf->no);
@@ -642,7 +645,7 @@ cr_output_unit(FILE * F, const region * r,
 			fprintf(F, "\"%s\";privat\n", c);
 		c = hp_status(u);
 		if (c && *c && (u->faction == f || omniscient(f)))
-			fprintf(F, "\"%s\";hp\n", c);
+			fprintf(F, "\"%s\";hp\n", add_translation(c, locale_string(u->faction->locale, c)));
 		if (fval(u, FL_HUNGER) && (u->faction == f))
 			fputs("1;hunger\n", F);
 		if (is_mage(u)) {
