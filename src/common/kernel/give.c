@@ -126,7 +126,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
       handle_event(&src->attribs, "give", dest);
       handle_event(&dest->attribs, "receive", src);
 #if defined(MUSEUM_MODULE) && defined(TODO)
-TODO: Einen Trigger benutzen!
+/* TODO: Einen Trigger für den museums-warden benutzen! */
         if (a_find(dest->attribs, &at_warden)) {
           /* warden_add_give(src, dest, itype, n); */
         }
@@ -158,6 +158,10 @@ givemen(int n, unit * u, unit * u2, struct order * ord)
   } else if (!u2 && u->race == new_race[RC_SNOTLING]) {
     /* Snotlings können nicht an Bauern übergeben werden. */
     error = 307;
+#endif
+#ifdef HEROES
+  } else if (u2 && (fval(u, UFL_HERO)!=fval(u2, UFL_HERO))) {
+    error = 75;
 #endif
   } else if ((u && unit_has_cursed_item(u)) || (u2 && unit_has_cursed_item(u2))) {
     error = 78;
@@ -279,6 +283,12 @@ giveunit(unit * u, unit * u2, order * ord)
     return;
   }
 
+#ifdef HEROES
+  if (fval(u, UFL_HERO)) {
+    cmistake(u, ord, 75, MSG_COMMERCE);
+    return;
+  }
+#endif
   if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)) {
     cmistake(u, ord, 74, MSG_COMMERCE);
     return;

@@ -19,9 +19,14 @@
 #define CATAPULT_INITIAL_RELOAD 4 /* erster schuss in runde 1 + rand() % INITIAL */
 #define CATAPULT_STRUCTURAL_DAMAGE
 
-#define BASE_CHANCE  70			/* 70% Überlebenschance */
+#define BASE_CHANCE    70 /* 70% Basis-Überlebenschance */
+#ifdef NEW_COMBATSKILLS_RULE
+#define TDIFF_CHANGE    5 /* 5% höher pro Stufe */
+#define DAMAGE_QUOTIENT 2 /* damage += skilldiff/DAMAGE_QUOTIENT */
+#else
 #define TDIFF_CHANGE 10
-
+# define DAMAGE_QUOTIENT 1 /* damage += skilldiff/DAMAGE_QUOTIENT */
+#endif
 
 typedef enum combatmagic {
 	DO_PRECOMBATSPELL,
@@ -107,15 +112,11 @@ static int obs_count = 0;
 #define MINSPELLRANGE 1
 #define MAXSPELLRANGE 7
 
+#ifndef ROW_FACTOR
+# define ROW_FACTOR 10
+#endif
 static const double EFFECT_PANIC_SPELL = 0.25;
 static const double TROLL_REGENERATION = 0.10;
-
-#define MAX_ADVANTAGE           5
-
-enum {
-	SI_DEFENDER,
-	SI_ATTACKER
-};
 
 extern weapon_type * oldweapontype[];
 
@@ -516,7 +517,7 @@ get_unitrow(const fighter * af)
   if (enemyfront) {
     for (line=FIRST_ROW;line!=NUMROWS;++line) {
       front += size[line];
-      if (!front || front<enemyfront/10) ++retreat;
+      if (!front || front<enemyfront/ROW_FACTOR) ++retreat;
       else if (front) break;
     }
   }
@@ -568,21 +569,11 @@ contest(int skilldiff, armor_t ar, armor_t sh)
 	int p, vw = BASE_CHANCE - TDIFF_CHANGE * skilldiff;
 	double mod = 1.0;
 
-	/* Hardcodet, muß geändert werden. */
-
-#ifdef OLD_ARMOR
-	if (ar != AR_NONE)
-		mod *= (1 - armordata[ar].penalty);
-	if (sh != AR_NONE)
-		mod *= (1 - armordata[sh].penalty);
-	vw = (int) (vw * mod);
-#else
 	if (ar != AR_NONE)
 		mod *= (1 + armordata[ar].penalty);
 	if (sh != AR_NONE)
 		mod *= (1 + armordata[sh].penalty);
 	vw = (int)(100 - ((100 - vw) * mod));
-#endif
 
 	do {
 		p = rand() % 100;
@@ -1098,7 +1089,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 		}
 
 		/* Skilldifferenzbonus */
-		da += max(0, sk-sd);
+		da += max(0, (sk-sd)/DAMAGE_QUOTIENT);
 	}
 
 
@@ -1182,7 +1173,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 #ifdef TODO_RUNESWORD
 			if (select_weapon(dt, 0, -1) == WP_RUNESWORD) continue;
 #endif
-			if (!(df->person[dt.index].flags & FL_HERO)) {
+			if (!(df->person[dt.index].flags & FL_COURAGE)) {
 				df->person[dt.index].flags |= FL_DAZZLED;
 				df->person[dt.index].defence--;
 			}
@@ -1897,7 +1888,7 @@ dazzle(battle *b, troop *td)
 		return;
 	}
 #endif
-	if (td->fighter->person[td->index].flags & FL_HERO) {
+	if (td->fighter->person[td->index].flags & FL_COURAGE) {
 #ifdef SMALL_BATTLE_MESSAGES
 		if (b->small) {
 			sprintf(smallbuf, "Eine kurze Schwäche erfaßt %s/%d, vergeht jedoch "
@@ -1963,6 +1954,29 @@ attacks_per_round(troop t)
 {
 	return t.fighter->person[t.index].speed;
 }
+
+
+#ifdef HEROES
+#define HERO_SPEED 10
+static void
+make_heroes(battle * b)
+{
+  side * s;
+  cv_foreach(s, b->sides) {
+    fighter * fig;
+    cv_foreach(fig, s->fighters) {
+      unit * u = fig->unit;
+      if (fval(u, UFL_HERO)) {
+        int i;
+        assert(playerrace(u->race));
+        for (i=0;i!=u->number;++i) {
+          fig->person[i].speed += (HERO_SPEED-1);
+        }
+      }
+    } cv_next(fig);
+  } cv_next(s);
+}
+#endif
 
 static void
 attack(battle *b, troop ta, const att *a)
@@ -2148,8 +2162,6 @@ do_attack(fighter * af)
 	unit *au = af->unit;
 	side *side = af->side;
 	battle *b = side->battle;
-	int apr;
-	int a;
 
 	ta.fighter = af;
 
@@ -2165,11 +2177,21 @@ do_attack(fighter * af)
 		/* Wir suchen eine beliebige Feind-Einheit aus. An der können
 		 * wir feststellen, ob noch jemand da ist. */
 		int enemies = count_enemies(b, af->side, FIGHT_ROW, LAST_ROW);
+    int apr, attacks = attacks_per_round(ta);
 		if (!enemies) break;
 
-		for (apr=attacks_per_round(ta); apr > 0; apr--) {
-			for (a=0; a!=10; ++a) {
-				if (au->race->attack[a].type != AT_NONE)
+		for (apr=0;apr!=attacks;++apr) {
+      int a;
+			for (a=0; a!=10 && au->race->attack[a].type!=AT_NONE; ++a) {
+        if (apr>0) {
+          /* Wenn die Waffe nachladen muss, oder es sich nicht um einen 
+           * Waffen-Angriff handelt, dann gilt der Speed nicht. */
+          if (au->race->attack[a].type!=AT_STANDARD) continue;
+          else {
+            weapon * wp = preferred_weapon(ta, true);
+            if (wp->type->reload) continue;
+          }
+        }
 					attack(b, ta, &(au->race->attack[a]));
 			}
 		}
@@ -2926,7 +2948,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 			fig->person[i].defence++;
 			fig->person[i].damage++;
 			fig->person[i].damage_rear++;
-			fig->person[i].flags |= FL_HERO;
+        fig->person[i].flags |= FL_COURAGE;
 		}
 		/* Leute mit Kraftzauber machen +2 Schaden im Nahkampf. */
 		if (i < strongmen) {
@@ -3053,7 +3075,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 	if (t > 0 && get_unitrow(fig) > BEHIND_ROW)
 		t -= 1;
 #endif
-#if TACTICS_RANDOM
+#ifdef TACTICS_RANDOM
 	if (t > 0) {
 		int bonus = 0;
 
@@ -3074,9 +3096,6 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 		}
 		t += bonus;
 	}
-	/* Nicht gut, da nicht personenbezogen. */
-	/* if (t > 0) t += rand() % TACTICS_RANDOM; */
-	/* statt +/- 2 kann man auch random(5) nehmen */
 #endif
 	add_tactics(&fig->side->leader, fig, t);
 	return fig;
@@ -3393,8 +3412,6 @@ join_allies(battle * b)
     }
 }
 
-extern struct item_type * i_silver;
-
 static void
 flee(const troop dt)
 {
@@ -3503,7 +3520,7 @@ init_battle(region * r, battle **bp)
               msg_message("no_attack_after_advance", "unit region command", u, u->region, ord));
           }
 #endif
-          if (fval(u, UFL_HUNGER)) {
+          if (LongHunger(u)) {
             cmistake(u, ord, 225, MSG_BATTLE);
             continue;
           }
@@ -3708,7 +3725,9 @@ do_battle(void)
       continue;
     }
     join_allies(b);
-
+#ifdef HEROES
+    make_heroes(b);
+#endif
     /* Alle Mann raus aus der Burg! */
     for (bu=r->buildings; bu!=NULL; bu=bu->next) bu->sizeleft = bu->size;
 
@@ -3802,7 +3821,7 @@ do_battle(void)
             if ((u->status == ST_FLEE
               || (b->turn>1 && fig->person[dt.index].hp <= runhp)
               || (fig->person[dt.index].flags & FL_PANICED))
-              && !(fig->person[dt.index].flags & FL_HERO))
+              && !(fig->person[dt.index].flags & FL_COURAGE))
             {
               double ispaniced = 0.0;
               if (fig->person[dt.index].flags & FL_PANICED) {

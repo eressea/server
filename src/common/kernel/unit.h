@@ -34,13 +34,14 @@ struct skill;
 #define UFL_PARTEITARNUNG (1<<4)	/* 16 */
 #define UFL_DISBELIEVES   (1<<5)	/* 32 */
 #define UFL_WARMTH        (1<<6)	/* 64 */
+/* UFL_HERO, defined below  (1<<7) */
 #define UFL_MOVED         (1<<8)
 #define UFL_FOLLOWING     (1<<9)
 #define UFL_FOLLOWED      (1<<10)
-#define UFL_HUNGER        (1<<11) /* kann im Folgemonat keinen langen Befehl
-außer ARBEITE ausführen */
+#define UFL_HUNGER        (1<<11) /* kann im Folgemonat keinen langen Befehl außer ARBEITE ausführen */
 #define UFL_SIEGE         (1<<12) /* speedup: belagert eine burg, siehe attribut */
 #define UFL_TARGET        (1<<13) /* speedup: hat ein target, siehe attribut */
+#define UFL_WERE          (1<<14)
 
 /* warning: von 512/1024 gewechslet, wegen konflikt mit NEW_FOLLOW */
 #define UFL_LOCKED        (1<<16) /* Einheit kann keine Personen aufnehmen oder weggeben, nicht rekrutieren. */
@@ -52,10 +53,15 @@ außer ARBEITE ausführen */
 
 #define UFL_TAKEALL       (1<<25) /* Einheit nimmt alle Gegenstände an */
 
-#define UFL_WERE          (1<<28)
-
 /* Flags, die gespeichert werden sollen: */
+#ifndef HEROES
 #define UFL_SAVEMASK (UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL)
+#else
+# define UFL_HERO          (1<<7)
+# define UFL_SAVEMASK (UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL | UFL_HERO)
+extern int maxheroes(const struct faction * f);
+extern int countheroes(const struct faction * f);
+#endif
 
 typedef struct unit {
 	struct unit *next; /* needs to be first entry, for region's unitlist */

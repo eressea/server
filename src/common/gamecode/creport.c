@@ -729,16 +729,25 @@ cr_output_unit(FILE * F, const region * r,
       fputs("1;unaided\n", F);
     }
     i = u_geteffstealth(u);
-    if (i >= 0)
+    if (i >= 0) {
       fprintf(F, "%d;Tarnung\n", i);
+    }
     c = uprivate(u);
-    if (c)
+    if (c) {
       fprintf(F, "\"%s\";privat\n", c);
+    }
     c = hp_status(u);
-    if (c && *c && (u->faction == f || omniscient(f)))
+    if (c && *c && (u->faction == f || omniscient(f))) {
       fprintf(F, "\"%s\";hp\n", add_translation(c, locale_string(u->faction->locale, c)));
-    if (fval(u, UFL_HUNGER) && (u->faction == f))
+    }
+#ifdef HEROES
+    if (fval(u, UFL_HERO)) {
+      fputs("1;hero\n", F);
+    }
+#endif
+    if (fval(u, UFL_HUNGER) && (u->faction == f)) {
       fputs("1;hunger\n", F);
+    }
     if (is_mage(u)) {
       fprintf(F, "%d;Aura\n", get_spellpoints(u));
       fprintf(F, "%d;Auramax\n", max_spellpoints(u->region,u));

@@ -194,8 +194,14 @@ FirstTurn(void)
 }
 
 int
-LongHunger(void) {
+LongHunger(const struct unit * u) {
   static int value = -1;
+  if (u!=NULL) {
+    if (!fval(u, UFL_HUNGER)) return false;
+#ifdef NEW_DAEMONHUNGER_RULE
+    if (u->race==new_race[RC_DAEMON]) return false;
+#endif
+  }
   if (value<0) {
     const char * str = get_param(global.parameters, "hunger.long");
     value = str?atoi(str):0;
@@ -399,7 +405,8 @@ const char *keywords[MAXKEYWORDS] =
 	"PFLANZEN",
 	"WERWESEN",
 	"XONTORMIA",
-	"ALLIANZ"
+  "ALLIANZ",
+  "PROMOTION"
 };
 
 const char *report_options[MAX_MSG] =
@@ -923,7 +930,7 @@ autoalliance(const plane * pl, const faction * sf, const faction * f2)
     }
   }
 
-  if (sf->alliance && AllianceAuto()) {
+  if (sf->alliance!=NULL && AllianceAuto()) {
     if (sf->alliance==f2->alliance) return AllianceAuto();
   }
 
@@ -1223,11 +1230,12 @@ count_all(const faction * f)
 {
 	int n = 0;
 	unit *u;
-	for (u=f->units;u;u=u->nextF)
+  for (u=f->units;u;u=u->nextF) {
 		if (playerrace(u->race)) {
 			n += u->number;
 			assert(f==u->faction);
 		}
+  }
 	return n;
 }
 

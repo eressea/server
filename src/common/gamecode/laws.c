@@ -2444,6 +2444,36 @@ reshow(unit * u, struct order * ord, const char * s, param_t p)
   }
 }
 
+#ifdef HEROES
+static int
+promote_cmd(unit * u, struct order * ord)
+{
+  int money, people; 
+
+  if (maxheroes(u->faction) < countheroes(u->faction)+u->number) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "heroes_maxed", "max count", 
+      maxheroes(u->faction), countheroes(u->faction)));
+    return 0;
+  }
+  if (!playerrace(u->race)) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "heroes_race", "race", 
+      u->race));
+    return 0;
+  }
+  money = get_all(u, i_silver->rtype);
+  people = count_all(u->faction) * u->number;
+
+  if (people>money) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "heroes_cost", "cost have", 
+      people, money));
+    return 0;
+  }
+  use_all(u, i_silver->rtype, people);
+  fset(u, UFL_HERO);
+  return 0;
+}
+#endif
+
 static int
 group_cmd(unit * u, struct order * ord)
 {
@@ -3320,7 +3350,7 @@ setdefaults (void)
       order *ord;
       boolean trade = false;
 
-      if (LongHunger() && fval(u, UFL_HUNGER)) {
+      if (LongHunger(u)) {
         /* Hungernde Einheiten führen NUR den default-Befehl aus */
         set_order(&u->thisorder, default_order(u->faction->locale));
         continue;
@@ -3465,27 +3495,17 @@ use_item(unit * u, const item_type * itype, int amount, struct order * ord)
 }
 
 
-static int
-canheal(const unit *u)
+static double
+heal_factor(const race *rc)
 {
-	switch(old_race(u->race)) {
-	case RC_DAEMON:
-		return 15;
-		break;
-	case RC_GOBLIN:
-		return 20;
-		break;
-	case RC_TROLL:
-		return 15;
-		break;
-	case RC_FIREDRAGON:
-	case RC_DRAGON:
-	case RC_WYRM:
-		return 10;
-		break;
+  switch(old_race(rc)) {
+    case RC_TROLL:
+    case RC_DAEMON:
+      return 1.5;
+  	case RC_GOBLIN:
+      return 2.0;
 	}
-	if (u->race->flags & RCF_NOHEAL) return 0;
-	return 10;
+  return 1.0;
 }
 
 static void
@@ -3508,55 +3528,53 @@ monthly_healing(void)
     }
     for (u = r->units; u; u = u->next) {
       int umhp = unit_max_hp(u) * u->number;
-      int p;
+      double p = 1.0;
 
       /* hp über Maximum bauen sich ab. Wird zb durch Elixier der Macht
       * oder verändertes Ausdauertalent verursacht */
       if (u->hp > umhp) {
         u->hp -= (int) ceil((u->hp - umhp) / 2.0);
-        if (u->hp < umhp)
-          u->hp = umhp;
+        if (u->hp < umhp) u->hp = umhp;
+        continue;
       }
 
-      if((u->race->flags & RCF_NOHEAL) || fval(u, UFL_HUNGER) || fspecial(u->faction, FS_UNDEAD))
-        continue;
+      if (u->race->flags & RCF_NOHEAL) continue;
+      if (fval(u, UFL_HUNGER)) continue;
+      if (fspecial(u->faction, FS_UNDEAD)) continue;
 
-      if(rterrain(r) == T_OCEAN && !u->ship && !(canswim(u)))
-        continue;
+      if (rterrain(r)==T_OCEAN && u->ship==NULL && !canswim(u)) continue;
 
       if(fspecial(u->faction, FS_REGENERATION)) {
         u->hp = umhp;
         continue;
       }
 
-      p = canheal(u);
-      if (u->hp < umhp && p > 0) {
-        /* Mind 1 HP wird pro Runde geheilt, weil angenommen wird,
-        das alle Personen mind. 10 HP haben. */
-        int max_unit = max(umhp, u->number * 10);
-#ifdef NEW_TAVERN
+      p *= heal_factor(u->race);
+      if (u->hp < umhp) {
+#ifdef NEW_DAEMONHUNGER_RULE
+        double maxheal = max(u->number, umhp/20.0);
+#else
+        double maxheal = max(u->number, umhp/10.0);
+#endif
+        int addhp;
         struct building * b = inside_building(u);
         const struct building_type * btype = b?b->type:NULL;
         if (btype == bt_find("inn")) {
-          max_unit = max_unit * 3 / 2;
+          p *= 1.5;
         }
-#endif
-        /* der healing curse verändert den Regenerationsprozentsatz.
-        * Wenn dies für negative Heilung benutzt wird, kann es zu
-        * negativen u->hp führen! */
-        if (healingcurse != 0) {
-          p += healingcurse;
-        }
+        /* pro punkt 5% höher */
+        p *= (1.0 + healingcurse * 0.05);
+
+        maxheal = p * maxheal;
+        addhp = (int)maxheal;
+        maxheal -= addhp;
+        if (maxheal>0.0 && chance(maxheal)) ++addhp;
 
         /* Aufaddieren der geheilten HP. */
-        u->hp = min(u->hp + max_unit*p/100, umhp);
-        if (u->hp < umhp && (rand() % 10 < max_unit % 10)){
-          ++u->hp;
-        }
+        u->hp = min(u->hp + addhp, umhp);
+
         /* soll man an negativer regeneration sterben können? */ 
-        if (u->hp <= 0){
-          u->hp = 1;
-        }
+        assert(u->hp > 0);
       }
     }
   }
@@ -3807,6 +3825,12 @@ processorders (void)
 	puts(" - Krieg & Frieden");
   declare_war();
 #endif
+
+#ifdef HEROES
+  puts(" - Heldenbeförderung");
+  parse(K_PROMOTION, promote_cmd, false);
+#endif
+
 	puts(" - Neue Nummern");
 	renumber();
 

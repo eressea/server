@@ -270,10 +270,10 @@ walkingcapacity(const struct unit * u)
 	n += personen * personcapacity(u);
 	/* Goliathwasser */
   tmp = get_effect(u, oldpotiontype[P_STRONG]);
-	n += min(u->number, tmp) * (HORSECAPACITY - personcapacity(u));
+	n += min(personen, tmp) * (HORSECAPACITY - personcapacity(u));
   /* change_effect wird in ageing gemacht */
   tmp = get_item(u, I_TROLLBELT);
-	n += min(tmp, u->number) * STRENGTHCAPACITY;
+	n += min(personen, tmp) * STRENGTHCAPACITY;
 
 	return n;
 }
@@ -876,7 +876,7 @@ init_drive(void)
     * doesn't seem to be an easy way to speed this up. */
 
     for(u=r->units; u; u=u->next) {
-      if (get_keyword(u->thisorder) == K_DRIVE && !fval(u, UFL_LONGACTION) && !fval(u, UFL_HUNGER)) {
+      if (get_keyword(u->thisorder) == K_DRIVE && !fval(u, UFL_LONGACTION) && !LongHunger(u)) {
         boolean found = false;
         order * ord;
 
@@ -922,7 +922,7 @@ init_drive(void)
           ut = getunit(r, u->faction);
           if (ut==NULL) continue;
 
-          if (get_keyword(ut->thisorder) == K_DRIVE && !fval(ut, UFL_LONGACTION) && !fval(ut, UFL_HUNGER)) {
+          if (get_keyword(ut->thisorder) == K_DRIVE && !fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
             init_tokens(ut->thisorder);
             skip_token();
             if (getunit(r, ut->faction) == u) {
@@ -1349,7 +1349,7 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
         if (ut) {
           boolean found = false;
           if (get_keyword(ut->thisorder) == K_DRIVE
-            && !fval(ut, UFL_LONGACTION) && !fval(ut, UFL_HUNGER)) {
+            && !fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
               init_tokens(ut->thisorder);
               skip_token();
               u2 = getunit(first, ut->faction);
@@ -2201,7 +2201,7 @@ move_hunters(void)
               break;
             }
 
-            if (!fval(u, UFL_LONGACTION) && !fval(u, UFL_HUNGER) && hunt(u)) {
+            if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && hunt(u)) {
               up = &r->units;
               break;
             }
@@ -2335,7 +2335,7 @@ follow_unit(void)
       attrib * a;
       order * ord;
 
-      if (fval(u, UFL_LONGACTION) || fval(u, UFL_HUNGER)) continue;
+      if (fval(u, UFL_LONGACTION) || LongHunger(u)) continue;
       a = a_find(u->attribs, &at_follow);
       for (ord=u->orders;ord;ord=ord->next) {
         const struct locale * lang = u->faction->locale;

@@ -1025,7 +1025,7 @@ sp_flee(fighter * fi, int level, double power, spell * sp)
 				df->person[n].attack -= 1;
 				--force;
 				++panik;
-			} else if (!(df->person[n].flags & FL_HERO)
+			} else if (!(df->person[n].flags & FL_COURAGE)
 					|| !fval(df->unit->race, RCF_UNDEAD))
 			{
 				if (is_magic_resistant(mage, df->unit, 0) == false) {
@@ -1085,9 +1085,9 @@ sp_hero(fighter * fi, int level, double power, spell * sp)
 		--allies;
 
 		if (df) {
-			if (!(df->person[dt.index].flags & FL_HERO)) {
+			if (!(df->person[dt.index].flags & FL_COURAGE)) {
 				df->person[dt.index].defence += df_bonus;
-				df->person[dt.index].flags = df->person[dt.index].flags | FL_HERO;
+				df->person[dt.index].flags = df->person[dt.index].flags | FL_COURAGE;
 				targets++;
 				--force;
 			}
@@ -1145,10 +1145,10 @@ sp_berserk(fighter * fi, int level, double power, spell * sp)
 		--allies;
 
 		if (df) {
-			if (!(df->person[dt.index].flags & FL_HERO)) {
+			if (!(df->person[dt.index].flags & FL_COURAGE)) {
 				df->person[dt.index].attack += at_bonus;
 				df->person[dt.index].defence -= df_malus;
-				df->person[dt.index].flags = df->person[dt.index].flags | FL_HERO;
+				df->person[dt.index].flags = df->person[dt.index].flags | FL_COURAGE;
 				targets++;
 				--force;
 			}
@@ -1202,8 +1202,8 @@ sp_frighten(fighter * fi, int level, double power, spell * sp)
 
 		assert(!helping(fi->side, df->side));
 
-		if (df->person[dt.index].flags & FL_HERO) {
-			df->person[dt.index].flags &= ~(FL_HERO);
+		if (df->person[dt.index].flags & FL_COURAGE) {
+			df->person[dt.index].flags &= ~(FL_COURAGE);
 		}
 		if (is_magic_resistant(mage, df->unit, 0) == false) {
 			df->person[dt.index].attack -= at_malus;

@@ -105,7 +105,7 @@ extern "C" {
 #define FL_TIRED	  1
 #define FL_DAZZLED  2 /* durch Untote oder Dämonen eingeschüchtert */
 #define FL_PANICED  4
-#define FL_HERO     8 /* Helden fliehen nie */
+#define FL_COURAGE  8 /* Helden fliehen nie */
 #define FL_SLEEPING 16
 #define FL_STUNNED	32	/* eine Runde keinen Angriff */
 
@@ -162,7 +162,7 @@ extern "C" {
       int speed       : 8;     /* (Magie) Geschwindigkeitsmultiplkator. */
       int reload      : 4;     /* Anzahl Runden, die die Waffe x noch laden muss.
                                 * dahinter steckt ein array[RL_MAX] wenn er min. eine hat. */
-      int last_action : 8;		 /* In welcher Runde haben wir zuletzt etwas getan */
+      int last_action : 4;     /* In welcher Runde haben wir zuletzt etwas getan */
       struct weapon * missile; /* missile weapon */
       struct weapon * melee;   /* melee weapon */
 #undef FIXED_OPPONENTS

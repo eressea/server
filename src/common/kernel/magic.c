@@ -2424,7 +2424,7 @@ magic(void)
 
       for (ord = u->orders; ord; ord = ord->next) {
         if (get_keyword(ord) == K_CAST) {
-          if (LongHunger() && fval(u, UFL_HUNGER)) {
+          if (LongHunger(u)) {
             cmistake(u, ord, 224, MSG_MAGIC);
             continue;
           }

@@ -2042,6 +2042,10 @@
     <text locale="de">ALLIANZ</text>
     <text locale="en">ALLIANCE</text>
   </string>
+  <string name="PROMOTION">
+    <text locale="de">BEFÖRDERUNG</text>
+    <text locale="en">PROMOTION</text>
+  </string>
   <string name="PFLANZEN">
     <text locale="de">PFLANZEN</text>
   </string>
@@ -5897,6 +5901,16 @@
   <string name="unknown_faction">
     <text locale="de">Unbekannte Partei</text>
     <text locale="en">unknown faction</text>
+  </string>
+
+  <string name="hero">
+    <text locale="de">Held</text>
+    <text locale="en">hero</text>
+  </string>
+
+  <string name="hero_p">
+    <text locale="de">Helden</text>
+    <text locale="en">heroes</text>
   </string>
 
 </strings>

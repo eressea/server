@@ -100,7 +100,6 @@ struct building_type;
 #define PARTIAL_STUDY /* Wenn nicht genug Silber vorhanden, wird ein Talent anteilig gelernt */
 #define HUNGER_REDUCES_SKILL /* Hunger reduziert den Talentwert auf die Hälfte */
 #define NEW_RECEIPIES /* Vereinfachte, besser verteilte Kräuterzutaten für Tränke */
-#define NEW_TAVERN
 #define GOBLINKILL
 
 #define USE_FIREWALL 1
@@ -450,6 +449,9 @@ enum {
   K_WEREWOLF,
   K_XE,
   K_ALLIANCE,
+#ifdef HEROES
+  K_PROMOTION,
+#endif
   MAXKEYWORDS,
   NOKEYWORD = (keyword_t) - 1
 };
@@ -1169,7 +1171,7 @@ extern const char* get_param(const struct param * p, const char * name);
 extern boolean ExpensiveMigrants(void);
 extern int FirstTurn(void);
 extern int NMRTimeout(void);
-extern int LongHunger(void);
+extern int LongHunger(const struct unit * u);
 extern boolean TradeDisabled(void);
 extern int SkillCap(skill_t sk);
 extern int AllianceAuto(void); /* flags that allied factions get automatically */

@@ -20,7 +20,7 @@
  */
 
 #define TEACH_ALL 1
-#define TEACH_FRIENDS 1
+#define TEACH_FRIENDS
 
 #include <config.h>
 #include "eressea.h"
@@ -293,7 +293,12 @@ teach(unit * u, struct order * ord)
 			teachskill[i++]=sk;
 		} while (sk!=NOSKILL);
 		while (teaching && student) {
-			if (student->faction == u->faction && !fval(student, UFL_HUNGER)) {
+			if (student->faction == u->faction) {
+#ifdef NEW_DAEMONHUNGER_RULE
+       if (LongHunger(student)) continue;
+#else
+      if (fval(student, UFL_HUNGER)) continue;
+#endif
 				if (get_keyword(student->thisorder) == K_STUDY) {
           /* Input ist nun von student->thisorder !! */
           init_tokens(student->thisorder);
@@ -310,9 +315,14 @@ teach(unit * u, struct order * ord)
 			}
 			student = student->next;
 		}
-#if TEACH_FRIENDS
+#ifdef TEACH_FRIENDS
 		while (teaching && student) {
-			if (student->faction != u->faction && !fval(student, UFL_HUNGER) && alliedunit(u, student->faction, HELP_GUARD)) {
+			if (student->faction != u->faction && alliedunit(u, student->faction, HELP_GUARD)) {
+#ifdef NEW_DAEMONHUNGER_RULE
+      if (LongHunger(student)) continue;
+#else
+        if (fval(student, UFL_HUNGER)) continue;
+#endif
 				if (get_keyword(student->thisorder) == K_STUDY) {
 					/* Input ist nun von student->thisorder !! */
           init_tokens(student->thisorder);
@@ -699,7 +709,7 @@ learn(void)
             days *= 2;
           }
 
-          if (fval(u, UFL_HUNGER)) days = days / 2;
+          if (fval(u, UFL_HUNGER)) days /= 2;
 
           while (days) {
             if (days>=u->number*30) {

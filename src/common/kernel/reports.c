@@ -261,6 +261,12 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
     }
   }
 
+#ifdef HEROES
+  if (fval(u, UFL_HERO) && (u->faction == f || omniscient(f))) {
+    scat(", ");
+    scat(LOC(f->locale, "hero"));
+  }
+#endif
   /* status */
 
   if (u->number && (u->faction == f || telepath_see || isbattle)) {

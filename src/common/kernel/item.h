@@ -552,6 +552,8 @@ extern void init_resources(void);
 
 extern const char* resname(resource_t res, int index);
 
+extern struct item_type *i_silver;
+
 #ifdef __cplusplus
 }
 #endif

@@ -102,7 +102,6 @@ extern char * g_reportdir;
 extern char * g_datadir;
 extern char * g_basedir;
 extern char * g_resourcedir;
-extern item_type * i_silver;
 
 extern boolean nonr;
 extern boolean nocr;

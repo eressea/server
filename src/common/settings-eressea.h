@@ -34,10 +34,14 @@
 #define PEASANTS_DO_NOT_STARVE 0
 #define NEW_MIGRATION 1
 #define ASTRAL_HUNGER
-
 #define NEWATSROI 0
 
 #define MUSEUM_MODULE
 #define ARENA_MODULE
 #define WORMHOLE_MODULE
 #define XECMD_MODULE
+
+#define NEW_DAEMONHUNGER_RULE
+#define NEW_COMBATSKILLS_RULE
+#define ROW_FACTOR 3 /* factor for combat row advancement rule */
+#define HEROES

@@ -49,6 +49,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define FIND_FOREIGN_TEMP
 
@@ -1127,3 +1128,22 @@ unitlist_insert(struct unit_list **ul, struct unit *u)
   *ul = rl2;
 }
 
+#ifdef HEROES
+int 
+maxheroes(const struct faction * f)
+{
+  return (int)(log10(count_all(f) / 50.0) * 20);
+}
+
+int 
+countheroes(const struct faction * f)
+{
+  const unit * u = f->units;
+  int n = 0;
+  while (u) {
+    if (fval(u, UFL_HERO)) n+= u->number;
+    u = u->nextF;
+  }
+  return n;
+}
+#endif

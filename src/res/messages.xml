@@ -6028,5 +6028,18 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) können keine Helden erwählen."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) cannot be heroes."</text>
   </message>
+
+  <message name="heroes_cost" section="errors">
+    <type>
+      <arg name="command" type="order"/>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="cost" type="int"/>
+      <arg name="have" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat nur $int($have) von $int($cost) benötigtem Silber."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit has $int($have) of $int($cost) silver required."</text>
+  </message>
+
 </messages>
 

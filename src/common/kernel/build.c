@@ -62,7 +62,6 @@
 
 #include <items/catapultammo.h>
 
-#define NEW_TAVERN
 #define STONERECYCLE 50
 /* Name, MaxGroesse, MinBauTalent, Kapazitaet, {Eisen, Holz, Stein, BauSilber,
  * Laen, Mallorn}, UnterSilber, UnterSpezialTyp, UnterSpezial */

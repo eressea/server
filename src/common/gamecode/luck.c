@@ -55,8 +55,6 @@
 
 #define STANDARD_LUCK 0
 
-extern struct item_type *i_silver;
-
 static void
 lucky_silver(const unit *u)
 {
