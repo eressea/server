@@ -24,6 +24,7 @@ extern "C" {
   extern struct region_list *all_in_range(const struct region *r, int n, boolean (*valid)(const struct region *));
   extern boolean inhabitable(const struct region * r);
   extern struct plane * get_astralplane(void);
+  extern struct plane * get_normalplane(void);
 
   void create_teleport_plane(void);
   void set_teleport_plane_regiontypes(void);

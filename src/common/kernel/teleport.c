@@ -94,8 +94,10 @@ region *
 r_standard_to_astral(const region *r)
 {
   region *r2;
-  r2 = tpregion(r);
 
+  assert(rplane(r) == get_normalplane());
+
+  r2 = tpregion(r);
   if (rplane(r2) != get_astralplane() || rterrain(r2) != T_ASTRAL) return NULL;
 
   return r2;
@@ -112,7 +114,7 @@ r_astral_to_standard(const region *r)
   y = (r->y-TE_CENTER_Y)*TP_RADIUS;
 
   r2 = findregion(x,y);
-  if (r2!=NULL || getplaneid(r2) != 0) return NULL;
+  if (rplane(r2)!=get_normalplane()) return NULL;
 
   return r2;
 }
@@ -160,6 +162,12 @@ random_in_teleport_plane(void)
       next = rand() % 100;
     }
   }
+}
+
+plane *
+get_normalplane(void)
+{
+  return NULL;
 }
 
 plane * 
