@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.23 2001/02/13 19:22:48 corwin Exp $
+ *	$Id: laws.c,v 1.24 2001/02/17 16:07:02 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2133,7 +2133,7 @@ reorder_owners(region * r)
 				if (fval(u, FL_OWNER)) {
 					unit * nu = *ubegin;
 					insert=ubegin;
-					if (nu && nu->building==u->building && fval(nu, FL_OWNER)) {
+					if (nu!=u && nu->building==u->building && fval(nu, FL_OWNER)) {
 						log_error(("[reorder_owners] %s hat mehrere Besitzer mit FL_OWNER.\n", buildingname(nu->building)));
 						freset(nu, FL_OWNER);
 					}
@@ -2182,7 +2182,7 @@ reorder_owners(region * r)
 				if (fval(u, FL_OWNER)) {
 					unit * nu = *ubegin;
 					insert = ubegin;
-					if (nu && nu->ship==u->ship && fval(nu, FL_OWNER)) {
+					if (nu!=u && nu->ship==u->ship && fval(nu, FL_OWNER)) {
 						log_error(("[reorder_owners] %s hat mehrere Besitzer mit FL_OWNER.\n", shipname(nu->ship)));
 						freset(nu, FL_OWNER);
 					}

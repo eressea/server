@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.25 2001/02/17 14:47:43 enno Exp $
+ *	$Id: korrektur.c,v 1.26 2001/02/17 16:07:03 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1953,6 +1953,7 @@ set_atgm(faction * f)
 	if (!f) return;
 	while (p) {
 		a_add(&f->attribs, make_gm(p));
+		p = p->next;
 	}
 }
 
