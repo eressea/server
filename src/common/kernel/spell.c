@@ -3193,6 +3193,7 @@ sp_unholypower(castorder *co)
 	spellparameter *pa = co->par;
 	int i;
 	int n;
+	int wounds;
 
 	n = dice(co->force, 10);
 
@@ -3220,10 +3221,14 @@ sp_unholypower(castorder *co)
 			cmistake(mage, strdup(co->order), 284, MSG_MAGIC);
 			continue;
 		}
+		/* Untote heilen nicht, darum den neuen Untoten maximale hp geben
+		 * und vorhandene Wunden abziehen */
+		wounds = unit_max_hp(u)*u->number - u->hp;
 
 		if(u->number <= n) {
 			n -= u->number;
 			u->race = target_race;
+			u->hp = unit_max_hp(u)*u->number - wounds;
 			add_message(&co->rt->msgs, msg_message("unholypower_effect",
 				"mage target race", mage, u, target_race));
 		} else {
@@ -3238,6 +3243,8 @@ sp_unholypower(castorder *co)
 				cmistake(mage, strdup(co->order), 74, MSG_MAGIC);
 				continue;
 			}
+			/* Verletzungsanteil der transferierten Personen berechnen */
+			wounds = wounds*n/u->number;
 
 			un = createunit(co->rt, u->faction, 0, target_race);
 			if (co->rt==u->region) {
@@ -3245,6 +3252,7 @@ sp_unholypower(castorder *co)
 				un->ship = u->ship;
 			}
 			transfermen(u, un, n);
+			un->hp = unit_max_hp(un)*n - wounds;
 			add_message(&co->rt->msgs, msg_message("unholypower_limitedeffect",
 				"mage target race amount",
 				mage, u, target_race, n));
