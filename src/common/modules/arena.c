@@ -192,7 +192,7 @@ use_wand_of_tears(unit * user, const struct item_type * itype, const char * cmd)
 #if SKILLPOINTS
 				change_skill(u, u->skills[i].id, -10);
 #else
-				if (rand()%3) reduce_skill(u->skills+i, 1);
+				if (rand()%3) reduce_skill(u, u->skills+i, 1);
 #endif
 			}
 			if (k) ADDMSG(&u->faction->msgs, msg_message("wand_of_tears_effect",

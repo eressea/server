@@ -599,7 +599,8 @@ spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh,
 		  boolean days)
 {
 	char * sbuf = buf+strlen(buf);
-	int i;
+	int i, effsk;
+
 	if (!u->number)
 		return;
 
@@ -625,12 +626,24 @@ spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh,
 			sbuf += sprintf(sbuf, "%d/", i);
 		}
 	}
-	sbuf += sprintf(sbuf, "%d", effskill(u, sk));
 
-#if SKILLPOINTS
+	effsk = effskill(u, sk);
+	sbuf += sprintf(sbuf, "%d", effsk);
+
+#if SKILLPOINTS == 1
 	if (days) {
 		assert(u->number);
 		sbuf += sprintf(sbuf, " [%d]", get_skill(u, sk) / u->number);
+	}
+#else
+	if(effsk > 0 && u->faction->options & Pow(O_SHOWSKCHANGE)) {
+		attrib *a;
+		for(a = a_find(u->attribs,&at_showskchange); a; a=a->nexttype) {
+			if(a->data.sa[0] == sk) {
+				sbuf += sprintf(sbuf, " (%s%hd)", (a->data.sa[1]>0)?"+":"", a->data.sa[1]);
+				break;
+			}
+		}
 	}
 #endif
 }

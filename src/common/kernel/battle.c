@@ -992,10 +992,10 @@ drain_exp(unit *u, int n)
 		skill * sv = get_skill(u, sk);
 		while (n>0) {
 			if (n>=30*u->number) {
-				reduce_skill(sv, 1);
+				reduce_skill(u, sv, 1);
 				n-=30;
 			} else {
-				if (rand()%(30*u->number)<n) reduce_skill(sv, 1);
+				if (rand()%(30*u->number)<n) reduce_skill(u, sv, 1);
 				n = 0;
 			}
 		}

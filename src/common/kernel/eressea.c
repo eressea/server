@@ -271,7 +271,8 @@ const char *options[MAXOPTIONS] =
 	"MATERIALPOOL",
 	"ADRESSEN",
 	"BZIP2",
-	"PUNKTE"
+	"PUNKTE",
+	"SHOWSKCHANGE"
 };
 
 int

@@ -546,10 +546,10 @@ sp_mindblast(fighter * fi, int level, int power, spell * sp)
 				skill * sv = get_skill(du, sk);
 				while (n>0) {
 					if (n>=30*du->number) {
-						reduce_skill(sv, 1);
+						reduce_skill(du, sv, 1);
 						n-=30;
 					} else {
-						if (rand()%(30*du->number)<n) reduce_skill(sv, 1);
+						if (rand()%(30*du->number)<n) reduce_skill(du, sv, 1);
 						n = 0;
 					}
 				}

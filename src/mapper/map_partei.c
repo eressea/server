@@ -299,7 +299,7 @@ change_level(unit * u, skill_t sk, int bylevel)
 {
 	skill * sv = get_skill(u, sk);
 	assert(bylevel>0);
-	if (sv==0) set_skill(u, sk, bylevel, 0);
+	if (sv==0) set_skill(u, sk, bylevel, 0, true);
 	else {
 		sv->level = (unsigned char)(sv->level+bylevel);
 		sv->learning = 0;

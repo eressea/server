@@ -1038,7 +1038,7 @@ godcurse(void)
 				skill * sv = u->skills;
 				while (sv!=u->skills+u->skill_size) {
 					int weeks = 1+rand()%3;
-					reduce_skill(sv, weeks);
+					reduce_skill(u, sv, weeks);
 					++sv;
 				}
 #endif
@@ -1211,7 +1211,7 @@ randomevents(void)
 				while (sv!=u->skills+u->skill_size) {
 					if (rand() % 100 < 25) {
 						int weeks = 0+rand()%3;
-						if (rand() % 100 < 40) reduce_skill(sv, weeks);
+						if (rand() % 100 < 40) reduce_skill(u, sv, weeks);
 						else while (weeks--) learn_skill(u, sv->id, 1.0);
 					}
 					++sv;

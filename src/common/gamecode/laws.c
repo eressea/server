@@ -394,7 +394,7 @@ live(region * r)
 				}				/* bestes Talent raussuchen */
 				if (sb!=NULL) {
 					int weeks = min(effect, u->number);
-					reduce_skill(sb, weeks);
+					reduce_skill(u, sb, weeks);
 					ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
 						"unit weeks skill", u, weeks, (skill_t)sb->id));
 				}	/* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
@@ -3394,6 +3394,7 @@ processorders (void)
 
 	puts(" - Zaubern");
 	magic();
+	remove_empty_units();
 
 	puts(" - Lehren");
 	teaching();

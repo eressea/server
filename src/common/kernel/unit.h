@@ -73,6 +73,7 @@ extern attrib_type at_potionuser;
 extern attrib_type at_contact;
 extern attrib_type at_effect;
 extern attrib_type at_private;
+extern attrib_type at_showskchange;
 
 int ualias(const struct unit * u);
 
@@ -116,7 +117,7 @@ extern int get_skill(const struct unit * u, skill_t id);
 #define has_skill(u, id) (get_skill(u, id)>0)
 #define change_level(u, sk, bylevel) set_level(u, sk, max(0,get_level(u,sk)+bylevel));
 #else
-extern void set_skill(struct unit * u, skill_t id, int level, int weeks);
+extern void set_skill(struct unit * u, skill_t id, int level, int weeks, boolean load);
 extern struct skill * get_skill(const struct unit * u, skill_t id);
 extern boolean has_skill(const unit* u, skill_t sk);
 #endif

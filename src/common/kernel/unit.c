@@ -777,7 +777,7 @@ transfermen(unit * u, unit * u2, int n)
 		skill * sv;
 		for (sv=u->skills;sv!=u->skills+u->skill_size;++sv) {
 			if (u2->number == 0) {
-				set_skill(u2, sv->id, sv->level, sv->learning);
+				set_skill(u2, sv->id, sv->level, sv->learning, false);
 			} else {
 				skill * sn = get_skill(u2, sv->id);
 				if (sn) {
@@ -919,6 +919,11 @@ set_number(unit * u, int count)
 }
 
 #if !SKILLPOINTS
+
+attrib_type at_showskchange = {
+	"showskchange", NULL, NULL, NULL, NULL, NULL
+};
+
 boolean
 learn_skill(unit * u, skill_t sk, double chance)
 {
@@ -939,25 +944,27 @@ learn_skill(unit * u, skill_t sk, double chance)
 		if (rand()%2==0) --heads;
 		if (heads>coins) break;
 	}
-	if (heads) ++weeks;
-	else ++level;
-	if (!sv) {
-		set_skill(u, sk, level, weeks);
+	if (heads) {
+		++weeks;
 	} else {
-		sv->level = (unsigned char)level;
-		sv->learning = (unsigned char)weeks;
+		++level;
+		weeks = 0;
 	}
+	set_skill(u, sk, level, weeks, false);
 	return heads==0;
 }
 
 void
-set_skill(unit * u, skill_t id, int level, int weeks)
+set_skill(unit * u, skill_t id, int level, int weeks, boolean load)
 {
+	attrib *a;
 	skill *i = u->skills;
+	unsigned char oldlevel = 0;
 
 	assert(level>=0 && weeks>=0 && weeks<=level*2);
 	for (; i != u->skills + u->skill_size; ++i) {
 		if (i->id == id) {
+			oldlevel = i->level;
 			if (level || weeks) {
 				i->level = (unsigned char)level;
 				i->learning = (unsigned char)weeks;
@@ -967,7 +974,23 @@ set_skill(unit * u, skill_t id, int level, int weeks)
 			}
 			return;
 		}
-	} if (!level && !weeks) {
+	}
+
+	if(load == false) {
+		for(a = a_find(u->attribs, &at_showskchange);a;a = a->nexttype) {
+			if(a->data.sa[0] == id) {
+				a->data.sa[1] = (short)(a->data.sa[1] + (level-oldlevel));
+				break;
+			}
+		}
+		if(a == NULL) {
+			a = a_add(&u->attribs, a_new(&at_showskchange));
+			a->data.sa[0] = id;
+			a->data.sa[1] = (short)(level-oldlevel);
+		}
+	}
+
+	if (!level && !weeks) {
 		return;
 	}
 	++u->skill_size;

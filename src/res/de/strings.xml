@@ -193,6 +193,9 @@
 	<string name="PUNKTE">
 		<text locale="de">PUNKTE</text>
 	</string>
+	<string name="SHOWSKCHANGE">
+		<text locale="de">TALENTVERSCHIEBUNGEN</text>
+	</string>
 
 	<comment>Schiffstypen</comment>
 	<string name="balloon_a">

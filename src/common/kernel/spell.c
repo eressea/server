@@ -144,7 +144,7 @@ do_shock(unit *u, char *reason)
 	if(rand()%10 < 2) {
 		for (sk=0; sk < MAXSKILLS; sk++) {
 			int n = get_skill(u, sk);
-			if (n!=0) set_skill(u, sk, (n*9)/10);
+			if (n!=0) set_skill(u, sk, (n*9)/10, false);
 		}
 	}
 #else
@@ -152,7 +152,7 @@ do_shock(unit *u, char *reason)
 		skill * sv = u->skills+i;
 		int weeks = (sv->level * sv->level - sv->level) / 2 + sv->learning;
 		int change = (weeks+9) / 10;
-		reduce_skill(sv, change);
+		reduce_skill(u, sv, change);
 	}
 #endif
 
@@ -4699,7 +4699,7 @@ sp_headache(castorder *co)
 	if (smax!=NULL) {
 		/* wirkt auf maximal 10 Personen */
 		int change = min(10, target->number) * (rand()%2+1) / target->number;
-		reduce_skill(smax, change);
+		reduce_skill(target, smax, change);
 	}
 #endif
 	set_string(&target->thisorder, "");

@@ -41,6 +41,9 @@
 	<string name="ZUGVORLAGE">
 		<text locale="en">TEMPLATE</text>
 	</string>
+	<string name="SHOWSKCHANGE">
+		<text locale="en">SKILLCHANGES</text>
+	</string>
 
 	<string name="INFO">
 		<text locale="en">INFO</text>

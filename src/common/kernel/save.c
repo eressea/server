@@ -1472,14 +1472,14 @@ readgame(boolean backup)
 					int lvl = level(skill);
 					int weeks = (skill - level_days(lvl))/30;
 					if (weeks || lvl) {
-						set_skill(u, sk, lvl, 2*weeks);
+						set_skill(u, sk, lvl, 2*weeks, true);
 					}
 				}
 			} else {
 				while ((sk = (skill_t) ri(F)) != NOSKILL) {
 					int level = ri(F);
 					int weeks = ri(F);
-					set_skill(u, sk, level, weeks);
+					set_skill(u, sk, level, weeks, true);
 				}
 			}
 #endif

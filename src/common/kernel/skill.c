@@ -30,6 +30,7 @@
 #include "curse.h"
 #include "region.h"
 #include "karma.h"
+#include "attrib.h"
 
 /* libc includes */
 #include <assert.h>
@@ -257,13 +258,16 @@ level(int days)
 
 #if !SKILLPOINTS
 void 
-reduce_skill(skill * sv, int change)
+reduce_skill(unit *u, skill * sv, int change)
 {
 	if (sv->learning>=change) {
 		/* just forget a few weeks */
 		sv->learning = (unsigned char)(sv->learning-change);
 	} else {
 		int weeks;
+		unsigned char oldlevel = sv->level;
+		attrib *a;
+
 		change -= sv->learning;
 		while (change>=sv->level && sv->level > 0) {
 			change -= sv->level;
@@ -279,6 +283,18 @@ reduce_skill(skill * sv, int change)
 			weeks = 0;
 		}
 		sv->learning = (unsigned char)weeks;
+
+		for(a = a_find(u->attribs, &at_showskchange);a;a = a->nexttype) {
+			if(a->data.sa[0] == sv->id) {
+				a->data.sa[1] = (short)(a->data.sa[1] + (sv->level-oldlevel));
+				break;
+			}
+		}
+		if(a == NULL) {
+			a = a_add(&u->attribs, a_new(&at_showskchange));
+			a->data.sa[0] = sv->id;
+			a->data.sa[1] = (short)(sv->level-oldlevel);
+		}
 	}
 	assert(sv->level>=0 && sv->learning>=0 && sv->learning<=sv->level*2);
 }

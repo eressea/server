@@ -42,7 +42,7 @@ typedef char direction_t;
 typedef int race_t;
 typedef int curse_t;
 typedef int magic_t;
-typedef int skill_t;
+typedef short skill_t;
 typedef int herb_t;
 typedef int potion_t;
 typedef int luxury_t;
@@ -561,6 +561,7 @@ enum {
 	O_ADRESSEN,			/* 512 */
 	O_BZIP2,				/* 1024 - crkurz compatible flag */
 	O_SCORE,				/* 2048 - punkte anzeigen? */
+	O_SHOWSKCHANGE,	/* 4096 - Skillveränderungen anzeigen? */
 	MAXOPTIONS
 };
 

@@ -456,7 +456,7 @@ new_message(struct faction * receiver, const char* sig, ...)
 				args[i] = (void*)oldresourcetype[(resource_t)va_arg(marker, resource_t)];
 				break;
 			case 't':
-				args[i] = (void*)va_arg(marker, skill_t);
+				args[i] = (void*)va_arg(marker, int);
 				break;
 			case 'd':
 				args[i] = (void*)i;
