@@ -159,10 +159,10 @@ attrib_type at_shiptrail = {
 static int
 age_speedup(attrib *a)
 {
-  if(a->data.i > 0) {
-    --a->data.i;
+  if (a->data.sa[0] > 0) {
+    a->data.sa[0] = a->data.sa[0] - a->data.sa[1];
   }
-  return a->data.i;
+  return a->data.sa[0]>0;
 }
 
 attrib_type at_speedup = {

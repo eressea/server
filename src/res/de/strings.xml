@@ -7,6 +7,19 @@
     _a: including article (ein Troll, a troll)
    -->
 
+  <namespace name="iteminfo">
+    <string name="speedsail">
+      <text locale="de">
+      Setzt eine Einheit dieses Segel auf einem Schiff, so erhöht
+      sich dessen Reichweite kurzfristig um 50 Regionen.
+      </text>
+      <text locale="en">
+      A unit setting this sail on a ship temporarily increases the
+      ship's range by 50 regions.
+      </text>
+    </string>
+  </namespace>
+
   <namespace name="school">
     <string name="none">
       <text locale="de">Kein Magiegebiet</text>
@@ -574,6 +587,14 @@
   <string name="catapultammo_p">
     <text locale="de">Katapultmunition</text>
     <text locale="en">ammunition</text>
+  </string>
+  <string name="speedsail">
+    <text locale="de">Sonnensegel</text>
+    <text locale="en">solar sail</text>
+  </string>
+  <string name="speedsail_p">
+    <text locale="de">Sonnensegel</text>
+    <text locale="en">solar sails</text>
   </string>
 
   <string name="elfspoil">
@@ -3947,33 +3968,23 @@
     </string>
     <string name="miracle_doctor">
       <text locale="de">
-      Wenn einem der Alchemist nicht weiterhelfen kann, geht
-      man zu dem
-      gelehrten Tybiedmagier. Seine Tränke und Tinkturen
-      helfen gegen alles,
-      was man sonst nicht bekommen kann. Ob nun die kryptische
-      Formel unter dem
-      Holzschuh des untreuen Ehemannes wirklich geholfen hat -
-      nun, der des
-      Lesens nicht mächtige Bauer wird es nie wissen.  Dem
-      Magier hilft es
-      auf jeden Fall... beim Füllen seines Geldbeutels.  50
-      Silber pro Stufe
-      lassen sich so in einer Woche verdienen.
+      Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem
+      gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen
+      alles, was man sonst nicht bekommen kann. Ob nun die kryptische
+      Formel unter dem Holzschuh des untreuen Ehemannes wirklich geholfen
+      hat - nun, der des Lesens nicht mächtige Bauer wird es nie wissen.
+      Dem Magier hilft es auf jeden Fall... beim Füllen seines
+      Geldbeutels.  50 Silber pro Stufe lassen sich so in einer Woche
+      verdienen.
       </text>
       <text locale="en">
-      If the local alchemist could not help you, you should
-      visit a
-      scholar of Tybied. His potions and tinctures may help
-      when nothing
-      else does. If the cryptic formula under the wooden shoes
-      of the
-      unfaithful husband really helped? - well, the peasant,
-      who isn't
-      capable of reading, will never know. At least it helped
-      the mage...
-      to fill his purse. In one week he can earn 50 silver per
-      level that way.
+      If the local alchemist could not help you, you should visit a
+      scholar of Tybied. His potions and tinctures may help when nothing
+      else does. If the cryptic formula under the wooden shoes of the
+      unfaithful husband really helped? - well, the peasant, who isn't
+      capable of reading, will never know. At least it helped the mage...
+      to fill his purse. In one week he can earn 50 silver per level that
+      way.
       </text>
     </string>
 
@@ -5783,63 +5794,63 @@
     <text locale="de">Unbekannte Partei</text>
     <text locale="en">unknown faction</text>
   </string>
-  
+
   <string name="spinx00">
     <text locale="de">Das Schiff des Elfen hat ein rotes Segel</text>
   </string>
-  
+
   <string name="spinx01">
     <text locale="de">Der Zwerg hat eine Nuss dabei</text>
   </string>
-  
+
   <string name="spinx02">
     <text locale="de">Die Katze führt eine Hellebarde</text>
   </string>
-  
+
   <string name="spinx03">
     <text locale="de">Das Schiff mit dem grünen Segel liegt links neben dem mit einem weissen Segel</text>
   </string>
-  
+
   <string name="spinx04">
     <text locale="de">Auf dem Schiff mit grünen Segeln kam der Speerkämpfer</text>
   </string>
-  
+
   <string name="spinx05">
     <text locale="de">Der Krieger mit dem Kreis im Wappen hat einen Keks</text>
   </string>
-  
+
   <string name="spinx06">
     <text locale="de">Der Krieger des mittleren Schiffs hat ein Schwert</text>
   </string>
-  
+
   <string name="spinx07">
     <text locale="de">Auf dem gelben Segel prankt ein Kreuz als Wappen</text>
   </string>
-  
+
   <string name="spinx08">
     <text locale="de">Der Mensch kam mit dem ersten Schiff</text>
   </string>
-  
+
   <string name="spinx09">
     <text locale="de">Das Schiff mit dem Stern im Wappen liegt neben dem der einen Mandelkern hat</text>
   </string>
-  
+
   <string name="spinx10">
     <text locale="de">Das Schiff des Kriegers, der ein Apfel hat, liegt neben dem, der ein Kreuz als Wappen hat</text>
   </string>
-  
+
   <string name="spinx11">
     <text locale="de">Der Krieger mit dem Turm im Wappen trägt eine Axt</text>
   </string>
-  
+
   <string name="spinx12">
     <text locale="de">Das Schiff des Menschen liegt neben dem blauen Schiff</text>
   </string>
-  
+
   <string name="spinx13">
     <text locale="de">Das Insekt trägt einen Baum als Wappen</text>
   </string>
-  
+
   <string name="spinx14">
     <text locale="de">Das Schiff mit dem Stern im Wappen liegt neben dem des Kriegers, der einen Zweihänder führt</text>
   </string>

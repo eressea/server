@@ -120,6 +120,7 @@ restart_race(unit *u, const race * rc)
   unit * nu = addplayer(u->region, f);
   order ** ordp = &u->orders;
   f->subscription = u->faction->subscription;
+  f->age = u->faction->age;
   fset(f, FFL_RESTART);
   if (f->subscription) {
     sql_print(("UPDATE subscriptions set faction='%s', race='%s' where id=%u;\n",
@@ -975,7 +976,7 @@ transfer_faction(faction *f, faction *f2)
 }
 
 static int
-restart(unit * u, struct order * ord)
+restart_cmd(unit * u, struct order * ord)
 {
   init_tokens(ord);
   skip_token(); /* skip keyword */
@@ -1091,7 +1092,7 @@ parse_quit(void)
             break;
           case K_RESTART:
             if (u->number > 0) {
-              if (restart(u, ord)!=0) ord = NULL;
+              if (restart_cmd(u, ord)!=0) ord = NULL;
             }
             break;
         }
@@ -2211,35 +2212,42 @@ display_item(faction *f, unit *u, const item_type * itype)
   char t[NAMESIZE + 1];
   char filename[MAX_PATH];
   const char *name;
+  const char *info;
+  const char *key;
 
   if (u && *i_find(&u->items, itype) == NULL) return false;
 
   name = resourcename(itype->rtype, 0);
-  sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
-  fp = fopen(filename, "r");
-  if (!fp) {
-    name = locale_string(f->locale, resourcename(itype->rtype, 0));
+  key = mkname("iteminfo", name);
+  info = locale_string(f->locale, key);
+
+  if (info==key) {
     sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
     fp = fopen(filename, "r");
-  }
-  if (!fp) {
-    name = resourcename(itype->rtype, 0);
-    sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(default_locale), name);
-    fp = fopen(filename, "r");
-  }
-  if (!fp) return false;
-
-  buf[0]='\0';
-  while (fgets(t, NAMESIZE, fp) != NULL) {
-    if (t[strlen(t) - 1] == '\n') {
-      t[strlen(t) - 1] = 0;
+    if (!fp) {
+      name = locale_string(f->locale, resourcename(itype->rtype, 0));
+      sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
+      fp = fopen(filename, "r");
     }
-    strcat(buf, t);
+    if (!fp) {
+      name = resourcename(itype->rtype, 0);
+      sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(default_locale), name);
+      fp = fopen(filename, "r");
+    }
+    if (!fp) return false;
+
+    buf[0]='\0';
+    while (fgets(t, NAMESIZE, fp) != NULL) {
+      if (t[strlen(t) - 1] == '\n') {
+        t[strlen(t) - 1] = 0;
+      }
+      strcat(buf, t);
+    }
+    fclose(fp);
+    info = buf;
   }
-  fclose(fp);
-  name = buf;
   ADDMSG(&f->msgs, msg_message("displayitem", "weight item description",
-    itype->weight/1000, itype->rtype, strdup(name)));
+    itype->weight/1000, itype->rtype, strdup(info)));
 
   return true;
 }

@@ -202,6 +202,14 @@
     <text locale="fr">"heavy fog makes it impossible to leave the region. ($int36($id))"</text>
     <text locale="en">"heavy fog makes it impossible to leave the region. ($int36($id))"</text>
   </message>
+  <message name="use_speedsail" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) setzt ein Sonnensegel. Die Geschwindigkeit des Schiffes erhöht sich dramatisch."</text>
+    <text locale="fr">"$unit($unit) sets a solar sail. The ship's speed is greatly increased."</text>
+    <text locale="en">"$unit($unit) sets a solar sail. The ship's speed is greatly increased."</text>
+  </message>
   <message name="use_questkey_wrongregion" section="events">
     <type>
       <arg name="region" type="region"/>

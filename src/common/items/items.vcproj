@@ -176,6 +176,12 @@
 			RelativePath=".\seed.c">
 		</File>
 		<File
+			RelativePath=".\speedsail.c">
+		</File>
+		<File
+			RelativePath=".\speedsail.h">
+		</File>
+		<File
 			RelativePath=".\weapons.c">
 		</File>
 		<File

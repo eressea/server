@@ -1,3 +1,23 @@
+function test_sail()
+  r0 = terraform(0, 0, "plain")
+
+  orcs = add_faction("enno@eressea.de", "orc", "de")
+  orcs.age = 20
+
+  orc = add_unit(orcs, r0)
+  orc.number = 1
+  orc:add_item("speedsail", orc.number)
+
+  orc:clear_orders()
+  orc:add_order("NUMMER PARTEI orcs")
+  orc:add_order("NUMMER EINHEIT orc")
+  orc:add_order("BENENNE EINHEIT Orks")
+  orc:add_order("ZEIGEN \"Sonnensegel\"")
+
+  process_orders()
+  write_reports() 
+end
+
 function test_movement()
   west = direction("west")
   east = direction("east")
@@ -302,7 +322,8 @@ function test_fail()
   print(f)
 end
 
-test_movement()
+test_sail()
+-- test_movement()
 -- test_fail()
 -- test_handler()
 -- test_parser()
