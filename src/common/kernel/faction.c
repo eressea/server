@@ -87,6 +87,8 @@ addplayer(region *r, const char *email, const struct race * frace, const locale 
 	int i;
 	unit *u;
 
+	assert(frace != new_race[RC_ORC]);
+
 	faction *f = (faction *) calloc(1, sizeof(faction));
 
 	set_string(&f->email, email);
