@@ -913,9 +913,11 @@ terraform(region * r, terrain_t t)
 	
 	if (landregion(t)) {
 		const char *name = NULL;
-
-		if (terrain[r->terrain].herbs) name = terrain[r->terrain].herbs[rand()%3];
-
+		if (terrain[r->terrain].herbs) {
+			int len=0;
+			while (terrain[r->terrain].herbs[len]) ++len;
+			if (len) name = terrain[r->terrain].herbs[rand()%len];
+		}
 		if (name != NULL) {
 			const item_type * itype = finditemtype(name, locale_de);
 			const herb_type * htype = resource2herb(itype->rtype);

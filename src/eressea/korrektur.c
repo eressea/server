@@ -1334,6 +1334,33 @@ fix_herbtypes(void)
 }
 #endif
 
+static int
+fix_plainherbs(void)
+{
+	region *r, *lastr;
+	for (r=regions;r;r=r->next) {
+		int i;
+		const char * name;
+		terrain_t t = rterrain(r);
+		if (t!=T_PLAIN) continue;
+		name = LOC(default_locale, rherbtype(r)->itype->rtype->_name[0]);
+		for (i=0;i!=3;++i) if (strcmp(terrain[t].herbs[i], name)==0) break;
+		if (i!=3) lastr=r->next;
+		r=r->next;
+	}
+	for (r=lastr;r;r=r->next) {
+		terrain_t t = rterrain(r);
+		if (t!=T_PLAIN) continue;
+		if (rand()%2) {
+			const char * name = terrain[t].herbs[3+rand()%3];
+			const item_type * itype = finditemtype(name, default_locale);
+			const herb_type * htype = resource2herb(itype->rtype);
+			rsetherbtype(r, htype);
+		}
+	}
+	return 0;
+}
+
 #ifdef SKILLFIX_SAVE
 typedef struct skillfix_data {
 	unit * u;
@@ -2685,6 +2712,7 @@ korrektur(void)
 	stats();
 	do_once("sql2", dump_sql());
 	do_once("fw01", fix_watchers());
+	do_once("fixh", fix_plainherbs());
 #if NEW_RESOURCEGROWTH
 	/* do not remove do_once calls - old datafiles need them! */
 	do_once("rgrw", convert_resources());

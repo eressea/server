@@ -46,7 +46,10 @@ log_read(const char * filename)
 			fscanf(log, "%s %d %d", buf, &x, &y);
 			u = readunit(log);
 			r = findregion(x, y);
-			assert(r);
+			if (r==NULL) {
+				r = new_region(x, y);
+				terraform(r, T_PLAIN);
+			}
 			if (u->region!=r) move_unit(u, r, NULL);
 		} else if (strcmp(buf, "REGION")==0) {
 			int x, y;
