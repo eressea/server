@@ -2645,6 +2645,12 @@ setdefaults (void)
 					trade = true;
 					break;
 
+				case K_CAST:
+					set_string(&u->thisorder, "");
+					break;
+					/* dient dazu, das neben Zaubern kein weiterer Befehl
+					 * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
+
 					/* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
 					 * Arten von MACHE zaehlen aber als neue defaults und werden
 					 * behandelt wie die anderen (deswegen kein break nach case
@@ -2671,9 +2677,6 @@ setdefaults (void)
 					}
 					/* Ab hier Befehle, die auch eine idle
 					 * Faction machen darf: */
-				case K_CAST:
-					/* dient nur dazu, das neben Zaubern kein weiterer Befehl
-					 * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
 				case K_ROUTE:
 				case K_WORK:
 				case K_DRIVE:

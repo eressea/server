@@ -196,7 +196,7 @@ extern settings global;
 #define DMRISEHAFEN    20
 
 /* Vermehrungsrate Bauern (PEASANTDIE inklusive) */
-#define PEASANTGROWTH   2
+#define PEASANTGROWTH   1
 /* Vermehrung trotz 90% Auslastung */
 #define PEASANTFORCE   75
 

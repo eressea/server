@@ -674,10 +674,10 @@ makename(void)
 	int s, v, k, e, p = 0, x = 0;
 	int nk, ne, nv, ns;
 	static char name[16];
-	const char *kons = "bdfghklmnprstvwz",
+	const char *kons = "bcdfghklmnprstvwz",
 		*end = "nlrdst",
-		*vokal = "aaaaaaaaaßàâeeeeeeeeeéèêiiiiiiiiiíîoooooooooóòôuuuuuuuuuúyy",
-		*start = "dgtskpvfr";
+		*vokal = "aaaaaaaaaàâeeeeeeeeeéèêiiiiiiiiiíîoooooooooóòôuuuuuuuuuúyy",
+		*start = "bcdgtskpvfr";
 
 	nk = strlen(kons);
 	ne = strlen(end);
@@ -685,7 +685,7 @@ makename(void)
 	ns = strlen(start);
 
 	for (s = rand() % 3 + 2; s > 0; s--) {
-		if (x == 0) {
+		if (x > 0) {
 			k = rand() % nk;
 			name[p] = kons[k];
 			p++;

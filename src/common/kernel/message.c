@@ -463,7 +463,7 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 			assert(f);
 			m = add_message(&f->msgs, m);
 		} else {
-			if (f) add_message(&r->msgs, m);
+			if (f==NULL) add_message(&r->msgs, m);
 			else r_addmessage(r, f, m);
 		}
 		break;
