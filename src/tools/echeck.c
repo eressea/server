@@ -1,6 +1,6 @@
 /* vi: set ts=2 ai sw=2:
  *
- * $Id: echeck.c,v 1.2 2001/01/30 15:22:49 corwin Exp $
+ * $Id: echeck.c,v 1.3 2001/02/02 22:00:15 corwin Exp $
  *
  *	Eressea PB(E)M host Copyright (C) 1997-2000
  *		Enno Rehling (rehling@usa.net)
@@ -25,7 +25,18 @@
 
 #define MAINVERSION "3"
 #define MINVERSION	"10"
-#define PATCHLEVEL	"3"
+#define PATCHLEVEL	"4"
+
+#ifndef DEFAULT_PATH
+#if defined(unix)
+#define DEFAULT_PATH "/usr/local/lib/echeck:."
+#define PATH_DELIM ":"
+#else
+#define DEFAULT_PATH NULL
+#define PATH_DELIM ":"
+#endif
+#endif
+	
 
 #define VERSION MAINVERSION"."MINVERSION"."PATCHLEVEL
 
@@ -190,12 +201,12 @@ char order_buf[BUFSIZE],	/* current order line */
  indent, next_indent,			/* indent index */
  does_default=0,					/* Ist DEFAULT aktiv? */
  befehle_ende,						/* EOF der Befehlsdatei */
- *path=NULL,
  *filename;
 int rec_cost=RECRUIT_COST,
  this_command,
  this_unit,								/* wird von getaunit gesetzt */
  Rx, Ry;									/* Koordinaten der aktuellen Region */
+const char *path;
 FILE *F;
 
 /* ------------------------------------------------------------- */
@@ -917,6 +928,29 @@ ItemName(int i, int plural) {
 	return item->name->txt;
 }
 
+FILE *
+path_fopen(const char *path, const char *file, const char *mode)
+{
+	FILE *f;
+	char *pathw = strdup(path);
+	char *token;
+	char buf[4096];
+
+	token = strtok(pathw, PATH_DELIM);
+	while(token) {
+		sprintf(buf, "%s/%s", token, file);
+		f = fopen(buf, mode);
+		if(f) {
+			free(pathw);
+			return f;
+		}
+		token = strtok(NULL, PATH_DELIM);
+	}
+
+	free(pathw);
+	return NULL;
+}
+
 
 void
 readspells(void) {
@@ -924,21 +958,13 @@ readspells(void) {
 	t_spell *it, *in;
 	char *file;
 
-	if (path) {
-		char *x;
-		file=cmalloc(strlen(path)+12);
-		x=(char *)(path+strlen(path)-1);
-		if (*x=='/' || *x=='\\' || *x==':')	/* endet path auf /, \ oder : ? */
-			sprintf(file,"%szauber.txt",path);
-		else
-			sprintf(file,"%s/zauber.txt",path);
-	} else
-		file=strdup("zauber.txt");
-	F=fopen(file, "r");
-	if (!F) {
-		fprintf(ERR, "Kann Datei '%s' nicht lesen.\n", file);
+	F = path_fopen(path, "zauber.txt", "r");
+	if(!F) {
+		fprintf(ERR, "Kann Datei 'zauber.txt' nicht lesen.\n", file);
+		fprintf(ERR, "Suchpfad ist '%s'\n", path);
 		return;
 	}
+
 	it=in=spells;
 	for (;;) {
 		do {
@@ -982,21 +1008,13 @@ readskills(void) {
 	t_skills *it, *in;
 	char *file;
 
-	if (path) {
-		char *x;
-		file=cmalloc(strlen(path)+12);
-		x=(char *)(path+strlen(path)-1);
-		if (*x=='/' || *x=='\\' || *x==':')	/* endet path auf /, \ oder : ? */
-			sprintf(file,"%stalente.txt",path);
-		else
-			sprintf(file,"%s/talente.txt",path);
-	} else
-		file=strdup("talente.txt");
-	F=fopen(file, "r");
-	if (!F) {
-		fprintf(ERR, "Kann Datei '%s' nicht lesen.\n", file);
+	F = path_fopen(path, "talente.txt", "r");
+	if(!F) {
+		fprintf(ERR, "Kann Datei 'talente.txt' nicht lesen.\n", file);
+		fprintf(ERR, "Suchpfad ist '%s'\n", path);
 		return;
 	}
+
 	it=in=skilldata;
 	for (;;) {
 		do {
@@ -1034,23 +1052,14 @@ readitems(void) {
 	t_item *it, *in;
 	t_names *n, *nn;
 	char *file;
-
-	if (path) {
-		char *x;
-		file=cmalloc(strlen(path)+12);
-		x=(char *)(path+strlen(path)-1);
-		if (*x=='/' || *x=='\\' || *x==':')	/* endet path auf /, \ oder : ? */
-			sprintf(file,"%sitems.txt",path);
-		else
-			sprintf(file,"%s/items.txt",path);
-	} else
-		file=strdup("items.txt");
-
-	F=fopen(file, "r");
-	if (!F) {
-		fprintf(ERR,"Kann Datei '%s' nicht lesen.\n", file);
-		exit(100);
+	
+	F = path_fopen(path, "items.txt", "r");
+	if(!F) {
+		fprintf(ERR, "Kann Datei 'items.txt' nicht lesen.\n", file);
+		fprintf(ERR, "Suchpfad ist '%s'\n", path);
+		return;
 	}
+
 	it=in=itemdata;
 	for (;;) {
 		do {
@@ -3947,7 +3956,7 @@ readaunit(void) {
 		if (befehle_ende)
 			return;
 
-		/* Erst wenn wir sicher sind, daﬂ kein Befehl eingegeben wurde, checken
+		/* Erst wenn wir sicher sind, dass kein Befehl eingegeben wurde, checken
 		 * wir, ob nun eine neue Einheit oder ein neuer Spieler drankommt */
 
 		if (igetkeyword(order_buf)==-1) {
@@ -4553,6 +4562,12 @@ main(int argc, char *argv[]) {
 														added 15.6.00 chartus*/
 #endif
 
+	/* Path-Handling */
+	path = getenv("ECHECKPATH");
+	if(path == NULL) {
+		path = DEFAULT_PATH;
+	}
+
 	ERR=stdout;
 
 	if (argc <= 1) {
@@ -4605,8 +4620,8 @@ main(int argc, char *argv[]) {
 
 	if (unit_count==0) {
 		fputs("\nBitte ¸berpr¸fe, ob Du die Befehle korrekt eingesandt hast.\n"
-				"Beachte dabei besonders, daﬂ die Befehle nicht als HTML, Word-Dokument\n"
-				"oder als Attachment (Anlage) eingeschickt werden d¸rfen.\n", ERR);
+			"Beachte dabei besonders, dass die Befehle nicht als HTML, Word-Dokument\n"
+			"oder als Attachment (Anlage) eingeschickt werden d¸rfen.\n", ERR);
 		return -42;
 	}
 
