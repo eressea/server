@@ -318,27 +318,7 @@ unit_setmagic(unit& u, const char * type)
 static void
 unit_addorder(unit& u, const char * str)
 {
-  char buf[1024];
-  char * s = buf;
-  boolean quote = false;
-  order * ord;
-
-  while (*str) {
-    switch (*str) {
-      case '"':
-        quote=!quote;
-        break;
-      case ' ':
-        if (quote) *s++ = SPACE_REPLACEMENT;
-        else *s++ = ' ';
-        break;
-      default:
-        *s++ = *str;
-    }
-    ++str;
-  }
-  *s=0;
-  ord = parse_order(buf, u.faction->locale);
+  order * ord = parse_order(str, u.faction->locale);
   addlist(&u.orders, ord);
   u.faction->lastorders = turn;
 }

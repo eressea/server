@@ -2647,7 +2647,7 @@ expandentertainment(region * r)
 		change_money(u, u->n);
 		rsetmoney(r, rmoney(r) - u->n);
 		m -= u->n;
-		entertaining -= u->n;
+		entertaining -= o->qty;
 
 		/* Nur soviel PRODUCEEXP wie auch tatsächlich gemacht wurde */
 		produceexp(u, SK_ENTERTAINMENT, min(u->n, u->number));

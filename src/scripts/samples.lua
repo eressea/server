@@ -155,7 +155,28 @@ function test_monsters()
   process_orders()
 end
 
-test_monsters()
+function test_parser()
+  -- this script tests the changes to quotes
+
+  plain = terraform(0, 0, "plain")
+  skill = 5
+
+  f = add_faction("enno@eressea.de", "human", "de")
+  f.age = 20
+  u = add_unit(f, plain)
+  u.number = 10
+  u:clear_orders()
+  u:add_order("Nummer Partei test")
+  u:add_order("BENENNE PARTEI \"Diese Partei heisst \\\"Enno's Schergen\\\".\"")
+  u:add_order("BENENNE EINHEIT \"Mein Name ist \\\"Enno\\\".\"")
+
+  process_orders()
+  write_reports() 
+  write_game("parser")
+end
+
+test_parser()
+-- test_monsters()
 -- test_combat()
 -- test_rewards()
 -- test_give()
