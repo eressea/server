@@ -145,6 +145,7 @@ extern attrib_type at_building_action;
 typedef struct building_action {
   building * b;
   char * fname;
+  char * param;
 } building_action;
 
 #ifdef __cplusplus

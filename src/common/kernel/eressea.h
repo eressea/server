@@ -161,6 +161,7 @@ struct building_type;
 #define SAVEXMLNAME_VERSION 316
 #define SAVEALLIANCE_VERSION 317
 #define CLAIM_VERSION 318
+#define BACTION_VERSION 319 /* building action gets a param string */
 
 #define MIN_VERSION ALLIANCES_VERSION
 #define REGIONOWNERS_VERSION 400
@@ -169,7 +170,7 @@ struct building_type;
 #ifdef REGIONOWNERS
 # define RELEASE_VERSION REGIONOWNERS_VERSION
 #else
-# define RELEASE_VERSION CLAIM_VERSION
+# define RELEASE_VERSION BACTION_VERSION
 #endif
 
 #if RESOURCE_CONVERSION

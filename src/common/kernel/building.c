@@ -40,6 +40,8 @@
 /* attributes includes */
 #include <attributes/matmod.h>
 
+static const char * NULLSTRING = "(null)";
+
 static void 
 lc_init(struct attrib *a)
 {
@@ -51,6 +53,7 @@ lc_done(struct attrib *a)
 {
   building_action * data = (building_action*)a->data.v;
   if (data->fname) free(data->fname);
+  if (data->param) free(data->param);
   free(data);
 }
 
@@ -59,10 +62,14 @@ lc_write(const struct attrib * a, FILE* F)
 {
   building_action * data = (building_action*)a->data.v;
   const char * fname = data->fname;
+  const char * fparam = data->param;
   building * b = data->b;
 
   write_building_reference(b, F);
   fwritestr(F, fname);
+#if RELEASE_VERSION>=BACTION_VERSION
+  fwritestr(F, fparam?fparam:NULLSTRING);
+#endif
   fputc(' ', F);
 }
 
@@ -75,6 +82,13 @@ lc_read(struct attrib * a, FILE* F)
   read_building_reference(&data->b, F);
   freadstr(F, lbuf, sizeof(lbuf));
   data->fname = strdup(lbuf);
+  if (global.data_version>=BACTION_VERSION) {
+    freadstr(F, lbuf, sizeof(lbuf));
+    if (strcmp(lbuf, NULLSTRING)==0) data->param = NULL;
+    else data->param = strdup(lbuf);
+  } else {
+    data->param = strdup(NULLSTRING);
+  }
   return AT_READ_OK;
 }
 

@@ -36,6 +36,7 @@ lc_age(struct attrib * a)
   lua_State * L = (lua_State *)global.vm_state;
   building_action * data = (building_action*)a->data.v;
   const char * fname = data->fname;
+  const char * fparam = data->param;
   building * b = data->b;
 
   assert(b!=NULL);
@@ -62,16 +63,21 @@ lc_age(struct attrib * a)
     std::terminate();
   }
 
-  return luabind::call_function<int>(L, fname, *b);
+  if (fparam) {
+    return luabind::call_function<int>(L, fname, *b, fparam);
+  } else {
+    return luabind::call_function<int>(L, fname, *b);
+  }
 }
 
 static int
-building_addaction(building& b, const char * fname)
+building_addaction(building& b, const char * fname, const char * param)
 {
   attrib * a = a_add(&b.attribs, a_new(&at_building_action));
   building_action * data = (building_action*)a->data.v;
   data->b = &b;
   data->fname = strdup(fname);
+  if (param) data->param = strdup(param);
 
   return 0;
 }

@@ -171,7 +171,6 @@ region_remove(region& r)
   region ** rp = &regions;
   while (*rp) {
     if (*rp==&r) {
-      unit * u;
       while (r.units) {
         destroy_unit(r.units);
       }
