@@ -1715,7 +1715,7 @@ report(FILE *F, faction * f)
 	dh = 0;
 	for(a=a_find(f->attribs, &at_faction_special); a; a=a->nexttype) {
 		dh++;
-		if(fspecials[a->data.sa[0]].maxlevel) {
+		if(fspecials[a->data.sa[0]].maxlevel != 100) {
 			sprintf(buf2, "%s (%d)", fspecials[a->data.sa[0]].name, a->data.sa[1]);
 		} else {
 			sprintf(buf2, "%s", fspecials[a->data.sa[0]].name);

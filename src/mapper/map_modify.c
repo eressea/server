@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: map_modify.c,v 1.8 2001/04/01 06:58:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1143,10 +1142,7 @@ settg(region *r)
 	if (tradegood==NULL) tradegood = luxurytypes;
 
 	for (ltype=luxurytypes; ltype; ltype=ltype->next) {
-		struct demand * dmd;
-		dmd = calloc(sizeof(struct demand), 1);
-		dmd->type = ltype;
-		if (ltype!=tradegood) dmd->value = 1 + rand() % 5;
+		if (ltype!=tradegood) r_setdemand(r, ltype, 1 + rand() % 5);
 		++g;
 	}
 	r_setdemand(r, tradegood, 0);

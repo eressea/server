@@ -1,5 +1,6 @@
 /* vi: set ts=2:
  *
+ *	$Id: movement.c,v 1.17 2001/04/08 17:36:48 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2125,6 +2126,8 @@ follow(void)
 						unit * uf = findunit(id);
 						if (!a) {
 							a = a_add(&u->attribs, make_follow(uf));
+						} else {
+							a->data.v = uf;
 						}
 					} else if (a) {
 						a_remove(&u->attribs, a);

@@ -1,5 +1,6 @@
 /* vi: set ts=2:
  *
+ *	$Id: spell.c,v 1.17 2001/04/08 17:36:48 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -3554,7 +3555,7 @@ sp_bloodsacrifice(castorder *co)
 		return 0;
 	}
 
-	get_mage(mage)->spellpoints += aura;
+	change_spellpoints(mage, aura);
 	use_pooled(mage, mage->region, R_HITPOINTS, damage);
 
 	add_message(&mage->faction->msgs, new_message(mage->faction,

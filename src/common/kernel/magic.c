@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: magic.c,v 1.12 2001/03/07 15:00:18 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1480,7 +1479,7 @@ regeneration_magiepunkte(void)
 				if (aura < auramax) {
 					struct building * b = inside_building(u);
 					const struct building_type * btype = b?b->type:NULL;
-					reg_aura = regeneration(u);
+					reg_aura = (double)regeneration(u);
 
 					/* Magierturm erhöht die Regeneration um 50% */
 					if (btype == &bt_magictower) {

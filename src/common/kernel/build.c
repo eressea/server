@@ -602,7 +602,8 @@ build(unit * u, const construction * ctype, int completed, int want)
 		while (type->improvement!=NULL &&
 			   type->improvement!=type &&
 			   type->maxsize>0 &&
-			   type->maxsize<=completed) {
+			   type->maxsize<=completed)
+		{
 			completed -= type->maxsize;
 			type = type->improvement;
 		}
@@ -763,9 +764,17 @@ build_building(unit * u, const building_type * btype, int want)
 	if (b) built = b->size;
 	if (want<=0 || want == INT_MAX) {
 		if(b == NULL) {
-			want = btype->maxsize - built;
+			if(btype->maxsize > 0) {
+				want = btype->maxsize - built;
+			} else {
+				want = INT_MAX;
+			}
 		} else {
-			want = b->type->maxsize - built;
+			if(b->type->maxsize > 0) {
+				want = b->type->maxsize - built;
+			} else {
+				want = INT_MAX;
+			}
 		}
 	}
 	built = build(u, btype->construction, built, want);

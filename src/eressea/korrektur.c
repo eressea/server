@@ -1023,7 +1023,7 @@ show_newspells(void)
 	 * terminieren */
 
 	spellid_t newspellids[] = { 
-	};
+					SPL_NOSPELL };
 
 	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]
 	 * abgelegt */
@@ -1596,32 +1596,36 @@ stats(void)
 static void
 fix_prices(void)
 {
-	FILE *fp;
-	char buf[256];
-	char *token;
-	int x, y, p, i;
 	region *r;
 
 	puts(" - Korrigiere Handelsgüterpreise");
 
-	fp = fopen("prices.fix", "r");
-	if (fp==NULL) return;
-
-	while(fgets(buf, 256, fp)!=NULL) {
-		token = strtok(buf, ":");		/* Name */
-		token = strtok(NULL, ":"); x = atoi(token);
-		token = strtok(NULL, ":"); y = atoi(token);
-		r = findregion(x, y);
-		assert(r != NULL);
-		if(r->land) {
-			for(i = 0; oldluxurytype[i]!=NULL; i++) {
-				token = strtok(NULL, ":"); p = atoi(token);
-				r_setdemand(r, oldluxurytype[i], p);
+	for(r=regions; r; r=r->next) if(r->land) {
+		int sales = 0, buys = 0;
+		const luxury_type *sale, *ltype;
+		struct demand *dmd;
+		for (dmd=r->land->demands;dmd;dmd=dmd->next) {
+			if(dmd->value == 0) {
+				sales++;
+				sale = dmd->type;
+			} else {
+				buys++;
+			}
+		}
+		if(sales == 0) {
+			int c = 0;
+			for(ltype=luxurytypes; ltype; ltype=ltype->next) c++;
+			c = rand()%c;
+			for(ltype=luxurytypes; c>0; c--) ltype=ltype->next;
+			r_setdemand(r, ltype, 0);
+			sale = ltype;
+		}
+		if(buys == 0) {
+			for(ltype=luxurytypes; ltype; ltype=ltype->next) {
+				if(ltype != sale) r_setdemand(r, ltype, 1 + rand() % 5);
 			}
 		}
 	}
-
-	fclose(fp);
 }
 
 static void
@@ -2171,6 +2175,7 @@ korrektur(void)
 	do_once(atoi36("fhrb"), fix_herbs());
 	do_once(atoi36("ftos"), fix_timeouts());
 	do_once(atoi36("gmtst"), test_gmquest()); /* test gm quests */
+	do_once(atoi36("fixsl"), fix_prices());
 #ifndef SKILLFIX_SAVE
 	fix_skills();
 #endif

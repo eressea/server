@@ -364,7 +364,7 @@ live(region * r)
 void
 calculate_emigration(region *r)
 {
-	direction_t i;
+	direction_t i, j;
 	int maxpeasants_here;
 	int maxpeasants[MAXDIRECTIONS];
 	double wfactor, gfactor;
@@ -387,6 +387,7 @@ calculate_emigration(region *r)
 		if (fval(r, RF_ORCIFIED)==fval(c, RF_ORCIFIED)) {
 			if (landregion(rterrain(c)) && landregion(rterrain(r))) {
 				int wandering_peasants;
+				double vfactor;
 
 				/* First let's calculate the peasants who wander off to less inhabited
 				 * regions. wfactor indicates the difference of population denity.
@@ -405,8 +406,25 @@ calculate_emigration(region *r)
 				gfactor = max(gfactor, 0);
 				gfactor = min(gfactor, 1);
 
+				/* This calculates the influence of volcanos on peasant
+				 * migration. */
+
+				if(rterrain(c) != T_VOLCANO) {
+						vfactor = 0.25;
+				} else {
+						vfactor = 1.00;
+				}
+
+				for(j=0; j != MAXDIRECTIONS; j++) {
+					region *rv = rconnect(c, j);
+					if(rv && rterrain(rv) == T_VOLCANO) {
+						vfactor *= 0.5;
+						break;
+					}
+				}
+
 				wandering_peasants = (int) (rpeasants(r) * (gfactor + wfactor)
-						* PEASANTSWANDER_WEIGHT / 100.0);
+						* vfactor * PEASANTSWANDER_WEIGHT / 100.0);
 
 				r->land->newpeasants -= wandering_peasants;
 				c->land->newpeasants += wandering_peasants;

@@ -25,6 +25,9 @@ LDFLAGS = $(LIBS)
 
 LIBS    = -L$(PUBLISH_DIR)
 
+LINTFLAGS     = -booltype boolean -boolops +posixlib +matchanyintegral \
+	-predboolint -retvalint -retvalother -realcompare -exportlocal
+
 ARCHITECTURE = Linux
 
 ##
@@ -91,6 +94,14 @@ ifeq ($(CONFIG), dmalloc)
   LIBS      += -ldmalloc
 endif
 
+# ifeq ($(CONFIG), lint)
+#  BUILD_DIR  = Lint-$(ARCHITECTURE)
+#  CC         = lint
+#  CFLAGS     = -I$(ERESSEA) $(INCLUDES) -booltype boolean -boolops
+#  LDFLAGS    =
+#  LIBS       =
+# endif
+
 
 #
 ## Dependencies
@@ -130,10 +141,11 @@ recurse-subdirs-release:: subdirs-release publish-release
 recurse-subdirs-profile:: subdirs-profile publish-profile
 recurse-subdirs-dmalloc:: subdirs-dmalloc publish-dmalloc
 
+recurse-lint:: lint
 recurse-clean:: clean
 recurse-depend:: depend
 
-subdirs-debug subdirs-release subdirs-profile subdirs-dmalloc clean depend::
+subdirs-debug subdirs-release subdirs-profile subdirs-dmalloc lint clean depend::
 	@mkdir -p $(PUBLISH_DIR)
 	@if [ -n "$(SUBDIRS)" ]; then \
 	for subdir in x-placeholder-dir $(SUBDIRS); do \
@@ -153,7 +165,10 @@ publish-dmalloc:: subdirs-dmalloc
 publish-debug publish-release publish-profile publish-dmalloc:: $(PUBLISH_DIR)/$(LIBRARY) $(PUBLISH_DIR)/$(BINARY)
 
 clean:: $(BUILD_DIR) $(PUBLISH_DIR)
-	rm -fr Release-$(ARCHITECTURE)/* Debug-$(ARCHITECTURE)/* Profile-$(ARCHITECTURE)/* Dmalloc-$(ARCHITECTURE)/*
+	rm -fr Release-$(ARCHITECTURE)/* Debug-$(ARCHITECTURE)/* Profile-$(ARCHITECTURE)/* Dmalloc-$(ARCHITECTURE)/* Lint-$(ARCHITECTURE)/*
+
+lint::
+	$(LINT) -I$(ERESSEA) $(INCLUDES) $(LINTFLAGS) *.c
 
 $(BUILD_DIR) $(PUBLISH_DIR):
 	@mkdir $@
@@ -174,3 +189,4 @@ ifeq ($(CONVERT_TRIGGERS), 1)
  CFLAGS += -DCONVERT_TRIGGER
  INCLUDES += -I. -I$(ERESSEA)/eressea/old
 endif
+
