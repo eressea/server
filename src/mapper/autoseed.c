@@ -17,6 +17,7 @@
 /* kernel includes */
 #include <region.h>
 #include <faction.h>
+#include <race.h>
 #include <unit.h>
 
 /* libc includes */
@@ -265,10 +266,15 @@ autoseed(struct regionlist * rlist)
 static terrain_t
 preferred_terrain(const struct race * rc)
 {
+	if (rc==rc_find("dwarf")) return T_MOUNTAIN;
+	if (rc==rc_find("insect")) return T_DESERT;
+	if (rc==rc_find("halfling")) return T_SWAMP;
+	if (rc==rc_find("troll")) return T_MOUNTAIN;
 	return T_PLAIN;
 }
 
 #define REGIONS_PER_FACTION 2
+#define MINFACTIONS 1
 
 void
 mkisland(int nsize)
@@ -277,6 +283,8 @@ mkisland(int nsize)
 	region * r;
 	regionlist * rlist = NULL;
 	int rsize;
+	
+	if (listlen(newfactions)<MINFACTIONS) return;
 	do {
 		x = (rand() % 2001) - 1000;
 		y = (rand() % 2001) - 1000;
