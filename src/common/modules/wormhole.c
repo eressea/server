@@ -20,6 +20,7 @@
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/message.h>
+#include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 
@@ -32,7 +33,7 @@
 static boolean
 good_region(const region * r)
 {
-  return (r->units!=NULL && r->land!=NULL);
+  return (rplane(r)==NULL && r->units!=NULL && r->land!=NULL);
 }
 
 static int
