@@ -164,7 +164,7 @@ attack_firesword(const troop * at, int *casualties, int row)
 	int force  = 1+rand()%10;
 
 	if (row==FIGHT_ROW) {
-		enemies = count_enemies(fi->side->battle, fi->side, minrow, maxrow);
+		enemies = count_enemies(fi->side->battle, fi->side, minrow, maxrow, true);
 	}
 	if (!enemies) {
 		if (casualties) *casualties = 0;
@@ -184,7 +184,7 @@ attack_firesword(const troop * at, int *casualties, int row)
 	}
 
 	do {
-		dt = select_enemy(fi->side->battle, fi, minrow, maxrow);
+		dt = select_enemy(fi->side->battle, fi, minrow, maxrow, true);
 		assert(dt.fighter);
 		--force;
 		killed += terminate(dt, *at, AT_SPELL, damage, 1);
@@ -231,7 +231,7 @@ attack_catapult(const troop * at, int * casualties, int row)
 	minrow = FIGHT_ROW;
 	maxrow = FIGHT_ROW;
 
-	n = min(CATAPULT_ATTACKS, count_enemies(b, af->side, minrow, maxrow));
+	n = min(CATAPULT_ATTACKS, count_enemies(b, af->side, minrow, maxrow, true));
 
 #if CATAPULT_AMMUNITION
 	new_use_pooled(au, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1);
@@ -239,7 +239,7 @@ attack_catapult(const troop * at, int * casualties, int row)
 
 	while (--n >= 0) {
 		/* Select defender */
-		dt = select_enemy(b, af, minrow, maxrow);
+		dt = select_enemy(b, af, minrow, maxrow, true);
 		if (!dt.fighter)
 			break;
 

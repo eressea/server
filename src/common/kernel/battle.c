@@ -1261,14 +1261,16 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 }
 
 static int
-count_side(const side * s, int minrow, int maxrow)
+count_side(const side * s, int minrow, int maxrow, boolean advance)
 {
   void **fi;
   int people = 0;
   int unitrow[NUMROWS];
   int i;
 
-  for (i=0;i!=NUMROWS;++i) unitrow[i] = -1;
+  if (advance) {
+    for (i=0;i!=NUMROWS;++i) unitrow[i] = -1;
+  }
 
   for (fi = s->fighters.begin; fi != s->fighters.end; ++fi) {
     const fighter *fig = *fi;
@@ -1276,11 +1278,12 @@ count_side(const side * s, int minrow, int maxrow)
 
     if (fig->alive - fig->removed <= 0) continue;
     row = statusrow(fig->status);
-    if (unitrow[row] == -1) {
-      unitrow[row] = get_unitrow(fig);
+    if (advance) {
+      if (unitrow[row] == -1) {
+        unitrow[row] = get_unitrow(fig);
+      }
+      row = unitrow[row];
     }
-    row = unitrow[row];
-
     if (row >= minrow && row <= maxrow) {
       people += fig->alive - fig->removed;
     }
@@ -1290,7 +1293,7 @@ count_side(const side * s, int minrow, int maxrow)
 
 /* new implementation of count_enemies ignores mask, since it was never used */
 int
-count_enemies(battle * b, side * as, int minrow, int maxrow)
+count_enemies(battle * b, side * as, int minrow, int maxrow, boolean advance)
 {
   int i = 0;
   void **si;
@@ -1300,14 +1303,14 @@ count_enemies(battle * b, side * as, int minrow, int maxrow)
   for (si = b->sides.begin; si != b->sides.end; ++si) {
     side *side = *si;
     if (as==NULL || enemy(side, as)) {
-      i += count_side(side, minrow, maxrow);
+      i += count_side(side, minrow, maxrow, advance);
     }
   }
   return i;
 }
 
 troop
-select_enemy(battle * b, fighter * af, int minrow, int maxrow)
+select_enemy(battle * b, fighter * af, int minrow, int maxrow, boolean advance)
 {
   side *as = af->side;
   int si;
@@ -1321,7 +1324,7 @@ select_enemy(battle * b, fighter * af, int minrow, int maxrow)
   }
   minrow = max(minrow, FIGHT_ROW);
 
-  enemies = count_enemies(b, as, minrow, maxrow);
+  enemies = count_enemies(b, as, minrow, maxrow, advance);
 
   /* Niemand ist in der angegebenen Entfernung? */
   if (enemies<=0) return no_troop;
@@ -1330,19 +1333,24 @@ select_enemy(battle * b, fighter * af, int minrow, int maxrow)
   for (si=0;as->enemies[si];++si) {
     side *ds = as->enemies[si];
     void ** fi;
-    int ui, unitrow[NUMROWS];
+    int unitrow[NUMROWS];
 
-    for (ui=0;ui!=NUMROWS;++ui) unitrow[ui] = -1;
+    if (advance) {
+      int ui;
+      for (ui=0;ui!=NUMROWS;++ui) unitrow[ui] = -1;
+    }
 
     for (fi=ds->fighters.begin;fi!=ds->fighters.end;++fi) {
       fighter * df = *fi;
       int dr;
 
-      ui = statusrow(df->status);
-      if (unitrow[ui]<0) {
-        unitrow[ui] = get_unitrow(df);
+      dr = statusrow(df->status);
+      if (advance) {
+        if (unitrow[dr]<0) {
+          unitrow[dr] = get_unitrow(df);
+        }
+        dr = unitrow[dr];
       }
-      dr = unitrow[ui];
 
       if (dr < minrow || dr > maxrow) continue;
       if (df->alive - df->removed > enemies) {
@@ -1386,7 +1394,7 @@ select_opponent(battle * b, troop at, int minrow, int maxrow)
     }
   }
 #endif
-  dt = select_enemy(b, at.fighter, minrow, maxrow);
+  dt = select_enemy(b, at.fighter, minrow, maxrow, true);
 #ifdef FIXED_OPPONENTS
   if (dt.fighter!=NULL) {
     fighter * df = dt.fighter;
@@ -2162,34 +2170,34 @@ attack(battle *b, troop ta, const att *a, int numattack)
 void
 do_attack(fighter * af)
 {
-	troop ta;
-	unit *au = af->unit;
-	side *side = af->side;
-	battle *b = side->battle;
+  troop ta;
+  unit *au = af->unit;
+  side *side = af->side;
+  battle *b = side->battle;
 
-	ta.fighter = af;
+  ta.fighter = af;
 
-	assert(au && au->number);
-	/* Da das Zuschlagen auf Einheiten und nicht auf den einzelnen
-	 * Kämpfern beruht, darf die Reihenfolge und Größe der Einheit keine
-	 * Rolle spielen, Das tut sie nur dann, wenn jeder, der am Anfang der
-	 * Runde lebte, auch zuschlagen darf. Ansonsten ist der, der zufällig
-	 * mit einer großen Einheit zuerst drankommt, extrem bevorteilt. */
-	ta.index = af->fighting;
+  assert(au && au->number);
+  /* Da das Zuschlagen auf Einheiten und nicht auf den einzelnen
+  * Kämpfern beruht, darf die Reihenfolge und Größe der Einheit keine
+  * Rolle spielen, Das tut sie nur dann, wenn jeder, der am Anfang der
+  * Runde lebte, auch zuschlagen darf. Ansonsten ist der, der zufällig
+  * mit einer großen Einheit zuerst drankommt, extrem bevorteilt. */
+  ta.index = af->fighting;
 
-	while (ta.index--) {
-		/* Wir suchen eine beliebige Feind-Einheit aus. An der können
-		 * wir feststellen, ob noch jemand da ist. */
-		int enemies = count_enemies(b, af->side, FIGHT_ROW, LAST_ROW);
+  while (ta.index--) {
+    /* Wir suchen eine beliebige Feind-Einheit aus. An der können
+    * wir feststellen, ob noch jemand da ist. */
+    int enemies = count_enemies(b, af->side, FIGHT_ROW, LAST_ROW, true);
     int apr, attacks = attacks_per_round(ta);
-		if (!enemies) break;
+    if (!enemies) break;
 
-		for (apr=0;apr!=attacks;++apr) {
+    for (apr=0;apr!=attacks;++apr) {
       int a;
-			for (a=0; a!=10 && au->race->attack[a].type!=AT_NONE; ++a) {
+      for (a=0; a!=10 && au->race->attack[a].type!=AT_NONE; ++a) {
         if (apr>0) {
           /* Wenn die Waffe nachladen muss, oder es sich nicht um einen 
-           * Waffen-Angriff handelt, dann gilt der Speed nicht. */
+          * Waffen-Angriff handelt, dann gilt der Speed nicht. */
           if (au->race->attack[a].type!=AT_STANDARD) continue;
           else {
             weapon * wp = preferred_weapon(ta, true);
@@ -2197,9 +2205,9 @@ do_attack(fighter * af)
           }
         }
         attack(b, ta, &(au->race->attack[a]), apr);
-			}
-		}
-	}
+      }
+    }
+  }
 }
 
 void
@@ -2286,42 +2294,46 @@ make_side(battle * b, const faction * f, const group * g, boolean stealth, const
 void
 loot_items(fighter * corpse)
 {
-	unit * u = corpse->unit;
-	item * itm = u->items;
-	battle * b = corpse->side->battle;
-	u->items = NULL;
+  unit * u = corpse->unit;
+  item * itm = u->items;
+  battle * b = corpse->side->battle;
+  u->items = NULL;
 
-	while (itm) {
-		int i;
-		if (itm->number) {
-			for (i = 10; i != 0; i--) {
-				int loot = itm->number / i;
-				itm->number -= loot;
-				/* Looten tun hier immer nur die Gegner. Das
-				 * ist als Ausgleich für die neue Loot-regel
-				 * (nur ganz tote Einheiten) fair.
-				 * zusätzlich looten auch geflohene, aber
-				 * nach anderen Regeln.
-				 */
-				if (loot>0 && (itm->type->flags & (ITF_CURSED|ITF_NOTLOST)
-						|| rand()%100 >= 50 - corpse->side->battle->keeploot)) {
-					fighter *fig = select_enemy(b, corpse, FIGHT_ROW, LAST_ROW).fighter;
-					if (fig) {
-						item * l = fig->loot;
-						while (l && l->type!=itm->type) l=l->next;
-						if (!l) {
-							l = calloc(sizeof(item), 1);
-							l->next = fig->loot;
-							fig->loot = l;
-							l->type = itm->type;
-						}
-						l->number += loot;
-					}
-				}
-			}
-		}
-		itm = itm->next;
-	}
+  while (itm) {
+    int i;
+    if (itm->number) {
+      for (i = 10; i != 0; --i) {
+        int loot = itm->number / i;
+        /* Looten tun hier immer nur die Gegner. Das ist als Ausgleich für die 
+        * neue Loot-regel (nur ganz tote Einheiten) fair.
+        * zusätzlich looten auch geflohene, aber nach anderen Regeln.
+        */
+        if (loot>0) {
+          int maxrow = BEHIND_ROW;
+          int lootchance = 50 + b->keeploot;
+
+          if (itm->type->flags & (ITF_CURSED|ITF_NOTLOST)) maxrow = LAST_ROW;
+          itm->number -= loot;
+
+          if (maxrow == LAST_ROW || rand() % 100 < lootchance) {
+            fighter *fig = select_enemy(b, corpse, FIGHT_ROW, maxrow, false).fighter;
+            if (fig) {
+              item * l = fig->loot;
+              while (l && l->type!=itm->type) l=l->next;
+              if (!l) {
+                l = calloc(sizeof(item), 1);
+                l->next = fig->loot;
+                fig->loot = l;
+                l->type = itm->type;
+              }
+              l->number += loot;
+            }
+          }
+        }
+      }
+    }
+    itm = itm->next;
+  }
 }
 
 #ifndef NO_RUNNING

@@ -18,8 +18,10 @@
 // lua includes
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
-#include <luabind/operator.hpp>
 #include <luabind/iterator_policy.hpp>
+#ifdef HAVE_LUABIND_B7
+# include <luabind/operator.hpp>
+#endif
 
 #include <ostream>
 using namespace luabind;

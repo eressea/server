@@ -11,8 +11,10 @@
 // lua includes
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
-#include <luabind/operator.hpp>
 #include <luabind/iterator_policy.hpp>
+#ifdef HAVE_LUABIND_B7
+# include <luabind/operator.hpp>
+#endif
 
 // util includes
 #include <util/base36.h>

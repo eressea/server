@@ -210,8 +210,8 @@ extern "C" {
 
   /* for combar spells and special attacks */
   extern int damage_unit(struct unit *u, const char *dam, boolean armor, boolean magic);
-  extern troop select_enemy(struct battle * b, struct fighter * af, int minrow, int maxrow);
-  extern int count_enemies(struct battle * b, struct side * as, int minrow, int maxrow);
+  extern troop select_enemy(struct battle * b, struct fighter * af, int minrow, int maxrow, boolean advance);
+  extern int count_enemies(struct battle * b, struct side * as, int minrow, int maxrow, boolean advance);
   extern boolean terminate(troop dt, troop at, int type, const char *damage, boolean missile);
   extern void battlemsg(battle * b, struct unit * u, const char * s);
   extern void battlerecord(battle * b, const char *s);
