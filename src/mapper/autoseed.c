@@ -22,6 +22,7 @@
 /* libc includes */
 #include <limits.h>
 #include <memory.h>
+#include <stdlib.h>
 
 newfaction * newfactions = NULL;
 

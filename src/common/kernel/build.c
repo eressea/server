@@ -618,7 +618,7 @@ build(unit * u, const construction * ctype, int completed, int want)
 			completed = completed % type->maxsize;
 		}
 		else {
-			completed = 0; assert(type->reqsize==1);
+			completed = 0; assert(type->reqsize>=1);
 		}
 
 		if (basesk < type->minskill) {
