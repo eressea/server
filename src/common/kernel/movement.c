@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.11 2001/02/18 10:06:09 enno Exp $
+ *	$Id: movement.c,v 1.12 2001/02/18 12:20:37 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -740,11 +740,11 @@ cycle_route(unit *u, int gereist)
 	for (cm=0;;++cm) {
 		pause = false;
 		token = getstrtoken();
-		if(findparam(token) == P_PAUSE) {
+		d = finddirection(token);
+		if(d == D_PAUSE) {
 			pause = true;
-		} else {
-			d = finddirection(token);
-			if (d==NODIRECTION) break;
+		} else if (d==NODIRECTION) {
+			break;
 		}
 		if (cm<gereist) {
 			/* hier sollte keine PAUSE auftreten */

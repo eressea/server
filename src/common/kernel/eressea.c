@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.17 2001/02/18 08:37:57 enno Exp $
+ *	$Id: eressea.c,v 1.18 2001/02/18 12:20:37 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1034,7 +1034,7 @@ igetstrtoken (const char *s1)
 {
 	int i;
 	static const char *s;
-	static char buf[DISPLAYSIZE + 1];
+	static char lbuf[DISPLAYSIZE + 1];
 
 	if (s1) s = s1;
 	while (*s == ' ')
@@ -1042,7 +1042,7 @@ igetstrtoken (const char *s1)
 	i = 0;
 
 	while (*s && *s != ' ' && i < DISPLAYSIZE) {
-		buf[i] = (*s);
+		lbuf[i] = (*s);
 
 		/* Hier wird space_replacement wieder in space zurueck
 		 * verwandelt, ausser wenn es nach einem escape_char kommt. Im
@@ -1050,17 +1050,17 @@ igetstrtoken (const char *s1)
 		 * ersetzt, statt den aktuellen char einfach dran zu haengen. */
 
 		if (*s == SPACE_REPLACEMENT) {
-			if (i > 0 && buf[i - 1] == ESCAPE_CHAR)
-				buf[--i] = SPACE_REPLACEMENT;
+			if (i > 0 && lbuf[i - 1] == ESCAPE_CHAR)
+				lbuf[--i] = SPACE_REPLACEMENT;
 			else
-				buf[i] = SPACE;
+				lbuf[i] = SPACE;
 		}
 		i++;
 		s++;
 	}
 
-	buf[i] = 0;
-	return buf;
+	lbuf[i] = 0;
+	return lbuf;
 }
 
 char *
@@ -2129,6 +2129,7 @@ init_directions(tnode * root)
 		{ "südwesten", D_SOUTHWEST},
 		{ "osten", D_EAST },
 		{ "westen",D_WEST },
+		{ "pause", D_PAUSE },
 		{ NULL, NODIRECTION}
 	};
 	int i;
@@ -2416,9 +2417,11 @@ movewhere(region * r, const unit *u)
 	region * r2;
 
 	token = getstrtoken();
-	if(findparam(token) == P_PAUSE) return r;
 
 	d = finddirection(token);
+	if (d == D_PAUSE)
+		return r;
+
 	if (d == NODIRECTION)
 		return findspecialdirection(r, token);
 

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: mapper.c,v 1.12 2001/02/11 08:55:48 corwin Exp $
+ *	$Id: mapper.c,v 1.13 2001/02/18 12:20:37 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -56,7 +56,7 @@ char datafile[256];
 
 short Signals = 0;
 unit *clipunit;
-ship *clipship;
+struct ship *clipship;
 region *clipregion;
 tagregion *Tagged;
 
