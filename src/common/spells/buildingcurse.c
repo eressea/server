@@ -39,9 +39,9 @@ cinfo_building(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 	unused(typ);
 	assert(typ == TYP_BUILDING);
 
-	if (self){
+	if (self == 1){ /* owner or inside */
 		msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
-	} else {
+	} else { /* outside */
 		msg = msg_message(mkname("curseinfo", "buildingunknown"), "id", c->no);
 	}
 	nr_render(msg, lang, buf, sizeof(buf), NULL);
@@ -50,4 +50,30 @@ cinfo_building(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 }
 
 /* CurseInfo mit Spezialabfragen */
+
+/* C_MAGICSTONE*/
+static int
+cinfo_magicrunes(void * obj, typ_t typ, curse *c, int self)
+{
+
+	if (typ == TYP_BUILDING){
+		building * b;
+		b = (building*)obj;
+		if (self){
+			sprintf(buf, "Auf den Mauern von %s erkennt man seltsame Runen. (%s)",
+					b->name, curseid(c));
+			return 1;
+		}
+	} else if (typ == TYP_SHIP) {
+		ship *sh;
+		sh = (ship*)obj;
+		if (self){
+			sprintf(buf, "Auf den Planken von %s erkennt man seltsame Runen. (%s)",
+					sh->name, curseid(c));
+			return 1;
+		}
+	}
+
+	return 0;
+}
 

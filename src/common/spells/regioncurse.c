@@ -114,6 +114,7 @@ cinfo_magicstreet(const locale * lang,void * obj, typ_t typ, curse *c, int self)
 	return 1;
 }
 
+
 void 
 register_regioncurse(void)
 {

@@ -41,7 +41,7 @@ cinfo_ship(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 	unused(obj);
 	assert(typ == TYP_SHIP);
 
-	if (self){
+	if (self){ /* owner or inside */
 		msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
 	} else {
 		msg = msg_message(mkname("curseinfo", "shipunknown"), "id", c->no);
@@ -49,24 +49,6 @@ cinfo_ship(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 	nr_render(msg, lang, buf, sizeof(buf), NULL);
 	msg_release(msg);
 	return 1;
-}
-
-static int
-cinfo_ship_onlyowner(const locale * lang, void * obj, typ_t typ, curse *c, int self)
-{
-	message * msg;
-	
-	unused(obj);
-	unused(typ);
-	assert(typ == TYP_SHIP);
-
-	if (self){
-		msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
-		nr_render(msg, lang, buf, sizeof(buf), NULL);
-		msg_release(msg);
-		return 1;
-	}
-	return 0;
 }
 
 /* CurseInfo mit Spezialabfragen */
@@ -93,6 +75,22 @@ cinfo_shipnodrift(const locale * lang, void * obj, typ_t typ, curse *c, int self
 	scat(" (");
 	scat(itoa36(c->no));
 	scat(")");
+	return 1;
+}
+
+/* C_DISORIENTATION */
+static int
+cinfo_disorientation(void * obj, typ_t typ, curse *c, int self)
+{
+	unused(typ);
+	unused(obj);
+	unused(self);
+
+	assert(typ == TYP_SHIP);
+
+	sprintf(buf, "Der Kompaﬂ kaputt, die Segel zerrissen, der Himmel "
+			"wolkenverhangen. Wohin fahren wir? (%s)", curseid(c));
+
 	return 1;
 }
 
