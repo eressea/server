@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.4 2001/02/03 13:45:30 enno Exp $
+ *	$Id: battle.c,v 1.5 2001/02/04 10:04:36 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -215,7 +215,7 @@ armedmen(const unit * u)
 {
 	item * itm;
 	int n = 0;
-	if (!urace(u)->flags & RCF_NOWEAPONS) {
+	if (!(urace(u)->flags & RCF_NOWEAPONS)) {
 		if (urace(u)->ec_flags & CANGUARD) {
 			/* kann ohne waffen bewachen: fuer untote und drachen */
 			n = u->number;			

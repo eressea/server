@@ -96,7 +96,7 @@ endif
 #
 ## Tags
 #
-tags:
+tags: depend
 	@echo "Creating tags in `pwd`/tags";
 	$(CTAGS) $(CTAGSFLAGS) --recurse=yes -f $(ERESSEA)/tags $(ERESSEA)
 

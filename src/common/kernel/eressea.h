@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.h,v 1.8 2001/02/03 13:45:32 enno Exp $
+ *	$Id: eressea.h,v 1.9 2001/02/04 10:04:36 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -62,6 +62,9 @@ struct herb_type;
 #include <vmap.h>
 #include <vset.h>
 #include <attrib.h>
+
+#define AT_PERSISTANT
+
 /* eressea-defined attribute-type flags */
 #define ATF_CURSE  ATF_USER_DEFINED
 
