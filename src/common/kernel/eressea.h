@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.h,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: eressea.h,v 1.3 2001/01/28 08:01:51 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -126,7 +126,8 @@ struct herb_type;
 #define MAGE_ATTRIB_VERSION 195
 #define GLOBAL_ATTRIB_VERSION 196
 #define BASE36IDS_VERSION 197
-#define LOCALE_VERSION 200 /* TODO */
+#define NEWSOURCE_VERSION 197
+#define LOCALE_VERSION 300 /* TODO */
 
 /* globale settings des Spieles */
 typedef struct settings {
@@ -136,7 +137,7 @@ typedef struct settings {
 } settings;
 extern settings global;
 
-#define RELEASE_VERSION BASE36IDS_VERSION
+#define RELEASE_VERSION NEWSOURCE_VERSION
 
 /* changes from->to: 72->73: struct unit::lock entfernt.
  * 73->74: struct unit::flags eingeführt.

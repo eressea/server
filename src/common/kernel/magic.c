@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: magic.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: magic.c,v 1.3 2001/01/28 08:01:51 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2426,6 +2426,7 @@ set_familiar(unit * mage, unit * familiar)
 		attrib * a = a_add(&mage->attribs, a_new(&at_skillmod));
 		skillmod_data * smd = (skillmod_data *)a->data.v;
 		smd->special = sm_familiar;
+		assert(!nonplayer(mage));
 	}
 
 	a = a_find(mage->attribs, &at_familiar);
@@ -2435,7 +2436,7 @@ set_familiar(unit * mage, unit * familiar)
 	} else assert(!a->data.v || a->data.v == familiar);
 	/* TODO: Diese Attribute beim Tod des Familiars entfernen: */
 
-	a = a_find(mage->attribs, &at_familiarmage);
+	a = a_find(familiar->attribs, &at_familiarmage);
 	if (a==NULL) {
 		a = a_add(&familiar->attribs, a_new(&at_familiarmage));
 		a->data.v = mage;

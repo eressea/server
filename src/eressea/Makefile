@@ -15,9 +15,9 @@ OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
 ## conversion code for old triggers - should only be used for free eressea,
 ## and only for old datafiles.
 ##
-SUBDIRS += old
-LIBRARIES += $(PUBLISH_DIR)/libe-compat.a
-LIBS += -le-compat
+#SUBDIRS += old
+#LIBRARIES += $(PUBLISH_DIR)/libe-compat.a
+#LIBS += -le-compat
 
 ##
 ## more definitions

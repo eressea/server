@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: border.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: border.c,v 1.3 2001/01/28 08:01:51 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -76,10 +76,11 @@ write_borders(FILE * f)
 			putc('\n', f);
 #if	RELEASE_VERSION>BORDER_VERSION
 			a_write(f, b->attribs);
+			putc('\n', f);
 #endif
 		}
 	}
-	fputs("end\n", f);
+	fputs("end", f);
 }
 
 void

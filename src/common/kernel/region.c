@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: region.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: region.c,v 1.3 2001/01/28 08:01:52 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -36,6 +36,7 @@
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -656,7 +657,7 @@ makename(void)
 	int s, v, k, e, p = 0, x = 0;
 	int nk, ne, nv, ns;
 	static char name[16];
-	char *kons = "bdfghklmnprstvwz",
+	const char *kons = "bdfghklmnprstvwz",
 		*end = "nlrdst",
 		*vokal = "aaaaaaaaaßàâeeeeeeeeeéèêiiiiiiiiiíîoooooooooóòôuuuuuuuuuúyy",
 		*start = "dgtskpvfr";
@@ -801,14 +802,18 @@ read_region_reference(region ** r, FILE * F)
 {
 	int x[2];
 	fscanf(F, "%d %d", &x[0], &x[1]);
-	*r = findregion(x[0], x[1]);
-	if (*r==NULL) ur_add(memcpy(malloc(sizeof(x)), x, sizeof(x)), (void**)r, resolve_region);
+	if (x[0]==INT_MAX) *r = NULL;
+	else {
+		*r = findregion(x[0], x[1]);
+		if (*r==NULL) ur_add(memcpy(malloc(sizeof(x)), x, sizeof(x)), (void**)r, resolve_region);
+	}
 }
 
 void
 write_region_reference(const region * r, FILE * F)
 {
-	fprintf(F, "%d %d ", r->x, r->y);
+	if (r) fprintf(F, "%d %d ", r->x, r->y);
+	else fprintf(F, "%d %d ", INT_MAX, INT_MAX);
 }
 
 void *

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.4 2001/01/27 19:30:07 enno Exp $
+ *	$Id: save.c,v 1.5 2001/01/28 08:01:52 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -740,6 +740,11 @@ readgame(boolean backup)
 	/* globale Variablen */
 
 	global.data_version = ri(F);
+#ifdef CONVERT_TRIGGER
+	assert(global.data_version < NEWSOURCE_VERSION);
+#else
+	assert(global.data_version >= NEWSOURCE_VERSION);
+#endif
 	if (global.data_version >= GLOBAL_ATTRIB_VERSION) a_read(F, &global.attribs);
 #ifndef COMPATIBILITY
 	if (global.data_version < ITEMTYPE_VERSION) {
@@ -971,7 +976,7 @@ readgame(boolean backup)
 		if (maxregions==0) skip = true;
 		if ((n%1024)==0) {	/* das spart extrem Zeit */
 			printf("* %d,%d    \r", x, y);
-			printf(" - Einzulesende Regionen: %d/%d\t", maxregions, n);
+			printf(" - Einzulesende Regionen: %d/%d      ", maxregions, n);
 		}
 		if (skip) {
 			char * r;
@@ -1575,9 +1580,9 @@ writegame(char *path, char quiet)
 	/* Write planes */
 	wnl(F);
 	wi(F, listlen(planes));
+	wnl(F);
 
 	for(pl = planes; pl; pl=pl->next) {
-		wnl(F);
 		wi(F, pl->id);
 		wspace(F);
 		ws(F, pl->name);
@@ -1593,9 +1598,9 @@ writegame(char *path, char quiet)
 		wi(F, pl->flags);
 		wspace(F);
 		a_write(F, pl->attribs);
+		wnl(F);
 	}
 
-	wnl(F);
 
 	/* Write factions */
 
@@ -1638,6 +1643,7 @@ writegame(char *path, char quiet)
 		wi(F, f->flags);
 		wspace(F);
 		a_write(F, f->attribs);
+		wnl(F);
 		write_msglevels(f->warnings, F);
 		wnl(F);
 		wi(F, listlen(f->ursprung));
@@ -1757,7 +1763,7 @@ writegame(char *path, char quiet)
 			wnl(F);
 		}
 		a_write(F, r->attribs);
-
+		wnl(F);
 		wi(F, listlen(r->buildings));
 		wnl(F);
 		for (b = r->buildings; b; b = b->next) {
@@ -1782,6 +1788,7 @@ writegame(char *path, char quiet)
 			ws(F, b->type->_name);
 			wnl(F);
 			a_write(F, b->attribs);
+			wnl(F);
 		}
 
 		wi(F, listlen(r->ships));
@@ -1812,6 +1819,7 @@ writegame(char *path, char quiet)
 			wi(F, sh->coast);
 			wnl(F);
 			a_write(F, sh->attribs);
+			wnl(F);
 		}
 
 		wi(F, listlen(r->units));
@@ -1934,10 +1942,12 @@ writegame(char *path, char quiet)
 			wnl(F);
 #endif
 			a_write(F, u->attribs);
+			wnl(F);
 		}
 	}
 	wnl(F);
 	write_borders(F);
+	wnl(F);
 #ifdef OLD_TRIGGER
 	save_timeouts(F);
 #endif

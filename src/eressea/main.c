@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: main.c,v 1.3 2001/01/28 08:01:52 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -243,7 +243,7 @@ processturn(char *filename)
 #endif /* FUZZY_BASE36 */
 	if (!nowrite) {
 		char ztext[64];
-		sprintf(ztext, "data/%d", turn);
+		sprintf(ztext, "%s/%d", datapath(), turn);
 		writegame(ztext, 0);
 	}
 }

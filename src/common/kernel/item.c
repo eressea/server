@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.3 2001/01/27 18:15:32 enno Exp $
+ *	$Id: item.c,v 1.4 2001/01/28 08:01:51 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1945,6 +1945,7 @@ rt_write(FILE * F, const resource_type * rt)
 {
 	fprintf(F, "RESOURCETYPE %d\n", rt->hashkey);
 	a_write(F, rt->attribs); /* scheisse, weil nicht CR. */
+	fputc('\n', F);
 	fprintf(F, "\"%s\";name_singular\n", rt->_name[0]);
 	fprintf(F, "\"%s\";name_plural\n", rt->_name[1]);
 	fprintf(F, "\"%s\";appearance_singular\n", rt->_appearance[0]);

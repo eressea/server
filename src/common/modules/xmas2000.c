@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: xmas2000.c,v 1.1 2001/01/27 11:32:32 enno Exp $
+ *	$Id: xmas2000.c,v 1.2 2001/01/28 08:01:52 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -132,8 +132,8 @@ make_gates(region * r)
 
 	b = new_building(btype, r, NULL);
 	b->size = btype->maxsize;
-	b->name = "Der Weg nach Hause";
-	b->display = "Achtung, hier gibt es die Geschenke!";
+	b->name = strdup("Der Weg nach Hause");
+	b->display = strdup("Achtung, hier gibt es die Geschenke!");
 	add_trigger(&b->attribs, "timer", trigger_xmasgate(b));
 }
 

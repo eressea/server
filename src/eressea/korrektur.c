@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.4 2001/01/27 19:30:07 enno Exp $
+ *	$Id: korrektur.c,v 1.5 2001/01/28 08:01:52 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1649,7 +1649,7 @@ convert_triggers(void)
 				switch (rel->id) {
 				case REL_FAMILIAR:
 					if (u && u2) {
-						if (nonplayer(u) || u->race==RC_GOBLIN)
+						if (nonplayer(u) || (!nonplayer(u2) && u->race==RC_GOBLIN))
 							set_familiar(u2, u);
 						else 
 							set_familiar(u, u2);
