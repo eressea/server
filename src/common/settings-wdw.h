@@ -37,6 +37,7 @@
 #define MIGRANTS_CAN_LEARN_EXPENSIVE_SKILLS 1	/* vinyambar 3 only */
 #define MAGICPOWER 0.5
 #define MAGICREGEN 0.5
+#define RESOURCE_FACTOR 0.25
 
 #if NEWATSROI == 1
 #define ATSBONUS 2
