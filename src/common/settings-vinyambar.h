@@ -15,6 +15,7 @@
  * Include this file from settings.h to make eressea work.
  */
 #define GAME_ID 2
+#define IMMUN_GEGEN_ANGRIFF 8
 #define RESOURCE_CONVERSION 1
 #define NEW_RESOURCEGROWTH 1
 #define LARGE_CASTLES 1

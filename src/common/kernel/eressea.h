@@ -200,7 +200,6 @@ extern void read_laen(struct region * r, int laen);
 #endif
 
 /* So lange kann die Partei nicht angegriffen werden */
-#define IMMUN_GEGEN_ANGRIFF		8
 #undef STUDY_IF_NOT_WORKING
 
 /** Attackierende Einheiten können keine langen Befehle ausführen */

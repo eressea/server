@@ -15,12 +15,13 @@
  * Include this file from settings.h to make eressea work.
  */
 #define GAME_ID 1
+#define IMMUN_GEGEN_ANGRIFF 3
 #define RESOURCE_CONVERSION 1
 #define NEW_RESOURCEGROWTH 1
 #define LARGE_CASTLES 1
 #define GROWING_TREES 1
 #define REMOVENMRNEWBIE 1
-#define NMRTIMEOUT 4
+#define NMRTIMEOUT 2
 #define HUNGER_DISABLES_LONGORDERS 1
 #define REDUCED_PEASANTGROWTH 1
 #define RACE_ADJUSTMENTS 1

@@ -242,7 +242,7 @@ restart(unit *u, const race * rc)
 
 	fset(f, FFL_RESTART);
 	fprintf(sqlstream, "UPDATE subscriptions set faction='%s' where faction"
-		"='%s' and game=%d;", itoa36(u->faction->no), itoa36(f->no), GAME_ID);
+		"='%s' and game=%d;\n", itoa36(u->faction->no), itoa36(f->no), GAME_ID);
 	f->magiegebiet = u->faction->magiegebiet;
 	f->options = u->faction->options;
 	freestrlist(nu->orders);
@@ -2734,7 +2734,7 @@ renumber_factions(void)
 		a_remove(&rp->faction->attribs, rp->attrib);
 		if (updatelog) fprintf(updatelog, "renum %s %s\n", itoa36(rp->faction->no), itoa36(rp->want));
 		fprintf(sqlstream, "UPDATE subscriptions set faction='%s' where "
-			"faction='%s' and game=%d;", itoa36(rp->want), 
+			"faction='%s' and game=%d;\n", itoa36(rp->want), 
 			itoa36(rp->faction->no), GAME_ID);
 		rp->faction->no = rp->want;
 		register_faction_id(rp->want);

@@ -2365,7 +2365,7 @@ remove_empty_factions(void)
 				}
 			}
 			fprintf(sqlstream, "UPDATE subscriptions set status='DEAD' where "
-				"faction='%s' and game=%d;", itoa36(f->no), GAME_ID);
+				"faction='%s' and game=%d\n;", itoa36(f->no), GAME_ID);
 
 			*fp = f->next;
 /*			stripfaction(f);
