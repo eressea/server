@@ -1,3 +1,27 @@
 <?xml version="1.0"?>
-<items>
-</items>
+<resources>
+  <resource name="jadee_ring" appearance="ring">
+    <!-- Wedding ring for Jadee -->
+    <function name="change" value="changeitem"/>
+    <item cursed="yes" notlost="yes" weight="0" />
+  </resource>
+
+  <resource name="wente_ring" appearance="ring">
+    <!-- Wedding ring for Wildente -->
+    <function name="change" value="changeitem"/>
+    <item cursed="yes" notlost="yes" weight="0" />
+  </resource>
+
+  <resource name="jadee_dress">
+    <!-- Wedding dress for Jadee -->
+    <function name="change" value="changeitem"/>
+    <item cursed="yes" notlost="yes" weight="0" />
+  </resource>
+
+  <resource name="wente_dress">
+    <!-- Wedding dress for Wildente -->
+    <function name="change" value="changeitem"/>
+    <item cursed="yes" notlost="yes" weight="0" />
+  </resource>
+
+</resources>

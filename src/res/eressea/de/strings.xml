@@ -22,12 +22,42 @@
   <string name="seaserpenthead_p">
     <text locale="de">Seeschlangenköpfe</text>
   </string>
+
+  <!-- starting here: Wildente and Jadee's wedding  -->
   <string name="pavilion">
     <text locale="de">Pavillion</text>
     <text locale="en">pavilion</text>
   </string>
+
   <string name="portal">
     <text locale="de">Portal</text>
     <text locale="en">portal</text>
   </string>
+
+  <string name="jadee_ring">
+    <text locale="de">Jadees Hochzeitsring</text>
+    <text locale="en">Jadee's wedding ring</text>
+  </string>
+
+  <string name="wente_ring">
+    <text locale="de">Wildentes Hochzeitsring</text>
+    <text locale="en">Wildente's wedding ring</text>
+  </string>
+
+  <string name="jadee_dress">
+    <text locale="de">Hochzeitskleid</text>
+    <text locale="en">wedding dress</text>
+  </string>
+
+  <string name="wente_dress">
+    <text locale="de">Frack</text>
+    <text locale="en">wedding suit</text>
+  </string>
+
+  <string name="ring">
+    <text locale="de">Ring</text>
+    <text locale="en">ring</text>
+  </string>
+  <!-- ending here: Wildente and Jadee's wedding  -->
+
 </strings>
