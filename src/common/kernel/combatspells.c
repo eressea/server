@@ -44,6 +44,9 @@ spell_damage(int sp)
 		case 3:
 			/* fast immer tödlich 30-50 HP */
 			return "5d5+25";
+		case 4:
+			/* verwundet 11-26 HP */
+			return "3d6+8";
 		default:
 			/* schwer verwundet 14-34 HP */
 			return "4d6+10";
@@ -73,7 +76,7 @@ get_force(int power, int formel)
 			/* (10,40,90,160,250,360,490,640,810,1000,1210,1440,..)*/
 			return (power*power*10);
 		case 6:
-			/* (6,24,54,96,150,216,)*/
+			/* (6,24,54,96,150,216,294,384,486,600,726,864)*/
 			return (power*power*6);
 		default:
 			return power;
@@ -574,8 +577,8 @@ sp_dragonodem(fighter * fi, int level, int power, spell * sp)
 	const char *damage;
 
 	sprintf(buf, "%s zaubert %s", unitname(fi->unit), sp->name);
-	/* 14-34 HP */
-	damage = spell_damage(10);
+	/* 11-26 HP */
+	damage = spell_damage(4);
 	/* Jungdrache 3->54, Drache 6->216, Wyrm 12->864 Treffer */
 	force = lovar(get_force(level,6));
 

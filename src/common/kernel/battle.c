@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.17 2001/02/18 12:11:32 enno Exp $
+ *	$Id: battle.c,v 1.18 2001/02/18 19:07:31 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1450,8 +1450,10 @@ do_combatspell(troop at)
 	}
 
 	level = ((cspell_f)sp->sp_function)(fi, level, power, sp);
-	if (level > 0)
+	if (level > 0){
 		pay_spell(mage, sp, level, 1);
+		at.fighter->action_counter++;
+	}
 }
 
 

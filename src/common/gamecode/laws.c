@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.27 2001/02/18 10:06:08 enno Exp $
+ *	$Id: laws.c,v 1.28 2001/02/18 19:07:31 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2689,7 +2689,7 @@ setdefaults (void)
 			 * werden. */
 
 			if(trade == true) {
-				fset(u, FL_LONGACTION);
+				/* fset(u, FL_LONGACTION); */
 				set_string(&u->thisorder, "");
 			}
 			/* thisorder kopieren wir nun nach lastorder. in lastorder steht
