@@ -129,6 +129,11 @@ extern "C" {
     AR_NONE
   };
 
+  typedef struct troop {
+    struct fighter *fighter;
+    int index;
+  } troop;
+
   typedef struct fighter {
     struct side *side;
     struct unit *unit;                /* Die Einheit, die hier kämpft */
@@ -160,6 +165,7 @@ extern "C" {
       int last_action : 8;		/* In welcher Runde haben wir zuletzt etwas getan */
       struct weapon * missile;   /* missile weapon */
       struct weapon * melee;     /* melee weapon */
+	  struct troop opponent; /* default opponent */
     } * person;
     int flags;
     struct {
@@ -176,11 +182,6 @@ extern "C" {
     int hits;
 #endif
   } fighter;
-
-  typedef struct troop {
-    struct fighter *fighter;
-    int index;
-  } troop;
 
 
   /* schilde */

@@ -36,9 +36,12 @@ function process(orders)
   read_orders(orders)
 
   -- igjarjuk gets called:
-  require("igjarjuk-call.lua")
-  call_igjarjuk()
-  
+  -- require("igjarjuk-call.lua")
+  -- call_igjarjuk()
+  u = get_unit(atoi36("50ki"))
+  if u~=nil then
+    u.region:set_flag(14, true)
+  end
   --
   process_orders()
   

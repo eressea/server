@@ -5351,6 +5351,7 @@ sp_baddreams(castorder *co)
 	region *r = co->rt;
 	curse * c;
 
+  return cast_level;
 	/* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
 	 * also duration+2 */
 	duration = (int)max(1, power/2); /* Stufe 1 macht sonst mist */
@@ -5390,6 +5391,7 @@ sp_gooddreams(castorder *co)
 	int cast_level = co->level;
 	double power = co->force;
 
+  return cast_level;
 	/* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
 	 * also duration+2 */
 	duration = (int)max(1, power/2); /* Stufe 1 macht sonst mist */

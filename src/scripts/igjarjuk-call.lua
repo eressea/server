@@ -19,7 +19,7 @@ function call_igjarjuk()
   
   -- make him a special kind of wyrm
   wyrm.race = "skeletal_wyrm"
-  wyrm.hp = 5000
+  wyrm.hp = 10000
   wyrm.status = 1
   wyrm.magic = "nomagic"
   wyrm:set_skill("sk_magic", 20)
@@ -27,6 +27,7 @@ function call_igjarjuk()
   wyrm.faction:set_policy(laoris.faction, "fight", true)
   wyrm.faction:set_policy(get_faction(atoi36("dpen")), "fight", true)
 
+  laoris:add_item("wand_of_tears", -6)
   -- inform the folks in the grave about what's up
   grave = wyrm.region
   fog:add_notice(tostring(laoris) .. " schwingt die Schwinge des Greifen. Das Auge des Dämons glüht in hellem weißen Licht, Blitze springen auf " .. tostring(wyrm) .. " über.")
