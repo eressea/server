@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: render.c,v 1.4 2001/02/10 11:38:29 enno Exp $
+ *	$Id: render.c,v 1.5 2001/02/10 19:24:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -255,7 +255,7 @@ render_immediate(const message * m, const char * find, localizer * l)
 			struct entry * e = m->type->entries;
 			++p;
 			if (*p=='$') {
-				int key;
+				unsigned int key;
 				eval * e;
 				++p;
 				while (*p!=' ') *f++ = *p++;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: region.c,v 1.7 2001/02/05 16:11:58 enno Exp $
+ *	$Id: region.c,v 1.8 2001/02/10 19:24:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -346,12 +346,10 @@ reldirection(region * from, region * to)
 void
 free_regionlist(regionlist *rl)
 {
-	regionlist *rl2;
-
-	while(rl != NULL) {
-		rl2 = rl;
-		rl  = rl->next;
-		free(rl2);
+	while (rl) {
+		regionlist * rl2 = rl->next;
+		free(rl);
+		rl = rl2;
 	}
 }
 

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: message.c,v 1.4 2001/02/10 11:38:29 enno Exp $
+ *	$Id: message.c,v 1.5 2001/02/10 19:24:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -193,7 +193,18 @@ mistake(const unit * u, const char *command, const char *comment, int mtype)
 	xmistake(u, command, gc_add(strdup(translate_regions(comment, u->faction))), mtype);
 }
 
-messagetype * messagetypes;
+static messagetype * messagetypes;
+
+extern unsigned int new_hashstring(const char* s);
+void
+debug_messagetypes(FILE * out)
+{
+	messagetype * mt;
+	for (mt=messagetypes;mt;mt=mt->next) {
+		fprintf(out, "%u->%u;%s\n", mt->hashkey, new_hashstring(mt->name));
+	}
+}
+
 
 messagetype *
 new_messagetype(const char * name, int level, const char * section)

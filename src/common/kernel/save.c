@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.14 2001/02/10 15:27:09 corwin Exp $
+ *	$Id: save.c,v 1.15 2001/02/10 19:24:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -961,7 +961,7 @@ readgame(boolean backup)
 			} else {
 				firstx=0;
 				firsty=0;
-				if (maxregions>0) n = min(n, maxregions)-1;
+				if (maxregions>0) maxregions = min(n, maxregions)-1;
 			}
 		}
 		if (maxregions==0) skip = true;

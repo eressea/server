@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.19 2001/02/10 14:18:00 enno Exp $
+ *	$Id: korrektur.c,v 1.20 2001/02/10 19:24:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1204,35 +1204,133 @@ count_demand(const region *r)
 {
 	struct demand *dmd;
 	int c = 0;
-	for (dmd=r->land->demands;dmd;dmd=dmd->next) c++;
+	if (r->land) {
+		for (dmd=r->land->demands;dmd;dmd=dmd->next) c++;
+	}
 	return c;
 }
 
-static void
-fix_demand_region(const region *r)
+static int
+recurse_regions(region * r, regionlist **rlist, boolean(*fun)(const region * r))
 {
-	direction_t d;
+	if (!fun(r)) return 0;
+	else {
+		int len = 0;
+		direction_t d;
+		regionlist * rl = calloc(sizeof(regionlist), 1);
+		rl->next = *rlist;
+		rl->region = r;
+		(*rlist) = rl;
+		fset(r, FL_MARK);
+		for (d=0;d!=MAXDIRECTIONS;++d) {
+			region * nr = rconnect(r, d);
+			if (nr && !fval(nr, FL_MARK)) len += recurse_regions(nr, rlist, fun);
+		}
+		return len+1;
+	}
+}
 
-	for (d=0;d!=MAXDIRECTIONS;++d) {
-		region *nr = rconnect(r, d);
-		if (nr && nr->land && count_demand(nr) != 7) {
-			const luxury_type *sale=NULL;
-			const luxury_type *ltype;
-			struct demand *dmd, *dmd2;
+static int maxluxuries = 0;
 
-			for(dmd = nr->land->demands; dmd; dmd=dmd->next)
-				if(dmd->value == 0) sale = dmd->type;
+static boolean
+f_nolux(const region * r)
+{
+	if (r->land && count_demand(r) != maxluxuries) return true;
+	return false;
+}
 
-			dmd2 = NULL;
-			for (ltype = luxurytypes;ltype;ltype=ltype->next) {
-				dmd = malloc(sizeof(struct demand));
-				dmd->type = ltype;
-				if(ltype == sale) {
-					dmd->value = 0;
-				} else {
-					dmd->value = 1+rand()%5;
+static void
+fix_demand_region(region *r)
+{
+	regionlist *rl, *rlist = NULL;
+	static const luxury_type **mlux = 0, ** ltypes;
+	const luxury_type *sale = NULL;
+	int maxlux = 0;
+
+	recurse_regions(r, &rlist, f_nolux);
+	if (mlux==0) {
+		int i = 0;
+		if (maxluxuries==0) for (sale=luxurytypes;sale;sale=sale->next) {
+			maxluxuries++;
+		}
+		mlux = (const luxury_type **)gc_add(calloc(maxluxuries, sizeof(const luxury_type *)));
+		ltypes = (const luxury_type **)gc_add(calloc(maxluxuries, sizeof(const luxury_type *)));
+		for (sale=luxurytypes;sale;sale=sale->next) {
+			ltypes[i++] = sale;
+		}
+	}
+	else {
+		int i;
+		for (i=0;i!=maxluxuries;++i) mlux[i] = 0;
+	}
+	for (rl=rlist;rl;rl=rl->next) {
+		region * r = rl->region;
+		direction_t d;
+		for (d=0;d!=MAXDIRECTIONS;++d) {
+			region * nr = rconnect(r, d);
+			if (nr && nr->land && nr->land->demands) {
+				struct demand * dmd;
+				for (dmd = nr->land->demands;dmd;dmd=dmd->next) {
+					if (dmd->value == 0) {
+						int i;
+						for (i=0;i!=maxluxuries;++i) {
+							if (mlux[i]==NULL) {
+								maxlux = i;
+								mlux[i] = dmd->type;
+								break;
+							} else if (mlux[i]==dmd->type) {
+								break;
+							}
+						}
+						break;
+					}
 				}
 			}
+		}
+		freset(r, FL_MARK); /* undo recursive marker */
+	}
+	if (maxlux<2) {
+		int i;
+		for (i=maxlux;i!=2;++i) {
+			int j;
+			do {
+				int k = rand() % maxluxuries;
+				mlux[i] = ltypes[k];
+				for (j=0;j!=i;++j) {
+					if (mlux[j]==mlux[i]) break;
+				}
+			} while (j!=i);
+		}
+		maxlux=2;
+	}
+	for (rl=rlist;rl;rl=rl->next) {
+		region * r = rl->region;
+		setluxuries(r, mlux[rand() % maxlux]);
+	}
+	while (rlist) {
+		rl = rlist->next;
+		free(rlist);
+		rlist = rl;
+	}
+}
+
+extern attrib * make_atgmcreate(const struct item_type * itype);
+extern attrib * make_atpermissions(void);
+extern struct attrib_type at_permissions;
+
+static void
+make_gms(void)
+{
+	faction * f = findfaction(atoi36("rr"));
+	if (f) {
+		attrib * a = a_find(f->attribs, &at_permissions);
+		if (!a) {
+			item_type * itype;
+			a = a_add(&f->attribs, make_atpermissions());
+			for (itype=itemtypes;itype;itype=itype->next) {
+				a_add((attrib**)&a->data.v, make_atgmcreate(itype));
+			}
+			a_add((attrib**)&a->data.v, make_key(atoi36("gmtf")));
 		}
 	}
 }
@@ -1241,9 +1339,14 @@ static void
 fix_demand(void)
 {
 	region *r;
+	const luxury_type *sale = NULL;
 
-	for (r=regions; r; r=r->next) if (r->land) {
-		if (count_demand(r) != 7) fix_demand_region(r);
+	if (maxluxuries==0) for (sale=luxurytypes;sale;sale=sale->next) ++maxluxuries;
+
+	for (r=regions; r; r=r->next) {
+		if ((r->land) && count_demand(r) != maxluxuries) {
+			fix_demand_region(r);
+		}
 	}
 }
 
@@ -1804,7 +1907,7 @@ korrektur(void)
 #ifdef TEST_GM_COMMANDS
 	setup_gm_faction();
 #endif
-	
+	make_gms();
 	/* Wieder entfernen! */
 	do_once(atoi36("trgr"), fix_targetregion_resolve())
 

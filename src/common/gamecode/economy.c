@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: economy.c,v 1.5 2001/02/10 14:17:59 enno Exp $
+ *	$Id: economy.c,v 1.6 2001/02/10 19:24:04 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1144,16 +1144,13 @@ maintain(building * b, boolean full)
 	return true;
 }
 
-void
+static void
 gebaeude_stuerzt_ein(region * r, building * b)
 {
 	unit *u;
 	int n, i;
 	direction_t d;
 	int opfer = 0;
-	faction *f;
-
-	for (f = factions; f; f = f->next) freset(f, FL_DH);
 
 	sprintf(buf, "%s stürzte ein.", buildingname(b));
 
@@ -1171,7 +1168,7 @@ gebaeude_stuerzt_ein(region * r, building * b)
 		if (u->building == b) {
 			int loss = 0;
 
-			fset(u->faction, FL_DH);
+			fset(u->faction, FL_MARK);
 			freset(u, FL_OWNER);
 			leave(r,u);
 			n = u->number;
@@ -1197,10 +1194,14 @@ gebaeude_stuerzt_ein(region * r, building * b)
 		scat(" zu beklagen.");
 	} else buf[0] = 0;
 	addmessage(r, 0, buf, MSG_EVENT, ML_IMPORTANT);
-	for (f = factions; f; f = f->next)
-		if (fval(f, FL_DH))
+	for (u=r->units; u; u=u->next) {
+		faction * f = u->faction;
+		if (fval(f, FL_MARK)) {
+			freset(u->faction, FL_MARK);
 			add_message(&f->msgs,
 				new_message(f, "buildingcrash%r:region%b:building%s:opfer", r, b, buf));
+		}
+	}
 	destroy_building(b);
 }
 

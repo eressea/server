@@ -60,12 +60,18 @@ read_permissions(attrib * a, FILE * F)
 	return 1;
 }
 
-static struct attrib_type at_permissions = {
+struct attrib_type at_permissions = {
 	"GM:permissions",
 	NULL, NULL, NULL,
 	write_permissions, read_permissions,
 	ATF_UNIQUE
 };
+
+attrib *
+make_atpermissions(void)
+{
+	return a_new(&at_permissions);
+}
 
 /**
  ** GM: CREATE <number> <itemtype>
@@ -95,7 +101,7 @@ static attrib_type at_gmcreate = {
 	write_gmcreate, read_gmcreate
 };
 
-static attrib *
+attrib *
 make_atgmcreate(const struct item_type * itype)
 {
 	attrib * a = a_new(&at_gmcreate);
@@ -175,21 +181,6 @@ init_gmcmd(void)
 	add_gmcommand(&g_cmds, "gm", &gm_command);
 	add_gmcommand(&g_cmds, "terraform", &gm_terraform);
 	add_gmcommand(&g_cmds, "create", &gm_create);
-
-	{
-		faction * f = findfaction(atoi36("rr"));
-		if (f) {
-			attrib * a = a_find(f->attribs, &at_permissions);
-			if (!a) {
-				item_type * itype;
-				a = a_add(&f->attribs, a_new(&at_permissions));
-				for (itype=itemtypes;itype;itype=itype->next) {
-					a_add((attrib**)&a->data.v, make_atgmcreate(itype));
-				}
-				a_add((attrib**)&a->data.v, make_key(atoi36("gmtf")));
-			}
-		}
-	}
 }
 
 

@@ -54,6 +54,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "echeck"=..\echeck\echeck.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "eressea"=".\eressea\eressea-6.dsp" - Package Owner=<4>
 
 Package=<5>

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.h,v 1.15 2001/02/10 14:18:00 enno Exp $
+ *	$Id: eressea.h,v 1.16 2001/02/10 19:24:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -141,7 +141,7 @@ typedef struct settings {
 } settings;
 extern settings global;
 
-#define RELEASE_VERSION NEWHASH_VERSION
+#define RELEASE_VERSION NEWSOURCE_VERSION
 #define ECHECK_VERSION "3.10"
 
 /* changes from->to: 72->73: struct unit::lock entfernt.

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.9 2001/02/10 10:40:11 enno Exp $
+ *	$Id: battle.c,v 1.10 2001/02/10 19:24:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -648,7 +648,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 	if (riding(t) && (wtype==NULL || !fval(wtype, WTF_MISSILE))) {
 		skill += 2;
 #ifdef BETA_CODE
-		skill = skillmod(urace(tu)->attribs, tu, tu->region, wtype->skill, skill, SMF_RIDING);
+		if (wtype) skill = skillmod(urace(tu)->attribs, tu, tu->region, wtype->skill, skill, SMF_RIDING);
 #else
 		if (tu->race == RC_TROLL) skill--;
 #endif
