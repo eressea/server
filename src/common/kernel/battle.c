@@ -2442,7 +2442,7 @@ aftermath(battle * b)
           du->hp = df->run.hp;
           set_string(&du->thisorder, "");
           setguard(du, GUARD_NONE);
-          fset(du, UFL_MOVED);
+          fset(du, UFL_LONGACTION);
           leave(du->region, du);
           if (df->run.region) {
             travel(du, df->run.region, 1, NULL);
@@ -3480,7 +3480,7 @@ init_battle(region * r, battle **bp)
           }
 
           /* ist ein Flüchtling aus einem andern Kampf */
-          if (fval(u, UFL_MOVED)) list_continue(sl);
+          if (fval(u, UFL_LONGACTION)) list_continue(sl);
 
           if (peace_ct && curse_active(get_curse(r->attribs, peace_ct))) {
             sprintf(buf, "Hier ist es so schön friedlich, %s möchte "
@@ -3514,8 +3514,7 @@ init_battle(region * r, battle **bp)
 
           /* Beginn Fehlerbehandlung */
           /* Fehler: "Die Einheit wurde nicht gefunden" */
-          if (!u2 || fval(u2, UFL_MOVED) || u2->number == 0
-            || !cansee(u->faction, u->region, u2, 0)) {
+          if (!u2 || u2->number == 0 || !cansee(u->faction, u->region, u2, 0)) {
               cmistake(u, sl->s, 63, MSG_BATTLE);
               list_continue(sl);
             }
