@@ -1217,7 +1217,6 @@
 		</type>
 		<text locale="de">"$unit($unit) in $region($region): '$command' - Die Einheit wurde nicht gefunden."</text>
 		<text locale="en">"$unit($unit) in $region($region): '$command' - The unit could not be found."</text>
-		</locale>
 	</message>
 
 	<message name="error64" section="errors">
