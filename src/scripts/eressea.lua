@@ -1,3 +1,19 @@
+function run_scripts()
+  scripts = { 
+    "wedding-jadee.lua", 
+    "eternath.lua",
+    "ponnuki.lua",
+    "xmas2004.lua"
+  }
+  for index in scripts do
+    local script = scriptpath .. "/" .. scripts[index]
+    print("- loading " .. script)
+    if pcall(dofile, script)==0 then
+      print("Could not load " .. script)
+    end
+  end
+end
+
 function write_emails()
   local locales = { "de", "en" }
   local files = {}
@@ -32,15 +48,10 @@ function process(orders)
   add_equipment("stone", 30);
   add_equipment("money", 2000 + get_turn() * 10);
 
-  -- initialize other scripts
-  local magrathea = get_region(-67, -5)
-  if magrathea~=nil and init_ponnuki~=nil then
-    init_ponnuki(magrathea)
-    return
-  end
-
   -- run the turn:
   read_orders(orders)
+  run_scripts()
+
   plan_monsters()
   process_orders()
   
@@ -61,22 +72,10 @@ end
 -- main body of script
 --
 
-scripts = { 
-  "wedding-jadee.lua", 
-  "eternath.lua",
-  "ponnuki.lua"
-}
-
 -- orderfile: contains the name of the orders.
 if orderfile==nil then
   print "you must specify an orderfile"
 else
-  for index in scripts do
-    local script = scriptpath .. scripts[index]
-    if pcall(dofile, script)==0 then
-      print("Could not load " .. script)
-    end
-  end
   process(orderfile)
 end
 

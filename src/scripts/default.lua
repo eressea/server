@@ -18,19 +18,6 @@ function write_emails()
   end
 end
 
-function run_scripts()
-  scripts = { 
-    "xmas2004.lua"
-  }
-  for index in scripts do
-    local script = scriptpath .. "/" .. scripts[index]
-    print("- loading " .. script)
-    if pcall(dofile, script)==0 then
-      print("Could not load " .. script)
-    end
-  end
-end
-
 function process(orders)
   file = "" .. get_turn()
   if read_game(file)~=0 then
@@ -48,9 +35,6 @@ function process(orders)
   -- run the turn:
   read_orders(orders)  
   plan_monsters()
-
-  -- load scripts:
-  run_scripts()
 
   --
   process_orders()

@@ -17,7 +17,7 @@ function ponnuki_brain(u)
   u:add_order("NACH " .. directions[d])
 end
 
-function init_ponnuki(home)
+local function init_ponnuki(home)
   local f = get_faction(0)
   local u = get_unit(atoi36("ponn"))
   if u == nil then
@@ -32,3 +32,11 @@ function init_ponnuki(home)
     u:set_brain(ponnuki_brain)
   end
 end
+
+-- initialize other scripts
+local magrathea = get_region(-67, -5)
+if magrathea~=nil and init_ponnuki~=nil then
+  init_ponnuki(magrathea)
+  return
+end
+
