@@ -280,6 +280,21 @@ has_laen(region *r) {
 }
 #endif
 
+static int
+crwritemap(void)
+{
+  FILE * F = fopen("world.cr", "w+");
+  region * r;
+  for (r=regions;r;r=r->next) {
+    plane * p = rplane(r);
+    fprintf(F, "REGION %d %d %d\n", r->x, r->y, p?p->id:0);
+    fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale), LOC(default_locale, terrain[rterrain(r)].name));
+  }
+  fclose(F);
+	return 0;
+}
+
+
 void
 drawmap(boolean maponly) {
 	int x, x1, y1, y2, s, q;
@@ -714,6 +729,9 @@ movearound(int rx, int ry) {
 					adddbllist(&reglist, " Z: Terrain Region");
 					DisplayRegList(1);
 					ch = 999999;
+					break;
+				case 'W':
+					crwritemap();
 					break;
 				case 'q':
 					if (yes_no(0, "Wirklich beenden?", 'n'))
