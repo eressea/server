@@ -5,8 +5,8 @@
 		<arg name="number" type="int"></arg>
 		<arg name="race" type="race"></arg>
 	</type>
-	<text locale="de">"$if($isnull($region),"Es","In $region($region)") wurde$if($eq($number,1),"","n") $number $race($race,$number) gesichtet."</text>
-	<text locale="en">$if($isnull($region),"","In $region($region), ")$number $race($race,$number) were discovered."</text>
+	<text locale="de">"$if($isnull($region),"Es","In $region($region)") wurde$if($eq($number,1),"","n") $int(number) $race($race,$number) gesichtet."</text>
+	<text locale="en">"$if($isnull($region),"","In $region($region), ")$int($number) $race($race,$number) were discovered."</text>
 </message>
 <message name="mallorn_effect" section="magic">
 	<type>

@@ -1330,7 +1330,7 @@ randomevents(void)
 							   NULL, u->race, u->number));
 			/* create new message to add to units */
 			msg = msg_message("sighting", "region race number",
-							  NULL, u->race, u->number);
+							  u->region, u->race, u->number);
 			for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
 			for (u=r->units;u;u=u->next) {
 				faction * f = u->faction;
