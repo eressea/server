@@ -7,7 +7,7 @@ endif
 CC      = gcc-3.0 -D_GNU_SOURCE
 # CC      = gcc -D_GNU_SOURCE
 AR      = ar
-CTAGS   = ctags
+CTAGS   = ctags-exuberant
 LD      = gcc-3.0
 INSTALL = cp
 CFLAGS  += -march=athlon -minline-all-stringops

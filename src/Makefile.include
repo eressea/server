@@ -8,7 +8,7 @@ default: debug
 
 DEPEND  = @gcc -MM -MG -r
 AR      = @ar
-CTAGS   = @ctags
+CTAGS   = @ctags-exuberant
 CC      = @gcc
 LD      = @gcc
 INSTALL = @cp
@@ -16,7 +16,7 @@ INSTALL = @cp
 
 
 ARFLAGS = crs
-CTAGSFLAGS = --langmap=c:.c.h --c-types=-m
+CTAGSFLAGS = --c-types=cdefgmnstuv
 CFLAGS  = -I$(ERESSEA) -Wall -Wwrite-strings -Wstrict-prototypes \
            -Wpointer-arith -Werror-implicit-function-declaration \
 		   -Wno-char-subscripts $(INCLUDES)
@@ -120,7 +120,7 @@ endif
 #
 ## Tags
 #
-tags: depend
+tags:
 	@echo "Creating tags in `pwd`/tags";
 	$(CTAGS) $(CTAGSFLAGS) --recurse=yes -f $(ERESSEA)/tags $(ERESSEA)
 

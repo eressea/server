@@ -1076,7 +1076,7 @@ randomevents(void)
 	}
 
 
-#if RACE_ADJUSTMENTS
+#if RACE_ADJUSTMENTS == 0
 	/* Orks vermehren sich */
 
 	for (r = regions; r; r = r->next) {
