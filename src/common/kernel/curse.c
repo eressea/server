@@ -505,7 +505,7 @@ create_curse(unit *magician, attrib **ap, const curse_type *ct, int vigour,
 	curse *c;
 
 	/* die Kraft eines Spruchs darf nicht 0 sein*/
-	assert(vigour >= 0);
+	assert(vigour > 0);
 
 	c = get_curse(*ap, ct);
 

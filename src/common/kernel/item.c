@@ -841,7 +841,7 @@ use_antimagiccrystal(region * r, unit * mage, int amount, strlist * cmdstrings)
 			if(*ap) ap = &(*ap)->next;
 		}
 
-		if(force) {
+		if (force>0) {
 			create_curse(mage, &r->attribs, ct_find("antimagiczone"), force, duration, effect, 0);
 		}
 
