@@ -61,7 +61,11 @@ end
 -- main body of script
 --
 
-scripts = { "ponnuki.lua", "wedding-jadee.lua" }
+scripts = { 
+  "wedding-jadee.lua", 
+  "eternath.lua",
+  "ponnuki.lua"
+}
 
 -- orderfile: contains the name of the orders.
 if orderfile==nil then

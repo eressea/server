@@ -5,27 +5,28 @@
 hellgate = nil
 peacegate = nil
 
-function gate_exchange(b1, b2)
-  local units1 = {}
-  local units2 = {}
+function wedding_travellers(b)
+  local units = {}
+  
+  for u in b.units do
+    if u:get_flag("wdgt") then
+      units[u] = u
+    end
+  end
+  return units
+end
+
+function wedding_exchange(b1, b2)
+  local units1 = wedding_travellers(b1)
+  local units2 = wedding_travellers(b2)
+
+  -- we've found which units we want to exchange, now swap them:
   local u
-  for u in b1.units do
-    if u:get_flag("wdgt") then
-      units1[u.no] = u
-    end
-  end
-  for u in b2.units do
-    if u:get_flag("wdgt") then
-      units2[u.no] = u
-    end
-  end
-  for id in units1 do
-    u = units1[id]
+  for u in units1 do
     u.region = b2.region
     u.building = b2
   end
-  for id in units2 do
-    u = units2[id]
+  for u in units2 do
     u.region = b1.region
     u.building = b1
   end
@@ -35,7 +36,7 @@ function hellgate_action(b)
   if hellgate == nil then
     hellgate = b
   else
-    gate_exchange(hellgate, b)
+    wedding_exchange(hellgate, b)
   end
   return 1
 end
