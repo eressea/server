@@ -83,6 +83,44 @@
 
 extern void reorder_owners(struct region * r);
 
+static int
+convert_orders(void)
+{
+	region * r;
+	for (r=regions;r;r=r->next) {
+		unit * u;
+		for (u=r->units;u;u=u->next) {
+			strlist * o;
+			for (o=u->orders;o;o=o->next) {
+				int c = igetkeyword(o->s, u->faction->locale);
+				switch (c) {
+				case K_RESERVE:
+				case K_BUY:
+				case K_SELL:
+				case K_CAST:
+					sprintf(buf, "@%s", LOC(u->faction->locale, keywords[c]));
+					for (;;) {
+						const char * c = getstrtoken();
+						if (c && *c) {
+							if (strchr(c, ' ')) {
+								strcat(buf, " \"");
+								strcat(buf, c);
+								strcat(buf, "\"");
+							} else {
+								strcat(buf, " ");
+								strcat(buf, c);
+							}
+						} else break;
+					}
+					set_string(&o->s, buf);
+					break;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
 static void
 verify_owners(boolean bOnce)
 {
@@ -147,8 +185,8 @@ warn_items(void)
 			for (itm=u->items;itm;itm=itm->next) {
 				if (itm->number>100000 && itm->type!=it_money) {
 					found = 1;
-					log_error(("Einheit %s hat %u %s\n", 
-						unitid(u), itm->number, 
+					log_error(("Einheit %s hat %u %s\n",
+						unitid(u), itm->number,
 						resourcename(itm->type->rtype, 0)));
 				}
 			}
@@ -345,9 +383,9 @@ no_teurefremde(boolean convert)
 		for(u=r->units;u;u=u->next) {
 			if(u->faction->no != MONSTER_FACTION
 					&& is_migrant(u)
-					&& kor_teure_talente(u)) 
+					&& kor_teure_talente(u))
 			{
-				log_printf("* Warnung, teurer Migrant: %s %s\n", 
+				log_printf("* Warnung, teurer Migrant: %s %s\n",
 						unitname(u), factionname(u->faction));
 				if(convert) {
 					u->race = u->faction->race;
@@ -2443,13 +2481,13 @@ heal_all(void)
 	for(r=regions; r; r=r->next) {
 		for(u=r->units;u;u=u->next) {
 			int max_hp = unit_max_hp(u) * u->number;
-			if(u->hp < max_hp) { 
+			if(u->hp < max_hp) {
 				u->hp = max_hp;
 				fset(u->faction, FL_DH);
-			} 
+			}
 		}
 	}
-	
+
 	for (f=factions; f; f=f->next) {
 		if(fval(f,FL_DH)) {
 			add_message(&f->msgs, msg);
@@ -2502,7 +2540,7 @@ peasant_adjustment(void)
 		}
 		if (c==0) continue;
 		avg = sum/c;
-		
+
 		for(r=regions; r; r=r->next) if(rterrain(r) == ter) {
 			unit *u;
 			int playerp = 0;
@@ -2532,13 +2570,13 @@ peasant_adjustment(void)
 			freeall += max(0,production(r) * MAXPEASANTS_PER_AREA
 				- ((rtrees(r,2)+rtrees(r,1)/2) * TREESIZE) - playerp);
 		}
-		
+
 		for(r=regions; r; r=r->next) if(rterrain(r) == ter) {
 			unit *u;
 			double free;
 			int newp;
 			int playerp = 0;
-			
+
 			for(u = r->units; u; u=u->next) {
 				if(lifestyle(u) > 0) playerp += u->number;
 				/* Sonderregel Bauernmob */
@@ -2555,7 +2593,7 @@ peasant_adjustment(void)
 			assert(rpeasants(r) >= 0);
 		}
 	}
-	
+
 	s = 0;
 	for(r=regions; r; r=r->next) {
 		s += rpeasants(r);
@@ -2687,7 +2725,7 @@ warn_password(void)
 			c++;
 		}
 		if (pwok == false) {
-			ADDMSG(&f->msgs, msg_message("msg_errors", "string", 
+			ADDMSG(&f->msgs, msg_message("msg_errors", "string",
 				"Dein Passwort enthält Zeichen, die bei der Nachsendung "
 				"von Reports Probleme bereiten können. Bitte wähle ein neues "
 				"Passwort, bevorzugt nur aus Buchstaben und Zahlen bestehend."));
@@ -2745,7 +2783,7 @@ questportal_init(void)
 
 	u = findunit(atoi36("L0sc"));
 	if(u) i_change(&u->items, &it_questkey1, 1);
-	
+
 	u = findunit(atoi36("xi7m"));
 	if(u) i_change(&u->items, &it_questkey2, 1);
 	return 0;
@@ -2828,6 +2866,7 @@ korrektur(void)
 	update_gmquests(); /* test gm quests */
 	/* fix_unitrefs(); */
 	stats();
+	do_once("pers", convert_orders());
 	do_once("sql2", dump_sql());
 	do_once("fw02", fix_watchers());
 	do_once("fxh3", fix_plainherbs());
@@ -2858,8 +2897,8 @@ korrektur(void)
 	warn_password();
 	fix_road_borders();
 
-	/* seems something fishy is going on, do this just 
-	 * to be on the safe side: 
+	/* seems something fishy is going on, do this just
+	 * to be on the safe side:
 	 */
 	fix_demand();
   /* trade_orders(); */

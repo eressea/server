@@ -610,12 +610,8 @@ is_persistent(const char *s, const struct locale *lang)
 	if(*s == '@') return true;
 #endif      /* Nur kurze Befehle! */
 	switch(igetkeyword(s, lang)) {
-		case K_BUY:
-		case K_SELL:
-		case K_CAST:
 		case K_KOMMENTAR:
 		case K_LIEFERE:
-		case K_RESERVE:
 			return true;
 			break;
 	}
@@ -657,11 +653,11 @@ read_items(FILE *F, item **ilist)
 }
 
 #if RESOURCE_CONVERSION
-struct attrib_type at_resources = { 
-	"resources", NULL, NULL, NULL, NULL, NULL, ATF_UNIQUE 
+struct attrib_type at_resources = {
+	"resources", NULL, NULL, NULL, NULL, NULL, ATF_UNIQUE
 };
 
-void 
+void
 read_iron(struct region * r, int iron)
 {
 	attrib * a = a_find(r->attribs, &at_resources);
@@ -673,7 +669,7 @@ read_iron(struct region * r, int iron)
 	a->data.sa[0] = (short)iron;
 }
 
-void 
+void
 read_laen(struct region * r, int laen)
 {
 	attrib * a = a_find(r->attribs, &at_resources);
@@ -1385,7 +1381,7 @@ curse_read(attrib * a, FILE * f) {
 
 	if (global.data_version >= CURSETYPE_VERSION) {
 		char cursename[64];
-		fscanf(f, "%d %s %d %d %d %d %d ", &c->no, cursename, &c->flag, 
+		fscanf(f, "%d %s %d %d %d %d %d ", &c->no, cursename, &c->flag,
 			&c->duration, &c->vigour, &mageid, &c->effect);
 		ct = ct_find(cursename);
 	} else {
@@ -1858,7 +1854,7 @@ readregion(FILE * F, int x, int y)
 		i = ri(F); rsethorses(r, i);
 #if NEW_RESOURCEGROWTH
 		if (global.data_version < NEWRESOURCE_VERSION) {
-			i = ri(F); 
+			i = ri(F);
 #if RESOURCE_CONVERSION
 			if (i!=0) read_iron(r, i);
 #endif
@@ -2098,7 +2094,7 @@ readfaction(FILE * F)
 	f->age = ri(F);
 /*
 	if (sqlstream && f->age==0) {
-		fprintf(sqlstream, 
+		fprintf(sqlstream,
 			"UPDATE users SET status='ACTIVE' where email='%s';\n",
 			f->email);
 	}
