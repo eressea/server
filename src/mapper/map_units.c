@@ -1480,10 +1480,20 @@ showunits(region * r)
 				refresh();
 			} else {
 				if ((s = strchr(pointer->s, '('))!=NULL) {
+					char idbuf[12];
+					int  i = 0;
+
 					s++;
-					f  = atoi36(s);
-					f2 = atoi36(s);
-					if (f || f2)
+					while(*s != ')') {
+						idbuf[i] = *s;
+						i++; s++;
+						assert(i<=11);
+					}
+					idbuf[i] = '\0';
+
+					f  = atoi36(idbuf);
+					
+					if (f)
 						switch (pointer->s[0]) {
 						case '\025':
 							clipunit = findunit(f, r);
