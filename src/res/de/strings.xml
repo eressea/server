@@ -603,6 +603,14 @@
 	</string>
 
 	<comment>Items</comment>
+	<string name="sphereofinv">
+		<text locale="de">Sphäre der Unsichtbarkeit</text>
+		<text locale="en">sphere of invisibility</text>
+	</string>
+	<string name="sphereofinv_p">
+		<text locale="de">Sphären der Unsichtbarkeit</text>
+		<text locale="en">spheres of invisibility</text>
+	</string>
 	<string name="herb">
 		<text locale="de">Kraut</text>
 	</string>

@@ -1215,6 +1215,10 @@ t_item itemdata[MAXITEMS] = {
 		{"Magischer Kräuterbeutel", "Magische Kräuterbeutel", "", ""}, G_M,
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	}
+	{			/* I_SPHERE_OF_INVISIBILITY */
+		{"Sphäre der Unsichtbarkeit", "Sphären der Unsichtbarkeit", "", ""}, G_M,
+		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
+	}
 };
 
 const item_t matresource[] = {
