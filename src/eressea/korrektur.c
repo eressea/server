@@ -947,7 +947,7 @@ fix_demand_region(region *r)
 	}
 	for (rl=rlist;rl;rl=rl->next) {
 		region * r = rl->region;
-		log_warning(("fixing demand in %s\n", regionname(r, NULL)));
+		if (!fval(r, RF_CHAOTIC)) log_warning(("fixing demand in %s\n", regionname(r, NULL)));
 		setluxuries(r, mlux[rand() % maxlux]);
 	}
 	while (rlist) {
@@ -1028,7 +1028,7 @@ fix_demand(void)
 	if (maxluxuries==0) for (sale=luxurytypes;sale;sale=sale->next) ++maxluxuries;
 
 	for (r=regions; r; r=r->next) {
-		if ((r->land) && count_demand(r) != maxluxuries) {
+		if (r->land!=NULL && r->land->peasants>=100 && count_demand(r) != maxluxuries) {
 			fix_demand_region(r);
 		}
 	}
@@ -2174,7 +2174,7 @@ korrektur(void)
 #ifdef CONVERT_TRIGGER
 	convert_triggers();
 #endif
-	fix_migrants();
+	/* fix_migrants(); */
 	/* In Vin3 können Parteien komplett übergeben werden. */
 #ifdef ENHANCED_QUIT
 	no_teurefremde(0);

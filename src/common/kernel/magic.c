@@ -1028,8 +1028,6 @@ cancast(unit * u, spell * sp, int level, int range, char * cmd)
 	}
 	/* reicht die Stufe aus? */
 	if (eff_skill(u, SK_MAGIC, u->region) < sp->level) {
-		log_warning(("Zauber von %s schlug fehl: %s braucht Stufe %d.\n",
-				unitname(u), spell_name(sp, default_locale), sp->level));
 		/* die Einheit ist nicht erfahren genug für diesen Zauber */
 		cmistake(u, strdup(cmd), 169, MSG_MAGIC);
 		return false;
