@@ -34,6 +34,7 @@
 #define COMBAT_TURNS 5
 #define PEASANTS_DO_NOT_STARVE 0
 #define NEW_MIGRATION 1
+#define MIGRANTS_CAN_LEARN_EXPENSIVE_SKILLS 1	/* vinyambar 3 only */
 
 #if NEWATSROI == 1
 #define ATSBONUS 2

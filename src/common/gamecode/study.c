@@ -514,12 +514,13 @@ learn(void)
 				/* keine kostenpflichtigen Talente für Migranten. Vertraute sind
 				 * keine Migranten, wird in is_migrant abgefangen. Vorsicht,
 				 * studycost darf hier noch nicht durch Akademie erhöht sein */
+#if MIGRANTS_CAN_LEARN_EXPENSIVE_SKILLS == 0
 				if (is_migrant(u) && studycost > 0){
 					sprintf(buf, "Migranten können keine kostenpflichtigen Talente lernen");
 					mistake(u, u->thisorder, buf, MSG_EVENT);
 					continue;
 				}
-
+#endif
 				/* Akademie: */
 				{
 					struct building * b = inside_building(u);
