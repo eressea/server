@@ -275,7 +275,9 @@ has_laen(region *r)
 }
 #else
 static boolean
-has_laen(region *r) {
+has_laen(region *r)
+{
+	if(rlaen(r) >= 0) return true;
 	return false;
 }
 #endif
