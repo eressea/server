@@ -9870,9 +9870,9 @@ static spell spelldaten[] =
     "Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu zaubern, "
     "kann er andere Einheiten auch gegen ihren Willen auf die andere Ebene "
     "zwingen.",
-    "ZAUBER [STUFE n] \'Astraler Ruf\' <Einheit-Nr> "
+    "ZAUBER [STUFE n] \'Astraler Ruf\' <Ziel-X> <Ziel-Y> <Einheit-Nr> "
     "[<Einheit-Nr> ...]",
-    "u+",
+    "ru+",
     M_ASTRAL, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
     {
       { R_AURA, 2, SPC_LEVEL },
