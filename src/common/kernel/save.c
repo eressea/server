@@ -205,7 +205,7 @@ convertunique(faction * f)
 		for (;;) {
 			char zFaction[5];
 			int subscription, fno;
-			if (fscanf(F, "%s %d", zFaction, &subscription)<=0) break;
+			if (fscanf(F, "%d %s", &subscription)<=0, zFaction) break;
 			mnode = calloc(1, sizeof(mapnode));
 			fno = atoi36(zFaction);
 			mnode->next = subscriptions[fno%HASHSIZE];
