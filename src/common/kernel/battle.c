@@ -1504,7 +1504,7 @@ do_combatmagic(battle *b, combatmagic_t was)
 			}
 
 
-                        power = spellpower(r, mage, sp, level);
+                        power = spellpower(r, mage, sp, level, cmd);
 			if (power <= 0) {	/* Effekt von Antimagie */
                           report_failed_spell(b, mage, sp);
                           pay_spell(mage, sp, level, 1);
@@ -1546,69 +1546,70 @@ do_combatmagic(battle *b, combatmagic_t was)
 static void
 do_combatspell(troop at, int row)
 {
-	spell *sp;
-	fighter *fi = at.fighter;
-	unit *mage = fi->unit;
-	battle *b = fi->side->battle;
-	region *r = b->region;
-	int level;
+  spell *sp;
+  fighter *fi = at.fighter;
+  unit *mage = fi->unit;
+  battle *b = fi->side->battle;
+  region *r = b->region;
+  int level;
   double power;
-	int fumblechance = 0;
-	void **mg;
-	int sl;
-	char cmd[128];
-	const struct locale * lang = mage->faction->locale;
+  int fumblechance = 0;
+  void **mg;
+  int sl;
+  char cmd[128];
+  const struct locale * lang = mage->faction->locale;
 
-	if (row>BEHIND_ROW) return;
+  if (row>BEHIND_ROW) return;
 
-	sp = get_combatspell(mage, 1);
-	if (sp == NULL) {
-		fi->magic = 0; /* Hat keinen Kampfzauber, kämpft nichtmagisch weiter */
-		return;
-	}
-	snprintf(cmd, 128, "ZAUBER %s", spell_name(sp, lang));
-	if (cancast(mage, sp, 1, 1, cmd) == false) {
-		fi->magic = 0; /* Kann nicht mehr Zaubern, kämpft nichtmagisch weiter */
-		return;
-	}
+  sp = get_combatspell(mage, 1);
+  if (sp == NULL) {
+    fi->magic = 0; /* Hat keinen Kampfzauber, kämpft nichtmagisch weiter */
+    return;
+  }
+  snprintf(cmd, 128, "%s \"%s\"",
+    LOC(lang, keywords[K_CAST]), spell_name(sp, lang));
+  if (cancast(mage, sp, 1, 1, cmd) == false) {
+    fi->magic = 0; /* Kann nicht mehr Zaubern, kämpft nichtmagisch weiter */
+    return;
+  }
 
-	level = eff_spelllevel(mage, sp, fi->magic, 1);
-	if ((sl = get_combatspelllevel(mage, 1)) > 0) level = min(level, sl);
+  level = eff_spelllevel(mage, sp, fi->magic, 1);
+  if ((sl = get_combatspelllevel(mage, 1)) > 0) level = min(level, sl);
 
-	if (fumble(r, mage, sp, sp->level) == true) {
-          report_failed_spell(b, mage, sp);
-          pay_spell(mage, sp, level, 1);
-          return;
-	}
+  if (fumble(r, mage, sp, sp->level) == true) {
+    report_failed_spell(b, mage, sp);
+    pay_spell(mage, sp, level, 1);
+    return;
+  }
 
-	for (mg = b->meffects.begin; mg != b->meffects.end; ++mg) {
-		meffect *mblock = *mg;
-		if (mblock->typ == SHIELD_BLOCK) {
-			if (meffect_blocked(b, mblock, fi->side) != 0) {
-				fumblechance += mblock->duration;
-				mblock->duration -= mblock->effect;
-			}
-		}
-	}
+  for (mg = b->meffects.begin; mg != b->meffects.end; ++mg) {
+    meffect *mblock = *mg;
+    if (mblock->typ == SHIELD_BLOCK) {
+      if (meffect_blocked(b, mblock, fi->side) != 0) {
+        fumblechance += mblock->duration;
+        mblock->duration -= mblock->effect;
+      }
+    }
+  }
 
-	/* Antimagie die Fehlschlag erhöht */
-	if (rand()%100 < fumblechance) {
-          report_failed_spell(b, mage, sp);
-          pay_spell(mage, sp, level, 1);
-          return;
-	}
-	power = spellpower(r, mage, sp, level);
-	if (power <= 0) {	/* Effekt von Antimagie */
-          report_failed_spell(b, mage, sp);
-          pay_spell(mage, sp, level, 1);
-          return;
-	}
+  /* Antimagie die Fehlschlag erhöht */
+  if (rand()%100 < fumblechance) {
+    report_failed_spell(b, mage, sp);
+    pay_spell(mage, sp, level, 1);
+    return;
+  }
+  power = spellpower(r, mage, sp, level, cmd);
+  if (power <= 0) {	/* Effekt von Antimagie */
+    report_failed_spell(b, mage, sp);
+    pay_spell(mage, sp, level, 1);
+    return;
+  }
 
-	level = ((cspell_f)sp->sp_function)(fi, level, power, sp);
-	if (level > 0) {
-		pay_spell(mage, sp, level, 1);
-		at.fighter->action_counter++;
-	}
+  level = ((cspell_f)sp->sp_function)(fi, level, power, sp);
+  if (level > 0) {
+    pay_spell(mage, sp, level, 1);
+    at.fighter->action_counter++;
+  }
 }
 
 

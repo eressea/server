@@ -985,7 +985,7 @@ cancast(unit * u, spell * sp, int level, int range, char * cmd)
  */
 
 double
-spellpower(region * r, unit * u, spell * sp, int cast_level)
+spellpower(region * r, unit * u, spell * sp, int cast_level, const char * cmd)
 {
   curse * c;
   double force = cast_level;
@@ -1005,7 +1005,7 @@ spellpower(region * r, unit * u, spell * sp, int cast_level)
   if (curse_active(c)) {
     force -= curse_geteffect(c);
     curse_changevigour(&r->attribs, c, -cast_level);
-    cmistake(u, findorder(u, u->thisorder), 185, MSG_MAGIC);
+    cmistake(u, findorder(u, cmd), 185, MSG_MAGIC);
   }
 
   /* Patzerfluch-Effekt: */
@@ -1013,7 +1013,7 @@ spellpower(region * r, unit * u, spell * sp, int cast_level)
   if (curse_active(c)) {
     force -= curse_geteffect(c);
     curse_changevigour(&u->attribs, c, -1);
-    cmistake(u, findorder(u, u->thisorder), 185, MSG_MAGIC);
+    cmistake(u, findorder(u, cmd), 185, MSG_MAGIC);
   }
 
   force = force * MagicPower();
@@ -2925,7 +2925,7 @@ magic(void)
         continue;
       }
 
-      co->force = spellpower(target_r, u, sp, co->level);
+      co->force = spellpower(target_r, u, sp, co->level, cmd);
       /* die Stärke kann durch Antimagie auf 0 sinken */
       if (co->force <= 0) {
         co->force = 0;

@@ -311,7 +311,7 @@ int change_maxspellpoints(struct unit * u, int csp);
    /* verändert die maximalen Magiepunkte einer Einheit */
 
 /* Zaubern */
-double spellpower(struct region *r, struct unit *u, spell *spruch, int cast_level);
+extern double spellpower(struct region *r, struct unit *u, spell *spruch, int cast_level, const char * cmd);
 	/*	ermittelt die Stärke eines Spruchs */
 boolean fumble (struct region *r, struct unit *u, spell *spruch, int cast_level);
 	/*	true, wenn der Zauber misslingt, bei false gelingt der Zauber */
