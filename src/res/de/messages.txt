@@ -1,5 +1,5 @@
 # Kommentare sind erlaubt. Endlich.
-# $Id: messages.txt,v 1.2 2001/02/04 09:46:48 corwin Exp $
+# $Id: messages.txt,v 1.3 2001/02/11 07:21:12 corwin Exp $
 
 # Fehlermeldungen:
 msg_errors;errors:0;de;{string}
@@ -484,11 +484,11 @@ icastle_create;magic:0;de;{unit} in {region}: '{command}' - Der Magier erschafft
 sp_raisepeasantmob_effect;magic:0;de;{$mage mage} wiegelt in {region} die Bauern zum Aufstand auf.
 firewall_effect;magic:0;de;{mage} erschafft in {region} eine Wand aus Feuer.
 wisps_effect;magic:0;de;{mage} ruft Irrlichter in {region}.
-becomewyrm;magic;2;de;{mage} verwandelt sich in einen Wyrm.
-puttorest;magic;0;de;{mage} befreit die gequälten Seelen der Toten.
-unholypower_effect;0;de;{mage} verwandelt {target}.
-unholypower_limitedeffect;0;de;{mage} verwandelt {amount} {race} aus {target}.
-holyground;0;de;{mage} beschwört Naturgeister in den Boden der Region.
+becomewyrm;magic:2;de;{mage} verwandelt sich in einen Wyrm.
+puttorest;magic:0;de;{mage} befreit die gequälten Seelen der Toten.
+unholypower_effect;magic:0;de;{mage} verwandelt {target}.
+unholypower_limitedeffect;magic:0;de;{mage} verwandelt {amount} {race} aus {target}.
+holyground;magic:0;de;{mage} beschwört Naturgeister in den Boden der Region.
 
 # Kämpfe
 msg_battle;battle:0;de;{string}
@@ -523,6 +523,6 @@ drown;events:0;de;{unit} ertrinkt.
 
 # Spezialplanes
 error_pflnorecruit;errors:0;de;{unit} in {region}: '{command}' - In der Ebene der Herausforderung kann niemand rekrutiert werden.
-buildingcrash;events;0;de;In {region} stürzte {building} ein.{opfer}
-nomaintenance;events;0;de;Für das Gebäude {building} konnte die ganze Woche kein Unterhalt bezahlt werden.
-unitmessage;events;0;de;Eine Botschaft von {unit} aus {region}: '{message}'"
+buildingcrash;events:0;de;In {region} stürzte {building} ein.{opfer}
+nomaintenance;events:0;de;Für das Gebäude {building} konnte die ganze Woche kein Unterhalt bezahlt werden.
+unitmessage;events:0;de;Eine Botschaft von {unit} aus {region}: '{message}'"
