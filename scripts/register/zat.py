@@ -17,26 +17,30 @@ if k==0:
     print "Unbekanntes Spiel"
 
 name, patch = cursor.fetchone()
-print "Auswertung für " + name + " Patch Level " + str(int(patch))
-while os.access(patchdir+'/patch-'+str(int(patch+1))+'.sql', os.F_OK)==0:
-    patch=patch+1
-    os.system('mysql --table ' + dbname + '-e ' + patchdir+'/patch-'+str(int(patch+1))+'.sql')
-    cursor.execute('update games set patch='+str(int(patch))+' where game='+str(game))
 
-k = cursor.execute("UPDATE subscriptions SET user=NULL where status='TRANSFERED' and updated<'"+date+"'"
+os.system("mysqldump vinyambar > backup-vinyambar-"+str(int(patch))+".sql")
+
+k = cursor.execute("SELECT max(lastturn) from subscriptions")
+lastturn = int(cursor.fetchone()[0])
+
+print "Auswertung für " + name + " Patch Level " + str(int(patch)) + ", Runde "+str(lastturn)
+while os.access(patchdir+'/patch-'+str(int(patch+1))+'.sql', os.F_OK):
+    patch=patch+1
+    print "  Patching to level "+str(patch)
+    os.system('mysql ' + dbname + ' < ' + patchdir+'/patch-'+str(int(patch))+'.sql')
+    cursor.execute('update games set patch='+str(int(patch))+' where id='+str(game))
+
+k = cursor.execute("UPDATE subscriptions SET user=0 where game="+str(int(game))+" and status='TRANSFERED' and updated<'"+date+"'")
 print "Removing "+str(int(k))+" transfered subscriptions."
 
-k = cursor.execute("UPDATE subscriptions SET user=NULL where status='CANCELLED' and updated<'"+date+"'"
+k = cursor.execute("UPDATE subscriptions SET user=0 where game="+str(int(game))+" and status='CANCELLED' and updated<'"+date+"'")
 print "Removing "+str(int(k))+" cancelled subscriptions."
 
-k = cursor.execute("UPDATE subscriptions SET user=NULL where status='DEAD' and updated<'"+date+"'"
+k = cursor.execute("UPDATE subscriptions SET user=0 where game="+str(int(game))+" and status='DEAD' and updated<'"+date+"'")
 print "Removing "+str(int(k))+" dead subscriptions."
 
-k = cursor.execute("SELECT max(lastturn) from subscriptions");
-lastturn = int(cursor.fetchone()[0])
-k = cursor.execute("UPDATE subscriptions SET status='CANCELLED' where lastturn+3<="+str(lastturn)
-k = cursor.execute("UPDATE subscriptions SET status='CANCELLED' where NMR>2"
-print "Cancelling "+str(int(k))+" subscriptions with 3+ NMRs."
+k = cursor.execute("UPDATE subscriptions SET status='CANCELLED' where game="+str(int(game))+" and status='ACTIVE' and lastturn+3<="+str(lastturn))
+print "Cancelling "+str(int(k))+" active subscriptions with 3+ NMRs."
 
 k = cursor.execute("SELECT users.id FROM users, subscriptions WHERE users.id=subscriptions.user and subscriptions.status='ACTIVE' and subscriptions.game="+str(game))
 while k!=0:

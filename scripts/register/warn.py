@@ -5,6 +5,9 @@ import smtplib
 
 From='accounts@vinyambar.de'
 dbname=sys.argv[1]
+dryrun=0
+if len(sys.argv)>2:
+    dryrun=1
 price=1.25
 warnahead=2
 db=MySQLdb.connect(db=dbname)
@@ -35,7 +38,8 @@ while users > 0:
 	  "BLZ 500 502 01 (Frankfurter Sparkasse)\n")
 	try:
 	    # print Msg
-	    server.sendmail(From, email, Msg)
+	    if dryrun==0:
+		server.sendmail(From, email, Msg)
 	except:
 	    print "Could not send confirmation to "+email
 	    print "Exception is:", sys.exc_type, ":", sys.exc_value

@@ -130,8 +130,8 @@ else:
     cursor.execute("INSERT INTO users (firstname, lastname, email, address, city, phone, country, password) "+
       "VALUES ('"+firstname+"', '"+lastname+"', '"+email+"', '"+address+"', '"+city+"', '"+phone+"', "+country+", '"+genpasswd()+"')")
     
-      cursor.execute("SELECT LAST_INSERT_ID() from dual")
-      userid=str(int(cursor.fetchone()[0]))
+    cursor.execute("SELECT LAST_INSERT_ID() from dual")
+    userid=str(int(cursor.fetchone()[0]))
 
     cursor.execute("INSERT INTO subscriptions (user, game, status) "+
       "VALUES ("+str(userid)+", 3, 'WAITING')")
