@@ -68,6 +68,8 @@ extern int maxregions;
 extern boolean dirtyload;
 char datafile[256];
 
+static char * xmlfile = NULL;
+
 /* -------------------- resizeterm ------------------------------------- */
 
 short Signals = 0;
@@ -1478,6 +1480,9 @@ main(int argc, char *argv[])
 		i = 1;
 		while (i < argc && argv[i][0] == '-') {
 			switch (argv[i][1]) {
+			case 'i':
+				xmlfile = argv[++i];
+				break;
 			case 't':
 				if (argv[i][2])
 					turn = atoi((char *)(argv[i] + 2));
@@ -1555,7 +1560,7 @@ main(int argc, char *argv[])
 	register_spells();
 /*	register_dungeon(); */
 
-	init_data("eressea.xml");
+	init_data(xmlfile?xmlfile:"eressea.xml");
 	init_locales();
 
 	init_resources();

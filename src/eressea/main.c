@@ -514,6 +514,9 @@ read_args(int argc, char **argv)
 			case 'b':
 				g_basedir = argv[++i];
 				break;
+			case 'i':
+				xmlfile = argv[++i];
+				break;
 			case 't':
 				turn = atoi(argv[++i]);
 				break;
