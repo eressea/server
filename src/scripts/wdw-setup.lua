@@ -3,14 +3,14 @@ positions = {}
 function init_positions()
   -- init starting positions for the alliances here.
   positions = { 
-    [11] = get_region(0, 1),
-    [12] = get_region(0, 2),
-    [13] = get_region(0, 3),
-    [14] = get_region(0, 4),
-    [15] = get_region(0, 5),
-    [17] = get_region(0, 6),
-    [18] = get_region(0, 7),
-    [19] = get_region(0, 8)
+    [11] = get_region(1,-12),
+    [12] = get_region(10,-11),
+    [13] = get_region(7,-8),
+    [14] = get_region(13,1),
+    [15] = get_region(5,10),
+    [17] = get_region(-6,14),
+    [18] = get_region(-15,12),
+    [19] = get_region(-15,6)
   }  
 end
 
@@ -124,7 +124,7 @@ skills = {
 
 function wdw_setup()
   -- initialize starting equipment for new players
-  add_equipment("magicskillboost", 1)
+  -- add_equipment("magicskillboost", 1)
 
   init_positions()
 
@@ -137,7 +137,7 @@ function wdw_setup()
   faction = make_faction(position, alliance, 4, "16419@uni-lueneburg.de", "Insekten")
 
   -- Initialize Refinius
-  alliance = add_alliance(12, "Refinius")
+  alliance = add_alliance(12, "Allianz 12")
   position = get_position(12)
   faction = make_faction(position, alliance, 5, "wanderameisen@dunklerpfad.de", "Meermenschen")
   faction = make_faction(position, alliance, 5, "ElunasErben@dunklerpfad.de", "Elfen")
@@ -190,12 +190,13 @@ function wdw_setup()
   faction = make_faction(position, alliance, 6, "lothar.juerss@gmx.at", "Zwerge")
 
   -- Initialize Matula
-  alliance = add_alliance(19, "Matula")
+  alliance = add_alliance(19, "Allianz 19")
   position = get_position(19)
-  faction = make_faction(position, alliance, 4, "mserrano@tiscali.de", "Elfen")
-  faction = make_faction(position, alliance, 4, "kerki@aol.com", "Dämonen")
-  faction = make_faction(position, alliance, 4, "Roddiwi@aol.com", "Orks")
+  faction = make_faction(position, alliance, 4, "mserrano@tiscali.de", "Meermenschen")
+  faction = make_faction(position, alliance, 4, "kerki@aol.com", "Elfen")
+  faction = make_faction(position, alliance, 4, "Roddiwi@aol.com", "Zwerge")
   faction = make_faction(position, alliance, 4, "bauschan@aol.com", "Trolle")
+  
 end
 
 
