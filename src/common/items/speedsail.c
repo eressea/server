@@ -35,13 +35,12 @@
 static int
 use_speedsail(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
 {
-	struct plane * p = rplane(u->region);
-	unused(amount);
-	unused(itype);
-	if (p!=NULL) {
-		ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_realworld_only", ""));
-		return EUNUSABLE;
-	} else {
+  struct plane * p = rplane(u->region);
+  unused(amount);
+  unused(itype);
+  if (p!=NULL) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_realworld_only", ""));
+  } else {
     if (u->ship) {
       attrib * a = a_find(u->ship->attribs, &at_speedup);
       if (a==NULL) {
@@ -49,6 +48,8 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
         a->data.sa[0] = 50; /* speed */
         a->data.sa[1] = 50; /* decay */
         ADDMSG(&u->faction->msgs, msg_message("use_speedsail", "unit", u));
+        /* Ticket abziehen */
+        i_change(&u->items, itype, -1);
         return 0;
       } else {
         cmistake(u, ord, 211, MSG_EVENT);
@@ -56,8 +57,8 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
     } else {
       cmistake(u, ord, 144, MSG_EVENT);
     }
-		return EUNUSABLE;
-	}
+  }
+  return EUNUSABLE;
 }
 
 static resource_type rt_speedsail = {

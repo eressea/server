@@ -743,9 +743,7 @@ maintain(building * b, boolean first)
 	region * r = b->region;
 	boolean paid = true, work = first;
 	unit * u;
-	if (fval(b, BLD_MAINTAINED)) return true;
-	if (b->type==NULL || b->type->maintenance==NULL) return true;
-	if (is_cursed(b->attribs, C_NOCOST, 0)) {
+	if (fval(b, BLD_MAINTAINED) || b->type==NULL || b->type->maintenance==NULL || is_cursed(b->attribs, C_NOCOST, 0)) {
 		fset(b, BLD_MAINTAINED);
 		fset(b, BLD_WORKING);
 		return true;
@@ -1962,8 +1960,9 @@ expandselling(region * r, request * sellorders, int limit)
 		if (taxcollected > 0) {
 			change_money(maxowner, (int) taxcollected);
 			add_income(maxowner, IC_TRADETAX, taxcollected, taxcollected);
-			/*			sprintf(buf, "%s verdient %d Silber durch den Handel in %s.",
-			unitname(maxowner), (int) taxcollected, regionid(r)); */
+			/* TODO: Meldung
+       * sprintf(buf, "%s verdient %d Silber durch den Handel in %s.",
+       * unitname(maxowner), (int) taxcollected, regionname(r)); */
 		}
 	}
 	if (hafenowner) {

@@ -58,6 +58,7 @@
 #include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/spy.h>
+#include <kernel/teleport.h>
 #include <kernel/unit.h>
 #ifdef USE_UGROUPS
 #  include <kernel/ugroup.h>
@@ -2840,7 +2841,9 @@ renumber_factions(void)
       sql_print(("UPDATE subscriptions set faction='%s' where id=%u;\n",
                  itoa36(rp->want), f->subscription));
     }
+    funhash(f);
     f->no = rp->want;
+    fhash(f);
     register_faction_id(rp->want);
     fset(f, FF_NEWID);
   }
@@ -3161,6 +3164,79 @@ renumber(void)
   renumber_factions();
 }
 
+static building *
+age_building(building * b)
+{
+  static const building_type * bt_blessed = (const building_type*)0xdeadbeef;
+  static const curse_type * ct_astralblock = NULL;
+  if (bt_blessed==(const building_type*)0xdeadbeef) {
+    bt_blessed = bt_find("blessedstonecircle");
+    ct_astralblock = ct_find("astralblock");
+  }
+
+  /* blesses stone circles create an astral protection in the astral region 
+   * above the shield, which prevents chaos suction and other spells. 
+   * The shield is created when a magician enters the blessed stone circle,
+   * and lasts for as long as his skill level / 2 is, at no mana cost.
+   *
+   * TODO: this would be nicer in a btype->age function, but we don't have it.
+   */
+  if (ct_astralblock && bt_blessed && b->type==bt_blessed) {
+    region * r = b->region;
+    region * rt = r_standard_to_astral(r);
+    unit * u, * mage = NULL;
+
+    /* step 1: give unicorns to people in the building,
+     * find out if there's a magician in there. */
+    for (u=r->units;u;u=u->next) {
+      if (b==u->building && inside_building(u)) {
+        if (!(u->race->ec_flags & NOGIVE)) {
+          int n, unicorns = 0;
+          for (n=0; n!=u->number; ++n) {
+            if (chance(0.02)) {
+              change_item(u, I_UNICORN, 1);
+              ++unicorns;
+            }
+            if (unicorns) {
+              ADDMSG(&u->faction->msgs, msg_message("scunicorn", 
+                "unit amount type", u, unicorns, 
+                olditemtype[I_UNICORN]->rtype));
+            }
+          }
+        }
+        if (mage==NULL && is_mage(u)) {
+          mage = u;
+        }
+      }
+    }
+
+    /* if there's a magician, and a connection to astral space, create the
+     * curse. */
+    if (rt!=NULL && mage!=NULL) {
+      curse * c = get_curse(rt->attribs, ct_astralblock);
+      if (c==NULL) {
+        if (mage!=NULL) {
+          int sk = effskill(mage, SK_MAGIC);
+          /* the mage reactivates the circle */
+          c = create_curse(mage, &rt->attribs, ct_astralblock,
+            sk, sk/2, 100, 0);
+          ADDMSG(&r->msgs, msg_message("astralshield_activate", 
+            "region unit", r, mage));
+        }
+      } else if (mage!=NULL) {
+        int sk = effskill(mage, SK_MAGIC);
+        c->duration = max(c->duration, sk/2);
+        c->vigour = max(c->vigour, sk);
+      }
+    }
+  }
+
+  a_age(&b->attribs);
+  handle_event(&b->attribs, "timer", b);
+
+  return b;
+}
+
 static void
 ageing(void)
 {
@@ -3209,6 +3285,7 @@ ageing(void)
 
     a_age(&r->attribs);
     handle_event(&r->attribs, "timer", r);
+
     /* Einheiten */
     for (up=&r->units;*up;) {
       unit * u = *up;
@@ -3216,6 +3293,7 @@ ageing(void)
       if (u==*up) handle_event(&u->attribs, "timer", u);
       if (u==*up) up = &(*up)->next;
     }
+
     /* Schiffe */
     for (sp=&r->ships;*sp;) {
       ship * s = *sp;
@@ -3223,11 +3301,12 @@ ageing(void)
       if (s==*sp) handle_event(&s->attribs, "timer", s);
       if (s==*sp) sp = &(*sp)->next;
     }
+
     /* Gebäude */
     for (bp=&r->buildings;*bp;) {
       building * b = *bp;
-      a_age(&b->attribs);
-      if (b==*bp) handle_event(&b->attribs, "timer", b);
+      b = age_building(b);
+
       if (b==*bp) bp = &(*bp)->next;
     }
   }

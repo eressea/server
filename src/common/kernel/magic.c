@@ -952,7 +952,7 @@ cancast(unit * u, spell * sp, int level, int range, struct order * ord)
 					/* Noch fehlte keine Komponente, wir generieren den Anfang der
 					 * Fehlermeldung */
 					sprintf(buf, "%s in %s: 'ZAUBER %s' Für diesen Zauber fehlen "
-							"noch %d ", unitname(u), regionid(u->region),
+							"noch %d ", unitname(u), regionname(u->region, u->faction),
 							spell_name(sp, u->faction->locale),
 							itemanz);
 					scat(locale_string(u->faction->locale,
@@ -2559,7 +2559,7 @@ magic(void)
             if (range > 1024) { /* (2^10) weiter als 10 Regionen entfernt */
               ADDMSG(&u->faction->msgs, msg_message("spellfail::nocontact",
                 "mage region command target", u, u->region, ord, 
-                gc_add(strdup(regionid(target_r)))));
+                gc_add(strdup(regionname(target_r, u->faction)))));
               continue;
             }
           }

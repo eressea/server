@@ -1,5 +1,5 @@
 C++ = g++ ;
-CC = tcc ;
+CC = gcc ;
 
 if ! $(HAVE_LUA) {
   HAVE_LUA = 1 ;

@@ -261,10 +261,11 @@ static void
 battledebug(const char *s)
 {
 #if SHOW_DEBUG
-	printf("%s\n", translate_regions(s, NULL));
+  puts(s);
+  putc('\n');
 #endif
 	if (bdebug) {
-		dbgprintf((bdebug, "%s\n", translate_regions(s, NULL)));
+		dbgprintf((bdebug, "%s\n", s));
 	}
 }
 

@@ -56,9 +56,6 @@ extern struct summary * make_summary(boolean count_new);
 
 int hat_in_region(item_t itm, struct region * r, struct faction * f);
 
-char *translate_regions(const char *st, const struct faction * f);
-
-char *replace_global_coords(const char *s, const struct faction * f);
 
 char *f_regionid(const struct region *r, const struct faction *f);
 

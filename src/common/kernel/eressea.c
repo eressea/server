@@ -1500,15 +1500,8 @@ boolean enable_fuzzy = false;
 faction *
 findfaction (int n)
 {
-	faction * f;
-
-	f = ffindhash(n);
-	if (f) return f;
-	for (f = factions; f; f = f->next)
-		if (f->no == n) {
-			fhash(f);
-			return f;
-		}
+	faction * f = ffindhash(n);
+	return f;
 #ifdef FUZZY_BASE36
 	if(enable_fuzzy) {
 		n = atoi(itoa36(n));
@@ -1523,10 +1516,8 @@ findfaction (int n)
 			}
 		}
 	}
+  return NULL;
 #endif /* FUZZY_BASE36 */
-	/* Gibt komische Seiteneffekte hier! */
-	/* if (n==MONSTER_FACTION) return makemonsters(); */
-	return NULL;
 }
 
 faction *
@@ -1719,20 +1710,6 @@ cstring(const char *s)
 }
 
 const char *
-regionid(const region * r)
-{
-	char	*buf = idbuf[(++nextbuf) % 8];
-
-	if (!r) {
-		strcpy(buf, "(Chaos)");
-	} else {
-		sprintf(buf, "\\r(%d,%d)", r->x, r->y);
-	}
-
-	return buf;
-}
-
-const char *
 buildingname (const building * b)
 {
 	char *buf = idbuf[(++nextbuf) % 8];
@@ -1770,14 +1747,6 @@ unitname(const unit * u)
 	char *ubuf = idbuf[(++nextbuf) % 8];
 	sprintf(ubuf, "%s (%s)", strcheck(u->name, NAMESIZE), itoa36(u->no));
 	return ubuf;
-}
-
-char *
-xunitid(const unit *u)
-{
-	char *buf = idbuf[(++nextbuf) % 8];
-	sprintf(buf, "%s in %s", unitname(u), regionid(u->region));
-	return buf;
 }
 
 /* -- Erschaffung neuer Einheiten ------------------------------ */

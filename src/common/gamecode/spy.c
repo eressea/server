@@ -440,11 +440,11 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 			{
 				vset_add(&survivors, u);
 				if (dead > 0) {
-					strcat(strcpy(buffer, unit_lives_msg), regionid(safety));
+					strcat(strcpy(buffer, unit_lives_msg), regionname(safety, u->faction));
 					sprintf(buf, (dead == 1) ? person_lost_msg : persons_lost_msg,
 							dead, unitname(u), buffer);
 				} else
-					sprintf(buf, unit_intact_msg, unitname(u), regionid(safety));
+					sprintf(buf, unit_intact_msg, unitname(u), regionname(safety, u->faction));
 				addmessage(0, u->faction, buf, MSG_EVENT, ML_WARN);
 				set_leftship(u, u->ship);
 				u->ship = 0;

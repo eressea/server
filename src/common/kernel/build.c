@@ -529,7 +529,7 @@ build_road(region * r, unit * u, int size, direction_t d)
 
   if (n <= 0) {
     sprintf(buf, "In %s gibt es keine Brücken und Straßen "
-      "mehr zu bauen", regionid(r));
+      "mehr zu bauen", regionname(r, u->faction));
     mistake(u, u->thisorder, buf, MSG_PRODUCE);
     return;
   }

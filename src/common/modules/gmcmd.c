@@ -648,6 +648,7 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 
 		f->no = i;
 		addlist(&factions, f);
+    fhash(f);
 	}
 
 	/* GM playfield */
@@ -751,6 +752,7 @@ gm_addfaction(const char * email, plane * p, region * r)
 
 		f->no = i;
 		addlist(&factions, f);
+    fhash(f);
 	}
 	/* generic permissions */
 	a = a_add(&f->attribs, a_new(&at_permissions));

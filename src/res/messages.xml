@@ -6069,5 +6069,53 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit has $int($have) of $int($cost) silver required."</text>
   </message>
 
+  <message name="tidalwave" section="events">
+    <type>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"Eine gewaltige Flutwelle verschlingt $region($region) und alle Bewohner."</text>
+    <text locale="en">"A tidal wave wipes out $region($region) and all who lived there."</text>
+  </message>
+
+  <message name="astralshield_activate" section="events">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) reaktiviert den astralen Schutzschild in $region($region)."</text>
+    <text locale="en">"$unit($unit) reactivates the astral protection shield in $region($region)."</text>
+  </message>
+
+  <message name="dissolve_units" section="events">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="number" type="int"/>
+      <arg name="race" type="race"/>
+      <arg name="action" type="string"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): $int($number) $race($race,$number) $action"</text>
+    <text locale="en">"$unit($unit) in $region($region): $int($number) $race($race,$number) $action"</text>
+  </message>
+
+  <message name="forestfire_spread" section="events">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="next" type="region"/>
+      <arg name="trees" type="int"/>
+    </type>
+    <text locale="de">"Der Waldbrand in $region($region) griff auch auf $region($next) über, und $int($trees) verbrannten."</text>
+    <text locale="en">"The fire in $region($region) spread to $region($next) and $int($trees) were burnt."</text>
+  </message>
+
+  <message name="plague_spell" section="events">
+    <type>
+      <arg name="region" type="region"/>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) ruft in $region($region) eine Pest hervor."</text>
+    <text locale="en">"$unit($unit) sends the plague on $region($region)."</text>
+  </message>
+
 </messages>
 

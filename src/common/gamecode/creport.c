@@ -161,14 +161,11 @@ reset_translations(void)
 static void
 cr_output_str_list(FILE * F, const char *title, const strlist * S, const faction * f)
 {
-	char *s;
-
 	if (!S) return;
 
 	fprintf(F, "%s\n", title);
 	while (S) {
-		s = replace_global_coords(S->s, f);
-		fprintf(F, "\"%s\"\n", s);
+		fprintf(F, "\"%s\"\n", S->s);
 		S = S->next;
 	}
 }

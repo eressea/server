@@ -38,7 +38,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Umlaute hier drin, weil die in den Report kommen */
 static const char *skillnames[MAXSKILLS] =
 {
 	"sk_alchemy",

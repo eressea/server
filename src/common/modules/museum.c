@@ -324,7 +324,7 @@ use_museumexitticket(unit *u, const struct item_type *itype, int amount, order *
 	/* Exitticket abziehen */
 	i_change(&u->items, itype, -1);
 
-	return 1;
+	return 0;
 }
 
 resource_type rt_museumexitticket = {
@@ -379,7 +379,7 @@ use_museumticket(unit *u, const struct item_type *itype, int amount, order * ord
   /* Benutzer ein Exitticket geben */
   i_change(&u->items, &it_museumexitticket, 1);
 
-  return 1;
+  return 0;
 }
 
 resource_type rt_museumticket = {

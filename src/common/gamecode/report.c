@@ -290,10 +290,6 @@ rpsnr(FILE * F, const char * s, int offset)
 	char ui=0;
 	size_t indent = 0, len;
 
-	/* Geht nicht: Privatbeschreibungen der Monster enthalten
-	 * \\r-Koordinaten ! */
-	/* assert(!strstr(s, "\\r(") || !"error: regionid not translated"); */
-
 	len = strlen(s);
 	while (*x++ == ' ');
 	indent = x - s - 1;
@@ -396,16 +392,7 @@ rnl(FILE * F)
 static void
 rps(FILE * F, const char * src)
 {
-	char * s;
-
-	if (strstr(src, "\\r(")) {
-		s = replace_global_coords(src, current_faction);
-	} else if(src != buf) {
-		s = strcpy(buf, src);
-	} else {
-		s = (char *)src;
-	}
-	rpsnr(F, s, 0);
+	rpsnr(F, src, 0);
 }
 
 static void
@@ -762,19 +749,11 @@ print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int in
 	}
 }
 
-char *
-replace_global_coords(const char *s, const faction * f)
-{
-	return translate_regions(s, f);
-}
-
 static void
 rps_nowrap(FILE * F, const char *s)
 {
 	const char *x = s;
 	int indent = 0;
-
-	x = s = replace_global_coords(s, current_faction);
 
 	while (*x++ == ' ');
 	indent = x - s - 1;

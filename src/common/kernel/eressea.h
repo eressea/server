@@ -351,7 +351,7 @@ extern void plagues(struct region * r, boolean ismagic);
 #define IDSIZE              15	/* max. Länge einer no (als String), ohne trailing 0 */
 #define KEYWORDSIZE         15	/* max. Länge eines Keyword, ohne trailing 0 */
 #define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE)	/* max. Länge der Strings, die
-						 * von struct unitname, regionid, etc. zurückgegeben werden. ohne die 0 */
+						 * von struct unitname, etc. zurückgegeben werden. ohne die 0 */
 #define CMDSIZE             (DISPLAYSIZE*2+1)
 #define STARTMONEY          5000
 
@@ -1007,9 +1007,7 @@ struct region *findunitregion(const struct unit * su);
 
 char *estring(const char *s);
 char *cstring(const char *s);
-const char *regionid(const struct region * r);
 const char *unitname(const struct unit * u);
-char *xunitid(const struct unit * u);
 
 struct building *largestbuilding(const struct region * r, boolean img);
 

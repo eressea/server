@@ -1029,9 +1029,8 @@ readunit(FILE * F)
 		u_setfaction(u, NULL);
 	}
 	{
-		faction * f;
-		int n = rid(F);
-		f = findfaction(n);
+    int n = rid(F);
+		faction * f = findfaction(n);
 		if (f!=u->faction) u_setfaction(u, f);
 	}
 	rds(F, &u->name);
@@ -1812,6 +1811,7 @@ readgame(const char * filename, int backup)
   while (--n >= 0) {
     faction * f = readfaction(F);
     addlist2(fp, f);
+    fhash(f);
   }
   *fp = 0;
 

@@ -469,7 +469,7 @@ fix_firewalls(void)
             if (a==NULL || a->data.i <= 0) {
               erase_border(b);
               log_warning(("firewall between regions %s and %s was bugged. removed.\n",
-                regionid(r), regionid(r2)));
+                regionname(r, NULL), regionname(r2, NULL)));
               b = get_borders(r, r2);
             } else {
               b = b->next;

@@ -55,12 +55,12 @@ extern void t_add(trigger ** tlist, trigger * t);
 /** add and handle triggers **/
 
 /* add a trigger to a list of attributes */
-extern void add_trigger(struct attrib ** ap, const char * event, struct trigger * t);
-extern void remove_triggers(struct attrib ** ap, const char * event, const trigger_type * tt);
-extern struct trigger ** get_triggers(struct attrib * ap, const char * event);
+extern void add_trigger(struct attrib ** ap, const char * eventname, struct trigger * t);
+extern void remove_triggers(struct attrib ** ap, const char * eventname, const trigger_type * tt);
+extern struct trigger ** get_triggers(struct attrib * ap, const char * eventname);
 /* calls handle() for each of these. e.g. used in timeout */
-extern void handle_event(struct attrib ** attribs, const char * event, void * data);
-extern void handle_event_va(struct attrib ** attribs, const char * event, const char * format, ...);
+extern void handle_event(struct attrib ** attribs, const char * eventname, void * data);
+extern void handle_event_va(struct attrib ** attribs, const char * eventname, const char * format, ...);
 
 /* functions for making complex triggers: */
 extern void free_triggers(trigger * triggers); /* release all these triggers */

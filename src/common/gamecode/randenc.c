@@ -95,6 +95,7 @@ dissolve_units(void)
 		for (u=r->units;u;u=u->next) {
 			attrib * a = a_find(u->attribs, &at_unitdissolve);
 			if (a) {
+        const char * str = NULL;
 				if (u->age == 0 && a->data.ca[1] < 100) continue;
 
 				/* TODO: Durch einzelne Berechnung ersetzen */
@@ -112,56 +113,55 @@ dissolve_units(void)
 					continue;
 				}
 
-				scale_number(u,u->number - n);
+				scale_number(u, u->number - n);
 
-				sprintf(buf, "%s in %s: %d %s ", unitname(u), regionid(r),
-						n, LOC(default_locale, rc_name(u->race, n!=1)));
 				switch(a->data.ca[0]) {
 				case 1:
 					rsetpeasants(r, rpeasants(r) + n);
 					if (n == 1) {
-						scat("kehrte auf sein Feld zurück.");
-					}else{
-						scat("kehrten auf ihre Felder zurück.");
+						str = "kehrte auf sein Feld zurück.";
+					} else {
+						str = "kehrten auf ihre Felder zurück.";
 					}
 					break;
 				case 2:
-					if(r->land) {
+					if (r->land) {
 #if GROWING_TREES
 						rsettrees(r, 2, rtrees(r,2) + n);
 #else
 						rsettrees(r, rtrees(r) + n);
 #endif
 						if (n == 1) {
-							scat("wurde zum Baum.");
-						}else{
-							scat("wurden zu Bäumen.");
+							str = "wurde zum Baum.";
+						} else {
+							str = "wurden zu Bäumen.";
 						}
 					} else {
 						if(n == 1) {
-							scat("verfaulte in der feuchten Seeluft.");
+							str = "verfaulte in der feuchten Seeluft.";
 						} else {
-							scat("verfaulten in der feuchten Seeluft.");
+							str = "verfaulten in der feuchten Seeluft.";
 						}
 					}
 					break;
 				default:
 					if (u->race == new_race[RC_STONEGOLEM] || u->race == new_race[RC_IRONGOLEM]) {
 						if (n == 1) {
-							scat("zerfiel zu Staub.");
-						}else{
-							scat("zerfielen zu Staub.");
+							str = "zerfiel zu Staub.";
+						} else {
+							str = "zerfielen zu Staub.";
 						}
 					}else{
 						if (n == 1) {
-							scat("verschwand über Nacht.");
+							str = "verschwand über Nacht.";
 						}else{
-							scat("verschwanden über Nacht.");
+							str = "verschwanden über Nacht.";
 						}
 					}
 					break;
 				}
-				addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
+        ADDMSG(&u->faction->msgs, msg_message("dissolve_units",
+          "unit region number race action", u, r, n, u->race, str));
 			}
 		}
 	}
@@ -606,9 +606,7 @@ chaos(region * r)
 							}
 							u = u2;
 						}
-						sprintf(buf, "Ein gewaltige Flutwelle verschlingt %s und "
-							"alle Bewohner.", regionid(r));
-						addmessage(r, 0, buf, MSG_EVENT, ML_IMPORTANT);
+						ADDMSG(&r->msgs, msg_message("tidalwave", "region", r));
 
 						for (b = rbuildings(r); b;) {
 							b2 = b->next;
@@ -1312,24 +1310,6 @@ randomevents(void)
 		} /* !RACE_ADJUSTMENTS */
 #endif
 
-		for (u=r->units; u; u=u->next) {
-			if (!(u->race->ec_flags & NOGIVE)) {
-				struct building * b = inside_building(u);
-				const struct building_type * btype = b?b->type:NULL;
-				if (btype == bt_find("blessedstonecircle")) {
-					int n, c = 0;
-					for (n=0; n<u->number; n++) if (rand()%100 < 2) {
-						change_item(u, I_UNICORN, 1);
-						c++;
-					}
-					if (c) {
-						ADDMSG(&u->faction->msgs, new_message(u->faction,
-							"scunicorn%u:unit%i:amount%X:type",u,c,
-							olditemtype[I_UNICORN]->rtype));
-					}
-				}
-			}
-		}
 	}
 
 	/* Orkifizierte Regionen mutieren und mutieren zurück */

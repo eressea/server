@@ -71,6 +71,7 @@ createmonsters(void)
 	f->alive = 1;
 	f->options = (char) pow(2, O_REPORT);
 	addlist(&factions, f);
+  fhash(f);
 }
 
 /* ------------------------------------------------------------- */

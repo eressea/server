@@ -404,7 +404,8 @@ set_new_dragon_target(unit * u, region * r, int range)
 		} else {
 			a->data.v = max_region;
 		}
-		sprintf(buf, "Kommt aus: %s, Will nach: %s", regionid(r), regionid(max_region));
+		sprintf(buf, "Kommt aus: %s, Will nach: %s", 
+      regionname(r, u->faction), regionname(max_region, u->faction));
 		usetprivate(u, buf);
 		return a;
 	}

@@ -161,13 +161,13 @@ attrib_type at_eventhandler = {
 };
 
 struct trigger **
-get_triggers(struct attrib * ap, const char * event)
+get_triggers(struct attrib * ap, const char * eventname)
 {
 	handler_info * td = NULL;
 	attrib * a = a_find(ap, &at_eventhandler);
 	while (a!=NULL) {
 		td = (handler_info *)a->data.v;
-		if (!strcmp(td->event, event)) {
+		if (!strcmp(td->event, eventname)) {
 			break;
 		}
 		a = a->nexttype;
@@ -177,7 +177,7 @@ get_triggers(struct attrib * ap, const char * event)
 }
 
 void
-add_trigger(struct attrib ** ap, const char * event, struct trigger * t)
+add_trigger(struct attrib ** ap, const char * eventname, struct trigger * t)
 {
 	trigger ** tp;
 	handler_info * td = NULL;
@@ -185,7 +185,7 @@ add_trigger(struct attrib ** ap, const char * event, struct trigger * t)
 	assert(t->next==NULL);
 	while (a!=NULL) {
 		td = (handler_info *)a->data.v;
-		if (!strcmp(td->event, event)) {
+		if (!strcmp(td->event, eventname)) {
 			break;
 		}
 		a = a->nexttype;
@@ -193,7 +193,7 @@ add_trigger(struct attrib ** ap, const char * event, struct trigger * t)
 	if (!a) {
 		a = a_add(ap, a_new(&at_eventhandler));
 		td = (handler_info *)a->data.v;
-		td->event = strdup(event);
+		td->event = strdup(eventname);
 	}
 	tp = &td->triggers;
 	while (*tp) tp=&(*tp)->next;
@@ -201,7 +201,7 @@ add_trigger(struct attrib ** ap, const char * event, struct trigger * t)
 }
 
 void
-handle_event_va(attrib ** attribs, const char * event, const char * format, ...)
+handle_event_va(attrib ** attribs, const char * eventname, const char * format, ...)
 {
   event_arg args[9];
   int argc = 0;
@@ -218,12 +218,12 @@ handle_event_va(attrib ** attribs, const char * event, const char * format, ...)
   }
   args[argc].type=NULL;
   va_end(marker);
-  handle_event(attribs, event, args);
+  handle_event(attribs, eventname, args);
   free (toks);
 }
 
 void
-handle_event(attrib ** attribs, const char * event, void * data)
+handle_event(attrib ** attribs, const char * eventname, void * data)
 {
 	while (*attribs) {
 		if ((*attribs)->type==&at_eventhandler) break;
@@ -231,7 +231,7 @@ handle_event(attrib ** attribs, const char * event, void * data)
 	}
 	while (*attribs) {
 		handler_info * tl = (handler_info*)(*attribs)->data.v;
-		if (!strcmp(tl->event, event)) break;
+		if (!strcmp(tl->event, eventname)) break;
 		attribs = &(*attribs)->nexttype;
 	}
 	if (*attribs) {
@@ -265,9 +265,9 @@ tt_find(const char * name)
 }
 
 void 
-remove_triggers(struct attrib ** ap, const char * event, const trigger_type * tt)
+remove_triggers(struct attrib ** ap, const char * eventname, const trigger_type * tt)
 {
-	trigger ** tp = get_triggers(*ap, event);
+	trigger ** tp = get_triggers(*ap, eventname);
 	if(tp == NULL) return;
 	while (*tp) {
 		/* first, remove all gate-triggers */

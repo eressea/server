@@ -472,7 +472,7 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
  * Zauberwirkungen)
 
 	sprintf(buf, "%s in %s: 'ZAUBER %s': [hier die Fehlermeldung].",
-		unitname(mage), regionid(mage->region), sa->strings[0]);
+		unitname(mage), regionname(mage->region, mage->faction), sa->strings[0]);
 	add_message(0, mage->faction, buf,  MSG_MAGIC, ML_MISTAKE);
 
  * Allgemein sichtbare Auswirkungen in der Region sollten als
@@ -706,7 +706,7 @@ sp_destroy_magic(castorder *co)
 		{
 			region *tr = pa->param[0]->data.r;
 			ap = &tr->attribs;
-			strcpy(ts, regionid(tr));
+			strcpy(ts, regionname(tr, mage->faction));
 			break;
 		}
     case SPP_TEMP:
@@ -1027,7 +1027,7 @@ sp_blessstonecircle(castorder *co)
 	}
 
 	if(b->size < b->type->maxsize) {
-    sprintf(buf, "%s muss vor der Weihe  fertiggestellt sein.", buildingname(b));
+    sprintf(buf, "%s muss vor der Weihe fertiggestellt sein.", buildingname(b));
     mistake(mage, co->order, buf, MSG_MAGIC);
 		return 0;
 	}
@@ -1746,7 +1746,7 @@ sp_great_drought(castorder *co)
 			fset(u->faction, FL_DH);
 			sprintf(buf, "%s ruft das Feuer der Sonne auf %s hinab.",
 					cansee(u->faction, r, mage, 0)? unitname(mage) : "Jemand",
-					regionid(r));
+					regionname(r, u->faction));
 			if (rterrain(r) != T_OCEAN){
 				if(rterrain(r) == T_SWAMP && terraform){
 						scat(" Eis schmilzt und verwandelt sich in Morast. Reißende "
@@ -2444,7 +2444,7 @@ sp_earthquake(castorder *co)
 			fset(u->faction, FL_DH);
 			sprintf(buf, "%s läßt die Erde in %s erzittern.",
 					cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand",
-					regionid(r));
+					regionname(r, u->faction));
 
 			addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
 		}
@@ -2603,23 +2603,16 @@ sp_forest_fire(castorder *co)
 		}
 
 		if (destroyed > 0  || vernichtet_schoesslinge > 0) {
-			rsettrees(nr, 2, rtrees(nr,2) - destroyed);
-			rsettrees(nr, 1, rtrees(nr,1) - vernichtet_schoesslinge);
-			sprintf(buf, "Der Waldbrand in %s griff auch auf %s "
-					"über und %d %s.",
-					regionid(r), regionid(nr), destroyed+vernichtet_schoesslinge,
-					destroyed+vernichtet_schoesslinge == 1 ? "Baum verbrannte" : "Bäume verbrannten");
-			for (u = nr->units; u; u = u->next) freset(u->faction, FL_DH);
-			for(u = nr->units; u; u = u->next ) {
-				if(!fval(u->faction, FL_DH) ) {
-					fset(u->faction, FL_DH);
-					addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
-				}
-			}
-			if(!fval(mage->faction, FL_DH)){
-			  addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
-			}
-		}
+      message * m = msg_message("forestfire_spread", "region next trees",
+        r, nr, destroyed+vernichtet_schoesslinge);
+
+      add_message(&r->msgs, m);
+      add_message(&mage->faction->msgs, m);
+      msg_release(m);
+
+      rsettrees(nr, 2, rtrees(nr,2) - destroyed);
+      rsettrees(nr, 1, rtrees(nr,1) - vernichtet_schoesslinge);
+    }
 #else
 		if (rtrees(nr) >= 800) {
 			if (chance(probability)) destroyed = (int)(rtrees(nr) * percentage/2);
@@ -2628,21 +2621,12 @@ sp_forest_fire(castorder *co)
 		}
 
 		if (destroyed > 0 ) {
+      message * m = msg_message("forestfire_spread", "region next trees",
+        r, nr, destroyed);
+      add_message(&r->msgs, m);
+      add_message(&mage->faction->msgs, m);
+      msg_release(m);
 			rsettrees(nr, rtrees(nr) - destroyed);
-			sprintf(buf, "Der Waldbrand in %s griff auch auf %s "
-					"über und %d %s.",
-					regionid(r), regionid(nr), destroyed,
-					destroyed == 1 ? "Baum verbrannte" : "Bäume verbrannten");
-			for (u = nr->units; u; u = u->next) freset(u->faction, FL_DH);
-			for(u = nr->units; u; u = u->next ) {
-				if(!fval(u->faction, FL_DH) ) {
-					fset(u->faction, FL_DH);
-					addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
-				}
-			}
-			if(!fval(mage->faction, FL_DH)){
-			  addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
-			}
 		}
 #endif
 	}
@@ -2801,7 +2785,7 @@ sp_summondragon(castorder *co)
 				} else {
 					a->data.v = co->rt;
 				}
-				sprintf(buf, "Kommt aus: %s, Will nach: %s", regionid(rl2->data), regionid(co->rt));
+				sprintf(buf, "Kommt aus: %s, Will nach: %s", regionname(rl2->data, u->faction), regionname(co->rt, u->faction));
 				usetprivate(u, buf);
 			}
 		}
@@ -3487,9 +3471,8 @@ sp_plague(castorder *co)
 
 	plagues(r, true);
 
-	sprintf(buf, "%s ruft eine Pest in %s hervor.", unitname(mage),
-			regionid(r));
-	addmessage(0, mage->faction, buf,  MSG_MAGIC, ML_INFO);
+  ADDMSG(&mage->faction->msgs, msg_message("plague_spell", 
+    "region mage", r, mage));
 	return cast_level;
 }
 
@@ -3788,7 +3771,7 @@ sp_summonundead(castorder *co)
 
 	if (!r->land || deathcount(r) == 0) {
 		sprintf(buf, "%s in %s: In %s sind keine Gräber.", unitname(mage),
-				regionid(mage->region), regionid(r));
+				regionname(mage->region, mage->faction), regionname(r, mage->faction));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
@@ -3872,11 +3855,11 @@ sp_auraleak(castorder *co)
 			if (cansee(u->faction, r, mage, 0)) {
 				sprintf(buf, "%s rief in %s einen Riss in dem Gefüge der Magie "
 						"hervor, der alle magische Kraft aus der Region riss.",
-						unitname(mage), regionid(r));
+						unitname(mage), regionname(r, u->faction));
 			} else {
 				sprintf(buf, "In %s entstand ein Riss in dem Gefüge der Magie, "
 						"der alle magische Kraft aus der Region riss.",
-						regionid(r));
+						regionname(r, u->faction));
 			}
 			addmessage(r, u->faction, buf, MSG_EVENT, ML_WARN);
 		}
@@ -4235,18 +4218,18 @@ sp_rallypeasantmob(castorder *co)
 				fset(u->faction, FL_DH);
 				sprintf(buf, "%s besänftigt den Bauernaufstand in %s.",
 						cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand",
-						regionid(r));
+						regionname(r, u->faction));
 				addmessage(r, u->faction, buf, MSG_MAGIC, ML_INFO);
 			}
 		}
 		if (!fval(mage->faction, FL_DH)){
 			sprintf(buf, "%s besänftigt den Bauernaufstand in %s.",
-					unitname(mage), regionid(r));
+					unitname(mage), regionname(r, u->faction));
 			addmessage(r, u->faction, buf, MSG_MAGIC, ML_INFO);
 		}
 	} else {
 		sprintf(buf, "Der Bauernaufstand in %s hatte sich bereits verlaufen.",
-				regionid(r));
+				regionname(r, u->faction));
 		addmessage(r, u->faction, buf, MSG_MAGIC, ML_INFO);
 	}
 	return erfolg;
@@ -4383,7 +4366,7 @@ sp_migranten(castorder *co)
     || target->number > max_spellpoints(r, mage))
   {
     sprintf(buf, "%s in %s: 'ZAUBER %s': So viele Personen übersteigen "
-      "meine Kräfte.", unitname(mage), regionid(mage->region),
+      "meine Kräfte.", unitname(mage), regionname(mage->region, mage->faction),
       spell_name(sp, mage->faction->locale));
     addmessage(0, mage->faction, buf, MSG_MAGIC, ML_WARN);
   }
@@ -4501,7 +4484,7 @@ sp_generous(castorder *co)
 	if(is_cursed(r->attribs, C_DEPRESSION, 0)){
 		sprintf(buf, "%s in %s: Die Stimmung in %s ist so schlecht, das "
 				"niemand auf den Zauber reagiert.", unitname(mage),
-				regionid(mage->region), regionid(r));
+				regionname(mage->region, mage->faction), regionname(r, mage->faction));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
@@ -4677,13 +4660,13 @@ sp_pump(castorder *co)
 
 	if (see == false){
 		sprintf(buf, "%s horcht %s über %s aus, aber %s wusste nichts zu "
-				"berichten.", unitname(mage), unitname(target), regionid(rt),
+				"berichten.", unitname(mage), unitname(target), regionname(rt, mage->faction),
 				unitname(target));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
 		return cast_level/2;
 	} else {
 		sprintf(buf, "%s horcht %s über %s aus.", unitname(mage),
-				unitname(target), regionid(rt));
+				unitname(target), regionname(rt, mage->faction));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
 	}
 
@@ -5045,7 +5028,7 @@ sp_dragonsong(castorder *co)
 				} else {
 					a->data.v = r;
 				}
-				sprintf(buf, "Kommt aus: %s, Will nach: %s", regionid(rl2->data), regionid(r));
+				sprintf(buf, "Kommt aus: %s, Will nach: %s", regionname(rl2->data, u->faction), regionname(r, u->faction));
 				usetprivate(u, buf);
 			}
 		}
@@ -5509,7 +5492,7 @@ sp_dreamreading(castorder *co)
   set_level(u2, SK_OBSERVATION, eff_skill(u, SK_OBSERVATION, u2->region));
 
   sprintf(buf, "%s verliert sich in die Träume von %s und erhält einen "
-      "Eindruck von %s.", unitname(mage), unitname(u), regionid(u->region));
+      "Eindruck von %s.", unitname(mage), unitname(u), regionname(u->region, mage->faction));
   addmessage(r, mage->faction, buf, MSG_EVENT, ML_INFO);
 	return cast_level;
 }
@@ -5582,7 +5565,7 @@ sp_disturbingdreams(castorder *co)
 	curse_setflag(c, CURSE_ISNEW);
 
 	sprintf(buf, "%s sorgt für schlechten Schlaf in %s.",
-			unitname(mage), regionid(r));
+			unitname(mage), regionname(r, mage->faction));
 	addmessage(0, mage->faction, buf, MSG_EVENT, ML_INFO);
 	return cast_level;
 }
@@ -5825,7 +5808,7 @@ sp_enterastral(castorder *co)
 	default:
 		sprintf(buf, "%s in %s: 'ZAUBER %s': Dieser Zauber funktioniert "
 				"nur in der materiellen Welt.", unitname(mage),
-				regionid(mage->region), spell_name(sp, mage->faction->locale));
+				regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
@@ -5833,7 +5816,7 @@ sp_enterastral(castorder *co)
 	if(!rt) {
 		sprintf(buf, "%s in %s: 'ZAUBER %s': Es kann hier kein Kontakt zur "
 				"Astralwelt hergestellt werden.", unitname(mage),
-				regionid(mage->region), spell_name(sp, mage->faction->locale));
+				regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
@@ -5842,7 +5825,7 @@ sp_enterastral(castorder *co)
 			is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
 		sprintf(buf, "%s in %s: 'ZAUBER %s': Es kann kein Kontakt zu "
 				"dieser astralen Region hergestellt werden.", unitname(mage),
-				regionid(mage->region), spell_name(sp, mage->faction->locale));
+				regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
@@ -5949,7 +5932,7 @@ sp_pullastral(castorder *co)
       if(!rl2) {
         sprintf(buf, "%s in %s: 'ZAUBER %s': Es kann kein Kontakt zu "
           "dieser Region hergestellt werden.", unitname(mage),
-          regionid(mage->region), spell_name(sp, mage->faction->locale));
+          regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
         addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
         free_regionlist(rl);
         return 0;
@@ -5959,7 +5942,7 @@ sp_pullastral(castorder *co)
     default:
       sprintf(buf, "%s in %s: 'ZAUBER %s': Dieser Zauber funktioniert "
         "nur in der astralen  Welt.", unitname(mage),
-        regionid(mage->region), spell_name(sp, mage->faction->locale));
+        regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
       addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
       return 0;
   }
@@ -5968,7 +5951,7 @@ sp_pullastral(castorder *co)
     is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
       sprintf(buf, "%s in %s: 'ZAUBER %s': Es kann kein Kontakt zu "
         "dieser Region hergestellt werden.", unitname(mage),
-        regionid(mage->region), spell_name(sp, mage->faction->locale));
+        regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
       addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
       return 0;
     }
@@ -6475,7 +6458,7 @@ sp_disruptastral(castorder *co)
 				  if(!is_magic_resistant(mage, u, 0) && can_survive(u, tr)) {
 					  move_unit(u, tr, NULL);
 					  sprintf(buf, "%s wird aus der astralen Ebene nach %s geschleudert.",
-						  unitname(u), regionid(tr));
+						  unitname(u), regionname(tr, u->faction));
 					  addmessage(0, u->faction, buf, MSG_MAGIC, ML_INFO);
 				  }
 			  }
@@ -6610,7 +6593,7 @@ sp_permtransfer(castorder *co)
 
 	if(!is_mage(tu)) {
 /*		sprintf(buf, "%s in %s: 'ZAUBER %s': Einheit ist kein Magier."
-			, unitname(mage), regionid(mage->region),sa->strings[0]); */
+			, unitname(mage), regionname(mage->region, mage->faction),sa->strings[0]); */
 		cmistake(mage, co->order, 214, MSG_MAGIC);
 		return 0;
 	}
@@ -6656,7 +6639,7 @@ sp_movecastle(castorder *co)
 
 	if(dir == NODIRECTION) {
 		sprintf(buf, "%s in %s: 'ZAUBER %s': Ungültige Richtung %s.",
-			unitname(mage), regionid(mage->region),
+			unitname(mage), regionname(mage->region, mage->faction),
 			spell_name(sp, mage->faction->locale),
 			pa->param[1]->data.s);
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
@@ -6666,7 +6649,7 @@ sp_movecastle(castorder *co)
 	if(b->size > (cast_level-12) * 250) {
 		sprintf(buf, "%s in %s: 'ZAUBER %s': Der Elementar ist "
 			"zu klein, um das Gebäude zu tragen.", unitname(mage),
-			regionid(mage->region), spell_name(sp, mage->faction->locale));
+			regionname(mage->region, mage->faction), spell_name(sp, mage->faction->locale));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return cast_level;
 	}
@@ -6676,7 +6659,7 @@ sp_movecastle(castorder *co)
 	if(!(terrain[target_region->terrain].flags & LAND_REGION)) {
 		sprintf(buf, "%s in %s: 'ZAUBER %s': Der Erdelementar "
 				"weigert sich, nach %s zu gehen.",
-			unitname(mage), regionid(mage->region),
+			unitname(mage), regionname(mage->region, mage->faction),
 			spell_name(sp, mage->faction->locale),
 			locale_string(mage->faction->locale, directions[dir]));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
@@ -7079,7 +7062,7 @@ sp_q_antimagie(castorder *co)
 	switch(obj){
 		case SPP_REGION:
 			ap = &r->attribs;
-			set_string(&ts, regionid(r));
+			set_string(&ts, regionname(r, mage->faction));
 			break;
 
     case SPP_TEMP:
@@ -7112,7 +7095,7 @@ sp_q_antimagie(castorder *co)
 
 	succ = destroy_curse(ap, cast_level, force, c);
 
-	if(succ) {
+	if (succ) {
 		ADDMSG(&mage->faction->msgs, msg_message(
 			"destroy_magic_effect", "unit region command succ target",
 			mage, mage->region, co->order, succ, strdup(ts)));

@@ -206,7 +206,9 @@ chg_item(selection * s, void * data) {
 boolean
 modify_items(unit * u)
 {
-	selection *ilist = NULL, **ilast = &ilist;
+	selection *ilist = NULL;
+#if 0
+	selection **ilast = &ilist;
 	const item_type * itype = itemtypes;
 
 	while (itype!=NULL) {
@@ -222,7 +224,8 @@ modify_items(unit * u)
 		itype=itype->next;
 		while (ilist->prev!=NULL) ilist=ilist->prev;
 	}
-	i_modif = false;
+#endif
+  i_modif = false;
 	do_selection(ilist, "Gegenstände", chg_item, (void*)u);
 	while (ilist) {
 		selection * s = ilist;

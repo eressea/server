@@ -123,11 +123,11 @@ addfaction(const char *email, const char * password,
 
   f->no = unused_faction_id();
   register_faction_id(f->no);
+  addlist(&factions, f);
+  fhash(f);
 
   sprintf(buf, "%s %s", LOC(loc, "factiondefault"), factionid(f));
   set_string(&f->name, buf);
-
-  addlist(&factions, f);
 
   return f;
 }

@@ -1655,9 +1655,9 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
     else
       scat("segelt");
     scat(" von ");
-    scat(regionid(starting_point));
+    scat(regionname(starting_point, u->faction));
     scat(" nach ");
-    scat(regionid(current_point));
+    scat(regionname(current_point, u->faction));
     scat(".");
     addmessage(0, u->faction, buf, MSG_MOVE, ML_INFO);
 

@@ -116,7 +116,7 @@ static item_type it_gryphonwing = {
 
 static int
 enter_fail(unit * u) {
-	sprintf(buf, "In %s erklingt die Stimme des Torwächters: 'Nur wer ohne materielle Güter und noch lernbegierig ist, der darf die Ebene der Herausforderung betreten. Und vergiß nicht mein Trinkgeld.'. %s erhielt keinen Einlaß.", regionid(u->region), unitname(u));
+	sprintf(buf, "In %s erklingt die Stimme des Torwächters: 'Nur wer ohne materielle Güter und noch lernbegierig ist, der darf die Ebene der Herausforderung betreten. Und vergiß nicht mein Trinkgeld.'. %s erhielt keinen Einlaß.", regionname(u->region, u->faction), unitname(u));
 	addmessage(NULL, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
 	return 1;
 }
@@ -157,7 +157,7 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
 		if (u2) change_money(u2, get_money(u) - fee);
 		else if (enter_fail(u)) return -1;
 	}
-	sprintf(buf, "In %s öffnet sich ein Portal. Eine Stimme ertönt, und spricht: 'Willkommen in der Ebene der Herausforderung'. %s durchschreitet das Tor zu einer anderen Welt.", regionid(u->region), unitname(u));
+	sprintf(buf, "In %s öffnet sich ein Portal. Eine Stimme ertönt, und spricht: 'Willkommen in der Ebene der Herausforderung'. %s durchschreitet das Tor zu einer anderen Welt.", regionname(u->region, u->faction), unitname(u));
 	addmessage(NULL, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
 	new_use_pooled(u, &rt_gryphonwing, GET_SLACK|GET_RESERVE, 1);
 	use_pooled(u, r, R_SILVER, fee);
@@ -357,6 +357,7 @@ guardian_faction(plane * pl, int id)
 
 		f->no = id;
 		addlist(&factions, f);
+    fhash(f);
 	}
 	if (f->race != new_race[RC_ILLUSION]) {
 		assert(!"guardian id vergeben");

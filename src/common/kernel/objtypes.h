@@ -44,7 +44,6 @@ extern void resolve_IDs(void);
 
 typedef obj_ID (*ID_fun)(void *obj);
 typedef void *(*find_fun)(obj_ID id);
-typedef char *(*desc_fun)(void *obj);
 typedef attrib **(*attrib_fun)(void *obj);
 typedef void (*set_fun)(void *ptrptr, void *obj);	/* 	*ptrptr = obj  */
 
@@ -52,7 +51,6 @@ typedef void (*set_fun)(void *ptrptr, void *obj);	/* 	*ptrptr = obj  */
 typedef struct {
 	ID_fun		getID;		/* liefert obj_ID zu struct unit* */
 	find_fun	find;		/* liefert struct unit* zu obj_ID  */
-	desc_fun	getname;	/* unitname() */
 	attrib_fun	getattribs;	/* liefert &u->attribs */
 	set_fun		ppset;		/* setzt *(struct unit **) zu struct unit*  */
 } typdata_t;

@@ -57,65 +57,6 @@ typedef struct msg_setting {
 #define MAXSTRLEN (4*DISPLAYSIZE+3)
 #include "region.h"
 #include "eressea.h"
-const char *
-translate_regions(const char *st, const faction * f)
-{
-	static char temp[MAXSTRLEN + 1];
-	char *s, *t = temp;
-	const char *p = st;
-	char *c = strstr(p, "\\r(");
-
-	if (!c) return strcpy(temp, st);
-
-	temp[0] = 0;
-	do {
-		static region *r;
-		static int cache_x = -999999, cache_y = -999999;
-		int koor_x, koor_y;
-		int x = MAXSTRLEN - (t - temp);
-		plane *cache_pl = NULL;
-
-		if (c - p < x)
-			x = c - p;
-
-		s = temp;
-		strnzcpy(t, p, x);
-		t += (c - p);
-		p = c + 3;
-		koor_x = atoi(p);
-		p  = strchr(p, ',') + 1;
-		koor_y = atoi(p);
-
-		if (koor_x != cache_x || koor_y != cache_y) {
-			r = findregion(koor_x, koor_y);
-			cache_x = koor_x;
-			cache_y = koor_y;
-			cache_pl = getplane(r);
-		}
-
-		if (r!=NULL) {
-			const char *rn;
-
-      if (f!=NULL) {
-        rn = rname(r, f->locale);
-			} else {
-        rn = rname(r, default_locale);
-      }
-				if(rn && *rn) {
-					sprintf(t, "%s (%d,%d)", rn, region_x(r, f), region_y(r, f));
-				} else {
-					sprintf(t, "(%d,%d)", region_x(r, f), region_y(r, f));
-				}
-		} else strcpy(t, "(Chaos)");
-
-		t += strlen(t);
-		p = strchr(p, ')') + 1;
-		c = strstr(p, "\\r(");
-	} while (c!= NULL);
-	if (s == temp)
-		strcat(t, p);
-	return s;
-}
 
 messageclass * msgclasses;
 
@@ -382,14 +323,14 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 void
 addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 {
-  caddmessage(r, f, gc_add(strdup(translate_regions(s, f))), mtype, level);
+  caddmessage(r, f, gc_add(strdup(s)), mtype, level);
 }
 
 void
 mistake(const unit * u, struct order * ord, const char *comment, int mtype)
 {
   if (u->faction->no != MONSTER_FACTION) {
-    char * cmt = strdup(translate_regions(comment, u->faction));
+    char * cmt = strdup(comment);
     ADDMSG(&u->faction->msgs, msg_message("mistake",
       "command error unit region", copy_order(ord), cmt, u, u->region));
   }

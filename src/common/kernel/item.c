@@ -52,8 +52,10 @@ resource_type * resourcetypes;
 weapon_type * weapontypes;
 luxury_type * luxurytypes;
 potion_type * potiontypes;
-item_type * itemtypes;
 herb_type * herbtypes;
+
+#define IMAXHASH 127
+static item_type * itemtypes[IMAXHASH];
 
 #ifdef AT_PTYPE
 static attrib_type at_ptype = { "potion_type" };
@@ -178,7 +180,9 @@ new_resourcetype(const char ** names, const char ** appearances, int flags)
 void
 it_register(item_type * itype)
 {
-	item_type ** p_itype = &itemtypes;
+  int hash = hashstring(itype->rtype->_name[0]);
+  int key = hash % IMAXHASH;
+	item_type ** p_itype = &itemtypes[key];
 	while (*p_itype && *p_itype != itype) p_itype = &(*p_itype)->next;
 	if (*p_itype==NULL) {
 #ifdef AT_ITYPE
@@ -452,12 +456,18 @@ it_find(const char * zname)
 	const char * name = it_alias(zname);
 	unsigned int hash = hashstring(name);
 	item_type * itype;
+  unsigned int key = hash % IMAXHASH;
 
-	for (itype=itemtypes; itype; itype=itype->next)
-		if (itype->rtype->hashkey==hash && strcmp(itype->rtype->_name[0], name) == 0) break;
-	if (!itype) for (itype=itemtypes; itype; itype=itype->next)
-		if (strcmp(itype->rtype->_name[1], name) == 0) break;
-
+  for (itype=itemtypes[key]; itype; itype=itype->next) {
+    if (itype->rtype->hashkey==hash && strcmp(itype->rtype->_name[0], name) == 0) {
+      break;
+    }
+	}
+  if (itype==NULL) {
+    for (itype=itemtypes[key]; itype; itype=itype->next) {
+      if (strcmp(itype->rtype->_name[1], name) == 0) break;
+    }
+  }
 	return itype;
 }
 
@@ -2285,7 +2295,6 @@ init_itemnames(void)
   int i;
   for (i=0;localenames[i];++i) {
     const struct locale * lang = find_locale(localenames[i]);
-    const item_type * itl = itemtypes;
     boolean exist = false;
     local_names * in = inames;
 
@@ -2299,14 +2308,20 @@ init_itemnames(void)
     if (in==NULL) in = calloc(sizeof(local_names), 1);
     in->next = inames;
     in->lang = lang;
-    while (itl) {
-      void * result = NULL;
-      const char * iname = locale_string(lang, itl->rtype->_name[0]);
-      if (!exist || findtoken(&in->names, iname, &result)==E_TOK_NOMATCH || result!=itl) {
-        addtoken(&in->names, iname, (void*)itl);
-        addtoken(&in->names, locale_string(lang, itl->rtype->_name[1]), (void*)itl);
+    
+    if (!exist) {
+      int key;
+      for (key=0;key!=IMAXHASH;++key) {
+        const item_type * itl;
+        for (itl=itemtypes[key];itl;itl=itl->next) {
+          void * result = NULL;
+          const char * iname = locale_string(lang, itl->rtype->_name[0]);
+          if (findtoken(&in->names, iname, &result)==E_TOK_NOMATCH || result!=itl) {
+            addtoken(&in->names, iname, (void*)itl);
+            addtoken(&in->names, locale_string(lang, itl->rtype->_name[1]), (void*)itl);
+          }
+        }
       }
-      itl=itl->next;
     }
     inames = in;
   }

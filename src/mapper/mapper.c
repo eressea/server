@@ -1544,7 +1544,6 @@ makemonsters(void)
 	f->name=strdup("Monster");
 	f->passw=strdup("abc123");
 	f->override = strdup(itoa36(rand()));
-	fhash(f);
 	return f;
 }
 

@@ -572,7 +572,7 @@ jihad_attacks(void)
 
 			if(doit == false) continue;
 
-			printf("\tPogrom durch %s in %s\n", factionid(f), regionid(r));
+			log_printf("-->> Pogrom durch %s in %s\n", factionid(f), regionname(r, NULL));
 
 			for(u2 = r->units; u; u=u->next) if(u2->faction == f) {
 				for(u=r->units; u; u=u->next) if(jihad(f, u->race)) {
