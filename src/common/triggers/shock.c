@@ -17,6 +17,7 @@
 #include "shock.h"
 
 /* kernel includes */
+#include <curse.h>
 #include <spell.h>
 #include <unit.h>
 

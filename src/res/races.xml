@@ -813,14 +813,14 @@
 		<ai splitsize="1"></ai>
 		<attack type="4" damage="2d40"></attack>
 	</race>
-	<race name="shadowmaster" magres="0.750000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" maintenance="0" weight="0" speed="1.000000" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" scarepeasants walk noteach desert>
+	<race name="shadowmaster" magres="0.750000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" maintenance="0" weight="5000" speed="1.000000" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" scarepeasants walk noteach desert>
 		<ai splitsize="50" killpeasants attackrandom moverandom learn></ai>
 		<function name="name" value="nameshadow"></function>
 		<attack type="4" damage="2d4"></attack>
 		<attack type="2" damage="2d30"></attack>
 		<attack type="3" damage="1d2"></attack>
 	</race>
-	<race name="shadowdemon" magres="0.750000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" maintenance="0" weight="0" speed="1.000000" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" scarepeasants walk noteach desert recruitethereal>
+	<race name="shadowdemon" magres="0.750000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" maintenance="0" weight="5000" speed="1.000000" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" scarepeasants walk noteach desert recruitethereal>
 		<ai splitsize="1000" killpeasants attackrandom moverandom learn></ai>
 		<function name="name" value="nameshadow"></function>
 		<attack type="4" damage="2d3"></attack>

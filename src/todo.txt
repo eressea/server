@@ -2,16 +2,16 @@ Status:
     *=default
     !=critical, muss diese Runde gemacht werden.
     +=fixed, muss überprüft werden
-    V=verified, ist getestet
+    v=verified, ist getestet
 	-=war kein Bug
 
 Announcen:
-! Schattendämonen, Gewicht
+* Schattendämonen, Gewicht
 
 Nächste Woche beachten:
 + bei der auswertung auf die resourcenanzeige achten.
 + Kräuterneuverteilung
-! Bauern in Bofintedlat aussetzen, bitte
+v Bauern in Bofintedlat aussetzen, bitte
 
 Bugfixes/Debugging:
 ! TARNE PARTEI NICHT immer noch defekt?
@@ -29,7 +29,7 @@ v Kampf und Bergung (W. Edel)
 v trigger anschauen. killunit::handle
 v Durchreiseregionen werden nicht angezeigt
 v Regionen nach Straßen werden nicht angezeigt
-! Gewicht von Schattendämonen
++ Gewicht von Schattendämonen
 v remove_empty_factions darf kein free machen, weil noch attribute
   auf die partei zeigen. Attribute mit faction 0 wurden nie eingelesen.
 * Parteien in Durchreise- und Leuchtturmregionen tauchen nicht als PARTEI Block auf
@@ -53,3 +53,4 @@ V Regel mit mindestens 0 NMR aus der parteiboerse (standin.py) nehmen.
 
 Designideen zur Diskussion:
 * neue Waffen
+* Lernen in Astralebene unmöglich machen
