@@ -635,13 +635,25 @@ select_weapon(const troop t, boolean attacking, boolean missile)
 {
 	weapon * weapon = NULL;
 
-	/* Im Nahkampf: Verteidiger schalten auf eine Waffe, mit der das besser geht, um. */
-	if (!attacking && !missile) weapon = t.fighter->person[t.index].secondary;
-	/* Wenn keine Nahkampfwaffe vorhanden, oder nicht Nahampf, dann die normale Waffe nehmen: */
-	if (weapon==NULL) weapon = t.fighter->person[t.index].weapon;
-	/* Wenn keine Waffe, dann NULL==waffenlos */
-	if (weapon==NULL) return NULL;
-	else return weapon;
+
+	if (attacking) {
+		if (!missile) {
+			/* try your best weapon if it's melee */
+			weapon = t.fighter->person[t.index].preferred;
+		} else {
+			/* from the back rows, use your missile weapon */
+			weapon = t.fighter->person[t.index].missile;
+		}
+	} else {
+		if (!missile) {
+			/* have to use your melee weapon if it's melee */
+			weapon = t.fighter->person[t.index].melee;
+		} else {
+			/* from the back rows, use your best skill */
+			weapon = t.fighter->person[t.index].preferred;
+		}
+	}
+	return weapon;
 }
 
 /* ------------------------------------------------------------- */
@@ -725,9 +737,9 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 		skill = weapon_skill(NULL, tu, attacking);
 	} else {
 		if (attacking) {
-			skill = w->offskill;
+			skill = w->attackskill;
 		} else {
-			skill = missile?w->defmissile:w->defskill;
+			skill = w->defenseskill;
 		}
 		if (wtype->modifiers) {
 			/* Pferdebonus, Lanzenbonus, usw. */
@@ -1694,7 +1706,7 @@ static int
 setreload(troop at)
 {
 	fighter * af = at.fighter;
-	const weapon_type * wtype = af->person[at.index].weapon->type;
+	const weapon_type * wtype = af->person[at.index].missile->type;
 	if (wtype->reload == 0) return 0;
 	return af->person[at.index].reload = wtype->reload;
 }
@@ -1911,9 +1923,8 @@ attack(battle *b, troop ta, const att *a)
 			 * konventionell weiter */
 			do_combatspell(ta, row);
 		} else {
-			weapon * wp;
-
-			wp = select_weapon(ta, true, true);
+			weapon * wp = ta.fighter->person[ta.index].preferred;
+			if (row!=FIGHT_ROW) wp = ta.fighter->person[ta.index].missile;
 			/* Sonderbehandlungen */
 
 			if (getreload(ta)) {
@@ -2680,7 +2691,15 @@ print_stats(battle * b)
 			}
 		} next(side);
 	}
+}
 
+static int
+weapon_weight(const weapon * w, boolean missile)
+{
+	if (missile == i2b(fval(w->type, WTF_MISSILE))) {
+		return w->attackskill + w->defenseskill;
+	}
+	return 0;
 }
 
 fighter *
@@ -2821,11 +2840,8 @@ make_fighter(battle * b, unit * u, boolean attack)
 		for (itm=u->items;itm;itm=itm->next) {
 			const weapon_type * wtype = resource2weapon(itm->type->rtype);
 			if (wtype==NULL || itm->number==0) continue;
-			weapons[w].offskill = weapon_skill(wtype, u, true);
-			weapons[w].defskill = weapon_skill(wtype, u, false);
-			weapons[w].defmissile = weapons[w].defskill;
-			/* Fernkämpfer haben im Nahkampf Talent/2 */
-			if (fval(wtype, WTF_MISSILE)) weapons[w].defskill/=2;
+			weapons[w].attackskill = weapon_skill(wtype, u, true);
+			weapons[w].defenseskill = weapon_skill(wtype, u, false);
 			weapons[w].type = wtype;
 			weapons[w].used = 0;
 			weapons[w].count = itm->number;
@@ -2837,12 +2853,12 @@ make_fighter(battle * b, unit * u, boolean attack)
 		for (i=0; i!=w; ++i) {
 			int j, o=0, d=0;
 			for (j=0; j!=i; ++j) {
-				if (fig->weapons[j].defmissile>=fig->weapons[i].defmissile) ++d;
-				if (fig->weapons[j].offskill>=fig->weapons[i].offskill) ++o;
+				if (weapon_weight(fig->weapons+j, true)>=weapon_weight(fig->weapons+i, true)) ++d;
+				if (weapon_weight(fig->weapons+j, false)>=weapon_weight(fig->weapons+i, false)) ++o;
 			}
 			for (j=i+1; j!=w; ++j) {
-				if (fig->weapons[j].defmissile>fig->weapons[i].defmissile) ++d;
-				if (fig->weapons[j].offskill>fig->weapons[i].offskill) ++o;
+				if (weapon_weight(fig->weapons+j, true)>weapon_weight(fig->weapons+i, true)) ++d;
+				if (weapon_weight(fig->weapons+j, false)>weapon_weight(fig->weapons+i, false)) ++o;
 			}
 			owp[o] = i;
 			dwp[d] = i;
@@ -2851,30 +2867,33 @@ make_fighter(battle * b, unit * u, boolean attack)
 		 * oi and di are the current index to the sorted owp/dwp arrays
 		 * owp, dwp contain indices to the figther::weapons array */
 
-		/* hand out offensive weapons: */
+		/* hand out melee weapons: */
 		for (i=0; i!=fig->alive; ++i) {
 			int wpless = weapon_skill(NULL, u, true);
-			while (oi!=w && fig->weapons[owp[oi]].used==fig->weapons[owp[oi]].count) {
+			while (oi!=w && (fig->weapons[owp[oi]].used==fig->weapons[owp[oi]].count || fval(fig->weapons[owp[oi]].type, WTF_MISSILE))) {
 				++oi;
 			}
 			if (oi==w) break; /* no more weapons available */
-			if (fig->weapons[owp[oi]].offskill<wpless) continue; /* we fight better with bare hands */
-			fig->person[i].weapon = &fig->weapons[owp[oi]];
-			if (fig->person[i].weapon->type->reload) {
-				fig->person[i].reload = rand() % fig->person[i].weapon->type->reload;
+			if (weapon_weight(fig->weapons+owp[oi], false)<=wpless) {
+				continue; /* we fight better with bare hands */
 			}
+			fig->person[i].preferred = fig->person[i].melee = &fig->weapons[owp[oi]];
 			++fig->weapons[owp[oi]].used;
 		}
-		/* hand out defensive weapons. No missiles, please. */
-		for (di=0, i=0; i!=fig->alive; ++i) {
-			if (fig->person[i].weapon==NULL) continue;
-			while (di!=w && (fig->weapons[dwp[di]].used==fig->weapons[dwp[di]].count || fval(fig->weapons[dwp[di]].type, WTF_MISSILE))) {
+		/* hand out missile weapons (from back to front, in case of mixed troops). */
+		for (di=0, i=fig->alive; i--!=0;) {
+			while (di!=w && (fig->weapons[dwp[di]].used==fig->weapons[dwp[di]].count || !fval(fig->weapons[dwp[di]].type, WTF_MISSILE))) {
 				++di;
 			}
 			if (di==w) break; /* no more weapons available */
-			if (fig->weapons[dwp[di]].defmissile>fig->person[i].weapon->defmissile) {
-				fig->person[i].secondary = &fig->weapons[dwp[di]];
+			if (weapon_weight(fig->weapons+dwp[di], true)>0) {
+				fig->person[i].missile = &fig->weapons[dwp[di]];
 				++fig->weapons[dwp[di]].used;
+			}
+			if (fig->person[i].missile && (fig->person[i].melee==NULL ||
+				weapon_weight(fig->person[i].missile, true) > 
+				weapon_weight(fig->person[i].melee, false))) {
+				fig->person[i].preferred = fig->person[i].missile;
 			}
 		}
 	}

@@ -96,9 +96,8 @@ typedef struct side {
 typedef struct weapon {
 	int count, used;
 	const struct weapon_type * type;
-	int offskill   : 8; /* offense skill */
-	int defskill   : 8; /* defense against melee attacks */
-	int defmissile : 8; /* defense against missiles - not div. by 2 yet */
+	int attackskill : 8; 
+	int defenseskill : 8;
 } weapon;
 
 /*** fighter::person::flags ***/
@@ -158,8 +157,9 @@ typedef struct fighter {
 		int reload      : 4;    /* Anzahl Runden, die die Waffe x noch laden muss.
 		                         * dahinter steckt ein array[RL_MAX] wenn er min. eine hat. */
 		int last_action : 8;		/* In welcher Runde haben wir zuletzt etwas getan */
-		struct weapon * weapon;        /* offensive weapon */
-		struct weapon * secondary;     /* defensive weapon */
+		struct weapon * preferred; /* weapon with best skill */
+		struct weapon * missile;   /* missile weapon */
+		struct weapon * melee;     /* melee weapon */
 	} * person;
 	int flags;
 	struct {

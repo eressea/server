@@ -334,15 +334,16 @@ sp_combatrosthauch(fighter * fi, int level, int power, spell * sp)
 						k +=n;
 						i_change(&df->unit->items, wp->type->itype, -n);
 						for (p=0;n && p!=df->unit->number;++p) {
-							if (df->person[p].weapon==wp) {
-								df->person[p].weapon = df->person[p].secondary;
-								df->person[p].secondary = NULL;
+							if (df->person[p].missile==wp) {
+								df->person[p].preferred = df->person[p].melee;
+								df->person[p].missile = NULL;
 								--n;
 							}
 						}
 						for (p=0;n && p!=df->unit->number;++p) {
-							if (df->person[p].secondary==wp) {
-								df->person[p].secondary = NULL;
+							if (df->person[p].melee==wp) {
+								df->person[p].preferred = df->person[p].missile;
+								df->person[p].melee = NULL;
 								--n;
 							}
 						}
@@ -1285,7 +1286,7 @@ sp_windshield(fighter * fi, int level, int power, spell * sp)
 			break;
 		assert(!helping(fi->side, df->side));
 
-		if (df->person[dt.index].weapon && fval(df->person[dt.index].weapon->type, WTF_MISSILE)) {
+		if (df->person[dt.index].preferred && df->person[dt.index].preferred==df->person[dt.index].missile) {
 			df->person[dt.index].attack -= at_malus;
 			--force;
 		}

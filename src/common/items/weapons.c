@@ -177,7 +177,7 @@ attack_firesword(const troop * at, int *casualties, int row)
 	if (fi->catmsg == -1) {
 		int i, k=0;
 		for (i=0;i<=at->index;++i) {
-			if (fi->person[i].weapon->type == oldweapontype[WP_FIRESWORD]) ++k;
+			if (fi->person[i].melee->type == oldweapontype[WP_FIRESWORD]) ++k;
 		}
 		sprintf(buf, "%d Kämpfer aus %s benutz%s Flammenschwert%s:", k, unitname(fi->unit),
 			(k==1)?"t sein ":"en ihre",(k==1)?"":"er");
@@ -206,7 +206,7 @@ attack_catapult(const troop * at, int * casualties, int row)
 	troop dt;
 	int d = 0, n;
 	int minrow, maxrow;
-	weapon * wp = af->person[at->index].weapon;
+	weapon * wp = af->person[at->index].missile;
 	
 	assert(row>=FIGHT_ROW);
 	if (row>BEHIND_ROW) return false; /* keine weiteren attacken */
@@ -224,7 +224,7 @@ attack_catapult(const troop * at, int * casualties, int row)
 	if (af->catmsg == -1) {
 		int i, k=0;
 		for (i=0;i<=at->index;++i) {
-			if (af->person[i].reload==0 && af->person[i].weapon == wp) ++k;
+			if (af->person[i].reload==0 && af->person[i].missile == wp) ++k;
 		}
 		sprintf(buf, "%d Kämpfer aus %s feuer%s Katapult ab:", k, unitname(au), (k==1)?"t sein":"n ihr");
 		battlerecord(b, buf);
