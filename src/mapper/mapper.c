@@ -1702,7 +1702,7 @@ main(int argc, char *argv[])
 
 	init_gmcmd();
 
-	if (!*datafile) ssprintf(datafile, "%u", turn);
+	if (!*datafile) sprintf(datafile, "%u", turn);
 
 	readgame(datafile, backup);
 	for (f=factions;f;f=f->next) if (f->age==0) {
