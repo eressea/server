@@ -899,12 +899,16 @@ sp_chaosrow(fighter * fi, int level, int force, spell * sp)
 			switch (row) {
 				case FIGHT_ROW:
 					df->status = ST_FIGHT;
+					break;
 				case BEHIND_ROW:
 					df->status = ST_CHICKEN;
+					break;
 				case AVOID_ROW:
 					df->status = ST_AVOID;
+					break;
 				case FLEE_ROW:
 					df->status = ST_FLEE;
+					break;
 				default:
 					assert(!"unknown combatrow");
 			}
