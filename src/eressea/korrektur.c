@@ -2739,7 +2739,7 @@ set_zip(void)
 	}
 
 	f = findfaction(0);
-	f->options = f->options & !(1 << O_COMPRESS);
+	f->options = f->options & ~(1 << O_COMPRESS);
 	f->options = f->options | (1 << O_BZIP2);
 
 	return 0;
@@ -2751,7 +2751,7 @@ heal_all(void)
 	region *r;
 	unit *u;
 	faction *f;
-	struct message * msg = msg_message("healall", "");
+	message *msg = msg_message("healall","");
 
 	for(f=factions; f; f=f->next) {
 		freset(f, FL_DH);
@@ -2775,7 +2775,6 @@ heal_all(void)
 	}
 
 	msg_release(msg);
-
 	return 0;
 }
 
@@ -2807,45 +2806,6 @@ korrektur(void)
 	fix_skills();
 #endif
 	stats();
-	/* Turn ist noch nicht inkrementiert! Also immer <eingelesenes Datenfile>.
-	 * das gilt aber nicht, wenn man es aus der console ('c') aufruft.
-	 */
-	switch (turn) {
-	case 188:
-		name_seaserpents();
-		break;
-	case 189:
-		break;
-	case 194:
-		remove_impossible_dragontargets();
-		break;
-	case 195:
-		remove_impossible_dragontargets();
-		break;
-	case 208:
-	  fix_feuerwand_orks();
-	  break;
-	case 209:
-	  fix_buildings();
-#if 0
-	  fix_traveldir();
-#endif
-	  break;
-	case 212:
-		fix_prices();
-		break;
-	case 215:
-		fix_options();
-		init_region_age();
-		break;
-	case 217:
-		init_mwarden();
-		break;
-	case 254:
-		fix_negpotion();
-		break;
-	}
-
 	do_once("sql2", dump_sql());
 #if NEW_RESOURCEGROWTH
 	/* do not remove do_once calls - old datafiles need them! */

@@ -2770,7 +2770,7 @@ reports(void)
 				gotit = true;
 			}
 		}
-		if (f->email && BAT) {
+		if (f->no > 0 && f->email && BAT) {
 			sprintf(buf, "%s/%s.sh", reportpath(), factionid(f));
 			shfp = fopen(buf, "w");
 			fprintf(shfp,"#!/bin/sh\n\nPATH=%s\n\n",MAILITPATH);

@@ -2737,8 +2737,9 @@ plagues(region * r, boolean ismagic)
 /* Lohn bei den einzelnen Burgstufen für Normale Typen, Orks, Bauern,
  * Modifikation für Städter. */
 
+#if LARGE_CASTLES
 static const int wagetable[7][4] = {
-	{10, 10, 11, -5},			/* Baustelle */
+	{10, 10, 11, -7},			/* Baustelle */
 	{10, 10, 11, -5},			/* Handelsposten */
 	{11, 11, 12, -3},			/* Befestigung */
 	{12, 11, 13, -1},			/* Turm */
@@ -2746,6 +2747,16 @@ static const int wagetable[7][4] = {
 	{14, 12, 15,  1},			/* Festung */
 	{15, 13, 16,  2}		 	/* Zitadelle */
 };
+#else
+static const int wagetable[7][4] = {
+	{10, 10, 11, -5},			/* Baustelle */
+	{11, 11, 12, -3},			/* Befestigung */
+	{12, 11, 13, -1},			/* Turm */
+	{13, 12, 14,  0},			/* Burg */
+	{14, 12, 15,  1},			/* Festung */
+	{15, 13, 16,  2}		 	/* Zitadelle */
+};
+#endif
 
 int
 wage(const region *r, const unit *u, boolean img)
