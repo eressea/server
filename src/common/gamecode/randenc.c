@@ -1,5 +1,6 @@
 /* vi: set ts=2:
  *
+ *	
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1282,8 +1283,9 @@ randomevents(void)
 			set_skill(u, SK_OBSERVATION, u->number * (rand() % 180));
 			set_skill(u, SK_AUSDAUER, u->number * 30);
 			set_skill(u, SK_STEALTH, u->number * 30);
-			fprintf(stderr, "%d %s in %s.\n", u->number,
+			log_printf("%d %s in %s.\n", u->number,
 				race[u->race].name[1], regionname(r, NULL));
+
 			name_unit(u);
 			set_string(&u->lastorder, "WARTEN");
 
@@ -1362,8 +1364,9 @@ randomevents(void)
 			set_string(&u->lastorder, "WARTEN");
 			name_unit(u);
 
-			fprintf(stderr, "%d %s in %s.\n", u->number,
+			log_printf("%d %s in %s.\n", u->number,
 				race[u->race].name[1], regionname(r, NULL));
+
 			add_message(&r->msgs, new_message(NULL,
 				"undeadrise%r:region", r));
 			for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
@@ -1414,7 +1417,8 @@ randomevents(void)
 				else
 					set_string(&u->name, "Wütende Ents");
 
-				fprintf(stderr, "%d Ents in %s.\n", u->number, regionname(r, NULL));
+				log_printf("%d Ents in %s.\n", u->number, regionname(r, NULL));
+
 				add_message(&r->msgs, new_message(NULL,
 					"entrise%r:region", r));
 				for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);

@@ -846,7 +846,7 @@ typedef struct skillvalue {
 																		 löschen müssen! (Ist dafür nicht eigentlich FL_DH gedacht?) */
 #define FL_NOIDLEOUT			(1<<24) /* Partei stirbt nicht an NMRs */
 #define FL_TAKEALL				(1<<25) /* Einheit nimmt alle Gegenstände an */
-#define FL_UNNAMED					(1<<26) /* Partei/Einheit/Gebäude/Schiff ist unbenannt */
+#define FL_UNNAMED				(1<<26) /* Partei/Einheit/Gebäude/Schiff ist unbenannt */
 
 /* Flags, die gespeichert werden sollen: */
 #ifdef NOAID

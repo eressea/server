@@ -1,5 +1,6 @@
 /* vi: set ts=2:
  *
+ *	
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -22,6 +23,7 @@
 
 /* attributes includes */
 #include <attributes/overrideroads.h>
+#include <attributes/otherfaction.h>
 #ifdef AT_OPTION
 # include <attributes/option.h>
 #endif
@@ -62,6 +64,7 @@
 #include <nrmessage.h>
 #include <translation.h>
 #include <util/message.h>
+#include <log.h>
 
 /* libc includes */
 #include <assert.h>
@@ -101,7 +104,7 @@ read_datenames(const char *filename)
 	int  i, l;
 
 	if( (namesFP=fopen(filename,"r")) == NULL) {
-		fprintf(stderr, "Kann Datei '%s' nicht öffnen, Abbruch\n",filename);
+		log_error(("Kann Datei '%s' nicht öffnen, Abbruch\n", filename));
 		return -1;
 	}
 
@@ -2778,10 +2781,9 @@ can_find(faction * f, faction * f2)
 }
 
 void
-add_find(faction * f, unit * u)
+add_find(faction * f, unit * u, faction *f2)
 {
 	/* faction f sees f2 through u */
-	faction * f2 = u->faction;
 	int key = f->no % FMAXHASH;
 	struct fsee ** fp = &fsee[key];
 	struct fsee * fs;
@@ -2817,8 +2819,15 @@ update_find(void)
 				if (u2->faction==lastf || u2->faction==u->faction)
 					continue;
 				if (seefaction(u->faction, r, u2, 0)) {
-					lastf=u2->faction;
-					add_find(u->faction, u2);
+					attrib *a = a_find(u2->attribs, &at_otherfaction);
+					if(a) {
+						faction *f = findfaction(a->data.i);
+						lastf=f;
+						add_find(u->faction, u2, f);
+					} else {
+						lastf=u2->faction;
+						add_find(u->faction, u2, u2->faction);
+					}
 				}
 			}
 		}

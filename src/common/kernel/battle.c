@@ -1,5 +1,6 @@
 /* vi: set ts=2:
  *
+ *	
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -59,6 +60,7 @@ typedef enum combatmagic {
 #include <base36.h>
 #include <cvector.h>
 #include <rand.h>
+#include <log.h>
 
 /* attributes includes */
 #include <attributes/key.h>
@@ -3020,7 +3022,7 @@ make_battle(region * r)
 		sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
 		bdebug = fopen(zFilename, "w");
 #endif
-		if (!bdebug) fputs("battles können nicht debugged werden\n", stderr);
+		if (!bdebug) log_error(("battles können nicht debugged werden\n"));
 		else {
 			dbgprintf((bdebug, "In %s findet ein Kampf statt:", rname(r, NULL)));
 		}

@@ -1,5 +1,6 @@
 /* vi: set ts=2:
  *
+ * 
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -25,6 +26,7 @@
 #include "iceberg.h"
 #include "hate.h"
 #include "overrideroads.h"
+#include "otherfaction.h"
 #include "racename.h"
 #ifdef AT_OPTION
 # include "option.h"
@@ -53,6 +55,7 @@ init_attributes(void)
 	init_orcification();
 	init_hate();
 	init_reduceproduction();
+	init_otherfaction();
 	init_racename();
 #ifdef AT_MOVED
 	init_moved();

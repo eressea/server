@@ -26,7 +26,8 @@ LDFLAGS = $(LIBS)
 LIBS    = -L$(PUBLISH_DIR)
 
 LINTFLAGS     = -booltype boolean -boolops +posixlib +matchanyintegral \
-	-predboolint -retvalint -retvalother -realcompare -exportlocal
+	-predboolint -retvalint -retvalother -realcompare -exportlocal \
+	-DHAVE_READDIR
 
 ARCHITECTURE = Linux
 

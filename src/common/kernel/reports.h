@@ -32,7 +32,7 @@ extern const char *neue_gebiete[];
 
 /* kann_finden speedups */
 extern boolean kann_finden(struct faction * f1, struct faction * f2);
-extern void add_find(struct faction *, struct unit *);
+extern void add_find(struct faction *, struct unit *, struct faction *);
 extern struct unit * can_find(struct faction *, struct faction *);
 /* funktionen zum schreiben eines reports */
 extern int read_datenames(const char *filename);

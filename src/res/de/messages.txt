@@ -54,7 +54,7 @@ error48;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist nicht bewa
 error49;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist nicht der Eigentümer.
 error50;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist nicht erfahren genug dafür.
 error51;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat nicht genug Silber.
-error52;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist vom Kampf erschöpft.
+error52;errors:0;de;{unit} in {region}: '{command}' - Die Einheit kann keinen langen Befehl mehr ausführen.
 error53;errors:0;de;{unit} in {region}: '{command}' - Die Einheit kann keine Tränke herstellen.
 error54;errors:0;de;{unit} in {region}: '{command}' - Die Einheit kann nicht handeln.
 error55;errors:0;de;{unit} in {region}: '{command}' - Die Einheit kann sich nicht fortbewegen.
@@ -287,6 +287,7 @@ error285;errors:0;de;{unit} in {region}: '{command}' - Diese Einheit kennt keine
 error286;errors:0;de;{unit} in {region}: '{command}' - Die Einheit transportiert uns nicht.
 error287;errors:0;de;{unit} in {region}: '{command}' - Dorthin können wir die Einheit nicht transportieren.
 error288;errors:0;de;{unit} in {region}: '{command}' - Wieviel sollen wir einreißen?
+error289;errors:0;de;{unit} in {region}: '{command}' - Tarne wie?
 
 # Meldungen und Ereignisse
 msg_event;events:0;de;{string}

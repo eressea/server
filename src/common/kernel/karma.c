@@ -251,8 +251,8 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"komplett.",
 		100
 	},
-	{	/* TODO: Namen ändern */
-		"Schnell",
+	{
+		"Windvolk",
 		"Ein solches Volk ist sehr athletisch und die Kinder üben besonders "
 		"den Langstreckenlauf von kleinauf. Nach jahrelangem Training sind "
 		"sie dann in der Lage, sich zu Fuß so schnell zu bewegen als würden "

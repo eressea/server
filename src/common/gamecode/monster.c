@@ -1,5 +1,6 @@
 /* vi: set ts=2:
  *
+ *	
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -488,8 +489,9 @@ monster_seeks_target(region *r, unit *u)
 	}
 
 	/* TODO: prüfen, ob target überhaupt noch existiert... */
+	if(!target) return; /* this is a bug workaround! remove!! */
 
-	if( r == target->region ) { /* Wir haben ihn! */
+	if(r == target->region ) { /* Wir haben ihn! */
 		switch( u->race ) {
 			case RC_ALP:
 				alp_findet_opfer(u, r);

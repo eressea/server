@@ -1,5 +1,6 @@
 /* vi: set ts=2:
  *
+ *	
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -50,6 +51,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <attributes/otherfaction.h>
 
 void
 spy(region * r, unit * u)
@@ -136,12 +139,30 @@ setstealth(unit * u, strlist * S)
 
 	switch(findparam(s)) {
 	case P_FACTION:
-		/* TARNE PARTEI [NICHT] */
+		/* TARNE PARTEI [NICHT|NUMMER abcd] */
 		s = getstrtoken();
-		if (findparam(s) == P_NOT) {
-			freset(u, FL_PARTEITARNUNG);
-		} else {
+		if(!s || *s == 0) {
 			fset(u, FL_PARTEITARNUNG);
+		} else if (findparam(s) == P_NOT) {
+			freset(u, FL_PARTEITARNUNG);
+		} else if (findkeyword(s) == K_NUMBER) {
+			char *s2 = getstrtoken();
+			int nr;
+			if(!s2 || *s2 == 0 || (nr = atoi36(s2)) == u->faction->no) {
+				a_removeall(&u->faction->attribs, &at_otherfaction);
+			} else {
+				/* TODO: Prüfung ob Partei sichtbar */
+				if(!findfaction(nr)) {
+					cmistake(u, S->s, 66, MSG_EVENT);
+				} else {
+					attrib *a;
+					a = a_find(u->attribs, &at_otherfaction);
+					if(!a) a = a_add(&u->attribs, a_new(&at_otherfaction));
+					a->data.i = nr;
+				}
+			}
+		} else {
+			cmistake(u, S->s, 289, MSG_EVENT);
 		}
 		break;
 	case P_ANY:

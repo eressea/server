@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -31,11 +30,12 @@
 #include "building.h"
 
 /* util includes */
-#include <goodies.h>
 #include <base36.h>
+#include <goodies.h>
 #include <message.h>
 #include <nrmessage.h>
 #include <crmessage.h>
+#include <log.h>
 
 /* libc includes */
 #include <stddef.h>
@@ -428,7 +428,7 @@ caddmessage(region * r, faction * f, char *s, msg_t mtype, int level)
 			m = add_message(&r->msgs, new_message(f, "msg_event%s:string", s));
 		break;
 	default:
-		fprintf(stderr, "Warnung: Ungültige Msg-Klasse!");
+		assert(!"Ungültige Msg-Klasse!");
 	}
 }
 

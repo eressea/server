@@ -254,16 +254,16 @@ expandrecruit(region * r, request * recruitorders)
 		race_t rc = u->faction->race;
 		int recruitcost = race[rc].rekrutieren;
 
-		/* check if recruiting is limited. either horses or peasant fraction or not at all */
+		/* check if recruiting is limited. 
+		 * either horses or peasant fraction or not at all */
 		if ((race[rc].ec_flags & ECF_REC_UNLIMITED)==0) {
 			/* not unlimited, and everything's gone: */
 			if (race[rc].ec_flags & ECF_REC_HORSES) {
 				/* recruit from horses if not all gone */
 				if (h <= 0) continue;
-			}
-			else if ((race[rc].ec_flags & ECF_REC_ETHEREAL) == 0) {
+			} else if ((race[rc].ec_flags & ECF_REC_ETHEREAL) == 0) {
 				/* recruit from peasants if any space left */
-				if (n > rfrac) continue;
+				if (n >= rfrac) continue;
 			}
 		}
 		if (recruitcost) {

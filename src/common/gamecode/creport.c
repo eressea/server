@@ -1,5 +1,6 @@
 /* vi: set ts=2:
  *
+ *	
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -24,6 +25,7 @@
 
 /* attributes include */
 #include <attributes/follow.h>
+#include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 
 /* gamecode includes */
@@ -413,7 +415,7 @@ cr_output_unit(FILE * F, region * r,
 	if (strlen(u->display))
 		fprintf(F, "\"%s\";Beschr\n", u->display);
 
-	if ((u->faction == f || omniscient(f)) || !fval(u, FL_PARTEITARNUNG)) {
+	if( u->faction == f || omniscient(f)) {
 #ifdef GROUPS
 		if (u->faction == f) {
 			const attrib * a = a_find(u->attribs, &at_group);
@@ -424,6 +426,13 @@ cr_output_unit(FILE * F, region * r,
 		}
 #endif
 		fprintf(F, "%d;Partei\n", u->faction->no);
+	} else if(!fval(u, FL_PARTEITARNUNG)) {
+		attrib *a = a_find(u->attribs, &at_otherfaction);
+		if(a) {
+			fprintf(F, "%d;Partei\n", a->data.i);
+		} else {
+			fprintf(F, "%d;Partei\n", u->faction->no);
+		}
 	}
 
 	if(u->faction != f && a_fshidden
@@ -463,6 +472,8 @@ cr_output_unit(FILE * F, region * r,
 			unit * u = (unit*)a->data.v;
 			if (u) fprintf(F, "%d;folgt\n", u->no);
 		}
+		a = a_find(u->attribs, &at_otherfaction);
+		if(a) fprintf(F, "%d;verkleidung\n", a->data.i);
 		i = ualias(u);
 		if (i>0)
 			fprintf(F, "%d;temp\n", i);

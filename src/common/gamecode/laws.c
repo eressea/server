@@ -1,5 +1,6 @@
 /* vi: set ts=2:
  *
+ *	
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -80,6 +81,8 @@
 #include <assert.h>
 #include <ctype.h>
 
+#include <attributes/otherfaction.h>
+
 /* - external symbols ------------------------------------------ */
 extern int dropouts[2];
 extern int * age;
@@ -96,6 +99,7 @@ findoption(char *s)
 static void
 destroyfaction(faction * f)
 {
+	region *rc;
 	unit *u;
 	faction *ff;
 
@@ -198,16 +202,27 @@ destroyfaction(faction * f)
 		}
 #endif
 	}
+
+	/* units of other factions that were disguised as this faction
+	 * have their disguise replaced by ordinary faction hiding. */
+	for(rc=regions; rc; rc=rc->next) {
+		for(u=rc->units; u; u=u->next) {
+			attrib *a = a_find(u->attribs, &at_otherfaction);
+			if(!a) continue;
+			if(a->data.i == f->no) {
+				a_removeall(&u->attribs, &at_otherfaction);
+				fset(u, FL_PARTEITARNUNG);
+			}
+		}
+	}
 }
 
 void
 restart(unit *u, int race)
 {
-#ifdef ALLOW_RESTART
 	faction *f = addplayer(u->region, u->faction->email, race)->faction;
 	f->magiegebiet = u->faction->magiegebiet;
 	destroyfaction(u->faction);
-#endif
 }
 
 /* ------------------------------------------------------------- */
@@ -2246,7 +2261,18 @@ renumber_factions(void)
 		}
 	}
 	for (rp=renum;rp;rp=rp->next) {
+		region *r;
+		unit *u;
 		a_remove(&rp->faction->attribs, rp->attrib);
+		/* all units disguised as belonging to this faction have their
+		 * attribute changed */
+		for(r=regions; r; r=r->next) {
+			for(u=r->units; u; u=u->next) {
+				attrib *a = a_find(u->attribs, &at_otherfaction);
+				if(!a) continue;
+				a->data.i = rp->want;
+			}
+		}
 		rp->faction->no = rp->want;
 		register_faction_id(rp->want);
 		fset(rp->faction, FF_NEWID);

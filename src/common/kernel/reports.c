@@ -44,6 +44,7 @@
 
 /* attributes includes */
 #include <attributes/follow.h>
+#include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 
 const char * g_reportdir;
@@ -124,8 +125,10 @@ hp_status(const unit * u)
 {
 	double p = (double) ((double) u->hp / (double) (u->number * unit_max_hp(u)));
 
-	if (p > 1.25)
-		return "magisch gestärkt";
+	if (p > 2.00)
+		return "sehr stark";
+	if (p > 1.50)
+		return "stark";
 	if (p < 0.50)
 		return "schwer verwundet";
 	if (p < 0.75)
@@ -178,6 +181,8 @@ bufunit(const faction * f, const unit * u, int indent,
 	int i, dh;
 	skill_t sk;
 	int getarnt = fval(u, FL_PARTEITARNUNG);
+	attrib *a_otherfaction = NULL;
+	const char *c;
 	const char *pzTmp;
 	spell *sp;
 	building * b;
@@ -187,28 +192,41 @@ bufunit(const faction * f, const unit * u, int indent,
 	attrib *a_fshidden = NULL;
 	item * itm;
 	item * show;
-
+	
 	if(fspecial(u->faction, FS_HIDDEN))
 		a_fshidden = a_find(u->attribs, &at_fshidden);
 
 	strcpy(buf, unitname(u));
+	
+	a_otherfaction = a_find(u->attribs, &at_otherfaction);
 
-	if (!getarnt && (u->faction != f)) {
-		scat(", ");
-		scat(factionname(u->faction));
-	} else {
+	if (u->faction == f) {
 #ifdef GROUPS
-		if (u->faction==f) {
-			attrib * a = a_find(u->attribs, &at_group);
-			if (a) {
-				group * g = (group*)a->data.v;
-				scat(", ");
-				scat(groupid(g, f));
-			}
+		attrib *a = a_find(u->attribs, &at_group);
+		if (a) {
+			group * g = (group*)a->data.v;
+			scat(", ");
+			scat(groupid(g, f));
 		}
 #endif
-		if (getarnt) scat(", parteigetarnt");
+		if (getarnt) {
+			scat(", parteigetarnt");
+		}	else if (a_otherfaction) {
+			scat(", ");
+			scat(factionname(findfaction(a_otherfaction->data.i)));
+		}
+	} else {
+		if (getarnt) {
+			scat(", parteigetarnt");
+		} else if(a_otherfaction) {
+			scat(", ");
+			scat(factionname(findfaction(a_otherfaction->data.i)));
+		} else {
+			scat(", ");
+			scat(factionname(u->faction));
+		}
 	}
+
 	scat(", ");
 	if(u->faction != f && a_fshidden
 			&& a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {

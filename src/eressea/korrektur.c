@@ -1134,7 +1134,7 @@ fix_age(void)
 	for (f=factions;f;f=f->next) {
 		if (f->no!=MONSTER_FACTION && !nonplayer_race(f->race)) continue;
 		if (f->age!=turn) {
-			fprintf(stderr, "  - Alter von Partei %s anpassen", factionid(f));
+			log_printf("Alter von Partei %s auf %d angepasst.\n", factionid(f), turn);
 			f->age = turn;
 		}
 	}
@@ -1915,7 +1915,10 @@ fix_herbs(void)
 
 	for (r=regions; r; r=r->next) if (rterrain(r) == T_PLAIN) {
 		const herb_type *htype = rherbtype(r);
-		assert(htype);
+		if (htype==NULL) {
+			htype = htypes[i];
+			rsetherbtype(r, htype);
+		}
 		for (i=0;i!=6;++i) if (htypes[i]==htype) break;
 		assert(i!=6);
 		herbs[i]++;
