@@ -215,7 +215,7 @@ mm_smithy(const unit * u, const resource_type * rtype, int value) /* material-mo
 static void
 init_smithy(struct building_type * bt)
 {
-	a_add(&bt->attribs, make_skillmod(NOSKILL, SMF_PRODUCTION, sm_smithy, 0, 0));
+	a_add(&bt->attribs, make_skillmod(NOSKILL, SMF_PRODUCTION, sm_smithy, 1.0, 0));
 	a_add(&bt->attribs, make_matmod(mm_smithy));
 }
 

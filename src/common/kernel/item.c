@@ -1427,7 +1427,6 @@ init_olditems(void)
 		int capacity = 0;
 		int price;
 		attrib * a;
-		skillmod_data * smd;
 		item_type * itype;
 		construction * con = calloc(sizeof(construction), 1);
 
@@ -1498,10 +1497,7 @@ init_olditems(void)
 			itype->capacity = STRENGTHCAPACITY;
 			break;
 		case I_GREATBOW:
-			a = a_add(&con->attribs, a_new(&at_skillmod));
-			smd = (skillmod_data*)a->data.v;
-			smd->skill=NOSKILL;
-			smd->special = mod_elves_only;
+			a = a_add(&con->attribs, make_skillmod(NOSKILL, SMF_PRODUCTION, mod_elves_only, 1.0, 0));
 			break;
 		default:
 			if (itemdata[i].flags & FL_ITEM_MOUNT) itype->capacity = HORSECAPACITY;
