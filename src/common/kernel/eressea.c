@@ -2804,6 +2804,7 @@ findspecialdirection(const region *r, char *token)
 	attrib *a;
 	spec_direction *d;
 
+	if (strlen(token)==0) return NULL;
 	for (a = a_find(r->attribs, &at_direction);a;a=a->nexttype) {
 		d = (spec_direction *)(a->data.v);
 
