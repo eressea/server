@@ -1866,10 +1866,13 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	}
 
 	if (f->age <= 2) {
+		/* doppelt gemoppelt und funktioniert nicht. */
 		if (f->age <= 1) {
 			ADDMSG(&f->msgs, msg_message("changepasswd",
 				"value", gc_add(strdup(f->passw))));
 		}
+		*/
+		/* Was tut das? */
 		RENDER(f, buf, sizeof(buf), ("newbie_password", "password", f->passw));
 		rnl(F);
 		centre(F, buf, true);
