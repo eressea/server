@@ -3468,6 +3468,24 @@ writeforward(void)
 }
 
 static void
+writeturn(void)
+{
+	char zText[MAX_PATH];
+	FILE *f;
+
+	sprintf(zText, "%s/datum", basepath());
+	f = cfopen(zText, "w");
+	if (!f) return;
+	fputs(gamedate2(), f);
+	fclose(f);
+	sprintf(zText, "%s/turn", basepath());
+	f = cfopen(zText, "w");
+	if (!f) return;
+	fprintf(f,"%d",turn);
+	fclose(f);
+}
+
+static void
 out_faction(FILE *file, faction *f)
 {
  	fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
@@ -3635,8 +3653,8 @@ report_summary(summary * s, summary * o, boolean full)
 	fclose(F);
 
 	if (full) {
-		FILE * F;
 #ifdef PLAYER_CSV
+		FILE *F;
 		region * r;
 #endif
 		printf("Schreibe Liste der Adressen (adressen)...\n");
@@ -3644,15 +3662,8 @@ report_summary(summary * s, summary * o, boolean full)
 		writenewssubscriptions();
 		writeforward();
 
-		{
-			char zText[MAX_PATH];
-			sprintf(zText, "%s/datum", basepath());
-			F = cfopen(zText, "w");
-			if (!F) return;
-		}
-		printf("Schreibe Datum (datum)...\n");
-		fputs(gamedate2(), F);
-		fclose(F);
+		printf("writing date & turn\n");
+		writeturn();
 
 #ifdef PLAYER_CSV
 		{

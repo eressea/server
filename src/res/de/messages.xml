@@ -5120,15 +5120,12 @@
 		</locale>
 	</message>
 
-	<message name="phunger">
+	<message name="phunger" section="events">
 		<type>
 			<arg name="dead" type="int"></arg>
 		</type>
-		<locale name="de">
-			<nr section="events">
-				<text>"An Unterernährung sterben $int($dead) Bauern."</text>
-			</nr>
-		</locale>
+		<text locale="de">"$if($eq($dead,1),"Ein Bauer","$dead Bauern") verhungert."</text>
+		<text locale="en">"$if($eq($dead,1),"One peasant starves","$dead peasants starve")."</text>
 	</message>
 
 	<message name="renamed_seen">
