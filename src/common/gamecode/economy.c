@@ -931,9 +931,11 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 			while (*itmp) {
 				const herb_type * htype = resource2herb((*itmp)->type->rtype);
 				if (htype && (*itmp)->number>0) {
-					if (give_item((*itmp)->number, (*itmp)->type, u, u2, S->s)==0) continue;
-					given = true;
-				}
+          if (give_item((*itmp)->number, (*itmp)->type, u, u2, S->s)==0) {
+					  given = true;
+            continue;
+          }
+        }
 				itmp = &(*itmp)->next;
 			}
 		}
