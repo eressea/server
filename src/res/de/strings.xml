@@ -3499,9 +3499,53 @@
 			<text locale="de">Schleieraura</text>
 			<text locale="en">Veil</text>
 		</string>
+		<string name="song_of_healing">
+			<text locale="de">Lied der Heilung</text>
+			<text locale="en">Blessed Harvest</text>
+		</string>
+		<string name="song_of_fear">
+			<text locale="de">Gesang der Furcht</text>
+			<text locale="en">Song of Terror</text>
+		</string>
 		<string name="blessedharvest">
 			<text locale="de">Segen der Erde</text>
 			<text locale="en">Blessed Harvest</text>
+		</string>
+		<string name="heroic_song">
+			<text locale="de">Heldengesang</text>
+			<text locale="en">Epic Heroes</text>
+		</string>
+		<string name="analysesong_unit">
+			<text locale="de">Gesang des Lebens analysieren</text>
+			<text locale="en">Analyze Song of Life</text>
+		</string>
+		<string name="fumbleshield">
+			<text locale="de">Bannlied</text>
+			<text locale="en">Countersong</text>
+		</string>
+		<string name="transfer_aura_song">
+			<text locale="de">Gesang des Auratransfers</text>
+			<text locale="en">Hymn of Aura Sharing</text>
+		</string>
+		<string name="song_of_confusion">
+			<text locale="de">Gesang der Verwirrung</text>
+			<text locale="en">Song of Confusion</text>
+		</string>
+		<string name="blabbermouth">
+			<text locale="de">Plappermaul</text>
+			<text locale="en">Blabbermouth</text>
+		</string>
+		<string name="raindance">
+			<text locale="de">Regentanz</text>
+			<text locale="en">Rain Dance</text>
+		</string>
+		<string name="jugglery">
+			<text locale="de">Gaukeleien</text>
+			<text locale="en">Jugglery</text>
+		</string>
+		<string name="appeasement">
+			<text locale="de">Friedenslied</text>
+			<text locale="en">Appeasing Song</text>
 		</string>
 		<string name="gwyrrdearnsilver">
 			<text locale="de">Viehheilung</text>
@@ -3849,59 +3893,230 @@
 	<namespace name="spellinfo">
 		<string name="analyze_magic">
 			<text locale="de">
-			Mit diesem Spruch kann der Magier versuchen, die Verzauberungen
-			eines einzelnen angegebenen Objekts zu erkennen. Von allen Sprüchen,
-			die seine eigenen Fähigkeiten nicht überschreiten, wird er einen
-			Eindruck ihres Wirkens erhalten können. Bei stärkeren Sprüchen
+			Mit diesem Spruch kann der Magier versuchen, die
+			Verzauberungen
+			eines einzelnen angegebenen Objekts zu erkennen. Von
+			allen Sprüchen,
+			die seine eigenen Fähigkeiten nicht überschreiten, wird
+			er einen
+			Eindruck ihres Wirkens erhalten können. Bei stärkeren
+			Sprüchen
 			benötigt er ein wenig Glück für eine gelungene Analyse.
 			</text>
 			<text locale="en">
-			With this spell the mage can try to identify the enchantments of
-			a single object. He will get an impression of the operation of all
-			spells that don't exceed his own capabilities. For more powerful
+			With this spell the mage can try to identify the
+			enchantments of
+			a single object. He will get an impression of the
+			operation of all
+			spells that don't exceed his own capabilities. For more
+			powerful
 			spells he will need some luck for a successful analysis.
 			</text>
 		</string>
 		<string name="concealing_aura">
 			<text locale="de">
-			Dieser Zauber wird die gesamte Ausrüstung der Zieleinheit für
-			einige Zeit vor den Blicken anderer verschleiern. Der Zauber
+			Dieser Zauber wird die gesamte Ausrüstung der
+			Zieleinheit für
+			einige Zeit vor den Blicken anderer verschleiern. Der
+			Zauber
 			schützt nicht vor Dieben und Spionen.
 			</text>
 			<text locale="en">
-			This spell will hide the whole equipment of a target unit from the
-			looks of others. It will not protect against thieves or spies.
+			This spell will hide the whole equipment of a target
+			unit from the
+			looks of others. It will not protect against thieves or
+			spies.
 			</text>
 		</string>
 		<string name="miracle_doctor">
 			<text locale="de">
-			Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem
-			gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen alles,
-			was man sonst nicht bekommen kann. Ob nun die kryptische Formel unter dem
-			Holzschuh des untreuen Ehemannes wirklich geholfen hat - nun, der des
-			Lesens nicht mächtige Bauer wird es nie wissen.  Dem Magier hilft es
-			auf jeden Fall... beim Füllen seines Geldbeutels.  50 Silber pro Stufe
+			Wenn einem der Alchemist nicht weiterhelfen kann, geht
+			man zu dem
+			gelehrten Tybiedmagier. Seine Tränke und Tinkturen
+			helfen gegen alles,
+			was man sonst nicht bekommen kann. Ob nun die kryptische
+			Formel unter dem
+			Holzschuh des untreuen Ehemannes wirklich geholfen hat -
+			nun, der des
+			Lesens nicht mächtige Bauer wird es nie wissen.  Dem
+			Magier hilft es
+			auf jeden Fall... beim Füllen seines Geldbeutels.  50
+			Silber pro Stufe
 			lassen sich so in einer Woche verdienen.
 			</text>
 			<text locale="en">
-			If the local alchemist could not help you, you should visit a
-			scholar of Tybied. His potions and tinctures may help when nothing
-			else does. If the cryptic formula under the wooden shoes of the
-			unfaithful husband really helped? - well, the peasant, who isn't
-			capable of reading, will never know. At least it helped the mage...
-			to fill his purse. In one week he can earn 50 silver per level that way.
+			If the local alchemist could not help you, you should
+			visit a
+			scholar of Tybied. His potions and tinctures may help
+			when nothing
+			else does. If the cryptic formula under the wooden shoes
+			of the
+			unfaithful husband really helped? - well, the peasant,
+			who isn't
+			capable of reading, will never know. At least it helped
+			the mage...
+			to fill his purse. In one week he can earn 50 silver per
+			level that way.
 			</text>
 		</string>
 
-		<string name="blessedharvest">
-			<text locale="de">Dieses Ernteritual verbessert die
-			Erträge der arbeitenden Bauern in der Region um ein
-			Silberstück. Je mehr Kraft der Druide investiert, desto
-			länger wirkt der Zauber.</text>
-			<text locale="en">This harvest ritual increases the
-			income of each working peasant by one silver piece. The
-			more power the druid invests, the longer the spell
-			lasts.</text>
+		<string name="appeasement">
+			<text locale="de">Dieses Lied zähmt selbst den wildesten
+			Ork und macht ihn friedfertig und sanftmütig. Jeder
+			Gedanke, dem Sänger zu schaden, wird ihm entfallen.
+			Unbehelligt kann der Magier in eine Nachbarregion
+			ziehen.</text>
+			<text locale="en">This little melody calms even the
+			wildest orc to a gentle and serene creature who will not
+			even think about putting the singer to harm. The mage
+			may travel to a neighboring region without being
+			harassed by annoying troublemakers.</text>
+		</string>
+		<string name="song_of_healing">
+			<text locale="de">Nicht nur der Feldscher kann den
+			Verwundeten einer Schlacht helfen. Die Barden kennen
+			verschiedene Lieder, die die Selbstheilungskräfte des
+			Körpers unterstützen. Dieses Lied vermag Wunden zu
+			schließen, gebrochene Knochen zu richten und selbst
+			abgetrennte Glieder wieder zu regenerieren.</text>
+			<text locale="en">The field medic isn't the only one
+			capable of tending the wounds of battle. The bards know
+			a number of magic melodies to enhance the natural
+			healing process of the body. This song is able to close
+			wounds, mend fractured bones and even regenerate lost
+			lims. </text>
+		</string>
+		<string name="raindance">
+			<text locale="de">Dieses uralte Tanzritual ruft die
+			Kräfte des Lebens und der Fruchtbarkeit. Die Erträge der
+			Bauern werden für einige Wochen deutlich besser
+			ausfallen.</text>
+			<text locale="en">This ancient rite calls upon the
+			forces of life and fertility. For the next few weeks,
+			the peasant's harvest will be extraordinary good.</text>
+		</string>
+		<string name="song_of_fear">
+			<text locale="de">Ein gar machtvoller Gesang aus den
+			Überlieferungen der Katzen, der tief in die Herzen der
+			Feinde dringt und ihnen Mut und Hoffnung raubt. Furcht
+			wird sie zittern lassen und Panik ihre Gedanken
+			beherrschen. Voller Angst werden sie versuchen, den
+			gräßlichen Gesängen zu entrinnen und fliehen.</text>
+			<text locale="en">This antique, powerful song, passed
+			down by the cats, will penetrate the hearts of the enemy
+			and bereave them of courage and hope. Both their minds
+			and bodies will be ruled by panic. Shivering with fear,
+			they will flee from the dreadful chants and try to make
+			their escape.</text>
+		</string>
+		<string name="song_of_confusion">
+			<text locale="de">Aus den uralten Gesängen der Katzen
+			entstammt dieses magisches Lied, welches vor einem
+			Kampfe eingesetzt, einem entscheidende strategische
+			Vorteile bringen kann. Wer unter den Einfluss dieses
+			Gesangs gelangt, der wird seiner Umgebung nicht achtend
+			der Melodie folgen, sein Geist wird verwirrt und
+			sprunghaft plötzlichen Eingebungen nachgeben. So sollen
+			schon einst wohlgeordnete Heere plötzlich ihre Schützen
+			weit vorne und ihre Kavallerie bei den Lagerwachen
+			kartenspielend wiedergefunden haben (oder ihren Anführer
+			schlafend im lange verlassenen Lager, wie es in den
+			Großen Kriegen der Alten Welt wirklich geschehen sein
+			soll).</text>
+			<text locale="en">If is used before battle, this chant,
+			taken from the ancient tunes of the cats, might give you
+			the critical tactical advantage. Those under the spell's
+			influence will act uncoordinated and inconsequent due to
+			the nonsensical ideas planted into their minds through
+			the melody. So it is supposed to have come to pass that
+			well-organized armies found their archers up at the
+			front (while the cavalry was back at the camp playing
+			cards) or that even a famous general overslept a battle
+			in his tent, as tale-tellers claim it really happened
+			during the Great Wars in the Old World. </text>
+		</string>
+		<string name="heroic_song">
+			<text locale="de">Dieser alte Schlachtengesang hebt die
+			Moral der eigenen Truppen und und hilft ihnen auch der
+			angsteinflößenden Aura dämonischer und untoter Wesen zu
+			widerstehen. Ein derartig gefestigter Krieger wird auch
+			in schwierigen Situationen nicht die Flucht ergreifen
+			und sein überlegtes Verhalten wird ihm manch Vorteil in
+			der Verteidigung geben.</text>
+			<text locale="en"></text>
+		</string>
+		<string name="transfer_aura_song">
+			<text locale="de">Mit Hilfe dieses Zaubers kann der
+			Magier eigene Aura im Verhältnis 2:1 auf einen anderen
+			Magier des gleichen Magiegebietes übertragen.</text>
+			<text locale="en">This spell enables the wizard to
+			transfer aura at a rate of 2:1 to another sorcerer of
+			the same school of magic.</text>
+		</string>
+		<string name="analysesong_unit">
+			<text locale="de">Alle lebenden Wesen haben ein eigenes
+			individuelles Lebenslied. Nicht zwei Lieder gleichen
+			sich, auch wenn sich alle Lieder einer Art ähneln. Jeder
+			Zauber verändert dieses Lied auf die eine oder andere
+			Art und gibt sich damit zu erkennen. Dieser Gesang
+			hilft, jene Veränderungen im Lebenslied einer Person zu
+			erlauschen, welche magischer Natur sind. Alle
+			Verzauberungen, die nicht stärker maskiert sind als Eure
+			Fähigkeit, werdet Ihr so entschlüsseln und demaskieren
+			können.</text>
+			<text locale="en">Each and every living being has its
+			own, individual 'life-song'. No two of these songs are
+			alike, even though songs of creatures of the same
+			species are similar. Every spell alters this song of
+			life in one way or the other and this can be identified.
+			By casting this spell, the bard can detect all those
+			magic variations in a person's 'life-song'. You will be
+			able to decipher all enchantments or spells, which
+			aren't disguised beyond your capability.</text>
+		</string>
+		<string name="fumbleshield">
+			<text locale="de">Dieser schrille Gesang hallt über das
+			ganze Schlachtfeld. Die besonderen Dissonanzen in den
+			Melodien machen es Magier fast unmöglich, sich auf ihre
+			Zauber zu konzentrieren.</text>
+			<text locale="en">The screeching sounds of this melody
+			can be heard across the whole battlefield. Wizards
+			exposed to these special dissonances find it nearly
+			impossible to concentrate on their spells.</text>
+		</string>
+		<string name="blabbermouth">
+			<text locale="de">Die verzauberte Einheit beginnt
+			hemmungslos zu plappern und erzählt welche Talente sie
+			kann, was für Gegenstände sie mit sich führt und sollte
+			sie magisch begabt sein, sogar welche Zauber sie
+			beherrscht. Leider beeinflußt dieser Zauber nicht das
+			Gedächnis, und so wird sie sich im nachhinein wohl
+			bewußt werden, dass sie zuviel erzählt hat.</text>
+			<text locale="en">The persons of the bewitched unit
+			starts to babble without control about what it is said,
+			speaking about their talents, the objects they carry or
+			wear and if the unit is a mage, he or she will even list
+			the spells they know. Unfortunately, this spell does not
+			influence the memory of the subjects and afterwards, the
+			enchanted will realize that they probably talked too
+			much.</text>
+		</string>
+		<string name="jugglery">
+			<text locale="de">Cerddormagier sind _die_ Gaukler unter
+			den Magiern, sie lieben es das Volk zu unterhalten und
+			im Mittelpunkt zu stehen. Schon Anfänger lernen die
+			kleinen Kunststücke und magischen Tricks, mit denen man
+			das Volk locken und verführen kann, den Geldbeutel ganz
+			weit zu öffnen, und am Ende der Woche wird der Gaukler
+			50 Silber pro Stufe verdient haben.</text>
+			<text locale="en">The mages of Cerddor truly are the
+			bards of the wizards; they love to use their sorcery to
+			entertain the crowds and to be the center of attention.
+			Even the apprentices study those little magic tricks,
+			which attract and fascinate the people and thus ensnare
+			them into leaving a few coins or more for the artist. By
+			the end of the week, the bard will have earned 50 silver
+			per level. </text>
 		</string>
 		<string name="gwyrrdearnsilver">
 			<text locale="de">Die Fähigkeiten der Gwyrrd-Magier in
@@ -4113,7 +4328,8 @@
 			</text>
 			<text locale="en">Combat medics are not the only ones
 				who can help those who got injured during a
-				battle. Druids are, with the help of a summons of
+				battle. Druids are, with the help of a summons
+				of
 				the Elemental Spirits Of Life, able to heal
 				wounds, mend broken bones or even regenerate
 				separated limbs as well.
@@ -4151,7 +4367,7 @@
 				anderen Magier des gleichen Magiegebietes
 				übertragen.
 			</text>
-			<text locale="en">The caster can transfer mana at a
+			<text locale="en">The caster can transfer aura at a
 				ratio of 2:1 to another member of the same
 				school of magic with the help of this spell.
 			</text>
@@ -4600,7 +4816,7 @@
 				übertragen.
 			</text>
 			<text locale="en">With the help of this spell, the
-				caster can transfer mana at a ratio of 2:1 to
+				caster can transfer aura at a ratio of 2:1 to
 				another member of the same school of magic.
 			</text>
 		</string>
@@ -4707,7 +4923,7 @@
 				chaossorcerer causes a deep rift to appear in
 				the astral balance that will tear all magical
 				power from a region. All spellcasters in that
-				region will lose most of their mana.
+				region will lose most of their aura.
 			</text>
 		</string>
 		<string name="draigfumbleshield">
@@ -4980,14 +5196,16 @@
 				einen anderen Traumweber übertragen.
 			</text>
 			<text locale="en">With the help of this spell the
-				mentalist can transfer mana at a ratio of 2:1 to
+				mentalist can transfer aura at a ratio of 2:1 to
 				another mentalist.
 			</text>
 		</string>
 		<string name="shapeshift">
 			<text locale="de">Mit Hilfe dieses arkanen Rituals
-				vermag der Traumweber die wahre Gestalt einer Gruppe
-				zu verschleiern. Unbedarften Beobachtern erscheint
+				vermag der Traumweber die wahre Gestalt einer
+				Gruppe
+				zu verschleiern. Unbedarften Beobachtern
+				erscheint
 				sie dann als einer anderen Rasse zugehörig.
 			</text>
 			<text locale="en">With the help of this ritual the
@@ -5145,37 +5363,40 @@
 		</string>
 		<string name="illaundestroymagic">
 			<text locale="de">Dieser Zauber ermöglicht es dem
-				Traumweber die natürlichen und aufgezwungenen
-				Traumbilder einer Person, eines Gebäudes,
-				Schiffes oder einer Region zu unterscheiden und
-				diese zu entwirren.
-			</text>
+			Traumweber die natürlichen und aufgezwungenen
+			Traumbilder einer Person, eines Gebäudes,
+			Schiffes oder einer Region zu unterscheiden und
+			diese zu entwirren.</text>
 			<text locale="en">This spell allows the mentalist to
-				distinguish between the natural and unnatural
-				dreams of a person, a ship, a building or a
-				region and remove those that are of magical
-				origin. </text>
+			distinguish between the natural and unnatural
+			dreams of a person, a ship, a building or a
+			region and remove those that are of magical
+			origin.</text>
 		</string>
 		<string name="courting">
 			<text locale="de">Aus 'Die Gesänge der Alten' von
 			Firudin dem Weisen: 'Diese verführerische kleine Melodie
-			und einige einschmeichelnde Worte überwinden das Misstrauen
-			der Bauern im Nu. Begeistert werden sie sich Euch anschliessen
-			und selbst Haus und Hof in Stich lassen.'</text>
+			und einige einschmeichelnde Worte überwinden das
+			Misstrauen der Bauern im Nu. Begeistert werden sie sich
+			Euch anschliessen und selbst Haus und Hof in Stich
+			lassen.'</text>
 			<text locale="en">From the 'Songs of the Elder' by
 			Firudin the Sage: 'This enticing little melody and its
-			ingratiating words will lure the peasants in no time. They will
-			leave home and hearth to follow your lead.'</text>
+			ingratiating words will lure the peasants in no time.
+			They will leave home and hearth to follow your lead.'
+			</text>
 		</string>
 		<string name="generous">
-			<text locale="de">Dieser fröhliche Gesang wird sich wie ein
-			Gerücht in der Region ausbreiten und alle Welt in Feierlaune
-			versetzten. Überall werden Tavernen und Theater gut gefüllt
-			sein und selbst die Bettler satt werden.</text>
-			<text locale="en">This joyous song will spread like wildfire
-			throughout the region and cause festive spirits in all the
-			population. All the taverns and theaters will be packed to the
-			brim and even the beggars will not go hungry.</text>
+			<text locale="de">Dieser fröhliche Gesang wird sich wie
+			ein Gerücht in der Region ausbreiten und alle Welt in
+			Feierlaune versetzten. Überall werden Tavernen und
+			Theater gut gefüllt sein und selbst die Bettler satt
+			werden.</text>
+			<text locale="en">This joyous song will spread like
+			wildfire throughout the region and cause festive spirits
+			in all the population. All the taverns and theaters will
+			be packed to the brim and even the beggars will not go
+			hungry.</text>
 		</string>
 		<string name="illaunfamiliar">
 			<text locale="de">Einem erfahrenen Magier wird
@@ -5417,13 +5638,17 @@
 	</string>
 
 	<string name="nr_calendar">
-		<text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s.</text>
-		<text locale="en">It is %s of the month of %s in the %d. year of %s.</text>
+		<text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s.
+		</text>
+		<text locale="en">It is %s of the month of %s in the %d. year of
+		%s.</text>
 	</string>
 
 	<string name="nr_calendar_season">
-		<text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s. Es ist %s.</text>
-		<text locale="en">It is %s of the month of %s in the %d. year of %s. It is %s.</text>
+		<text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s.
+		Es ist %s.</text>
+		<text locale="en">It is %s of the month of %s in the %d. year of
+		%s. It is %s.</text>
 	</string>
 
 	<string name="status_aggressive">
@@ -5472,3 +5697,18 @@
 	</string>
 
 </strings>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

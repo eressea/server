@@ -8937,12 +8937,7 @@ spell spelldaten[] =
 
 /* M_BARDE */
 
-	{SPL_DENYATTACK, "Friedenslied",
-	 "Dieses Lied zähmt selbst den wildesten Ork und macht ihn friedfertig "
-	 "und sanftmütig. Jeder Gedanke, dem Sänger zu schaden, wird ihm "
-	 "entfallen. Unbehelligt kann der Magier in eine Nachbarregion ziehen.",
-		NULL,
-		NULL,
+	{SPL_DENYATTACK, "appeasement", NULL, NULL, NULL,
 	 M_BARDE, (PRECOMBATSPELL | SPELLLEVEL ), 5, 1,
 	 {
 			{R_AURA, 2, SPC_FIX},
@@ -8953,14 +8948,7 @@ spell spelldaten[] =
 	 (spell_f)sp_denyattack, patzer
 	},
 
-	{SPL_CERDDOR_EARN_SILVER, "Gaukeleien",
-	"Cerddormagier sind _die_ Gaukler unter den Magiern, sie lieben es das "
-	"Volk zu unterhalten und im Mittelpunkt zu stehen. Schon Anfänger lernen "
-	"die kleinen Kunststücke und magischen Tricks, mit denen man das Volk "
-	"locken und verführen kann, den Geldbeutel ganz weit zu öffnen, und "
-	"am Ende der Woche wird der Gaukler 50 Silber pro Stufe verdient haben.",
-		NULL,
-		NULL,
+	{SPL_CERDDOR_EARN_SILVER, "jugglery", NULL,	NULL, NULL,
 	 M_BARDE, (SPELLLEVEL|ONSHIPCAST), 5, 1,
 	 {
 			{R_AURA, 1, SPC_LEVEL},
@@ -8971,14 +8959,7 @@ spell spelldaten[] =
 	 (spell_f)sp_earn_silver, patzer
 	},
 
-	{SPL_HEALINGSONG, "Lied der Heilung",
-		"Nicht nur der Feldscher kann den Verwundeten einer Schlacht helfen. "
-		"Die Barden kennen verschiedene Lieder, die die Selbstheilungskräfte "
-		"des Körpers unterstützen. Dieses Lied vermag Wunden zu schließen, "
-		"gebrochene Knochen zu richten und selbst abgetrennte Glieder wieder "
-		"zu regenerieren.",
-		NULL,
-		NULL,
+	{SPL_HEALINGSONG, "song_of_healing", NULL, NULL, NULL,
 	 M_BARDE, (POSTCOMBATSPELL | SPELLLEVEL), 5, 2,
 	 {
 			{R_AURA, 1, SPC_LEVEL},
@@ -8989,9 +8970,7 @@ spell spelldaten[] =
 	 (spell_f)sp_healing, patzer
 	},
 
-	{SPL_GENEROUS, "generous", NULL,
-		NULL,
-		NULL,
+	{SPL_GENEROUS, "generous", NULL, NULL, NULL,
 		M_BARDE,
 		(FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL | TESTRESISTANCE),
 		5, 2,
@@ -9004,12 +8983,7 @@ spell spelldaten[] =
 	 (spell_f)sp_generous, patzer
 	},
 
-	{SPL_RAINDANCE, "Regentanz",
-		"Dieses uralte Tanzritual ruft die Kräfte des Lebens und der "
-		"Fruchtbarkeit. Die Erträge der Bauern werden für einige Wochen deutlich "
-		"besser ausfallen.",
-		NULL,
-		NULL,
+	{SPL_RAINDANCE, "raindance", NULL, NULL, NULL,
 		M_BARDE,
 		(FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL),
 		5, 3,
@@ -9022,14 +8996,7 @@ spell spelldaten[] =
 	 (spell_f)sp_blessedharvest, patzer
 	},
 
-	{SPL_SONG_OF_FEAR, "Gesang der Furcht",
-		"Ein gar machtvoller Gesang aus den Überlieferungen der Katzen, der "
-		"tief in die Herzen der Feinde dringt und ihnen Mut und Hoffnung "
-		"raubt. Furcht wird sie zittern lassen und Panik ihre Gedanken "
-		"beherrschen. Voller Angst werden sie versuchen, den gräßlichen "
-		"Gesängen zu entrinnen und fliehen.",
-		NULL,
-		NULL,
+	{SPL_SONG_OF_FEAR, "song_of_fear", NULL, NULL, NULL,
 		M_BARDE, (COMBATSPELL | SPELLLEVEL), 5, 3,
 		{
 			{R_AURA, 1, SPC_LEVEL},
@@ -9053,19 +9020,7 @@ spell spelldaten[] =
 	 (spell_f)sp_recruit, patzer
 	},
 
-	{SPL_SONG_OF_CONFUSION, "Gesang der Verwirrung",
-		"Aus den uralten Gesängen der Katzen entstammt dieses magisches Lied, "
-		"welches vor einem Kampfe eingesetzt, einem entscheidende strategische "
-		"Vorteile bringen kann. Wer unter den Einfluss dieses Gesangs gelangt, "
-		"der wird seiner Umgebung nicht achtend der Melodie folgen, sein Geist "
-		"wird verwirrt und sprunghaft plötzlichen Eingebungen nachgeben. So "
-		"sollen schon einst wohlgeordnete Heere plötzlich ihre Schützen "
-		"weit vorne und ihre Kavallerie bei den Lagerwachen kartenspielend "
-		"wiedergefunden haben (oder ihren Anführer schlafend im lange "
-		"verlassenen Lager, wie es in den Großen Kriegen der Alten Welt "
-		"wirklich geschehen sein soll).",
-		NULL,
-		NULL,
+	{SPL_SONG_OF_CONFUSION, "song_of_confusion", NULL, NULL, NULL,
 		M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
 		{
 			{R_AURA, 2, SPC_LEVEL},
@@ -9076,15 +9031,7 @@ spell spelldaten[] =
 			(spell_f)sp_chaosrow, patzer
 	},
 
-	{SPL_BABBLER, "Plappermaul",
-		"Die verzauberte Einheit beginnt hemmungslos zu plappern und "
-		"erzählt welche Talente sie kann, was für Gegenstände sie mit sich "
-		"führt und sollte sie magisch begabt sein, sogar welche Zauber "
-		"sie beherrscht. Leider beeinflußt dieser Zauber nicht das Gedächnis, "
-		"und so wird sie sich im nachhinein wohl bewußt werden, dass sie "
-		"zuviel erzählt hat.",
-		NULL,
-		"u",
+	{SPL_BABBLER, "blabbermouth", NULL,	NULL, "u",
 	 M_BARDE, (UNITSPELL | ONETARGET | TESTCANSEE), 5, 4,
 	 {
 			{R_AURA, 10, SPC_FIX},
@@ -9095,14 +9042,7 @@ spell spelldaten[] =
 	 (spell_f)sp_babbler, patzer
 	},
 
-	{SPL_HERO, "Heldengesang",
-		"Dieser alte Schlachtengesang hebt die Moral der eigenen Truppen "
-		"und und hilft ihnen auch der angsteinflößenden Aura dämonischer und "
-		"untoter Wesen zu widerstehen. Ein derartig gefestigter Krieger wird "
-		"auch in schwierigen Situationen nicht die Flucht ergreifen und sein "
-		"überlegtes Verhalten wird ihm manch Vorteil in der Verteidigung geben.",
-		NULL,
-		NULL,
+	{SPL_HERO, "heroic_song", NULL, NULL, NULL,
 	 M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 4, 5,
 	 {
 			{R_AURA, 2, SPC_LEVEL},
@@ -9113,10 +9053,7 @@ spell spelldaten[] =
 	 (spell_f)sp_hero, patzer
 	},
 
-	{SPL_TRANSFERAURA_BARDE, "Gesang des Auratransfers",
-	 "Mit Hilfe dieses Zaubers kann der Magier eigene Aura im Verhältnis "
-	 "2:1 auf einen anderen Magier des gleichen Magiegebietes übertragen.",
-		"ZAUBERE \"Gesang des Auratransfers\" <Einheit-Nr> <investierte Aura>",
+	{SPL_TRANSFERAURA_BARDE, "transfer_aura_song", NULL, NULL,
 		"ui",
 	 M_BARDE, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 5,
 	 {
@@ -9128,16 +9065,7 @@ spell spelldaten[] =
 	 (spell_f)sp_transferaura, patzer
 	},
 
-	{SPL_UNIT_ANALYSESONG, "Gesang des Lebens analysieren",
-		"Alle lebenden Wesen haben ein eigenes individuelles Lebenslied. "
-		"Nicht zwei Lieder gleichen sich, auch wenn sich alle Lieder einer "
-		"Art ähneln. Jeder Zauber verändert dieses Lied auf die eine oder "
-		"andere Art und gibt sich damit zu erkennen. Dieser Gesang hilft, "
-		"jene Veränderungen im Lebenslied einer Person zu erlauschen, "
-		"welche magischer Natur sind. Alle Verzauberungen, die nicht stärker "
-		"maskiert sind als Eure Fähigkeit, werdet Ihr so entschlüsseln und "
-		"demaskieren können.",
-		NULL,
+	{SPL_UNIT_ANALYSESONG, "Gesang des Lebens analysieren", NULL, NULL,
 		"u",
 		M_BARDE,
 		(UNITSPELL | ONSHIPCAST | ONETARGET | TESTCANSEE),
@@ -9151,12 +9079,7 @@ spell spelldaten[] =
 	 (spell_f)sp_analysesong_unit, patzer
 	},
 
-	{SPL_CERRDOR_FUMBLESHIELD, "Bannlied",
-		"Dieser schrille Gesang hallt über das ganze Schlachtfeld. Die besonderen "
-		"Dissonanzen in den Melodien machen es Magier fast unmöglich, sich "
-		"auf ihre Zauber zu konzentrieren.",
-		NULL,
-		NULL,
+	{SPL_CERRDOR_FUMBLESHIELD, "fumbleshield", NULL, NULL, NULL,
 	 M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 2, 5,
 	 {
 			{R_AURA, 5, SPC_LEVEL},
