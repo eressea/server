@@ -195,7 +195,7 @@ extern void read_laen(struct region * r, int laen);
 
 /* NEWMAIL benutzt ein spezielles Skript zum Erstellen der Reportmails */
 #define MAIL				"eresseamail"
-#define MAILITPATH	"/usr/sbin:/home/eressea/bin:/bin:/usr/bin:/usr/local/bin"
+#define MAILITPATH	"/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"
 
 #define DEFAULT_LOCALE "de"
 
