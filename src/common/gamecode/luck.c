@@ -53,7 +53,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-const int STANDARD_LUCK = 2;
+const int STANDARD_LUCK = 0;
 
 extern struct item_type *i_silver;
 
@@ -64,7 +64,7 @@ lucky_silver(const unit *u)
 	int luck = fspecial(u->faction, FS_LUCKY);
 
 	do {
-		r = 1000 + rand()%(10000*luck);
+		r = 1 + rand()%(10000*(luck+STANDARD_LUCK));
 		if(r > max) max = r;
 		i++;
 	} while(i <= luck);
