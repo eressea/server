@@ -3249,7 +3249,7 @@ sp_unholypower(castorder *co)
 
 		if(u->number <= n) {
 			n -= u->number;
-			u->race = target_race;
+			u->race = u->irace = target_race;
 			u->hp = unit_max_hp(u)*u->number - wounds;
 			add_message(&co->rt->msgs, msg_message("unholypower_effect",
 				"mage target race", mage, u, target_race));
