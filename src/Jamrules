@@ -1,3 +1,6 @@
+C++ = g++ ;
+CC = gcc ;
+
 if ! $(DISTCC_HOSTS) {
 } else {
   CC = distcc $(CC) ;

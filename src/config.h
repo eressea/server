@@ -45,13 +45,6 @@
 # include <dmalloc.h>
 #endif
 
-#if defined(__GNUC__)
-# include <stdbool.h>
-# define HAS_BOOLEAN
-typedef int boolean;
-/* # define boolean bool */
-#endif
-
 #if defined(_DEBUG) && defined(_MSC_VER)
 # ifndef MALLOCDBG
 #  define MALLOCDBG 1

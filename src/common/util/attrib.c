@@ -98,7 +98,8 @@ a_findc(const attrib * a, const attrib_type * at)
 }
 
 attrib *
-a_add(attrib ** pa, attrib * a) {
+a_add(attrib ** pa, attrib * a) 
+{
 	attrib ** find = pa;
 	assert(a->next==NULL && a->nexttype==NULL);
 	while (*find && (*find)->type!=a->type) find = &(*find)->next;

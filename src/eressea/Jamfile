@@ -27,7 +27,7 @@ if $(HAVE_LUA) {
   server.cpp
   ;
 
- LINKLIBS on $(BINARY) += -llua50 -llualib50 ;
+ LINKLIBS on $(BINARY) += -L$(LUABIND_ROOT)/lib -llua50 -llualib50 ;
  LINKLIBS on $(BINARY) += -lluabind ;
  LINKLIBS on $(BINARY) += -ldl -lstdc++ ;
 } else {
