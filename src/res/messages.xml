@@ -5721,13 +5721,13 @@
     <text locale="de">"$unit($unit) versucht $spell($spell) zu zaubern, doch der Zauber schlägt fehl!"</text>
     <text locale="en">"$unit($unit) tries to cast $spell($spell), but the spell fails!"</text>
   </message>
-  <message name="battle::row_header" section="battle">
+  <message name="battle::aborted" section="battle">
     <type>
     </type>
     <text locale="de">"Der Kampf wurde abgebrochen, da alle Verteidiger flohen."</text>
     <text locale="en">"The battle was aborted because all enemies escaped."</text>
   </message>
-  <message name="battle::aborted" section="battle">
+  <message name="battle::row_header" section="battle">
     <type>
       <arg name="row" type="int"/>
     </type>

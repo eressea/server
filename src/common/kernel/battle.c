@@ -1718,6 +1718,7 @@ getreload(troop at)
 	return at.fighter->person[at.index].reload;
 }
 
+#ifdef SMALL_BATTLE_MESSAGES
 static char *
 attack_message(const troop at, const troop dt, const weapon * wp, int dist)
 {
@@ -1756,6 +1757,7 @@ attack_message(const troop at, const troop dt, const weapon * wp, int dist)
 
 	return smallbuf;
 }
+#endif
 
 int
 hits(troop at, troop dt, weapon * awp)
@@ -2731,9 +2733,9 @@ print_stats(battle * b)
           unit *u = tf->unit;
           message * m = NULL;
           if (!fval(tf, FIG_ATTACKED)) {
-            msg_message("battle::tactics_lost", "unit", u);
+            m = msg_message("battle::tactics_lost", "unit", u);
           } else {
-            msg_message("battle::tactics_won", "unit", u);
+            m = msg_message("battle::tactics_won", "unit", u);
           }
           message_all(b, m);
           msg_release(m);
