@@ -186,6 +186,8 @@ season(int turn)
 	year  = t/(months_per_year * weeks_per_month) + 1;
 	month = (t - (year-1) * months_per_year * weeks_per_month)/weeks_per_month;
 
+	assert(month >= 0 && month < months_per_year);
+
 	return month_season[month];
 }
 

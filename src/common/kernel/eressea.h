@@ -1178,7 +1178,11 @@ extern void reorder_owners(struct region * r);
 
 extern const char *localenames[];
 
-#define FIRST_TURN 184
+/* FIRST_TURN is only used in eressea */
+
+#ifndef FIRST_TURN
+#define FIRST_TURN 0
+#endif
 
 #include <log.h>
 
