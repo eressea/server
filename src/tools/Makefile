@@ -1,5 +1,4 @@
-include $(ERESSEA)/Makefile.include
 
-echeck:
-	$(CC) $(CFLAGS) $(LDFLAGS) -o echeck echeck.c
+namegen:
+	$(CC) -I.. -I../common/kernel -I../common/util $(CFLAGS) $(LDFLAGS) -o namegen namegen.c
 
