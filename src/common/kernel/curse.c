@@ -780,7 +780,7 @@ static struct curse_type ct_farvision = { "farvision",
 static struct curse_type ct_gbdream = { "gbdream",
 	CURSETYP_NORM, 0, (NO_MERGE),
 	"",
-	cinfo_dreamcurse
+	cinfo_region
 };
 static struct curse_type ct_auraboost = { "auraboost",
 	CURSETYP_NORM, CURSE_SPREADMODULO, (NO_MERGE),
@@ -993,8 +993,8 @@ static struct curse_type ct_sparkle = { "sparkle",
 static struct curse_type ct_skillmod = { "skillmod",
 	CURSETYP_NORM, CURSE_SPREADMODULO, M_MEN,
 	"",
-	cinfo_skill,
-	NULL, NULL,
+	cinfo_unit,
+	NULL,
 	read_skill, write_skill
 };
 
@@ -1007,7 +1007,6 @@ resolve_curse(void * id)
 void
 register_curses(void)
 {
-	int i;
 	ct_register(&ct_fogtrap);
 	ct_register(&ct_antimagiczone);
 	ct_register(&ct_farvision);

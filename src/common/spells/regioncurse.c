@@ -24,15 +24,15 @@
 
 /* util includes */
 #include <message.h>
+#include <functions.h>
 
 /* libc includes */
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 
-
-static int
-cinfo_region(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+int
+cinfo_region(const struct locale * lang, const void * obj, enum typ_t typ, struct curse *c, int self)
 {
 	message * msg;
 
@@ -114,7 +114,11 @@ cinfo_magicstreet(const locale * lang,void * obj, typ_t typ, curse *c, int self)
 	return 1;
 }
 
-void register_regioncurse(void)
+void 
+register_regioncurse(void)
 {
+	register_function((pf_generic)cinfo_cursed_by_the_gods, "curseinfo::cursed_by_the_gods");
+	register_function((pf_generic)cinfo_dreamcurse, "curseinfo::dreamcurse");
+	register_function((pf_generic)cinfo_magicstreet, "curseinfo::magicstreet");
 }
 

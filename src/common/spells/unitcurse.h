@@ -33,7 +33,9 @@ int cinfo_skill(void *, enum typ_t, struct curse *, int);
 int cinfo_itemcloak(void *, enum typ_t, struct curse *, int);
 int cinfo_fumble(void *, enum typ_t, struct curse *, int);
 */
-
+struct curse;
+struct locale;
+extern int cinfo_unit(const struct locale * lang, const void * obj, enum typ_t typ, struct curse *c, int self);
 extern void register_unitcurse(void);
 
 #endif /* _UCURSE_H */

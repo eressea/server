@@ -208,8 +208,6 @@ typedef struct curse_unit {
 
 /* ------------------------------------------------------------- */
 
-typedef int (*cdesc_fun)(const locale *, const void*, int, curse*, int);
-
 typedef struct curse_type {
 	const char *cname; /* Name der Zauberwirkung, Identifizierung des curse */
 	int typ;
@@ -217,7 +215,7 @@ typedef struct curse_type {
 	unsigned int mergeflags;
 	const char *info_str;  /* Wirkung des curse, wird bei einer gelungenen
 								 Zauberanalyse angezeigt */
-	int (*curseinfo)(const locale*, const void*, int, curse*, int);
+	int (*curseinfo)(const struct locale*, const void*, int, curse*, int);
 	void (*change_vigour)(curse*, int);
 	int (*read)(FILE * F, curse * c);
 	int (*write)(FILE * F, const curse * c);
