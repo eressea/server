@@ -14,4 +14,4 @@
 
 extern struct item_type it_skillpotion;
 extern struct item_type it_astralcrystal;
-extern void init_xerewards(void);
+extern void register_xerewards(void);

@@ -40,8 +40,8 @@ typedef struct party {
 	struct strlist *botschaften;
 	int n;
 	int wants;
-	race_t race;
-	race_t irace;
+	struct race * race;
+	struct race * irace;
 	char *thisorder;
 	char *lastorder;
 	struct item * items;
@@ -106,8 +106,8 @@ typedef struct unit {
 								 * * gearbeitet worden. */
 #endif
 	status_t status;
-	race_t race;
-	race_t irace;
+	const struct race * race;
+	const struct race * irace;
 	int n;	/* enno: attribut? */
 	int wants;	/* enno: attribut? */
 } unit;
@@ -138,7 +138,7 @@ void usettarget(struct unit * u, const struct unit * b);
 struct unit * utarget(const struct unit * u);
 void usettarget(struct unit * u, const struct unit * b);
 
-extern const struct race_type * urace(const struct unit * u);
+extern const struct race * urace(const struct unit * u);
 
 const char* uprivate(const struct unit * u);
 void usetprivate(struct unit * u, const char * c);

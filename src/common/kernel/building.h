@@ -43,7 +43,7 @@ typedef struct building_type {
 	const struct maintenance * maintenance; /* array of requirements */
 	const struct construction * construction; /* construction of 1 building-level */
 
-	const char * (*name)(int, const struct locale *);
+	const char * (*name)(int size);
 	struct attrib * attribs;
 } building_type;
 
@@ -69,6 +69,8 @@ extern struct building_typelist *buildingtypes;
 #define BFL_NONE           0x00
 #define BLD_MAINTAINED     0x01 /* vital maintenance paid for */
 #define BLD_WORKING        0x02 /* full maintenance paid, it works */
+#define BLD_UNGUARDED      0x04 /* you can enter this building anytime */
+
 #define BLD_SAVEMASK       0x00 /* mask for persistent flags */
 
 typedef struct building {
@@ -88,7 +90,7 @@ typedef struct building {
 } building;
 
 extern attrib_type at_building_generic_type;
-extern const char * buildingtype(const struct building * b, int bsize, const struct locale * language);
+extern const char * buildingtype(const struct building * b, int bsize);
 extern const char * buildingname(const struct building * b);
 extern int buildingmaintenance(const building * b, resource_t rtype);
 extern int buildingcapacity(const struct building * b);

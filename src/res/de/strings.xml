@@ -1,0 +1,1064 @@
+<comment>
+	_d: dativ (wir erklären allen /Trollen/ den Krieg)
+	_p: plural (13 /Trolle/)
+	_x: preposition (15 /Troll/schwerter)
+</comment>
+
+<strings>
+	<namespace name="race">
+		<string name="clone">
+			<text locale="de">Klon</text>
+			<text locale="en">clone</text>
+		</string>
+		<string name="clone_p">
+			<text locale="de">Klone</text>
+			<text locale="en">clones</text>
+		</string>
+		<string name="clone_d">
+			<text locale="de">Klonen</text>
+			<text locale="en">clones</text>
+		</string>
+		<string name="clone_x">
+			<text locale="de">Klonen</text>
+			<text locale="en">clone</text>
+		</string>
+
+		<string name="template">
+			<text locale="de">Schablone</text>
+			<text locale="en">template</text>
+		</string>
+		<string name="template_p">
+			<text locale="de">Schablonen</text>
+			<text locale="en">templates</text>
+		</string>
+		<string name="template_d">
+			<text locale="de">Schablonen</text>
+			<text locale="en">templates</text>
+		</string>
+		<string name="template_x">
+			<text locale="de">Schablonen</text>
+			<text locale="en">template</text>
+		</string>
+
+		<string name="gnome">
+			<text locale="de">Gnom</text>
+			<text locale="en">gnome</text>
+		</string>
+		<string name="gnome_p">
+			<text locale="de">Gnome</text>
+			<text locale="en">gnomes</text>
+		</string>
+		<string name="gnome_d">
+			<text locale="de">Gnomen</text>
+			<text locale="en">gnomes</text>
+		</string>
+		<string name="gnome_x">
+			<text locale="de">Gnomen</text>
+			<text locale="en">gnome</text>
+		</string>
+
+		<string name="museumghost">
+			<text locale="de">Museumsgeist</text>
+			<text locale="en">museumghost</text>
+		</string>
+		<string name="museumghost_p">
+			<text locale="de">Museumsgeister</text>
+			<text locale="en">museumghosts</text>
+		</string>
+		<string name="museumghost_d">
+			<text locale="de">Museumsgeistern</text>
+			<text locale="en">museumghosts</text>
+		</string>
+		<string name="museumghost_x">
+			<text locale="de">Museumsgeister</text>
+			<text locale="en">museumghost</text>
+		</string>
+
+		<string name="ghast">
+			<text locale="de">Ghast</text>
+			<text locale="en">ghast</text>
+		</string>
+		<string name="ghast_p">
+			<text locale="de">Ghaste</text>
+			<text locale="en">ghasts</text>
+		</string>
+		<string name="ghast_d">
+			<text locale="de">Ghasten</text>
+			<text locale="en">ghasts</text>
+		</string>
+		<string name="ghast_x">
+			<text locale="de">Ghast</text>
+			<text locale="en">ghast</text>
+		</string>
+
+		<string name="ghoul">
+			<text locale="de">Ghoul</text>
+			<text locale="en">ghoul</text>
+		</string>
+		<string name="ghoul_p">
+			<text locale="de">Ghoule</text>
+			<text locale="en">ghouls</text>
+		</string>
+		<string name="ghoul_d">
+			<text locale="de">Ghoulen</text>
+			<text locale="en">ghouls</text>
+		</string>
+		<string name="ghoul_x">
+			<text locale="de">Ghoul</text>
+			<text locale="en">ghoul</text>
+		</string>
+
+		<string name="juju-zombie">
+			<text locale="de">Juju-Zombie</text>
+			<text locale="en">juju-zombie</text>
+		</string>
+		<string name="juju-zombie_p">
+			<text locale="de">Juju-Zombies</text>
+			<text locale="en">juju-zombies</text>
+		</string>
+		<string name="juju-zombie_d">
+			<text locale="de">Juju-Zombies</text>
+			<text locale="en">juju-zombies</text>
+		</string>
+		<string name="juju-zombie_x">
+			<text locale="de">Juju-Zombie</text>
+			<text locale="en">juju-zombie</text>
+		</string>
+
+		<string name="zombie">
+			<text locale="de">Zombie</text>
+			<text locale="en">zombie</text>
+		</string>
+		<string name="zombie_p">
+			<text locale="de">Zombies</text>
+			<text locale="en">zombies</text>
+		</string>
+		<string name="zombie_d">
+			<text locale="de">Zombies</text>
+			<text locale="en">zombies</text>
+		</string>
+		<string name="zombie_x">
+			<text locale="de">Zombie</text>
+			<text locale="en">zombie</text>
+		</string>
+
+		<string name="skeleton lord">
+			<text locale="de">Skelettherr</text>
+			<text locale="en">skeleton lord</text>
+		</string>
+		<string name="skeleton lord_p">
+			<text locale="de">Skelettherren</text>
+			<text locale="en">skeleton lords</text>
+		</string>
+		<string name="skeleton lord_d">
+			<text locale="de">Skelettherren</text>
+			<text locale="en">skeleton lords</text>
+		</string>
+		<string name="skeleton lord_x">
+			<text locale="de">Skelettherren</text>
+			<text locale="en">skeleton lord</text>
+		</string>
+
+		<string name="skeleton">
+			<text locale="de">Skelett</text>
+			<text locale="en">skeleton</text>
+		</string>
+		<string name="skeleton_p">
+			<text locale="de">Skelette</text>
+			<text locale="en">skeletons</text>
+		</string>
+		<string name="skeleton_d">
+			<text locale="de">Skeletten</text>
+			<text locale="en">skeletons</text>
+		</string>
+		<string name="skeleton_x">
+			<text locale="de">Skelett</text>
+			<text locale="en">skeleton</text>
+		</string>
+
+		<string name="centaur">
+			<text locale="de">Zentaur</text>
+			<text locale="en">centaur</text>
+		</string>
+		<string name="centaur_p">
+			<text locale="de">Zentauren</text>
+			<text locale="en">centaurs</text>
+		</string>
+		<string name="centaur_d">
+			<text locale="de">Zentauren</text>
+			<text locale="en">centaurs</text>
+		</string>
+		<string name="centaur_x">
+			<text locale="de">Zentauren</text>
+			<text locale="en">centaur</text>
+		</string>
+
+		<string name="shadow knight">
+			<text locale="de">Schattenritter</text>
+			<text locale="en">shadow knight</text>
+		</string>
+		<string name="shadow knight_p">
+			<text locale="de">Schattenritter</text>
+			<text locale="en">shadow knight</text>
+		</string>
+		<string name="shadow knight_d">
+			<text locale="de">Schattenrittern</text>
+			<text locale="en">shadow knights</text>
+		</string>
+		<string name="shadow knight_x">
+			<text locale="de">Schattenritter</text>
+			<text locale="en">shadow knight</text>
+		</string>
+
+		<string name="sea serpent">
+			<text locale="de">Seeschlange</text>
+			<text locale="en">sea serpent</text>
+		</string>
+		<string name="sea serpent_p">
+			<text locale="de">Seeschlangen</text>
+			<text locale="en">sea serpents</text>
+		</string>
+		<string name="sea serpent_d">
+			<text locale="de">Seeschlangen</text>
+			<text locale="en">sea serpents</text>
+		</string>
+		<string name="sea serpent_x">
+			<text locale="de">Seeschlangen</text>
+			<text locale="en">sea serpent</text>
+		</string>
+
+		<string name="kraken">
+			<text locale="de">Krake</text>
+			<text locale="en">kraken</text>
+		</string>
+		<string name="kraken_p">
+			<text locale="de">Kraken</text>
+			<text locale="en">krakens</text>
+		</string>
+		<string name="kraken_d">
+			<text locale="de">Kraken</text>
+			<text locale="en">krakens</text>
+		</string>
+		<string name="kraken_x">
+			<text locale="de">Kraken</text>
+			<text locale="en">kraken</text>
+		</string>
+
+		<string name="giant turtle">
+			<text locale="de">Riesenschildkröte</text>
+			<text locale="en">giant turtle</text>
+		</string>
+		<string name="giant turtle_p">
+			<text locale="de">Riesenschildkröten</text>
+			<text locale="en">giant turtles</text>
+		</string>
+		<string name="giant turtle_d">
+			<text locale="de">Riesenschildkröten</text>
+			<text locale="en">giant turtles</text>
+		</string>
+		<string name="giant turtle_x">
+			<text locale="de">Riesenschildkröten</text>
+			<text locale="en">giant turtle</text>
+		</string>
+
+		<string name="dolphin">
+			<text locale="de">Delphin</text>
+			<text locale="en">dolphin</text>
+		</string>
+		<string name="dolphin_p">
+			<text locale="de">Delphine</text>
+			<text locale="en">dolphins</text>
+		</string>
+		<string name="dolphin_d">
+			<text locale="de">Delphinen</text>
+			<text locale="en">dolphins</text>
+		</string>
+		<string name="dolphin_x">
+			<text locale="de">Delphin</text>
+			<text locale="en">dolphin</text>
+		</string>
+
+		<string name="tiger">
+			<text locale="de">Tiger</text>
+			<text locale="en">tiger</text>
+		</string>
+		<string name="tiger_p">
+			<text locale="de">Tiger</text>
+			<text locale="en">tiger</text>
+		</string>
+		<string name="tiger_d">
+			<text locale="de">Tigern</text>
+			<text locale="en">tigers</text>
+		</string>
+		<string name="tiger_x">
+			<text locale="de">Tiger</text>
+			<text locale="en">tiger</text>
+		</string>
+
+		<string name="hellcat">
+			<text locale="de">Höllenkatze</text>
+			<text locale="en">hellcat</text>
+		</string>
+		<string name="hellcat_p">
+			<text locale="de">Höllenkatzen</text>
+			<text locale="en">hellcats</text>
+		</string>
+		<string name="hellcat_d">
+			<text locale="de">Höllenkatzen</text>
+			<text locale="en">hellcats</text>
+		</string>
+		<string name="hellcat_x">
+			<text locale="de">Höllenkatzen</text>
+			<text locale="en">hellcat</text>
+		</string>
+
+		<string name="owl">
+			<text locale="de">Eule</text>
+			<text locale="en">owl</text>
+		</string>
+		<string name="owl_p">
+			<text locale="de">Eulen</text>
+			<text locale="en">owls</text>
+		</string>
+		<string name="owl_d">
+			<text locale="de">Eulen</text>
+			<text locale="en">owls</text>
+		</string>
+		<string name="owl_x">
+			<text locale="de">Eulen</text>
+			<text locale="en">owl</text>
+		</string>
+
+		<string name="fairy">
+			<text locale="de">Fee</text>
+			<text locale="en">fairy</text>
+		</string>
+		<string name="fairy_p">
+			<text locale="de">Feen</text>
+			<text locale="en">fairies</text>
+		</string>
+		<string name="fairy_d">
+			<text locale="de">Feen</text>
+			<text locale="en">fairies</text>
+		</string>
+		<string name="fairy_x">
+			<text locale="de">Feen</text>
+			<text locale="en">fairy</text>
+		</string>
+
+		<string name="dreamcat">
+			<text locale="de">Traumkatze</text>
+			<text locale="en">dreamcat</text>
+		</string>
+		<string name="dreamcat_p">
+			<text locale="de">Traumkatzen</text>
+			<text locale="en">dreamcats</text>
+		</string>
+		<string name="dreamcat_d">
+			<text locale="de">Traumkatzen</text>
+			<text locale="en">dreamcats</text>
+		</string>
+		<string name="dreamcat_x">
+			<text locale="de">Traumkatzen</text>
+			<text locale="en">dreamcat</text>
+		</string>
+
+		<string name="imp">
+			<text locale="de">Teufelchen</text>
+			<text locale="en">imp</text>
+		</string>
+		<string name="imp_p">
+			<text locale="de">Teufelchen</text>
+			<text locale="en">imps</text>
+		</string>
+		<string name="imp_d">
+			<text locale="de">Teufelchen</text>
+			<text locale="en">imps</text>
+		</string>
+		<string name="imp_x">
+			<text locale="de">Teufelchen-</text>
+			<text locale="en">imp</text>
+		</string>
+
+		<string name="ghost">
+			<text locale="de">Geist</text>
+			<text locale="en">ghost</text>
+		</string>
+		<string name="ghost_p">
+			<text locale="de">Geister</text>
+			<text locale="en">ghosts</text>
+		</string>
+		<string name="ghost_d">
+			<text locale="de">Geistern</text>
+			<text locale="en">ghosts</text>
+		</string>
+		<string name="ghost_x">
+			<text locale="de">Geister</text>
+			<text locale="en">ghost</text>
+		</string>
+
+		<string name="direwolf">
+			<text locale="de">Warg</text>
+			<text locale="en">direwolf</text>
+		</string>
+		<string name="direwolf_p">
+			<text locale="de">Warge</text>
+			<text locale="en">direwolves</text>
+		</string>
+		<string name="direwolf_d">
+			<text locale="de">Wargen</text>
+			<text locale="en">direwolves</text>
+		</string>
+		<string name="direwolf_x">
+			<text locale="de">Warg</text>
+			<text locale="en">direwolf</text>
+		</string>
+
+		<string name="unicorn">
+			<text locale="de">Einhorn</text>
+			<text locale="en">unicorn</text>
+		</string>
+		<string name="unicorn_p">
+			<text locale="de">Einhörner</text>
+			<text locale="en">unicorns</text>
+		</string>
+		<string name="unicorn_d">
+			<text locale="de">Einhörnern</text>
+			<text locale="en">unicorns</text>
+		</string>
+		<string name="unicorn_x">
+			<text locale="de">Einhorn</text>
+			<text locale="en">unicorn</text>
+		</string>
+
+		<string name="nymph">
+			<text locale="de">Nymphe</text>
+			<text locale="en">nymph</text>
+		</string>
+		<string name="nymph_p">
+			<text locale="de">Nymphen</text>
+			<text locale="en">nymphs</text>
+		</string>
+		<string name="nymph_d">
+			<text locale="de">Nymphen</text>
+			<text locale="en">nymphs</text>
+		</string>
+		<string name="nymph_x">
+			<text locale="de">Nymphen</text>
+			<text locale="en">nymph</text>
+		</string>
+
+		<string name="songdragon">
+			<text locale="de">Singdrache</text>
+			<text locale="en">songdragon</text>
+		</string>
+		<string name="songdragon_p">
+			<text locale="de">Singdrachen</text>
+			<text locale="en">songdragons</text>
+		</string>
+		<string name="songdragon_d">
+			<text locale="de">Singdrachen</text>
+			<text locale="en">songdragons</text>
+		</string>
+		<string name="songdragon_x">
+			<text locale="de">Singdrachen</text>
+			<text locale="en">songdragon</text>
+		</string>
+
+		<string name="rat">
+			<text locale="de">Ratte</text>
+			<text locale="en">rat</text>
+		</string>
+		<string name="rat_p">
+			<text locale="de">Ratten</text>
+			<text locale="en">rats</text>
+		</string>
+		<string name="rat_d">
+			<text locale="de">Ratten</text>
+			<text locale="en">rats</text>
+		</string>
+		<string name="rat_x">
+			<text locale="de">Ratten</text>
+			<text locale="en">rat</text>
+		</string>
+
+		<string name="eagle">
+			<text locale="de">Adler</text>
+			<text locale="en">eagle</text>
+		</string>
+		<string name="eagle_p">
+			<text locale="de">Adler</text>
+			<text locale="en">eagles</text>
+		</string>
+		<string name="eagle_d">
+			<text locale="de">Adlern</text>
+			<text locale="en">eagles</text>
+		</string>
+		<string name="eagle_x">
+			<text locale="de">Adler</text>
+			<text locale="en">eagle</text>
+		</string>
+
+		<string name="tunnelworm">
+			<text locale="de">Tunnelwurm</text>
+			<text locale="en">tunnelworm</text>
+		</string>
+		<string name="tunnelworm_p">
+			<text locale="de">Tunnelwürmer</text>
+			<text locale="en">tunnelworms</text>
+		</string>
+		<string name="tunnelworm_d">
+			<text locale="de">Tunnelwürmern</text>
+			<text locale="en">tunnelworms</text>
+		</string>
+		<string name="tunnelworm_x">
+			<text locale="de">Tunnelwurm</text>
+			<text locale="en">tunnelworm</text>
+		</string>
+
+		<string name="lynx">
+			<text locale="de">Luchs</text>
+			<text locale="en">lynx</text>
+		</string>
+		<string name="lynx_p">
+			<text locale="de">Luchse</text>
+			<text locale="en">lynx</text>
+		</string>
+		<string name="lynx_d">
+			<text locale="de">Luchsen</text>
+			<text locale="en">lynx</text>
+		</string>
+		<string name="lynx_x">
+			<text locale="de">Luchs</text>
+			<text locale="en">lynx</text>
+		</string>
+
+		<string name="wolf">
+			<text locale="de">Wolf</text>
+			<text locale="en">wolf</text>
+		</string>
+		<string name="wolf_p">
+			<text locale="de">Wölfe</text>
+			<text locale="en">wolves</text>
+		</string>
+		<string name="wolf_d">
+			<text locale="de">Wölfen</text>
+			<text locale="en">wolves</text>
+		</string>
+		<string name="wolf_x">
+			<text locale="de">Wolfs</text>
+			<text locale="en">wolf</text>
+		</string>
+
+		<string name="peasant">
+			<text locale="de">Bauer</text>
+			<text locale="en">peasant</text>
+		</string>
+		<string name="peasant_p">
+			<text locale="de">Bauern</text>
+			<text locale="en">peasants</text>
+		</string>
+		<string name="peasant_d">
+			<text locale="de">Bauern</text>
+			<text locale="en">peasants</text>
+		</string>
+		<string name="peasant_x">
+			<text locale="de">Bauern</text>
+			<text locale="en">peasant</text>
+		</string>
+
+		<string name="braineater">
+			<text locale="de">Hirntöter</text>
+			<text locale="en">braineater</text>
+		</string>
+		<string name="braineater_p">
+			<text locale="de">Hirntöter</text>
+			<text locale="en">braineaters</text>
+		</string>
+		<string name="braineater_d">
+			<text locale="de">Hirntöter</text>
+			<text locale="en">braineaters</text>
+		</string>
+		<string name="braineater_x">
+			<text locale="de">Hirntöter</text>
+			<text locale="en">braineater</text>
+		</string>
+
+		<string name="toad">
+			<text locale="de">Kröte</text>
+			<text locale="en">toad</text>
+		</string>
+		<string name="toad_p">
+			<text locale="de">Kröten</text>
+			<text locale="en">toads</text>
+		</string>
+		<string name="toad_d">
+			<text locale="de">Kröten</text>
+			<text locale="en">toads</text>
+		</string>
+		<string name="toad_x">
+			<text locale="de">Kröten</text>
+			<text locale="en">toad</text>
+		</string>
+
+		<string name="alp">
+			<text locale="de">Alp</text>
+			<text locale="en">alp</text>
+		</string>
+		<string name="alp_p">
+			<text locale="de">Alps</text>
+			<text locale="en">alps</text>
+		</string>
+		<string name="alp_d">
+			<text locale="de">Alps</text>
+			<text locale="en">alps</text>
+		</string>
+		<string name="alp_x">
+			<text locale="de">Alp</text>
+			<text locale="en">alp</text>
+		</string>
+
+		<string name="mountainguard">
+			<text locale="de">Bergwächter</text>
+			<text locale="en">mountainguard</text>
+		</string>
+		<string name="mountainguard_p">
+			<text locale="de">Bergwächter</text>
+			<text locale="en">mountainguard</text>
+		</string>
+		<string name="mountainguard_d">
+			<text locale="de">Bergwächtern</text>
+			<text locale="en">mountainguards</text>
+		</string>
+		<string name="mountainguard_x">
+			<text locale="de">Bergwächter</text>
+			<text locale="en">mountainguard</text>
+		</string>
+
+		<string name="shadowmaster">
+			<text locale="de">Schattenmeister</text>
+			<text locale="en">shadowmaster</text>
+		</string>
+		<string name="shadowmaster_p">
+			<text locale="de">Schattenmeister</text>
+			<text locale="en">shadowmaster</text>
+		</string>
+		<string name="shadowmaster_d">
+			<text locale="de">Schattenmeistern</text>
+			<text locale="en">shadowmasters</text>
+		</string>
+		<string name="shadowmaster_x">
+			<text locale="de">Schattenmeister</text>
+			<text locale="en">shadowmaster</text>
+		</string>
+
+		<string name="shadowdemon">
+			<text locale="de">Schattendämon</text>
+			<text locale="en">shadowdemon</text>
+		</string>
+		<string name="shadowdemon_p">
+			<text locale="de">Schattendämonen</text>
+			<text locale="en">shadowdemons</text>
+		</string>
+		<string name="shadowdemon_d">
+			<text locale="de">Schattendämonen</text>
+			<text locale="en">shadowdemons</text>
+		</string>
+		<string name="shadowdemon_x">
+			<text locale="de">Schattendämon</text>
+			<text locale="en">shadowdemon</text>
+		</string>
+
+		<string name="stone golem">
+			<text locale="de">Steingolem</text>
+			<text locale="en">stone golem</text>
+		</string>
+		<string name="stone golem_p">
+			<text locale="de">Steingolems</text>
+			<text locale="en">stone golems</text>
+		</string>
+		<string name="stone golem_d">
+			<text locale="de">Steingolems</text>
+			<text locale="en">stone golems</text>
+		</string>
+		<string name="stone golem_x">
+			<text locale="de">Steingolem</text>
+			<text locale="en">stone golem</text>
+		</string>
+
+		<string name="irongolem">
+			<text locale="de">Eisengolem</text>
+			<text locale="en">irongolem</text>
+		</string>
+		<string name="irongolem_p">
+			<text locale="de">Eisengolems</text>
+			<text locale="en">irongolems</text>
+		</string>
+		<string name="irongolem_d">
+			<text locale="de">Eisengolems</text>
+			<text locale="en">irongolems</text>
+		</string>
+		<string name="irongolem_x">
+			<text locale="de">Eisengolem</text>
+			<text locale="en">irongolem</text>
+		</string>
+
+		<string name="spell">
+			<text locale="de">Zauber</text>
+			<text locale="en">spell</text>
+		</string>
+		<string name="spell_p">
+			<text locale="de">Zauber</text>
+			<text locale="en">spell</text>
+		</string>
+		<string name="spell_d">
+			<text locale="de">Zauber</text>
+			<text locale="en">spell</text>
+		</string>
+		<string name="spell_x">
+			<text locale="de">Zauber</text>
+			<text locale="en">spell</text>
+		</string>
+
+		<string name="special">
+			<text locale="de">Spezial</text>
+			<text locale="en">special</text>
+		</string>
+		<string name="special_p">
+			<text locale="de">Spezial</text>
+			<text locale="en">special</text>
+		</string>
+		<string name="special_d">
+			<text locale="de">Spezial</text>
+			<text locale="en">special</text>
+		</string>
+		<string name="special_x">
+			<text locale="de">Spezial</text>
+			<text locale="en">special</text>
+		</string>
+
+		<string name="dracoid">
+			<text locale="de">Dracoid</text>
+			<text locale="en">dracoid</text>
+		</string>
+		<string name="dracoid_p">
+			<text locale="de">Dracoide</text>
+			<text locale="en">dracoids</text>
+		</string>
+		<string name="dracoid_d">
+			<text locale="de">Dracoiden</text>
+			<text locale="en">dracoids</text>
+		</string>
+		<string name="dracoid_x">
+			<text locale="de">Dracoiden</text>
+			<text locale="en">dracoid</text>
+		</string>
+
+		<string name="catdragon">
+			<text locale="de">Katzendrache</text>
+			<text locale="en">catdragon</text>
+		</string>
+		<string name="catdragon_p">
+			<text locale="de">Katzendrachen</text>
+			<text locale="en">catdragons</text>
+		</string>
+		<string name="catdragon_d">
+			<text locale="de">Katzendrachen</text>
+			<text locale="en">catdragons</text>
+		</string>
+		<string name="catdragon_x">
+			<text locale="de">Katzendrachen</text>
+			<text locale="en">catdragon</text>
+		</string>
+
+		<string name="ent">
+			<text locale="de">Ent</text>
+			<text locale="en">ent</text>
+		</string>
+		<string name="ent_p">
+			<text locale="de">Ents</text>
+			<text locale="en">ents</text>
+		</string>
+		<string name="ent_d">
+			<text locale="de">Ents</text>
+			<text locale="en">ents</text>
+		</string>
+		<string name="ent_x">
+			<text locale="de">Ent</text>
+			<text locale="en">ent</text>
+		</string>
+
+		<string name="wyrm">
+			<text locale="de">Wyrm</text>
+			<text locale="en">wyrm</text>
+		</string>
+		<string name="wyrm_p">
+			<text locale="de">Wyrme</text>
+			<text locale="en">wyrms</text>
+		</string>
+		<string name="wyrm_d">
+			<text locale="de">Wyrmen</text>
+			<text locale="en">wyrms</text>
+		</string>
+		<string name="wyrm_x">
+			<text locale="de">Wyrm</text>
+			<text locale="en">wyrm</text>
+		</string>
+
+		<string name="dragon">
+			<text locale="de">Drache</text>
+			<text locale="en">dragon</text>
+		</string>
+		<string name="dragon_p">
+			<text locale="de">Drachen</text>
+			<text locale="en">dragons</text>
+		</string>
+		<string name="dragon_d">
+			<text locale="de">Drachen</text>
+			<text locale="en">dragons</text>
+		</string>
+		<string name="dragon_x">
+			<text locale="de">Drachen</text>
+			<text locale="en">dragon</text>
+		</string>
+
+		<string name="young dragon">
+			<text locale="de">Jungdrache</text>
+			<text locale="en">young dragon</text>
+		</string>
+		<string name="young dragon_p">
+			<text locale="de">Jungdrachen</text>
+			<text locale="en">young dragons</text>
+		</string>
+		<string name="young dragon_d">
+			<text locale="de">Jungdrachen</text>
+			<text locale="en">young dragons</text>
+		</string>
+		<string name="young dragon_x">
+			<text locale="de">Jungdrachen</text>
+			<text locale="en">young dragon</text>
+		</string>
+
+		<string name="illusion">
+			<text locale="de">Illusion</text>
+			<text locale="en">illusion</text>
+		</string>
+		<string name="illusion_p">
+			<text locale="de">Illusionen</text>
+			<text locale="en">illusions</text>
+		</string>
+		<string name="illusion_d">
+			<text locale="de">Illusions</text>
+			<text locale="en">illusions</text>
+		</string>
+		<string name="illusion_x">
+			<text locale="de">Illusions</text>
+			<text locale="en">illusion</text>
+		</string>
+
+		<string name="undead">
+			<text locale="de">Untoter</text>
+			<text locale="en">undead</text>
+		</string>
+		<string name="undead_p">
+			<text locale="de">Untote</text>
+			<text locale="en">undead</text>
+		</string>
+		<string name="undead_d">
+			<text locale="de">Untoten</text>
+			<text locale="en">undead</text>
+		</string>
+		<string name="undead_x">
+			<text locale="de">Untoten</text>
+			<text locale="en">undead</text>
+		</string>
+
+		<string name="aquarian">
+			<text locale="de">Meermensch</text>
+			<text locale="en">aquarian</text>
+		</string>
+		<string name="aquarian_p">
+			<text locale="de">Meermenschen</text>
+			<text locale="en">aquarians</text>
+		</string>
+		<string name="aquarian_d">
+			<text locale="de">Meermenschen</text>
+			<text locale="en">aquarians</text>
+		</string>
+		<string name="aquarian_x">
+			<text locale="de">Meermenschen</text>
+			<text locale="en">aquarian</text>
+		</string>
+
+		<string name="cat">
+			<text locale="de">Katze</text>
+			<text locale="en">cat</text>
+		</string>
+		<string name="cat_p">
+			<text locale="de">Katzen</text>
+			<text locale="en">cats</text>
+		</string>
+		<string name="cat_d">
+			<text locale="de">Katzen</text>
+			<text locale="en">cats</text>
+		</string>
+		<string name="cat_x">
+			<text locale="de">Katzen</text>
+			<text locale="en">cats</text>
+		</string>
+
+		<string name="halfling">
+			<text locale="de">Halbling</text>
+			<text locale="en">halfling</text>
+		</string>
+		<string name="halfling_p">
+			<text locale="de">Halblinge</text>
+			<text locale="en">halflings</text>
+		</string>
+		<string name="halfling_d">
+			<text locale="de">Halblingen</text>
+			<text locale="en">halflings</text>
+		</string>
+		<string name="halfling_x">
+			<text locale="de">Halblings</text>
+			<text locale="en">halfling</text>
+		</string>
+
+		<string name="insect">
+			<text locale="de">Insekt</text>
+			<text locale="en">insect</text>
+		</string>
+		<string name="insect_p">
+			<text locale="de">Insekten</text>
+			<text locale="en">insects</text>
+		</string>
+		<string name="insect_d">
+			<text locale="de">Insekten</text>
+			<text locale="en">insects</text>
+		</string>
+		<string name="insect_x">
+			<text locale="de">Insekten</text>
+			<text locale="en">insect</text>
+		</string>
+
+		<string name="demon">
+			<text locale="de">Dämon</text>
+			<text locale="en">demon</text>
+		</string>
+		<string name="demon_p">
+			<text locale="de">Dämonen</text>
+			<text locale="en">demons</text>
+		</string>
+		<string name="demon_d">
+			<text locale="de">Dämonen</text>
+			<text locale="en">demons</text>
+		</string>
+		<string name="demon_x">
+			<text locale="de">Dämonen</text>
+			<text locale="en">demon</text>
+		</string>
+
+		<string name="troll">
+			<text locale="de">Troll</text>
+			<text locale="en">troll</text>
+		</string>
+		<string name="troll_p">
+			<text locale="de">Trolle</text>
+			<text locale="en">trolls</text>
+		</string>
+		<string name="troll_d">
+			<text locale="de">Trollen</text>
+			<text locale="en">trolls</text>
+		</string>
+		<string name="troll_x">
+			<text locale="de">Troll</text>
+			<text locale="en">troll</text>
+		</string>
+
+		<string name="human">
+			<text locale="de">Mensch</text>
+			<text locale="en">human</text>
+		</string>
+		<string name="human_p">
+			<text locale="de">Menschen</text>
+			<text locale="en">humans</text>
+		</string>
+		<string name="human_d">
+			<text locale="de">Menschen</text>
+			<text locale="en">humans</text>
+		</string>
+		<string name="human_x">
+			<text locale="de">Menschen</text>
+			<text locale="en">human</text>
+		</string>
+
+		<string name="goblin">
+			<text locale="de">Goblin</text>
+			<text locale="en">goblin</text>
+		</string>
+		<string name="goblin_p">
+			<text locale="de">Goblins</text>
+			<text locale="en">goblins</text>
+		</string>
+		<string name="goblin_d">
+			<text locale="de">Goblins</text>
+			<text locale="en">goblins</text>
+		</string>
+		<string name="goblin_x">
+			<text locale="de">Goblin</text>
+			<text locale="en">goblin</text>
+		</string>
+
+		<string name="orc">
+			<text locale="de">Ork</text>
+			<text locale="en">orc</text>
+		</string>
+		<string name="orc_p">
+			<text locale="de">Orks</text>
+			<text locale="en">orcs</text>
+		</string>
+		<string name="orc_d">
+			<text locale="de">Orks</text>
+			<text locale="en">orcs</text>
+		</string>
+		<string name="orc_x">
+			<text locale="de">Ork</text>
+			<text locale="en">orc</text>
+		</string>
+
+		<string name="elf">
+			<text locale="de">Elf</text>
+			<text locale="en">elf</text>
+		</string>
+		<string name="elf_p">
+			<text locale="de">Elfen</text>
+			<text locale="en">elves</text>
+		</string>
+		<string name="elf_d">
+			<text locale="de">Elfen</text>
+			<text locale="en">elves</text>
+		</string>
+		<string name="elf_x">
+			<text locale="de">Elfen</text>
+			<text locale="en">elves</text>
+		</string>
+
+		<string name="dwarf">
+			<text locale="de">Zwerg</text>
+			<text locale="en">dwarf</text>
+		</string>
+		<string name="dwarf_p">
+			<text locale="de">Zwerge</text>
+			<text locale="en">dwarves</text>
+		</string>
+		<string name="dwarf_d">
+			<text locale="de">Zwergen</text>
+			<text locale="en">dwarves</text>
+		</string>
+		<string name="dwarf_x">
+			<text locale="de">Zwergen</text>
+			<text locale="en">dwarf</text>
+		</string>
+
+	</namespace>
+</strings>

@@ -4,13 +4,13 @@ ifndef ERESSEA
 endif
 
 # Hier definieren, damit nicht '@gcc'
-CC      = gcc -D_GNU_SOURCE
+CC      = gcc-3.0 -D_GNU_SOURCE -DLARGE_CASTLES -DNEW_RESOURCEGROWTH -DGROWING_TREES
+# CC      = gcc -D_GNU_SOURCE
 AR      = ar
 CTAGS   = ctags
-LD      = gcc
+LD      = gcc-3.0
 INSTALL = cp
-
-# CFLAGS += -Wshadow
+CFLAGS  += -march=athlon -minline-all-stringops
 
 #		 Ps = 0  -> Normal (default)
 #		 Ps = 1  -> Bold

@@ -15,17 +15,8 @@
 #ifndef SKILL_H
 #define SKILL_H
 
-typedef struct modifiers {
-	signed char value[MAXSKILLS];
-} modifiers;
-
-typedef struct skillmods {
-	modifiers mod[MAXTERRAINS];
-} skillmods;
-
-extern skillmods * skill_refresh(struct unit * u);
 extern signed char skill_bonus(struct unit * u, struct region * r);
-char eff_skill(const struct unit * u, skill_t sk, const struct region * r);
+int eff_skill(const struct unit * u, skill_t sk, const struct region * r);
 
 int pure_skill(struct unit * u, skill_t sk, struct region * r);
 
@@ -42,14 +33,16 @@ typedef struct skillmod_data {
 	int flags;
 } skillmod_data;
 extern attrib_type at_skillmod;
+extern int rc_skillmod(const struct race * rc, const struct region *r, skill_t skill);
 extern int skillmod(const attrib * a, const struct unit * u, const struct region * r, skill_t sk, int value, int flags);
 extern void skill_init(void);
 extern void skill_done(void);
 extern struct attrib * make_skillmod(skill_t skill, unsigned int flags, int(*special)(const struct unit*, const struct region*, skill_t, int), double multiplier, int bonus);
 
 extern const char * skillname(skill_t, const struct locale *);
+extern skill_t sk_find(const char * name);
 
-int level_days(int level);
-void remove_zero_skills(void);
+extern int level_days(int level);
+extern void remove_zero_skills(void);
 
 #endif

@@ -33,8 +33,8 @@ age_firedragon(unit *u)
 {
 	if (rand()%100 < age_chance(u->age, DRAGONAGE, 1)) {
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
-		u->race = RC_DRAGON;
-		u->irace = RC_DRAGON;
+		u->race = new_race[RC_DRAGON];
+		u->irace = new_race[RC_DRAGON];
 		scale_number(u,1);
 		u->hp = (int) (unit_max_hp(u) * u->number * q);
 	}
@@ -45,8 +45,8 @@ age_dragon(unit *u)
 {
 	if (rand()%100 < age_chance(u->age, WYRMAGE, 1)) {
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
-		u->race = RC_WYRM;
-		u->irace = RC_WYRM;
+		u->race = new_race[RC_WYRM];
+		u->irace = new_race[RC_WYRM];
 		scale_number(u,1);
 		u->hp = (int) (unit_max_hp(u) * u->number * q);
 	}

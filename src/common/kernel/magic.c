@@ -53,6 +53,7 @@
 #include <triggers/killunit.h>
 #include <triggers/giveitem.h>
 #include <triggers/changerace.h>
+#include <triggers/clonedied.h>
 
 /* libc includes */
 #include <assert.h>
@@ -416,7 +417,7 @@ updatespelllist(unit * u)
 		}
 	}
 	/* Nur Orkmagier bekommen den Keuschheitsamulettzauber */
-	if (u->race == RC_ORC
+	if (old_race(u->race) == RC_ORC
 			&& !getspell(u, SPL_ARTEFAKT_CHASTITYBELT)
 			&& find_spellbyid(SPL_ARTEFAKT_CHASTITYBELT)->level <= max)
 	{
@@ -445,8 +446,9 @@ updatespelllist(unit * u)
 	}
 
 	/* Transformierte Wyrm-Magier bekommen Drachenodem */
-	if (dragon(u)){
-		switch (u->race){ 
+	if (dragonrace(u->race)) {
+		race_t urc = old_race(u->race);
+		switch (urc) {
 		/* keine breaks! Wyrme sollen alle drei Zauber können.*/
 			case RC_WYRM:
 			{
@@ -558,6 +560,18 @@ getspell(const unit *u, spellid_t spellid)
 
 #include "umlaut.h"
 
+#define SPELLNAMES_HACK 1
+#if SPELLNAMES_HACK
+struct tnode spellnames;
+
+static void init_spellnames(void)
+{
+	int i;
+	for (i=0; spelldaten[i].id != SPL_NOSPELL; i++)
+		addtoken(&spellnames, spelldaten[i].name, (void*)i);
+}
+#endif
+
 spell *
 find_spellbyname(unit *u, char *s)
 {
@@ -576,8 +590,17 @@ find_spellbyname(unit *u, char *s)
 			return sp;
 		}
 	}
-#if 0 /* enno: geht vorerst nicht mit locales */
-	if (findtoken(&spellnames, s, (void**)&i)==0 && getspell(u, spelldaten[i].id)) return &spelldaten[i];
+#if SPELLNAMES_HACK /* enno: geht vorerst nicht mit locales */
+	{
+		static int init = 0;
+		int i;
+		if (!init) {
+			init=1;
+			init_spellnames();
+		}
+		if (findtoken(&spellnames, s, (void**)&i)==0 && getspell(u, spelldaten[i].id))
+			return &spelldaten[i];
+	}
 #endif
 	return (spell *) NULL;
 }
@@ -778,7 +801,7 @@ use_item_aura(const region * r, const unit * u)
 	int sk, n;
 
 	sk = eff_skill(u, SK_MAGIC, r);
-	n = (int)(sk * sk * race[u->race].maxaura / 4);
+	n = (int)(sk * sk * u->race->maxaura / 4);
 
 	return n;
 }
@@ -792,7 +815,7 @@ max_spellpoints(const region * r, const unit * u)
 	double divisor = 1.2;
 
 	sk = eff_skill(u, SK_MAGIC, r);
-	msp = race[u->race].maxaura*(pow(sk, potenz)/divisor+1) + get_spchange(u);
+	msp = u->race->maxaura*(pow(sk, potenz)/divisor+1) + get_spchange(u);
 
 	if (get_item(u,I_AURAKULUM) > 0) {
 		msp += use_item_aura(r, u);
@@ -878,13 +901,14 @@ spl_costtyp(spell * sp)
 
 	for (k = 0; k < MAXINGREDIENT; k++) {
 		if (costtyp == SPC_LINEAR) return SPC_LINEAR;
-				
+
 		if (sp->komponenten[k][2] == SPC_LINEAR) {
 			return SPC_LINEAR;
 		}
 
-		if (costtyp==SPC_FIX) {
-			costtyp = SPC_LEVEL;
+		/* wenn keine Fixkosten, Typ übernehmen */
+		if (sp->komponenten[k][2] != SPC_FIX) {
+			costtyp = sp->komponenten[k][2];
 		}
 	}
 	return costtyp;
@@ -991,7 +1015,7 @@ knowsspell(const region * r, const unit * u, const spell * sp)
 	}
 	/* Magier? */
 	if (get_mage(u) == NULL) {
-		log_warning(("%s ist kein Magier, versucht aber zu zaubern.\n", 
+		log_warning(("%s ist kein Magier, versucht aber zu zaubern.\n",
 				unitname(u)));
 		return false;
 	}
@@ -1002,12 +1026,12 @@ knowsspell(const region * r, const unit * u, const spell * sp)
 			return false;
 		}
 		if (eff_skill(u, SK_MAGIC, u->region) >= sp->level){
-			log_warning(("%s ist hat die erforderliche Stufe, kennt aber %s nicht.\n", 
+			log_warning(("%s ist hat die erforderliche Stufe, kennt aber %s nicht.\n",
 				unitname(u), sp->name));
 		}
 		return false;
 	}
-	
+
 	/* hier sollten alle potentiellen Fehler abgefangen sein */
 	return true;
 }
@@ -1034,7 +1058,7 @@ cancast(unit * u, spell * sp, int level, int range, char * cmd)
 	}
 	/* reicht die Stufe aus? */
 	if (eff_skill(u, SK_MAGIC, u->region) < sp->level) {
-		log_warning(("Zauber von %s schlug fehl: %s braucht Stufe %d.\n", 
+		log_warning(("Zauber von %s schlug fehl: %s braucht Stufe %d.\n",
 				unitname(u), sp->name, sp->level));
 		/* die Einheit ist nicht erfahren genug für diesen Zauber */
 		cmistake(u, strdup(cmd), 169, MSG_MAGIC);
@@ -1067,11 +1091,15 @@ cancast(unit * u, spell * sp, int level, int range, char * cmd)
 
 			if (get_pooled(u, u->region, res) < itemanz) {
 				if (b == false) {
+					/* es fehlte schon eine andere Komponente, wir basteln die
+					 * Meldung weiter zusammen */
 					scat(", ");
 					icat(itemanz);
 					scat(locale_string(u->faction->locale,
 							resname(res, (itemanz == 1 ? 0 : 1))));
 				} else {
+					/* Noch fehlte keine Komponente, wir generieren den Anfang der
+					 * Fehlermeldung */
 					sprintf(buf, "%s in %s: 'ZAUBER %s' Für diesen Zauber fehlen "
 							"noch %d ", unitname(u), regionid(u->region), sp->name,
 							itemanz);
@@ -1108,9 +1136,13 @@ spellpower(region * r, unit * u, spell * sp, int cast_level)
 	int force = cast_level;
 	if (sp==NULL) return 0;
 	else {
+		/* Bonus durch Magieturm und gesegneten Steinkreis */
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
 		if (btype == &bt_magictower) {
+			force++;
+		} else
+		if (btype == &bt_blessedstonecircle){
 			force++;
 		}
 	}
@@ -1125,6 +1157,7 @@ spellpower(region * r, unit * u, spell * sp, int cast_level)
 		cmistake(u, findorder(u, u->thisorder), 185, MSG_MAGIC);
 	}
 
+	/* Patzerfluch-Effekt: */
 	if (is_cursed(u->attribs, C_FUMBLE, 0) == true) {
 		force -= get_curseeffect(u->attribs, C_FUMBLE, 0);
 		change_cursevigour(&u->attribs, C_FUMBLE, 0, -1);
@@ -1182,7 +1215,7 @@ magic_resistance(unit *target)
 	int n;
 
 	/* Bonus durch Rassenmagieresistenz */
-	chance = (int)(race[target->race].magres * 100);
+	chance = (int)(target->race->magres * 100);
 
 	/* Auswirkungen von Zaubern auf der Einheit */
 	if (is_cursed(target->attribs, C_MAGICRESISTANCE, 0)) {
@@ -1234,6 +1267,16 @@ magic_resistance(unit *target)
 
 	/* Bonus durch Artefakte */
 	/* TODO (noch gibs keine)*/
+
+	/* Bonus durch Gebäude */
+	{
+		struct building * b = inside_building(target);
+		const struct building_type * btype = b?b->type:NULL;
+		/* gesegneter Steinkreis gibt 30% dazu */
+		if (btype == &bt_blessedstonecircle){
+			chance += 30;
+		}
+	}
 	return chance;
 }
 
@@ -1292,6 +1335,9 @@ target_resists_magic(unit *magician, void *obj, int objtyp, int t_bonus)
 			/* Bonus durch Typ */
 			if (((building *)obj)->type == &bt_magictower)
 				chance += 40;
+			if (((building *)obj)->type == &bt_blessedstonecircle)
+				chance += 60;
+
 
 			break;
 
@@ -1430,8 +1476,8 @@ do_fumble(castorder *co)
 			link_action_timeout(a1, t1); /* converted */
 		}
 #endif
-		u->race = RC_TOAD;
-		u->irace = RC_TOAD;
+		u->race = new_race[RC_TOAD];
+		u->irace = new_race[RC_TOAD];
 		sprintf(buf, "Eine Botschaft von %s: 'Ups! Quack, Quack!'", unitname(u));
 		addmessage(r, 0, buf, MSG_MAGIC, ML_MISTAKE);
 		break;
@@ -1457,11 +1503,11 @@ do_fumble(castorder *co)
 	/* Spruch gelingt, aber alle Magiepunkte weg */
 		((nspell_f)sp->sp_function)(co);
 		set_spellpoints(u, 0);
-		sprintf(buf, "Als %s versucht, \"%s\" zu zaubern erhebt sich "
+		sprintf(buf, "Als %s versucht, '%s' zu zaubern erhebt sich "
 				"plötzlich ein dunkler Wind. Bizarre geisterhafte "
 				"Gestalten kreisen um den Magier und scheinen sich von "
 				"den magischen Energien des Zaubers zu ernähren. Mit letzter "
-				"Kraft geling es %s dennoch den Spruch zu zaubern.",
+				"Kraft gelingt es %s dennoch den Spruch zu zaubern.",
 				unitname(u), sp->name, unitname(u));
 		addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
 		break;
@@ -1496,11 +1542,11 @@ regeneration(unit * u)
 	double potenz = 1.5;
 	double divisor = 2.0;
 
-	if(fspecial(u->faction, FS_MAGICIMMUNE)) return 0;
+	if (fspecial(u->faction, FS_MAGICIMMUNE)) return 0;
 
 	sk = effskill(u, SK_MAGIC);
 	/* Rassenbonus/-malus */
-	d = (int)(pow(sk, potenz) * race[u->race].regaura / divisor);
+	d = (int)(pow(sk, potenz) * u->race->regaura / divisor);
 	d++;
 
 	/* Einfluss von Artefakten */
@@ -1531,8 +1577,12 @@ regeneration_magiepunkte(void)
 					const struct building_type * btype = b?b->type:NULL;
 					reg_aura = (double)regeneration(u);
 
-					/* Magierturm erhöht die Regeneration um 50% */
+					/* Magierturm erhöht die Regeneration um 75% */
 					if (btype == &bt_magictower) {
+						reg_aura *= 1.75;
+					}
+					/* gesegnerter Steinkreis erhöht die Regeneration um 50% */
+					if (btype == &bt_blessedstonecircle) {
 						reg_aura *= 1.50;
 					}
 
@@ -1551,8 +1601,9 @@ regeneration_magiepunkte(void)
 					reg_aura = min((auramax - aura), reg_aura);
 
 					aura += (int)reg_aura;
-					add_message(&u->faction->msgs, new_message(u->faction,
-						"regenaura%u:unit%r:region%i:amount", u, r, (int)reg_aura));
+					add_message(&u->faction->msgs, msg_message(
+						"regenaura", "unit region amount", 
+						u, r, (int)reg_aura));
 				}
 				set_spellpoints(u, min(aura, auramax));
 
@@ -1565,7 +1616,16 @@ regeneration_magiepunkte(void)
 
 /* ------------------------------------------------------------- */
 /* ------------------------------------------------------------- */
-/* gibt bei Misserfolg 0 zurück, ansonsten 1 */
+/* Zuerst wird versucht alle noch nicht gefundenen Objekte zu finden
+ * oder zu prüfen, ob das gefundene Objekt wirklich hätte gefunden
+ * werden dürfen (nicht alle Zauber wirken global). Dabei zählen wir die
+ * Misserfolge (failed).
+ * Dann folgen die Tests der gefundenen Objekte auf Magieresistenz und
+ * Sichtbarkeit. Dabei zählen wir die magieresistenten (resists)
+ * Objekte. Alle anderen werten wir als Erfolge (success) */
+
+/* gibt bei Misserfolg 0 zurück, bei Magieresistenz zumindeste eines
+ * Objektes 1 und bei Erfolg auf ganzer Linie 2 */
 int
 verify_targets(castorder *co)
 {
@@ -1575,9 +1635,15 @@ verify_targets(castorder *co)
 	spellparameter *sa = co->par;
 	spllprm *spobj;
 	int failed = 0;
+	int resists = 0;
+	int success = 0;
 	int i;
 
 	if (sa) {
+		/* zuerst versuchen wir vorher nicht gefundene Objekte zu finden.
+		 * Wurde ein Objekt durch globalsuche gefunden, obwohl der Zauber
+		 * gar nicht global hätte suchen dürften, setzen wir das Objekt
+		 * zurück. */
 		for (i=0;i<sa->length;i++) {
 			spobj = sa->param[i];
 
@@ -1590,82 +1656,174 @@ verify_targets(castorder *co)
 					} else {
 						u = findunitr(target_r, spobj->data.i);
 					}
-					if (u) {
-						/* die Einheit wurde nun gefunden und befindet sich in der
-						 * Zielregion */
-
-						/* Wenn auf Sichtbarkeit geprüft werden soll und die Einheit
-						 * nicht gesehen wird und auch nicht kontaktiert, dann melde
-						 * 'Einheit nicht gefunden' */
-						if ((sp->sptyp & TESTCANSEE)
-								&& !cansee(mage->faction, target_r, u, 0)
-								&& !ucontact(u, mage))
-						{
-							spobj->flag = TARGET_NOTFOUND;
-							add_message(&mage->faction->msgs, new_message(mage->faction,
-								"spellunitnotfound%u:unit%r:region%s:command%s:id",
-								mage, mage->region, strdup(co->order),
-								strdup(itoa36(spobj->data.i))));
-							failed++;
-							break;
-						}
-
-						if ((sp->sptyp & TESTRESISTANCE)
-								&& target_resists_magic(mage, u, TYP_UNIT, 0))
-						{ /* Fehlermeldung */
-							spobj->flag = TARGET_RESISTS;
-							add_message(&mage->faction->msgs, new_message(mage->faction,
-								"spellunitresists%u:unit%r:region%s:command%s:id",
-								mage, mage->region, strdup(co->order),
-								strdup(itoa36(spobj->data.i))));
-							failed++;
-							break;
-						}
-						spobj->typ = SPP_UNIT;
-						spobj->data.u = u;
-					} else { /* Einheit nicht gefunden */
+					if (!u){ /* Einheit nicht gefunden */
 						spobj->flag = TARGET_NOTFOUND;
+						failed++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitnotfound%u:unit%r:region%s:command%s:id",
 							mage, mage->region, strdup(co->order),
 							strdup(itoa36(spobj->data.i))));
-						failed++;
 						break;
+					} else { /* Einheit wurde nun gefunden, pointer umsetzen */
+						spobj->flag = 0;
+						spobj->typ = SPP_UNIT;
+						spobj->data.u = u;
 					}
-
-					/* TODO: Test auf Parteieigenschaft Magieresistsenz */
-					if ((sp->sptyp & TESTRESISTANCE)
-							&& target_resists_magic(mage, u, TYP_UNIT, 0))
-					{ /* Fehlermeldung */
-						spobj->typ = SPP_UNIT_ID;
-						spobj->data.i = u->no;
-						spobj->flag = TARGET_RESISTS;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellunitresists%u:unit%r:region%s:command%s:id",
-							mage, mage->region, strdup(co->order),
-							strdup(itoa36(spobj->data.i))));
+					break;
+				}
+				/* TEMP-Einheit */
+				case SPP_TUNIT_ID:
+				{
+					unit *u;
+						/* Versuch 1 : Region der Zauberwirkung */
+					u = findnewunit(target_r, mage->faction, spobj->data.i);
+					if (!u){ 
+						/* Versuch 2 : Region des Magiers */
+						u = findnewunit(mage->region, mage->faction, spobj->data.i);
+					}
+					if (!u && sp->sptyp & SEARCHGLOBAL) {
+						/* Fehler: TEMP-Einheiten kann man nicht global suchen. der
+						 * TEMP-Name gilt immer nur jeweils für die Region */
+					}
+					if (!u){ /* Einheit nicht gefunden */
+						char tbuf[1024];
+						spobj->flag = TARGET_NOTFOUND;
 						failed++;
+						/* Meldung zusammenbauen, sonst steht dort anstatt
+						 * "TEMP <nummer>" nur "<nummer>" */
+						sprintf(tbuf, "%s %s", LOC(mage->faction->locale,
+									parameters[P_TEMP]), itoa36(spobj->data.i));
+						add_message(&mage->faction->msgs, new_message(mage->faction,
+							"spellunitnotfound%u:unit%r:region%s:command%s:id",
+							mage, mage->region, strdup(co->order),
+							strdup(tbuf)));
 						break;
+					} else {
+						/* Einheit wurde nun gefunden, pointer umsetzen */
+						spobj->flag = 0;
+						spobj->typ = SPP_UNIT;
+						spobj->data.u = u;
 					}
 					break;
 				}
 				case SPP_UNIT:
 				{
-					unit *u;
-					u = spobj->data.u;
+					unit *u = spobj->data.u;
 					if (!(sp->sptyp & SEARCHGLOBAL)
 							&& !findunitr(target_r, u->no))
 					{ /* die Einheit befindet sich nicht in der Zielregion */
 						spobj->typ = SPP_UNIT_ID;
 						spobj->data.i = u->no;
 						spobj->flag = TARGET_NOTFOUND;
+						failed++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitnotfound%u:unit%r:region%s:command%s:id",
 							mage, mage->region, strdup(co->order),
 							strdup(itoa36(spobj->data.i))));
-						failed++;
 						break;
 					}
+					break;
+				}
+				case SPP_BUILDING_ID:
+				{
+					building *b;
+
+					if (sp->sptyp & SEARCHGLOBAL) {
+						b = findbuilding(spobj->data.i);
+					} else {
+						b = findbuildingr(target_r, spobj->data.i);
+					}
+					if (!b) { /* Burg nicht gefunden */
+						spobj->flag = TARGET_NOTFOUND;
+						failed++;
+						add_message(&mage->faction->msgs, new_message(mage->faction,
+							"spellbuildingnotfound%u:unit%r:region%s:command%i:id",
+							mage, mage->region, strdup(co->order), spobj->data.i));
+						break;
+					} else {
+						spobj->typ = SPP_BUILDING;
+						spobj->flag = 0;
+						spobj->data.b = b;
+					}
+					break;
+				}
+				case SPP_BUILDING:
+				{
+					building *b;
+					b = spobj->data.b;
+
+					if (!(sp->sptyp & SEARCHGLOBAL)
+							&& !findbuildingr(target_r, b->no))
+					{ /* die Burg befindet sich nicht in der Zielregion */
+						spobj->typ = SPP_BUILDING_ID;
+						spobj->data.i = b->no;
+						spobj->flag = TARGET_NOTFOUND;
+						failed++;
+						add_message(&mage->faction->msgs, new_message(mage->faction,
+							"spellbuildingnotfound%u:unit%r:region%s:command%i:id",
+							mage, mage->region, strdup(co->order), spobj->data.i));
+						break;
+					}
+					break;
+				}
+				case SPP_SHIP_ID:
+				{
+					ship *sh;
+
+					if (sp->sptyp & SEARCHGLOBAL) {
+						sh = findship(spobj->data.i);
+					} else {
+						sh = findshipr(target_r, spobj->data.i);
+					}
+					if (!sh) { /* Schiff nicht gefunden */
+						spobj->flag = TARGET_NOTFOUND;
+						failed++;
+						add_message(&mage->faction->msgs, new_message(mage->faction,
+							"spellshipnotfound%u:unit%r:region%s:command%i:id",
+							mage, mage->region, strdup(co->order), spobj->data.i));
+						break;
+					} else {
+						spobj->typ = SPP_SHIP;
+						spobj->flag = 0;
+						spobj->data.sh = sh;
+					}
+					break;
+				}
+				case SPP_SHIP:
+				{
+					ship *sh;
+					sh = spobj->data.sh;
+
+					if (!(sp->sptyp & SEARCHGLOBAL)
+							&& !findshipr(target_r, sh->no))
+					{ /* das Schiff befindet sich nicht in der Zielregion */
+						spobj->typ = SPP_SHIP_ID;
+						spobj->data.i = sh->no;
+						spobj->flag = TARGET_NOTFOUND;
+						failed++;
+						add_message(&mage->faction->msgs, new_message(mage->faction,
+							"spellshipnotfound%u:unit%r:region%s:command%i:id",
+							mage, mage->region, strdup(co->order), spobj->data.i));
+						break;
+					}
+					break;
+				}
+				case SPP_REGION:
+				case SPP_INT:
+				case SPP_STRING:
+				default:
+					break;
+			}
+		}
+		/* Nun folgen die Tests auf cansee und Magieresistenz */
+		for (i=0;i<sa->length;i++) {
+			spobj = sa->param[i];
+
+			switch(spobj->typ) {
+				case SPP_UNIT:
+				{
+					unit *u;
+					u = spobj->data.u;
 
 					/* Wenn auf Sichtbarkeit geprüft werden soll und die Einheit
 					 * nicht gesehen wird und auch nicht kontaktiert, dann melde
@@ -1684,41 +1842,24 @@ verify_targets(castorder *co)
 						failed++;
 						break;
 					}
-					break;
-				}
-				case SPP_BUILDING_ID:
-				{
-					building *b;
-
-					if (sp->sptyp & SEARCHGLOBAL) {
-						b = findbuilding(spobj->data.i);
-					} else {
-						b = findbuildingr(target_r, spobj->data.i);
-					}
-					if (b) {
-						/* die Burg wurde nun gefunden und befindet sich in der
-						 * Zielregion */
-						if ((sp->sptyp & TESTRESISTANCE)
-								&& target_resists_magic(mage, b, TYP_BUILDING, 0))
-						{ /* Fehlermeldung */
-							spobj->flag = TARGET_RESISTS;
-							add_message(&mage->faction->msgs, new_message(mage->faction,
-								"spellbuildingresists%u:unit%r:region%s:command%i:id",
-								mage, mage->region, strdup(co->order), spobj->data.i));
-							failed++;
-							break;
-						}
-
-						spobj->typ = SPP_BUILDING;
-						spobj->data.b = b;
-					} else { /* Burg nicht gefunden */
-						spobj->flag = TARGET_NOTFOUND;
+					
+					if ((sp->sptyp & TESTRESISTANCE)
+							&& target_resists_magic(mage, u, TYP_UNIT, 0))
+					{ /* Fehlermeldung */
+						spobj->typ = SPP_UNIT_ID;
+						spobj->data.i = u->no;
+						spobj->flag = TARGET_RESISTS;
+						resists++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellbuildingnotfound%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
-						failed++;
+							"spellunitresists%u:unit%r:region%s:command%s:id",
+							mage, mage->region, strdup(co->order),
+							strdup(itoa36(spobj->data.i))));
 						break;
 					}
+
+					/* TODO: Test auf Parteieigenschaft Magieresistsenz */
+					
+					success++;
 					break;
 				}
 				case SPP_BUILDING:
@@ -1726,64 +1867,19 @@ verify_targets(castorder *co)
 					building *b;
 					b = spobj->data.b;
 
-					if (!(sp->sptyp & SEARCHGLOBAL)
-							&& !findbuildingr(target_r, b->no))
-					{ /* die Burg befindet sich nicht in der Zielregion */
-						spobj->flag = TARGET_NOTFOUND;
-						spobj->typ = SPP_BUILDING_ID;
-						spobj->data.i = b->no;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellbuildingnotfound%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
-						failed++;
-						break;
-					}
 					if ((sp->sptyp & TESTRESISTANCE)
 								&& target_resists_magic(mage, b, TYP_BUILDING, 0))
 					{ /* Fehlermeldung */
 						spobj->typ = SPP_BUILDING_ID;
 						spobj->data.i = b->no;
 						spobj->flag = TARGET_RESISTS;
+						resists++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellbuildingresists%u:unit%r:region%s:command%i:id",
 							mage, mage->region, strdup(co->order), spobj->data.i));
-						failed++;
 						break;
 					}
-					break;
-				}
-				case SPP_SHIP_ID:
-				{
-					ship *sh;
-
-					if (sp->sptyp & SEARCHGLOBAL) {
-						sh = findship(spobj->data.i);
-					} else {
-						sh = findshipr(target_r, spobj->data.i);
-					}
-					if (sh) {
-						/* das Schiff wurde nun gefunden und befindet sich in der
-						 * Zielregion */
-						if ((sp->sptyp & TESTRESISTANCE)
-								&& target_resists_magic(mage, sh, TYP_SHIP, 0))
-						{ /* Fehlermeldung */
-							spobj->flag = TARGET_RESISTS;
-							add_message(&mage->faction->msgs, new_message(mage->faction,
-								"spellshipresists%u:unit%r:region%s:command%i:id",
-								mage, mage->region, strdup(co->order), spobj->data.i));
-							failed++;
-							break;
-						}
-						spobj->typ = SPP_SHIP;
-						spobj->data.sh = sh;
-					} else { /* Schiff nicht gefunden */
-						spobj->flag = TARGET_NOTFOUND;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellshipnotfound%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
-						failed++;
-						break;
-					}
+					success++;
 					break;
 				}
 				case SPP_SHIP:
@@ -1791,31 +1887,19 @@ verify_targets(castorder *co)
 					ship *sh;
 					sh = spobj->data.sh;
 
-					if (!(sp->sptyp & SEARCHGLOBAL)
-							&& !findshipr(target_r, sh->no))
-					{ /* das Schiff befindet sich nicht in der Zielregion */
-						spobj->flag = TARGET_NOTFOUND;
-						spobj->typ = SPP_SHIP_ID;
-						spobj->data.i = sh->no;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellshipnotfound%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
-						failed++;
-						break;
-					}
-
 					if ((sp->sptyp & TESTRESISTANCE)
 								&& target_resists_magic(mage, sh, TYP_SHIP, 0))
 					{ /* Fehlermeldung */
 						spobj->typ = SPP_SHIP_ID;
 						spobj->data.i = sh->no;
 						spobj->flag = TARGET_RESISTS;
+						resists++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellshipresists%u:unit%r:region%s:command%i:id",
 							mage, mage->region, strdup(co->order), spobj->data.i));
-						failed++;
 						break;
 					}
+					success++;
 					break;
 				}
 				case SPP_REGION:
@@ -1835,16 +1919,24 @@ verify_targets(castorder *co)
 							&& target_resists_magic(mage, tr, TYP_REGION, 0))
 					{ /* Fehlermeldung */
 						spobj->flag = TARGET_RESISTS;
+						resists++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellregionresists%u:unit%r:region%s:command",
 							mage, mage->region, strdup(co->order)));
-						failed++;
 						break;
 					}
+					success++;
 					break;
 				}
 				case SPP_INT:
 				case SPP_STRING:
+					success++;
+					break;
+
+				case SPP_SHIP_ID:
+				case SPP_TUNIT_ID:
+				case SPP_UNIT_ID:
+				case SPP_BUILDING_ID:
 				default:
 					break;
 			}
@@ -1871,33 +1963,35 @@ verify_targets(castorder *co)
 						"spellregionresists%u:unit%r:region%s:command",
 						mage, mage->region, strdup(co->order)));
 					spobj->flag = TARGET_RESISTS;
-					failed++;
+					resists++;
+				} else {
+					success++;
 				}
+			} else {
+				success++;
 			}
 		}
 	}
 	if (failed > 0) {
-		/* mindestens ein Ziel wurde nicht gefunden oder widerstand dem
-		 * Zauber */
+		/* mindestens ein Ziel wurde nicht gefunden */
 		if (sa->length <= failed) {
 			return 0;
 		}
-		/* durchsuche die Parameterliste nach Zielen */
-		for (i=0;i<sa->length;i++) {
-			spobj = sa->param[i];
-			if (spobj->typ == SPP_REGION || spobj->typ == SPP_SHIP
-					|| spobj->typ == SPP_UNIT || spobj->typ == SPP_BUILDING)
-			{
-				if (spobj->flag != TARGET_NOTFOUND
-						&& spobj->flag != TARGET_RESISTS)
-				{ /* noch ein gültiges Ziel gefunden */
-					return 1;
-				}
+		if (success == 0) {
+			/* kein Ziel war ein Erfolg */
+			if (resists > 0){
+				/* aber zumindest ein Ziel wurde gefunden, hat nur wiederstanden */
+				return 1;
+			} else {
+				/* nur Fehlschläge */
+				return 0;
 			}
-		} /* nur Fehlschläge gefunden */
-		return 0;
+		}
 	} /* kein Fehlschlag gefunden */
-	return 1;
+	if (resists > 0){
+		return 1;
+	}
+	return 2;
 }
 
 /* ------------------------------------------------------------- */
@@ -2011,6 +2105,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 							}
 							token = strtok(NULL, " ");
 							unitname = atoi36(token);
+							spobj->typ = SPP_TUNIT_ID;
 							ut = findnewunit(u->region, u->faction, unitname);
 							break;
 
@@ -2035,6 +2130,9 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 					if (ut) {
 						spobj->typ = SPP_UNIT;
 						spobj->data.u = ut;
+					} else if (spobj->typ && spobj->typ == SPP_TUNIT_ID){
+						/* die TEMP Einheit wurde nicht gefunden */
+						spobj->data.i = unitname;
 					} else {
 						/* eine Zieleinheit wurde nicht gefunden, wir merken uns die
 						 * Unitid für später. */
@@ -2049,7 +2147,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 					int x, y, tx, ty;
 
 					i++;
-					if (par->length < i+1 - skip) {
+					if (par->length < i - skip) {
 						/* Fehler: Zielregion vergessen */
 						cmistake(u, strdup(s), 194, MSG_MAGIC);
 						/* Aufräumen */
@@ -2432,23 +2530,6 @@ free_castorders(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Damit man keine Rituale in fremden Gebiet machen kann, diese vor
- * Bewegung zaubern. Magier sind also in einem fremden Gebiet eine Runde
- * lang verletzlich, da sie es betreten, und angegriffen werden können,
- * bevor sie ein Ritual machen können.
- *
- * Syntax: ZAUBER [REGION X Y] [STUFE <stufe>] "Spruchname" [Einheit-1
- * Einheit-2 ..]
- *
- * Nach Priorität geordnet die Zauber global auswerten.
- *
- * Die Kosten für Farcasting multiplizieren sich mit der Entfernung,
- * cast_level gibt die virtuelle Stufe an, die den durch das Farcasten
- * entstandenen Spruchkosten entspricht.  Sind die Spruchkosten nicht
- * levelabhängig, so sind die Kosten nur von der Entfernung bestimmt,
- * die Stärke/Level durch den realen Skill des Magiers
- */
-
 /***
  ** at_familiarmage
  **/
@@ -2515,6 +2596,22 @@ set_familiar(unit * mage, unit * familiar)
 	} else assert(!a->data.v || a->data.v == mage);
 }
 
+void
+remove_familiar(unit *mage)
+{
+	attrib *a = a_find(mage->attribs, &at_familiar);
+	attrib *an;
+	skillmod_data *smd;
+
+	a_remove(&mage->attribs, a);
+  a = a_find(mage->attribs, &at_skillmod);
+  while (a) {
+		an = a->nexttype;
+		smd = (skillmod_data *)a->data.v;
+	  if (smd->special==sm_familiar) a_remove(&mage->attribs, a);
+		a = an;
+	} 
+}
 
 void
 create_newfamiliar(unit * mage, unit * familiar)
@@ -2553,7 +2650,6 @@ create_newfamiliar(unit * mage, unit * familiar)
 
 }
 
-
 static void *
 resolve_familiar(void * data)
 {
@@ -2575,6 +2671,83 @@ read_familiar(attrib * a, FILE * F)
 	fscanf(F, "%s", buf);
 	i = atoi36(buf);
 	ur_add((void*)i, &a->data.v, resolve_familiar);
+	return 1;
+}
+
+/* clones */
+
+void
+create_newclone(unit * mage, unit * clone)
+{
+	attrib *a;
+
+	a = a_find(mage->attribs, &at_clone);
+	if (a == NULL) {
+		a = a_add(&mage->attribs, a_new(&at_clone));
+		a->data.v = clone;
+	} else assert(!a->data.v || a->data.v == clone);
+	/* TODO: Diese Attribute beim Tod des Klons entfernen: */
+
+	a = a_find(clone->attribs, &at_clonemage);
+	if (a == NULL) {
+		a = a_add(&clone->attribs, a_new(&at_clonemage));
+		a->data.v = mage;
+	} else assert(!a->data.v || a->data.v == mage);
+
+	/* Wenn der Magier stirbt, wird das in destroy_unit abgefangen.
+	 * Kein Trigger, zu kompliziert. */
+
+	/* Wenn der Klon stirbt, dann bekommt der Magier einen Schock */
+	add_trigger(&clone->attribs, "destroy", trigger_clonedied(mage));
+}
+
+void
+set_clone(unit * mage, unit * clone)
+{
+	attrib *a;
+
+	a = a_find(mage->attribs, &at_clone);
+	if (a==NULL) {
+		a = a_add(&mage->attribs, a_new(&at_clone));
+		a->data.v = clone;
+	} else assert(!a->data.v || a->data.v == clone);
+
+	a = a_find(clone->attribs, &at_clonemage);
+	if (a==NULL) {
+		a = a_add(&clone->attribs, a_new(&at_clonemage));
+		a->data.v = mage;
+	} else assert(!a->data.v || a->data.v == mage);
+}
+
+unit *
+has_clone(unit *mage)
+{
+	attrib *a = a_find(mage->attribs, &at_clone);
+	if(a) return (unit *)a->data.v;
+	return NULL;
+}
+
+static void *
+resolve_clone(void * data)
+{
+	unit * clone = resolve_unit(data);
+	if (clone) {
+		attrib * a = a_find(clone->attribs, &at_clonemage);
+		if (a!=NULL && a->data.v) {
+			unit * mage = (unit *)a->data.v;
+			set_clone(mage, clone);
+		}
+	}
+	return clone;
+}
+
+static int
+read_clone(attrib * a, FILE * F)
+{
+	int i;
+	fscanf(F, "%s", buf);
+	i = atoi36(buf);
+	ur_add((void*)i, &a->data.v, resolve_clone);
 	return 1;
 }
 
@@ -2632,32 +2805,56 @@ attrib_type at_familiar = {
 	ATF_UNIQUE
 };
 
+attrib_type at_clonemage = {
+	"clonemage",
+	NULL,
+	NULL,
+	age_unit,
+	write_unit,
+	read_magician,
+	ATF_UNIQUE
+};
+
+attrib_type at_clone = {
+	"clone",
+	NULL,
+	NULL,
+	age_unit,
+	write_unit,
+	read_clone,
+	ATF_UNIQUE
+};
+
 unit *
 get_familiar(const unit *u)
 {
-#ifdef NEW_TRIGGER
 	attrib * a = a_find(u->attribs, &at_familiar);
 	if (a!=NULL) return (unit*)a->data.v;
-#endif
-#ifdef OLD_TRIGGER
-	return (unit*)get_relation(u, TYP_UNIT, REL_CREATOR);
-#else
 	return NULL;
-#endif
 }
 
 unit *
 get_familiar_mage(const unit *u)
 {
-#ifdef NEW_TRIGGER
 	attrib * a = a_find(u->attribs, &at_familiarmage);
 	if (a!=NULL) return (unit*)a->data.v;
-#endif
-#ifdef OLD_TRIGGER
-	return (unit*)get_relation(u, TYP_UNIT, REL_CREATOR);
-#else
 	return NULL;
-#endif
+}
+
+unit *
+get_clone(const unit *u)
+{
+	attrib * a = a_find(u->attribs, &at_clone);
+	if (a!=NULL) return (unit*)a->data.v;
+	return NULL;
+}
+
+unit *
+get_clone_mage(const unit *u)
+{
+	attrib * a = a_find(u->attribs, &at_clonemage);
+	if (a!=NULL) return (unit*)a->data.v;
+	return NULL;
 }
 
 static boolean
@@ -2673,6 +2870,24 @@ is_moving_ship(const region * r, const ship *sh)
 	}
 	return false;
 }
+
+/* ------------------------------------------------------------- */
+/* Damit man keine Rituale in fremden Gebiet machen kann, diese vor
+ * Bewegung zaubern. Magier sind also in einem fremden Gebiet eine Runde
+ * lang verletzlich, da sie es betreten, und angegriffen werden können,
+ * bevor sie ein Ritual machen können.
+ *
+ * Syntax: ZAUBER [REGION X Y] [STUFE <stufe>] "Spruchname" [Einheit-1
+ * Einheit-2 ..]
+ *
+ * Nach Priorität geordnet die Zauber global auswerten.
+ *
+ * Die Kosten für Farcasting multiplizieren sich mit der Entfernung,
+ * cast_level gibt die virtuelle Stufe an, die den durch das Farcasten
+ * entstandenen Spruchkosten entspricht.  Sind die Spruchkosten nicht
+ * levelabhängig, so sind die Kosten nur von der Entfernung bestimmt,
+ * die Stärke/Level durch den realen Skill des Magiers
+ */
 
 void
 magic(void)
@@ -2701,10 +2916,10 @@ magic(void)
 		for (u = r->units; u; u = u->next) {
 			boolean casted = false;
 
-			if (u->race == RC_SPELL || fval(u, FL_LONGACTION))
+			if (old_race(u->race) == RC_SPELL || fval(u, FL_LONGACTION))
 				continue;
 
-			if (rterrain(r) == T_GLACIER && u->race == RC_INSECT &&
+			if (old_race(u->race) == RC_INSECT && r_insectstalled(r) && 
 					!is_cursed(u->attribs, C_KAELTESCHUTZ,0))
 				continue;
 
@@ -2809,9 +3024,10 @@ magic(void)
 					 * normalerweise nur Meermenschen, ausgenommen explizit als
 					 * OCEANCASTABLE deklarierte Sprüche */
 					if (rterrain(r) == T_OCEAN) {
-						if (u->race != RC_AQUARIAN 
-								&& !(race[u->race].flags & RCF_SWIM) 
+						if (old_race(u->race) != RC_AQUARIAN
+								&& !fval(u->race, RCF_SWIM)
 								&& !(sp->sptyp & OCEANCASTABLE)) {
+							/* Fehlermeldung */
 								continue;
 						}
 					/* Auf bewegenden Schiffen kann man nur explizit als
@@ -2849,7 +3065,7 @@ magic(void)
 						if (ilevel!=level) {
 							level = ilevel;
 							sprintf(buf, "%s in %s: 'ZAUBER %s' Dieser Zauber kann nicht "
-									"mit Stufenangabe gezaubert werden.", unitname(u), 
+									"mit Stufenangabe gezaubert werden.", unitname(u),
 									regionid(u->region), sp->name);
 							addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
 						}
@@ -2917,7 +3133,7 @@ magic(void)
 
 			u = (unit *)co->magician;
 			sp = co->sp;
-			level = co->level;
+			level = co->level; /* Talent des Magiers oder gewünschte Stufe */
 			target_r = co->rt;
 
 			/* Da sich die Aura und Komponenten in der Zwischenzeit verändert
@@ -2941,7 +3157,7 @@ magic(void)
 					sprintf(buf, "%s hat nur genügend Komponenten um %s auf Stufe %d "
 							"zu zaubern.", unitname(u), sp->name, level);
 					addmessage(0, u->faction, buf, MSG_MAGIC, ML_INFO);
-				}	
+				}
 			}
 			co->level = level;
 
@@ -2962,10 +3178,39 @@ magic(void)
 			}
 			co->force = force;
 
-			/* Ziele auf Existenz prüfen und Magieresistenz feststellen */
-			if (verify_targets(co) == 0) {
-				/* kein Ziel gefunden, Fehlermeldungen sind in verify_targets */
-				continue;
+			/* Ziele auf Existenz prüfen und Magieresistenz feststellen. Wurde
+			 * kein Ziel gefunden, so ist verify_targets=0. Scheitert der
+			 * Spruch an der Magieresistenz, so ist verify_targets = 1, bei
+			 * Erfolg auf ganzer Linie ist verify_targets= 2 
+			 */
+			switch (verify_targets(co)){
+				case 0:
+					/* kein Ziel gefunden, Fehlermeldungen sind in verify_targets */
+					continue; /* äußere Schleife, nächster Zauberer */
+				case 1:
+				{ /* einige oder alle Ziele waren magieresistent */
+					spellparameter *pa = co->par;
+					int n;
+					for (n = 0; n < pa->length; n++) {
+						if(pa->param[n]->flag != TARGET_RESISTS 
+								&& pa->param[n]->flag != TARGET_NOTFOUND)
+						{ /* mindestens ein erfolgreicher Zauberversuch, wir machen
+								 normal weiter */
+							break;
+						}
+					} 
+					/* zwar wurde mindestens ein Ziel gefunden, das widerstand
+					 * jedoch dem Zauber. Kosten abziehen und abbrechen. */
+					pay_spell(u, sp, level, co->distance);
+					sprintf(buf, "%s gelingt es %s zu zaubern, doch der Spruch zeigt "
+							"keine Wirkung.", unitname(u), sp->name);
+					addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
+					continue; /* äußere Schleife, nächster Zauberer */
+				}
+				case 2:
+				default: 
+					/* Zauber war erfolgreich */
+					break;
 			}
 
 			/* Auch für Patzer gibt es Erfahrung, müssen die Spruchkosten
@@ -3002,7 +3247,7 @@ magic(void)
 }
 
 attrib *
-create_special_direction(region *r, int x, int y, int duration, 
+create_special_direction(region *r, int x, int y, int duration,
 						 const char *desc, const char *keyword)
 
 {

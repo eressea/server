@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -44,6 +44,7 @@
 #include "karma.h"
 #include "ship.h"
 #include "battle.h"
+#include "luck.h"
 
 /* attributes includes */
 #include <attributes/racename.h>
@@ -112,7 +113,7 @@ dissolve_units(void)
 				scale_number(u,u->number - n);
 
 				sprintf(buf, "%s in %s: %d %s ", unitname(u), regionid(r),
-						n, race[u->race].name[ n == 1 ? 0 : 1]);
+						n, LOC(default_locale, rc_name(u->race, n!=1)));
 				switch(a->data.ca[0]) {
 				case 1:
 					rsetpeasants(r, rpeasants(r) + n);
@@ -124,7 +125,11 @@ dissolve_units(void)
 					break;
 				case 2:
 					if(r->land) {
+#ifdef GROWING_TREES
+						rsettrees(r, 2, rtrees(r,2) + n);
+#else
 						rsettrees(r, rtrees(r) + n);
+#endif
 						if (n == 1) {
 							scat("wurde zum Baum.");
 						}else{
@@ -139,7 +144,7 @@ dissolve_units(void)
 					}
 					break;
 				default:
-					if (u->race == RC_STONEGOLEM || u->race == RC_IRONGOLEM) {
+					if (u->race == new_race[RC_STONEGOLEM] || u->race == new_race[RC_IRONGOLEM]) {
 						if (n == 1) {
 							scat("zerfiel zu Staub.");
 						}else{
@@ -457,7 +462,7 @@ get_allies(region * r, unit * u)
 
 	u_setfaction(newunit, u->faction);
 	set_racename(&newunit->attribs, get_racename(u->attribs));
-	if(race[u->race].flags & RCF_SHAPESHIFT) {
+	if(u->race->flags & RCF_SHAPESHIFT) {
 		newunit->irace = u->irace;
 	}
 	if (fval(u, FL_PARTEITARNUNG)) fset(newunit, FL_PARTEITARNUNG);
@@ -530,12 +535,12 @@ chaos(region * r)
 		case 0:				/* Untote */
 			if (rterrain(r) != T_OCEAN) {
 				u = random_unit(r);
-				if (u && !nonplayer(u)) {
+				if (u && playerrace(u->race)) {
 					sprintf(buf, "%s scheint von einer seltsamen Krankheit befallen.",
 							unitname(u));
 					addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
 					u_setfaction(u, findfaction(MONSTER_FACTION));
-					u->race = RC_GHOUL;
+					u->race = new_race[RC_GHOUL];
 				}
 			}
 			break;
@@ -545,7 +550,7 @@ chaos(region * r)
 				switch (rand() % 3) {
 				case 0:
 					mfac = 100;
-					u = createunit(r, findfaction(MONSTER_FACTION), rand() % 8 + 1, RC_FIREDRAGON);
+					u = createunit(r, findfaction(MONSTER_FACTION), rand() % 8 + 1, new_race[RC_FIREDRAGON]);
 					if (u->number == 1) {
 						set_string(&u->name, "Feuerdrache");
 					} else {
@@ -554,7 +559,7 @@ chaos(region * r)
 					break;
 				case 1:
 					mfac = 500;
-					u = createunit(r, findfaction(MONSTER_FACTION), rand() % 4 + 1, RC_DRAGON);
+					u = createunit(r, findfaction(MONSTER_FACTION), rand() % 4 + 1, new_race[RC_DRAGON]);
 					if (u->number == 1) {
 						set_string(&u->name, "Drache");
 					} else {
@@ -563,7 +568,7 @@ chaos(region * r)
 					break;
 				case 2:
 					mfac = 1000;
-					u = createunit(r, findfaction(MONSTER_FACTION), rand() % 2 + 1, RC_WYRM);
+					u = createunit(r, findfaction(MONSTER_FACTION), rand() % 2 + 1, new_race[RC_WYRM]);
 					if (u->number == 1) {
 						set_string(&u->name, "Wyrm");
 					} else {
@@ -592,7 +597,7 @@ chaos(region * r)
 
 						for (u = r->units; u;) {
 							u2 = u->next;
-							if (u->race != RC_SPELL && u->ship == 0) {
+							if (u->race != new_race[RC_SPELL] && u->ship == 0) {
 								set_number(u, 0);
 							}
 							u = u2;
@@ -650,11 +655,9 @@ chaosfactor(region * r)
 }
 
 void
-drown(void)
+drown(region *r)
 {
-	region *r;
-
-	for (r=regions; r; r=r->next) if (rterrain(r) == T_OCEAN) {
+	if (rterrain(r) == T_OCEAN) {
 		unit ** up = up=&r->units;
 		while (*up) {
 			unit *u = *up;
@@ -668,16 +671,16 @@ drown(void)
 			if (amphibian_level) {
 				int dead = damage_unit(u, "5d1", false, false);
 				if (dead) {
-					add_message(&u->faction->msgs, new_message(u->faction,
-						"drown_amphibian_dead%d:amount%u:unit",dead, u));
+					ADDMSG(&u->faction->msgs, new_message(u->faction,
+						"drown_amphibian_dead%d:amount%u:unit%r:region",dead, u, r));
 				} else {
-					add_message(&u->faction->msgs, new_message(u->faction,
-						"drown_amphibian_nodead%u:unit",u));
+					ADDMSG(&u->faction->msgs, new_message(u->faction,
+						"drown_amphibian_nodead%u:unit%r:region",u, r));
 				}
 			} else if (!canswim(u)) {
 				scale_number(u, 0);
-				add_message(&u->faction->msgs, new_message(u->faction,
-					"drown%u:unit",u));
+				ADDMSG(&u->faction->msgs, new_message(u->faction,
+					"drown%u:unit%r:region", u, r));
 			}
 			if (*up==u) up=&u->next;
 		}
@@ -730,7 +733,13 @@ volcano_outbreak(region *r)
 
 	/* Vulkan-Region verwüsten */
 
+#ifdef GROWING_TREES
+	rsettrees(r, 2, 0);
+	rsettrees(r, 1, 0);
+	rsettrees(r, 0, 0);
+#else
 	rsettrees(r, 0);
+#endif
 
 	a = a_find(r->attribs, &at_reduceproduction);
 	if (!a) a = a_add(&r->attribs, a_new(&at_reduceproduction));
@@ -746,16 +755,16 @@ volcano_outbreak(region *r)
 		unit * u = *up;
 		dead = damage_unit(u, "4d10", true, false);
 		if (dead) {
-			add_message(&u->faction->msgs, new_message(u->faction,
+			ADDMSG(&u->faction->msgs, new_message(u->faction,
 				"volcano_dead%u:unit%r:region%i:dead", u, r, dead));
 		}
 		if (!fval(u->faction, FL_DH)) {
 			fset(u->faction, FL_DH);
 			if (rn) {
-				add_message(&u->faction->msgs, new_message(u->faction,
+				ADDMSG(&u->faction->msgs, new_message(u->faction,
 					"volcanooutbreak%r:regionv%r:regionn", r, rn));
 			} else {
-				add_message(&u->faction->msgs, new_message(u->faction,
+				ADDMSG(&u->faction->msgs, new_message(u->faction,
 					"volcanooutbreaknn%r:region", r));
 			}
 		}
@@ -768,7 +777,13 @@ volcano_outbreak(region *r)
 
 	if (rn) {
 
+#ifdef GROWING_TREES
+		rsettrees(r, 2, 0);
+		rsettrees(r, 1, 0);
+		rsettrees(r, 0, 0);
+#else
 		rsettrees(r, 0);
+#endif
 
 		a = a_add(&rn->attribs, a_new(&at_reduceproduction));
 		if (!a) a = a_add(&r->attribs, a_new(&at_reduceproduction));
@@ -783,11 +798,11 @@ volcano_outbreak(region *r)
 			unit * u = *up;
 			dead = damage_unit(u, "3d10", true, false);
 			if (dead) {
-				add_message(&u->faction->msgs, new_message(u->faction,
+				ADDMSG(&u->faction->msgs, new_message(u->faction,
 					"volcano_dead%u:unit%r:region%i:dead", u, rn, dead));
 			}
 			if (!fval(u->faction, FL_DH)) {
-				add_message(&u->faction->msgs, new_message(u->faction,
+				ADDMSG(&u->faction->msgs, new_message(u->faction,
 					"volcano_dead%u:unit%r:region%i:dead", u, r, dead));
 				fset(u->faction, FL_DH);
 			}
@@ -795,6 +810,38 @@ volcano_outbreak(region *r)
 		}
 		remove_empty_units_in_region(rn);
 	}
+}
+
+static void
+melt_iceberg(region *r)
+{
+	attrib *a;
+	unit *u;
+	building *b, *b2;
+
+	for (u=r->units; u; u=u->next) freset(u->faction, FL_DH);
+	for (u=r->units; u; u=u->next) if (!fval(u->faction, FL_DH)) {
+		fset(u->faction, FL_DH);
+		ADDMSG(&u->faction->msgs, new_message(u->faction,
+			"iceberg_melt%r:region", r));
+	}
+
+	/* driftrichtung löschen */
+	a = a_find(r->attribs, &at_iceberg);
+	if (a) a_remove(&r->attribs, a);
+
+	/* Gebäude löschen */
+	for (b = rbuildings(r); b; b = b2) {
+		b2 = b->next;
+		destroy_building(b);
+	}
+
+	/* in Ozean wandeln */
+	rsetterrain(r, T_OCEAN);
+
+	/* Einheiten, die nicht schwimmen können oder in Schiffen sind,
+	 * ertrinken */
+	drown(r);
 }
 
 static void
@@ -830,7 +877,7 @@ move_iceberg(region *r)
 			for (u=r->units; u; u=u->next) freset(u->faction, FL_DH);
 			for (u=r->units; u; u=u->next) if (!fval(u->faction, FL_DH)) {
 				fset(u->faction, FL_DH);
-				add_message(&u->faction->msgs, new_message(u->faction,
+				ADDMSG(&u->faction->msgs, new_message(u->faction,
 					"iceberg_drift%r:region%d:dir", r, dir));
 			}
 
@@ -882,11 +929,11 @@ move_iceberg(region *r)
 				if (fval(sh, FL_DH)) {
 					u = captain(sh, r);
 					if (sh->damage>=sh->size * DAMAGE_SCALE) {
-						if (u) add_message(&u->faction->msgs, new_message(u->faction,
+						if (u) ADDMSG(&u->faction->msgs, new_message(u->faction,
 							"overrun_by_iceberg_des%h:ship", sh));
 						destroy_ship(sh, r);
 					} else {
-						if (u) add_message(&u->faction->msgs, new_message(u->faction,
+						if (u) ADDMSG(&u->faction->msgs, new_message(u->faction,
 							"overrun_by_iceberg%h:ship", sh));
 					}
 				}
@@ -902,7 +949,7 @@ move_iceberg(region *r)
 			for (u=r->units; u; u=u->next) freset(u->faction, FL_DH);
 			for (u=r->units; u; u=u->next) if (!fval(u->faction, FL_DH)) {
 				fset(u->faction, FL_DH);
-				add_message(&u->faction->msgs, new_message(u->faction,
+				ADDMSG(&u->faction->msgs, new_message(u->faction,
 					"iceberg_land%r:region", r));
 			}
 		}
@@ -914,9 +961,14 @@ move_icebergs(void)
 {
 	region *r;
 
-	for (r=regions; r; r=r->next) if (rterrain(r) == T_ICEBERG && !fval(r, RF_DH) && rand()%100 < 60) {
-		fset(r, RF_DH);
-		move_iceberg(r);
+	for (r=regions; r; r=r->next) if (rterrain(r) == T_ICEBERG && !fval(r, RF_DH)) {
+		if (rand()%100 < 60) {
+			fset(r, RF_DH);
+			move_iceberg(r);
+		} else if (rand()%100 < 10){
+			fset(r, RF_DH);
+			melt_iceberg(r);
+		}
 	}
 }
 
@@ -948,12 +1000,46 @@ create_icebergs(void)
 		for (u=r->units; u; u=u->next) freset(u->faction, FL_DH);
 		for (u=r->units; u; u=u->next) if (!fval(u->faction, FL_DH)) {
 			fset(u->faction, FL_DH);
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"iceberg_create%r:region", r));
+			ADDMSG(&u->faction->msgs, msg_message("iceberg_create", "region", r));
 		}
 	}
 }
 
+void
+godcurse(void)
+{
+	region *r;
+	ship *sh, *shn;
+	skill_t sk;
+
+	for(r=regions; r; r=r->next) {
+		if(is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+			unit * u;
+			for(u=r->units; u; u=u->next) {
+				for(sk=0; sk < MAXSKILLS; sk++) {
+					int s = get_skill(u, sk);
+					if(s > 0) {
+						change_skill(u, sk, -min(s, (30+rand()%90)*u->number));
+					}
+				}
+			}
+		}
+	}
+
+	if(rterrain(r) == T_OCEAN) {
+		for (sh = r->ships; sh;) {
+			shn = sh->next;
+			damage_ship(sh, 0.10);
+			if (sh->damage>=sh->size * DAMAGE_SCALE) {
+				unit * u = shipowner(r, sh);
+				if (u) ADDMSG(&u->faction->msgs,
+					msg_message("godcurse_destroy_ship", "ship", sh));
+				destroy_ship(sh, r);
+			}
+			sh = shn;
+		}
+	}
+}
 
 void
 randomevents(void)
@@ -968,22 +1054,28 @@ randomevents(void)
 	for (r=regions; r; r=r->next) freset(r, RF_DH);
 	create_icebergs();
 	move_icebergs();
-	drown();
+
+	godcurse();
+
+	for (r=regions; r; r=r->next) {
+		drown(r);
+	}
 
 	/* Orks vermehren sich */
 
 	for (r = regions; r; r = r->next) {
+
 		plane * p = rplane(r);
 		/* there is a flag for planes without orc growth: */
 		if (p && (p->flags & PFL_NOORCGROWTH)) continue;
 		for (u = r->units; u; u = u->next) {
-			if ( (u->race == RC_ORC || is_cursed(u->attribs, C_ORC, 0))
+			if ( (u->race == new_race[RC_ORC] || is_cursed(u->attribs, C_ORC, 0))
 					&& get_skill(u, SK_MAGIC) == 0
 			    && get_skill(u, SK_ALCHEMY) == 0) {
 				int increase = 0;
 				int num, prob;
 
-				if (u->race == RC_ORC) {
+				if (u->race == new_race[RC_ORC]) {
 					num  = u->number;
 					prob = 5;
 				} else {
@@ -997,7 +1089,7 @@ randomevents(void)
 					}
 				}
 				if (increase) {
-					if (u->race == RC_ORC) {
+					if (u->race == new_race[RC_ORC]) {
 						int s;
 						s = get_skill(u, SK_SWORD) / (u->number * 2);
 						change_skill(u, SK_SWORD,
@@ -1025,9 +1117,8 @@ randomevents(void)
 					set_number(u, u->number + increase);
 
 					u->hp += unit_max_hp(u) * increase;
-					add_message(&u->faction->msgs, new_message(u->faction,
-						"orcgrowth%u:unit%i:amount%i:race",
-						u, increase, u->race));
+					ADDMSG(&u->faction->msgs, msg_message("orcgrowth",
+						"unit amount race", u, increase, u->race));
 				}
 			}
 		}
@@ -1039,7 +1130,7 @@ randomevents(void)
 		int bauernblut = 0;
 		boolean bfind = false;
 		for (u = r->units; u; u = u->next) {
-			if (u->race == RC_DAEMON) {
+			if (u->race == new_race[RC_DAEMON]) {
 				/* Alles Bauernblut der Region zählen.
 				 * warnung: bauernblut einer partei hilft im moment der anderen
 				 * so selten wie das benutzt wird, ist das erstmal wursht,
@@ -1054,7 +1145,7 @@ randomevents(void)
 					while (ud) {
 						attrib * a = a_find(ud->attribs, &at_bauernblut);
 						if (a) bauernblut += a->data.i;
-						do { ud=ud->next; } while (ud && ud->race!=RC_DAEMON);
+						do { ud=ud->next; } while (ud && ud->race!=new_race[RC_DAEMON]);
 					}
 					bfind = true;
 				}
@@ -1096,7 +1187,7 @@ randomevents(void)
 #if 0
 /* ist kaputt. weiß nicht, wieso. */
 							if (r==s) {
-								sprintf(buf, "Durch Konzentrationsmangel vergißt %s das Talent %s vollständig", 
+								sprintf(buf, "Durch Konzentrationsmangel vergißt %s das Talent %s vollständig",
 									unitname(u), skillname(u->faction->local, sk));
 								addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
 							}
@@ -1108,15 +1199,20 @@ randomevents(void)
 		}
 	}
 
+	for (r = regions; r; r = r->next) {
+#ifndef RACE_ADJUSTMENTS
 	/* Elfen generieren Wald, Personen in Steinkreisen können Einhörner
 	 * bekommen. */
 
-	for (r = regions; r; r = r->next) {
 		if (r->land && !fval(r, RF_MALLORN)) {
+#ifdef GROWING_TREES
+			int trees = rtrees(r,2);
+#else
 			int trees = rtrees(r);
+#endif
 			int maxgen = (production(r) * MAXPEASANTS_PER_AREA)/8;
 			for (u = r->units; u && maxgen > 0; u = u->next) {
-				if (u->race == RC_ELF) {
+				if (u->race == new_race[RC_ELF]) {
 					for (n = u->number; n && maxgen > 0; n--) {
 						if (rand() % 1000 < 15) {	/* 1.5% Chance */
 							trees++;
@@ -1125,11 +1221,16 @@ randomevents(void)
 					}
 				}
 			}
+#ifdef GROWING_TREES
+			rsettrees(r, 2, trees);
+#else
 			rsettrees(r, trees);
+#endif
 		}
+#endif
 
 		for (u=r->units; u; u=u->next) {
-			if (!(race[u->race].ec_flags & NOGIVE)) {
+			if (!(u->race->ec_flags & NOGIVE)) {
 				struct building * b = inside_building(u);
 				const struct building_type * btype = b?b->type:NULL;
 				if (btype == &bt_blessedstonecircle) {
@@ -1139,7 +1240,7 @@ randomevents(void)
 						c++;
 					}
 					if (c) {
-						add_message(&u->faction->msgs, new_message(u->faction,
+						ADDMSG(&u->faction->msgs, new_message(u->faction,
 							"scunicorn%u:unit%i:amount%X:type",u,c,
 							olditemtype[I_UNICORN]->rtype));
 					}
@@ -1159,8 +1260,7 @@ randomevents(void)
 				if (rc && rpeasants(rc) > 0 && !fval(rc, RF_ORCIFIED)) chance += 2;
 			}
 			if (rand()%100 < chance) {
-				message * msg = add_message(&r->msgs, msg_message("deorcified", "region", r));
-				msg_release(msg);
+				ADDMSG(&r->msgs, msg_message("deorcified", "region", r));
 				freset(r, RF_ORCIFIED);
 			}
 		} else {
@@ -1172,7 +1272,7 @@ randomevents(void)
 				if (rand()%100 < chance) {
 					fset(r, RF_ORCIFIED);
 					a_remove(&r->attribs, a);
-					add_message(&r->msgs, msg_message("orcified", "region", r));
+					ADDMSG(&r->msgs, msg_message("orcified", "region", r));
 				} else {
 					a->data.i -= max(10,a->data.i/10);
 					if (a->data.i <= 0) a_remove(&r->attribs, a);
@@ -1186,16 +1286,14 @@ randomevents(void)
 	for (r = regions; r; r = r->next) {
 		switch(rterrain(r)) {
 		case T_VOLCANO:
-			if (rand()%100 < 5) {
-				message * msg = add_message(&r->msgs, msg_message("volcanostartsmoke", "region", r));
-				msg_release(msg);
+			if (rand()%100 < 4) {
+				ADDMSG(&r->msgs, msg_message("volcanostartsmoke", "region", r));
 				rsetterrain(r, T_VOLCANO_SMOKING);
 			}
 			break;
 		case T_VOLCANO_SMOKING:
-			if (rand()%100 < 10) {
-				message * msg = add_message(&r->msgs, msg_message("volcanostopsmoke", "region", r));
-				msg_release(msg);
+			if (rand()%100 < 12) {
+				ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
 				rsetterrain(r, T_VOLCANO);
 			} else if (rand()%100 < 8) {
 				volcano_outbreak(r);
@@ -1225,7 +1323,7 @@ randomevents(void)
 	for (r = regions; r; r = r->next) {
 		unit * u;
 		if (rterrain(r) == T_OCEAN && rand()%10000 < 1) {
-			u = createunit(r, findfaction(MONSTER_FACTION), 1, RC_SEASERPENT);
+			u = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_SEASERPENT]);
 			set_skill(u, SK_MAGIC, u->number * 300);
 			set_skill(u, SK_OBSERVATION, u->number * 180);
 			set_skill(u, SK_STEALTH, u->number * 90);
@@ -1246,10 +1344,10 @@ randomevents(void)
 			case 5:
 			case 6:
 			case 7:
-				u = createunit(r, findfaction(MONSTER_FACTION), nrand(60, 20) + 1, RC_FIREDRAGON);
+				u = createunit(r, findfaction(MONSTER_FACTION), nrand(60, 20) + 1, new_race[RC_FIREDRAGON]);
 				break;
 			default:
-				u = createunit(r, findfaction(MONSTER_FACTION), nrand(30, 20) + 1, RC_DRAGON);
+				u = createunit(r, findfaction(MONSTER_FACTION), nrand(30, 20) + 1, new_race[RC_DRAGON]);
 				break;
 			}
 
@@ -1259,25 +1357,25 @@ randomevents(void)
 			set_skill(u, SK_AUSDAUER, u->number * 30);
 			set_skill(u, SK_STEALTH, u->number * 30);
 			log_printf("%d %s in %s.\n", u->number,
-				race[u->race].name[1], regionname(r, NULL));
+				LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
 
 			name_unit(u);
 			set_string(&u->lastorder, "WARTEN");
 
 			if (u->number == 1) {
 				sprintf(buf, "Es wurde ein %s gesichtet.",
-					race[u->race].name[0]);
+					LOC(default_locale, rc_name(u->race, 0)));
 			} else {
 				sprintf(buf, "Es wurden %d %s gesichtet.",
-					u->number, race[u->race].name[1]);
+					u->number, LOC(default_locale, rc_name(u->race, u->number!=1)));
 			}
 			addmessage(r, 0, buf, MSG_COMMENT, ML_IMPORTANT);
 			if (u->number == 1) {
 				sprintf(buf, "In %s wurde ein %s gesichtet.", regionid(r),
-					race[u->race].name[0]);
+					LOC(default_locale, rc_name(u->race, u->number!=1)));
 			} else {
 				sprintf(buf, "In %s wurden %d %s gesichtet.", regionid(r),
-					u->number, race[u->race].name[1]);
+					u->number, LOC(default_locale, rc_name(u->race, u->number!=1)));
 			}
 			for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
 			for (u=r->units;u;u=u->next) {
@@ -1303,22 +1401,22 @@ randomevents(void)
 			 * Lieber sammeln lassen, bis sie mindestens 5% der Bevölkerung sind, und
 			 * dann erst auferstehen. */
 			int undead = unburied / (rand() % 2 + 1);
-			race_t rc;
+			const race * rc;
 			int i;
 
 			if (!undead || r->age < 20) continue;
 
 			switch(rand()%3) {
 			case 0:
-				rc = RC_SKELETON; break;
+				rc = new_race[RC_SKELETON]; break;
 			case 1:
-				rc = RC_ZOMBIE; break;
+				rc = new_race[RC_ZOMBIE]; break;
 			default:
-				rc = RC_GHOUL; break;
+				rc = new_race[RC_GHOUL]; break;
 			}
 
 			u = createunit(r, findfaction(MONSTER_FACTION), undead, rc);
-			if ((rc == RC_SKELETON || rc == RC_ZOMBIE) && rand()%10 < 4) {
+			if ((rc == new_race[RC_SKELETON] || rc == new_race[RC_ZOMBIE]) && rand()%10 < 4) {
 				set_item(u, I_RUSTY_SWORD, undead);
 				if (rand()%10 < 3) {
 					set_item(u, I_RUSTY_SHIELD, undead);
@@ -1329,7 +1427,7 @@ randomevents(void)
 			}
 
 			for (i=0;i < MAXSKILLS;i++) {
-				if (race[rc].bonus[i] >= 1) {
+				if (rc->bonus[i] >= 1) {
 					set_skill(u, i, 30 * u->number);
 				}
 			}
@@ -1340,7 +1438,7 @@ randomevents(void)
 			name_unit(u);
 
 			log_printf("%d %s in %s.\n", u->number,
-				race[u->race].name[1], regionname(r, NULL));
+				LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
 
 			{
 				message * msg = msg_message("undeadrise", "region amount", r, undead);
@@ -1364,9 +1462,11 @@ randomevents(void)
 
 	for (r = regions; r; r=r->next) {
 		for (u=r->units; u; u=u->next) {
-			if (u->faction->no != MONSTER_FACTION && (race[u->race].flags & RCF_DESERT)) {
+			if (u->faction->no != MONSTER_FACTION
+					&& (u->race->flags & RCF_DESERT)) {
+				if (fval(u, FL_ISNEW)) continue;
 				if (rand()%100 < 5) {
-					add_message(&u->faction->msgs, new_message(u->faction,
+					ADDMSG(&u->faction->msgs, new_message(u->faction,
 						"desertion%u:unit%r:region", u, r));
 					u_setfaction(u, findfaction(MONSTER_FACTION));
 				}
@@ -1379,15 +1479,23 @@ randomevents(void)
 	for (r = regions; r; r = r->next) {
 		if (fval(r, RF_CHAOTIC) ||(r->x >= -13  && r->x <= -6  && r->y >= 50 && r->y <= 57)) {
 			if (woodcount(r) >= 40 && rand()%100 < 33) {
+#ifdef GROWING_TREES
+				int trees = rtrees(r,2);
+#else
 				int trees = rtrees(r);
+#endif
 				int treemen = rand()%(max(50,trees)/3);
 				struct message * msg;
 
 				treemen = max(25, treemen);
 				woodcounts(r, -40);
 				trees = max(0, trees-treemen);
+#ifdef GROWING_TREES
+				rsettrees(r, 2, trees);
+#else
 				rsettrees(r, trees);
-				u = createunit(r, findfaction(MONSTER_FACTION),treemen, RC_TREEMAN);
+#endif
+				u = createunit(r, findfaction(MONSTER_FACTION),treemen, new_race[RC_TREEMAN]);
 				set_string(&u->lastorder, "WARTEN");
 				/* guard(u, GUARD_ALL); kein auto-guard! erst in monster.c! */
 				change_skill(u,SK_OBSERVATION,180*u->number);
@@ -1450,8 +1558,10 @@ randomevents(void)
 
 	dissolve_units();
 	check_split();
+	check_luck();
 }
 
+#if NEW_LAEN
 void growlaen(void) {
 	region *r;
 	regionlist *Berge=NULL, *rl;
@@ -1496,7 +1606,7 @@ void growlaen(void) {
 			/* Meldungen generieren */
 			for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
 			for (u = r->units; u; u = u->next ) {
-				if (!fval(u->faction, FL_DH) && eff_skill(u, SK_MINING, rl->region) >= olditemtype[I_EOG]->minskill)
+				if (!fval(u->faction, FL_DH) && eff_skill(u, SK_MINING, rl->region) >= olditemtype[I_LAEN]->minskill)
 				{
 					if (!msg) msg = msg_message("unveileog", "unit region", u, rl->region);
 					r_addmessage(rl->region, u->faction, msg);
@@ -1508,4 +1618,6 @@ void growlaen(void) {
 	}
   free(add_laen);
   free_regionlist(Berge);
+
 }
+#endif

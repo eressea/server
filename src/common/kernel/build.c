@@ -193,7 +193,7 @@ siege(region * r, unit * u)
 		return;
 	}
 
-	if (race[u->race].nonplayer) {
+	if (!playerrace(u->race)) {
 		/* keine Drachen, Illusionen, Untote etc */
 		cmistake(u, u->thisorder, 166, MSG_BATTLE);
 		return;
@@ -278,7 +278,7 @@ do_siege(void)
 void
 destroy_road(unit *u, int n, const char *cmd)
 {
-	direction_t d = getdirection();
+	direction_t d = getdirection(u->faction->locale);
 	unit *u2;
 	region *r = u->region;
 
@@ -462,7 +462,7 @@ build_road(region * r, unit * u, int size, direction_t d)
 			cmistake(u, findorder(u, u->thisorder), 131, MSG_PRODUCE);
 			return;
 		}
-	if (!get_pooled(u, r, R_STONE) && u->race != RC_STONEGOLEM) {
+	if (!get_pooled(u, r, R_STONE) && old_race(u->race) != RC_STONEGOLEM) {
 		cmistake(u, findorder(u, u->thisorder), 151, MSG_PRODUCE);
 		return;
 	}
@@ -494,7 +494,7 @@ build_road(region * r, unit * u, int size, direction_t d)
 	}							/* Auswirkung Schaffenstrunk */
 
 	/* und anhand der rohstoffe */
-	if (u->race == RC_STONEGOLEM){
+	if (old_race(u->race) == RC_STONEGOLEM){
 		n = min(n, u->number * GOLEM_STONE);
 	} else {
 		n = use_pooled(u, r, R_STONE, n);
@@ -505,7 +505,7 @@ build_road(region * r, unit * u, int size, direction_t d)
 	 * maximum. */
 	rsetroad(r, d, rroad(r, d) + min(n, left));
 
-	if (u->race == RC_STONEGOLEM){
+	if (old_race(u->race) == RC_STONEGOLEM){
 		int golemsused = n / GOLEM_STONE;
 		if (n%GOLEM_STONE != 0){
 			++golemsused;
@@ -572,7 +572,7 @@ build(unit * u, const construction * ctype, int completed, int want)
 	if (basesk==0) return ENEEDSKILL;
 
 	effsk = basesk;
-	if (u->building) {
+	if (inside_building(u)) {
 		effsk = skillmod(u->building->type->attribs, u, u->region, type->skill, effsk, SMF_PRODUCTION);
 	}
 	effsk = skillmod(type->attribs, u, u->region, type->skill, effsk, SMF_PRODUCTION);
@@ -648,9 +648,7 @@ build(unit * u, const construction * ctype, int completed, int want)
 			n = min(type->maxsize-completed, n);
 		}
 
-		if (n<=0) break; /* can't build any more */
-
-		if (type->materials) for (c=0;n && type->materials[c].number;c++) {
+		if (type->materials) for (c=0;n>0 && type->materials[c].number;c++) {
 			resource_t rtype = type->materials[c].type;
 			int need;
 			int have = get_pooled(u, NULL, rtype);
@@ -682,7 +680,7 @@ build(unit * u, const construction * ctype, int completed, int want)
 			int need = required(completed + n, type->reqsize, type->materials[c].number);
 			int multi = 1;
 			int canuse = 100; /* normalization */
-			if (u->building) canuse = matmod(u->building->type->attribs, u, oldresourcetype[rtype], canuse);
+			if (inside_building(u)) canuse = matmod(u->building->type->attribs, u, oldresourcetype[rtype], canuse);
 			if (canuse<0) return canuse; /* pass errors to caller */
 			canuse = matmod(type->attribs, u, oldresourcetype[rtype], canuse);
 
@@ -730,8 +728,8 @@ build_building(unit * u, const building_type * btype, int want)
 {
 	region * r = u->region;
 	boolean newbuilding = false;
-	int c, built = 0;
-	building * b = getbuilding(r);
+	int c, built = 0, id;
+	building * b = NULL;
 	/* einmalige Korrektur */
 	static char buffer[8 + IDSIZE + 1 + NAMESIZE + 1];
 	const char *string2;
@@ -740,16 +738,31 @@ build_building(unit * u, const building_type * btype, int want)
 		cmistake(u, findorder(u, u->thisorder), 101, MSG_PRODUCE);
 		return;
 	}
-
+	
 	/* Falls eine Nummer angegeben worden ist, und ein Gebaeude mit der
 	 * betreffenden Nummer existiert, ist b nun gueltig. Wenn keine Burg
-	 * gefunden wurde, dann wird einfach eine neue erbaut, falls man in
-	 * keiner burg ist. Ansonsten baut man an der eigenen burg weiter. */
+	 * gefunden wurde, dann wird nicht einfach eine neue erbaut. Ansonsten
+	 * baut man an der eigenen burg weiter. */
 
-	if (!b && u->building && u->building->type==btype) b = u->building;
+	/* Wenn die angegebene Nummer falsch ist, KEINE Burg bauen! */
+	id = atoi36(getstrtoken());
+	if (id!=0){ /* eine Nummer angegeben, keine neue Burg bauen */
+		b = findbuilding(id);
+		if (!b || b->region != u->region){ /* eine Burg mit dieser Nummer gibt es hier nicht */
+			/* vieleicht Tippfehler und die eigene Burg ist gemeint? */
+			if (u->building && u->building->type==btype) {
+				b = u->building;
+			} else {
+				/* keine neue Burg anfangen wenn eine Nummer angegeben war */
+				cmistake(u, findorder(u, u->thisorder), 6, MSG_PRODUCE);
+				return;
+			}
+		}
+	}
+
 	if (b) btype = b->type;
 
-	if (fval(btype, BTF_UNIQUE) && buildingtype_exists(r, btype)) {
+	if (b && fval(btype, BTF_UNIQUE) && buildingtype_exists(r, btype)) {
 		/* only one of these per region */
 		cmistake(u, findorder(u, u->thisorder), 93, MSG_PRODUCE);
 		return;
@@ -791,22 +804,19 @@ build_building(unit * u, const building_type * btype, int want)
 	case ENOMATERIALS: {
 		/* something missing from the list of materials */
 		const construction * cons = btype->construction;
-		char * ch;
+		char * ch = buf;
 		assert(cons);
-		strcpy(buf, "Dafür braucht man mindestens:");
-		ch = buf+strlen(buf);
 		for (c=0;cons->materials[c].number; c++) {
 			int n;
 			if (c!=0) strcat(ch++, ",");
 			n = cons->materials[c].number / cons->reqsize;
-			sprintf(ch, " %d %s", n?n:1, 
-					locale_string(u->faction->locale, 
+			sprintf(ch, " %d %s", n?n:1,
+					locale_string(u->faction->locale,
 						resname(cons->materials[c].type, cons->materials[c].number!=1))
 					);
 			ch = ch+strlen(ch);
 		}
-		strcat(ch,".");
-		mistake(u, u->thisorder, buf, MSG_PRODUCE);
+		msg_error(u, findorder(u,u->thisorder), "build_required", "required", buf);
 		return;
 	}
 	case ELOWSKILL:
@@ -835,7 +845,7 @@ build_building(unit * u, const building_type * btype, int want)
 	if(b->type==&bt_castle) {
 			string2 = locale_string(u->faction->locale, bt_castle._name);
 	} else {
-			string2 = buildingtype(b, b->size, u->faction->locale);
+			string2 = LOC(u->faction->locale, buildingtype(b, b->size));
 			if( newbuilding && b->type->maxsize != -1 )
 				want = b->type->maxsize - b->size;
 	}
@@ -984,17 +994,17 @@ continue_ship(region * r, unit * u, int want)
 }
 /* ------------------------------------------------------------- */
 
-static int
+static boolean
 mayenter(region * r, unit * u, building * b)
 {
 	unit *u2;
+	if (fval(b, BLD_UNGUARDED)) return true;
 	u2 = buildingowner(r, b);
 
+	if (u2==NULL || ucontact(u2, u)
+		|| allied(u2, u->faction, HELP_GUARD)) return true;
 
-	return (!u2
-		|| ucontact(u2, u)
-		|| allied(u2, u->faction, HELP_GUARD));
-
+	return false;
 }
 
 static int
@@ -1040,7 +1050,7 @@ do_leave(void)
 			for (S = u->orders; S; S = S->next) {
 				if(igetkeyword(S->s, u->faction->locale) == K_LEAVE) {
 					if (r->terrain == T_OCEAN && u->ship) {
-						if(!(race[u->race].flags & RCF_SWIM)) {
+						if(!fval(u->race, RCF_SWIM)) {
 							cmistake(u, S->s, 11, MSG_MOVE);
 							break;
 						}
@@ -1099,17 +1109,20 @@ do_misc(char try)
 						/* Sollte momentan nicht vorkommen, da Schwimmer nicht
 						 * an Land können, und es keine Gebäude auf See gibt. */
 
-						if( !(race[u->race].flags & RCF_WALK) &&
-								!(race[u->race].flags & RCF_FLY)) {
+						if( !fval(u->race, RCF_WALK) &&
+								!fval(u->race, RCF_FLY)) {
 							if (try) cmistake(u, S->s, 232, MSG_MOVE);
-							S = Snext;
-							continue;
+							break;
 						}
 
 						b = getbuilding(r);
 
 						if (!b) {
 							if(try) cmistake(u, S->s, 6, MSG_MOVE);
+							break;
+						}
+						if(rterrain(r) == T_OCEAN) {
+							if (try) cmistake(u, S->s, 297, MSG_MOVE);
 							break;
 						}
 						if (!mayenter(r, u, b)) {
@@ -1145,8 +1158,8 @@ do_misc(char try)
 						/* Muß abgefangen werden, sonst könnten Schwimmer an
 						 * Bord von Schiffen an Land gelangen. */
 
-						if( !(race[u->race].flags & RCF_WALK) &&
-								!(race[u->race].flags & RCF_FLY)) {
+						if( !fval(u->race, RCF_WALK) &&
+								!fval(u->race, RCF_FLY)) {
 							cmistake(u, S->s, 233, MSG_MOVE);
 							S = Snext;
 							continue;

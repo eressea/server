@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -67,7 +67,7 @@ init_scores(void)
 		case I_MALLORN:
 			a->data.i = 30;
 			break;
-		case I_EOG:
+		case I_LAEN:
 			a->data.i = 100;
 			break;
 		case I_WAGON:
@@ -90,11 +90,11 @@ init_scores(void)
 		case I_GREATBOW:
 			a->data.i = 50;
 			break;
-		case I_EOGSHIELD:
-		case I_EOGSWORD:
+		case I_LAENSHIELD:
+		case I_LAENSWORD:
 			a->data.i = 400;
 			break;
-		case I_EOGCHAIN:
+		case I_LAENCHAIN:
 			a->data.i = 1000;
 			break;
 		case I_CHAIN_MAIL:
@@ -212,13 +212,13 @@ score(void)
 		for (u = r->units; u; u = u->next) {
 			char index;
 			item * itm;
-			if (u->race == RC_SPELL || u->race == RC_BIRTHDAYDRAGON)
+			if (u->race == new_race[RC_SPELL] || u->race == new_race[RC_BIRTHDAYDRAGON])
 				continue;
 
 			f = u->faction;
 
-			if(u->race <= RC_AQUARIAN) {
-				f->score += (race[u->race].rekrutieren * u->number) / 50;
+			if(u->race <= new_race[RC_AQUARIAN]) {
+				f->score += (u->race->recruitcost * u->number) / 50;
 			}
 			f->score += get_money(u) / 50;
 			for (itm=u->items; itm; itm=itm->next) {
@@ -267,7 +267,7 @@ score(void)
 			f->score, f->score - average_score_of_age(f->age, f->age / 24 + 1),
 		      ((float) f->score / (float) allscores) * 100.0,
 					(float) f->score / f->number,
-					f->name, race[f->race].name[0], factionid(f), f->age);
+					f->name, LOC(default_locale, rc_name(f->race, 0)), factionid(f), f->age);
 	}
 
 	fclose(scoreFP);

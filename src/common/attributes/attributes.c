@@ -28,6 +28,8 @@
 #include "overrideroads.h"
 #include "otherfaction.h"
 #include "racename.h"
+#include "raceprefix.h"
+#include "synonym.h"
 #ifdef USE_UGROUPS
 #  include "ugroup.h"
 #endif
@@ -49,6 +51,7 @@ void
 init_attributes(void)
 {
 	at_register(&at_overrideroads);
+	at_register(&at_raceprefix);
 
 	init_iceberg();
 	init_key();
@@ -60,6 +63,8 @@ init_attributes(void)
 	init_reduceproduction();
 	init_otherfaction();
 	init_racename();
+	init_synonym();
+
 #ifdef AT_MOVED
 	init_moved();
 #endif

@@ -50,10 +50,11 @@ new_get_resource(const unit * u, const resource_type * rtype)
 		if (i>=0) return i;
 	}
 	if (itype!=NULL) {
+		race_t urc = old_race(u->race);
 		/* resouce is an item */
-		if (u->race==RC_STONEGOLEM && itype == olditemtype[R_STONE]) {
+		if (urc==RC_STONEGOLEM && itype == olditemtype[R_STONE]) {
 			return u->number*GOLEM_STONE;
-		} else if (u->race==RC_IRONGOLEM && itype == olditemtype[R_IRON]) {
+		} else if (urc==RC_IRONGOLEM && itype == olditemtype[R_IRON]) {
 			return u->number*GOLEM_IRON;
 		} else {
 			const item * i = *i_find((item**)&u->items, itype);
@@ -95,7 +96,7 @@ new_change_resource(unit * u, const resource_type * rtype, int change)
 	}
 	else
 		assert(!"unbekannte resource entdeckt");
-	assert(i >= 0 && (i < 1000000));	/* Softer Test, daß kein Unfug
+	assert(i >= 0 && (i < 100000000));	/* Softer Test, daß kein Unfug
 										 * * passiert */
 	return i;
 }
@@ -103,10 +104,11 @@ new_change_resource(unit * u, const resource_type * rtype, int change)
 int
 new_get_resvalue(const unit * u, const resource_type * rtype)
 {
+	race_t urc = old_race(u->race);
 	struct reservation * res = u->reservations;
-	if (rtype==oldresourcetype[R_STONE] && u->race==RC_STONEGOLEM)
+	if (rtype==oldresourcetype[R_STONE] && urc==RC_STONEGOLEM)
 		return (u->number * GOLEM_STONE);
-	if (rtype==oldresourcetype[R_IRON] && u->race==RC_IRONGOLEM)
+	if (rtype==oldresourcetype[R_IRON] && urc==RC_IRONGOLEM)
 		return (u->number * GOLEM_IRON);
 	while (res && res->type!=rtype) res=res->next;
 	if (res) return res->value;
@@ -255,12 +257,13 @@ change_resource(unit * u, resource_t res, int change)
 {
 	int i = 0;
 	const item_type * itype = resource2item(oldresourcetype[res]);
+	race_t urc = old_race(u->race);
 
-	if (res==R_STONE && u->race==RC_STONEGOLEM) {
+	if (res==R_STONE && urc==RC_STONEGOLEM) {
 	  i = u->number - (change+GOLEM_STONE-1)/GOLEM_STONE;
 		scale_number(u, i);
 	}
-	else if (res==R_IRON && u->race==RC_IRONGOLEM) {
+	else if (res==R_IRON && urc==RC_IRONGOLEM) {
 	  i = u->number - (change+GOLEM_IRON-1)/GOLEM_IRON;
 		scale_number(u, i);
 	}

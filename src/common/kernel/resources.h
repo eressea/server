@@ -1,0 +1,58 @@
+/* vi: set ts=2:
+ +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
+ |                   |  Enno Rehling <enno@eressea-pbem.de>
+ | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
+ | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
+ +-------------------+  Stefan Reich <reich@halbling.de>
+
+ This program may not be used, modified or distributed 
+ without prior permission by the authors of Eressea.
+*/
+#ifdef NEW_RESOURCEGROWTH
+
+enum {
+	RM_USED    = 1<<0, /* resource has been used */
+	RM_MALLORN = 1<<1, /* this is not wood. it's mallorn */
+};
+
+typedef struct rawmaterial {
+	const struct rawmaterial_type * type;
+	int amount : 16;
+	int level : 8;
+	int flags : 8;
+	int base : 8;
+	int divisor : 8;
+	int startlevel : 8;
+	struct rawmaterial * next;
+} rawmaterial;
+
+typedef struct rawmaterial_type {
+	const char * name;
+	item_t _itype; /* what you'll be producing. hack - needs resource_type */
+	const struct resource_type * rtype;
+
+	void (*terraform) (struct rawmaterial *, const struct region *);
+	void (*update) (struct rawmaterial *, const struct region *);
+	void (*use) (struct rawmaterial *, const struct region *, int amount);
+	int (*visible) (const struct rawmaterial *, int skilllevel);
+
+	/* no initialization required */
+	struct rawmaterial_type * next;
+} rawmaterial_type;
+
+extern struct rawmaterial_type * rawmaterialtypes;
+
+extern void update_resources(struct region * r);
+extern void terraform_resources(struct region * r);
+extern void read_resources(struct region * r);
+extern void write_resources(struct region * r);
+extern struct rawmaterial * rm_get(struct region *, const struct resource_type *);
+extern void init_rawmaterials(void);
+extern struct rawmaterial_type * rmt_find(const char * str);
+
+extern struct rawmaterial_type rm_stones;
+extern struct rawmaterial_type rm_iron;
+extern struct rawmaterial_type rm_laen;
+
+#endif

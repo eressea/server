@@ -490,37 +490,19 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
  * Spezielle V. für Katzen, Trolle, Elfen, Dämonen, Insekten, Zwerge?
  */
 
-static race_t
-select_familiar(race_t magerace, magic_t magiegebiet)
+static const race *
+select_familiar(const race * magerace, magic_t magiegebiet)
 {
-	assert(race[magerace].familiars[0] != NORACE);
+	int rnd = rand()%100;
+	assert(magerace->familiars[0]);
 
-	if(rand()%100 < 3) {
+	if (rnd < 3) {
 		/* RC_KRAKEN muß letzter Vertraute sein */
-		return (race_t)(RC_HOUSECAT + rand()%(RC_KRAKEN-RC_HOUSECAT));
+		return new_race[(race_t)(RC_HOUSECAT + rand()%(RC_KRAKEN+1-RC_HOUSECAT))];
+	} else if (rnd < 80) {
+		return magerace->familiars[0];
 	}
-
-	if(rand()%100 < 80) {
-			return race[magerace].familiars[0];
-	}
-	return race[magerace].familiars[magiegebiet];
-}
-
-int
-skillmod_familiar(const region *r, const unit *familiar, skill_t sk)
-{
-	int mod;
-
-	if (sk == SK_MAGIC)
-		return 0;
-
-	mod = eff_skill(familiar, sk, r)/2;
-
-	if(r != familiar->region) {
-		mod /= distance(r, familiar->region);
-	}
-
-	return mod;
+	return magerace->familiars[magiegebiet];
 }
 
 /* ------------------------------------------------------------- */
@@ -541,166 +523,15 @@ is_familiar(const unit *u)
 static void
 make_familiar(unit *familiar, unit *mage)
 {
-	sc_mage *m;
-	unused(mage);
-	switch(familiar->race) {
-		case RC_HOUSECAT:
-			/* Kräu+1, Mag, Pfer+1, Spi+3, Tar+3, Wahr+4, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_SPY, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_TUNNELWORM:
-			/* Ber+50,Hol+50,Sbau+50,Aus+2*/
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_MINING, 30);
-			set_skill(familiar, SK_LUMBERJACK, 30);
-			set_skill(familiar, SK_ROAD_BUILDING, 30);
-			set_skill(familiar, SK_AUSDAUER, 30);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_EAGLE:
-			/* Spi, Wahr+2, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_RAT:
-			/* Spionage+5, Tarnung+4, Wahrnehmung+2, Ausdauer */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_SPY, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			set_number(familiar, 50+rand()%500+rand()%500);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_PSEUDODRAGON:
-			/* Magie+1, Spionage, Tarnung, Wahrnehmung, Ausdauer */
-			m = create_mage(familiar, M_GRAU);
-			set_skill(familiar, SK_MAGIC, 30);
-			addspell(familiar, SPL_FLEE);
-			addspell(familiar, SPL_SLEEP);
-			addspell(familiar, SPL_FRIGHTEN);
-			m->combatspell[0] = SPL_FLEE;
-			m->combatspell[1] = SPL_SLEEP;
-			break;
-		case RC_NYMPH:
-			/* Alc, Arm, Bog+2, Han-2, Kräu+4, Mag+1, Pfer+5, Rei+5,
-			 * Rüs-2, Sbau, Seg-2, Sta, Spi+2, Tak-2, Tar+3, Unt+10,
-			 * Waf-2, Wag-2, Wahr+2, Steu-2, Aus-1 */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_LONGBOW, 30);
-			set_skill(familiar, SK_HERBALISM, 30);
-			set_skill(familiar, SK_HORSE_TRAINING, 30);
-			set_skill(familiar, SK_RIDING, 30);
-			set_skill(familiar, SK_SPY, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_ENTERTAINMENT, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			m = create_mage(familiar, M_GRAU);
-			addspell(familiar, SPL_SEDUCE);
-			addspell(familiar, SPL_CALM_MONSTER);
-			addspell(familiar, SPL_SONG_OF_CONFUSION);
-			addspell(familiar, SPL_DENYATTACK);
-			m->combatspell[0] = SPL_SONG_OF_CONFUSION;
-			break;
-		case RC_UNICORN:
-			/* Mag+2, Spi, Tak, Tar+4, Wahr+4, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			m = create_mage(familiar, M_GRAU);
-			addspell(familiar, SPL_RESISTMAGICBONUS);
-			addspell(familiar, SPL_SONG_OF_PEACE);
-			addspell(familiar, SPL_CALM_MONSTER);
-			addspell(familiar, SPL_HERO);
-			addspell(familiar, SPL_HEALINGSONG);
-			addspell(familiar, SPL_DENYATTACK);
-			break;
-		case RC_WARG:
-			/* Spi, Tak, Tar, Wahri+2, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_WRAITH:
-			/* Mag+1, Rei-2, Hie, Sta, Spi, Tar, Wahr, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			m = create_mage(familiar, M_GRAU);
-			addspell(familiar, SPL_STEALAURA);
-			addspell(familiar, SPL_FRIGHTEN);
-			addspell(familiar, SPL_SUMMONUNDEAD);
-			break;
-		case RC_IMP:
-			/* Mag+1,Rei-1,Hie,Sta,Spi+1,Tar+1,Wahr+1,Steu+1,Aus*/
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_SPY, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			set_skill(familiar, SK_TAXING, 30);
-			m = create_mage(familiar, M_GRAU);
-			addspell(familiar, SPL_STEALAURA);
-			break;
-		case RC_DREAMCAT:
-			/* Mag+1,Hie,Sta,Spi+1,Tar+1,Wahr+1,Steu+1,Aus*/
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_SPY, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			set_skill(familiar, SK_TAXING, 30);
-			m = create_mage(familiar, M_GRAU);
-			addspell(familiar, SPL_ILL_SHAPESHIFT);
-			addspell(familiar, SPL_TRANSFERAURA_TRAUM);
-			break;
-		case RC_FEY:
-			/* Mag+1,Rei-1,Hie-1,Sta-1,Spi+2,Tar+5,Wahr+2,Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			m = create_mage(familiar,M_GRAU);
-			addspell(familiar, SPL_DENYATTACK);
-			addspell(familiar, SPL_CALM_MONSTER);
-			addspell(familiar, SPL_SEDUCE);
-			break;
-		case RC_OWL:
-			/* Spi+1,Tar+1,Wahr+5,Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_SPY, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			m = create_mage(familiar,M_GRAU);
-			break;
-		case RC_HELLCAT:
-			/* Spi, Tak, Tar, Wahr+1, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			m = create_mage(familiar,M_GRAU);
-			break;
-		case RC_TIGER:
-			/* Spi, Tak, Tar, Wahr+1, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			m = create_mage(familiar,M_GRAU);
-			break;
-	}
-#ifdef NEW_TRIGGER
+	/* skills and spells: */
+	familiar->race->init_familiar(familiar);
+
+	/* triggers: */
 	create_newfamiliar(mage, familiar);
-#else
-	{
-		old_trigger *trig1, *trig2;
-		action *act1, *act2;
-		create_relation(familiar,TYP_UNIT,REL_CREATOR,mage,TYP_UNIT,REL_FAMILIAR);
-		create_relation(mage,TYP_UNIT,REL_FAMILIAR,familiar,TYP_UNIT,REL_CREATOR);
-		/* Wenn der Magier stirbt, dann auch der Vertraute */
-		trig1 = create_trigger(mage, TYP_UNIT, SPREAD_NEVER, TR_DESTRUCT);
-		act1  = action_destroy(familiar, TYP_UNIT, SPREAD_NEVER);
-		link_action_trigger(act1,trig1); /* conversion done */
-		/* Wenn der Vertraute stirbt, dann bekommt der Magier einen Schock */
-		trig2 = create_trigger(familiar, TYP_UNIT, SPREAD_NEVER, TR_DESTRUCT);
-		act2  = action_shock(mage, TYP_UNIT, SPREAD_NEVER);
-		link_action_trigger(act2,trig2); /* conversion done */
-	}
-#endif
+
+	/* Hitpoints nach Talenten korrigieren, sonst starten vertraute
+	 * mit Ausdauerbonus verwundet */
+	familiar->hp = unit_max_hp(familiar);
 }
 
 static int
@@ -711,7 +542,7 @@ sp_summon_familiar(castorder *co)
 	region *target_region = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
-	race_t rc;
+	const race * rc;
 	skill_t sk;
 	int dh, dh1;
 	direction_t d;
@@ -721,10 +552,10 @@ sp_summon_familiar(castorder *co)
 	}
 	rc = select_familiar(mage->faction->race, mage->faction->magiegebiet);
 
-	if(race[rc].flags & RCF_SWIM && !(race[rc].flags & RCF_WALK)) {
-		int coasts;
+	if (fval(rc, RCF_SWIM) && !fval(rc, RCF_WALK)) {
+		int coasts = is_coastregion(r);
 
-		if((coasts = is_coastregion(r)) == 0) {
+		if (coasts == 0) {
 			cmistake(mage, strdup(co->order), 229, MSG_MAGIC);
 			return 0;
 		}
@@ -755,14 +586,13 @@ sp_summon_familiar(castorder *co)
 
 	dh = 0;
 	dh1 = 0;
-	sprintf(buf, "%s ruft einen Vertrauten. ", unitname(mage));
-	scat(race[rc].name[1]);
-	scat(" können ");
+	sprintf(buf, "%s ruft einen Vertrauten. %s können ", 
+		unitname(mage), LOC(mage->faction->locale, rc_name(rc, 1)));
 	for(sk=0;sk<MAXSKILLS;sk++){
-		if(race[rc].bonus[sk] > -5) dh++;
+		if(rc->bonus[sk] > -5) dh++;
 	}
-	for(sk=0;sk<MAXSKILLS;sk++){
-		if(race[rc].bonus[sk] > -5){
+	for(sk=0;sk<MAXSKILLS;sk++) {
+		if(rc->bonus[sk] > -5){
 			dh--;
 			if (dh1 == 0){
 				dh1 = 1;
@@ -1090,15 +920,23 @@ sp_summonent(castorder *co)
 	attrib *a;
 	int ents;
 
+#ifdef GROWING_TREES
+	if(rtrees(r,2) == 0) {
+#else
 	if(rtrees(r) == 0) {
+#endif
 		cmistake(mage, strdup(co->order), 204, MSG_EVENT);
 		/* nicht ohne bäume */
     return 0;
 	}
 
+#ifdef GROWING_TREES
+	ents = min(power*power, rtrees(r,2));
+#else
 	ents = min(power*power, rtrees(r));
+#endif
 
-	u = create_unit(r, mage->faction, ents, RC_TREEMAN, 0, race[RC_TREEMAN].name[ents>1], mage);
+	u = create_unit(r, mage->faction, ents, new_race[RC_TREEMAN], 0, LOC(mage->faction->locale, rc_name(new_race[RC_TREEMAN], ents!=1)), mage);
 
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 2;	/* An r->trees. */
@@ -1106,7 +944,11 @@ sp_summonent(castorder *co)
 	a_add(&u->attribs, a);
 	fset(u, FL_LOCKED);
 
+#ifdef GROWING_TREES
+	rsettrees(r, 2, rtrees(r,2) - ents);
+#else
 	rsettrees(r, rtrees(r) - ents);
+#endif
 
 	/* melden, 1x pro Partei */
 	{
@@ -1240,7 +1082,13 @@ sp_mallorn(castorder *co)
 	}
 
 	/* half the trees will die */
+#ifdef GROWING_TREES
+	rsettrees(r, 2, rtrees(r,2)/2);
+	rsettrees(r, 1, rtrees(r,1)/2);
+	rsettrees(r, 0, rtrees(r,0)/2);
+#else
 	rsettrees(r, rtrees(r)/2);
+#endif
 	fset(r, RF_MALLORN);
 
 	/* melden, 1x pro Partei */
@@ -1294,7 +1142,7 @@ sp_blessedharvest(castorder *co)
  * Gebiet:     Gwyrrd
  * Syntax:     ZAUBER [REGION x y] [STUFE 2] "Hain"
  * Wirkung:
- *     Erschafft Stufe-10*Stufe Bäume
+ *     Erschafft Stufe-10*Stufe Jungbäume
  *
  * Flag:
  * (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE)
@@ -1315,7 +1163,11 @@ sp_hain(castorder *co)
 	}
 
 	trees = lovar(force * 10) + force;
+#ifdef GROWING_TREES
+	rsettrees(r, 1, rtrees(r,1) + trees);
+#else
 	rsettrees(r, rtrees(r) + trees);
+#endif
 
 	/* melden, 1x pro Partei */
 	{
@@ -1343,7 +1195,8 @@ patzer_ents(castorder *co)
 	}
 
 	ents = force*10;
-	u = create_unit(r, findfaction(MONSTER_FACTION), ents, RC_TREEMAN, 0, race[RC_TREEMAN].name[ents>1], NULL);
+	u = create_unit(r, findfaction(MONSTER_FACTION), ents, new_race[RC_TREEMAN], 0, 
+		LOC(default_locale, rc_name(new_race[RC_TREEMAN], ents!=1)), NULL);
 
 	/* 'Erfolg' melden */
 	add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -1600,7 +1453,8 @@ sp_create_irongolem(castorder *co)
 		return 0;
 	}
 
-	u2 = create_unit(r, mage->faction, force*8, RC_IRONGOLEM, 0, race[RC_IRONGOLEM].name[1], mage);
+	u2 = create_unit(r, mage->faction, force*8, new_race[RC_IRONGOLEM], 0, 
+		LOC(mage->faction->locale, rc_name(new_race[RC_IRONGOLEM], 1)), mage);
 
 	set_skill(u2, SK_ARMORER, 30*u2->number);
 	set_skill(u2, SK_WEAPONSMITH, 30*u2->number);
@@ -1610,10 +1464,10 @@ sp_create_irongolem(castorder *co)
 	a->data.ca[1] = IRONGOLEM_CRUMBLE;
 	a_add(&u2->attribs, a);
 
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-				"magiccreate_effect%r:region%s:command%u:unit%i:amount%s:item",
-						mage->region, strdup(co->order), mage, force*8,
-						race[RC_IRONGOLEM].name[1]));
+	add_message(&mage->faction->msgs, 
+		msg_message("magiccreate_effect", "region command unit amount object",
+		mage->region, strdup(co->order), mage, force*8,
+		LOC(mage->faction->locale, rc_name(new_race[RC_IRONGOLEM], 1))));
 
 	return cast_level;
 }
@@ -1660,7 +1514,8 @@ sp_create_stonegolem(castorder *co)
 		return 0;
 	}
 
-	u2 = create_unit(r, mage->faction, force*5, RC_STONEGOLEM, 0, race[RC_STONEGOLEM].name[1], mage);
+	u2 = create_unit(r, mage->faction, force*5, new_race[RC_STONEGOLEM], 0, 
+		LOC(mage->faction->locale, rc_name(new_race[RC_STONEGOLEM], 1)), mage);
 	set_skill(u2, SK_ROAD_BUILDING, 30*u2->number);
 	set_skill(u2, SK_BUILDING, 30*u2->number);
 
@@ -1669,10 +1524,10 @@ sp_create_stonegolem(castorder *co)
 	a->data.ca[1] = STONEGOLEM_CRUMBLE;
 	a_add(&u2->attribs, a);
 
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-				"magiccreate_effect%r:region%s:command%u:unit%i:amount%s:item",
-						mage->region, strdup(co->order), mage, force*5,
-						race[RC_STONEGOLEM].name[1]));
+	add_message(&mage->faction->msgs, 
+		msg_message("magiccreate_effect", "region command unit amount object",
+		mage->region, strdup(co->order), mage, force*5,
+		LOC(mage->faction->locale, rc_name(new_race[RC_STONEGOLEM], 1))));
 
 	return cast_level;
 }
@@ -1725,7 +1580,13 @@ sp_great_drought(castorder *co)
 
   /* sterben */
 	rsetpeasants(r, rpeasants(r)/2); /* evtl wuerfeln */
+#ifdef GROWING_TREES
+	rsettrees(r, 2, rtrees(r,2)/2);
+	rsettrees(r, 1, rtrees(r,1)/2);
+	rsettrees(r, 0, rtrees(r,0)/2);
+#else
 	rsettrees(r, rtrees(r)/2);
+#endif
 	rsethorses(r, rhorses(r)/2);
 
 	/* Arbeitslohn = 1/4 */
@@ -1752,8 +1613,10 @@ sp_great_drought(castorder *co)
 				break;
 
 			case T_GLACIER:
+#ifndef NEW_RESOURCEGROWTH
 				rsetiron(r, 0);
 				rsetlaen(r, -1);
+#endif
 				if (rand() % 100 < 50){
 					rsetterrain(r, T_SWAMP);
 					destroy_all_roads(r, 0);
@@ -1762,7 +1625,7 @@ sp_great_drought(castorder *co)
 					rsetterrain(r, T_OCEAN);
 					/* Einheiten dürfen hier auf keinen Fall gelöscht werden! */
 					for (u = r->units; u; u = u->next) {
-						if (u->race != RC_SPELL && u->ship == 0) {
+						if (old_race(u->race) != RC_SPELL && u->ship == 0) {
 							set_number(u, 0);
 						}
 					}
@@ -2234,7 +2097,13 @@ sp_drought(castorder *co)
 		c->duration = max(c->duration, power);
 	} else {
 		/* Baeume und Pferde sterben */
+#ifdef GROWING_TREES
+		rsettrees(r, 2, rtrees(r,2)/2);
+		rsettrees(r, 1, rtrees(r,1)/2);
+		rsettrees(r, 0, rtrees(r,0)/2);
+#else
 		rsettrees(r, rtrees(r)/2);
+#endif
 		rsethorses(r, rhorses(r)/2);
 
 		create_curse(mage, &r->attribs, C_DROUGHT, 0, power, power, 4, 0);
@@ -2341,7 +2210,7 @@ sp_ironkeeper(castorder *co)
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
-	keeper = create_unit(r, mage->faction, 1, RC_IRONKEEPER, 0, "Bergwächter", mage);
+	keeper = create_unit(r, mage->faction, 1, new_race[RC_IRONKEEPER], 0, "Bergwächter", mage);
 
 	/*keeper->age = cast_level + 2;*/
 	guard(keeper, GUARD_MINING);
@@ -2549,7 +2418,8 @@ patzer_peasantmob(castorder *co)
 		rsetpeasants(r, rpeasants(r) - n);
 		assert(rpeasants(r) >= 0);
 
-		u = createunit(r, findfaction(MONSTER_FACTION), n, RC_PEASANT);
+		u = createunit(r, findfaction(MONSTER_FACTION), n, new_race[RC_PEASANT]);
+		set_string(&u->name, "Bauernmob");
 		guard(u, GUARD_ALL);
 		a = a_new(&at_unitdissolve);
 		a->data.ca[0] = 1;  /* An rpeasants(r). */
@@ -2596,20 +2466,33 @@ sp_forest_fire(castorder *co)
 	unit *u;
 	region *nr;
 	int prozent, chance, vernichtet;
+#ifdef GROWING_TREES
+	int vernichtet_schoesslinge;
+#endif
 	direction_t i;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 
 	prozent = (rand() % 71) + 10; 	/* 10 - 80% */
+#ifdef GROWING_TREES
+	vernichtet = rtrees(r,2) * prozent / 100;
+	vernichtet_schoesslinge = rtrees(r,1) * prozent / 100;
+#else
 	vernichtet = rtrees(r) * prozent / 100;
+#endif
 
 	if(!vernichtet ) {
 		cmistake(mage, strdup(co->order), 198, MSG_MAGIC);
 		return 0;
 	}
 
+#ifdef GROWING_TREES
+	rsettrees(r, 2, rtrees(r,2) - vernichtet);
+	rsettrees(r, 1, rtrees(r,1) - vernichtet_schoesslinge);
+#else
 	rsettrees(r, rtrees(r) - vernichtet);
+#endif
 	chance = vernichtet / 10;	/* Chance, dass es sich ausbreitet */
 
 	/* melden, 1x pro Partei */
@@ -2627,9 +2510,15 @@ sp_forest_fire(castorder *co)
 		}
 	}
 	if(!fval(mage->faction, FL_DH)){
+#ifdef GROWING_TREES
+		sprintf(buf, "%s erzeugt eine verheerende Feuersbrunst.  %d %s "
+				"den Flammen zum Opfer.", unitname(mage), vernichtet+vernichtet_schoesslinge,
+				vernichtet+vernichtet_schoesslinge == 1 ? "Baum fiel" : "Bäume fielen");
+#else
 		sprintf(buf, "%s erzeugt eine verheerende Feuersbrunst.  %d %s "
 				"den Flammen zum Opfer.", unitname(mage), vernichtet,
 				vernichtet == 1 ? "Baum fiel" : "Bäume fielen");
+#endif
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
 	}
 
@@ -2638,6 +2527,38 @@ sp_forest_fire(castorder *co)
 		assert(nr);
 		vernichtet = 0;
 
+#ifdef GROWING_TREES
+		if(rtrees(nr,2) + rtrees(nr,1) >= 800) {
+			if((rand() % 100) < chance ) {
+				vernichtet = rtrees(nr,2) * prozent / 200;
+				vernichtet_schoesslinge = rtrees(nr,1) * prozent / 200;
+			}
+		} else if(rtrees(nr,2) + rtrees(nr,1) >= 600) {
+			if((rand() % 100) < chance / 2 ) {
+				vernichtet = rtrees(nr,2) * prozent / 400;
+				vernichtet_schoesslinge = rtrees(nr,1) * prozent / 400;
+			}
+		}
+		
+		if(vernichtet > 0  || vernichtet_schoesslinge > 0) {
+			rsettrees(nr, 2, rtrees(nr,2) - vernichtet);
+			rsettrees(nr, 1, rtrees(nr,1) - vernichtet_schoesslinge);
+			sprintf(buf, "Der Waldbrand in %s griff auch auf %s "
+					"über und %d %s.",
+					regionid(r), regionid(nr), vernichtet+vernichtet_schoesslinge,
+					vernichtet+vernichtet_schoesslinge == 1 ? "Baum verbrannte" : "Bäume verbrannten");
+			for (u = nr->units; u; u = u->next) freset(u->faction, FL_DH);
+			for(u = nr->units; u; u = u->next ) {
+				if(!fval(u->faction, FL_DH) ) {
+					fset(u->faction, FL_DH);
+					addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
+				}
+			}
+			if(!fval(mage->faction, FL_DH)){
+		  	addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
+			}
+		}
+#else
 		if(rtrees(nr) >= 800) {
 			if((rand() % 100) < chance ) vernichtet = rtrees(nr) * prozent / 200;
 		} else if(rtrees(nr) >= 600) {
@@ -2661,6 +2582,7 @@ sp_forest_fire(castorder *co)
 		  	addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
 			}
 		}
+#endif
 	}
 	return cast_level;
 }
@@ -2772,7 +2694,7 @@ sp_summondragon(castorder *co)
 	int time;
 	int number;
 	int range;
-	race_t race;
+	const race * race;
 
 	f = findfaction(MONSTER_FACTION);
 
@@ -2786,18 +2708,18 @@ sp_summondragon(castorder *co)
 		if (rand()%100 < 25){
 			switch(rand()%3){
 			case 0:
-				race = RC_WYRM;
+				race = new_race[RC_WYRM];
 				number = 1;
 				break;
 
 			case 1:
-				race = RC_DRAGON;
+				race = new_race[RC_DRAGON];
 				number = 2;
 				break;
 
 			case 2:
 			default:
-				race = RC_FIREDRAGON;
+				race = new_race[RC_FIREDRAGON];
 				number = 6;
 				break;
 			}
@@ -2822,7 +2744,7 @@ sp_summondragon(castorder *co)
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
 		for(u = rl2->region->units; u; u = u->next) {
-			if(u->race == RC_WYRM || u->race == RC_DRAGON) {
+			if (u->race == new_race[RC_WYRM] || u->race == new_race[RC_DRAGON]) {
 				attrib * a = a_find(u->attribs, &at_targetregion);
 				if (!a) {
 					a = a_add(&u->attribs, make_targetregion(co->rt));
@@ -3201,8 +3123,8 @@ sp_unholypower(castorder *co)
 	n = dice(co->force, 10);
 
 	for (i = 0; i < pa->length && n > 0; i++) {
-			unit *u;
-			race_t target_race;
+		const race * target_race;
+		unit *u;
 
 		if(pa->param[i]->flag == TARGET_RESISTS
 				|| pa->param[i]->flag == TARGET_NOTFOUND)
@@ -3210,13 +3132,16 @@ sp_unholypower(castorder *co)
 
 		u = pa->param[i]->data.u;
 
-		switch(u->race) {
+		switch (old_race(u->race)) {
 		case RC_SKELETON:
-			target_race = RC_SKELETON_LORD; break;
+			target_race = new_race[RC_SKELETON_LORD]; 
+			break;
 		case RC_ZOMBIE:
-			target_race = RC_ZOMBIE_LORD; break;
+			target_race = new_race[RC_ZOMBIE_LORD]; 
+			break;
 		case RC_GHOUL:
-			target_race = RC_GHOUL_LORD; break;
+			target_race = new_race[RC_GHOUL_LORD]; 
+			break;
 		default:
 			cmistake(mage, strdup(co->order), 284, MSG_MAGIC);
 			continue;
@@ -3225,9 +3150,8 @@ sp_unholypower(castorder *co)
 		if(u->number <= n) {
 			n -= u->number;
 			u->race = target_race;
-			add_message(&co->rt->msgs, new_message(mage->faction,
-				"unholypower_effect%u:mage%u:target%s:targetrace", mage, u,
-				race[u->race].name[1]));
+			add_message(&co->rt->msgs, msg_message("unholypower_effect", 
+				"mage target race", mage, u, target_race));
 		} else {
 			unit *un;
 
@@ -3247,9 +3171,9 @@ sp_unholypower(castorder *co)
 				un->ship = u->ship;
 			}
 			transfermen(u, un, n);
-			add_message(&co->rt->msgs, new_message(mage->faction,
-				"unholypower_limitedeffect%u:mage%u:target%s:race%i:amount",
-				mage, u, race[u->race].name[n==1?0:1], n));
+			add_message(&co->rt->msgs, msg_message("unholypower_limitedeffect", 
+				"mage target race amount",
+				mage, u, target_race, n));
 			n = 0;
 		}
 	}
@@ -3438,7 +3362,7 @@ sp_summonshadow(castorder *co)
 	unit *u;
 	int val;
 
-	u = createunit(r, mage->faction, force*force, RC_SHADOW);
+	u = createunit(r, mage->faction, force*force, new_race[RC_SHADOW]);
 	if (r==mage->region) {
 		u->building = mage->building;
 		u->ship = mage->ship;
@@ -3485,7 +3409,7 @@ sp_summonshadowlords(castorder *co)
 	int cast_level = co->level;
 	int force = co->force;
 
-	u = createunit(r, mage->faction, force*force, RC_SHADOWLORD);
+	u = createunit(r, mage->faction, force*force, new_race[RC_SHADOWLORD]);
 	if (r==mage->region) {
 		u->building = mage->building;
 		u->ship = mage->ship;
@@ -3708,7 +3632,7 @@ sp_summonundead(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int force = co->force;
-	race_t race = RC_SKELETON;
+	const race * race = new_race[RC_SKELETON];
 
 	if (!r->land || deathcount(r) == 0) {
 		sprintf(buf, "%s in %s: In %s sind keine Gräber.", unitname(mage),
@@ -3720,11 +3644,11 @@ sp_summonundead(castorder *co)
 	undead = min(deathcount(r), 2 + lovar(force * 10));
 
 	if(cast_level <= 8) {
-		race = RC_SKELETON;
+		race = new_race[RC_SKELETON];
 	} else if(cast_level <= 12) {
-		race = RC_ZOMBIE;
+		race = new_race[RC_ZOMBIE];
 	} else {
-		race = RC_GHOUL;
+		race = new_race[RC_GHOUL];
 	}
 
 	u = make_undead_unit(r, mage->faction, undead, race);
@@ -4160,7 +4084,7 @@ sp_rallypeasantmob(castorder *co)
 
 	for (u = r->units; u; u = un){
 		un = u->next;
-		if (u->faction->no == MONSTER_FACTION && u->race == RC_PEASANT){
+		if (u->faction->no == MONSTER_FACTION && u->race == new_race[RC_PEASANT]){
 			rsetpeasants(r, rpeasants(r) + u->number);
 			rsetmoney(r, rmoney(r) + get_money(u));
 			set_money(u, 0);
@@ -4237,7 +4161,7 @@ sp_raisepeasantmob(castorder *co)
 	rsetpeasants(r, rpeasants(r) - n);
 	assert(rpeasants(r) >= 0);
 
-	u = createunit(r, findfaction(MONSTER_FACTION), n, RC_PEASANT);
+	u = createunit(r, findfaction(MONSTER_FACTION), n, new_race[RC_PEASANT]);
 	guard(u, GUARD_ALL);
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 1;	/* An rpeasants(r). */
@@ -4304,7 +4228,7 @@ sp_migranten(castorder *co)
 	}
 
 	/* Keine Monstereinheiten */
-	if (nonplayer(target)){
+	if (!playerrace(target->race)){
 		sprintf(buf, "%s kann nicht auf Monster gezaubert werden.", sp->name);
 		addmessage(0, mage->faction, buf, MSG_EVENT, ML_WARN);
 		return 0;
@@ -4502,7 +4426,7 @@ sp_recruit(castorder *co)
 	}
 	/* Immer noch zuviel auf niedrigen Stufen. Deshalb die Rekrutierungskosten
 	 * mit einfliessen lassen und dafür den Exponenten etwas größer. */
-	n = (int)((pow(force, 1.6) * 50)/race[f->race].rekrutieren);
+	n = (int)((pow(force, 1.6) * 50)/f->race->recruitcost);
 	n = min(rpeasants(r),n);
 	n = max(n, 1);
 
@@ -4552,7 +4476,7 @@ sp_pump(castorder *co)
 
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
-	if (is_undead(target)){
+	if (fval(target->race, RCF_UNDEAD)) {
 		sprintf(buf, "%s kann nicht auf Untote gezaubert werden.", sp->name);
 		addmessage(0, mage->faction, buf, MSG_EVENT, ML_WARN);
 		return 0;
@@ -4581,7 +4505,7 @@ sp_pump(castorder *co)
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
 	}
 
-	u = createunit(rt, mage->faction, RS_FARVISION, RC_SPELL);
+	u = createunit(rt, mage->faction, RS_FARVISION, new_race[RC_SPELL]);
 	set_string(&u->name, "Zauber: Aushorchen");
 	u->age = 2;
 	set_skill(u, SK_OBSERVATION, eff_skill(target, SK_OBSERVATION, r));
@@ -4622,7 +4546,7 @@ sp_seduce(castorder *co)
 
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
-	if (is_undead(target)) {
+	if (fval(target->race, RCF_UNDEAD)) {
 		sprintf(buf, "%s kann nicht auf Untote gezaubert werden.", sp->name);
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_WARN);
 		return 0;
@@ -4728,7 +4652,7 @@ sp_calm_monster(castorder *co)
 
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
-	if (is_undead(target)){
+	if (fval(target->race, RCF_UNDEAD)) {
 		sprintf(buf, "%s kann nicht auf Untote gezaubert werden.", sp->name);
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_WARN);
 		return 0;
@@ -4838,7 +4762,7 @@ sp_raisepeasants(castorder *co)
 	bauern = min(rpeasants(r),power*250);
 	rsetpeasants(r, rpeasants(r) - bauern);
 
-	u2 = create_unit(r,mage->faction, bauern,RC_PEASANT,0,"Wilder Bauernmob",mage);
+	u2 = create_unit(r,mage->faction, bauern, new_race[RC_PEASANT], 0,"Wilder Bauernmob",mage);
 
 	fset(u2, FL_LOCKED);
 	fset(u2, FL_PARTEITARNUNG);
@@ -5005,7 +4929,7 @@ int
 sp_illusionary_shapeshift(castorder *co)
 {
 	unit *u;
-	race_t rc;
+	const race * rc;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
@@ -5021,35 +4945,29 @@ sp_illusionary_shapeshift(castorder *co)
 
 	u = pa->param[0]->data.u;
 
-	rc = findrace(pa->param[1]->data.s);
-	if(rc == NORACE) {
+	rc = findrace(pa->param[1]->data.s, mage->faction->locale);
+	if (rc == NULL) {
 		cmistake(mage, strdup(co->order), 202, MSG_MAGIC);
 		return 0;
 	}
 
 	/* ähnlich wie in laws.c:setealth() */
-	if(race[rc].nonplayer ) {
+	if (!playerrace(rc)) {
 		sprintf(buf, "%s %s keine %s-Gestalt annehmen.",
 			unitname(u),
 			u->number > 1 ? "können" : "kann",
-			race[rc].name[2]);
+			rc_name(rc, 2));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
 	{
-#ifdef NEW_TRIGGER
-		trigger * trestore = trigger_changerace(u, NORACE, u->irace);
+		trigger * trestore = trigger_changerace(u, NULL, u->irace);
 		add_trigger(&u->attribs, "timer", trigger_timeout(power+2, trestore));
-#else
-		timeout * to = create_timeout(power+2);
-		action * ac = action_changeirace(u, TYP_UNIT, SPREAD_NEVER, u->irace);
-		link_action_timeout(ac, to);
-#endif
 	}
 	u->irace = rc;
 
 	sprintf(buf, "%s läßt %s als %s erscheinen.",
-		unitname(mage), unitname(u), race[rc].name[u->number > 1]);
+		unitname(mage), unitname(u), rc_name(rc, u->number != 1));
 	addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
 
 	return cast_level;
@@ -5256,7 +5174,7 @@ sp_clonecopy(castorder *co)
 		return 0;
 	}
 
-	clone = createunit(target_region, mage->faction, 1, RC_CLONE);
+	clone = createunit(target_region, mage->faction, 1, new_race[RC_CLONE]);
 	if (target_region==mage->region) {
 		clone->building = mage->building;
 		clone->ship = mage->ship;
@@ -5295,7 +5213,7 @@ sp_dreamreading(castorder *co)
 	u = pa->param[0]->data.u;
 
 	/* Illusionen und Untote abfangen. */
-	if (is_undead(u) || u->race == RC_ILLUSION){
+	if (fval(u->race, RCF_UNDEAD|RCF_ILLUSIONARY)) {
 		add_message(&mage->faction->msgs, new_message(mage->faction,
 			"spellunitnotfound%u:unit%r:region%s:command%s:id",
 			mage, mage->region, strdup(co->order), strdup(itoa36(u->no))));
@@ -5309,11 +5227,11 @@ sp_dreamreading(castorder *co)
       return 0;
   }
 
-  u2=createunit(u->region,mage->faction,RS_FARVISION,RC_SPELL);
+  u2=createunit(u->region,mage->faction, RS_FARVISION, new_race[RC_SPELL]);
   set_number(u2, 1);
   set_string(&u2->name, "sp_dreamreading");
   u2->age  = 2;   /* Nur für diese Runde. */
-  set_skill(u2, SK_OBSERVATION, get_skill(u,SK_OBSERVATION)/u->number);
+  set_skill(u2, SK_OBSERVATION, get_skill(u, SK_OBSERVATION)/u->number);
 
   sprintf(buf, "%s verliert sich in die Träume von %s und erhält einen "
       "Eindruck von %s.", unitname(mage), unitname(u), regionid(u->region));
@@ -6117,7 +6035,7 @@ sp_showastral(castorder *co)
 	for(rl2=rl; rl2; rl2=rl2->next) {
 		if(!is_cursed(rl2->region->attribs, C_ASTRALBLOCK, 0)) {
 			for(u = rl2->region->units; u; u=u->next) {
-				if(u->race != RC_SPECIAL && u->race != RC_SPELL) n++;
+				if (u->race != new_race[RC_SPECIAL] && u->race != new_race[RC_SPELL]) n++;
 			}
 		}
 	}
@@ -6136,7 +6054,7 @@ sp_showastral(castorder *co)
 		for(rl2=rl; rl2; rl2=rl2->next) {
 			if(!is_cursed(rl2->region->attribs, C_ASTRALBLOCK, 0)) {
 				for(u = rl2->region->units; u; u=u->next) {
-					if(u->race != RC_SPECIAL && u->race != RC_SPELL) {
+					if(u->race != new_race[RC_SPECIAL] && u->race != new_race[RC_SPELL]) {
 						c++;
 						scat(unitname(u));
 						scat(" (");
@@ -6146,7 +6064,7 @@ sp_showastral(castorder *co)
 						}
 						icat(u->number);
 						scat(" ");
-						scat(u->number==1?race[u->race].name[0]:race[u->race].name[1]);
+						scat(LOC(mage->faction->locale, rc_name(u->race, u->number!=1)));
 						scat(", Entfernung ");
 						icat(distance(rl2->region, rt));
 						scat(")");
@@ -6193,7 +6111,7 @@ sp_viewreality(castorder *co)
 
 	/* Irgendwann mal auf Curses u/o Attribut umstellen. */
 	for(rl2=rl; rl2; rl2=rl2->next) {
-		u = createunit(rl2->region, mage->faction, RS_FARVISION, RC_SPELL);
+		u = createunit(rl2->region, mage->faction, RS_FARVISION, new_race[RC_SPELL]);
 		set_string(&u->name, "Zauber: Blick in die Realität");
 		u->age = 2;
 	}
@@ -6258,7 +6176,7 @@ sp_disruptastral(castorder *co)
 		/* Einheiten auswerfen */
 
 		for(u=rl2->region->units;u;u=u->next) {
-			if(u->race != RC_SPELL) {
+			if(u->race != new_race[RC_SPELL]) {
 				regionlist *trl, *trl2;
 				region *tr;
 				int c = 0;
@@ -6927,6 +6845,117 @@ sp_q_antimagie(castorder *co)
 	return max(succ, 1);
 }
 
+/* ------------------------------------------------------------- */
+/* Name:           Fluch brechen
+ * Stufe:          7
+ * Kosten:         SPC_LEVEL
+ *
+ * Wirkung:
+ *   Kann eine bestimmte Verzauberung angreifen und auflösen. Die Stärke
+ *   des Zaubers muss stärker sein als die der Verzauberung.
+ * Syntax:
+ *  ZAUBERE \"Fluch brechen\" REGION <Zauber-id>
+ *  ZAUBERE \"Fluch brechen\" EINHEIT <Einheit-Nr> <Zauber-id>
+ *  ZAUBERE \"Fluch brechen\" BURG <Burg-Nr> <Zauber-id>
+ *  ZAUBERE \"Fluch brechen\" GEBÄUDE <Gebäude-Nr> <Zauber-id>
+ *  ZAUBERE \"Fluch brechen\" SCHIFF <Schiff-Nr> <Zauber-id>
+ *
+ *  "kcc"
+ * Flags:
+ *   (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE)
+ */
+int
+sp_destroy_curse(castorder *co)
+{
+	attrib **ap;
+	int obj;
+	curse * c;
+	int succ = 0;
+	region *r = co->rt;
+	unit *mage = (unit *)co->magician;
+	int cast_level = co->level; 
+	int force = co->force;
+	spellparameter *pa = co->par;
+	char *ts;
+
+	if(pa->length < 2){
+		/* Das Zielobjekt wurde vergessen */
+		cmistake(mage, strdup(co->order), 203, MSG_MAGIC);
+	}
+
+	obj = pa->param[0]->typ;
+
+	c = findcurse(atoi36(pa->param[1]->data.s));
+	if (!c){
+		/* Es wurde kein Ziel gefunden */
+		add_message(&mage->faction->msgs, new_message(mage->faction, 
+					"spelltargetnotfound%u:unit%r:region%s:command",
+					mage, mage->region, strdup(co->order)));
+	}
+
+	switch(obj){
+		case SPP_REGION:
+			ap = &r->attribs;
+			set_string(&ts, regionid(r));
+			break;
+
+		case SPP_UNIT:
+		{
+			unit *u = pa->param[0]->data.u;
+			ap = &u->attribs;
+			set_string(&ts, unitid(u));
+			break;
+		}
+		case SPP_BUILDING:
+		{
+			building *b = pa->param[0]->data.b;
+			ap = &b->attribs;
+			set_string(&ts, buildingid(b));
+			break;
+		}
+		case SPP_SHIP:
+		{
+			ship *sh = pa->param[0]->data.sh;
+			ap = &sh->attribs;
+			set_string(&ts, shipid(sh));
+			break;
+		}
+		default:
+			/* Das Zielobjekt wurde vergessen */
+			cmistake(mage, strdup(co->order), 203, MSG_MAGIC);
+		return 0;
+	}
+
+	/* überprüfung, ob curse zu diesem objekt gehört */
+	if (!is_cursed_with(*ap, c)){
+		/* Es wurde kein Ziel gefunden */
+		add_message(&mage->faction->msgs, new_message(mage->faction, 
+					"spelltargetnotfound%u:unit%r:region%s:command",
+					mage, mage->region, strdup(co->order)));
+	}
+
+	/* curse auflösen, wenn zauber stärker (force > vigour)*/
+	succ = c->vigour - force;
+	c->vigour = max(0, succ);
+	
+	if(succ <= 0) {
+		remove_cursec(ap, c);
+
+		add_message(&mage->faction->msgs, new_message(mage->faction,
+			"destroy_magic_effect%u:unit%r:region%s:command%i:id%s:target",
+			mage, mage->region, strdup(co->order), strdup(pa->param[1]->data.s),
+			strdup(ts)));
+	} else {
+		add_message(&mage->faction->msgs, new_message(mage->faction,
+			"destroy_magic_noeffect%u:unit%r:region%s:command",
+			mage, mage->region, strdup(co->order)));
+	}
+
+	return cast_level;
+}
+
+
+/* ------------------------------------------------------------- */
 int
 sp_becomewyrm(castorder *co)
 {
@@ -6951,7 +6980,7 @@ sp_becomewyrm(castorder *co)
 		a->data.i++;
 	}
 
-	mage->race = RC_WYRM;
+	mage->race = new_race[RC_WYRM];
 	addspell(mage, SPL_WYRMODEM);
 
 	add_message(&mage->faction->msgs, new_message(mage->faction,

@@ -26,9 +26,6 @@
 enum {
 	T_OCEAN,
 	T_PLAIN,
-#ifndef NO_FOREST
-	T_FOREST,					/* wird zu T_PLAIN konvertiert */
-#endif
 	T_SWAMP,
 	T_DESERT,					/* kann aus T_PLAIN entstehen */
 	T_HIGHLAND,
@@ -80,6 +77,15 @@ typedef struct terraindata_t {
 	 */
 	unsigned int flags;
 	const char ** herbs;
+#ifdef NEW_RESOURCEGROWTH
+	struct {
+		const struct rawmaterial_type * type;
+		const char *startlevel;
+		const char *base;
+		const char *divisor;
+		double chance;
+	} rawmaterials[3];
+#endif
 } terraindata_t;
 
 extern const terraindata_t terrain[];

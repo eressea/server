@@ -21,6 +21,7 @@
 #include "translation.h"
 
 /* libc includes */
+#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -80,6 +81,7 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
 		if (section) nrt->section = strdup(section);
 		else nrt->section = NULL;
 		messagetypes = nrt;
+		assert(string && *string);
 		nrt->string = strdup(string);
                 *c = '\0';
 		for (i=0;i!=mtype->nparameters;++i) {

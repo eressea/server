@@ -18,6 +18,7 @@
 
 /* kernel includes */
 #include <unit.h>
+#include <race.h>
 #include <region.h>
 
 /* util includes */
@@ -40,7 +41,7 @@ typedef struct createunit_data {
 	struct region * r;
 	struct faction * f;
 	struct unit * u;
-	race_t race;
+	const struct race * race;
 	int number;
 } createunit_data;
 
@@ -76,9 +77,10 @@ static void
 createunit_write(const trigger * t, FILE * F)
 {
 	createunit_data * td = (createunit_data*)t->data.v;
-	fprintf(F, "%s ", itoa36(td->u->no));
-	fprintf(F, "%d %d ", td->r->x, td->r->y);
-	fprintf(F, "%d %d ", td->race, td->number);
+	write_unit_reference(td->u, F);
+	write_region_reference(td->r, F);
+	write_race_reference(td->race, F);
+	fprintf(F, "%d ", td->number);
 }
 
 static int
@@ -88,8 +90,9 @@ createunit_read(trigger * t, FILE * F)
 
 	read_unit_reference(&td->u, F);
 	read_region_reference(&td->r, F);
+	read_race_reference(&td->race, F);
 
-	fscanf(F, "%d %d ", &td->race, &td->number);
+	fscanf(F, "%d ", &td->number);
 	return 1;
 }
 
@@ -103,13 +106,13 @@ trigger_type tt_createunit = {
 };
 
 trigger *
-trigger_createunit(region * r, struct faction * f, race_t race, int number)
+trigger_createunit(region * r, struct faction * f, const struct race * rc, int number)
 {
 	trigger * t = t_new(&tt_createunit);
 	createunit_data * td = (createunit_data*)t->data.v;
 	td->r = r;
 	td->f = f;
-	td->race = race;
+	td->race = rc;
 	td->number = number;
 	return t;
 }

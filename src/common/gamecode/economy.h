@@ -57,14 +57,12 @@ const struct ship_type * findshiptype(char *s, const struct locale * lang);
 void scramble(void *v1, int n, size_t width);
 void economics(void);
 void produce(void);
-
-/* int get_money(char test, struct region *r, struct unit *u, int amount, int use_allies);
- * int get_maxmoney(struct region *r, struct unit *u, int use_allies); */
-int entertainmoney(struct region *r);
+extern int entertainmoney(const struct region * r);
 
 enum { IC_WORK, IC_ENTERTAIN, IC_TAX, IC_TRADE, IC_TRADETAX, IC_STEAL, IC_MAGIC };
 void maintain_buildings(boolean crash);
 extern void add_spende(struct faction * f1, struct faction * f2, int betrag, struct region * r);
 void report_donations(void);
+extern void init_economy(void);
 
 #endif

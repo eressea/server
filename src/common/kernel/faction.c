@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * 
+ *
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -26,6 +26,24 @@
 /* libc includes */
 #include <stdio.h>
 #include <stdlib.h>
+
+const unit *
+random_unit_in_faction(const faction *f)
+{
+	unit *u;
+	int c = 0, u_nr;
+
+	for(u = f->units; u; u=u->next) c++;
+
+	u_nr = rand()%c;
+	c = 0;
+
+	for(u = f->units; u; u=u->next)
+		if(u_nr == c) return u;
+
+	/* Hier sollte er nie ankommen */
+	return NULL;
+}
 
 const char *
 factionname(const faction * f)
@@ -64,7 +82,7 @@ unused_faction_id(void)
 }
 
 unit *
-addplayer(region *r, char *email, race_t frace, locale *loc)
+addplayer(region *r, char *email, const struct race * frace, locale *loc)
 {
 	int i;
 	unit *u;
@@ -84,13 +102,12 @@ addplayer(region *r, char *email, race_t frace, locale *loc)
 	f->locale = loc;
 	set_ursprung(f, 0, r->x, r->y);
 
-	f->options = Pow(O_REPORT) | Pow(O_ZUGVORLAGE) | Pow(O_SILBERPOOL);
+	f->options = Pow(O_REPORT) | Pow(O_ZUGVORLAGE) | Pow(O_SILBERPOOL) | Pow(O_COMPUTER);
 
 	f->no = unused_faction_id();
 	register_faction_id(f->no);
 
-	f->unique_id = max_unique_id + 1;
-	max_unique_id++;
+	f->unique_id = ++max_unique_id;
 
 	sprintf(buf, "Partei %s", factionid(f));
 	set_string(&f->name, buf);
@@ -101,10 +118,12 @@ addplayer(region *r, char *email, race_t frace, locale *loc)
 	u = createunit(r, f, 1, f->race);
 	give_starting_equipment(r, u);
 	fset(u, FL_ISNEW);
-	if (f->race == RC_DAEMON) {
+	if (old_race(f->race) == RC_DAEMON) {
+		race_t urc;
 		do
-			u->irace = (char) (rand() % MAXRACES);
-		while (u->irace == RC_DAEMON || race[u->irace].nonplayer);
+			urc = (race_t)(rand() % MAXRACES);
+		while (urc == RC_DAEMON || !playerrace(new_race[urc]));
+		u->irace = new_race[urc];
 	}
 	fset(u, FL_PARTEITARNUNG);
 

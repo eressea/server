@@ -142,14 +142,18 @@ static attrib_type at_driveweight = {
 };
 
 int
-personcapacity(unit *u)
+personcapacity(const unit *u)
 {
-	int cap = race[u->race].weight+540;
+	int cap = u->race->weight+540;
 
-	if(u->race == RC_TROLL)
+	if (old_race(u->race) == RC_TROLL)
 		cap += 540;
+#ifdef RACE_ADJUSTMENTS
+	else if(old_race(u->race) == RC_GOBLIN)
+		cap -= 100;
+#endif
 
-	if(fspecial(u->faction, FS_QUICK))
+	if (fspecial(u->faction, FS_QUICK))
 		cap -= 200;
 
 	return cap;
@@ -178,7 +182,7 @@ ridingcapacity(unit * u)
 	 * von zwei Pferden gezogen wird */
 
 	pferde = min(get_item(u, I_HORSE), effskill(u, SK_RIDING) * u->number * 2);
-	if(race[u->race].flags & RCF_HORSE) pferde += u->number;
+	if(fval(u->race, RCF_HORSE)) pferde += u->number;
 
 	/* maximal diese Pferde können zum Ziehen benutzt werden */
 	wagen = min(pferde / HORSESNEEDED, get_item(u, I_WAGON));
@@ -196,7 +200,7 @@ walkingcapacity(unit * u)
 	 * die Leute tragen */
 
 	pferde = get_item(u, I_HORSE);
-	if(race[u->race].flags & RCF_HORSE) {
+	if (fval(u->race, RCF_HORSE)) {
 		pferde += u->number;
 		personen = 0;
 	} else {
@@ -212,7 +216,7 @@ walkingcapacity(unit * u)
 
 	n = wagen_mit_pferden * WAGONCAPACITY;
 
-	if (u->race == RC_TROLL) {
+	if (old_race(u->race) == RC_TROLL) {
 		/* 4 Trolle ziehen einen Wagen. */
 		/* Unbesetzte Wagen feststellen */
 		wagen_ohne_pferde = wagen - wagen_mit_pferden;
@@ -240,13 +244,13 @@ canwalk(unit * u)
 	int wagen, maxwagen;
 	int pferde, maxpferde;
 
-	if (dragon(u)) return 0;
+	if (dragonrace(u->race)) return 0;
 
 	wagen = get_item(u, I_WAGON);
 	pferde = get_item(u, I_HORSE);
 
 	maxwagen = effskill(u, SK_RIDING) * u->number * 2;
-	if (u->race == RC_TROLL) {
+	if (old_race(u->race) == RC_TROLL) {
 		maxwagen = max(maxwagen, u->number / 4);
 	}
 	maxpferde = effskill(u, SK_RIDING) * u->number * 4 + u->number;
@@ -279,7 +283,7 @@ canfly(unit *u)
 	if(get_item(u, I_PEGASUS) >= u->number && effskill(u, SK_RIDING) >= 4)
 		return true;
 
-	if(race[u->race].flags & RCF_FLY) return true;
+	if (fval(u->race, RCF_FLY)) return true;
 
 	return false;
 }
@@ -287,16 +291,16 @@ canfly(unit *u)
 boolean
 canswim(unit *u)
 {
-	if(get_item(u, I_HORSE)) return false;
+	if (get_item(u, I_HORSE)) return false;
 
-	if(get_item(u, I_DOLPHIN) >= u->number && effskill(u, SK_RIDING) >= 4)
+	if (get_item(u, I_DOLPHIN) >= u->number && effskill(u, SK_RIDING) >= 4)
 		return true;
 
 	if(fspecial(u->faction, FS_AMPHIBIAN)) return true;
 
-	if(race[u->race].flags & RCF_FLY) return true;
+	if (u->race->flags & RCF_FLY) return true;
 
-	if(race[u->race].flags & RCF_SWIM) return true;
+	if (u->race->flags & RCF_SWIM) return true;
 
 	return false;
 }
@@ -312,14 +316,14 @@ canride(unit * u)
 	maxunicorns = (skill/5) * u->number;
 	maxpferde = skill * u->number * 2;
 
-	if(!(race[u->race].flags & RCF_HORSE)
+	if(!(u->race->flags & RCF_HORSE)
 		&& ((pferde == 0 && unicorns == 0)
 			|| pferde > maxpferde || unicorns > maxunicorns)) {
 		return 0;
 	}
 
 	if(ridingcapacity(u) - eff_weight(u) >= 0) {
-		if(pferde == 0 && unicorns >= u->number && !(race[u->race].flags & RCF_HORSE)) {
+		if(pferde == 0 && unicorns >= u->number && !(u->race->flags & RCF_HORSE)) {
 			return 2;
 		}
 		return 1;
@@ -651,7 +655,7 @@ bewegung_blockiert_von(unit * reisender, region * r)
 	boolean contact = false;
 	unit * guard = NULL;
 
-	if (illusionary(reisender)) return NULL;
+	if (fval(reisender->race, RCF_ILLUSIONARY)) return NULL;
 	for (u=r->units;u && !contact;u=u->next) {
 		if (getguard(u) & GUARD_TRAVELTHRU) {
 			int sk = eff_skill(u, SK_OBSERVATION, r);
@@ -789,7 +793,7 @@ init_drive(void)
 				}
 				for (S = ut->orders; S; S = S->next) {
 					if (igetkeyword(S->s, u->faction->locale) == K_TRANSPORT) {
-						if (ut->race!=RC_UNDEAD && getunit(r, ut->faction) == u) {
+						if (getunit(r, ut->faction) == u) {
 							found = true;
 							break;
 						}
@@ -846,7 +850,7 @@ cantravel(const unit *u, const region *from, const region * to, boolean (*allowe
 	if (allowed && !allowed(from, to)) return ETRAVEL_NOTALLOWED;
 	if (u->ship && fval(u, FL_OWNER) && rterrain(from)==T_OCEAN) {
 		/* wir sind auf einem schiff und auf dem ozean */
-		if (rterrain(to)==T_OCEAN || (u->race != RC_AQUARIAN && !dragon(u))) {
+		if (rterrain(to)==T_OCEAN || (old_race(u->race) != RC_AQUARIAN && !dragon(u))) {
 			/* Drache oder Meermensch sind wir auch nicht */
 			return ETRAVEL_NOSWIM;
 		} else if (get_item(u, I_HORSE) > 0) {
@@ -903,9 +907,9 @@ travel(region * first, unit * u, region * next, int flucht)
 	 * Außerdem: Wenn Einheit transportiert, nur halbe BP */
 
 	if (rterrain(current)==T_OCEAN
-			&& !(race[u->race].flags & RCF_FLY) && rterrain(next) != T_OCEAN)
+			&& !(u->race->flags & RCF_FLY) && rterrain(next) != T_OCEAN)
 	{ /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
-		if (!(race[u->race].flags & RCF_SWIM) && u->race != RC_AQUARIAN) {
+		if (!(u->race->flags & RCF_SWIM) && old_race(u->race) != RC_AQUARIAN) {
 			cmistake(u, findorder(u, u->thisorder), 44, MSG_MOVE);
 			return NULL;
 		} else {
@@ -920,7 +924,7 @@ travel(region * first, unit * u, region * next, int flucht)
 			cmistake(u, findorder(u, u->thisorder), 70, MSG_MOVE);
 			return NULL;
 		}
-		if (u->ship && !flucht && race[u->race].flags & RCF_SWIM) {
+		if (u->ship && !flucht && u->race->flags & RCF_SWIM) {
 			cmistake(u, findorder(u, u->thisorder), 143, MSG_MOVE);
 			return NULL;
 		}
@@ -928,7 +932,7 @@ travel(region * first, unit * u, region * next, int flucht)
 		cmistake(u, findorder(u, u->thisorder), 13, MSG_MOVE);
 		return NULL;
 	}
-	if (!nonplayer(u)) {
+	if (playerrace(u->race)) {
 		switch (canwalk(u)) {
 		case 1:
 			cmistake(u, findorder(u, u->thisorder), 57, MSG_MOVE);
@@ -946,7 +950,7 @@ travel(region * first, unit * u, region * next, int flucht)
 
 	/* im array rv[] speichern wir die Regionen ab, durch die wir wandern. */
 
-	dk = race[u->race].speed;
+	dk = u->race->speed;
 
 	if(is_cursed(u->attribs, C_SPEED, 0)) {
 		int men = get_cursedmen(u->attribs, C_SPEED, 0);
@@ -992,7 +996,7 @@ travel(region * first, unit * u, region * next, int flucht)
 		break;
 	}
 
-	switch(u->race) {
+	switch(old_race(u->race)) {
 	case RC_DRAGON:
 	case RC_WYRM:
 	case RC_FIREDRAGON:
@@ -1046,7 +1050,7 @@ travel(region * first, unit * u, region * next, int flucht)
 					wache));
 				break;
 			}
-			if (is_spell_active(next, C_ANTIMAGICZONE) && illusionary(u)){
+			if (is_spell_active(next, C_ANTIMAGICZONE) && fval(u->race, RCF_ILLUSIONARY)) {
 				change_cursevigour(&next->attribs, C_ANTIMAGICZONE, 0, - u->number);
 
 				add_message(&u->faction->msgs, new_message(u->faction,
@@ -1083,7 +1087,7 @@ travel(region * first, unit * u, region * next, int flucht)
 				break;
 			}
 
-			if (u->race == RC_INSECT && r_insectstalled(next) &&
+			if (old_race(u->race) == RC_INSECT && r_insectstalled(next) &&
 					!is_cursed(u->attribs, C_KAELTESCHUTZ,0)) {
 				add_message(&u->faction->msgs, new_message(u->faction,
 					"detectforbidden%u:unit%r:region", u, next));
@@ -1615,7 +1619,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 									if (st > 0) {
 										i_change(&u2->items, itm->type, -st);
 										i_change(&hafenmeister->items, itm->type, st);
-										i_add(&trans, i_new(itm->type));
+										i_add(&trans, i_new(itm->type, st));
 									}
 								}
 							}
@@ -1890,7 +1894,7 @@ hunt(unit *u)
 	} else if(attacked(u)) {
 		cmistake(u, findorder(u, u->thisorder), 52, MSG_MOVE);
 		return false;
-	} else if(race[u->race].flags & RCF_CANNOTMOVE) {
+	} else if(u->race->flags & RCF_CANNOTMOVE) {
 		cmistake(u, findorder(u, u->thisorder), 55, MSG_MOVE);
 		return false;
 	}
@@ -1924,9 +1928,11 @@ hunt(unit *u)
 
 	/* In command steht jetzt das NACH-Kommando. */
 
-	igetkeyword(command, u->faction->locale);		/* NACH ignorieren und Parsing initialisieren. */
-	move(u->region, u, false);							/* NACH ausführen */
-	return true;						/* true -> Einheitenliste von vorne durchgehen */
+	igetkeyword(command, u->faction->locale);	/* NACH ignorieren und Parsing initialisieren. */
+	move(u->region, u, false);								/* NACH ausführen */
+	fset(u, FL_LONGACTION);										/* Von Hand setzen, um Endlosschleife zu vermeiden, 
+																							wenn Verfolgung nicht erfolgreich */
+	return true;															/* true -> Einheitenliste von vorne durchgehen */
 }
 
 void
@@ -2041,7 +2047,7 @@ movement(void)
 					cmistake(u, findorder(u, u->thisorder), 52, MSG_MOVE);
 					set_string(&u->thisorder, "");
 					up = &u->next;
-				} else if (race[u->race].flags & RCF_CANNOTMOVE) {
+				} else if (u->race->flags & RCF_CANNOTMOVE) {
 					cmistake(u, findorder(u, u->thisorder), 55, MSG_MOVE);
 					set_string(&u->thisorder, "");
 					up = &u->next;
@@ -2072,7 +2078,7 @@ movement(void)
 					if(attacked(u)) {
 						cmistake(u, o->s, 52, MSG_MOVE);
 						break;
-					} else if(race[u->race].flags & RCF_CANNOTMOVE) {
+					} else if(u->race->flags & RCF_CANNOTMOVE) {
 						cmistake(u, o->s, 55, MSG_MOVE);
 						break;
 					}
@@ -2106,7 +2112,7 @@ movement(void)
 				|| igetkeyword(u->thisorder, u->faction->locale) == K_ROUTE)) {
 					if (attacked(u)) {
 						cmistake(u, findorder(u, u->thisorder), 52, MSG_PRODUCE);
-					} else if (race[u->race].flags & RCF_CANNOTMOVE) {
+					} else if (u->race->flags & RCF_CANNOTMOVE) {
 						cmistake(u, findorder(u, u->thisorder), 55, MSG_PRODUCE);
 					} else
 						move(r, u, true);

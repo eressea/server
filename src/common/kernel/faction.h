@@ -33,7 +33,7 @@ typedef struct faction {
 	int lastorders;	/* enno: short? */
 	int age;	/* enno: short? */
 	ursprung *ursprung;
-	race_t race;
+	const struct race * race;
 	magic_t magiegebiet;
 	int newbies;
 	int num_migrants;			/* Anzahl Migranten */
@@ -47,9 +47,7 @@ typedef struct faction {
 	struct warning * warnings;
 	struct msglevel * msglevels;
 	struct ally *allies;
-#ifdef GROUPS
 	struct group *groups;
-#endif
 	struct strlist *mistakes; /* enno: das muﬂ irgendwann noch ganz raus */
 	boolean alive; /* enno: sollte ein flag werden */
 	int nregions;
@@ -70,8 +68,14 @@ typedef struct faction {
 	} * battles;
 } faction;
 
+typedef struct faction_list {
+	struct faction_list * next;
+	struct faction * data;
+} faction_list;
+
+extern const struct unit * random_unit_in_faction(const struct faction *f);
 extern const char * factionname(const struct faction * f);
 extern void * resolve_faction(void * data);
-extern struct unit * addplayer(struct region *r, char *email, race_t frace, struct locale *loc);
+extern struct unit * addplayer(struct region *r, char *email, const struct race * frace, struct locale *loc);
 
 #endif

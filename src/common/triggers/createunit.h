@@ -24,6 +24,6 @@ struct unit;
 
 extern struct trigger_type tt_createunit;
 
-extern struct trigger * trigger_createunit(struct region * r, struct faction * f, race_t race, int number);
+extern struct trigger * trigger_createunit(struct region * r, struct faction * f, const struct race * rc, int number);
 
 #endif

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -10,6 +10,9 @@
  *
  * This program may not be used, modified or distributed without
  * prior permission by the authors of Eressea.
+ */
+
+/* Neue items in common/items/ anlegen!
  */
 
 #include <config.h>
@@ -104,12 +107,12 @@ int
 res_changeitem(unit * u, const resource_type * rtype, int delta)
 {
 	int num;
-	if (rtype == oldresourcetype[R_STONE] && u->race==RC_STONEGOLEM && delta<=0) {
+	if (rtype == oldresourcetype[R_STONE] && old_race(u->race)==RC_STONEGOLEM && delta<=0) {
 		int reduce = delta / GOLEM_STONE;
 		if (delta % GOLEM_STONE != 0) --reduce;
 		scale_number(u, u->number+reduce);
 		num = u->number;
-	} else if (rtype == oldresourcetype[R_IRON] && u->race==RC_IRONGOLEM && delta<=0) {
+	} else if (rtype == oldresourcetype[R_IRON] && old_race(u->race) == RC_IRONGOLEM && delta<=0) {
 		int reduce = delta / GOLEM_IRON;
 		if (delta % GOLEM_IRON != 0) --reduce;
 		scale_number(u, u->number+reduce);
@@ -180,7 +183,7 @@ it_register(item_type * itype)
 
 item_type *
 new_itemtype(resource_type * rtype,
-             int iflags, int weight, int capacity, int minskill, skill_t skill)
+             int iflags, int weight, int capacity)
 {
 	item_type * itype;
 	assert (resource2item(rtype) == NULL);
@@ -191,8 +194,6 @@ new_itemtype(resource_type * rtype,
 	itype->rtype = rtype;
 	itype->weight = weight;
 	itype->capacity = capacity;
-	itype->minskill = minskill;
-	itype->skill = skill;
 	itype->flags |= iflags;
 	it_register(itype);
 
@@ -342,7 +343,7 @@ rt_register(resource_type * rtype)
 }
 
 const resource_type *
-item2resource(const item_type * itype) 
+item2resource(const item_type * itype)
 {
 	return itype->rtype;
 }
@@ -360,7 +361,7 @@ resource2item(const resource_type * rtype)
 }
 
 const herb_type *
-resource2herb(const resource_type * rtype) 
+resource2herb(const resource_type * rtype)
 {
 #ifdef AT_HTYPE
 	attrib * a = a_find(rtype->attribs, &at_htype);
@@ -383,7 +384,7 @@ resource2weapon(const resource_type * rtype) {
 }
 
 const luxury_type *
-resource2luxury(const resource_type * rtype) 
+resource2luxury(const resource_type * rtype)
 {
 #ifdef AT_LTYPE
 	attrib * a = a_find(rtype->attribs, &at_ltype);
@@ -551,9 +552,8 @@ i_change(item ** pi, const item_type * itype, int delta)
 	if (!*pi || (*pi)->type!=itype) {
 		item * i;
 		if (delta==0) return NULL;
-		i = i_new(itype);
+		i = i_new(itype, delta);
 		i->next = *pi;
-		i->number = delta;
 		*pi = i;
 	} else {
 		item * i = *pi;
@@ -596,12 +596,14 @@ i_freeall(item *i) {
 	}
 }
 
+
 item *
-i_new(const item_type * itype)
+i_new(const item_type * itype, int size)
 {
 	item * i = calloc(1, sizeof(item));
 	assert(itype);
 	i->type = itype;
+	i->number = size;
 	return i;
 }
 
@@ -629,7 +631,7 @@ give_horses(const unit * s, const unit * d, const item_type * itype, int n, cons
 #define LASTLUXURY      (I_INCENSE +1)
 #define MAXLUXURIES (LASTLUXURY - FIRSTLUXURY)
 
-item_type * olditemtype[MAXITEMS+1];
+struct item_type * olditemtype[MAXITEMS+1];
 resource_type * oldresourcetype[MAXRESOURCES+1];
 herb_type * oldherbtype[MAXHERBS+1];
 luxury_type * oldluxurytype[MAXLUXURIES+1];
@@ -651,9 +653,12 @@ set_item(unit * u, item_t it, int value)
 {
 	const item_type * type = olditemtype[it];
 	item * i = *i_find(&u->items, type);
-	if (!i)
-		i = i_add(&u->items, i_new(type));
-	return i->number = value;
+	if (!i) {
+		i = i_add(&u->items, i_new(type, value));
+	} else {
+		i->number = value;
+	}
+	return value;
 }
 
 int
@@ -663,9 +668,12 @@ change_item(unit * u, item_t it, int value)
 	item * i = *i_find(&u->items, type);
 	if (!i) {
 		if (!value) return 0;
-		else i = i_add(&u->items, i_new(type));
+		assert(value>0);
+		i = i_add(&u->items, i_new(type, value));
+	} else {
+		i->number += value;
 	}
-	return i->number += value;
+	return i->number;
 }
 
 /*** alte herbs ***/
@@ -683,9 +691,9 @@ set_herb(unit * u, herb_t h, int value)
 {
 	const item_type * type = oldherbtype[h]->itype;
 	item * i = *i_find((item**)&u->items, type);
-	if (!i)
-		i = i_add(&u->items, i_new(type));
-	return i->number = value;
+	if (!i) i = i_add(&u->items, i_new(type, value));
+	else i->number = value;
+	return value;
 }
 
 int
@@ -695,9 +703,12 @@ change_herb(unit * u, herb_t h, int value)
 	item * i = *i_find(&u->items, type);
 	if (!i) {
 		if (!value) return 0;
-		else i = i_add(&u->items, i_new(type));
+		assert(value>0);
+		i = i_add(&u->items, i_new(type, value));
+	} else {
+		i->number += value;
 	}
-	return i->number += value;
+	return i->number;
 }
 
 /*** alte potions ***/
@@ -807,7 +818,7 @@ use_antimagiccrystal(region * r, unit * mage, strlist * cmdstrings)
 		create_curse(mage, &r->attribs, C_ANTIMAGICZONE, 0, power, duration, effect, 0);
 	}
 
-	change_item(mage, I_ANTIMAGICCRYSTAL, -1);
+	use_pooled(mage, mage->region, R_ANTIMAGICCRYSTAL, 1);
 	add_message(&mage->faction->msgs,
 			new_message(mage->faction, "use_antimagiccrystal%u:unit%r:region", mage, r));
 	return;
@@ -1005,19 +1016,19 @@ t_item itemdata[MAXITEMS] = {
 		{"Elfenbogen", "Elfenbögen", "Elfenbogen", "Elfenbögen"}, G_M,
 		IS_PRODUCT, SK_WEAPONSMITH, 5, {0, 0, 0, 0, 0, 1}, 100, 0, 0, NULL
 	},
-	{			/* I_EOGSWORD 38 */
+	{			/* I_LAENSWORD 38 */
 		{"Laenschwert", "Laenschwerter", "Laenschwert", "Laenschwerter"}, G_N,
 		IS_PRODUCT, SK_WEAPONSMITH, 8, {0, 0, 0, 0, 1, 0}, 100, 0, 0, NULL
 	},
-	{			/* I_EOGSHIELD 39 */
+	{			/* I_LAENSHIELD 39 */
 		{"Laenschild", "Laenschilde", "Laenschild", "Laenschilde"}, G_N,
 		IS_PRODUCT, SK_ARMORER, 7, {0, 0, 0, 0, 1, 0}, 0, 0, 0, NULL
 	},
-	{			/* I_EOGCHAIN 40 */
+	{			/* I_LAENCHAIN 40 */
 		{"Laenkettenhemd", "Laenkettenhemden", "Laenkettenhemd", "Laenkettenhemden"}, G_N,
 		IS_PRODUCT, SK_ARMORER, 9, {0, 0, 0, 0, 3, 0}, 100, 0, 0, NULL
 	},
-	{			/* I_EOG 41 */
+	{			/* I_LAEN 41 */
 		{"Laen", "Laen", "Laen", "Laen"}, G_N,
 		IS_RESOURCE, SK_MINING, 7, {0, 0, 0, 0, 0, 0}, 200, 0, 0, NULL
 	},
@@ -1181,7 +1192,7 @@ const item_t matresource[] = {
 	I_WOOD,
 	I_STONE,
 	-1,
-	I_EOG,
+	I_LAEN,
 	I_MALLORN
 };
 
@@ -1190,7 +1201,7 @@ const item_t matresource[] = {
 static int
 mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 {
-	if (u->race==RC_ELF) return value;
+	if (old_race(u->race) == RC_ELF) return value;
 	unused(r);
 	return -118;
 }
@@ -1211,16 +1222,26 @@ static int
 limit_oldtypes(const region * r, const resource_type * rtype)
 		/* TODO: split into seperate functions. really much nicer. */
 {
-	if (rtype==oldresourcetype[R_EOG]) {
+	if (rtype==oldresourcetype[R_WOOD]) {
+#ifdef GROWING_TREES
+		return rtrees(r,2) + rtrees(r,1);
+#else
+		return rtrees(r);
+#endif
+#ifndef NEW_RESOURCEGROWTH
+	} else if (rtype==oldresourcetype[R_EOG]) {
 		return rlaen(r);
 	} else if (rtype==oldresourcetype[R_IRON]) {
 		return riron(r);
 	} else if (rtype==oldresourcetype[R_STONE]) {
 		return terrain[rterrain(r)].quarries;
-	} else if (rtype==oldresourcetype[R_WOOD]) {
-		return rtrees(r);
+#endif
 	} else if (rtype==oldresourcetype[R_MALLORN]) {
+#ifdef GROWING_TREES
+		return rtrees(r,2) + rtrees(r,1);
+#else
 		return rtrees(r);
+#endif
 	} else if (rtype==oldresourcetype[R_HORSE]) {
 		return rhorses(r);
 	} else {
@@ -1235,7 +1256,36 @@ use_oldresource(region * r, const resource_type * rtype, int norders)
 		/* TODO: split into seperate functions. really much nicer. */
 {
 	assert(norders>0);
-	if (rtype==oldresourcetype[R_EOG]) {
+	if (rtype==oldresourcetype[R_WOOD] || rtype==oldresourcetype[R_MALLORN]) {
+#ifdef GROWING_TREES
+		int avail_grownup = rtrees(r,2);
+		int avail_young   = rtrees(r,1);
+		int avail = avail_grownup + avail_young;
+		int wcount;
+
+		assert(norders <= avail);
+
+		if(norders <= avail_grownup) {
+			rsettrees(r, 2, avail_grownup-norders);
+			wcount = norders;
+		} else {
+			rsettrees(r, 2, 0);
+			rsettrees(r, 1, avail_young-(norders-avail_grownup));
+			wcount = norders * 3;
+		}
+		if(rtype==oldresourcetype[R_MALLORN]) {
+			woodcounts(r, wcount);
+		} else {
+			woodcounts(r, wcount*2);
+		}
+#else
+		int avail = rtrees(r);
+		assert(norders <= avail);
+		rsettrees(r, avail-norders);
+		woodcounts(r, norders);
+#endif
+#ifndef NEW_RESOURCEGROWTH
+	} else if (rtype==oldresourcetype[R_EOG]) {
 		int avail = rlaen(r);
 		assert(norders <= avail);
 		rsetlaen(r, avail-norders);
@@ -1243,24 +1293,17 @@ use_oldresource(region * r, const resource_type * rtype, int norders)
 		int avail = riron(r);
 		assert(norders <= avail);
 		rsetiron(r, avail-norders);
-	} else if (rtype==oldresourcetype[R_WOOD]) {
-		int avail = rtrees(r);
-		assert(norders <= avail);
-		rsettrees(r, avail-norders);
-		woodcounts(r, norders);
-	} else if (rtype==oldresourcetype[R_MALLORN]) {
-		int avail = rtrees(r);
-		assert(norders <= avail);
-		rsettrees(r, avail-norders);
-		woodcounts(r, norders*2);
+#endif
 	} else if (rtype==oldresourcetype[R_HORSE]) {
 		int avail = rhorses(r);
 		assert(norders <= avail);
 		rsethorses(r, avail-norders);
+	} else if (rtype!=oldresourcetype[R_STONE]) {
+		assert(!"unknown resource");
 	}
 }
 
-static int 
+static int
 use_olditem(struct unit * user, const struct item_type * itype, const char * cmd)
 {
 	item_t i;
@@ -1275,6 +1318,7 @@ use_olditem(struct unit * user, const struct item_type * itype, const char * cmd
 
 typedef const char* translate_t[5];
 static translate_t translation[] = {
+	{ "Delphin", "dolphin", "dolphin_p", "dolphin", "dolphin_p" },
 	{ "Holz", "log", "log_p", "log", "log_p" },
 	{ "Eisen", "iron", "iron_p", "iron", "iron_p" },
 	{ "Wagen", "cart", "cart_p", "cart", "cart_p" },
@@ -1322,7 +1366,6 @@ init_olditems(void)
 		const char * appearance[2];
 		int weight = itemdata[i].gewicht;
 		int capacity = 0;
-		int skill=0, minskill=0; /* skill required for *using* it */
 		int price;
 		attrib * a;
 		skillmod_data * smd;
@@ -1375,10 +1418,11 @@ init_olditems(void)
 			appearance[1] = reverse_lookup(lang, itemdata[i].name[3]);
 		}
 		rtype = new_resourcetype(name, appearance, rflags);
-		itype = new_itemtype(rtype, iflags, weight, capacity, minskill, skill);
+		itype = new_itemtype(rtype, iflags, weight, capacity);
 
 		switch (i) {
 		case I_HORSE:
+			itype->capacity = HORSECAPACITY;
 			itype->give = give_horses;
 			break;
 		case I_WAGON:
@@ -1530,12 +1574,10 @@ init_oldherbs(void)
 		}
 
 		rtype = new_resourcetype(names, appearance, RTF_ITEM|RTF_POOLED);
-		itype = new_itemtype(rtype, ITF_HERB, 0, 0, 0, NOSKILL);
+		itype = new_itemtype(rtype, ITF_HERB, 0, 0);
 
 		t = (terrain_t)(h/3+1);
-#ifdef NO_FOREST
 		if (t>T_PLAIN) --t;
-#endif
 		oldherbtype[h] = new_herbtype(itype, t);
 		oldresourcetype[herb2res(h)] = rtype;
 	}
@@ -1835,7 +1877,7 @@ static int
 use_warmthpotion(struct unit *u, const struct potion_type *ptype, const char *cmd)
 {
 	assert(ptype==oldpotiontype[P_WARMTH]);
-	if (u->faction->race == RC_INSECT) {
+	if (old_race(u->faction->race) == RC_INSECT) {
 		fset(u, FL_WARMTH);
 		cmistake(u, cmd, 164, MSG_EVENT);
 	} else {
@@ -1852,14 +1894,14 @@ use_bloodpotion(struct unit *u, const struct potion_type *ptype, const char *cmd
 {
 	assert(ptype==oldpotiontype[P_BAUERNBLUT]);
 	unused(ptype);
-	if (u->race == RC_DAEMON) {
+	if (old_race(u->race) == RC_DAEMON) {
 		attrib * a = (attrib*)a_find(u->attribs, &at_bauernblut);
 		if (!a) a = a_add(&u->attribs, a_new(&at_bauernblut));
 		a->data.i += 100;
 	} else {
 		/* bekommt nicht: */
 		cmistake(u, cmd, 165, MSG_EVENT);
-		u->race = RC_GHOUL;
+		u->race = new_race[RC_GHOUL];
 		u_setfaction(u, findfaction(MONSTER_FACTION));
 	}
 	return 0;
@@ -1936,7 +1978,7 @@ init_oldpotions(void)
 		rtype = new_resourcetype(names, appearance, RTF_ITEM|RTF_POOLED);
 		if (p==P_FOOL) rtype->flags |= RTF_SNEAK;
 		oldresourcetype[potion2res(p)] = rtype;
-		itype = new_itemtype(rtype, ITF_POTION, 0, 0, 0, NOSKILL);
+		itype = new_itemtype(rtype, ITF_POTION, 0, 0);
 		itype->construction = con;
 		itype->use = use_potion;
 		oldpotiontype[p] = new_potiontype(itype, (terrain_t)p/3);
@@ -1959,13 +2001,13 @@ resource_type * r_silver;
 item_type * i_silver;
 
 static const char * names[] = {
-	"money", "money_p", 
-	"person", "person_p", 
-	"permaura", "permaura_p", 
-	"hp", "hp_p", 
-	"peasant", "peasant_p", 
-	"aura", "aura_p", 
-	"unit", "unit_p" 
+	"money", "money_p",
+	"person", "person_p",
+	"permaura", "permaura_p",
+	"hp", "hp_p",
+	"peasant", "peasant_p",
+	"aura", "aura_p",
+	"unit", "unit_p"
 };
 
 void
@@ -1973,7 +2015,7 @@ init_resources(void)
 {
 	/* silver was never an item: */
 	r_silver = new_resourcetype(&names[0], NULL, RTF_ITEM|RTF_POOLED);
-	i_silver = new_itemtype(r_silver, ITF_NONE, 1/*weight*/, 0, 0, NOSKILL);
+	i_silver = new_itemtype(r_silver, ITF_NONE, 1/*weight*/, 0);
 	r_silver->uchange = res_changeitem;
 
 	r_person = new_resourcetype(&names[2], NULL, RTF_NONE);
@@ -2008,7 +2050,7 @@ init_resources(void)
 	init_oldpotions();
 }
 
-int 
+int
 get_money(const unit * u)
 {
 	const item * i = u->items;
@@ -2017,13 +2059,13 @@ get_money(const unit * u)
 	return i->number;
 }
 
-int 
+int
 set_money(unit * u, int v)
 {
 	item ** ip = &u->items;
 	while (*ip && (*ip)->type!=i_silver) ip = &(*ip)->next;
 	if ((*ip)==NULL && v) {
-		i_add(&u->items, i_new(i_silver))->number = v;
+		i_add(&u->items, i_new(i_silver, v));
 		return v;
 	}
 	if ((*ip)!=NULL) {
@@ -2039,7 +2081,7 @@ change_money(unit * u, int v)
 	item ** ip = &u->items;
 	while (*ip && (*ip)->type!=i_silver) ip = &(*ip)->next;
 	if ((*ip)==NULL && v) {
-		i_add(&u->items, i_new(i_silver))->number = v;
+		i_add(&u->items, i_new(i_silver, v));
 		return v;
 	}
 	if ((*ip)!=NULL) {
@@ -2078,7 +2120,7 @@ findresourcetype(const char * name, const locale * lang)
 		}
 		rnames = rn;
 	}
-	
+
 	if (findtoken(&rn->names, name, &i)==E_TOK_NOMATCH) return NULL;
 	return (const resource_type*)i;
 }
@@ -2174,8 +2216,6 @@ it_write(FILE * F, const item_type * it)
 	fprintf(F, "%d;flags\n", it->flags);
 	fprintf(F, "%d;weight\n", it->weight);
 	fprintf(F, "%d;capacity\n", it->capacity);
-	fprintf(F, "%d;minskill\n", it->minskill);
-	fprintf(F, "%d;skill\n", it->skill);
 	if (it->use!=NULL) {
 		const char * name = get_functionname((pf_generic)it->use);
 		fprintf(F, "\"%s\";use\n", name);
@@ -2293,12 +2333,6 @@ it_read(FILE * F)
 		case 'g':
 			if (!strcmp(semi, "give")) it->give = (int (*)(const unit*, const unit*, const struct item_type *, int, const char *))get_function(s);
 			break;
-		case 'm':
-			if (!strcmp(semi, "minskill")) it->minskill=i;
-			break;
-		case 's':
-			if (!strcmp(semi, "skill")) it->skill=i;
-			break;
 		case 'u':
 			if (!strcmp(semi, "use")) it->use = (int (*)(unit *, const struct item_type *, const char *))get_function(s);
 			break;
@@ -2321,18 +2355,215 @@ resname(resource_t res, int index)
 		return locale_string(NULL, resourcename(oldresourcetype[res], index));
 	}
 	else if (res == R_AURA) {
-		return "Aura";
+		return index==1?"aura":"aura_p";
 	} else if (res == R_PERMAURA) {
-		return "permanente Aura";
+		return index==1?"permaura":"permaura_p";
 	} else if (res == R_PEASANTS) {
-		return index==1?"Bauer":"Bauern";
+		return index==1?"peasant":"peasant_p";
 	} else if (res == R_UNIT) {
-		return index==1?"Einheit":"Einheiten";
+		return index==1?"unit":"unit_p";
 	} else if (res == R_PERSON) {
-		return index==1?"Person":"Personen";
+		return index==1?"person":"person_p";
 	} else if (res == R_HITPOINTS) {
-		return index==1?"Trefferpunkt":"Trefferpunkte";
+		return index==1?"hp":"hp_p";
 	}
 	return NULL;
 }
 
+void
+init_items(void)
+{
+	register_function((pf_generic)res_changeitem, "changeitem");
+	register_function((pf_generic)res_changeperson, "changeperson");
+	register_function((pf_generic)res_changepeasants, "changepeasants");
+	register_function((pf_generic)res_changepermaura, "changepermaura");
+	register_function((pf_generic)res_changehp, "changehp");
+	register_function((pf_generic)res_changeaura, "changeaura");
+
+	register_function((pf_generic)use_oldresource, "useoldresource");
+	register_function((pf_generic)use_olditem, "useolditem");
+	register_function((pf_generic)use_potion, "usepotion");
+	register_function((pf_generic)use_tacticcrystal, "usetacticcrystal");
+	register_function((pf_generic)use_birthdayamulet, "usebirthdayamulet");
+	register_function((pf_generic)use_antimagiccrystal, "useantimagiccrystal");
+	register_function((pf_generic)use_warmthpotion, "usewarmthpotion");
+	register_function((pf_generic)use_bloodpotion, "usebloodpotion");
+
+	register_function((pf_generic)give_horses, "givehorses");
+}
+
+int
+xml_writeitems(const char * file)
+{
+	FILE * stream = fopen(file, "w+");
+	resource_type * rt = resourcetypes;
+	item_type * it = itemtypes;
+	weapon_type * wt = weapontypes;
+
+	luxury_type * lt = luxurytypes;
+	potion_type * pt = potiontypes;
+	herb_type * ht = herbtypes;
+
+	if (stream==NULL) return -1;
+	fputs("<resources>\n", stream);
+	while (rt) {
+		fprintf(stream, "\t<resource name=\"%s\"", rt->_name[0]);
+		if (fval(rt, RTF_SNEAK)) fputs(" sneak", stream);
+		if (fval(rt, RTF_LIMITED)) fputs(" limited", stream);
+		if (fval(rt, RTF_POOLED)) fputs(" pooled", stream);
+		fputs(">\n", stream);
+
+		if (rt->uchange) {
+			const char * name = get_functionname((pf_generic)rt->uchange);
+			assert(name);
+			fprintf(stream, "\t\t<function name=\"change\" value=\"%s\"></function>\n",
+				name);
+		}
+		if (rt->uget) {
+			const char * name = get_functionname((pf_generic)rt->uget);
+			assert(name);
+			fprintf(stream, "\t\t<function name=\"get\" value=\"%s\"></function>\n",
+				name);
+		}
+		if (rt->name) {
+			const char * name = get_functionname((pf_generic)rt->name);
+			assert(name);
+			fprintf(stream, "\t\t<function name=\"name\" value=\"%s\"></function>\n",
+				name);
+		}
+
+		fputs("\t</resource>\n", stream);
+		rt = rt->next;
+	}
+	fputs("</resources>\n\n", stream);
+
+	fputs("<items>\n", stream);
+	while (it) {
+		const construction *ic = it->construction;
+		if (ic && ic->improvement) {
+			log_printf("construction::improvement not implemented, not writing item '%s'", it->rtype->_name[0]);
+			it=it->next;
+			continue;
+		}
+		if (ic && ic->attribs) {
+			log_printf("construction::attribs not implemented, not writing item '%s'", it->rtype->_name[0]);
+			it=it->next;
+			continue;
+		}
+		fprintf(stream, "\t<item resource=\"%s\"", it->rtype->_name[0]);
+		if (it->weight) fprintf(stream, " weight=\"%d\"", it->weight);
+		if (it->capacity) fprintf(stream, " capacity=\"%d\"", it->capacity);
+	/*
+		if (fval(it, ITF_HERB)) fputs(" herb", stream);
+		if (fval(it, ITF_WEAPON)) fputs(" weapon", stream);
+		if (fval(it, ITF_LUXURY)) fputs(" luxury", stream);
+		if (fval(it, ITF_POTION)) fputs(" potion", stream);
+	*/
+		if (fval(it, ITF_CURSED)) fputs(" cursed", stream);
+		if (fval(it, ITF_NOTLOST)) fputs(" notlost", stream);
+		if (fval(it, ITF_BIG)) fputs(" big", stream);
+		if (fval(it, ITF_ANIMAL)) fputs(" animal", stream);
+		if (fval(it, ITF_NOBUILDBESIEGED)) fputs(" nobuildbesieged", stream);
+		if (fval(it, ITF_DYNAMIC)) fputs(" dynamic", stream);
+		fputs(">\n", stream);
+
+		if (ic) {
+			requirement * cm = ic->materials;
+			fputs("\t\t<construction", stream);
+			if (ic->skill!=NOSKILL) {
+				fprintf(stream, " skill=\"%s\"", skillname(ic->skill, NULL));
+				if (ic->minskill) fprintf(stream, " minskill=\"%d\"", ic->minskill);
+			}
+			if (ic->reqsize!=1) {
+				fprintf(stream, " reqsize=\"%d\"", ic->reqsize);
+			}
+			if (ic->maxsize!=-1) {
+				fprintf(stream, " maxsize=\"%d\"", ic->maxsize);
+			}
+			fputs(">\n", stream);
+			while (cm && cm->number) {
+#ifdef NO_OLD_ITEMS
+				resource_type * rtype = cm->rtype;
+#else
+				resource_type * rtype = oldresourcetype[cm->type];
+#endif
+				fprintf(stream, "\t\t\t<material resource=\"%s\" size=\"%d\"",
+					rtype->_name[0], cm->number);
+				if (cm->recycle!=0.0)
+					fprintf(stream, " recycle=\"%.2f\"", cm->recycle);
+				fputs("></material>\n", stream);
+				++cm;
+			}
+			fputs("\t\t</construction>\n", stream);
+		}
+		if (it->use) {
+			const char * name = get_functionname((pf_generic)it->use);
+			assert(name);
+			fprintf(stream, "\t\t<function name=\"use\" value=\"%s\"></function>\n",
+				name);
+		}
+		if (it->give) {
+			const char * name = get_functionname((pf_generic)it->give);
+			assert(name);
+			fprintf(stream, "\t\t<function name=\"give\" value=\"%s\"></function>\n",
+				name);
+		}
+
+		fputs("\t</item>\n", stream);
+		fflush(stream);
+		it = it->next;
+	}
+	fputs("</items>\n\n", stream);
+
+	fputs("<weapons>\n", stream);
+	while (wt) {
+		weapon_mod * wm = wt->modifiers;
+		fprintf(stream, "\t<weapon resource=\"%s\"", wt->itype->rtype->_name[0]);
+		if (wt->minskill) fprintf(stream, " minskill=\"%d\"", wt->minskill);
+		fprintf(stream, " skill=\"%s\"", skillname(wt->skill, NULL));
+		if (wt->defmod) fprintf(stream, " offmod=\"%d\"", wt->offmod);
+		if (wt->offmod) fprintf(stream, " defmod=\"%d\"", wt->defmod);
+		if (wt->reload!=0) fprintf(stream, " reload=\"%d\"", wt->reload);
+		if (wt->magres!=0.0) fprintf(stream, " magres=\"%.2f\"", wt->magres);
+
+		if (fval(wt, WTF_MISSILE)) fputs(" missile", stream);
+		if (fval(wt, WTF_MAGICAL)) fputs(" magical", stream);
+		if (fval(wt, WTF_PIERCE)) fputs(" pierce", stream);
+		if (fval(wt, WTF_CUT)) fputs(" cut", stream);
+		if (fval(wt, WTF_BLUNT)) fputs(" blunt", stream);
+		if (fval(wt, WTF_BOW)) fputs(" bow", stream);
+
+		fputs(">\n", stream);
+		while (wm && wm->value) {
+			fprintf(stream, "\t\t<modifier value=\"%d\"", wm->value);
+			if (fval(wm, WMF_WALKING)) fputs(" walking", stream);
+			if (fval(wm, WMF_RIDING)) fputs(" riding", stream);
+			if (fval(wm, WMF_AGAINST_RIDING)) fputs(" against_riding", stream);
+			if (fval(wm, WMF_AGAINST_WALKING)) fputs(" against_walking", stream);
+			if (fval(wm, WMF_OFFENSIVE)) fputs(" offensive", stream);
+			if (fval(wm, WMF_DEFENSIVE)) fputs(" defensive", stream);
+			if (fval(wm, WMF_DAMAGE)) fputs(" damage", stream);
+			if (fval(wm, WMF_SKILL)) fputs(" skill", stream);
+			fputs("></modifier>\n", stream);
+			++wm;
+		}
+		fprintf(stream, "\t\t<damage type=\"default\" value=\"%s\"></damage>\n", wt->damage[0]);
+		if (strcmp(wt->damage[0], wt->damage[1])!=0) {
+			fprintf(stream, "\t\t<damage type=\"riding\" value=\"%s\"></damage>\n", wt->damage[1]);
+		}
+
+		if (wt->attack) {
+			const char * name = get_functionname((pf_generic)wt->attack);
+			assert(name);
+			fprintf(stream, "\t\t<function name=\"attack\" value=\"%s\"></function>\n",
+				name);
+		}
+
+		fputs("\t</weapon>\n", stream);
+		fflush(stream);
+		wt = wt->next;
+	}
+	fputs("</weapons>\n\n", stream);
+	fclose(stream);
+	return 0;
+}

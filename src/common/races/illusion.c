@@ -29,7 +29,7 @@
 void
 age_illusion(unit *u)
 {
-	if (u->faction->race!=RC_ILLUSION) {
+	if (u->faction->race!=new_race[RC_ILLUSION]) {
 		if (u->age == ILLUSIONMAX) {
 			add_message(&u->faction->msgs, new_message(u->faction,
 				"warnillusiondissolve%u:unit", u));

@@ -23,19 +23,17 @@
 #include "eressea.h"
 #include "terrain.h"
 
+/* kernel includes */
 #include "curse.h"
 #include "region.h"
+#include "resources.h"
 
+/* libc includes */
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef NO_FOREST
 static const char * plain_herbs[] = {"Flachwurz", "Würziger Wagemut", "Eulenauge", "Grüner Spinnerich", "Blauer Baumringel", "Elfenlieb", NULL};
-#else
-static const char * plain_herbs[] = {"Flachwurz", "Würziger Wagemut", "Eulenauge", NULL};
-static const char * forest_herbs[] = {"Grüner Spinnerich", "Blauer Baumringel", "Elfenlieb", NULL};
-#endif
 static const char * swamp_herbs[] = {"Gurgelkraut", "Knotiger Saugwurz", "Blasenmorchel", NULL};
 static const char * desert_herbs[] = {"Wasserfinder", "Kakteenschwitz", "Sandfäule", NULL};
 static const char * highland_herbs[] = {"Windbeutel", "Fjordwuchs", "Alraune", NULL};
@@ -71,21 +69,13 @@ const terraindata_t terrain[] = {
 		50,	/* Steine fuer Strasse */
 		1000, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LARGE_SHIPS|LAND_REGION,	/* Flags */
-		plain_herbs
-	},
-#ifndef NO_FOREST
-	/* T_FOREST */
-	{
-		"forest", 'F',
-		NULL,
-		"in den Wald von %s",
-		0, /* Steine pro Runde */
-		50,	/* Steine fuer Strasse */
-		1000, /* bewirtschaftbare Parzellen */
-		NORMAL_TERRAIN|LARGE_SHIPS|LAND_REGION,	/* Flags */
-		forest_herbs
-	},
+		plain_herbs,
+#ifdef NEW_RESOURCEGROWTH
+		{ { &rm_iron, "2d4-1", "5d8", "2d20+10", 10.0 },
+			{ &rm_stones, "1d4", "5d8", "2d30+20", 15.0 },
+			{ &rm_laen, "1d4", "1d4", "2d20+50", 1.0} }
 #endif
+	},
 	/* T_SWAMP */
 	{
 		"swamp", 'S',
@@ -95,7 +85,12 @@ const terraindata_t terrain[] = {
 		75,	/* Steine fuer Strasse - nur mit Damm */
 		200, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		swamp_herbs
+		swamp_herbs,
+#ifdef NEW_RESOURCEGROWTH
+		{ { &rm_iron, "2d4-1", "5d8", "2d20+10", 2.0 },
+			{ &rm_stones, "1d4", "5d8", "2d30+20", 2.0 },
+			{ &rm_laen, "1d4", "1d4", "2d20+50", 2.0} }
+#endif
 	},
 	/* T_DESERT */
 	{
@@ -106,7 +101,12 @@ const terraindata_t terrain[] = {
 		100,	/* Steine fuer Strasse - nur mit Karawanserei */
 		50, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		desert_herbs
+		desert_herbs,
+#ifdef NEW_RESOURCEGROWTH
+		{ { &rm_iron, "2d4-1", "5d8", "2d20+10", 15.0 },
+			{ &rm_stones, "1d4", "5d8", "2d30+20", 25.0 },
+			{ &rm_laen, "1d4", "1d4", "2d20+50", 2.5} }
+#endif
 	},
 	/* T_HIGHLAND */
 	{
@@ -117,7 +117,12 @@ const terraindata_t terrain[] = {
 		100,	/* Steine fuer Strasse */
 		400, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		highland_herbs
+		highland_herbs,
+#ifdef NEW_RESOURCEGROWTH
+		{ { &rm_iron, "2d4-1", "5d8", "2d20+10", 15.0 },
+			{ &rm_stones, "1d4", "5d8", "2d30+20", 20.0 },
+			{ &rm_laen, "1d4", "1d4", "2d20+50", 2.5} }
+#endif
 	},
 	/* T_MOUNTAIN */
 	{
@@ -128,7 +133,12 @@ const terraindata_t terrain[] = {
 		250,	/* Steine fuer Strasse */
 		100, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		mountain_herbs
+		mountain_herbs,
+#ifdef NEW_RESOURCEGROWTH
+		{ { &rm_iron, "1", "50", "50", 100.0 },
+			{ &rm_stones, "1", "100", "100", 100.0 },
+			{ &rm_laen, "1", "4", "100", 5.0} }
+#endif
 	},
 	/* T_GLACIER */
 	{
@@ -139,7 +149,12 @@ const terraindata_t terrain[] = {
 		250,	/* Steine fuer Strasse - nur mit Tunnel */
 		10, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		glacier_herbs
+		glacier_herbs,
+#ifdef NEW_RESOURCEGROWTH
+		{ { &rm_iron, "1", "3", "50", 100.0 },
+			{ &rm_stones, "1", "2", "100", 100.0 },
+			{ &rm_laen, "1", "4", "100", 0.5} }
+#endif
 	},
 	/* T_FIREWALL */
 	{
@@ -172,7 +187,7 @@ const terraindata_t terrain[] = {
 		125,	/* Steine fuer Strasse */
 		500, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		highland_herbs
+		highland_herbs,
 	},
 	/* T_ASTRAL */
 	{
@@ -204,7 +219,12 @@ const terraindata_t terrain[] = {
 		250,	/* Steine fuer Strasse */
 		50, 	/* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		NULL
+		NULL,
+#ifdef NEW_RESOURCEGROWTH
+		{ { &rm_iron, "1", "50", "50", 50.0 },
+			{ &rm_stones, "1", "100", "100", 50.0 },
+			{ &rm_laen, "1", "4", "100", 7.5} }
+#endif
 	},
 	{
 		"activevolcano", 'V',
@@ -214,7 +234,12 @@ const terraindata_t terrain[] = {
 		250,	/* Steine fuer Strasse */
 		50, 	/* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		NULL
+		NULL,
+#ifdef NEW_RESOURCEGROWTH
+		{ { &rm_iron, "1", "50", "50", 50.0 },
+			{ &rm_stones, "1", "100", "100", 50.0 },
+			{ &rm_laen, "1", "4", "100", 7.5} }
+#endif
 	},
 	/* T_ICEBERG_SLEEP */
 	{
@@ -225,7 +250,12 @@ const terraindata_t terrain[] = {
 		250,	/* Steine fuer Strasse - nur mit Tunnel */
 		10, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		glacier_herbs
+		glacier_herbs,
+#ifdef NEW_RESOURCEGROWTH
+		{ { &rm_iron, "1", "3", "50", 100.0 },
+			{ &rm_stones, "1", "2", "100", 100.0 },
+			{ NULL, NULL, NULL, NULL, 100.0 } }
+#endif
 	},
 	/* T_ICEBERG */
 	{
@@ -236,7 +266,12 @@ const terraindata_t terrain[] = {
 		-1,	/* Steine fuer Strasse */
 		10, 	/* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		glacier_herbs
+		glacier_herbs,
+#ifdef NEW_RESOURCEGROWTH
+		{ { &rm_iron, "1", "3", "50", 100.0 },
+			{ &rm_stones, "1", "2", "100", 100.0 },
+			{ NULL, NULL, NULL, NULL, 100.0 } }
+#endif
 	},
 	/* T_HALL1 */
 	{

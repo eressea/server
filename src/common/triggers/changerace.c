@@ -18,6 +18,7 @@
 
 /* kernel includes */
 #include <unit.h>
+#include <race.h>
 
 /* util includes */
 #include <event.h>
@@ -37,8 +38,8 @@
 
 typedef struct changerace_data {
 	struct unit * u;
-	race_t race;
-	race_t irace;
+	const struct race * race;
+	const struct race * irace;
 } changerace_data;
 
 static void
@@ -61,8 +62,8 @@ changerace_handle(trigger * t, void * data)
 	 */
 	changerace_data * td = (changerace_data*)t->data.v;
 	if (td->u) {
-		if (td->race!=NORACE) td->u->race = td->race;
-		if (td->irace!=NORACE) td->u->irace = td->irace;
+		if (td->race!=NULL) td->u->race = td->race;
+		if (td->irace!=NULL) td->u->irace = td->irace;
 	} else {
 		log_error(("could not perform changerace::handle()\n"));
 	}
@@ -74,23 +75,18 @@ static void
 changerace_write(const trigger * t, FILE * F)
 {
 	changerace_data * td = (changerace_data*)t->data.v;
-	fprintf(F, "%s ", itoa36(td->u->no));
-	fprintf(F, "%d %d ", td->race, td->irace);
+	write_unit_reference(td->u, F);
+	write_race_reference(td->race, F);
+	write_race_reference(td->irace, F);
 }
 
 static int
 changerace_read(trigger * t, FILE * F)
 {
 	changerace_data * td = (changerace_data*)t->data.v;
-	char zText[128];
-	int i;
-
-	fscanf(F, "%s", zText);
-	i = atoi36(zText);
-	td->u = findunit(i);
-	if (td->u==NULL) ur_add((void*)i, (void**)&td->u, resolve_unit);
-
-	fscanf(F, "%d %d", &td->race, &td->irace);
+	read_unit_reference(&td->u, F);
+	read_race_reference(&td->race, F);
+	read_race_reference(&td->irace, F);
 	return 1;
 }
 
@@ -104,12 +100,12 @@ trigger_type tt_changerace = {
 };
 
 trigger *
-trigger_changerace(unit * u, race_t race, race_t irace)
+trigger_changerace(struct unit * u, const struct race * prace, const struct race * irace)
 {
 	trigger * t = t_new(&tt_changerace);
 	changerace_data * td = (changerace_data*)t->data.v;
 	td->u = u;
-	td->race = race;
+	td->race = prace;
 	td->irace = irace;
 	return t;
 }

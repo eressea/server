@@ -21,6 +21,7 @@ typedef struct group {
 	struct group * next;
 	struct group * nexthash;
 	struct faction * f;
+	attrib *attribs;
 	char * name;
 	struct ally * allies;
 	int flags;

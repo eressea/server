@@ -57,7 +57,8 @@ extern void t_add(trigger ** tlist, trigger * t);
 
 /* add a trigger to a list of attributes */
 extern void add_trigger(struct attrib ** ap, const char * event, struct trigger * t);
-struct trigger ** get_triggers(struct attrib * ap, const char * event);
+extern void remove_triggers(struct attrib ** ap, const char * event, const trigger_type * tt);
+extern struct trigger ** get_triggers(struct attrib * ap, const char * event);
 /* calls handle() for each of these. e.g. used in timeout */
 extern void handle_event(struct attrib ** attribs, const char * event, void * data);
 

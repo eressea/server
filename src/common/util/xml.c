@@ -1,5 +1,19 @@
+/* vi: set ts=2:
+ +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
+ |                   |  Enno Rehling <enno@eressea-pbem.de>
+ | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
+ | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
+ +-------------------+  Stefan Reich <reich@halbling.de>
+
+ This program may not be used, modified or distributed 
+ without prior permission by the authors of Eressea.
+*/
 #include <config.h>
 #include "xml.h"
+
+/* util includes */
+#include "log.h"
 
 /* libc includes */
 #include <assert.h>
@@ -9,10 +23,16 @@
 #include <ctype.h>
 
 static int 
-__cberror(const struct xml_stack * stack, const char* parsed, unsigned int line, int error, void *data)
+__cberror(struct xml_stack * stack, const char* parsed, unsigned int line, int error, void *data)
 {
+	struct xml_stack * s = stack;
 	unused(data);
-	fprintf(stderr, "Error #%d in line %u while parsing \"%s\"\n", -error, line, parsed);
+	log_printf("Error #%d in line %u while parsing \"%s\"\nXML stacktrace:\n", error, line, parsed);
+
+	while (s) {
+		log_printf("\t%s\n", s->tag->name);
+		s = s->next;
+	}
 	return error;
 }
 
@@ -25,10 +45,11 @@ make_tag(const char * name)
 }
 
 static void
-push_tag(xml_stack ** ostack, xml_tag * tag)
+push_tag(xml_stack ** ostack, xml_tag * tag, FILE * stream)
 {
 	xml_stack * stack = calloc(sizeof(xml_stack), 1);
 	stack->next = *ostack;
+	stack->stream = stream;
 	stack->tag = tag;
 	*ostack = stack;
 }
@@ -73,9 +94,9 @@ pop_tag(xml_stack ** ostack)
 }
 
 int
-xml_parse(FILE * stream, struct xml_callbacks * cb, void * data)
+xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * stack)
 {
-	xml_stack * stack = NULL;
+	xml_stack * start = stack;
 	enum { TAG, ENDTAG, ATNAME, ATVALUE, PLAIN } state = PLAIN;
 	char tokbuffer[1024];
 	char * pos = tokbuffer;
@@ -83,8 +104,12 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data)
 	unsigned int line = 0;
 	xml_tag * tag = NULL;
 	xml_attrib * attrib = NULL;
-	int (*cb_error)(const struct xml_stack*, const char*, unsigned int, int, void*) = __cberror;
+	int (*cb_error)(struct xml_stack*, const char*, unsigned int, int, void*) = __cberror;
 	if (cb && cb->error) cb_error = cb->error;
+
+	if (stack && cb->tagbegin) {
+		cb->tagbegin(stack, data);
+	}
 
 	for (;;) {
 		int reparse;
@@ -107,7 +132,6 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data)
 			case ATVALUE:
 				switch (c) {
 				case '<':
-				case '/':
 					*pos='\0';
 					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
 				case '"':
@@ -143,15 +167,20 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data)
 					state = ATVALUE;
 					pos = tokbuffer;
 					break;
-				case '>':
 				case '<':
+				case '"':
 				case '/':
 					*pos='\0';
 					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
 				default:
-					if (isspace(c)) {
-						*pos='\0';
-						return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
+					if (isspace(c) || c == '>') {
+						*pos++='\0';
+						attrib = make_attrib(tag, tokbuffer);
+						attrib->value = NULL;
+						state = TAG;
+						pos = tokbuffer;
+						if (c=='>') reparse = 1;
+						break;
 					}
 					*pos++ = (char)c;
 				}
@@ -186,7 +215,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data)
 				case '>':
 					if (tag==NULL) {
 						*pos='\0';
-						push_tag(&stack, make_tag(tokbuffer));
+						push_tag(&stack, make_tag(tokbuffer), stream);
 					}
 					if (cb && cb->tagbegin) cb->tagbegin(stack, data);
 					state = PLAIN;
@@ -196,7 +225,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data)
 					if (isspace(c)) {
 						if (tag==NULL) {
 							*pos='\0';
-							push_tag(&stack, tag = make_tag(tokbuffer));
+							push_tag(&stack, tag = make_tag(tokbuffer), stream);
 							state = ATNAME;
 							pos = tokbuffer;
 						}
@@ -217,7 +246,11 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data)
 					while (stack && strcmp(stack->tag->name, tokbuffer)!=0) free_tag(pop_tag(&stack));
 					if (stack==NULL) return cb_error(stack, tokbuffer, line, XML_NESTINGERROR, data);
 					if (cb && cb->tagend) cb->tagend(stack, data);
-					free_tag(pop_tag(&stack));
+					if (stack==start) {
+						return XML_OK;
+					} else {
+						free_tag(pop_tag(&stack));
+					}
 					state = PLAIN;
 					pos = tokbuffer;
 					break;
@@ -244,4 +277,31 @@ xml_value(const xml_tag * tag, const char * name)
 	while (xa && strcmp(name, xa->name)!=0) xa = xa->next;
 	if (xa) return xa->value;
 	return NULL;
+}
+
+int
+xml_ivalue(const xml_tag * tag, const char * name)
+{
+	const xml_attrib * xa = tag->attribs;
+	while (xa && strcmp(name, xa->name)!=0) xa = xa->next;
+	if (xa) return atoi(xa->value);
+	return 0;
+}
+
+boolean
+xml_bvalue(const xml_tag * tag, const char * name)
+{
+	const xml_attrib * xa = tag->attribs;
+	while (xa && strcmp(name, xa->name)!=0) xa = xa->next;
+	if (xa) return true;
+	return false;
+}
+
+double
+xml_fvalue(const xml_tag * tag, const char * name)
+{
+	const xml_attrib * xa = tag->attribs;
+	while (xa && strcmp(name, xa->name)!=0) xa = xa->next;
+	if (xa) return atof(xa->value);
+	return 0.0;
 }

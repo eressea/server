@@ -35,6 +35,7 @@
 
 /* util includes */
 #include <attrib.h>
+#include <functions.h>
 #include <goodies.h>
 
 /* libc includes */
@@ -51,7 +52,6 @@ resource_type rt_museumticket = {
 item_type it_museumticket = {
 	&rt_museumticket,
 	ITF_NONE, 0, 0,
-	0, NOSKILL,
 	NULL,
 	&use_museumticket
 };
@@ -66,7 +66,6 @@ resource_type rt_museumexitticket = {
 item_type it_museumexitticket = {
 	&rt_museumexitticket,
 	ITF_CURSED, 0, 0,
-	0, NOSKILL,
 	NULL,
 	&use_museumexitticket
 };
@@ -218,6 +217,9 @@ init_museum(void)
 
 	rt_register(&rt_museumexitticket);
 	it_register(&it_museumexitticket);
+
+	register_function((pf_generic)use_museumticket, "usemuseumticket");
+	register_function((pf_generic)use_museumexitticket, "usemuseumexitticket");
 }
 
 void

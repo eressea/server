@@ -30,6 +30,9 @@
 
 enum {
 	B_SITE,
+#ifdef LARGE_CASTLES
+	B_TRADEPOST,
+#endif
 	B_FORTIFICATION,
 	B_TOWER,
 	B_CASTLE,
@@ -112,7 +115,7 @@ typedef struct construction {
 
 	const struct construction * improvement;
 		/* next level, if upgradable. if more than one of these items
-		 * can be built (weapons, armout) per turn, must not be NULL,
+		 * can be built (weapons, armour) per turn, must not be NULL,
 		 * but point to the same type again:
 		 *   const_sword.improvement = &const_sword
 		 * last level of a building points to NULL, as do objects of

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -41,9 +41,11 @@
 #include <modules/score.h>
 #include <modules/xmas2000.h>
 #include <modules/gmcmd.h>
+#include <modules/infocmd.h>
 
 /* gamecode includes */
 #include <creation.h>
+#include <economy.h>
 #include <goodies.h>
 #include <laws.h>
 
@@ -58,6 +60,7 @@
 #include <reports.h>
 #include <creport.h>
 #include <region.h>
+#include <resources.h>
 #include <save.h>
 #include <ship.h>
 #include <border.h>
@@ -76,13 +79,14 @@
 #include <time.h>
 #include <locale.h>
 
-/** 
+/**
  ** global variables we are importing from other modules
  **/
 extern char * g_reportdir;
 extern char * g_datadir;
 extern char * g_basedir;
 extern char * g_resourcedir;
+extern item_type * i_silver;
 
 extern boolean nonr;
 extern boolean nocr;
@@ -93,21 +97,25 @@ extern boolean nobattledebug;
 extern boolean dirtyload;
 
 static boolean printpotions;
+static int insertfaction;
 
 extern void debug_messagetypes(FILE * out);
-extern void freeland(land_region * lr);
+extern void free_region(region * r);
 extern void render_init(void);
+extern void free_borders(void);
+
 
 #ifdef FUZZY_BASE36
 extern int fuzzy_hits;
 #endif /* FUZZY_BASE36 */
 
-/** 
- ** global variables wthat we are exporting 
+/**
+ ** global variables wthat we are exporting
  **/
 static char * orders = NULL;
 static int nowrite = 0;
 static boolean g_writemap = false;
+static boolean g_killeiswald = false;
 
 struct settings global = {
 	"Eressea", /* gamename */
@@ -150,15 +158,25 @@ game_init(void)
 	creport_init();
 
 	debug_language("locales.log");
-	init_locales();
 
 	init_races();
-	init_spells();
-	init_resources();
 	init_items();
+	init_spells();
+
+	init_data("eressea.xml");
+	init_locales();
+
+	init_resources();
+	register_items();
 	init_attributes();
 
+	init_economy();
+#ifdef NEW_RESOURCEGROWTH
+	init_rawmaterials();
+#endif
+
 	init_gmcmd();
+	init_info();
 	init_conversion();
 
 	init_museum();
@@ -269,6 +287,7 @@ processturn(char *filename)
 	return 0;
 }
 
+#ifdef CLEANUP_CODE
 static void
 game_done(void)
 {
@@ -313,11 +332,8 @@ game_done(void)
 			s2 = s->next;
 			free(s);
 		}
-		free(r->display);
-		if (r->land) freeland(r->land);
 		r2 = r->next;
-		while (r->attribs) a_remove (&r->attribs, r->attribs);
-		free(r);
+		free_region(r);
 	}
 	for (f = factions; f; f = f2) {
 		stripfaction(f);
@@ -335,6 +351,7 @@ game_done(void)
 	creport_cleanup();
 	report_cleanup();
 }
+#endif
 
 #include "magic.h"
 
@@ -353,7 +370,7 @@ init_malloc_debug(void)
 #endif
 
 #if 0
-static void 
+static void
 write_stats(void)
 {
 	FILE * F;
@@ -402,7 +419,7 @@ write_stats(void)
 }
 #endif
 
-static int 
+static int
 usage(const char * prog, const char * arg)
 {
 	if (arg) {
@@ -418,6 +435,7 @@ usage(const char * prog, const char * arg)
 		"-t turn          : read this datafile, not the most current one\n"
 		"-o reportdir     : gibt das reportverzeichnis an\n"
 		"-l logfile       : specify an alternative logfile\n"
+		"--noeiswald      : beruhigt ungemein\n"
 		"--nomsg          : keine Messages (RAM sparen)\n"
 		"--nobattle       : keine Kämpfe\n"
 		"--nodebug        : keine Logfiles für Kämpfe\n"
@@ -446,12 +464,13 @@ read_args(int argc, char **argv)
 			else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
 			else if (strcmp(argv[i]+2, "nocr")==0) nocr = true;
 			else if (strcmp(argv[i]+2, "nomsg")==0) nomsg = true;
+			else if (strcmp(argv[i]+2, "noeiswald")==0) g_killeiswald = true;
 			else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
 			else if (strcmp(argv[i]+2, "nodebug")==0) nobattledebug = true;
 #ifdef USE_MERIAN
 			else if (strcmp(argv[i]+2, "nomer")==0) nomer = true;
 #endif
-			else if (strcmp(argv[i]+2, "help")==0) 
+			else if (strcmp(argv[i]+2, "help")==0)
 				return usage(argv[0], NULL);
 			else
 				return usage(argv[0], argv[i]);
@@ -473,6 +492,9 @@ read_args(int argc, char **argv)
 				break;
 			case 't':
 				turn = atoi(argv[++i]);
+				break;
+			case 'i':
+				insertfaction = atoi36(argv[++i]);
 				break;
 			case 'f':
 				firstx = atoi(argv[++i]);
@@ -505,6 +527,19 @@ read_args(int argc, char **argv)
 	return 0;
 }
 
+extern void write_races(const char * filename);
+extern int xml_writeitems(const char * filename);
+extern void write_racestrings(const char * filename);
+
+typedef struct lostdata {
+	int x, y;
+	int prevunit;
+	int building;
+	int ship;
+} lostdata;
+
+static unit * lostunits;
+
 int
 main(int argc, char *argv[])
 {
@@ -517,6 +552,7 @@ main(int argc, char *argv[])
 	   "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
 
 	setlocale(LC_ALL, "");
+	setlocale(LC_NUMERIC, "C");
 #ifdef LOCALE_CHECK
 	if (!locale_check()) {
 		log_error(("The current locale is not suitable for international Eressea.\n"));
@@ -540,12 +576,150 @@ main(int argc, char *argv[])
 
 	kernel_init();
 	game_init();
+#ifdef BETA_CODE
+	xml_writeitems("items.xml");
+#endif
 
+#if 0
+	write_races("races.xml");
+	write_racestrings("racestrings.xml");
+	return 0;
+#endif
+
+	if (insertfaction) {
+		faction * lostf;
+		unit *ulost, **ulostp = &lostunits;
+		faction **fp = &factions;
+		region **rp = &regions;
+
+		if ((i=readgame(false))!=0) return i;
+		lostf = findfaction(insertfaction);
+		lostf->lastorders = turn;
+		lostf->allies = NULL;
+		lostf->groups = NULL;
+
+		free(used_faction_ids);
+		while (*rp) {
+			building *b, *b2;
+			ship *s, *s2;
+			region *r  = *rp;
+			int prevunit = 0;
+			unit ** up = &r->units;
+			while(*up) {
+				unit * u = *up;
+				if (u->faction != lostf) {
+					*up = u->next;
+					prevunit = u->no;
+					stripunit(u);
+					uunhash(u);
+					free(u);
+				} else {
+					lostdata * ld = calloc(sizeof(lostdata), 1);
+					ld->x = r->x;
+					ld->y = r->y;
+					ld->ship = u->ship?u->ship->no:0;
+					ld->building = u->building?u->building->no:0;
+					ld->prevunit = prevunit;
+					u->building = (building*)ld; /* hack */
+					u->ship = NULL;
+					u->region = NULL;
+					u->items = i_new(i_silver, 10);
+					prevunit = u->no;
+					*ulostp = u;
+					ulostp = &u->next;
+					up = &u->next;
+				}
+			}
+			for (b = r->buildings; b; b = b2) {
+				bunhash(b);
+				free(b->name);
+				free(b->display);
+				b2 = b->next;
+				free(b);
+			}
+			for (s = r->ships; s; s = s2) {
+				sunhash(s);
+				free(s->name);
+				free(s->display);
+				s2 = s->next;
+				free(s);
+			}
+			*rp = r->next;
+			free_region(r);
+		}
+		while (*fp) {
+			faction * f = *fp;
+			if (f!=lostf) {
+				stripfaction(f);
+				*fp = f->next;
+				free(f);
+			} else {
+				fp = &f->next;
+			}
+		}
+		while (planes) {
+			plane * pl = planes;
+			planes = planes->next;
+			free(pl);
+		}
+		free_borders();
+
+		++turn;
+		if ((i=readgame(false))!=0) return i;
+
+		ulost=lostunits;
+		while (ulost) {
+			unit * u = ulost;
+			lostdata * ld = (lostdata*)u->building;
+			region * r = findregion(ld->x, ld->y);
+			ulost = u->next;
+
+			u->items = NULL;
+			if (r) {
+				unit ** up = &r->units;
+				u->region = r;
+				if (ld->prevunit) {
+					while (*up && (*up)->no!=ld->prevunit) up = &(*up)->next;
+					if (*up) up=&(*up)->next;
+				}
+				u->next = *up;
+				*up = u;
+				if (ld->building) {
+					building * b = r->buildings;
+					while (b && b->no!=ld->building) b = b->next;
+					if (b) u->building = b;
+				}
+				if (ld->ship) {
+					ship * s = r->ships;
+					while (s && s->no!=ld->ship) s = s->next;
+					if (s) u->ship = s;
+				}
+			}
+		}
+		if (!nowrite) {
+			char ztext[64];
+			sprintf(ztext, "%s/%d.fix", datapath(), turn);
+			writegame(ztext, 0);
+		}
+		return 0;
+	}
 	if ((i=readgame(false))!=0) return i;
+	writepasswd();
+	if (g_killeiswald) {
+		region * r = findregion(0, 25);
+		if (r) {
+			/* mach sie alle zur schnecke... */
+			unit * u;
+			terraform(r, T_OCEAN);
+			for (u=r->units;u;u=u->next) scale_number(u, 1);
+		}
+	}
 	if (g_writemap) return crwritemap();
 	if ((i=processturn(orders))!=0) return i;
 
-	/* game_done(); */
+#ifdef CLEANUP_CODE
+	game_done();
+#endif
 	kernel_done();
 	log_close();
 	return 0;

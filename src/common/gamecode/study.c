@@ -73,7 +73,7 @@ getmagicskill(void)
 }
 
 /* ------------------------------------------------------------- */
-
+/* Vertraute und Kröten sind keine Migranten */
 boolean
 is_migrant(unit *u)
 {
@@ -81,7 +81,7 @@ is_migrant(unit *u)
 
 	if (is_familiar(u)) return false;
 
-	if (u->race == RC_TOAD) return false;
+	if (u->race == new_race[RC_TOAD]) return false;
 
 	return true;
 }
@@ -90,7 +90,7 @@ is_migrant(unit *u)
 boolean
 magic_lowskill(unit *u)
 {
-	if (u->race == RC_TOAD) return true;
+	if (u->race == new_race[RC_TOAD]) return true;
 	return false;
 }
 
@@ -132,6 +132,11 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
 {
 	attrib * a;
 	int n;
+#ifdef RANDOMIZED_LEARNING
+#ifdef SKILLMODIFIESLEARNING
+	int smod, lmod, learning;
+#endif
+#endif
 
 	/* learning sind die Tage, die sie schon durch andere Lehrer zugute
 	 * geschrieben bekommen haben. Total darf dies nicht über 30 Tage pro Mann
@@ -146,7 +151,19 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
 	}
 
 #ifdef RANDOMIZED_LEARNING
+#ifdef SKILLMODIFIESLEARNING
+	smod = rc_skillmod(student->race, student->region, sk);
+	lmod = 5 * smod;
+	if(smod < 0) {
+		lmod -= 5;
+	} else if(smod > 0) {
+		lmod += 5;
+	}
+	learning = max(0, 30 + lmod);
+	n = student->number * dice(2, learning);
+#else
 	n = student->number * dice(2,30);
+#endif
 #else
 	n = student->number * 30;
 #endif
@@ -164,8 +181,8 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
 
 		/* Solange Akademien größenbeschränkt sind, sollte Lehrer und
 		 * Student auch in unterschiedlichen Gebäuden stehen dürfen */
-		if (btype == &bt_academy 
-/*		&& student->building==teacher->building 
+		if (btype == &bt_academy
+/*		&& student->building==teacher->building
  *		&& inside_building(student)!=NULL) */
 			&& student->building && student->building->type == &bt_academy)
 		{
@@ -215,7 +232,7 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
 			add_message(&student->faction->msgs, msg_message("teach",
 				"teacher student skill", teacher, student, sk));
 			if (teacher->faction != student->faction) {
-				add_message(&teacher->faction->msgs, msg_message("teach", 
+				add_message(&teacher->faction->msgs, msg_message("teach",
 					"teacher student skill", teacher, student, sk));
 			}
 		}
@@ -234,7 +251,7 @@ teach(region * r, unit * u)
 	char *s;
 	skill_t sk;
 
-	if ((race[u->race].flags & RCF_NOTEACH)) {
+	if ((u->race->flags & RCF_NOTEACH)) {
 		cmistake(u, u->thisorder, 274, MSG_EVENT);
 		return;
 	}
@@ -387,13 +404,13 @@ teach(region * r, unit * u)
 		/* Input ist nun von u2->thisorder !! */
 
 		if (i != K_STUDY || ((sk = getskill(u2->faction->locale)) == NOSKILL)) {
-			sprintf(buf, "%s lernt nicht", unitname(u2));
-			mistake(u, u->thisorder, buf, MSG_EVENT);
+			add_message(&u->faction->msgs,
+				msg_error(u, u->thisorder, "teach_nolearn", "student", u2));
 			continue;
 		}
 		if (eff_skill(u, sk, r) <= eff_skill(u2, sk, r)) {
-			sprintf(buf, "%s ist mindestens gleich gut wie wir", unitname(u2));
-			mistake(u, u->thisorder, buf, MSG_EVENT);
+			add_message(&u->faction->msgs,
+				msg_error(u, u->thisorder, "teach_asgood", "student", u2));
 			continue;
 		}
 		if (sk == SK_MAGIC) {
@@ -428,6 +445,11 @@ learn(void)
 	int i, l;
 	int warrior_skill;
 	int studycost;
+#ifdef RANDOMIZED_LEARNING
+#ifdef SKILLMODIFIESLEARNING
+	int smod, lmod, learning;
+#endif
+#endif
 
 	/* lernen nach lehren */
 
@@ -435,25 +457,30 @@ learn(void)
 		for (u = r->units; u; u = u->next) {
 			if (rterrain(r) == T_OCEAN){
 				/* sonderbehandlung aller die auf Ozeanen lernen können */
-				if (u->race != RC_AQUARIAN 
-					&& !(race[u->race].flags & RCF_SWIM)) {
+				if (u->race != new_race[RC_AQUARIAN]
+					&& !(u->race->flags & RCF_SWIM)) {
 					continue;
 				}
-			} 
+			}
 			if (igetkeyword(u->thisorder, u->faction->locale) == K_STUDY) {
 				double multi = 1.0;
 				attrib * a = NULL;
 				int money = 0;
 				int maxalchemy = 0;
-				if (rterrain(r) == T_GLACIER && u->race == RC_INSECT
-					&& !is_cursed(u->attribs, C_KAELTESCHUTZ,0)){
+				if (u->race == new_race[RC_INSECT] && r_insectstalled(r)
+						&& !is_cursed(u->attribs, C_KAELTESCHUTZ,0)) {
 					continue;
 				}
 				if (attacked(u)) {
 					cmistake(u, findorder(u, u->thisorder), 52, MSG_PRODUCE);
 					continue;
 				}
-				
+				if ((u->race->flags & RCF_NOLEARN)) {
+					sprintf(buf, "%s können nichts lernen", LOC(default_locale, rc_name(u->race, 1)));
+					mistake(u, u->thisorder, buf, MSG_EVENT);
+					continue;
+				} 
+
 				i = getskill(u->faction->locale);
 
 				if (i < 0) {
@@ -461,25 +488,33 @@ learn(void)
 					continue;
 				}
 				/* Hack: Talente mit Malus -99 können nicht gelernt werden */
-				if (race[u->race].bonus[i] == -99) {
+				if (u->race->bonus[i] == -99) {
 					cmistake(u, findorder(u, u->thisorder), 77, MSG_EVENT);
 					continue;
 				}
-				if ((race[u->race].flags & RCF_NOLEARN)) {
-					sprintf(buf, "%s können nichts lernen", race[u->race].name[1]);
+
+				p = studycost = study_cost(u,i);
+				a = a_find(u->attribs, &at_learning);
+
+				/* keine kostenpflichtigen Talente für Migranten. Vertraute sind
+				 * keine Migranten, wird in is_migrant abgefangen. Vorsicht,
+				 * studycost darf hier noch nicht durch Akademie erhöht sein */
+				if (is_migrant(u) && studycost > 0){
+					sprintf(buf, "Migranten können keine kostenpflichtigen Talente lernen");
 					mistake(u, u->thisorder, buf, MSG_EVENT);
 					continue;
-				} else {
+				}
+
+				/* Akademie: */
+				{
 					struct building * b = inside_building(u);
 					const struct building_type * btype = b?b->type:NULL;
 
-					p = studycost = study_cost(u,i);
-					a = a_find(u->attribs, &at_learning);
-					
 					if (btype == &bt_academy) {
 						studycost = max(50, studycost * 2);
 					}
 				}
+
 				if (i == SK_MAGIC) {
 					if (u->number > 1){
 						cmistake(u, findorder(u, u->thisorder), 106, MSG_MAGIC);
@@ -553,24 +588,13 @@ learn(void)
 						mistake(u, u->thisorder, buf, MSG_EVENT);
 						continue;
 					}
-					if (is_migrant(u)
-						&& (i == SK_MAGIC || i == SK_ALCHEMY || i == SK_TACTICS
-							|| i == SK_HERBALISM || i == SK_SPY))
-					{
-						if ((nonplayer(u) && get_skill(u, i) > 0)) {
-						} else {
-							sprintf(buf, "Migranten können keine kostenpflichtigen Talente lernen");
-							mistake(u, u->thisorder, buf, MSG_EVENT);
-							continue;
-						}
-					}
 				}
 				if (studycost) {
 					money = get_pooled(u, r, R_SILVER);
 					money = min(money, studycost * u->number);
 				}
 				if (money < studycost * u->number) {
-					studycost = p;	/* Ohne Uni? */
+					studycost = p;	/* Ohne Univertreurung */
 					money = min(money, studycost);
 					if (p>0 && money < studycost * u->number) {
 #ifdef PARTIAL_STUDY
@@ -589,7 +613,7 @@ learn(void)
 					add_message(&u->faction->msgs, msg_message("studycost",
 						"unit region cost skill", u, u->region, money, i));
 				}
-				
+
 				if (get_effect(u, oldpotiontype[P_WISE])) {
 					l = min(u->number, get_effect(u, oldpotiontype[P_WISE]));
 					a->data.i += l * 10;
@@ -600,7 +624,7 @@ learn(void)
 					a->data.i -= l * 30;
 					change_effect(u, oldpotiontype[P_FOOL], -l);
 				}
-				
+
 				warrior_skill = fspecial(u->faction, FS_WARRIOR);
 				if(warrior_skill > 0) {
 					if(i == SK_CROSSBOW || i == SK_LONGBOW
@@ -613,7 +637,7 @@ learn(void)
 						a->data.i = max(0, a->data.i);
 					}
 				}
-				
+
 				if (p != studycost) {
 					/* ist_in_gebaeude(r, u, BT_UNIVERSITAET) == 1) { */
 					/* p ist Kosten ohne Uni, studycost mit; wenn
@@ -631,9 +655,21 @@ learn(void)
 							 (int)(u->number * 30 * multi), a->data.i);
 				}
 #endif
-				
+
 #ifdef RANDOMIZED_LEARNING
+#ifdef SKILLMODIFIESLEARNING
+				smod = rc_skillmod(u->race, u->region, (skill_t)i);
+				lmod = 5 * smod;
+				if(smod < 0) {
+					lmod -= 5;
+				} else if(smod > 0) {
+					lmod += 5;
+				}
+				learning = max(0, 30 + lmod);
+				change_skill(u, (skill_t)i, (int)((u->number * dice(2,learning) + a->data.i) * multi));
+#else
 				change_skill(u, (skill_t)i, (int)((u->number * dice(2,30) + a->data.i) * multi));
+#endif
 #else
 				change_skill(u, (skill_t)i, (int)((u->number * 30 + a->data.i) * multi));
 #endif
@@ -684,17 +720,18 @@ teaching(void)
 
 		for (u = r->units; u; u = u->next) {
 
-			if (u->race == RC_SPELL || fval(u, FL_LONGACTION))
+			if (u->race == new_race[RC_SPELL] || fval(u, FL_LONGACTION))
 				continue;
 
-			if (rterrain(r) == T_OCEAN 
-					&& u->race != RC_AQUARIAN 
-					&& !(race[u->race].flags & RCF_SWIM))
+			if (rterrain(r) == T_OCEAN
+					&& u->race != new_race[RC_AQUARIAN]
+					&& !(u->race->flags & RCF_SWIM))
 					continue;
 
-			if (rterrain(r) == T_GLACIER && u->race == RC_INSECT
-					&& !is_cursed(u->attribs, C_KAELTESCHUTZ,0))
+			if (u->race == new_race[RC_INSECT] && r_insectstalled(r)
+					&& !is_cursed(u->attribs, C_KAELTESCHUTZ,0)) {
 				continue;
+			}
 
 			switch (igetkeyword(u->thisorder, u->faction->locale)) {
 

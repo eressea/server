@@ -13,8 +13,7 @@
 #ifndef INFOCMD_H
 #define INFOCMD_H
 
-extern void info_init(void);
-extern void info_done(void);
+extern void init_info(void);
 extern void infocommands(void);
 
 #endif

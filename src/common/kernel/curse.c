@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -78,6 +78,8 @@ void
 curse_done(attrib * a) {
 	curse *c = (curse *)a->data.v;
 
+	cunhash(c);
+
 	if( c->data )
 			free(c->data);
 	free(c);
@@ -133,7 +135,7 @@ cfindhash(int i)
 	for (old = cursehash[i % MAXENTITYHASH]; old; old = old->nexthash)
 		if (old->no == i)
 			return old;
-	return 0;
+	return NULL;
 }
 
 /* ------------------------------------------------------------- */
@@ -215,18 +217,19 @@ typedef struct twoids {
 } twoids;
 
 boolean
-cmp_curse(const attrib * a, void * data) {
+cmp_curse(const attrib * a, const void * data) {
+	const curse * c = (const curse*)data;
 	if (a->type->flags & ATF_CURSE) {
-		if (!data || (curse*)data == (curse*)a->data.v) return true;
+		if (!data || c == (curse*)a->data.v) return true;
 	}
 	return false;
 }
 
 boolean
-cmp_oldcurse(const attrib * a, void * data)
+cmp_oldcurse(const attrib * a, const void * data)
 {
 	twoids * ti = (twoids*)data;
-	curse * c = (curse*)a->data.v;
+	const curse * c = (const curse*)a->data.v;
 	if (a->type!=&at_curse || c->cspellid!=ti->id) return false;
 	switch(cursedaten[ti->id].typ) {
 	case CURSETYP_SKILL:
@@ -267,6 +270,15 @@ get_curse(attrib *ap, curse_t id, int id2)
 }
 
 /* ------------------------------------------------------------- */
+/* findet einen curse global anhand seiner 'curse-Einheitnummer' */
+
+curse *
+findcurse(int curseid)
+{
+	return cfindhash(curseid);
+}
+
+/* ------------------------------------------------------------- */
 /* Normalerweise ist alles ausser der Id eines curse und dem
  * verzauberten Objekt nicht bekannt. Um den Zauber eindeutig zu
  * identifizieren benötigt man je nach Typ einen weiteren Identifier.
@@ -279,7 +291,14 @@ remove_curse(attrib **ap, curse_t id, int id2)
 }
 
 void
-remove_allcurse(attrib **ap, void * data, boolean(*compare)(const attrib *, void *))
+remove_cursec(attrib **ap, curse *c)
+{
+	attrib *a = a_select(*ap, c, cmp_curse);
+	if (a) a_remove(ap, a);
+}
+
+void
+remove_allcurse(attrib **ap, const void * data, boolean(*compare)(const attrib *, const void *))
 {
 	attrib * a = a_select(*ap, data, compare);
 	while (a) {
@@ -693,6 +712,32 @@ is_cursed(attrib *ap, curse_t id, int id2)
 	return true;
 }
 
+boolean
+is_cursed_internal(attrib *ap, curse_t id, int id2)
+{
+	curse *c = get_curse(ap, id, id2);
+
+	if (!c)
+		return false;
+
+	return true;
+}
+
+
+boolean
+is_cursed_with(attrib *ap, curse *c)
+{
+	attrib *a = ap;
+
+	while (a){
+		if ((a->type->flags & ATF_CURSE) && (c == (curse *)a->data.v)) {
+			return true;
+		}
+		a = a->next;
+	}
+
+	return false;
+}
 /* ------------------------------------------------------------- */
 /* Diese Funktionen werden von reports.c:print_curses() während der
  * Generierung des Normalreports aufgerufen und ersetzen
@@ -740,6 +785,33 @@ cinfo_holyground(void * obj, typ_t typ, curse *c, int self)
 			curseid(c));
 	return 1;
 }
+
+static int
+cinfo_cursed_by_the_gods(void * obj, typ_t typ, curse *c, int self)
+{
+	region *r;
+	unused(typ);
+	unused(self);
+
+	assert(typ == TYP_REGION);
+	r = (region *)obj;
+	if (rterrain(r)!=T_OCEAN){
+		sprintf(buf,
+			"Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen "
+			"über die tote Erde und furchtbare Kreaturen ziehen über das Land. Die Brunnen "
+			"sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz "
+			"überzogen. Niemand kann hier lange überleben. (%s)", curseid(c));
+	} else {
+		sprintf(buf,
+			"Diese Region wurde von den Göttern verflucht. Das Meer ist eine ekelige Brühe, "
+			"braunschwarze, stinkende Gase steigen aus den unergründlichen Tiefen hervor, und "
+			"untote Seeungeheuer, Schiffe zerfressend und giftige grüne Galle "
+			"geifernd, sind der Schrecken aller Seeleute, die diese Gewässer durchqueren. "
+			"Niemand kann hier lange überleben. (%s)", curseid(c));
+	}
+	return 1;
+}
+
 /* C_GBDREAM, */
 static int
 cinfo_dreamcurse(void * obj, typ_t typ, curse *c, int self)
@@ -1013,7 +1085,7 @@ static int
 cinfo_calm(void * obj, typ_t typ, curse *c, int self)
 {
 	unit *u;
-	race_t rc;
+	const race * rc;
 	faction *f;
 	unused(typ);
 
@@ -1022,10 +1094,10 @@ cinfo_calm(void * obj, typ_t typ, curse *c, int self)
 	if (c->magician){
 		rc = c->magician->irace;
 		f = c->magician->faction;
-		if (self){
+		if (self) {
 			sprintf(buf, "%s mag %s", u->name, factionname(f));
-		}else{
-			sprintf(buf, "%s scheint %s zu mögen", u->name, race[rc].name[1]);
+		} else {
+			sprintf(buf, "%s scheint %s zu mögen", u->name, LOC(f->locale, rc_name(rc, 1)));
 		}
 		scat(". (");
 		scat(itoa36(c->no));
@@ -1504,11 +1576,14 @@ curse_type cursedaten[MAXCURSE] =
 		"beschützen diese vor dem der dunklen Magie des lebenden Todes.",
 		(cdesc_fun)cinfo_holyground
 	},
-	{ /* C_FREE_13, */
+	{ /* C_CURSED_BY_THE_GODS, */
 		CURSETYP_NORM, 0, (NO_MERGE),
-		"",
-		"",
-		NULL
+		"Verflucht von den Göttern",
+		"Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen "
+		"über die tote Erde, furchbare Kreaturen ziehen über das Land. Die Brunnen "
+		"sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz "
+		"überzogen. Niemand kann hier lange überleben.",
+		(cdesc_fun)cinfo_cursed_by_the_gods,
 	},
 	{ /* C_FREE_14, */
 		CURSETYP_NORM, 0, (NO_MERGE),
@@ -1557,7 +1632,7 @@ curse_type cursedaten[MAXCURSE] =
 	{ /* C_ORC, */
 		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"Orkfieber",
-		"Dieser Zauber scheint die Einheit zu \"orkisieren\". Wie bei Orks "
+		"Dieser Zauber scheint die Einheit zu 'orkisieren'. Wie bei Orks "
 		"ist eine deutliche Neigung zur Fortpflanzung zu beobachten.",
 		(cdesc_fun)cinfo_orc
 	},

@@ -22,6 +22,6 @@ struct unit;
 
 extern struct trigger_type tt_changerace;
 
-extern struct trigger * trigger_changerace(struct unit * u, race_t race, race_t irace);
+extern struct trigger * trigger_changerace(struct unit * u, const struct race *urace, const struct race *irace);
 
 #endif

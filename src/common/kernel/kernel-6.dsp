@@ -66,7 +66,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../util" /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /FR /YX"stdafx.h" /FD /c
+# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../util" /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /YX"stdafx.h" /FD /c
 # ADD BASE RSC /l 0x407
 # ADD RSC /l 0x407
 BSC32=bscmake.exe
@@ -227,6 +227,10 @@ SOURCE=.\plane.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\player.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\pool.h
 # End Source File
 # Begin Source File
@@ -272,10 +276,6 @@ SOURCE=.\spells.h
 # Begin Source File
 
 SOURCE=.\spy.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\study.h
 # End Source File
 # Begin Source File
 
@@ -417,10 +417,6 @@ SOURCE=.\teleport.c
 # Begin Source File
 
 SOURCE=.\terrain.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\ugroup.c
 # End Source File
 # Begin Source File
 

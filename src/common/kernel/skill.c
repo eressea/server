@@ -32,8 +32,10 @@
 #include "region.h"
 #include "karma.h"
 
+/* libc includes */
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Umlaute hier drin, weil die in den Report kommen */
 static const char *skillnames[MAXSKILLS] =
@@ -75,6 +77,16 @@ skillname(skill_t sk, const struct locale * lang)
 	return locale_string(lang, skillnames[sk]);
 }
 
+skill_t
+sk_find(const char * name)
+{
+	skill_t i;
+	for (i=0;i!=MAXSKILLS;++i) {
+		if (strcmp(name, skillnames[i])==0) return i;
+	}
+	return NOSKILL;
+}
+
 /** skillmod attribut **/
 static void
 init_skillmod(attrib * a) {
@@ -96,8 +108,6 @@ attrib_type at_skillmod = {
 	NULL, /* can't read function pointers */
 	ATF_PRESERVE
 };
-
-skillmods * modhash[MAXRACES];
 
 attrib *
 make_skillmod(skill_t skill, unsigned int flags, int(*special)(const struct unit*, const struct region*, skill_t, int), double multiplier, int bonus)
@@ -188,61 +198,96 @@ item_modification(const unit *u, skill_t sk, int *val)
 }
 
 
-signed char
-skill_mod(race_t typ, skill_t sk, terrain_t t)
+int
+skill_mod(const race * rc, skill_t sk, terrain_t t)
 {
-	signed char result = 0;
+	int result = 0;
 
-	result = race[typ].bonus[sk];
+	result = rc->bonus[sk];
 
 	switch (sk) {
 	case SK_TACTICS:
-		if (typ == RC_DWARF) {
+		if (rc == new_race[RC_DWARF]) {
 			if (t == T_MOUNTAIN || t == T_GLACIER || t == T_ICEBERG_SLEEP) ++result;
 		}
 		break;
 	}
-	if (typ == RC_INSECT) {
+	if (rc == new_race[RC_INSECT]) {
 		if (t == T_MOUNTAIN || t == T_GLACIER || t == T_ICEBERG_SLEEP || t == T_ICEBERG)
 			--result;
 		else if (t == T_DESERT || t == T_SWAMP)
 			++result;
 	}
-
+	
 	return result;
 }
 
-int modcount;
+#define RCMODMAXHASH 31
+static struct skillmods {
+	struct skillmods * next;
+	const struct race * race;
+	struct modifiers {
+		int value[MAXSKILLS];
+	} mod[MAXTERRAINS];
+} * modhash[RCMODMAXHASH];
 
-void
-skill_done(void)
+static struct skillmods *
+init_skills(const race * rc)
 {
-	race_t typ;
-	for (typ=0;typ!=MAXRACES;++typ) {
-		skillmods * mods = modhash[typ];
-		if (mods) free(mods);
+	terrain_t t;
+	struct skillmods *mods = (struct skillmods*)calloc(1, sizeof(struct skillmods));
+	mods->race = rc;
+
+	for (t=0;t!=MAXTERRAINS;++t) {
+		skill_t sk;
+		for (sk=0;sk!=MAXSKILLS;++sk) {
+			mods->mod[t].value[sk] = skill_mod(rc, sk, t);
+		}
 	}
+	return mods;
+}
+
+int
+rc_skillmod(const struct race * rc, const region *r, skill_t skill)
+{
+	int mods;
+	unsigned int index = ((unsigned int)rc) % RCMODMAXHASH;
+	struct skillmods **imods = &modhash[index];
+	while (*imods && (*imods)->race!=rc) imods = &(*imods)->next;
+	if (*imods==NULL) {
+		*imods = init_skills(rc);
+	}
+	mods = (*imods)->mod[rterrain(r)].value[skill];
+
+	if (rc == new_race[RC_ELF] && r_isforest(r)) switch (skill) {
+	case SK_OBSERVATION:
+		++mods;
+		break;
+	case SK_STEALTH:
+		if (r_isforest(r)) ++mods;
+		break;
+	case SK_TACTICS:
+		if (r_isforest(r)) mods += 2;
+		break;
+	}
+
+	return mods;
 }
 
 void
 skill_init(void)
 {
-	terrain_t t;
-	skill_t sk;
-	race_t typ;
-	for (typ=0;typ!=MAXRACES;++typ) {
-		skillmods * mods = modhash[typ];
+}
 
-		if (!mods) {
-			++modcount;
-			mods = (skillmods*)calloc(1, sizeof(skillmods));
-
-			for (t=0;t!=MAXTERRAINS;++t) {
-				for (sk=0;sk!=MAXSKILLS;++sk) {
-					mods->mod[t].value[sk] = skill_mod(typ, sk, t);
-				}
-			}
-			modhash[typ] = mods;
+void
+skill_done(void)
+{
+	int i;
+	for (i = 0;i!=RCMODMAXHASH;++i) {
+		while (modhash[i]) {
+			struct skillmods * mods = modhash[i];
+			modhash[i] = mods->next;
+			free(mods);
 		}
 	}
 }
@@ -262,21 +307,18 @@ level(int days)
 	i = 0;
 	while (level_days(i+1) <= days) ++i;
 #else
-	static int ldays[32];
+	static int ldays[64];
 	static boolean init = false;
 	if (!init) {
 		init = true;
-		for (i=0;i!=32;++i) ldays[i] = level_days(i+1);
+		for (i=0;i!=64;++i) ldays[i] = level_days(i+1);
 	}
-	for (i=0;i!=32;++i) if (ldays[i]>days) return i;
+	for (i=0;i!=64;++i) if (ldays[i]>days) return i;
 #endif
 	return i;
 }
 
-#ifdef OLD_FAMILIAR_MOD
-extern int skillmod_familiar(const struct region *r, const struct unit *fam, skill_t sk);
-#endif
-char
+int
 eff_skill(const unit * u, skill_t sk, const region * r)
 {
 	int i, result = 0;
@@ -288,33 +330,13 @@ eff_skill(const unit * u, skill_t sk, const region * r)
 	if (result == 0) return 0;
 
 	assert(r);
-	result = (char)(result + modhash[u->race]->mod[rterrain(r)].value[sk]);
-
-	if (u->race==RC_ELF && r_isforest(r)) switch (sk) {
-	case SK_OBSERVATION:
-		++result;
-		break;
-	case SK_STEALTH:
-		if (r_isforest(r)) ++result;
-		break;
-	case SK_TACTICS:
-		if (r_isforest(r)) result += 2;
-		break;
-	}
+	result = result + rc_skillmod(u->race, r, sk);
 
 	result += att_modification(u, sk);
 	item_modification(u, sk, &result);
 
 	i = skillmod(u->attribs, u, r, sk, result, SMF_ALWAYS);
-	if (i!=result)	{
-		result = i;
-	} else {
-#ifdef OLD_TRIGGER
-		unit * familiar = get_familiar(u);
-		if (familiar!=NULL)
-			result += skillmod_familiar(r, familiar, sk);
-#endif
-	}
+	if (i!=result)	result = i;
 
 	if (fspecial(u->faction, FS_TELEPATHY)) {
 		switch(sk) {
@@ -330,11 +352,10 @@ eff_skill(const unit * u, skill_t sk, const region * r)
 		}
 	}
 
-
 #ifdef HUNGER_REDUCES_SKILL
 	if (fval(u, FL_HUNGER)) result = result/2;
 #endif
-	return (char)max(result, 0);
+	return max(result, 0);
 }
 
 int

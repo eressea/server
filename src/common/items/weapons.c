@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -22,6 +22,10 @@
 #include <item.h>
 #include <battle.h>
 
+/* util includes */
+#include <functions.h>
+
+/* libc includes */
 #include <assert.h>
 #include <stdlib.h>
 
@@ -51,6 +55,95 @@ static weapon_mod wm_halberd[] = {
 	{ 0, 0 }
 };
 
+enum {
+	WP_RUNESWORD,
+	WP_FIRESWORD,
+	WP_EOGSWORD,
+	WP_CATAPULT,
+	WP_GREATBOW,
+	WP_LONGBOW,
+	WP_CROSSBOW,
+	WP_SPEAR,
+	WP_GREATSWORD,
+	WP_SWORD,
+	WP_AXE,
+	WP_HALBERD,
+	WP_LANCE,
+	WP_RUSTY_SWORD,
+	WP_NONE,
+	WP_MAX
+};
+
+enum {
+	RL_CATAPULT,
+	RL_CROSSBOW,
+	RL_MAX,
+	RL_NONE
+};
+
+/* Schadenstypen */
+
+#define CUT     (1<<0)
+#define PIERCE  (1<<1)
+#define BASH    (1<<2)
+
+typedef struct weapondata {
+	double magres;
+	const char *damfoot;
+	const char *damhorse;
+	item_t item;
+	skill_t skill;
+	char attmod;
+	char defmod;
+	boolean rear;
+	boolean is_magic;
+	struct reload {
+		int type;
+		char time;
+	} reload;
+	char damage_type;
+} weapondata;
+
+static weapondata weapontable[WP_MAX + 1] =
+/* MagRes, Schaden/Fuß, Schaden/Pferd, Item, Skill, OffMod, DefMod,
+ * rear. is_magic */
+{
+	/* Runenschwert */
+	{0.00, "3d10+10", "3d10+10", I_RUNESWORD, SK_SWORD, 2, 2, false, true, { RL_NONE, 0}, CUT },
+	/* Flammenschwert */
+	{0.30, "3d6+10", "3d6+10", I_FIRESWORD, SK_SWORD, 1, 1, false, false, { RL_NONE, 0}, CUT },
+	/* Laenschwert */
+	{0.30, "3d6+10", "3d6+10", I_LAENSWORD, SK_SWORD, 1, 1, false, false, { RL_NONE, 0}, CUT },
+	/* Katapult */
+	{0.00, "3d10+5", "3d10+5", I_CATAPULT, SK_CATAPULT, 0, 0, true, false, { RL_CATAPULT, 5 }, BASH },
+	/* Elfenbogen */
+	{0.00, "2d6+4", "2d6+4", I_GREATBOW, SK_LONGBOW, 0, 0, true, false, { RL_NONE, 0 }, PIERCE },
+	/* Langbogen */
+	{0.00, "1d11+1", "1d11+1", I_LONGBOW, SK_LONGBOW, 0, 0, true, false, { RL_NONE, 0 }, PIERCE },
+	/* Armbrust */
+	{0.00, "3d3+5", "3d3+5", I_CROSSBOW, SK_CROSSBOW, 0, 0, true, false, { RL_CROSSBOW, 1 }, PIERCE },
+	/* Speer */
+	{0.00, "1d10+0", "1d12+2", I_SPEAR, SK_SPEAR, 0, 0, false, false, { RL_NONE, 0}, PIERCE },
+	/* Zweihänder */
+	{0.00, "2d8+3", "2d8+3", I_GREATSWORD, SK_SWORD, -1, -2, false, false, { RL_NONE, 0}, CUT },
+	/* Schwert */
+	{0.00, "1d9+2", "1d9+2", I_SWORD, SK_SWORD, 0, 0, false, false, { RL_NONE, 0}, CUT },
+	/* Kriegsaxt */
+	{0.00, "2d6+4", "2d6+4", I_AXE, SK_SWORD, 1, -2, false, false, { RL_NONE, 0}, CUT },
+	/* Hellebarde */
+	{0.00, "2d6+3", "2d6+3", I_HALBERD, SK_SPEAR, -1, 2, false, false, { RL_NONE, 0}, CUT },
+	/* Lanze */
+	{0.00, "1d5", "2d6+5", I_LANCE, SK_SPEAR, 0, -2, false, false, { RL_NONE, 0}, PIERCE },
+	/* Rostiges Schwert */
+	{0.00, "1d9", "1d9", I_RUSTY_SWORD, SK_SWORD, -1, -1, false, false, { RL_NONE, 0}, CUT },
+	/* Unbewaffnet */
+	{0.00, "1d5+0", "1d6+0", I_WOOD, SK_SWORD, 0, 0, false, false, { RL_NONE, 0}, BASH },
+	/* Dummy */
+	{0.00, "0d0+0", "0d0+0", I_WOOD, SK_SWORD, 0, 0, false, false, { RL_NONE, 0}, 0 }
+};
+
+weapon_type * oldweapontype[WP_MAX];
+
 static boolean
 attack_firesword(const troop * at, int *casualties)
 {
@@ -70,6 +163,17 @@ attack_firesword(const troop * at, int *casualties)
 	if (!enemies) {
 		if (casualties) *casualties = 0;
 		return false; /* if no enemy found, no use doing standarad attack */
+	}
+
+	if (fi->catmsg == -1) {
+		int i, k=0;
+		for (i=0;i<=at->index;++i) {
+			if (fi->person[i].weapon->type == oldweapontype[WP_FIRESWORD]) ++k;
+		}
+		sprintf(buf, "%d Kämpfer aus %s benutz%s Flammenschwert%s:", k, unitname(fi->unit),
+			(k==1)?"t sein ":"en ihre",(k==1)?"":"er");
+		battlerecord(fi->side->battle, buf);
+		fi->catmsg = 0;
 	}
 
 	do {
@@ -132,94 +236,7 @@ attack_catapult(const troop * at, int * casualties)
 	return false;
 }
 
-enum {
-	WP_RUNESWORD,
-	WP_FIRESWORD,
-	WP_EOGSWORD,
-	WP_CATAPULT,
-	WP_GREATBOW,
-	WP_LONGBOW,
-	WP_CROSSBOW,
-	WP_SPEAR,
-	WP_GREATSWORD,
-	WP_SWORD,
-	WP_AXE,
-	WP_HALBERD,
-	WP_LANCE,
-	WP_RUSTY_SWORD,
-	WP_NONE,
-	WP_MAX
-};
 
-enum {
-	RL_CATAPULT,
-	RL_CROSSBOW,
-	RL_MAX,
-	RL_NONE
-};
-
-/* Schadenstypen */
-
-#define CUT     (1<<0)
-#define PIERCE  (1<<1)
-#define BASH    (1<<2)
-
-typedef struct weapondata {
-	double magres;
-	const char *damfoot;
-	const char *damhorse;
-	item_t item;
-	skill_t skill;
-	char attmod;
-	char defmod;
-	boolean rear;
-	boolean is_magic;
-	struct reload {
-		int type;
-		char time;
-	} reload;
-	char damage_type;
-} weapondata;
-
-static weapondata weapontable[WP_MAX + 1] =
-/* MagRes, Schaden/Fuß, Schaden/Pferd, Item, Skill, OffMod, DefMod,
- * rear. is_magic */
-{
-	/* Runenschwert */
-	{0.00, "3d10+10", "3d10+10", I_RUNESWORD, SK_SWORD, 2, 2, false, true, { RL_NONE, 0}, CUT },
-	/* Flammenschwert */
-	{0.30, "3d6+10", "3d6+10", I_FIRESWORD, SK_SWORD, 1, 1, false, false, { RL_NONE, 0}, CUT },
-	/* Laenschwert */
-	{0.30, "3d6+10", "3d6+10", I_EOGSWORD, SK_SWORD, 1, 1, false, false, { RL_NONE, 0}, CUT },
-	/* Katapult */
-	{0.00, "3d10+5", "3d10+5", I_CATAPULT, SK_CATAPULT, 0, 0, true, false, { RL_CATAPULT, 5 }, BASH },
-	/* Elfenbogen */
-	{0.00, "2d6+4", "2d6+4", I_GREATBOW, SK_LONGBOW, 0, 0, true, false, { RL_NONE, 0 }, PIERCE },
-	/* Langbogen */
-	{0.00, "1d11+1", "1d11+1", I_LONGBOW, SK_LONGBOW, 0, 0, true, false, { RL_NONE, 0 }, PIERCE },
-	/* Armbrust */
-	{0.00, "3d3+5", "3d3+5", I_CROSSBOW, SK_CROSSBOW, 0, 0, true, false, { RL_CROSSBOW, 1 }, PIERCE },
-	/* Speer */
-	{0.00, "1d10+0", "1d12+2", I_SPEAR, SK_SPEAR, 0, 0, false, false, { RL_NONE, 0}, PIERCE },
-	/* Zweihänder */
-	{0.00, "2d8+3", "2d8+3", I_GREATSWORD, SK_SWORD, -1, -2, false, false, { RL_NONE, 0}, CUT },
-	/* Schwert */
-	{0.00, "1d9+2", "1d9+2", I_SWORD, SK_SWORD, 0, 0, false, false, { RL_NONE, 0}, CUT },
-	/* Kriegsaxt */
-	{0.00, "2d6+4", "2d6+4", I_AXE, SK_SWORD, 1, -2, false, false, { RL_NONE, 0}, CUT },
-	/* Hellebarde */
-	{0.00, "2d6+3", "1d6", I_HALBERD, SK_SPEAR, -1, 2, false, false, { RL_NONE, 0}, CUT },
-	/* Lanze */
-	{0.00, "1d5", "2d6+5", I_LANCE, SK_SPEAR, 0, -2, false, false, { RL_NONE, 0}, PIERCE },
-	/* Rostiges Schwert */
-	{0.00, "1d9", "1d9", I_RUSTY_SWORD, SK_SWORD, -1, -1, false, false, { RL_NONE, 0}, CUT },
-	/* Unbewaffnet */
-	{0.00, "1d5+0", "1d6+0", I_WOOD, SK_SWORD, 0, 0, false, false, { RL_NONE, 0}, BASH },
-	/* Dummy */
-	{0.00, "0d0+0", "0d0+0", I_WOOD, SK_SWORD, 0, 0, false, false, { RL_NONE, 0}, 0 }
-};
-
-weapon_type * oldweapontype[WP_MAX];
 static void
 init_oldweapons(void)
 {
@@ -294,7 +311,6 @@ static construction cons_mallornspear = {
 item_type it_mallornspear = {
 	&rt_mallornspear,        /* resourcetype */
 	ITF_WEAPON, 100, 0,      /* flags, weight, capacity */
-	0, NOSKILL,              /* minskill, skill */
 	&cons_mallornspear       /* construction */
 };
 weapon_type wt_mallornspear = {
@@ -325,7 +341,6 @@ static construction cons_mallornlance = {
 item_type it_mallornlance = {
 	&rt_mallornlance,        /* resourcetype */
 	ITF_WEAPON, 100, 0,      /* flags, weight, capacity */
-	0, NOSKILL,              /* minskill, skill */
 	&cons_mallornlance       /* construction */
 };
 weapon_type wt_mallornlance = {
@@ -356,7 +371,6 @@ static construction cons_mallornbow = {
 item_type it_mallornbow = {
 	&rt_mallornbow,        /* resourcetype */
 	ITF_WEAPON, 100, 0,    /* flags, weight, capacity */
-	0, NOSKILL,            /* minskill, skill */
 	&cons_mallornbow       /* construction */
 };
 weapon_type wt_mallornbow = {
@@ -387,7 +401,6 @@ static construction cons_mallorncrossbow = {
 item_type it_mallorncrossbow = {
 	&rt_mallorncrossbow,   /* resourcetype */
 	ITF_WEAPON, 100, 0,    /* flags, weight, capacity */
-	0, NOSKILL,            /* minskill, skill */
 	&cons_mallorncrossbow  /* construction */
 };
 weapon_type wt_mallorncrossbow = {
@@ -400,7 +413,7 @@ weapon_type wt_mallorncrossbow = {
 /** end mallorncrossbow **/
 
 void
-init_weapons(void) {
+register_weapons(void) {
 	rt_register(&rt_mallornspear);
 	it_register(&it_mallornspear);
 	wt_register(&wt_mallornspear);
@@ -417,4 +430,7 @@ init_weapons(void) {
 	it_register(&it_mallorncrossbow);
 	wt_register(&wt_mallorncrossbow);
 	init_oldweapons();
+
+	register_function((pf_generic)attack_catapult, "attack_catapult");
+	register_function((pf_generic)attack_firesword, "attack_firesword");
 }

@@ -116,14 +116,14 @@ locale_string(const locale * lang, const char * key)
 	}
 	if (!find) {
 		const char * s = key;
+		log_warning(("missing translation for \"%s\" in locale %s\n", key, lang->name));
 		if (lang!=default_locale) {
-			log_warning(("missing translation for \"%s\" in locale %s\n", key, lang->name));
 			s = locale_string(default_locale, key);
-			if (s_debug) {
-				fprintf(s_debug, "%s;%s;%s\n", key, lang->name, s);
-				fflush(s_debug);
-				locale_setstring((struct locale*)lang, key, s);
-			}
+		}
+		if (s_debug) {
+			fprintf(s_debug, "%s;%s;%s\n", key, lang->name, s);
+			fflush(s_debug);
+			locale_setstring((struct locale*)lang, key, s);
 		}
 		return s;
 	}
@@ -179,4 +179,16 @@ reverse_lookup(const locale * lang, const char * str)
 		}
 	}
 	return str;
+}
+
+const char * 
+mkname(const char * space, const char * name)
+{
+	static char zBuffer[128];
+	if (space) {
+		sprintf(zBuffer, "%s::%s", space, name);
+	} else {
+		strcpy(zBuffer, name);
+	}
+	return zBuffer;
 }

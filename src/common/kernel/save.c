@@ -31,10 +31,10 @@
 #include "race.h"
 #include "attrib.h"
 #include "plane.h"
-#include "player.h"
 #include "movement.h"
 #include "alchemy.h"
 #include "region.h"
+#include "resources.h"
 #include "unit.h"
 #include "skill.h"
 #include "message.h"
@@ -45,15 +45,21 @@
 #include "pathfinder.h"
 #include "group.h"
 
+#ifdef USE_UGROUPS
+#include "ugroup.h"
+#include <attributes/ugroup.h>
+#endif
+
 /* attributes includes */
 #include <attributes/key.h>
 
 /* util includes */
-#include <event.h>
-#include <base36.h>
 #include <attrib.h>
-#include <umlaut.h>
+#include <base36.h>
+#include <event.h>
 #include <resolve.h>
+#include <sql.h>
+#include <umlaut.h>
 
 /* libc includes */
 #include <string.h>
@@ -77,8 +83,20 @@ const char * g_datadir;
 /* imported symbols */
 extern int cmsg[MAX_MSG][ML_MAX];
 extern int quiet;
+extern int dice_rand(const char *s);
+static region * current_region;
 
 int firstx = 0, firsty = 0;
+
+#ifdef RESOURCE_FIX
+int laen_read(attrib * a, FILE * F)
+{
+	int laen;
+	fscanf(F, "%d", &laen);
+	read_laen(current_region, laen);
+	return 0;
+}
+#endif
 
 char *
 rns(FILE * f, char *c, size_t size)
@@ -356,7 +374,7 @@ readunit(FILE * F, struct faction * f)
 	i = getid();
 	u = findunitg(i, NULL);
 
-	if (u && u->race == RC_SPELL) return NULL;
+	if (u && old_race(u->race) == RC_SPELL) return NULL;
 	if (u && u->faction == f) {
 		/* SP zeigt nun auf den Pointer zur ersten StrListe. Auf die
 		 * erste StrListe wird mit u->orders gezeigt. Deswegen also
@@ -432,9 +450,9 @@ readfaction(void)
 
 	f = findfaction(i36);
 
-	if (f==NULL || strcmp(f->passw, pass)) {
+	if (f==NULL || strcasecmp(f->passw, pass)) {
 		faction * f2 = findfaction(i10);
-		if (f2!=NULL && !strcmp(f2->passw, pass)) {
+		if (f2!=NULL && !strcasecmp(f2->passw, pass)) {
 			f = f2;
 			addstrlist(&f->mistakes, "Die Befehle wurden nicht als base36 eingeschickt!");
 		}
@@ -451,7 +469,7 @@ readfaction(void)
 		freestrlist(f->mistakes);
 		f->mistakes = 0;
 
-		if (strcmp(f->passw, pass)) {
+		if (strcasecmp(f->passw, pass)) {
 			addstrlist(&f->mistakes, "Das Passwort wurde falsch eingegeben");
 			return 0;
 		}
@@ -710,6 +728,69 @@ read_items(FILE *F, item **ilist)
 	}
 }
 
+#ifdef RESOURCE_FIX
+struct attrib_type at_resources = { 
+	"resources", NULL, NULL, NULL, NULL, NULL, ATF_UNIQUE 
+};
+
+void 
+read_iron(struct region * r, int iron)
+{
+	attrib * a = a_find(r->attribs, &at_resources);
+	assert(iron>=0);
+	if (a==NULL) {
+		a = a_add(&r->attribs, a_new(&at_resources));
+		a->data.sa[1] = -1;
+	}
+	a->data.sa[0] = (short)iron;
+}
+
+void 
+read_laen(struct region * r, int laen)
+{
+	attrib * a = a_find(r->attribs, &at_resources);
+	assert(laen>=0);
+	if (a==NULL) {
+		a = a_add(&r->attribs, a_new(&at_resources));
+		a->data.sa[0] = -1;
+	}
+	a->data.sa[1] = (short)laen;
+}
+#endif
+
+#ifdef USE_UGROUPS
+void
+read_ugroups(FILE *file)
+{
+	int i;
+	faction *f;
+	ugroup *ug;
+	int fno, ugid, ugmem;
+
+	while(1) {
+		fno = ri(file);
+		if(fno == -1) break;
+		f = findfaction(fno);
+		while(1) {
+			ugid  = ri(file);
+			if(ugid == -1) break;
+			ugmem = ri(file);
+			ug = malloc(sizeof(ugroup));
+			ug->id = ugid;
+			ug->members = ugmem;
+			ug->unit_array = malloc(ug->members * sizeof(unit *));
+			for(i=0; i<ugmem; i++) {
+				unit *u = findunitg(ri36(file), NULL);
+				ug->unit_array[i] = u;
+				a_add(&u->attribs, a_new(&at_ugroup))->data.i = ugid;
+			}
+			ug->next = f->ugroups;
+			f->ugroups = ug;
+		}
+	}
+}
+#endif
+
 int
 readgame(boolean backup)
 {
@@ -748,6 +829,8 @@ readgame(boolean backup)
 	/* globale Variablen */
 
 	global.data_version = ri(F);
+	assert(global.data_version>=MIN_VERSION || !"unsupported data format");
+	assert(global.data_version<=RELEASE_VERSION || !"unsupported data format");
 #ifdef CONVERT_TRIGGER
 	assert(global.data_version < NEWSOURCE_VERSION);
 #else
@@ -777,21 +860,17 @@ readgame(boolean backup)
 	/* Planes */
 	planes = NULL;
 	n = ri(F);
-	if (global.data_version < PLANES_VERSION) {
-		assert(n==0); /* Keine Planes definiert, hoffentlich. */
-	} else {
-		while(--n >= 0) {
-			plane *pl = calloc(1, sizeof(plane));
-			pl->id = ri(F);
-			rds(F, &pl->name);
-			pl->minx = ri(F);
-			pl->maxx = ri(F);
-			pl->miny = ri(F);
-			pl->maxy = ri(F);
-			pl->flags = ri(F);
-			if (global.data_version>=ATTRIB_VERSION) a_read(F, &pl->attribs);
-			addlist(&planes, pl);
-		}
+	while(--n >= 0) {
+		plane *pl = calloc(1, sizeof(plane));
+		pl->id = ri(F);
+		rds(F, &pl->name);
+		pl->minx = ri(F);
+		pl->maxx = ri(F);
+		pl->miny = ri(F);
+		pl->maxy = ri(F);
+		pl->flags = ri(F);
+		a_read(F, &pl->attribs);
+		addlist(&planes, pl);
 	}
 
 	/* Read factions */
@@ -799,10 +878,12 @@ readgame(boolean backup)
 	n = ri(F);
 	printf(" - Einzulesende Parteien: %d\n", n);
 	fp = &factions;
+	while (*fp) fp=&(*fp)->next;
 
 	/* fflush (stdout); */
 
 	while (--n >= 0) {
+		int planes;
 		f = (faction *) calloc(1, sizeof(faction));
 
 		f->first = 0;
@@ -829,24 +910,26 @@ readgame(boolean backup)
 		rds(F, &f->passw);
 		if (global.data_version < LOCALE_VERSION) {
 			f->locale = find_locale("de");
-			if (f->no==1045674) f->locale=find_locale("en");	/* meui, amer. betatester */
 		} else {
 			rs(F, buf);
 			f->locale = find_locale(buf);
 		}
 		f->lastorders = ri(F);
 		f->age = ri(F);
-		f->race = (char) ri(F);
-		if (global.data_version < RACES_VERSION) {
-			if (f->race==0) f->race=RC_UNDEAD;
-			else --f->race;
+		if (global.data_version < NEWRACE_VERSION) {
+			race_t rc = (char) ri(F);
+			f->race = new_race[rc];
+		} else {
+			rs(F, buf);
+			f->race = rc_find(buf);
+			assert(f->race);
 		}
 		if (global.data_version >= MAGIEGEBIET_VERSION)
 			f->magiegebiet = (magic_t)ri(F);
 		else
 			f->magiegebiet = (magic_t)((rand() % 5)+1);
 
-		if (nonplayer_race(f->race)) {
+		if (!playerrace(f->race)) {
 			f->lastorders = turn+1;
 		}
 		if (global.data_version >= KARMA_VERSION)
@@ -864,20 +947,12 @@ readgame(boolean backup)
 		if (global.data_version>=MSGLEVEL_VERSION)
 			read_msglevels(&f->warnings, F);
 
-		if (global.data_version >= PLANES_VERSION) {
-			int c = ri(F);
-			int id, ux, uy;
-			while(--c >= 0) {
-				id = ri(F);
-				ux = ri(F);
-				uy = ri(F);
-				set_ursprung(f,id,ux,uy);
-			}
-		} else {
-			int ux, uy;
-			ux = ri(F);
-			uy = ri(F);
-			set_ursprung(f,0,ux,uy);
+		planes = ri(F);
+		while(--planes >= 0) {
+			int id = ri(F);
+			int ux = ri(F);
+			int uy = ri(F);
+			set_ursprung(f, id, ux, uy);
 		}
 		f->newbies = 0;
 		f->options = ri(F);
@@ -922,7 +997,7 @@ readgame(boolean backup)
 				aid = ri(F);
 			}
 			state = ri(F);
-			if (aid==0) continue;
+			if (aid==0 || state==0) continue;
 			sf = (ally *) calloc(1, sizeof(ally));
 
 			sf->faction = findfaction(aid);
@@ -939,6 +1014,15 @@ readgame(boolean backup)
 		if (global.data_version>=GROUPS_VERSION) read_groups(F, f);
 
 		addlist2(fp, f);
+
+		if (f->age==1) {
+			fprintf(sqlstream, "INSERT INTO users (id, email) VALUES (%d, '%s');\n", 
+				f->unique_id, f->email);
+			fprintf(sqlstream, "INSERT INTO factions (id, user, name, password, race, locale, lastorders, banner, email) "
+				"VALUES ('%s', %d, '%s', '%s', '%s', '%s', %u, '%s', '%s');\n",
+				itoa36(f->no), f->unique_id, sqlquote(f->name), sqlquote(f->passw), f->race->_name[0],
+				locale_name(f->locale), f->lastorders, sqlquote(f->banner), f->email);
+		}
 	}
 	*fp = 0;
 
@@ -968,7 +1052,7 @@ readgame(boolean backup)
 
 		int x = ri(F);
 		int y = ri(F);
-		int terrain;
+		int ter;
 
 		if (firstx && firsty) {
 			if (x!=firstx || y!=firsty) {
@@ -999,17 +1083,16 @@ readgame(boolean backup)
 		--maxregions;
 
 		r = new_region(x, y);
+		current_region = r;
 		if (global.data_version < MEMSAVE_VERSION) {
 			rds(F, &name);
 		}
 		rds(F, &r->display);
-		terrain = ri(F);
-#ifdef NO_FOREST
+		ter = ri(F);
 		if (global.data_version < NOFOREST_VERSION) {
-			if (terrain>T_PLAIN) --terrain;
+			if (ter>T_PLAIN) --ter;
 		}
-#endif
-		rsetterrain(r, (terrain_t)terrain);
+		rsetterrain(r, (terrain_t)ter);
 		if (global.data_version >= MEMSAVE_VERSION) r->flags = (char) ri(F);
 
 		if (global.data_version >= REGIONAGE_VERSION)
@@ -1017,8 +1100,7 @@ readgame(boolean backup)
 		else
 			r->age = 0;
 
-		if (global.data_version >= PLANES_VERSION && global.data_version &&
-			global.data_version < MEMSAVE_VERSION) {
+		if (global.data_version < MEMSAVE_VERSION) {
 			ri(F);
 		}
 		if (global.data_version < MEMSAVE_VERSION) {
@@ -1039,7 +1121,7 @@ readgame(boolean backup)
 		if (global.data_version < MEMSAVE_VERSION || r->land) {
 			int i;
 #ifdef GROWING_TREES
-			if(global.data_version < GROWTREES_VERSION) {
+			if(global.data_version < GROWTREE_VERSION) {
 				i = ri(F); rsettrees(r, 2, i);
 			} else {
 				i = ri(F); rsettrees(r, 0, i);
@@ -1050,7 +1132,47 @@ readgame(boolean backup)
 			i = ri(F); rsettrees(r, i);
 #endif
 			i = ri(F); rsethorses(r, i);
+#ifdef NEW_RESOURCEGROWTH
+			if (global.data_version < NEWRESOURCE_VERSION) {
+				i = ri(F); 
+#ifdef RESOURCE_FIX
+				if (i!=0) read_iron(r, i);
+#endif
+			} else {
+				rawmaterial ** pres = &r->resources;
+				assert(*pres==NULL);
+				for (;;) {
+					rawmaterial * res;
+					rs(F, buf);
+					if (strcmp(buf, "end")==0) break;
+					res = calloc(sizeof(rawmaterial), 1);
+					res->type = rmt_find(buf);
+					assert(res->type!=NULL);
+					res->level = ri(F);
+					res->amount = ri(F);
+
+					if(global.data_version >= RANDOMIZED_RESOURCES_VERSION) {
+						res->startlevel = ri(F);
+						res->base = ri(F);
+						res->divisor = ri(F);
+					} else {
+						int i;
+						res->startlevel = 1;
+						for (i=0; i<3; i++) {
+							if(res->type == terrain[rterrain(r)].rawmaterials[i].type) break;
+						}
+						assert(i<=2);
+						res->base = dice_rand(terrain[rterrain(r)].rawmaterials[i].base);
+						res->divisor = dice_rand(terrain[rterrain(r)].rawmaterials[i].divisor);
+					}
+
+					*pres = res;
+					pres=&res->next;
+				}
+			}
+#else
 			i = ri(F); rsetiron(r, i);
+#endif
 			if (global.data_version>=ITEMTYPE_VERSION) {
 				rs(F, buf);
 				if (strcmp(buf, "noherb") != 0) {
@@ -1070,7 +1192,13 @@ readgame(boolean backup)
 				rsetherbs(r, (short)ri(F));
 			} else if (global.data_version<MEMSAVE_VERSION) {
 				int i = ri(F);
+#ifndef NEW_RESOURCEGROWTH
 				rsetlaen(r, i);
+#else
+#ifdef RESOURCE_FIX
+				if (i!=0) read_laen(r, i);
+#endif
+#endif
 				if (ri(F)) fset(r, RF_MALLORN);
 				if (ri(F)) fset(r, RF_ENCOUNTER);
 			}
@@ -1097,7 +1225,6 @@ readgame(boolean backup)
 		}
 
 		assert(rterrain(r) != NOTERRAIN);
-		assert(rtrees(r) >= 0);
 		assert(rhorses(r) >= 0);
 		assert(rpeasants(r) >= 0);
 		assert(rmoney(r) >= 0);
@@ -1124,7 +1251,7 @@ readgame(boolean backup)
 				}
 			}
 		}
-		if (global.data_version>=ATTRIB_VERSION) a_read(F, &r->attribs);
+		a_read(F, &r->attribs);
 
 		/* Burgen */
 
@@ -1214,7 +1341,6 @@ readgame(boolean backup)
 
 		while (--p >= 0) {
 			int number, n;
-			unsigned char oldtype=0, oldtypus, olditypus;
 #if USE_EVENTS
 			static boolean init = false;
 			if (!init) {
@@ -1245,71 +1371,26 @@ readgame(boolean backup)
 			}
 			number = ri(F);
 			u->region = r;
-			if (global.data_version<RACES_VERSION)
-				oldtype = (unsigned char) ri(F);
 			if (global.data_version<ITEMTYPE_VERSION)
 				set_money(u, ri(F));
 			u->age = (short)ri(F);
-			if (global.data_version<RACES_VERSION) {
-				oldtypus = (unsigned char) ri(F);
-				olditypus = (unsigned char) ri(F);
-
-				if (global.data_version>=FULL_BASE36_VERSION) {
-					n = rid(F);
-				} else {
-					n = ri(F);
-				}
-				u_setfaction(u, findfaction(n));
-
-				u->race = typus2race(oldtypus);
-				u->irace = typus2race(olditypus);
-				if (u->race==NORACE && oldtype == U_MAN)
-					u->race = RC_DRACOID;
-				else switch (oldtype) {
-					case U_UNDEAD:
-						u->race = RC_UNDEAD;
-						u->irace = RC_UNDEAD;
-						break;
-					case U_ILLUSION:
-						u->race = RC_ILLUSION;
-						u->irace = u->faction->race;
-						break;
-					case U_FIREDRAGON:
-						u->race = RC_FIREDRAGON;
-						break;
-					case U_DRAGON:
-						u->race = RC_DRAGON;
-						break;
-					case U_WYRM:
-						u->race = RC_WYRM;
-						break;
-					case U_SPELL:
-						u->race = RC_SPELL;
-						break;
-					case U_MONSTER:
-						u->race = RC_SPECIAL;
-						break;
-					case U_BIRTHDAYDRAGON:
-						u->race = RC_BIRTHDAYDRAGON;
-						u->irace = RC_DRAGON;
-						break;
-					case U_TREEMAN:
-						u->race = RC_TREEMAN;
-						break;
-					default:
-						u->irace = u->race;
-				}
-				if (u->irace==NORACE) u->irace=u->race;
+			if (global.data_version<NEWRACE_VERSION) {
+				u->race = new_race[(race_t)ri(F)];
+				u->irace = new_race[(race_t)ri(F)];
+			} else {
+				rs(F, buf);
+				u->race = rc_find(buf);
+				rs(F, buf);
+				if (strlen(buf)) u->irace = rc_find(buf);
+				else u->irace = u->race;
 			}
-			else {
-				u->race = (race_t) ri(F);
-				u->irace = (race_t) ri(F);
-				if (global.data_version<GUARD_VERSION)
-					u_setfaction(u, findfaction(n = ri(F)));
+			if (global.data_version<GUARD_VERSION)
+				u_setfaction(u, findfaction(n = ri(F)));
+			if (u->faction == NULL) {
+				log_error(("unit %s has faction == NULL\n", unitname(u)));
+				abort();
 			}
-			if (u->faction == NULL)
-				fprintf(stderr,"\nEinheit %s hat faction==NULL\n",unitname(u));
-			if (u->race != RC_SPELL && !nonplayer(u)){
+			if (playerrace(u->race)) {
 				u->faction->no_units++;
 			}
 			set_number(u, number);
@@ -1366,7 +1447,7 @@ readgame(boolean backup)
 				u_seteffstealth(u, ri(F));
 
 			assert(u->number >= 0);
-			assert(u->race != NORACE);
+			assert(u->race);
 
 			while ((sk = (skill_t) ri(F)) != NOSKILL) {
 				set_skill(u, sk, ri(F));
@@ -1430,6 +1511,9 @@ readgame(boolean backup)
 	}
 	if (!dirtyload) {
 		if (global.data_version >= BORDER_VERSION) read_borders(F);
+#ifdef USE_UGROUPS
+		if (global.data_version >= UGROUPS_VERSION) read_ugroups(F);
+#endif
 #if defined(OLD_TRIGGER) || defined(CONVERT_TRIGGER)
 		if (global.data_version >= TIMEOUT_VERSION) load_timeouts(F);
 #endif
@@ -1459,6 +1543,7 @@ readgame(boolean backup)
 		}
 	}
 #endif
+	fclose(F);
 #ifdef AMIGA
 	fputs("Ok.", stderr);
 #endif
@@ -1503,10 +1588,43 @@ readgame(boolean backup)
 			u->faction->alive = 1;
 		}
 	}
-	fclose(F);
 	if(findfaction(0)) {
 		findfaction(0)->alive = 1;
 	}
+
+	/* Regionen */
+	for (r=regions;r;r=r->next) {
+		building ** bp;
+#if 0
+		unit ** up;
+		ship ** sp;
+
+		a_age(&r->attribs);
+		handle_event(&r->attribs, "create", r);
+		/* Einheiten */
+		for (up=&r->units;*up;) {
+			unit * u = *up;
+			a_age(&u->attribs);
+			if (u==*up) handle_event(&u->attribs, "create", u);
+			if (u==*up) up = &(*up)->next;
+		}
+		/* Schiffe */
+		for (sp=&r->ships;*sp;) {
+			ship * s = *sp;
+			a_age(&s->attribs);
+			if (s==*sp) handle_event(&s->attribs, "create", s);
+			if (s==*sp) sp = &(*sp)->next;
+		}
+#endif
+		/* Gebäude */
+		for (bp=&r->buildings;*bp;) {
+			building * b = *bp;
+			a_age(&b->attribs);
+			if (b==*bp) handle_event(&b->attribs, "create", b);
+			if (b==*bp) bp = &(*bp)->next;
+		}
+	}
+
 	return 0;
 }
 /* ------------------------------------------------------------- */
@@ -1560,6 +1678,34 @@ write_items(FILE *F, item *ilist)
 	fputs("end", F);
 }
 
+#ifdef USE_UGROUPS
+void
+write_ugroups(FILE *file)
+{
+	faction *f;
+	ugroup *ug;
+	int i;
+
+	for(f=factions; f; f=f->next) if(f->ugroups) {
+		wi(file, f->no);
+		wspace(file);
+		for(ug = f->ugroups; ug; ug=ug->next) {
+			wi(file, ug->id);
+			wspace(file);
+			wi(file, ug->members);
+			wspace(file);
+			for(i=0; i<ug->members; i++) {
+				wid(file, ug->unit_array[i]->no);
+				wspace(file);
+			}
+		}
+		fputs("-1\n", file);
+	}
+	fputs("-1\n", file);
+}
+#endif
+
+#ifdef USE_PLAYERS
 static void
 export_players(const char * path)
 {
@@ -1601,6 +1747,7 @@ export_players(const char * path)
 	}
 	fclose(F);
 }
+#endif
 
 void
 writegame(char *path, char quiet)
@@ -1617,11 +1764,12 @@ writegame(char *path, char quiet)
 	strlist *S;
 	const herb_type *rht;
 	FILE * F;
+#ifdef USE_PLAYERS
 	char playerfile[MAX_PATH];
 
 	sprintf(buf, "%s/%d.players", datapath(), turn);
 	export_players(playerfile);
-
+#endif
 	write_dynamictypes();
 
 	F = cfopen(path, "w");
@@ -1678,11 +1826,7 @@ writegame(char *path, char quiet)
 
 	printf(" - Schreibe %d Parteien...\n",n);
 	for (f = factions; f; f = f->next) {
-#if RELEASE_VERSION>= FULL_BASE36_VERSION
 		wid(F, f->no);
-#else
-		wi(F, f->no);
-#endif
 		wspace(F);
 		wi(F, f->unique_id);
 		wspace(F);
@@ -1702,7 +1846,7 @@ writegame(char *path, char quiet)
 		wspace(F);
 		wi(F, f->age);
 		wspace(F);
-		wi(F, f->race);
+		ws(F, f->race->_name[0]);
 		wnl(F);
 		wi(F, f->magiegebiet);
 		wspace(F);
@@ -1734,28 +1878,17 @@ writegame(char *path, char quiet)
 		wnl(F);
 #endif
 
-#if RELEASE_VERSION < 79
-		for (i = 0; i != MAXPOTIONS; i++) {
-			wspace(F);
-			wi(F, f->showpotion[i]);
-		}
-		wnl(F);
-#endif
 		wi(F, listlen(f->allies));
 		for (sf = f->allies; sf; sf = sf->next) {
 			int no = (sf->faction!=NULL)?sf->faction->no:0;
 			wspace(F);
-#if RELEASE_VERSION>= FULL_BASE36_VERSION
 			wid(F, no);
-#else
-			wi(F, no);
-#endif
 			wspace(F);
 			wi(F, sf->status);
 		}
 		wnl(F);
 #if RELEASE_VERSION>=GROUPS_VERSION
-	write_groups(F, f->groups);
+		write_groups(F, f->groups);
 #endif
 	}
 
@@ -1801,11 +1934,44 @@ writegame(char *path, char quiet)
 			struct demand * demand;
 			ws(F, r->land->name);
 			wspace(F);
+#ifdef GROWING_TREES
+			wi(F, rtrees(r,0));
+			wspace(F);
+			wi(F, rtrees(r,1));
+			wspace(F);
+			wi(F, rtrees(r,2));
+			wspace(F);
+#else
 			wi(F, rtrees(r));
 			wspace(F);
+#endif
 			wi(F, rhorses(r));
 			wspace(F);
+#ifndef NEW_RESOURCEGROWTH
 			wi(F, riron(r));
+#elif RELEASE_VERSION>=NEWRESOURCE_VERSION
+			{
+				rawmaterial * res = r->resources;
+				while (res) {
+					ws(F, res->type->name);
+					wspace(F);
+					wi(F, res->level);
+					wspace(F);
+					wi(F, res->amount);
+					wspace(F);
+					wi(F, res->startlevel);
+					wspace(F);
+					wi(F, res->base);
+					wspace(F);
+					wi(F, res->divisor);
+					wspace(F);
+					res = res->next;
+				}
+				ws(F, "end");
+			}
+#else
+			assert(!"invalid defines");
+#endif
 			wspace(F);
 			rht =  rherbtype(r);
 			if (rht) {
@@ -1834,11 +2000,7 @@ writegame(char *path, char quiet)
 		wi(F, listlen(r->buildings));
 		wnl(F);
 		for (b = r->buildings; b; b = b->next) {
-#if RELEASE_VERSION>= FULL_BASE36_VERSION
 			wid(F, b->no);
-#else
-			wi(F, b->no);
-#endif
 			wspace(F);
 			ws(F, b->name);
 			wspace(F);
@@ -1862,11 +2024,7 @@ writegame(char *path, char quiet)
 		wnl(F);
 		for (sh = r->ships; sh; sh = sh->next) {
 			assert(sh->region == r);
-#if RELEASE_VERSION>= FULL_BASE36_VERSION
 			wid(F, sh->no);
-#else
-			wi(F, sh->no);
-#endif
 			wspace(F);
 			ws(F, sh->name);
 			wspace(F);
@@ -1879,10 +2037,8 @@ writegame(char *path, char quiet)
 #endif
 			wspace(F);
 			wi(F, sh->size);
-#if RELEASE_VERSION > 76
 			wspace(F);
 			wi(F, sh->damage);
-#endif
 			wspace(F);
 			wi(F, sh->coast);
 			wnl(F);
@@ -1896,34 +2052,23 @@ writegame(char *path, char quiet)
 			skill_t sk;
 			wid(F, u->no);
 			wspace(F);
-#if RELEASE_VERSION>= FULL_BASE36_VERSION
 			wid(F, u->faction->no);
-#else
-			wi(F, u->faction->no);
-#endif
 			wspace(F);
 			ws(F, u->name);
 			wspace(F);
 			ws(F, u->display);
 			wspace(F);
-#ifndef NDEBUG
-			if (u->race != RC_SPELL)
-				assert(u->number == u->debug_number);
-#endif
+			assert(old_race(u->race) == RC_SPELL || u->number == u->debug_number);
 			wi(F, u->number);
 			wspace(F);
 			wi(F, u->age);
 			wspace(F);
-			wi(F, u->race);
+			ws(F, u->race->_name[0]);
 			wspace(F);
-			wi(F, u->irace);
+			ws(F, u->irace!=u->race?u->irace->_name[0]:"");
 			wspace(F);
 			if (u->building)
-#if RELEASE_VERSION>= FULL_BASE36_VERSION
 				wid(F, u->building->no);
-#else
-				wi(F, u->building->no);
-#endif
 			else
 				wi(F, 0);
 			wspace(F);
@@ -1964,7 +2109,7 @@ writegame(char *path, char quiet)
 			if (get_money(u) < 0)
 				printf("Einheit %s hat %d silber", unitname(u), get_money(u));
 #else
-			assert(u->race != NORACE);
+			assert(u->race);
 #endif
 
 			for (sk = 0; sk != MAXSKILLS; sk++) {
@@ -2016,6 +2161,10 @@ writegame(char *path, char quiet)
 	wnl(F);
 	write_borders(F);
 	wnl(F);
+#if RELEASE_VERSION >= UGROUPS_VERSION
+	write_ugroups(F);
+	wnl(F);
+#endif
 #ifdef OLD_TRIGGER
 	save_timeouts(F);
 #endif

@@ -87,7 +87,6 @@ static resource_type rt_lmsreward = {
 item_type it_lmsreward = {
 	&rt_lmsreward,           /* resourcetype */
 	ITF_NOTLOST|ITF_CURSED, 0, 0,       /* flags, weight, capacity */
-	0, NOSKILL,              /* minskill, skill */
 	NULL,                    /* construction */
 	NULL,	/* anstelle von use_lmsreward */
 /*	&use_lmsreward, */

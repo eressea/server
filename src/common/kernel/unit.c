@@ -104,14 +104,14 @@ destroy_unit(unit * u)
 
 	if (!ufindhash(u->no)) return;
 
-	if (u->race != RC_ILLUSION && u->race != RC_SPELL) {
+	if (!fval(u->race, RCF_ILLUSIONARY)) {
 		item ** p_item = &u->items;
 		unit * u3;
 
 		u->faction->no_units--;
 
 		if (r) for (u3 = r->units; u3; u3 = u3->next) {
-			if (u3 != u && u3->faction == u->faction && !race[u3->race].nonplayer) {
+			if (u3 != u && u3->faction == u->faction && playerrace(u3->race)) {
 				i_merge(&u3->items, &u->items);
 				u->items = NULL;
 				break;
@@ -168,7 +168,7 @@ destroy_unit(unit * u)
 	if (zombie) {
 		u_setfaction(u, findfaction(MONSTER_FACTION));
 		scale_number(u, 1);
-		u->race = u->irace = RC_ZOMBIE;
+		u->race = u->irace = new_race[RC_ZOMBIE];
 	} else {
 		if (r && rterrain(r) != T_OCEAN)
 			rsetmoney(r, rmoney(r) + get_money(u));
@@ -649,26 +649,26 @@ leave(struct region * r, unit * u)
 	unused(r);
 }
 
-const struct race_type * 
+const struct race * 
 urace(const struct unit * u)
 {
-	return &race[u->race];
+	return u->race;
 }
 
 boolean
 can_survive(const unit *u, const region *r)
 {
   if (((terrain[rterrain(r)].flags & WALK_INTO)
-			&& (race[u->race].flags & RCF_WALK)) ||
+			&& (u->race->flags & RCF_WALK)) ||
 			((terrain[rterrain(r)].flags & SWIM_INTO)
-			&& (race[u->race].flags & RCF_SWIM)) ||
+			&& (u->race->flags & RCF_SWIM)) ||
 			((terrain[rterrain(r)].flags & FLY_INTO)
-			&& (race[u->race].flags & RCF_FLY))) {
+			&& (u->race->flags & RCF_FLY))) {
 
 		if (get_item(u, I_HORSE) && !(terrain[rterrain(r)].flags & WALK_INTO))
 			return false;
 
-		if(is_undead(u) && is_cursed(r->attribs, C_HOLYGROUND, 0))
+		if (fval(u->race, RCF_UNDEAD) && is_cursed(r->attribs, C_HOLYGROUND, 0))
 			return false;
 
 		return true;
@@ -820,15 +820,15 @@ u_setfaction(unit * u, faction * f)
 
 /* vorsicht Sprüche können u->number == 0 (RS_FARVISION) haben! */
 void
-set_number (unit * u, int count)
+set_number(unit * u, int count)
 {
 	assert (count >= 0);
 #ifndef NDEBUG
 	assert (u->debug_number == u->number);
 	assert (u->faction != 0 || u->number > 0);
 #endif
-	if (u->faction && u->race != u->faction->race && !nonplayer(u)
-	    && u->race != RC_SPELL && u->race != RC_SPECIAL
+	if (u->faction && u->race != u->faction->race && playerrace(u->race)
+	    && old_race(u->race) != RC_SPELL && old_race(u->race) != RC_SPECIAL
 			&& !(is_cursed(u->attribs, C_SLAVE, 0))){
 		u->faction->num_migrants += count - u->number;
 	}

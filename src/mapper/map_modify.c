@@ -30,6 +30,7 @@
 #include <ship.h>
 #include <terrain.h>
 #include <unit.h>
+#include <resources.h>
 
 /* util includes */
 #include <base36.h>
@@ -243,25 +244,91 @@ addmenulist(menulist ** SP, const char *s, int *val)
 
 static int peasants, money, trees, horses, iron, laen, chaotisch;
 
+#ifdef GROWING_TREES
+static int ytrees, seeds;
+#endif
+
+#ifdef NEW_RESOURCEGROWTH
+static int ironlevel, laenlevel, stone, stonelevel;
+#endif
+
 static void
 get_region(region *r) {
+#ifdef NEW_RESOURCEGROWTH
+	struct rawmaterial *res;
+#endif
+
 	peasants  = rpeasants(r);
 	money     = rmoney(r);
+#ifdef GROWING_TREES
+	trees     = rtrees(r,2);
+	ytrees    = rtrees(r,1);
+	seeds     = rtrees(r,0);
+#else
 	trees     = rtrees(r);
+#endif
 	horses    = rhorses(r);
+#ifdef NEW_RESOURCEGROWTH
+	iron = -1;
+	ironlevel = -1;
+	laen = -1;
+	laenlevel = -1;
+	stone = -1;
+	stonelevel = -1;
+	for (res=r->resources;res;res=res->next) {
+		const item_type * itype = resource2item(res->type->rtype);
+		if(itype == olditemtype[I_IRON]) {
+			iron = res->amount;
+			ironlevel = res->level + itype->construction->minskill - 1;
+		} else if(itype == olditemtype[I_LAEN]) {
+			laen = res->amount;
+			laenlevel = res->level + itype->construction->minskill - 1;
+		} else if(itype == olditemtype[I_STONE]) {
+			stone = res->amount;
+			stonelevel = res->level + itype->construction->minskill - 1;
+		}
+	}
+#else
 	iron      = riron(r);
 	laen      = rlaen(r);
+#endif
 	chaotisch = fval(r, RF_CHAOTIC);
 }
 
 static void
-put_region(region *r) {
+put_region(region *r) { 
+#ifdef NEW_RESOURCEGROWTH
+	struct rawmaterial *res;
+#endif
+
 	rsetpeasants(r, peasants);
 	rsetmoney(r,money);
+#ifdef GROWING_TREES
+	rsettrees(r,2,trees);
+	rsettrees(r,1,ytrees);
+	rsettrees(r,0,seeds);
+#else
 	rsettrees(r,trees);
+#endif
 	rsethorses(r, horses);
+#ifdef NEW_RESOURCEGROWTH
+	for (res=r->resources;res;res=res->next) {
+		const item_type * itype = resource2item(res->type->rtype);
+		if(itype == olditemtype[I_IRON]) {
+			res->amount = iron;
+			res->level = ironlevel - itype->construction->minskill + 1;
+		} else if(itype == olditemtype[I_LAEN]) {
+			res->amount = laen;
+			res->level = laenlevel - itype->construction->minskill + 1;
+		} else if(itype == olditemtype[I_STONE]) {
+			res->amount = stone;
+			res->level = stonelevel - itype->construction->minskill + 1;
+		}
+	}
+#else
 	rsetiron(r, iron);
 	rsetlaen(r, laen);
+#endif
 	if (chaotisch) fset(r, RF_CHAOTIC); else freset(r, RF_CHAOTIC);
 }
 
@@ -278,25 +345,40 @@ create_region_menu(menulist ** menu, region * r)
 
 	addmenulist(menu, "Peasants", &peasants);
 	addmenulist(menu, "Silver", &money);
-	if (fval(r, RF_MALLORN))
+	if (fval(r, RF_MALLORN)) {
 		addmenulist(menu, "Mallorntrees", &trees);
-	else
-		addmenulist(menu, "Bäume", &trees);
+#ifdef GROWING_TREES
+		addmenulist(menu, "Mallornsprouts", &ytrees);
+		addmenulist(menu, "Mallornseeds", &seeds);
+#endif
+	} else {
+		addmenulist(menu, "Trees", &trees);
+#ifdef GROWING_TREES
+		addmenulist(menu, "Sprouts", &ytrees);
+		addmenulist(menu, "Seeds", &seeds);
+#endif
+	}
 	addmenulist(menu, "Horses", &horses);
 #ifdef NEW_RESOURCEGROWTH
-	if(a_find(r->attribs, &at_iron)) {
+	if(iron != -1) {
 		addmenulist(menu, "Iron", &iron);
-  }
-	if(a_find(r->attribs, &at_laen)) {
+		addmenulist(menu, "Ironlevel", &ironlevel);
+	}
+	if(laen != -1) {
 		addmenulist(menu, "Laen", &laen);
-  }
+		addmenulist(menu, "Laenlevel", &laenlevel);
+	}
+	if(stone != -1) {
+		addmenulist(menu, "Stone", &stone);
+		addmenulist(menu, "Stonelevel", &stonelevel);
+	}
 #else
 	if (r->terrain == T_MOUNTAIN || r->terrain == T_GLACIER) {
 		addmenulist(menu, "Iron", &iron);
 		addmenulist(menu, "Laen", &laen);
 	}
 #endif
-	addmenulist(menu, "Chaos-Faktor", &chaotisch);
+	addmenulist(menu, "Chaos-Factor", &chaotisch);
 
 	if (r->planep) {
 		strcpy(buf,"Plane: ");
@@ -308,7 +390,7 @@ create_region_menu(menulist ** menu, region * r)
 		sncat(buf, ")", BUFSIZE);
 		addmenulist(menu, buf, 0);
 	}
-	strcpy(buf, "Burgen:");
+	strcpy(buf, "Buildings:");
 	if (!r->buildings) {
 		sncat(buf, " keine", BUFSIZE);
 		addmenulist(menu, buf, 0);
@@ -331,7 +413,7 @@ create_region_menu(menulist ** menu, region * r)
 		}
 	}
 
-	strcpy(buf, "Schiffe:");
+	strcpy(buf, "Ships:");
 	if (!r->ships) {
 		sncat(buf, " keine", BUFSIZE);
 		addmenulist(menu, buf, 0);

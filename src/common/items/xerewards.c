@@ -24,6 +24,9 @@
 #include <message.h>
 #include <magic.h>
 
+/* util includes */
+#include <functions.h>
+
 /* libc includes */
 #include <assert.h>
 #include <string.h>
@@ -57,7 +60,6 @@ static resource_type rt_skillpotion = {
 item_type it_skillpotion = {
 	&rt_skillpotion,        /* resourcetype */
 	0, 0, 0,		/* flags, weight, capacity */
-	0, NOSKILL,             /* minskill, skill */
 	NULL,                   /* construction */
 	&use_skillpotion,
 	NULL
@@ -95,7 +97,6 @@ static resource_type rt_manacrystal = {
 item_type it_manacrystal = {
 	&rt_manacrystal,        /* resourcetype */
 	0, 0, 0,		/* flags, weight, capacity */
-	0, NOSKILL,             /* minskill, skill */
 	NULL,                   /* construction */
 	&use_manacrystal,
 	NULL
@@ -103,9 +104,11 @@ item_type it_manacrystal = {
 
 
 void
-init_xerewards(void)
+register_xerewards(void)
 {
 	it_register(&it_skillpotion);
 	it_register(&it_manacrystal);
+	register_function((pf_generic)use_skillpotion, "useskillpotion");
+	register_function((pf_generic)use_manacrystal, "usemanacrystal");
 }
 

@@ -75,15 +75,6 @@ arena_tower(int magic) {
 	return arena_region(magic)->buildings;
 }
 
-static boolean
-give_igjarjuk(const unit * src, const unit * d, const item_type * itype, int n, const char * cmd)
-{
-	sprintf(buf, "Eine höhere Macht hindert %s daran, das Objekt zu übergeben. "
-			"'ES IST DEINS, MEIN KIND. DEINS GANZ ALLEIN'.", unitname(src));
-	mistake(src, cmd, buf, MSG_COMMERCE);
-	return false;
-}
-
 static int
 leave_fail(unit * u) {
 	sprintf(buf, "Der Versuch, die Greifenschwingen zu benutzen, schlug fehl. %s konnte die Ebene der Herausforderung nicht verlassen.", unitname(u));
@@ -112,7 +103,6 @@ static resource_type rt_gryphonwing = {
 static item_type it_gryphonwing = {
 	&rt_gryphonwing,           /* resourcetype */
 	ITF_NOTLOST|ITF_CURSED, 0, 0,       /* flags, weight, capacity */
-	0, NOSKILL,              /* minskill, skill */
 	NULL,                    /* construction */
 	&leave_arena,
 	&give_igjarjuk
@@ -180,7 +170,6 @@ static resource_type rt_arenagate = {
 static item_type it_arenagate = {
 	&rt_arenagate,           /* resourcetype */
 	ITF_NONE, 0, 0,          /* flags, weight, capacity */
-	0, NOSKILL,              /* minskill, skill */
 	NULL,                    /* construction */
 	&enter_arena
 };
@@ -218,7 +207,7 @@ init_wand_of_tears(void)
 	if (itype==NULL) {
 		/* Dieser Teil kann, nachdem sie ausgeteilt wurden, gänzlich verschwinden. */
 		resource_type * rtype = new_resourcetype(names, appearances, RTF_DYNAMIC|RTF_ITEM);
-		itype = new_itemtype(rtype, ITF_DYNAMIC|ITF_NOTLOST, 1, 0, 0, NOSKILL);
+		itype = new_itemtype(rtype, ITF_DYNAMIC|ITF_NOTLOST, 1, 0);
 		itype->use = use_wand_of_tears;
 		for (i=0;i!=6;++i) {
 			unit * u = tower_region[i]->units;
@@ -245,7 +234,7 @@ age_hurting(attrib * a) {
 			}
 		}
 	}
-	if (active) for (u=b->region->units;u;u=u->next) if (!nonplayer_race(u->faction->race)) {
+	if (active) for (u=b->region->units;u;u=u->next) if (playerrace(u->faction->race)) {
 		int i;
 		if (u->faction->magiegebiet!=M_CHAOS) {
 			for (i=0;i!=active;++i) u->hp = (u->hp+1) / 2; /* make them suffer, but not die */
@@ -323,8 +312,8 @@ tower_init(void)
 		attrib * a;
 		item * items;
 
-		i_add(&items, i_new(&it_gryphonwing))->number=1;
-		i_add(&items, i_new(&it_demonseye))->number=1;
+		i_add(&items, i_new(&it_gryphonwing, 1));
+		i_add(&items, i_new(&it_demonseye, 1));
 		a = a_add(&b->attribs, make_giveitem(b, items));
 
 		b->size = 10;
@@ -346,7 +335,7 @@ guardian_faction(plane * pl, int id)
 		for (i = 0; i < 4; i++) f->passw[i] = (char) (97 + rand() % 26);
 		f->email = strdup("igjarjuk@eressea-pbem.de");
 		f->name = strdup("Igjarjuks Kundschafter");
-		f->race = RC_ILLUSION;
+		f->race = new_race[RC_ILLUSION];
 		f->age = turn;
 		f->locale = find_locale("de");
 		f->options = want(O_COMPRESS) | want(O_REPORT) | want(O_COMPUTER) | want(O_ADRESSEN) | want(O_DEBUG);
@@ -354,7 +343,7 @@ guardian_faction(plane * pl, int id)
 		f->no = id;
 		addlist(&factions, f);
 	}
-	if (f->race != RC_ILLUSION) {
+	if (f->race != new_race[RC_ILLUSION]) {
 		assert(!"guardian id vergeben");
 		exit(0);
 	}
@@ -368,7 +357,7 @@ guardian_faction(plane * pl, int id)
 			if (u->faction==f) break;
 		}
 		if (u) continue;
-		u = createunit(r, f, 1, RC_GOBLIN);
+		u = createunit(r, f, 1, new_race[RC_GOBLIN]);
 		set_string(&u->name, "Igjarjuks Auge");
 		set_item(u, I_RING_OF_INVISIBILITY, 1);
 		u->thisorder = calloc(1, sizeof(char));
@@ -548,10 +537,12 @@ void
 init_arena(void)
 {
 	at_register(&at_hurting);
-	init_demonseye();
+	register_demonseye();
 	it_register(&it_arenagate);
 	it_register(&it_gryphonwing);
 	register_function((pf_generic)use_wand_of_tears, "use_wand_of_tears");
+	register_function((pf_generic)enter_arena, "enter_arena");
+	register_function((pf_generic)leave_arena, "leave_arena");
 	tt_register(&tt_caldera);
 }
 

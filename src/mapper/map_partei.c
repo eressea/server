@@ -266,8 +266,8 @@ SeedPartei(void)
 	do {
 		win = openwin(SX - 10, 6, "< Neue Partei einfügen >");
 		wmove(win, y, 4);
-		for (i = 1; i < MAXRACES; i++) if(!race[i].nonplayer) {
-			sprintf(buf, "%d=%s; ", i, race[i].name[0]);
+		for (i = 1; i < MAXRACES; i++) if(playerrace(new_race[i])) {
+			sprintf(buf, "%d=%s; ", i, new_race[i]->_name[0]);
 			q += strlen(buf);
 			if (q > SX - 20) {
 				q = strlen(buf);
@@ -279,7 +279,7 @@ SeedPartei(void)
 		rc = (race_t) map_input(win, 2, 1, "Rasse", 0, MAXRACES-1, rc);
 
 		delwin(win);
-	} while(race[i].nonplayer);
+	} while(!playerrace(new_race[i]));
 	return goodregion(rc);
 }
 
@@ -311,8 +311,8 @@ NeuePartei(region * r)
 	y = 3;
 	q = 0;
 	wmove(win, y, 4);
-	for (i = 0; i < MAXRACES; i++) if(!race[i].nonplayer) {
-	  sprintf(buf, "%d=%s; ", i, race[i].name[0]);
+	for (i = 0; i < MAXRACES; i++) if(playerrace(new_race[i])) {
+	  sprintf(buf, "%d=%s; ", i, new_race[i]->_name[0]);
 	  q += strlen(buf);
 	  if (q > SX - 20) {
 			q = strlen(buf);
@@ -326,7 +326,7 @@ NeuePartei(region * r)
 	y++;
 	do {
 		frace = (char) map_input(win, 2, y, "Rasse", -1, MAXRACES-1, 0);
-	} while(race[frace].nonplayer);
+	} while(!playerrace(new_race[frace]));
 	if(frace == -1) {
 		delwin(win);
 		return;
@@ -364,7 +364,7 @@ NeuePartei(region * r)
 	delwin(win);
 	modified = 1;
 
-	u = addplayer(r, email, frace, find_locale(locales[locale_nr]));
+	u = addplayer(r, email, new_race[frace], find_locale(locales[locale_nr]));
 
 	if(late) give_latestart_bonus(r, u, late);
 
@@ -385,7 +385,7 @@ ModifyPartei(faction * f)
 	sprintf(buf, "<%s >", factionname(f));
 	win = openwin(SX - 6, 12, buf);
 	wmove(win, 1, 2);
-	wprintw(win, (NCURSES_CONST char*)"Rasse: %s", race[f->race].name[1]);
+	wprintw(win, (NCURSES_CONST char*)"Rasse: %s", f->race->_name[1]);
 	wmove(win, 2, 2);
 	wprintw(win, (NCURSES_CONST char*)"Einheiten: %d", f->nunits);
 	wmove(win, 3, 2);
@@ -451,7 +451,7 @@ ModifyPartei(faction * f)
 			q = 0;
 			wmove(mywin, y, 4);
 			for (i = 1; i < MAXRACES; i++) {
-				sprintf(buf, "%d=%s; ", i, race[i].name[0]);
+				sprintf(buf, "%d=%s; ", i, new_race[i]->_name[0]);
 				q += strlen(buf);
 				if (q > SX - 25) {
 					q = strlen(buf);
@@ -460,15 +460,15 @@ ModifyPartei(faction * f)
 				}
 				wAddstr(buf);
 			}
-			q = map_input(mywin, 2, 1, "Rasse", 1, MAXRACES-1, f->race);
+			q = map_input(mywin, 2, 1, "Rasse", 1, MAXRACES-1, old_race(f->race));
 			delwin(mywin);
 			touchwin(stdscr);
 			touchwin(win);
-			if (q != f->race) {
+			if (new_race[q] != f->race) {
 				modified = 1;
-				f->race = (char) q;
+				f->race = new_race[q];
 				wmove(win, 1, 2);
-				wprintw(win, (NCURSES_CONST char*)"Rasse: %s", race[f->race].name[1]);
+				wprintw(win, (NCURSES_CONST char*)"Rasse: %s", f->race->_name[1]);
 			}
 			refresh();
 			wrefresh(win);
@@ -535,10 +535,10 @@ ParteiListe(void)
 	for (f = factions->next; f; f = f->next) {
 	  if (SX > 104)
 		sprintf(buf, "%4s: %-30.30s %-12.12s %-24.24s", factionid(f),
-				f->name, race[f->race].name[1], f->email);
+				f->name, f->race->_name[1], f->email);
 	  else
 		sprintf(buf, "%4s: %-30.30s %-12.12s", factionid(f),
-				f->name, race[f->race].name[1]);
+				f->name, f->race->_name[1]);
 	  adddbllist(&P, buf);
 	}
 

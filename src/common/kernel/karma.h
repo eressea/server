@@ -35,6 +35,9 @@ typedef enum {
 	FS_JIHAD,
 	FS_UNDEAD,
 	FS_QUICK,
+	FS_LUCKY,
+	FS_LYCANTROP,
+	FS_ELITE,
 	MAXFACTIONSPECIALS
 } fspecial_t;
 
@@ -60,9 +63,9 @@ extern struct attrib_type at_jihad;
 
 extern struct fspecialdata fspecials[];
 
-int fspecial(const struct faction *f, fspecial_t special);
-void set_jihad(void);
-int jihad(struct faction *f, race_t race);
-void jihad_attacks(void);
+extern int fspecial(const struct faction *f, fspecial_t special);
+extern void set_jihad(void);
+extern int jihad(struct faction *, const struct race *);
+extern void jihad_attacks(void);
 
 #endif

@@ -208,7 +208,6 @@ int use_item_power(struct region * r, struct unit * u);
 int use_item_regeneration(struct region * r, struct unit * u);
 void showspells(struct region *r, struct unit *u);
 int sp_antimagiczone(struct castorder *co);
-int skillmod_familiar(const struct region *r, const struct unit *fam, skill_t sk);
 
 
 /* Kampfzauber */

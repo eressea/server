@@ -28,10 +28,11 @@ extern unsigned int locale_hashkey(const struct locale * lang);
 extern const char * locale_name(const struct locale * lang);
 
 extern const char * reverse_lookup(const struct locale * lang, const char * str);
+extern const char * mkname(const char * name, const char * space);
 
 extern void debug_language(const char * log);
 
-#define LOC(s,l) locale_string(s, l)
+#define LOC(lang, s) locale_string(lang, s)
 
 extern locale * default_locale;
 

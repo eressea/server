@@ -99,7 +99,7 @@ sp_summon_alp(struct castorder *co)
 	 * Regionsberichte von ihm.  Er erhält aber später eine Mitteilung,
 	 * sobald der Alp sein Opfer erreicht hat.
 	 */
-	alp = createunit(r, findfaction(MONSTER_FACTION), 1, RC_ALP);
+	alp = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_ALP]);
 	if (r==mage->region) {
 		alp->building = mage->building;
 		alp->ship = mage->ship;

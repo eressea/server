@@ -23,6 +23,8 @@
 
 /* attributes includes */
 #include <attributes/reduceproduction.h>
+#include <attributes/otherfaction.h>
+#include <attributes/racename.h>
 #include <attributes/gm.h>
 
 /* kernel includes */
@@ -55,6 +57,8 @@
 #include <umlaut.h>
 #include <translation.h>
 #include <crmessage.h>
+#include <sql.h>
+#include <xml.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -66,6 +70,7 @@
 #include <math.h>
 #include <limits.h>
 #include <time.h>
+#include <errno.h>
 
 /* exported variables */
 region  *regions;
@@ -73,6 +78,17 @@ faction *factions;
 settings global;
 char     buf[BUFSIZE + 1];
 FILE    *logfile;
+const struct race * new_race[MAXRACES];
+
+race_t 
+old_race(const struct race * rc)
+{
+	race_t i;
+	for (i=0;i!=MAXRACES;++i) {
+		if (new_race[i]==rc) return i;
+	}
+	return NORACE;
+}
 
 const char *directions[MAXDIRECTIONS+2] =
 {
@@ -106,6 +122,7 @@ const char *parameters[MAXPARAMS] =
 	"NICHT",
 	"NÄCHSTER",
 	"PARTEI",
+	"ERESSEA",
 	"PERSONEN",
 	"REGION",
 	"SCHIFF",
@@ -117,7 +134,7 @@ const char *parameters[MAXPARAMS] =
 	"GIB",			/* Für HELFE */
 	"KÄMPFE",
 	"BEWACHE",
-	"ZAUBERBUCH",
+	"ZAUBER",
 	"PAUSE",
 	"VORNE",
 	"AGGRESSIV",
@@ -133,7 +150,10 @@ const char *parameters[MAXPARAMS] =
 	"VOR",
 	"ANZAHL",
 	"GEGENSTÄNDE",
-	"TRÄNKE"
+	"TRÄNKE",
+	"GRUPPE",
+	"PARTEITARNUNG",
+	"BÄUME"
 };
 
 
@@ -196,9 +216,7 @@ const char *keywords[MAXKEYWORDS] =
 	"MAGIEGEBIET",
 	"PIRATERIE",
 	"NEUSTART",
-#ifdef GROUPS
 	"GRUPPE",
-#endif
 	"OPFERE",
 	"BETEN",
 	"SORTIEREN",
@@ -207,7 +225,12 @@ const char *keywords[MAXKEYWORDS] =
 	"INFO",
 #ifdef USE_UGROUPS
 	"JOINVERBAND",
-	"LEAVEVERBAND"
+	"LEAVEVERBAND",
+#endif
+	"PRÄFIX",
+	"SYNONYM",
+#ifdef GROWING_TREES
+	"PFLANZEN",
 #endif
 };
 
@@ -258,7 +281,7 @@ max_skill(faction * f, skill_t skill)
 	switch (skill) {
 	case SK_MAGIC:
 		m = MAXMAGICIANS;
-		if (f->race == RC_ELF) m += 1;
+		if (old_race(f->race) == RC_ELF) m += 1;
 		m += fspecial(f, FS_MAGOCRACY) * 2;
 		break;
 	case SK_ALCHEMY:
@@ -320,11 +343,18 @@ int
 shipcapacity (const ship * sh)
 {
 	int i;
-	assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
-	if (sh->size!=sh->type->construction->maxsize) return 0;
+
+	/* sonst ist construction:: size nicht ship_type::maxsize */
+	assert(!sh->type->construction || sh->type->construction->improvement==NULL);
+
+	if (sh->type->construction && sh->size!=sh->type->construction->maxsize)
+		return 0;
+
 #ifdef SHIPDAMAGE
-	i = ((sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE) * sh->type->cargo / sh->size;
-	i += ((sh->size * DAMAGE_SCALE - sh->damage) % DAMAGE_SCALE) * sh->type->cargo / (sh->size*DAMAGE_SCALE);
+	i = ((sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE)
+		* sh->type->cargo / sh->size;
+	i += ((sh->size * DAMAGE_SCALE - sh->damage) % DAMAGE_SCALE)
+		* sh->type->cargo / (sh->size*DAMAGE_SCALE);
 #else
 	i = sh->type->cargo;
 #endif
@@ -349,8 +379,8 @@ shipspeed (ship * sh, const unit * u)
 	if( is_cursed(sh->attribs, C_SHIP_NODRIFT, 0) )
 			k += 1;
 
-	if (u->faction->race == RC_AQUARIAN
-			&& u->race == RC_AQUARIAN)
+	if (old_race(u->faction->race) == RC_AQUARIAN
+			&& old_race(u->race) == RC_AQUARIAN)
 		k += 1;
 #ifdef SHIPSPEED
 	k *= SHIPSPEED;
@@ -496,7 +526,7 @@ verify_data (void)
 				log_warning(("Einheit %s hat %d Personen\n", unitid(u), u->number));
 			}
 		}
-		if (f->no != 0 && ((mage > 3 && f->race != RC_ELF) || mage > 4))
+		if (f->no != 0 && ((mage > 3 && old_race(f->race) != RC_ELF) || mage > 4))
 			log_error(("Partei %s hat %d Magier.\n", factionid(f), mage));
 		if (alchemist > 3)
 			log_error(("Partei %s hat %d Alchemisten.\n", factionid(f), alchemist));
@@ -605,7 +635,7 @@ findunitregion (const unit * su)
 #endif
 }
 
-char
+int
 effskill(const unit * u, skill_t sk)
 {
 	return eff_skill(u, sk, u->region);
@@ -645,7 +675,7 @@ scale_number (unit * u, int n)
 	const attrib * a;
 	int remain;
 
-	if (n== u->number) return;
+	if (n == u->number) return;
 	if (n && u->number) {
 		int full;
 		remain = ((u->hp%u->number) * (n % u->number)) % u->number;
@@ -700,6 +730,7 @@ unit_has_cursed_item(unit *u)
 	return false;
 }
 
+/* f hat zu f2 HELFE mode gesetzt */
 int
 isallied(const plane * pl, const faction * f, const faction * f2, int mode)
 {
@@ -736,7 +767,7 @@ alliance(const ally * sf, const faction * f, int mode)
 	return 0;
 }
 
-#ifdef GROUPS
+/* Die Gruppe von Einheit u hat helfe zu f2 gesetzt. */
 int
 allied(const unit * u, const faction * f2, int mode)
 {
@@ -766,16 +797,9 @@ allied(const unit * u, const faction * f2, int mode)
 	if (a) sf = ((group*)a->data.v)->allies;
 	return alliance(sf, f2, mode);
 }
-#else
-int
-allied(const unit * u, const faction * f, int mode)
-{
-	return isallied(rplane(u->region), u->faction, f, mode);
-}
-#endif
 
 boolean
-seefaction(faction * f, region * r, unit * u, int modifier)
+seefaction(const faction * f, const region * r, const unit * u, int modifier)
 {
 	if (((f == u->faction) || !fval(u, FL_PARTEITARNUNG)) && cansee(f, r, u, modifier))
 		return true;
@@ -792,7 +816,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 	boolean cansee = false;
 	unit *u2;
 	if (u->faction == f || omniscient(f)) cansee = true;
-	else if (u->race == RC_SPELL || u->number == 0) return false;
+	else if (old_race(u->race) == RC_SPELL || u->number == 0) return false;
 	else {
 		n = eff_stealth(u, r) - modifier;
 		for (u2 = r->units; u2; u2 = u2->next) {
@@ -850,7 +874,7 @@ cansee(faction * f, region * r, unit * u, int modifier)
 		maxskill=INT_MIN;
 	}
 #endif
-	if (u->race == RC_SPELL || u->number == 0) return false;
+	if (old_race(u->race) == RC_SPELL || u->number == 0) return false;
 	else {
 		boolean xcheck = false;
 		int o = INT_MIN;
@@ -888,7 +912,7 @@ cansee(faction * f, region * r, unit * u, int modifier)
 #endif
 
 boolean
-cansee_durchgezogen(faction * f, region * r, unit * u, int modifier)
+cansee_durchgezogen(const faction * f, const region * r, const unit * u, int modifier)
 /* r kann != u->region sein, wenn es um durchreisen geht */
 /* und es muss niemand aus f in der region sein, wenn sie vom Turm
  * erblickt wird */
@@ -896,7 +920,7 @@ cansee_durchgezogen(faction * f, region * r, unit * u, int modifier)
 	int n;
 	boolean cansee = false;
 	unit *u2;
-	if (u->race == RC_SPELL || u->number == 0) return false;
+	if (old_race(u->race) == RC_SPELL || u->number == 0) return false;
 	else if (u->faction == f) cansee = true;
 	else {
 
@@ -1006,8 +1030,8 @@ count_all(const faction * f)
 	int n = 0;
 	unit *u;
 	for (u=f->units;u;u=u->nextF)
-		if (!nonplayer(u)) {
-			n+=u->number;
+		if (playerrace(u->race)) {
+			n += u->number;
 			assert(f==u->faction);
 		}
 	return n;
@@ -1017,30 +1041,13 @@ int
 count_maxmigrants(const faction * f)
 {
 	int x = 0;
-	if (f->race == RC_HUMAN) {
+	if (old_race(f->race) == RC_HUMAN) {
 		x = (int)(log10(count_all(f) / 50.0) * 20);
 		if (x < 0) x = 0;
 	}
 	return x;
 }
 
-race_t
-findrace(const char *s)
-{
-	race_t i;
-	int n;
-
-	if (!s[0]) return NORACE;
-
-	n = strlen(s);
-
-	for (i = 0; i != MAXRACES; i++)
-		if (!strncasecmp(s, race[i].name[0], n) ||
-		    !strncasecmp(s, race[i].name[1], n)) {
-			return (race_t) i;
-		}
-	return NORACE;
-}
 /*------------------------------------------------------------------*/
 
 /* GET STR, I zur Eingabe von Daten liest diese aus dem Buffer, der beim ersten
@@ -1114,7 +1121,6 @@ findstr(const char **v, const char *s, unsigned char n)
 	return -1;
 }
 
-
 enum {
 	UT_NONE,
 	UT_PARAM,
@@ -1130,6 +1136,9 @@ static struct lstr {
 	struct tnode tokens[UT_MAX];
 	struct tnode skillnames;
 	struct tnode keywords;
+	struct tnode races;
+	struct tnode directions;
+	struct tnode options;
 	struct lstr * next;
 } * lstrs;
 
@@ -1150,6 +1159,30 @@ get_lnames(const struct locale * lang)
 		}
 	}
 	return lnames;
+}
+
+const struct race * 
+findrace(const char * s, const struct locale * lang)
+{
+	struct lstr * lnames = get_lnames(lang);
+	const struct race * rc;
+
+	if (findtoken(&lnames->races, s, (void **)&rc)==E_TOK_SUCCESS) {
+		return rc;
+	}
+	return NULL;
+}
+
+int
+findoption(const char *s, const struct locale * lang)
+{
+	struct lstr * lnames = get_lnames(lang);
+	int dir;
+
+	if (findtoken(&lnames->options, s, (void**)&dir)==E_TOK_SUCCESS) {
+		return (direction_t)dir;
+	}
+	return NODIRECTION;
 }
 
 skill_t
@@ -1591,55 +1624,101 @@ newcontainerid(void)
 	return random_no;
 }
 
-unit *
-createunitid(region * r1, faction * f, int number, race_t race, int id, const char * dname)
+void
+createunitid(unit *u, int id)
 {
-	char name[16];
-	unit * u = calloc(1, sizeof(unit));
-
-	assert(f->alive);
-	u_setfaction(u, f);
-	set_string(&u->thisorder, "");
-	set_string(&u->lastorder, locale_string(u->faction->locale, keywords[K_WORK]));
-	u_seteffstealth(u, -1);
-	u->race = race;
-	u->irace = race;
-	u->hp = unit_max_hp (u) * number;
-	u->status = ST_FIGHT;
-	set_number (u, number);
-
 	if (id<=0 || id > MAX_UNIT_NR || ufindhash(id) || dfindhash(id) || forbiddenid(id))
 		u->no = newunitid();
 	else
 		u->no = id;
 	uhash(u);
+}
+
+unit *
+createunit(region * r, faction * f, int number, const struct race * rc)
+{
+	return create_unit(r, f, number, rc, 0, NULL, NULL);
+}
+
+unit *
+create_unit(region * r, faction * f, int number, const struct race *urace, int id, const char * dname, unit *creator)
+{
+	unit * u = calloc(1, sizeof(unit));
+
+	assert(f->alive);
+	u_setfaction(u, f);
+	set_string(&u->thisorder, "");
+	set_string(&u->lastorder, LOC(u->faction->locale, keywords[K_WORK]));
+	u_seteffstealth(u, -1);
+	u->race = urace;
+	u->irace = urace;
+
+	set_number(u, number);
+
+	/* die nummer der neuen einheit muss vor name_unit generiert werden,
+	 * da der default name immer noch 'Nummer u->no' ist */
+	createunitid(u, id);
+
+	/* zuerst in die Region setzen, da zb Drachennamen den Regionsnamen
+	 * enthalten */
+	move_unit(u, r, NULL);
+
+	/* u->race muss bereits gesetzt sein, wird für default-hp gebraucht */
+	/* u->region auch */
+	u->hp = unit_max_hp(u) * number;
 
 	if (!dname) {
-		sprintf(name, "Nummer %s", itoa36(u->no));
-		set_string(&u->name, name);
+		name_unit(u);
 	}
 	else set_string(&u->name, dname);
 	set_string(&u->display, "");
-	fset(u, FL_UNNAMED);
-	move_unit(u, r1, NULL);
 
 	/* Nicht zu der Einheitenzahl zählen sollten auch alle Monster. Da
 	 * aber auf die MAXUNITS nur in MACHE TEMP geprüft wird, ist es egal */
-	if(!is_undead(u)) {
+	if(!fval(u->race, RCF_UNDEAD)) {
 		f->no_units++;
 	}
 
+	if (creator){
+		attrib * a;
+
+		/* erbt Kampfstatus */
+		u->status = creator->status;
+
+		/* erbt Gebäude/Schiff*/
+		if (creator->region==r) {
+			u->building = creator->building;
+			u->ship = creator->ship;
+		}
+
+		/* Temps von parteigetarnten Einheiten sind wieder parteigetarnt */
+		if (fval(creator, FL_PARTEITARNUNG))
+			fset(u, FL_PARTEITARNUNG);
+
+		/* Daemonentarnung */
+		set_racename(&u->attribs, get_racename(creator->attribs));
+		if (fval(creator->race, RCF_SHAPESHIFT)) {
+			u->irace = creator->irace;
+		}
+
+		/* Gruppen */
+		a = a_find(creator->attribs, &at_group);
+		if (a) {
+			group * g = (group*)a->data.v;
+			a_add(&u->attribs, a_new(&at_group))->data.v = g;
+		}
+		a = a_find(creator->attribs, &at_otherfaction);
+		if (a){
+			attrib *an = a_add(&u->attribs, a_new(&at_otherfaction));
+			an->data.i = a->data.i;
+		}
+	}
 	/* Monster sind grundsätzlich parteigetarnt */
 	if(f->no <= 0) fset(u, FL_PARTEITARNUNG);
 
 	return u;
 }
 
-unit *
-createunit(region * r1, faction * f, int number, race_t race)
-{
-	return createunitid(r1, f, number, race, 0, NULL);
-}
 /* Setzt Default Befehle -------------------------------------- */
 
 boolean
@@ -1652,7 +1731,12 @@ idle (faction * f)
 int
 maxworkingpeasants(const struct region * r)
 {
+#ifdef GROWING_TREES
+	int i = production(r) * MAXPEASANTS_PER_AREA
+		- ((rtrees(r,2)+rtrees(r,1)/2) * TREESIZE);
+#else
 	int i = production(r) * MAXPEASANTS_PER_AREA - rtrees(r) * TREESIZE;
+#endif
 	return max(i, 0);
 }
 
@@ -1874,16 +1958,67 @@ static const t_umlaut umlaut[] = {
 #endif
 
 static void
+init_directions(tnode * root, const struct locale * lang)
+{
+	/* mit dieser routine kann man mehrere namen für eine direction geben,
+	 * das ist für die hexes ideal. */
+	const struct {
+		const char* name;
+		int direction;
+	} dirs [] = {
+		{ "dir_ne", D_NORTHEAST},
+		{ "dir_nw", D_NORTHWEST},
+		{ "dir_se", D_SOUTHEAST},
+		{ "dir_sw", D_SOUTHWEST},
+		{ "dir_east", D_EAST},
+		{ "dir_west", D_WEST},
+		{ "northeast", D_NORTHEAST},
+		{ "northwest", D_NORTHWEST},
+		{ "southeast", D_SOUTHEAST},
+		{ "southwest", D_SOUTHWEST},
+		{ "east", D_EAST },
+		{ "west",D_WEST },
+		{ "PAUSE", D_PAUSE },
+		{ NULL, NODIRECTION}
+	};
+	int i;
+	struct lstr * lnames = get_lnames(lang);
+	for (i=0; dirs[i].direction!=NODIRECTION;++i) {
+		addtoken(&lnames->directions, LOC(lang, dirs[i].name), (void*)dirs[i].direction);
+	}
+}
+
+direction_t
+finddirection(const char *s, const struct locale * lang)
+{
+	struct lstr * lnames = get_lnames(lang);
+	int dir;
+
+	if (findtoken(&lnames->directions, s, (void**)&dir)==E_TOK_SUCCESS) {
+		return (direction_t)dir;
+	}
+	return NODIRECTION;
+}
+
+static void
 init_tokens(const struct locale * lang)
 {
 	struct lstr * lnames = get_lnames(lang);
 	int i;
+	const struct race * rc;
+
+	init_directions(&lnames->directions, lang);
+	for (rc=races;rc;rc=rc->next) {
+		addtoken(&lnames->races, LOC(lang, rc_name(rc, 1)), (void*)rc);
+	}
 	for (i=0;i!=MAXPARAMS;++i)
-		addtoken(&lnames->tokens[UT_PARAM], locale_string(lang, parameters[i]), (void*)i);
+		addtoken(&lnames->tokens[UT_PARAM], LOC(lang, parameters[i]), (void*)i);
 	for (i=0;i!=MAXSKILLS;++i)
 		addtoken(&lnames->skillnames, skillname(i, lang), (void*)i);
 	for (i=0;i!=MAXKEYWORDS;++i)
-		addtoken(&lnames->keywords, locale_string(lang, keywords[i]), (void*)i);
+		addtoken(&lnames->keywords, LOC(lang, keywords[i]), (void*)i);
+	for (i=0;i!=MAXOPTIONS;++i)
+		addtoken(&lnames->options, LOC(lang, options[i]), (void*)i);
 #if 0
 	for (i=0;umlaut[i].txt;++i)
 		addtoken(&lnames->tokens[umlaut[i].typ], umlaut[i].txt, (void*)umlaut[i].id);
@@ -1899,6 +2034,7 @@ kernel_done(void)
 	translation_done();
 	skill_done();
 	gc_done();
+	sql_done();
 }
 
 static void
@@ -1930,6 +2066,7 @@ read_strings(FILE * F)
 }
 
 const char * messages[] = {
+	"%s/%s/strings.xml",
 	"%s/%s/messages.xml",
 	NULL
 };
@@ -1944,15 +2081,68 @@ const char * locales[] = {
 	NULL
 };
 
-void
-init_locales(void)
+static int read_xml(const char * filename);
+
+static int 
+parse_tagbegin(struct xml_stack *stack, void *data)
 {
+	const xml_tag * tag = stack->tag;
+	if (strcmp(tag->name, "include")==0) {
+		const char * filename = xml_value(tag, "file");
+		if (filename) {
+			return read_xml(filename);
+		} else {
+			log_printf("required tag 'file' missing from include");
+			return XML_USERERROR;
+		}
+	} else if (strcmp(tag->name, "races")==0) {
+		read_races(stack->stream, stack);
+	} else if (strcmp(tag->name, "strings")==0) {
+		return read_messages(stack->stream, stack);
+	} else if (strcmp(tag->name, "messages")==0) {
+		return read_messages(stack->stream, stack);
+	}
+	return XML_OK;
+}
+
+static xml_callbacks msgcallback = {
+	NULL,
+	parse_tagbegin,
+	NULL,
+	NULL
+};
+
+static int
+read_xml(const char * filename)
+{
+	char zText[80];
 	FILE * F;
-	int l;
+	int i;
+	sprintf(zText, "%s/%s", resourcepath(), filename);
+	F = fopen(zText, "r+");
+	if (F==NULL) {
+		log_printf("could not open %s: %s\n", zText, strerror(errno));
+		return XML_USERERROR;
+	}
+
+	i = xml_parse(F, &msgcallback, NULL, NULL);
+	fclose(F);
+	return i;
+}
+
+int
+init_data(const char * filename)
+{
+	int l = read_xml(filename);
+
+	if (l) return l;
+
+	/* old stuff, for removal: */
 	for (l=0;locales[l];++l) {
 		char zText[MAX_PATH];
 		int i;
 		for (i=0;strings[i];++i) {
+			FILE * F;
 			sprintf(zText, strings[i], resourcepath(), locales[l]);
 			F = fopen(zText, "r+");
 			if (F) {
@@ -1961,20 +2151,17 @@ init_locales(void)
 			} else {
 				sprintf(buf, "fopen(%s): ", zText);
 				perror(buf);
-			}
-		}
-		for (i=0;messages[i];++i) {
-			sprintf(zText, messages[i], resourcepath(), locales[l]);
-			F = fopen(zText, "r+");
-			if (F) {
-				read_messages(F, NULL);
-				fclose(F);
-			} else {
-				sprintf(buf, "fopen(%s): ", zText);
-				perror(buf);
+				return 1;
 			}
 		}
 	}
+	return 0;
+}
+
+void
+init_locales(void)
+{
+	int l;
 	for (l=0;locales[l];++l) {
 		const struct locale * lang = find_locale(locales[l]);
 		if (lang) init_tokens(lang);
@@ -1984,6 +2171,16 @@ init_locales(void)
 /* TODO: soll hier weg */
 extern building_type bt_caldera;
 extern attrib_type at_traveldir_new;
+
+attrib_type at_germs = {
+	"germs",
+	DEFAULT_INIT,
+	DEFAULT_FINALIZE,
+	DEFAULT_AGE,
+	DEFAULT_WRITE,
+	DEFAULT_READ,
+	ATF_UNIQUE
+};
 
 void
 attrib_init(void)
@@ -2013,6 +2210,7 @@ attrib_init(void)
 
 	/* Schiffstypen registrieren: */
 	st_register(&st_boat);
+	st_register(&st_balloon);
 	st_register(&st_longboat);
 	st_register(&st_dragonship);
 	st_register(&st_caravelle);
@@ -2025,6 +2223,8 @@ attrib_init(void)
 	at_register(&at_traveldir_new);
 	at_register(&at_familiar);
 	at_register(&at_familiarmage);
+	at_register(&at_clone);
+	at_register(&at_clonemage);
 	at_register(&at_eventhandler);
 	at_register(&at_stealth);
 	at_register(&at_mage);
@@ -2049,7 +2249,6 @@ attrib_init(void)
 	at_register(&at_deathcount);
 	at_register(&at_chaoscount);
 	at_register(&at_woodcount);
-	at_register(&at_laen);
 	at_register(&at_road);
 
 	/* neue UNIT-Attribute */
@@ -2092,11 +2291,17 @@ attrib_init(void)
 	at_register(&at_events);
 #endif
 	at_register(&at_jihad);
+	at_register(&at_skillmod);
+#ifdef GROWING_TREES
+	at_register(&at_germs);
+#endif
+	at_register(&at_laen); /* required for old datafiles */
 }
 
 void
 kernel_init(void)
 {
+	char zBuffer[MAX_PATH];
 	skill_init();
 	attrib_init();
 	translation_init();
@@ -2106,6 +2311,9 @@ kernel_init(void)
 		srand(time((time_t *) NULL));
 	else
 		srand(turn);
+
+	sprintf(zBuffer, "%s/patch-%d.sql", datapath(), turn);
+	sql_init(zBuffer);
 }
 
 /*********************/
@@ -2178,10 +2386,8 @@ remove_empty_factions(void)
 			fprintf(dofp, "%s\n", f->email);
 
 			for (f3 = factions; f3; f3 = f3->next) {
-#ifdef GROUPS
 				ally * sf;
 				group * g;
-#endif
 				ally ** sfp = &f3->allies;
 				while (*sfp) {
 					sf = *sfp;
@@ -2191,7 +2397,6 @@ remove_empty_factions(void)
 					}
 					else sfp = &(*sfp)->next;
 				}
-#ifdef GROUPS
 				for (g = f3->groups; g; g=g->next) {
 					sfp = &g->allies;
 					while (*sfp) {
@@ -2203,7 +2408,6 @@ remove_empty_factions(void)
 						else sfp = &(*sfp)->next;
 					}
 				}
-#endif
 			}
 			stripfaction(f);
 			*fp = f->next;
@@ -2223,8 +2427,8 @@ remove_empty_units_in_region(region *r)
 	while (*up) {
 		unit * u = *up;
 
-		if ((u->race != RC_SPELL && u->number <= 0)
-		 	|| (u->race == RC_SPELL && u->age <= 0)
+		if ((old_race(u->race) != RC_SPELL && u->number <= 0)
+		 	|| (old_race(u->race) == RC_SPELL && u->age <= 0)
 		 	|| u->number < 0) {
 			destroy_unit(u);
 		}
@@ -2288,9 +2492,9 @@ weight(const unit * u)
 
 	faerie_level = fspecial(u->faction, FS_FAERIE);
 	if (faerie_level) {
-		n += (u->number * race[u->race].weight)/(1+faerie_level);
+		n += (u->number * u->race->weight)/(1+faerie_level);
 	} else {
-		n += u->number * race[u->race].weight;
+		n += u->number * u->race->weight;
 	}
 
 	w = get_item(u, I_BAG_OF_HOLDING) * BAGCAPACITY;
@@ -2358,58 +2562,12 @@ resolve2(void)
 
 #endif
 
-static void
-init_directions(tnode * root)
-{
-	/* mit dieser routine kann man mehrere namen für eine direction geben,
-	 * das ist für die hexes ideal. */
-	const struct {
-		const char* name;
-		int direction;
-	} dirs [] = {
-		{ "no", D_NORTHEAST},
-		{ "nw", D_NORTHWEST},
-		{ "nordosten", D_NORTHEAST},
-		{ "nordwesten", D_NORTHWEST},
-		{ "so", D_SOUTHEAST},
-		{ "sw", D_SOUTHWEST},
-		{ "südosten", D_SOUTHEAST},
-		{ "südwesten", D_SOUTHWEST},
-		{ "osten", D_EAST },
-		{ "westen",D_WEST },
-		{ "pause", D_PAUSE },
-		{ NULL, NODIRECTION}
-	};
-	int i;
-	for (i=0; dirs[i].direction!=NODIRECTION;++i) {
-		addtoken(root, dirs[i].name, (void*)dirs[i].direction);
-	}
-}
-
-direction_t
-finddirection(const char *s)
-{
-	static boolean init = false;
-	static tnode dirnames;
-	int dir;
-
-	if (!init) {
-		init_directions(&dirnames);
-		init=true;
-	}
-
-	if (findtoken(&dirnames, s, (void**)&dir)==E_TOK_SUCCESS) {
-		return (direction_t)dir;
-	}
-	return NODIRECTION;
-}
-
 unit *
-make_undead_unit(region * r, faction * f, int n, race_t race)
+make_undead_unit(region * r, faction * f, int n, const struct race * rc)
 {
 	unit *u;
 
-	u = createunit(r, f, n, race);
+	u = createunit(r, f, n, rc);
 	set_string(&u->lastorder, "");
 	name_unit(u);
 	fset(u, FL_ISNEW);
@@ -2420,9 +2578,9 @@ void
 guard(unit * u, unsigned int mask)
 {
 	int flags = GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX;
-	switch (u->race) {
+	switch (old_race(u->race)) {
 	case RC_ELF:
-		if (u->faction->race != RC_ELF) break;
+		if (u->faction->race != u->race) break;
 		/* else fallthrough */
 	case RC_TREEMAN:
 		flags |= GUARD_TREES;
@@ -2447,7 +2605,7 @@ int
 lifestyle(const unit * u)
 {
 	static plane * astralspace = NULL;
-	int need = u->number * race[u->race].maintenance;
+	int need = u->number * u->race->maintenance;
 
 	if (!astralspace) {
 		astralspace = getplanebyname("Astralraum");
@@ -2464,7 +2622,7 @@ lifestyle(const unit * u)
 		need += 1;
 	if(fspecial(u->faction, FS_ADMINISTRATOR))
 		need += 1;
-	if(fspecial(u->faction, FS_WYRM) && u->race == RC_WYRM)
+	if(fspecial(u->faction, FS_WYRM) && old_race(u->race) == RC_WYRM)
 		need *= 500;
 
 	return need;
@@ -2481,7 +2639,7 @@ hunger(unit * u, int need)
 	if(lspp <= 0) return;
 
 	while(need > 0) {
-		int dam = u->race==RC_HALFLING?15+rand()%14:(13+rand()%12);
+		int dam = old_race(u->race)==RC_HALFLING?15+rand()%14:(13+rand()%12);
 		if(dam >= hp) {
 			++dead;
 		} else {
@@ -2555,8 +2713,9 @@ plagues(region * r, boolean ismagic)
 /* Lohn bei den einzelnen Burgstufen für Normale Typen, Orks, Bauern,
  * Modifikation für Städter. */
 
-static const int wagetable[6][4] = {
+static const int wagetable[7][4] = {
 	{10, 10, 11, -5},			/* Baustelle */
+	{10, 10, 11, -5},			/* Handelsposten */
 	{11, 11, 12, -3},			/* Befestigung */
 	{12, 11, 13, -1},			/* Turm */
 	{13, 12, 14,  0},			/* Burg */
@@ -2577,7 +2736,7 @@ wage(const region *r, const unit *u, boolean img)
 	if (b) esize = buildingeffsize(b, img);
 
 	if (u) {
-		wage = wagetable[esize][u->race == RC_ORC];
+		wage = wagetable[esize][old_race(u->race) == RC_ORC];
 		if (fspecial(u->faction, FS_URBAN)) {
 			wage += wagetable[esize][3];
 		}
@@ -2590,6 +2749,11 @@ wage(const region *r, const unit *u, boolean img)
 			wage = wagetable[esize][2];
 		}
 		wage += get_curseeffect(r->attribs, C_BLESSEDHARVEST, 0);
+	}
+
+	/* Godcurse: Income -10 */
+	if(is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+		wage = max(0,wage-10);
 	}
 
 	/* Bei einer Dürre verdient man nur noch ein Viertel  */
@@ -2613,7 +2777,7 @@ fwage(const region *r, const faction *f, boolean img)
 	if (b) esize = buildingeffsize(b, img);
 
 	if (f) {
-		wage = wagetable[esize][f->race == RC_ORC];
+		wage = wagetable[esize][old_race(f->race) == RC_ORC];
 		if (fspecial(f, FS_URBAN)) {
 			wage += wagetable[esize][3];
 		}
@@ -2628,6 +2792,11 @@ fwage(const region *r, const faction *f, boolean img)
 		wage += get_curseeffect(r->attribs, C_BLESSEDHARVEST, 0);
 	}
 
+	/* Godcurse: Income -10 */
+	if(is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+		wage = max(0,wage-10);
+	}
+
 	/* Bei einer Dürre verdient man nur noch ein Viertel  */
 	if (is_spell_active(r, C_DROUGHT))
 		wage /= get_curseeffect(r->attribs, C_DROUGHT, 0);
@@ -2640,7 +2809,7 @@ fwage(const region *r, const faction *f, boolean img)
 
 
 
-static region *
+region *
 findspecialdirection(const region *r, char *token)
 {
 	attrib *a;
@@ -2666,7 +2835,7 @@ movewhere(region * r, const unit *u)
 
 	token = getstrtoken();
 
-	d = finddirection(token);
+	d = finddirection(token, u->faction->locale);
 	if (d == D_PAUSE)
 		return r;
 
@@ -2699,7 +2868,7 @@ movewhere(region * r, const unit *u)
 			   "(%d,%d) noch nicht generiert!\n", r->x, r->y,
 			   r->x + delta_x[d], r->y + delta_y[d]);
 #else
-		add_message(&u->faction->msgs, 
+		add_message(&u->faction->msgs,
 			msg_message("moveblocked", "unit direction", u, d));
 		return NULL;
 #endif
@@ -2714,7 +2883,7 @@ movewhere(region * r, const unit *u)
 	}
 
 	if (move_blocked(u, r, d) == true) {
-		add_message(&u->faction->msgs, 
+		add_message(&u->faction->msgs,
 			msg_message("moveblocked", "unit direction", u, d));
 		return NULL;
 	}

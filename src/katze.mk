@@ -6,12 +6,14 @@ endif
 # CONVERT_TRIGGERS = 1
 
 # Hier definieren, damit nicht '@gcc'
-CC      = gcc
+CC      = gcc -DNEW_RESOURCEGROWTH
 AR      = ar
 CTAGS   = ctags
 CC      = gcc
 LD      = gcc
 INSTALL = cp
+
+CFLAGS += -DNEW_RESOURCEGROWTH
 
 # CFLAGS += -Wshadow
 

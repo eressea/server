@@ -73,7 +73,7 @@ age_undead(unit *u)
 		for (m = u->number; m; m--)
 			if (rand() % 100 < UNDEAD_BREAKUP_FRACTION)
 				n++;
-		u2 = make_undead_unit(r, findfaction(MONSTER_FACTION), 0, RC_UNDEAD);
+		u2 = make_undead_unit(r, findfaction(MONSTER_FACTION), 0, new_race[RC_UNDEAD]);
 		transfermen(u, u2, u->number - n);
 		u2->building = u->building;
 		u2->ship = u->ship;
@@ -85,8 +85,8 @@ age_skeleton(unit *u)
 {
 	if (u->faction->no == 0 && rand()%100 < age_chance(u->age, 27, 1)) {
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
-		u->race = RC_SKELETON_LORD;
-		u->irace = RC_SKELETON_LORD;
+		u->race = new_race[RC_SKELETON_LORD];
+		u->irace = new_race[RC_SKELETON_LORD];
 		scale_number(u,1);
 		u->hp = (int) (unit_max_hp(u) * u->number * q);
 	}
@@ -97,8 +97,8 @@ age_zombie(unit *u)
 {
 	if (u->faction->no == 0 && rand()%100 < age_chance(u->age, 27, 1)) {
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
-		u->race = RC_ZOMBIE_LORD;
-		u->irace = RC_ZOMBIE_LORD;
+		u->race = new_race[RC_ZOMBIE_LORD];
+		u->irace = new_race[RC_ZOMBIE_LORD];
 		scale_number(u,1);
 		u->hp = (int) (unit_max_hp(u) * u->number * q);
 	}
@@ -109,8 +109,8 @@ age_ghoul(unit *u)
 {
 	if (u->faction->no == 0 && rand()%100 < age_chance(u->age, 27, 1)) {
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
-		u->race = RC_GHOUL_LORD;
-		u->irace = RC_GHOUL_LORD;
+		u->race = new_race[RC_GHOUL_LORD];
+		u->irace = new_race[RC_GHOUL_LORD];
 		scale_number(u,1);
 		u->hp = (int) (unit_max_hp(u) * u->number * q);
 	}

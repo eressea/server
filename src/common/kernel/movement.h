@@ -27,7 +27,7 @@ struct ship;
 #define SCALEWEIGHT      100	/* Faktor, um den die Anzeige von gewichten
 								 * * skaliert wird */
 
-extern int personcapacity(struct unit *u);
+extern int personcapacity(const struct unit *u);
 
 #define HORSECAPACITY   7000
 #define WAGONCAPACITY  14000

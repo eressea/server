@@ -4,28 +4,26 @@
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
-CFG=askalon - Win32 Conversion
+CFG=askalon - Win32 Debug
 !MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit\
  NMAKE
 !MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den\
  Befehl
-!MESSAGE 
+!MESSAGE
 !MESSAGE NMAKE /f "askalon-5.mak".
-!MESSAGE 
+!MESSAGE
 !MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
 !MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
-!MESSAGE 
-!MESSAGE NMAKE /f "askalon-5.mak" CFG="askalon - Win32 Conversion"
-!MESSAGE 
+!MESSAGE
+!MESSAGE NMAKE /f "askalon-5.mak" CFG="askalon - Win32 Debug"
+!MESSAGE
 !MESSAGE Für die Konfiguration stehen zur Auswahl:
-!MESSAGE 
+!MESSAGE
 !MESSAGE "askalon - Win32 Release" (basierend auf\
   "Win32 (x86) Console Application")
 !MESSAGE "askalon - Win32 Debug" (basierend auf\
   "Win32 (x86) Console Application")
-!MESSAGE "askalon - Win32 Conversion" (basierend auf\
-  "Win32 (x86) Console Application")
-!MESSAGE 
+!MESSAGE
 
 # Begin Project
 # PROP Scc_ProjName ""
@@ -80,34 +78,7 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 
-!ELSEIF  "$(CFG)" == "askalon - Win32 Conversion"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "askalon_"
-# PROP BASE Intermediate_Dir "askalon_"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "askalon_"
-# PROP Intermediate_Dir "askalon_"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /MDd /Za /W4 /Gm /Zi /Od /I ".." /I "../util" /I "../common" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /FD /c
-# SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /MDd /Za /W4 /Gm /Zi /Od /I ".." /I "../util" /I "../common" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_DEBUG" /D "CONVERT_TRIGGER" /FR /FD /c
-# SUBTRACT CPP /YX
-# ADD BASE RSC /l 0x407 /d "_DEBUG"
-# ADD RSC /l 0x407 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-
-!ENDIF 
+!ENDIF
 
 # Begin Target
 
@@ -151,9 +122,7 @@ SOURCE=..\old\pointertags.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "askalon - Win32 Conversion"
-
-!ENDIF 
+!ENDIF
 
 # End Source File
 # Begin Source File
@@ -166,9 +135,7 @@ SOURCE=..\old\relation.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "askalon - Win32 Conversion"
-
-!ENDIF 
+!ENDIF
 
 # End Source File
 # Begin Source File
@@ -183,7 +150,7 @@ SOURCE=..\old\trigger.c
 
 !ELSEIF  "$(CFG)" == "askalon - Win32 Conversion"
 
-!ENDIF 
+!ENDIF
 
 # End Source File
 # End Group

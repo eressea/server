@@ -66,6 +66,7 @@ magicstorm_trail;en;a %s
 
 caldera;en;caldera
 xmas_exit;en;portal
+temple;en;temple
 
 ## directions
 dir_nw;en;NW
@@ -105,7 +106,7 @@ harbour;en;harbour
 illusioncastle;en;fairy castle
 inn;en;inn
 lighthouse;en;lighthouse
-magictower;en;magic tower
+magictower;en;mage tower
 mine;en;mine
 monument;en;monument
 quarry;en;quarry
@@ -117,9 +118,10 @@ tunnel;en;tunnel
 
 ##  Burgausbaustufen
 site;en;foundation
+tradepost;en;tradepost
 fortification;en;fortification
 tower;en;tower
-castle;en;stronghold
+castle;en;castle
 fortress;en;fortress
 citadel;en;citadel
 
@@ -149,8 +151,8 @@ antimagic;en;antimagic cristal
 antimagic_p;en;antimagic cristals
 ao_chastity;en;amulet of chastity
 ao_chastity_p;en;amulets of chastity
-ao_daemon;en;eye of the Demon
-ao_daemon_p;en;eye of the Demon
+ao_daemon;en;eye of the demon
+ao_daemon_p;en;eye of the demon
 aoc;en;amulet of the kitten
 aoc_p;en;amulets of the kitten
 aod;en;amulet of darkness
@@ -196,8 +198,8 @@ firesword;en;flaming sword
 firesword_p;en;flaming swords
 greatbow;en;great bow
 greatbow_p;en;great bows
-greatsword;en;great sword
-greatsword_p;en;great swords
+greatsword;en;claymore
+greatsword_p;en;claymores
 griphonwing;en;wing of the gryphon
 griphonwing_p;en;wings of the gryphon
 halberd;en;halberd
@@ -279,7 +281,7 @@ stone;en;stone
 stone_p;en;stones
 sword;en;sword
 sword_p;en;swords
-toadslime;en;toadslime
+toadslime;en;pot of toadslime
 trollbelt;en;trollbelt
 unit;en;unit
 unit_p;en;units
@@ -287,6 +289,14 @@ skillpotion;en;potion of skills
 skillpotion_p;en;potions of skills
 manacrystal;en;astralcrystal
 manacrystal_p;en;astralcrystals
+seed;en;seed
+seed_p;en;seeds
+mallornseed;en;mallorn seed
+mallornseed_p;en;mallorn seeds
+birthday_firework;en;firework
+birthday_firework_p;en;fireworks
+lebkuchenherz;en;gingerbread heart
+lebkuchenherz_p;en;gingerbread hearts
 
 ##  luxury goods
 balm;en;balm
@@ -390,6 +400,7 @@ AGGRESSIV;en;AGGRESSIVE
 ALLES;en;ALL
 ANZAHL;en;NUMBER
 AURA;en;AURA
+BÄUME;en;TREES
 BAUERN;en;PEASANTS
 BEISTAND;en;AID
 BEWACHE;en;GUARD
@@ -408,10 +419,10 @@ HINTEN;en;REAR
 HINTER;en;AFTER
 KOMMANDO;en;CONTROL
 KRÄUTER;en;HERBS
-KÄMPFE;en;FIGHT
+KÄMPFE;en;COMBAT
 NICHT;en;NOT
 NÄCHSTER;en;NEXT
-PARTEI;en;FACTION
+PARTEI;en;PARTEI
 PARTEITARNUNG;en;FACTIONSTEALTH
 PAUSE;en;PAUSE
 PERSONEN;en;MEN
@@ -430,9 +441,9 @@ ZAUBER;en;SPELLS
 
 ##  Skills
 sk_alchemy;en;alchemy
-sk_armorer;en;armorer
+sk_armorer;en;armoursmithing
 sk_bow;en;bow
-sk_building;en;building
+sk_building;en;masonry
 sk_cartmaking;en;cartmaking
 sk_catapult;en;catapult
 sk_crossbow;en;crossbow
@@ -501,6 +512,7 @@ NUMMER;en;NUMBER
 OPFERE;en;SACRIFICE
 OPTION;en;OPTION
 PASSWORT;en;PASSWORD
+PFLANZEN;en;PLANT
 PIRATERIE;en;PIRACY
 PRÄFIX;en;PREFIX
 REKRUTIEREN;en;RECRUIT
@@ -523,13 +535,13 @@ VERLASSE;en;LEAVE
 ZAUBERE;en;CAST
 ZEIGEN;en;SHOW
 ZERSTÖREN;en;DESTROY
-ZÜCHTEN;en;BREED
+ZÜCHTEN;en;GROW
 
 Adler;en;eagle
 Drache;en;dragon
 Drachen;en;dragons
-Dämon;en;Demon
-Dämonen;en;Demons
+Dämon;en;demon
+Dämonen;en;demons
 Einhorn;en;unicorn
 Einhörner;en;unicorns
 Elf;en;elf
@@ -545,7 +557,7 @@ Halblinge;en;halflings
 Hirntöter;en;braineater
 Insekt;en;insect
 Insekten;en;insects
-Jungdrache;en;young dragons
+Jungdrache;en;young dragon
 Jungdrachen;en;young dragons
 Katze;en;cat
 Katzen;en;cats
@@ -575,6 +587,39 @@ Zombie;en;zombie
 Zombie_p;en;zombies
 Zwerg;en;dwarf
 Zwerge;en;dwarves
+Kröte;en;toad
+Kröten;en;toads
+Klon;en;clone
+Gnom;en;gnome
+Museumsgeist;en;museumghost
+Ghast;en;ghast
+Ghoul;en;ghoul
+Juju-Zombie;en;juju-zombie
+Skelettherr;en;skeleton lord
+Zentaur;en;centaur
+Krake;en;kraken
+Delphin;en;dolphin
+Tiger;en;tiger
+Höllenkatze;en;hellcat
+Traumkatze;en;dreamcat
+Teufelchen;en;imp
+Nymphe;en;nymph
+Singdrache;en;songdragon
+Ratte;en;rat
+Tunnelwurm;en;tunnelworm
+Wolf;en;wolf
+Bauer;en;peasant
+Alp;en;alp
+Bergwächter;en;mountainguard
+Schattenmeister;en;shadowmaster
+Schattendämon;en;shadowdemon
+Eisengolem;en;irongolem
+Zauber;en;spell
+Spezial;en;special
+Dracoid;en;dracoid
+Ent;en;ent
+Wyrm;en;wyrm
+Illusion;en;illusion
 
 ##  NR generieren
 nr_options;en;Options
@@ -595,7 +640,7 @@ nr_addresses;en;Addresses
 anonymous;en;anonymous
 b_attacke;en;attack
 b_defense;en;defense
-b_armor;en;armor
+b_armor;en;armour
 b_damage;en;damage
 
 ## Testitem
@@ -613,7 +658,7 @@ Südwestküste;en;southwest coast
 Westküste;en;west coast
 
 ## report newbie info
-newbie_info_1;en;Remember tosend your orders to eressea@eressea.amber.kn-bremen.de with the subject ERESSEA BEFEHLE.
+newbie_info_1;en;Remember to send your orders to eressea@eressea.amber.kn-bremen.de with the subject ERESSEA BEFEHLE.
 newbie_info_2;en;If you fail to send in orders for one of the first two turns, your faction will be erased from the game to reduce the number of zombie players in Eressea.
 newbie_info_3;en;With the first two turns, you will get a computer report (CR). It can be used with many of the tools on http://eressea-pbem.de/download.html. If you want to continue getting it after the second turn, please make one of your units give the order OPTION COMPUTER.
 nr_nmr;en;No orders were received for your faction!

@@ -15,6 +15,8 @@
 #include <config.h>
 #include "otherfaction.h"
 
+#include <eressea.h>
+#include <faction.h>
 #include <attrib.h>
 
 /*
@@ -24,6 +26,20 @@
 attrib_type at_otherfaction = {
 	"otherfaction", NULL, NULL, NULL, a_writedefault, a_readdefault, ATF_UNIQUE
 };
+
+struct faction *
+get_otherfaction(const struct attrib * a)
+{
+	return findfaction(a->data.i);
+}
+
+struct attrib * 
+make_otherfaction(const struct faction * f)
+{
+	attrib * a = a_new(&at_otherfaction);
+	a->data.i = f->no;
+	return a;
+}
 
 void
 init_otherfaction(void)

@@ -225,6 +225,20 @@ tt_find(const char * name)
 	return tt;
 }
 
+void 
+remove_triggers(struct attrib ** ap, const char * event, const trigger_type * tt)
+{
+	trigger ** tp = get_triggers(*ap, event);
+	if(tp == NULL) return;
+	while (*tp) {
+		/* first, remove all gate-triggers */
+		trigger * t = *tp;
+		if (t->type == tt) {
+			*tp = t->next;
+			t_free(t);
+		} else tp = &t->next;
+	}
+}
 
 /***
  ** default events

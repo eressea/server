@@ -215,7 +215,7 @@ richest_neighbour(region * r, int absolut)
 }
 
 boolean
-room_for_race_in_region(region *r, race_t rc)
+room_for_race_in_region(region *r, const race * rc)
 {
 	unit *u;
 	int  c = 0;
@@ -224,7 +224,7 @@ room_for_race_in_region(region *r, race_t rc)
 		if(u->race == rc) c += u->number;
 	}
 
-	if(c > (race[rc].splitsize*2))
+	if(c > (rc->splitsize*2))
 		return false;
 
 	return true;
@@ -331,7 +331,7 @@ move_monster(region * r, unit * u)
 	direction_t d = NODIRECTION;
 	strlist *S;
 
-	switch(u->race) {
+	switch(old_race(u->race)) {
 	case RC_FIREDRAGON:
 	case RC_DRAGON:
 	case RC_WYRM:
@@ -366,7 +366,7 @@ move_monster(region * r, unit * u)
 int
 dragon_affinity_value(region *r, unit *u)
 {
-	if(u->race == RC_FIREDRAGON) {
+	if(u->race == new_race[RC_FIREDRAGON]) {
 		return (1+rand() % 6) + (int) (count_all_money(r) * (0.1 + drand48()));
 	} else {
 		return (1+rand() % 6) + (int) (count_all_money(r) * (0.3 + drand48()));
@@ -483,7 +483,7 @@ monster_seeks_target(region *r, unit *u)
 	 * derzeit gibt es nur den alp
 	 */
 
-	switch( u->race ) {
+	switch( old_race(u->race) ) {
 		case RC_ALP:
 			target = alp_target(u);
 			break;
@@ -495,12 +495,11 @@ monster_seeks_target(region *r, unit *u)
 	if(!target) return; /* this is a bug workaround! remove!! */
 
 	if(r == target->region ) { /* Wir haben ihn! */
-		switch( u->race ) {
-			case RC_ALP:
-				alp_findet_opfer(u, r);
-				break;
-			default:
-				assert(!"Seeker-Monster hat keine Aktion fuer Ziel");
+		if (u->race == new_race[RC_ALP]) {
+			alp_findet_opfer(u, r);
+		}
+		else {
+			assert(!"Seeker-Monster hat keine Aktion fuer Ziel");
 		}
 		return;
 	}
@@ -522,13 +521,9 @@ monster_seeks_target(region *r, unit *u)
 	}
 	assert(d != NODIRECTION );
 
-	switch( u->race ) {
-		case RC_ALP:
-			if( (u->age % 2) )		/* bewegt sich nur jede zweite Runde */
-				d = NODIRECTION;
-			break;
-		default:
-			break;
+	if (u->race == new_race[RC_ALP]) {
+		if( (u->age % 2) )		/* bewegt sich nur jede zweite Runde */
+			d = NODIRECTION;
 	}
 
 	if( d == NODIRECTION )
@@ -549,7 +544,7 @@ random_unit(const region * r)
 	unit *u;
 
 	for (u = r->units; u; u = u->next) {
-		if (u->race != RC_SPELL) {
+		if (u->race != new_race[RC_SPELL]) {
 			c += u->number;
 		}
 	}
@@ -562,7 +557,7 @@ random_unit(const region * r)
 	u = r->units;
 
 	while (u && c < n) {
-		if (u->race != RC_SPELL) {
+		if (u->race != new_race[RC_SPELL]) {
 			c += u->number;
 		}
 		u = u->next;
@@ -580,7 +575,7 @@ random_attack_by_monster(const region * r, unit * u)
 	int tries = 0;
 	int attacked = 0;
 
-	switch (u->race) {
+	switch (old_race(u->race)) {
 	case RC_FIREDRAGON:
 		kill = 25;
 		max = 50;
@@ -606,8 +601,8 @@ random_attack_by_monster(const region * r, unit * u)
 		target = random_unit(r);
 		if (target
 		    && target != u
-		    && humanoid(target)
-			&& !illusionary(target)
+		    && humanoidrace(target->race)
+			 && !illusionaryrace(target->race)
 		    && target->number <= max)
 		{
 			if (monster_attack(u, target)) {
@@ -631,17 +626,21 @@ random_attack_by_monster(const region * r, unit * u)
 void
 eaten_by_monster(unit * u)
 {
-	int n;
+	int n = 0;
+	int horse = 0;
 
-	switch (u->race) {
+	switch (old_race(u->race)) {
 	case RC_FIREDRAGON:
 		n = rand()%80 * u->number;
+		horse = get_item(u, I_HORSE);
 		break;
 	case RC_DRAGON:
 		n = rand()%200 * u->number;
+		horse = get_item(u, I_HORSE);
 		break;
 	case RC_WYRM:
 		n = rand()%500 * u->number;
+		horse = get_item(u, I_HORSE);
 		break;
 	default:
 		n = rand()%(u->number/20+1);
@@ -658,6 +657,11 @@ eaten_by_monster(unit * u)
 				"eatpeasants%u:unit%i:amount", u, n));
 		}
 	}
+	if (horse > 0) {
+		set_item(u, I_HORSE, 0);
+		add_message(&u->region->msgs, new_message(NULL,
+					"eathorse%u:unit%i:amount", u, horse));
+	}
 }
 
 void
@@ -665,7 +669,7 @@ absorbed_by_monster(unit * u)
 {
 	int n;
 
-	switch (u->race) {
+	switch (old_race(u->race)) {
 	default:
 		n = rand()%(u->number/20+1);
 	}
@@ -720,7 +724,7 @@ scared_by_monster(unit * u)
 {
 	int n;
 
-	switch (u->race) {
+	switch (old_race(u->race)) {
 	case RC_FIREDRAGON:
 		n = rand()%160 * u->number;
 		break;
@@ -739,8 +743,11 @@ scared_by_monster(unit * u)
 		n = min(rpeasants(u->region), n);
 		if(n > 0) {
 			n = scareaway(u->region, n);
-			add_message(&u->region->msgs, new_message(NULL,
-				"fleescared%i:amount%u:unit", n, u));
+			if(n > 0) {
+				add_message(&u->region->msgs,
+							new_message(NULL,
+										"fleescared%i:amount%u:unit", n, u));
+			}
 		}
 	}
 }
@@ -772,8 +779,8 @@ make_ponnuki(void)
 	unit * u = ufindhash(ponn);
 	region * r = findregion(-67,-5);
 	if (u || !r) return;
-	u = createunit(r, findfaction(MONSTER_FACTION), 1, RC_ILLUSION);
-	u->irace = RC_GOBLIN;
+	u = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_ILLUSION]);
+	u->irace = new_race[RC_GOBLIN];
 	set_string(&u->name, "Ponnuki");
 	set_string(&u->display, "Go, Ponnuki, Go.");
     uunhash(u);
@@ -870,7 +877,7 @@ learn_monster(unit *u)
 		if(get_skill(u, sk) > 0) {
 			c++;
 			if(c == n) {
-				sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_STUDY]), 
+				sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_STUDY]),
 					skillname(sk, u->faction->locale));
 				set_string(&u->thisorder, buf);
 				break;
@@ -887,13 +894,13 @@ monsters_kill_peasants(void)
 
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) if(!fval(u, FL_MOVED)) {
-			if(race[u->race].flags & RCF_SCAREPEASANTS) {
+			if(u->race->flags & RCF_SCAREPEASANTS) {
 				scared_by_monster(u);
 			}
-			if(race[u->race].flags & RCF_KILLPEASANTS) {
+			if(u->race->flags & RCF_KILLPEASANTS) {
 				eaten_by_monster(u);
 			}
-			if(race[u->race].flags & RCF_ABSORBPEASANTS) {
+			if(u->race->flags & RCF_ABSORBPEASANTS) {
 				absorbed_by_monster(u);
 			}
 		}
@@ -975,22 +982,22 @@ plan_monsters(void)
 			/* Diese Verkettung ist krank und sollte durch eine 'vernünftige KI'
 			 * ersetzt werden. */
 
-			if( (race[u->race].flags & RCF_MOVERANDOM)
+			if( (u->race->flags & RCF_MOVERANDOM)
 					&& (rand()%100<MOVECHANCE || check_overpopulated(u))) {
 				move_monster(r, u);
 			} else {
 				boolean done = false;
-				if((race[u->race].flags & RCF_ATTACKRANDOM)
+				if((u->race->flags & RCF_ATTACKRANDOM)
 					&& rand()%100<MONSTERATTACK
 					&& is_moving == false)
 				{
 					done = random_attack_by_monster(r, u);
 				}
 				if (!done) {
-					if(u->race == RC_SEASERPENT) {
+					if(u->race == new_race[RC_SEASERPENT]) {
 						set_string(&u->thisorder, locale_string(u->faction->locale, keywords[K_PIRACY]));
 						set_string(&u->lastorder, locale_string(u->faction->locale, keywords[K_PIRACY]));
-					} else if(race[u->race].flags & RCF_LEARN) {
+					} else if(u->race->flags & RCF_LEARN) {
 						learn_monster(u);
 					}
 				}
@@ -998,7 +1005,7 @@ plan_monsters(void)
 
 			/* Ab hier noch nicht generalisierte Spezialbehandlungen. */
 
-			switch (u->race) {
+			switch (old_race(u->race)) {
 			case RC_ILLUSION:
 				if (u->no==atoi36("ponn")) ponnuki(u);
 				break;
@@ -1033,7 +1040,7 @@ plan_monsters(void)
 				}
 				if (tr!=NULL) {
 #ifdef NEW_PATH
-					switch(u->race) {
+					switch(old_race(u->race)) {
 					case RC_FIREDRAGON:
 						set_movement_order(u, tr, 4, allowed_dragon);
 						break;
@@ -1045,7 +1052,7 @@ plan_monsters(void)
 						break;
 					}
 #else
-					switch(u->race) {
+					switch(old_race(u->race)) {
 					case RC_FIREDRAGON:
 						set_movement_order(u, r, ta->data.sa[0], ta->data.sa[1], 4);
 						break;
@@ -1074,13 +1081,13 @@ plan_monsters(void)
 						/* money is gone */
 						set_new_dragon_target(u, r, DRAGON_RANGE);
 					}
-					else if (u->race != RC_FIREDRAGON && r->terrain!=T_OCEAN
+					else if (u->race != new_race[RC_FIREDRAGON] && r->terrain!=T_OCEAN
 							&& !(terrain[rterrain(r)].flags & FORBIDDEN_LAND)) {
 						ra = 20 + rand() % 100;
 						if (get_money(u) > ra * 50 + 100 && rand() % 100 < 50)
 						{
 							unit *un;
-							un = createunit(r, findfaction(MONSTER_FACTION), ra, RC_DRACOID);
+							un = createunit(r, findfaction(MONSTER_FACTION), ra, new_race[RC_DRACOID]);
 							name_unit(un);
 							change_money(u, -un->number * 50);
 							set_skill(un, SK_SPEAR, un->number * (180 + rand() % 500));
@@ -1134,15 +1141,15 @@ age_default(unit *u)
 void
 age_unit(region * r, unit * u)
 {
-	if (u->race == RC_SPELL) {
+	if (u->race == new_race[RC_SPELL]) {
 		u->age--;
 		if (u->age <= 0)
 			destroy_unit(u);
 	} else {
 		u->age++;
 
-		if(race[u->race].age_function) {
-			race[u->race].age_function(u);
+		if(u->race->age) {
+			u->race->age(u);
 		} else {
 			age_default(u);
 		}
@@ -1187,7 +1194,7 @@ check_overpopulated(unit *u)
 		if(u2->race == u->race && u != u2) c += u2->number;
 	}
 
-	if(c > race[u->race].splitsize * 2) return true;
+	if(c > u->race->splitsize * 2) return true;
 
 	return false;
 }
@@ -1201,7 +1208,7 @@ check_split(void)
 	for(r=regions;r;r=r->next) {
 		for(u=r->units;u;u=u->next) {
 			if(u->faction->no == MONSTER_FACTION) {
-				if(u->number > race[u->race].splitsize) {
+				if(u->number > u->race->splitsize) {
 						split_unit(r, u);
 				}
 			}

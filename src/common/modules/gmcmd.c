@@ -6,7 +6,7 @@
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
- This program may not be used, modified or distributed 
+ This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
 */
 
@@ -19,6 +19,7 @@
 #include <items/demonseye.h>
 #include <attributes/key.h>
 #include <triggers/gate.h>
+#include <triggers/unguard.h>
 
 /* kernel includes */
 #include <building.h>
@@ -162,7 +163,13 @@ gm_gate(const char * str, void * data, const char * cmd)
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (permissions && has_permission(permissions, atoi36("gmgate"))) {
-			add_trigger(&u->attribs, "timer", trigger_gate(b, r));
+			remove_triggers(&b->attribs, "timer", &tt_gate);
+			remove_triggers(&b->attribs, "create", &tt_unguard);
+			if (r!=b->region) {
+				add_trigger(&b->attribs, "timer", trigger_gate(b, r));
+				add_trigger(&b->attribs, "create", trigger_unguard(b));
+				fset(b, BLD_UNGUARDED);
+			}
 		}
 	}
 }
@@ -227,7 +234,7 @@ gm_teleport(const char * str, void * data, const char * cmd)
 }
 
 /**
- ** GM: MESSAGE <x> <y> <string>
+ ** GM: BROADCAST <x> <y> <string>
  ** requires: permission-key "gmmsgr"
  **/
 static void
@@ -250,6 +257,35 @@ gm_messageregion(const char * str, void * data, const char * cmd)
 		}
 		else {
 			add_message(&r->msgs, msg_message("msg_event", "string", msg));
+		}
+	}
+}
+
+/**
+ ** GM: TELL <unit> <string>
+ ** requires: permission-key "gmmsgr"
+ **/
+static void
+gm_messageunit(const char * str, void * data, const char * cmd)
+{
+	unit * u = (unit*)data;
+	const struct plane * p = rplane(u->region);
+	unit * target = findunit(atoi36(igetstrtoken(str)));
+	const char * msg = getstrtoken();
+	region * r = target->region;
+
+	if (r==NULL || p!=rplane(r)) {
+		mistake(u, cmd, "In diese Region kann keine Nachricht gesandt werden.\n", 0);
+	} else {
+		/* checking permissions */
+		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
+		if (!permissions || !has_permission(permissions, atoi36("gmmsgu"))) {
+			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+		}
+		else {
+			char * m = (char*)gc_add(strdup(msg));
+			add_message(&target->faction->msgs,
+				msg_message("unitmessage", "region unit string", r, u, m));
 		}
 	}
 }
@@ -379,7 +415,8 @@ init_gmcmd(void)
 	add_command(&g_keys, &g_cmds, "take", &gm_take);
 	add_command(&g_keys, &g_cmds, "teleport", &gm_teleport);
 	add_command(&g_keys, &g_cmds, "skill", &gm_skill);
-	add_command(&g_keys, &g_cmds, "message", &gm_messageregion);
+	add_command(&g_keys, &g_cmds, "broadcast", &gm_messageregion);
+	add_command(&g_keys, &g_cmds, "tell", &gm_messageunit);
 }
 
 /*
@@ -426,7 +463,7 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	f->passw = strdup(itoa36(rand()));
 	f->email = strdup(email);
 	f->name = strdup("Questenpartei");
-	f->race = RC_TEMPLATE;
+	f->race = new_race[RC_TEMPLATE];
 	f->age = 0;
 	f->lastorders = turn;
 	f->alive = true;
@@ -485,6 +522,7 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmskil")));
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmtake")));
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmmsgr")));
+	a_add((attrib**)&a->data.v, make_key(atoi36("gmmsgu")));
 
 	a_add((attrib**)&a->data.v, make_atgmcreate(resource2item(r_silver)));
 
@@ -496,13 +534,117 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	}
 
 	/* one initial unit */
-	u = createunit(center, f, 1, RC_TEMPLATE);
-	u->irace = RC_GNOME;
+	u = createunit(center, f, 1, new_race[RC_TEMPLATE]);
+	u->irace = new_race[RC_GNOME];
 	u->number = 1;
 	set_string(&u->name, "Questenmeister");
-	u->irace = RC_GOBLIN;
 
 	return f;
+}
+
+faction *
+gm_addfaction(const char * email, plane * p, region * r)
+{
+	attrib * a;
+	unit * u;
+	int i;
+	faction * f = calloc(1, sizeof(faction));
+
+	assert(p!=NULL);
+
+	/* GM faction */
+	a_add(&f->attribs, make_key(atoi36("quest")));
+	f->banner = strdup("Questenpartei");
+	f->passw = strdup(itoa36(rand()));
+	f->email = strdup(email);
+	f->name = strdup("Questenpartei");
+	f->race = new_race[RC_TEMPLATE];
+	f->age = 0;
+	f->lastorders = turn;
+	f->alive = true;
+	f->locale = find_locale("de");
+	f->options = want(O_COMPRESS) | want(O_REPORT) | want(O_COMPUTER) | want(O_ADRESSEN);
+	{
+		faction * xist;
+		int i = atoi36("gm00")-1;
+		do {
+			xist = findfaction(++i);
+		} while (xist);
+
+		f->no = i;
+		addlist(&factions, f);
+	}
+	/* generic permissions */
+	a = a_add(&f->attribs, a_new(&at_permissions));
+
+	a_add((attrib**)&a->data.v, make_key(atoi36("gmterf")));
+	a_add((attrib**)&a->data.v, make_key(atoi36("gmgate")));
+	a_add((attrib**)&a->data.v, make_key(atoi36("gmtele")));
+	a_add((attrib**)&a->data.v, make_key(atoi36("gmgive")));
+	a_add((attrib**)&a->data.v, make_key(atoi36("gmskil")));
+	a_add((attrib**)&a->data.v, make_key(atoi36("gmtake")));
+	a_add((attrib**)&a->data.v, make_key(atoi36("gmmsgr")));
+	a_add((attrib**)&a->data.v, make_key(atoi36("gmmsgu")));
+
+	a_add((attrib**)&a->data.v, make_atgmcreate(resource2item(r_silver)));
+
+	for (i=0;i<=I_INCENSE;++i) {
+		a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
+	}
+	for (i=I_GREATSWORD;i!=I_KEKS;++i) {
+		a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
+	}
+
+	/* one initial unit */
+	u = createunit(r, f, 1, new_race[RC_TEMPLATE]);
+	u->irace = new_race[RC_GNOME];
+	u->number = 1;
+	set_string(&u->name, "Questenmeister");
+
+	return f;
+}
+
+plane *
+gm_addplane(int radius, unsigned int flags, const char * name)
+{
+	region * center;
+	plane * p;
+	boolean invalid = false;
+	int minx, miny, maxx, maxy, cx, cy;
+	int x, y;
+
+	/* GM playfield */
+	do {
+		minx = (rand() % (2*EXTENSION)) - EXTENSION;
+		miny = (rand() % (2*EXTENSION)) - EXTENSION;
+		for (x=0;!invalid && x<=radius*2;++x) {
+			for (y=0;!invalid && y<=radius*2;++y) {
+				region * r = findregion(minx+x, miny+y);
+				if (r) invalid = true;
+			}
+		}
+	} while (invalid);
+	maxx = minx+2*radius; cx = minx+radius;
+	maxy = miny+2*radius; cy = miny+radius;
+	p = create_new_plane(rand(), name, minx, maxx, miny, maxy, flags);
+	center = new_region(cx, cy);
+	for (x=0;x<=2*radius;++x) {
+		int y;
+		for (y=0;y<=2*radius;++y) {
+			region * r = findregion(minx+x, miny+y);
+			if (!r) r = new_region(minx+x, miny+y);
+			freset(r, RF_ENCOUNTER);
+			r->planep = p;
+			if (distance(r, center)==radius) {
+				terraform(r, T_FIREWALL);
+			} else if (r==center) {
+				terraform(r, T_PLAIN);
+			} else {
+				terraform(r, T_OCEAN);
+			}
+		}
+	}
+	return p;
 }
 
 #ifdef TEST_GM_COMMANDS

@@ -18,11 +18,12 @@ INCLUDES  += \
 	-I..
 
 LIBS      += \
+	-L$(PUBLISH_DIR) \
+	-le-triggers \
 	-le-modules \
 	-le-kernel \
 	-le-items \
 	-le-spells \
-	-le-triggers \
 	-le-races \
 	-le-attributes \
 	-le-util \

@@ -49,6 +49,7 @@ extern int firstx, firsty;
 extern int quiet;
 
 extern void init_locales(void);
+extern int init_data(const char * xmlfile);
 extern int lastturn(void);
 
 extern void read_items(FILE *f, struct item **it);
@@ -60,5 +61,9 @@ extern void write_faction_reference(const struct faction * f, FILE * F);
 extern int read_faction_reference(struct faction ** f, FILE * F);
 
 extern const char * datapath(void);
+
+#ifdef RESOURCE_FIX
+extern struct attrib_type at_resources;
+#endif
 
 #endif

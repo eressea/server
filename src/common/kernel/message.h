@@ -54,7 +54,8 @@ extern struct message * msg_error(const struct unit *, const char *cmd,
 											 const char * name, const char* sig, ...);
 extern struct message * add_message(struct message_list** pm, struct message * m);
 extern void free_messages(struct message_list * m);
-extern void read_messages(FILE * F, const struct locale * lang);
+extern int load_messages(const char *);
+extern int read_messages(FILE * F, struct xml_stack * stack);
 
 /* message sections */
 extern struct messageclass * msgclasses;
@@ -64,4 +65,5 @@ extern const struct messageclass * mc_find(const char * name);
 /* convenience, deprecated */
 extern struct message * new_message(struct faction * receiver, const char * signature, ...);
 
+#define ADDMSG(msgs, mcreate) { message * m = mcreate; add_message(msgs, m); msg_release(m); }
 #endif

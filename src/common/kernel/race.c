@@ -43,6 +43,7 @@
 
 /* util includes */
 #include <attrib.h>
+#include <functions.h>
 
 /* attrib includes */
 #include <attributes/raceprefix.h>
@@ -50,34 +51,58 @@
 
 /* libc includes */
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <math.h>
 #include <ctype.h>
 
+/** external variables **/
+race * races;
+
+race *
+rc_new(const char * zName)
+{
+	char zBuffer[80];
+	race * rc = calloc(sizeof(race), 1);
+	sprintf(zBuffer, "%s", zName);
+	rc->_name[0] = strdup(zBuffer);
+	sprintf(zBuffer, "%s_p", zName);
+	rc->_name[1] = strdup(zBuffer);
+	sprintf(zBuffer, "%s_d", zName);
+	rc->_name[2] = strdup(zBuffer);
+	sprintf(zBuffer, "%s_x", zName);
+	rc->_name[3] = strdup(zBuffer);
+	return rc;
+}
+
+race *
+rc_add(race * rc) 
+{
+	rc->next = races;
+	return races = rc;
+}
+
+static const char * racealias[2][2] = {
+	{ "skeletton lord", "skeleton lord" },
+	{ NULL, NULL }
+};
+race *
+rc_find(const char * name)
+{
+	const char * rname = name;
+	race * rc = races;
+	int i;
+	for (i=0;racealias[i][0];++i) {
+		if (strcmp(racealias[i][0], name)==0) {
+			rname = racealias[i][1];
+			break;
+		}
+	}
+	while (rc && !strcmp(rname, rc->_name[0])==0) rc = rc->next;
+	return rc;
+}
+
 /* TODO: Tragkraft in die Struktur */
-
-/* struct racedata{
- * magres, maxaura, regaura,
- * {4 namen},
- * heimat, rekr.kost, unterhalt, splitsize, weight, speed
- * hitpoints, damage, armor, at_default, df_default, at_bonus, df_bonus,
- * attack[6]
- * Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Kräu,Mag,Pfer,Rei, Rüs,Sbau,Hie,Seg,
- * Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wahr,Steu,Aus, WlK
- * nonplayer,use_armor,
- * flags,
- * battle_flags,
- * ec(onomic)_flags,
- * generate_name,
- * familiars
- * */
-
-/* at_default, df_default
- * Angriffs- bzw. Verteidigungswert von Unbewaffneten dieser Rasse, die
- * nicht waffenlosen Kampf können. */
-/* at_bonus, df_bonus
- * Angriffs- bzw. Verteidigungsbonus auf den Kampfskill, der zusätzlich
- * zum Talentwert gilt. */
 
 /** dragon movement **/
 boolean
@@ -126,1757 +151,23 @@ const struct race_syn race_synonyms[] = {
 
 /*                      "den Zwergen", "Halblingsparteien" */
 
-struct racedata race[MAXRACES] =
-{
-	{
-		/* const char *name[4] */
-		{"Zwerg", "Zwerge", "Zwergen", "Zwergen"},
-
-		/* Magieresistenz (0=Normal) */
-		0.05,
-
-		/* Maximale Aura (1=Durchschnitt) */
-		1.00,
-
-		/* Auraregeneration (1=Durchschnitt) */
-		0.50,
-
-		/* Rekrutierungskosten, Unterhalt pro Runde */
-		90, 10,
-
-		/* Splitsize */
-		10000,
-
-		/* Gewicht */
-		1000,
-
-		/* Multiplikator Geschwindigkeit */
-		1.0,
-
-		/* Trefferpunkte */
-		24,
-
-		/* Schaden AT_STANDARD unbewaffnet */
-		"1d5",
-
-		/* Natürliche Rüstung */
-		0,
-
-		/* Angriff, Verteidigung unbewaffnet */
-		-2, -2,
-
-		/* Bonus Angriff, Verteidigung */
-		0, 0,
-
-		/* Angriffe */
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-
-		/* Talentboni
- 		  Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Kräu,Mag,Pfer,Rei, Rüs,Sbau,Hie,Seg,
-		  Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wahr,Steu,Aus, WlK */
-		{
-			0, 0, 2,-1,   2, 1,-1, 2,  -2,-2,-2,-2,   2,-1, 1,-2,
-			0, 0, 2, 2,   0,-1,-1, 2,   0, 0, 1, 0,   -99
-		},
-
-		/* Nonplayer (bei Gelegenheit entfernen) */
-		false,
-
-		/* Flags */
-		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
-
-		/* Battle_flags */
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-
-		/* Economic-Flags */
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
-
-		/* Vertraute für den Zauber
-		   (Generisch, Illaun, Tybied, Cerddor, Gwyrrd, Draig) */
-		{RC_TUNNELWORM, RC_EAGLE, RC_OWL, RC_HOUSECAT, RC_WARG, RC_RAT}
-	},
-
-	{
-		{"Elf", "Elfen", "Elfen", "Elfen"},
-		0.10, 1.00, 1.25,
-		130, 10, 10000, 1000, 1.0,
-		18, "1d5", 0, -2, -2, 0, 0,
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-1, 0,-2, 2,  -1, 0, 0,-2,   2, 1, 1, 0,  -1,-1, 0,-1,
-			 0, 0,-1,-1,   0, 1, 0, 0,   0, 1, 0, 0,  -99
-		},
-		false,
-		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
-		{RC_HOUSECAT, RC_FEY, RC_OWL, RC_NYMPH, RC_UNICORN, RC_IMP}
-	},
-	{
-		{"Ork", "Orks", "Orks", "Ork"},
-		-0.05, 1.00, 1.00,
-		50, 10, 10000, 1000, 1.0,
-		24, "1d5", 0, -2, -2, 0, 0,
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			1, 0, 1, 0,   1,-3, 1, 0,  -2,-1,-1, 0,   1,-1, 0,-1,
-			0,-1, 1, 0,   1, 0,-2, 2,  -1, 0, 1, 0,   -99
-		},
-		false,
-		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
-		{RC_GOBLIN, RC_WRAITH, RC_IMP, RC_RAT, RC_WARG, RC_DAEMON}
-	},
-	{
-		{"Goblin", "Goblins", "Goblins", "Goblin"},
-		-0.05, 1.00, 1.00,
-		40, 10, 10000, 1000, 1.0,
-		16, "1d5", 0, -2, 0, 0, 0,
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			1, 0, 1, 0,   1,-1, 0, 1,   0,-1, 0, 0,   0,-2, 0,-2,
-			0, 0, 0,-2,  -2, 1,-1, 0,  -1, 0, 0, 0,   -99
-		},
-		false,
-		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
-		{RC_RAT, RC_PSEUDODRAGON, RC_IMP, RC_RAT, RC_RAT, RC_IMP}
-	},
-	{
-		{"Mensch", "Menschen", "Menschen", "Menschen"},
-		0.00, 1.00, 1.00,
-		75, 10, 10000, 1000, 1.0,
-		20, "1d5", 0, -2, -2, 0, 0,
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 0, 0,   0, 1, 0, 0,  -1, 0, 0, 0,   0, 1, 0, 1,
-			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   -99
-		},
-		false,
-		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
-		{RC_WARG, RC_DREAMCAT, RC_OWL, RC_OWL, RC_EAGLE, RC_IMP}
-	},
-	{
-		{"Troll", "Trolle", "Trollen", "Troll"},
-		0.10, 1.00, 1.00,
-		90, 10, 10000, 2000, 1.0,
-		30, "1d5+3", 1, -2, -2, 0, 0,
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 2,-2,   2, 0, 0, 2,  -1, 0,-1,-2,   2,-1, 1,-1,
-			0,-3, 2, 2,  -1,-3,-1, 0,   0,-1, 1, 0,   -99
-		},
-		false,
-		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
-		{RC_TUNNELWORM, RC_RAT, RC_RAT, RC_EAGLE, RC_TUNNELWORM, RC_WARG}
-	},
-	{
-		{"Dämon", "Dämonen", "Dämonen", "Dämonen"},
-		0.15, 1.00, 1.25,
-		150, 10, 10000, 1000, 1.0,
-		50, "1d5", 2, -2, -2, 0, 0,
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_DAZZLE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			2, 0, 0, 0,   0,-3, 1, 0,  -3, 1,-3,-1,   0,-1, 1,-1,
-			1, 0, 0, 0,  -1, 1,-3, 1,  -2, 1, 1, 0,   -99
-		},
-		false,
-		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM | RCF_SHAPESHIFT,
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-		ECF_REC_ETHEREAL | GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
-		{RC_IMP, RC_IMP, RC_WRAITH, RC_RAT, RC_WARG, RC_IMP}
-	},
-	{
-		{"Insekt", "Insekten", "Insekten", "Insekten"},
-		0.05, 1.00, 1.00,
-		80, 10, 10000, 1000, 1.0,
-		24, "1d5", 2, -2, -2, 0, 0,
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 1, 1,-2,   2,-1, 1, 0,   1, 0,-3,-3,   2, 0,-1, 0,
-			1, 0, 0,-1,  -1,-1,-2, 0,   0, 1, 0, 0,   -99
-		},
-		false,
-		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
-		{RC_WRAITH, RC_RAT, RC_OWL, RC_RAT, RC_TUNNELWORM, RC_IMP}
-	},
-	{
-		{"Halbling", "Halblinge", "Halblingen", "Halblings"},
-		0.05, 1.00, 1.00,
-		80, 10, 10000, 1000, 1.0,
-		18, "1d5", 0, -2, -2, 0, 0,
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 1, 1,-1,   1, 2, 0,-1,   2, 0,-1,-1,   0,-1,-1,-2,
-			-1,1, 0, 1,   0, 1, 1, 0,   2, 1,-1, 0,   -99
-		},
-		false,
-		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
-		{RC_OWL, RC_RAT, RC_EAGLE, RC_PSEUDODRAGON, RC_EAGLE, RC_RAT}
-	},
-	{
-		{"Katze", "Katzen", "Katzen", "Katzen"},
-		0.00, 1.00, 1.00,
-		90, 10, 10000, 1000, 1.0,
-		20, "1d5", 0, -2, -2, 0, 1,
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-1,0,-2, 0,  -1, 0, 0,-1,   1, 0, 0, 0,  -1,-1, 0,-2,
-			0, 2,-1,-1,   0, 1, 0, 0,   0, 2, 1, 0,   -99
-		},
-		false,
-		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
-		{RC_HOUSECAT, RC_DREAMCAT, RC_HOUSECAT, RC_PSEUDODRAGON,
-			RC_TIGER, RC_HELLCAT}
-	},
-	{
-		{"Meermensch", "Meermenschen", "Meermenschen", "Meermenschen"},
-		0.00, 1.00, 1.00,
-		80, 10, 10000, 1000, 1.0,
-		20, "1d5", 0, -2, -2, 0, 0,
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0,-2, 0,  -1, 2, 0, 0,   0, 0, 0, 0,  -1, 3, 0, 3,
-			0, 0, 0,-1,   0, 0, 0, 0,   0, 0, 0, 0,  -99
-		},
-		false,
-		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
-		{RC_OCEANTURTLE, RC_DOLPHIN, RC_OCEANTURTLE, RC_DOLPHIN,
-			RC_DOLPHIN, RC_DOLPHIN}
-	},
-	{
-		{"Untoter", "Untote", "Untoten", "Untoten"},
-		0.00, 1.00, 1.00,
-		2, 0, 20000, 1000, 1.0,
-		20, "1d7", 0, 0, 0, 1, 1,
-		{
-			{AT_NATURAL, {"1d7"}, 0}, {AT_DAZZLE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,
-			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0
-		},
-		true,
-		(RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
-		(BF_EQUIPMENT | BF_MAGIC_EQUIPMENT),
-		CANGUARD,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-		&untoten_name, &age_undead
-	},
-	{
-		{"Illusion", "Illusionen", "Illusions", "Illusions"},
-		0.00, 0.00, 0.00,
-		50, 0, 999999, 0, 1.0,
-		1, "1d1", 0, 0, 0, 0, 0,
-		{
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,
-			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0
-		},
-		true, RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOWEAPONS, 0, 0,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-		NULL, &age_illusion
-	},
-	{
-		{"Jungdrache", "Jungdrachen", "Jungdrachen", "Jungdrachen"},
-		0.50, 1.00, 1.00,
-		10000, 0, 6, 20000, 1.0,
-		300, "2d15", 4, 0, 0, 4, 4,
-		{
-			{AT_NATURAL, {"1d30"}, 0}, {AT_NATURAL, {"1d30"}, 0}, {AT_NATURAL, {"1d30"}, 0},
-			{AT_SPELL, {(void *)SPL_FIREDRAGONODEM}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,
-			0, 0, 0, 0,   4, 0, 0, 0,   0, 0, 0, 0, 0
-		},
-		true,
-		RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_LEARN|RCF_FLY|RCF_WALK|RCF_NOTEACH,
-		BF_MAGIC_EQUIPMENT,
-		GETITEM | CANGUARD,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-		&drachen_name, &age_firedragon, &allowed_dragon
-	},
-	{
-		{"Drache", "Drachen", "Drachen", "Drachen"},
-		0.70, 1.00, 2.00,
-		50000, 0, 2, 60000, 1.5,
-		900, "2d30", 6, 0, 0, 7, 7,
-		{
-			{AT_NATURAL, {"2d20"}, 0}, {AT_NATURAL, {"2d20"}, 0}, {AT_NATURAL, {"3d30"}, 0},
-			{AT_SPELL, {(void *)SPL_DRAGONODEM}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 0, 0, 	0, 0, 0, 0, 	0, 0, 0, 0, 	0, 0, 0, 0,
-			0, 0, 0, 0, 	8, 0, 0, 0, 	0, 5, 0, 0, 0
-		},
-		true,
-		( RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_LEARN|RCF_FLY|RCF_WALK|RCF_NOTEACH ),
-		( BF_MAGIC_EQUIPMENT ),
-		GETITEM | CANGUARD,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-		&drachen_name, &age_dragon, &allowed_dragon
-	},
-	{
-		{"Wyrm", "Wyrme", "Wyrmen", "Wyrm"},
-		0.90, 1.00, 3.00,
-		250000, 0, 1, 180000, 1.0,
-		2700, "2d60", 8, 0, 0, 10, 10,
-		{
-			{AT_NATURAL, {"3d20"}, 0}, {AT_NATURAL, {"3d20"}, 0}, {AT_NATURAL, {"5d30"}, 0},
-			{AT_SPELL, {(void *)SPL_WYRMODEM}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 0, 0,   0, 0, 0, 0, 	0, 0, 0, 0, 	0, 0, 0, 0,
-			0, 0, 0, 0,  12, 0, 0, 0,   0,10, 0, 0, 0
-		},
-		true,
-		( RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_LEARN|RCF_FLY|RCF_WALK|RCF_NOTEACH ),
-		( BF_MAGIC_EQUIPMENT ),
-		GETITEM | CANGUARD,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-		&drachen_name, NULL, &allowed_dragon
-	},
-	{
-		{"Ent", "Ents", "Ents", "Ent"},
-		0.25, 1.00, 0.50,
-		5000, 0, 1000, 5000, 1.0,
-		50, "2d4+12", 4, 0, 0, 9, 7,
-		{
-			{AT_NATURAL, {"2d12"}, 0}, {AT_NATURAL, {"2d12"}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		},
-		true,
-		( RCF_SCAREPEASANTS | RCF_MOVERANDOM | RCF_LEARN | RCF_WALK | RCF_NOTEACH ),
-		( BF_MAGIC_EQUIPMENT ),
-		CANGUARD,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	{
-		{"Katzendrache", "Katzendrachen", "Katzendrachen", "Katzendrachen"},
-		0.90, 1.00, 1.00,
-		500000, 0, 1, 20000, 1.0,
-		20, "2d40", 0, 0, 0, 0, 50,
-		{
-			{AT_NATURAL, {"2d40"}, 0}, {AT_NATURAL, {"2d40"}, 0}, {AT_NATURAL, {"2d40"}, 0},
-			{AT_NATURAL, {"2d40"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		},
-		true,
-		( RCF_FLY | RCF_WALK | RCF_NOTEACH | RCF_SHAPESHIFT ),
-		0,
-		GIVEITEM | GIVEPERSON | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	{
-		{"Dracoid", "Dracoide", "Dracoiden", "Dracoiden"},
-		0.00, 1.00, 1.00,
-		50, 0, 10000, 1000, 1.0,
-		24, "1d5", 0, -2, -2, 0, 0,
-		{
-			{AT_NATURAL, {"1d6"}, 0}, {AT_NATURAL, {"1d6"}, 0}, {AT_STANDARD, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		true,
-		RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_LEARN|RCF_WALK|RCF_NOTEACH,
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-		GIVEITEM | GIVEPERSON | GETITEM | CANGUARD,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-		&dracoid_name, NULL
-	},
-	/* nur fuer den mapper: */
-	{
-		{"Spezial", "Spezial", "Spezial", "Spezial"},
-		0.00, 0.00, 0.00,
-		0, 0, 1, 0, 0.0,
-		1, "1d4", 0, -2, -2, 0, 0,
-		{
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		true, 0, 0, 0,
-	{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	{
-		{"Zauber", "Zauber", "Zauber", "Zauber"},
-		0.00, 1.00, 0.10,
-		0, 0, 1, 0, 0.0,
-		1, "1d4", 0, -2, -2, 0, 0,
-		{
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		true, 0, 0, 0,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-
-	/* ende Spezialunits */
-
-	{
-		{"Eisengolem", "Eisengolems", "Eisengolems", "Eisengolem"},
-		0.25, 1.00, 0.10,
-		5000, 0, 50, 10000, 1.0,
-		50, "2d10+4", 2, 0, 0, 4, 2,
-		{
-			{AT_NATURAL, {"2d8+4"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0,
-		 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0},
-		true,
-		RCF_WALK | RCF_NOLEARN | RCF_NOTEACH, 0,
-		GIVEITEM | GIVEPERSON,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	{
-		{"Steingolem", "Steingolems", "Steingolems", "Steingolem"},
-		0.25, 1.00, 0.10,
-		5000, 0, 50, 10000, 1.0,
-		60, "2d12+6", 4, 0, 0, 4, 2,
-		{
-			{AT_NATURAL, {"2d10+4"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		true,
-		RCF_WALK | RCF_NOLEARN | RCF_NOTEACH, 0,
-		GIVEITEM | GIVEPERSON,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	{
-		{"Schattendämon", "Schattendämonen", "Schattendämonen", "Schattendämon"},
-		0.75, 1.00, 1.00,
-		5000, 0, 1000, 0, 1.0,
-		50, "2d4", 3, 0, 0, 8, 11,
-		{
-			{AT_NATURAL, {"2d3"}, 0}, {AT_DRAIN_ST, {"1d1"}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		true,
-		RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_LEARN|RCF_WALK|RCF_NOTEACH|RCF_DESERT,
-		BF_MAGIC_EQUIPMENT,
-		ECF_REC_ETHEREAL,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-		&shadow_name, NULL,
-	},
-	{
-		{"Schattenmeister", "Schattenmeister", "Schattenmeistern", "Schattenmeister"},
-		0.75, 1.00, 2.00,
-		50000, 0, 50, 0, 1.0,
-		150, "2d5", 4, 0, 0, 11, 13,
-		{
-			{AT_NATURAL, {"2d4"}, 0}, {AT_DRAIN_EXP, {"2d30"}, 0}, {AT_DRAIN_ST, {"1d2"}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		true,
-		RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_LEARN|RCF_WALK|RCF_NOTEACH|RCF_DESERT,
-		BF_MAGIC_EQUIPMENT,
-		0,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-		&shadow_name, NULL,
-	},
-	{
-		{"Bergwächter", "Bergwächter", "Bergwächtern", "Bergwächter"},
-		0.50, 1.00, 0.50,
-		50000, 0, 1, 10000, 0.0,
-		1000, "2d40", 12, 0, 0, 6, 8,
-		{
-			{AT_NATURAL, {"2d40"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		true, RCF_CANNOTMOVE|RCF_NOLEARN|RCF_NOTEACH|RCF_NOWEAPONS, 0,
-		0,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	{
-		{"Alp", "Alps", "Alps", "Alp"},
-		0.95, 1.00, 1.00,
-		50000, 0, 1, 0, 1.5,
-		20, "1d4", 2, 0, 0, 2, 20,
-		{
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		true,
-		(RCF_SEEKTARGET|RCF_FLY|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH),
-		0,
-		0,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	{
-		{"Kröte", "Kröten", "Kröten", "Kröten"},
-		0.20, 1.00, 1.00,
-		50, 0, 1, 1, 1.0,
-		10, "1d2", 0, -2, -2, 0, 0,
-		{
-			{AT_NATURAL, {"1d2"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-10,-10,-10,-10,  -10,-10,-10,-10,  -10,-10,-10,-10, -10,-10,-10,-10,
-			-10,-10,-10,-10,  -10, +2,-10,-10,  -10,-10,-10,-10, 0
-		},
-		true,
-		RCF_LEARN|RCF_ATTACKRANDOM|RCF_CANNOTMOVE,
-		0,
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	{
-		{"Hirntöter", "Hirntöter", "Hirntöter", "Hirntöter"},
-		0.90, 1.00, 1.00,
-		50000, 0, 500, 1, 1.0,
-		20, "0d0", 1, 0, 0, 6, 10,
-		{
-			{AT_DRAIN_EXP, {"3d15"}, 0}, {AT_DRAIN_ST, {"1d1"}, 0}, {AT_NATURAL, {"1d1"}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		},
-		true,
-		( RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_LEARN|RCF_FLY|RCF_WALK|RCF_NOTEACH),
-		( BF_INV_NONMAGIC),
-		CANGUARD,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	{
-		{"Bauer", "Bauern", "Bauern", "Bauern"},
-		0.00, 1.00, 1.00,
-		50, 0, 10000, 10, 1.0,
-		20, "1d6", 0, 0, 0, 0, 0,
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-		},
-		true,
-		RCF_CANNOTMOVE|RCF_NOTEACH,
-		( BF_EQUIPMENT | BF_MAGIC_EQUIPMENT ),
-		CANGUARD,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	{
-		{"Wolf", "Wölfe", "Wölfen", "Wolfs"},
-		0.00, 0.00, 0.00,
-		50, 0, 5000, 5, 1.0,
-		20, "2d4", 0, 0, 0, 3, 1,
-		{
-			{AT_NATURAL, {"2d4"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,
-			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0
-		},
-		true,
-		(RCF_WALK|RCF_NOTEACH), (0), GIVEPERSON,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-
-	/*************************************************************/
-	/* Vertraute !                                               */
-	/*************************************************************/
-	/* RC_HOUSECAT */
-	{
-		{"Luchs", "Luchse", "Luchsen", "Luchs"},
-		0.00, 0.00, 0.00,
-		50, 0, 99999, 5, 1.0,
-		20, "2d3", 0, 0, 0, 4, 5,
-		{
-			{AT_NATURAL, {"2d3"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,     1, 0,  1,-99,   -99,-99,-99,-99,
-			-99,  3,-99,-99,   -99,  3,-99,-99,   -99, 4,-99,  0,    0
-		},
-		true,
-		(RCF_WALK|RCF_NOTEACH), (0),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_TUNNELWORM */
-	{
-		{"Tunnelwurm", "Tunnelwürmer", "Tunnelwürmern", "Tunnelwurm"},
-		0.80, 0.00, 0.00,
-		50, 0, 99999, 30000, 1.0,
-		300, "3d20", 6, 0, 0, 6, 1,
-		{
-			{AT_NATURAL, {"3d20"}, 0}, {AT_STRUCTURAL, {"1d10"}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99, 50,-99,   -99,-99, 50,-99,   -99, 0,-99,-99,   -99,-99,-99,-99,
-			-99,-99, 50,-99,   -99,-99,-99,-99,   -99,-99,-99, 2, 0
-		},
-		true,
-		(RCF_WALK|RCF_SCAREPEASANTS|RCF_NOTEACH), (0),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_EAGLE */
-	{
-		{"Adler", "Adler", "Adlern", "Adler"},
-		0.00, 0.00, 0.00,
-		50, 0, 9999, 5, 1.5,
-		15, "2d3", 0, 0, 0, 6, 2,
-		{
-			{AT_NATURAL, {"2d3"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 0,-99,-99,   -99,-99,-99,-99,
-			-99,  0,-99,-99,   -99,-99,-99,-99,   -99, 2,-99,  0, 0
-		},
-		true,
-		(RCF_WALK|RCF_FLY|RCF_NOTEACH), (0),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_RAT */
-	{
-		{"Ratte", "Ratten", "Ratten", "Ratten"},
-		0.00, 0.00, 0.00,
-		50, 0, 9999, 1, 1.0,
-		5, "1d2", 0, 0, 0, 1, 1,
-		{
-			{AT_NATURAL, {"1d2"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 0,-99,-99,   -99,-99,-99,-99,
-			-99,  5,-99,-99,   -99,  4,-99,-99,   -99, 2,-99,  0, 0
-		},
-		true,
-		(RCF_WALK|RCF_NOTEACH), (0),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_PSEUDODRAGON */
-	{
-		{"Singdrache", "Singdrachen", "Singdrachen", "Singdrachen"},
-		0.99, 1.00, 1.00,
-		50, 0, 9999, 10, 1.5,
-		40, "2d4", 1, 0, 0, 3, 1,
-		{
-			{AT_NATURAL, {"2d4"}, 0}, {AT_NATURAL, {"2d4"}, 0}, {AT_NATURAL, {"2d4"}, 0},
-			{AT_SPELL, {(void*)SPL_FIREDRAGONODEM}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 1,-99,-99,   -99,-99,-99,-99,
-			-99,  0,-99,-99,   -99,  0,-99,-99,   -99, 0,-99,  0, 0
-		},
-		true,
-		(RCF_WALK|RCF_FLY|RCF_NOTEACH), (0),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_NYMPH */
-	{
-		{"Nymphe", "Nymphen", "Nymphen", "Nymphen"},
-		0.90, 1.00, 1.50,
-		50, 0, 9999, 10, 1.0,
-		15, "1d4", 0, 0, 0, 3, 1,
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_DRAIN_EXP, {"2d20"}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			 0, 0,-99, 2,   -99,-2,-99,-99,   4, 1, 5, 5,  -2,-99, 0,-2,
-			 0, 2,-99,-99,   -2, 3, 10, -2,  -2, 2,-2,-1, 0
-		},
-		true,
-		(RCF_WALK|RCF_NOTEACH),
-		(BF_EQUIPMENT|BF_MAGIC_EQUIPMENT),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_UNICORN */
-	{
-		{"Einhorn", "Einhörner", "Einhörnern", "Einhorn"},
-		0.90, 1.50, 1.50,
-		50, 0, 9999, 50, 2.0,
-		40, "2d4", 0, 0, 0, 6, 4,
-		{
-			{AT_NATURAL, {"3d12"}, 0}, {AT_NATURAL, {"2d4"}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 2,-99,-99,   -99,-99,-99,-99,
-			-99,  0,-99,-99,     0,  4,-99,-99,   -99, 5,-99,  0, 0
-		},
-		true,
-		(RCF_WALK|RCF_NOTEACH), (0),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_WARG */
-	{
-		{"Warg", "Warge", "Wargen", "Warg"},
-		0.00, 0.00, 0.00,
-		50, 0, 5000, 5, 1.0,
-		25, "2d6", 0, 0, 0, 6, 3,
-		{
-			{AT_NATURAL, {"2d6"}, 0}, {AT_NATURAL, {"1d4"}, 0}, {AT_NATURAL, {"1d4"}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 0,-99,-99,  -99,-99,-99,-99,
-			-99,  0,-99,-99,     0,  0,-99,-99,   -99, 2,-99,  0, 0
-		},
-		true,
-		(RCF_WALK|RCF_SCAREPEASANTS|RCF_NOTEACH), (0),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_WRAITH */
-	{
-		{"Geist", "Geister", "Geistern", "Geister"},
-		0.80, 0.50, 0.10,
-		50, 0, 5000, 5, 1.0,
-		30, "2d6", 5, 0, 0, 5, 8,
-		{
-			{AT_NATURAL, {"1d5"}, 0}, {AT_NATURAL, {"1d5"}, 0}, {AT_STANDARD, {NULL}, 0},
-			{AT_DRAIN_EXP, {"2d30"}, 0}, {AT_DRAIN_ST, {"1d1"}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 1,-99, -2,  -99,-99, 0,-99,
-			  0,  0,-99,-99,   -99,  0,-99,-99,   -99, 0,-99,  0, 0
-		},
-		true,
-		(RCF_WALK|RCF_FLY|RCF_SCAREPEASANTS|RCF_NOTEACH),
-		(BF_EQUIPMENT|BF_MAGIC_EQUIPMENT|BF_INV_NONMAGIC),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_IMP */
-	{
-		{"Teufelchen", "Teufelchen", "Teufelchen", "Teufelchen-"},
-		0.50, 1.00, 0.00,
-		50, 0, 5000, 5, 1.0,
-		10, "1d4", 1, 0, 0, 5, 4,
-		{
-			{AT_NATURAL, {"1d4"}, 0}, {AT_NATURAL, {"1d4"}, 0}, {AT_STANDARD, {NULL}, 0},
-			{AT_SPELL, {(void*)SPL_FIREDRAGONODEM}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 1,-99, -1,  -99,-99, 0,-99,
-			  0,  1,-99,-99,   -99,  1,-99,-99,   -99, 1,  1,  0, 0
-		},
-		true, (RCF_FLY|RCF_WALK|RCF_NOTEACH), (BF_EQUIPMENT|BF_MAGIC_EQUIPMENT),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_DREAMCAT */
-	{
-		{"Traumkatze", "Traumkatzen", "Traumkatzen", NULL},
-		0.50, 1.00, 1.00,
-		50, 0, 5000, 5, 1.0,
-		10, "1d5", 0, 0, 0, 5, 6,
-		{
-			{AT_NATURAL, {"1d5"}, 0}, {AT_NATURAL, {"1d5"}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 1,-99,-99,  -99,-99, 0,-99,
-			  0,  1,-99,-99,   -99,  1,-99,-99,   -99, 1,  1,  0, 0
-		},
-		true,
-		(RCF_FLY|RCF_WALK|RCF_NOTEACH), (BF_INV_NONMAGIC),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_FEY */
-	{
-		{"Fee", "Feen", "Feen", NULL},
-		0.80, 1.00, 1.50,
-		50, 0, 5000, 5, 1.0,
-		6, "1d3", 0, 0, 0, 6, 14,
-		{
-			{AT_NATURAL, {"1d3"}, 0}, {AT_NATURAL, {"1d3"}, 0}, {AT_NATURAL, {"1d3"}, 0},
-			{AT_NATURAL, {"1d3"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 1,-99, -1,  -99,-99, -1,-99,
-			 -1,  2,-99,-99,   -99,  5,-99,-99,   -99, 2,-99,  0, 0
-		},
-		true,
-		(RCF_FLY|RCF_WALK|RCF_NOTEACH), (BF_EQUIPMENT|BF_MAGIC_EQUIPMENT),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_OWL */
-	{
-		{"Eule", "Eulen", "Eulen", NULL},
-		0.00, 0.00, 0.00,
-		50, 0, 5000, 5, 1.0,
-		9, "1d4", 0, 0, 0, 2, 4,
-		{
-			{AT_NATURAL, {"1d4"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 0,-99,-99,  -99,-99,-99,-99,
-			-99,  1,-99,-99,   -99,  1,-99,-99,   -99, 5,-99,  0, 0
-		},
-		true,
-		(RCF_FLY|RCF_WALK|RCF_NOTEACH), (0),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_HELLCAT */
-	{
-		{"Höllenkatze", "Höllenkatzen", "Höllenkatzen", NULL},
-		0.50, 0.00, 0.00,
-		50, 0, 5000, 5, 1.0,
-		40, "2d6", 0, 0, 0, 6, 4,
-		{
-			{AT_NATURAL, {"2d6"}, 0}, {AT_NATURAL, {"1d6"}, 0}, {AT_NATURAL, {"1d6"}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 0,-99,-99,  -99,-99,-99,-99,
-			-99,  0,-99,-99,     0,  0,-99,-99,   -99, 1,-99,  0, 0
-		},
-		true,
-		(RCF_WALK|RCF_NOTEACH), (RCF_SCAREPEASANTS),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_TIGER */
-	{
-		{"Tiger", "Tiger", "Tigern", NULL},
-		0.00, 0.00, 0.00,
-		50, 0, 5000, 5, 1.0,
-		30, "2d6", 0, 0, 0, 6, 3,
-		{
-			{AT_NATURAL, {"2d6"}, 0}, {AT_NATURAL, {"1d6"}, 0}, {AT_NATURAL, {"1d6"}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 0,-99,-99,  -99,-99,-99,-99,
-			-99,  0,-99,-99,     0,  0,-99,-99,   -99, 1,-99,  0, 0
-		},
-		true,
-		(RCF_WALK|RCF_NOTEACH), (0),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_DOLPHIN */
-	{
-		{"Delphin", "Delphine", "Delphinen", NULL},
-		0.00, 0.00, 0.00,
-		50, 0, 5000, 5, 2.0,
-		24, "1d6", 0, 0, 0, 5, 5,
-		{
-			{AT_NATURAL, {"1d6"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 0,-99,-99,  -99,-99,-99,-99,
-			-99,  0,-99,-99,     0,  0,-99,-99,   -99, 1,-99,  0, 0
-		},
-		true,
-		(RCF_SWIM|RCF_NOTEACH), (0),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_OCEANTURTLE */
-	{
-		{"Riesenschildkröte", "Riesenschildkröten", "Riesenschildkröten", NULL},
-		0.00, 0.00, 0.00,
-		50, 0, 5000, 5, 1.0,
-		900, "2d50", 7, 0, 0, 10, 5,
-		{
-			{AT_NATURAL, {"2d50"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 0,-99,-99,  -99,-99,-99,-99,
-			-99,  0,-99,-99,     0,-99,-99,-99,   -99, 1,-99,  0, 0
-		},
-		true,
-		(RCF_SWIM|RCF_WALK|RCF_NOTEACH), (0),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}, /* RC_KRAKEN */
-	{
-		{"Krake", "Kraken", "Kraken", NULL},
-		0.00, 0.00, 0.00,
-		50, 0, 5000, 5, 2.0,
-		300, "2d10", 0, 0, 0, 7, 7,
-		{
-			{AT_NATURAL, {"2d10"}, 0}, {AT_NATURAL, {"1d10"}, 0}, {AT_NATURAL, {"1d10"}, 0},
-			{AT_NATURAL, {"1d10"}, 0}, {AT_NATURAL, {"1d10"}, 0}, {AT_NATURAL, {"1d10"}, 0},
-		},
-		{
-			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 0,-99,-99,  -99,-99,-99,-99,
-			-99,  0,-99,-99,     0,-99,-99,-99,   -99, 1,-99,  0, 0
-		},
-		true,
-		(RCF_SWIM|RCF_NOTEACH), (0),
-		GIVEITEM | GETITEM,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	/*************************************************************/
-	/* Ende Vertraute !                                          */
-	/*************************************************************/
-
-	/* RC_SEASERPENT */
-	{
-		{"Seeschlange", "Seeschlangen", "Seeschlangen", NULL},
-		0.50, 1.00, 1.00,
-		5000, 0, 6, 20000, 1.0,
-		600, "2d15", 3, 0, 0, 4, 4,
-		{
-			{AT_NATURAL, {"1d30"}, 0}, {AT_NATURAL, {"1d30"}, 0}, {AT_NATURAL, {"1d30"}, 0},
-			{AT_SPELL, {(void*)SPL_FIREDRAGONODEM}, 0}, {AT_STRUCTURAL, {"1d10"}, 0},
-			{AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,
-			0, 0, 0, 0,   4, 0, 0, 0,   0, 0, 0, 0, 0
-		},
-		true,
-		RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_LEARN|RCF_NOTEACH|RCF_SWIM|RCF_MOVERANDOM,
-		(0),
-		GETITEM | CANGUARD,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-		&drachen_name, NULL, &allowed_swim
-	},
-
-	/* Schattenritter, nur temporär für einen Kampf. 1 Hitpoint, keine
-	 * Rüstung, kein Angriff. */
-	{
-		{"Schattenritter", "Schattenritter", "Schattenrittern", NULL},
-		0.00, 0.00, 0.00,
-		5, 0, 20000, 1000, 1.0,
-		1, "1d1", 0, 0, 0, 1, 1,
-		{
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{
-			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,
-			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0
-		},
-		true,
-		(RCF_SCAREPEASANTS|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH),
-		(BF_NOBLOCK),
-		0,
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	{
-		/* const char *name[4] */
-		{"Zentaur", "Zentauren", "Zentauren", "Zentauren"},
-
-		/* Magieresistenz (0=Normal) */
-		0.00,
-
-		/* Maximale Aura (1=Durchschnitt) */
-		0.75,
-
-		/* Auraregeneration (1=Durchschnitt) */
-		0.75,
-
-		/* Rekrutierungskosten, Unterhalt pro Runde */
-		100, 10,
-
-		/* Splitsize */
-		10000,
-
-		/* Gewicht */
-		5000,
-
-		/* Multiplikator Geschwindigkeit */
-		1.0,
-
-		/* Trefferpunkte */
-		30,
-
-		/* Schaden AT_STANDARD unbewaffnet */
-		"2d5",
-
-		/* Natürliche Rüstung */
-		0,
-
-		/* Angriff, Verteidigung unbewaffnet */
-		0, 0,
-
-		/* Bonus Angriff, Verteidigung */
-		0, 0,
-
-		/* Angriffe */
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-
-		/* Talentboni
- 		  Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Kräu,Mag,Pfer,Rei, Rüs,Sbau,Hie,Seg,
-		  Sta,Spi,Stei,Str, Tak,Tar,Unt,Waf, Wag,Wahr,Steu,Aus, WlK */
-		{
-			0, 1,-3, 1,  -2, 1, 0,-2,   1, 0, 4, 0,  -1,-4, 0,-4,
-			1,-1,-1, 0,   0,-1, 0, 1,   1, 0, 1, 0,   0
-		},
-
-		/* Nonplayer (bei Gelegenheit entfernen) */
-		false,
-
-		/* Flags */
-		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM | RCF_HORSE,
-
-		/* Battle_flags */
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-
-		/* Economic-Flags */
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM | ECF_REC_HORSES,
-
-		/* Vertraute für den Zauber
-		   (Generisch, Illaun, Tybied, Cerddor, Gwyrrd, Draig) */
-		{RC_EAGLE, RC_FEY, RC_OWL, RC_UNICORN, RC_NYMPH, RC_IMP}
-	},
-
-	/* Skelette, einfachste Untotenart */
-	{
-		/* const char *name[4] */
-		{"Skelett", "Skelette", "Skeletten", NULL},
-
-		/* Magieresistenz (0=Normal) */
-		0.10,
-
-		/* Maximale Aura (1=Durchschnitt) */
-		1.0,
-
-		/* Auraregeneration (1=Durchschnitt) */
-		1.0,
-
-		/* Rekrutierungskosten, Unterhalt pro Runde */
-		0, 0,
-
-		/* Splitsize */
-		10000,
-
-		/* Gewicht */
-		500,
-
-		/* Multiplikator Geschwindigkeit */
-		1.0,
-
-		/* Trefferpunkte */
-		20,
-
-		/* Schaden AT_STANDARD unbewaffnet */
-		"1d7",
-
-		/* Natürliche Rüstung */
-		1,
-
-		/* Angriff, Verteidigung unbewaffnet */
-		1, 1,
-
-		/* Bonus Angriff, Verteidigung */
-		6, 6,
-
-		/* Angriffe */
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-
-		/* Talentboni
- 		  Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Kräu,Mag,Pfer,Rei, Rüs,Sbau,Hie,Seg,
-		  Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wahr,Steu,Aus, WlK */
-		{
-			0, 1, 0, 1,   0, 0, 0, 1,   0, 0, 0, 1,   0, 0, 1, 0,
-			1, 0, 0, 0,   1, 0, 0, 0,   0, 0, 0, 1,   1
-		},
-
-		/* Nonplayer (bei Gelegenheit entfernen) */
-		true,
-
-		/* Flags */
-		(RCF_SCAREPEASANTS|RCF_KILLPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
-
-		/* Battle_flags */
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT | BF_RES_PIERCE | BF_RES_CUT,
-
-		/* Economic-Flags */
-		CANGUARD,
-
-		/* Vertraute für den Zauber
-		   (Generisch, Illaun, Tybied, Cerddor, Gwyrrd, Draig) */
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-
-		/* char *(*generate_name) (unit *) */
-		&skeleton_name,
-
-		/* Altern, wenn u->age%age == 0 */
-		&age_skeleton,
-	},
-
-	/* Skelette, einfachste Untotenart */
-	{
-		/* const char *name[4] */
-		{"Skelettherr", "Skelettherren", "Skelettherren", NULL},
-
-		/* Magieresistenz (0=Normal) */
-		0.30,
-
-		/* Maximale Aura (1=Durchschnitt) */
-		1.0,
-
-		/* Auraregeneration (1=Durchschnitt) */
-		1.0,
-
-		/* Rekrutierungskosten, Unterhalt pro Runde */
-		2, 0,
-
-		/* Splitsize */
-		10000,
-
-		/* Gewicht */
-		1000,
-
-		/* Multiplikator Geschwindigkeit */
-		1.0,
-
-		/* Trefferpunkte */
-		60,
-
-		/* Schaden AT_STANDARD unbewaffnet */
-		"1d7",
-
-		/* Natürliche Rüstung */
-		4,
-
-		/* Angriff, Verteidigung unbewaffnet */
-		6, 6,
-
-		/* Bonus Angriff, Verteidigung */
-		8, 8,
-
-		/* Angriffe */
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-
-		/* Talentboni
- 		  Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Kräu,Mag,Pfer,Rei, Rüs,Sbau,Hie,Seg,
-		  Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wahr,Steu,Aus, WlK */
-		{
-			0, 1, 0, 1,   0, 0, 0, 1,   0, 0, 0, 1,   0, 0, 1, 0,
-			1, 0, 0, 0,   1, 0, 0, 0,   0, 0, 0, 1,   1
-		},
-
-		/* Nonplayer (bei Gelegenheit entfernen) */
-		true,
-
-		/* Flags */
-		(RCF_SCAREPEASANTS|RCF_ABSORBPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
-
-		/* Battle_flags */
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT | BF_RES_PIERCE | BF_RES_CUT,
-
-		/* Economic-Flags */
-		CANGUARD,
-
-		/* Vertraute für den Zauber
-		   (Generisch, Illaun, Tybied, Cerddor, Gwyrrd, Draig) */
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-
-		/* char *(*generate_name) (unit *) */
-		&skeleton_name,
-
-	},
-
-	/* Zombies, Untotenart */
-	{
-		/* const char *name[4] */
-		{"Zombie", "Zombies", "Zombies", NULL},
-
-		/* Magieresistenz (0=Normal) */
-		0.20,
-
-		/* Maximale Aura (1=Durchschnitt) */
-		1.0,
-
-		/* Auraregeneration (1=Durchschnitt) */
-		1.0,
-
-		/* Rekrutierungskosten, Unterhalt pro Runde */
-		4, 0,
-
-		/* Splitsize */
-		10000,
-
-		/* Gewicht */
-		1000,
-
-		/* Multiplikator Geschwindigkeit */
-		1.0,
-
-		/* Trefferpunkte */
-		40,
-
-		/* Schaden AT_STANDARD unbewaffnet */
-		"1d7",
-
-		/* Natürliche Rüstung */
-		1,
-
-		/* Angriff, Verteidigung unbewaffnet */
-		2, 2,
-
-		/* Bonus Angriff, Verteidigung */
-		5, 5,
-
-		/* Angriffe */
-		{
-			{AT_STANDARD, {"1d7"}, 0},  {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-
-		/* Talentboni
- 		  Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Kräu,Mag,Pfer,Rei, Rüs,Sbau,Hie,Seg,
-		  Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wahr,Steu,Aus, WlK */
-		{
-			0, 1, 0, 1,   0, 0, 0, 1,   0, 0, 0, 1,   0, 0, 1, 0,
-			1, 0, 0, 0,   1, 0, 0, 0,   0, 0, 0, 1,   1
-		},
-
-		/* Nonplayer (bei Gelegenheit entfernen) */
-		true,
-
-		/* Flags */
-		(RCF_SCAREPEASANTS|RCF_KILLPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
-
-		/* Battle_flags */
-		BF_EQUIPMENT|BF_MAGIC_EQUIPMENT|BF_RES_PIERCE|BF_RES_CUT,
-
-		/* Economic-Flags */
-		CANGUARD,
-
-		/* Vertraute für den Zauber
-		   (Generisch, Illaun, Tybied, Cerddor, Gwyrrd, Draig) */
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-
-		/* char *(*generate_name) (unit *) */
-		&zombie_name,
-
-		/* Altern, wenn u->age%age == 0 */
-		&age_zombie,
-	},
-
-	/* Juju-Zombies, Untotenart */
-	{
-		/* const char *name[4] */
-		{"Juju-Zombie", "Juju-Zombies", "Juju-Zombies", NULL},
-
-		/* Magieresistenz (0=Normal) */
-		0.50,
-
-		/* Maximale Aura (1=Durchschnitt) */
-		1.0,
-
-		/* Auraregeneration (1=Durchschnitt) */
-		1.0,
-
-		/* Rekrutierungskosten, Unterhalt pro Runde */
-		8, 0,
-
-		/* Splitsize */
-		10000,
-
-		/* Gewicht */
-		1000,
-
-		/* Multiplikator Geschwindigkeit */
-		1.0,
-
-		/* Trefferpunkte */
-		80,
-
-		/* Schaden AT_STANDARD unbewaffnet */
-		"1d7",
-
-		/* Natürliche Rüstung */
-		2,
-
-		/* Angriff, Verteidigung unbewaffnet */
-		6, 6,
-
-		/* Bonus Angriff, Verteidigung */
-		8, 8,
-
-		/* Angriffe */
-		{
-			{AT_STANDARD, {"1d7"}, 0}, {AT_DRAIN_ST, {"1d1"}, 0}, {AT_DRAIN_ST, {"1d1"}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-
-		/* Talentboni
- 		  Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Kräu,Mag,Pfer,Rei, Rüs,Sbau,Hie,Seg,
-		  Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wahr,Steu,Aus, WlK */
-		{
-			0, 1, 0, 1,   0, 0, 0, 1,   0, 0, 0, 1,   0, 0, 1, 0,
-			1, 0, 0, 0,   1, 0, 0, 0,   0, 0, 0, 1,   1
-		},
-
-		/* Nonplayer (bei Gelegenheit entfernen) */
-		true,
-
-		/* Flags */
-		(RCF_SCAREPEASANTS|RCF_ABSORBPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
-
-		/* Battle_flags */
-		BF_EQUIPMENT|BF_MAGIC_EQUIPMENT|BF_RES_PIERCE|BF_RES_CUT|BF_RES_BASH,
-
-		/* Economic-Flags */
-		CANGUARD,
-
-		/* Vertraute für den Zauber
-		   (Generisch, Illaun, Tybied, Cerddor, Gwyrrd, Draig) */
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-
-		/* char *(*generate_name) (unit *) */
-		&zombie_name,
-
-		/* Altern, wenn u->age%age == 0 */
-		NULL,
-	},
-
-
-	/* Ghoule, Untotenart */
-	{
-		/* const char *name[4] */
-		{"Ghoul", "Ghoule", "Ghoulen", NULL},
-
-		/* Magieresistenz (0=Normal) */
-		0.30,
-
-		/* Maximale Aura (1=Durchschnitt) */
-		1.0,
-
-		/* Auraregeneration (1=Durchschnitt) */
-		1.0,
-
-		/* Rekrutierungskosten, Unterhalt pro Runde */
-		5, 0,
-
-		/* Splitsize */
-		10000,
-
-		/* Gewicht */
-		1000,
-
-		/* Multiplikator Geschwindigkeit */
-		1.0,
-
-		/* Trefferpunkte */
-		30,
-
-		/* Schaden AT_STANDARD unbewaffnet */
-		"1d7",
-
-		/* Natürliche Rüstung */
-		1,
-
-		/* Angriff, Verteidigung unbewaffnet */
-		3, 3,
-
-		/* Bonus Angriff, Verteidigung */
-		3, 3,
-
-		/* Angriffe */
-		{
-			{AT_NATURAL, {"2d6"}, 0}, {AT_DRAIN_ST, {"1d2"}, 0}, {AT_DRAIN_ST, {"1d2"}, 0},
-			{AT_DRAIN_EXP, {"1d30"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-
-		/* Talentboni
- 		  Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Kräu,Mag,Pfer,Rei, Rüs,Sbau,Hie,Seg,
-		  Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wahr,Steu,Aus, WlK */
-		{
-			0, 1, 0, 1,   0, 0, 0, 1,   0, 0, 0, 1,   0, 0, 1, 0,
-			1, 0, 0, 0,   1, 0, 0, 0,   0, 0, 0, 1,   1
-		},
-
-		/* Nonplayer (bei Gelegenheit entfernen) */
-		true,
-
-		/* Flags */
-		(RCF_SCAREPEASANTS|RCF_ABSORBPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
-
-		/* Battle_flags */
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-
-		/* Economic-Flags */
-		CANGUARD,
-
-		/* Vertraute für den Zauber
-		   (Generisch, Illaun, Tybied, Cerddor, Gwyrrd, Draig) */
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-
-		/* char *(*generate_name) (unit *) */
-		&ghoul_name,
-
-		/* Altern, wenn u->age%age == 0 */
-		&age_ghoul,
-	},
-
-	/* Ghasts, Untotenart */
-	{
-		/* const char *name[4] */
-		{"Ghast", "Ghaste", "Ghasten", NULL},
-
-		/* Magieresistenz (0=Normal) */
-		0.60,
-
-		/* Maximale Aura (1=Durchschnitt) */
-		1.0,
-
-		/* Auraregeneration (1=Durchschnitt) */
-		1.0,
-
-		/* Rekrutierungskosten, Unterhalt pro Runde */
-		5, 0,
-
-		/* Splitsize */
-		10000,
-
-		/* Gewicht */
-		1000,
-
-		/* Multiplikator Geschwindigkeit */
-		1.0,
-
-		/* Trefferpunkte */
-		60,
-
-		/* Schaden AT_STANDARD unbewaffnet */
-		"1d7",
-
-		/* Natürliche Rüstung */
-		2,
-
-		/* Angriff, Verteidigung unbewaffnet */
-		6, 6,
-
-		/* Bonus Angriff, Verteidigung */
-		6, 6,
-
-		/* Angriffe */
-		{
-			{AT_NATURAL, {"2d8"}, 0}, {AT_DRAIN_ST, {"1d5"}, 0}, {AT_DRAIN_ST, {"1d5"}, 0},
-			{AT_DRAIN_EXP, {"1d30"}, 0}, {AT_DRAIN_EXP, {"1d30"}, 0}, {AT_NONE, {NULL}, 0},
-		},
-
-		/* Talentboni
- 		  Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Kräu,Mag,Pfer,Rei, Rüs,Sbau,Hie,Seg,
-		  Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wahr,Steu,Aus, WlK */
-		{
-			0, 1, 0, 1,   0, 0, 0, 1,   0, 0, 0, 1,   0, 0, 1, 0,
-			1, 0, 0, 0,   1, 0, 0, 0,   0, 0, 0, 1,   1
-		},
-
-		/* Nonplayer (bei Gelegenheit entfernen) */
-		true,
-
-		/* Flags */
-		(RCF_SCAREPEASANTS|RCF_ABSORBPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
-
-		/* Battle_flags */
-		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-
-		/* Economic-Flags */
-		CANGUARD,
-
-		/* Vertraute für den Zauber
-		   (Generisch, Illaun, Tybied, Cerddor, Gwyrrd, Draig) */
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
-
-		/* char *(*generate_name) (unit *) */
-		&ghoul_name,
-
-		/* Altern, wenn u->age%age == 0 */
-		NULL,
-	},
-
-	/* Museumsgeist */
-	{
-		/* const char *name[4] */
-		{"Museumsgeist", "Museumsgeister", "Museumsgeistern", NULL},
-
-		/* Magieresistenz (0=Normal) */
-		1.0,
-
-		/* Maximale Aura (1=Durchschnitt) */
-		0.0,
-
-		/* Auraregeneration (1=Durchschnitt) */
-		0.0,
-
-		/* Rekrutierungskosten, Unterhalt pro Runde */
-		5, 0,
-
-		/* Splitsize */
-		10000,
-
-		/* Gewicht */
-		1000,
-
-		/* Multiplikator Geschwindigkeit */
-		1.0,
-
-		/* Trefferpunkte */
-		50,
-
-		/* Schaden AT_STANDARD unbewaffnet */
-		"1d4",
-
-		/* Natürliche Rüstung */
-		0,
-
-		/* Angriff, Verteidigung unbewaffnet */
-		10, 10,
-
-		/* Bonus Angriff, Verteidigung */
-		10, 10,
-
-		/* Angriffe */
-		{
-			{AT_DRAIN_EXP, {"5d600"}, 0}, {AT_DRAIN_ST, {"5d5"}, 0}, {AT_DRAIN_EXP, {"5d600"}, 0},
-			{AT_DRAIN_EXP, {"5d600"}, 0}, {AT_DRAIN_ST, {"5d5"}, 0}, {AT_DRAIN_EXP, {"5d600"}, 0}
-		},
-
-		/* Talentboni
- 		  Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Kräu,Mag,Pfer,Rei, Rüs,Sbau,Hie,Seg,
-		  Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wahr,Steu,Aus, WlK */
-		{
-			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,
-			0, 0, 0, 0,   1, 0, 0, 0,   0, 1, 0, 1,   1
-		},
-
-		/* Nonplayer (bei Gelegenheit entfernen) */
-		true,
-
-		/* Flags */
-		(RCF_WALK|RCF_NOTEACH),
-
-		/* Battle_flags */
-		(0),
-
-		/* Economic-Flags */
-		CANGUARD,
-
-		/* Vertraute für den Zauber
-		   (Generisch, Illaun, Tybied, Cerddor, Gwyrrd, Draig) */
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	/* Weihnachtsgnom */
-	{
-		/* const char *name[4] */
-		{"Gnom", "Gnome", "Gnomen", NULL},
-
-		/* Magieresistenz (0=Normal) */
-		1.0,
-
-		/* Maximale Aura (1=Durchschnitt) */
-		0.0,
-
-		/* Auraregeneration (1=Durchschnitt) */
-		0.0,
-
-		/* Rekrutierungskosten, Unterhalt pro Runde */
-		5, 0,
-
-		/* Splitsize */
-		10000,
-
-		/* Gewicht */
-		1000,
-
-		/* Multiplikator Geschwindigkeit */
-		1.0,
-
-		/* Trefferpunkte */
-		50,
-
-		/* Schaden AT_STANDARD unbewaffnet */
-		"1d4",
-
-		/* Natürliche Rüstung */
-		0,
-
-		/* Angriff, Verteidigung unbewaffnet */
-		10, 10,
-
-		/* Bonus Angriff, Verteidigung */
-		10, 10,
-
-		/* Angriffe */
-		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-
-		/* Talentboni
- 		  Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Kräu,Mag,Pfer,Rei, Rüs,Sbau,Hie,Seg,
-		  Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wahr,Steu,Aus, WlK */
-		{
-			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,
-			0, 0, 0, 0,   1, 0, 0, 0,   0, 1, 0, 1,   1
-		},
-
-		/* Nonplayer (bei Gelegenheit entfernen) */
-		true,
-
-		/* Flags */
-		(RCF_WALK|RCF_NOTEACH),
-
-		/* Battle_flags */
-		(0),
-
-		/* Economic-Flags */
-		CANGUARD,
-
-		/* Vertraute für den Zauber
-		   (Generisch, Illaun, Tybied, Cerddor, Gwyrrd, Draig) */
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	/* Template */
-	{
-		/* const char *name[4] */
-		{"Schablone", "Schablonen", "Schablonen", "Schablonen"},
-		1.0,    /* Magieresistenz (0=Normal) */
-		0.0,    /* Maximale Aura (1=Durchschnitt) */
-		0.0,    /* Auraregeneration (1=Durchschnitt) */
-		0, 0,   /* Rekrutierungskosten, Unterhalt pro Runde */
-		10000,  /* Splitsize */
-		0,      /* Gewicht */
-		10.0,   /* Multiplikator Geschwindigkeit */
-		10,     /* Trefferpunkte */
-		"1d4",  /* Schaden AT_STANDARD unbewaffnet */
-		0,      /* Natürliche Rüstung */
-		-2, -2, /* Angriff, Verteidigung unbewaffnet */
-		0, 0,   /* Bonus Angriff, Verteidigung */
-		{ /* Angriffe */
-			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{ 		/* Talentboni */
- 			/* Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Krä,Mag,Pfe,Rei, Rüs,Sba,Hie,Seg, */
-			     0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0,
-			/* Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wah,Ste,Aus, WlK */
-			     0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0,   0
-		},
-		false, /* Nonplayer (bei Gelegenheit entfernen) */
-		(RCF_SHAPESHIFTANY | RCF_SHAPESHIFT | RCF_FLY | RCF_SWIM | RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM), /* flags */
-		(BF_EQUIPMENT | BF_MAGIC_EQUIPMENT),                      /* battle  */
-		(ECF_REC_ETHEREAL | ECF_REC_UNLIMITED | CANGUARD | GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM),  /* economy */
-		/* Vertraute für den Zauber (Gen, Ill, Tyb, Cer, Gwy, Dra) */
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	},
-	/* Klon */
-	{
-		/* const char *name[4] */
-		{"Klon", "Klone", "Klonen", "Klonen"},
-		0.9,    /* Magieresistenz (0=Normal) */
-		0.0,    /* Maximale Aura (1=Durchschnitt) */
-		0.0,    /* Auraregeneration (1=Durchschnitt) */
-		0, 0,   /* Rekrutierungskosten, Unterhalt pro Runde */
-		10000,  /* Splitsize */
-		1000,   /* Gewicht */
-		1.0,    /* Multiplikator Geschwindigkeit */
-		40,     /* Trefferpunkte */
-		"0d0",  /* Schaden AT_STANDARD unbewaffnet */
-		0,      /* Natürliche Rüstung */
-		-2, -2, /* Angriff, Verteidigung unbewaffnet */
-		0, 0,   /* Bonus Angriff, Verteidigung */
-		{ /* Angriffe */
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-		},
-		{ 		/* Talentboni */
- 			/* Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Krä,Mag,Pfe,Rei, Rüs,Sba,Hie,Seg, */
-			   -99,-99,-99,-99, -99,-99,-99,-99, -99,-99,-99,-99, -99,-99,-99,-99,
-			/* Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wah,Ste,Aus, WlK */
-			   -99,-99,-99,-99, -99,-99,-99,-99, -99,-99,-99,-99, -99
-		},
-		false, /* Nonplayer (bei Gelegenheit entfernen) */
-		(RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
-		(0),								                      /* battle  */
-		(0),																			/* economy */
-		/* Vertraute für den Zauber (Gen, Ill, Tyb, Cer, Gwy, Dra) */
-		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
-	}
+/* required for old_race, do not change order! */
+static const char * oldracenames[MAXRACES] = {
+	"dwarf", "elf", "orc", "goblin", "human", "troll", "demon", "insect", "halfling", "cat", "aquarian",
+	"undead", "illusion",
+	"young dragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
+	"special", "spell",
+	"irongolem", "stone golem", "shadowdemon", "shadowmaster", "mountainguard", "alp",
+	"toad",
+	"braineater", "peasant",
+	"wolf", "lynx", "tunnelworm", "eagle", "rat", "songdragon", "nymph", "unicorn", 
+	"direwolf", "ghost",
+	"imp", "dreamcat", "fairy", "owl", "hellcat", "tiger", "dolphin", "giant turtle", "kraken", "sea serpent",
+	"shadow knight",
+	"centaur",
+	"skeleton", "skeleton lord", "zombie", "juju-zombie", "ghoul", "ghast", "museumghost", "gnome",
+	"template", 
+	"clone"
 };
 
 /* magres, {3 namen},
@@ -1894,14 +185,14 @@ void
 set_show_item(faction *f, item_t i)
 {
 	attrib *a = a_add(&f->attribs, a_new(&at_showitem));
-	a->data.v = olditemtype[i];
+	a->data.v = (void*)olditemtype[i];
 }
 
 void
 give_starting_equipment(struct region *r, struct unit *u)
 
 {
-	switch(u->race) {
+	switch(old_race(u->race)) {
 	case RC_DWARF:
 		set_skill(u, SK_SWORD, 30);
 		set_item(u, I_AXE, 1);
@@ -2007,7 +298,7 @@ unit_max_hp(const unit * u)
 {
 	int h;
 	double p;
-	h = race[u->race].hitpoints;
+	h = u->race->hitpoints;
 
 	p = pow(effskill(u, SK_AUSDAUER) / 2.0, 1.5) * 0.2;
 	h += (int) (h * p + 0.5);
@@ -2018,7 +309,7 @@ unit_max_hp(const unit * u)
 
 	return h;
 }
-
+/*
 boolean is_undead(const unit *u)
 {
 	return u->race == RC_UNDEAD || u->race == RC_SKELETON
@@ -2026,13 +317,7 @@ boolean is_undead(const unit *u)
 		|| u->race == RC_ZOMBIE_LORD || u->race == RC_GHOUL
 		|| u->race == RC_GHOUL_LORD;
 }
-
-extern void
-init_races(void)
-{
-	a_add(&race[RC_TROLL].attribs, make_skillmod(NOSKILL, SMF_RIDING, NULL, 0.0, -1));
-}
-
+*/
 boolean
 r_insectstalled(const region * r)
 {
@@ -2044,7 +329,13 @@ r_insectstalled(const region * r)
 }
 
 const char *
-racename(const locale *loc, const unit *u, const race_t r)
+rc_name(const race * rc, int n)
+{
+	return mkname("race", rc->_name[n]);
+}
+
+const char *
+racename(const locale *loc, const unit *u, const race * rc)
 {
 	static char lbuf[80];
 	attrib *a, *a2;
@@ -2067,10 +358,9 @@ racename(const locale *loc, const unit *u, const race_t r)
 			strcpy(s, locale_string(loc,
 				((frace_synonyms *)(a->data.v))->synonyms[u->number != 1]));
 		} else {
-			strcpy(s, locale_string(loc,
-				race[r].name[u->number != 1]));
+			strcpy(s, LOC(loc, rc_name(rc, u->number != 1)));
 		}
-		s[0] = tolower(s[0]);
+		s[0] = (char)tolower(s[0]);
 		strcat(lbuf, s);
 		return lbuf;
 	}
@@ -2078,6 +368,464 @@ racename(const locale *loc, const unit *u, const race_t r)
 		return(locale_string(loc,
 			((frace_synonyms *)(a->data.v))->synonyms[u->number != 1]));
 	}
-	return(locale_string(loc, race[r].name[u->number != 1]));
+	return LOC(loc, rc_name(rc, u->number != 1));
 }
 
+static void
+oldfamiliars(unit * familiar)
+{
+	sc_mage * m;
+	race_t frt = old_race(familiar->race);
+
+	switch(frt) {
+		case RC_HOUSECAT:
+			/* Kräu+1, Mag, Pfer+1, Spi+3, Tar+3, Wahr+4, Aus */
+			set_skill(familiar, SK_MAGIC, 30);
+			set_skill(familiar, SK_SPY, 30);
+			set_skill(familiar, SK_STEALTH, 30);
+			set_skill(familiar, SK_OBSERVATION, 30);
+			m = create_mage(familiar, M_GRAU);
+			break;
+		case RC_TUNNELWORM:
+			/* Ber+50,Hol+50,Sbau+50,Aus+2*/
+			set_skill(familiar, SK_MAGIC, 30);
+			set_skill(familiar, SK_MINING, 30);
+			set_skill(familiar, SK_LUMBERJACK, 30);
+			set_skill(familiar, SK_ROAD_BUILDING, 30);
+			set_skill(familiar, SK_AUSDAUER, 30);
+			m = create_mage(familiar, M_GRAU);
+			break;
+		case RC_EAGLE:
+			/* Spi, Wahr+2, Aus */
+			set_skill(familiar, SK_MAGIC, 30);
+			set_skill(familiar, SK_OBSERVATION, 30);
+			m = create_mage(familiar, M_GRAU);
+			break;
+		case RC_RAT:
+			/* Spionage+5, Tarnung+4, Wahrnehmung+2, Ausdauer */
+			set_skill(familiar, SK_MAGIC, 30);
+			set_skill(familiar, SK_SPY, 30);
+			set_skill(familiar, SK_STEALTH, 30);
+			set_skill(familiar, SK_OBSERVATION, 30);
+			set_skill(familiar, SK_AUSDAUER, 50+rand()%500+rand()%500);
+			/* set_number(familiar, 50+rand()%500+rand()%500); */
+			m = create_mage(familiar, M_GRAU);
+			break;
+		case RC_PSEUDODRAGON:
+			/* Magie+1, Spionage, Tarnung, Wahrnehmung, Ausdauer */
+			m = create_mage(familiar, M_GRAU);
+			set_skill(familiar, SK_MAGIC, 30);
+			addspell(familiar, SPL_FLEE);
+			addspell(familiar, SPL_SLEEP);
+			addspell(familiar, SPL_FRIGHTEN);
+			m->combatspell[0] = SPL_FLEE;
+			m->combatspell[1] = SPL_SLEEP;
+			break;
+		case RC_NYMPH:
+			/* Alc, Arm, Bog+2, Han-2, Kräu+4, Mag+1, Pfer+5, Rei+5,
+			 * Rüs-2, Sbau, Seg-2, Sta, Spi+2, Tak-2, Tar+3, Unt+10,
+			 * Waf-2, Wag-2, Wahr+2, Steu-2, Aus-1 */
+			set_skill(familiar, SK_MAGIC, 30);
+			set_skill(familiar, SK_LONGBOW, 30);
+			set_skill(familiar, SK_HERBALISM, 30);
+			set_skill(familiar, SK_HORSE_TRAINING, 30);
+			set_skill(familiar, SK_RIDING, 30);
+			set_skill(familiar, SK_SPY, 30);
+			set_skill(familiar, SK_STEALTH, 30);
+			set_skill(familiar, SK_ENTERTAINMENT, 30);
+			set_skill(familiar, SK_OBSERVATION, 30);
+			m = create_mage(familiar, M_GRAU);
+			addspell(familiar, SPL_SEDUCE);
+			addspell(familiar, SPL_CALM_MONSTER);
+			addspell(familiar, SPL_SONG_OF_CONFUSION);
+			addspell(familiar, SPL_DENYATTACK);
+			m->combatspell[0] = SPL_SONG_OF_CONFUSION;
+			break;
+		case RC_UNICORN:
+			/* Mag+2, Spi, Tak, Tar+4, Wahr+4, Aus */
+			set_skill(familiar, SK_MAGIC, 30);
+			set_skill(familiar, SK_STEALTH, 30);
+			set_skill(familiar, SK_OBSERVATION, 30);
+			m = create_mage(familiar, M_GRAU);
+			addspell(familiar, SPL_RESISTMAGICBONUS);
+			addspell(familiar, SPL_SONG_OF_PEACE);
+			addspell(familiar, SPL_CALM_MONSTER);
+			addspell(familiar, SPL_HERO);
+			addspell(familiar, SPL_HEALINGSONG);
+			addspell(familiar, SPL_DENYATTACK);
+			break;
+		case RC_WARG:
+			/* Spi, Tak, Tar, Wahri+2, Aus */
+			set_skill(familiar, SK_MAGIC, 30);
+			set_skill(familiar, SK_OBSERVATION, 30);
+			m = create_mage(familiar, M_GRAU);
+			break;
+		case RC_WRAITH:
+			/* Mag+1, Rei-2, Hie, Sta, Spi, Tar, Wahr, Aus */
+			set_skill(familiar, SK_MAGIC, 30);
+			m = create_mage(familiar, M_GRAU);
+			addspell(familiar, SPL_STEALAURA);
+			addspell(familiar, SPL_FRIGHTEN);
+			addspell(familiar, SPL_SUMMONUNDEAD);
+			break;
+		case RC_IMP:
+			/* Mag+1,Rei-1,Hie,Sta,Spi+1,Tar+1,Wahr+1,Steu+1,Aus*/
+			set_skill(familiar, SK_MAGIC, 30);
+			set_skill(familiar, SK_SPY, 30);
+			set_skill(familiar, SK_STEALTH, 30);
+			set_skill(familiar, SK_OBSERVATION, 30);
+			set_skill(familiar, SK_TAXING, 30);
+			m = create_mage(familiar, M_GRAU);
+			addspell(familiar, SPL_STEALAURA);
+			break;
+		case RC_DREAMCAT:
+			/* Mag+1,Hie,Sta,Spi+1,Tar+1,Wahr+1,Steu+1,Aus*/
+			set_skill(familiar, SK_MAGIC, 30);
+			set_skill(familiar, SK_SPY, 30);
+			set_skill(familiar, SK_STEALTH, 30);
+			set_skill(familiar, SK_OBSERVATION, 30);
+			set_skill(familiar, SK_TAXING, 30);
+			m = create_mage(familiar, M_GRAU);
+			addspell(familiar, SPL_ILL_SHAPESHIFT);
+			addspell(familiar, SPL_TRANSFERAURA_TRAUM);
+			break;
+		case RC_FEY:
+			/* Mag+1,Rei-1,Hie-1,Sta-1,Spi+2,Tar+5,Wahr+2,Aus */
+			set_skill(familiar, SK_MAGIC, 30);
+			m = create_mage(familiar,M_GRAU);
+			addspell(familiar, SPL_DENYATTACK);
+			addspell(familiar, SPL_CALM_MONSTER);
+			addspell(familiar, SPL_SEDUCE);
+			break;
+		case RC_OWL:
+			/* Spi+1,Tar+1,Wahr+5,Aus */
+			set_skill(familiar, SK_MAGIC, 30);
+			set_skill(familiar, SK_SPY, 30);
+			set_skill(familiar, SK_STEALTH, 30);
+			set_skill(familiar, SK_OBSERVATION, 30);
+			m = create_mage(familiar,M_GRAU);
+			break;
+		case RC_HELLCAT:
+			/* Spi, Tak, Tar, Wahr+1, Aus */
+			set_skill(familiar, SK_MAGIC, 30);
+			set_skill(familiar, SK_OBSERVATION, 30);
+			m = create_mage(familiar,M_GRAU);
+			break;
+		case RC_TIGER:
+			/* Spi, Tak, Tar, Wahr+1, Aus */
+			set_skill(familiar, SK_MAGIC, 30);
+			set_skill(familiar, SK_OBSERVATION, 30);
+			m = create_mage(familiar,M_GRAU);
+			break;
+	}
+}
+
+static item *
+dragon_drops(const struct race * rc, int size)
+{
+	item * itm = NULL;
+	switch (old_race(rc)) {
+	case RC_FIREDRAGON:
+		i_add(&itm, i_new(olditemtype[I_DRACHENBLUT], size));
+		break;
+	case RC_DRAGON:
+		i_add(&itm, i_new(olditemtype[I_DRACHENBLUT], size * 4));
+		i_add(&itm, i_new(olditemtype[I_DRAGONHEAD], size));
+		break;
+	case RC_WYRM:
+		i_add(&itm, i_new(olditemtype[I_DRACHENBLUT], size * 10));
+		i_add(&itm, i_new(olditemtype[I_DRAGONHEAD], size));
+		break;
+	case RC_SEASERPENT:
+		i_add(&itm, i_new(olditemtype[I_DRACHENBLUT], size * 6));
+		i_add(&itm, i_new(olditemtype[I_SEASERPENTHEAD], size));
+		break;
+	}
+	return itm;
+}
+
+int 
+rc_specialdamage(const race * ar, const race * dr, const struct weapon_type * wtype)
+{
+	race_t art = old_race(ar);
+	switch (art) {
+	case RC_ELF:
+		if (wtype!=NULL && fval(wtype, WTF_BOW)) {
+			return 1;
+		}
+		break;
+	case RC_HALFLING:
+		if (wtype!=NULL && dragonrace(dr)) {
+			return 5;
+		}
+		break;
+	}
+	return 0;
+}
+
+void
+write_race_reference(const race * rc, FILE * F)
+{
+	fprintf(F, "%s ", rc?rc->_name[0]:"none");
+}
+
+void
+read_race_reference(const struct race ** rp, FILE * F)
+{
+	char zName[20];
+	if (global.data_version<NEWRACE_VERSION) {
+		int i;
+		fscanf(F, "%d", &i);
+		if (i>=0) {
+			*rp = new_race[i];
+		} else {
+			*rp = NULL;
+		}
+	} else {
+		fscanf(F, "%s", zName);
+		if (strcmp(zName, "none")==0) {
+			*rp = NULL;
+		} else {
+			*rp = rc_find(zName);
+			assert(*rp!=NULL);
+		}
+	}
+}
+
+#include <xml.h>
+#include <log.h>
+/* callbacks */
+
+typedef struct xml_state {
+	struct race * race;
+	int nextfamiliar;
+	int nextattack;
+} xml_state;
+
+static int 
+tagbegin(struct xml_stack * stack, void * data)
+{
+	xml_state * state = (xml_state*)data;
+	const xml_tag * tag = stack->tag;
+	if (strcmp(tag->name, "races")==0) {
+		memset(state, 0, sizeof(xml_state));
+	} else if (strcmp(tag->name, "race")==0) {
+		const char * zName = xml_value(tag, "name");
+		race * rc;
+		
+		state->nextattack = 0;
+		state->nextfamiliar = 0;
+
+		if (zName) {
+			rc = rc_find(zName);
+			if (rc==NULL) {
+				rc = rc_add(rc_new(zName));
+			}
+		} else {
+			log_error(("missing required tag 'name'\n"));
+			return XML_USERERROR;
+		}
+		rc->magres = xml_fvalue(tag, "magres");
+		rc->maxaura = xml_fvalue(tag, "maxaura");
+		rc->regaura = xml_fvalue(tag, "regaura");
+		rc->recruitcost = xml_ivalue(tag, "recruitcost");
+		rc->maintenance = xml_ivalue(tag, "maintenance");
+		rc->weight = xml_ivalue(tag, "weight");
+		rc->speed = xml_fvalue(tag, "speed");
+		rc->hitpoints = xml_ivalue(tag, "hp");
+		rc->def_damage = strdup(xml_value(tag, "damage"));
+		rc->armor = (char)xml_ivalue(tag, "ac");
+
+		rc->at_default = (char)xml_ivalue(tag, "unarmedattack");
+		rc->df_default = (char)xml_ivalue(tag, "unarmeddefense");
+		rc->at_bonus = (char)xml_ivalue(tag, "attackmodifier");
+		rc->df_bonus = (char)xml_ivalue(tag, "defensemodifier");
+
+		if (xml_bvalue(tag, "playerrace")) rc->flags |= RCF_PLAYERRACE;
+		if (xml_bvalue(tag, "scarepeasants")) rc->flags |= RCF_SCAREPEASANTS;
+		if (xml_bvalue(tag, "cannotmove")) rc->flags |= RCF_CANNOTMOVE;
+		if (xml_bvalue(tag, "fly")) rc->flags |= RCF_FLY;
+		if (xml_bvalue(tag, "swim")) rc->flags |= RCF_SWIM;
+		if (xml_bvalue(tag, "walk")) rc->flags |= RCF_WALK;
+		if (xml_bvalue(tag, "nolearn")) rc->flags |= RCF_NOLEARN;
+		if (xml_bvalue(tag, "noteach")) rc->flags |= RCF_NOTEACH;
+		if (xml_bvalue(tag, "horse")) rc->flags |= RCF_HORSE;
+		if (xml_bvalue(tag, "desert")) rc->flags |= RCF_DESERT;
+		if (xml_bvalue(tag, "absorbpeasants")) rc->flags |= RCF_ABSORBPEASANTS;
+		if (xml_bvalue(tag, "noheal")) rc->flags |= RCF_NOHEAL;
+		if (xml_bvalue(tag, "noweapons")) rc->flags |= RCF_NOWEAPONS;
+		if (xml_bvalue(tag, "shapeshift")) rc->flags |= RCF_SHAPESHIFT;
+		if (xml_bvalue(tag, "shapeshiftany")) rc->flags |= RCF_SHAPESHIFTANY;
+		if (xml_bvalue(tag, "illusionary")) rc->flags |= RCF_ILLUSIONARY;
+		if (xml_bvalue(tag, "undead")) rc->flags |= RCF_UNDEAD;
+
+		if (xml_bvalue(tag, "nogive")) rc->ec_flags |= NOGIVE;
+		if (xml_bvalue(tag, "giveitem")) rc->ec_flags |= GIVEITEM;
+		if (xml_bvalue(tag, "giveperson")) rc->ec_flags |= GIVEPERSON;
+		if (xml_bvalue(tag, "giveunit")) rc->ec_flags |= GIVEUNIT;
+		if (xml_bvalue(tag, "getitem")) rc->ec_flags |= GETITEM;
+		if (xml_bvalue(tag, "canguard")) rc->ec_flags |= CANGUARD;
+		if (xml_bvalue(tag, "recruithorses")) rc->ec_flags |= ECF_REC_HORSES;
+		if (xml_bvalue(tag, "recruitethereal")) rc->ec_flags |= ECF_REC_ETHEREAL;
+		if (xml_bvalue(tag, "recruitunlimited")) rc->ec_flags |= ECF_REC_UNLIMITED;
+
+		if (xml_bvalue(tag, "equipment")) rc->battle_flags |= BF_EQUIPMENT;
+		if (xml_bvalue(tag, "noblock")) rc->battle_flags |= BF_NOBLOCK;
+		if (xml_bvalue(tag, "invinciblenonmagic")) rc->battle_flags |= BF_INV_NONMAGIC;
+		if (xml_bvalue(tag, "resistbash")) rc->battle_flags |= BF_RES_BASH;
+		if (xml_bvalue(tag, "resistcut")) rc->battle_flags |= BF_RES_CUT;
+		if (xml_bvalue(tag, "resistpierce")) rc->battle_flags |= BF_RES_PIERCE;
+
+		state->race = rc;
+	} else if (strcmp(tag->name, "ai")==0) {
+		race * rc = state->race;
+		rc->splitsize = xml_ivalue(tag, "splitsize");
+
+		if (xml_bvalue(tag, "killpeasants")) rc->flags |= RCF_KILLPEASANTS;
+		if (xml_bvalue(tag, "attackrandom")) rc->flags |= RCF_ATTACKRANDOM;
+		if (xml_bvalue(tag, "moverandom")) rc->flags |= RCF_MOVERANDOM;
+		if (xml_bvalue(tag, "learn")) rc->flags |= RCF_LEARN;
+
+	} else if (strcmp(tag->name, "skill")==0) {
+		race * rc = state->race;
+		const char * name = xml_value(tag, "name");
+		if (name) {
+			int mod = xml_ivalue(tag, "modifier");
+			if (mod!=0) {
+				skill_t sk = sk_find(name);
+				if (sk!=NOSKILL) {
+					rc->bonus[sk] = (char)mod;
+				} else {
+					log_error(("unknown skill '%s'\n", name));
+				}
+			}
+		} else {
+			log_error(("missing required tag 'name'\n"));
+			return XML_USERERROR;
+		}
+	} else if (strcmp(tag->name, "attack")==0) {
+		race * rc = state->race;
+		const char * damage = xml_value(tag, "damage");
+		struct att * a = &rc->attack[state->nextattack++];
+		if (damage) {
+			a->data.dice = strdup(damage);
+		} else {
+			a->data.iparam = xml_ivalue(tag, "spell");
+		}
+		a->type = xml_ivalue(tag, "type");
+		a->flags = xml_ivalue(tag, "flags");
+	} else if (strcmp(tag->name, "function")==0) {
+		race * rc = state->race;
+		const char * name = xml_value(tag, "name");
+		const char * value = xml_value(tag, "value");
+		if (name && value) {
+			pf_generic fun = get_function(value);
+			if (fun==NULL) {
+				log_error(("unknown function value '%s=%s' for race %s\n", name, value, rc->_name[0]));
+			} else {
+				if (strcmp(name, "name")==0) {
+					rc->generate_name = (const char* (*)(const struct unit*))fun;
+				} else if (strcmp(name, "age")==0) {
+					rc->age = (void(*)(struct unit*))fun;
+				} else if (strcmp(name, "move")==0) {
+					rc->move_allowed = (boolean(*)(const struct region *, const struct region *))fun;
+				} else if (strcmp(name, "itemdrop")==0) {
+					rc->itemdrop = (struct item *(*)(const struct race *, int))fun;
+				} else if (strcmp(name, "initfamiliar")==0) {
+					rc->init_familiar = (void(*)(struct unit *))fun;
+				} else {
+					log_error(("unknown function type '%s=%s' for race %s\n", name, value, rc->_name[0]));
+				}
+			}
+		}
+	} else if (strcmp(tag->name, "familiar")==0) {
+		race * rc = state->race;
+		const char * zRace = xml_value(tag, "race");
+		if (zRace && rc) {
+			race * frc = rc_find(zRace);
+			if (frc == NULL) {
+				frc = rc_add(rc_new(zRace));
+			}
+			if (xml_bvalue(tag, "default")) {
+				rc->familiars[0] = frc;
+			} else {
+				rc->familiars[++state->nextfamiliar] = frc;
+			}
+		} else {
+			log_error(("missing required tag 'race'\n"));
+			return XML_USERERROR;
+		}
+	}
+	return XML_OK;
+}
+
+static int 
+tagend(struct xml_stack * stack, void * data)
+{
+	xml_state * state = (xml_state*)data;
+	const xml_tag * tag = stack->tag;
+	if (strcmp(tag->name, "race")==0) {
+		state->race = NULL;
+		state->nextfamiliar = 0;
+		state->nextattack = 0;
+	}
+	return XML_OK;
+}
+
+static xml_callbacks xml_races = {
+	NULL, tagbegin, tagend, NULL
+};
+
+int
+read_races(FILE * F, struct xml_stack * stack)
+{
+	xml_state state;
+	int i, err = xml_parse(F, &xml_races, &state, stack);
+
+	for (i=0;i!=MAXRACES;++i) {
+		race * rc = rc_find(oldracenames[i]);
+		if (rc) {
+			new_race[i] = rc;
+			if (rc == new_race[RC_TROLL]) {
+				a_add(&rc->attribs, make_skillmod(NOSKILL, SMF_RIDING, NULL, 0.0, -1));
+			}
+		}
+	}
+	return err;
+}
+
+void
+init_races(void)
+{
+	char zBuffer[MAX_PATH];
+	/* init_familiar functions */
+	register_function((pf_generic)oldfamiliars, "oldfamiliars");
+
+	/* move_allowed functions */
+	register_function((pf_generic)allowed_swim, "moveswimming");
+	register_function((pf_generic)allowed_walk, "movewalking");
+	register_function((pf_generic)allowed_fly, "moveflying");
+	register_function((pf_generic)allowed_dragon, "movedragon");
+
+	/* generate_name functions */
+	register_function((pf_generic)untoten_name, "nameundead");
+	register_function((pf_generic)skeleton_name, "nameskeleton");
+	register_function((pf_generic)zombie_name, "namezombie");
+	register_function((pf_generic)ghoul_name, "nameghoul");
+	register_function((pf_generic)drachen_name, "namedragon");
+	register_function((pf_generic)dracoid_name, "namedracoid");
+	register_function((pf_generic)shadow_name, "nameshadow");
+	
+	/* aging functions */
+	register_function((pf_generic)age_undead, "ageundead");
+	register_function((pf_generic)age_illusion, "ageillusion");
+	register_function((pf_generic)age_skeleton, "ageskeleton");
+	register_function((pf_generic)age_zombie, "agezombie");
+	register_function((pf_generic)age_ghoul, "ageghoul");
+	register_function((pf_generic)age_dragon, "agedragon");
+	register_function((pf_generic)age_firedragon, "agefiredragon");
+
+	/* itemdrop functions */
+	register_function((pf_generic)dragon_drops, "dragondrops");
+	sprintf(zBuffer, "%s/races.xml", resourcepath());
+}

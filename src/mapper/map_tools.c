@@ -103,12 +103,15 @@ map_input(WINDOW * win, int x, int y, const char *text, int mn, int mx, int pre)
 	} else
 		wrefresh(win);
 	do {
+		char zText[160];
 		sprintf(lbuf, "%d", pre);
 		wmove(win, y, x);
 		curs_set(1);
-		wprintw(win, (NCURSES_CONST char*)"%s (%d..%d): %d", text, mn, mx, pre);
+		sprintf(zText, "%s (%d..%d): %d", text, mn, mx, pre);
+		wprintw(win, (NCURSES_CONST char*)zText);
 		wrefresh(win);
-		cx = getcurx(win) - strlen(lbuf);
+/*		getyx(win, y, x); */
+		cx = x + strlen(zText)/* getcurx(win) */- strlen(lbuf);
 		val = strlen(lbuf);
 		do {
 			ch = getch();

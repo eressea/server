@@ -36,6 +36,7 @@
 #include "plane.h"
 #ifdef USE_UGROUPS
 # include "ugroup.h"
+# include <attributes/ugroup.h>
 #endif
 
 /* util includes */
@@ -141,7 +142,7 @@ report_item(const unit * owner, const item * i, const faction * viewer, const ch
 	} else if (i->type->rtype==r_silver) {
 		int pp = i->number/owner->number;
 		if (number) *number = 1;
-		if (pp > 50000 && dragon(owner)) {
+		if (pp > 50000 && dragonrace(owner->race)) {
 			if (name) *name = locale_string(viewer->locale, "dragonhoard");
 			if (basename) *basename = "dragonhoard";
 		} else if (pp > 5000) {
@@ -222,6 +223,20 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 		}
 	}
 
+#ifdef USE_UGROUPS
+	if(u->faction == f) {
+		attrib *a = a_find(u->attribs, &at_ugroup);
+		if(a) {
+			ugroup *ug = findugroupid(u->faction, a->data.i);
+			if(is_ugroupleader(u, ug)) {
+				scat("*");
+			}
+			scat(itoa36(ug->id));
+		}
+		scat(", ");
+	}
+#endif
+
 	scat(", ");
 
 	if(u->faction != f && a_fshidden
@@ -288,7 +303,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 	}
 
 	dh = 0;
-	if (f == u->faction || telepath_see || omniscient(u->faction)) {
+	if (f == u->faction || telepath_see || omniscient(f)) {
 		show = u->items;
 	} else if (!itemcloak && mode >= see_unit && !(a_fshidden
 			&& a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
@@ -310,8 +325,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 					}
 				}
 				if (ishow==NULL) {
-					ishow = i_add(&show, i_new(itm->type));
-					ishow->number = itm->number;
+					ishow = i_add(&show, i_new(itm->type, itm->number));
 				}
 			}
 		}
@@ -485,12 +499,12 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 			if (pzTmp)
 				scat(pzTmp);
 			else
-				scat(locale_string(f->locale, race[uc->irace].name[uc->number != 1]));
+				scat(racename(f->locale, u, u->irace));
 			scat(" (");
 			scat(itoa36(uc->no));
 			scat("), ");
 		} else {
-			scat(locale_string(f->locale, race[uc->race].name[uc->number != 1]));
+			scat(racename(f->locale, u, u->race));
 			scat(" (");
 			scat(itoa36(uc->no));
 			scat("), ");
@@ -535,8 +549,7 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 						}
 					}
 					if (ishow==NULL) {
-						ishow = i_add(&show, i_new(itm->type));
-						ishow->number = itm->number;
+						ishow = i_add(&show, i_new(itm->type, itm->number));
 					}
 				}
 			}
@@ -680,7 +693,7 @@ spy_message(int spy, unit *u, unit *target)
 
 	sprintf(buf, "%s gelang es, Informationen über ", unitname(u));
 	scat(unitname(target));
-	scat(" herausbekommen: ");
+	scat(" herauszubekommen: ");
 
 	/* Infos:
 	 * - Kampfstatus
@@ -801,9 +814,6 @@ spy_message(int spy, unit *u, unit *target)
 			if (found == 0) {
 				scat(" keine verborgenen Gegenstände");
 			}
-			scat(" und ");
-			icat(get_money(target));
-			scat(" Silber");
 			scat(". ");
 		}
 	}

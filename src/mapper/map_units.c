@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -111,7 +111,7 @@ make_new_unit(region * r)
 		y = 4;
 		wmove(win, y, 4);
 		for (i = 0; i < MAXRACES; i++) {
-			sprintf(buf, "%d=%s; ", i, race[i].name[0]);
+			sprintf(buf, "%d=%s; ", i, new_race[i]->_name[0]);
 			q += strlen(buf);
 			if (q > SX - 20) {
 				q = strlen(buf);
@@ -120,9 +120,9 @@ make_new_unit(region * r)
 			}
 			wAddstr(buf);
 		}
-		q = map_input(win, 2, 3, "Rasse", 0, MAXRACES-1, f->race);
+		q = map_input(win, 2, 3, "Rasse", 0, MAXRACES-1, old_race(f->race));
 
-		u = createunit(r, f, anz, (race_t) q);
+		u = createunit(r, f, anz, new_race[q]);
 		if (p==0)
 			u->age = (short)map_input(win, 2, 4, "Alter", 1, 99, 1);
 		else
@@ -466,7 +466,7 @@ modify_unit(region * r, unit * modunit)
 		y = 0;
 		wclear(mywin);
 		Movexy(3, y);
-		wprintw(mywin, (NCURSES_CONST char*)"Rasse: %s", race[u->race].name[0]);
+		wprintw(mywin, (NCURSES_CONST char*)"Rasse: %s", u->race->_name[0]);
 		Movexy(3, ++y);
 		wprintw(mywin, (NCURSES_CONST char*)"Anzahl: %d", u->number);
 		Movexy(3, ++y);
@@ -477,12 +477,12 @@ modify_unit(region * r, unit * modunit)
 		Movexy(3, ++y);
 		Addstr("Dämonentarnung: ");
 #if 0	/* ja, wie denn? */
-		if (u->race == RC_DAEMON && u->itypus > 0 && u->typus != u->itypus)
+		if (u->race == new_race[RC_DAEMON] && u->itypus > 0 && u->typus != u->itypus)
 			Addstr(typusdaten[u->itypus].name[0]);
 		else {
 #endif
 			Addstr("keine");
-			if (u->race != RC_DAEMON)
+			if (u->race != new_race[RC_DAEMON])
 				Addstr(" möglich");
 #if 0
 		}
@@ -556,7 +556,7 @@ modify_unit(region * r, unit * modunit)
 				q = 0;
 				wmove(win, y, 4);
 				for (i = 1; i < MAXRACES; i++) {
-					sprintf(buf, "%d=%s; ", i, race[i].name[0]);
+					sprintf(buf, "%d=%s; ", i, new_race[i]->_name[0]);
 					q += strlen(buf);
 					if (q > SX - 20) {
 						q = strlen(buf);
@@ -565,19 +565,19 @@ modify_unit(region * r, unit * modunit)
 					}
 					wAddstr(buf);
 				}
-				u->race = (race_t)map_input(win, 2, 1, "Rasse", 0, MAXRACES-1, modunit->faction->race);
+				u->race = new_race[map_input(win, 2, 1, "Rasse", 0, MAXRACES-1, old_race(modunit->faction->race))];
 				modif = 1;
 				delwin(win);
 				break;
 			case 'd':
-				if (u->race == RC_DAEMON) {
+				if (u->race == new_race[RC_DAEMON]) {
 					race_t rc;
 					win = openwin(SX - 10, 5, "< Tarnrasse wählen >");
 					y = 2;
 					q = 0;
 					wmove(win, y, 4);
 					for (rc = 1; rc != MAXRACES; rc++) {
-						sprintf(buf, "%d=%s; ", rc, race[rc].name[0]);
+						sprintf(buf, "%d=%s; ", rc, new_race[rc]->_name[0]);
 						q += strlen(buf);
 						if (q > SX - 20) {
 							q = strlen(buf);
@@ -586,7 +586,7 @@ modify_unit(region * r, unit * modunit)
 						}
 						wAddstr(buf);
 					}
-					u->irace = (race_t)map_input(win, 2, 1, "Tarnrasse", 0, MAXRACES, modunit->irace);
+					u->irace = new_race[map_input(win, 2, 1, "Tarnrasse", 0, MAXRACES, old_race(modunit->irace))];
 					modif = 1;
 					delwin(win);
 				} else
@@ -834,20 +834,20 @@ mapper_spunit(dbllist ** SP, unit * u, int indent)
 	icat(u->number);
 	sncat(buf, " ", BUFSIZE);
 
-	i = u->race;
+	i = old_race(u->race);
 	if (u->irace != u->race) {
-		sncat(buf, race[u->irace].name[u->number != 1], BUFSIZE);
+		sncat(buf, u->irace->_name[u->number != 1], BUFSIZE);
 		sncat(buf, " (", BUFSIZE);
-		if (u->race == RC_ILLUSION)
-			sncat(buf, race[u->faction->race].name[u->number != 1], BUFSIZE);
+		if (u->race == new_race[RC_ILLUSION])
+			sncat(buf, u->faction->race->_name[u->number != 1], BUFSIZE);
 		else
-			sncat(buf, race[u->race].name[u->number != 1], BUFSIZE);
+			sncat(buf, u->race->_name[u->number != 1], BUFSIZE);
 		sncat(buf, ")", BUFSIZE);
 	} else {
-		if (u->race == RC_ILLUSION)
-			sncat(buf, race[u->faction->race].name[u->number != 1], BUFSIZE);
+		if (u->race == new_race[RC_ILLUSION])
+			sncat(buf, u->faction->race->_name[u->number != 1], BUFSIZE);
 		else
-			sncat(buf, race[u->race].name[u->number != 1], BUFSIZE);
+			sncat(buf, u->race->_name[u->number != 1], BUFSIZE);
 	}
 
 	switch (u->status) {

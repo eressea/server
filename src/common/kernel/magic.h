@@ -51,7 +51,8 @@ typedef enum {
 	SPP_BUILDING_ID,   /*  -  : atoi() -> int */
 	SPP_SHIP_ID,       /*  -  : atoi() -> int */
 	SPP_STRING,        /* "c" */
-	SPP_INT            /* "i" : atoi() -> int */
+	SPP_INT,           /* "i" : atoi() -> int */
+	SPP_TUNIT_ID       /*  -  : temp einheit */
 } sppobj_t;
 
 typedef struct spllprm{
@@ -245,6 +246,8 @@ extern attrib_type at_seenspell;
 extern attrib_type at_mage;
 extern attrib_type at_familiarmage;
 extern attrib_type at_familiar;
+extern attrib_type at_clonemage;
+extern attrib_type at_clone;
 extern attrib_type at_reportspell;
 extern attrib_type at_icastle;
 
@@ -385,10 +388,15 @@ boolean target_resists_magic(struct unit *magician, void *obj, int objtyp,
    /* (sind in curse)*/
 extern struct unit * get_familiar(const struct unit *u);
 extern struct unit * get_familiar_mage(const struct unit *u);
+extern struct unit * get_clone(const struct unit *u);
+extern struct unit * get_clone_mage(const struct unit *u);
 extern struct attrib_type at_familiar;
 extern struct attrib_type at_familiarmage;
 extern void set_familiar(struct unit * mage, struct unit * familiar);
+extern void remove_familiar(struct unit * mage);
 extern void create_newfamiliar(struct unit * mage, struct unit * familiar);
+extern void create_newclone(struct unit * mage, struct unit * familiar);
+extern struct unit * has_clone(struct unit * mage);
 extern struct attrib *create_special_direction(struct region *r, int x, int y, int duration,
 		const char *desc, const char *keyword);
 

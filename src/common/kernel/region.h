@@ -41,6 +41,7 @@
 #define RF_SAVEMASK (RF_CHAOTIC|RF_MALLORN|RF_BLOCKED|RF_BLOCK_NORTHWEST|RF_BLOCK_NORTHEAST|RF_BLOCK_EAST|RF_BLOCK_SOUTHEAST|RF_BLOCK_SOUTHWEST|RF_BLOCK_WEST|RF_ENCOUNTER|RF_ORCIFIED)
 struct message;
 struct message_list;
+struct rawmaterial;
 
 typedef struct land_region {
 	char *name;
@@ -61,7 +62,9 @@ typedef struct land_region {
 	int peasants;
 	int newpeasants;
 	int money;
+#ifndef NEW_RESOURCEGROWTH
 	int iron;
+#endif
 } land_region;
 
 typedef struct region {
@@ -86,6 +89,9 @@ typedef struct region {
 	unsigned short age;
 #ifdef WEATHER
 	weather_t weathertype;
+#endif
+#ifdef NEW_RESOURCEGROWTH
+	struct rawmaterial * resources;
 #endif
 } region;
 
@@ -123,10 +129,8 @@ extern attrib_type at_chaoscount;
 extern attrib_type at_woodcount;
 extern attrib_type at_deathcount;
 extern attrib_type at_travelunit;
-extern attrib_type at_iron;
-extern attrib_type at_stone;
-extern attrib_type at_laen;
 extern attrib_type at_road;
+extern attrib_type at_laen;
 
 void initrhash(void);
 void rhash(struct region * r);
@@ -150,9 +154,6 @@ void chaoscounts(struct region * r, int delta);
 
 void setluxuries(struct region * r, const struct luxury_type * sale);
 
-int rlaen(const struct region * r);
-void rsetlaen(struct region * r, int value);
-
 int rroad(const struct region * r, direction_t d);
 void rsetroad(struct region * r, direction_t d, int value);
 
@@ -160,10 +161,10 @@ int is_coastregion(struct region *r);
 
 #ifdef GROWING_TREES
 int rtrees(const struct region * r, int ageclass);
-int rsettrees(region *r, int ageclass, int value);
+int rsettrees(const struct region *r, int ageclass, int value);
 #else
 int rtrees(const struct region * r);
-int rsettrees(struct region * r, int value);
+int rsettrees(const struct region * r, int value);
 #endif
 
 int rpeasants(const struct region * r);
@@ -176,8 +177,13 @@ void rsetmoney(struct region * r, int value);
 
 #define rbuildings(r) ((r)->buildings)
 
+#ifndef NEW_RESOURCEGROWTH
 #define riron(r) ((r)->land?(r)->land->iron:0)
 #define rsetiron(r, value) ((r)->land?((r)->land->iron=(value)):(value),0)
+
+int rlaen(const struct region * r);
+void rsetlaen(struct region * r, int value);
+#endif /* NEW_RESOURCEGROWTH */
 
 #define rherbtype(r) ((r)->land?(r)->land->herbtype:0)
 #define rsetherbtype(r, value) ((r)->land?((r)->land->herbtype=(value)):(value),0)
@@ -212,4 +218,5 @@ extern const direction_t back[MAXDIRECTIONS];
 extern int production(const struct region *r);
 extern void read_region_reference(struct region ** r, FILE * F);
 extern void write_region_reference(const struct region * r, FILE * F);
+
 #endif /* _REGION_H */

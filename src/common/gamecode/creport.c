@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -25,8 +25,10 @@
 
 /* attributes include */
 #include <attributes/follow.h>
-#include <attributes/otherfaction.h>
 #include <attributes/racename.h>
+#include <attributes/orcification.h>
+#include <attributes/otherfaction.h>
+#include <attributes/raceprefix.h>
 
 /* gamecode includes */
 #include "laws.h"
@@ -47,6 +49,7 @@
 #include <race.h>
 #include <region.h>
 #include <reports.h>
+#include <resources.h>
 #include <ship.h>
 #include <skill.h>
 #include <teleport.h>
@@ -73,12 +76,12 @@ extern const char *spelldata[];
 extern int quiet;
 
 /* globals */
-#define C_REPORT_VERSION 57
+#define C_REPORT_VERSION 61
 
 #define TAG_LOCALE "de"
 #ifdef TAG_LOCALE
-static const char * 
-crtag(const char * key) 
+static const char *
+crtag(const char * key)
 {
 	static const locale * lang = NULL;
 	if (!lang) lang = find_locale(TAG_LOCALE);
@@ -92,7 +95,7 @@ crtag(const char * key)
  */
 typedef struct translation {
 	struct translation * next;
-	const char * key;
+	char * key;
 	const char * value;
 } translation;
 
@@ -111,7 +114,7 @@ add_translation(const char * key, const char * value)
 			t = junkyard;
 			junkyard = junkyard->next;
 		} else t = malloc(sizeof(translation));
-		t->key = key;
+		t->key = strdup(key);
 		t->value = value;
 		t->next = translation_table[kk];
 		translation_table[kk] = t;
@@ -141,6 +144,7 @@ reset_translations(void)
 		translation * t = translation_table[i];
 		while (t) {
 			translation * c = t->next;
+			free(t->key);
 			t->next = junkyard;
 			junkyard = t;
 			t = c;
@@ -151,7 +155,7 @@ reset_translations(void)
 
 /* implementation */
 void
-cr_output_str_list(FILE * F, const char *title, const strlist * S, faction * f)
+cr_output_str_list(FILE * F, const char *title, const strlist * S, const faction * f)
 {
 	char *s;
 
@@ -168,7 +172,7 @@ cr_output_str_list(FILE * F, const char *title, const strlist * S, faction * f)
 #include "objtypes.h"
 
 static void
-print_curses(FILE * F, void * obj, typ_t typ, attrib *a, int self)
+print_curses(FILE * F, const void * obj, typ_t typ, const attrib *a, int self)
 {
 	boolean header = false;
 	while (a) {
@@ -262,7 +266,7 @@ cr_resource(const void * v, char * buffer, const void * userdata)
 	const resource_type * r = (const resource_type *)v;
 	if (r) {
 		const char * key = resourcename(r, 0);
-		sprintf(buffer, "\"%s\"", 
+		sprintf(buffer, "\"%s\"",
 			add_translation(key, locale_string(report->locale, key)));
 		return 0;
 	}
@@ -273,9 +277,9 @@ static int
 cr_race(const void * v, char * buffer, const void * userdata)
 {
 	const faction * report = (const faction*)userdata;
-	int rc = (int)v;
-	const char * key = race[rc].name[0];
-	sprintf(buffer, "\"%s\"", 
+	const struct race * rc = (const race *)v;
+	const char * key = rc_name(rc, 0);
+	sprintf(buffer, "\"%s\"",
 		add_translation(key, locale_string(report->locale, key)));
 	return 0;
 }
@@ -285,13 +289,13 @@ cr_skill(const void * v, char * buffer, const void * userdata)
 {
 	const faction * report = (const faction*)userdata;
 	skill_t sk = (skill_t)v;
-	if (sk!=NOSKILL) sprintf(buffer, "\"%s\"", 
+	if (sk!=NOSKILL) sprintf(buffer, "\"%s\"",
 		add_translation(skillname(sk, NULL), skillname(sk, report->locale)));
 	else strcpy(buffer, "\"\"");
 	return 0;
 }
 
-void 
+void
 creport_init(void)
 {
 	tsf_register("report", &cr_ignore);
@@ -306,7 +310,6 @@ creport_init(void)
 	tsf_register("resource", &cr_resource);
 	tsf_register("race", &cr_race);
 	tsf_register("direction", &cr_int);
-	tsf_register("int36", &cr_int);
 }
 
 void
@@ -363,6 +366,7 @@ report_crtypes(FILE * F, const struct locale* lang)
 				fputc('\"', F);
 				fputs(escape_string(nrt_string(nrt), NULL, 0), F);
 				fputs("\";text\n", F);
+				fprintf(F, "\"%s\";section\n", nrt_section(nrt));
 			}
 		}
 		while (mtypehash[i]) {
@@ -386,7 +390,7 @@ render_messages(FILE * F, faction * f, message_list *msgs)
 #if RENDER_CRMESSAGES
 		char nrbuffer[1024*32];
 		nrbuffer[0] = '\0';
-		if (nr_render(m->msg, f->locale, nrbuffer, f)==0 && nrbuffer[0]) {
+		if (nr_render(m->msg, f->locale, nrbuffer, sizeof(nrbuffer), f)==0 && nrbuffer[0]) {
 			fprintf(F, "MESSAGE %d\n", ++msgno);
 			fprintf(F, "%d;type\n", hash);
 			fputs("\"", F);
@@ -400,7 +404,7 @@ render_messages(FILE * F, faction * f, message_list *msgs)
 			if (!printed) fprintf(F, "MESSAGE %d\n", ++msgno);
 			fputs(crbuffer, F);
 		}
-		else log_error(("could not render cr-message %p\n", m->msg));
+		else log_error(("could not render cr-message %p: %s\n", m->msg, m->msg->type->name));
 		if (printed) {
 			unsigned int ihash = hash % MTMAXHASH;
 			struct known_mtype * kmt = mtypehash[ihash];
@@ -428,14 +432,14 @@ cr_output_buildings(FILE * F, building * b, unit * u, int fno, faction *f)
 {
 	const building_type * type = b->type;
 	unit * bo = buildingowner(b->region, b);
+	const char * bname = buildingtype(b, b->size);
 
-	assert(b);
 	fprintf(F, "BURG %d\n", b->no);
 	if (!u || u->faction != f) {
 		const attrib * a = a_find(b->attribs, &at_icastle);
 		if (a) type = ((icastle_data*)a->data.v)->type;
 	}
-	fprintf(F, "\"%s\";Typ\n", add_translation(b->type->_name, locale_string(f->locale, b->type->_name)));
+	fprintf(F, "\"%s\";Typ\n", add_translation(bname, LOC(f->locale, bname)));
 	fprintf(F, "\"%s\";Name\n", b->name);
 	if (strlen(b->display))
 		fprintf(F, "\"%s\";Beschr\n", b->display);
@@ -463,7 +467,7 @@ cr_output_buildings(FILE * F, building * b, unit * u, int fno, faction *f)
 
 /* prints a ship */
 static void
-cr_output_ship(FILE * F, ship * s, unit * u, int fcaptain, faction * f, region * r)
+cr_output_ship(FILE * F, const ship * s, const unit * u, int fcaptain, const faction * f, const region * r)
 {
 	unit *u2;
 	int w = 0;
@@ -509,9 +513,9 @@ cr_output_ship(FILE * F, ship * s, unit * u, int fcaptain, faction * f, region *
 
 /* prints all that belongs to a unit */
 static void
-cr_output_unit(FILE * F, region * r,
-	       faction * f,	/* observers faction */
-	       unit * u, int mode)
+cr_output_unit(FILE * F, const region * r,
+	       const faction * f,	/* observers faction */
+	       const unit * u, int mode)
 {
 	/* Race attributes are always plural and item attributes always
 	 * singular */
@@ -535,26 +539,49 @@ cr_output_unit(FILE * F, region * r,
 	if (strlen(u->display))
 		fprintf(F, "\"%s\";Beschr\n", u->display);
 
-	if( u->faction == f || omniscient(f)) {
-#ifdef GROUPS
-		if (u->faction == f) {
+	{
+		/* print faction information */
+		const faction * sf = visible_faction(f,u);
+		if (u->faction == f || omniscient(f)) {
+			const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
+			/* my own faction, full info */
 			const attrib * a = a_find(u->attribs, &at_group);
 			if (a) {
 				const group * g = (const group*)a->data.v;
+				const attrib *a = a_find(g->attribs, &at_raceprefix);
 				fprintf(F, "%d;gruppe\n", g->gid);
+				if (a) {
+					const char * name = (const char*)a->data.v;
+					fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
+				}
+			}
+			fprintf(F, "%d;Partei\n", u->faction->no);
+			if (sf!=u->faction) fprintf(F, "%d;Verkleidung\n", sf->no);
+			if (fval(u, FL_PARTEITARNUNG))
+				fprintf(F, "%d;Parteitarnung\n", fval(u, FL_PARTEITARNUNG));
+			if (a_otherfaction)
+				fprintf(F, "%d;Anderepartei\n", a_otherfaction->data.i);
+		} else {
+			const attrib * a = a_find(u->attribs, &at_group);
+			if (fval(u, FL_PARTEITARNUNG)) {
+				/* faction info is hidden */
+				fprintf(F, "%d;Parteitarnung\n", fval(u, FL_PARTEITARNUNG));
+			} else {
+				/* other unit. show visible faction, not u->faction */
+				fprintf(F, "%d;Partei\n", sf->no);
+				if (sf == f) {
+					fprintf(F, "1;Verraeter\n");
+				}
+			}
+			if (a) {
+				const attrib *agrp = a_find(((const group*)a->data.v)->attribs, &at_raceprefix);
+				if (agrp) {
+					const char * name = (const char*)agrp->data.v;
+					fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
+				}
 			}
 		}
-#endif
-		fprintf(F, "%d;Partei\n", u->faction->no);
-	} else if(!fval(u, FL_PARTEITARNUNG)) {
-		attrib *a = a_find(u->attribs, &at_otherfaction);
-		if(a) {
-			fprintf(F, "%d;Partei\n", a->data.i);
-		} else {
-			fprintf(F, "%d;Partei\n", u->faction->no);
-		}
 	}
-
 	if(u->faction != f && a_fshidden
 			&& a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {
 		fprintf(F, "-1;Anzahl\n");
@@ -564,12 +591,16 @@ cr_output_unit(FILE * F, region * r,
 
 
 	pzTmp = get_racename(u->attribs);
-	if (pzTmp==NULL) fprintf(F, "\"%s\";Typ\n", 
-		add_translation(race[u->irace].name[1], locale_string(f->locale, race[u->irace].name[1])));
+	if (pzTmp==NULL) {
+		const char * zRace = rc_name(u->irace, 1);
+		fprintf(F, "\"%s\";Typ\n", 
+			add_translation(zRace, locale_string(f->locale, zRace)));
+	}
 	else fprintf(F, "\"%s\";Typ\n", pzTmp);
 	if ((pzTmp || u->irace != u->race) && u->faction==f) {
-		fprintf(F, "\"%s\";wahrerTyp\n", 
-			add_translation(race[u->race].name[1], locale_string(f->locale, race[u->race].name[1])));
+		const char * zRace = rc_name(u->race, 1);
+		fprintf(F, "\"%s\";wahrerTyp\n",
+			add_translation(zRace, locale_string(f->locale, zRace)));
 	}
 
 	if (u->building)
@@ -580,8 +611,6 @@ cr_output_unit(FILE * F, region * r,
 		fprintf(F, "%d;bewacht\n", getguard(u)?1:0);
 	if ((b=usiege(u))!=NULL)
 		fprintf(F, "%d;belagert\n", b->no);
-	if (fval(u, FL_PARTEITARNUNG))
-		fprintf(F, "%d;Parteitarnung\n", fval(u, FL_PARTEITARNUNG));
 
 	/* additional information for own units */
 	if (u->faction == f || omniscient(f)) {
@@ -594,16 +623,16 @@ cr_output_unit(FILE * F, region * r,
 			unit * u = (unit*)a->data.v;
 			if (u) fprintf(F, "%d;folgt\n", u->no);
 		}
-		a = a_find(u->attribs, &at_otherfaction);
-		if(a) fprintf(F, "%d;verkleidung\n", a->data.i);
 		i = ualias(u);
 		if (i>0)
 			fprintf(F, "%d;temp\n", i);
 		else if (i<0)
 			fprintf(F, "%d;alias\n", -i);
 		i = get_money(u);
-		if (u->status)
-			fprintf(F, "%d;Kampfstatus\n", u->status);
+		fprintf(F, "%d;Kampfstatus\n", u->status);
+		if(fval(u, FL_NOAID)) {
+			fputs("1;unaided\n", F);
+		}
 		i = u_geteffstealth(u);
 		if (i >= 0)
 			fprintf(F, "%d;Tarnung\n", i);
@@ -622,7 +651,7 @@ cr_output_unit(FILE * F, region * r,
 
 		/* default commands */
 		fprintf(F, "COMMANDS\n");
-		if(u->lastorder[0]) fprintf(F, "\"%s\"\n", u->lastorder);
+		if(u->lastorder[0] && u->lastorder[0] != '@') fprintf(F, "\"%s\"\n", u->lastorder);
 		for (S = u->orders; S; S = S->next) {
 			if(is_persistent(S->s, u->faction->locale)) {
 				fprintf(F, "\"%s\"\n", S->s);
@@ -639,9 +668,10 @@ cr_output_unit(FILE * F, region * r,
 				}
 #ifdef NOVISIBLESKILLPOINTS
 				/* 0 ist nur der Kompatibilität wegen drin, rausnehmen */
-				fprintf(F, "0 %d;%s\n", eff_skill(u, sk, r), skillnames[sk]);
+				fprintf(F, "0 %d;%s\n", eff_skill(u, sk, r),
+					add_translation(skillname(sk, NULL), skillname(sk, f->locale)));
 #else
-				fprintf(F, "%d %d;%s\n", get_skill(u, sk), eff_skill(u, sk, r), 
+				fprintf(F, "%d %d;%s\n", get_skill(u, sk), eff_skill(u, sk, r),
 					add_translation(skillname(sk, NULL), skillname(sk, f->locale)));
 #endif
 			}
@@ -692,8 +722,7 @@ cr_output_unit(FILE * F, region * r,
 					}
 				}
 				if (ishow==NULL) {
-					ishow = i_add(&show, i_new(itm->type));
-					ishow->number = itm->number;
+					ishow = i_add(&show, i_new(itm->type, itm->number));
 				}
 			}
 		}
@@ -735,7 +764,7 @@ show_allies(FILE * F, ally * sf)
 
 /* prints all visible spells in a region */
 static void
-show_active_spells(region * r)
+show_active_spells(const region * r)
 {
 	char fogwall[MAXDIRECTIONS];
 #ifdef TODO /* alte Regionszauberanzeigen umstellen */
@@ -747,45 +776,28 @@ show_active_spells(region * r)
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
-extern int fcompare(const void *a, const void *b);
-
-
 /* this is a copy of laws.c->find_address output changed. */
 static void
-cr_find_address(FILE * F, faction * uf)
+cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
 {
-	faction *f;
-	void **fp;
-	cvector *fcts = malloc(sizeof(cvector));
-
-	cv_init(fcts);
-	for (f = factions; f; f = f->next) {
-		if (f->no != 0 && kann_finden(uf, f) != 0) {
-			cv_pushback(fcts, f);
-		}
-	}
-	v_sort(fcts->begin, fcts->end, fcompare);
-
-	/* FIND orders - diese duerfen erst ablaufen, nachdem alle ihre Adresse
-	 * gesetzt haben! */
-
+	const faction_list * flist = addresses;
 	if (!quiet)
 		puts(" - gebe Adressen heraus (CR)");
-	for (fp = fcts->begin; fp != fcts->end; ++fp) {
-		f = *fp;
-		if (uf!=f && f->no != 0 && kann_finden(uf, f) != 0) {
+	while (flist!=NULL) {
+		const faction * f = flist->data;
+		if (uf!=f && f->no != MONSTER_FACTION) {
 			fprintf(F, "PARTEI %d\n", f->no);
 			fprintf(F, "\"%s\";Parteiname\n", f->name);
 			fprintf(F, "\"%s\";email\n", f->email);
 			fprintf(F, "\"%s\";banner\n", f->banner);
 		}
+		flist = flist->next;
 	}
-	free(cv_kill(fcts));
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
 static void
-cr_reportspell(FILE * F, spellid_t id)
+cr_reportspell(FILE * F, spellid_t id, const struct locale * lang)
 {
 	int k, itemanz, res, costtyp;
 	spell *sp = find_spellbyid(id);
@@ -812,13 +824,15 @@ cr_reportspell(FILE * F, spellid_t id)
 		itemanz = sp->komponenten[k][1];
 		costtyp = sp->komponenten[k][2];
 		if(itemanz > 0) {
-			fprintf(F, "%d %d;%s\n", itemanz, costtyp == SPC_LEVEL || costtyp == SPC_LINEAR, resname(res, 0));
+			const char * name = resname(res, 0);
+			fprintf(F, "%d %d;%s\n", itemanz, costtyp == SPC_LEVEL || costtyp == SPC_LINEAR,
+				add_translation(name, LOC(lang, name)));
 		}
 	}
 }
 
 static unsigned int
-encode_region(faction * f, region * r) {
+encode_region(const faction * f, const region * r) {
 	unsigned int id;
 	char *cp, c;
 	/* obfuscation */
@@ -833,19 +847,30 @@ encode_region(faction * f, region * r) {
 	return id;
 }
 
+static char *
+report_resource(char * buf, const char * name, const locale * loc, int amount, int level)
+{
+	buf += sprintf(buf, "RESOURCE %u\n", hashstring(name));
+	buf += sprintf(buf, "\"%s\";type\n", add_translation(name, LOC(loc, name)));
+	if (amount>=0) {
+		if (level>=0) buf += sprintf(buf, "%d;skill\n", level);
+		buf += sprintf(buf, "%d;number\n", amount);
+	}
+	return buf;
+}
+
 /* main function of the creport. creates the header and traverses all regions */
 void
-report_computer(FILE * F, faction * f, const time_t report_time)
+report_computer(FILE * F, faction * f, const seen_region * seen,
+	const faction_list * addresses, const time_t report_time)
 {
 	int i;
-	region *r;
 	building *b;
 	ship *sh;
 	unit *u;
-	seen_region * sd;
+	const seen_region * sd = seen;
 	const attrib * a;
 
-	int maxmining;
 	/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
 	/* initialisations, header and lists */
 
@@ -862,7 +887,6 @@ report_computer(FILE * F, faction * f, const time_t report_time)
 	fprintf(F, "\"%s\";Konfiguration\n", "Standard");
 	fprintf(F, "\"%s\";Koordinaten\n", "Hex");
 	fprintf(F, "%d;Basis\n", 36);
-	fprintf(F, "%d;Umlaute\n", 1);
 	fprintf(F, "%d;Runde\n", turn);
 	fputs("2;Zeitalter\n", F);
 	fprintf(F, "PARTEI %d\n", f->no);
@@ -873,12 +897,20 @@ report_computer(FILE * F, faction * f, const time_t report_time)
 		fprintf(F, "%d;Punkte\n", f->score);
 		fprintf(F, "%d;Punktedurchschnitt\n", average_score_of_age(f->age, f->age / 24 + 1));
 	}
-	fprintf(F, "\"%s\";Typ\n", add_translation(race[f->race].name[1], locale_string(f->locale, race[f->race].name[1])));
-	fprintf(F, "%d;Rekrutierungskosten\n", race[f->race].rekrutieren);
+	{
+		const char * zRace = rc_name(f->race, 1);
+		fprintf(F, "\"%s\";Typ\n", add_translation(zRace, LOC(f->locale, zRace)));
+	}
+	a = a_find(f->attribs, &at_raceprefix);
+	if(a) {
+		const char * name = (const char*)a->data.v;
+		fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
+	}
+	fprintf(F, "%d;Rekrutierungskosten\n", f->race->recruitcost);
 	fprintf(F, "%d;Anzahl Personen\n", count_all(f));
 	fprintf(F, "\"%s\";Magiegebiet\n", neue_gebiete[f->magiegebiet]);
 
-	if (f->race == RC_HUMAN) {
+	if (f->race == new_race[RC_HUMAN]) {
 		fprintf(F, "%d;Anzahl Immigranten\n", count_migrants(f));
 		fprintf(F, "%d;Max. Immigranten\n", count_maxmigrants(f));
 	}
@@ -890,31 +922,39 @@ report_computer(FILE * F, faction * f, const time_t report_time)
 		fprintf(F, "%d;%s\n", (f->options&want(i))?1:0, options[i]);
 	}
 	show_allies(F, f->allies);
-#ifdef GROUPS
 	{
 		group * g;
 		for (g=f->groups;g;g=g->next) {
+			const attrib *a = a_find(g->attribs, &at_raceprefix);
+
 			fprintf(F, "GRUPPE %d\n", g->gid);
 			fprintf(F, "\"%s\";name\n", g->name);
+			if(a) {
+				const char * name = (const char*)a->data.v;
+				fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
+			}
 			show_allies(F, g->allies);
 		}
 	}
-#endif
 
 	cr_output_str_list(F, "FEHLER", f->mistakes, f);
 	cr_output_messages(F, f->msgs, f);
 	{
 		struct bmsg * bm;
 		for (bm=f->battles;bm;bm=bm->next) {
-			fprintf(F, "BATTLE %d %d\n", region_x(bm->r, f), region_y(bm->r, f));
+			if (!rplane(bm->r)) fprintf(F, "BATTLE %d %d\n", region_x(bm->r, f), region_y(bm->r, f));
+			else {
+				if (rplane(bm->r)->flags & PFL_NOCOORDS) fprintf(F, "BATTLESPEC %d %d\n", encode_region(f, bm->r), rplane(bm->r)->id);
+				else fprintf(F, "BATTLE %d %d %d\n", region_x(bm->r, f), region_y(bm->r, f), rplane(bm->r)->id);
+			}
 			cr_output_messages(F, bm->msgs, f);
 		}
 	}
 
-	cr_find_address(F, f);
+	cr_find_address(F, f, addresses);
 	a = a_find(f->attribs, &at_reportspell);
 	while (a) {
-		cr_reportspell(F, (spellid_t)a->data.i);
+		cr_reportspell(F, (spellid_t)a->data.i, f->locale);
 		a = a->nexttype;
 	}
 	for (a=a_find(f->attribs, &at_showitem);a;a=a->nexttype) {
@@ -936,14 +976,14 @@ report_computer(FILE * F, faction * f, const time_t report_time)
 			m++;
 		}
 	}
-	/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-	 * = = = */
+
 	/* traverse all regions */
-	for (sd = seen; sd!=NULL; sd = sd->next) {
+	while (sd!=NULL) {
 		int modifier = 0;
 		const char * tname;
-
-		r = sd->r;
+		unsigned char seemode = sd->mode;
+		const region * r = sd->r;
+		sd = sd->next;
 
 		if (!rplane(r)) fprintf(F, "REGION %d %d\n", region_x(r, f), region_y(r, f));
 		else {
@@ -963,33 +1003,56 @@ report_computer(FILE * F, faction * f, const time_t report_time)
 		}
 
 		fprintf(F, "\"%s\";Terrain\n", add_translation(tname, locale_string(f->locale, tname)));
-		if (sd->mode != see_neighbour)
+		if (seemode != see_neighbour)
 		{
+#define RESOURCECOMPAT
+			char cbuf[8192], *pos = cbuf;
 			int g = 0;
 			direction_t d;
+#ifdef RESOURCECOMPAT
 			if (r->display && strlen(r->display))
 				fprintf(F, "\"%s\";Beschr\n", r->display);
+#endif
 			if (landregion(rterrain(r))) {
-				fprintf(F, "%d;Bauern\n", rpeasants(r));
-				fprintf(F, "%d;Pferde\n", rhorses(r));
-				fprintf(F, "%d;Baeume\n", rtrees(r));
-				if (fval(r, RF_MALLORN) && rtrees(r))
+#ifdef GROWING_TREES
+				int trees = rtrees(r,2);
+				int ytrees = rtrees(r,1);
+# ifdef RESOURCECOMPAT
+				if (trees > 0) fprintf(F, "%d;Baeume\n", trees);
+				if (ytrees > 0) fprintf(F, "%d;Schoesslinge\n", ytrees);
+				if (fval(r, RF_MALLORN) && (trees > 0 || ytrees > 0))
 					fprintf(F, "1;Mallorn\n");
+# endif
+				if (ytrees) pos = report_resource(pos, "rm_youngtrees", f->locale, ytrees, -1);
+				if (!fval(r, RF_MALLORN)) {
+					if (trees) pos = report_resource(pos, "rm_trees", f->locale, trees, -1);
+				} else {
+					if (trees) pos = report_resource(pos, "rm_mallorn", f->locale, trees, -1);
+				}
+#else
+				int trees = rtrees(r);
+# ifdef RESOURCECOMPAT
+				fprintf(F, "%d;Baeume\n", trees);
+				if (fval(r, RF_MALLORN) && trees)
+					fprintf(F, "1;Mallorn\n");
+# endif
+				if (!fval(r, RF_MALLORN)) {
+					if (trees) pos = report_resource(pos, "rm_trees", f->locale, trees, -1);
+				} else {
+					if (trees) pos = report_resource(pos, "rm_mallorn", f->locale, trees, -1);
+				}
+#endif
+				fprintf(F, "%d;Bauern\n", rpeasants(r));
+				if(fval(r, RF_ORCIFIED)) {
+					fprintf(F, "1;Verorkt\n");
+				}
+				fprintf(F, "%d;Pferde\n", rhorses(r));
 
-				if (sd->mode>=see_unit) {
+				if (seemode>=see_unit) {
 					struct demand * dmd = r->land->demands;
-					if (rterrain(r) == T_MOUNTAIN || rterrain(r) == T_GLACIER) {
-						maxmining = 0;
-						for (u = r->units; u; u = u->next) {
-							int s = eff_skill(u, SK_MINING, r);
-							if (u->faction == f || omniscient(f))
-								maxmining = max(maxmining, s);
-						}
-						if (maxmining >= 4)
-							fprintf(F, "%d;Eisen\n", riron(r));
-						if (maxmining >= 7)
-							fprintf(F, "%d;Laen\n", rlaen(r));
-					}
+#ifdef NEW_RESOURCEGROWTH
+					struct rawmaterial * res = r->resources;
+
 					fprintf(F, "%d;Silber\n", rmoney(r));
 					fprintf(F, "%d;Unterh\n", entertainmoney(r));
 
@@ -1001,6 +1064,59 @@ report_computer(FILE * F, faction * f, const time_t report_time)
 					if (production(r)) {
 						fprintf(F, "%d;Lohn\n", fwage(r, f, true));
 					}
+
+					while (res) {
+						int maxskill = 0;
+						int level = -1;
+						int visible = -1;
+						const item_type * itype = resource2item(res->type->rtype);
+						if (res->type->visible==NULL) {
+							visible = res->amount;
+							level = res->level + itype->construction->minskill - 1;
+						} else {
+							const unit * u;
+							for (u=r->units; visible!=res->amount && u!=NULL; u=u->next) {
+								if (u->faction == f) {
+									int s = eff_skill(u, itype->construction->skill, r);
+									if (s>maxskill) {
+										if (s>=itype->construction->minskill) {
+											assert(itype->construction->minskill>0);
+											level = res->level + itype->construction->minskill - 1;
+										}
+										maxskill = s;
+										visible = res->type->visible(res, maxskill);
+									}
+								}
+							}
+						}
+						if (level>=0) {
+							pos = report_resource(pos, res->type->name, f->locale, visible, level);
+# ifdef RESOURCECOMPAT
+							if (visible>=0) fprintf(F, "%d;%s\n", visible, crtag(res->type->name));
+#endif
+						}
+						res = res->next;
+					}
+#else
+					const unit * u;
+					int maxmining = 0;
+					for (u = r->units; u; u = u->next) {
+						if (u->faction == f) {
+							int s = eff_skill(u, SK_MINING, r);
+							maxmining = max(maxmining, s);
+						}
+					}
+					for (u = r->units; u; u = u->next) {
+						if (u->faction == f) {
+							int s = eff_skill(u, SK_MINING, r);
+							maxmining = max(maxmining, s);
+						}
+					}
+					if (maxmining >= 4 && riron(r) > 0)
+						fprintf(F, "%d;Eisen\n", riron(r));
+					if (maxmining >= 7 && rlaen(r) > 0)
+						fprintf(F, "%d;Laen\n", rlaen(r));
+#endif
 					/* trade */
 					if(rpeasants(r)/TRADE_FRACTION > 0) {
 						fputs("PREISE\n", F);
@@ -1014,6 +1130,7 @@ report_computer(FILE * F, faction * f, const time_t report_time)
 						}
 					}
 				}
+				if (pos!=cbuf) fputs(cbuf, F);
 			}
 			for (d = 0; d != MAXDIRECTIONS; d++)
 			{ /* Nachbarregionen, die gesehen werden, ermitteln */
@@ -1051,7 +1168,7 @@ report_computer(FILE * F, faction * f, const time_t report_time)
 					b = b->next;
 				}
 			}
-			if (sd->mode==see_unit && r->planep && r->planep->id == 1 && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
+			if (seemode==see_unit && r->planep && r->planep->id == 1 && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
 			{
 				/* Sonderbehandlung Teleport-Ebene */
 				regionlist *rl = allinhab_in_range(r_astral_to_standard(r),TP_RADIUS);
@@ -1078,7 +1195,7 @@ report_computer(FILE * F, faction * f, const time_t report_time)
 				/* show units pulled throuth region */
 				for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
 					unit * u = (unit*)ru->data.v;
-					if (cansee_durchgezogen(f, r, u, 0) && in_region(r, u) == 0) {
+					if (cansee_durchgezogen(f, r, u, 0) && r!=u->region) {
 						if (u->ship && !fval(u, FL_OWNER))
 							continue;
 						if (!see) fprintf(F, "DURCHREISE\n");
@@ -1118,7 +1235,7 @@ report_computer(FILE * F, faction * f, const time_t report_time)
 			/* visible units */
 			for (u = r->units; u; u = u->next) {
 				boolean visible = true;
-				switch (sd->mode) {
+				switch (seemode) {
 				case see_unit:
 					modifier=0;
 					break;
@@ -1135,7 +1252,7 @@ report_computer(FILE * F, faction * f, const time_t report_time)
 					visible=false;
 				}
 				if (u->building || u->ship || (visible && cansee(f, r, u, modifier)))
-					cr_output_unit(F, r, f, u, sd->mode);
+					cr_output_unit(F, r, f, u, seemode);
 			}
 		}			/* region traversal */
 	}

@@ -119,8 +119,8 @@ typedef struct item_type {
 	unsigned int flags;
 	int weight;
 	int capacity;
-	int minskill;
-	skill_t skill;
+/*	int minskill;
+	skill_t skill; */
 	const struct construction * construction;
 	/* --- functions --- */
 	int (*use)(struct unit * user, const struct item_type * itype, const char * cmd);
@@ -237,7 +237,7 @@ extern void i_merge(item ** pi, item ** si);
 extern item * i_remove(item ** pi, item * it);
 extern void i_free(item * i);
 extern void i_freeall(item * i);
-extern item * i_new(const item_type * it);
+extern item * i_new(const item_type * it, int number);
 
 /* convenience: */
 extern item * i_change(item ** items, const item_type * it, int delta);
@@ -245,7 +245,7 @@ extern int i_get(const item * i, const item_type * it);
 
 /* creation */
 extern resource_type * new_resourcetype(const char ** names, const char ** appearances, int flags);
-extern item_type * new_itemtype(resource_type * rtype, int iflags, int weight, int capacity, int minskill, skill_t skill);
+extern item_type * new_itemtype(resource_type * rtype, int iflags, int weight, int capacity);
 extern luxury_type * new_luxurytype(item_type * itype, int price);
 extern weapon_type * new_weapontype(item_type * itype, int wflags, double magres, const char* damage[], int offmod, int defmod, int reload, skill_t skill, int minskill);
 extern potion_type * new_potiontype(item_type * itype, int level);
@@ -330,10 +330,10 @@ enum {
 	I_GREATSWORD,
 	I_AXE,
 	I_GREATBOW,
-	I_EOGSWORD,
-	I_EOGSHIELD,
-	I_EOGCHAIN,
-	I_EOG,
+	I_LAENSWORD,
+	I_LAENSHIELD,
+	I_LAENCHAIN,
+	I_LAEN,
 	I_SHIELD,
 	I_HALBERD,
 	I_LANCE,
@@ -523,7 +523,7 @@ enum {
 
 extern luxury_type * oldluxurytype[];
 extern potion_type * oldpotiontype[];
-extern item_type * olditemtype[];
+extern struct item_type * olditemtype[];
 extern resource_type * oldresourcetype[];
 extern herb_type * oldherbtype[];
 
@@ -550,6 +550,7 @@ extern resource_type * rt_read(FILE * F);
 extern void it_write(FILE * F, const item_type * it);
 extern void rt_write(FILE * F, const resource_type * rt);
 extern void init_resources(void);
+extern void init_items(void);
 
 extern const char* resname(resource_t res, int index);
 #endif /* _ITEM_H */

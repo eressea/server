@@ -19,43 +19,85 @@
 
 /* kernel includes */
 #include <faction.h>
-#include <player.h>
 #include <region.h>
 #include <unit.h>
+#include <save.h>
+
+/* util includes */
+#include <base36.h>
+#include <sql.h>
 
 /* libc includes */
 #include <string.h>
+#include <time.h>
 #include <stdlib.h>
 
 static void
 info_email(const char * str, void * data, const char * cmd)
 {
-	unit * u = (unit*)data;
-	const char * email = igetstrtoken(str);
-	player * p = u->faction->owner;
-
-	if (p==NULL) {
-		p = u->faction->owner = make_player();
-		p->faction = u->faction;
-	}
-	if (p->email) free(p->email);
-	if (strlen(email)) p->email = strdup(email);
-	else p->email = NULL;
+	unused(str);
+	unused(data);
+	unused(cmd);
 }
 
 static void
 info_name(const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
-	const char * name = igetstrtoken(str);
-	player * p = u->faction->owner;
+	faction * f = u->faction;
+	const char * name = sqlquote(igetstrtoken(str));
 
-	if (p==NULL) {
-		p = u->faction->owner = make_player();
+	if (sqlstream!=NULL) {
+		fprintf(sqlstream, "UPDATE users SET firstname = '%s' WHERE id = %u;\n", 
+				name, f->unique_id);
 	}
-	if (p->name) free(p->name);
-	if (strlen(name)) p->name = strdup(name);
-	else p->name = NULL;
+}
+
+static void
+info_address(const char * str, void * data, const char * cmd)
+{
+	unit * u = (unit*)data;
+	faction * f = u->faction;
+	const char * address = sqlquote(igetstrtoken(str));
+
+	if (sqlstream!=NULL) {
+		fprintf(sqlstream, "UPDATE users SET address = '%s' WHERE id = %u;\n", 
+				address, f->unique_id);
+	}
+}
+
+static void
+info_phone(const char * str, void * data, const char * cmd)
+{
+	unit * u = (unit*)data;
+	faction * f = u->faction;
+	const char * phone = sqlquote(igetstrtoken(str));
+
+	if (sqlstream!=NULL) {
+		fprintf(sqlstream, "UPDATE users SET phone = '%s' WHERE id = %u;\n", 
+				phone, f->unique_id);
+	}
+}
+
+static void
+info_vacation(const char * str, void * data, const char * cmd)
+{
+	unit * u = (unit*)data;
+	faction * f = u->faction;
+	const char * email = sqlquote(igetstrtoken(str));
+	int duration = atoi(getstrtoken());
+	time_t start_time = time(NULL);
+	time_t end_time = start_time + 60*60*24*duration;
+	struct tm start = *localtime(&start_time);
+	struct tm end = *localtime(&end_time);
+
+	if (sqlstream!=NULL) {
+		fprintf(sqlstream, "UPDATE factions SET vacation = '%s' WHERE id = '%s';\n", email, itoa36(f->no));
+		fprintf(sqlstream, "UPDATE factions SET vacation_start = '%04d-%02d-%02d' WHERE id = '%s';\n", 
+			start.tm_year, start.tm_mon, start.tm_mday, itoa36(f->no));
+		fprintf(sqlstream, "UPDATE factions SET vacation_end = '%04d-%02d-%02d' WHERE id = '%s';\n",
+			end.tm_year, end.tm_mon, end.tm_mday, itoa36(f->no));
+	}
 }
 
 static struct command * g_cmds;
@@ -79,6 +121,7 @@ infocommands(void)
 		}
 		if (*rp==r) rp = &r->next;
 	}
+	fflush(sqlstream);
 }
 
 static void
@@ -88,15 +131,13 @@ info_command(const char * str, void * data, const char * cmd)
 }
 
 void
-info_init(void)
+init_info(void)
 {
 	add_command(&g_keys, &g_cmds, "info", &info_command);
+
 	add_command(&g_keys, &g_cmds, "email", &info_email);
 	add_command(&g_keys, &g_cmds, "name", &info_name);
-}
-
-void
-info_done(void)
-{
-	/* TODO */
+	add_command(&g_keys, &g_cmds, "adresse", &info_address);
+	add_command(&g_keys, &g_cmds, "telefon", &info_phone);
+	add_command(&g_keys, &g_cmds, "urlaub", &info_vacation);
 }

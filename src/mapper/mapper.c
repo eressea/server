@@ -22,6 +22,7 @@
 #include <eressea.h>
 #include "mapper.h"
 
+#include <spells/spells.h>
 #include <attributes/attributes.h>
 #include <triggers/triggers.h>
 #include <items/weapons.h>
@@ -32,6 +33,7 @@
 #include <modules/museum.h>
 #include <modules/gmcmd.h>
 
+/* kernel includes */
 #include <item.h>
 #include <faction.h>
 #include <race.h>
@@ -39,10 +41,11 @@
 #include <reports.h>
 #include <save.h>
 #include <unit.h>
-#include <spells.h>
 #include <plane.h>
 #include <teleport.h>
+#include <resources.h>
 
+/* libc includes */
 #include <ctype.h>
 #include <limits.h>
 #include <locale.h>
@@ -180,7 +183,7 @@ RegionSymbol(region *r) {
 				rs = (chtype)(p+48);
 			else {
 				rs = terrain[rterrain(r)].symbol;
-				if(rs == 'P' && rtrees(r) >= 600) rs = 'F';
+				if(rs == 'P' && r_isforest(r)) rs = 'F';
 			}
 		}
 		break;
@@ -233,7 +236,7 @@ RegionSymbol(region *r) {
 		break;
 	default:
 		rs = terrain[rterrain(r)].symbol;
-		if(rs == 'P' && rtrees(r) >= 600) rs = 'F';
+		if(rs == 'P' && r_isforest(r)) rs = 'F';
 	}
 	return rs;
 }
@@ -255,6 +258,17 @@ factionhere(region * r, int f)
 	for (u = r->units; u; u = u->next)
 		if (u->faction->no == f)
 			return true;
+	return false;
+}
+
+static boolean
+has_laen(region *r)
+{
+	rawmaterial *rm;
+
+	for(rm=r->resources; rm; rm=rm->next) {
+		if(rm->type == &rm_laen) return true;
+	}
 	return false;
 }
 
@@ -340,7 +354,7 @@ drawmap(boolean maponly) {
 				if ((hl == -2 && r->units) ||
 					 (hl == -3 && r->buildings) ||
 					 (hl == -4 && r->ships) ||
-					 (hl == -5 && rlaen(r) != -1) ||
+					 (hl == -5 && has_laen(r)) ||
 					 (hl == -6 && fval(r, RF_MALLORN)) ||
 					 (hl == -7 && fval(r, RF_CHAOTIC)) ||
 					 (hl == -8 && is_cursed_internal(r->attribs, C_CURSED_BY_THE_GODS, 0)) ||
@@ -1325,13 +1339,18 @@ main(int argc, char *argv[])
 	init_triggers();
 
 	debug_language("locales.log");
-	init_locales();
 
 	init_races();
-	init_attributes();
 	init_spells();
+	init_data("eressea.xml");
+	init_locales();
+
 	init_resources();
-	init_items();
+	register_items();
+	init_attributes();
+#ifdef NEW_RESOURCEGROWTH
+	init_rawmaterials();
+#endif 
 
 	init_museum();
 	init_arena();

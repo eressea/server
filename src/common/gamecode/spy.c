@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -58,7 +58,7 @@ void
 spy(region * r, unit * u)
 {
 	unit *target;
-	int spy, observe;
+	int spy, spychance, observe, observechance;
 
 	target = getunit(r, u->faction);
 
@@ -74,26 +74,38 @@ spy(region * r, unit * u)
 		cmistake(u, findorder(u, u->thisorder), 39, MSG_EVENT);
 		return;
 	}
-	spy = eff_skill(u, SK_SPY, r)
-		- (eff_skill(target, SK_OBSERVATION, r) + eff_stealth(target, r) / 2);
+	/* Die Grundchance für einen erfolgreichen Spionage-Versuch ist 10%.
+	 * Für jeden Talentpunkt, den das Spionagetalent das Tarnungstalent
+	 * des Opfers übersteigt, erhöht sich dieses um 5%*/
+	spy = eff_skill(u, SK_SPY, r) - eff_skill(target, SK_STEALTH, r);
+	spychance = 10 + max(spy*5, 0);
 
-	if (spy < 0) {
+	if (rand()%100 < spychance){
+		spy_message(spy, u, target);
+	} else {
 		add_message(&u->faction->msgs, new_message(u->faction,
 			"spyfail%u:spy%u:target", u, target));
-	} else if (spy == 0) {
-		spy_message(spy, u, target);
-	} else if (spy > 0) {
-		spy_message(1, u, target);
 	}
-	observe = eff_skill(target, SK_OBSERVATION, r) - effskill(u, SK_STEALTH);
 
+	/* der Spion kann identifiziert werden, wenn das Opfer bessere
+	 * Wahrnehmung als das Ziel Tarnung + Spionage/2 hat */
+	observe = eff_skill(target, SK_OBSERVATION, r)
+				- (effskill(u, SK_STEALTH) + eff_skill(u, SK_SPY, r)/2);
 	if (get_item(u, I_RING_OF_INVISIBILITY) >= u->number &&
 		get_item(target, I_AMULET_OF_TRUE_SEEING) == 0) {
 		observe = min(observe, 0);
 	}
-	if (observe > 0)
+
+	/* Anschließend wird - unabhängig vom Erfolg - gewürfelt, ob der
+	 * Spionageversuch bemerkt wurde. Die Wahrscheinlich dafür ist (100 -
+	 * SpionageSpion*5 + WahrnehmungOpfer*2)%. */
+	observechance = 100 - (eff_skill(u, SK_SPY, r) * 5)
+				+ (eff_skill(target, SK_OBSERVATION, r) * 2);
+
+	if (rand()%100 < observechance){
 		add_message(&target->faction->msgs, new_message(target->faction,
 		"spydetect%u:spy%u:target", observe>0?u:NULL, target));
+	}
 }
 
 void
@@ -101,7 +113,7 @@ setstealth(unit * u, strlist * S)
 {
 	char *s;
 	char level;
-	race_t t;
+	const race * trace;
 	attrib *a;
 
 	s = getstrtoken();
@@ -113,24 +125,39 @@ setstealth(unit * u, strlist * S)
 		return;
 	}
 
-	/* Pseudodrachen können sich nur als Drachen tarnen */
 
-	t = findrace(s);
-	if (t != NORACE) {
-		if (u->race == RC_PSEUDODRAGON || u->race == RC_BIRTHDAYDRAGON) {
-			if (t==RC_PSEUDODRAGON||t==RC_FIREDRAGON||t==RC_DRAGON||t==RC_WYRM) {
-				u->irace = t;
-				if (race[u->race].flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+	trace = findrace(s, u->faction->locale);
+	if (trace) {
+		/* Dämonen können sich nur als andere Spielerrassen tarnen */
+		if (u->race == new_race[RC_DAEMON]) {
+			race_t allowed[] = { RC_DWARF, RC_ELF, RC_ORC, RC_GOBLIN, RC_HUMAN, 
+				RC_TROLL, RC_DAEMON, RC_INSECT, RC_HALFLING, RC_CAT, RC_AQUARIAN, 
+				NORACE };
+			int i;
+			for (i=0;allowed[i]!=NORACE;++i) if (new_race[allowed[i]]==trace) break;
+			if (new_race[allowed[i]]==trace) {
+				u->irace = trace;
+				if (u->race->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+					set_racename(&u->attribs, NULL);
+			}
+			return;
+		}
+
+		/* Pseudodrachen können sich nur als Drachen tarnen */
+		if (u->race == new_race[RC_PSEUDODRAGON] || u->race == new_race[RC_BIRTHDAYDRAGON]) {
+			if (trace==new_race[RC_PSEUDODRAGON]||trace==new_race[RC_FIREDRAGON]||trace==new_race[RC_DRAGON]||trace==new_race[RC_WYRM]) {
+				u->irace = trace;
+				if (u->race->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
 					set_racename(&u->attribs, NULL);
 			}
 			return;
 		}
 
 		/* Dämomen und Illusionsparteien können sich als andere race tarnen */
-		if (race[u->race].flags & RCF_SHAPESHIFT) {
-			if (!race[t].nonplayer) {
-				u->irace = t;
-				if (race[u->race].flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+		if (u->race->flags & RCF_SHAPESHIFT) {
+			if (playerrace(trace)) {
+				u->irace = trace;
+				if (u->race->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
 					set_racename(&u->attribs, NULL);
 			}
 		}
@@ -147,9 +174,11 @@ setstealth(unit * u, strlist * S)
 			freset(u, FL_PARTEITARNUNG);
 		} else if (findkeyword(s, u->faction->locale) == K_NUMBER) {
 			char *s2 = getstrtoken();
-			int nr = atoi36(s2);
+			int nr = -1;
+
+			if(s2) nr = atoi36(s2);
 			if(!s2 || *s2 == 0 || nr == u->faction->no) {
-				a_removeall(&u->faction->attribs, &at_otherfaction);
+				a_removeall(&u->attribs, &at_otherfaction);
 			} else {
 				/* TODO: Prüfung ob Partei sichtbar */
 				if(!findfaction(nr)) {
@@ -212,7 +241,7 @@ setstealth(unit * u, strlist * S)
 				return;
 			}
 			u_seteffstealth(u, level);
-		} else if (race[u->race].flags & RCF_SHAPESHIFTANY) {
+		} else if (u->race->flags & RCF_SHAPESHIFTANY) {
 			set_racename(&u->attribs, s);
 		}
 	}
@@ -391,7 +420,7 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 			unit *u = (unit *) survivors.data[index];
 
 			assert(index < survivors.size);
-			if (u->faction == f && !nonplayer(u)) {
+			if (u->faction == f && playerrace(u->race)) {
 				remove = min(get_money(u), money);
 				money -= remove;
 				change_money(u, -remove);

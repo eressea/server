@@ -21,6 +21,9 @@
 #include "faction.h"
 #include "save.h"
 
+/* attrib includes */
+#include <attributes/raceprefix.h>
+
 /* util includes */
 #include <resolve.h>
 #include <base36.h>
@@ -29,7 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef GROUPS
 #define GMAXHASH 2047
 static group * ghash[GMAXHASH];
 static int maxgid;
@@ -40,6 +42,7 @@ new_group(faction * f, const char * name, int gid)
 	group ** gp = &f->groups;
 	int index = gid % GMAXHASH;
 	group * g = calloc(sizeof(group), 1);
+	attrib *a;
 
 	while (*gp) gp = &(*gp)->next;
 	*gp = g;
@@ -47,6 +50,11 @@ new_group(faction * f, const char * name, int gid)
 	maxgid = max(gid, maxgid);
 	g->name = strdup(name);
 	g->gid = gid;
+
+	a = a_find(f->attribs, &at_raceprefix);
+	if(a) {
+		a_add(&g->attribs, a_new(&at_raceprefix))->data.v = strdup((char *)a->data.v);
+	}
 
 	g->nexthash = ghash[index];
 	return ghash[index] = g;
@@ -89,8 +97,11 @@ read_group(attrib * a, FILE * f)
 	group * g;
 	fscanf(f, "%d ", &gid);
 	a->data.v = g = find_group(gid);
-	g->members++;
-	return 1;
+	if (g!=0) {
+		g->members++;
+		return 1;
+	}
+	return 0;
 }
 
 static void
@@ -153,10 +164,12 @@ write_groups(FILE * F, group * g)
 		fprintf(F, "%d \"%s\" ", g->gid, g->name);
 		for (a=g->allies;a;a=a->next) if (a->faction)
 			fprintf(F, "%s %d ", factionid(a->faction), a->status);
-		fprintf(F, "0 \n");
+		fputs("0 ", F);
+		a_write(F, g->attribs);
+		fputs("\n", F);
 		g=g->next;
 	}
-	fprintf(F, "0\n");
+	fputs("0\n", F);
 }
 
 void
@@ -174,7 +187,7 @@ read_groups(FILE * F, faction * f)
 		for (;;) {
 			ally * a;
 			int aid;
-			if (global.data_version>=FULL_BASE36_VERSION) {
+			if (global.data_version >= FULL_BASE36_VERSION) {
 				fscanf(F, "%s ", buf);
 				aid = atoi36(buf);
 			} else {
@@ -188,6 +201,8 @@ read_groups(FILE * F, faction * f)
 			a->faction = findfaction(aid);
 			if (!a->faction) ur_add((void*)aid, (void**)&a->faction, resolve_faction);
 		}
+		if(global.data_version >= GROUPATTRIB_VERSION) {
+			a_read(F, &g->attribs);
+		}
 	}
 }
-#endif

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * 
+ *
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -30,11 +30,17 @@ verify_follow(attrib * a)
 	return 1;
 }
 
+#define FOLLOW_PERSISTENT 0
+
+#if FOLLOW_PERSISTENT
 static void
 write_follow(const attrib * a, FILE * F)
 {
 	write_unit_reference((unit*)a->data.v, F);
 }
+#else
+#define write_follow NULL
+#endif
 
 static int
 read_follow(attrib * a, FILE * F)
@@ -42,11 +48,17 @@ read_follow(attrib * a, FILE * F)
 	if (global.data_version < BASE36IDS_VERSION) {
 		int i;
 		fscanf(F, "%d", &i);
+#if FOLLOW_PERSISTENT
 		ur_add((void*)i, (void**)&a->data.v, resolve_unit);
+#endif
 	} else {
+#if FOLLOW_PERSISTENT
 		read_unit_reference((unit**)&a->data.v, F);
+#else
+		read_unit_reference(NULL, F);
+#endif
 	}
-	return 1;
+	return FOLLOW_PERSISTENT;
 }
 
 attrib_type at_follow = {

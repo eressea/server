@@ -21,9 +21,19 @@
 #ifndef ERESSEA_H
 #define ERESSEA_H
 
+/* Features currently in development (change makefile please): */
+#ifndef MSG_LEVELS 
+# undef MSG_LEVELS /* msg-levels active */
+#endif
+
+/* Features enabled: */
+#define  RESOURCE_FIX /* Should be removed soon! */
+#define NEW_RESOURCEGROWTH
+#define LARGE_CASTLES
+#define GROWING_TREES
+#define STEALTHFACTION
 #define AT_MOVED
-#undef MSG_LEVELS /* msg-levels wieder aktiviert */
-#undef OLD_MESSAGES
+#undef  RACE_ADJUSTMENTS
 
 /* basic types used in the eressea "kernel" */
 typedef unsigned char order_t;
@@ -43,6 +53,7 @@ typedef int spellid_t;
 
 struct plane;
 struct region;
+struct race;
 struct ship;
 struct building;
 struct faction;
@@ -56,11 +67,14 @@ struct item_type;
 struct potion_type;
 struct luxury_type;
 struct herb_type;
+struct weapon_type;
 /* types */
 struct ship_type;
 struct building_type;
 
 /* util includes */
+struct xml_stack;
+
 #include <cvector.h>
 #include <umlaut.h>
 #include <language.h>
@@ -72,6 +86,7 @@ struct building_type;
 #define AT_PERSISTENT
 #undef RANDOMIZED_LEARNING
 #undef NOVISIBLESKILLPOINTS
+#undef SKILLMODIFIESLEARNING
 
 /* eressea-defined attribute-type flags */
 #define ATF_CURSE  ATF_USER_DEFINED
@@ -84,7 +99,6 @@ struct building_type;
 #define PARTIAL_STUDY /* Wenn nicht genug Silber vorhanden, wird ein Talent anteilig gelernt */
 #define HUNGER_REDUCES_SKILL /* Hunger reduziert den Talentwert auf die Hälfte */
 #define DAEMON_HUNGER /* Dämonen hungern, statt mit 10% in ihre sphäre zurückzukehren */
-#define NO_FOREST /* Es gibt keinen Terraintyp "Wald" mehr */
 #define NEW_RECEIPIES /* Vereinfachte, besser verteilte Kräuterzutaten für Tränke */
 #define NEW_TRIGGER
 #undef OLD_TRIGGER /* leave active for compatibility until conversion is implemented */
@@ -92,7 +106,6 @@ struct building_type;
 #define GOBLINKILL
 #undef HELFE_WAHRNEHMUNG
 #define NOAID
-#define GROUPS /* Parteien können in Unterabteilungen eingeteilt werden */
 
 #define USE_FIREWALL 1
 #undef COMPATIBILITY
@@ -102,9 +115,8 @@ struct building_type;
 #define FUZZY_BASE36 /* Fuzzy- Behandlung von Gebäude- und Schiffsnummern */
 #define FULL_BASE36
 
-#define ATTRIB_VERSION 82
-#define PLANES_VERSION 90
 #define RACES_VERSION 91
+#define MIN_VERSION RACES_VERSION
 #define MAGIEGEBIET_VERSION 92
 #define FATTRIBS_VERSION 94
 #define ATNORD_VERSION 95
@@ -139,7 +151,13 @@ struct building_type;
 #define NEWSOURCE_VERSION 197
 #define NEWSTATUS_VERSION 198
 #define NEWNAMES_VERSION 199
-#define LOCALE_VERSION 300 /* TODO */
+#define LOCALE_VERSION 300
+#define GROUPATTRIB_VERSION 301
+#define NEWRESOURCE_VERSION 303
+#define GROWTREE_VERSION 305
+#define RANDOMIZED_RESOURCES_VERSION 306 /* should be the same, but doesn't work */
+#define NEWRACE_VERSION 307
+#define UGROUPS_VERSION 400 /* nicht aktivieren, nicht fertig */
 
 /* globale settings des Spieles */
 typedef struct settings {
@@ -149,8 +167,21 @@ typedef struct settings {
 } settings;
 extern settings global;
 
-#define RELEASE_VERSION NEWNAMES_VERSION
-#define ECHECK_VERSION "3.11"
+#define RELEASE_VERSION NEWRACE_VERSION
+
+/*
+#if RELEASE_VERSION >= UGROUPS_VERSION
+#define USE_UGROUPS
+#endif
+*/
+
+#ifdef RESOURCE_FIX
+extern void init_resourcefix(void);
+extern void read_iron(struct region * r, int iron);
+extern void read_laen(struct region * r, int laen);
+#endif
+
+#define ECHECK_VERSION "4.01"
 
 /* changes from->to: 72->73: struct unit::lock entfernt.
  * 73->74: struct unit::flags eingeführt.
@@ -206,12 +237,12 @@ extern settings global;
 #define STARVATION_SURVIVAL  10
 
 /* Pferdevermehrung */
-#define HORSEGROWTH 8
+#define HORSEGROWTH 4
 /* Wanderungschance pro Pferd */
-#define HORSEMOVE   5
+#define HORSEMOVE   3
 
 /* Vermehrungschance pro Baum */
-#define FORESTGROWTH 4
+#define FORESTGROWTH 2
 #define TREESIZE     (MAXPEASANTS_PER_AREA-2)
 
 /* Eisen in Bergregionen bei Erschaffung */
@@ -296,8 +327,6 @@ extern void plagues(struct region * r, boolean ismagic);
 
 #define ORCIFICATION
 
-#define NEW_FOLLOW 1
-
 /* Bewegungsweiten: */
 #define BP_WALKING 4
 #define BP_RIDING  6
@@ -318,7 +347,7 @@ extern void plagues(struct region * r, boolean ismagic);
 #define SPACE               ' '
 #define ESCAPE_CHAR         '\\'
 
-#define DISPLAYSIZE         4095	/* max. Länge einer Beschreibung, ohne trailing 0 */
+#define DISPLAYSIZE         8191	/* max. Länge einer Beschreibung, ohne trailing 0 */
 #define NAMESIZE            127	/* max. Länge eines Namens, ohne trailing 0 */
 #define IDSIZE              15	/* max. Länge einer no (als String), ohne trailing 0 */
 #define KEYWORDSIZE         15	/* max. Länge eines Keyword, ohne trailing 0 */
@@ -403,9 +432,7 @@ enum {
 	K_MAGIEGEBIET,
 	K_PIRACY,
 	K_RESTART,
-#ifdef GROUPS
 	K_GROUP,
-#endif
 	K_SACRIFICE,
 	K_PRAY,
 	K_SORT,
@@ -415,6 +442,11 @@ enum {
 #ifdef USE_UGROUPS
 	K_JOINUGROUP,
 	K_LEAVEUGROUP,
+#endif
+	K_PREFIX,
+	K_SYNONYM,
+#ifdef GROWING_TREES
+	K_PFLANZE,
 #endif
 	MAXKEYWORDS,
 	NOKEYWORD = (keyword_t) - 1
@@ -450,6 +482,7 @@ enum {
 	P_NOT,
 	P_NEXT,
 	P_FACTION,
+	P_GAMENAME,
 	P_PERSON,
 	P_REGION,
 	P_SHIP,
@@ -478,6 +511,9 @@ enum {
 	P_NUMBER,
 	P_ITEMS,
 	P_POTIONS,
+	P_GROUP,
+	P_FACTIONSTEALTH,
+	P_TREES,
 	MAXPARAMS,
 	NOPARAM = (param_t) - 1
 };
@@ -647,6 +683,7 @@ enum {
 	RC_MUS_SPIRIT,   /* 58 */
 	RC_GNOME,        /* 59 */
 	RC_TEMPLATE,     /* 60 */
+	RC_CLONE,        /* 61 */
 
 	MAXRACES,
 	NORACE = (race_t) - 1
@@ -666,6 +703,14 @@ enum {
 	MAXDIRECTIONS,
 	D_PAUSE,
 	NODIRECTION = (direction_t) - 1
+};
+
+/* Jahreszeiten, siehe auch res/timestrings */
+enum {
+	SEASON_WINTER,
+	SEASON_SPRING,
+	SEASON_SUMMER,
+	SEASON_AUTUMN
 };
 
 /* ------------------------------------------------------------- */
@@ -760,13 +805,14 @@ enum {
 	A_TY_LOCK
 };
 
-#define DONT_HELP    0
-#define HELP_MONEY   1			/* Mitversorgen von Einheiten */
-#define HELP_FIGHT   2			/* Bei Verteidigung mithelfen */
-#define HELP_OBSERVE 4			/* Bei Wahrnehmung mithelfen */
-#define HELP_GIVE    8			/* Dinge annehmen ohne KONTAKTIERE */
-#define HELP_GUARD  16			/* Laesst Steuern eintreiben etc. */
-#define HELP_ALL    31-HELP_OBSERVE		/* Alle "positiven" HELPs zusammen */
+#define DONT_HELP      0
+#define HELP_MONEY     1			/* Mitversorgen von Einheiten */
+#define HELP_FIGHT     2			/* Bei Verteidigung mithelfen */
+#define HELP_OBSERVE   4			/* Bei Wahrnehmung mithelfen */
+#define HELP_GIVE      8			/* Dinge annehmen ohne KONTAKTIERE */
+#define HELP_GUARD    16			/* Laesst Steuern eintreiben etc. */
+#define HELP_FSTEALTH 32			/* Laesst Steuern eintreiben etc. */
+#define HELP_ALL    63-HELP_OBSERVE		/* Alle "positiven" HELPs zusammen */
 /* HELP_OBSERVE deaktiviert */
 /* ------------------------------------------------------------- */
 /* Prototypen */
@@ -813,10 +859,8 @@ typedef struct skillvalue {
 #define FL_TRAVELTHRU     (1<<7)	/* 128 */
 #define FL_MOVED          (1<<8)
 
-#if NEW_FOLLOW
 #define FL_FOLLOWING      (1<<9)
 #define FL_FOLLOWED       (1<<10)
-#endif
 
 #define FL_HUNGER         (1<<11) /* kann im Folgemonat keinen langen Befehl
                                      außer ARBEITE ausführen */
@@ -855,7 +899,7 @@ typedef struct skillvalue {
 #define FL_SAVEMASK (FL_OWNER | FL_PARTEITARNUNG | FL_LOCKED | FL_HUNGER | FL_NOIDLEOUT | FL_TAKEALL | FL_UNNAMED)
 #endif
 
-#define fval(u, i) (((u)->flags & (i)) == i)
+#define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))
 #define freset(u, i) ((u)->flags &= ~(i))
 
@@ -890,14 +934,16 @@ extern int count_all_money(const struct region * r);
 
 /* direction, geography */
 extern const char *directions[];
-extern direction_t finddirection(const char *s);
+extern direction_t finddirection(const char *s, const struct locale *);
+
+extern int findoption(const char *s, const struct locale * lang);
 
 /* shared character-buffer */
-#define BUFSIZE 8191
+#define BUFSIZE 32765
 extern char buf[BUFSIZE + 1];
 
 /* special units */
-struct unit *make_undead_unit(struct region * r, struct faction * f, int n, race_t race);
+struct unit *make_undead_unit(struct region * r, struct faction * f, int n, const struct race * race);
 
 extern struct region *regions;
 extern struct faction *factions;
@@ -943,9 +989,9 @@ extern int atoi36(const char * s);
 #define curseid(x) itoa36((x)->no)
 
 extern boolean cansee(const struct faction * f, const struct region * r, const struct unit * u, int modifier);
-boolean cansee_durchgezogen(struct faction * f, struct region * r, struct unit * u, int modifier);
-boolean seefaction(struct faction * f, struct region * r, struct unit * u, int modifier);
-char effskill(const struct unit * u, skill_t sk);
+boolean cansee_durchgezogen(const struct faction * f, const struct region * r, const struct unit * u, int modifier);
+boolean seefaction(const struct faction * f, const struct region * r, const struct unit * u, int modifier);
+extern int effskill(const struct unit * u, skill_t sk);
 
 int lovar(int n);
 
@@ -955,8 +1001,9 @@ int newunitid(void);
 int forbiddenid(int id);
 int newcontainerid(void);
 
-extern struct unit *createunit(struct region * r, struct faction * f, int number, race_t race);
-extern struct unit *createunitid(struct region * r1, struct faction * f, int number, race_t race, int id, const char * dname);
+extern struct unit *createunit(struct region * r, struct faction * f, int number, const struct race * rc);
+extern struct unit *create_unit(struct region * r1, struct faction * f, int number, const struct race * rc, int id, const char * dname, struct unit *creator);
+extern void create_unitid(struct unit *u, int id);
 extern boolean getunitpeasants;
 struct unit *getunitg(const struct region * r, const struct faction * f);
 struct unit *getunit(const struct region * r, const struct faction * f);
@@ -987,7 +1034,7 @@ struct building *largestbuilding(const struct region * r, boolean img);
 int count_all(const struct faction * f);
 int teure_talente(struct unit * u);
 int count_maxmigrants(const struct faction * f);
-race_t findrace(const char *s);
+const struct race * findrace(const char *, const struct locale *);
 
 int effstealth(const struct unit * u);
 int eff_stealth(const struct unit * u, const struct region * r);
@@ -1123,5 +1170,9 @@ extern const char *locales[];
 #include <stdafx.h>
 #endif
 #include "terrain.h" /* für (bald) alte MAXTERRAINS */
+
+/** compatibility: **/
+extern race_t old_race(const struct race *);
+extern const struct race * new_race[];
 
 #endif

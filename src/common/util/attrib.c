@@ -77,7 +77,7 @@ at_find(unsigned int hk)
 }
 
 attrib *
-a_select(attrib * a, void * data, boolean(*compare)(const attrib *, void *))
+a_select(attrib * a, const void * data, boolean(*compare)(const attrib *, const void *))
 {
 	while (a && !compare(a, data)) a = a->next;
 	return a;

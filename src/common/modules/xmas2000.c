@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -139,7 +139,7 @@ make_santa(region * r)
 {
 	unit * santa = ufindhash(atoi36("xmas"));
 
-	while (santa && santa->race!=RC_ILLUSION) {
+	while (santa && santa->race!=new_race[RC_ILLUSION]) {
 		uunhash(santa);
 		santa->no = newunitid();
 		uhash(santa);
@@ -149,12 +149,12 @@ make_santa(region * r)
 		faction * f = findfaction(atoi36("rr"));
 		if (f==NULL) return NULL;
 		f->alive = true;
-		santa = createunit(r, f, 1, RC_ILLUSION);
+		santa = createunit(r, f, 1, new_race[RC_ILLUSION]);
 		uunhash(santa);
 		santa->no = atoi36("xmas");
 		uhash(santa);
 		fset(santa, FL_PARTEITARNUNG);
-		santa->irace = RC_GNOME;
+		santa->irace = new_race[RC_GNOME];
 		set_string(&santa->name, "Ein dicker Gnom mit einem Rentierschlitten");
 		set_string(&santa->display, "hat: 12 Rentiere, Schlitten, Sack mit Geschenken, Kekse für Khorne");
 	}
@@ -171,7 +171,7 @@ santa_comes_to_town(region * r)
 	for (f = factions;f;f=f->next) {
 		unit * u;
 		unit * senior = f->units;
-		if (nonplayer_race(f->race)) continue;
+		if (!playerrace(f->race)) continue;
 		for (u = f->units; u; u=u->nextF) {
 			if (senior->age < u->age) senior = u;
 		}
@@ -213,7 +213,11 @@ create_xmas2000(int x, int y)
 	r = new_region(x, y);
 	terraform(r, T_PLAIN);
 	set_string(&r->land->name, "Weihnachtsinsel");
+#ifdef GROWING_TREES
+	rsettrees(r, 2, 1000);
+#else
 	rsettrees(r, 1000);
+#endif
 	rsetpeasants(r, 0);
 	rsetmoney(r, 0);
 	for (dir=0;dir!=MAXDIRECTIONS;++dir) {
@@ -227,8 +231,8 @@ create_xmas2000(int x, int y)
 		unit * u;
 
 		u = createunit(r, f, 2, f->race);
-		if (f->race==RC_DAEMON) u->irace = RC_HUMAN;
-		sprintf(zText, "%s %s", prefix[rand()%prefixes], race[u->irace].name[1]);
+		if (f->race==new_race[RC_DAEMON]) u->irace = new_race[RC_HUMAN];
+		sprintf(zText, "%s %s", prefix[rand()%prefixes], LOC(u->faction->locale, rc_name(u->irace, 1)));
 		fset(u, FL_PARTEITARNUNG);
 		set_string(&u->name, zText);
 	}

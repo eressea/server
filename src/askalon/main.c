@@ -80,8 +80,14 @@ init_game(void)
 {
 	register_triggers();
 	init_locales();
+	{
+		char zText[MAX_PATH];
+		sprintf(zText, "%s/%s", resourcepath(), "askalon.xml");
+		init_data(zText);
+	}
 
 	init_resources();
+	register_items();
 	init_weapons();
 
 	init_conversion();
@@ -375,6 +381,7 @@ main(int argc, char *argv[])
 	FILE * F;
 
 	setlocale(LC_ALL, "");
+	setlocale(LC_NUMERIC, "C");
 #ifdef LOCALE_CHECK
 	assert(locale_check() || !"ERROR: The current locale is not suitable for international Eressea.\n");
 #endif

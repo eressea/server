@@ -11,6 +11,7 @@
  */
 
 #include <config.h>
+
 #include "eressea.h"
 
 /* kernel includes */
@@ -23,13 +24,14 @@
 #include <attributes/ugroup.h>
 
 /* libc includes */
+#include <stdio.h>
 #include <stdlib.h>
 
 /* TODO:
  * - Anzeige (CR)
  * - Speicherung
  * - Evt. NACH (Betrete/Verlasse?) des Leaders vererben auf Members.
- * - Routine zur automatisch Aufsplittung.
+ * - Routine zur automatischen Aufsplittung.
  */
 
 /* Nur die erste Einheit in der Liste 

@@ -20,7 +20,6 @@
 
 #ifndef FACTYPES_H
 #define FACTYPES_H
-#include <config.h>
 #include "magic.h"
 
 #define AT_NONE 0
@@ -40,7 +39,7 @@ typedef struct att {
 	int type;
 	union {
 		const char * dice;
-		int i;
+		int iparam;
 	} data;
 	int flags;
 } att;
@@ -50,12 +49,12 @@ typedef struct race_syn {
 	const char *synonyms[4];
 } race_syn;
 
-typedef struct race_type {
-	const char *name[4]; /* neu: name[4]völker */
+typedef struct race {
+	const char *_name[4]; /* neu: name[4]völker */
 	double magres;
 	double maxaura; /* Faktor auf Maximale Aura */
 	double regaura; /* Faktor auf Regeneration */
-	int rekrutieren;
+	int recruitcost;
 	int maintenance;
 	int splitsize;
 	int weight;
@@ -69,26 +68,37 @@ typedef struct race_type {
 	char df_bonus;   /* Verändert den Verteidigungskill (default: 0)*/
 	struct att attack[6];
 	char bonus[MAXSKILLS];
-	boolean nonplayer;
+	boolean __remove_me_nonplayer;
 	int flags;
 	int battle_flags;
 	int ec_flags;
-	race_t familiars[MAXMAGIETYP];
-	const char *(*generate_name) (const struct unit *);
-	void (*age_function)(struct unit *u);
-	boolean (*move_allowed)(const struct region *, const struct region *);
-	struct attrib * attribs;
-} racetype;
+	race_t oldfamiliars[MAXMAGIETYP];
 
-#define racedata race_type
+	const char *(*generate_name) (const struct unit *);
+	void (*age)(struct unit *u);
+	boolean (*move_allowed)(const struct region *, const struct region *);
+	struct item * (*itemdrop)(const struct race *, int size);
+	void (*init_familiar)(struct unit *);
+
+	const struct race * familiars[MAXMAGIETYP];
+	struct attrib * attribs;
+	struct race * next;
+} race;
+
+extern struct race * races;
+
+extern struct race * rc_find(const char *);
+extern const char * rc_name(const struct race *, int);
+extern struct race * rc_add(struct race *);
+extern int rc_specialdamage(const race *, const race *, const struct weapon_type *);
 
 /* Flags */
-#define RCF_KILLPEASANTS   (1<<0)		/* Töten Bauern. Dämonen werden nicht über dieses Flag, sondern in randenc() behandelt. */
-#define RCF_SCAREPEASANTS  (1<<1)
-#define RCF_ATTACKRANDOM   (1<<2)
-#define RCF_MOVERANDOM     (1<<3)
-#define RCF_CANNOTMOVE     (1<<4)
-#define RCF_SEEKTARGET     (1<<5)		/* sucht ein bestimmtes Opfer */
+#define RCF_PLAYERRACE     (1<<0)	/* can be played by a player. */
+#define RCF_KILLPEASANTS   (1<<1)		/* Töten Bauern. Dämonen werden nicht über dieses Flag, sondern in randenc() behandelt. */
+#define RCF_SCAREPEASANTS  (1<<2)
+#define RCF_ATTACKRANDOM   (1<<3)
+#define RCF_MOVERANDOM     (1<<4)
+#define RCF_CANNOTMOVE     (1<<5)
 #define RCF_LEARN          (1<<6) 	/* Lernt automatisch wenn struct faction == 0 */
 #define RCF_FLY            (1<<7)   /* kann fliegen */
 #define RCF_SWIM           (1<<8)   /* kann schwimmen */
@@ -97,12 +107,13 @@ typedef struct race_type {
 #define RCF_NOTEACH        (1<<11) 	/* kann nicht lehren */
 #define RCF_HORSE          (1<<12)  /* Einheit ist Pferd, sozusagen */
 #define RCF_DESERT         (1<<13)  /* 5% Chance, das Einheit desertiert */
-#define RCF_DRAGONLIMIT    (1<<14)  /* Kann nicht aus Gletscher in Ozean */
+#define RCF_ILLUSIONARY    (1<<14)	/* (Illusion & Spell) Does not drop items. */
 #define RCF_ABSORBPEASANTS (1<<15)  /* Tötet und absorbiert Bauern */
 #define RCF_NOHEAL         (1<<16)  /* Einheit kann nicht geheilt werden */
-#define RCF_NOWEAPONS      (1<<17)  /* Einheit kann keine Waffen bneutzen */
+#define RCF_NOWEAPONS      (1<<17)  /* Einheit kann keine Waffen benutzen */
 #define RCF_SHAPESHIFT     (1<<18)	/* Kann TARNE RASSE benutzen. */
 #define RCF_SHAPESHIFTANY  (1<<19)	/* Kann TARNE RASSE "string" benutzen. */
+#define RCF_UNDEAD         (1<<20)	/* Undead. */
 
 /* Economic flags */
 #define NOGIVE         (1<<0)   /* gibt niemals nix */
@@ -116,46 +127,37 @@ typedef struct race_type {
 #define ECF_REC_UNLIMITED  (1<<8)   /* Rekrutiert ohne Limit */
 
 /* Battle-Flags */
-#define BF_EQUIPMENT				(1<<0)
-	/* Kann Ausrüstung benutzen */
-#define BF_MAGIC_EQUIPMENT	(1<<1)
-	/* Kann magische Gegenstände (keine Waffen und Rüstungen)benutzen */
-#define BF_DRAIN_STRENGTH		(1<<2)
-	/* Treffer entzieht Attack/Defense */
-#define BF_DRAIN_EXP				(1<<3)
-	/* Treffer entzieht Talenttage */
-#define BF_INV_NONMAGIC			(1<<4)
-	/* Immun gegen nichtmagischen Schaden */
-#define BF_NOBLOCK					(1<<5)
-	/* Wird in die Rückzugsberechnung nicht einbezogen */
-#define BF_RES_PIERCE				(1<<6)
-	/* Halber Schaden durch PIERCE */
-#define BF_RES_CUT					(1<<7)
-	/* Halber Schaden durch CUT */
-#define BF_RES_BASH					(1<<8)
-	/* Halber Schaden durch BASH */
+#define BF_EQUIPMENT    (1<<0) /* Kann Ausrüstung benutzen */
+#define BF_NOBLOCK      (1<<1) /* Wird in die Rückzugsberechnung nicht einbezogen */
+#define BF_RES_PIERCE   (1<<2) /* Halber Schaden durch PIERCE */
+#define BF_RES_CUT      (1<<3) /* Halber Schaden durch CUT */
+#define BF_RES_BASH     (1<<4) /* Halber Schaden durch BASH */
+#define BF_INV_NONMAGIC (1<<5) /* Immun gegen nichtmagischen Schaden */
 
-extern struct racedata race[];
-void give_starting_equipment(struct region *r, struct unit *u);
-void give_latestart_bonus(struct region *r, struct unit *u, int b);
-int unit_old_max_hp(struct unit * u);
-boolean is_undead(const struct unit *u);
+extern void give_starting_equipment(struct region *r, struct unit *u);
+extern void give_latestart_bonus(struct region *r, struct unit *u, int b);
+extern int unit_old_max_hp(struct unit * u);
+extern const char * racename(const struct locale *lang, const struct unit *u, const race * rc);
 
-#define dragon(u) ((u)->race == RC_FIREDRAGON || (u)->race == RC_DRAGON || (u)->race == RC_WYRM || (u)->race == RC_BIRTHDAYDRAGON)
-#define humanoid(u) (u->race==RC_UNDEAD || u->race==RC_DRACOID || !race[(u)->race].nonplayer)
-#define nonplayer(u) (race[(u)->race].nonplayer)
-#define nonplayer_race(r) (race[r].nonplayer)
-#define illusionary(u) ((u)->race==RC_ILLUSION)
-#define omniscient(f) ((f)->race==RC_ILLUSION || (f)->race==RC_TEMPLATE)
+#define omniscient(f) (((f)->race)==new_race[RC_ILLUSION] || ((f)->race)==new_race[RC_TEMPLATE])
+
+#define playerrace(rc) (fval((rc), RCF_PLAYERRACE))
+#define dragonrace(rc) ((rc) == new_race[RC_FIREDRAGON] || (rc) == new_race[RC_DRAGON] || (rc) == new_race[RC_WYRM] || (rc) == new_race[RC_BIRTHDAYDRAGON])
+#define humanoidrace(rc) (fval((rc), RCF_UNDEAD) || (rc)==new_race[RC_DRACOID] || playerrace(rc))
+#define illusionaryrace(rc) (fval(rc, RCF_ILLUSIONARY))
 
 extern boolean allowed_dragon(const struct region * src, const struct region * target);
 
 extern void init_races(void);
 extern boolean r_insectstalled(const struct region *r);
 
-extern const char * racename(const struct locale *loc, const struct unit *u, const race_t race);
 
 extern const char *race_prefixes[];
 extern const struct race_syn race_synonyms[];
+
+extern void write_race_reference(const struct race * rc, FILE * F);
+extern void read_race_reference(const struct race ** rp, FILE * F);
+
+extern int read_races(FILE * F, struct xml_stack * stack);
 
 #endif

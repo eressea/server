@@ -92,12 +92,14 @@ typedef struct side {
 	int size[NUMROWS];	/* Anzahl Personen in Reihe X. 0 = Summe */
 	int nonblockers[NUMROWS]; /* Anzahl nichtblockierender Kämpfer, z.B. Schattenritter. */
 	int alive;		/* Die Partei hat den Kampf verlassen */
+	int removed;  /* stoned */
 	int flee;
 	int dead;
 	int casualties;
 	int healed;
 	boolean dh;
 	boolean stealth;	/* Die Einheiten sind getarnt */
+	const struct faction *stealthfaction;
 } side;
 
 typedef struct weapon {

@@ -28,7 +28,7 @@ typedef struct player_hash {
 static player_hash * players[PMAXHASH];
 
 player *
-make_player(void)
+make_player(const struct faction * f)
 {
 	player * p = calloc(sizeof(player), 1);
 	unsigned int hash;
@@ -40,6 +40,7 @@ make_player(void)
 		else break;
 	}
 	hash = p->id % PMAXHASH;
+	p->faction = f;
 	p->nexthash = players[hash]->entries;
 	players[hash]->entries = p;
 
@@ -94,7 +95,7 @@ players_done(void)
 		players[i]->entries = p->nexthash;
 		free(p->name);
 		if (p->email) free(p->email);
-		if (p->info) free(p->info);
+		if (p->name) free(p->name);
 		free(p);
 	}
 }

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * 
+ *
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -12,9 +12,11 @@
  * prior permission by the authors of Eressea.
  */
 
+struct plane;
 struct attrib;
 struct unit;
 struct faction;
+struct region;
 
 extern void init_gmcmd(void);
 /* initialize this module */
@@ -22,7 +24,8 @@ extern void init_gmcmd(void);
 extern void gmcommands(void);
 /* execute commands */
 
-extern struct faction * gm_addquest(const char * email, const char * name, int radius, unsigned int flags);
+extern struct faction * gm_addfaction(const char * email, struct plane * p, struct region * r);
+extern struct plane * gm_addplane(int radius, unsigned int flags, const char * name);
 
 /*
  * doesn't belong in here:

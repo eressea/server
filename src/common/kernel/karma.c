@@ -71,10 +71,10 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Personen in einer Partei mit dieser Eigenschaft heilen jeden "
 		"Schaden innerhalb einer Woche und zusätzlich in jeder Kampfrunde "
 		"HP entsprechend ihres Ausdauer-Talents. Sie benötigen jedoch 11 "
-		"Unterhalt pro Woche.",
+		"Silber Unterhalt pro Woche.",
 		1
 	},
-	{
+	{ /* TODO: Für alte Parteien zu stark */
 		"Städter",
 		"Personen einer Partei mit dieser Eigenschaft lieben die Städte und "
 		"verabscheuen das Leben in der freien Natur. Ihr Arbeitlohn verändert "
@@ -90,7 +90,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Barbar",
 		"Einheiten dieser Partei erhalten durch Lernen von Waffentalenten "
 		"(Taktik und Reiten zählen nicht dazu!) 40 statt 30 Lerntage. Weitere "
-		"Stufen erhöhen den Bonus um +5/+10. Die Fokussierung auf das "
+		"Stufen erhöhen den Bonus um 5 Lerntage. Die Fokussierung auf das "
 		"Kriegerdasein führt jedoch zu Problemen, andere Talente zu erlernen. "
 		"In allen nichtkriegerischen Talenten einschließlich Magie und Taktik "
 		"erhalten sie die entsprechende Anzahl von Lerntagen weniger pro "
@@ -119,7 +119,8 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Stufen bringen jeweils einen zusätzlichen Talentpunkt.",
 		100
 	},
-	{
+	{ /* Ohne Schiffsunterhaltskosten schwache Eigenschaft. */
+		/* Aufpassen: Tragkraft? */
 		"Feenreich",
 		"Alle Personen dieser Partei wiegen nur noch die Hälfte ihres normalen "
 		"Gewichtes. Die Nähe zum Feenreich macht sie jedoch besonders "
@@ -168,11 +169,11 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 	{
 		"Magokrat",
 		"Eine Partei mit dieser Eigenschaft hat eine so hohe magische "
-		"Affinität, dass sie pro Stufe der Eigenschaft zwei zusätzlich Magier "
-		"ausbilden kann.",
+		"Affinität, dass sie pro Stufe der Eigenschaft zwei zusätzlich "
+		"Magier ausbilden kann.",
 		100
 	},
-	/* TODO: negative Eigenschaft */
+	/* TODO: negative Eigenschaft, vergleichsweise schwach */
 	{
 		"Sappeur",
 		"Befestigungen wirken gegen Einheiten einer Partei mit dieser "
@@ -193,6 +194,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		100
 	},
 	{
+		/* Evt. zwei Stufen draus machen */
 		"Versteckt",
 		"Eine Partei mit dieser Eigenschaft hat die Fähigkeit zu Tarnung "
 		"zur Perfektion getrieben. Jede Einheit mit mindestens Tarnung 3 "
@@ -233,8 +235,8 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Eine Partei mit dieser Eigenschaft kann eine (Spieler)-Rasse "
 		"mit dem speziellen kurzen Befehl JIHAD <RASSE> zum Feind erklären. "
 		"Bei einem Kampf gegen einen Angehörigen dieser Rasse bekommen ihre "
-		"Kämpfer grundsätzlich 1 auf Angriff und Schaden. Allerdings "
-		"kann es zu spontanen Pogromen gegen Angehörige der mit einem "
+		"Kämpfer grundsätzlich einen Bonus von +1 auf Angriff und Schaden. "
+		"Allerdings kann es zu spontanen Pogromen gegen Angehörige der mit einem "
 		"Jihad belegten Rasse kommen. Wird die Eigenschaft mehrmals erworben "
 		"können entweder mehrere Rassen mit einem Jihad belegt werden, "
 		"oder eine Rasse mehrfach, in diesem Fall addiert sich die Wirkung. "
@@ -250,7 +252,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"soviele Trefferpunkte wie normale Angehörige der entsprechenden Rasse, "
 		"verlieren jedoch ihre Fähigkeit zur Regeneration erlittenen Schadens "
 		"komplett.",
-		100
+		1
 	},
 	{
 		"Windvolk",
@@ -260,6 +262,40 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"sie reiten. Allerdings hat das jahrelange Konditionstraining ihre "
 		"Kräfte schwinden lassen, und ihre Tragkraft ist um 2 Gewichtseinheiten "
 		"verringert.",
+		1
+	},
+	{
+		"Glück",
+		"Diese Eigenschaft bewirkt, das der Partei gelegentlich positive "
+		"Ereignisse zustoßen. Dies können spontane Verbesserungen des "
+		"Wissensstandes, ein Fund wertvoller Gegenstände oder ähnliches "
+		"sein. Je häufiger diese Eigenschaft erworben wird, desto größer die "
+		"Wahrscheinlichkeit für solche Ereignisse, und desto postiver ihre "
+		"Auswirkungen.",
+		100
+	},
+	/* TODO: Noch nicht implementiert */
+	{
+		"Lykanthrop",
+		"Angehörige einer Partei mit dieser Eigenschaft sind Werwesen. Einheiten "
+		"einer solchen Partei können sich mit Hilfe der Befehle 'WERWESEN' und "
+		"'WERWESEN NICHT' in eine andere Form verwandeln. Beide Befehle haben "
+		"nur eine gewisse Erfolgswahrscheinlichkeit und funktionieren nicht immer. "
+		"In Werform erhalten die Einheiten +2 auf Angriff und Schaden und "
+		"eine natürliche Rüstung von 2. Sie können sich so schnell "
+		"bewegen, als wäre sie beritten, benutzen aber keine Pferde im "
+		"Kampf, und verwenden als Rüstungen nur Schilde. Sie sind "
+		"eingeschränkt und können in Werform kein Geld verdienen "
+		"und nicht Lernen oder Lehren.",
+		1
+	},
+	/* TODO: Noch nicht implementiert */
+	/* Einheitenlimit-Senkung sinnlos für alte Parteien. */
+	{
+		"Elite",
+		"Für eine Partei mit dieser Eigenschaft verdoppeln sich alle Boni- und "
+		"Mali ihrer Rasse. Ihre Unterhaltskosten erhöhen sich auf 12 Silber pro "
+		"Runde, ihr Einheitenlimit reduziert sich auf 25%%.",
 		1
 	}
 };
@@ -467,7 +503,8 @@ set_jihad(void)
 				faction *f = u->faction;
 				int can = fspecial(f, FS_JIHAD);
 				int has = 0;
-				race_t jrace;
+				const race * jrace;
+				race_t jrt;
 				attrib *a;
 				char *s;
 
@@ -486,39 +523,41 @@ set_jihad(void)
 					continue;
 				}
 
-				jrace = findrace(s);
+				jrace = rc_find(s);
+				jrt = old_race(jrace);
 
-				if (race[jrace].nonplayer) {
+				if (!playerrace(jrace)) {
 					cmistake(u, S->s, 282, MSG_EVENT);
 					continue;
 				}
 
 				for(a = a_find(f->attribs, &at_jihad); a; a = a->nexttype) {
-					if(a->data.sa[0] == jrace) break;
+					if (a->data.sa[0] == jrt) break;
 				}
 
 				if(a) {
 					a->data.sa[1]++;
 				} else {
 					a = a_add(&f->attribs, a_new(&at_jihad));
-					a->data.sa[0] = (short)jrace;
+					a->data.sa[0] = (short)jrt;
 					a->data.sa[1] = 1;
 				}
 
-				add_message(&f->msgs, new_message(f,
-					"setjihad%s:race", race[jrace].name[2]));
+				add_message(&f->msgs, msg_message("setjihad", 
+					"race", jrace));
 			}
 		}
 	}
 }
 
 int
-jihad(faction *f, race_t race)
+jihad(faction *f, const race * rc)
 {
 	attrib *a;
+	race_t jrt = old_race(rc);
 
 	for(a = a_find(f->attribs, &at_jihad); a; a = a->nexttype) {
-		if(a->data.sa[0] == race) return a->data.sa[1];
+		if(a->data.sa[0] == jrt) return a->data.sa[1];
 	}
 
 	return 0;

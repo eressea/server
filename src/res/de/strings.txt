@@ -130,6 +130,7 @@ wands_of_tear_p;de;Szepter der Tränen
 
 ## Burgausbaustufen
 site;de;Grundmauern
+tradepost;de;Handelsposten
 fortification;de;Befestigung
 tower;de;Turm
 castle;de;Burg
@@ -314,7 +315,15 @@ museumexitticket_p;de;Rückkehrtickets des Großen Museum
 manacrystal;de;Astralkristall
 manacrystal_p;de;Astralkristalle
 skillpotion;de;Talenttrunk
-skillpotion_;de;Talenttrünke
+skillpotion_p;de;Talenttrünke
+seed;de;Same
+seed_p;de;Samen
+mallornseed;de;Mallornsame
+mallornseed_p;de;Mallornsamen
+birthday_firework;de;Feuerwerk
+birthday_firework_p;de;Feuerwerke
+lebkuchenherz;de;Lebkuchenherz mit der Aufschrift 'Erz und Stein, das ist fein'
+lebkuchenherz_p;de;Lebkuchenherzen mit der Aufschrift 'Erz und Stein, das ist fein'
 
 ## herb singular
 h0;de;Flachwurz
@@ -405,7 +414,7 @@ ANZAHL;de;ANZAHL
 AURA;de;AURA
 BAUERN;de;BAUERN
 BEISTAND;de;BEISTAND
-BEWACHE;de;BEWACHE
+BEWACHE;de;BEWACHEN
 BURG;de;BURG
 DEFENSIV;de;DEFENSIV
 EINHEIT;de;EINHEIT
@@ -501,6 +510,7 @@ LERNEN;de;LERNEN
 LIEFERE;de;LIEFERE
 MACHEN;de;MACHEN
 NACH;de;NACH
+INFO;de;INFO
 PASSWORT;de;PASSWORT
 REKRUTIEREN;de;REKRUTIEREN
 RESERVIEREN;de;RESERVIEREN

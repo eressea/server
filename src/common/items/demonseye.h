@@ -13,4 +13,5 @@
  */
 
 extern struct item_type it_demonseye;
-extern void init_demonseye(void);
+extern void register_demonseye(void);
+extern boolean give_igjarjuk(const struct unit *, const struct unit *, const struct item_type *, int, const char *);

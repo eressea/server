@@ -1,4 +1,14 @@
+/* vi: set ts=2:
+ +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
+ |                   |  Enno Rehling <enno@eressea-pbem.de>
+ | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
+ | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
+ |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
+ +-------------------+  Stefan Reich <reich@halbling.de>
 
+ This program may not be used, modified or distributed 
+ without prior permission by the authors of Eressea.
+*/
 #include <config.h>
 #include "eressea.h"
 
@@ -14,6 +24,7 @@
 #include "movement.h"
 #include "spell.h"
 #include "race.h"
+#include "skill.h"
 
 /* util includes */
 #include <rand.h>
@@ -105,6 +116,7 @@ sp_kampfzauber(fighter * fi, int level, int power, spell * sp)
 	sprintf(buf, "%s zaubert %s", unitname(fi->unit), sp->name);
 
 	switch(sp->id) {
+	  	/* lovar halbiert im Schnitt! */
 		case SPL_FIREBALL:
 			damage = spell_damage(0);
 			force = lovar(get_force(power,0));
@@ -181,9 +193,10 @@ sp_versteinern(fighter * fi, int level, int power, spell * sp)
 			/* person ans ende hinter die lebenden schieben */
 			struct person p = dt.fighter->person[dt.index];
 			++dt.fighter->removed;
+			++dt.fighter->side->removed;
 			++stoned;
 			dt.fighter->person[dt.index] = dt.fighter->person[df->alive-df->removed];
-			dt.fighter->person[df->alive-df->removed] = p;
+			dt.fighter->person[(df->alive - df->removed)] = p;
 		}
 		--force;
 	} while (force && stoned < enemies);
@@ -309,7 +322,7 @@ sp_combatrosthauch(fighter * fi, int level, int power, spell * sp)
 							iron = true;
 							break;
 						}
-						mat=mat++;
+						mat++;
 					}
 					if (iron) {
 						int p;
@@ -522,7 +535,7 @@ sp_mindblast(fighter * fi, int level, int power, spell * sp)
 		dt = select_enemy(fi, minrow, maxrow);
 		assert(dt.fighter);
 		du = dt.fighter->unit;
-		if (humanoid(du) && is_magic_resistant(mage, du, 0) == false) {
+		if (humanoidrace(du->race) && is_magic_resistant(mage, du, 0) == false) {
 			sk = random_skill(du);
 			if (sk != NOSKILL) {
 				/* Skill abziehen */
@@ -629,12 +642,12 @@ sp_wolfhowl(fighter * fi, int level, int power, spell * sp)
 
 	force = get_force(power, 3)/2;
 
-	u = createunit(r, mage->faction, force, RC_WOLF);
+	u = createunit(r, mage->faction, force, new_race[RC_WOLF]);
 	u->status = ST_FIGHT;
 
 	set_string(&u->name, force == 1 ? "Wolf" : "Wölfe");
-	set_skill(u, SK_WEAPONLESS, power/3);
-	set_skill(u, SK_AUSDAUER, power/3);
+	set_skill(u, SK_WEAPONLESS, level_days(power/3) * u->number);
+	set_skill(u, SK_AUSDAUER, level_days(power/3) * u->number);
 	u->hp = u->number * unit_max_hp(u);
 
 	if (fval(mage, FL_PARTEITARNUNG))
@@ -665,7 +678,7 @@ sp_shadowknights(fighter * fi, int level, int power, spell * sp)
 
 	force = get_force(power, 3);
 
-	u = createunit(r, mage->faction, force, RC_SHADOWKNIGHT);
+	u = createunit(r, mage->faction, force, new_race[RC_SHADOWKNIGHT]);
 	u->status = ST_FIGHT;
 
 	set_string(&u->name, "Schattenritter");
@@ -768,13 +781,13 @@ sp_chaosrow(fighter * fi, int level, int force, spell * sp)
 		if (chance < 1 + rand()%100) {
 			row = df->status+FIRST_ROW;
 			df->side->size[row] -= df->alive;
-			if (race[df->unit->race].battle_flags & BF_NOBLOCK) {
+			if (df->unit->race->battle_flags & BF_NOBLOCK) {
 				df->side->nonblockers[df->status+FIRST_ROW] -= df->alive;
 			}
 			row = FIRST_ROW + (rand()% AVOID_ROW);
 			df->status = (status_t)row - FIRST_ROW;
 			df->side->size[row] += df->alive;
-			if (race[df->unit->race].battle_flags & BF_NOBLOCK) {
+			if (df->unit->race->battle_flags & BF_NOBLOCK) {
 				df->side->nonblockers[row] += df->alive;
 			}
 			k++;
@@ -843,7 +856,7 @@ sp_flee(fighter * fi, int level, int power, spell * sp)
 				--force;
 				++panik;
 			} else if (!(df->person[n].flags & FL_HERO)
-					|| !is_undead(df->unit))
+					|| !fval(df->unit->race, RCF_UNDEAD))
 			{
 				if (is_magic_resistant(mage, df->unit, 0) == false) {
 					df->person[n].flags |= FL_PANICED;
@@ -1352,7 +1365,7 @@ sp_reanimate(fighter * fi, int level, int force, spell * sp)
 		troop t = select_corpse(b, fi);
 		if (t.fighter
 				&& t.fighter->side->casualties > 0
-				&& t.fighter->unit->race != RC_DAEMON
+				&& old_race(t.fighter->unit->race) != RC_DAEMON
 				&& (chance(c)))
 		{
 			assert(t.fighter->alive < t.fighter->unit->number);
@@ -1439,7 +1452,7 @@ sp_healing(fighter * fi, int level, int force, spell * sp)
 			break;
 
 		/* wir heilen erstmal keine Monster */
-		if (nonplayer(df->unit))
+		if (!playerrace(df->unit->race))
 			continue;
 
 		hp = unit_max_hp(df->unit);
@@ -1464,7 +1477,7 @@ sp_healing(fighter * fi, int level, int force, spell * sp)
 			break;
 
 		/* Untote kann man nicht heilen */
-		if (race[df->unit->race].flags & RCF_NOHEAL)
+		if (fval(df->unit->race, RCF_NOHEAL))
 			continue;
 
 		hp = unit_max_hp(df->unit);
@@ -1530,7 +1543,7 @@ sp_undeadhero(fighter * fi, int level, int force, spell * sp)
 			break;
 
 		/* keine Monster */
-		if (nonplayer(du))
+		if (!playerrace(du->race))
 			continue;
 
 		if (df->alive + df->run.number < du->number) {
@@ -1555,7 +1568,7 @@ sp_undeadhero(fighter * fi, int level, int force, spell * sp)
 					 * Untoten gemacht werden */
 					int nr;
 
-					du->race = RC_UNDEAD;
+					du->race = new_race[RC_UNDEAD];
 					setguard(du, GUARD_NONE);
 					u_setfaction(du,mage->faction);
 					if (fval(mage, FL_PARTEITARNUNG))
@@ -1570,7 +1583,7 @@ sp_undeadhero(fighter * fi, int level, int force, spell * sp)
 					set_money(du, 0);
 				} else {
 					unit *u;
-					u = createunit(r, mage->faction, 0, RC_UNDEAD);
+					u = createunit(r, mage->faction, 0, new_race[RC_UNDEAD]);
 					transfermen(du, u, j);
 					sprintf(buf, "%s", du->name);
 					set_string(&u->name, buf);

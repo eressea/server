@@ -1,0 +1,18 @@
+<eressea>
+	<comment>German Localization</comment>
+	<include file="de/messages.xml"></include>
+	<include file="de/strings.xml"></include>
+
+	<comment>English Localization</comment>
+	<include file="en/messages.xml"></include>
+	<include file="en/strings.xml"></include>
+
+	<include file="races.xml"></include>
+	<include file="items.xml"></include>
+
+	<game name="eressea">
+		<comment>Game specific</comment>
+		<include file="eressea/races.xml"></include>
+		<include file="eressea/items.xml"></include>
+	</game>
+</eressea>

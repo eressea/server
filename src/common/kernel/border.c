@@ -32,6 +32,15 @@ border * borders[BMAXHASH];
 border_type * bordertypes;
 
 
+void
+free_borders(void)
+{
+	int i;
+	for (i=0;i!=BMAXHASH;++i) {
+		borders[i] = NULL;
+	}
+}
+
 border *
 find_border(unsigned int id)
 {

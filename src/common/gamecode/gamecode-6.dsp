@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /Za /W4 /GX /Z7 /O2 /I "../kernel" /I "../util" /I "../.." /I ".." /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /Za /W4 /GX /Z7 /O2 /I "../util" /I "../kernel" /I "../.." /I ".." /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE RSC /l 0x407
 # ADD RSC /l 0x407
 BSC32=bscmake.exe
@@ -66,7 +66,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../kernel" /I "../util" /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /FR /YX"stdafx.h" /FD /c
+# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../kernel" /I "../util" /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /YX"stdafx.h" /FD /c
 # ADD BASE RSC /l 0x407
 # ADD RSC /l 0x407
 BSC32=bscmake.exe
@@ -137,27 +137,11 @@ LIB32=link.exe -lib
 # PROP Default_Filter "*.h"
 # Begin Source File
 
-SOURCE=.\alchemy.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\battle.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\border.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\build.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\building.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\creation.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\creport.h
 # End Source File
 # Begin Source File
 
@@ -165,67 +149,7 @@ SOURCE=.\economy.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\eressea.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\group.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\item.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\karma.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\laws.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\magic.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\message.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\monster.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\movement.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\names.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\objtypes.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\orders.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\pathfinder.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\plane.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\pool.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\race.h
 # End Source File
 # Begin Source File
 
@@ -233,55 +157,7 @@ SOURCE=.\randenc.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\region.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\render.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\reports.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\save.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\ship.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\skill.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\spell.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\spells.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\spy.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\study.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\teleport.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\terrain.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\unit.h
 # End Source File
 # End Group
 # Begin Group "Spells"

@@ -94,7 +94,7 @@ attrib_type at_building_generic_type = {
 };
 
 const char *
-buildingtype(const building * b, int bsize, const locale * lang)
+buildingtype(const building * b, int bsize)
 {
 	const char * s = NULL;
 	const building_type * btype = b->type;
@@ -104,8 +104,7 @@ buildingtype(const building * b, int bsize, const locale * lang)
 		if (a) s = (const char*)a->data.v;
 	}
 
-	if (btype->name) s = btype->name(bsize, lang);
-	if (s==NULL) s = locale_string(lang, btype->_name);
+	if (btype->name) s = btype->name(bsize);
 	if (s==NULL) s = btype->_name;
 	return s;
 }
@@ -180,6 +179,9 @@ findbuilding(int i)
 #ifdef NEW_BUILDINGS
 enum {
 	B_SITE,
+#ifdef LARGE_CASTLES
+	B_TRADEPOST,
+#endif
 	B_FORTIFICATION,
 	B_TOWER,
 	B_CASTLE,
@@ -190,10 +192,13 @@ enum {
 #endif
 
 static const char *
-castle_name(int bsize, const locale * lang)
+castle_name(int bsize)
 {
 	const char * fname[MAXBUILDINGS] = {
 	  "site",
+#ifdef LARGE_CASTLES
+		"tradepost",
+#endif
 	  "fortification",
 	  "tower",
 	  "castle",
@@ -208,13 +213,25 @@ castle_name(int bsize, const locale * lang)
 		ctype=ctype->improvement;
 		++i;
 	}
-	return locale_string(lang, fname[i]);
+	return fname[i];
 }
 
 static requirement castle_req[] = {
 	{ R_STONE, 1, 0.5 },
 	{ NORESOURCE, 0, 0.0 },
 };
+
+#ifdef LARGE_CASTLES
+static const construction castle_bld[MAXBUILDINGS] = {
+	{ SK_BUILDING, 1,     2, 1, castle_req, &castle_bld[1] },
+	{ SK_BUILDING, 1,     8, 1, castle_req, &castle_bld[2] },
+	{ SK_BUILDING, 2,    40, 1, castle_req, &castle_bld[3] },
+	{ SK_BUILDING, 3,   200, 1, castle_req, &castle_bld[4] },
+	{ SK_BUILDING, 4,  1000, 1, castle_req, &castle_bld[5] },
+	{ SK_BUILDING, 5,  5000, 1, castle_req, &castle_bld[6] },
+	{ SK_BUILDING, 6,    -1, 1, castle_req, NULL }
+};
+#else
 static const construction castle_bld[MAXBUILDINGS] = {
 	{ SK_BUILDING, 1,    2, 1, castle_req, &castle_bld[1] },
 	{ SK_BUILDING, 2,    8, 1, castle_req, &castle_bld[2] },
@@ -223,6 +240,8 @@ static const construction castle_bld[MAXBUILDINGS] = {
 	{ SK_BUILDING, 5, 1000, 1, castle_req, &castle_bld[5] },
 	{ SK_BUILDING, 6,   -1, 1, castle_req, NULL }
 };
+#endif
+
 building_type bt_castle = {
 	"castle",
 	BFL_NONE,
@@ -711,8 +730,8 @@ buildingt buildingdaten[MAXBUILDINGTYPES] =
 	{"Karawanserei", 10, 2, -1, {1, 5, 1, 500, 0, 0}, 3000, 0, I_HORSE, 2, 0},
 	{"Tunnel", 100, 6, -1, {1, 5, 10, 300, 0, 0}, 100, 0, I_STONE, 2, 0},
 	{"Taverne", -1, 2, 10, {1, 3, 4, 200, 0, 0}, 0, 5, 0, 0, 0},
-	{"Steinkreis", 100, 5, -1, {0, 5, 5, 0, 0, 0}, 0, 0, 0, 0, 0},
-	{"Gesegneter Steinkreis", 100, 5, -1, {0, 5, 5, 0, 0, 0}, 0, 0, 0, 0, NO_BUILD},
+	{"Tempel", 100, 5, -1, {0, 5, 5, 0, 0, 0}, 0, 0, 0, 0, 0},
+	{"Gesegneter Tempel", 100, 5, -1, {0, 5, 5, 0, 0, 0}, 0, 0, 0, 0, NO_BUILD},
 	{"Traumschlößchen", 0, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, 0, NO_BUILD}
 };
 */
@@ -921,9 +940,9 @@ new_building(const struct building_type * btype, region * r, const struct locale
 	{
 		static char buffer[IDSIZE + 1 + NAMESIZE + 1];
 		if(b->type==&bt_castle)
-			sprintf(buffer, "%s %s", locale_string(lang, btype->_name), buildingid(b));
+			sprintf(buffer, "%s", locale_string(lang, btype->_name));
 		else
-			sprintf(buffer, "%s %s", buildingtype(b, 0, lang), buildingid(b));
+			sprintf(buffer, "%s", LOC(lang, buildingtype(b, 0)));
 		set_string(&b->name, buffer);
 	}
 	return b;

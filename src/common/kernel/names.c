@@ -522,11 +522,7 @@ drachen_name(const unit *u)
 	char *t;
 
 	switch (rterrain(r)) {
-#ifdef NO_FOREST
 	case T_PLAIN:
-#else
-	case T_FOREST:
-#endif
 		t = strdup(dtitel[1][rand() % DTITEL]);
 		break;
 	case T_MOUNTAIN:
@@ -720,8 +716,8 @@ name_unit(unit *u)
 {
 	char name[16];
 
-	if(race[u->race].generate_name){
-		set_string(&u->name, (race[u->race].generate_name(u)));
+	if(u->race->generate_name){
+		set_string(&u->name, (u->race->generate_name(u)));
 	} else {
 		sprintf(name, "Nummer %s", itoa36(u->no));
 		set_string(&u->name, name);

@@ -72,6 +72,42 @@ Package=<4>
 
 ###############################################################################
 
+Project: "mapper"="..\dev\mapper\mapper-6.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name triggers
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name util
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name kernel
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name attributes
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name items
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name modules
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name races
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name spells
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "modules"=".\common\modules\modules-6.dsp" - Package Owner=<4>
 
 Package=<5>

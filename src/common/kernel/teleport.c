@@ -23,11 +23,14 @@
 #include "eressea.h"
 #include "teleport.h"
 
+/* kernel includes */
 #include "unit.h"
 #include "region.h"
+#include "race.h"
 #include "faction.h"
 #include "plane.h"
 
+/* libc includes */
 #include <assert.h>
 #include <stdlib.h>
 
@@ -115,6 +118,8 @@ random_in_teleport_plane(void)
 	unit *u;
 	faction *f0 = findfaction(MONSTER_FACTION);
 
+	if(!f0) return;
+
 	for(r=regions; r; r=r->next) {
 		if(getplaneid(r) != 1 || rterrain(r) != T_ASTRAL) continue;
 
@@ -122,7 +127,7 @@ random_in_teleport_plane(void)
 		if(rand()%100 == 0) {
 			switch(rand()%1) {
 			case 0:
-				u = createunit(r, f0, 1+rand()%10+rand()%10, RC_HIRNTOETER);
+				u = createunit(r, f0, 1+rand()%10+rand()%10, new_race[RC_HIRNTOETER]);
 				set_string(&u->name, "Hirntöter");
 				set_string(&u->display, "Wabernde grüne Schwaden treiben durch den Nebel und verdichten sich zu einer unheimlichen Kreatur, die nur aus einem langen Ruderschwanz und einem riesigen runden Maul zu bestehen scheint.");
 				set_skill(u, SK_STEALTH, 30);

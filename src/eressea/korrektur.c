@@ -47,17 +47,21 @@
 #include <race.h>
 #include <region.h>
 #include <reports.h>
+#include <resources.h>
 #include <skill.h>
 #include <teleport.h>
 #include <unit.h>
 #include <spell.h>
+#include <alchemy.h>
+#include <study.h>
 
 /* util includes */
 #include <attrib.h>
-#include <event.h>
 #include <base36.h>
 #include <cvector.h>
+#include <event.h>
 #include <resolve.h>
+#include <sql.h>
 #include <vset.h>
 
 /* libc includes */
@@ -68,6 +72,33 @@
 /* attributes includes */
 #include <attributes/targetregion.h>
 #include <attributes/key.h>
+
+
+static int
+skillmodifieslearning(void)
+{
+	region *r;
+	unit *u;
+	int smod, lmod, learning;
+
+	for(r=regions; r; r=r->next) {
+		for(u=r->units; u; u=u->next) {
+			skillvalue *i = u->skills;
+			for (; i != u->skills + u->skill_size; ++i) {
+				smod = rc_skillmod(u->race, u->region, i->id);
+				lmod = 5 * smod;
+				if(smod < 0) {
+					lmod -= 5;
+				} else if(smod > 0) {
+					lmod += 5;
+				}
+				learning = max(0, 30 + lmod);
+				i->value = (i->value * learning)/30;
+			}
+		}
+	}
+	return 0;
+}
 
 extern void reorder_owners(struct region * r);
 
@@ -159,8 +190,7 @@ fix_skills(void)
 	if (a) { \
 		log_warning(("[do_once] a unique fix %d=\"%s\" was called a second time\n", atoi36(magic), magic)); \
 	} else { \
-		(fun); \
-		a_add(&global.attribs, make_key(atoi36(magic))); \
+		if (fun == 0) a_add(&global.attribs, make_key(atoi36(magic))); \
 	} \
 }
 #if 0
@@ -178,18 +208,18 @@ fix_vertrautenmagie(void)
 				if (m->magietyp != M_GRAU) continue;
 
 				switch(u->race) {
-					case RC_PSEUDODRAGON:
+					case new_race[RC_PSEUDODRAGON]:
 						if(!getspell(u, SPL_FLEE)) addspell(u, SPL_FLEE);
 						if(!getspell(u, SPL_SLEEP)) addspell(u, SPL_SLEEP);
 						if(!getspell(u, SPL_FRIGHTEN)) addspell(u, SPL_FRIGHTEN);
 						break;
-					case RC_NYMPH:
+					case new_race[RC_NYMPH]:
 						if(!getspell(u, SPL_SEDUCE)) addspell(u, SPL_SEDUCE);
 						if(!getspell(u, SPL_CALM_MONSTER)) addspell(u, SPL_CALM_MONSTER);
 						if(!getspell(u, SPL_SONG_OF_CONFUSION)) addspell(u, SPL_SONG_OF_CONFUSION);
 						if(!getspell(u, SPL_DENYATTACK)) addspell(u, SPL_DENYATTACK);
 						break;
-					case RC_UNICORN:
+					case new_race[RC_UNICORN]:
 						if(!getspell(u, SPL_RESISTMAGICBONUS)) addspell(u, SPL_RESISTMAGICBONUS);
 						if(!getspell(u, SPL_SONG_OF_PEACE)) addspell(u, SPL_SONG_OF_PEACE);
 						if(!getspell(u, SPL_CALM_MONSTER)) addspell(u, SPL_CALM_MONSTER);
@@ -197,30 +227,30 @@ fix_vertrautenmagie(void)
 						if(!getspell(u, SPL_HEALINGSONG)) addspell(u, SPL_HEALINGSONG);
 						if(!getspell(u, SPL_DENYATTACK)) addspell(u, SPL_DENYATTACK);
 						break;
-					case RC_WRAITH:
+					case new_race[RC_WRAITH]:
 						if(!getspell(u, SPL_STEALAURA)) addspell(u, SPL_STEALAURA);
 						if(!getspell(u, SPL_FRIGHTEN)) addspell(u, SPL_FRIGHTEN);
 						if(!getspell(u, SPL_SUMMONUNDEAD)) addspell(u, SPL_SUMMONUNDEAD);
 						break;
-					case RC_IMP:
+					case new_race[RC_IMP]:
 						if(!getspell(u, SPL_STEALAURA)) addspell(u, SPL_STEALAURA);
 						break;
-					case RC_DREAMCAT:
+					case new_race[RC_DREAMCAT]:
 						if(!getspell(u, SPL_ILL_SHAPESHIFT)) addspell(u, SPL_ILL_SHAPESHIFT);
 						if(!getspell(u, SPL_TRANSFERAURA_TRAUM)) addspell(u, SPL_TRANSFERAURA_TRAUM);
 						break;
-					case RC_FEY:
+					case new_race[RC_FEY]:
 						if(!getspell(u, SPL_DENYATTACK)) addspell(u, SPL_DENYATTACK);
 						if(!getspell(u, SPL_CALM_MONSTER)) addspell(u, SPL_CALM_MONSTER);
 						if(!getspell(u, SPL_SEDUCE)) addspell(u, SPL_SEDUCE);
 						break;
 					/* kein break, ein Wyrm hat alle Drachensprüche */
-					case RC_WYRM:
+					case new_race[RC_WYRM]:
 						if(!getspell(u, SPL_WYRMODEM)) addspell(u, SPL_WYRMODEM);
-					case RC_DRAGON:
+					case new_race[RC_DRAGON]:
 						if(!getspell(u, SPL_DRAGONODEM)) addspell(u, SPL_DRAGONODEM);
-					case RC_FIREDRAGON:
-					case RC_SEASERPENT:
+					case new_race[RC_FIREDRAGON]:
+					case new_race[RC_SEASERPENT]:
 						if(!getspell(u, SPL_FIREDRAGONODEM)) addspell(u, SPL_FIREDRAGONODEM);
 						break;
 				}
@@ -309,13 +339,13 @@ santa_comes_to_town(void)
 		santa = ufindhash(atoi36("xmas"));
 	}
 	if (!santa) {
-		santa = createunit(r, findfaction(MONSTER_FACTION), 1, RC_ILLUSION);
+		santa = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_ILLUSION]);
 		uunhash(santa);
 		santa->no = atoi36("xmas");
 		uhash(santa);
 	}
 	santa->age = 2;
-	santa->irace = RC_DAEMON;
+	santa->irace = new_race[RC_DAEMON];
 	set_string(&santa->name, "Ein dicker Gnom mit einem Rentierschlitten");
 	set_string(&santa->display, "hat: 6 Rentiere, Schlitten, Sack mit Geschenken, Kekse für Khorne");
 	fset(santa, FL_TRAVELTHRU);
@@ -432,7 +462,7 @@ bename_dracoide(void)
 
 	for(r=regions;r;r=r->next) {
 		for(u=r->units;u;u=u->next) {
-			if(u->race == RC_DRACOID) name_unit(u);
+			if(u->race == new_race[RC_DRACOID]) name_unit(u);
 		}
 	}
 }
@@ -446,7 +476,7 @@ repair_illusion(void)
 	for (r=regions;r;r=r->next) {
 		unit * u;
 		for (u=r->units;u;u=u->next) {
-			if (!race[u->race].nonplayer
+			if (playerrace(u->race)
 				&& (get_item(u, I_PLATE_ARMOR) == u->number || get_item(u, I_CHAIN_MAIL) == u->number)
 				&& get_item(u, I_HORSE) == u->number && get_skill(u, SK_SPEAR) == 0 && get_skill(u, SK_SWORD) == 0
 				&& (get_item(u, I_SWORD) == u->number || get_item(u, I_SPEAR) == u->number))
@@ -457,17 +487,17 @@ repair_illusion(void)
 			  if (get_skill(u, SK_OBSERVATION) == i) u->race=RC_SPELL;
 			  else if (i) continue;
 			  else {
-				u->race = RC_ILLUSION;
+				u->race = new_race[RC_ILLUSION];
 				log_puts("[repair_illusion] repariert: %s in Partei %s\n", unitname(u), factionid(u->faction));
 			  }
 			}
-			if(!race[u->race].nonplayer && (
+			if(playerrace(u->race) && (
 					strcmp(u->name, "Ausgemergelte Skelette") == 0 ||
 					strcmp(u->name, "Zerfallende Zombies") == 0 ||
 					strcmp(u->name, "Keuchende Ghoule") == 0
 				)) {
-				u->race = RC_UNDEAD;
-				u->irace = RC_UNDEAD;
+				u->race = new_race[RC_UNDEAD];
+				u->irace = new_race[RC_UNDEAD];
 			}
 		}
 	}
@@ -506,8 +536,8 @@ repair_undead(void)
 	if (!f) return;
 	while (fscanf(f, "%d %d\n", &no, &age)!=EOF) {
 		unit * u = findunitg(no, NULL);
-		if (u && (u->race!=RC_UNDEAD || u->irace != RC_UNDEAD)) {
-			if (u->age>=age) u->race = u->irace = RC_UNDEAD;
+		if (u && (u->race!=RC_UNDEAD || u->irace != new_race[RC_UNDEAD])) {
+			if (u->age>=age) u->race = u->irace = new_race[RC_UNDEAD];
 			fprintf(stderr, "Repariere %s\n", unitname(u));
 		}
 	}
@@ -523,7 +553,7 @@ reset_dragon_irace(void)
 
 	for(r=regions;r;r=r->next) {
 		for(u=r->units;u;u=u->next) {
-			if(u->race == RC_DRAGON || u->race == RC_WYRM) {
+			if(u->race == new_race[RC_DRAGON] || u->race == new_race[RC_WYRM]) {
 				u->irace = u->race;
 			}
 		}
@@ -540,7 +570,7 @@ fix_irace(void)
 
 	for(r=regions; r; r=r->next) {
 		for(u=r->units; u; u=u->next) {
-			if(u->race != u->irace && u->race <= RC_AQUARIAN && u->race!=RC_DAEMON)
+			if(u->race != u->irace && u->race <= new_race[RC_AQUARIAN] && u->race!=RC_DAEMON)
 				u->irace = u->race;
 		}
 	}
@@ -562,7 +592,7 @@ fix_regions(void) {
 			rsetpeasants(r, 0);
 			rsettrees(r, 0);
 			for (u=r->units;u;u=u->next)
-				if (!race[u->race].nonplayer && u->ship==NULL) set_number(u, 0);
+				if (playerrace(u->race) && u->ship==NULL) set_number(u, 0);
 		}
 	}
 }
@@ -663,9 +693,9 @@ fix_migrants(void) {
 	for (r=regions;r;r=r->next) {
 		unit * u;
 		for (u=r->units;u;u=u->next) {
-			if (u->race==RC_HUMAN) u->irace=RC_HUMAN;
-			if (u->irace!=u->race && (race[u->race].flags & RCF_SHAPESHIFT)==0) {
-				log_warning(("[fix_migrants] %s ist ein %s, als %s getarnt\n", unitname(u), race[u->race].name[0], race[u->irace].name[0]));
+			if (u->race == new_race[RC_HUMAN]) u->irace = u->race;
+			if (u->irace!=u->race && (u->race->flags & RCF_SHAPESHIFT)==0) {
+				log_warning(("[fix_migrants] %s ist ein %s, als %s getarnt\n", unitname(u), rc_name(u->race, 0), rc_name(u->irace, 0)));
 			}
 		}
 	}
@@ -701,7 +731,7 @@ katja_erschaffe_elf(void)
 	faction *mon = findfaction(MONSTER_FACTION);
 	strlist *S;
 
-	u = createunit(xon, mon, 1, RC_ELF);
+	u = createunit(xon, mon, 1, new_race[RC_ELF]);
 	set_string(&u->name,"Corwin");
 	set_string(&u->display,"Ein kleiner, unscheinbarer Elf.");
 	set_item(u, I_BIRTHDAYAMULET, 1);
@@ -715,7 +745,6 @@ katja_erschaffe_elf(void)
 }
 #endif
 
-#if 0
 static boolean
 kor_teure_talente(unit *u)
 {
@@ -728,9 +757,7 @@ kor_teure_talente(unit *u)
 	}
 	return false;
 }
-#endif
 
-#if 0
 static void
 no_teurefremde(boolean convert)
 {
@@ -740,21 +767,23 @@ no_teurefremde(boolean convert)
 	for(r=regions;r;r=r->next) {
 		for(u=r->units;u;u=u->next) {
 			if(u->faction->no != MONSTER_FACTION
-					&& u->race != RC_ILLUSION
-					&& u->race != RC_UNDEAD
-					&& u->race != u->faction->race
-					&& kor_teure_talente(u)) {
+					&& is_migrant(u)
+					&& kor_teure_talente(u)) 
+			{
+				log_printf("* Warnung, teurer Migrant: %s %s\n", 
+						unitname(u), factionname(u->faction));
 				if(convert) {
 					u->race = u->faction->race;
+					u->irace = u->faction->race;
 					u->faction->num_migrants -= u->number;
-				} else {
-					printf("* Warnung, teurer Migrant: %s\n", unitname(u));
+					sprintf(buf, "Die Götter segnen %s mit der richtigen Rasse",
+							unitname(u));
+					addmessage(0, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
 				}
 			}
 		}
 	}
 }
-#endif
 
 #if 0
 static void
@@ -889,7 +918,7 @@ name_seaserpents(void)
 
 	for (r=regions;r;r=r->next) {
 		for (u=r->units;u;u=u->next) {
-			if(u->race == RC_SEASERPENT && strncmp(u->name, "Nummer ", 7)) {
+			if(u->race == new_race[RC_SEASERPENT] && strncmp(u->name, "Nummer ", 7)) {
 				set_string(&u->name, "Seeschlange");
 			}
 		}
@@ -976,9 +1005,6 @@ show_newspells(void)
 	 * terminieren */
 
 	spellid_t newspellids[] = {
-		SPL_ARTEFAKT_CHASTITYBELT,
-	  SPL_CLONECOPY,
-		SPL_SPARKLE_DREAM,
 		SPL_NOSPELL };
 
 	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]
@@ -1014,16 +1040,6 @@ show_newspells(void)
 		}
 	}
 
-}
-
-static void
-fix_laen(void)
-{
-	region *r;
-
-	for(r=regions; r; r=r->next) {
-		if(rterrain(r) != T_MOUNTAIN) rsetlaen(r, -1);
-	}
 }
 
 static void
@@ -1137,7 +1153,7 @@ fix_age(void)
 {
 	faction * f;
 	for (f=factions;f;f=f->next) {
-		if (f->no!=MONSTER_FACTION && !nonplayer_race(f->race)) continue;
+		if (f->no!=MONSTER_FACTION && playerrace(f->race)) continue;
 		if (f->age!=turn) {
 			log_printf("Alter von Partei %s auf %d angepasst.\n", factionid(f), turn);
 			f->age = turn;
@@ -1201,7 +1217,7 @@ fix_balsamfiasko(void)
 }
 #endif
 
-#if 0
+#if 1
 static int
 count_demand(const region *r)
 {
@@ -1235,7 +1251,7 @@ recurse_regions(region * r, regionlist **rlist, boolean(*fun)(const region * r))
 }
 
 
-#if 0
+#if 1
 static int maxluxuries = 0;
 
 static boolean
@@ -1245,7 +1261,7 @@ f_nolux(const region * r)
 	return false;
 }
 
-static void
+static int
 fix_demand_region(region *r)
 {
 	regionlist *rl, *rlist = NULL;
@@ -1318,6 +1334,7 @@ fix_demand_region(region *r)
 		free(rlist);
 		rlist = rl;
 	}
+	return 0;
 }
 #endif
 
@@ -1372,6 +1389,9 @@ update_gms(void)
 			if (!find_key((attrib*)permissions->data.v, atoi36("gmmsgr"))) {
 				a_add((attrib**)&permissions->data.v, make_key(atoi36("gmmsgr")));
 			}
+			if (!find_key((attrib*)permissions->data.v, atoi36("gmmsgu"))) {
+				a_add((attrib**)&permissions->data.v, make_key(atoi36("gmmsgu")));
+			}
 			for (i=I_GREATSWORD;i!=I_KEKS;++i) {
 				attrib * a = a_find(permissions, &at_gmcreate);
 				while (a && a->data.v!=(void*)olditemtype[i]) a=a->nexttype;
@@ -1381,8 +1401,8 @@ update_gms(void)
 	}
 }
 
-#if 0
-static void
+#if 1
+static int
 fix_demand(void)
 {
 	region *r;
@@ -1395,6 +1415,7 @@ fix_demand(void)
 			fix_demand_region(r);
 		}
 	}
+	return 0;
 }
 #endif
 
@@ -1681,14 +1702,12 @@ fix_herbtypes(void)
 			}
 		} else {
 			if (r->terrain==T_PLAIN) {
-#ifdef NO_FOREST
 				if (r_isforest(r)) {
 					int i = rand()%3+3;
 					const char * name = terrain[T_PLAIN].herbs[i];
 					const item_type * itype = finditemtype(name, NULL);
 					r->land->herbtype = resource2herb(itype->rtype);
 				}
-#endif
 			} else {
 				/* Das geht so nicht, wegen der Eisberg-Terrains */
 				/* assert(htype->terrain==r->terrain); */
@@ -1814,7 +1833,7 @@ convert_triggers(void)
 				switch (rel->id) {
 				case REL_FAMILIAR:
 					if (u && u2) {
-						if (nonplayer(u) || (!nonplayer(u2) && u->race==RC_GOBLIN))
+						if (!playerrace(u->race) || (playerrace(u2->race) && u->race==RC_GOBLIN))
 							set_familiar(u2, u);
 						else
 							set_familiar(u, u2);
@@ -2127,6 +2146,24 @@ fix_timeouts(void)
 #endif
 
 #include <modules/gmcmd.h>
+
+static int
+secondfaction(faction * pf)
+{
+	unit * u = findunit(atoi36("5q9w"));
+	if (u!=NULL) {
+		plane * p = rplane(u->region);
+		if (p!=NULL) {
+			region * center = findregion((p->maxx-p->minx)/2, (p->maxy-p->miny)/2);
+			if (center!=NULL) {
+				gm_addfaction(pf->email, p, center);
+				return 0;
+			}
+		}
+	}
+	return -1;
+}
+
 static void
 update_gmquests(void)
 {
@@ -2134,9 +2171,18 @@ update_gmquests(void)
 	faction * f = findfaction(atoi36("gm04"));
 	if (f) {
 		unit * u = f->units;
+		potion_t p;
+		attrib * permissions = a_find(f->attribs, &at_permissions);
+
+		do_once("et02", secondfaction(f));
 		if (u!=NULL) {
 			plane * p = rplane(u->region);
 			if (p!=NULL) p->flags |= PFL_NOORCGROWTH;
+		}
+		for (p=0;p!=MAX_POTIONS;++p) {
+			attrib * a = a_find(permissions, &at_gmcreate);
+			while (a && a->data.v!=(void*)oldpotiontype[p]->itype) a=a->nexttype;
+			if (!a) a_add((attrib**)&permissions->data.v, make_atgmcreate(oldpotiontype[p]->itype));
 		}
 	}
 }
@@ -2168,6 +2214,30 @@ test_gmquest(void)
 }
 #endif
 
+#if 0
+static int
+create_xe(void)
+{
+	 attrib *a;
+	 plane * p = gm_addplane(4, PFL_NOCOORDS | PFL_NORECRUITS | 
+		 PFL_NOGIVE | PFL_NOATTACK | PFL_NOTERRAIN | PFL_NOMAGIC | 
+		 PFL_NOSTEALTH | PFL_NOTEACH | PFL_NOBUILD | PFL_NOFEED, 
+		 "Xontormia-Expreß");
+	 region * center = findregion((p->maxx-p->minx)/2, (p->maxy-p->miny)/2);
+	 faction * f = gm_addfaction("abeer@gmx.de", p, center);
+
+	 log_printf("Xe-Partei %s\n", factionname(f));
+
+	 a = a_find(f->attribs, &at_permissions);
+	 a_remove(&f->attribs, a);
+	 a = a_add(&f->attribs, a_new(&at_permissions));
+	 a_add((attrib**)&a->data.v, make_key(atoi36("gmterf")));
+	 a_add((attrib**)&a->data.v, make_key(atoi36("gmmsgr")));
+	 a_add((attrib**)&a->data.v, make_key(atoi36("gmmsgu")));
+	 return 0;
+}
+#endif
+
 #define TEST_LOCALES 0
 #if TEST_LOCALES
 static void
@@ -2185,6 +2255,8 @@ setup_locales(void)
 #include <triggers/shock.h>
 #include <triggers/killunit.h>
 
+#if 0
+#error "this is broken, it duplicates triggers"
 static void
 fix_unitrefs(void)
 {
@@ -2258,6 +2330,7 @@ fix_unitrefs(void)
 		r=r->next;
 	}
 }
+#endif
 
 static void
 update_igjarjuk_quest(void)
@@ -2267,13 +2340,193 @@ update_igjarjuk_quest(void)
 
 	if (!f) return;
 	for (u=f->units;u;u=u->nextF) {
-		u->race = RC_TEMPLATE;
+		u->race = new_race[RC_TEMPLATE];
 	}
 }
 
-#ifdef NEW_RESOURCEGROWTH
-static void
-new_resourcegrowth(void)
+
+#ifdef RESOURCE_FIX
+extern struct attrib_type at_resources;
+void
+init_resourcefix(void)
+{
+	at_register(&at_resources);
+}
+
+static int
+read_resfix(void)
+{
+#if 0
+	FILE * F = fopen("resource.fix", "r");
+	if (F==NULL) return;
+	while (!feof(F)) {
+		int x, y, stone, iron, laen, age;
+		int lstone, liron, llaen; /* level */
+		region * r;
+		fscanf(F, "%d %d %d %d %d %d %d %d %d\n", &x, &y, &age, &stone, &iron, &laen, &lstone, &liron, &llaen);
+		r = findregion(x, y);
+		if (r) {
+			rawmaterial * rm = r->resources;
+			while (rm) {
+				if (rm->type==&rm_iron && liron>0) {
+					rm->amount = iron;
+					rm->level = liron;
+				}
+				else if (rm->type==&rm_laen && llaen>0) {
+					rm->amount = laen;
+					rm->level = llaen;
+				}
+				else if (rm->type==&rm_stones && lstone>0) {
+					rm->amount = stone;
+					rm->level = lstone;
+				}
+				rm = rm->next;
+			}
+			r->age = (unsigned short)age;
+		}
+	}
+	fclose(F);
+#else
+	return -1;
+#endif
+}
+
+static int
+convert_resources(void)
+{
+#if 0
+	region *r;
+
+	for(r=regions;r;r=r->next) {
+		attrib *a = a_find(r->attribs, &at_resources);
+		r->resources = 0;
+		terraform_resources(r);
+
+		if (a==NULL) continue;
+		else {
+			int INIT_STONE = 20; /* skip this many weeks */
+			double ironmulti = 0.40;
+			double laenmulti = 0.50;
+			double stonemulti = 0.30; /* half the stones used */
+			rawmaterial * rmiron = rm_get(r, rm_iron.rtype);
+			rawmaterial * rmlaen = rm_get(r, rm_laen.rtype);
+			rawmaterial * rmstone = rm_get(r, rm_stones.rtype);
+
+			int oldiron;
+			int oldlaen = MAXLAENPERTURN * min(r->age, 100) / 2;
+			int oldstone = terrain[rterrain(r)].quarries * max(0, r->age - INIT_STONE);
+			int iron = a->data.sa[0];
+			int laen = a->data.sa[1];
+			int stone, level;
+			int i, base;
+
+			/** STONE **/
+			for (i=0;terrain[r->terrain].rawmaterials[i].type;++i) {
+				if (terrain[r->terrain].rawmaterials[i].type == &rm_stones) break;
+			}
+			if (terrain[r->terrain].rawmaterials[i].type) {
+				base = terrain[r->terrain].rawmaterials[i].base;
+				stone = max (0, (int)(oldstone * stonemulti));
+				level = 1;
+				base = (int)(terrain[r->terrain].rawmaterials[i].base*(1+level*terrain[r->terrain].rawmaterials[i].divisor));
+				while (stone >= base) {
+					stone-=base;
+					++level;
+					base = (int)(terrain[r->terrain].rawmaterials[i].base*(1+level*terrain[r->terrain].rawmaterials[i].divisor));
+				}
+				rmstone->level = level;
+				rmstone->amount = base - stone;
+				assert (rmstone->amount > 0);
+				log_printf("CONVERSION: %d stones @ level %d in %s\n", rmstone->amount, rmstone->level, regionname(r, NULL));
+			} else {
+				log_error(("found stones in %s of %s\n", terrain[r->terrain].name, regionname(r, NULL)));
+			}
+
+			/** IRON **/
+			if (r_isglacier(r) || r->terrain==T_ICEBERG) {
+				oldiron = GLIRONPERTURN * min(r->age, 100) / 2;
+			} else {
+				oldiron = IRONPERTURN * r->age;
+			}
+			for (i=0;terrain[r->terrain].rawmaterials[i].type;++i) {
+				if (terrain[r->terrain].rawmaterials[i].type == &rm_iron) break;
+			}
+			if (terrain[r->terrain].rawmaterials[i].type) {
+				base = terrain[r->terrain].rawmaterials[i].base;
+				iron = max(0, (int)(oldiron * ironmulti - iron ));
+				level = 1;
+				base = (int)(terrain[r->terrain].rawmaterials[i].base*(1+level*terrain[r->terrain].rawmaterials[i].divisor));
+				while (iron >= base) {
+					iron-=base;
+					++level;
+					base = (int)(terrain[r->terrain].rawmaterials[i].base*(1+level*terrain[r->terrain].rawmaterials[i].divisor));
+				}
+				rmiron->level = level;
+				rmiron->amount = base - iron;
+				assert (rmiron->amount > 0);
+				log_printf("CONVERSION: %d iron @ level %d in %s\n", rmiron->amount, rmiron->level, regionname(r, NULL));
+			} else {
+				log_error(("found iron in %s of %s\n", terrain[r->terrain].name, regionname(r, NULL)));
+			}
+
+			/** LAEN **/
+			if (laen>=0) {
+				if (rmlaen==NULL) {
+					rmlaen = calloc(sizeof(rawmaterial), 1);
+					rmlaen->next = r->resources;
+					r->resources = rmlaen;
+				}
+				for (i=0;terrain[r->terrain].rawmaterials[i].type;++i) {
+					if (terrain[r->terrain].rawmaterials[i].type == &rm_laen) break;
+				}
+				if (terrain[r->terrain].rawmaterials[i].type) {
+					laen = max(0, (int)(oldlaen * laenmulti - laen));
+					level = 1;
+					base = (int)(terrain[r->terrain].rawmaterials[i].base*(1+level*terrain[r->terrain].rawmaterials[i].divisor));
+					while (laen >= base) {
+						laen-=base;
+						++level;
+						base = (int)(terrain[r->terrain].rawmaterials[i].base*(1+level*terrain[r->terrain].rawmaterials[i].divisor));
+					}
+					rmlaen->level = level;
+					rmlaen->amount = base - laen;
+					assert(rmlaen->amount>0);
+					log_printf("CONVERSION: %d laen @ level %d in %s\n", rmlaen->amount, rmlaen->level, regionname(r, NULL));
+					rmlaen = NULL;
+				}
+			}
+			if (rmlaen) {
+				struct rawmaterial *res;
+				struct rawmaterial ** pres = &r->resources;
+				if (laen!=-1) log_error(("found laen in %s of %s\n", terrain[r->terrain].name, regionname(r, NULL)));
+				while (*pres!=rmlaen) pres = &(*pres)->next;
+				res = *pres;
+				*pres = (*pres)->next;
+				free(res);
+			}
+#ifndef NDEBUG
+			{
+				rawmaterial * res = r->resources;
+				while (res) {
+					assert(res->amount>0);
+					assert(res->level>0);
+					res = res->next;
+				}
+			}
+#endif
+		}
+	}
+	return 0;
+#else
+	return -1;
+#endif
+}
+
+#endif
+
+#if 0
+static int
+convert_resources(void)
 {
 	region *r;
 	attrib *a;
@@ -2296,8 +2549,160 @@ new_resourcegrowth(void)
 			a_add(&r->attribs, a_new(&at_stone))->data.i = terrain[rterrain(r)].quarries;
 		}
 	}
+	return 0;
 }
 #endif
+
+
+static void
+fix_negpotion(void)
+{
+	region *r;
+	unit *u;
+	int i;
+
+	for(r=regions; r; r=r->next) {
+		for(u=r->units; u; u=u->next) {
+			i = get_effect(u, oldpotiontype[P_FAST]);
+			if (i < 0){
+				change_effect(u, oldpotiontype[P_FAST], -i);
+			}
+		}
+	}
+}
+
+#ifdef GROWING_TREES
+int
+growing_trees(void)
+{
+	region *r;
+
+	for(r=regions; r; r=r->next) {
+		if(rtrees(r, 2)) {
+			rsettrees(r, 1, rtrees(r, 2)/4);
+			rsettrees(r, 0, rtrees(r, 2)/2);
+		}
+	}
+	return 0;
+}
+#endif
+
+#include <triggers/gate.h>
+#include <triggers/unguard.h>
+typedef struct gate_data {
+	struct building * gate;
+	struct region * target;
+} gate_data;
+
+static void
+fix_gates(void)
+{
+	region * r;
+	for (r=regions;r;r=r->next) {
+		unit * u;
+		building * b;
+		for (u=r->units;u;u=u->next) {
+			trigger ** triggers = get_triggers(u->attribs, "timer");
+			if (triggers) {
+				trigger * t = *triggers;
+				while (t && t->type!= &tt_gate) t=t->next;
+				if (t!=NULL) {
+					gate_data * gd = (gate_data*)t->data.v;
+					struct building * b = gd->gate;
+					struct region * rtarget = gd->target;
+					if (r!=b->region) {
+						add_trigger(&b->attribs, "timer", trigger_gate(b, rtarget));
+						add_trigger(&b->attribs, "create", trigger_unguard(b));
+						fset(b, BLD_UNGUARDED);
+					}
+				}
+				remove_triggers(&u->attribs, "timer", &tt_gate);
+				remove_triggers(&u->attribs, "create", &tt_unguard);
+			}
+		}
+		for (b=r->buildings;b;b=b->next) {
+			trigger ** triggers = get_triggers(b->attribs, "timer");
+			if (triggers) {
+				trigger * t = *triggers;
+				while (t && t->type!= &tt_gate) t=t->next;
+				if (t!=NULL) {
+					gate_data * gd = (gate_data*)t->data.v;
+					struct building * b = gd->gate;
+					struct region * rtarget = gd->target;
+					remove_triggers(&b->attribs, "timer", &tt_gate);
+					remove_triggers(&b->attribs, "create", &tt_unguard);
+					if (r!=b->region) {
+						add_trigger(&b->attribs, "timer", trigger_gate(b, rtarget));
+						add_trigger(&b->attribs, "create", trigger_unguard(b));
+						fset(b, BLD_UNGUARDED);
+					}
+				}
+			}
+		}
+	}
+}
+
+static int
+dump_sql(void)
+{
+	faction * f;
+	for (f=factions;f;f=f->next) {
+		if (f->unique_id==0) {
+			f->unique_id = ++max_unique_id;
+		}
+		if (f->age!=1) {
+			fprintf(sqlstream, "INSERT INTO users (id, email) VALUES (%d, '%s');\n",
+				f->unique_id, f->email);
+			fprintf(sqlstream, "INSERT INTO factions (id, user, name, password, race, locale, lastorders, banner, email) "
+				"VALUES ('%s', %d, '%s', '%s', '%s', '%s', %u, '%s', '%s');\n",
+				itoa36(f->no), f->unique_id, sqlquote(f->name), sqlquote(f->passw), LOC(default_locale, rc_name(f->race, 1)),
+				locale_name(f->locale), f->lastorders, sqlquote(f->banner), f->email);
+		}
+	}
+	return 0;
+}
+
+static int
+fix_ratfamiliar(void)
+{
+	region *r;
+	unit *u;
+
+	for(r=regions; r; r=r->next) {
+		for(u=r->units; u; u=u->next){
+			if (old_race(u->race) == RC_RAT){
+				if (u->number > 1){
+					int hp = u->number*3;
+					scale_number(u, 1);
+					set_skill(u, SK_MAGIC, get_skill(u, SK_MAGIC)+30);
+					create_mage(u, M_GRAU);
+					set_skill(u, SK_SPY, get_skill(u, SK_SPY)+30);
+					set_skill(u, SK_STEALTH, get_skill(u, SK_STEALTH)+30);
+					set_skill(u, SK_OBSERVATION, get_skill(u, SK_OBSERVATION)+30);
+					set_skill(u, SK_AUSDAUER, get_skill(u, SK_AUSDAUER)+hp);
+					u->hp = unit_max_hp(u);
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+static int
+randomized_resources(void)
+{
+	region *r;
+
+	for(r = regions; r; r=r->next) if(r->land) {
+		terrain_t ter = rterrain(r);
+
+		/* Dieses if verhindert, das Laen nocheinmal verteilt wird. */
+		if(ter == T_MOUNTAIN || ter == T_GLACIER || ter == T_ICEBERG || ter == T_ICEBERG_SLEEP) continue;
+
+		terraform_resources(r);
+	}
+	return 0;
+}
 
 void
 korrektur(void)
@@ -2307,6 +2712,7 @@ korrektur(void)
 #endif
 
 	fix_firewalls();
+	fix_gates();
 #ifdef TEST_GM_COMMANDS
 	setup_gm_faction();
 #endif
@@ -2317,10 +2723,11 @@ korrektur(void)
 	convert_triggers();
 #endif
 	fix_migrants();
+	no_teurefremde(1);
 	update_igjarjuk_quest();
 	fix_allies();
 	update_gmquests(); /* test gm quests */
-	fix_unitrefs();
+	/* fix_unitrefs(); */
 #ifndef SKILLFIX_SAVE
 	fix_skills();
 #endif
@@ -2339,9 +2746,6 @@ korrektur(void)
 		break;
 	case 195:
 		remove_impossible_dragontargets();
-		break;
-	case 197:
-		fix_laen();
 		break;
 	case 208:
 	  fix_feuerwand_orks();
@@ -2362,19 +2766,37 @@ korrektur(void)
 	case 217:
 		init_mwarden();
 		break;
+	case 254:
+		fix_negpotion();
+		break;
 	}
 
+	do_once("sql2", dump_sql());
 #ifdef NEW_RESOURCEGROWTH
-	do_once("rgrw", new_resourcegrowth());
+	/* do not remove do_once calls - old datafiles need them! */
+	do_once("rgrw", convert_resources());
+	do_once("rsfx", read_resfix());
 #endif
+	/* do_once("xepl", create_xe()); */
+#ifdef GROWING_TREES
+	do_once("grtr", growing_trees());
+#endif
+
+	do_once("grat", fix_ratfamiliar());
+
+	do_once("fdmd", fix_demand());
+	do_once("rndr", randomized_resources());
 
 	{
 		/* Test der Message-Funktion. Ist leider noch nicht
 		 * Plane-übergreifend, deshalb die Waldelfen. */
 		faction *f = findfaction(atoi36("1"));
-		attrib *permission = a_find(f->attribs, &at_permissions);
-		if(!permission) permission = a_add(&f->attribs, a_new(&at_permissions));
-		a_add((attrib**)&permission->data.v, make_key(atoi36("gmmsgr")));
+		if(f) {
+			attrib *permission = a_find(f->attribs, &at_permissions);
+			if(!permission) permission = a_add(&f->attribs, a_new(&at_permissions));
+			a_add((attrib**)&permission->data.v, make_key(atoi36("gmmsgr")));
+			a_add((attrib**)&permission->data.v, make_key(atoi36("gmmsgu")));
+		}
 	}
 
   /* trade_orders(); */
@@ -2404,6 +2826,9 @@ void
 korrektur_end(void)
 {
 	/* fix_balsamfiasko(); */
+#ifdef SKILLMODIFIESLEARNING
+	do_once("smle", skillmodifieslearning());
+#endif
 }
 
 void

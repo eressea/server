@@ -25,12 +25,13 @@
 
 /* kernel includes */
 #include "border.h"
+#include "curse.h"
 #include "faction.h"
 #include "item.h"
+#include "message.h"
 #include "plane.h"
 #include "region.h"
-#include "curse.h"
-#include "message.h"
+#include "resources.h"
 
 /* util includes */
 #include <resolve.h>
@@ -457,6 +458,16 @@ attrib_type at_travelunit = {
 	NO_READ
 };
 
+#ifdef NEW_RESOURCEGROWTH
+extern int laen_read(attrib * a, FILE * F);
+
+# define LAEN_READ laen_read
+# define LAEN_WRITE NULL
+#else
+# define LAEN_READ DEFAULT_READ
+# define LAEN_WRITE DEFAULT_WRITE
+#endif
+
 /***************/
 /*   at_laen   */
 /***************/
@@ -465,8 +476,8 @@ attrib_type at_laen = {
 	DEFAULT_INIT,
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
-	DEFAULT_WRITE,
-	DEFAULT_READ,
+	LAEN_WRITE,
+	LAEN_READ,
 	ATF_UNIQUE
 };
 
@@ -544,7 +555,11 @@ rroad(const region * r, direction_t d)
 boolean
 r_isforest(const region * r)
 {
-	if (r->terrain==T_PLAIN && rtrees(r)>=600) return true;
+#ifdef GROWING_TREES
+	if (r->terrain==T_PLAIN && rtrees(r,2) + rtrees(r,1) >= 600) return true;
+#else
+	if (r->terrain==T_PLAIN && rtrees(r) >= 600) return true;
+#endif
 	return false;
 }
 
@@ -628,7 +643,7 @@ rtrees(const region *r, int ageclass)
 }
 
 int
-rsettrees(region *r, int ageclass, int value)
+rsettrees(const region *r, int ageclass, int value)
 {
 	if (!r->land) assert(value==0);
 	else {
@@ -645,7 +660,7 @@ rtrees(const region *r)
 }
 
 int
-rsettrees(region *r, int value)
+rsettrees(const region *r, int value)
 {
 	if (!r->land) assert(value==0);
 	else {
@@ -656,10 +671,11 @@ rsettrees(region *r, int value)
 }
 #endif
 
+static region *last;
+
 region *
 new_region(int x, int y)
 {
-	static region *last = 0;
 	region *r = rfindhash(x, y);
 
 	if (r) {
@@ -682,7 +698,7 @@ new_region(int x, int y)
 	return r;
 }
 
-void
+static void
 freeland(land_region * lr)
 {
 	while (lr->demands) {
@@ -692,6 +708,17 @@ freeland(land_region * lr)
 	}
 	if (lr->name) free(lr->name);
 	free(lr);
+}
+
+void
+free_region(region * r)
+{
+	runhash(r);
+	if (last == r) last = NULL;
+	free(r->display);
+	if (r->land) freeland(r->land);
+	while (r->attribs) a_remove (&r->attribs, r->attribs);
+	free(r);
 }
 
 static char *
@@ -754,73 +781,63 @@ setluxuries(region * r, const luxury_type * sale)
 	}
 }
 
-#ifdef NEW_RESOURCEGROWTH
-
-static int
-new_stones(int base, int div, int skill)
-{
-		return rstone->base+
-}
-
-static void
-terraform_stone(const region *r)
-{
-	region_stone *rstone;
-	attrib *a;
-
-	switch(rterrain(r)) {
-	case T_MOUNTAIN:
-		a = a_add(&r->attribs, a_new(&at_stone));
-		rstone = (region_stone *)(a->data.v);
-		rstone->base = 100;
-		rstone->div = 1;
-		rstone->skill = 1;
-		rstone->stone = new_stones(rstone->base, rstone->div, rstone->skill);
-		break;
-	case T_GLACIER:
-		break;
-	case T_VOLCANE:
-	case T_VOLCANE_SMOKING:
-		break;
-	default:
-
-	}
-}
-#endif
-
 void
 terraform(region * r, terrain_t t)
 {
-	attrib *a;
 	const struct locale * locale_de = find_locale("de");
+#ifdef NEW_RESOURCEGROWTH
+	rawmaterial  **lrm;
+	int i;
+#endif
 
 	/* defaults: */
 	rsetterrain(r, t);
+
+#ifdef NEW_RESOURCEGROWTH
+	/* Resourcen, die nicht mehr vorkommen können, löschen */
+	lrm = &r->resources;
+	while (*lrm) {
+		rawmaterial *rm = *lrm;
+		for (i=0; i!=3; ++i) {
+			if(terrain[r->terrain].rawmaterials[i].type == rm->type) break;
+		}
+		if (i==3) {
+			*lrm = rm->next;
+			free(rm);
+		} else {
+			lrm = &rm->next;
+		}
+	}
+#endif
+
+#ifndef NEW_RESOURCEGROWTH
 	rsetlaen(r, -1);
 	rsetiron(r, 0);
-
+#endif
 	if (!landregion(t)) {
 		if (r->land) {
 			freeland(r->land);
 			r->land = NULL;
 		}
+#ifdef GROWING_TREES
+		rsettrees(r, 0, 0);
+		rsettrees(r, 1, 0);
+		rsettrees(r, 2, 0);
+#else
 		rsettrees(r, 0);
+#endif
 		rsethorses(r, 0);
+#ifndef NEW_RESOURCEGROWTH
 		rsetiron(r, 0);
+		rsetlaen(r, -1);
+#endif
 		rsetpeasants(r, 0);
 		rsetmoney(r, 0);
-		rsetlaen(r, -1);
 		freset(r, RF_ENCOUNTER);
 		freset(r, RF_MALLORN);
 		/* Beschreibung und Namen löschen */
 		return;
 	}
-
-#ifdef NEW_RESOURCEGROWTH
-	a_removeall(&r->attribs, &at_iron);
-	a_removeall(&r->attribs, &at_laen);
-	a_removeall(&r->attribs, &at_stone);
-#endif
 
 	if (!r->land) {
 		static struct surround {
@@ -909,15 +926,15 @@ terraform(region * r, terrain_t t)
 	case T_PLAIN:
 		rsethorses(r, rand() % (terrain[t].production_max / 5));
 		if(rand()%100 < 40) {
-			rsettrees(r, terrain[T_PLAIN].production_max * (40 + rand() % 40) / 100);
+#ifdef GROWING_TREES
+			rsettrees(r, 2, terrain[t].production_max * (30+rand()%40)/100);
+			rsettrees(r, 1, rtrees(r, 2)/4);
+			rsettrees(r, 0, rtrees(r, 2)/2);
+#else
+			rsettrees(r, terrain[t].production_max * (30+rand()%40)/100);
+#endif
 		}
 		break;
-#ifndef NO_FOREST
-	case T_FOREST:
-		rsetterrain(r, T_PLAIN);
-		rsettrees(r, terrain[T_PLAIN].production_max * (60 + rand() % 30) / 100);
-		break;
-#endif
 	case T_MOUNTAIN:
 #ifndef NEW_RESOURCEGROWTH
 		rsetiron(r, IRONSTART);
@@ -946,6 +963,15 @@ terraform(region * r, terrain_t t)
 	case T_VOLCANO_SMOKING:
 		break;
 	}
+
+#ifdef GROWING_TREES
+	/* Initialisierung irgendwann über rm_-Mechamismus machen */
+	if(t != T_PLAIN && rand()%100 < 20) {
+		rsettrees(r, 2, terrain[t].production_max * (30 + rand() % 40) / 100);
+		rsettrees(r, 1, rtrees(r, 2)/4);
+		rsettrees(r, 0, rtrees(r, 2)/2);
+	}
+#endif
 
 #ifdef NEW_RESOURCEGROWTH
 	terraform_resources(r);

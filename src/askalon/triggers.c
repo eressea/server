@@ -50,6 +50,7 @@ register_triggers(void)
 	tt_register(&tt_createcurse);
 	tt_register(&tt_createunit);
 	tt_register(&tt_gate);
+	tt_register(&tt_unguard);
 	tt_register(&tt_giveitem);
 	tt_register(&tt_killunit);
 	tt_register(&tt_removecurse);

@@ -20,6 +20,66 @@
  * (struct attribute)
  */
 
+/* Brainstorming Überarbeitung curse
+ * 
+ * Ziel: Keine Enum-Liste, flexible, leicht erweiterbare Curse-Objekte
+ *
+ * Was wird gebraucht?
+ * - Eindeutige Kennung für globale Suche
+ * - eine Wirkung, die sich einfach 'anwenden' läßt, dabei flexibel ist,
+ *   Raum läßt für variable Boni, Anzahl betroffener Personen,
+ *   spezielle Effekte oder anderes
+ * - einfacher Zugriff auf allgemeine Funktionen wie zb Alterung, aber
+ *   auch Antimagieverhalten
+ * - Ausgabe von Beschreibungen in verschiedenen Sprachen
+ * - definiertes gekapseltes Verhalten zb bei Zusammenlegung von
+ *   Einheiten, Übergabe von Personen, Mehrfachverzauberung
+ * - (Rück-)Referenzen auf Objekt, Verursacher (Magier), ?
+ *
+ * Vieleicht wäre ein Wirkungsklassensystem sinnvoll, so das im übrigen
+ * source einfach alle curse-attribs abgefragt werden können und bei
+ * gewünschter Wirkungsklasse angewendet, also nicht für jeden curse
+ * spezielle Änderungen im übrigen source notwendig sind.
+ *
+ * Die (Wirkungs-)Typen sollten die wichtigen Funktionen speziell
+ * belegen können, zb Alterung, Ausgabetexte, Merge-Verhalten
+ *
+ * Was sind wichtige individuelle Eigenschaften?
+ * - Referenzen auf Objekt und Verursacher
+ * - Referenzen für globale Liste
+ * > die Wirkung:
+ * - Dauer
+ * - Widerstandskraft, zb gegen Antimagie
+ * - Seiteneffekte zb Flag ONLYONE, Unverträglichkeiten
+ * - Alterungsverhalten zb Flag NOAGE
+ * - Effektverhalten, zb Bonus (variabel)
+ * - bei Einheitenzaubern die Zahl der betroffenen Personen
+ * 
+ * Dabei sind nur die beiden letzten Punkte wirklich reine individuelle
+ * Wirkung, die anderen sind eher allgemeine Kennzeichen eines jeden
+ * Curse, die individuell belegt sind.
+ * ONLYONE und NOAGE könnten auch Eigenschaften des Typs sein, nicht des
+ * individuellen curse. Allgemein ist Alterung wohl eher eine
+ * Typeigenschaft als die eines individuellen curse. 
+ * Dagegen ist der Widerstand gegen Antimagie sowohl abhängig von der
+ * Güte des Verursachers, also des Magiers zum Zeitpunkt des Zaubers,
+ * als auch vom Typ, der gegen bestimmte Arten des 'Fluchbrechens' immun
+ * sein könnte.
+ *
+ * Was sind wichtige Typeigenschaften?
+ * - Verhalten bei Personenübergaben
+ * - allgemeine Wirkung
+ * - Beschreibungstexte
+ * - Verhalten bei Antimagie
+ * - Alterung
+ * - Speicherung des C-Objekts
+ * - Laden des C-Objekts
+ * - Erzeugen des C-Objekts
+ * - Löschen und Aufräumen des C-Objekts
+ * - Funktionen zur Änderung der Werte
+ *
+ * */
+
 /* ------------------------------------------------------------- */
 /* Zauberwirkungen */
 /* nicht vergessen curse_type zu aktualisieren und Reihenfolge beachten!
@@ -58,7 +118,7 @@ enum {
 	C_RIOT,           /*region in Aufruhr */
 	C_NOCOST,
 	C_HOLYGROUND,
-	C_FREE_13,
+	C_CURSED_BY_THE_GODS,
 	C_FREE_14,
 	C_FREE_15,
 	C_FREE_16,
@@ -218,6 +278,8 @@ curse * create_curse(struct unit *magician, struct attrib**ap, curse_t id, int i
 
 boolean is_cursed(struct attrib *ap, curse_t id, int id2);
 	/* gibt true, wenn bereits ein Zauber dieses Typs vorhanden ist */
+boolean is_cursed_internal(struct attrib *ap, curse_t id, int id2);
+	/* ignoriert CURSE_ISNEW */
 
 void remove_curse(struct attrib **ap, curse_t id, int id2);
 	/* löscht einen Spruch auf einem Objekt. Bei einigen Typen von
@@ -225,8 +287,10 @@ void remove_curse(struct attrib **ap, curse_t id, int id2);
 	 * ein weiterer Identifizierer angegeben werden, zb der Skill. In
 	 * allen anderen Fällen ist id2 egal.
 	 */
-void remove_allcurse(struct attrib **ap, void * data, boolean(*compare)(const attrib *, void *));
+void remove_allcurse(struct attrib **ap, const void * data, boolean(*compare)(const attrib *, const void *));
 	/* löscht alle Curse dieses Typs */
+void remove_cursec(attrib **ap, curse *c);
+	/* löscht den curse c, wenn dieser in ap steht */
 
 int get_curseeffect(struct attrib *ap, curse_t id, int id2);
 	/* gibt die Auswirkungen der Verzauberungen zurück. zB bei
@@ -282,19 +346,24 @@ void ct_register(const curse_type *);
 
 curse * cfindhash(int i);
 void chash(curse *c);
+void cunhash(curse *c);
 
+curse * findcurse(int curseid);
 
 extern void curse_init(struct attrib * a);
 extern void curse_done(struct attrib * a);
 extern int curse_age(struct attrib * a);
 
-extern boolean cmp_curse(const attrib * a, void * data);
+extern boolean cmp_curse(const attrib * a, const void * data);
 /* compatibility mode für katjas curses: */
-extern boolean cmp_oldcurse(const attrib * a, void * data);
+extern boolean cmp_oldcurse(const attrib * a, const void * data);
 extern struct twoids * packids(int id, int id2);
 
 extern void * resolve_curse(void * data);
 
 extern boolean is_spell_active(const struct region * r, curse_t id);
 	/* prüft, ob ein bestimmter Zauber auf einer struct region liegt */
+
+extern boolean is_cursed_with(attrib *ap, curse *c);
+	
 #endif

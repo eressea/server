@@ -11,6 +11,7 @@
  */
 
 #include <config.h>
+#include "eressea.h"
 #include "ugroup.h"
 
 #include <attrib.h>

@@ -19,15 +19,19 @@ typedef struct player {
 	unsigned int id;
 	char * name;
 	char * email;
-	char * info;
-	struct faction * faction;
+	char * address;
+	struct vacation {
+		int weeks;
+		char * email;
+	} * vacation;
+	const struct faction * faction;
 
 	struct player * nexthash; /* don't use! */
 } player;
 
 extern struct player * get_players(void);
 extern struct player * get_player(unsigned int id);
-extern struct player * make_player(void);
+extern struct player * make_player(const struct faction * f);
 extern struct player * next_player(struct player * p);
 
 #endif

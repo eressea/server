@@ -66,7 +66,7 @@ a_readgive(attrib * a, FILE * F)
 		fscanf(F, "%s", zText);
 		if (!strcmp("end", zText)) break;
 		fscanf(F, "%d", &i);
-		if (i==0) i_add(&gdata->items, i_new(it_find(zText)))->number = i;
+		if (i==0) i_add(&gdata->items, i_new(it_find(zText), i));
 	}
 	return 1;
 }

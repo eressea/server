@@ -19,6 +19,9 @@
 /* kernel includes */
 #include <item.h>
 
+/* util includes */
+#include <functions.h>
+
 /* libc includes */
 #include <assert.h>
 
@@ -40,7 +43,7 @@ static resource_type rt_demonseye = {
 };
 
 
-static boolean
+boolean
 give_igjarjuk(const struct unit * src, const struct unit * d, const struct item_type * itype, int n, const char * cmd)
 {
 	sprintf(buf, "Eine höhere Macht hindert %s daran, das Objekt zu übergeben. "
@@ -52,14 +55,15 @@ give_igjarjuk(const struct unit * src, const struct unit * d, const struct item_
 item_type it_demonseye = {
 	&rt_demonseye,           /* resourcetype */
 	ITF_NOTLOST|ITF_CURSED, 0, 0,       /* flags, weight, capacity */
-	0, NOSKILL,              /* minskill, skill */
 	NULL,                    /* construction */
 	&summon_igjarjuk,
 	&give_igjarjuk
 };
 
 void
-init_demonseye(void)
+register_demonseye(void)
 {
 	it_register(&it_demonseye);
+	register_function((pf_generic)summon_igjarjuk, "useigjarjuk");
+	register_function((pf_generic)give_igjarjuk, "giveigjarjuk");
 }

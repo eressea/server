@@ -62,7 +62,7 @@ extern void a_finalizestring(attrib * a);
 
 extern void at_register(attrib_type * at);
 
-extern attrib * a_select(attrib * a, void * data, boolean(*compare)(const attrib *, void *));
+extern attrib * a_select(attrib * a, const void * data, boolean(*compare)(const attrib *, const void *));
 extern attrib * a_find(attrib * a, const attrib_type * at);
 extern attrib * a_add(attrib ** pa, attrib * at);
 extern int a_remove(attrib ** pa, attrib * at);

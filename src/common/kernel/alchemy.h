@@ -25,7 +25,7 @@ enum {
 	/* Stufe 1 */
 	P_FAST,
 	P_STRONG,
-	P_TREES,
+	P_LIFE,
 	/* Stufe 2 */
 	P_DOMORE,
 	P_HEILWASSER,
