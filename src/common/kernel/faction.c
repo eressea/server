@@ -23,8 +23,9 @@
 #include "group.h"
 
 /* util includes */
-#include <base36.h>
-#include <event.h>
+#include <util/base36.h>
+#include <util/event.h>
+#include <util/goodies.h>
 
 #include <attributes/otherfaction.h>
 
@@ -93,11 +94,13 @@ addfaction(const char *email, const char * password,
            int subscription)
 {
   int i;
-  faction *f;
-  assert(frace != new_race[RC_ORC]);
-  f = calloc(sizeof(faction), 1);
+  faction * f = calloc(sizeof(faction), 1);
 
-  set_string(&f->email, email);
+  assert(frace != new_race[RC_ORC]);
+
+  if (set_email(&f->email, email)!=0) {
+    log_error(("Invalid email address: %s\n", email));
+  }
 
   if (password) {
     set_string(&f->passw, password);

@@ -58,6 +58,7 @@
 #include <attrib.h>
 #include <base36.h>
 #include <event.h>
+#include <util/goodies.h>
 #include <resolve.h>
 #include <sql.h>
 #include <rand.h>
@@ -1491,6 +1492,8 @@ readfaction(FILE * F)
   int planes;
   int i = rid(F);
   faction * f = findfaction(i);
+  char * email;
+
   if (f==NULL) {
     f = (faction *) calloc(1, sizeof(faction));
     f->no = i;
@@ -1519,7 +1522,11 @@ readfaction(FILE * F)
   if (!quiet) printf("   - Lese Partei %s (%s)\n", f->name, factionid(f));
 
   rds(F, &f->banner);
-  rds(F, &f->email);
+  rds(F, &email);
+  if (set_email(&f->email, email)!=0) {
+    log_error(("Invalid email address: %s\n", email));
+    set_email(&f->email, "");
+  }
   rds(F, &f->passw);
   if (global.data_version >= OVERRIDE_VERSION) {
     rds(F, &f->override);

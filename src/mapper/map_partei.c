@@ -256,7 +256,9 @@ read_newfactions(const char * filename)
 		}
 		if (nf) continue;
 		nf = calloc(sizeof(newfaction), 1);
-		nf->email = strdup(email);
+    if (set_email(&nf->email, email)!=0) {
+      log_error(("Invalid email address: %s\n", email));
+    }
 		nf->password = strdup(password);
 		nf->race = rc_find(race);
 		nf->subscription = subscription;

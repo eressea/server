@@ -1531,7 +1531,7 @@ makemonsters(void)
 	f->next=factions;
 	f->race=new_race[RC_TEMPLATE];
 	f->alive=1;
-	f->email=strdup("");
+  set_email(&f->email, "");
 	f->lastorders=0;
 	f->locale=default_locale;
 	

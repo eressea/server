@@ -37,6 +37,7 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/event.h>
+#include <util/goodies.h>
 #include <util/umlaut.h>
 
 /* libc includes */
@@ -628,7 +629,9 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	f->passw = strdup(itoa36(rand()));
 	f->override = strdup(itoa36(rand()));
 	f->override = strdup(itoa36(rand()));
-	f->email = strdup(email);
+  if (set_email(&f->email, email)!=0) {
+    log_error(("Invalid email address: %s\n", email));
+  }
 	f->name = strdup("Questenpartei");
 	f->race = new_race[RC_TEMPLATE];
 	f->age = 0;
@@ -729,7 +732,9 @@ gm_addfaction(const char * email, plane * p, region * r)
 	add_key(&f->attribs, atoi36("quest"));
 	f->banner = strdup("Questenpartei");
 	f->passw = strdup(itoa36(rand()));
-	f->email = strdup(email);
+  if (set_email(&f->email, email)!=0) {
+    log_error(("Invalid email address: %s\n", email));
+  }
 	f->name = strdup("Questenpartei");
 	f->race = new_race[RC_TEMPLATE];
 	f->age = 0;

@@ -348,7 +348,9 @@ guardian_faction(plane * pl, int id)
 		f->banner = strdup("Sie dienen dem großen Wyrm");
 		f->passw = strdup(itoa36(rand()));
 		f->override = strdup(itoa36(rand()));
-		f->email = strdup("igjarjuk@eressea-pbem.de");
+    if (set_email(&f->email, "igjarjuk@eressea.de")!=0) {
+      log_error(("Invalid email address: %s\n", email));
+    }
 		f->name = strdup("Igjarjuks Kundschafter");
 		f->race = new_race[RC_ILLUSION];
 		f->age = turn;

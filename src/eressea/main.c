@@ -257,7 +257,9 @@ readshortpwds()
       f = findfaction(atoi36(faction));
       if (f!=NULL) {
         shortpwd * pwd = (shortpwd*)malloc(sizeof(shortpwd));
-        pwd->email = strdup(email);
+        if (set_email(&pwd->email, email)!=0) {
+          log_error(("Invalid email address: %s\n", email));
+        }
         pwd->pwd = strdup(passwd);
         pwd->used = false;
         pwd->next = f->shortpwds;

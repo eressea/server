@@ -2053,12 +2053,16 @@ email_cmd(unit * u, struct order * ord)
 
   if (!s[0]) {
     cmistake(u, ord, 85, MSG_EVENT);
-  } else if (strstr(s, "internet:") || strchr(s, ' ')) {
-    cmistake(u, ord, 117, MSG_EVENT);
   } else {
-    set_string(&u->faction->email, s);
-    ADDMSG(&u->faction->msgs, msg_message("changemail", "value", 
-      gc_add(strdup(u->faction->email))));
+    faction * f = u->faction;
+    if (set_email(&f->email, s)!=0) {
+      log_error(("Invalid email address: %s\n", s));
+      ADDMSG(&f->msgs, msg_message("changemail_invalid", "value", 
+        gc_add(strdup(s))));
+    } else {
+      ADDMSG(&f->msgs, msg_message("changemail", "value", 
+        gc_add(strdup(f->email))));
+    }
   }
   return 0;
 }

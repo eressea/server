@@ -134,3 +134,33 @@ locale_check(void)
 	if (errorlevel) return false;
 	return true;
 }
+
+int 
+set_email(char** pemail, const char *newmail)
+{
+  int at = 0;
+  const char * s;
+
+  if (newmail && *newmail) {
+    for (s=newmail;*s;++s) {
+      switch(*s) {
+        case ':':
+        case '"':
+        case ' ':
+          return -1;
+        case '@':
+          if (at) return -1;
+          at = 1;
+        default:
+          break;
+      }
+    }
+    if (!at) return -1;
+  }
+  if (*pemail) free(*pemail);
+  *pemail = 0;
+  if (newmail) {
+    *pemail = strdup(newmail);
+  }
+  return 0;
+}
