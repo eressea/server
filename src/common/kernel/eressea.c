@@ -91,7 +91,7 @@ static attrib_type at_creator = {
 	/* Rest ist NULL; temporäres, nicht alterndes Attribut */
 };
 static int 
-MaxAge() {
+MaxAge(void) {
 	static int value = -1;
 	if (value<0) {
 		value = atoi(get_param(global.parameters, "MaxAge"));
@@ -100,7 +100,7 @@ MaxAge() {
 }
 
 int
-LongHunger() {
+LongHunger(void) {
 	static int value = -1;
 	if (value<0) {
 		value = atoi(get_param(global.parameters, "hunger.long"));
@@ -119,7 +119,7 @@ SkillCap(skill_t sk) {
 }
 
 boolean
-TradeDisabled() {
+TradeDisabled(void) {
 	static int value = -1;
 	if (value<0) {
 		value = (boolean)atoi(get_param(global.parameters, "trade.disabled"));
@@ -128,7 +128,7 @@ TradeDisabled() {
 }
 
 int 
-NMRTimeout() {
+NMRTimeout(void) {
 	static int value = -1;
 	if (value<0) {
 		value = atoi(get_param(global.parameters, "nmr.timeout"));

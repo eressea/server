@@ -100,7 +100,7 @@ create_xmas2000(int x, int y)
 		u = createunit(r, f, 2, f->race);
 		if (f->race==new_race[RC_DAEMON]) u->irace = new_race[RC_HUMAN];
 		sprintf(zText, "%s %s", prefix[rand()%prefixes], LOC(u->faction->locale, rc_name(u->irace, 1)));
-		fset(u, FL_PARTEITARNUNG);
+		fset(u, UFL_PARTEITARNUNG);
 		set_string(&u->name, zText);
 	}
 	make_gates(r);

@@ -1934,6 +1934,33 @@ static const char *potiontext[MAXPOTIONS] =
 	"Verletzung angewandt.",
 };
 
+static int 
+heal(unit * user, int effect)
+{
+	int req = unit_max_hp(user) * user->number - user->hp;
+	if (req>0) {
+		req = min(req, effect);
+		effect -= req;
+		user->hp += req;
+	}
+	return effect;
+}
+
+static int
+use_healingpotion(struct unit *user, const struct potion_type *ptype, int amount, const char *cmd)
+{
+	int effect = amount * 400;
+	unit * u = user->region->units;
+	effect = heal(user, effect);
+	while (effect>0 && u!=NULL) {
+		if (u->faction==user->faction) {
+			effect = heal(u, effect);
+		}
+		u = u->next;
+	}
+	return 0;
+}
+
 static int
 use_warmthpotion(struct unit *u, const struct potion_type *ptype, int amount, const char *cmd)
 {
@@ -2096,6 +2123,7 @@ init_oldpotions(void)
 		if (p==P_FOOL) itype->useonother = &use_foolpotion;
 	}
 	oldpotiontype[P_WARMTH]->use = &use_warmthpotion;
+	oldpotiontype[P_WARMTH]->use = &use_healingpotion;
 	oldpotiontype[P_BAUERNBLUT]->use = &use_bloodpotion;	
 }
 
