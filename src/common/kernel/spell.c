@@ -2408,6 +2408,7 @@ patzer_peasantmob(castorder *co)
 	attrib *a;
 	region *r;
 	unit *mage = (unit *)co->magician;
+	strlist *S;
 
 	if (mage->region->land){
 		r = mage->region;
@@ -2423,7 +2424,11 @@ patzer_peasantmob(castorder *co)
 
 		u = createunit(r, findfaction(MONSTER_FACTION), n, new_race[RC_PEASANT]);
 		set_string(&u->name, "Bauernmob");
-		guard(u, GUARD_ALL);
+		/* guard(u, GUARD_ALL);  hier zu früh! Befehl BEWACHE setzten */
+		sprintf(buf, "BEWACHE");
+		S = makestrlist(buf);
+		addlist(&u->orders, S);
+		set_string(&u->thisorder, LOC(u->faction->locale, "defaultorder"));
 		a = a_new(&at_unitdissolve);
 		a->data.ca[0] = 1;  /* An rpeasants(r). */
 		a->data.ca[1] = 10; /* 10% */

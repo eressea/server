@@ -2591,6 +2591,12 @@ bewache_an(void)
 						if (rterrain(r) != T_OCEAN) {
 							if (!fval(u, RCF_ILLUSIONARY) && u->race != new_race[RC_SPELL]) {
 #ifdef WACH_WAFF
+								/* Monster der Monsterpartei dürfen immer bewachen */
+								if (u->faction == findfaction(MONSTER_FACTION)){
+									guard(u, GUARD_ALL);
+									continue;
+								}
+
 								if (!armedmen(u)) {
 									add_message(&u->faction->msgs,
 										msg_error(u, S->s, "unit_unarmed", ""));

@@ -3948,7 +3948,7 @@
 		</type>
 		<locale name="en">
 			<nr section="none">
-				<text>"$unit($unit) in $region($region): '$command' - Unit $int36($id) could not be located."</text>
+				<text>"$unit($unit) in $region($region): '$command' - Unit $id could not be located."</text>
 			</nr>
 		</locale>
 	</message>

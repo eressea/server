@@ -1651,7 +1651,7 @@ verify_targets(castorder *co)
 						failed++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, strdup(co->order),
+							mage, mage->region, strdup(co->order), 
 							strdup(itoa36(spobj->data.i))));
 						break;
 					} else { /* Einheit wurde nun gefunden, pointer umsetzen */
@@ -1685,8 +1685,7 @@ verify_targets(castorder *co)
 									parameters[P_TEMP]), itoa36(spobj->data.i));
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, strdup(co->order),
-							strdup(tbuf)));
+							mage, mage->region, strdup(co->order), strdup(tbuf)));
 						break;
 					} else {
 						/* Einheit wurde nun gefunden, pointer umsetzen */
@@ -1827,7 +1826,7 @@ verify_targets(castorder *co)
 						spobj->flag = TARGET_NOTFOUND;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, strdup(co->order),
+							mage, mage->region, strdup(co->order), 
 							strdup(itoa36(spobj->data.i))));
 						failed++;
 						break;
@@ -1843,7 +1842,7 @@ verify_targets(castorder *co)
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitresists%u:unit%r:region%s:command%s:id",
 							mage, mage->region, strdup(co->order),
-							strdup(itoa36(spobj->data.i))));
+							strdup(spobj->data.i)));
 						break;
 					}
 
@@ -1866,7 +1865,7 @@ verify_targets(castorder *co)
 						resists++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellbuildingresists%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
+							mage, mage->region, strdup(co->order), strdup(spobj->data.i)));
 						break;
 					}
 					success++;
@@ -1886,7 +1885,7 @@ verify_targets(castorder *co)
 						resists++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellshipresists%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
+							mage, mage->region, strdup(co->order), strdup(spobj->data.i)));
 						break;
 					}
 					success++;
@@ -3194,6 +3193,7 @@ magic(void)
 					/* zwar wurde mindestens ein Ziel gefunden, das widerstand
 					 * jedoch dem Zauber. Kosten abziehen und abbrechen. */
 					pay_spell(u, sp, level, co->distance);
+					countspells(u,1);
 					sprintf(buf, "%s gelingt es %s zu zaubern, doch der Spruch zeigt "
 							"keine Wirkung.", unitname(u), sp->name);
 					addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
