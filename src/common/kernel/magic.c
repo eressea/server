@@ -84,6 +84,28 @@ attrib_type at_reportspell = {
  ** TODO: separate castle-appearance from illusion-effects
  **/
 
+static double
+MagicRegeneration(void)
+{
+  static double value = -1.0;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "magic.regeneration");
+    value = str?atof(str):1.0;
+  }
+  return value;
+}
+
+static double
+MagicPower(void)
+{
+  static double value = -1.0;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "magic.power");
+    value = str?atof(str):1.0;
+  }
+  return value;
+}
+
 static ship *
 findshipr(const region *r, int n)
 	/* Ein Schiff in einer bestimmten Region finden: */
@@ -1009,9 +1031,7 @@ spellpower(region * r, unit * u, spell * sp, int cast_level)
 		cmistake(u, findorder(u, u->thisorder), 185, MSG_MAGIC);
 	}
 
-#ifdef MAGICPOWER
-	force = force * MAGICPOWER;
-#endif
+	force = force * MagicPower();
 
 	return max(force, 0);
 }
@@ -1254,84 +1274,86 @@ fumble(region * r, unit * u, spell * sp, int cast_grade)
 static void
 do_fumble(castorder *co)
 {
-	curse * c;
-	region * r = co->rt;
-	unit * u = (unit*)co->magician;
-	spell * sp = co->sp;
-	int level = co->level;
-	int duration;
+  curse * c;
+  region * r = co->rt;
+  unit * u = (unit*)co->magician;
+  spell * sp = co->sp;
+  int level = co->level;
+  int duration;
+  const char * sp_name = spell_name(sp, u->faction->locale);
 
-	switch (rand() % 10) {
-	/* wenn vorhanden spezieller Patzer, ansonsten nix */
-	case 0:
-		sp->patzer(co);
-		break;
-	case 1:
-	/* Kröte */
-		duration = rand()%level/2;
-		if (duration<2) duration = 2;
-		{
-			/* one or two things will happen: the toad changes her race back,
-			 * and may or may not get toadslime.
-			 * The list of things to happen are attached to a timeout
-			 * trigger and that's added to the triggerlit of the mage gone toad.
-			 */
-			trigger * trestore = trigger_changerace(u, u->race, u->irace);
-			if (rand()%10>2) t_add(&trestore, trigger_giveitem(u, olditemtype[I_TOADSLIME], 1));
-			add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
-		}
-		u->race = new_race[RC_TOAD];
-		u->irace = new_race[RC_TOAD];
-		sprintf(buf, "Eine Botschaft von %s: 'Ups! Quack, Quack!'", unitname(u));
-		addmessage(r, 0, buf, MSG_MAGIC, ML_MISTAKE);
-		break;
-	case 2:
-	/* temporärer Stufenverlust */
-		duration = max(rand()%level/2, 2);
-		c = create_curse(u, &u->attribs, ct_find("skil"), level, duration,
-			-(level/2), 1);
-		c->data = (void*)SK_MAGIC;
-		add_message(&u->faction->msgs,
-				new_message(u->faction, "patzer2%u:unit%r:region", u, r));
-		break;
-	case 3:
-	case 4:
-	/* Spruch schlägt fehl, alle Magiepunkte weg */
-		set_spellpoints(u, 0);
-		add_message(&u->faction->msgs, msg_message("patzer3", 
-			"unit region command",
-			u, r, spell_name(sp, u->faction->locale)));
-		break;
+  ADDMSG(&u->faction->msgs, msg_message("patzer", "unit region spell", 
+    u, r, sp_name));
+  switch (rand() % 10) {
+  case 0:
+    /* wenn vorhanden spezieller Patzer, ansonsten nix */
+    sp->patzer(co);
+    break;
 
-	case 5:
-	case 6:
-	/* Spruch gelingt, aber alle Magiepunkte weg */
-		((nspell_f)sp->sp_function)(co);
-		set_spellpoints(u, 0);
-		sprintf(buf, "Als %s versucht, '%s' zu zaubern erhebt sich "
-				"plötzlich ein dunkler Wind. Bizarre geisterhafte "
-				"Gestalten kreisen um den Magier und scheinen sich von "
-				"den magischen Energien des Zaubers zu ernähren. Mit letzter "
-				"Kraft gelingt es %s dennoch den Spruch zu zaubern.",
-				unitname(u), spell_name(sp, u->faction->locale), unitname(u));
-		addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
-		break;
+  case 1:
+    /* Kröte */
+    duration = rand()%level/2;
+    if (duration<2) duration = 2;
+    {
+      /* one or two things will happen: the toad changes her race back,
+      * and may or may not get toadslime.
+      * The list of things to happen are attached to a timeout
+      * trigger and that's added to the triggerlit of the mage gone toad.
+      */
+      trigger * trestore = trigger_changerace(u, u->race, u->irace);
+      if (rand()%10>2) t_add(&trestore, trigger_giveitem(u, olditemtype[I_TOADSLIME], 1));
+      add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
+    }
+    u->race = new_race[RC_TOAD];
+    u->irace = new_race[RC_TOAD];
+    sprintf(buf, "Eine Botschaft von %s: 'Ups! Quack, Quack!'", unitname(u));
+    addmessage(r, 0, buf, MSG_MAGIC, ML_MISTAKE);
+    break;
 
-	case 7:
-	case 8:
-	case 9:
-	default:
-		/* Spruch gelingt, alle nachfolgenden Sprüche werden 2^4 so teuer */
-		((nspell_f)sp->sp_function)(co);
-		sprintf(buf, "%s fühlt sich nach dem Zaubern von %s viel erschöpfter "
-				"als sonst und hat das Gefühl, dass alle weiteren Zauber deutlich "
-				"mehr Kraft als normalerweise kosten werden.", unitname(u), 
-				spell_name(sp, u->faction->locale));
-		addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
-		countspells(u,3);
-	}
+  case 2:
+    /* temporärer Stufenverlust */
+    duration = max(rand()%level/2, 2);
+    c = create_curse(u, &u->attribs, ct_find("skil"), level, duration,
+      -(level/2), 1);
+    c->data = (void*)SK_MAGIC;
+    ADDMSG(&u->faction->msgs, msg_message("patzer2", "unit region", u, r));
+    break;
+  case 3:
+  case 4:
+    /* Spruch schlägt fehl, alle Magiepunkte weg */
+    set_spellpoints(u, 0);
+    ADDMSG(&u->faction->msgs, msg_message("patzer3", "unit region command",
+      u, r, sp_name));
+    break;
 
-	return;
+  case 5:
+  case 6:
+    /* Spruch gelingt, aber alle Magiepunkte weg */
+    ((nspell_f)sp->sp_function)(co);
+    set_spellpoints(u, 0);
+    sprintf(buf, "Als %s versucht, '%s' zu zaubern erhebt sich "
+      "plötzlich ein dunkler Wind. Bizarre geisterhafte "
+      "Gestalten kreisen um den Magier und scheinen sich von "
+      "den magischen Energien des Zaubers zu ernähren. Mit letzter "
+      "Kraft gelingt es %s dennoch den Spruch zu zaubern.",
+      unitname(u), sp_name, unitname(u));
+    addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
+    break;
+
+  case 7:
+  case 8:
+  case 9:
+  default:
+    /* Spruch gelingt, alle nachfolgenden Sprüche werden 2^4 so teuer */
+    ((nspell_f)sp->sp_function)(co);
+    sprintf(buf, "%s fühlt sich nach dem Zaubern von %s viel erschöpfter "
+      "als sonst und hat das Gefühl, dass alle weiteren Zauber deutlich "
+      "mehr Kraft als normalerweise kosten werden.", unitname(u), sp_name);
+    addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
+    countspells(u, 3);
+  }
+
+  return;
 }
 
 /* ------------------------------------------------------------- */
@@ -1361,9 +1383,7 @@ regeneration(unit * u)
 	/* Würfeln */
 	aura = (rand() % d + rand() % d)/2 + 1;
 
-#ifdef MAGICREGEN
-	aura = (int)(aura * MAGICREGEN);
-#endif
+	aura = (int)(aura * MagicRegeneration());
 
 	return aura;
 }

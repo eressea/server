@@ -28,6 +28,9 @@
     <param name="allied.skilllimit" value="15"/>
     <param name="atsroi.ats" value="2"/>
     <param name="atsroi.roi" value="4"/>
+    <param name="magic.regeneration" value="0.5"/>
+    <param name="magic.power" value="0.5"/>
+    <param name="resource.factor" value="0.25"/>
   </game>
 
   <xi:include href="vinyambar/wdw-strings.xml"/>

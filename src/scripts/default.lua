@@ -19,9 +19,10 @@ end
 function wyrm()
  print("- running the wyrm quest")
  local grave = get_region(-9995,4)
- local plane = find_plane_id("arena")
+ local plane = get_plane_id("arena")
  local map = {}
  local mapsize = 0
+ local r
  for r in regions() do
    mapsize=mapsize+1
    map[mapsize] = r

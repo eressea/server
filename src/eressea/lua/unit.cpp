@@ -15,11 +15,14 @@
 #include <kernel/magic.h>
 #include <kernel/spell.h>
 
+#include <util/base36.h>
+
 // lua includes
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
 
+#include <ostream>
 using namespace luabind;
 
 class bind_spell_ptr {
@@ -217,6 +220,19 @@ unit_setname(unit& u, const char * name)
   set_string(&u.name, name);
 }
 
+static std::ostream& 
+operator<<(std::ostream& stream, unit& u)
+{
+  stream << u.name << " (" << itoa36(u.no) << ")";
+  return stream;
+}
+
+static bool 
+operator==(const unit& a, const unit&b)
+{
+  return a.no==b.no;
+}
+
 void
 bind_unit(lua_State * L) 
 {
@@ -226,6 +242,8 @@ bind_unit(lua_State * L)
 
     class_<struct unit>("unit")
     .property("name", &unit_getname, &unit_setname)
+    .def(tostring(self))
+    .def(self == unit())
     .def_readonly("faction", &unit::faction)
     .def_readonly("id", &unit::no)
     .def_readwrite("hp", &unit::hp)

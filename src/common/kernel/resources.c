@@ -25,17 +25,38 @@
 #include <assert.h>
 #include <string.h>
 
+static double
+ResourceFactor(void)
+{
+  static double value = -1.0;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "resource.factor");
+    value = str?atof(str):1.0;
+  }
+  return value;
+}
+
 void
 update_resources(region * r)
 {
-	struct rawmaterial * res = r->resources;
-	while (res) {
-		if (res->type->update) res->type->update(res, r);
-		res = res->next;
-	}
+  struct rawmaterial * res = r->resources;
+  while (res) {
+    if (res->type->update) res->type->update(res, r);
+    res = res->next;
+  }
 }
 
 extern int dice_rand(const char *s);
+
+static void
+update_resource(struct rawmaterial * res, double modifier)
+{
+  double amount = 1 + (res->level-res->startlevel) * res->divisor/100.0;
+  amount = ResourceFactor() * res->base * amount * modifier;
+  if (amount<1.0) res->amount = 1;
+  else res->amount = (int)amount;
+  assert(res->amount>0);
+}
 
 void
 terraform_resources(region * r)
@@ -53,6 +74,7 @@ terraform_resources(region * r)
 
 		if (rand()%100 < tdata->rawmaterials[i].chance) {
 			struct rawmaterial * res = calloc(sizeof(struct rawmaterial), 1);
+
 			res->next = r->resources;
 			r->resources = res;
 			res->level      = dice_rand(tdata->rawmaterials[i].startlevel);
@@ -61,12 +83,7 @@ terraform_resources(region * r)
 			res->divisor    = dice_rand(tdata->rawmaterials[i].divisor);
 			res->flags      = 0;
 			res->type       = tdata->rawmaterials[i].type;
-			res->amount     = (int)(res->base * (1+(res->level-res->startlevel)*(res->divisor/100.0)));
-#ifdef RESOURCE_FACTOR
-			res->amount     = (int)(res->amount * RESOURCE_FACTOR);
-			if (res->amount == 0) res->amount = 1;
-#endif
-			assert(res->amount>0);
+                        update_resource(res, 1.0);
 			res->type->terraform(res, r);
 		}
 	}
@@ -120,28 +137,25 @@ visible_default(const rawmaterial *res, int skilllevel)
 	return -1;
 }
 
-static void use_default(rawmaterial *res, const region * r, int amount)
+static void 
+use_default(rawmaterial *res, const region * r, int amount)
 {
-	const terraindata_t * tdata = &terrain[rterrain(r)];
-	assert(res->amount>0 && amount>=0 && amount <= res->amount);
-	res->amount-=amount;
-	while (res->amount==0) {
-		double modifier = 1.0 + ((rand() % (SHIFT*2+1)) - SHIFT) * ((rand() % (SHIFT*2+1)) - SHIFT) / 10000.0;
-		int i;
+  const terraindata_t * tdata = &terrain[rterrain(r)];
+  assert(res->amount>0 && amount>=0 && amount <= res->amount);
+  res->amount-=amount;
+  while (res->amount==0) {
+    double modifier = 1.0 + ((rand() % (SHIFT*2+1)) - SHIFT) * ((rand() % (SHIFT*2+1)) - SHIFT) / 10000.0;
+    int i;
 
-		for (i=0; i!=3; ++i) {
-			const rawmaterial_type * rmtype = tdata->rawmaterials[i].type;
-			assert(rmtype);
-			if (rmtype==res->type) break;
-		}
+    for (i=0; i!=3; ++i) {
+      const rawmaterial_type * rmtype = tdata->rawmaterials[i].type;
+      assert(rmtype);
+      if (rmtype==res->type) break;
+    }
 
-		++res->level;
-		res->amount = (int)(modifier * res->base * (1+(res->level-res->startlevel)*res->divisor/100.0));
-		/* random adjustment, +/- 91% */
-#ifdef RESOURCE_QUANTITY
-		res->amount = (int)(res->amount * RESOURCE_QUANTITY);
-#endif
-	}
+    ++res->level;
+    update_resource(res, modifier);
+  }
 }
 
 struct rawmaterial *

@@ -1267,6 +1267,15 @@
   </type>
   <text locale="de">"$unit($mage) erleidet einen Schock ${reason}."</text>
 </message>
+<message name="patzer" section="magic">
+  <type>
+    <arg name="unit" type="unit"></arg>
+    <arg name="region" type="region"></arg>
+    <arg name="spell" type="string"></arg>
+  </type>
+  <text locale="de">"$unit($unit) unterläuft in $region($region) beim Zaubern von $command ein Patzer:"</text>
+  <text locale="en">"$unit($unit) fumbles while casting $command in $region($region):"</text>
+</message>
 <message name="patzer3" section="magic">
   <type>
     <arg name="unit" type="unit"></arg>

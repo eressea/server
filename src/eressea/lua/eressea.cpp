@@ -88,6 +88,6 @@ bind_eressea(lua_State * L)
     def("remove_empty_units", &remove_empty_units),
 
     /* planes not really implemented */
-    def("find_plane_id", &find_plane_id)
+    def("get_plane_id", &find_plane_id)
   ];
 }
