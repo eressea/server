@@ -2728,6 +2728,18 @@ fix_idleout(void)
 	return 0;
 }
 
+static int
+set_zip(void)
+{
+	faction *f;
+	for(f=factions;f;f=f->next) {
+		if(!(f->options & (1 << O_BZIP2)) && !(f->options & (1 << O_COMPRESS))) {
+			f->options = f->options | (1 << O_COMPRESS);
+		}
+	}
+	return 0;
+}
+
 void
 korrektur(void)
 {
@@ -2812,6 +2824,7 @@ korrektur(void)
 	do_once("rndr", randomized_resources());
 #endif
 	do_once("idlo", fix_idleout());
+	do_once("szip", set_zip());
 
   /* trade_orders(); */
 	if (global.data_version < NEWROAD_VERSION) {
