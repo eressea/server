@@ -198,76 +198,77 @@ init_mage(attrib * a) {
 static void
 free_mage(attrib * a)
 {
-	sc_mage * mage = (sc_mage*)a->data.v;
-	freelist(mage->spellptr);
-	free(mage);
+  sc_mage * mage = (sc_mage*)a->data.v;
+  freelist(mage->spellptr);
+  free(mage);
 }
 
 static int
 read_mage(attrib * a, FILE * F)
 {
-	int i, mtype;
-	sc_mage * mage = (sc_mage*)a->data.v;
-	spell_ptr ** sp = &mage->spellptr;
-	fscanf(F, "%d %d %d", &mtype, &mage->spellpoints, &mage->spchange);
+  int i, mtype;
+  sc_mage * mage = (sc_mage*)a->data.v;
+  spell_ptr ** sp = &mage->spellptr;
+
+  fscanf(F, "%d %d %d", &mtype, &mage->spellpoints, &mage->spchange);
   mage->magietyp = (magic_t)mtype;
-	for (i=0;i!=MAXCOMBATSPELLS;++i) {
+  for (i=0;i!=MAXCOMBATSPELLS;++i) {
     int spid;
-		fscanf (F, "%d %d", &spid, &mage->combatspelllevel[i]);
+    fscanf (F, "%d %d", &spid, &mage->combatspelllevel[i]);
+    if (spid<0) spid = SPL_NOSPELL;
     mage->combatspell[i] = (spellid_t)spid;
-	}
-	for (;;) {
+  }
+  for (;;) {
     int spid;
-		fscanf (F, "%d", &spid);
-		if (spid < 0) break;
+    fscanf (F, "%d", &spid);
+    if (spid < 0) break;
     *sp = calloc (sizeof(spell_ptr), 1);
-		(*sp)->spellid = (spellid_t)spid;
-		sp = &(*sp)->next;
-	}
-	return AT_READ_OK;
+    (*sp)->spellid = (spellid_t)spid;
+    sp = &(*sp)->next;
+  }
+  return AT_READ_OK;
 }
 
 static void
 write_mage(const attrib * a, FILE * F) {
-	int i;
-	sc_mage *mage = (sc_mage*)a->data.v;
-	spell_ptr *sp = mage->spellptr;
-	fprintf (F, "%d %d %d ",
-		mage->magietyp, mage->spellpoints, mage->spchange);
-	for (i=0;i!=MAXCOMBATSPELLS;++i) {
-		fprintf (F, "%d %d ", mage->combatspell[i], mage->combatspelllevel[i]);
-	}
-	while (sp) {
-		fprintf (F, "%d ", sp->spellid);
-		sp = sp->next;
-	}
-	fprintf (F, "-1\n");
+  int i;
+  sc_mage *mage = (sc_mage*)a->data.v;
+  spell_ptr *sp = mage->spellptr;
+  fprintf(F, "%d %d %d ", mage->magietyp, mage->spellpoints, mage->spchange);
+  for (i=0;i!=MAXCOMBATSPELLS;++i) {
+    fprintf(F, "%d %d ", mage->combatspell[i], mage->combatspelllevel[i]);
+  }
+  while (sp!=NULL) {
+    fprintf (F, "%d ", sp->spellid);
+    sp = sp->next;
+  }
+  fprintf (F, "-1\n");
 }
 
 attrib_type at_mage = {
-	"mage",
-	init_mage,
-	free_mage,
-	NULL,
-	write_mage,
-	read_mage,
-	ATF_UNIQUE
+  "mage",
+  init_mage,
+  free_mage,
+  NULL,
+  write_mage,
+  read_mage,
+  ATF_UNIQUE
 };
 
 boolean
 is_mage(const unit * u)
 {
-	return i2b(get_mage(u) != NULL);
+  return i2b(get_mage(u) != NULL);
 }
 
 sc_mage *
 get_mage(const unit * u)
 {
-	if (has_skill(u, SK_MAGIC)) {
-		attrib * a = a_find(u->attribs, &at_mage);
-		if (a) return a->data.v;
-	}
-	return (sc_mage *) NULL;
+  if (has_skill(u, SK_MAGIC)) {
+    attrib * a = a_find(u->attribs, &at_mage);
+    if (a) return a->data.v;
+  }
+  return (sc_mage *) NULL;
 }
 
 magic_t
@@ -490,7 +491,7 @@ get_combatspell(const unit *u, int nr)
 	m = get_mage(u);
 	if (m) {
 		return find_spellbyid(m->combatspell[nr]);
-	} else if(u->race->precombatspell != NO_SPELL) {
+	} else if(u->race->precombatspell != SPL_NOSPELL) {
 		return find_spellbyid(u->race->precombatspell);
 	}
 

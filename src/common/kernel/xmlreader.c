@@ -774,10 +774,10 @@ parse_races(xmlDocPtr doc)
     /* reading eressea/races/race/precombatspell */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "precombatspell", xpath);
-    assert(rc->precombatspell==NO_SPELL || !"precombatspell is already initialized");
+    assert(rc->precombatspell==SPL_NOSPELL || !"precombatspell is already initialized");
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
-      rc->precombatspell = (spellid_t)xml_ivalue(node, "spell", NO_SPELL);
+      rc->precombatspell = (spellid_t)xml_ivalue(node, "spell", SPL_NOSPELL);
     }
     xmlXPathFreeObject(result);
 

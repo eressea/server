@@ -7784,7 +7784,6 @@ find_spellbyid(spellid_t id)
 {
   spell_list * slist;
 
-  assert(id!=SPL_DONOTUSE);
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell* sp = slist->data;
     if (sp->id == id) return sp;
