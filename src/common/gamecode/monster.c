@@ -864,25 +864,25 @@ learn_monster(unit *u)
 {
 	int c = 0;
 	int n;
-	skill_t sk;
+	skill * sv;
 
 	/* Monster lernt ein zufälliges Talent aus allen, in denen es schon
 	 * Lerntage hat. */
 
-	for(sk=0;sk<MAXSKILLS;sk++)
-		if (has_skill(u, sk)) c++;
+  for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+    if (sv->level>0) ++c;
+  }
 
 	if(c == 0) return;
 
 	n = rand()%c + 1;
 	c = 0;
 
-	for (sk=0;sk<MAXSKILLS;sk++) {
-		if (has_skill(u, sk)) {
-			c++;
-			if(c == n) {
+  for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+		if (sv->level>0) {
+			if (++c == n) {
 				sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_STUDY]),
-					skillname(sk, u->faction->locale));
+					skillname(sv->id, u->faction->locale));
 				set_string(&u->thisorder, buf);
 				break;
 			}

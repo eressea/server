@@ -6381,7 +6381,7 @@ sp_disruptastral(castorder *co)
 
 	rl = all_in_range(rt, (int)(power/5));
 
-	for(rl2=rl; rl; rl=rl->next) {
+	for (rl2=rl; rl2!=NULL; rl2=rl2->next) {
 		attrib *a, *a2;
 		spec_direction *sd;
 
@@ -6391,7 +6391,7 @@ sp_disruptastral(castorder *co)
 		/* Nicht-Permanente Tore zerstören */
 		a = a_find(r->attribs, &at_direction);
 
-		while(a) {
+		while (a!=NULL) {
 			a2 = a->nexttype;
 			sd = (spec_direction *)(a->data.v);
 			if(sd->duration != -1) a_remove(&r->attribs, a);
@@ -6424,9 +6424,9 @@ sp_disruptastral(castorder *co)
 		}
 
 		/* Kontakt unterbinden */
-		create_curse(mage,&rl2->region->attribs, ct_find("astralblock"),
+		create_curse(mage, &rl2->region->attribs, ct_find("astralblock"),
 			power, duration, 100, 0);
-		addmessage(r, 0, "Mächtige Magie verhindert den Kontakt zur Realität.",
+		addmessage(rl2->region, 0, "Mächtige Magie verhindert den Kontakt zur Realität.",
 				MSG_COMMENT, ML_IMPORTANT);
 	}
 

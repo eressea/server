@@ -785,11 +785,11 @@ scale_number (unit * u, int n)
 		}
 		data->value = snew;
 	}
-	for (sk = 0; sk < MAXSKILLS; sk++) {
-		if (n==0 || u->number == 0) {
-			remove_skill(u, sk);
-		}
-	}
+  if (u->number==0 || n==0) {
+    for (sk = 0; sk < MAXSKILLS; sk++) {
+      remove_skill(u, sk);
+    }
+  }
 
 	set_number(u, n);
 }

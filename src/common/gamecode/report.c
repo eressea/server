@@ -3170,7 +3170,6 @@ typedef struct summary {
 summary *
 make_summary(boolean count_new)
 {
-	char sk;
 	faction *f;
 	region *r;
 	unit *u;
@@ -3228,6 +3227,8 @@ make_summary(boolean count_new)
 			for (u = r->units; u; u = u->next) {
 				f = u->faction;
 				if (u->faction->no != MONSTER_FACTION) {
+          skill * sv;
+
 					s->nunits++;
 					s->playerpop += u->number;
 					s->spielerpferde += get_item(u, I_HORSE);
@@ -3264,9 +3265,9 @@ make_summary(boolean count_new)
 
 					s->spielerpferde += get_item(u, I_HORSE);
 
-					for (sk = 0; sk < MAXSKILLS; sk++) {
-						int aktskill;
-						aktskill = eff_skill(u, sk, r);
+          for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+						skill_t sk = sv->id;
+            int aktskill = eff_skill(u, sk, r);
 						if (aktskill > s->maxskill) s->maxskill = aktskill;
 					}
 					if (!fval(f, FL_DH)) {

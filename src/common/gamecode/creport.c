@@ -578,7 +578,7 @@ cr_output_unit(FILE * F, const region * r,
 	boolean itemcloak = is_cursed(u->attribs, C_ITEMCLOAK, 0);
 	building * b;
 	const char * pzTmp;
-	skill_t sk;
+	skill * sv;
 	strlist *S;
 	const attrib *a_fshidden = NULL;
 
@@ -712,14 +712,15 @@ cr_output_unit(FILE * F, const region * r,
 
 		/* talents */
 		pr = 0;
-		for (sk = 0; sk != MAXSKILLS; ++sk) {
-			if (has_skill(u, sk)) {
+    for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+			if (sv->level>0) {
+        skill_t sk = sv->id;
 				int esk = eff_skill(u, sk, r);
 				if (!pr) {
 					pr = 1;
 					fprintf(F, "TALENTE\n");
 				}
-				fprintf(F, "%d %d;%s\n", u->number*level_days(get_level(u, sk)), esk,
+				fprintf(F, "%d %d;%s\n", u->number*level_days(sv->level), esk,
 					add_translation(skillname(sk, NULL), skillname(sk, f->locale)));
 			}
 		}

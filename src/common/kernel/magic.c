@@ -1263,14 +1263,15 @@ target_resists_magic(unit *magician, void *obj, int objtyp, int t_bonus)
 		case TYP_UNIT:
 			{
 				int at, pa = 0;
-				skill_t i;
+				skill * sv;
+        unit * u = (unit*)obj;
 
-				if(fspecial(((unit *)obj)->faction, FS_MAGICIMMUNE)) return true;
+				if (fspecial(u->faction, FS_MAGICIMMUNE)) return true;
 
 				at = effskill(magician, SK_MAGIC);
 
-				for (i=0;i<MAXSKILLS;i++) {
-					int sk = effskill((unit *)obj, i);
+				for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+					int sk = effskill(u, sv->id);
 					if (pa < sk) pa = sk;
 				}
 

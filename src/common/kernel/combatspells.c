@@ -490,10 +490,10 @@ static skill_t
 random_skill(unit *u)
 {
 	int n = 0;
-	skill_t sk;
+	skill * sv;
 
-	for(sk=0;sk<MAXSKILLS;sk++) {
-		if (get_level(u, sk)) n++;
+  for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+		if (sv->level>0) ++n;
 	}
 
 	if(n == 0)
@@ -501,10 +501,9 @@ random_skill(unit *u)
 
 	n = rand()%n;
 
-	for(sk=0;sk<MAXSKILLS;sk++) {
-		if (get_level(u, sk)) {
-			if(n == 0) return sk;
-			n--;
+  for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+		if (sv->level>0) {
+			if (n-- == 0) return sv->id;
 		}
 	}
 
