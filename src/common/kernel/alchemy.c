@@ -69,7 +69,7 @@ herbsearch(region * r, unit * u, int max)
 	rsetherbs(r, rherbs(r)-herbsfound);
 
 	if (herbsfound) {
-		change_skill(u, SK_HERBALISM, PRODUCEEXP * u->number);
+		produceexp(u, SK_HERBALISM, u->number);
 		i_change(&u->items, whichherb->itype, herbsfound);
 		add_message(&u->faction->msgs, new_message(u->faction,
 			"herbfound%u:unit%r:region%i:amount%X:herb", u, r, herbsfound,
@@ -146,8 +146,8 @@ use_potion(unit * u, const item_type * itype, const char * cmd)
 	new_use_pooled(u, ptype->itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1);
 	usetpotionuse(u, ptype);
 
-	add_message(&u->faction->msgs, new_message(u->faction,
-		"usepotion%u:unit%X:potion", u, ptype->itype->rtype));
+	ADDMSG(&u->faction->msgs, msg_message("usepotion",
+		"unit potion", u, ptype->itype->rtype));
 	return 0;
 }
 

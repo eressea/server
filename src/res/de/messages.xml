@@ -57,7 +57,7 @@
 		</type>
 		<locale name="de">
 			<nr section="events">
-				<text>"$unit($unit) benutzt einen $resource($potion,1)."</text>
+				<text>"$unit($unit) benutzt einen $resource($potion,1)trank."</text>
 			</nr>
 		</locale>
 	</message>
@@ -2410,19 +2410,6 @@
 		<locale name="de">
 			<nr section="errors">
 				<text>"$unit($unit) in $region($region): '$command' - Die Nestwärme kann nur von Insektenvölkern benutzt werden."</text>
-			</nr>
-		</locale>
-	</message>
-
-	<message name="error164">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="region" type="region"></arg>
-			<arg name="command" type="string"></arg>
-		</type>
-		<locale name="de">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Die Einheit benutzte einen Nestwärmetrank."</text>
 			</nr>
 		</locale>
 	</message>

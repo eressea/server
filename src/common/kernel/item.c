@@ -1887,7 +1887,8 @@ use_warmthpotion(struct unit *u, const struct potion_type *ptype, const char *cm
 	assert(ptype==oldpotiontype[P_WARMTH]);
 	if (old_race(u->faction->race) == RC_INSECT) {
 		fset(u, FL_WARMTH);
-		cmistake(u, cmd, 164, MSG_EVENT);
+		ADDMSG(&u->faction->msgs, msg_message("usepotion",
+			"unit potion", u, ptype->itype->rtype));
 	} else {
 		/* nur für insekten: */
 		cmistake(u, cmd, 163, MSG_EVENT);
@@ -1906,6 +1907,8 @@ use_bloodpotion(struct unit *u, const struct potion_type *ptype, const char *cmd
 		attrib * a = (attrib*)a_find(u->attribs, &at_bauernblut);
 		if (!a) a = a_add(&u->attribs, a_new(&at_bauernblut));
 		a->data.i += 100;
+		ADDMSG(&u->faction->msgs, msg_message("usepotion",
+			"unit potion", u, ptype->itype->rtype));
 	} else {
 		/* bekommt nicht: */
 		cmistake(u, cmd, 165, MSG_EVENT);
