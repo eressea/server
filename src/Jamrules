@@ -26,8 +26,24 @@ CCFLAGS += -Wall ;
 CCFLAGS += -Wwrite-strings 
 		   -Wstrict-prototypes 
 		   -Werror-implicit-function-declaration
-		   -Wno-char-subscripts 
+		   -Wno-char-subscripts
 		   ;
+
+rule iconv
+{
+  LINKLIBS on $(<) += -liconv ;
+}
+
+rule luabind
+{
+  LINKLIBS on $(<) += -L$(LUABIND_ROOT)/lib -llua50 -llualib50 ;
+  LINKLIBS on $(<) += -lm -lluabind ;
+}
+
+rule libxml2
+{
+  LINKLIBS on $(<) += -lxml2 ;
+}
 
 rule UsingLuabind
 {

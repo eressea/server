@@ -29,5 +29,7 @@ LinkLibraries mapper :
  races
  triggers
  util ;
- 
-LINKLIBS on mapper += -L$(LUABIND_ROOT)/lib -lm -lncurses -lxml2 ;
+
+iconv mapper ;
+libxml2 mapper ;
+LINKLIBS on mapper += -L$(LUABIND_ROOT)/lib -lm -lncurses ;

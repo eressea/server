@@ -28,11 +28,15 @@ LinkLibraries $(SERVER) :
  gamecode kernel items modules attributes spells races triggers util ;
 LinkLibraries $(LUASERVER) :
  gamecode kernel items modules attributes spells races triggers util ;
- 
-LINKLIBS on $(SERVER) += -L$(LUABIND_ROOT)/lib -lm -lxml2 ;
-LINKLIBS on $(LUASERVER) += -L$(LUABIND_ROOT)/lib -llua50 -llualib50 ;
-LINKLIBS on $(LUASERVER) += -lm -lluabind -ldl -lstdc++ -lxml2 -liconv ;
-# -Wl,-R,$(HOME)/software/$(HOST)/lib ;
+
+iconv $(SERVER) ;
+libxml2 $(SERVER) ;
+LINKLIBS on $(SERVER) += -L$(LUABIND_ROOT)/lib -lm ;
+
+luabind $(LUASERVER) ;
+iconv $(LUASERVER) ;
+libxml2 $(LUASERVER) ;
+LINKLIBS on $(LUASERVER) += -lm -ldl -lstdc++ ;
 
 if $(HAVE_LUA) {
  SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;

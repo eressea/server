@@ -35,10 +35,10 @@
 
 	<strings>
 		<string name="mailto">
-			<text>vinyambar@eressea.amber.kn-bremen.de</text>
+			<text locale="de">vinyambar@eressea.amber.kn-bremen.de</text>
 		</string>
 		<string name="mailcmd">
-			<text>WDW BEFEHLE</text>
+			<text locale="de">WDW BEFEHLE</text>
 		</string>
 	</strings>
 </eressea>

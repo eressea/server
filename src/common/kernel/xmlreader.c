@@ -783,7 +783,6 @@ parse_races(xmlDocPtr doc)
     /* reading eressea/races/race/attack */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "attack", xpath);
-    assert(rc->attack[0].data.dice==NULL || !"attacks are already initialized");
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       struct att * a = &rc->attack[k];
