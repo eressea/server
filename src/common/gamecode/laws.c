@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.7 2001/02/03 13:45:29 enno Exp $
+ *	$Id: laws.c,v 1.8 2001/02/09 15:17:30 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2828,31 +2828,13 @@ processorders (void)
 	if (turn == 0) srand(time((time_t *) NULL));
 	else srand(turn);
 	new_units();
-#if MALLOCDBG
-	assert(_CrtCheckMemory());
-#endif
 	puts(" - Monster KI...");
 	plan_monsters();
-#if MALLOCDBG
-	assert(_CrtCheckMemory());
-#endif
 	set_passw();		/* und pruefe auf illegale Befehle */
-#if MALLOCDBG
-	assert(_CrtCheckMemory());
-#endif
 	puts(" - Defaults und Instant-Befehle...");
 	setdefaults();
-#if MALLOCDBG
-	assert(_CrtCheckMemory());
-#endif
 	instant_orders();
-#if MALLOCDBG
-	assert(_CrtCheckMemory());
-#endif
 	mail();
-#if MALLOCDBG
-	assert(_CrtCheckMemory());
-#endif
 	puts(" - Altern");
 
 	for (f = factions; f; f = f->next) {
@@ -2884,9 +2866,6 @@ processorders (void)
 
 	puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (1.Versuch)");
 	do_misc(0);
-#if MALLOCDBG
-	assert(_CrtCheckMemory());
-#endif
 	puts(" - Verlassen");
 	do_leave();
 
@@ -2897,13 +2876,7 @@ processorders (void)
 	jihad_attacks();
 
 	puts(" - Attackieren");
-#if MALLOCDBG
-	assert(_CrtCheckMemory());
-#endif
 	if(nobattle == false) do_battle();
-#if MALLOCDBG
-	assert(_CrtCheckMemory());
-#endif
 	if (turn == 0) srand(time((time_t *) NULL));
 	else srand(turn);
 
@@ -2931,9 +2904,6 @@ processorders (void)
 	puts(" - Gebäudeunterhalt (1. Versuch)");
 	maintain_buildings(false);
 
-#if MALLOCDBG
-	assert(_CrtCheckMemory());
-#endif
 	puts(" - Sterben");
 	quit();
 

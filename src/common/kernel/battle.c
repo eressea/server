@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.7 2001/02/09 13:53:51 corwin Exp $
+ *	$Id: battle.c,v 1.8 2001/02/09 15:17:31 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -3499,9 +3499,11 @@ do_battle(void)
 
 		/* Auswirkungen berechnen: */
 		aftermath(b);
+		/*
 #if MALLOCDBG
 		assert(_CrtCheckMemory());
 #endif
+		*/
 		/* Hier ist das Gefecht beendet, und wir können die
 		 * Hilfsstrukturen * wieder löschen: */
 

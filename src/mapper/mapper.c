@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: mapper.c,v 1.7 2001/02/09 13:53:53 corwin Exp $
+ *	$Id: mapper.c,v 1.8 2001/02/09 15:17:31 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -715,10 +715,16 @@ movearound(int rx, int ry) {
 					}
 					break;
 				case 0x14:
-					while (Tagged)
-						removelist(&Tagged, Tagged);
-					ch=-9;
-					break;
+					{
+						tagregion *tag_next;
+						tag = Tagged;
+						while (tag) {
+							tag_next = tag->next;
+							removelist(&Tagged, tag);
+							tag = tag_next;
+						}
+						ch=-9;
+					} break;
 				case 'G':
 					rx=tx; ry=ty;
 					recalc_everything(&x, &y, &rx, &ry);

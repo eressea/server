@@ -19,7 +19,7 @@ ARFLAGS = cr
 CTAGSFLAGS = --langmap=c:.c.h --c-types=-m
 CFLAGS  = -I$(ERESSEA) -Wall -Wwrite-strings -Wstrict-prototypes \
            -Wpointer-arith -Werror-implicit-function-declaration \
-	   -Wno-char-subscripts -Wshadow \
+	   -Wno-char-subscripts \
        	   -march=pentiumpro -fPIC $(INCLUDES)
 LDFLAGS = $(LIBS)
 
@@ -78,6 +78,13 @@ ifeq ($(CONFIG), profile)
   LDFLAGS   += -g -pg
 endif
 
+ifeq ($(CONFIG), dmalloc)
+  BUILD_DIR  = Dmalloc-$(ARCHITECTURE)
+  CFLAGS    += -g -DDMALLOC
+  LDFLAGS   += -g
+  LIBS      += -ldmalloc
+endif
+
 
 #
 ## Dependencies
@@ -106,7 +113,7 @@ PUBLISH_DIR = $(ERESSEA)/$(BUILD_DIR)
 env:
 	@$(MAKEENV)
 
-debug release profile:: env $(PUBLISH_DIR) $(PUBLISH_DIR)
+debug release profile dmalloc:: env $(PUBLISH_DIR) $(PUBLISH_DIR)
 	$(MAKE) CONFIG=$@ recurse-subdirs-$@
 
 ##
@@ -115,11 +122,12 @@ debug release profile:: env $(PUBLISH_DIR) $(PUBLISH_DIR)
 recurse-subdirs-debug:: subdirs-debug publish-debug
 recurse-subdirs-release:: subdirs-release publish-release
 recurse-subdirs-profile:: subdirs-profile publish-profile
+recurse-subdirs-dmalloc:: subdirs-dmalloc publish-dmalloc
 
 recurse-clean:: clean
 recurse-depend:: depend
 
-subdirs-debug subdirs-release subdirs-profile clean depend::
+subdirs-debug subdirs-release subdirs-profile subdirs-dmalloc clean depend::
 	@mkdir -p $(PUBLISH_DIR)
 	@if [ -n "$(SUBDIRS)" ]; then \
 	for subdir in x-placeholder-dir $(SUBDIRS); do \
@@ -134,11 +142,12 @@ subdirs-debug subdirs-release subdirs-profile clean depend::
 publish-debug:: subdirs-debug
 publish-release:: subdirs-release
 publish-profile:: subdirs-profile
+publish-dmalloc:: subdirs-dmalloc
 
-publish-debug publish-release publish-profile:: $(PUBLISH_DIR)/$(LIBRARY) $(PUBLISH_DIR)/$(BINARY)
+publish-debug publish-release publish-profile publish-dmalloc:: $(PUBLISH_DIR)/$(LIBRARY) $(PUBLISH_DIR)/$(BINARY)
 
 clean:: $(BUILD_DIR) $(PUBLISH_DIR)
-	rm -fr Release-$(ARCHITECTURE)/* Debug-$(ARCHITECTURE)/* Profile-$(ARCHITECTURE)/*
+	rm -fr Release-$(ARCHITECTURE)/* Debug-$(ARCHITECTURE)/* Profile-$(ARCHITECTURE)/* Dmalloc-$(ARCHITECTURE)/*
 
 $(BUILD_DIR) $(PUBLISH_DIR):
 	@mkdir $@

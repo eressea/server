@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_tools.c,v 1.4 2001/02/09 13:53:53 corwin Exp $
+ *	$Id: map_tools.c,v 1.5 2001/02/09 15:17:31 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -94,7 +94,7 @@ BuildingName(building * b)
 int
 map_input(WINDOW * win, int x, int y, const char *text, int mn, int mx, int pre)
 {
-	char buf[10];
+	char lbuf[10];
 	int val, ch, cx, nw = 0;
 	if (!win) {
 		win = openwin(50, 3, 0);
@@ -103,13 +103,13 @@ map_input(WINDOW * win, int x, int y, const char *text, int mn, int mx, int pre)
 	} else
 		wrefresh(win);
 	do {
-		sprintf(buf, "%d", pre);
+		sprintf(lbuf, "%d", pre);
 		wmove(win, y, x);
 		curs_set(1);
 		wprintw(win, (NCURSES_CONST char*)"%s (%d..%d): %d", text, mn, mx, pre);
 		wrefresh(win);
 #ifdef HAVE_GETCURX
-		cx = getcurx(win) - strlen(buf);
+		cx = getcurx(win) - strlen(lbuf);
 #else
 		cx = (int)(x + strlen(text) + 7 + log10(abs(mn)) + log10(abs(mx)));
 		if (mx < 0)
@@ -117,7 +117,7 @@ map_input(WINDOW * win, int x, int y, const char *text, int mn, int mx, int pre)
 		if (mn < 0)
 			cx++;
 #endif
-		val = strlen(buf);
+		val = strlen(lbuf);
 		do {
 			ch = getch();
 			if (ch==8 || ch == KEY_BACKSPACE || ch == KEY_LEFT) {
@@ -134,14 +134,14 @@ map_input(WINDOW * win, int x, int y, const char *text, int mn, int mx, int pre)
 				curs_set(0);
 			} else if ((ch == '-' && val == 0) || (ch >= '0' && ch <= '9' && val < 10)) {
 				waddch(win, ch);
-				buf[val] = (char) ch;
+				lbuf[val] = (char) ch;
 				val++;
 			} else
 				beep();
 			wrefresh(win);
 		} while (!(ch == 10 || ch == 13));
-		buf[val] = 0;
-		val = atoi(buf);
+		lbuf[val] = 0;
+		val = atoi(lbuf);
 		if (val < mn || val > mx)
 			beep();
 	} while (val < mn || val > mx);
