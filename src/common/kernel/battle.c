@@ -12,28 +12,6 @@
  * prior permission by the authors of Eressea.
  */
 
-#define SHOW_KILLS
-#undef DELAYED_OFFENSE /* non-guarding factions cannot attack after moving */
-
-#define TACTICS_RANDOM 5 /* define this as 1 to deactivate */
-#define CATAPULT_INITIAL_RELOAD 4 /* erster schuss in runde 1 + rand() % INITIAL */
-#define CATAPULT_STRUCTURAL_DAMAGE
-
-#define BASE_CHANCE    70 /* 70% Basis-Überlebenschance */
-#ifdef NEW_COMBATSKILLS_RULE
-#define TDIFF_CHANGE    5 /* 5% höher pro Stufe */
-#define DAMAGE_QUOTIENT 2 /* damage += skilldiff/DAMAGE_QUOTIENT */
-#else
-#define TDIFF_CHANGE 10
-# define DAMAGE_QUOTIENT 1 /* damage += skilldiff/DAMAGE_QUOTIENT */
-#endif
-
-typedef enum combatmagic {
-  DO_PRECOMBATSPELL,
-  DO_POSTCOMBATSPELL
-} combatmagic_t;
-
-
 #include <config.h>
 #include "eressea.h"
 #include "battle.h"
@@ -87,18 +65,29 @@ typedef enum combatmagic {
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef HAVE_ZLIB
-# include <zlib.h>
-# define dbgprintf(a) gzprintf a;
-gzFile bdebug;
-#elif HAVE_BZ2LIB
-# include <bzlib.h>
-# define dbgprintf(a) bz2printf a;
-BZFILE *bdebug;
+#define dbgprintf(a) fprintf a;
+static FILE *bdebug;
+
+#define SHOW_KILLS
+#undef DELAYED_OFFENSE /* non-guarding factions cannot attack after moving */
+
+#define TACTICS_RANDOM 5 /* define this as 1 to deactivate */
+#define CATAPULT_INITIAL_RELOAD 4 /* erster schuss in runde 1 + rand() % INITIAL */
+#define CATAPULT_STRUCTURAL_DAMAGE
+
+#define BASE_CHANCE    70 /* 70% Basis-Überlebenschance */
+#ifdef NEW_COMBATSKILLS_RULE
+#define TDIFF_CHANGE    5 /* 5% höher pro Stufe */
+#define DAMAGE_QUOTIENT 2 /* damage += skilldiff/DAMAGE_QUOTIENT */
 #else
-# define dbgprintf(a) fprintf a;
-FILE *bdebug;
+#define TDIFF_CHANGE 10
+# define DAMAGE_QUOTIENT 1 /* damage += skilldiff/DAMAGE_QUOTIENT */
 #endif
+
+typedef enum combatmagic {
+  DO_PRECOMBATSPELL,
+  DO_POSTCOMBATSPELL
+} combatmagic_t;
 
 /* external variables */
 boolean nobattledebug = false;
@@ -3171,16 +3160,8 @@ make_battle(region * r)
 		char zFilename[MAX_PATH];
 		sprintf(zText, "%s/battles", basepath());
 		makedir(zText, 0700);
-#ifdef HAVE_ZLIB
-		sprintf(zFilename, "%s/battle-%d-%s.log.gz", zText, obs_count, simplename(r));
-		bdebug = gzopen(zFilename, "w");
-#elif HAVE_BZ2LIB
-		sprintf(zFilename, "%s/battle-%d-%s.log.bz2", zText, obs_count, simplename(r));
-		bdebug = BZ2_bzopen(zFilename, "w");+
-#else
 		sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
 		bdebug = fopen(zFilename, "w");
-#endif
 		if (!bdebug) log_error(("battles können nicht debugged werden\n"));
 		else {
 			dbgprintf((bdebug, "In %s findet ein Kampf statt:\n", rname(r, NULL)));
@@ -3240,13 +3221,7 @@ free_battle(battle * b)
 	int max_fac_no = 0;
 
 	if (bdebug) {
-#ifdef HAVE_ZLIB
-		gzclose(bdebug);
-#elif HAVE_BZ2LIB
-		BZ2_bzclose(bdebug);
-#else
 		fclose(bdebug);
-#endif
 	}
 
 	for (bf=b->factions;bf;bf=bf->next) {
