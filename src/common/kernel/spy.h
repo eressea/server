@@ -33,7 +33,7 @@ extern int setwere_cmd(struct unit * u, struct order * ord);
 extern int setstealth_cmd(struct unit * u, struct order * ord);
 extern int spy_cmd(struct unit * u, struct order * ord);
 extern int sabotage_cmd(struct unit * u, struct order * ord);
-void spy_message(int spy, struct unit *u, struct unit *target);
+extern void spy_message(int spy, struct unit *u, struct unit *target);
 
 #define OCEAN_SWIMMER_CHANCE 0.1
 #define CANAL_SWIMMER_CHANCE 0.9

@@ -225,14 +225,34 @@ setstealth_cmd(unit * u, struct order * ord)
         a_removeall(&u->attribs, &at_otherfaction);
       } else {
         struct faction * f = findfaction(nr);
-        /* TODO: Prüfung ob Partei sichtbar */
         if(f==NULL) {
           cmistake(u, ord, 66, MSG_EVENT);
         } else {
-          attrib *a;
-          a = a_find(u->attribs, &at_otherfaction);
-          if (!a) a = a_add(&u->attribs, make_otherfaction(f));
-          else a->data.v = f;
+          region * lastr = NULL;
+          /* for all units mu of our faction, check all the units in the region
+           * they are in, if their visible faction is f, it's ok. use lastr to
+           * avoid testing the same region twice in a row. */
+          unit * mu = u->faction->units;
+          while (mu!=NULL) {
+            unit * ru = mu->region->units;
+            if (mu->region==lastr) continue;
+            while (ru!=NULL) {
+              attrib *a = a_find(ru->attribs, &at_otherfaction);
+              if (a) {
+                faction *fv = get_otherfaction(a);
+                if (fv==f) break;
+              }
+              ru = ru->next;
+            }
+            if (ru!=NULL) break;
+            lastr = mu->region;
+            mu = mu->nextF;
+          }
+          if (mu!=NULL) {
+            attrib * a = a_find(u->attribs, &at_otherfaction);
+            if (!a) a = a_add(&u->attribs, make_otherfaction(f));
+            else a->data.v = f;
+          }
         }
       }
     } else {

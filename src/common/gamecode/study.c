@@ -489,7 +489,7 @@ learn(void)
           continue;
         }
       }
-			if (get_keyword(u->thisorder) == K_STUDY) {
+      if (get_keyword(u->thisorder) == K_STUDY) {
         double multi = 1.0;
         attrib * a = NULL;
         teaching_info * teach = NULL;
@@ -502,7 +502,7 @@ learn(void)
           continue;
         }
         if (attacked(u)) {
-				cmistake(u, u->thisorder, 52, MSG_PRODUCE);
+          cmistake(u, u->thisorder, 52, MSG_PRODUCE);
           continue;
         }
         if ((u->race->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
@@ -516,7 +516,7 @@ learn(void)
         sk = getskill(u->faction->locale);
 
         if (sk < 0) {
-				cmistake(u, u->thisorder, 77, MSG_EVENT);
+          cmistake(u, u->thisorder, 77, MSG_EVENT);
           continue;
         }
         if (SkillCap(sk) && SkillCap(sk) <= effskill(u, sk)) {

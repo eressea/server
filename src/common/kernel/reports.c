@@ -852,7 +852,7 @@ ucansee(const struct faction *f, const struct unit *u, const struct unit *x)
 faction *
 visible_faction(const faction *f, const unit * u)
 {
-	if(!alliedunit(u, f, HELP_FSTEALTH)) {
+	if (!alliedunit(u, f, HELP_FSTEALTH)) {
 		attrib *a = a_find(u->attribs, &at_otherfaction);
 		if (a) {
 			faction *fv = get_otherfaction(a);
