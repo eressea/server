@@ -205,6 +205,18 @@ unit_getregion(const unit& u)
   return u.region;
 }
 
+static const char *
+unit_getname(const unit& u)
+{
+  return u.name;
+}
+
+static void
+unit_setname(unit& u, const char * name)
+{
+  set_string(&u.name, name);
+}
+
 void
 bind_unit(lua_State * L) 
 {
@@ -213,7 +225,7 @@ bind_unit(lua_State * L)
     def("add_unit", &add_unit),
 
     class_<struct unit>("unit")
-    .def_readwrite("name", &unit::name)
+    .property("name", &unit_getname, &unit_setname)
     .def_readonly("faction", &unit::faction)
     .def_readonly("id", &unit::no)
     .def_readwrite("hp", &unit::hp)
