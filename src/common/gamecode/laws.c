@@ -437,15 +437,17 @@ calculate_emigration(region *r)
 {
 	direction_t i;
 	int overpopulation = rpeasants(r) - maxworkingpeasants(r);
-	int weight[MAXDIRECTIONS];
-	int weightall = 0;
+	int weight[MAXDIRECTIONS], weightall;
 
+	if(overpopulation <= 0) return;
+
+	weightall = 0;
 
 	for (i = 0; i != MAXDIRECTIONS; i++) {
 		region *rc = rconnect(r,i);
 		int w;
 
-		if (rc ==NULL || rterrain(rc) == T_OCEAN) {
+		if (rc == NULL || rterrain(rc) == T_OCEAN) {
 			w = 0;
 		} else {
 			w = rpeasants(rc) - maxworkingpeasants(rc);
@@ -457,13 +459,15 @@ calculate_emigration(region *r)
 		weightall += w;
 	}
 	
-	if (weightall!=0) for (i = 0; i != MAXDIRECTIONS; i++) {
-		region *rc = rconnect(r,i);
-		int wandering_peasants = (overpopulation * weight[i])/weightall;
-		if (wandering_peasants==0 || rc==NULL) continue;
-
-		r->land->newpeasants -= wandering_peasants;
-		rc->land->newpeasants += wandering_peasants;
+	if (weightall !=0 ) for (i = 0; i != MAXDIRECTIONS; i++) {
+		region *rc;
+		if((rc = rconnect(r,i)) != NULL) {
+			int wandering_peasants = (overpopulation * weight[i])/weightall;
+			if (wandering_peasants > 0) {
+				r->land->newpeasants -= wandering_peasants;
+				rc->land->newpeasants += wandering_peasants;
+			}
+		}
 	}
 }
 
