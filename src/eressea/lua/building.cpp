@@ -11,6 +11,7 @@
 // lua includes
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
+#include <luabind/operator.hpp>
 #include <luabind/iterator_policy.hpp>
 
 // util includes
@@ -139,8 +140,8 @@ bind_building(lua_State * L)
     def("add_building", &add_building),
 
     class_<struct building>("building")
-    .def(tostring(self))
     .def(self == building())
+    .def(tostring(self))
     .property("name", &building_getname, &building_setname)
     .property("info", &building_getinfo, &building_setinfo)
     .property("units", &building_units, return_stl_iterator)

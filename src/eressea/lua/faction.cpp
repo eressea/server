@@ -18,6 +18,7 @@
 // lua includes
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
+#include <luabind/operator.hpp>
 #include <luabind/iterator_policy.hpp>
 
 #include <ostream>

@@ -29,7 +29,11 @@ CCFLAGS += -Wwrite-strings
 		   -Wno-char-subscripts
 		   ;
 
-XMLHDRS = /usr/include/libxml2 ;
+if $(HOST) = "hamunaptra" {
+  XMLHDRS = /homes2/info-f/enno/software/hamunaptra/include/libxml2 ;
+} else {
+  XMLHDRS = /usr/include/libxml2 ;
+}
 
 rule iconv
 {
@@ -40,7 +44,12 @@ rule iconv
 
 rule luabind
 {
-  LINKLIBS on $(<) += -L$(LUABIND_ROOT)/lib -llua50 -llualib50 ;
+  LINKLIBS on $(<) += -L$(LUABIND_ROOT)/lib ;
+  if $(HOST) = "hamunaptra" {
+    LINKLIBS on $(<) += -llua -llualib ;
+  } else { 
+    LINKLIBS on $(<) += -llua50 -llualib50 ;
+  }
   LINKLIBS on $(<) += -lm -lluabind ;
 }
 
