@@ -514,7 +514,6 @@ set_curse(unit *mage, attrib **ap, curse_t id, int id2, int vigour,
 	c = (curse*)a->data.v;
 
 	c->type = find_cursetype(id);
-	c->cspellid = id;
 	c->flag = (0);
 	c->vigour = vigour;
 	c->duration = duration;
@@ -621,7 +620,7 @@ create_curse(unit *magician, attrib **ap, curse_t id, int id2, int vigour,
 void
 do_transfer_curse(curse *c, unit * u, unit * u2, int n)
 {
-	curse_t id = c->cspellid;
+	curse_t id = c->type->cspellid;
 	int id2 = 0;
 	int flag = c->flag;
 	int duration = c->duration;

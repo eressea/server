@@ -1225,7 +1225,7 @@ magic_resistance(unit *target)
 		curse *c = (curse*)a->data.v;
 		unit *mage = c->magician;
 
-		if (c->cspellid == C_SONG_GOODMR) {
+		if (c->type->cspellid == C_SONG_GOODMR) {
 			if (mage != NULL) {
 				if (allied(mage, target->faction, HELP_GUARD)) {
 					chance += c->effect;
@@ -1243,7 +1243,7 @@ magic_resistance(unit *target)
 		curse *c = (curse*)a->data.v;
 		unit *mage = c->magician;
 
-		if (c->cspellid == C_SONG_BADMR) {
+		if (c->type->cspellid == C_SONG_BADMR) {
 			if (mage != NULL) {
 				if (allied(mage, target->faction, HELP_GUARD)) {
 					a = a->nexttype;

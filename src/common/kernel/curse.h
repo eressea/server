@@ -189,7 +189,6 @@ enum {
 typedef struct curse {
 	struct curse *nexthash;
 	int no;            /* 'Einheitennummer' dieses Curse */
-	curse_t cspellid;  /* Id des Cursezaubers */
 	struct curse_type * type; /* Zeiger auf ein curse_type-struct */
 	int flag;          /* generelle Flags wie zb CURSE_ISNEW oder CURSE_NOAGE */
 	int duration;      /* Dauer der Verzauberung. Wird jede Runde vermindert */

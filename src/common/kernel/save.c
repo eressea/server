@@ -1406,9 +1406,9 @@ curse_read(attrib * a, FILE * f) {
 	}
 
 	ct = find_cursetype((curse_t)cspellid);
+	assert(ct!=NULL);
 
 	c->type = ct;
-	c->cspellid = (curse_t)cspellid;
 
 	/* beim Einlesen sind noch nicht alle units da, muss also
 	 * zwischengespeichert werden. */
