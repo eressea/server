@@ -1084,6 +1084,10 @@ movearound(int rx, int ry) {
 					seed_dropouts();
 					modified = 1;
 					break;
+				case 'm':
+					mkisland(20);
+					modified = 1;
+					break;
 				case 'S':
 					if (modified)
 						if (yes_no(0, "Daten abspeichern?", 'j')) {
@@ -1477,6 +1481,7 @@ main(int argc, char *argv[])
 	boolean backup = true;
 	boolean logging = false;
 	boolean readlog = false;
+	boolean autoseeding = false;
 
 	setlocale(LC_ALL, "");
 
@@ -1531,6 +1536,9 @@ main(int argc, char *argv[])
 				break;
 			case 'r':
 				g_resourcedir = argv[++i];
+				break;
+			case 'a':
+				autoseeding = true;
 				break;
 			case 'o':
 				strcpy(datafile, argv[++i]);
@@ -1605,33 +1613,43 @@ main(int argc, char *argv[])
 	if (readlog) {
 		log_read("mapper.log");
 	}
-	if (logging) {
-		log_start("mapper.log");
-		log_newstuff();
-	}
 #ifdef OLD_ITEMS
 	make_xref();
 #endif
 	setminmax();
 	srand(time((time_t *) NULL));
 
-#ifndef WIN32
-	signal_init();
-#endif
-	init_win(x, y);
-
-	hl=-1;
-	Tagged=NULL;
-	movearound(x, y);
-
-	if (logging) log_stop();
-	if (modified) {
-		beep();
- 		if (yes_no(0, "Daten wurden modifiziert! Abspeichern?", 'j')) {
-			remove_empty_units();
-			writegame(datafile, 1);
+	if (autoseeding) {
+		while (newfactions) {
+			int n = listlen(newfactions);
+			int k = (n+19)/20;
+			k = n / k;
+			mkisland(k);
 		}
+		remove_empty_units();
+		writegame(datafile, 1);
+	} else {
+		if (logging) {
+			log_start("mapper.log");
+			log_newstuff();
+		}
+#ifndef WIN32
+		signal_init();
+#endif
+		init_win(x, y);
+
+		hl=-1;
+		Tagged=NULL;
+		movearound(x, y);
+		if (logging) log_stop();
+		if (modified) {
+			beep();
+ 			if (yes_no(0, "Daten wurden modifiziert! Abspeichern?", 'j')) {
+				remove_empty_units();
+				writegame(datafile, 1);
+			}
+		}
+		Exit(0);
 	}
-	Exit(0);
 	return 0;
 }

@@ -22,6 +22,7 @@
 /* libc includes */
 #include <limits.h>
 #include <memory.h>
+#include <string.h>
 #include <stdlib.h>
 
 newfaction * newfactions = NULL;
@@ -260,3 +261,70 @@ autoseed(struct regionlist * rlist)
 		}
 	}
 }
+
+static terrain_t
+preferred_terrain(const struct race * rc)
+{
+	return T_PLAIN;
+}
+
+#define REGIONS_PER_FACTION 2
+
+void
+mkisland(int nsize)
+{
+	int x, y;
+	region * r;
+	regionlist * rlist = NULL;
+	int rsize;
+	do {
+		x = (rand() % 2001) - 1000;
+		y = (rand() % 2001) - 1000;
+		r = findregion(x, y);
+	} while (r!=NULL);
+
+	r = new_region(x, y);
+	terraform(r, T_OCEAN);
+	add_regionlist(&rlist, r);
+	rsize = 1;
+	while (rlist && nsize && newfactions) {
+		int i = rand() % rsize;
+		regionlist ** rnext = &rlist;
+		direction_t d;
+		while (i--) rnext=&(*rnext)->next;
+		r = (*rnext)->region;
+		*rnext = (*rnext)->next;
+		--rsize;
+		assert(r->terrain==T_OCEAN);
+		if (rand() % REGIONS_PER_FACTION == 0) {
+			newfaction ** nfp, * nextf = newfactions;
+			terraform(r, preferred_terrain(nextf->race));
+			addplayer(r, nextf->email, nextf->race, nextf->lang);
+
+			/* remove duplicate email addresses */
+			nfp=&newfactions;
+			while (*nfp) {
+				newfaction * nf = *nfp;
+				if (strcmp(nextf->email, nf->email)==0) {
+					*nfp = nf->next;
+					if (nextf!=nf) free(nf);
+				}
+				else nfp = &nf->next;
+			}
+			--nsize;
+		}
+		else {
+			terraform(r, (terrain_t)((rand() % T_GLACIER)+1));
+		}
+		for (d=0;d!=MAXDIRECTIONS;++d) {
+			region * rn = rconnect(r, d);
+			if (rn==NULL) {
+				rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
+				terraform(rn, T_OCEAN);
+				add_regionlist(&rlist, rn);
+				++rsize;
+			}
+		}
+	}
+}
+
