@@ -9617,12 +9617,7 @@ spell spelldaten[] =
 
 /* M_ASTRAL */
 
-	{SPL_ANALYSEMAGIC, "Magie analysieren",
-		"Mit diesem Spruch kann der Magier versuchen, die Verzauberungen "
-		"eines einzelnen angegebenen Objekts zu erkennen. Von allen Sprüchen, "
-		"die seine eigenen Fähigkeiten nicht überschreiten, wird er einen "
-		"Eindruck ihres Wirkens erhalten können. Bei stärkeren Sprüchen "
-		"benötigt er ein wenig Glück für eine gelungene Analyse.",
+	{SPL_ANALYSEMAGIC, "analyze_magic", NULL,
 		"ZAUBERE [STUFE n] \"Magie analysieren\" REGION\n"
 		"ZAUBERE [STUFE n] \"Magie analysieren\" EINHEIT <Einheit-Nr>\n"
 		"ZAUBERE [STUFE n] \"Magie analysieren\" BURG <Burg-Nr>\n"
@@ -9639,10 +9634,7 @@ spell spelldaten[] =
 		(spell_f)sp_analysemagic, patzer
 	},
 
-	{SPL_ITEMCLOAK, "Schleieraura",
-		"Dieser Zauber wird die gesamte Ausrüstung der Zieleinheit für "
-		"einige Zeit vor den Blicken anderer verschleiern. Der Zauber "
-		"schützt nicht vor Dieben und Spionen.",
+	{SPL_ITEMCLOAK, "concealing_aura", NULL,
 		NULL,
 		"u",
 		M_ASTRAL, (SPELLLEVEL | UNITSPELL | ONSHIPCAST | ONETARGET), 5, 1,
@@ -9655,14 +9647,7 @@ spell spelldaten[] =
 		(spell_f)sp_itemcloak, patzer
 	},
 
-	{SPL_TYBIED_EARN_SILVER, "Wunderdoktor",
-	"Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem "
-	"gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen alles, "
-	"was man sonst nicht bekommen kann. Ob nun die kryptische Formel unter dem "
-	"Holzschuh des untreuen Ehemannes wirklich geholfen hat - nun, der des "
-	"Lesens nicht mächtige Bauer wird es nie wissen.  Dem Magier hilft es "
-	"auf jeden Fall... beim Füllen seines Geldbeutels.  50 Silber pro Stufe "
-	"lassen sich so in einer Woche verdienen.",
+	{SPL_TYBIED_EARN_SILVER, "miracle_doctor", NULL,
 		NULL,
 		NULL,
 		M_ASTRAL, (SPELLLEVEL|ONSHIPCAST), 5, 1,

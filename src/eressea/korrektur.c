@@ -2636,6 +2636,7 @@ fix_astralplane(void)
     region_list * rnew = rlist;
     region * r = rnew->data;
     direction_t dir;
+    rlist = rlist->next;
     for (dir=0;dir!=MAXDIRECTIONS;++dir) {
       region * rnext = rconnect(r, dir);
       if (rnext==NULL) continue;
@@ -2659,7 +2660,6 @@ fix_astralplane(void)
       }
     }
     free(rnew);
-    rlist= rlist->next;
   }
 	return 0;
 }
