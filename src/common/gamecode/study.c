@@ -26,30 +26,30 @@
 #include "eressea.h"
 
 #include "alchemy.h"
-#include "item.h"
-#include "faction.h"
-#include "magic.h"
 #include "building.h"
-#include "race.h"
-#include "pool.h"
-#include "region.h"
-#include "unit.h"
-#include "skill.h"
-#include "message.h"
-#include "plane.h"
+#include "faction.h"
+#include "item.h"
 #include "karma.h"
-#include "rand.h"
+#include "magic.h"
+#include "message.h"
 #include "movement.h"
+#include "plane.h"
+#include "pool.h"
+#include "race.h"
+#include "rand.h"
+#include "region.h"
+#include "skill.h"
+#include "unit.h"
 
 /* util includes */
 #include <base36.h>
 
 /* libc includes */
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <limits.h>
 #include <assert.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #define TEACHNUMBER 10
@@ -132,9 +132,10 @@ study_cost(unit *u, int talent)
 
 /* ------------------------------------------------------------- */
 
+#define MAXTEACHERS 4
 typedef struct teaching_info {
-	unit * teachers[4];
-	int value;
+  unit * teachers[MAXTEACHERS];
+  int value;
 } teaching_info;
 
 static void 
@@ -193,10 +194,10 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
       a = a_add(&student->attribs, a_new(&at_learning));
       teach = (teaching_info*)a->data.v;
     } else {
-      while (teach->teachers[index]) ++index;
+      while (teach->teachers[index] && index!=MAXTEACHERS) ++index;
     }
-    teach->teachers[index] = teacher;
-    teach->teachers[index+1] = NULL;
+    if (index<MAXTEACHERS) teach->teachers[index++] = teacher;
+    if (index<MAXTEACHERS) teach->teachers[index] = NULL;
     teach->value += n;
 
     /* Solange Akademien größenbeschränkt sind, sollte Lehrer und
@@ -705,7 +706,7 @@ learn(void)
           if (a!=NULL) {
             if (teach!=NULL) {
               int index = 0;
-              while (teach->teachers[index]) {
+              while (teach->teachers[index] && index!=MAXTEACHERS) {
                 unit * teacher = teach->teachers[index++];
                 if (teacher->faction != u->faction) {
                   add_message(&u->faction->msgs, msg_message("teach_student",
