@@ -2449,6 +2449,15 @@
     <text locale="fr">"$unit($unit) drowns when $ship($ship) in $region($region) sinks."</text>
     <text locale="en">"$unit($unit) drowns when $ship($ship) in $region($region) sinks."</text>
   </message>
+  <message name="error317" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Dieses Objekt ist unzerstörbar."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This object is indestructible."</text>
+  </message>
   <message name="error316" section="events">
     <type>
       <arg name="unit" type="unit"/>

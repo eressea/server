@@ -25,7 +25,7 @@ LinkLibraries mapper :
  items
  gamecode 
  kernel
- modules
+ modules 
  attributes
  spells
  races
