@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.25 2001/02/18 09:32:13 corwin Exp $
+ *	$Id: laws.c,v 1.26 2001/02/18 09:35:14 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1864,7 +1864,6 @@ instant_orders(void)
 
 	for (r = regions; r; r = r->next)
 		for (u = r->units; u; u = u->next) {
-			printf("Unit: %s\n", itoa36(u->no));
 #ifdef GROUPS
 			for (S = u->orders; S; S = S->next)
 			{
