@@ -30,6 +30,7 @@
 #include "racename.h"
 #include "raceprefix.h"
 #include "synonym.h"
+#include "at_movement.h"
 #ifdef USE_UGROUPS
 #  include "ugroup.h"
 #endif
@@ -62,6 +63,7 @@ init_attributes(void)
 	init_otherfaction();
 	init_racename();
 	init_synonym();
+	init_movement();
 
 	init_moved();
 #ifdef AT_OPTION

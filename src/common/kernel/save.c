@@ -727,11 +727,11 @@ void
 read_alliances(FILE * F)
 {
 	char pbuf[32];
-	rns(F, pbuf, sizeof(pbuf));
+	rs(F, pbuf);
 	while (strcmp(pbuf, "end")!=0) {
 		rs(F, buf);
 		makealliance(atoi36(pbuf), buf);
-		rns(F, pbuf, sizeof(pbuf));
+		rs(F, pbuf);
 	}
 }
 #endif
@@ -818,7 +818,7 @@ readgame(boolean backup)
 
 	/* Read factions */
 #ifdef ALLIANCES
-	if (global.data_version>ALLIANCES_VERSION) {
+	if (global.data_version>=ALLIANCES_VERSION) {
 		read_alliances(F);
 	}
 #endif

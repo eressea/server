@@ -34,6 +34,8 @@
 #include <unit.h>
 #include <base36.h>
 
+#include <attributes/at_movement.h>
+
 /* libc includes */
 #include <ctype.h>
 #include <stdlib.h>
@@ -51,7 +53,7 @@ SpecialFunctionUnit(unit *u)
 
 	win = openwin(60, 5, "< Specials Units >");
 	wmove(win, 1, 2);
-	wAddstr("B - give balloon");
+	wAddstr("B - give balloon, M - set noMovement");
 	wmove(win, 2, 2);
 	wrefresh(win);
 	switch(getch()) {
@@ -69,6 +71,10 @@ SpecialFunctionUnit(unit *u)
 			u->ship = sh;
 			fset(u, FL_OWNER);
 		}
+		break;
+	case 'm':
+	case 'M':
+		set_movement(&u->attribs, MV_CANNOTMOVE);
 		break;
 	}
 	delwin(win);
@@ -869,6 +875,10 @@ mapper_spunit(dbllist ** SP, unit * u, int indent)
 		default:
 			sncat(buf, ", unbekannt", BUFSIZE);
 			break;
+	}
+
+	if(get_movement(&u->attribs, MV_CANNOTMOVE)) {
+		sncat(buf, ", cannot move", BUFSIZE);
 	}
 
 	sncat(buf, " (", BUFSIZE); icat(u->hp/u->number); sncat(buf, " HP)", BUFSIZE);
