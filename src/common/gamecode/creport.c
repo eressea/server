@@ -552,7 +552,8 @@ cr_output_unit(FILE * F, const region * r,
 				const group * g = (const group*)a->data.v;
 				ap = a_find(g->attribs, &at_raceprefix);
 				fprintf(F, "%d;gruppe\n", g->gid);
-			} else {
+			}
+			if (ap==NULL) {
 				ap = a_find(u->faction->attribs, &at_raceprefix);
 			}
 			if (ap) {
@@ -579,6 +580,9 @@ cr_output_unit(FILE * F, const region * r,
 			}
 			if (a) {
 				const attrib *agrp = a_find(((const group*)a->data.v)->attribs, &at_raceprefix);
+				if (agrp==NULL) {
+					agrp = a_find(u->faction->attribs, &at_raceprefix);
+				}
 				if (agrp) {
 					const char * name = (const char*)agrp->data.v;
 					fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
@@ -902,7 +906,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 		fprintf(F, "\"%s\";Typ\n", add_translation(zRace, LOC(f->locale, zRace)));
 	}
 	a = a_find(f->attribs, &at_raceprefix);
-	if(a) {
+	if (a) {
 		const char * name = (const char*)a->data.v;
 		fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
 	}

@@ -383,8 +383,11 @@ drawmap(boolean maponly) {
 				case -8:
 					addstr("Godcurse ");
 					break;
+				case -9:
+					addstr("Anfänger ");
+					break;
 				default:
-					printw((NCURSES_CONST char*)"Partei %d ",hl);
+					printw((NCURSES_CONST char*)"Partei %d ", hl);
 			}
 		}
 		switch(politkarte) {
@@ -435,6 +438,7 @@ drawmap(boolean maponly) {
 					 (hl == -6 && fval(r, RF_MALLORN)) ||
 					 (hl == -7 && fval(r, RF_CHAOTIC)) ||
 					 (hl == -8 && is_cursed_internal(r->attribs, C_CURSED_BY_THE_GODS, 0)) ||
+					 (hl == -9 && r->units && r->units->faction->age==0) ||
 					 (hl >= 0 && factionhere(r, hl)) ||
 					 (x==tx && y1==ty))
 					addch(rs | A_REVERSE);
@@ -648,7 +652,7 @@ SetHighlight(void)
 	wmove(win, 1, 2);
 	wAddstr("Regionen mit P)artei, E)inheiten, B)urgen, S)chiffen,");
 	wmove(win, 2, 2);
-	wAddstr("             L)aen, C)haos, G)odcurse oder N)icht Highlighten?");
+	wAddstr("             A)nfängern, L)aen, C)haos, G)odcurse oder N)ichts?");
 	wrefresh(win);
 	c = tolower(getch());
 	switch (c) {
@@ -676,6 +680,9 @@ SetHighlight(void)
 		break;
 	case 'g':
 		hl = -8;
+		break;
+	case 'a':
+		hl = -9;
 		break;
 	case 'n':
 	default:
@@ -1021,6 +1028,9 @@ movearound(int rx, int ry) {
 				case 0x2:
 					make_ocean_block(rx, ry);
 					ch = -9;
+					break;
+				case 's':
+					seed_dropouts();
 					break;
 				case 'S':
 					if (modified)
@@ -1517,6 +1527,8 @@ main(int argc, char *argv[])
 
 	sprintf(buf, "%s/newfactions.%d", basepath(), turn);
 	read_newfactions(buf);
+	sprintf(buf, "%s/dropouts.%d", basepath(), turn);
+	read_dropouts(buf);
 
 	if (findfaction(MONSTER_FACTION)==NULL) {
 		makemonsters();

@@ -2350,9 +2350,9 @@ remove_empty_factions(void)
 	faction **fp, *f3;
 	FILE *dofp;
 	char zText[MAX_PATH];
-	sprintf(zText, "%s/dropouts", basepath());
+	sprintf(zText, "%s/dropouts.%d", basepath(), turn);
 
-	dofp = fopen(zText, "a");
+	dofp = fopen(zText, "w");
 
 	for (fp = &factions; *fp;) {
 		faction * f = *fp;
@@ -2361,11 +2361,13 @@ remove_empty_factions(void)
 		 * haben. */
 
 		if (f->alive == 0 && f->no != MONSTER_FACTION) {
+			ursprung * ur = f->ursprung;
+			while (ur && ur->id!=0) ur=ur->next;
 			if (!quiet) printf("\t%s\n", factionname(f));
 
 			/* Einfach in eine Datei schreiben und später vermailen */
 
-			fprintf(dofp, "%s\n", f->email);
+			fprintf(dofp, "%s %s %d %d %d\n", f->email, rc_name(f->race, 0), f->age, ur?ur->x:0, ur?ur->y:0);
 			if (updatelog) fprintf(updatelog, "dropout %s\n", itoa36(f->no));
 
 			for (f3 = factions; f3; f3 = f3->next) {

@@ -150,7 +150,64 @@ give_latestart_bonus(region *r, unit *u, int b)
 	}
 }
 
+typedef struct dropout {
+	struct dropout * next;
+	const struct race * race;
+	int x, y;
+} dropout;
+
+static dropout * dropouts;
 static newfaction * newfactions;
+
+void
+read_dropouts(const char * filename)
+{
+	FILE * F = fopen(filename, "r");
+	if (F==NULL) return;
+	for (;;) {
+		char email[64], race[20];
+		int age, x, y;
+		dropout * drop;
+		if (fscanf(F, "%s %s %d %d %d", email, race, &age, &x, &y)<=0) break;
+		if (age<=1) {
+			drop = calloc(sizeof(dropout), 1);
+			drop->race = rc_find(race);
+			drop->x = x;
+			drop->y = y;
+			drop->next = dropouts;
+			dropouts = drop;
+		}
+	}
+}
+
+void
+seed_dropouts(void)
+{
+	dropout ** dropp = &dropouts;
+	while (*dropp) {
+		dropout *drop = *dropp;
+		region * r = findregion(drop->x, drop->y);
+		if (r && r->units==NULL) {
+			boolean found = false;
+			newfaction **nfp = &newfactions;
+			while (*nfp) {
+				newfaction * nf = *nfp;
+				if (nf->race==drop->race) {
+					unit * u = addplayer(r, nf->email, nf->race, nf->lang);
+					if (nf->bonus) give_latestart_bonus(r, u, nf->bonus);
+					*nfp = nf->next;
+					*dropp = drop->next;
+					found=true;
+					break;
+				}
+				nfp = &nf->next;
+			}
+			if (found) dropp=&drop->next;
+		} else {
+			*dropp = drop->next;
+		}
+	}
+}
 
 void
 read_newfactions(const char * filename)
@@ -235,6 +292,7 @@ NeuePartei(region * r)
 		strcpy(email, nf->email);
 	} else {
 		int locale_nr;
+		faction * f;
 		WINDOW *win = openwin(SX - 10, 12, "< Neue Partei einfügen >");
 
 		strcpy(buf, my_input(win, 2, 1, "EMail-Adresse (Leer->Ende): ", NULL));
@@ -244,6 +302,13 @@ NeuePartei(region * r)
 		}
 
 		strcpy(email, buf);
+		for (f=factions;f;f=f->next) {
+			if (strcmp(email, f->email)==0 && f->age==0) {
+				warnung(0, "Neue Partei mit dieser Adresse existiert bereits.");
+				delwin(win);
+				return;
+			}
+		}
 
 		y = 3;
 		q = 0;

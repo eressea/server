@@ -1060,9 +1060,6 @@ void changeblockchaos(void);
 struct region *firstregion(struct faction * f);
 struct region *lastregion(struct faction * f);
 
-#define f_koor_x(x)	x-f->ursprung[0]
-#define f_koor_y(y)	y-f->ursprung[1]
-
 void inituhash(void);
 void uhash(struct unit * u);
 void uunhash(struct unit * u);
