@@ -222,9 +222,6 @@
 				RelativePath=".\resolve.h">
 			</File>
 			<File
-				RelativePath=".\script.h">
-			</File>
-			<File
 				RelativePath=".\sql.h">
 			</File>
 			<File
@@ -268,6 +265,12 @@
 			RelativePath=".\event.c">
 		</File>
 		<File
+			RelativePath=".\functions.c">
+		</File>
+		<File
+			RelativePath=".\functions.h">
+		</File>
+		<File
 			RelativePath=".\goodies.c">
 		</File>
 		<File
@@ -293,9 +296,6 @@
 		</File>
 		<File
 			RelativePath=".\resolve.c">
-		</File>
-		<File
-			RelativePath=".\script.c">
 		</File>
 		<File
 			RelativePath=".\sql.c">

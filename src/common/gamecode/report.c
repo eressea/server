@@ -2400,7 +2400,7 @@ openbatch(void)
 		if (f->email) {
 			sprintf(buf, "%s/mailit", reportpath());
 			if ((BAT = fopen(buf, "w")) == NULL)
-				puts("* Fehler: mailit konnte nicht geöffnet werden!");
+				log_error(("mailit konnte nicht geöffnet werden!\n"));
 			else
 				fprintf(BAT,
 						"#!/bin/sh\n"
@@ -3666,7 +3666,7 @@ report_summary(summary * s, summary * o, boolean full)
 
 	fprintf(F, "\n\n");
 
-	for (i = 0; i != NMRTimeout()+1; ++i) {
+	for (i = 0; i <= NMRTimeout(); ++i) {
 		nmrs[i] = 0;
 	}
 
@@ -3674,12 +3674,18 @@ report_summary(summary * s, summary * o, boolean full)
 		if (f->age <= 1 && turn - f->lastorders == 1) {
 			newplayers++;
 		} else if (f->no != MONSTER_FACTION) {
-			nmrs[min(NMRTimeout(),turn-f->lastorders)]++;
+      int nmr = turn-f->lastorders;
+      if (nmr<0 || nmr>NMRTimeout()) {
+        log_error(("faction %s has %d NMRS\n", factionid(f), nmr));
+        nmr = max(0, nmr);
+        nmr = min(nmr, NMRTimeout());
+      }
+			nmrs[nmr]++;
 		}
 	}
 
-	for (i = 0; i != NMRTimeout()+1; ++i) {
-		if(i == NMRTimeout()) {
+	for (i = 0; i <= NMRTimeout(); ++i) {
+		if (i == NMRTimeout()) {
 			fprintf(F, "+ NMRs:\t\t %d\n", nmrs[i]);
 		} else {
 			fprintf(F, "%d %s:\t\t %d\n", i,
@@ -3723,10 +3729,6 @@ report_summary(summary * s, summary * o, boolean full)
 	fclose(F);
 
 	if (full) {
-#ifdef PLAYER_CSV
-		FILE *F;
-		region * r;
-#endif
 		printf("Schreibe Liste der Adressen (adressen)...\n");
 		writeadresses();
 		writenewssubscriptions();
@@ -3735,28 +3737,6 @@ report_summary(summary * s, summary * o, boolean full)
 		printf("writing date & turn\n");
 		writeturn();
 
-#ifdef PLAYER_CSV
-		{
-			strcpy(zText, "%s/players", basepath());
-			F = cfopen(zText, "w");
-		}
-		if (!F) return;
-		printf("Schreibe Spielerliste (players)...\n");
-		r = findregion(0, 0);
-		fputs("id;name;email;info;age;x;y;nmr;score;race;magic;units;people;money", F);
-		if (r) {
-			fputs("id;name;email;info;age;x;y;nmr;score;race;magic;units;people;money", F);
-			for (f=factions;f;f=f->next) {
-				fprintf(F, "%s;\"%s\";\"%s\";\"%s\";\"%s\";%d;%d;%d;%d;%d;"
-					"\"%s\";\"%s\";"
-					"%d;%d;%d\n",
-					factionid(f), f->name, f->email, f->banner, f->passw, f->age, region_x(r, f), region_y(r, f), turn-f->lastorders, f->score,
-					f->race->name[0], neue_gebiete[f->magiegebiet],
-					f->no_units, f->number, f->money);
-			}
-		}
-		fclose(F);
-#endif
 		writemonument();
 	}
 	free(nmrs);

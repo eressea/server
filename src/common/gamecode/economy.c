@@ -120,65 +120,18 @@ income(const unit * u)
 	return 20 * u->number;
 }
 
-/* ------------------------------------------------------------- */
-
-/* ------------------------------------------------------------- */
-
-static struct scramble {
-	int index;
-	int rnd;
-} * vec;
-
-static int
-scramblecmp(const void *p1, const void *p2)
-{
-	return ((struct scramble *)p1)->rnd - ((struct scramble *)p2)->rnd;
-}
-
 static void
 scramble(void *data, int n, size_t width)
 {
-	int i;
-	static int vecsize = 0;
-	void *buffer = NULL, *temp = NULL;
-
-	if (n > vecsize) {
-		vecsize = n;
-		vec = (struct scramble *) realloc(vec, vecsize * sizeof(struct scramble));
-	}
-	for (i = 0; i != n; i++) {
-		vec[i].rnd = rand();
-		vec[i].index = i;
-	}
-	qsort(vec, n, sizeof(struct scramble), scramblecmp);
-	for (i = 0; i != n; i++) {
-		/* in vec[k].index steht, wohin der block k soll */
-		/* src soll nach target geschoben werden. dafür wird target gemerkt,
-		* src verschoben, und target zum neuen src. ende, wenn k wieder i ist */
-		if (vec[i].index!=i) {
-			char * src = ((char*)data)+width*i;
-			int k = i;
-			int dest = vec[k].index;
-
-			if (temp==NULL) {
-				temp = malloc(width);
-			}
-			buffer = temp;
-			do {
-				char * target = ((char*)data)+width*dest;
-				memmove(buffer, target, width);
-				memmove(target, src, width);
-				k = dest; /* wo das gerettete target hin soll */
-				dest = vec[dest].index;
-				vec[k].index = k; /* dest ist an der richtigen stelle */
-				/* swap buffer and src. misuse target as intermediate var. */
-				target = buffer;
-				buffer = src;
-				src = target;
-			} while (vec[i].index!=i);
-		}
-	}
-	if (buffer!=NULL) free(temp);
+  int j;
+  char temp[64];
+  assert(width<=sizeof(temp));
+  for (j=0;j!=n;++j) {
+    int k = rand() % n;
+    memcpy(temp, (char*)data+j*width, width);
+    memcpy((char*)data+j*width, (char*)data+k*width, width);
+    memcpy((char*)data+k*width, temp, width);
+  }
 }
 #if 0
 #define MAX 6
@@ -3394,10 +3347,6 @@ produce(void)
 		assert(rmoney(r) >= 0);
 		assert(rpeasants(r) >= 0);
 
-	}
-	if (vec) {
-		free(vec);
-		vec = 0;
 	}
 }
 

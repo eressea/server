@@ -360,7 +360,7 @@ msg_error(const struct unit * u, const char * cmd, const char * name, const char
 	assert(cmd!=u->thisorder || !"only use entries from u->orders - memory corruption imminent.");
 
 	if (!mtype) {
-		fprintf(stderr, "trying to create message of unknown type \"%s\"\n", name);
+		log_error(("trying to create message of unknown type \"%s\"\n", name));
 		return NULL;
 	}
 
@@ -395,7 +395,7 @@ msg_message(const char * name, const char* sig, ...)
 	memset(args, 0, sizeof(args));
 
 	if (!mtype) {
-		fprintf(stderr, "trying to create message of unknown type \"%s\"\n", name);
+		log_error(("trying to create message of unknown type \"%s\"\n", name));
 		return NULL;
 	}
 
@@ -435,7 +435,7 @@ new_message(struct faction * receiver, const char* sig, ...)
 	mtype = mt_find(buffer);
 
 	if (!mtype) {
-		fprintf(stderr, "trying to create message of unknown type \"%s\"\n", buffer);
+		log_error(("trying to create message of unknown type \"%s\"\n", buffer));
 		return NULL;
 	}
 

@@ -3699,7 +3699,7 @@ count_migrants (const faction * f)
 		u = u->nextF;
 	}
 	if (f->num_migrants != n)
-		puts("FEHLER: Anzahl Migranten falsch");
+    log_error(("Anzahl Migranten für (%s) ist falsch: %n statt %n.\n", factionid(f), f->num_migrants, n));
 #endif
 	return f->num_migrants;
 }
