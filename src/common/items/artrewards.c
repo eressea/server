@@ -142,6 +142,9 @@ use_trappedairelemental(struct unit * u, const struct item_type * itype,
 
   ADDMSG(&u->faction->msgs, msg_message("trappedairelemental_success",
     "unit region command ship", u, u->region, cm, sh));
+  
+  itype->rtype->uchange(u, itype->rtype, -1);
+
   return 1;
 }
 
@@ -175,6 +178,8 @@ use_aurapotion50(struct unit * u, const struct item_type * itype,
 
   ADDMSG(&u->faction->msgs, msg_message("aurapotion50",
     "unit region command", u, u->region, cm));
+  
+  itype->rtype->uchange(u, itype->rtype, -1);
 
   return 1;
 }
@@ -259,6 +264,8 @@ use_instantartacademy(struct unit * u, const struct item_type * itype,
 
   ADDMSG(&u->region->msgs, msg_message(
     "artacademy_create", "unit region", u, u->region));
+  
+  itype->rtype->uchange(u, itype->rtype, -1);
 
   return 1;
 }
@@ -297,6 +304,8 @@ use_instantartsculpture(struct unit * u, const struct item_type * itype,
 
   ADDMSG(&u->region->msgs, msg_message(
     "artsculpture_create", "unit region command", u, u->region, cm));
+
+  itype->rtype->uchange(u, itype->rtype, -1);
 
   return 1;
 }
