@@ -1168,7 +1168,58 @@ sp_hain(castorder *co)
 
 	if(!r->land) {
 		cmistake(mage, strdup(co->order), 296, MSG_MAGIC);
-		return cast_level;
+		return 0;
+	}
+	if (fval(r, RF_MALLORN)) {
+		cmistake(mage, strdup(co->order), 92, MSG_MAGIC);
+		return 0;
+	}
+
+	trees = lovar(force * 10) + force;
+#if GROWING_TREES
+	rsettrees(r, 1, rtrees(r,1) + trees);
+#else
+	rsettrees(r, rtrees(r) + trees);
+#endif
+
+	/* melden, 1x pro Partei */
+	{
+		message * seen = msg_message("growtree_effect", "mage amount", mage, trees);
+		message * unseen = msg_message("growtree_effect", "mage amount", NULL, trees);
+		report_effect(r, mage, seen, unseen);
+	}
+
+	return cast_level;
+}
+/* ------------------------------------------------------------- */
+/* Name:       Segne Mallornstecken - Mallorn Hainzauber 
+ * Stufe:      4
+ * Kategorie:  Region, positiv
+ * Gebiet:     Gwyrrd
+ * Syntax:     ZAUBER [REGION x y] [STUFE 4] "Segne Mallornstecken"
+ * Wirkung:
+ *     Erschafft Stufe-10*Stufe Jungbäume
+ *
+ * Flag:
+ * (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE)
+ */
+
+static int
+sp_mallornhain(castorder *co)
+{
+	int trees;
+	region *r = co->rt;
+	unit *mage = (unit *)co->magician;
+	int cast_level = co->level;
+	int force = co->force;
+
+	if(!r->land) {
+		cmistake(mage, strdup(co->order), 296, MSG_MAGIC);
+		return 0;
+	}
+	if (!fval(r, RF_MALLORN)) {
+		cmistake(mage, strdup(co->order), 91, MSG_MAGIC);
+		return 0;
 	}
 
 	trees = lovar(force * 10) + force;
@@ -7469,6 +7520,24 @@ spell spelldaten[] =
 			{0, 0, 0}
 		},
 		(spell_f)sp_windshield, patzer
+	},
+
+	{SPL_MALLORNTREEGROW, "Segne Mallornstecken",
+		"Diese Ritual verstärkt die Wirkung des magischen Trankes um ein "
+		"vielfaches. Wo sonst aus einem Stecken nur ein Baum spießen konnte, "
+		"so treibt nun jeder Ast Wurzeln.",
+		NULL,
+		NULL,
+	 M_DRUIDE,
+	 (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
+	 5, 4,
+	 {
+		 {R_AURA, 6, SPC_LEVEL},
+		 {R_MALLORN, 2, SPC_LEVEL},
+		 {R_TREES, 1, SPC_FIX},
+		 {0, 0, 0},
+		 {0, 0, 0}},
+	 (spell_f)sp_mallornhain, patzer_ents
 	},
 
 	{ SPL_GOODWINDS, "Beschwörung eines Wasserelementar",

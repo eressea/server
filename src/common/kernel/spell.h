@@ -200,6 +200,7 @@ enum {
 	SPL_DRAINODEM,		/* 174? */
 	SPL_AURA_OF_FEAR,	/* 175? */
 	SPL_SHADOWCALL,		/* 176? */
+	SPL_MALLORNTREEGROW,
 	MAXALLSPELLS,
 	NO_SPELL = (spellid_t) -1
 };
