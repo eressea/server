@@ -962,9 +962,12 @@ f_regionid(const region * r, const faction * f)
 	else {
 		pl = getplane(r);
 		if(pl && fval(pl,PFL_NOCOORDS)) {
-			sprintf(buf, "%s", rname(r, f->locale));
+      strncpy(buf, rname(r, f->locale), NAMESIZE);
+      buf[NAMESIZE]=0;
 		} else {
-			sprintf(buf, "%s (%d,%d%s%s)", rname(r, f->locale), region_x(r,f), region_y(r,f), pl?",":"", pl?pl->name:"");
+      strncpy(buf, rname(r, f->locale), NAMESIZE);
+      buf[NAMESIZE]=0;
+			sprintf(buf+strlen(buf), " (%d,%d%s%s)", region_x(r,f), region_y(r,f), pl?",":"", pl?pl->name:"");
 		}
 	}
 
