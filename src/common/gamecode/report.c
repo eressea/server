@@ -1367,7 +1367,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	if (partial==0 && r->planep && r->planep->id == 1 &&
 			!is_cursed(r->attribs, C_ASTRALBLOCK, 0))	{
 		/* Sonderbehandlung Teleport-Ebene */
-		region_list *rl = allinhab_in_range(r_astral_to_standard(r), TP_RADIUS);
+		region_list *rl = astralregions(r_astral_to_standard(r), inhabitable);
 		region_list *rl2;
 
 		if (rl) {

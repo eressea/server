@@ -1348,7 +1348,7 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 			if (sd->mode==see_unit && r->planep && r->planep->id == 1 && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
 			{
 				/* Sonderbehandlung Teleport-Ebene */
-				region_list *rl = allinhab_in_range(r_astral_to_standard(r),TP_RADIUS);
+				region_list *rl = astralregions(r_astral_to_standard(r), inhabitable);
 
 				if (rl) {
 					region_list *rl2 = rl;

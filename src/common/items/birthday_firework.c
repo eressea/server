@@ -38,7 +38,7 @@ const int FIREWORK_RANGE=10;
 static int
 use_birthday_firework(struct unit * u, const struct item_type * itype, int amount, const char *cm)
 {
-	region_list *rlist = all_in_range(u->region, FIREWORK_RANGE);
+	region_list *rlist = all_in_range(u->region, FIREWORK_RANGE, NULL);
 	region_list *rl;
 	message *m;
 	const char *name;

@@ -41,6 +41,7 @@
 #include "spell.h"
 #include "ship.h"
 #include "skill.h"
+#include "teleport.h"
 #include "unit.h"
 
 /* util includes */
@@ -1065,7 +1066,7 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
 
         /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
         * Nicht kumulativ mit anderen Beschleunigungen! */
-        if ( mp == 1 && getplane(next) == astral_plane && is_mage(u)) {
+        if ( mp == 1 && getplane(next) == get_astralplane() && is_mage(u)) {
           if(get_mage(u)->magietyp == M_ASTRAL
             || get_mage(u)->magietyp == M_TRAUM) {
               mp *= 2;

@@ -18,21 +18,15 @@
 extern "C" {
 #endif
 
-#define TE_CENTER_X	1000
-#define TE_CENTER_Y	1000
-#define ENNOS_PLANE 1
-#if ENNOS_PLANE
-#define TP_RADIUS 4
-#else
-#define RADIUS 75
-#define TP_RADIUS 2
-#endif
-struct region *r_standard_to_astral(const struct region *r);
-struct region *r_astral_to_standard(const struct region *);
-struct region_list *all_in_range(struct region *r, int n);
-struct region_list *allinhab_in_range(const struct region *r, int n);
-void create_teleport_plane(void);
-void set_teleport_plane_regiontypes(void);
+  struct region *r_standard_to_astral(const struct region *r);
+  struct region *r_astral_to_standard(const struct region *);
+  extern struct region_list *astralregions(const struct region * r, boolean (*valid)(const struct region *));
+  extern struct region_list *all_in_range(const struct region *r, int n, boolean (*valid)(const struct region *));
+  extern boolean inhabitable(const struct region * r);
+  extern struct plane * get_astralplane(void);
+
+  void create_teleport_plane(void);
+  void set_teleport_plane_regiontypes(void);
 
 #ifdef __cplusplus
 }

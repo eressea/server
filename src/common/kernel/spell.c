@@ -1916,7 +1916,7 @@ sp_treewalkexit(castorder *co)
 	spellparameter *pa = co->par;
 	int cast_level = co->level;
 
-	if(getplane(r) != astral_plane) {
+	if(getplane(r) != get_astralplane()) {
 		cmistake(mage, strdup(co->order), 193, MSG_MAGIC);
 		return 0;
 	}
@@ -1939,7 +1939,7 @@ sp_treewalkexit(castorder *co)
 	tay = rt->y;
 	rt  = NULL;
 
-	rl  = allinhab_in_range(r_astral_to_standard(r),TP_RADIUS);
+	rl  = astralregions(r_astral_to_standard(r), inhabitable);
 	rt  = 0;
 
 	rl2 = rl;
@@ -2232,7 +2232,7 @@ sp_fog_of_confusion(castorder *co)
 	range = (power-11)/3-1;
 	duration = (int)((power-11)/1.5)+1;
 
-	rl = all_in_range(r, (int)range);
+	rl = all_in_range(r, (int)range, NULL);
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
 		curse * c;
@@ -2807,7 +2807,7 @@ sp_summondragon(castorder *co)
 		}
 	}
 
-	rl = all_in_range(r, (int)power);
+	rl = all_in_range(r, (int)power, NULL);
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
 		for(u = rl2->data->units; u; u = u->next) {
@@ -5598,7 +5598,7 @@ sp_dream_of_confusion(castorder *co)
 	double range = (power-14)/2-1;
 	int duration = (int)(power-14)+1;
 
-	rl = all_in_range(r, (int)range);
+	rl = all_in_range(r, (int)range, NULL);
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
     region * r2 = rl2->data;
@@ -5934,7 +5934,7 @@ sp_pullastral(castorder *co)
 	case 1:
 		rt = r;
 		ro = pa->param[0]->data.r;
-		rl = all_in_range(r_astral_to_standard(r), TP_RADIUS);
+		rl = astralregions(r_astral_to_standard(r), NULL);
 		rl2 = rl;
 		while (rl2!=NULL) {
       region * r2 = rl2->data;
@@ -6066,7 +6066,7 @@ sp_leaveastral(castorder *co)
         MSG_MAGIC, ML_MISTAKE);
       return 0;
     }
-    rl  = allinhab_in_range(r_astral_to_standard(r), TP_RADIUS);
+    rl  = astralregions(r_astral_to_standard(r), inhabitable);
     rl2 = rl;
     while (rl2!=NULL) {
       if (rl2->data == rt) break;
@@ -6391,7 +6391,7 @@ sp_viewreality(castorder *co)
 		return 0;
 	}
 
-	rl = all_in_range(r_astral_to_standard(r), TP_RADIUS);
+	rl = astralregions(r_astral_to_standard(r), NULL);
 
 	/* Irgendwann mal auf Curses u/o Attribut umstellen. */
 	for (rl2=rl; rl2; rl2=rl2->next) {
@@ -6440,7 +6440,7 @@ sp_disruptastral(castorder *co)
 		return 0;
 	}
 
-	rl = all_in_range(rt, (int)(power/5));
+	rl = all_in_range(rt, (int)(power/5), NULL);
 
 	for (rl2=rl; rl2!=NULL; rl2=rl2->next) {
 		attrib *a, *a2;
@@ -6454,7 +6454,7 @@ sp_disruptastral(castorder *co)
     if (r2->units!=NULL) {
       region_list * trl2;
 
-      trl = allinhab_in_range(r_astral_to_standard(rl2->data), TP_RADIUS);
+      trl = astralregions(r_astral_to_standard(rl2->data), inhabitable);
       for (trl2 = trl; trl2; trl2 = trl2->next) ++inhab_regions;
     }
 
