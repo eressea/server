@@ -85,6 +85,7 @@ bind_eressea(lua_State * L)
     def("process_orders", &process_orders),
     def("add_equipment", &lua_addequipment),
     def("get_turn", &get_turn),
+    def("remove_empty_units", &remove_empty_units),
 
     /* planes not really implemented */
     def("find_plane_id", &find_plane_id)
