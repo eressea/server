@@ -3703,3 +3703,25 @@ count_migrants (const faction * f)
 #endif
 	return f->num_migrants;
 }
+
+int
+writepasswd(void)
+{
+  FILE * F;
+  char zText[128];
+
+  sprintf(zText, "%s/passwd", basepath());
+  F = cfopen(zText, "w");
+  if (F) {
+    faction *f;
+    puts("Schreibe Passwörter...");
+
+    for (f = factions; f; f = f->next) {
+      fprintf(F, "%s:%s:%s:%s:%u\n", 
+        factionid(f), f->email, f->passw, f->override, f->subscription);
+    }
+    fclose(F);
+    return 0;
+  }
+  return 1;
+}
