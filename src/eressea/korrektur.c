@@ -1394,44 +1394,25 @@ fix_plainherbs(void)
 		if (t!=T_PLAIN) continue;
 		name = LOC(default_locale, rherbtype(r)->itype->rtype->_name[0]);
 		for (herb=0;herb!=6;++herb) {
-			if (strcmp(terrain[t].herbs[herb], name)==0) {
-				++count[herb];
-				break;
-			}
+			if (strcmp(terrain[t].herbs[herb], name)==0) break;
 		}
-		if (wnext==wbegin) {
-			const struct herb_type * htype = NULL;
-			while (count[herb] > WINDOWSIZE/6*DEVIATION) {
-				--count[herb];
+		assert(herb!=6);
+		if (count[herb] > (wend+WINDOWSIZE-wbegin)%WINDOWSIZE/6*DEVIATION) {
+			const struct herb_type * htype;
+			do {
 				herb = rand() % 6;
-				++count[herb];
-			}
+			} while (count[herb] > (wend+WINDOWSIZE-wbegin)%WINDOWSIZE/6*DEVIATION);
 			htype = resource2herb(finditemtype(terrain[t].herbs[herb], default_locale)->rtype);
 			rsetherbtype(r, htype);
-			--count[window[wbegin]];
-			++wbegin;
 		}
+		++count[herb];
 		window[wend]=herb;
-		wend = wnext;
-		r=r->next;
-	}
-	/* check, output: */
-	for (c=0;c!=6;++c) count[c]=0;
-	for (r=regions;r;r=r->next) {
-		int i;
-		const char * name;
-		terrain_t t = rterrain(r);
-		if (t!=T_PLAIN) continue;
-		name = LOC(default_locale, rherbtype(r)->itype->rtype->_name[0]);
-		for (i=0;i!=6;++i) {
-			if (strcmp(terrain[t].herbs[i], name)==0) {
-				count[i]++;
-				break;
-			}
+		if (wbegin==wnext) {
+			--count[window[wbegin]];
+			wbegin = (wbegin+1)%WINDOWSIZE;
 		}
-		r=r->next;
+		wend = wnext;
 	}
-	for (c=0;c!=6;++c) log_warning(("Herbs %d : %d\n", c, count[c]));
 	return 0;
 }
 
@@ -2895,7 +2876,7 @@ korrektur(void)
 	do_once("pers", convert_orders());
 	do_once("sql2", dump_sql());
 	do_once("fw02", fix_watchers());
-	do_once("fxh3", fix_plainherbs());
+	do_once("fxh4", fix_plainherbs());
 #if NEW_RESOURCEGROWTH
 	/* do not remove do_once calls - old datafiles need them! */
 	do_once("rgrw", convert_resources());
