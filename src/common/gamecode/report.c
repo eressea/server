@@ -2786,7 +2786,7 @@ reports(void)
 				if(f->age == 1) {
 					fprintf(BAT, "ls %s.nr %s.cr | zip -m -j -9 -@ %s.zip\n",
 						factionid(f), factionid(f), factionid(f));
-					fprintf(BAT, "zip -j -9 %s.zip res/%s/%s/welcome.txt\n", factionid(f), global.welcomepath, locale_name(f->locale));
+					fprintf(BAT, "zip -j -9 %s.zip ../res/%s/%s/welcome.txt", factionid(f), global.welcomepath, locale_name(f->locale));
 				} else {
 					fprintf(BAT, "ls %s.nr %s.cr | zip -m -j -9 -@ %s.zip\n",
 						factionid(f), factionid(f), factionid(f));
@@ -2799,7 +2799,7 @@ reports(void)
 
 				if (f->age == 1) {
 					fprintf(shfp,
-						" \\\n\t\"text/plain\" \"Willkommen\" res/%s/%s/welcome.txt\n", global.welcomepath, locale_name(f->locale));
+						" \\\n\t\"text/plain\" \"Willkommen\" ../res/%s/%s/welcome.txt", global.welcomepath, locale_name(f->locale));
 				}
 
 				fprintf(BAT, "bzip2 -9v `ls %s.nr %s.cr`\n",
@@ -2828,7 +2828,7 @@ reports(void)
 
 				if (f->age == 1) {
 					fprintf(shfp,
-						" \\\n\t\"text/plain\" \"Willkommen\" res/%s/%s/welcome.txt\n", global.welcomepath, locale_name(f->locale));
+						" \\\n\t\"text/plain\" \"Willkommen\" ../res/%s/%s/welcome.txt", global.welcomepath, locale_name(f->locale));
 				}
 
 				if (!nonr && f->options & wants_report)
