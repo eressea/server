@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# produces a lot of status information about vinyambar.
+
 if [ $# -gt 0 ]; then
   db="$1"
 else
