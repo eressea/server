@@ -110,6 +110,10 @@ SOURCE=.\questkeys.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\racespoils.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\seed.h
 # End Source File
 # Begin Source File
@@ -144,6 +148,10 @@ SOURCE=.\lmsreward.c
 # Begin Source File
 
 SOURCE=.\questkeys.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\racespoils.c
 # End Source File
 # Begin Source File
 

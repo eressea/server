@@ -7524,17 +7524,7 @@ spell spelldaten[] =
 		patzer
 	},
 
-	{SPL_STONEGOLEM, "Erschaffe Steingolems",
-		"Man befeuchte einen kluftfreien Block aus feinkristallinen Gestein "
-		"mit einer Phiole des Lebenswassers bis dieses vollständig vom Gestein "
-		"aufgesogen wurde. Sodann richte man seine Kraft auf die sich bildenden "
-		"feine "
-		"Aura des Lebens und forme der ungebundenen Kraft ein Gehäuse. Je mehr "
-		"Kraft der Magier investiert, desto mehr Golems können geschaffen "
-		"werden, bevor die Aura sich verflüchtigt. "
-		"Jeder Golem hat jede Runde eine Chance von 10% zu Staub zu zerfallen. "
-		"Gibt man den Golems die Befehle MACHE BURG oder MACHE STRASSE, "
-		"so werden pro Golem 4 Steine verbaut und der Golem löst sich auf.",
+	{SPL_STONEGOLEM, "createstonegolems", NULL,
 		NULL,
 		NULL,
 		M_DRUIDE, (SPELLLEVEL), 4, 1,
@@ -7547,13 +7537,7 @@ spell spelldaten[] =
 	 (spell_f)sp_create_stonegolem, patzer
 	},
 
-	{SPL_IRONGOLEM, "Erschaffe Eisengolems",
-		"Je mehr Kraft der Magier investiert, desto mehr Golems können "
-		"geschaffen werden. "
-		"Jeder Golem hat jede Runde eine Chance von 15% zu Staub zu zerfallen. "
-		"Gibt man den Golems den Befehl MACHE SCHWERT/BIHÄNDER oder "
-		"MACHE SCHILD/KETTENHEMD/PLATTENPANZER, so werden pro Golem 4 "
-		"Eisenbarren verbaut und der Golem löst sich auf.",
+	{SPL_IRONGOLEM, "createirongolems", NULL,
 		NULL,
 		NULL,
 	 M_DRUIDE, (SPELLLEVEL), 4, 2,
