@@ -60,6 +60,7 @@ make_santa(region * r)
 	}
 	if (!santa) {
 		faction * f = findfaction(atoi36("rr"));
+		if (f==NULL) f = findfaction(MONSTER_FACTION);
 		if (f==NULL) return NULL;
 		f->alive = true;
 		santa = createunit(r, f, 1, new_race[RC_ILLUSION]);
