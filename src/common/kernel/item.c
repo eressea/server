@@ -865,7 +865,7 @@ use_tacticcrystal(region * r, unit * u, int amount, strlist * cmdstrings)
 		int power = 5; /* Widerstand gegen Antimagiesprüche, ist in diesem
 											Fall egal, da der curse für den Kampf gelten soll,
 											der vor den Antimagiezaubern passiert */
-		curse * c = create_curse(u, &u->attribs, ct_find("skill"), power,
+		curse * c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
 			duration, effect, u->number);
 		c->data = (void*)SK_TACTICS;
 		unused(cmdstrings);

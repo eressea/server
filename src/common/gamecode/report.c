@@ -2470,7 +2470,6 @@ merian(FILE * out, faction * f)
 #endif
 seen_region * seen;
 seen_region * reuse;
-seen_region** append;
 seen_region * last;
 
 #define MAXSEEHASH 4095
@@ -2554,18 +2553,43 @@ add_seen(const struct region * r, unsigned char mode, boolean dis)
 {
 	seen_region * find = find_seen(r);
 	if (find==NULL) {
+		seen_region * insert;
 		int index = abs((r->x & 0xffff) + ((r->y) << 16)) % MAXSEEHASH;
 		if (!reuse) reuse = (seen_region*)calloc(1, sizeof(struct seen_region));
-		*append = find = reuse;
+		find = reuse;
 		reuse = reuse->next;
 		find->nextHash = seehash[index];
 		seehash[index] = find;
 		find->r = r;
-		if (last) last->next = find;
-		find->next = NULL;
-		find->prev = last;
+
+		for (insert=last;insert;insert=insert->next) {
+			const region * rl;
+			seen_region * inext = insert->next;
+			for (rl=insert->r;rl && (!inext || rl!=inext->r);rl=rl->next) {
+				if (rl==r) break;
+			}
+			if (rl==r) break;
+		}
+		if (insert==0) {
+			for (insert=seen;insert!=last;insert=insert->next) {
+				const region * rl;
+				seen_region * inext = insert->next;
+				for (rl=insert->r;rl && (!inext || rl!=inext->r);rl=rl->next) {
+					if (rl==r) break;
+				}
+				if (rl==r) break;
+			}
+			if (insert==last) insert=0;
+		}
 		last = find;
-		append = &last->next;
+		find->prev = insert;
+		if (insert!=0) {
+			find->next = insert->next;
+			insert->next = find;
+		} else {
+			find->next = seen;
+			seen = find;
+		}
 	} else if (find->mode >= mode) {
 		return false;
 	}
@@ -2676,14 +2700,13 @@ prepare_report(faction * f)
 {
 	region * r;
 	region * end = lastregion(f);
+	seen_region ** append = &reuse;
 
-	append = &reuse;
-	memset(seehash, 0, sizeof(seehash));
 	while (*append) append = &(*append)->next;
 	*append = seen;
+	memset(seehash, 0, sizeof(seehash));
 	seen = NULL;
 	last = NULL;
-	append = &seen;
 	for (r = firstregion(f); r != end; r = r->next) {
 		attrib *ru;
 		unit * u;
