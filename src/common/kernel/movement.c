@@ -744,7 +744,7 @@ cycle_route(unit *u, int gereist)
 		if (cm<gereist) {
 			/* hier sollte keine PAUSE auftreten */
 			assert(!pause);
-			if (!pause) strcat(strcat(tail, " "), shortdirections[d]);
+			if (!pause) strcat(strcat(tail, " "), LOC(lang, shortdirections[d]));
 		}
 		else if (cm==gereist && !paused && pause) {
 			strcat(strcat(tail, " "), LOC(lang, parameters[P_PAUSE]));
