@@ -203,7 +203,6 @@ parse_tagbegin(struct xml_stack *stack, void *data)
 		state->nrsection = tsection;
 		mc_add(tsection);
 		if (tlevel) state->nrlevel = atoi(tlevel);
-		return XML_OK;
 	} else if (strcasecmp(tag->name, "text")==0) {
 		const char * zLocale = xml_value(tag, "locale");
 		if (zLocale) {
@@ -212,7 +211,6 @@ parse_tagbegin(struct xml_stack *stack, void *data)
 				state->lang = make_locale(zLocale);
 			}
 		}
-		return XML_OK;
 	} else if (strcasecmp(tag->name, "arg")==0) {
 		if (state->mtname!=NULL) {
 			const char * zName = xml_value(tag, "name");
@@ -221,8 +219,9 @@ parse_tagbegin(struct xml_stack *stack, void *data)
 				char zBuffer[128];
 				sprintf(zBuffer, "%s:%s", zName, zType);
 				state->argv[state->argc++] = strdup(zBuffer);
-				return XML_OK;
 			}
+		} else {
+			return XML_USERERROR;
 		}
 	} else if (strcasecmp(tag->name, "nr")==0) {
 		if (state->mtname!=NULL) {
@@ -234,8 +233,10 @@ parse_tagbegin(struct xml_stack *stack, void *data)
 			}
 			if (zLevel) state->nrlevel = atoi(zLevel);
 		}
+	} else {
+		return XML_USERERROR;
 	}
-	return XML_USERERROR;
+	return XML_OK;
 }
 
 static int 

@@ -185,7 +185,7 @@ const char *
 mkname(const char * space, const char * name)
 {
 	static char zBuffer[128];
-	if (space) {
+	if (space && *space) {
 		sprintf(zBuffer, "%s::%s", space, name);
 	} else {
 		strcpy(zBuffer, name);
