@@ -13,6 +13,7 @@
 #include <kernel/skill.h>
 #include <kernel/unit.h>
 #include <kernel/magic.h>
+#include <kernel/spell.h>
 
 // lua includes
 #include <lua.hpp>
@@ -144,6 +145,40 @@ unit_setrace(unit& u, const char * rcname)
   }
 }
 
+static void
+unit_addspell(unit& u, const char * name)
+{
+  bool add = false;
+  spell * sp = spelldaten;
+  while (sp->id!=SPL_NOSPELL) {
+    if (strcmp(name, sp->sname)==0) {
+      if (add) log_error(("two spells are called %s.\n", name));
+      addspell(&u, sp->id);
+      add = true;
+    }
+    ++sp;
+  }
+  if (!add) log_error(("spell %s could not be found\n", name));
+}
+
+static void
+unit_removespell(unit& u, const spell * sp)
+{
+  sc_mage * mage = get_mage(&u);
+  if (mage!=NULL) {
+    spell_ptr ** isptr = &mage->spellptr;
+    while (*isptr && (*isptr)->spellid != sp->id) {
+      isptr = &(*isptr)->next;
+    }
+    if (*isptr) {
+      spell_ptr * sptr = *isptr;
+      *isptr = sptr->next;
+      free(sptr);
+    }
+  }
+}
+
+
 void
 bind_unit(lua_State * L) 
 {
@@ -163,6 +198,8 @@ bind_unit(lua_State * L)
     .def("eff_skill", &unit_effskill)
     .def("set_skill", &unit_setskill)
     .def("set_racename", &unit_setracename)
+    .def("add_spell", &unit_addspell)
+    .def("remove_spell", &unit_removespell)
     .property("spells", &unit_spells, return_stl_iterator)
     .property("familiarspells", &unit_familiarspells, return_stl_iterator)
     .property("number", &unit_getnumber, &unit_setnumber)
