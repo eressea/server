@@ -21,7 +21,6 @@
 
 #include <config.h>
 #include "eressea.h"
-#include "spell.h"
 
 /* kernel includes */
 /* FIXME: brauchen wir die wirklich alle? */
@@ -47,6 +46,8 @@
 #include "teleport.h"
 #include "terrain.h"
 #include "unit.h"
+
+#include "spell.h"
 
 /* spells includes */
 #include <spells/alp.h>

@@ -1840,9 +1840,9 @@ verify_targets(castorder *co)
 						spobj->flag = TARGET_RESISTS;
 						resists++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellunitresists%u:unit%r:region%s:command%s:id",
+							"spellunitresists%u:unit%r:region%s:command%d:id",
 							mage, mage->region, strdup(co->order),
-							strdup(spobj->data.i)));
+							spobj->data.i));
 						break;
 					}
 
@@ -1864,8 +1864,8 @@ verify_targets(castorder *co)
 						spobj->flag = TARGET_RESISTS;
 						resists++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellbuildingresists%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), strdup(spobj->data.i)));
+							"spellbuildingresists%u:unit%r:region%s:command%d:id",
+							mage, mage->region, strdup(co->order), spobj->data.i));
 						break;
 					}
 					success++;
@@ -1884,8 +1884,8 @@ verify_targets(castorder *co)
 						spobj->flag = TARGET_RESISTS;
 						resists++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellshipresists%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), strdup(spobj->data.i)));
+							"spellshipresists%u:unit%r:region%s:command%d:id",
+							mage, mage->region, strdup(co->order), spobj->data.i));
 						break;
 					}
 					success++;
