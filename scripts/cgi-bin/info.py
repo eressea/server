@@ -7,6 +7,7 @@ import re
 import smtplib
 
 # specify the filename of the template file
+scripturl="http://eressea.upb.de/~enno/cgi-bin/info.cgi"
 TemplateFile = "vinyambar.html"
 DefaultTitle = "Vinyambar Datenbank"
 dbname = "vinyambar"
@@ -21,8 +22,8 @@ def Display(Content, Title=DefaultTitle):
     TemplateInput = TemplateHandle.read()
     TemplateHandle.close()                    # close the file
 
-	for key in Form.keys():
-		Content=Content+"<br>"+key+"="+Form[key]
+    for key in Form.keys():
+	Content=Content+"<br>"+str(key)+"="+str(Form[key])
 
     # this defines an exception string in case our
     # template file is messed up
@@ -52,7 +53,7 @@ def ShowInfo(custid, Password):
     results = cursor.execute(query);
     if results > 0:
 
-	output = "<div align=center>Letzte Aktualisierung: "+str(lastdate)[0:10]+"</div><form action=\"update.cgi\" method=post><div align=left><table width=80% border>\n"
+	output = "<div align=center>Letzte Aktualisierung: "+str(lastdate)[0:10]+"</div><form action=\""+scripturl+"\" method=post><div align=left><table width=80% border>\n"
 	while results>0:
 	    results = results - 1
 	    row = cursor.fetchone()
@@ -107,12 +108,27 @@ def ShowInfo(custid, Password):
 	    output=output+line
 
 	output=output+"</table></div>"
-	output=output+"<div align=left><input type=submit value=\"Speichern\"></div>"
+	output=output+'<div align=left><input name="save" type="submit" value="Speichern"></div>'
+	output=output+'<input type="hidden" name="user" value="'+str(custid)+'"></div>'
+	output=output+'<input type="hidden" name="pass" value="'+Password+'"></div>'
 	output=output+"</form>"
     else:
 	output = "Die Kundennummer oder das angegebene Passwort sind nicht korrekt."
-
+    db.close()
     Display(output, "Kundendaten #"+str(custid))
+
+def Save(custid, Password):
+    validkeys=['email','address','lastname','firstname','city','password','phone']
+    values='id='+str(custid)
+    for key in Form.keys():
+	if key in validkeys:
+	    values=values+", "+key+"='"+Form[key].value+"'"
+    db = MySQLdb.connect(db=dbname)
+    cursor=db.cursor()
+    cursor.execute('UPDATE users SET '+values+' where id='+str(custid))
+    db.close()
+    ShowInfo(custid, Password)
+#    Display("Noch nicht implementiert", "Daten speichern für Kunde #"+str(custid))
 
 def SendPass(custid):
     try:
@@ -127,14 +143,12 @@ def SendPass(custid):
 	server=smtplib.SMTP(smtpserver)
 	server.sendmail(From, email, Msg)
 	server.close()
+	db.close()
 	Display('<div align="center">Das Passwort wurde verschickt</div>', 'Kundendaten #'+str(custid))
     except:
 	Display('<div align="center">Beim Versenden des Passwortes ist ein Fehler aufgetreten</div>', 'Kundendaten #'+str(custid))
 
 Form = cgi.FieldStorage()
-
-if Form.has_key("user"):
-    custid = int(Form["user"].value)
 
 if Form.has_key("user"):
     custid = int(Form["user"].value)
@@ -146,7 +160,9 @@ if Form.has_key("pass"):
 else:
     Password=""
 
-if Password!="":
-    ShowInfo(custid, Password)
-else:
+if Password=="":
     SendPass(custid)
+elif Form.has_key("save"):
+    Save(custid, Password)
+else:
+    ShowInfo(custid, Password)
