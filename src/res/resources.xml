@@ -52,3 +52,20 @@
 		<text locale="en">hammers of Odin</text>
 	</string>
 </strings>
+<resource name="shovel">
+	<comment>gimmik</comment>
+	<item notlost weight="1">
+	</item>
+</resource>
+<strings>
+	<string name="shovel">
+		<text locale="de">Schaufel</text>
+		<text locale="en">shovel</text>
+	</string>
+	<string name="shovel_p">
+		<text locale="de">Schaufeln</text>
+		<text locale="en">shovels</text>
+	</string>
+</strings>
+
+
