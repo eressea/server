@@ -84,10 +84,11 @@ leave_fail(unit * u) {
 }
 
 static int
-leave_arena(struct unit * u, const struct item_type * itype, const char * cmd)
+leave_arena(struct unit * u, const struct item_type * itype, int amount, const char * cmd)
 {
 	if (!u->building && leave_fail(u)) return -1;
 	if (u->building!=arena_tower(u->faction->magiegebiet) && leave_fail(u)) return -1;
+	unused(amount);
 	unused(cmd);
 	unused(itype);
 	assert(!"not implemented");
@@ -106,6 +107,7 @@ static item_type it_gryphonwing = {
 	ITF_NOTLOST|ITF_CURSED, 0, 0,       /* flags, weight, capacity */
 	NULL,                    /* construction */
 	&leave_arena,
+	NULL,
 	&give_igjarjuk
 };
 
@@ -117,13 +119,14 @@ enter_fail(unit * u) {
 }
 
 static int
-enter_arena(unit * u, const item_type * itype, const char * cmd)
+enter_arena(unit * u, const item_type * itype, int amount, const char * cmd)
 {
 	skill_t sk;
 	region * r = u->region;
 	unit * u2;
 	int fee = u->faction->score / 5;
 	unused(cmd);
+	unused(amount);
 	unused(itype);
 	if (fee>2000) fee = 2000;
 	if (getplane(r)==arena) return -1;
@@ -180,23 +183,22 @@ static item_type it_arenagate = {
  ***/
 
 static int
-use_wand_of_tears(unit * user, const struct item_type * itype, const char * cmd)
+use_wand_of_tears(unit * user, const struct item_type * itype, int amount, const char * cmd)
 {
-	unit * u;
+	int i;
 	unused(cmd);
-	for (u=user->region->units;u;u=u->next) {
-		if (u->faction != user->faction) {
-			int i, k=SKILLPOINTS;
+	for (i=0;i!=amount;++i) {
+		unit * u;
+		for (u=user->region->units;u;u=u->next) {
+			if (u->faction != user->faction) {
+				int i;
 
-			for (i=0;i!=u->skill_size;++i) {
-#if SKILLPOINTS
-				change_skill(u, u->skills[i].id, -10);
-#else
-				if (rand()%3) reduce_skill(u, u->skills+i, 1);
-#endif
+				for (i=0;i!=u->skill_size;++i) {
+					if (rand()%3) reduce_skill(u, u->skills+i, 1);
+				}
+				ADDMSG(&u->faction->msgs, msg_message("wand_of_tears_effect",
+					"unit", u));
 			}
-			if (k) ADDMSG(&u->faction->msgs, msg_message("wand_of_tears_effect",
-				"unit", u));
 		}
 	}
 	ADDMSG(&user->region->msgs, msg_message("wand_of_tears_usage",

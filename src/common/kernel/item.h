@@ -121,7 +121,8 @@ typedef struct item_type {
 	int capacity;
 	const struct construction * construction;
 	/* --- functions --- */
-	int (*use)(struct unit * user, const struct item_type * itype, const char * cmd);
+	int (*use)(struct unit * user, const struct item_type * itype, int amount, const char * cmd);
+	int (*useonother)(struct unit * user, int targetno, const struct item_type * itype, int amount, const char * cmd);
 	int (*give)(const struct unit * src, const struct unit * dest, const struct item_type * itm, int number, const char * cmd);
 	struct item_type * next;
 } item_type;
@@ -148,7 +149,7 @@ typedef struct potion_type {
 	const item_type * itype;
 	int level;
 	const char * text;
-	int (*use)(struct unit *, const struct potion_type *, const char *);
+	int (*use)(struct unit *, const struct potion_type *, int, const char *);
 } potion_type;
 extern potion_type * potiontypes;
 
@@ -272,7 +273,7 @@ typedef struct t_item {
 	int gewicht;
 	int preis;
 	unsigned int flags;
-	void (*benutze_funktion) (struct region *, struct unit *, strlist *);
+	void (*benutze_funktion) (struct region *, struct unit *, int amount, strlist *);
 } t_item;
 
 enum {

@@ -724,7 +724,7 @@ get_potion(const unit * u, potion_t p)
 	return it?it->number:0;
 }
 
-void use_birthdayamulet(region * r, unit * magician, strlist * cmdstrings);
+void use_birthdayamulet(region * r, unit * magician, int amount, strlist * cmdstrings);
 
 enum {
 	IS_RESOURCE,
@@ -801,29 +801,30 @@ destroy_curse_crystal(attrib **alist, int cast_level, int force)
 /* Kann auch von Nichtmagier benutzt werden, erzeugt eine
  * Antimagiezone, die zwei Runden bestehen bleibt */
 static void
-use_antimagiccrystal(region * r, unit * mage, strlist * cmdstrings)
+use_antimagiccrystal(region * r, unit * mage, int amount, strlist * cmdstrings)
 {
-	int effect;
-	int power;
-	int duration = 2;
-	spell *sp = find_spellbyid(SPL_ANTIMAGICZONE);
-	unused(cmdstrings);
+	int i;
+	for (i=0;i!=amount;++i) {
+		int effect, power, duration = 2;
+		spell *sp = find_spellbyid(SPL_ANTIMAGICZONE);
+		unused(cmdstrings);
 
-	/* Reduziert die Stärke jedes Spruchs um effect */
-	effect = sp->level*4; /* Stufe 5 =~ 15 */
+		/* Reduziert die Stärke jedes Spruchs um effect */
+		effect = sp->level*4; /* Stufe 5 =~ 15 */
 
-	/* Hält Sprüche bis zu einem summierten Gesamtlevel von power aus.
-	 * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
-	 * um seine Stufe */
-	power = sp->level * 20; /* Stufe 5 =~ 100 */
+		/* Hält Sprüche bis zu einem summierten Gesamtlevel von power aus.
+		 * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
+		 * um seine Stufe */
+		power = sp->level * 20; /* Stufe 5 =~ 100 */
 
-	power = destroy_curse(&r->attribs, effect, power, NULL);
+		power = destroy_curse(&r->attribs, effect, power, NULL);
 
-	if(power) {
-		create_curse(mage, &r->attribs, C_ANTIMAGICZONE, 0, power, duration, effect, 0);
+		if(power) {
+			create_curse(mage, &r->attribs, C_ANTIMAGICZONE, 0, power, duration, effect, 0);
+		}
+
 	}
-
-	use_pooled(mage, mage->region, R_ANTIMAGICCRYSTAL, 1);
+	use_pooled(mage, mage->region, R_ANTIMAGICCRYSTAL, amount);
 	add_message(&mage->faction->msgs,
 			new_message(mage->faction, "use_antimagiccrystal%u:unit%r:region", mage, r));
 	return;
@@ -833,19 +834,21 @@ use_antimagiccrystal(region * r, unit * mage, strlist * cmdstrings)
 /* Kann auch von Nichtmagier benutzt werden, modifiziert Taktik für diese
  * Runde um -1 - 4 Punkte. */
 static void
-use_tacticcrystal(region * r, unit * u, strlist * cmdstrings)
+use_tacticcrystal(region * r, unit * u, int amount, strlist * cmdstrings)
 {
-	int effect = rand()%6 - 1;
-	int duration = 1; /* wirkt nur eine Runde */
-	int power = 5; /* Widerstand gegen Antimagiesprüche, ist in diesem
-										Fall egal, da der curse für den Kampf gelten soll,
-										der vor den Antimagiezaubern passiert */
-	unused(cmdstrings);
+	int i;
+	for (i=0;i!=amount;++i) {
+		int effect = rand()%6 - 1;
+		int duration = 1; /* wirkt nur eine Runde */
+		int power = 5; /* Widerstand gegen Antimagiesprüche, ist in diesem
+											Fall egal, da der curse für den Kampf gelten soll,
+											der vor den Antimagiezaubern passiert */
+		unused(cmdstrings);
 
-	create_curse(u, &u->attribs, C_SKILL, SK_TACTICS, power,
-			duration, effect, u->number);
-
-	change_item(u, I_TACTICCRYSTAL, -1);
+		create_curse(u, &u->attribs, C_SKILL, SK_TACTICS, power,
+				duration, effect, u->number);
+	}
+	use_pooled(u, u->region, R_TACTICCRYSTAL, amount);
 	add_message(&u->faction->msgs,
 			new_message(u->faction, "use_tacticcrystal%u:unit%r:region", u, r));
 	return;
@@ -1309,16 +1312,17 @@ use_oldresource(region * r, const resource_type * rtype, int norders)
 }
 
 static int
-use_olditem(struct unit * user, const struct item_type * itype, const char * cmd)
+use_olditem(struct unit * user, const struct item_type * itype, int amount, const char * cmd)
 {
-	item_t i;
-	for (i=0;i!=MAXITEMS;++i) {
-		if (olditemtype[i]==itype) {
+	item_t it;
+	for (it=0;it!=MAXITEMS;++it) {
+		if (olditemtype[it]==itype) {
 			strlist * s = makestrlist(cmd);
-			itemdata[i].benutze_funktion(user->region, user, s);
+			itemdata[it].benutze_funktion(user->region, user, amount, s);
+			return 0;
 		}
 	}
-	return 0;
+	return EUNUSABLE;
 }
 
 typedef const char* translate_t[5];
@@ -1884,7 +1888,7 @@ const char *potiontext[MAXPOTIONS] =
 };
 
 static int
-use_warmthpotion(struct unit *u, const struct potion_type *ptype, const char *cmd)
+use_warmthpotion(struct unit *u, const struct potion_type *ptype, int amount, const char *cmd)
 {
 	assert(ptype==oldpotiontype[P_WARMTH]);
 	if (old_race(u->faction->race) == RC_INSECT) {
@@ -1899,26 +1903,46 @@ use_warmthpotion(struct unit *u, const struct potion_type *ptype, const char *cm
 }
 
 static int
-use_bloodpotion(struct unit *u, const struct potion_type *ptype, const char *cmd)
+use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int amount, const char *cmd)
 {
+	unit * target = findunit(targetno);
+	if (target==NULL || u->region!=target->region) {
+		cmistake(u, cmd, 63, MSG_EVENT);
+		return ECUSTOM;
+	}
+	/* TODO: wahrnehmung-check */
+	ADDMSG(&u->faction->msgs, msg_message("givedumb", 
+		"unit recipient amount", u, target, amount));
+	assert(oldpotiontype[P_FOOL]->itype==itype);
+	change_effect(target, oldpotiontype[P_FOOL], amount);
+	return 0;
+}
+
+static int
+use_bloodpotion(struct unit *u, const struct potion_type *ptype, int amount, const char *cmd)
+{
+	int i;
 	assert(ptype==oldpotiontype[P_BAUERNBLUT]);
 	unused(ptype);
-	if (old_race(u->race) == RC_DAEMON) {
-		attrib * a = (attrib*)a_find(u->attribs, &at_bauernblut);
-		if (!a) a = a_add(&u->attribs, a_new(&at_bauernblut));
-		a->data.i += 100;
-	} else {
-		/* bekommt nicht: */
-		cmistake(u, cmd, 165, MSG_EVENT);
-		u->race = new_race[RC_GHOUL];
-		u_setfaction(u, findfaction(MONSTER_FACTION));
+	for (i=0;i!=amount;++i) {
+		if (old_race(u->race) == RC_DAEMON) {
+			attrib * a = (attrib*)a_find(u->attribs, &at_bauernblut);
+			if (!a) a = a_add(&u->attribs, a_new(&at_bauernblut));
+			a->data.i += 100;
+		} else {
+			/* bekommt nicht: */
+			cmistake(u, cmd, 165, MSG_EVENT);
+			u->race = new_race[RC_GHOUL];
+			u_setfaction(u, findfaction(MONSTER_FACTION));
+			break;
+		}
 	}
 	return 0;
 }
 
 #include <attributes/fleechance.h>
 static int
-use_mistletoe(struct unit * user, const struct item_type * itype, const char * cmd)
+use_mistletoe(struct unit * user, const struct item_type * itype, int amount, const char * cmd)
 {
 	int mtoes = new_get_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK);
 
@@ -2012,9 +2036,10 @@ init_oldpotions(void)
 		oldpotiontype[p] = new_potiontype(itype, (terrain_t)p/3);
 		oldpotiontype[p]->level = potionlevel[p];
 		oldpotiontype[p]->text = potiontext[p];
+		if (p==P_FOOL) itype->useonother = &use_foolpotion;
 	}
 	oldpotiontype[P_WARMTH]->use = &use_warmthpotion;
-	oldpotiontype[P_BAUERNBLUT]->use = &use_bloodpotion;
+	oldpotiontype[P_BAUERNBLUT]->use = &use_bloodpotion;	
 }
 
 resource_type * r_silver;
@@ -2486,7 +2511,7 @@ it_read(FILE * F)
 			if (!strcmp(semi, "give")) it->give = (int (*)(const unit*, const unit*, const struct item_type *, int, const char *))get_function(s);
 			break;
 		case 'u':
-			if (!strcmp(semi, "use")) it->use = (int (*)(unit *, const struct item_type *, const char *))get_function(s);
+			if (!strcmp(semi, "use")) it->use = (int (*)(unit *, const struct item_type *, int, const char *))get_function(s);
 			break;
 		case 'w':
 			if (!strcmp(semi, "weight")) it->weight=i;
@@ -2540,6 +2565,7 @@ register_resources(void)
 	register_function((pf_generic)use_antimagiccrystal, "useantimagiccrystal");
 	register_function((pf_generic)use_warmthpotion, "usewarmthpotion");
 	register_function((pf_generic)use_bloodpotion, "usebloodpotion");
+	register_function((pf_generic)use_foolpotion, "usefoolpotion");
 	register_function((pf_generic)use_mistletoe, "usemistletoe");
 
 	register_function((pf_generic)give_horses, "givehorses");

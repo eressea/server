@@ -85,7 +85,7 @@ attrib_type at_bauernblut = {
 };
 
 int
-use_potion(unit * u, const item_type * itype, const char * cmd)
+use_potion(unit * u, const item_type * itype, int amount, const char * cmd)
 {
 	const potion_type * ptype = resource2potion(itype->rtype);
 	const potion_type * use = ugetpotionuse(u);
@@ -100,7 +100,7 @@ use_potion(unit * u, const item_type * itype, const char * cmd)
 	}
 
 	if (ptype->use) {
-		int nRetval = ptype->use(u, ptype, cmd);
+		int nRetval = ptype->use(u, ptype, amount, cmd);
 		if (nRetval) return nRetval;
 	} else if (ptype==oldpotiontype[P_LIFE]) {
 		region * r = u->region;

@@ -34,19 +34,22 @@
 #include <stdlib.h>
 
 static int
-use_skillpotion(struct unit * u, const struct item_type * itype, const char *cm)
+use_skillpotion(struct unit * u, const struct item_type * itype, int amount, const char *cm)
 {
-	skill * sv = u->skills;
-	while (sv!=u->skills+u->skill_size) {
-		int i;
-		for (i=0;i!=3;++i) learn_skill(u, sv->id, 1.0);
-		++sv;
+	int i;
+	for (i=0;i!=amount;++i) {
+		skill * sv = u->skills;
+		while (sv!=u->skills+u->skill_size) {
+			int i;
+			for (i=0;i!=3;++i) learn_skill(u, sv->id, 1.0);
+			++sv;
+		}
 	}
 	add_message(&u->faction->msgs, new_message(u->faction,
 		"skillpotion_use%u:unit", u));
 
-	res_changeitem(u, itype->rtype, -1);
-	return -1;
+	res_changeitem(u, itype->rtype, -amount);
+	return 0;
 }
 
 static resource_type rt_skillpotion = {
@@ -61,29 +64,31 @@ item_type it_skillpotion = {
 	0, 0, 0,		/* flags, weight, capacity */
 	NULL,                   /* construction */
 	&use_skillpotion,
+	NULL,
 	NULL
 };
 
 
 static int
-use_manacrystal(struct unit * u, const struct item_type * itype, const char *cm)
+use_manacrystal(struct unit * u, const struct item_type * itype, int amount, const char *cm)
 {
-	int     sp;
+	int i, sp = 0;
 
 	if(!is_mage(u)) {
 		cmistake(u, u->thisorder, 295, MSG_EVENT);
 		return -1;
 	}
 
-	sp = max(25, max_spellpoints(u->region, u)/2);
-
-	change_spellpoints(u, sp);
+	for (i=0;i!=amount;++i) {
+		sp += max(25, max_spellpoints(u->region, u)/2);
+		change_spellpoints(u, sp);
+	}
 
 	add_message(&u->faction->msgs, new_message(u->faction,
 		"manacrystal_use%u:unit%i:aura", u, sp));
 
-	res_changeitem(u, itype->rtype, -1);
-	return -1;
+	res_changeitem(u, itype->rtype, -amount);
+	return 0;
 }
 
 static resource_type rt_manacrystal = {
@@ -98,6 +103,7 @@ item_type it_manacrystal = {
 	0, 0, 0,		/* flags, weight, capacity */
 	NULL,                   /* construction */
 	&use_manacrystal,
+	NULL,
 	NULL
 };
 

@@ -1179,7 +1179,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 
 	if (df->person[dt.index].hp > 0) {	/* Hat überlebt */
 		battledebug(debugbuf);
-		if (old_race(au->irace) == RC_DAEMON) {
+		if (old_race(au->race) == RC_DAEMON) {
 #ifdef TODO_RUNESWORD
 			if (select_weapon(dt, 0, -1) == WP_RUNESWORD) continue;
 #endif

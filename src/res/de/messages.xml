@@ -4376,11 +4376,10 @@
 			<arg name="unit" type="unit"></arg>
 			<arg name="recipient" type="unit"></arg>
 			<arg name="amount" type="int"></arg>
-			<arg name="discover" type="string"></arg>
 		</type>
 		<locale name="de">
 			<nr section="events">
-				<text>"$unit($unit) gibt $unit($recipient) $int($amount) Dumpfbackenbrot: ${discover}."</text>
+				<text>"$unit($unit) gibt $unit($recipient) $int($amount) Dumpfbackenbrot."</text>
 			</nr>
 		</locale>
 	</message>

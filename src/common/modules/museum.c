@@ -316,10 +316,12 @@ create_museum(void)
 }
 
 int
-use_museumticket(unit *u, const struct item_type *itype, const char * cmd)
+use_museumticket(unit *u, const struct item_type *itype, int amount, const char * cmd)
 {
 	attrib *a;
 	region *r = u->region;
+
+	unused(amount);
 
 	/* Prüfen ob in normaler Plane und nur eine Person */
 	if(r->planep != NULL) {
@@ -355,12 +357,14 @@ use_museumticket(unit *u, const struct item_type *itype, const char * cmd)
 }
 
 int
-use_museumexitticket(unit *u, const struct item_type *itype, const char * cmd)
+use_museumexitticket(unit *u, const struct item_type *itype, int amount, const char * cmd)
 {
 	attrib *a;
 	region *r;
 	unit   *warden = findunit(atoi36("mwar"));
 	int    unit_cookie;
+
+	unused(amount);
 
 	/* Prüfen ob in Eingangshalle */
 	if(u->region->x != 9525 || u->region->y != 9525) {

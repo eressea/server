@@ -940,20 +940,6 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 	}
 	if (findparam(s, u->faction->locale) == P_ANY) { /* Alle Gegenstände übergeben */
 		char * s = getstrtoken();
-		const resource_type * rtype = findresourcetype(s, u->faction->locale);
-
-		/* Dumpfbackenbrot kann ohne kontaktiere übergeben werden */
-		if (rtype!=NULL) {
-			const potion_type * ptype = resource2potion(rtype);
-			if (ptype!=NULL && ptype == oldpotiontype[P_FOOL]) {
-				item * i = *i_find(&u->items, ptype->itype);
-				if (i!=NULL) {
-					n = i->number - new_get_resvalue(u, i->type->rtype);
-					give_item(n, i->type, u, u2, S->s);
-					return;
-				}
-			}
-		}
 
 		if(u2 && !ucontact(u2, u)) {
 			cmistake(u, S->s, 40, MSG_COMMERCE);

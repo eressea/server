@@ -3187,24 +3187,35 @@ setdefaults (void)
 	}
 }
 
-
 static int
-use_item(unit * u, const item_type * itype, const char * cmd)
+use_item(unit * u, const item_type * itype, int amount, const char * cmd)
 {
 	int i;
+	int target = read_unitid(u->faction, u->region);
 
-	if (itype->use==NULL) {
-		cmistake(u, cmd, 76, MSG_PRODUCE);
-		return EUNUSABLE;
-	}
 	i = new_get_pooled(u, itype->rtype, GET_DEFAULT);
 
+	if (amount>i) {
+		amount = i;
+	}
 	if (i==0) {
 		cmistake(u, cmd, 43, MSG_PRODUCE);
 		return ENOITEM;
 	}
 
-	return itype->use(u, itype, cmd);
+	if (target==-1) {
+		if (itype->use==NULL) {
+			cmistake(u, cmd, 76, MSG_PRODUCE);
+			return EUNUSABLE;
+		}
+		return itype->use(u, itype, amount, cmd);
+	} else {
+		if (itype->useonother==NULL) {
+			cmistake(u, cmd, 76, MSG_PRODUCE);
+			return EUNUSABLE;
+		}
+		return itype->useonother(u, target, itype, amount, cmd);
+	}
 }
 
 
@@ -3370,11 +3381,17 @@ use(void)
 		for (u = r->units; u; u = u->next) {
 			for (S = u->orders; S; S = S->next) {
 				if (igetkeyword(S->s, u->faction->locale) == K_USE) {
-					char * t = getstrtoken();
-					const item_type * itype = finditemtype(t, u->faction->locale);
+					const char * t = getstrtoken();
+					int n = atoi(t);
+					const item_type * itype;
+					if (n==0) {
+						n = 1;
+						t = getstrtoken();
+					}
+					itype = finditemtype(t, u->faction->locale);
 
 					if (itype!=NULL) {
-						use_item(u, itype, S->s);
+						use_item(u, itype, n, S->s);
 					} else {
 						cmistake(u, S->s, 43, MSG_PRODUCE);
 					}

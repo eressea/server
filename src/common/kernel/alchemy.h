@@ -77,7 +77,7 @@ enum {
 
 herb_t rherb2herb(struct region *r);
 void herbsearch(struct region * r, struct unit * u, int max);
-int use_potion(struct unit * u, const struct item_type * itype, const char * cmd);
+int use_potion(struct unit * u, const struct item_type * itype, int amount, const char * cmd);
 void init_potions(void);
 
 extern struct attrib_type at_bauernblut;

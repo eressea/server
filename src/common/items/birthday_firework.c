@@ -35,12 +35,14 @@ const int FIREWORK_RANGE=10;
 
 
 static int
-use_birthday_firework(struct unit * u, const struct item_type * itype, const char *cm)
+use_birthday_firework(struct unit * u, const struct item_type * itype, int amount, const char *cm)
 {
 	regionlist *rlist = all_in_range(u->region, FIREWORK_RANGE);
 	regionlist *rl;
 	message *m;
 	char *name;
+
+	unused(amount);
 
 	name = getstrtoken();
 
@@ -68,7 +70,7 @@ use_birthday_firework(struct unit * u, const struct item_type * itype, const cha
 
 	res_changeitem(u, itype->rtype, -1);
 
-	return -1;
+	return 0;
 }
 
 resource_type rt_birthday_firework = {
@@ -83,6 +85,7 @@ item_type it_birthday_firework = {
 	0, 50, 0,			/* flags, weight, capacity */
 	NULL,					/* construction */
 	&use_birthday_firework,	/* use */
+	NULL,
 	NULL						/* give */
 };
 

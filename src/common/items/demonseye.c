@@ -26,9 +26,10 @@
 #include <assert.h>
 
 static int
-summon_igjarjuk(struct unit * u, const struct item_type * itype, const char * cmd)
+summon_igjarjuk(struct unit * u, const struct item_type * itype, int amount, const char * cmd)
 {
 	unused(u);
+	unused(amount);
 	unused(itype);
 	unused(cmd);
 	assert(!"not implemented");
@@ -57,6 +58,7 @@ item_type it_demonseye = {
 	ITF_NOTLOST|ITF_CURSED, 0, 0,       /* flags, weight, capacity */
 	NULL,                    /* construction */
 	&summon_igjarjuk,
+	NULL,
 	&give_igjarjuk
 };
 
