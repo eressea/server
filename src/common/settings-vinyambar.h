@@ -11,11 +11,11 @@
 */
 
 /*
- * Contains defines for the "free" game (Eressea) .
+ * Contains defines for the "modern" vinyambar game.
  * Include this file from settings.h to make eressea work.
  */
 #define RESOURCE_CONVERSION 1
 #define NEW_RESOURCEGROWTH 1
 #define LARGE_CASTLES 1
 #define GROWING_TREES 1
-#define REMOVENMRNEWBIE 0
+#undef REMOVENMRNEWBIE

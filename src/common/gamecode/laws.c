@@ -3001,7 +3001,7 @@ setdefaults (void)
 				case K_WORK:
 				case K_DRIVE:
 				case K_MOVE:
-					if(fval(u, FL_HUNGER)) {
+					if(!global.disabled[K_WORK] && fval(u, FL_HUNGER)) {
 						set_string(&u->thisorder, locale_string(u->faction->locale, "defaultorder"));
 					} else {
 						set_string(&u->thisorder, S->s);
