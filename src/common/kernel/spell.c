@@ -8066,8 +8066,7 @@ spell spelldaten[] =
 	},
 
 /* M_CHAOS */
-	{SPL_SPARKLE_CHAOS, "Verwünschung",
-		"Das Ziel des Zauberers wird von einer harmlosen Verwünschung heimgesucht.",
+	{SPL_SPARKLE_CHAOS, "sparklechaos", NULL,
 		NULL,
 		"u",
 	 M_CHAOS, (UNITSPELL | TESTCANSEE | SPELLLEVEL | ONETARGET), 5, 1,
@@ -8080,13 +8079,7 @@ spell spelldaten[] =
 	 (spell_f)sp_sparkle, patzer
 	},
 
-	{SPL_DRAIG_EARN_SILVER, "Kleine Flüche",
-	"In den dunkleren Gassen gibt es sie, die Flüche und Verhexungen auf "
-	"Bestellung. Aber auch Gegenzauber hat der Jünger des Draigs natürlich im "
-	"Angebot. Ob nun der Sohn des Nachbarn in einen Liebesbann gezogen werden "
-	"soll oder die Nebenbuhlerin Pickel und Warzen bekommen soll, niemand "
-	"gibt gerne zu, zu solchen Mitteln gegriffen zu haben.  Für diese "
-	"Dienstleistung streicht der Magier 50 Silber pro Stufe ein.",
+	{SPL_DRAIG_EARN_SILVER, "draigearnsilver", NULL,
 	NULL,
 	NULL,
 	 M_CHAOS, (SPELLLEVEL|ONSHIPCAST), 5, 1,
@@ -8099,9 +8092,7 @@ spell spelldaten[] =
 	 (spell_f)sp_earn_silver, patzer
 	},
 
-	{SPL_FIREBALL, "Feuerball",
-		"Der Zauberer schleudert fokussiertes Chaos in die Reihen der Gegner. "
-		"Das ballförmige Chaos wird jeden verwunden, den es trifft.",
+	{SPL_FIREBALL, "fireball", NULL,
 		NULL,
 		NULL,
 	 M_CHAOS, (COMBATSPELL | SPELLLEVEL), 5, 2,
@@ -8114,11 +8105,7 @@ spell spelldaten[] =
 	 (spell_f)sp_kampfzauber, patzer
 	},
 
-	{SPL_MAGICBOOST, "Gabe des Chaos",
-		"Der Magier öffnet seinen Geist den Sphären des Chaos und wird so "
-		"für einige Zeit über mehr magische Kraft verfügen. Doch die Hilfe "
-		"der Herren der Sphären hat seinen Preis, und so wird die Phase der "
-		"Macht abgelöst von einer Phase der Schwäche.",
+	{SPL_MAGICBOOST, "magicboost", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (ONSHIPCAST), 3, 3,
@@ -8131,16 +8118,7 @@ spell spelldaten[] =
 	 (spell_f)sp_magicboost, patzer
 	},
 
-	{SPL_BLOODSACRIFICE, "kleines Blutopfer",
-		"Mit diesem Ritual kann der Magier einen Teil seiner Lebensenergie "
-		"opfern, um dafür an magischer Kraft zu gewinnen. Erfahrene "
-		"Ritualmagier berichten, das sich das Ritual, einmal initiiert, nur "
-		"schlecht steuern ließe und die Menge der so gewonnenen Kraft stark "
-		"schwankt. So steht im 'Buch des Blutes' geschrieben: 'So richte Er aus "
-		"das Zeichen der vier Elemente im Kreis des Werdens und Vergehens und "
-		"Weihe einjedes mit einem Tropfen Blut. Sodann begebe Er in der Mitten "
-		"der Ewigen Vierer sich und lasse Leben verrinnen, auf das Kraft "
-		"geboren werde.'",
+	{SPL_BLOODSACRIFICE, "bloodsacrifice", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (ONSHIPCAST), 1, 4,
@@ -8153,11 +8131,7 @@ spell spelldaten[] =
 		(spell_f)sp_bloodsacrifice, patzer
 	},
 
-	{SPL_BERSERK, "Blutrausch",
-		"In diesem blutigen Ritual opfert der Magier vor der Schlacht ein "
-		"Neugeborenes vor den Augen seiner Armee. Die so gerufenen Blutgeister "
-		"werden von den Soldaten Besitz ergreifen und sie in einen Blutrausch "
-		"versetzen.",
+	{SPL_BERSERK, "berserk", NULL,
 		NULL,
 		NULL,
 	 M_CHAOS, (PRECOMBATSPELL | SPELLLEVEL), 4, 5,
@@ -8170,11 +8144,7 @@ spell spelldaten[] =
 	 (spell_f)sp_berserk, patzer
 	},
 
-	{SPL_FUMBLECURSE, "Chaosfluch",
-		"Dieser heimtückische Fluch beeinträchtigt die magischen Fähigkeiten "
-		"des Opfers erheblich. Eine chaosmagische Zone um das Opfer vermindert "
-		"seine Konzentrationsfähigkeit und macht es ihm sehr schwer Zauber "
-		"zu wirken.",
+	{SPL_FUMBLECURSE, "fumblecurse", NULL,
 		NULL,
 		"u",
 		M_CHAOS,
@@ -8189,12 +8159,7 @@ spell spelldaten[] =
 	 (spell_f)sp_fumblecurse, patzer_fumblecurse
 	},
 
-	{SPL_SUMMONUNDEAD, "Mächte des Todes",
-		"Nächtelang muss der Schwarzmagier durch die Friedhöfe und Gräberfelder "
-		"der Region ziehen um dann die ausgegrabenen Leichen beleben zu können. "
-		"Die Untoten werden ihm zu Diensten sein, doch sei der Unkundige gewarnt, "
-		"dass die Beschwörung der Mächte des Todes ein zweischneidiges Schwert "
-		"sein kann.",
+	{SPL_SUMMONUNDEAD, "summonundead", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (SPELLLEVEL | FARCASTING | ONSHIPCAST),
@@ -8207,11 +8172,7 @@ spell spelldaten[] =
 			{0, 0, 0}},
 		(spell_f)sp_summonundead, patzer_peasantmob
 	},
-	{SPL_COMBATRUST, "Rosthauch",
-		"Mit diesem Ritual wird eine dunkle Gewitterfront "
-		"beschworen, die sich unheilverkündend über der Region auftürmt. "
-		"Der magische Regen wird alles Erz rosten lassen und so viele "
-		"Waffen des Gegners zerstören.",
+	{SPL_COMBATRUST, "combatrust", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (COMBATSPELL | SPELLLEVEL), 5, 6,
@@ -8224,12 +8185,7 @@ spell spelldaten[] =
 	 (spell_f)sp_combatrosthauch, patzer
 	},
 
-	{SPL_TRUESEEING_DRAIG, "Erschaffe ein Amulett des wahren Sehens",
-		"Der Spruch ermöglicht es einem Magier, ein Amulett des Wahren Sehens "
-		"zu erschaffen. Das Amulett erlaubt es dem Träger, alle Einheiten, die "
-		"durch einen Ring der Unsichtbarkeit geschützt sind, zu sehen. Einheiten "
-		"allerdings, die sich mit ihrem Tarnungs-Talent verstecken, bleiben "
-		"weiterhin unentdeckt.",
+	{SPL_TRUESEEING_DRAIG, "trueseeingdraig", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (ONSHIPCAST), 5, 6,
@@ -8242,11 +8198,7 @@ spell spelldaten[] =
 		(spell_f)sp_createitem_trueseeing, patzer_createitem
 	},
 
-	{SPL_INVISIBILITY_DRAIG, "Erschaffe einen Ring der Unsichtbarkeit",
-		"Mit diesem Spruch kann der Zauberer einen Ring der Unsichtbarkeit "
-		"erschaffen. Der Träger des Ringes wird für alle Einheiten anderer "
-		"Parteien unsichtbar, egal wie gut ihre Wahrnehmung auch sein mag. In "
-		"einer unsichtbaren Einheit muss jede Person einen Ring tragen.",
+	{SPL_INVISIBILITY_DRAIG, "invisibilitydraig", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (ONSHIPCAST), 5, 6,
@@ -8259,9 +8211,7 @@ spell spelldaten[] =
 		(spell_f)sp_createitem_invisibility, patzer_createitem
 	},
 
-	{SPL_TRANSFERAURA_CHAOS, "Machtübertragung",
-	 "Mit Hilfe dieses Zaubers kann der Magier eigene Aura im Verhältnis "
-	 "2:1 auf einen anderen Magier des gleichen Magiegebietes übertragen.",
+	{SPL_TRANSFERAURA_CHAOS, "tranferaurachaos", NULL,
 	 "ZAUBERE \"Machtübertragung\" <Einheit-Nr> <investierte Aura>",
 		"ui",
 		M_CHAOS, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 7,
@@ -8274,9 +8224,7 @@ spell spelldaten[] =
 		(spell_f)sp_transferaura, patzer
 	},
 
-	{SPL_FIREWALL, "Feuerwand",
-		"Der Zauberer erschafft eine Wand aus Feuer in der angegebenen Richtung."
-		"Sie verletzt jeden, der sie durchschreitet.",
+	{SPL_FIREWALL, "firewall", NULL,
 		"ZAUBERE \"Feuerwand\" <Richtung>",
 		"c",
 		M_CHAOS, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 4, 7,
@@ -8289,10 +8237,7 @@ spell spelldaten[] =
 		(spell_f)sp_firewall, patzer_peasantmob
 	},
 
-	{SPL_PLAGUE, "Fluch der Pestilenz",
-		"In einem aufwendigen Ritual opfert der Schwarzmagier einige Bauern "
-		"und verteilt dann die Leichen auf magische Weise in den Brunnen der "
-		"Region.",
+	{SPL_PLAGUE, "plague", NULL,
 		NULL,
 		NULL,
 		M_CHAOS,
@@ -8307,12 +8252,7 @@ spell spelldaten[] =
 	 (spell_f)sp_plague, patzer_peasantmob
 	},
 
-	{SPL_CHAOSROW, "Wahnsinn des Krieges",
-		"Vor den Augen der feindlichen Soldaten opfert der Schwarzmagier die "
-		"zehn Bauern in einem blutigen, grausamen Ritual und beschwört auf "
-		"diese Weise Geister des Wahnsinns über die feindlichen Truppen. "
-		"Diese werden im Kampf verwirrt reagieren und nicht in der Lage "
-		"sein, den Anweisungen ihrer Offiziere zu folgen.",
+	{SPL_CHAOSROW, "chaosrow", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
@@ -8325,13 +8265,7 @@ spell spelldaten[] =
 		(spell_f)sp_chaosrow, patzer
 	},
 
-	{SPL_SUMMONSHADOW, "Beschwöre Schattendämonen",
-	 "Mit Hilfe dunkler Rituale beschwört der Zauberer Dämonen aus "
-	 "der Sphäre der Schatten. Diese gefürchteten Wesen können sich "
-	 "fast unsichtbar unter den Lebenden bewegen, ihre finstere Aura "
-	 "ist jedoch für jeden spürbar. Im Kampf sind Schattendämonen "
-	 "gefürchtete Gegner. Sie sind schwer zu treffen und entziehen ihrem "
-	 "Gegner Kraft.",
+	{SPL_SUMMONSHADOW, "summonshadow", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (SPELLLEVEL), 5, 8,
@@ -8344,11 +8278,7 @@ spell spelldaten[] =
 		(spell_f)sp_summonshadow, patzer_peasantmob
 	},
 
-	{SPL_UNDEADHERO, "Untote Helden",
-		"Dieses Ritual bindet die bereits entfliehenden Seelen einiger "
-		"Kampfopfer an ihren toten Körper, wodurch sie zu untoten Leben "
-		"wiedererweckt werden. Ob sie ehemals auf der Seite des Feindes "
-		"oder der eigenen kämpften, ist für das Ritual ohne belang.",
+	{SPL_UNDEADHERO, "undeadhero", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (POSTCOMBATSPELL | SPELLLEVEL), 5, 9,
@@ -8361,11 +8291,7 @@ spell spelldaten[] =
 		(spell_f)sp_undeadhero, patzer
 	},
 
-	{SPL_STRENGTH, "Erschaffe einen Gürtel der Trollstärke",
-		"Dieses magische Artefakt verleiht dem Träger die Stärke eines "
-		"ausgewachsenen Höllentrolls. Seine Tragkraft erhöht sich auf "
-		"das 50fache und auch im Kampf werden sich die erhöhte Kraft und "
-		"die trollisch zähe Haut positiv auswirken.",
+	{SPL_STRENGTH, "strength", NULL,
 		NULL,
 		NULL,
 	 M_CHAOS, (ONSHIPCAST), 5, 9,
@@ -8378,11 +8304,7 @@ spell spelldaten[] =
 	(spell_f)sp_create_trollbelt, patzer
 	},
 
-	{SPL_AURALEAK, "Astraler Riss",
-		"Der Schwarzmagier kann mit diesem dunklen Ritual einen Riss in das "
-		"Gefüge der Magie bewirken, der alle magische Kraft aus der Region "
-		"reißen wird. Alle magisch begabten in der Region werden einen "
-		"Großteil ihrer Aura verlieren.",
+	{SPL_AURALEAK, "auraleak", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (REGIONSPELL | TESTRESISTANCE), 3, 9,
@@ -8395,10 +8317,7 @@ spell spelldaten[] =
 		(spell_f)sp_auraleak, patzer
 	},
 
-	{SPL_DRAIG_FUMBLESHIELD, "Astrales Chaos",
-		"Dieses Ritual, ausgeführt vor einem Kampf, verwirbelt die astralen "
-		"Energien auf dem Schlachtfeld und macht es so feindlichen Magier "
-		"schwieriger, ihre Zauber zu wirken.",
+	{SPL_DRAIG_FUMBLESHIELD, "draigfumbleshield", NULL,
 		NULL,
 		NULL,
 	 M_CHAOS, (PRECOMBATSPELL | SPELLLEVEL), 2, 9,
@@ -8411,11 +8330,7 @@ spell spelldaten[] =
 	 (spell_f)sp_fumbleshield, patzer
 	},
 
-	{SPL_FOREST_FIRE, "Feuerteufel",
-		"Diese Elementarbeschwörung ruft einen Feuerteufel herbei, ein Wesen "
-		"aus den tiefsten Niederungen der Flammenhöllen. Der Feuerteufel "
-		"wird sich begierig auf die Wälder der Region stürzen und sie in "
-		"Flammen setzen.",
+	{SPL_FOREST_FIRE, "forestfire", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 10,
@@ -8428,13 +8343,7 @@ spell spelldaten[] =
 		(spell_f)sp_forest_fire, patzer_peasantmob
 	},
 
-	{SPL_DRAIG_DESTROY_MAGIC, "Pentagramm",
-		"Genau um Mitternacht, wenn die Kräfte der Finsternis am größten sind, "
-		"kann auch ein Schwarzmagier seine Kräfte nutzen um Verzauberungen "
-		"aufzuheben. Dazu zeichnet er ein Pentagramm in das verzauberte Objekt "
-		"und beginnt mit einer Anrufung der Herren der Finsternis. Die Herren "
-		"werden ihm beistehen, doch ob es ihm gelingt, den Zauber zu lösen, "
-		"hängt allein von seiner eigenen Kraft ab.",
+	{SPL_DRAIG_DESTROY_MAGIC, "draigdestroymagic", NULL,
 		"ZAUBERE [REGION x y] [STUFE n] \"Pentagramm\" REGION\n"
 		"ZAUBERE [REGION x y] [STUFE n] \"Pentagramm\" EINHEIT <Einheit-Nr>\n"
 		"ZAUBERE [REGION x y] [STUFE n] \"Pentagramm\" BURG <Burg-Nr>\n"
@@ -8453,12 +8362,7 @@ spell spelldaten[] =
 		(spell_f)sp_destroy_magic, patzer
 	},
 
-	{SPL_UNHOLYPOWER, "Unheilige Kraft",
-		"Nur geflüstert wird dieses Ritual an den dunklen Akademien an die "
-		"Adepten weitergegeben, gehört es doch zu den finstersten, die je "
-		"niedergeschrieben wurden. Durch die Anrufung unheiliger Dämonen "
-		"wird die Kraft der lebenden Toten verstärkt und sie verwandeln "
-		"sich in untote Monster großer Kraft.",
+	{SPL_UNHOLYPOWER, "unholypower", NULL,
 		NULL,
 		"u+",
 		M_CHAOS, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 10,
@@ -8471,12 +8375,7 @@ spell spelldaten[] =
 		(spell_f)sp_unholypower, patzer
 	},
 
-	{SPL_DEATHCLOUD, "Todeswolke",
-		"Mit einem düsteren Ritual und unter Opferung seines eigenen Blutes "
-		"beschwört der Schwarzmagier einen großen Geist von der Elementarebene "
-		"der Gifte. Der Geist manifestiert sich als giftgrüner Schwaden über "
-		"der Region und wird allen, die mit ihm in Kontakt kommen, Schaden "
-		"zufügen.",
+	{SPL_DEATHCLOUD, "deathcloud", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
@@ -8489,13 +8388,7 @@ spell spelldaten[] =
 		(spell_f)sp_deathcloud, patzer_peasantmob
 	},
 
-	{SPL_SUMMONDRAGON, "Drachenruf",
-		"Mit diesem dunklen Ritual erzeugt der Magier einen Köder, der "
-		"für Drachen einfach unwiderstehlich riecht. Ob die Drachen aus der "
-		"Umgebung oder aus der Sphäre des Chaos stammen, konnte noch nicht "
-		"erforscht werden. Es soll beides bereits vorgekommen sein. "
-		"Der Köder hält etwa 6 Wochen, muss aber in einem drachengenehmen "
-		"Terrain plaziert werden.",
+	{SPL_SUMMONDRAGON, "summondragon", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
@@ -8508,13 +8401,7 @@ spell spelldaten[] =
 	 (spell_f)sp_summondragon, patzer_peasantmob
 	},
 
-	{SPL_SUMMONSHADOWLORDS, "Beschwöre Schattenmeister",
-	 "Mit Hilfe dunkler Rituale beschwört der Zauberer Dämonen aus "
-	 "der Sphäre der Schatten. Diese gefürchteten Wesen können sich "
-	 "fast unsichtbar unter den Lebenden bewegen, ihre finstere Aura "
-	 "ist jedoch für jeden spürbar. Im Kampf sind Schattenmeister "
-	 "gefürchtete Gegner. Sie sind schwer zu treffen und entziehen ihrem "
-	 "Gegner Kraft und Leben.",
+	{SPL_SUMMONSHADOWLORDS, "summonshadowlords", NULL,
 		NULL,
 		NULL,
 	 M_CHAOS, (SPELLLEVEL), 5, 12,
@@ -8527,11 +8414,7 @@ spell spelldaten[] =
 	 (spell_f)sp_summonshadowlords, patzer_peasantmob
 	},
 
-	{SPL_FIRESWORD, "Erschaffe ein Flammenschwert",
-		"'Und so reibe das Blut eines wilden Kämpfers in den Stahl der Klinge "
-		"und beginne die Anrufung der Sphären des Chaos. Und hast du alles "
-		"zu ihrem Wohlgefallen getan, so werden sie einen niederen der ihren "
-		"senden, das Schwert mit seiner Macht zu beseelen...'",
+	{SPL_FIRESWORD, "firesword", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (ONSHIPCAST), 5, 12,
@@ -8544,10 +8427,7 @@ spell spelldaten[] =
 		(spell_f)sp_create_firesword, patzer
 	},
 
-	{SPL_DRAIG_FAMILIAR, "Vertrauten rufen",
-		"Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein "
-		"ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem "
-		"Magier anschließen wird.",
+	{SPL_DRAIG_FAMILIAR, "draigfamiliar", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (NOTFAMILIARCAST), 5, 13,
@@ -8560,10 +8440,7 @@ spell spelldaten[] =
 		(spell_f)sp_summon_familiar, patzer
 	},
 
-	{SPL_CHAOSSUCTION, "Chaossog",
-		"Durch das Opfern von 500 Bauern kann der Chaosmagier ein Tor zur "
-		"astralen Welt öffnen. Das Tor kann in der Folgewoche verwendet werden, "
-		"es löst sich am Ende der Folgewoche auf.",
+	{SPL_CHAOSSUCTION, "chaossuction", NULL,
 		NULL,
 		NULL,
 		M_CHAOS, (0), 5, 14,
