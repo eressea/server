@@ -403,7 +403,7 @@ teach(region * r, unit * u)
 			continue;
 		}
 		/* u is teacher, u2 is student */
-		if (eff_skill(u2, sk, r) >= eff_skill(u, sk, r)-TEACHDIFFERENCE) {
+		if (eff_skill(u2, sk, r) > eff_skill(u, sk, r)-TEACHDIFFERENCE) {
 			add_message(&u->faction->msgs,
 				msg_error(u, u->thisorder, "teach_asgood", "student", u2));
 			continue;
