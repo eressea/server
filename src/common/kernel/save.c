@@ -444,9 +444,9 @@ readfaction(void)
 
 	f = findfaction(i36);
 
-	if (f==NULL || strcasecmp(f->passw, pass)) {
+	if (f==NULL || !checkpasswd(f, pass)) {
 		faction * f2 = findfaction(i10);
-		if (f2!=NULL && !strcasecmp(f2->passw, pass)) {
+		if (f2!=NULL && !checkpasswd(f2, pass)) {
 			f = f2;
 			addstrlist(&f->mistakes, "Die Befehle wurden nicht als base36 eingeschickt!");
 		}
@@ -463,7 +463,7 @@ readfaction(void)
 		freestrlist(f->mistakes);
 		f->mistakes = 0;
 
-		if (strcasecmp(f->passw, pass)) {
+		if (!checkpasswd(f, pass)) {
 			addstrlist(&f->mistakes, "Das Passwort wurde falsch eingegeben");
 			return 0;
 		}
@@ -915,6 +915,12 @@ readgame(boolean backup)
 		rds(F, &f->banner);
 		rds(F, &f->email);
 		rds(F, &f->passw);
+		if (global.data_version >= OVERRIDE_VERSION) {
+			rds(F, &f->override);
+		} else {
+			f->override = strdup(itoa36(rand()));
+		}
+
 		if (global.data_version < LOCALE_VERSION) {
 			f->locale = find_locale("de");
 		} else {
@@ -948,6 +954,7 @@ readgame(boolean backup)
 			f->flags = ri(F);
 		else
 			f->flags = 0;
+		freset(f, FFL_OVERRIDE);
 
 		if (global.data_version>=FATTRIBS_VERSION)
 			a_read(F, &f->attribs);
@@ -1858,6 +1865,9 @@ writegame(char *path, char quiet)
 		ws(F, f->banner);
 		ws(F, f->email);
 		ws(F, f->passw);
+#if RELEASE_VERSION>=OVERRIDE_VERSION
+		ws(F, f->override);
+#endif
 #if RELEASE_VERSION>=LOCALE_VERSION
 		ws(F, locale_name(f->locale));
 #endif
@@ -2043,7 +2053,7 @@ writegame(char *path, char quiet)
 			else
 				wi(F, 0);
 			wi(F, u->status);
-			wi(F, u->flags & FL_SAVEMASK);
+			wi(F, u->flags & UFL_SAVEMASK);
 #if RELEASE_VERSION < GUARDFIX_VERSION
 			wi(F, getguard(u));
 #endif

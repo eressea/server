@@ -332,15 +332,14 @@ tower_init(void)
 static void
 guardian_faction(plane * pl, int id)
 {
-	unsigned int i;
 	region * r;
 	faction * f = findfaction(id);
 
 	if (!f) {
 		f = calloc(1, sizeof(faction));
 		f->banner = strdup("Sie dienen dem großen Wyrm");
-		f->passw = strdup("    ");
-		for (i = 0; i < 4; i++) f->passw[i] = (char) (97 + rand() % 26);
+		f->passw = strdup(itoa36(rand()));
+		f->override = strdup(itoa36(rand()));
 		f->email = strdup("igjarjuk@eressea-pbem.de");
 		f->name = strdup("Igjarjuks Kundschafter");
 		f->race = new_race[RC_ILLUSION];

@@ -29,6 +29,7 @@ typedef struct faction {
 	char *banner;
 	char *email;
 	char *passw;
+	char *override;
 	struct locale * locale;
 	int lastorders;	/* enno: short? */
 	int age;	/* enno: short? */
@@ -77,5 +78,6 @@ extern const struct unit * random_unit_in_faction(const struct faction *f);
 extern const char * factionname(const struct faction * f);
 extern void * resolve_faction(void * data);
 extern struct unit * addplayer(struct region *r, char *email, const struct race * frace, struct locale *loc);
+extern boolean checkpasswd(faction * f, const char * passwd);
 
 #endif

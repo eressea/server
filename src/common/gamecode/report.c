@@ -3467,7 +3467,8 @@ report_summary(summary * s, summary * o, boolean full)
 		out_faction(F, f);
 	}
 
-	if (full && NMRTIMEOUT) {
+#if NMRTIMEOUT
+	if (full) {
 		fprintf(F, "\n\nFactions with NMRs:\n");
 		for (i = NMRTIMEOUT; i > 0; --i) {
 			for(f=factions; f; f=f->next) {
@@ -3483,7 +3484,8 @@ report_summary(summary * s, summary * o, boolean full)
 			}
 		}
 	}
-
+#endif
+	
 	fclose(F);
 
 	if (full) {

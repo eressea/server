@@ -1144,7 +1144,7 @@ quit(void)
 		for (u = r->units; u; u = u->next)
 			for (S = u->orders; S; S = S->next)
 				if (igetkeyword(S->s, u->faction->locale) == K_QUIT) {
-					if (strcasecmp(getstrtoken(), u->faction->passw) == 0) {
+					if (checkpasswd(u->faction, getstrtoken())) {
 						destroyfaction(u->faction);
 					} else {
 						cmistake(u, S->s, 86, MSG_EVENT);
@@ -1185,7 +1185,7 @@ quit(void)
 						continue;
 					}
 
-					if (strcasecmp(s_pass, u->faction->passw)) {
+					if (!checkpasswd(u->faction, s_pass)) {
 						cmistake(u, S->s, 86, MSG_EVENT);
 						printf("  Warnung: NEUSTART mit falschem Passwort für Partei %s: %s\n",
 							   factionid(u->faction), S->s);
@@ -1206,9 +1206,24 @@ quit(void)
 			continue;
 		}
 #endif
-		fprintf(sqlstream, 
-			"UPDATE subscriptions SET lastturn=%d WHERE game=%d AND faction='%s';",
-			f->lastorders, GAME_ID, itoa36(f->no));
+		if (fval(f, FFL_OVERRIDE)) {
+			free(f->override);
+			f->override = strdup(itoa36(rand()));
+		}
+		if (turn!=f->lastorders) {
+			char info[256];
+			sprintf(info, "%d Einheiten, %d Personen, %d Silber", 
+				f->nunits, f->number, f->money);
+			fprintf(sqlstream, 
+				"UPDATE subscriptions SET lastturn=%d, password='%s', info='%s' "
+				"WHERE game=%d AND faction='%s';", 
+				f->lastorders, f->override, info, GAME_ID, itoa36(f->no));
+		} else {
+			fprintf(sqlstream, 
+				"UPDATE subscriptions SET lastturn=%d, password='%s' "
+				"WHERE game=%d AND faction='%s';", 
+				f->lastorders, f->override, GAME_ID, itoa36(f->no));
+		}
 
 		if (turn - f->lastorders >= (NMRTIMEOUT - 1)) {
 			inactivefaction(f);
@@ -2069,8 +2084,8 @@ set_passw(void)
 							}
 						}
 						set_string(&u->faction->passw, pbuf);
-						add_message(&u->faction->msgs, new_message(u->faction,
-							"changepasswd%s:value", gc_add(strdup(u->faction->passw))));
+						ADDMSG(&u->faction->msgs, msg_message("changepasswd", 
+							"value", gc_add(strdup(u->faction->passw))));
 					}
 					break;
 

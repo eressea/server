@@ -93,6 +93,8 @@ addplayer(region *r, char *email, const struct race * frace, locale *loc)
 
 	for (i = 0; i < 6; i++) buf[i] = (char) (97 + rand() % 26); buf[i] = 0;
 	set_string(&f->passw, buf);
+	for (i = 0; i < 6; i++) buf[i] = (char) (97 + rand() % 26); buf[i] = 0;
+	set_string(&f->override, buf);
 
 	f->lastorders = turn;
 	f->alive = 1;
@@ -130,3 +132,13 @@ addplayer(region *r, char *email, const struct race * frace, locale *loc)
 	return u;
 }
 
+boolean 
+checkpasswd(faction * f, const char * passwd)
+{
+	if (strcasecmp(f->passw, passwd)==0) return true;
+	if (strcasecmp(f->override, passwd)==0) {
+		fset(f, FFL_OVERRIDE);
+		return true;
+	}
+	return false;
+}

@@ -1389,6 +1389,7 @@ makemonsters(void)
 	f->unique_id = ++max_unique_id;
 	f->name=strdup("Monster");
 	f->passw=strdup("abc123");
+	f->override = strdup(itoa36(rand()));
 	fhash(f);
 	return f;
 }

@@ -153,13 +153,10 @@ struct xml_stack;
 #define INTERIM_VERSION 309
 #define NEWSKILL_VERSION 309
 #define WATCHERS_VERSION 310
-
-#if SKILLPOINTS
-# define RELEASE_VERSION INTERIM_VERSION
-#else
-# define RELEASE_VERSION WATCHERS_VERSION
-#endif
+#define OVERRIDE_VERSION 311
+ 
 #define UGROUPS_VERSION 400 /* nicht aktivieren, nicht fertig */
+#define RELEASE_VERSION OVERRIDE_VERSION
 
 /*
 #if RELEASE_VERSION >= UGROUPS_VERSION
@@ -882,18 +879,19 @@ extern int max_unique_id;
 #define MAX_UNIT_NR (36*36*36*36-1)
 #define MAX_CONTAINER_NR (36*36*36*36-1)
 
-#define FL_NOAIDF					(1<<21) /* Hilfsflag Kampf */
-#define FL_NOAID					(1<<22) /* Einheit hat Noaid-Status */
+#define FL_NOAIDF         (1<<21) /* Hilfsflag Kampf */
+#define FL_NOAID          (1<<22) /* Einheit hat Noaid-Status */
 
 #define FL_MARK           (1<<23) /* für markierende algorithmen, die das hinterher auch wieder
 																		 löschen müssen! (Ist dafür nicht eigentlich FL_DH gedacht?) */
-#define FL_NOIDLEOUT			(1<<24) /* Partei stirbt nicht an NMRs */
-#define FL_TAKEALL				(1<<25) /* Einheit nimmt alle Gegenstände an */
-#define FL_UNNAMED				(1<<26) /* Partei/Einheit/Gebäude/Schiff ist unbenannt */
-#define FL_RESTARTED				(1<<27) /* Partei hat schon einen Neustart gemacht */
-																		/* no longer used, may contain old data! */
+#define FL_NOIDLEOUT      (1<<24) /* Partei stirbt nicht an NMRs */
+#define FL_TAKEALL        (1<<25) /* Einheit nimmt alle Gegenstände an */
+#define FL_UNNAMED        (1<<26) /* Partei/Einheit/Gebäude/Schiff ist unbenannt */
+
+#define FFL_OVERRIDE      (1<<27) /* Override-Passwort wurde benutzt */
+
 /* Flags, die gespeichert werden sollen: */
-#define FL_SAVEMASK (FL_NOAID | FL_RESTARTED | FL_OWNER | FL_PARTEITARNUNG | FL_LOCKED | FL_HUNGER | FL_NOIDLEOUT | FL_TAKEALL | FL_UNNAMED)
+#define UFL_SAVEMASK (FL_NOAID | FL_OWNER | FL_PARTEITARNUNG | FL_LOCKED | FL_HUNGER | FL_NOIDLEOUT | FL_TAKEALL | FL_UNNAMED)
 
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))

@@ -470,6 +470,7 @@ stripfaction (faction * f)
 	free(f->email);
 	free(f->banner);
 	free(f->passw);
+	free(f->override);
 	free(f->name);
 #ifndef FAST_REGION
 	vset_destroy(&f->regions);

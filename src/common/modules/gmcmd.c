@@ -618,6 +618,8 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	a_add(&f->attribs, make_key(atoi36("quest")));
 	f->banner = strdup("Questenpartei");
 	f->passw = strdup(itoa36(rand()));
+	f->override = strdup(itoa36(rand()));
+	f->override = strdup(itoa36(rand()));
 	f->email = strdup(email);
 	f->name = strdup("Questenpartei");
 	f->race = new_race[RC_TEMPLATE];
