@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: magic.c,v 1.4 2001/02/03 13:45:32 enno Exp $
+ *	$Id: magic.c,v 1.5 2001/02/04 18:50:59 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2440,7 +2440,6 @@ set_familiar(unit * mage, unit * familiar)
 		skillmod_data * smd = (skillmod_data *)a->data.v;
 		smd->special = sm_familiar;
 		smd->skill=NOSKILL;
-		assert(!nonplayer(mage));
 	}
 
 	a = a_find(mage->attribs, &at_familiar);

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.9 2001/02/04 13:47:25 corwin Exp $
+ *	$Id: report.c,v 1.10 2001/02/04 18:50:59 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -861,9 +861,7 @@ see_border(border * b, faction * f, region * r)
 	return cs;
 }
 
-attrib_type at_roads_override = {
-	"roads_override", NULL, NULL, NULL, &a_writestring, &a_readstring
-};
+extern attrib_type at_roads_override;
 
 static void
 describe(FILE * F, region * r, int partial, faction * f)
