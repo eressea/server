@@ -343,7 +343,7 @@ static struct curse_type ct_badmagicresistancezone = {
 static struct curse_type ct_goodmagicresistancezone = {
 	"goodmagicresistancezone",
 	CURSETYP_NORM, 0, NO_MERGE,
-	"Dieser Lied, das irgendwie in die magische Essenz der Region gewoben "
+	"Dieses Lied, das irgendwie in die magische Essenz der Region gewoben "
 	"ist, verstärkt die natürliche Widerstandskraft gegen eine "
 	"Verzauberung. Es scheint jedoch nur auf bestimmte Einheiten zu wirken.",
 	cinfo_region

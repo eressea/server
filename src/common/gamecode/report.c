@@ -2126,32 +2126,33 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	for (a=a_find(f->attribs, &at_showitem);a;a=a->nexttype) {
 		const potion_type * ptype = resource2potion(((const item_type*)a->data.v)->rtype);
 		const char * description = NULL;
-		const char * pname = resourcename(ptype->itype->rtype, 0);
 		requirement * m;
-		if (ptype==NULL) continue;
-		m = ptype->itype->construction->materials;
-		if (ch==0) {
-			rnl(F);
-			centre(F, LOC(f->locale, "section_newpotions"), true);
-			ch = 1;
-		}
+    if (ptype!=NULL) {
+      const char * pname = resourcename(ptype->itype->rtype, 0);
+		  m = ptype->itype->construction->materials;
+		  if (ch==0) {
+			  rnl(F);
+			  centre(F, LOC(f->locale, "section_newpotions"), true);
+			  ch = 1;
+		  }
 
-		rnl(F);
-		centre(F, LOC(f->locale, pname), true);
-		sprintf(buf, "%s %d", LOC(f->locale, "nr_level"), ptype->level);
-		centre(F, buf, true);
-		rnl(F);
-		sprintf(buf, "%s: ", LOC(f->locale, "nr_herbsrequired"));
-		while (m->number) {
-			scat(LOC(f->locale, resourcename(oldresourcetype[m->type], 0)));
-			++m;
-			if (m->number) scat(", ");
-		}
-		centre(F, buf, true);
-		rnl(F);
-		description = LOC(f->locale, mkname("potion", pname));
-		if (description==pname) description = ptype->text;
-		centre(F, description, true);
+		  rnl(F);
+		  centre(F, LOC(f->locale, pname), true);
+		  sprintf(buf, "%s %d", LOC(f->locale, "nr_level"), ptype->level);
+		  centre(F, buf, true);
+		  rnl(F);
+		  sprintf(buf, "%s: ", LOC(f->locale, "nr_herbsrequired"));
+		  while (m->number) {
+			  scat(LOC(f->locale, resourcename(oldresourcetype[m->type], 0)));
+			  ++m;
+			  if (m->number) scat(", ");
+		  }
+		  centre(F, buf, true);
+		  rnl(F);
+		  description = LOC(f->locale, mkname("potion", pname));
+		  if (description==pname) description = ptype->text;
+		  centre(F, description, true);
+    }
 	}
 	rnl(F);
 	centre(F, LOC(f->locale, "nr_alliances"), false);
