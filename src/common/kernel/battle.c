@@ -158,13 +158,13 @@ validate_sides(battle * b)
 {
   side* s;
   cv_foreach(s, b->sides) {
-	int snumber = 0;
+    int snumber = 0;
     fighter *df;
-	cv_foreach(df, s->fighters) {
-	  unit *du = df->unit;
-	  snumber += du->number;
-	} cv_next(df);
-	assert(snumber==s->flee+s->healed+s->alive+s->dead);
+    cv_foreach(df, s->fighters) {
+      unit *du = df->unit;
+      snumber += du->number;
+    } cv_next(df);
+    assert(snumber==s->flee+s->healed+s->alive+s->dead);
   } cv_next(s);
 }
 #else
@@ -904,29 +904,29 @@ meffect_blocked(battle *b, meffect *s, side *as)
 void
 rmfighter(fighter *df, int i)
 {
-	side *ds = df->side;
+  side *ds = df->side;
 
-	/* nicht mehr personen abziehen, als in der Einheit am Leben sind */
-	assert(df->alive >= i);
-	assert(df->alive <= df->unit->number);
+  /* nicht mehr personen abziehen, als in der Einheit am Leben sind */
+  assert(df->alive >= i);
+  assert(df->alive <= df->unit->number);
 
-	/* erst ziehen wir die Anzahl der Personen von den Kämpfern in der
-	 * Schlacht, dann von denen auf dieser Seite ab*/
-	df->side->alive -= i;
-	df->side->battle->alive -= i;
+  /* erst ziehen wir die Anzahl der Personen von den Kämpfern in der
+  * Schlacht, dann von denen auf dieser Seite ab*/
+  df->side->alive -= i;
+  df->side->battle->alive -= i;
 
-	/* Dann die Kampfreihen aktualisieren */
-	ds->size[SUM_ROW] -= i;
-	ds->size[statusrow(df->status)] -= i;
+  /* Dann die Kampfreihen aktualisieren */
+  ds->size[SUM_ROW] -= i;
+  ds->size[statusrow(df->status)] -= i;
 
-	/* Spezialwirkungen, z.B. Schattenritter */
-	if (df->unit->race->battle_flags & BF_NOBLOCK) {
-		ds->nonblockers[SUM_ROW] -= i;
-		ds->nonblockers[statusrow(df->status)] -= i;
-	}
+  /* Spezialwirkungen, z.B. Schattenritter */
+  if (df->unit->race->battle_flags & BF_NOBLOCK) {
+    ds->nonblockers[SUM_ROW] -= i;
+    ds->nonblockers[statusrow(df->status)] -= i;
+  }
 
-	/* und die Einheit selbst aktualisieren */
-	df->alive -= i;
+  /* und die Einheit selbst aktualisieren */
+  df->alive -= i;
 }
 
 

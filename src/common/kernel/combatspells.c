@@ -898,89 +898,89 @@ sp_strong_wall(fighter * fi, int level, double power, spell * sp)
 int
 sp_chaosrow(fighter * fi, int level, double power, spell * sp)
 {
-	battle *b = fi->side->battle;
-	unit *mage = fi->unit;
-	cvector *fgs;
-	void **fig;
-	int n, enemies, row;
-	int k = 0;
-	int minrow = FIGHT_ROW;
-	int maxrow = NUMROWS;
+  battle *b = fi->side->battle;
+  unit *mage = fi->unit;
+  cvector *fgs;
+  void **fig;
+  int enemies;
+  int k = 0;
+  int minrow = FIGHT_ROW;
+  int maxrow = NUMROWS;
 
-	switch (sp->id) {
-		case SPL_CHAOSROW:
-			sprintf(buf, "%s murmelt eine düster klingende Formel", unitname(mage));
-			power *= 40;
-			break;
+  switch (sp->id) {
+    case SPL_CHAOSROW:
+      sprintf(buf, "%s murmelt eine düster klingende Formel", unitname(mage));
+      power *= 40;
+      break;
 
-		case SPL_SONG_OF_CONFUSION:
-			sprintf(buf, "%s stimmt einen seltsamen Gesang an", unitname(mage));
-			power = get_force(power, 5);
-			break;
-	}
+    case SPL_SONG_OF_CONFUSION:
+      sprintf(buf, "%s stimmt einen seltsamen Gesang an", unitname(mage));
+      power = get_force(power, 5);
+      break;
+  }
 
-	enemies = count_enemies(b, fi->side, minrow, maxrow);
-	if (!enemies) {
-		scat(", aber niemand war in Reichweite.");
-		battlerecord(b, buf);
-		return 0;
-	}
-	scat(". ");
+  enemies = count_enemies(b, fi->side, minrow, maxrow);
+  if (!enemies) {
+    scat(", aber niemand war in Reichweite.");
+    battlerecord(b, buf);
+    return 0;
+  }
+  scat(". ");
 
-	fgs = fighters(b, fi, minrow, maxrow, FS_ENEMY);
-	v_scramble(fgs->begin, fgs->end);
+  fgs = fighters(b, fi, minrow, maxrow, FS_ENEMY);
+  v_scramble(fgs->begin, fgs->end);
 
-	for (fig = fgs->begin; fig != fgs->end; ++fig) {
-		fighter *df = *fig;
+  for (fig = fgs->begin; fig != fgs->end; ++fig) {
+    fighter *df = *fig;
+    int n = df->unit->number;
+  
+    if (power<=0.0) break;
+    /* force sollte wegen des max(0,x) nicht unter 0 fallen können */
 
-		if (power<=0.0) break;
-		/* force sollte wegen des max(0,x) nicht unter 0 fallen können */
+    if (is_magic_resistant(mage, df->unit, 0)) continue;
 
-		if (is_magic_resistant(mage, df->unit, 0)) continue;
+    if (chance(power/n)) {
+      int row = statusrow(df->status);
+      df->side->size[row] -= df->alive;
+      if (df->unit->race->battle_flags & BF_NOBLOCK) {
+        df->side->nonblockers[row] -= df->alive;
+      }
+      row = FIRST_ROW + (rand()%(LAST_ROW-FIRST_ROW));
+      switch (row) {
+        case FIGHT_ROW:
+          df->status = ST_FIGHT;
+          break;
+        case BEHIND_ROW:
+          df->status = ST_CHICKEN;
+          break;
+        case AVOID_ROW:
+          df->status = ST_AVOID;
+          break;
+        case FLEE_ROW:
+          df->status = ST_FLEE;
+          break;
+        default:
+          assert(!"unknown combatrow");
+      }
+      assert(statusrow(df->status)==row);
+      df->side->size[row] += df->alive;
+      if (df->unit->race->battle_flags & BF_NOBLOCK) {
+        df->side->nonblockers[row] += df->alive;
+      }
+      k+=df->alive;
+    }
+    power = max(0, power-n);
+  }
+  cv_kill(fgs);
 
-		n = df->unit->number;
-
-		if (chance(power/n)) {
-			row = statusrow(df->status);
-			df->side->size[row] -= df->alive;
-			if (df->unit->race->battle_flags & BF_NOBLOCK) {
-				df->side->nonblockers[row] -= df->alive;
-			}
-			row = FIRST_ROW + (rand()%(LAST_ROW-FIRST_ROW));
-			switch (row) {
-				case FIGHT_ROW:
-					df->status = ST_FIGHT;
-					break;
-				case BEHIND_ROW:
-					df->status = ST_CHICKEN;
-					break;
-				case AVOID_ROW:
-					df->status = ST_AVOID;
-					break;
-				case FLEE_ROW:
-					df->status = ST_FLEE;
-					break;
-				default:
-					assert(!"unknown combatrow");
-			}
-			df->side->size[row] += df->alive;
-			if (df->unit->race->battle_flags & BF_NOBLOCK) {
-				df->side->nonblockers[row] += df->alive;
-			}
-			k+=df->alive;
-		}
-		power = max(0, power-n);
-	}
-	cv_kill(fgs);
-
-	scat("Ein plötzlicher Tumult entsteht");
-	if (k > 0) {
-		scat(" und bringt die Kampfaufstellung durcheinander.");
-	} else {
-		scat(", der sich jedoch schnell wieder legt.");
-	}
-	battlerecord(b, buf);
-	return level;
+  scat("Ein plötzlicher Tumult entsteht");
+  if (k > 0) {
+    scat(" und bringt die Kampfaufstellung durcheinander.");
+  } else {
+    scat(", der sich jedoch schnell wieder legt.");
+  }
+  battlerecord(b, buf);
+  return level;
 }
 
 /* Gesang der Furcht (Kampfzauber) */
@@ -1718,6 +1718,13 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
   int n, undead = 0;
   int force = (int)get_force(power,0);
   double c = 0.50 + 0.02 * power;
+  side * s;
+
+  cv_foreach(s, b->sides) {
+    while (s->casualties) {
+
+    }
+  } cv_next(s);
 
   /* Liste aus allen Kämpfern */
   fgs = fighters(b, fi, minrow, maxrow,	FS_ENEMY | FS_HELP );
@@ -1744,51 +1751,34 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
       }
 
       if (j > 0) {
-        int hp = unit_max_hp(du);
-        undead += j;
-        df->side->casualties -= j;
-		df->side->dead -= j;
-        if (j == du->number) {
-          /* Einheit war vollständig tot und konnte vollständig zu
-          * Untoten gemacht werden */
-          int nr;
+        unit * u = createunit(r, mage->faction, 0, new_race[RC_UNDEAD]);
 
-          df->side->alive += j;
-          du->race = new_race[RC_UNDEAD];
-          setguard(du, GUARD_NONE);
-          u_setfaction(du,mage->faction);
-          if (fval(mage, UFL_PARTEITARNUNG))
-            fset(du, UFL_PARTEITARNUNG);
-          /* den Toten wieder volle Hitpoints geben */
-          for (nr = 0; nr != df->alive; ++nr) {
-            df->person[nr].hp = hp;
-          }
-          /* vereinfachtes loot */
-          change_money(mage, get_money(du));
-          set_money(du, 0);
-        } else {
-          unit *u;
-          u = createunit(r, mage->faction, 0, new_race[RC_UNDEAD]);
-          transfermen(du, u, j);
-          sprintf(buf, "%s", du->name);
-          set_string(&u->name, buf);
-          sprintf(buf, "%s", du->display);
-          set_string(&u->display, buf);
-          u->status = du->status;
-          setguard(u, GUARD_NONE);
-          if (fval(mage, UFL_PARTEITARNUNG))
-            fset(u, UFL_PARTEITARNUNG);
-          set_string(&u->lastorder, du->lastorder);
-          /* den Toten volle Hitpoints geben */
-          u->hp = u->number * unit_max_hp(u);
+        /* new units gets some stats from old unit */
+        set_string(&u->name, du->name);
+        set_string(&u->display, du->display);
+        u->status = du->status;
+        setguard(u, GUARD_NONE);
+
+        /* inherit stealth from magician */
+        if (fval(mage, UFL_PARTEITARNUNG)) {
+          fset(u, UFL_PARTEITARNUNG);
         }
+
+        /* transfer dead people to new unit, set hitpoints to those of old unit */
+        transfermen(du, u, j);
+        u->hp = u->number * unit_max_hp(du);
+        df->side->casualties -= j;
+        df->side->dead -= j;
+
+        /* counting total number of undead */
+        undead += j;
       }
     }
   }
   cv_kill(fgs);
 
   if (undead == 0) {
-    sprintf(buf, "%s kann keinen Untoten rufen.", unitname(mage));
+    sprintf(buf, "%s kann keine Untoten rufen.", unitname(mage));
     level = 0;
   } else if (undead == 1) {
     sprintf(buf, "%s erweckt einen Untoten.", unitname(mage));

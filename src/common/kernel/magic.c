@@ -987,38 +987,38 @@ cancast(unit * u, spell * sp, int level, int range, char * cmd)
 double
 spellpower(region * r, unit * u, spell * sp, int cast_level)
 {
-	curse * c;
-	double force = cast_level;
-	if (sp==NULL) {
-		return 0;
-	} else {
-		/* Bonus durch Magieturm und gesegneten Steinkreis */
-		struct building * b = inside_building(u);
-		const struct building_type * btype = b?b->type:NULL;
-		if (btype && btype->flags & BTF_MAGIC) ++force;
-	}
+  curse * c;
+  double force = cast_level;
+  if (sp==NULL) {
+    return 0;
+  } else {
+    /* Bonus durch Magieturm und gesegneten Steinkreis */
+    struct building * b = inside_building(u);
+    const struct building_type * btype = b?b->type:NULL;
+    if (btype && btype->flags & BTF_MAGIC) ++force;
+  }
 
-	if (get_item(u, I_RING_OF_POWER) > 0) ++force;
+  if (get_item(u, I_RING_OF_POWER) > 0) ++force;
 
-	/* Antimagie in der Zielregion */
-	c = get_curse(r->attribs, ct_find("antimagiczone"));
-	if (curse_active(c)) {
-		force -= curse_geteffect(c);
-		curse_changevigour(&r->attribs, c, -cast_level);
-		cmistake(u, findorder(u, u->thisorder), 185, MSG_MAGIC);
-	}
+  /* Antimagie in der Zielregion */
+  c = get_curse(r->attribs, ct_find("antimagiczone"));
+  if (curse_active(c)) {
+    force -= curse_geteffect(c);
+    curse_changevigour(&r->attribs, c, -cast_level);
+    cmistake(u, findorder(u, u->thisorder), 185, MSG_MAGIC);
+  }
 
-	/* Patzerfluch-Effekt: */
-	c = get_curse(r->attribs, ct_find("fumble"));
-	if (curse_active(c)) {
-		force -= curse_geteffect(c);
-		curse_changevigour(&u->attribs, c, -1);
-		cmistake(u, findorder(u, u->thisorder), 185, MSG_MAGIC);
-	}
+  /* Patzerfluch-Effekt: */
+  c = get_curse(r->attribs, ct_find("fumble"));
+  if (curse_active(c)) {
+    force -= curse_geteffect(c);
+    curse_changevigour(&u->attribs, c, -1);
+    cmistake(u, findorder(u, u->thisorder), 185, MSG_MAGIC);
+  }
 
-	force = force * MagicPower();
+  force = force * MagicPower();
 
-	return max(force, 0);
+  return max(force, 0);
 }
 
 /* ------------------------------------------------------------- */
