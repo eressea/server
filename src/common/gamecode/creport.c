@@ -76,7 +76,7 @@ extern const char *spelldata[];
 extern int quiet;
 
 /* globals */
-#define C_REPORT_VERSION 63
+#define C_REPORT_VERSION 64
 
 #define TAG_LOCALE "de"
 #ifdef TAG_LOCALE
@@ -1041,10 +1041,11 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 				if (fval(r, RF_MALLORN) && (trees > 0 || ytrees > 0))
 					fprintf(F, "1;Mallorn\n");
 # endif
-				if (ytrees) pos = report_resource(pos, "rm_youngtrees", f->locale, ytrees, -1);
 				if (!fval(r, RF_MALLORN)) {
+					if (ytrees) pos = report_resource(pos, "rm_youngtrees", f->locale, ytrees, -1);
 					if (trees) pos = report_resource(pos, "rm_trees", f->locale, trees, -1);
 				} else {
+					if (ytrees) pos = report_resource(pos, "rm_youngmallorn", f->locale, ytrees, -1);
 					if (trees) pos = report_resource(pos, "rm_mallorn", f->locale, trees, -1);
 				}
 #else

@@ -171,6 +171,11 @@
 		<text locale="en">young trees</text>
 	</message>
 
+	<message name="rm_youngmallorn">
+		<text locale="de">Mallornschößlinge</text>
+		<text locale="en">young mallorn</text>
+	</message>
+
 	<message name="rm_trees">
 		<text locale="de">Bäume</text>
 		<text locale="en">trees</text>
