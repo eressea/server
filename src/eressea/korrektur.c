@@ -62,7 +62,7 @@
 #include <base36.h>
 #include <log.h>
 #include <cvector.h>
-#include <event.h>
+#include <util/event.h>
 #include <goodies.h>
 #include <resolve.h>
 #include <sql.h>
@@ -729,7 +729,6 @@ fix_herbs(void)
 }
 #endif
 
-#include <event.h>
 #include <triggers/timeout.h>
 #include <triggers/changerace.h>
 #include <triggers/changefaction.h>

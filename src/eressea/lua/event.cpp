@@ -2,6 +2,9 @@
 #include <eressea.h>
 #include "event.h"
 
+// kernel includes
+#include <kernel/unit.h>
+
 // util includes
 #include <util/base36.h>
 #include <util/event.h>
