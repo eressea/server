@@ -849,7 +849,7 @@ init_drive(void)
 				ut = getunit(r, u->faction);
 				if(!ut) continue;
 
-				if (igetkeyword(ut->thisorder, u->faction->locale) == K_DRIVE && !fval(ut, FL_LONGACTION) && !fval(ut, FL_HUNGER)) {
+				if (igetkeyword(ut->thisorder, ut->faction->locale) == K_DRIVE && !fval(ut, FL_LONGACTION) && !fval(ut, FL_HUNGER)) {
 					u2 = getunit(r, u->faction);
 					if(u2 == u) {
 						w += weight(ut);
