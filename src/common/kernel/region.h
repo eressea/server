@@ -39,6 +39,8 @@
 #define RF_ALL 0xFFFFFF
 
 #define RF_SAVEMASK (RF_CHAOTIC|RF_MALLORN|RF_BLOCKED|RF_BLOCK_NORTHWEST|RF_BLOCK_NORTHEAST|RF_BLOCK_EAST|RF_BLOCK_SOUTHEAST|RF_BLOCK_SOUTHWEST|RF_BLOCK_WEST|RF_ENCOUNTER|RF_ORCIFIED)
+struct message;
+struct message_list;
 
 typedef struct land_region {
 	char *name;
@@ -69,6 +71,11 @@ typedef struct region {
 	char *display;
 	unsigned int flags;
 	struct message_list *msgs;
+	struct individual_message {
+		struct individual_message * next;
+		const struct faction * viewer;
+		struct message_list *msgs;
+	} * individual_messages;
 	struct attrib *attribs;
 	struct region *nexthash;
 	terrain_t terrain;
@@ -77,6 +84,9 @@ typedef struct region {
 	weather_t weathertype;
 #endif
 } region;
+
+extern struct message_list * r_getmessages(struct region * r, const struct faction * viewer);
+extern void r_addmessage(struct region * r, const struct faction * viewer, struct message * msg);
 
 typedef struct {
 	int  x;

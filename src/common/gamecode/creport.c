@@ -1091,6 +1091,10 @@ report_computer(FILE * F, faction * f, const time_t report_time)
 				}
 			}
 			cr_output_messages(F, r->msgs, f);
+			{
+				message_list * mlist = r_getmessages(r, f);
+				if (mlist) cr_output_messages(F, mlist, f);
+			}
 			/* buildings */
 			for (b = rbuildings(r); b; b = b->next) {
 				int fno = -1;

@@ -30,6 +30,7 @@
 #include "plane.h"
 #include "region.h"
 #include "curse.h"
+#include "message.h"
 
 /* util includes */
 #include <resolve.h>
@@ -911,3 +912,28 @@ resolve_region(void * id) {
 	return findregion(x, y);
 }
 
+
+struct message_list *
+r_getmessages(struct region * r, const struct faction * viewer)
+{
+	struct individual_message * imsg = r->individual_messages;
+	while (imsg && (imsg)->viewer!=viewer) imsg = imsg->next;
+	if (imsg) return imsg->msgs;
+	return NULL;
+}
+
+void 
+r_addmessage(struct region * r, const struct faction * viewer, struct message * msg)
+{
+	struct individual_message * imsg;
+	assert(r);
+	imsg = r->individual_messages;
+	while (imsg && imsg->viewer!=viewer) imsg = imsg->next;
+	if (imsg==NULL) {
+		imsg = malloc(sizeof(struct individual_message));
+		imsg->next = r->individual_messages;
+		r->individual_messages = imsg;
+		imsg->viewer = viewer;
+	}
+	add_message(&imsg->msgs, msg);
+}

@@ -26,6 +26,7 @@
 #include "plane.h"
 #include "faction.h"
 #include "unit.h"
+#include "region.h"
 #include "item.h"
 #include "building.h"
 
@@ -434,43 +435,37 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 	switch (mtype) {
 	case MSG_INCOME:
 		assert(f);
-		m = add_message(&f->msgs, msg_message("msg_economy", "string", s));
+		add_message(&f->msgs, msg_message("msg_economy", "string", s));
 		break;
 	case MSG_BATTLE:
 		assert(0 || !"battle-meldungen nicht über addmessage machen");
 		break;
 	case MSG_MOVE:
 		assert(f);
-		m = add_message(&f->msgs, msg_message("msg_movement", "string", s));
+		add_message(&f->msgs, msg_message("msg_movement", "string", s));
 		break;
 	case MSG_COMMERCE:
 		assert(f);
-		m = add_message(&f->msgs, msg_message("msg_economy", "string", s));
+		add_message(&f->msgs, msg_message("msg_economy", "string", s));
 		break;
 	case MSG_PRODUCE:
 		assert(f);
-		m = add_message(&f->msgs, msg_message("msg_production", "string", s));
+		add_message(&f->msgs, msg_message("msg_production", "string", s));
 		break;
 	case MSG_MAGIC:
 	case MSG_COMMENT:
 	case MSG_MESSAGE:
-		/* Botschaften an REGION oder einzelne PARTEI */
-		if (!r) {
-			assert(f);
-			m = add_message(&f->msgs, msg_message("msg_event", "string", s));
-		}
-		else
-			m = add_message(&r->msgs, msg_message("msg_event", "string", s));
-		break;
 	case MSG_ORCVERMEHRUNG:
 	case MSG_EVENT:
 		/* Botschaften an REGION oder einzelne PARTEI */
+		m = msg_message("msg_event", "string", s);
 		if (!r) {
 			assert(f);
-			m = add_message(&f->msgs, msg_message("msg_event", "string", s));
+			m = add_message(&f->msgs, m);
+		} else {
+			if (f) add_message(&r->msgs, m);
+			else r_addmessage(r, f, m);
 		}
-		else
-			m = add_message(&r->msgs, msg_message("msg_event", "string", s));
 		break;
 	default:
 		assert(!"Ungültige Msg-Klasse!");

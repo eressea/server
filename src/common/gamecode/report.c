@@ -1960,7 +1960,9 @@ report(FILE *F, faction * f, const char * pzTime)
 		/* Nachrichten an REGION in der Region */
 
 		if (unit_in_region || durchgezogen_in_region) {
+			message_list * mlist = r_getmessages(r, f);
 			rp_messages(F, r->msgs, f, 0, true, true);
+			if (mlist) rp_messages(F, mlist, f, 0, true, true);
 		}
 		/* Burgen und ihre Einheiten */
 
