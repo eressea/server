@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "attributes"=".\common\attributes\attributes-6.dsp" - Package Owner=<4>
+Project: "attributes"=.\common\attributes\attributes.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -15,7 +15,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "eressea"=".\eressea\eressea-6.dsp" - Package Owner=<4>
+Project: "eressea"=.\eressea\eressea.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -32,11 +32,29 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name gamecode
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name attributes
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name items
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name modules
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name races
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name spells
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name triggers
+    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "gamecode"=".\common\gamecode\gamecode-6.dsp" - Package Owner=<4>
+Project: "gamecode"=.\common\gamecode\gamecode.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -48,7 +66,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "items"=".\common\items\items-6.dsp" - Package Owner=<4>
+Project: "items"=.\common\items\items.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -60,7 +78,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "kernel"=".\common\kernel\kernel-6.dsp" - Package Owner=<4>
+Project: "kernel"=.\common\kernel\kernel.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -72,7 +90,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "mapper"="..\dev\mapper\mapper-6.dsp" - Package Owner=<4>
+Project: "mapper"=.\mapper\mapper.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -108,7 +126,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "modules"=".\common\modules\modules-6.dsp" - Package Owner=<4>
+Project: "modules"=.\common\modules\modules.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -120,7 +138,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "races"=".\common\races\races-6.dsp" - Package Owner=<4>
+Project: "races"=.\common\races\races.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -132,7 +150,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "spells"=".\common\spells\spells-6.dsp" - Package Owner=<4>
+Project: "spells"=.\common\spells\spells.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -144,7 +162,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "triggers"=".\common\triggers\triggers-6.dsp" - Package Owner=<4>
+Project: "triggers"=.\common\triggers\triggers.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -156,7 +174,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "util"=".\common\util\util-6.dsp" - Package Owner=<4>
+Project: "util"=.\common\util\util.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
