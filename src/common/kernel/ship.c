@@ -425,7 +425,7 @@ tagbegin(struct xml_stack * stack)
 			if (tname!=NULL) {
 				if (st->coast) {
 					terrain_t * tnew;
-					for (;st->coast[size++];);
+					for (;st->coast[size++]!=NOTERRAIN;);
 					tnew = malloc(sizeof(terrain_t) * (size+2));
 					memcpy(tnew, st->coast, size*sizeof(terrain_t));
 					free(st->coast);
