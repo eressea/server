@@ -140,10 +140,7 @@ enum {
 	C_FREE_24,
 /* struct's vom untertyp curse_skill: */
 	C_SKILL,
-	C_FREE_30,
-	C_FREE_31,
-	C_FREE_32,
-/* struct's vom untertyp curse_secondid: */
+	C_DUMMY,
 	MAXCURSE
 };
 
@@ -169,7 +166,6 @@ enum {
 	CURSETYP_NORM,
 	CURSETYP_UNIT,
 	CURSETYP_SKILL,
-	CURSETYP_SECONDID,
 	MAXCURSETYP
 };
 
@@ -223,12 +219,6 @@ typedef struct curse_skill {
 	int cursedmen;        /* verzauberte Personen in der Einheit */
 	skill_t skill;        /* Talent auf das der Spruch wirkt (id2) */
 } curse_skill;
-
-/* für alle fälle, wo man unterscheidbare Curses gleichen Typs braucht */
-typedef struct curse_secondid {
-	int secondid;
-	int i;
-}curse_secondid;
 
 typedef int (*cdesc_fun)(const void*, int, curse*, int);
 /* Parameter: Objekt, auf dem curse liegt, Typ des Objekts, curse,

@@ -2862,8 +2862,8 @@ wall_vigour(curse* c, int delta)
 }
 
 const curse_type ct_firewall = {
+	C_DUMMY, "Feuerwand",
 	CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR | NO_MERGE),
-	"Feuerwand",
 	"Eine Feuerwand blockiert die Ein- und Ausreise",
 	NULL, /* curseinfo */
 	wall_vigour /* change_vigour */

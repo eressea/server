@@ -224,17 +224,6 @@ is_curseskill(curse_t id)
 	return false;
 }
 
-boolean
-is_cursesecondid(curse_t id)
-{
-	const curse_type *ct = find_cursetype(id);
-
-	if (ct->typ == CURSETYP_SECONDID)
-		return true;
-
-	return false;
-}
-
 /* ------------------------------------------------------------- */
 /* get_curse identifiziert eine Verzauberung über die ID und gibt
  * einen pointer auf die struct zurück.
@@ -266,16 +255,17 @@ cmp_oldcurse(const attrib * a, const void * data)
 
 	if (ct->cspellid != ti->id) return false;
 
+	/* TODO: prüfen auf namen */
+
 	if (is_curseskill(ti->id)){
 		curse_skill * cc = (curse_skill*)c->data;
-		if (cc->skill == (skill_t) ti->id2) return true;
-	} else if (is_cursesecondid(ti->id)) {
-		curse_secondid * cc = (curse_secondid*)c->data;
-		if (cc->secondid == ti->id2) return true;
-	} else {
-		return true;
+		if (cc->skill == (skill_t) ti->id2){
+			return true;
+		} else {
+			return false;
+		}
 	}
-	return false;
+	return true;
 }
 
 twoids *
@@ -544,13 +534,6 @@ set_curse(unit *mage, attrib **ap, curse_t id, int id2, int vigour,
 			curse_skill *cc = calloc(1, sizeof(curse_skill));
 			cc->skill = (skill_t) id2;
 			cc->cursedmen += men;
-			c->data = cc;
-			break;
-		}
-		case CURSETYP_SECONDID:
-		{
-			curse_secondid *cc = calloc(1, sizeof(curse_secondid));
-			cc->secondid = id2;
 			c->data = cc;
 			break;
 		}
@@ -1527,7 +1510,7 @@ curse_type cursedaten[MAXCURSE] =
 		(cdesc_fun)cinfo_magicstreet
 	},
 	{ C_RESIST_MAGIC,
-		"ct_magicresistance",
+		"ct_magicrunes",
 		CURSETYP_NORM, 0, M_SUMEFFECT,
 		"Dieses Zauber verstärkt die natürliche Widerstandskraft gegen eine "
 		"Verzauberung.",
@@ -1658,58 +1641,58 @@ curse_type cursedaten[MAXCURSE] =
 
 	/* struct's vom typ curse_unit: */
 	{ C_SPEED,
-		"Beschleunigen II",
+		"ct_speed",
 		CURSETYP_UNIT, CURSE_SPREADNEVER, M_MEN,
 		"Diese Einheit bewegt sich doppelt so schnell.",
 		(cdesc_fun)cinfo_speed
 	},
 	{ C_ORC,
-		"Orkfieber",
+		"ct_orcish",
 		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"Dieser Zauber scheint die Einheit zu 'orkisieren'. Wie bei Orks "
 		"ist eine deutliche Neigung zur Fortpflanzung zu beobachten.",
 		(cdesc_fun)cinfo_orc
 	},
 	{ C_MBOOST,
-		"",
+		"ct_magicboost",
 		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"",
 		NULL
 	},
 	{ C_KAELTESCHUTZ,
-		"Winterfell",
+		"ct_insectfur",
 		CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
 		"Dieser Zauber schützt vor den Auswirkungen der Kälte.",
 		(cdesc_fun)cinfo_kaelteschutz
 	},
 	{ C_STRENGTH, /* */
-		"Trollstärke",
+		"ct_strength",
 		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"Dieser Zauber vermehrt die Stärke der verzauberten Personen um ein "
 		"vielfaches.",
 		(cdesc_fun)cinfo_strength
 	},
 	{ C_ALLSKILLS, /* Alp */
-		"",
+		"ct_worse",
 		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"",
 		(cdesc_fun)cinfo_allskills
 	},
 	{ C_MAGICRESISTANCE, /* */
-		"Magieschutz",
+		"ct_magicresistance",
 		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"Dieser Zauber verstärkt die natürliche Widerstandskraft gegen eine "
 		"Verzauberung.",
 		NULL
 	},
 	{ C_ITEMCLOAK, /* */
-		"Schleieraura",
+		"ct_itemcloak",
 		CURSETYP_UNIT, CURSE_SPREADNEVER, M_DURATION,
 		"Dieser Zauber macht die Ausrüstung unsichtbar.",
 		(cdesc_fun)cinfo_itemcloak
 	},
 	{ C_SPARKLE, /* */
-		"Leichte Verzauberung",
+		"ct_sparkle",
 		CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
 		"Dieser Zauber ist einer der ersten, den junge Magier in der Schule lernen.",
 		(cdesc_fun)cinfo_sparkle
@@ -1735,30 +1718,11 @@ curse_type cursedaten[MAXCURSE] =
 
 /* struct's vom typ curse_skill: */
 	{ C_SKILL, /* */
-		"",
+		"ct_skillmod",
 		CURSETYP_SKILL, CURSE_SPREADMODULO, M_MEN,
 		"",
 		(cdesc_fun)cinfo_skill
 	},
-	{ C_FREE_30, /* */
-		"",
-		CURSETYP_UNIT, 0, (NO_MERGE),
-		"",
-		NULL
-	},
-	{ C_FREE_31, /* */
-		"",
-		CURSETYP_UNIT, 0, (NO_MERGE),
-		"",
-		NULL
-	},
-	{ C_FREE_32, /* */
-		"",
-		CURSETYP_UNIT, 0, (NO_MERGE),
-		"",
-		NULL
-	},
-/* struct's vom typ curse_secondid: */
 };
 
 void *

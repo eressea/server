@@ -1382,12 +1382,6 @@ curse_write(const attrib * a,FILE * f) {
 			fprintf(f, "%d %d ", (int)cc->skill, cc->cursedmen);
 			break;
 		}
-		case CURSETYP_SECONDID:
-		{
-			curse_secondid * cc = (curse_secondid*)c->data;
-			fprintf(f, "%d %d ", (int)cc->secondid, cc->i);
-			break;
-		}
 		case CURSETYP_NORM:
 		default:
 			break;
@@ -1438,13 +1432,6 @@ curse_read(attrib * a, FILE * f) {
 			fscanf(f, "%d %d ", &skill, &cc->cursedmen);
 			cc->skill = (skill_t)skill;
 			break;
-		}
-		case CURSETYP_SECONDID:
-		{
-			curse_secondid * cc = calloc(1, sizeof(curse_secondid));
-			fscanf(f, "%d %d ", &cc->secondid, &cc->i);
-			break;
-
 		}
 		case CURSETYP_NORM:
 		default:
