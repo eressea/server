@@ -709,12 +709,6 @@ drifting_ships(region * r)
         continue;
       }
 
-      /* Leuchtturm: Ok. */
-      if (check_leuchtturm(r, NULL)) {
-        shp = &sh->next;
-        continue;
-      }
-
       /* Auswahl einer Richtung: Zuerst auf Land, dann
       * zufällig. Falls unmögliches Resultat: vergiß es. */
       d_offset = rand() % MAXDIRECTIONS;
@@ -751,7 +745,7 @@ drifting_ships(region * r)
         }
       }
 
-      if (*shp != sh) shp = &sh->next;
+      if (*shp == sh) shp = &sh->next;
     }
   }
 }
