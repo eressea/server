@@ -26,74 +26,7 @@
  * wichtig
  */
 
-#ifndef NEW_BUILDINGS
-
-enum {
-	B_SITE,
-#if LARGE_CASTLES
-	B_TRADEPOST,
-#endif
-	B_FORTIFICATION,
-	B_TOWER,
-	B_CASTLE,
-	B_FORTRESS,
-	B_CITADEL,
-	MAXBUILDINGS
-};
-
-enum {
-	BT_BURG,
-	BT_LEUCHTTURM,
-	BT_BERGWERK,
-	BT_STEINBRUCH,
-	BT_HAFEN,
-	BT_UNIVERSITAET,
-	BT_MAGIERTURM,
-	BT_SCHMIEDE,
-	BT_SAEGEWERK,
-	BT_PFERDEZUCHT,
-	BT_MONUMENT,
-	BT_DAMM,
-	BT_KARAWANSEREI,
-	BT_TUNNEL,
-	BT_TAVERNE,
-	BT_STONECIRCLE,
-	BT_BLESSEDSTONECIRCLE,
-	BT_ICASTLE,
-	MAXBUILDINGTYPES,
-	NOBUILDING = -1
-};
-#endif
-
-
-extern char *buildingnames[MAXBUILDINGS];
-
-void destroy(struct region * r, struct unit * u, const char * cmd);
-
-extern boolean can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
-
-void do_siege(void);
-void build_road(struct region * r, struct unit * u, int size, direction_t d);
-void create_ship(struct region * r, struct unit * u, const struct ship_type * newtype, int size);
-void continue_ship(struct region * r, struct unit * u, int size);
-
-struct building * getbuilding(const struct region * r);
-struct ship *getship(const struct region * r);
-
-void remove_contacts(void);
-void do_leave(void);
-void do_misc(char try);
-
-void reportevent(struct region * r, char *s);
-
-void shash(struct ship * sh);
-void sunhash(struct ship * sh);
-
-void destroy_ship(struct ship * s, struct region * r);
-
-/* ** ** ** ** ** ** *
- *  new build rules  *
- * ** ** ** ** ** ** */
+struct xml_tag;
 
 typedef struct requirement {
 #ifdef NO_OLD_ITEMS
@@ -125,8 +58,33 @@ typedef struct construction {
 		/* stores skill modifiers and other attributes */
 } construction;
 
-int build(struct unit * u, const construction * ctype, int completed, int want);
-int maxbuild(const struct unit *u, const construction *cons);
+void destroy(struct region * r, struct unit * u, const char * cmd);
+
+extern boolean can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
+
+void do_siege(void);
+void build_road(struct region * r, struct unit * u, int size, direction_t d);
+void create_ship(struct region * r, struct unit * u, const struct ship_type * newtype, int size);
+void continue_ship(struct region * r, struct unit * u, int size);
+
+struct building * getbuilding(const struct region * r);
+struct ship *getship(const struct region * r);
+
+void remove_contacts(void);
+void do_leave(void);
+void do_misc(char try);
+
+void reportevent(struct region * r, char *s);
+
+void shash(struct ship * sh);
+void sunhash(struct ship * sh);
+
+void destroy_ship(struct ship * s, struct region * r);
+
+extern int build(struct unit * u, const construction * ctype, int completed, int want);
+extern int maxbuild(const struct unit *u, const construction *cons);
+
+extern void xml_readrequirement(const struct xml_tag * tag, construction * con);
 
 /** error messages that build may return: */
 #define ELOWSKILL -1

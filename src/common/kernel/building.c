@@ -183,7 +183,6 @@ findbuilding(int i)
 
 
 /** Building: Fortification */
-#ifdef NEW_BUILDINGS
 enum {
 	B_SITE,
 #if LARGE_CASTLES
@@ -196,7 +195,6 @@ enum {
 	B_CITADEL,
 	MAXBUILDINGS
 };
-#endif
 
 static int
 sm_smithy(const unit * u, const region * r, skill_t sk, int value) /* skillmod */
@@ -408,34 +406,7 @@ tagbegin(struct xml_stack * stack)
 			if (xml_bvalue(tag, "variable")) mt[len].flags |= MTF_VARIABLE;
 			if (xml_bvalue(tag, "vital")) mt[len].flags |= MTF_VITAL;
 		} else if (strcmp(tag->name, "requirement")==0) {
-			construction * con = (construction *)bt->construction;
-			if (con!=NULL) {
-				const resource_type * rtype;
-				resource_t type = NORESOURCE;
-				requirement * radd = con->materials;
-				if (radd) {
-					requirement * rnew;
-					int size;
-					for (size=0;radd[size++].number;);
-					rnew = malloc(sizeof(requirement) * (size+2));
-					memcpy(rnew, radd, size*sizeof(requirement));
-					free(radd);
-					con->materials = rnew;
-					radd = rnew+size;
-				} else {
-					radd = con->materials = calloc(sizeof(requirement), 2);
-				}
-				radd[0].number = xml_ivalue(tag, "quantity");
-				rtype = rt_find(xml_value(tag, "type"));
-				for (type=0;type!=MAX_RESOURCES;++type) {
-					if (oldresourcetype[type]==rtype) {
-						radd[0].type = type;
-						break;
-					}
-				}
-				radd[1].number = 0;
-				radd[1].type = 0;
-			}
+			xml_readrequirement(tag, bt->construction);
 		}
 	}
 	return XML_OK;

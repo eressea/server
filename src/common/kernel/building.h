@@ -47,7 +47,7 @@ typedef struct building_type {
 	int fumblebonus;  /* bonus that reduces fumbling */
 	double auraregen; /* modifier for aura regeneration inside building */
 	struct maintenance * maintenance; /* array of requirements */
-	const struct construction * construction; /* construction of 1 building-level */
+	struct construction * construction; /* construction of 1 building-level */
 
 	const char * (*name)(int size);
 	void (*init)(struct building_type*);

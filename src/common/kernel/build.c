@@ -46,6 +46,7 @@
 #include <event.h>
 #include <goodies.h>
 #include <resolve.h>
+#include <xml.h>
 
 /* from libc */
 #include <assert.h>
@@ -1211,3 +1212,32 @@ do_misc(char try)
 	}
 }
 
+void
+xml_readrequirement(const struct xml_tag * tag, construction * con)
+{
+	requirement * radd;
+	const resource_type * rtype;
+	resource_t type = NORESOURCE;
+
+	assert(con!=NULL);
+
+	if (con->materials) {
+		int size = 0;
+		while (con->materials[size].number) ++size;
+		con->materials = realloc(con->materials, sizeof(requirement) * (size+2));
+		radd = con->materials+size;
+	} else {
+		radd = con->materials = malloc(sizeof(requirement) * 2);
+	}
+	radd->number = xml_ivalue(tag, "quantity");
+	radd->recycle = xml_fvalue(tag, "recycle");
+	rtype = rt_find(xml_value(tag, "type"));
+	for (type=0;type!=MAX_RESOURCES;++type) {
+		if (oldresourcetype[type]==rtype) {
+			radd->type = type;
+			break;
+		}
+	}
+	radd[1].number = 0;
+	radd[1].type = 0;
+}
