@@ -33,7 +33,8 @@
 	<xi:include file="eressea/dungeons.xml"/>
 	<strings>
 		<string name="mailto">
-			<text>tutorial@eressea.upb.de</text>
+			<text locale="en">tutorial@eressea.upb.de</text>
+			<text locale="de">tutorial@eressea.upb.de</text>
 		</string>
 		<string name="mailcmd">
 			<text locale="de">ERESSEA BEFEHLE</text>

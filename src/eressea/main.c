@@ -59,6 +59,7 @@
 #include <laws.h>
 
 /* kernel includes */
+#include <kernel/xmlreader.h>
 #include <building.h>
 #include <creport.h>
 #include <faction.h>
@@ -79,6 +80,7 @@
 
 /* util includes */
 #include <rand.h>
+#include <util/xml.h>
 #include <log.h>
 #include <sql.h>
 #include <base36.h>
@@ -171,12 +173,13 @@ game_init(void)
 	register_dungeon();
 #endif
 
-	init_data(xmlfile);
-	init_locales();
+  register_xmlreader();
+  init_data(xmlfile);
 
-	init_attributes();
-	init_resources();
-	init_items();
+  init_locales();
+  init_attributes();
+  init_races();
+  init_items();
   init_races();
 	init_economy();
 #if NEW_RESOURCEGROWTH

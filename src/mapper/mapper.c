@@ -46,6 +46,7 @@
 #endif
 
 /* kernel includes */
+#include <kernel/xmlreader.h>
 #include <item.h>
 #include <faction.h>
 #include <race.h>
@@ -1718,12 +1719,13 @@ main(int argc, char *argv[])
 #endif
 /*	register_dungeon(); */
 
-	init_data(xmlfile);
-	init_locales();
+  register_xmlreader();
+  init_data(xmlfile);
 
-	init_resources();
-	register_items();
-	init_attributes();
+  init_locales();
+  init_attributes();
+
+  init_resources();
 #if NEW_RESOURCEGROWTH
 	init_rawmaterials();
 #endif
