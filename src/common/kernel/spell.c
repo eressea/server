@@ -7147,7 +7147,7 @@ sp_destroy_curse(castorder *co)
 		/* überprüfung, ob curse zu diesem objekt gehört */
 		if (!is_cursed_with(*ap, c)){
 			/* Es wurde kein Ziel gefunden */
-			add_message(&mage->faction->msgs, 
+			add_message(&mage->faction->msgs,
 						new_message(mage->faction,
 									"spelltargetnotfound%u:unit%r:region%s:command",
 									mage, mage->region, strdup(co->order)));
@@ -7171,7 +7171,7 @@ sp_destroy_curse(castorder *co)
 		}
 	}
 	if(ts != NULL) free(ts);
-	
+
 	return cast_level;
 }
 
@@ -8990,11 +8990,7 @@ spell spelldaten[] =
 	 (spell_f)sp_healing, patzer
 	},
 
-	{SPL_GENEROUS, "Hohes Lied der Gaukelei",
-		"Dieser fröhliche Gesang wird sich wie ein Gerücht in der Region "
-		"ausbreiten und alle Welt in Feierlaune versetzten. Überall werden "
-		"Tavernen und Theater gut gefüllt sein und selbst die Bettler satt "
-		"werden.",
+	{SPL_GENEROUS, "generous", NULL,
 		NULL,
 		NULL,
 		M_BARDE,
@@ -9045,11 +9041,7 @@ spell spelldaten[] =
 	 (spell_f)sp_flee, patzer
 	},
 
-	{SPL_RECRUIT, "Gesang des Werbens",
-		"Aus 'Die Gesänge der Alten' von Firudin dem Weisen: "
-		"'Diese verführerische kleine Melodie und einige einschmeichelnde "
-		"Worte überwinden das Misstrauen der Bauern im Nu. Begeistert werden "
-		"sie sich Euch anschliessen und selbst Haus und Hof in Stich lassen.'",
+	{SPL_RECRUIT, "courting", NULL,
 		NULL,
 		NULL,
 		M_BARDE, (SPELLLEVEL), 5, 4,
@@ -10428,7 +10420,7 @@ spell spelldaten[] =
 		 {0, 0, 0}},
 	 (spell_f)sp_shadowcall, patzer
 	},
-	
+
 	{SPL_IMMOLATION, "Feuersturm",
 		"Verletzt alle Gegner.",
 		NULL,

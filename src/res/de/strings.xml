@@ -3024,7 +3024,7 @@
 			<text locale="de">Jungdrachen</text>
 			<text locale="en">young dragon</text>
 		</string>
-		
+
 		<string name="phoenix">
 			<text locale="de">Phönix</text>
 			<text locale="en">phoenix</text>
@@ -3358,7 +3358,11 @@
 	<namespace name="spell">
 		<string name="generous">
 			<text locale="de">Hohes Lied der Gaukelei</text>
-			<text locale="en">Song of Genrosity</text>
+			<text locale="en">Song of Generosity</text>
+		</string>
+		<string name="courting">
+			<text locale="de">Gesang des Werbens</text>
+			<text locale="en">Song of Courting</text>
 		</string>
 		<string name="itemcloak">
 			<text locale="de">Schleieraura</text>
@@ -4974,6 +4978,27 @@
 				dreams of a person, a ship, a building or a
 				region and remove those that are of magical
 				origin. </text>
+		</string>
+		<string name="courting">
+			<text locale="de">Aus 'Die Gesänge der Alten' von
+			Firudin dem Weisen: 'Diese verführerische kleine Melodie
+			und einige einschmeichelnde Worte überwinden das Misstrauen
+			der Bauern im Nu. Begeistert werden sie sich Euch anschliessen
+			und selbst Haus und Hof in Stich lassen.'</text>
+			<text locale="en">From the 'Songs of the Elder' by
+			Firudin the Sage: 'This enticing little melody and its
+			ingratiating words will lure the peasants in no time. They will
+			leave home and hearth to follow your lead.'</text>
+		</string>
+		<string name="generous">
+			<text locale="de">Dieser fröhliche Gesang wird sich wie ein
+			Gerücht in der Region ausbreiten und alle Welt in Feierlaune
+			versetzten. Überall werden Tavernen und Theater gut gefüllt
+			sein und selbst die Bettler satt werden.</text>
+			<text locale="en">This joyous song will spread like wildfire
+			throughout the region and cause festive spirits in all the
+			population. All the taverns and theaters will be packed to the
+			brim and even the beggars will not go hungry.</text>
 		</string>
 		<string name="illaunfamiliar">
 			<text locale="de">Einem erfahrenen Magier wird
