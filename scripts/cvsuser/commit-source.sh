@@ -5,7 +5,8 @@ NEWFILE="/tmp/commit.source.$$"
 OLDFILE="/tmp/commit.source.last"
 
 BUILDNO=0
-BUILDFILE="/home/cvs/.build/eressea-source"
+BUILDLOG="/home/cvs/.build/eressea-source.log"
+BUILDFILE="/home/cvs/.build/eressea-source.no"
 if [ -e $BUILDFILE ]; then
   BUILDNO=`cat $BUILDFILE`
 fi
@@ -26,6 +27,12 @@ echo "Old md5sum=$OLDMD5"
 if [ $NEWMD5 != $OLDMD5 ]; then
   let BUILDNO=$BUILDNO+1
   echo $BUILDNO >| $BUILDFILE
+  (
+   echo
+   echo -n "[commit $BUILDNO] $WHO"
+   date
+   cat $NEWFILE
+  ) >> $BUILDLOG
   mailx -s "[commit $BUILDNO] eressea-source by $WHO" $NOTIFY < $NEWFILE
   echo "New log message. Sent out notification"
 else
