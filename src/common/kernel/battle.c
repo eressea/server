@@ -1039,7 +1039,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 
 	switch (type) {
 	case AT_STANDARD:
-		weapon = select_weapon(at, true, true);
+		weapon = select_weapon(at, true, missile);
 		sk = weapon_effskill(at, dt, weapon, true, missile);
 		if (weapon) awtype = weapon->type;
 		if (awtype && fval(awtype, WTF_MAGICAL)) magic = true;
