@@ -6151,8 +6151,15 @@ sp_fetchastral(castorder *co)
 
 		u = pa->param[n]->data.u;
 
-		if(!ucontact(u, mage)) {
-			if(power > 12 && !pa->param[n]->flag == TARGET_RESISTS && can_survive(u, rt)) {
+    if (ro != u->region) {
+      sprintf(buf, "%s ist zu weit von %s entfernt.",
+        unitname(u), unitname(mage));
+      addmessage(r, mage->faction, buf, MSG_EVENT, ML_MISTAKE);
+      continue;
+    }
+
+		if (!ucontact(u, mage)) {
+			if (power > 12 && !pa->param[n]->flag == TARGET_RESISTS && can_survive(u, rt)) {
 				sprintf(buf, "%s hat uns nicht kontaktiert, widersteht dem "
 						"Zauber jedoch nicht.", unitname(u));
 				addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
