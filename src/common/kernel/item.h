@@ -185,7 +185,7 @@ typedef struct weapon_mod {
 
 typedef struct weapon_type {
 	const item_type * itype;
-	char * damage[2];
+	const char * damage[2];
 	unsigned int flags;
 	skill_t skill;
 	int minskill;

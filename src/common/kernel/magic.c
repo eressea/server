@@ -592,7 +592,7 @@ find_spellbyname(unit *u, char *name, const struct locale * lang)
 		sn=sn->next;
 	}
 	if (!sn) sn = init_spellnames(lang, m->magietyp);
-	if (findtoken(&sn->names, name, &sp)==E_TOK_NOMATCH) return NULL;
+	if (findtoken(&sn->names, name, (void**)&sp)==E_TOK_NOMATCH) return NULL;
 
 	for (spt = m->spellptr; spt; spt = spt->next) {
 		if (sp->id==spt->spellid) return sp;

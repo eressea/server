@@ -2193,8 +2193,7 @@ tagbegin(struct xml_stack * stack)
 
 			assert(strcmp(stack->next->tag->name, "weapon")==0);
 			if (strcmp(type, "default")!=0) pos = 1;
-			if (state->wtype->damage[pos]) free(state->wtype->damage[pos]);
-			state->wtype->damage[pos] = strdup(xml_value(tag, "value"));
+			state->wtype->damage[pos] = gc_add(strdup(xml_value(tag, "value")));
 		} else if (strcmp(tag->name, "modifier")==0) {
 			int value = xml_ivalue(tag, "value");
 			assert(strcmp(stack->next->tag->name, "weapon")==0);
