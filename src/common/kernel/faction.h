@@ -116,6 +116,9 @@ extern struct faction * addfaction(const char *email, const char* password,
 extern boolean checkpasswd(const faction * f, const char * passwd, boolean shortp);
 extern void destroyfaction(faction * f);
 
+extern void set_alliance(struct faction * a, struct faction * b, int status);
+extern int get_alliance(const struct faction * a, const struct faction * b);
+
 #ifdef REGIONOWNERS
 extern boolean is_enemy(const struct faction * f, const struct faction * enemy);
 extern void add_enemy(struct faction * f, struct faction * enemy);

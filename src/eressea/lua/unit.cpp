@@ -234,6 +234,39 @@ operator==(const unit& a, const unit&b)
   return a.no==b.no;
 }
 
+static int
+unit_getaura(const unit& u)
+{
+  return get_spellpoints(&u);
+}
+
+static void
+unit_setaura(unit& u, int points)
+{
+  return set_spellpoints(&u, points);
+}
+
+static const char * 
+unit_getmagic(const unit& u)
+{
+  sc_mage * mage = get_mage(&u);
+  return mage?magietypen[mage->magietyp]:NULL;
+}
+
+static void
+unit_setmagic(unit& u, const char * type)
+{
+  sc_mage * mage = get_mage(&u);
+  magic_t mtype;
+  for (mtype=0;mtype!=MAXMAGIETYP;++mtype) {
+    if (strcmp(magietypen[mtype], type)==0) break;
+  }
+  if (mtype==MAXMAGIETYP) return;
+  if (mage==NULL) {
+    mage = create_mage(&u, mtype);
+  }
+}
+
 void
 bind_unit(lua_State * L) 
 {
@@ -256,6 +289,8 @@ bind_unit(lua_State * L)
     .def("set_racename", &unit_setracename)
     .def("add_spell", &unit_addspell)
     .def("remove_spell", &unit_removespell)
+    .property("circle", &unit_getmagic, &unit_setmagic)
+    .property("aura", &unit_getaura, &unit_setaura)
     .property("region", &unit_getregion, &unit_setregion)
     .property("is_familiar", &unit_isfamiliar)
     .property("spells", &unit_spells, return_stl_iterator)

@@ -82,6 +82,48 @@ operator==(const faction& a, const faction&b)
   return a.no==b.no;
 }
 
+static struct helpmode {
+  const char * name;
+  int status;
+} helpmodes[] = {
+  { "money", HELP_MONEY },
+  { "fight", HELP_FIGHT },
+  { "observe", HELP_OBSERVE },
+  { "give", HELP_GIVE },
+  { "guard", HELP_GUARD },
+  { "stealth", HELP_FSTEALTH },
+  { "travel", HELP_TRAVEL },
+  { "all", HELP_ALL },
+  { NULL, 0 }
+};
+
+static int
+faction_getpolicy(const faction& a, const faction& b, const char * flag)
+{
+  int mode;
+
+  for (mode=0;helpmodes[mode].name!=NULL;++mode) {
+    if (strcmp(flag, helpmodes[mode].name)==0) {
+      return get_alliance(&a, &b) & mode;
+    }
+  }
+  return 0;
+}
+
+static void
+faction_setpolicy(faction& a, faction& b, const char * flag, boolean value)
+{
+  int mode;
+
+  for (mode=0;helpmodes[mode].name!=NULL;++mode) {
+    if (strcmp(flag, helpmodes[mode].name)==0) {
+      if (value) set_alliance(&a, &b, get_alliance(&a, &b) | mode);
+      else set_alliance(&a, &b, get_alliance(&a, &b) & ~mode);
+      break;
+    }
+  }
+}
+
 void
 bind_faction(lua_State * L) 
 {
@@ -93,6 +135,8 @@ bind_faction(lua_State * L)
     class_<struct faction>("faction")
     .def(tostring(self))
     .def(self == faction())
+    .def("set_policy", &faction_setpolicy)
+    .def("get_policy", &faction_getpolicy)
     .def_readonly("name", &faction::name)
     .def_readonly("password", &faction::passw)
     .def_readonly("email", &faction::email)

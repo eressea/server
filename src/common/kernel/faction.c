@@ -306,6 +306,38 @@ destroyfaction(faction * f)
 	}
 }
 
+int
+get_alliance(const faction * a, const faction * b)
+{
+  const ally * sf = a->allies;
+  for (;sf!=NULL;sf=sf->next) {
+    if (sf->faction==b) {
+      return sf->status;
+    }
+  }
+  return 0;
+}
+
+void
+set_alliance(faction * a, faction * b, int status)
+{
+  ally ** sfp;
+  sfp = &a->allies;
+  while (*sfp) {
+    ally * sf = *sfp;
+    if (sf->faction==b) break;
+    sfp = &sf->next;
+  }
+  if (*sfp==NULL) {
+    ally * sf = *sfp = malloc(sizeof(ally));
+    sf->next = NULL;
+    sf->status = status;
+    sf->faction = b;
+    return;
+  }
+  (*sfp)->status |= status;
+}
+
 #ifdef REGIONOWNERS
 boolean
 is_enemy(const struct faction * f, const struct faction * enemy)
