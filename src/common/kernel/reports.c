@@ -34,6 +34,7 @@
 #include "ship.h"
 #include "skill.h"
 #include "unit.h"
+#include "spell.h"
 #include "plane.h"
 #ifdef USE_UGROUPS
 # include "ugroup.h"
@@ -373,7 +374,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 					}else{
 						scat(", ");
 					}
-					scat(sp->name);
+					scat(spell_name(sp, f->locale));
 				}
 			}
 			dh = 0;
@@ -395,7 +396,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 					sp = get_combatspell(u,i);
 					if (sp) {
 						int sl;
-						scat(sp->name);
+						scat(spell_name(sp, u->faction->locale));
 						if((sl = get_combatspelllevel(u,i)) > 0) {
 							scat(" (");
 							icat(sl);
@@ -736,7 +737,7 @@ spy_message(int spy, unit *u, unit *target)
 					} else {
 						scat(", ");
 					}
-					scat(sp->name);
+					scat(spell_name(sp, u->faction->locale));
 				}
 				if (found == 0) {
 					scat("Keine");

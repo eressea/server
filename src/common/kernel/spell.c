@@ -56,6 +56,7 @@
 #include <base36.h>
 #include <message.h>
 #include <event.h>
+#include <language.h>
 #include <rand.h>
 
 /* libc includes */
@@ -169,6 +170,7 @@ magicanalyse_region(region *r, unit *mage, int force)
 {
 	attrib *a;
 	boolean found = false;
+	const struct locale * lang = mage->faction->locale;
 
 	for (a=r->attribs;a;a=a->next) {
 		curse * c;
@@ -186,14 +188,14 @@ magicanalyse_region(region *r, unit *mage, int force)
 		found = true;
 
 		if(rand()%100 < chance){ /* Analyse geglückt */
-			if(c->flag & CURSE_NOAGE){
+			if(c->flag & CURSE_NOAGE) {
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_region_noage%u:mage%r:region%s:spell",
-					mage, r, c->type->name));
+					mage, r, LOC(lang, c->type->cname)));
 			}else{
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_region_age%u:mage%r:region%s:spell%i:months",
-					mage, r, c->type->name, mon));
+					mage, r, LOC(lang, c->type->cname), mon));
 			}
 		} else {
 			add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -211,6 +213,7 @@ magicanalyse_unit(unit *u, unit *mage, int force)
 {
 	attrib *a;
 	boolean found = false;
+	const struct locale * lang = mage->faction->locale;
 
 	for (a=u->attribs;a;a=a->next) {
 		curse * c;
@@ -229,11 +232,11 @@ magicanalyse_unit(unit *u, unit *mage, int force)
 			if(c->flag & CURSE_NOAGE){
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_unit_noage%u:mage%u:unit%s:spell",
-					mage, u, c->type->name));
+					mage, u, LOC(lang, c->type->cname)));
 			}else{
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_unit_age%u:mage%u:unit%s:spell%i:months",
-					mage, u, c->type->name, mon));
+					mage, u, LOC(lang, c->type->cname), mon));
 			}
 		} else {
 			add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -251,6 +254,7 @@ magicanalyse_building(building *b, unit *mage, int force)
 {
 	attrib *a;
 	boolean found = false;
+	const struct locale * lang = mage->faction->locale;
 
 	for (a=b->attribs;a;a=a->next) {
 		curse * c;
@@ -269,11 +273,11 @@ magicanalyse_building(building *b, unit *mage, int force)
 			if(c->flag & CURSE_NOAGE){
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_building_age%u:mage%b:building%s:spell",
-					mage, b, c->type->name));
+					mage, b, LOC(lang, c->type->cname)));
 			}else{
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_building_age%u:mage%b:building%s:spell%i:months",
-					mage, b, c->type->name, mon));
+					mage, b, LOC(lang, c->type->cname)));
 			}
 		} else {
 			add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -292,6 +296,7 @@ magicanalyse_ship(ship *sh, unit *mage, int force)
 {
 	attrib *a;
 	boolean found = false;
+	const struct locale * lang = mage->faction->locale;
 
 	for (a=sh->attribs;a;a=a->next) {
 		curse * c;
@@ -310,11 +315,11 @@ magicanalyse_ship(ship *sh, unit *mage, int force)
 			if(c->flag & CURSE_NOAGE){
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_ship_noage%u:mage%h:ship%s:spell",
-					mage, sh, c->type->name));
+					mage, sh, LOC(lang, c->type->cname)));
 			}else{
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_ship_age%u:mage%h:ship%s:spell",
-					mage, sh, c->type->name, mon));
+					mage, sh, LOC(lang, c->type->cname)));
 			}
 		} else {
 			add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -387,7 +392,7 @@ destroy_curse(attrib **alist, int cast_level, int force,
 		c1 = (curse*)a->data.v;
 
 		/* Immunität prüfen */
-		if (c1->flag & CURSE_IMMUN) {
+		if (c1->flag & CURSE_IMMUNE) {
 			do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
 			continue;
 		}
@@ -850,7 +855,7 @@ sp_goodwinds(castorder *co)
 
 	/* keine Probleme mit C_SHIP_SPEEDUP und C_SHIP_FLYING */
 	/* NODRIFT bewirkt auch +1 Geschwindigkeit */
-	create_curse(mage, &sh->attribs, C_SHIP_NODRIFT, 0, power, cast_level, 0, 0);
+	create_curse(mage, &sh->attribs, ct_find("nodrift"), power, cast_level, 0, 0);
 
 	/* melden, 1x pro Partei */
 	freset(mage->faction, FL_DH);
@@ -908,7 +913,7 @@ sp_magicstreet(castorder *co)
 	}
 
 	/* wirkt schon in der Zauberrunde! */
-	create_curse(mage, &r->attribs, C_MAGICSTREET, 0, power, cast_level, 0, 0);
+	create_curse(mage, &r->attribs, ct_find("magicstreet"), power, cast_level, 0, 0);
 
 	/* melden, 1x pro Partei */
 	{
@@ -1056,6 +1061,7 @@ sp_maelstrom(castorder *co)
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
+	curse * c;
 	int power = co->force;
 
 	if(rterrain(r) != T_OCEAN) {
@@ -1067,8 +1073,8 @@ sp_maelstrom(castorder *co)
 	/* Attribut auf Region.
 	 * Existiert schon ein curse, so wird dieser verstärkt
 	 * (Max(Dauer), Max(Stärke))*/
-	create_curse(mage,&mage->attribs,C_MAELSTROM,0,power,power,power,0);
-	set_curseflag(r->attribs, C_MAELSTROM, 0, CURSE_ISNEW);
+	c = create_curse(mage, &mage->attribs, ct_find("maelstrom"), power, power, power,0);
+	curse_setflag(c, CURSE_ISNEW);
 
 	/* melden, 1x pro Partei */
 	{
@@ -1150,8 +1156,7 @@ sp_blessedharvest(castorder *co)
 	/* Attribut auf Region.
 	 * Existiert schon ein curse, so wird dieser verstärkt
 	 * (Max(Dauer), Max(Stärke))*/
-	create_curse(mage,&r->attribs,C_BLESSEDHARVEST,0,power,power,1,0);
-
+	create_curse(mage,&r->attribs, ct_find("blessedharvest"), power, power, 1, 0);
 	{
 		message * seen = msg_message("harvest_effect", "mage", mage);
 		message * unseen = msg_message("harvest_effect", "mage", NULL);
@@ -1192,7 +1197,7 @@ sp_hain(castorder *co)
 		return 0;
 	}
 
-	trees = lovar(force * 10 * RESOURCE_QUANTITY) + force;
+	trees = lovar((int)(force * 10 * RESOURCE_QUANTITY)) + force;
 #if GROWING_TREES
 	rsettrees(r, 1, rtrees(r,1) + trees);
 #else
@@ -1239,7 +1244,7 @@ sp_mallornhain(castorder *co)
 		return 0;
 	}
 
-	trees = lovar(force * 10 * RESOURCE_QUANTITY) + force;
+	trees = lovar((int)(force * 10 * RESOURCE_QUANTITY)) + force;
 #if GROWING_TREES
 	rsettrees(r, 1, rtrees(r,1) + trees);
 #else
@@ -1431,7 +1436,7 @@ sp_kaelteschutz(castorder *co)
 			men = u->number;
 		}
 
-		create_curse(mage, &u->attribs, C_KAELTESCHUTZ, 0, cast_level,
+		create_curse(mage, &u->attribs, ct_find("insectfur"), cast_level,
 				duration, 1, men);
 
 		force -= u->number;
@@ -1477,7 +1482,7 @@ sp_sparkle(castorder *co)
 	if(pa->param[0]->flag == TARGET_RESISTS) return cast_level;
 
 	u = pa->param[0]->data.u;
-	create_curse(mage, &u->attribs, C_SPARKLE, 0, cast_level,
+	create_curse(mage, &u->attribs, ct_find("sparkle"), cast_level,
 			cast_level, rand(), u->number);
 
 	add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -1531,7 +1536,7 @@ sp_create_irongolem(castorder *co)
 		return 0;
 	}
 
-	u2 = create_unit(r, mage->faction, max(1,force*8*RESOURCE_QUANTITY), new_race[RC_IRONGOLEM], 0,
+	u2 = create_unit(r, mage->faction, max(1,(int)(force*8*RESOURCE_QUANTITY)), new_race[RC_IRONGOLEM], 0,
 		LOC(mage->faction->locale, rc_name(new_race[RC_IRONGOLEM], 1)), mage);
 
 	set_level(u2, SK_ARMORER, 1);
@@ -1592,7 +1597,7 @@ sp_create_stonegolem(castorder *co)
 		return 0;
 	}
 
-	u2 = create_unit(r, mage->faction, max(1,force*5*RESOURCE_QUANTITY), new_race[RC_STONEGOLEM], 0,
+	u2 = create_unit(r, mage->faction, max(1,(int)(force*5*RESOURCE_QUANTITY)), new_race[RC_STONEGOLEM], 0,
 		LOC(mage->faction->locale, rc_name(new_race[RC_STONEGOLEM], 1)), mage);
 	set_level(u2, SK_ROAD_BUILDING, 1);
 	set_level(u2, SK_BUILDING, 1);
@@ -1668,7 +1673,7 @@ sp_great_drought(castorder *co)
 	rsethorses(r, rhorses(r)/2);
 
 	/* Arbeitslohn = 1/4 */
-	create_curse(mage, &r->attribs, C_DROUGHT, 0, force, 1, 4, 0);
+	create_curse(mage, &r->attribs, ct_find("drought"), force, 1, 4, 0);
 
   /* terraforming */
 	if (rand() % 100 < 25){
@@ -2042,13 +2047,14 @@ sp_holyground(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int power = co->force;
+	curse * c;
 	message * msg = r_addmessage(r, mage->faction, msg_message("holyground", "mage", mage));
 	msg_release(msg);
 
-	create_curse(mage, &r->attribs, C_HOLYGROUND, 0,
-			power*power, 1, 0, 0);
+	c = create_curse(mage, &r->attribs, ct_find("holyground"), 
+		power*power, 1, 0, 0);
 
-	set_curseflag(mage->region->attribs, C_HOLYGROUND, 0, CURSE_NOAGE);
+	curse_setflag(c, CURSE_NOAGE);
 
 	a_removeall(&r->attribs, &at_deathcount);
 
@@ -2072,7 +2078,7 @@ static int
 sp_homestone(castorder *co)
 {
 	unit *u;
-	curse * success;
+	curse * c;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
@@ -2083,23 +2089,20 @@ sp_homestone(castorder *co)
 		return 0;
 	}
 
-	success = create_curse(mage, &mage->building->attribs, C_MAGICSTONE, 0,
+	c = create_curse(mage, &mage->building->attribs, ct_find("magicstone"),
 			force*force, 1, 0, 0);
 
-	if(!success) {
+	if (c==NULL) {
 		cmistake(mage, strdup(co->order), 206, MSG_MAGIC);
 		return 0;
 	}
 
-	set_curseflag(mage->building->attribs, C_MAGICSTONE, 0, CURSE_NOAGE);
-
-	/* Nur ein Heimstein pro Burg möglich */
-	set_curseflag(mage->building->attribs, C_MAGICSTONE, 0, CURSE_ONLYONE);
+	curse_setflag(c, CURSE_NOAGE|CURSE_ONLYONE);
 
 	/* Magieresistenz der Burg erhöht sich um 50% */
-	create_curse(mage,  &mage->building->attribs, C_RESIST_MAGIC, 0,
-		force*force, 1, 50, 0);
-	set_curseflag(mage->building->attribs, C_RESIST_MAGIC, 0, CURSE_NOAGE);
+	c = create_curse(mage,  &mage->building->attribs, 
+		ct_find("magicresistance"), force*force, 1, 50, 0);
+	curse_setflag(c, CURSE_NOAGE);
 
 	/* melden, 1x pro Partei in der Burg */
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
@@ -2169,8 +2172,8 @@ sp_drought(castorder *co)
 	 * hoch (evtl dauert dann die Duerre laenger).  Ansonsten volle
 	 * Auswirkungen.
 	 */
-	c = get_curse(r->attribs, C_DROUGHT, 0);
-	if(c) {
+	c = get_curse(r->attribs, ct_find("drought"));
+	if (c) {
 		c->vigour = max(c->vigour, power);
 		c->duration = max(c->duration, power);
 	} else {
@@ -2184,7 +2187,7 @@ sp_drought(castorder *co)
 #endif
 		rsethorses(r, rhorses(r)/2);
 
-		create_curse(mage, &r->attribs, C_DROUGHT, 0, power, power, 4, 0);
+		create_curse(mage, &r->attribs, ct_find("drought"), power, power, 4, 0);
 	}
 	return cast_level;
 }
@@ -2221,6 +2224,7 @@ sp_fog_of_confusion(castorder *co)
 	rl = all_in_range(r, range);
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
+		curse * c;
 		if(rterrain(rl2->region) != T_OCEAN
 				&& !r_isforest(rl2->region)) continue;
 
@@ -2230,10 +2234,10 @@ sp_fog_of_confusion(castorder *co)
 			continue;
 		}
 
-		create_curse(mage, &rl2->region->attribs, C_REGCONF,0,
-				power, duration, cast_level*5, 0);
+		c = create_curse(mage, &rl2->region->attribs, 
+			ct_find("disorientationzone"), power, duration, cast_level*5, 0);
 		/* Soll der schon in der Zauberrunde wirken? */
-		set_curseflag(rl2->region->attribs, C_REGCONF, 0, CURSE_ISNEW);
+		curse_setflag(c, CURSE_ISNEW);
 
 		for (u = rl2->region->units; u; u = u->next) freset(u->faction, FL_DH);
 		for(u = rl2->region->units; u; u = u->next ) {
@@ -2360,7 +2364,7 @@ sp_stormwinds(castorder *co)
 		}
 
 		/* Duration = 1, nur diese Runde */
-		create_curse(mage, &sh->attribs, C_SHIP_SPEEDUP, 0, power, 1, 0, 0);
+		create_curse(mage, &sh->attribs, ct_find("stormwind"), power, 1, 0, 0);
 		/* Da der Spruch nur diese Runde wirkt, brauchen wir kein
 		 * set_cursedisplay() zu benutzten - es sieht eh niemand...  */
 		erfolg++;
@@ -2685,6 +2689,7 @@ sp_fumblecurse(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int force = co->force;
+	curse * c;
 	spellparameter *pa = co->par;
 
 	/* wenn kein Ziel gefunden, Zauber abbrechen */
@@ -2698,14 +2703,14 @@ sp_fumblecurse(castorder *co)
 
 	effect = force/2;
 
-	if (create_curse(mage, &target->attribs, C_FUMBLE, 0,
-				force, duration+1, effect, 0) == NULL)
-	{
+	c = create_curse(mage, &target->attribs, ct_find("fumble"),
+				force, duration+1, effect, 0);
+	if (c == NULL) {
 		report_failure(mage, co->order);
 		return 0;
 	}
 
-	set_curseflag(target->attribs, C_FUMBLE, 0, CURSE_ONLYONE);
+	curse_setflag(c, CURSE_ONLYONE);
 	add_message(&target->faction->msgs, new_message(target->faction,
 		"fumblecurse%u:unit%r:region", target, target->region));
 
@@ -2719,16 +2724,17 @@ patzer_fumblecurse(castorder *co)
 	int cast_level = co->level;
 	int force = co->force;
 	int effect;
+	curse * c;
 
 	effect = force/2;
 
-	if (create_curse(mage, &mage->attribs, C_FUMBLE, 0, force,
-				(cast_level/2)+1, effect, 0))
-	{
+	c = create_curse(mage, &mage->attribs, ct_find("fumble"), force,
+				(cast_level/2)+1, effect, 0);
+	if (c!=NULL) {
 		add_message(&mage->faction->msgs, new_message(mage->faction,
 			"magic_fumble%u:unit%r:region%s:command",
 			mage, mage->region, strdup(co->order)));
-		set_curseflag(mage->attribs, C_FUMBLE, 0, CURSE_ONLYONE);
+		curse_setflag(c, CURSE_ONLYONE);
 	}
 	return;
 }
@@ -2862,7 +2868,7 @@ wall_vigour(curse* c, int delta)
 }
 
 const curse_type ct_firewall = {
-	C_DUMMY, "Feuerwand",
+	"Feuerwand",
 	CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR | NO_MERGE),
 	"Eine Feuerwand blockiert die Ein- und Ausreise",
 	NULL, /* curseinfo */
@@ -3575,6 +3581,7 @@ sp_chaossuction(castorder *co)
 static int
 sp_magicboost(castorder *co)
 {
+	curse * c;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int power = co->force;
@@ -3584,17 +3591,18 @@ sp_magicboost(castorder *co)
 		report_failure(mage, co->order);
 		return 0;
 	}
-	/* (magier, attribut, curseid, id2, power, duration, effect, men) */
-	create_curse(mage, &mage->attribs, C_MBOOST, 0, power, 10, 6, 1);
-	create_curse(mage, &mage->attribs, C_AURA, 0, power, 4, 200, 1);
+
+	c = create_curse(mage, &mage->attribs, ct_find("magicboost"), power, 10, 6, 1);
+	/* kann nicht durch Antimagie beeinflusst werden */
+	curse_setflag(c, CURSE_IMMUNE);
+
+	c = create_curse(mage, &mage->attribs, ct_find("aura"), power, 4, 200, 1);
 
 	{
-		trigger * tsummon = trigger_createcurse(mage, mage, C_AURA, 0, power, 6, 50, 1);
+		trigger * tsummon = trigger_createcurse(mage, mage, c->type, power, 6, 50, 1);
 		add_trigger(&mage->attribs, "timer", trigger_timeout(5, tsummon));
 	}
 
-	/* kann nicht durch Antimagie beeinflusst werden */
-	set_curseflag(mage->attribs, C_MBOOST, 0, CURSE_IMMUN);
 
 	add_message(&mage->faction->msgs, new_message(mage->faction,
 		"magicboost_effect%u:unit%r:region%s:command",
@@ -3851,7 +3859,7 @@ sp_babbler(castorder *co)
  *
  * Wirkung:
  *  Zeigt die Verzauberungen eines Objekts an (curse->name,
- *  cures->info). Aus der Differenz Spruchstärke und Curse->vigour
+ *  curse::info). Aus der Differenz Spruchstärke und Curse->vigour
  *  ergibt sich die Chance den Spruch zu identifizieren ((force -
  *  c->vigour)*10 + 100 %).
  *
@@ -3902,7 +3910,7 @@ sp_analysesong_obj(castorder *co)
  * Gebiet:         Cerddor
  * Wirkung:
  *  Zeigt die Verzauberungen eines Objekts an (curse->name,
- *  cures->info). Aus der Differenz Spruchstärke und Curse->vigour
+ *  curse::info). Aus der Differenz Spruchstärke und Curse->vigour
  *  ergibt sich die Chance den Spruch zu identifizieren ((force -
  *  c->vigour)*10 + 100 %).
  *
@@ -4014,7 +4022,7 @@ sp_charmingsong(castorder *co)
 		add_trigger(&mage->faction->attribs, "destroy", trigger_killunit(target));
 	}
 	/* sperre ATTACKIERE, GIB PERSON und überspringe Migranten */
-	create_curse(mage, &target->attribs, C_SLAVE, 0, force, duration, 0, 0);
+	create_curse(mage, &target->attribs, ct_find("slavery"), force, duration, 0, 0);
 
 	/* setze Partei um und lösche langen Befehl aus Sicherheitsgründen */
 	u_setfaction(target,mage->faction);
@@ -4054,7 +4062,7 @@ sp_song_resistmagic(castorder *co)
 	int force = co->force;
 
 
-	create_curse(mage, &r->attribs, C_SONG_GOODMR, 0,
+	create_curse(mage, &r->attribs, ct_find("goodmagicresistancezone"),
 			force, force, mr_bonus, 0);
 
 	/* Erfolg melden */
@@ -4084,7 +4092,7 @@ sp_song_susceptmagic(castorder *co)
 	int cast_level = co->level;
 	int force = co->force;
 
-	create_curse(mage, &r->attribs, C_SONG_BADMR, 0,
+	create_curse(mage, &r->attribs, ct_find("badmagicresistancezone"),
 			force, force, mr_malus, 0);
 
 	add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -4203,7 +4211,7 @@ sp_raisepeasantmob(castorder *co)
 	a->data.ca[1] = 15;	/* 15% */
 	a_add(&u->attribs, a);
 
-	create_curse(mage, &r->attribs, C_RIOT, 0, cast_level, anteil, 0, 0);
+	create_curse(mage, &r->attribs, ct_find("riotzone"), cast_level, anteil, 0, 0);
 
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
 	for (u = r->units; u; u = u->next ) {
@@ -4264,7 +4272,8 @@ sp_migranten(castorder *co)
 
 	/* Keine Monstereinheiten */
 	if (!playerrace(target->race)){
-		sprintf(buf, "%s kann nicht auf Monster gezaubert werden.", sp->name);
+		sprintf(buf, "%s kann nicht auf Monster gezaubert werden.", 
+			spell_name(sp, mage->faction->locale));
 		addmessage(0, mage->faction, buf, MSG_EVENT, ML_WARN);
 		return 0;
 	}
@@ -4281,7 +4290,7 @@ sp_migranten(castorder *co)
 	{
 		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': So viele Personen übersteigen "
 				"meine Kräfte.", unitname(mage), regionid(mage->region),
-				sp->name);
+				spell_name(sp, mage->faction->locale));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_WARN);
 	}
 
@@ -4324,7 +4333,8 @@ sp_migranten(castorder *co)
 	if (kontaktiert == 0){
 		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Die Einheit %s hat keinen "
 				"Kontakt mit uns aufgenommen.", unitname(mage),
-				regionid(mage->region), sp->name, unitname(target));
+				regionid(mage->region), spell_name(sp, mage->faction->locale)
+				, unitname(target));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
@@ -4362,7 +4372,7 @@ sp_song_of_peace(castorder *co)
 	else
 		duration = lovar(force/2);
 
-	create_curse(mage,&r->attribs,C_PEACE,0,force,duration,1,0);
+	create_curse(mage,&r->attribs, ct_find("peacezone"), force, duration, 1,0);
 
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
 	for (u = r->units; u; u = u->next ) {
@@ -4409,7 +4419,7 @@ sp_generous(castorder *co)
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
-	create_curse(mage,&r->attribs,C_GENEROUS,0,force,force,2,0);
+	create_curse(mage,&r->attribs, ct_find("generous"), force,force,2,0);
 
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
 	for (u = r->units; u; u = u->next ) {
@@ -4509,7 +4519,8 @@ sp_pump(castorder *co)
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
 	if (fval(target->race, RCF_UNDEAD)) {
-		sprintf(buf, "%s kann nicht auf Untote gezaubert werden.", sp->name);
+		sprintf(buf, "%s kann nicht auf Untote gezaubert werden.", 
+			spell_name(sp, mage->faction->locale));
 		addmessage(0, mage->faction, buf, MSG_EVENT, ML_WARN);
 		return 0;
 	}
@@ -4579,7 +4590,8 @@ sp_seduce(castorder *co)
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
 	if (fval(target->race, RCF_UNDEAD)) {
-		sprintf(buf, "%s kann nicht auf Untote gezaubert werden.", sp->name);
+		sprintf(buf, "%s kann nicht auf Untote gezaubert werden.", 
+			spell_name(sp, mage->faction->locale));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_WARN);
 		return 0;
 	}
@@ -4669,6 +4681,7 @@ static int
 sp_calm_monster(castorder *co)
 {
 	int duration;
+	curse * c;
 	unit *target;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
@@ -4685,18 +4698,20 @@ sp_calm_monster(castorder *co)
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
 	if (fval(target->race, RCF_UNDEAD)) {
-		sprintf(buf, "%s kann nicht auf Untote gezaubert werden.", sp->name);
+		sprintf(buf, "%s kann nicht auf Untote gezaubert werden.", 
+			spell_name(sp, mage->faction->locale));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_WARN);
 		return 0;
 	}
 
-	if (!create_curse(mage, &target->attribs, C_CALM, 0, force, duration,
-				mage->faction->unique_id, 0)){
+	c = create_curse(mage, &target->attribs, ct_find("calmmonster"), force, duration,
+				mage->faction->unique_id, 0);
+	if (c==NULL) {
 		report_failure(mage, co->order);
 		return 0;
 	}
 	/* Nur ein Beherrschungszauber pro Unit */
-	set_curseflag(target->attribs, C_CALM, 0, CURSE_ONLYONE);
+	curse_setflag(c, CURSE_ONLYONE);
 
 	sprintf(buf, "%s besänftigt %s.", unitname(mage), unitname(target));
 	addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
@@ -4858,7 +4873,7 @@ sp_depression(castorder *co)
 	int cast_level = co->level;
 	int power = co->force;
 
-	create_curse(mage,&r->attribs,C_DEPRESSION,0,power,power,0,0);
+	create_curse(mage,&r->attribs, ct_find("depression"), power, power, 0, 0);
 
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
 	for (u = r->units; u; u = u->next ) {
@@ -4948,18 +4963,14 @@ sp_songofAttraction(castorder *co)
 {
 	region *r = co->rt; /* Zauberregion */
 	unit *mage = (unit *)co->magician;
-	unit *u;
 	int cast_level = co->level;
-	int power = co->force;
-	region *rn;
-	faction *f;
-	int range;
+	/* int power = co->force; */
 
 	/* TODO Wander Effekt */
 
 	add_message(&mage->faction->msgs, new_message(mage->faction,
 				"summon%u:unit%r:region%s:command%u:unit%r:region",
-				mage, mage->region, strdup(co->order),mage, co->rt));
+				mage, mage->region, strdup(co->order),mage, r));
 
 	return cast_level;
 }
@@ -5172,7 +5183,7 @@ sp_readmind(castorder *co)
  * Kosten:         SPC_FIX
  * Wirkung:
  *  Zeigt die Verzauberungen eines Objekts an (curse->name,
- *  cures->info). Aus der Differenz Spruchstärke und Curse->vigour
+ *  curse::info). Aus der Differenz Spruchstärke und Curse->vigour
  *  ergibt sich die Chance den Spruch zu identifizieren ((force -
  *  c->vigour)*10 + 100 %).
  */
@@ -5196,7 +5207,7 @@ sp_analyseregionsdream(castorder *co)
  * Kosten:         SPC_FIX
  * Wirkung:
  *  Zeigt die Verzauberungen eines Objekts an (curse->name,
- *  cures->info). Aus der Differenz Spruchstärke und Curse->vigour
+ *  curse::info). Aus der Differenz Spruchstärke und Curse->vigour
  *  ergibt sich die Chance den Spruch zu identifizieren ((force -
  *  c->vigour)*10 + 100 %).
  */
@@ -5242,6 +5253,7 @@ sp_baddreams(castorder *co)
 	int cast_level = co->level;
 	int power = co->force;
 	region *r = co->rt;
+	curse * c;
 
 	/* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
 	 * also duration+2 */
@@ -5249,8 +5261,8 @@ sp_baddreams(castorder *co)
 	duration = 2 + rand()%duration;
 
 	/* Nichts machen als ein entsprechendes Attribut in die Region legen. */
-	create_curse(mage, &r->attribs, C_GBDREAM, 0, power, duration, -1, 0);
-	set_curseflag(r->attribs, C_GBDREAM, 0, CURSE_ISNEW);
+	c = create_curse(mage, &r->attribs, ct_find("gbdream"), power, duration, -1, 0);
+	curse_setflag(c, CURSE_ISNEW);
 
 	/* Erfolg melden*/
 	add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -5276,6 +5288,7 @@ int
 sp_gooddreams(castorder *co)
 {
 	int    duration;
+	curse * c;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
@@ -5285,8 +5298,8 @@ sp_gooddreams(castorder *co)
 	 * also duration+2 */
 	duration = max(1, power/2); /* Stufe 1 macht sonst mist */
 	duration = 2 + rand()%duration;
-	create_curse(mage, &r->attribs, C_GBDREAM, 0, power, duration, 1, 0);
-	set_curseflag(r->attribs, C_GBDREAM, 0, CURSE_ISNEW);
+	c = create_curse(mage, &r->attribs, ct_find("gbdream"), power, duration, 1, 0);
+	curse_setflag(c, CURSE_ISNEW);
 
 	/* Erfolg melden*/
 	add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -5392,7 +5405,6 @@ sp_dreamreading(castorder *co)
 int
 sp_sweetdreams(castorder *co)
 {
-	unit *u;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
@@ -5404,12 +5416,13 @@ sp_sweetdreams(castorder *co)
 
 	/* Schleife über alle angegebenen Einheiten */
 	for (n = 0; n < pa->length; n++) {
+		curse * c;
+		unit *u;
 		/* sollte nie negativ werden */
-		if (opfer < 1)
-			break;
+		if (opfer < 1) break;
 
-		if(pa->param[n]->flag == TARGET_RESISTS
-				|| pa->param[n]->flag == TARGET_NOTFOUND)
+		if (pa->param[n]->flag == TARGET_RESISTS || 
+			pa->param[n]->flag == TARGET_NOTFOUND) 
 			continue;
 
 		/* Zieleinheit */
@@ -5419,8 +5432,8 @@ sp_sweetdreams(castorder *co)
 		opfer -= men;
 
 		/* Nichts machen als ein entsprechendes Attribut an die Einheit legen. */
-		create_curse(mage,&u->attribs,C_ORC,0,power,duration,5,men);
-		set_curseflag(u->attribs, C_ORC, 0, CURSE_ISNEW);
+		c = create_curse(mage,&u->attribs, ct_find("orcish"), power,duration,5,men);
+		curse_setflag(c, CURSE_ISNEW);
 
 		sprintf(buf, "%s verschafft %s ein interessanteres Nachtleben.",
 				unitname(mage), unitname(u));
@@ -5449,9 +5462,8 @@ sp_disturbingdreams(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int power = co->force;
-
-	create_curse(mage, &r->attribs, C_BADLEARN, 0, power, power/6, 10, 0);
-	set_curseflag(r->attribs, C_BADLEARN, 0, CURSE_ISNEW);
+	curse * c = create_curse(mage, &r->attribs, ct_find("badlearn"), power, power/6, 10, 0);
+	curse_setflag(c, CURSE_ISNEW);
 
 	sprintf(buf, "%s sorgt für schlechten Schlaf in %s.",
 			unitname(mage), regionid(r));
@@ -5475,17 +5487,17 @@ sp_dream_of_confusion(castorder *co)
 	rl = all_in_range(r, range);
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
-
+		curse * c;
 		/* Magieresistenz jeder Region prüfen */
 		if (target_resists_magic(mage, rl2->region, TYP_REGION, 0)){
 			report_failure(mage, co->order);
 			continue;
 		}
 
-		create_curse(mage, &rl2->region->attribs, C_REGCONF,0,
-				power, duration, cast_level*5, 0);
+		c = create_curse(mage, &rl2->region->attribs, 
+			ct_find("disorientationzone"), power, duration, cast_level*5, 0);
 		/* soll der Zauber schon in der Zauberrunde wirken? */
-		set_curseflag(rl2->region->attribs, C_REGCONF, 0, CURSE_ISNEW);
+		curse_setflag(c, CURSE_ISNEW);
 
 		for (u = rl2->region->units; u; u = u->next) freset(u->faction, FL_DH);
 		for (u = rl2->region->units; u; u = u->next ) {
@@ -5517,7 +5529,7 @@ sp_dream_of_confusion(castorder *co)
  *
  * Wirkung:
  *  Zeigt die Verzauberungen eines Objekts an (curse->name,
- *  cures->info). Aus der Differenz Spruchstärke und Curse->vigour
+ *  curse::info). Aus der Differenz Spruchstärke und Curse->vigour
  *  ergibt sich die Chance den Spruch zu identifizieren ((force -
  *  c->vigour)*10 + 100 %).
  *
@@ -5589,7 +5601,7 @@ sp_itemcloak(castorder *co)
 	/* Zieleinheit */
 	target = pa->param[0]->data.u;
 
-	create_curse(mage,&target->attribs,C_ITEMCLOAK,0,power,power,0,0);
+	create_curse(mage,&target->attribs, ct_find("itemcloak"), power,power,0,0);
 	add_message(&mage->faction->msgs, new_message(mage->faction,
 		"itemcloak%u:mage%u:target", mage, target));
 
@@ -5647,8 +5659,8 @@ sp_resist_magic_bonus(castorder *co)
 		m = min(u->number,opfer);
 		opfer -= m;
 
-		create_curse(mage, &u->attribs, C_MAGICRESISTANCE, 0, power, duration,
-				resistbonus, m);
+		create_curse(mage, &u->attribs, ct_find("magicresistance"), 
+			power, duration, resistbonus, m);
 
 		sprintf(buf, "%s wird kurz von einem magischen Licht umhüllt.",
 				unitname(u));
@@ -5695,7 +5707,7 @@ sp_enterastral(castorder *co)
 	default:
 		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Dieser Zauber funktioniert "
 				"nur in der materiellen Welt.", unitname(mage),
-				regionid(mage->region),sp->name);
+				regionid(mage->region), spell_name(sp, mage->faction->locale));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
@@ -5703,7 +5715,7 @@ sp_enterastral(castorder *co)
 	if(!rt) {
 		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Es kann hier kein Kontakt zur "
 				"Astralwelt hergestellt werden.", unitname(mage),
-				regionid(mage->region),sp->name);
+				regionid(mage->region), spell_name(sp, mage->faction->locale));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
@@ -5712,7 +5724,7 @@ sp_enterastral(castorder *co)
 			is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
 		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Es kann kein Kontakt zu "
 				"dieser astralen Region hergestellt werden.", unitname(mage),
-				regionid(mage->region),sp->name);
+				regionid(mage->region), spell_name(sp, mage->faction->locale));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
@@ -5818,7 +5830,7 @@ sp_pullastral(castorder *co)
 		if(!rl2) {
 			sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Es kann kein Kontakt zu "
 				"dieser Region hergestellt werden.", unitname(mage),
-				regionid(mage->region),sp->name);
+				regionid(mage->region), spell_name(sp, mage->faction->locale));
 			addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 			free_regionlist(rl);
 			return 0;
@@ -5828,7 +5840,7 @@ sp_pullastral(castorder *co)
 	default:
 		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Dieser Zauber funktioniert "
 				"nur in der astralen  Welt.", unitname(mage),
-				regionid(mage->region),sp->name);
+				regionid(mage->region), spell_name(sp, mage->faction->locale));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
@@ -5837,7 +5849,7 @@ sp_pullastral(castorder *co)
 			is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
 		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Es kann kein Kontakt zu "
 				"dieser Region hergestellt werden.", unitname(mage),
-				regionid(mage->region),sp->name);
+				regionid(mage->region), spell_name(sp, mage->faction->locale));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
@@ -6346,8 +6358,8 @@ sp_disruptastral(castorder *co)
 		}
 
 		/* Kontakt unterbinden */
-		create_curse(mage,&rl2->region->attribs,C_ASTRALBLOCK,0,power,power/3,
-				100, 0);
+		create_curse(mage,&rl2->region->attribs, ct_find("astralblock"),
+			power, power/3, 100, 0);
 		addmessage(r, 0, "Mächtige Magie verhindert den Kontakt zur Realität.",
 				MSG_COMMENT, ML_IMPORTANT);
 	}
@@ -6391,7 +6403,7 @@ static int
 sp_eternizewall(castorder *co)
 {
 	unit *u;
-	curse * success;
+	curse * c;
 	building *b;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
@@ -6403,18 +6415,15 @@ sp_eternizewall(castorder *co)
 	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
 	b = pa->param[0]->data.b;
-	success = create_curse(mage, &b->attribs, C_NOCOST, 0,
-			power*power, 1, 0, 0);
+	c = create_curse(mage, &b->attribs, ct_find("nocost"), 
+		power*power, 1, 0, 0);
 
-	if(!success){	/* ist bereits verzaubert */
+	if(c==NULL) {	/* ist bereits verzaubert */
 		cmistake(mage, strdup(co->order), 206, MSG_MAGIC);
 		return 0;
 	}
 
-	set_curseflag(b->attribs, C_NOCOST, 0, CURSE_NOAGE);
-
-	/* Nur einmal  pro Burg möglich */
-	set_curseflag(b->attribs, C_NOCOST, 0, CURSE_ONLYONE);
+	curse_setflag(c, CURSE_NOAGE|CURSE_ONLYONE);
 
 	/* melden, 1x pro Partei in der Burg */
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
@@ -6521,7 +6530,8 @@ sp_movecastle(castorder *co)
 
 	if(dir == NODIRECTION) {
 		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Ungültige Richtung %s.",
-			unitname(mage), regionid(mage->region), sp->name,
+			unitname(mage), regionid(mage->region), 
+			spell_name(sp, mage->faction->locale),
 			pa->param[1]->data.s);
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
@@ -6530,7 +6540,7 @@ sp_movecastle(castorder *co)
 	if(b->size > (cast_level-12) * 250) {
 		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Der Elementar ist "
 			"zu klein, um das Gebäude zu tragen.", unitname(mage),
-			regionid(mage->region), sp->name);
+			regionid(mage->region), spell_name(sp, mage->faction->locale));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return cast_level;
 	}
@@ -6540,7 +6550,8 @@ sp_movecastle(castorder *co)
 	if(!(terrain[target_region->terrain].flags & LAND_REGION)) {
 		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Der Erdelementar "
 				"weigert sich, nach %s zu gehen.",
-			unitname(mage), regionid(mage->region), sp->name,
+			unitname(mage), regionid(mage->region), 
+			spell_name(sp, mage->faction->locale),
 			locale_string(mage->faction->locale, directions[dir]));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return cast_level;
@@ -6624,7 +6635,7 @@ sp_flying_ship(castorder *co)
 	/* mit C_SHIP_NODRIFT haben wir kein Problem */
 
 	/* Duration = 1, nur diese Runde */
-	create_curse(mage, &sh->attribs, C_SHIP_FLYING, 0, power, 1, 0, 0);
+	create_curse(mage, &sh->attribs, ct_find("flyingship"), power, 1, 0, 0);
 	/* Da der Spruch nur diese Runde wirkt, brauchen wir kein
 	 * set_cursedisplay() zu benutzten - es sieht eh niemand...
 	 */
@@ -6766,7 +6777,7 @@ sp_antimagiczone(castorder *co)
 	/* Reduziert die Stärke jedes Spruchs um effect */
 	effect = cast_level;
 
-	create_curse(mage, &r->attribs, C_ANTIMAGICZONE, 0, power, force,
+	create_curse(mage, &r->attribs, ct_find("antimagiczone"), power, force,
 			effect, 0);
 
 	/* Erfolg melden*/
@@ -6809,8 +6820,8 @@ sp_antimagiczone(castorder *co)
  * "kc"
  */
 
-int
-sp_antimagicshild(castorder *co)
+static int
+sp_magicrunes(castorder *co)
 {
 	int duration;
 	unit *mage = (unit *)co->magician;
@@ -6827,7 +6838,7 @@ sp_antimagicshild(castorder *co)
 			b = pa->param[0]->data.b;
 
 			/* Magieresistenz der Burg erhöht sich um 20% */
-			create_curse(mage, &b->attribs, C_RESIST_MAGIC, 0, force,
+			create_curse(mage, &b->attribs, ct_find("magicrunes"), force,
 					duration, 20, 0);
 
 			/* Erfolg melden */
@@ -6841,7 +6852,7 @@ sp_antimagicshild(castorder *co)
 			ship *sh;
 			sh = pa->param[0]->data.sh;
 			/* Magieresistenz des Schiffs erhöht sich um 20% */
-			create_curse(mage, &sh->attribs, C_RESIST_MAGIC, 0, force,
+			create_curse(mage, &sh->attribs, ct_find("magicrunes"), force,
 					duration, 20, 0);
 
 			/* Erfolg melden */
@@ -6892,7 +6903,7 @@ sp_speed2(castorder *co)
 		u = pa->param[n]->data.u;
 
 		men = min(maxmen,u->number);
-		create_curse(mage, &u->attribs, C_SPEED, 0, force, dur, 2, men);
+		create_curse(mage, &u->attribs, ct_find("speed"), force, dur, 2, men);
 		maxmen -= men;
 		used += men;
 	}
@@ -7082,7 +7093,7 @@ sp_destroy_curse(castorder *co)
 	c->vigour = max(0, succ);
 
 	if(succ <= 0) {
-		remove_cursec(ap, c);
+		remove_curse(ap, c);
 
 		add_message(&mage->faction->msgs, new_message(mage->faction,
 			"destroy_magic_effect%u:unit%r:region%s:command%i:id%s:target",
@@ -7440,10 +7451,8 @@ spell spelldaten[] =
 
 /* M_DRUIDE */
 
-	{SPL_BLESSEDHARVEST, "Segen der Erde",
-	 "Dieses Ernteritual verbessert die Erträge der arbeitenden Bauern in der "
-	 "Region um ein Silberstück. Je mehr Kraft der Druide investiert, desto "
-	 "länger wirkt der Zauber.",
+	{SPL_BLESSEDHARVEST, "blessedharvest",
+		NULL,
 		NULL,
 		NULL,
 		M_DRUIDE,
@@ -7459,12 +7468,8 @@ spell spelldaten[] =
 		patzer
 	},
 
-	{SPL_GWYRRD_EARN_SILVER, "Viehheilung",
-	"Die Fähigkeiten der Gwyrrd-Magier in der Viehzucht und Heilung sind bei "
-	"den Bauern sehr begehrt. Grade auf Märkten sind ihre Dienste häufig sehr "
-	"gefragt. Manch einer mag auch sein Talent dazu nutzen, ein Tier für einen "
-	"besseren Preis zu verkaufen.  Pro Stufe kann der Magier so 50 Silber "
-	"verdienen.",
+	{SPL_GWYRRD_EARN_SILVER, "veterinarian",
+		NULL,
 		NULL,
 		NULL,
 		M_DRUIDE,
@@ -10253,7 +10258,7 @@ spell spelldaten[] =
 		 {0, 0, 0},
 		 {0, 0, 0},
 		 {0, 0, 0}},
-	 (spell_f)sp_antimagicshild, patzer
+	 (spell_f)sp_magicrunes, patzer
 	},
 
 

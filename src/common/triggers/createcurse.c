@@ -39,8 +39,7 @@
 typedef struct createcurse_data {
 	struct unit * mage;
 	struct unit * target;
-	curse_t id;
-	int id2;
+	const curse_type * type;
 	int vigour;
 	int duration;
 	int effect;
@@ -68,7 +67,7 @@ createcurse_handle(trigger * t, void * data)
 	createcurse_data * td = (createcurse_data*)t->data.v;
 	if (td->mage!=NULL && td->target!=NULL) {
 		create_curse(td->mage, &td->target->attribs,
-			td->id, td->id2, td->vigour, td->duration, td->effect, td->men);
+			td->type, td->vigour, td->duration, td->effect, td->men);
 	} else {
 		log_error(("could not perform createcurse::handle()\n"));
 	}
@@ -82,7 +81,7 @@ createcurse_write(const trigger * t, FILE * F)
 	createcurse_data * td = (createcurse_data*)t->data.v;
 	fprintf(F, "%s ", itoa36(td->mage->no));
 	fprintf(F, "%s ", itoa36(td->target->no));
-	fprintf(F, "%d %d %d %d %d %d ", td->id, td->id2, td->vigour, td->duration, td->effect, td->men);
+	fprintf(F, "%s %d %d %d %d ", td->type->cname, td->vigour, td->duration, td->effect, td->men);
 }
 
 static int
@@ -102,7 +101,15 @@ createcurse_read(trigger * t, FILE * F)
 	td->target = findunit(i);
 	if (td->target==NULL) ur_add((void*)i, (void**)&td->target, resolve_unit);
 
-	fscanf(F, "%d %d %d %d %d %d ", &td->id, &td->id2, &td->vigour, &td->duration, &td->effect, &td->men);
+	if (global.data_version<CURSETYPE_VERSION) {
+		int id1, id2;
+		fscanf(F, "%d %d %d %d %d %d ", &id1, &id2, &td->vigour, &td->duration, &td->effect, &td->men);
+		assert(id2==0);
+		td->type = ct_find(oldcursename(id1));
+	} else {
+		fscanf(F, "%s %d %d %d %d ", zText, &td->vigour, &td->duration, &td->effect, &td->men);
+		td->type = ct_find(zText);
+	}
 	return AT_READ_OK;
 }
 
@@ -117,15 +124,14 @@ trigger_type tt_createcurse = {
 
 trigger *
 trigger_createcurse(struct unit * mage, struct unit * target,
-						  curse_t id, int id2, int vigour, int duration,
-						  int effect, int men)
+					const curse_type * ct, int vigour, int duration,
+					int effect, int men)
 {
 	trigger * t = t_new(&tt_createcurse);
 	createcurse_data * td = (createcurse_data*)t->data.v;
 	td->mage = mage;
 	td->target = target;
-	td->id = id;
-	td->id2 = id2;
+	td->type = ct;
 	td->vigour = vigour;
 	td->duration = duration;
 	td->effect = effect;

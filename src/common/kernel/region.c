@@ -1029,7 +1029,7 @@ production(const region *r)
 {
 	/* muß r->terrain sein, nicht rterrain() wegen rekursion */
 	int p = terrain[r->terrain].production_max;
-	if (is_spell_active(r, C_DROUGHT)) p /= 2;
+	if (curse_active(get_curse(r->attribs, ct_find("drought")))) p /= 2;
 
 	return p;
 }

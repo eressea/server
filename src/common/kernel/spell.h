@@ -266,4 +266,5 @@ typedef struct wall_data {
 
 extern struct attrib_type at_cursewall;
 extern struct attrib_type at_unitdissolve;
+
 #endif

@@ -16,6 +16,7 @@
 #define CREATECURSE_H
 
 /* all types we use are defined here to reduce dependencies */
+struct curse_type;
 struct trigger_type;
 struct trigger;
 struct region;
@@ -24,6 +25,6 @@ struct unit;
 
 extern struct trigger_type tt_createcurse;
 
-extern struct trigger * trigger_createcurse(struct unit * mage, struct unit * target, curse_t id, int id2, int vigour, int duration, int effect, int men);
+extern struct trigger * trigger_createcurse(struct unit * mage, struct unit * target, const struct curse_type * ct, int vigour, int duration, int effect, int men);
 
 #endif

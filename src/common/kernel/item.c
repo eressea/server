@@ -829,7 +829,7 @@ use_antimagiccrystal(region * r, unit * mage, int amount, strlist * cmdstrings)
 			c = (curse*)a->data.v;
 
 			/* Immunität prüfen */
-			if (c->flag & CURSE_IMMUN) {
+			if (c->flag & CURSE_IMMUNE) {
 				do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
 				continue;
 			}
@@ -842,7 +842,7 @@ use_antimagiccrystal(region * r, unit * mage, int amount, strlist * cmdstrings)
 		}
 
 		if(force) {
-			create_curse(mage, &r->attribs, C_ANTIMAGICZONE, 0, force, duration, effect, 0);
+			create_curse(mage, &r->attribs, ct_find("antimagiczone"), force, duration, effect, 0);
 		}
 
 	}
@@ -865,10 +865,10 @@ use_tacticcrystal(region * r, unit * u, int amount, strlist * cmdstrings)
 		int power = 5; /* Widerstand gegen Antimagiesprüche, ist in diesem
 											Fall egal, da der curse für den Kampf gelten soll,
 											der vor den Antimagiezaubern passiert */
+		curse * c = create_curse(u, &u->attribs, ct_find("skill"), power,
+			duration, effect, u->number);
+		c->data = (void*)SK_TACTICS;
 		unused(cmdstrings);
-
-		create_curse(u, &u->attribs, C_SKILL, SK_TACTICS, power,
-				duration, effect, u->number);
 	}
 	use_pooled(u, u->region, R_TACTICCRYSTAL, amount);
 	add_message(&u->faction->msgs,
@@ -2596,7 +2596,6 @@ register_resources(void)
 	xml_register(&xml_resource, "eressea resource", 0);
 }
 
-#ifdef BETA_CODE
 int
 xml_writeitems(const char * file)
 {
@@ -2774,4 +2773,3 @@ xml_writeitems(const char * file)
 	fclose(stream);
 	return 0;
 }
-#endif

@@ -377,13 +377,21 @@ int
 shipspeed (ship * sh, const unit * u)
 {
 	int k = sh->type->range;
+	static const curse_type * stormwind_ct, * nodrift_ct;
+	static boolean init;
+	if (!init) { 
+		init = true; 
+		stormwind_ct = ct_find("stormwind"); 
+		nodrift_ct = ct_find("nodrift");
+	}
+
 	assert(u->ship==sh);
 	assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
 	if (sh->size!=sh->type->construction->maxsize) return 0;
 
-	if( is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0) )
+	if( curse_active(get_curse(sh->attribs, stormwind_ct)))
 			k *= 2;
-	if( is_cursed(sh->attribs, C_SHIP_NODRIFT, 0) )
+	if( curse_active(get_curse(sh->attribs, nodrift_ct)))
 			k += 1;
 
 	if (old_race(u->faction->race) == RC_AQUARIAN
@@ -2688,8 +2696,16 @@ wage(const region *r, const unit *u, boolean img)
 {
 	building *b = largestbuilding(r, img);
 	int      esize = 0;
+	curse * c;
 	int      wage;
 	attrib	 *a;
+	static const curse_type * drought_ct, * blessedharvest_ct;
+	static boolean init;
+	if (!init) { 
+		init = true; 
+		drought_ct = ct_find("drought"); 
+		blessedharvest_ct = ct_find("blessedharvest"); 
+	}
 
 	if (b) esize = buildingeffsize(b, img);
 
@@ -2706,17 +2722,19 @@ wage(const region *r, const unit *u, boolean img)
 		} else {
 			wage = wagetable[esize][2];
 		}
-		wage += get_curseeffect(r->attribs, C_BLESSEDHARVEST, 0);
+		wage += curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
 	}
 
 	/* Godcurse: Income -10 */
-	if(is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+	if (curse_active(get_curse(r->attribs, ct_find("godcursezone")))) {
 		wage = max(0,wage-10);
 	}
 
 	/* Bei einer Dürre verdient man nur noch ein Viertel  */
-	if (is_spell_active(r, C_DROUGHT))
-		wage /= get_curseeffect(r->attribs, C_DROUGHT, 0);
+	if (drought_ct) {
+		c = get_curse(r->attribs, drought_ct);
+		if (curse_active(c)) wage /= curse_geteffect(c);
+	}
 
 	a = a_find(r->attribs, &at_reduceproduction);
 	if (a) wage = (wage * a->data.sa[0])/100;
@@ -2731,6 +2749,7 @@ fwage(const region *r, const faction *f, boolean img)
 	int      esize = 0;
 	int      wage;
 	attrib   *a;
+	curse * c;
 
 	if (b) esize = buildingeffsize(b, img);
 
@@ -2747,17 +2766,17 @@ fwage(const region *r, const faction *f, boolean img)
 		} else {
 			wage = wagetable[esize][2];
 		}
-		wage += get_curseeffect(r->attribs, C_BLESSEDHARVEST, 0);
+		wage += curse_geteffect(get_curse(r->attribs, ct_find("blessedharvest")));
 	}
 
 	/* Godcurse: Income -10 */
-	if(is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+	if (curse_active(get_curse(r->attribs, ct_find("godcursezone")))) {
 		wage = max(0,wage-10);
 	}
 
 	/* Bei einer Dürre verdient man nur noch ein Viertel  */
-	if (is_spell_active(r, C_DROUGHT))
-		wage /= get_curseeffect(r->attribs, C_DROUGHT, 0);
+	c = get_curse(r->attribs, ct_find("drought"));
+	if (curse_active(c)) wage /= curse_geteffect(c);
 
 	a = a_find(r->attribs, &at_reduceproduction);
 	if (a) wage = (wage * a->data.sa[0])/100;

@@ -140,32 +140,30 @@ enum {
 	C_FREE_24,
 /* struct's vom untertyp curse_skill: */
 	C_SKILL,
-	C_DUMMY,
 	MAXCURSE
 };
 
 /* ------------------------------------------------------------- */
 /* Flags */
 
-#define CURSE_ISNEW 1 /* wirkt in der zauberrunde nicht (default)*/
-#define CURSE_NOAGE 2 /* wirkt ewig */
-#define CURSE_IMMUN 4 /* ignoriert Antimagie */
+#define CURSE_ISNEW   1 /* wirkt in der zauberrunde nicht (default)*/
+#define CURSE_NOAGE   2 /* wirkt ewig */
+#define CURSE_IMMUNE  4 /* ignoriert Antimagie */
 #define CURSE_ONLYONE 8 /* Verhindert, das ein weiterer Zauber dieser Art
 													 auf das Objekt gezaubert wird */
 
 /* Verhalten von Zaubern auf Units beim Übergeben von Personen */
-enum{
+typedef enum {
 	CURSE_SPREADNEVER,  /* wird nie mit übertragen */
 	CURSE_SPREADALWAYS, /* wird immer mit übertragen */
 	CURSE_SPREADMODULO, /* personenweise weitergabe */
 	CURSE_SPREADCHANCE  /* Ansteckungschance je nach Mengenverhältnis*/
-};
+} spread_t;
 
 /* typ von struct */
 enum {
 	CURSETYP_NORM,
 	CURSETYP_UNIT,
-	CURSETYP_SKILL,
 	MAXCURSETYP
 };
 
@@ -189,7 +187,7 @@ enum {
 typedef struct curse {
 	struct curse *nexthash;
 	int no;            /* 'Einheitennummer' dieses Curse */
-	struct curse_type * type; /* Zeiger auf ein curse_type-struct */
+	const struct curse_type * type; /* Zeiger auf ein curse_type-struct */
 	int flag;          /* generelle Flags wie zb CURSE_ISNEW oder CURSE_NOAGE */
 	int duration;      /* Dauer der Verzauberung. Wird jede Runde vermindert */
 	int vigour;        /* Stärke der Verzauberung, Widerstand gegen Antimagie */
@@ -207,17 +205,6 @@ typedef struct curse_unit {
 	int cursedmen;        /* verzauberte Personen in der Einheit */
 } curse_unit;
 
-/* Einheitenzauber:
- * Spezialtyp, der Talentmodifizierer. Bei Handwerkstalenten oder
- * Kampftalenten können Personenbezogenen Boni oder Mali berücksichtigt
- * werden, bei anderen Talenten muss sich der Implementiere genauere
- * Gedanken zu den Auswirkungen bei nicht ganz voll verzauberten
- * Einheiten machen.
- */
-typedef struct curse_skill {
-	int cursedmen;        /* verzauberte Personen in der Einheit */
-	skill_t skill;        /* Talent auf das der Spruch wirkt (id2) */
-} curse_skill;
 
 typedef int (*cdesc_fun)(const void*, int, curse*, int);
 /* Parameter: Objekt, auf dem curse liegt, Typ des Objekts, curse,
@@ -226,18 +213,17 @@ typedef int (*cdesc_fun)(const void*, int, curse*, int);
 /* ------------------------------------------------------------- */
 
 typedef struct curse_type {
-	curse_t cspellid;  /* Id des Cursezaubers */
-	const char *name; /* Name der Zauberwirkung, Identifizierung des curse */
+	const char *cname; /* Name der Zauberwirkung, Identifizierung des curse */
 	int typ;
-	int givemenacting;
-	int mergeflags;
-	const char *info;  /* Wirkung des curse, wird bei einer gelungenen
+	spread_t spread;
+	unsigned int mergeflags;
+	const char *info_str;  /* Wirkung des curse, wird bei einer gelungenen
 								 Zauberanalyse angezeigt */
 	int (*curseinfo)(const void*, int, curse*, int);
 	void (*change_vigour)(curse*, int);
+	int (*read)(FILE * F, curse * c);
+	int (*write)(FILE * F, const curse * c);
 } curse_type;
-
-extern struct curse_type cursedaten[];
 
 extern attrib_type at_curse;
 extern void curse_write(const attrib * a,FILE * f);
@@ -247,8 +233,6 @@ extern int curse_read(struct attrib * a,FILE * f);
 /* Kommentare:
  * Bei einigen Typen von Verzauberungen (z.B.Skillmodif.) muss neben
  * der curse-id noch ein weiterer Identifizierer angegeben werden (id2).
- * Das ist bei curse_skill der Skill, bei curse_secondid irgendwas frei
- * definierbares. In allen anderen Fällen ist id2 egal.
  *
  * Wenn der Typ korrekt definiert wurde, erfolgt die Verzweigung zum
  * korrekten Typus automatisch, und die unterschiedlichen struct-typen
@@ -257,7 +241,7 @@ extern int curse_read(struct attrib * a,FILE * f);
 * allgemeine Funktionen *
 */
 
-curse * create_curse(struct unit *magician, struct attrib**ap, curse_t id, int id2,
+curse * create_curse(struct unit *magician, struct attrib**ap, const curse_type * ctype,
 		int vigour, int duration, int effect, int men);
 	/* Verzweigt automatisch zum passenden struct-typ. Sollte es schon
 	 * einen Zauber dieses Typs geben, so wird der neue dazuaddiert. Die
@@ -265,23 +249,18 @@ curse * create_curse(struct unit *magician, struct attrib**ap, curse_t id, int i
 	 * nochmal gesondert auf min(get_cursedmen, u->number) gesetzt werden.
 	 */
 
-boolean is_cursed(struct attrib *ap, curse_t id, int id2);
-	/* gibt true, wenn bereits ein Zauber dieses Typs vorhanden ist */
-boolean is_cursed_internal(struct attrib *ap, curse_t id, int id2);
+boolean is_cursed_internal(struct attrib *ap, const curse_type * ctype);
 	/* ignoriert CURSE_ISNEW */
 
-void remove_curse(struct attrib **ap, curse_t id, int id2);
-	/* löscht einen Spruch auf einem Objekt. Bei einigen Typen von
-	 * Verzauberungen (z.B. Skillmodif.) muss neben der curse-id noch
-	 * ein weiterer Identifizierer angegeben werden, zb der Skill. In
-	 * allen anderen Fällen ist id2 egal.
-	 */
 void remove_allcurse(struct attrib **ap, const void * data, boolean(*compare)(const attrib *, const void *));
 	/* löscht alle Curse dieses Typs */
-void remove_cursec(attrib **ap, curse *c);
+void remove_cursetype(struct attrib **ap, const curse_type *ct);
 	/* löscht den curse c, wenn dieser in ap steht */
+extern void remove_curse(struct attrib **ap, const curse * c);
+	/* löscht einen konkreten Spruch auf einem Objekt. 
+	 */
 
-int get_curseeffect(struct attrib *ap, curse_t id, int id2);
+extern int curse_geteffect(const curse * c);
 	/* gibt die Auswirkungen der Verzauberungen zurück. zB bei
 	 * Skillmodifiziernden Verzauberungen ist hier der Modifizierer
 	 * gespeichert. Wird automatisch beim Anlegen eines neuen curse
@@ -289,27 +268,17 @@ int get_curseeffect(struct attrib *ap, curse_t id, int id2);
 	 */
 
 
-int get_cursevigour(struct attrib *ap, curse_t id, int id2);
-	/* gibt die allgemeine Stärke der Verzauberung zurück. id2 wird wie
-	 * oben benutzt. Dies ist nicht die Wirkung, sondern die Kraft und
-	 * damit der gegen Antimagie wirkende Widerstand einer Verzauberung */
-void set_cursevigour(struct attrib *ap, curse_t id, int id2, int i);
-	/* setzt die Stärke der Verzauberung auf i */
-int change_cursevigour(struct attrib **ap, curse_t id, int id2, int i);
+extern int curse_changevigour(struct attrib **ap, curse * c, int i);
 	/* verändert die Stärke der Verzauberung um i */
 
-int get_cursedmen(struct unit *u, struct curse *c);
+extern int get_cursedmen(struct unit *u, struct curse *c);
 	/* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
 	 * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
-int change_cursedmen(struct attrib **ap, curse_t id, int id2, int cursedmen);
+extern int change_cursedmen(struct attrib **ap, curse * c, int cursedmen);
 	/* verändert die Anzahl der betroffenen Personen um cursedmen */
-void set_cursedmen(struct attrib *ap, curse_t id, int id2, int cursedmen);
-	/* setzt die Anzahl der betroffenen Personen auf cursedmen */
 
-void set_curseflag(struct attrib *ap, curse_t id, int id2, int flag);
+extern void curse_setflag(curse * c, int flag);
 	/* setzt Spezialflag einer Verzauberung (zB 'dauert ewig') */
-void remove_curseflag(struct attrib *ap, curse_t id, int id2, int flag);
-	/* löscht Spezialflag einer Verzauberung (zB 'ist neu') */
 
 void transfer_curse(struct unit * u, struct unit * u2, int n);
 	/* sorgt dafür, das bei der Übergabe von Personen die curse-attribute
@@ -320,12 +289,19 @@ void remove_cursemagepointer(struct unit *magician, attrib *ap_target);
 	/* wird von remove_empty_units verwendet um alle Verweise auf
 	 * gestorbene Magier zu löschen.
 	 * */
-curse * get_curse(struct attrib *ap, curse_t id, int id2);
-	/* gibt pointer auf die passende curse-struct zurück, oder einen
-	 * NULL-pointer
+
+extern curse * get_cursex(attrib *ap, const curse_type * ctype, void * data, 
+						  boolean(*compare)(const curse *, const void *));
+	/* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
+	 * und für die compare() true liefert, oder einen NULL-pointer.
 	 * */
-struct unit * get_tracingunit(struct attrib **ap, curse_t id);
-struct unit * get_cursingmagician(struct attrib *ap, curse_t id, int id2);
+extern curse * get_curse(struct attrib *ap, const curse_type * ctype);
+	/* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
+	 * oder einen NULL-pointer
+	 * */
+
+struct unit * get_tracingunit(struct attrib **ap, const curse_type * ct);
+struct unit * get_cursingmagician(struct attrib *ap, const curse_type * ctype);
 	/* gibt struct unit-pointer auf Magier zurück, oder einen Nullpointer
 	 * */
 int find_cursebyname(const char *c);
@@ -344,17 +320,30 @@ extern void curse_done(struct attrib * a);
 extern int curse_age(struct attrib * a);
 
 extern boolean cmp_curse(const attrib * a, const void * data);
-/* compatibility mode für katjas curses: */
+extern boolean cmp_cursetype(const attrib * a, const void * data);
+extern boolean cmp_curseeffect(const curse * c, const void * data);
+extern boolean cmp_cursedata(const curse * c, const void * data);
+
+/* compatibility mode für katjas curses: 
 extern boolean cmp_oldcurse(const attrib * a, const void * data);
 extern struct twoids * packids(int id, int id2);
+*/
 
 extern void * resolve_curse(void * data);
-
-extern boolean is_spell_active(const struct region * r, curse_t id);
-	/* prüft, ob ein bestimmter Zauber auf einer struct region liegt */
-
 extern boolean is_cursed_with(attrib *ap, curse *c);
-const curse_type * find_cursetype(curse_t id);
-	
+
+extern boolean curse_active(const curse * c);
+	/* gibt true, wenn der Curse nicht NULL oder inaktiv ist */
+
+/*** COMPATIBILITY MACROS. DO NOT USE FOR NEW CODE, REPLACE IN OLD CODE: */
+extern const char * oldcursename(int id);
+extern void register_curses(void);
+
+#define get_oldcurse(id) \
+	get_curse(a, ct_find(oldcursename(id)))
+#define is_cursed(a, id, id2) \
+	curse_active(get_curse(a, ct_find(oldcursename(id))))
+#define get_curseeffect(a, id, id2) \
+	curse_geteffect(get_curse(a, ct_find(oldcursename(id))))
 	
 #endif

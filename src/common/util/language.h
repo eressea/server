@@ -28,7 +28,7 @@ extern unsigned int locale_hashkey(const struct locale * lang);
 extern const char * locale_name(const struct locale * lang);
 
 extern const char * reverse_lookup(const struct locale * lang, const char * str);
-extern const char * mkname(const char * name, const char * space);
+extern const char * mkname(const char * namespc, const char * key);
 
 extern void debug_language(const char * log);
 

@@ -660,13 +660,23 @@ cr_output_unit(FILE * F, const region * r,
 				fprintf(F, "SPRUECHE\n");
 				for (;spt; spt = spt->next) {
 					sp = find_spellbyid(spt->spellid);
-					fprintf(F, "\"%s\"\n", sp->name);
+					if (sp) {
+						const char * name = sp->sname;
+						if (sp->info==NULL) {
+							name = add_translation(mkname("spell", name), spell_name(sp, f->locale));
+						}
+						fprintf(F, "\"%s\"\n", name);
+					}
 				}
 				for (i=0;i!=MAXCOMBATSPELLS;++i) {
 					sp = find_spellbyid(mage->combatspell[i]);
 					if (sp) {
+						const char * name = sp->sname;
+						if (sp->info==NULL) {
+							name = add_translation(mkname("spell", name), spell_name(sp, f->locale));
+						}
 						fprintf(F, "KAMPFZAUBER %d\n", i);
-						fprintf(F, "\"%s\";name\n", sp->name);
+						fprintf(F, "\"%s\";name\n", name);
 						fprintf(F, "%d;level\n", mage->combatspelllevel[i]);
 					}
 				}
@@ -776,12 +786,16 @@ cr_reportspell(FILE * F, spellid_t id, const struct locale * lang)
 {
 	int k, itemanz, res, costtyp;
 	spell *sp = find_spellbyid(id);
+	const char * name = sp->sname;
+	if (sp->info==NULL) {
+		name = add_translation(mkname("spell", name), spell_name(sp, lang));
+	}
 
-	fprintf(F, "ZAUBER %d\n", hashstring(sp->name));
-	fprintf(F, "\"%s\";name\n", sp->name);
+	fprintf(F, "ZAUBER %d\n", hashstring(spell_name(sp, default_locale)));
+	fprintf(F, "\"%s\";name\n", name);
 	fprintf(F, "%d;level\n", sp->level);
 	fprintf(F, "%d;rank\n", sp->rank);
-	fprintf(F, "\"%s\";info\n", sp->beschreibung);
+	fprintf(F, "\"%s\";info\n", spell_info(sp, lang));
 
 	if (sp->sptyp & PRECOMBATSPELL) fputs("\"precombat\";class\n", F);
 	else if (sp->sptyp & COMBATSPELL) fputs("\"combat\";class\n", F);

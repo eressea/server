@@ -121,7 +121,10 @@ buildingmaintenance(const building * b, resource_t rtype)
 {
 	const building_type * bt = b->type;
 	int c, cost=0;
-	if (is_cursed(b->attribs, C_NOCOST, 0)) {
+	static boolean init = false;
+	static const curse_type * nocost_ct;
+	if (!init) { init = true; nocost_ct = ct_find("nocost"); }
+	if (curse_active(get_curse(b->attribs, nocost_ct))) {
 		return 0;
 	}
 	for (c=0;bt->maintenance && bt->maintenance[c].number;++c) {

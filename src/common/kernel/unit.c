@@ -951,43 +951,44 @@ item_modification(const unit *u, skill_t sk, int val)
 static int
 att_modification(const unit *u, skill_t sk)
 {
-	curse *c;
-	unit *mage;
+	int bonus = 0, malus = 0;
+	attrib * a;
 	int result = 0;
+	static boolean init = false;
+	static const curse_type * skillmod_ct;
+	static const curse_type * gbdream_ct;
+	if (!init) { 
+		init = true; 
+		skillmod_ct = ct_find("skillmod"); 
+		gbdream_ct = ct_find("gbdream");
+	}
 
 	result += get_curseeffect(u->attribs, C_ALLSKILLS, 0);
-	result += get_curseeffect(u->attribs, C_SKILL, (int)sk);
+	if (skillmod_ct) {
+		curse * c = get_cursex(u->attribs, skillmod_ct, (void*)(int)sk, cmp_cursedata);
+		result += curse_geteffect(c);
+	}
 
 	/* TODO hier kann nicht mit get/iscursed gearbeitet werden, da nur der
 	 * jeweils erste vom Typ C_GBDREAM zurückgegen wird, wir aber alle
 	 * durchsuchen und aufaddieren müssen */
-	if (is_cursed(u->region->attribs, C_GBDREAM, 0)){
-		attrib *a;
-		int bonus = 0, malus = 0;
-		int mod;
-
-		a = a_select(u->region->attribs, packids(C_GBDREAM, 0), cmp_oldcurse);
-		while(a) {
-			c = (curse*)a->data.v;
-			mage = c->magician;
-			mod = c->effect;
-			/* wir suchen jeweils den größten Bonus und den größten Malus */
-			if (mod > 0
-					&& (mage == NULL
-						|| allied(mage, u->faction, HELP_GUARD)))
-			{
-				if (mod > bonus ) bonus = mod;
-				
-			} else if (mod < 0
-				&& (mage == NULL
-					|| !allied(mage, u->faction, HELP_GUARD)))
-			{
-				if (mod < malus ) malus = mod;
-			}
-			a = a_select(a->next, packids(C_GBDREAM, 0), cmp_oldcurse);
+	a = a_select(u->region->attribs, gbdream_ct, cmp_cursetype);
+	while (a) {
+		curse * c = (curse*)a->data.v;
+		int mod = c->effect;
+		unit * mage = c->magician;
+		/* wir suchen jeweils den größten Bonus und den größten Malus */
+		if (mod>0 && (mage==NULL || allied(mage, u->faction, HELP_GUARD))) 
+		{
+			if (mod > bonus ) bonus = mod;
+		} else if (mod < 0 && 
+			(mage == NULL || !allied(mage, u->faction, HELP_GUARD)))
+		{
+			if (mod < malus ) malus = mod;
 		}
-		result = result + bonus + malus;
+		a = a_select(a->next, gbdream_ct, cmp_cursetype);
 	}
+	result = result + bonus + malus;
 
 	return result;
 }

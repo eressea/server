@@ -54,7 +54,7 @@ use_questkey(struct unit * u, const struct item_type * itype, int amount, const 
 	key1 =  region_hashkey(r1);
 	key2 =  region_hashkey(r2);
 
-	key = min(key2, key) % BMAXHASH;
+	key = min(key2, key1) % BMAXHASH;
 
 	bo = borders[key];
 
@@ -68,10 +68,10 @@ use_questkey(struct unit * u, const struct item_type * itype, int amount, const 
 	assert(bo != NULL);
 
 	lock = (int)bo->data;
-	if(itype == &it_questkey1) k = 1;
-	if(itype == &it_questkey2) k = 2;
+	if (itype == &it_questkey1) k = 1;
+	else k = 2;
 
-	if(lock & k) {
+	if (lock & k) {
 		m = msg_message("questportal_unlock","region unit key", u->region, u, k);
 		lock = lock & ~k;
 	} else {

@@ -689,9 +689,9 @@ horses(region * r)
 	horses = rhorses(r);
 	if(is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
 		rsethorses(r, (int)(horses*0.9));
-	}	else if (maxhorses > 0) {
+	} else if (maxhorses > 0) {
 		int i;
-		int growth = (RESOURCE_QUANTITY * HORSEGROWTH * 200 * (maxhorses-horses))/maxhorses;
+		int growth = (int)((RESOURCE_QUANTITY * HORSEGROWTH * 200 * (maxhorses-horses))/maxhorses);
 
 		if(a_find(r->attribs, &at_horseluck)) growth *= 2;
 		/* printf("Horses: <%d> %d -> ", growth, horses); */
@@ -2489,7 +2489,7 @@ instant_orders(void)
 					}
 					else level = 0;
 
-					spell = find_spellbyname(u, s);
+					spell = find_spellbyname(u, s, u->faction->locale);
 
 					if(!spell){
 						cmistake(u, S->s, 173, MSG_MAGIC);
@@ -2554,7 +2554,7 @@ instant_orders(void)
 						break;
 					}
 
-					spell = find_spellbyname(u, s);
+					spell = find_spellbyname(u, s, u->faction->locale);
 					rc = findrace(s, u->faction->locale);
 					itype = finditemtype(s, u->faction->locale);
 					if (spell == NULL && itype == NULL && rc==NULL) {
@@ -3003,7 +3003,7 @@ ageing(void)
 			}
 
 			if (is_cursed(u->attribs, C_OLDRACE, 0)){
-				curse *c = get_curse(u->attribs, C_OLDRACE, 0);
+				curse *c = get_curse(u->attribs, ct_find("oldrace"));
 				if (c->duration == 1 && !(c->flag & CURSE_NOAGE)) {
 					u->race = new_race[c->effect];
 					u->irace = new_race[c->effect];

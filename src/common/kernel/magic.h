@@ -145,8 +145,8 @@ struct spell_ptr {
 
 typedef struct spell {
 	spellid_t id;
-	const char *name;
-	const char *beschreibung;
+	const char *sname;
+	const char *info;
 	const char *syntax;
 	const char *parameter;
 	magic_t magietyp;
@@ -285,7 +285,7 @@ boolean is_familiar(const struct unit *u);
 	/*	gibt true, wenn eine Familiar-Relation besteht.  */
 
 /* Sprüche */
-spell *find_spellbyname(struct unit *u, char *s);
+spell *find_spellbyname(struct unit *u, char *s, const struct locale * lang);
 	/*	versucht einen Spruch über den Namen zu identifizieren, gibt
 	 *	ansonsten NULL zurück */
 spell *find_spellbyid(spellid_t i);
@@ -401,5 +401,8 @@ extern struct attrib *create_special_direction(struct region *r, int x, int y, i
 		const char *desc, const char *keyword);
 
 extern struct plane * astral_plane;
+
+extern const char * spell_info(const struct spell * sp, const struct locale * lang);
+extern const char * spell_name(const struct spell * sp, const struct locale * lang);
 
 #endif

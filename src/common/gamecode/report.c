@@ -455,11 +455,11 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
 	spell *sp = find_spellbyid(id);
 
 	rnl(F);
-	centre(F, sp->name, true);
+	centre(F, spell_name(sp, lang), true);
 	rnl(F);
 	strcpy(buf,"Beschreibung:");
 	rps(F, buf);
-	rparagraph(F, sp->beschreibung, 0, 0);
+	rparagraph(F, spell_info(sp, lang), 0, 0);
 	rnl(F);
 
 
@@ -544,7 +544,7 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
 			scat("[STUFE n] ");
 		}
 		scat("\"");
-		scat(sp->name);
+		scat(spell_name(sp, lang));
 		scat("\" ");
 		if (sp->sptyp & ONETARGET){
 			if (sp->sptyp & UNITSPELL) {

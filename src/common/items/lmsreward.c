@@ -39,7 +39,7 @@ info_lmsstory(const void* vp, int i, curse * c, int i2)
 }
 
 static curse_type ct_lmsstory = {
-	0, 0, 0, NULL, NULL, &info_lmsstory
+	"lmsstory", 0, 0, 0, "xxx", &info_lmsstory
 };
 
 

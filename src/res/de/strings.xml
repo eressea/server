@@ -10,32 +10,32 @@
 		<text locale="de">Tresen</text>
 		<text locale="en">counter </text>
 	</string>
-	
+
 	<string name="wenige">
 		<text locale="de">wenige</text>
 		<text locale="en">few </text>
 	</string>
-	
+
 	<string name="viele">
 		<text locale="de">viele</text>
 		<text locale="en">many </text>
 	</string>
-	
+
 	<string name="relativ viele">
 		<text locale="de">relativ viele</text>
 		<text locale="en">rather many </text>
 	</string>
-	
+
 	<string name="sehr wenige">
 		<text locale="de">sehr wenige</text>
 		<text locale="en">very few </text>
 	</string>
-	
+
 	<string name="sehr viele">
 		<text locale="de">sehr viele</text>
 		<text locale="en">a great many </text>
 	</string>
-		
+
 	<string name="prefix_Dunkel">
 		<text locale="de">Dunkel</text>
 		<text locale="en">dark </text>
@@ -1172,10 +1172,12 @@
 		<text locale="de">Feuerwerke</text>
 	</string>
 	<string name="lebkuchenherz">
-		<text locale="de">Lebkuchenherz mit der Aufschrift 'Erz und Stein, das ist fein'</text>
+		<text locale="de">Lebkuchenherz mit der Aufschrift 'Erz und
+		Stein, das ist fein'</text>
 	</string>
 	<string name="lebkuchenherz_p">
-		<text locale="de">Lebkuchenherzen mit der Aufschrift 'Erz und Stein, das ist fein'</text>
+		<text locale="de">Lebkuchenherzen mit der Aufschrift 'Erz und
+		Stein, das ist fein'</text>
 	</string>
 	<string name="questkey1">
 		<text locale="de">Achatener Schlüssel</text>
@@ -1551,7 +1553,7 @@
 	<string name="ZAUBER">
 		<text locale="de">ZAUBER</text>
 	</string>
-	
+
 	<string name="XEPOTION">
 		<text locale="de">XETRANK</text>
 	</string>
@@ -2158,7 +2160,9 @@
 		<text locale="de">beschädigt</text>
 	</string>
 	<string name="nr_youaredead">
-		<text locale="de">Unglücklicherweise wurde deine Partei ausgelöscht. Du kannst gerne an einer anderen Stelle wieder einsteigen. Melde Dich einfach wieder an.</text>
+		<text locale="de">Unglücklicherweise wurde deine Partei
+		ausgelöscht. Du kannst gerne an einer anderen Stelle wieder
+		einsteigen. Melde Dich einfach wieder an.</text>
 	</string>
 	<string name="nr_skills">
 		<text locale="de">Talente</text>
@@ -2200,16 +2204,23 @@
 
 	<comment>report newbie info</comment>
 	<string name="nr_nmr">
-		<text locale="de">Deine Partei hat letzte Runde keinen Zug abgegeben!</text>
+		<text locale="de">Deine Partei hat letzte Runde keinen Zug
+		abgegeben!</text>
 	</string>
 
 	<namespace name="info">
 		<string name="mistletoe">
-			<text locale="de">Im Mistelzweig ruht eine magische Kraft
-			besonderer Art. Der Anwender wird von seinen Feinden in Frieden
-			gelassen, eine Woche lang läßt jeder Kämpfer ihn unbeschadet
+			<text locale="de">Im Mistelzweig ruht eine magische
+			Kraft
+			besonderer Art. Der Anwender wird von seinen Feinden
+			in Frieden
+			gelassen, eine Woche lang läßt jeder Kämpfer ihn
+			unbeschadet
 			seines Weges ziehen.</text>
-			<text locale="en">The magical misteltoe has a wonderous property: It's use will make one person able to escape unharmed from every conflict, no enemy will lay hand on the bearer for one week.</text>
+			<text locale="en">The magical misteltoe has a
+			wonderous property: It's use will make one person able
+			to escape unharmed from every conflict, no enemy will
+			lay hand on the bearer for one week.</text>
 		</string>
 	</namespace>
 	<namespace name="race">
@@ -3011,7 +3022,7 @@
 			<text locale="de">Schattendrachen</text>
 			<text locale="en">shadow dragon</text>
 		</string>
-		
+
 		<string name="shadowbat">
 			<text locale="de">Todesflatter</text>
 			<text locale="en">darkbat</text>
@@ -3028,7 +3039,7 @@
 			<text locale="de">Todesflatter</text>
 			<text locale="en">darkbat</text>
 		</string>
-		
+
 		<string name="nightmare">
 			<text locale="de">Alptraum</text>
 			<text locale="en">nightmare</text>
@@ -3045,7 +3056,7 @@
 			<text locale="de">Alptraum</text>
 			<text locale="en">nightmare</text>
 		</string>
-		
+
 		<string name="vampunicorn">
 			<text locale="de">Nachteinhorn</text>
 			<text locale="en">vampiric unicorn</text>
@@ -3300,7 +3311,7 @@
 			<text locale="de">Altork</text>
 			<text locale="en">oldorc</text>
 		</string>
-		
+
 		<string name="snotling">
 			<text locale="de">Snotling</text>
 			<text locale="en">snotling</text>
@@ -3317,7 +3328,7 @@
 			<text locale="de">Snotling</text>
 			<text locale="en">snotling</text>
 		</string>
-		
+
 		<string name="uruk">
 			<text locale="de">Ork</text>
 			<text locale="en">orc</text>
@@ -3409,4 +3420,44 @@
 			<text locale="en">exhausted</text>
 		</string>
 	</namespace>
+	<namespace name="spell">
+		<string name="blessedharvest">
+			<text locale="de">Segen der Erde</text>
+			<text locale="en">Blessed Harvest</text>
+		</string>
+		<string name="veterinarian">
+			<text locale="de">Viehheilung</text>
+			<text locale="en">Cattle Healing</text>
+		</string>
+	</namespace>
+	<namespace name="spellinfo">
+		<string name="blessedharvest">
+			<text locale="de">Dieses Ernteritual verbessert die
+			Erträge der arbeitenden Bauern in der Region um ein
+			Silberstück. Je mehr Kraft der Druide investiert,
+			desto länger wirkt der Zauber.</text>
+			<text locale="en">This harvest ritual increases the
+			income of each working peasant by one silver piece.
+			The more power the druid invests, the longer the spell
+			lasts.</text>
+		</string>
+		<string name="veterinarian">
+			<text locale="de">Die Fähigkeiten der Gwyrrd-Magier in
+			der Viehzucht und Heilung sind bei den Bauern sehr
+			begehrt. Grade auf Märkten sind ihre Dienste häufig
+			sehr gefragt. Manch einer mag auch sein Talent dazu
+			nutzen, ein Tier für einen besseren Preis zu
+			verkaufen. Pro Stufe kann der Magier so 50 Silber
+			verdienen.</text>
+			<text locale="en">The abilities of the mages of Gwyrrd
+			concerning the breeding and healing of cattle are
+			highly appreciated among the peasants. Especially at
+			the markets, their services are demanded frequently.
+			Some of them also use their talents to sell an animal
+			at a higher price. A mage can earn 50 silver pieces
+			per level in this way.</text>
+		</string>
+	</namespace>
 </strings>
+
+

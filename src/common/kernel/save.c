@@ -435,7 +435,7 @@ static faction *
 factionorders(void)
 {
 	char b[16];
-	char * fid = strnzcpy(b, getstrtoken(), 16);
+	char * fid = strnzcpy(b, getstrtoken(), 15);
 	char * pass = getstrtoken();
 	faction *f;
 
@@ -1353,11 +1353,11 @@ writegame(char *path, char quiet)
 /* ------------------------------------------------------------- */
 
 void
-curse_write(const attrib * a,FILE * f) {
+curse_write(const attrib * a, FILE * f) {
 	int flag;
 	int mage_no;
 	curse * c = (curse*)a->data.v;
-	curse_type * ct = c->type;
+	const curse_type * ct = c->type;
 
 	flag = (c->flag & ~(CURSE_ISNEW));
 
@@ -1367,45 +1367,39 @@ curse_write(const attrib * a,FILE * f) {
 		mage_no = -1;
 	}
 
-	fprintf(f, "%d %d %d %d %d %d %d ", c->no, (int)ct->cspellid, flag,
+	fprintf(f, "%d %s %d %d %d %d %d ", c->no, ct->cname, flag,
 			c->duration, c->vigour, mage_no, c->effect);
 
-	switch(c->type->typ){
-		case CURSETYP_UNIT:
-		{
-			curse_unit * cc = (curse_unit*)c->data;
-			fprintf(f, "%d ", cc->cursedmen);
-			break;
-		}
-		case CURSETYP_SKILL:
-		{
-			curse_skill * cc = (curse_skill*)c->data;
-			fprintf(f, "%d %d ", (int)cc->skill, cc->cursedmen);
-			break;
-		}
-		case CURSETYP_NORM:
-		default:
-			break;
+	if (c->type->write) c->type->write(f, c);
+	else if (c->type->typ == CURSETYP_UNIT) {
+		curse_unit * cc = (curse_unit*)c->data;
+		fprintf(f, "%d ", cc->cursedmen);
 	}
 }
 
 int
 curse_read(attrib * a, FILE * f) {
-	int cspellid;
 	int mageid;
 	curse * c = (curse*)a->data.v;
-	curse_type * ct;
+	const curse_type * ct;
 
-	if (global.data_version < CURSE_NO_VERSION){
-		fscanf(f, "%d %d %d %d %d %d ",&cspellid, &c->flag, &c->duration,
-				&c->vigour, &mageid, &c->effect);
-		c->no = newunitid();
+	if (global.data_version >= CURSETYPE_VERSION) {
+		char cursename[64];
+		fscanf(f, "%d %s %d %d %d %d %d ", &c->no, cursename, &c->flag, 
+			&c->duration, &c->vigour, &mageid, &c->effect);
+		ct = ct_find(cursename);
 	} else {
-		fscanf(f, "%d %d %d %d %d %d %d ", &c->no, &cspellid, &c->flag,
+		int cspellid;
+		if (global.data_version < CURSE_NO_VERSION) {
+			fscanf(f, "%d %d %d %d %d %d ",&cspellid, &c->flag, &c->duration,
+				&c->vigour, &mageid, &c->effect);
+			c->no = newunitid();
+		} else {
+			fscanf(f, "%d %d %d %d %d %d %d ", &c->no, &cspellid, &c->flag,
 				&c->duration, &c->vigour, &mageid, &c->effect);
+		}
+		ct = ct_find(oldcursename(cspellid));
 	}
-
-	ct = find_cursetype((curse_t)cspellid);
 	assert(ct!=NULL);
 
 	c->type = ct;
@@ -1418,28 +1412,12 @@ curse_read(attrib * a, FILE * f) {
 		ur_add((void*)mageid, (void**)&c->magician, resolve_unit);
 	}
 
-	switch(c->type->typ){
-		case CURSETYP_UNIT:
-		{
-			curse_unit * cc = calloc(1, sizeof(curse_unit));
+	if (c->type->read) c->type->read(f, c);
+	else if (c->type->typ==CURSETYP_UNIT) {
+		curse_unit * cc = calloc(1, sizeof(curse_unit));
 
-			c->data = cc;
-			fscanf(f, "%d ", &cc->cursedmen);
-			break;
-		}
-		case CURSETYP_SKILL:
-		{
-			curse_skill * cc = calloc(1, sizeof(curse_skill));
-			int skill;
-
-			c->data = cc;
-			fscanf(f, "%d %d ", &skill, &cc->cursedmen);
-			cc->skill = (skill_t)skill;
-			break;
-		}
-		case CURSETYP_NORM:
-		default:
-			break;
+		c->data = cc;
+		fscanf(f, "%d ", &cc->cursedmen);
 	}
 	chash(c);
 

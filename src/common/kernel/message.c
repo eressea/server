@@ -385,6 +385,7 @@ new_message(struct faction * receiver, const char* sig, ...)
 	void * args[16];
 
 	memset(args, 0, sizeof(args));
+	assert(signature-sig < sizeof(buffer));
 	strnzcpy(buffer, sig, signature-sig);
 	mtype = mt_find(buffer);
 

@@ -903,6 +903,14 @@ travel(region * first, unit * u, region * next, int flucht)
 	unit *ut, *u2;
 	int gereist = 0;
 	static direction_t route[MAXSPEED];
+	static boolean init = false;
+	static const curse_type * speed_ct;
+	static const curse_type * fogtrap_ct;
+	if (!init) { 
+		init = true; 
+		speed_ct = ct_find("speed"); 
+		fogtrap_ct = ct_find("fogtrap"); 
+	}
 
 	/* tech:
 	 *
@@ -959,8 +967,8 @@ travel(region * first, unit * u, region * next, int flucht)
 
 	dk = u->race->speed;
 
-	{
-		curse *c = get_curse(u->attribs, C_SPEED, 0);
+	if (speed_ct) {
+		curse *c = get_curse(u->attribs, speed_ct);
 		if(c) {
 			int men = get_cursedmen(u, c);
 			dk *= 1.0 + (double)men/(double)u->number;
@@ -1051,7 +1059,7 @@ travel(region * first, unit * u, region * next, int flucht)
 			if (k<0) break;
 			/* r2 -> Zielregion, r3 -> Momentane Region */
 			if (move_blocked(u, current, reldirection(current, next))
-					|| is_spell_active(current, C_FOGTRAP))
+					|| curse_active(get_curse(current->attribs, fogtrap_ct)))
 			{
 				ADDMSG(&u->faction->msgs, msg_message("leavefail", 
 					"unit region", u, next));
@@ -1064,19 +1072,21 @@ travel(region * first, unit * u, region * next, int flucht)
 					wache));
 				break;
 			}
-			if (is_spell_active(next, C_ANTIMAGICZONE) && fval(u->race, RCF_ILLUSIONARY)) {
-				change_cursevigour(&next->attribs, C_ANTIMAGICZONE, 0, - u->number);
-
-				add_message(&u->faction->msgs, new_message(u->faction,
-					"illusionantimagic%u:unit", u));
-				destroy_unit(u);
-
-				return route;
+			
+			if (fval(u->race, RCF_ILLUSIONARY)) {
+				curse * c = get_curse(next->attribs, ct_find("antimagiczone"));
+				if (curse_active(c)) {
+					curse_changevigour(&next->attribs, c, - u->number);
+					add_message(&u->faction->msgs, new_message(u->faction,
+						"illusionantimagic%u:unit", u));
+					destroy_unit(u);
+					return route;
+				}
 			}
 			/* Ozeanfelder können nur von Einheiten mit Schwimmen und ohne
 			 * Pferde betreten werden. Drachen können fliegen. */
 
-			if(rterrain(next) == T_OCEAN && !canswim(u)) {
+			if (rterrain(next) == T_OCEAN && !canswim(u)) {
 				plane *pl = getplane(next);
 				if(pl && fval(pl, PFL_NOCOORDS)) {
 					add_message(&u->faction->msgs, new_message(u->faction,
@@ -1363,6 +1373,12 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 	region *rv[MAXSPEED + 1];
 	region *tt[MAXSPEED + 1]; /* travelthru */
 	static direction_t route[MAXSPEED+1]; /* route[i] := direction from tt[i] to tt[i-1] */
+	static boolean init = false;
+	static const curse_type * fogtrap_ct;
+	if (!init) { 
+		init = true; 
+		fogtrap_ct = ct_find("fogtrap"); 
+	}
 
 	if (!ship_ready(starting_point, u))
 		return NULL;
@@ -1449,7 +1465,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 			/* Falls Blockade, endet die Seglerei hier */
 
 			if (move_blocked(u, current_point, reldirection(current_point, next_point))
-					|| is_spell_active(current_point, C_FOGTRAP)) {
+					|| curse_active(get_curse(current_point->attribs, fogtrap_ct))) {
 					add_message(&u->faction->msgs, new_message(u->faction,
 						"sailfail%h:ship%r:region", u->ship, current_point));
 				break;
@@ -1967,10 +1983,17 @@ destroy_damaged_ships(void)
 boolean
 is_disorientated(unit *u)
 {
-	if(u->ship && get_curse(u->ship->attribs, C_DISORIENTATION, 0))
+	static boolean init = false;
+	static const curse_type * shipconf_ct, * regconf_ct;
+	if (!init) { 
+		init = true; 
+		regconf_ct = ct_find("disorientationzone"); 
+		shipconf_ct = ct_find("shipdisorientation"); 
+	}
+	if (u->ship && curse_active(get_curse(u->ship->attribs, shipconf_ct)))
 		return true;
 
-	if(is_spell_active(u->region, C_REGCONF))
+	if (curse_active(get_curse(u->region->attribs, regconf_ct)))
 		return true;
 
 	return false;

@@ -156,11 +156,11 @@ alp_findet_opfer(unit *alp, region *r)
 	 */
 	a_removeall(&alp->attribs, &at_eventhandler);
 	/* Alp umwandeln in Curse */
-	c = create_curse(mage, &opfer->attribs, C_ALLSKILLS, 0, 0, 0, -2, opfer->number);
+	c = create_curse(mage, &opfer->attribs, ct_find("worse"), 0, 0, -2, opfer->number);
 	/* solange es noch keine spezielle alp-Antimagie gibt, reagiert der
 	 * auch auf normale */
 	/* set_curseflag(opfer->attribs, C_ALLSKILLS, 0, CURSE_NOAGE+CURSE_IMMUN); */
-	set_curseflag(opfer->attribs, C_ALLSKILLS, 0, CURSE_NOAGE);
+	curse_setflag(c, CURSE_NOAGE);
 	destroy_unit(alp);
 
 	{

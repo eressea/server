@@ -551,49 +551,44 @@ getspell(const unit *u, spellid_t spellid)
 
 #include "umlaut.h"
 
-#define SPELLNAMES_HACK 1
-#if SPELLNAMES_HACK
-struct tnode spellnames;
-
-static void init_spellnames(void)
+static local_names * spellnames;
+static local_names *
+init_spellnames(const struct locale * lang)
 {
 	int i;
-	for (i=0; spelldaten[i].id != SPL_NOSPELL; i++)
-		addtoken(&spellnames, spelldaten[i].name, (void*)i);
+	local_names * sn = calloc(sizeof(local_names), 1);
+	sn->next = spellnames;
+	sn->lang = lang;
+	for (i=0; spelldaten[i].id != SPL_NOSPELL; i++) {
+		const char * n = spelldaten[i].sname;
+		if (spelldaten[i].info==NULL) n = locale_string(lang, n);
+		addtoken(&sn->names, n, (void*)(spelldaten+i));
+	}
+	return spellnames = sn;
 }
-#endif
+
 
 spell *
-find_spellbyname(unit *u, char *s)
+find_spellbyname(unit *u, char *name, const struct locale * lang)
 {
-	sc_mage *m;
+	local_names * sn = spellnames;
 	spell_ptr *spt;
-	spell *sp;
+	sc_mage * m = get_mage(u);
+	spell * sp;
 
-	m = get_mage(u);
-	if (!m) {
-		return (spell *) NULL;
+	if (!m) return NULL;
+	while (sn) {
+		if (sn->lang==lang) break;
+		sn=sn->next;
 	}
+	if (!sn) sn = init_spellnames(lang);
+	if (findtoken(&sn->names, name, &sp)==E_TOK_NOMATCH) return NULL;
 
 	for (spt = m->spellptr; spt; spt = spt->next) {
-		sp = find_spellbyid(spt->spellid);
-		if (!strncasecmp(sp->name, s, strlen(s))) {
-			return sp;
-		}
+		if (sp->id==spt->spellid) return sp;
 	}
-#if SPELLNAMES_HACK /* enno: geht vorerst nicht mit locales */
-	{
-		static int init = 0;
-		int i;
-		if (!init) {
-			init=1;
-			init_spellnames();
-		}
-		if (findtoken(&spellnames, s, (void**)&i)==0 && getspell(u, spelldaten[i].id))
-			return &spelldaten[i];
-	}
-#endif
-	return (spell *) NULL;
+	if (lang==default_locale) return NULL;
+	return find_spellbyname(u, name, default_locale);
 }
 
 spell *
@@ -1022,7 +1017,7 @@ knowsspell(const region * r, const unit * u, const spell * sp)
 		}
 		if (eff_skill(u, SK_MAGIC, u->region) >= sp->level){
 			log_warning(("%s ist hat die erforderliche Stufe, kennt aber %s nicht.\n",
-				unitname(u), sp->name));
+				unitname(u), spell_name(sp, default_locale)));
 		}
 		return false;
 	}
@@ -1054,7 +1049,7 @@ cancast(unit * u, spell * sp, int level, int range, char * cmd)
 	/* reicht die Stufe aus? */
 	if (eff_skill(u, SK_MAGIC, u->region) < sp->level) {
 		log_warning(("Zauber von %s schlug fehl: %s braucht Stufe %d.\n",
-				unitname(u), sp->name, sp->level));
+				unitname(u), spell_name(sp, default_locale), sp->level));
 		/* die Einheit ist nicht erfahren genug für diesen Zauber */
 		cmistake(u, strdup(cmd), 169, MSG_MAGIC);
 		return false;
@@ -1096,7 +1091,8 @@ cancast(unit * u, spell * sp, int level, int range, char * cmd)
 					/* Noch fehlte keine Komponente, wir generieren den Anfang der
 					 * Fehlermeldung */
 					sprintf(buf, "%s in %s: 'ZAUBER %s' Für diesen Zauber fehlen "
-							"noch %d ", unitname(u), regionid(u->region), sp->name,
+							"noch %d ", unitname(u), regionid(u->region), 
+							spell_name(sp, u->faction->locale),
 							itemanz);
 					scat(locale_string(u->faction->locale,
 								resname(res, (itemanz == 1 ? 0 : 1))));
@@ -1128,6 +1124,7 @@ cancast(unit * u, spell * sp, int level, int range, char * cmd)
 int
 spellpower(region * r, unit * u, spell * sp, int cast_level)
 {
+	curse * c;
 	int force = cast_level;
 	if (sp==NULL) return 0;
 	else {
@@ -1139,16 +1136,18 @@ spellpower(region * r, unit * u, spell * sp, int cast_level)
 	if (get_item(u, I_RING_OF_POWER) > 0) ++force;
 
 	/* Antimagie in der Zielregion */
-	if (is_spell_active(r, C_ANTIMAGICZONE)) {
-		force -= get_curseeffect(r->attribs, C_ANTIMAGICZONE, 0);
-		change_cursevigour(&r->attribs, C_ANTIMAGICZONE, 0, -cast_level);
+	c = get_curse(r->attribs, ct_find("antimagiczone"));
+	if (curse_active(c)) {
+		force -= curse_geteffect(c);
+		curse_changevigour(&r->attribs, c, -cast_level);
 		cmistake(u, findorder(u, u->thisorder), 185, MSG_MAGIC);
 	}
 
 	/* Patzerfluch-Effekt: */
-	if (is_cursed(u->attribs, C_FUMBLE, 0) == true) {
-		force -= get_curseeffect(u->attribs, C_FUMBLE, 0);
-		change_cursevigour(&u->attribs, C_FUMBLE, 0, -1);
+	c = get_curse(r->attribs, ct_find("fumble"));
+	if (curse_active(c)) {
+		force -= curse_geteffect(c);
+		curse_changevigour(&u->attribs, c, -1);
 		cmistake(u, findorder(u, u->thisorder), 185, MSG_MAGIC);
 	}
 
@@ -1210,9 +1209,9 @@ magic_resistance(unit *target)
 	chance += effskill(target, SK_MAGIC)*5;
 
 	/* Auswirkungen von Zaubern auf der Einheit */
-	c = get_curse(target->attribs, C_MAGICRESISTANCE, 0);
+	c = get_curse(target->attribs, ct_find("magicresistance"));
 	if (c) {
-		chance += get_curseeffect(target->attribs, C_MAGICRESISTANCE, 0) * get_cursedmen(target, c);
+		chance += curse_geteffect(c) * get_cursedmen(target, c);
 	}
 
 	/* Unicorn +10 */
@@ -1225,38 +1224,22 @@ magic_resistance(unit *target)
 		curse *c = (curse*)a->data.v;
 		unit *mage = c->magician;
 
-		if (c->type->cspellid == C_SONG_GOODMR) {
-			if (mage != NULL) {
+		if (mage!=NULL) {
+			if (c->type == ct_find("goodmagicresistancezone")) {
 				if (allied(mage, target->faction, HELP_GUARD)) {
 					chance += c->effect;
 					break;
 				}
-			} else {
-				a = a->nexttype;
-				continue;
 			}
-		}
-		a = a->nexttype;
-	}
-	a = a_find(target->region->attribs, &at_curse);
-	while (a) {
-		curse *c = (curse*)a->data.v;
-		unit *mage = c->magician;
-
-		if (c->type->cspellid == C_SONG_BADMR) {
-			if (mage != NULL) {
+			else if (c->type == ct_find("badmagicresistancezone")) {
 				if (allied(mage, target->faction, HELP_GUARD)) {
 					a = a->nexttype;
 					continue;
-				} else {
-					chance -= c->effect;
-					break;
 				}
 			}
 		}
 		a = a->nexttype;
 	}
-
 	/* Bonus durch Artefakte */
 	/* TODO (noch gibs keine)*/
 
@@ -1425,6 +1408,7 @@ fumble(region * r, unit * u, spell * sp, int cast_grade)
 void
 do_fumble(castorder *co)
 {
+	curse * c;
 	region * r = co->rt;
 	unit * u = (unit*)co->magician;
 	spell * sp = co->sp;
@@ -1458,8 +1442,9 @@ do_fumble(castorder *co)
 	case 2:
 	/* temporärer Stufenverlust */
 		duration = max(rand()%level/2, 2);
-		create_curse(u, &u->attribs, C_SKILL, SK_MAGIC, level, duration,
-				-(level/2), 1);
+		c = create_curse(u, &u->attribs, ct_find("skil"), level, duration,
+			-(level/2), 1);
+		c->data = (void*)SK_MAGIC;
 		add_message(&u->faction->msgs,
 				new_message(u->faction, "patzer2%u:unit%r:region", u, r));
 		break;
@@ -1467,9 +1452,9 @@ do_fumble(castorder *co)
 	case 4:
 	/* Spruch schlägt fehl, alle Magiepunkte weg */
 		set_spellpoints(u, 0);
-		add_message(&u->faction->msgs, new_message(u->faction,
-					"patzer3%u:unit%r:region%s:command",
-					u, r, sp->name));
+		add_message(&u->faction->msgs, msg_message("patzer3", 
+			"unit region command",
+			u, r, spell_name(sp, u->faction->locale)));
 		break;
 
 	case 5:
@@ -1482,7 +1467,7 @@ do_fumble(castorder *co)
 				"Gestalten kreisen um den Magier und scheinen sich von "
 				"den magischen Energien des Zaubers zu ernähren. Mit letzter "
 				"Kraft gelingt es %s dennoch den Spruch zu zaubern.",
-				unitname(u), sp->name, unitname(u));
+				unitname(u), spell_name(sp, u->faction->locale), unitname(u));
 		addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
 		break;
 
@@ -1494,7 +1479,8 @@ do_fumble(castorder *co)
 		((nspell_f)sp->sp_function)(co);
 		sprintf(buf, "%s fühlt sich nach dem Zaubern von %s viel erschöpfter "
 				"als sonst und hat das Gefühl, dass alle weiteren Zauber deutlich "
-				"mehr Kraft als normalerweise kosten werden.", unitname(u), sp->name);
+				"mehr Kraft als normalerweise kosten werden.", unitname(u), 
+				spell_name(sp, u->faction->locale));
 		addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
 		countspells(u,3);
 	}
@@ -2962,7 +2948,7 @@ magic(void)
 						cmistake(u, so->s, 172, MSG_MAGIC);
 						continue;
 					}
-					sp = find_spellbyname(u, s);
+					sp = find_spellbyname(u, s, u->faction->locale);
 
 					/* Vertraute können auch Zauber sprechen, die sie selbst nicht
 					 * können. find_spellbyname findet aber nur jene Sprüche, die
@@ -2970,7 +2956,7 @@ magic(void)
 					if (sp == NULL && is_familiar(u)) {
 						familiar = u;
 						mage = get_familiar_mage(u);
-						sp = find_spellbyname(mage, s);
+						sp = find_spellbyname(mage, s, mage->faction->locale);
 					}
 
 					if (sp == NULL) {
@@ -3028,7 +3014,9 @@ magic(void)
 						if (range > 1024) { /* (2^10) weiter als 10 Regionen entfernt */
 							sprintf(buf, "%s in %s: 'ZAUBER %s' Zu der Region %s kann keine "
 									"Verbindung hergestellt werden", unitname(u),
-									regionid(u->region), sp->name, regionid(target_r));
+									regionid(u->region), 
+									spell_name(sp, u->faction->locale), 
+									regionid(target_r));
 							addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
 							continue;
 						}
@@ -3040,7 +3028,8 @@ magic(void)
 							level = ilevel;
 							sprintf(buf, "%s in %s: 'ZAUBER %s' Dieser Zauber kann nicht "
 									"mit Stufenangabe gezaubert werden.", unitname(u),
-									regionid(u->region), sp->name);
+									regionid(u->region), 
+									spell_name(sp, u->faction->locale));
 							addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
 						}
 					}
@@ -3129,7 +3118,8 @@ magic(void)
 				 * gezaubert, co->level ist aber defaultmäßig Stufe des Magiers */
 				if (spl_costtyp(sp) != SPC_FIX) {
 					sprintf(buf, "%s hat nur genügend Komponenten um %s auf Stufe %d "
-							"zu zaubern.", unitname(u), sp->name, level);
+							"zu zaubern.", unitname(u), 
+							spell_name(sp, u->faction->locale), level);
 					addmessage(0, u->faction, buf, MSG_MAGIC, ML_INFO);
 				}
 			}
@@ -3146,7 +3136,8 @@ magic(void)
 			force = spellpower(target_r, u, sp, level);
 			if (force < 1) {
 				sprintf(buf, "%s schafft es nicht genügend Kraft aufzubringen "
-						"um %s dennoch zu zaubern.", unitname(u), sp->name);
+						"um %s dennoch zu zaubern.", unitname(u), 
+						spell_name(sp, u->faction->locale));
 				addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
 				continue;
 			}
@@ -3178,7 +3169,8 @@ magic(void)
 					pay_spell(u, sp, level, co->distance);
 					countspells(u,1);
 					sprintf(buf, "%s gelingt es %s zu zaubern, doch der Spruch zeigt "
-							"keine Wirkung.", unitname(u), sp->name);
+							"keine Wirkung.", unitname(u), 
+							spell_name(sp, u->faction->locale));
 					addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
 					continue; /* äußere Schleife, nächster Zauberer */
 				}
@@ -3236,4 +3228,22 @@ create_special_direction(region *r, int x, int y, int duration,
 	d->keyword = strdup(keyword);
 
 	return a;
+}
+
+const char * 
+spell_info(const struct spell * sp, const struct locale * lang)
+{
+	if (sp->info==NULL) {
+		return LOC(lang, mkname("spellinfo", sp->sname));
+	}
+	return sp->info;
+}
+
+const char * 
+spell_name(const struct spell * sp, const struct locale * lang)
+{
+	if (sp->info==NULL) {
+		return LOC(lang, mkname("spell", sp->sname));
+	}
+	return sp->sname;
 }

@@ -610,8 +610,8 @@ main(int argc, char *argv[])
 	game_init();
 #if defined(BETA_CODE)
 	/* xml_writeships(); */
-	xml_writebuildings();
-	/* xml_writeitems("items.xml"); */
+	/* xml_writebuildings(); */
+	xml_writeitems("items.xml");
 	return 0;
 #endif
 

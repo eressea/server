@@ -38,7 +38,6 @@ typedef unsigned char order_t;
 typedef char terrain_t;
 typedef char direction_t;
 typedef int race_t;
-typedef int curse_t;
 typedef int magic_t;
 typedef short skill_t;
 typedef int herb_t;
@@ -50,6 +49,7 @@ typedef int resource_t;
 typedef int spellid_t;
 
 struct plane;
+struct spell;
 struct region;
 struct race;
 struct ship;
@@ -152,9 +152,10 @@ struct xml_stack;
 #define NEWSKILL_VERSION 309
 #define WATCHERS_VERSION 310
 #define OVERRIDE_VERSION 311
+#define CURSETYPE_VERSION 312
  
 #define UGROUPS_VERSION 400 /* nicht aktivieren, nicht fertig */
-#define RELEASE_VERSION OVERRIDE_VERSION
+#define RELEASE_VERSION CURSETYPE_VERSION
 
 /*
 #if RELEASE_VERSION >= UGROUPS_VERSION

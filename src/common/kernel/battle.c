@@ -1425,6 +1425,7 @@ do_combatmagic(battle *b, combatmagic_t was)
 
 		level = eff_skill(mage, SK_MAGIC, r);
 		if (level > 0) {
+			const struct locale * lang = mage->faction->locale;
 			char cmd[128];
 
 			switch(was) {
@@ -1443,7 +1444,8 @@ do_combatmagic(battle *b, combatmagic_t was)
 			if (sp == NULL)
 				continue;
 
-			snprintf(cmd, 128, "ZAUBER %s", sp->name);
+			snprintf(cmd, 128, "%s \"%s\"", 
+				LOC(lang, keywords[K_CAST]), spell_name(sp, lang));
 
 			if (cancast(mage, sp, 1, 1, cmd) == false)
 				continue;
@@ -1452,7 +1454,7 @@ do_combatmagic(battle *b, combatmagic_t was)
 			if (sl > 0) level = min(sl, level);
 			if (level < 0) {
 				sprintf(buf, "%s versucht %s zu zaubern, doch der Zauber schlägt "
-						"fehl!", unitname(mage), sp->name);
+						"fehl!", unitname(mage), spell_name(sp, lang));
 				battlerecord(b, buf);
 				continue;
 			}
@@ -1460,14 +1462,14 @@ do_combatmagic(battle *b, combatmagic_t was)
 			power = spellpower(r, mage, sp, level);
 			if (power <= 0) {	/* Effekt von Antimagie */
 				sprintf(buf, "%s versucht %s zu zaubern, doch der Zauber schlägt "
-						"fehl!", unitname(mage), sp->name);
+						"fehl!", unitname(mage), spell_name(sp, lang));
 				battlerecord(b, buf);
 				continue;
 			}
 
 			if (fumble(r, mage, sp, sp->level) == true) {
 				sprintf(buf, "%s versucht %s zu zaubern, doch der Zauber schlägt "
-						"fehl!", unitname(mage), sp->name);
+						"fehl!", unitname(mage), spell_name(sp, lang));
 				battlerecord(b, buf);
 				pay_spell(mage, sp, level, 1);
 				continue;
@@ -1512,6 +1514,7 @@ do_combatspell(troop at, int row)
 	void **mg;
 	int sl;
 	char cmd[128];
+	const struct locale * lang = mage->faction->locale;
 
 	if (row>BEHIND_ROW) return;
 
@@ -1520,7 +1523,7 @@ do_combatspell(troop at, int row)
 		fi->magic = 0; /* Hat keinen Kampfzauber, kämpft nichtmagisch weiter */
 		return;
 	}
-	snprintf(cmd, 128, "ZAUBER %s", sp->name);
+	snprintf(cmd, 128, "ZAUBER %s", spell_name(sp, lang));
 	if (cancast(mage, sp, 1, 1, cmd) == false) {
 		fi->magic = 0; /* Kann nicht mehr Zaubern, kämpft nichtmagisch weiter */
 		return;
@@ -1531,7 +1534,7 @@ do_combatspell(troop at, int row)
 
 	if (fumble(r, mage, sp, sp->level) == true) {
 		sprintf(buf, "%s versucht %s zu zaubern, doch der Zauber schlägt "
-				"fehl!", unitname(mage), sp->name);
+				"fehl!", unitname(mage), spell_name(sp, lang));
 		battlerecord(b, buf);
 		pay_spell(mage, sp, level, 1);
 		return;
@@ -1550,14 +1553,14 @@ do_combatspell(troop at, int row)
 	/* Antimagie die Fehlschlag erhöht */
 	if (rand()%100 < fumblechance) {
 		sprintf(buf, "%s versucht %s zu zaubern, doch der Zauber schlägt "
-				"fehl!", unitname(mage), sp->name);
+				"fehl!", unitname(mage), spell_name(sp, lang));
 		battlerecord(b, buf);
 		return;
 	}
 	power = spellpower(r, mage, sp, level);
 	if (power <= 0) {	/* Effekt von Antimagie */
 		sprintf(buf, "%s versucht %s zu zaubern, doch der Zauber schlägt "
-				"fehl!", unitname(mage), sp->name);
+				"fehl!", unitname(mage), spell_name(sp, lang));
 		battlerecord(b, buf);
 		pay_spell(mage, sp, level, 1);
 		return;
@@ -1633,6 +1636,13 @@ skilldiff(troop at, troop dt, int dist)
 #endif
 
 	if (df->building) {
+		boolean init = false;
+		static const curse_type * strongwall_ct, * magicstone_ct;
+		if (!init) {
+			strongwall_ct = ct_find("strongwall");
+			magicstone_ct = ct_find("magicstone");
+			init=true;
+		}
 		if (df->building->type->flags & BTF_PROTECTION) {
 			if(fspecial(au->faction, FS_SAPPER)) {
 				/* Halbe Schutzwirkung, aufgerundet */
@@ -1643,12 +1653,15 @@ skilldiff(troop at, troop dt, int dist)
 			}
 			is_protected = 2;
 		}
-		if (is_cursed(df->building->attribs, C_STRONGWALL, 0)) {
-			/* wirkt auf alle Gebäude */
-			skdiff -= get_curseeffect(df->building->attribs, C_STRONGWALL, 0);
-			is_protected = 2;
+		if (strongwall_ct) {
+			curse * c = get_curse(df->building->attribs, strongwall_ct);
+			if (curse_active(c)) {
+				/* wirkt auf alle Gebäude */
+				skdiff -= curse_geteffect(c);
+				is_protected = 2;
+			}
 		}
-		if (is_cursed(df->building->attribs, C_MAGICSTONE, 0)) {
+		if (magicstone_ct && curse_active(get_curse(df->building->attribs, magicstone_ct))) {
 			/* Verdoppelt Burgenbonus */
 			skdiff -= buildingeffsize(df->building, false);
 		}
@@ -2745,11 +2758,16 @@ make_fighter(battle * b, unit * u, boolean attack)
 	rest = u->hp % u->number;
 
 	/* Effekte von Sprüchen */
+	
 	{
-		curse *c = get_curse(u->attribs, C_SPEED, 0);
-		if (c) {
-			speeded = get_cursedmen(u, c);
-			speed   = get_curseeffect(u->attribs, C_SPEED, 0);
+		static const curse_type * speed_ct;
+		speed_ct = ct_find("speed");
+		if (speed_ct) {
+			curse *c = get_curse(u->attribs, speed_ct);
+			if (c) {
+				speeded = get_cursedmen(u, c);
+				speed   = curse_geteffect(c);
+			}
 		}
 	}
 
@@ -3354,6 +3372,14 @@ do_battle(void)
 				strlist *sl;
 
 				list_foreach(strlist, u->orders, sl) {
+					boolean init=false;
+					static const curse_type * peace_ct, * slave_ct, * calm_ct;
+					if (!init) {
+						init = true;
+						peace_ct = ct_find("peacezone");
+						slave_ct = ct_find("slavery");
+						calm_ct = ct_find("calmmonster");
+					}
 					if (igetkeyword(sl->s, u->faction->locale) == K_ATTACK) {
 						unit *u2;
 						fighter *c1, *c2;
@@ -3385,14 +3411,14 @@ do_battle(void)
 						/* ist ein Flüchtling aus einem andern Kampf */
 						if (fval(u, FL_MOVED)) list_continue(sl);
 
-						if (is_spell_active(r, C_PEACE)) {
+						if (peace_ct && curse_active(get_curse(r->attribs, peace_ct))) {
 							sprintf(buf, "Hier ist es so schön friedlich, %s möchte "
 									"hier niemanden angreifen.", unitname(u));
 							mistake(u, sl->s, buf, MSG_BATTLE);
 							list_continue(sl);
 						}
 
-						if (is_cursed(u->attribs, C_SLAVE, 0)) {
+						if (slave_ct && curse_active(get_curse(u->attribs, slave_ct))) {
 							sprintf(buf, "%s kämpft nicht.", unitname(u));
 							mistake(u, sl->s, buf, MSG_BATTLE);
 							list_continue(sl);
@@ -3467,13 +3493,13 @@ do_battle(void)
 							sprintf(buf, "%s ist böse gewesen...", unitname(u));
 							mistake(u, sl->s, buf, MSG_BATTLE);
 							list_continue(sl);
-						}if (u2->faction->age < IMMUN_GEGEN_ANGRIFF) {
+						} if (u2->faction->age < IMMUN_GEGEN_ANGRIFF) {
 							add_message(&u->faction->msgs,
 						  	msg_error(u, findorder(u, u->thisorder), "newbie_immunity_error", "turns", IMMUN_GEGEN_ANGRIFF));
 							list_continue(sl);
 						}
 						/* Fehler: "Die Einheit ist mit uns alliert" */
-						if (is_cursed(u->attribs, C_CALM, u2->faction->unique_id)) {
+						if (calm_ct && curse_active(get_cursex(u->attribs, calm_ct, (void*)u2->faction->unique_id, cmp_curseeffect))) {
 							cmistake(u, sl->s, 47, MSG_BATTLE);
 							list_continue(sl);
 						}

@@ -118,6 +118,10 @@ SOURCE=.\weather.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\xecmd.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\xmas.h
 # End Source File
 # Begin Source File
@@ -160,6 +164,10 @@ SOURCE=.\score.c
 # Begin Source File
 
 SOURCE=.\weather.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\xecmd.c
 # End Source File
 # Begin Source File
 

@@ -90,6 +90,10 @@ SOURCE=.\birthday_firework.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\catapultammo.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\demonseye.h
 # End Source File
 # Begin Source File
@@ -99,6 +103,10 @@ SOURCE=.\items.h
 # Begin Source File
 
 SOURCE=.\lmsreward.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\questkeys.h
 # End Source File
 # Begin Source File
 
@@ -119,6 +127,10 @@ SOURCE=.\birthday_firework.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\catapultammo.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\demonseye.c
 # End Source File
 # Begin Source File
@@ -128,6 +140,10 @@ SOURCE=.\items.c
 # Begin Source File
 
 SOURCE=.\lmsreward.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\questkeys.c
 # End Source File
 # Begin Source File
 
