@@ -8,7 +8,7 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: message.c,v 1.3 2001/04/12 17:21:45 enno Exp $
+ 
 */
 
 #include <config.h>

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: illusion.c,v 1.3 2001/04/01 06:58:41 enno Exp $
+ * 
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: umlaut.h,v 1.3 2001/02/15 02:41:47 enno Exp $
+ *	
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)

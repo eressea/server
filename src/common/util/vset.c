@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: vset.c,v 1.4 2001/04/11 18:01:50 corwin Exp $
+ *	
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)

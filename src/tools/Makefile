@@ -1,3 +1,5 @@
+include ../Makefile.include
+
 all: atoi36 namegen
 
 atoi36: atoi36.c

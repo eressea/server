@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: option.h,v 1.1 2001/03/01 07:05:15 corwin Exp $
+ * 
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: pool.c,v 1.5 2001/02/14 07:44:57 enno Exp $
+ *	
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)

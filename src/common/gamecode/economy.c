@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: economy.c,v 1.12 2001/04/13 14:39:51 enno Exp $
+ *	
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)

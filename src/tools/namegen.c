@@ -8,7 +8,7 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: namegen.c,v 1.1 2001/03/01 21:07:55 corwin Exp $
+ 
  */
 
 #include <stdio.h>

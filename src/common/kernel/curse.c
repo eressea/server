@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: curse.c,v 1.6 2001/02/18 10:06:09 enno Exp $
+ *	
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
