@@ -1059,7 +1059,6 @@ describe(FILE * F, region * r, int partial, faction * f)
 
 	/* Bäume */
 
-	/* TODO : wieder normale bäume */
 #if GROWING_TREES
 	trees  = rtrees(r,2);
 	ytrees = rtrees(r,1);
@@ -1072,14 +1071,14 @@ describe(FILE * F, region * r, int partial, faction * f)
 			scat(" ");
 			if (fval(r, RF_MALLORN)) {
 				if (trees == 1)
-					scat("Mallorntannenbaum");
+					scat("Mallornbaum");
 				else
-					scat("Mallorntannenbäume");
+					scat("Mallornbäume");
 			}
 			else if (trees == 1)
-				scat("Tannenbaum");
+				scat("Baum");
 			else
-				scat("Tannenbäume");
+				scat("Bäume");
 		}
 	}
 #else
