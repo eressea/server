@@ -61,9 +61,7 @@ if len(sys.argv)>4:
 	print "Could not send confirmation to "+email
 	print "Exception is:", sys.exc_type, ":", sys.exc_value
 
-cursor.execute("select count(*) from users u, transactions t where u.id=t.user group by u.id having sum(t.balance)!=0.0")
-count = cursor.fetchone()[0]
 cursor.execute("select sum(transactions.balance) from transactions")
 balance = cursor.fetchone()[0]
-print str(balance)+ " EUR (" + str(balance*1.955830)+ " DEM) in " + str(int(count)) + " Konten"
+print str(balance)+ " EUR (" + str(balance*1.955830)+ " DEM)"
 
