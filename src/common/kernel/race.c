@@ -351,12 +351,12 @@ rc_name(const race * rc, int n)
 const char *
 raceprefix(const unit *u)
 {
-	attrib * agroup = a_find(u->attribs, &at_group);
-	attrib * asource = u->faction->attribs;
-	attrib * a2 = NULL;
+	const attrib * agroup = a_findc(u->attribs, &at_group);
+	const attrib * asource = u->faction->attribs;
+	const attrib * a2 = NULL;
 
-	if (agroup!=NULL) asource = ((group *)(agroup->data.v))->attribs;
-	a2 = a_find(asource, &at_raceprefix);
+	if (agroup!=NULL) asource = ((const group *)(agroup->data.v))->attribs;
+	a2 = a_findc(asource, &at_raceprefix);
 
 	if (a2!=NULL) return (const char *)a2->data.v;
 	return NULL;

@@ -828,8 +828,8 @@
 		<arg name="object" type="string"></arg>
 	</type>
 	<text locale="de">"$unit($unit) in $region($region): '$command' - $unit($unit) erschafft $int($amount) ${object}."</text>
-	<text locale="fr">"$unit($unit) in $region($region): '$command' - $unit($unit) creates $int($amount) ${item}."</text>
-	<text locale="en">"$unit($unit) in $region($region): '$command' - $unit($unit) creates $int($amount) ${item}."</text>
+	<text locale="fr">"$unit($unit) in $region($region): '$command' - $unit($unit) creates $int($amount) ${object}."</text>
+	<text locale="en">"$unit($unit) in $region($region): '$command' - $unit($unit) creates $int($amount) ${object}."</text>
 </message>
 <message name="use_tacticcrystal" section="magic">
 	<type>

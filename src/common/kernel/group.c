@@ -51,11 +51,6 @@ new_group(faction * f, const char * name, int gid)
 	g->name = strdup(name);
 	g->gid = gid;
 
-	a = a_find(f->attribs, &at_raceprefix);
-	if(a) {
-		a_add(&g->attribs, a_new(&at_raceprefix))->data.v = strdup((char *)a->data.v);
-	}
-
 	g->nexthash = ghash[index];
 	return ghash[index] = g;
 }
