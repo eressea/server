@@ -72,6 +72,9 @@ get_force(int power, int formel)
 		case 5:
 			/* (10,40,90,160,250,360,490,640,810,1000,1210,1440,..)*/
 			return (power*power*10);
+		case 6:
+			/* (6,24,54,96,150,216,)*/
+			return (power*power*6);
 		default:
 			return power;
 	}
@@ -571,8 +574,10 @@ sp_dragonodem(fighter * fi, int level, int power, spell * sp)
 	const char *damage;
 
 	sprintf(buf, "%s zaubert %s", unitname(fi->unit), sp->name);
-	damage = spell_damage(0);
-	force = lovar(get_force(level,3));
+	/* 14-34 HP */
+	damage = spell_damage(10);
+	/* Jungdrache 3->54, Drache 6->216, Wyrm 12->864 Treffer */
+	force = lovar(get_force(level,6));
 
 	enemies = count_enemies(fi->side, FS_ENEMY, minrow,
 			maxrow);
