@@ -149,7 +149,7 @@ static void
 game_init(void)
 {
 	init_triggers();
-
+	init_xmas2000();
 	report_init();
 	creport_init();
 
