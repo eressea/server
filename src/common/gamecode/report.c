@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.6 2001/02/03 13:45:30 enno Exp $
+ *	$Id: report.c,v 1.7 2001/02/04 08:38:14 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -863,6 +863,10 @@ see_border(border * b, faction * f, region * r)
 	return cs;
 }
 
+attrib_type at_roads_override = {
+	"roads_override", NULL, NULL, NULL, &a_writestring, &a_readstring
+};
+
 static void
 describe(FILE * F, region * r, int partial, faction * f)
 {
@@ -1025,44 +1029,50 @@ describe(FILE * F, region * r, int partial, faction * f)
 	}
 
 	if (!is_cursed(r->attribs, C_REGCONF, 0)) {
-		int nrd = 0;
-
-		/* Nachbarregionen, die gesehen werden, ermitteln */
-		for (d = 0; d != MAXDIRECTIONS; d++)
-			if (see[d] && rconnect(r, d)) nrd++;
-
-		/* Richtungen aufzählen */
-
-		dh = false;
-		for (d = 0; d != MAXDIRECTIONS; d++) if (see[d]) {
-			region * r2 = rconnect(r, d);
-			if(!r2) continue;
-			nrd--;
-			if (dh) {
-				if (nrd == 0) scat(" und im ");
-				else scat(", im ");
+		attrib *a_do = a_find(r->attribs, &at_roads_override);
+		if(a_do) {
+			scat(" ");
+			scat((char *)a_do->data.v);
+		} else {
+			int nrd = 0;
+			
+			/* Nachbarregionen, die gesehen werden, ermitteln */
+			for (d = 0; d != MAXDIRECTIONS; d++)
+				if (see[d] && rconnect(r, d)) nrd++;
+			
+			/* Richtungen aufzählen */
+			
+			dh = false;
+			for (d = 0; d != MAXDIRECTIONS; d++) if (see[d]) {
+				region * r2 = rconnect(r, d);
+				if(!r2) continue;
+				nrd--;
+				if (dh) {
+					if (nrd == 0) scat(" und im ");
+					else scat(", im ");
+				}
+				else scat(" Im ");
+				scat(directions[d]);
+				scat(" ");
+				if (!dh) scat("der Region liegt ");
+				sprintf(dbuf, trailinto(r2, f->locale),
+						f_regionid(r2, f));
+				scat(dbuf);
+				dh = true;
 			}
-			else scat(" Im ");
-			scat(directions[d]);
-			scat(" ");
-			if (!dh) scat("der Region liegt ");
-			sprintf(dbuf, trailinto(r2, f->locale),
-					f_regionid(r2, f));
-			scat(dbuf);
-			dh = true;
+			/* Spezielle Richtungen */
+			for (a = a_find(r->attribs, &at_direction);a;a = a->nexttype) {
+				spec_direction * d = (spec_direction *)(a->data.v);
+				scat(" ");
+				scat(d->desc);
+				scat(" (\"");
+				scat(d->keyword);
+				scat("\")");
+				scat(".");
+				dh = 1;
+			}
+			if (dh) scat(".");
 		}
-		/* Spezielle Richtungen */
-		for (a = a_find(r->attribs, &at_direction);a;a = a->nexttype) {
-			spec_direction * d = (spec_direction *)(a->data.v);
-			scat(" ");
-			scat(d->desc);
-			scat(" (\"");
-			scat(d->keyword);
-			scat("\")");
-			scat(".");
-			dh = 1;
-		}
-		if (dh) scat(".");
 		rnl(F);
 		rparagraph(F, buf, 0, 0);
 	} else {
