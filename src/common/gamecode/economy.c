@@ -1773,7 +1773,7 @@ attrib_allocation(const allocator * self, region * r, allocation * alist)
 			norders -= want;
 			al->get = min(al->want, (int)(x/al->save));
 			if (rdata->use) {
-				int use = (int)(al->get * al->save);
+				int use = required(al->get, al->save);
 				if (use) rdata->use(r, rtype, use);
 			}
 		}
