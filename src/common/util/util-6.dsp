@@ -167,6 +167,10 @@ SOURCE=.\lists.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\log.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\rand.h
 # End Source File
 # Begin Source File
@@ -225,6 +229,10 @@ SOURCE=.\language.c
 # Begin Source File
 
 SOURCE=.\lists.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\log.c
 # End Source File
 # Begin Source File
 

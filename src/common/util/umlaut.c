@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: umlaut.c,v 1.3 2001/02/10 10:40:12 enno Exp $
+ *	$Id: umlaut.c,v 1.4 2001/02/13 02:58:51 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -50,10 +50,12 @@ addtoken(tnode * root, const char* str, void * id)
 		root->id = id;
 		root->leaf=1;
 	} else {
-		char c = (char)tolower(*(unsigned char*)str);
-		int index = ((unsigned char)c) % 32;
-		int i=0;
-		tnode * tk = root->next[index];
+		tnode * tk;
+		int index, i = 0;
+		char c = *str;
+		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c);
+		index = ((unsigned char)c) % 32;
+		tk = root->next[index];
 		if (root->id==E_TOK_NOMATCH) root->id = id;
 		while (tk && tk->c != c) tk = tk->nexthash;
 		if (!tk) {
@@ -81,8 +83,11 @@ findtoken(tnode * tk, const char * str)
 	if(*str == 0) return E_TOK_NOMATCH;
 
 	while (*str) {
-		char c = (char)tolower(*str);
-		int index = ((unsigned char)c) % 32;
+		int index;
+		char c = *str;
+		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c);
+
+		index = ((unsigned char)c) % 32;
 		tk = tk->next[index];
 		while (tk && tk->c!=c) tk = tk->nexthash;
 		++str;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.13 2001/02/12 22:39:56 enno Exp $
+ *	$Id: eressea.c,v 1.14 2001/02/13 02:58:51 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1033,7 +1033,7 @@ igetstrtoken (const char *s1)
 		s++;
 	i = 0;
 
-	while (i < DISPLAYSIZE && *s && *s != ' ') {
+	while (*s && *s != ' ' && i < DISPLAYSIZE) {
 		buf[i] = (*s);
 
 		/* Hier wird space_replacement wieder in space zurueck

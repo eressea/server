@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.9 2001/02/11 20:54:01 enno Exp $
+ *	$Id: item.c,v 1.10 2001/02/13 02:58:51 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -44,11 +44,21 @@ potion_type * potiontypes;
 item_type * itemtypes;
 herb_type * herbtypes;
 
-attrib_type at_ptype = { "potion_type" };
-attrib_type at_wtype = { "weapon_type" };
-attrib_type at_ltype = { "luxury_type" };
-attrib_type at_itype = { "item_type" };
-attrib_type at_htype = { "herb_type" };
+#ifdef AT_PTYPE
+static attrib_type at_ptype = { "potion_type" };
+#endif
+#ifdef AT_WTYPE
+static attrib_type at_wtype = { "weapon_type" };
+#endif
+#ifdef AT_LTYPE
+static attrib_type at_ltype = { "luxury_type" };
+#endif
+#ifdef AT_ITYPE
+static attrib_type at_itype = { "item_type" };
+#endif
+#ifdef AT_HTYPE
+static attrib_type at_htype = { "herb_type" };
+#endif
 
 static int
 res_changeaura(unit * u, const resource_type * rtype, int delta)
@@ -158,7 +168,11 @@ it_register(item_type * itype)
 	item_type ** p_itype = &itemtypes;
 	while (*p_itype && *p_itype != itype) p_itype = &(*p_itype)->next;
 	if (*p_itype==NULL) {
+#ifdef AT_ITYPE
 		a_add(&itype->rtype->attribs, a_new(&at_itype))->data.v = (void*) itype;
+#else
+		itype->rtype->itype = itype;
+#endif
 		*p_itype = itype;
 		rt_register(itype->rtype);
 	}
@@ -190,7 +204,11 @@ new_itemtype(resource_type * rtype,
 void
 lt_register(luxury_type * ltype)
 {
+#ifdef AT_LTYPE
 	a_add(&ltype->itype->rtype->attribs, a_new(&at_ltype))->data.v = (void*) ltype;
+#else
+	ltype->itype->rtype->ltype = ltype;
+#endif
 	ltype->next = luxurytypes;
 	luxurytypes = ltype;
 }
@@ -214,7 +232,11 @@ new_luxurytype(item_type * itype, int price)
 void
 wt_register(weapon_type * wtype)
 {
+#ifdef AT_WTYPE
 	a_add(&wtype->itype->rtype->attribs, a_new(&at_wtype))->data.v = (void*) wtype;
+#else
+	wtype->itype->rtype->wtype = wtype;
+#endif
 	wtype->next = weapontypes;
 	weapontypes = wtype;
 }
@@ -250,7 +272,11 @@ new_weapontype(item_type * itype,
 void
 pt_register(potion_type * ptype)
 {
+#ifdef AT_PTYPE
 	a_add(&ptype->itype->rtype->attribs, a_new(&at_ptype))->data.v = (void*) ptype;
+#else
+	ptype->itype->rtype->ptype = ptype;
+#endif
 	ptype->next = potiontypes;
 	potiontypes = ptype;
 }
@@ -276,7 +302,11 @@ new_potiontype(item_type * itype,
 void
 ht_register(herb_type * htype)
 {
+#ifdef AT_HTYPE
 	a_add(&htype->itype->rtype->attribs, a_new(&at_htype))->data.v = (void*) htype;
+#else
+	htype->itype->rtype->htype = htype;
+#endif
 	htype->next = herbtypes;
 	herbtypes = htype;
 }
@@ -312,43 +342,68 @@ rt_register(resource_type * rtype)
 }
 
 const resource_type *
-item2resource(const item_type * itype) {
+item2resource(const item_type * itype) 
+{
 	return itype->rtype;
 }
 
 const item_type *
-resource2item(const resource_type * rtype) {
+resource2item(const resource_type * rtype)
+{
+#ifdef AT_ITYPE
 	attrib * a = a_find(rtype->attribs, &at_itype);
 	if (a) return (const item_type *)a->data.v;
 	return NULL;
+#else
+	return rtype->itype;
+#endif
 }
 
 const herb_type *
-resource2herb(const resource_type * rtype) {
+resource2herb(const resource_type * rtype) 
+{
+#ifdef AT_HTYPE
 	attrib * a = a_find(rtype->attribs, &at_htype);
 	if (a) return (const herb_type *)a->data.v;
 	return NULL;
+#else
+	return rtype->htype;
+#endif
 }
 
 const weapon_type *
 resource2weapon(const resource_type * rtype) {
+#ifdef AT_WTYPE
 	attrib * a = a_find(rtype->attribs, &at_wtype);
 	if (a) return (const weapon_type *)a->data.v;
 	return NULL;
+#else
+	return rtype->wtype;
+#endif
 }
 
 const luxury_type *
-resource2luxury(const resource_type * rtype) {
+resource2luxury(const resource_type * rtype) 
+{
+#ifdef AT_LTYPE
 	attrib * a = a_find(rtype->attribs, &at_ltype);
 	if (a) return (const luxury_type *)a->data.v;
 	return NULL;
+#else
+	return rtype->ltype;
+#endif
 }
 
 const potion_type *
-resource2potion(const resource_type * rtype) {
+resource2potion(const resource_type * rtype)
+{
+#ifdef AT_PTYPE
 	attrib * a = a_find(rtype->attribs, &at_ptype);
 	if (a) return (const potion_type *)a->data.v;
 	return NULL;
+#else
+	return rtype->ptype;
+#endif
 }
 
 resource_type *
