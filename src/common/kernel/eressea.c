@@ -1810,8 +1810,7 @@ lastregion (faction * f)
 			if (check_leuchtturm(r, f))
 				f->last = r->next;
 			if (p && is_watcher(p, f)) {
-				f->first = r;
-				return r;
+				f->last = r->next;
 			}
 		}
 	}
