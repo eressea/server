@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.14 2001/02/14 09:17:56 enno Exp $
+ *	$Id: battle.c,v 1.15 2001/02/14 20:09:48 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -443,7 +443,7 @@ tactics_bonus(troop at, troop dt, boolean attacking)
 #endif /* NEW_TACTICS */
 
 int
-get_unitrow(const fighter * af)
+get_unitrow(fighter * af)
 {
 	static boolean * counted = NULL;
 	static size_t csize = 0;
@@ -514,7 +514,7 @@ get_unitrow(const fighter * af)
 }
 
 static int
-sort_fighterrow(const fighter ** elem1, const fighter ** elem2)
+sort_fighterrow(fighter ** elem1, fighter ** elem2)
 {
 	int a, b;
 

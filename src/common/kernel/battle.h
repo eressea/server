@@ -223,7 +223,7 @@ extern int hits(troop at, troop dt, weapon * awp);
 extern void damage_building(struct battle *b, struct building *bldg, int damage_abs);
 extern struct cvector * fighters(struct battle *b, struct fighter *af, int minrow, int maxrow, int mask);
 extern int countallies(struct side * as);
-extern int get_unitrow(const struct fighter * af);
+extern int get_unitrow(struct fighter * af);
 extern boolean helping(struct side * as, struct side * ds);
 extern void rmtroop(struct troop dt);
 extern struct region * fleeregion(const struct unit * u);

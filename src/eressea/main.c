@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.16 2001/02/14 01:38:51 enno Exp $
+ *	$Id: main.c,v 1.17 2001/02/14 20:09:49 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -459,6 +459,7 @@ read_args(int argc, char **argv)
 			if (strcmp(argv[i]+1, "nocr")==0) nocr = true;
 			else if (strcmp(argv[i]+2, "nosave")==0) nowrite = true;
 			else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
+			else if (strcmp(argv[i]+2, "nocr")==0) nocr = true;
 			else if (strcmp(argv[i]+2, "nomsg")==0) nomsg = true;
 			else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
 			else if (strcmp(argv[i]+2, "nodebug")==0) nobattledebug = true;
