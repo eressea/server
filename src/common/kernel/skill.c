@@ -315,8 +315,12 @@ int
 skill_weeks(int level)
 /* how many weeks must i study to get from level to level+1 */
 {
-	/* derzeit gleichverteilt. MUSS geändert werden! */
-	return (1+rand()%(level*2+1));
+	int coins = 2*level;
+	int heads = 1;
+	while (coins--) {
+		heads += rand() % 2;
+	}
+	return heads;
 }
 
 void 
