@@ -348,18 +348,18 @@ cinfo_fumble(const struct locale * lang, void * obj, enum typ_t typ, struct curs
 void
 register_unitcurse(void)
 {
-	register_function((pf_generic)register_function((pf_generic)cinfo_unit, "unit");, "cinfo::unit, "unit");");
-	register_function((pf_generic)register_function((pf_generic)cinfo_unit_onlyowner, "unit_onlyowner");, "cinfo::unit_onlyowner, "unit_onlyowner");");
-	register_function((pf_generic)register_function((pf_generic)cinfo_auraboost, "auraboost");, "cinfo::auraboost, "auraboost");");
-	register_function((pf_generic)register_function((pf_generic)cinfo_slave, "slave");, "cinfo::slave, "slave");");
-	register_function((pf_generic)register_function((pf_generic)cinfo_calm, "calm");, "cinfo::calm, "calm");");
-	register_function((pf_generic)register_function((pf_generic)cinfo_speed, "speed");, "cinfo::speed, "speed");");
-	register_function((pf_generic)register_function((pf_generic)cinfo_orc, "orc");, "cinfo::orc, "orc");");
-	register_function((pf_generic)register_function((pf_generic)cinfo_kaelteschutz, "kaelteschutz");, "cinfo::kaelteschutz, "kaelteschutz");");
-	register_function((pf_generic)register_function((pf_generic)cinfo_sparkle, "sparkle");, "cinfo::sparkle, "sparkle");");
-	register_function((pf_generic)register_function((pf_generic)cinfo_strength, "strength");, "cinfo::strength, "strength");");
-	register_function((pf_generic)register_function((pf_generic)cinfo_allskills, "allskills");, "cinfo::allskills, "allskills");");
-	register_function((pf_generic)register_function((pf_generic)cinfo_skill, "skill");, "cinfo::skill, "skill");");
-	register_function((pf_generic)register_function((pf_generic)cinfo_itemcloak, "itemcloak");, "cinfo::itemcloak, "itemcloak");");
-	register_function((pf_generic)register_function((pf_generic)cinfo_fumble, "fumble");, "cinfo::fumble, "fumble");");
+	register_function((pf_generic)cinfo_unit, "cinfo::unit");
+	register_function((pf_generic)cinfo_unit_onlyowner, "cinfo::unit_onlyowner");
+	register_function((pf_generic)cinfo_auraboost, "cinfo::auraboost");
+	register_function((pf_generic)cinfo_slave, "cinfo::slave");
+	register_function((pf_generic)cinfo_calm, "cinfo::calm");
+	register_function((pf_generic)cinfo_speed, "cinfo::speed");
+	register_function((pf_generic)cinfo_orc, "cinfo::orc");
+	register_function((pf_generic)cinfo_kaelteschutz, "cinfo::kaelteschutz");
+	register_function((pf_generic)cinfo_sparkle, "cinfo::sparkle");
+	register_function((pf_generic)cinfo_strength, "cinfo::strength");
+	register_function((pf_generic)cinfo_allskills, "cinfo::allskills");
+	register_function((pf_generic)cinfo_skill, "cinfo::skill");
+	register_function((pf_generic)cinfo_itemcloak, "cinfo::itemcloak");
+	register_function((pf_generic)cinfo_fumble, "cinfo::fumble");
 }
