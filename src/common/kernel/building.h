@@ -140,6 +140,12 @@ extern struct building *findbuilding(int n);
 extern struct unit * buildingowner(const struct region * r, const struct building * b);
 
 extern attrib_type at_nodestroy;
+extern attrib_type at_building_action;
+
+typedef struct building_action {
+  building * b;
+  char * fname;
+} building_action;
 
 #ifdef __cplusplus
 }

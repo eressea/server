@@ -26,30 +26,11 @@ add_building(region * r, const char * name)
   return new_building(btype, r, NULL);
 }
 
-typedef struct lcbuilding_data {
-  building * b;
-  char * fname;
-} lcbuilding_data;
-
-static void 
-lc_init(struct attrib *a)
-{
-  a->data.v = calloc(1, sizeof(lcbuilding_data));
-}
-
-static void 
-lc_done(struct attrib *a)
-{
-  lcbuilding_data * data = (lcbuilding_data*)a->data.v;
-  if (data->fname) free(data->fname);
-  free(data);
-}
-
 static int
 lc_age(struct attrib * a)
 {
   lua_State * L = (lua_State *)global.vm_state;
-  lcbuilding_data * data = (lcbuilding_data*)a->data.v;
+  building_action * data = (building_action*)a->data.v;
   const char * fname = data->fname;
   building * b = data->b;
 
@@ -58,49 +39,15 @@ lc_age(struct attrib * a)
 
   luabind::object globals = luabind::get_globals(L);
   if (globals.at(fname).type()!=LUA_TFUNCTION) return -1;
-  
+
   return luabind::call_function<int>(L, fname, *b);
 }
-
-static void 
-lc_write(const struct attrib * a, FILE* F)
-{
-  lcbuilding_data * data = (lcbuilding_data*)a->data.v;
-  const char * fname = data->fname;
-  building * b = data->b;
-
-  write_building_reference(b, F);
-  fwritestr(F, fname);
-  fputc(' ', F);
-}
-
-static int
-lc_read(struct attrib * a, FILE* F)
-{
-  char lbuf[256];
-  lcbuilding_data * data = (lcbuilding_data*)a->data.v;
-
-  read_building_reference(&data->b, F);
-  freadstr(F, lbuf, sizeof(lbuf));
-  data->fname = strdup(lbuf);
-  return AT_READ_OK;
-}
-
-attrib_type at_luacall_building = {
-  "lcbuilding", 
-  lc_init, 
-  lc_done, 
-  lc_age, 
-  lc_write, 
-  lc_read,
-  ATF_UNIQUE
-};
 
 static int
 building_addaction(building& b, const char * fname)
 {
-  attrib * a = a_add(&b.attribs, a_new(&at_luacall_building));
-  lcbuilding_data * data = (lcbuilding_data*)a->data.v;
+  attrib * a = a_add(&b.attribs, a_new(&at_building_action));
+  building_action * data = (building_action*)a->data.v;
   data->b = &b;
   data->fname = strdup(fname);
 
@@ -172,7 +119,7 @@ building_units(const building& b) {
 void
 bind_building(lua_State * L) 
 {
-  at_register(&at_luacall_building);
+  at_building_action.age = lc_age;
   module(L)[
     def("get_building", &findbuilding),
     def("add_building", &add_building),

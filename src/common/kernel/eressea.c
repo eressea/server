@@ -3230,6 +3230,7 @@ attrib_init(void)
 #endif
   at_register(&at_speedup);
   at_register(&at_nodestroy);
+  at_register(&at_building_action);
 }
 
 void

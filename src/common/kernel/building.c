@@ -40,6 +40,51 @@
 /* attributes includes */
 #include <attributes/matmod.h>
 
+static void 
+lc_init(struct attrib *a)
+{
+  a->data.v = calloc(1, sizeof(building_action));
+}
+
+static void 
+lc_done(struct attrib *a)
+{
+  building_action * data = (building_action*)a->data.v;
+  if (data->fname) free(data->fname);
+  free(data);
+}
+
+static void 
+lc_write(const struct attrib * a, FILE* F)
+{
+  building_action * data = (building_action*)a->data.v;
+  const char * fname = data->fname;
+  building * b = data->b;
+
+  write_building_reference(b, F);
+  fwritestr(F, fname);
+  fputc(' ', F);
+}
+
+static int
+lc_read(struct attrib * a, FILE* F)
+{
+  char lbuf[256];
+  building_action * data = (building_action*)a->data.v;
+
+  read_building_reference(&data->b, F);
+  freadstr(F, lbuf, sizeof(lbuf));
+  data->fname = strdup(lbuf);
+  return AT_READ_OK;
+}
+
+attrib_type at_building_action = {
+  "lcbuilding", 
+  lc_init, lc_done, 
+  NULL, 
+  lc_write, lc_read
+};
+
 attrib_type at_nodestroy = {
 	"nodestroy",
 	NULL, NULL, NULL,
