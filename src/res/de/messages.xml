@@ -4748,6 +4748,9 @@
 	<message name="newbie_immunity_error">
 		<type>
 			<arg name="turns" type="int"></arg>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="command"></arg>
 		</type>
 		<locale name="de">
 			<nr section="events">
