@@ -2993,7 +2993,6 @@ magic(void)
       if (co->force>0 && fumble(target_r, u, sp, co->level)) {
         /* zuerst bezahlen, dann evt in do_fumble alle Aura verlieren */
         fumbled = true;
-        co->force = 0;
       } else if (co->force>0) {
         co->level = ((nspell_f)sp->sp_function)(co);
         if (co->level <= 0) {
