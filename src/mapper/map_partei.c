@@ -258,7 +258,7 @@ read_newfactions(const char * filename)
 		if (nf) continue;
 		nf = calloc(sizeof(newfaction), 1);
     if (set_email(&nf->email, email)!=0) {
-      log_error(("Invalid email address for faction %s: %s\n", itoa36(nf->no), email));
+      log_error(("Invalid email address for subscription %s: %s\n", itoa36(subscription), email));
     }
 		nf->password = strdup(password);
 		nf->race = rc_find(race);
