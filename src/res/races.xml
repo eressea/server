@@ -58,7 +58,7 @@
 		<attack type="2" damage="5d600"></attack>
 		<attack type="1" damage="1d4"></attack>
 	</race>
-	<race name="ghast" magres="0.600000" maxaura="1.000000" regaura="1.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment giveitem>
+	<race name="ghast" magres="0.600000" maxaura="1.000000" regaura="1.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment nogive>
 		<ai splitsize="10000" attackrandom moverandom></ai>
 		<function name="name" value="nameghoul"></function>
 		<skill name="sk_crossbow" modifier="1"></skill>
@@ -76,7 +76,7 @@
 		<attack type="2" damage="1d30"></attack>
 		<attack type="2" damage="1d30"></attack>
 	</race>
-	<race name="ghoul" magres="0.300000" maxaura="1.000000" regaura="1.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment giveitem>
+	<race name="ghoul" magres="0.300000" maxaura="1.000000" regaura="1.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment nogive>
 		<ai splitsize="10000" attackrandom moverandom></ai>
 		<function name="name" value="nameghoul"></function>
 		<function name="age" value="ageghoul"></function>
@@ -94,7 +94,7 @@
 		<attack type="3" damage="1d2"></attack>
 		<attack type="2" damage="1d30"></attack>
 	</race>
-	<race name="juju-zombie" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="8" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment resistbash resistcut resistpierce giveitem>
+	<race name="juju-zombie" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="8" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment resistbash resistcut resistpierce nogive>
 		<ai splitsize="10000" attackrandom moverandom></ai>
 		<function name="name" value="namezombie"></function>
 		<skill name="sk_crossbow" modifier="1"></skill>
@@ -110,7 +110,7 @@
 		<attack type="3" damage="1d1"></attack>
 		<attack type="3" damage="1d1"></attack>
 	</race>
-	<race name="zombie" magres="0.200000" maxaura="1.000000" regaura="1.000000" recruitcost="4" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" scarepeasants walk nolearn noteach noheal undead canguard equipment resistcut resistpierce giveitem>
+	<race name="zombie" magres="0.200000" maxaura="1.000000" regaura="1.000000" recruitcost="4" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" scarepeasants walk nolearn noteach noheal undead canguard equipment resistcut resistpierce nogive>
 		<ai splitsize="10000" killpeasants attackrandom moverandom></ai>
 		<function name="name" value="namezombie"></function>
 		<function name="age" value="agezombie"></function>
@@ -125,7 +125,7 @@
 		<skill name="sk_unarmed" modifier="1"></skill>
 		<attack type="1" damage="1d7"></attack>
 	</race>
-	<race name="skeleton lord" magres="0.300000" maxaura="1.000000" regaura="1.000000" recruitcost="2" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment resistcut resistpierce giveitem>
+	<race name="skeleton lord" magres="0.300000" maxaura="1.000000" regaura="1.000000" recruitcost="2" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment resistcut resistpierce nogive>
 		<ai splitsize="10000" attackrandom moverandom></ai>
 		<function name="name" value="nameskeleton"></function>
 		<skill name="sk_crossbow" modifier="1"></skill>
@@ -140,7 +140,7 @@
 		<attack type="1" damage="1d7"></attack>
 		<attack type="1" damage="1d7"></attack>
 	</race>
-	<race name="skeleton" magres="0.100000" maxaura="1.000000" regaura="1.000000" recruitcost="0" maintenance="0" weight="500" capacity="540" speed="1.000000" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" scarepeasants walk nolearn noteach noheal undead canguard equipment resistcut resistpierce giveitem>
+	<race name="skeleton" magres="0.100000" maxaura="1.000000" regaura="1.000000" recruitcost="0" maintenance="0" weight="500" capacity="540" speed="1.000000" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" scarepeasants walk nolearn noteach noheal undead canguard equipment resistcut resistpierce nogive>
 		<ai splitsize="10000" killpeasants attackrandom moverandom></ai>
 		<function name="name" value="nameskeleton"></function>
 		<function name="age" value="ageskeleton"></function>
@@ -813,15 +813,15 @@
 		<ai splitsize="1"></ai>
 		<attack type="4" damage="2d40"></attack>
 	</race>
-	<race name="shadowmaster" magres="0.750000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" maintenance="0" weight="500" capacity="200" speed="1.000000" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" scarepeasants walk noteach desert giveitem>
+	<race name="shadowmaster" magres="0.750000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" maintenance="0" weight="500" capacity="200" speed="1.000000" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" scarepeasants walk noteach desert nogive>
 		<ai splitsize="50" killpeasants attackrandom moverandom learn></ai>
 		<function name="name" value="nameshadow"></function>
 		<attack type="4" damage="2d4"></attack>
 		<attack type="2" damage="2d30"></attack>
 		<attack type="3" damage="1d2"></attack>
 	</race>
-	<race name="shadowdemon" magres="0.750000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" maintenance="0" weight="500" capacity="200" speed="1.000000" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" scarepeasants walk noteach desert recruitethereal>
-		<ai splitsize="1000" killpeasants attackrandom moverandom learn giveitem></ai>
+	<race name="shadowdemon" magres="0.750000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" maintenance="0" weight="500" capacity="200" speed="1.000000" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" scarepeasants walk noteach desert recruitethereal nogive>
+		<ai splitsize="1000" killpeasants attackrandom moverandom learn></ai>
 		<function name="name" value="nameshadow"></function>
 		<attack type="4" damage="2d3"></attack>
 		<attack type="3" damage="1d1"></attack>
