@@ -7632,14 +7632,20 @@
 		<text locale="de">"Ein magischer Schimmer liegt auf diesen Mauern. ($int36($id))"</text>
 		<text locale="en">""</text>
 	</message>
-	<message name="curseinfo::magicstone">
+	<message name="curseinfo::magicwalls">
 		<type>
 			<arg name="id" type="int"></arg>
 		</type>
 		<text locale="de">"Diese Mauern wirken, als wären sie direkt aus der Erde gewachsen und nicht erbaut. ($int36($id))"</text>
 		<text locale="en">""</text>
 	</message>
-
+	<message name="curseinfo::nocostbuilding">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Der Zahn der Zeit kann diesen Mauern nichts anhaben. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
 	<message name="curseinfo::orcish">
 		<type>
 			<arg name="unit" type="unit"></arg>

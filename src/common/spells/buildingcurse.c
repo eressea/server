@@ -85,6 +85,7 @@ static struct curse_type ct_magicrunes = { "magicrunes",
 	cinfo_magicrunes
 };
 
+/* Heimstein-Zauber */
 static struct curse_type ct_magicwalls = { "magicwalls",
 	CURSETYP_NORM, 0, NO_MERGE,
 	"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
@@ -94,11 +95,15 @@ static struct curse_type ct_magicwalls = { "magicwalls",
 	"gefährden können.",
 	cinfo_building
 };
+
+/* Feste Mauer - Präkampfzauber, wirkt nur 1 Runde */
 static struct curse_type ct_strongwall = { "strongwall",
 	CURSETYP_NORM, 0, NO_MERGE,
 	"",
-	cinfo_building
+	NULL
 };
+
+/* Ewige Mauern-Zauber */
 static struct curse_type ct_nocostbuilding = { "nocostbuilding",
 	CURSETYP_NORM, 0, NO_MERGE,
 	"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
