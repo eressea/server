@@ -873,7 +873,7 @@ mapper_spunit(dbllist ** SP, unit * u, int indent)
 
 	sncat(buf, " (", BUFSIZE); icat(u->hp/u->number); sncat(buf, " HP)", BUFSIZE);
 
-	if (getguard(u, UFL_GUARD))
+	if (getguard(u))
 		sncat(buf, ", bewacht die Region", BUFSIZE);
 
 	if (usiege(u)) {
