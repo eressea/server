@@ -11,10 +11,5 @@ CC      = gcc
 LD      = gcc
 INSTALL = cp
 
-CFLAGS += -DHAVE_GETCURX
-
-# ifdef DMALLOC
-# 	LIBS   += -ldmalloc
-# 	CFLAGS += -DDMALLOC
-# endif
+# CFLAGS += -DIRGENDWAS
 

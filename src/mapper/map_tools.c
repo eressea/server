@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_tools.c,v 1.5 2001/02/09 15:17:31 corwin Exp $
+ *	$Id: map_tools.c,v 1.6 2001/02/10 12:31:42 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -108,15 +108,7 @@ map_input(WINDOW * win, int x, int y, const char *text, int mn, int mx, int pre)
 		curs_set(1);
 		wprintw(win, (NCURSES_CONST char*)"%s (%d..%d): %d", text, mn, mx, pre);
 		wrefresh(win);
-#ifdef HAVE_GETCURX
 		cx = getcurx(win) - strlen(lbuf);
-#else
-		cx = (int)(x + strlen(text) + 7 + log10(abs(mn)) + log10(abs(mx)));
-		if (mx < 0)
-			cx++;
-		if (mn < 0)
-			cx++;
-#endif
 		val = strlen(lbuf);
 		do {
 			ch = getch();

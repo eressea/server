@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: attributes.c,v 1.6 2001/02/10 10:40:10 enno Exp $
+ * $Id: attributes.c,v 1.7 2001/02/10 12:31:42 corwin Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -36,7 +36,7 @@
 void
 init_attributes(void)
 {
-	at_register(&at_orcification);
+	/* at_register(&at_orcification); */
 	at_register(&at_overrideroads);
 	/* at_iceberg */
 	init_iceberg();

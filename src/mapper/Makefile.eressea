@@ -1,7 +1,0 @@
-CC    = gcc -march=pentiumpro
-DEBUG = -ggdb
-LIBS  = -lncurses -lm -lz
-
-CFLAGS  = ${DEBUG} -Wall -Wno-char-subscripts -ansi -pedantic -I.. -DHAVE_GETCURX -DMAPPER -D_BSD_SOURCE -D_GNU_SOURCE -DHAVE_ZLIB
-LDFLAGS = ${DEBUG}
-
