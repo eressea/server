@@ -1952,12 +1952,12 @@ sp_treewalkexit(castorder *co)
 
     u = pa->param[n]->data.u;
 
-    if(!ucontact(u, mage)) {
+    if (!ucontact(u, mage)) {
       sprintf(buf, "%s hat uns nicht kontaktiert.", unitname(u));
       addmessage(r, mage->faction, buf,  MSG_MAGIC, ML_MISTAKE);
     } else {
       int w = weight(u);
-      if(!can_survive(u, rt)) {
+      if (!can_survive(u, rt)) {
         cmistake(mage, co->order, 231, MSG_MAGIC);
       } else if(remaining_cap - w < 0) {
         sprintf(buf, "%s ist zu schwer.", unitname(u));
@@ -5837,8 +5837,8 @@ sp_enterastral(castorder *co)
 		if(pa->param[n]->flag == TARGET_NOTFOUND) continue;
 		u = pa->param[n]->data.u;
 
-		if(!ucontact(u, mage)) {
-			if(power > 10 && !is_magic_resistant(mage, u, 0)
+		if (!ucontact(u, mage)) {
+			if (power > 10 && !is_magic_resistant(mage, u, 0)
 					&& can_survive(u, rt)) {
 				sprintf(buf, "%s hat uns nicht kontaktiert, widersteht dem "
 						"Zauber jedoch nicht.", unitname(u));
@@ -5964,7 +5964,7 @@ sp_pullastral(castorder *co)
 
       u = pa->param[n]->data.u;
 
-      if(!ucontact(u, mage)) {
+      if (!ucontact(u, mage)) {
         if(power > 12 && pa->param[n]->flag == TARGET_RESISTS && can_survive(u, rt)) {
           sprintf(buf, "%s hat uns nicht kontaktiert, widersteht dem "
             "Zauber jedoch nicht.", unitname(u));
@@ -6084,8 +6084,8 @@ sp_leaveastral(castorder *co)
 
     u = pa->param[n]->data.u;
 
-    if(!ucontact(u, mage)) {
-      if(power > 10 && !pa->param[n]->flag == TARGET_RESISTS && can_survive(u, rt)) {
+    if (!ucontact(u, mage)) {
+      if (power > 10 && !pa->param[n]->flag == TARGET_RESISTS && can_survive(u, rt)) {
         sprintf(buf, "%s hat uns nicht kontaktiert, widersteht dem "
           "Zauber jedoch nicht.", unitname(u));
         addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);

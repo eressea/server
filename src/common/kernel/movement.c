@@ -820,16 +820,16 @@ bewegung_blockiert_von(unit * reisender, region * r)
 static boolean
 is_guardian(unit * u2, unit *u, unsigned int mask)
 {
-	if (u2->faction != u->faction
-			&& getguard(u2)&mask
-			&& u2->number
-			&& !ucontact(u2, u) && !besieged(u2)
-			&& alliedunit(u2, u->faction, HELP_GUARD) != HELP_GUARD
-			&& armedmen(u2)
-			&& cansee(u2->faction, u->region, u, 0)
-		) return true;
-
-	return false;
+	if (u2->faction == u->faction) return false;
+	if ((getguard(u2) & mask) == 0) return false;
+  if (u2->number==0) return false;
+  if (alliedunit(u2, u->faction, HELP_GUARD)) return false;
+  if (ucontact(u2, u)) return false;
+  if (besieged(u2)) return false;
+  if (!armedmen(u2)) return false;
+  if (!cansee(u2->faction, u->region, u, 0)) return false;
+  
+  return true;
 }
 
 unit *

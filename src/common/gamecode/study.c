@@ -408,16 +408,6 @@ teach(unit * u, struct order * ord)
             if (ualias(u2))
               count++;
 
-            /* this is pointless, as there currently is no way to negativly influence
-            * a unit by teaching it. */
-            /*
-            if (!ucontact(u2, u)) {
-            sprintf(buf, "Einheit %s hat keinen Kontakt mit uns aufgenommen",
-            unitid(u2));
-            mistake(u, u->thisorder, buf, MSG_EVENT);
-            continue;
-            }
-            */
             if (get_keyword(u2->thisorder) != K_STUDY) {
               add_message(&u->faction->msgs,
                 msg_feedback(u, u->thisorder, "teach_nolearn", "student", u2));

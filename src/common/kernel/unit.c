@@ -424,10 +424,6 @@ ucontact(const unit * u, const unit * u2)
 {
 	attrib *ru;
 
-	/* Alliierte kontaktieren immer */
-	if (alliedunit(u, u2->faction, HELP_GIVE) == HELP_GIVE)
-		return true;
-
 	/* Explizites KONTAKTIERE */
 	for (ru = a_find(u->attribs, &at_contact); ru; ru = ru->nexttype)
 		if (((unit*)ru->data.v) == u2)

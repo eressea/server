@@ -468,7 +468,7 @@ give_cmd(unit * u, order * ord)
 			cmistake(u, ord, 49, MSG_EVENT);
 			return;
 		}
-		if (!ucontact(u2, u)) {
+		if (!alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
 			cmistake(u, ord, 40, MSG_EVENT);
 			return;
 		}
@@ -551,7 +551,7 @@ give_cmd(unit * u, order * ord)
 			return;
 		}
 
-		if (u2 && !ucontact(u2, u)) {
+		if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
 			cmistake(u, ord, 40, MSG_COMMERCE);
 			return;
 		}
@@ -561,7 +561,7 @@ give_cmd(unit * u, order * ord)
 	if (findparam(s, u->faction->locale) == P_ANY) { /* Alle Gegenstände übergeben */
 		const char * s = getstrtoken();
 
-		if(u2 && !ucontact(u2, u)) {
+    if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
 			cmistake(u, ord, 40, MSG_COMMERCE);
 			return;
 		}
@@ -635,7 +635,7 @@ give_cmd(unit * u, order * ord)
 		return;
 	}
 
-	if (u2 && !ucontact(u2, u)) {
+  if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
 		const resource_type * rtype = findresourcetype(s, u->faction->locale);
 		if (rtype==NULL || !fval(rtype, RTF_SNEAK))
 		{

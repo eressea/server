@@ -169,7 +169,8 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
     error = 74;
   } else if (u2 && (fval(u2, UFL_LOCKED)|| is_cursed(u2->attribs, C_SLAVE, 0))) {
     error = 75;
-  } else if (u2 && u2->faction != u->faction && ucontact(u2, u) == 0) {
+  } else if (u2 && u2->faction != u->faction && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
+
     error = 73;
   } else if (u2 && (has_skill(u, SK_MAGIC) || has_skill(u2, SK_MAGIC))) {
     error = 158;
@@ -326,7 +327,7 @@ give_unit(unit * u, unit * u2, order * ord)
     return;
   }
 
-  if (ucontact(u2, u) == 0) {
+  if (!alliedunit(u2, u->faction, HELP_GIVE) && ucontact(u2, u) == 0) {
     cmistake(u, ord, 73, MSG_COMMERCE);
     return;
   }
