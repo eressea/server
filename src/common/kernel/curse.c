@@ -226,25 +226,12 @@ typedef struct cursetype_list {
 	const curse_type * type;
 } cursetype_list;
 
-#define CMAXHASH 63
-cursetype_list * cursetypes[CMAXHASH];
-
-static char * 
-strlower(const char * str)
-{
-  static char result[128];
-  char * pos = result;
-  while (*str) {
-    *pos++ = (char)tolower(*(unsigned char*)str++);
-  }
-  *pos=0;
-  return result;
-}
+cursetype_list * cursetypes[256];
 
 void
 ct_register(const curse_type * ct)
 {
-  unsigned int hash = hashstring(strlower(ct->cname)) % CMAXHASH;
+  unsigned int hash = tolower(ct->cname[0]);
 	cursetype_list ** ctlp = &cursetypes[hash];
 	while (*ctlp) {
 		cursetype_list * ctl = *ctlp;
@@ -258,8 +245,7 @@ ct_register(const curse_type * ct)
 const curse_type *
 ct_find(const char *c)
 {
-  char * lower = strlower(c);
-  unsigned int hash = hashstring(lower)  % CMAXHASH;
+  unsigned int hash = tolower(c[0]);
 	cursetype_list * ctl = cursetypes[hash];
 	while (ctl) {
 		int k = min(strlen(c), strlen(ctl->type->cname));
