@@ -126,11 +126,7 @@ report_failure(unit * mage, const char * sa) {
 void
 do_shock(unit *u, const char *reason)
 {
-#if SKILLPOINTS
-	skill_t sk;
-#else
 	int i;
-#endif
 	if(u->number == 0) return;
 
 	/* HP - Verlust */
@@ -4802,15 +4798,8 @@ sp_calm_monster(castorder *co)
 static int
 sp_headache(castorder *co)
 {
-#if SKILLPOINTS
-	skill_t sk = 0;
-	skill_t i;
-	int sk_val = 0;
-	int days;
-#else
 	skill * smax = NULL;
 	int i;
-#endif
 	unit *target;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
@@ -4825,19 +4814,6 @@ sp_headache(castorder *co)
 
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
-#if SKILLPOINTS
-	/* finde das größte Talent: */
-	for (i=0;i<MAXSKILLS;i++){
-		int l = get_level(target, i);
-		if (sk_val < l) {
-			sk = i;
-			sk_val = l;
-		}
-	}
-	/* wirkt auf maximal 10 Personen */
-	days = min(10, target->number) * lovar(60);
-	change_skill(target, sk, -days);
-#else
 	/* finde das größte Talent: */
 	for (i=0;i!=target->skill_size;++i) {
 		skill * sv = target->skills+i;
@@ -4850,7 +4826,6 @@ sp_headache(castorder *co)
 		int change = min(10, target->number) * (rand()%2+1) / target->number;
 		reduce_skill(target, smax, change);
 	}
-#endif
 	set_string(&target->thisorder, "");
 
 	sprintf(buf, "%s verschafft %s einige feuchtfröhliche Stunden mit heftigen "
@@ -6229,6 +6204,7 @@ sp_fetchastral(castorder *co)
 int
 sp_showastral(castorder *co)
 {
+#if 0
 	unit *u;
 	region *rt;
 	int n = 0;
@@ -6238,8 +6214,6 @@ sp_showastral(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int power = co->force;
-
-	return 0;
 
 	switch(getplaneid(r)) {
 	case 0:
@@ -6314,6 +6288,10 @@ sp_showastral(castorder *co)
 
 	free_regionlist(rl);
 	return cast_level;
+#else
+	unused(co);
+	return 0;
+#endif
 }
 
 /* ------------------------------------------------------------- */

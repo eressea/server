@@ -1,6 +1,3 @@
-<building name="temple" maxsize="50" maxcapacity=2 nobuild nodestroy unique auraregen="1.00">
-</building>
-
 <building name="xmas_exit" maxsize="10" maxcapacity=2 nobuild nodestroy unique auraregen="1.00">
 </building>
 

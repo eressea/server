@@ -46,4 +46,6 @@ extern int count_migrants (const struct faction * f);
 extern attrib_type at_germs;
 #endif
 
+extern void destroyfaction(struct faction * f);
+
 #endif

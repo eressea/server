@@ -42,6 +42,11 @@
 #include <limits.h>
 #include <stdlib.h>
 
+#define PFL_MUSEUM PFL_NOMONSTERS | PFL_NOCOORDS | PFL_NORECRUITS | PFL_NOGIVE | PFL_NOATTACK | PFL_NOTERRAIN | PFL_NOMAGIC | PFL_NOSTEALTH | PFL_NOTEACH | PFL_NOBUILD | PFL_NOFEED
+
+static int use_museumticket(unit *, const struct item_type *, int, const char *);
+static int use_museumexitticket(unit *, const struct item_type *, int, const char *);
+
 resource_type rt_museumticket = {
 	{ "museumticket", "museumticket_p"},
 	{ "museumticket", "museumticket_p"},
@@ -316,7 +321,7 @@ create_museum(void)
 	}
 }
 
-int
+static int
 use_museumticket(unit *u, const struct item_type *itype, int amount, const char * cmd)
 {
 	attrib *a;
@@ -357,7 +362,7 @@ use_museumticket(unit *u, const struct item_type *itype, int amount, const char 
 	return 1;
 }
 
-int
+static int
 use_museumexitticket(unit *u, const struct item_type *itype, int amount, const char * cmd)
 {
 	attrib *a;
@@ -408,4 +413,3 @@ use_museumexitticket(unit *u, const struct item_type *itype, int amount, const c
 
 	return 1;
 }
-

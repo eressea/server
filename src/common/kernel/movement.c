@@ -643,7 +643,7 @@ caught_target(region * r, unit * u)
 		if (!present(r, target)) {
 			add_message(&u->faction->msgs, new_message(u->faction,
 				"followfail%u:unit%u:follower", target, u));
-		} else if (!allied(target, u->faction, HELP_ALL)
+		} else if (!alliedunit(target, u->faction, HELP_ALL)
 				   && cansee(target->faction, r, u, 0))
 		{
 			add_message(&target->faction->msgs, new_message(target->faction,
@@ -670,7 +670,7 @@ bewegung_blockiert_von(unit * reisender, region * r)
 				!get_item(u, I_AMULET_OF_TRUE_SEEING)) continue;
 			if (u->faction==reisender->faction
 				|| ucontact(u, reisender)
-				|| allied(u, reisender->faction, HELP_GUARD))
+				|| alliedunit(u, reisender->faction, HELP_GUARD))
 			{
 				contact = true;
 			} else if (sk>=perception) {
@@ -698,7 +698,7 @@ is_guardian(unit * u2, unit *u, unsigned int mask)
 			&& getguard(u2)&mask
 			&& u2->number
 			&& !ucontact(u2, u) && !besieged(u2)
-			&& allied(u2, u->faction, HELP_GUARD) != HELP_GUARD
+			&& alliedunit(u2, u->faction, HELP_GUARD) != HELP_GUARD
 #ifdef WACH_WAFF
 			&& armedmen(u2)
 #endif
@@ -745,7 +745,7 @@ cycle_route(unit *u, int gereist)
 	strcpy(neworder, locale_string(u->faction->locale, keywords[K_ROUTE]));
 
 	for (cm=0;;++cm) {
-		const locale * lang = u->faction->locale;
+		const struct locale * lang = u->faction->locale;
 		pause = false;
 		token = getstrtoken();
 		d = finddirection(token, lang);
@@ -1635,7 +1635,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 			assert(trans==NULL);
 			for (u2 = current_point->units; u2; u2 = u2->next) {
 				if (u2->ship == u->ship &&
-						!allied(hafenmeister, u->faction, HELP_GUARD)) {
+						!alliedunit(hafenmeister, u->faction, HELP_GUARD)) {
 
 
 					if (effskill(hafenmeister, SK_OBSERVATION) > effskill(u2, SK_STEALTH)) {
@@ -1805,7 +1805,7 @@ piracy(unit *u)
 	for(a =  a_find(r->attribs, &at_piracy_direction); a; a=a->nexttype) {
 		faction *f = findfaction(a->data.sa[0]);
 
-		if(allied(u, f, HELP_FIGHT)
+		if (alliedunit(u, f, HELP_FIGHT)
 				&& intlist_find(il, a->data.sa[1])) {
 			target_dir = (direction_t)a->data.sa[1];
 			break;
@@ -1827,7 +1827,7 @@ piracy(unit *u)
 
 				for(sh2 = rc->ships; sh2; sh2 = sh2->next) {
 					cap = shipowner(rc, sh2);
-					if(cap && !allied(u, cap->faction, HELP_FIGHT)
+					if (cap && !alliedunit(u, cap->faction, HELP_FIGHT)
 							&& (intlist_find(il, cap->faction->no) || all)) {
 						aff[dir]++;
 					}

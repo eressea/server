@@ -23,12 +23,14 @@
 
 /* misc includes */
 #include <attributes/key.h>
-#include <modules/xmas2000.h>
-#include <modules/xmas2001.h>
-#include <modules/museum.h>
-#include <modules/xecmd.h>
 #include <items/questkeys.h>
 #include <items/catapultammo.h>
+#include <modules/xmas2000.h>
+#include <modules/xmas2001.h>
+#include <modules/xecmd.h>
+#ifdef ALLIANCES
+#include <modules/alliance.h>
+#endif
 
 /* gamecode includes */
 #include <creation.h>
@@ -84,6 +86,48 @@
 #undef  XMAS2001
 
 extern void reorder_owners(struct region * r);
+
+#ifdef ALLIANCES
+#define MAXALLIANCES 3
+static void
+init_alliances(void)
+{
+	faction * f = factions;
+	alliance * aalliance[MAXALLIANCES];
+	if (alliances==NULL) {
+		aalliance[0] = makealliance(atoi36("dark"), "Ritter der dunklen Sonne");
+		aalliance[1] = makealliance(atoi36("deep"), "Monster aus der Tiefe");
+		aalliance[2] = makealliance(atoi36("pope"), "Priester des Vatikan");
+	}
+	while (f!=NULL) {
+		if (f->alliance==NULL && f->no!=MONSTER_FACTION) {
+			setalliance(f, aalliance[rand() % MAXALLIANCES]);
+		}
+		f=f->next;
+	}
+}
+#endif
+
+static int
+curse_emptiness(void)
+{
+	const curse_type * ct = ct_find("godcursezone");
+	region * r = regions;
+	while (r!=NULL) {
+		if (r->land && r->age>120 && !get_curse(r->attribs, ct)) {
+			unit * u = r->units;
+			while (u && u->faction->no!=MONSTER_FACTION) u=u->next;
+			if (u==NULL) {
+				curse * c = create_curse(NULL, &r->attribs, ct,
+					100, 100, 0, 0);
+				curse_setflag(c, CURSE_ISNEW|CURSE_IMMUNE);
+			}
+			break;
+		}
+		r = r->next;
+	}
+	return 0;
+}
 
 static int
 convert_orders(void)
@@ -540,14 +584,6 @@ name_seaserpents(void)
 }
 #endif
 
-static int
-old_rroad(region * r)
-{
-	attrib * a = a_find(r->attribs, &at_road);
-	if (!a) return 0;
-	return a->data.i;
-}
-
 attrib_type at_roadfix = {
 	"roadfix",
 	DEFAULT_INIT,
@@ -561,52 +597,6 @@ attrib_type at_roadfix = {
 	DEFAULT_READ,
 	ATF_UNIQUE
 };
-
-static void
-newroads(void)
-{
-	region *r;
-	for(r=regions;r;r=r->next) if (terrain[rterrain(r)].roadreq>0) {
-		direction_t d;
-		int connections = 0;
-		int maxcon = MAXDIRECTIONS;
-		int stones = old_rroad(r);
-		if (stones<=0) continue;
-		for (d=0;d!=MAXDIRECTIONS;++d) {
-			region * r2 = rconnect(r, d);
-			if (r2 && old_rroad(r2)) ++connections;
-			else if (terrain[rterrain(r2)].roadreq<=0) --maxcon;
-		}
-		if (!connections) connections=maxcon;
-		else maxcon=0;
-		for (d=0;d!=MAXDIRECTIONS && connections;++d) {
-			region * r2 = rconnect(r, d);
-			int use = stones/connections;
-			if (!r2 ||
-				terrain[rterrain(r2)].roadreq<=0 ||
-				(old_rroad(r2)<=0 && !maxcon))
-				continue;
-			if (use>terrain[rterrain(r)].roadreq) {
-				/* wenn etwas übrig bleibt (connections==1) kriegt es der regionserste */
-				int give = use-terrain[rterrain(r)].roadreq;
-				unit * u = r->units;
-				use = terrain[rterrain(r)].roadreq;
-				if (u) change_item(u, I_STONE, give);
-			}
-			rsetroad(r, d, use);
-			stones = stones - use;
-			--connections;
-			if (old_rroad(r)==terrain[rterrain(r)].roadreq*2 && old_rroad(r2)==terrain[rterrain(r2)].roadreq*2) {
-				border * b = get_borders(r, r2);
-				attrib * a = a_find(b->attribs, &at_roadfix);
-				if (a) continue;
-				while (b && b->type!=&bt_road) b = b->next;
-				assert(b);
-				a = a_add(&b->attribs, a_new(&at_roadfix));
-			}
-		}
-	}
-}
 
 /* ************************************************************ */
 /* GANZ WICHTIG! ALLE GEÄNDERTEN SPRÜCHE NEU ANZEIGEN */
@@ -1116,7 +1106,8 @@ write_laenrepair(void) {
 
 #include "group.h"
 static void
-fix_allies(void) {
+fix_allies(void) 
+{
 	faction * f;
 	for (f=factions;f;f=f->next) {
 		group * g;
@@ -2904,15 +2895,15 @@ korrektur(void)
 	do_once("rest", fix_restart_flag());
 	warn_password();
 	fix_road_borders();
-
+	curse_emptiness();
+#ifdef ALLIANCES
+	init_alliances();
+#endif
 	/* seems something fishy is going on, do this just
 	 * to be on the safe side:
 	 */
 	fix_demand();
   /* trade_orders(); */
-	if (global.data_version < NEWROAD_VERSION) {
-		newroads();
-	}
 
 	/* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
 	 * Beschreibungen geändert haben */

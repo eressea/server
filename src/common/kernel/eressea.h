@@ -107,30 +107,32 @@ struct xml_stack;
 #define FUZZY_BASE36 /* Fuzzy- Behandlung von Gebäude- und Schiffsnummern */
 #define FULL_BASE36
 
-#define RACES_VERSION 91
-#define MIN_VERSION RACES_VERSION
-#define MAGIEGEBIET_VERSION 92
-#define FATTRIBS_VERSION 94
-#define ATNORD_VERSION 95
-#define NEWMAGIC 100
-#define MEMSAVE_VERSION 101
-#define BORDER_VERSION 102
-#define ATNAME_VERSION 103
-#define ATTRIBFIX_VERSION 104
-#define BORDERID_VERSION 105
-#define NEWROAD_VERSION 106
-#define GUARD_VERSION 107
-#define TIMEOUT_VERSION 108
-#define GUARDFIX_VERSION 109
-#define NEW_FACTIONID_VERSION 110
-#define ACTIONFIX1_VERSION 111
-#define SHIPTYPE_VERSION 112
-#define GROUPS_VERSION 113
-#define MSGLEVEL_VERSION 114
-#define DISABLE_ROADFIX 114
-#define FACTIONFLAGS_VERSION 114 /* speichern von struct faction::flags */
-#define KARMA_VERSION 114
-#define FULL_BASE36_VERSION 115
+/** 
+ * heaps and heaps of unsupported versions:
+	#define RACES_VERSION 91
+	#define MAGIEGEBIET_VERSION 92
+	#define FATTRIBS_VERSION 94
+	#define ATNORD_VERSION 95
+	#define NEWMAGIC 100
+	#define MEMSAVE_VERSION 101
+	#define BORDER_VERSION 102
+	#define ATNAME_VERSION 103
+	#define ATTRIBFIX_VERSION 104
+	#define BORDERID_VERSION 105
+	#define NEWROAD_VERSION 106
+	#define GUARD_VERSION 107
+	#define TIMEOUT_VERSION 108
+	#define GUARDFIX_VERSION 109
+	#define NEW_FACTIONID_VERSION 110
+	#define ACTIONFIX1_VERSION 111
+	#define SHIPTYPE_VERSION 112
+	#define GROUPS_VERSION 113
+	#define MSGLEVEL_VERSION 114
+	#define DISABLE_ROADFIX 114
+	#define FACTIONFLAGS_VERSION 114
+	#define KARMA_VERSION 114
+	#define FULL_BASE36_VERSION 115
+ **/
 #define TYPES_VERSION 117
 #define ITEMTYPE_VERSION 190
 #define NOFOREST_VERSION 191
@@ -156,6 +158,7 @@ struct xml_stack;
 #define CURSETYPE_VERSION 312
 #define ALLIANCES_VERSION 313
  
+#define MIN_VERSION TYPES_VERSION
 #define UGROUPS_VERSION 400 /* nicht aktivieren, nicht fertig */
 #define RELEASE_VERSION ALLIANCES_VERSION
 
@@ -317,7 +320,6 @@ extern void plagues(struct region * r, boolean ismagic);
 /* ist noch nicht fertig! */
 
 #define ARENA_PLANE
-#define MUSEUM_PLANE
 #undef UNDERWORLD_PLANE
 
 #define ORCIFICATION
@@ -822,7 +824,7 @@ enum {
 #define HELP_GIVE      8			/* Dinge annehmen ohne KONTAKTIERE */
 #define HELP_GUARD    16			/* Laesst Steuern eintreiben etc. */
 #define HELP_FSTEALTH 32			/* Laesst Steuern eintreiben etc. */
-#define HELP_ALL    63-HELP_OBSERVE		/* Alle "positiven" HELPs zusammen */
+#define HELP_ALL    (63-HELP_OBSERVE)		/* Alle "positiven" HELPs zusammen */
 /* HELP_OBSERVE deaktiviert */
 /* ------------------------------------------------------------- */
 /* Prototypen */
@@ -1013,8 +1015,8 @@ struct unit *getunitg(const struct region * r, const struct faction * f);
 struct unit *getunit(const struct region * r, const struct faction * f);
 int read_unitid(const struct faction * f, const struct region * r);
 
-int isallied(const struct plane * pl, const struct faction * f, const struct faction * f2, int mode);
-int allied(const struct unit * u, const struct faction * f, int mode);
+extern int alliedunit(const struct unit * u, const struct faction * f2, int mode);
+extern int alliedfaction(const struct plane * pl, const struct faction * f, const struct faction * f2, int mode);
 
 struct faction *findfaction(int n);
 struct faction *findfaction_unique_id(int unique_id);
@@ -1169,7 +1171,7 @@ extern void kernel_done(void);
 
 extern void reorder_owners(struct region * r);
 
-extern const char *locales[];
+extern const char *localenames[];
 
 #define FIRST_TURN 184
 

@@ -600,7 +600,7 @@ jihad_attacks(void)
 						if(sf->faction == u->faction) break;
 					}
 
-					if(sf) sf->status = sf->status & (HELP_ALL - HELP_FIGHT);
+					if (sf) sf->status = sf->status & (HELP_ALL - HELP_FIGHT);
 
 					sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_ATTACK]), unitid(u));
 					S = makestrlist(buf);

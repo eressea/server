@@ -17,9 +17,12 @@ struct attrib;
 struct unit;
 struct faction;
 struct region;
+struct faction_list;
 
 typedef struct alliance {
 	struct alliance * next;
+	struct faction_list * members;
+	unsigned int flags;
 	int id;
 	char * name;
 } alliance;
@@ -27,8 +30,11 @@ typedef struct alliance {
 extern alliance * alliances;
 extern alliance * findalliance(int id);
 extern alliance * makealliance(int id, const char * name);
+extern const char * alliancename(const struct alliance * al);
+extern void setalliance(struct faction * f, alliance * al);
 
 extern void alliancejoin(void);
 extern void alliancekick(void);
+extern void alliancevictory(void);
 /* execute commands */
 

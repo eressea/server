@@ -103,12 +103,7 @@ read_borders(FILE * f)
 
 		fscanf(f, "%s", zText);
 		if (!strcmp(zText, "end")) break;
-		if (global.data_version<BORDERID_VERSION) {
-			fscanf(f, "%d %d %d %d ", &fx, &fy, &tx, &ty);
-			bid = ++nextborder;
-		} else {
-			fscanf(f, "%u %d %d %d %d", &bid, &fx, &fy, &tx, &ty);
-		}
+		fscanf(f, "%u %d %d %d %d", &bid, &fx, &fy, &tx, &ty);
 		type = find_bordertype(zText);
 		assert(type || !"border type not registered");
 		from = findregion(fx, fy);
@@ -132,8 +127,7 @@ read_borders(FILE * f)
 		b->id = bid;
 		assert(bid<=nextborder);
 		if (type->read) type->read(b, f);
-		if (global.data_version>BORDER_VERSION)
-			a_read(f, &b->attribs);
+		a_read(f, &b->attribs);
 
 	}
 }
@@ -204,10 +198,7 @@ void
 b_read(border * b, FILE *f)
 {
 	assert(sizeof(int)==sizeof(b->data));
-	if (global.data_version<NEWROAD_VERSION)
-		fscanf(f, "%d ", (int*)&b->data);
-	else
-		fscanf(f, "%x ", (unsigned int*)&b->data);
+	fscanf(f, "%x ", (unsigned int*)&b->data);
 }
 
 void

@@ -22,6 +22,9 @@
 
 /* modules include */
 #include <modules/score.h>
+#ifdef ALLIANCES
+#include <modules/alliance.h>
+#endif
 
 /* attributes include */
 #include <attributes/follow.h>
@@ -83,7 +86,7 @@ extern int quiet;
 static const char *
 crtag(const char * key)
 {
-	static const locale * lang = NULL;
+	static const struct locale * lang = NULL;
 	if (!lang) lang = find_locale(TAG_LOCALE);
 	return locale_string(lang, key);
 }
@@ -347,6 +350,19 @@ cr_race(const void * v, char * buffer, const void * userdata)
 	return 0;
 }
 
+#ifdef ALLIANCES
+static int
+cr_alliance(const void * v, char * buffer, const void * userdata)
+{
+	const alliance * al = (const alliance *)v;
+	if (al!=NULL) {
+		sprintf(buffer, "%d", al->id);
+	}
+	unused(userdata);
+	return 0;
+}
+#endif
+
 static int
 cr_skill(const void * v, char * buffer, const void * userdata)
 {
@@ -373,6 +389,9 @@ creport_init(void)
 	tsf_register("resource", &cr_resource);
 	tsf_register("race", &cr_race);
 	tsf_register("direction", &cr_int);
+#ifdef ALLIANCES
+	tsf_register("alliance", &cr_alliance);
+#endif
 }
 
 void
@@ -709,11 +728,13 @@ cr_output_unit(FILE * F, const region * r,
 			if (spt) {
 				spell *sp;
 				int i;
+				int t = effskill(u, SK_MAGIC);
 				fprintf(F, "SPRUECHE\n");
 				for (;spt; spt = spt->next) {
 					sp = find_spellbyid(spt->spellid);
 					if (sp) {
 						const char * name = sp->sname;
+						if (sp->level > t) continue;
 						if (sp->info==NULL) {
 							name = add_translation(mkname("spell", name), spell_name(sp, f->locale));
 						}
@@ -789,12 +810,15 @@ cr_output_unit(FILE * F, const region * r,
 
 /* prints allies */
 static void
-show_allies(FILE * F, ally * sf)
+show_allies(FILE * F, const faction * f, const ally * sf)
 {
-	for (; sf; sf = sf->next) if(sf->faction) {
-		fprintf(F, "ALLIANZ %d\n", sf->faction->no);
-		fprintf(F, "\"%s\";Parteiname\n", sf->faction->name);
-		fprintf(F, "%d;Status\n", sf->status);
+	for (; sf; sf = sf->next) if (sf->faction) {
+		int mode = alliedfaction(NULL, f, sf->faction, HELP_ALL);
+		if (mode!=0) {
+			fprintf(F, "ALLIANZ %d\n", sf->faction->no);
+			fprintf(F, "\"%s\";Parteiname\n", sf->faction->name);
+			fprintf(F, "%d;Status\n", mode);
+		}
 	}
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
@@ -827,6 +851,12 @@ cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
 			fprintf(F, "\"%s\";Parteiname\n", f->name);
 			fprintf(F, "\"%s\";email\n", f->email);
 			fprintf(F, "\"%s\";banner\n", f->banner);
+#ifdef ALLIANCES
+			if (f->alliance!=NULL) {
+				fprintf(F, "%d;alliance\n", f->alliance->id);
+				fprintf(F, "\"%s\";alliancename\n", f->alliance->name);
+			}
+#endif
 		}
 		flist = flist->next;
 	}
@@ -889,7 +919,7 @@ encode_region(const faction * f, const region * r) {
 }
 
 static char *
-report_resource(char * buf, const char * name, const locale * loc, int amount, int level)
+report_resource(char * buf, const char * name, const struct locale * loc, int amount, int level)
 {
 	buf += sprintf(buf, "RESOURCE %u\n", hashstring(name));
 	buf += sprintf(buf, "\"%s\";type\n", add_translation(name, LOC(loc, name)));
@@ -970,7 +1000,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 
 	fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
 	fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
-	fprintf(F, "%d;noskillpoints\n", !SKILLPOINTS);
+	fprintf(F, "%d;noskillpoints\n", 1);
 	fprintf(F, "%ld;date\n", report_time);
 	fprintf(F, "\"%s\";Spiel\n", global.gamename);
 	fprintf(F, "\"%s\";Konfiguration\n", "Standard");
@@ -1009,7 +1039,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 	for (i=0;i!=MAXOPTIONS;++i) {
 		fprintf(F, "%d;%s\n", (f->options&want(i))?1:0, options[i]);
 	}
-	show_allies(F, f->allies);
+	show_allies(F, f, f->allies);
 	{
 		group * g;
 		for (g=f->groups;g;g=g->next) {
@@ -1021,7 +1051,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 				const char * name = (const char*)a->data.v;
 				fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
 			}
-			show_allies(F, g->allies);
+			show_allies(F, f, g->allies);
 		}
 	}
 

@@ -420,7 +420,7 @@ ucontact(const unit * u, const unit * u2)
 	attrib *ru;
 
 	/* Alliierte kontaktieren immer */
-	if (allied(u, u2->faction, HELP_GIVE) == HELP_GIVE)
+	if (alliedunit(u, u2->faction, HELP_GIVE) == HELP_GIVE)
 		return true;
 
 	/* Explizites KONTAKTIERE */
@@ -978,11 +978,11 @@ att_modification(const unit *u, skill_t sk)
 		int mod = c->effect;
 		unit * mage = c->magician;
 		/* wir suchen jeweils den größten Bonus und den größten Malus */
-		if (mod>0 && (mage==NULL || allied(mage, u->faction, HELP_GUARD))) 
+		if (mod>0 && (mage==NULL || alliedunit(mage, u->faction, HELP_GUARD))) 
 		{
 			if (mod > bonus ) bonus = mod;
 		} else if (mod < 0 && 
-			(mage == NULL || !allied(mage, u->faction, HELP_GUARD)))
+			(mage == NULL || !alliedunit(mage, u->faction, HELP_GUARD)))
 		{
 			if (mod < malus ) malus = mod;
 		}

@@ -104,10 +104,6 @@ boolean nobattledebug = false;
 #define MINSPELLRANGE 1
 #define MAXSPELLRANGE 7
 
-#ifndef COMBAT_TURNS
-# define COMBAT_TURNS 10
-#endif
-
 static const double EFFECT_PANIC_SPELL = 0.25;
 static const double TROLL_REGENERATION = 0.10;
 
@@ -338,13 +334,15 @@ set_enemy(side * as, side * ds, boolean attacking)
 
 #ifdef ALLIANCES
 static int
-allysfm(side * s, faction * f, int mode)
+allysfm(const side * s, const faction * f, int mode)
 {
-	return isallied(s->battle->plane, s->faction, f, mode);
+	if (s->bf->faction==f) return true;
+	return alliedfaction(s->battle->plane, s->bf->faction, f, mode);
 }
 #else
+extern int alliance(const ally * sf, const faction * f, int mode);
 static int
-allysfm(side * s, faction * f, int mode)
+allysfm(const side * s, const faction * f, int mode)
 {
 	if (s->bf->faction==f) return true;
 	if (s->group) return alliance(s->group->allies, f, mode);
@@ -353,11 +351,10 @@ allysfm(side * s, faction * f, int mode)
 #endif
 
 static int
-allysf(side * s, faction * f)
+allysf(const side * s, const faction * f)
 {
 	return allysfm(s, f, HELP_FIGHT);
 }
-
 
 troop
 select_corpse(battle * b, fighter * af)
@@ -3234,15 +3231,15 @@ join_allies(battle * b)
 		for (si = 0; si != size; ++si) {
 			int se;
 			side *s = b->sides.begin[si];
-			/* Wenn alle attackierten noch FL_NOAIDF haben, dann kämpfe nicht mit. */
-			if (fval(s->bf->faction, FL_NOAIDF)) continue;
+			/* Wenn alle attackierten noch FL_NOAID haben, dann kämpfe nicht mit. */
+			if (fval(s->bf->faction, FL_NOAID)) continue;
 			if (s->bf->faction!=f) {
 				/* Wenn wir attackiert haben, kommt niemand mehr hinzu: */
 				if (s->bf->attacker) continue;
 				/* Wenn alliierte attackiert haben, helfen wir nicht mit: */
 				if (s->bf->faction!=f && s->bf->attacker) continue;
 				/* alliiert müssen wir schon sein, sonst ist's eh egal : */
-				if (!allied(u, s->bf->faction, HELP_FIGHT)) continue;
+				if (!alliedunit(u, s->bf->faction, HELP_FIGHT)) continue;
 				/* wenn die partei verborgen ist, oder gar eine andere
 				 * vorgespiegelt wird, und er sich uns gegenüber nicht zu
 				 * erkennen gibt, helfen wir ihm nicht */
@@ -3258,7 +3255,7 @@ join_allies(battle * b)
 			for (se = 0; se != size; ++se) {
 				side * evil = b->sides.begin[se];
 				if (u->faction==evil->bf->faction) continue;
-				if (allied(u, evil->bf->faction, HELP_FIGHT) &&
+				if (alliedunit(u, evil->bf->faction, HELP_FIGHT) &&
 					!evil->bf->attacker) continue;
 				if (enemy(s, evil)) break;
 			}
@@ -3463,38 +3460,9 @@ do_battle(void)
 							list_continue(sl);
 						}
 						/* Fehler: "Die Einheit ist mit uns alliert" */
-						/* alliances are dissolved */
-						if (allied(u, u2->faction, HELP_FIGHT)) {
-							ally *sf, **sfp;
-							attrib * a = a_find(u->attribs, &at_group);
-
-							if (a) {
-								sfp = &((group*)a->data.v)->allies;
-							} else {
-								sfp = &u->faction->allies;
-							}
-
-							for(sf=*sfp; sf; sf = sf->next) {
-								if(sf->faction == u2->faction) {
-									removelist(sfp, sf);
-									break;
-								}
-							}
-
-							a = a_find(u2->attribs, &at_group);
-
-							if(a) {
-								sfp = &((group*)a->data.v)->allies;
-							} else {
-								sfp = &u2->faction->allies;
-							}
-
-							for(sf=*sfp; sf; sf = sf->next) {
-								if(sf->faction == u->faction) {
-									removelist(sfp, sf);
-									break;
-								}
-							}
+						if (alliedunit(u, u2->faction, HELP_FIGHT)) {
+							cmistake(u, sl->s, 47, MSG_BATTLE);
+							list_continue(sl);
 						}
 						/* xmas */
 						if (u2->no==atoi36("xmas") && old_race(u2->irace)==RC_GNOME) {

@@ -11,29 +11,58 @@
  
  */
 #include <config.h>
-
 #include "command.h"
 
 #include "umlaut.h"
+#include "language.h"
 
 /* libc includes */
+#include <assert.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 
 typedef struct command {
-	void(*fun)(const char*, void *, const char*);
+	parser fun;
+	struct tnode * nodes;
 } command;
 
+tnode *
+stree_find(const syntaxtree * stree, const struct locale * lang)
+{
+	while (stree) {
+		if (stree->lang==lang) return stree->root;
+		stree = stree->next;
+	}
+	return NULL;
+}
+
+syntaxtree *
+stree_create(void)
+{
+	syntaxtree * sroot = NULL;
+	const struct locale * lang = locales;
+	while (lang) {
+		syntaxtree * stree = malloc(sizeof(syntaxtree));
+		stree->lang = lang;
+		stree->next = sroot;
+		sroot=stree;
+		lang=nextlocale(lang);
+	}
+	return sroot;
+}
+
 void
-add_command(struct tnode * keys, const char * str, void(*fun)(const char*, void *, const char*))
+add_command(struct tnode * keys, struct tnode * tnext, 
+				const char * str, parser fun)
 {
 	command * cmd = malloc(sizeof(command));
 	cmd->fun = fun;
+	cmd->nodes = tnext;
 	addtoken(keys, str, (void*)cmd);
 }
 
-int
+void
 do_command(const struct tnode * keys, void * u, const char * str)
 {
 	int i;
@@ -48,8 +77,13 @@ do_command(const struct tnode * keys, void * u, const char * str)
 	strncpy(zText, str, i);
 	zText[i]=0;
 	if (findtoken(keys, zText, (void**)&cmd)==E_TOK_SUCCESS) {
-		cmd->fun(++c, u, str);
-		return 0;
+		if (cmd->nodes) {
+			assert(!cmd->fun);
+			do_command(cmd->nodes, u, ++c);
+			return;
+		}
+		assert(cmd->fun);
+		cmd->fun(cmd->nodes, ++c, u, str);
 	}
-	return 1;
+	return;
 }

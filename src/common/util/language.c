@@ -26,7 +26,7 @@
 
 /** importing **/
 
-struct locale {
+typedef struct locale {
 	struct locale * next;
 	unsigned int hashkey;
 	const char * name;
@@ -36,10 +36,10 @@ struct locale {
 		char * str;
 		char * key;
 	} * strings[SMAXHASH];
-};
+} locale;
 
 locale * default_locale;
-static locale * locales;
+locale * locales;
 
 unsigned int
 locale_hashkey(const locale * lang)
@@ -192,4 +192,10 @@ mkname(const char * space, const char * name)
 		strcpy(zBuffer, name);
 	}
 	return zBuffer;
+}
+
+locale * 
+nextlocale(const struct locale * lang)
+{
+	return lang->next;
 }

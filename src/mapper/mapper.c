@@ -31,11 +31,13 @@
 #include <items/items.h>
 
 #include <modules/xmas2000.h>
-#include <modules/arena.h>
-#include <modules/museum.h>
 #include <modules/gmcmd.h>
-
-#include <util/base36.h>
+#ifdef MUSEUM_MODULE
+#include <modules/museum.h>
+#endif
+#ifdef ARENA_MODULE
+#include <modules/arena.h>
+#endif
 
 /* kernel includes */
 #include <item.h>
@@ -50,6 +52,9 @@
 #include <teleport.h>
 #include <resources.h>
 #include <building.h>
+
+/* util includes */
+#include <base36.h>
 
 /* libc includes */
 #include <ctype.h>
@@ -1572,8 +1577,12 @@ main(int argc, char *argv[])
 	init_rawmaterials();
 #endif
 
+#ifdef MUSEUM_MODULE
 	init_museum();
+#endif
+#ifdef ARENA_MODULE
 	init_arena();
+#endif
 	init_xmas2000();
 
 	init_gmcmd();

@@ -1,4 +1,28 @@
 <messages>
+	<message name="alliance::kickattempt" section="events">
+		<type>
+			<arg name="votes" type="int"></arg>
+			<arg name="alliance" type="alliance"></arg>
+		</type>
+		<text locale="de">"$int($votes) Mitglieder von $alliance($alliance) haben versucht, Deine Partei aus der Allianz auszuschliessen."</text>
+		<text locale="en">"$int($votes) members of $alliance($alliance) tried to kick you out of the alliance."</text>
+	</message>
+	<message name="alliance::lost" section="events">
+		<type>
+			<arg name="alliance" type="alliance"></arg>
+		</type>
+		<text locale="de">"$alliance($alliance) scheidet aus dem Spiel aus, nachdem alle Tempel verloren gingen."</text>
+		<text locale="en">"$alliance($alliance) has to leave the game after all their temples were lost."</text>
+	</message>
+	<message name="alliance::kickedout" section="events">
+		<type>
+			<arg name="votes" type="int"></arg>
+			<arg name="member" type="faction"></arg>
+			<arg name="alliance" type="alliance"></arg>
+		</type>
+		<text locale="de">"$faction($member) ist mit $int($votes) Stimmen aus $alliance($alliance) ausgeschlossen worden."</text>
+		<text locale="en">"$faction($member) was kicked from $alliance($alliance) by $int($votes) of the alliance's members."</text>
+	</message>
 	<message name="newbieimmunity" section="events">
 		<type>
 			<arg name="turns" type="int"></arg>

@@ -906,29 +906,11 @@ mapper_spunit(dbllist ** SP, unit * u, int indent)
 	}
 	dh = 0;
 
-#if 0
-	for (spell = 0; spell != MAXSPELLS; spell++)
-		if (get_spell(u, spell)) {
-			sncat(buf, ", ", BUFSIZE);
-
-			if (!dh) {
-				sncat(buf, "Zauber: ", BUFSIZE);
-				dh = 1;
-			}
-			sncat(buf, spellnames[spell], BUFSIZE);
-		}
-#endif
 	if (u->lastorder[0]) {
 		scat(", \"");
 		sncat(buf, u->lastorder, BUFSIZE);
 		scat("\"");
 	}
-#if 0
-	if (u->combatspell != NOSPELL) {
-		sncat(buf, ", Kampfzauber: ", BUFSIZE);
-		sncat(buf, spellnames[u->combatspell], BUFSIZE);
-	}
-#endif
 	if (uprivate(u)) {
 		sncat(buf, " (Bem: ", BUFSIZE);
 		sncat(buf, uprivate(u), BUFSIZE);

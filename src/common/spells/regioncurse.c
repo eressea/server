@@ -63,7 +63,7 @@ cinfo_region(const struct locale * lang, const void * obj, typ_t typ, struct cur
  * godcursezone
  */
 static int
-cinfo_cursed_by_the_gods(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_cursed_by_the_gods(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
 	region *r;
 	message * msg;
@@ -99,7 +99,7 @@ static struct curse_type ct_godcursezone = {
  * C_GBDREAM
  */
 static int
-cinfo_dreamcurse(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_dreamcurse(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
 
@@ -131,7 +131,7 @@ static struct curse_type ct_gbdream = {
  *  erzeugt Straﬂennetz
  */
 static int
-cinfo_magicstreet(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_magicstreet(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
 
@@ -164,7 +164,7 @@ static struct curse_type ct_magicstreet = {
 /* --------------------------------------------------------------------- */
 
 static int
-cinfo_antimagiczone(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_antimagiczone(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
 
@@ -221,7 +221,7 @@ cansee_antimagiczone(const struct faction *viewer, curse *c, const void * obj, t
 
 /* --------------------------------------------------------------------- */
 static int
-cinfo_farvision(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_farvision(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
 

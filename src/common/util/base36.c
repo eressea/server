@@ -25,20 +25,12 @@
 #include <stdlib.h>
 #include <assert.h>
 
-int
-atoi36(const char * s)
-{
-	char * p = NULL;
-	int i = (int)(strtol(s, &p, 36));
-	if (*p || i<0) return -1;
-	return i;
-}
-
-#if 0
 #include <ctype.h>
 int
-atoi36(const char * s)
+atoi36(const char * str)
 {
+	/* cannot use strtol, becuase invalid strings will cause crash */
+	const unsigned char * s = (const unsigned char *)str;
 	int i = 0;
 	assert(s);
 	if(!(*s)) return 0;
@@ -48,13 +40,12 @@ atoi36(const char * s)
 		if (isupper((int)*s)) i = i*36 + (*s)-'A' + 10;
 		else if (islower((int)*s)) i=i*36 + (*s)-'a' + 10;
 		else if (isdigit((int)*s)) i=i*36 + (*s)-'0';
-		else return -1;
+		else return 0;
 		++s;
 	}
-	if (i<0 || !isspace(*s) && *s!='0') return -1;
+	if (i<0 || (!isspace(*s) && *s!='\0')) return 0;
 	return i;
 }
-#endif
 
 const char*
 itoab(int i, int base)

@@ -33,7 +33,7 @@
 
 
 int
-cinfo_ship(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_ship(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
 
@@ -55,7 +55,7 @@ cinfo_ship(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
 
 /* C_SHIP_NODRIFT */
 static int
-cinfo_shipnodrift(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+cinfo_shipnodrift(const struct locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	ship * sh;
 	unused(typ);

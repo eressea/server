@@ -604,11 +604,6 @@
 		<text locale="de">Struktur</text>
 	</string>
 
-	<comment>Testgebäude</comment>
-	<string name="temple">
-		<text locale="de">Tempel</text>
-	</string>
-
 	<comment>Testitem</comment>
 	<string name="wand">
 		<text locale="de">Zauberstab</text>
@@ -1691,12 +1686,15 @@
 
 	<string name="XEPOTION">
 		<text locale="de">XETRANK</text>
+		<text locale="en">XEPOTION</text>
 	</string>
 	<string name="XEBALLOON">
 		<text locale="de">XEBALLON</text>
+		<text locale="en">XEBALLOON</text>
 	</string>
 	<string name="XELAEN">
 		<text locale="de">XELAEN</text>
+		<text locale="en">XELAEN</text>
 	</string>
 
 	<comment>Talente:</comment>
@@ -1869,6 +1867,17 @@
 	</string>
 	<string name="MACHEN">
 		<text locale="de">MACHEN</text>
+	</string>
+	<string name="NACH">
+		<text locale="de">NACH</text>
+	</string>
+	<string name="XONTORMIA">
+		<text locale="de">XONTORMIA</text>
+		<text locale="en">XONTORMIA</text>
+	</string>
+	<string name="ALLIANZ">
+		<text locale="de">ALLIANZ</text>
+		<text locale="en">ALLIANCE</text>
 	</string>
 	<string name="NACH">
 		<text locale="de">NACH</text>

@@ -16,13 +16,18 @@
 #include "command.h"
 
 /* kernel includes */
+#include <building.h>
 #include <faction.h>
 #include <message.h>
 #include <region.h>
 #include <unit.h>
 
+/* gamecode includes */
+#include <gamecode/laws.h> /* for destroyfaction */
+
 /* util includes */
 #include <umlaut.h>
+#include <base36.h>
 
 /* libc includes */
 #include <stdlib.h>
@@ -79,11 +84,12 @@ add_kick(attrib * a, const faction * f)
 }
 
 static void
-alliance_kick(const char * str, void * data, const char * cmd)
+alliance_kick(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	faction * f = findfaction(atoi36(igetstrtoken(str)));
 	attrib * a;
+	unused(tnext);
 
 	if (f==NULL || f->alliance!=u->faction->alliance) {
 		/* does not belong to our alliance */
@@ -95,11 +101,12 @@ alliance_kick(const char * str, void * data, const char * cmd)
 }
 
 static void
-alliance_join(const char * str, void * data, const char * cmd)
+alliance_join(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	alliance * al = findalliance(atoi36(igetstrtoken(str)));
-	
+	unused(tnext);
+
 	if (u->faction->alliance!=NULL || al==NULL) {
 		/* not found */
 		return;
@@ -108,15 +115,8 @@ alliance_join(const char * str, void * data, const char * cmd)
 	/* inform the rest? */
 }
 
-static tnode * g_keys;
 static void
-alliance_command(const char * str, void * data, const char * cmd)
-{
-	do_command(g_keys, data, str);
-}
-
-static void
-execute(tnode * root)
+execute(const struct syntaxtree * syntax)
 {
 	region ** rp = &regions;
 	while (*rp) {
@@ -124,9 +124,11 @@ execute(tnode * root)
 		unit **up = &r->units;
 		while (*up) {
 			unit * u = *up;
+			const struct locale * lang = u->faction->locale;
+			tnode * root = stree_find(syntax, lang);
 			strlist * order;
 			for (order = u->orders; order; order = order->next) {
-				if (igetkeyword(order->s, u->faction->locale) == K_ALLIANCE) {
+				if (igetkeyword(order->s, lang) == K_ALLIANCE) {
 					do_command(root, u, order->s);
 				}
 			}
@@ -137,24 +139,139 @@ execute(tnode * root)
 }
 
 void
-alliancejoin(void)
+alliancekick(void)
 {
-	tnode root;
-	add_command(&root, "alliance", &alliance_command);
-	g_keys = calloc(1, sizeof(tnode));
-	add_command(g_keys, "join", &alliance_join);
-	execute(&root);
-	free(g_keys);
+	static syntaxtree * stree = NULL;
+	faction * f = factions;
+	if (stree==NULL) {
+		syntaxtree * slang = stree = stree_create();
+		while (slang) {
+			struct tnode * root = calloc(sizeof(tnode), 1);
+			struct tnode * leaf = calloc(sizeof(tnode), 1);
+			add_command(root, leaf, LOC(slang->lang, "alliance"), NULL);
+			add_command(leaf, NULL, LOC(slang->lang, "kick"), &alliance_kick);
+			slang = slang->next;
+		}
+	}
+	execute(stree);
+	while (f) {
+		attrib * a = a_find(f->attribs, &at_kick);
+		if (a!=NULL) {
+			faction_list * flist = (faction_list*)a->data.v;
+			if (flist!=NULL) {
+				unsigned int votes = listlen(flist);
+				unsigned int size = listlen(f->alliance->members);
+				if (size<=votes*2) {
+					f->alliance = NULL;
+					/* tell him he's been kicked */
+					for (flist=f->alliance->members;flist;flist=flist->next) {
+						ADDMSG(&flist->data->msgs, msg_message("alliance::kickedout",
+							"member alliance votes", f, f->alliance, votes));
+					}
+				} else {
+					/* warn that he's been attempted to kick */
+					for (flist=f->alliance->members;flist;flist=flist->next) {
+						ADDMSG(&flist->data->msgs, msg_message("alliance::kickattempt",
+							"member alliance votes", f, f->alliance, votes));
+					}
+				}
+			}
+		}
+		f = f->next;
+	}
+	/* some may have been kicked, must remove f->alliance==NULL */
 }
 
 void
-alliancekick(void)
+alliancejoin(void)
 {
-	tnode root;
-	add_command(&root, "alliance", &alliance_command);
-	g_keys = calloc(1, sizeof(tnode));
-	add_command(g_keys, "kick", &alliance_kick);
-	execute(&root);
-	free(g_keys);
+	static syntaxtree * stree = NULL;
+	if (stree==NULL) {
+		syntaxtree * slang = stree = stree_create();
+		while (slang) {
+			struct tnode * root = calloc(sizeof(tnode), 1);
+			struct tnode * leaf = calloc(sizeof(tnode), 1);
+			add_command(root, leaf, LOC(slang->lang, "alliance"), NULL);
+			add_command(leaf, NULL, LOC(slang->lang, "join"), &alliance_join);
+			slang = slang->next;
+		}
+	}
+	execute(stree);
 }
 
+void 
+setalliance(struct faction * f, alliance * al)
+{
+	if (f->alliance==al) return;
+	if (f->alliance!=NULL) {
+		faction_list ** flistp = &f->alliance->members;
+		while (*flistp) {
+			if ((*flistp)->data==f) {
+				*flistp = (*flistp)->next;
+				break;
+			}
+			flistp = &(*flistp)->next;
+		}
+	}
+	f->alliance = al;
+	if (al!=NULL) {
+		faction_list * flist = calloc(sizeof(faction_list), 1);
+		flist->next = al->members;
+		flist->data = f;
+		al->members = flist;
+	}
+}
+
+const char *
+alliancename(const alliance * al)
+{
+	typedef char name[OBJECTIDSIZE + 1];
+	static name idbuf[8];
+	static int nextbuf = 0;
+
+	char *buf = idbuf[(++nextbuf) % 8];
+
+	if (al && al->name) {
+		sprintf(buf, "%s (%s)", strcheck(al->name, NAMESIZE), itoa36(al->id));
+	} else {
+		return NULL;
+	}
+	return buf;
+}
+
+void
+alliancevictory(void)
+{
+	const struct building_type * btype = bt_find("stronghold");
+	region * r = regions;
+	alliance * al = alliances;
+	while (r!=NULL) {
+		building * b = r->buildings;
+		while (b!=NULL) {
+			if (b->type==btype) {
+				unit * u = buildingowner(r, b);
+				if (u) {
+					fset(u->faction->alliance, FL_MARK);
+				}
+			}
+			b = b->next;
+		}
+		r=r->next;
+	}
+	while (al!=NULL) {
+		if (!fval(al, FL_MARK)) {
+			faction_list * flist = al->members;
+			while (flist!=0) {
+				faction * f = flist->data;
+				if (f->alliance==al) {
+					ADDMSG(&f->msgs, msg_message("alliance::lost", 
+						"alliance", al));
+					destroyfaction(f);
+				}
+				flist = flist->next;
+			}
+		} else {
+			freset(al, FL_MARK);
+		}
+	}
+}

@@ -191,7 +191,7 @@ new_get_pooled(const unit * u, const resource_type * rtype, int mode)
 				}
 				mask = (mode >> 3) & (GET_SLACK|GET_RESERVE);
 			}
-			else if (allied(v, f, HELP_MONEY)) mask = (mode >> 6) & (GET_SLACK|GET_RESERVE);
+			else if (alliedunit(v, f, HELP_MONEY)) mask = (mode >> 6) & (GET_SLACK|GET_RESERVE);
 			else continue;
 			use += new_get_pooled(v, rtype, mask);
 		}
@@ -238,7 +238,7 @@ new_use_pooled(unit * u, const resource_type * rtype, int mode, int count)
 				}
 				mask = (mode >> 3) & (GET_SLACK|GET_RESERVE);
 			}
-			else if (allied(v, f, HELP_MONEY)) mask = (mode >> 6) & (GET_SLACK|GET_RESERVE);
+			else if (alliedunit(v, f, HELP_MONEY)) mask = (mode >> 6) & (GET_SLACK|GET_RESERVE);
 			else continue;
 			use -= new_use_pooled(v, rtype, mask, use);
 		}

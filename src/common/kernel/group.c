@@ -187,12 +187,8 @@ read_groups(FILE * F, faction * f)
 		for (;;) {
 			ally * a;
 			int aid;
-			if (global.data_version >= FULL_BASE36_VERSION) {
-				fscanf(F, "%s ", buf);
-				aid = atoi36(buf);
-			} else {
-				fscanf(F, "%d ", &aid);
-			}
+			fscanf(F, "%s ", buf);
+			aid = atoi36(buf);
 			if (aid==0) break;
 			a = calloc(sizeof(ally), 1);
 			*pa = a;

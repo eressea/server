@@ -20,6 +20,9 @@
 
 /* modules includes */
 #include <modules/score.h>
+#ifdef ALLIANCES
+#include <modules/alliance.h>
+#endif
 
 /* attributes includes */
 #include <attributes/overrideroads.h>
@@ -577,11 +580,11 @@ nmr_warnings(void)
 
 {
 	faction *f,*fa;
-
+#define FRIEND (HELP_GUARD|HELP_MONEY)
 	for(f=factions;f;f=f->next) {
 		if(f->no != MONSTER_FACTION && (turn-f->lastorders) >= 2) {
 			for(fa=factions;fa;fa=fa->next) {
-				if(isallied(NULL, f, fa, HELP_GUARD | HELP_MONEY) && isallied(NULL, fa,f,HELP_GUARD | HELP_MONEY)) {
+				if (alliedfaction(NULL, f, fa, FRIEND) && alliedfaction(NULL, fa, f, FRIEND)) {
 					sprintf(buf, "Achtung: %s hat einige Zeit keine "
 						"Züge eingeschickt und könnte dadurch in Kürze aus dem "
 						"Spiel ausscheiden.", factionname(f));
@@ -1023,7 +1026,7 @@ see_border(const border * b, const faction * f, const region * r)
 }
 
 const char *
-trailinto(const region * r, const locale * lang)
+trailinto(const region * r, const struct locale * lang)
 {
 	char ref[32];
 	const char * s;
@@ -1049,8 +1052,8 @@ static void
 eval_trail(struct opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
 	const struct faction * f = (const struct faction *)userdata;
-	locale * lang = opop(stack, locale*);
-	region * r = opop(stack, region*);
+	const struct locale * lang = opop(stack, const struct locale*);
+	const struct region * r = opop(stack, const struct region*);
 	const char * trail = trailinto(r, lang);
 	const char * rn = regionname(r, f);
 	char * x = balloc(strlen(trail)+strlen(rn));
@@ -1630,20 +1633,20 @@ order_template(FILE * F, faction * f)
 }
 
 static void
-alliances(ally * sf)
+report_alliances(const faction * f, const ally * sf)
 {
 	int allierte = 0;
 	int i=0, h, hh = 0;
 	int dh = 0;
-	ally * sff;
+	const ally * sff;
 	for (sff = sf; sff; sff = sff->next) {
-		if (sff->status > 0 && sff->status <= HELP_ALL) {
+		if (alliedfaction(NULL, f, sf->faction, HELP_ALL) && sff->status > 0 && sff->status <= HELP_ALL) {
 			allierte++;
 		}
 	}
 
 	while (sf) {
-		if (sf->status > 0) {
+		if (alliedfaction(NULL, f, sf->faction, HELP_ALL) && sf->status > 0) {
 			i++;
 			if (dh) {
 				if (i == allierte)
@@ -1713,7 +1716,7 @@ allies(FILE * F, faction * f)
 		} else {
 			strcpy(buf, "Wir helfen den Parteien ");
 		}
-		alliances(f->allies);
+		report_alliances(f, f->allies);
 		scat(".");
 		rparagraph(F, buf, 0, 0);
 		rnl(F);
@@ -1726,7 +1729,7 @@ allies(FILE * F, faction * f)
 			} else {
 				sprintf(buf, "%s hilft den Parteien ", g->name);
 			}
-			alliances(g->allies);
+			report_alliances(f, g->allies);
 			scat(".");
 			rparagraph(F, buf, 0, 0);
 			rnl(F);
@@ -1822,7 +1825,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 	int i;
 	unit *u;
 	attrib * a = a_find(b->attribs, &at_icastle);
-	const locale * lang = NULL;
+	const struct locale * lang = NULL;
 	const building_type * type = b->type;
 
 	if (f) lang = f->locale;
@@ -1920,6 +1923,11 @@ report(FILE *F, faction * f, const faction_list * addresses,
 			LOC(f->locale, rc_name(f->race, 1)), neue_gebiete[f->magiegebiet],
 			f->email);
 	centre(F, buf, true);
+#ifdef ALLIANCES
+	if (f->alliance!=NULL) {
+		centre(F, alliancename(f->alliance), true);
+	}
+#endif
 
 	buf[0] = 0;
 	dh = 0;
@@ -3748,6 +3756,20 @@ eval_faction(struct opstack ** stack, const void * userdata) /* faction -> strin
 	opush(stack, strcpy(balloc(len+1), c));
 }
 
+#ifdef ALLIANCES
+static void
+eval_alliance(struct opstack ** stack, const void * userdata) /* faction -> string */
+{
+	const struct alliance * al = opop(stack, const struct alliance *);
+	const char * c = alliancename(al);
+	if (c!=NULL) {
+		size_t len = strlen(c);
+		opush(stack, strcpy(balloc(len+1), c));
+	}
+	else opush(stack, NULL);
+}
+#endif
+
 static void
 eval_region(struct opstack ** stack, const void * userdata) /* region -> string */
 {
@@ -3829,6 +3851,9 @@ eval_int36(struct opstack ** stack, const void * userdata)
 void
 report_init(void)
 {
+#ifdef ALLIANCES
+	add_function("alliance", &eval_alliance);
+#endif
 	add_function("region", &eval_region);
 	add_function("resource", &eval_resource);
 	add_function("race", &eval_race);

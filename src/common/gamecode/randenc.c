@@ -1027,7 +1027,7 @@ godcurse(void)
 		}
 	}
 
-	if(rterrain(r) == T_OCEAN) {
+	if (rterrain(r) == T_OCEAN) {
 		for (sh = r->ships; sh;) {
 			shn = sh->next;
 			damage_ship(sh, 0.10);

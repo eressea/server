@@ -14,9 +14,23 @@
 #define COMMAND_H
 
 struct tnode;
+struct locale;
 
-extern void add_command(struct tnode * keys, const char * str, 
-                        void(*fun)(const char*, void *, const char*));
-extern int do_command(const struct tnode * keys, void * u, const char * cmd);
+typedef struct syntaxtree {
+	const struct locale * lang;
+	struct tnode * root;
+	struct syntaxtree * next;
+} syntaxtree;
+
+typedef void (*parser)(const struct tnode *, const char*, void *, const char*);
+extern void add_command(struct tnode * troot, 
+								struct tnode * tnext, 
+								const char * str, 
+                        parser fun);
+extern void do_command(const struct tnode * troot, void * u, 
+							 const char * cmd);
+
+extern struct syntaxtree * stree_create(void);
+extern struct tnode * stree_find(const struct syntaxtree * stree, const struct locale * lang);
 
 #endif

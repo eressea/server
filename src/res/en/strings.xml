@@ -218,9 +218,6 @@
 	<string name="xmas_exit">
 		<text locale="en">portal</text>
 	</string>
-	<string name="temple">
-		<text locale="en">temple</text>
-	</string>
 
 	<comment> directions</comment>
 	<string name="dir_nw">

@@ -332,7 +332,7 @@ rc_name(const race * rc, int n)
 }
 
 const char *
-racename(const locale *loc, const unit *u, const race * rc)
+racename(const struct locale *loc, const unit *u, const race * rc)
 {
 	static char lbuf[80];
 	attrib *a, *a2;

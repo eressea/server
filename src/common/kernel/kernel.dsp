@@ -280,7 +280,7 @@ SOURCE=.\alchemy.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\battle.c
+SOURCE=".\battle.c"
 # End Source File
 # Begin Source File
 

@@ -82,7 +82,7 @@ unused_faction_id(void)
 }
 
 unit *
-addplayer(region *r, const char *email, const char * password, const struct race * frace, const locale *loc)
+addplayer(region *r, const char *email, const char * password, const struct race * frace, const struct locale *loc)
 {
 	int i;
 	unit *u;
@@ -110,7 +110,7 @@ addplayer(region *r, const char *email, const char * password, const struct race
 	f->locale = loc;
 	set_ursprung(f, 0, r->x, r->y);
 
-	f->options = Pow(O_REPORT) | Pow(O_ZUGVORLAGE) | Pow(O_SILBERPOOL) | Pow(O_COMPUTER) | Pow(O_COMPRESS);
+	f->options = Pow(O_REPORT) | Pow(O_ZUGVORLAGE) | Pow(O_SILBERPOOL) | Pow(O_COMPUTER) | Pow(O_COMPRESS) | Pow(O_ADRESSEN) | Pow(O_STATISTICS);
 
 	f->no = unused_faction_id();
 	register_faction_id(f->no);

@@ -1236,13 +1236,13 @@ magic_resistance(unit *target)
 
 		if (mage!=NULL) {
 			if (c->type == ct_find("goodmagicresistancezone")) {
-				if (allied(mage, target->faction, HELP_GUARD)) {
+				if (alliedunit(mage, target->faction, HELP_GUARD)) {
 					chance += c->effect;
 					break;
 				}
 			}
 			else if (c->type == ct_find("badmagicresistancezone")) {
-				if (allied(mage, target->faction, HELP_GUARD)) {
+				if (alliedunit(mage, target->faction, HELP_GUARD)) {
 					a = a->nexttype;
 					continue;
 				}

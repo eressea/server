@@ -129,7 +129,7 @@ make_atgmcreate(const struct item_type * itype)
 }
 
 static void
-gm_create(const char * str, void * data, const char * cmd)
+gm_create(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	int i;
@@ -165,7 +165,7 @@ has_permission(const attrib * permissions, unsigned int key)
  ** requires: permission-key "gmgate"
  **/
 static void
-gm_gate(const char * str, void * data, const char * cmd)
+gm_gate(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
@@ -198,7 +198,7 @@ gm_gate(const char * str, void * data, const char * cmd)
  ** requires: permission-key "gmterf"
  **/
 static void
-gm_terraform(const char * str, void * data, const char * cmd)
+gm_terraform(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
@@ -226,7 +226,7 @@ gm_terraform(const char * str, void * data, const char * cmd)
  ** requires: permission-key "gmtele"
  **/
 static void
-gm_teleport(const char * str, void * data, const char * cmd)
+gm_teleport(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
@@ -256,7 +256,7 @@ gm_teleport(const char * str, void * data, const char * cmd)
  ** requires: permission-key "gmmsgr"
  **/
 static void
-gm_messageplane(const char * str, void * data, const char * cmd)
+gm_messageplane(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
@@ -291,7 +291,7 @@ gm_messageplane(const char * str, void * data, const char * cmd)
 }
 
 static void
-gm_messagefaction(const char * str, void * data, const char * cmd)
+gm_messagefaction(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	int n = atoi36(igetstrtoken(str));
@@ -321,7 +321,7 @@ gm_messagefaction(const char * str, void * data, const char * cmd)
  ** requires: permission-key "gmmsgr"
  **/
 static void
-gm_messageregion(const char * str, void * data, const char * cmd)
+gm_messageregion(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
@@ -349,7 +349,7 @@ gm_messageregion(const char * str, void * data, const char * cmd)
  ** requires: permission-key "gmkill"
  **/
 static void
-gm_killunit(const char * str, void * data, const char * cmd)
+gm_killunit(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
@@ -380,7 +380,7 @@ gm_killunit(const char * str, void * data, const char * cmd)
  ** requires: permission-key "gmmsgr"
  **/
 static void
-gm_killfaction(const char * str, void * data, const char * cmd)
+gm_killfaction(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	int n = atoi36(igetstrtoken(str));
@@ -415,7 +415,7 @@ gm_killfaction(const char * str, void * data, const char * cmd)
  ** requires: permission-key "gmmsgr"
  **/
 static void
-gm_messageunit(const char * str, void * data, const char * cmd)
+gm_messageunit(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
@@ -451,7 +451,7 @@ gm_messageunit(const char * str, void * data, const char * cmd)
  ** requires: permission-key "gmgive"
  **/
 static void
-gm_give(const char * str, void * data, const char * cmd)
+gm_give(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	unit * to = findunit(atoi36(igetstrtoken(str)));
@@ -486,7 +486,7 @@ gm_give(const char * str, void * data, const char * cmd)
  ** requires: permission-key "gmtake"
  **/
 static void
-gm_take(const char * str, void * data, const char * cmd)
+gm_take(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	unit * to = findunit(atoi36(igetstrtoken(str)));
@@ -521,7 +521,7 @@ gm_take(const char * str, void * data, const char * cmd)
  ** requires: permission-key "gmskil"
  **/
 static void
-gm_skill(const char * str, void * data, const char * cmd)
+gm_skill(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unit * u = (unit*)data;
 	unit * to = findunit(atoi36(igetstrtoken(str)));
@@ -534,7 +534,7 @@ gm_skill(const char * str, void * data, const char * cmd)
 	} else if (skill==NOSKILL || skill==SK_MAGIC || skill==SK_ALCHEMY) {
 		/* unknown or not enough */
 		mistake(u, cmd, "Dieses Talent ist unbekannt, oder kann nicht erhöht werden.\n", 0);
-	} else if (num<0 || num>30+SKILLPOINTS*4970) {
+	} else if (num<0 || num>30) {
 		/* sanity check failed */
 		mistake(u, cmd, "Der gewählte Wert ist nicht zugelassen.\n", 0);
 	} else {
@@ -554,45 +554,27 @@ static tnode g_root;
 static tnode g_tell;
 static tnode g_kill;
 
-static void
-gm_command(const char * str, void * data, const char * cmd)
-{
-	do_command(&g_keys, data, str);
-}
-
-static void
-gm_tell(const char * str, void * data, const char * cmd)
-{
-	do_command(&g_tell, data, str);
-}
-
-static void
-gm_kill(const char * str, void * data, const char * cmd)
-{
-	do_command(&g_kill, data, str);
-}
-
 void
 init_gmcmd(void)
 {
 	at_register(&at_gmcreate);
 	at_register(&at_permissions);
-	add_command(&g_root, "gm", &gm_command);
-	add_command(&g_keys, "terraform", &gm_terraform);
-	add_command(&g_keys, "create", &gm_create);
-	add_command(&g_keys, "gate", &gm_gate);
-	add_command(&g_keys, "give", &gm_give);
-	add_command(&g_keys, "take", &gm_take);
-	add_command(&g_keys, "teleport", &gm_teleport);
-	add_command(&g_keys, "skill", &gm_skill);
-	add_command(&g_keys, "tell", &gm_tell);
-	add_command(&g_tell, "region", &gm_messageregion);
-	add_command(&g_tell, "unit", &gm_messageunit);
-	add_command(&g_tell, "plane", &gm_messageplane);
-	add_command(&g_tell, "faction", &gm_messagefaction);
-	add_command(&g_keys, "kill", &gm_kill);
-	add_command(&g_kill, "unit", &gm_killunit);
-	add_command(&g_kill, "faction", &gm_killfaction);
+	add_command(&g_root, &g_keys, "gm", NULL);
+	add_command(&g_keys, NULL, "terraform", &gm_terraform);
+	add_command(&g_keys, NULL, "create", &gm_create);
+	add_command(&g_keys, NULL, "gate", &gm_gate);
+	add_command(&g_keys, NULL, "give", &gm_give);
+	add_command(&g_keys, NULL, "take", &gm_take);
+	add_command(&g_keys, NULL, "teleport", &gm_teleport);
+	add_command(&g_keys, NULL, "skill", &gm_skill);
+	add_command(&g_keys, &g_tell, "tell", NULL);
+	add_command(&g_tell, NULL, "region", &gm_messageregion);
+	add_command(&g_tell, NULL, "unit", &gm_messageunit);
+	add_command(&g_tell, NULL, "plane", &gm_messageplane);
+	add_command(&g_tell, NULL, "faction", &gm_messagefaction);
+	add_command(&g_keys, &g_kill, "kill", NULL);
+	add_command(&g_kill, NULL, "unit", &gm_killunit);
+	add_command(&g_kill, NULL, "faction", &gm_killfaction);
 }
 
 /*

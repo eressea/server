@@ -119,7 +119,7 @@ can_contact(const region * r, const unit * u, const unit * u2)
 			&& slipthru(u->region, u2, u2->building))
 		return true;
 
-	if (allied(u, u2->faction, HELP_GIVE))
+	if (alliedunit(u, u2->faction, HELP_GIVE))
 		return true;
 
 	return false;
@@ -285,7 +285,7 @@ destroy_road(unit *u, int n, const char *cmd)
 
 	for (u2=r->units;u2;u2=u2->next) {
 		if (u2->faction!=u->faction && getguard(u2)&GUARD_TAX &&
-			 	!allied(u, u2->faction, HELP_GUARD)) {
+			 	!alliedunit(u, u2->faction, HELP_GUARD)) {
 			cmistake(u, cmd, 70, MSG_EVENT);
 			return;
 		}
@@ -1016,7 +1016,7 @@ mayenter(region * r, unit * u, building * b)
 	u2 = buildingowner(r, b);
 
 	if (u2==NULL || ucontact(u2, u)
-		|| allied(u2, u->faction, HELP_GUARD)) return true;
+		|| alliedunit(u2, u->faction, HELP_GUARD)) return true;
 
 	return false;
 }
@@ -1029,7 +1029,7 @@ mayboard(region * r, unit * u, ship * sh)
 
 	return (!u2
 		|| ucontact(u2, u)
-		|| allied(u2, u->faction, HELP_GUARD));
+		|| alliedunit(u2, u->faction, HELP_GUARD));
 
 }
 

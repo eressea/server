@@ -14,11 +14,11 @@
 #ifndef MY_LOCALE_H
 #define MY_LOCALE_H
 
-typedef struct locale locale;
+struct locale;
 
 /** managing multiple locales: **/
-extern locale * find_locale(const char * name);
-extern locale * make_locale(const char * key);
+extern struct locale * find_locale(const char * name);
+extern struct locale * make_locale(const char * key);
 
 /** operations on locales: **/
 extern void locale_setstring(struct locale * lang, const char * key, const char * value);
@@ -34,6 +34,8 @@ extern void debug_language(const char * log);
 
 #define LOC(lang, s) locale_string(lang, s)
 
-extern locale * default_locale;
+extern struct locale * default_locale;
+extern struct locale * locales;
+extern struct locale * nextlocale(const struct locale * lang);
 
 #endif

@@ -38,8 +38,6 @@
 #define PFL_NOMONSTERS  16384  /* no monster randenc */
 #define PFL_SEESPECIAL  32768  /* far seeing */
 
-#define PFL_MUSEUM PFL_NOMONSTERS | PFL_NOCOORDS | PFL_NORECRUITS | PFL_NOGIVE | PFL_NOATTACK | PFL_NOTERRAIN | PFL_NOMAGIC | PFL_NOSTEALTH | PFL_NOTEACH | PFL_NOBUILD | PFL_NOFEED
-
 typedef struct watcher {
 	struct watcher * next;
 	struct faction * faction;

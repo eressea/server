@@ -210,7 +210,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 		} else {
 			scat(", ");
 			if(a_otherfaction
-					&& allied(u, f, HELP_FSTEALTH)) {
+					&& alliedunit(u, f, HELP_FSTEALTH)) {
 				scat(factionname(get_otherfaction(a_otherfaction)));
 				scat(" (");
 				scat(factionname(u->faction));
@@ -365,13 +365,11 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 
 				for (spt = get_mage(u)->spellptr;spt; spt = spt->next){
 					sp = find_spellbyid(spt->spellid);
-					if(sp->level > t){
-						continue;
-					}
-					if (!dh){
+					if (sp->level > t) continue;
+					if (!dh) {
 						sprintf(buf+strlen(buf),", %s: ", LOC(f->locale, "nr_spells"));
 						dh = 1;
-					}else{
+					} else {
 						scat(", ");
 					}
 					scat(spell_name(sp, f->locale));
@@ -433,13 +431,9 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 	}
 
 	dh=0;
-	if (!getarnt && f && f->allies) {
-		ally *sf;
-
-		for (sf = f->allies; sf && !dh; sf = sf->next) {
-			if (sf->status > 0 && sf->status <= HELP_ALL && sf->faction == fv) {
-				dh = 1;
-			}
+	if (!getarnt && f) {
+		if (alliedfaction(getplane(u->region), f, fv, HELP_ALL)) {
+			dh = 1;
 		}
 	}
 	return dh;
@@ -848,7 +842,7 @@ ucansee(const struct faction *f, const struct unit *u, const struct unit *x)
 faction *
 visible_faction(const faction *f, const unit * u)
 {
-	if(!allied(u, f, HELP_FSTEALTH)) {
+	if(!alliedunit(u, f, HELP_FSTEALTH)) {
 		attrib *a = a_find(u->attribs, &at_otherfaction);
 		if (a) {
 			faction *fv = get_otherfaction(a);

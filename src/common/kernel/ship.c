@@ -38,7 +38,7 @@ ship_typelist *shiptypes = NULL;
 static local_names * snames;
 
 const ship_type *
-findshiptype(const char * name, const locale * lang)
+findshiptype(const char * name, const struct locale * lang)
 {
 	local_names * sn = snames;
 	void * i;

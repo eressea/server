@@ -36,13 +36,17 @@
 #include <items/items.h>
 
 /* modules includes */
-#include <modules/arena.h>
 #include <modules/dungeon.h>
-#include <modules/museum.h>
 #include <modules/score.h>
 #include <modules/xmas2000.h>
 #include <modules/gmcmd.h>
 #include <modules/infocmd.h>
+#ifdef MUSEUM_MODULE
+#include <modules/museum.h>
+#endif
+#ifdef ARENA_MODULE
+#include <modules/arena.h>
+#endif
 
 /* gamecode includes */
 #include <creation.h>
@@ -173,8 +177,12 @@ game_init(void)
 	init_info();
 	init_conversion();
 
+#ifdef MUSEUM_MODULE
 	init_museum();
+#endif
+#ifdef ARENA_MODULE
 	init_arena();
+#endif
 	init_xmas2000();
 #ifdef REMOVE_THIS
 	render_init();

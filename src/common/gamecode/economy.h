@@ -25,9 +25,6 @@
 /* Welchen Teil des Silbers die Bauern fuer Unterhaltung ausgeben (1/20), und
  * wiviel Silber ein Unterhalter pro Talentpunkt bekommt. */
 
-#define ENTERTAININCOME         20
-#define ENTERTAINFRACTION       20
-
 /* Wieviele Silbermuenzen jeweils auf einmal "getaxed" werden. */
 
 #define TAXFRACTION             10

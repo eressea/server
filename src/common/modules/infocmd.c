@@ -33,7 +33,7 @@
 #include <stdlib.h>
 
 static void
-info_email(const char * str, void * data, const char * cmd)
+info_email(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	unused(str);
 	unused(data);
@@ -41,14 +41,17 @@ info_email(const char * str, void * data, const char * cmd)
 }
 
 static void
-info_name(const char * str, void * data, const char * cmd)
+info_name(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
-	unit * u = (unit*)data;
-	faction * f = u->faction;
-	const char * name = sqlquote(igetstrtoken(str));
-
+	unused(tnext);
+        unused(str);
+        unused(data);
+        unused(cmd);
 	if (sqlstream!=NULL) {
 #ifdef SQLOUTPUT
+		unit * u = (unit*)data;
+		const char * name = sqlquote(igetstrtoken(str));
+		faction * f = u->faction;
 		fprintf(sqlstream, "UPDATE users SET firstname = '%s' WHERE id = %u;\n", 
 				name, f->unique_id);
 #endif
@@ -56,14 +59,13 @@ info_name(const char * str, void * data, const char * cmd)
 }
 
 static void
-info_address(const char * str, void * data, const char * cmd)
+info_address(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
-	unit * u = (unit*)data;
-	faction * f = u->faction;
-	const char * address = sqlquote(igetstrtoken(str));
-
 	if (sqlstream!=NULL) {
 #ifdef SQLOUTPUT
+		unit * u = (unit*)data;
+		faction * f = u->faction;
+		const char * address = sqlquote(igetstrtoken(str));
 		fprintf(sqlstream, "UPDATE users SET address = '%s' WHERE id = %u;\n", 
 				address, f->unique_id);
 #endif
@@ -71,14 +73,13 @@ info_address(const char * str, void * data, const char * cmd)
 }
 
 static void
-info_phone(const char * str, void * data, const char * cmd)
+info_phone(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
-	unit * u = (unit*)data;
-	faction * f = u->faction;
-	const char * phone = sqlquote(igetstrtoken(str));
-
 	if (sqlstream!=NULL) {
 #ifdef SQLOUTPUT
+		unit * u = (unit*)data;
+		faction * f = u->faction;
+		const char * phone = sqlquote(igetstrtoken(str));
 		fprintf(sqlstream, "UPDATE users SET phone = '%s' WHERE id = %u;\n", 
 				phone, f->unique_id);
 #endif
@@ -86,19 +87,19 @@ info_phone(const char * str, void * data, const char * cmd)
 }
 
 static void
-info_vacation(const char * str, void * data, const char * cmd)
+info_vacation(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
-	unit * u = (unit*)data;
-	faction * f = u->faction;
-	const char * email = sqlquote(igetstrtoken(str));
-	int duration = atoi(getstrtoken());
-	time_t start_time = time(NULL);
-	time_t end_time = start_time + 60*60*24*duration;
-	struct tm start = *localtime(&start_time);
-	struct tm end = *localtime(&end_time);
 
 	if (sqlstream!=NULL) {
 #ifdef SQLOUTPUT
+		unit * u = (unit*)data;
+		faction * f = u->faction;
+		const char * email = sqlquote(igetstrtoken(str));
+		int duration = atoi(getstrtoken());
+		time_t start_time = time(NULL);
+		time_t end_time = start_time + 60*60*24*duration;
+		struct tm start = *localtime(&start_time);
+		struct tm end = *localtime(&end_time);
 		fprintf(sqlstream, "UPDATE factions SET vacation = '%s' WHERE id = '%s';\n", email, itoa36(f->no));
 		fprintf(sqlstream, "UPDATE factions SET vacation_start = '%04d-%02d-%02d' WHERE id = '%s';\n", 
 			start.tm_year, start.tm_mon, start.tm_mday, itoa36(f->no));
@@ -109,6 +110,7 @@ info_vacation(const char * str, void * data, const char * cmd)
 }
 
 static tnode g_keys;
+static tnode g_info;
 
 void
 infocommands(void)
@@ -131,20 +133,14 @@ infocommands(void)
 	fflush(sqlstream);
 }
 
-static void
-info_command(const char * str, void * data, const char * cmd)
-{
-	do_command(&g_keys, data, str);
-}
-
 void
 init_info(void)
 {
-	add_command(&g_keys, "info", &info_command);
+	add_command(&g_keys, &g_info, "info", NULL);
 
-	add_command(&g_keys, "email", &info_email);
-	add_command(&g_keys, "name", &info_name);
-	add_command(&g_keys, "adresse", &info_address);
-	add_command(&g_keys, "telefon", &info_phone);
-	add_command(&g_keys, "urlaub", &info_vacation);
+	add_command(&g_info, NULL, "email", &info_email);
+	add_command(&g_info, NULL, "name", &info_name);
+	add_command(&g_info, NULL, "adresse", &info_address);
+	add_command(&g_info, NULL, "telefon", &info_phone);
+	add_command(&g_info, NULL, "urlaub", &info_vacation);
 }

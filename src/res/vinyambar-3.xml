@@ -12,15 +12,12 @@
 	<include file="ships.xml"></include>
 	<include file="buildings.xml"></include>
 
-	<game name="Eressea" welcome="eressea">
+	<game name="Kreis der Macht" units="250" welcome="vinyambar">
 		<comment>Game specific</comment>
+		<order name="ARBEITEN" disable></order>
 		<order name="MEINUNG" disable></order>
 		<order name="MAGIEGEBIET" disable></order>
 	</game>
-	<include file="eressea/de/strings.xml"></include>
-	<include file="eressea/en/strings.xml"></include>
-	<include file="eressea/races.xml"></include>
-	<include file="eressea/items.xml"></include>
-	<include file="eressea/dungeons.xml"></include>
-	<include file="eressea/temple.xml"></include>
+	<include file="vinyambar/de/strings.xml"></include>
+	<include file="vinyambar/stronghold.xml"></include>
 </eressea>

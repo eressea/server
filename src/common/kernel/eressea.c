@@ -238,7 +238,8 @@ const char *keywords[MAXKEYWORDS] =
 	"SYNONYM",
 	"PFLANZEN",
 	"WERWESEN",
-	"XONTORMIA"
+	"XONTORMIA",
+	"ALLIANZ"
 };
 
 const char *report_options[MAX_MSG] =
@@ -725,50 +726,6 @@ unit_has_cursed_item(unit *u)
 	return false;
 }
 
-#ifdef ALLIANCES
-int
-allied(const unit * u, const faction * f2, int mode)
-{
-	if (u->faction->alliance==f2->alliance) return mode;
-	return 0;
-}
-
-int
-isallied(const plane * pl, const faction * f, const faction * f2, int mode)
-{
-	unused(pl);
-	if (f->alliance==f2->alliance) return mode;
-	return 0;
-}
-
-#else
-
-/* f hat zu f2 HELFE mode gesetzt */
-int
-isallied(const plane * pl, const faction * f, const faction * f2, int mode)
-{
-	ally *sf;
-	attrib * a;
-
-	if (f == f2) return mode;
-	if (f2==NULL) return 0;
-
-	a = a_find(f->attribs, &at_gm);
-	while (a) {
-		plane * p = (plane*)a->data.v;
-		if (p==pl) return mode;
-		a=a->next;
-	}
-
-	if (pl && pl->flags & PFL_FRIENDLY) return mode;
-	if (mode != HELP_GIVE && pl && (pl->flags & PFL_NOALLIANCES)) return 0;
-	for (sf = f->allies; sf; sf = sf->next)
-		if (sf->faction == f2)
-			return (sf->status & mode);
-
-	return 0;
-}
-
 static int
 alliance(const ally * sf, const faction * f, int mode)
 {
@@ -780,37 +737,57 @@ alliance(const ally * sf, const faction * f, int mode)
 	return 0;
 }
 
+static int 
+autoalliance(const plane * pl, const faction * sf, const faction * f2)
+{
+	int mode = 0;
+	attrib * a = a_find(f2->attribs, &at_gm);
+
+	/* if f2 is a gm in this plane, everyone has an auto-help to it */
+	if (pl && pl->flags & PFL_FRIENDLY) return mode;
+	while (a) {
+		const plane * p = (const plane*)a->data.v;
+		if (p==pl) return HELP_ALL;
+		a=a->next;
+	}
+#ifdef AUTOALLIANCE
+	if (sf->alliance==f2->alliance) mode |= AUTOALLIANCE;
+#endif
+
+	return mode;
+}
+
+int
+alliedfaction(const struct plane * pl, const faction * sf, const faction * f2, int mode)
+{
+#ifdef ALLIANCES
+	if (sf->alliance!=f2->alliance) return 0;
+#endif
+	return alliance(sf->allies, f2, mode) | (mode & autoalliance(pl, sf, f2));
+}
+
 /* Die Gruppe von Einheit u hat helfe zu f2 gesetzt. */
 int
-allied(const unit * u, const faction * f2, int mode)
+alliedunit(const unit * u, const faction * f2, int mode)
 {
 	ally * sf;
 	const attrib * a;
-	plane * pl;
+	const plane * pl = getplane(u->region);
+	int automode;
 
 	if (u->faction == f2) return mode;
 	if (u->faction == NULL || f2==NULL) return 0;
 
+	automode = mode & autoalliance(pl, u->faction, f2);
+
+	if (pl!=NULL && (pl->flags & PFL_NOALLIANCES))
+		mode = (mode & automode) | (mode & HELP_GIVE);
+
 	sf = u->faction->allies;
-	pl = getplane(u->region);
-
-	if (pl && pl->flags & PFL_FRIENDLY) return mode;
-
-	/* if f2 is a gm in this plane, everyone has an auto-help to it */
-	a = a_find(f2->attribs, &at_gm);
-	while (a) {
-		plane * p = (plane*)a->data.v;
-		if (p==pl) return mode;
-		a=a->next;
-	}
-
-	if (mode != HELP_GIVE && pl && (pl->flags & PFL_NOALLIANCES))
-		return 0;
 	a = a_find(u->attribs, &at_group);
-	if (a) sf = ((group*)a->data.v)->allies;
-	return alliance(sf, f2, mode);
+	if (a!=NULL) sf = ((group*)a->data.v)->allies;
+	return alliance(sf, f2, mode) | automode;
 }
-#endif
 
 boolean
 seefaction(const faction * f, const region * r, const unit * u, int modifier)
@@ -2078,7 +2055,7 @@ read_strings(FILE * F)
 	char rbuf[8192];
 	while (fgets(rbuf, sizeof(rbuf), F)) {
 		char * b = rbuf;
-		locale * lang;
+		struct locale * lang;
 		char * key = b;
 		char * language;
 		const char * k;
@@ -2111,7 +2088,7 @@ const char * strings[] = {
 	NULL
 };
 
-const char * locales[] = {
+const char * localenames[] = {
 	"de", "en",
 	NULL
 };
@@ -2192,12 +2169,12 @@ init_data(const char * filename)
 	if (l) return l;
 
 	/* old stuff, for removal: */
-	for (l=0;locales[l];++l) {
+	for (l=0;localenames[l];++l) {
 		char zText[MAX_PATH];
 		int i;
 		for (i=0;strings[i];++i) {
 			FILE * F;
-			sprintf(zText, strings[i], resourcepath(), locales[l]);
+			sprintf(zText, strings[i], resourcepath(), localenames[l]);
 			F = fopen(zText, "r+");
 			if (F) {
 				read_strings(F);
@@ -2216,8 +2193,8 @@ void
 init_locales(void)
 {
 	int l;
-	for (l=0;locales[l];++l) {
-		const struct locale * lang = find_locale(locales[l]);
+	for (l=0;localenames[l];++l) {
+		const struct locale * lang = find_locale(localenames[l]);
 		if (lang) init_tokens(lang);
 	}
 }

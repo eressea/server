@@ -27,9 +27,7 @@ typedef struct {
 	struct item *items;
 } museumgiveback;
 
-void warden_add_give(struct unit *src, struct unit *u, const struct item_type *itype, int n);
-void init_museum(void);
-void create_museum(void);
-int use_museumticket(struct unit *u, const struct item_type *itype, int amount, const char *cmd);
-int use_museumexitticket(struct unit *u, const struct item_type *itype, int amount, const char * cmd);
+extern void warden_add_give(struct unit *src, struct unit *u, const struct item_type *itype, int n);
+extern void init_museum(void);
+extern void create_museum(void);
 

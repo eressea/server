@@ -12,8 +12,6 @@
  * prior permission by the authors of Eressea.
  */
 
-/* this is an attribute used by the kernel (isallied) */
-
 struct plane;
 extern struct attrib_type at_gm;
 

@@ -34,7 +34,7 @@
 
 
 int
-cinfo_building(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
+cinfo_building(const struct locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
 

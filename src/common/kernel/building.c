@@ -291,7 +291,7 @@ building_type bt_castle = {
 static local_names * bnames;
 
 const building_type *
-findbuildingtype(const char * name, const locale * lang)
+findbuildingtype(const char * name, const struct locale * lang)
 {
 	local_names * bn = bnames;
 	void * i;

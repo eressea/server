@@ -11,16 +11,16 @@
 */
 
 /*
- * Contains defines for the "free" game (Eressea) .
+ * Contains defines for the "alliance" vinyambar game (V3).
  * Include this file from settings.h to make eressea work.
  */
 #define CATAPULT_AMMUNITION 1	/* Gebaut werden kann sie auch mit 0! */
 #define CHANGED_CROSSBOWS 1
 #define COMBAT_TURNS 5
-#define ENTERTAINBASE 0
-#define ENTERTAINPERLEVEL 20
+#define ENTERTAINBASE 15
+#define ENTERTAINPERLEVEL 5
 #define ENTERTAINFRACTION 20
-#define GAME_ID 0
+#define GAME_ID 3
 #define GROWING_TREES 1
 #define GUARD_DISABLES_PRODUCTION 1
 #define GUARD_DISABLES_RECRUIT 1
@@ -29,18 +29,19 @@
 #define LARGE_CASTLES 1
 #define NEW_MIGRATION 1
 #define NEW_RESOURCEGROWTH 1
-#define NMRTIMEOUT 4
+#define NMRTIMEOUT 5
 #define PEASANTS_DO_NOT_STARVE 0
 #define PEASANT_ADJUSTMENT 1
 #define RACE_ADJUSTMENTS 1
 #define RECRUITFRACTION 40		/* 100/RECRUITFRACTION% */
 #define REDUCED_PEASANTGROWTH 1
-#define REMOVENMRNEWBIE 1
+#define REMOVENMRNEWBIE 0
 #define RESOURCE_CONVERSION 1
 #define RESOURCE_QUANTITY 0.5
 #define TEACHDIFFERENCE 2
 
-#define MUSEUM_MODULE
-#define ARENA_MODULE
+#define ALLIANCES
+#undef  ALLIANCEJOIN
+#define AUTOALLIANCE (HELP_FIGHT)
 
-#define MAILITPATH	"/usr/sbin:$HOME/eressea/bin:/bin:/usr/bin:/usr/local/bin"
+#define MAILITPATH	"/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"

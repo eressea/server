@@ -2323,7 +2323,7 @@ change_money(unit * u, int v)
 static local_names * rnames;
 
 const resource_type *
-findresourcetype(const char * name, const locale * lang)
+findresourcetype(const char * name, const struct locale * lang)
 {
 	local_names * rn = rnames;
 	void * i;
@@ -2365,7 +2365,7 @@ attrib_type at_seenitem = {
 static local_names * inames;
 
 const item_type *
-finditemtype(const char * name, const locale * lang)
+finditemtype(const char * name, const struct locale * lang)
 {
 	local_names * in = inames;
 	void * i;

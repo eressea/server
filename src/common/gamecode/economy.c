@@ -273,8 +273,8 @@ expandrecruit(region * r, request * recruitorders)
 			if (rc->ec_flags & ECF_REC_HORSES) {
 				/* recruit from horses if not all gone */
 				if (h <= 0) continue;
-			} else if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
-				/* recruit from peasants if any space left */
+			} else {
+				/* recruit, watch peasants if any space left */
 				if (n - (uruks+1)/2 >= rfrac) continue;
 			}
 		}
@@ -287,7 +287,7 @@ expandrecruit(region * r, request * recruitorders)
 			else {
 				if ((rc->ec_flags & ECF_REC_ETHEREAL)==0) {
 					p--; /* use a peasant */
-					if(rc == new_race[RC_URUK]) uruks++;
+					if (rc == new_race[RC_URUK]) uruks++;
 				}
 				n++;
 			}
@@ -467,7 +467,7 @@ recruit(region * r, unit * u, strlist * S,
 }
 /* ------------------------------------------------------------- */
 
-	int
+int
 count_max_migrants(faction * f)
 {
 	int x = (int)(log10(count_all(f) / 50.0) * 20);
@@ -476,7 +476,7 @@ count_max_migrants(faction * f)
 
 extern const char* resname(resource_t res, int i);
 
-	void
+void
 add_give(unit * u, unit * u2, int n, const resource_type * rtype, const char * cmd, int error)
 {
 	if (error)
@@ -494,7 +494,7 @@ add_give(unit * u, unit * u2, int n, const resource_type * rtype, const char * c
 	}
 }
 
-	void
+void
 addgive(unit * u, unit * u2, int n, resource_t res, const char * cmd, int error)
 {
 	add_give(u, u2, n, oldresourcetype[res], cmd, error);
@@ -549,7 +549,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, const char
 #endif
 			handle_event(&src->attribs, "give", dest);
 			handle_event(&dest->attribs, "receive", src);
-#if defined(MUSEUM_PLANE) && defined(TODO)
+#if defined(MUSEUM_MODULE) && defined(TODO)
 TODO: Einen Trigger benutzen!
 				if (a_find(dest->attribs, &at_warden)) {
 					/* warden_add_give(src, dest, itype, n); */
@@ -565,7 +565,7 @@ TODO: Einen Trigger benutzen!
 	return 0;
 }
 
-	void
+void
 givemen(int n, unit * u, unit * u2, const char * cmd)
 {
 	ship *sh;
@@ -678,7 +678,7 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 	addgive(u, u2, n, R_PERSON, cmd, error);
 }
 
-	void
+void
 giveunit(region * r, unit * u, unit * u2, strlist * S)
 {
 	int n = u->number;
@@ -1049,7 +1049,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 	cmistake(u, S->s, 123, MSG_COMMERCE);
 }
 /* ------------------------------------------------------------- */
-	void
+void
 forgetskill(unit * u)
 {
 	skill_t talent;
@@ -1067,7 +1067,7 @@ forgetskill(unit * u)
 
 /* ------------------------------------------------------------- */
 
-	void
+void
 report_donations(void)
 {
 	spende * sp;
@@ -1083,7 +1083,7 @@ report_donations(void)
 	}
 }
 
-	void
+void
 add_spende(faction * f1, faction * f2, int betrag, region * r)
 {
 	spende *sp;
@@ -1107,7 +1107,7 @@ add_spende(faction * f1, faction * f2, int betrag, region * r)
 	spenden = sp;
 }
 
-	static boolean
+static boolean
 maintain(building * b, boolean first)
 	/* first==false -> take money from wherever you can */
 {
@@ -1140,7 +1140,7 @@ maintain(building * b, boolean first)
 				for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FL_DH);
 				fset(u->faction, FL_DH); /* hat schon */
 				for (ua=r->units;ua;ua=ua->next) {
-					if (!fval(ua->faction, FL_DH) && (ua->faction == u->faction || allied(ua, u->faction, HELP_MONEY))) {
+					if (!fval(ua->faction, FL_DH) && (ua->faction == u->faction || alliedunit(ua, u->faction, HELP_MONEY))) {
 						need -= new_get_pooled(ua, oldresourcetype[m->type], GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE);
 						fset(ua->faction, FL_DH);
 						if (need<=0) break;
@@ -1183,7 +1183,7 @@ maintain(building * b, boolean first)
 				for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FL_DH);
 				fset(u->faction, FL_DH); /* hat schon */
 				for (ua=r->units;ua;ua=ua->next) {
-					if (!fval(ua->faction, FL_DH) && allied(ua, u->faction, HELP_MONEY)) {
+					if (!fval(ua->faction, FL_DH) && alliedunit(ua, u->faction, HELP_MONEY)) {
 						int give = use_all(ua, m->type, cost);
 						if (!give) continue;
 						cost -= give;
@@ -1204,7 +1204,7 @@ maintain(building * b, boolean first)
 	return true;
 }
 
-	static void
+static void
 gebaeude_stuerzt_ein(region * r, building * b)
 {
 	unit *u;
@@ -1258,7 +1258,7 @@ gebaeude_stuerzt_ein(region * r, building * b)
 	destroy_building(b);
 }
 
-	void
+void
 maintain_buildings(boolean crash)
 {
 	region * r;
@@ -1433,7 +1433,7 @@ typedef struct allocation_list {
 static allocation_list * allocations;
 
 
-	static void
+static void
 allocate_resource(unit * u, const resource_type * rtype, int want)
 {
 	const item_type * itype = resource2item(rtype);
@@ -1479,7 +1479,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 					&& cansee(u2->faction,r,u,0)
 					&& !ucontact(u2, u)
 					&& !besieged(u2)
-					&& !allied(u2, u->faction, HELP_GUARD)
+					&& !alliedunit(u2, u->faction, HELP_GUARD)
 #ifdef WACH_WAFF
 					&& armedmen(u2)
 #endif
@@ -1502,7 +1502,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 					&& !fval(u2, UFL_ISNEW)
 					&& u2->number
 					&& !ucontact(u2, u)
-					&& !allied(u2, u->faction, HELP_GUARD))
+					&& !alliedunit(u2, u->faction, HELP_GUARD))
 			{
 				add_message(&u->faction->msgs,
 						msg_error(u, findorder(u, u->thisorder), "region_guarded", "guard", u2));
@@ -1617,7 +1617,7 @@ typedef struct allocator {
 
 static struct allocator * allocators;
 
-	static const allocator *
+static const allocator *
 get_allocator(const struct resource_type * type)
 {
 	const struct allocator * alloc = allocators;
@@ -1625,7 +1625,7 @@ get_allocator(const struct resource_type * type)
 	return alloc;
 }
 
-	static allocator *
+static allocator *
 make_allocator(const struct resource_type * type, void (*allocate)(const struct allocator *, region *, allocation *))
 {
 	allocator * alloc = (allocator *)malloc(sizeof(allocator));
@@ -1634,7 +1634,7 @@ make_allocator(const struct resource_type * type, void (*allocate)(const struct 
 	return alloc;
 }
 
-	static void
+static void
 add_allocator(allocator * alloc)
 {
 	alloc->next = allocators;
@@ -1646,7 +1646,7 @@ enum {
 	AFL_LOWSKILL = 1<<1
 };
 
-	static int
+static int
 required(int want, double save)
 {
 	int norders = (int)(want * save);
@@ -1655,7 +1655,7 @@ required(int want, double save)
 }
 
 #if NEW_RESOURCEGROWTH
-	static void
+static void
 leveled_allocation(const allocator * self, region * r, allocation * alist)
 {
 	const resource_type * rtype = self->type;
@@ -1715,7 +1715,7 @@ leveled_allocation(const allocator * self, region * r, allocation * alist)
 }
 #endif
 
-	static void
+static void
 attrib_allocation(const allocator * self, region * r, allocation * alist)
 {
 	allocation * al;
@@ -1755,7 +1755,7 @@ attrib_allocation(const allocator * self, region * r, allocation * alist)
 	assert(avail==0 || norders==0);
 }
 
-	static void
+static void
 split_allocations(region * r)
 {
 	allocation_list ** p_alist=&allocations;
@@ -1799,7 +1799,7 @@ split_allocations(region * r)
 	allocations = NULL;
 }
 
-	static void
+static void
 create_potion(unit * u, const potion_type * ptype, int want)
 {
 	int built;
@@ -1866,7 +1866,7 @@ create_item(unit * u, const item_type * itype, int want)
 	}
 }
 
-	static void
+static void
 make(region * r, unit * u)
 {
 	char *s;
@@ -1953,7 +1953,7 @@ const attrib_type at_luxuries = {
 	"luxuries", NULL, NULL, NULL, NULL, NULL
 };
 
-	static void
+static void
 expandbuying(region * r, request * buyorders)
 {
 	int max_products;
@@ -2061,7 +2061,7 @@ attrib_type at_trades = {
 	NO_READ
 };
 
-	void
+void
 buy(region * r, unit * u, request ** buyorders, const char * cmd)
 {
 	int n, k;
@@ -2156,7 +2156,7 @@ buy(region * r, unit * u, request ** buyorders, const char * cmd)
 static int tax_per_size[7] =
 {0, 6, 12, 18, 24, 30, 36};
 
-	static void
+static void
 expandselling(region * r, request * sellorders)
 {
 	int money, price, j, max_products;
@@ -2329,7 +2329,7 @@ expandselling(region * r, request * sellorders)
 	}
 }
 
-	void
+void
 sell(region * r, unit * u, request ** sellorders, const char * cmd)
 {
 	const item_type * itype;
@@ -2454,7 +2454,7 @@ sell(region * r, unit * u, request ** sellorders, const char * cmd)
 }
 /* ------------------------------------------------------------- */
 
-	static void
+static void
 expandstealing(region * r, request * stealorders)
 {
 	int i;
@@ -2499,7 +2499,7 @@ expandstealing(region * r, request * stealorders)
 }
 
 /* ------------------------------------------------------------- */
-	void
+void
 plant(region *r, unit *u, int raw)
 {
 	int n, i, skill, planted = 0;
@@ -2555,7 +2555,7 @@ plant(region *r, unit *u, int raw)
 }
 
 #if GROWING_TREES
-	static void
+static void
 planttrees(region *r, unit *u, int raw)
 {
 	int n, i, skill, planted = 0;
@@ -2615,7 +2615,7 @@ planttrees(region *r, unit *u, int raw)
 }
 
 /* züchte bäume */
-	void
+void
 breedtrees(region *r, unit *u, int raw)
 {
 	int n, i, skill, planted = 0;
@@ -2674,7 +2674,7 @@ breedtrees(region *r, unit *u, int raw)
 
 #endif
 
-	void
+void
 pflanze(region *r, unit *u)
 {
 	int m;
@@ -2720,7 +2720,7 @@ pflanze(region *r, unit *u)
 
 
 /* züchte pferde */
-	void
+void
 breedhorses(region *r, unit *u)
 {
 	int n, c;
@@ -2753,7 +2753,7 @@ breedhorses(region *r, unit *u)
 				"raised%u:unit%i:amount", u, gezuechtet));
 }
 
-	void
+void
 zuechte(region *r, unit *u)
 {
 	int m;
@@ -2792,7 +2792,7 @@ zuechte(region *r, unit *u)
 	}
 }
 
-	static const char *
+static const char *
 rough_amount(int a, int m)
 
 {
@@ -2810,7 +2810,7 @@ rough_amount(int a, int m)
 	return "sehr viele";
 }
 
-	static void
+static void
 research(region *r, unit *u)
 {
 	char *s;
@@ -2844,7 +2844,7 @@ research(region *r, unit *u)
 	}
 }
 
-	int
+int
 wahrnehmung(region * r, faction * f)
 {
 	unit *u;
@@ -2853,7 +2853,7 @@ wahrnehmung(region * r, faction * f)
 	for (u = r->units; u; u = u->next) {
 		if (u->faction == f
 #ifdef HELFE_WAHRNEHMUNG
-				|| allied(u, f, HELP_OBSERVE)
+				|| alliedunit(u, f, HELP_OBSERVE)
 #endif
 			 ) {
 			if (eff_skill(u, SK_OBSERVATION, r) > w) {
@@ -2865,7 +2865,7 @@ wahrnehmung(region * r, faction * f)
 	return w;
 }
 
-	void
+void
 steal(region * r, unit * u, request ** stealorders)
 {
 	int n, i, id;
@@ -2973,7 +2973,7 @@ steal(region * r, unit * u, request ** stealorders)
 /* ------------------------------------------------------------- */
 
 
-	int
+int
 entertainmoney(const region *r)
 {
 	int n;
@@ -2991,7 +2991,7 @@ entertainmoney(const region *r)
 	return n;
 }
 
-	static void
+static void
 expandentertainment(region * r)
 {
 	unit *u;
@@ -3016,7 +3016,7 @@ expandentertainment(region * r)
 	}
 }
 
-	void
+void
 entertain(region * r, unit * u)
 {
 	int max_e;
@@ -3044,7 +3044,7 @@ entertain(region * r, unit * u)
 		return;
 	}
 
-	u->wants = u->number * effskill(u, SK_ENTERTAINMENT) * ENTERTAININCOME;
+	u->wants = u->number * (ENTERTAINBASE + effskill(u, SK_ENTERTAINMENT) * ENTERTAINPERLEVEL);
 	if ((max_e = geti()) != 0)
 		u->wants = min(u->wants,max_e);
 
@@ -3057,7 +3057,7 @@ entertain(region * r, unit * u)
 /* ------------------------------------------------------------- */
 
 
-	static void
+static void
 expandwork(region * r)
 {
 	int n, earnings;
@@ -3113,7 +3113,7 @@ expandwork(region * r)
 	rsetmoney(r, rmoney(r) + earnings);
 }
 
-	void
+void
 work(region * r, unit * u)
 {
 	request *o;
@@ -3140,7 +3140,7 @@ work(region * r, unit * u)
 }
 /* ------------------------------------------------------------- */
 
-	static void
+static void
 expandtax(region * r, request * taxorders)
 {
 	unit *u;
@@ -3161,7 +3161,7 @@ expandtax(region * r, request * taxorders)
 			add_income(u, IC_TAX, u->wants, u->n);
 }
 
-	void
+void
 tax(region * r, unit * u, request ** taxorders)
 {
 	/* Steuern werden noch vor der Forschung eingetrieben */
@@ -3217,7 +3217,7 @@ tax(region * r, unit * u, request ** taxorders)
 }
 /* ------------------------------------------------------------- */
 
-	void
+void
 produce(void)
 {
 	region *r;
@@ -3372,7 +3372,7 @@ produce(void)
 	}
 }
 
-	void
+void
 init_economy(void)
 {
 	add_allocator(make_allocator(item2resource(olditemtype[I_HORSE]), attrib_allocation));

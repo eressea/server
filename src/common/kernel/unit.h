@@ -150,9 +150,7 @@ extern void u_setfaction(struct unit * u, struct faction * f);
 /* vorsicht Sprüche können u->number == 0 (RS_FARVISION) haben! */
 extern void set_number(struct unit * u, int count);
 
-#if !SKILLPOINTS
 extern boolean learn_skill(struct unit * u, skill_t sk, double chance);
-#endif
 
 extern int invisible(const unit *u);
 

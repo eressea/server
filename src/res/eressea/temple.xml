@@ -1,0 +1,10 @@
+<building name="temple" maxsize="50" maxcapacity=2 nobuild nodestroy unique auraregen="1.00">
+</building>
+<strings>
+	<string name="temple">
+		<text locale="de">Tempel</text>
+		<text locale="en">temple</text>
+	</string>
+</strings>
+
+

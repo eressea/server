@@ -74,6 +74,9 @@
 #include <util/message.h>
 
 #include <modules/xecmd.h>
+#ifdef ALLIANCES
+#include <modules/alliance.h>
+#endif
 
 #ifdef AT_OPTION
 /* attributes includes */
@@ -98,7 +101,7 @@ extern int * age;
 boolean nobattle = false;
 /* ------------------------------------------------------------- */
 
-static void
+void
 destroyfaction(faction * f)
 {
 	region *rc;
@@ -118,7 +121,7 @@ destroyfaction(faction * f)
 			unit * unit;
 		} * friends = NULL;
 		for (au=r->units;au;au=au->next) if (au->faction!=f) {
-			if (allied(u, au->faction, HELP_ALL)) {
+			if (alliedunit(u, au->faction, HELP_ALL)) {
 				struct friend * nf, ** fr = &friends;
 
 				while (*fr && (*fr)->faction->no<au->faction->no) fr = &(*fr)->next;
@@ -327,7 +330,7 @@ get_food(region *r)
 			unit *v;
 
 			for (v = r->units; need && v; v = v->next)
-				if (v->faction != u->faction && allied(v, u->faction, HELP_MONEY)
+				if (v->faction != u->faction && alliedunit(v, u->faction, HELP_MONEY)
 						&& !is_monstrous(v)) {
 					int give = lifestyle(v);
 					give = max(0, get_money(v) - give);
@@ -1222,21 +1225,30 @@ quit(void)
 			continue;
 		}
 	}
-#if REMOVENMRNEWBIE
 	puts(" - beseitige Spieler, die sich nach der Anmeldung nicht "
 		 "gemeldet haben...");
 
 	age = calloc(turn+1, sizeof(int));
-	for (f = factions; f; f = f->next) if(!fval(f, FL_NOIDLEOUT)) {
-		if (f->age>=0 && f->age <= turn) ++age[f->age];
-		if (f->age == 2 || f->age == 3) {
-			if (f->lastorders == turn - 2) {
-				destroyfaction(f);
-				++dropouts[f->age-2];
+	for (f = factions; f; f = f->next) if (f->no != MONSTER_FACTION) {
+#if REMOVENMRNEWBIE
+		if(!fval(f, FL_NOIDLEOUT) && f!=) {
+			if (f->age>=0 && f->age <= turn) ++age[f->age];
+			if (f->age == 2 || f->age == 3) {
+				if (f->lastorders == turn - 2) {
+					destroyfaction(f);
+					++dropouts[f->age-2];
+					continue;
+				}
 			}
 		}
-	}
 #endif
+#if defined(ALLIANCES) && !defined(ALLIANCEJOIN)
+		if (f->alliance==NULL) {
+			destroyfaction(f);
+			continue;
+		}
+#endif
+	}
 	/* Clear away debris of destroyed factions */
 
 	puts(" - beseitige leere Einheiten und leere Parteien...");
@@ -3506,7 +3518,9 @@ processorders (void)
 	puts(" - Defaults und Instant-Befehle...");
 	setdefaults();
 	instant_orders();
-
+#ifdef ALLIANCES
+	alliancekick();
+#endif
 	mail();
 	puts(" - Altern");
 	age_factions();
@@ -3516,6 +3530,11 @@ processorders (void)
 
 	puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (1.Versuch)");
 	do_misc(0);
+
+#ifdef ALLIANCES
+	puts(" - Testen der Allianzbedingungen");
+	alliancevictory();
+#endif
 
 	puts(" - GM Kommandos");
 	infocommands();
@@ -3628,6 +3647,9 @@ processorders (void)
 #if 0
 	puts(" - Einheiten aus Gebäuden/Schiffen weisen");
 	evict();
+#endif
+#ifdef ALLIANCEJOIN
+	alliancejoin();
 #endif
 	puts(" - Neue Nummern");
 	renumber();
