@@ -183,7 +183,7 @@ lint::
 	$(LINT) -I$(ERESSEA_SRC) $(INCLUDES) $(LINTFLAGS) *.c
 
 $(BUILD_DIR) $(PUBLISH_DIR):
-	@mkdir $@
+	@mkdir -p $@
 
 # object files:
 $(BUILD_DIR)/%:: $(BUILD_DIR)
