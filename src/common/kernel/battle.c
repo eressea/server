@@ -3054,6 +3054,7 @@ simplename(region * r)
 		}
 		if (isspace(c)) name[i] = '_';
 		else name[i] = *cp;
+		if (c==0) break;
 	}
 	name[i]=0;
 	return name;
