@@ -1974,10 +1974,12 @@ report_option(unit * u, const char * sec, char *cmd)
 		return;
 	}
 	s = getstrtoken();
-	if (s[0])
+#ifdef MSG_LEVELS
+        if (s[0])
 		set_msglevel(&u->faction->warnings, mc->name, atoi(s));
 	else
 		set_msglevel(&u->faction->warnings, mc->name, -1);
+#endif
 }
 
 static void

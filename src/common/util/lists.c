@@ -32,8 +32,8 @@ addlist(void *l1, void *p1)
 
 	/* add entry p to the end of list l */
 
-	list **l;
-	list *p, *q;
+	void_list **l;
+	void_list *p, *q;
 
 	l = l1;
 	p = p1;
@@ -50,12 +50,12 @@ addlist(void *l1, void *p1)
 void
 choplist(void * a, void * b)
 {
-	list **l = (list**)a, *p = (list*)b;
+	void_list **l = (void_list**)a, *p = (void_list*)b;
 	/* remove entry p from list l - when called, a pointer to p must be
 	 * kept in order to use (and free) p; if omitted, this will be a
 	 * memory leak */
 
-	list **q;
+	void_list **q;
 
 	for (q = l; *q; q = &((*q)->next)) {
 		if (*q == p) {
@@ -77,7 +77,7 @@ translist(void *l1, void *l2, void *p)
 }
 
 void
-insertlist(list ** l, list * p)
+insertlist(void_list ** l, void_list * p)
 {
 
 	/* insert entry p at the beginning of list l */
@@ -114,7 +114,7 @@ freelist(void *p1)
 
 	/* remove all entries following and including entry p from a listlist */
 
-	list *p, *p2;
+	void_list *p, *p2;
 
 	p = p1;
 
@@ -129,11 +129,11 @@ freelist(void *p1)
 void
 invert_list(void * heap)
 {
-	list * x = NULL;
-	list * m = *(list**)heap;
+	void_list * x = NULL;
+	void_list * m = *(void_list**)heap;
 	while (m)
 	{
-		list * d = m;
+		void_list * d = m;
 		m = m->next;
 		d->next = x;
 		x = d;
@@ -148,7 +148,7 @@ listlen(void *l)
 	/* count entries p in list l */
 
 	size_t i;
-	list *p;
+	void_list *p;
 
 	for (p = l, i = 0; p; p = p->next, i++);
 	return i;
@@ -164,7 +164,7 @@ listelem(void *l, int n)
 	int i=0;
 
 	while(i < n && l != NULL) {
-			l = ((list *)l)->next;
+			l = ((void_list *)l)->next;
 			i++;
 	}
 

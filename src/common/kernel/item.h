@@ -555,8 +555,6 @@ extern void init_resources(void);
 
 extern const char* resname(resource_t res, int index);
 
-extern int xml_readresource(FILE * F, struct xml_stack * stack);
-
 #ifdef __cplusplus
 }
 #endif

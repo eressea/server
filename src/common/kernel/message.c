@@ -46,12 +46,6 @@
 #include <ctype.h>
 #include <assert.h>
 
-typedef struct warning {
-	struct warning * next;
-	const struct messageclass * section;
-	int level;
-} warning;
-
 typedef struct msg_setting {
 	struct msg_setting *next;
 	const struct message_type *type;
@@ -122,174 +116,6 @@ translate_regions(const char *st, const faction * f)
 		strcat(t, p);
 	return s;
 }
-
-#include <xml.h>
-
-typedef struct xml_state {
-	const char * mtname;
-	const message_type * mtype;
-	int argc;
-	char * argv[32];
-	struct locale * lang;
-	const char * nrsection;
-	const char * nspc;
-	int nrlevel;
-	char * nrtext;
-} xml_state;
-
-static int 
-parse_plaintext(struct xml_stack *stack, const char *str)
-{
-	if (stack) {
-		xml_state * state = (xml_state*)stack->state;
-		const xml_tag * tag = stack->tag;
-		if (strcmp(tag->name, "text")==0) {
-			const xml_tag * tagparent = stack->next->tag;
-			if (strcmp(tagparent->name, "string")==0) {
-				locale_setstring(state->lang, mkname(state->nspc, state->mtname), str);
-			} else {
-				if (state->nrtext!=NULL) free(state->nrtext);
-				state->nrtext = strdup(str);
-			}
-		}
-	}
-	return XML_OK;
-}
-
-static int 
-parse_tagbegin(struct xml_stack *stack)
-{
-	const xml_tag * tag = stack->tag;
-	if (strcmp(tag->name, "messages")==0 || strcmp(tag->name, "strings")==0) {
-		stack->state = calloc(sizeof(xml_state), 1);
-		return XML_OK;
-	} else {
-		xml_state * state = (xml_state*)stack->state;
-		if (strcasecmp(tag->name, "locale")==0) {
-			if (state->mtname!=NULL) {
-				const char * zName = xml_value(tag, "name");
-				if (zName) {
-					state->lang = find_locale(zName);
-					if (state->lang==NULL) state->lang = make_locale(zName);
-				}
- 			}
-		} else if (strcmp(tag->name, "namespace")==0) {
-			const char * tname = xml_value(tag, "name");
-			if (tname) state->nspc = tname;
-			else state->nspc = NULL;
-		} else if (strcmp(tag->name, "string")==0) {
-			const char * tname = xml_value(tag, "name");
-			if (tname) state->mtname = tname;
-			else {
-				state->mtname = NULL;
-				return XML_USERERROR;
-			}
-		} else if (strcmp(tag->name, "message")==0) {
-			const char * tname = xml_value(tag, "name");
-			const char * tsection = xml_value(tag, "section");
-			const char * tlevel = xml_value(tag, "level");
-			state->argc = 0;
-			if (tname) state->mtname = tname;
-			else {
-				state->mtname = NULL;
-				return XML_USERERROR;
-			}
-			if (!tsection) {
-				/* by default, put into events */
-				tsection = "events";
-			}
-			state->nrsection = tsection;
-			mc_add(tsection);
-			if (tlevel) state->nrlevel = atoi(tlevel);
-		} else if (strcasecmp(tag->name, "text")==0) {
-			const char * zLocale = xml_value(tag, "locale");
-			if (zLocale) {
-				state->lang = find_locale(zLocale);
-				if (state->lang==NULL) {
-					state->lang = make_locale(zLocale);
-				}
-			}
-		} else if (strcasecmp(tag->name, "arg")==0) {
-			if (state->mtname!=NULL) {
-				const char * zName = xml_value(tag, "name");
-				const char * zType = xml_value(tag, "type");
-				if (zName && zType) {
-					char zBuffer[128];
-					sprintf(zBuffer, "%s:%s", zName, zType);
-					state->argv[state->argc++] = strdup(zBuffer);
-				}
-			} else {
-				return XML_USERERROR;
-			}
-		} else if (strcasecmp(tag->name, "nr")==0) {
-			if (state->mtname!=NULL) {
-				const char * zSection = xml_value(tag, "section");
-				const char * zLevel = xml_value(tag, "level");
-				if (zSection) {
-					state->nrsection = zSection;
-					mc_add(zSection);
-				}
-				if (zLevel) state->nrlevel = atoi(zLevel);
-			}
-		} else {
-			return XML_USERERROR;
-		}
-	}
-	return XML_OK;
-}
-
-static int 
-parse_tagend(struct xml_stack *stack)
-{
-	const xml_tag * tag = stack->tag;
-
-	if (strcmp(tag->name, "messages")==0 || strcmp(tag->name, "strings")==0) {
-		free(stack->state);
-	} else {
-		xml_state * state = (xml_state*)stack->state;
-		if (strcasecmp(tag->name, "type")==0) {
-			const struct message_type * mtype;
-
-			state->argv[state->argc]=0;
-
-			/* add the messagetype */
-			mtype = mt_find(state->mtname);
-			if (!mtype) mtype = mt_register(mt_new(state->mtname, (const char**)state->argv));
-			
-			while (state->argc--) {
-				free(state->argv[state->argc]); 
-			}
-			if (state->nrtext) {
-				free(state->nrtext);
-				state->nrtext = 0;
-			}
-			state->mtype = mtype;
-		} else if (strcasecmp(tag->name, "locale")==0) {
-			state->lang = NULL;
-		} else if (strcasecmp(tag->name, "namespace")==0) {
-			state->nspc = NULL;
-		} else if (strcasecmp(tag->name, "text")==0) {
-			const xml_tag * tagparent = stack->next->tag;
-			if (strcmp(tagparent->name, "string")!=0) {
-				/* todo: bad test */
-				if (state->argc) {
-					nrt_register(state->mtype, state->lang, state->nrtext, state->nrlevel, state->nrsection);
-					crt_register(state->mtype);
-				}
-				else locale_setstring(state->lang, state->mtname, state->nrtext);
-			}
-		} else if (strcasecmp(tag->name, "message")==0) {
-			state->nrsection = NULL;
-		}
-	}
-	return XML_OK;
-}
-
-static xml_callbacks xml_messages = {
-	parse_tagbegin,
-	parse_tagend,
-	parse_plaintext
-};
 
 void
 free_messages(message_list * m)
@@ -596,27 +422,6 @@ mistake(const unit * u, const char *command, const char *comment, int mtype)
 
 extern unsigned int new_hashstring(const char* s);
 
-void
-set_msglevel(struct warning ** warnings, const char * type, int level)
-{
-	struct warning ** w = warnings;
-	while (*w) {
-		if (!strcasecmp((*w)->section->name, type)) break;
-		w = &(*w)->next;
-	}
-	if (*w && level==-1){
-		struct warning * old = *w;
-		*w = old->next;
-		free(old);
-	} else if (level>=0) {
-		struct warning * x = calloc(sizeof(struct warning), 1);
-		x->next = *w;
-		x->level = level;
-		x->section = mc_find(type);
-		*w = x;
-	}
-}
-
 message * 
 add_message(message_list** pm, message * m)
 {
@@ -635,17 +440,43 @@ add_message(message_list** pm, message * m)
 	return m;
 }
 
+#ifdef MSG_LEVELS
+typedef struct warning {
+  struct warning * next;
+  const struct messageclass * section;
+  int level;
+} warning;
+
+void
+set_msglevel(struct warning ** warnings, const char * type, int level)
+{
+  struct warning ** w = warnings;
+  while (*w) {
+    if (!strcasecmp((*w)->section->name, type)) break;
+    w = &(*w)->next;
+  }
+  if (*w && level==-1){
+    struct warning * old = *w;
+    *w = old->next;
+    free(old);
+  } else if (level>=0) {
+    struct warning * x = calloc(sizeof(struct warning), 1);
+    x->next = *w;
+    x->level = level;
+    x->section = mc_find(type);
+    *w = x;
+  }
+}
+
 void
 write_msglevels(struct warning * warnings, FILE * F)
 {
-#ifdef MSG_LEVELS
 	/* hier ist ein bug? */
 	struct warning * w = warnings;
 	while (w) {
 		fprintf(F, "%s %d ", w->section->name, w->level);
 		w = w->next;
 	}
-#endif
 	fputs("end ", F);
 }
 
@@ -666,10 +497,9 @@ read_msglevels(struct warning ** w, FILE * F)
 		fscanf(F, "%s", buf);
 	}
 }
+#endif
 
 void
 init_messages(void)
 {
-	xml_register(&xml_messages, "eressea messages", 0);
-	xml_register(&xml_messages, "eressea strings", 0);
 }

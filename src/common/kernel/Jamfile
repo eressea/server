@@ -41,6 +41,7 @@ SOURCES =
  terrain.c
  ugroup.c
  unit.c
+ xmlreader.c
  ;
 
 Library kernel : $(SOURCES) ;

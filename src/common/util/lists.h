@@ -27,11 +27,10 @@ extern "C" {
 
 #include <stddef.h>
 
-typedef struct list list;
-struct list {
-	list * next;
-	void * data;
-};
+typedef struct void_list {
+  struct void_list * next;
+  void * data;
+} void_list;
 
 #define list_foreach(type, list, item) item=list; while (item!=NULL) { type* __next__=item->next;
 #define list_continue(item) { item=__next__; continue; }

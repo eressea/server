@@ -21,6 +21,12 @@
 #include <config.h>
 #include "eressea.h"
 
+/* modules includes */
+#include <modules/xecmd.h>
+#ifdef ALLIANCES
+# include <modules/alliance.h>
+#endif
+
 /* attributes includes */
 #include <attributes/reduceproduction.h>
 #include <attributes/otherfaction.h>
@@ -61,10 +67,9 @@
 #include <sql.h>
 #include <xml.h>
 
-#include <modules/xecmd.h>
-#ifdef ALLIANCES
-# include <modules/alliance.h>
-#endif
+/* libxml includes */
+#include <libxml/tree.h>
+#include <libxml/xpath.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -193,21 +198,21 @@ const char *parameters[MAXPARAMS] =
 	"PRIVAT",
 	"HINTEN",
 	"KOMMANDO",
-	"KRÄUTER",
+	"KRAEUTER",
 	"NICHT",
-	"NÄCHSTER",
+	"NAECHSTER",
 	"PARTEI",
 	"ERESSEA",
 	"PERSONEN",
 	"REGION",
 	"SCHIFF",
 	"SILBER",
-	"STRAßEN",
-	"TEMPORÄRE",
+	"STRASSEN",
+	"TEMPORAERE",
 	"FLIEHE",
-	"GEBÄUDE",
+	"GEBAEUDE",
 	"GIB",			/* Für HELFE */
-	"KÄMPFE",
+	"KAEMPFE",
 	"DURCHREISE",
 	"BEWACHE",
 	"ZAUBER",
@@ -225,11 +230,11 @@ const char *parameters[MAXPARAMS] =
 	"HINTER",
 	"VOR",
 	"ANZAHL",
-	"GEGENSTÄNDE",
-	"TRÄNKE",
+	"GEGENSTAENDE",
+	"TRAENKE",
 	"GRUPPE",
 	"PARTEITARNUNG",
-	"BÄUME",
+	"BAEUME",
 	"XEPOTION",
 	"XEBALLOON",
 	"XELAEN"
@@ -260,7 +265,7 @@ const char *keywords[MAXKEYWORDS] =
 	"FORSCHEN",
 	"GIB",
 	"HELFEN",
-	"KÄMPFEN",
+	"KAEMPFEN",
 	"KAMPFZAUBER",
 	"KAUFEN",
 	"KONTAKTIEREN",
@@ -287,8 +292,8 @@ const char *keywords[MAXKEYWORDS] =
 	"VERGESSEN",
 	"ZAUBERE",
 	"ZEIGEN",
-	"ZERSTÖREN",
-	"ZÜCHTEN",
+	"ZERSTOEREN",
+	"ZUECHTEN",
 	"DEFAULT",
 	"REPORT",
 	"URSPRUNG",
@@ -308,7 +313,7 @@ const char *keywords[MAXKEYWORDS] =
 	"JOINVERBAND",
 	"LEAVEVERBAND",
 #endif
-	"PRÄFIX",
+	"PRAEFIX",
 	"SYNONYM",
 	"PFLANZEN",
 	"WERWESEN",
@@ -2215,90 +2220,21 @@ kernel_done(void)
 }
 
 const char * localenames[] = {
-	"de", "en",
-	NULL
+  "de", "en",
+  NULL
 };
-
-static int read_xml(const char * filename, struct xml_stack *stack);
-
-static int
-parse_tagbegin(struct xml_stack *stack)
-{
-	const xml_tag * tag = stack->tag;
-	if (strcmp(tag->name, "include")==0) {
-		const char * filename = xml_value(tag, "file");
-		if (filename) {
-			return read_xml(filename, stack);
-		} else {
-			log_printf("required tag 'file' missing from include");
-			return XML_USERERROR;
-		}
-	} else if (strcmp(tag->name, "game")==0) {
-		const char * welcome = xml_value(tag, "welcome");
-		const char * name = xml_value(tag, "name");
-		int maxunits = xml_ivalue(tag, "units");
-		if (welcome!=NULL) {
-			global.welcomepath = strdup(welcome);
-		}
-		if (name!=NULL) {
-			global.gamename = strdup(name);
-		}
-		if (maxunits!=0) {
-			global.maxunits = maxunits;
-		}
-	} else if (strcmp(tag->name, "param")==0) {
-		const char * name = xml_value(tag, "name");
-		const char * value = xml_value(tag, "value");
-		set_param(&global.parameters, name, value);
-	} else if (strcmp(tag->name, "order")==0) {
-		const char * name = xml_value(tag, "name");
-		if (xml_bvalue(tag, "disable")) {
-			int k;
-			for (k=0;k!=MAXKEYWORDS;++k) {
-				if (strncmp(keywords[k], name, strlen(name))==0) {
-					global.disabled[k]=1;
-					break;
-				}
-			}
-		}
-	}
-	return XML_OK;
-}
-
-static xml_callbacks xml_eressea = {
-	parse_tagbegin, NULL, NULL
-};
-
-static int
-read_xml(const char * filename, xml_stack * stack)
-{
-	char zText[80];
-	FILE * F;
-	int i;
-	sprintf(zText, "%s/%s", resourcepath(), filename);
-	F = fopen(zText, "r+");
-	if (F==NULL) {
-		log_printf("could not open %s: %s\n", zText, strerror(errno));
-		return XML_USERERROR;
-	}
-
-	i = xml_read(F, filename, stack);
-	fclose(F);
-	return i;
-}
 
 int
 init_data(const char * filename)
 {
-	int l;
+  int l;
+  char zText[80];
 
-	xml_register(&xml_eressea, "eressea", 0);
-	xml_register(&xml_eressea, "eressea include", XML_CB_IGNORE);
+  sprintf(zText, "%s/%s", resourcepath(), filename);
+  l = read_xml(zText);
+  if (l) return l;
 
-	l = read_xml(filename, NULL);
-	if (l) return l;
-
-	return 0;
+  return 0;
 }
 
 void

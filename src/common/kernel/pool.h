@@ -56,8 +56,8 @@ int use_pooled_give(struct unit * u, struct region * r, resource_t itm, int coun
 #define GET_DEFAULT (GET_RESERVE|GET_SLACK|GET_POOLED_SLACK)
 
 
-int get_all(const struct unit * u, resource_t itm);
-int use_all(struct unit * u, resource_t itm, int count);
+extern int get_all(const struct unit * u, const struct resource_type * rtype);
+extern int use_all(struct unit * u, const struct resource_type * rtype, int count);
 
 /** use_all
  * verbraucht 'count' Objekte der resource 'itm'

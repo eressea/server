@@ -23,7 +23,6 @@ extern "C" {
 struct message;
 struct messageclass;
 struct faction;
-struct warning;
 struct msglevel;
 
 struct message_type;
@@ -48,17 +47,18 @@ typedef struct msglevel {
 	int level;
 } msglevel;
 
+#ifdef MSG_LEVELS
+struct warning;
 void write_msglevels(struct warning * warnings, FILE * F);
 void read_msglevels(struct warning ** w, FILE * F);
 void set_msglevel(struct warning ** warnings, const char * type, int level);
+#endif
 
 extern struct message * msg_message(const char * name, const char* sig, ...);
 extern struct message * msg_error(const struct unit *, const char *cmd, 
-											 const char * name, const char* sig, ...);
+                                  const char * name, const char* sig, ...);
 extern struct message * add_message(struct message_list** pm, struct message * m);
 extern void free_messages(struct message_list * m);
-extern int load_messages(const char *);
-extern int read_messages(FILE * F, struct xml_stack * stack);
 extern void init_messages(void);
 
 /* message sections */

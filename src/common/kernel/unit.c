@@ -471,8 +471,10 @@ read_unit_reference(unit ** up, FILE * F)
   assert(up!=NULL);
   fscanf(F, "%s", zId);
   i = atoi36(zId);
-  assert(i!=0);
-
+  if (i==0) {
+	*up = NULL;
+	return AT_READ_FAIL;
+  }
   *up = findunit(i);
   if (*up==NULL) ur_add((void*)i, (void**)up, resolve_unit);
   return AT_READ_OK;

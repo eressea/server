@@ -1,20 +1,13 @@
+<?xml version="1.0"?>
 <dungeon size="15" level="1" radius="5" connect="0.50" maxpeople="50">
-	<skilllimit name="sk_stealth" maxvalue="4"></skilllimit>
-	<skilllimit name="sk_magic" maxvalue="5"></skilllimit>
-	<monster boss size="1" max="1" chance="1.0" race="young dragon">
-		<treasure item="money" amount="1000"></treasure>
-		<treasure item="jewel" amount="100"></treasure>
+	<skilllimit name="sk_stealth" maxvalue="4"/>
+	<skilllimit name="sk_magic" maxvalue="5"/>
+	<monster boss="yes" size="1" max="1" chance="1.0" race="young dragon">
+		<treasure item="money" amount="1000"/>
+		<treasure item="jewel" amount="100"/>
 	</monster>
 	<monster size="30" max="10" chance="0.2" race="dracoid">
-		<weapon type="bow"></weapon>
-		<treasure item="money" amount="10"></treasure>
+		<weapon type="bow"/>
+		<treasure item="money" amount="10"/>
 	</monster>
 </dungeon>
-
-<comment>
- #   #
-  # #
- #   # #
-  # #
-     #
-</comment>

@@ -30,7 +30,6 @@
 #include <resolve.h>
 #include <event.h>
 #include <language.h>
-#include <xml.h>
 
 /* libc includes */
 #include <assert.h>
@@ -116,26 +115,26 @@ buildingtype(const building * b, int bsize)
 }
 
 int
-buildingmaintenance(const building * b, resource_t rtype)
+buildingmaintenance(const building * b, const resource_type * rtype)
 {
-	const building_type * bt = b->type;
-	int c, cost=0;
-	static boolean init = false;
-	static const curse_type * nocost_ct;
-	if (!init) { init = true; nocost_ct = ct_find("nocost"); }
-	if (curse_active(get_curse(b->attribs, nocost_ct))) {
-		return 0;
-	}
-	for (c=0;bt->maintenance && bt->maintenance[c].number;++c) {
-		const maintenance * m = bt->maintenance + c;
-		if (m->type==rtype) {
-			if (fval(m, MTF_VARIABLE))
-				cost += (b->size * m->number);
-			else
-				cost += m->number;
-		}
-	}
-	return cost;
+  const building_type * bt = b->type;
+  int c, cost=0;
+  static boolean init = false;
+  static const curse_type * nocost_ct;
+  if (!init) { init = true; nocost_ct = ct_find("nocost"); }
+  if (curse_active(get_curse(b->attribs, nocost_ct))) {
+    return 0;
+  }
+  for (c=0;bt->maintenance && bt->maintenance[c].number;++c) {
+    const maintenance * m = bt->maintenance + c;
+    if (m->rtype==rtype) {
+      if (fval(m, MTF_VARIABLE))
+        cost += (b->size * m->number);
+      else
+        cost += m->number;
+    }
+  }
+  return cost;
 }
 
 #define BMAXHASH 8191
@@ -143,10 +142,10 @@ static building *buildhash[BMAXHASH];
 void
 bhash(building * b)
 {
-	building *old = buildhash[b->no % BMAXHASH];
+  building *old = buildhash[b->no % BMAXHASH];
 
-	buildhash[b->no % BMAXHASH] = b;
-	b->nexthash = old;
+  buildhash[b->no % BMAXHASH] = b;
+  b->nexthash = old;
 }
 
 void
@@ -315,113 +314,10 @@ findbuildingtype(const char * name, const struct locale * lang)
 	return (const building_type*)i;
 }
 
-static int 
-tagend(struct xml_stack * stack)
-{
-	const xml_tag * tag = stack->tag;
-	if (strcmp(tag->name, "building")==0) {
-		bt_register((building_type*)stack->state);
-		stack->state = 0;
-	}
-	return XML_OK;
-}
-
-static int 
-tagbegin(struct xml_stack * stack)
-{
-	building_type * bt = (building_type *)stack->state;
-	const xml_tag * tag = stack->tag;
-	if (strcmp(tag->name, "building")==0) {
-		const char * name = xml_value(tag, "name");
-		if (name!=NULL) {
-			const char * x;
-			bt = stack->state = calloc(sizeof(building_type), 1);
-			bt->_name = strdup(name);
-			bt->magres = xml_ivalue(tag, "magres");
-			bt->magresbonus = xml_ivalue(tag, "magresbonus");
-			bt->fumblebonus = xml_ivalue(tag, "fumblebonus");
-			bt->auraregen = xml_fvalue(tag, "auraregen");
-			if ((x = xml_value(tag, "capacity"))!=0) bt->capacity = atoi(x);
-			else bt->capacity = -1;
-			if ((x = xml_value(tag, "maxcapacity"))!=0) bt->maxcapacity = atoi(x);
-			else bt->maxcapacity = -1;
-			if ((x = xml_value(tag, "maxsize"))!=0) bt->maxsize = atoi(x);
-			else bt->maxsize = -1;
-
-			if (xml_bvalue(tag, "nodestroy")) bt->flags |= BTF_INDESTRUCTIBLE;
-			if (xml_bvalue(tag, "nobuild")) bt->flags |= BTF_NOBUILD;
-			if (xml_bvalue(tag, "unique")) bt->flags |= BTF_UNIQUE;
-			if (xml_bvalue(tag, "decay")) bt->flags |= BTF_DECAY;
-			if (xml_bvalue(tag, "magic")) bt->flags |= BTF_MAGIC;
-			if (xml_bvalue(tag, "protection")) bt->flags |= BTF_PROTECTION;
-		}
-	} else if (bt!=NULL) {
-		if (strcmp(tag->name, "construction")==0) {
-			const char * x;
-			construction * con = calloc(sizeof(construction), 1);
-			if ((x=xml_value(tag, "maxsize"))!=0) con->maxsize = atoi(x);
-			else con->maxsize = -1;
-			if ((x=xml_value(tag, "minskill"))!=0) con->minskill = atoi(x);
-			else con->minskill = -1;
-			if ((x=xml_value(tag, "reqsize"))!=0) con->reqsize = atoi(x);
-			else con->reqsize = -1;
-			con->skill = sk_find(xml_value(tag, "skill"));
-			bt->construction = con;
-		} else if (strcmp(tag->name, "function")==0) {
-			const char * name = xml_value(tag, "name");
-			const char * value = xml_value(tag, "value");
-			if (name && value) {
-				pf_generic fun = get_function(value);
-				if (fun==NULL) {
-					log_error(("unknown function value '%s=%s' for building %s\n", name, value, bt->_name));
-				} else {
-					if (strcmp(name, "name")==0) {
-						bt->name = (const char * (*)(int size))fun;
-					} else if (strcmp(name, "init")==0) {
-						bt->init = (void (*)(struct building_type*))fun;
-					} else {
-						log_error(("unknown function type '%s=%s' for building %s\n", name, value, bt->_name));
-					}
-				}
-			}
-		} else if (strcmp(tag->name, "maintenance")==0) {
-			size_t len = 0;
-			const resource_type * rtype = NULL;
-			maintenance * mt = bt->maintenance;
-			resource_t type = NORESOURCE;
-			if (mt==NULL) {
-				mt = bt->maintenance = calloc(sizeof(struct maintenance), 2);
-				len = 0;
-			} else {
-				while (mt[len].number) ++len;
-				mt = bt->maintenance = realloc(mt, sizeof(struct maintenance)*(len+2));
-			}
-			mt[len+1].number = 0;
-			mt[len].number = xml_ivalue(tag, "amount");
-			rtype = rt_find(xml_value(tag, "type"));
-			for (type=0;type!=MAX_RESOURCES;++type) {
-				if (oldresourcetype[type]==rtype) {
-					mt[len].type = type;
-					break;
-				}
-			}
-			if (xml_bvalue(tag, "variable")) mt[len].flags |= MTF_VARIABLE;
-			if (xml_bvalue(tag, "vital")) mt[len].flags |= MTF_VITAL;
-		} else if (strcmp(tag->name, "requirement")==0) {
-			xml_readrequirement(tag, bt->construction);
-		}
-	}
-	return XML_OK;
-}
-
-static xml_callbacks xml_buildings = {
-	tagbegin, tagend, NULL
-};
 
 void
 register_buildings(void)
 {
-	xml_register(&xml_buildings, "eressea building", 0);
 	register_function((pf_generic)init_smithy, "init_smithy");
 	register_function((pf_generic)castle_name, "castle_name");
 	bt_register(&bt_castle);

@@ -1,120 +1,27 @@
-<resource name="mistletoe">
-	<comment>Sets the chance of escape in a fight to 100 percent</comment>
-	<item notlost weight="0">
-		<function name="use" value="usemistletoe"></function>
-	</item>
-</resource>
-<strings>
-	<string name="mistletoe">
-		<text locale="de">Mistelzweig</text>
-		<text locale="en">mistletoe</text>
-	</string>
-	<string name="mistletoe_p">
-		<text locale="de">Mistelzweige</text>
-		<text locale="en">mistletoes</text>
-	</string>
-</strings>
+<?xml version="1.0"?>
+<resources>
+  <resource name="mistletoe">
+    <!-- Sets the chance of escape in a fight to 100 percent -->
+    <item notlost="yes" weight="0">
+      <function name="use" value="usemistletoe"/>
+    </item>
+  </resource>
+  <resource name="wand_of_tears">
+    <item notlost="yes" weight="1" capacity="0">
+      <function name="use" value="use_wand_of_tears"/>
+    </item>
+  </resource>
 
-<resource name="wand_of_tears">
-	<item notlost weight="1" capacity="0">
-		<function name="use" value="use_wand_of_tears"></function>
-	</item>
-</resource>
-<strings>
-	<string name="wand_of_tears">
-		<text locale="de">Szepter der Tränen</text>
-		<text locale="en">wand of tears</text>
-	</string>
-	<string name="wand_of_tears_p">
-		<text locale="de">Szepter der Tränen</text>
-		<text locale="en">wands of tears</text>
-	</string>
-</strings>
+  <resource name="snowball">
+    <!-- xmas gimmik -->
+    <item notlost="yes" weight="0">
+      <function name="use" value="usesnowball"/>
+    </item>
+  </resource>
 
-<resource name="magicbox">
-	<comment>A magic box that increases the user's capacity by 10 WU</comment>
-	<item cursed weight="0" capacity="1000">
-	</item>
-</resource>
-<strings>
-	<string name="magicbox">
-		<text locale="de">Magische Kiste</text>
-		<text locale="en">magical box</text>
-	</string>
-	<string name="magicbox_p">
-		<text locale="de">Magische Kisten</text>
-		<text locale="en">magical boxes</text>
-	</string>
-</strings>
-
-<resource name="odinshammer">
-	<comment>Odin's Hammer, reward for a quest. Can't be traded or lost</comment>
-	<item cursed notlost weight="200">
-		<weapon minskill="7" skill="sk_melee" magres="0.15" blunt>
-			<modifier value="-1" riding against_riding against_walking offensive skill></modifier>
-			<modifier value="1" walking against_riding defensive skill></modifier>
-			<damage type="default" value="1d20+6"></damage>
-			<damage type="riding" value="1d10+6"></damage>
-		</weapon>
-	</item>
-</resource>
-<strings>
-	<string name="odinshammer">
-		<text locale="de">Odins Hammer</text>
-		<text locale="en">hammer of Odin</text>
-	</string>
-	<string name="odinshammer_p">
-		<text locale="de">Odins Hämmer</text>
-		<text locale="en">hammers of Odin</text>
-	</string>
-</strings>
-<resource name="shovel">
-	<comment>gimmik</comment>
-	<item notlost weight="1">
-	</item>
-</resource>
-<strings>
-	<string name="shovel">
-		<text locale="de">Schaufel</text>
-		<text locale="en">shovel</text>
-	</string>
-	<string name="shovel_p">
-		<text locale="de">Schaufeln</text>
-		<text locale="en">shovels</text>
-	</string>
-</strings>
-
-<resource name="snowball">
-	<comment>xmas gimmik</comment>
-	<item notlost weight="0">
-		<function name="use" value="usesnowball"></function>
-	</item>
-</resource>
-<strings>
-	<string name="snowball">
-		<text locale="de">Schneeball</text>
-		<text locale="en">snowball</text>
-	</string>
-	<string name="snowball_p">
-		<text locale="de">Schneebälle</text>
-		<text locale="en">snowball</text>
-	</string>
-</strings>
-
-<resource name="snowman">
-	<comment>xmas gimmik</comment>
-	<item notlost weight="1">
-	</item>
-</resource>
-<strings>
-	<string name="snowman">
-		<text locale="de">Schneemann</text>
-		<text locale="en">snowman</text>
-	</string>
-	<string name="snowman_p">
-		<text locale="de">Schneemänner</text>
-		<text locale="en">snowmen</text>
-	</string>
-</strings>
-
-
+  <resource name="snowman">
+    <!-- xmas gimmik -->
+    <item notlost="yes" weight="1">
+    </item>
+  </resource>
+</resources>

@@ -25,13 +25,13 @@ LUASERVER_SOURCES =
  ;
 
 LinkLibraries $(SERVER) :
- kernel gamecode items modules attributes spells races triggers util ;
+ gamecode kernel items modules attributes spells races triggers util ;
 LinkLibraries $(LUASERVER) :
- kernel gamecode items modules attributes spells races triggers util ;
+ gamecode kernel items modules attributes spells races triggers util ;
  
-LINKLIBS on $(SERVER) += -lm ;
+LINKLIBS on $(SERVER) += -L$(LUABIND_ROOT)/lib -lm -lxml2 -liconv ;
 LINKLIBS on $(LUASERVER) += -L$(LUABIND_ROOT)/lib -llua50 -llualib50 ;
-LINKLIBS on $(LUASERVER) += -lm -lluabind -ldl -lstdc++ ;
+LINKLIBS on $(LUASERVER) += -lm -lluabind -ldl -lstdc++ -lxml2 -liconv ;
 # -Wl,-R,$(HOME)/software/$(HOST)/lib ;
 
 if $(HAVE_LUA) {

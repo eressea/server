@@ -172,16 +172,22 @@ reverse_lookup(const locale * lang, const char * str)
 	return str;
 }
 
+char *
+mkname_buf(const char * space, const char * name, char * buffer)
+{
+  if (space && *space) {
+    sprintf(buffer, "%s::%s", space, name);
+  } else {
+    strcpy(buffer, name);
+  }
+  return buffer;
+}
+
 const char *
 mkname(const char * space, const char * name)
 {
-	static char zBuffer[128];
-	if (space && *space) {
-		sprintf(zBuffer, "%s::%s", space, name);
-	} else {
-		strcpy(zBuffer, name);
-	}
-	return zBuffer;
+  static char zBuffer[128];
+  return mkname_buf(space, name, zBuffer);
 }
 
 locale *

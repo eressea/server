@@ -16,6 +16,10 @@
 extern "C" {
 #endif
 
+#ifndef DUNGEON_MODULE
+#error "must define DUNGEON_MODULE to use this module"
+#endif
+
 struct region;
 struct plane;
 struct building;

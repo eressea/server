@@ -12,6 +12,8 @@
 
 #include <config.h>
 #include <eressea.h>
+
+#ifdef DUNGEON_MODULE
 #include "dungeon.h"
 #include "gmcmd.h"
 
@@ -260,3 +262,5 @@ register_dungeon(void)
 {
 	xml_register(&xml_dungeon, "eressea dungeon", 0);
 }
+
+#endif

@@ -258,86 +258,8 @@ shipowner(const region * r, const ship * sh)
 	return first;
 }
 
-static int 
-tagend(struct xml_stack * stack)
-{
-	const xml_tag * tag = stack->tag;
-	if (strcmp(tag->name, "ship")==0) {
-		st_register((ship_type*)stack->state);
-		stack->state = 0;
-	}
-	return XML_OK;
-}
-
-static int 
-tagbegin(struct xml_stack * stack)
-{
-	ship_type * st = (ship_type *)stack->state;
-	const xml_tag * tag = stack->tag;
-	if (strcmp(tag->name, "ship")==0) {
-		const char * name = xml_value(tag, "name");
-		if (name!=NULL) {
-			st = stack->state = calloc(sizeof(ship_type), 1);
-			st->name[0] = strdup(name);
-			st->name[1] = strcat(strcpy(malloc(strlen(name)+3), name),"_a");
-			st->cabins = xml_ivalue(tag, "cabins");
-			st->cargo = xml_ivalue(tag, "cargo");
-			st->combat = xml_ivalue(tag, "combat");
-			st->cptskill = xml_ivalue(tag, "cptskill");
-			st->damage = xml_fvalue(tag, "damage");
-			if (xml_bvalue(tag, "fly")) st->flags |= SFL_FLY;
-			if (xml_bvalue(tag, "opensea")) st->flags |= SFL_OPENSEA;
-			st->minskill = xml_ivalue(tag, "minskill");
-			st->range = xml_ivalue(tag, "range");
-			st->storm = xml_fvalue(tag, "storm");
-			st->sumskill = xml_ivalue(tag, "sumskill");
-		}
-	} else if (st!=NULL) {
-		if (strcmp(tag->name, "coast")==0) {
-			int size=0;
-			terrain_t t;
-			terrain_t * add;
-			const char * tname = xml_value(tag, "terrain");
-			if (tname!=NULL) {
-				if (st->coast) {
-					terrain_t * tnew;
-					for (;st->coast[size]!=NOTERRAIN;++size);
-					tnew = malloc(sizeof(terrain_t) * (size+2));
-					memcpy(tnew, st->coast, size*sizeof(terrain_t));
-					free(st->coast);
-					st->coast = tnew;
-					add = st->coast+size;
-				} else {
-					st->coast = malloc(sizeof(terrain_t) * 2);
-					add = st->coast;
-				}
-				add[0] = NOTERRAIN;
-				for (t=0;t!=MAXTERRAINS;++t) if (strcmp(tname, terrain[t].name)==0) {
-					add[0] = t;
-					break;
-				}
-				add[1] = NOTERRAIN;
-			}
-		} else if (strcmp(tag->name, "construction")==0) {
-			construction * con = st->construction = calloc(sizeof(construction), 1);
-			con->maxsize = xml_ivalue(tag, "maxsize");
-			con->minskill = xml_ivalue(tag, "minskill");
-			con->reqsize = xml_ivalue(tag, "reqsize");
-			con->skill = sk_find(xml_value(tag, "skill"));
-		} else if (strcmp(tag->name, "requirement")==0) {
-			xml_readrequirement(tag, st->construction);
-		}
-	}
-	return XML_OK;
-}
-
-static xml_callbacks xml_ships = {
-	tagbegin, tagend, NULL
-};
-
 void
 register_ships(void)
 {
-	xml_register(&xml_ships, "eressea ship", 0);
 }
 

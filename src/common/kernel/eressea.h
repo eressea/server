@@ -74,9 +74,6 @@ struct weapon_type;
 struct ship_type;
 struct building_type;
 
-/* util includes */
-struct xml_stack;
-
 #include <cvector.h>
 #include <umlaut.h>
 #include <language.h>
@@ -887,17 +884,6 @@ typedef struct strlist {
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))
 #define freset(u, i) ((u)->flags &= ~(i))
-
-typedef struct request {
-	struct request * next;
-	struct unit *unit;
-	int qty;
-	int no;
-	union {
-		boolean goblin; /* stealing */
-		const struct luxury_type * ltype; /* trading */
-	} type;
-} request;
 
 extern int turn;
 extern const char *xmlfile;

@@ -86,6 +86,17 @@ typedef struct spende {
 static spende *spenden;
 /* ------------------------------------------------------------- */
 
+typedef struct request {
+  struct request * next;
+  struct unit *unit;
+  int qty;
+  int no;
+  union {
+    boolean goblin; /* stealing */
+    const struct luxury_type * ltype; /* trading */
+  } type;
+} request;
+
 static request workers[1024];
 static request *nextworker;
 static int working;
@@ -1094,15 +1105,15 @@ maintain(building * b, boolean first)
 			/* first ist im ersten versuch true, im zweiten aber false! Das
 			* bedeutet, das in der Runde in die Region geschafften Resourcen
 			* nicht genutzt werden können, weil die reserviert sind! */
-			if (!first) need -= get_all(u, m->type);
-			else need -= get_pooled(u, r, m->type);
+			if (!first) need -= get_all(u, m->rtype);
+			else need -= new_get_pooled(u, m->rtype, GET_DEFAULT);
 			if (!first && need > 0) {
 				unit * ua;
 				for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FL_DH);
 				fset(u->faction, FL_DH); /* hat schon */
 				for (ua=r->units;ua;ua=ua->next) {
 					if (!fval(ua->faction, FL_DH) && (ua->faction == u->faction || alliedunit(ua, u->faction, HELP_MONEY))) {
-						need -= new_get_pooled(ua, oldresourcetype[m->type], GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE);
+						need -= get_all(ua, m->rtype);
 						fset(ua->faction, FL_DH);
 						if (need<=0) break;
 					}
@@ -1137,19 +1148,19 @@ maintain(building * b, boolean first)
 			if (!fval(m, MTF_VITAL) && !work) continue;
 			if (fval(m, MTF_VARIABLE)) cost = cost * b->size;
 
-			if (!first) cost -= new_use_pooled(u, oldresourcetype[m->type], GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE, cost);
-			else cost -= new_use_pooled(u, oldresourcetype[m->type], GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, cost);
+			if (!first) cost -= use_all(u, m->rtype, cost);
+			else cost -= new_use_pooled(u, m->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, cost);
 			if (!first && cost > 0) {
 				unit * ua;
 				for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FL_DH);
 				fset(u->faction, FL_DH); /* hat schon */
 				for (ua=r->units;ua;ua=ua->next) {
 					if (!fval(ua->faction, FL_DH) && alliedunit(ua, u->faction, HELP_MONEY)) {
-						int give = use_all(ua, m->type, cost);
+						int give = use_all(ua, m->rtype, cost);
 						if (!give) continue;
 						cost -= give;
 						fset(ua->faction, FL_DH);
-						if (m->type==R_SILVER) add_spende(ua->faction, u->faction, give, r);
+						if (m->rtype==r_silver) add_spende(ua->faction, u->faction, give, r);
 						if (cost<=0) break;
 					}
 				}
@@ -2425,7 +2436,7 @@ expandstealing(region * r, request * stealorders)
 	for (i = 0; i != norders && oa[i].unit->n <= oa[i].unit->wants; i++) {
 		unit *u = findunitg(oa[i].no, r);
 		int n = 0;
-		if (u && u->region==r) n = get_all(u, R_SILVER);
+		if (u && u->region==r) n = get_all(u, r_silver);
 #ifndef GOBLINKILL
 		if (oa[i].type.goblin) { /* Goblin-Spezialklau */
 			int uct = 0;
@@ -2443,7 +2454,7 @@ expandstealing(region * r, request * stealorders)
 		}
 		if (n > 0) {
 			n = min(n, oa[i].unit->wants);
-			use_all(u, R_SILVER, n);
+			use_all(u, r_silver, n);
 			oa[i].unit->n = n;
 			change_money(oa[i].unit, n);
 			ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount", u, u->region, n));
@@ -2637,6 +2648,10 @@ pflanze(region *r, unit *u)
 	param_t p;
 	const item_type * itype = NULL;
 
+  if (r->land==NULL) {
+	/* TODO: error message here */
+	return;
+  }
 	/* pflanze [<anzahl>] <parameter> */
 	s = getstrtoken();
 	m = atoi(s);

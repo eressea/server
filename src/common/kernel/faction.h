@@ -70,7 +70,9 @@ typedef struct faction {
 #ifdef USE_UGROUPS
 	struct ugroup *ugroups;
 #endif
+#ifdef MSG_LEVELS
 	struct warning * warnings;
+#endif
 	struct msglevel * msglevels;
 	struct ally *allies;
 	struct group *groups;

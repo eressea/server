@@ -396,6 +396,9 @@
 		<File
 			RelativePath=".\unit.c">
 		</File>
+		<File
+			RelativePath=".\xmlreader.c">
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

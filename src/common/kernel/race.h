@@ -98,6 +98,7 @@ extern struct race * races;
 extern struct race * rc_find(const char *);
 extern const char * rc_name(const struct race *, int);
 extern struct race * rc_add(struct race *);
+extern struct race * rc_new(const char * zName);
 extern int rc_specialdamage(const race *, const race *, const struct weapon_type *);
 
 /* Flags */

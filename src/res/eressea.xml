@@ -1,36 +1,38 @@
-<eressea>
-	<include file="messages.xml"></include>
+<?xml version="1.0"?>
+<eressea xmlns:xi="http://www.w3.org/2001/XInclude">
+	<xi:include href="messages.xml"/>
 
 	<comment>Localization</comment>
-	<include file="de/strings.xml"></include>
-	<include file="en/strings.xml"></include>
+	<xi:include href="de/strings.xml"/>
+	<xi:include href="en/strings.xml"/>
 
-	<include file="races.xml"></include>
-	<include file="resources.xml"></include>
-	<include file="ships.xml"></include>
-	<include file="buildings.xml"></include>
+	<xi:include href="races.xml"/>
+	<xi:include href="resources.xml"/>
+	<xi:include href="ships.xml"/>
+	<xi:include href="buildings.xml"/>
 
 	<game name="Eressea" welcome="eressea">
 		<comment>Game specific</comment>
-		<order name="MEINUNG" disable></order>
-		<order name="MAGIEGEBIET" disable></order>
-		<param name="entertain.base" value="0"></param>
-		<param name="entertain.perlevel" value="20"></param>
-		<param name="nmr.timeout" value="4"></param>
-		<param name="nmr.removenewbie" value="1"></param>
-		<param name="GiveRestriction" value="3"></param>
-		<param name="database.gameid" value="0"></param>
-		<param name="hunger.long" value="1"></param>
+		<order name="MEINUNG" disable="yes"/>
+		<order name="MAGIEGEBIET" disable="yes"/>
+		<param name="entertain.base" value="0"/>
+		<param name="entertain.perlevel" value="20"/>
+		<param name="nmr.timeout" value="4"/>
+		<param name="nmr.removenewbie" value="1"/>
+		<param name="GiveRestriction" value="3"/>
+		<param name="database.gameid" value="0"/>
+		<param name="hunger.long" value="1"/>
 	</game>
-	<include file="eressea/de/strings.xml"></include>
-	<include file="eressea/en/strings.xml"></include>
-	<include file="eressea/races.xml"></include>
-	<include file="eressea/items.xml"></include>
-	<include file="eressea/dungeons.xml"></include>
-	<include file="eressea/temple.xml"></include>
+	<xi:include href="eressea/de/strings.xml"/>
+	<xi:include href="eressea/en/strings.xml"/>
+	<xi:include href="eressea/races.xml"/>
+	<xi:include href="eressea/items.xml"/>
+	<xi:include href="eressea/dungeons.xml"/>
+	<xi:include href="eressea/temple.xml"/>
 	<strings>
 		<string name="mailto">
-			<text>eressea-server@eressea.upb.de</text>
+			<text locale="de">eressea-server@eressea.upb.de</text>
+			<text locale="en">eressea-server@eressea.upb.de</text>
 		</string>
 		<string name="mailcmd">
 			<text locale="de">ERESSEA BEFEHLE</text>

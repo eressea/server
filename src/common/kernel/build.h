@@ -87,8 +87,6 @@ void destroy_ship(struct ship * s, struct region * r);
 extern int build(struct unit * u, const construction * ctype, int completed, int want);
 extern int maxbuild(const struct unit *u, const construction *cons);
 
-extern void xml_readrequirement(const struct xml_tag * tag, construction * con);
-
 /** error messages that build may return: */
 #define ELOWSKILL -1
 #define ENEEDSKILL -2

@@ -1,10 +1,11 @@
-<comment>
-  Due to extreme lazyness on Enno's part, this file doesn't contain everything.
-  A lot of what it should contain is currently in de/strings.xml.
-</comment>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <strings>
-	<comment> OPTION [x]</comment>
+	<!--
+	  Due to extreme lazyness on Enno's part, this file doesn't contain everything.
+	  A lot of what it should contain is currently in de/strings.xml.
+	 -->
+
+	<!-- OPTION [x] -->
 	<string name="ADRESSEN">
 		<text locale="en">ADDRESSES</text>
 	</string>
@@ -49,7 +50,7 @@
 		<text locale="en">INFO</text>
 	</string>
 
-	<comment> ship types</comment>
+	<!-- ship types -->
 	<string name="caravel">
 		<text locale="en">caravel</text>
 	</string>
@@ -69,7 +70,7 @@
 		<text locale="en">balloon</text>
 	</string>
 
-	<comment>Schiffstypen</comment>
+	<!--Schiffstypen -->
 	<string name="caravel_a">
 		<text locale="en">a caravel</text>
 	</string>
@@ -89,7 +90,7 @@
 		<text locale="en">a trireme</text>
 	</string>
 
-	<comment>  Terraintypen</comment>
+	<!--  Terraintypen -->
 	<string name="activevolcano">
 		<text locale="en">active volcano</text>
 	</string>
@@ -219,7 +220,7 @@
 		<text locale="en">portal</text>
 	</string>
 
-	<comment> directions</comment>
+	<!-- directions -->
 	<string name="dir_nw">
 		<text locale="en">NW</text>
 	</string>
@@ -293,7 +294,7 @@
 		<text locale="en">New Spells</text>
 	</string>
 
-	<comment>  Building Types</comment>
+	<!--  Building Types -->
 	<string name="academy">
 		<text locale="en">academy</text>
 	</string>
@@ -349,7 +350,7 @@
 		<text locale="en">tunnel</text>
 	</string>
 
-	<comment>  Burgausbaustufen</comment>
+	<!--  Burgausbaustufen -->
 	<string name="site">
 		<text locale="en">foundation</text>
 	</string>
@@ -372,7 +373,7 @@
 		<text locale="en">citadel</text>
 	</string>
 
-	<comment>  Items</comment>
+	<!--  Items -->
 	<string name="herb">
 		<text locale="en">herb</text>
 	</string>
@@ -383,7 +384,7 @@
 		<text locale="en">vials</text>
 	</string>
 
-	<comment>  Resourcen</comment>
+	<!--  Resourcen -->
 	<string name="money">
 		<text locale="en">silver</text>
 	</string>
@@ -415,7 +416,7 @@
 		<text locale="en">peasants</text>
 	</string>
 
-	<comment>  items</comment>
+	<!--  items -->
 	<string name="almond">
 		<text locale="en">almond</text>
 	</string>
@@ -900,7 +901,7 @@
 		<text locale="en">gingerbread hearts</text>
 	</string>
 
-	<comment>  luxury goods</comment>
+	<!--  luxury goods -->
 	<string name="balm">
 		<text locale="en">balm</text>
 	</string>
@@ -944,7 +945,7 @@
 		<text locale="en">incense</text>
 	</string>
 
-	<comment>  Spezialitems</comment>
+	<!--  Spezialitems -->
 	<string name="lmsreward">
 		<text locale="en">Belt of Heroic Legends</text>
 	</string>
@@ -952,7 +953,7 @@
 		<text locale="en">Belts of Heroic Legends</text>
 	</string>
 
-	<comment>  intranslatables:</comment>
+	<!--  intranslatables: -->
 	<string name="h0">
 		<text locale="en">Flachwurz</text>
 	</string>
@@ -960,10 +961,10 @@
 		<text locale="en">Flachwurz</text>
 	</string>
 	<string name="h1">
-		<text locale="en">Würziger Wagemut</text>
+		<text locale="en">Wuerziger Wagemut</text>
 	</string>
 	<string name="h1_p">
-		<text locale="en">Würzige Wagemut</text>
+		<text locale="en">Wuerzige Wagemut</text>
 	</string>
 	<string name="h2">
 		<text locale="en">Eulenauge</text>
@@ -972,10 +973,10 @@
 		<text locale="en">Eulenaugen</text>
 	</string>
 	<string name="h3">
-		<text locale="en">Grüner Spinnerich</text>
+		<text locale="en">spider ivy</text>
 	</string>
 	<string name="h3_p">
-		<text locale="en">Grüne Spinneriche</text>
+		<text locale="en">spider ivies</text>
 	</string>
 	<string name="h4">
 		<text locale="en">Blauer Baumringel</text>
@@ -990,10 +991,10 @@
 		<text locale="en">Elfenlieb</text>
 	</string>
 	<string name="h6">
-		<text locale="en">Gurgelkraut</text>
+		<text locale="en">bugleweed</text>
 	</string>
 	<string name="h6_p">
-		<text locale="en">Gurgelkräuter</text>
+		<text locale="en">bugleweeds</text>
 	</string>
 	<string name="h7">
 		<text locale="en">Knotiger Saugwurz</text>
@@ -1020,10 +1021,10 @@
 		<text locale="en">Kakteenschwitze</text>
 	</string>
 	<string name="h11">
-		<text locale="en">Sandfäule</text>
+		<text locale="en">sand reeker</text>
 	</string>
 	<string name="h11_p">
-		<text locale="en">Sandfäulen</text>
+		<text locale="en">sand reekers</text>
 	</string>
 	<string name="h12">
 		<text locale="en">Windbeutel</text>
@@ -1044,10 +1045,10 @@
 		<text locale="en">Alraunen</text>
 	</string>
 	<string name="h15">
-		<text locale="en">Steinbeißer</text>
+		<text locale="en">rock weed</text>
 	</string>
 	<string name="h15_p">
-		<text locale="en">Steinbeißer</text>
+		<text locale="en">rock weed</text>
 	</string>
 	<string name="h16">
 		<text locale="en">Spaltwachs</text>
@@ -1056,10 +1057,10 @@
 		<text locale="en">Spaltwachse</text>
 	</string>
 	<string name="h17">
-		<text locale="en">Höhlenglimm</text>
+		<text locale="en">cave lichen</text>
 	</string>
 	<string name="h17_p">
-		<text locale="en">Höhlenglimme</text>
+		<text locale="en">cave lichen</text>
 	</string>
 	<string name="h18">
 		<text locale="en">Eisblume</text>
@@ -1068,10 +1069,10 @@
 		<text locale="en">Eisblumen</text>
 	</string>
 	<string name="h19">
-		<text locale="en">Weißer Wüterich</text>
+		<text locale="en">white hemlock</text>
 	</string>
 	<string name="h19_p">
-		<text locale="en">Weiße Wüteriche</text>
+		<text locale="en">white hemlocks</text>
 	</string>
 	<string name="h20">
 		<text locale="en">Snowcrystal petal</text>
@@ -1098,10 +1099,10 @@
 		<text locale="en">waters of life</text>
 	</string>
 	<string name="p3">
-		<text locale="en">Schaffenstrunk</text>
+		<text locale="en">busybeer</text>
 	</string>
 	<string name="p3_p">
-		<text locale="en">Schaffenstrünke</text>
+		<text locale="en">busybeers</text>
 	</string>
 	<string name="p4">
 		<text locale="en">ointment</text>
@@ -1170,7 +1171,7 @@
 		<text locale="en">healing potions</text>
 	</string>
 
-	<comment>  Parameters</comment>
+	<!--  Parameters -->
 	<string name="AGGRESSIV">
 		<text locale="en">AGGRESSIVE</text>
 	</string>
@@ -1183,7 +1184,7 @@
 	<string name="AURA">
 		<text locale="en">AURA</text>
 	</string>
-	<string name="BÄUME">
+	<string name="BAEUME">
 		<text locale="en">TREES</text>
 	</string>
 	<string name="BAUERN">
@@ -1213,10 +1214,10 @@
 	<string name="FREMDES">
 		<text locale="en">FOREIGN</text>
 	</string>
-	<string name="GEBÄUDE">
+	<string name="GEBAEUDE">
 		<text locale="en">BUILDING</text>
 	</string>
-	<string name="GEGENSTÄNDE">
+	<string name="GEGENSTAENDE">
 		<text locale="en">ITEMS</text>
 	</string>
 	<string name="GIB">
@@ -1237,16 +1238,16 @@
 	<string name="KOMMANDO">
 		<text locale="en">CONTROL</text>
 	</string>
-	<string name="KRÄUTER">
+	<string name="KRAEUTER">
 		<text locale="en">HERBS</text>
 	</string>
-	<string name="KÄMPFE">
+	<string name="KAEMPFE">
 		<text locale="en">COMBAT</text>
 	</string>
 	<string name="NICHT">
 		<text locale="en">NOT</text>
 	</string>
-	<string name="NÄCHSTER">
+	<string name="NAECHSTER">
 		<text locale="en">NEXT</text>
 	</string>
 	<string name="PARTEI">
@@ -1273,16 +1274,16 @@
 	<string name="SILBER">
 		<text locale="en">SILVER</text>
 	</string>
-	<string name="STRAßEN">
+	<string name="STRASSEN">
 		<text locale="en">ROADS</text>
 	</string>
 	<string name="STUFE">
 		<text locale="en">LEVEL</text>
 	</string>
-	<string name="TEMPORÄRE">
+	<string name="TEMPORAERE">
 		<text locale="en">TEMPORARY</text>
 	</string>
-	<string name="TRÄNKE">
+	<string name="TRAENKE">
 		<text locale="en">POTIONS</text>
 	</string>
 	<string name="UM">
@@ -1298,7 +1299,7 @@
 		<text locale="en">SPELLS</text>
 	</string>
 
-	<comment>  Skills</comment>
+	<!--  Skills -->
 	<string name="sk_alchemy">
 		<text locale="en">alchemy</text>
 	</string>
@@ -1387,7 +1388,7 @@
 		<text locale="en">weaponsmithing</text>
 	</string>
 
-	<comment>  Keywords</comment>
+	<!--  Keywords -->
 	<string name="//">
 		<text locale="en">//</text>
 	</string>
@@ -1469,7 +1470,7 @@
 	<string name="KONTAKTIEREN">
 		<text locale="en">CONTACT</text>
 	</string>
-	<string name="KÄMPFEN">
+	<string name="KAEMPFEN">
 		<text locale="en">COMBAT</text>
 	</string>
 	<string name="LEHREN">
@@ -1517,7 +1518,7 @@
 	<string name="PIRATERIE">
 		<text locale="en">PIRACY</text>
 	</string>
-	<string name="PRÄFIX">
+	<string name="PRAEFIX">
 		<text locale="en">PREFIX</text>
 	</string>
 	<string name="REKRUTIEREN">
@@ -1577,273 +1578,17 @@
 	<string name="ZEIGEN">
 		<text locale="en">SHOW</text>
 	</string>
-	<string name="ZERSTÖREN">
+	<string name="ZERSTOEREN">
 		<text locale="en">DESTROY</text>
 	</string>
-	<string name="ZÜCHTEN">
+	<string name="ZUECHTEN">
 		<text locale="en">GROW</text>
 	</string>
 	<string name="WERWESEN">
 		<text locale="en">LYCANTROPE</text>
 	</string>
 
-	<string name="Adler">
-		<text locale="en">eagle</text>
-	</string>
-	<string name="Drache">
-		<text locale="en">dragon</text>
-	</string>
-	<string name="Drachen">
-		<text locale="en">dragons</text>
-	</string>
-	<string name="Dämon">
-		<text locale="en">demon</text>
-	</string>
-	<string name="Dämonen">
-		<text locale="en">demons</text>
-	</string>
-	<string name="Einhorn">
-		<text locale="en">unicorn</text>
-	</string>
-	<string name="Einhörner">
-		<text locale="en">unicorns</text>
-	</string>
-	<string name="Elf">
-		<text locale="en">elf</text>
-	</string>
-	<string name="Elfen">
-		<text locale="en">elves</text>
-	</string>
-	<string name="Eule">
-		<text locale="en">owl</text>
-	</string>
-	<string name="Eulen">
-		<text locale="en">owls</text>
-	</string>
-	<string name="Geist">
-		<text locale="en">ghost</text>
-	</string>
-	<string name="Geister">
-		<text locale="en">ghosts</text>
-	</string>
-	<string name="Goblin">
-		<text locale="en">goblin</text>
-	</string>
-	<string name="Goblins">
-		<text locale="en">goblins</text>
-	</string>
-	<string name="Halbling">
-		<text locale="en">halfling</text>
-	</string>
-	<string name="Halblinge">
-		<text locale="en">halflings</text>
-	</string>
-	<string name="Hirntöter">
-		<text locale="en">braineater</text>
-	</string>
-	<string name="Insekt">
-		<text locale="en">insect</text>
-	</string>
-	<string name="Insekten">
-		<text locale="en">insects</text>
-	</string>
-	<string name="Jungdrache">
-		<text locale="en">young dragon</text>
-	</string>
-	<string name="Jungdrachen">
-		<text locale="en">young dragons</text>
-	</string>
-	<string name="Katze">
-		<text locale="en">cat</text>
-	</string>
-	<string name="Katzen">
-		<text locale="en">cats</text>
-	</string>
-	<string name="Katzendrache">
-		<text locale="en">catdragon</text>
-	</string>
-	<string name="Katzendrachen">
-		<text locale="en">catdragons</text>
-	</string>
-	<string name="Luchs">
-		<text locale="en">lynx</text>
-	</string>
-	<string name="Luchse">
-		<text locale="en">lynx</text>
-	</string>
-	<string name="Meermensch">
-		<text locale="en">aquarian</text>
-	</string>
-	<string name="Meermenschen">
-		<text locale="en">aquarians</text>
-	</string>
-	<string name="Mensch">
-		<text locale="en">human</text>
-	</string>
-	<string name="Menschen">
-		<text locale="en">humans</text>
-	</string>
-	<string name="Ork">
-		<text locale="en">orc</text>
-	</string>
-	<string name="Orks">
-		<text locale="en">orcs</text>
-	</string>
-	<string name="Uruk">
-		<text locale="en">orc</text>
-	</string>
-	<string name="Uruks">
-		<text locale="en">orcs</text>
-	</string>
-	<string name="Riesenschildkröte">
-		<text locale="en">giant turtle</text>
-	</string>
-	<string name="Riesenschildkröten">
-		<text locale="en">giant turtles</text>
-	</string>
-	<string name="Schablone">
-		<text locale="en">template</text>
-	</string>
-	<string name="Schablonen">
-		<text locale="en">templates</text>
-	</string>
-	<string name="Schattenritter">
-		<text locale="en">shadow knight</text>
-	</string>
-	<string name="Seeschlange">
-		<text locale="en">sea serpent</text>
-	</string>
-	<string name="Troll">
-		<text locale="en">troll</text>
-	</string>
-	<string name="Trolle">
-		<text locale="en">trolls</text>
-	</string>
-	<string name="Untote">
-		<text locale="en">undead</text>
-	</string>
-	<string name="Untoter">
-		<text locale="en">undead</text>
-	</string>
-	<string name="Warg">
-		<text locale="en">wolf</text>
-	</string>
-	<string name="Warge">
-		<text locale="en">wolves</text>
-	</string>
-	<string name="Zombie">
-		<text locale="en">zombie</text>
-	</string>
-	<string name="Zombie_p">
-		<text locale="en">zombies</text>
-	</string>
-	<string name="Zwerg">
-		<text locale="en">dwarf</text>
-	</string>
-	<string name="Zwerge">
-		<text locale="en">dwarves</text>
-	</string>
-	<string name="Kröte">
-		<text locale="en">toad</text>
-	</string>
-	<string name="Kröten">
-		<text locale="en">toads</text>
-	</string>
-	<string name="Klon">
-		<text locale="en">clone</text>
-	</string>
-	<string name="Gnom">
-		<text locale="en">gnome</text>
-	</string>
-	<string name="Museumsgeist">
-		<text locale="en">museumghost</text>
-	</string>
-	<string name="Ghast">
-		<text locale="en">ghast</text>
-	</string>
-	<string name="Ghoul">
-		<text locale="en">ghoul</text>
-	</string>
-	<string name="Juju-Zombie">
-		<text locale="en">juju-zombie</text>
-	</string>
-	<string name="Skelettherr">
-		<text locale="en">skeleton lord</text>
-	</string>
-	<string name="Zentaur">
-		<text locale="en">centaur</text>
-	</string>
-	<string name="Krake">
-		<text locale="en">kraken</text>
-	</string>
-	<string name="Delphin">
-		<text locale="en">dolphin</text>
-	</string>
-	<string name="Tiger">
-		<text locale="en">tiger</text>
-	</string>
-	<string name="Höllenkatze">
-		<text locale="en">hellcat</text>
-	</string>
-	<string name="Traumkatze">
-		<text locale="en">dreamcat</text>
-	</string>
-	<string name="Teufelchen">
-		<text locale="en">imp</text>
-	</string>
-	<string name="Nymphe">
-		<text locale="en">nymph</text>
-	</string>
-	<string name="Singdrache">
-		<text locale="en">songdragon</text>
-	</string>
-	<string name="Ratte">
-		<text locale="en">rat</text>
-	</string>
-	<string name="Tunnelwurm">
-		<text locale="en">tunnelworm</text>
-	</string>
-	<string name="Wolf">
-		<text locale="en">wolf</text>
-	</string>
-	<string name="Bauer">
-		<text locale="en">peasant</text>
-	</string>
-	<string name="Alp">
-		<text locale="en">alp</text>
-	</string>
-	<string name="Bergwächter">
-		<text locale="en">mountainguard</text>
-	</string>
-	<string name="Schattenmeister">
-		<text locale="en">shadowmaster</text>
-	</string>
-	<string name="Schattendämon">
-		<text locale="en">shadowdemon</text>
-	</string>
-	<string name="Eisengolem">
-		<text locale="en">irongolem</text>
-	</string>
-	<string name="Zauber">
-		<text locale="en">spell</text>
-	</string>
-	<string name="Spezial">
-		<text locale="en">special</text>
-	</string>
-	<string name="Dracoid">
-		<text locale="en">dracoid</text>
-	</string>
-	<string name="Ent">
-		<text locale="en">ent</text>
-	</string>
-	<string name="Wyrm">
-		<text locale="en">wyrm</text>
-	</string>
-	<string name="Illusion">
-		<text locale="en">illusion</text>
-	</string>
-
-	<comment>  NR generieren</comment>
+	<!--  NR generieren -->
 	<string name="nr_options">
 		<text locale="en">Options</text>
 	</string>
@@ -1865,7 +1610,7 @@
 	<string name="nr_youaredead">
 		<text locale="en">Your faction has been eliminated. We hope you had a good time anyways, and encourage you to sign up you for another game.</text>
 	</string>
-	<comment> TODO: calendar ist noch komplexer</comment>
+	<!-- TODO: calendar ist noch komplexer -->
 	<string name="nr_skills">
 		<text locale="en">skills</text>
 	</string>
@@ -1903,7 +1648,7 @@
 		<text locale="en">damage</text>
 	</string>
 
-	<comment> Testitem</comment>
+	<!-- Testitem -->
 	<string name="wand">
 		<text locale="en">wand</text>
 	</string>
@@ -1911,27 +1656,39 @@
 		<text locale="en">wands</text>
 	</string>
 
-	<comment>  Küsten</comment>
-	<string name="Nordwestküste">
+	<!--  Coasts -->
+	<namespace name="coast">
+	<string name="nw">
 		<text locale="en">northwest coast</text>
 	</string>
-	<string name="Nordostküste">
+	<string name="ne">
 		<text locale="en">northeast coast</text>
 	</string>
-	<string name="Ostküste">
+	<string name="e">
 		<text locale="en">east coast</text>
 	</string>
-	<string name="Südostküste">
+	<string name="se">
 		<text locale="en">southeast coast</text>
 	</string>
-	<string name="Südwestküste">
+	<string name="sw">
 		<text locale="en">southwest coast</text>
 	</string>
-	<string name="Westküste">
+	<string name="w">
 		<text locale="en">west coast</text>
 	</string>
+	</namespace>
 
 	<string name="nr_nmr">
 		<text locale="en">No orders were received for your faction!</text>
+	</string>
+
+	<!-- resources -->
+	<string name="mistletoe">
+		<text locale="de">Mistelzweig</text>
+		<text locale="en">mistletoe</text>
+	</string>
+	<string name="mistletoe_p">
+		<text locale="de">Mistelzweige</text>
+		<text locale="en">mistletoes</text>
 	</string>
 </strings>

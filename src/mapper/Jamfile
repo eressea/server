@@ -20,8 +20,8 @@ SOURCES =
 
 Main mapper : $(SOURCES) ;
 LinkLibraries mapper :
- kernel
  gamecode 
+ kernel
  items
  modules 
  attributes
@@ -30,4 +30,4 @@ LinkLibraries mapper :
  triggers
  util ;
  
-LINKLIBS on mapper += -lm -lncurses ;
+LINKLIBS on mapper += -L$(LUABIND_ROOT)/lib -lm -lncurses -lxml2 -liconv ;

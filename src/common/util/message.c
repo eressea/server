@@ -32,35 +32,35 @@ mt_name(const message_type* mtype)
 message_type *
 mt_new(const char * name, const char * args[])
 {
-	int i, nparameters;
-	message_type * mtype = (message_type *)malloc(sizeof(message_type));
+  int i, nparameters = 0;
+  message_type * mtype = (message_type *)malloc(sizeof(message_type));
 
-	for (nparameters=0;args[nparameters];++nparameters);
+  if (args!=NULL) for (nparameters=0;args[nparameters];++nparameters);
 
-	mtype->name = strdup(name);
-	mtype->nparameters = nparameters;
-	if(nparameters > 0) {
-		mtype->pnames = (const char**)malloc(sizeof(char*) * nparameters);
-		mtype->types = (const char**)malloc(sizeof(char*) * nparameters);
+  mtype->name = strdup(name);
+  mtype->nparameters = nparameters;
+  if (nparameters > 0) {
+	mtype->pnames = (const char**)malloc(sizeof(char*) * nparameters);
+	mtype->types = (const char**)malloc(sizeof(char*) * nparameters);
+  } else {
+	mtype->pnames = NULL;
+	mtype->types = NULL;
+  }
+  if (args!=NULL) for (i=0;args[i];++i) {
+	const char * x = args[i];
+	const char * spos = strchr(x, ':');
+	if (spos==NULL) {
+	  mtype->pnames[i] = strdup(x);
+	  mtype->types[i] = NULL;
 	} else {
-		mtype->pnames = NULL;
-		mtype->types = NULL;
+	  char * cp = strncpy(malloc(spos-x+1), x, spos-x);
+	  cp[spos-x] = '\0';
+	  mtype->pnames[i] = cp;
+	  /* optimierung: Typ-Strings zentral verwalten. */
+	  mtype->types[i] = strdup(spos+1);
 	}
-	for (i=0;args[i];++i) {
-		const char * x = args[i];
-		const char * spos = strchr(x, ':');
-		if (spos==NULL) {
-			mtype->pnames[i] = strdup(x);
-			mtype->types[i] = NULL;
-		} else {
-			char * cp = strncpy(malloc(spos-x+1), x, spos-x);
-			cp[spos-x] = '\0';
-			mtype->pnames[i] = cp;
-			/* optimierung: Typ-Strings zentral verwalten. */
-			mtype->types[i] = strdup(spos+1);
-		}
-	}
-	return mtype;
+  }
+  return mtype;
 }
 
 message_type *

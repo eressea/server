@@ -23,9 +23,9 @@ extern "C" {
 #define MTF_VITAL    0x02	/* if resource missing, building may crash */
 
 typedef struct maintenance {
-	resource_t type; /* type of resource required */
-	int number;         /* amount of resources */
-	unsigned int flags; /* misc. flags */
+  const struct resource_type * rtype; /* type of resource required */
+  int number;         /* amount of resources */
+  unsigned int flags; /* misc. flags */
 } maintenance;
 
 /* building_type::flags */
@@ -110,7 +110,7 @@ extern void add_buildinglist(building_list **bl, struct building *b);
 extern attrib_type at_building_generic_type;
 extern const char * buildingtype(const struct building * b, int bsize);
 extern const char * buildingname(const struct building * b);
-extern int buildingmaintenance(const building * b, resource_t rtype);
+extern int buildingmaintenance(const building * b, const struct resource_type * rtype);
 extern int buildingcapacity(const struct building * b);
 extern struct building *new_building(const struct building_type * typ, struct region * r, const struct locale * lang);
 void build_building(struct unit * u, const struct building_type * typ, int size);

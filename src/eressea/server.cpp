@@ -37,9 +37,6 @@
 #include <items/items.h>
 
 /* modules includes */
-#ifdef DUNGEON_MODULE
-#include <modules/dungeon.h>
-#endif
 #include <modules/score.h>
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
@@ -53,36 +50,40 @@
 #ifdef ARENA_MODULE
 #include <modules/arena.h>
 #endif
+#ifdef DUNGEON_MODULE
+#include <modules/dungeon.h>
+#endif
 
 /* gamecode includes */
-#include <economy.h>
-#include <goodies.h>
-#include <laws.h>
+#include <gamecode/economy.h>
+#include <gamecode/laws.h>
+#include <gamecode/creport.h>
 
 /* kernel includes */
-#include <building.h>
-#include <creport.h>
-#include <faction.h>
-#include <message.h>
-#include <plane.h>
-#include <race.h>
-#include <skill.h>
-#include <teleport.h>
-#include <unit.h>
-#include <region.h>
-#include <reports.h>
-#include <resources.h>
-#include <save.h>
-#include <ship.h>
-#include <border.h>
-#include <region.h>
-#include <item.h>
+#include <kernel/border.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/message.h>
+#include <kernel/plane.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/region.h>
+#include <kernel/reports.h>
+#include <kernel/resources.h>
+#include <kernel/save.h>
+#include <kernel/ship.h>
+#include <kernel/skill.h>
+#include <kernel/teleport.h>
+#include <kernel/unit.h>
+#include <kernel/xmlreader.h>
 
 /* util includes */
-#include <util/rand.h>
-#include <util/log.h>
-#include <util/sql.h>
 #include <util/base36.h>
+#include <util/goodies.h>
+#include <util/log.h>
+#include <util/rand.h>
+#include <util/sql.h>
 
 /* lua includes */
 #include "lua/bindings.h"
@@ -165,56 +166,57 @@ crwritemap(void)
 static void
 game_init(void)
 {
-	init_triggers();
-	init_xmas();
-	report_init();
-	creport_init();
+  init_triggers();
+  init_xmas();
+  report_init();
+  creport_init();
 
-	debug_language("locales.log");
-	register_races();
-	register_resources();
-	register_buildings();
-	register_ships();
-	register_items();
-	register_spells();
+  debug_language("locales.log");
+  register_races();
+  register_resources();
+  register_buildings();
+  register_ships();
+  register_items();
+  register_spells();
 #ifdef DUNGEON_MODULE
-	register_dungeon();
+  register_dungeon();
 #endif
-
-	init_data(xmlfile);
-	init_locales();
-
-	init_attributes();
-	init_resources();
-  init_races();
-	init_items();
-	init_economy();
-#if NEW_RESOURCEGROWTH
-	init_rawmaterials();
-#endif
-
-	init_gmcmd();
-	init_info();
-	init_conversion();
-
 #ifdef MUSEUM_MODULE
-	register_museum();
+  register_museum();
 #endif
 #ifdef ARENA_MODULE
-	register_arena();
+  register_arena();
 #endif
 #ifdef WORMHOLE_MODULE
   register_wormholes();
 #endif
 
+  register_xmlreader();
+  init_data(xmlfile);
+
+  init_locales();
+/*  init_resources(); must be done inside the xml-read, because requirements use items */
+
+  init_attributes();
+  init_races();
+  init_items();
+  init_economy();
+#if NEW_RESOURCEGROWTH
+  init_rawmaterials();
+#endif
+
+  init_gmcmd();
+  init_info();
+  init_conversion();
+
 #ifdef REMOVE_THIS
-	render_init();
-	{
-		FILE * F = fopen("messagetypes.txt", "w");
-		debug_messagetypes(F);
-		fclose(F);
-		abort();
-	}
+  render_init();
+  {
+    FILE * F = fopen("messagetypes.txt", "w");
+    debug_messagetypes(F);
+    fclose(F);
+    abort();
+  }
 #endif
 }
 

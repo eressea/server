@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<strings xmlns="http://eressea.upb.de/~eressea/xsd/strings.xsd">
-<comment>
-	_d: dativ (wir erklären allen /Trollen/ den Krieg)
-	_p: plural (13 /Trolle/)
-	_x: preposition (15 /Troll/schwerter)
-	_a: including article (ein Troll, a troll)
-</comment>
+<strings>
+	<!--
+		_d: dativ (wir erklären allen /Trollen/ den Krieg)
+		_p: plural (13 /Trolle/)
+		_x: preposition (15 /Troll/schwerter)
+		_a: including article (ein Troll, a troll)
+	 -->
 
 	<string name="Tresen">
 		<text locale="de">Tresen</text>
@@ -225,27 +225,28 @@
 		<text locale="en">mallorn trees</text>
 	</string>
 
-	<comment>Küsten</comment>
-	<string name="Nordwestküste">
-		<text locale="de">Nordwestküste</text>
-	</string>
-	<string name="Nordostküste">
-		<text locale="de">Nordostküste</text>
-	</string>
-	<string name="Ostküste">
-		<text locale="de">Ostküste</text>
-	</string>
-	<string name="Südostküste">
-		<text locale="de">Südostküste</text>
-	</string>
-	<string name="Südwestküste">
-		<text locale="de">Südwestküste</text>
-	</string>
-	<string name="Westküste">
-		<text locale="de">Westküste</text>
-	</string>
-
-	<comment>OPTION [x]</comment>
+	<!--Küsten -->
+	<namespace name="coast">
+		<string name="nw">
+			<text locale="de">Nordwestküste</text>
+		</string>
+		<string name="ne">
+			<text locale="de">Nordostküste</text>
+		</string>
+		<string name="e">
+			<text locale="de">Ostküste</text>
+		</string>
+		<string name="se">
+			<text locale="de">Südostküste</text>
+		</string>
+		<string name="sw">
+			<text locale="de">Südwestküste</text>
+	  	</string>
+		<string name="w">
+			<text locale="de">Westküste</text>
+		</string>
+	</namespace>
+	<!--OPTION [x] -->
 	<string name="AUSWERTUNG">
 		<text locale="de">AUSWERTUNG</text>
 	</string>
@@ -286,7 +287,7 @@
 		<text locale="de">TALENTVERSCHIEBUNGEN</text>
 	</string>
 
-	<comment>Schiffstypen</comment>
+	<!--Schiffstypen -->
 	<string name="balloon_a">
 		<text locale="de">ein Ballon</text>
 	</string>
@@ -325,7 +326,7 @@
 		<text locale="de">Trireme</text>
 	</string>
 
-	<comment>Terraintypen</comment>
+	<!--Terraintypen -->
 	<string name="maelstrom">
 		<text locale="de">Mahlstrom</text>
 	</string>
@@ -467,7 +468,7 @@
 		<text locale="de">Kohlenstücke</text>
 	</string>
 
-	<comment>Himmelsrichtungen</comment>
+	<!--Himmelsrichtungen -->
 	<string name="west">
 		<text locale="de">Westen</text>
 	</string>
@@ -506,12 +507,12 @@
 		<text locale="de">West</text>
 	</string>
 
-	<comment>Verschiedenes</comment>
+	<!--Verschiedenes -->
 	<string name="unknownunit">
 		<text locale="de">eine unbekannte Einheit</text>
 	</string>
 
-	<comment>Meldungssektionen</comment>
+	<!--Meldungssektionen -->
 	<string name="section_events">
 		<text locale="de">Meldungen und Ereignisse</text>
 	</string>
@@ -546,7 +547,7 @@
 		<text locale="de">Neue Tränke</text>
 	</string>
 
-	<comment>Gebäudetypen</comment>
+	<!--Gebäudetypen -->
 	<string name="fortress_generic">
 		<text locale="de">Burg</text>
 	</string>
@@ -609,7 +610,7 @@
 		<text locale="de">Struktur</text>
 	</string>
 
-	<comment>Testitem</comment>
+	<!--Testitem -->
 	<string name="wand">
 		<text locale="de">Zauberstab</text>
 	</string>
@@ -617,7 +618,7 @@
 		<text locale="de">Zauberstäbe</text>
 	</string>
 
-	<comment>Burgausbaustufen</comment>
+	<!--Burgausbaustufen -->
 	<string name="site">
 		<text locale="de">Grundmauern</text>
 	</string>
@@ -640,7 +641,7 @@
 		<text locale="de">Zitadelle</text>
 	</string>
 
-	<comment>Items</comment>
+	<!--Items -->
 	<string name="sphereofinv">
 		<text locale="de">Sphäre der Unsichtbarkeit</text>
 		<text locale="en">sphere of invisibility</text>
@@ -767,7 +768,7 @@
 		<text locale="en">feathers of the phoenix</text>
 	</string>
 
-	<comment>Resourcen</comment>
+	<!--Resourcen -->
 	<string name="money">
 		<text locale="de">Silber</text>
 	</string>
@@ -811,7 +812,7 @@
 		<text locale="de">Personen</text>
 	</string>
 
-	<comment>items</comment>
+	<!--items -->
 	<string name="runesword">
 		<text locale="de">Runenschwert</text>
 	</string>
@@ -890,7 +891,7 @@
 	<string name="mallornbow_p">
 		<text locale="de">Mallornbögen</text>
 	</string>
-	<comment>more items</comment>
+	<!--more items -->
 	<string name="chainmail">
 		<text locale="de">Kettenhemd</text>
 	</string>
@@ -1274,6 +1275,30 @@
 	<string name="presspass_p">
 		<text locale="de">Akkreditionen des Xontormia-Expreß</text>
 	</string>
+	<string name="wand_of_tears">
+		<text locale="de">Szepter der Tränen</text>
+		<text locale="en">wand of tears</text>
+	</string>
+	<string name="wand_of_tears_p">
+		<text locale="de">Szepter der Tränen</text>
+		<text locale="en">wands of tears</text>
+	</string>
+	<string name="snowball">
+		<text locale="de">Schneeball</text>
+		<text locale="en">snowball</text>
+	</string>
+	<string name="snowball_p">
+		<text locale="de">Schneebälle</text>
+		<text locale="en">snowball</text>
+	</string>
+	<string name="snowman">
+		<text locale="de">Schneemann</text>
+		<text locale="en">snowman</text>
+	</string>
+	<string name="snowman_p">
+		<text locale="de">Schneemänner</text>
+		<text locale="en">snowmen</text>
+	</string>
 	<string name="trollbelt">
 		<text locale="de">Gürtel der Trollstärke</text>
 	</string>
@@ -1365,7 +1390,7 @@
 		<text locale="en">sapphire keys</text>
 	</string>
 
-	<comment>herb singular</comment>
+	<!--herb singular -->
 	<string name="h0">
 		<text locale="de">Flachwurz</text>
 	</string>
@@ -1430,7 +1455,7 @@
 		<text locale="de">Schneekristall</text>
 	</string>
 
-	<comment>herb plural</comment>
+	<!--herb plural -->
 	<string name="h0_p">
 		<text locale="de">Flachwurz</text>
 	</string>
@@ -1587,7 +1612,7 @@
 		<text locale="de">Heiltränke</text>
 	</string>
 
-	<comment>Spezialitems</comment>
+	<!--Spezialitems -->
 	<string name="lmsreward">
 		<text locale="de">Gürtel der Heldentaten</text>
 	</string>
@@ -1595,7 +1620,7 @@
 		<text locale="de">Gürtel der Heldentaten</text>
 	</string>
 
-	<comment>Parameter</comment>
+	<!--Parameter -->
 	<string name="AGGRESSIV">
 		<text locale="de">AGGRESSIV</text>
 	</string>
@@ -1608,7 +1633,7 @@
 	<string name="AURA">
 		<text locale="de">AURA</text>
 	</string>
-	<string name="BÄUME">
+	<string name="BAEUME">
 		<text locale="de">BÄUME</text>
 	</string>
 	<string name="BAUERN">
@@ -1638,10 +1663,10 @@
 	<string name="FREMDES">
 		<text locale="de">FREMDES</text>
 	</string>
-	<string name="GEBÄUDE">
+	<string name="GEBAEUDE">
 		<text locale="de">GEBÄUDE</text>
 	</string>
-	<string name="GEGENSTÄNDE">
+	<string name="GEGENSTAENDE">
 		<text locale="de">GEGENSTÄNDE</text>
 	</string>
 	<string name="GIB">
@@ -1662,20 +1687,20 @@
 	<string name="KOMMANDO">
 		<text locale="de">KOMMANDO</text>
 	</string>
-	<string name="KRÄUTER">
+	<string name="KRAEUTER">
 		<text locale="de">KRÄUTER</text>
 	</string>
 	<string name="DURCHREISE">
 		<text locale="de">DURCHREISE</text>
 		<text locale="en">TRAVEL</text>
 	</string>
-	<string name="KÄMPFE">
+	<string name="KAEMPFE">
 		<text locale="de">KÄMPFE</text>
 	</string>
 	<string name="NICHT">
 		<text locale="de">NICHT</text>
 	</string>
-	<string name="NÄCHSTER">
+	<string name="NAECHSTER">
 		<text locale="de">NÄCHSTER</text>
 	</string>
 	<string name="PARTEI">
@@ -1702,16 +1727,16 @@
 	<string name="SILBER">
 		<text locale="de">SILBER</text>
 	</string>
-	<string name="STRAßEN">
+	<string name="STRASSEN">
 		<text locale="de">STRAßEN</text>
 	</string>
 	<string name="STUFE">
 		<text locale="de">STUFE</text>
 	</string>
-	<string name="TEMPORÄRE">
+	<string name="TEMPORAERE">
 		<text locale="de">TEMPORÄRE</text>
 	</string>
-	<string name="TRÄNKE">
+	<string name="TRAENKE">
 		<text locale="de">TRÄNKE</text>
 	</string>
 	<string name="UM">
@@ -1740,7 +1765,7 @@
 		<text locale="en">XELAEN</text>
 	</string>
 
-	<comment>Talente:</comment>
+	<!--Talente: -->
 	<string name="sk_alchemy">
 		<text locale="de">Alchemie</text>
 	</string>
@@ -1829,7 +1854,7 @@
 		<text locale="de">Wahrnehmung</text>
 	</string>
 
-	<comment>Befehle</comment>
+	<!--Befehle -->
 	<string name="//">
 		<text locale="de">//</text>
 	</string>
@@ -1895,7 +1920,7 @@
 	<string name="HELFEN">
 		<text locale="de">HELFEN</text>
 	</string>
-	<string name="KÄMPFEN">
+	<string name="KAEMPFEN">
 		<text locale="de">KÄMPFEN</text>
 	</string>
 	<string name="KAMPFZAUBER">
@@ -1933,7 +1958,7 @@
 	<string name="PFLANZEN">
 		<text locale="de">PFLANZEN</text>
 	</string>
-	<string name="PRÄFIX">
+	<string name="PRAEFIX">
 		<text locale="de">PRÄFIX</text>
 	</string>
 	<string name="SYNONYM">
@@ -1993,10 +2018,10 @@
 	<string name="ZEIGEN">
 		<text locale="de">ZEIGEN</text>
 	</string>
-	<string name="ZERSTÖREN">
+	<string name="ZERSTOEREN">
 		<text locale="de">ZERSTÖREN</text>
 	</string>
-	<string name="ZÜCHTEN">
+	<string name="ZUECHTEN">
 		<text locale="de">ZÜCHTEN</text>
 	</string>
 	<string name="DEFAULT">
@@ -2048,7 +2073,7 @@
 		<text locale="de">WERWESEN</text>
 	</string>
 
-	<comment>NR generieren</comment>
+	<!--NR generieren -->
 	<string name="nr_options">
 		<text locale="de">Optionen</text>
 	</string>
@@ -2109,7 +2134,7 @@
 		<text locale="de">Schaden</text>
 	</string>
 
-	<comment>report newbie info</comment>
+	<!--report newbie info -->
 	<string name="nr_nmr">
 		<text locale="de">Deine Partei hat letzte Runde keinen Zug
 		abgegeben!</text>
@@ -5778,18 +5803,3 @@
 	</string>
 
 </strings>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

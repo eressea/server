@@ -36,7 +36,6 @@
 #include <items/items.h>
 
 /* modules includes */
-#include <modules/dungeon.h>
 #include <modules/score.h>
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
@@ -49,6 +48,9 @@
 #endif
 #ifdef ARENA_MODULE
 #include <modules/arena.h>
+#endif
+#ifdef DUNGEON_MODULE
+#include <modules/dungeon.h>
 #endif
 
 /* gamecode includes */
@@ -165,7 +167,9 @@ game_init(void)
 	register_ships();
 	register_items();
 	register_spells();
+#ifdef DUNGEON_MODULE
 	register_dungeon();
+#endif
 
 	init_data(xmlfile);
 	init_locales();

@@ -68,12 +68,12 @@ const char *neue_gebiete[] = {
 
 const char *coasts[MAXDIRECTIONS] =
 {
-	"Nordwestküste",
-	"Nordostküste",
-	"Ostküste",
-	"Südostküste",
-	"Südwestküste",
-	"Westküste"
+	"coast::nw",
+	"coast::ne",
+	"coast::e",
+	"coast::se",
+	"coast::sw",
+	"coast::w"
 };
 
 const char *
@@ -906,3 +906,65 @@ get_addresses(faction * f)
 #endif
   return flist;
 }
+
+seen_region * reuse;
+#define MAXSEEHASH 4095
+seen_region * seehash[MAXSEEHASH];
+
+void 
+seen_init(void)
+{
+  int i;
+  for (i=0;i!=MAXSEEHASH;++i) {
+    seen_region * sd = seehash[i];
+    if (sd==NULL) continue;
+    while (sd->nextHash!=NULL) sd = sd->nextHash;
+    sd->nextHash = reuse;
+    reuse = seehash[i];
+    seehash[i] = NULL;
+  }
+}
+
+void
+seen_done(void)
+{
+  seen_init();
+	while (reuse) {
+		seen_region * r = reuse;
+		reuse = reuse->nextHash;
+		free(r);
+	}
+}
+
+seen_region *
+find_seen(const region * r)
+{
+	int index = abs((r->x & 0xffff) + ((r->y) << 16)) % MAXSEEHASH;
+	seen_region * find=seehash[index];
+	while (find) {
+		if (find->r==r) return find;
+		find=find->nextHash;
+	}
+	return NULL;
+}
+
+boolean
+add_seen(const struct region * r, unsigned char mode, boolean dis)
+{
+	seen_region * find = find_seen(r);
+	if (find==NULL) {
+		int index = abs((r->x & 0xffff) + ((r->y) << 16)) % MAXSEEHASH;
+		if (!reuse) reuse = (seen_region*)calloc(1, sizeof(struct seen_region));
+		find = reuse;
+		reuse = reuse->nextHash;
+		find->nextHash = seehash[index];
+		seehash[index] = find;
+		find->r = r;
+	} else if (find->mode >= mode) {
+		return false;
+	}
+	find->mode = mode;
+	find->disbelieves |= dis;
+	return true;
+}
+

@@ -18,7 +18,7 @@
  * permission from the authors.
  */
 
-#ifndef H_KRNL_ALCHEMY
+#ifndef H_KRNL_ALCHEMY_H
 #define H_KRNL_ALCHEMY_H
 #ifdef __cplusplus
 extern "C" {

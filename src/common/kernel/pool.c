@@ -357,15 +357,15 @@ use_pooled_give(unit * u, region * r, resource_t resource, int count)
 }
 
 int
-get_all(const unit * u, resource_t resource)
+get_all(const unit * u, const resource_type * rtype)
 {
-	return new_get_pooled(u, oldresourcetype[resource], GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE);
+  return new_get_pooled(u, rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE);
 }
 
 int
-use_all(unit * u, resource_t resource, int count)
+use_all(unit * u, const resource_type * rtype, int count)
 {
-	return new_use_pooled(u, oldresourcetype[resource], GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE, count);
+  return new_use_pooled(u, rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE, count);
 }
 
 void

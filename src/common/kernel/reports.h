@@ -81,7 +81,10 @@ typedef struct seen_region {
 } seen_region;
 
 extern struct seen_region * find_seen(const struct region * r);
-
+extern boolean add_seen(const struct region * r, unsigned char mode, boolean dis);
+extern void seen_done(void);
+extern void seen_init(void);
+  
 extern const char* resname(resource_t res, int i);
 
 extern char **seasonnames;

@@ -1616,7 +1616,7 @@ order_template(FILE * F, faction * f)
 						unitid(u), u->name, u->number, get_money(u));
 				if (u->building != NULL && fval(u, UFL_OWNER)) {
 					building * b = u->building;
-					int cost = buildingmaintenance(b, R_SILVER);
+					int cost = buildingmaintenance(b, r_silver);
 
 					if (cost > 0) {
 						scat(",U");
@@ -2452,68 +2452,6 @@ base36conversion(void)
 }
 
 extern void init_intervals(void);
-
-
-seen_region * reuse;
-#define MAXSEEHASH 4095
-seen_region * seehash[MAXSEEHASH];
-
-static void 
-seen_init(void)
-{
-  int i;
-  for (i=0;i!=MAXSEEHASH;++i) {
-    seen_region * sd = seehash[i];
-    if (sd==NULL) continue;
-    while (sd->nextHash!=NULL) sd = sd->nextHash;
-    sd->nextHash = reuse;
-    reuse = seehash[i];
-    seehash[i] = NULL;
-  }
-}
-
-static void
-seen_done(void)
-{
-  seen_init();
-	while (reuse) {
-		seen_region * r = reuse;
-		reuse = reuse->nextHash;
-		free(r);
-	}
-}
-
-seen_region *
-find_seen(const region * r)
-{
-	int index = abs((r->x & 0xffff) + ((r->y) << 16)) % MAXSEEHASH;
-	seen_region * find=seehash[index];
-	while (find) {
-		if (find->r==r) return find;
-		find=find->nextHash;
-	}
-	return NULL;
-}
-
-static boolean
-add_seen(const struct region * r, unsigned char mode, boolean dis)
-{
-	seen_region * find = find_seen(r);
-	if (find==NULL) {
-		int index = abs((r->x & 0xffff) + ((r->y) << 16)) % MAXSEEHASH;
-		if (!reuse) reuse = (seen_region*)calloc(1, sizeof(struct seen_region));
-		find = reuse;
-		reuse = reuse->nextHash;
-		find->nextHash = seehash[index];
-		seehash[index] = find;
-		find->r = r;
-	} else if (find->mode >= mode) {
-		return false;
-	}
-	find->mode = mode;
-	find->disbelieves |= dis;
-	return true;
-}
 
 #define DBG_CACHE 1
 #if DBG_CACHE

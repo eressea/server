@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="luabind.lib lua50.lib lualib50.lib"
+				AdditionalDependencies="luabind.lib lua50.lib lualib50.lib libxml2.lib iconv.lib"
 				OutputFile=".\Release/eressea-lua.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -167,7 +167,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="luabindd.lib lua50d.lib lualib50d.lib"
+				AdditionalDependencies="luabindd.lib lua50d.lib lualib50d.lib libxml2.lib iconv.lib"
 				OutputFile=".\Debug/eressea-lua.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
