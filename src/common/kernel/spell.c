@@ -1814,7 +1814,7 @@ sp_great_drought(castorder *co)
  *  Der Druide kann 5*Stufe GE in die astrale Ebene schicken.
  *  Der Druide wird nicht mitteleportiert, es sei denn, er gibt sich
  *  selbst mit an.
- *  Der Zauber funktioniert nun in Wäldern.
+ *  Der Zauber funktioniert nur in Wäldern.
  *
  * Syntax: Zauber "Weg der Bäume" <Einheit> ...
  *

@@ -976,8 +976,6 @@ show_newspells(void)
 	 * terminieren */
 
 	spellid_t newspellids[] = { 
-			SPL_BLOODSACRIFICE,
-			SPL_MALLORN,
 			SPL_NOSPELL };
 
 	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]

@@ -87,6 +87,14 @@ is_migrant(unit *u)
 }
 
 /* ------------------------------------------------------------- */
+boolean
+magic_lowskill(unit *u)
+{
+	if (u->race == RC_TOAD) return true;
+	return false;
+}
+
+/* ------------------------------------------------------------- */
 
 static int
 study_cost(unit *u, int talent)
@@ -227,6 +235,11 @@ teach(region * r, unit * u)
 
 	if (r->planep && fval(r->planep, PFL_NOTEACH)) {
 		cmistake(u, u->thisorder, 273, MSG_EVENT);
+		return;
+	}
+
+	if (magic_lowskill(u2)){
+		cmistake(u, u->thisorder, 274, MSG_EVENT);
 		return;
 	}
 
