@@ -583,10 +583,10 @@
     <text locale="en">flaming swords</text>
   </string>
   <string name="greatbow">
-    <text locale="en">great bow</text>
+    <text locale="en">elven bow</text>
   </string>
   <string name="greatbow_p">
-    <text locale="en">great bows</text>
+    <text locale="en">elven bows</text>
   </string>
   <string name="greatsword">
     <text locale="en">claymore</text>
