@@ -18,9 +18,6 @@ SOURCES =
  weather.c
  wormhole.c
  xecmd.c
- xmas2000.c
- xmas2001.c
- xmas2002.c
  xmas.c
  ;
 
