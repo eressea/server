@@ -16,6 +16,15 @@
 struct player;
 struct alliance;
 
+#ifdef SHORTPWDS
+typedef struct shortpwd {
+  struct shortpwd * next;
+  char * email;
+  char * pwd;
+  boolean used;
+} shortpwd;
+#endif
+
 typedef struct faction {
 	struct faction *next;
 	struct faction *nexthash;
@@ -31,6 +40,9 @@ typedef struct faction {
 	char *email;
 	char *passw;
 	char *override;
+#ifdef SHORTPWDS
+  struct shortpwd * shortpwds;
+#endif
 	const struct locale * locale;
 	int lastorders;	/* enno: short? */
 	int age;	/* enno: short? */
@@ -86,7 +98,7 @@ extern void * resolve_faction(void * data);
 extern struct unit * addplayer(struct region *r, const char *email, 
 															 const char* password, const struct race * frace,
 															 const struct locale *loc, int subscription);
-extern boolean checkpasswd(const faction * f, const char * passwd);
+extern boolean checkpasswd(const faction * f, const char * passwd, boolean shortp);
 extern void destroyfaction(faction * f);
 
 #ifdef REGIONOWNERS

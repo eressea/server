@@ -115,7 +115,7 @@ void
 setwere(unit *u, strlist *S)
 {
 	int level = fspecial(u->faction,FS_LYCANTROPE);
-	char *s;
+	const char *s;
 
 	if(!level) {
 		cmistake(u, S->s, 311, MSG_EVENT);
@@ -153,7 +153,7 @@ setwere(unit *u, strlist *S)
 void
 setstealth(unit * u, strlist * S)
 {
-	char *s;
+	const char *s;
 	char level;
 	const race * trace;
 	attrib *a;
@@ -214,7 +214,7 @@ setstealth(unit * u, strlist * S)
 		} else if (findparam(s, u->faction->locale) == P_NOT) {
 			freset(u, FL_PARTEITARNUNG);
 		} else if (findkeyword(s, u->faction->locale) == K_NUMBER) {
-			char *s2 = getstrtoken();
+			const char *s2 = getstrtoken();
 			int nr = -1;
 
 			if(s2) nr = atoi36(s2);
@@ -493,7 +493,7 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 void
 sabotage(region * r, unit * u)
 {
-	char *s;
+	const char *s;
 	int i;
 	ship *sh;
 	unit *u2;

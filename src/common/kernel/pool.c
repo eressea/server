@@ -385,7 +385,7 @@ init_pool(void)
 						&& (urace(u)->ec_flags & GETITEM)) {
 					int count = geti();
 					int use;
-					char *what = getstrtoken();
+					const char *what = getstrtoken();
 					const resource_type * rtype = findresourcetype(what, u->faction->locale);
 					if (rtype == NULL)
 						list_continue(s);	/* nur mit resources implementiert */

@@ -145,8 +145,18 @@ addplayer(region *r, const char *email, const char * password,
 }
 
 boolean
-checkpasswd(const faction * f, const char * passwd)
+checkpasswd(const faction * f, const char * passwd, boolean shortp)
 {
+#ifdef SHORTPWDS
+  shortpwd * slist = f->shortpwds;
+  if (shortp) while (slist) {
+    if (strcasecmp(slist->pwd, passwd)==0) {
+      slist->used = true;
+      return true;
+    }
+    slist = slist->next;
+  }
+#endif
 	if (strcasecmp(f->passw, passwd)==0) return true;
 	if (strcasecmp(f->override, passwd)==0) return true;
 	return false;

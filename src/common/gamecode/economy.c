@@ -801,7 +801,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 	 */
 {
 	unit *u2;
-	char *s;
+	const char *s;
 	int i, n;
 	const item_type * itype;
 	int notfound_error = 63;
@@ -961,7 +961,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 		return;
 	}
 	if (findparam(s, u->faction->locale) == P_ANY) { /* Alle Gegenstände übergeben */
-		char * s = getstrtoken();
+		const char * s = getstrtoken();
 
 		if(u2 && !ucontact(u2, u)) {
 			cmistake(u, S->s, 40, MSG_COMMERCE);
@@ -1081,9 +1081,7 @@ void
 forgetskill(unit * u)
 {
 	skill_t talent;
-	char *s;
-
-	s = getstrtoken();
+	const char *s = getstrtoken();
 
 	if ((talent = findskill(s, u->faction->locale)) != NOSKILL) {
 		struct message * m = add_message(&u->faction->msgs,
@@ -1908,14 +1906,13 @@ create_item(unit * u, const item_type * itype, int want)
 static void
 make(region * r, unit * u)
 {
-	char *s;
 	const building_type * btype;
 	const ship_type * stype;
 	param_t p;
 	int m;
 	const item_type * itype;
+  const char *s = getstrtoken();
 
-	s = getstrtoken();
 	m = atoi(s);
 	sprintf(buf, "%d", m);
 	if (!strcmp(buf, s)) {
@@ -2375,7 +2372,7 @@ sell(region * r, unit * u, request ** sellorders, const char * cmd)
 	const luxury_type * ltype=NULL;
 	int n;
 	request *o;
-	char *s;
+	const char *s;
 
 	if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
 		cmistake(u, cmd, 69, MSG_INCOME);
@@ -2718,7 +2715,7 @@ void
 pflanze(region *r, unit *u)
 {
 	int m;
-	char *s;
+	const char *s;
 	param_t p;
 	const item_type * itype = NULL;
 
@@ -2797,7 +2794,7 @@ void
 zuechte(region *r, unit *u)
 {
 	int m;
-	char *s;
+	const char *s;
 	param_t p;
 
 	/* züchte [<anzahl>] <parameter> */
@@ -2853,9 +2850,7 @@ rough_amount(int a, int m)
 static void
 research(region *r, unit *u)
 {
-	char *s;
-
-	s = getstrtoken();
+	const char *s = getstrtoken();
 
 	if (findparam(s, u->faction->locale) == P_HERBS) {
 

@@ -1053,7 +1053,7 @@ count_maxmigrants(const faction * f)
 /* GET STR, I zur Eingabe von Daten liest diese aus dem Buffer, der beim ersten
  * Aufruf inititialisiert wird? */
 
-char *
+const char *
 igetstrtoken (const char *s1)
 {
 	int i;
@@ -1087,7 +1087,7 @@ igetstrtoken (const char *s1)
 	return lbuf;
 }
 
-char *
+const char *
 getstrtoken (void)
 {
 	return igetstrtoken (0);
@@ -1348,9 +1348,7 @@ read_newunitid (const faction * f, const region * r)
 int
 read_unitid (const faction * f, const region * r)
 {
-	char *s;
-
-	s = getstrtoken ();
+	const char * s = getstrtoken ();
 
 	/* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
 	 * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
@@ -2683,8 +2681,8 @@ fwage(const region *r, const faction *f, boolean img)
 
 
 
-region *
-findspecialdirection(const region *r, char *token)
+static region *
+findspecialdirection(const region *r, const char *token)
 {
 	attrib *a;
 	spec_direction *d;
@@ -2705,7 +2703,7 @@ region *
 movewhere(region * r, const unit *u)
 {
 	direction_t d;
-	char *token;
+	const char *token;
 	region * r2;
 
 	token = getstrtoken();

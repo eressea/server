@@ -75,6 +75,7 @@
 
 /* util includes */
 #include <rand.h>
+#include <log.h>
 #include <sql.h>
 #include <base36.h>
 
@@ -267,12 +268,46 @@ writepasswd(void)
 	}
 }
 
+#ifdef SHORTPWDS
+static void
+readshortpwds()
+{
+  FILE * F;
+  char zText[MAX_PATH];
+  sprintf(zText, "%s/%s.%u", basepath(), "shortpwds", turn);
+
+  F = fopen(zText, "r");
+  if (F==NULL) {
+    log_error(("could not open password file %s", zText));
+  } else {
+    while (!feof(F)) {
+      faction * f;
+      char passwd[16], faction[5], email[64];
+      fscanf(F, "%s %s %s\n", faction, passwd, email);
+      f = findfaction(atoi36(faction));
+      if (f!=NULL) {
+        shortpwd * pwd = (shortpwd*)malloc(sizeof(shortpwd));
+        pwd->email = strdup(email);
+        pwd->pwd = strdup(passwd);
+        pwd->used = false;
+        pwd->next = f->shortpwds;
+        f->shortpwds = pwd;
+      }
+    }
+    fclose(F);
+  }
+}
+#endif
+
 static int
 processturn(char *filename)
 {
 	struct summary * begin, * end;
 	int i;
 
+#ifdef SHORTPWDS
+  readshortpwds("passwords");
+#endif
 	begin = make_summary(false);
 	printf(" - Korrekturen Runde %d\n", turn);
 	korrektur();

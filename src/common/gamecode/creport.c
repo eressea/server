@@ -875,6 +875,19 @@ cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
 				fprintf(F, "\"%s\";alliancename\n", f->alliance->name);
 			}
 #endif
+#ifdef SHORTPWDS
+      if (f->shortpwds) {
+        shortpwd * spwd = f->shortpwds;
+        while (spwd) {
+          unsigned int vacation = 0;
+          if (spwd->used) {
+            fprintf(F, "VACATION %u\n", ++vacation);
+            fprintf(F, "\"%s\";email\n", spwd->email);
+          }
+          spwd=spwd->next;
+        }
+      }
+#endif
 		}
 		flist = flist->next;
 	}

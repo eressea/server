@@ -40,7 +40,7 @@ use_birthday_firework(struct unit * u, const struct item_type * itype, int amoun
 	regionlist *rlist = all_in_range(u->region, FIREWORK_RANGE);
 	regionlist *rl;
 	message *m;
-	char *name;
+	const char *name;
 
 	unused(amount);
 

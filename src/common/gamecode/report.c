@@ -1854,6 +1854,19 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
 		if (f->no!=MONSTER_FACTION) {
 			sprintf(buf, "%s: %s; %s", factionname(f), f->email, f->banner);
 			rparagraph(F, buf, 4, (char)(ALLIED(uf, f)?'+':'*'));
+#ifdef SHORTPWDS
+      if (f->shortpwds) {
+        shortpwd * spwd = f->shortpwds;
+        while (spwd) {
+          if (spwd->used) {
+            sprintf(buf, "Vertretung: %s", spwd->email);
+            rparagraph(F, buf, 6, '-');
+          }
+          spwd=spwd->next;
+        }
+      }
+#endif
+
 		}
 		flist = flist->next;
 	}

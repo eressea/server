@@ -141,7 +141,7 @@ gm_create(const tnode * tnext, const char * str, void * data, const char * cmd)
 	i = atoi(igetstrtoken(str));
 
 	if (i>0) {
-		char * iname = getstrtoken();
+		const char * iname = getstrtoken();
 		const item_type * itype = finditemtype(iname, u->faction->locale);
 		if (itype==NULL) {
 			mistake(u, cmd, "Unbekannter Gegenstand.\n", 0);

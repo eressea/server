@@ -42,6 +42,8 @@
 #define GIVERESTRICTION 3
 #define NEWATSROI 0
 
+#undef SHORTPWDS
+
 #define ZEROFOKS_QUESTMASTER "eressea@zerofoks.net"
 
 #define CHECK_OVERLOAD_ON_ENTER

@@ -590,7 +590,7 @@ get_spellnames(const struct locale * lang, magic_t mtype)
 }
 
 spell *
-find_spellbyname(unit *u, char *name, const struct locale * lang)
+find_spellbyname(unit *u, const char *name, const struct locale * lang)
 {
 	spell_ptr *spt;
 	sc_mage * m = get_mage(u);
@@ -2877,7 +2877,7 @@ magic(void)
 	unit *familiar;    /* wenn u ein Vertrauter ist */
 	unit *mage;        /* derjenige, der den Spruch am Ende zaubert */
 	spell *sp;
-	char *s;
+	const char *s;
 	strlist *so;
 	int spellrank;
 	int level, success;

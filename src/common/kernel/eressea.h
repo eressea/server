@@ -982,8 +982,8 @@ int geti(void);
 
 extern int findstr(const char **v, const char *s, unsigned char n);
 
-extern char *igetstrtoken(const char *s);
-extern char *getstrtoken(void);
+extern const char *igetstrtoken(const char *s);
+extern const char *getstrtoken(void);
 
 extern skill_t findskill(const char *s, const struct locale * lang);
 

@@ -548,7 +548,7 @@ factionorders(void)
 {
 	char b[16];
 	char * fid = strnzcpy(b, getstrtoken(), 15);
-	char * pass = getstrtoken();
+	const char * pass = getstrtoken();
 	faction *f;
 
 	f = findfaction(atoi36(fid));
@@ -565,7 +565,7 @@ factionorders(void)
 		freestrlist(f->mistakes);
 		f->mistakes = 0;
 
-		if (checkpasswd(f, pass) == false) {
+		if (checkpasswd(f, pass, true) == false) {
 			addstrlist(&f->mistakes, "Das Passwort wurde falsch eingegeben");
 			return 0;
 		}

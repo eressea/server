@@ -1060,7 +1060,7 @@ quit(void)
 			un = u->next;
 			for (S = u->orders; S; S = S->next) {
 				if (igetkeyword(S->s, u->faction->locale) == K_QUIT) {
-					if (checkpasswd(u->faction, getstrtoken())) {
+					if (checkpasswd(u->faction, getstrtoken(), false)) {
 #ifdef ENHANCED_QUIT
 						int f2_id = getid();
 
@@ -1098,7 +1098,7 @@ quit(void)
 							   factionid(u->faction), S->s);
 					}
 				} else if(igetkeyword(S->s, u->faction->locale) == K_RESTART && u->number > 0) {
-					char *s_race,*s_pass;
+					const char *s_race, *s_pass;
 
 					if (!landregion(rterrain(r))) {
 						cmistake(u, S->s, 242, MSG_EVENT);
@@ -1128,7 +1128,7 @@ quit(void)
 						continue;
 					}
 
-					if (!checkpasswd(u->faction, s_pass)) {
+					if (!checkpasswd(u->faction, s_pass, false)) {
 						cmistake(u, S->s, 86, MSG_EVENT);
 						printf("  Warnung: NEUSTART mit falschem Passwort für Partei %s: %s\n",
 							   factionid(u->faction), S->s);
@@ -1222,7 +1222,7 @@ set_ally(unit * u, strlist * S)
 	ally * sf, ** sfp;
 	faction *f;
 	int keyword, not_kw;
-	char *s;
+	const char *s;
 
 	f = getfaction();
 
@@ -1339,7 +1339,8 @@ set_ally(unit * u, strlist * S)
 static void
 set_display(region * r, unit * u, strlist * S)
 {
-	char **s, *s2;
+	char **s;
+  const char *s2;
 
 	s = 0;
 
@@ -1383,7 +1384,7 @@ set_display(region * r, unit * u, strlist * S)
 
 	case P_PRIVAT:
 		{
-			char *d = getstrtoken();
+			const char *d = getstrtoken();
 			if(d == NULL || *d == 0) {
 				usetprivate(u, NULL);
 			} else {
@@ -1418,10 +1419,6 @@ set_display(region * r, unit * u, strlist * S)
 
 	s2 = getstrtoken();
 
-	if (strlen(s2) >= DISPLAYSIZE) {
-		s2[DISPLAYSIZE] = 0;
-		cmistake(u, S->s, 3, MSG_EVENT);
-	}
 	set_string(&(*s), s2);
 }
 
@@ -1517,14 +1514,15 @@ set_synonym(unit * u, strlist *S)
 void
 set_group(unit * u)
 {
-	char * s = getstrtoken();
+	const char * s = getstrtoken();
 	join_group(u, s);
 }
 
 void
 set_name(region * r, unit * u, strlist * S)
 {
-	char **s, *s2;
+  char **s;
+	const char *s2;
 	int i;
 	param_t p;
 	boolean foreign = false;
@@ -1794,7 +1792,7 @@ void
 distributeMail(region * r, unit * u, strlist * S)
 {
 	unit *u2;
-	char *s;
+	const char *s;
 	int n;
 
 	s = getstrtoken();
@@ -1813,10 +1811,6 @@ distributeMail(region * r, unit * u, strlist * S)
 			cmistake(u, S->s, 30, MSG_MESSAGE);
 			return;
 		} else {
-			if (strlen(s) >= DISPLAYSIZE) {
-				s[DISPLAYSIZE] = 0;
-				cmistake(u, S->s, 111, MSG_MESSAGE);
-			}
 			sprintf(buf, "von %s: '%s'", unitname(u), s);
 			addmessage(r, 0, buf, MSG_MESSAGE, ML_IMPORTANT);
 			return;
@@ -1981,7 +1975,7 @@ set_passw(void)
 	region *r;
 	unit *u;
 	strlist *S;
-	char *s;
+	const char *s;
 	int o, i;
 	magic_t mtyp;
 
@@ -2316,8 +2310,8 @@ instant_orders(void)
 	region *r;
 	unit *u;
 	strlist *S;
-	char *s;
-	char *param;
+	const char *s;
+	const char *param;
 	spell *spell;
 #ifdef NEW_ITEMS
 	const item_type * itype;
@@ -2897,7 +2891,7 @@ static void
 renumber(void)
 {
 	region *r;
-	char   *s;
+	const char *s;
 	strlist *S;
 	unit * u;
 	int i;
@@ -2911,7 +2905,6 @@ renumber(void)
 
 				case P_FACTION:
 					s = getstrtoken();
-					if(strlen(s)>4) s[4]=0;
 					if (s && *s) {
 						int i = atoi36(s);
 						attrib * a = a_find(f->attribs, &at_number);
@@ -3110,7 +3103,7 @@ new_units (void)
 			for (S = u->orders; S;) {
 				if ((igetkeyword(S->s, u->faction->locale) == K_MAKE) && (getparam(u->faction->locale) == P_TEMP)) {
 					int g;
-					char * name;
+					const char * name;
 					int alias;
 					int mu = maxunits(u->faction);
 
@@ -3415,7 +3408,7 @@ defaultorders (void)
 {
 	region *r;
 	unit *u;
-	char * c;
+	const char * c;
 	int i;
 	strlist *s;
 	list_foreach(region, regions, r) {

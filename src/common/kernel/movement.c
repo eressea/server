@@ -753,7 +753,7 @@ cycle_route(unit *u, int gereist)
 	int cm = 0;
 	char tail[1024];
 	char neworder[2048];
-	char *token;
+	const char *token;
 	direction_t d = NODIRECTION;
 	boolean paused = false;
 	boolean pause;
@@ -1766,7 +1766,7 @@ move(region * r, unit * u, boolean move_on_land)
 		while (up) {
 			unit *un = up->next;
 
-			if (fval(up, FL_FOLLOWING) && !fval(up, FL_MOVED)) {
+			if (fval(up, FL_FOLLOWING) && !fval(up, FL_LONGACTION) && !fval(up, FL_MOVED)) {
 				attrib * a = a_find(up->attribs, &at_follow);
 				if (a && a->data.v==u) {
 					/* wir basteln ihm ein NACH */
@@ -1804,7 +1804,7 @@ piracy(unit *u)
 	int         aff[MAXDIRECTIONS];
 	int         saff = 0;
 	int					*il;
-	char        *s;
+	const char *s;
 	boolean     all = true;
 	attrib      *a;
 

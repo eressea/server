@@ -323,7 +323,7 @@ destroy(region * r, unit * u, const char * cmd)
 	const construction * con = NULL;
 	int size = 0;
 #endif
-	char *s;
+	const char *s;
 	int n = INT_MAX;
 
 	if (u->number < 1)

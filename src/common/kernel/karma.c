@@ -368,7 +368,7 @@ sacrificings(void)
 		for(u=r->units; u; u=u->next) {
 			if(igetkeyword(u->thisorder, u->faction->locale) == K_SACRIFICE) {
 				int   n = 1, karma;
-				char *s = getstrtoken();
+				const char *s = getstrtoken();
 
 				if(s && *s) n = atoi(s);
 				if(n <= 0) {
@@ -432,7 +432,7 @@ prayers(void)
 				int karma_cost;
 				short mult = 1;
 				param_t p;
-				char *s = getstrtoken();
+				const char *s = getstrtoken();
 
 				if(findparam(s, u->faction->locale) == P_FOR) s = getstrtoken();
 
@@ -509,7 +509,7 @@ set_jihad(void)
 				const race * jrace;
 				race_t jrt;
 				attrib *a;
-				char *s;
+				const char *s;
 
 				for(a = a_find(f->attribs, &at_jihad); a; a = a->nexttype) {
 					has += a->data.sa[1];

@@ -283,7 +283,7 @@ boolean is_familiar(const struct unit *u);
 	/*	gibt true, wenn eine Familiar-Relation besteht.  */
 
 /* Sprüche */
-spell *find_spellbyname(struct unit *u, char *s, const struct locale * lang);
+spell *find_spellbyname(struct unit *u, const char *s, const struct locale * lang);
 	/*	versucht einen Spruch über den Namen zu identifizieren, gibt
 	 *	ansonsten NULL zurück */
 spell *find_spellbyid(spellid_t i);

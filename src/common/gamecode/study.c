@@ -243,7 +243,7 @@ teach(region * r, unit * u)
 	static char order[BUFSIZE];
 	int teaching, i, j, count, academy=0;
 	unit *u2;
-	char *s;
+	const char *s;
 	skill_t sk;
 
 	if ((u->race->flags & RCF_NOTEACH) || fval(u, UFL_WERE)) {
