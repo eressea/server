@@ -1146,7 +1146,7 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 		fprintf(F, "%d;Max. Immigranten\n", count_maxmigrants(f));
 	}
 
-#if HEROES == 1
+#ifdef HEROES
   i = countheroes(f);
   if (i>0) fprintf(F, "%d;heroes\n", i);
   i = maxheroes(f);

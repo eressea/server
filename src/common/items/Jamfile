@@ -18,6 +18,7 @@ SOURCES =
  weapons.c
  xerewards.c
  artrewards.c
+ speedsail.c
  ;
 
 Library items : $(SOURCES) ;
