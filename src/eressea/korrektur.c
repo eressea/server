@@ -2713,9 +2713,13 @@ fix_idleout(void)
 	faction *f;
 
 	f = findfaction(0);
-	fset(f, FL_NOIDLEOUT);
+	if(f){
+		fset(f, FL_NOIDLEOUT);
+	}
 	f = findfaction(atoi36("muse"));
-	fset(f, FL_NOIDLEOUT);
+	if(f){
+		fset(f, FL_NOIDLEOUT);
+	}
 	return 0;
 }
 
