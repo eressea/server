@@ -2213,7 +2213,7 @@
     <text locale="fr">"Le mot de passe de cette faction est '${value}'"</text>
     <text locale="en">"The password of this faction is '$value'."</text>
   </message>
-  <message name="changemail" section="events">
+  <message name="changemail_invalid" section="events">
     <type>
       <arg name="value" type="string"/>
     </type>
