@@ -236,7 +236,7 @@ gamedate_season(const struct locale * lang)
 }
 
 static char *
-gamedate2(void)
+gamedate2(const struct locale * lang)
 {
 	int year,month,week,r;
 	static char buf[256];
@@ -249,15 +249,15 @@ gamedate2(void)
 	month = r/weeks_per_month;			/* 0 - months_per_year-1 */
 	week  = r%weeks_per_month;			/* 0 - weeks_per_month-1 */
 	sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
-		weeknames2[week],
-		monthnames[month],
-		year,
-		agename);
+			LOC(lang, weeknames2[week]),
+			LOC(lang, monthnames[month]),
+			year,
+			LOC(lang, agename));
 	return buf;
 }
 
 static char *
-gamedate_short(void)
+gamedate_short(const struct locale * lang)
 {
 	int year,month,week,r;
 	static char buf[256];
@@ -270,7 +270,7 @@ gamedate_short(void)
 	month = r/weeks_per_month;			/* 0 - months_per_year-1 */
 	week  = r%weeks_per_month;			/* 0 - weeks_per_month-1 */
 
-	sprintf(buf, "%d/%s/%d", week+1, monthnames[month], year);
+	sprintf(buf, "%d/%s/%d", week+1, LOC(lang, monthnames[month]), year);
 
 	return buf;
 }
@@ -2967,7 +2967,7 @@ reports(void)
 				}
 
 				fprintf(shfp, "eresseamail.zipped $addr \"%s %s\" \"%d-%s.zip\" "
-				    "%d-%s.zip\n", global.gamename, gamedate_short(), turn, factionid(f), turn, factionid(f));
+				    "%d-%s.zip\n", global.gamename, gamedate_short(f->locale), turn, factionid(f), turn, factionid(f));
 
 			} else if(f->options & wants_bzip2) {
 
@@ -2979,7 +2979,7 @@ reports(void)
 				fprintf(BAT, "bzip2 -9v `ls %d-%s.nr %d-%s.cr`\n",
 					turn, factionid(f), turn, factionid(f));
 
-				fprintf(shfp, "eresseamail.bzip2 $addr \"%s %s\"", global.gamename, gamedate_short());
+				fprintf(shfp, "eresseamail.bzip2 $addr \"%s %s\"", global.gamename, gamedate_short(f->locale));
 
 				if (!nonr && f->options & wants_report)
 					fprintf(shfp,
@@ -2998,7 +2998,7 @@ reports(void)
 #endif
 			} else {
 
-				fprintf(shfp, MAIL " $addr \"%s %s\"", global.gamename, gamedate_short());
+				fprintf(shfp, MAIL " $addr \"%s %s\"", global.gamename, gamedate_short(f->locale));
 
 				if (f->age == 1) {
 					fprintf(shfp,
@@ -3495,7 +3495,7 @@ writeturn(void)
 	sprintf(zText, "%s/datum", basepath());
 	f = cfopen(zText, "w");
 	if (!f) return;
-	fputs(gamedate2(), f);
+	fputs(gamedate2(&default_locale), f);
 	fclose(f);
 	sprintf(zText, "%s/turn", basepath());
 	f = cfopen(zText, "w");
@@ -3532,7 +3532,7 @@ report_summary(summary * s, summary * o, boolean full)
 		if (!F) return;
 	}
 	printf("Schreibe Zusammenfassung (parteien)...\n");
-	fprintf(F,   "%s\n%s\n\n", global.gamename, gamedate2());
+	fprintf(F,   "%s\n%s\n\n", global.gamename, gamedate2(&default_locale));
 	fprintf(F,   "Auswertung Nr:         %d\n\n", turn);
 	fprintf(F,   "Parteien:              %s\n", pcomp(s->factions, o->factions));
 	fprintf(F,   "Einheiten:             %s\n", pcomp(s->nunits, o->nunits));
