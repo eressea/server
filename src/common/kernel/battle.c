@@ -1051,7 +1051,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	}
 
 #if CHANGED_CROSSBOWS == 1
-	if(fval(awtype,WTF_ARMORPIERCING)) {
+	if(awtype && fval(awtype,WTF_ARMORPIERCING)) {
 		/* crossbows */
 		ar /= 2;
 		an /= 2;

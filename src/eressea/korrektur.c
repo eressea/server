@@ -2801,6 +2801,18 @@ xe_init(void)
 	return 0;
 }
 
+static int
+fix_restart_flag(void)
+{
+	faction *f;
+
+	for(f=factions; f; f=f->next) {
+		freset(f, FFL_RESTART);
+	}
+
+	return 0;
+}
+
 extern border *borders[];
 
 static void
@@ -2894,6 +2906,7 @@ korrektur(void)
 	do_once("guac", guard_conversion());
 	do_once("qpoi", questportal_init());
 	do_once("xini", xe_init());
+	do_once("rest", fix_restart_flag());
 	warn_password();
 	fix_road_borders();
 

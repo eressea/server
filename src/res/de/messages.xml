@@ -4430,6 +4430,17 @@
 			</nr>
 		</locale>
 	</message>
+	
+	<message name="error314">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Eine Partei kann nur einmal neu starten."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - Restart can only be used once."</text>
+	</message>
+
 
 	<message name="drown_on_ship">
 		<type>
