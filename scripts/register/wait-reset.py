@@ -47,6 +47,7 @@ def Send(email, custid, firstname, password, position, locale):
     TemplateHandle.close()                    # close the file
 
     SubResult = re.subn("<FIRSTNAME>", firstname, TemplateInput)
+    SubResult = re.subn("<GAME>", game, SubResult[0])
     SubResult = re.subn("<PASSWORD>", password, SubResult[0])
     SubResult = re.subn("<POSITION>", str(int(position)), SubResult[0])
     SubResult = re.subn("<CUSTID>", str(int(custid)), SubResult[0])
@@ -70,7 +71,7 @@ cursor.execute("update subscriptions set status='EXPIRED' where TO_DAYS(updated)
 cursor.execute("update subscriptions set status='WAITING' where TO_DAYS(updated)<TO_DAYS('"+date+"') and status='CONFIRMED'")
 
 # remind everyone who is left on the waiting list.
-waiting = cursor.execute("select firstname, locale, email, u.id, s.password, u.password from users u, subscriptions s where u.id=s.user and s.status='WAITING'")
+waiting = cursor.execute("select firstname, locale, email, u.id, s.password, u.password from users u, subscriptions s where u.id=s.user and s.status='WAITING' ORDER BY s.id")
 position=0
 while waiting:
     waiting=waiting-1

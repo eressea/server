@@ -70,20 +70,25 @@ if (password==None) or (custid==None):
 else:
     db=MySQLdb.connect(db=dbname)
     cursor=db.cursor()
-    exist=cursor.execute("select u.status, s.id, s.game from users u, subscriptions s where u.id="+custid+" and s.status in ('WAITING', 'CONFIRMED') and s.password='"+password+"'")
+    try:
+	custid=int(custid)
+    except:
+	custid=0
+    query = "select u.status, s.id, s.game from users u, subscriptions s where u.id="+str(custid)+" and s.status in ('WAITING', 'CONFIRMED') and u.status not in ('INVALID', 'BANNED') and s.password='"+password+"'"
+    exist=cursor.execute(query)
     if exist==0:
 	Display('<p>Kundennummer oder Schlüssel falsch. Bitte beachte, dass Du beim Schlüssel auf Groß- und Kleinschreibung achten mußt.')
     else:
 	status, sid, gid = cursor.fetchone()
 	if os.environ.has_key('REMOTE_ADDR'):
 	    ip=os.environ['REMOTE_ADDR']
-	    cursor.execute("REPLACE userips (ip, user) VALUES ('"+ip+"', "+str(int(custid))+")")
+	    cursor.execute("REPLACE userips (ip, user) VALUES ('"+ip+"', "+str(custid)+")")
 	if status=='NEW' or status=='TUTORIAL':
 	    if tutorial_id!=None and gid==tutorial_id:
 		# user confirms his tutorial participation
-		cursor.execute("update users set status='TUTORIAL' where id="+custid)
+		cursor.execute("update users set status='TUTORIAL' where id="+str(custid))
 	    else:
-		cursor.execute("update users set status='ACTIVE' where id="+custid)
+		cursor.execute("update users set status='ACTIVE' where id="+str(custid))
 	cursor.execute("update subscriptions set status='CONFIRMED' where id="+str(sid))
 
 	Display("<p>Deine Anmeldung wurde bestätigt.");

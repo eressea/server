@@ -183,22 +183,26 @@ else:
 	if ip!=None:
 	    cursor.execute("REPLACE userips (ip, user) VALUES ('"+ip+"', "+str(int(custid))+")")
 	
-	# add a subscription record
-	password = genpasswd()
-	values="'WAITING', '"+password+"'"
-	fields="status, password"
 	game = game_id
 	if tutorial_id!=None and status!='ACTIVE':
 	    game=tutorial_id
-	if bonus!=None:
-	    fields=fields+", bonus"
-	    if bonus=='yes':
-		values=values+", 1"
-	    else:
-		values=values+", 0"
-	cursor.execute("insert into subscriptions (user, race, game, "+fields+") VALUES ("+str(int(custid))+", '"+race+"', "+str(game)+", "+values+")")
-	cursor.execute("SELECT LAST_INSERT_ID() from dual")
-	sid = cursor.fetchone()[0]
+	exist = cursor.execute("select id, password from subscriptions where status='WAITING' AND user="+str(custid)+" and game="+str(game))
+	if exist:
+	    sid, password = cursor.fetchone()
+	else:
+	    # add a subscription record
+	    password = genpasswd()
+	    values="'WAITING', '"+password+"'"
+	    fields="status, password"
+	    if bonus!=None:
+		fields=fields+", bonus"
+		if bonus=='yes':
+		    values=values+", 1"
+		else:
+		    values=values+", 0"
+	    cursor.execute("insert into subscriptions (user, race, game, "+fields+") VALUES ("+str(int(custid))+", '"+race+"', "+str(game)+", "+values+")")
+	    cursor.execute("SELECT LAST_INSERT_ID() from dual")
+	    sid = cursor.fetchone()[0]
 	Send(email, custid, sid, firstname, password, game)
 	text={"de":"Deine Anmeldung wurde bearbeitet. Eine EMail mit Hinweisen ist unterwegs zu Dir", "en":"Your application was processed. An email containing further instructions is being sent to you"}
 	Display("<p>"+text[locale]+".")
