@@ -109,7 +109,7 @@ use_potion(unit * u, const item_type * itype, const char * cmd)
 			holz += new_use_pooled(u, oldresourcetype[R_MALLORN], GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10 - holz);
 		rsettrees(r, rtrees(r) + holz);
 		add_message(&u->faction->msgs, new_message(u->faction,
-			"growtree_effect%u:unit%i:amount", u, holz));
+			"growtree_effect%u:mage%i:amount", u, holz));
 	} else if (ptype==oldpotiontype[P_HEAL]) {
 		return EUNUSABLE;
 	} else if (ptype==oldpotiontype[P_HEILWASSER]) {
