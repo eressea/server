@@ -838,7 +838,7 @@
 		<skill name="sk_weaponsmithing" modifier="14"></skill>
 		<attack type="4" damage="2d8+4"></attack>
 	</race>
-	<race name="spell" magres="0.000000" maxaura="1.000000" regaura="0.100000" recruitcost="0" maintenance="0" weight="0" speed="0.000000" hp="1" ac="0" damage="1d4" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" nolearn noheal noweapons illusionary>
+	<race name="spell" magres="0.000000" maxaura="1.000000" regaura="0.100000" recruitcost="0" maintenance="0" weight="0" speed="0.000000" hp="1" ac="0" damage="1d4" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" nolearn noheal noweapons illusionary fly swim walk>
 		<ai splitsize="1"></ai>
 		<attack type="1" damage="1d4"></attack>
 	</race>

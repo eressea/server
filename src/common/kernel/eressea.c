@@ -2120,7 +2120,7 @@ parse_tagbegin(struct xml_stack *stack)
 			int k;
 			for (k=0;k!=MAXKEYWORDS;++k) {
 				if (strncmp(keywords[k], name, strlen(name))==0) {
-					global.disabled[k]=0;
+					global.disabled[k]=1;
 					break;
 				}
 			}
