@@ -1150,7 +1150,8 @@ orc_growth(void)
     unit *u;
     for (u = r->units; u; u = u->next) {
       curse *c = get_curse(u->attribs, ct_find("orcish"));
-      if (c && !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
+
+      if (c && !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY) && !fval(u, UFL_HERO)) {
         int n;
         int increase = 0;
         int num  = get_cursedmen(u, c);
@@ -1162,9 +1163,9 @@ orc_growth(void)
           }
         }
         if (increase) {
-          set_number(u, u->number + increase);
+          u2 = create_unit(r, u->faction, increase, u->race, 0, NULL, u);
+          transfermen(u2, u, u2->number);
 
-          u->hp += unit_max_hp(u) * increase;
           ADDMSG(&u->faction->msgs, msg_message("orcgrowth",
             "unit amount race", u, increase, u->race));
         }
