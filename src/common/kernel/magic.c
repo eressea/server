@@ -2824,7 +2824,7 @@ magic(void)
               continue;
             }
             if (range > 1024) { /* (2^10) weiter als 10 Regionen entfernt */
-              ADDMSG(&u->faction->msgs, msg_message("spellfail::nolevel",
+              ADDMSG(&u->faction->msgs, msg_message("spellfail::nocontact",
                 "mage region command target", u, u->region, so->s, 
                 gc_add(strdup(regionid(target_r)))));
               continue;

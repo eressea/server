@@ -3178,147 +3178,148 @@ new_units (void)
 static void
 setdefaults (void)
 {
-	region *r;
-	unit *u;
-	strlist *S;
+  region *r;
 
-	for (r = regions; r; r = r->next){
-		for (u = r->units; u; u = u->next) {
-			boolean trade = false;
+  for (r = regions; r; r = r->next) {
+    unit *u;
 
-			set_string(&u->thisorder, u->lastorder);
-			for(S = u->orders; S; S = S->next) {
-				const char * cmd;
-				keyword_t keyword = igetkeyword(S->s, u->faction->locale);
+    for (u = r->units; u; u = u->next) {
+      strlist *slist;
+      boolean trade = false;
 
-				switch (keyword) {
+      if (LongHunger() && fval(u, UFL_HUNGER)) {
+        /* Hungernde Einheiten führen NUR den default-Befehl aus */
+        const char * cmd = locale_string(u->faction->locale, "defaultorder");
+        set_string(&u->thisorder, cmd);
+        continue;
+      }
 
-					/* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
-					 * werden. Da Handel erst nach anderen langen Befehlen kommt,
-					 * muß das vorher abgefangen werden. Wir merken uns also
-					 * hier, ob die Einheit handelt. */
+      /* by default the default long order becomes the new long order. */
+      set_string(&u->thisorder, u->lastorder);
+      
+      /* check all orders for a potential new long order this round: */
+      for (slist=u->orders; !trade && slist!=NULL; slist=slist->next) {
+        const char * cmd = slist->s;
 
-				case K_BUY:
-				case K_SELL:
-					trade = true;
-					break;
+        keyword_t keyword = igetkeyword(cmd, u->faction->locale);
+        switch (keyword) {
 
-				case K_CAST:
-					set_string(&u->thisorder, "");
-					break;
-					/* dient dazu, das neben Zaubern kein weiterer Befehl
-					 * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
+          case K_BUY:
+          case K_SELL:
+            /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
+             * werden. */
+            set_string(&u->thisorder, "");
+            trade = true;
+            break;
 
-					/* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
-					 * Arten von MACHE zaehlen aber als neue defaults und werden
-					 * behandelt wie die anderen (deswegen kein break nach case
-					 * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
-					 * abgespeichert). */
+          case K_CAST:
+            /* dient dazu, das neben Zaubern kein weiterer Befehl
+             * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
+            set_string(&u->thisorder, "");
+            break;
 
-				case K_MAKE:
-					if (getparam(u->faction->locale) == P_TEMP) break;
-				case K_BESIEGE:
-				case K_ENTERTAIN:
-				case K_TAX:
-	  		case K_RESEARCH:
-				case K_SPY:
-				case K_STEAL:
-				case K_SABOTAGE:
-				case K_STUDY:
-		  	case K_TEACH:
-				case K_ZUECHTE:
+          case K_MAKE:
+            /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
+            * Arten von MACHE zaehlen aber als neue defaults und werden
+            * behandelt wie die anderen (deswegen kein break nach case
+            * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
+            * abgespeichert). */
+            if (getparam(u->faction->locale) == P_TEMP) break;
+            /* else fall through */
+
 #if GROWING_TREES
-				case K_PFLANZE:
+          case K_PFLANZE:
 #endif
-				case K_BIETE:
-				case K_PIRACY:
-					if (idle (u->faction)) {
-						set_string (&u->thisorder, locale_string(u->faction->locale, "defaultorder"));
-						break;
-					}
-					/* Ab hier Befehle, die auch eine idle
-					 * Faction machen darf: */
-				case K_ROUTE:
-				case K_WORK:
-				case K_DRIVE:
-				case K_MOVE:
-				case K_WEREWOLF:
-					cmd = S->s;
-					if (LongHunger() && fval(u, UFL_HUNGER)) {
-						cmd = locale_string(u->faction->locale, "defaultorder");
-					}
-					set_string(&u->thisorder, cmd);
-					break;
+          case K_BESIEGE:
+          case K_ENTERTAIN:
+          case K_TAX:
+          case K_RESEARCH:
+          case K_SPY:
+          case K_STEAL:
+          case K_SABOTAGE:
+          case K_STUDY:
+          case K_TEACH:
+          case K_ZUECHTE:
+          case K_BIETE:
+          case K_PIRACY:
+            /* Über dieser Zeile nur Befehle, die auch eine idle Faction machen darf */
+            if (idle (u->faction)) {
+              set_string (&u->thisorder, locale_string(u->faction->locale, "defaultorder"));
+              break;
+            }
+            /* else fall through */
 
-					/* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
-					 * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
-					 * nicht moeglich ist, Schulden zu machen. */
-				}
-			}
+          case K_ROUTE:
+          case K_WORK:
+          case K_DRIVE:
+          case K_MOVE:
+          case K_WEREWOLF:
+            set_string(&u->thisorder, cmd);
+            break;
 
-			/* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
-			 * werden. */
+            /* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
+            * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
+            * nicht moeglich ist, Schulden zu machen. */
+        }
+      }
 
-			if(trade == true) {
-				/* fset(u, UFL_LONGACTION); */
-				set_string(&u->thisorder, "");
-			}
-			/* thisorder kopieren wir nun nach lastorder. in lastorder steht
-			 * der DEFAULT befehl der einheit. da MOVE kein default werden
-			 * darf, wird MOVE nicht in lastorder kopiert. MACHE TEMP wurde ja
-			 * schon gar nicht erst in thisorder kopiert, so dass MACHE TEMP
-			 * durch diesen code auch nicht zum default wird Ebenso soll BIETE
-			 * nicht hierher, da i.A. die Einheit dann ja weg ist (und damit
-			 * die Einheitsnummer ungueltig). Auch Attackiere sollte nie in
-			 * den Default übernommen werden */
+      /* thisorder kopieren wir nun nach lastorder. in lastorder steht
+      * der DEFAULT befehl der einheit. da MOVE kein default werden
+      * darf, wird MOVE nicht in lastorder kopiert. MACHE TEMP wurde ja
+      * schon gar nicht erst in thisorder kopiert, so dass MACHE TEMP
+      * durch diesen code auch nicht zum default wird Ebenso soll BIETE
+      * nicht hierher, da i.A. die Einheit dann ja weg ist (und damit
+      * die Einheitsnummer ungueltig). Auch Attackiere sollte nie in
+      * den Default übernommen werden */
+      switch (igetkeyword (u->thisorder, u->faction->locale)) {
+        case K_MOVE:
+        case K_BIETE:
+        case K_ATTACK:
+        case K_WEREWOLF:
+        case NOKEYWORD:
+          break;
 
-			switch (igetkeyword (u->thisorder, u->faction->locale)) {
-				case K_MOVE:
-				case K_BIETE:
-				case K_ATTACK:
-				case K_WEREWOLF:
-				break;
+        default:
+          set_string(&u->lastorder, u->thisorder);
+      }
 
-			default:
-				set_string(&u->lastorder, u->thisorder);
-			}
-			/* Attackiere sollte niemals Default werden */
-			if (igetkeyword(u->lastorder, u->faction->locale) == K_ATTACK)
-				set_string(&u->lastorder, locale_string(u->faction->locale, "defaultorder"));
-
-		}
-	}
+      /* Attackiere sollte niemals Default werden */
+      if (igetkeyword(u->lastorder, u->faction->locale) == K_ATTACK) {
+        set_string(&u->lastorder, locale_string(u->faction->locale, "defaultorder"));
+      }
+    }
+  }
 }
 
 static int
 use_item(unit * u, const item_type * itype, int amount, const char * cmd)
 {
-	int i;
-	int target = read_unitid(u->faction, u->region);
+  int i;
+  int target = read_unitid(u->faction, u->region);
 
-	i = new_get_pooled(u, itype->rtype, GET_DEFAULT);
+  i = new_get_pooled(u, itype->rtype, GET_DEFAULT);
 
-	if (amount>i) {
-		amount = i;
-	}
-	if (i==0) {
-		cmistake(u, cmd, 43, MSG_PRODUCE);
-		return ENOITEM;
-	}
+  if (amount>i) {
+    amount = i;
+  }
+  if (i==0) {
+    cmistake(u, cmd, 43, MSG_PRODUCE);
+    return ENOITEM;
+  }
 
-	if (target==-1) {
-		if (itype->use==NULL) {
-			cmistake(u, cmd, 76, MSG_PRODUCE);
-			return EUNUSABLE;
-		}
-		return itype->use(u, itype, amount, cmd);
-	} else {
-		if (itype->useonother==NULL) {
-			cmistake(u, cmd, 76, MSG_PRODUCE);
-			return EUNUSABLE;
-		}
-		return itype->useonother(u, target, itype, amount, cmd);
-	}
+  if (target==-1) {
+    if (itype->use==NULL) {
+      cmistake(u, cmd, 76, MSG_PRODUCE);
+      return EUNUSABLE;
+    }
+    return itype->use(u, itype, amount, cmd);
+  } else {
+    if (itype->useonother==NULL) {
+      cmistake(u, cmd, 76, MSG_PRODUCE);
+      return EUNUSABLE;
+    }
+    return itype->useonother(u, target, itype, amount, cmd);
+  }
 }
 
 
