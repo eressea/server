@@ -105,11 +105,11 @@ check_victory_murder(void)
 }
 #endif
 
-boolean
+void
 check_victory(void)
 {
 #if VICTORY_CONDITION == VICTORY_MURDER
-	return check_victory_murder();
+	check_victory_murder();
 #endif
 }
 
