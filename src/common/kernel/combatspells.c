@@ -1705,100 +1705,101 @@ sp_healing(fighter * fi, int level, double power, spell * sp)
 int
 sp_undeadhero(fighter * fi, int level, double power, spell * sp)
 {
-	battle *b = fi->side->battle;
-	unit *mage = fi->unit;
-	region *r = b->region;
-	int minrow = FIGHT_ROW;
-	int maxrow = AVOID_ROW;
-	cvector *fgs;
-	void **fig;
-	int n, j, undead = 0;
-	int k = (int)get_force(power,0);
-	double c = 0.50 + 0.02 * power;
+  battle *b = fi->side->battle;
+  unit *mage = fi->unit;
+  region *r = b->region;
+  int minrow = FIGHT_ROW;
+  int maxrow = AVOID_ROW;
+  cvector *fgs;
+  void **fig;
+  int n, j, undead = 0;
+  int k = (int)get_force(power,0);
+  double c = 0.50 + 0.02 * power;
 
-	/* Liste aus allen Kämpfern */
-	fgs = fighters(b, fi, minrow, maxrow,	FS_ENEMY | FS_HELP );
-	v_scramble(fgs->begin, fgs->end);
+  /* Liste aus allen Kämpfern */
+  fgs = fighters(b, fi, minrow, maxrow,	FS_ENEMY | FS_HELP );
+  v_scramble(fgs->begin, fgs->end);
 
-	for (fig = fgs->begin; fig != fgs->end; ++fig) {
-		fighter *df = *fig;
-		unit *du = df->unit;
+  for (fig = fgs->begin; fig != fgs->end; ++fig) {
+    fighter *df = *fig;
+    unit *du = df->unit;
 
-		if (!k)
-			break;
+    if (!k)
+      break;
 
-		/* keine Monster */
-		if (!playerrace(du->race))
-			continue;
+    /* keine Monster */
+    if (!playerrace(du->race))
+      continue;
 
-		if (df->alive + df->run.number < du->number) {
-			j = 0;
+    if (df->alive + df->run.number < du->number) {
+      j = 0;
 
-			/* Wieviele Untote können wir aus dieser Einheit wecken? */
-			for (n = df->alive + df->run.number; n <= du->number; n++) {
-				if (!k) break;
+      /* Wieviele Untote können wir aus dieser Einheit wecken? */
+      for (n = df->alive + df->run.number; n <= du->number; n++) {
+        if (!k) break;
 
-				if (chance(c)) {
-					undead++;
-					j++;
-					--df->side->casualties;
-					--k;
-				}
-			}
+        if (chance(c)) {
+          undead++;
+          j++;
+          --df->side->casualties;
+          ++df->side->alive;
+          --k;
+        }
+      }
 
-			if (j > 0) {
-				int hp = unit_max_hp(du);
-				if (j == du->number) {
-					/* Einheit war vollständig tot und konnte vollständig zu
-					 * Untoten gemacht werden */
-					int nr;
+      if (j > 0) {
+        int hp = unit_max_hp(du);
+        if (j == du->number) {
+          /* Einheit war vollständig tot und konnte vollständig zu
+          * Untoten gemacht werden */
+          int nr;
 
-					du->race = new_race[RC_UNDEAD];
-					setguard(du, GUARD_NONE);
-					u_setfaction(du,mage->faction);
-					if (fval(mage, UFL_PARTEITARNUNG))
-						fset(du, UFL_PARTEITARNUNG);
-					df->alive = du->number;
-					/* den Toten wieder volle Hitpoints geben */
-					for (nr = 0; nr != df->alive; ++nr) {
-						df->person[nr].hp = hp;
-					}
-					/* vereinfachtes loot */
-					change_money(mage, get_money(du));
-					set_money(du, 0);
-				} else {
-					unit *u;
-					u = createunit(r, mage->faction, 0, new_race[RC_UNDEAD]);
-					transfermen(du, u, j);
-					sprintf(buf, "%s", du->name);
-					set_string(&u->name, buf);
-					sprintf(buf, "%s", du->display);
-					set_string(&u->display, buf);
-					u->status = du->status;
-					setguard(u, GUARD_NONE);
-					if (fval(mage, UFL_PARTEITARNUNG))
-						fset(u, UFL_PARTEITARNUNG);
-					set_string(&u->lastorder, du->lastorder);
-					/* den Toten volle Hitpoints geben */
-					u->hp = u->number * unit_max_hp(u);
-				}
-			}
-		}
-	}
-	cv_kill(fgs);
+          du->race = new_race[RC_UNDEAD];
+          setguard(du, GUARD_NONE);
+          u_setfaction(du,mage->faction);
+          if (fval(mage, UFL_PARTEITARNUNG))
+            fset(du, UFL_PARTEITARNUNG);
+          df->alive = du->number;
+          /* den Toten wieder volle Hitpoints geben */
+          for (nr = 0; nr != df->alive; ++nr) {
+            df->person[nr].hp = hp;
+          }
+          /* vereinfachtes loot */
+          change_money(mage, get_money(du));
+          set_money(du, 0);
+        } else {
+          unit *u;
+          u = createunit(r, mage->faction, 0, new_race[RC_UNDEAD]);
+          transfermen(du, u, j);
+          sprintf(buf, "%s", du->name);
+          set_string(&u->name, buf);
+          sprintf(buf, "%s", du->display);
+          set_string(&u->display, buf);
+          u->status = du->status;
+          setguard(u, GUARD_NONE);
+          if (fval(mage, UFL_PARTEITARNUNG))
+            fset(u, UFL_PARTEITARNUNG);
+          set_string(&u->lastorder, du->lastorder);
+          /* den Toten volle Hitpoints geben */
+          u->hp = u->number * unit_max_hp(u);
+        }
+      }
+    }
+  }
+  cv_kill(fgs);
 
-	if (undead == 0) {
-		sprintf(buf, "%s kann keinen Untoten rufen.", unitname(mage));
-		level = 0;
-	} else if (undead == 1) {
-		sprintf(buf, "%s erweckt einen Untoten.", unitname(mage));
-		level = 1;
-	} else {
-		sprintf(buf, "%s erweckt %d Untote.", unitname(mage), undead);
-	}
+  if (undead == 0) {
+    sprintf(buf, "%s kann keinen Untoten rufen.", unitname(mage));
+    level = 0;
+  } else if (undead == 1) {
+    sprintf(buf, "%s erweckt einen Untoten.", unitname(mage));
+    level = 1;
+  } else {
+    sprintf(buf, "%s erweckt %d Untote.", unitname(mage), undead);
+  }
 
-	battlerecord(b, buf);
-	return level;
+  battlerecord(b, buf);
+  return level;
 }
 
 

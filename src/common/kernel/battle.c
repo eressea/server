@@ -2295,7 +2295,7 @@ aftermath(battle * b)
   for (fi = fighters->begin; fi != fighters->end; ++fi) {
     fighter *df = *fi;
     unit *du = df->unit;
-    int dead;
+    int dead = du->number - df->alive - df->run.number;
     const attrib *a;
     int pr_mercy = 0;
 
@@ -2305,38 +2305,41 @@ aftermath(battle * b)
       }
     }
 
-    dead = du->number - df->alive;
-    dead -= df->run.number;
 #ifdef TROLLSAVE
     /* Trolle können regenerieren */
-    if (df->alive > 0 && dead && old_race(du->race) == RC_TROLL)
+    if (df->alive > 0 && dead && old_race(du->race) == RC_TROLL) {
       for (i = 0; i != dead; ++i) {
         if (chance(TROLL_REGENERATION)) {
           ++df->alive;
           ++df->side->alive;
           ++df->side->battle->alive;
+          ++trollsave[df->side->index];
+          --dead;
         }
       }
-      trollsave[df->side->index] += dead - du->number + df->alive;
+    }
 #endif
-      /* Regeneration durch PR_MERCY */
-      if (dead && pr_mercy)
-        for (i = 0; i != dead; ++i)
-          if (rand()%100 < pr_mercy) {
-            ++df->alive;
-            ++df->side->alive;
-            ++df->side->battle->alive;
-          }
+    /* Regeneration durch PR_MERCY */
+    if (dead>0 && pr_mercy) {
+      for (i = 0; i != dead; ++i) {
+        if (rand()%100 < pr_mercy) {
+          ++df->alive;
+          ++df->side->alive;
+          ++df->side->battle->alive;
+          --dead;
+        }
+      }
+    }
 
-          /* Tote, die wiederbelebt werde können */
-          if (playerrace(df->unit->race)) {
-            df->side->casualties += dead;
-          }
+    /* Tote, die wiederbelebt werde können */
+    if (playerrace(df->unit->race)) {
+      df->side->casualties += dead;
+    }
 #ifdef SHOW_KILLS
-          if (df->hits + df->kills) {
-            struct message * m = new_message(du->faction, "killsandhits%u:unit%i:hits%i:kills", du, df->hits, df->kills);
-            message_faction(b, du->faction, m);
-          }
+    if (df->hits + df->kills) {
+      struct message * m = new_message(du->faction, "killsandhits%u:unit%i:hits%i:kills", du, df->hits, df->kills);
+      message_faction(b, du->faction, m);
+    }
 #endif
   }
 
@@ -2376,7 +2379,7 @@ aftermath(battle * b)
       int dead = du->number - df->alive - df->run.number;
       int sum_hp = 0;
       int n;
-      snumber +=du->number;
+      snumber += du->number;
       if (relevant && df->action_counter >= du->number) {
         ship * sh = du->ship?du->ship:leftship(du);
 
