@@ -524,7 +524,6 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, const char
 	assert(itype!=NULL);
 	n = new_get_pooled(src, item2resource(itype), GET_DEFAULT);
 	n = min(want, n);
-#define GIVERESTRICTION 3
 	if (dest && src->faction != dest->faction && src->faction->age < GIVERESTRICTION) {
 		ADDMSG(&src->faction->msgs, msg_error(src, cmd, "giverestriction",
 					"turns", GIVERESTRICTION));
