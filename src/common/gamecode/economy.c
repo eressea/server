@@ -977,7 +977,8 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 				while (*itmp) {
 					if ((*itmp)->number > 0 
 							&& (*itmp)->number - new_get_resvalue(u, (*itmp)->type->rtype) > 0) {
-						give_item((*itmp)->number, (*itmp)->type, u, u2, S->s);
+						n = (*itmp)->number - new_get_resvalue(u, (*itmp)->type->rtype);
+						give_item(n, (*itmp)->type, u, u2, S->s);
 					}
 					else itmp = &(*itmp)->next;
 				}
