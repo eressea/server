@@ -3995,9 +3995,9 @@
 			<text locale="en">The more power a mage invests, the
 				more golems can be created before the aura
 				dissipates. Each golem has a 15% chance per week
-				to turn to dust. If you command a golem to "MAKE
-				SWORD/MAKE CLAYMORE" or "MAKE
-				SHIELD/CHAINMAIL/PLATEMAIL",it will work 5 iron
+				to turn to dust. If you command a golem to 'MAKE
+				SWORD/MAKE CLAYMORE' or 'MAKE
+				SHIELD/CHAINMAIL/PLATEMAIL',it will work 5 iron
 				ingots and disintegrate afterwards.
 			</text>
 		</string>
@@ -4338,7 +4338,7 @@
 				so ein Objekt von Magie zu befreien.
 			</text>
 			<text locale="en">Old legends of the druids say that what
-				normal people call "magic" consists of elemental
+				normal people call 'magic' consists of elemental
 				spirits. A magician summons these spirits and binds
 				them to various forms to achieve the desired effects.
 				This ritual is able to expel any elemental spirits
