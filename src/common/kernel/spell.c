@@ -7273,7 +7273,7 @@ sp_wdwpyramid(castorder *co)
 		int    maxshowdist;
 
 		for(r2 = regions; r2; r2 = r2->next) {
-			if(a_find(r->attribs, &at_wdwpyramid) != NULL) {
+			if(a_find(r2->attribs, &at_wdwpyramid) != NULL) {
 				int dist = distance(mage->region, r2);
 				if (dist < mindist) {
 					mindist = dist;
