@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: randenc.c,v 1.7 2001/02/10 10:40:10 enno Exp $
+ *	$Id: randenc.c,v 1.8 2001/02/10 14:07:29 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -443,7 +443,7 @@ get_allies(region * r, unit * u)
 		break;
 	}
 
-	newunit->faction = u->faction;
+	u_setfaction(newunit, u->faction);
 	if (u->race==RC_DAEMON) newunit->irace=u->irace;
 	if (fval(u, FL_PARTEITARNUNG)) fset(newunit, FL_PARTEITARNUNG);
 	fset(u, FL_ISNEW);
@@ -1372,7 +1372,7 @@ randomevents(void)
 				if (rand()%100 < 5) {
 					add_message(&u->faction->msgs, new_message(u->faction,
 						"desertion%u:unit%r:region", u, r));
-					u->faction = findfaction(MONSTER_FACTION);
+					u_setfaction(u, findfaction(MONSTER_FACTION));
 				}
 			}
 		}

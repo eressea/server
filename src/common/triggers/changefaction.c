@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: changefaction.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: changefaction.c,v 1.3 2001/02/10 14:07:29 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -62,7 +62,7 @@ changefaction_handle(trigger * t, void * data)
 	 */
 	changefaction_data * td = (changefaction_data*)t->data.v;
 	if (td->unit && td->faction) {
-		td->unit->faction = td->faction;
+		u_setfaction(td->unit, td->faction);
 	} else {
 		fprintf(stderr, "\aERROR: could not perform changefaction::handle()\n");
 	}
