@@ -16,8 +16,14 @@ if (trylock(sys.argv[1]+'.err')!=0):
   sys.exit()
 
 # move input file then unlock it:
-os.rename(sys.argv[1]+'.err', sys.argv[1]+'.tmp')
-unlock(sys.argv[1]+'.err')
+if os.access(sys.argv[1]+'.err', os.F_OK)==0:
+    unlock(sys.argv[1]+'.err')
+    sys.exit();
+
+try:
+    os.rename(sys.argv[1]+'.err', sys.argv[1]+'.tmp')
+finally:
+    unlock(sys.argv[1]+'.err')
 
 infile=open(sys.argv[1]+".tmp", "r")
 server=smtplib.SMTP('localhost')
