@@ -2804,6 +2804,31 @@ reorder(void)
 	}
 }
 
+#if 0
+
+static void
+evict(void)
+{
+	region *r;
+	strlist *S;
+	unit * u;
+
+	for (r=regions;r;r=r->next) {
+		for (u=r->units;u;u=u->next) {
+			for (S = u->orders; S; S = S->next) if (igetkeyword(S->s, u->faction->locale)==K_EVICT) {
+				/* Nur der Kapitän bzw Burgherr kann jemanden rausschmeißen */
+				if(!fval(u, FL_OWNER)) {
+					cmistake(u,S->s,146,MSG_EVENT);
+					continue;
+				}
+				int id = getid();
+				unit *u2 = findunit(id);
+			}
+		}
+	}
+}
+#endif
+
 static void
 renumber(void)
 {
@@ -3538,6 +3563,10 @@ processorders (void)
 
 	puts(" - Einheiten Sortieren");
 	reorder();
+#if 0
+	puts(" - Einheiten aus Gebäuden/Schiffen weisen");
+	evict();
+#endif
 	puts(" - Neue Nummern");
 	renumber();
 

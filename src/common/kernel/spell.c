@@ -3257,7 +3257,7 @@ sp_unholypower(castorder *co)
  * Kategorie:  Region, negativ
  *
  * Wirkung:
- *   alle Personen in der Region verlieren 8 HP * Magieresistenz
+ *   alle Personen in der Region verlieren 18 HP * Magieresistenz
  *   Wirkt gegen MR
  *   Rüstung wirkt nicht
  * Patzer:
@@ -3295,8 +3295,8 @@ sp_deathcloud(castorder *co)
 		if (target_resists_magic(mage, u, TYP_UNIT, 0)){
 			continue;
 		}
-		/* Jede Person verliert 8 HP */
-		damage = 8 * u->number;
+		/* Jede Person verliert 18 HP */
+		damage = 18 * u->number;
 		/* Reduziert durch Magieresistenz */
 		damage *= (100.0 - magic_resistance(u))/100.0;
 		change_hitpoints(u, -(int)damage);
@@ -8122,7 +8122,7 @@ spell spelldaten[] =
 		NULL,
 		M_CHAOS, (ONSHIPCAST), 1, 4,
 		{
-			{R_HITPOINTS, 4, SPC_FIX},
+			{R_HITPOINTS, 12, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0},
 			{0, 0, 0},
@@ -8277,7 +8277,7 @@ spell spelldaten[] =
 		5, 7,
 		{
 			{R_AURA, 30, SPC_FIX},
-		  {R_PEASANTS, 250, SPC_FIX},
+		  {R_PEASANTS, 50, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0},
 			{0, 0, 0}},
@@ -8440,8 +8440,8 @@ spell spelldaten[] =
 		"u+",
 		M_CHAOS, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 10,
 		{
-			{R_AURA, 8, SPC_LEVEL},
-			{R_PEASANTS, 50, SPC_LEVEL},
+			{R_AURA, 10, SPC_LEVEL},
+			{R_PEASANTS, 5, SPC_LEVEL},
 			{0, 0, 0},
 			{0, 0, 0},
 			{0, 0, 0}},
@@ -8459,7 +8459,7 @@ spell spelldaten[] =
 		M_CHAOS, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
 		{
 			{R_AURA, 40, SPC_FIX},
-			{R_HITPOINTS, 4, SPC_FIX},
+			{R_HITPOINTS, 15, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0},
 			{0, 0, 0}},
@@ -8546,7 +8546,7 @@ spell spelldaten[] =
 		M_CHAOS, (0), 5, 14,
 		{
 			{R_AURA, 150, SPC_FIX},
-		 {R_PEASANTS, 500, SPC_FIX},
+		 {R_PEASANTS, 200, SPC_FIX},
 		 {0, 0, 0},
 		 {0, 0, 0},
 		 {0, 0, 0}},
