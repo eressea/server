@@ -814,7 +814,7 @@ readgame(boolean backup)
 	}
 #endif
 	turn = ri(F);
-	read_dynamictypes();
+	/* read_dynamictypes(); */
 	if (global.data_version < NEWMAGIC) {
 		max_unique_id = 0;
 	} else {
@@ -1260,7 +1260,7 @@ writegame(char *path, char quiet)
 	sprintf(buf, "%s/%d.players", datapath(), turn);
 	export_players(playerfile);
 #endif
-	write_dynamictypes();
+	/* write_dynamictypes(); */
 
 	F = cfopen(path, "w");
 	if (F==NULL)

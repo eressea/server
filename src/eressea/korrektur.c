@@ -1788,7 +1788,7 @@ resize_plane(struct plane * p, int radius)
 		for (y=miny;y<=maxy;++y) {
 			region * r = findregion(x, y);
 			if (r==NULL) {
-				r = new_region(minx+x, miny+y);
+				r = new_region(x, y);
 				freset(r, RF_ENCOUNTER);
 				r->planep = p;
 				if (distance(r, center)==radius) {

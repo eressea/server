@@ -15,6 +15,20 @@
 	</string>
 </strings>
 
+<resource name="wand_of_tears">
+	<item notlost weight="1" capacity="0">
+		<function name="use" value="use_wand_of_tears"></function>
+	</item>
+</resource>
+<string name="wand_of_tears">
+	<text locale="de">Szepter der Tränen</text>
+	<text locale="en">wand of tears</text>
+</string>
+<string name="wand_of_tears_p">
+	<text locale="de">Szepter der Tränen</text>
+	<text locale="en">wands of tears</text>
+</string>
+
 <resource name="magicbox">
 	<comment>A magic box that increases the user's capacity by 10 WU</comment>
 	<item cursed weight="0" capacity="1000">

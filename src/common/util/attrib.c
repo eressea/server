@@ -252,13 +252,12 @@ a_read(FILE * f, attrib ** attribs)
 
 	while(key!=-1) {
 		attrib_type * at = at_find(key);
-		attrib * na;
 		if (!at) {
 			fprintf(stderr, "attribute hash: %d (%s)\n", key, zText);
 			assert(at || !"attribute not registered");
 		}
 		if (at->read) {
-			na = a_new(at);
+			attrib * na = a_new(at);
 			if (at->read(na, f))
 				a_add(attribs, na);
 			else

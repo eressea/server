@@ -522,12 +522,6 @@
 	<string name="wand_p">
 		<text locale="de">Zauberstäbe</text>
 	</string>
-	<string name="wand_of_tears">
-		<text locale="de">Szepter der Tränen</text>
-	</string>
-	<string name="wand_of_tears_p">
-		<text locale="de">Szepter der Tränen</text>
-	</string>
 
 	<comment>Burgausbaustufen</comment>
 	<string name="site">

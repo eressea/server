@@ -1917,12 +1917,6 @@
 	<string name="wand_p">
 		<text locale="en">wands</text>
 	</string>
-	<string name="wand_of_tears">
-		<text locale="en">wand of tears</text>
-	</string>
-	<string name="wand_of_tears_p">
-		<text locale="en">wands of tears</text>
-	</string>
 
 	<comment>  Küsten</comment>
 	<string name="Nordwestküste">
