@@ -225,11 +225,11 @@ age_borders(void)
     }
   }
   while (deleted) {
-    border_list * blist = deleted;
-    border * b = blist->data;
+    border_list * blist = deleted->next;
+    border * b = deleted->data;
     erase_border(b);
-    deleted = blist->next;
     free(deleted);
+    deleted = blist;
   }
 }
 
