@@ -2405,6 +2405,10 @@ instant_orders(void)
 					setstealth(u, S);
 					break;
 
+				case K_WEREWOLF:
+					setwere(u, S);
+					break;
+
 				case K_STATUS:
 					param = getstrtoken();
 					switch (findparam(param, u->faction->locale)) {
@@ -3126,6 +3130,7 @@ setdefaults (void)
 				case K_WORK:
 				case K_DRIVE:
 				case K_MOVE:
+				case K_WEREWOLF:
 					cmd = S->s;
 #if HUNGER_DISABLES_LONGORDERS
 					if (fval(u, FL_HUNGER)) {
@@ -3161,6 +3166,7 @@ setdefaults (void)
 				case K_MOVE:
 				case K_BIETE:
 				case K_ATTACK:
+				case K_WEREWOLF:
 				break;
 
 			default:

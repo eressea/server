@@ -1780,7 +1780,9 @@
 	<string name="GM">
 		<text locale="de">GM</text>
 	</string>
-
+	<string name="WERWESEN">
+		<text locale="de">WERWESEN</text>
+	</string>
 
 	<string name="Adler">
 		<text locale="de">Adler</text>

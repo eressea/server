@@ -231,9 +231,8 @@ const char *keywords[MAXKEYWORDS] =
 #endif
 	"PRÄFIX",
 	"SYNONYM",
-#if GROWING_TREES
 	"PFLANZEN",
-#endif
+	"WERWESEN"
 };
 
 const char *report_options[MAX_MSG] =

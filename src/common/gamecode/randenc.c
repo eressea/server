@@ -1044,6 +1044,7 @@ godcurse(void)
 void
 randomevents(void)
 {
+	faction *f;
 	region *r;
 	building *b, *b2;
 	unit *u;
@@ -1467,6 +1468,19 @@ randomevents(void)
 					ADDMSG(&u->faction->msgs, msg_message("desertion",
 						"unit region", u, r));
 					u_setfaction(u, findfaction(MONSTER_FACTION));
+				}
+			}
+		}
+	}
+	
+	for (f = factions; f; f=f->next) {
+		int level = fspecial(f, FS_LYCANTROPE);
+		if(level > 0) {
+			for(u = f->units; u; u=u->nextF) {
+				if(rand()%100 < 2*level) {
+					ADDMSG(&u->faction->msgs, msg_message("becomewere",
+						"unit region", u, u->region));
+					fset(u, UFL_WERE);
 				}
 			}
 		}

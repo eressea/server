@@ -26,6 +26,7 @@ struct unit;
 struct region;
 struct strlist;
 
+void setwere(struct unit * u, struct strlist * S);
 void setstealth(struct unit * u, struct strlist * S);
 void spy(struct region * r, struct unit * u);
 void sabotage(struct region * r, struct unit * u);

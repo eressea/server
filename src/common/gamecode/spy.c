@@ -109,6 +109,45 @@ spy(region * r, unit * u)
 }
 
 void
+setwere(unit *u, strlist *S)
+{
+	int level = fspecial(u->faction,FS_LYCANTROPE);
+	char *s;
+
+	if(!level) {
+		cmistake(u, S->s, 311, MSG_EVENT);
+		return;
+	}
+
+	s = getstrtoken();
+
+	if(s == NULL || *s == '\0') {
+		if(fval(u, UFL_WERE)) {
+			cmistake(u, S->s, 309, MSG_EVENT);
+		} else if(rand()%100 < 35+(level-1)*20) { /* 35, 55, 75, 95% */
+			fset(u, UFL_WERE);
+		} else {
+			cmistake(u, S->s, 311, MSG_EVENT);
+		}
+		return;
+	}
+
+	if(findparam(s, u->faction->locale) == P_NOT) {
+		if(fval(u, UFL_WERE)) {
+			cmistake(u, S->s, 310, MSG_EVENT);
+		} else if(rand()%100 < 90-level*20) {	/* 70, 50, 30, 10% */
+			freset(u, UFL_WERE);
+		} else {
+			cmistake(u, S->s, 311, MSG_EVENT);
+		}
+
+		return;
+	}
+
+	return;
+}
+
+void
 setstealth(unit * u, strlist * S)
 {
 	char *s;
@@ -124,7 +163,6 @@ setstealth(unit * u, strlist * S)
 		u_seteffstealth(u, -1);
 		return;
 	}
-
 
 	trace = findrace(s, u->faction->locale);
 	if (trace) {

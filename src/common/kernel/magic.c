@@ -2888,6 +2888,10 @@ magic(void)
 					!is_cursed(u->attribs, C_KAELTESCHUTZ,0))
 				continue;
 
+			if(fval(u, UFL_WERE)) {
+				continue;
+			}
+
 			if (attacked(u)) {
 				continue;
 			}

@@ -4340,6 +4340,96 @@
 			</nr>
 		</locale>
 	</message>
+	
+	<message name="error309">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<locale name="de">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - Diese Einheit ist schon ein Werwesen."</text>
+			</nr>
+		</locale>
+		<locale name="en">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - This unit already assumed lycantropic form."</text>
+			</nr>
+		</locale>
+	</message>
+	
+	<message name="error310">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<locale name="de">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - Diese Einheit ist kein Werwesen."</text>
+			</nr>
+		</locale>
+		<locale name="en">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - This unit is not in lycantropic form."</text>
+			</nr>
+		</locale>
+	</message>
+	
+	<message name="error311">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<locale name="de">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - Die Einheit kann sich nicht verwandeln."</text>
+			</nr>
+		</locale>
+		<locale name="en">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - This unit can not change shape."</text>
+			</nr>
+		</locale>
+	</message>
+	
+	<message name="error312">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<locale name="de">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - Werwesen können nicht mit anderen Personen gemischt werden."</text>
+			</nr>
+		</locale>
+		<locale name="en">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - Lycantropes may not be mixed with normal people."</text>
+			</nr>
+		</locale>
+	</message>
+	
+	<message name="error313">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<locale name="de">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - Werwesen können nicht arbeiten."</text>
+			</nr>
+		</locale>
+		<locale name="en">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - Lycantropes don't work."</text>
+			</nr>
+		</locale>
+	</message>
 
 	<message name="drown_on_ship">
 		<type>
@@ -7366,5 +7456,15 @@
 		<text locale="de">"SIEG! $if($eq($n,1), "Die Partei $winners hat", "Die Parteien $winners haben") die Siegbedingung für die erforderliche Zeit erfüllt. Das Spiel ist damit beendet."</text>
 		<text locale="en">"VICTORY! $if($eq($n,1), "The faction $winners has", "The factions $winners have") fulfilled the victory condition for the necessary time. The game is over."</text>
 	</message>
+	
+	<message name="becomewere" section="events">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+		</type>
+		<text locale="de">"$unit($unit) in $region($region) verwandelt sich in ein Werwesen."</text>
+		<text locale="en">"$unit($unit) in $region($region) becomes a lycantrope."</text>
+	</message>
+
 
 </messages>

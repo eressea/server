@@ -246,7 +246,7 @@ teach(region * r, unit * u)
 	char *s;
 	skill_t sk;
 
-	if ((u->race->flags & RCF_NOTEACH)) {
+	if ((u->race->flags & RCF_NOTEACH) || fval(u, UFL_WERE)) {
 		cmistake(u, u->thisorder, 274, MSG_EVENT);
 		return;
 	}
@@ -471,7 +471,7 @@ learn(void)
 					cmistake(u, findorder(u, u->thisorder), 52, MSG_PRODUCE);
 					continue;
 				}
-				if ((u->race->flags & RCF_NOLEARN)) {
+				if ((u->race->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
 					sprintf(buf, "%s können nichts lernen", LOC(default_locale, rc_name(u->race, 1)));
 					mistake(u, u->thisorder, buf, MSG_EVENT);
 					continue;

@@ -583,6 +583,8 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 		error = 73;
 	} else if (u2 && (has_skill(u, SK_MAGIC) || has_skill(u2, SK_MAGIC))) {
 		error = 158;
+	} else if (fval(u, UFL_WERE) != fval(u2, UFL_WERE)) {
+		error = 312;
 	} else {
 		if (n > u->number) n = u->number;
 		if (n == 0) {
@@ -3002,6 +3004,11 @@ entertain(region * r, unit * u)
 	int max_e;
 	request *o;
 
+	if (fval(u, UFL_WERE)) {
+		cmistake(u, findorder(u, u->thisorder), 58, MSG_INCOME);
+		return;
+	}
+
 	if (!effskill(u, SK_ENTERTAINMENT)) {
 		cmistake(u, findorder(u, u->thisorder), 58, MSG_INCOME);
 		return;
@@ -3094,6 +3101,10 @@ work(region * r, unit * u)
 	request *o;
 	int w;
 
+	if(fval(u, UFL_WERE)) {
+		cmistake(u, findorder(u, u->thisorder), 313, MSG_INCOME);
+		return;
+	}
 	if (besieged(u)) {
 		cmistake(u, findorder(u, u->thisorder), 60, MSG_INCOME);
 		return;
@@ -3143,6 +3154,11 @@ tax(region * r, unit * u, request ** taxorders)
 	int max;
 
 	if (!humanoidrace(u->race) && u->faction != findfaction(MONSTER_FACTION)) {
+		cmistake(u, findorder(u, u->thisorder), 228, MSG_INCOME);
+		return;
+	}
+	
+	if (fval(u, UFL_WERE)) {
 		cmistake(u, findorder(u, u->thisorder), 228, MSG_INCOME);
 		return;
 	}

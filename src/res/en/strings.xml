@@ -1593,6 +1593,9 @@
 	<string name="ZÜCHTEN">
 		<text locale="en">GROW</text>
 	</string>
+	<string name="WERWESEN">
+		<text locale="en">LYCANTROPE</text>
+	</string>
 
 	<string name="Adler">
 		<text locale="en">eagle</text>

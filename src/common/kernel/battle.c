@@ -773,9 +773,13 @@ select_armor(troop t)
 	int geschuetzt = 0;
 
 	/* Drachen benutzen keine Rüstungen */
-
 	if (!(t.fighter->unit->race->battle_flags & BF_EQUIPMENT))
 		return AR_NONE;
+	
+	/* ... und Werwölfe auch nicht */
+	if(fval(t.fighter->unit, UFL_WERE)) {
+		return AR_NONE;
+	}
 
 	do {
 		if (armordata[a].shield == 0) {
@@ -1026,6 +1030,11 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	ar += armordata[shield].prot;
 	/* natürliche Rüstung */
 	an = du->race->armor;
+	if(fval(du, UFL_WERE)) {
+		int level = fspecial(du->faction, FS_LYCANTROPE);
+		an += level;
+		da += level;
+	}
 	/* magische Rüstung durch Artefakte oder Sprüche */
 	/* Momentan nur Trollgürtel */
 	am = select_magicarmor(dt);
@@ -1581,6 +1590,11 @@ skilldiff(troop at, troop dt, int dist)
 	/* Effekte durch Rassen */
 	if (awp!=NULL && au->race == new_race[RC_HALFLING] && dragonrace(du->race)) {
 		skdiff += 5;
+	}
+
+	/* Werwolf */
+	if(fval(au, UFL_WERE)) {
+		skdiff += fspecial(au->faction, FS_LYCANTROPE);
 	}
 
 	if (old_race(au->race) == RC_GOBLIN &&
@@ -2862,12 +2876,12 @@ make_fighter(battle * b, unit * u, boolean attack)
 	if (fig->horses) {
 		if ((r->terrain != T_PLAIN && r->terrain != T_HIGHLAND
 				&& r->terrain != T_DESERT) || r_isforest(r)
-				|| eff_skill(u, SK_RIDING, r) < 2 || old_race(u->race) == RC_TROLL)
+				|| eff_skill(u, SK_RIDING, r) < 2 || old_race(u->race) == RC_TROLL || fval(u, UFL_WERE))
 			fig->horses = 0;
 	}
 
 	if (fig->elvenhorses) {
-		if (eff_skill(u, SK_RIDING, r) < 5 || old_race(u->race) == RC_TROLL)
+		if (eff_skill(u, SK_RIDING, r) < 5 || old_race(u->race) == RC_TROLL || fval(u, UFL_WERE))
 			fig->elvenhorses = 0;
 	}
 

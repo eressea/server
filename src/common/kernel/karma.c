@@ -274,20 +274,21 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Auswirkungen.",
 		100
 	},
-	/* TODO: Noch nicht implementiert */
 	{
 		"Lykanthrop",
 		"Angehörige einer Partei mit dieser Eigenschaft sind Werwesen. Einheiten "
-		"einer solchen Partei können sich mit Hilfe der Befehle 'WERWESEN' und "
+		"einer solchen Partei können sich mit Hilfe der langen Befehle 'WERWESEN' und "
 		"'WERWESEN NICHT' in eine andere Form verwandeln. Beide Befehle haben "
-		"nur eine gewisse Erfolgswahrscheinlichkeit und funktionieren nicht immer. "
-		"In Werform erhalten die Einheiten +2 auf Angriff und Schaden und "
-		"eine natürliche Rüstung von 2. Sie können sich so schnell "
-		"bewegen, als wäre sie beritten, benutzen aber keine Pferde im "
-		"Kampf, und verwenden als Rüstungen nur Schilde. Sie sind "
-		"eingeschränkt und können in Werform kein Geld verdienen "
-		"und nicht Lernen oder Lehren.",
-		1
+		"nur eine gewisse Erfolgswahrscheinlichkeit und funktionieren nicht immer: "
+		"Je höher die Stufe der Eigenschaft, desto größer die Wahrscheinlichkeit, "
+		"dass die Verwandlung gelingt, und je geringer die Chance, sich "
+		"zurückzuverwandeln. Zudem besteht eine zunehmende kleine Chance der "
+		"spontanen Verwandlung. In Werform erhalten die Einheiten einen Bonus auf "
+		"Angriff, Schaden und natürliche Rüstung in Höhe der Eigenschaft. Sie "
+		"benutzen jedoch keine Pferde im Kampf, und verwenden als Rüstungen nur "
+		"Schilde. Sie sind eingeschränkt und können in Werform kein Geld verdienen, "
+		"nicht Zaubern und nicht Lernen oder Lehren.",
+		4
 	},
 	/* TODO: Noch nicht implementiert */
 	/* Einheitenlimit-Senkung sinnlos für alte Parteien. */
@@ -295,7 +296,9 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Elite",
 		"Für eine Partei mit dieser Eigenschaft verdoppeln sich alle Boni- und "
 		"Mali ihrer Rasse. Ihre Unterhaltskosten erhöhen sich auf 12 Silber pro "
-		"Runde, ihr Einheitenlimit reduziert sich auf 25%%.",
+		"Runde, ihr Einheitenlimit reduziert sich auf 25%%. Diese Eigenschaft "
+		"kann nicht erworben werden, wenn die Partei nach dem Erwerb zuviele "
+		"Einheiten hätte.",
 		1
 	}
 };
