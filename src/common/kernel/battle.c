@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.12 2001/02/14 01:38:50 enno Exp $
+ *	$Id: battle.c,v 1.13 2001/02/14 08:35:12 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -598,6 +598,14 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
 			} else {
 				skill = race[u->race].df_default;
 			}
+		} else {
+			/* der rassen-defaultwert kann höher sein als der Talentwert von
+			 * waffenloser kampf */
+			if (attacking) {
+				if (skill < race[u->race].at_default) skill = race[u->race].at_default;
+			} else {
+				if (skill < race[u->race].df_default) skill = race[u->race].df_default;
+			} 
 		}
 	} else {
 		/* changed: if we own a weapon, we have at least a skill of 0 */
@@ -606,12 +614,14 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
 		if (attacking) {
 			skill += wtype->offmod;
 		} else {
+			/* Fernkämpfer haben im Nahkampf Talent 0 */
 			if (fval(wtype, WTF_MISSILE)) skill = 0;
 			else {
 				skill += wtype->defmod;
 			}
 		}
 	}
+	/* Rassenbonus auf Kampf */
 	if (attacking) {
 		skill += race[u->race].at_bonus;
 	} else {
@@ -659,8 +669,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 		}
 	}
 
-	/* Burgenbonus, Pferdebonus. Der Waffenabhängige wird aber * nicht hier
-	 * gemacht, sondern in weapon_effskill */
+	/* Burgenbonus, Pferdebonus */
 	if (riding(t) && (wtype==NULL || !fval(wtype, WTF_MISSILE))) {
 		skill += 2;
 #ifdef BETA_CODE
@@ -671,8 +680,9 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 	}
 
 	if (t.index<tf->elvenhorses) {
-		/* Elfenpferde: Helfen dem Reiter, egal ob und welche Waffe. Das ist eleganter, und
-		 * vor allem einfacher, sonst muß man noch ein WMF_ELVENHORSE einbauen. */
+		/* Elfenpferde: Helfen dem Reiter, egal ob und welche Waffe. Das ist
+		 * eleganter, und vor allem einfacher, sonst muß man noch ein
+		 * WMF_ELVENHORSE einbauen. */
 		skill += 2;
 	}
 
@@ -1515,9 +1525,10 @@ skilldiff(troop at, troop dt, int dist)
 			skdiff -= buildingeffsize(df->building, false);
 		}
 	}
-	/* Goblin-Verteidigung */
-
+	/* Goblin-Verteidigung
+	 * ist direkt in der Rassentabelle als df_default
 	if (du->race == RC_GOBLIN && dwp == NULL) skdiff -= 2;
+	*/
 
 	/* Effekte der Waffen */
 	skdiff += weapon_effskill(at, dt, awp, true, dist>1);
