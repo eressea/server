@@ -1916,7 +1916,10 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
         if (i>=size) pword = NOPARAM;
         switch (pword) {
           case P_REGION:
-            j = addparam_region(param+i, &spobj, u, ord);
+            spobj = malloc(sizeof(spllprm));
+            spobj->flag = 0;
+            spobj->typ = SPP_REGION;
+            spobj->data.r = u->region;
             ++c;
             break;
           case P_UNIT:
