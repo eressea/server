@@ -1841,8 +1841,7 @@ piracy(unit *u)
 
 				for(sh2 = rc->ships; sh2; sh2 = sh2->next) {
 					cap = shipowner(rc, sh2);
-					if (cap && !alliedunit(u, cap->faction, HELP_FIGHT)
-							&& (intlist_find(il, cap->faction->no) || all)) {
+					if (cap && (intlist_find(il, cap->faction->no) || all)) {
 						aff[dir]++;
 					}
 				}
