@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.10 2001/02/10 19:24:05 enno Exp $
+ *	$Id: battle.c,v 1.11 2001/02/11 08:55:30 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1752,6 +1752,14 @@ attack(battle *b, troop ta, att *a)
 					int dead;
 					standard_attack = wp->type->attack(&ta, &dead);
 					af->catmsg += dead;
+					/* TODO: dies hier ist nicht richtig. wenn die katapulte/etc. 
+					 * keinen gegner gefunden haben, sollte es nicht erhöht werden. 
+					 * außerdem müsste allen gegenern der counter erhöht werden.
+					 */
+					if (af->person[ta.index].last_action < b->turn) {
+						af->person[ta.index].last_action = b->turn;
+						af->action_counter++;
+					}
 				}
 				if (standard_attack) {
 					boolean missile = false;
@@ -3058,7 +3066,6 @@ battle_report(battle * b)
 				s2->bf->lastturn = b->turn;
 			}
 		} next(s2);
-		if (cont) break;
 	} next(s);
 
 	printf(" %d", b->turn);
