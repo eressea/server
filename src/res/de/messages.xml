@@ -7282,9 +7282,9 @@
 		<text locale="en">"Life itself touches the world and all beings are healed."</text>
 	</message>
 
-	<message name="showitem" section="events">
+	<message name="displayitem" section="events">
 		<type>
-			<arg name="item" type="item"></arg>
+			<arg name="item" type="resource"></arg>
 			<arg name="description" type="string"></arg>
 		</type>
 		<text locale="de">"$resource($item,1): $description"</text>

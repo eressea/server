@@ -33,8 +33,11 @@ typedef struct opstack {
 void * 
 opstack_pop(opstack ** stack)
 {
-	opstack * os = *stack;
+	opstack * os;
 	void * data;
+
+	assert(stack);
+	os = *stack;
 	assert(os);
 	data = os->data;
 	*stack = os->next;
