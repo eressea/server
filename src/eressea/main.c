@@ -718,10 +718,11 @@ main(int argc, char *argv[])
 		}
 	}
 	if (g_writemap) return crwritemap(); 
-	{
-		faction * monster = findfaction(MONSTER_FACTION);
-		display_item(monster, monster->units, it_find("mistletoe"));
-	}
+/*	{
+ * faction * monster = findfaction(MONSTER_FACTION);
+ * 		display_item(monster, monster->units, it_find("mistletoe"));
+ * 	}
+ * */
 	if ((i=processturn(orders))!=0) return i;
 
 #ifdef CLEANUP_CODE
