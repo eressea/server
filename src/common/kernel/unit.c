@@ -423,6 +423,7 @@ ucontact(const unit * u, const unit * u2)
 /* Prüft, ob u den Kontaktiere-Befehl zu u2 gesetzt hat. */
 {
 	attrib *ru;
+  if (u->faction==u2->faction) return true;
 
 	/* Explizites KONTAKTIERE */
 	for (ru = a_find(u->attribs, &at_contact); ru; ru = ru->nexttype)
