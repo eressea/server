@@ -2,7 +2,7 @@
 -- used on the jadee/wildente wedding island. the two _action functions
 -- are used as age() functions for a building_action with b:addaction("name")
 
-if gate_exchange==nil then
+if gate_travel==nil then
   dofile("gates.lua")
 end
 
@@ -24,7 +24,8 @@ local function wedding_exchange(b1, b2)
   local units1 = wedding_travellers(b1)
   local units2 = wedding_travellers(b2)
 
-  gate_exchange(b1, units1, b2, units2)
+  gate_travel(b2, units1)
+  gate_travel(b1, units2)
 end
 
 function hellgate_action(b)

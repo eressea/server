@@ -1,5 +1,6 @@
 function run_scripts()
   scripts = { 
+    "hse05-portals.lua"
   }
   for index in scripts do
     local script = scriptpath .. "/" .. scripts[index]
