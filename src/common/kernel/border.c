@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: border.c,v 1.5 2001/02/12 22:39:56 enno Exp $
+ *	$Id: border.c,v 1.6 2001/02/18 10:06:09 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -106,12 +106,12 @@ read_borders(FILE * f)
 		assert(type || !"border type not registered");
 		from = findregion(fx, fy);
 		if (!from) {
-			fputs("\aERROR: border for unknown regions\n", stderr);
+			log_error(("ERROR: border for unknown region %d,%d\n", fx, fy));
 			from = new_region(fx, fy);
 		}
 		to = findregion(tx, ty);
 		if (!to)  {
-			fputs("\aERROR: border for unknown regions\n", stderr);
+			log_error(("ERROR: border for unknown region %d,%d\n", tx, ty));
 			to = new_region(tx, ty);
 		}
 		if (to==from) {

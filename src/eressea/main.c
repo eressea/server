@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.17 2001/02/14 20:09:49 enno Exp $
+ *	$Id: main.c,v 1.18 2001/02/18 10:06:10 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -57,6 +57,7 @@
 #include <reports.h>
 #include <region.h>
 #include <save.h>
+#include <ship.h>
 #include <time.h>
 #include <border.h>
 #include <region.h>

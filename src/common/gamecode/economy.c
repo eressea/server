@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: economy.c,v 1.6 2001/02/10 19:24:04 enno Exp $
+ *	$Id: economy.c,v 1.7 2001/02/18 10:06:08 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2813,7 +2813,7 @@ produce(void)
 		for (u = r->units; u; u = u->next) {
 			strlist * s;
 
-			if (u->race == RC_SPELL || fval(u, FL_HADBATTLE))
+			if (u->race == RC_SPELL || fval(u, FL_LONGACTION))
 				continue;
 
 			if (rterrain(r) == T_GLACIER && u->race == RC_INSECT &&

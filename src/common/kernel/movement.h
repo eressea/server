@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.h,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: movement.h,v 1.3 2001/02/18 10:06:09 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -55,7 +55,7 @@ extern boolean cansail(const struct region * r, struct ship * sh);
 extern boolean canswim(struct unit *u);
 extern struct unit *kapitaen(struct region * r, struct ship * sh);
 extern void travelthru(struct unit * u, struct region * r);
-extern ship * move_ship(ship * sh, struct region * from, struct region * to, struct region ** route);
+extern struct ship * move_ship(struct ship * sh, struct region * from, struct region * to, struct region ** route);
 
 extern attrib_type at_piracy_direction;
 

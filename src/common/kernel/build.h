@@ -75,7 +75,7 @@ void create_ship(struct region * r, struct unit * u, const struct ship_type * ne
 void continue_ship(struct region * r, struct unit * u, int size);
 
 struct building * getbuilding(const struct region * r);
-ship *getship(const struct region * r);
+struct ship *getship(const struct region * r);
 
 void remove_contacts(void);
 void do_leave(void);
@@ -83,10 +83,10 @@ void do_misc(char try);
 
 void reportevent(struct region * r, char *s);
 
-void shash(ship * sh);
-void sunhash(ship * sh);
+void shash(struct ship * sh);
+void sunhash(struct ship * sh);
 
-void destroy_ship(ship * s, struct region * r);
+void destroy_ship(struct ship * s, struct region * r);
 
 /* ** ** ** ** ** ** *
  *  new build rules  *

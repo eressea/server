@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: magic.c,v 1.10 2001/02/18 09:21:11 katze Exp $
+ *	$Id: magic.c,v 1.11 2001/02/18 10:06:09 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -98,6 +98,7 @@ findshipr(const region *r, int n)
 
 	for (sh = r->ships; sh; sh = sh->next) {
 		if (sh->no == n) {
+			assert(sh->region == r);
 			return sh;
 		}
 	}
@@ -2639,8 +2640,9 @@ magic(void)
 
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) {
+			boolean casted = false;
 
-			if (u->race == RC_SPELL || fval(u, FL_HADBATTLE))
+			if (u->race == RC_SPELL || fval(u, FL_LONGACTION))
 				continue;
 
 			if (rterrain(r) == T_GLACIER && u->race == RC_INSECT &&
@@ -2661,7 +2663,7 @@ magic(void)
 						cmistake(u, so->s, 269, MSG_MAGIC);
 						continue;
 					}
-					set_string(&u->thisorder, "");
+					casted = true;
 					target_r = r;
 					mage = u;
 					level = eff_skill(u, SK_MAGIC, r);
@@ -2830,6 +2832,7 @@ magic(void)
 					add_castorder(&cll[(int)(sp->rank)], co);
 				}
 			}
+			if (casted) fset(u, FL_LONGACTION);
 		}
 	}
 	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {

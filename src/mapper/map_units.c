@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_units.c,v 1.3 2001/02/09 13:53:53 corwin Exp $
+ *	$Id: map_units.c,v 1.4 2001/02/18 10:06:10 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1270,7 +1270,7 @@ showunits(region * r)
 						}
 						x = un;
 					}
-					translist(&shipregion->ships, &r->ships, clipship);
+					move_ship(clipship, shipregion, r, NULL);
 					clipship = NULL;
 					shipregion = NULL;
 				}

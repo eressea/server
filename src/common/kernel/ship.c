@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: ship.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: ship.c,v 1.3 2001/02/18 10:06:09 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -216,7 +216,7 @@ const ship_type st_trireme = {
 };
 
 ship *
-new_ship(const ship_type * stype)
+new_ship(const ship_type * stype, region * r)
 {
 	static char buffer[7 + IDSIZE + 1];
 	ship *sh = (ship *) calloc(1, sizeof(ship));
@@ -224,6 +224,7 @@ new_ship(const ship_type * stype)
 	sh->no = newcontainerid();
 	sh->coast = NODIRECTION;
 	sh->type = stype;
+	sh->region = r;
 
 	sprintf(buffer, "Schiff %s", shipid(sh));
 	set_string(&sh->name, buffer);

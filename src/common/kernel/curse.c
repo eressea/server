@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: curse.c,v 1.5 2001/02/15 02:41:46 enno Exp $
+ *	$Id: curse.c,v 1.6 2001/02/18 10:06:09 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -30,6 +30,7 @@
 #include "race.h"
 #include "faction.h"
 #include "building.h"
+#include "ship.h"
 #include "objtypes.h"
 
 /* util includes */

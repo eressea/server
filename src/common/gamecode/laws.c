@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.26 2001/02/18 09:35:14 corwin Exp $
+ *	$Id: laws.c,v 1.27 2001/02/18 10:06:08 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2204,67 +2204,6 @@ reorder_owners(region * r)
 #endif
 }
 
-#if 0
-static void
-reorder_owners(region * r)
-{
-	unit * us[4096];
-	unit * u, **ui = &r->units;
-	unit ** first;
-	building * b;
-	ship * sh;
-	int i = 0;
-	int end;
-
-	if (rbuildings(r)==NULL && r->ships==NULL) return;
-	for (u=r->units;u;u=u->next) us[i++] = u;
-	end = i;
-	for (b=rbuildings(r);b;b=b->next) {
-		first = NULL;
-		for (i=0;i!=end;++i) if (us[i] && us[i]->building==b) {
-			if (!first) first = ui;
-			if (fval(us[i], FL_OWNER) && first != ui) {
-				us[i]->next = *first;
-				*first = us[i];
-			} else {
-				*ui = us[i];
-				ui = &us[i]->next;
-			}
-			us[i] = NULL;
-		}
-		u = buildingowner(r, b);
-		if (!fval(u, FL_OWNER)) {
-			fprintf(stderr, "WARNING: Gebäude %s hatte keinen Besitzer. Setze %s\n", buildingname(b), unitname(u));
-			fset(u, FL_OWNER);
-		}
-	}
-	for (i=0;i!=end;++i) if (us[i] && us[i]->ship==NULL) {
-		*ui = us[i];
-		ui = &us[i]->next;
-		us[i] = NULL;
-	}
-	for (sh=r->ships;sh;sh=sh->next) {
-		first = NULL;
-		for (i=0;i!=end;++i) if (us[i] && us[i]->ship==sh) {
-			if (!first) first = ui;
-			if (fval(us[i], FL_OWNER) && first != ui) {
-				us[i]->next = *first;
-				*first = us[i];
-			} else {
-				*ui = us[i];
-				ui = &us[i]->next;
-			}
-			us[i] = NULL;
-		}
-		u = shipowner(r, sh);
-		if (!fval(u, FL_OWNER)) {
-			fprintf(stderr, "WARNING: Das Schiff %s hatte keinen Besitzer. Setze %s\n", shipname(sh), unitname(u));
-			fset(u, FL_OWNER);
-		}
-	}
-	*ui = NULL;
-}
-#endif
 
 static attrib_type at_number = {
 	"faction_renum", 
@@ -2749,8 +2688,10 @@ setdefaults (void)
 			/* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
 			 * werden. */
 
-			if(trade == true) set_string(&u->thisorder, "");
-
+			if(trade == true) {
+				fset(u, FL_LONGACTION);
+				set_string(&u->thisorder, "");
+			}
 			/* thisorder kopieren wir nun nach lastorder. in lastorder steht
 			 * der DEFAULT befehl der einheit. da MOVE kein default werden
 			 * darf, wird MOVE nicht in lastorder kopiert. MACHE TEMP wurde ja

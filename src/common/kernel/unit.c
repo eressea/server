@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: unit.c,v 1.6 2001/02/18 09:32:13 corwin Exp $
+ *	$Id: unit.c,v 1.7 2001/02/18 10:06:10 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -32,6 +32,7 @@
 #include "movement.h"
 #include "race.h"
 #include "region.h"
+#include "ship.h"
 
 /* util includes */
 #include <resolve.h>
@@ -684,7 +685,7 @@ transfermen(unit * u, unit * u2, int n)
 	/* "hat attackiert"-status wird übergeben */
 
 	if (u2) {
-		if (fval(u, FL_HADBATTLE)) fset(u2, FL_HADBATTLE);
+		if (fval(u, FL_LONGACTION)) fset(u2, FL_LONGACTION);
 		hp = u->hp;
 		if (u->skills)
 			for (sk = 0; sk < MAXSKILLS; ++sk)

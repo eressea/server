@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.15 2001/02/14 20:09:48 enno Exp $
+ *	$Id: battle.c,v 1.16 2001/02/18 10:06:09 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2237,7 +2237,7 @@ aftermath(battle * b)
 			int n;
 
 			if (relevant && df->action_counter >= df->unit->number) {
-				fset(df->unit, FL_HADBATTLE);
+				fset(df->unit, FL_LONGACTION);
 				/* TODO: das sollte hier weg sobald anderswo üb
 				 * erall HADBATTLE getestet wird. */
 				set_string(&du->thisorder, "");
@@ -2440,17 +2440,15 @@ aftermath(battle * b)
 		}
 	}
 
-	sh = r->ships;
 	if (battle_was_relevant) {
-		while (sh) {
+		ship **sp = &r->ships;
+		while (*sp) {
+			ship * sh = *sp;
 			sh->drifted = false;
 			if (sh->damage >= sh->size * DAMAGE_SCALE) {
-				ship * sn = sh->next;
 				destroy_ship(sh, r);
-				sh = sn;
-			} else {
-				sh = sh->next;
 			}
+			if (*sp==sh) sp=&sh->next;
 		}
 	}
 #ifdef TROLLSAVE
@@ -3259,7 +3257,7 @@ do_battle(void)
 
 		/* list_foreach geht nicht, wegen flee() */
 		for (u = r->units; u != NULL; u = u->next) {
-			if (fval(u, FL_HADBATTLE)) continue;
+			if (fval(u, FL_LONGACTION)) continue;
 			if (u->number > 0) {
 				strlist *sl;
 

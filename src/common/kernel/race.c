@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: race.c,v 1.5 2001/02/14 08:35:12 katze Exp $
+ *	$Id: race.c,v 1.6 2001/02/18 10:06:09 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1852,7 +1852,7 @@ give_starting_equipment(struct region *r, struct unit *u)
 		break;
 	case RC_AQUARIAN:
 		{
-			ship *sh = new_ship(&st_boat);
+			ship *sh = new_ship(&st_boat, r);
 			sh->size = sh->type->construction->maxsize;
 			addlist(&r->ships, sh);
 			u->ship = sh;

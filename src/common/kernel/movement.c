@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.10 2001/02/17 15:02:49 enno Exp $
+ *	$Id: movement.c,v 1.11 2001/02/18 10:06:09 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -415,6 +415,7 @@ move_ship(ship * sh, region * from, region * to, region ** route)
 	attrib			*a;
 
 	translist(&from->ships, &to->ships, sh);
+	sh->region = to;
 
 	while (u) {
 		unit *nu = u->next;
@@ -1194,6 +1195,7 @@ travel(region * first, unit * u, region * next, int flucht)
 	else if (flucht)
 		move_unit(u, current, NULL);
 	set_string(&u->thisorder, "");
+	fset(u, FL_LONGACTION);
 	setguard(u, GUARD_NONE);
 
 	if (fval(u, FL_FOLLOWING)) caught_target(current, u);
@@ -1617,7 +1619,7 @@ kapitaen(region * r, ship * sh)
 
 /* Segeln, Wandern, Reiten */
 
-void
+static void
 move(region * r, unit * u, boolean move_on_land)
 {
 	region *r2;
@@ -1669,6 +1671,7 @@ move(region * r, unit * u, boolean move_on_land)
 			if (*up==uf) up = &uf->next;
 		}
 	}
+	if (u->region!=r) fset(u, FL_LONGACTION);
 }
 
 attrib_type at_piracy_direction = {
@@ -1863,6 +1866,7 @@ hunt(unit *u)
 		strcat(command, " ");
 		strcat(command, directions[dir]);
 		moves++;
+		rc = rconnect(rc, dir);
 	}
 
 	/* In command steht jetzt das NACH-Kommando. */
@@ -2027,11 +2031,10 @@ movement(void)
 						if(p != P_UNIT) {
 							cmistake(u, o->s, 240, MSG_MOVE);
 						}
-						u = u2; break;;
+						u = u2; break;
 					}
 
-					if(hunt(u)) {
-						set_string(&u->thisorder, "");
+					if (!fval(u, FL_LONGACTION) && hunt(u)) {
 						u = r->units;
 						continue;
 					}
@@ -2088,7 +2091,7 @@ follow(void)
 		for (u=r->units;u;u=u->next) {
 			attrib * a;
 			strlist * o;
-			if (fval(u, FL_HADBATTLE)) continue;
+			if (fval(u, FL_LONGACTION)) continue;
 			a = a_find(u->attribs, &at_follow);
 			for (o=u->orders;o;o=o->next) {
 				if (igetkeyword(o->s) == K_FOLLOW

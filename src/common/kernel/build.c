@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: build.c,v 1.7 2001/02/09 13:53:51 corwin Exp $
+ *	$Id: build.c,v 1.8 2001/02/18 10:06:09 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -854,7 +854,7 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want)
 	if (want>0) want = min(want, msize);
 	else want = msize;
 
-	sh = new_ship(newtype);
+	sh = new_ship(newtype, r);
 
 	addlist(&r->ships, sh);
 

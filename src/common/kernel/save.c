@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.19 2001/02/17 15:02:49 enno Exp $
+ *	$Id: save.c,v 1.20 2001/02/18 10:06:09 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -455,7 +455,7 @@ readfaction(void)
 		 * muß in "Gänsefüßchen" stehen!! */
 
 		/* War vorher in main.c:getgarbage() */
-		if (1 || !quiet) { 
+		if (!quiet) { 
 			printf(" %4s;", factionid(f));
 			fflush(stdout); 
 		}
@@ -1137,6 +1137,7 @@ readgame(boolean backup)
 		while (--p >= 0) {
 			sh = (ship *) calloc(1, sizeof(ship));
 
+			sh->region = r;
 			if (global.data_version>=FULL_BASE36_VERSION)
 				sh->no = rid(F);
 			else
@@ -1777,6 +1778,7 @@ writegame(char *path, char quiet)
 		wi(F, listlen(r->ships));
 		wnl(F);
 		for (sh = r->ships; sh; sh = sh->next) {
+			assert(sh->region == r);
 #if RELEASE_VERSION>= FULL_BASE36_VERSION
 			wid(F, sh->no);
 #else

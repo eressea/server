@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: study.c,v 1.6 2001/02/11 09:42:57 katze Exp $
+ *	$Id: study.c,v 1.7 2001/02/18 10:06:08 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -586,7 +586,7 @@ teaching(void)
 
 		for (u = r->units; u; u = u->next) {
 
-			if (u->race == RC_SPELL || fval(u, FL_HADBATTLE))
+			if (u->race == RC_SPELL || fval(u, FL_LONGACTION))
 				continue;
 
 			if (rterrain(r) == T_OCEAN && u->race != RC_AQUARIAN)

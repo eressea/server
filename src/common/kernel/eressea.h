@@ -52,6 +52,9 @@ struct item_type;
 struct potion_type;
 struct luxury_type;
 struct herb_type;
+/* types */
+struct ship_type;
+struct building_type;
 
 /* util includes */
 #include <cvector.h>
@@ -793,22 +796,6 @@ typedef struct strlist {
 	char * s;
 } strlist;
 
-typedef struct ship {
-	struct ship *next;
-	struct ship *nexthash;
-	int no;
-	char *name;
-	char *display;
-	struct attrib * attribs;
-	int size;
-	int damage; /* damage in 100th of a point of size */
-	int flags;
-	const struct ship_type * type;
-	direction_t coast;
-	boolean moved;
-	boolean drifted;
-} ship;
-
 extern int max_unique_id;
 typedef struct skillvalue {
 	skill_t id;
@@ -817,7 +804,7 @@ typedef struct skillvalue {
 
 #define FL_GUARD          (1<<0)	/* 1 */
 #define FL_ISNEW          (1<<1)	/* 2 */
-#define FL_HADBATTLE      (1<<2)	/* 4 */
+#define FL_LONGACTION     (1<<2)	/* 4 */
 #define FL_OWNER          (1<<3)	/* 8 */
 #define FL_PARTEITARNUNG  (1<<4)	/* 16 */
 #define FL_DISBELIEVES    (1<<5)	/* 32 */
@@ -991,7 +978,7 @@ char *factionname(const struct faction * f);
 char *regionid(const struct region * r);
 char *unitname(const struct unit * u);
 char *xunitid(const struct unit * u);
-char *shipname(const ship * sh);
+char *shipname(const struct ship * sh);
 
 struct building *largestbuilding(const struct region * r, boolean img);
 
@@ -1049,7 +1036,7 @@ const char *strcheck(const char *s, size_t maxlen);
 
 const char * findorder(const struct unit * u, const char * cmd);
 
-#define attacked(u) (fval(u, FL_HADBATTLE))
+#define attacked(u) (fval(u, FL_LONGACTION))
 boolean idle(struct faction * f);
 boolean unit_has_cursed_item(struct unit *u);
 struct region * rconnect(const struct region *, direction_t dir);

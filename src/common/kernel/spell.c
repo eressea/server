@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.c,v 1.11 2001/02/18 09:21:11 katze Exp $
+ *	$Id: spell.c,v 1.12 2001/02/18 10:06:09 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -41,6 +41,7 @@
 #include "race.h"
 #include "region.h"
 #include "resolve.h"
+#include "ship.h"
 #include "skill.h"
 #include "spy.h"
 #include "teleport.h"
