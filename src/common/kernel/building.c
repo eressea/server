@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: building.c,v 1.4 2001/02/03 13:45:32 enno Exp $
+ *	$Id: building.c,v 1.5 2001/02/03 18:46:15 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -824,7 +824,7 @@ bt_read(FILE * F)
 			char * s = buf+1;
 			assert(*(semi-2)=='\"');
 			*(semi-2)=0;
-			if (!strcmp(semi, "name")) bt->_name = strdup(s);
+			if (!strcmp(semi, "name") && !bt->_name) bt->_name = strdup(s);
 		}
 		else {
 			int i = atoi(buf);

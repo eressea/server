@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.11 2001/02/03 13:45:34 enno Exp $
+ *	$Id: korrektur.c,v 1.12 2001/02/03 18:46:15 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1681,7 +1681,7 @@ convert_triggers(void)
 					fprintf(stderr, "WARNING: unknown relation %d between %s and 0x%p not converted\n", rel->id, unitname(u), u2);
 					break;
 				}
-				a = a->next;
+				a = a->nexttype;
 			}
 			u = u->next;
 		}
