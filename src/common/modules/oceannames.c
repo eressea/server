@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: oceannames.c,v 1.2 2001/02/03 13:45:33 enno Exp $
+ * $Id: oceannames.c,v 1.3 2001/02/10 13:20:33 corwin Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -86,7 +86,7 @@ nameocean(struct region *r, struct faction * f, const char * newname)
 		faction_list **oldf = NULL, **newf = NULL;
 		faction_list * fl = NULL;
 		name * names = (name*)a->data.v;
-		while (names && (!newf && newname) || !oldf) {
+		while ((names && (!newf && newname)) || !oldf) {
 			faction_list ** fli = &names->factions;
 			if (oldf==NULL) while (*fli) {
 				if ((*fli)->f==f) {

@@ -28,6 +28,12 @@ LIBS    = -L$(PUBLISH_DIR)
 ARCHITECTURE = Linux
 
 ##
+## Default-Strings
+##
+MSG_COMPILE = "***** Compiling $@ *****"
+MSG_SUBDIR  = "===== Making $@ in $$subdir ====="
+
+##
 ## user-defined makefiles
 ##
 
@@ -132,9 +138,10 @@ subdirs-debug subdirs-release subdirs-profile subdirs-dmalloc clean depend::
 	@if [ -n "$(SUBDIRS)" ]; then \
 	for subdir in x-placeholder-dir $(SUBDIRS); do \
 	if [ -d $$subdir ]; then \
-	echo --\> Making $@ in $$subdir ; \
+	echo $(MSG_SUBDIR) ; \
 	mkdir -p $$subdir/$(BUILD_DIR) ; \
 	$(MAKE) -C $$subdir -$(MAKEFLAGS) recurse-$@ || exit 1; \
+	echo; \
 	fi \
 	done \
 	fi
@@ -155,7 +162,7 @@ $(BUILD_DIR) $(PUBLISH_DIR):
 # object files:
 $(BUILD_DIR)/%:: $(BUILD_DIR)
 $(BUILD_DIR)/%.o:: %.c
-	@echo "***** Compiling $@ *****"
+	@echo $(MSG_COMPILE)
 	$(CC) $(CFLAGS) -o $@ -c $<
 	@echo
 

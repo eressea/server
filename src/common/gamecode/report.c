@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.12 2001/02/10 10:40:10 enno Exp $
+ *	$Id: report.c,v 1.13 2001/02/10 13:20:33 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -3079,7 +3079,7 @@ writemonument(void)
 }
 
 static void
-writeadresses()
+writeadresses(void)
 {
 	faction *f;
 	FILE * F;
