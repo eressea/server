@@ -1892,6 +1892,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
 		case '?':
 			/* tja. das sollte moeglichst nur am Ende passieren, 
 			 * weil sonst die kacke dampft. */
+			j = 0;
 			++c;
 			assert(*c==0);
 			break;
