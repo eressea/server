@@ -728,9 +728,12 @@ static void
 fix_age(void)
 {
 	faction * f;
+	const race * oldorc = rc_find("orc");
+	const race * uruk = rc_find("uruk");
 	for (f=factions;f;f=f->next) {
 		if (f->no!=MONSTER_FACTION && playerrace(f->race)) continue;
-		if (f->age!=turn) {
+		if (f->race==oldorc) f->race= uruk;
+		else if (f->age!=turn) {
 			log_printf("Alter von Partei %s auf %d angepasst.\n", factionid(f), turn);
 			f->age = turn;
 		}
@@ -1767,11 +1770,12 @@ static int
 resize_plane(struct plane * p, int radius)
 {
 	region * center = findregion(p->minx+(p->maxx-p->minx)/2, p->miny+(p->maxy-p->miny)/2);
-	int minx = center->x - radius;
-	int maxx = center->x + radius;
-	int miny = center->y - radius;
-	int maxy = center->y + radius;
-	int x, y;
+	int x, y, minx, maxx, miny, maxy;
+        if (!center) return 0;
+	minx = center->x - radius;
+	maxx = center->x + radius;
+	miny = center->y - radius;
+	maxy = center->y + radius;
 
 	for (x=minx;x<=maxx;++x) {
 		for (y=miny;y<=maxy;++y) {
