@@ -46,7 +46,7 @@
 # include <dmalloc.h>
 #endif
 
-#if defined(__GCC__)
+#if defined(__GNUC__)
 # include <stdbool.h>
 # define HAS_BOOLEAN
 # define boolean bool

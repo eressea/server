@@ -1404,7 +1404,7 @@ setminmax(void)
 	MINY -= 20;
 }
 
-extern boolean quiet;
+extern int quiet;
 
 extern char * g_reportdir;
 extern char * g_datadir;
@@ -1503,7 +1503,9 @@ main(int argc, char *argv[])
 				maxregions = atoi(argv[++i]);
 				maxregions = (maxregions*81+80) / 81;
 				break;
-			case 'q': quiet = true; break;
+			case 'q': 
+				quiet = 1; 
+				break;
 			case 'l':
 				logging = true;
 				break;

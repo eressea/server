@@ -599,8 +599,7 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 #endif
 
 void
-spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh,
-		  boolean days)
+spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days)
 {
 	char * sbuf = buf+strlen(buf);
 	int i, effsk;
