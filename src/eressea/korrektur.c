@@ -2623,8 +2623,7 @@ fix_astralplane(void)
 	return 0;
 }
 
-#if !SKILLPOINTS
-
+#if SKILLPOINTS == 0
 static int
 level(int days)
 {
@@ -2633,7 +2632,6 @@ level(int days)
 	return l-1;
 }
 
-#if SKILLPOINTS == 0
 int
 convert_skills(void)
 {
