@@ -2657,6 +2657,7 @@ fix_astralplane(void)
 	plane * astralplane = getplanebyname("Astralraum");
 	if (astralplane) {
 		freset(astralplane, PFL_NOCOORDS);
+		freset(astralplane, PFL_NOFEED);
 		set_ursprung(findfaction(MONSTER_FACTION), astralplane->id, 0, 0);
 	}
 	return 0;
