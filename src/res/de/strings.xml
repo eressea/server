@@ -6024,4 +6024,14 @@
     </text>
   </string>
 
+  <string name="grail">
+    <text locale="de">Gral</text>
+    <text locale="en">grail</text>
+  </string>
+
+  <string name="grail_p">
+    <text locale="de">Grale</text>
+    <text locale="en">grails</text>
+  </string>
+
 </strings>

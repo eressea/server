@@ -23,6 +23,7 @@
   <game name="HSE" welcome="eressea">
     <comment>Game specific</comment>
     <order name="MEINUNG" disable="yes"/>
+    <order name="NUMMER" disable="yes"/>
     <order name="MAGIEGEBIET" disable="yes"/>
     <param name="entertain.base" value="15"/>
     <param name="entertain.perlevel" value="5"/>
@@ -38,6 +39,7 @@
   <xi:include href="eressea/en/strings.xml"/>
   <xi:include href="eressea/races.xml"/>
   <xi:include href="eressea/items.xml"/>
+  <xi:include href="eressea/items-hse05.xml"/>
   <xi:include href="eressea/dungeons.xml"/>
   <xi:include href="eressea/temple.xml"/>
   <strings>

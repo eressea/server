@@ -1009,6 +1009,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 	int n;
 	boolean cansee = false;
 	unit *u2;
+  static const item_type * itype_grail = (const item_type *)0xdeadbeef;
 
 	if (u->faction == f || omniscient(f)) {
 		return true;
@@ -1023,7 +1024,11 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 			return false;
 		}
 	}
-	n = eff_stealth(u, r) - modifier;
+
+  if (itype_grail==(const item_type *)0xdeadbeef) itype_grail = it_find("grail");
+  if (itype_grail!=NULL && i_get(u->items, itype_grail)) return true;
+
+  n = eff_stealth(u, r) - modifier;
 	for (u2 = r->units; u2; u2 = u2->next) {
 		if (u2->faction == f) {
 			int o;
@@ -1053,73 +1058,6 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 	return cansee;
 }
 
-#if 0
-boolean
-cansee(faction * f, region * r, unit * u, int modifier)
-/* r kann != u->region sein, wenn es um durchreisen geht */
-/* und es muss niemand aus f in der region sein, wenn sie vom Turm
- * erblickt wird */
-{
-	boolean cansee = false;
-	unit *u2;
-#if FAST_CANSEE
-	static region * lastr = NULL;
-	static faction * lastf = NULL;
-	static int maxskill = INT_MIN;
-#endif
-	int n = 0;
-	boolean ring = false;
-	if (u->faction == f || omniscient(f)) return true;
-#if FAST_CANSEE /* buggy */
-	if (lastr==r && lastf==f) {
-		n = eff_stealth(u, r) - modifier;
-		if (n<=maxskill) return true;
-	}
-	else {
-		lastf=f;
-		lastr=r;
-		maxskill=INT_MIN;
-	}
-#endif
-	if (old_race(u->race) == RC_SPELL || u->number == 0) return false;
-	else {
-		boolean xcheck = false;
-		int o = INT_MIN;
-		ring = (boolean)(ring || (invisible(u) >= u->number));
-		n = n || eff_stealth(u, r) - modifier;
-		for (u2 = r->units; u2; u2 = u2->next) {
-			if (u2->faction == f) {
-
-				if (!xcheck && (getguard(u) || usiege(u) || u->building || u->ship)) {
-					cansee = true;
-					break;
-				}
-				else
-					xcheck = true;
-
-#if NEWATSROI == 0
-				if (ring && !get_item(u2, I_AMULET_OF_TRUE_SEEING))
-					continue;
-#endif
-
-				o = eff_skill(u2, SK_OBSERVATION, r);
-#ifdef NIGHTEYES
-				if (u2->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
-					o = NIGHT_EYE_TALENT;
-#endif
-				if (o >= n) {
-					cansee = true;
-					break;
-				}
-			}
-		}
-#if FAST_CANSEE
-		maxskill = o;
-#endif
-	}
-	return cansee;
-}
-#endif
 
 boolean
 cansee_durchgezogen(const faction * f, const region * r, const unit * u, int modifier)
