@@ -2264,7 +2264,8 @@ init_data(const char * filename)
   sprintf(zText, "%s/%s", resourcepath(), filename);
   l = read_xml(zText);
   if (l) return l;
-
+  
+  if (turn<FirstTurn()) turn = FirstTurn();
   return 0;
 }
 
