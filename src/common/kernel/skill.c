@@ -298,15 +298,11 @@ level_days(int level)
 	return 30 * ((level+1) * level / 2);
 }
 
+#if SKILLPOINTS
 int
 level(int days)
 {
 	int i;
-#ifdef SLOW_SKILLS
-	/* that's just too many function calls, baby: */
-	i = 0;
-	while (level_days(i+1) <= days) ++i;
-#else
 	static int ldays[64];
 	static boolean init = false;
 	if (!init) {
@@ -314,9 +310,9 @@ level(int days)
 		for (i=0;i!=64;++i) ldays[i] = level_days(i+1);
 	}
 	for (i=0;i!=64;++i) if (ldays[i]>days) return i;
-#endif
 	return i;
 }
+#endif
 
 int
 eff_skill(const unit * u, skill_t sk, const region * r)
@@ -326,7 +322,11 @@ eff_skill(const unit * u, skill_t sk, const region * r)
 	if (u->number==0) return 0;
 	if (r->planep && sk == SK_STEALTH && fval(r->planep, PFL_NOSTEALTH)) return 0;
 
+#if SKILLPOINTS
 	result = level(get_skill(u, sk) / u->number);
+#else
+	result = get_skill(u, sk) / u->number;
+#endif
 	if (result == 0) return 0;
 
 	assert(r);
@@ -366,7 +366,11 @@ pure_skill(unit * u, skill_t sk, region * r)
 
 	if (u->number==0) return 0;
 
+#if SKILLPOINTS
 	result = level(get_skill(u, sk) / u->number);
+#else
+	result = get_skill(u, sk) / u->number;
+#endif
 
 	return max(result, 0);
 }
@@ -381,9 +385,8 @@ remove_zero_skills(void)
 	for(r=regions; r; r=r->next) {
 		for(u=r->units; u; u=u->next) {
 			for (sk = 0; sk != MAXSKILLS; sk++) {
-				if(get_skill(u, sk) < u->number) {
-					set_skill(u, sk, 0);
-					
+				if (get_skill(u, sk) < u->number) {
+					set_level(u, sk, 0);
 				}
 			}
 		}

@@ -1026,7 +1026,7 @@ forgetskill(unit * u)
 		struct message * m = add_message(&u->faction->msgs,
 			msg_message("forget", "unit skill", u, talent));
 		msg_release(m);
-		set_skill(u, talent, 0);
+		set_level(u, talent, 0);
 	}
 }
 

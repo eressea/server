@@ -539,7 +539,13 @@ sp_mindblast(fighter * fi, int level, int power, spell * sp)
 			sk = random_skill(du);
 			if (sk != NOSKILL) {
 				/* Skill abziehen */
+#if SKILLPOINTS
 				change_skill(du, sk, -(30+rand()%61));
+#else
+				if (learn_skill(du, sk, 30+rand()%61)) {
+					change_skill(du, sk, -1);
+				}
+#endif
 				--enemies;
 			} else {
 				troop t;
@@ -632,22 +638,19 @@ sp_dragonodem(fighter * fi, int level, int power, spell * sp)
 int
 sp_wolfhowl(fighter * fi, int level, int power, spell * sp)
 {
-	unit *u;
 	battle *b = fi->side->battle;
 	region *r = b->region;
 	unit *mage = fi->unit;
 	attrib *a;
-	int force;
+	int force = get_force(power, 3)/2;
+	unit *u = createunit(r, mage->faction, force, new_race[RC_WOLF]);
 	unused(sp);
 
-	force = get_force(power, 3)/2;
-
-	u = createunit(r, mage->faction, force, new_race[RC_WOLF]);
 	u->status = ST_FIGHT;
 
 	set_string(&u->name, force == 1 ? "Wolf" : "Wölfe");
-	set_skill(u, SK_WEAPONLESS, level_days(power/3) * u->number);
-	set_skill(u, SK_AUSDAUER, level_days(power/3) * u->number);
+	set_level(u, SK_WEAPONLESS, power/3);
+	set_level(u, SK_AUSDAUER, power/3);
 	u->hp = u->number * unit_max_hp(u);
 
 	if (fval(mage, FL_PARTEITARNUNG))

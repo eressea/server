@@ -27,6 +27,7 @@
 #include "unit.h"
 #include "region.h"
 #include "race.h"
+#include "skill.h"
 #include "faction.h"
 #include "plane.h"
 
@@ -130,8 +131,8 @@ random_in_teleport_plane(void)
 				u = createunit(r, f0, 1+rand()%10+rand()%10, new_race[RC_HIRNTOETER]);
 				set_string(&u->name, "Hirntöter");
 				set_string(&u->display, "Wabernde grüne Schwaden treiben durch den Nebel und verdichten sich zu einer unheimlichen Kreatur, die nur aus einem langen Ruderschwanz und einem riesigen runden Maul zu bestehen scheint.");
-				set_skill(u, SK_STEALTH, 30);
-				set_skill(u, SK_OBSERVATION, 30);
+				set_level(u, SK_STEALTH, 1);
+				set_level(u, SK_OBSERVATION, 1);
 				break;
 			}
 		}

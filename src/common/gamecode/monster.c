@@ -1096,15 +1096,11 @@ plan_monsters(void)
 							un = createunit(r, findfaction(MONSTER_FACTION), ra, new_race[RC_DRACOID]);
 							name_unit(un);
 							change_money(u, -un->number * 50);
-#if SKILLPOINTS
-							set_skill(un, SK_SPEAR, un->number * (level_days(3) + rand() % (level_days(6)-level_days(3))));
-							set_skill(un, SK_SWORD, un->number * (level_days(3) + rand() % (level_days(6)-level_days(3))));
-							set_skill(un, SK_LONGBOW, un->number * (level_days(2) + rand() % (level_days(4)-level_days(2))));
-#else
-							set_skill(un, SK_SPEAR, un->number * (3 + rand() % 4));
-							set_skill(un, SK_SWORD, un->number * (3 + rand() % 4));
-							set_skill(un, SK_LONGBOW, un->number * (2 + rand() % 3));
-#endif
+
+							set_level(un, SK_SPEAR, (3 + rand() % 4));
+							set_level(un, SK_SWORD, (3 + rand() % 4));
+							set_level(un, SK_LONGBOW, (2 + rand() % 3));
+
 							switch (rand() % 3) {
 							case 0:
 								set_item(un, I_LONGBOW, un->number);
@@ -1174,7 +1170,6 @@ split_unit(region * r, unit *u)
 	unit *u2;
 	skill_t sk;
 	int newsize;
-	int n;
 	assert(u->number!=1);
 
 	newsize = u->number/2;
@@ -1185,15 +1180,23 @@ split_unit(region * r, unit *u)
 	set_string(&u2->thisorder, "WARTEN");
 	set_string(&u2->lastorder, "WARTEN");
 
+#if SKILLPOINTS
 	for(sk = 0; sk < MAXSKILLS; sk++) {
-		int i;
-		n = get_skill(u, sk);
-		i = (n / u->number) * newsize;
+		int n = get_skill(u, sk);
+		int i = (n / u->number) * newsize;
 		i += (n % u->number) * newsize / u->number;
 		set_skill(u2, sk, i);
 		set_skill(u, sk, n-i);
 	}
 	set_number(u, u->number - newsize);
+#else
+	scale_number(u, u->number - newsize);
+	for(sk = 0; sk < MAXSKILLS; sk++) {
+		int n = get_skill(u, sk);
+		int level = n / u->number;
+		set_level(u2, sk, level);
+	}
+#endif
 }
 
 boolean

@@ -362,11 +362,10 @@ live(region * r)
 				if (best > 0) {
 					int value = get_effect(u, oldpotiontype[P_FOOL]);
 #if SKILLPOINTS
-					int k;
+					int k = get_skill(u, ibest);
 					value = min(value, u->number) * 30;
-					k = get_skill(u, ibest) - value;
-					k = max(k, 0);
-					set_skill(u, ibest, k);
+					k = min(k, value);
+					change_skill(u, ibest, -k);
 #else
 					/* Talent sinkt für max. 10 Personen um 1 Stufe */
 					int k = min(u->number, value);

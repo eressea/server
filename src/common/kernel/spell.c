@@ -147,7 +147,7 @@ do_shock(unit *u, char *reason)
 	for (sk=0; sk < MAXSKILLS; sk++) {
 		int n = get_skill(u, sk);
 		if (n!=0 && rand()%10 < 2) {
-			change_skill(u, sk, -1);
+			change_level(u, sk, -1);
 		}
 	}
 #endif
@@ -1467,8 +1467,8 @@ sp_create_irongolem(castorder *co)
 	u2 = create_unit(r, mage->faction, force*8, new_race[RC_IRONGOLEM], 0, 
 		LOC(mage->faction->locale, rc_name(new_race[RC_IRONGOLEM], 1)), mage);
 
-	set_skill(u2, SK_ARMORER, skill_level(1)*u2->number);
-	set_skill(u2, SK_WEAPONSMITH, skill_level(1)*u2->number);
+	set_level(u2, SK_ARMORER, 1);
+	set_level(u2, SK_WEAPONSMITH, 1);
 
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 0;
@@ -1527,8 +1527,8 @@ sp_create_stonegolem(castorder *co)
 
 	u2 = create_unit(r, mage->faction, force*5, new_race[RC_STONEGOLEM], 0, 
 		LOC(mage->faction->locale, rc_name(new_race[RC_STONEGOLEM], 1)), mage);
-	set_skill(u2, SK_ROAD_BUILDING, skill_level(1)*u2->number);
-	set_skill(u2, SK_BUILDING, skill_level(1)*u2->number);
+	set_level(u2, SK_ROAD_BUILDING, 1);
+	set_level(u2, SK_BUILDING, 1);
 
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 0;
@@ -3384,8 +3384,8 @@ sp_summonshadow(castorder *co)
 	/* Bekommen Tarnung = (Magie+Tarnung)/2 und Wahrnehmung 1. */
 	val = (get_skill(mage, SK_MAGIC) + get_skill(mage, SK_STEALTH))/(2*mage->number);
 
-	set_skill(u, SK_STEALTH, u->number * val);
-	set_skill(u, SK_OBSERVATION, u->number * skill_level(1));
+	set_level(u, SK_STEALTH, val);
+	set_level(u, SK_OBSERVATION, 1);
 
 	sprintf(buf, "%s beschwört %d Dämonen aus dem Reich der Schatten.",
 		unitname(mage), force*force);
@@ -3429,12 +3429,8 @@ sp_summonshadowlords(castorder *co)
 		fset(u, FL_PARTEITARNUNG);
 
 	/* Bekommen Tarnung = Magie und Wahrnehmung 5. */
-	set_skill(u, SK_STEALTH, (u->number * get_skill(mage, SK_MAGIC)/mage->number));
-#if SKILLPOINTS
-	set_skill(u, SK_OBSERVATION, u->number * level_days(5));
-#else
-	set_skill(u, SK_OBSERVATION, u->number * 5);
-#endif
+	set_level(u, SK_STEALTH, get_level(mage, SK_MAGIC));
+	set_level(u, SK_OBSERVATION, 5);
 	sprintf(buf, "%s beschwört %d Schattenmeister.",
 		unitname(mage), force*force);
 	addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
@@ -4522,7 +4518,7 @@ sp_pump(castorder *co)
 	u = createunit(rt, mage->faction, RS_FARVISION, new_race[RC_SPELL]);
 	set_string(&u->name, "Zauber: Aushorchen");
 	u->age = 2;
-	set_skill(u, SK_OBSERVATION, eff_skill(target, SK_OBSERVATION, r));
+	set_level(u, SK_OBSERVATION, eff_skill(target, SK_OBSERVATION, u->region));
 
 	return cast_level;
 }
@@ -5251,7 +5247,7 @@ sp_dreamreading(castorder *co)
   set_number(u2, 1);
   set_string(&u2->name, "sp_dreamreading");
   u2->age  = 2;   /* Nur für diese Runde. */
-  set_skill(u2, SK_OBSERVATION, get_skill(u, SK_OBSERVATION)/u->number);
+  set_level(u2, SK_OBSERVATION, eff_skill(u, SK_OBSERVATION, u2->region));
 
   sprintf(buf, "%s verliert sich in die Träume von %s und erhält einen "
       "Eindruck von %s.", unitname(mage), unitname(u), regionid(u->region));

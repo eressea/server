@@ -199,7 +199,7 @@ give_starting_equipment(struct region *r, struct unit *u)
 
 	switch(old_race(u->race)) {
 	case RC_DWARF:
-		set_skill(u, SK_SWORD, 30);
+		set_level(u, SK_SWORD, 1);
 		set_item(u, I_AXE, 1);
 		set_item(u, I_CHAIN_MAIL, 1);
 		break;
@@ -208,11 +208,11 @@ give_starting_equipment(struct region *r, struct unit *u)
 		set_show_item(u->faction, I_FEENSTIEFEL);
 		break;
 	case RC_ORC:
-		set_skill(u, SK_SPEAR, 300);
-		set_skill(u, SK_SWORD, 300);
-		set_skill(u, SK_CROSSBOW, 300);
-		set_skill(u, SK_LONGBOW, 300);
-		set_skill(u, SK_CATAPULT, 300);
+		set_level(u, SK_SPEAR, 4);
+		set_level(u, SK_SWORD, 4);
+		set_level(u, SK_CROSSBOW, 4);
+		set_level(u, SK_LONGBOW, 4);
+		set_level(u, SK_CATAPULT, 4);
 		break;
 	case RC_GOBLIN:
 		set_item(u, I_RING_OF_INVISIBILITY, 1);
@@ -228,12 +228,12 @@ give_starting_equipment(struct region *r, struct unit *u)
 		}
 		break;
 	case RC_TROLL:
-		set_skill(u, SK_BUILDING, 30);
-		set_skill(u, SK_OBSERVATION, 180);
+		set_level(u, SK_BUILDING, 1);
+		set_level(u, SK_OBSERVATION, 3);
 		set_item(u, I_STONE, 50);
 		break;
 	case RC_DAEMON:
-		set_skill(u, SK_AUSDAUER, 3600);
+		set_level(u, SK_AUSDAUER, 15);
 		u->hp = unit_max_hp(u);
 		break;
 	case RC_INSECT:
@@ -241,8 +241,8 @@ give_starting_equipment(struct region *r, struct unit *u)
 		i_change(&u->items, oldpotiontype[P_WARMTH]->itype, 9);
 		break;
 	case RC_HALFLING:
-		set_skill(u, SK_TRADE, 30);
-		set_skill(u, SK_RIDING, 90);
+		set_level(u, SK_TRADE, 1);
+		set_level(u, SK_RIDING, 2);
 		set_item(u, I_HORSE, 2);
 		set_item(u, I_WAGON, 1);
 		set_item(u, I_BALM, 5);
@@ -265,7 +265,7 @@ give_starting_equipment(struct region *r, struct unit *u)
 			u->ship = sh;
 			fset(u, FL_OWNER);
 		}
-		set_skill(u, SK_SAILING, 30);
+		set_level(u, SK_SAILING, 1);
 		break;
 	case RC_CENTAUR:
 		rsethorses(r, 250+rand()%51+rand()%51);
@@ -273,29 +273,6 @@ give_starting_equipment(struct region *r, struct unit *u)
 	}
 
 	set_money(u, 2000 + turn * 10);
-}
-
-void
-give_latestart_bonus(region *r, unit *u, int b)
-{
-	change_skill(u, SK_OBSERVATION, b*30*u->number);
-	change_money(u, 200*b);
-
-	{
-		unit *u2 = createunit(r, u->faction, 1, u->race);
-		change_skill(u2, SK_TACTICS, ((b*30)/2) * u2->number);
-		u2->irace = u->irace;
-		fset(u2, FL_PARTEITARNUNG);
-	}
-
-	{
-		unit *u2 = createunit(r, u->faction, 2*b, u->race);
-		change_skill(u2, SK_SPEAR, 180 * u2->number);
-		change_skill(u2, SK_TAXING, 180 * u2->number);
-		change_item(u2, I_SPEAR, u2->number);
-		u2->irace = u->irace;
-		fset(u2, FL_PARTEITARNUNG);
-	}
 }
 
 int
@@ -385,41 +362,41 @@ oldfamiliars(unit * familiar)
 	switch(frt) {
 		case RC_HOUSECAT:
 			/* Kräu+1, Mag, Pfer+1, Spi+3, Tar+3, Wahr+4, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_SPY, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
+			set_level(familiar, SK_MAGIC, 1);
+			set_level(familiar, SK_SPY, 1);
+			set_level(familiar, SK_STEALTH, 1);
+			set_level(familiar, SK_OBSERVATION, 1);
 			m = create_mage(familiar, M_GRAU);
 			break;
 		case RC_TUNNELWORM:
 			/* Ber+50,Hol+50,Sbau+50,Aus+2*/
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_MINING, 30);
-			set_skill(familiar, SK_LUMBERJACK, 30);
-			set_skill(familiar, SK_ROAD_BUILDING, 30);
-			set_skill(familiar, SK_AUSDAUER, 30);
+			set_level(familiar, SK_MAGIC, 1);
+			set_level(familiar, SK_MINING, 1);
+			set_level(familiar, SK_LUMBERJACK, 1);
+			set_level(familiar, SK_ROAD_BUILDING, 1);
+			set_level(familiar, SK_AUSDAUER, 1);
 			m = create_mage(familiar, M_GRAU);
 			break;
 		case RC_EAGLE:
 			/* Spi, Wahr+2, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
+			set_level(familiar, SK_MAGIC, 1);
+			set_level(familiar, SK_OBSERVATION, 1);
 			m = create_mage(familiar, M_GRAU);
 			break;
 		case RC_RAT:
 			/* Spionage+5, Tarnung+4, Wahrnehmung+2, Ausdauer */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_SPY, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			set_skill(familiar, SK_AUSDAUER, 50+rand()%500+rand()%500);
+			set_level(familiar, SK_MAGIC, 1);
+			set_level(familiar, SK_SPY, 1);
+			set_level(familiar, SK_STEALTH, 1);
+			set_level(familiar, SK_OBSERVATION, 1);
+			set_level(familiar, SK_AUSDAUER, 1+rand()%8);
 			/* set_number(familiar, 50+rand()%500+rand()%500); */
 			m = create_mage(familiar, M_GRAU);
 			break;
 		case RC_PSEUDODRAGON:
 			/* Magie+1, Spionage, Tarnung, Wahrnehmung, Ausdauer */
 			m = create_mage(familiar, M_GRAU);
-			set_skill(familiar, SK_MAGIC, 30);
+			set_level(familiar, SK_MAGIC, 1);
 			addspell(familiar, SPL_FLEE);
 			addspell(familiar, SPL_SLEEP);
 			addspell(familiar, SPL_FRIGHTEN);
@@ -430,15 +407,15 @@ oldfamiliars(unit * familiar)
 			/* Alc, Arm, Bog+2, Han-2, Kräu+4, Mag+1, Pfer+5, Rei+5,
 			 * Rüs-2, Sbau, Seg-2, Sta, Spi+2, Tak-2, Tar+3, Unt+10,
 			 * Waf-2, Wag-2, Wahr+2, Steu-2, Aus-1 */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_LONGBOW, 30);
-			set_skill(familiar, SK_HERBALISM, 30);
-			set_skill(familiar, SK_HORSE_TRAINING, 30);
-			set_skill(familiar, SK_RIDING, 30);
-			set_skill(familiar, SK_SPY, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_ENTERTAINMENT, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
+			set_level(familiar, SK_MAGIC, 1);
+			set_level(familiar, SK_LONGBOW, 1);
+			set_level(familiar, SK_HERBALISM, 1);
+			set_level(familiar, SK_HORSE_TRAINING, 1);
+			set_level(familiar, SK_RIDING, 1);
+			set_level(familiar, SK_SPY, 1);
+			set_level(familiar, SK_STEALTH, 1);
+			set_level(familiar, SK_ENTERTAINMENT, 1);
+			set_level(familiar, SK_OBSERVATION, 1);
 			m = create_mage(familiar, M_GRAU);
 			addspell(familiar, SPL_SEDUCE);
 			addspell(familiar, SPL_CALM_MONSTER);
@@ -448,9 +425,9 @@ oldfamiliars(unit * familiar)
 			break;
 		case RC_UNICORN:
 			/* Mag+2, Spi, Tak, Tar+4, Wahr+4, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
+			set_level(familiar, SK_MAGIC, 1);
+			set_level(familiar, SK_STEALTH, 1);
+			set_level(familiar, SK_OBSERVATION, 1);
 			m = create_mage(familiar, M_GRAU);
 			addspell(familiar, SPL_RESISTMAGICBONUS);
 			addspell(familiar, SPL_SONG_OF_PEACE);
@@ -461,13 +438,13 @@ oldfamiliars(unit * familiar)
 			break;
 		case RC_WARG:
 			/* Spi, Tak, Tar, Wahri+2, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
+			set_level(familiar, SK_MAGIC, 1);
+			set_level(familiar, SK_OBSERVATION, 1);
 			m = create_mage(familiar, M_GRAU);
 			break;
 		case RC_WRAITH:
 			/* Mag+1, Rei-2, Hie, Sta, Spi, Tar, Wahr, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
+			set_level(familiar, SK_MAGIC, 1);
 			m = create_mage(familiar, M_GRAU);
 			addspell(familiar, SPL_STEALAURA);
 			addspell(familiar, SPL_FRIGHTEN);
@@ -475,28 +452,28 @@ oldfamiliars(unit * familiar)
 			break;
 		case RC_IMP:
 			/* Mag+1,Rei-1,Hie,Sta,Spi+1,Tar+1,Wahr+1,Steu+1,Aus*/
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_SPY, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			set_skill(familiar, SK_TAXING, 30);
+			set_level(familiar, SK_MAGIC, 1);
+			set_level(familiar, SK_SPY, 1);
+			set_level(familiar, SK_STEALTH, 1);
+			set_level(familiar, SK_OBSERVATION, 1);
+			set_level(familiar, SK_TAXING, 1);
 			m = create_mage(familiar, M_GRAU);
 			addspell(familiar, SPL_STEALAURA);
 			break;
 		case RC_DREAMCAT:
 			/* Mag+1,Hie,Sta,Spi+1,Tar+1,Wahr+1,Steu+1,Aus*/
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_SPY, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
-			set_skill(familiar, SK_TAXING, 30);
+			set_level(familiar, SK_MAGIC, 1);
+			set_level(familiar, SK_SPY, 1);
+			set_level(familiar, SK_STEALTH, 1);
+			set_level(familiar, SK_OBSERVATION, 1);
+			set_level(familiar, SK_TAXING, 1);
 			m = create_mage(familiar, M_GRAU);
 			addspell(familiar, SPL_ILL_SHAPESHIFT);
 			addspell(familiar, SPL_TRANSFERAURA_TRAUM);
 			break;
 		case RC_FEY:
 			/* Mag+1,Rei-1,Hie-1,Sta-1,Spi+2,Tar+5,Wahr+2,Aus */
-			set_skill(familiar, SK_MAGIC, 30);
+			set_level(familiar, SK_MAGIC, 1);
 			m = create_mage(familiar,M_GRAU);
 			addspell(familiar, SPL_DENYATTACK);
 			addspell(familiar, SPL_CALM_MONSTER);
@@ -504,22 +481,22 @@ oldfamiliars(unit * familiar)
 			break;
 		case RC_OWL:
 			/* Spi+1,Tar+1,Wahr+5,Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_SPY, 30);
-			set_skill(familiar, SK_STEALTH, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
+			set_level(familiar, SK_MAGIC, 1);
+			set_level(familiar, SK_SPY, 1);
+			set_level(familiar, SK_STEALTH, 1);
+			set_level(familiar, SK_OBSERVATION, 1);
 			m = create_mage(familiar,M_GRAU);
 			break;
 		case RC_HELLCAT:
 			/* Spi, Tak, Tar, Wahr+1, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
+			set_level(familiar, SK_MAGIC, 1);
+			set_level(familiar, SK_OBSERVATION, 1);
 			m = create_mage(familiar,M_GRAU);
 			break;
 		case RC_TIGER:
 			/* Spi, Tak, Tar, Wahr+1, Aus */
-			set_skill(familiar, SK_MAGIC, 30);
-			set_skill(familiar, SK_OBSERVATION, 30);
+			set_level(familiar, SK_MAGIC, 1);
+			set_level(familiar, SK_OBSERVATION, 1);
 			m = create_mage(familiar,M_GRAU);
 			break;
 	}

@@ -539,17 +539,6 @@ verify_data(void)
 }
 
 int
-get_skill(const unit * u, skill_t id)
-{
-	skillvalue *i = u->skills;
-
-	for (; i != u->skills + u->skill_size; ++i)
-		if (i->id == id)
-			return i->value;
-	return 0;
-}
-
-int
 distribute(int old, int new_value, int n)
 {
 	int i;
@@ -706,7 +695,7 @@ scale_number (unit * u, int n)
 	}
 	for (skill = 0; skill < MAXSKILLS; skill++) {
 		if (n==0 || u->number == 0) {
-			set_skill(u, skill, 0);
+			set_level(u, skill, 0);
 		} else {
 			int sval = get_skill(u, skill);
 			int snew = sval / u->number * n;

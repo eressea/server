@@ -157,10 +157,13 @@ extern const struct unit u_unknown;
 
 extern struct unit * udestroy;
 
-int change_skill(struct unit * u, skill_t id, int byvalue);
-void set_skill(struct unit * u, skill_t id, int value);
-int get_skill(const struct unit * u, skill_t id);
-void transfermen(struct unit * u, struct unit * u2, int n);
+extern int change_skill(struct unit * u, skill_t id, int byvalue);
+extern int change_level(struct unit * u, skill_t id, int bylevel);
+extern void set_skill(struct unit * u, skill_t id, int value);
+extern void set_level(struct unit * u, skill_t id, int level);
+extern int get_skill(const struct unit * u, skill_t id);
+extern int get_level(const struct unit * u, skill_t id);
+extern void transfermen(struct unit * u, struct unit * u2, int n);
 
 #undef DESTROY
 
@@ -189,4 +192,9 @@ extern struct faction * dfindhash(int no);
 extern void u_setfaction(struct unit * u, struct faction * f);
 /* vorsicht Sprüche können u->number == 0 (RS_FARVISION) haben! */
 extern void set_number(struct unit * u, int count);
+
+#if !SKILLPOINTS
+extern boolean learn_skill(const struct unit * u, skill_t sk, int days);
+#endif
+
 #endif

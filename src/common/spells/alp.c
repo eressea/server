@@ -17,6 +17,7 @@
 
 #include <unit.h>
 #include <region.h>
+#include <skill.h>
 #include <magic.h>
 
 /* util includes */
@@ -104,7 +105,7 @@ sp_summon_alp(struct castorder *co)
 		alp->building = mage->building;
 		alp->ship = mage->ship;
 	}
-	set_skill(alp, SK_STEALTH, alp->number * 840);	/* 840 Tage = T7 */
+	set_level(alp, SK_STEALTH, 7);
 	set_string(&alp->name, "Alp");
 	alp->status = ST_FLEE;	/* flieht */
 

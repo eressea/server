@@ -33,6 +33,7 @@
 #include "race.h"
 #include "region.h"
 #include "ship.h"
+#include "skill.h"
 
 #include <attributes/moved.h>
 
@@ -494,7 +495,7 @@ u_geteffstealth(const struct unit * u)
 }
 
 int
-change_skill (unit * u, skill_t id, int byvalue)
+change_skill(unit * u, skill_t id, int byvalue)
 {
 	skillvalue *i = u->skills;
 	int wounds = 0;
@@ -519,8 +520,8 @@ change_skill (unit * u, skill_t id, int byvalue)
 	return byvalue;
 }
 
-int
-change_skill_transfermen (unit * u, skill_t id, int byvalue)
+static int
+change_skill_transfermen(unit * u, skill_t id, int byvalue)
 {
 	skillvalue *i = u->skills;
 
@@ -535,8 +536,47 @@ change_skill_transfermen (unit * u, skill_t id, int byvalue)
 	return byvalue;
 }
 
+int
+get_skill(const unit * u, skill_t id)
+{
+	skillvalue *i = u->skills;
+
+	for (; i != u->skills + u->skill_size; ++i)
+		if (i->id == id)
+			return i->value;
+	return 0;
+}
+
+#if SKILLPOINTS
+extern int level(int days);
+#endif
+
+int
+get_level(const unit * u, skill_t id)
+{
+	skillvalue *i = u->skills;
+	for (; i != u->skills + u->skill_size; ++i)
+		if (i->id == id)
+#if SKILLPOINTS
+			return level(i->value/u->number);
+#else
+			return i->value/u->number;
+#endif
+	return 0;
+}
+
+void 
+set_level(unit * u, skill_t id, int value)
+{
+#if SKILLPOINTS
+	set_skill(u, id, level_days(value)*u->number);
+#else
+	set_skill(u, id, u->number*value);
+#endif
+}
+
 void
-set_skill (unit * u, skill_t id, int value)
+set_skill(unit * u, skill_t id, int value)
 {
 	skillvalue *i = u->skills;
 
@@ -836,3 +876,18 @@ set_number(unit * u, int count)
 	u->debug_number = count;
 #endif
 }
+
+#if !SKILLPOINTS
+boolean
+learn_skill(const unit * u, skill_t sk, int days)
+{
+	int now = get_skill(u, sk);
+	int nowlvl = now / u->number;
+	int need = (nowlvl+1) * u->number - now;
+	int needdays = level_days(nowlvl+1) - level_days(nowlvl);
+	needdays = needdays * u->number / need;
+	if ((rand()%needdays) < days) return true;
+	return false;
+}
+#endif
+
