@@ -3512,10 +3512,18 @@ writeturn(void)
 static void
 out_faction(FILE *file, faction *f)
 {
+#ifdef ALLIANCES
+ 	fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
+		f->name, itoa36(f->no), f->alliance?f->alliance->id:0,
+		LOC(default_locale, rc_name(f->race, 0)), neue_gebiete[f->magiegebiet],
+		f->no_units, f->number, f->money, turn - f->lastorders,
+		turn - f->lastorders != 1 ? "NMRs" : "NMR ");
+#else
  	fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
 		factionname(f), LOC(default_locale, rc_name(f->race, 0)),
 		neue_gebiete[f->magiegebiet], f->no_units, f->number, f->money,
 		turn - f->lastorders, turn - f->lastorders != 1 ? "NMRs" : "NMR ");
+#endif
 }
 
 void
