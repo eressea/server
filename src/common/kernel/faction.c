@@ -86,12 +86,12 @@ addplayer(region *r, const char *email, const struct race * frace, const locale 
 {
 	int i;
 	unit *u;
+	faction *f;
 
-	assert(frace != new_race[RC_ORC]);
+        assert(frace != new_race[RC_ORC]);
+        f = calloc(sizeof(faction), 1);
 
-	faction *f = (faction *) calloc(1, sizeof(faction));
-
-	set_string(&f->email, email);
+        set_string(&f->email, email);
 
 	for (i = 0; i < 6; i++) buf[i] = (char) (97 + rand() % 26); buf[i] = 0;
 	set_string(&f->passw, buf);
