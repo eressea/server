@@ -492,7 +492,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, const char
 	n = new_get_pooled(src, item2resource(itype), GET_DEFAULT);
 	n = min(want, n);
 #define GIVERESTRICTION 3
-	if (src->faction != dest->faction && src->faction->age < GIVERESTRICTION) {
+	if (dest && src->faction != dest->faction && src->faction->age < GIVERESTRICTION) {
 		ADDMSG(&src->faction->msgs, msg_error(src, cmd, "giverestriction", 
 			"turns", GIVERESTRICTION));
 		return;
@@ -537,7 +537,7 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 	int k = 0;
 	int error = 0;
 
-	if (u->faction != u2->faction && u->faction->age < GIVERESTRICTION) {
+	if (u2 && u->faction != u2->faction && u->faction->age < GIVERESTRICTION) {
 		ADDMSG(&u->faction->msgs, msg_error(u, cmd, "giverestriction", 
 			"turns", GIVERESTRICTION));
 		return;

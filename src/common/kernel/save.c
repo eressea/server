@@ -2124,6 +2124,7 @@ writegame(char *path, char quiet)
 			wnl(F);
 			write_items(F, u->items);
 			wnl(F);
+			assert(u->hp);
 			wi(F, u->hp);
 			wnl(F);
 #if RELEASE_VERSION < MAGE_ATTRIB_VERSION
