@@ -12,6 +12,7 @@
 #include <config.h>
 
 #include "translation.h"
+#include "log.h"
 
 /* libc includes */
 #include <assert.h>
@@ -308,24 +309,26 @@ parse_int(opstack ** stack, const char * in)
 
 
 static const char *
-parse(opstack ** stack, const char* in, const void * userdata)
+parse(opstack ** stack, const char* inn, const void * userdata)
 {
-	while (*in) {
-		switch (*in) {
+	const char * b = inn;
+	while (*b) {
+		switch (*b) {
 		case '"':
-			return parse_string(stack, ++in, userdata);
+			return parse_string(stack, ++b, userdata);
 			break;
 		case '$':
-			return parse_symbol(stack, ++in, userdata);
+			return parse_symbol(stack, ++b, userdata);
 			break;
 		default:
-			if (isdigit(*in) || *in=='-' || *in=='+') {
-				return parse_int(stack, in);
+			if (isdigit(*b) || *b=='-' || *b=='+') {
+				return parse_int(stack, b);
 			}
-			else ++in;
+			else ++b;
 		}
 	}
-	return in;
+	log_error(("could not parse %s. Missing \"\"?", inn));
+	return NULL;
 }
 
 char * 
