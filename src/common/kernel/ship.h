@@ -53,15 +53,6 @@ typedef struct ship_typelist {
 extern ship_typelist *shiptypes;
 
 /* Alte Schiffstypen: */
-#ifdef NOXMLBOATS
-extern const ship_type st_boat;
-extern const ship_type st_balloon;
-extern const ship_type st_longboat;
-extern const ship_type st_dragonship;
-extern const ship_type st_caravelle;
-extern const ship_type st_trireme;
-extern const ship_type st_transport;
-#endif
 
 extern const ship_type * st_find(const char* name);
 extern void st_register(const ship_type * type);

@@ -1363,7 +1363,7 @@ statistics(FILE * F, region * r, faction * f)
 				p / RECRUITFRACTION);
 		rps(F, buf);
 
-		if (buildingtype_exists(r, &bt_caravan)) {
+		if (buildingtype_exists(r, bt_find("caravan"))) {
 			sprintf(buf, "Luxusgüter zum angegebenen Preis: %d",
 				(p * 2) / TRADE_FRACTION);
 		} else {
@@ -3156,7 +3156,7 @@ writemonument(void)
 
 	for (r = regions; r; r = r->next) {
 		for (b = r->buildings; b; b = b->next) {
-			if (b->type == &bt_monument && b->display && *b->display) {
+			if (b->type == bt_find("monument") && b->display && *b->display) {
 				freset(b, FL_DH);
 				count++;
 				if(b->size > size[6]) {
@@ -3203,7 +3203,7 @@ writemonument(void)
 		j = 0;
 		for (r = regions; r; r = r->next) {
 			for (b = r->buildings; b; b = b->next) {
-				if (b->type == &bt_monument && b->display && *b->display && !fval(b, FL_DH)) {
+				if (b->type == bt_find("monument") && b->display && *b->display && !fval(b, FL_DH)) {
 					j++;
 					if(j == ra) {
 						fprintf(F, "In %s", rname(b->region, NULL));

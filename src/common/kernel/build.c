@@ -440,24 +440,36 @@ build_road(region * r, unit * u, int size, direction_t d)
 		return;
 	}
 
-	if (rterrain(r) == T_SWAMP)
+	if (rterrain(r) == T_SWAMP) {
 		/* wenn kein Damm existiert */
-		if (!buildingtype_exists(r, &bt_dam)) {
+		static const struct building_type * bt_dam;
+		if (!bt_dam) bt_dam = bt_find("dam");
+		assert(bt_dam);
+		if (!buildingtype_exists(r, bt_dam)) {
 			cmistake(u, findorder(u, u->thisorder), 132, MSG_PRODUCE);
 			return;
 		}
-	if (rterrain(r) == T_DESERT)
+	}
+	if (rterrain(r) == T_DESERT) {
+		static const struct building_type * bt_caravan;
+		if (!bt_caravan) bt_caravan = bt_find("caravan");
+		assert(bt_caravan);
 		/* wenn keine Karawanserei existiert */
-		if (!buildingtype_exists(r, &bt_caravan)) {
+		if (!buildingtype_exists(r, bt_caravan)) {
 			cmistake(u, findorder(u, u->thisorder), 133, MSG_PRODUCE);
 			return;
 		}
-	if (rterrain(r) == T_GLACIER)
+	}
+	if (rterrain(r) == T_GLACIER) {
+		static const struct building_type * bt_tunnel;
+		if (!bt_tunnel) bt_tunnel = bt_find("tunnel");
+		assert(bt_tunnel);
 		/* wenn kein Tunnel existiert */
-		if (!buildingtype_exists(r, &bt_tunnel)) {
+		if (!buildingtype_exists(r, bt_tunnel)) {
 			cmistake(u, findorder(u, u->thisorder), 131, MSG_PRODUCE);
 			return;
 		}
+	}
 	if (!get_pooled(u, r, R_STONE) && old_race(u->race) != RC_STONEGOLEM) {
 		cmistake(u, findorder(u, u->thisorder), 151, MSG_PRODUCE);
 		return;
@@ -840,8 +852,8 @@ build_building(unit * u, const building_type * btype, int want)
 		newbuilding = 1;
 	}
 
-	if(b->type==&bt_castle) {
-			string2 = locale_string(u->faction->locale, bt_castle._name);
+	if (b->type->name) {
+			string2 = LOC(u->faction->locale, b->type->_name);
 	} else {
 			string2 = LOC(u->faction->locale, buildingtype(b, b->size));
 			if( newbuilding && b->type->maxsize != -1 )
@@ -857,8 +869,7 @@ build_building(unit * u, const building_type * btype, int want)
 	set_string(&u->lastorder, buffer);
 
 	b->size += built;
-	if (b->type == &bt_lighthouse)
-	  update_lighthouse(b);
+	update_lighthouse(b);
 
 	add_message(&u->faction->msgs, new_message(
 		u->faction, "buildbuilding%b:building%u:unit%i:size", b, u, built));

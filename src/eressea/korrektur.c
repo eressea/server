@@ -1108,19 +1108,19 @@ fix_icastles(void)
 		building * b;
 		for (b=r->buildings; b; b=b->next) {
 			attrib * a;
-			const building_type * btype = &bt_castle;
+			const building_type * btype = bt_find("castle");
 			icastle_data * data;
 			a = a_find(b->attribs, &at_icastle);
-			if (b->type!=&bt_illusion && !a) continue;
+			if (b->type!=bt_find("illusion") && !a) continue;
 
 			if (!a) {
 				/* attribut hat gefehle */
 				a = a_add(&b->attribs, a_new(&at_icastle));
 			}
-			if (b->type!=&bt_illusion) {
+			if (b->type!=bt_find("illusion")) {
 				/* gebäudetyp war falsch */
 				btype = b->type;
-				b->type = &bt_illusion;
+				b->type = bt_find("illusion");
 			}
 			data = (icastle_data*)a->data.v;
 			if (data->time<=0) {

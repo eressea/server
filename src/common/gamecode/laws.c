@@ -1012,7 +1012,7 @@ demographics(void)
 			if (r->land) for (dmd=r->land->demands;dmd;dmd=dmd->next) {
 				if (dmd->value>0 && dmd->value < MAXDEMAND) {
 					int rise = DMRISE;
-					if (buildingtype_exists(r, &bt_harbour)) rise = DMRISEHAFEN;
+					if (buildingtype_exists(r, bt_find("harbour"))) rise = DMRISEHAFEN;
 					if (rand() % 100 < rise) dmd->value++;
 				}
 			}
@@ -1375,11 +1375,11 @@ set_display(region * r, unit * u, strlist * S)
 			cmistake(u, S->s, 5, MSG_PRODUCE);
 			break;
 		}
-		if (u->building->type == &bt_generic) {
+		if (u->building->type == bt_find("generic")) {
 			cmistake(u, S->s, 279, MSG_PRODUCE);
 			break;
 		}
-		if (u->building->type == &bt_monument && u->building->display[0] != 0) {
+		if (u->building->type == bt_find("monument") && u->building->display[0] != 0) {
 			cmistake(u, S->s, 29, MSG_PRODUCE);
 			break;
 		}
@@ -1571,7 +1571,7 @@ set_name(region * r, unit * u, strlist * S)
 				break;
 			}
 
-			if (b->type == &bt_generic) {
+			if (b->type == bt_find("generic")) {
 				cmistake(u, S->s, 278, MSG_EVENT);
 				break;
 			}
@@ -1601,12 +1601,12 @@ set_name(region * r, unit * u, strlist * S)
 				cmistake(u, S->s, 148, MSG_PRODUCE);
 				break;
 			}
-			if (u->building->type == &bt_generic) {
+			if (u->building->type == bt_find("generic")) {
 				cmistake(u, S->s, 278, MSG_EVENT);
 				break;
 			}
 			sprintf(buf, "Monument %d", u->building->no);
-			if (u->building->type == &bt_monument
+			if (u->building->type == bt_find("monument")
 				&& !strcmp(u->building->name, buf)) {
 				cmistake(u, S->s, 29, MSG_EVENT);
 				break;
@@ -3265,7 +3265,7 @@ monthly_healing(void)
 #ifdef NEW_TAVERN
 				struct building * b = inside_building(u);
 				const struct building_type * btype = b?b->type:NULL;
-				if (btype == &bt_inn) {
+				if (btype == bt_find("inn")) {
 					max_unit = max_unit * 3 / 2;
 				}
 #endif
@@ -3348,7 +3348,7 @@ age_factions(void)
 	faction *f;
 
 	for (f = factions; f; f = f->next) {
-		f->age = f->age + 1;
+		++f->age;
 		if (f->age < IMMUN_GEGEN_ANGRIFF) {
 			add_message(&f->msgs, new_message(f,
 				"newbieimmunity%i:turns", IMMUN_GEGEN_ANGRIFF - f->age));

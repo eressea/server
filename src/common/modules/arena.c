@@ -309,7 +309,7 @@ tower_init(void)
 			start_region[i] = findregion(arena_center->x+delta_x[i]*2, arena_center->y+delta_y[i]*2);                               
 			if (r->terrain!=T_DESERT) terraform(r, T_DESERT);                                                                       
 			if (!r->buildings) {                                                                                                    
-				building * b = new_building(&bt_castle, r, NULL);                                                                   
+				building * b = new_building(bt_find("castle"), r, NULL);
 				b->size = 10;                                                                                                       
 				if (i!=0) sprintf(buf, "Turm des %s", neue_gebiete[i]);                                                             
 				else sprintf(buf, "Turm der Ahnungslosen");                                                                         
@@ -318,7 +318,7 @@ tower_init(void)
 		}          
 	}
 	if (first && !arena_center->buildings) {
-		building * b = new_building(&bt_castle, arena_center, NULL);
+		building * b = new_building(bt_find("castle"), arena_center, NULL);
 		attrib * a;
 		item * items;
 
@@ -389,15 +389,6 @@ block_create(int x1, int y1, char terrain)
 }
 
 #ifdef CENTRAL_VOLCANO
-building_type bt_caldera = {
-	"caldera", /* _name */
-	BTF_NOBUILD|BTF_INDESTRUCTIBLE,  /* flags */
-	1, -1, -1, /* capac, maxcap, maxsize */
-	NULL, /* maintenance */
-	NULL, /* construction */
-	NULL       /* name() */
-};
-
 
 static int
 caldera_handle(trigger * t, void * data)
@@ -483,7 +474,7 @@ init_volcano(void)
 	assert(arena_center);
 	if (r->terrain!=T_DESERT) return; /* been done before */
 	terraform(arena_center, T_VOLCANO_SMOKING);
-	b = new_building(&bt_caldera, r, NULL);
+	b = new_building(bt_find("caldera"), r, NULL);
 	b->size = 1;
 	b->name = strdup("Igjarjuk's Schlund");
 	b->display = strdup("Feurige Lava fließt aus dem Krater des großen Vulkans. Alles wird von ihr verschlungen.");

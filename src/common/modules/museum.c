@@ -262,27 +262,28 @@ create_museum(void)
 
 	r = findregion(9526, 9525);
 	if(!r->buildings) {
-		b = new_building(&bt_generic, r, NULL);
+		const building_type * bt_generic = bt_find("generic");
+		b = new_building(bt_generic, r, NULL);
 		set_string(&b->name, "Séparée im dämonischen Stil");
 		set_string(&b->display, "Diese ganz im dämonischen Stil gehaltene Sitzgruppe ist ganz in dunklen Schwarztönen gehalten. Muster fremdartiger Runen bedecken das merkwürdig geformte Mobiliar, das unangenehm lebendig wirkt.");
 
-		b = new_building(&bt_generic, r, NULL);
+		b = new_building(bt_generic, r, NULL);
 		set_string(&b->name, "Séparée im elfischen Stil");
 		set_string(&b->display, "Ganz in Grün- und Brauntönen gehalten wirkt die Sitzgruppe fast lebendig. Bei näherer Betrachtung erschließt sich dem Betrachter, daß sie tatsächlich aus lebenden Pflanzen erstellt ist. So ist der Tisch aus einem eizigen Baum gewachsen, und die Polster bestehen aus weichen Grassoden. Ein wunderschön gemusterter Webteppich mit tausenden naturgetreu eingestickter Blumensarten bedeckt den Boden.");
 
-		b = new_building(&bt_generic, r, NULL);
+		b = new_building(bt_generic, r, NULL);
 		set_string(&b->name, "Séparée im halblingschen Stil");
 		set_string(&b->display, "Dieses rustikale Mobiliar ist aus einem einzigen, gewaltigen Baum hergestellt worden. Den Stamm haben fleißige Halblinge der Länge nach gevierteilt und aus den vier langen Viertelstämmen die Sitzbänke geschnitzt, während der verbleibende Stumpf als Tisch dient. Schon von weitem steigen dem Besucher die Gerüche der Köstlichkeiten entgegen, die auf dem Tisch stapeln.");
 
-		b = new_building(&bt_generic, r, NULL);
+		b = new_building(bt_generic, r, NULL);
 		set_string(&b->name, "Séparée im orkischen Stil");
 		set_string(&b->display, "Grobgeschreinerte, elfenhautbespannte Stühle und ein Tisch aus Knochen, über deren Herkunft man sich lieber keine Gedanken macht, bilden die Sitzgruppe im orkischen Stil. Überall haben Orks ihre Namen, und anderes wenig zitierenswertes in das Holz und Gebein geritzt.");
 
-		b = new_building(&bt_generic, r, NULL);
+		b = new_building(bt_generic, r, NULL);
 		set_string(&b->name, "Séparée im Meermenschenstil");
 		set_string(&b->display, "Ganz in Blau- und Grüntönen gehalten, mit Algen und Muscheln verziert wirken die aus altem Meerholz geschnitzten Stühle immer ein wenig feucht. Seltsammerweise hat der schwere aus alten Planken gezimmerte Tisch einen Mast mit kompletten Segel in der Mitte.");
 
-		b = new_building(&bt_generic, r, NULL);
+		b = new_building(bt_generic, r, NULL);
 		set_string(&b->name, "Séparée im Katzenstil");
 		set_string(&b->display, "Die Wände dieses Séparée sind aus dunklem Holz. Was aus der Ferne wie ein chaotisch durchbrochenes Flechtwerk wirkt, entpuppt sich bei näherer Betrachtung als eine bis in winzige Details gestaltete dschungelartige Landschaft, in die eine Vielzahl von kleinen Bildergeschichten eingewoben sind. Wie es scheint hat sich der Künstler Mühe gegeben wirklich jedes Katzenvolk Eresseas zu porträtieren. Das schummrige Innere wird von einem Kamin dominiert, vor dem einige Sessel und weiche Kissen zu einem gemütlichen Nickerchen einladen. Feiner Anduner Sisal bezieht die Lehnen der Sessel und verlockt dazu, seine Krallen hinein zu versenken. Auf einem kleinen Ecktisch steht ein großer Korb mit roten Wollknäulen und grauen und braunen Spielmäusen.");
 	} else {

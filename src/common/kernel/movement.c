@@ -1323,7 +1323,7 @@ check_takeoff(ship *sh, region *from, region *to)
 		coastl  = (direction_t)((coast+MAXDIRECTIONS-1) % MAXDIRECTIONS);
 
 		if(dir != coast && dir != coastl && dir != coastr
-			&& check_working_buildingtype(from, &bt_harbour) == false)
+			&& check_working_buildingtype(from, bt_find("harbour")) == false)
 		{
 			return false;
 		}
@@ -1336,7 +1336,7 @@ boolean
 ship_allowed(const struct ship_type * type, region * r)
 {
 	int c = 0;
-	if (check_working_buildingtype(r, &bt_harbour)) return true;
+	if (check_working_buildingtype(r, bt_find("harbour"))) return true;
 	for (c=0;type->coast[c]!=NOTERRAIN;++c) {
 		if (type->coast[c]==rterrain(r)) return true;
 	}
@@ -1606,7 +1606,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 
 			/* Hafengebühren ? */
 
-			hafenmeister = owner_buildingtyp(current_point, &bt_harbour);
+			hafenmeister = owner_buildingtyp(current_point, bt_find("harbour"));
 			if (sh && hafenmeister != NULL) {
 				item * itm;
 				assert(trans==NULL);

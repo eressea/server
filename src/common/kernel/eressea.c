@@ -971,6 +971,11 @@ update_lighthouse(building * lh)
 	region * r = lh->region;
 	int d = (int)log10(lh->size) + 1;
 	int x, y;
+	static const struct building_type * bt_lighthouse;
+	if (!bt_lighthouse) bt_lighthouse = bt_find("lighthouse");
+	assert(bt_lighthouse);
+
+	if (lh->type!=bt_lighthouse) return;
 
 	for (x=-d;x<=d;++x) {
 		for (y=-d;y<=d;++y) {
@@ -1490,8 +1495,9 @@ buildingname (const building * b)
 building *
 largestbuilding (const region * r, boolean img)
 {
-	const building_type * btype = &bt_castle; /* TODO: parameter der funktion? */
+	static const building_type * btype = NULL;
 	building *b, *best = NULL;
+	if (!btype) btype = bt_find("castle"); /* TODO: parameter der funktion? */
 	/* durch die verw. von '>' statt '>=' werden die aelteren burgen
 	 * bevorzugt. */
 
@@ -1720,7 +1726,7 @@ check_leuchtturm(region * r, faction * f)
 		building *b = (building *)a->data.v;
 		region *r2 = b->region;
 
-		assert(b->type == &bt_lighthouse);
+		assert(b->type == bt_find("lighthouse"));
 		if (fval(b, BLD_WORKING) && b->size >= 10) {
 			int c = 0;
 			unit *u;
@@ -2174,41 +2180,6 @@ attrib_type at_germs = {
 void
 attrib_init(void)
 {
-	/* Gebäudetypen registrieren */
-	init_buildings();
-	bt_register(&bt_castle);
-	bt_register(&bt_lighthouse);
-	bt_register(&bt_mine);
-	bt_register(&bt_quarry);
-	bt_register(&bt_harbour);
-	bt_register(&bt_academy);
-	bt_register(&bt_magictower);
-	bt_register(&bt_smithy);
-	bt_register(&bt_sawmill);
-	bt_register(&bt_stables);
-	bt_register(&bt_monument);
-	bt_register(&bt_dam);
-	bt_register(&bt_caravan);
-	bt_register(&bt_tunnel);
-	bt_register(&bt_inn);
-	bt_register(&bt_stonecircle);
-	bt_register(&bt_blessedstonecircle);
-	bt_register(&bt_illusion);
-	bt_register(&bt_generic);
-	bt_register(&bt_caldera);
-
-#ifdef NOXMLBOATS
-	/* Schiffstypen registrieren: */
-	st_register(&st_boat);
-	st_register(&st_balloon);
-	st_register(&st_longboat);
-	st_register(&st_dragonship);
-	st_register(&st_caravelle);
-	st_register(&st_trireme);
-#endif
-
-	/* disable: st_register(&st_transport); */
-
 	/* Alle speicherbaren Attribute müssen hier registriert werden */
 	at_register(&at_unitdissolve);
 	at_register(&at_traveldir_new);

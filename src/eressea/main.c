@@ -149,6 +149,7 @@ game_init(void)
 	debug_language("locales.log");
 	register_races();
 	register_resources();
+	register_buildings();
 	register_ships();
 	register_items();
 	register_spells();
@@ -517,6 +518,8 @@ read_args(int argc, char **argv)
 
 #ifdef BETA_CODE
 extern int xml_writeitems(const char * filename);
+extern int xml_writeships(void);
+extern int xml_writebuildings(void);
 #endif
 
 typedef struct lostdata {
@@ -565,9 +568,10 @@ main(int argc, char *argv[])
 
 	kernel_init();
 	game_init();
-#if defined(BETA_CODE) && 0
+#if defined(BETA_CODE)
 	/* xml_writeships(); */
-	xml_writeitems("items.xml");
+	xml_writebuildings();
+	/* xml_writeitems("items.xml"); */
 	return 0;
 #endif
 

@@ -32,24 +32,31 @@ typedef struct maintenance {
 #define BTF_UNIQUE         0x04 /* only one per struct region (harbour) */
 #define BTF_DECAY          0x08 /* decays when not occupied */
 #define BTF_DYNAMIC        0x10 /* dynamic type, needs bt_write */
+#define BTF_PROTECTION     0x20 /* protection in combat */
+#define BTF_MAGIC          0x40 /* magical effect */
 
 typedef struct building_type {
 	const char * _name;
 
 	int flags;  /* flags */
 	int capacity; /* Kapazität pro Größenpunkt */
-	int maxcapacity; /* Max. Kapazität */
-	int maxsize;	/* how big can it get, with all the extensions? */
+	int maxcapacity;  /* Max. Kapazität */
+	int maxsize;      /* how big can it get, with all the extensions? */
+	int magres;       /* how well it resists against spells */
+	int magresbonus;  /* bonus it gives the target against spells */
+	int fumblebonus;  /* bonus that reduces fumbling */
+	double auraregen; /* modifier for aura regeneration inside building */
 	const struct maintenance * maintenance; /* array of requirements */
 	const struct construction * construction; /* construction of 1 building-level */
 
 	const char * (*name)(int size);
+	void (*init)(struct building_type*);
 	struct attrib * attribs;
 } building_type;
 
 extern const building_type * bt_find(const char* name);
-extern void bt_register(const building_type * type);
-extern void init_buildings(void);
+extern void bt_register(building_type * type);
+extern void register_buildings(void);
 
 typedef struct building_typelist {
 	struct building_typelist * next;
@@ -99,26 +106,6 @@ void build_building(struct unit * u, const struct building_type * typ, int size)
 
 /* Alte Gebäudetypen: */
 
-extern struct building_type bt_castle;
-extern struct building_type bt_lighthouse;
-extern struct building_type bt_mine;
-extern struct building_type bt_quarry;
-extern struct building_type bt_harbour;
-extern struct building_type bt_academy;
-extern struct building_type bt_magictower;
-extern struct building_type bt_smithy;
-extern struct building_type bt_sawmill;
-extern struct building_type bt_stables;
-extern struct building_type bt_monument;
-extern struct building_type bt_dam;
-extern struct building_type bt_caravan;
-extern struct building_type bt_tunnel;
-extern struct building_type bt_inn;
-extern struct building_type bt_stonecircle;
-extern struct building_type bt_blessedstonecircle;
-extern struct building_type bt_illusion;
-extern struct building_type bt_generic;
-
 /* old functions, still in build.c: */
 int buildingeffsize(const building * b, boolean img);
 void bhash(struct building * b);
@@ -133,7 +120,6 @@ extern void bt_write(FILE * F, const building_type * bt);
 extern struct building_type * bt_make(const char * name, int flags, int capacity, int maxcapacity, int maxsize);
 
 #include "build.h"
-extern const struct building_type * oldbuildings[MAXBUILDINGTYPES];
 #define NOBUILDING NULL
 
 extern void * resolve_building(void * data);

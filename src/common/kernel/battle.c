@@ -1602,7 +1602,7 @@ skilldiff(troop at, troop dt, int dist)
 #endif
 
 	if (df->building) {
-		if (df->building->type == &bt_castle) {
+		if (df->building->type->flags & BTF_PROTECTION) {
 			if(fspecial(au->faction, FS_SAPPER)) {
 				/* Halbe Schutzwirkung, aufgerundet */
 				/* -1 because the tradepost has no protection value */
@@ -1824,7 +1824,7 @@ damage_building(battle *b, building *bldg, int damage_abs)
 
 	/* Wenn Burg, dann gucken, ob die Leute alle noch in das Gebäude passen. */
 
-	if (bldg->type == &bt_castle) {
+	if (bldg->type->flags & BTF_PROTECTION) {
 		fighter *fi;
 
 		bldg->sizeleft = bldg->size;

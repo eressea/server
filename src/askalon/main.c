@@ -88,6 +88,7 @@ init_game(void)
 
 	init_resources();
 	register_items();
+	register_buildings();
 	init_weapons();
 
 	init_conversion();

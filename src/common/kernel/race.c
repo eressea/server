@@ -223,7 +223,7 @@ give_starting_equipment(struct region *r, struct unit *u)
 		break;
 	case RC_HUMAN:
 		{
-			building *b = new_building(&bt_castle, r, u->faction->locale);
+			building *b = new_building(bt_find("castle"), r, u->faction->locale);
 			b->size = 10;
 			u->building = b;
 			fset(u, FL_OWNER);

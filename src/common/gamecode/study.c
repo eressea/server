@@ -186,8 +186,8 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
 
 		/* Solange Akademien größenbeschränkt sind, sollte Lehrer und
 		 * Student auch in unterschiedlichen Gebäuden stehen dürfen */
-		if (btype == &bt_academy
-			&& student->building && student->building->type == &bt_academy)
+		if (btype == bt_find("academy")
+			&& student->building && student->building->type == bt_find("academy"))
 		{
 			int j = study_cost(student, sk);
 			j = max(50, j * 2);
@@ -516,7 +516,7 @@ learn(void)
 					struct building * b = inside_building(u);
 					const struct building_type * btype = b?b->type:NULL;
 
-					if (btype == &bt_academy) {
+					if (btype == bt_find("academy")) {
 						studycost = max(50, studycost * 2);
 					}
 				}

@@ -147,126 +147,6 @@ captain(ship *sh, region *r)
 
 /* Alte Schiffstypen: */
 
-#ifdef NOXMLBOATS
-static const terrain_t coast_large[] = {
-	T_OCEAN, T_PLAIN, NOTERRAIN
-};
-
-static terrain_t coast_small[] = {
-	T_OCEAN, T_PLAIN, T_SWAMP, T_DESERT, T_HIGHLAND, T_MOUNTAIN, T_GLACIER,
-	T_GRASSLAND, T_VOLCANO, T_VOLCANO_SMOKING, T_ICEBERG_SLEEP, T_ICEBERG,
-	NOTERRAIN
-};
-
-static requirement boat_req[] = {
-  {I_WOOD, 1},
-  {0, 0}
-};
-
-static const construction boat_bld = {
-  SK_SHIPBUILDING, 1,
-  5, 1, boat_req,
-  NULL
-};
-
-const ship_type st_boat = {
-	{ "Boot", "ein Boot" }, 2,
-	SFL_OPENSEA, 0, 1.00, 1.00,
-	5, 50*100,
-	1, 1, 2, coast_small,
-	&boat_bld
-};
-
-
-static requirement balloon_req[] = {
-  {0, 0}
-};
-
-static const construction balloon_bld = {
-	SK_SHIPBUILDING, 100,
-	5, 1, balloon_req,
-	NULL
-};
-
-const ship_type st_balloon = {
-	{ "Ballon", "ein Ballon" }, 2,
-	SFL_OPENSEA|SFL_FLY, 0, 1.00, 1.00,
-	5, 50*100,
-	6, 6, 6, coast_small,
-	&balloon_bld
-};
-
-
-static requirement longboat_req[] = {
-  {I_WOOD, 1},
-  {0, 0}
-};
-
-static const construction longboat_bld = {
-  SK_SHIPBUILDING, 1,
-  50, 1, longboat_req,
-  NULL
-};
-
-const ship_type st_longboat = {
-	{ "Langboot", "ein Langboot" }, 3,
-	SFL_OPENSEA, 0, 1.00, 1.00,
-	50, 500*100,
-	1, 1, 10, coast_large,
-	&longboat_bld
-};
-
-static requirement dragonship_req[] = {
-  {I_WOOD, 1},
-  {0, 0}
-};
-static const construction dragonship_bld = {
-  SK_SHIPBUILDING, 2,
-  100, 1, dragonship_req,
-  NULL
-};
-const ship_type st_dragonship = {
-	{ "Drachenschiff", "ein Drachenschiff" }, 5,
-	SFL_OPENSEA, 0, 1.00, 1.00,
-	100, 1000*100,
-	2, 1, 50, coast_large,
-	&dragonship_bld
-};
-
-static requirement caravelle_req[] = {
-  {I_WOOD, 1},
-  {0, 0}
-};
-static const construction caravelle_bld = {
-  SK_SHIPBUILDING, 3,
-  250, 1, caravelle_req,
-  NULL
-};
-const ship_type st_caravelle = {
-	{ "Karavelle", "eine Karavelle" }, 5,
-	SFL_OPENSEA, 0, 1.00, 1.00,
-	300, 3000*100,
-	3, 1, 30, coast_large,
-	&caravelle_bld
-};
-
-static requirement trireme_req[] = {
-  {I_WOOD, 1},
-  {0, 0}
-};
-static const construction trireme_bld = {
-  SK_SHIPBUILDING, 4,
-  200, 1, trireme_req,
-  NULL
-};
-const ship_type st_trireme = {
-	{ "Trireme", "eine Trireme" }, 7,
-	SFL_OPENSEA, 0, 1.00, 1.00,
-	200, 2000*100,
-	4, 1, 120, coast_large,
-	&trireme_bld
-};
-#endif
 
 ship *
 new_ship(const ship_type * stype, region * r)
@@ -341,40 +221,6 @@ shipowner(const region * r, const ship * sh)
 		fset(first, FL_OWNER);
 	return first;
 }
-
-#ifdef NOXMLBOATS
-void
-xml_writeships(void)
-{
-	FILE * F = fopen("ships.xml", "w");
-	ship_typelist *stl= shiptypes;
-	while (stl) {
-		int i;
-		const ship_type * st = stl->type;
-		fprintf(F, "<ship name=\"%s\" range=\"%u\" storm=\"%.2f\" damage=\"%.2f\" cabins=\"%u\" cargo=\"%u\" cptskill=\"%u\" minskill=\"%u\" sumskill=\"%u\"",
-			locale_string(find_locale("en"), st->name[0]), st->range, st->storm, st->damage, st->cabins, st->cargo, 
-			st->cptskill, st->minskill, st->sumskill);
-		if (st->flags & SFL_OPENSEA) fputs(" opensea", F);
-		if (st->flags & SFL_FLY) fputs(" fly", F);
-		fputs(">\n", F);
-		for (i=0;st->coast[i]!=NOTERRAIN;++i) {
-			fprintf(F, "\t<coast terrain=\"%s\"></coast>\n", terrain[st->coast[i]].name);
-		}
-		fprintf(F, "\t<construction skill=\"%s\" minskill=\"%u\" maxsize=\"%u\" reqsize=\"%u\">\n", 
-			skillname(st->construction->skill, NULL), st->construction->minskill, 
-			st->construction->maxsize, st->construction->reqsize);
-		for (i=0;st->construction->materials[i].number!=0;++i) {
-			fprintf(F, "\t\t<requirement type=\"%s\" quantity=\"%d\"></requirement>\n", 
-				oldresourcetype[st->construction->materials[i].type]->_name[0], 
-				st->construction->materials[i].number);
-		}
-		fputs("\t</construction>\n", F);
-		fputs("</ship>\n\n", F);
-		stl=stl->next;
-	}
-	fclose(F);
-}
-#endif
 
 static int 
 tagend(struct xml_stack * stack)
@@ -483,8 +329,6 @@ static xml_callbacks xml_ships = {
 void
 register_ships(void)
 {
-#ifndef NOXMLBOATS
 	xml_register(&xml_ships, "eressea ship", 0);
-#endif
 }
 

@@ -1206,9 +1206,9 @@ gebaeude_stuerzt_ein(region * r, building * b)
 	/* Falls Karawanserei, Damm oder Tunnel einstürzen, wird die schon
 	 * gebaute Straße zur Hälfte vernichtet */
 	for (d=0;d!=MAXDIRECTIONS;++d) if (rroad(r, d) > 0 &&
-		(b->type == &bt_caravan ||
-		 b->type == &bt_dam ||
-		 b->type == &bt_tunnel))
+		(b->type == bt_find("caravan") ||
+		 b->type == bt_find("dam") ||
+		 b->type == bt_find("tunnel")))
 	{
 		rsetroad(r, d, rroad(r, d) / 2);
 		road = 1;
@@ -1446,7 +1446,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 	if (itype == olditemtype[I_LAEN]) {
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
-		if (btype != &bt_mine) {
+		if (btype != bt_find("mine")) {
 			cmistake(u, findorder(u, u->thisorder), 104, MSG_PRODUCE);
 			return;
 		}
@@ -1514,16 +1514,16 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 	} else {
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
-		if (itype == olditemtype[I_IRON] && btype == &bt_mine) {
+		if (itype == olditemtype[I_IRON] && btype == bt_find("mine")) {
 			++skill;
 		}
-		else if (itype == olditemtype[I_STONE] && btype == &bt_quarry) {
+		else if (itype == olditemtype[I_STONE] && btype == bt_find("quarry")) {
 			++skill;
 		}
-		else if (itype == olditemtype[I_WOOD] && btype == &bt_sawmill) {
+		else if (itype == olditemtype[I_WOOD] && btype == bt_find("sawmill")) {
 			++skill;
 		}
-		else if (itype == olditemtype[I_MALLORN] && btype == &bt_sawmill) {
+		else if (itype == olditemtype[I_MALLORN] && btype == bt_find("sawmill")) {
 			++skill;
 		}
 	}
@@ -1564,7 +1564,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 	if (itype==olditemtype[I_IRON]) {
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
-		if (btype==&bt_mine)
+		if (btype==bt_find("mine"))
 			al->save *= 0.5;
 		if (u->race == new_race[RC_DWARF])
 #if RACE_ADJUSTMENTS
@@ -1575,7 +1575,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 	} else if (itype==olditemtype[I_STONE]) {
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
-		if (btype==&bt_quarry)
+		if (btype==bt_find("quarry"))
 			al->save = al->save*0.5;
 #if RACE_ADJUSTMENTS
 		if (u->race == new_race[RC_TROLL])
@@ -1584,12 +1584,12 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 	} else if (itype==olditemtype[I_MALLORN]) {
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
-		if (btype==&bt_sawmill)
+		if (btype==bt_find("sawmill"))
 			al->save *= 0.5;
 	} else if (itype==olditemtype[I_WOOD]) {
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
-		if (btype==&bt_sawmill)
+		if (btype==bt_find("sawmill"))
 			al->save *= 0.5;
 	}
 }
@@ -2168,17 +2168,17 @@ expandselling(region * r, request * sellorders)
 
 	for (b = rbuildings(r); b; b = b->next) {
 		if (b->size > maxsize && buildingowner(r, b) != NULL
-			&& b->type == &bt_castle) {
+			&& b->type == bt_find("castle")) {
 			maxb = b;
 			maxsize = b->size;
 			maxowner = buildingowner(r, b);
-		} else if (b->size == maxsize && b->type == &bt_castle) {
+		} else if (b->size == maxsize && b->type == bt_find("castle")) {
 			maxb = (building *) NULL;
 			maxowner = (unit *) NULL;
 		}
 	}
 
-	hafenowner = owner_buildingtyp(r, &bt_harbour);
+	hafenowner = owner_buildingtyp(r, bt_find("harbour"));
 
 	if (maxb != (building *) NULL && maxowner != (unit *) NULL) {
 		maxeffsize = buildingeffsize(maxb, false);
@@ -2198,7 +2198,7 @@ expandselling(region * r, request * sellorders)
 	max_products = rpeasants(r) / TRADE_FRACTION;
 	if (max_products <= 0) return;
 
-	if (rterrain(r) == T_DESERT && buildingtype_exists(r, &bt_caravan)) {
+	if (rterrain(r) == T_DESERT && buildingtype_exists(r, bt_find("caravan"))) {
 		max_products = rpeasants(r) * 2 / TRADE_FRACTION;
 	}
 	/* Verkauf: so programmiert, dass er leicht auf mehrere Gueter pro
@@ -2328,7 +2328,7 @@ sell(region * r, unit * u, request ** sellorders, const char * cmd)
 	s = getstrtoken();
 	if (findparam(s, u->faction->locale) == P_ANY) {
 		n = rpeasants(r) / TRADE_FRACTION;
-		if (rterrain(r) == T_DESERT && buildingtype_exists(r, &bt_caravan))
+		if (rterrain(r) == T_DESERT && buildingtype_exists(r, bt_find("caravan")))
 			n *= 2;
 		if (n==0) {
 			cmistake(u, cmd, 303, MSG_COMMERCE);
@@ -2708,7 +2708,7 @@ breedhorses(region *r, unit *u)
 	struct building * b = inside_building(u);
 	const struct building_type * btype = b?b->type:NULL;
 
-	if (btype!=&bt_stables) {
+	if (btype!=bt_find("stables")) {
 		cmistake(u, findorder(u, u->thisorder), 122, MSG_PRODUCE);
 		return;
 	}

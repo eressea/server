@@ -987,7 +987,7 @@ sp_blessstonecircle(castorder *co)
 
 	b = p->param[0]->data.b;
 
-	if(b->type != &bt_stonecircle) {
+	if(b->type != bt_find("stonecircle")) {
 		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': %s ist kein Steinkreis.",
 			unitname(mage), regionid(mage->region), co->order, buildingname(b));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
@@ -1002,7 +1002,7 @@ sp_blessstonecircle(castorder *co)
 		return 0;
 	}
 
-	b->type = &bt_blessedstonecircle;
+	b->type = bt_find("blessedstonecircle");
 
 	sprintf(buf, "%s weiht %s.", unitname(mage), buildingname(b));
 	addmessage(r, 0, buf, MSG_MAGIC, ML_INFO);
@@ -2052,7 +2052,7 @@ sp_homestone(castorder *co)
 	int cast_level = co->level;
 	int force = co->force;
 
-	if(!mage->building || mage->building->type != &bt_castle){
+	if(!mage->building || mage->building->type != bt_find("castle")){
 		cmistake(mage, strdup(co->order), 197, MSG_MAGIC);
 		return 0;
 	}
@@ -4908,13 +4908,13 @@ sp_icastle(castorder *co)
 	icastle_data * data;
 
 	if((type=bt_find(pa->param[0]->data.s)) == NOBUILDING) {
-		type = &bt_castle;
+		type = bt_find("castle");
 	}
 
-	b = new_building(&bt_illusion, r, mage->faction->locale);
+	b = new_building(bt_find("illusion"), r, mage->faction->locale);
 
 	/* Größe festlegen. */
-	if(type == &bt_illusion) {
+	if(type == bt_find("illusion")) {
 		b->size = (rand()%(power*power)+1)*10;
 	} else if (b->type->maxsize == -1) {
 		b->size = ((rand()%power)+1)*5;
@@ -6453,7 +6453,7 @@ sp_movecastle(castorder *co)
 		"erheben das Gebäude und tragen es in Richtung %s.",
 		buildingname(b), locale_string(mage->faction->locale, directions[dir]));
 
-	if((b->type==&bt_caravan || b->type==&bt_dam || b->type==&bt_tunnel)) {
+	if((b->type==bt_find("caravan") || b->type==bt_find("dam") || b->type==bt_find("tunnel"))) {
 		boolean damage = false;
 		direction_t d;
 		for (d=0;d!=MAXDIRECTIONS;++d) {

@@ -1213,7 +1213,7 @@ randomevents(void)
 			if (!(u->race->ec_flags & NOGIVE)) {
 				struct building * b = inside_building(u);
 				const struct building_type * btype = b?b->type:NULL;
-				if (btype == &bt_blessedstonecircle) {
+				if (btype == bt_find("blessedstonecircle")) {
 					int n, c = 0;
 					for (n=0; n<u->number; n++) if (rand()%100 < 2) {
 						change_item(u, I_UNICORN, 1);

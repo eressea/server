@@ -937,8 +937,8 @@ readgame(boolean backup)
 			rds(F, &b->display);
 			b->size = ri(F);
 			if (global.data_version < TYPES_VERSION) {
-			    int i = ri(F);
-			    b->type = oldbuildings[i];
+				assert(!"data format is no longer supported");
+			    /* b->type = oldbuildings[ri(F)]; */
 			}
 			else {
 			    rs(F, buf);
@@ -966,13 +966,7 @@ readgame(boolean backup)
 			rds(F, &sh->display);
 
 			if (global.data_version < SHIPTYPE_VERSION) {
-#ifdef NOXMLBOATS
-				const ship_type * oldship[] = { &st_boat, &st_balloon, &st_longboat, &st_dragonship, &st_caravelle, &st_trireme };
-				int i = ri(F);
-				sh->type = oldship[i];
-#else
 				assert(!"cannot read old datafile with xml ship support");
-#endif
 			}
 			else {
 				rs(F, buf);
@@ -1080,9 +1074,7 @@ readgame(boolean backup)
 
 	for (r=regions;r;r=r->next) {
 		building * b;
-		for (b=r->buildings;b;b=b->next) {
-			if (b->type==&bt_lighthouse) update_lighthouse(b);
-		}
+		for (b=r->buildings;b;b=b->next) update_lighthouse(b);
 	}
 	printf(" - Regionen initialisieren & verbinden...\n");
 	for (r = regions; r; r = r->next) {

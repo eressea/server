@@ -144,16 +144,11 @@ a_readicastle(attrib * a, FILE * f)
 {
 	icastle_data * data = (icastle_data*)a->data.v;
 	if (global.data_version<TYPES_VERSION) {
-		union {
-			int i;
-			short sa[2];
-		} old;
 		int t;
-		fscanf(f, "%d", &old.i);
-		data->time = old.sa[1];
-		t = old.sa[0];
-		if (t<0 || t >= MAXBUILDINGS) t = 0;
-		data->type = oldbuildings[t];
+		fscanf(f, "%d", &t);
+		data->time = 0;
+		data->type = NULL;
+		return 0; /* no longer supported */
 	} else {
 		int bno;
 		fscanf(f, "%s %d %d", buf, &bno, &data->time);
@@ -163,8 +158,8 @@ a_readicastle(attrib * a, FILE * f)
 			ur_add((void*)bno, (void**)&data->building, resolve_building);
 		}
 		data->type = bt_find(buf);
+		return 1;
 	}
-	return 1;
 }
 
 static void
@@ -1139,16 +1134,9 @@ spellpower(region * r, unit * u, spell * sp, int cast_level)
 		/* Bonus durch Magieturm und gesegneten Steinkreis */
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
-		if (btype == &bt_magictower) {
-			force++;
-		} else
-		if (btype == &bt_blessedstonecircle){
-			force++;
-		}
+		if (btype && btype->flags & BTF_MAGIC) ++force;
 	}
-	if (get_item(u, I_RING_OF_POWER) > 0) {
-		force++;
-	}
+	if (get_item(u, I_RING_OF_POWER) > 0) ++force;
 
 	/* Antimagie in der Zielregion */
 	if (is_spell_active(r, C_ANTIMAGICZONE)) {
@@ -1272,10 +1260,9 @@ magic_resistance(unit *target)
 	{
 		struct building * b = inside_building(target);
 		const struct building_type * btype = b?b->type:NULL;
+
 		/* gesegneter Steinkreis gibt 30% dazu */
-		if (btype == &bt_blessedstonecircle){
-			chance += 30;
-		}
+		if (btype) chance += btype->magresbonus;
 	}
 	return chance;
 }
@@ -1333,10 +1320,7 @@ target_resists_magic(unit *magician, void *obj, int objtyp, int t_bonus)
 			chance += get_curseeffect(((building *)obj)->attribs, C_RESIST_MAGIC, 0);
 
 			/* Bonus durch Typ */
-			if (((building *)obj)->type == &bt_magictower)
-				chance += 40;
-			if (((building *)obj)->type == &bt_blessedstonecircle)
-				chance += 60;
+			chance += ((building *)obj)->type->magres;
 
 
 			break;
@@ -1397,9 +1381,7 @@ fumble(region * r, unit * u, spell * sp, int cast_grade)
 	struct building * b = inside_building(u);
 	const struct building_type * btype = b?b->type:NULL;
 
-	if (btype==&bt_magictower) {
-		patzer -= 10;
-	}
+	if (btype) patzer -= btype->fumblebonus;
 	/* CHAOSPATZERCHANCE 10 : +10% Chance zu Patzern */
 	if (sp->magietyp == M_CHAOS) {
 		patzer += CHAOSPATZERCHANCE;
@@ -1568,13 +1550,7 @@ regeneration_magiepunkte(void)
 					reg_aura = (double)regeneration(u);
 
 					/* Magierturm erhöht die Regeneration um 75% */
-					if (btype == &bt_magictower) {
-						reg_aura *= 1.75;
-					}
-					/* gesegnerter Steinkreis erhöht die Regeneration um 50% */
-					if (btype == &bt_blessedstonecircle) {
-						reg_aura *= 1.50;
-					}
+					if (btype) reg_aura*=btype->auraregen;
 
 					/* Bonus/Malus durch Zauber */
 					n = get_curseeffect(u->attribs, C_AURA, 0);
