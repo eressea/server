@@ -134,6 +134,13 @@ terraform_region(int x, int y, const char * tname)
   return r;
 }
 
+static region *
+region_next(const region& r, int dir)
+{
+  if (dir<0 || dir >=MAXDIRECTIONS) return NULL;
+  return r_connect(&r, (direction_t)dir);
+}
+
 void
 bind_region(lua_State * L) 
 {
@@ -151,6 +158,7 @@ bind_region(lua_State * L)
     .def("add_notice", &region_addnotice)
     .def("get_flag", &region_getflag)
     .def("set_flag", &region_setflag)
+    .def("next", &region_next)
     .def_readonly("x", &region::x)
     .def_readonly("y", &region::y)
     .def_readwrite("age", &region::age)

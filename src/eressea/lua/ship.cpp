@@ -25,5 +25,6 @@ bind_ship(lua_State * L)
     .def_readonly("info", &ship::display)
     .def_readwrite("damage", &ship::damage)
     .def_readwrite("size", &ship::size)
+    .def_readwrite("coast", &ship::coast)
   ];
 }
