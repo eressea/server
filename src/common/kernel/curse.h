@@ -206,10 +206,6 @@ typedef struct curse_unit {
 } curse_unit;
 
 
-typedef int (*cdesc_fun)(const void*, int, curse*, int);
-/* Parameter: Objekt, auf dem curse liegt, Typ des Objekts, curse,
- * Besitzerpartei?1:0 */
-
 /* ------------------------------------------------------------- */
 
 typedef struct curse_type {

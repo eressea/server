@@ -942,7 +942,7 @@ static curse_type cursedaten[MAXCURSE] =
 		"fogtrap",
 		CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
 		"",
-		(cdesc_fun)cinfo_fogtrap
+		/* cinfo_fogtrap*/
 	},
 	{ 
 		"antimagiczone",
@@ -962,7 +962,7 @@ static curse_type cursedaten[MAXCURSE] =
 		"gbdream",
 		CURSETYP_NORM, 0, (NO_MERGE),
 		"",
-		(cdesc_fun)cinfo_dreamcurse
+		/* cinfo_dreamcurse*/
 	},
 
 	{  /* Verändert die max Aura und Regeneration um effect% */
@@ -972,7 +972,7 @@ static curse_type cursedaten[MAXCURSE] =
 		"und Magischer Essenz ein. Mit positiver Ausrichtung kann er wohl "
 		"wie ein Fokus für Aura wirken, jedoch genauso für das Gegenteil "
 		"benutzt werden.",
-		(cdesc_fun)cinfo_auraboost
+		/* cinfo_auraboost */
 	},
 	{
 		"maelstrom",
@@ -986,14 +986,14 @@ static curse_type cursedaten[MAXCURSE] =
 		"blessedharvest",
 		CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
 		"Dieser Fruchtbarkeitszauber erhöht die Erträge der Felder.",
-		(cdesc_fun)cinfo_blessedharvest
+		/* cinfo_blessedharvest */
 	},
 	{
 		"drought",
 		CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
 		"Dieser Zauber strahlt starke negative Energien aus. Warscheinlich "
 		"ist er die Ursache der Dürre."	,
-		(cdesc_fun)cinfo_drought
+		/* cinfo_drought */
 	},
 	{
 		"badlearn",
@@ -1001,7 +1001,7 @@ static curse_type cursedaten[MAXCURSE] =
 		"Dieser Zauber scheint die Ursache für die Schlaflosigkeit und "
 		"Mattigkeit zu sein, unter der die meisten Leute hier leiden und "
 		"die dazu führt, das Lernen weniger Erfolg bringt. ",
-		(cdesc_fun)cinfo_badlearn
+		/* cinfo_badlearn */
 	},
 	{ /* Sturmwind-Zauber, wirkt nur 1 Runde */
 		"stormwind",
@@ -1022,7 +1022,7 @@ static curse_type cursedaten[MAXCURSE] =
 		"und des Wassers gebunden. Der dem Wasser verbundene Teil des Zaubers "
 		"läßt es leichter durch die Wellen gleiten und der der Luft verbundene "
 		"Teil scheint es vor widrigen Winden zu schützen.",
-		(cdesc_fun)cinfo_shipnodrift
+		/* cinfo_shipnodrift */
 	},
 	{ /*  Trübsal-Zauber */
 		"depression",
@@ -1032,7 +1032,7 @@ static curse_type cursedaten[MAXCURSE] =
 		"hat sich wie ein bleiernes Tuch auf die Gemüter der Bevölkerung "
 		"gelegt und eh er nicht gebrochen oder verklungen ist, wird keiner "
 		"sich an Gaukelleien erfreuen können.",
-		(cdesc_fun)cinfo_depression
+		/* cinfo_depression */
 	},
 	{ /* Heimstein-Zauber */
 		"magicwalls",
@@ -1042,7 +1042,7 @@ static curse_type cursedaten[MAXCURSE] =
 		"Vieleicht wurde gar ein Erdelementar in diese Mauern gebannt. "
 		"Ausser ebenso starkter Antimagie wird nichts je diese Mauern "
 		"gefährden können.",
-		(cdesc_fun)cinfo_magicstone
+		/* cinfo_magicstone */
 	},
 	{ /* Feste Mauer - Präkampfzauber, wirkt nur 1 Runde */
 		"strongwall",
@@ -1054,27 +1054,27 @@ static curse_type cursedaten[MAXCURSE] =
 		"astralblock",
 		CURSETYP_NORM, 0, NO_MERGE,
 		"",
-		(cdesc_fun)cinfo_astralblock
+		/* cinfo_astralblock */
 	},
 	{ /* Unterhaltungsanteil vermehren */
 		"generous",
 		CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR | M_MAXEFFECT ),
 		"Dieser Zauber beeinflusst die allgemeine Stimmung in der Region positiv. "
 		"Die gute Laune macht die Leute freigiebiger.",
-		(cdesc_fun)cinfo_generous
+		/* cinfo_generous */
 	},
 	{ /* verhindert Attackiere regional */
 		"peacezone",
 		CURSETYP_NORM, 0, NO_MERGE,
 		"Dieser machtvoller Beeinflussungszauber erstickt jeden Streit schon im "
 		"Keim.",
-		(cdesc_fun)cinfo_peacezone
+		/* cinfo_peacezone */
 	},
 	{  /* erschwert geordnete Bewegungen */
 		"disorientationzone",
 		CURSETYP_NORM, 0, NO_MERGE,
 		"",
-		(cdesc_fun)cinfo_regconf
+		/* cinfo_regconf */
 	},
 	{ /*  erzeugt Straßennetz */
 		"magicstreet",
@@ -1082,14 +1082,14 @@ static curse_type cursedaten[MAXCURSE] =
 		"Es scheint sich um einen elementarmagischen Zauber zu handeln, der alle "
 		"Pfade und Wege so gut festigt, als wären sie gepflastert. Wie auf einer "
 		"Straße kommt man so viel besser und schneller vorwärts.",
-		(cdesc_fun)cinfo_magicstreet
+		/* cinfo_magicstreet */
 	},
 	{
 		"magicrunes",
 		CURSETYP_NORM, 0, M_SUMEFFECT,
 		"Dieses Zauber verstärkt die natürliche Widerstandskraft gegen eine "
 		"Verzauberung.",
-		(cdesc_fun)cinfo_magicrunes
+		/* cinfo_magicrunes */
 	},
 	{ /*  erniedigt Magieresistenz von nicht-aliierten Einheiten, wirkt nur
 			 1x pro Einheit */
@@ -1115,20 +1115,20 @@ static curse_type cursedaten[MAXCURSE] =
 		"Dieser mächtige Bann scheint die Einheit ihres freien Willens "
 		"zu berauben. Solange der Zauber wirkt, wird sie nur den Befehlen "
 		"ihres neuen Herrn gehorchen.",
-		(cdesc_fun)cinfo_slave
+		/* cinfo_slave */
 	},
 	{
 		"shipdisorientation",
 		CURSETYP_NORM, 0, NO_MERGE,
 		"Dieses Schiff hat sich verfahren.",
-		(cdesc_fun)cinfo_disorientation
+		/* cinfo_disorientation */
 	},
 	{
 		"calmmonster",
 		CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
 		"Dieser Beeinflussungszauber scheint die Einheit einem ganz "
 		"bestimmten Volk wohlgesonnen zu machen.",
-		(cdesc_fun)cinfo_calm
+		/* cinfo_calm */
 	},
 	{ /* Merkt sich die alte 'richtige' Rasse einer gestalltwandelnden
 			 Einheit */
@@ -1141,13 +1141,13 @@ static curse_type cursedaten[MAXCURSE] =
 		"fumble",
 		CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
 		"Eine Wolke negativer Energie umgibt die Einheit.",
-		(cdesc_fun)cinfo_fumble
+		/* cinfo_fumble */
 	},
 	{
 		"riotzone",
 		CURSETYP_NORM, 0, (M_DURATION),
 		"Eine Wolke negativer Energie liegt über der Region.",
-		(cdesc_fun)cinfo_riot
+		/* cinfo_riot */
 	},
 	{ /* Ewige Mauern-Zauber */
 		"nocostbuilding",
@@ -1155,14 +1155,14 @@ static curse_type cursedaten[MAXCURSE] =
 		"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
 		"gebunden. Unbeeindruck vom Zahn der Zeit wird dieses Gebäude wohl "
 		"auf Ewig stehen.",
-		(cdesc_fun)cinfo_nocost
+		/* cinfo_nocost */
 	},
 	{
 		"holyground",
 		CURSETYP_NORM, 0, (M_VIGOUR_ADD),
 		"Verschiedene Naturgeistern sind im Boden der Region gebunden und "
 		"beschützen diese vor dem der dunklen Magie des lebenden Todes.",
-		(cdesc_fun)cinfo_holyground
+		/* cinfo_holyground */
 	},
 	{
 		"godcursezone",
@@ -1171,7 +1171,7 @@ static curse_type cursedaten[MAXCURSE] =
 		"über die tote Erde, furchbare Kreaturen ziehen über das Land. Die Brunnen "
 		"sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz "
 		"überzogen. Niemand kann hier lange überleben.",
-		(cdesc_fun)cinfo_cursed_by_the_gods,
+		/* cinfo_cursed_by_the_gods, */
 	},
 	{
 		"",
@@ -1215,14 +1215,14 @@ static curse_type cursedaten[MAXCURSE] =
 		"speed",
 		CURSETYP_UNIT, CURSE_SPREADNEVER, M_MEN,
 		"Diese Einheit bewegt sich doppelt so schnell.",
-		(cdesc_fun)cinfo_speed
+		/* cinfo_speed */
 	},
 	{
 		"orcish",
 		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"Dieser Zauber scheint die Einheit zu 'orkisieren'. Wie bei Orks "
 		"ist eine deutliche Neigung zur Fortpflanzung zu beobachten.",
-		(cdesc_fun)cinfo_orc
+		/* cinfo_orc */
 	},
 	{
 		"magicboost",
@@ -1234,20 +1234,20 @@ static curse_type cursedaten[MAXCURSE] =
 		"insectfur",
 		CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
 		"Dieser Zauber schützt vor den Auswirkungen der Kälte.",
-		(cdesc_fun)cinfo_kaelteschutz
+		/* cinfo_kaelteschutz */
 	},
 	{ /* */
 		"strength",
 		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"Dieser Zauber vermehrt die Stärke der verzauberten Personen um ein "
 		"vielfaches.",
-		(cdesc_fun)cinfo_strength
+		/* cinfo_strength */
 	},
 	{ /* Alp */
 		"worse",
 		CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 		"",
-		(cdesc_fun)cinfo_allskills
+		/* cinfo_allskills */
 	},
 	{ /* */
 		"magicresistance",
@@ -1260,13 +1260,13 @@ static curse_type cursedaten[MAXCURSE] =
 		"itemcloak",
 		CURSETYP_UNIT, CURSE_SPREADNEVER, M_DURATION,
 		"Dieser Zauber macht die Ausrüstung unsichtbar.",
-		(cdesc_fun)cinfo_itemcloak
+		/* cinfo_itemcloak */
 	},
 	{ /* */
 		"sparkle",
 		CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
 		"Dieser Zauber ist einer der ersten, den junge Magier in der Schule lernen.",
-		(cdesc_fun)cinfo_sparkle
+		/* cinfo_sparkle */
 	},
 	{
 		"",
@@ -1292,8 +1292,8 @@ static curse_type cursedaten[MAXCURSE] =
 		"skillmod",
 		CURSETYP_NORM, CURSE_SPREADMODULO, M_MEN,
 		"",
-		(cdesc_fun)cinfo_skill,
-		NULL, /* void (*change_vigour)(curse*, int); */
+		/* cinfo_skill, */
+		NULL, NULL, /* void (*change_vigour)(curse*, int); */
 		read_skill, write_skill
 	}
 };
