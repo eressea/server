@@ -93,7 +93,7 @@ academy;de;Akademie
 magictower;de;Magierturm
 smithy;de;Schmiede
 sawmill;de;Sägewerk
-stable_p;de;Pferdezucht
+stable;de;Pferdezucht
 monument;de;Monument
 dam;de;Damm
 caravan;de;Karawanserei
@@ -380,7 +380,7 @@ lmsreward;de;Gürtel der Heldentaten
 lmsreward_p;de;Gürtel der Heldentaten
 
 ## Parameter
-ALLE_p;de;ALLES
+ALLES;de;ALLES
 BAUERN;de;BAUERN
 BURG;de;BURG
 EINHEIT;de;EINHEIT
@@ -409,7 +409,7 @@ AGGRESSIV;de;AGGRESSIV
 DEFENSIV;de;DEFENSIV
 STUFE;de;STUFE
 HELFE;de;HELFE
-FREMDE_p;de;FREMDES
+FREMDES;de;FREMDES
 AURA;de;AURA
 UM;de;UM
 BEISTAND;de;BEISTAND
@@ -530,7 +530,7 @@ Eulen;de;Eulen
 Geist;de;Geist
 Geister;de;Geister
 Goblin;de;Goblin
-Goblin_p;de;Goblins
+Goblins;de;Goblins
 Halbling;de;Halbling
 Halblinge;de;Halblinge
 Hirntöter;de;Hirntöter
@@ -540,14 +540,14 @@ Jungdrache;de;Jungdrache
 Jungdrachen;de;Jungdrachen
 Katze;de;Katze
 Katzen;de;Katzen
-Luch_p;de;Luchs
+Luchs;de;Luchs
 Luchse;de;Luchse
 Meermensch;de;Meermensch
 Meermenschen;de;Meermenschen
 Mensch;de;Mensch
 Menschen;de;Menschen
 Ork;de;Ork
-Ork_p;de;Orks
+Orks;de;Orks
 Riesenschildkröte;de;Riesenschildkröte
 Riesenschildkröten;de;Riesenschildkröten
 Schablone;de;Schablone
@@ -561,7 +561,7 @@ Untoter;de;Untoter
 Warg;de;Warg
 Warge;de;Warge
 Zombie;de;Zombie
-Zombie_p;de;Zombies
+Zombies;de;Zombies
 Zwerg;de;Zwerg
 Zwerge;de;Zwerge
 
