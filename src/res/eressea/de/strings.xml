@@ -39,9 +39,19 @@
     <text locale="en">Jadee's wedding ring</text>
   </string>
 
+  <string name="jadee_ring_p">
+    <text locale="de">Jadees Hochzeitsringe</text>
+    <text locale="en">Jadee's wedding rings</text>
+  </string>
+
   <string name="wente_ring">
     <text locale="de">Wildentes Hochzeitsring</text>
     <text locale="en">Wildente's wedding ring</text>
+  </string>
+
+  <string name="wente_ring_p">
+    <text locale="de">Wildentes Hochzeitsringe</text>
+    <text locale="en">Wildente's wedding rings</text>
   </string>
 
   <string name="jadee_dress">
@@ -49,14 +59,29 @@
     <text locale="en">wedding dress</text>
   </string>
 
+  <string name="jadee_dress_p">
+    <text locale="de">Hochzeitskleider</text>
+    <text locale="en">wedding dresses</text>
+  </string>
+
   <string name="wente_dress">
     <text locale="de">Frack</text>
-    <text locale="en">wedding suit</text>
+    <text locale="en">tuxedo</text>
+  </string>
+
+  <string name="wente_dress_p">
+    <text locale="de">Frack</text>
+    <text locale="en">tuxedos</text>
   </string>
 
   <string name="ring">
     <text locale="de">Ring</text>
     <text locale="en">ring</text>
+  </string>
+
+  <string name="ring_p">
+    <text locale="de">Ringe</text>
+    <text locale="en">rings</text>
   </string>
   <!-- ending here: Wildente and Jadee's wedding  -->
 
