@@ -105,7 +105,10 @@ visible_default(const rawmaterial *res, int skilllevel)
  * plus current level of difficulty */
 {
 	const struct item_type * itype = olditemtype[res->type->_itype];
-	if (res->level + itype->construction->minskill <= skilllevel+1) {
+	if (res->level<=1 && res->level + itype->construction->minskill <= skilllevel+1) {
+		assert (res->amount>0);
+		return res->amount;
+	} else if (res->level + itype->construction->minskill <= skilllevel+2) {
 		assert (res->amount>0);
 		return res->amount;
 	}
