@@ -1,0 +1,513 @@
+# Kommentare sind erlaubt. Endlich.
+# $Id: messages.de,v 1.1 2001/01/25 09:37:56 enno Exp $
+
+# Fehlermeldungen:
+msg_errors;errors:0;de;{string}
+mistake;errors:0;de;{unit} in {region}: '{command}' - {error}.
+error1;errors:0;de;{unit} in {region}: '{command}' - Auf dem Schiff befinden sich zuwenig erfahrene Seeleute.
+error2;errors:2;de;{unit} in {region}: '{command}' - Auf hoher See kann man nicht bewachen.
+error3;errors:3;de;{unit} in {region}: '{command}' - Beschreibung zu lang - gekürzt.
+error4;errors:0;de;{unit} in {region}: '{command}' - Das Gebäude ist bereits fertig.
+error5;errors:0;de;{unit} in {region}: '{command}' - Das Gebäude gehört uns nicht.
+error6;errors:0;de;{unit} in {region}: '{command}' - Das Gebäude wurde nicht gefunden.
+error7;errors:0;de;{unit} in {region}: '{command}' - Das geht nicht mehr.
+error8;errors:1;de;{unit} in {region}: '{command}' - Das ist sinnlos.
+error9;errors:0;de;{unit} in {region}: '{command}' - Das kann man nicht sabotieren.
+error10;errors:1;de;{unit} in {region}: '{command}' - Das macht wenig Sinn.
+error11;errors:0;de;{unit} in {region}: '{command}' - Das Schiff befindet sich auf hoher See.
+error12;errors:0;de;{unit} in {region}: '{command}' - Das Schiff gehört uns nicht.
+error13;errors:0;de;{unit} in {region}: '{command}' - Das Schiff hat sich bereits bewegt.
+error14;errors:0;de;{unit} in {region}: '{command}' - Das Schiff ist auf hoher See.
+error15;errors:0;de;{unit} in {region}: '{command}' - Das Schiff ist noch nicht fertig gebaut.
+error16;errors:0;de;{unit} in {region}: '{command}' - Das Schiff ist schon fertig.
+error17;errors:0;de;{unit} in {region}: '{command}' - Das Schiff ist zu schwer beladen, um fliegen zu können.
+error18;errors:0;de;{unit} in {region}: '{command}' - Das Schiff ist zu schwer beladen, um in See zu stechen.
+error19;errors:0;de;{unit} in {region}: '{command}' - Das Schiff muß erst verlassen werden.
+error20;errors:0;de;{unit} in {region}: '{command}' - Das Schiff wurde nicht gefunden.
+error21;errors:0;de;{unit} in {region}: '{command}' - Dazu gibt es keine Informationen.
+error22;errors:0;de;{unit} in {region}: '{command}' - Der Befehl wurde nicht erkannt.
+error23;errors:0;de;{unit} in {region}: '{command}' - Der Belagerungszustand macht die Kontaktaufnahme unmöglich.
+error24;errors:0;de;{unit} in {region}: '{command}' - Der Belagerungszustand macht Spionage unmöglich.
+error25;errors:0;de;{unit} in {region}: '{command}' - Der Fluch verhindert das.
+error26;errors:0;de;{unit} in {region}: '{command}' - Die Anzahl zu kaufender Produkte fehlt.
+error27;errors:0;de;{unit} in {region}: '{command}' - Die Anzahl zu verkaufender Produkte fehlt.
+error28;errors:0;de;{unit} in {region}: '{command}' - Die Bauern sind schlecht gelaunt.
+error29;errors:0;de;{unit} in {region}: '{command}' - Die Beschreibung von Monumenten kann man nicht verändern.
+error30;errors:0;de;{unit} in {region}: '{command}' - Die Botschaft enthält keinen Text.
+error31;errors:0;de;{unit} in {region}: '{command}' - Die Burg wurde nicht gefunden.
+error32;errors:0;de;{unit} in {region}: '{command}' - Die Einheit befindet sich nicht an Bord unseres Schiffes.
+error33;errors:0;de;{unit} in {region}: '{command}' - Die Einheit befindet sich nicht in unserer Burg.
+error34;errors:0;de;{unit} in {region}: '{command}' - Die Einheit darf nicht an Bord kommen.
+error35;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat diese Kräuter nicht.
+error36;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat diesen Gegenstand nicht.
+error37;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat diesen Trank nicht.
+error38;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat keine Kräuter.
+error39;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat keine Spionage gelernt.
+error40;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat keinen Kontakt mit uns aufgenommen.
+error41;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat nicht genug Silber.
+error42;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat nicht genug Wagenlenker oder zuviel andere Fracht, um die Wagen aufzuladen.
+error43;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat soetwas nicht.
+error44;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist auf hoher See.
+error45;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist eine der unsrigen.
+error46;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist in keiner Taverne.
+error47;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist mit uns alliiert.
+error48;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist nicht bewaffnet und kampffähig.
+error49;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist nicht der Eigentümer.
+error50;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist nicht erfahren genug dafür.
+error51;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat nicht genug Silber.
+error52;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist vom Kampf erschöpft.
+error53;errors:0;de;{unit} in {region}: '{command}' - Die Einheit kann keine Tränke herstellen.
+error54;errors:0;de;{unit} in {region}: '{command}' - Die Einheit kann nicht handeln.
+error55;errors:0;de;{unit} in {region}: '{command}' - Die Einheit kann sich nicht fortbewegen.
+error56;errors:0;de;{unit} in {region}: '{command}' - Die Einheit kann soviele Pferde nicht bändigen.
+error57;errors:0;de;{unit} in {region}: '{command}' - Die Einheit trägt zuviel Gewicht, um sich bewegen zu können.
+error58;errors:0;de;{unit} in {region}: '{command}' - Die Einheit weiß nicht, wie man gaukelt.
+error59;errors:0;de;{unit} in {region}: '{command}' - Die Einheit weiß nichts über Botanik.
+# Liefere
+error63;errors:4;de;{unit} in {region}: '{command}' - Die Einheit wurde nicht gefunden.
+#
+error64;errors:0;de;{unit} in {region}: '{command}' - Die Einheit wurde nicht gefunden.
+error65;errors:0;de;{unit} in {region}: '{command}' - Die Lernkosten können nicht bezahlt werden.
+error66;errors:0;de;{unit} in {region}: '{command}' - Die Partei wurde nicht gefunden.
+error67;errors:0;de;{unit} in {region}: '{command}' - Die Pferde würden ertrinken.
+error70;errors:0;de;{unit} in {region}: '{command}' - Die Region wird von Nichtalliierten bewacht.
+error71;errors:0;de;{unit} in {region}: '{command}' - Die Richtung wurde nicht erkannt.
+error72;errors:0;de;{unit} in {region}: '{command}' - Die Ziel-Einheit hat keinen Kontakt mit uns aufgenommen.
+error73;errors:0;de;{unit} in {region}: '{command}' - Die Zieleinheit hat uns nicht kontaktiert.
+error74;errors:0;de;{unit} in {region}: '{command}' - Eine hungernde Einheit kann niemanden weggeben.
+error75;errors:0;de;{unit} in {region}: '{command}' - Die Einheit nimmt niemanden an.
+error76;errors:0;de;{unit} in {region}: '{command}' - Diesen Gegenstand kann man nicht benutzen.
+error77;errors:0;de;{unit} in {region}: '{command}' - Dieses Talent wurde nicht erkannt.
+error78;errors:0;de;{unit} in {region}: '{command}' - Ein Fluch verhindert die Übergabe.
+error79;errors:0;de;{unit} in {region}: '{command}' - Ein Schiff oder eine Burg muß angegeben werden.
+error80;errors:0;de;{unit} in {region}: '{command}' - Einheit ist nicht bewaffnet und kampffähig.
+error81;errors:0;de;{unit} in {region}: '{command}' - Einheit muß zuerst die Region bewachen.
+error82;errors:0;de;{unit} in {region}: '{command}' - Es gibt keine Abstimmung mit dieser Nummer.
+error83;errors:0;de;{unit} in {region}: '{command}' - Es konnte kein Bauer gefangen werden.
+error84;errors:0;de;{unit} in {region}: '{command}' - Es wurde kein Name angegeben.
+error85;errors:0;de;{unit} in {region}: '{command}' - Es wurde keine EMail-Adresse angegeben.
+error86;errors:0;de;{unit} in {region}: '{command}' - Falsches Passwort.
+error87;errors:0;de;{unit} in {region}: '{command}' - Für das Elixier benötigt man Drachenblut.
+error88;errors:0;de;{unit} in {region}: '{command}' - Für den Schiffbau braucht man Holz.
+error89;errors:0;de;{unit} in {region}: '{command}' - Geldgebot fehlt.
+error90;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat keinen FAHRE-Befehl.
+error91;errors:0;de;{unit} in {region}: '{command}' - Hier gibt es keine Mallornbäume.
+error92;errors:0;de;{unit} in {region}: '{command}' - Hier gibt es keinen normalen Wald.
+error93;errors:0;de;{unit} in {region}: '{command}' - Hier gibt es schon einen Hafen.
+error94;errors:0;de;{unit} in {region}: '{command}' - Hier kann man keine Straße bauen.
+error95;errors:0;de;{unit} in {region}: '{command}' - Illusionen können eine Region nicht bewachen.
+error96;errors:0;de;{unit} in {region}: '{command}' - In dieser Einheit gibt es niemanden, den man transferieren könnte.
+error97;errors:0;de;{unit} in {region}: '{command}' - In Gletschern können keine Insekten rekrutiert werden.
+error98;errors:0;de;{unit} in {region}: '{command}' - Insekten können im Winter nur in Wüsten rekrutiert werden.
+error99;errors:0;de;{unit} in {region}: '{command}' - Kann die zu transportierende Einheit nicht finden.
+error100;errors:0;de;{unit} in {region}: '{command}' - Keiner hier ist gelernter Schiffbauer.
+error101;errors:0;de;{unit} in {region}: '{command}' - Keiner hier kann ein Gebäude errichten.
+error102;errors:0;de;{unit} in {region}: '{command}' - Keiner hier kann handeln.
+error103;errors:0;de;{unit} in {region}: '{command}' - Keiner hier kann Straßen bauen.
+error104;errors:0;de;{unit} in {region}: '{command}' - Laen kann nur einem Bergwerk abgebaut werden.
+error105;errors:0;de;{unit} in {region}: '{command}' - Leere Einheiten können nicht übergeben werden.
+error106;errors:0;de;{unit} in {region}: '{command}' - Magier müssen zum studieren allein sein.
+error107;errors:0;de;{unit} in {region}: '{command}' - Man braucht mindestens zwei Pferde, um sie zu züchten.
+error108;errors:0;de;{unit} in {region}: '{command}' - Es sind keine Kräuter zu finden.
+error109;errors:0;de;{unit} in {region}: '{command}' - Man muß angeben, ob eine Burg, ein Schiff, eine Einheit, eine Region oder eine Partei benannt werden soll.
+error110;errors:0;de;{unit} in {region}: '{command}' - Man muß angeben, ob eine Burg, ein Schiff, eine Region oder eine Einheit beschrieben werden soll.
+error111;errors:0;de;{unit} in {region}: '{command}' - Nachricht zu lang - gekürzt.
+error112;errors:0;de;{unit} in {region}: '{command}' - Namen dürfen keine Klammern enthalten.
+error113;errors:0;de;{unit} in {region}: '{command}' - Nichts angegeben, was wir übergeben sollen.
+error114;errors:0;de;{unit} in {region}: '{command}' - Nummer ist nicht im gültigen Bereich.
+error115;errors:0;de;{unit} in {region}: '{command}' - Nummer ist schon belegt.
+error116;errors:0;de;{unit} in {region}: '{command}' - Nummer kann nicht vergeben werden.
+error117;errors:0;de;{unit} in {region}: '{command}' - Nur die EMail-Adresse angeben!
+error118;errors:0;de;{unit} in {region}: '{command}' - Nur Elfen können diese Bögen herstellen.
+error119;errors:0;de;{unit} in {region}: '{command}' - Ohne eine Burg gibt es keinen Markt.
+error120;errors:0;de;{unit} in {region}: '{command}' - Personen können nur an Menschen übergeben werden.
+error121;errors:0;de;{unit} in {region}: '{command}' - Personen können nur an Menschen übergeben werden.
+error122;errors:0;de;{unit} in {region}: '{command}' - Pferde kann man nur in einer Pferdezucht züchten.
+error123;errors:0;de;{unit} in {region}: '{command}' - So etwas hat die Einheit nicht.
+error124;errors:0;de;{unit} in {region}: '{command}' - So etwas kann man nicht auf dem Markt kaufen.
+error125;errors:0;de;{unit} in {region}: '{command}' - So etwas kann man nicht machen.
+error126;errors:0;de;{unit} in {region}: '{command}' - So etwas kann man nicht verkaufen.
+error127;errors:0;de;{unit} in {region}: '{command}' - So viele Fremde kann Deine Partei nicht aufnehmen.
+error128;errors:0;de;{unit} in {region}: '{command}' - So viele Fremde kann die Partei nicht aufnehmen.
+error129;errors:0;de;{unit} in {region}: '{command}' - So viele Leute kann die Partei nicht aufnehmen.
+error130;errors:0;de;{unit} in {region}: '{command}' - Syntax: MAGIEGEBIET <1-5>.
+error131;errors:0;de;{unit} in {region}: '{command}' - Um in Gletschern Straßen bauen zu können, muß zuerst ein Tunnel errichtet werden.
+error132;errors:0;de;{unit} in {region}: '{command}' - Um in Sümpfen Straßen bauen zu können, muß zuerst ein Damm errichtet werden.
+error133;errors:0;de;{unit} in {region}: '{command}' - Um in Wüsten Straßen bauen zu können, muß zuerst eine Karawanserei errichtet werden.
+error134;errors:0;de;{unit} in {region}: '{command}' - Unbekannte Meldungs-Option.
+error137;errors:0;de;{unit} in {region}: '{command}' - Unbekannter Hilfe-Modus.
+error138;errors:0;de;{unit} in {region}: '{command}' - Uns gehört nichts, was man abreißen oder versenken könnte.
+error139;errors:0;de;{unit} in {region}: '{command}' - Unterschiedliche Typen können nicht gemischt werden.
+error140;errors:0;de;{unit} in {region}: '{command}' - Die Einheit befindet sich weder in einer Burg noch in einem Schiff.
+error141;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat nicht mehr genug Kristalle für so viele Personen.
+error142;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat zuwenig Silber, um zu rekrutieren.
+error143;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist auf einem Schiff.
+error144;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist auf keinem Schiff.
+error145;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist in keiner Burg.
+error146;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist nicht der Kapitän des Schiffes.
+error147;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist nicht Burgherr der größten Burg in der Region.
+error148;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist nicht der Burgherr.
+error149;errors:0;de;{unit} in {region}: '{command}' - Wohin soll die Botschaft gehen?
+error150;errors:0;de;{unit} in {region}: '{command}' - Zum Pflanzen braucht man mindestens Kräuterkunde 6.
+error151;errors:0;de;{unit} in {region}: '{command}' - Zum Straßenbau braucht man Steine.
+error60;errors:0;de;{unit} in {region}: '{command}' - Die Einheit wird belagert.
+error135;errors:0;de;{unit} in {region}: '{command}' - Unbekannte Option.
+error69;errors:0;de;{unit} in {region}: '{command}' - Die Region wird bewacht.
+error152;errors:0;de;{unit} in {region}: '{command}' - Die Einheit springt über Bord und ertrinkt.
+error153;errors:0;de;{unit} in {region}: '{command}' - Die Einheit schließt sich den Bauern an.
+error154;errors:0;de;{unit} in {region}: '{command}' - Hochqualifizierte Personen weigern sich, für andere Parteien zu arbeiten.
+error155;errors:0;de;{unit} in {region}: '{command}' - Zuviele Magier in der Partei.
+error156;errors:0;de;{unit} in {region}: '{command}' - Zuviele Alchemisten in der Partei.
+error157;errors:0;de;{unit} in {region}: '{command}' - Die Partei hat ein anderes Magiegebiet.
+error158;errors:0;de;{unit} in {region}: '{command}' - Magier arbeiten grundsätzlich nur alleine!
+error159;errors:0;de;{unit} in {region}: '{command}' - Es konnten keine Personen übergeben werden.
+error160;errors:0;de;{unit} in {region}: '{command}' - Es konnten keine Luxusgüter gekauft werden.
+error161;errors:0;de;{unit} in {region}: '{command}' - Die Einheit besitzt den Trank nicht.
+error162;errors:0;de;{unit} in {region}: '{command}' - Der Heiltrank wird automatisch bei Bedarf benutzt.
+error163;errors:0;de;{unit} in {region}: '{command}' - Die Nestwärme kann nur von Insektenvölkern benutzt werden.
+error164;errors:2;de;{unit} in {region}: '{command}' - Die Einheit benutzte einen Nestwärmetrank.
+error165;errors:0;de;{unit} in {region}: '{command}' - Der Trank bekommt der Einheit nicht.
+error166;errors:0;de;{unit} in {region}: '{command}' - Diese Rasse kann eine Burg nicht belagern.
+error167;errors:0;de;{unit} in {region}: '{command}' - Die Einheit geht nicht zu den Bauern.
+error168;errors:0;de;{unit} in {region}: '{command}' - Es konnten keine Luxusgüter verkauft werden.
+error169;errors:0;de;{unit} in {region}: '{command}' - Diesen Zauber kennt die Einheit nicht.
+error170;errors:0;de;{unit} in {region}: '{command}' - Die Bauern nehmen dieses großzügige Geschenk nicht an.
+error171;errors:0;de;{unit} in {region}: '{command}' - Diesen Kampfzauber gibt es nicht.
+error172;errors:0;de;{unit} in {region}: '{command}' - Es wurde kein Zauber angegeben.
+error173;errors:0;de;{unit} in {region}: '{command}' - Selbst in der Bibliothek von Xontormia konnte dieser Spruch nicht gefunden werden.
+error174;errors:0;de;{unit} in {region}: '{command}' - Dieser Zauber ist nur im Kampf sinnvoll.
+error175;errors:0;de;{unit} in {region}: '{command}' - Diesen Spruch kann man nicht auf einem sich bewegenden Schiff stehend zaubern.
+error176;errors:0;de;{unit} in {region}: '{command}' - Diesen Spruch kann man nicht in die Ferne richten.
+error177;errors:0;de;{unit} in {region}: '{command}' - Diesen Spruch kann der Vertraute nicht zaubern.
+error178;errors:0;de;{unit} in {region}: '{command}' - Es wurde kein Magiegebiet angegeben.
+error179;errors:0;de;{unit} in {region}: '{command}' - Dieses Magiegebiet kann die Einheit nicht lernen.
+error180;errors:0;de;{unit} in {region}: '{command}' - Der Zauber schlägt fehl.
+error181;errors:0;de;{unit} in {region}: '{command}' - Dazu muß sich der Magier in der Burg oder an Bord des Schiffes befinden.
+error182;errors:0;de;{unit} in {region}: '{command}' - Das Schiff kann in diese Richtung nicht ablegen.
+error183;errors:0;de;{unit} in {region}: '{command}' - Der Magier befindet sich nicht auf einem Schiff.
+error184;errors:0;de;{unit} in {region}: '{command}' - Die Einheit bewegt sich nicht.
+error185;errors:0;de;{unit} in {region}: '{command}' - Der Zauber scheint ungewöhnlich schwach zu sein. Irgendetwas hat die magischen Energien abgeleitet.
+error186;errors:0;de;{unit} in {region}: '{command}' - Dieser Zauber kann nur auf Land gelegt werden.
+error187;errors:0;de;{unit} in {region}: '{command}' - Hier gibt es bereits gute Straßen.
+error188;errors:0;de;{unit} in {region}: '{command}' - Dieser Zauber kann nicht im Sumpf gezaubert werden.
+error189;errors:0;de;{unit} in {region}: '{command}' - Selbst der mächtigste Magier der Welt könnte keinen Ozean austrocknen lassen.
+error190;errors:0;de;{unit} in {region}: '{command}' - Der Zauber funktioniert nur in der materiellen Welt.
+error191;errors:0;de;{unit} in {region}: '{command}' - Der Zauber funktioniert nur in Wäldern.
+error192;errors:0;de;{unit} in {region}: '{command}' - Die Wege zur Geisterwelt scheinen blockiert zu sein.
+error193;errors:0;de;{unit} in {region}: '{command}' - Der Zauber funktioniert nur in der Geisterwelt.
+error194;errors:0;de;{unit} in {region}: '{command}' - Die Zielregion wurde nicht korrekt angegeben.
+error195;errors:0;de;{unit} in {region}: '{command}' - Dorthin führt kein Weg.
+error196;errors:0;de;{unit} in {region}: '{command}' - Das ist keine Waldregion.
+error197;errors:0;de;{unit} in {region}: '{command}' - Um einen Heimstein zu erschaffen, muß der Zauberer in einer Burg sein.
+error198;errors:0;de;{unit} in {region}: '{command}' - Die Flammen finden keine Nahrung. Das Feuer erlischt, ohne Schaden anzurichten.
+error199;errors:0;de;{unit} in {region}: '{command}' - Der Magier hat bereits einen Vertrauten.
+error200;errors:0;de;{unit} in {region}: '{command}' - Die maximale Aura reicht nicht für diesen Zauber.
+error201;errors:0;de;{unit} in {region}: '{command}' - Rasse und Zieleinheit wurden vergessen.
+error202;errors:0;de;{unit} in {region}: '{command}' - Das ist keine gültige Rasse.
+error203;errors:0;de;{unit} in {region}: '{command}' - Das Ziel wurde vergessen.
+error204;errors:0;de;{unit} in {region}: '{command}' - In einer Region ohne Bäume kann man diesen Zauber nicht wirken.
+error205;errors:0;de;{unit} in {region}: '{command}' - Dieser Zauber gelingt nur in einer Ozeanregion.
+error207;errors:0;de;{unit} in {region}: '{command}' - Zu dieser Einheit kann keine Aura übertragen werden.
+error208;errors:0;de;{unit} in {region}: '{command}' - Auraangabe fehlerhaft.
+error209;errors:0;de;{unit} in {region}: '{command}' - Syntax Error.
+error210;errors:0;de;{unit} in {region}: '{command}' - Es ist zu gefährlich, ein sturmgepeitschtes Schiff fliegen zu lassen.
+error211;errors:0;de;{unit} in {region}: '{command}' - Auf dem Schiff befindet liegt bereits so ein Zauber.
+error212;errors:0;de;{unit} in {region}: '{command}' - Der Magier befindet sich nicht auf einem Schiff.
+error213;errors:0;de;{unit} in {region}: '{command}' - Parameter nicht korrekt angegeben.
+error214;errors:0;de;{unit} in {region}: '{command}' - Einheit ist kein Magier.
+error215;errors:0;de;{unit} in {region}: '{command}' - Von hier aus kann man die astrale Ebene nicht erreichen.
+error216;errors:0;de;{unit} in {region}: '{command}' - Hier gibt es keine Verbindung zur astralen Welt.
+error217;errors:0;de;{unit} in {region}: '{command}' - Dieser Zauber kann nur im Astralraum gezaubert werden.
+error218;errors:0;de;{unit} in {region}: '{command}' - Die materielle Welt ist hier nicht sichtbar.
+error220;errors:0;de;{unit} in {region}: '{command}' - Im astralen Nebel konnte niemand entdeckt werden.
+error221;errors:0;de;{unit} in {region}: '{command}' - So etwas kann man nicht bauen.
+error222;errors:0;de;{unit} in {region}: '{command}' - Zeige alle was?
+error223;errors:0;de;{unit} in {region}: '{command}' - Hungernde Einheiten können nicht bewachen.
+error224;errors:0;de;{unit} in {region}: '{command}' - Hungernde Einheiten können nicht zaubern.
+error225;errors:0;de;{unit} in {region}: '{command}' - Hungernde Soldaten kämpfen nicht.
+error226;errors:0;de;{unit} in {region}: '{command}' - Einheiten in den hinteren Reihen können nicht angreifen.
+error227;errors:0;de;{unit} in {region}: '{command}' - Dafür braucht ein Einheit mindestens Kräuterkunde 7.
+error228;errors:0;de;{unit} in {region}: '{command}' - Nur normale Personen können Steuern eintreiben.
+error229;errors:0;de;{unit} in {region}: '{command}' - Ein Vertrauter wird beschworen, verschwindet jedoch wieder, als er keine Verbindung zu seinem Element herstellen kann.
+error230;errors:0;de;{unit} in {region}: '{command}' - Dorthin kann die Einheit uns nicht transportieren.
+error231;errors:0;de;{unit} in {region}: '{command}' - Die Einheit oder ihre Tiere würden dort nicht überleben.
+error232;errors:0;de;{unit} in {region}: '{command}' - Schwimmer können keine Gebäude betreten.
+error233;errors:0;de;{unit} in {region}: '{command}' - Schwimmer können keine Schiffe betreten.
+error234;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist mit Ausschiffen beschäftigt..
+error235;errors:0;de;{unit} in {region}: '{command}' - Für das Gebäude wurde noch kein Unterhalt bezahlt.
+error236;errors:0;de;{unit} in {region}: '{command}' - Das Gebäude ist noch nicht fertig gebaut.
+error237;errors:0;de;{unit} in {region}: '{command}' - Die Region befindet sich in Aufruhr.
+error238;errors:0;de;{unit} in {region}: '{command}' - Hier können nur Orks rekrutiert werden.
+error239;errors:0;de;{unit} in {region}: '{command}' - Soll eine Einheit oder ein Schiff eine neue Nummer bekommen?
+error240;errors:0;de;{unit} in {region}: '{command}' - Soll eine Einheit oder ein Schiff verfolgt werden?
+error241;errors:0;de;{unit} in {region}: '{command}' - Die Partei muß mindestens 100 Wochen alt sein.
+error242;errors:0;de;{unit} in {region}: '{command}' - Die Einheit muß sich an Land befinden.
+error243;errors:0;de;{unit} in {region}: '{command}' - Keine gültige Rasse angegeben.
+error244;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat schon einen Namen.
+error245;errors:0;de;{unit} in {region}: '{command}' - Das Schiff hat schon einen Namen.
+error246;errors:0;de;{unit} in {region}: '{command}' - Das Gebäude hat schon einen Namen.
+error247;errors:0;de;{unit} in {region}: '{command}' - Die Partei hat schon einen Namen.
+error248;errors:0;de;{unit} in {region}: '{command}' - Die Partei muß mindestens 10 Runden alt sein.
+error249;errors:0;de;{unit} in {region}: '{command}' - Das Schiff kann nicht aufs offene Meer hinaus segeln.
+error250;errors:0;de;{unit} in {region}: '{command}' - Nicht genug Karma.
+error251;errors:0;de;{unit} in {region}: '{command}' - Diese Kraft haben uns die Götter schon gewährt.
+error252;errors:0;de;{unit} in {region}: '{command}' - Was und wieviel soll geopfert werden?
+error253;errors:0;de;{unit} in {region}: '{command}' - Der Magier ist nicht stark genug, sich den Göttern zu opfern.
+error254;errors:0;de;{unit} in {region}: '{command}' - Auraangabe fehlerhaft oder zuwenig Aura.
+error255;errors:0;de;{unit} in {region}: '{command}' - Soetwas kann man nicht opfern.
+error256;errors:0;de;{unit} in {region}: '{command}' - Um soetwas kann man nicht beten.
+error257;errors:0;de;{unit} in {region}: '{command}' - Ungültiges Locale.
+error258;errors:0;de;{unit} in {region}: '{command}' - Die Zieleinheit ist ungültig.
+error259;errors:0;de;{unit} in {region}: '{command}' - Der Befehl ist nur auf Einheiten innerhalb des selben Gebäudes oder Schiffes anwendbar.
+error260;errors:0;de;{unit} in {region}: '{command}' - Der Besitzer eines Schiffes oder Gebäudes kann nicht neu sortiert werden.
+error261;errors:0;de;{unit} in {region}: '{command}' - Vor der Besitzer eines Schiffes oder Gebäudes kann nicht sortiert werden.
+error262;errors:0;de;{unit} in {region}: '{command}' - Die Partei kann keine weiteren Wyrme besitzen.
+error263;errors:0;de;{unit} in {region}: '{command}' - Dieses Gut wird hier produziert.
+error264;errors:0;de;{unit} in {region}: '{command}' - Dieses Gut hat die Einheit nicht.
+error265;errors:0;de;{unit} in {region}: '{command}' - Dieser Gegenstand funktioniert nur in der normalen Welt.
+error266;errors:0;de;{unit} in {region}: '{command}' - Dieser Gegenstand funktioniert nur in der Eingangshalle.
+error267;errors:0;de;{unit} in {region}: '{command}' - Nur eine Einzelperson kann das Ticket benutzen.
+error268;errors:0;de;{unit} in {region}: '{command}' - Hier kann man nichts übergeben.
+error269;errors:0;de;{unit} in {region}: '{command}' - Hier kann man nicht zaubern.
+error270;errors:0;de;{unit} in {region}: '{command}' - Hier kann man niemanden bestehlen.
+error271;errors:0;de;{unit} in {region}: '{command}' - Hier kann man niemanden angreifen.
+error272;errors:0;de;{unit} in {region}: '{command}' - Pferde müssen leider draußen bleiben.
+error273;errors:0;de;{unit} in {region}: '{command}' - Hier kann man nicht unterrichten.
+error274;errors:0;de;{unit} in {region}: '{command}' - Die Einheit kann nicht unterrichten.
+error275;errors:0;de;{unit} in {region}: '{command}' - Hier kann man keine Gebäude errichten.
+error276;errors:0;de;{unit} in {region}: '{command}' - Hier kann man keine Schiffe bauen.
+error277;errors:0;de;{unit} in {region}: '{command}' - Das kann die Einheit nicht.
+error278;errors:0;de;{unit} in {region}: '{command}' - Der Name des Gebäudes kann nicht geändert werden.
+error279;errors:0;de;{unit} in {region}: '{command}' - Die Beschreibung des Gebäudes kann nicht geändert werden.
+
+# Meldungen und Ereignisse
+msg_event;events:0;de;{string}
+drown_on_ship;events:0;de;{unit} ertrinkt beim Untergang der {ship} in {region}.
+siege;events:0;de;{unit} belagert {building}. Dabei richten die Katapulte Zerstörungen von {destruction} Größenpunkten an.
+recruit;events:0;de;{unit} in {region} rekrutiert {amount} {$of want}Personen.
+givedumb;events:0;de;{unit} gibt {recipient} {amount} Dumpfbackenbrot: {discover}.
+givecommand;events:0;de;{unit} gibt das Kommando an {receipient}.
+forget;events:0;de;{unit} vergißt {skill}.
+entermaelstrom;events:0;de;Die {ship} fährt in den Mahlstrom von {region} und nimmt {damage} Schaden{$sink sink}.
+storm;events:0;de;Die {ship} wird in {region} von Stürmen abgetrieben{$sink sink}.
+shipconf;events:0;de;Die {ship} verliert im Sturm die Orientierung.
+shipnoconf;events:0;de;Die {ship} ist wieder auf Kurs.
+shipsink;events:0;de;Die {ship} ist zu stark beschädigt und sinkt.
+errusingpotion;events:0;de;{unit}: '{command}' - Die Einheit benutzt bereits {using}.
+starvation;events:0;de;{unit} verliert in {region} {dead} Personen durch Unterernährung.
+malnourish;events:0;de;{unit} wird durch unzureichende Nahrung geschwächt.
+dumbeffect;events:0;de;{unit} vergißt durch Dumpfbackenbrot {days} Tage des Talentes {skill}.
+donation;events:0;de;{from} spendete {amount} Silber an {to}.
+pest;events:0;de;Hier wütete die Pest, und {dead} Bauern starben.
+usepotion;events:4;de;{unit} benutzt {potion}.
+spydetect;events:0;de;{target} fühlt sich durch {$unit spy} beobachtet.
+spyfail;events:0;de;{spy} gelang es nicht, etwas über {target} herauszufinden.
+stealfail;events:0;de;{unit} gelang es nicht, sich nahe genug an {target} heranzuschleichen.
+stealdetect;events:0;de;{unit} fühlt sich bebachtet.
+stealfatal;events:0;de;{unit} wurde beim versuchten Diebstahl ertappt.
+thiefdiscover;events:0;de;{target} ertappte {unit} beim versuchten Diebstahl.
+stealeffect;events:0;de;{unit} wurde in {region} beklaut.
+newbieimmunity;events:1;de;Deine Partei ist noch {turns} Wochen immun gegen Angriffe.
+changebanner;events:3;de;Das Banner wurde auf '{value}' geändert.
+changemail;events:1;de;Die Adresse wurde auf '{value}' geändert.
+changepasswd;events:1;de;Das Passwort wurde auf '{value}' geändert.
+deletepasswd;events:0;de;Das Passwort wurde gelöscht.
+eatpeasants;events:0;de;{unit} verspeiste {amount} Bauern.
+absorbpeasants;events:0;de;{unit} tötete {amount} Bauern.
+fleescared;events:0;de;{amount} Bauern flohen aus Furcht vor {unit}.
+warnillusiondissolve;events:1;de;{unit} wird sich bald verflüchtigen.
+illusiondissolve;events:0;de;{unit} hat sich unbemerkt verflüchtigt.
+illusionantimagic;events:0;de;{unit} marschiert in eine Antimagiezone und löst sich auf.
+shipdestroy;events:0;de;{unit} in {region} versenkt die {ship}.
+orcified;events:0;de;Vor den vielen Orks in {region} fliehen die anderen Einwohner.
+deorcified;events:0;de;Langsam kehren andere Völker nach {region} zurück.
+piratenovictim;events:0;de;Die {ship} in {region} kann keine Schiffe aufbringen.
+piratesawvictim;events:0;de;Die {ship} in {region} entdeckt ein Opfer im {dir}.
+itemcloak;events:0;de;{mage} legt einen Schleier um die Ausrüstung von {target}.
+scunicorn;events:0;de;{unit} schließen sich {amount} {type} an.
+buildroad;events:1;de;{unit} erweitert in {region} das Straßennetz um {size}.
+destroy;events:1;de;{unit} zerstört {building}.
+researchherb;events:0;de;{unit} in {region} stellt fest, daß es hier {amount} {herb} gibt.
+researchherb_none;events:0;de;{unit} in {region} kann keine Kräuter finden.
+destroy_road;events:0;de;{unit} reißt die Straße zwischen {from} und {to} ein.
+desertion;events:0;de;{unit} in {region} desertiert.
+volcanostartsmoke;events:0;de;Aus dem Vulkankrater von {region} steigt plötzlich Rauch.
+volcanostopsmoke;events:0;de;Aus dem Vulkankrater von {region} steigt kein Rauch mehr.
+volcano_dead;events:0;de;Beim Vulkanausbruch in {region} sterben {dead} Personen in {unit}.
+volcanooutbreak;events:0;de;Der Vulkan in {regionv} bricht aus. Die Lavamassen verwüsten {regionn}.
+volcanooutbreaknn;events:0;de;Der Vulkan in {region} bricht aus.
+phunger;events:0;de;An Unterernährung sterben {dead} Bauern.
+renamed_seen;events:0;de;{renamed} in {region} bekommt von {renamer} einen Spitznamen.
+renamed_notseen;events:0;de;{renamed} in {region} bekommt einen Spitznamen.
+renamed_ship_seen;events:0;de;Die {ship} in {region} bekommt von {renamer} einen Spitznamen.
+renamed_ship_notseen;events:0;de;Die {ship} in {region} bekommt einen Spitznamen.
+renamed_building_seen;events:0;de;{building} in {region} bekommt von {renamer} einen Spitznamen.
+renamed_building_notseen;events:0;de;{building} in {region} bekommt einen Spitznamen.
+renamed_faction_seen;events:0;de;Die Partei bekommt von {renamer} in {region} einen Spitznamen.
+renamed_faction_notseen;events:0;de;Die Partei bekommt einen Spitznamen.
+orcgrowth;events:3;de;{unit} vermehrt sich um {amount} {race}.
+undeadrise;events:0;de;In {region} erhoben sich die Toten aus den Gräbern.
+entrise;events:0;de;In {region} erschienen die Herren der Bäume.
+
+# Bewegung
+msg_movement;movement:0;de;{string}
+fogblock;movement:0;de;{unit} konnte von {region} nicht nach {$dir direction} ausreisen, der Nebel war zu dicht.
+moveblocked;movement:0;de;{unit} entdeckt, daß es keinen Weg nach {$dir direction} gibt.
+followfail;movement:0;de;{follower} konnte {unit} nicht folgen.
+followdetect;movement:0;de;{follower} ist {unit} gefolgt.
+leavefail;movement:0;de;{unit} konnte aus {region} nicht ausreisen.
+moveblockedbyguard;movement:0;de;{unit} wurde in {region} von {faction} aufgehalten.
+sailfail;movement:0;de;Die {ship} konnte {region} nicht verlassen.
+detectforbidden;movement:0;de;{unit} weigert sich, nach {region} zu reisen.
+detectforbiddendir;movement:0;de;{unit} weigert sich, nach {$dir direction} zu reisen.
+sailforbidden;movement:0;de;Die Mannschaft der {ship} weigert sich, nach {region} zu reisen.
+sailforbiddendir;movement:0;de;Die Mannschaft der {ship} weigert sich, nach {$dir direction} zu reisen.
+sailnolanding;movement:0;de;Die {ship} konnte in {region} nicht einreisen, die Küste ist zu gefährlich für das Schiff.
+sailnolandingstorm;movement:0;de;Die Mannschaft der {ship} kann in letzter Sekunde verhindern, daß das Schiff auf Land aufläuft.
+detectocean;movement:0;de;{unit} entdeckt, daß {region} Ozean ist.
+detectoceandir;movement:0;de;{unit} entdeckt daß im {$dir direction} Ozean ist.
+travel;movement:3;de;{unit} {$travel mode} von {start} nach {end}.{$travelthru regions}
+transport;movement:1;de;{unit} transportiert {target} von {start} nach {end}.
+firewall_damage;movement:0;de;{unit} erleidet beim Durchqueren der Feuerwand nach {region} schwere Verbrennungen.
+firewall_death;movement:0;de;{unit} stirbt beim Versuch, die Feuerwand nach {region} zu durchqueren.
+
+# Produktion/Rohstoffe:
+msg_production;production:0;de;{string}
+buildship;production:3;de;{unit} baut für {size} an {ship} weiter.
+buildbuilding;production:3;de;{unit} baut für {size} an {building} weiter.
+manufacture;production:3;de;{unit} in {region} produziert {amount} {$of wanted}{resource}.
+# seit NEW_ITEMS nicht mehr:" aus {materials}."
+produce;production:3;de;{unit} in {region} produziert {amount} {$of wanted}{resource}.
+emptyeog;production:0;de;Die Laenader in {region} ist erschöpft.
+unveileog;production:0;de;{unit} in {region} entdeckt eine Laenader.
+plant;production:2;de;{unit} pflanzt in {region} {amount} {herb}.
+raised;production:3;de;{unit} züchtet {amount} Pferde.
+herbfound;production:2;de;{unit} in {region} findet {amount} {herb}.
+
+# Wirtschaft und Handel
+msg_economy;economy:0;de;{string}
+give;economy:0;de;{unit} übergibt {amount} {resource} an {target}.
+income;economy:0;de;{unit} verdient in {region} {amount} {$of wanted}mit {$earn mode}.
+income_tax;economy:4;de;{unit} treibt in {region} {amount} Steuern ein.
+income_tax_reduced;economy:2;de;{unit} treibt in {region} {amount} statt {wanted} Steuern ein.
+income_steal;economy:3;de;{unit} klaut in {region} {amount} Silber.
+income_steal_reduced;economy:1;de;{unit} klaut in {region} {amount} statt {wanted} Silber.
+income_magic;economy:3;de;{unit} verdient in {region} {amount} Silber durch Zauberei.
+income_magic_reduced;economy:1;de;{unit} verdient in {region} {amount} statt {wanted} Silber durch Zauberei.
+income_entertainment;economy:4;de;{unit} verdient in {region} {amount} Silber durch Unterhaltung.
+income_entertainment_reduced;economy:2;de;{unit} verdient in {region} {amount} statt {wanted} Silber durch Unterhaltung.
+income_work;economy:4;de;{unit} arbeitet in {region} für einen Lohn von {amount} Silber.
+income_work_reduced;economy:1;de;{unit} arbeitet in {region} für einen Lohn von {amount} statt {wanted} Silber.
+income_trade;economy:4;de;{unit} verdient in {region} {amount} Silber durch den Verkauf von Luxusgütern.
+income_tradetax;economy:4;de;{unit} verdient am Handel in {region} Steuern in Höhe von {amount} Silber.
+maintenance;economy:4;de;{unit} bezahlt den Unterhalt von {building}.
+maintenancefail;economy:0;de;{unit} kann den Unterhalt von {building} nicht bezahlen.
+maintenancespecialfail;economy:0;de;{unit} fehlt {item} für den Betrieb von {building}.
+buy;economy:4;de;{unit} bezahlt {money} Silber für den Kauf von Luxusgütern.
+buyamount;economy:4;de;{unit} kauft {amount} {resource}.
+sellamount;economy:4;de;{unit} verkauft {amount} {resource}.
+
+
+# Lehren und Lernen
+msg_study;study:0;de;{string}
+teach;study:1;de;{teacher} lehrt {student} {skill}.
+teachdumb;study:0;de;{teacher} kann durch Dumpfbackenbrot nur {amount} Schüler lehren.
+studycost;study:4;de;{unit} in {region} verbraucht {cost} Silber für das Studium von {skill}.
+
+# Magie und Effekte
+msg_magic;magic:0;de;{string}
+regenaura;magic:2;de;{unit} in {region} regeneriert {amount} Aura.
+effectstrength;magic:0;de;{mage} erhöht die Körperkraft von {target} beträchtlich.
+regionmagic_effect;magic:0;de;{unit} in {region}: '{command}' - {unit} gelingt es die Region zu verzaubern
+objmagic_effect;magic:0;de;{unit} in {region}: '{command}' - {unit} verzaubert {target}
+weakmagic;magic:0;de;{unit} in {region}: '{command}' - Der Zauber von {unit} war viel zu schwach und löst sich gleich wieder auf.
+magic_fumble;magic:0;de;{unit} in {region}: '{command}' - Der Magier verfängt sich in seinem eigenen Zauber.
+patzer2;magic:0;de;{unit} in {region} hat rasende Kopfschmerzen und kann sich nicht mehr richtig konzentrieren. Irgendwas bei diesem Zauber ist fürchterlich schiefgelaufen.
+patzer3;magic:0;de;Als {unit} in {region} versucht, {command} zu zaubern, scheint plötzlich ein Beben durch die magische Essenz zu laufen und ein furchtbarer Sog versucht {unit} in eine andere Dimension zu ziehen. Mit letzter Kraft gelingt es {unit} sich zu retten.
+shock;magic:0;de;{mage} erleidet einen Schock {reason}.
+spellunitnotfound;magic:0;de;{unit} in {region}: '{command}' - Einheit {id} wurde nicht gefunden.
+spellbuildingnotfound;magic:0;de;{unit} in {region}: '{command}' - Gebäude {id} wurde nicht gefunden.
+spellshipnotfound;magic:0;de;{unit} in {region}: '{command}' - Schiff {id} wurde nicht gefunden.
+spellunitresists;magic:0;de;{unit} in {region}: '{command}' - Einheit {id} widersteht dem Zauber.
+spellbuildingresists;magic:0;de;{unit} in {region}: '{command}' - Gebäude {id} konnte nicht verzaubert werden.
+spellshipresists;magic:0;de;{unit} in {region}: '{command}' - Schiff {id} konnte nicht verzaubert werden.
+spellregionresists;magic:0;de;{unit} in {region}: '{command}' - Die Region konnte nicht verzaubert werden.
+analyse_region_nospell;magic:0;de;{mage} meint, das auf {region} kein Zauber liegt.
+analyse_unit_nospell;magic:0;de;{mage} meint, das auf {target} kein Zauber liegt.
+analyse_building_nospell;magic:0;de;{mage} meint, das auf {building} kein Zauber liegt.
+analyse_ship_nospell;magic:0;de;{mage} meint, das auf {ship} kein Zauber liegt.
+analyse_region_fail;magic:0;de;{mage} meint, das auf {region} ein Zauber liegt, konnte aber über den Zauber nichts herausfinden.
+analyse_unit_fail;magic:0;de;{mage} meint, das {unit} verzaubert ist, konnte aber über den Zauber nichts herausfinden.
+analyse_building_fail;magic:0;de;{mage} meint, das auf {building} ein Zauber liegt, konnte aber über den Zauber nichts herausfinden.
+analyse_ship_fail;magic:0;de;{mage} meint, das auf {ship} ein Zauber liegt, konnte aber über den Zauber nichts herausfinden.
+analyse_region_noage;magic:0;de;{mage} fand heraus, das auf {region} der Zauber {spell} liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben.
+analyse_unit_noage;magic:0;de;{mage} fand heraus, das auf {unit} der Zauber {spell} liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben.
+analyse_building_noage;magic:0;de;{mage} fand heraus, das auf {building} der Zauber {spell} liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben.
+analyse_ship_noage;magic:0;de;{mage} fand heraus, das auf {ship} der Zauber {spell} liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben.
+analyse_region_age;magic:0;de;{mage} fand heraus, das auf {region} der Zauber {spell} liegt, der noch etwa {months} Wochen bestehen bleibt.
+analyse_unit_age;magic:0;de;{mage} fand heraus, das auf {unit} der Zauber {spell} liegt, der noch etwa {months} Wochen bestehen bleibt.
+analyse_building_age;magic:0;de;{mage} fand heraus, das auf {building} der Zauber {spell} liegt, der noch etwa {months} Wochen bestehen bleibt.
+analyse_ship_age;magic:0;de;{mage} fand heraus, das auf {ship} der Zauber {spell} liegt, der noch etwa {months} Wochen bestehen bleibt.
+teleport_success;magic:0;de;{unit} wurde von {source} nach {target} teleportiert.
+stealaura_fail;magic:0;de;{unit} konnte {target} keine Aura entziehen.
+stealaura_fail_detect;magic:0;de;{unit} fühlt sich einen Moment seltsam geschwächt.
+stealaura_detect;magic:0;de;{unit} fühlt seine magischen Kräfte schwinden und verliert {aura} Aura.
+auratransfer_success;magic:0;de;{unit} transferiert {aura} Aura auf {target}.
+wind_effect;magic:0;de;{$mage mage} erfleht den Segen der Götter des Windes und des Wassers für {ship}.
+path_effect;magic:0;de;{$mage mage} sorgt für trockene Straßen in {region}.
+ent_effect;magic:0;de;{$mage mage} belebt {amount} Bäume.
+maelstrom_effect;magic:0;de;{$mage mage} beschwört die Mächte des Wassers und ein gigantischer Strudel bildet sich.
+harvest_effect;magic:0;de;{$mage mage} segnet in einem kurzen Ritual die Felder.
+growtree_effect;magic:0;de;{$mage mage} erschuf einen heiligen Hain von {amount} Bäumen.
+rust_effect;magic:0;de;{$mage mage} legt einen Rosthauch auf {target}. {amount} Waffen wurden vom Rost zerfressen.
+rust_fail;magic:0;de;{$mage mage} legt einen Rosthauch auf {target}, doch der Rosthauch fand keine Nahrung.
+heat_effect;magic:0;de;{$mage mage} belegt {target} mit einem Kälteschutz.
+sparkle_effect;magic:0;de;{$mage mage} belegt {target} mit einem Zauber.
+drought_effect;magic:0;de;{$mage mage} ruft das Feuer der Sonne auf {region} herab.
+fumblecurse;magic:0;de;{unit} in {region} wird von einem Unbekannten verflucht.
+deathcloud_effect;magic:0;de;{$mage mage} beschwört einen Giftelementar in {region}.
+destroy_magic_effect;magic:0;de;{unit} in {region}: '{command}' - Der Magier zerstört {succ} Flüche auf {target}.
+destroy_magic_noeffect;magic:0;de;{unit} in {region}: '{command}' - Der Magier konnte keinen Fluch zerstören.
+magicboost_effect;magic:0;de;{unit} in {region}: '{command}' - Die Sphären des Chaos geben dem Magier einen Teil ihrer Kraft.
+use_antimagiccrystal;magic:0;de;{unit} benutzt in {region} einen Antimagiekristall.
+use_tacticcrystal;magic:0;de;{unit} benutzt in {region} ein Traumauge.
+magiccreate_effect;magic:0;de;{unit} in {region}: '{command}' - {unit} erschafft {amount} {item}
+summondragon;magic:0;de;{unit} in {region}: '{command}' - {unit} ruft Drachen nach {region}
+sp_migranten;magic:0;de;{unit} in {region}: '{command}' - {target} wird von uns aufgenommen.
+sp_migranten_fail1;magic:0;de;{unit} in {region}: '{command}' - {target} ist von unserer Art, das Ritual wäre verschwendete Aura
+icastle_create;magic:0;de;{unit} in {region}: '{command}' - Der Magier erschafft ein Traumgebäude.
+sp_raisepeasantmob_effect;magic:0;de;{$mage mage} wiegelt in {region} die Bauern zum Aufstand auf.
+firewall_effect;magic:0;de;{mage} erschafft in {region} eine Wand aus Feuer.
+wisps_effect;magic:0;de;{mage} ruft Irrlichter in {region}.
+becomewyrm;magic;2;de;{mage} verwandelt sich in einen Wyrm.
+
+# Kämpfe
+msg_battle;battle:0;de;{string}
+killsandhits;battle:0;de;{unit} erzielte {hits} Treffer und tötete {kills} Gegner.
+casualties;battle:0;de;{unit} verlor {fallen} Personen, {alive} überlebten und {run} flohen nach {runto}.
+
+# Parteispecials und Prayer-Effects
+new_fspecial;events:0;de;Die Götter gewähren uns die Kraft eines {special}.
+new_fspecial_level;events:0;de;Die Götter gewähren uns die Kraft eines {special}({level}).
+pray_success;events:0;de;Die Götter erhören {unit}.
+
+# Eisberge
+iceberg_drift;events:0;de;Der Eisberg {region} treibt nach {dir}.
+overrun_by_iceberg;events:0;de;Die {ship} wird bei einer Kollision mit einem Eisberg beschädigt.
+overrun_by_iceberg_des;events:0;de;Die {ship} wird bei einer Kollision mit einem Eisberg zerstört.
+iceberg_land;events:0;de;Der Eisberg {region} treibt an eine Küste.
+iceberg_create;events:0;de;Der Gletscher von {region} bricht und treibt davon.
+
+# Tempel der Schreie
+praytoigjarjuk;events:0;de;{unit} sendet ein Stoßgebet an den Herrn der Schreie.
+cryinpain;events:0;de;"AAAAAAAGHHHHHH!" - Ein Schrei durchzieht die Region, {unit} windet sich vor Schmerz.
+
+# Szepter der Tränen
+wand_of_tears_effect;events:0;de;Ein bohrender Schmerz durchzuckt {unit}, Verwirrung macht sich breit.
+wand_of_tears_usage;events:0;de;{unit} schwenkt sein Szepter und sorgt für Verwirrung und Chaos in der Region.
+
+# Ertrinkende
+drown_amphibian_nodead;events:1;de;{unit} nimmt Schaden auf dem Wasser.
+drown_amphibian_dead;events:0;de;{amount} Personen in {unit} ertrinken.
+drown;events:0;de;{unit} ertrinkt.
+

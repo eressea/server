@@ -1,0 +1,17 @@
+alchemy.h
+creation.h
+economy.h
+magic.h
+race.h
+randenc.h
+alp.c
+build.c
+creation.c
+creport.c
+economy.c
+laws.c
+monster.c
+randenc.c
+report.c
+spy.c
+study.c

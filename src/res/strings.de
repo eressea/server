@@ -1,0 +1,345 @@
+# Terraintypen
+maelstrom;de;Mahlstrom
+ocean;de;Ozean
+plain;de;Ebene
+forest;de;Wald
+swamp;de;Sumpf
+desert;de;Wüste
+highland;de;Hochland
+mountain;de;Berge
+glacier;de;Gletscher
+firewall;de;Feuerwand
+grassland;de;Steppe
+volcano;de;Vulkan
+fog;de;Nebel
+iceberg;de;Eisberg
+thickfog;de;Dichter Nebel
+hell;de;Ebene aus Feuer und Dunkelheit
+activevolcano;de;Aktiver Vulkan
+hall1;de;Halle
+corridor1;de;Gang
+xmas_exit;de;Pforte
+
+maelstrom_trail;de;ein %s
+ocean_trail;de;%s
+plain_trail;de;die Ebene von %s
+forest_trail;de;der Wald von %s
+swamp_trail;de;der Sumpf von %s
+desert_trail;de;die Wüste von %s
+highland_trail;de;das Hochland von %s
+mountain_trail;de;die Berge von %s
+glacier_trail;de;der Gletscher von %s
+firewall_trail;de;eine %s
+grassland_trail;de;die Steppe von %s
+volcano_trail;de;der Vulkan von %s
+fog_trail;de;ein %s
+iceberg_trail;de;der Eisberg von %s
+thickfog_trail;de;%s
+hell_trail;de;eine %s
+activevolcano_trail;de;ein %s
+hall1_trail;de;die %s
+corridor1_trail;de;die %s
+
+# Himmelsrichtungen
+west;de;Westen
+northwest;de;Nordwesten
+northeast;de;Nordosten
+east;de;Osten
+southwest;de;Südwesten
+southeast;de;Südosten
+
+# Verschiedenes
+unknownunit;de;eine unbekannte Einheit
+
+# Meldungssektionen
+section_events;de;Meldungen und Ereignisse
+section_errors;de;Warnungen und Fehler
+section_economy;de;Wirtschaft und Handel
+section_production;de;Rohstoffe und Produktion
+section_magic;de;Magie und Artefakte
+section_movement;de;Reisen und Bewegung
+section_study;de;Lehren und Lernen
+section_battle;de;Kämpfe
+
+# Gebäudetypen
+fortress_generic;de;Burg
+lighthouse;de;Leuchtturm
+mine;de;Bergwerk
+quarry;de;Steinbruch
+harbour;de;Hafen
+academy;de;Akademie
+magictower;de;Magierturm
+smithy;de;Schmiede
+sawmill;de;Sägewerk
+stables;de;Pferdezucht
+monument;de;Monument
+dam;de;Damm
+caravan;de;Karawanserei
+tunnel;de;Tunnel
+inn;de;Taverne
+stonecircle;de;Steinkreis
+blessedstonecircle;de;Gesegneter Steinkreis
+illusion;de;Traumschlößchen
+generic;de;Struktur
+
+#Testgebäude
+temple;de;Tempel
+
+#Testitem
+wand;de;Zauberstab
+wands;de;Zauberstäbe
+wand_of_tears;de;Szepter der Tränen
+wands_of_tears;de;Szepter der Tränen
+
+# Burgausbaustufen
+site;de;Grundmauern
+fortification;de;Befestigung
+tower;de;Turm
+castle;de;Burg
+fortress;de;Festung
+citadel;de;Zitadelle
+
+# Items
+herb;de;Kraut
+herbbag;de;Kräuterbeutel
+vial;de;Phiole
+vials;de;Phiolen
+
+# Resourcen
+money;de;Silber
+moneys;de;Silber
+hp;de;Trefferpunkt
+hps;de;Trefferpunkte
+aura;de;Aura
+auras;de;Aura
+permaura;de;permanente Aura
+permauras;de;permanente Aura
+peasant;de;Bauer
+peasants;de;Bauern
+unit;de;Einheit
+units;de;Einheiten
+person;de;Person
+persons;de;Personen
+
+#items
+iron;de;Eisen
+irons;de;Eisen
+log;de;Holz
+logs;de;Holz
+stone;de;Stein
+stones;de;Steine
+cart;de;Wagen
+carts;de;Wagen
+catapult;de;Katapult
+catapults;de;Katapulte
+sword;de;Schwert
+swords;de;Schwerter
+spear;de;Speer
+spears;de;Speere
+mallornspear;de;Mallornspeer
+mallornspears;de;Mallornspeere
+crossbow;de;Armbrust
+crossbows;de;Armbrüste
+mallorncrossbow;de;Mallornarmbrust
+mallorncrossbows;de;Mallornarmbrüste
+bow;de;Bogen
+bows;de;Bögen
+mallornbow;de;Mallornbogen
+mallornbows;de;Mallornbögen
+# more items
+chainmail;de;Kettenhemd
+chainmails;de;Kettenhemden
+plate;de;Plattenpanzer
+plates;de;Plattenpanzer
+balm;de;Balsam
+spice;de;Gewürz
+spices;de;Gewürze
+jewel;de;Juwel
+jewels;de;Juwelen
+myrrh;de;Myrrhe
+oil;de;Öl
+silk;de;Seide
+incense;de;Weihrauch
+firesword;de;Flammenschwert
+fireswords;de;Flammenschwerter
+shieldstone;de;Schildstein
+shieldstones;de;Schildsteine
+greatsword;de;Bihänder
+axe;de;Kriegsaxt
+axes;de;Kriegsäxte
+greatbow;de;Elfenbogen
+greatbows;de;Elfenbögen
+laensword;de;Laenschwert
+laenswords;de;Laenschwerter
+laenshield;de;Laenschild
+laenshields;de;Laenschilde
+laenmail;de;Laenkettenhemd
+laenmails;de;Laenkettenhemden
+laen;de;Laen
+shield;de;Schild
+shields;de;Schilde
+halberd;de;Hellebarde
+halberds;de;Hellebarden
+lance;de;Lanze
+lances;de;Lanzen
+mallornlance;de;Mallornlanze
+mallornlances;de;Mallornlanzen
+mallorn;de;Mallorn
+cookie;de;Keks
+cookies;de;Kekse
+apple;de;Apfel
+apples;de;Äpfel
+nut;de;Nuß
+nuts;de;Nüsse
+almond;de;Mandelkern
+almonds;de;Mandelkerne
+dragonblood;de;Drachenblut
+fairyboot;de;Feenstiefel
+healingpotion;de;Heiltrank
+healingpotions;de;Heiltränke
+antimagic;de;Antimagiekristall
+antimagics;de;Antimagiekristalle
+toadslime;de;Tiegel mit Krötenschleim
+amulet;de;Amulett
+amulets;de;Amulette
+ao_daemon;de;Auge des Dämon
+ao_daemons;de;Augen des Dämon
+griphonwing;de;Schwinge des Greifen
+griphonwings;de;Schwingen des Greifen
+ao_chastity;de;Amulett der Keuschheit
+ao_chastitys;de;Amulette der Keuschheit
+aoh;de;Amulett der Heilung
+aohs;de;Amulette der Heilung
+aog;de;Amulett des Treffens
+aogs;de;Amulette des Treffens
+aots;de;Amulett des wahren Sehens
+aotss;de;Amulette des wahren Sehens
+aoc;de;Katzenamulett
+aocs;de;Katzenamulette
+roi;de;Ring der Unsichtbarkeit
+rois;de;Ringe der Unsichtbarkeit
+rop;de;Ring der Macht
+rops;de;Ringe der Macht
+roqf;de;Ring der flinken Finger
+roqfs;de;Ringe der flinken Finger
+horse;de;Pferd
+horses;de;Pferde
+magicherbbag;de;Magischer Kräuterbeutel
+magicherbbags;de;Magische Kräuterbeutel
+moneybag;de;Silberbeutel
+moneychest;de;Silberkassette
+dragonhoard;de;Drachenhort
+dragonhead;de;Drachenkopf
+dragonheads;de;Drachenköpfe
+eyeofdragon;de;Auge des Drachen
+eyeofdragons;de;Augen des Drachen
+rustysword;de;Schartiges Schwert
+rustyswords;de;Schartige Schwerter
+rustyshield;de;Rostiges Schild
+rustyshields;de;Rostige Schilde
+rustychainmail;de;Rostiges Kettenhemd
+rustychainmails;de;Rostige Kettenhemden
+soc;de;Magischer Kräuterbeutel
+socs;de;Magische Kräuterbeutel
+ror;de;Ring der Regeneration
+rors;de;Ringe der Regeneration
+aod;de;Amulett der Dunkelheit
+aods;de;Amulette der Dunkelheit
+magicbag;de;Zauberbeutel
+dreameye;de;Traumauge
+dreameyes;de;Traumaugen
+seaserpenthead;de;Seeschlangenkopf
+seaserpentheads;de;Seeschlangenköpfe
+aurafocus;de;Aurafocus
+aurafocuses;de;Aurafocuse
+presspass;de;Akkredition des Xontormia-Expreß
+presspasses;de;Akkreditionen des Xontormia-Expreß
+trollbelt;de;Gürtel der Trollstärke
+elvenhorse;de;Elfenpferd
+elvenhorses;de;Elfenpferde
+pegasus;de;Pegasus
+pegasi;de;Pegasi
+dolphin;de;Delphin
+dolphins;de;Delphine
+museumticket;de;Eintrittskarte des Großen Museum
+museumtickets;de;Eintrittskarten des Großen Museum
+museumexitticket;de;Rückkehrticket des Großen Museum
+museumexittickets;de;Rückkehrtickets des Großen Museum
+
+# herb singular
+h0;de;Flachwurz
+h1;de;Würziger Wagemut
+h2;de;Eulenauge
+h3;de;Grüner Spinnerich
+h4;de;Blauer Baumringel
+h5;de;Elfenlieb
+h6;de;Gurgelkraut
+h7;de;Knotiger Saugwurz
+h8;de;Blasenmorchel
+h9;de;Wasserfinder
+h10;de;Kakteenschwitz
+h11;de;Sandfäule
+h12;de;Windbeutel
+h13;de;Fjordwuchs
+h14;de;Alraune
+h15;de;Steinbeißer
+h16;de;Spaltwachs
+h17;de;Höhlenglimm
+h18;de;Eisblume
+h19;de;Weißer Wüterich
+h20;de;Schneekristall
+
+#herb plural
+h0s;de;Flachwurz
+h1s;de;Würzige Wagemut
+h2s;de;Eulenaugen
+h3s;de;Grüne Spinneriche
+h4s;de;Blaue Baumringel
+h5s;de;Elfenlieb
+h6s;de;Gurgelkräuter
+h7s;de;Knotige Saugwurze
+h8s;de;Blasenmorcheln
+h9s;de;Wasserfinder
+h10s;de;Kakteenschwitze
+h11s;de;Sandfäulen
+h12s;de;Windbeutel
+h13s;de;Fjordwuchse
+h14s;de;Alraunen
+h15s;de;Steinbeißer
+h16s;de;Spaltwachse
+h17s;de;Höhlenglimme
+h18s;de;Eisblumen
+h19s;de;Weiße Wüteriche
+h20s;de;Schneekristalle
+
+p0;de;Siebenmeilentee
+p1;de;Goliathwasser
+p2;de;Wasser des Lebens
+p3;de;Schaffenstrunk
+p4;de;Wundsalbe
+p5;de;Bauernblut
+p6;de;Gehirnschmalz
+p7;de;Dumpfbackenbrot
+p8;de;Nestwärme
+p9;de;Pferdeglück
+p10;de;Berserkerblut
+p11;de;Bauernlieb
+p12;de;Trank der Wahrheit
+p13;de;Elixier der Macht
+p14;de;Heiltrank
+
+p0s;de;Siebenmeilentees
+p1s;de;Goliathwasser
+p2s;de;Wasser des Lebens
+p3s;de;Schaffenstrünke
+p4s;de;Wundsalben
+p5s;de;Bauernblut
+p6s;de;Gehirnschmalz
+p7s;de;Dumpfbackenbrote
+p8s;de;Nestwärme
+p9s;de;Pferdeglück
+p10s;de;Berserkerblut
+p11s;de;Bauernlieb
+p12s;de;Tränke der Wahrheit
+p13s;de;Elixiere der Macht
+p14s;de;Heiltränke

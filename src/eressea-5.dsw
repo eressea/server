@@ -1,0 +1,164 @@
+Microsoft Developer Studio Workspace File, Format Version 5.00
+# WARNUNG: DIESE ARBEITSBEREICHSDATEI DARF NICHT BEARBEITET ODER GELÖSCHT WERDEN!
+
+###############################################################################
+
+Project: "askalon"=".\askalon\askalon-5.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name attributes
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name gamecode
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name kernel
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name triggers
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name util
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "attributes"=".\common\attributes\attributes-5.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "eressea"=".\eressea\eressea-5.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name kernel
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name util
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name gamecode
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "gamecode"=".\common\gamecode\gamecode-5.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "items"=".\common\items\items-5.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "kernel"=".\common\kernel\kernel-5.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "mapper"=".\mapper\mapper-5.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name triggers
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name util
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name kernel
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name attributes
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name items
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "triggers"=".\common\triggers\triggers-5.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "util"=".\common\util\util-5.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

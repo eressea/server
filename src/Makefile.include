@@ -1,0 +1,83 @@
+## include this File in all Makefiles for Eressea
+
+default: debug
+
+ifndef ERESSEA
+	MAKEENV = echo "Missing ERESSEA environment variable." && exit 1
+endif
+
+DEPEND  = g++ -MM -MG -r
+AR      = ar
+ARFLAGS = cr
+
+CC      = gcc
+CFLAGS  = -I$(ERESSEA) -Wall -Wwrite-strings -Wstrict-prototypes \
+           -Wpointer-arith -Werror-implicit-function-declaration \
+	   -Wno-char-subscripts \
+       	   -march=pentiumpro -fPIC $(INCLUDES)
+
+LIBS    = -L$(PUBLISH_DIR)
+LD      = gcc
+LDFLAGS = $(LIBS)
+
+#INSTALL = install
+INSTALL = cp
+
+ARCHITECTURE=Linux
+
+
+ifeq ($(CONFIG), debug)
+  BUILD_DIR  = Debug-$(ARCHITECTURE)
+  CFLAGS    += -g
+  LDFLAGS   += -g
+endif
+
+ifeq ($(CONFIG), release)
+  BUILD_DIR  = Release-$(ARCHITECTURE)
+  CFLAGS    += -O4 -funroll-loops -fomit-frame-pointer
+endif
+
+ifeq ($(CONFIG), profile)
+  BUILD_DIR  = Profile-$(ARCHITECTURE)
+  CFLAGS    += -g -pg -O4 -funroll-loops
+  LDFLAGS   += -g -pg
+endif
+
+
+#
+## Dependencies
+#
+ifneq ($(wildcard *.c),)
+ifeq (.depend,$(wildcard .depend))
+include .depend
+endif
+# Create dependencies
+depend::
+	@echo "Creating dependencies in `pwd`/.depend";
+	$(DEPEND) $(CFLAGS) $(DEFINES) $(INCDIRS) $(SOURCES) >| .depend
+endif
+
+
+
+PUBLISH_DIR = $(ERESSEA)/$(BUILD_DIR)
+
+debug release profile:: env $(PUBLISH_DIR) $(PUBLISH_DIR)
+	$(MAKE) CONFIG=$@ publish-$@
+
+env:
+	@$(MAKEENV)
+
+publish-debug publish-release publish-profile:: $(BUILD_DIR)/$(LIBRARY) $(BUILD_DIR)/$(BINARY)
+
+
+clean:: $(BUILD_DIR) $(PUBLISH_DIR)
+	rm -fr Release-$(ARCHITECTURE)/* Debug-$(ARCHITECTURE)/* Profile-$(ARCHITECTURE)/*
+
+$(BUILD_DIR) $(PUBLISH_DIR):
+	@mkdir $@
+
+# object files:
+$(BUILD_DIR)/%:: $(BUILD_DIR)
+$(BUILD_DIR)/%.o:: %.c
+	@echo "Compiling $@"
+	@$(CC) -o $@ -c $< $(CFLAGS)
