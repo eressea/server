@@ -118,31 +118,11 @@ sp_summon_alp(struct castorder *co)
 
 	strcpy(buf, "Ein Alp starb, ohne sein Ziel zu erreichen.");
 	{
-#ifdef NEW_TRIGGER
 		/* Wenn der Alp stirbt, den Magier nachrichtigen */
 		add_trigger(&alp->attribs, "destroy", trigger_unitmessage(mage, buf, MSG_EVENT, ML_INFO));
 		/* Wenn Opfer oder Magier nicht mehr existieren, dann stirbt der Alp */
 		add_trigger(&mage->attribs, "destroy", trigger_killunit(alp));
 		add_trigger(&opfer->attribs, "destroy", trigger_killunit(alp));
-#else
-		/* da der Alp niemals GIB PERSONEN ausfuehrt, koennen alle seine
-		 * spread-Angaben bei Relations und Actions vom Typ SPREAD_NEVER sein.
-		 */
-
-		old_trigger *tr1, *tr2;
-		action *ac;
-		/* Wenn der Alp stirbt, den Magier nachrichtigen */
-		tr1 = create_trigger(alp, TYP_UNIT, SPREAD_NEVER, TR_DESTRUCT);
-		ac = action_sendmessage(mage, TYP_UNIT, SPREAD_TRANSFER, buf, MSG_EVENT, ML_INFO);
-		link_action_trigger(ac, tr1);
-
-		/* Wenn Opfer oder Magier nicht mehr existieren, dann stirbt der Alp */
-		tr1 = create_trigger(mage, TYP_UNIT, SPREAD_TRANSFER, TR_DESTRUCT);
-		tr2 = create_trigger(opfer, TYP_UNIT, SPREAD_TRANSFER, TR_DESTRUCT);
-		ac = action_destroy(alp, TYP_UNIT, SPREAD_NEVER);
-		link_action_trigger(ac, tr1);
-		link_action_trigger(ac, tr2);
-#endif
 	}
 	sprintf(buf, "%s beschwˆrt den Alp %s f¸r %s.", unitname(mage),
 		unitname(alp), unitname(opfer));
@@ -177,11 +157,7 @@ alp_findet_opfer(unit *alp, region *r)
 	 * m¸ssen jetzt aber deaktiviert werden, sonst werden sie gleich
 	 * beim destroy_unit(alp) ausgelˆst.
 	 */
-#ifdef NEW_TRIGGER
 	a_removeall(&alp->attribs, &at_eventhandler);
-#else
-	remove_all_actions(alp, TYP_UNIT);
-#endif
 	/* Alp umwandeln in Curse */
 	c = create_curse(mage, &opfer->attribs, C_ALLSKILLS, 0, 0, 0, -2, opfer->number);
 	/* solange es noch keine spezielle alp-Antimagie gibt, reagiert der
@@ -192,14 +168,7 @@ alp_findet_opfer(unit *alp, region *r)
 
 	{
 		/* wenn der Magier stirbt, wird der Curse wieder vom Opfer genommen */
-#ifdef NEW_TRIGGER
 		add_trigger(&mage->attribs, "destroy", trigger_removecurse(c, opfer));
-#else
-		old_trigger * tr = create_trigger(mage, TYP_UNIT, SPREAD_TRANSFER, TR_DESTRUCT);
-		action * ac = action_removecurse(opfer, TYP_UNIT, SPREAD_MODULO, C_ALLSKILLS, 0);
-		/* TODO: der Spread des Curses muﬂ dem Spread der Action angepaﬂt werden! */
-		link_action_trigger(ac, tr);
-#endif
 	}
 }
 

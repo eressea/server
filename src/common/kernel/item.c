@@ -2102,7 +2102,7 @@ tagbegin(struct xml_stack * stack)
 			state->rtype->flags |= RTF_ITEM;
 			state->itype = new_itemtype(state->rtype, flags, weight, capacity);
 		} else if (strcmp(tag->name, "weapon")==0) {
-			skill_t sk = sk_find(xml_value(tag, "sk"));
+			skill_t sk = sk_find(xml_value(tag, "skill"));
 			int minskill = xml_ivalue(tag, "minskill");
 			int offmod = xml_ivalue(tag, "offmod");
 			int defmod = xml_ivalue(tag, "defmod");
@@ -2139,7 +2139,7 @@ tagbegin(struct xml_stack * stack)
 				if (xml_bvalue(tag, "offensive")) flags|=WMF_OFFENSIVE;
 				if (xml_bvalue(tag, "defensive")) flags|=WMF_DEFENSIVE;
 				if (xml_bvalue(tag, "damage")) flags|=WMF_DAMAGE;
-				if (xml_bvalue(tag, "sk")) flags|=WMF_SKILL;
+				if (xml_bvalue(tag, "skill")) flags|=WMF_SKILL;
 				if (xml_bvalue(tag, "missile_target")) flags|=WMF_MISSILE_TARGET;
 				if (state->wmods) {
 					memcpy(mods, state->wtype->modifiers, sizeof(weapon_mod)*state->wmods);

@@ -117,12 +117,10 @@ extern int get_skill(const struct unit * u, skill_t id);
 #define change_level(u, sk, bylevel) set_level(u, sk, max(0,get_level(u,sk)+bylevel));
 #else
 extern void set_skill(struct unit * u, skill_t id, int level, int weeks);
-extern struct skill * get_skill(struct unit * u, skill_t id);
+extern struct skill * get_skill(const struct unit * u, skill_t id);
 extern boolean has_skill(const unit* u, skill_t sk);
-extern int change_level(struct unit * u, skill_t id, int bylevel);
 #endif
 
-extern int change_skillpoints(struct unit * u, skill_t id, int byvalue);
 extern void set_level(struct unit * u, skill_t id, int level);
 extern int get_level(const struct unit * u, skill_t id);
 extern void transfermen(struct unit * u, struct unit * u2, int n);
@@ -159,7 +157,7 @@ extern void u_setfaction(struct unit * u, struct faction * f);
 extern void set_number(struct unit * u, int count);
 
 #if !SKILLPOINTS
-extern boolean learn_skill(const struct unit * u, skill_t sk, double chance);
+extern boolean learn_skill(struct unit * u, skill_t sk, double chance);
 #endif
 
 #endif

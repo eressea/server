@@ -539,10 +539,20 @@ sp_mindblast(fighter * fi, int level, int power, spell * sp)
 			sk = random_skill(du);
 			if (sk != NOSKILL) {
 				/* Skill abziehen */
+				int n = 30+rand()%61;
 #if SKILLPOINTS
-				change_skill(du, sk, -(30+rand()%61));
+				change_skill(du, sk, -n);
 #else
-				change_skillpoints(du, sk, -(30+rand()%61));
+				skill * sv = get_skill(du, sk);
+				while (n>0) {
+					if (n>=30*du->number) {
+						reduce_skill(sv, 1);
+						n-=30;
+					} else {
+						if (rand()%(30*du->number)<n) reduce_skill(sv, 1);
+						n = 0;
+					}
+				}
 #endif
 				--enemies;
 			} else {

@@ -87,6 +87,7 @@ extern int quiet;
 boolean nocr = false;
 boolean nonr = false;
 boolean nomer = false;
+boolean noreports = false;
 
 /*
  * -------------------------------------------------------------

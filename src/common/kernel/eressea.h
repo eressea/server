@@ -96,8 +96,6 @@ struct xml_stack;
 #define HUNGER_REDUCES_SKILL /* Hunger reduziert den Talentwert auf die Hälfte */
 #define DAEMON_HUNGER /* Dämonen hungern, statt mit 10% in ihre sphäre zurückzukehren */
 #define NEW_RECEIPIES /* Vereinfachte, besser verteilte Kräuterzutaten für Tränke */
-#define NEW_TRIGGER
-#undef OLD_TRIGGER /* leave active for compatibility until conversion is implemented */
 #define NEW_TAVERN
 #define GOBLINKILL
 #undef HELFE_WAHRNEHMUNG
@@ -152,9 +150,14 @@ struct xml_stack;
 #define GROWTREE_VERSION 305
 #define RANDOMIZED_RESOURCES_VERSION 306 /* should be the same, but doesn't work */
 #define NEWRACE_VERSION 307
-#define UGROUPS_VERSION 400 /* nicht aktivieren, nicht fertig */
+#define NEWSKILL_VERSION 308
 
-#define RELEASE_VERSION NEWRACE_VERSION
+#if SKILLPOINTS
+# define RELEASE_VERSION NEWRACE_VERSION
+#else
+# define RELEASE_VERSION NEWSKILL_VERSION
+#endif
+#define UGROUPS_VERSION 400 /* nicht aktivieren, nicht fertig */
 
 /*
 #if RELEASE_VERSION >= UGROUPS_VERSION

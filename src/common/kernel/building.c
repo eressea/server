@@ -954,9 +954,6 @@ destroy_building(building * b)
 	unit *u;
 
 	if(!bfindhash(b->no)) return;
-#ifdef OLD_TRIGGER
-	do_trigger(b, TYP_BUILDING, TR_DESTRUCT);
-#endif
 	for(u=b->region->units; u; u=u->next) {
 		if(u->building == b) leave(b->region, u);
 	}
@@ -965,9 +962,6 @@ destroy_building(building * b)
 	if (b->type == &bt_lighthouse) update_lighthouse(b);
 	bunhash(b);
 
-#ifdef OLD_TRIGGER
-	change_all_pointers(b, TYP_BUILDING, NULL);
-#endif
 #if 0	/* Memoryleak. Aber ohne klappt das Rendern nicht! */
 	removelist(&b->region->buildings, b);
 #endif

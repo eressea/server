@@ -40,10 +40,6 @@
 #include "pathfinder.h"
 #include "karma.h"
 
-#ifdef OLD_TRIGGER
-#include "old/trigger.h"
-#endif
-
 /* util includes */
 #include <resolve.h>
 #include <base36.h>
@@ -1456,7 +1452,6 @@ do_fumble(castorder *co)
 	/* Kröte */
 		duration = rand()%level/2;
 		if (duration<2) duration = 2;
-#ifdef NEW_TRIGGER
 		{
 			/* one or two things will happen: the toad changes her race back,
 			 * and may or may not get toadslime.
@@ -1467,15 +1462,6 @@ do_fumble(castorder *co)
 			if (rand()%10>2) t_add(&trestore, trigger_giveitem(u, olditemtype[I_TOADSLIME], 1));
 			add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
 		}
-#else
-		{
-			action *a1;
-			timeout *t1;
-			t1 = create_timeout(duration);
-			a1 = action_changerace(u, TYP_UNIT, SPREAD_ALWAYS, u->race, u->irace);
-			link_action_timeout(a1, t1); /* converted */
-		}
-#endif
 		u->race = new_race[RC_TOAD];
 		u->irace = new_race[RC_TOAD];
 		sprintf(buf, "Eine Botschaft von %s: 'Ups! Quack, Quack!'", unitname(u));

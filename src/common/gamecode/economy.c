@@ -240,6 +240,19 @@ expandorders(region * r, request * requests)
 }
 /* ------------------------------------------------------------- */
 
+
+static void
+change_level(unit * u, skill_t sk, int bylevel)
+{
+	skill * sv = get_skill(u, sk);
+	assert(bylevel>0);
+	if (sv==0) set_skill(u, sk, bylevel, 0);
+	else {
+		sv->level = (unsigned char)(sv->level+bylevel);
+		sv->learning = 0;
+	}
+}
+
 static void
 expandrecruit(region * r, request * recruitorders)
 {
@@ -322,16 +335,19 @@ expandrecruit(region * r, request * recruitorders)
 					change_level(unew, SK_AUSDAUER, i);
 			}
 			if (unew!=u) {
+				faction * f = u->faction;
 				unit ** up=&u->next;
 				transfermen(unew, u, unew->number);
 				while (*up!=unew) up=&(*up)->next;
 				assert(unew->next==NULL);
 				*up = NULL;
+				if (f->units==unew) f->units = unew->nextF;
+				uunhash(unew);
 				free(unew);
 			}
 			if (u->n < u->wants) {
-				ADDMSG(&unew->faction->msgs, msg_message("recruit", 
-					"unit region amount want", unew, r, u->n, u->wants));
+				ADDMSG(&u->faction->msgs, msg_message("recruit", 
+					"unit region amount want", u, r, u->n, u->wants));
 			}
 		}
 	}

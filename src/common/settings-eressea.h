@@ -28,9 +28,4 @@
 
 #define PEASANT_ADJUSTMENT 1
 
-#define SKILLPOINTS 1
-#undef CONVERT_SKILLPOINTS
-
-#if defined(CONVERT_SKILLPOINTS) && !SKILLPOINTS
-# error "cannot have both CONVERT_SKILLPOINTS && !SKILLPOINTS"
-#endif
+#define SKILLPOINTS 0

@@ -51,6 +51,7 @@ extern const char * skillname(skill_t, const struct locale *);
 extern skill_t sk_find(const char * name);
 
 extern int level_days(int level);
+extern int level(int days);
 
 #if SKILLPOINTS
 # define skill_level(level) level_days(level)

@@ -652,12 +652,13 @@ learn(void)
 				change_skill(u, (skill_t)i, days);
 #else
 				while (days) {
-					if (days>u->number*30) {
+					if (days>=u->number*30) {
 						learn_skill(u, (skill_t)i, 1.0);
 						days -= u->number*30;
 					} else {
 						double chance = (double)days/u->number/30;
 						learn_skill(u, (skill_t)i, chance);
+						days = 0;
 					}
 				}
 #endif

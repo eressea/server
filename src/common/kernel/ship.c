@@ -293,9 +293,6 @@ destroy_ship(ship * s, region * r)
 	unit * u = r->units;
 
 	if(!findship(s->no)) return;
-#ifdef OLD_TRIGGER
-	do_trigger(s, TYP_SHIP, TR_DESTRUCT);
-#endif
 	while (u) {
 		if (u->ship == s) {
 			leave_ship(u);
@@ -303,9 +300,6 @@ destroy_ship(ship * s, region * r)
 		u = u->next;
 	}
 	sunhash(s);
-#ifdef OLD_TRIGGER
-	change_all_pointers(s, TYP_SHIP, NULL);
-#endif
 	choplist(&r->ships, s);
 	handle_event(&s->attribs, "destroy", s);
 }

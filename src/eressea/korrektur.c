@@ -77,7 +77,6 @@
 #undef  XMAS1999
 #undef  XMAS2000
 #undef  XMAS2001
-#undef  CONVERT_SKILLPOINTS
 
 extern void reorder_owners(struct region * r);
 
@@ -2606,8 +2605,8 @@ fix_questcoors(void)
 			ursprung * u = f->ursprung;
 			while (u) {
 				if (u->id == p->id) {
-					u->x = eternath->x;
-					u->y = eternath->y;
+					u->x = 0;
+					u->y = 0;
 					break;
 				}
 				u=u->next;
@@ -2693,9 +2692,6 @@ void
 korrektur_end(void)
 {
 	/* fix_balsamfiasko(); */
-#ifdef CONVERT_SKILLPOINTS
-	do_once("nskp", convert_skills());
-#endif
 #ifdef XMAS2001
 	do_once("2001", xmas2001());
 #endif

@@ -20,10 +20,6 @@
 #include <config.h>
 #include <eressea.h>
 
-#ifndef NEW_TRIGGER
-# error "new triggers not activated"
-#endif
-
 /* triggers includes */
 #include <triggers/changefaction.h>
 #include <triggers/changerace.h>

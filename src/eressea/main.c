@@ -91,6 +91,7 @@ extern item_type * i_silver;
 
 extern boolean nonr;
 extern boolean nocr;
+extern boolean noreports;
 extern boolean nomer;
 extern boolean nomsg;
 extern boolean nobattle;
@@ -269,7 +270,7 @@ processturn(char *filename)
 	remove_unequipped_guarded();
 #endif
 	korrektur_end();
-	reports();
+	if (!noreports) reports();
 	free_units();
 	puts(" - Beseitige leere Parteien");
 	remove_empty_factions();
@@ -462,12 +463,16 @@ read_args(int argc, char **argv)
 		if (argv[i][0]!='-') {
 			return usage(argv[0], argv[i]);
 		} else if (argv[i][1]=='-') { /* long format */
-			if (strcmp(argv[i]+1, "nocr")==0) nocr = true;
+			if (strcmp(argv[i]+2, "nocr")==0) nocr = true;
 			else if (strcmp(argv[i]+2, "nosave")==0) nowrite = true;
+			else if (strcmp(argv[i]+2, "noreports")==0) {
+				noreports = true;
+				nocr = true;
+				nocr = true;
+			}
 			else if (strcmp(argv[i]+2, "xml")==0) xmlfile = argv[++i];
 			else if (strcmp(argv[i]+2, "dirtyload")==0) dirtyload = true;
 			else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
-			else if (strcmp(argv[i]+2, "nocr")==0) nocr = true;
 			else if (strcmp(argv[i]+2, "nomsg")==0) nomsg = true;
 			else if (strcmp(argv[i]+2, "noeiswald")==0) g_killeiswald = true;
 			else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;

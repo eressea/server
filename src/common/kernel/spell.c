@@ -525,13 +525,7 @@ select_familiar(const race * magerace, magic_t magiegebiet)
 boolean
 is_familiar(const unit *u)
 {
-#ifdef NEW_TRIGGER
 	return i2b(get_familiar_mage(u)!=NULL);
-#else
-	if (get_relation(u, TYP_UNIT, REL_CREATOR) != NULL )
-		return true;
-	return false;
-#endif
 }
 
 static void
@@ -2234,14 +2228,8 @@ sp_ironkeeper(castorder *co)
 	/* Parteitarnen, damit man nicht sofort weiß, wer dahinter steckt */
 	fset(keeper, FL_PARTEITARNUNG);
 	{
-#ifdef NEW_TRIGGER
 		trigger * tkill = trigger_killunit(keeper);
 		add_trigger(&keeper->attribs, "timer", trigger_timeout(cast_level+2, tkill));
-#else
-		timeout * to = create_timeout(cast_level+2);
-		action *ac = action_destroy(keeper, TYP_UNIT, SPREAD_TRANSFER);
-		link_action_timeout(ac, to); /* conversion done */
-#endif
 	}
 
 	sprintf(buf, "%s beschwört einen Bergwächter.", unitname(mage));
@@ -2739,17 +2727,8 @@ sp_summondragon(castorder *co)
 				break;
 			}
 			{
-#ifdef NEW_TRIGGER
 				trigger * tsummon = trigger_createunit(r, f, race, number);
 				add_trigger(&r->attribs, "timer", trigger_timeout(time, tsummon));
-#else
-				action *a2;
-				timeout *t2;
-				t2 = create_timeout(time);
-				a2 = action_createunit(r, TYP_REGION, SPREAD_NEVER, f->unique_id,
-						number, race);
-				link_action_timeout(a2, t2);
-#endif
 			}
 		}
 	}
@@ -3543,14 +3522,8 @@ sp_magicboost(castorder *co)
 	create_curse(mage, &mage->attribs, C_AURA, 0, power, 4, 200, 1);
 
 	{
-#ifdef NEW_TRIGGER
 		trigger * tsummon = trigger_createcurse(mage, mage, C_AURA, 0, power, 6, 50, 1);
 		add_trigger(&mage->attribs, "timer", trigger_timeout(5, tsummon));
-#else
-		timeout *to = create_timeout(5);
-		action * ac = action_createmagicboostcurse(mage, TYP_UNIT, SPREAD_NEVER, power);
-		link_action_timeout(ac, to); /* conversion done */
-#endif
 	}
 
 	/* kann nicht durch Antimagie beeinflusst werden */
@@ -3965,7 +3938,6 @@ sp_charmingsong(castorder *co)
 
 	duration = 3 + rand()%force;
 	{
-#ifdef NEW_TRIGGER
 		trigger * trestore = trigger_changefaction(target, target->faction);
 		/* läuft die Dauer ab, setze Partei zurück */
 		add_trigger(&target->attribs, "timer", trigger_timeout(duration, trestore));
@@ -3973,24 +3945,6 @@ sp_charmingsong(castorder *co)
 		add_trigger(&target->faction->attribs, "destroy", trigger_killunit(target));
 		/* wird die neue Partei von Target aufgelöst, dann auch diese Einheit */
 		add_trigger(&mage->faction->attribs, "destroy", trigger_killunit(target));
-#else
-		old_trigger *t1;
-		timeout *t2;
-		action *a1, *a2;
-
-		/* läuft die Dauer ab, setze Partei zurück */
-		t2 = create_timeout(duration);
-		a2 = action_changefaction(target, TYP_UNIT, SPREAD_ALWAYS,
-				target->faction->unique_id);
-		link_action_timeout(a2, t2);
-
-		/* wird die alte Partei von Target aufgelöst */
-		t1 = create_trigger(target->faction, TYP_FACTION, 0, TR_DESTRUCT);
-		/* dann löse auch target auf */
-		a1 = action_destroy(target, TYP_UNIT, SPREAD_ALWAYS);
-		link_action_trigger(a1, t1);
-		/* TODO sollte irgendwie nach Ablauf des Zaubers gelöscht werden */
-#endif
 	}
 	/* sperre ATTACKIERE, GIB PERSON und überspringe Migranten */
 	create_curse(mage, &target->attribs, C_SLAVE, 0, force, duration, 0, 0);

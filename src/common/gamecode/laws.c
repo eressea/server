@@ -26,10 +26,6 @@
 #include <modules/gmcmd.h>
 #include <modules/infocmd.h>
 
-#ifdef OLD_TRIGGER
-# include "old/trigger.h"
-#endif
-
 /* gamecode includes */
 #include "creation.h"
 #include "economy.h"
@@ -107,9 +103,6 @@ destroyfaction(faction * f)
 	faction *ff;
 
 	if( !f->alive ) return;
-#ifdef OLD_TRIGGER
-	do_trigger(f, TYP_FACTION, TR_DESTRUCT);
-#endif
 
 	for (u=f->units;u;u=u->nextF) {
 		region * r = u->region;
@@ -173,12 +166,7 @@ destroyfaction(faction * f)
 		set_number(u, 0);
 	}
 	f->alive = 0;
-#ifdef NEW_TRIGGER
 	handle_event(&f->attribs, "destroy", f);
-#endif
-#ifdef OLD_TRIGGER
-	change_all_pointers(f, TYP_FACTION, NULL);
-#endif
 	for (ff = factions; ff; ff = ff->next) {
 		group *g;
 		ally *sf, *sfn;
@@ -2913,10 +2901,6 @@ ageing(void)
 			if (b==*bp) bp = &(*bp)->next;
 		}
 	}
-#ifdef OLD_TRIGGER
-	/* timeouts */
-	countdown_timeouts();
-#endif
 }
 
 static int

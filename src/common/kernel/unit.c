@@ -43,9 +43,6 @@
 #include <event.h>
 #include <goodies.h>
 #include <resolve.h>
-#ifdef OLD_TRIGGER
-# include <old/trigger.h>
-#endif
 
 /* libc includes */
 #include <string.h>
@@ -608,7 +605,9 @@ set_level(unit * u, skill_t id, int value)
 		if (sv->id == id) {
 			sv->level = (unsigned char)value;
 			sv->learning = 0;
+			break;
 		}
+		++sv;
 	}
 #endif
 }
@@ -781,8 +780,14 @@ transfermen(unit * u, unit * u2, int n)
 				set_skill(u2, sv->id, sv->level, sv->learning);
 			} else {
 				skill * sn = get_skill(u2, sv->id);
-				sn->level = (unsigned char)((sv->level*n+sn->level*u2->number)/(u2->number+n));
-				if (sn->learning>sv->learning) sn->learning=sv->learning;
+				if (sn) {
+					int level = ((sv->level*n+sn->level*u2->number)/(u2->number+n));
+					sn->level = (unsigned char)level;
+					if (sn->learning>sv->learning) sn->learning=sv->learning;
+				} else {
+					int level = (sv->level*n/(u2->number+n));
+					set_level(u2, sv->id, level);
+				}
 			}
 		}
 #endif
@@ -909,15 +914,66 @@ set_number(unit * u, int count)
 
 #if !SKILLPOINTS
 boolean
-learn_skill(const unit * u, skill_t sk, double chance)
+learn_skill(unit * u, skill_t sk, double chance)
 {
-	/** rewrite me **/
-	assert(!"rewrite me!");
-	return 0;
+	int coins, heads = 0;
+	int level = 0;
+	int weeks = 0;
+	skill * sv;
+	assert (chance <= 1.0);
+	if (chance < 1.0 && rand()%10000>=chance*10000) return false;
+	sv = get_skill(u, sk);
+	if (sv) {
+		level = sv->level;
+		weeks = sv->learning;
+	}
+	coins = level * 2;
+	heads = coins - weeks;
+	while (heads>0 && coins--) {
+		if (rand()%2==0) --heads;
+		if (heads>coins) break;
+	}
+	if (heads) ++weeks;
+	else ++level;
+	if (!sv) {
+		set_skill(u, sk, level, weeks);
+	} else {
+		sv->level = (unsigned char)level;
+		sv->learning = (unsigned char)weeks;
+	}
+	return heads==0;
+}
+
+void
+set_skill(unit * u, skill_t id, int level, int weeks)
+{
+	skill *i = u->skills;
+
+	assert(level>=0 && weeks>=0 && weeks<=level*2);
+	for (; i != u->skills + u->skill_size; ++i) {
+		if (i->id == id) {
+			if (level || weeks) {
+				i->level = (unsigned char)level;
+				i->learning = (unsigned char)weeks;
+			} else {
+				*i = *(u->skills + u->skill_size - 1);
+				--u->skill_size;
+			}
+			return;
+		}
+	} if (!level && !weeks) {
+		return;
+	}
+	++u->skill_size;
+	u->skills = realloc(u->skills, u->skill_size * sizeof(skill));
+	i = (u->skills + u->skill_size - 1);
+	i->level = (unsigned char)level;
+	i->learning = (unsigned char)weeks;
+	i->id = (unsigned char)id;
 }
 
 skill *
-get_skill(unit * u, skill_t sk)
+get_skill(const unit * u, skill_t sk)
 {
 	skill * sv = u->skills;
 	while (sv!=u->skills+u->skill_size) {
@@ -929,7 +985,7 @@ get_skill(unit * u, skill_t sk)
 }
 
 boolean
-has_skill(unit * u, skill_t sk)
+has_skill(const unit * u, skill_t sk)
 {
 	skill * sv = u->skills;
 	while (sv!=u->skills+u->skill_size) {
@@ -1042,10 +1098,10 @@ int
 eff_skill(const unit * u, skill_t sk, const region * r)
 {
 	int level = get_level(u, sk);
-	int mlevel = level - get_modifier(u, sk, level, r);
+	if (level>0) {
+		int mlevel = level + get_modifier(u, sk, level, r);
 
-#if SKILLPOINTS
-	if (mlevel<0) return 0;
-#endif
-	return mlevel;
+		if (mlevel>0) return mlevel;
+	}
+	return 0;
 }

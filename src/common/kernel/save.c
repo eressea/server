@@ -68,11 +68,6 @@
 #include <ctype.h>
 #include <assert.h>
 
-#if defined(OLD_TRIGGER) || defined(CONVERT_TRIGGER)
-# include <eressea/old/trigger.h>
-extern void resolve2(void);
-#endif
-
 #define xisdigit(c)     (((c) >= '0' && (c) <= '9') || (c) == '-')
 #define COMMENT_CHAR    ';'
 
@@ -135,7 +130,6 @@ cfopen(const char *filename, const char *mode)
 /* Dummy-Funktion für die Kompatibilität */
 
 #define rid(F) ((global.data_version<BASE36_VERSION)?ri(F):ri36(F))
-#define wid(F, i) fprintf(F, itoa36(i))
 
 int nextc;
 
@@ -1452,24 +1446,28 @@ readgame(boolean backup)
 
 			assert(u->number >= 0);
 			assert(u->race);
-#ifdef CONVERT_SKILLPOINTS
-			while ((sk = (skill_t) ri(F)) != NOSKILL) {
-				int skill = ri(F) / u->number;
-				int lvl = level(skill);
-				int weeks = (skill - level_days(lvl))/30;
-				if (weeks || lvl) {
-					set_skill(u, sk, lvl, weeks);
-				}
-			}
-#elif SKILLPOINTS
+#if SKILLPOINTS
+			assert(global.data_version<NEWSKILL_VERSION);
 			while ((sk = (skill_t) ri(F)) != NOSKILL) {
 				set_skill(u, sk, ri(F));
 			}
 #else
-			while ((sk = (skill_t) ri(F)) != NOSKILL) {
-				int level = ri(F);
-				int weeks = ri(F);
-				set_skill(u, sk, level, weeks);
+			if (global.data_version<NEWSKILL_VERSION) {
+				/* convert old data */
+				while ((sk = (skill_t) ri(F)) != NOSKILL) {
+					int skill = ri(F) / u->number;
+					int lvl = level(skill);
+					int weeks = (skill - level_days(lvl))/30;
+					if (weeks || lvl) {
+						set_skill(u, sk, lvl, 2*weeks);
+					}
+				}
+			} else {
+				while ((sk = (skill_t) ri(F)) != NOSKILL) {
+					int level = ri(F);
+					int weeks = ri(F);
+					set_skill(u, sk, level, weeks);
+				}
 			}
 #endif
 			if (global.data_version>=ITEMTYPE_VERSION) {
@@ -1531,9 +1529,6 @@ readgame(boolean backup)
 #ifdef USE_UGROUPS
 		if (global.data_version >= UGROUPS_VERSION) read_ugroups(F);
 #endif
-#if defined(OLD_TRIGGER) || defined(CONVERT_TRIGGER)
-		if (global.data_version >= TIMEOUT_VERSION) load_timeouts(F);
-#endif
 	}
 
 #ifdef WEATHER
@@ -1568,9 +1563,6 @@ readgame(boolean backup)
         /* Unaufgeloeste Zeiger initialisieren */
 	printf("\n - Referenzen initialisieren...\n");
 	resolve();
-#if defined(OLD_TRIGGER) || defined (CONVERT_TRIGGER)
-	resolve2();
-#endif
 	resolve_IDs();
 
 	printf("\n - Leere Gruppen löschen...\n");
@@ -1654,8 +1646,8 @@ int space=0;
 
 #define wc(F, c) { putc(c, F); UNSPACE }
 #define wnl(F) { putc('\n', F); DOSPACE }
-#define wspace(F) { assert (!space); putc(' ', F); UNSPACE }
-#define whs(F, s) { fputs(s, F); UNSPACE }
+/* #define wspace(F) { assert(space); putc(' ', F); DOSPACE } */ 
+#define whs(F, s) { fputs(s, F); putc(' ', F); DOSPACE }
 
 void
 wsn(FILE * F, const char *s)
@@ -1677,14 +1669,14 @@ ws(FILE * F, const char *s)
 void
 wi(FILE * F, int n)
 {
-	sprintf(buf, "%d ", n);
-	wsn(F, buf); DOSPACE
+	fprintf(F, "%d ", n);
+	DOSPACE
 }
 
 void wi36(FILE * F, int n)
 {
-	sprintf(buf, "%s ", itoa36(n));
-	wsn(F, buf); DOSPACE
+	fprintf(F, "%s ", itoa36(n));
+	DOSPACE
 }
 
 void
@@ -1693,9 +1685,7 @@ write_items(FILE *F, item *ilist)
 	item * itm;
 	for (itm=ilist;itm;itm=itm->next) if (itm->number) {
 		whs(F, resourcename(itm->type->rtype, 0));
-		wspace(F);
 		wi(F, itm->number);
-		wspace(F);
 	}
 	fputs("end", F);
 }
@@ -1710,15 +1700,11 @@ write_ugroups(FILE *file)
 
 	for(f=factions; f; f=f->next) if(f->ugroups) {
 		wi(file, f->no);
-		wspace(file);
 		for(ug = f->ugroups; ug; ug=ug->next) {
 			wi(file, ug->id);
-			wspace(file);
 			wi(file, ug->members);
-			wspace(file);
 			for(i=0; i<ug->members; i++) {
-				wid(file, ug->unit_array[i]->no);
-				wspace(file);
+				wi36(file, ug->unit_array[i]->no);
 			}
 		}
 		fputs("-1\n", file);
@@ -1810,9 +1796,7 @@ writegame(char *path, char quiet)
 	wnl(F);
 #endif
 	wi(F, turn);
-	wspace(F);
 	wi(F, max_unique_id);
-	wspace(F);
 	wi(F, nextborder);
 
 	/* Write planes */
@@ -1822,19 +1806,12 @@ writegame(char *path, char quiet)
 
 	for(pl = planes; pl; pl=pl->next) {
 		wi(F, pl->id);
-		wspace(F);
 		ws(F, pl->name);
-		wspace(F);
 		wi(F, pl->minx);
-		wspace(F);
 		wi(F, pl->maxx);
-		wspace(F);
 		wi(F, pl->miny);
-		wspace(F);
 		wi(F, pl->maxy);
-		wspace(F);
 		wi(F, pl->flags);
-		wspace(F);
 		a_write(F, pl->attribs);
 		wnl(F);
 	}
@@ -1848,49 +1825,33 @@ writegame(char *path, char quiet)
 
 	printf(" - Schreibe %d Parteien...\n",n);
 	for (f = factions; f; f = f->next) {
-		wid(F, f->no);
-		wspace(F);
+		wi36(F, f->no);
 		wi(F, f->unique_id);
-		wspace(F);
 		ws(F, f->name);
-		wspace(F);
 		ws(F, f->banner);
-		wspace(F);
 		ws(F, f->email);
-		wspace(F);
 		ws(F, f->passw);
-		wspace(F);
 #if RELEASE_VERSION>=LOCALE_VERSION
 		ws(F, locale_name(f->locale));
-		wspace(F);
 #endif
 		wi(F, f->lastorders);
-		wspace(F);
 		wi(F, f->age);
-		wspace(F);
 		ws(F, f->race->_name[0]);
 		wnl(F);
 		wi(F, f->magiegebiet);
-		wspace(F);
 		wi(F, f->karma);
-		wspace(F);
 		wi(F, f->flags);
-		wspace(F);
 		a_write(F, f->attribs);
 		wnl(F);
 		write_msglevels(f->warnings, F);
 		wnl(F);
 		wi(F, listlen(f->ursprung));
 		for(ur = f->ursprung;ur;ur=ur->next) {
-			wspace(F);
 			wi(F, ur->id);
-			wspace(F);
 			wi(F, ur->x);
-			wspace(F);
 			wi(F, ur->y);
 		}
 		wnl(F);
-		wspace(F);
 		f->options = f->options & ~Pow(O_DEBUG);
 		wi(F, f->options);
 		wnl(F);
@@ -1903,9 +1864,7 @@ writegame(char *path, char quiet)
 		wi(F, listlen(f->allies));
 		for (sf = f->allies; sf; sf = sf->next) {
 			int no = (sf->faction!=NULL)?sf->faction->no:0;
-			wspace(F);
-			wid(F, no);
-			wspace(F);
+			wi36(F, no);
 			wi(F, sf->status);
 		}
 		wnl(F);
@@ -1941,34 +1900,23 @@ writegame(char *path, char quiet)
 		wnl(F);
 
 		wi(F, r->x);
-		wspace(F);
 		wi(F, r->y);
-		wspace(F);
 		ws(F, r->display);
-		wspace(F);
 		wi(F, rterrain(r));
-		wspace(F);
 		wi(F, r->flags & RF_SAVEMASK);
-		wspace(F);
 		wi(F, r->age);
 		wnl(F);
 		if (landregion(rterrain(r))) {
 			struct demand * demand;
 			ws(F, r->land->name);
-			wspace(F);
 #if GROWING_TREES
 			wi(F, rtrees(r,0));
-			wspace(F);
 			wi(F, rtrees(r,1));
-			wspace(F);
 			wi(F, rtrees(r,2));
-			wspace(F);
 #else
 			wi(F, rtrees(r));
-			wspace(F);
 #endif
 			wi(F, rhorses(r));
-			wspace(F);
 #if NEW_RESOURCEGROWTH == 0
 			wi(F, riron(r));
 #elif RELEASE_VERSION>=NEWRESOURCE_VERSION
@@ -1976,17 +1924,11 @@ writegame(char *path, char quiet)
 				rawmaterial * res = r->resources;
 				while (res) {
 					ws(F, res->type->name);
-					wspace(F);
 					wi(F, res->level);
-					wspace(F);
 					wi(F, res->amount);
-					wspace(F);
 					wi(F, res->startlevel);
-					wspace(F);
 					wi(F, res->base);
-					wspace(F);
 					wi(F, res->divisor);
-					wspace(F);
 					res = res->next;
 				}
 				ws(F, "end");
@@ -1994,25 +1936,18 @@ writegame(char *path, char quiet)
 #else
 			assert(!"invalid defines");
 #endif
-			wspace(F);
 			rht =  rherbtype(r);
 			if (rht) {
 				ws(F, resourcename(rht->itype->rtype, 0));
 			} else {
 				ws(F, "noherb");
 			}
-			wspace(F);
 			wi(F, rherbs(r));
-			wspace(F);
 			wi(F, rpeasants(r));
-			wspace(F);
 			wi(F, rmoney(r));
-			wspace(F);
 			if (r->land) for (demand=r->land->demands; demand; demand=demand->next) {
 				ws(F, resourcename(demand->type->itype->rtype, 0));
-				wspace(F);
 				wi(F, demand->value);
-				wspace(F);
 			}
 			fputs("end", F);
 			wnl(F);
@@ -2022,20 +1957,10 @@ writegame(char *path, char quiet)
 		wi(F, listlen(r->buildings));
 		wnl(F);
 		for (b = r->buildings; b; b = b->next) {
-			wid(F, b->no);
-			wspace(F);
+			wi36(F, b->no);
 			ws(F, b->name);
-			wspace(F);
 			ws(F, b->display);
-			wspace(F);
 			wi(F, b->size);
-			wspace(F);
-#ifdef TODO
-			/* gibts mit dem neuen Magiesystem nicht mehr, sind nun attribute
-			wi(F, b->zauber);
-			wspace(F);
-			*/
-#endif
 			ws(F, b->type->_name);
 			wnl(F);
 			a_write(F, b->attribs);
@@ -2046,22 +1971,16 @@ writegame(char *path, char quiet)
 		wnl(F);
 		for (sh = r->ships; sh; sh = sh->next) {
 			assert(sh->region == r);
-			wid(F, sh->no);
-			wspace(F);
+			wi36(F, sh->no);
 			ws(F, sh->name);
-			wspace(F);
 			ws(F, sh->display);
-			wspace(F);
 #if RELEASE_VERSION < SHIPTYPE_VERSION
 			wi(F, sh->type);
 #else
 			ws(F, sh->type->name[0]);
 #endif
-			wspace(F);
 			wi(F, sh->size);
-			wspace(F);
 			wi(F, sh->damage);
-			wspace(F);
 			wi(F, sh->coast);
 			wnl(F);
 			a_write(F, sh->attribs);
@@ -2071,61 +1990,45 @@ writegame(char *path, char quiet)
 		wi(F, listlen(r->units));
 		wnl(F);
 		for (u = r->units; u; u = u->next) {
-#if !SKILLPOINTS || defined(CONVERT_SKILLPOINTS)
+#if !SKILLPOINTS
 			int i;
 #else
 			skill_t sk;
 #endif
-			wid(F, u->no);
-			wspace(F);
-			wid(F, u->faction->no);
-			wspace(F);
+			wi36(F, u->no);
+			wi36(F, u->faction->no);
 			ws(F, u->name);
-			wspace(F);
 			ws(F, u->display);
-			wspace(F);
 			assert(old_race(u->race) == RC_SPELL || u->number == u->debug_number);
 			wi(F, u->number);
-			wspace(F);
 			wi(F, u->age);
-			wspace(F);
 			ws(F, u->race->_name[0]);
-			wspace(F);
 			ws(F, u->irace!=u->race?u->irace->_name[0]:"");
-			wspace(F);
 			if (u->building)
-				wid(F, u->building->no);
+				wi36(F, u->building->no);
 			else
 				wi(F, 0);
-			wspace(F);
 			if (u->ship)
 #if RELEASE_VERSION>= FULL_BASE36_VERSION
-				wid(F, u->ship->no);
+				wi36(F, u->ship->no);
 #else
 				wi(F, u->ship->no);
 #endif
 			else
 				wi(F, 0);
-			wspace(F);
 			wi(F, u->status);
-			wspace(F);
 			wi(F, u->flags & FL_SAVEMASK);
 #if RELEASE_VERSION < GUARDFIX_VERSION
-			wspace(F);
 			wi(F, getguard(u));
 #endif
 			for(S=u->orders; S; S=S->next) {
 				if (is_persistent(S->s, u->faction->locale)) {
-					wspace(F);
 					ws(F, S->s);
 				}
 			}
-			wspace(F);
 			ws(F, ""); /* Abschluß der persistenten Befehle */
-			wspace(F);
 			ws(F, u->lastorder);
 #if RELEASE_VERSION < EFFSTEALTH_VERSION
-			wspace(F);
 			wi(F, u_geteffstealth(u));
 #endif
 			wnl(F);
@@ -2142,9 +2045,7 @@ writegame(char *path, char quiet)
 			for (sk = 0; sk != MAXSKILLS; sk++) {
 				if (get_skill(u, sk)) {
 					wi(F, sk);
-					wspace(F);
 					wi(F, get_skill(u, sk));
-					wspace(F);
 				}
 			}
 #else
@@ -2152,11 +2053,8 @@ writegame(char *path, char quiet)
 				skill * sv = u->skills+i;
 				if (sv->learning || sv->level) {
 					wi(F, sv->id);
-					wspace(F);
 					wi(F, sv->level);
-					wspace(F);
 					wi(F, sv->learning);
-					wspace(F);
 				}
 			}
 #endif
@@ -2173,27 +2071,19 @@ writegame(char *path, char quiet)
 #if RELEASE_VERSION < MAGE_ATTRIB_VERSION
 			if (is_mage(u)) {
 				m = get_mage(u);
-				wspace(F);
 				wi(F, m->magietyp);
-				wspace(F);
 				wi(F, m->spellpoints);
-				wspace(F);
 				wi(F, m->spchange);
 				for (i = 0; i != MAXCOMBATSPELLS; i++){
-					wspace(F);
 					wi(F, m->combatspell[i]);
-					wspace(F);
 					wi(F, m->combatspelllevel[i]);
 				}
-				wspace(F);
 				wi(F, -1);
 				wnl(F);
 				/* BUG: Endlosschleife! */
 				for (sp = m->spellptr;sp;sp=sp->next){
-					wspace(F);
 					wi(F, sp->spellid);
 				}
-				wspace(F);
 			}
 			wi(F, -1);
 			wnl(F);
@@ -2208,9 +2098,6 @@ writegame(char *path, char quiet)
 #if RELEASE_VERSION >= UGROUPS_VERSION
 	write_ugroups(F);
 	wnl(F);
-#endif
-#ifdef OLD_TRIGGER
-	save_timeouts(F);
 #endif
 	fclose(F);
 	printf("\nOk.\n");

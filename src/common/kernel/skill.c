@@ -80,6 +80,7 @@ skill_t
 sk_find(const char * name)
 {
 	skill_t i;
+	if (name==NULL) return NOSKILL;
 	for (i=0;i!=MAXSKILLS;++i) {
 		if (strcmp(name, skillnames[i])==0) return i;
 	}
@@ -240,7 +241,6 @@ level_days(int level)
 	return 30 * ((level+1) * level / 2);
 }
 
-#if SKILLPOINTS
 int
 level(int days)
 {
@@ -254,7 +254,6 @@ level(int days)
 	for (i=0;i!=64;++i) if (ldays[i]>days) return i;
 	return i;
 }
-#endif
 
 #if !SKILLPOINTS
 void 

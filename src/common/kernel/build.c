@@ -22,10 +22,6 @@
 #include "eressea.h"
 #include "build.h"
 
-#ifdef OLD_TRIGGER
-#include <old/trigger.h>
-#endif
-
 /* kernel includes */
 #include "alchemy.h"
 #include "border.h"
@@ -296,7 +292,7 @@ destroy_road(unit *u, int n, const char *cmd)
 #if 0
 		int salvage, divy = 2;
 #endif
-		int willdo = min(n, (1+get_skill(u, SK_ROAD_BUILDING))*u->number);
+		int willdo = min(n, eff_skill(u, SK_ROAD_BUILDING, r)*u->number);
 		int road = rroad(r, d);
 		region * r2 = rconnect(r,d);
 		willdo = min(willdo, road);
@@ -513,7 +509,7 @@ build_road(region * r, unit * u, int size, direction_t d)
 		scale_number(u,u->number - golemsused);
 	} else {
 		/* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-		change_skill(u, SK_ROAD_BUILDING, min(n, u->number) * PRODUCEEXP);
+		produceexp(u, SK_ROAD_BUILDING, min(n, u->number));
 	}
 	add_message(&u->faction->msgs, new_message(
 		u->faction, "buildroad%r:region%u:unit%i:size", r, u, n));
@@ -696,7 +692,7 @@ build(unit * u, const construction * ctype, int completed, int want)
 		completed = completed + n;
 	}
 	/* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-	change_skill(u, ctype->skill, min(made, u->number) * PRODUCEEXP);
+	produceexp(u, ctype->skill, min(made, u->number));
 
 	return made;
 }
@@ -853,7 +849,7 @@ build_building(unit * u, const building_type * btype, int want)
 	if( want == INT_MAX )
 		sprintf(buffer, "%s %s %s", locale_string(u->faction->locale, keywords[K_MAKE]), string2, buildingid(b));
 	else if( want-built <= 0 )
-		strcpy(buffer, locale_string(u->faction->locale, keywords[K_WORK]));
+		strcpy(buffer, locale_string(u->faction->locale, "defaultorder"));
 	else
 		sprintf(buffer, "%s %d %s %s", locale_string(u->faction->locale, keywords[K_MAKE]), want-built, string2, buildingid(b));
 	set_string(&u->lastorder, buffer);

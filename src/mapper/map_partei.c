@@ -294,23 +294,35 @@ level(int days)
 }
 
 static void
+change_level(unit * u, skill_t sk, int bylevel)
+{
+	skill * sv = get_skill(u, sk);
+	assert(bylevel>0);
+	if (sv==0) set_skill(u, sk, bylevel, 0);
+	else {
+		sv->level = (unsigned char)(sv->level+bylevel);
+		sv->learning = 0;
+	}
+}
+
+static void
 give_latestart_bonus(region *r, unit *u, int b)
 {
-	int bsk = skill_level(level(b*30));
-	change_skill(u, SK_OBSERVATION, bsk*u->number);
+	int bsk = level(b*30);
+	change_level(u, SK_OBSERVATION, bsk);
 	change_money(u, 200*b);
 
 	{
 		unit *u2 = createunit(r, u->faction, 1, u->race);
-		change_skill(u2, SK_TACTICS, bsk * u2->number / 2);
+		change_level(u2, SK_TACTICS, bsk);
 		u2->irace = u->irace;
 		fset(u2, FL_PARTEITARNUNG);
 	}
 
 	{
 		unit *u2 = createunit(r, u->faction, 2*b, u->race);
-		change_skill(u2, SK_SPEAR, skill_level(3) * u2->number);
-		change_skill(u2, SK_TAXING, skill_level(3) * u2->number);
+		change_level(u2, SK_SPEAR, 3);
+		change_level(u2, SK_TAXING, 3);
 		change_item(u2, I_SPEAR, u2->number);
 		u2->irace = u->irace;
 		fset(u2, FL_PARTEITARNUNG);
@@ -437,7 +449,7 @@ ModifyPartei(faction * f)
 				if (u->faction == f && get_skill(u, SK_MAGIC)) {
 					if (fval(f, FL_DH))
 						waddnstr(win, ", ", -1);
-					wprintw(win, (NCURSES_CONST char*)"%s(%d): %d", unitid(u), u->number, get_skill(u, SK_MAGIC) / u->number);
+					wprintw(win, (NCURSES_CONST char*)"%s(%d): %d", unitid(u), u->number, get_level(u, SK_MAGIC));
 					fset(f, FL_DH);
 				}
 		waddch(win, ')');
@@ -453,7 +465,7 @@ ModifyPartei(faction * f)
 				if (u->faction == f && get_skill(u, SK_ALCHEMY)) {
 					if (fval(f, FL_DH))
 						waddnstr(win, ", ", -1);
-					wprintw(win, (NCURSES_CONST char*)"%s(%d): %d", unitid(u), u->number, get_skill(u, SK_ALCHEMY) / u->number);
+					wprintw(win, (NCURSES_CONST char*)"%s(%d): %d", unitid(u), u->number, get_level(u, SK_ALCHEMY));
 					fset(f, FL_DH);
 				}
 		waddch(win, ')');

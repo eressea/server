@@ -494,9 +494,6 @@ stripunit(unit * u)
 		i_free(u->items);
 		u->items = it;
 	}
-#ifdef OLD_TRIGGER
-	change_all_pointers(u, TYP_UNIT, NULL);	/* vor Zerstoeren der Attribs! */
-#endif
 	while (u->attribs) a_remove (&u->attribs, u->attribs);
 }
 
@@ -2267,13 +2264,6 @@ attrib_init(void)
 	at_register(&at_effect);
 	at_register(&at_private);
 
-#if defined(OLD_TRIGGER)
-	at_register(&at_pointer_tag);
-	at_register(&at_relation);
-	at_register(&at_relbackref);
-	at_register(&at_trigger);
-	at_register(&at_action);
-#endif
 	at_register(&at_icastle);
 	at_register(&at_guard);
 	at_register(&at_lighthouse);
@@ -2523,51 +2513,6 @@ init_used_faction_ids(void)
 	}
 }
 
-
-#if defined(OLD_TRIGGER) || defined(CONVERT_TRIGGER)
-# include <eressea/old/trigger.h>
-# include <resolve.h>
-typedef struct unresolved {
-	struct unresolved * next;
-	void ** ptrptr;
-		/* pointer to the location where the unresolved object
-		 * should be, or NULL if special handling is required */
-	void * data;
-		/* information on how to resolve the missing object */
-	resolve_fun resolve;
-		/* function to resolve the unknown object */
-	typ_t typ;
-	tag_t tag;
-} unresolved;
-
-static unresolved * ur_list;
-
-void
-ur_add2(int id, void ** ptrptr, typ_t typ, tag_t tag, resolve_fun fun) {
-	/* skip this for the moment */
-   unresolved * ur = calloc(1, sizeof(unresolved));
-   ur->data = (void *)id;
-   ur->resolve = fun;
-   ur->ptrptr = ptrptr;
-   ur->typ = typ;
-   ur->tag = tag;
-   ur->next = ur_list;
-   ur_list = ur;
-}
-
-void
-resolve2(void)
-{
-	while (ur_list) {
-		unresolved * ur = ur_list;
-		ur_list = ur->next;
-		if (ur->ptrptr) *ur->ptrptr = ur->resolve(ur->data);
-		else ur->resolve(ur->data);
-		free(ur);
-	}
-}
-
-#endif
 
 unit *
 make_undead_unit(region * r, faction * f, int n, const struct race * rc)
@@ -3060,7 +3005,7 @@ produceexp(struct unit * u, skill_t sk, int n)
 	change_skill(u, sk, PRODUCEEXP * n);
 	return 1;
 #else
-	learn_skill(u, sk, 30.0/PRODUCEEXP);
+	learn_skill(u, sk, PRODUCEEXP/30.0);
 	return 0;
 #endif
 }

@@ -59,11 +59,6 @@ read_ID(FILE *f)
 /****** Not implemented ******/
 obj_ID default_ID;
 /* die müssen schon ein value zurückliefern... */
-#ifdef OLD_TRIGGER
-static obj_ID notimplemented_ID(void *p) { unused(p); assert(0); return default_ID; }
-static void * notimplemented_find(obj_ID id) { unused(id); assert(0); return 0; }
-static void notimplemented_destroy(void *p) { unused(p); assert(0); }
-#endif
 static char * notimplemented_desc(void *p) { unused(p); assert(0); return 0; }
 
 static void cannot_destroy(void *p) {
@@ -156,45 +151,6 @@ static void faction_set( void *pp, void *p ) {
 	*(faction **)pp = (faction *)p;
 }
 
-#ifdef OLD_TRIGGER
-/****** Action ******/
-static attrib ** action_attribs( void *p ) {
-	return &((action *)p)->attribs;
-}
-static void * action_deref( void *pp ) {
-	return (void *) (*((action **)pp));
-}
-static void action_set( void *pp, void *p ) {
-	if( (*(action **)pp)->magic != ACTION_MAGIC ) {
-			fprintf(stderr, "Error: action_set(pp=%p, p=%p): (*pp)->magic ungueltig!\n", pp, p);
-			return;
-	}
-	*(action **)pp = (action *)p;
-}
-
-/****** old_trigger ******/
-static attrib ** trigger_attribs( void *p ) {
-	return &((old_trigger *)p)->attribs;
-}
-static void * trigger_deref( void *pp ) {
-	return (void *) (*((old_trigger **)pp));
-}
-static void trigger_set( void *pp, void *p ) {
-	*(old_trigger **)pp = (old_trigger *)p;
-}
-
-/****** timeout ******/
-static attrib ** timeout_attribs( void *p ) {
-	return &((timeout *)p)->attribs;
-}
-static void * timeout_deref( void *pp ) {
-	return (void *) (*((timeout **)pp));
-}
-static void timeout_set( void *pp, void *p ) {
-	*(timeout **)pp = (timeout *)p;
-}
-#endif
-
 /******* Typ-Funktionstabelle ********/
 
 typdata_t typdata[] = {
@@ -243,46 +199,12 @@ typdata_t typdata[] = {
 		(deref_fun)faction_deref,
 		(set_fun)faction_set,
 	},
-#ifdef OLD_TRIGGER
-	/* TYP_ACTION */ {
-		(ID_fun)notimplemented_ID,
-		(find_fun)notimplemented_find,
-		(desc_fun)notimplemented_desc,
-		(attrib_fun)action_attribs,
-		(destroy_fun)notimplemented_destroy,
-		(deref_fun)action_deref,
-		(set_fun)action_set,
-	},
-	/* TYP_TRIGGER */ {
-		(ID_fun)notimplemented_ID,
-		(find_fun)notimplemented_find,
-		(desc_fun)notimplemented_desc,
-		(attrib_fun)trigger_attribs,
-		(destroy_fun)notimplemented_destroy,
-		(deref_fun)trigger_deref,
-		(set_fun)trigger_set,
-	},
-	/* TYP_TIMEOUT */ {
-		(ID_fun)notimplemented_ID,
-		(find_fun)notimplemented_find,
-		(desc_fun)notimplemented_desc,
-		(attrib_fun)timeout_attribs,
-		(destroy_fun)notimplemented_destroy,
-		(deref_fun)timeout_deref,
-		(set_fun)timeout_set,
-	},
-#endif
 };
 
 /******** Resolver-Funktionen für obj_ID ********/
 
-#ifdef OLD_TRIGGER
-#include "old/pointertags.h"
-#include "old/trigger.h"
-#else
 #define tag_t int
 #define TAG_NOTAG (-1)
-#endif
 
 typedef struct unresolved2 {
 	struct unresolved2 *next;
@@ -326,10 +248,6 @@ resolve_IDs(void)
 
 		robj = typdata[ur->typ].find(ur->id);
 		typdata[ur->typ].ppset(ur->objPP, robj);
-#ifdef OLD_TRIGGER
-		if( ur->tag != TAG_NOTAG )
-			tag_pointer(ur->objPP, ur->typ, ur->tag);
-#endif
 		free(ur);
 	}
 }

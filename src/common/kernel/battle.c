@@ -680,7 +680,7 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
 
 	if (wtype==NULL) {
 		skill = effskill(u, SK_WEAPONLESS);
-		if (skill==0) {
+		if (skill<=0) {
 			/* wenn kein waffenloser kampf, dann den rassen-defaultwert */
 			if(u->race == new_race[RC_URUK]) {
 				int sword = effskill(u, SK_SWORD);
@@ -989,7 +989,16 @@ drain_exp(unit *u, int n)
 		}
 	}
 	if (sk != NOSKILL) {
-		change_skillpoints(u, sk, -n);
+		skill * sv = get_skill(u, sk);
+		while (n>0) {
+			if (n>=30*u->number) {
+				reduce_skill(sv, 1);
+				n-=30;
+			} else {
+				if (rand()%(30*u->number)<n) reduce_skill(sv, 1);
+				n = 0;
+			}
+		}
 	}
 }
 #endif

@@ -356,8 +356,7 @@ modify_talente(unit * u, region * r)
 	wmove(wn, 0, 3);
 	waddnstr(wn, "< Talente >", -1);
 	for (i = 0; i < MAXSKILLS; i++) {
-		q = get_skill(u, i);
-		sprintf(buf, "%s %d [%d]", skillname(i, NULL), eff_skill(u, i, r), q / u->number);
+		sprintf(buf, "%s %d", skillname(i, NULL), eff_skill(u, i, r));
 		TL[i] = strdup(buf);
 		if (L > 10) {
 			wmove(wn, i + 1, 4);
@@ -423,15 +422,15 @@ modify_talente(unit * u, region * r)
 					wmove(wn, x + 2, 39);
 					waddch(wn, '|');
 					wrefresh(wn);
-					q = map_input(wn, 2, 2, "Tage pro Person", 0, 5000, get_skill(u, x) / u->number);
+					q = map_input(wn, 2, 2, "Talentstufe", 0, 30, get_level(u, x));
 				} else {
-					q = map_input(0, 0, 0, "Tage pro Person", 0, 5000, get_skill(u, x) / u->number);
+					q = map_input(0, 0, 0, "Talentstufe", 0, 30, get_level(u, x));
 					touchwin(mywin);
 					touchwin(wn);
 					wrefresh(mywin);	/* altes Fenster überbügeln */
 				}
-				set_skill(u, x, q * u->number);
-				sprintf(buf, "%s %d [%d]", skillname(x, NULL), eff_skill(u, x, r), q);
+				set_level(u, x, q);
+				sprintf(buf, "%s %d", skillname(x, NULL), eff_skill(u, x, r));
 				free(TL[x]);
 				modif = 1;
 				TL[x] = strdup(buf);
@@ -498,12 +497,12 @@ modify_unit(region * r, unit * modunit)
 		x = 0;
 		Addstr("Talente: ");
 		for (sk = 0; sk != MAXSKILLS; sk++) {
-			if ((a = get_skill(u, sk))!=0) {
+			if (has_skill(u, sk)) {
 				if (x) {
 					Addstr(", ");
 					q += 2;
 				}
-				sprintf(buf, "%s %d [%d]", skillname(sk, NULL), eff_skill(u, sk, r), a / u->number);
+				sprintf(buf, "%s %d", skillname(sk, NULL), eff_skill(u, sk, r));
 				q += strlen(buf);
 				if (q > SX - 8) {
 					q = strlen(buf);
