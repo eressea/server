@@ -556,7 +556,7 @@ cr_output_unit(FILE * F, const region * r,
 				ap = a_find(u->faction->attribs, &at_raceprefix);
 			}
 			if (ap) {
-				const char * name = (const char*)a->data.v;
+				const char * name = (const char*)ap->data.v;
 				fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
 			}
 			fprintf(F, "%d;Partei\n", u->faction->no);

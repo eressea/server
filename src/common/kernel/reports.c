@@ -117,16 +117,11 @@ hp_status(const unit * u)
 {
 	double p = (double) ((double) u->hp / (double) (u->number * unit_max_hp(u)));
 
-	if (p > 2.00)
-		return "dmg_critical";
-	if (p > 1.50)
-		return "dmg_heavily";
-	if (p < 0.50)
-		return "dmg_badly";
-	if (p < 0.75)
-		return "dmg_wounded";
-	if (p < 0.99)
-		return "dmg_exhausted";
+	if (p > 2.00) return mkname("damage", "critical");
+	if (p > 1.50) return mkname("damage", "heavily");
+	if (p < 0.50) return mkname("damage", "badly");
+	if (p < 0.75) return mkname("damage", "wounded");
+	if (p < 0.99) return mkname("damage", "exhausted");
 
 	return NULL;
 }

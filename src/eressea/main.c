@@ -583,8 +583,8 @@ main(int argc, char *argv[])
 	kernel_init();
 	game_init();
 #if defined(BETA_CODE) && 0
-	xml_writeships(); 
-	/* xml_writeitems("items.xml"); */
+	/* xml_writeships(); */
+	xml_writeitems("items.xml");
 	return 0;
 #endif
 

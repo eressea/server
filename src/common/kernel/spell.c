@@ -6916,7 +6916,7 @@ sp_destroy_curse(castorder *co)
 	switch(obj){
 		case SPP_REGION:
 			ap = &r->attribs;
-			set_string(&ts, regionid(r));
+			set_string(&ts, regionname(r, mage->faction));
 			break;
 
 		case SPP_UNIT:

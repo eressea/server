@@ -3153,26 +3153,27 @@
 			<text locale="en">dwarf</text>
 		</string>
 
-		<string name="dmg_critical">
+	</namespace>
+	<namespace name="damage">
+		<string name="critical">
 			<text locale="de">sehr stark</text>
 			<text locale="en">critically wounded</text>
 		</string>
-		<string name="dmg_heavily">
+		<string name="heavily">
 			<text locale="de">stark</text>
 			<text locale="en">heavily wounded</text>
 		</string>
-		<string name="dmg_badly">
+		<string name="badly">
 			<text locale="de">schwer verwundet</text>
 			<text locale="en">badly wounded</text>
 		</string>
-		<string name="dmg_wounded">
+		<string name="wounded">
 			<text locale="de">verwundet</text>
 			<text locale="en">wounded</text>
 		</string>
-		<string name="dmg_exhausted">
+		<string name="exhausted">
 			<text locale="de">erschöpft</text>
 			<text locale="en">exhausted</text>
 		</string>
-
 	</namespace>
 </strings>

@@ -1919,12 +1919,14 @@ use_bloodpotion(struct unit *u, const struct potion_type *ptype, const char *cmd
 static int
 use_mistletoe(struct unit * user, const struct item_type * itype, const char * cmd)
 {
-	if (user->number!=1) {
+	int mtoes = new_get_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK);
+
+	if (user->number>mtoes) {
 		ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
 			"unit item region command", user, itype, user->region, cmd));
 		return -1;
 	}
-	new_use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1);
+	new_use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
 	a_add(&user->attribs, make_fleechance((float)1.0));
 		ADDMSG(&user->faction->msgs, msg_message("use_item",
 			"unit item", user, itype));

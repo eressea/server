@@ -52,22 +52,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* eine insel pro 9x9 feld. das erste feld von (0,0) bis (8,8) */
-
-/* Ozean und Grasland wird automatisch generiert (ein Ozean, darin eine Insel
- * aus Grasland). Jedes Seed generiert ein Feld des entsprechenden terrains,
- * und max. 3 angrenzende Felder. Details in der Funktion SEED und TRANSMUTE in
- * REGIONS.C */
-
-/* ------------------------------------------------------------- */
-
-/* OCEAN, PLAIN, FOREST, SWAMP, DESERT, HIGHLAND, MOUNTAIN, GLACIER,
- * MAXTERRAINS */
-
-/* ------------------------------------------------------------- */
-
-/* ------------------------------------------------------------- */
-
 void
 createmonsters(void)
 {
@@ -90,8 +74,6 @@ createmonsters(void)
 }
 
 /* ------------------------------------------------------------- */
-
-
 
 void
 listnames(void)

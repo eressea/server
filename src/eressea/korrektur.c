@@ -2665,6 +2665,28 @@ convert_skills(void)
 }
 #endif
 
+static int
+fix_questcoors(void)
+{
+	plane * p = getplanebyid (59034966);
+	if (p) {
+		faction * f;
+		region * eternath = findregion(-8750, 3631);
+		if (eternath) for (f=factions;f;f=f->next) {
+			ursprung * u = f->ursprung;
+			while (u) {
+				if (u->id == p->id) {
+					u->x = eternath->x;
+					u->y = eternath->y;
+					break;
+				}
+				u=u->next;
+			}
+		}
+	}
+	return 0;
+}
+
 void
 korrektur(void)
 {
@@ -2715,6 +2737,7 @@ korrektur(void)
 	do_once("idlo", fix_idleout());
 	do_once("szip", set_zip());
 	do_once("heal", heal_all());
+	do_once("fqco", fix_questcoors());
 
 	/* seems something fishy is going on, do this just 
 	 * to be on the safe side: 

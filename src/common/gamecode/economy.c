@@ -1825,7 +1825,7 @@ create_item(unit * u, const item_type * itype, int want)
 	}
 }
 
-void
+static void
 make(region * r, unit * u)
 {
 	char *s;
@@ -2512,7 +2512,7 @@ plant(region *r, unit *u, int raw)
 }
 
 #if GROWING_TREES
-void
+static void
 planttrees(region *r, unit *u, int raw)
 {
 	int n, i, skill, planted = 0;
@@ -2558,8 +2558,8 @@ planttrees(region *r, unit *u, int raw)
 	produceexp(u, SK_HERBALISM, u->number);
 	new_use_pooled(u, itype->rtype, GET_DEFAULT, n);
 
-	add_message(&u->faction->msgs, new_message(u->faction,
-		"plant%u:unit%r:region%i:amount%X:herb", u, r, planted, itype->rtype));
+	ADDMSG(&u->faction->msgs, msg_message("plant", 
+		"unit region amount herb", u, r, planted, itype->rtype));
 }
 #endif
 
@@ -2759,7 +2759,7 @@ rough_amount(int a, int m)
 	return "sehr viele";
 }
 
-void
+static void
 research(region *r, unit *u)
 {
 	char *s;
