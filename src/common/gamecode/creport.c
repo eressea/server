@@ -633,7 +633,7 @@ cr_output_unit(FILE * F, const region * r,
 		const faction * sf = visible_faction(f, u);
 		const char * prefix = raceprefix(u);
 		if (u->faction == f || omniscient(f)) {
-			const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
+			const attrib * a_otherfaction = a_find(u->attribs, &at_otherfaction);
 			const faction * otherfaction = a_otherfaction?get_otherfaction(a_otherfaction):NULL;
 			/* my own faction, full info */
 			const attrib *a = a_find(u->attribs, &at_group);
@@ -645,22 +645,29 @@ cr_output_unit(FILE * F, const region * r,
 			if (sf!=u->faction) fprintf(F, "%d;Verkleidung\n", sf->no);
 			if (fval(u, UFL_PARTEITARNUNG))
 				fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_PARTEITARNUNG)));
-			if (otherfaction)
-				fprintf(F, "%d;Anderepartei\n", otherfaction->no);
-		} else {
+      if (otherfaction) {
+        if (otherfaction!=u->faction) {
+          fprintf(F, "%d;Anderepartei\n", otherfaction->no);
+        }
+      }
+    } else {
 			if (fval(u, UFL_PARTEITARNUNG)) {
 				/* faction info is hidden */
 				fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, UFL_PARTEITARNUNG)));
 			} else {
-				const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
+				const attrib * a_otherfaction = a_find(u->attribs, &at_otherfaction);
 				const faction * otherfaction = a_otherfaction?get_otherfaction(a_otherfaction):NULL;
 				/* other unit. show visible faction, not u->faction */
 				fprintf(F, "%d;Partei\n", sf->no);
 				if (sf == f) {
 					fprintf(F, "1;Verraeter\n");
 				}
-				if (a_otherfaction && alliedunit(u, f, HELP_FSTEALTH)) {
-					fprintf(F, "%d;Anderepartei\n", otherfaction->no);
+        if (a_otherfaction) {
+          if (otherfaction!=u->faction) {
+            if (alliedunit(u, f, HELP_FSTEALTH)) {
+              fprintf(F, "%d;Anderepartei\n", otherfaction->no);
+            }
+          }
 				}
 			}
 		}

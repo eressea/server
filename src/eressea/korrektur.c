@@ -482,6 +482,26 @@ fix_firewalls(void)
   }
 }
 
+static void
+fix_otherfaction(void)
+{
+  int count = 0;
+  region * r;
+  for (r=regions;r;r=r->next) {
+    unit * u;
+    for (u=r->units;u;u=u->next) {
+      attrib * a = a_find(u->attribs, &at_otherfaction);
+      faction * f = (faction*)a->data.v;
+      if (f==u->faction) {
+        a_remove(&u->attribs, a);
+        ++ncount;
+      }
+    }
+    r = r->next;
+  }
+  if (count) log_warning(("%u units had otherfaction=own faction.\n"));
+}
+
 extern attrib * make_atgmcreate(const struct item_type * itype);
 extern attrib * make_atpermissions(void);
 extern struct attrib_type at_permissions;
@@ -1093,6 +1113,7 @@ korrektur(void)
 	 * to be on the safe side:
 	 */
 	fix_demand();
+  fix_otherfaction();
 	/* trade_orders(); */
 
 	/* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
