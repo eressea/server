@@ -587,8 +587,7 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 				u2->irace = u->irace;
 			} else if (u2 && u2->race != u->race) {
 				error = 139;
-			}
-			if (u2) {
+			} else if (u2) {
 				/* Einheiten von Schiffen können nicht NACH in von
 				* Nicht-alliierten bewachten Regionen ausführen */
 				sh = leftship(u);
