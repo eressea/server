@@ -98,6 +98,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 {
 	xml_stack * start = stack;
 	enum { TAG, ENDTAG, ATNAME, ATVALUE, PLAIN } state = PLAIN;
+	boolean startline = true;
 	char tokbuffer[1024];
 	char * pos = tokbuffer;
 	int quoted = 0;
@@ -199,8 +200,20 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 				case '>':
 					*pos='\0';
 					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
+				case '\n':
+					/* ignore */
+					if (!startline) *pos++ = ' ';
+					startline = true;
+					break;
+				case ' ':
+				case '\t':
+					if (!startline) {
+						*pos++ = (char)c;
+					}
+					break;
 				default:
 					*pos++ = (char)c;
+					startline = false;
 				}
 				break; /* case PLAIN */
 			case TAG:
@@ -219,6 +232,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb, void * data, xml_stack * sta
 					}
 					if (cb && cb->tagbegin) cb->tagbegin(stack, data);
 					state = PLAIN;
+					startline = true;
 					pos = tokbuffer;
 					break;
 				default:

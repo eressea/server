@@ -5,6 +5,15 @@
 </comment>
 
 <strings>
+	<namespace name="info">
+		<string name="mistletoe">
+			<text locale="de">Im Mistelzweig ruht eine magische Kraft
+			besonderer Art. Der Anwender wird von seinen Feinden in Frieden
+			gelassen, eine Woche lang l‰ﬂt jeder K‰mpfer ihn unbeschadet
+			seines Weges ziehen.</text>
+			<text locale="en">The magical misteltoe has a wonderous property: It's use will make one person able to escape unharmed from every conflict, no enemy will lay hand on the bearer for one week.</text>
+		</string>
+	</namespace>
 	<namespace name="race">
 		<string name="clone">
 			<text locale="de">Klon</text>

@@ -717,7 +717,11 @@ main(int argc, char *argv[])
 			for (u=r->units;u;u=u->next) scale_number(u, 1);
 		}
 	}
-	if (g_writemap) return crwritemap();
+	if (g_writemap) return crwritemap(); 
+	{
+		faction * monster = findfaction(MONSTER_FACTION);
+		display_item(monster, monster->units, it_find("mistletoe"));
+	}
 	if ((i=processturn(orders))!=0) return i;
 
 #ifdef CLEANUP_CODE

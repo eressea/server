@@ -2041,35 +2041,39 @@ display_item(faction *f, unit *u, const item_type * itype)
 	FILE *fp;
 	char t[NAMESIZE + 1];
 	char filename[MAX_PATH];
-	const char *name;
+	const char *name, *info;
 
 	if (u && *i_find(&u->items, itype) == NULL) return false;
-	name = resourcename(itype->rtype, 0);
-	sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
-	fp = fopen(filename, "r");
-	if (!fp) {
-		name = locale_string(f->locale, resourcename(itype->rtype, 0));
+	info = mkname("info", itype->rtype->_name[0]);
+	name = LOC(u->faction->locale, info);
+	if (name==info) {
+		name = resourcename(itype->rtype, 0);
 		sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
 		fp = fopen(filename, "r");
-	}
-	if (!fp) {
-		name = resourcename(itype->rtype, 0);
-		sprintf(filename, "%s/items/%s", resourcepath(), name);
-		fp = fopen(filename, "r");
-	}
-	if (!fp) return false;
-
-	sprintf(buf, "%s: ", LOC(f->locale, name));
-
-	while (fgets(t, NAMESIZE, fp) != NULL) {
-		if (t[strlen(t) - 1] == '\n') {
-			t[strlen(t) - 1] = 0;
+		if (!fp) {
+			name = locale_string(f->locale, resourcename(itype->rtype, 0));
+			sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
+			fp = fopen(filename, "r");
 		}
-		strcat(buf, t);
-	}
-	fclose(fp);
+		if (!fp) {
+			name = resourcename(itype->rtype, 0);
+			sprintf(filename, "%s/items/%s", resourcepath(), name);
+			fp = fopen(filename, "r");
+		}
+		if (!fp) return false;
 
-	addmessage(0, f, buf, MSG_EVENT, ML_IMPORTANT);
+		sprintf(buf, "%s: ", LOC(f->locale, name));
+
+		while (fgets(t, NAMESIZE, fp) != NULL) {
+			if (t[strlen(t) - 1] == '\n') {
+				t[strlen(t) - 1] = 0;
+			}
+			strcat(buf, t);
+		}
+		fclose(fp);
+		name = buf;
+	}
+	addmessage(0, f, name, MSG_EVENT, ML_IMPORTANT);
 
 	return true;
 }

@@ -317,36 +317,44 @@
 		<text locale="en">"'$command' - $unit($unit) marched into $region($region) during the last turn and is too exhausted to attack."</text>
 	</message>
 
-	<message name="mistake">
+	<message name="use_singleperson" section="errors">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="item" type="resource"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - $resource($item,0) können nur von Ein-Personen Einheiten benutzt werden."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - $resource($item,0) can only be used by single-person units."</text>
+	</message>
+
+	<message name="use_item" section="events">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="item" type="resource"></arg>
+		</type>
+		<text locale="de">"$unit($unit) benutzt ein $resource($item,1)."</text>
+		<text locale="en">"$unit($unit) uses a $resource($item,1)."</text>
+	</message>
+
+	<message name="mistake" section="errors">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 			<arg name="error" type="string"></arg>
 		</type>
-		<locale name="de">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - ${error}."</text>
-			</nr>
-		</locale>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - ${error}."</text>
 	</message>
 
-	<message name="error1">
+	<message name="error1" section="errors">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<locale name="de">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Auf dem Schiff befinden sich zuwenig erfahrene Seeleute."</text>
-			</nr>
-		</locale>
-		<locale name="en">
-			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - There are not enough experienced sailors on board the ship."</text>
-			</nr>
-		</locale>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Auf dem Schiff befinden sich zuwenig erfahrene Seeleute."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - There are not enough experienced sailors on board the ship."</text>
 	</message>
 
 	<message name="error2">
@@ -7345,7 +7353,7 @@
 	  <text locale="de">"Zur Feier des Geburtstags von ${name} wird in $region($region) ein großes Feuerwerk abgebrannt, welches noch hier zu bewundern ist. Kaskaden bunter Sterne, leuchtende Wasserfälle aus Licht und strahlende Feuerdrachen erhellen den Himmel."</text>
 	  <text locale="en">"A large firework in honor of ${name}, visible all over the sky, has been started in $region($region)."
 	</message>
-	
+
 	<message name="birthday_firework_local">
 	  <type>
 	    <arg name="unit" type="unit"></arg>
@@ -7354,7 +7362,7 @@
 	  <text locale="de">"Zur Feier des Geburtstags von ${name} brennt $unit($unit) ein großes Feuerwerk ab. Kaskaden bunter Sterne, leuchtende Wasserfälle aus Licht und strahlende Feuerdrachen erhellen den Himmel."</text>
 	  <text locale="en">"A large firework in honor of ${name} is visible all over the sky."</text>
 	</message>
-	
+
 	<message name="birthday_firework_noname">
 	  <type>
 	    <arg name="unit" type="unit"></arg>

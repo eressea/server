@@ -1466,8 +1466,8 @@ randomevents(void)
 					&& (u->race->flags & RCF_DESERT)) {
 				if (fval(u, FL_ISNEW)) continue;
 				if (rand()%100 < 5) {
-					ADDMSG(&u->faction->msgs, new_message(u->faction,
-						"desertion%u:unit%r:region", u, r));
+					ADDMSG(&u->faction->msgs, msg_message("desertion",
+						"unit region", u, r));
 					u_setfaction(u, findfaction(MONSTER_FACTION));
 				}
 			}

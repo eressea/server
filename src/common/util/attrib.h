@@ -25,6 +25,7 @@ typedef struct attrib {
 		afun f;
 		void * v;
 		int i;
+		float flt;
 		char c;
 		short s;
 		short sa[2];

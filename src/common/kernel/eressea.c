@@ -2013,6 +2013,7 @@ init_tokens(const struct locale * lang)
 	init_directions(&lnames->directions, lang);
 	for (rc=races;rc;rc=rc->next) {
 		addtoken(&lnames->races, LOC(lang, rc_name(rc, 1)), (void*)rc);
+		addtoken(&lnames->races, LOC(lang, rc_name(rc, 0)), (void*)rc);
 	}
 	for (i=0;i!=MAXPARAMS;++i)
 		addtoken(&lnames->tokens[UT_PARAM], LOC(lang, parameters[i]), (void*)i);

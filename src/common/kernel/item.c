@@ -32,6 +32,7 @@
 #include "unit.h"
 
 /* util includes */
+#include <message.h>
 #include <functions.h>
 #include <goodies.h>
 
@@ -1329,6 +1330,7 @@ static translate_t translation[] = {
 	{ "Mallorn", "mallorn", "mallorn_p", "mallorn", "mallorn_p" },
 	{ "Wagen", "cart", "cart_p", "cart", "cart_p" },
 	{ "Plattenpanzer", "plate", "plate_p", "plate", "plate_p" },
+	{ "Trollgürtel", "trollbelt", "trollbelt_p", "trollbelt", "trollbelt_p" },
 	{ "Balsam", "balm", "balm_p", "balm", "balm_p" },
 	{ "Gewürz", "spice", "spice_p", "spice", "spice_p" },
 	{ "Myrrhe", "myrrh", "myrrh_p", "myrrh", "myrrh_p" },
@@ -1913,6 +1915,23 @@ use_bloodpotion(struct unit *u, const struct potion_type *ptype, const char *cmd
 	return 0;
 }
 
+#include <attributes/fleechance.h>
+static int
+use_mistletoe(struct unit * user, const struct item_type * itype, const char * cmd)
+{
+	if (user->number!=1) {
+		ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
+			"unit item region command", user, itype, user->region, cmd));
+		return -1;
+	}
+	new_use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1);
+	a_add(&user->attribs, make_fleechance((float)1.0));
+		ADDMSG(&user->faction->msgs, msg_message("use_item",
+			"unit item", user, itype));
+	
+	return 0;
+}
+
 void
 init_oldpotions(void)
 {
@@ -2394,6 +2413,7 @@ init_items(void)
 	register_function((pf_generic)use_antimagiccrystal, "useantimagiccrystal");
 	register_function((pf_generic)use_warmthpotion, "usewarmthpotion");
 	register_function((pf_generic)use_bloodpotion, "usebloodpotion");
+	register_function((pf_generic)use_mistletoe, "usemistletoe");
 
 	register_function((pf_generic)give_horses, "givehorses");
 }

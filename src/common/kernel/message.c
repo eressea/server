@@ -293,6 +293,7 @@ int
 read_messages(FILE * F, struct xml_stack * stack)
 {
 	xml_state state;
+	memset(&state, 0, sizeof(state));
 	return xml_parse(F, &msgcallback, &state, stack);
 }
 

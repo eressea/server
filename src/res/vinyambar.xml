@@ -8,7 +8,7 @@
 	<include file="en/strings.xml"></include>
 
 	<include file="races.xml"></include>
-	<include file="items.xml"></include>
+	<include file="resources.xml"></include>
 
 	<game name="Vinyambar II" units="250" welcome="vinyambar">
 		<comment>Game specific</comment>

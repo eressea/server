@@ -4437,7 +4437,7 @@ sp_recruit(castorder *co)
 
 	rsetpeasants(r, rpeasants(r) - n);
 	u = create_unit(r, f, n, f->race, 0, (n == 1 ? "Bauer" : "Bauern"), mage);
-	set_string(&u->thisorder, locale_string(u->faction->locale, keywords[K_WORK]));
+	set_string(&u->thisorder, locale_string(u->faction->locale, "defaultorder"));
 
 	sprintf(buf, "%s konnte %d %s anwerben", unitname(mage), n,
 			n == 1 ? "Bauer" : "Bauern");
@@ -4956,7 +4956,7 @@ sp_illusionary_shapeshift(castorder *co)
 		sprintf(buf, "%s %s keine %s-Gestalt annehmen.",
 			unitname(u),
 			u->number > 1 ? "können" : "kann",
-			rc_name(rc, 2));
+			LOC(u->faction->locale, rc_name(rc, 2)));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
@@ -4967,7 +4967,7 @@ sp_illusionary_shapeshift(castorder *co)
 	u->irace = rc;
 
 	sprintf(buf, "%s läßt %s als %s erscheinen.",
-		unitname(mage), unitname(u), rc_name(rc, u->number != 1));
+		unitname(mage), unitname(u), LOC(u->faction->locale, rc_name(rc, u->number != 1)));
 	addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
 
 	return cast_level;

@@ -64,6 +64,7 @@ typedef enum combatmagic {
 
 /* attributes includes */
 #include <attributes/key.h>
+#include <attributes/fleechance.h>
 #include <attributes/racename.h>
 #include <attributes/otherfaction.h>
 #include <attributes/moved.h>
@@ -2078,8 +2079,8 @@ double
 fleechance(unit * u)
 {
 	double c = 0.20;			/* Fluchtwahrscheinlichkeit in % */
-	region *r = u->region;
-
+	region * r = u->region;
+	attrib * a = a_find(u->attribs, &at_fleechance);
 	/* Einheit u versucht, dem Getümmel zu entkommen */
 
 	c += (eff_skill(u, SK_STEALTH, r) * 0.05);
@@ -2095,6 +2096,8 @@ fleechance(unit * u)
 	} else {
 		c = min(c, 0.75);
 	}
+
+	if (a!=NULL) c += a->data.flt;
 
 	return c;
 }
