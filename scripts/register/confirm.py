@@ -30,6 +30,7 @@ while (records>0):
     gameinfo=row[5]
     subscription=row[6]
 
+    print "Sent confirmation to "+email+" for "+gamename+"."
     Msg = ("From: "+From+"\nTo: "+email+"\nSubject: Vinyambar Anmeldung angenommen.\n\n"+
         "Deine Anmeldung für '"+gamename+"' wurde akzeptiert.\n"
         "\n"+
