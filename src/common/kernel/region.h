@@ -154,6 +154,9 @@ void runhash(struct region * r);
 void free_regionlist(region_list *rl);
 void add_regionlist(region_list **rl, struct region *r);
 extern struct spec_direction * special_direction(const region * from, const region * to);
+extern struct attrib *create_special_direction(struct region *r, struct region *rt,
+                                               int duration, const char *desc, 
+                                               const char *keyword);
 
 int woodcount(const struct region * r);
 int deathcount(const struct region * r);

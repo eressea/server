@@ -221,6 +221,24 @@ attrib_type at_direction = {
 };
 
 
+attrib *
+create_special_direction(region *r, region * rt, int duration,
+                         const char *desc, const char *keyword)
+
+{
+  attrib *a = a_add(&r->attribs, a_new(&at_direction));
+  spec_direction *d = (spec_direction *)(a->data.v);
+
+  d->active = false;
+  d->x = rt->x;
+  d->y = rt->y;
+  d->duration = duration;
+  d->desc = strdup(desc);
+  d->keyword = strdup(keyword);
+
+  return a;
+}
+
 /* Moveblock wird zur Zeit nicht über Attribute, sondern ein Bitfeld
    r->moveblock gemacht. Sollte umgestellt werden, wenn kompliziertere
 	 Dinge gefragt werden. */
@@ -371,12 +389,11 @@ koor_reldirection(int ax, int ay, int bx, int by)
 spec_direction *
 special_direction(const region * from, const region * to)
 {
-  spec_direction *sd;
   const attrib *a = a_findc(from->attribs, &at_direction);
   
   while (a!=NULL) {
-    sd = (spec_direction *)a->data.v;
-    if (sd->active && sd->x==to->x && sd->y==to->y) return sd;
+    spec_direction * sd = (spec_direction *)a->data.v;
+    if (sd->x==to->x && sd->y==to->y) return sd;
     a = a->nexttype;
   }
   return NULL;
@@ -389,7 +406,7 @@ reldirection(const region * from, const region * to)
 
   if (dir==NODIRECTION) {
     spec_direction *sd = special_direction(from, to);
-    if (sd!=NULL) return D_SPECIAL;
+    if (sd!=NULL && sd->active) return D_SPECIAL;
   }
   return dir;
 }

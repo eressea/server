@@ -22,6 +22,8 @@ function test_movement()
   r3 = terraform(3, 0, "plain")
   r4 = terraform(4, 0, "glacier")
 
+  r0:add_direction(r4, "Wirbel", "Nimm die Abkürzung, Luke")
+
   r0:set_road(east, 1.0)
   r1:set_road(west, 1.0)
   r1:set_road(east, 1.0)
@@ -49,6 +51,10 @@ function test_movement()
   for i = 1, 100 do
     ships[i] = add_ship("boat", ocean)
   end
+
+  astra = mkunit(orcs, r0, 1)
+  astra:add_order("NACH Wirbel")
+  astra:add_order("NUMMER EINHEIT astr")
 
   foot = mkunit(orcs, r0, 1)
   foot:add_order("ROUTE W W")
@@ -407,4 +413,7 @@ if not drift then
 end
 if foot.region ~= w1 then
   print "ERROR: Fusseinheit hat ihr NACH nicht korrekt ausgeführt"
+end
+if astra.region ~= r4 then
+  print "ERROR: Astraleinheit konnte Wirbel nicht benutzen"
 end

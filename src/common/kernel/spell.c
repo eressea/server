@@ -3621,10 +3621,10 @@ sp_chaossuction(castorder *co)
 		return 0;
 	}
 
-	create_special_direction(r, rt->x, rt->y, 2,
+	create_special_direction(r, rt, 2,
 			"Ein Wirbel aus reinem Chaos zieht über die Region.",
 			"Wirbel");
-	create_special_direction(rt, r->x, r->y, 2,
+	create_special_direction(rt, r, 2,
 			"Ein Wirbel aus reinem Chaos zieht über die Region.",
 			"Wirbel");
 

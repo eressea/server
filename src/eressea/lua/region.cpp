@@ -3,11 +3,11 @@
 #include "list.h"
 
 // kernel includes
+#include <kernel/building.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
-#include <kernel/unit.h>
-#include <kernel/building.h>
 #include <kernel/ship.h>
+#include <kernel/unit.h>
 
 // lua includes
 #include <lua.hpp>
@@ -157,6 +157,14 @@ region_next(const region& r, int dir)
   return r_connect(&r, (direction_t)dir);
 }
 
+static void
+region_adddirection(region& r, region &rt, const char * name, const char * info)
+{
+  create_special_direction(&r, &rt, -1, info, name);
+  spec_direction * sd = special_direction(&r, &rt);
+  sd->active = 1;
+}
+
 void
 bind_region(lua_State * L) 
 {
@@ -172,6 +180,7 @@ bind_region(lua_State * L)
     .property("info", &region_getinfo, &region_setinfo)
     .property("terrain", &region_getterrain)
     .def("add_notice", &region_addnotice)
+    .def("add_direction", &region_adddirection)
 
     .def("get_flag", &region_getflag)
     .def("set_flag", &region_setflag)

@@ -2760,24 +2760,6 @@ magic(void)
   }
 }
 
-attrib *
-create_special_direction(region *r, int x, int y, int duration,
-						 const char *desc, const char *keyword)
-
-{
-	attrib *a = a_add(&r->attribs, a_new(&at_direction));
-	spec_direction *d = (spec_direction *)(a->data.v);
-
-        d->active = false;
-	d->x = x;
-	d->y = y;
-	d->duration = duration;
-	d->desc = strdup(desc);
-	d->keyword = strdup(keyword);
-
-	return a;
-}
-
 const char *
 spell_info(const struct spell * sp, const struct locale * lang)
 {
