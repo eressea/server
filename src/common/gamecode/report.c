@@ -487,7 +487,9 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
           scat(" * Stufe");
         }
       } else {
-        itemanz *= sp->level;
+        if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR ) {
+          itemanz *= sp->level;
+        }
         sprintf(buf, "  %d %s", itemanz, LOC(lang, resname(res, itemanz!=1)));
       }
 			rps(F, buf);
