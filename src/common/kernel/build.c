@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: build.c,v 1.5 2001/02/04 08:52:24 enno Exp $
+ *	$Id: build.c,v 1.6 2001/02/04 10:04:51 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -716,22 +716,23 @@ build_building(unit * u, const building_type * btype, int want)
 		cmistake(u, findorder(u, u->thisorder), 4, MSG_PRODUCE);
 		return;
 	case ENOMATERIALS: {
-			/* something missing from the list of materials */
-			const construction * cons = btype->construction;
-			char * ch = buf+strlen(buf);
-			assert(cons);
-			strcpy(buf, "Dafür braucht man mindestens:");
-			for (c=0;cons->materials[c].number; c++) {
-				int n;
-				if (c!=0) strcat(ch++, ",");
-				n = cons->materials[c].number / cons->reqsize;
-				sprintf(ch, " %d %s", n?n:1, resname(cons->materials[c].type, cons->materials[c].number==1));
-				ch = ch+strlen(ch);
-			}
-			strcat(ch,".");
-			mistake(u, u->thisorder, buf, MSG_PRODUCE);
-			return;
+		/* something missing from the list of materials */
+		const construction * cons = btype->construction;
+		char * ch;
+		assert(cons);
+		strcpy(buf, "Dafür braucht man mindestens:");
+		ch = buf+strlen(buf);
+		for (c=0;cons->materials[c].number; c++) {
+			int n;
+			if (c!=0) strcat(ch++, ",");
+			n = cons->materials[c].number / cons->reqsize;
+			sprintf(ch, " %d %s", n?n:1, resname(cons->materials[c].type, cons->materials[c].number==1));
+			ch = ch+strlen(ch);
 		}
+		strcat(ch,".");
+		mistake(u, u->thisorder, buf, MSG_PRODUCE);
+		return;
+	}
 	case ELOWSKILL:
 	case ENEEDSKILL:
 		/* no skill, or not enough skill points to build */
