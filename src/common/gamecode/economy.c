@@ -98,7 +98,7 @@ static int norders;
 static request *oa;
 
 static int 
-giverestriction() {
+giverestriction(void) {
 	static int value = -1;
 	if (value<0) {
 		value = atoi(get_param(global.parameters, "GiveRestriction"));

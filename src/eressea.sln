@@ -60,12 +60,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "util", "common\util\util.vc
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xmlsplitter", "D:\Documents\eressea\src\freeze\tools\xmlsplitter.vcproj", "{8031178A-081B-4BFA-AA98-46A2B03A3202}"
-	ProjectSection(ProjectDependencies) = postProject
-		{1D80D05F-BCF5-4971-8F06-D9581FD3B1F4} = {1D80D05F-BCF5-4971-8F06-D9581FD3B1F4}
-		{EDB0DE67-8215-4AF7-ACA1-F23CB11FF211} = {EDB0DE67-8215-4AF7-ACA1-F23CB11FF211}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -114,10 +108,6 @@ Global
 		{1D80D05F-BCF5-4971-8F06-D9581FD3B1F4}.Debug.Build.0 = Debug|Win32
 		{1D80D05F-BCF5-4971-8F06-D9581FD3B1F4}.Release.ActiveCfg = Release|Win32
 		{1D80D05F-BCF5-4971-8F06-D9581FD3B1F4}.Release.Build.0 = Release|Win32
-		{8031178A-081B-4BFA-AA98-46A2B03A3202}.Debug.ActiveCfg = Debug|Win32
-		{8031178A-081B-4BFA-AA98-46A2B03A3202}.Debug.Build.0 = Debug|Win32
-		{8031178A-081B-4BFA-AA98-46A2B03A3202}.Release.ActiveCfg = Release|Win32
-		{8031178A-081B-4BFA-AA98-46A2B03A3202}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

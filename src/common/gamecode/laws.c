@@ -101,7 +101,7 @@ boolean nobattle = false;
 /* ------------------------------------------------------------- */
 
 static int 
-RemoveNMRNewbie() {
+RemoveNMRNewbie(void) {
 	static int value = -1;
 	if (value<0) {
 		value = atoi(get_param(global.parameters, "nmr.removenewbie"));
