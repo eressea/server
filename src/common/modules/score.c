@@ -282,24 +282,24 @@ score(void)
 
 		for (a = alliances; a; a = a->next) {
 			int alliance_score = 0, alliance_number = 0, alliance_factions = 0;
-      int grails = 0;
+			int grails = 0;
 
 			for (f = factions; f; f = f->next) {
 				if(f->alliance && f->alliance->id == a->id) {
 					alliance_factions++;
 					alliance_score  += f->score;
 					alliance_number += f->number;
+					if (token!=NULL) {
+						unit * u = f->units;
+						while (u!=NULL) {
+							item ** iitem = i_find(&u->items, token);
+							if (iitem!=NULL && *iitem!=NULL) {
+								grails += (*iitem)->number;
+							}
+							u=u->nextF;
+						}
+					}
 				}
-        if (token!=NULL) {
-          unit * u = f->units;
-          while (u!=NULL) {
-            item ** iitem = i_find(&u->items, token);
-            if (iitem!=NULL && *iitem!=NULL) {
-              grails += (*iitem)->number;
-            }
-            u=u->nextF;
-          }
-        }
 			}
 
 			fprintf(scoreFP, "%d:%d:%d:%d", a->id, alliance_factions, alliance_number, alliance_score);
