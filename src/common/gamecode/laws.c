@@ -2367,6 +2367,10 @@ instant_orders(void)
 					break;
 
 				case K_GUARD:
+					if (u->faction->age < IMMUN_GEGEN_ANGRIFF) {
+						cmistake(u, S->s, 304, MSG_EVENT);
+						break;
+					}
 					if (fval(u, FL_HUNGER)) {
 						cmistake(u, S->s, 223, MSG_EVENT);
 						break;
@@ -2447,8 +2451,7 @@ remove_unequipped_guarded(void)
 
 	for (r = regions; r; r = r->next)
 		for (u = r->units; u; u = u->next) {
-			int g = getguard(u);
-			if (g && !armedmen(u))
+			if (getguard(u) && (!armedmen(u) || u->faction->age < IMMUN_GEGEN_ANGRIFF))
 				setguard(u, GUARD_NONE);
 		}
 }

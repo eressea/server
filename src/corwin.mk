@@ -4,7 +4,7 @@ ifndef ERESSEA
 endif
 
 # Hier definieren, damit nicht '@gcc'
-CC      = gcc-3.0 -D_GNU_SOURCE -DLARGE_CASTLES -DNEW_RESOURCEGROWTH -DGROWING_TREES
+CC      = gcc-3.0 -D_GNU_SOURCE
 # CC      = gcc -D_GNU_SOURCE
 AR      = ar
 CTAGS   = ctags

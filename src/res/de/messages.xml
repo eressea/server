@@ -4261,6 +4261,24 @@
 		</locale>
 	</message>
 
+	<message name="error304">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<locale name="de">
+			<nr section="errors">
+							<text>"$unit($unit) in $region($region): '$command' - Einheiten einer Partei, die noch immun gegen Angriffe ist, dürfen nicht bewachen."</text>
+			</nr>
+		</locale>
+		<locale name="en">
+			<nr section="errors">
+							<text>"$unit($unit) in $region($region): '$command' - units of a faction that can't be attacked may not guard."</text>
+			</nr>
+		</locale>
+	</message>
+
 	<message name="msg_event">
 		<type>
 			<arg name="string" type="string"></arg>
