@@ -3610,6 +3610,46 @@
 			<text locale="de">Wolfsgeheul</text>
 			<text locale="en">Timber Wolves</text>
 		</string>
+		<string name="versteinern">
+			<text locale="de">Blick des Basilisken</text>
+			<text locale="en">Gaze Of The Basilisk</text>
+		</string>
+		<string name="strongwall">
+			<text locale="de">Starkes Tor und feste Mauer</text>
+			<text locale="en">Strong Wall And Sturdy Gate</text>
+		</string>
+		<string name="gwyrrddestroymagic">
+			<text locale="de">Geister bannen</text>
+			<text locale="en">Banish Spirits</text>
+		</string>
+		<string name="treewalkenter">
+			<text locale="de">Weg der Bäume</text>
+			<text locale="en">Path Of Trees</text>
+		</string>
+		<string name="treewalkexit">
+			<text locale="de">Sog des Lebens</text>
+			<text locale="en">Ties Of Life</text>
+		</string>
+		<string name="holyground">
+			<text locale="de">Heiliger Boden</text>
+			<text locale="en">Sacred Ground</text>
+		</string>
+		<string name="artefaktsackofconservation">
+			<text locale="de">Erschaffe einen magischen Kräuterbeutel</text>
+			<text locale="en">Create A Magical Herb Pouch</text>
+		</string>
+		<string name="summonent">
+			<text locale="de">Erwecke Ents</text>
+			<text locale="en">Awakening Of The Ents</text>
+		</string>
+		<string name="gwyrrdfamiliar">
+			<text locale="de">Vertrauten binden</text>
+			<text locale="en">Bind Familiar</text>
+		</string>
+		<string name="blessstonecircle">
+			<text locale="de">Segne Steinkreis</text>
+			<text locale="en">Bless Stone Circle</text>
+		</string>
 	</namespace>
 	<namespace name="spellinfo">
 		<string name="blessedharvest">
@@ -3692,300 +3732,447 @@
 		</string>
 		<string name="treegrow">
 			<text locale="de">Diese Ritual verstärkt die Wirkung des
-			      magischen Trankes um ein vielfaches. Wo sonst aus
-			      einem Stecken nur ein Baum spießen konnte, so
-			      treibt nun jeder Ast Wurzeln.
+				magischen Trankes um ein vielfaches. Wo sonst aus
+				einem Stecken nur ein Baum spießen konnte, so
+				treibt nun jeder Ast Wurzeln.
 			</text>
 			<text locale="en">This ritual greatly increases the
-			      effect of the potion. Now every branch becomes a
-			      sturdy oak where before only one could be grown
-			      from a log.
+				effect of the potion. Now every branch becomes a
+				sturdy oak where before only one could be grown
+				from a log.
 			</text>
 		</string>
 		<string name="rustweapon">
 			<text locale="de">Mit diesem Ritual wird eine dunkle
-			      Gewitterfront beschworen, die sich
-			      unheilverkündend über der Region auftürmt. Der
-			      magische Regen wird alles Erz rosten lassen. Seine
-			      Kraft reicht nicht aus, um Rüstungen unbrauchbar
-			      zu machen, jedoch werden Eisenwaffen so
-			      unbrauchbar schartig und rostig, dass man sie
-			      wegwerfen muss. Die Zerstörungskraft des Regens
-			      ist von der investierten Kraft des Magiers
-			      abhängig. Für jede Stufe können bis zu 10
-			      Eisenwaffen betroffen werden. Ein Ring der Macht
-			      verstärkt die Wirkung wie eine zusätzliche Stufe.
+				Gewitterfront beschworen, die sich
+				unheilverkündend über der Region auftürmt. Der
+				magische Regen wird alles Erz rosten lassen. Seine
+				Kraft reicht nicht aus, um Rüstungen unbrauchbar
+				zu machen, jedoch werden Eisenwaffen so
+				unbrauchbar schartig und rostig, dass man sie
+				wegwerfen muss. Die Zerstörungskraft des Regens
+				ist von der investierten Kraft des Magiers
+				abhängig. Für jede Stufe können bis zu 10
+				Eisenwaffen betroffen werden. Ein Ring der Macht
+				verstärkt die Wirkung wie eine zusätzliche Stufe.
 			</text>
 			<text locale="en">This ritual conjurs up a dark
-			      thunderstorm that affects a whole region. The
-			      magic rain will let rust any ore. Its power is not
-			      strong enough to destroy armors, but any iron
-			      weapons will get so rusty that they won't be
-			      usable any more. The exact number of weapons
-			      affected by the rain depends on the ammount of
-			      power invested by the mage. Up to ten weapons can
-			      be destroyed per level - a Ring Of Power increases
-			      the effect like an additional level.
+				thunderstorm that affects a whole region. The
+				magic rain will let rust any ore. Its power is not
+				strong enough to destroy armors, but any iron
+				weapons will get so rusty that they won't be
+				usable any more. The exact number of weapons
+				affected by the rain depends on the ammount of
+				power invested by the mage. Up to ten weapons can
+				be destroyed per level - a Ring Of Power increases
+				the effect like an additional level.
 			</text>
 		</string>
 		<string name="kaelteschutz">
 			<text locale="de">Dieser Zauber ermöglicht es dem Magier
-			      Insekten auf magische Weise vor der lähmenden
-			      Kälte der Gletscher zu bewahren. Sie können
-			      Gletscher betreten und dort normal agieren. Der
-			      Spruch wirkt auf Stufe*10 Insekten. Ein Ring der
-			      Macht erhöht die Menge der verzauberbaren Insekten
-			      zusätzlich um 10.
+				Insekten auf magische Weise vor der lähmenden
+				Kälte der Gletscher zu bewahren. Sie können
+				Gletscher betreten und dort normal agieren. Der
+				Spruch wirkt auf Stufe*10 Insekten. Ein Ring der
+				Macht erhöht die Menge der verzauberbaren Insekten
+				zusätzlich um 10.
 			</text>
 			<text locale="en">This spell enables the druid to
-			      magically protect insects from the paralysing cold
-			      of a glacier. Under the effect of this spell,
-			      insects are able to enter glaciers and act
-			      normally there. Ten insects per level can be
-			      protected in this way. A Ring Of Power increases
-			      the number by additional ten.
+				magically protect insects from the paralysing cold
+				of a glacier. Under the effect of this spell,
+				insects are able to enter glaciers and act
+				normally there. Ten insects per level can be
+				protected in this way. A Ring Of Power increases
+				the number by additional ten.
 			</text>
 		</string>
 		<string name="hagel">
 			<text locale="de">Im Kampf ruft der Magier die
-			      Elementargeister der Kälte an und bindet sie an
-			      sich. Sodann kann er ihnen befehlen, den Gegner
-			      mit Hagelkörnern und Eisbrocken zuzusetzen.
+				Elementargeister der Kälte an und bindet sie an
+				sich. Sodann kann er ihnen befehlen, den Gegner
+				mit Hagelkörnern und Eisbrocken zuzusetzen.
 			</text>
 			<text locale="en">During a battle the druid calls the
-			      Elemental Spirits Of Cold and binds them to
-			      himself. Then he commands them to attack his foes
-			      with hail and ice missiles.
+				Elemental Spirits Of Cold and binds them to
+				himself. Then he commands them to attack his foes
+				with hail and ice missiles.
 			</text>
 		</string>
 		<string name="ironkeeper">
 			<text locale="de">Erschafft einen Wächtergeist, der
-			      Eisen- und Laenabbau durch nichtalliierte Parteien
-			      (HELFE BEWACHE) verhindert, solange er die Region
-			      bewacht. Der Bergwächter ist an den Ort der
-			      Beschwörung gebunden.
+				Eisen- und Laenabbau durch nichtalliierte Parteien
+				(HELFE BEWACHE) verhindert, solange er die Region
+				bewacht. Der Bergwächter ist an den Ort der
+				Beschwörung gebunden.
 			</text>
 			<text locale="en">Creates a guardian spirit on a
-			      mountain or glacier that keeps all factions that
-			      are not allied (HELP GUARD) from mining iron or
-			      laen as long as it guards the region. The Mountain
-			      Guardian is^bound to the loaction where it has
-			      been summoned.
+				mountain or glacier that keeps all factions that
+				are not allied (HELP GUARD) from mining iron or
+				laen as long as it guards the region. The Mountain
+				Guardian is^bound to the loaction where it has
+				been summoned.
 			</text>
 		</string>
 		<string name="magicstreet">
 			<text locale="de">Durch Ausführung dieser Rituale ist
-			      der Magier in der Lage einen mächtigen
-			      Erdelementar zu beschwören. Solange dieser in den
-			      Boden gebannt ist, wird kein Regen die Wege
-			      aufweichen und kein Fluß Brücken zerstören können.
-			      Alle Reisende erhalten damit die gleichen
-			      Vorteile, die sonst nur ein ausgebautes
-			      gepflastertes Straßennetz bietet. Selbst Sümpfe
-			      und Gletscher können so verzaubert werden. Je mehr
-			      Kraft der Magier in den Bann legt, desto länger
-			      bleibt die Straße bestehen.
+				der Magier in der Lage einen mächtigen
+				Erdelementar zu beschwören. Solange dieser in den
+				Boden gebannt ist, wird kein Regen die Wege
+				aufweichen und kein Fluß Brücken zerstören können.
+				Alle Reisende erhalten damit die gleichen
+				Vorteile, die sonst nur ein ausgebautes
+				gepflastertes Straßennetz bietet. Selbst Sümpfe
+				und Gletscher können so verzaubert werden. Je mehr
+				Kraft der Magier in den Bann legt, desto länger
+				bleibt die Straße bestehen.
 			</text>
 			<text locale="en">By performing these rituals the druid
-			      is able to summon a powerful earth elemental. As
-			      long as this elemental remains bound to a region,
-			      no rain can turn a path into mud and no river can
-			      destroy a bridge. All travelers in this region
-			      gain the same advantages as if they were
-			      travelling on a road. Even swamps and glaciers can
-			      be enchanted in this way. The more power the druid
-			      invests, the longer the roads remain intact.
+				is able to summon a powerful earth elemental. As
+				long as this elemental remains bound to a region,
+				no rain can turn a path into mud and no river can
+				destroy a bridge. All travelers in this region
+				gain the same advantages as if they were
+				travelling on a road. Even swamps and glaciers can
+				be enchanted in this way. The more power the druid
+				invests, the longer the roads remain intact.
 			</text>
 		</string>
 		<string name="windshield">
 			<text locale="de">Die Anrufung der Elementargeister des
-			      Windes beschwört plötzliche Windböen, kleine
-			      Windhosen und Luftlöcher herauf, die die
-			      gegnerischen Schützen behindern werden.
+				Windes beschwört plötzliche Windböen, kleine
+				Windhosen und Luftlöcher herauf, die die
+				gegnerischen Schützen behindern werden.
 			</text>
 			<text locale="en">Calling the Elemental Spirits Of Wind
-			      conjurs up sudden breezes, small whirlwinds and
-			      minor turbulences that will hinder enemy archers.
+				conjurs up sudden breezes, small whirlwinds and
+				minor turbulences that will hinder enemy archers.
 			</text>
 		</string>
 		<string name="mallorntreegrow">
 			<text locale="de">Diese Ritual verstärkt die Wirkung des
-			      magischen Trankes um ein vielfaches. Wo sonst aus
-			      einem Stecken nur ein Baum spießen konnte, so
-			      treibt nun jeder Ast Wurzeln.
+				magischen Trankes um ein vielfaches. Wo sonst aus
+				einem Stecken nur ein Baum spießen konnte, so
+				treibt nun jeder Ast Wurzeln.
 			</text>
 			<text locale="en">This ritual greatly increases the
-			      effect of the potion. Now every branch becomes a
-			      mallorn tree where before only one could be grown
-			      from a log.
+				effect of the potion. Now every branch becomes a
+				mallorn tree where before only one could be grown
+				from a log.
 			</text>
 		</string>
 		<string name="goodwinds">
 			<text locale="de">Der Magier zwingt mit diesem Ritual
-			      die Elementargeister des Wassers in seinen Dienst
-			      und bringt sie dazu, das angegebene Schiff
-			      schneller durch das Wasser zu tragen. Zudem wird
-			      das Schiff nicht durch ungünstige Winde oder
-			      Strömungen beeinträchtigt.
+				die Elementargeister des Wassers in seinen Dienst
+				und bringt sie dazu, das angegebene Schiff
+				schneller durch das Wasser zu tragen. Zudem wird
+				das Schiff nicht durch ungünstige Winde oder
+				Strömungen beeinträchtigt.
 			</text>
 			<text locale="en">While being aboard a ship, the druid
-			      uses this ritual to force the Elemental Spirits Of
-			      Water to serve him and commands them to carry the
-			      ship across the water at a higher speed. In
-			      addition, the ship will not be affected by
-			      unfavourable winds or currents.
+				uses this ritual to force the Elemental Spirits Of
+				Water to serve him and commands them to carry the
+				ship across the water at a higher speed. In
+				addition, the ship will not be affected by
+				unfavourable winds or currents.
 			</text>
 		</string>
 		<string name="healing">
 			<text locale="de">Nicht nur der Feldscher kann den
-			      Verwundeten einer Schlacht helfen. Druiden
-			      vermögen mittels einer Beschwörung der
-			      Elementargeister des Lebens Wunden zu schließen,
-			      gebrochene Knochen zu richten und selbst
-			      abgetrennte Glieder wieder zu regenerieren.
+				Verwundeten einer Schlacht helfen. Druiden
+				vermögen mittels einer Beschwörung der
+				Elementargeister des Lebens Wunden zu schließen,
+				gebrochene Knochen zu richten und selbst
+				abgetrennte Glieder wieder zu regenerieren.
 			</text>
 			<text locale="en">Combat medics are not the only ones
-			      who can help those who got injured during a
-			      battle. Druids are, with the help of a summons of
-			      the Elemental Spirits Of Life, able to heal
-			      wounds, mend broken bones or even regenerate
-			      separated limbs as well.
+				who can help those who got injured during a
+				battle. Druids are, with the help of a summons of
+				the Elemental Spirits Of Life, able to heal
+				wounds, mend broken bones or even regenerate
+				separated limbs as well.
 			</text>
 		</string>
 		<string name="reelingarrows">
 			<text locale="de">Diese Beschwörung öffnet ein Tor in
-			      die Ebene der Elementargeister des Windes. Sofort
-			      erheben sich in der Umgebung des Tors starke Winde
-			      oder gar Stürme und behindern alle Schützen einer
-			      Schlacht.
+				die Ebene der Elementargeister des Windes. Sofort
+				erheben sich in der Umgebung des Tors starke Winde
+				oder gar Stürme und behindern alle Schützen einer
+				Schlacht.
 			</text>
 			<text locale="en">This summons opens a gate to the plane
-			      of Elemental Spirits Of Wind. Immediately, strong
-			      winds or even storms will rise near the gate and
-			      hinder all archers during a battle.
+				of Elemental Spirits Of Wind. Immediately, strong
+				winds or even storms will rise near the gate and
+				hinder all archers during a battle.
 			</text>
 		</string>
 		<string name="gwyrrdfumbleshield">
 			<text locale="de">Dieses Ritual beschwört einige
-			      Elementargeister der Magie und schickt sie in die
-			      Reihen der feindlichen Magier. Diesen wird das
-			      Zaubern für die Dauer des Kampfes deutlich
-			      schwerer fallen.
+				Elementargeister der Magie und schickt sie in die
+				Reihen der feindlichen Magier. Diesen wird das
+				Zaubern für die Dauer des Kampfes deutlich
+				schwerer fallen.
 			</text>
 			<text locale="en">This ritual summons some Elemental
-			      Spirits Of Magic and sends them into the ranks of
-			      the enemy mages. Casting spells will be much
-			      harder for them during the battle.
+				Spirits Of Magic and sends them into the ranks of
+				the enemy mages. Casting spells will be much
+				harder for them during the battle.
 			</text>
 		</string>
 		<string name="transferauradruide">
 			<text locale="de">Mit Hilfe dieses Zaubers kann der
-			      Magier eigene Aura im Verhältnis 2:1 auf einen
-			      anderen Magier des gleichen Magiegebietes
-			      übertragen.
+				Magier eigene Aura im Verhältnis 2:1 auf einen
+				anderen Magier des gleichen Magiegebietes
+				übertragen.
 			</text>
 			<text locale="en">The caster can transfer mana at a
-			      ratio of 2:1 to another member of the same school
-			      of magic with the help of this spell.
+				ratio of 2:1 to another member of the same school
+				of magic with the help of this spell.
 			</text>
 		</string>
 		<string name="earthquake">
 			<text locale="de">Der Druide beschwört mit diesem Ritual
-			      einen Elementargeist der Erde und bringt ihn dazu,
-			      die Erde erbeben zu lassen. Dieses Erdbeben wird
-			      alle Gebäude in der Region beschädigen.
+				einen Elementargeist der Erde und bringt ihn dazu,
+				die Erde erbeben zu lassen. Dieses Erdbeben wird
+				alle Gebäude in der Region beschädigen.
 			</text>
 			<text locale="en">With this ritual the druid summons an
-			      Elemental Spirit Of Earth that brings the ground
-			      to shake. This earthquake damages all buildings in
-			      the target region.
+				Elemental Spirit Of Earth that brings the ground
+				to shake. This earthquake damages all buildings in
+				the target region.
 			</text>
 		</string>
 		<string name="stormwinds">
 			<text locale="de">Die Beschwörung von Elementargeistern
-			      der Stürme ist ein uraltes Ritual. Der Druide
-			      bannt die Elementare in die Segel der Schiffe, wo
-			      sie helfen, das Schiff mit hoher Geschwindigkeit
-			      über die Wellen zu tragen. Je mehr Kraft der
-			      Druide in den Zauber investiert, desto größer ist
-			      die Zahl der Elementargeister, die sich bannen
-			      lassen. Für jedes Schiff wird ein Elementargeist
-			      benötigt.
+				der Stürme ist ein uraltes Ritual. Der Druide
+				bannt die Elementare in die Segel der Schiffe, wo
+				sie helfen, das Schiff mit hoher Geschwindigkeit
+				über die Wellen zu tragen. Je mehr Kraft der
+				Druide in den Zauber investiert, desto größer ist
+				die Zahl der Elementargeister, die sich bannen
+				lassen. Für jedes Schiff wird ein Elementargeist
+				benötigt.
 			</text>
 			<text locale="en">Calling the Elemental Spirits Of Storm
-			      is an ancient ritual. The druid binds the
-			      elementals to a ship's sails where they can help
-			      to carry the vessel across the waves at an amazing
-			      speed. The more power the druid invests, the
-			      greater is the number of spirits bound. Each ship
-			      needs an own spirit.
+				is an ancient ritual. The druid binds the
+				elementals to a ship's sails where they can help
+				to carry the vessel across the waves at an amazing
+				speed. The more power the druid invests, the
+				greater is the number of spirits bound. Each ship
+				needs an own spirit.
 			</text>
 		</string>
 		<string name="trueseeinggwyrrd">
 			<text locale="de">Der Spruch ermöglicht es einem Magier,
-			      ein Amulett des Wahren Sehens zu erschaffen. Das
-			      Amulett erlaubt es dem Träger, alle Einheiten, die
-			      durch einen Ring der Unsichtbarkeit geschützt
-			      sind, zu sehen. Einheiten allerdings, die sich mit
-			      ihrem Tarnungs-Talent verstecken, bleiben
-			      weiterhin unentdeckt.
+				ein Amulett des Wahren Sehens zu erschaffen. Das
+				Amulett erlaubt es dem Träger, alle Einheiten, die
+				durch einen Ring der Unsichtbarkeit geschützt
+				sind, zu sehen. Einheiten allerdings, die sich mit
+				ihrem Tarnungs-Talent verstecken, bleiben
+				weiterhin unentdeckt.
 			</text>
 			<text locale="en">This spell enables the caster to
-			      create an Amulet Of True Sight. Wearing such an
-			      amulet, a person can discover anyone wearing a
-			      Ring of Invisibility. Anyway, units concealed by
-			      the use of their stealth skill will remain
-			      undiscovered.
+				create an Amulet Of True Sight. Wearing such an
+				amulet, a person can discover anyone wearing a
+				Ring of Invisibility. Anyway, units concealed by
+				the use of their stealth skill will remain
+				undiscovered.
 			</text>
 		</string>
 		<string name="invisibilitygwyrrd">
 			<text locale="de">Mit diesem Spruch kann der Zauberer
-			      einen Ring der Unsichtbarkeit erschaffen. Der
-			      Träger des Ringes wird für alle Einheiten anderer
-			      Parteien unsichtbar, egal wie gut ihre Wahrnehmung
-			      auch sein mag. In einer unsichtbaren Einheit muss
-			      jede Person einen Ring tragen.
+				einen Ring der Unsichtbarkeit erschaffen. Der
+				Träger des Ringes wird für alle Einheiten anderer
+				Parteien unsichtbar, egal wie gut ihre Wahrnehmung
+				auch sein mag. In einer unsichtbaren Einheit muss
+				jede Person einen Ring tragen.
 			</text>
 			<text locale="en">With this spell the caster can create
-			      a Ring Of Invisibility. The wearer of this ring
-			      will be invisible to all units of other factions,
-			      no matter how good their perception skill may be.
-			      In an invisible unit, each person must wear a Ring
-			      Of Invisibility.
+				a Ring Of Invisibility. The wearer of this ring
+				will be invisible to all units of other factions,
+				no matter how good their perception skill may be.
+				In an invisible unit, each person must wear a Ring
+				Of Invisibility.
 			</text>
 		</string>
 		<string name="homestone">
 			<text locale="de">Mit dieser Formel bindet der Magier
-			      auf ewig die Kräfte der Erde in die Mauern der
-			      Burg,in der er sich gerade befindet. Weder magisch
-			      noch mit schwerem Geschütz können derartig
-			      gestärkte Mauern zerstört werden, und auch das
-			      Alter setzt ihnen weniger zu. Das Gebäude bietet
-			      sodann auch einen besseren Schutz gegen Angriffe
-			      mit dem Schwert wie mit Magie.
+				auf ewig die Kräfte der Erde in die Mauern der
+				Burg,in der er sich gerade befindet. Weder magisch
+				noch mit schwerem Geschütz können derartig
+				gestärkte Mauern zerstört werden, und auch das
+				Alter setzt ihnen weniger zu. Das Gebäude bietet
+				sodann auch einen besseren Schutz gegen Angriffe
+				mit dem Schwert wie mit Magie.
 			</text>
 			<text locale="en">With this spell the druid eternally
-			      binds the powers of earth to the walls of the
-			      castle in which he currently is. No magic and no
-			      ballistic attacks will ever be able to destroy a
-			      wall that has been fortified in this way and the
-			      castle will also be less affected by aging. In
-			      addition, the building will provide a better
-			      protection against attacks by sword or by magic.
+				binds the powers of earth to the walls of the
+				castle in which he currently is. No magic and no
+				ballistic attacks will ever be able to destroy a
+				wall that has been fortified in this way and the
+				castle will also be less affected by aging. In
+				addition, the building will provide a better
+				protection against attacks by sword or by magic.
 			</text>
 		</string>
 		<string name="wolfhowl">
 			<text locale="de">Nicht wenige Druiden freunden sich im
-			      Laufe ihres Lebens in der Natur mit den ältesten
-			      Freunden der großen Völker an. Sie erlernen, mit
-			      einem einzigen heulenden Ruf viele ihrer Freunde
-			      herbeizurufen, um ihnen im Kampf beizustehen.
+				Laufe ihres Lebens in der Natur mit den ältesten
+				Freunden der großen Völker an. Sie erlernen, mit
+				einem einzigen heulenden Ruf viele ihrer Freunde
+				herbeizurufen, um ihnen im Kampf beizustehen.
 			</text>
 			<text locale="en">During their life in the wilderness,
-			      many druids make friends with the wolves who are
-			      the oldest friends of the great races. They learn
-			      to call many of them with a single howl to aid
-			      them in combat.
+				many druids make friends with the wolves who are
+				the oldest friends of the great races. They learn
+				to call many of them with a single howl to aid
+				them in combat.
+			</text>
+		</string>
+		<string name="versteinern">
+			<text locale="de">Dieser schwierige, aber effektive 
+				Kampfzauber benutzt die Elementargeister des Steins, 
+				um eine Reihe von Gegnern für die Dauer des Kampfes 
+				in Stein zu verwandeln. Die betroffenen Personen 
+				werden nicht mehr kämpfen, können jedoch auch nicht 
+				verwundet werden.
+			</text>
+			<text locale="en">This complicated but effective spell 
+				uses the Elemental Spirits Of Stone to turn a number 
+				of enemies to stone for the duration of combat. The 
+				affected persons won't be able to fight any more, but 
+				they can't be wounded either.
+			</text>
+		</string>
+		<string name="strongwall">
+			<text locale="de">Mit dieser Formel bindet der Magier zu 
+				Beginn eines Kampfes einige Elementargeister des Fels 
+				in die Mauern des Gebäudes, in dem er sich gerade 
+				befindet. Das Gebäude bietet sodann einen besseren 
+				Schutz gegen Angriffe mit dem Schwert wie mit Magie.
+			</text>
+			<text locale="en">At the beginning of a battle, the 
+				magician binds some Elemental Spirits Of Rock to the 
+				walls of the builing in which he currently is. The 
+				structure will then provide a better protection against 
+				attacks by sword or by magic.
+			</text>
+		</string>
+		<string name="gwyrrddestroymagic">
+			<text locale="de">Wie die alten Lehren der Druiden 
+				berichten, besteht das, was die normalen Wesen Magie 
+				nennen aus Elementargeistern. Der Magier beschwört 
+				und bannt diese in eine Form, um den gewünschten 
+				Effekt zu erzielen. Dieses Ritual nun vermag es, in 
+				diese Welt gerufene Elementargeister zu vertreiben, um 
+				so ein Objekt von Magie zu befreien.
+			</text>
+			<text locale="en">Old legends of the druids say that what 
+				normal people call "magic" consists of elemental 
+				spirits. A magician summons these spirits and binds 
+				them to various forms to achieve the desired effects. 
+				This ritual is able to expel any elemental spirits 
+				that have been summoned to this world and thereby 
+				dispels any magic on the target.
+			</text>
+		</string>
+		<string name="treewalkenter">
+			<text locale="de">Große Macht liegt in Orten, an denen das 
+				Leben pulsiert. Der Druide kann diese Kraft sammeln 
+				und so ein Tor in die Welt der Geistwesen erschaffen. 
+				Der Druide kann dann Stufe*5 Gewichtseinheiten durch 
+				das Tor entsenden.
+			</text>
+			<text locale="en">A great power lies within those places 
+				that are pulsing with life. A druid can focus this 
+				power and thereby create a gate into the World Of 
+				Spirits. He can then send level*5 weight units of 
+				living or dead matter through the gate.
+			</text>
+		</string>
+		<string name="treewalkexit">
+			<text locale="de">Ein Druide, den es in die Welt der 
+				Geister verschlagen hat, kann mit Hilfe dieses Zaubers 
+				Stufe*5 Gewichtseinheiten in einen Wald auf der 
+				materiellen Welt zurückschicken."
+			</text>
+			<text locale="en">A druid who has traveled to the World Of 
+				Spirits can use this spell to send level*5 weight 
+				units of living or dead matter back to a forest in the 
+				material world.
+			</text>
+		</string>
+		<string name="holyground">
+			<text locale="de">Dieses Ritual beschwört verschiedene 
+				Naturgeister in den Boden der Region, welche diese 
+				fortan bewachen. In einer so gesegneten Region werden 
+				niemals wieder die Toten ihre Gräber verlassen, und 
+				anderswo entstandene Untote werden sie wann immer 
+				möglich meiden.
+			</text>
+			<text locale="en">This ritual binds various rural spirits 
+				to a specific territory to guard the land. In a region 
+				blessed in this way the dead won't ever rise from 
+				their graves again. Existing undead also shun the 
+				sacred grounds and will avoid entering the protected 
+				area whenever possible.
+			</text>
+		</string>
+		<string name="artefaktsackofconservation">
+			<text locale="de">Der Druide nehme etwas präpariertes 
+				Leder, welches er in einem großen Ritual der Reinigung 
+				von allen unreinen Geistern befreie, und binde dann 
+				einige kleine Geister der Luft und des Wassers in das 
+				Material. Aus dem so vorbereiteten Leder fertige er 
+				nun ein kleines Beutelchen, welches in ihm aufbewahrte 
+				Kräuter besser zu konservieren vermag.
+			</text>
+			<text locale="en">The druid takes some specially prepared 
+				leather and performes a great ritual during which the 
+				leather is cleansed of all impure spirits. Then he 
+				binds some minor spirits of air and water to the 
+				material. After completing this process, the druid 
+				works the enchanted leather into a small pouch which 
+				is suitable to contain herbs, for it is able to 
+				preserve them for a long time and prevents rot.
+			</text>
+		</string>
+		<string name="summonent">
+			<text locale="de">Mit Hilfe dieses Zaubers weckt der 
+				Druide die in den Wälder der Region schlummernden 
+				Ents aus ihrem äonenlangen Schlaf. Die wilden 
+				Baumwesen werden sich ihm anschließen und ihm 
+				beistehen, jedoch nach einiger Zeit wieder in 
+				Schlummer verfallen.
+			</text>
+			<text locale="en">With the help of this spell the druid 
+				awakens the ents who are slumbering in the forests of 
+				a region from aeons of sleep. These strange 
+				tree-creatures will join him and aid his cause, but 
+				after a while they will sink back into their slumber.
+			</text>
+		</string>
+		<string name="gwyrrdfamiliar">
+			<text locale="de">Einem erfahrenen Druidem wird irgendwann 
+				auf seinen Wanderungen ein ungewöhnliches Exemplar 
+				einer Gattung begegnen, welches sich dem Druiden 
+				anschließen wird.
+			</text>
+			<text locale="en">Once during his travels, the seasoned 
+				druid will meet an extraordinary creature of its 
+				species that will join him.
+			</text>
+		</string>
+		<string name="blessstonecircle">
+			<text locale="de">Dieses Ritual segnet einen Steinkreis, 
+				der zuvor aus Steinen und etwas Holz gebaut werden 
+				muss. Die Segnung des Druiden macht aus dem Kreis 
+				eine mächtige Stätte magischen Wirkens.
+			</text>
+			<text locale="en">This ritual blesses a circle of stones 
+				that has to be constructed from stones and some wood 
+				before. The druid's blessing turns the circle into a 
+				place of great magic that is suitable for rituals of 
+				all kinds.
 			</text>
 		</string>
 
