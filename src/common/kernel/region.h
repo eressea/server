@@ -1,7 +1,7 @@
 /* vi: set ts=2:
  *
- *	
- *	Eressea PB(E)M host Copyright (C) 1998-2003
+ *  
+ *  Eressea PB(E)M host Copyright (C) 1998-2003
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -23,22 +23,25 @@ extern "C" {
 
 #define FAST_CONNECT
 
-#define RF_CHAOTIC		(1<<0)
-#define RF_MALLORN 		(1<<1)
-#define RF_BLOCKED		(1<<2)
+#define RF_CHAOTIC     (1<<0)
+#define RF_MALLORN     (1<<1)
+#define RF_BLOCKED     (1<<2)
 
-#define RF_BLOCK_NORTHWEST	(1<<3)
-#define RF_BLOCK_NORTHEAST	(1<<4)
-#define RF_BLOCK_EAST				(1<<5)
-#define RF_BLOCK_SOUTHEAST	(1<<6)
-#define RF_BLOCK_SOUTHWEST	(1<<7)
-#define RF_BLOCK_WEST				(1<<8)
+#define RF_BLOCK_NORTHWEST  (1<<3)
+#define RF_BLOCK_NORTHEAST  (1<<4)
+#define RF_BLOCK_EAST       (1<<5)
+#define RF_BLOCK_SOUTHEAST  (1<<6)
+#define RF_BLOCK_SOUTHWEST  (1<<7)
+#define RF_BLOCK_WEST       (1<<8)
 
-#define RF_ENCOUNTER				(1<<9)
-#define RF_MIGRATION				(1<<10)
-#define RF_UNUSED_1					(1<<11)
-#define RF_ORCIFIED					(1<<12)
-#define RF_DH								(1<<18)
+#define RF_ENCOUNTER   (1<<9)
+#define RF_MIGRATION   (1<<10)
+#define RF_UNUSED_1    (1<<11)
+#define RF_ORCIFIED    (1<<12)
+
+#define RF_COMBATDEBUG (1<<14)
+
+#define RF_DH          (1<<18)
 
 #define RF_ALL 0xFFFFFF
 
@@ -48,54 +51,54 @@ struct message_list;
 struct rawmaterial;
 
 typedef struct land_region {
-	char *name;
-	/* TODO: demand kann nach Konvertierung entfernt werden. */
-	struct demand {
-		struct demand * next;
-		const struct luxury_type * type;
-		int value;
-	} * demands;
-	const struct herb_type * herbtype;
-	short herbs;
+  char *name;
+  /* TODO: demand kann nach Konvertierung entfernt werden. */
+  struct demand {
+    struct demand * next;
+    const struct luxury_type * type;
+    int value;
+  } * demands;
+  const struct herb_type * herbtype;
+  short herbs;
 #if GROWING_TREES
-	int trees[3]; /* 0 -> Samen, 1 -> Sprößlinge, 2 -> Bäume */
+  int trees[3]; /* 0 -> Samen, 1 -> Sprößlinge, 2 -> Bäume */
 #else
-	int trees;
+  int trees;
 #endif
-	int horses;
-	int peasants;
-	int newpeasants;
-	int money;
+  int horses;
+  int peasants;
+  int newpeasants;
+  int money;
 #if NEW_RESOURCEGROWTH == 0
-	int iron;
+  int iron;
 #endif
 } land_region;
 
 typedef struct region {
-	struct region *next;
-	struct land_region *land;
-	struct unit *units;
-	struct ship *ships;
-	struct building *buildings;
-	int x, y;
-	struct plane *planep;
-	char *display;
-	unsigned int flags;
-	unsigned short age;
-	struct message_list *msgs;
-	struct individual_message {
-		struct individual_message * next;
-		const struct faction * viewer;
-		struct message_list *msgs;
-	} * individual_messages;
-	struct attrib *attribs;
-	struct region *nexthash;
-	terrain_t terrain;
+  struct region *next;
+  struct land_region *land;
+  struct unit *units;
+  struct ship *ships;
+  struct building *buildings;
+  int x, y;
+  struct plane *planep;
+  char *display;
+  unsigned int flags;
+  unsigned short age;
+  struct message_list *msgs;
+  struct individual_message {
+    struct individual_message * next;
+    const struct faction * viewer;
+    struct message_list *msgs;
+  } * individual_messages;
+  struct attrib *attribs;
+  struct region *nexthash;
+  terrain_t terrain;
 #ifdef WEATHER
-	weather_t weathertype;
+  weather_t weathertype;
 #endif
 #if NEW_RESOURCEGROWTH
-	struct rawmaterial * resources;
+  struct rawmaterial * resources;
 #endif
 #ifdef FAST_CONNECT
   struct region * connect[MAXDIRECTIONS];
@@ -120,7 +123,7 @@ typedef struct spec_direction {
 } spec_direction;
 
 typedef struct {
-	direction_t dir;
+  direction_t dir;
 } moveblock;
 
 #define region_hashkey(r) (abs((r)->x + 0x100 * (r)->y))

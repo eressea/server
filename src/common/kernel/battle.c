@@ -3581,6 +3581,62 @@ init_battle(region * r, battle **bp)
   return fighting;
 }
 
+static void
+battle_stats(FILE * F, battle * b)
+{
+  typedef struct stat_info {
+    struct stat_info * next;
+    weapon * wp;
+    int level;
+    int number;
+  } stat_info;
+  side * s;
+  cv_foreach(s, b->sides) {
+    fighter * df;
+    stat_info * stats = NULL, * stat;
+    cv_foreach(df, s->fighters) {
+      unit *du = df->unit;
+      troop dt;
+      stat_info * slast = NULL;
+
+      dt.fighter = df;
+      for (dt.index=0;dt.index!=du->number;++dt.index) {
+        weapon * wp = preferred_weapon(dt, true);
+        int level = wp->attackskill;
+        stat_info ** slist = &stats;
+
+        if (slast && slast->wp==wp && slast->level==level) {
+          ++slast->number;
+          continue;
+        }
+        while (*slist && (*slist)->wp!=wp) {
+          slist = &(*slist)->next;
+        }
+        while (*slist && (*slist)->wp==wp && (*slist)->level>level) {
+          slist = &(*slist)->next;
+        }
+        stat = *slist;
+        if (stat->wp!=wp || stat->level!=level) {
+          stat = calloc(1, sizeof(stat_info));
+          stat->wp = wp;
+          stat->level = level;
+          stat->next = *slist;
+          *slist = stat;
+        }
+        slast = stat;
+        ++slast->number;
+      }
+    } cv_next(df);
+
+    fprintf(F, "##STATS## Heer %u - %s:\n", s->index, factionname(s->bf->faction));
+    for (stat=stats;stat!=NULL;stat=stat->next) {
+      const weapon_type * wtype = stat->wp->type;
+      fprintf(F, "%s %u : %u\n", wtype->itype->rtype->_name[0], stat->level, stat->number);
+    }
+    freelist(stats);
+  } cv_next(s);
+}
+
 void
 do_battle(void)
 {
@@ -3630,6 +3686,8 @@ do_battle(void)
       b->turn = 1;
       b->has_tactics_turn = false;
     }
+
+    if (b->region->flags & RF_COMBATDEBUG) battle_stats(bdebug, b);
 
     /* PRECOMBATSPELLS */
     do_combatmagic(b, DO_PRECOMBATSPELL);

@@ -89,6 +89,20 @@ operator==(const region& a, const region&b)
   return a.x==b.x && a.y==b.y;
 }
 
+static bool
+region_getflag(const region& r, int bit)
+{
+  if (r.flags & (1<<bit)) return true;
+  return false;
+}
+
+static void
+region_setflag(region& r, int bit, bool set)
+{
+  if (set) r.flags |= (1<<bit);
+  else r.flags &= ~(1<<bit);
+}
+
 void
 bind_region(lua_State * L) 
 {
@@ -103,6 +117,8 @@ bind_region(lua_State * L)
     .property("info", &region_getinfo, &region_setinfo)
     .property("terrain", &region_getterrain)
     .def("add_notice", &region_addnotice)
+    .def("get_flag", &region_setflag)
+    .def("set_flag", &region_getflag)
     .def_readonly("x", &region::x)
     .def_readonly("y", &region::y)
     .def_readwrite("age", &region::age)

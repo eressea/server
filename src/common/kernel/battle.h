@@ -78,7 +78,7 @@ extern "C" {
 # define E_ENEMY 1
 # define E_ATTACKING 2
     int enemy[128];
-	struct side * enemies[128];
+    struct side * enemies[128];
     cvector fighters;	/* vector der Einheiten dieser Fraktion */
     int index;		/* Eintrag der Fraktion in b->matrix/b->enemies */
     int size[NUMROWS];	/* Anzahl Personen in Reihe X. 0 = Summe */
