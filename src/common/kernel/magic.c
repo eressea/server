@@ -1003,17 +1003,29 @@ spellpower(region * r, unit * u, spell * sp, int cast_level, const char * cmd)
   /* Antimagie in der Zielregion */
   c = get_curse(r->attribs, ct_find("antimagiczone"));
   if (curse_active(c)) {
+    unit * mage = c->magician;
     force -= curse_geteffect(c);
     curse_changevigour(&r->attribs, c, -cast_level);
     cmistake(u, findorder(u, cmd), 185, MSG_MAGIC);
+    if (force>0) {
+      ADDMSG(&mage->faction->msgs, msg_message("reduce_spell", "self mage region", mage, u, r));
+    } else {
+      ADDMSG(&mage->faction->msgs, msg_message("block_spell", "self mage region", mage, u, r));
+    }
   }
 
   /* Patzerfluch-Effekt: */
   c = get_curse(r->attribs, ct_find("fumble"));
   if (curse_active(c)) {
+    unit * mage = c->magician;
     force -= curse_geteffect(c);
     curse_changevigour(&u->attribs, c, -1);
     cmistake(u, findorder(u, cmd), 185, MSG_MAGIC);
+    if (force>0) {
+      ADDMSG(&mage->faction->msgs, msg_message("reduce_spell", "self mage region", mage, u, r));
+    } else {
+      ADDMSG(&mage->faction->msgs, msg_message("block_spell", "self mage region", mage, u, r));
+    }
   }
 
   force = force * MagicPower();

@@ -5812,6 +5812,26 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit $unit($target) did not contact us."</text>
   </message>
 
+  <message name="block_spell" section="magic">
+    <type>
+      <arg name="self" type="unit"/>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"Antimagie von $unit($self) blockiert in $region($region) einen Zauber von $unit($mage)."</text>
+    <text locale="en">"In $region($region), anti-magic from $unit($self) blocks the spell of $unit($mage)."</text>
+  </message>
+
+  <message name="reduce_spell" section="magic">
+    <type>
+      <arg name="self" type="unit"/>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($self) schwächt in $region($region) einen Zauber von $unit($mage) durch Antimagie ab."</text>
+    <text locale="en">"In $region($region), anti-magic from $unit($self) reduces the effect of $unit($mage)'s spell."</text>
+  </message>
+
   <message name="hornofpeace_u_success" section="magic">
     <type>
       <arg name="unit" type="unit"/>
@@ -5851,7 +5871,7 @@
     <text locale="de">"$unit($unit) in $region($region) bläst das Horn des Tanzes, doch niemand hier lässt sich von Stimmung anstecken."</text>
     <text locale="en">"$unit($unit) in $region($region) blows the Horn of Dancing, but nobody here gets into the mood."</text>
   </message>
-  
+
   <message name="trappedairelemental_success" section="magic">
     <type>
       <arg name="unit" type="unit"/>
@@ -5862,7 +5882,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die $ship($ship) wird jetzt schneller ihr Ziel erreichen."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The $ship($ship) will now be faster."</text>
   </message>
-  
+
   <message name="aurapotion50" section="magic">
     <type>
       <arg name="unit" type="unit"/>
@@ -5872,7 +5892,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Magier fühlt sich durch den Trank magische gestärkt."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The mage is magically invigorated."</text>
   </message>
-  
+
   <message name="bagpipeoffear_faction" section="magic">
     <type>
       <arg name="unit" type="unit"/>
@@ -5883,7 +5903,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ausser sich vor Furcht geben die Bauern dem Barden $int($money) Silber."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Stricken with fear the peasants give the bard $int($money) silver."</text>
   </message>
-  
+
   <message name="bagpipeoffear_region" section="magic">
     <type>
       <arg name="unit" type="unit"/>
