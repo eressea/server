@@ -421,11 +421,10 @@ destroy(region * r, unit * u, const char * cmd)
       add_message(&u->faction->msgs, new_message(
         u->faction, "shipdestroy_partial%u:unit%r:region%h:ship", u, r, sh));
     }
-  } else
-    printf("* Fehler im Program! Die Einheit %s von %s\n"
-    "  (Spieler: %s) war owner eines objects,\n"
-    "  war aber weder in einer Burg noch in einem Schiff.\n",
-    unitname(u), u->faction->name, u->faction->email);
+  } else {
+    log_error(("Die Einheit %s von %s war owner eines objects, war aber weder in einer Burg noch in einem Schiff.\n",
+      unitname(u), u->faction->name, u->faction->email));
+  }
 
 #if 0
   /* Achtung: Nicht an ZERST÷RE mit Punktangabe angepaﬂt! */

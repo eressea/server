@@ -2842,11 +2842,11 @@ movewhere(region * r, const unit *u)
 #endif
 
 	if (!rconnect(r, d)) {
-#if USE_CREATION
+#ifdef USE_CREATION
 		makeblock(r->x + delta_x[d], r->y + delta_y[d], 1);
-		printf("* Fehler! Region (%d,%d) hatte seine Nachbarn "
+		log_error((("Region (%d,%d) hatte seine Nachbarn "
 			   "(%d,%d) noch nicht generiert!\n", r->x, r->y,
-			   r->x + delta_x[d], r->y + delta_y[d]);
+			   r->x + delta_x[d], r->y + delta_y[d]));
 #else
 		add_message(&u->faction->msgs,
 			msg_message("moveblocked", "unit direction", u, d));
@@ -2856,9 +2856,9 @@ movewhere(region * r, const unit *u)
 	r2 = rconnect(r, d);
 
 	if (!r2) {
-		printf("* Fehler! Region (%d,%d) hatte seine Nachbarn "
+		log_error(("Region (%d,%d) hatte seine Nachbarn "
 			   "(%d,%d) nicht gefunden!", r->x, r->y,
-			   r->x + delta_x[d], r->y + delta_y[d]);
+			   r->x + delta_x[d], r->y + delta_y[d]));
 		return 0;
 	}
 
@@ -2872,7 +2872,7 @@ movewhere(region * r, const unit *u)
 	 * auch schon alle existieren. Dies erleichtert das Umherschauen bei
 	 * den Reports! */
 
-#if USE_CREATION
+#ifdef USE_CREATION
 	for (d = 0; d != MAXDIRECTIONS; d++)
 		if (!rconnect(r2, d))
 			makeblock(r2->x + delta_x[d], r2->y + delta_y[d], 1);

@@ -951,16 +951,16 @@ fix_gates(void)
 static int
 fix_astralplane(void)
 {
-	plane * astralplane = getplanebyname("Astralraum");
+  plane * astralplane = get_astralplane();
   region * r;
   region_list * rlist = NULL;
 
-	if (astralplane) {
-		freset(astralplane, PFL_NOCOORDS);
-		freset(astralplane, PFL_NOFEED);
-		set_ursprung(findfaction(MONSTER_FACTION), astralplane->id, 0, 0);
-	}
-  for (r=regions;r;r=r->next) {
+  if (astralplane) {
+    freset(astralplane, PFL_NOCOORDS);
+    freset(astralplane, PFL_NOFEED);
+    set_ursprung(findfaction(MONSTER_FACTION), astralplane->id, 0, 0);
+  }
+  for (r=regions;r;r=r->next) if (rplane(r)==astralplane) {
     region * ra = r_standard_to_astral(r);
     if (ra==NULL) continue;
     if (r->terrain!=T_FIREWALL) continue;
@@ -968,9 +968,10 @@ fix_astralplane(void)
     if (ra->units!=NULL) {
       add_regionlist(&rlist, ra);
     }
+    log_printf("protecting firewall in %s by blocking astral space in %s.\n", regionname(r), regionname(ra));
     terraform(ra, T_ASTRALB);
   }
-  while (rlist) {
+  while (rlist!=NULL) {
     region_list * rnew = rlist;
     region * r = rnew->data;
     direction_t dir;
@@ -999,7 +1000,7 @@ fix_astralplane(void)
     }
     free(rnew);
   }
-	return 0;
+  return 0;
 }
 
 static int

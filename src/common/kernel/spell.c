@@ -1798,90 +1798,73 @@ sp_great_drought(castorder *co)
 static int
 sp_treewalkenter(castorder *co)
 {
-	region *r = co->rt;
-	unit *mage = (unit *)co->magician;
-	spellparameter *pa = co->par;
-	double power = co->force;
-	int cast_level = co->level;
-	region *rt;
-	unit *u, *u2;
-	int remaining_cap;
-	int n;
-	int erfolg = 0 ;
+  region *r = co->rt;
+  unit *mage = (unit *)co->magician;
+  spellparameter *pa = co->par;
+  double power = co->force;
+  int cast_level = co->level;
+  region *rt;
+  int remaining_cap;
+  int n;
+  int erfolg = 0;
 
-	if (getplane(r) != 0) {
-		cmistake(mage, strdup(co->order), 190, MSG_MAGIC);
-		return 0;
-	}
+  if (getplane(r) != 0) {
+    cmistake(mage, strdup(co->order), 190, MSG_MAGIC);
+    return 0;
+  }
 
-	if (!r_isforest(r)) {
-		cmistake(mage, strdup(co->order), 191, MSG_MAGIC);
-		return 0;
-	}
+  if (!r_isforest(r)) {
+    cmistake(mage, strdup(co->order), 191, MSG_MAGIC);
+    return 0;
+  }
 
-	rt = r_standard_to_astral(r);
-	if(!rt || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
-		cmistake(mage, strdup(co->order), 192, MSG_MAGIC);
-		return 0;
-	}
+  rt = r_standard_to_astral(r);
+  if(!rt || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
+    cmistake(mage, strdup(co->order), 192, MSG_MAGIC);
+    return 0;
+  }
 
-	assert(rt != NULL);
+  assert(rt != NULL);
 
-	remaining_cap = (int)(power * 500);
+  remaining_cap = (int)(power * 500);
 
-	/* fuer jede Einheit */
-	for (n = 0; n < pa->length; n++) {
-		if(pa->param[n]->flag == TARGET_RESISTS
-				|| pa->param[n]->flag == TARGET_NOTFOUND)
-			continue;
+  /* fuer jede Einheit */
+  for (n = 0; n < pa->length; n++) {
+    unit * u = pa->param[n]->data.u;
+    spllprm * param = pa->param[n];
 
-		u = pa->param[n]->data.u;
+    if (param->flag & (TARGET_RESISTS|TARGET_NOTFOUND)) {
+      continue;
+    }
 
-		if(!ucontact(u, mage)) {
-			cmistake(mage, strdup(co->order), 73, MSG_MAGIC);
-		} else {
-			int w = weight(u);
-			if(!can_survive(u, rt)) {
-				cmistake(mage, strdup(co->order), 231, MSG_MAGIC);
-			} else if(remaining_cap - w < 0) {
-				sprintf(buf, "%s ist zu schwer.", unitname(u));
-			  addmessage(r, mage->faction, buf,  MSG_MAGIC, ML_WARN);
-			} else {
-				remaining_cap = remaining_cap - w;
-				move_unit(u, rt, NULL);
-				erfolg = cast_level;
+    if (!ucontact(u, mage)) {
+      cmistake(mage, strdup(co->order), 73, MSG_MAGIC);
+    } else {
+      int w;
+      
+      if (!can_survive(u, rt)) {
+        cmistake(mage, strdup(co->order), 231, MSG_MAGIC);
+        continue;
+      }
 
-				/* Meldungen in der Ausgangsregion */
+      w = weight(u);
+      if (remaining_cap - w < 0) {
+        ADDMSG(&mage->faction->msgs, msg_message("fail_tooheavy", 
+          "command region unit target", co->order, r, mage, u));
+        continue;
+      }
+      remaining_cap = remaining_cap - w;
+      move_unit(u, rt, NULL);
+      erfolg = cast_level;
 
-				for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
+      /* Meldungen in der Ausgangsregion */
+      ADDMSG(&r->msgs, msg_message("astral_disappear", "unit", u));
 
-				for(u2 = r->units; u2; u2 = u2->next ) {
-					if(!fval(u2->faction, FL_DH)) {
-						fset(u2->faction, FL_DH);
-						if(cansee(u2->faction, r, u, 0)) {
-							sprintf(buf, "%s wird durchscheinend und verschwindet.",
-								unitname(u));
-							addmessage(r, u2->faction, buf, MSG_EVENT, ML_INFO);
-						}
-					}
-				}
-
-				/* Meldungen in der Zielregion */
-
-				for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
-				for(u2 = rt->units; u2; u2 = u2->next ) {
-					if(!fval(u2->faction, FL_DH)) {
-						fset(u2->faction, FL_DH);
-						if(cansee(u2->faction, rt, u, 0)) {
-							sprintf(buf, "%s erscheint plötzlich.", unitname(u));
-							addmessage(rt, u2->faction, buf, MSG_EVENT, ML_INFO);
-						}
-					}
-				}
-			}
-		}
-	}
-	return erfolg;
+      /* Meldungen in der Zielregion */
+      ADDMSG(&rt->msgs, msg_message("astral_appear", "unit", u));
+    }
+  }
+  return erfolg;
 }
 
 /* ------------------------------------------------------------- */
@@ -3601,7 +3584,7 @@ sp_chaossuction(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 
-	if(getplane(r)) {
+	if (getplane(r)!=get_normalplane()) {
 		/* Der Zauber funktioniert nur in der materiellen Welt. */
 		cmistake(mage, strdup(co->order), 190, MSG_MAGIC);
 		return 0;
@@ -3609,7 +3592,7 @@ sp_chaossuction(castorder *co)
 
 	rt  = r_standard_to_astral(r);
 
-	if(!rt || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
+	if (rt==NULL || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
 		/* Hier gibt es keine Verbindung zur astralen Welt.*/
 		cmistake(mage, strdup(co->order), 216, MSG_MAGIC);
 		return 0;
@@ -5795,8 +5778,7 @@ sp_resist_magic_bonus(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/*		 "ZAUBERE [STUFE n]  \"Astraler Weg\" [<Ziel-X> <Ziel-Y>]
- *		 <Einheit-Nr> [<Einheit-Nr> ...]",
+/* "ZAUBERE [STUFE n]  \"Astraler Weg\" <Einheit-Nr> [<Einheit-Nr> ...]",
  *
  * Parameter:
  * pa->param[0]->data.s
@@ -6165,115 +6147,101 @@ sp_leaveastral(castorder *co)
 int
 sp_fetchastral(castorder *co)
 {
-	region *rt, *ro;
-	unit *u, *u2;
-	int remaining_cap;
-	int n, w;
-	region *r = co->rt;
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-	double power = co->force;
-	spellparameter *pa = co->par;
+  int n;
+  unit *mage = (unit *)co->magician;
+  int cast_level = co->level;
+  spellparameter *pa = co->par;
+  double power = co->force;
+  int remaining_cap = (int)((power-3) * 1500);
+  region_list * rtl = NULL;
+  region * rt = co->rt;
+  region * ro = NULL;
 
-	switch(getplaneid(r)) {
-	case 0:
-		rt = r;
-		ro = r_standard_to_astral(r);
-		if(!ro) {
-			cmistake(mage, strdup(co->order), 216, MSG_MAGIC);
-			return 0;
-		}
-		break;
-	default:
-		sprintf(buf, "Der Zauber funktioniert nur in der materiellen Welt.");
-		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
-		return 0;
-	}
+  if (rplane(rt)!=get_normalplane()) {
+    ADDMSG(&mage->faction->msgs, msg_message("error190", 
+      "command region unit", co->order, rt, mage));
+    return 0;
+  }
 
-	if(!ro
-			|| is_cursed(ro->attribs, C_ASTRALBLOCK, 0)
-			|| is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
-		sprintf(buf, "Die Wege aus dieser astralen Region sind blockiert.");
-		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
-		return 0;
-	}
+  if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
+    ADDMSG(&mage->faction->msgs, msg_message("spellfail_distance", 
+      "command region unit", co->order, rt, mage));
+    return 0;
+  }
 
-  remaining_cap = (int)((power-3) * 1500);
+  /* für jede Einheit in der Kommandozeile */
+  for (n=0; n!=pa->length; ++n) {
+    unit * u = pa->param[n]->data.u;
+    int w;
 
-	/* für jede Einheit in der Kommandozeile */
-	for (n = 0; n < pa->length; n++) {
+    if (pa->param[n]->flag & TARGET_NOTFOUND) continue;
 
-		if(pa->param[n]->flag == TARGET_NOTFOUND) continue;
+    if (u->region!=ro) {
+      /* this can happen several times if the units are from different astral
+       * regions. Only possible on the intersections of schemes */
+      region_list * rfind;
+      rt = u->region;
+      if (rtl!=NULL) free_regionlist(rtl);
+      rtl = astralregions(rt, NULL);
+      for (rfind=rtl;rfind!=NULL;rfind=rfind->next) {
+        if (rfind->data==ro) break;
+      }
+      if (rfind==NULL) {
+        /* the region r is not in the schemes of rt */
+        ADDMSG(&mage->faction->msgs, msg_message("spellfail_distance", 
+          "command region unit target", co->order, ro, mage, u));
+        continue;
+      }
+    }
 
-		u = pa->param[n]->data.u;
-
-    if (ro != u->region) {
-      sprintf(buf, "%s ist zu weit von %s entfernt.",
-        unitname(u), unitname(mage));
-      addmessage(r, mage->faction, buf, MSG_EVENT, ML_MISTAKE);
+    if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
+      ADDMSG(&mage->faction->msgs, msg_message("spellfail_distance", 
+        "command region unit", co->order, ro, mage));
       continue;
     }
 
-		if (!ucontact(u, mage)) {
-			if (power > 12 && !pa->param[n]->flag == TARGET_RESISTS && can_survive(u, rt)) {
-				sprintf(buf, "%s hat uns nicht kontaktiert, widersteht dem "
-						"Zauber jedoch nicht.", unitname(u));
-				addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
-				sprintf(buf, "%s wird von %s in eine andere Welt geschleudert.",
-					unitname(u),
-					cansee(u->faction, r, mage, 0)?unitname(mage):"jemandem");
-				addmessage(r, u->faction, buf, MSG_EVENT, ML_WARN);
-			} else {
-				sprintf(buf, "%s hat uns nicht kontaktiert und widersteht dem "
-						"Zauber.", unitname(u));
-				addmessage(r, mage->faction, buf, MSG_MAGIC, ML_WARN);
-				sprintf(buf, "%s versucht, %s in eine andere Welt zu schleudern.",
-					cansee(u->faction, r, mage, 0)?unitname(mage):"Jemand",
-					unitname(u));
-				addmessage(r, u->faction, buf, MSG_EVENT, ML_WARN);
-				continue;
-			}
-		}
+    if (!can_survive(u, rt)) {
+      cmistake(mage, strdup(co->order), 231, MSG_MAGIC);
+      continue;
+    } 
 
-		w = weight(u);
-		if(!can_survive(u, rt)) {
-			cmistake(mage, strdup(co->order), 231, MSG_MAGIC);
-		} else if(remaining_cap - w < 0) {
-			addmessage(r, mage->faction, "Die Einheit ist zu schwer.",
-					MSG_MAGIC, ML_MISTAKE);
-		} else {
-			remaining_cap = remaining_cap - w;
-			move_unit(u, rt, NULL);
+    w = weight(u);
+    if (remaining_cap - w < 0) {
+      ADDMSG(&mage->faction->msgs, msg_message("fail_tooheavy", 
+        "command region unit target", co->order, ro, mage, u));
+      continue;
+    }
 
-			/* Meldungen in der Ausgangsregion */
+    if (!ucontact(u, mage)) {
+      if (power>12 && !(pa->param[n]->flag & TARGET_RESISTS)) {
+        sprintf(buf, "%s hat uns nicht kontaktiert, widersteht dem "
+          "Zauber jedoch nicht.", unitname(u));
+        addmessage(rt, mage->faction, buf, MSG_MAGIC, ML_INFO);
+        sprintf(buf, "%s wird von %s in eine andere Welt geschleudert.",
+          unitname(u), unitname(mage));
+        addmessage(rt, u->faction, buf, MSG_EVENT, ML_WARN);
+      } else {
+        sprintf(buf, "%s hat uns nicht kontaktiert und widersteht dem "
+          "Zauber.", unitname(u));
+        addmessage(rt, mage->faction, buf, MSG_MAGIC, ML_WARN);
+        sprintf(buf, "%s versucht, %s in eine andere Welt zu schleudern.",
+          unitname(mage), unitname(u));
+        addmessage(ro, u->faction, buf, MSG_EVENT, ML_WARN);
+        continue;
+      }
+    }
 
-			for (u2 = ro->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
-			for(u2 = ro->units; u2; u2 = u2->next ) {
-				if(!fval(u2->faction, FL_DH)) {
-					fset(u2->faction, FL_DH);
-					if(cansee(u2->faction, ro, u, 0)) {
-						sprintf(buf, "%s wird durchscheinend und verschwindet.",
-							unitname(u));
-						addmessage(ro, u2->faction, buf, MSG_EVENT, ML_INFO);
-					}
-				}
-			}
+    remaining_cap -= w;
+    move_unit(u, rt, NULL);
 
-			/* Meldungen in der Zielregion */
+    /* Meldungen in der Ausgangsregion */
+    ADDMSG(&ro->msgs, msg_message("astral_disappear", "unit", u));
 
-			for (u2 = rt->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
-			for (u2 = rt->units; u2; u2 = u2->next ) {
-				if(!fval(u2->faction, FL_DH)) {
-					fset(u2->faction, FL_DH);
-					if(cansee(u2->faction, rt, u, 0)) {
-						sprintf(buf, "%s erscheint plötzlich.", unitname(u));
-						addmessage(rt, u2->faction, buf, MSG_EVENT, ML_INFO);
-					}
-				}
-			}
-		}
-	}
-	return cast_level;
+    /* Meldungen in der Zielregion */
+    ADDMSG(&rt->msgs, msg_message("astral_appear", "unit", u));
+  }
+  if (rtl!=NULL) free_regionlist(rtl);
+  return cast_level;
 }
 
 #ifdef SHOWASTRAL_NOT_BORKED

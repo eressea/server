@@ -1119,8 +1119,8 @@ quit(void)
 						break;
 					} else {
 						cmistake(u, S->s, 86, MSG_EVENT);
-						printf("	Warnung: STIRB mit falschem Passwort für Partei %s: %s\n",
-							   factionid(u->faction), S->s);
+						log_warning(("STIRB mit falschem Passwort für Partei %s: %s\n",
+							   factionid(u->faction), S->s));
 					}
 				} else if(igetkeyword(S->s, u->faction->locale) == K_RESTART && u->number > 0) {
 					const char *s_race, *s_pass;
@@ -1155,8 +1155,8 @@ quit(void)
 
 					if (!checkpasswd(u->faction, s_pass, false)) {
 						cmistake(u, S->s, 86, MSG_EVENT);
-						printf("  Warnung: NEUSTART mit falschem Passwort für Partei %s: %s\n",
-							   factionid(u->faction), S->s);
+						log_warning(("NEUSTART mit falschem Passwort für Partei %s: %s\n",
+							   factionid(u->faction), S->s));
 						continue;
 					}
 					restart(u, frace);

@@ -676,9 +676,6 @@ ship_in_storm(unit *cap, region *next_point)
 	if(i) fset(cap, UFL_STORM);
 }
 
-#define USE_CREATION 0
-/* ------------------------------------------------------------- */
-
 static boolean
 present(region * r, unit * u)
 {

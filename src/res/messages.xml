@@ -5560,9 +5560,9 @@
       <arg name="unit" type="unit"/>
       <arg name="potion" type="resource"/>
     </type>
-    <text locale="de">"$unit($unit) benutzt einen $resource($potion,1)."</text>
-    <text locale="fr">"$unit($unit) uses a $resource($potion,1)."</text>
-    <text locale="en">"$unit($unit) uses a $resource($potion,1)."</text>
+    <text locale="de">"$unit($unit) benutzt $resource($potion,1)."</text>
+    <text locale="fr">"$unit($unit) uses $resource($potion,1)."</text>
+    <text locale="en">"$unit($unit) uses $resource($potion,1)."</text>
   </message>
   <message name="pest" section="events">
     <type>
@@ -5912,7 +5912,7 @@
     <text locale="de">"$unit($unit) spielt einen Dudelsack. Ausser sich vor Furcht geben die Bauern $int($money) Silber."</text>
     <text locale="en">"$unit($unit) plays the bagpipe. Stricken with fear the peasants give $int($money) silver."</text>
   </message>
-  
+
   <message name="artacademy_create" section="magic">
     <type>
       <arg name="unit" type="unit"/>
@@ -5930,6 +5930,54 @@
     <text locale="de">"$unit($unit) in $region($region) erschafft eine Skulptur."</text>
     <text locale="en">"$unit($unit) in $region($region) creates a sculpture."</text>
   </message>
-  
+
+  <message name="spellfail_distance" section="error">
+    <type>
+      <arg name="command" type="order"/>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="target" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) ist zu weit entfernt."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) is too far away."</text>
+  </message>
+
+  <message name="spellfail_block" section="error">
+    <type>
+      <arg name="command" type="order"/>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Wege aus dieser Region sind blockiert."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The connections from to this regions are blocked."</text>
+  </message>
+
+  <message name="astral_appear" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) erscheint plötzlich."</text>
+    <text locale="en">"$unit($unit) appears."</text>
+  </message>
+
+  <message name="astral_disappear" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) wird durchscheinend und verschwindet."</text>
+    <text locale="en">"$unit($unit) disappears."</text>
+  </message>
+
+  <message name="fail_toheavy" section="errors">
+    <type>
+      <arg name="command" type="order"/>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="target" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($target) ist zu schwer."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) is too heavy."</text>
+  </message>
+
 </messages>
 

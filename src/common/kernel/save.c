@@ -253,7 +253,7 @@ rds(FILE * F, char **ds)
 		if (s - buffer > DISPLAYSIZE) {
 			assert(s <= buffer + DISPLAYSIZE + 1);
 			*s = 0;
-			printf("\nDer String %s wurde nicht terminiert.\n", s);
+			log_error(("\nDer String %s wurde nicht terminiert.\n", s));
 			exit(1);
 		}
 		rc(F);
@@ -665,7 +665,7 @@ readorders(const char *filename)
 
 	fclose(F);
 	puts("\n");
-	printf("   %d Befehlsdateien gelesen\n", nfactions);
+	log_printf("   %d Befehlsdateien gelesen\n", nfactions);
 	return 0;
 }
 /* ------------------------------------------------------------- */
@@ -1237,12 +1237,7 @@ writeunit(FILE * F, const unit * u)
 	wnl(F);
 
 	assert(u->number >= 0);
-#ifdef MONEY_BUG
-	if (get_money(u) < 0)
-		printf("Einheit %s hat %d silber", unitname(u), get_money(u));
-#else
 	assert(u->race);
-#endif
 
 	for (i=0;i!=u->skill_size;++i) {
 		skill * sv = u->skills+i;
@@ -1741,16 +1736,8 @@ readgame(const char * filename, int backup)
   if (backup) create_backup(buf);
   F = cfopen(buf, "r");
   if (F==NULL) {
-    printf("Keine Spieldaten gefunden.\n");
-#if 0
-    printf("Neues Spiel (j/n)? ");
-    if (tolower(getchar()) != 'j') {
-      exit(0);
-    }
-    return creategame();
-#else
+    log_error(("Keine Spieldaten gefunden.\n"));
     return -1;
-#endif
   }
 
   rc(F);
@@ -1774,9 +1761,7 @@ readgame(const char * filename, int backup)
       ++basearg;
     }
     if (strcmp(basearg, basefile)!=0) {
-      printf("WARNING: xmlfile mismatch:\n");
-      printf("WARNING: datafile contains %s\n", basefile);
-      printf("WARNING: argument/default is %s\n", basearg);
+      log_warning(("xmlfile mismatch: datafile contains %s, argument/default is %s\n", basefile, basearg));
       printf("WARNING: any key to continue, Ctrl-C to stop\n");
       getchar();
     }
