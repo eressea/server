@@ -5977,11 +5977,11 @@
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
-			<arg name="target" type="unit"></arg>
+			<arg name="target" type="string"></arg>
 		</type>
 		<locale name="de">
 			<nr section="magic">
-				<text>"$unit($unit) in $region($region): '$command' - $unit($unit) verzaubert $unit($target)"</text>
+				<text>"$unit($unit) in $region($region): '$command' - $unit($unit) verzaubert $target"</text>
 			</nr>
 		</locale>
 	</message>

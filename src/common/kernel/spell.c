@@ -1291,7 +1291,7 @@ patzer_ents(castorder *co)
 
 	/* melden, 1x pro Partei */
 	{
-		message * unseen = msg_message("entrise", "region amount", r, ents);
+		message * unseen = msg_message("entrise", "region", r);
 		report_effect(r, mage, unseen, unseen);
 	}
 }
