@@ -730,11 +730,12 @@ print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int in
 
 		if (fval(a->type, ATF_CURSE)) {
 			curse *c = (curse *)a->data.v;
-			if (c->type->curseinfo)
+			if (c->type->curseinfo) {
 				if (c->type->cansee){
 					self = c->type->cansee(viewer, obj, typ, c, self);
 				}
 				dh = c->type->curseinfo(viewer->locale, obj, typ, c, self);
+			}
 			if (dh == 1) {
 				rnl(F);
 				rparagraph(F, buf, indent, 0);

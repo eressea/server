@@ -334,7 +334,7 @@ cinfo_sparkle(const struct locale * lang, const void * obj, typ_t typ, struct cu
 static struct curse_type ct_sparkle = { "sparkle",
 	CURSETYP_UNIT, CURSE_SPREADMODULO, ( M_MEN | M_DURATION ),
 	"Dieser Zauber ist einer der ersten, den junge Magier in der Schule lernen.",
-	NULL
+	cinfo_sparkle
 };
 
 /* ------------------------------------------------------------- */
@@ -361,7 +361,7 @@ static struct curse_type ct_strength = { "strength",
 	CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 	"Dieser Zauber vermehrt die Stärke der verzauberten Personen um ein "
 	"vielfaches.",
-	NULL
+	cinfo_strength
 };
 
 /* ------------------------------------------------------------- */
@@ -387,7 +387,7 @@ static struct curse_type ct_worse = {
 	"worse",
 	CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
 	"",
-	NULL
+	cinfo_allskills
 };
 
 /* ------------------------------------------------------------- */
