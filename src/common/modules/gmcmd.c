@@ -404,7 +404,14 @@ gm_messageunit(const char * str, void * data, const char * cmd)
 	const struct plane * p = rplane(u->region);
 	unit * target = findunit(atoi36(igetstrtoken(str)));
 	const char * msg = getstrtoken();
-	region * r = target->region;
+	region * r;
+
+	if (target == NULL) {
+		cmistake(u, cmd, 63, MSG_EVENT);
+		return;
+	}
+
+	r = target->region;
 
 	if (r==NULL || p!=rplane(r)) {
 		mistake(u, cmd, "In diese Region kann keine Nachricht gesandt werden.\n", 0);
