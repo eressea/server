@@ -1011,7 +1011,7 @@ update_gms(void)
 				add_key((attrib**)&permissions->data.v, atoi36(keys[k]));
 			}
 			for (i=I_GREATSWORD;i!=I_KEKS;++i) {
-				attrib * a = a_find(permissions, &at_gmcreate);
+				attrib * a = a_find((attrib*)permissions->data.v, &at_gmcreate);
 				while (a && a->data.v!=(void*)olditemtype[i]) a=a->nexttype;
 				if (!a) a_add((attrib**)&permissions->data.v, make_atgmcreate(olditemtype[i]));
 			}
@@ -1963,7 +1963,7 @@ update_gmquests(void)
 			if (p!=NULL) p->flags |= PFL_NOMONSTERS;
 		}
 		for (p=0;p!=MAX_POTIONS;++p) {
-			attrib * a = a_find(permissions, &at_gmcreate);
+			attrib * a = a_find((attrib*)permissions->data.v, &at_gmcreate);
 			while (a && a->data.v!=(void*)oldpotiontype[p]->itype) a=a->nexttype;
 			if (!a) a_add((attrib**)&permissions->data.v, make_atgmcreate(oldpotiontype[p]->itype));
 		}

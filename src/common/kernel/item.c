@@ -1974,13 +1974,13 @@ use_mistletoe(struct unit * user, const struct item_type * itype, int amount, co
 
 	if (user->number>mtoes) {
 		ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
-			"unit item region command", user, itype, user->region, cmd));
+			"unit item region command", user, itype->rtype, user->region, cmd));
 		return -1;
 	}
 	new_use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
 	a_add(&user->attribs, make_fleechance((float)1.0));
 		ADDMSG(&user->faction->msgs, msg_message("use_item",
-			"unit item", user, itype));
+			"unit item", user, itype->rtype));
 	
 	return 0;
 }
