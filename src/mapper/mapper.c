@@ -1466,7 +1466,11 @@ main(int argc, char *argv[])
 	debug_language("locales.log");
 
 	register_races();
+	register_resources();
+	register_items();
 	register_spells();
+/*	register_dungeon(); */
+
 	init_data("eressea.xml");
 	init_locales();
 
