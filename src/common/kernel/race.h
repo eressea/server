@@ -167,9 +167,7 @@ extern int read_race_reference(const struct race ** rp, FILE * F);
 
 extern const char * raceprefix(const struct unit *u);
 
-#ifdef NEW_STARTEQUIPMENT
 extern void add_equipment(const struct item_type * itype, int number);
-#endif
 extern void give_starting_equipment(struct region *r, struct unit *u);
 
 #ifdef __cplusplus

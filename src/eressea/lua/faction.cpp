@@ -5,7 +5,9 @@
 // kernel includes
 #include <kernel/faction.h>
 #include <kernel/unit.h>
-#include <modules/alliance.h>
+#ifdef ALLIANCES
+# include <modules/alliance.h>
+#endif
 
 // lua includes
 #include <lua.hpp>
@@ -43,6 +45,7 @@ faction_units(const faction& f)
   return eressea::list<unit, unit, factionunit>(f.units);
 }
 
+#ifdef ALLIANCES
 static void
 faction_setalliance(faction& f, alliance * team)
 {
@@ -54,8 +57,7 @@ faction_getalliance(const faction& f)
 {
   return f.alliance;
 }
-
-
+#endif
 
 void
 bind_faction(lua_State * L) 
@@ -73,6 +75,8 @@ bind_faction(lua_State * L)
     .def_readwrite("subscription", &faction::subscription)
     .def_readwrite("lastturn", &faction::lastorders)
     .property("units", &faction_units, return_stl_iterator)
+#ifdef ALLIANCES
     .property("alliance", &faction_getalliance, &faction_setalliance)
+#endif
   ];
 }

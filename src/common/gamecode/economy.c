@@ -133,27 +133,7 @@ scramble(void *data, int n, size_t width)
     memcpy((char*)data+k*width, temp, width);
   }
 }
-#if 0
-#define MAX 6
-int oi[MAX];
 
-void
-test_scramble(void)
-{
-	int i;
-	for (i=0;i!=MAX;++i) {
-		oi[i] = i;
-	}
-	scramble(oi, MAX, sizeof(int));
-	for (i=0;i!=MAX;++i) {
-		int j;
-		for (j=0;j!=MAX;++j) {
-			if (oi[j]==i) break;
-		}
-		assert(j!=MAX);
-	}
-}
-#endif
 static void
 expandorders(region * r, request * requests)
 {
@@ -190,15 +170,11 @@ expandorders(region * r, request * requests)
 		} else {
 			oa = NULL;
 		}
-#if 0
-		freelist(requests);
-#else
 		while (requests) {
 			request * o = requests->next;
 			free(requests);
 			requests = o;
 		}
-#endif
 }
 /* ------------------------------------------------------------- */
 

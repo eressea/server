@@ -1155,6 +1155,7 @@ typedef struct settings {
 	unsigned int   maxunits;
 	struct attrib *attribs;
 	unsigned int   data_version;
+  unsigned int   data_turn;
 	boolean disabled[MAXKEYWORDS];
 	struct param * parameters;
 } settings;

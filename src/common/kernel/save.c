@@ -574,7 +574,7 @@ factionorders(void)
 
 		/* TODO: +1 ist ein Workaround, weil turn erst in process_orders
 		 * incrementiert wird. */
-		f->lastorders = turn+1;
+		f->lastorders = global.data_turn+1;
 
 	} else
 		log_warning(("Befehle für die ungültige Partei %s\n", fid));
@@ -894,7 +894,7 @@ readgame(const char * filename, int backup)
 		exit(-1);
 	}
 #endif
-	turn = ri(F);
+	global.data_turn = turn = ri(F);
 	/* read_dynamictypes(); */
 	/* max_unique_id = */ ri(F);
 	nextborder = ri(F);

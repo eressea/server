@@ -146,10 +146,28 @@
 			RelativePath=".\alliance.c">
 		</File>
 		<File
+			RelativePath=".\arena.c">
+		</File>
+		<File
+			RelativePath=".\arena.h">
+		</File>
+		<File
+			RelativePath=".\dungeon.c">
+		</File>
+		<File
+			RelativePath=".\dungeon.h">
+		</File>
+		<File
 			RelativePath=".\gmcmd.c">
 		</File>
 		<File
 			RelativePath=".\infocmd.c">
+		</File>
+		<File
+			RelativePath=".\museum.c">
+		</File>
+		<File
+			RelativePath=".\museum.h">
 		</File>
 		<File
 			RelativePath=".\score.c">

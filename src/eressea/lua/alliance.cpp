@@ -1,5 +1,7 @@
 #include <config.h>
 #include <eressea.h>
+
+#ifdef ALLIANCES
 #include "list.h"
 
 // kernel includes
@@ -51,3 +53,4 @@ bind_alliance(lua_State * L)
     .property("factions", &alliance_factions, return_stl_iterator)
   ];
 }
+#endif

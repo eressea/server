@@ -326,7 +326,9 @@ lua_init(void)
   luaopen_io(luaState);
   luabind::open(luaState);
   bind_eressea(luaState);
+#ifdef ALLIANCES
   bind_alliance(luaState);
+#endif
   bind_region(luaState);
   bind_faction(luaState);
   bind_unit(luaState);

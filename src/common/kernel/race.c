@@ -193,13 +193,11 @@ set_show_item(faction *f, item_t i)
 	a->data.v = (void*)olditemtype[i];
 }
 
-#ifdef NEW_STARTEQUIPMENT
 static item * equipment;
 void add_equipment(const item_type * itype, int number)
 {
   if (itype!=NULL) i_change(&equipment, itype, number);
 }
-#endif
 
 void
 give_starting_equipment(struct region *r, struct unit *u)
