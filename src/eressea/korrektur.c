@@ -796,48 +796,6 @@ get_timeout(trigger * td, trigger * tfind)
 #include <modules/gmcmd.h>
 
 static int
-resize_plane(struct plane * p, int radius)
-{
-	region * center = findregion(p->minx+(p->maxx-p->minx)/2, p->miny+(p->maxy-p->miny)/2);
-	int x, y, minx, maxx, miny, maxy;
-        if (!center) return 0;
-	minx = center->x - radius;
-	maxx = center->x + radius;
-	miny = center->y - radius;
-	maxy = center->y + radius;
-
-	for (x=minx;x<=maxx;++x) {
-		for (y=miny;y<=maxy;++y) {
-			region * r = findregion(x, y);
-			if (r && rplane(r)!=p) break;
-		}
-	}
-	if (x<=maxx) return -1;
-	p->maxx=maxx;
-	p->maxy=maxy;
-	p->minx=minx;
-	p->miny=miny;
-	for (x=minx;x<=maxx;++x) {
-		for (y=miny;y<=maxy;++y) {
-			region * r = findregion(x, y);
-			if (r==NULL) {
-				r = new_region(x, y);
-				freset(r, RF_ENCOUNTER);
-				r->planep = p;
-				if (distance(r, center)==radius) {
-					terraform(r, T_FIREWALL);
-				} else if (distance(r, center)<radius) {
-					terraform(r, T_OCEAN);
-				}
-			} else if (rterrain(r)==T_FIREWALL && distance(r, center)!=radius) {
-				terraform(r, T_OCEAN);
-			}
-		}
-	}
-	return 0;
-}
-
-static int
 secondfaction(faction * pf)
 {
 	unit * u = findunit(atoi36("5q9w"));
@@ -1165,10 +1123,13 @@ static void
 fix_dissolve(unit * u, int value, char mode)
 {
   attrib * a = a_find(u->attribs, &at_unitdissolve);
+
+  unused(value);
+
   if (a!=NULL) return;
   a = a_add(&u->attribs, a_new(&at_unitdissolve));
   a->data.ca[0] = mode;
-  a->data.ca[1] = (char)value;
+  a->data.ca[1] = 100;
   log_warning(("unit %s has race %s and no dissolve-attrib\n", unitname(u), rc_name(u->race, 0)));
 }
 
@@ -1178,7 +1139,7 @@ check_dissolve(void)
   region * r;
   for (r=regions;r!=NULL;r=r->next) {
     unit * u;
-    for (u=r->units;u!=NULL;u=u->next) {
+    for (u=r->units;u!=NULL;u=u->next) if (u->faction->no!=MONSTER_FACTION) {
       if (u->race==new_race[RC_STONEGOLEM]) {
         fix_dissolve(u, STONEGOLEM_CRUMBLE, 0);
         continue;
