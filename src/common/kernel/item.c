@@ -1474,11 +1474,7 @@ init_olditems(void)
 		if (itemdata[i].benutze_funktion) {
 			itype->use = use_olditem;
 		}
-		if (con->materials) {
-			itype->construction = con;
-		} else {
-			free(con);
-		}
+		itype->construction = con;
 		olditemtype[i] = itype;
 		oldresourcetype[item2res(i)] = rtype;
 	}
