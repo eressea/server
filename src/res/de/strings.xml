@@ -1409,7 +1409,7 @@
     <text locale="de">Auratrank</text>
     <text locale="en">aura potion</text>
   </string>
-  <string name="trappedairelemental_p">
+  <string name="aurapotion50_p">
     <text locale="de">Auratränke</text>
     <text locale="en">aura potions</text>
   </string>
