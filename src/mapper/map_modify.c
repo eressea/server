@@ -530,7 +530,7 @@ NeuesSchiff(region * r)
 	wAddstr(stype[q]->name[0]);
 	wrefresh(win);
 
-	s = new_ship(stype[q], r);
+	s = new_ship(stype[q], default_locale, r);
 	/* Ist das richtig so, Henning? */
 	addlist(&r->ships, s);
 	s->region = r;
