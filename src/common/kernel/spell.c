@@ -393,11 +393,9 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
 					if (cansee(u->faction, r, mage, 0)) {
 						r_addmessage(r, u->faction, seen);
 					} else {
-						if (!unseen) unseen = msg_message("path_effect", "mage", NULL);
 						r_addmessage(r, u->faction, unseen);
 					}
 				} else { /* Fernzauber, fremde Partei sieht den Magier niemals */
-					if (!unseen) unseen = msg_message("path_effect", "mage", NULL);
 					r_addmessage(r, u->faction, unseen);
 				}
 			} else { /* Partei des Magiers, sieht diesen immer */
