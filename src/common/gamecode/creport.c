@@ -1123,7 +1123,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 								}
 							}
 						}
-						if (level>=0) {
+						if (level>=0 && visible >=0) {
 							pos = report_resource(pos, res->type->name, f->locale, visible, level);
 # ifdef RESOURCECOMPAT
 							if (visible>=0) fprintf(F, "%d;%s\n", visible, crtag(res->type->name));
