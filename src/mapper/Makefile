@@ -24,8 +24,12 @@ LIBS      += \
 	-le-races \
 	-le-attributes \
 	-le-util \
-	-lcurses \
 	-lm
+ifeq ($(NCURSES), 1)
+ LIBS += -lncurses
+else
+ LIBS += -lcurses
+endif
 
 ##
 ## conversion code for old triggers - should only be used for free eressea,
