@@ -1850,7 +1850,7 @@ travel(unit * u, region_list ** routep)
   /* a few pre-checks that need not be done for each step: */
   if (rterrain(r)!=T_OCEAN) {
     /* An Land kein NACH wenn in dieser Runde Schiff VERLASSEN! */
-    if (leftship(u) && is_guarded(r, u, GUARD_LANDING)) {
+    if ((u->ship || leftship(u)) && is_guarded(r, u, GUARD_LANDING)) {
       cmistake(u, u->thisorder, 70, MSG_MOVE);
       return;
     }
