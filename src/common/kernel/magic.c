@@ -1779,10 +1779,9 @@ verify_targets(castorder *co)
 						spobj->data.i = u->no;
 						spobj->flag = TARGET_RESISTS;
 						resists++;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellunitresists%u:unit%r:region%s:command%d:id",
-							mage, mage->region, strdup(co->order),
-							spobj->data.i));
+						ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
+              "unit region command target",
+							mage, mage->region, strdup(co->order), u));
 						break;
 					}
 

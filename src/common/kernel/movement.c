@@ -254,6 +254,7 @@ walkingcapacity(unit * u)
 	n += personen * personcapacity(u);
 	/* Goliathwasser */
 	n += get_effect(u, oldpotiontype[P_STRONG]) * personcapacity(u);
+  /* change_effect wird in ageing gemacht */
 	n += min(get_item(u, I_TROLLBELT), u->number) * STRENGTHCAPACITY;
 
 	return n;
@@ -604,21 +605,6 @@ drifting_ships(region * r)
 			sh = sh2;
 		}
 	}
-}
-
-char *
-coords_or_direction(region *r, faction *f, int dir)
-{
-	static char lbuf[32];
-	plane *pl = getplane(r);
-
-	if(fval(pl, PFL_NOCOORDS)) {
-		strcpy(lbuf, locale_string(f->locale, directions[dir]));
-	} else {
-		sprintf(lbuf, "(%d,%d)",region_x(r,f), region_y(r,f));
-	}
-
-	return lbuf;
 }
 
 static void
@@ -2055,26 +2041,27 @@ destroy_damaged_ships(void)
 	}
 }
 
-boolean
+#ifdef TODO /* Wenn Feature ausgearbeitet */
+
+static boolean
 is_disorientated(unit *u)
 {
-	static boolean init = false;
-	static const curse_type * shipconf_ct, * regconf_ct;
-	if (!init) { 
-		init = true; 
-		regconf_ct = ct_find("disorientationzone"); 
-		shipconf_ct = ct_find("shipdisorientation"); 
-	}
-	if (u->ship && curse_active(get_curse(u->ship->attribs, shipconf_ct)))
-		return true;
+  static boolean init = false;
+  static const curse_type * shipconf_ct, * regconf_ct;
+  if (!init) { 
+    init = true; 
+    regconf_ct = ct_find("disorientationzone"); 
+    shipconf_ct = ct_find("shipdisorientation"); 
+  }
+  if (u->ship && curse_active(get_curse(u->ship->attribs, shipconf_ct)))
+    return true;
 
-	if (curse_active(get_curse(u->region->attribs, regconf_ct)))
-		return true;
+  if (curse_active(get_curse(u->region->attribs, regconf_ct)))
+    return true;
 
-	return false;
+  return false;
 }
 
-#ifdef TODO /* Wenn Feature ausgearbeitet */
 void
 regain_orientation(region * r)
 {

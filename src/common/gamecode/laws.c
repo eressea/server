@@ -306,6 +306,7 @@ live(region * r)
 					ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
 						"unit weeks skill", u, weeks, (skill_t)sb->id));
 				}	/* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
+        change_effect(u, oldpotiontype[P_FOOL], -effect);
 			}
 		}
 		age_unit(r, u);

@@ -2831,6 +2831,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 
 	/* Effekte von Alchemie */
 	berserk = get_effect(u, oldpotiontype[P_BERSERK]);
+  /* change_effect wird in ageing gemacht */
 
 	/* Effekte von Artefakten */
 	strongmen = min(fig->unit->number, get_item(u, I_TROLLBELT));
