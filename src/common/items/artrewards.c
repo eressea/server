@@ -114,14 +114,13 @@ item_type it_hornofdancing = {
 #define SPEEDUP 2
 
 static int
-use_trappedairelemental(struct unit * u, const struct item_type * itype,
+use_trappedairelemental(struct unit * u, int shipId, 
+                        const struct item_type * itype,
                         int amount, struct order * ord)
 {
   curse  *c;
-  int    shipId;
   ship   *sh;
 
-  shipId = getshipid();
   if(shipId <= 0) {
     cmistake(u, ord, 20, MSG_MOVE);
     return -1;
@@ -156,8 +155,8 @@ item_type it_trappedairelemental = {
   &rt_trappedairelemental,        /* resourcetype */
     0, 1, 0,                        /* flags, weight, capacity */
     NULL,                           /* construction */
-    &use_trappedairelemental,
     NULL,
+    &use_trappedairelemental,
     NULL
 };
 
