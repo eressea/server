@@ -645,6 +645,7 @@ main(int argc, char *argv[])
 #endif
 
   lua_State * luaState = lua_init();
+  global.vm_state = luaState;
   if ((i=read_args(argc, argv, luaState))!=0) return i;
 
   strcat(strcpy(zText, resourcepath()), "/timestrings");
