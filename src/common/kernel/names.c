@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: names.c,v 1.3 2001/02/02 08:40:46 enno Exp $
+ *	$Id: names.c,v 1.4 2001/02/18 12:11:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -667,7 +667,7 @@ abkz(const char *s, size_t max)
 
 	while (*p != 0) {
 		/* Leerzeichen überspringen */
-		while (*p != 0 && !isalnum((int)*p))
+		while (*p != 0 && !isalnum(*(unsigned char*)p))
 			p++;
 
 		/* Counter erhöhen */
@@ -675,7 +675,7 @@ abkz(const char *s, size_t max)
 			c++;
 
 		/* alnums überspringen */
-		while(*p != 0 && isalnum((int)*p))
+		while(*p != 0 && isalnum(*(unsigned char*)p))
 			p++;
 	}
 
@@ -691,12 +691,12 @@ abkz(const char *s, size_t max)
 	while (*p != 0 && c < max) {
 		/* Leerzeichen überspringen */
 
-		while (*p != 0 && !isalnum((int)*p))
+		while (*p != 0 && !isalnum(*(unsigned char*)p))
 			p++;
 
 		/* alnums übertragen */
 
-		for (i = 0; i < bpt && *p != 0 && isalnum((int)*p); i++) {
+		for (i = 0; i < bpt && *p != 0 && isalnum(*(unsigned char*)p); i++) {
 			buf[c] = *p;
 			c++;
 			p++;
@@ -704,7 +704,7 @@ abkz(const char *s, size_t max)
 
 		/* Bis zum nächsten Leerzeichen */
 
-		while (c < max && *p != 0 && isalnum((int)*p))
+		while (c < max && *p != 0 && isalnum(*(unsigned char*)p))
 			p++;
 	}
 

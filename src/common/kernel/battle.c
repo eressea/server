@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.16 2001/02/18 10:06:09 enno Exp $
+ *	$Id: battle.c,v 1.17 2001/02/18 12:11:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2952,8 +2952,12 @@ simplename(region * r)
 	static char name[17];
 	const char * cp = rname(r, NULL);
 	for (i=0;*cp && i!=16;++i, ++cp) {
-		while (*cp && !isalpha(*cp) && !isspace(*cp)) ++cp;
-		if (isspace(*cp)) name[i] = '_';
+		int c = *(unsigned char*)cp;
+		while (c && !isalpha(c) && !isspace(c)) {
+			++cp;
+			c = *(unsigned char*)cp;
+		}
+		if (isspace(c)) name[i] = '_';
 		else name[i] = *cp;
 	}
 	name[i]=0;

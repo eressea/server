@@ -168,15 +168,15 @@ typedef struct fighter {
 		struct weapon * weapon;        /* offensive weapon */
 		struct weapon * secondary;     /* defensive weapon */
 	} * person;
-#ifdef SHOW_KILLS
-	int kills;
-	int hits;
-#endif
 	int flags;
 	int run_number;  /* number of people who have flown */
 	int run_hp;      /* accumulated hp of fleeing people */
 	struct region *run_to;  /* destination of fleeing people */
 	int action_counter;	/* number of active actions the struct unit did in the fight */
+#ifdef SHOW_KILLS
+	int kills;
+	int hits;
+#endif
 #ifdef FAST_GETUNITROW
 	struct {
 		int alive;
