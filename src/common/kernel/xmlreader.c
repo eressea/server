@@ -607,7 +607,7 @@ parse_resources(xmlDocPtr doc)
     xmlXPathObjectPtr result;
     int k;
 
-    if (xml_bvalue(node, "pooled", false)) flags |= RTF_POOLED;
+    if (xml_bvalue(node, "pooled", true)) flags |= RTF_POOLED;
 
     property = xmlGetProp(node, BAD_CAST "name");
     assert(property!=NULL);
