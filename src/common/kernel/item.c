@@ -1940,6 +1940,7 @@ use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int 
 		"unit recipient amount", u, target, amount));
 	assert(oldpotiontype[P_FOOL]->itype==itype);
 	change_effect(target, oldpotiontype[P_FOOL], amount);
+	new_use_pooled(u, itype->rtype, GET_DEFAULT, amount);
 	return 0;
 }
 
