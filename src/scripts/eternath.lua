@@ -1,5 +1,5 @@
 if gate_travel==nil then
-  dofile("gates.lua")
+  loadscript("gates.lua")
 end
 
 local function eternath_exchange(b1, b2, size)

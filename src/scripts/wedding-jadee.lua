@@ -3,7 +3,7 @@
 -- are used as age() functions for a building_action with b:addaction("name")
 
 if gate_travel==nil then
-  dofile("gates.lua")
+  loadscript("gates.lua")
 end
 
 hellgate = nil

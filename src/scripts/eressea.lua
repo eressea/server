@@ -1,15 +1,19 @@
+function loadscript(name)
+  local script = scriptpath .. "/" .. name
+  print("- loading " .. script)
+  if pcall(dofile, script)==0 then
+    print("Could not load " .. script)
+  end
+end
+
 function run_scripts()
   scripts = { 
-    "wedding-jadee.lua", 
     "eternath.lua",
+    "wedding-jadee.lua", 
     "ponnuki.lua"
   }
   for index in scripts do
-    local script = scriptpath .. "/" .. scripts[index]
-    print("- loading " .. script)
-    if pcall(dofile, script)==0 then
-      print("Could not load " .. script)
-    end
+    loadscript(scripts[index])
   end
 end
 
