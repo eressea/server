@@ -5939,7 +5939,7 @@ sp_pullastral(castorder *co)
       u = pa->param[n]->data.u;
 
       if (!ucontact(u, mage)) {
-        if(power > 12 && pa->param[n]->flag == TARGET_RESISTS && can_survive(u, rt)) {
+        if(power > 12 && pa->param[n]->flag != TARGET_RESISTS && can_survive(u, rt)) {
           sprintf(buf, "%s hat uns nicht kontaktiert, widersteht dem "
             "Zauber jedoch nicht.", unitname(u));
           addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
