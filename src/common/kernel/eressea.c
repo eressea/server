@@ -2510,6 +2510,12 @@ void
 guard(unit * u, unsigned int mask)
 {
 	int flags = GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX;
+#if GUARD_DISABLES_PRODUCTION == 1
+	flags |= GUARD_PRODUCE;
+#endif
+#if GUARD_DISABLES_RECRUIT == 1
+	flags |= GUARD_RECRUIT;
+#endif
 	switch (old_race(u->race)) {
 	case RC_ELF:
 		if (u->faction->race != u->race) break;

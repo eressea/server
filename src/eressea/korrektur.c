@@ -2717,6 +2717,26 @@ fix_seeds(void)
 	return 0;
 }
 
+static int
+guard_conversion(void)
+{
+	faction *f;
+	unit *u;
+	int mask = GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX;
+
+	for(f=factions; f; f=f->next) {
+		for(u=f->units; u; u=u->nextF) {
+			int g = getguard(u);
+
+			if( (g & mask) == mask) {
+				setguard(u, g | GUARD_PRODUCE | GUARD_RECRUIT);
+			}
+		}
+	}
+
+	return 0;
+}
+
 void
 korrektur(void)
 {
@@ -2766,6 +2786,7 @@ korrektur(void)
 	do_once("fsee", fix_seeds());
 	do_once("orc2", orc_conversion2());
 	do_once("witm", warn_items());
+	do_once("guac", guard_conversion());
 	warn_password();
 
 	/* seems something fishy is going on, do this just 
