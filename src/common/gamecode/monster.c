@@ -1074,7 +1074,8 @@ plan_monsters(void)
 						/* money is gone */
 						set_new_dragon_target(u, r, DRAGON_RANGE);
 					}
-					else if (u->race != RC_FIREDRAGON && r->terrain!=T_OCEAN && r->terrain!=T_FIREWALL) {
+					else if (u->race != RC_FIREDRAGON && r->terrain!=T_OCEAN
+							&& !(terrain[rterrain(r)].flags & FORBIDDEN_LAND)) {
 						ra = 20 + rand() % 100;
 						if (get_money(u) > ra * 50 + 100 && rand() % 100 < 50)
 						{

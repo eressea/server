@@ -25,6 +25,7 @@ hell;de;Ebene aus Feuer und Dunkelheit
 activevolcano;de;Aktiver Vulkan
 hall1;de;Halle
 corridor1;de;Gang
+magicstorm;de;Magischer Sturm
 
 maelstrom_trail;de;ein %s
 ocean_trail;de;%s
@@ -45,6 +46,7 @@ hell_trail;de;eine %s
 activevolcano_trail;de;ein %s
 hall1_trail;de;die %s
 corridor1_trail;de;die %s
+magicstorm_trail;de;ein %s
 
 caldera;de;Krater
 xmas_exit;de;Pforte

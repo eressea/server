@@ -864,7 +864,11 @@ spellcost(unit *u, spell * sp)
 
 /* ------------------------------------------------------------- */
 /* durch Komponenten und cast_level begrenzter maximal möglicher
- * Level */
+ * Level
+ * Da die Funktion nicht alle Komponenten durchprobiert sondern beim
+ * ersten Fehler abbricht, muss die Fehlermeldung später mit cancast()
+ * generiert werden.
+ * */
 int
 eff_spelllevel(unit *u, spell * sp, int cast_level, int range)
 {
@@ -2765,8 +2769,9 @@ magic(void)
 							continue;
 						}
 						if (range > 1024) { /* (2^10) weiter als 10 Regionen entfernt */
-							sprintf(buf, "Zu der Region %s kann keine Verbindung "
-									"hergestellt werden", regionid(target_r));
+							sprintf(buf, "%s in %s: 'ZAUBER %s' Zu der Region %s kann keine "
+									"Verbindung hergestellt werden", unitname(u),
+									regionid(u->region), sp->name, regionid(target_r));
 							addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
 							continue;
 						}
@@ -2776,8 +2781,10 @@ magic(void)
 						int ilevel = eff_skill(u, SK_MAGIC, u->region);
 						if (ilevel!=level) {
 							level = ilevel;
-							addmessage(0, u->faction, "Dieser Zauber kann nicht mit "
-									"Stufenangabe gezaubert werden.", MSG_MAGIC, ML_WARN);
+							sprintf(buf, "%s in %s: 'ZAUBER %s' Dieser Zauber kann nicht "
+									"mit Stufenangabe gezaubert werden.", unitname(u), 
+									regionid(u->region), sp->name);
+							addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
 						}
 					}
 					/* Vertrautenmagie */
@@ -2854,11 +2861,14 @@ magic(void)
 			/* reichen die Komponenten nicht, wird der Level reduziert. */
 			level = eff_spelllevel(u, sp, level, co->distance);
 			if (level < 1) {
-				sprintf(buf, "%s schafft es nicht genügend Kraft aufzubringen "
-							"um %s zu zaubern und muss erschöpft aufgeben.", unitname(u),
-							sp->name);
-				addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
+				/* Fehlermeldung mit Komponenten generieren */
+				cancast(u, sp, co->level, co->distance);
 				continue;
+			}
+			if (level < co->level){
+				sprintf(buf, "%s hat nur genügend Komponenten um %s auf Stufe %d "
+						"zu zaubern.", unitname(u), sp->name, level);
+				addmessage(0, u->faction, buf, MSG_MAGIC, ML_INFO);
 			}
 			co->level = level;
 

@@ -145,9 +145,11 @@ personcapacity(unit *u)
 {
 	int cap = race[u->race].weight+540;
 
-	if(fspecial(u->faction, FS_QUICK)) {
-		cap -= 2000;
-	}
+	if(u->race == RC_TROLL)
+		cap += 540;
+
+	if(fspecial(u->faction, FS_QUICK))
+		cap -= 200;
 
 	return cap;
 }
@@ -730,6 +732,7 @@ cycle_route(unit *u, int gereist)
 	strcpy(neworder, locale_string(u->faction->locale, keywords[K_ROUTE]));
 
 	for (cm=0;;++cm) {
+		const locale * lang = u->faction->locale;
 		pause = false;
 		token = getstrtoken();
 		d = finddirection(token);
@@ -740,19 +743,21 @@ cycle_route(unit *u, int gereist)
 		}
 		if (cm<gereist) {
 			/* hier sollte keine PAUSE auftreten */
-			if (!pause) strcat(strcat(tail, " "), locale_string(u->faction->locale, shortdirections[d]));
+			assert(!pause);
+			if (!pause) strcat(strcat(tail, " "), shortdirections[d]);
 		}
-		else if (cm==gereist && !paused && pause){
-			strcat(strcat(tail, " "), locale_string(u->faction->locale, parameters[P_PAUSE]));
+		else if (cm==gereist && !paused && pause) {
+			strcat(strcat(tail, " "), LOC(lang, parameters[P_PAUSE]));
 			paused=true;
 		}
-		/* da PAUSE nicht in ein shortdirections[d] umgesetzt wird (ist
-		 * hier keine normale direction), muss jede PAUSE einzeln
-		 * herausgefiltert und explizit gesetzt werden */
 		else if (pause) {
-			strcat(strcat(neworder, " "), locale_string(u->faction->locale, parameters[P_PAUSE]));
-		} else
-			strcat(strcat(neworder, " "), locale_string(u->faction->locale, shortdirections[d]));
+			/* da PAUSE nicht in ein shortdirections[d] umgesetzt wird (ist
+			 * hier keine normale direction), muss jede PAUSE einzeln
+			 * herausgefiltert und explizit gesetzt werden */
+			strcat(strcat(neworder, " "), LOC(lang, parameters[P_PAUSE]));
+		} else {
+			strcat(strcat(neworder, " "), LOC(lang, shortdirections[d]));
+		}
 	}
 
 	strcat(neworder, tail);
@@ -897,7 +902,7 @@ travel(region * first, unit * u, region * next, int flucht)
 	if (rterrain(current)==T_OCEAN
 			&& !(race[u->race].flags&(RCF_FLY) && rterrain(next)!=T_OCEAN))
 	{ /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
-		if (u->race != RC_AQUARIAN)
+		if (race[u->race].flags & RCF_SWIM)
 		{
 			cmistake(u, findorder(u, u->thisorder), 44, MSG_MOVE);
 			return NULL;
@@ -913,7 +918,7 @@ travel(region * first, unit * u, region * next, int flucht)
 			cmistake(u, findorder(u, u->thisorder), 70, MSG_MOVE);
 			return NULL;
 		}
-		if (u->ship && !flucht && u->race != RC_AQUARIAN) {
+		if (u->ship && !flucht && race[u->race].flags & RCF_SWIM) {
 			cmistake(u, findorder(u, u->thisorder), 143, MSG_MOVE);
 			return NULL;
 		}
@@ -1332,11 +1337,11 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 	unit *u2, *hafenmeister;
 	item * trans = NULL;
 	int st, first = 1;
-	int k, m, l, i, t = 0;
+	int k, m, l, i, step = 0;
 	int stormchance;
 	region *rv[MAXSPEED + 1];
-	region *tt[MAXSPEED + 1];
-	static direction_t route[MAXSPEED+1];
+	region *tt[MAXSPEED + 1]; /* travelthru */
+	static direction_t route[MAXSPEED+1]; /* route[i] := direction from tt[i] to tt[i-1] */
 
 	if (!ship_ready(starting_point, u))
 		return NULL;
@@ -1360,16 +1365,29 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 	 * Küstenstreifen, rv[] speichert die gesichteten Küstenstreifen, m
 	 * zählt befahrene Felder, current_point ist die letzte gültige,
 	 * befahrene Region. */
-	tt[t++] = starting_point;
+	tt[step] = starting_point;
 
-	do {
-
+	while (current_point!=next_point &&
+		   ((rterrain(current_point) == T_OCEAN
+			 || is_cursed(u->ship->attribs, C_SHIP_FLYING, 0))
+			&& next_point != 0 && m < k))
+	{
 		direction_t dir = reldirection(current_point, next_point);
-		/* Fliegende Schiffe ignorieren Terrain, Nebelwaende, Mahlströme und
-		 * Blockaden */
+		
+		if(terrain[rterrain(next_point)].flags & FORBIDDEN_LAND) {
+			plane *pl = getplane(next_point);
+			if(pl && fval(pl, PFL_NOCOORDS)) {
+				add_message(&u->faction->msgs, new_message(u->faction,
+					"sailforbiddendir%h:ship%i:direction",
+					u->ship, reldirection(current_point,next_point)));
+			} else {
+				add_message(&u->faction->msgs, new_message(u->faction,
+					"sailforbidden%h:ship%r:region", u->ship, next_point));
+			}
+			break;
+		}
 
 		if( !is_cursed(u->ship->attribs, C_SHIP_FLYING, 0) ) {
-
 			if (rterrain(current_point) != T_OCEAN
 			    && rterrain(next_point) != T_OCEAN) {
 				plane *pl = getplane(next_point);
@@ -1447,7 +1465,6 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 						u->ship, reldirection(current_point,next_point)));
 /*					sprintf(buf, "Die Mannschaft der %s weigert sich, in die Feuerwand "
 						"im %s zu fahren.",
-
 						shipname(u->ship), directions[dir]); */
 				} else {
 					add_message(&u->faction->msgs, new_message(u->faction,
@@ -1483,32 +1500,26 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 
 		/* Falls kein Problem, eines weiter ziehen */
 
+		route[step] = dir;
+		tt[++step] = current_point;	/* travelthrough */
+		u->ship->moved = 1;
+		m++;
+
 		last_point = current_point;
 		current_point = next_point;
-		next_point = movewhere(current_point, u);
-		m++;
-		u->ship->moved = 1;
 
 		/* Falls eine Küstenregion, dann in rv[] aufnehmen (die letzte
 		 * Küste wird nachher nicht aufgelistet werden, wenn das
 		 * Schiff dort seine Runde beendent!). */
-		route[t-1] = dir;
-		tt[t++] = current_point;	/* travelthrough */
 		if (rterrain(current_point) != T_OCEAN) {
 			rv[l] = current_point;
 			l++;
 		}
+		next_point = movewhere(current_point, u);
 	}
 
-	while ((rterrain(current_point) == T_OCEAN
-		|| is_cursed(u->ship->attribs, C_SHIP_FLYING, 0))
-		&& next_point != 0 && m < k);
-	route[t-1] = NODIRECTION;
-
-	/* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
-	 * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
-	cycle_route(u, t-1);
-	set_string(&u->thisorder, "");
+	route[step] = NODIRECTION;
+	/* at this point, step is the number of steps made. tt[step] is the final region. */
 
 	/* Nun enthält current_point die Region, in der das Schiff seine Runde
 	 * beendet hat. Wir generieren hier ein Ereignis für den Spieler, das
@@ -1517,15 +1528,16 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 	 * Inland zu segeln versuchte */
 
 	if (u->ship->moved) {
-		if (current_point->terrain != T_OCEAN && !is_cursed(u->ship->attribs, C_SHIP_FLYING, 0)) {
-			u->ship->coast = reldirection(current_point, last_point);
-		} else {
-			u->ship->coast = NODIRECTION;
-		}
-	}
-
-	if (u->ship->moved) {
 		ship * sh = u->ship;
+		/* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
+		 * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
+		cycle_route(u, step);
+		set_string(&u->thisorder, "");
+		if (current_point->terrain != T_OCEAN && !is_cursed(sh->attribs, C_SHIP_FLYING, 0)) {
+			sh->coast = reldirection(current_point, last_point);
+		} else {
+			sh->coast = NODIRECTION;
+		}
 		sh->moved = 1;
 		sprintf(buf, "Die %s ", shipname(sh));
 		if( is_cursed(sh->attribs, C_SHIP_FLYING, 0) )
@@ -1577,7 +1589,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 		if (fval(u, FL_FOLLOWING)) caught_target(current_point, u);
 
 		if (starting_point != current_point) {
-			tt[t - 1] = 0;
+			tt[step+1] = NULL;
 			sh = move_ship(sh, starting_point, current_point, tt);
 
 			/* Hafengebühren ? */

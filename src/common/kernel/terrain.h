@@ -22,7 +22,7 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
 
-#define landregion(t) (t!=T_OCEAN && t!=T_FIREWALL && t!=T_ASTRAL && t!=T_ASTRALB && t!=T_FIREWALL && t!=T_HELL)
+#define landregion(t) (t!=T_OCEAN && t!=T_FIREWALL && t!=T_ASTRAL && t!=T_ASTRALB && t!=T_FIREWALL && t!=T_HELL && t!=T_MAGICSTORM)
 enum {
 	T_OCEAN,
 	T_PLAIN,
@@ -45,6 +45,7 @@ enum {
 	T_ICEBERG,
 	T_HALL1,
 	T_CORRIDOR1,
+	T_MAGICSTORM,
 	MAXTERRAINS,
 	NOTERRAIN = (terrain_t) - 1
 };

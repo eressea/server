@@ -229,6 +229,7 @@ extern int countallies(struct side * as);
 extern int get_unitrow(struct fighter * af);
 extern boolean helping(struct side * as, struct side * ds);
 extern void rmtroop(struct troop dt);
+extern void rmfighter(fighter *df, int i);
 extern struct region * fleeregion(const struct unit * u);
 extern boolean enemy (const struct side * a, const struct side * b);
 extern struct troop select_corpse(struct battle * b, struct fighter * af);

@@ -459,3 +459,4 @@ border_type bt_road = {
 	b_uinvisible, /* uvisible */
 	b_validroad /* valid */
 };
+

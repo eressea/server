@@ -21,6 +21,15 @@
 #include <attrib.h>
 #include <resolve.h>
 
+static int
+verify_follow(attrib * a)
+{
+	if (a->data.v==NULL) {
+		return 0;
+	}
+	return 1;
+}
+
 static void
 write_follow(const attrib * a, FILE * F)
 {
@@ -41,7 +50,7 @@ read_follow(attrib * a, FILE * F)
 }
 
 attrib_type at_follow = {
-	"follow", NULL, NULL, NULL, write_follow, read_follow
+	"follow", NULL, NULL, verify_follow, write_follow, read_follow
 };
 
 attrib *

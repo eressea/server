@@ -113,12 +113,6 @@ ursprung_x(const faction *f, const plane *pl)
 		if(ur->id == id)
 			return ur->x;
 	}
-
-	if (pl) {
-		set_ursprung((faction*)f, id, plane_center_x(pl), plane_center_y(pl));
-		return plane_center_x(pl);
-	}
-
 	return 0;
 }
 
@@ -138,12 +132,6 @@ ursprung_y(const faction *f, const plane *pl)
 		if(ur->id == id)
 			return ur->y;
 	}
-
-	if (pl) {
-		set_ursprung((faction*)f, id, plane_center_x(pl), plane_center_y(pl));
-		return plane_center_y(pl);
-	}
-
 	return 0;
 }
 
@@ -232,9 +220,9 @@ rel_to_abs(const struct plane *pl, const struct faction * f, int rel, unsigned c
 	assert(index == 0 || index == 1);
 
 	if(index == 0)
-		return (rel + ursprung_x(f,pl));
+		return (rel + ursprung_x(f,pl) + plane_center_x(pl));
 
-	return (rel + ursprung_y(f,pl));
+	return (rel + ursprung_y(f,pl) + plane_center_y(pl));
 }
 
 
@@ -251,13 +239,13 @@ write_plane_reference(const plane * u, FILE * F)
 }
 
 void
-read_plane_reference(plane ** up, FILE * F)
+read_plane_reference(plane ** pp, FILE * F)
 {
 	int i;
 	fscanf(F, "%d", &i);
-	if (i==0) *up = NULL;
+	if (i==0) *pp = NULL;
 	{
-		*up = getplanebyid(i);
-		if (*up==NULL) ur_add((void*)i, (void**)&up, resolve_plane);
+		*pp = getplanebyid(i);
+		if (*pp==NULL) ur_add((void*)i, (void**)pp, resolve_plane);
 	}
 }

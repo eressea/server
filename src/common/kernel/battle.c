@@ -837,26 +837,48 @@ meffect_blocked(battle *b, meffect *s, side *as)
 }
 
 /* ------------------------------------------------------------- */
+/* rmfighter wird schon im PRAECOMBAT gebraucht, da gibt es noch keine
+ * troops */
+void
+rmfighter(fighter *df, int i)
+{
+	side *ds = df->side;
+
+	/* nicht mehr personen abziehen, als in der Einheit am Leben sind */
+	assert(df->alive >= i);
+	assert(df->alive <= df->unit->number);
+
+	/* erst ziehen wir die Anzahl der Personen von den Kämpfern in der
+	 * Schlacht, dann von denen auf dieser Seite ab*/
+	df->side->alive -= i;
+	df->side->battle->alive -= i;
+
+	/* Dann die Kampfreihen aktualisieren */
+	ds->size[SUM_ROW] -= i;
+	ds->size[statusrow(df->status)] -= i;
+
+	/* Spezialwirkungen, z.B. Schattenritter */
+	if (race[df->unit->race].battle_flags & BF_NOBLOCK) {
+		ds->nonblockers[SUM_ROW] -= i;
+		ds->nonblockers[statusrow(df->status)] -= i;
+	}
+
+	/* und die Einheit selbst aktualisieren */
+	df->alive -= i;
+}
+
+
 void
 rmtroop(troop dt)
 {
 	fighter *df = dt.fighter;
-	side *ds = df->side;
 
-	--df->alive;
-	--df->side->alive;
-	--df->side->battle->alive;
+	/* troop ist immer eine einzele Person */
+	rmfighter(df, 1);
+
 	assert(dt.index >= 0 && dt.index < df->unit->number);
-	assert(df->alive < df->unit->number);
 	df->person[dt.index] = df->person[df->alive - df->removed];
 	df->person[df->alive - df->removed].hp = 0;
-	--ds->size[SUM_ROW];
-	--ds->size[statusrow(df->status)];
-	/* z.B. Schattenritter */
-	if (race[df->unit->race].battle_flags & BF_NOBLOCK) {
-		--ds->nonblockers[SUM_ROW];
-		--ds->nonblockers[statusrow(df->status)];
-	}
 }
 
 void

@@ -149,7 +149,13 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
 		if (a==NULL) a = a_add(&student->attribs, a_new(&at_learning));
 		a->data.i += n;
 
-		if (btype == &bt_academy && student->building==teacher->building && inside_building(student)!=NULL) {
+		/* Solange Akademien größenbeschränkt sind, sollte Lehrer und
+		 * Student auch in unterschiedlichen Gebäuden stehen dürfen */
+		if (btype == &bt_academy 
+/*		&& student->building==teacher->building 
+ *		&& inside_building(student)!=NULL) */
+			&& student->building && student->building->type == &bt_academy)
+		{
 			int j = study_cost(teacher, sk);
 			j = max(50, j * 2);
 			if (get_pooled(teacher, teacher->region, R_SILVER) >= j) {		/* kann Einheit das zahlen? */

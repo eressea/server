@@ -21,6 +21,15 @@
 #include <attrib.h>
 #include <resolve.h>
 
+static int
+verify_hate(attrib * a)
+{
+	if (a->data.v==NULL) {
+		return 0;
+	}
+	return 1;
+}
+
 static void
 write_hate(const attrib * a, FILE * F)
 {
@@ -44,7 +53,7 @@ attrib_type at_hate = {
 	"hates",
 	NULL,
 	NULL,
-	NULL,
+	verify_hate,
 	write_hate,
 	read_hate,
 };

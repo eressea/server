@@ -1157,7 +1157,6 @@ sp_denyattack(fighter * fi, int level, int power, spell * sp)
 /* Magier weicht dem Kampf aus. Wenn er sich bewegen kann, zieht er in
  * eine Nachbarregion, wobei ein NACH berücksichtigt wird. Ansonsten
  * bleibt er stehen und nimmt nicht weiter am Kampf teil. */
-	side *sf = fi->side;
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
 	region *r = b->region;
@@ -1185,15 +1184,16 @@ sp_denyattack(fighter * fi, int level, int power, spell * sp)
 	} else {
 		fi->run.region = fleeregion(mage);
 	}
-	travel(r, mage, fi->run.region, 1);
+	/* bewegung erst am Ende des Kampfes, zusammen mit den normalen
+	 * Flüchtlingen */
+	/* travel(r, mage, fi->run.region, 1); */
 
 	/* wir tun so, als wäre die Person geflohen */
 	fset(fi, FIG_NOLOOT);
 	fi->run.hp = mage->hp;
 	fi->run.number = mage->number;
-	fi->alive = 0;
-	sf->size[SUM_ROW] -= mage->number;
-	sf->size[mage->status + FIGHT_ROW] -= mage->number;
+	/* fighter leeren */
+	rmfighter(fi, mage->number);
 
 	scat("Das Kampfgetümmel erstirbt und er kann unbehelligt "
 			"seines Weges ziehen.");

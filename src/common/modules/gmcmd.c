@@ -145,6 +145,7 @@ gm_terraform(const char * str, struct unit * u)
 	terrain_t t;
 	if (r==NULL || p!=rplane(r)) {
 		mistake(u, str, "Diese Regon kann die Einheit nicht umwandeln.\n", 0);
+		return;
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
@@ -261,7 +262,7 @@ gm_skill(const char * str, struct unit * u)
 	unit * to = findunit(atoi36(igetstrtoken(str)));
 	skill_t skill = findskill(getstrtoken(), u->faction->locale);
 	int num = atoi(getstrtoken());
-	
+
 	if (to==NULL || rplane(to->region) != rplane(u->region)) {
 		/* unknown or in another plane */
 		cmistake(u, str, 64, MSG_COMMERCE);
@@ -331,7 +332,7 @@ gmcommands(void)
 			for (order = u->orders; order; order = order->next)
 				if (igetkeyword(order->s, u->faction->locale) == K_GM) {
 					gm_command(order->s, u);
-				}			
+				}
 			if (u==*up) up = &u->next;
 		}
 		if (*rp==r) rp = &r->next;
@@ -370,11 +371,11 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 		do {
 			xist = findfaction(++i);
 		} while (xist);
-		
+
 		f->no = i;
 		addlist(&factions, f);
 	}
-	
+
 	/* GM playfield */
 	do {
 		minx = (rand() % (2*EXTENSION)) - EXTENSION;
@@ -415,13 +416,13 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmgive")));
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmskil")));
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmtake")));
-	
+
 	a_add((attrib**)&a->data.v, make_atgmcreate(resource2item(r_silver)));
 
 	for (i=0;i<=I_INCENSE;++i) {
 		a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
 	}
-	
+
 	/* one initial unit */
 	u = createunit(center, f, 1, RC_TEMPLATE);
 	u->irace = RC_GNOME;
@@ -435,17 +436,17 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 #ifdef TEST_GM_COMMANDS
 void
 setup_gm_faction(void)
-{		
+{
 	int i = atoi36("gms")-1;
 	faction * f = factions;
 	unit * newunit;
 	region * r = regions;
 	attrib * a;
-	
+
 	do {
 		f = findfaction(++i);
 	} while (f);
-	
+
 	f = (faction *) calloc(1, sizeof(faction));
 	f->no = i;
 	set_string(&f->email, "gms@eressea-pbem.de");
@@ -455,15 +456,15 @@ setup_gm_faction(void)
 	f->options |= (1 << O_REPORT);
 	f->options |= (1 << O_COMPUTER);
 	addlist(&factions, f);
-	
+
 	a = a_add(&f->attribs, a_new(&at_permissions));
 	a_add((attrib**)&a->data.v, make_atgmcreate(&it_demonseye));
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmtf")));
-	
+
 	while (r && !r->land) r=r->next;
 	newunit = createunit(r, f, 1, RC_DAEMON);
 	set_string(&newunit->name, "Flamdring, Gott des Feuers");
 	set_money(newunit, 100);
 	fset(newunit, FL_ISNEW);
 }
-#endif		
+#endif

@@ -1195,7 +1195,7 @@ sp_blessedharvest(castorder *co)
 		}
 	}
 	if (!fval(mage->faction, FL_DH)){
-			add_message(&r->msgs, new_message(mage->faction,
+			add_message(&mage->faction->msgs, new_message(mage->faction,
 				"harvest_effect%u:mage", mage));
 	}
 	return cast_level;
@@ -1238,7 +1238,9 @@ sp_hain(castorder *co)
 		}
 	}
 	if (!fval(mage->faction, FL_DH)){
-		add_message(&r->msgs, new_message(mage->faction,
+		/* dann steht niemand von der Magierpartei in der Region, sieht also
+		 * auch keine Regionsmeldung. ergo: global anzeigen */
+		add_message(&mage->faction->msgs, new_message(mage->faction,
 			"growtree_effect%u:mage%i:amount", mage, trees));
 	}
 
@@ -3521,7 +3523,12 @@ sp_magicboost(castorder *co)
  * Kategorie:  Einheit, positiv
  *
  * Wirkung:
- *   Hitpoints to Aura: 4:1/3:1
+ *   Hitpoints to Aura: 
+ *   skill < 8  = 4:1
+ *   skill < 12 = 3:1
+ *   skill < 15 = 2:1
+ *   skill < 18 = 1:2
+ *   skill >    = 2:1
  * Patzer:
  *   permanenter HP verlust
  *
@@ -3534,6 +3541,7 @@ sp_bloodsacrifice(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int aura, damage;
+	int skill = eff_skill(mage, SK_MAGIC, mage->region);
 	int hp = mage->hp - 5; /* braucht noch 4 HP zum Bezahlen des
 																		 Spruchs, und 1 HP zum Überleben*/
 
@@ -3544,10 +3552,16 @@ sp_bloodsacrifice(castorder *co)
 
 	damage = min(hp, dice_rand("4d12"));
 
-	if (eff_skill(mage, SK_MAGIC, mage->region) > 8){
-		aura = damage / 3;
-	} else {
+	if (skill < 8) {
 		aura = damage / 4;
+	} else if (skill < 12){
+		aura = damage / 3;
+	} else if (skill < 15){
+		aura = damage / 2;
+	} else if (skill < 18){
+		aura = damage;
+	} else {
+		aura = damage * 2;
 	}
 
 	if (aura <= 0){
@@ -4121,7 +4135,7 @@ sp_raisepeasantmob(castorder *co)
 		}
 	}
 	if (!fval(mage->faction, FL_DH)){
-			add_message(&r->msgs, new_message(mage->faction,
+			add_message(&mage->faction->msgs, new_message(mage->faction,
 				"sp_raisepeasantmob_effect%u:mage%r:region", mage, r));
 	}
 
@@ -4799,7 +4813,7 @@ sp_puttorest(castorder *co)
 	}
 
 	if (!fval(mage->faction, FL_DH)){
-		add_message(&r->msgs, new_message(mage->faction,
+		add_message(&mage->faction->msgs, new_message(mage->faction,
 			"puttorest%u:mage", mage));
 	}
 	return co->level;
@@ -7763,7 +7777,11 @@ spell spelldaten[] =
 		"opfern, um dafür an magischer Kraft zu gewinnen. Erfahrene "
 		"Ritualmagier berichten, das sich das Ritual, einmal initiiert, nur "
 		"schlecht steuern ließe und die Menge der so gewonnenen Kraft stark "
-		"schwankt.",
+		"schwankt. So steht im 'Buch des Blutes' geschrieben: 'So richte Er aus "
+		"das Zeichen der vier Elemente im Kreis des Werdens und Vergehens und "
+		"Weihe einjedes mit einem Tropfen Blut. Sodann begebe Er in der Mitten "
+		"der Ewigen Vierer sich und lasse Leben verrinnen, auf das Kraft "
+		"geboren werde.'",
 		NULL,
 		NULL,
 		M_CHAOS, (ONSHIPCAST), 1, 4,
@@ -9581,7 +9599,7 @@ spell spelldaten[] =
 		"ZAUBER [STUFE n] \"Astraler Ruf\" <Ziel-X> <Ziel-Y> <Einheit-Nr> "
 			"[<Einheit-Nr> ...]",
 	 "ru+",
-	 M_ASTRAL, (UNITSPELL|SPELLLEVEL), 7, 6,
+	 M_ASTRAL, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
 	 {
 		 {R_AURA, 2, SPC_LEVEL},
 		 {0, 0, 0},
@@ -9600,7 +9618,7 @@ spell spelldaten[] =
 		"Welt zwingen.",
 		NULL,
 		"u+",
-		M_ASTRAL, (UNITSPELL |SPELLLEVEL), 7, 6,
+		M_ASTRAL, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
 		{
 			{R_AURA, 2, SPC_LEVEL},
 			{0, 0, 0},

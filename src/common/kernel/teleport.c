@@ -162,7 +162,7 @@ create_teleport_plane(void)
 			rsetterrain(ra, T_ASTRAL);
 		}
 		ra->planep  = getplanebyid(1);
-		if (r->terrain==T_FIREWALL) rsetterrain(ra, T_ASTRALB);
+		if (terrain[rterrain(r)].flags & FORBIDDEN_LAND) rsetterrain(ra, T_ASTRALB);
 	}
 
 	for(i=0;i<4;i++) {

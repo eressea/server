@@ -147,8 +147,8 @@ setstealth(unit * u, strlist * S)
 			freset(u, FL_PARTEITARNUNG);
 		} else if (findkeyword(s, u->faction->locale) == K_NUMBER) {
 			char *s2 = getstrtoken();
-			int nr;
-			if(!s2 || *s2 == 0 || (nr = atoi36(s2)) == u->faction->no) {
+			int nr = atoi36(s2);
+			if(!s2 || *s2 == 0 || nr == u->faction->no) {
 				a_removeall(&u->faction->attribs, &at_otherfaction);
 			} else {
 				/* TODO: Prüfung ob Partei sichtbar */

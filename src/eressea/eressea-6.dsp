@@ -1167,19 +1167,10 @@ SOURCE=..\common\attributes\overrideroads.h
 # Begin Source File
 
 SOURCE=..\common\attributes\racename.c
+# End Source File
+# Begin Source File
 
-!IF  "$(CFG)" == "eressea - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
-
-# PROP Intermediate_Dir "../common/attributes/Debug"
-
-!ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
-
-!ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
-
-!ENDIF 
-
+SOURCE=..\common\attributes\racename.h
 # End Source File
 # Begin Source File
 

@@ -974,6 +974,7 @@ show_newspells(void)
 	 * terminieren */
 
 	spellid_t newspellids[] = { 
+			SPL_BLOODSACRIFICE,
 					SPL_NOSPELL };
 
 	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]
@@ -2156,6 +2157,83 @@ setup_locales(void)
 }
 #endif
 
+#include <triggers/shock.h>
+#include <triggers/killunit.h>
+
+static void
+fix_unitrefs(void)
+{
+	region * r=regions;
+	while (r) {
+		unit * u = r->units;
+		while (u) {
+			attrib * a;
+
+			a = a_find(u->attribs, &at_familiar);
+			if (a) {
+				/* magier, hat einen familiar */
+				unit * ufamiliar = get_familiar(u);
+				if (ufamiliar) {
+					attrib * ae;
+					/* killunit attribut am magier */
+					ae = a_find(u->attribs, &at_eventhandler);
+					if (ae) {
+						trigger * tkillunit = NULL;
+						trigger ** tlist = get_triggers(u->attribs, "destroy");
+						if (tlist!=NULL) {
+							tkillunit = *tlist;
+							while (tkillunit) {
+								if (strcmp(tkillunit->type->name, "killunit")==0) break;
+								tkillunit = tkillunit->next;
+							}
+							if (tkillunit && !tkillunit->data.v) {
+								log_warning(("killunit-trigger für Magier %s und Vertrauten %s restauriert.\n", 
+									itoa36(u->no), itoa36(ufamiliar->no)));
+								tkillunit->data.v = ufamiliar;
+							}
+							else ae = NULL;
+						}
+					}
+					if (ae==NULL) {
+						/* Wenn der Magier stirbt, dann auch der Vertraute */
+						add_trigger(&u->attribs, "destroy", trigger_killunit(ufamiliar));
+					}
+
+					/* killunit attribut am magier */
+					ae = a_find(ufamiliar->attribs, &at_eventhandler);
+					if (ae) {
+						trigger * tshockunit = NULL;
+						trigger ** tlist = get_triggers(ufamiliar->attribs, "destroy");
+						if (tlist!=NULL) {
+							tshockunit = *tlist;
+							while (tshockunit) {
+								if (strcmp(tshockunit->type->name, "shock")==0) break;
+								tshockunit = tshockunit->next;
+							}
+							if (tshockunit && !tshockunit->data.v) {
+								log_warning(("shockunit-trigger für Magier %s und Vertrauten %s restauriert.\n", 
+									itoa36(u->no), itoa36(ufamiliar->no)));
+								tshockunit->data.v = u;
+							}
+							else ae = NULL;
+						}
+					}
+					if (ae==NULL) {
+						/* Wenn der Vertraute stirbt, schockt er den Magier */
+						add_trigger(&ufamiliar->attribs, "destroy", trigger_shock(u));
+					}
+
+				} else {
+					log_error(("Magier %s hat ein at_familiar, aber keinen Vertrauten.\n", 
+						itoa36(u->no)));
+				}
+			}
+			u = u->next;
+		}
+		r=r->next;
+	}
+}
+
 void
 korrektur(void)
 {
@@ -2180,6 +2258,7 @@ korrektur(void)
 	do_once(atoi36("fixsl"), fix_prices());
 	do_once(atoi36("gmtst"), test_gmquest()); /* test gm quests */
 	update_gmquests(); /* test gm quests */
+	fix_unitrefs();
 #ifndef SKILLFIX_SAVE
 	fix_skills();
 #endif

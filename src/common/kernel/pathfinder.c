@@ -305,7 +305,7 @@ allowed_terrain(terrain_t ter, terrain_t ter_last, int t)
 	if(t & WALK && terrain[ter].flags & WALK_INTO) return true;
 
 	/* Alte Variante:
-	if(ter == T_FIREWALL) return false;
+	if(terrain[ter].flags & FORBIDDEN_LAND) return false;
 	if(t & FLY) return true;
 	if(t & SWIM && !(t & WALK) && ter == T_OCEAN) return true;
 	if(t & SWIM && t & WALK) return true;

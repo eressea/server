@@ -440,7 +440,7 @@ read_unit_reference(unit ** up, FILE * F)
 	if (i==0) *up = NULL;
 	{
 		*up = findunit(i);
-		if (*up==NULL) ur_add((void*)i, (void**)&up, resolve_unit);
+		if (*up==NULL) ur_add((void*)i, (void**)up, resolve_unit);
 	}
 }
 

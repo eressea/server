@@ -38,6 +38,8 @@
 #include <save.h>
 #include <unit.h>
 #include <spells.h>
+#include <plane.h>
+#include <teleport.h>
 
 #include <ctype.h>
 #include <limits.h>
@@ -917,6 +919,25 @@ movearound(int rx, int ry) {
 					while (showunits(r));
 					ch = -9;
 					break;
+				case 'U':
+					{
+						unit *u, *un;
+						region *target_r;
+						static int tx = 0, ty = 0;
+						
+						tx=map_input(0,0,0,"Versetzen nach X-Koordinate", MINX, MAXX, tx);
+						ty=map_input(0,0,0,"Versetzen nach Y-Koordinate", MINY, MAXY, ty);
+						target_r = findregion(tx,ty);
+						if(target_r) {
+							for(u = r->units; u;) {
+								un = u->next;
+								leave(r, u);
+								move_unit(u, target_r, NULL);
+								u = un;
+							}
+						}
+					}
+					break;
 				case 'E':
 					clipunit = 0;
 					clipregion = 0;
@@ -954,6 +975,31 @@ movearound(int rx, int ry) {
 						recalc_everything(&x, &y, &rx, &ry);
 
 						ch=-8;
+					}
+					break;
+				case 'A':
+					{
+						plane *astral = getplanebyid(1);
+						if(!astral) break;
+						if(r->planep != astral) {
+							region *nr = r_standard_to_astral(r);
+							if(nr) {
+								r  = nr;
+								rx = nr->x;
+								ry = nr->y;
+								recalc_everything(&x, &y, &rx, &ry);
+								ch = -8;
+							}
+						} else {
+							region *nr = r_astral_to_standard(r);
+							if(nr) {
+								r  = nr;
+								rx = nr->x;
+								ry = nr->y;
+								recalc_everything(&x, &y, &rx, &ry);
+								ch = -8;
+							}
+						}
 					}
 					break;
 				case '1':	/* left down */

@@ -574,7 +574,7 @@ chaos(region * r)
 				guard(u, GUARD_ALL);
 			}
 		case 2:	/* Terrainveränderung */
-			if (rterrain(r) != T_FIREWALL) {
+			if (!(terrain[rterrain(r)].flags & FORBIDDEN_LAND)) {
 				if (rterrain(r) != T_OCEAN) {
 					direction_t dir;
 					for (dir=0;dir!=MAXDIRECTIONS;++dir) {

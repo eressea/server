@@ -2729,7 +2729,7 @@ tax(region * r, unit * u, request ** taxorders)
 	request *o;
 	int max;
 
-	if (!humanoid(u)) {
+	if (!humanoid(u) && u->faction != findfaction(MONSTER_FACTION)) {
 		cmistake(u, findorder(u, u->thisorder), 228, MSG_INCOME);
 		return;
 	}

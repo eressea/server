@@ -2258,7 +2258,9 @@ renumber_factions(void)
 			for(u=r->units; u; u=u->next) {
 				attrib *a = a_find(u->attribs, &at_otherfaction);
 				if(!a) continue;
-				a->data.i = rp->want;
+				if (a->data.i == rp->faction->no){
+					a->data.i = rp->want;
+				}
 			}
 		}
 		rp->faction->no = rp->want;

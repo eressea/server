@@ -143,8 +143,24 @@ attrib_type at_eventhandler = {
 	read_handler
 };
 
+struct trigger **
+get_triggers(struct attrib * ap, const char * event)
+{
+	handler_info * td = NULL;
+	attrib * a = a_find(ap, &at_eventhandler);
+	while (a!=NULL) {
+		td = (handler_info *)a->data.v;
+		if (!strcmp(td->event, event)) {
+			break;
+		}
+		a = a->nexttype;
+	}
+	if (!a) return NULL;
+	return &td->triggers;
+}
+
 void
-add_trigger(attrib ** ap, const char * event, trigger * t)
+add_trigger(struct attrib ** ap, const char * event, struct trigger * t)
 {
 	trigger ** tp;
 	handler_info * td = NULL;
@@ -186,7 +202,7 @@ handle_event(attrib ** attribs, const char * event, void * param)
 }
 
 void
-t_add(trigger ** tlist, trigger * t)
+t_add(struct trigger ** tlist, struct trigger * t)
 {
 	while (*tlist) tlist = &(*tlist)->next;
 	*tlist = t;

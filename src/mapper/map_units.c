@@ -1295,7 +1295,7 @@ showunits(region * r)
 			if (pointer) {
 				if ((s = strchr(pointer->s, '('))!=NULL) {
 					s++;
-					f = atoi(s);
+					f = atoi36(s);
 					if (f) {
 						b = findbuilding(f);
 						if (b) {
@@ -1432,7 +1432,7 @@ showunits(region * r)
 				if ((s = strchr(pointer->s, '('))!=NULL) {
 					s++;
 					f  = atoi36(s);
-					f2 = atoi(s);
+					f2 = atoi36(s);
 					if (f || f2)
 						switch (pointer->s[0]) {
 						case '\025':

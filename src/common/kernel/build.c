@@ -858,7 +858,7 @@ build_ship(unit * u, ship * sh, int want)
 	int n;
 
 	if (want > 0) can = min(want, can);
-	can = min(can, 2*construction->maxsize); /* 100% bauen + 100% reparieren */
+	can = min(can, construction->maxsize+sh->damage); /* 100% bauen + 100% reparieren */
 	can = build(u, construction, size, can);
 
 	if((n=construction->maxsize - sh->size)>0 && can>0) {

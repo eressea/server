@@ -2708,7 +2708,9 @@ can_find(faction * f, faction * f2)
 	ss=fs->see;
 	while (ss && ss->seen!=f2) ss=ss->next;
 	if (ss) {
-		assert(ss->proof->faction==f2);
+		/* bei TARNE PARTEI yxz muss die Partei von unit proof nicht
+		 * wirklich Partei f2 sein! */
+		/* assert(ss->proof->faction==f2); */
 		return ss->proof;
 	}
 	return NULL;

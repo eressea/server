@@ -283,7 +283,17 @@ const terraindata_t terrain[] = {
 		WALK_INTO|LAND_REGION,	/* Flags */
 		NULL
 	},
-
+	/* T_MAGICSTORM */
+	{
+		"magicstorm", '%',
+		NULL,
+		"in einen gewaltigen magischen Sturm",
+		0,		/* Steine pro Runde */
+		-1,		/* Steine fuer Strasse */
+		0, 		/* bewirtschaftbare Parzellen */
+		FORBIDDEN_LAND,	/* Flags */
+		NULL
+	},
 	/*** sentinel - must be last ***/
 	{
 		NULL, 'X',
