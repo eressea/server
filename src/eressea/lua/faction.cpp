@@ -111,7 +111,7 @@ faction_getpolicy(const faction& a, const faction& b, const char * flag)
 }
 
 static void
-faction_setpolicy(faction& a, faction& b, const char * flag, boolean value)
+faction_setpolicy(faction& a, faction& b, const char * flag, bool value)
 {
   int mode;
 
