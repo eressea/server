@@ -882,6 +882,16 @@
 		</locale>
 	</message>
 
+	<message name="enter_overload" section="errors">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Die Einheit darf nicht an Bord kommen, da sie das Schiff überladen würde."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - The unit cannot go aboard, the ship would be overloaded."</text>
+	</message>
+
 	<message name="error35">
 		<type>
 			<arg name="unit" type="unit"></arg>
