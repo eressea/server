@@ -2056,7 +2056,7 @@ email_cmd(unit * u, struct order * ord)
   } else {
     faction * f = u->faction;
     if (set_email(&f->email, s)!=0) {
-      log_error(("Invalid email address: %s\n", s));
+      log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), s));
       ADDMSG(&f->msgs, msg_message("changemail_invalid", "value", 
         gc_add(strdup(s))));
     } else {
@@ -2446,7 +2446,7 @@ reshow(unit * u, struct order * ord, const char * s, param_t p)
 
 #ifdef HEROES
 static int
-promote_cmd(unit * u, struct order * ord)
+promotion_cmd(unit * u, struct order * ord)
 {
   int money, people; 
 
@@ -2471,7 +2471,7 @@ promote_cmd(unit * u, struct order * ord)
   use_all(u, i_silver->rtype, people);
   fset(u, UFL_HERO);
   ADDMSG(&u->faction->msgs, msg_message("hero_promotion", "unit cost", 
-    u, money));
+    u, people));
   return 0;
 }
 #endif
@@ -3830,7 +3830,7 @@ processorders (void)
 
 #ifdef HEROES
   puts(" - Heldenbeförderung");
-  parse(K_PROMOTION, promote_cmd, false);
+  parse(K_PROMOTION, promotion_cmd, false);
 #endif
 
 	puts(" - Neue Nummern");

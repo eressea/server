@@ -258,7 +258,7 @@ readshortpwds()
       if (f!=NULL) {
         shortpwd * pwd = (shortpwd*)malloc(sizeof(shortpwd));
         if (set_email(&pwd->email, email)!=0) {
-          log_error(("Invalid email address: %s\n", email));
+          log_error(("Invalid email address faction %s: %s\n", faction, email));
         }
         pwd->pwd = strdup(passwd);
         pwd->used = false;

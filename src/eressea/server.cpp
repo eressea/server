@@ -631,6 +631,16 @@ typedef struct lostdata {
   int ship;
 } lostdata;
 
+static void
+my_lua_error(lua_State * L)
+{
+  const char* error = lua_tostring(L, -1);
+
+  log_error((error));
+  lua_pop(L, 1);
+  std::terminate();
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -669,23 +679,21 @@ main(int argc, char *argv[])
   // run the main script
   if (luafile==NULL) lua_console(luaState);
   else {
+    if (script_path) sprintf(buf, "%s/%s", script_path, luafile);
+    else strcpy(buf, luafile);
+#ifdef LUABIND_NO_EXCEPTIONS
+    luabind::set_error_callback(my_lua_error);
+#else
     try {
-      if (script_path) {
-        sprintf(buf, "%s/%s", script_path, luafile);
-        lua_dofile(luaState, buf);
-      }
-      else lua_dofile(luaState, luafile);
+#endif
+      lua_dofile(luaState, buf);
+#ifndef LUABIND_NO_EXCEPTIONS
     } 
     catch (luabind::error& e) {
       lua_State* L = e.state();
-      const char* error = lua_tostring(L, -1);
-      log_error((error));
-      lua_pop(L, 1);
-      std::terminate();
-      // L will now point to the destructed
-      // lua state and be invalid
-      /* ... */
+      my_lua_error(L);
     }
+#endif
   }
 #ifdef CLEANUP_CODE
   game_done();

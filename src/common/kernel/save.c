@@ -1524,7 +1524,7 @@ readfaction(FILE * F)
   rds(F, &f->banner);
   rds(F, &email);
   if (set_email(&f->email, email)!=0) {
-    log_error(("Invalid email address: %s\n", email));
+    log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
     set_email(&f->email, "");
   }
   rds(F, &f->passw);

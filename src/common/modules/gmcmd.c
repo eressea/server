@@ -630,7 +630,7 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	f->override = strdup(itoa36(rand()));
 	f->override = strdup(itoa36(rand()));
   if (set_email(&f->email, email)!=0) {
-    log_error(("Invalid email address: %s\n", email));
+    log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
   }
 	f->name = strdup("Questenpartei");
 	f->race = new_race[RC_TEMPLATE];
@@ -733,7 +733,7 @@ gm_addfaction(const char * email, plane * p, region * r)
 	f->banner = strdup("Questenpartei");
 	f->passw = strdup(itoa36(rand()));
   if (set_email(&f->email, email)!=0) {
-    log_error(("Invalid email address: %s\n", email));
+    log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
   }
 	f->name = strdup("Questenpartei");
 	f->race = new_race[RC_TEMPLATE];
