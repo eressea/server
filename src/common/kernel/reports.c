@@ -620,7 +620,7 @@ spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh,
 
 	if (sk == SK_MAGIC){
 		if (find_magetype(u) != M_GRAU){
-			sbuf += sprintf(sbuf, "%s ", LOC(lang, magietypen[find_magetype(u)]));
+			sbuf += sprintf(sbuf, "%s ", LOC(lang, mkname("school", magietypen[find_magetype(u)])));
 		}
 	}
 
