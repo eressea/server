@@ -107,12 +107,12 @@ read_borders(FILE * f)
 		type = find_bordertype(zText);
 		assert(type || !"border type not registered");
 		from = findregion(fx, fy);
-		if (!from) {
+		if (from==NULL) {
 			log_error(("border for unknown region %d,%d\n", fx, fy));
 			from = new_region(fx, fy);
 		}
 		to = findregion(tx, ty);
-		if (!to)  {
+		if (to==NULL)  {
 			log_error(("border for unknown region %d,%d\n", tx, ty));
 			to = new_region(tx, ty);
 		}
@@ -140,7 +140,14 @@ new_border(border_type * type, region * from, region * to)
 
 	key = min(k2, key) % BMAXHASH;
 	bp = &borders[key];
-	while (*bp && !(((*bp)->from==from && (*bp)->to==to) || ((*bp)->from==to && (*bp)->to==from))) bp = &(*bp)->nexthash;
+
+  /* find the first border across the same edge, so we can insert before it.
+   * if there's no border here yet, add the border to the end (this way, the
+   * b->next pointer will point to *bp, which is NULL).
+   */
+  while (*bp && ((*bp)->from!=from || (*bp)->to!=to)) {
+    bp = &(*bp)->nexthash;
+  }
 	b = calloc(1, sizeof(struct border));
 	b->type = type;
 	b->nexthash = *bp;
@@ -149,25 +156,29 @@ new_border(border_type * type, region * from, region * to)
 	b->to = to;
 	b->id = ++nextborder;
 	*bp = b;
-	if (type->init) type->init(b);
+
+  if (type->init) type->init(b);
 	return b;
 }
 
 void
 erase_border(border * b)
 {
-	border ** np, ** hp;
+	border ** np = NULL, ** hp;
 	int key = region_hashkey(b->from);
 	int k2 = region_hashkey(b->to);
 	attrib ** ap = &b->attribs;
 
 	while (*ap) a_remove(ap, *ap);
 	key = min(k2, key) % BMAXHASH;
-	hp = np = &borders[key];
-	while (*np && *np != b) np = &(*np)->next;
-	while (*hp && *hp != b) hp = &(*hp)->nexthash;
+	hp = &borders[key];
+  while (*hp && *hp != b) {
+    border * bp = *hp;
+    if (bp->next==b) np = &bp->next;
+    hp = &(*hp)->nexthash;
+  }
 	assert((*np && *hp) || !"error: border is not registered");
-	*np = b->next;
+	if (np!=NULL) *np = b->next;
 	*hp = b->nexthash;
 	if (b->type->destroy) b->type->destroy(b);
 	free(b);
@@ -248,9 +259,9 @@ age_borders(void)
 		while (*bp) {
 			border * b = *bp;
 			attrib ** ap = &b->attribs;
-			while(*ap) {
+			while (*ap) {
 				attrib * a = *ap;
-				if(a->type->age && a->type->age(a)==0) {
+				if (a->type->age && a->type->age(a)==0) {
 					if (a->type == &at_countdown) {
 						erase_border(b);
 						b = NULL;
@@ -262,8 +273,10 @@ age_borders(void)
 				}
 				else ap=&a->next;
 			}
-			if (!b) continue; /* bei löschung bp nicht vorziehen */
-			bp=&b->nexthash;
+      if (b!=NULL) {
+        /* bei löschung zeigt bp bereits auf den nächsten */
+        bp=&b->nexthash;
+      }
 		}
 	}
 }
