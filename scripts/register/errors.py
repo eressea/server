@@ -38,6 +38,7 @@ for line in infile.readlines():
     if match!=None:
         To = match.group(1)
         Reason = match.group(2)
+	print "ERROR: "+To+": "+Reason
         Msg = ("From: "+From+"\nTo: "+To+"\nSubject: Vinyambar Anmeldung fehlgeschlagen.\n\n"
             +"Deine Anmeldung konnte aus folgendem Grund nicht akzeptiert werden:\n  "+Reason+"\n")
         try:

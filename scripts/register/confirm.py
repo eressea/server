@@ -39,7 +39,7 @@ while (records>0):
         "Auftragsnummer: " + str(int(subscription)) + "\n"+
         "Passwort:       " + passwd + "\n" +
         "Rasse:          " + race + "\n\n"+
-        "Bitte bewahre diese Mail sorgfältig auf, da Du deine Kundennummerund das\n"+
+        "Bitte bewahre diese Mail sorgfältig auf, da Du deine Kundennummer und das\n"+
         "Passwort für das Spiel benötigst. Solltest Du noch Fragen zu Deiner \n"+
         "Anmeldung haben, wende Dich bitte an accounts@vinyambar.de.\n\n"+
         "Das Vinyambar-Team")

@@ -150,14 +150,17 @@ else:
   cursor=db.cursor()
   cursor.execute("INSERT INTO users (firstname, lastname, email, address, city, phone, country, password) "+
     "VALUES ('"+firstname+"', '"+lastname+"', '"+email+"', '"+address+"', '"+city+"', '"+phone+"', "+country+", '"+genpasswd()+"')")
+    
+  cursor.execute("SELECT LAST_INSERT_ID() from dual")
+  lastid=str(int(cursor.fetchone()[0]))
 
   if (oldrace!=None):
     cursor.execute("INSERT INTO subscriptions (user, race, game) "+
-      "VALUES (LAST_INSERT_ID(), '"+oldrace+"', 1)")
+      "VALUES ("+lastid+", '"+oldrace+"', 1)")
 
   if (newrace!=None):
     cursor.execute("INSERT INTO subscriptions (user, race, game) "+
-      "VALUES (LAST_INSERT_ID(), '"+newrace+"', 1)")
+      "VALUES ("+lastid+", '"+newrace+"', 2)")
 
 errors.close()
 unlock(sys.argv[1]+".err")
