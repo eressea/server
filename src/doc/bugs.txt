@@ -917,3 +917,7 @@ o Leuchttürme schauen mindestens eine Region zu weit. (Größe 10
 - benutze item funktioniert nicht. itype->use ist überall 0x0
 
 - auch nichtpoolbare Resourcen wie Aura, HP, perm Aura sind im pool
+
+- lernen in akademie bringt 80 statt 70 Tage, ausser bei Magie, da
+  funktionierts?
+  (Zhardamon, irq 20.2.01)
