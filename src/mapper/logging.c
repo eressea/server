@@ -60,6 +60,7 @@ log_read(const char * filename)
 				readfaction(log);
 			} else {
 				*fp = readfaction(log);
+				fp=&(*fp)->next;
 			}
 		} else assert(0);
 	}
