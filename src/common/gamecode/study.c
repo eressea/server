@@ -387,12 +387,16 @@ teach(region * r, unit * u)
 		if (ualias(u2))
 			count++;
 
+		/* this is pointless, as there currently is no way to negativly influence
+		 * a unit by teaching it. */
+		/*
 		if (!ucontact(u2, u)) {
 			sprintf(buf, "Einheit %s hat keinen Kontakt mit uns aufgenommen",
 					unitid(u2));
 			mistake(u, u->thisorder, buf, MSG_EVENT);
 			continue;
 		}
+		*/
 		i = igetkeyword(u2->thisorder, u2->faction->locale);
 
 		/* Input ist nun von u2->thisorder !! */
