@@ -7385,37 +7385,21 @@
 	  <text locale="en">"A large firework is visible all over the sky."</text>
 	</message>
 
-	<message name="lucky_item">
+	<message name="lucky_item" section="events">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="item" type="resource"></arg>
 			<arg name="amount" type="int"></arg>
 		</type>
-		<locale name="de">
-			<nr section="events">
-				<text>"$unit($unit) hat Glück und findet einen Hort von $int($amount) $resource($item,$amount)."</text>
-			</nr>
-		</locale>
-		<locale name="en">
-			<nr section="events">
-				<text>"$unit($unit) luckily finds a cache of $int($amount) $resource($item,$amount)."</text>
-			</nr>
-		</locale>
+		<text locale="de">"$unit($unit) hat Glück und findet einen Hort von $int($amount) $resource($item,$amount)."</text>
+		<text locale="en">"$unit($unit) luckily finds a cache of $int($amount) $resource($item,$amount)."</text>
 	</message>
-	
-	<message name="healall">
+
+	<message name="healall" section="events">
 		<type>
 		</type>
-		<locale name="de">
-			<nr section="events">
-				<text>Ein Hauch des Lebens liegt über der Welt und alle Wesen fühlen sich frisch und erholt.</text>
-			</nr>
-		</locale>
-		<locale name="en">
-			<nr section="events">
-				<text>Life itself touches the world and all beings are healed.</text>
-			</nr>
-		</locale>
+		<text locale="de">"Ein Hauch des Lebens liegt über der Welt und alle Wesen fühlen sich frisch und erholt."</text>
+		<text locale="en">"Life itself touches the world and all beings are healed."</text>
 	</message>
 
 </messages>
