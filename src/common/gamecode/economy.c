@@ -506,113 +506,114 @@ TODO: Einen Trigger benutzen!
 static void
 givemen(int n, unit * u, unit * u2, const char * cmd)
 {
-	ship *sh;
-	int k = 0;
-	int error = 0;
+  ship *sh;
+  int k = 0;
+  int error = 0;
 
-	if (u2 && u->faction != u2->faction && u->faction->age < giverestriction()) {
-		ADDMSG(&u->faction->msgs, msg_error(u, cmd, "giverestriction",
-			"turns", giverestriction()));
-		return;
-	} else if (u == u2) {
-		error = 10;
+  if (u2 && u->faction != u2->faction && u->faction->age < giverestriction()) {
+    ADDMSG(&u->faction->msgs, msg_error(u, cmd, "giverestriction",
+      "turns", giverestriction()));
+    return;
+  } else if (u == u2) {
+    error = 10;
 #if RACE_ADJUSTMENTS
-	} else if (!u2 && u->race == new_race[RC_SNOTLING]) {
-		/* Snotlings können nicht an Bauern übergeben werden. */
-		error = 307;
+  } else if (!u2 && u->race == new_race[RC_SNOTLING]) {
+    /* Snotlings können nicht an Bauern übergeben werden. */
+    error = 307;
 #endif
-	} else if ((u && unit_has_cursed_item(u)) || (u2 && unit_has_cursed_item(u2))) {
-		error = 78;
-	} else if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER) || is_cursed(u->attribs, C_SLAVE, 0)) {
-		error = 74;
-	} else if (u2 && (fval(u2, UFL_LOCKED)|| is_cursed(u2->attribs, C_SLAVE, 0))) {
-		error = 75;
-	} else if (u2 != (unit *) NULL
-		&& u2->faction != u->faction
-		&& ucontact(u2, u) == 0) {
-			error = 73;
-		} else if (u2 && (has_skill(u, SK_MAGIC) || has_skill(u2, SK_MAGIC))) {
-			error = 158;
-		} else if (u2 && fval(u, UFL_WERE) != fval(u2, UFL_WERE)) {
-			error = 312;
-		} else {
-			if (n > u->number) n = u->number;
-			if (n == 0) {
-				error = 96;
-			} else if (u2 && u->faction != u2->faction) {
-				if (u2->faction->newbies + n > MAXNEWBIES) {
-					error = 129;
-				} else if (u->race != u2->faction->race) {
-					if (u2->faction->race != new_race[RC_HUMAN]) {
-						error = 120;
-					} else if (count_migrants(u2->faction) + n > count_max_migrants(u2->faction)) {
-						error = 128;
-					}
-					else if (teure_talente(u) || teure_talente(u2)) {
-						error = 154;
-					} else if (u2->number!=0) {
-						error = 139;
-					}
-				}
-			}
-		}
-		if (u2 && (has_skill(u, SK_ALCHEMY) || has_skill(u2, SK_ALCHEMY))) {
+  } else if ((u && unit_has_cursed_item(u)) || (u2 && unit_has_cursed_item(u2))) {
+    error = 78;
+  } else if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER) || is_cursed(u->attribs, C_SLAVE, 0)) {
+    error = 74;
+  } else if (u2 && (fval(u2, UFL_LOCKED)|| is_cursed(u2->attribs, C_SLAVE, 0))) {
+    error = 75;
+  } else if (u2 && u2->faction != u->faction && ucontact(u2, u) == 0) {
+    error = 73;
+  } else if (u2 && (has_skill(u, SK_MAGIC) || has_skill(u2, SK_MAGIC))) {
+    error = 158;
+  } else if (u2 && fval(u, UFL_WERE) != fval(u2, UFL_WERE)) {
+    error = 312;
+  } else if (u2 && u2->number!=0 && u2->race != u->race) {
+    log_warning(("Partei %s versucht %s an %s zu übergeben.\n",
+                 itoa36(u->faction->no), u->race->_name[0],
+                 u2->race->_name[1]));
+    error = 139;
+  } else {
+    if (n > u->number) n = u->number;
+    if (n == 0) {
+      error = 96;
+    } else if (u2 && u->faction != u2->faction) {
+      if (u2->faction->newbies + n > MAXNEWBIES) {
+        error = 129;
+      } else if (u->race != u2->faction->race) {
+        if (u2->faction->race != new_race[RC_HUMAN]) {
+          error = 120;
+        } else if (count_migrants(u2->faction) + n > count_max_migrants(u2->faction)) {
+          error = 128;
+        }
+        else if (teure_talente(u) || teure_talente(u2)) {
+          error = 154;
+        } else if (u2->number!=0) {
+          error = 139;
+        }
+      }
+    }
+  }
 
-			k = count_skill(u2->faction, SK_ALCHEMY);
+  if (u2 && (has_skill(u, SK_ALCHEMY) || has_skill(u2, SK_ALCHEMY))) {
+    k = count_skill(u2->faction, SK_ALCHEMY);
 
-			/* Falls die Zieleinheit keine Alchemisten sind, werden sie nun
-			* welche. */
-			if (!has_skill(u2, SK_ALCHEMY) && has_skill(u, SK_ALCHEMY))
-				k += u2->number;
+    /* Falls die Zieleinheit keine Alchemisten sind, werden sie nun
+    * welche. */
+    if (!has_skill(u2, SK_ALCHEMY) && has_skill(u, SK_ALCHEMY))
+      k += u2->number;
 
-			/* Wenn in eine Alchemisteneinheit Personen verschoben werden */
-			if (has_skill(u2, SK_ALCHEMY) && !has_skill(u, SK_ALCHEMY))
-				k += n;
+    /* Wenn in eine Alchemisteneinheit Personen verschoben werden */
+    if (has_skill(u2, SK_ALCHEMY) && !has_skill(u, SK_ALCHEMY))
+      k += n;
 
-			/* Wenn Parteigrenzen überschritten werden */
-			if (u2->faction != u->faction)
-				k += n;
+    /* Wenn Parteigrenzen überschritten werden */
+    if (u2->faction != u->faction)
+      k += n;
 
-			/* wird das Alchemistenmaximum ueberschritten ? */
+    /* wird das Alchemistenmaximum ueberschritten ? */
 
-			if (k > max_skill(u2->faction, SK_ALCHEMY)) {
-				error = 156;
-			}
-		}
+    if (k > max_skill(u2->faction, SK_ALCHEMY)) {
+      error = 156;
+    }
+  }
 
-		if (!error) {
-			if (u2 && u2->number == 0) {
-				set_racename(&u2->attribs, get_racename(u->attribs));
-				u2->race = u->race;
-				u2->irace = u->irace;
-			} else if (u2 && u2->race != u->race) {
-				error = 139;
-			} else if (u2) {
-				/* Einheiten von Schiffen können nicht NACH in von
-				* Nicht-alliierten bewachten Regionen ausführen */
-				sh = leftship(u);
-				if (sh) set_leftship(u2, sh);
+  if (error==0) {
+    if (u2 && u2->number == 0) {
+      set_racename(&u2->attribs, get_racename(u->attribs));
+      u2->race = u->race;
+      u2->irace = u->irace;
+    } else if (u2) {
+      /* Einheiten von Schiffen können nicht NACH in von
+      * Nicht-alliierten bewachten Regionen ausführen */
+      sh = leftship(u);
+      if (sh) set_leftship(u2, sh);
 
-				transfermen(u, u2, n);
-				if (u->faction != u2->faction) {
-					u2->faction->newbies += n;
-				}
-			} else {
-				if (getunitpeasants) {
+      transfermen(u, u2, n);
+      if (u->faction != u2->faction) {
+        u2->faction->newbies += n;
+      }
+    } else {
+      if (getunitpeasants) {
 #ifdef ORCIFICATION
-					if (u->race == new_race[RC_ORC] && !fval(u->region, RF_ORCIFIED)) {
-						attrib *a = a_find(u->region->attribs, &at_orcification);
-						if (!a) a = a_add(&u->region->attribs, a_new(&at_orcification));
-						a->data.i += n;
-					}
+        if (u->race == new_race[RC_ORC] && !fval(u->region, RF_ORCIFIED)) {
+          attrib *a = a_find(u->region->attribs, &at_orcification);
+          if (!a) a = a_add(&u->region->attribs, a_new(&at_orcification));
+          a->data.i += n;
+        }
 #endif
-					transfermen(u, NULL, n);
-				} else {
-					error = 159;
-				}
-			}
-		}
-		addgive(u, u2, n, R_PERSON, cmd, error);
+        transfermen(u, NULL, n);
+      } else {
+        error = 159;
+      }
+    }
+  }
+  addgive(u, u2, n, R_PERSON, cmd, error);
 }
 
 void
