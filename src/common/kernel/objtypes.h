@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: objtypes.h,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: objtypes.h,v 1.3 2001/01/27 18:15:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -33,13 +33,6 @@ typedef enum {
 	TYP_TRIGGER,
 	TYP_TIMEOUT
 } typ_t;
-
-#if defined(OLD_TRIGGER) || defined (CONVERT_TRIGGER)
-#ifndef POINTERTAGS_H
-#include <old/pointertags.h>
-#endif
-extern void add_ID_resolve2(obj_ID id, void *objPP, typ_t typ, tag_t tag);
-#endif
 
 extern obj_ID get_ID(void *obj, typ_t typ);
 extern void write_ID(FILE *f, obj_ID id);

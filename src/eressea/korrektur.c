@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: korrektur.c,v 1.3 2001/01/27 18:15:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1610,9 +1610,11 @@ init_mwarden(void)
 }
 
 #ifdef CONVERT_TRIGGER
+#include <old/relation.h>
+#include <old/trigger.h>
+
 #include <event.h>
-#include <relation.h>
-#include <trigger.h>
+
 #include <trigger_internal.h>
 #include <triggers/killunit.h>
 #include <triggers/timeout.h>

@@ -25,6 +25,27 @@ INSTALL = cp
 
 ARCHITECTURE=Linux
 
+##
+## Architecture-Dependent Exe and Library Names
+##
+
+ifeq ($(ARCHITECTURE), Linux)
+ ifneq ($(LIBNAME), )
+   LIBRARY = lib$(LIBNAME).a
+ endif
+ ifneq ($(EXENAME), )
+  BINARY = $(EXENAME)
+ endif
+endif
+
+ifeq ($(ARCHITECTURE), Windows)
+ ifneq ($(LIBNAME), )
+  LIBRARY = $(LIBNAME).lib
+ endif
+ ifneq ($(EXENAME), )
+  BINARY = $(EXENAME).exe
+ endif
+endif
 
 ifeq ($(CONFIG), debug)
   BUILD_DIR  = Debug-$(ARCHITECTURE)
@@ -61,14 +82,39 @@ endif
 
 PUBLISH_DIR = $(ERESSEA)/$(BUILD_DIR)
 
-debug release profile:: env $(PUBLISH_DIR) $(PUBLISH_DIR)
-	$(MAKE) CONFIG=$@ publish-$@
-
 env:
 	@$(MAKEENV)
 
-publish-debug publish-release publish-profile:: $(BUILD_DIR)/$(LIBRARY) $(BUILD_DIR)/$(BINARY)
+debug release profile:: env $(PUBLISH_DIR) $(PUBLISH_DIR)
+	$(MAKE) CONFIG=$@ recurse-subdirs-$@
 
+##
+## recurse-subdirs-X is called from a Makefile one level up.
+##
+recurse-subdirs-debug:: subdirs-debug publish-debug
+recurse-subdirs-release:: subdirs-release publish-release
+recurse-subdirs-profile:: subdirs-profile publish-profile
+
+recurse-clean:: clean
+recurse-depend:: depend
+
+subdirs-debug subdirs-release subdirs-profile clean depend::
+	@mkdir -p $(PUBLISH_DIR)
+	@if [ -n "$(SUBDIRS)" ]; then \
+	for subdir in x-placeholder-dir $(SUBDIRS); do \
+	if [ -d $$subdir ]; then \
+	echo --\> Making $@ in $$subdir ; \
+	mkdir -p $$subdir/$(BUILD_DIR) ; \
+	$(MAKE) -C $$subdir -$(MAKEFLAGS) recurse-$@ || exit 1; \
+	fi \
+	done \
+	fi
+
+publish-debug:: subdirs-debug
+publish-release:: subdirs-release
+publish-profile:: subdirs-profile
+
+publish-debug publish-release publish-profile:: $(BUILD_DIR)/$(LIBRARY) $(BUILD_DIR)/$(BINARY)
 
 clean:: $(BUILD_DIR) $(PUBLISH_DIR)
 	rm -fr Release-$(ARCHITECTURE)/* Debug-$(ARCHITECTURE)/* Profile-$(ARCHITECTURE)/*
@@ -81,3 +127,12 @@ $(BUILD_DIR)/%:: $(BUILD_DIR)
 $(BUILD_DIR)/%.o:: %.c
 	@echo "Compiling $@"
 	@$(CC) -o $@ -c $< $(CFLAGS)
+
+##
+## conversion code for old triggers - should only be used for free eressea,
+## and only for old datafiles.
+##
+
+CFLAGS += -DCONVERT_TRIGGER
+INCLUDES += -I. -I$(ERESSEA)/eressea/old
+

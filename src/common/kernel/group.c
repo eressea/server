@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: group.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: group.c,v 1.3 2001/01/27 18:15:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -174,7 +174,7 @@ read_groups(FILE * F, faction * f)
 		for (;;) {
 			ally * a;
 			int aid;
-			if (data_version>=FULL_BASE36_VERSION) {
+			if (global.data_version>=FULL_BASE36_VERSION) {
 				fscanf(F, "%s ", buf);
 				aid = atoi36(buf);
 			} else {

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: eressea.c,v 1.3 2001/01/27 18:15:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2093,7 +2093,8 @@ init_used_faction_ids(void)
 
 
 #if defined(OLD_TRIGGER) || defined(CONVERT_TRIGGER)
-# include "old/trigger.h"
+# include "trigger.h"
+# include <resolve.h>
 typedef struct unresolved {
 	struct unresolved * next;
 	void ** ptrptr;

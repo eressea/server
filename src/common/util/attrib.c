@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: attrib.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: attrib.c,v 1.3 2001/01/27 18:15:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -169,7 +169,7 @@ int
 a_readdefault(attrib * a, FILE * f)
 {
 	assert(sizeof(int)==sizeof(a->data));
-	fscanf(f, "%d ", &a->data.i);
+	fscanf(f, "%d", &a->data.i);
 	return 1;
 }
 
@@ -241,17 +241,16 @@ a_read(FILE * f, attrib ** attribs)
 
 	key = -1;
 	fscanf(f, "%s", zText);
-	if (!strcmp(zText, "end")) {
-		fgets(zText, sizeof(zText), f); /* always ends with \n */
-		key=-1;
-	}
+	if (!strcmp(zText, "end")) return;
+/*	{	fgets(zText, sizeof(zText), f); ENNO: was ist das?  "always ends with \n" ? */
+/*		key=-1; }*/
 	else key = __at_hashkey(zText);
 
 	while(key!=-1) {
 		attrib_type * at = at_find(key);
 		attrib * na;
 		if (!at) {
-			fprintf(stderr, "attribute key: %d %s\n", key, zText);
+			fprintf(stderr, "attribute hash: %d (%s)\n", key, zText);
 			assert(at || !"attribute not registered");
 		}
 		if (at->read) {
@@ -284,5 +283,5 @@ a_write(FILE * f, const attrib * attribs)
 		}
 		na = na->next;
 	}
-	fprintf(f, "end\n");
+	fprintf(f, "end");
 }

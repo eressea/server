@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: item.c,v 1.3 2001/01/27 18:15:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1998,7 +1998,8 @@ rt_read(FILE * F)
 		char * semi = buf;
 		char * s = NULL;
 		int i = 0;
-		fgets(buf, 1024, F);
+		fgets(buf, sizeof(buf), F);
+		if (strlen(buf)==1) continue;
 		buf[strlen(buf)-1]=0;
 		for(;;) {
 			char * s = strchr(semi, ';');
@@ -2057,7 +2058,8 @@ it_read(FILE * F)
 		char * semi = buf;
 		char * s = NULL;
 		int i = 0;
-		fgets(buf, 1024, F);
+		fgets(buf, sizeof(buf), F);
+		if (strlen(buf)==1) continue;
 		buf[strlen(buf)-1]=0;
 		for(;;) {
 			char * s = strchr(semi, ';');

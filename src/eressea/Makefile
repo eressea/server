@@ -1,16 +1,27 @@
 SUBDIRS =
+LIBNAME =
+EXENAME = eressea
 
-LIBRARY = 
-BINARY = eressea
+include ../Makefile.include
 
+##
 ## cheating: we link all attributes/items/etc for all the games. TODO - don't.
+##
 #SOURCES = $(wildcard *.c)
 SOURCES = main.c korrektur.c
 OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
 
-include ../Makefile.include
+##
+## conversion code for old triggers - should only be used for free eressea,
+## and only for old datafiles.
+##
+SUBDIRS += old
+LIBRARIES += $(PUBLISH_DIR)/libe-compat.a
+LIBS += -le-compat
 
+##
 ## more definitions
+##
 
 INCLUDES  += \
 	-I../common \
@@ -29,13 +40,12 @@ LIBNAMES      = \
 	e-attributes \
 	e-util
 
-LIBRARIES = $(LIBNAMES:%=$(PUBLISH_DIR)/lib%.a)
+LIBRARIES += $(LIBNAMES:%=$(PUBLISH_DIR)/lib%.a)
 
 LIBS += $(LIBNAMES:%=-l%) -lm
 
-
 # executable:
+
 $(BUILD_DIR)/$(BINARY):: $(BUILD_DIR) $(OBJECTS) $(LIBRARIES)
 	$(LD) -o $@ $(OBJECTS) $(LDFLAGS)
 	$(INSTALL) $@ $(PUBLISH_DIR)/
-

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: building.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: building.c,v 1.3 2001/01/27 18:15:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -783,7 +783,8 @@ void
 bt_write(FILE * F, const building_type * bt)
 {
 	fprintf(F, "BUILDINGTYPE %s\n", bt->_name);
-	a_write(F, bt->attribs); /* scheisse, weil nicht CR. */
+	a_write(F, bt->attribs); /* scheisse, weil nicht CR-Format */
+	fputs("\n", F);
 	fprintf(F, "\"%s\";name\n", bt->_name);
 	fprintf(F, "%d;flags\n", bt->flags);
 	fprintf(F, "%d;capacity\n", bt->capacity);
@@ -810,7 +811,8 @@ bt_read(FILE * F)
 	a_read(F, &bt->attribs); /* scheisse, weil nicht CR. */
 	for (;;) {
 		char * semi = buf;
-		fgets(buf, 1024, F);
+		fgets(buf, sizeof(buf), F);
+		if (strlen(buf)==1) continue;
 		buf[strlen(buf)-1]=0;
 		for(;;) {
 			char * s = strchr(semi, ';');

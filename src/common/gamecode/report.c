@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: report.c,v 1.3 2001/01/27 18:15:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2568,7 +2568,7 @@ reports(void)
 #endif
 	makedir("reports", 0700);
 
-	if (data_version<BASE36_VERSION) base36conversion();
+	if (global.data_version<BASE36_VERSION) base36conversion();
 	/* öffnet file BAT (mailit batch file) */
 
 	BAT = openbatch();

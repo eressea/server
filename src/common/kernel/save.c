@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: save.c,v 1.3 2001/01/27 18:15:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -66,7 +66,7 @@
 #include <assert.h>
 
 #if defined(OLD_TRIGGER) || defined(CONVERT_TRIGGER)
-# include "old/trigger.h"
+# include "trigger.h"
 extern void resolve2(void);
 #endif
 
@@ -77,7 +77,6 @@ extern void resolve2(void);
 
 int inside_only = 0;
 int minfaction = 0;
-int data_version;
 const char * g_datadir;
 /* imported symbols */
 extern int cmsg[MAX_MSG][ML_MAX];
@@ -123,7 +122,7 @@ cfopen(const char *filename, const char *mode)
 
 /* Dummy-Funktion für die Kompatibilität */
 
-#define rid(F) ((data_version<BASE36_VERSION)?ri(F):ri36(F))
+#define rid(F) ((global.data_version<BASE36_VERSION)?ri(F):ri36(F))
 #define wid(F, i) fprintf(F, itoa36(i))
 
 int nextc;
@@ -740,35 +739,35 @@ readgame(boolean backup)
 
 	/* globale Variablen */
 
-	data_version = ri(F);
-	if (data_version >= GLOBAL_ATTRIB_VERSION) a_read(F, &global.attribs);
+	global.data_version = ri(F);
+	if (global.data_version >= GLOBAL_ATTRIB_VERSION) a_read(F, &global.attribs);
 #ifndef COMPATIBILITY
-	if (data_version < ITEMTYPE_VERSION) {
+	if (global.data_version < ITEMTYPE_VERSION) {
 		fprintf(stderr, "kann keine alten datenfiles einlesen");
 		exit(-1);
 	}
 #endif
 	turn = ri(F);
 	read_dynamictypes();
-	if (data_version < NEWMAGIC) {
+	if (global.data_version < NEWMAGIC) {
 		max_unique_id = 0;
 	} else {
 		max_unique_id = ri(F);
 	}
 
-	if (data_version < BORDERID_VERSION) {
+	if (global.data_version < BORDERID_VERSION) {
 		nextborder = 0;
 	} else {
 		nextborder = ri(F);
 	}
 
 	printf(" - Version: %d.%d, Runde %d.\n",
-		data_version / 10, data_version % 10, turn);
+		global.data_version / 10, global.data_version % 10, turn);
 
 	/* Planes */
 	planes = NULL;
 	n = ri(F);
-	if (data_version < PLANES_VERSION) {
+	if (global.data_version < PLANES_VERSION) {
 		assert(n==0); /* Keine Planes definiert, hoffentlich. */
 	} else {
 		while(--n >= 0) {
@@ -780,7 +779,7 @@ readgame(boolean backup)
 			pl->miny = ri(F);
 			pl->maxy = ri(F);
 			pl->flags = ri(F);
-			if (data_version>=ATTRIB_VERSION) a_read(F, &pl->attribs);
+			if (global.data_version>=ATTRIB_VERSION) a_read(F, &pl->attribs);
 			addlist(&planes, pl);
 		}
 	}
@@ -797,12 +796,12 @@ readgame(boolean backup)
 		f = (faction *) calloc(1, sizeof(faction));
 
 		f->first = 0;
-		if (data_version<FULL_BASE36_VERSION) {
+		if (global.data_version<FULL_BASE36_VERSION) {
 			f->no = ri(F);
 		} else {
 			f->no = rid(F);
 		}
-		if (data_version < NEWMAGIC) {
+		if (global.data_version < NEWMAGIC) {
 			f->unique_id = max_unique_id + 1;
 			max_unique_id++;
 		} else {
@@ -818,7 +817,7 @@ readgame(boolean backup)
 		rds(F, &f->banner);
 		rds(F, &f->email);
 		rds(F, &f->passw);
-		if (data_version < LOCALE_VERSION) {
+		if (global.data_version < LOCALE_VERSION) {
 			f->locale = find_locale("de");
 			/* if (f->no==44) f->locale=strdup("en"); */
 		} else {
@@ -828,31 +827,31 @@ readgame(boolean backup)
 		f->lastorders = ri(F);
 		f->age = ri(F);
 		f->race = (char) ri(F);
-		if (data_version < RACES_VERSION) {
+		if (global.data_version < RACES_VERSION) {
 			if (f->race==0) f->race=RC_UNDEAD;
 			else --f->race;
 		}
-		if (data_version >= MAGIEGEBIET_VERSION)
+		if (global.data_version >= MAGIEGEBIET_VERSION)
 			f->magiegebiet = (magic_t)ri(F);
 		else
 			f->magiegebiet = (magic_t)((rand() % 5)+1);
 
-		if (data_version >= KARMA_VERSION)
+		if (global.data_version >= KARMA_VERSION)
 			f->karma = ri(F);
 		else
 			f->karma = 0;
 
-		if (data_version >= FACTIONFLAGS_VERSION)
+		if (global.data_version >= FACTIONFLAGS_VERSION)
 			f->flags = ri(F);
 		else
 			f->flags = 0;
 
-		if (data_version>=FATTRIBS_VERSION)
+		if (global.data_version>=FATTRIBS_VERSION)
 			a_read(F, &f->attribs);
-		if (data_version>=MSGLEVEL_VERSION)
+		if (global.data_version>=MSGLEVEL_VERSION)
 			read_msglevels(&f->warnings, F);
 
-		if (data_version >= PLANES_VERSION) {
+		if (global.data_version >= PLANES_VERSION) {
 			int c = ri(F);
 			int id, ux, uy;
 			while(--c >= 0) {
@@ -876,21 +875,21 @@ readgame(boolean backup)
 			f->options = f->options | Pow(O_REPORT) | Pow(O_ZUGVORLAGE);
 		}
 
-		if (data_version<MSGLEVEL_VERSION) {
-			if (data_version >= (HEX_VERSION-1)) {
+		if (global.data_version<MSGLEVEL_VERSION) {
+			if (global.data_version >= (HEX_VERSION-1)) {
 				int maxopt = ri(F);
 				for (i=0;i!=maxopt;++i) ri(F);
-			} else if (data_version > 77) {
+			} else if (global.data_version > 77) {
 				for (i = 0; i != MAX_MSG; i++) ri(F);
 			} else {
 				for (i = 0; i != MAX_MSG - 1; i++) ri(F);
 			}
 		}
 
-		if (data_version < 79) { /* showdata überspringen */
+		if (global.data_version < 79) { /* showdata überspringen */
 			assert(!"not implemented");
 		} else {
-			if (data_version >= NEWMAGIC && data_version < TYPES_VERSION) {
+			if (global.data_version >= NEWMAGIC && global.data_version < TYPES_VERSION) {
 				int i, sk = ri(F); /* f->seenspell überspringen */
 				for (i = 0; spelldaten[i].id != SPL_NOSPELL; i++) {
 					if (spelldaten[i].magietyp == f->magiegebiet && spelldaten[i].level <= sk) {
@@ -904,7 +903,7 @@ readgame(boolean backup)
 		sfp = &f->allies;
 		while (--p >= 0) {
 			int aid, state;
-			if (data_version>=FULL_BASE36_VERSION) {
+			if (global.data_version>=FULL_BASE36_VERSION) {
 				aid = rid(F);
 			} else {
 				aid = ri(F);
@@ -925,7 +924,7 @@ readgame(boolean backup)
 		*sfp = 0;
 
 #ifdef GROUPS
-		if (data_version>=GROUPS_VERSION) read_groups(F, f);
+		if (global.data_version>=GROUPS_VERSION) read_groups(F, f);
 #endif
 
 		addlist2(fp, f);
@@ -934,7 +933,7 @@ readgame(boolean backup)
 
 	/* Benutzte Faction-Ids */
 
-	if (data_version < NEW_FACTIONID_VERSION) {
+	if (global.data_version < NEW_FACTIONID_VERSION) {
 		init_used_faction_ids();
 	} else {
 		no_used_faction_ids = ri(F);
@@ -984,34 +983,34 @@ readgame(boolean backup)
 		--maxregions;
 
 		r = new_region(x, y);
-		if (data_version < MEMSAVE_VERSION) {
+		if (global.data_version < MEMSAVE_VERSION) {
 			rds(F, &name);
 		}
 		rds(F, &r->display);
 		terrain = ri(F);
 #ifdef NO_FOREST
-		if (data_version < NOFOREST_VERSION) {
+		if (global.data_version < NOFOREST_VERSION) {
 			if (terrain>T_PLAIN) --terrain;
 		}
 #endif
 		rsetterrain(r, (terrain_t)terrain);
-		if (data_version >= MEMSAVE_VERSION) r->flags = (char) ri(F);
+		if (global.data_version >= MEMSAVE_VERSION) r->flags = (char) ri(F);
 
-		if (data_version >= REGIONAGE_VERSION)
+		if (global.data_version >= REGIONAGE_VERSION)
 			r->age = (unsigned short) ri(F);
 		else
 			r->age = 0;
 
-		if (data_version >= PLANES_VERSION && data_version &&
-			data_version < MEMSAVE_VERSION) {
+		if (global.data_version >= PLANES_VERSION && global.data_version &&
+			global.data_version < MEMSAVE_VERSION) {
 			ri(F);
 		}
-		if (data_version < MEMSAVE_VERSION) {
+		if (global.data_version < MEMSAVE_VERSION) {
 			if (ri(F)) fset(r, RF_CHAOTIC);
 			else freset(r, RF_CHAOTIC);
 		}
 
-		if (data_version < MEMSAVE_VERSION) {
+		if (global.data_version < MEMSAVE_VERSION) {
 			if (landregion(rterrain(r))) {
 				r->land = calloc(1, sizeof(land_region));
 				rsetname(r, name);
@@ -1021,12 +1020,12 @@ readgame(boolean backup)
 			r->land = calloc(1, sizeof(land_region));
 			rds(F, &r->land->name);
 		}
-		if (data_version < MEMSAVE_VERSION || r->land) {
+		if (global.data_version < MEMSAVE_VERSION || r->land) {
 			int i;
 			i = ri(F); rsettrees(r, i);
 			i = ri(F); rsethorses(r, i);
 			i = ri(F); rsetiron(r, i);
-			if (data_version>=ITEMTYPE_VERSION) {
+			if (global.data_version>=ITEMTYPE_VERSION) {
 				rs(F, buf);
 				if (strcmp(buf, "noherb") != 0) {
 					rsetherbtype(r, ht_find(buf));
@@ -1034,7 +1033,7 @@ readgame(boolean backup)
 					rsetherbtype(r, NULL);
 				}
 				rsetherbs(r, (short)ri(F));
-			} else if (data_version>=MEMSAVE_VERSION) {
+			} else if (global.data_version>=MEMSAVE_VERSION) {
 				int i = ri(F);
 				terrain_t ter = rterrain(r);
 				if (ter == T_ICEBERG || ter == T_ICEBERG_SLEEP) ter = T_GLACIER;
@@ -1043,7 +1042,7 @@ readgame(boolean backup)
 				else
 					rsetherbtype(r, oldherbtype[(i-1)+3*(ter-1)]);
 				rsetherbs(r, (short)ri(F));
-			} else if (data_version<MEMSAVE_VERSION) {
+			} else if (global.data_version<MEMSAVE_VERSION) {
 				int i = ri(F);
 				rsetlaen(r, i);
 				if (ri(F)) fset(r, RF_MALLORN);
@@ -1051,9 +1050,9 @@ readgame(boolean backup)
 			}
 			rsetpeasants(r, ri(F));
 			rsetmoney(r, ri(F));
-			if (data_version<ATTRIBFIX_VERSION) ri(F);
+			if (global.data_version<ATTRIBFIX_VERSION) ri(F);
 		}
-		if (data_version<MEMSAVE_VERSION) {
+		if (global.data_version<MEMSAVE_VERSION) {
 			int chaoscount = ri(F);
 			int deathcount = ri(F);
 			attrib * a;
@@ -1076,8 +1075,8 @@ readgame(boolean backup)
 		assert(rpeasants(r) >= 0);
 		assert(rmoney(r) >= 0);
 
-		if (data_version < MEMSAVE_VERSION || r->land) {
-			if (data_version<ITEMTYPE_VERSION) {
+		if (global.data_version < MEMSAVE_VERSION || r->land) {
+			if (global.data_version<ITEMTYPE_VERSION) {
 				int i, p = 0;
 				for (i = 0; oldluxurytype[i]!=NULL; i++) {
 					int k = ri(F);
@@ -1098,7 +1097,7 @@ readgame(boolean backup)
 				}
 			}
 		}
-		if (data_version>=ATTRIB_VERSION) a_read(F, &r->attribs);
+		if (global.data_version>=ATTRIB_VERSION) a_read(F, &r->attribs);
 
 		/* Burgen */
 
@@ -1108,7 +1107,7 @@ readgame(boolean backup)
 		while (--p >= 0) {
 
 			b = (building *) calloc(1, sizeof(building));
-			if (data_version>=FULL_BASE36_VERSION)
+			if (global.data_version>=FULL_BASE36_VERSION)
 				b->no = rid(F);
 			else
 				b->no = ri(F);
@@ -1116,7 +1115,7 @@ readgame(boolean backup)
 			rds(F, &b->name);
 			rds(F, &b->display);
 			b->size = ri(F);
-			if (data_version < TYPES_VERSION) {
+			if (global.data_version < TYPES_VERSION) {
 			    int i = ri(F);
 			    b->type = oldbuildings[i];
 			}
@@ -1136,7 +1135,7 @@ readgame(boolean backup)
 		while (--p >= 0) {
 			sh = (ship *) calloc(1, sizeof(ship));
 
-			if (data_version>=FULL_BASE36_VERSION)
+			if (global.data_version>=FULL_BASE36_VERSION)
 				sh->no = rid(F);
 			else
 				sh->no = ri(F);
@@ -1146,7 +1145,7 @@ readgame(boolean backup)
 			rds(F, &sh->name);
 			rds(F, &sh->display);
 
-			if (data_version < SHIPTYPE_VERSION) {
+			if (global.data_version < SHIPTYPE_VERSION) {
 				const ship_type * oldship[] = { &st_boat, &st_longboat, &st_dragonship, &st_caravelle, &st_trireme };
 				int i = ri(F);
 				sh->type = oldship[i];
@@ -1156,10 +1155,10 @@ readgame(boolean backup)
 				sh->type = st_find(buf);
 				assert(sh->type || !"ship_type not registered!");
 			}
-			if (data_version >= TYPES_VERSION) {
+			if (global.data_version >= TYPES_VERSION) {
 				sh->size = ri(F);
 				sh->damage = ri(F);
-			} else if (data_version > 76) {
+			} else if (global.data_version > 76) {
 				assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
 				sh->size = sh->type->construction->maxsize - ri(F);
 				sh->damage = DAMAGE_SCALE*sh->size*ri(F)/100;
@@ -1211,8 +1210,8 @@ readgame(boolean backup)
 			add_handler(&u->attribs, "hunger", print_hunger, 0);
 #endif
 			u->no = rid(F);
-			if (data_version>=GUARD_VERSION) {
-				if (data_version>=FULL_BASE36_VERSION) {
+			if (global.data_version>=GUARD_VERSION) {
+				if (global.data_version>=FULL_BASE36_VERSION) {
 					n = rid(F);
 				} else {
 					n = ri(F);
@@ -1222,22 +1221,22 @@ readgame(boolean backup)
 			uhash(u);
 			rds(F, &u->name);
 			rds(F, &u->display);
-			if (data_version < MEMSAVE_VERSION) {
+			if (global.data_version < MEMSAVE_VERSION) {
 				rs(F, buf);
 				if (strlen(buf)) usetprivate(u, buf);
 			}
 			number = ri(F);
 			u->region = r;
-			if (data_version<RACES_VERSION)
+			if (global.data_version<RACES_VERSION)
 				oldtype = (unsigned char) ri(F);
-			if (data_version<ITEMTYPE_VERSION)
+			if (global.data_version<ITEMTYPE_VERSION)
 				set_money(u, ri(F));
 			u->age = (short)ri(F);
-			if (data_version<RACES_VERSION) {
+			if (global.data_version<RACES_VERSION) {
 				oldtypus = (unsigned char) ri(F);
 				olditypus = (unsigned char) ri(F);
 
-				if (data_version>=FULL_BASE36_VERSION) {
+				if (global.data_version>=FULL_BASE36_VERSION) {
 					n = rid(F);
 				} else {
 					n = ri(F);
@@ -1287,7 +1286,7 @@ readgame(boolean backup)
 			else {
 				u->race = (race_t) ri(F);
 				u->irace = (race_t) ri(F);
-				if (data_version<GUARD_VERSION)
+				if (global.data_version<GUARD_VERSION)
 					set_faction(u, findfaction(n = ri(F)));
 			}
 			if (u->faction == NULL)
@@ -1296,7 +1295,7 @@ readgame(boolean backup)
 				u->faction->no_units++;
 			}
 			set_number(u, number);
-			if (data_version>=FULL_BASE36_VERSION) {
+			if (global.data_version>=FULL_BASE36_VERSION) {
 				u->building = findbuilding(rid(F));
 				u->ship = findship(rid(F));
 			} else {
@@ -1304,7 +1303,7 @@ readgame(boolean backup)
 				u->ship = findship(ri(F));
 			}
 
-			if (data_version <= 73) {
+			if (global.data_version <= 73) {
 				if (ri(F)) {
 					fset(u, FL_OWNER);
 				} else {
@@ -1312,7 +1311,7 @@ readgame(boolean backup)
 				}
 			}
 			u->status = (status_t) ri(F);
-			if (data_version <= 73) {
+			if (global.data_version <= 73) {
 				if (ri(F)) {
 					guard(u, GUARD_ALL);
 				} else {
@@ -1320,13 +1319,13 @@ readgame(boolean backup)
 				}
 			} else
 				u->flags = ri(F);
-			if (data_version < GUARD_VERSION) {
+			if (global.data_version < GUARD_VERSION) {
 #if RELEASE_VERSION < GUARDFIX_VERSION
 				if (fval(u, FL_GUARD)) guard(u, GUARD_ALL);
 #endif
 			}
 			/* Kurze persistente Befehle einlesen */
-			if (data_version >= MEMSAVE_VERSION) {
+			if (global.data_version >= MEMSAVE_VERSION) {
 				rs(F, buf);
 				while(*buf != 0) {
 					S = makestrlist(buf);
@@ -1336,7 +1335,7 @@ readgame(boolean backup)
 			}
 			rds(F, &u->lastorder);
 			set_string(&u->thisorder, "");
-			if (data_version < EFFSTEALTH_VERSION)
+			if (global.data_version < EFFSTEALTH_VERSION)
 				u_seteffstealth(u, ri(F));
 
 			assert(u->number >= 0);
@@ -1348,7 +1347,7 @@ readgame(boolean backup)
 				/*	init_potions(r, u); */
 				}
 			}
-			if (data_version>=ITEMTYPE_VERSION) {
+			if (global.data_version>=ITEMTYPE_VERSION) {
 				read_items(F, &u->items);
 			} else {
 				while ((item = (item_t) ri(F)) >= 0) {
@@ -1365,8 +1364,8 @@ readgame(boolean backup)
 			}
 			u->hp = ri(F);
 			/* assert(u->hp >= u->number); */
-			if (data_version < MAGE_ATTRIB_VERSION) {
-				if (data_version < NEWMAGIC) {
+			if (global.data_version < MAGE_ATTRIB_VERSION) {
+				if (global.data_version < NEWMAGIC) {
 					if (get_skill(u, SK_MAGIC) > 0) {
 						/* ist Magier und muss in neuen Magier konvertiert werden */
 						create_mage(u, u->faction->magiegebiet);
@@ -1407,9 +1406,9 @@ readgame(boolean backup)
 			}
 		}
 	}
-	if (data_version >= BORDER_VERSION) read_borders(F);
+	if (global.data_version >= BORDER_VERSION) read_borders(F);
 #if defined(OLD_TRIGGER) || defined(CONVERT_TRIGGER)
-	if (data_version >= TIMEOUT_VERSION) load_timeouts(F);
+	if (global.data_version >= TIMEOUT_VERSION) load_timeouts(F);
 #endif
 
 #ifdef WEATHER
@@ -1418,7 +1417,7 @@ readgame(boolean backup)
 
 	weathers = NULL;
 
-	if (data_version >= 81) {
+	if (global.data_version >= 81) {
 		n = ri(F);
 		while(--n >= 0) {
 			weather *w;
@@ -1565,11 +1564,12 @@ writegame(char *path, char quiet)
 	wnl(F);
 #if RELEASE_VERSION >= GLOBAL_ATTRIB_VERSION
 	a_write(F, global.attribs);
+	wnl(F);
 #endif
 	wi(F, turn);
-	wnl(F);
+	wspace(F);
 	wi(F, max_unique_id);
-	wnl(F);
+	wspace(F);
 	wi(F, nextborder);
 
 	/* Write planes */
@@ -1863,7 +1863,7 @@ writegame(char *path, char quiet)
 			wi(F, u->status);
 			wspace(F);
 			wi(F, u->flags & FL_SAVEMASK);
-#if data_version < GUARDFIX_VERSION
+#if RELEASE_VERSION < GUARDFIX_VERSION
 			wspace(F);
 			wi(F, getguard(u));
 #endif
@@ -1994,7 +1994,7 @@ curse_read(attrib * a, FILE * f) {
 	int mageid;
 	curse * c = (curse*)a->data.v;
 
-	if (data_version < CURSE_NO_VERSION){
+	if (global.data_version < CURSE_NO_VERSION){
 		fscanf(f, "%d %d %d %d %d %d ",&cspellid, &c->flag, &c->duration,
 				&c->vigour, &mageid, &c->effect);
 		c->no = newunitid();
@@ -2111,7 +2111,9 @@ attrib_init(void)
 	/* disable: st_register(&st_transport); */
 
 	/* Alle speicherbaren Attribute müssen hier registriert werden */
-	at_register(&at_key);   
+	at_register(&at_unitdissolve);
+	at_register(&at_orcification);
+	at_register(&at_key);
 	at_register(&at_traveldir_new);
 	at_register(&at_familiar);
 	at_register(&at_familiarmage);
