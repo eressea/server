@@ -735,7 +735,6 @@ enum {
 
 #define MAXSPEED   21
 
-int shipcapacity(const struct ship * sh);
 int shipspeed(struct ship * sh, const struct unit * u);
 
 /* MAXSPEED setzt die groesse fuer den Array, der die Kuesten Beschreibungen

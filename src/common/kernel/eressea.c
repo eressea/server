@@ -85,7 +85,7 @@ FILE    *updatelog;
 const struct race * new_race[MAXRACES];
 boolean sqlpatch = false;
 
-race_t 
+race_t
 old_race(const struct race * rc)
 {
 	race_t i;
@@ -361,28 +361,6 @@ count_skill(faction * f, skill_t sk)
 	return n;
 }
 
-int
-shipcapacity (const ship * sh)
-{
-	int i;
-
-	/* sonst ist construction:: size nicht ship_type::maxsize */
-	assert(!sh->type->construction || sh->type->construction->improvement==NULL);
-
-	if (sh->type->construction && sh->size!=sh->type->construction->maxsize)
-		return 0;
-
-#ifdef SHIPDAMAGE
-	i = ((sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE)
-		* sh->type->cargo / sh->size;
-	i += ((sh->size * DAMAGE_SCALE - sh->damage) % DAMAGE_SCALE)
-		* sh->type->cargo / (sh->size*DAMAGE_SCALE);
-#else
-	i = sh->type->cargo;
-#endif
-	return i;
-}
-
 int quiet = 0;
 
 FILE *debug;
@@ -393,9 +371,9 @@ shipspeed (ship * sh, const unit * u)
 	int k = sh->type->range;
 	static const curse_type * stormwind_ct, * nodrift_ct;
 	static boolean init;
-	if (!init) { 
-		init = true; 
-		stormwind_ct = ct_find("stormwind"); 
+	if (!init) {
+		init = true;
+		stormwind_ct = ct_find("stormwind");
 		nodrift_ct = ct_find("nodrift");
 	}
 
@@ -739,7 +717,7 @@ unit_has_cursed_item(unit *u)
 	return false;
 }
 
-static int 
+static int
 autoalliance(const plane * pl, const faction * sf, const faction * f2)
 {
 	int mode = 0;
@@ -773,7 +751,7 @@ alliance(const ally * sf, const faction * f, int mode)
 	return nmode;
 }
 
-int 
+int
 alliedgroup(const struct plane * pl, const struct faction * f, const struct ally * sf, const struct faction * f2, int mode)
 {
 	return alliance(sf, f2, mode) | (mode & autoalliance(pl, f, f2));
@@ -841,7 +819,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 		} else {
 			return false;
 		}
-	} 
+	}
 	n = eff_stealth(u, r) - modifier;
 	for (u2 = r->units; u2; u2 = u2->next) {
 		if (u2->faction == f) {
@@ -1175,7 +1153,7 @@ get_lnames(const struct locale * lang)
 	return lnames;
 }
 
-const struct race * 
+const struct race *
 findrace(const char * s, const struct locale * lang)
 {
 	struct lstr * lnames = get_lnames(lang);
@@ -2105,7 +2083,7 @@ const char * localenames[] = {
 
 static int read_xml(const char * filename, struct xml_stack *stack);
 
-static int 
+static int
 parse_tagbegin(struct xml_stack *stack)
 {
 	const xml_tag * tag = stack->tag;
@@ -2171,7 +2149,7 @@ int
 init_data(const char * filename)
 {
 	int l;
-	
+
 	xml_register(&xml_eressea, "eressea", 0);
 	xml_register(&xml_eressea, "eressea include", XML_CB_IGNORE);
 
@@ -2417,8 +2395,8 @@ remove_empty_factions(boolean writedropouts)
 
 			*fp = f->next;
 /*			stripfaction(f);
- *			free(f); 
- *		Wir können die nicht löschen, weil sie evtl. noch in attributen 
+ *			free(f);
+ *		Wir können die nicht löschen, weil sie evtl. noch in attributen
  *    referenziert sind ! */
 		}
 		else fp = &(*fp)->next;
@@ -2727,10 +2705,10 @@ wage(const region *r, const unit *u, boolean img)
 	attrib	 *a;
 	static const curse_type * drought_ct, * blessedharvest_ct;
 	static boolean init;
-	if (!init) { 
-		init = true; 
-		drought_ct = ct_find("drought"); 
-		blessedharvest_ct = ct_find("blessedharvest"); 
+	if (!init) {
+		init = true;
+		drought_ct = ct_find("drought");
+		blessedharvest_ct = ct_find("blessedharvest");
 	}
 
 	if (b) esize = buildingeffsize(b, img);

@@ -72,7 +72,7 @@ struct ship *getship(const struct region * r);
 
 void remove_contacts(void);
 void do_leave(void);
-void do_misc(char try);
+void do_misc(boolean try);
 
 void reportevent(struct region * r, char *s);
 

@@ -837,7 +837,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 		cmistake(u, S->s, notfound_error, MSG_COMMERCE);
 		return;
 	}
-	if (u == u2){
+	if (u == u2) {
 		cmistake(u, S->s, 8, MSG_COMMERCE);
 		return;
 	}

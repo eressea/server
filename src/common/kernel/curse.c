@@ -178,11 +178,11 @@ ct_find(const char *c)
 		if (!strncasecmp(c, ctl->type->cname, k)) return ctl->type;
 		ctl = ctl->next;
 	}
-	/* disable this assert to be able to remoce certain curses from the game 
-	 * make sure that all locations using that curse can deal with a NULL 
+	/* disable this assert to be able to remoce certain curses from the game
+	 * make sure that all locations using that curse can deal with a NULL
 	 * return value.
 	 */
-	assert(!"unknown cursetype"); 
+	assert(!"unknown cursetype");
 	return NULL;
 }
 
@@ -409,7 +409,7 @@ get_cursedmen(unit *u, curse *c)
 		curse_unit * cc = (curse_unit*)c->data;
 		cursedmen = cc->cursedmen;
 	}
-	
+
 	return min(u->number, cursedmen);
 }
 
@@ -512,7 +512,7 @@ create_curse(unit *magician, attrib **ap, const curse_type *ct, int vigour,
 		return NULL;
 	}
 	assert(c==NULL || ct==c->type);
-	
+
 	/* es gibt schon eins diese Typs */
 	if (c && ct->mergeflags != NO_MERGE) {
 		if(ct->mergeflags & M_DURATION){
@@ -673,17 +673,17 @@ is_cursed_with(attrib *ap, curse *c)
 /* ------------------------------------------------------------- */
 /* cursedata */
 /* ------------------------------------------------------------- */
-/* 
- * typedef struct curse_type { 
+/*
+ * typedef struct curse_type {
  * 	const char *cname; (Name der Zauberwirkung, Identifizierung des curse)
  * 	int typ;
  * 	spread_t spread;
  * 	unsigned int mergeflags;
  * 	const char *info_str;  Wirkung des curse, wird bei einer gelungenen Zauberanalyse angezeigt
  * 	int (*curseinfo)(const struct locale*, const void*, int, curse*, int);
- * 	void (*change_vigour)(curse*, int); 
- * 	int (*read)(FILE * F, curse * c); 
- * 	int (*write)(FILE * F, const curse * c); 
+ * 	void (*change_vigour)(curse*, int);
+ * 	int (*read)(FILE * F, curse * c);
+ * 	int (*write)(FILE * F, const curse * c);
  * } curse_type;
  */
 
@@ -757,7 +757,7 @@ static const char * oldnames[MAXCURSE] = {
 	"skillmod"
 };
 
-const char * 
+const char *
 oldcursename(int id)
 {
 	return oldnames[id];

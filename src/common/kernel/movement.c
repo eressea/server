@@ -355,18 +355,13 @@ boolean
 cansail(const region * r, ship * sh)
 {
 	int n = 0, p = 0;
-	unit *u;
 
 	 /* sonst ist construction:: size nicht ship_type::maxsize */
 	assert(!sh->type->construction || sh->type->construction->improvement==NULL);
 
 	if (sh->type->construction && sh->size!=sh->type->construction->maxsize)
 	  return false;
-	for (u = r->units; u; u = u->next)
-		if (u->ship == sh) {
-			n += weight(u);
-			p += u->number;
-		}
+	getshipweight(sh, &n, &p);
 
 	if( is_cursed(sh->attribs, C_SHIP_FLYING, 0) ) {
 		if (sh->type->cargo>500*100)

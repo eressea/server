@@ -6,7 +6,7 @@
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
- This program may not be used, modified or distributed 
+ This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
 */
 
@@ -40,6 +40,8 @@
 #define RESOURCE_QUANTITY 0.5
 #define TEACHDIFFERENCE 2
 #define GIVERESTRICTION 3
+
+#undef CHECK_OVERLOAD_ON_ENTER
 
 #define MUSEUM_MODULE
 #define ARENA_MODULE

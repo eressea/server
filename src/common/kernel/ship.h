@@ -81,6 +81,8 @@ typedef struct ship {
 extern void damage_ship(ship *sh, double percent);
 extern struct unit *captain(ship *sh, struct region *r);
 extern struct unit *shipowner(const struct region * r, const struct ship * sh);
+extern int shipcapacity(const struct ship * sh);
+extern void getshipweight(const struct ship * sh, int *weight, int *cabins);
 
 extern ship *new_ship(const struct ship_type * stype, struct region * r);
 extern const char *shipname(const struct ship * sh);

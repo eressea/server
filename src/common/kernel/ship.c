@@ -195,6 +195,41 @@ shipname(const ship * sh)
 	return buf;
 }
 
+int
+shipcapacity (const ship * sh)
+{
+	int i;
+
+	/* sonst ist construction:: size nicht ship_type::maxsize */
+	assert(!sh->type->construction || sh->type->construction->improvement==NULL);
+
+	if (sh->type->construction && sh->size!=sh->type->construction->maxsize)
+		return 0;
+
+#ifdef SHIPDAMAGE
+	i = ((sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE)
+		* sh->type->cargo / sh->size;
+	i += ((sh->size * DAMAGE_SCALE - sh->damage) % DAMAGE_SCALE)
+		* sh->type->cargo / (sh->size*DAMAGE_SCALE);
+#else
+	i = sh->type->cargo;
+#endif
+	return i;
+}
+
+void
+getshipweight(const ship * sh, int *sweight, int *scabins)
+{
+	unit * u;
+	*sweight = 0;
+	*scabins = 0;
+	for (u = sh->region->units; u; u = u->next)
+	if (u->ship == sh) {
+		*sweight += weight(u);
+		*scabins += u->number;
+	}
+}
+
 unit *
 shipowner(const region * r, const ship * sh)
 {

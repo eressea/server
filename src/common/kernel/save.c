@@ -798,7 +798,7 @@ read_ugroups(FILE *file)
 #endif
 
 #ifdef ALLIANCES
-void 
+void
 read_alliances(FILE * F)
 {
 	char pbuf[32];

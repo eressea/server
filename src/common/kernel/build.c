@@ -127,7 +127,7 @@ can_contact(const region * r, const unit * u, const unit * u2)
 
 
 static void
-set_contact(const region * r, unit * u, char try)
+set_contact(const region * r, unit * u, boolean try)
 {
 
 	/* unit u kontaktiert unit u2. Dies setzt den contact einfach auf 1 -
@@ -1027,10 +1027,10 @@ mayenter(region * r, unit * u, building * b)
 }
 
 static int
-mayboard(region * r, unit * u, ship * sh)
+mayboard(const unit * u, const ship * sh)
 {
 	unit *u2;
-	u2 = shipowner(r, sh);
+	u2 = shipowner(sh->region, sh);
 
 	return (!u2
 		|| ucontact(u2, u)
@@ -1091,15 +1091,57 @@ do_leave(void)
 	}
 }
 
+static boolean
+entership(unit * u, ship * sh, const char * cmd, boolean lasttry)
+{
+	/* Muß abgefangen werden, sonst könnten Schwimmer an
+	 * Bord von Schiffen an Land gelangen. */
+	if( !fval(u->race, RCF_WALK) &&
+			!fval(u->race, RCF_FLY)) {
+		cmistake(u, cmd, 233, MSG_MOVE);
+		return false;
+	}
+
+	if (!sh) {
+		if (lasttry) cmistake(u, cmd, 20, MSG_MOVE);
+		return false;
+	}
+	if (!mayboard(u, sh)) {
+		if (lasttry) cmistake(u, cmd, 34, MSG_MOVE);
+		return false;
+	}
+#ifdef CHECK_OVERLOAD_ON_ENTER
+	{
+		int sweight, scabins;
+		getshipweight(sh, &sweight, &scabins);
+		sweight += weight(u);
+		scabins += u->number;
+
+		if (sweight > shipcapacity(sh) || scabins > sh->type->cabins) {
+			if (lasttry) cmistake(u, cmd, 34, MSG_MOVE);
+			return false;
+		}
+	}
+#endif
+
+	leave(u->region, u);
+	u->ship = sh;
+
+	if (shipowner(u->region, sh) == 0) {
+		fset(u, FL_OWNER);
+	}
+	return true;
+}
+
 void
-do_misc(char try)
+do_misc(boolean lasttry)
 {
 	region *r;
 	strlist *S, *Snext;
 	ship *sh;
 	building *b;
 
-	/* try: Fehler nur im zweiten Versuch melden. Sonst konfus. */
+	/* lasttry: Fehler nur im zweiten Versuch melden. Sonst konfus. */
 
 	for (r = regions; r; r = r->next) {
 		unit *u;
@@ -1108,7 +1150,7 @@ do_misc(char try)
 			for (S = u->orders; S; S = S->next) {
 				switch (igetkeyword(S->s, u->faction->locale)) {
 				case K_CONTACT:
-					set_contact(r, u, try);
+					set_contact(r, u, lasttry);
 					break;
 				}
 			}
@@ -1129,7 +1171,7 @@ do_misc(char try)
 						 * auf dem Ozean */
 						if( !fval(u->race, RCF_WALK) && !fval(u->race, RCF_FLY)) {
 							if (rterrain(r) != T_OCEAN){
-								if (try) cmistake(u, S->s, 232, MSG_MOVE);
+								if (lasttry) cmistake(u, S->s, 232, MSG_MOVE);
 								break;
 							}
 						}
@@ -1137,17 +1179,17 @@ do_misc(char try)
 						b = getbuilding(r);
 
 						if (!b) {
-							if(try) cmistake(u, S->s, 6, MSG_MOVE);
+							if(lasttry) cmistake(u, S->s, 6, MSG_MOVE);
 							break;
 						}
 						/* Gebäude auf dem Ozean sollte man betreten dürfen
 						if(rterrain(r) == T_OCEAN) {
-							if (try) cmistake(u, S->s, 297, MSG_MOVE);
+							if (lasttry) cmistake(u, S->s, 297, MSG_MOVE);
 							break;
 						}
 						*/
 						if (!mayenter(r, u, b)) {
-							if(try) {
+							if(lasttry) {
 								sprintf(buf, "Der Eintritt in %s wurde verwehrt",
 										buildingname(b));
 								mistake(u, S->s, buf, MSG_MOVE);
@@ -1155,7 +1197,7 @@ do_misc(char try)
 							break;
 						}
 						if (!slipthru(r, u, b)) {
-							if(try) {
+							if(lasttry) {
 								sprintf(buf, "%s wird belagert", buildingname(b));
 								mistake(u, S->s, buf, MSG_MOVE);
 							}
@@ -1175,44 +1217,17 @@ do_misc(char try)
 						break;
 
 					case P_SHIP:
-
-						/* Muß abgefangen werden, sonst könnten Schwimmer an
-						 * Bord von Schiffen an Land gelangen. */
-
-						if( !fval(u->race, RCF_WALK) &&
-								!fval(u->race, RCF_FLY)) {
-							cmistake(u, S->s, 233, MSG_MOVE);
-							S = Snext;
-							continue;
-						}
-
 						sh = getship(r);
-
-						if (!sh) {
-							if(try) cmistake(u, S->s, 20, MSG_MOVE);
-							break;
-						}
-						if (!mayboard(r, u, sh)) {
-							if(try) cmistake(u, S->s, 34, MSG_MOVE);
-							break;
-						}
-
-						/* Wenn wir hier angekommen sind, war der Befehl
-						 * erfolgreich und wir löschen ihn, damit er im
-						 * zweiten Versuch nicht nochmal ausgeführt wird. */
-						removelist(&u->orders, S);
-
-						leave(r, u);
-						u->ship = sh;
-						/* Wozu sollte das gut sein? */
-						/* freset(u, FL_LEFTSHIP); */
-						if (shipowner(r, sh) == 0) {
-							fset(u, FL_OWNER);
+						if (entership(u, sh, S->s, lasttry)) {
+							/* Wenn wir hier angekommen sind, war der Befehl
+							 * erfolgreich und wir löschen ihn, damit er im
+							 * zweiten Versuch nicht nochmal ausgeführt wird. */
+							removelist(&u->orders, S);
 						}
 						break;
 
 					default:
-						if(try) cmistake(u, S->s, 79, MSG_MOVE);
+						if(lasttry) cmistake(u, S->s, 79, MSG_MOVE);
 
 					}
 				}
