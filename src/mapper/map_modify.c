@@ -354,18 +354,18 @@ create_region_menu(menulist ** menu, region * r)
 	}
 	addmenulist(menu, "Horses", &horses);
 #if NEW_RESOURCEGROWTH
-	if(iron != -1) {
+/*	if(iron != -1) { */
 		addmenulist(menu, "Iron", &iron);
 		addmenulist(menu, "Ironlevel", &ironlevel);
-	}
-	if(laen != -1) {
+/*	} */
+/*	if(laen != -1) { */
 		addmenulist(menu, "Laen", &laen);
 		addmenulist(menu, "Laenlevel", &laenlevel);
-	}
-	if(stone != -1) {
+/*	} */
+/* 	if(stone != -1) { */
 		addmenulist(menu, "Stone", &stone);
 		addmenulist(menu, "Stonelevel", &stonelevel);
-	}
+/*	} */
 #else
 	if (r->terrain == T_MOUNTAIN || r->terrain == T_GLACIER) {
 		addmenulist(menu, "Iron", &iron);
