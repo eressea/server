@@ -40,7 +40,7 @@
 
 #define TE_CENTER_X 1000
 #define TE_CENTER_Y 1000
-#define TP_RADIUS 4
+#define TP_RADIUS 2
 #define TP_DISTANCE 4
 
 static int

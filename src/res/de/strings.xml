@@ -4226,7 +4226,7 @@
     <string name="gwyrrdearnsilver">
       <text locale="de">Die Fähigkeiten der Gwyrrd-Magier in
       der Viehzucht und Heilung sind bei den Bauern sehr
-      begehrt. Grade auf Märkten sind ihre Dienste häufig sehr
+      begehrt. Gerade auf Märkten sind ihre Dienste häufig sehr
       gefragt. Manch einer mag auch sein Talent dazu nutzen,
       ein Tier für einen besseren Preis zu verkaufen. Pro
       Stufe kann der Magier so 50 Silber verdienen.</text>
@@ -4243,7 +4243,7 @@
       aus feinkristallinen Gestein mit einer Phiole des
       Lebenswassers bis dieses vollständig vom Gestein
       aufgesogen wurde. Sodann richte man seine Kraft auf die
-      sich bildenden feine Aura des Lebens und forme der
+      sich bildende feine Aura des Lebens und forme der
       ungebundenen Kraft ein Gehäuse. Je mehr Kraft der Magier
       investiert, desto mehr Golems können geschaffen werden,
       bevor die Aura sich verflüchtigt. Jeder Golem hat jede
@@ -4281,7 +4281,7 @@
     <string name="treegrow">
       <text locale="de">Diese Ritual verstärkt die Wirkung des
       magischen Trankes um ein vielfaches. Wo sonst aus einem
-      Stecken nur ein Baum spießen konnte, so treibt nun jeder
+      Stecken nur ein Baum sprießen konnte, so treibt nun jeder
       Ast Wurzeln. </text>
       <text locale="en">This ritual greatly increases the
       effect of the potion. Now every branch becomes a sturdy
@@ -4399,7 +4399,7 @@
     <string name="mallorntreegrow">
       <text locale="de">Diese Ritual verstärkt die Wirkung des
       magischen Trankes um ein vielfaches. Wo sonst aus einem
-      Stecken nur ein Baum spießen konnte, so treibt nun jeder
+      Stecken nur ein Baum sprießen konnte, so treibt nun jeder
       Ast Wurzeln.
       </text>
       <text locale="en">This ritual greatly increases the
@@ -4546,7 +4546,7 @@
     <string name="homestone">
       <text locale="de">Mit dieser Formel bindet der Magier
         auf ewig die Kräfte der Erde in die Mauern der
-        Burg,in der er sich gerade befindet. Weder
+        Burg, in der er sich gerade befindet. Weder
         magisch noch mit schwerem Geschütz können
         derartig gestärkte Mauern zerstört werden, und
         auch das Alter setzt ihnen weniger zu. Das
@@ -4611,7 +4611,7 @@
     <string name="gwyrrddestroymagic">
       <text locale="de">Wie die alten Lehren der Druiden
         berichten, besteht das, was die normalen Wesen
-        Magie nennen aus Elementargeistern. Der Magier
+        Magie nennen, aus Elementargeistern. Der Magier
         beschwört und bannt diese in eine Form, um den
         gewünschten Effekt zu erzielen. Dieses Ritual
         nun vermag es, in diese Welt gerufene

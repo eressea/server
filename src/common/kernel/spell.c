@@ -8171,9 +8171,9 @@ static spell spelldaten[] =
   },
   {
     SPL_GWYRRD_ARMORSHIELD, "Rindenhaut",
-    "Diese vor dem Kampf zu zaubernde Ritual gibt den eigenen Truppen "
+    "Dieses vor dem Kampf zu zaubernde Ritual gibt den eigenen Truppen "
     "einen zusätzlichen Bonus auf ihre Rüstung. Jeder Treffer "
-    "reduziert die Kraft des Zaubers, so das der Schild sich irgendwann "
+    "reduziert die Kraft des Zaubers, so dass der Schild sich irgendwann "
     "im Kampf auflösen wird.", NULL, NULL,
     M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 2, 12,
     {
