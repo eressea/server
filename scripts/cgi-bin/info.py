@@ -64,7 +64,7 @@ def ShowInfo(custid, Password):
 	    line = line + "<tr><th height=30>Adresse</th><td><input size=40 name=address value=\""+row[4]+"\"></td></tr>\n"
 	    line = line + "<tr><th height=30>Wohnort</th><td><input size=40 name=city value=\""+row[5]+"\"></td></tr>\n"
 	    line = line + "<tr><th height=30>Telefon</th><td><input size=40 name=phone value=\""+row[7]+"\"></td></tr>\n"
-	    line = line + "<tr><th height=30>Kontostand</th><td>"+str(row[8])+" DM</td></tr>\n"
+	    line = line + "<tr><th height=30>Kontostand</th><td>"+str(row[8])+" EUR</td></tr>\n"
 	    line = line + "<tr><th height=30>Status</th><td>"+row[9]+"</td></tr>\n"
 	    output = output + line;
 
@@ -102,7 +102,7 @@ def ShowInfo(custid, Password):
 	    row = cursor.fetchone()
 	    line = "<tr>"
 	    line = line + "<td align=left>"+str(row[0])[0:10]+"</td>\n"
-	    line = line + "<td align=left>"+str(row[1])+"</td>\n"
+	    line = line + "<td align=right>"+str(row[1])+" EUR</td>\n"
 	    line = line + "<td align=left>"+row[2]+"</td>\n"
 	    line = line + "</tr>\n"
 	    output=output+line
