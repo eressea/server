@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: laws.c,v 1.3 2001/01/28 09:47:10 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1191,7 +1191,7 @@ set_name(region * r, unit * u, strlist * S)
 			}
 			sprintf(buf, "Monument %d", u->building->no);
 			if (u->building->type == &bt_monument
-				&& strcmp(u->building->name, buf) != NULL) {
+				&& !strcmp(u->building->name, buf)) {
 				cmistake(u, S->s, 29, MSG_EVENT);
 				break;
 			}

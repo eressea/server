@@ -48,6 +48,6 @@ LIBS += $(LIBNAMES:%=-l%) -lm
 
 # executable:
 
-$(BUILD_DIR)/$(BINARY):: $(BUILD_DIR) $(OBJECTS) $(LIBRARIES)
+$(BUILD_DIR)/$(BINARY):: subdirs-$(CONFIG) $(BUILD_DIR) $(OBJECTS)
 	$(LD) -o $@ $(OBJECTS) $(LDFLAGS)
 	$(INSTALL) $@ $(PUBLISH_DIR)/
