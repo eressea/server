@@ -714,11 +714,11 @@
 		<text locale="en">human scalps</text>
 	</string>
 	<string name="aquarianspoil">
-		<text locale="de">Meermenschschuppen</text>
+		<text locale="de">Meermenschschuppe</text>
 		<text locale="en">aquarian scale</text>
 	</string>
 	<string name="aquarianspoil_p">
-		<text locale="de">Meermenschschupper</text>
+		<text locale="de">Meermenschschuppen</text>
 		<text locale="en">aquarian scales</text>
 	</string>
 	<string name="insectspoil">
