@@ -92,7 +92,7 @@ extern char **seasonnames;
 extern char **weeknames;
 extern char **monthnames;
 extern int  *month_season;
-extern int  *storms;
+extern int  *storms; /* in movement.c */
 extern char *agename;
 extern int  seasons;
 extern int  weeks_per_month;

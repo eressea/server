@@ -2500,7 +2500,7 @@ aftermath(battle * b)
           fset(du, UFL_LONGACTION);
           leave(du->region, du);
           if (df->run.region) {
-            travel(du, df->run.region, 1, NULL);
+            run_to(du, df->run.region);
             df->run.region = du->region;
           }
         } else

@@ -709,8 +709,12 @@ enum {
 	NORACE = (race_t) - 1
 };
 
-
-/* ---------- Regionen ----------------------------------------- */
+/* movewhere error codes */
+enum {
+  E_MOVE_OK = 0,   /* possible to move */
+  E_MOVE_NOREGION, /* no region exists in this direction */
+  E_MOVE_BLOCKED   /* cannot see this region, there is a blocking border. */
+};
 
 /* Richtungen */
 enum {
@@ -1120,7 +1124,8 @@ extern int maxworkingpeasants(const struct region * r);
 
 extern int wage(const struct region *r, const struct unit *u, boolean img);
 extern int fwage(const struct region *r, const struct faction *f, boolean img);
-extern struct region * movewhere(struct region * r, const struct unit *u);
+extern int movewhere(const struct unit *u, const char * token, struct region * r, struct region** resultp);
+extern struct message * movement_error(struct unit * u, const char * token, struct order * ord, int error_code);
 extern boolean move_blocked(const struct unit * u, const struct region *src, const struct region *dest);
 extern void add_income(struct unit * u, int type, int want, int qty);
 

@@ -1039,7 +1039,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 #endif
 
 			o = eff_skill(u2, SK_OBSERVATION, r);
-#if NIGHTEYES
+#ifdef NIGHTEYES
 			if (u2->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
 				o = NIGHT_EYE_TALENT;
 #endif
@@ -1102,7 +1102,7 @@ cansee(faction * f, region * r, unit * u, int modifier)
 #endif
 
 				o = eff_skill(u2, SK_OBSERVATION, r);
-#if NIGHTEYES
+#ifdef NIGHTEYES
 				if (u2->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
 					o = NIGHT_EYE_TALENT;
 #endif
@@ -1133,16 +1133,18 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u, int mod
 	else if (u->faction == f) cansee = true;
 	else {
 
-		n = eff_stealth(u, r) - modifier;
+    if (getguard(u) || usiege(u) || u->building || u->ship) {
+      cansee = true;
+    }
 
-		for (u2 = r->units; u2; u2 = u2->next){
+		n = eff_stealth(u, r) - modifier;
+    if (n<=0) {
+      cansee = true;
+    }
+
+    for (u2 = r->units; !cansee && u2; u2 = u2->next){
 			if (u2->faction == f) {
 				int o;
-
-				if (getguard(u) || usiege(u) || u->building || u->ship) {
-					cansee = true;
-					break;
-				}
 
 #if NEWATSROI == 0
 				if (invisible(u) >= u->number
@@ -1152,13 +1154,12 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u, int mod
 
 				o = eff_skill(u2, SK_OBSERVATION, r);
 
-#if NIGHTEYES
+#ifdef NIGHTEYES
 				if (u2->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
 					o = NIGHT_EYE_TALENT;
 #endif
 				if (o >= n) {
 					cansee = true;
-					break;
 				}
 			}
 		}
@@ -2924,79 +2925,48 @@ findspecialdirection(const region *r, const char *token)
   return NULL;
 }
 
-region *
-movewhere(region * r, const unit *u)
+message *
+movement_error(unit * u, const char * token, order * ord, int error_code)
 {
-	direction_t d;
-	const char *token;
-	region * r2;
+  direction_t d;
+  switch (error_code) {
+    case E_MOVE_BLOCKED:
+      d = finddirection(token, u->faction->locale);
+      return msg_message("moveblocked", "unit direction", u, d);
+    case E_MOVE_NOREGION:
+      return msg_feedback(u, ord, "unknowndirection", "direction", token);
+  }
+  return NULL;
+}
 
-	token = getstrtoken();
+int
+movewhere(const unit *u, const char * token, region * r, region** resultp)
+{
+  direction_t d = finddirection(token, u->faction->locale);
+  region * r2;
 
-	d = finddirection(token, u->faction->locale);
-	if (d == D_PAUSE)
-		return r;
+  switch (d) {
 
-	if (d == NODIRECTION)
-		return findspecialdirection(r, token);
+  case D_PAUSE:
+    *resultp = r;
+    break;
 
-#if 0 /* NOT here! make a temporary attribute for this and move it into travel() */
-	if (is_cursed(r->attribs, C_REGCONF, 0)) {
-		if (rand()%100 < get_curseeffect(r->attribs, C_REGCONF, 0)) {
-			if(u->wants < 0) u->wants--;
-			else if(u->wants > 0) u->wants++;
-			else u->wants = rand()%2==0?1:-1;
-		}
+  case NODIRECTION:
+    r2 = findspecialdirection(r, token);
+    if (r2!=NULL) {
+      return E_MOVE_NOREGION;
+    }
+    *resultp = r2;
+    break;
+
+  default:
+    r2 = rconnect(r, d);
+  	if (r2==NULL || move_blocked(u, r, r2)) {
+  		return E_MOVE_BLOCKED;
+    }
+    *resultp = r2;
 	}
-
-	if (u->ship && is_cursed(u->ship->attribs, C_DISORIENTATION, 0)) {
-		if (rand()%100 < get_curseeffect(r->attribs, C_DISORIENTATION, 0)) {
-			if(u->wants < 0) u->wants--;
-			else if(u->wants > 0) u->wants++;
-			else u->wants = rand()%20?1:-1;
-		}
-	}
-	d = (direction_t)((d + u->wants + MAXDIRECTIONS) % MAXDIRECTIONS);
-#endif
-
-	if (!rconnect(r, d)) {
-#ifdef USE_CREATION
-		makeblock(r->x + delta_x[d], r->y + delta_y[d], 1);
-		log_error((("Region (%d,%d) hatte seine Nachbarn "
-			   "(%d,%d) noch nicht generiert!\n", r->x, r->y,
-			   r->x + delta_x[d], r->y + delta_y[d]));
-#else
-		add_message(&u->faction->msgs,
-			msg_message("moveblocked", "unit direction", u, d));
-		return NULL;
-#endif
-	}
-	r2 = rconnect(r, d);
-
-	if (!r2) {
-		log_error(("Region (%d,%d) hatte seine Nachbarn "
-			   "(%d,%d) nicht gefunden!", r->x, r->y,
-			   r->x + delta_x[d], r->y + delta_y[d]));
-		return 0;
-	}
-
-	if (move_blocked(u, r, r2)) {
-		add_message(&u->faction->msgs,
-			msg_message("moveblocked", "unit direction", u, d));
-		return NULL;
-	}
-
-	/* r2 enthält nun die existierende Zielregion - ihre Nachbarn sollen
-	 * auch schon alle existieren. Dies erleichtert das Umherschauen bei
-	 * den Reports! */
-
-#ifdef USE_CREATION
-	for (d = 0; d != MAXDIRECTIONS; d++)
-		if (!rconnect(r2, d))
-			makeblock(r2->x + delta_x[d], r2->y + delta_y[d], 1);
-#endif
-
-	return r2;
+  return E_MOVE_OK;
 }
 
 boolean

@@ -151,6 +151,15 @@ error_callback(lua_State * L)
 }
 #endif
 
+static int
+get_direction(const char * name)
+{
+  for (int i=0;i!=MAXDIRECTIONS;++i) {
+    if (strcasecmp(directions[i], name)==0) return i;
+  }
+  return NODIRECTION;
+}
+
 void
 bind_eressea(lua_State * L)
 {
@@ -170,6 +179,9 @@ bind_eressea(lua_State * L)
     /* scripted monsters */
     def("plan_monsters", &lua_planmonsters),
     def("set_brain", &race_setscript),
+
+    /* string to enum */
+    def("direction", &get_direction),
 
     /* localization: */
     def("set_string", &lua_setstring),

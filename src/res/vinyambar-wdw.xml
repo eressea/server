@@ -3,7 +3,6 @@
   <xi:include href="messages.xml"/>
 
   <!-- Localization -->
-  <!-- Strings MUST always be read first -->
 
   <xi:include href="de/strings.xml"/>
   <xi:include href="en/strings.xml"/>

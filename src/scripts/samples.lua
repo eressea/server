@@ -1,3 +1,84 @@
+function test_movement()
+  west = direction("west")
+  east = direction("east")
+
+  r0 = terraform(0, 0, "plain")
+  r1 = terraform(1, 0, "desert")
+  r2 = terraform(2, 0, "glacier")
+  r3 = terraform(3, 0, "plain")
+  r4 = terraform(4, 0, "glacier")
+
+  r0:set_road(east, 1.0)
+  r1:set_road(west, 1.0)
+  r1:set_road(east, 1.0)
+  r2:set_road(west, 1.0)
+  r2:set_road(east, 1.0)
+  r3:set_road(west, 1.0)
+  r3:set_road(east, 1.0)
+  r4:set_road(west, 1.0)
+
+  orcs = add_faction("enno@eressea.de", "orc", "de")
+  orcs.age = 20
+
+  orc = add_unit(orcs, r0)
+  orc.number = 10
+  orc:add_item("money", orc.number*10)
+  orc:add_item("horse", orc.number*3)
+  orc:set_skill("sk_riding", 10)
+
+  bugs = add_faction("enno@eressea.de", "insect", "de")
+  bugs.age = 20
+
+  bug = add_unit(bugs, r0)
+  bug.number = 1
+  bug:add_item("money", bug.number*10)
+
+  orc:clear_orders()
+  orc:add_order("NUMMER PARTEI orcs")
+  orc:add_order("NUMMER EINHEIT orc")
+  orc:add_order("BENENNE EINHEIT Orks")
+  orc:add_order("ROUTE O O O P P O W W W W")
+  orc:add_order("GIB 0 ALLES Steine")
+  orc:add_order("GIB 0 ALLES Holz")
+  orc:add_order("TRANSPORTIEREN " .. itoa36(bug.id))
+
+  bug:clear_orders()
+  bug:add_order("NUMMER PARTEI bugs")
+  bug:add_order("NUMMER EINHEIT bug")
+  bug:add_order("BENENNE EINHEIT Käfer")
+  bug:add_order("GIB 0 ALLES Steine")
+  bug:add_order("GIB 0 ALLES Holz")
+  bug:add_order("FAHREN " .. itoa36(orc.id))
+
+  u = add_unit(orcs, r0)
+  u.number = 1
+  u:add_item("horse", u.number*3)
+  u:add_item("money", u.number*10)
+  u:set_skill("sk_riding", 10)
+  u:set_skill("sk_stealth", 2)
+  u:clear_orders()
+  u:add_order("FOLGEN EINHEIT " .. itoa36(bug.id))
+  u:add_order("NACH W")
+  u:add_order("NUMMER EINHEIT foLg")
+  u:add_order("BENENNE EINHEIT Verfolger")
+
+  u2 = add_unit(orcs, r0)
+  u2.number = 1
+  u2:add_item("horse", u2.number*3)
+  u2:add_item("money", u.number*10)
+  u2:set_skill("sk_riding", 10)
+  u2:set_skill("sk_stealth", 2)
+  u2:clear_orders()
+  u2:add_order("FOLGEN EINHEIT nix")
+  u2:add_order("NUMMER EINHEIT Last")
+  u2:add_order("BENENNE EINHEIT Verfolger-Verfolger")
+
+
+  process_orders()
+  write_reports() 
+end
+
+
 function test_handler()
 
   local function msg_handler(u, evt)
@@ -221,7 +302,8 @@ function test_fail()
   print(f)
 end
 
-test_fail()
+test_movement()
+-- test_fail()
 -- test_handler()
 -- test_parser()
 -- test_monsters()

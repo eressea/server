@@ -51,7 +51,7 @@ extern int personcapacity(const struct unit *u);
 
 extern direction_t getdirection(const struct locale *);
 extern void movement(void);
-extern int travel(struct unit * u, struct region * r2, int flucht, struct region_list** routep);
+extern void run_to(struct unit * u, struct region * to);
 extern struct unit *is_guarded(struct region * r, struct unit * u, unsigned int mask);
 extern int enoughsailors(const struct ship * sh, const struct region * r);
 extern boolean canswim(struct unit *u);

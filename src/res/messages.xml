@@ -4483,9 +4483,9 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Kann die zu transportierende Einheit nicht finden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Could not find the unit to be transported."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Could not find the unit to be transported."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit will nicht transportiert werden."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The unit doen not want to be transported."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit doen not want to be transported."</text>
   </message>
   <message name="error98" section="errors">
     <type>
@@ -4755,15 +4755,16 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The target-unit did not contact us."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The target-unit did not contact us."</text>
   </message>
-  <message name="error71" section="errors">
+  <message name="unknowndirection" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
+      <arg name="dirname" type="string"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Richtung wurde nicht erkannt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Direction could not be recognized."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Direction could not be recognized."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Richtung '$dirname' wurde nicht erkannt."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Direction '$dirname' was not recognized."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Direction '$dirname' was not recognized."</text>
   </message>
   <message name="error70" section="errors">
     <type>

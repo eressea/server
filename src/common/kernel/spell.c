@@ -2980,8 +2980,8 @@ wall_write(const border * b, FILE * f)
 	fprintf(f, "%d %d ", fd->mage?fd->mage->no:0, fd->force);
 }
 
-static void
-wall_move(const border * b, struct unit * u, const struct region * from, const struct region * to)
+static region *
+wall_move(const border * b, struct unit * u, struct region * from, struct region * to)
 {
   wall_data * fd = (wall_data*)b->data;
   int hp = dice(3, fd->force) * u->number;
@@ -2999,7 +2999,7 @@ wall_move(const border * b, struct unit * u, const struct region * from, const s
     }
   }
   unused(from);
-  unused(to);
+  return to;
 }
 
 border_type bt_firewall = {
@@ -3093,6 +3093,24 @@ wisps_name(const border * b, const region * r, const faction * f, int gflags)
 		return "Irrlichter";
 }
 
+static region *
+wisps_move(const border * b, struct unit * u, struct region * from, struct region * next)
+{
+  direction_t reldir = reldirection(from, next);
+  wall_data * wd = (wall_data*)b->data;
+  assert(reldir!=D_SPECIAL);
+
+  if (wd->active) {
+    /* pick left and right region: */
+    region * rl = rconnect(from, (direction_t)((reldir+MAXDIRECTIONS-1)%MAXDIRECTIONS));
+    region * rr = rconnect(from, (direction_t)((reldir+1)%MAXDIRECTIONS));
+    int j = rand() % 3;
+    if (j==1 && rl && landregion(rterrain(rl))==landregion(rterrain(next))) return rl;
+    if (j==2 && rr && landregion(rterrain(rr))==landregion(rterrain(next))) return rr;
+  }
+  return next;
+}
+
 border_type bt_wisps = {
 	"wisps",
 	b_transparent, /* transparent */
@@ -3105,6 +3123,8 @@ border_type bt_wisps = {
 	b_rvisible, /* rvisible */
 	b_fvisible, /* fvisible */
 	b_uvisible, /* uvisible */
+  NULL, /* visible */
+  wisps_move
 };
 
 static int

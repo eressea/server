@@ -61,9 +61,8 @@
 #include <attributes/targetregion.h>
 #include <attributes/at_movement.h>
 
-/* TODO: boder_type::move() must be able to change target (wisps) */
 extern border_type bt_wisps;
-/* ------------------------------------------------------------- */
+int * storms;
 
 typedef struct traveldir {
 	int no;
@@ -80,6 +79,31 @@ static attrib_type at_traveldir = {
 	DEFAULT_READ
 };
 
+typedef struct follower {
+  struct follower * next;
+  unit * uf;
+  unit * ut;
+  region_list * route_end;
+} follower;
+
+static void
+get_followers(unit * target, region * r, region_list * route_end, follower ** followers)
+{
+  unit * uf;
+  for (uf=r->units;uf;uf=uf->next) {
+    if (fval(uf, UFL_FOLLOWING) && !fval(uf, UFL_LONGACTION)) {
+      const attrib * a = a_findc(uf->attribs, &at_follow);
+      if (a && a->data.v == target) {
+        follower * fnew = malloc(sizeof(follower));
+        fnew->uf = uf;
+        fnew->ut = target;
+        fnew->route_end = route_end;
+        fnew->next = *followers;
+        *followers = fnew;
+      }
+    }
+  }
+}
 
 static void
 shiptrail_init(attrib *a)
@@ -279,7 +303,14 @@ walkingcapacity(const struct unit * u)
 	return n;
 }
 
-int
+enum {
+  E_CANWALK_OK = 0,
+  E_CANWALK_TOOMANYHORSES,
+  E_CANWALK_TOOMANYCARTS,
+  E_CANWALK_TOOHEAVY
+};
+
+static int
 canwalk(unit * u)
 {
 	int wagen, maxwagen;
@@ -288,7 +319,7 @@ canwalk(unit * u)
 	/* workaround: monsters are too stupid to drop items, therefore they have
 	 * infinite carrying capacity */
 
-	if (u->faction->no == 0) return 0;
+	if (u->faction->no == 0) return E_CANWALK_OK;
 
 	wagen = get_item(u, I_WAGON);
 	pferde = get_item(u, I_HORSE);
@@ -300,10 +331,10 @@ canwalk(unit * u)
 	maxpferde = effskill(u, SK_RIDING) * u->number * 4 + u->number;
 
 	if (pferde > maxpferde)
-		return 2;
+		return E_CANWALK_TOOMANYHORSES;
 
 	if (walkingcapacity(u) - eff_weight(u) >= 0)
-		return 0;
+		return E_CANWALK_OK;
 
 	/* Stimmt das Gewicht, impliziert dies hier, daß alle Wagen ohne
 	 * Zugpferde/-trolle als Fracht aufgeladen wurden: zu viele Pferde hat
@@ -311,12 +342,12 @@ canwalk(unit * u)
 	 * als erlaubt. */
 
 	if (wagen > maxwagen)
-		return 3;
+		return E_CANWALK_TOOMANYCARTS;
 	/* Es muß nicht zwingend an den Wagen liegen, aber egal... (man
 	 * könnte z.B. auch 8 Eisen abladen, damit ein weiterer Wagen als
 	 * Fracht draufpaßt) */
 
-	return 1;
+	return E_CANWALK_TOOHEAVY;
 }
 
 boolean
@@ -507,10 +538,10 @@ leave_trail(ship * sh, region * from, region_list *route)
 }
 
 static void
-travel_route(const unit * u, region * r, region_list * route)
+mark_travelthru(const unit * u, region * r, region_list * route, region_list * route_end)
 {
   /* kein travelthru in der letzten region! */
-  while (route) {
+  while (route!=route_end) {
     travelthru(u, r);
     r = route->data;
     route = route->next;
@@ -538,7 +569,7 @@ move_ship(ship * sh, region * from, region * to, region_list * route)
         leave_trail(sh, from, route);
         trail = true;
       }
-      if (route!=NULL) travel_route(u, from, route);
+      if (route!=NULL) mark_travelthru(u, from, route, NULL);
       if (from!=to) {
         u->ship = NULL;		/* damit move_unit() kein leave() macht */
         move_unit(u, to, ulist);
@@ -881,21 +912,41 @@ cycle_route(unit *u, int gereist)
   free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
 }
 
+static boolean 
+transport(unit * ut, unit * u)
+{
+  order * ord;
+
+  if (LongHunger(u)) {
+    return false;
+  }
+
+  for (ord = ut->orders; ord; ord = ord->next) {
+    if (get_keyword(ord) == K_TRANSPORT) {
+      init_tokens(ord);
+      skip_token();
+      if (getunit(ut->region, ut->faction) == u) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 static void
-init_drive(void)
+init_transportation(void)
 {
   region *r;
-  unit *u, *ut;
 
   for (r=regions; r; r=r->next) {
+    unit *u;
+
     /* This is just a simple check for non-corresponding K_TRANSPORT/
     * K_DRIVE. This is time consuming for an error check, but there
     * doesn't seem to be an easy way to speed this up. */
-
-    for(u=r->units; u; u=u->next) {
+    for (u=r->units; u; u=u->next) {
       if (get_keyword(u->thisorder) == K_DRIVE && !fval(u, UFL_LONGACTION) && !LongHunger(u)) {
-        boolean found = false;
-        order * ord;
+        unit * ut;
 
         init_tokens(u->thisorder);
         skip_token();
@@ -904,17 +955,7 @@ init_drive(void)
           cmistake(u, u->thisorder, 63, MSG_MOVE);
           continue;
         }
-        for (ord = ut->orders; ord; ord = ord->next) {
-          if (get_keyword(ord) == K_TRANSPORT) {
-            init_tokens(ord);
-            skip_token();
-            if (getunit(r, ut->faction) == u) {
-              found = true;
-              break;
-            }
-          }
-        }
-        if (found == false) {
+        if (!transport(ut, u)) {
           if (cansee(u->faction, r, ut, 0)) {
             cmistake(u, u->thisorder, 286, MSG_MOVE);
           } else {
@@ -925,15 +966,16 @@ init_drive(void)
     }
 
     /* This calculates the weights of all transported units and
-    * adds them to an internal counter which is used by travel() to
-    * calculate effective weight and movement. */
-
+     * adds them to an internal counter which is used by travel () to
+     * calculate effective weight and movement. */
     for (u=r->units; u; u=u->next) {
       order * ord;
       int w = 0;
 
       for (ord = u->orders; ord; ord = ord->next) {
         if (get_keyword(ord) == K_TRANSPORT) {
+          unit * ut;
+
           init_tokens(ord);
           skip_token();
           ut = getunit(r, u->faction);
@@ -949,42 +991,10 @@ init_drive(void)
           }
         }
       }
-
-      if(w > 0) a_add(&u->attribs, a_new(&at_driveweight))->data.i = w;
+      if (w > 0) a_add(&u->attribs, a_new(&at_driveweight))->data.i = w;
     }
   }
 }
-
-int  *storms;
-
-#if 0
-/* in arbeit */
-#define ETRAVEL_NOTALLOWED 1
-#define ETRAVEL_NOSWIM     2
-#define ETRAVEL_NORIDE     4
-#define ETRAVEL_LEFTSHIP   8
-
-int
-cantravel(const unit *u, const region *from, const region * to, boolean (*allowed)(const struct region *, const struct region *))
-{
-	/* basic allowed function */
-	if (allowed && !allowed(from, to)) return ETRAVEL_NOTALLOWED;
-	if (u->ship && fval(u, UFL_OWNER) && rterrain(from)==T_OCEAN) {
-		/* wir sind auf einem schiff und auf dem ozean */
-		if (rterrain(to)==T_OCEAN || (old_race(u->race) != RC_AQUARIAN && !dragon(u))) {
-			/* Drache oder Meermensch sind wir auch nicht */
-			return ETRAVEL_NOSWIM;
-		} else if (get_item(u, I_HORSE) > 0) {
-			return ETRAVEL_NORIDE|ETRAVEL_NOSWIM;
-		}
-	}
-	if (!u->ship && leftship(u) && is_guarded(from, u, GUARD_LANDING)) {
-		/* An Land kein NACH wenn in dieser Runde Schiff VERLASSEN! */
-		return ETRAVEL_LEFTSHIP;
-	}
-}
-#endif
-
 
 static boolean
 roadto(const region * r, direction_t dir)
@@ -1024,404 +1034,316 @@ direction_name(const region * from, const region * to, const struct locale * lan
   return NULL;
 }
 
-static int
-notify_followers(region * r, unit * target, const region_list * route)
+static region_list *
+cap_route(region * r, region_list * route, region_list * route_end, int speed)
 {
-  int followers = 0;
-  unit *up; 
+  region * current = r;
+  int moves = speed;
+  region_list * iroute = route;
+  while (iroute!=route_end) {
+    region * next = iroute->data;
+    direction_t reldir = reldirection(current, next);
 
-  for (up=r->units;up;up=up->next) {
-    if (fval(up, UFL_FOLLOWING) && !fval(up, UFL_LONGACTION)) {
-      const attrib * a = a_findc(up->attribs, &at_follow);
-      if (a && a->data.v==target) {
-        /* wir basteln ihm ein NACH */
-        const region_list * rlist = route;
-        region * from = r;
+    iroute = iroute->next;
 
-        strcpy(buf, locale_string(up->faction->locale, keywords[K_MOVE]));
-        while (rlist!=NULL) {
-          strcat(strcat(buf, " "), direction_name(from, rlist->data, up->faction->locale));
-          from = rlist->data;
-          rlist = rlist->next;
-        }
-        set_order(&up->thisorder, parse_order(buf, up->faction->locale));
-        free_order(up->thisorder); /* parse_order & set_order have each increased the refcount */
-        ++followers;
-      }
-    }
+    /* adjust the range of the unit */
+    if (roadto(current, reldir)) moves -= BP_ROAD;
+    else moves -= BP_NORMAL;
+    if (moves<0) break;
+    current = next;
   }
-  return followers;
+  return iroute;
 }
 
-/** traveling without ships
- * The travel unction returns the number of followers - in case it's non-null,
- * the loop through the units in the region needs to be repeated
- * to exceute the newly made MOVE commands of followers
- */
-int
-travel(unit * u, region * next, int flucht, region_list ** routep)
+static void
+make_route(unit * u, order * ord, region_list ** routep)
 {
-  region *first = u->region;
-  region *current = u->region;
-  int k, m = 0;
-  double dk;
-  unit *ut, *u2;
-  int gereist = 0;
-  region_list *route = NULL;
-  region_list **iroute = &route;
-  static boolean init = false;
+  region_list **iroute = routep;
+  region * current = u->region;
+  region * next = NULL;
+  const char * token = getstrtoken();
+  int error = movewhere(u, token, current, &next);
+
+  if (error!=E_MOVE_OK) {
+    message * msg = movement_error(u, token, ord, error);
+    if (msg!=NULL) {
+      add_message(&u->faction->msgs, msg);
+      msg_release(msg);
+    }
+    next = NULL;
+  }
+
+  while (next!=NULL) {
+    border * b = get_borders(current, next);
+    direction_t reldir;
+
+    if (current==next) {
+      /* PAUSE */
+      break;
+    }
+    while (b!=NULL) {
+      if (b->type->move) {
+        region * rto = b->type->move(b, u, current, next);
+        if (rto!=next) {
+          /* the target region was changed (bt_wisps, for example). check the
+           * new target region for borders */
+          next = rto;
+          b = get_borders(current, next);
+          continue;
+        }
+      }
+      b = b->next;
+    }
+    
+    reldir = reldirection(current, next);
+    
+    add_regionlist(iroute, next);
+    iroute = &(*iroute)->next;
+
+    current = next;
+    token = getstrtoken();
+    error = movewhere(u, token, current, &next);
+    if (error) {
+      message * msg = movement_error(u, token, ord, error);
+      if (msg!=NULL) {
+        add_message(&u->faction->msgs, msg);
+        msg_release(msg);
+      }
+      next = NULL;
+      break;
+    }
+  }
+}
+
+/** calculate the speed of a unit
+ *
+ * zu Fuß reist man 1 Region, zu Pferd 2 Regionen. Mit Straßen reist
+ * man zu Fuß 2, mit Pferden 3 weit.
+ *
+ * Berechnet wird das mit BPs. Zu Fuß hat man 4 BPs, zu Pferd 6.
+ * Normalerweise verliert man 3 BP pro Region, bei Straßen nur 2 BP.
+ * Außerdem: Wenn Einheit transportiert, nur halbe BP 
+ */
+static int 
+movement_speed(unit * u)
+{
+  int mp;
   static const curse_type * speed_ct;
-  int followers = 0;
+  static boolean init = false;
+  double dk = u->race->speed;
 
-  if (routep) *routep = NULL;
-  if (!init) { 
-    init = true; 
-    speed_ct = ct_find("speed"); 
-  }
-
-  /* tech:
-  *
-  * zu Fuß reist man 1 Region, zu Pferd 2 Regionen. Mit Straßen reist
-  * man zu Fuß 2, mit Pferden 3 weit.
-  *
-  * Berechnet wird das mit BPs. Zu Fuß hat man 4 BPs, zu Pferd 6.
-  * Normalerweise verliert man 3 BP pro Region, bei Straßen nur 2 BP.
-  * Außerdem: Wenn Einheit transportiert, nur halbe BP */
-
-  if (rterrain(current)==T_OCEAN
-    && !(u->race->flags & RCF_FLY) && rterrain(next) != T_OCEAN)
-  { /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
-    if (!(u->race->flags & RCF_SWIM) && old_race(u->race) != RC_AQUARIAN) {
-      cmistake(u, u->thisorder, 44, MSG_MOVE);
-      return 0;
-    } else {
-      if (u->ship && get_item(u, I_HORSE) > 0) {
-        cmistake(u, u->thisorder, 67, MSG_MOVE);
-        return 0;
-      }
-    }
-  } else if (rterrain(current)!=T_OCEAN) {
-    /* An Land kein NACH wenn in dieser Runde Schiff VERLASSEN! */
-    if (leftship(u) && is_guarded(current, u, GUARD_LANDING)) {
-      cmistake(u, u->thisorder, 70, MSG_MOVE);
-      return 0;
-    }
-    if (u->ship && !flucht && u->race->flags & RCF_SWIM) {
-      cmistake(u, u->thisorder, 143, MSG_MOVE);
-      return 0;
-    }
-  } else if (rterrain(next) == T_OCEAN && u->ship && fval(u->ship, SF_MOVED)) {
-    cmistake(u, u->thisorder, 13, MSG_MOVE);
-    return 0;
-  }
-
-  switch (canwalk(u)) {
-    case 1:
-      cmistake(u, u->thisorder, 57, MSG_MOVE);
-      return 0;
-    case 2:
-      cmistake(u, u->thisorder, 56, MSG_MOVE);
-      return 0;
-    case 3:
-      cmistake(u, u->thisorder, 42, MSG_MOVE);
-      return 0;
-  }
-
-  /* wir suchen so lange nach neuen Richtungen, wie es geht. Diese werden
-  * dann nacheinander ausgeführt. */
-
-  dk = u->race->speed;
-
-  if (speed_ct) {
-    curse *c = get_curse(u->attribs, speed_ct);
-    if(c) {
-      int men = get_cursedmen(u, c);
-      dk *= 1.0 + (double)men/(double)u->number;
-    }
-  }
-
-  switch(canride(u)) {
-    case 1:		/* Pferd */
-      k = (int)(dk*BP_RIDING);
-      break;
-    case 2:		/* Einhorn */
-      k = (int)(dk*BP_UNICORN);
-      break;
-    default:
-      {
-        int mp = 1;
-
-        /* faction special */
-        if(fspecial(u->faction, FS_QUICK))
-          mp = BP_RIDING;
-
-        /* Siebenmeilentee */
-        if (get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
-          mp *= 2;
-          change_effect(u, oldpotiontype[P_FAST], -u->number);
-        }
-
-        /* unicorn in inventory */
-        if (u->number <= get_item(u, I_FEENSTIEFEL))
-          mp *= 2;
-
-        /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
-        * Nicht kumulativ mit anderen Beschleunigungen! */
-        if ( mp == 1 && getplane(next) == get_astralplane() && is_mage(u)) {
-          if(get_mage(u)->magietyp == M_ASTRAL
-            || get_mage(u)->magietyp == M_TRAUM) {
-              mp *= 2;
-            }
-        }
-        k = (int)(dk*mp*BP_WALKING);
-      }
-      break;
-  }
-
-  switch(old_race(u->race)) {
+  /* dragons have a fixed speed, and no other effects work on them: */
+  switch (old_race(u->race)) {
     case RC_DRAGON:
     case RC_WYRM:
     case RC_FIREDRAGON:
     case RC_BIRTHDAYDRAGON:
     case RC_PSEUDODRAGON:
-      k = BP_DRAGON;
+      return BP_DRAGON;
   }
 
-  /* die nächste Region, in die man wandert, wird durch movewhere() aus
-  * der letzten Region bestimmt.
-  *
-  * Anfangen tun wir bei r. r2 ist beim ersten Durchlauf schon gesetzt
-  * (Parameter!), das Ziel des Schrittes. m zählt die Schritte, k sind
-  * die noch möglichen Schritte, r3 die letzte gültige, befahrene Region. */
+  if (!init) { 
+    init = true; 
+    speed_ct = ct_find("speed"); 
+  }
+  if (speed_ct) {
+    curse *c = get_curse(u->attribs, speed_ct);
+    if (c!=NULL) {
+      int men = get_cursedmen(u, c);
+      dk *= 1.0 + (double)men/(double)u->number;
+    }
+  }
 
-  while (next) {
-    border * b = get_borders(current, next);
+  switch (canride(u)) {
+
+  case 1:		/* Pferd */
+    mp = BP_RIDING;
+    break;
+
+  case 2:		/* Einhorn */
+    mp = BP_UNICORN;
+    break;
+
+  default:
+    mp = BP_WALKING;
+    /* faction special */
+    if (fspecial(u->faction, FS_QUICK)) mp = BP_RIDING;
+
+    /* Siebenmeilentee */
+    if (get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
+      mp *= 2;
+      change_effect(u, oldpotiontype[P_FAST], -u->number);
+    }
+
+    /* unicorn in inventory */
+    if (u->number <= get_item(u, I_FEENSTIEFEL)) {
+      mp *= 2;
+    }
+
+    /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
+    * Nicht kumulativ mit anderen Beschleunigungen! */
+    if (mp*dk <= BP_WALKING*u->race->speed && getplane(u->region) == get_astralplane() && is_mage(u)) {
+      sc_mage * mage = get_mage(u);
+      if (mage->magietyp == M_ASTRAL || mage->magietyp == M_TRAUM) {
+        mp *= 2;
+      }
+    }
+    break;
+  }
+  return (int)(dk*mp);
+}
+
+enum {
+  TRAVEL_NORMAL,
+  TRAVEL_FOLLOWING,
+  TRAVEL_TRANSPORTED,
+  TRAVEL_RUNNING
+};
+
+static region_list *
+travel_route(unit * u, region_list * route_begin, region_list * route_end, order * ord, int mode)
+{
+  region * r = u->region;
+  region * current = u->region;
+  region_list * iroute = route_begin;
+  int steps = 0;
+
+  while (iroute && iroute!=route_end) {
+    region * next = iroute->data;
     direction_t reldir = reldirection(current, next);
 
-    while (b!=NULL) {
-      if (b->type==&bt_wisps) {
-        wall_data * wd = (wall_data*)b->data;
-        assert(reldir!=D_SPECIAL);
-
-        if (wd->active) {
-          /* pick left and right region: */
-          region * rl = rconnect(current, (direction_t)((reldir+MAXDIRECTIONS-1)%MAXDIRECTIONS));
-          region * rr = rconnect(current, (direction_t)((reldir+1)%MAXDIRECTIONS));
-          int j = rand() % 3;
-          if (j==0) break;
-          else if (j==1 && rl && landregion(rterrain(rl))==landregion(rterrain(next))) next = rl;
-          else if (j==2 && rr && landregion(rterrain(rr))==landregion(rterrain(next))) next = rr;
-          break;
-        }
+    /* check if we are caught by guarding units */
+    if (iroute!=route_begin && mode!=TRAVEL_RUNNING && mode!=TRAVEL_TRANSPORTED) {
+      unit * wache = bewegung_blockiert_von(u, current);
+      if (wache!=NULL) {
+        ADDMSG(&u->faction->msgs, msg_message("moveblockedbyguard", 
+          "unit region guard", u, current, wache));
+        break;
       }
-      if (b->type->move) b->type->move(b, u, current, next);
-      b = b->next;
     }
-    if (current!=next) { /* !pause */
-      if (roadto(current, reldir)) k-=BP_ROAD;
-      else k-=BP_NORMAL;
-      if (k<0) break;
 
-      if (reldir>=0 && move_blocked(u, current, next)) {
-        ADDMSG(&u->faction->msgs, msg_message("leavefail", 
-          "unit region", u, next));
-      }
-      if (!entrance_allowed(u, next)) {
-        ADDMSG(&u->faction->msgs, msg_message("regionowned", 
-          "unit region target", u, current, next));
-        break;
-      }
-      if (gereist) {
-        unit * wache = bewegung_blockiert_von(u, current);
-        if (wache!=NULL) {
-          ADDMSG(&u->faction->msgs, msg_message("moveblockedbyguard", 
-            "unit region guard", u, current, wache));
+    /* check movement from/to oceans. 
+     * aquarian special, flying units, horses, the works */
+    if ((u->race->flags & RCF_FLY) == 0) {
+      if (rterrain(current)==T_OCEAN && rterrain(next) != T_OCEAN) {
+        int moving = u->race->flags & (RCF_SWIM|RCF_WALK);
+        /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
+        if (moving != (RCF_SWIM|RCF_WALK) && old_race(u->race) != RC_AQUARIAN) {
+          /* can't swim+walk and isn't an aquarian */
+          if (ord!=NULL) cmistake(u, ord, 44, MSG_MOVE);
           break;
         }
       }
 
-      if (fval(u->race, RCF_ILLUSIONARY)) {
-        curse * c = get_curse(next->attribs, ct_find("antimagiczone"));
-        if (curse_active(c)) {
-          curse_changevigour(&next->attribs, c, - u->number);
-          add_message(&u->faction->msgs, new_message(u->faction,
-            "illusionantimagic%u:unit", u));
-          destroy_unit(u);
-          if (routep) *routep = route;
-          else free_regionlist(route);
-          return 0;
+      if (rterrain(current)==T_OCEAN || rterrain(next) == T_OCEAN) {
+        /* trying to enter or exit ocean with horses, are we? */
+        if (get_item(u, I_HORSE) > 0) {
+          /* tries to do it with horses */
+          if (ord!=NULL) cmistake(u, ord, 67, MSG_MOVE);
+          break;
         }
       }
+
       /* Ozeanfelder können nur von Einheiten mit Schwimmen und ohne
-      * Pferde betreten werden. Drachen können fliegen. */
-
+       * Pferde betreten werden. */
       if (rterrain(next) == T_OCEAN && !canswim(u)) {
-        plane *pl = getplane(next);
-        if (reldir<MAXDIRECTIONS && pl!=NULL && fval(pl, PFL_NOCOORDS)) {
-          ADDMSG(&u->faction->msgs, msg_message("detectoceandir", 
-            "unit direction", u, reldir));
-        } else {
-          ADDMSG(&u->faction->msgs, msg_message("detectocean", 
-            "unit region", u, next));
-        }
+        ADDMSG(&u->faction->msgs, msg_message("detectocean",
+          "unit region", u, next));
         break;
       }
+    }
 
-      if (terrain[rterrain(next)].flags & FORBIDDEN_LAND) {
-        plane *pl = getplane(next);
-        if (reldir<MAXDIRECTIONS && pl!=NULL && fval(pl, PFL_NOCOORDS)) {
-          ADDMSG(&u->faction->msgs, msg_message("detectforbiddendir", 
-            "unit direction", u, reldir));
-        } else {
-          ADDMSG(&u->faction->msgs, msg_message("detectforbidden", 
-            "unit region", u, next));
-        }
-        break;
-      }
-
-      if (old_race(u->race)==RC_INSECT) {
-        if (r_insectstalled(next) && is_freezing(u)) {
-          ADDMSG(&u->faction->msgs, msg_message("detectforbidden",
-                                                "unit region", u, next));
-          break;
-        }
-      }
-      add_regionlist(iroute, next);
-      iroute = &(*iroute)->next;
-      m++;
-    } else {
+    /* movement blocked by a wall */
+    if (reldir>=0 && move_blocked(u, current, next)) {
+      ADDMSG(&u->faction->msgs, msg_message("leavefail", 
+        "unit region", u, next));
       break;
     }
 
-    current = next;
-    if(!flucht) {
-      ++gereist;
-      if (current==first) break; /* PAUSE beendet die Reise */
-      next = movewhere(current, u);
+    /* region ownership only: region owned by enemies */
+    if (!entrance_allowed(u, next)) {
+      ADDMSG(&u->faction->msgs, msg_message("regionowned", 
+        "unit region target", u, current, next));
+      break;
     }
+
+    /* illusionary units disappear in antimagic zones */
+    if (fval(u->race, RCF_ILLUSIONARY)) {
+      curse * c = get_curse(next->attribs, ct_find("antimagiczone"));
+      if (curse_active(c)) {
+        curse_changevigour(&next->attribs, c, - u->number);
+        ADDMSG(&u->faction->msgs, msg_message("illusionantimagic", "unit", u));
+        set_number(u, 0);
+        break;
+      }
+    }
+
+    /* terrain is marked as forbidden (curse, etc) */
+    if (terrain[rterrain(next)].flags & FORBIDDEN_LAND) {
+      ADDMSG(&u->faction->msgs, msg_message("detectforbidden", 
+        "unit region", u, next));
+      break;
+    }
+
+    /* unit is an insect and cannot move into a glacier */
+    if (old_race(u->race)==RC_INSECT) {
+      if (r_insectstalled(next) && is_freezing(u)) {
+        ADDMSG(&u->faction->msgs, msg_message("detectforbidden",
+          "unit region", u, next));
+        break;
+      }
+    }
+
+    current = next;
+    iroute = iroute->next;
+    ++steps;
   }
 
-  if (gereist) {
+  if (iroute!=route_begin) {
+    /* the unit has moved at least one region */
     int mode;
-    order * ord;
+    region_list *rlist = route_begin;
+    char * p = buf;
+    region * next = r;
 
     setguard(u, GUARD_NONE);
-    cycle_route(u, gereist);
+    cycle_route(u, steps);
 
-    buf[0] = 0;
-
-    if (flucht == 1)
-      mode = 0;
-    else if (canride(u)) {
+    if (canride(u)) {
       mode = 1;
       produceexp(u, SK_RIDING, u->number);
-    } else
+    } else {
       mode = 2;
+    } /* TODO: Flucht mit 0, was mit transport? */
 
-    /* Haben Drachen ihr Ziel erreicht? */
-    if (u->faction->no==MONSTER_FACTION) {
-      attrib * ta = a_find(u->attribs, &at_targetregion);
-      if (ta && current == (region*)ta->data.v) {
-        a_remove(&u->attribs, ta);
-        set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
-        free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
-      }
-    }
+    /* Berichte über Durchreiseregionen */
 
-    /* Über die letzte Region braucht man keinen Bericht */
-
-    m--;
-    if (m > 0) {
-      region_list *rlist = route;
-      char * p = buf;
-
-      travelthru(u, first);
-
-      while (rlist!=NULL) {
-        region * r = rlist->data;
-
-        rlist = rlist->next;
-        if (rlist!=NULL) {
-          MSG(("travelthru_trail", "region", r), p, sizeof(buf) - (p-buf), 
-              u->faction->locale, u->faction);
-          if (rlist->next!=NULL) {
-            if (rlist->next->data==current) scat(" und ");
-            else scat(", ");
-          }
-          p += strlen(p);
+    *p = 0;
+    while (rlist!=iroute) {
+      if (next!=u->region && next!=current) {
+        MSG(("travelthru_trail", "region", next), 
+          p, sizeof(buf) - (p-buf), u->faction->locale, u->faction);
+        if (rlist->data!=current) {
+          if (rlist->next->data==current) scat(" und ");
+          else scat(", ");
         }
-        travelthru(u, r);
+        p += strlen(p);
       }
+      next = rlist->data;
+      rlist = rlist->next;
     }
     ADDMSG(&u->faction->msgs, msg_message("travel", 
-      "unit mode start end regions", u, mode, first, current, strdup(buf)));
+      "unit mode start end regions", u, mode, r, current, strdup(buf)));
 
-    /* und jetzt noch die transportierten Einheiten verschieben */
-    for (ord = u->orders; ord; ord = ord->next) {
-      if (get_keyword(ord) == K_TRANSPORT) {
-        init_tokens(ord);
-        skip_token();
-        ut = getunit(first, u->faction);
-        if (ut) {
-          boolean found = false;
-          if (get_keyword(ut->thisorder) == K_DRIVE) {
-            if (!fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
-              init_tokens(ut->thisorder);
-              skip_token();
-              u2 = getunit(first, ut->faction);
-              if (u2 == u) {
-                found = true;
-                add_message(&u->faction->msgs, new_message(
-                  u->faction, "transport%u:unit%u:target%r:start%r:end",
-                  u, ut, first, current));
-                if (!(terrain[current->terrain].flags & WALK_INTO) && get_item(ut, I_HORSE)) {
-                  cmistake(u, u->thisorder, 67, MSG_MOVE);
-                  cmistake(ut, ut->thisorder, 67, MSG_MOVE);
-                  continue;
-                }
-                if (can_survive(ut, current)) {
-                  travel_route(ut, ut->region, route);
-                  move_unit(ut, current, NULL);
-                  if (fval(ut, UFL_FOLLOWED) && route!=NULL) {
-                    followers += notify_followers(first, ut, route);
-                  }
-                } else {
-                  cmistake(u, u->thisorder, 287, MSG_MOVE);
-                  cmistake(ut, ut->thisorder, 230, MSG_MOVE);
-                  continue;
-                }
-              }
-            }
-          }
-          if (!found) {
-            if (cansee(u->faction, u->region, ut, 0)) {
-              cmistake(u, u->thisorder, 90, MSG_MOVE);
-            } else {
-              cmistake(u, u->thisorder, 63, MSG_MOVE);
-            }
-          }
-        } else {
-          if (ut) {
-            cmistake(u, u->thisorder, 63, MSG_MOVE);
-          } else {
-            cmistake(u, u->thisorder, 99, MSG_MOVE);
-          }
-        }
-      }
-    }
+    mark_travelthru(u, r, route_begin, iroute);
     move_unit(u, current, NULL);
+
+    /* make orders for the followers */
   }
-  else if (flucht) {
-    move_unit(u, current, NULL);
-  }
-  set_order(&u->thisorder, NULL);
   fset(u, UFL_LONGACTION);
   setguard(u, GUARD_NONE);
-
-  if (fval(u, UFL_FOLLOWING)) caught_target(current, u);
-  if (routep) *routep = route;
-  else free_regionlist(route);
-  return followers;
+  assert(u->region==current);
+  return iroute;
 }
 
 static boolean
@@ -1514,18 +1436,32 @@ check_takeoff(ship *sh, region *from, region *to)
   return true;
 }
 
-static region_list *
-sail(unit * u, region * next_point, boolean move_on_land)
+static void
+sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
 {
   region *starting_point = u->region;
   region *current_point, *last_point;
   int k, step = 0;
-  region_list *route = NULL;
-  region_list **iroute = &route;
+  region_list **iroute = routep;
   ship * sh = u->ship;
   faction * f = u->faction;
+  region * next_point = NULL;
+  int error;
+  const char * token = getstrtoken();
 
-  if (!ship_ready(starting_point, u)) return NULL;
+  if (routep) *routep = NULL;
+
+  error = movewhere(u, token, starting_point, &next_point);
+  if (error) {
+    message * msg = movement_error(u, token, ord, error);
+    if (msg!=NULL) {
+      add_message(&u->faction->msgs, msg);
+      msg_release(msg);
+    }
+    return;
+  }
+
+  if (!ship_ready(starting_point, u)) return;
 
   /* Wir suchen so lange nach neuen Richtungen, wie es geht. Diese werden
   * dann nacheinander ausgeführt. */
@@ -1535,7 +1471,7 @@ sail(unit * u, region * next_point, boolean move_on_land)
   last_point = starting_point;
   current_point = starting_point;
 
-  /* die nächste Region, in die man segelt, wird durch movewhere() aus der
+  /* die nächste Region, in die man segelt, wird durch movewhere () aus der
   * letzten Region bestimmt.
   *
   * Anfangen tun wir bei starting_point. next_point ist beim ersten
@@ -1543,6 +1479,8 @@ sail(unit * u, region * next_point, boolean move_on_land)
   * befahrene Region. */
 
   while (current_point!=next_point && step < k && next_point) {
+    const char * token;
+    int error;
     terrain_t tthis = rterrain(current_point);
     /* these values need to be updated if next_point changes (due to storms): */
     terrain_t tnext = rterrain(next_point); 
@@ -1627,7 +1565,7 @@ sail(unit * u, region * next_point, boolean move_on_land)
         } else {
           if (check_takeoff(sh, current_point, next_point) == false) {
             /* Schiff kann nicht ablegen */
-            cmistake(u, u->thisorder, 182, MSG_MOVE);
+            cmistake(u, ord, 182, MSG_MOVE);
             break;
           }
         }
@@ -1643,7 +1581,7 @@ sail(unit * u, region * next_point, boolean move_on_land)
           }
           if (d==MAXDIRECTIONS) {
             /* Schiff kann nicht aufs offene Meer */
-            cmistake(u, u->thisorder, 249, MSG_MOVE);
+            cmistake(u, ord, 249, MSG_MOVE);
             break;
           }
         }
@@ -1674,15 +1612,27 @@ sail(unit * u, region * next_point, boolean move_on_land)
 
     /* Falls kein Problem, eines weiter ziehen */
     fset(sh, SF_MOVED);
-    add_regionlist(iroute, next_point);
-    iroute = &(*iroute)->next;
+    if (iroute) {
+      add_regionlist(iroute, next_point);
+      iroute = &(*iroute)->next;
+    }
     step++;
 
     last_point = current_point;
     current_point = next_point;
 
     if (rterrain(current_point) != T_OCEAN && !is_cursed(sh->attribs, C_SHIP_FLYING, 0)) break;
-    next_point = movewhere(current_point, u);
+    token = getstrtoken();
+    error = movewhere(u, token, current_point, &next_point);
+    if (error) {
+      message * msg = movement_error(u, token, ord, error);
+      if (msg!=NULL) {
+        add_message(&u->faction->msgs, msg);
+        msg_release(msg);
+      }
+      next_point=current_point;
+      break;
+    }
   }
 
   if (sh->damage>=sh->size * DAMAGE_SCALE) {
@@ -1723,7 +1673,7 @@ sail(unit * u, region * next_point, boolean move_on_land)
     /* Verfolgungen melden */
     if (fval(u, UFL_FOLLOWING)) caught_target(current_point, u);
 
-    sh = move_ship(sh, starting_point, current_point, route);
+    sh = move_ship(sh, starting_point, current_point, *routep);
 
     /* Hafengebühren ? */
 
@@ -1784,7 +1734,6 @@ sail(unit * u, region * next_point, boolean move_on_land)
       }
     }
   }
-  return route;
 }
 
 unit *
@@ -1809,32 +1758,164 @@ get_captain(const ship * sh)
 *
 * the token parser needs to be initialized before calling this function!
 */
-static int
-move(unit * u, boolean move_on_land)
+
+/** fleeing units use this function 
+*/
+void 
+run_to(unit * u, region * to)
+{
+  region_list * route = NULL;
+  add_regionlist(&route, to);
+  travel_route(u, route, NULL, NULL, TRAVEL_RUNNING);
+  /* weder transport noch follow */
+}
+
+static region_list *
+travel_i(unit * u, region_list * route_begin, region_list * route_end, order * ord, int mode, follower ** followers)
 {
   region * r = u->region;
-  region_list * route = NULL;
-  region * r2 = movewhere(r, u);
-  int followers = 0;
 
-  if (r2==NULL) {
-    cmistake(u, u->thisorder, 71, MSG_MOVE);
-    return 0;
+  switch (canwalk(u)) {
+    case E_CANWALK_TOOHEAVY:
+      cmistake(u, ord, 57, MSG_MOVE);
+      return route_begin;
+    case E_CANWALK_TOOMANYHORSES:
+      cmistake(u, ord, 56, MSG_MOVE);
+      return route_begin;
+    case E_CANWALK_TOOMANYCARTS:
+      cmistake(u, ord, 42, MSG_MOVE);
+      return route_begin;
   }
-  else if (u->ship && fval(u, UFL_OWNER)) {
-    route = sail(u, r2, move_on_land);
+  route_end = cap_route(r, route_begin, route_end, movement_speed(u));
+
+  route_end = travel_route(u, route_begin, route_end, ord, mode);
+  get_followers(u, r, route_end, followers);
+
+  /* transportation */
+  for (ord = u->orders; ord; ord = ord->next) {
+    unit * ut;
+
+    if (get_keyword(ord) != K_TRANSPORT) continue;
+    
+    init_tokens(ord);
+    skip_token();
+    ut = getunit(r, u->faction);
+    if (ut!=NULL) {
+      boolean found = false;
+      if (get_keyword(ut->thisorder) == K_DRIVE) {
+        if (!fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
+          init_tokens(ut->thisorder);
+          skip_token();
+          if (getunit(u->region, ut->faction) == u) {
+            region_list * route_to = travel_route(ut, route_begin, route_end, ord, TRAVEL_TRANSPORTED);
+
+            if (route_to!=route_begin) {
+              get_followers(ut, r, route_to, followers);
+            }
+            ADDMSG(&ut->faction->msgs, msg_message("transport", 
+              "unit target start end", u, ut, r, ut->region));
+            found = true;
+          }
+        }
+        if (!found) {
+          if (cansee(u->faction, u->region, ut, 0)) {
+            cmistake(u, ord, 90, MSG_MOVE);
+          } else {
+            cmistake(u, ord, 63, MSG_MOVE);
+          }
+        }
+      } else {
+        cmistake(u, ord, 99, MSG_MOVE);
+      }
+    } else {
+      cmistake(u, ord, 63, MSG_MOVE);
+    }
+  }
+  return route_end;
+}
+
+/** traveling without ships
+ * walking, flying or riding units use this function
+ */
+static void
+travel(unit * u, region_list ** routep)
+{
+  static boolean init = false;
+  region * r = u->region;
+  region_list * route_end;
+  region_list * route_begin = NULL;
+  follower * followers = NULL;
+
+  if (routep) *routep = NULL;
+
+  /* a few pre-checks that need not be done for each step: */
+  if (rterrain(r)!=T_OCEAN) {
+    /* An Land kein NACH wenn in dieser Runde Schiff VERLASSEN! */
+    if (leftship(u) && is_guarded(r, u, GUARD_LANDING)) {
+      cmistake(u, u->thisorder, 70, MSG_MOVE);
+      return;
+    }
+    if (u->ship && u->race->flags & RCF_SWIM) {
+      cmistake(u, u->thisorder, 143, MSG_MOVE);
+      return;
+    }
+  }
+  else if (u->ship && fval(u->ship, SF_MOVED)) {
+    /* die Einheit ist auf einem Schiff, das sich bereits bewegt hat */
+    cmistake(u, u->thisorder, 13, MSG_MOVE);
+    return;
+  }
+
+  make_route(u, u->thisorder, routep);
+  route_begin = *routep;
+
+  /* und ab die post: */
+  route_end = travel_i(u, route_begin, NULL, u->thisorder, TRAVEL_NORMAL, &followers);
+
+  /* followers */
+  while (followers!=NULL) {
+    follower * fnext = followers->next;
+    unit * uf = followers->uf;
+    unit * ut = followers->ut;
+    region_list * route_end = followers->route_end;
+    
+    free(followers);
+    followers = fnext;
+
+    if (uf->region==r) {
+      order * follow_order;
+      char str[32];
+
+      /* construct an order */
+      sprintf(str, "%s %s %s", 
+        locale_string(uf->faction->locale, keywords[K_FOLLOW]), 
+        locale_string(uf->faction->locale, parameters[P_UNIT]), 
+        itoa36(ut->no));
+      follow_order = parse_order(str, uf->faction->locale);
+
+      route_end = travel_i(uf, route_begin, route_end, follow_order, TRAVEL_FOLLOWING, &followers);
+      caught_target(uf->region, uf);
+      free_order(follow_order);
+    }
+  }
+
+}
+
+static void
+move(unit * u, boolean move_on_land)
+{
+  region_list * route = NULL;
+
+  if (u->ship && fval(u, UFL_OWNER)) {
+    sail(u, u->thisorder, move_on_land, &route);
   } else {
-    followers += travel(u, r2, 0, &route);
+    travel(u, &route);
   }
 
   fset(u, UFL_LONGACTION);
   set_order(&u->thisorder, NULL);
 
-  if (fval(u, UFL_FOLLOWED) && route!=NULL) {
-    return followers + notify_followers(r, u, route);
-  }
   if (route!=NULL) free_regionlist(route);
-  return followers;
 }
 
 typedef struct piracy_data {
@@ -1873,7 +1954,7 @@ mk_piracy(const faction * f, direction_t target_dir)
   return a;
 }
 
-static int
+static void
 piracy_cmd(unit *u, struct order * ord)
 {
 	region *r = u->region;
@@ -1888,12 +1969,12 @@ piracy_cmd(unit *u, struct order * ord)
 
 	if (!sh) {
 		cmistake(u, ord, 144, MSG_MOVE);
-		return 0;
+		return;
 	}
 
 	if (!fval(u, UFL_OWNER)) {
 		cmistake(u, ord, 46, MSG_MOVE);
-		return 0;
+		return;
 	}
 
 	/* Feststellen, ob schon ein anderer alliierter Pirat ein
@@ -1962,7 +2043,7 @@ piracy_cmd(unit *u, struct order * ord)
 	if (target_dir == NODIRECTION) {
 		add_message(&u->faction->msgs,
 			new_message(u->faction, "piratenovictim%h:ship%r:region", sh, r));
-		return 0;
+		return;
 	}
 
 	/* Meldung generieren */
@@ -1978,7 +2059,7 @@ piracy_cmd(unit *u, struct order * ord)
 	/* Bewegung ausführen */
   init_tokens(u->thisorder);
   skip_token();
-	return move(u, true);
+	move(u, true);
 }
 
 static void
@@ -2079,10 +2160,7 @@ hunt(unit *u)
   /* NACH ignorieren und Parsing initialisieren. */
   igetstrtoken(command);
   /* NACH ausführen */
-  if (move(u, false)!=0) {
-    /* niemand sollte auf einen kapitän direkt ein folge haben, oder? */
-    assert(1==0);
-  }
+  move(u, false);
   fset(u, UFL_LONGACTION); /* Von Hand setzen, um Endlosschleife zu vermeiden, wenn Verfolgung nicht erfolgreich */
   return 1;   															/* true -> Einheitenliste von vorne durchgehen */
 }
@@ -2265,7 +2343,7 @@ movement(void)
   int ships;
 
   /* Initialize the additional encumbrance by transported units */
-  init_drive();
+  init_transportation();
 
   /* Move ships in last phase, others first 
   * This is to make sure you can't land someplace and then get off the ship
@@ -2275,7 +2353,6 @@ movement(void)
     region * r = regions;
     while (r!=NULL) {
       unit ** up = &r->units;
-      boolean repeat = false;
 
       while (*up) {
         unit *u = *up;
@@ -2295,13 +2372,13 @@ movement(void)
               if (u->ship && fval(u, UFL_OWNER)) {
                 init_tokens(u->thisorder);
                 skip_token();
-                if (move(u, false)!=0) repeat = true;
+                move(u, false);
               }
             } else {
               if (u->ship==NULL || !fval(u, UFL_OWNER)) {
                 init_tokens(u->thisorder);
                 skip_token();
-                if (move(u, false)!=0) repeat = true;
+                move(u, false);
               }
             }
           }
@@ -2311,19 +2388,17 @@ movement(void)
           /* not moved, use next unit */
           up = &u->next;
         } else if (*up && (*up)->region!=r) {
-          /* moved the previous unit along with u (units on ships, for example)
-          * must start from the beginning again */
+          /* moved the upcoming unit along with u (units on ships or followers,
+           * for example). must start from the beginning again */
           up = &r->units;
         }
         /* else *up is already the next unit */
       }
-      if (!repeat) {
-        if (ships==0) {
-          /* Abtreiben von beschädigten, unterbemannten, überladenen Schiffen */
-          drifting_ships(r);
-        }
-        r = r->next;
+      if (ships==0) {
+        /* Abtreiben von beschädigten, unterbemannten, überladenen Schiffen */
+        drifting_ships(r);
       }
+      r = r->next;
     }
   }
 

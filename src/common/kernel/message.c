@@ -399,6 +399,7 @@ void
 cmistake(const unit * u, struct order *ord, int mno, int mtype)
 {
 	static char ebuf[20];
+  unused(mtype);
 
 	if (u->faction->no == MONSTER_FACTION) return;
 	sprintf(ebuf, "error%d", mno);

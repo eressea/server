@@ -1366,9 +1366,7 @@ sp_denyattack(fighter * fi, int level, double power, spell * sp)
   case K_ROUTE:
     init_tokens(mage->thisorder);
     skip_token();
-    fi->run.region = movewhere(r, mage);
-    if (!fi->run.region) {
-      cmistake(mage, mage->thisorder, 71, MSG_MOVE);
+    if (movewhere(mage, getstrtoken(), mage->region, &fi->run.region)!=E_MOVE_OK) {
       fi->run.region = fleeregion(mage);
     }
     break;

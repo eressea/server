@@ -78,7 +78,7 @@ extern "C" {
     /* is the border in a valid state,
     * or should it be erased at the end of this turn to save space?
     */
-    void (*move)(const border *, struct unit * u, const struct region * from, const struct region * to);
+    struct region * (*move)(const border *, struct unit * u, struct region * from, struct region * to);
     /* executed when the units traverses this border */
     struct border_type * next; /* for internal use only */
   } border_type;

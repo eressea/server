@@ -106,6 +106,19 @@ region_setflag(region& r, int bit, bool set)
   else r.flags &= ~(1<<bit);
 }
 
+static void
+region_setroad(region& r, int dir, lua_Number size)
+{
+  rsetroad(&r, (direction_t)dir, (int)(terrain[rterrain(&r)].roadreq * size));
+}
+
+static lua_Number
+region_getroad(region& r, int dir)
+{
+  lua_Number result = rroad(&r, (direction_t)dir);
+  return terrain[rterrain(&r)].roadreq / result;
+}
+
 static region *
 terraform_region(int x, int y, const char * tname)
 {
@@ -159,8 +172,13 @@ bind_region(lua_State * L)
     .property("info", &region_getinfo, &region_setinfo)
     .property("terrain", &region_getterrain)
     .def("add_notice", &region_addnotice)
+
     .def("get_flag", &region_getflag)
     .def("set_flag", &region_setflag)
+
+    .def("get_road", &region_getroad)
+    .def("set_road", &region_setroad)
+
     .def("next", &region_next)
     .def_readonly("x", &region::x)
     .def_readonly("y", &region::y)

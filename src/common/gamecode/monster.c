@@ -915,29 +915,38 @@ void
 plan_monsters(void)
 {
   region *r;
-  unit *u;
-  attrib *ta;
-
   faction *f = findfaction(MONSTER_FACTION);
-  if (!f)
-    return;
 
+  if (!f) return;
   f->lastorders = turn;
 
   for (r = regions; r; r = r->next) {
+    unit *u;
     for (u = r->units; u; u = u->next) {
-      region * tr = NULL;
       boolean is_moving = false;
+      attrib * ta;
 
       /* Ab hier nur noch Befehle für NPC-Einheiten. */
-
       if (u->faction->no != MONSTER_FACTION) continue;
 
       /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
       produceexp(u, SK_OBSERVATION, u->number);
 
+      /* Haben Drachen ihr Ziel erreicht? */
+      ta = a_find(u->attribs, &at_targetregion);
+      if (ta) {
+        if (u->region == (region*)ta->data.v) {
+          a_remove(&u->attribs, ta);
+          set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
+          free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
+        }
+        else {
+          is_moving = true;
+        }
+      }
+
       ta = a_find(u->attribs, &at_hate);
-      if (ta && is_waiting(u)) {
+      if (ta && !is_waiting(u)) {
         unit * tu = (unit *)ta->data.v;
         if (tu && tu->region==r) {
           sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_ATTACK]), itoa36(tu->no));
@@ -947,11 +956,6 @@ plan_monsters(void)
           if (tu) set_movement_order(u, tu->region, 2, allowed_walk);
         }
         else a_remove(&u->attribs, ta);
-      }
-      ta = a_find(u->attribs, &at_targetregion);
-      if (ta!=NULL) {
-        tr = (region *) ta->data.v;
-        if (tr != r) is_moving = true;
       }
 
       if (!(fval(u, UFL_ISNEW)) && r->terrain != T_OCEAN) { /* Monster bewachen immer */
