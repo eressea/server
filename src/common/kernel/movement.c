@@ -429,7 +429,7 @@ move_ship(ship * sh, region * from, region * to, region ** route)
 						/* TODO: Speichermechanismus portabel machen. */
 						a = a_find((*ri)->attribs, &at_traveldir_new);
 						while (a) {
-							if(a->data.sa[0] == sh->no) break;
+							if(((traveldir *)(a->data.v))->no == sh->no) break;
 							a = a->nexttype;
 						}
 						if(!a) {
