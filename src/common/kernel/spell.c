@@ -402,13 +402,13 @@ destroy_curse(attrib **alist, int cast_level, int force,
 		 * richtigen Typ ist. */
 		if(!c || c==c1) {
 			int n;
-			n = destr_curse(c, cast_level, force);
+			n = destr_curse(c1, cast_level, force);
 			if (n != force){
 				assert(n<force); /* force darf sich nur vermindert haben */
 				succ = cast_level;
 				force = n;
 			}
-			if(c->vigour <= 0) {
+			if(c1->vigour <= 0) {
 				a_remove(ap, a);
 			}
 		}
@@ -1530,13 +1530,15 @@ sp_create_irongolem(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int force = co->force;
+	/* hier fehlt noch ein wenig zufall */
+	int number = 1+(int)(force*RESOURCE_QUANTITY)*8;
 
 	if (rterrain(r) == T_SWAMP){
 		cmistake(mage, strdup(co->order), 188, MSG_MAGIC);
 		return 0;
 	}
 
-	u2 = create_unit(r, mage->faction, max(1,(int)(force*8*RESOURCE_QUANTITY)), new_race[RC_IRONGOLEM], 0,
+	u2 = create_unit(r, mage->faction, number, new_race[RC_IRONGOLEM], 0,
 		LOC(mage->faction->locale, rc_name(new_race[RC_IRONGOLEM], 1)), mage);
 
 	set_level(u2, SK_ARMORER, 1);
@@ -1549,7 +1551,7 @@ sp_create_irongolem(castorder *co)
 
 	add_message(&mage->faction->msgs,
 		msg_message("magiccreate_effect", "region command unit amount object",
-		mage->region, strdup(co->order), mage, force*8,
+		mage->region, strdup(co->order), mage, number,
 		LOC(mage->faction->locale, rc_name(new_race[RC_IRONGOLEM], 1))));
 
 	return cast_level;
@@ -1591,13 +1593,14 @@ sp_create_stonegolem(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int force = co->force;
+	int number = 1+(int)(force*5*RESOURCE_QUANTITY);
 
 	if (rterrain(r) == T_SWAMP){
 		cmistake(mage, strdup(co->order), 188, MSG_MAGIC);
 		return 0;
 	}
 
-	u2 = create_unit(r, mage->faction, max(1,(int)(force*5*RESOURCE_QUANTITY)), new_race[RC_STONEGOLEM], 0,
+	u2 = create_unit(r, mage->faction, number, new_race[RC_STONEGOLEM], 0,
 		LOC(mage->faction->locale, rc_name(new_race[RC_STONEGOLEM], 1)), mage);
 	set_level(u2, SK_ROAD_BUILDING, 1);
 	set_level(u2, SK_BUILDING, 1);
@@ -1609,7 +1612,7 @@ sp_create_stonegolem(castorder *co)
 
 	add_message(&mage->faction->msgs,
 		msg_message("magiccreate_effect", "region command unit amount object",
-		mage->region, strdup(co->order), mage, force*5,
+		mage->region, strdup(co->order), mage, number,
 		LOC(mage->faction->locale, rc_name(new_race[RC_STONEGOLEM], 1))));
 
 	return cast_level;
