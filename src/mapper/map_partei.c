@@ -533,7 +533,7 @@ ParteiListe(void)
 	}
 #endif
 
-	for (f = factions->next; f; f = f->next) {
+	for (f = factions; f; f = f->next) {
 	  if (SX > 104)
 		sprintf(buf, "%4s: %-30.30s %-12.12s %-24.24s", factionid(f),
 				f->name, f->race->_name[1], f->email);
