@@ -191,9 +191,10 @@ void rsethorses(const struct region * r, int value);
 #define riron(r) ((r)->land?(r)->land->iron:0)
 #define rsetiron(r, value) ((r)->land?((r)->land->iron=(value)):(value),0)
 
-int rlaen(const struct region * r);
-void rsetlaen(struct region * r, int value);
 #endif /* NEW_RESOURCEGROWTH */
+
+extern int rlaen(const struct region * r);
+extern void rsetlaen(struct region * r, int value);
 
 #define rherbtype(r) ((r)->land?(r)->land->herbtype:0)
 #define rsetherbtype(r, value) ((r)->land?((r)->land->herbtype=(value)):(value),0)

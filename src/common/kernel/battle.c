@@ -2001,18 +2001,15 @@ attack(battle *b, troop ta, const att *a, int numattack)
 				ta.fighter->person[ta.index].reload--;
 			} else {
 				boolean standard_attack = true;
-
+        boolean reload = false;
         /* spezialattacken der waffe nur, wenn erste attacke in der runde.
          * sonst helden mit feuerschwertern zu mächtig */
 				if (numattack==0 && wp && wp->type->attack) {
 					int dead = 0;
 					standard_attack = wp->type->attack(&ta, &dead, row);
+          if (!standard_attack) reload = true;
 					af->catmsg += dead;
-					/* TODO: dies hier ist nicht richtig. wenn die katapulte/etc.
-					 * keinen gegner gefunden haben, sollte es nicht erhöht werden.
-					 * außerdem müsste allen gegenern der counter erhöht werden.
-					 */
-					if (af->person[ta.index].last_action < b->turn) {
+					if (!standard_attack && af->person[ta.index].last_action < b->turn) {
 						af->person[ta.index].last_action = b->turn;
 						af->action_counter++;
 					}
@@ -2038,7 +2035,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
 						ta.fighter->person[ta.index].last_action = b->turn;
 						ta.fighter->action_counter++;
 					}
-
+          reload = true;
 					if (hits(ta, td, wp)) {
 						const char * d;
 						if (wp == NULL) d = au->race->def_damage;
@@ -2047,7 +2044,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
 						terminate(td, ta, a->type, d, missile);
 					}
 				}
-				if (wp && wp->type->reload && !getreload(ta)) {
+				if (reload && wp && wp->type->reload && !getreload(ta)) {
 					int i = setreload(ta);
 					sprintf(buf, " Nachladen gesetzt: %d", i);
 					battledebug(buf);

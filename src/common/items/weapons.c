@@ -207,8 +207,10 @@ attack_catapult(const troop * at, int * casualties, int row)
 	weapon * wp = af->person[at->index].missile;
 	
 	assert(row>=FIGHT_ROW);
-	if (row>BEHIND_ROW) return false; /* keine weiteren attacken */
-	
+	if (row>BEHIND_ROW) {
+    /* probiere noch weitere attacken, kann nicht schiessen */
+    return true;
+	}
 	assert(wp->type->itype==olditemtype[I_CATAPULT]);
 	assert(af->person[at->index].reload==0);
 
