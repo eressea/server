@@ -97,7 +97,7 @@ space_replace(char * str, char replace)
 const char *
 escape_string(const char * str, char * buffer, unsigned int len)
 {
-	char s_buffer[4096];
+	static char s_buffer[4096];
 	const char * p = str;
 	char * o;
 	if (buffer==NULL) {

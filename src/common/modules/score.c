@@ -217,7 +217,7 @@ score(void)
 
 			f = u->faction;
 
-			if(u->race <= new_race[RC_AQUARIAN]) {
+			if (old_race(u->race) <= RC_AQUARIAN) {
 				f->score += (u->race->recruitcost * u->number) / 50;
 			}
 			f->score += get_money(u) / 50;

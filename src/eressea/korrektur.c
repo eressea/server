@@ -812,7 +812,6 @@ give_arena_gates(void)
 		addmessage(NULL, senior->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
 	}
 }
-#endif
 
 static void
 remove_impossible_dragontargets(void)
@@ -844,7 +843,6 @@ remove_impossible_dragontargets(void)
 	}
 }
 
-#if 0
 static void
 fix_score_option(void)
 {
@@ -914,7 +912,6 @@ fix_hungrydead(void)
 		}
 	}
 }
-#endif
 
 static void
 name_seaserpents(void)
@@ -930,6 +927,7 @@ name_seaserpents(void)
 		}
 	}
 }
+#endif
 
 static int
 old_rroad(region * r)
@@ -1048,6 +1046,7 @@ show_newspells(void)
 
 }
 
+#if 0
 static void
 fix_feuerwand_orks(void)
 {
@@ -1151,6 +1150,7 @@ fix_buildings(void)
 	vset_destroy(&done);
 	fclose(statfile);
 }
+#endif
 
 extern plane * arena;
 
@@ -1616,6 +1616,7 @@ stats(void)
 
 }
 
+#if 0
 static void
 fix_prices(void)
 {
@@ -1690,7 +1691,6 @@ init_region_age(void)
 	}
 }
 
-#if 0
 static void
 fix_herbtypes(void)
 {
@@ -1787,6 +1787,7 @@ write_skillfix(void)
 }
 #endif
 
+#if 0
 static void
 init_mwarden(void)
 {
@@ -1798,6 +1799,7 @@ init_mwarden(void)
 	a = a_add(&u->attribs, a_new(&at_warden));
 	a->data.i = 0;
 }
+#endif
 
 #ifdef CONVERT_TRIGGER
 #include "old/relation.h"
@@ -2557,8 +2559,6 @@ convert_resources(void)
 	}
 	return 0;
 }
-#endif
-
 
 static void
 fix_negpotion(void)
@@ -2576,6 +2576,7 @@ fix_negpotion(void)
 		}
 	}
 }
+#endif
 
 #if GROWING_TREES
 int
