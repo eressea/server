@@ -5830,7 +5830,7 @@
   </message>
   <message name="spellfail::contact" section="magic">
     <type>
-      <arg name="unit" type="unit"/>
+      <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
       <arg name="target" type="unit"/>
