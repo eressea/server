@@ -291,7 +291,6 @@ cr_skill(const void * v, char * buffer, const void * userdata)
 	return 0;
 }
 
-
 void 
 creport_init(void)
 {
@@ -307,6 +306,7 @@ creport_init(void)
 	tsf_register("resource", &cr_resource);
 	tsf_register("race", &cr_race);
 	tsf_register("direction", &cr_int);
+	tsf_register("int36", &cr_int);
 }
 
 void
