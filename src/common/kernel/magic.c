@@ -1069,12 +1069,14 @@ cancast(unit * u, spell * sp, int level, int range, char * cmd)
 				if (b == false) {
 					scat(", ");
 					icat(itemanz);
-					scat(resname(res, (itemanz == 1 ? 0 : 1)));
+					scat(locale_string(u->faction->locale,
+							resname(res, (itemanz == 1 ? 0 : 1))));
 				} else {
 					sprintf(buf, "%s in %s: 'ZAUBER %s' Für diesen Zauber fehlen "
 							"noch %d ", unitname(u), regionid(u->region), sp->name,
 							itemanz);
-					scat(resname(res, (itemanz == 1 ? 0 : 1)));
+					scat(locale_string(u->faction->locale,
+								resname(res, (itemanz == 1 ? 0 : 1))));
 					b = false;
 				}
 			}

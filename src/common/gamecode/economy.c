@@ -1347,7 +1347,9 @@ manufacture(unit * u, const item_type * itype, int want)
 			  if (c!=0)
 				 strcat(ch++, ",");
 			  n=cons->materials[c].number / cons->reqsize;
-			  sprintf(ch, " %d %s", n?n:1, resname(cons->materials[c].type, cons->materials[c].number==1));
+			  sprintf(ch, " %d %s", n?n:1, 
+						locale_string(u->faction->locale,
+							resname(cons->materials[c].type, cons->materials[c].number!=1)));
 			  ch = ch+strlen(ch);
 			}
 			strcat(ch,".");
@@ -1635,7 +1637,9 @@ create_potion(unit * u, const potion_type * ptype, int want)
 			  if (c!=0)
 				 strcat(ch++, ",");
 			  n=cons->materials[c].number / cons->reqsize;
-			  sprintf(ch, " %d %s", n?n:1, resname(cons->materials[c].type, cons->materials[c].number==1));
+			  sprintf(ch, " %d %s", n?n:1, 
+						locale_string(u->faction->locale,
+							resname(cons->materials[c].type, cons->materials[c].number!=1)));
 			  ch = ch+strlen(ch);
 			}
 			strcat(ch,".");
