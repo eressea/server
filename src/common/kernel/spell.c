@@ -8041,7 +8041,7 @@ static spell spelldaten[] =
     "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' EINHEIT <Einheit-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' GEBÄUDE <Gebäude-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' SCHIFF <Schiff-Nr>",
-    "kc",
+    "kc?",
     M_DRUIDE,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
     2, 8,
@@ -8522,7 +8522,7 @@ static spell spelldaten[] =
     "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' EINHEIT <Einheit-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' GEBÄUDE <Gebäude-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' SCHIFF <Schiff-Nr>",
-    "kc",
+    "kc?",
     M_CHAOS,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
     2, 10,
@@ -8877,7 +8877,7 @@ static spell spelldaten[] =
     "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' EINHEIT <Einheit-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' GEBÄUDE <Gebäude-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' SCHIFF <Schiff-Nr>",
-    "kc",
+    "kc?",
     M_TRAUM,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
     2, 8,
@@ -9354,7 +9354,7 @@ static spell spelldaten[] =
     "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' REGION\n"
     "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' GEBÄUDE <Gebäude-nr>\n"
     "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' SCHIFF <Schiff-nr>",
-    "kc",
+    "kc?",
     M_BARDE, (SPELLLEVEL|ONSHIPCAST), 5, 8,
     {
       { R_AURA, 3, SPC_LEVEL },
@@ -9374,7 +9374,7 @@ static spell spelldaten[] =
     "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' EINHEIT <Einheit-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' GEBÄUDE <Gebäude-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' SCHIFF <Schiff-Nr>",
-    "kc",
+    "kc?",
     M_BARDE,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
     2, 8,
@@ -9612,7 +9612,7 @@ static spell spelldaten[] =
     "ZAUBERE [STUFE n] \'Magie analysieren\' EINHEIT <Einheit-Nr>\n"
     "ZAUBERE [STUFE n] \'Magie analysieren\' GEBÄUDE <Gebäude-Nr>\n"
     "ZAUBERE [STUFE n] \'Magie analysieren\' SCHIFF <Schiff-Nr>",
-    "kc",
+    "kc?",
     M_ASTRAL, (SPELLLEVEL | UNITSPELL | ONSHIPCAST | TESTCANSEE), 5, 1,
     {
       { R_AURA, 1, SPC_LEVEL },
@@ -9830,7 +9830,7 @@ static spell spelldaten[] =
     "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' EINHEIT <Einheit-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' GEBÄUDE <Gebäude-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' SCHIFF <Schiff-Nr>",
-    "kc",
+    "kc?",
     M_ASTRAL,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
     2, 5,

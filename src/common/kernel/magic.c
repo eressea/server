@@ -1862,7 +1862,13 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
   int minlen = 0;
 
   for (c=syntax;*c!=0;++c) {
-    if (*c!='+' && *c!='k') ++minlen;
+		/* this makes sure that:
+		 *  minlen("kc?") = 0
+		 *  minlen("kc+") = 1
+		 *  minlen("cccc+c?") = 4
+		 */
+    if (*c=='?') --minlen;
+    else if (*c!='+' && *c!='k') ++minlen;
   }
   c = syntax;
 
@@ -1883,78 +1889,84 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
     param_t pword;
     int j = -1;
     switch (*c) {
-      case '+':
-        /* das vorhergehende Element kommt ein oder mehrmals vor, wir
-        * springen zum key zurück */
-        j = 0;
-        --c;
-        break;
-      case 'u':
-        /* Parameter ist eine Einheit, evtl. TEMP */
-        j = addparam_unit(param+i, &spobj, u, ord);
-        ++c;
-        break;
-      case 'r':
-        /* Parameter sind zwei Regionskoordinaten */
-        j = addparam_region(param+i, &spobj, u, ord);
-        ++c;
-        break;
-      case 'b':
-				/* Parameter ist eine Burgnummer */
-        j = addparam_building(param+i, &spobj);
-        ++c;
-        break;
-      case 's':
-        j = addparam_ship(param+i, &spobj);
-        ++c;
-        break;
-      case 'c': 
-        /* Text, wird im Spruch ausgewertet */
-        j = addparam_string(param+i, &spobj);
-        ++c;
-        break;
-      case 'i': /* Zahl */
-        j = addparam_int(param+i, &spobj);
-        ++c;
-        break;
-      case 'k':
-        ++c;
-        pword = findparam(param[i++], u->faction->locale);
-        switch (pword) {
-          case P_REGION:
-            spobj = malloc(sizeof(spllprm));
-            spobj->flag = 0;
-            spobj->typ = SPP_REGION;
-            spobj->data.r = u->region;
-            j = 0;
-            ++c;
-            break;
-          case P_UNIT:
-            if (i<size) {
-              j = addparam_unit(param+i, &spobj, u, ord);
-              ++c;
-            }
-            break;
-          case P_BUILDING:
-          case P_GEBAEUDE:
-            if (i<size) {
-              j = addparam_building(param+i, &spobj);
-              ++c;
-            }
-            break;
-          case P_SHIP:
-            if (i<size) {
-              j = addparam_ship(param+i, &spobj);
-              ++c;
-            }
-            break;
-          default:
-            j = -1;
-            break;
-        }
-        break;
-      default:
-        j = -1;
+		case '?':
+			/* tja. das sollte moeglichst nur am Ende passieren, 
+			 * weil sonst die kacke dampft. */
+			++c;
+			assert(*c==0);
+			break;
+		case '+':
+			/* das vorhergehende Element kommt ein oder mehrmals vor, wir
+			 * springen zum key zurück */
+			j = 0;
+			--c;
+			break;
+		case 'u':
+			/* Parameter ist eine Einheit, evtl. TEMP */
+			j = addparam_unit(param+i, &spobj, u, ord);
+			++c;
+			break;
+		case 'r':
+			/* Parameter sind zwei Regionskoordinaten */
+			j = addparam_region(param+i, &spobj, u, ord);
+			++c;
+			break;
+		case 'b':
+			/* Parameter ist eine Burgnummer */
+			j = addparam_building(param+i, &spobj);
+			++c;
+			break;
+		case 's':
+			j = addparam_ship(param+i, &spobj);
+			++c;
+			break;
+		case 'c': 
+			/* Text, wird im Spruch ausgewertet */
+			j = addparam_string(param+i, &spobj);
+			++c;
+			break;
+		case 'i': /* Zahl */
+			j = addparam_int(param+i, &spobj);
+			++c;
+			break;
+		case 'k':
+			++c;
+			pword = findparam(param[i++], u->faction->locale);
+			switch (pword) {
+			case P_REGION:
+				spobj = malloc(sizeof(spllprm));
+				spobj->flag = 0;
+				spobj->typ = SPP_REGION;
+				spobj->data.r = u->region;
+				j = 0;
+				++c;
+				break;
+			case P_UNIT:
+				if (i<size) {
+					j = addparam_unit(param+i, &spobj, u, ord);
+					++c;
+				}
+				break;
+			case P_BUILDING:
+			case P_GEBAEUDE:
+				if (i<size) {
+					j = addparam_building(param+i, &spobj);
+					++c;
+				}
+				break;
+			case P_SHIP:
+				if (i<size) {
+					j = addparam_ship(param+i, &spobj);
+					++c;
+				}
+				break;
+			default:
+				j = -1;
+				break;
+			}
+			break;
+		default:
+			j = -1;
         break;
     }
     if (j<0) fail = true;
