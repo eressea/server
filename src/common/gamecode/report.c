@@ -2785,8 +2785,8 @@ reports(void)
 			if (f->no > 0 && f->options & wants_compressed) {
 
 				if(f->age == 1) {
-					fprintf(BAT, "ls %d-%s.nr %d-%s.cr | zip -m -j -9 -@ %s.zip\n",
-						turn, factionid(f), turn, factionid(f), factionid(f));
+					fprintf(BAT, "ls %d-%s.nr %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
+						turn, factionid(f), turn, factionid(f), turn, factionid(f));
 					fprintf(BAT, "zip -j -9 %d-%s.zip ../res/%s/%s/welcome.txt\n", turn, factionid(f), global.welcomepath, locale_name(f->locale));
 				} else {
 					fprintf(BAT, "ls %d-%s.nr %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
