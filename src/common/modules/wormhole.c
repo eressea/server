@@ -72,6 +72,18 @@ static int
 wormhole_age(struct attrib * a)
 {
   wormhole_data * data = (wormhole_data*)a->data.v;
+  region * r = data->entry->region;
+  unit * u = r->units;
+  int maxtransport = 4;
+
+  for (;u!=NULL && maxtransport!=0;u=u->next) {
+    if (u->number>maxtransport) continue;
+    if (teure_talente(u)) continue;
+    if (u->building!=data->entry) continue;
+    move_unit(u, data->exit->region, NULL);
+    maxtransport -= u->number;
+  }
+
   destroy_building(data->entry);
   /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
   return -1;
