@@ -3495,7 +3495,7 @@ writeturn(void)
 	sprintf(zText, "%s/datum", basepath());
 	f = cfopen(zText, "w");
 	if (!f) return;
-	fputs(gamedate2(&default_locale), f);
+	fputs(gamedate2(default_locale), f);
 	fclose(f);
 	sprintf(zText, "%s/turn", basepath());
 	f = cfopen(zText, "w");
@@ -3532,7 +3532,7 @@ report_summary(summary * s, summary * o, boolean full)
 		if (!F) return;
 	}
 	printf("Schreibe Zusammenfassung (parteien)...\n");
-	fprintf(F,   "%s\n%s\n\n", global.gamename, gamedate2(&default_locale));
+	fprintf(F,   "%s\n%s\n\n", global.gamename, gamedate2(default_locale));
 	fprintf(F,   "Auswertung Nr:         %d\n\n", turn);
 	fprintf(F,   "Parteien:              %s\n", pcomp(s->factions, o->factions));
 	fprintf(F,   "Einheiten:             %s\n", pcomp(s->nunits, o->nunits));

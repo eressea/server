@@ -5,7 +5,10 @@
 		</type>
 		<text locale="de">"Deine Partei ist noch $int($turns) Wochen immun gegen Angriffe."</text>
 	</message>
-
+	<message name="turnreminder" section="errors">
+		<text locale="de">Bitte sende die Befehle nächste Runde ein, wenn du weiterspielen möchtest.</text>
+		<text locale="en">Please send in orders for the next turn if you want to continue playing.</text>
+	</message>
 	<message name="giverestriction" section="errors">
 		<type>
 			<arg name="unit" type="unit"></arg>

@@ -273,9 +273,7 @@ checkorders(void)
 	puts(" - Warne späte Spieler...");
 	for (f = factions; f; f = f->next)
 		if (f->no!=MONSTER_FACTION && turn - f->lastorders == NMRTIMEOUT - 1)
-			addstrlist(&f->mistakes,
-				"Bitte sende die Befehle nächste Runde ein, "
-				   "wenn du weiterspielen möchtest.");
+			ADDMSG(&f->msgs, msg_message("turnreminder", ""));
 }
 /* ------------------------------------------------------------- */
 
