@@ -181,8 +181,11 @@ init_gmcmd(void)
 		if (f) {
 			attrib * a = a_find(f->attribs, &at_permissions);
 			if (!a) {
+				item_type * itype;
 				a = a_add(&f->attribs, a_new(&at_permissions));
-				a_add((attrib**)&a->data.v, make_atgmcreate(&it_demonseye));
+				for (itype=itemtypes;itype;itype=itype->next) {
+					a_add((attrib**)&a->data.v, make_atgmcreate(itype));
+				}
 				a_add((attrib**)&a->data.v, make_key(atoi36("gmtf")));
 			}
 		}
