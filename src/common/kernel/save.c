@@ -368,8 +368,9 @@ getbuf(FILE * F)
     else {
       /* wenn die zeile länger als erlaubt war, ist sie ungültig,
        * und wird mit dem rest weggeworfen: */
-      while (bp!=NULL) {
+      for (;;) {
         bp = (unsigned char *)fgets(lbuf, MAXLINE, F);
+        if (bp==NULL) break;
         end = bp + strlen((const char *)bp);
         if (*(end-1)=='\n') break;
         lbuf[MAXLINE-1] = 0;
