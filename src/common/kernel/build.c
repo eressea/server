@@ -197,14 +197,14 @@ siege(region * r, unit * u)
 	}
 	/* schaden durch katapulte */
 
-	d = min(u->number, get_item(u, I_CATAPULT));
+	d = min(u->number,
+		min(new_get_pooled(u, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK), get_item(u, I_CATAPULT)));
 	if (eff_skill(u, SK_CATAPULT, r) >= 1) {
 		katapultiere = d;
 		d *= eff_skill(u, SK_CATAPULT, r);
 	} else {
 		d = 0;
 	}
-
 
 	if ((bewaffnete = armedmen(u)) == 0 && d == 0) {
 		/* abbruch, falls unbewaffnet oder unfaehig, katapulte zu benutzen */
@@ -232,6 +232,7 @@ siege(region * r, unit * u)
 	/* meldung, schaden anrichten */
 	if (d && !(is_cursed(b->attribs, C_MAGICSTONE, 0))) {
 		b->size -= d;
+		new_use_pooled(au, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, d);
 		d = 100 * d / b->size;
 	} else d = 0;
 

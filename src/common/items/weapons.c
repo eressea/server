@@ -215,7 +215,7 @@ attack_catapult(const troop * at, int * casualties, int row)
 	assert(af->person[at->index].reload==0);
 
 #if CATAPULT_AMMUNITION
-	if(new_get_pooled(au, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE) <= 0) {
+	if(new_get_pooled(au, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK) <= 0) {
 		/* No ammo. Use other weapon if available. */
 		return true;
 	}
@@ -236,7 +236,7 @@ attack_catapult(const troop * at, int * casualties, int row)
 	n = min(CATAPULT_ATTACKS, count_enemies(b, af->side, FS_ENEMY, minrow, maxrow));
 
 #if CATAPULT_AMMUNITION
-	new_use_pooled(au, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE, 1);
+	new_use_pooled(au, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1);
 #endif
 
 	while (--n >= 0) {
