@@ -2054,6 +2054,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 			count_migrants(f), maxmig);
 		centre(F, buf, true);
 	}
+#if HEROES == 1
   {
     int maxh = maxheroes(f);
     if (maxh) {
@@ -2062,6 +2063,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
       centre(F, buf, true);
     }
   }
+#endif
 
 	if (f->age > 1 && f->lastorders != turn) {
 		rnl(F);
