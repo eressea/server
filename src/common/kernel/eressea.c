@@ -2453,8 +2453,8 @@ remove_empty_units_in_region(region *r)
 	while (*up) {
 		unit * u = *up;
 
-		if ((old_race(u->race) != RC_SPELL && u->number <= 0)
-		 	|| (old_race(u->race) == RC_SPELL && u->age <= 0)
+		if ((u->number <= 0 && u->race != new_race[RC_SPELL])
+		 	|| (u->age <= 0 && u->race == new_race[RC_SPELL])
 		 	|| u->number < 0) {
 			destroy_unit(u);
 		}

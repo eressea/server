@@ -663,7 +663,7 @@ drown(region *r)
 			unit *u = *up;
 			int amphibian_level = fspecial(u->faction, FS_AMPHIBIAN);
 
-			if (u->ship) {
+			if (u->ship || u->race == new_race[RC_SPELL]) {
 				up=&u->next;
 				continue;
 			}

@@ -3334,6 +3334,7 @@ processorders (void)
 
 	puts(" - Zerstören, Geben, Rekrutieren, Vergessen");
 	economics();
+	remove_empty_units();
 
 	puts(" - Gebäudeunterhalt (1. Versuch)");
 	maintain_buildings(false);

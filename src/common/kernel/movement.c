@@ -2031,14 +2031,6 @@ movement(void)
 			unit *u = *up;
 			keyword_t kword;
 
-			/* Sollte hier nicht mehr auftreten */
-			/*
-			if(u->no == 0) {
-				up = &u->next;
-				continue;
-			}
-			*/
-
 			if (fval(u, FL_FOLLOWING)) {
 				/* skip all followers */
 				do {
