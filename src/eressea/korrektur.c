@@ -80,9 +80,9 @@
 #include <attributes/targetregion.h>
 #include <attributes/key.h>
 
-#undef  XMAS1999
-#undef  XMAS2000
-#undef  XMAS2001
+#undef XMAS1999
+#undef XMAS2000
+#undef XMAS2001
 #undef XMAS2002
 
 extern void reorder_owners(struct region * r);
@@ -1161,9 +1161,48 @@ check_phoenix(void)
 }
 #endif
 
+static void
+fix_dissolve(unit * u, int value, char mode)
+{
+  attrib * a = a_find(u->attribs, &at_unitdissolve);
+  if (a!=NULL) return;
+  a = a_add(&u->attribs, a_new(&at_unitdissolve));
+  a->data.ca[0] = mode;
+  a->data.ca[1] = (char)value;
+  log_warning(("unit %s has race %s and no dissolve-attrib\n", unitname(u), rc_name(u->race, 0)));
+}
+
+static void
+check_dissolve(void)
+{
+  region * r;
+  for (r=regions;r!=NULL;r=r->next) {
+    unit * u;
+    for (u=r->units;u!=NULL;u=u->next) {
+      if (u->race==new_race[RC_STONEGOLEM]) {
+        fix_dissolve(u, STONEGOLEM_CRUMBLE, 0);
+        continue;
+      } 
+      if (u->race==new_race[RC_IRONGOLEM]) {
+        fix_dissolve(u, IRONGOLEM_CRUMBLE, 0);
+        continue;
+      } 
+      if (u->race==new_race[RC_PEASANT]) {
+        fix_dissolve(u, 15, 1);
+        continue;
+      }
+      if (u->race==new_race[RC_TREEMAN]) {
+        fix_dissolve(u, 5, 2);
+        continue;
+      }
+    }
+  }
+}
+
 void
 korrektur(void)
 {
+  check_dissolve();
 	french_testers();
 #if TEST_LOCALES
 	setup_locales();
@@ -1171,9 +1210,6 @@ korrektur(void)
 	fix_astralplane();
 	fix_firewalls();
 	fix_gates();
-#ifdef TEST_GM_COMMANDS
-	setup_gm_faction();
-#endif
 	update_gms();
 	verify_owners(false);
 	/* fix_herbtypes(); */
@@ -1213,34 +1249,9 @@ korrektur(void)
 #endif
 
 	if (global.data_version<TYPES_VERSION) fix_icastles();
-#ifdef XMAS2000
-	santa_comes_to_town();
-#endif
 #ifdef FUZZY_BASE36
 	enable_fuzzy = true;
 #endif
-}
-
-int
-astral_penger(void)
-{
-	plane * astralplane = getplanebyname("Astralraum");
-	region * r;
-	const item_type * itype = it_find("money");
-	assert(itype);
-	for (r=regions;r;r=r->next) {
-		unit * u;
-		if (rplane(r)!=astralplane) continue;
-		for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
-		for (u=r->units;u;u=u->next) {
-			if (u->faction->no==MONSTER_FACTION) continue;
-			if (!fval(u->faction, FL_DH)) {
-				fset(u->faction, FL_DH);
-				i_change(&u->items, itype, 300);
-			}
-		}
-	}
-	return 0;
 }
 
 void
