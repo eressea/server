@@ -68,7 +68,6 @@
 #define dbgprintf(a) fprintf a;
 static FILE *bdebug;
 
-#define SHOW_KILLS
 #undef DELAYED_OFFENSE /* non-guarding factions cannot attack after moving */
 
 #define TACTICS_RANDOM 5 /* define this as 1 to deactivate */

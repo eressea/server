@@ -31,6 +31,7 @@ CCFLAGS += -Wwrite-strings
 
 if $(HOST) = "hamunaptra" {
   XMLHDRS = /homes2/info-f/enno/software/hamunaptra/include/libxml2 ;
+  C++FLAGS += -DHAVE_LUABIND_B7 ;
 } else {
   XMLHDRS = /usr/include/libxml2 ;
 }

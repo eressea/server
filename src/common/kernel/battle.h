@@ -17,6 +17,11 @@
 extern "C" {
 #endif
 
+#define SHOW_KILLS
+#undef SMALL_BATTLE_MESSAGES
+#undef FIXED_OPPONENTS
+#undef NO_RUNNING  
+
   /** more defines **/
 #define FS_ENEMY 1
 #define FS_HELP  2
@@ -165,7 +170,6 @@ extern "C" {
       int last_action : 4;     /* In welcher Runde haben wir zuletzt etwas getan */
       struct weapon * missile; /* missile weapon */
       struct weapon * melee;   /* melee weapon */
-#undef FIXED_OPPONENTS
 #ifdef FIXED_OPPONENTS
       struct troop opponent;   /* default opponent */
 #endif
