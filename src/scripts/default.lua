@@ -20,7 +20,7 @@ end
 
 function run_scripts()
   scripts = { 
-    "xmas2004"
+    "xmas2004.lua"
   }
   for index in scripts do
     local script = scriptpath .. "/" .. scripts[index]
