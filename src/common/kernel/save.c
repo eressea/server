@@ -1165,6 +1165,7 @@ readgame(const char * filename, int backup)
 	for (r=regions;r;r=r->next) {
 		building ** bp;
 #if 0
+    /* what is this doing here? ageing happens at the end of the turn. goddamn it. */
 		unit ** up;
 		ship ** sp;
 
@@ -1184,7 +1185,6 @@ readgame(const char * filename, int backup)
 			if (s==*sp) handle_event(&s->attribs, "create", s);
 			if (s==*sp) sp = &(*sp)->next;
 		}
-#endif
 		/* Gebäude */
 		for (bp=&r->buildings;*bp;) {
 			building * b = *bp;
@@ -1192,6 +1192,7 @@ readgame(const char * filename, int backup)
 			if (b==*bp) handle_event(&b->attribs, "create", b);
 			if (b==*bp) bp = &(*bp)->next;
 		}
+#endif
 	}
 
 	return 0;
