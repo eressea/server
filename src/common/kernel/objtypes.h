@@ -19,11 +19,11 @@
 #include <stdio.h>
 #include "attrib.h"
 
-typedef struct {
+typedef struct obj_ID {
 	int a, b;
 } obj_ID;
 
-typedef enum {
+typedef enum typ_t {
 	TYP_UNIT,
 	TYP_REGION,
 	TYP_BUILDING,

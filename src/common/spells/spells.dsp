@@ -90,16 +90,32 @@ SOURCE=.\alp.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\buildingcurse.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\regioncurse.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\shipcurse.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\spells.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\unitcurse.h
+# End Source File
 # End Group
 # Begin Source File
 
 SOURCE=.\alp.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\buildingcurse.c
 # End Source File
 # Begin Source File
 
