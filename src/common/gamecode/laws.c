@@ -147,6 +147,9 @@ static void
 get_food(region *r)
 {
 	unit *u;
+	int peasantfood = rpeasants(r)*10;
+	int bauernblut = 0;
+	boolean bfind = false;
 
 	/* 1. Versorgung von eigenen Einheiten. Das vorhandene Silber
 	 * wird zunächst so auf die Einheiten aufgeteilt, dass idealerweise
@@ -213,51 +216,46 @@ get_food(region *r)
 		}
 	}
 
-	for (r = regions; r; r = r->next) {
-		int peasantfood = rpeasants(r)*10;
-		int bauernblut = 0;
-		boolean bfind = false;
-		for (u = r->units; u; u = u->next) {
-			if (u->race == new_race[RC_DAEMON]) {
-				/* Alles Bauernblut der Region zählen.
-				* warnung: bauernblut einer partei hilft im moment der anderen
-				* so selten wie das benutzt wird, ist das erstmal wursht,
-				* aber ein TODO fürs BUGS File.
-				* Es ist auch deshalb fast egal, weil es ja im Grunde nicht dem Dämon,
-				* sondern der Region zu gute kommt - und da ist der anwender schnuppe
-				*/
-				if (!bfind) {
-					unit * ud = u;
-					while (ud) {
-						attrib * a = a_find(ud->attribs, &at_bauernblut);
-						if (a) bauernblut += a->data.i;
-						do { ud=ud->next; } while (ud && ud->race!=new_race[RC_DAEMON]);
-					}
-					bfind = true;
+	for (u = r->units; u; u = u->next) {
+		if (u->race == new_race[RC_DAEMON]) {
+			/* Alles Bauernblut der Region zählen.
+			 * warnung: bauernblut einer partei hilft im moment der anderen
+			 * so selten wie das benutzt wird, ist das erstmal wursht,
+			 * aber ein TODO fürs BUGS File.
+			 * Es ist auch deshalb fast egal, weil es ja im Grunde nicht dem Dämon,
+			 * sondern der Region zu gute kommt - und da ist der anwender schnuppe
+			 */
+			if (!bfind) {
+				unit * ud = u;
+				while (ud) {
+					attrib * a = a_find(ud->attribs, &at_bauernblut);
+					if (a) bauernblut += a->data.i;
+					do { ud=ud->next; } while (ud && ud->race!=new_race[RC_DAEMON]);
 				}
-				if (r->planep == NULL || !fval(r->planep, PFL_NOFEED)) {
-					int demons = u->number;
-					if (bauernblut>=demons) {
-						bauernblut -= demons;
-						demons = 0;
-					} else if (bauernblut) {
-						demons-=bauernblut;
-					}
-					if (peasantfood>=demons) {
-						peasantfood -= demons;
-						demons = 0;
-					} else {
-						demons -= peasantfood;
-						peasantfood = 0;
-					}
-					if (demons > 0) {
-						hunger(demons, u); /* nicht gefütterte dämonen hungern */
-					}
+				bfind = true;
+				}
+			if (r->planep == NULL || !fval(r->planep, PFL_NOFEED)) {
+				int demons = u->number;
+				if (bauernblut>=demons) {
+					bauernblut -= demons;
+					demons = 0;
+				} else if (bauernblut) {
+					demons-=bauernblut;
+				}
+				if (peasantfood>=demons) {
+					peasantfood -= demons;
+					demons = 0;
+				} else {
+					demons -= peasantfood;
+					peasantfood = 0;
+				}
+				if (demons > 0) {
+					hunger(demons, u); /* nicht gefütterte dämonen hungern */
 				}
 			}
 		}
-		rsetpeasants(r, peasantfood/10);
 	}
+	rsetpeasants(r, peasantfood/10);
 
 	/* 3. Von den überlebenden das Geld abziehen: */
 	for (u = r->units; u; u = u->next) {
