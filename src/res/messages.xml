@@ -1,4 +1,13 @@
 <messages>
+<message name="sighting" section="events">
+	<type>
+		<arg name="region" type="region"></arg>
+		<arg name="number" type="int"></arg>
+		<arg name="race" type="race"></arg>
+	</type>
+	<text locale="de">"$if($isnull($region),"In $region($region)","Es") wurde$if($eq($number,1),"","n") $number $race($race,$number) gesichtet."</text>
+	<text locale="en">"In $region($region), $number $race($race,$number) were discovered."</text>
+</message>
 <message name="mallorn_effect" section="magic">
 	<type>
 		<arg name="mage" type="unit"></arg>

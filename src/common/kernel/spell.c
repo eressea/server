@@ -3518,7 +3518,7 @@ sp_summonshadowlords(castorder *co)
  * Gebiet:     Draig
  * Kategorie:  Teleport
  * Wirkung:
- *  Durch das Opfern von 500 Bauern kann der Chaosmagier ein Tor zur
+ *  Durch das Opfern von 200 Bauern kann der Chaosmagier ein Tor zur
  *  astralen Welt öffnen. Das Tor kann im Folgemonat verwendet werden,
  *  es löst sich am Ende des Folgemonats auf.
  *

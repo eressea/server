@@ -4657,12 +4657,12 @@
 			</text>
 		</string>
 		<string name="chaossuction">
-			<text locale="de">Durch das Opfern von 500 Bauern kann
+			<text locale="de">Durch das Opfern von 200 Bauern kann
 				der Chaosmagier ein Tor zur astralen Welt
 				öffnen. Das Tor kann in der Folgewoche verwendet
 				werden, es löst sich am Ende der Folgewoche auf.
 			</text>
-			<text locale="en">By sacrificing the lives of 500
+			<text locale="en">By sacrificing the lives of 200
 				peasants, the chaossorcerer is able to open a
 				planar gate. This gate can be used during the
 				following week to transfer units to the astral

@@ -1284,6 +1284,7 @@ randomevents(void)
 
 	for (r = regions; r; r = r->next) {
 		unit * u;
+		message * msg;
 		if (rterrain(r) == T_OCEAN && rand()%10000 < 1) {
 			u = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_SEASERPENT]);
 			set_level(u, SK_MAGIC, 4);
@@ -1323,30 +1324,22 @@ randomevents(void)
 
 			name_unit(u);
 			set_string(&u->lastorder, "WARTEN");
-
-			if (u->number == 1) {
-				sprintf(buf, "Es wurde ein %s gesichtet.",
-					LOC(default_locale, rc_name(u->race, 0)));
-			} else {
-				sprintf(buf, "Es wurden %d %s gesichtet.",
-					u->number, LOC(default_locale, rc_name(u->race, u->number!=1)));
-			}
-			addmessage(r, 0, buf, MSG_COMMENT, ML_IMPORTANT);
-			if (u->number == 1) {
-				sprintf(buf, "In %s wurde ein %s gesichtet.", regionid(r),
-					LOC(default_locale, rc_name(u->race, u->number!=1)));
-			} else {
-				sprintf(buf, "In %s wurden %d %s gesichtet.", regionid(r),
-					u->number, LOC(default_locale, rc_name(u->race, u->number!=1)));
-			}
+			/* add message to the region */
+			ADDMSG(&r->msgs,
+				   msg_message("sighting", "region race number", 
+							   NULL, u->race, u->number));
+			/* create new message to add to units */
+			msg = msg_message("sighting", "region race number",
+							  NULL, u->race, u->number);
 			for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
 			for (u=r->units;u;u=u->next) {
 				faction * f = u->faction;
 				if (!fval(f, FL_DH)) {
-					addmessage(0, f, buf, MSG_EVENT, ML_IMPORTANT);
+					add_message(&f->msgs, msg);
 					fset(f, FL_DH);
 				}
 			}
+			msg_release(msg);
 		}
 	}
 
