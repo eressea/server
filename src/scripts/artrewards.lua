@@ -69,6 +69,14 @@ function give_visitor2()
   visitor2.region:add_notice(s)
 end
 
+function give_visitor3()
+  visitor3 = get_unit(atoi36("visg"))
+  -- Windgeist
+  visitor3:add_item("trappedairelemental", 1)
+  s = "von Bote des Rats von Andune (bote): Glückwunsch zum Gewinn eines Besucherpreises im Wettstreit der Künste, " .. visitor3.name .. "."
+  visitor3.region:add_notice(s)
+end
+
 function give_rewards()
   print("- giving out rewards of the art contest")
   give_winner1()
@@ -77,6 +85,7 @@ function give_rewards()
   give_loser()
   give_visitor1()
   give_visitor2()
+  give_visitor3()
 end
 
 give_rewards()
