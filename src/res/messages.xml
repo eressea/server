@@ -3359,6 +3359,16 @@
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Im astralen Nebel konnte niemand entdeckt werden."</text>
   </message>
+  <message name="gbdream_noteach" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ein Zauber in dieser Region verhindert das."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - There is an active spell in this region that prevents this."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is an active spell in this region that prevents this."</text>
+  </message>
   <message name="error218" section="errors">
     <type>
       <arg name="unit" type="unit"/>

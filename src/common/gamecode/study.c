@@ -754,7 +754,6 @@ void
 teaching(void)
 {
 	region *r;
-	unit *u;
 	/* das sind alles befehle, die 30 tage brauchen, und die in thisorder
 	 * stehen! von allen 30-tage befehlen wird einfach der letzte verwendet
 	 * (dosetdefaults).
@@ -762,6 +761,7 @@ teaching(void)
 	 * lehren vor lernen. */
 
 	for (r = regions; r; r = r->next) {
+    unit *u;
 
 		for (u = r->units; u; u = u->next) {
 
@@ -783,7 +783,17 @@ teaching(void)
 				if (attacked(u)){
 					cmistake(u, u->thisorder, 52, MSG_PRODUCE);
 					continue;
-				}
+				} else {
+          static const curse_type * gbdream_ct = NULL;
+          if (gbdream_ct==0) gbdream_ct = ct_find("gbdream");
+          if (gbdream_ct) {
+            if (get_curse(u->region->attribs, gbdream_ct)) {
+              ADDMSG(&u->faction->msgs, 
+                msg_feedback(u, u->thisorder, "gbdream_noteach", ""));
+              continue;
+            }
+          }
+        }
 				teach(u, u->thisorder);
 				break;
 			}
