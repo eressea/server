@@ -808,7 +808,7 @@ bewegung_blockiert_von(unit * reisender, region * r)
 	if (!contact && guard) {
 		double prob = 0.3; /* 30% base chance */
 		prob += 0.1 * (perception - eff_stealth(reisender, r));
-		prob += 0.1 * max(guard->number, get_item(guard, I_AMULET_OF_TRUE_SEEING));
+		prob += 0.1 * min(guard->number, get_item(guard, I_AMULET_OF_TRUE_SEEING));
 
 		if (chance(prob)) {
 			return guard;
