@@ -2011,7 +2011,6 @@
 	<string name="WERWESEN">
 		<text locale="de">WERWESEN</text>
 	</string>
-
 	<string name="Adler">
 		<text locale="de">Adler</text>
 	</string>
@@ -4019,9 +4018,8 @@
 				unheilverkündend über der Region auftürmt. Der
 				magische Regen wird alles Erz rosten lassen. Seine
 				Kraft reicht nicht aus, um Rüstungen unbrauchbar
-				zu machen, jedoch werden Eisenwaffen so
-				unbrauchbar schartig und rostig, dass man sie
-				wegwerfen muss. Die Zerstörungskraft des Regens
+				zu machen, jedoch werden Eisenwaffen schartig und
+				rostig. Die Zerstörungskraft des Regens
 				ist von der investierten Kraft des Magiers
 				abhängig. Für jede Stufe können bis zu 10
 				Eisenwaffen betroffen werden. Ein Ring der Macht
@@ -4031,8 +4029,7 @@
 				thunderstorm that affects a whole region. The
 				magic rain will let rust any ore. Its power is not
 				strong enough to destroy armors, but any iron
-				weapons will get so rusty that they won't be
-				usable any more. The exact number of weapons
+				weapons will get rusty. The exact number of weapons
 				affected by the rain depends on the ammount of
 				power invested by the mage. Up to ten weapons can
 				be destroyed per level - a Ring Of Power increases
@@ -5291,6 +5288,18 @@
 	<string name="nr_mallorntree_p">
 		<text locale="de">Mallornbäume</text>
 		<text locale="en">mallorn trees</text>
+	</string>
+	<string name="alliance">
+		<text locale="de">ALLIANZ</text>
+		<text locale="en">ALLIANCE</text>
+	</string>
+	<string name="kick">
+		<text locale="de">AUSSTOSSEN</text>
+		<text locale="en">KICK</text>
+	</string>
+	<string name="join">
+		<text locale="de">AUFNEHEMEN</text>
+		<text locale="en">JOIN</text>
 	</string>
 </strings>
 

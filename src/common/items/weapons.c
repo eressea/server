@@ -73,6 +73,9 @@ enum {
 	WP_HALBERD,
 	WP_LANCE,
 	WP_RUSTY_SWORD,
+	WP_RUSTY_GREATSWORD,
+	WP_RUSTY_AXE,
+	WP_RUSTY_HALBERD,
 	WP_NONE,
 	WP_MAX
 };
@@ -144,6 +147,12 @@ static weapondata weapontable[WP_MAX + 1] =
 	{0.00, "1d5", "2d6+5", I_LANCE, SK_SPEAR, 0, -2, false, false, { RL_NONE, 0}, PIERCE },
 	/* Rostiges Schwert */
 	{0.00, "1d9", "1d9", I_RUSTY_SWORD, SK_SWORD, -1, -1, false, false, { RL_NONE, 0}, CUT },
+	/* Rostiger Zweihänder */
+	{0.00, "2d8", "2d8", I_RUSTY_GREATSWORD, SK_SWORD, -2, -3, false, false, { RL_NONE, 0}, CUT },
+	/* Rostige Axt */
+	{0.00, "2d6", "2d6", I_RUSTY_AXE, SK_SWORD, 0, -3, false, false, { RL_NONE, 0}, CUT },
+	/* Rostige Hellebarde */
+	{0.00, "2d6", "2d6", I_RUSTY_HALBERD, SK_SPEAR, -2, 1, false, false, { RL_NONE, 0}, CUT },
 	/* Unbewaffnet */
 	{0.00, "1d5+0", "1d6+0", I_WOOD, SK_SWORD, 0, 0, false, false, { RL_NONE, 0}, BASH },
 	/* Dummy */
@@ -272,7 +281,7 @@ init_oldweapons(void)
 		item_type * itype = olditemtype[weapontable[w].item];
 		int minskill = 1, wflags = WTF_NONE;
 		weapon_mod * modifiers = NULL;
-		int (*attack)(const troop *, int * deaths, int row) = NULL;
+		boolean (*attack)(const troop *, int * deaths, int row) = NULL;
 
 		switch (w) {
 		case WP_RUNESWORD:

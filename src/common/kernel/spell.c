@@ -1338,18 +1338,21 @@ sp_rosthauch(castorder *co)
 		i = min(get_item(u, I_SWORD), force);
 		if (i > 0){
 			change_item(u, I_SWORD, -i);
+			change_item(u, I_RUSTY_SWORD, i);
 			force -= i;
 			ironweapon += i;
 		}
 		i = min(get_item(u, I_GREATSWORD), force);
 		if (i > 0){
 			change_item(u, I_GREATSWORD, -i);
+			change_item(u, I_RUSTY_GREATSWORD, i);
 			force -= i;
 			ironweapon += i;
 		}
 		i = min(get_item(u, I_AXE), force);
 		if (i > 0){
 			change_item(u, I_AXE, -i);
+			change_item(u, I_RUSTY_AXE, i);
 			force -= i;
 			ironweapon += i;
 		}
@@ -1357,6 +1360,7 @@ sp_rosthauch(castorder *co)
 		if (i > 0){
 			if(rand()%100 < 50){
 				change_item(u, I_HALBERD, -i);
+				change_item(u, I_RUSTY_HALBERD, i);
 				force -= i;
 				ironweapon += i;
 			}

@@ -123,7 +123,7 @@ typedef struct item_type {
 	/* --- functions --- */
 	int (*use)(struct unit * user, const struct item_type * itype, int amount, const char * cmd);
 	int (*useonother)(struct unit * user, int targetno, const struct item_type * itype, int amount, const char * cmd);
-	int (*give)(const struct unit * src, const struct unit * dest, const struct item_type * itm, int number, const char * cmd);
+	boolean (*give)(const struct unit * src, const struct unit * dest, const struct item_type * itm, int number, const char * cmd);
 	struct item_type * next;
 } item_type;
 
@@ -372,6 +372,9 @@ enum {
 	I_RUSTY_CHAIN_MAIL,
 	I_SACK_OF_CONSERVATION,
 	I_SPHERE_OF_INVISIBILITY,
+	I_RUSTY_GREATSWORD,
+	I_RUSTY_AXE,
+	I_RUSTY_HALBERD,
 	MAX_ITEMS /* do not use outside item.c ! */
 };
 

@@ -1218,6 +1218,18 @@ t_item itemdata[MAXITEMS] = {
 	{			/* I_SPHERE_OF_INVISIBILITY */
 		{"Sphäre der Unsichtbarkeit", "Sphären der Unsichtbarkeit", "", ""}, G_M,
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
+	},
+	{			/* I_RUSTY_GREATSWORD */
+		{"Rostiger Zweihänder", "Rostige Zweihänder", "Rostiger Zweihänder", "Rostige Zweihänder"}, G_M,
+		IS_PRODUCT, SK_WEAPONSMITH, 4, {2, 0, 0, 0, 0, 0}, 200, 0, 0, NULL
+	},
+	{			/* I_RUSTY_AXE */
+		{"Rostige Kriegsaxt", "Rostige Kriegsäxte", "Rostige Kriegsaxt", "Rostige Kriegsäxte"}, G_F,
+		IS_PRODUCT, SK_WEAPONSMITH, 3, {1, 1, 0, 0, 0, 0}, 200, 0, 0, NULL
+	},
+	{			/* I_RUSTY_HALBERD */
+		{"Rostige Hellebarde", "Rostige Hellebarden", "Rostige Hellebarde", "Rostige Hellebarden"}, G_F,
+		IS_PRODUCT, SK_WEAPONSMITH, 3, {1, 1, 0, 0, 0, 0}, 200, 0, 0, NULL
 	}
 };
 
