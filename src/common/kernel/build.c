@@ -884,7 +884,8 @@ build_building(unit * u, const building_type * btype, int want)
 					);
 			ch = ch+strlen(ch);
 		}
-		msg_feedback(u, u->thisorder, "build_required", "required", buf);
+		ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "build_required", 
+      "required", buf));
 		return;
 	}
 	case ELOWSKILL:
