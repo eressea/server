@@ -36,7 +36,7 @@ double version(void);
 FILE * cfopen(const char *filename, const char *mode);
 int readorders(const char *);
 int creategame(void);
-extern int readgame(const char * filename, boolean backup);
+extern int readgame(const char * filename, int backup);
 void writegame(const char *filename, char quiet);
 
 extern void rsf(FILE * F, char *s, size_t len);

@@ -846,7 +846,7 @@ read_alliances(FILE * F)
 #endif
 
 int
-readgame(const char * filename, boolean backup)
+readgame(const char * filename, int backup)
 {
 	int i, n, p;
 	faction *f, **fp;

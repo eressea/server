@@ -48,7 +48,8 @@
 #if defined(__GNUC__)
 # include <stdbool.h>
 # define HAS_BOOLEAN
-# define boolean bool
+typedef int boolean;
+/* # define boolean bool */
 #endif
 
 #if defined(_DEBUG) && defined(_MSC_VER)
