@@ -357,11 +357,12 @@ already_seen(const faction * f, spellid_t id)
 void
 updatespelllist(unit * u)
 {
-	int i, sk = eff_skill(u, SK_MAGIC, u->region);
-	magic_t gebiet;
-	int max = eff_skill(u, SK_MAGIC, u->region);
+  int max = eff_skill(u, SK_MAGIC, u->region);
+	int i, sk = max;
+	magic_t gebiet = find_magetype(u);
 
-	gebiet = find_magetype(u);
+  if (u->faction->no==MONSTER_FACTION) return;
+	
 
 	/* Magier mit keinem bzw M_GRAU bekommen weder Sprüche angezeigt noch
 	 * neue Sprüche in ihre List-of-known-spells. Das sind zb alle alten
