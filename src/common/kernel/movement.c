@@ -1367,10 +1367,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 	 * befahrene Region. */
 	tt[step] = starting_point;
 
-	while (current_point!=next_point &&
-		   ((rterrain(current_point) == T_OCEAN
-			 || is_cursed(u->ship->attribs, C_SHIP_FLYING, 0))
-			&& next_point != 0 && m < k))
+	while (current_point!=next_point && m < k && next_point)
 	{
 		direction_t dir = reldirection(current_point, next_point);
 		
@@ -1515,6 +1512,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 			rv[l] = current_point;
 			l++;
 		}
+		if (rterrain(current_point) != T_OCEAN && !is_cursed(u->ship->attribs, C_SHIP_FLYING, 0)) break;
 		next_point = movewhere(current_point, u);
 	}
 

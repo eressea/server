@@ -863,6 +863,33 @@ spellcost(unit *u, spell * sp)
 }
 
 /* ------------------------------------------------------------- */
+/* SPC_LINEAR ist am höchstwertigen, dann müssen Komponenten für die
+ * Stufe des Magiers vorhanden sein.
+ * SPC_LINEAR hat die gewünschte Stufe als multiplikator,
+ * nur SPC_FIX muss nur einmal vorhanden sein, ist also am
+ * niedrigstwertigen und sollte von den beiden anderen Typen
+ * überschrieben werden */
+int
+spl_costtyp(spell * sp)
+{
+	int k;
+	int costtyp = SPC_FIX;
+
+	for (k = 0; k < MAXINGREDIENT; k++) {
+		if (costtyp == SPC_LINEAR) return SPC_LINEAR;
+				
+		if (sp->komponenten[k][2] == SPC_LINEAR) {
+			return SPC_LINEAR;
+		}
+
+		if (costtyp==SPC_FIX) {
+			costtyp = SPC_LEVEL;
+		}
+	}
+	return costtyp;
+}
+
+/* ------------------------------------------------------------- */
 /* durch Komponenten und cast_level begrenzter maximal möglicher
  * Level
  * Da die Funktion nicht alle Komponenten durchprobiert sondern beim
@@ -2866,9 +2893,13 @@ magic(void)
 				continue;
 			}
 			if (level < co->level){
-				sprintf(buf, "%s hat nur genügend Komponenten um %s auf Stufe %d "
-						"zu zaubern.", unitname(u), sp->name, level);
-				addmessage(0, u->faction, buf, MSG_MAGIC, ML_INFO);
+				/* Sprüche mit Fixkosten werden immer auf Stufe des Spruchs
+				 * gezaubert, co->level ist aber defaultmäßig Stufe des Magiers */
+				if (spl_costtyp(sp) != SPC_FIX) {
+					sprintf(buf, "%s hat nur genügend Komponenten um %s auf Stufe %d "
+							"zu zaubern.", unitname(u), sp->name, level);
+					addmessage(0, u->faction, buf, MSG_MAGIC, ML_INFO);
+				}	
 			}
 			co->level = level;
 
