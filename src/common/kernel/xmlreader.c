@@ -932,7 +932,7 @@ xml_readstrings(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr, bool
 		locale_setstring(lang, zName, xml_to_locale(text));
 		xmlFree(text);
 	  } else {
-		log_warning(("string %s has no test in locale %s\n",
+		log_warning(("string %s has no text in locale %s\n",
 					 zName, locale_name(lang)));
 	  }
     }

@@ -465,7 +465,7 @@ leave_trail(unit * u, region **route, region * to)
       a = a->nexttype;
     }
 
-    if (a!=NULL) {
+    if (a==NULL) {
       a = a_add(&(r->attribs), a_new(&at_traveldir_new));
       td = (traveldir *)a->data.v;
       td->no = sh->no;
