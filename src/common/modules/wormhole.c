@@ -47,12 +47,6 @@ cmp_age(const void * v1, const void *v2)
   return 0;
 }
 
-static building_type bt_wormhole = {
-  "wormhole", BTF_NOBUILD|BTF_UNIQUE|BTF_INDESTRUCTIBLE,
-  1, 4, 4,
-  0, 0, 0, 0.0
-};
-
 typedef struct wormhole_data {
   building * entry;
   building * exit;
@@ -102,7 +96,7 @@ wormhole_age(struct attrib * a)
   return -1;
 }
 
-void 
+static void 
 wormhole_write(const struct attrib * a, FILE* F)
 {
   wormhole_data * data = (wormhole_data*)a->data.v;
@@ -110,7 +104,7 @@ wormhole_write(const struct attrib * a, FILE* F)
   write_building_reference(data->exit, F);
 }
 
-int
+static int
 wormhole_read(struct attrib * a, FILE* F)
 {
   wormhole_data * data = (wormhole_data*)a->data.v;
@@ -132,18 +126,18 @@ static attrib_type at_wormhole = {
 };
 
 static void
-make_wormhole(region * r1, region * r2)
+make_wormhole(const building_type * bt_wormhole, region * r1, region * r2)
 {
-  building * b1 = new_building(&bt_wormhole, r1, NULL);
-  building * b2 = new_building(&bt_wormhole, r2, NULL);
+  building * b1 = new_building(bt_wormhole, r1, NULL);
+  building * b2 = new_building(bt_wormhole, r2, NULL);
   attrib * a1 = a_add(&b1->attribs, a_new(&at_wormhole));
   attrib * a2 = a_add(&b2->attribs, a_new(&at_wormhole));
   wormhole_data * d1 = (wormhole_data*)a1->data.v;
   wormhole_data * d2 = (wormhole_data*)a2->data.v;
   d1->entry = d2->exit = b1;
   d2->entry = d1->exit = b2;
-  b1->size = bt_wormhole.maxsize;
-  b2->size = bt_wormhole.maxsize;
+  b1->size = bt_wormhole->maxsize;
+  b2->size = bt_wormhole->maxsize;
   ADDMSG(&r1->msgs, msg_message("wormhole_appear", "region", r1));
   ADDMSG(&r2->msgs, msg_message("wormhole_appear", "region", r2));
 }
@@ -152,11 +146,13 @@ void
 create_wormholes(void)
 {
 #define WORMHOLE_CHANCE 10000
+  const building_type * bt_wormhole = bt_find("wormhole");
   region_list *rptr, * rlist = NULL;
   region * r = regions;
   int i = 0, count = 0;
   region ** match;
 
+  if (bt_wormhole==NULL) return;
   /*
    * select a list of regions. we'll sort them by age later.
    */
@@ -185,14 +181,13 @@ create_wormholes(void)
 
   count /= 2;
   for (i=0;i!=count;++i) {
-    make_wormhole(match[i], match[i+count]);
+    make_wormhole(bt_wormhole, match[i], match[i+count]);
   }
 }
 
 void 
 register_wormholes(void)
 {
-  bt_register(&bt_wormhole);
   at_register(&at_wormhole);
 }
 #endif

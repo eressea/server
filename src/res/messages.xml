@@ -6006,5 +6006,27 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) is too heavy."</text>
   </message>
 
+  <message name="heroes_maxed" section="errors">
+    <type>
+      <arg name="command" type="order"/>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="max" type="int"/>
+      <arg name="count" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Partei hat bereits $int($count) von $int($max) Helden."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The faction already has $int($count) of $int($max) heroes."</text>
+  </message>
+
+  <message name="heroes_race" section="errors">
+    <type>
+      <arg name="command" type="order"/>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="race" type="race"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) können keine Helden erwählen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) cannot be heroes."</text>
+  </message>
 </messages>
 
