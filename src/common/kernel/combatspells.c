@@ -514,84 +514,69 @@ random_skill(unit *u)
 int
 sp_mindblast(fighter * fi, int level, double power, spell * sp)
 {
-	battle *b = fi->side->battle;
-	unit *mage = fi->unit;
-	troop dt;
-	unit *du;
-	skill_t sk;
-	int killed = 0;
-	int force, enemies;
-	int k = 0;
-	int minrow = FIGHT_ROW;
-	int maxrow = BEHIND_ROW;
+  battle *b = fi->side->battle;
+  unit *mage = fi->unit;
+  troop dt;
+  unit *du;
+  skill_t sk;
+  int killed = 0;
+  int force, enemies;
+  int k = 0;
+  int minrow = FIGHT_ROW;
+  int maxrow = BEHIND_ROW;
 
-	sprintf(buf, "%s zaubert %s", unitname(mage), 
-		spell_name(sp, default_locale));
-	force = lovar(power * 25);
+  sprintf(buf, "%s zaubert %s", unitname(mage), 
+    spell_name(sp, default_locale));
+  force = lovar(power * 25);
 
-	enemies = count_enemies(b, fi->side, minrow, maxrow);
-	if (!enemies) {
-		scat(", aber niemand war in Reichweite.");
-		battlerecord(b, buf);
-		return 0;
-	}
-	scat(":");
-	battlerecord(b, buf);
+  enemies = count_enemies(b, fi->side, minrow, maxrow);
+  if (!enemies) {
+    scat(", aber niemand war in Reichweite.");
+    battlerecord(b, buf);
+    return 0;
+  }
+  scat(":");
+  battlerecord(b, buf);
 
-	do {
-		dt = select_enemy(b, fi, minrow, maxrow);
-		assert(dt.fighter);
-		du = dt.fighter->unit;
-		if (humanoidrace(du->race) && is_magic_resistant(mage, du, 0) == false) {
-			sk = random_skill(du);
-			if (sk != NOSKILL) {
-				/* Skill abziehen */
-				int n = 30+rand()%61;
-				skill * sv = get_skill(du, sk);
-				while (n>0) {
-					if (n>=30*du->number) {
-						reduce_skill(du, sv, 1);
-						n-=30;
-					} else {
-						if (rand()%(30*du->number)<n) reduce_skill(du, sv, 1);
-						n = 0;
-					}
-				}
-				--enemies;
-			} else {
-				troop t;
-				/* Keine Skills mehr, Einheit töten */
-				t.fighter = dt.fighter;
-				t.index = 0;
-				while(dt.fighter->alive - dt.fighter->removed) {
-					rmtroop(t);
-					enemies--;
-					killed++;
-				}
-			}
-			k++;
-		}
-		--force;
-	} while (force && enemies);
+  do {
+    dt = select_enemy(b, fi, minrow, maxrow);
+    assert(dt.fighter);
+    du = dt.fighter->unit;
+    if (humanoidrace(du->race) && !is_magic_resistant(mage, du, 0)) {
+      sk = random_skill(du);
+      if (sk != NOSKILL) {
+        skill * sv = get_skill(du, sk);
+        int n = 1 + rand() % 3;
+        /* Skill abziehen */
+        reduce_skill(du, sv, n);
+      } else {
+        /* Keine Skills mehr, Einheit töten */
+        rmtroop(dt);
+        ++killed;
+      }
+      --enemies;
+      ++k;
+    }
+    --force;
+  } while (force && enemies);
 
-	sprintf(buf, "%d Krieger %s Erinnerungen",
-			k, k == 1 ? "verliert" : "verlieren");
+  sprintf(buf, "%d Krieger %s Erinnerungen", k, k == 1 ? "verliert" : "verlieren");
 
-	if (killed > 0) {
-		scat(", ");
-		icat(killed);
-		scat(" Krieger ");
-		if (killed == 1) {
-			scat("wurde");
-		} else {
-			scat("wurden");
-		}
-		scat(" getötet");
-	}
-	scat(".");
+  if (killed > 0) {
+    scat(", ");
+    icat(killed);
+    scat(" Krieger ");
+    if (killed == 1) {
+      scat("wurde");
+    } else {
+      scat("wurden");
+    }
+    scat(" getötet");
+  }
+  scat(".");
 
-	battlerecord(b, buf);
-	return level;
+  battlerecord(b, buf);
+  return level;
 }
 
 int
