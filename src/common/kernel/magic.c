@@ -2361,7 +2361,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 
 castorder *
 new_castorder(void *u, unit *u2, spell *sp, region *r, int lev,
-		int force, int range, char *cmd, spellparameter *p)
+		double force, int range, char *cmd, spellparameter *p)
 {
 	castorder *corder;
 

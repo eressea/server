@@ -168,15 +168,15 @@ typedef struct spell {
 
 struct castorder {
 	castorder *next;
-	void *magician;       /* Magier (kann vom Typ struct unit oder fighter sein) */
-	struct unit *familiar;       /* Vertrauter, gesetzt, wenn der Spruch durch
-					den Vertrauten gezaubert wird */
-	struct spell *sp;            /* Spruch */
-	int level;            /* gewünschte Stufe oder Stufe des Magiers */
-	float force;          /* Stärke des Zaubers */
-	struct region *rt;    /* Zielregion des Spruchs */
-	int distance;         /* Entfernung zur Zielregion */
-	char *order;          /* Befehl */
+	void *magician;        /* Magier (kann vom Typ struct unit oder fighter sein) */
+	struct unit *familiar; /* Vertrauter, gesetzt, wenn der Spruch durch
+                            den Vertrauten gezaubert wird */
+	struct spell *sp;      /* Spruch */
+	int level;             /* gewünschte Stufe oder Stufe des Magiers */
+	double force;          /* Stärke des Zaubers */
+	struct region *rt;     /* Zielregion des Spruchs */
+	int distance;          /* Entfernung zur Zielregion */
+	char *order;           /* Befehl */
 	struct spellparameter *par;  /* für weitere Parameter */
 };
 
@@ -187,7 +187,7 @@ typedef void (*spell_f) (void*);
 /* normale zauber: */
 typedef int (*nspell_f)(castorder*);
 /* kampfzauber: */
-typedef int (*cspell_f) (struct fighter*, int, int, struct spell * sp);
+typedef int (*cspell_f) (struct fighter*, int, double, struct spell * sp);
 /* zauber-patzer: */
 typedef void (*pspell_f) (castorder *);
 
@@ -335,7 +335,7 @@ boolean fumble (struct region *r, struct unit *u, spell *spruch, int cast_level)
 
 /* */
 castorder *new_castorder(void *u, struct unit *familiar, spell *sp, struct region *r,
-		int lev, int force, int distance, char *cmd, spellparameter *p);
+		int lev, double force, int distance, char *cmd, spellparameter *p);
 	/* Zwischenspreicher für Zauberbefehle, notwendig für Prioritäten */
 void add_castorder(castorder **cll, castorder *co);
 	/* Hänge c-order co an die letze c-order von cll an */

@@ -434,10 +434,6 @@ teach(region * r, unit * u)
 }
 /* ------------------------------------------------------------- */
 
-#ifdef SKILLFIX_SAVE
-extern void skillfix(struct unit *, skill_t, int, int, int);
-#endif
-
 void
 learn(void)
 {
@@ -668,13 +664,6 @@ learn(void)
 				if (is_cursed(r->attribs,C_BADLEARN,0)) {
 					teach->value -= u->number * 10;
 				}
-#ifdef SKILLFIX_SAVE
-				if (teach && teach->value) {
-					int skill = get_skill(u, sk);
-					skillfix(u, sk, skill,
-							 (int)(u->number * 30 * multi), teach->value);
-				}
-#endif
 
 				days = (int)((u->number * 30 + teach->value) * multi);
 				if (fval(u, UFL_HUNGER)) days = days / 2;

@@ -40,7 +40,7 @@ typedef struct createcurse_data {
 	struct unit * mage;
 	struct unit * target;
 	const curse_type * type;
-	int vigour;
+	double vigour;
 	int duration;
 	int effect;
 	int men;
@@ -81,7 +81,7 @@ createcurse_write(const trigger * t, FILE * F)
 	createcurse_data * td = (createcurse_data*)t->data.v;
 	fprintf(F, "%s ", itoa36(td->mage->no));
 	fprintf(F, "%s ", itoa36(td->target->no));
-	fprintf(F, "%s %d %d %d %d ", td->type->cname, td->vigour, td->duration, td->effect, td->men);
+	fprintf(F, "%s %lf %d %d %d ", td->type->cname, td->vigour, td->duration, td->effect, td->men);
 }
 
 static int
@@ -103,11 +103,11 @@ createcurse_read(trigger * t, FILE * F)
 
 	if (global.data_version<CURSETYPE_VERSION) {
 		int id1, id2;
-		fscanf(F, "%d %d %d %d %d %d ", &id1, &id2, &td->vigour, &td->duration, &td->effect, &td->men);
+		fscanf(F, "%d %d %lf %d %d %d ", &id1, &id2, &td->vigour, &td->duration, &td->effect, &td->men);
 		assert(id2==0);
 		td->type = ct_find(oldcursename(id1));
 	} else {
-		fscanf(F, "%s %d %d %d %d ", zText, &td->vigour, &td->duration, &td->effect, &td->men);
+		fscanf(F, "%s %lf %d %d %d ", zText, &td->vigour, &td->duration, &td->effect, &td->men);
 		td->type = ct_find(zText);
 	}
 	return AT_READ_OK;
@@ -124,7 +124,7 @@ trigger_type tt_createcurse = {
 
 trigger *
 trigger_createcurse(struct unit * mage, struct unit * target,
-					const curse_type * ct, int vigour, int duration,
+					const curse_type * ct, double vigour, int duration,
 					int effect, int men)
 {
 	trigger * t = t_new(&tt_createcurse);

@@ -161,35 +161,34 @@ do_shock(unit *u, const char *reason)
 /* Spruchanalyse - Ausgabe von curse->info und curse->name       */
 /* ------------------------------------------------------------- */
 
-static int
-curse_chance(const struct curse * c, int force)
+static double
+curse_chance(const struct curse * c, double force)
 {
-  return 100 + (int)((force - c->vigour)*10);
+  return 1.0 + (force - c->vigour) * 0.1;
 }
 
-void
-magicanalyse_region(region *r, unit *mage, int force)
+static void
+magicanalyse_region(region *r, unit *mage, double force)
 {
 	attrib *a;
 	boolean found = false;
 	const struct locale * lang = mage->faction->locale;
 
 	for (a=r->attribs;a;a=a->next) {
-		curse * c;
-		int chance;
+		curse * c = (curse*)a->data.v;
+		double probability;
 		int mon;
-		if (!fval(a->type, ATF_CURSE)) continue;
 
-		c = (curse*)a->data.v;
+    if (!fval(a->type, ATF_CURSE)) continue;
 
 		/* ist der curse schwächer als der Analysezauber, so ergibt sich
-		 * mehr als 100% chance und damit immer ein Erfolg. */
-		chance = curse_chance(c, force);
+		 * mehr als 100% probability und damit immer ein Erfolg. */
+		probability = curse_chance(c, force);
 		mon = c->duration + (rand()%10) - 5;
-		mon = max(1,mon);
+		mon = max(1, mon);
 		found = true;
 
-		if(rand()%100 < chance){ /* Analyse geglückt */
+		if (chance(probability)) { /* Analyse geglückt */
 			if(c->flag & CURSE_NOAGE) {
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_region_noage%u:mage%r:region%s:spell",
@@ -210,8 +209,8 @@ magicanalyse_region(region *r, unit *mage, int force)
 	}
 }
 
-void
-magicanalyse_unit(unit *u, unit *mage, int force)
+static void
+magicanalyse_unit(unit *u, unit *mage, double force)
 {
 	attrib *a;
 	boolean found = false;
@@ -219,18 +218,18 @@ magicanalyse_unit(unit *u, unit *mage, int force)
 
 	for (a=u->attribs;a;a=a->next) {
 		curse * c;
-		int chance;
+		double probability;
 		int mon;
 		if (!fval(a->type, ATF_CURSE)) continue;
 
 		c = (curse*)a->data.v;
 		/* ist der curse schwächer als der Analysezauber, so ergibt sich
-		 * mehr als 100% chance und damit immer ein Erfolg. */
-		chance = curse_chance(c, force);
+		 * mehr als 100% probability und damit immer ein Erfolg. */
+		probability = curse_chance(c, force);
 		mon = c->duration + (rand()%10) - 5;
 		mon = max(1,mon);
 
-		if(rand()%100 < chance){ /* Analyse geglückt */
+		if (chance(probability)) { /* Analyse geglückt */
 			if(c->flag & CURSE_NOAGE){
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_unit_noage%u:mage%u:unit%s:spell",
@@ -251,8 +250,8 @@ magicanalyse_unit(unit *u, unit *mage, int force)
 	}
 }
 
-void
-magicanalyse_building(building *b, unit *mage, int force)
+static void
+magicanalyse_building(building *b, unit *mage, double force)
 {
 	attrib *a;
 	boolean found = false;
@@ -260,18 +259,19 @@ magicanalyse_building(building *b, unit *mage, int force)
 
 	for (a=b->attribs;a;a=a->next) {
 		curse * c;
-		int chance;
+		double probability;
 		int mon;
-		if (!fval(a->type, ATF_CURSE)) continue;
+
+    if (!fval(a->type, ATF_CURSE)) continue;
 
 		c = (curse*)a->data.v;
 		/* ist der curse schwächer als der Analysezauber, so ergibt sich
-		 * mehr als 100% chance und damit immer ein Erfolg. */
-		chance = curse_chance(c, force);
+		 * mehr als 100% probability und damit immer ein Erfolg. */
+		probability = curse_chance(c, force);
 		mon = c->duration + (rand()%10) - 5;
 		mon = max(1,mon);
 
-		if(rand()%100 < chance){ /* Analyse geglückt */
+		if (chance(probability)) { /* Analyse geglückt */
 			if(c->flag & CURSE_NOAGE){
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_building_age%u:mage%b:building%s:spell",
@@ -293,8 +293,8 @@ magicanalyse_building(building *b, unit *mage, int force)
 
 }
 
-void
-magicanalyse_ship(ship *sh, unit *mage, int force)
+static void
+magicanalyse_ship(ship *sh, unit *mage, double force)
 {
 	attrib *a;
 	boolean found = false;
@@ -302,18 +302,18 @@ magicanalyse_ship(ship *sh, unit *mage, int force)
 
 	for (a=sh->attribs;a;a=a->next) {
 		curse * c;
-		int chance;
+		double probability;
 		int mon;
 		if (!fval(a->type, ATF_CURSE)) continue;
 
 		c = (curse*)a->data.v;
 		/* ist der curse schwächer als der Analysezauber, so ergibt sich
-		 * mehr als 100% chance und damit immer ein Erfolg. */
-		chance = curse_chance(c, force);
+		 * mehr als 100% probability und damit immer ein Erfolg. */
+		probability = curse_chance(c, force);
 		mon = c->duration + (rand()%10) - 5;
 		mon = max(1,mon);
 
-		if(rand()%100 < chance){ /* Analyse geglückt */
+		if (chance(probability)) { /* Analyse geglückt */
 			if(c->flag & CURSE_NOAGE){
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_ship_noage%u:mage%h:ship%s:spell",
@@ -351,10 +351,9 @@ double
 destr_curse(curse* c, int cast_level, double force)
 {
 	if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
-		double chance;
+		double probability = 0.1 + (cast_level - c->vigour)*0.2;
 		/* pro Stufe Unterschied -20% */
-		chance = 0.1 + (cast_level - c->vigour)*0.2;
-		if (rand()%100 >= chance*100) {
+		if (chance(probability)) {
 			force -= c->vigour;
 			if (c->type->change_vigour){
 				c->type->change_vigour(c, -(cast_level+1/2));
@@ -2232,7 +2231,7 @@ sp_fog_of_confusion(castorder *co)
 	regionlist *rl,*rl2;
 
 	range = (power-11)/3-1;
-	duration = ((power-11)/3)*2+1;
+	duration = (int)((power-11)/1.5)+1;
 
 	rl = all_in_range(r, (int)range);
 
@@ -2341,21 +2340,18 @@ sp_stormwinds(castorder *co)
 	faction *f;
 	ship *sh;
 	unit *u;
-	int n, force;
 	int erfolg = 0;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	double power = co->force;
 	spellparameter *pa = co->par;
-
-	force = power;
+	int n, force = (int)power;
 
 	/* melden vorbereiten */
 	for(f = factions; f; f = f->next ) freset(f, FL_DH);
 
 	for (n = 0; n < pa->length; n++) {
-		if (!force)
-			break;
+		if (force<=0) break;
 
 		if(pa->param[n]->flag == TARGET_RESISTS
 				|| pa->param[n]->flag == TARGET_NOTFOUND)
@@ -2552,35 +2548,32 @@ sp_forest_fire(castorder *co)
 {
 	unit *u;
 	region *nr;
-	int prozent, chance, vernichtet;
-#if GROWING_TREES
-	int vernichtet_schoesslinge;
-#endif
 	direction_t i;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
+  double probability;
+	double percentage = (rand() % 8 + 1) * 0.1;	 /* 10 - 80% */
 
-	prozent = (rand() % 71) + 10;	 /* 10 - 80% */
 #if GROWING_TREES
-	vernichtet = rtrees(r,2) * prozent / 100;
-	vernichtet_schoesslinge = rtrees(r,1) * prozent / 100;
+  int vernichtet_schoesslinge = (int)(rtrees(r, 1) * percentage);
+	int destroyed = (int)(rtrees(r, 2) * percentage);
 #else
-	vernichtet = rtrees(r) * prozent / 100;
+	int destroyed = (int)(rtrees(r) * percentage);
 #endif
 
-	if(!vernichtet ) {
+	if (destroyed<1) {
 		cmistake(mage, strdup(co->order), 198, MSG_MAGIC);
 		return 0;
 	}
 
 #if GROWING_TREES
-	rsettrees(r, 2, rtrees(r,2) - vernichtet);
+	rsettrees(r, 2, rtrees(r,2) - destroyed);
 	rsettrees(r, 1, rtrees(r,1) - vernichtet_schoesslinge);
 #else
-	rsettrees(r, rtrees(r) - vernichtet);
+	rsettrees(r, rtrees(r) - destroyed);
 #endif
-	chance = vernichtet / 10;	/* Chance, dass es sich ausbreitet */
+	probability = destroyed * 0.001;	/* Chance, dass es sich ausbreitet */
 
 	/* melden, 1x pro Partei */
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
@@ -2591,20 +2584,20 @@ sp_forest_fire(castorder *co)
 			sprintf(buf, "%s erzeugt eine verheerende Feuersbrunst.  %d %s "
 					"den Flammen zum Opfer.",
 					cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand",
-					vernichtet,
-					vernichtet == 1 ? "Baum fiel" : "Bäume fielen");
+					destroyed,
+					destroyed == 1 ? "Baum fiel" : "Bäume fielen");
 			addmessage(r, u->faction, buf, MSG_EVENT, ML_INFO);
 		}
 	}
 	if(!fval(mage->faction, FL_DH)){
 #if GROWING_TREES
 		sprintf(buf, "%s erzeugt eine verheerende Feuersbrunst.  %d %s "
-				"den Flammen zum Opfer.", unitname(mage), vernichtet+vernichtet_schoesslinge,
-				vernichtet+vernichtet_schoesslinge == 1 ? "Baum fiel" : "Bäume fielen");
+				"den Flammen zum Opfer.", unitname(mage), destroyed+vernichtet_schoesslinge,
+				destroyed+vernichtet_schoesslinge == 1 ? "Baum fiel" : "Bäume fielen");
 #else
 		sprintf(buf, "%s erzeugt eine verheerende Feuersbrunst.  %d %s "
-				"den Flammen zum Opfer.", unitname(mage), vernichtet,
-				vernichtet == 1 ? "Baum fiel" : "Bäume fielen");
+				"den Flammen zum Opfer.", unitname(mage), destroyed,
+				destroyed == 1 ? "Baum fiel" : "Bäume fielen");
 #endif
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
 	}
@@ -2612,28 +2605,28 @@ sp_forest_fire(castorder *co)
 	for(i = 0; i < MAXDIRECTIONS; i++ ) {
 		nr = rconnect(r, i);
 		assert(nr);
-		vernichtet = 0;
+		destroyed = 0;
 
 #if GROWING_TREES
 		if(rtrees(nr,2) + rtrees(nr,1) >= 800) {
-			if((rand() % 100) < chance ) {
-				vernichtet = rtrees(nr,2) * prozent / 200;
-				vernichtet_schoesslinge = rtrees(nr,1) * prozent / 200;
+			if (chance(probability)) {
+				destroyed = (int)(rtrees(nr,2) * percentage/2);
+				vernichtet_schoesslinge = (int)(rtrees(nr,1) * percentage/2);
 			}
-		} else if(rtrees(nr,2) + rtrees(nr,1) >= 600) {
-			if((rand() % 100) < chance / 2 ) {
-				vernichtet = rtrees(nr,2) * prozent / 400;
-				vernichtet_schoesslinge = rtrees(nr,1) * prozent / 400;
+		} else if (rtrees(nr,2) + rtrees(nr,1) >= 600) {
+			if (chance(probability/2)) {
+				destroyed = (int)(rtrees(nr,2) * percentage/4);
+				vernichtet_schoesslinge = (int)(rtrees(nr,1) * percentage/4);
 			}
 		}
 
-		if(vernichtet > 0  || vernichtet_schoesslinge > 0) {
-			rsettrees(nr, 2, rtrees(nr,2) - vernichtet);
+		if (destroyed > 0  || vernichtet_schoesslinge > 0) {
+			rsettrees(nr, 2, rtrees(nr,2) - destroyed);
 			rsettrees(nr, 1, rtrees(nr,1) - vernichtet_schoesslinge);
 			sprintf(buf, "Der Waldbrand in %s griff auch auf %s "
 					"über und %d %s.",
-					regionid(r), regionid(nr), vernichtet+vernichtet_schoesslinge,
-					vernichtet+vernichtet_schoesslinge == 1 ? "Baum verbrannte" : "Bäume verbrannten");
+					regionid(r), regionid(nr), destroyed+vernichtet_schoesslinge,
+					destroyed+vernichtet_schoesslinge == 1 ? "Baum verbrannte" : "Bäume verbrannten");
 			for (u = nr->units; u; u = u->next) freset(u->faction, FL_DH);
 			for(u = nr->units; u; u = u->next ) {
 				if(!fval(u->faction, FL_DH) ) {
@@ -2646,18 +2639,18 @@ sp_forest_fire(castorder *co)
 			}
 		}
 #else
-		if(rtrees(nr) >= 800) {
-			if((rand() % 100) < chance ) vernichtet = rtrees(nr) * prozent / 200;
-		} else if(rtrees(nr) >= 600) {
-			if((rand() % 100) < chance / 2 ) vernichtet = rtrees(nr) * prozent / 400;
+		if (rtrees(nr) >= 800) {
+			if (chance(probability)) destroyed = (int)(rtrees(nr) * percentage/2);
+		} else if (rtrees(nr) >= 600) {
+			if(chance(probability/2)) destroyed = (int)(rtrees(nr) * percentage/4);
 		}
 
-		if(vernichtet > 0 ) {
-			rsettrees(nr, rtrees(nr) - vernichtet);
+		if (destroyed > 0 ) {
+			rsettrees(nr, rtrees(nr) - destroyed);
 			sprintf(buf, "Der Waldbrand in %s griff auch auf %s "
 					"über und %d %s.",
-					regionid(r), regionid(nr), vernichtet,
-					vernichtet == 1 ? "Baum verbrannte" : "Bäume verbrannten");
+					regionid(r), regionid(nr), destroyed,
+					destroyed == 1 ? "Baum verbrannte" : "Bäume verbrannten");
 			for (u = nr->units; u; u = u->next) freset(u->faction, FL_DH);
 			for(u = nr->units; u; u = u->next ) {
 				if(!fval(u->faction, FL_DH) ) {
@@ -2698,10 +2691,10 @@ sp_fumblecurse(castorder *co)
 	unit *target;
 	int rx, sx;
 	int duration;
-	int effect;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double force = co->force;
+  int effect = (int)(force/2);
 	curse * c;
 	spellparameter *pa = co->par;
 
@@ -2713,8 +2706,6 @@ sp_fumblecurse(castorder *co)
 	rx = rand()%3;
 	sx = cast_level - effskill(target, SK_MAGIC);
 	duration = max(sx, rx) + 1;
-
-	effect = force/2;
 
 	c = create_curse(mage, &target->attribs, ct_find("fumble"),
 				force, duration, effect, 0);
@@ -2736,11 +2727,9 @@ patzer_fumblecurse(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double force = co->force;
-	int effect;
+	int effect = (int)(force/2);
 	curse * c;
 	int duration = (cast_level/2)+1;
-
-	effect = force/2;
 
 	c = create_curse(mage, &mage->attribs, ct_find("fumble"), force,
 				duration, effect, 0);
@@ -3079,12 +3068,12 @@ sp_firewall(castorder *co)
   if (b==NULL) {
     b = new_border(&bt_firewall, r, r2);
     fd = (wall_data*)b->data;
-    fd->force = (force+1)/2;
+    fd->force = (int)(force/2+0.5);
     fd->mage = mage;
     fd->active = false;
   } else {
     fd = (wall_data*)b->data;
-    fd->force = max(fd->force, (force+1)/2);
+    fd->force = (int)max(fd->force, force/2+0.5);
   }
 
   a = a_find(b->attribs, &at_countdown);
@@ -3166,7 +3155,7 @@ sp_wisps(castorder *co)
 
 	b = new_border(&bt_wisps, r, r2);
 	fd = (wall_data*)b->data;
-	fd->force = (force+1)/2;
+	fd->force = (int)(force/2+0.5);
 	fd->mage = mage;
 	fd->active = false;
 
@@ -3216,7 +3205,7 @@ sp_unholypower(castorder *co)
 	int n;
 	int wounds;
 
-	n = dice(co->force, 10);
+	n = dice((int)co->force, 10);
 
 	for (i = 0; i < pa->length && n > 0; i++) {
 		const race * target_race;
@@ -3465,7 +3454,7 @@ sp_summonshadow(castorder *co)
 	unit *u;
 	int val;
 
-	u = createunit(r, mage->faction, force*force, new_race[RC_SHADOW]);
+	u = createunit(r, mage->faction, (int)(force*force), new_race[RC_SHADOW]);
 	if (r==mage->region) {
 		u->building = mage->building;
 		u->ship = mage->ship;
@@ -3512,7 +3501,7 @@ sp_summonshadowlords(castorder *co)
 	int cast_level = co->level;
 	double force = co->force;
 
-	u = createunit(r, mage->faction, force*force, new_race[RC_SHADOWLORD]);
+	u = createunit(r, mage->faction, (int)(force*force), new_race[RC_SHADOWLORD]);
 	if (r==mage->region) {
 		u->building = mage->building;
 		u->ship = mage->ship;
@@ -3673,14 +3662,14 @@ sp_bloodsacrifice(castorder *co)
 	int cast_level = co->level;
 	int aura;
 	int skill = eff_skill(mage, SK_MAGIC, mage->region);
-	double hp = co->force*4;
+	int hp = (int)(co->force*8);
 
-	if (hp <= 0){
+	if (hp <= 0) {
 		report_failure(mage, co->order);
 		return 0;
 	}
 
-	aura = lovar(hp*2);
+	aura = lovar(hp);
 
 	if (skill < 8) {
 		aura /= 4;
@@ -3729,7 +3718,7 @@ sp_summonundead(castorder *co)
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
-	double force = co->force;
+	int force = (int)(co->force*10);
 	const race * race = new_race[RC_SKELETON];
 
 	if (!r->land || deathcount(r) == 0) {
@@ -3739,7 +3728,7 @@ sp_summonundead(castorder *co)
 		return 0;
 	}
 
-	undead = min(deathcount(r), 2 + lovar(force * 10));
+	undead = min(deathcount(r), 2 + lovar(force));
 
 	if(cast_level <= 8) {
 		race = new_race[RC_SKELETON];
@@ -3914,7 +3903,7 @@ sp_analysesong_obj(castorder *co)
 
 	obj = pa->param[0]->typ;
 
-	switch(obj){
+	switch(obj) {
 	case SPP_REGION:
 		magicanalyse_region(r, mage, force);
 		break;
@@ -4027,7 +4016,7 @@ sp_charmingsong(castorder *co)
 
 	/* Magieresistensbonus für mehr als Stufe Personen */
 	if (target->number > force) {
-		resist_bonus += (target->number - force) * 10;
+		resist_bonus += (int)((target->number - force) * 10);
 	}
 	/* Magieresistensbonus für höhere Talentwerte */
 	for(i = 0; i < MAXSKILLS; i++){
@@ -4039,7 +4028,7 @@ sp_charmingsong(castorder *co)
 		resist_bonus += tb * 15;
 	}
 	/* Magieresistenz */
-	if (target_resists_magic(mage, target, TYP_UNIT, resist_bonus)){
+	if (target_resists_magic(mage, target, TYP_UNIT, resist_bonus)) {
 		report_failure(mage, co->order);
 		sprintf(buf, "%s fühlt sich einen Moment lang benommen und desorientiert.",
 				unitname(target));
@@ -4096,7 +4085,7 @@ sp_song_resistmagic(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double force = co->force;
-	int duration = force+1;
+	int duration = (int)force+1;
 
 	create_curse(mage, &r->attribs, ct_find("goodmagicresistancezone"),
 			force, duration, mr_bonus, 0);
@@ -4127,7 +4116,7 @@ sp_song_susceptmagic(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double force = co->force;
-	int duration = force+1;
+	int duration = (int)force+1;
 
 	create_curse(mage, &r->attribs, ct_find("badmagicresistancezone"),
 			force, duration, mr_malus, 0);
@@ -4227,7 +4216,7 @@ sp_raisepeasantmob(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double force = co->force;
-	int duration = force+1;
+	int duration = (int)force+1;
 
 	anteil += rand()%4;
 
@@ -4406,10 +4395,8 @@ sp_song_of_peace(castorder *co)
 	int cast_level = co->level;
 	double force = co->force;
 
-	if(force < 2)
-		duration = 0;
-	else
-		duration = lovar(force/2);
+	if (force < 2) duration = 0;
+	else duration = lovar(force/2);
 
 	create_curse(mage,&r->attribs, ct_find("peacezone"), force, duration, 1,0);
 
@@ -4450,7 +4437,7 @@ sp_generous(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double force = co->force;
-	int duration = force+1;
+	int duration = (int)force+1;
 
 	if(is_cursed(r->attribs, C_DEPRESSION, 0)){
 		sprintf(buf, "%s in %s: Die Stimmung in %s ist so schlecht, das "
@@ -4559,13 +4546,11 @@ sp_bigrecruit(castorder *co)
 	}
 	/* Für vergleichbare Erfolge bei unterschiedlichen Rassen die
 	 * Rekrutierungskosten mit einfliessen lassen. */
-	n = (int)((force * force * 1000)/f->race->recruitcost);
-	/* Zufälliger Wert mit n/2 Maximum, mindestens aber force Anzahl */
-	n = force+lovar(n);
+	n = (int)force + lovar((force * force * 1000)/f->race->recruitcost);
 	/* natürlich nur maximal soviele Bauern, wie auch in der Region sind */
-	n = min(rpeasants(r),n);
+	n = min(rpeasants(r), n);
 
-	if(n <= 0){
+	if (n <= 0) {
 		report_failure(mage, co->order);
 		return 0;
 	}
@@ -4711,7 +4696,7 @@ sp_seduce(castorder *co)
 			loot += rand() % 2;
 		}
 		if (loot > 0) {
-			loot = min(loot, force * 5);
+			loot = (int)min(loot, force * 5);
 			scat(", ");
 			icat(loot);
 			scat(" ");
@@ -4773,7 +4758,6 @@ sp_create_nimblefingerring(castorder *co)
 static int
 sp_calm_monster(castorder *co)
 {
-	int duration;
 	curse * c;
 	unit *target;
 	region *r = co->rt;
@@ -4782,8 +4766,6 @@ sp_calm_monster(castorder *co)
 	int cast_level = co->level;
 	double force = co->force;
 	spell *sp = co->sp;
-
-	duration = force;
 
 	/* wenn kein Ziel gefunden, Zauber abbrechen */
 	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -4797,8 +4779,8 @@ sp_calm_monster(castorder *co)
 		return 0;
 	}
 
-	c = create_curse(mage, &target->attribs, ct_find("calmmonster"), force, duration,
-				(int)mage->faction, 0);
+	c = create_curse(mage, &target->attribs, ct_find("calmmonster"), force, 
+    (int)force, (int)mage->faction, 0);
 	if (c==NULL) {
 		report_failure(mage, co->order);
 		return 0;
@@ -4899,7 +4881,7 @@ sp_raisepeasants(castorder *co)
 				MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
-	bauern = min(rpeasants(r),power*250);
+	bauern = (int)min(rpeasants(r), power*250);
 	rsetpeasants(r, rpeasants(r) - bauern);
 
 	u2 = create_unit(r,mage->faction, bauern, new_race[RC_PEASANT], 0,"Wilder Bauernmob",mage);
@@ -4944,7 +4926,7 @@ sp_depression(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double force = co->force;
-	int duration = force+1;
+	int duration = (int)force+1;
 
 	create_curse(mage,&r->attribs, ct_find("depression"), force, duration, 0, 0);
 
@@ -5066,9 +5048,9 @@ sp_puttorest(castorder *co)
 {
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
-	int laid_to_rest = 0;
-	laid_to_rest = dice(co->force * 2, 100);
-	laid_to_rest = max(laid_to_rest, deathcount(r));
+  int dead = deathcount(r);
+  int laid_to_rest = dice((int)(co->force * 2), 100);
+	laid_to_rest = max(laid_to_rest, dead);
 
 	deathcounts(r, -laid_to_rest);
 
@@ -5191,7 +5173,7 @@ sp_illusionary_shapeshift(castorder *co)
 	}
 	{
 		trigger * trestore = trigger_changerace(u, NULL, u->irace);
-		add_trigger(&u->attribs, "timer", trigger_timeout(power+2, trestore));
+		add_trigger(&u->attribs, "timer", trigger_timeout((int)power+2, trestore));
 	}
 	u->irace = rc;
 
@@ -5328,7 +5310,7 @@ sp_baddreams(castorder *co)
 
 	/* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
 	 * also duration+2 */
-	duration = max(1, power/2); /* Stufe 1 macht sonst mist */
+	duration = (int)max(1, power/2); /* Stufe 1 macht sonst mist */
 	duration = 2 + rand()%duration;
 
 	/* Nichts machen als ein entsprechendes Attribut in die Region legen. */
@@ -5367,7 +5349,7 @@ sp_gooddreams(castorder *co)
 
 	/* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
 	 * also duration+2 */
-	duration = max(1, power/2); /* Stufe 1 macht sonst mist */
+	duration = (int)max(1, power/2); /* Stufe 1 macht sonst mist */
 	duration = 2 + rand()%duration;
 	c = create_curse(mage, &r->attribs, ct_find("gbdream"), power, duration, 1, 0);
 	curse_setflag(c, CURSE_ISNEW);
@@ -5482,8 +5464,8 @@ sp_sweetdreams(castorder *co)
 	double power = co->force;
 	spellparameter *pa = co->par;
 	int men, n;
-	int duration = 1+(power/2);
-	int opfer = power*power;
+	int duration = (int)(power/2)+1;
+	int opfer = (int)(power*power);
 
 	/* Schleife über alle angegebenen Einheiten */
 	for (n = 0; n < pa->length; n++) {
@@ -5533,7 +5515,7 @@ sp_disturbingdreams(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double power = co->force;
-	int duration = 1 + (power/6);
+	int duration = 1 + (int)(power/6);
 	curse * c = create_curse(mage, &r->attribs, ct_find("badlearn"), power, duration, 10, 0);
 	curse_setflag(c, CURSE_ISNEW);
 
@@ -5554,7 +5536,7 @@ sp_dream_of_confusion(castorder *co)
 	int cast_level = co->level;
 	double power = co->force;
 	double range = (power-14)/2-1;
-	int duration = ((power-14)/2)*2+1;
+	int duration = (int)(power-14)+1;
 
 	rl = all_in_range(r, (int)range);
 
@@ -5665,7 +5647,7 @@ sp_itemcloak(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double power = co->force;
-	int duration = power+1;
+	int duration = (int)power+1;
 	spellparameter *pa = co->par;
 
 	/* wenn kein Ziel gefunden, Zauber abbrechen */
@@ -5709,7 +5691,7 @@ sp_resist_magic_bonus(castorder *co)
 	spellparameter *pa = co->par;
 
 	/* Pro Stufe können bis zu 5 Personen verzaubert werden */
-	opfer = power * 5;
+	opfer = (int)(power * 5);
 
 	/* Schleife über alle angegebenen Einheiten */
 	for (n = 0; n < pa->length; n++) {
@@ -5802,7 +5784,7 @@ sp_enterastral(castorder *co)
 		return 0;
 	}
 
-	remaining_cap = (power-3) * 1500;
+	remaining_cap = (int)((power-3) * 1500);
 
 	/* für jede Einheit in der Kommandozeile */
 	for (n = 0; n < pa->length; n++) {
@@ -5927,7 +5909,7 @@ sp_pullastral(castorder *co)
 		return 0;
 	}
 
-	remaining_cap = (power-3) * 1500;
+  remaining_cap = (int)((power-3) * 1500);
 
 	/* für jede Einheit in der Kommandozeile */
 	for (n = 1; n < pa->length; n++) {
@@ -6010,47 +5992,45 @@ sp_leaveastral(castorder *co)
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
-	double power = co->force;
-	spellparameter *pa = co->par;
+  double power = co->force;
+  spellparameter *pa = co->par;
 
-	switch(getplaneid(r)) {
-	case 1:
-		ro = r;
-		rt = pa->param[0]->data.r;
-		if(!rt) {
-			addmessage(r, mage->faction, "Dorthin führt kein Weg.",
-				MSG_MAGIC, ML_MISTAKE);
-	    return 0;
-		}
-		rl  = allinhab_in_range(r_astral_to_standard(r), TP_RADIUS);
-		rl2 = rl;
-		while(rl2) {
-			if(rl2->region == rt) break;
-			rl2 = rl2->next;
-		}
-		if(!rl2) {
-			addmessage(r, mage->faction, "Dorthin führt kein Weg.",
-				MSG_MAGIC, ML_MISTAKE);
-			free_regionlist(rl);
-	    return 0;
-		}
-		free_regionlist(rl);
-		break;
-	default:
-		sprintf(buf, "Der Zauber funktioniert nur in der astralen Welt.");
-		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
-		return 0;
-	}
+  switch(getplaneid(r)) {
+  case 1:
+    ro = r;
+    rt = pa->param[0]->data.r;
+    if(!rt) {
+      addmessage(r, mage->faction, "Dorthin führt kein Weg.",
+        MSG_MAGIC, ML_MISTAKE);
+      return 0;
+    }
+    rl  = allinhab_in_range(r_astral_to_standard(r), TP_RADIUS);
+    rl2 = rl;
+    while(rl2) {
+      if(rl2->region == rt) break;
+      rl2 = rl2->next;
+    }
+    if(!rl2) {
+      addmessage(r, mage->faction, "Dorthin führt kein Weg.",
+        MSG_MAGIC, ML_MISTAKE);
+      free_regionlist(rl);
+      return 0;
+    }
+    free_regionlist(rl);
+    break;
+  default:
+    sprintf(buf, "Der Zauber funktioniert nur in der astralen Welt.");
+    addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+    return 0;
+  }
 
-	if(!ro
-			|| is_cursed(ro->attribs, C_ASTRALBLOCK, 0)
-			|| is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
-		sprintf(buf, "Die Wege aus dieser astralen Region sind blockiert.");
-		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
-		return 0;
-	}
-
-	remaining_cap = (power-3) * 1500;
+  if (ro==NULL || is_cursed(ro->attribs, C_ASTRALBLOCK, 0) || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
+    sprintf(buf, "Die Wege aus dieser astralen Region sind blockiert.");
+    addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
+      return 0;
+  }
+  
+  remaining_cap = (int)((power-3) * 1500);
 
 	/* für jede Einheit in der Kommandozeile */
 	for (n = 1; n < pa->length; n++) {
@@ -6157,7 +6137,7 @@ sp_fetchastral(castorder *co)
 		return 0;
 	}
 
-	remaining_cap = (power-3) * 1500;
+  remaining_cap = (int)((power-3) * 1500);
 
 	/* für jede Einheit in der Kommandozeile */
 	for (n = 0; n < pa->length; n++) {
@@ -6379,7 +6359,7 @@ sp_disruptastral(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double power = co->force;
-	int duration = (power/3)+1;
+	int duration = (int)(power/3)+1;
 
 	switch(getplaneid(r)) {
 	case 0:
@@ -6399,7 +6379,7 @@ sp_disruptastral(castorder *co)
 		return 0;
 	}
 
-	rl = all_in_range(rt, power/5);
+	rl = all_in_range(rt, (int)(power/5));
 
 	for(rl2=rl; rl; rl=rl->next) {
 		attrib *a, *a2;
@@ -6848,13 +6828,13 @@ sp_create_antimagiccrystal(castorder *co)
 int
 sp_antimagiczone(castorder *co)
 {
-	int power;
+	double power;
 	int effect;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double force = co->force;
-	int duration = force+1;
+	int duration = (int)force+1;
 
 	/* Hält Sprüche bis zu einem summierten Gesamtlevel von power aus.
 	 * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
@@ -7111,7 +7091,6 @@ sp_destroy_curse(castorder *co)
 	attrib **ap;
 	int obj;
 	curse * c;
-	int succ = 0;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
@@ -7176,10 +7155,9 @@ sp_destroy_curse(castorder *co)
 		}
 
 		/* curse auflösen, wenn zauber stärker (force > vigour)*/
-		succ = c->vigour - force;
-		c->vigour = max(0, succ);
+		c->vigour -= force;
 
-		if(succ <= 0) {
+		if (c->vigour <= 0.0) {
 			remove_curse(ap, c);
 
 			add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -7192,7 +7170,7 @@ sp_destroy_curse(castorder *co)
 				mage, mage->region, strdup(co->order)));
 		}
 	}
-	if(ts != NULL) free(ts);
+	if (ts != NULL) free(ts);
 
 	return cast_level;
 }
@@ -7247,11 +7225,10 @@ sp_earn_silver(castorder *co)
 	unit *mage = (unit *)co->magician;
 	double force = co->force;
 	region *r = co->rt;
-	int wanted, earned;
+	int wanted = (int)(force * 50);
+	int earned = min(rmoney(r), wanted);
 
-	wanted = force * 50;
-	earned = min(rmoney(r), wanted);
-	rsetmoney(r, rmoney(r) - earned);
+  rsetmoney(r, rmoney(r) - earned);
 	change_money(mage, earned);
 	/* TODO klären: ist das Silber damit schon reserviert? */
 

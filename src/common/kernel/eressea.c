@@ -2949,6 +2949,14 @@ produceexp(struct unit * u, skill_t sk, int n)
 	return 0;
 }
 
+int
+lovar(double xpct_x2)
+{
+  int n = (int)(xpct_x2 * 500)+1;
+  if (n==0) return 0;
+	return (rand() % n + rand() % n)/1000;
+}
+
 boolean
 teure_talente (const struct unit * u)
 {

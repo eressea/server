@@ -3436,10 +3436,6 @@ defaultorders (void)
 	list_next(r);
 }
 
-#ifdef SKILLFIX_SAVE
-void write_skillfix(void);
-#endif
-
 /* ************************************************************ */
 /* GANZ WICHTIG! ALLE GEÄNDERTEN SPRÜCHE NEU ANZEIGEN */
 /* GANZ WICHTIG! FÜGT AUCH NEUE ZAUBER IN DIE LISTE DER BEKANNTEN EIN */
@@ -3675,9 +3671,6 @@ processorders (void)
 	puts(" - Attribute altern");
 	ageing();
 
-#ifdef SKILLFIX_SAVE
-	write_skillfix();
-#endif
 	/* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
 	 * Beschreibungen geändert haben */
 	update_spells();

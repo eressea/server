@@ -796,7 +796,7 @@ sp_shadowcall(fighter * fi, int level, int power, spell * sp)
 	a->data.ca[1] = 100;
 	a_add(&u->attribs, a);
 
-	make_fighter(b, u, true);
+	make_fighter(b, u, fi->side, fval(fi, FIG_ATTACKED));
 	sprintf(buf, "%s ruft %d %s zu Hilfe", unitname(mage), force,
 		racename(default_locale, u, u->race));
 	battlerecord(b, buf);
@@ -829,7 +829,7 @@ sp_wolfhowl(fighter * fi, int level, int power, spell * sp)
 	a->data.ca[1] = 100;
 	a_add(&u->attribs, a);
 
-	make_fighter(b, u, true);
+	make_fighter(b, u, fi->side, fval(fi, FIG_ATTACKED));
 	sprintf(buf, "%s ruft %d %s zu Hilfe", unitname(mage), force,
 		racename(default_locale, u, u->race));
 	battlerecord(b, buf);
@@ -863,7 +863,7 @@ sp_shadowknights(fighter * fi, int level, int power, spell * sp)
 	a->data.ca[1] = 100;
 	a_add(&u->attribs, a);
 
-	make_fighter(b, u, true);
+	make_fighter(b, u, fi->side, fval(fi, FIG_ATTACKED));
 
 	sprintf(buf, "%s beschwört Trugbilder herauf", unitname(mage));
 	battlerecord(b, buf);

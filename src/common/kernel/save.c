@@ -882,11 +882,7 @@ readgame(const char * filename, int backup)
 	global.data_version = ri(F);
 	assert(global.data_version>=MIN_VERSION || !"unsupported data format");
 	assert(global.data_version<=RELEASE_VERSION || !"unsupported data format");
-#ifdef CONVERT_TRIGGER
-	assert(global.data_version < NEWSOURCE_VERSION);
-#else
 	assert(global.data_version >= NEWSOURCE_VERSION);
-#endif
 	if(global.data_version >= SAVEXMLNAME_VERSION) {
 		char basefile[1024];
 		const char *basearg = "(null)";

@@ -812,7 +812,8 @@ use_antimagiccrystal(region * r, unit * mage, int amount, strlist * cmdstrings)
 {
 	int i;
 	for (i=0;i!=amount;++i) {
-		int effect, force, duration = 2;
+		int effect, duration = 2;
+    double force;
 		spell *sp = find_spellbyid(SPL_ANTIMAGICZONE);
 		attrib ** ap = &r->attribs;
 		unused(cmdstrings);

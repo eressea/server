@@ -33,7 +33,7 @@
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="4"
-				SuppressStartupBanner="FALSE"
+				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="1"
 				CompileAs="0"/>
 			<Tool

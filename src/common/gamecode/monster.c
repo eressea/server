@@ -654,7 +654,7 @@ eaten_by_monster(unit * u)
 		n = lovar(n);
 		n = min(rpeasants(u->region), n);
 
-		if(n > 0) {
+		if (n > 0) {
 			deathcounts(u->region, n);
 			rsetpeasants(u->region, rpeasants(u->region) - n);
 			add_message(&u->region->msgs, new_message(NULL,
@@ -982,11 +982,7 @@ plan_monsters(void)
 				}
 				else a_remove(&u->attribs, ta);
 			}
-#ifdef CONVERT_TRIGGER
-			ta = set_new_dragon_target(u, r, DRAGON_RANGE);
-#else
 			ta = a_find(u->attribs, &at_targetregion);
-#endif
 			if (ta!=NULL) {
 				tr = (region *) ta->data.v;
 				if (tr != r) is_moving = true;

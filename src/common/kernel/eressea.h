@@ -977,7 +977,8 @@ boolean cansee_durchgezogen(const struct faction * f, const struct region * r, c
 boolean seefaction(const struct faction * f, const struct region * r, const struct unit * u, int modifier);
 extern int effskill(const struct unit * u, skill_t sk);
 
-int lovar(int n);
+extern int lovar(double xpct_x2); 
+  /* returns a value between [0..xpct_2], generated with two dice */
 
 int distribute(int old, int new_value, int n);
 

@@ -1297,15 +1297,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	return true;
 }
 
-int
-lovar(int n)
-{
-	assert(n > 0);
-	if (n == 1) return rand()%2;
-	n /= 2;
-	return (rand() % n + 1) + (rand() % n + 1);
-}
-
 /* ------------------------------------------------------------- */
 int
 count_enemies(battle * b, side * as, int mask, int minrow, int maxrow)
@@ -1446,7 +1437,7 @@ do_combatmagic(battle *b, combatmagic_t was)
 	region *r = b->region;
 	castorder *co;
 	castorder *cll[MAX_SPELLRANK];
-	int level, power;
+	int level;
 	int spellrank;
 	int sl;
 
@@ -1464,6 +1455,7 @@ do_combatmagic(battle *b, combatmagic_t was)
 
 		level = eff_skill(mage, SK_MAGIC, r);
 		if (level > 0) {
+      double power;
 			const struct locale * lang = mage->faction->locale;
 			char cmd[128];
 
@@ -1520,10 +1512,10 @@ do_combatmagic(battle *b, combatmagic_t was)
 	}
 	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
 		for (co = cll[spellrank]; co; co = co->next) {
-			fig = (fighter*)co->magician;
-			sp = co->sp;
-			level = co->level;
-			power = co->force;
+			fighter * fig = (fighter*)co->magician;
+			spell * sp = co->sp;
+			int level = co->level;
+			double power = co->force;
 
 			level = ((cspell_f)sp->sp_function)(fig, level, power, sp);
 			if (level > 0) {
@@ -1548,7 +1540,8 @@ do_combatspell(troop at, int row)
 	unit *mage = fi->unit;
 	battle *b = fi->side->battle;
 	region *r = b->region;
-	int level, power;
+	int level;
+  double power;
 	int fumblechance = 0;
 	void **mg;
 	int sl;
@@ -2747,7 +2740,7 @@ weapon_weight(const weapon * w, boolean missile)
 }
 
 fighter *
-make_fighter(battle * b, unit * u, boolean attack)
+make_fighter(battle * b, unit * u, side * s1, boolean attack)
 {
 #define WMAX 16
 	weapon weapons[WMAX];
@@ -2758,7 +2751,7 @@ make_fighter(battle * b, unit * u, boolean attack)
 	item * itm;
 	fighter *fig = NULL;
 	int i, t = eff_skill(u, SK_TACTICS, r);
-	side *s2, *s1 = NULL;
+	side *s2;
 	int h;
 	int berserk;
 	int strongmen;
@@ -2775,22 +2768,24 @@ make_fighter(battle * b, unit * u, boolean attack)
 	if (fval(u->race, RCF_ILLUSIONARY) || idle(u->faction))
 		return NULL;
 
-	cv_foreach(s2, b->sides) {
-		if (s2->bf->faction == u->faction
-				&& s2->stealth==stealth
-				&& s2->stealthfaction == stealthfaction
-				) {
-			if (s2->group==g) {
-				s1 = s2;
-				break;
-			}
-		}
-	} cv_next(s2);
+  if (s1==NULL) {
+    cv_foreach(s2, b->sides) {
+      if (s2->bf->faction == u->faction
+        && s2->stealth==stealth
+        && s2->stealthfaction == stealthfaction
+        ) {
+          if (s2->group==g) {
+            s1 = s2;
+            break;
+          }
+        }
+    } cv_next(s2);
 
-	/* aliances are moved out of make_fighter and will be handled later */
-	if (!s1) s1 = make_side(b, u->faction, g, stealth, stealthfaction);
-	/* Zu diesem Zeitpunkt ist attacked noch 0, da die Einheit für noch
-	 * keinen Kampf ausgewählt wurde (sonst würde ein fighter existieren) */
+    /* aliances are moved out of make_fighter and will be handled later */
+    if (!s1) s1 = make_side(b, u->faction, g, stealth, stealthfaction);
+    /* Zu diesem Zeitpunkt ist attacked noch 0, da die Einheit für noch
+    * keinen Kampf ausgewählt wurde (sonst würde ein fighter existieren) */
+  }
 	fig = calloc(1, sizeof(struct fighter));
 
 	cv_pushback(&s1->fighters, fig);
@@ -3043,7 +3038,7 @@ join_battle(battle * b, unit * u, boolean attack)
 		}
 	}
 	cv_next(fig);
-	if (!c) c = make_fighter(b, u, attack);
+	if (!c) c = make_fighter(b, u, NULL, attack);
 	return c;
 }
 static const char *

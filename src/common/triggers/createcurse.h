@@ -28,7 +28,7 @@ struct unit;
 
 extern struct trigger_type tt_createcurse;
 
-extern struct trigger * trigger_createcurse(struct unit * mage, struct unit * target, const struct curse_type * ct, int vigour, int duration, int effect, int men);
+extern struct trigger * trigger_createcurse(struct unit * mage, struct unit * target, const struct curse_type * ct, double vigour, int duration, int effect, int men);
 
 #ifdef __cplusplus
 }
