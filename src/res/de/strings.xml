@@ -3033,11 +3033,11 @@
 			<text locale="de">Phönixe</text>
 			<text locale="en">phoenixes</text>
 		</string>
-		<string name="troll_d">
+		<string name="phoenix_d">
 			<text locale="de">Phönixen</text>
 			<text locale="en">phoenixes</text>
 		</string>
-		<string name="troll_x">
+		<string name="phoenix_x">
 			<text locale="de">Phönix</text>
 			<text locale="en">phoenix</text>
 		</string>
