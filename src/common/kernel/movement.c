@@ -1366,42 +1366,42 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
         ut = getunit(first, u->faction);
         if (ut) {
           boolean found = false;
-          if (get_keyword(ut->thisorder) == K_DRIVE
-            && !fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
+          if (get_keyword(ut->thisorder) == K_DRIVE) {
+            if (!fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
               init_tokens(ut->thisorder);
               skip_token();
               u2 = getunit(first, ut->faction);
-              if(u2 == u) {
+              if (u2 == u) {
                 found = true;
                 add_message(&u->faction->msgs, new_message(
                   u->faction, "transport%u:unit%u:target%r:start%r:end",
                   u, ut, first, current));
-                if(!(terrain[current->terrain].flags & WALK_INTO)
-                  && get_item(ut, I_HORSE)) {
-                    cmistake(u, u->thisorder, 67, MSG_MOVE);
-                    cmistake(ut, ut->thisorder, 67, MSG_MOVE);
-                    continue;
+                if (!(terrain[current->terrain].flags & WALK_INTO) && get_item(ut, I_HORSE)) {
+                  cmistake(u, u->thisorder, 67, MSG_MOVE);
+                  cmistake(ut, ut->thisorder, 67, MSG_MOVE);
+                  continue;
+                }
+                if (can_survive(ut, current)) {
+                  travel_route(ut, ut->region, route);
+                  move_unit(ut, current, NULL);
+                  if (fval(ut, UFL_FOLLOWED) && route!=NULL) {
+                    followers += notify_followers(first, ut, route);
                   }
-                  if (can_survive(ut, current)) {
-                    travel_route(ut, ut->region, route);
-                    move_unit(ut, current, NULL);
-                    if (fval(ut, UFL_FOLLOWED) && route!=NULL) {
-                      followers += notify_followers(first, ut, route);
-                    }
-                  } else {
-                    cmistake(u, u->thisorder, 287, MSG_MOVE);
-                    cmistake(ut, ut->thisorder, 230, MSG_MOVE);
-                    continue;
-                  }
+                } else {
+                  cmistake(u, u->thisorder, 287, MSG_MOVE);
+                  cmistake(ut, ut->thisorder, 230, MSG_MOVE);
+                  continue;
+                }
               }
             }
-            if (!found) {
-              if(cansee(u->faction, u->region, ut, 0)) {
-                cmistake(u, u->thisorder, 90, MSG_MOVE);
-              } else {
-                cmistake(u, u->thisorder, 63, MSG_MOVE);
-              }
+          }
+          if (!found) {
+            if (cansee(u->faction, u->region, ut, 0)) {
+              cmistake(u, u->thisorder, 90, MSG_MOVE);
+            } else {
+              cmistake(u, u->thisorder, 63, MSG_MOVE);
             }
+          }
         } else {
           if (ut) {
             cmistake(u, u->thisorder, 63, MSG_MOVE);

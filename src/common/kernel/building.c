@@ -469,15 +469,34 @@ void
 destroy_building(building * b)
 {
 	unit *u;
+  direction_t d;
+  static const struct building_type * bt_caravan, * bt_dam, * bt_tunnel;
+  boolean init = false;
 
-	if(!bfindhash(b->no)) return;
-	for(u=b->region->units; u; u=u->next) {
-		if(u->building == b) leave(b->region, u);
+  if (!init) {
+    init = true;
+    bt_caravan = bt_find("caravan");
+    bt_dam = bt_find("dam");
+    bt_tunnel = bt_find("tunnel");
+  }
+
+	if (!bfindhash(b->no)) return;
+	for (u=b->region->units; u; u=u->next) {
+		if (u->building == b) leave(b->region, u);
 	}
 
 	b->size = 0;
 	update_lighthouse(b);
 	bunhash(b);
+
+  /* Falls Karawanserei, Damm oder Tunnel einstürzen, wird die schon
+   * gebaute Straße zur Hälfte vernichtet */
+  if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
+    region * r = b->region;
+    for (d=0;d!=MAXDIRECTIONS;++d) if (rroad(r, d) > 0) {
+      rsetroad(r, d, rroad(r, d) / 2);
+    }
+  }
 
 #if 0	/* Memoryleak. Aber ohne klappt das Rendern nicht! */
 	removelist(&b->region->buildings, b);

@@ -841,20 +841,7 @@ gebaeude_stuerzt_ein(region * r, building * b)
 	int opfer = 0;
 	int road = 0;
 	struct message * msg;
-	/*
-	"$building($crashed) stürzte ein.$if($road," Beim Einsturz wurde die halbe Straße vernichtet.","")$if($victims,"$int($victims) $if($eq($victims,1),"ist","sind"),"") zu beklagen."
-	*/
 
-	/* Falls Karawanserei, Damm oder Tunnel einstürzen, wird die schon
-	* gebaute Straße zur Hälfte vernichtet */
-	for (d=0;d!=MAXDIRECTIONS;++d) if (rroad(r, d) > 0 &&
-		(b->type == bt_find("caravan") ||
-		b->type == bt_find("dam") ||
-		b->type == bt_find("tunnel")))
-	{
-		rsetroad(r, d, rroad(r, d) / 2);
-		road = 1;
-	}
 	for (u = r->units; u; u = u->next) {
 		if (u->building == b) {
 			int loss = 0;
@@ -873,6 +860,15 @@ gebaeude_stuerzt_ein(region * r, building * b)
 		}
 	}
 
+  /* Falls Karawanserei, Damm oder Tunnel einstürzen, wird die schon
+  * gebaute Straße zur Hälfte vernichtet */
+  if (b->type == bt_find("caravan") || b->type == bt_find("dam") || b->type == bt_find("tunnel")) {
+    for (d=0;d!=MAXDIRECTIONS;++d) if (rroad(r, d) > 0) {
+      road = 1;
+      /* vernichtung findet erst in destroy_building statt! */
+      break;
+    }
+  }
 	msg = msg_message("buildingcrash", "region building opfer road", r, b, opfer, road);
 	add_message(&r->msgs, msg);
 	for (u=r->units; u; u=u->next) {
