@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.3 2001/01/28 09:47:10 enno Exp $
+ *	$Id: laws.c,v 1.4 2001/01/29 19:15:12 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1277,7 +1277,7 @@ set_name(region * r, unit * u, strlist * S)
 				break;
 			}
 			if (!fval(u,FL_UNNAMED)) {
-				cmistake(u, S->s, 64, MSG_EVENT);
+				cmistake(u, S->s, 244, MSG_EVENT);
 				break;
 			}
 			if (cansee(u2->faction, r, u, 0)) {

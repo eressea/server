@@ -10,6 +10,9 @@ DEPEND  = g++ -MM -MG -r
 AR      = ar
 ARFLAGS = cr
 
+CTAGS      = ctags
+CTAGSFLAGS = --langmap=c:.c.h
+
 CC      = gcc
 CFLAGS  = -I$(ERESSEA) -Wall -Wwrite-strings -Wstrict-prototypes \
            -Wpointer-arith -Werror-implicit-function-declaration \
@@ -78,6 +81,12 @@ depend::
 	$(DEPEND) $(CFLAGS) $(DEFINES) $(INCDIRS) $(SOURCES) >| .depend
 endif
 
+#
+## Tags
+#
+tags:
+	@echo "Creating tags in `pwd`/tags";
+	$(CTAGS) $(CTAGSFLAGS) --recurse=yes -f $(ERESSEA)/tags $(ERESSEA)
 
 
 PUBLISH_DIR = $(ERESSEA)/$(BUILD_DIR)
