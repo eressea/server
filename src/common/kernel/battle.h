@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 /** new code defines **/
-#define FAST_GETUNITROW
+#undef FAST_GETUNITROW
 
 /** more defines **/
 #define FS_ENEMY 1

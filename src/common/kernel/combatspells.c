@@ -28,6 +28,7 @@
 
 /* util includes */
 #include <rand.h>
+#include <base36.h>
 
 /* libc includes */
 #include <assert.h>
