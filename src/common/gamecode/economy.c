@@ -573,8 +573,9 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 	} else if (u == u2) {
 		error = 10;
 #if RACE_ADJUSTMENTS
-	} else if (u->race == new_race[RC_URUK] || u->race == new_race[RC_SNOTLING]) {
-		/* Uruks/Snotlings können nicht an Bauern übergeben werden. */
+	}
+	  else if (u->race == new_race[RC_SNOTLING]) {
+		/* Snotlings können nicht an Bauern übergeben werden. */
 		error = 307;
 #endif
 	} else if ((u && unit_has_cursed_item(u)) || (u2 && unit_has_cursed_item(u2))) {

@@ -4308,7 +4308,7 @@
 		</type>
 		<locale name="de">
 			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Orks sind keine Bauern."</text>
+				<text>"$unit($unit) in $region($region): '$command' - Snotlinge sind zu dumm, um auf den Feldern zu arbeiten."</text>
 			</nr>
 		</locale>
 	</message>
