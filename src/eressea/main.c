@@ -558,8 +558,6 @@ typedef struct lostdata {
 	int ship;
 } lostdata;
 
-static unit * lostunits;
-
 int
 main(int argc, char *argv[])
 {

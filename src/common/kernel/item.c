@@ -2432,7 +2432,7 @@ rt_read(FILE * F)
 {
 	resource_type * rt = calloc(sizeof(resource_type), 1);
 	unsigned int hash;
-	int i = fscanf(F, "%d\n", &hash);
+	int i = fscanf(F, "%ud\n", &hash);
 	if (i==0 || i==EOF) {
 		free(rt);
 		return NULL;
