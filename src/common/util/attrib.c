@@ -108,7 +108,7 @@ a_add(attrib ** pa, attrib * a)
 	}
 	if (a->type->flags & ATF_UNIQUE && *find) {
 		if ((*find)->type == a->type) {
-			log_printf(stderr, "duplicate attribute: %s\n", a->type->name);
+			log_error(("duplicate attribute: %s\n", a->type->name));
 			return a;
 		}
 	}
