@@ -1835,7 +1835,7 @@ writeunit(FILE * F, const unit * u)
 
 	for (i=0;i!=u->skill_size;++i) {
 		skill * sv = u->skills+i;
-		assert(sv->level>=0 && sv->weeks>=0 && sv->weeks<=sv->level*2+1);
+		assert(sv->weeks<=sv->level*2+1);
 		if (sv->level>0) {
 			wi(F, sv->id);
 			wi(F, sv->level);
@@ -1890,7 +1890,7 @@ readregion(FILE * F, int x, int y)
 		while (r->attribs) a_remove(&r->attribs, r->attribs);
 		if (r->land) {
 			free(r->land); /* mem leak */
-			r->land->demands;
+			r->land->demands = 0; /* mem leak */
 		}
 		while (r->resources) {
 			rawmaterial * rm = r->resources;

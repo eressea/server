@@ -696,7 +696,7 @@ transfermen(unit * u, unit * u2, int n)
 				if (sn==NULL) sn = add_skill(u2, sk);
 				sn->level = (unsigned char)level;
 				sn->weeks = (unsigned char)weeks;
-				assert(sn->level>=0 && sn->weeks>0 && sn->weeks<=sn->level*2+1);
+				assert(sn->weeks>0 && sn->weeks<=sn->level*2+1);
 			} else if (sn) {
 				sk_set(sn, 0);
 			}
@@ -863,7 +863,6 @@ get_skill(const unit * u, skill_t sk)
 {
 	skill * sv = u->skills;
 	while (sv!=u->skills+u->skill_size) {
-		assert(sv->level>=0 && sv->weeks>=0);
 		if (sv->id==sk) return sv;
 		++sv;
 	}
@@ -875,7 +874,6 @@ has_skill(const unit * u, skill_t sk)
 {
 	skill * sv = u->skills;
 	while (sv!=u->skills+u->skill_size) {
-		assert(sv->level>=0 && sv->weeks>=0);
 		if (sv->id==sk) {
 			return (sv->level>0);
 		}
