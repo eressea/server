@@ -583,7 +583,7 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 		error = 73;
 	} else if (u2 && (has_skill(u, SK_MAGIC) || has_skill(u2, SK_MAGIC))) {
 		error = 158;
-	} else if (fval(u, UFL_WERE) != fval(u2, UFL_WERE)) {
+	} else if (u2 && fval(u, UFL_WERE) != fval(u2, UFL_WERE)) {
 		error = 312;
 	} else {
 		if (n > u->number) n = u->number;

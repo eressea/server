@@ -2936,7 +2936,7 @@ cw_read(attrib * a, FILE * f)
 
 	curse_read(a, f);
 	br->self = c;
-	fscanf(f, "%d ", &br->id);
+	fscanf(f, "%u ", &br->id);
 	ur_add((void *)br->id, (void**)&wc->wall, resolve_borderid);
 	ur_add((void *)br, (void**)&wc->buddy, resolve_buddy);
 	return AT_READ_OK;
@@ -4934,7 +4934,7 @@ sp_icastle(castorder *co)
 	spellparameter *pa = co->par;
 	icastle_data * data;
 
-	if((type=bt_find(pa->param[0]->data.s)) == NOBUILDING) {
+	if((type=findbuildingtype(pa->param[0]->data.s, mage->faction->locale)) == NULL) {
 		type = bt_find("castle");
 	}
 
