@@ -14,7 +14,7 @@ SOURCES =
  gmcmd.c
  infocmd.c
  museum.c
- oceannames.c
+# oceannames.c
  score.c
  victoryconditions.c
  weather.c

@@ -12,6 +12,12 @@ if ! $(CCACHE_DIR) {
   Echo Compiling with ccache ;
 }
 
+if $(PROFILE) = 1 {
+  Echo Compiling with profiler ;
+  CCFLAGS += -pg ;
+  LINKFLAGS += -pg ;
+}
+
 CCFLAGS += -Wall ;
 
 CCFLAGS += -Wwrite-strings 

@@ -38,7 +38,7 @@ namehash names[NMAXHASH];
 void nhash(const char * name);
 
 typedef struct oceanname {
-	struct name * next;
+	struct oceanname * next;
 	struct faction_list * factions;
 	const char * name;
 } oceanname;

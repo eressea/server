@@ -157,7 +157,7 @@ const troop no_troop = {0, 0};
 region *
 fleeregion(const unit * u)
 {
-	const region *r = u->region;
+	region *r = u->region;
 	region *neighbours[MAXDIRECTIONS];
 	int c = 0;
 	direction_t i;

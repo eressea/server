@@ -889,20 +889,18 @@ readgame(const char * filename, int backup)
 #endif
 	if(global.data_version >= SAVEXMLNAME_VERSION) {
 		char basefile[1024];
-		char *basearg;
+		const char *basearg = "(null)";
 
 		rs(F, basefile);
-		if(xmlfile != NULL) {
+		if (xmlfile != NULL) {
 			basearg = strrchr(xmlfile, '/');
-			if(!basearg) {
+			if (basearg==NULL) {
 				basearg = xmlfile;
 			} else {
-				basearg++;
+				++basearg;
 			}
-		} else {
-			basearg = "(null)";
 		}
-		if(strcmp(basearg, basefile)) {
+		if (strcmp(basearg, basefile)!=0) {
 			printf("WARNING: xmlfile mismatch:\n");
 			printf("WARNING: datafile contains %s\n", basefile);
 			printf("WARNING: argument/default is %s\n", basearg);
