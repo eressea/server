@@ -422,7 +422,12 @@ rt_find(const char * name)
 	return rtype;
 }
 
-static const char * it_aliases[2][2] = { { "Runenschwert", "runesword" }, { NULL, NULL } };
+static const char * it_aliases[][2] = { 
+	{ "Runenschwert", "runesword" }, 
+	{ "p12", "truthpotion" },
+	{ "p1", "goliathwater" },
+	{ NULL, NULL },
+};
 static const char *
 it_alias(const char * zname)
 {
@@ -1382,7 +1387,7 @@ static translate_t translation[] = {
 	{ "Weihrauch", "incense", "incense_p", "incense", "incense_p" },
 	{ "Bihänder", "greatsword", "greatsword_p", "greatsword", "greatsword_p" },
 	{ "Laen", "laen", "laen_p", "laen", "laen_p" },
-	{ "Goliathwasser", "p1", "p1_p", NULL, NULL },
+	{ "Goliathwasser", "goliathwater", "goliathwater_p", NULL, NULL },
 	{ "Wasser des Lebens", "p2", "p2_p", NULL, NULL },
 	{ "Bauernblut", "p5", "p5_p", NULL, NULL },
 	{ "Gehirnschmalz", "p6", "p6_p", NULL, NULL },

@@ -1816,12 +1816,13 @@ zero_quest(void)
 {
 	const char * name = "Sergint Saiquent";
 	plane * p = getplanebyname(name);
-#ifdef ZEROFOKS_QUESTE /* "gregorjochmann@gmx.de" */
-	if (p==NULL {
+#ifdef ZEROFOKS_QUESTMASTER /* "gregorjochmann@gmx.de" */
+	if (p==NULL) {
 		region * center;
 		p = gm_addplane(4, 0, name);
 		center = findregion(p->minx+(p->maxx-p->minx)/2, p->miny+(p->maxy-p->miny)/2);
 		gm_addfaction(ZEROFOKS_QUESTMASTER, p, center);
+		return 0;
 	}
 #endif
 	if (p!=NULL) {

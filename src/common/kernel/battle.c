@@ -2482,7 +2482,11 @@ aftermath(battle * b)
 				 * for each of them, a peasant will die as well */
 				is += dead;
 			}
-			assert(du->hp >= du->number || !"unit has less hitpoints than people");
+			if (du->hp < du->number) {
+				log_error(("%s has less hitpoints (%u) than people (%u)\n",
+						  itoa36(du->no), du->hp, du->number));
+				du->hp=du->no;
+			}
 		} next(df);
 	} next(s);
 	dead_peasants = min(rpeasants(r), (is*BATTLE_KILLS_PEASANTS)/100);

@@ -2126,7 +2126,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	for (a=a_find(f->attribs, &at_showitem);a;a=a->nexttype) {
 		const potion_type * ptype = resource2potion(((const item_type*)a->data.v)->rtype);
 		const char * description = NULL;
-		const char * pname = ptype->resourcename(ptype->itype->rtype, 0);
+		const char * pname = resourcename(ptype->itype->rtype, 0);
 		requirement * m;
 		if (ptype==NULL) continue;
 		m = ptype->itype->construction->materials;
@@ -2149,7 +2149,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 		}
 		centre(F, buf, true);
 		rnl(F);
-		description = LOC(mkname("potion", pname));
+		description = LOC(f->locale, mkname("potion", pname));
 		if (description==pname) description = ptype->text;
 		centre(F, description, true);
 	}

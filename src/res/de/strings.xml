@@ -1459,7 +1459,7 @@
 	<string name="p0">
 		<text locale="de">Siebenmeilentee</text>
 	</string>
-	<string name="p1">
+	<string name="goliathwater">
 		<text locale="de">Goliathwasser</text>
 	</string>
 	<string name="p2">
@@ -1505,7 +1505,7 @@
 	<string name="p0_p">
 		<text locale="de">Siebenmeilentees</text>
 	</string>
-	<string name="goliathwater">
+	<string name="goliathwater_p">
 		<text locale="de">Goliathwasser</text>
 	</string>
 	<string name="p2_p">
