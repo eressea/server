@@ -2810,8 +2810,8 @@ reports(void)
 
 				if (!nonr && f->options & wants_report)
 					fprintf(shfp,
-						" \\\n\t\"application/x-bzip2\" \"Report\" %s.nr.bz2",
-						factionid(f));
+						" \\\n\t\"application/x-bzip2\" \"Report\" %d-%s.nr.bz2",
+						turn,factionid(f));
 
 				if (!nocr && (f->options & wants_computer_report || f->age<3))
 					fprintf(shfp,
