@@ -1013,11 +1013,13 @@ get_seen_interval(region ** first, region ** last)
       first = r;
       break;
     }
+    r = r->next;
   }
   while (r!=NULL) {
     if (find_seen(r)!=NULL) {
       last = r;
     }
+    r = r->next;
   }
 }
 
