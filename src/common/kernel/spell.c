@@ -1280,8 +1280,8 @@ patzer_ents(castorder *co)
 
 	/* 'Erfolg' melden */
 	ADDMSG(&mage->faction->msgs, msg_message(
-				"regionmagic_patzer", "unit region command unit", mage,
-				mage->region, co->order, mage));
+				"regionmagic_patzer", "unit region command", mage,
+				mage->region, co->order));
 
 	/* melden, 1x pro Partei */
 	{
@@ -2806,8 +2806,8 @@ sp_summondragon(castorder *co)
 	}
 
 	ADDMSG(&mage->faction->msgs, msg_message(
-				"summondragon", "unit region command unit region",
-				mage, mage->region, co->order,mage, co->rt));
+				"summondragon", "unit region command region",
+				mage, mage->region, co->order, co->rt));
 
 	free_regionlist(rl);
 	return cast_level;
@@ -4134,8 +4134,8 @@ sp_song_resistmagic(castorder *co)
 
 	/* Erfolg melden */
 	ADDMSG(&mage->faction->msgs, msg_message(
-				"regionmagic_effect", "unit region command unit", mage,
-				mage->region, co->order, mage));
+				"regionmagic_effect", "unit region command", mage,
+				mage->region, co->order));
 
 	return cast_level;
 }
@@ -4164,8 +4164,8 @@ sp_song_susceptmagic(castorder *co)
 			force, duration, mr_malus, 0);
 
 	ADDMSG(&mage->faction->msgs, msg_message(
-				"regionmagic_effect", "unit region command unit", mage,
-				mage->region, co->order, mage));
+				"regionmagic_effect", "unit region command", mage,
+				mage->region, co->order));
 
 	return cast_level;
 }
@@ -5027,8 +5027,8 @@ sp_dragonsong(castorder *co)
 	}
 
 	ADDMSG(&mage->faction->msgs, msg_message(
-				"summondragon", "unit region command unit region",
-				mage, mage->region, co->order,mage, co->rt));
+				"summondragon", "unit region command region",
+				mage, mage->region, co->order, co->rt));
 
 	free_regionlist(rl);
 	return cast_level;
@@ -5059,8 +5059,8 @@ sp_songofAttraction(castorder *co)
 	/* TODO Wander Effekt */
 
 	ADDMSG(&mage->faction->msgs, msg_message(
-				"summon", "unit region command unit region",
-				mage, mage->region, co->order,mage, r));
+				"summon", "unit region command region",
+				mage, mage->region, co->order, r));
 
 	return cast_level;
 }
@@ -5356,8 +5356,8 @@ sp_baddreams(castorder *co)
 
 	/* Erfolg melden*/
 	ADDMSG(&mage->faction->msgs, msg_message(
-				"regionmagic_effect", "unit region command unit", mage,
-				mage->region, co->order, mage));
+				"regionmagic_effect", "unit region command", mage,
+				mage->region, co->order));
 
 	return cast_level;
 }
@@ -5393,8 +5393,8 @@ sp_gooddreams(castorder *co)
 
 	/* Erfolg melden*/
 	ADDMSG(&mage->faction->msgs, msg_message(
-				"regionmagic_effect", "unit region command unit", mage,
-				mage->region, co->order, mage));
+				"regionmagic_effect", "unit region command", mage,
+				mage->region, co->order));
 
 	return cast_level;
 }
@@ -6880,8 +6880,8 @@ sp_antimagiczone(castorder *co)
 
 	/* Erfolg melden*/
 	ADDMSG(&mage->faction->msgs, msg_message(
-				"regionmagic_effect", "unit region command unit", mage,
-				mage->region, co->order, mage));
+				"regionmagic_effect", "unit region command", mage,
+				mage->region, co->order));
 
 	return cast_level;
 }
