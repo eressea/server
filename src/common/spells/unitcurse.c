@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+
 int
 cinfo_unit(const struct locale * lang, const void * obj, enum typ_t typ, struct curse *c, int self)
 {
