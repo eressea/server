@@ -1498,31 +1498,32 @@ writeregion(FILE * F, const region * r)
 	wnl(F);
 }
 
-static void
+static ally **
 addally(const faction * f, ally ** sfp, int aid, int state)
 {
-	struct faction * af = findfaction(aid);
-	ally * sf;
-	state &= ~HELP_OBSERVE;
+  struct faction * af = findfaction(aid);
+  ally * sf;
+  state &= ~HELP_OBSERVE;
 #ifndef REGIONOWNERS
-	state &= ~HELP_TRAVEL;
+  state &= ~HELP_TRAVEL;
 #endif
 #ifdef ALLIANCES
 # ifdef ALLIES_ONLY
-	if (af!=NULL && af->alliance!=f->alliance) state &= ~ALLIES_ONLY;;
+  if (af!=NULL && af->alliance!=f->alliance) state &= ~ALLIES_ONLY;;
 # else
 # endif
-	if (af!=NULL && af->alliance!=f->alliance) return;
+  if (af!=NULL && af->alliance!=f->alliance) return;
 #endif
   if (state==0) return;
 
   sf = calloc(1, sizeof(ally));
-	sf->faction = af;
-	if (!sf->faction) ur_add((void*)aid, (void**)&sf->faction, resolve_faction);
-	sf->status = state;
-	sf->next = *sfp;
+  sf->faction = af;
+  if (!sf->faction) ur_add((void*)aid, (void**)&sf->faction, resolve_faction);
+  sf->status = state;
 
-	*sfp = sf;
+  while (*sfp) sfp=&(*sfp)->next;
+  *sfp = sf;
+  return &sf;
 }
 
 /** Reads a faction from a file.
@@ -1647,7 +1648,7 @@ readfaction(FILE * F)
     while (--p >= 0) {
       int aid = rid(F);
       int state = ri(F);
-      addally(f, sfp, aid, state);
+      sfp = addally(f, sfp, aid, state);
     }
   } else {
     for (;;) {
@@ -1656,7 +1657,7 @@ readfaction(FILE * F)
       else {
         int aid = atoi36(buf);
         int state = ri(F);
-        addally(f, sfp, aid, state);
+        sfp = addally(f, sfp, aid, state);
       }
     }
   }

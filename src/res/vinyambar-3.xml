@@ -1,36 +1,38 @@
 <eressea>
-	<include file="messages.xml"></include>
+  <include file="messages.xml"></include>
 
-	<comment>Localization</comment>
-	<include file="de/strings.xml"></include>
-	<include file="en/strings.xml"></include>
+  <comment>Localization</comment>
+  <include file="de/strings.xml"></include>
+  <include file="en/strings.xml"></include>
 
-	<include file="races.xml"></include>
-	<include file="resources.xml"></include>
-	<include file="ships.xml"></include>
-	<include file="buildings.xml"></include>
+  <include file="races.xml"></include>
+  <include file="resources.xml"></include>
+  <include file="ships.xml"></include>
+  <include file="buildings.xml"></include>
 
-	<game name="Kreis der Macht" units="250" welcome="vinyambar">
-		<comment>Game specific</comment>
-		<order name="ARBEITEN" disable></order>
-		<order name="MEINUNG" disable></order>
-		<order name="MAGIEGEBIET" disable></order>
-		<param name="entertain.base" value="15"></param>
-		<param name="entertain.perlevel" value="5"></param>
-		<param name="nmr.timeout" value="5"></param>
-		<param name="nmr.removenewbie" value="0"></param>
-		<param name="GiveRestriction" value="0"></param>
-		<param name="database.gameid" value="3"></param>
-		<param name="hunger.long" value="0"></param>
-	</game>
-	<include file="vinyambar/de/strings.xml"></include>
-	<include file="vinyambar/stronghold.xml"></include>
-	<strings>
-		<string name="mailto">
-			<text>vinyambar@eressea.amber.kn-bremen.de</text>
-		</string>
-		<string name="mailcmd">
-			<text>VIN3 BEFEHLE</text>
-		</string>
-	</strings>
+  <game name="Kreis der Macht" units="250" welcome="vinyambar">
+    <comment>Game specific</comment>
+    <order name="ARBEITEN" disable></order>
+    <order name="MEINUNG" disable></order>
+    <order name="MAGIEGEBIET" disable></order>
+    <param name="entertain.base" value="15"></param>
+    <param name="entertain.perlevel" value="5"></param>
+    <param name="nmr.timeout" value="5"></param>
+    <param name="nmr.removenewbie" value="0"></param>
+    <param name="GiveRestriction" value="0"></param>
+    <param name="database.gameid" value="3"></param>
+    <param name="hunger.long" value="0"></param>
+    <param name="study.expensivemigrants" value="1"/>
+    <param name="report.mailit" value="/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"/>
+  </game>
+  <include file="vinyambar/de/strings.xml"></include>
+  <include file="vinyambar/stronghold.xml"></include>
+  <strings>
+    <string name="mailto">
+      <text>vinyambar@eressea.amber.kn-bremen.de</text>
+    </string>
+    <string name="mailcmd">
+      <text>VIN3 BEFEHLE</text>
+    </string>
+  </strings>
 </eressea>

@@ -53,7 +53,17 @@
 
 #define TEACHNUMBER 10
 
-/* ------------------------------------------------------------- */
+static boolean
+ExpensiveMigrants()
+{
+  int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "study.expensivemigrants");
+    value = str?atoi(str):0;
+  }
+  return value;
+}
+
 static skill_t
 getskill(const struct locale * lang)
 {
@@ -510,13 +520,11 @@ learn(void)
 				/* keine kostenpflichtigen Talente für Migranten. Vertraute sind
 				 * keine Migranten, wird in is_migrant abgefangen. Vorsicht,
 				 * studycost darf hier noch nicht durch Akademie erhöht sein */
-#if MIGRANTS_CAN_LEARN_EXPENSIVE_SKILLS == 0
-				if (is_migrant(u) && studycost > 0){
+				if (studycost > 0 && !ExpensiveMigrants() && is_migrant(u)) {
 					sprintf(buf, "Migranten können keine kostenpflichtigen Talente lernen");
 					mistake(u, u->thisorder, buf, MSG_EVENT);
 					continue;
 				}
-#endif
 				/* Akademie: */
 				{
 					struct building * b = inside_building(u);

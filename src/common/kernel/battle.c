@@ -2606,41 +2606,41 @@ print_fighters(battle * b, cvector * fighters)
 static void
 print_header(battle * b)
 {
-	bfaction * bf;
-	void **fi;
-	cvector *fighters = &b->fighters;
-	boolean * seen = malloc(sizeof(boolean)*cv_size(&b->sides));
+  bfaction * bf;
+  void **fi;
+  cvector *fighters = &b->fighters;
+  boolean * seen = malloc(sizeof(boolean)*cv_size(&b->sides));
 
-	for (bf=b->factions;bf;bf=bf->next) {
-		faction * f = bf->faction;
-		const char * lastf = NULL;
-		boolean first = false;
+  for (bf=b->factions;bf;bf=bf->next) {
+    faction * f = bf->faction;
+    const char * lastf = NULL;
+    boolean first = false;
 
-		strcpy(buf, "Der Kampf wurde ausgelöst von ");
-		memset(seen, 0, sizeof(boolean)*cv_size(&b->sides));
+    strcpy(buf, "Der Kampf wurde ausgelöst von ");
+    memset(seen, 0, sizeof(boolean)*cv_size(&b->sides));
 
-		for (fi = fighters->begin; fi != fighters->end; ++fi) {
-			fighter *df = *fi;
-			if (!fval(df, FIG_ATTACKED)) continue;
-			if (!seen[df->side->index] ) {
-				if (first) strcat(buf, ", ");
-				if (lastf) {
-					strcat(buf, lastf);
-					first = true;
-				}
-				if (seematrix(f, df->side) == true)
-					lastf = sidename(df->side, false);
-				else
-					lastf = "einer unbekannten Partei";
-				seen[df->side->index] = true;
-			}
-		}
-		if (first) strcat(buf, " und ");
-		if (lastf) strcat(buf, lastf);
-		strcat(buf, ".");
-		fbattlerecord(b, f, buf);
-	}
-	free(seen);
+    for (fi = fighters->begin; fi != fighters->end; ++fi) {
+      fighter *df = *fi;
+      if (!fval(df, FIG_ATTACKED)) continue;
+      if (!seen[df->side->index] ) {
+        if (first) strcat(buf, ", ");
+        if (lastf) {
+          strcat(buf, lastf);
+          first = true;
+        }
+        if (seematrix(f, df->side) == true)
+          lastf = sidename(df->side, false);
+        else
+          lastf = "einer unbekannten Partei";
+        seen[df->side->index] = true;
+      }
+    }
+    if (first) strcat(buf, " und ");
+    if (lastf) strcat(buf, lastf);
+    strcat(buf, ".");
+    fbattlerecord(b, f, buf);
+  }
+  free(seen);
 }
 
 static void

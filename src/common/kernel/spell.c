@@ -470,7 +470,7 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
  * ML_WARN ausgegeben werden. (stehen im Kopf der Auswertung unter
  * Zauberwirkungen)
 
-	sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': [hier die Fehlermeldung].",
+	sprintf(buf, "%s in %s: 'ZAUBER %s': [hier die Fehlermeldung].",
 		unitname(mage), regionid(mage->region), sa->strings[0]);
 	add_message(0, mage->faction, buf,  MSG_MAGIC, ML_MISTAKE);
 
@@ -1018,14 +1018,14 @@ sp_blessstonecircle(castorder *co)
 	b = p->param[0]->data.b;
 
 	if(b->type != bt_find("stonecircle")) {
-		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': %s ist kein Steinkreis.",
+		sprintf(buf, "%s in %s: 'ZAUBER %s': %s ist kein Steinkreis.",
 			unitname(mage), regionid(mage->region), co->order, buildingname(b));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
 
 	if(b->size < b->type->maxsize) {
-		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': %s muss vor der Weihe "
+		sprintf(buf, "%s in %s: 'ZAUBER %s': %s muss vor der Weihe "
 			"fertiggestellt sein.", unitname(mage), regionid(mage->region),
 			co->order, buildingname(b));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
@@ -3004,7 +3004,7 @@ wall_move(const border * b, struct unit * u, const struct region * from, const s
     hp = min (u->hp, hp);
     u->hp -= hp;
     if (u->hp) {
-      ADDMSG(&u->faction->msgs, msg_message("firewall_damage", 
+      ADDMSG(&u->faction->msgs, msg_message("firewall_damage",
         "region unit", from, u));
     }
     else ADDMSG(&u->faction->msgs, msg_message("firewall_death", "region unit", from, u));
@@ -3269,7 +3269,7 @@ sp_unholypower(castorder *co)
  *   Magier gerät in den Staub und verliert zufällige Zahl von HP bis
  *   auf max(hp,2)
  * Besonderheiten:
- *   Nicht als curse implementiert, was schlecht ist - man kann dadurch 
+ *   Nicht als curse implementiert, was schlecht ist - man kann dadurch
  *   kein dispell machen. Wegen fix unter Zeitdruck erstmal nicht zu
  *   ändern...
  * Missbrauchsmöglichkeit:
@@ -3290,7 +3290,7 @@ typedef struct dc_data {
   boolean active;
 } dc_data;
 
-static void 
+static void
 dc_initialize(struct attrib *a)
 {
   dc_data * data = (dc_data *)malloc(sizeof(dc_data));
@@ -3298,13 +3298,13 @@ dc_initialize(struct attrib *a)
   data->active = true;
 }
 
-static void 
+static void
 dc_finalize(struct attrib * a)
 {
   free(a->data.v);
 }
 
-static int 
+static int
 dc_age(struct attrib * a)
 /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
 {
@@ -3339,20 +3339,20 @@ dc_age(struct attrib * a)
   for (u = r->units; u; u = u->next ) {
     if (!fval(u->faction, FL_DH) ) {
       fset(u->faction, FL_DH);
-      ADDMSG(&u->faction->msgs, msg_message("deathcloud_effect", 
+      ADDMSG(&u->faction->msgs, msg_message("deathcloud_effect",
         "mage region", cansee(u->faction, r, mage, 0) ? mage : NULL, r));
     }
   }
 
   if (!fval(mage->faction, FL_DH)){
-    ADDMSG(&mage->faction->msgs, msg_message("deathcloud_effect", 
+    ADDMSG(&mage->faction->msgs, msg_message("deathcloud_effect",
       "mage region", mage, r));
   }
 
   return --data->countdown;
 }
 
-static void 
+static void
 dc_write(const struct attrib * a, FILE* F)
 {
   const dc_data * data = (const dc_data *)a->data.v;
@@ -3380,7 +3380,7 @@ mk_deathcloud(unit * mage, region * r, double strength, int duration)
 {
   attrib * a = a_new(&at_deathcloud);
   dc_data * data = (dc_data *)a->data.v;
-  
+
   data->countdown = duration;
   data->r = r;
   data->mage = mage;
@@ -4334,109 +4334,106 @@ sp_raisepeasantmob(castorder *co)
 static int
 sp_migranten(castorder *co)
 {
-	unit *target;
-	strlist *S;
-	int kontaktiert = 0;
-	region *r = co->rt;
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-	spellparameter *pa = co->par;
-	spell *sp = co->sp;
+  unit *target;
+  strlist *S;
+  int kontaktiert = 0;
+  region *r = co->rt;
+  unit *mage = (unit *)co->magician;
+  int cast_level = co->level;
+  spellparameter *pa = co->par;
+  spell *sp = co->sp;
 
-	/* wenn kein Ziel gefunden, Zauber abbrechen */
-	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+  /* wenn kein Ziel gefunden, Zauber abbrechen */
+  if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
-	target = pa->param[0]->data.u; /* Zieleinheit */
+  target = pa->param[0]->data.u; /* Zieleinheit */
 
-	/* Personen unserer Rasse können problemlos normal übergeben werden */
-	if (target->race == mage->faction->race){
-		/* u ist von unserer Art, das Ritual wäre verschwendete Aura. */
-		ADDMSG(&mage->faction->msgs, msg_message(
-				"sp_migranten_fail1", "unit region command target", mage,
-				mage->region, strdup(co->order), target));
-	}
-	/* Auf eigene Einheiten versucht zu zaubern? Garantiert Tippfehler */
-	if (target->faction == mage->faction){
-		cmistake(mage, strdup(co->order), 45, MSG_MAGIC);
-	}
+  /* Personen unserer Rasse können problemlos normal übergeben werden */
+  if (target->race == mage->faction->race){
+    /* u ist von unserer Art, das Ritual wäre verschwendete Aura. */
+    ADDMSG(&mage->faction->msgs, msg_message(
+      "sp_migranten_fail1", "unit region command target", mage,
+      mage->region, strdup(co->order), target));
+  }
+  /* Auf eigene Einheiten versucht zu zaubern? Garantiert Tippfehler */
+  if (target->faction == mage->faction){
+    cmistake(mage, strdup(co->order), 45, MSG_MAGIC);
+  }
 
-	/* Keine Monstereinheiten */
-	if (!playerrace(target->race)){
-		sprintf(buf, "%s kann nicht auf Monster gezaubert werden.",
-			spell_name(sp, mage->faction->locale));
-		addmessage(0, mage->faction, buf, MSG_EVENT, ML_WARN);
-		return 0;
-	}
-	/* niemand mit teurem Talent */
-	if (teure_talente(target)) {
-		sprintf(buf, "%s hat unaufkündbare Bindungen an seine alte Partei.",
-				unitname(target));
-		addmessage(0, mage->faction, buf, MSG_EVENT, ML_WARN);
-		return 0;
-	}
-	/* maximal Stufe Personen */
-	if (target->number > cast_level
-			|| target->number > max_spellpoints(r, mage))
-	{
-		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': So viele Personen übersteigen "
-				"meine Kräfte.", unitname(mage), regionid(mage->region),
-				spell_name(sp, mage->faction->locale));
-		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_WARN);
-	}
+  /* Keine Monstereinheiten */
+  if (!playerrace(target->race)){
+    sprintf(buf, "%s kann nicht auf Monster gezaubert werden.",
+      spell_name(sp, mage->faction->locale));
+    addmessage(0, mage->faction, buf, MSG_EVENT, ML_WARN);
+    return 0;
+  }
+  /* niemand mit teurem Talent */
+  if (teure_talente(target)) {
+    sprintf(buf, "%s hat unaufkündbare Bindungen an seine alte Partei.",
+      unitname(target));
+    addmessage(0, mage->faction, buf, MSG_EVENT, ML_WARN);
+    return 0;
+  }
+  /* maximal Stufe Personen */
+  if (target->number > cast_level
+    || target->number > max_spellpoints(r, mage))
+  {
+    sprintf(buf, "%s in %s: 'ZAUBER %s': So viele Personen übersteigen "
+      "meine Kräfte.", unitname(mage), regionid(mage->region),
+      spell_name(sp, mage->faction->locale));
+    addmessage(0, mage->faction, buf, MSG_MAGIC, ML_WARN);
+  }
 
-	/* Kontakt prüfen (aus alter Teleportroutine übernommen) */
-	{
-		/* Nun kommt etwas reichlich krankes, um den
-		 * KONTAKTIERE-Befehl des Ziels zu überprüfen. */
+  /* Kontakt prüfen (aus alter Teleportroutine übernommen) */
+  {
+    /* Nun kommt etwas reichlich krankes, um den
+    * KONTAKTIERE-Befehl des Ziels zu überprüfen. */
 
-		for (S = target->orders; S; S = S->next) {
-			if (strncasecmp("KON", S->s, 3) == 0) {
-				char *c;
-				int kontakt = -1;
-				/* So weit, so gut. S->s ist also ein KONTAKTIERE. Nun gilt es,
-				 * herauszufinden, wer kontaktiert wird. Das ist nicht trivial.
-				 * Zuerst muß der Parameter herausoperiert werden. */
-				/* Leerzeichen finden */
+    for (S = target->orders; S; S = S->next) {
+      if (strncasecmp("KON", S->s, 3) == 0) {
+        char *c;
+        int kontakt = -1;
+        /* So weit, so gut. S->s ist also ein KONTAKTIERE. Nun gilt es,
+        * herauszufinden, wer kontaktiert wird. Das ist nicht trivial.
+        * Zuerst muß der Parameter herausoperiert werden. */
+        /* Leerzeichen finden */
 
-				for (c = S->s; *c != 0; c++) {
-					if (isspace((int)*c) != 0) {
-						break;
-					}
-				}
+        for (c = S->s; *c != 0; c++) {
+          if (isspace((int)*c) != 0) {
+            break;
+          }
+        }
 
-				/* Wenn ein Leerzeichen da ist, ist *c != 0 und zeigt auf das
-				 * Leerzeichen. */
+        /* Wenn ein Leerzeichen da ist, ist *c != 0 und zeigt auf das
+        * Leerzeichen. */
 
-				if (*c == 0) {
-					continue;
-				}
-				kontakt = atoi36(c);
+        if (*c == 0) {
+          continue;
+        }
+        kontakt = atoi36(c);
 
-				if (kontakt == mage->no) {
-					kontaktiert = 1;
-					break;
-				}
-			}
-		}
-	}
+        if (kontakt == mage->no) {
+          kontaktiert = 1;
+          break;
+        }
+      }
+    }
+  }
 
-	if (kontaktiert == 0){
-		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Die Einheit %s hat keinen "
-				"Kontakt mit uns aufgenommen.", unitname(mage),
-				regionid(mage->region), spell_name(sp, mage->faction->locale)
-				, unitname(target));
-		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
-		return 0;
-	}
-	u_setfaction(target,mage->faction);
-	set_string(&target->thisorder, "");
+  if (kontaktiert == 0) {
+    ADDMSG(&mage->faction->msgs, msg_message("spellfail::contact",
+      "mage region order target", mage, mage->region, strdup(co->order),
+      target));
+    return 0;
+  }
+  u_setfaction(target,mage->faction);
+  set_string(&target->thisorder, "");
 
-	/* Erfolg melden */
-	ADDMSG(&mage->faction->msgs, msg_message(
-				"sp_migranten", "unit region command target", mage,
-				mage->region, strdup(co->order), target));
+  /* Erfolg melden */
+  ADDMSG(&mage->faction->msgs, msg_message("sp_migranten", 
+    "unit region command target", mage, mage->region, strdup(co->order), target));
 
-	return target->number;
+  return target->number;
 }
 
 /* ------------------------------------------------------------- */
@@ -4841,7 +4838,7 @@ sp_calm_monster(castorder *co)
 		return 0;
 	}
 
-	c = create_curse(mage, &target->attribs, ct_find("calmmonster"), force, 
+	c = create_curse(mage, &target->attribs, ct_find("calmmonster"), force,
     (int)force, (int)mage->faction, 0);
 	if (c==NULL) {
 		report_failure(mage, co->order);
@@ -5824,7 +5821,7 @@ sp_enterastral(castorder *co)
 		ro = r;
 		break;
 	default:
-		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Dieser Zauber funktioniert "
+		sprintf(buf, "%s in %s: 'ZAUBER %s': Dieser Zauber funktioniert "
 				"nur in der materiellen Welt.", unitname(mage),
 				regionid(mage->region), spell_name(sp, mage->faction->locale));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
@@ -5832,7 +5829,7 @@ sp_enterastral(castorder *co)
 	}
 
 	if(!rt) {
-		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Es kann hier kein Kontakt zur "
+		sprintf(buf, "%s in %s: 'ZAUBER %s': Es kann hier kein Kontakt zur "
 				"Astralwelt hergestellt werden.", unitname(mage),
 				regionid(mage->region), spell_name(sp, mage->faction->locale));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
@@ -5841,7 +5838,7 @@ sp_enterastral(castorder *co)
 
 	if(is_cursed(rt->attribs, C_ASTRALBLOCK, 0) ||
 			is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
-		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Es kann kein Kontakt zu "
+		sprintf(buf, "%s in %s: 'ZAUBER %s': Es kann kein Kontakt zu "
 				"dieser astralen Region hergestellt werden.", unitname(mage),
 				regionid(mage->region), spell_name(sp, mage->faction->locale));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
@@ -5948,7 +5945,7 @@ sp_pullastral(castorder *co)
 			rl2 = rl2->next;
 		}
 		if(!rl2) {
-			sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Es kann kein Kontakt zu "
+			sprintf(buf, "%s in %s: 'ZAUBER %s': Es kann kein Kontakt zu "
 				"dieser Region hergestellt werden.", unitname(mage),
 				regionid(mage->region), spell_name(sp, mage->faction->locale));
 			addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
@@ -5958,7 +5955,7 @@ sp_pullastral(castorder *co)
 		free_regionlist(rl);
 		break;
 	default:
-		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Dieser Zauber funktioniert "
+		sprintf(buf, "%s in %s: 'ZAUBER %s': Dieser Zauber funktioniert "
 				"nur in der astralen  Welt.", unitname(mage),
 				regionid(mage->region), spell_name(sp, mage->faction->locale));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
@@ -5967,7 +5964,7 @@ sp_pullastral(castorder *co)
 
 	if(is_cursed(rt->attribs, C_ASTRALBLOCK, 0) ||
 			is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
-		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Es kann kein Kontakt zu "
+		sprintf(buf, "%s in %s: 'ZAUBER %s': Es kann kein Kontakt zu "
 				"dieser Region hergestellt werden.", unitname(mage),
 				regionid(mage->region), spell_name(sp, mage->faction->locale));
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
@@ -6094,7 +6091,7 @@ sp_leaveastral(castorder *co)
     addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
       return 0;
   }
-  
+
   remaining_cap = (int)((power-3) * 1500);
 
 	/* für jede Einheit in der Kommandozeile */
@@ -6623,7 +6620,7 @@ sp_permtransfer(castorder *co)
 	aura = pa->param[0]->data.i;
 
 	if(!is_mage(tu)) {
-/*		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Einheit ist kein Magier."
+/*		sprintf(buf, "%s in %s: 'ZAUBER %s': Einheit ist kein Magier."
 			, unitname(mage), regionid(mage->region),sa->strings[0]); */
 		cmistake(mage, strdup(co->order), 214, MSG_MAGIC);
 		return 0;
@@ -6669,7 +6666,7 @@ sp_movecastle(castorder *co)
 	dir = finddirection(pa->param[1]->data.s, mage->faction->locale);
 
 	if(dir == NODIRECTION) {
-		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Ungültige Richtung %s.",
+		sprintf(buf, "%s in %s: 'ZAUBER %s': Ungültige Richtung %s.",
 			unitname(mage), regionid(mage->region),
 			spell_name(sp, mage->faction->locale),
 			pa->param[1]->data.s);
@@ -6678,7 +6675,7 @@ sp_movecastle(castorder *co)
 	}
 
 	if(b->size > (cast_level-12) * 250) {
-		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Der Elementar ist "
+		sprintf(buf, "%s in %s: 'ZAUBER %s': Der Elementar ist "
 			"zu klein, um das Gebäude zu tragen.", unitname(mage),
 			regionid(mage->region), spell_name(sp, mage->faction->locale));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
@@ -6688,7 +6685,7 @@ sp_movecastle(castorder *co)
 	target_region = rconnect(r,dir);
 
 	if(!(terrain[target_region->terrain].flags & LAND_REGION)) {
-		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Der Erdelementar "
+		sprintf(buf, "%s in %s: 'ZAUBER %s': Der Erdelementar "
 				"weigert sich, nach %s zu gehen.",
 			unitname(mage), regionid(mage->region),
 			spell_name(sp, mage->faction->locale),
@@ -7708,7 +7705,7 @@ get_spellnames(const struct locale * lang, magic_t mtype)
   return sn;
 }
 
-static spell * 
+static spell *
 find_spellbyname_i(const char *name, const struct locale * lang, magic_t mtype)
 {
   spell * sp = NULL;
@@ -9927,7 +9924,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_pullastral, patzer
   },
-  
+
   {
     SPL_FETCHASTRAL, "Ruf der Realität",
     "Ein Magier, welcher sich in der materiellen Welt befindet, kann er mit "
@@ -10079,7 +10076,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_magicrunes, patzer
   },
-  
+
   {
     SPL_REDUCESHIELD, "Schild des Fisches",
     "Dieser Zauber vermag dem Gegner ein geringfügig versetztes Bild der "
@@ -10518,7 +10515,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_wdwpyramid, patzer
   },
-  
+
   {
     SPL_WDWPYRAMID_DRUIDE, "Kraft der Natur",
     "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
@@ -10566,10 +10563,10 @@ static spell spelldaten[] =
   {
     SPL_NOSPELL, "Keiner", NULL, NULL, NULL, 0, 0, 0, 0,
     {
-      { 0, 0, 0 }, 
-      { 0, 0, 0 }, 
-      { 0, 0, 0 }, 
-      { 0, 0, 0 }, 
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
       { 0, 0, 0 }
     },
     NULL, NULL

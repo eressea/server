@@ -35,5 +35,3 @@
 #define PEASANTS_DO_NOT_STARVE 0
 #define NEW_MIGRATION 1
 #define ASTRAL_HUNGER
-
-#define MAILITPATH	"/usr/sbin:$HOME/tutorial/bin:/bin:/usr/bin:/usr/local/bin"

@@ -31,6 +31,8 @@
     <param name="magic.regeneration" value="0.5"/>
     <param name="magic.power" value="0.5"/>
     <param name="resource.factor" value="0.25"/>
+    <param name="study.expensivemigrants" value="1"/>
+    <param name="report.mailit" value="/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"/>
   </game>
 
   <xi:include href="vinyambar/wdw-strings.xml"/>

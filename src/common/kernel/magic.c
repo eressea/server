@@ -969,7 +969,7 @@ cancast(unit * u, spell * sp, int level, int range, char * cmd)
 					/* Noch fehlte keine Komponente, wir generieren den Anfang der
 					 * Fehlermeldung */
 					sprintf(buf, "%s in %s: 'ZAUBER %s' Für diesen Zauber fehlen "
-							"noch %d ", unitname(u), regionid(u->region), 
+							"noch %d ", unitname(u), regionid(u->region),
 							spell_name(sp, u->faction->locale),
 							itemanz);
 					scat(locale_string(u->faction->locale,
@@ -1282,7 +1282,7 @@ do_fumble(castorder *co)
   int duration;
   const char * sp_name = spell_name(sp, u->faction->locale);
 
-  ADDMSG(&u->faction->msgs, msg_message("patzer", "unit region spell", 
+  ADDMSG(&u->faction->msgs, msg_message("patzer", "unit region spell",
     u, r, sp_name));
   switch (rand() % 10) {
   case 0:
@@ -1486,7 +1486,7 @@ verify_targets(castorder *co)
 						failed++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, strdup(co->order), 
+							mage, mage->region, strdup(co->order),
 							strdup(itoa36(spobj->data.i))));
 						break;
 					} else { /* Einheit wurde nun gefunden, pointer umsetzen */
@@ -1661,7 +1661,7 @@ verify_targets(castorder *co)
 						spobj->flag = TARGET_NOTFOUND;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, strdup(co->order), 
+							mage, mage->region, strdup(co->order),
 							strdup(itoa36(spobj->data.i))));
 						failed++;
 						break;
@@ -2798,7 +2798,7 @@ magic(void)
               && !fval(u->race, RCF_SWIM)
               && !(sp->sptyp & OCEANCASTABLE)) {
                 /* Fehlermeldung */
-                ADDMSG(&u->faction->msgs, msg_message("spellfail_onocean", 
+                ADDMSG(&u->faction->msgs, msg_message("spellfail_onocean",
                   "unit region command", u, u->region, so->s));
                 continue;
               }
@@ -2824,12 +2824,9 @@ magic(void)
               continue;
             }
             if (range > 1024) { /* (2^10) weiter als 10 Regionen entfernt */
-              sprintf(buf, "%s in %s: 'ZAUBER %s' Zu der Region %s kann keine "
-                "Verbindung hergestellt werden", unitname(u),
-                regionid(u->region), 
-                spell_name(sp, u->faction->locale), 
-                regionid(target_r));
-              addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
+              ADDMSG(&u->faction->msgs, msg_message("spellfail::nolevel",
+                "mage region order target", u, u->region, so->s, 
+                gc_add(strdup(regionid(target_r)))));
               continue;
             }
           }
@@ -2838,11 +2835,8 @@ magic(void)
             int ilevel = eff_skill(u, SK_MAGIC, u->region);
             if (ilevel!=level) {
               level = ilevel;
-              sprintf(buf, "%s in %s: 'ZAUBER %s' Dieser Zauber kann nicht "
-                "mit Stufenangabe gezaubert werden.", unitname(u),
-                regionid(u->region), 
-                spell_name(sp, u->faction->locale));
-              addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
+              ADDMSG(&u->faction->msgs, msg_message("spellfail::nolevel",
+                "mage region order", u, u->region, so->s));
             }
           }
           /* Vertrautenmagie */
@@ -2920,7 +2914,7 @@ magic(void)
       region * target_r = co->rt;
 
       /* reichen die Komponenten nicht, wird der Level reduziert. */
-      co->level = eff_spelllevel(u, sp, cast_level, co->distance);       
+      co->level = eff_spelllevel(u, sp, cast_level, co->distance);
 
       if (co->level < 1) {
         /* Fehlermeldung mit Komponenten generieren */
@@ -2933,7 +2927,7 @@ magic(void)
         * gezaubert, co->level ist aber defaultmäßig Stufe des Magiers */
         if (spl_costtyp(sp) != SPC_FIX) {
           sprintf(buf, "%s hat nur genügend Komponenten um %s auf Stufe %d "
-            "zu zaubern.", unitname(u), spell_name(sp, u->faction->locale), 
+            "zu zaubern.", unitname(u), spell_name(sp, u->faction->locale),
             co->level);
           addmessage(0, u->faction, buf, MSG_MAGIC, ML_INFO);
         }
@@ -2951,7 +2945,7 @@ magic(void)
       if (co->force <= 0) {
         co->force = 0;
         sprintf(buf, "%s schafft es nicht genügend Kraft aufzubringen "
-          "um %s dennoch zu zaubern.", unitname(u), 
+          "um %s dennoch zu zaubern.", unitname(u),
           spell_name(sp, u->faction->locale));
         addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
       }
@@ -2981,7 +2975,7 @@ magic(void)
           /* zwar wurde mindestens ein Ziel gefunden, das widerstand
             * jedoch dem Zauber. Kosten abziehen und abbrechen. */
           sprintf(buf, "%s gelingt es %s zu zaubern, doch der Spruch zeigt "
-            "keine Wirkung.", unitname(u), 
+            "keine Wirkung.", unitname(u),
             spell_name(sp, u->faction->locale));
           addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
           co->force = 0;
@@ -3039,7 +3033,7 @@ create_special_direction(region *r, int x, int y, int duration,
 	return a;
 }
 
-const char * 
+const char *
 spell_info(const struct spell * sp, const struct locale * lang)
 {
 	if (sp->info==NULL) {
@@ -3048,7 +3042,7 @@ spell_info(const struct spell * sp, const struct locale * lang)
 	return sp->info;
 }
 
-const char * 
+const char *
 spell_name(const struct spell * sp, const struct locale * lang)
 {
 	if (sp->info==NULL) {
@@ -3057,7 +3051,7 @@ spell_name(const struct spell * sp, const struct locale * lang)
 	return sp->sname;
 }
 
-void 
+void
 add_spelllist(spell_list ** lspells, spell * sp)
 {
   spell_list * entry = malloc(sizeof(spell_list));

@@ -26,7 +26,9 @@
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="1"/>
     <param name="database.gameid" value="0"/>
+    <param name="rules.check_overload" value="1"/>
     <param name="firstturn" value="184"/>
+    <param name="report.mailit" value="/usr/sbin:$HOME/eressea/bin:/bin:/usr/bin:/usr/local/bin"/>
   </game>
   <xi:include href="eressea/de/strings.xml"/>
   <xi:include href="eressea/en/strings.xml"/>

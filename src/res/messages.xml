@@ -5762,6 +5762,15 @@
     <text locale="de">"In $region($region) findet ein Kampf statt."</text>
     <text locale="en">"There is a battle in $region($region)."</text>
   </message>
+  <message name="battle::combatspell" section="battle">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+      <arg name="dead" type="int"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell): $int($dead) $if($eq($dead,1),"Krieger wurde", "Krieger wurden") getötet."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell): $int($dead) $if($eq($dead,1),"enemy was", "enemies were") killed."</text>
+  </message>
   <message name="battle::army_report" section="battle">
     <type>
       <arg name="index" type="int"/>
@@ -5772,6 +5781,35 @@
     </type>
     <text locale="de">"Heer $int($index)($abbrev): $int($dead) Tote, $int($flown) Geflohene, $int($survived) Überlebende."</text>
     <text locale="en">"Army $int($index)($abbrev): $int($dead) dead, $int($flown) flown, $int($survived) survivors."</text>
+  </message>
+  <message name="spellfail::nolevel" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($mage) in $region($region): '$order($command)' - Dieser Zauber kann nicht mit Stufenangabe gezaubert werden."</text>
+    <text locale="en">"$unit($mage) in $region($region): '$order($command)' - This spell cannot be cast with variable level."</text>
+  </message>
+  <message name="spellfail::nocontact" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="target" type="string"/>
+    </type>
+    <text locale="de">"$unit($mage) in $region($region): '$order($command)' - Zur Region $target kann kein Kontakt hergestellt werden."</text>
+    <text locale="en">"$unit($mage) in $region($region): '$order($command)' - The region $target could not be contacted."</text>
+  </message>
+  <message name="spellfail::contact" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="target" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit $unit($target) hat keinen Kontakt mit uns aufgenommen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit $unit($target) did not contact us."</text>
   </message>
 </messages>
 

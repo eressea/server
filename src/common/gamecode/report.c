@@ -103,6 +103,17 @@ int  *month_season;
 char *agename;
 int  seasons;
 
+static const char*
+MailitPath()
+{
+  static const char * value = NULL;
+  if (value==NULL) {
+    value = get_param(global.parameters, "report.mailit");
+  }
+  return value;
+
+}
+
 int
 read_datenames(const char *filename)
 {
@@ -1795,36 +1806,36 @@ enemies(FILE * F, const faction * f)
 static void
 guards(FILE * F, const region * r, const faction * see)
 {				/* die Partei  see  sieht dies; wegen
-				 * "unbekannte Partei", wenn man es selbst ist... */
+                                * "unbekannte Partei", wenn man es selbst ist... */
 
-	faction* guardians[512];
+  faction* guardians[512];
 
-	int nextguard = 0;
+  int nextguard = 0;
 
-	unit *u;
-	int i;
+  unit *u;
+  int i;
 
-	boolean tarned = false;
-	/* Bewachung */
+  boolean tarned = false;
+  /* Bewachung */
 
   for (u = r->units; u; u = u->next) {
-		if (getguard(u)) {
-			faction *f  = u->faction;
-			faction *fv = visible_faction(see, u);
+    if (getguard(u)) {
+      faction *f  = u->faction;
+      faction *fv = visible_faction(see, u);
 
-			if(fv != f && see != fv) {
-				f = fv;
-			}
+      if(fv != f && see != fv) {
+        f = fv;
+      }
 
-			if (f != see && fval(u, UFL_PARTEITARNUNG)) {
-				tarned=true;
-			} else {
-				for (i=0;i!=nextguard;++i) if (guardians[i]==f) break;
-				if (i==nextguard) {
-					guardians[nextguard++] = f;
-				}
-			}
-		}
+      if (f != see && fval(u, UFL_PARTEITARNUNG)) {
+        tarned=true;
+      } else {
+        for (i=0;i!=nextguard;++i) if (guardians[i]==f) break;
+        if (i==nextguard) {
+          guardians[nextguard++] = f;
+        }
+      }
+    }
   }
 
   if (nextguard || tarned) {
@@ -1832,21 +1843,21 @@ guards(FILE * F, const region * r, const faction * see)
   } else {
     return;
   }
-  
-	for (i = 0; i!=nextguard+(tarned?1:0); ++i) {
-		if (i!=0) {
-  		if (i == nextguard-(tarned?0:1))
-	  		scat(" und ");
-		  else
-			  scat(", ");
-  	}
-	  if (i<nextguard) scat(factionname(guardians[i]));
 
-	  else scat("unbekannten Einheiten");
+  for (i = 0; i!=nextguard+(tarned?1:0); ++i) {
+    if (i!=0) {
+      if (i == nextguard-(tarned?0:1))
+        scat(" und ");
+      else
+        scat(", ");
+    }
+    if (i<nextguard) scat(factionname(guardians[i]));
+
+    else scat("unbekannten Einheiten");
   }
-	scat(" bewacht.");
-	rnl(F);
-	rparagraph(F, buf, 0, 0);
+  scat(" bewacht.");
+  rnl(F);
+  rparagraph(F, buf, 0, 0);
 }
 
 static void
@@ -2355,54 +2366,48 @@ report(FILE *F, faction * f, const faction_list * addresses,
 FILE *
 openbatch(void)
 {
-	faction *f;
-	FILE * BAT = NULL;
+  faction *f;
+  FILE * BAT = NULL;
 
-	/* falls und mind. ein internet spieler gefunden wird, schreibe den
-	 * header des batch files. ab nun kann BAT verwendet werden, um zu
-	 * pruefen, ob netspieler vorhanden sind und ins mailit batch
-	 * geschrieben werden darf. */
+  /* falls und mind. ein internet spieler gefunden wird, schreibe den
+  * header des batch files. ab nun kann BAT verwendet werden, um zu
+  * pruefen, ob netspieler vorhanden sind und ins mailit batch
+  * geschrieben werden darf. */
 
-	for (f = factions; f; f = f->next) {
+  for (f = factions; f; f = f->next) {
 
-		/* bei "internet:" verschicken wir die mail per batchfile. für
-		 * unix kann man alles in EIN batchfile schreiben, als
-		 * sogenanntes "herefile". Konnte der batchfile nicht geoeffnet
-		 * werden, schreiben wir die reports einzeln. der BAT file wird
-		 * nur gemacht, wenn es auch internet benutzer gibt. */
+    /* bei "internet:" verschicken wir die mail per batchfile. für
+    * unix kann man alles in EIN batchfile schreiben, als
+    * sogenanntes "herefile". Konnte der batchfile nicht geoeffnet
+    * werden, schreiben wir die reports einzeln. der BAT file wird
+    * nur gemacht, wenn es auch internet benutzer gibt. */
 
-		if (f->email) {
-			sprintf(buf, "%s/mailit", reportpath());
-			if ((BAT = fopen(buf, "w")) == NULL)
-				log_error(("mailit konnte nicht geöffnet werden!\n"));
-			else
-				fprintf(BAT,
-						"#!/bin/sh\n"
-						"\n"
-						"# MAILIT shell file, vom Eressea Host generiert\n"
-						"#\n"
-						"# Verwendung: nohup mailit &\n"
-						"#\n"
-						"\n"
-						"PATH=%s\n"
-						"\n"
-						"chmod 755 *.sh\n"
-						"\n"
-						,MAILITPATH);
-			break;
+    if (f->email) {
+      sprintf(buf, "%s/mailit", reportpath());
+      if ((BAT = fopen(buf, "w")) == NULL)
+        log_error(("mailit konnte nicht geöffnet werden!\n"));
+      else
+        fprintf(BAT,
+        "#!/bin/sh\n\n"
+        "# MAILIT shell file, vom Eressea Host generiert\n#\n"
+        "# Verwendung: nohup mailit &\n#\n\n"
+        "PATH=%s\n\n"
+        "chmod 755 *.sh\n"
+        "\n", MailitPath());
+      break;
 
-		}
-	}
-	return BAT;
+    }
+  }
+  return BAT;
 }
 
 void
 closebatch(FILE * BAT)
 {
-	if (BAT) {
-		fputs("\n", BAT);
-		fclose(BAT);
-	}
+  if (BAT) {
+    fputs("\n", BAT);
+    fclose(BAT);
+  }
 }
 
 
@@ -2690,7 +2695,7 @@ reports(void)
 		if (f->no > 0 && f->email && BAT) {
 			sprintf(buf, "%s/%s.sh", reportpath(), factionid(f));
 			shfp = fopen(buf, "w");
-			fprintf(shfp,"#!/bin/sh\n\nPATH=%s\n\n",MAILITPATH);
+			fprintf(shfp,"#!/bin/sh\n\nPATH=%s\n\n",MailitPath());
 			fprintf(shfp,"if [ $# -ge 1 ]; then\n");
 			fprintf(shfp,"\taddr=$1\n");
 			fprintf(shfp,"else\n");

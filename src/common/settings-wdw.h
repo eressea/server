@@ -34,7 +34,6 @@
 #define COMBAT_TURNS 5
 #define PEASANTS_DO_NOT_STARVE 0
 #define NEW_MIGRATION 1
-#define MIGRANTS_CAN_LEARN_EXPENSIVE_SKILLS 1	/* vinyambar 3 only */
 #define ASTRAL_HUNGER
 
 #if NEWATSROI == 1
@@ -52,5 +51,3 @@
 #define WDW_PHOENIX
 #define WDW_PYRAMIDSPELL
 #define NEW_STARTEQUIPMENT
-
-#define MAILITPATH	"/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"

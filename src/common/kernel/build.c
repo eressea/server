@@ -67,7 +67,16 @@
  * Laen, Mallorn}, UnterSilber, UnterSpezialTyp, UnterSpezial */
 
 
-/* ------------------------------------------------------------- */
+static boolean
+CheckOverload()
+{
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "rules.check_overload");
+    value = str?atoi(str):0;
+  }
+  return value;
+}
 
 static int
 slipthru(const region * r, const unit * u, const building * b)
@@ -1130,8 +1139,7 @@ entership(unit * u, ship * sh, const char * cmd, boolean lasttry)
 		if (lasttry) cmistake(u, cmd, 34, MSG_MOVE);
 		return false;
 	}
-#ifdef CHECK_OVERLOAD_ON_ENTER
-	{
+	if (CheckOverload()) {
 		int sweight, scabins;
 		int mweight = shipcapacity(sh);
 		int mcabins = sh->type->cabins;
@@ -1146,7 +1154,6 @@ entership(unit * u, ship * sh, const char * cmd, boolean lasttry)
 			}
 		}
 	}
-#endif
 
 	leave(u->region, u);
 	u->ship = sh;

@@ -104,65 +104,63 @@ get_force(double power, int formel)
 int
 sp_kampfzauber(fighter * fi, int level, double power, spell * sp)
 {
-	battle *b = fi->side->battle;
-	troop dt;
-	troop at;
-	/* Immer aus der ersten Reihe nehmen */
-	int minrow = FIGHT_ROW;
-	int maxrow = BEHIND_ROW-1;
-	int force, enemies;
-	int killed = 0;
-	const char *damage;
-	at.fighter = fi;
-	at.index   = 0;
+  battle *b = fi->side->battle;
+  troop at, dt;
+  message * m;
+  /* Immer aus der ersten Reihe nehmen */
+  int minrow = FIGHT_ROW;
+  int maxrow = BEHIND_ROW-1;
+  int force, enemies;
+  int killed = 0;
+  const char *damage;
 
-	if (power <= 0) return 0;
+  if (power <= 0) return 0;
+  at.fighter = fi;
+  at.index   = 0;
 
-	sprintf(buf, "%s zaubert %s", unitname(fi->unit), 
-		spell_name(sp, default_locale));
+  switch(sp->id) {
+    /* lovar halbiert im Schnitt! */
+    case SPL_FIREBALL:
+      damage = spell_damage(0);
+      force = lovar(get_force(power,0));
+      break;
+    case SPL_HAGEL:
+      damage = spell_damage(2);
+      force = lovar(get_force(power,4));
+      break;
+    case SPL_METEORRAIN:
+      damage = spell_damage(1);
+      force = lovar(get_force(power,1));
+      break;
+    default:
+      damage = spell_damage(10);
+      force = lovar(get_force(power,10));
+  }
 
-	switch(sp->id) {
-	  	/* lovar halbiert im Schnitt! */
-		case SPL_FIREBALL:
-			damage = spell_damage(0);
-			force = lovar(get_force(power,0));
-			break;
-		case SPL_HAGEL:
-			damage = spell_damage(2);
-			force = lovar(get_force(power,4));
-			break;
-		case SPL_METEORRAIN:
-			damage = spell_damage(1);
-			force = lovar(get_force(power,1));
-			break;
-		default:
-			damage = spell_damage(10);
-			force = lovar(get_force(power,10));
-	}
+  sprintf(buf, "%s zaubert %s", unitname(fi->unit), 
+    spell_name(sp, default_locale));
 
-	enemies = count_enemies(b, fi->side, minrow, maxrow);
-	if (!enemies) {
-          message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
-          message_all(b, m);
-          msg_release(m);
-          return 0;
-	}
-	scat(":");
-	battlerecord(b, buf);
+  enemies = count_enemies(b, fi->side, minrow, maxrow);
+  if (enemies==0) {
+    m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+    message_all(b, m);
+    msg_release(m);
+    return 0;
+  }
 
-	while (force>0 && killed < enemies) {
-		dt = select_enemy(b, fi, minrow, maxrow);
-		assert(dt.fighter);
-		--force;
-		killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
-	} 
+  while (force>0 && killed < enemies) {
+    dt = select_enemy(b, fi, minrow, maxrow);
+    assert(dt.fighter);
+    --force;
+    killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
+  } 
 
-	sprintf(buf, "%d Personen %s getötet",
-			killed, killed == 1 ? "wurde" : "wurden");
+  m = msg_message("battle::combatspell", "mage spell dead",
+    fi->unit, sp, killed);
+  message_all(b, m);
+  msg_release(m);
 
-	scat(".");
-	battlerecord(b, buf);
-	return level;
+  return level;
 }
 
 /* Versteinern */
