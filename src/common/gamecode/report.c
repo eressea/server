@@ -1558,6 +1558,12 @@ order_template(FILE * F, faction * f)
 	int dh;
 	region *last = f->last?f->last:lastregion(f);
 
+  if (quiet) {
+    printf(" ZV");
+    fflush(stdout);
+  }
+  else
+    printf(" - Schreibe Zugvorlage\n");
 	rps_nowrap(F, "");
 	rnl(F);
 	rps_nowrap(F, LOC(f->locale, "nr_template"));
@@ -3010,7 +3016,7 @@ reports(void)
 
         if (!nonr && f->options & wants_zugvorlage)
           fprintf(shfp,
-          " \\\n\t\"application/x-bzip2\" \"Report\" %d-%s.txt.bz2",
+          " \\\n\t\"application/x-bzip2\" \"Zugvorlage\" %d-%s.txt.bz2",
           turn,factionid(f));
 
 				if (!nocr && (f->options & wants_computer_report || f->age<3))
@@ -3032,10 +3038,15 @@ reports(void)
 						" \\\n\t\"text/plain\" \"Willkommen\" ../res/%s/%s/welcome.txt", global.welcomepath, locale_name(f->locale));
 				}
 
-				if (!nonr && f->options & wants_report)
-					fprintf(shfp,
-						" \\\n\t\"text/plain\" \"Report\" %d-%s.nr",
-						turn, factionid(f));
+        if (!nonr && f->options & wants_report)
+          fprintf(shfp,
+          " \\\n\t\"text/plain\" \"Report\" %d-%s.nr",
+          turn, factionid(f));
+
+        if (!nonr && f->options & wants_zugvorlage)
+          fprintf(shfp,
+          " \\\n\t\"text/plain\" \"Zugvorlage\" %d-%s.txt",
+          turn, factionid(f));
 
 				if (!nocr && (f->options & wants_computer_report || f->age<3))
 					fprintf(shfp,
