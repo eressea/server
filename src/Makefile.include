@@ -4,11 +4,13 @@ ifndef ERESSEA
 	export ERESSEA=$(PWD)
 endif
 
+.PHONY: tags
+
 default: debug
 
 DEPEND  = @gcc -MM -MG -r
 AR      = @ar
-CTAGS   = @ctags-exuberant
+CTAGS   = ctags-exuberant
 CC      = @gcc
 LD      = @gcc
 INSTALL = @cp
