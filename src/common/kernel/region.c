@@ -279,11 +279,16 @@ runhash(region * r)
 }
 
 region *
-rconnect(const region * r, direction_t dir) {
+r_connect(const region * r, direction_t dir) 
+{
 	static int set = 0;
 	static region * buffer[MAXDIRECTIONS];
 	static const region * last = NULL;
-	assert(dir<MAXDIRECTIONS);
+
+  assert(dir<MAXDIRECTIONS);
+#ifdef FAST_CONNECT
+  if (r->connect[dir]) return r->connect[dir];
+#endif
 	if (r != last) {
 		set = 0;
 		last = r;
@@ -292,6 +297,9 @@ rconnect(const region * r, direction_t dir) {
 		if (set & (1 << dir)) return buffer[dir];
 	buffer[dir] = rfindhash(r->x + delta_x[dir], r->y + delta_y[dir]);
 	set |= (1<<dir);
+#ifdef FAST_CONNECT
+  r->connect[dir] = buffer[dir];
+#endif
 	return buffer[dir];
 }
 

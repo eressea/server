@@ -1065,7 +1065,6 @@ const char * findorder(const struct unit * u, const char * cmd);
 #define attacked(u) (fval(u, UFL_LONGACTION))
 boolean idle(struct faction * f);
 boolean unit_has_cursed_item(struct unit *u);
-struct region * rconnect(const struct region *, direction_t dir);
 
 /* simple garbage collection: */
 void * gc_add(void * p);

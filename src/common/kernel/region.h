@@ -21,6 +21,7 @@ extern "C" {
 #include "language.h"
 #include <assert.h>
 
+#define FAST_CONNECT
 
 #define RF_CHAOTIC		(1<<0)
 #define RF_MALLORN 		(1<<1)
@@ -95,6 +96,9 @@ typedef struct region {
 #endif
 #if NEW_RESOURCEGROWTH
 	struct rawmaterial * resources;
+#endif
+#ifdef FAST_CONNECT
+  struct region * connect[MAXDIRECTIONS];
 #endif
 } region;
 
@@ -227,6 +231,12 @@ extern int read_region_reference(struct region ** r, FILE * F);
 extern void write_region_reference(const struct region * r, FILE * F);
 
 extern struct unit * region_owner(const struct region * r);
+extern struct region * r_connect(const struct region *, direction_t dir);
+#ifdef FAST_CONNECT
+# define rconnect(r, dir) ((r)->connect[dir]?(r)->connect[dir]:r_connect(r, dir))
+#else
+# define rconnect(r, dir) r_connect(r, dir)
+#endif
 
 #ifdef __cplusplus
 }
