@@ -19,6 +19,7 @@
 #include "faction.h"
 #include "item.h"
 #include "magic.h"
+#include "message.h"
 #include "region.h"
 #include "unit.h"
 #include "movement.h"
@@ -141,9 +142,10 @@ sp_kampfzauber(fighter * fi, int level, double power, spell * sp)
 
 	enemies = count_enemies(b, fi->side, minrow, maxrow);
 	if (!enemies) {
-		scat(", aber niemand war in Reichweite.");
-		battlerecord(b, buf);
-		return 0;
+          message * m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+          message_all(b, m);
+          msg_release(m);
+          return 0;
 	}
 	scat(":");
 	battlerecord(b, buf);

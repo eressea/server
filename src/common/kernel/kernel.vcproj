@@ -364,9 +364,6 @@
 			RelativePath=".\region.c">
 		</File>
 		<File
-			RelativePath=".\render.c">
-		</File>
-		<File
 			RelativePath=".\reports.c">
 		</File>
 		<File

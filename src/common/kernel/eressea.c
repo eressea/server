@@ -577,14 +577,11 @@ ffindhash(int no)
 void
 stripfaction (faction * f)
 {
-#ifdef OLD_MESSAGES
-	free_messages(f->msgs);
-#else
 	/* TODO: inhalt auch löschen */
 	if (f->msgs) free(f->msgs);
 	if (f->battles) free(f->battles);
-#endif
-	/* TODO: free msgs */
+
+        /* TODO: free msgs */
 	freestrlist(f->mistakes);
 	freelist(f->allies);
 	free(f->email);

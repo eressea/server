@@ -36,6 +36,8 @@ extern "C" {
 #define LAST_ROW (NUMROWS-1)
 #define FIRST_ROW FIGHT_ROW
 
+  struct message;
+
   typedef struct bfaction {
     struct bfaction * next;
     struct side * sides;
@@ -60,7 +62,9 @@ extern "C" {
     boolean reelarrow;
     int     dh;
     int     alive;
+#ifdef SMALL_BATTLE_MESSAGES
     boolean small;
+#endif
 #ifdef FAST_GETUNITROW
     boolean nonblockers;
 #endif
@@ -218,6 +222,8 @@ extern "C" {
   extern boolean terminate(troop dt, troop at, int type, const char *damage, boolean missile);
   extern void battlemsg(battle * b, struct unit * u, const char * s);
   extern void battlerecord(battle * b, const char *s);
+  extern void message_all(battle * b, struct message * m);
+  extern void message_faction(battle * b, struct faction * f, struct message * m);
   extern int hits(troop at, troop dt, weapon * awp);
   extern void damage_building(struct battle *b, struct building *bldg, int damage_abs);
   extern struct cvector * fighters(struct battle *b, struct fighter *af, int minrow, int maxrow, int mask);

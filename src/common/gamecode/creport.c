@@ -368,12 +368,22 @@ cr_alliance(const void * v, char * buffer, const void * userdata)
 static int
 cr_skill(const void * v, char * buffer, const void * userdata)
 {
-	const faction * report = (const faction*)userdata;
-	skill_t sk = (skill_t)(int)v;
-	if (sk!=NOSKILL) sprintf(buffer, "\"%s\"",
-		add_translation(skillname(sk, NULL), skillname(sk, report->locale)));
-	else strcpy(buffer, "\"\"");
-	return 0;
+  const faction * report = (const faction*)userdata;
+  skill_t sk = (skill_t)(int)v;
+  if (sk!=NOSKILL) sprintf(buffer, "\"%s\"",
+    add_translation(skillname(sk, NULL), skillname(sk, report->locale)));
+  else strcpy(buffer, "\"\"");
+  return 0;
+}
+
+static int
+cr_spell(const void * v, char * buffer, const void * userdata)
+{
+  const faction * report = (const faction*)userdata;
+  spell * sp = (spell*)v;
+  if (sp!=NULL) sprintf(buffer, "\"%s\"", spell_name(sp, report->locale));
+  else strcpy(buffer, "\"\"");
+  return 0;
 }
 
 void
@@ -382,6 +392,7 @@ creport_init(void)
 	tsf_register("report", &cr_ignore);
 	tsf_register("string", &cr_string);
 	tsf_register("order", &cr_string);
+        tsf_register("spell", &cr_spell);
 	tsf_register("int", &cr_int);
 	tsf_register("unit", &cr_unit);
 	tsf_register("region", &cr_region);

@@ -3484,6 +3484,16 @@ eval_unit(struct opstack ** stack, const void * userdata) /* unit -> string */
 }
 
 static void
+eval_spell(struct opstack ** stack, const void * userdata) /* unit -> string */
+{
+  const struct faction * f = (const struct faction *)userdata;
+  const struct spell * sp = opop(stack, const struct spell *);
+  const char * c = sp?spell_name(sp, f->locale):"an unknown spell";
+  size_t len = strlen(c);
+  opush(stack, strcpy(balloc(len+1), c));
+}
+
+static void
 eval_unitname(struct opstack ** stack, const void * userdata) /* unit -> string */
 {
 	const struct unit * u = opop(stack, const struct unit *);
@@ -3628,6 +3638,7 @@ report_init(void)
 	add_function("ship", &eval_ship);
 	add_function("unit", &eval_unit);
         add_function("order", &eval_string);
+        add_function("spell", &eval_spell);
 	add_function("unit.name", &eval_unitname);
 	add_function("unit.id", &eval_unitid);
 	add_function("building", &eval_building);

@@ -2047,7 +2047,7 @@
     </type>
     <text locale="de">"$unit($unit) in $region($region) stellt fest, dass es hier $localize($amount,$locale("de")) $resource($herb,$amount) gibt."</text>
     <text locale="fr">"$unit($unit) discovers that $localize($amount,$locale("en")) $resource($herb,$amount) grow in $region($region)."</text>
-    <text locale="en">"$unit($unit) discovers that $localize($amount,$locale("en")) $resource($herb,$amount) grow in $region($region)."</text>
+    <text locale="en">"$unit($unit) discovers that $localize($amount,$locale("fr")) $resource($herb,$amount) grow in $region($region)."</text>
   </message>
   <message name="destroy_partial" section="events">
     <type>
@@ -5691,6 +5691,56 @@
     <text locale="de">"Das Wurmloch in $region($region) schließt sich."</text>
     <text locale="fr">"The wormhole in $region($region) disappears."</text>
     <text locale="en">"The wormhole in $region($region) disappears."</text>
+  </message>
+  <message name="battle::potionsave" section="battle">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) konnte durch einen Heiltrank überleben."</text>
+    <text locale="en">"$unit($unit) was saved by a haling potion."</text>
+  </message>
+  <message name="battle::tactics_lost" section="battle">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) konnte dem Gegner eine Falle stellen."</text>
+    <text locale="en">"$unit($unit) lured the enemy into an ambush."</text>
+  </message>
+  <message name="battle::tactics_won" section="battle">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) überrascht den Gegner."</text>
+    <text locale="en">"$unit($unit) surprises the enemies."</text>
+  </message>
+  <message name="battle::spell_failed" section="battle">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="spell" type="spell"/>
+    </type>
+    <text locale="de">"$unit($unit) versucht $spell($spell) zu zaubern, doch der Zauber schlägt fehl!"</text>
+    <text locale="en">"$unit($unit) tries to cast $spell($spell), but the spell fails!"</text>
+  </message>
+  <message name="battle::row_header" section="battle">
+    <type>
+    </type>
+    <text locale="de">"Der Kampf wurde abgebrochen, da alle Verteidiger flohen."</text>
+    <text locale="en">"The battle was aborted because all enemies escaped."</text>
+  </message>
+  <message name="battle::aborted" section="battle">
+    <type>
+      <arg name="row" type="int"/>
+    </type>
+    <text locale="de">"... in der $int($row) Kampflinie:"</text>
+    <text locale="en">"... in combat rank $int($row):"</text>
+  </message>
+  <message name="battle::out_of_range" section="battle">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="spell" type="spell"/>
+    </type>
+    <text locale="de">"$unit($mage) zaubert $spell($spell), aber niemand war in Reichweite."</text>
+    <text locale="en">"$unit($mage) casts $spell($spell), but nobody was in range."</text>
   </message>
 </messages>
 

@@ -31,7 +31,6 @@ SOURCES =
  pool.c
  race.c
  region.c
- render.c
  reports.c
  resources.c
  save.c
