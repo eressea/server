@@ -108,8 +108,6 @@ struct building_type;
 
 #define MONSTER_FACTION 0 /* Die Partei, in der die Monster sind. */
 
-#define FULL_BASE36
-
 /**
  * heaps and heaps of unsupported versions:
 	#define RACES_VERSION 91

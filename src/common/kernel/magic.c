@@ -1440,7 +1440,97 @@ regeneration_magiepunkte(void)
 	}
 }
 
-/* ------------------------------------------------------------- */
+static boolean
+verify_ship(region * r, unit * mage, const spell * sp, spllprm * spobj, order * ord)
+{
+  ship *sh = findship(spobj->data.i);
+
+  if (sh!=NULL && sh->region!=r && !(sp->sptyp & SEARCHGLOBAL)) {
+    /* Burg muss in gleicher Region sein */
+    sh = NULL;
+  }
+
+  if (sh==NULL) { 
+    /* Burg nicht gefunden */
+    spobj->flag = TARGET_NOTFOUND;
+    ADDMSG(&mage->faction->msgs, msg_message("spellshipnotfound", 
+      "unit region command id", mage, mage->region, ord, spobj->data.i));
+    return false;
+  }
+  spobj->flag = 0;
+  spobj->data.sh = sh;
+  return true;
+}
+
+static boolean
+verify_building(region * r, unit * mage, const spell * sp, spllprm * spobj, order * ord)
+{
+  building *b = findbuilding(spobj->data.i);
+
+  if (b!=NULL && b->region!=r && !(sp->sptyp & SEARCHGLOBAL)) {
+    /* Burg muss in gleicher Region sein */
+    b = NULL;
+  }
+
+  if (b==NULL) { 
+    /* Burg nicht gefunden */
+    spobj->flag = TARGET_NOTFOUND;
+    ADDMSG(&mage->faction->msgs, msg_message("spellbuildingnotfound", 
+      "unit region command id", mage, mage->region, ord, spobj->data.i));
+    return false;
+  }
+  spobj->flag = 0;
+  spobj->data.b = b;
+  return true;
+}
+
+static boolean
+verify_unit(region * r, unit * mage, const spell * sp, spllprm * spobj, order * ord)
+{
+  unit *u = NULL;
+  switch (spobj->typ) {
+    case SPP_UNIT:
+      u = findunit(spobj->data.i);
+      break;
+    case SPP_TEMP:
+      u = findnewunit(r, mage->faction, spobj->data.i);
+      if (u==NULL) u = findnewunit(mage->region, mage->faction, spobj->data.i);
+      break;
+    default:
+      assert(!"shouldn't happen, this");
+  }
+  if (u!=NULL && (sp->sptyp & SEARCHGLOBAL) == 0) {
+    if (u->region!=r) u = NULL;
+    else if (sp->sptyp & TESTCANSEE) {
+      if (!cansee(mage->faction, r, u, 0) && !ucontact(u, mage)) {
+        u = NULL;
+      }
+    }
+  }
+
+  if (u==NULL) { 
+    /* Einheit nicht gefunden */
+    char * uid;
+    spobj->flag = TARGET_NOTFOUND;
+
+    if (spobj->typ==SPP_UNIT) {
+      uid = strdup(itoa36(spobj->data.i));
+    } else {
+      char tbuf[20];
+      sprintf(tbuf, "%s %s", LOC(mage->faction->locale,
+        parameters[P_TEMP]), itoa36(spobj->data.i));
+      uid = strdup(tbuf);
+    }
+    ADDMSG(&mage->faction->msgs, msg_message("spellunitnotfound", 
+      "unit region command id", mage, mage->region, ord, uid));
+    return false;
+  }
+  /* Einheit wurde gefunden, pointer setzen */
+  spobj->flag = 0;
+  spobj->data.u = u;
+  return true;
+}
+
 /* ------------------------------------------------------------- */
 /* Zuerst wird versucht alle noch nicht gefundenen Objekte zu finden
  * oder zu prüfen, ob das gefundene Objekt wirklich hätte gefunden
@@ -1459,7 +1549,6 @@ verify_targets(castorder *co)
 	spell *sp = co->sp;
 	region *target_r = co->rt;
 	spellparameter *sa = co->par;
-	spllprm *spobj;
 	int failed = 0;
 	int resists = 0;
 	int success = 0;
@@ -1471,210 +1560,43 @@ verify_targets(castorder *co)
 		 * gar nicht global hätte suchen dürften, setzen wir das Objekt
 		 * zurück. */
 		for (i=0;i<sa->length;i++) {
-			spobj = sa->param[i];
+			spllprm * spobj = sa->param[i];
 
 			switch(spobj->typ) {
-				case SPP_UNIT_ID:
-				{
-					unit *u;
-					if (sp->sptyp & SEARCHGLOBAL) {
-						u = findunitg(spobj->data.i, target_r);
-					} else {
-						u = findunitr(target_r, spobj->data.i);
-					}
-					if (!u){ /* Einheit nicht gefunden */
-						spobj->flag = TARGET_NOTFOUND;
-						failed++;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, co->order,
-							strdup(itoa36(spobj->data.i))));
-						break;
-					} else { /* Einheit wurde nun gefunden, pointer umsetzen */
-						spobj->flag = 0;
-						spobj->typ = SPP_UNIT;
-						spobj->data.u = u;
-					}
-					break;
-				}
-				/* TEMP-Einheit */
-				case SPP_TUNIT_ID:
-				{
-					unit *u;
-						/* Versuch 1 : Region der Zauberwirkung */
-					u = findnewunit(target_r, mage->faction, spobj->data.i);
-					if (!u){
-						/* Versuch 2 : Region des Magiers */
-						u = findnewunit(mage->region, mage->faction, spobj->data.i);
-					}
-					if (!u && sp->sptyp & SEARCHGLOBAL) {
-						/* Fehler: TEMP-Einheiten kann man nicht global suchen. der
-						 * TEMP-Name gilt immer nur jeweils für die Region */
-					}
-					if (!u){ /* Einheit nicht gefunden */
-						char tbuf[1024];
-						spobj->flag = TARGET_NOTFOUND;
-						failed++;
-						/* Meldung zusammenbauen, sonst steht dort anstatt
-						 * "TEMP <nummer>" nur "<nummer>" */
-						sprintf(tbuf, "%s %s", LOC(mage->faction->locale,
-									parameters[P_TEMP]), itoa36(spobj->data.i));
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, co->order, strdup(tbuf)));
-						break;
-					} else {
-						/* Einheit wurde nun gefunden, pointer umsetzen */
-						spobj->flag = 0;
-						spobj->typ = SPP_UNIT;
-						spobj->data.u = u;
-					}
-					break;
-				}
+        case SPP_TEMP:
 				case SPP_UNIT:
-				{
-					unit *u = spobj->data.u;
-					if (!(sp->sptyp & SEARCHGLOBAL)
-							&& !findunitr(target_r, u->no))
-					{ /* die Einheit befindet sich nicht in der Zielregion */
-						spobj->typ = SPP_UNIT_ID;
-						spobj->data.i = u->no;
-						spobj->flag = TARGET_NOTFOUND;
-						failed++;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, co->order,
-							strdup(itoa36(spobj->data.i))));
-						break;
-					}
-					break;
-				}
-				case SPP_BUILDING_ID:
-				{
-					building *b;
-
-					if (sp->sptyp & SEARCHGLOBAL) {
-						b = findbuilding(spobj->data.i);
-					} else {
-						b = findbuildingr(target_r, spobj->data.i);
-					}
-					if (!b) { /* Burg nicht gefunden */
-						spobj->flag = TARGET_NOTFOUND;
-						failed++;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellbuildingnotfound%u:unit%r:region%s:command%i:id",
-							mage, mage->region, co->order, spobj->data.i));
-						break;
-					} else {
-						spobj->typ = SPP_BUILDING;
-						spobj->flag = 0;
-						spobj->data.b = b;
-					}
-					break;
-				}
+          if (!verify_unit(target_r, mage, sp, spobj, co->order)) ++failed;
+          break;
 				case SPP_BUILDING:
-				{
-					building *b;
-					b = spobj->data.b;
-
-					if (!(sp->sptyp & SEARCHGLOBAL)
-							&& !findbuildingr(target_r, b->no))
-					{ /* die Burg befindet sich nicht in der Zielregion */
-						spobj->typ = SPP_BUILDING_ID;
-						spobj->data.i = b->no;
-						spobj->flag = TARGET_NOTFOUND;
-						failed++;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellbuildingnotfound%u:unit%r:region%s:command%i:id",
-							mage, mage->region, co->order, spobj->data.i));
-						break;
-					}
-					break;
-				}
-				case SPP_SHIP_ID:
-				{
-					ship *sh;
-
-					if (sp->sptyp & SEARCHGLOBAL) {
-						sh = findship(spobj->data.i);
-					} else {
-						sh = findshipr(target_r, spobj->data.i);
-					}
-					if (!sh) { /* Schiff nicht gefunden */
-						spobj->flag = TARGET_NOTFOUND;
-						failed++;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellshipnotfound%u:unit%r:region%s:command%i:id",
-							mage, mage->region, co->order, spobj->data.i));
-						break;
-					} else {
-						spobj->typ = SPP_SHIP;
-						spobj->flag = 0;
-						spobj->data.sh = sh;
-					}
-					break;
-				}
+          if (!verify_building(target_r, mage, sp, spobj, co->order)) ++failed;
+          break;
 				case SPP_SHIP:
-				{
-					ship *sh;
-					sh = spobj->data.sh;
-
-					if (!(sp->sptyp & SEARCHGLOBAL)
-							&& !findshipr(target_r, sh->no))
-					{ /* das Schiff befindet sich nicht in der Zielregion */
-						spobj->typ = SPP_SHIP_ID;
-						spobj->data.i = sh->no;
-						spobj->flag = TARGET_NOTFOUND;
-						failed++;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellshipnotfound%u:unit%r:region%s:command%i:id",
-							mage, mage->region, co->order, spobj->data.i));
-						break;
-					}
-					break;
-				}
-				case SPP_REGION:
-				case SPP_INT:
-				case SPP_STRING:
-				default:
-					break;
+          if (!verify_ship(target_r, mage, sp, spobj, co->order)) ++failed;
+          break;
 			}
 		}
-		/* Nun folgen die Tests auf cansee und Magieresistenz */
-		for (i=0;i<sa->length;i++) {
-			spobj = sa->param[i];
 
+    /* Nun folgen die Tests auf cansee und Magieresistenz */
+		for (i=0;i<sa->length;i++) {
+			spllprm * spobj = sa->param[i];
+      unit * u;
+      building * b;
+      ship * sh;
+      region * tr;
+
+      if (spobj->flag == TARGET_NOTFOUND) continue;
 			switch(spobj->typ) {
+        case SPP_TEMP:
 				case SPP_UNIT:
-				{
-					unit *u;
 					u = spobj->data.u;
 
-					/* Wenn auf Sichtbarkeit geprüft werden soll und die Einheit
-					 * nicht gesehen wird und auch nicht kontaktiert, dann melde
-					 * 'Einheit nicht gefunden' */
-					if ((sp->sptyp & TESTCANSEE)
-							&& !cansee(mage->faction, target_r, u, 0)
-							&& !ucontact(u, mage))
-					{
-						spobj->typ = SPP_UNIT_ID;
-						spobj->data.i = u->no;
-						spobj->flag = TARGET_NOTFOUND;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, co->order,
-							strdup(itoa36(spobj->data.i))));
-						failed++;
-						break;
-					}
-
-					if ((sp->sptyp & TESTRESISTANCE)
+          if ((sp->sptyp & TESTRESISTANCE)
 							&& target_resists_magic(mage, u, TYP_UNIT, 0))
-					{ /* Fehlermeldung */
-						spobj->typ = SPP_UNIT_ID;
+					{ 
+            /* Fehlermeldung */
 						spobj->data.i = u->no;
 						spobj->flag = TARGET_RESISTS;
-						resists++;
+						++resists;
 						ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
               "unit region command target",
 							mage, mage->region, co->order, u));
@@ -1682,19 +1604,14 @@ verify_targets(castorder *co)
 					}
 
 					/* TODO: Test auf Parteieigenschaft Magieresistsenz */
-
-					success++;
+					++success;
 					break;
-				}
 				case SPP_BUILDING:
-				{
-					building *b;
 					b = spobj->data.b;
 
 					if ((sp->sptyp & TESTRESISTANCE)
 								&& target_resists_magic(mage, b, TYP_BUILDING, 0))
 					{ /* Fehlermeldung */
-						spobj->typ = SPP_BUILDING_ID;
 						spobj->data.i = b->no;
 						spobj->flag = TARGET_RESISTS;
 						resists++;
@@ -1705,16 +1622,12 @@ verify_targets(castorder *co)
 					}
 					success++;
 					break;
-				}
 				case SPP_SHIP:
-				{
-					ship *sh;
 					sh = spobj->data.sh;
 
 					if ((sp->sptyp & TESTRESISTANCE)
 								&& target_resists_magic(mage, sh, TYP_SHIP, 0))
 					{ /* Fehlermeldung */
-						spobj->typ = SPP_SHIP_ID;
 						spobj->data.i = sh->no;
 						spobj->flag = TARGET_RESISTS;
 						resists++;
@@ -1725,20 +1638,12 @@ verify_targets(castorder *co)
 					}
 					success++;
 					break;
-				}
-				case SPP_REGION:
-				{ /* haben wir ein Regionsobjekt, dann wird auch dieses und
+
+        case SPP_REGION:
+          /* haben wir ein Regionsobjekt, dann wird auch dieses und
 						 nicht target_r überprüft. */
-					region *tr;
 					tr = spobj->data.r;
 
-					if (!tr) { /* Fehlermeldung */
-						failed++;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellregionresists%u:unit%r:region%s:command",
-							mage, mage->region, co->order));
-						break;
-					}
 					if ((sp->sptyp & TESTRESISTANCE)
 							&& target_resists_magic(mage, tr, TYP_REGION, 0))
 					{ /* Fehlermeldung */
@@ -1751,16 +1656,11 @@ verify_targets(castorder *co)
 					}
 					success++;
 					break;
-				}
 				case SPP_INT:
 				case SPP_STRING:
 					success++;
 					break;
 
-				case SPP_SHIP_ID:
-				case SPP_TUNIT_ID:
-				case SPP_UNIT_ID:
-				case SPP_BUILDING_ID:
 				default:
 					break;
 			}
@@ -1771,12 +1671,14 @@ verify_targets(castorder *co)
 		 * Magieresistenz der Region prüfen. */
 		if ((sp->sptyp & REGIONSPELL)) {
 			/* Zielobjekt Region anlegen */
-			sa = calloc(1, sizeof(spellparameter));
+      spllprm * spobj = malloc(sizeof(spllprm));
+      spobj->flag = 0;
+      spobj->typ = SPP_REGION;
+      spobj->data.r = target_r;
+      
+      sa = calloc(1, sizeof(spellparameter));
 			sa->length = 1;
 			sa->param = calloc(sa->length, sizeof(spllprm *));
-			spobj = calloc(1, sizeof(spllprm));
-			spobj->typ = SPP_REGION;
-			spobj->data.r = target_r;
 			sa->param[0] = spobj;
 			co->par = sa;
 
@@ -1845,392 +1747,213 @@ free_spellparameter(spellparameter *pa)
 	free(pa);
 }
 
+static int
+addparam_string(const char ** param, spllprm ** spobjp)
+{
+  spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
+  assert(param[0]);
+
+  spobj->flag = 0;
+  spobj->typ = SPP_STRING;
+  spobj->data.s = strdup(param[0]);
+  return 1;
+}
+
+static int
+addparam_int(const char ** param, spllprm ** spobjp)
+{
+  spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
+  assert(param[0]);
+
+  spobj->flag = 0;
+  spobj->typ = SPP_INT;
+  spobj->data.i = atoi(param[0]);
+  return 1;
+}
+
+static int
+addparam_ship(const char ** param, spllprm ** spobjp)
+{
+  spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
+  int id = atoi36(param[0]);
+
+  spobj->flag = 0;
+  spobj->typ = SPP_SHIP;
+  spobj->data.i = id;
+  return 1;
+}
+
+static int
+addparam_building(const char ** param, spllprm ** spobjp)
+{
+  spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
+  int id = atoi36(param[0]);
+  
+  spobj->flag = 0;
+  spobj->typ = SPP_BUILDING;
+  spobj->data.i = id;
+  return 1;
+}
+
+static int
+addparam_region(const char ** param, spllprm ** spobjp, const unit * u, order * ord)
+{
+  assert(param[0]);
+  if (param[1]==0) {
+    /* Fehler: Zielregion vergessen */
+    cmistake(u, ord, 194, MSG_MAGIC);
+    return -1;
+  } else {
+    int tx = atoi(param[0]), ty = atoi(param[1]);
+    int x = rel_to_abs(0, u->faction, tx, 0);
+    int y = rel_to_abs(0, u->faction, ty, 1);
+    region *rt = findregion(x,y);
+
+    if (rt!=NULL) {
+      spllprm * spobj = *spobjp = malloc(sizeof(spllprm));
+
+      spobj->flag = 0;
+      spobj->typ = SPP_REGION;
+      spobj->data.r = rt;
+    } else {
+      /* Fehler: Zielregion vergessen */
+      cmistake(u, ord, 194, MSG_MAGIC);
+      return -1;
+    }
+    return 2;
+  }
+}
+
+
+static int
+addparam_unit(const char ** param, spllprm ** spobjp, const unit * u, order * ord)
+{
+  spllprm *spobj;
+  int i = 0;
+  sppobj_t otype = SPP_UNIT;
+
+  *spobjp = NULL;
+  if (findparam(param[0], u->faction->locale)==P_TEMP) {
+    if (param[1]==NULL) {
+      /* Fehler: Ziel vergessen */
+      cmistake(u, ord, 203, MSG_MAGIC);
+      return -1;
+    }
+    ++i;
+    otype = SPP_TEMP;
+  }
+
+  spobj = *spobjp = malloc(sizeof(spllprm));
+  spobj->flag = 0;
+  spobj->typ = otype;
+  spobj->data.i = atoi36(param[i]);
+
+  return i+1;
+}
 
 static spellparameter *
-add_spellparameter(region *target_r, unit *u, const char *syntax, struct order * ord, int skip)
+add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param, int size, struct order * ord)
 {
-	int i = 1;
-	int c = 0;
-	int l = 0;
-	char *tbuf, *token;
+  boolean fail = false;
+	int i = 0;
+  int p = 0;
+	const char * c = syntax;
 	spellparameter *par;
-	spllprm *spobj;
-
-	par = calloc(1, sizeof(spellparameter));
-
-	/* Temporären Puffer initialisieren */
-	tbuf = getcommand(ord);
-
-	/* Tokens zählen */
-	token = strtok(tbuf, " ");
-	while(token) {
-		par->length++;
-		token = strtok(NULL, " ");
-	}
-  free(tbuf);
-	/* length sollte nun nur noch die Anzahl der für den Zauber relevanten
-	 * Elemente enthalten */
-	par->length -= skip; /* Anzahl der Elemente ('temp 123' sind zwei!) */
 
 	/* mindestens ein Ziel (Ziellose Zauber werden nicht
 	 * geparst) */
-	if (par->length < 1) {
+	if (size==0) {
 		/* Fehler: Ziel vergessen */
 		cmistake(u, ord, 203, MSG_MAGIC);
-		/* Aufräumen */
-		free(par);
 		return 0;
 	}
 
-	/* Pointer allozieren */
-	par->param = calloc(par->length, sizeof(spllprm *));
+  par = malloc(sizeof(spellparameter));
+  par->length = size;
+	par->param = malloc(size * sizeof(spllprm *));
 
-	/* Tokens zuweisen */
-	tbuf = getcommand(ord);
-	token = strtok (tbuf, " ");
-	while(token && syntax[c] != 0) {
-		if (i > skip) {
-			if (syntax[c] == '+') {
-				/* das vorhergehende Element kommt ein oder mehrmals vor, wir
-				 * springen zum key zurück */
-				c--;
-			}
-			if (syntax[c] == '?') {
-				/* optionales Element vom Typ des nachfolgenden Zeichen, wir
-				 * gehen ein Element weiter */
-				c++;
-			}
-			spobj = calloc(1, sizeof(spllprm));
-			switch(syntax[c]) {
-				case 'u':
-				{ /* Parameter ist eine Unitid */
-					unit *ut;
-					int unitname;
-
-					/* Zuerst feststellen, ob es sich um eine Temp-Einheit
-					 * handelt. Steht dort das Schlüsselwort EINHEIT, so hat
-					 * garantiert jemand die Syntax falsch verstanden und die
-					 * Einheitennummer kommt dahinter. In beiden Fällen wird der
-					 * Befehl um ein token weiter eingelesen und es muß geprüft
-					 * werden, ob der Befehlsstring überhaupt lang genug wäre. */
-					switch (findparam(token, u->faction->locale)) {
-						case P_TEMP:
-							i++;
-							if (par->length < i - skip) {
-								/* Fehler: Ziel vergessen */
-								cmistake(u, ord, 203, MSG_MAGIC);
-								/* Aufräumen */
-								free(tbuf);
-								free(spobj);
-								par->length = l;
-								free_spellparameter(par);
-								return 0;
-							}
-							token = strtok(NULL, " ");
-							unitname = atoi36(token);
-							spobj->typ = SPP_TUNIT_ID;
-							ut = findnewunit(u->region, u->faction, unitname);
-							break;
-
-						case P_UNIT:
-							i++;
-							if (par->length < i - skip) {
-								/* Fehler: Ziel vergessen */
-								cmistake(u, ord, 203, MSG_MAGIC);
-								/* Aufräumen */
-								free(tbuf);
-								free(spobj);
-								par->length = l;
-								free_spellparameter(par);
-								return 0;
-							}
-							token = strtok(NULL, " ");
-						default:
-							unitname = atoi36(token);
-							ut = findunitr(target_r, unitname);
+  while (!fail && *c && i<size && param[i]!=NULL) {
+    spllprm * spobj = NULL;
+    int j = 0;
+    switch (*c) {
+      case '+':
+        /* das vorhergehende Element kommt ein oder mehrmals vor, wir
+        * springen zum key zurück */
+        --c;
+        break;
+      case 'u':
+        /* Parameter ist eine Einheit, evtl. TEMP */
+        j = addparam_unit(param+i, &spobj, u, ord);
+        ++c;
+        break;
+      case 'r':
+        /* Parameter sind zwei Regionskoordinaten */
+        j = addparam_region(param+i, &spobj, u, ord);
+        ++c;
+        break;
+      case 'b':
+				/* Parameter ist eine Burgnummer */
+        j = addparam_building(param+i, &spobj);
+        ++c;
+        break;
+      case 's':
+        j = addparam_ship(param+i, &spobj);
+        ++c;
+        break;
+      case 'c': 
+        /* Text, wird im Spruch ausgewertet */
+        j = addparam_string(param+i, &spobj);
+        ++c;
+        break;
+      case 'i': /* Zahl */
+        j = addparam_int(param+i, &spobj);
+        ++c;
+        break;
+      case 'k':
+        ++c;
+        switch (findparam(param[i++], u->faction->locale)) {
+          case P_REGION:
+            j = addparam_region(param+i, &spobj, u, ord);
+            ++c;
+            break;
+          case P_UNIT:
+            j = addparam_unit(param+i, &spobj, u, ord);
+            ++c;
+            break;
+          case P_BUILDING:
+          case P_GEBAEUDE:
+            j = addparam_building(param+i, &spobj);
+            ++c;
+            break;
+          case P_SHIP:
+            j = addparam_ship(param+i, &spobj);
+            ++c;
+            break;
+          default:
+            /* Syntax Error. */
+            cmistake(u, ord, 209, MSG_MAGIC);
+            j = -1;
 					}
-
-					if (ut) {
-						spobj->typ = SPP_UNIT;
-						spobj->data.u = ut;
-					} else if (spobj->typ && spobj->typ == SPP_TUNIT_ID){
-						/* die TEMP Einheit wurde nicht gefunden */
-						spobj->data.i = unitname;
-					} else {
-						/* eine Zieleinheit wurde nicht gefunden, wir merken uns die
-						 * Unitid für später. */
-						spobj->typ = SPP_UNIT_ID;
-						spobj->data.i = unitname;
-					}
-					break;
-				}
-				case 'r':
-				{ /* Parameter sind zwei Regionskoordinaten */
-					region *rt;
-					int x, y, tx, ty;
-
-					i++;
-					if (par->length < i - skip) {
-						/* Fehler: Zielregion vergessen */
-						cmistake(u, ord, 194, MSG_MAGIC);
-						/* Aufräumen */
-						free(tbuf);
-						free(spobj);
-						par->length = l;
-						free_spellparameter(par);
-						return 0;
-					}
-					tx = atoi(token);
-					token = strtok(NULL, " ");
-					ty = atoi(token);
-
-					/* die relativen Koordinaten ins absolute Koordinatensystem
-					 * umrechnen */
-					x = rel_to_abs(0,u->faction,tx,0);
-					y = rel_to_abs(0,u->faction,ty,1);
-					rt = findregion(x,y);
-
-					if (rt) {
-						spobj->typ = SPP_REGION;
-						spobj->data.r = rt;
-					} else {
-						/* Fehler: Zielregion vergessen */
-						cmistake(u, ord, 194, MSG_MAGIC);
-						/* Aufräumen */
-						free(tbuf);
-						free(spobj);
-						par->length = l;
-						free_spellparameter(par);
-						return 0;
-					}
-					break;
-				}
-				case 'b':
-				{ /* Parameter ist eine Burgnummer */
-					building *b;
-					int b_id;
-
-#ifdef FULL_BASE36
-					b_id = atoi36(token);
-#else
-					b_id = atoi(token);
-#endif
-					b = findbuilding(b_id);
-
-					if (b) {
-						spobj->typ = SPP_BUILDING;
-						spobj->data.b = b;
-					} else {
-						/* eine Burg mit der Nummer b_id wurde in dieser Region
-						 * nicht gefunden, wir merken uns die b_id für später. */
-						spobj->typ = SPP_BUILDING_ID;
-						spobj->data.i = b_id;
-					}
-					break;
-				}
-				case 's':
-				{ /* Parameter ist eine Schiffsnummer */
-					ship *sh;
-					int shid;
-
-#ifdef FULL_BASE36
-					shid = atoi36(token);
-#else
-					shid = atoi(token);
-#endif
-					sh = findshipr(target_r, shid);
-
-					if (sh) {
-						spobj->typ = SPP_SHIP;
-						spobj->data.sh = sh;
-					} else {
-						/* ein Schiff mit der Nummer shipname wurde in dieser Region
-						 * nicht gefunden, wir merken uns die shipname für später. */
-						spobj->typ = SPP_SHIP_ID;
-						spobj->data.i = shid;
-					}
-					break;
-				}
-				case 'c': /* Text, wird im Spruch ausgewertet */
-					spobj->typ = SPP_STRING;
-					spobj->data.s = strdup(token);
-					break;
-				case 'i': /* Zahl */
-					spobj->typ = SPP_INT;
-					spobj->data.i = atoi(token);
-					break;
-				case 'k':
-				{ /* keyword, dieses Element beschreibt was für ein Typ nachfolgt */
-					c++; /* das nächste Zeichen ist immer ein c für einen
-									variablen Stringparameter */
-					switch (findparam(token, u->faction->locale)) {
-						case P_REGION:
-						{
-							spobj->typ = SPP_REGION;
-							spobj->data.r = target_r;
-							break;
-						}
-						case P_UNIT:
-						{
-							unit *ut;
-							int unitname;
-							i++;
-							if (par->length < i - skip) {
-								/* Fehler: Ziel vergessen */
-								cmistake(u, ord, 203, MSG_MAGIC);
-								/* Aufräumen */
-								free(tbuf);
-								free(spobj);
-								par->length = l;
-								free_spellparameter(par);
-								return 0;
-							}
-							token = strtok(NULL, " ");
-							if (findparam(token, u->faction->locale) == P_TEMP) {
-								i++;
-								if (par->length < i - skip) {
-									/* Fehler: Ziel vergessen */
-									cmistake(u, ord, 203, MSG_MAGIC);
-									/* Aufräumen */
-									free(tbuf);
-									free(spobj);
-									par->length = l;
-									free_spellparameter(par);
-									return 0;
-								}
-								token = strtok(NULL, " ");
-								unitname = atoi36(token);
-								ut = findnewunit(u->region, u->faction, unitname);
-							} else {
-								unitname = atoi36(token);
-								ut = findunitr(target_r, unitname);
-							}
-							if (ut) {
-								spobj->typ = SPP_UNIT;
-								spobj->data.u = ut;
-							} else {
-								/* eine Zieleinheit wurde nicht gefunden, wir merken uns die
-								 * Unitid für später. */
-								spobj->typ = SPP_UNIT_ID;
-								spobj->data.i = unitname;
-							}
-							break;
-						}
-						case P_BUILDING:
-						case P_GEBAEUDE:
-						{
-							building *b;
-							int b_id;
-
-							i++;
-							if (par->length < i - skip) {
-								/* Fehler: Ziel vergessen */
-								cmistake(u, ord, 203, MSG_MAGIC);
-								/* Aufräumen */
-								free(tbuf);
-								free(spobj);
-								par->length = l;
-								free_spellparameter(par);
-								return 0;
-							}
-							token = strtok(NULL, " ");
-
-#ifdef FULL_BASE36
-							b_id = atoi36(token);
-#else
-							b_id = atoi(token);
-#endif
-							b = findbuilding(b_id);
-
-							if (b) {
-								spobj->typ = SPP_BUILDING;
-								spobj->data.b = b;
-							} else {
-								/* eine Burg mit der Nummer b_id wurde in dieser Region
-								 * nicht gefunden, wir merken uns die b_id für später. */
-								spobj->typ = SPP_BUILDING_ID;
-								spobj->data.i = b_id;
-							}
-							break;
-						}
-						case P_SHIP:
-						{
-							ship *sh;
-							int shid;
-							i++;
-							if (par->length < i - skip) {
-								/* Fehler: Ziel vergessen */
-								cmistake(u, ord, 203, MSG_MAGIC);
-								/* Aufräumen */
-								free(tbuf);
-								free(spobj);
-								par->length = l;
-								free_spellparameter(par);
-								return 0;
-							}
-							token = strtok(NULL, " ");
-#ifdef FULL_BASE36
-							shid = atoi36(token);
-#else
-							shid = atoi(token);
-#endif
-							sh = findshipr(target_r, shid);
-
-							if (sh) {
-								spobj->typ = SPP_SHIP;
-								spobj->data.sh = sh;
-							} else {
-								/* ein Schiff mit der Nummer shipname wurde in dieser Region
-								 * nicht gefunden, wir merken uns die shipname für später. */
-								spobj->typ = SPP_SHIP_ID;
-								spobj->data.i = shid;
-							}
-							break;
-						}
-						default:
-							/* Syntax Error. */
-							cmistake(u, ord, 209, MSG_MAGIC);
-							/* Aufräumen */
-							free(tbuf);
-							free(spobj);
-							par->length = l;
-							free_spellparameter(par);
-							return 0;
-					}
-					break;
-				}
-				default:
-					/* Syntax Error. */
-					cmistake(u, ord, 209, MSG_MAGIC);
-					/* Aufräumen */
-					free(tbuf);
-					free(spobj);
-					par->length = l;
-					free_spellparameter(par);
-					return 0;
-			}
-			par->param[l] = spobj;
-			l++;
-			c++;
-		}
-		i++;
-		token = strtok(NULL, " ");
-	}
-  free(tbuf);
-
-	/* im Endeffekt waren es nur l parameter */
-	par->length = l;
-
-	/* das letzte Zeichen des Syntaxstrings sollte 0 oder ein +
-	 * sein, ansonsten fehlte ein Parameter */
-	if (syntax[c] != 0 && syntax[c] != '+' && syntax[c] != '?') {
-		/* Syntax Error. */
-		cmistake(u, ord, 209, MSG_MAGIC);
-		/* Aufräumen */
-		free_spellparameter(par);
-		return 0;
+        break;
+      default:
+        /* Syntax Error. */
+        cmistake(u, ord, 209, MSG_MAGIC);
+        j = -1;
+    }
+    if (j<0) fail = true;
+    else {
+      if (spobj!=NULL) par->param[p++] = spobj;
+      i += j;
+    }
 	}
 
+  if (fail) {
+    free_spellparameter(par);
+    return NULL;
+  }
+
+  /* im Endeffekt waren es evtl. nur p parameter (wegen TEMP) */
+	par->length = p;
 	return par;
 }
 
@@ -2664,7 +2387,6 @@ magic(void)
   const char *s;
   int spellrank;
   int range, t_x, t_y;
-  int skiptokens;
   castorder *co;
   castorder *cll[MAX_SPELLRANK];
   spellparameter *args;
@@ -2709,7 +2431,6 @@ magic(void)
           mage = u;
           level = eff_skill(u, SK_MAGIC, r);
           familiar = NULL;
-          skiptokens = 1;
           init_tokens(ord);
           skip_token();
           s = getstrtoken();
@@ -2718,7 +2439,6 @@ magic(void)
             s = getstrtoken();
             level = min(atoip(s), level);
             s = getstrtoken();
-            skiptokens += 2;
             if (level < 1) {
               /* Fehler "Das macht wenig Sinn" */
               cmistake(u, ord, 10, MSG_MAGIC);
@@ -2732,7 +2452,6 @@ magic(void)
             t_y = rel_to_abs(getplane(u->region),u->faction,t_y,1);
             target_r = findregion(t_x, t_y);
             s = getstrtoken();
-            skiptokens += 3;
             if (!target_r) {
               /* Fehler "Es wurde kein Zauber angegeben" */
               cmistake(u, ord, 172, MSG_MAGIC);
@@ -2745,7 +2464,6 @@ magic(void)
             s = getstrtoken();
             level = min(atoip(s), level);
             s = getstrtoken();
-            skiptokens += 2;
             if (level < 1) {
               /* Fehler "Das macht wenig Sinn" */
               cmistake(u, ord, 10, MSG_MAGIC);
@@ -2877,10 +2595,22 @@ magic(void)
           }
           /* Weitere Argumente zusammenbasten */
           if (sp->parameter) {
-            ++skiptokens;
-            args = add_spellparameter(target_r, mage, sp->parameter,
-              ord, skiptokens);
-            if (!args) {
+            char ** params = malloc(2*sizeof(char*));
+            size_t p = 0, size = 2;
+            for (;;) {
+              s = getstrtoken();
+              if (*s==0) break;
+              if (p+1>=size) {
+                size*=2;
+                params = realloc(params, sizeof(char*)*size);
+              }
+              params[p++] = strdup(s);
+            }
+            params[p] = 0;
+            args = add_spellparameter(target_r, mage, sp->parameter, params, p, ord);
+            for (p=0;params[p];++p) free(params[p]);
+            free(params);
+            if (args==NULL) {
               /* Syntax war falsch */
               continue;
             }

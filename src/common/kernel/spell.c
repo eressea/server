@@ -707,6 +707,7 @@ sp_destroy_magic(castorder *co)
 			strcpy(ts, regionid(tr));
 			break;
 		}
+    case SPP_TEMP:
 		case SPP_UNIT:
 		{
 			unit *u;
@@ -5647,6 +5648,7 @@ sp_analysemagic(castorder *co)
 			magicanalyse_region(tr, mage, cast_level);
 			break;
 		}
+    case SPP_TEMP:
 		case SPP_UNIT:
 		{
 			unit *u;
@@ -7056,6 +7058,7 @@ sp_q_antimagie(castorder *co)
 			set_string(&ts, regionid(r));
 			break;
 
+    case SPP_TEMP:
 		case SPP_UNIT:
 		{
 			unit *u = pa->param[0]->data.u;
@@ -7149,6 +7152,7 @@ sp_destroy_curse(castorder *co)
 			set_string(&ts, regionname(r, mage->faction));
 			break;
 
+    case SPP_TEMP:
 		case SPP_UNIT:
 		{
 			unit *u = pa->param[0]->data.u;
@@ -7579,10 +7583,6 @@ patzer_createitem(castorder *co)
  * + : gibt an, das der vorherige Parameter mehrfach vorkommen kann. Da
  *     ein Ende nicht definiert werden kann, muss dies immer am Schluss
  *     kommen.
- * ? : gibt an, das der folgende Parameter optional ist. Da nicht
- *     definiert werden kann, ob wirklich ein Parameter nachfolgt oder
- *     etwas anderes, muss dies immer als vorletztes Zeichen stehen und
- *     darf nicht direkt von einem + gefolgt werden.
  *
  * Flags für das Parsing:
  * TESTRESISTANCE : alle Zielobjekte, also alle Parameter vom Typ Unit,

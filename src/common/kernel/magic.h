@@ -42,22 +42,19 @@ struct building;
 
 /* siehe auch typ_t in objtypes.h */
 typedef enum {
-	SPP_UNIT,          /* "u" : getunit() -> *unit */
-	SPP_REGION,        /* "r" : findregion(x,y) -> *region */
-	SPP_BUILDING,      /* "b" : findbuilding() -> *building */
-	SPP_SHIP,          /* "s" : findship() -> *ship */
-	SPP_UNIT_ID,       /*  -  : atoi36() -> int */
-	SPP_BUILDING_ID,   /*  -  : atoi() -> int */
-	SPP_SHIP_ID,       /*  -  : atoi() -> int */
-	SPP_STRING,        /* "c" */
-	SPP_INT,           /* "i" : atoi() -> int */
-	SPP_TUNIT_ID       /*  -  : temp einheit */
+	SPP_REGION,   /* "r" : findregion(x,y) -> *region */
+	SPP_UNIT,     /*  -  : atoi36() -> int */
+  SPP_TEMP,     /*  -  : temp einheit */
+	SPP_BUILDING, /*  -  : atoi() -> int */
+	SPP_SHIP,     /*  -  : atoi() -> int */
+	SPP_STRING,   /* "c" */
+	SPP_INT,      /* "i" : atoi() -> int */
 } sppobj_t;
 
 typedef struct spllprm{
 	sppobj_t typ;
 	int flag;
-	union{
+	union {
 		struct region *r;
 		struct unit *u;
 		struct building *b;
