@@ -99,15 +99,90 @@ item_type it_halflingspoil = {
 	NULL           /* give */
 };
 
-resource_type rt_halflingspoil = {
-	{ "halflingspoil", "halflingspoil_p" },
-	{ "halflingspoil", "halflingspoil_p" },
+resource_type rt_humanspoil = {
+	{ "humanspoil", "humanspoil_p" },
+	{ "humanspoil", "humanspoil_p" },
 	RTF_ITEM|RTF_POOLED,
 	&res_changeitem
 };
 
-item_type it_halflingspoil = {
-	&rt_halflingspoil,  /* resourcetype */
+item_type it_humanspoil = {
+	&rt_humanspoil,  /* resourcetype */
+	0, 1, 0,       /* flags, weight, capacity */
+	NULL,	       /* construction */
+	NULL,          /* use */
+	NULL           /* give */
+};
+
+resource_type rt_aquarianspoil = {
+	{ "aquarianspoil", "aquarianspoil_p" },
+	{ "aquarianspoil", "aquarianspoil_p" },
+	RTF_ITEM|RTF_POOLED,
+	&res_changeitem
+};
+
+item_type it_aquarianspoil = {
+	&rt_aquarianspoil,  /* resourcetype */
+	0, 1, 0,       /* flags, weight, capacity */
+	NULL,	       /* construction */
+	NULL,          /* use */
+	NULL           /* give */
+};
+
+resource_type rt_insectspoil = {
+	{ "insectspoil", "insectspoil_p" },
+	{ "insectspoil", "insectspoil_p" },
+	RTF_ITEM|RTF_POOLED,
+	&res_changeitem
+};
+
+item_type it_insectspoil = {
+	&rt_insectspoil,  /* resourcetype */
+	0, 1, 0,       /* flags, weight, capacity */
+	NULL,	       /* construction */
+	NULL,          /* use */
+	NULL           /* give */
+};
+
+resource_type rt_catspoil = {
+	{ "catspoil", "catspoil_p" },
+	{ "catspoil", "catspoil_p" },
+	RTF_ITEM|RTF_POOLED,
+	&res_changeitem
+};
+
+item_type it_catspoil = {
+	&rt_catspoil,  /* resourcetype */
+	0, 1, 0,       /* flags, weight, capacity */
+	NULL,	       /* construction */
+	NULL,          /* use */
+	NULL           /* give */
+};
+
+resource_type rt_orcspoil = {
+	{ "orcspoil", "orcspoil_p" },
+	{ "orcspoil", "orcspoil_p" },
+	RTF_ITEM|RTF_POOLED,
+	&res_changeitem
+};
+
+item_type it_orcspoil = {
+	&rt_orcspoil,  /* resourcetype */
+	0, 1, 0,       /* flags, weight, capacity */
+	NULL,	       /* construction */
+	NULL,          /* use */
+	NULL           /* give */
+};
+
+resource_type rt_trollspoil = {
+	{ "trollspoil", "trollspoil_p" },
+	{ "trollspoil", "trollspoil_p" },
+	RTF_ITEM|RTF_POOLED,
+	&res_changeitem
+};
+
+item_type it_trollspoil = {
+	&rt_trollspoil,  /* resourcetype */
 	0, 1, 0,       /* flags, weight, capacity */
 	NULL,	       /* construction */
 	NULL,          /* use */
@@ -122,5 +197,11 @@ register_racespoils(void)
 	it_register(&it_goblinspoil);
 	it_register(&it_dwarfspoil);
 	it_register(&it_halflingspoil);
+	it_register(&it_humanspoil);
+	it_register(&it_aquarianspoil);
+	it_register(&it_insectspoil);
+	it_register(&it_catspoil);
+	it_register(&it_orcspoil);
+	it_register(&it_trollspoil);
 }
 

@@ -1214,7 +1214,7 @@ t_item itemdata[MAXITEMS] = {
 	{			/* I_SACK_OF_CONSERVATION */
 		{"Magischer Kräuterbeutel", "Magische Kräuterbeutel", "", ""}, G_M,
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
-	}
+	},
 	{			/* I_SPHERE_OF_INVISIBILITY */
 		{"Sphäre der Unsichtbarkeit", "Sphären der Unsichtbarkeit", "", ""}, G_M,
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
