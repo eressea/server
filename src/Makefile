@@ -3,8 +3,7 @@ TARGETS = subdirs
 SUBDIRS = \
   common \
   eressea \
-  mapper \
-  tools
+  mapper
 
 #  askalon
 

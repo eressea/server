@@ -711,6 +711,11 @@ enum {
 	SEASON_AUTUMN
 };
 
+/* Siegbedingungen */
+
+#define VICTORY_NONE   0
+#define VICTORY_MURDER 1
+
 /* ------------------------------------------------------------- */
 
 #define MAXSPEED   21

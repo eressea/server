@@ -5,6 +5,7 @@ endif
 
 # Hier definieren, damit nicht '@gcc'
 CC      = gcc-3.0 -D_GNU_SOURCE
+DEPEND  = @gcc-3.0 -MM -MG -r
 # CC      = gcc -D_GNU_SOURCE
 AR      = ar
 CTAGS   = ctags-exuberant

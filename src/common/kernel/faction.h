@@ -55,6 +55,9 @@ typedef struct faction {
 	int number; /* enno: unterschied zu num_people ? */
 	int money;
 	int score;
+#ifdef VICTORY_DELAY
+	unsigned char victory_delay;
+#endif
 #ifndef FAST_REGION
 	vset regions;
 #endif
