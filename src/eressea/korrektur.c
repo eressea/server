@@ -1321,9 +1321,9 @@ stats(void)
 		for (itype=itemtypes;itype;itype=itype->next) {
 			stats_t * itm = s_find(items, itype);
 			if (itm && itm->number>0.0)
-				fprintf(F, "%4.0lf %s\n", itm->number, locale_string(NULL, resourcename(itype->rtype, 0)));
+				fprintf(F, "%4.0f %s\n", itm->number, locale_string(NULL, resourcename(itype->rtype, 0)));
 			else
-				fprintf(F, "%4.0lf %s\n", 0.0, locale_string(NULL, resourcename(itype->rtype, 0)));
+				fprintf(F, "%4.0f %s\n", 0.0, locale_string(NULL, resourcename(itype->rtype, 0)));
 		}
 		fclose(F);
 	} else {
@@ -2835,7 +2835,7 @@ korrektur(void)
 #ifdef ENHANCED_QUIT
 	no_teurefremde(0);
 #else
-	no_teurefremde(1)
+	no_teurefremde(1);
 #endif
 	update_igjarjuk_quest();
 	fix_allies();
