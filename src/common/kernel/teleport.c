@@ -71,10 +71,10 @@ astralregions(const region * r, boolean (*valid)(const region *))
   r = r_astral_to_standard(r);
   if (r==NULL) return NULL;
 
-  for (x=r->x-TP_RADIUS;x<=r->x+TP_RADIUS;++x) {
-    for (y=r->y-TP_RADIUS;y<=r->y+TP_RADIUS;++y) {
+  for (x=-TP_RADIUS;x<=+TP_RADIUS;++x) {
+    for (y=-TP_RADIUS;y<=+TP_RADIUS;++y) {
       region * rn;
-      int dist = koor_distance(r->x, r->y, x, y);
+      int dist = koor_distance(0, 0, x, y);
 
       if (dist > TP_RADIUS) continue;
       if (dist==4) {
@@ -83,7 +83,7 @@ astralregions(const region * r, boolean (*valid)(const region *))
         if (x==-2 && y==2) continue;
         if (x==0 && y==-2) continue;
       }
-      rn = findregion(x, y);
+      rn = findregion(r->x+x, r->y+y);
       if (rn!=NULL && (valid==NULL || valid(rn))) add_regionlist(&rlist, rn);
     }
   }
