@@ -654,7 +654,9 @@ move_unit(unit * u, region * r, unit ** ulist)
 	if (u->region!=NULL) maxhp = unit_max_hp(u);
 	if (!ulist) ulist = (&r->units);
 	if (u->region) {
+#ifdef DELAYED_OFFENSE
 		set_moved(&u->attribs);
+#endif
 		setguard(u, GUARD_NONE);
 		fset(u, FL_MOVED);
 		if (u->ship || u->building) leave(u->region, u);

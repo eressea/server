@@ -21,7 +21,8 @@
 static int
 age_moved(attrib * a)
 {
-	return a->data.i-- > 0;
+	--a->data.i;
+	return a->data.i > 0;
 }
 
 static void
@@ -53,7 +54,7 @@ set_moved(attrib ** alist)
 {
 	attrib * a = a_find(*alist, &at_moved);
 	if (a==NULL) a = a_add(alist, a_new(&at_moved));
-	a->data.i = 1;
+	a->data.i = 2;
 }
 
 void
