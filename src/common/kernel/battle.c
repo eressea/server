@@ -680,10 +680,22 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
 				if (skill < u->race->df_default) skill = u->race->df_default;
 			}
 		}
+		if (attacking) {
+			skill += u->race->at_bonus;
+		} else {
+			skill += u->race->df_bonus;
+		}
 	} else {
 		/* changed: if we own a weapon, we have at least a skill of 0 */
 		skill = effskill(u, wtype->skill);
 		if (skill < wtype->minskill) skill = 0;
+		if (skill > 0) {
+			if(attacking) {
+				skill += u->race->at_bonus;
+			} else {
+				skill += u->race->df_bonus;
+			}
+		}
 		if (attacking) {
 			skill += wtype->offmod;
 		} else {
@@ -693,12 +705,6 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
 				skill += wtype->defmod;
 			}
 		}
-	}
-	/* Rassenbonus auf Kampf */
-	if (attacking) {
-		skill += u->race->at_bonus;
-	} else {
-		skill += u->race->df_bonus;
 	}
 
 	return skill;
