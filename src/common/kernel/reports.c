@@ -210,7 +210,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 			scat(", ");
 			if(a_otherfaction
 					&& allied(u, f, HELP_FSTEALTH)) {
-				scat(factionname(findfaction(a_otherfaction->data.i)));
+				scat(factionname(get_otherfaction(a_otherfaction)));
 				scat(" (");
 				scat(factionname(u->faction));
 				scat(")");
