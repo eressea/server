@@ -48,20 +48,20 @@ def ShowPage():
 	lastturn, game = cursor.fetchone()
 	maxturn[game] = lastturn
     output='<p>Um eine der folgenden Parteien zu übernehmen, musst du zuerst ein <a href="register.php">Spielerkonto anlegen</a>. Wenn Du eines hast, markiere die Partei, die Du übernehmen willst, und trage Kundennummer und Kundenpasswort ein.'
-    query = "SELECT g.id, g.name, s.faction, s.lastturn, s.id, s.race, s.info from games g, subscriptions s where s.game=g.id and s.status='CANCELLED'"
+    query = "SELECT g.id, g.name, s.faction, s.lastturn, s.id, r.name, s.info from games g, subscriptions s, races r where s.game=g.id and s.race=r.race and s.status='CANCELLED'"
     results = cursor.execute(query)
-    output=output+'<form action="'+scripturl+'" method=post><div align=center><table bgcolor="#e0e0e0" width=80% border>\n'
+    output=output+'<div align=center><form action="'+scripturl+'" method=post><table bgcolor="#e0e0e0" width="80%" border>\n'
     output=output+'<tr><th>Rasse</th><th>Spiel</th><th>NMRs</th><th>Informationen</th><th>Markieren</th></tr>'
     while results>0:
 	results=results-1
 	gid, game, faction, lastturn, sid, race, info = cursor.fetchone()
 	if info==None:
 	    info='Keine Informationen'
-	output=output+'<tr><td>'+ race + '</td><td><nobr>'+ game + '</nobr></td><td>' + str(int(maxturn[gid]-lastturn)) + '</td><td>' + info + '</td>'
+	output=output+'<tr><td>'+ race + '</td><td>'+ game + '</td><td>' + str(int(maxturn[gid]-lastturn)) + '</td><td>' + info + '</td>'
 	output=output+'<td><input type="checkbox" name="accept_' + str(int(sid)) + '"> übernehmen</td></tr>\n'
     
     output=output+'</table>'
-    output=output+'<p><table><tr><td>Kundennummer:</td><td><input name="user" size="4"></tr><tr><td>Passwort:</td><td><input name="pass" type="password" width="40"></td>'
+    output=output+'<p><table><tr><td>Kundennummer:</td><td><input name="user" size="4"></tr><tr><td>Passwort:</td><td><input name="pass" type="password" size="40"></td>'
     output=output+'<tr><td><input name="save" type="submit" value="Abschicken"></td></tr></table>'
     output=output+'</form></div>'
     Display(output)
