@@ -50,19 +50,19 @@
 	</string>
 
 	<comment> ship types</comment>
-	<string name="Karavelle">
+	<string name="caravel">
 		<text locale="en">caravel</text>
 	</string>
-	<string name="Boot">
+	<string name="boat">
 		<text locale="en">boat</text>
 	</string>
-	<string name="Langboot">
+	<string name="longboat">
 		<text locale="en">longboat</text>
 	</string>
-	<string name="Drachenschiff">
+	<string name="dragonship">
 		<text locale="en">dragonship</text>
 	</string>
-	<string name="Trireme">
+	<string name="trireme">
 		<text locale="en">trireme</text>
 	</string>
 	<string name="balloon">

@@ -1123,7 +1123,7 @@ quit(void)
 {
 	region *r;
 	unit *u, *un;
-	strlist *S, *Sn;
+	strlist *S;
 	faction *f;
 	const race * frace;
 
