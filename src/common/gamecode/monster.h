@@ -22,7 +22,7 @@
 #ifndef MONSTER_H
 #define MONSTER_H
 
-#define DRAGON_RANGE 6 /* Max. Distanz zum nächsten Drachenziel */
+#define DRAGON_RANGE 20 /* Max. Distanz zum nächsten Drachenziel */
 
 void age_illusion(struct unit *u);
 

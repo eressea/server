@@ -428,7 +428,7 @@ static boolean
 set_movement_order(unit * u, const region * target, int moves, boolean (*allowed)(const region *, const region *))
 {
 	region * r = u->region;
-	region ** plan = path_find(r, target, DRAGON_RANGE, allowed);
+	region ** plan = path_find(r, target, DRAGON_RANGE*5, allowed);
 	int position = 0;
 	char * c;
 

@@ -85,7 +85,7 @@
 #undef  XMAS1999
 #undef  XMAS2000
 #undef  XMAS2001
-#define XMAS2002
+#undef XMAS2002
 
 extern void reorder_owners(struct region * r);
 
