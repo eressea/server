@@ -294,7 +294,7 @@ is_mage(const unit * u)
 sc_mage *
 get_mage(const unit * u)
 {
-	if (get_skill(u, SK_MAGIC) != 0) {
+	if (has_skill(u, SK_MAGIC)) {
 		attrib * a = a_find(u->attribs, &at_mage);
 		if (a) return a->data.v;
 	}
@@ -3238,7 +3238,7 @@ magic(void)
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) {
 			if (is_mage(u) && countspells(u,0) > 0) {
-				change_skill(u, SK_MAGIC, PRODUCEEXP);
+				produceexp(u, SK_MAGIC, u->number);
 				/* Spruchlistenaktualiesierung ist in Regeneration */
 			}
 		}

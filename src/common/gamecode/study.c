@@ -112,7 +112,7 @@ study_cost(unit *u, int talent)
 			break;
 		case SK_MAGIC:	/* Die Magiekosten betragen 50+Summe(50*Stufe) */
 				/* 'Stufe' ist dabei die nächste zu erreichende Stufe */
-			stufe = 1 + pure_skill(u, SK_MAGIC, u->region);
+			stufe = 1 + get_level(u, SK_MAGIC);
 			return k*(1+((stufe+1)*stufe/2));
 			break;
 	}
@@ -128,7 +128,8 @@ static const attrib_type at_learning = {
 };
 
 static int
-teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean report)
+teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, 
+			  boolean report, int * academy)
 {
 	attrib * a;
 	int n;
@@ -172,13 +173,7 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
 				/* Jeder Schüler zusätzlich +10 Tage wenn in Uni. */
 				a->data.i += (n / 30) * 10; /* learning erhöhen */
 				/* Lehrer zusätzlich +1 Tag pro Schüler. */
-#if SKILLPOINTS
-				change_skill(teacher, sk, n / 30);
-#else
-				if (learn_skill(teacher, sk, n / 30)) {
-					change_skill(teacher, sk, teacher->number);
-				}
-#endif
+				if (academy) *academy += n;
 			}	/* sonst nehmen sie nicht am Unterricht teil */
 		}
 		/* Teaching ist die Anzahl Leute, denen man noch was beibringen kann. Da
@@ -231,7 +226,7 @@ teach(region * r, unit * u)
 	/* Parameter r gebraucht, um kontrollieren zu können, daß die Ziel-Unit auch
 	 * in der selben Region ist (getunit). Lehren vor lernen. */
 	static char order[BUFSIZE];
-	int teaching, i, j, count;
+	int teaching, i, j, count, academy=0;
 	unit *u2;
 	char *s;
 	skill_t sk;
@@ -257,8 +252,7 @@ teach(region * r, unit * u)
 		add_message(&u->faction->msgs, msg_message("teachdumb",
 			"teacher amount", u, j));
 	}
-	if (teaching == 0)
-		return;
+	if (teaching == 0) return;
 
 	strcpy(order, locale_string(u->faction->locale, keywords[K_TEACH]));
 
@@ -283,7 +277,7 @@ teach(region * r, unit * u)
 						sk = teachskill[i];
 					}
 					if (sk != NOSKILL && eff_skill(u, sk, r) > eff_skill(student, sk, r)) {
-						teaching -= teach_unit(u, student, teaching, sk, true);
+						teaching -= teach_unit(u, student, teaching, sk, true, &academy);
 					}
 				}
 			}
@@ -296,7 +290,7 @@ teach(region * r, unit * u)
 					/* Input ist nun von student->thisorder !! */
 					sk = getskill(student->faction->locale);
 					if (sk != NOSKILL && eff_skill(u, sk, r) >= eff_skill(student, sk, r)+TEACHDIFFERENCE) {
-						teaching -= teach_unit(u, student, teaching, sk, true);
+						teaching -= teach_unit(u, student, teaching, sk, true, &academy);
 					}
 				}
 			}
@@ -410,8 +404,16 @@ teach(region * r, unit * u)
 			}
 		}
 
-		teaching -= teach_unit(u, u2, teaching, sk, false);
+		teaching -= teach_unit(u, u2, teaching, sk, false, &academy);
 
+	}
+	if (academy) {
+#if SKILLPOINTS
+		change_skill(u, sk, academy / 30);
+#else
+		academy = academy/30;
+		learn_skill(u, sk, academy/30.0/TEACHNUMBER);
+#endif
 	}
 }
 /* ------------------------------------------------------------- */
@@ -649,8 +651,14 @@ learn(void)
 #if SKILLPOINTS
 				change_skill(u, (skill_t)i, days);
 #else
-				if (learn_skill(u, (skill_t)i, days)) {
-					change_skill(u, (skill_t)i, u->number);
+				while (days) {
+					if (days>u->number*30) {
+						learn_skill(u, (skill_t)i, 1.0);
+						days -= u->number*30;
+					} else {
+						double chance = (double)days/u->number/30;
+						learn_skill(u, (skill_t)i, chance);
+					}
 				}
 #endif
 				if (a) {

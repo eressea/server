@@ -22,54 +22,7 @@
 #ifndef UNIT_H
 #define UNIT_H
 
-#ifdef NEW_UNITS
-typedef struct party {
-	struct party *next;
-	struct party *nexthash;
-	struct party *nextF; /* nächste Einheit der Partei */
-	struct party *prevF; /* letzte Einheit der Partei */
-	int no;
-	char *name;
-	char *display;
-	short age;
-	struct region *region;
-	struct faction *faction;
-	struct building *building;
-	struct ship *ship;
-	struct strlist *orders;
-	struct strlist *botschaften;
-	int n;
-	int wants;
-	struct race * race;
-	struct race * irace;
-	char *thisorder;
-	char *lastorder;
-	struct item * items;
-	struct reservation {
-		struct reservation * next;
-		const struct resource_type * type;
-		int value;
-	} * reservations;
-	struct unit *units; /* new */
-	struct attrib * attribs;
-} party;
-
-typedef struct unit {
-	struct unit *next; /* new */
-	struct party *party;
-	int no;
-	int number;
-	int hp;
-	int skill_size;
-	struct skillvalue *skills;
-	struct strlist *orders; /* new */
-	struct attrib *attribs; /* new */
-	unsigned int flags;
-	char effstealth;
-	status_t status;
-} struct unit;
-
-#else
+struct skill;
 
 typedef struct unit {
 	struct unit *next;
@@ -89,7 +42,7 @@ typedef struct unit {
 	char *thisorder;
 	char *lastorder;
 	int skill_size;
-	struct skillvalue *skills;
+	struct skill *skills;
 	struct item * items;
 	struct reservation {
 		struct reservation * next;
@@ -111,7 +64,6 @@ typedef struct unit {
 	int n;	/* enno: attribut? */
 	int wants;	/* enno: attribut? */
 } unit;
-#endif
 
 extern attrib_type at_alias;
 extern attrib_type at_siege;
@@ -157,13 +109,26 @@ extern const struct unit u_unknown;
 
 extern struct unit * udestroy;
 
+#if SKILLPOINTS
 extern int change_skill(struct unit * u, skill_t id, int byvalue);
-extern int change_level(struct unit * u, skill_t id, int bylevel);
 extern void set_skill(struct unit * u, skill_t id, int value);
-extern void set_level(struct unit * u, skill_t id, int level);
 extern int get_skill(const struct unit * u, skill_t id);
+#define has_skill(u, id) (get_skill(u, id)>0)
+#define change_level(u, sk, bylevel) set_level(u, sk, max(0,get_level(u,sk)+bylevel));
+#else
+extern void set_skill(struct unit * u, skill_t id, int level, int weeks);
+extern struct skill * get_skill(struct unit * u, skill_t id);
+extern boolean has_skill(const unit* u, skill_t sk);
+extern int change_level(struct unit * u, skill_t id, int bylevel);
+#endif
+
+extern int change_skillpoints(struct unit * u, skill_t id, int byvalue);
+extern void set_level(struct unit * u, skill_t id, int level);
 extern int get_level(const struct unit * u, skill_t id);
 extern void transfermen(struct unit * u, struct unit * u2, int n);
+
+extern int eff_skill(const struct unit * u, skill_t sk, const struct region * r);
+extern int get_modifier(const struct unit * u, skill_t sk, int lvl, const struct region * r);
 
 #undef DESTROY
 
@@ -194,7 +159,7 @@ extern void u_setfaction(struct unit * u, struct faction * f);
 extern void set_number(struct unit * u, int count);
 
 #if !SKILLPOINTS
-extern boolean learn_skill(const struct unit * u, skill_t sk, int days);
+extern boolean learn_skill(const struct unit * u, skill_t sk, double chance);
 #endif
 
 #endif

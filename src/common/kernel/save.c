@@ -1452,13 +1452,26 @@ readgame(boolean backup)
 
 			assert(u->number >= 0);
 			assert(u->race);
-
+#ifdef CONVERT_SKILLPOINTS
 			while ((sk = (skill_t) ri(F)) != NOSKILL) {
-				set_skill(u, sk, ri(F));
-				if (sk == SK_ALCHEMY) {
-				/*	init_potions(r, u); */
+				int skill = ri(F) / u->number;
+				int lvl = level(skill);
+				int weeks = (skill - level_days(lvl))/30;
+				if (weeks || lvl) {
+					set_skill(u, sk, lvl, weeks);
 				}
 			}
+#elif SKILLPOINTS
+			while ((sk = (skill_t) ri(F)) != NOSKILL) {
+				set_skill(u, sk, ri(F));
+			}
+#else
+			while ((sk = (skill_t) ri(F)) != NOSKILL) {
+				int level = ri(F);
+				int weeks = ri(F);
+				set_skill(u, sk, level, weeks);
+			}
+#endif
 			if (global.data_version>=ITEMTYPE_VERSION) {
 				read_items(F, &u->items);
 			} else {
@@ -1478,7 +1491,7 @@ readgame(boolean backup)
 			/* assert(u->hp >= u->number); */
 			if (global.data_version < MAGE_ATTRIB_VERSION) {
 				if (global.data_version < NEWMAGIC) {
-					if (get_skill(u, SK_MAGIC) > 0) {
+					if (has_skill(u, SK_MAGIC)) {
 						/* ist Magier und muss in neuen Magier konvertiert werden */
 						create_mage(u, u->faction->magiegebiet);
 						/* bekommt anfangs soviel Aura wie er Magie kann */
@@ -1633,9 +1646,16 @@ readgame(boolean backup)
 }
 /* ------------------------------------------------------------- */
 
-#define wc(F, c) putc(c, F)
-#define wnl(F) putc('\n', F)
-#define wspace(F) putc(' ', F)
+#ifndef NDEBUG
+int space=0;
+# define DOSPACE space=1;
+# define UNSPACE space=0;
+#endif
+
+#define wc(F, c) { putc(c, F); UNSPACE }
+#define wnl(F) { putc('\n', F); DOSPACE }
+#define wspace(F) { assert (!space); putc(' ', F); UNSPACE }
+#define whs(F, s) { fputs(s, F); UNSPACE }
 
 void
 wsn(FILE * F, const char *s)
@@ -1646,27 +1666,25 @@ wsn(FILE * F, const char *s)
 		wc(F, *s++);
 }
 
-#define whs(F, s) fputs(s, F)
-
 void
 ws(FILE * F, const char *s)
 {
-	wc(F, '"');
+	fputc('"', F);
 	wsn(F, s);
-	wc(F, '"');
+	fputs("\" ", F); DOSPACE
 }
 
 void
 wi(FILE * F, int n)
 {
-	sprintf(buf, "%d", n);
-	wsn(F, buf);
+	sprintf(buf, "%d ", n);
+	wsn(F, buf); DOSPACE
 }
 
 void wi36(FILE * F, int n)
 {
-	sprintf(buf, "%s", itoa36(n));
-	wsn(F, buf);
+	sprintf(buf, "%s ", itoa36(n));
+	wsn(F, buf); DOSPACE
 }
 
 void
@@ -2053,7 +2071,11 @@ writegame(char *path, char quiet)
 		wi(F, listlen(r->units));
 		wnl(F);
 		for (u = r->units; u; u = u->next) {
+#if !SKILLPOINTS || defined(CONVERT_SKILLPOINTS)
+			int i;
+#else
 			skill_t sk;
+#endif
 			wid(F, u->no);
 			wspace(F);
 			wid(F, u->faction->no);
@@ -2116,14 +2138,28 @@ writegame(char *path, char quiet)
 			assert(u->race);
 #endif
 
+#if SKILLPOINTS
 			for (sk = 0; sk != MAXSKILLS; sk++) {
-				if (get_skill(u, sk) > 0) {
+				if (get_skill(u, sk)) {
 					wi(F, sk);
 					wspace(F);
 					wi(F, get_skill(u, sk));
 					wspace(F);
 				}
 			}
+#else
+			for (i=0;i!=u->skill_size;++i) {
+				skill * sv = u->skills+i;
+				if (sv->learning || sv->level) {
+					wi(F, sv->id);
+					wspace(F);
+					wi(F, sv->level);
+					wspace(F);
+					wi(F, sv->learning);
+					wspace(F);
+				}
+			}
+#endif
 			wi(F, -1);
 			wnl(F);
 			write_items(F, u->items);

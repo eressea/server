@@ -26,7 +26,6 @@
 #include "unit.h"
 #include "item.h"
 #include "magic.h"
-#include "plane.h"
 #include "race.h"
 #include "curse.h"
 #include "region.h"
@@ -110,12 +109,12 @@ attrib_type at_skillmod = {
 };
 
 attrib *
-make_skillmod(skill_t skill, unsigned int flags, int(*special)(const struct unit*, const struct region*, skill_t, int), double multiplier, int bonus)
+make_skillmod(skill_t sk, unsigned int flags, int(*special)(const struct unit*, const struct region*, skill_t, int), double multiplier, int bonus)
 {
 	attrib * a = a_new(&at_skillmod);
 	skillmod_data * smd = (skillmod_data*)a->data.v;
 
-	smd->skill=skill;
+	smd->skill=sk;
 	smd->special=special;
 	smd->bonus=bonus;
 	smd->multiplier=multiplier;
@@ -140,63 +139,6 @@ skillmod(const attrib * a, const unit * u, const region * r, skill_t sk, int val
 	}
 	return value;
 }
-
-int
-att_modification(const unit *u, skill_t sk)
-{
-	curse *c;
-	unit *mage;
-	int result = 0;
-
-	result += get_curseeffect(u->attribs, C_ALLSKILLS, 0);
-	result += get_curseeffect(u->attribs, C_SKILL, (int)sk);
-
-	/* TODO hier kann nicht mit get/iscursed gearbeitet werden, da nur der
-	 * jeweils erste vom Typ C_GBDREAM zurückgegen wird, wir aber alle
-	 * durchsuchen und aufaddieren müssen */
-	if (is_cursed(u->region->attribs, C_GBDREAM, 0)){
-		attrib *a;
-		int bonus = 0, malus = 0;
-		int mod;
-
-		a = a_select(u->region->attribs, packids(C_GBDREAM, 0), cmp_oldcurse);
-		while(a) {
-			c = (curse*)a->data.v;
-			mage = c->magician;
-			mod = c->effect;
-			/* wir suchen jeweils den größten Bonus und den größten Malus */
-			if (mod > 0
-					&& (mage == NULL
-						|| allied(mage, u->faction, HELP_GUARD)))
-			{
-				if (mod > bonus ) bonus = mod;
-				
-			} else if (mod < 0
-				&& (mage == NULL
-					|| !allied(mage, u->faction, HELP_GUARD)))
-			{
-				if (mod < malus ) malus = mod;
-			}
-			a = a_select(a->next, packids(C_GBDREAM, 0), cmp_oldcurse);
-		}
-		result = result + bonus + malus;
-	}
-
-	return result;
-}
-
-void
-item_modification(const unit *u, skill_t sk, int *val)
-{
-	/* Presseausweis: *2 Spionage, 0 Tarnung */
-	if(sk == SK_SPY && get_item(u, I_PRESSCARD) >= u->number) {
-		*val = *val * 2;
-	}
-	if(sk == SK_STEALTH && get_item(u, I_PRESSCARD) >= u->number) {
-		*val = 0;
-	}
-}
-
 
 int
 skill_mod(const race * rc, skill_t sk, terrain_t t)
@@ -248,7 +190,7 @@ init_skills(const race * rc)
 }
 
 int
-rc_skillmod(const struct race * rc, const region *r, skill_t skill)
+rc_skillmod(const struct race * rc, const region *r, skill_t sk)
 {
 	int mods;
 	unsigned int index = ((unsigned int)rc) % RCMODMAXHASH;
@@ -257,9 +199,9 @@ rc_skillmod(const struct race * rc, const region *r, skill_t skill)
 	if (*imods==NULL) {
 		*imods = init_skills(rc);
 	}
-	mods = (*imods)->mod[rterrain(r)].value[skill];
+	mods = (*imods)->mod[rterrain(r)].value[sk];
 
-	if (rc == new_race[RC_ELF] && r_isforest(r)) switch (skill) {
+	if (rc == new_race[RC_ELF] && r_isforest(r)) switch (sk) {
 	case SK_OBSERVATION:
 		++mods;
 		break;
@@ -314,82 +256,39 @@ level(int days)
 }
 #endif
 
-int
-eff_skill(const unit * u, skill_t sk, const region * r)
+#if !SKILLPOINTS
+void 
+reduce_skill(skill * sv, int change)
 {
-	int i, result = 0;
-
-	if (u->number==0) return 0;
-	if (r->planep && sk == SK_STEALTH && fval(r->planep, PFL_NOSTEALTH)) return 0;
-
-#if SKILLPOINTS
-	result = level(get_skill(u, sk) / u->number);
-#else
-	result = get_skill(u, sk) / u->number;
-#endif
-	if (result == 0) return 0;
-
-	assert(r);
-	result = result + rc_skillmod(u->race, r, sk);
-
-	result += att_modification(u, sk);
-	item_modification(u, sk, &result);
-
-	i = skillmod(u->attribs, u, r, sk, result, SMF_ALWAYS);
-	if (i!=result)	result = i;
-
-	if (fspecial(u->faction, FS_TELEPATHY)) {
-		switch(sk) {
-		case SK_ALCHEMY:
-		case SK_HERBALISM:
-		case SK_MAGIC:
-		case SK_SPY:
-		case SK_STEALTH:
-		case SK_OBSERVATION:
-			break;
-		default:
-			result -= 2;
+	int weeks = (sv->level * sv->level - sv->level) / 2 + sv->learning;
+	if (sv->learning>=change) {
+		/* just forget a few weeks */
+		weeks -= change;
+	} else {
+		change -= sv->learning;
+		while (change>=sv->level && sv->level > 0) {
+			change -= sv->level;
+			--sv->level;
+		}
+		if (change && change<sv->level) {
+			/* this is not an exact science... it would be better to set
+			 * sv->learning so that the average time to rise was = change.
+			 */
+			weeks = (sv->level-change)*2;
+		} else {
+			weeks = 0;
 		}
 	}
-
-#ifdef HUNGER_REDUCES_SKILL
-	if (fval(u, FL_HUNGER)) result = result/2;
-#endif
-	return max(result, 0);
+	sv->learning = (unsigned char)weeks;
 }
 
-int
-pure_skill(unit * u, skill_t sk, region * r)
+int 
+skill_compare(const skill * sk, const skill * sc)
 {
-	int  result = 0;
-	unused(r);
-
-	if (u->number==0) return 0;
-
-#if SKILLPOINTS
-	result = level(get_skill(u, sk) / u->number);
-#else
-	result = get_skill(u, sk) / u->number;
+	if (sk->level > sc->level) return 1;
+	if (sk->level < sc->level) return -1;
+	if (sk->learning > sc->learning) return 1;
+	if (sk->learning < sc->learning) return -1;
+	return 0;
+}
 #endif
-
-	return max(result, 0);
-}
-
-void
-remove_zero_skills(void)
-{
-	region *r;
-	unit *u;
-	skill_t sk;
-	
-	for(r=regions; r; r=r->next) {
-		for(u=r->units; u; u=u->next) {
-			for (sk = 0; sk != MAXSKILLS; sk++) {
-				if (get_skill(u, sk) < u->number) {
-					set_level(u, sk, 0);
-				}
-			}
-		}
-	}
-}
- 

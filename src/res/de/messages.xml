@@ -4513,17 +4513,14 @@
 		</locale>
 	</message>
 
-	<message name="dumbeffect">
+	<message name="dumbeffect" section="events">
 		<type>
 			<arg name="unit" type="unit"></arg>
-			<arg name="days" type="int"></arg>
+			<arg name="weeks" type="int"></arg>
 			<arg name="skill" type="skill"></arg>
 		</type>
-		<locale name="de">
-			<nr section="events">
-				<text>"$unit($unit) vergiﬂt durch Dumpfbackenbrot $int($days) Tage des Talentes $skill($skill)."</text>
-			</nr>
-		</locale>
+		<text locale="de">"$unit($unit) vergiﬂt durch Dumpfbackenbrot $int($weeks) Wochen des Talentes $skill($skill)."</text>
+		<text locale="en">"$unit($unit) eats a Dumpfbackenbrot and forgets $int($weeks) weeks worth of $skill($skill)."</text>
 	</message>
 
 	<message name="donation">

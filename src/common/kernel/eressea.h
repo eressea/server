@@ -91,7 +91,6 @@ struct xml_stack;
 #define OLD_FAMILIAR_MOD /* conversion required */
 /* feature-dis/en-able */
 #undef WEATHER        /* Kein Wetter-Modul */
-#undef NEW_UNITS      /* unit-split */
 #define NEW_DRIVE     /* Neuer Algorithmus Transportiere/Fahre */
 #define PARTIAL_STUDY /* Wenn nicht genug Silber vorhanden, wird ein Talent anteilig gelernt */
 #define HUNGER_REDUCES_SKILL /* Hunger reduziert den Talentwert auf die Hälfte */
@@ -339,7 +338,6 @@ extern void plagues(struct region * r, boolean ismagic);
 
 #define ENCCHANCE           10	/* %-Chance für einmalige Zufallsbegegnung */
 #define SPACE_REPLACEMENT   '~'
-#define SPACE               ' '
 #define ESCAPE_CHAR         '\\'
 
 #define DISPLAYSIZE         8191	/* max. Länge einer Beschreibung, ohne trailing 0 */
@@ -842,10 +840,6 @@ typedef struct strlist {
 } strlist;
 
 extern int max_unique_id;
-typedef struct skillvalue {
-	skill_t id;
-	int value;
-} skillvalue;
 
 #define FL_GUARD          (1<<0)	/* 1 */
 #define FL_ISNEW          (1<<1)	/* 2 */
@@ -1024,8 +1018,8 @@ char *xunitid(const struct unit * u);
 
 struct building *largestbuilding(const struct region * r, boolean img);
 
+extern boolean teure_talente(const struct unit * u);
 int count_all(const struct faction * f);
-int teure_talente(struct unit * u);
 int count_maxmigrants(const struct faction * f);
 const struct race * findrace(const char *, const struct locale *);
 

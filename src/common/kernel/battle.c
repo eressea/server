@@ -946,7 +946,7 @@ remove_troop(troop dt)
 /* ------------------------------------------------------------- */
 
 #if SKILLPOINTS
-void
+static void
 drain_exp(unit *u, int n)
 {
 	skill_t sk = (skill_t)(rand() % MAXSKILLS);
@@ -954,7 +954,7 @@ drain_exp(unit *u, int n)
 
 	ssk = sk;
 
-	while(get_skill(u, sk) <= 0) {
+	while (get_skill(u, sk) <= 0) {
 		sk++;
 		if (sk == MAXSKILLS)
 			sk = 0;
@@ -968,7 +968,10 @@ drain_exp(unit *u, int n)
 	}
 }
 #else
-void
+/** reduces the target's exp by an equivalent of n points learning
+ * 30 points = 1 week
+ */
+static void
 drain_exp(unit *u, int n)
 {
 	skill_t sk = (skill_t)(rand() % MAXSKILLS);
@@ -976,7 +979,7 @@ drain_exp(unit *u, int n)
 
 	ssk = sk;
 
-	while(get_skill(u, sk) <= 0) {
+	while (get_level(u, sk)==0) {
 		sk++;
 		if (sk == MAXSKILLS)
 			sk = 0;
@@ -986,10 +989,7 @@ drain_exp(unit *u, int n)
 		}
 	}
 	if (sk != NOSKILL) {
-		n = min(n, get_skill(u, sk));
-		if (learn_skill(u, sk, n) {
-			change_skill(u, sk, -1);
-		}
+		change_skillpoints(u, sk, -n);
 	}
 }
 #endif

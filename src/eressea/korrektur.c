@@ -122,46 +122,6 @@ verify_owners(boolean bOnce)
 	}
 }
 
-static void
-fix_skills(void)
-{
-	int magic;
-	char zText[128];
-	FILE * F = fopen("skills.fix", "r+");
-	if (F==NULL) return;
-	fprintf(stderr, "==-------------==\n");
-	fprintf(stderr, "  Fixing skills  \n");
-	fprintf(stderr, "==-------------==\n");
-	fscanf(F, "%s", zText);
-	magic = atoi36(zText);
-	{ /* check for magic key */
-		attrib * a = find_key(global.attribs, magic);
-		if (a) {
-			log_warning(("[fix_skills] function was called a second time\n"));
-			return;
-		}
-		a_add(&global.attribs, make_key(magic));
-	}
-	for (;;) {
-		int from, self, teach, skill;
-		int myskill, change, number;
-		unit * u;
-		if (fscanf(F, "%s %d %d %d %d %d\n", zText, &skill, &number, &from, &self, &teach)<=0) break;
-		u = findunit(atoi36(zText));
-		if (u==NULL) {
-			log_warning(("[fix_skills] unit %s not found!\n", zText));
-			continue;
-		}
-		myskill = get_skill(u, (skill_t)skill);
-		if (myskill < from+self) {
-			/* todesfälle oder orkvermehrung führen zu veränderungen */
-			change = (teach * myskill) / (from + teach);
-		}
-		else change = teach;
-		change_skill(u, (skill_t)skill, change);
-	}
-}
-
 /* make sure that this is done only once! */
 #define do_once(magic, fun) \
 { \
@@ -2416,32 +2376,6 @@ dump_sql(void)
 	return 0;
 }
 
-static int
-fix_ratfamiliar(void)
-{
-	region *r;
-	unit *u;
-
-	for(r=regions; r; r=r->next) {
-		for(u=r->units; u; u=u->next){
-			if (old_race(u->race) == RC_RAT){
-				if (u->number > 1){
-					int mod = skill_level(1);
-					scale_number(u, 1);
-					set_skill(u, SK_MAGIC, get_skill(u, SK_MAGIC)+mod);
-					create_mage(u, M_GRAU);
-					set_skill(u, SK_SPY, get_skill(u, SK_SPY)+mod);
-					set_skill(u, SK_STEALTH, get_skill(u, SK_STEALTH)+mod);
-					set_skill(u, SK_OBSERVATION, get_skill(u, SK_OBSERVATION)+mod);
-					set_skill(u, SK_AUSDAUER, get_skill(u, SK_AUSDAUER)+skill_level(3));
-					u->hp = unit_max_hp(u);
-				}
-			}
-		}
-	}
-	return 0;
-}
-
 #if NEW_RESOURCEGROWTH
 static int
 randomized_resources(void)
@@ -2661,47 +2595,6 @@ fix_astralplane(void)
 	return 0;
 }
 
-#if SKILLPOINTS == 0
-static int
-level(int days)
-{
-	int l = 0;
-	while (level_days(l)<=days) ++l;
-	return l-1;
-}
-#endif
-
-#if defined(CONVERT_SKILLPOINTS) || !SKILLPOINTS
-static int
-convert_skills(void)
-{
-	region * r;
-	for (r=regions;r;r=r->next) {
-		unit * u;
-		for (u=r->units;u;u=u->next) {
-			skill_t sk;
-			for (sk=0;sk!=MAXSKILLS;++sk) {
-				int val = get_skill(u, sk);
-				if (val) {
-					int lvl = level(val/u->number);
-					int days = val-level_days(lvl)*u->number;
-					set_skill(u, sk, lvl * u->number);
-					/* hat die Einheit mehr Lerntage als notwendig für den Skill,
-					 * bekommt sie einen Bonus Lernversuch (die chance ist umso
-					 * besser, je mehr tage sie hat) */
-					if (days) {
-						if (learn_skill(u, sk, days)){
-							change_skill(u,sk, u->number);
-						}
-					}
-				}
-			}
-		}
-	}
-	return 0;
-}
-#endif
-
 static int
 fix_questcoors(void)
 {
@@ -2730,9 +2623,6 @@ korrektur(void)
 #if TEST_LOCALES
 	setup_locales();
 #endif
-#if !SKILLPOINTS
-	do_once("nskp", convert_skills());
-#endif
 	fix_astralplane();
 	fix_firewalls();
 	fix_gates();
@@ -2751,9 +2641,6 @@ korrektur(void)
 	fix_allies();
 	update_gmquests(); /* test gm quests */
 	/* fix_unitrefs(); */
-#ifndef SKILLFIX_SAVE
-	fix_skills();
-#endif
 	stats();
 	do_once("sql2", dump_sql());
 #if NEW_RESOURCEGROWTH
@@ -2766,7 +2653,6 @@ korrektur(void)
 	do_once("grtr", growing_trees());
 #endif
 
-	do_once("grat", fix_ratfamiliar());
 	do_once("fgms", fix_gms());
 #if NEW_RESOURCEGROWTH
 	do_once("rndr", randomized_resources());

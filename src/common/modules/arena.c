@@ -26,18 +26,19 @@
 #include <items/demonseye.h>
 
 /* kernel includes */
-#include <unit.h>
+#include <building.h>
 #include <faction.h>
 #include <item.h>
-#include <movement.h>
+#include <magic.h>
 #include <message.h>
-#include <reports.h>
+#include <movement.h>
 #include <plane.h>
 #include <pool.h>
-#include <region.h>
-#include <building.h>
-#include <magic.h>
 #include <race.h>
+#include <region.h>
+#include <reports.h>
+#include <skill.h>
+#include <unit.h>
 
 /* util include */
 #include <base36.h>
@@ -129,7 +130,7 @@ enter_arena(unit * u, const item_type * itype, const char * cmd)
 	if (u->number!=1 && enter_fail(u)) return -1;
 	if (get_pooled(u, r, R_SILVER) < fee && enter_fail(u)) return -1;
 	for (sk=0;sk!=MAXSKILLS;++sk) {
-		if (get_skill(u, sk)>30 && enter_fail(u)) return -1;
+		if (get_level(u, sk)>1 && enter_fail(u)) return -1;
 	}
 	for (u2=r->units;u2;u2=u2->next) if (u2->faction==u->faction) break;
 #ifdef NEW_ITEMS
@@ -185,14 +186,21 @@ use_wand_of_tears(unit * user, const struct item_type * itype, const char * cmd)
 	unused(cmd);
 	for (u=user->region->units;u;u=u->next) {
 		if (u->faction != user->faction) {
-			int i;
+			int i, k=SKILLPOINTS;
 
-			for (i=0;i!=u->skill_size;++i)
+			for (i=0;i!=u->skill_size;++i) {
+#if SKILLPOINTS
 				change_skill(u, u->skills[i].id, -10);
-			add_message(&u->faction->msgs, new_message(u->faction, "wand_of_tears_effect%u:unit", u));
+#else
+				if (rand()%3) reduce_skill(u->skills+i, 1);
+#endif
+			}
+			if (k) ADDMSG(&u->faction->msgs, msg_message("wand_of_tears_effect",
+				"unit", u));
 		}
 	}
-	add_message(&user->region->msgs, new_message(NULL, "wand_of_tears_usage%u:unit", user));
+	ADDMSG(&user->region->msgs, msg_message("wand_of_tears_usage",
+		"unit", user));
 	return 0;
 }
 

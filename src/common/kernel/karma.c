@@ -393,7 +393,7 @@ sacrificings(void)
 						cmistake(u, u->thisorder, 214, MSG_EVENT);
 						continue;
 					}
-					if(pure_skill(u, SK_MAGIC, u->region) < 10) {
+					if (get_level(u, SK_MAGIC) < 10) {
 						cmistake(u, u->thisorder, 253, MSG_EVENT);
 						continue;
 					}

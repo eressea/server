@@ -114,7 +114,6 @@ xml_register(struct xml_callbacks * cb, const char * path, unsigned int flags)
 {
 	xml_hierarchy ** node=&callbacks;
 	xml_hierarchy * parent = NULL;
-	size_t len = strlen(path);
 
 	for (;;) {
 		const char * nextspace = path;

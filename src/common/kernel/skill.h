@@ -16,33 +16,49 @@
 #define SKILL_H
 
 extern signed char skill_bonus(struct unit * u, struct region * r);
-int eff_skill(const struct unit * u, skill_t sk, const struct region * r);
-
-int pure_skill(struct unit * u, skill_t sk, struct region * r);
 
 /* skillmod_data::flags -- wann gilt der modifier? */
 #define SMF_ALWAYS     (1<<0) /* immer */
 #define SMF_PRODUCTION (1<<1) /* für Produktion - am gebäude, an der einheit */
 #define SMF_RIDING     (1<<2) /* Bonus für berittene - an der rasse*/
 
+typedef struct skill {
+#if SKILLPOINTS
+	skill_t id;
+	int value;
+#else
+	unsigned char id;
+	unsigned char level;
+	unsigned char learning;
+#endif
+} skill;
+
 typedef struct skillmod_data {
 	skill_t skill;
-	int (*special)(const struct unit * u, const struct region * r, skill_t skill, int value);
+	int (*special)(const struct unit * u, const struct region * r, skill_t sk, int value);
 	double multiplier;
 	int bonus;
 	int flags;
 } skillmod_data;
 extern attrib_type at_skillmod;
-extern int rc_skillmod(const struct race * rc, const struct region *r, skill_t skill);
+extern int rc_skillmod(const struct race * rc, const struct region *r, skill_t sk);
 extern int skillmod(const attrib * a, const struct unit * u, const struct region * r, skill_t sk, int value, int flags);
 extern void skill_init(void);
 extern void skill_done(void);
-extern struct attrib * make_skillmod(skill_t skill, unsigned int flags, int(*special)(const struct unit*, const struct region*, skill_t, int), double multiplier, int bonus);
+extern struct attrib * make_skillmod(skill_t sk, unsigned int flags, int(*special)(const struct unit*, const struct region*, skill_t, int), double multiplier, int bonus);
 
 extern const char * skillname(skill_t, const struct locale *);
 extern skill_t sk_find(const char * name);
 
 extern int level_days(int level);
-extern void remove_zero_skills(void);
+
+#if SKILLPOINTS
+# define skill_level(level) level_days(level)
+#else
+# define skill_level(level) (level)
+extern void reduce_skill(skill * sv, int change);
+extern int skill_compare(const skill * sk, const skill * sc);
+#endif
+
 
 #endif

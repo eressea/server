@@ -25,11 +25,12 @@
 
 #include "building.h"
 #include "faction.h"
-#include "goodies.h"
 #include "group.h"
+#include "karma.h"
 #include "border.h"
 #include "item.h"
 #include "movement.h"
+#include "plane.h"
 #include "race.h"
 #include "region.h"
 #include "ship.h"
@@ -38,9 +39,10 @@
 #include <attributes/moved.h>
 
 /* util includes */
-#include <resolve.h>
 #include <base36.h>
 #include <event.h>
+#include <goodies.h>
+#include <resolve.h>
 #ifdef OLD_TRIGGER
 # include <old/trigger.h>
 #endif
@@ -494,10 +496,11 @@ u_geteffstealth(const struct unit * u)
 	return (a?a->data.i:-1);
 }
 
+#if SKILLPOINTS
 int
 change_skill(unit * u, skill_t id, int byvalue)
 {
-	skillvalue *i = u->skills;
+	skill *i = u->skills;
 	int wounds = 0;
 
 	if (id == SK_AUSDAUER) {
@@ -523,7 +526,7 @@ change_skill(unit * u, skill_t id, int byvalue)
 static int
 change_skill_transfermen(unit * u, skill_t id, int byvalue)
 {
-	skillvalue *i = u->skills;
+	skill *i = u->skills;
 
 	for (; i != u->skills + u->skill_size; ++i)
 		if (i->id == id) {
@@ -539,7 +542,7 @@ change_skill_transfermen(unit * u, skill_t id, int byvalue)
 int
 get_skill(const unit * u, skill_t id)
 {
-	skillvalue *i = u->skills;
+	skill *i = u->skills;
 
 	for (; i != u->skills + u->skill_size; ++i)
 		if (i->id == id)
@@ -547,38 +550,10 @@ get_skill(const unit * u, skill_t id)
 	return 0;
 }
 
-#if SKILLPOINTS
-extern int level(int days);
-#endif
-
-int
-get_level(const unit * u, skill_t id)
-{
-	skillvalue *i = u->skills;
-	for (; i != u->skills + u->skill_size; ++i)
-		if (i->id == id)
-#if SKILLPOINTS
-			return level(i->value/u->number);
-#else
-			return i->value/u->number;
-#endif
-	return 0;
-}
-
-void 
-set_level(unit * u, skill_t id, int value)
-{
-#if SKILLPOINTS
-	set_skill(u, id, level_days(value)*u->number);
-#else
-	set_skill(u, id, u->number*value);
-#endif
-}
-
 void
 set_skill(unit * u, skill_t id, int value)
 {
-	skillvalue *i = u->skills;
+	skill *i = u->skills;
 
 	assert(value>=0);
 	for (; i != u->skills + u->skill_size; ++i)
@@ -594,9 +569,48 @@ set_skill(unit * u, skill_t id, int value)
 	if (!value)
 		return;
 	++u->skill_size;
-	u->skills = realloc(u->skills, u->skill_size * sizeof(skillvalue));
+	u->skills = realloc(u->skills, u->skill_size * sizeof(skill));
 	(u->skills + u->skill_size - 1)->value = value;
 	(u->skills + u->skill_size - 1)->id = id;
+}
+
+#endif
+
+#if SKILLPOINTS
+extern int level(int days);
+#endif
+
+int
+get_level(const unit * u, skill_t id)
+{
+	skill * sv = u->skills;
+	while (sv != u->skills + u->skill_size) {
+		if (sv->id == id) {
+#if SKILLPOINTS
+			return level(sv->value/u->number);
+#else
+			return sv->level;
+#endif
+		}
+		++sv;
+	}
+	return 0;
+}
+
+void 
+set_level(unit * u, skill_t id, int value)
+{
+#if SKILLPOINTS
+	set_skill(u, id, level_days(value)*u->number);
+#else
+	skill * sv = u->skills;
+	while (sv != u->skills + u->skill_size) {
+		if (sv->id == id) {
+			sv->level = (unsigned char)value;
+			sv->learning = 0;
+		}
+	}
+#endif
 }
 
 static attrib_type at_leftship = {
@@ -741,10 +755,11 @@ move_unit(unit * u, region * r, unit ** ulist)
 void
 transfermen(unit * u, unit * u2, int n)
 {
-	skill_t sk;
-	const attrib * a;
+#if SKILLPOINTS
 	int skills[MAXSKILLS];
-	int hp = 0;
+#endif
+	const attrib * a;
+	int hp = u->hp;
 	region * r = u->region;
 
 	if (!n) return;
@@ -752,36 +767,51 @@ transfermen(unit * u, unit * u2, int n)
 	/* "hat attackiert"-status wird übergeben */
 
 	if (u2) {
-		if (fval(u, FL_LONGACTION)) fset(u2, FL_LONGACTION);
-		hp = u->hp;
-		if (u->skills)
-			for (sk = 0; sk < MAXSKILLS; ++sk)
+#if SKILLPOINTS
+		skill_t sk;
+		if (u->skills) {
+			for (sk = 0; sk < MAXSKILLS; ++sk) {
 				skills[sk] = get_skill(u, sk);
+			}
+		}
+#else
+		skill * sv;
+		for (sv=u->skills;sv!=u->skills+u->skill_size;++sv) {
+			if (u2->number == 0) {
+				set_skill(u2, sv->id, sv->level, sv->learning);
+			} else {
+				skill * sn = get_skill(u2, sv->id);
+				sn->level = (unsigned char)((sv->level*n+sn->level*u2->number)/(u2->number+n));
+				if (sn->learning>sv->learning) sn->learning=sv->learning;
+			}
+		}
+#endif
 		a = a_find(u->attribs, &at_effect);
 		while (a) {
 			effect_data * olde = (effect_data*)a->data.v;
 			change_effect(u2, olde->type, olde->value);
 			a = a->nexttype;
 		}
-		if (is_mage(u)) {
-		  /* Magier sind immer 1-Personeneinheiten und können nicht
-		   * übergeben werden. Sollte bereits in givemen abgefangen
-		   * werden */
-		}
+		if (fval(u, FL_LONGACTION)) fset(u2, FL_LONGACTION);
 		if (u->attribs) {
 			transfer_curse(u, u2, n);
 		}
 	}
 	scale_number(u, u->number - n);
 	if (u2) {
+#if SKILLPOINTS
+		skill_t sk;
+#endif
 		set_number(u2, u2->number + n);
 		hp -= u->hp;
 		u2->hp += hp;
+#if SKILLPOINTS
 		if (u->skills) {
 			for (sk = 0; sk < MAXSKILLS; ++sk) {
 				change_skill_transfermen(u2, sk, skills[sk] - get_skill(u, sk));
 			}
 		}
+#endif
 		/* TODO: Das ist schnarchlahm! und gehört ncht hierhin */
 		a = a_find(u2->attribs, &at_effect);
 		while (a) {
@@ -879,15 +909,143 @@ set_number(unit * u, int count)
 
 #if !SKILLPOINTS
 boolean
-learn_skill(const unit * u, skill_t sk, int days)
+learn_skill(const unit * u, skill_t sk, double chance)
 {
-	int now = get_skill(u, sk);
-	int nowlvl = now / u->number;
-	int need = (nowlvl+1) * u->number - now;
-	int needdays = level_days(nowlvl+1) - level_days(nowlvl);
-	needdays = needdays * u->number / need;
-	if ((rand()%needdays) < days) return true;
+	/** rewrite me **/
+	assert(!"rewrite me!");
+	return 0;
+}
+
+skill *
+get_skill(unit * u, skill_t sk)
+{
+	skill * sv = u->skills;
+	while (sv!=u->skills+u->skill_size) {
+		assert(sv->level>=0 && sv->learning>=0);
+		if (sv->id==sk) return sv;
+		++sv;
+	}
+	return NULL;
+}
+
+boolean
+has_skill(unit * u, skill_t sk)
+{
+	skill * sv = u->skills;
+	while (sv!=u->skills+u->skill_size) {
+		assert(sv->level>=0 && sv->learning>=0);
+		if (sv->id==sk) {
+			return (sv->level>0 || sv->learning>0);
+		}
+		++sv;
+	}
 	return false;
 }
+
 #endif
 
+static int
+item_modification(const unit *u, skill_t sk, int val)
+{
+	/* Presseausweis: *2 Spionage, 0 Tarnung */
+	if(sk == SK_SPY && get_item(u, I_PRESSCARD) >= u->number) {
+		val = val * 2;
+	}
+	if(sk == SK_STEALTH && get_item(u, I_PRESSCARD) >= u->number) {
+		val = 0;
+	}
+	return val;
+}
+
+static int
+att_modification(const unit *u, skill_t sk)
+{
+	curse *c;
+	unit *mage;
+	int result = 0;
+
+	result += get_curseeffect(u->attribs, C_ALLSKILLS, 0);
+	result += get_curseeffect(u->attribs, C_SKILL, (int)sk);
+
+	/* TODO hier kann nicht mit get/iscursed gearbeitet werden, da nur der
+	 * jeweils erste vom Typ C_GBDREAM zurückgegen wird, wir aber alle
+	 * durchsuchen und aufaddieren müssen */
+	if (is_cursed(u->region->attribs, C_GBDREAM, 0)){
+		attrib *a;
+		int bonus = 0, malus = 0;
+		int mod;
+
+		a = a_select(u->region->attribs, packids(C_GBDREAM, 0), cmp_oldcurse);
+		while(a) {
+			c = (curse*)a->data.v;
+			mage = c->magician;
+			mod = c->effect;
+			/* wir suchen jeweils den größten Bonus und den größten Malus */
+			if (mod > 0
+					&& (mage == NULL
+						|| allied(mage, u->faction, HELP_GUARD)))
+			{
+				if (mod > bonus ) bonus = mod;
+				
+			} else if (mod < 0
+				&& (mage == NULL
+					|| !allied(mage, u->faction, HELP_GUARD)))
+			{
+				if (mod < malus ) malus = mod;
+			}
+			a = a_select(a->next, packids(C_GBDREAM, 0), cmp_oldcurse);
+		}
+		result = result + bonus + malus;
+	}
+
+	return result;
+}
+
+int
+get_modifier(const unit * u, skill_t sk, int level, const region * r)
+{
+	int bskill = level;
+	int skill = bskill;
+
+	if (r->planep && sk == SK_STEALTH && fval(r->planep, PFL_NOSTEALTH)) return 0;
+
+	assert(r);
+	skill += rc_skillmod(u->race, r, sk);
+	skill += att_modification(u, sk);
+
+	skill = item_modification(u, sk, skill);
+	skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
+
+	if (fspecial(u->faction, FS_TELEPATHY)) {
+		switch(sk) {
+		case SK_ALCHEMY:
+		case SK_HERBALISM:
+		case SK_MAGIC:
+		case SK_SPY:
+		case SK_STEALTH:
+		case SK_OBSERVATION:
+			break;
+		default:
+			skill -= 2;
+		}
+	}
+
+#ifdef HUNGER_REDUCES_SKILL
+	if (fval(u, FL_HUNGER)) {
+		skill = skill/2;
+	}
+#endif
+	return skill - bskill;
+}
+
+int
+eff_skill(const unit * u, skill_t sk, const region * r)
+{
+	int level = get_level(u, sk);
+	int mlevel = level - get_modifier(u, sk, level, r);
+
+#if SKILLPOINTS
+	if (mlevel<0) return 0;
+#endif
+	return mlevel;
+}

@@ -245,7 +245,7 @@ extern int i_get(const item * i, const item_type * it);
 extern resource_type * new_resourcetype(const char ** names, const char ** appearances, int flags);
 extern item_type * new_itemtype(resource_type * rtype, int iflags, int weight, int capacity);
 extern luxury_type * new_luxurytype(item_type * itype, int price);
-extern weapon_type * new_weapontype(item_type * itype, int wflags, double magres, const char* damage[], int offmod, int defmod, int reload, skill_t skill, int minskill);
+extern weapon_type * new_weapontype(item_type * itype, int wflags, double magres, const char* damage[], int offmod, int defmod, int reload, skill_t sk, int minskill);
 extern potion_type * new_potiontype(item_type * itype, int level);
 extern herb_type * new_herbtype(item_type * itype, terrain_t terrain);
 

@@ -296,34 +296,42 @@ expandrecruit(region * r, request * recruitorders)
 
 	for (u = r->units; u; u = u->next) {
 		if (u->n >= 0) {
-			if (u->number)
-				u->hp += u->n * unit_max_hp(u);
-			if (u->race == new_race[RC_URUK]) {
-				change_skill(u, SK_SWORD, skill_level(1) * u->n);
-				change_skill(u, SK_SPEAR, skill_level(1) * u->n);
+			unit * unew;
+			if (u->number==0) unew = u;
+			else unew = createunit(r, u->faction, u->n, u->race);
+			if (unew->race == new_race[RC_URUK]) {
+				change_level(unew, SK_SWORD, 1);
+				change_level(unew, SK_SPEAR, 1);
 			}
-			if (u->race->ec_flags & ECF_REC_HORSES) {
-				change_skill(u, SK_RIDING, skill_level(1) * u->n);
+			if (unew->race->ec_flags & ECF_REC_HORSES) {
+				change_level(unew, SK_RIDING, 1);
 			}
-			i = fspecial(u->faction, FS_MILITIA);
+			i = fspecial(unew->faction, FS_MILITIA);
 			if (i > 0) {
-				int ld = skill_level(i);
-				if (u->race->bonus[SK_SPEAR] >= 0) 
-					change_skill(u, SK_SPEAR, u->n * ld);
-				if (u->race->bonus[SK_SWORD] >= 0) 
-					change_skill(u, SK_SWORD, u->n * ld);
-				if (u->race->bonus[SK_LONGBOW] >= 0) 
-					change_skill(u, SK_LONGBOW, u->n * ld);
-				if (u->race->bonus[SK_CROSSBOW] >= 0) 
-					change_skill(u, SK_CROSSBOW, u->n * ld);
-				if (u->race->bonus[SK_RIDING] >= 0) 
-					change_skill(u, SK_RIDING, u->n * ld);
-				if (u->race->bonus[SK_AUSDAUER] >= 0) 
-					change_skill(u, SK_AUSDAUER, u->n * ld);
+				if (unew->race->bonus[SK_SPEAR] >= 0) 
+					change_level(unew, SK_SPEAR, i);
+				if (unew->race->bonus[SK_SWORD] >= 0) 
+					change_level(unew, SK_SWORD, i);
+				if (unew->race->bonus[SK_LONGBOW] >= 0) 
+					change_level(unew, SK_LONGBOW, i);
+				if (unew->race->bonus[SK_CROSSBOW] >= 0) 
+					change_level(unew, SK_CROSSBOW, i);
+				if (unew->race->bonus[SK_RIDING] >= 0) 
+					change_level(unew, SK_RIDING, i);
+				if (unew->race->bonus[SK_AUSDAUER] >= 0) 
+					change_level(unew, SK_AUSDAUER, i);
+			}
+			if (unew!=u) {
+				unit ** up=&u->next;
+				transfermen(unew, u, unew->number);
+				while (*up!=unew) up=&(*up)->next;
+				assert(unew->next==NULL);
+				*up = NULL;
+				free(unew);
 			}
 			if (u->n < u->wants) {
-				add_message(&u->faction->msgs,
-					msg_message("recruit", "unit region amount want", u, r, u->n, u->wants));
+				ADDMSG(&unew->faction->msgs, msg_message("recruit", 
+					"unit region amount want", unew, r, u->n, u->wants));
 			}
 		}
 	}
@@ -577,7 +585,7 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 				} else if (count_migrants(u2->faction) + n > count_max_migrants(u2->faction)) {
 					error = 128;
 				}
-				else if (teure_talente(u) == 0 || teure_talente(u2) == 0) {
+				else if (teure_talente(u) || teure_talente(u2)) {
 					error = 154;
 				} else if (u2->number!=0) {
 					error = 139;
@@ -709,7 +717,7 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 			cmistake(u, S->s, 128, MSG_COMMERCE);
 			return;
 		}
-		if (teure_talente(u) == 0) {
+		if (teure_talente(u)) {
 			cmistake(u, S->s, 154, MSG_COMMERCE);
 			return;
 		}

@@ -349,10 +349,11 @@ live(region * r)
 		un = u->next;
 
 		if (!is_monstrous(u)) {
-			if (get_effect(u, oldpotiontype[P_FOOL]) > 0) {	/* Trank "Dumpfbackenbrot" */
+			int effect = get_effect(u, oldpotiontype[P_FOOL]);
+			if (effect > 0) {	/* Trank "Dumpfbackenbrot" */
+#if SKILLPOINTS
 				skill_t sk, ibest = NOSKILL;
 				int best = 0;
-
 				for (sk = 0; sk < MAXSKILLS; sk++) {
 					if (get_skill(u, sk) > best) {
 						best = get_skill(u, sk);
@@ -360,21 +361,28 @@ live(region * r)
 					}
 				}				/* bestes Talent raussuchen */
 				if (best > 0) {
-					int value = get_effect(u, oldpotiontype[P_FOOL]);
-#if SKILLPOINTS
 					int k = get_skill(u, ibest);
-					value = min(value, u->number) * 30;
+					int value = min(effect, u->number) * 30;
 					k = min(k, value);
 					change_skill(u, ibest, -k);
-#else
-					/* Talent sinkt für max. 10 Personen um 1 Stufe */
-					int k = min(u->number, value);
-					int sk = get_skill(u, ibest);
-					change_skill(u, ibest, -min(k, sk));
-#endif
 					ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
-						"unit days skill", u, value, ibest));
+						"unit days skill", u, (k+29)/30, ibest));
 				}	/* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
+#else
+				skill * sv = u->skills, * sb = NULL;
+				while (sv!=u->skills+u->skill_size) {
+					if (sb==NULL || skill_compare(sv, sb)>0) {
+						sb = sv;
+					}
+					++sv;
+				}				/* bestes Talent raussuchen */
+				if (sb!=NULL) {
+					int weeks = min(effect, u->number);
+					reduce_skill(sb, weeks);
+					ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
+						"unit weeks skill", u, weeks, (skill_t)sb->id));
+				}	/* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
+#endif
 			}
 		}
 		age_unit(r, u);
@@ -3440,10 +3448,6 @@ processorders (void)
 	puts(" - Attribute altern");
 	ageing();
 
-#ifdef REMOVE_ZERO_SKILLS
-	puts(" - Skills ohne Talenttage werden gelöscht");
-	remove_zero_skills();
-#endif
 #ifdef SKILLFIX_SAVE
 	write_skillfix();
 #endif

@@ -948,13 +948,7 @@ plan_monsters(void)
 			if (u->faction->no != MONSTER_FACTION) continue;
 
 			/* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
-#if SKILLPOINTS
-			change_skill(u, SK_OBSERVATION, u->number * 10);
-#else
-			if (learn_skill(u, SK_OBSERVATION, u->number * 10)) {
-				change_skill(u, SK_OBSERVATION, u->number);
-			}
-#endif
+			produceexp(u, SK_OBSERVATION, u->number);
 
 			ta = a_find(u->attribs, &at_hate);
 			if (ta && strncmp(u->lastorder, "WARTEN", 6) != 0) {
@@ -1167,36 +1161,15 @@ age_unit(region * r, unit * u)
 void
 split_unit(region * r, unit *u)
 {
-	unit *u2;
-	skill_t sk;
-	int newsize;
-	assert(u->number!=1);
+	unit *u2 = createunit(r, u->faction, 0, u->race);
+	int newsize = u->number/2;
 
-	newsize = u->number/2;
-
-	u2 = createunit(r, u->faction, newsize, u->race);
 	set_string(&u2->name, u->name);
 	set_string(&u2->display, u->display);
 	set_string(&u2->thisorder, "WARTEN");
 	set_string(&u2->lastorder, "WARTEN");
 
-#if SKILLPOINTS
-	for(sk = 0; sk < MAXSKILLS; sk++) {
-		int n = get_skill(u, sk);
-		int i = (n / u->number) * newsize;
-		i += (n % u->number) * newsize / u->number;
-		set_skill(u2, sk, i);
-		set_skill(u, sk, n-i);
-	}
-	set_number(u, u->number - newsize);
-#else
-	scale_number(u, u->number - newsize);
-	for(sk = 0; sk < MAXSKILLS; sk++) {
-		int n = get_skill(u, sk);
-		int level = n / u->number;
-		set_level(u2, sk, level);
-	}
-#endif
+	transfermen(u, u2, newsize);
 }
 
 boolean

@@ -665,18 +665,17 @@ cr_output_unit(FILE * F, const region * r,
 		/* talents */
 		pr = 0;
 		for (sk = 0; sk != MAXSKILLS; ++sk) {
-			int gsk = get_skill(u, sk);
-			if (gsk) {
+			if (has_skill(u, sk)) {
 				int esk = eff_skill(u, sk, r);
 				if (!pr) {
 					pr = 1;
 					fprintf(F, "TALENTE\n");
 				}
 #if SKILLPOINTS
-				fprintf(F, "%d %d;%s\n", gsk, esk,
+				fprintf(F, "%d %d;%s\n", get_skill(u, sk), esk,
 					add_translation(skillname(sk, NULL), skillname(sk, f->locale)));
 #else
-				fprintf(F, "%d %d;%s\n", level_days(gsk/u->number), esk,
+				fprintf(F, "%d %d;%s\n", level_days(get_level(u, sk)), esk,
 					add_translation(skillname(sk, NULL), skillname(sk, f->locale)));
 #endif
 			}

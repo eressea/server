@@ -124,7 +124,11 @@ report_failure(unit * mage, const char * sa) {
 void
 do_shock(unit *u, char *reason)
 {
+#if SKILLPOINTS
 	skill_t sk;
+#else
+	int i;
+#endif
 	if(u->number == 0) return;
 
 	/* HP - Verlust */
@@ -144,11 +148,11 @@ do_shock(unit *u, char *reason)
 		}
 	}
 #else
-	for (sk=0; sk < MAXSKILLS; sk++) {
-		int n = get_skill(u, sk);
-		if (n!=0 && rand()%10 < 2) {
-			change_level(u, sk, -1);
-		}
+	for (i=0;i!=u->skill_size;++i) if (rand()%5==0) {
+		skill * sv = u->skills+i;
+		int weeks = (sv->level * sv->level - sv->level) / 2 + sv->learning;
+		int change = (weeks+9) / 10;
+		reduce_skill(sv, change);
 	}
 #endif
 
@@ -3382,7 +3386,7 @@ sp_summonshadow(castorder *co)
 		fset(u, FL_PARTEITARNUNG);
 
 	/* Bekommen Tarnung = (Magie+Tarnung)/2 und Wahrnehmung 1. */
-	val = (get_skill(mage, SK_MAGIC) + get_skill(mage, SK_STEALTH))/(2*mage->number);
+	val = get_level(mage, SK_MAGIC) + get_level(mage, SK_STEALTH);
 
 	set_level(u, SK_STEALTH, val);
 	set_level(u, SK_OBSERVATION, 1);
@@ -4244,10 +4248,7 @@ sp_migranten(castorder *co)
 		return 0;
 	}
 	/* niemand mit teurem Talent */
-	if (get_skill(target, SK_MAGIC) || get_skill(target, SK_ALCHEMY)
-			|| get_skill(target, SK_TACTICS) || get_skill(target, SK_SPY)
-			|| get_skill(target, SK_HERBALISM))
-	{
+	if (teure_talente(target)) {
 		sprintf(buf, "%s hat unaufkündbare Bindungen an seine alte Partei.",
 				unitname(target));
 		addmessage(0, mage->faction, buf, MSG_EVENT, ML_WARN);
@@ -4698,10 +4699,16 @@ sp_calm_monster(castorder *co)
 static int
 sp_headache(castorder *co)
 {
-	unit *target;
-	skill_t i, sk = 0;
+#if SKILLPOINTS
+	skill_t sk = 0;
+	skill_t i;
 	int sk_val = 0;
 	int days;
+#else
+	skill * smax = NULL;
+	int i;
+#endif
+	unit *target;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	spellparameter *pa = co->par;
@@ -4715,21 +4722,30 @@ sp_headache(castorder *co)
 
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
+#if SKILLPOINTS
 	/* finde das größte Talent: */
-	for(i=0;i<MAXSKILLS;i++){
-		int t = get_skill(target, i);
-		if (sk_val < t){
+	for (i=0;i<MAXSKILLS;i++){
+		int l = get_level(target, i);
+		if (sk_val < l) {
 			sk = i;
-			sk_val = t;
+			sk_val = l;
 		}
 	}
 	/* wirkt auf maximal 10 Personen */
-	days = min(10,target->number) * lovar(60);
-#if SKILLPOINTS
+	days = min(10, target->number) * lovar(60);
 	change_skill(target, sk, -days);
 #else
-	if (learn_skill(target, sk, days)) {
-		change_skill(target, sk, -1);
+	/* finde das größte Talent: */
+	for (i=0;i!=target->skill_size;++i) {
+		skill * sv = target->skills+i;
+		if (smax==NULL || skill_compare(sv, smax)>0) {
+			smax = sv;
+		}
+	}
+	if (smax!=NULL) {
+		/* wirkt auf maximal 10 Personen */
+		int change = min(10, target->number) * (rand()%2+1) / target->number;
+		reduce_skill(smax, change);
 	}
 #endif
 	set_string(&target->thisorder, "");

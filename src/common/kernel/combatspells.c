@@ -486,7 +486,7 @@ random_skill(unit *u)
 	skill_t sk;
 
 	for(sk=0;sk<MAXSKILLS;sk++) {
-		if(get_skill(u, sk)) n++;
+		if (get_level(u, sk)) n++;
 	}
 
 	if(n == 0)
@@ -495,7 +495,7 @@ random_skill(unit *u)
 	n = rand()%n;
 
 	for(sk=0;sk<MAXSKILLS;sk++) {
-		if(get_skill(u, sk)) {
+		if (get_level(u, sk)) {
 			if(n == 0) return sk;
 			n--;
 		}
@@ -542,9 +542,7 @@ sp_mindblast(fighter * fi, int level, int power, spell * sp)
 #if SKILLPOINTS
 				change_skill(du, sk, -(30+rand()%61));
 #else
-				if (learn_skill(du, sk, 30+rand()%61)) {
-					change_skill(du, sk, -1);
-				}
+				change_skillpoints(du, sk, -(30+rand()%61));
 #endif
 				--enemies;
 			} else {

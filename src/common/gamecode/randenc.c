@@ -168,7 +168,7 @@ dissolve_units(void)
 }
 
 static int
-improve_all(faction * f, skill_t sk, int days)
+improve_all(faction * f, skill_t sk, int weeks)
 {
 	region *r;
 	unit *u;
@@ -179,11 +179,11 @@ improve_all(faction * f, skill_t sk, int days)
 		for (u = r->units; u; u = u->next) {
 			if (u->faction == f && get_skill(u, sk)) {
 #if SKILLPOINTS
-				change_skill(u, sk, u->number * days);
+				change_skill(u, sk, u->number * weeks * 30);
 				n += u->number;
 #else
-				if (learn_skill(u, sk, days * u->number)) {
-					change_skill(u, sk, 1);
+				for (n=0;n!=weeks;++n) {
+					learn_skill(u, sk, 1.0);
 				}
 #endif
 			}
@@ -298,11 +298,12 @@ find_manual(region * r, unit * u)
 	scat(". Der Wissensschub ist enorm.");
 	addmessage(r, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
 
-	if (improve_all(u->faction, skill, 90) == 0) {
+	if (improve_all(u->faction, skill, 3) == 0) {
 #if SKILLPOINTS
 		change_skill(u, skill, 270);
 #else
-		change_skill(u, skill, 1);
+		int i;
+		for (i=0;i!=9;++i) learn_skill(u, skill, 1.0);
 #endif
 	}
 }
@@ -1020,22 +1021,27 @@ godcurse(void)
 {
 	region *r;
 	ship *sh, *shn;
-	skill_t sk;
 
 	for(r=regions; r; r=r->next) {
 		if(is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
 			unit * u;
 			for(u=r->units; u; u=u->next) {
+#if SKILLPOINTS
+				skill_t sk;
 				for(sk=0; sk < MAXSKILLS; sk++) {
 					int s = get_skill(u, sk);
 					if (s > 0) {
-#if SKILLPOINTS
 						change_skill(u, sk, -min(s, (30+rand()%90)*u->number));
-#else
-						change_skill(u, sk, -min(s, u->number));
-#endif
 					}
 				}
+#else
+				skill * sv = u->skills;
+				while (sv!=u->skills+u->skill_size) {
+					int weeks = 1+rand()%3;
+					reduce_skill(sv, weeks);
+					++sv;
+				}
+#endif
 			}
 		}
 	}
@@ -1061,7 +1067,6 @@ randomevents(void)
 	region *r;
 	building *b, *b2;
 	unit *u;
-	int n;
 	int unfed;
 
 	/* Eiseberge */
@@ -1147,7 +1152,11 @@ randomevents(void)
 				 * Es ist auch deshalb fast egal, weil es ja im Grunde nicht dem Dämon,
 				 * sondern der Region zu gute kommt - und da ist der anwender schnuppe
 				 */
+#if SKILLPOINTS
 				skill_t sk;
+#else
+				skill * sv;
+#endif
 				int dc;
 				if (!bfind) {
 					unit * ud = u;
@@ -1184,31 +1193,30 @@ randomevents(void)
 				dc = rpeasants(r) - max(u->number - bauernblut, 0);
 				dc = max(0, dc);
 				rsetpeasants(r, dc);
+#if SKILLPOINTS
 				for (sk = 0; sk != MAXSKILLS; sk++) {
 					if (get_skill(u, sk) && rand() % 100 < 25) {
 						int change = rand() % 90 + 1;
 						if (rand() % 100 < 60) {
-#if SKILLPOINTS
 							change_skill(u, sk, u->number * change);
-#else
-							if (learn_skill(u, sk, change * u->number)) {
-								change_skill(u, sk, u->number);
-							}
-#endif
 						} else {
 							int s = get_skill(u, sk);
-#ifdef SKILLPOINTS
 							s = min(s, u->number * change);
 							change_skill(u, sk, -s);
-#else
-							s = min(s, u->number);
-							if (learn_skill(u, sk, change * u->number)) {
-								change_skill(u, sk, -s);
-							}
-#endif
 						}
 					}
 				}
+#else
+				sv = u->skills;
+				while (sv!=u->skills+u->skill_size) {
+					if (rand() % 100 < 25) {
+						int weeks = 0+rand()%3;
+						if (rand() % 100 < 40) reduce_skill(sv, weeks);
+						else while (weeks--) learn_skill(u, sv->id, 1.0);
+					}
+					++sv;
+				}
+#endif
 			}
 		}
 	}
@@ -1510,13 +1518,8 @@ randomevents(void)
 				u = createunit(r, findfaction(MONSTER_FACTION),treemen, new_race[RC_TREEMAN]);
 				set_string(&u->lastorder, "WARTEN");
 				/* guard(u, GUARD_ALL); kein auto-guard! erst in monster.c! */
-#if SKILLPOINTS
-				change_skill(u, SK_OBSERVATION, u->number * 180);
-#else
-				if (learn_skill(u, SK_OBSERVATION, u->number * 180)) {
-					change_skill(u, SK_OBSERVATION, u->number);
-				}
-#endif
+
+				set_level(u, SK_OBSERVATION, 2);
 				if (u->number == 1)
 					set_string(&u->name, "Ein wütender Ent");
 				else

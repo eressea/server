@@ -275,11 +275,11 @@ const char *options[MAXOPTIONS] =
 };
 
 int
-max_skill(faction * f, skill_t skill)
+max_skill(faction * f, skill_t sk)
 {
 	int m = INT_MAX;
 
-	switch (skill) {
+	switch (sk) {
 	case SK_MAGIC:
 		m = MAXMAGICIANS;
 		if (old_race(f->race) == RC_ELF) m += 1;
@@ -324,7 +324,7 @@ count_all_money(const region * r)
 }
 
 int
-count_skill(faction * f, skill_t skill)
+count_skill(faction * f, skill_t sk)
 {
 	int n = 0;
 	region *r;
@@ -333,9 +333,8 @@ count_skill(faction * f, skill_t skill)
 
 	for (r = firstregion(f); r != last; r = r->next)
 		for (u = r->units; u; u = u->next)
-			if (u->faction == f && get_skill(u, skill))
-				if(!is_familiar(u))
-					n += u->number;
+			if (u->faction == f && has_skill(u, sk))
+				if (!is_familiar(u)) n += u->number;
 
 	return n;
 }
@@ -663,7 +662,7 @@ eff_stealth (const unit * u, const region * r)
 void
 scale_number (unit * u, int n)
 {
-	skill_t skill;
+	skill_t sk;
 	const attrib * a;
 	int remain;
 
@@ -693,19 +692,23 @@ scale_number (unit * u, int n)
 		}
 		data->value = snew;
 	}
-	for (skill = 0; skill < MAXSKILLS; skill++) {
+	for (sk = 0; sk < MAXSKILLS; sk++) {
 		if (n==0 || u->number == 0) {
-			set_level(u, skill, 0);
-		} else {
-			int sval = get_skill(u, skill);
+			set_level(u, sk, 0);
+		}
+#if SKILLPOINTS
+		/* not necessary to scale in the new system */
+		else {
+			int sval = get_skill(u, sk);
 			int snew = sval / u->number * n;
 			remain = sval - snew / n * u->number;
 			snew += remain * n / u->number;
 			remain = (remain * n) % u->number;
 			if ((rand() % u->number) < remain)
 				++snew;	/* Nachkommastellen */
-			set_skill(u, skill, snew);
+			set_skill(u, sk, snew);
 		}
+#endif
 	}
 
 	set_number(u, n);
@@ -965,19 +968,6 @@ strcheck (const char *s, size_t maxlen)
 	return s;
 }
 #endif
-/* Zaehlfunktionen fuer Typen ------------------------------------- */
-
-int
-teure_talente (unit * u)
-{
-	if (get_skill (u, SK_MAGIC) > 0 || get_skill (u, SK_ALCHEMY) > 0 ||
-			get_skill (u, SK_TACTICS) > 0 || get_skill (u, SK_HERBALISM) > 0 ||
-			get_skill (u, SK_SPY) > 0) {
-		return 0;
-	} else {
-		return 1;
-	}
-}
 
 attrib_type at_lighthouse = {
 	"lighthouse"
@@ -1069,7 +1059,7 @@ igetstrtoken (const char *s1)
 			if (i > 0 && lbuf[i - 1] == ESCAPE_CHAR)
 				lbuf[--i] = SPACE_REPLACEMENT;
 			else
-				lbuf[i] = SPACE;
+				lbuf[i] = ' ';
 		}
 		i++;
 		s++;
@@ -2009,7 +1999,7 @@ init_tokens(const struct locale * lang)
 	for (i=0;i!=MAXPARAMS;++i)
 		addtoken(&lnames->tokens[UT_PARAM], LOC(lang, parameters[i]), (void*)i);
 	for (i=0;i!=MAXSKILLS;++i)
-		addtoken(&lnames->skillnames, skillname(i, lang), (void*)i);
+		addtoken(&lnames->skillnames, skillname((skill_t)i, lang), (void*)i);
 	for (i=0;i!=MAXKEYWORDS;++i)
 		addtoken(&lnames->keywords, LOC(lang, keywords[i]), (void*)i);
 	for (i=0;i!=MAXOPTIONS;++i)
@@ -3070,11 +3060,20 @@ produceexp(struct unit * u, skill_t sk, int n)
 	change_skill(u, sk, PRODUCEEXP * n);
 	return 1;
 #else
-	if (learn_skill(u, sk, PRODUCEEXP * n)) {
-		change_skill(u, sk, n);
-		return 1;
-	}
+	learn_skill(u, sk, 30.0/PRODUCEEXP);
 	return 0;
 #endif
+}
+
+boolean
+teure_talente (const struct unit * u)
+{
+	if (has_skill(u, SK_MAGIC) || has_skill(u, SK_ALCHEMY) ||
+		has_skill(u, SK_TACTICS) || has_skill(u, SK_HERBALISM) ||
+		has_skill(u, SK_SPY)) {
+		return true;
+	} else {
+		return false;
+	}
 }
 

@@ -595,16 +595,15 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 #endif
 
 void
-spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days)
+spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh,
+		  boolean days)
 {
 	char * sbuf = buf+strlen(buf);
-	int i, d;
+	int i;
 	if (!u->number)
 		return;
 
-	d = get_skill(u, sk);
-	if (!d)
-		return;
+	if (!has_skill(u, sk)) return;
 
 	strcat(sbuf, ", "); sbuf+=2;
 
@@ -631,7 +630,7 @@ spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, 
 #if SKILLPOINTS
 	if (days) {
 		assert(u->number);
-		sbuf += sprintf(sbuf, " [%d]", d / u->number);
+		sbuf += sprintf(sbuf, " [%d]", get_skill(u, sk) / u->number);
 	}
 #endif
 }
@@ -758,7 +757,7 @@ spy_message(int spy, unit *u, unit *target)
 			skill_t sk;
 
 			for (sk = 0; sk != MAXSKILLS; sk++) {
-				if (get_skill(target, sk)) {
+				if (has_skill(target, sk)) {
 					found++;
 					if (first == 1) {
 						first = 0;

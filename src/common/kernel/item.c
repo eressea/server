@@ -247,7 +247,7 @@ wt_register(weapon_type * wtype)
 
 weapon_type *
 new_weapontype(item_type * itype,
-               int wflags, double magres, const char* damage[], int offmod, int defmod, int reload, skill_t skill, int minskill)
+               int wflags, double magres, const char* damage[], int offmod, int defmod, int reload, skill_t sk, int minskill)
 {
 	weapon_type * wtype;
 
@@ -266,7 +266,7 @@ new_weapontype(item_type * itype,
 	wtype->minskill = minskill;
 	wtype->offmod = offmod;
 	wtype->reload = reload;
-	wtype->skill = skill;
+	wtype->skill = sk;
 	wt_register(wtype);
 
 	return wtype;
@@ -850,7 +850,7 @@ use_tacticcrystal(region * r, unit * u, strlist * cmdstrings)
 }
 
 t_item itemdata[MAXITEMS] = {
-	/* name[4]; typ; skill; minskill; material[6]; gewicht; preis;
+	/* name[4]; typ; sk; minskill; material[6]; gewicht; preis;
 	 * benutze_funktion; */
 	{			/* I_IRON */
 		{"Eisen", "Eisen", "Eisen", "Eisen"}, G_N,
@@ -2102,7 +2102,7 @@ tagbegin(struct xml_stack * stack)
 			state->rtype->flags |= RTF_ITEM;
 			state->itype = new_itemtype(state->rtype, flags, weight, capacity);
 		} else if (strcmp(tag->name, "weapon")==0) {
-			skill_t skill = sk_find(xml_value(tag, "skill"));
+			skill_t sk = sk_find(xml_value(tag, "sk"));
 			int minskill = xml_ivalue(tag, "minskill");
 			int offmod = xml_ivalue(tag, "offmod");
 			int defmod = xml_ivalue(tag, "defmod");
@@ -2114,7 +2114,7 @@ tagbegin(struct xml_stack * stack)
 			assert(state->itype!=NULL);
 			state->itype->flags |= ITF_WEAPON;
 			state->wtype = new_weapontype(state->itype,
-				flags, magres, NULL, offmod, defmod, reload, skill, minskill);
+				flags, magres, NULL, offmod, defmod, reload, sk, minskill);
 		} else if (strcmp(tag->name, "damage")==0) {
 			/* damage of a weapon */
 			int pos = 0;
@@ -2139,7 +2139,7 @@ tagbegin(struct xml_stack * stack)
 				if (xml_bvalue(tag, "offensive")) flags|=WMF_OFFENSIVE;
 				if (xml_bvalue(tag, "defensive")) flags|=WMF_DEFENSIVE;
 				if (xml_bvalue(tag, "damage")) flags|=WMF_DAMAGE;
-				if (xml_bvalue(tag, "skill")) flags|=WMF_SKILL;
+				if (xml_bvalue(tag, "sk")) flags|=WMF_SKILL;
 				if (xml_bvalue(tag, "missile_target")) flags|=WMF_MISSILE_TARGET;
 				if (state->wmods) {
 					memcpy(mods, state->wtype->modifiers, sizeof(weapon_mod)*state->wmods);
@@ -2559,9 +2559,11 @@ xml_writeitems(const char * file)
 	item_type * it = itemtypes;
 	weapon_type * wt = weapontypes;
 
+/*
 	luxury_type * lt = luxurytypes;
 	potion_type * pt = potiontypes;
 	herb_type * ht = herbtypes;
+*/
 
 	if (stream==NULL) return -1;
 	fputs("<resources>\n", stream);
@@ -2630,7 +2632,7 @@ xml_writeitems(const char * file)
 			requirement * cm = ic->materials;
 			fputs("\t\t<construction", stream);
 			if (ic->skill!=NOSKILL) {
-				fprintf(stream, " skill=\"%s\"", skillname(ic->skill, NULL));
+				fprintf(stream, " sk=\"%s\"", skillname(ic->skill, NULL));
 				if (ic->minskill) fprintf(stream, " minskill=\"%d\"", ic->minskill);
 			}
 			if (ic->reqsize!=1) {
@@ -2679,7 +2681,7 @@ xml_writeitems(const char * file)
 		weapon_mod * wm = wt->modifiers;
 		fprintf(stream, "\t<weapon resource=\"%s\"", wt->itype->rtype->_name[0]);
 		if (wt->minskill) fprintf(stream, " minskill=\"%d\"", wt->minskill);
-		fprintf(stream, " skill=\"%s\"", skillname(wt->skill, NULL));
+		fprintf(stream, " sk=\"%s\"", skillname(wt->skill, NULL));
 		if (wt->defmod) fprintf(stream, " offmod=\"%d\"", wt->offmod);
 		if (wt->offmod) fprintf(stream, " defmod=\"%d\"", wt->defmod);
 		if (wt->reload!=0) fprintf(stream, " reload=\"%d\"", wt->reload);
@@ -2702,7 +2704,7 @@ xml_writeitems(const char * file)
 			if (fval(wm, WMF_OFFENSIVE)) fputs(" offensive", stream);
 			if (fval(wm, WMF_DEFENSIVE)) fputs(" defensive", stream);
 			if (fval(wm, WMF_DAMAGE)) fputs(" damage", stream);
-			if (fval(wm, WMF_SKILL)) fputs(" skill", stream);
+			if (fval(wm, WMF_SKILL)) fputs(" sk", stream);
 			fputs("></modifier>\n", stream);
 			++wm;
 		}
