@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.12 2001/02/15 02:41:46 enno Exp $
+ *	$Id: item.c,v 1.13 2001/02/18 08:37:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1219,7 +1219,7 @@ limit_oldtypes(const region * r, const resource_type * rtype)
 
 
 static void
-use_oldtypes(region * r, const resource_type * rtype, int norders)
+use_oldresource(region * r, const resource_type * rtype, int norders)
 		/* TODO: split into seperate functions. really much nicer. */
 {
 	assert(norders>0);
@@ -1246,6 +1246,19 @@ use_oldtypes(region * r, const resource_type * rtype, int norders)
 		assert(norders <= avail);
 		rsethorses(r, avail-norders);
 	}
+}
+
+static int 
+use_olditem(struct unit * user, const struct item_type * itype, const char * cmd)
+{
+	item_t i;
+	for (i=0;i!=MAXITEMS;++i) {
+		if (olditemtype[i]==itype) {
+			strlist * s = makestrlist(cmd);
+			itemdata[i].benutze_funktion(user->region, user, s);
+		}
+	}
+	return 0;
 }
 
 typedef const char* translate_t[5];
@@ -1385,9 +1398,12 @@ init_olditems(void)
 			{
 				resource_limit * rdata = (resource_limit*)a->data.v;
 				rdata->limit = limit_oldtypes;
-				rdata->use = use_oldtypes;
+				rdata->use = use_oldresource;
 			}
 			break;
+		}
+		if (itemdata[i].benutze_funktion) {
+			itype->use = use_olditem;
 		}
 		itype->construction = con;
 		olditemtype[i] = itype;

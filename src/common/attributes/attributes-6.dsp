@@ -97,6 +97,10 @@ SOURCE=.\giveitem.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\gm.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\hate.h
 # End Source File
 # Begin Source File
@@ -135,6 +139,10 @@ SOURCE=.\follow.c
 # Begin Source File
 
 SOURCE=.\giveitem.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\gm.c
 # End Source File
 # Begin Source File
 

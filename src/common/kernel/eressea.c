@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.16 2001/02/17 14:47:42 enno Exp $
+ *	$Id: eressea.c,v 1.17 2001/02/18 08:37:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2144,7 +2144,10 @@ finddirection(const char *s)
 	static tnode dirnames;
 	int dir;
 
-	if (!init) init_directions(&dirnames);
+	if (!init) {
+		init_directions(&dirnames);
+		init=true;
+	}
 
 	if (findtoken(&dirnames, s, (void**)&dir)==E_TOK_SUCCESS) {
 		return (direction_t)dir;

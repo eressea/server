@@ -836,6 +836,40 @@ SOURCE=..\common\attributes\giveitem.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\attributes\gm.c
+
+!IF  "$(CFG)" == "eressea - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
+
+# PROP Intermediate_Dir "..\common\attributes\Debug"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\attributes\gm.h
+
+!IF  "$(CFG)" == "eressea - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
+
+# PROP Intermediate_Dir "..\common\attributes\Debug"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\attributes\hate.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
