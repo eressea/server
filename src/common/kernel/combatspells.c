@@ -148,12 +148,12 @@ sp_kampfzauber(fighter * fi, int level, double power, spell * sp)
 	scat(":");
 	battlerecord(b, buf);
 
-	do {
+	while (force>0 && killed < enemies) {
 		dt = select_enemy(b, fi, minrow, maxrow);
 		assert(dt.fighter);
 		--force;
 		killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
-	} while (force && killed < enemies);
+	} 
 
 	sprintf(buf, "%d Personen %s getötet",
 			killed, killed == 1 ? "wurde" : "wurden");

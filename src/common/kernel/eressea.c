@@ -1910,8 +1910,7 @@ firstregion (faction * f)
 		plane * p = rplane(r);
 		for (u = r->units; u; u = u->next) {
 			if (u->faction == f) {
-				f->first = r;
-				return r;
+				return f->first = r;
 			}
 		}
 		if (f->first == r->next)
@@ -1919,21 +1918,17 @@ firstregion (faction * f)
 		for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
 			u = (unit*)ru->data.v;
 			if (u->faction == f) {
-				f->first = r;
-				return r;
+				return f->first = r;
 			}
 		}
 		if (check_leuchtturm(r, f)) {
-			f->first = r;
-			return r;
+			return f->first = r;
 		}
 		if (p && is_watcher(p, f)) {
-			f->first = r;
-			return r;
+			return f->first = r;
 		}
 	}
-	f->first = regions;
-	return regions;
+	return f->first = regions;
 }
 
 void ** blk_list[1024];
