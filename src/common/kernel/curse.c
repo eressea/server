@@ -231,7 +231,7 @@ cursetype_list * cursetypes[CMAXHASH];
 void
 ct_register(const curse_type * ct)
 {
-  unsigned int hash = hashstring(ct->cname);
+  unsigned int hash = hashstring(ct->cname) % CMAXHASH;
 	cursetype_list ** ctlp = &cursetypes[hash];
 	while (*ctlp) {
 		cursetype_list * ctl = *ctlp;
@@ -245,7 +245,7 @@ ct_register(const curse_type * ct)
 const curse_type *
 ct_find(const char *c)
 {
-  unsigned int hash = hashstring(c);
+  unsigned int hash = hashstring(c)  % CMAXHASH;
 	cursetype_list * ctl = cursetypes[hash];
 	while (ctl) {
 		int k = min(strlen(c), strlen(ctl->type->cname));
