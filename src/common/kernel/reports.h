@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: reports.h,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: reports.h,v 1.3 2001/02/05 16:11:58 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -35,7 +35,7 @@ extern boolean kann_finden(struct faction * f1, struct faction * f2);
 extern void add_find(struct faction *, struct unit *);
 extern struct unit * can_find(struct faction *, struct faction *);
 /* funktionen zum schreiben eines reports */
-void read_datenames(char *filename);
+extern int read_datenames(const char *filename);
 void sparagraph(struct strlist ** SP, const char *s, int indent, char mark);
 void lparagraph(struct strlist ** SP, char *s, int indent, char mark);
 const char *hp_status(const struct unit * u);

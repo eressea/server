@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.3 2001/02/03 13:45:27 enno Exp $
+ *	$Id: main.c,v 1.4 2001/02/05 16:11:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -450,10 +450,6 @@ main(int argc, char *argv[])
 			case 'q':
 				quiet = 1;
 				break;
-			case 'i':
-				inside_only = 1;
-				printf(" - Lade nur die innersten Regionen.\n");
-				break;
 			case 'x':
 				maxregions = atoi(argv[++i]);
 				maxregions = (maxregions*81+80) / 81;
@@ -465,8 +461,9 @@ main(int argc, char *argv[])
 		strcat(strcpy(zText, resourcepath()), "/timestrings");
 		read_datenames(zText);
 	}
+
+	kernel_init();
 	init_game();
-	initgame();
 	readgame(false);
 #if MALLOCDBG
 	assert(_CrtCheckMemory());
@@ -590,8 +587,6 @@ main(int argc, char *argv[])
 			case 'x':
 				i++;
 			case 'q':
-			case 'i':
-				/* inner_world, quiet, minfaction und maxregions wird schon vorher abgefragt */
 				break;
 			default:
 				fprintf(stderr, "Usage: %s [options]\n"

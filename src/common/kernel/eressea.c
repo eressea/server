@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.8 2001/02/05 07:23:17 corwin Exp $
+ *	$Id: eressea.c,v 1.9 2001/02/05 16:11:58 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -459,8 +459,6 @@ stripunit(unit * u)
 	while (u->attribs) a_remove (&u->attribs, u->attribs);
 }
 
-extern int inside_only;
-
 void
 verify_data (void)
 {
@@ -470,8 +468,6 @@ verify_data (void)
 	unit *u;
 	int mage, alchemist;
 
-	if (inside_only)
-		return;
 	puts(" - Überprüfe Daten auf Korrektheit...");
 
 	list_foreach(faction, factions, f) {
@@ -1893,15 +1889,35 @@ init_tokens(void)
 	}
 }
 
-extern void attrib_init(void);
+extern void render_cleanup(void);
 
 void
-initgame(void)
+kernel_done(void) 
+{
+	/* calling this function releases memory assigned to static variables, etc.
+	 * calling it is optional, e.g. a release server will most likely not do it.
+	 */
+	render_cleanup();
+	skill_done();
+	gc_done();
+}
+
+extern void attrib_init(void);
+extern void render_init(void);
+
+void
+kernel_init(void)
 {
 	init_tokens();
 	skill_init();
 	attrib_init();
+	init_locales();
+	render_init();
 	if (!turn) turn = lastturn();
+	if (turn == 0)
+		srand(time((time_t *) NULL));
+	else
+		srand(turn);
 }
 
 /*********************/

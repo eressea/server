@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.10 2001/02/04 09:46:47 corwin Exp $
+ *	$Id: save.c,v 1.11 2001/02/05 16:11:58 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -75,7 +75,6 @@ extern void resolve2(void);
 
 #define ESCAPE_FIX
 
-int inside_only = 0;
 int minfaction = 0;
 const char * g_datadir;
 /* imported symbols */
@@ -542,7 +541,7 @@ readorders(const char *filename)
 	}
 
 	fclose(F);
-	return 1;
+	return 0;
 }
 /* ------------------------------------------------------------- */
 
@@ -759,9 +758,6 @@ readgame(boolean backup)
 	} else {
 		nextborder = ri(F);
 	}
-
-	printf(" - Version: %d.%d, Runde %d.\n",
-		global.data_version / 10, global.data_version % 10, turn);
 
 	/* Planes */
 	planes = NULL;
@@ -1195,14 +1191,7 @@ readgame(boolean backup)
 				init=true;
 			}
 #endif
-#ifdef AMIGA
-				u = &dummyu;
-#else
-			if (inside_only && inner_world(r) < 2)
-				u = &dummyu;
-			else
-				u = (unit *) calloc(1, sizeof(unit));
-#endif
+			u = (unit *) calloc(1, sizeof(unit));
 
 #if USE_EVENTS
 			add_handler(&u->attribs, "hunger", print_hunger, 0);
@@ -1396,12 +1385,7 @@ readgame(boolean backup)
 			}
 			a_read(F, &u->attribs);
 
-			if (inside_only && inner_world(r) < 2) {
-				destroy_unit(u);
-				memset(u, 0, sizeof(unit));
-			} else {
-				addlist2(up,u);
-			}
+			addlist2(up,u);
 		}
 	}
 	if (global.data_version >= BORDER_VERSION) read_borders(F);
@@ -2167,24 +2151,6 @@ attrib_init(void)
 	at_register(&at_events);
 #endif
 	at_register(&at_jihad);
-}
-
-extern void skill_init(void);
-extern void skill_done(void);
-void game_done(void)
-{
-#if 0
-	int l, i;
-	for (i=0;i!=MAX_MSG;++i) {
-		fprintf(stderr, "%s\t\n", report_options[i]);
-		for (l=0;l!=ML_MAX;++l)
-			fprintf(stderr, "\t%.8d", cmsg[i][l]);
-		fprintf(stderr, report_options[i]);
-		fprintf(stderr, "\n");
-	}
-#endif
-	skill_done();
-	gc_done();
 }
 
 extern void inittokens(void);

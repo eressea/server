@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.5 2001/02/04 10:04:36 corwin Exp $
+ *	$Id: battle.c,v 1.6 2001/02/05 16:11:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2901,24 +2901,22 @@ make_battle(region * r)
 
 	if (!nobattledebug) {
 		char zText[MAX_PATH];
+		char zFilename[MAX_PATH];
 		sprintf(zText, "%s/battles", basepath());
-		if (!debug) {
-			char zFilename[MAX_PATH];
-			makedir(zText, 0700);
+		makedir(zText, 0700);
 #ifdef HAVE_ZLIB
-			sprintf(zFilename, "%s/battle-%d-%s.log.gz", zText, obs_count, simplename(r));
-			bdebug = gzopen(zFilename, "w");
+		sprintf(zFilename, "%s/battle-%d-%s.log.gz", zText, obs_count, simplename(r));
+		bdebug = gzopen(zFilename, "w");
 #elif HAVE_BZ2LIB
-			sprintf(zFilename, "%s/battle-%d-%s.log.bz2", zText, obs_count, simplename(r));
-			bdebug = BZ2_bzopen(zFilename, "w");+                       
+		sprintf(zFilename, "%s/battle-%d-%s.log.bz2", zText, obs_count, simplename(r));
+		bdebug = BZ2_bzopen(zFilename, "w");+                       
 #else
-			sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
-			bdebug = fopen(zFilename, "w");
+		sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
+		bdebug = fopen(zFilename, "w");
 #endif
-			if (!bdebug) fputs("battles können nicht debugged werden\n", stderr);
-			else {
-				dbgprintf((bdebug, "In %s findet ein Kampf statt:", rname(r, NULL)));
-			}
+		if (!bdebug) fputs("battles können nicht debugged werden\n", stderr);
+		else {
+			dbgprintf((bdebug, "In %s findet ein Kampf statt:", rname(r, NULL)));
 		}
 		obs_count++;
 	}

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.h,v 1.11 2001/02/05 07:23:17 corwin Exp $
+ *	$Id: eressea.h,v 1.12 2001/02/05 16:11:58 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -911,8 +911,6 @@ extern char buf[BUFSIZE + 1];
 /* special units */
 struct unit *make_undead_unit(struct region * r, struct faction * f, int n, race_t race);
 
-extern FILE *debug;				/* Hier können bei -debug Debug-Ausgaben hineingeschreiben werden. */
-
 extern struct region *regions;
 extern struct faction *factions;
 
@@ -1061,8 +1059,6 @@ boolean idle(struct faction * f);
 boolean unit_has_cursed_item(struct unit *u);
 struct region * rconnect(const struct region *, direction_t dir);
 
-void game_done(void);
-
 /* simple garbage collection: */
 void * gc_add(void * p);
 void gc_done(void);
@@ -1131,6 +1127,8 @@ extern void add_income(struct unit * u, int type, int want, int qty);
 extern int month(int offset);
 extern const char * basepath(void);
 extern const char * resourcepath(void);
+extern void kernel_init(void);
+extern void kernel_done(void);
 
 #define FIRST_TURN 184
 

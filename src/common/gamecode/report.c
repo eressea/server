@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.10 2001/02/04 18:50:59 corwin Exp $
+ *	$Id: report.c,v 1.11 2001/02/05 16:11:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -91,9 +91,8 @@ int  seasons;
 extern int  weeks_per_month;
 extern int  months_per_year;
 
-void
-read_datenames(char *filename)
-
+int
+read_datenames(const char *filename)
 {
 	FILE *namesFP;
 	char line[256];
@@ -101,7 +100,7 @@ read_datenames(char *filename)
 
 	if( (namesFP=fopen(filename,"r")) == NULL) {
 		fprintf(stderr, "Kann Datei '%s' nicht öffnen, Abbruch\n",filename);
-		exit(1);
+		return -1;
 	}
 
 	fgets(line,255,namesFP);
@@ -113,7 +112,7 @@ read_datenames(char *filename)
 	seasons = strtol(line, NULL, 10);
 	seasonnames = malloc(sizeof(char *) * seasons);
 
-	for(i=0;i<seasons;i++) {
+	for (i=0;i<seasons;i++) {
 		fgets(line,255,namesFP);
 		l = strlen(line)-1;
 		if(line[l] == '\n') line[l] = 0;
@@ -157,6 +156,7 @@ read_datenames(char *filename)
 	}
 
 	fclose(namesFP);
+	return 0;
 }
 
 char *
@@ -1793,7 +1793,7 @@ report(FILE *F, faction * f)
 		centre(F, "Kämpfe", false);
 		rnl(F);
 		for (bm=f->battles;bm;bm=bm->next) {
-#if HAVE_SNPRINTF
+#ifdef HAVE_SNPRINTF
 			snprintf(buf, 80, "In %s findet ein Kampf statt:",
 					translate_regions(regionid(bm->r), f));
 #else

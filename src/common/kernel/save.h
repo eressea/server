@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.h,v 1.3 2001/01/30 23:16:17 enno Exp $
+ *	$Id: save.h,v 1.4 2001/02/05 16:11:58 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -30,12 +30,9 @@ double version(void);
 /* Nach MAX_INPUT_SIZE brechen wir das Einlesen der Zeile ab und nehmen an,
  * dass hier ein Fehler (fehlende ") vorliegt */
 
-extern int inside_only;
-
 FILE * cfopen(const char *filename, const char *mode);
 int readorders(const char *);
 int creategame(void);
-void initgame(void);
 int readgame(boolean backup);
 void writegame(char *path, char quiet);
 

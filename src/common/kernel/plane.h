@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: plane.h,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: plane.h,v 1.3 2001/02/05 16:11:58 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -47,13 +47,13 @@ typedef struct plane {
 	attrib *attribs;
 } plane;
 
-plane *planes;
+struct plane *planes;
 
-plane *getplane(const struct region *r);
-plane *findplane(int x, int y);
+struct plane *getplane(const struct region *r);
+struct plane *findplane(int x, int y);
 void	init_planes(void);
 int    getplaneid(struct region *r);
-plane * getplanebyid(int id);
+struct plane * getplanebyid(int id);
 int region_x(const struct region *r, const struct faction *f);
 int region_y(const struct region *r, const struct faction *f);
 int plane_center_x(plane *pl);

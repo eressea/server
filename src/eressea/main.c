@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.9 2001/02/03 13:45:34 enno Exp $
+ *	$Id: main.c,v 1.10 2001/02/05 16:11:58 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -18,13 +18,6 @@
  * This program may not be sold or used commercially without prior written
  * permission from the authors.
  */
-
-#define BENCHMARK 0
-#ifdef DMALLOC
-# define ENNO_CLEANUP 1
-#else
-# define ENNO_CLEANUP 0
-#endif
 
 #define LOCALE_CHECK
 #ifdef __LCC__
@@ -59,8 +52,10 @@
 #include <message.h>
 #include <teleport.h>
 #include <faction.h>
+#include <plane.h>
 #include <race.h>
 #include <reports.h>
+#include <region.h>
 #include <save.h>
 #include <time.h>
 #include <border.h>
@@ -78,8 +73,9 @@
 #include <string.h>
 #include <locale.h>
 
-int nodescriptions = 0;
-int nowrite = 0;
+/** 
+ ** global variables we are importing from other modules
+ **/
 extern char * g_reportdir;
 extern char * g_datadir;
 extern char * g_basedir;
@@ -92,15 +88,26 @@ extern boolean nomsg;
 extern boolean nobattle;
 extern boolean nobattledebug;
 
-int mapdetail = 0;
+#ifdef FUZZY_BASE36
+extern int fuzzy_hits;
+#endif /* FUZZY_BASE36 */
 
-extern void render_init(void);
+/** 
+ ** global variables wthat we are exporting 
+ **/
+struct settings global = {
+	"Eressea", /* gamename */
+};
+
+
+
+static char * orders = NULL;
+static int nowrite = 0;
 
 static void
-init_game(void)
+game_init(void)
 {
 	init_triggers();
-	init_locales();
 
 	init_races();
 	init_spells();
@@ -116,53 +123,9 @@ init_game(void)
 	init_museum();
 	init_arena();
 	init_xmas2000();
-	render_init();
 }
 
-void
-create_game(void)
-{
-	assert(regions==NULL || !"game is initialized");
-	printf("Keine Spieldaten gefunden, erzeuge neues Spiel in %s...\n", datapath());
-	makedir(datapath(), 0700);
-	/* erste Insel generieren */
-	new_region(0, 0);
-	/* Monsterpartei anlegen */
-	createmonsters();
-	/* Teleportebene anlegen */
-	create_teleport_plane();
-}
-
-void
-map(void)
-{
-	FILE * f;
-	region * r;
-	sprintf(buf, "map-%d.cr", turn);
-	f = fopen(buf, "wt");
-	fputs("VERSION 42\n", f);
-	fputs("\"Standard\";konfiguration\n", f);
-	fprintf(f, "%d;runde\n", turn);
-	for (r=regions;r;r=r->next) {
-		fprintf(f, "REGION %d %d\n", r->x, r->y);
-		fprintf(f, "\"%s\";name\n", rname(r, NULL));
-		fprintf(f, "\"%s\";terrain\n", terrain[rterrain(r)].name);
-		if (!mapdetail) continue;
-		fprintf(f, "%d;silber\n", rmoney(r));
-		if (r->display && strlen(r->display))
-			fprintf(f, "\"%s\";beschr\n", r->display);
-		fprintf(f, "%d;bauern\n", rpeasants(r));
-		fprintf(f, "%d;baeume\n", rtrees(r));
-		fprintf(f, "%d;pferde\n", rhorses(r));
-		if (rterrain(r) == T_MOUNTAIN || rterrain(r) == T_GLACIER) {
-			fprintf(f, "%d;eisen\n", riron(r));
-			if (rlaen(r)>=0) fprintf(f, "%d;laen\n", rlaen(r));
-		}
-	}
-	fclose(f);
-}
-
-void
+static void
 getgarbage(void)
 {
 	faction *f;
@@ -186,9 +149,7 @@ getgarbage(void)
 #endif
 }
 
-int quickleave = 0;
-
-void
+static void
 writepasswd(void)
 {
 	FILE * F;
@@ -207,29 +168,25 @@ writepasswd(void)
 	}
 }
 
-#ifdef FUZZY_BASE36
-extern int fuzzy_hits;
-#endif /* FUZZY_BASE36 */
-
-void
+static int
 processturn(char *filename)
 {
 	struct summary * begin, * end;
+	int i;
+
 	begin = make_summary(false);
 	printf(" - Korrekturen Runde %d\n", turn);
 	korrektur();
 	turn++;
-	if (!quickleave) {
-		puts(" - entferne Texte der letzten Runde");
-		getgarbage();
-		puts(" - Nehme Korrekturen am Datenbestand vor");
-		if (!readorders(filename)) return;
+	puts(" - entferne Texte der letzten Runde");
+	getgarbage();
+	puts(" - Nehme Korrekturen am Datenbestand vor");
+	if ((i=readorders(filename))!=0) return i;
 #if BENCHMARK
-		exit(0);
+	exit(0);
 #endif
-		processorders();
-		score();
-	}
+	processorders();
+	score();
 #ifdef WACH_WAFF
 	remove_unequipped_guarded();
 #endif
@@ -254,40 +211,15 @@ processturn(char *filename)
 		sprintf(ztext, "%s/%d", datapath(), turn);
 		writegame(ztext, 0);
 	}
+	return 0;
 }
-
-void
-doreports(void)
-{
-	struct summary * begin;
-	begin = make_summary(true);
-	printf("Schreibe die Reports der %d. Runde...\n", turn);
-	reports();
-	report_summary(begin, begin, false);
-	free(begin);
-}
-
-void
-showmap(int mode)
-{
-	FILE * F = cfopen("karte", "w");
-	if (!F)
-		return;
-	puts("Schreibe Karte...");
-
-	writemap(F, mode);
-
-	fclose(F);
-}
-
-#if ENNO_CLEANUP
 
 extern void creport_cleanup(void);
 extern void reports_cleanup(void);
-extern void render_cleanup(void);
+extern void freeland(land_region * lr);
 
-void
-cleanup(void)
+static void
+game_done(void)
 {
 	/* Diese Routine enfernt allen allokierten Speicher wieder. Das ist nur
 	 * zum Debugging interessant, wenn man Leak Detection hat, und nach
@@ -298,10 +230,6 @@ cleanup(void)
 	building *b, *b2;
 	faction *f, *f2;
 	ship *s, *s2;
-
-	creport_cleanup();
-	reports_cleanup();
-	render_cleanup();
 
 	free(used_faction_ids);
 	for (r = regions; r; r = r2) {
@@ -353,8 +281,9 @@ cleanup(void)
 #ifdef LEAK_DETECT
 	leak_report(stderr);
 #endif
+	creport_cleanup();
+	reports_cleanup();
 }
-#endif
 
 #include "magic.h"
 
@@ -386,7 +315,7 @@ locale_check(void)
 }
 
 #if MALLOCDBG
-void
+static void
 init_malloc_debug(void)
 {
 #if (defined(_MSC_VER))
@@ -399,55 +328,110 @@ init_malloc_debug(void)
 }
 #endif
 
-int
-main(int argc, char *argv[])
+#if 0
+static void 
+write_stats(void)
 {
-	int i, errorlevel = 0;
-
-	setlocale(LC_ALL, "");
-#ifdef LOCALE_CHECK
-	if (!locale_check())
-		puts("ERROR: The current locale is not suitable for international Eressea.\n");
+	FILE * F;
+	char zText[MAX_PATH];
+	strcat(strcpy(zText, resourcepath()), "/spells");
+	F = fopen(zText, "wt");
+	if (F) {
+		int i, m = -1;
+		for (i=0;spelldaten[i].id;++i) {
+			if (spelldaten[i].magietyp!=m) {
+				m=spelldaten[i].magietyp;
+				fprintf(F, "\n%s\n", magietypen[m]);
+			}
+			fprintf(F, "%d\t%s\n", spelldaten[i].level, spelldaten[i].name);
+		}
+		fclose(F);
+	} else {
+		sprintf(buf, "fopen(%s): ", zText);
+		perror(buf);
+	}
+	strcat(strcpy(zText, resourcepath()), "/bonus");
+	F = fopen(buf, "wt");
+	if (F) {
+		race_t r;
+		for (r=0;r!=MAXRACES;++r) {
+			skill_t sk;
+			int i = 0;
+			fprintf(F, "const bonus %s_bonus = {\n\t", race[r].name[0]);
+			for (sk=0;sk!=MAXSKILLS;sk++) {
+				if (race[r].bonus[sk]) {
+					if (i==8) {
+						i = 0;
+						fputs("\n\t", F);
+					}
+					fprintf(F, "{ SK_%s, %d }, ", skillnames[sk], race[r].bonus[sk]);
+					++i;
+				}
+			}
+			fputs("{ SK_NONE, 0 }\n};\n", F);
+		}
+		fclose(F);
+	} else {
+		sprintf(buf, "fopen(%s): ", zText);
+		perror(zText);
+	}
+}
 #endif
-#if MALLOCDBG
-	init_malloc_debug();
+
+static int 
+usage(const char * prog, const char * arg)
+{
+	if (arg) {
+		fprintf(stderr, "unknown argument: %s\n\n", arg);
+	}
+	fprintf(stderr, "Usage: %s [options]\n"
+		"-x n             : Lädt nur die ersten n regionen\n"
+		"-f x y           : Lädt nur die regionen ab (x,y)\n"
+		"-v befehlsdatei  : verarbeitet automatisch die angegebene Befehlsdatei\n"
+		"-d datadir       : gibt das datenverzeichnis an\n"
+		"-b basedir       : gibt das basisverzeichnis an\n"
+		"-r resdir        : gibt das resourceverzeichnis an\n"
+		"-t turn          : read this datafile, not the most current one\n"
+		"-o reportdir     : gibt das reportverzeichnis an\n"
+		"--nomsg          : keine Messages (RAM sparen)\n"
+		"--nobattle       : keine Kämpfe\n"
+		"--nodebug        : keine Logfiles für Kämpfe\n"
+		"--debug          : schreibt Debug-Ausgaben in die Datei debug\n"
+		"--nocr           : keine CRs\n"
+		"--nonr           : keine Reports\n"
+#ifdef USE_MERIAN
+		"--nomer          : keine Meriankarten\n"
 #endif
+		"--help           : help\n", prog);
+	return -1;
+}
 
-	debug = 0;
-	quickleave = 0;
-
-	printf(
-			"\n"
-			"%s PBEM host\n"
-			"Copyright (C) 1996-99 C.Schlittchen, K.Zedel, E.Rehling, H.Peters.\n\n"
-
-			"based on Atlantis v1.0\n"
-			"Copyright (C) 1993 by Russell Wallace.\n"
-			"and on German Atlantis v2.3\n"
-			"Copyright (C) 1996 by Alexander Schroeder.\n\n"
-
-			"Eressea is distributed in the hope that it will be useful,\n"
-			"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-			"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n"
-
-		 "This program may be freely used, modified and distributed. It may\n"
-		 "not be sold or used commercially without prior written permission\n"
-			"from the author.\n\n"
-
-	   "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n", global.gamename, version());
-
-	for (i = 1; i != argc; i++)
-		if ((argv[i][0] == '-' || argv[i][0] == '/'))
-			switch (argv[i][1]) {
+static int
+read_args(int argc, char **argv)
+{
+	int i;
+	for (i=1;i!=argc;++i) {
+		if (argv[i][0]!='-') {
+			return usage(argv[0], argv[i]);
+		} else if (argv[i][1]=='-') { /* long format */
+			if (strcmp(argv[i]+1, "nocr")==0) nocr = true;
+			else if (strcmp(argv[i]+2, "nosave")==0) nowrite = true;
+			else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
+			else if (strcmp(argv[i]+2, "nomsg")==0) nomsg = true;
+			else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
+			else if (strcmp(argv[i]+2, "nodebug")==0) nobattledebug = true;
+#ifdef USE_MERIAN
+			else if (strcmp(argv[i]+2, "nomer")==0) nomer = true;
+#endif
+			else if (strcmp(argv[i]+2, "help")==0) 
+				return usage(argv[0], NULL);
+			else
+				return usage(argv[0], argv[i]);
+		} else switch(argv[i][1]) {
 			case 'o':
 				g_reportdir = argv[++i];
 				break;
 			case 'd':
-				if (!strcmp(argv[i] + 1, "debug")) {
-					nodescriptions = 1;
-					debug = fopen("debug", "w");
-					break;
-				}
 				g_datadir = argv[++i];
 				break;
 			case 'r':
@@ -466,301 +450,61 @@ main(int argc, char *argv[])
 			case 'q':
 				quiet = 1;
 				break;
-			case 'i':
-				inside_only = 1;
-				printf(" - Lade nur die innersten Regionen.\n");
+			case 'v':
+				if (i<argc) orders = argv[++i];
+				else return usage(argv[0], argv[i]);
 				break;
 			case 'x':
 				maxregions = atoi(argv[++i]);
 				maxregions = (maxregions*81+80) / 81;
 				break;
-			}
-	{
-		char zText[MAX_PATH];
-		strcat(strcpy(zText, resourcepath()), "/timestrings");
-		read_datenames(zText);
-	}
-
-#ifdef WRITE_STATS
-	{
-		FILE * F;
-		char zText[MAX_PATH];
-		strcat(strcpy(zText, resourcepath()), "/spells");
-		F = fopen(zText, "wt");
-		if (F) {
-			int i, m = -1;
-			for (i=0;spelldaten[i].id;++i) {
-				if (spelldaten[i].magietyp!=m) {
-					m=spelldaten[i].magietyp;
-					fprintf(F, "\n%s\n", magietypen[m]);
-				}
-				fprintf(F, "%d\t%s\n", spelldaten[i].level, spelldaten[i].name);
-			}
-			fclose(F);
-		} else {
-			sprintf(buf, "fopen(%s): ", zText);
-			perror(buf);
-		}
-		strcat(strcpy(zText, resourcepath()), "/bonus");
-		F = fopen(buf, "wt");
-		if (F) {
-			race_t r;
-			for (r=0;r!=MAXRACES;++r) {
-				skill_t sk;
-				int i = 0;
-				fprintf(F, "const bonus %s_bonus = {\n\t", race[r].name[0]);
-				for (sk=0;sk!=MAXSKILLS;sk++) {
-					if (race[r].bonus[sk]) {
-						if (i==8) {
-							i = 0;
-							fputs("\n\t", F);
-						}
-						fprintf(F, "{ SK_%s, %d }, ", skillnames[sk], race[r].bonus[sk]);
-						++i;
-					}
-				}
-				fputs("{ SK_NONE, 0 }\n};\n", F);
-			}
-			fclose(F);
-		} else {
-			sprintf(buf, "fopen(%s): ", zText);
-			perror(zText);
-		}
-		}
-#endif
-	init_game();
-	initgame();
-	readgame(false);
-#if MALLOCDBG
-	assert(_CrtCheckMemory());
-#endif
-	/* verify_data(); */
-
-	if (turn == 0)
-		srand(time((time_t *) NULL));
-	else
-		srand(turn);
-
-	/* Problem: In jedem Report ist die Regionsreihenfolge eine andere. */
-
-	/* { int nregions=0; region *r; for(r=regions;r;r=r->next) nregions++;
-	 * scramble(regions, nregions, sizeof(region *)); } */
-
-	errorlevel = -1;
-
-	for (i = 1; i != argc; i++)
-		if (argv[i][0] == '-' ||
-			argv[i][0] == '/')
-			switch (argv[i][1]) {
-			case 'c':
-				korrektur();
-				break;
-			case 'Q':
-				quickleave = 1;
-				break;
-			case 'n':
-				if (strcmp(argv[i]+1, "nocr")==0) nocr = true;
-				else if (strcmp(argv[i]+1, "nosave")==0) nowrite = true;
-				else if (strcmp(argv[i]+1, "nonr")==0) nonr = true;
-				else if (strcmp(argv[i]+1, "nomer")==0) nomer = true;
-				else if (strcmp(argv[i]+1, "nomsg")==0) nomsg = true;
-				else if (strcmp(argv[i]+1, "nobattle")==0) nobattle = true;
-				else if (strcmp(argv[i]+1, "nodebug")==0) nobattledebug = true;
-				break;
-			case 'v':
-				++i;
-#define TEST_BORDERS 0
-#if TEST_BORDERS
-				{
-					border * b;
-					new_border(&bt_fogwall, findregion(5,-6), findregion(5, -5));
-					new_border(&bt_noway, findregion(4,-5), findregion(5, -5));
-					new_border(&bt_wall, findregion(5,-5), findregion(6, -5));
-					b = new_border(&bt_illusionwall, findregion(4,-4), findregion(5, -5));
-					b->data = (void*) 1; /* partei 1 hat's gezaubert */
-				}
-#endif
-				if (i >= argc || argv[i][0]) {
-					printf(" - verwende Befehlsdatei: %s\n", argv[i]);
-					processturn(argv[i]);
-					errorlevel = 0;
-				} else {
-					puts("Fehler: keine Befehlsdatei angegeben.\n\n");
-					errorlevel = 1;
-				}
-				break;
-#ifdef EXTRA_CR
-			case 'p' :
-				{
-					FILE * out = fopen("planes.cr", "wt");
-					faction * f;
-					region * r;
-					if (!out) break;
-					fprintf(out, "VERSION 36\n");
-					for (f = factions; f; f = f->next) cr_faction(out, f);
-					for (r = regions;r;r=r->next) if (getplane(r)) cr_region(out, r);
-				   fclose(out);
-				}
-				break;
-			case 'w' :
-				{
-					FILE * out = fopen("world.cr", "wt");
-					faction * f;
-					region * r;
-					if (!out) break;
-					fprintf(out, "VERSION 36\n");
-					for (f = factions; f; f = f->next) cr_faction(out, f);
-					for (r = regions;r;r=r->next) cr_region(out, r);
-				   fclose(out);
-				}
-				break;
-#endif
-
-			case '#':
-				score();
-				exit(0);
-				break;
-			case 'm':
-				if (argv[i][2]=='d') mapdetail = 1;
-				map();
-				break;
-			case 'f':
-				i++;
-			case 'r':
-			case 'b':
-			case 't':
-			case 'x':
-				i++;
-			case 'q':
-			case 'i':
-				/* inner_world, quiet, minfaction und maxregions wird schon vorher abgefragt */
-				break;
 			default:
-				fprintf(stderr, "Usage: %s [options]\n"
-					"-r               : schreibt die Reports neu\n"
-					"-x n             : Lädt nur die ersten n regionen\n"
-					"-g befehlsdatei  : verarbeitet Spielleiterbefehle\n"
-					"-v befehlsdatei  : verarbeitet automatisch die angegebene Befehlsdatei\n"
-				    "-#               : gibt Scoreliste aus\n"
-					"-d datadir       : gibt das datenverzeichnis an\n"
-					"-o reportdir     : gibt das reportverzeichnis an\n"
-					"-nomsg           : keine Messages (RAM sparen)\n"
-#ifdef USE_MERIAN
-					"-nomer           : keine Meriankarten\n"
-#endif
-					"-nocr            : keine CRs\n"
-					"-nonr            : keine Reports\n"
-					"-nobattle        : keine Kämpfe\n"
-					"-debug           : schreibt Debug-Ausgaben in die Datei debug\n"
-					"-?               : help\n", argv[0]);
-				errorlevel = 1;
-				break;
-			}
-	if (errorlevel >= 0) {
-#if ENNO_CLEANUP
-		cleanup();
-#endif
-		game_done();
-		return errorlevel;
-	}
-	puts("? zeigt das Menue an.");
-	printf("sizeof:\n region\t%d (%d)\n unit\t%d (%d)\n", (int)sizeof(region), listlen(regions), (int)sizeof(unit), -1);
-	printf(" ship\t%d (%d)\n building\t%d(%d)\n", (int)sizeof(ship), -1, (int)sizeof(building), -1);
-
-	for (;;) {
-		if (quickleave) break;
-		printf("> ");
-		fgets(buf, 1024, stdin);
-
-		switch (buf[0]) {
-		case 'c':
-			korrektur();
-			break;
-
-		case 'k':
-			showmap(M_TERRAIN);
-			break;
-
-		case 'p':
-			showmap(M_FACTIONS);
-			break;
-
-		case 'u':
-			showmap(M_UNARMED);
-			break;
-
-		case 'v':
-			printf("Datei mit den Befehlen? ");
-			fgets(buf, 1024, stdin);
-			if (buf[0])
-				processturn(buf);
-			break;
-
-		case 's':
-			{
-				char ztext[64];
-				sprintf(ztext, "data/%d", turn);
-				writegame(ztext, 0);
-			}
-			break;
-
-		case 'q':
-#if ENNO_CLEANUP
-			cleanup();
-#endif
-			game_done();
-			return 0;
-		case 'Q':
-			quickleave = 1;
-			break;
-		case 'l':
-			listnames();
-			break;
-
-		case '#':
-			score();
-			break;
-
-#ifdef QTMAP
-		case '*':
-			qt_edit_map(argc, argv);
-			break;
-#endif
-
-		default:
-			puts("modify:\n"
-				 " v - Befehle verarbeiten.\n"
-				 " g - Spielleiterbefehle verarbeiten.\n"
-				 " e - Erzeuge Regionen.\n"
-				 " t - Terraform Region.\n"
-				 " T - Terraform Block.\n"
-				 " m - Erschaffe Einheiten und Monster.\n"
-				 " b - Erbaue eine Burg.\n"
-				 " n - Neue Spieler hinzufuegen.\n"
-				 " M - Move unit.\n"
-				 " c - Korrekturen durchführen.\n"
-				 "information:\n"
-				 " a - Adressen anzeigen.\n"
-				 " i - Info ueber eine Region.\n"
-				 " U - Info ueber units einer Region.\n"
-				 " k - Karte anzeigen.\n"
-				 " p - Politische Karte anzeigen.\n"
-				 " u - Karte unbewaffneter Regionen anzeigen.\n"
-				 " l - Liste aller Laendernamen zeigen.\n"
-#ifdef QTMAP
-				 " * - Qt-Karte anzeigen.\n"
-#endif
-				 "save:\n"
-				 " r - Reports schreiben.\n"
-				 " # - Scoreliste speichern.\n"
-				 " s - Spielstand speichern.\n"
-				 "\n"
-				 " q - Beenden.");
+				usage(argv[0], argv[i]);
 		}
 	}
 	return 0;
 }
 
-struct settings global = {
-	"Eressea", /* gamename */
-};
+int
+main(int argc, char *argv[])
+{
+	int i;
+	char zText[MAX_PATH];
+
+	printf("\n%s PBEM host\n"
+		"Copyright (C) 1996-2001 C.Schlittchen, K.Zedel, E.Rehling, H.Peters.\n\n"
+	   "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
+
+	setlocale(LC_ALL, "");
+#ifdef LOCALE_CHECK
+	if (!locale_check()) {
+		puts("ERROR: The current locale is not suitable for international Eressea.\n");
+		return -1;
+	}
+#endif
+#if MALLOCDBG
+	init_malloc_debug();
+#endif
+
+	if ((i=read_args(argc, argv))!=0) return i;
+
+	printf(
+		"version %d.%d\n"
+		"turn    %d.\n"
+		"orders  %s.\n",
+		global.data_version / 10, global.data_version % 10, turn, orders);
+
+	strcat(strcpy(zText, resourcepath()), "/timestrings");
+	if ((i=read_datenames(zText))!=0) return i;
+
+	kernel_init();
+	game_init();
+
+	if ((i=readgame(false))!=0) return i;
+	if ((i=processturn(orders))!=0) return i;
+
+	game_done();
+	kernel_done();
+
+	return 0;
+}

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: mapper.c,v 1.5 2001/02/04 18:51:00 corwin Exp $
+ *	$Id: mapper.c,v 1.6 2001/02/05 16:11:58 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1160,9 +1160,6 @@ main(int argc, char *argv[])
 				maxregions = atoi(argv[++i]);
 				maxregions = (maxregions*81+80) / 81;
 				break;
-			case 'i':
-				inside_only=1;
-				break;
 			case 'q': quiet = true; break;
 			case 'n':
 				switch (argv[i][2]) {
@@ -1194,9 +1191,9 @@ main(int argc, char *argv[])
 		}
 	}
 
-	initgame();
+	kernel_init();
+
 	init_triggers();
-	init_locales();
 	init_attributes();
 
 	init_resources();
@@ -1206,7 +1203,6 @@ main(int argc, char *argv[])
 	init_museum();
 	init_arena();
 	init_xmas2000();
-	render_init();
 
 	if(!*datafile)
 		sprintf(datafile, "%s/%d", datapath(), turn);

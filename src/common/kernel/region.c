@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: region.c,v 1.6 2001/02/03 13:45:32 enno Exp $
+ *	$Id: region.c,v 1.7 2001/02/05 16:11:58 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -75,10 +75,12 @@ tregionid(const region * r, const faction * f)
 	} else if (pl && fval(pl, PFL_NOCOORDS)) {
 		strncpy(buf, rname(r, f->locale), 65);
 	} else {
-#if HAVE_SNPRINTF
+#ifdef HAVE_SNPRINTF
 		snprintf(buf, 65, "%s (%d,%d)", rname(r, f->locale), region_x(r, f), region_y(r, f));
 #else
-		sprintf(buf, "%s (%d,%d)", rname(r, f->locale), region_x(r, f), region_y(r, f));
+		strncpy(buf, rname(r, f->locale), 50);
+		buf[50]=0;
+		sprintf(buf+strlen(buf), " (%d,%d)", region_x(r, f), region_y(r, f));
 #endif
 	}
 	buf[64] = 0;

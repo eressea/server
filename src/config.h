@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: config.h,v 1.4 2001/02/03 13:45:27 enno Exp $
+ *	$Id: config.h,v 1.5 2001/02/05 16:11:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -121,6 +121,7 @@ typedef int boolean;
 # define HAVE_MKDIR_WITH_PERMISSION
 # include <string.h>
 # define HAVE_STRDUP
+# define HAVE_SNPRINTF
 #endif
 
 /* egcpp 4 dos */
@@ -139,7 +140,8 @@ typedef int boolean;
 # define HAVE_STRICMP
 # define HAVE_STRNICMP
 # define HAVE_STRDUP
-# define HAVE__SNPRINTF
+# define snprintf _snprintf
+# define HAVE_SNPRINTF
 # undef HAVE_STRCASECMP
 # undef HAVE_STRNCASECMP
 # define R_OK 4
@@ -149,6 +151,9 @@ typedef int boolean;
 #ifdef _MSC_VER
 # define R_OK 4
 # define HAVE__MKDIR_WITHOUT_PERMISSION
+
+# define snprintf _snprintf
+# define HAVE_SNPRINTF
 
 /* MSVC has _access */
 _CRTIMP int __cdecl _access(const char *, int);

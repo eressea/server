@@ -90,7 +90,7 @@ main(int argc, char ** argv)
 		if (in==NULL) return -1;
 	}
 
-	initgame();
+	kernel_init();
 	readgame(false);
 
 	markup(in);
