@@ -618,6 +618,9 @@ tagbegin(struct xml_stack * stack)
 			rc->recruitcost = xml_ivalue(tag, "recruitcost");
 			rc->maintenance = xml_ivalue(tag, "maintenance");
 			rc->weight = xml_ivalue(tag, "weight");
+#if RACE_CAPACITY
+			rc->capacity = xml_ivalue(tag, "capacity");
+#endif
 			rc->speed = xml_fvalue(tag, "speed");
 			rc->hitpoints = xml_ivalue(tag, "hp");
 			rc->def_damage = strdup(xml_value(tag, "damage"));

@@ -58,6 +58,7 @@ typedef struct race {
 	int maintenance;
 	int splitsize;
 	int weight;
+	int capacity;
 	double speed;
 	int hitpoints;
 	const char *def_damage;

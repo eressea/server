@@ -145,6 +145,9 @@ static attrib_type at_driveweight = {
 int
 personcapacity(const unit *u)
 {
+#if RACE_CAPACITY
+	int cap = u->race->weight+u->race->capacity;
+#else
 	int cap = u->race->weight+540;
 
 	if (old_race(u->race) == RC_TROLL)
@@ -153,7 +156,8 @@ personcapacity(const unit *u)
 	else if(old_race(u->race) == RC_GOBLIN)
 		cap -= 100;
 #endif
-
+#endif
+	
 	if (fspecial(u->faction, FS_QUICK))
 		cap -= 200;
 
