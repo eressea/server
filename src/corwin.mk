@@ -4,10 +4,9 @@ ifndef ERESSEA
 endif
 
 # Hier definieren, damit nicht '@gcc'
-CC      = gcc
+CC      = colorgcc
 AR      = ar
 CTAGS   = ctags
-CC      = gcc
 LD      = gcc
 INSTALL = cp
 

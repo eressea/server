@@ -15,7 +15,7 @@ INSTALL = @cp
 #INSTALL = install
 
 
-ARFLAGS = cr
+ARFLAGS = crs
 CTAGSFLAGS = --langmap=c:.c.h --c-types=-m
 CFLAGS  = -I$(ERESSEA) -Wall -Wwrite-strings -Wstrict-prototypes \
            -Wpointer-arith -Werror-implicit-function-declaration \
@@ -68,8 +68,8 @@ endif
 
 ifeq ($(CONFIG), debug)
   BUILD_DIR  = Debug-$(ARCHITECTURE)
-  CFLAGS    += -g
-  LDFLAGS   += -g
+  CFLAGS    += -ggdb
+  LDFLAGS   += -ggdb
 endif
 
 ifeq ($(CONFIG), release)
@@ -80,14 +80,14 @@ endif
 
 ifeq ($(CONFIG), profile)
   BUILD_DIR  = Profile-$(ARCHITECTURE)
-  CFLAGS    += -g -pg -O4 -funroll-loops
-  LDFLAGS   += -g -pg
+  CFLAGS    += -ggdb -pg -O4 -funroll-loops
+  LDFLAGS   += -ggdb -pg
 endif
 
 ifeq ($(CONFIG), dmalloc)
   BUILD_DIR  = Dmalloc-$(ARCHITECTURE)
-  CFLAGS    += -g -DDMALLOC
-  LDFLAGS   += -g
+  CFLAGS    += -ggdb -DDMALLOC
+  LDFLAGS   += -ggdb
   LIBS      += -ldmalloc
 endif
 

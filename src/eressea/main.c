@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.13 2001/02/10 22:02:10 enno Exp $
+ *	$Id: main.c,v 1.14 2001/02/11 19:55:00 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -532,12 +532,6 @@ main(int argc, char *argv[])
 
 	kernel_init();
 	game_init();
-
-	{
-		FILE * F = fopen("c:\\messagetypes.txt", "wt");
-		debug_messagetypes(F);
-		fclose(F);
-	}
 
 	if ((i=readgame(false))!=0) return i;
 	if ((i=processturn(orders))!=0) return i;
