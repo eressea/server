@@ -733,7 +733,7 @@ cycle_route(unit *u, int gereist)
 {
 	int cm = 0;
 	char tail[1024];
-	char neworder[1024];
+	char neworder[2048];
 	char *token;
 	direction_t d = NODIRECTION;
 	boolean paused = false;
@@ -743,6 +743,8 @@ cycle_route(unit *u, int gereist)
 	tail[0] = '\0';
 
 	strcpy(neworder, locale_string(u->faction->locale, keywords[K_ROUTE]));
+
+/*	fprintf(stderr, "Calc route: %s %s\n", unitname(u), regionname(u->region, NULL)); */
 
 	for (cm=0;;++cm) {
 		const struct locale * lang = u->faction->locale;
@@ -759,6 +761,7 @@ cycle_route(unit *u, int gereist)
 			assert(!pause);
 			if (!pause) strcat(strcat(tail, " "), LOC(lang, shortdirections[d]));
 		}
+		else if (strlen(neworder)>sizeof(neworder)/2) break;
 		else if (cm==gereist && !paused && pause) {
 			strcat(strcat(tail, " "), LOC(lang, parameters[P_PAUSE]));
 			paused=true;
