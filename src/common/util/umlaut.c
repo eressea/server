@@ -39,7 +39,6 @@ typedef struct tref {
 void
 addtoken(tnode * root, const char* str, void * id)
 {
-	static char zText[1024];
 	static struct replace {
 		char c;
 		const char * str;
@@ -92,6 +91,7 @@ addtoken(tnode * root, const char* str, void * id)
 		addtoken(next->node, str+1, id);
 		while (replace[i].str) {
 			if (*str==replace[i].c) {
+        char zText[1024];
 				strcat(strcpy(zText, replace[i].str), str+1);
 				addtoken(root, zText, id);
 				break;
