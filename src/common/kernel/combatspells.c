@@ -1563,9 +1563,9 @@ sp_reanimate(fighter * fi, int level, double power, spell * sp)
 			++tf->side->size[tf->unit->status + 1];
 			++tf->side->healed;
 			--tf->side->casualties;
-                        assert(tf->side->casualties>=0);
-                        --tf->side->dead;
-                        assert(tf->side->dead>=0);
+      assert(tf->side->casualties>=0);
+      --tf->side->dead;
+      assert(tf->side->dead>=0);
 			++j;
 		}
 	}
@@ -1745,10 +1745,10 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
         u->hp = u->number * unit_max_hp(du);
         assert(j<=df->side->casualties);
         df->side->casualties -= j;
-        /* tot sind sie eignetlich immer noch.
-         * siehe http://eressea.upb.de/mantis/view.php?id=447
+        /* tot sind sie eignetlich immer noch. Aber... was tun?
+        /* siehe http://eressea.upb.de/mantis/view.php?id=447 */
         df->side->dead -= j;
-        */
+        df->side->healed += j;
 
         /* counting total number of undead */
         undead += j;
