@@ -75,12 +75,12 @@ def ValidEmail(email):
 	return 0
     return 1
 
-def genpasswd():                                                                               
-    newpasswd=""                                                                                 
+def genpasswd():
+    newpasswd=""
     chars = string.letters + string.digits
-    for i in range(8):                                                                           
-	newpasswd = newpasswd + choice(chars)                                                      
-    return newpasswd                                                                             
+    for i in range(8):
+	newpasswd = newpasswd + choice(chars)
+    return newpasswd
 
 
 Form = cgi.FieldStorage()
@@ -98,6 +98,7 @@ locale=GetKey(Form, "locale")
 
 referrer=GetKey(Form, "referrer")
 firsttime=GetKey(Form, "firsttime")
+bonus=GetKey(Form, "bonus")
 
 if (locale==None) or (lastname==None) or (race==None) or (firstname==None) or (address==None) or (city==None):
     output="<p>Um Dich zu Eressea anzumelden musst Du das Formular vollständig ausfüllen.\n "
@@ -138,6 +139,12 @@ else:
 	if referrer!=None:
 	    fields=fields+", referrer"
 	    values=values+", '"+referrer+"'"
+	if bonus!=None:
+	    fields=fields+", bonus"
+	    if bonus=='yes':
+		values=values+", 1"
+	    else:
+		values=values+", 0"
 	if firsttime!=None:
 	    fields=fields+", firsttime"
 	    if firsttime=='yes':
