@@ -2158,11 +2158,14 @@ report(FILE *F, faction * f, const faction_list * addresses,
 		  }
 		  centre(F, buf, true);
 		  rnl(F);
-		  description = LOC(f->locale, potiontext);
-			if (strcmp(description, potiontext)==0) {
-				/* string not found */
-				description = ptype->text;
-			}
+      description = ptype->text;
+      if (description==NULL || f->locale!=find_locale("de")) {
+        description = LOC(f->locale, potiontext);
+        if (strcmp(description, potiontext)==0) {
+          /* string not found */
+          description = ptype->text;
+        }
+      }
 		  centre(F, description, true);
     }
 	}

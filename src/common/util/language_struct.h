@@ -7,16 +7,18 @@
 
 #define SMAXHASH 512
 
+typedef struct locale_str {
+  unsigned int hashkey;
+  struct locale_str * nexthash;
+  char * str;
+  char * key;
+} locale_str;
+
 typedef struct locale {
 	struct locale * next;
 	unsigned int hashkey;
 	const char * name;
-	struct locale_string {
-		unsigned int hashkey;
-		struct locale_string * nexthash;
-		char * str;
-		char * key;
-	} * strings[SMAXHASH];
+	struct locale_str * strings[SMAXHASH];
 } locale;
 
 extern locale * default_locale;

@@ -58,8 +58,8 @@ itoab(int i, int base)
 
 	if (!as) {
 		int j;
-		char * x = calloc(sizeof(char), 8*4);
-		as = calloc(sizeof(char*), 4);
+		char * x = (char*)calloc(sizeof(char), 8*4);
+		as = (char **)calloc(sizeof(char*), 4);
 		for (j=0;j!=4;++j) as[j] = x+j*8;
 	}
 	s = as[index];

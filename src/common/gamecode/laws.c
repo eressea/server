@@ -1487,12 +1487,13 @@ prefix_cmd(unit * u, struct order * ord)
   }
 
   for(i=0; race_prefixes[i] != NULL; i++) {
-    if(strncasecmp(s, LOC(u->faction->locale, race_prefixes[i]), strlen(s)) == 0) {
+    const char * tag = mkname("prefix", race_prefixes[i]);
+    if (strncasecmp(s, LOC(u->faction->locale, tag), strlen(s)) == 0) {
       break;
     }
   }
 
-  if(race_prefixes[i] == NULL) {
+  if (race_prefixes[i] == NULL) {
     cmistake(u, ord, 299, MSG_EVENT);
     return 0;
   }

@@ -1245,9 +1245,9 @@ movearound(int rx, int ry) {
 						}
 					}
 					break;
-			case 'E':
-				editmode = !editmode;
-				break;
+			  case 'E':
+				  editmode = !editmode;
+				  break;
 				case 'i':
 				case 'r':
 					showregion(r, 1);

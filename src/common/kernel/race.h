@@ -170,7 +170,8 @@ extern boolean r_insectstalled(const struct region *r);
 extern spell_list * familiarspells(const struct race * rc);
 
 
-extern const char *race_prefixes[];
+extern void add_raceprefix(const char *);
+extern char ** race_prefixes;
 extern const struct race_syn race_synonyms[];
 
 extern void write_race_reference(const struct race * rc, FILE * F);

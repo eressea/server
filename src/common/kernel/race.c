@@ -138,35 +138,21 @@ allowed_dragon(const region * src, const region * target)
 	return allowed_fly(src, target);
 }
 
-const char *race_prefixes[] = {
-	"prefix_Dunkel",
-	"prefix_Licht",
-	"prefix_Klein",
-	"prefix_Hoch",
-	"prefix_Huegel",
-	"prefix_Berg",
-	"prefix_Wald",
-	"prefix_Sumpf",
-	"prefix_Schnee",
-	"prefix_Sonnen",
-	"prefix_Mond",
-	"prefix_See",
-	"prefix_Tal",
-	"prefix_Schatten",
-	"prefix_Hoehlen",
-	"prefix_Blut",
-	"prefix_Wild",
-	"prefix_Chaos",
-	"prefix_Nacht",
-	"prefix_Nebel",
-	"prefix_Grau",
-	"prefix_Frost",
-	"prefix_Finster",
-	"prefix_Duester",
-	"prefix_flame",
-	"prefix_ice",
-	NULL
-};
+char ** race_prefixes = NULL;
+
+extern void 
+add_raceprefix(const char * prefix)
+{
+  static size_t size = 4;
+  static unsigned int next = 0;
+  if (race_prefixes==NULL) race_prefixes = malloc(size * sizeof(char*));
+  if (next+1==size) {
+    size *= 2;
+    race_prefixes = realloc(race_prefixes, size * sizeof(char*));
+  }
+  race_prefixes[next++] = strdup(prefix);
+  race_prefixes[next] = NULL;
+}
 
 /* Die Bezeichnungen dürfen wegen der Art des Speicherns keine
  * Leerzeichen enthalten! */
@@ -363,7 +349,7 @@ racename(const struct locale *loc, const unit *u, const race * rc)
 	if (prefix!=NULL) {
 		static char lbuf[80];
 		char * s = lbuf;
-		strcpy(lbuf, locale_string(loc, prefix));
+		strcpy(lbuf, locale_string(loc, mkname("prefix", prefix)));
 		s += strlen(lbuf);
 		if (asyn!=NULL) {
 			strcpy(s, locale_string(loc,

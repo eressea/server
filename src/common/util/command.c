@@ -43,7 +43,7 @@ stree_create(void)
 	syntaxtree * sroot = NULL;
 	const struct locale * lang = locales;
 	while (lang) {
-		syntaxtree * stree = malloc(sizeof(syntaxtree));
+		syntaxtree * stree = (syntaxtree *)malloc(sizeof(syntaxtree));
 		stree->lang = lang;
 		stree->next = sroot;
 		sroot=stree;
@@ -56,7 +56,7 @@ void
 add_command(struct tnode * keys, struct tnode * tnext, 
 				const char * str, parser fun)
 {
-	command * cmd = malloc(sizeof(command));
+	command * cmd = (command *)malloc(sizeof(command));
 	cmd->fun = fun;
 	cmd->nodes = tnext;
 	addtoken(keys, str, (void*)cmd);

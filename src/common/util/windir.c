@@ -12,7 +12,7 @@
  * prior permission by the authors of Eressea.
  */
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #include <config.h>
 
 #include <stdlib.h>

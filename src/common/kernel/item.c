@@ -1807,17 +1807,12 @@ herb_t potionherbs[MAXPOTIONS][MAXHERBSPERPOTION] =
 static const char *potiontext[MAXPOTIONS] =
 {
 	/* Stufe 1: */
-	"Für den Siebenmeilentee koche man einen Blauen Baumringel auf und "
-   "gieße dieses Gebräu in einen Windbeutel. Das heraustropfende Wasser "
-   "fange man auf, filtere es und verabreiche es alsdann. Durch diesen "
-   "Tee können bis zu zehn Menschen schnell wie ein Pferd laufen.",
-
-	"Zuerst brate man das Gurgelkraut leicht an und würze das Zeug mit "
-	"ein wenig Fjordwuchs. Man lasse alles so lange kochen, bis fast alle "
-	"Flüssigkeit verdampft ist. Diesen Brei stelle man über Nacht raus. "
-	"Am nächsten Morgen presse man den Brei aus. Die so gewonnene "
-	"Flüssigkeit, Goliathwasser genannt, verleiht bis zu zehn Männern die "
-	"Tragkraft eines Pferdes.",
+  "Für den Siebenmeilentee koche man einen Blauen Baumringel auf und "
+  "gieße dieses Gebräu in einen Windbeutel. Das heraustropfende Wasser "
+  "fange man auf, filtere es und verabreiche es alsdann. Durch diesen "
+  "Tee können bis zu zehn Menschen schnell wie ein Pferd laufen.",
+  
+  NULL,
 
 	"Das 'Wasser des Lebens' ist in der Lage, aus gefällten Baumstämmen "
 	"wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem "
@@ -1904,10 +1899,7 @@ static const char *potiontext[MAXPOTIONS] =
 	"der Trank das Glück von Zwillinge zu bescheren.",
 
 	/* Stufe 1, Trank der Wahrheit */
-	"Dieses wirkungsvolle einfache Gebräu schärft die Sinne des Trinkers "
-	"derart, daß er in der Lage ist, eine Woche lang auch die komplexesten "
-	"Illusionen zu durchschauen. Zur Herstellung benötigt ein Alchemist "
-	"einen Flachwurz und einen Fjordwuchs.",
+  NULL,
 
 	"Eines der seltensten und wertvollsten alchemistischen Elixiere, verleiht "
 	"dieser Trank dem Anwender für einige Wochen die Kraft eines Drachen. "

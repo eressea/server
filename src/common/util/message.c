@@ -59,7 +59,7 @@ mt_new(const char * name, const char * args[])
 	  mtype->pnames[i] = strdup(x);
 	  mtype->types[i] = NULL;
 	} else {
-	  char * cp = strncpy(malloc(spos-x+1), x, spos-x);
+	  char * cp = strncpy((char*)malloc(spos-x+1), x, spos-x);
 	  cp[spos-x] = '\0';
 	  mtype->pnames[i] = cp;
 	  /* optimierung: Typ-Strings zentral verwalten. */
@@ -98,7 +98,7 @@ arg_type * argtypes = NULL;
 void
 register_argtype(const char * name, void(*free_arg)(void*), void*(*copy_arg)(void*))
 {
-  arg_type * atype = malloc(sizeof(arg_type));
+  arg_type * atype = (arg_type *)malloc(sizeof(arg_type));
   atype->name = name;
   atype->next = argtypes;
   atype->free = free_arg;
@@ -145,7 +145,7 @@ msg_create(const struct message_type * type, void * args[])
     return NULL;
   }
   msg->type = type;
-  msg->parameters = calloc(sizeof(void*), type->nparameters);
+  msg->parameters = (void**)calloc(sizeof(void*), type->nparameters);
   msg->refcount=1;
   for (i=0;i!=type->nparameters;++i) {
     msg->parameters[i] = copy_arg(type->types[i], args[i]);
@@ -200,7 +200,7 @@ mt_register(const message_type * type)
   messagetype_list * mtl = messagetypes[hash];
   while (mtl && mtl->data!=type) mtl=mtl->next;
   if (mtl==NULL) {
-    mtl = malloc(sizeof(messagetype_list));
+    mtl = (messagetype_list*)malloc(sizeof(messagetype_list));
     mtl->data = type;
     mtl->next = messagetypes[hash];
     messagetypes[hash] = mtl;

@@ -62,7 +62,7 @@ removecurse_handle(trigger * t, void * data)
 		if (a) {
 			a_remove(&td->target->attribs, a);
 		}
-		else log_error(("ERROR: could not perform removecurse::handle()\n"));
+		else log_error(("could not perform removecurse::handle()\n"));
 	} else {
 		log_error(("could not perform removecurse::handle()\n"));
 	}

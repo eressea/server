@@ -174,7 +174,7 @@ a_removeall(attrib **p, const attrib_type * at)
 
 attrib *
 a_new(const attrib_type * at) {
-	attrib * a = calloc(1, sizeof(attrib));
+	attrib * a = (attrib*)calloc(1, sizeof(attrib));
   assert(at!=NULL);
 	a->type = at;
 	if (at->initialize) at->initialize(a);

@@ -48,7 +48,7 @@ locale *
 make_locale(const char * name)
 {
 	unsigned int hkey = hashstring(name);
-	locale * l = calloc(sizeof(locale), 1);
+	locale * l = (locale *)calloc(sizeof(locale), 1);
 #ifndef NDEBUG
 	locale * lp = locales;
 	while (lp && lp->hashkey!=hkey) lp=lp->next;
@@ -75,7 +75,7 @@ locale_getstring(const locale * lang, const char * key)
 {
 	unsigned int hkey = hashstring(key);
 	unsigned int id = hkey % SMAXHASH;
-	struct locale_string * find;
+	const struct locale_str * find;
 
 	assert(lang);
 	if (key==NULL || *key==0) return NULL;
@@ -94,8 +94,8 @@ locale_string(const locale * lang, const char * key)
 	else {
 		unsigned int hkey = hashstring(key);
 		unsigned int id = hkey % SMAXHASH;
-		struct locale_string * find;
-
+		struct locale_str * find;
+    
 		if (key == NULL || *key==0) return NULL;
 		if (lang == NULL) return key;
 		find = lang->strings[id];
@@ -126,7 +126,7 @@ locale_setstring(locale * lang, const char * key, const char * value)
 	int nval = atoi(key);
 	unsigned int hkey = nval?nval:hashstring(key);
 	unsigned int id = hkey % SMAXHASH;
-	struct locale_string * find;
+	struct locale_str * find;
 
 	if (lang==NULL) lang=default_locale;
 	find = lang->strings[id];
@@ -135,7 +135,7 @@ locale_setstring(locale * lang, const char * key, const char * value)
 		find=find->nexthash;
 	}
 	if (!find) {
-		find = calloc(1, sizeof(struct locale_string));
+		find = calloc(1, sizeof(struct locale_str));
 		find->nexthash = lang->strings[id];
 		lang->strings[id] = find;
 		find->hashkey = hkey;
@@ -165,7 +165,7 @@ reverse_lookup(const locale * lang, const char * str)
 	if (strlen(str)) {
 		if (lang!=NULL) {
 			for (i=0;i!=SMAXHASH;++i) {
-				struct locale_string * ls;
+				struct locale_str * ls;
 				for (ls=lang->strings[i];ls;ls=ls->nexthash) {
 					if (strcasecmp(ls->key, str)==0) return ls->key;
 					if (strcasecmp(ls->str, str)==0) return ls->key;

@@ -3163,7 +3163,21 @@ teure_talente (const struct unit * u)
 void
 attrib_init(void)
 {
-	/* Alle speicherbaren Attribute müssen hier registriert werden */
+/* these are non-persistent attributes !
+  at_register(&at_showitem);
+  at_register(&at_reportspell);
+  at_register(&at_horseluck);
+  at_register(&at_peasantluck);
+  at_register(&at_alias);
+  at_register(&at_target);
+  at_register(&at_potionuser);
+  at_register(&at_contact);
+  at_register(&at_lighthouse);
+  at_register(&at_prayer_effect);
+  at_register(&at_skillmod);
+*/
+
+  /* Alle speicherbaren Attribute müssen hier registriert werden */
 	at_register(&at_unitdissolve);
 	at_register(&at_shiptrail);
 	at_register(&at_familiar);
@@ -3174,12 +3188,10 @@ attrib_init(void)
 	at_register(&at_stealth);
 	at_register(&at_mage);
 	at_register(&at_countdown);
-	at_register(&at_showitem);
 	at_register(&at_curse);
 	at_register(&at_cursewall);
 
 	at_register(&at_seenspell);
-	at_register(&at_reportspell);
 	at_register(&at_deathcloud);
 
 	/* neue REGION-Attribute */
@@ -3188,29 +3200,21 @@ attrib_init(void)
 #if AT_SALARY
 	at_register(&at_salary);
 #endif
-	at_register(&at_horseluck);
-	at_register(&at_peasantluck);
 	at_register(&at_deathcount);
 	at_register(&at_chaoscount);
 	at_register(&at_woodcount);
 	at_register(&at_road);
 
 	/* neue UNIT-Attribute */
-	at_register(&at_alias);
 	at_register(&at_siege);
-	at_register(&at_target);
-	at_register(&at_potionuser);
-	at_register(&at_contact);
 	at_register(&at_effect);
 	at_register(&at_private);
 
 	at_register(&at_icastle);
 	at_register(&at_guard);
-	at_register(&at_lighthouse);
 	at_register(&at_group);
 	at_register(&at_faction_special);
 	at_register(&at_prayer_timeout);
-	at_register(&at_prayer_effect);
 	at_register(&at_wyrm);
 	at_register(&at_building_generic_type);
 
@@ -3225,7 +3229,6 @@ attrib_init(void)
 	register_bordertype(&bt_questportal);
 
 	at_register(&at_jihad);
-	at_register(&at_skillmod);
 #if GROWING_TREES
 	at_register(&at_germs);
 #endif

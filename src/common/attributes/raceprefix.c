@@ -41,7 +41,15 @@ set_prefix(attrib ** ap, const char * str)
 const char * 
 get_prefix(const attrib * a)
 {
+  char * str;
   a = a_findc(a, &at_raceprefix);
   if (a==NULL) return NULL;
-  return (const char *)a->data.v;
+  str = (char *)a->data.v;
+  /* conversion of old prefixes */
+  if (strncmp(str, "prefix_", 7)==0) {
+    ((attrib*)a)->data.v = strdup(str+7);
+    free(str);
+    str = (char *)a->data.v;
+  }
+  return str;
 }

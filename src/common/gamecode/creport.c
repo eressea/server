@@ -668,6 +668,7 @@ cr_output_unit(FILE * F, const region * r,
 			}
 		}
 		if (prefix) {
+      prefix = mkname("prefix", prefix);
 			fprintf(F, "\"%s\";typprefix\n", add_translation(prefix, LOC(f->locale, prefix)));
 		}
 	}
@@ -1131,7 +1132,9 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 	}
   prefix = get_prefix(f->attribs);
 	if (prefix!=NULL) {
-		fprintf(F, "\"%s\";typprefix\n", add_translation(prefix, LOC(f->locale, prefix)));
+    prefix = mkname("prefix", prefix);
+		fprintf(F, "\"%s\";typprefix\n", 
+      add_translation(prefix, LOC(f->locale, prefix)));
 	}
 	fprintf(F, "%d;Rekrutierungskosten\n", f->race->recruitcost);
 	fprintf(F, "%d;Anzahl Personen\n", count_all(f));
@@ -1160,7 +1163,9 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 			fprintf(F, "\"%s\";name\n", g->name);
       prefix = get_prefix(g->attribs);
 			if (prefix!=NULL) {
-				fprintf(F, "\"%s\";typprefix\n", add_translation(prefix, LOC(f->locale, prefix)));
+        prefix = mkname("prefix", prefix);
+				fprintf(F, "\"%s\";typprefix\n", 
+          add_translation(prefix, LOC(f->locale, prefix)));
 			}
 			show_allies(F, f, g->allies);
 		}

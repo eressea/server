@@ -636,7 +636,7 @@ stats(void)
 			for (u=r->units;u;u=u->next) {
 
 				for (itm=u->items;itm;itm=itm->next) {
-					if (itm->number>10000000) {
+					if (itm->number>50000000) {
 						log_error(("unit %s has %d %s\n", unitname(u), itm->number, resourcename(itm->type->rtype, 0)));
 						/* itm->number=1; */
 					}
@@ -977,7 +977,7 @@ warn_password(void)
 		boolean pwok = true;
 		const char * c = f->passw;
 		while (*c) {
-			if (!isalnum(*c)) pwok = false;
+			if (!isalnum((unsigned char)*c)) pwok = false;
 			c++;
 		}
 		if (pwok == false) {

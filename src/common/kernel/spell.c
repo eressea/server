@@ -558,7 +558,8 @@ select_familiar(const race * magerace, magic_t magiegebiet)
 boolean
 is_familiar(const unit *u)
 {
-	return i2b(get_familiar_mage(u)!=NULL);
+  attrib * a = a_find(u->attribs, &at_familiarmage);
+	return i2b(a!=NULL);
 }
 
 static void

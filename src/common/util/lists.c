@@ -35,8 +35,8 @@ addlist(void *l1, void *p1)
 	void_list **l;
 	void_list *p, *q;
 
-	l = l1;
-	p = p1;
+	l = (void_list **)l1;
+	p = (void_list *)p1;
 	assert(p->next == 0);
 
 	if (*l) {
@@ -94,7 +94,7 @@ promotelist(void *l, void *p)
 	/* remove entry p from list l; insert p again at the beginning of l */
 
 	choplist(l, p);
-	insertlist(l, p);
+	insertlist((void_list **)l, (void_list *)p);
 }
 
 #ifndef MALLOCDBG
@@ -116,7 +116,7 @@ freelist(void *p1)
 
 	void_list *p, *p2;
 
-	p = p1;
+	p = (void_list *)p1;
 
 	while (p) {
 		p2 = p->next;
@@ -150,7 +150,7 @@ listlen(void *l)
 	size_t i;
 	void_list *p;
 
-	for (p = l, i = 0; p; p = p->next, i++);
+	for (p = (void_list *)l, i = 0; p; p = p->next, i++);
 	return i;
 }
 

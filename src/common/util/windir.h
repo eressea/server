@@ -14,6 +14,8 @@
 
 #ifndef WINDIR_H
 #define WINDIR_H
+
+#ifdef _MSC_VER
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,5 +41,6 @@ struct dirent *readdir(DIR * thedir);
 
 #ifdef __cplusplus
 }
+#endif
 #endif
 #endif

@@ -301,7 +301,7 @@ update_subscriptions(void)
   strcat(strcpy(zText, basepath()), "/subscriptions");
   F = fopen(zText, "r");
   if (F==NULL) {
-    log_error(("could not open %s.\n", zText));
+    log_info((0, "could not open %s.\n", zText));
     return;
   }
   for (;;) {

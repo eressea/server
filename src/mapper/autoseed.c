@@ -288,14 +288,6 @@ mkisland(int nsize)
 	region * r;
 	region_list * rlist = NULL;
 	int rsize, isize=0;
-
-#ifdef RANDOM_LOCATION
-	do {
-		x = (rand() % 2001) - 1000;
-		y = (rand() % 2001) - 1000;
-		r = findregion(x, y);
-	} while (r!=NULL);
-#else
 	region * rmin = NULL;
 	direction_t d;
 	int dist;
@@ -323,8 +315,8 @@ mkisland(int nsize)
 			}
 		}
 	}
-#endif
-	if (listlen(newfactions)<MINFACTIONS) return 0;
+
+  if (listlen(newfactions)<MINFACTIONS) return 0;
 	r = new_region(x, y);
 	terraform(r, T_OCEAN);
 	add_regionlist(&rlist, r);

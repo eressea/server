@@ -30,98 +30,11 @@
 
 /* libc includes */
 #include <stdlib.h>
-void
-santa_comes_to_town(region * r, unit * santa, void (*action)(unit*))
-{
-	faction * f;
-	const item_type * roi = it_find("roi");
-	assert(roi);
-
-	for (f = factions;f;f=f->next) {
-		unit * u;
-		unit * senior = f->units;
-		if (!playerrace(f->race)) continue;
-		for (u = f->units; u; u=u->nextF) {
-			if (senior->age < u->age || effstealth(senior) > effstealth(u) || i_get(senior->items, roi)) senior = u;
-		}
-		if (!senior) continue;
-
-		sprintf(buf, "von %s: 'Ho ho ho. Frohe Weihnachten, und alles Gute für dein Volk, %s.'", unitname(santa), unitname(senior));
-		addmessage(senior->region, 0, buf, MSG_MESSAGE, ML_IMPORTANT);
-
-		travelthru(santa, senior->region);
-		if (action) action(senior);
-	}
-}
-
-unit *
-make_santa(region * r)
-{
-	unit * santa = ufindhash(atoi36("xmas"));
-
-	while (santa && santa->race!=new_race[RC_ILLUSION]) {
-		uunhash(santa);
-		santa->no = newunitid();
-		uhash(santa);
-		santa = ufindhash(atoi36("xmas"));
-	}
-	if (!santa) {
-		faction * f = findfaction(atoi36("rr"));
-		if (f==NULL) f = findfaction(MONSTER_FACTION);
-		if (f==NULL) return NULL;
-		f->alive = true;
-		santa = createunit(r, f, 1, new_race[RC_ILLUSION]);
-		uunhash(santa);
-		santa->no = atoi36("xmas");
-		uhash(santa);
-		fset(santa, UFL_PARTEITARNUNG);
-		santa->irace = new_race[RC_GNOME];
-		set_string(&santa->name, "Ein dicker Gnom mit einem Rentierschlitten");
-		set_string(&santa->display, "hat: 12 Rentiere, Schlitten, Sack mit Geschenken, Kekse für Khorne");
-	}
-	return santa;
-}
 
 static int
 xmasgate_handle(trigger * t, void * data)
 {
-	/* call an event handler on xmasgate.
-	 * data.v -> ( variant event, int timer )
-	 */
-	unit * santa = ufindhash(atoi36("xmas"));
-	building *b = (building *)t->data.v;
-	if (santa && b) {
-		unit ** up = &b->region->units;
-		if (santa->region!=b->region) santa = NULL;
-		while (*up) {
-			unit * u = *up;
-			if (u->building==b) {
-				region * r = u->region;
-				faction * f = u->faction;
-				unit * home = f->units;
-				unit * u2 = r->units;
-				while (u2) {
-					if (u2->faction==f && u2!=u && u2->number) break;
-					u2 = u2->next;
-				}
-				while (home && (home->region==b->region || home->region->land==NULL)) home = home->nextF;
-				if (home==NULL) continue;
-				if (santa!=NULL && u2==NULL) {
-					char zText[256];
-					item_type * itype = olditemtype[(rand() % 4) + I_KEKS];
-					i_change(&u->items, itype, 1);
-					sprintf(zText, "%s gibt %d %s an %s.", unitname(santa), 1, locale_string(f->locale, resourcename(itype->rtype, GR_PLURAL)), unitname(u));
-					i_change(&u->items, itype, 1);
-					addmessage(home->region, u->faction, zText, MSG_COMMERCE, ML_INFO);
-				}
-				move_unit(u, home->region, NULL);
-			}
-			if (*up==u) up = &u->next;
-		}
-	} else
-		log_error(("could not perform xmasgate::handle()\n"));
-	unused(data);
-	return 0;
+	return -1;
 }
 
 static void

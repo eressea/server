@@ -79,7 +79,7 @@ static xml_reader * xmlReaders;
 void
 xml_register_callback(xml_callback callback)
 {
-  xml_reader * reader = malloc(sizeof(xml_reader));
+  xml_reader * reader = (xml_reader *)malloc(sizeof(xml_reader));
   xml_reader ** insert = &xmlReaders;
   reader->callback = callback;
   reader->next = NULL;
