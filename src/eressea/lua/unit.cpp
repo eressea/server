@@ -1,6 +1,9 @@
 #include <config.h>
 #include <eressea.h>
 
+// Atributes includes
+#include <attributes/racename.h>
+
 // kernel includes
 #include <kernel/region.h>
 #include <kernel/item.h>
@@ -29,6 +32,12 @@ unit_setnumber(unit& u, int number)
     set_number(&u, number);
     u.hp = unit_max_hp(&u) * number;
   }
+}
+
+static void
+unit_setracename(unit& u, const char * name)
+{
+  set_racename(&u.attribs, name);
 }
 
 static int
@@ -108,6 +117,7 @@ bind_unit(lua_State * L)
     .def("get_skill", &unit_getskill)
     .def("eff_skill", &unit_effskill)
     .def("set_skill", &unit_setskill)
+    .def("set_racename", &unit_setracename)
     .property("number", &unit_getnumber, &unit_setnumber)
   ];
 }
