@@ -6020,9 +6020,8 @@
     <text locale="en">'Ho ho ho!' A fat little gnome Gnom on a sled
     pulled by 8 young dragons flies through the stary night and presents
     your faction with a solar sail. (To claim this item, one of your units
-    must issue the order 'CLAIM 1 solar sail'
-    Partei ein Sonnensegel. (Um das Segel einer Einheit zu geben, gib
-    ihr den Befehl 'BEANSPRUCHE 1 Sonnensegel').</text>
+    must issue the order 'CLAIM 1 solar sail'.
+    </text>
   </string>
 
 </strings>
