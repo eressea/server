@@ -20,14 +20,16 @@
 		<function name="use" value="use_wand_of_tears"></function>
 	</item>
 </resource>
-<string name="wand_of_tears">
-	<text locale="de">Szepter der Tränen</text>
-	<text locale="en">wand of tears</text>
-</string>
-<string name="wand_of_tears_p">
-	<text locale="de">Szepter der Tränen</text>
-	<text locale="en">wands of tears</text>
-</string>
+<strings>
+	<string name="wand_of_tears">
+		<text locale="de">Szepter der Tränen</text>
+		<text locale="en">wand of tears</text>
+	</string>
+	<string name="wand_of_tears_p">
+		<text locale="de">Szepter der Tränen</text>
+		<text locale="en">wands of tears</text>
+	</string>
+</strings>
 
 <resource name="magicbox">
 	<comment>A magic box that increases the user's capacity by 10 WU</comment>

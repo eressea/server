@@ -1,12 +1,9 @@
 <eressea>
-	<comment>German Localization</comment>
-	<include file="de/messages.xml"></include>
-	<include file="de/strings.xml"></include>
+	<include file="messages.xml"></include>
 
-	<comment>English Localization</comment>
-	<include file="en/messages.xml"></include>
+	<comment>Localization</comment>
+	<include file="de/strings.xml"></include>
 	<include file="en/strings.xml"></include>
-	<include file="fr/strings.xml"></include>
 
 	<include file="races.xml"></include>
 	<include file="resources.xml"></include>

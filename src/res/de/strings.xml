@@ -952,9 +952,11 @@
 	</string>
 	<string name="axe">
 		<text locale="de">Kriegsaxt</text>
+		<text locale="en">axe</text>
 	</string>
 	<string name="axe_p">
 		<text locale="de">Kriegsäxte</text>
+		<text locale="en">axes</text>
 	</string>
 	<string name="greatbow">
 		<text locale="de">Elfenbogen</text>
@@ -1180,6 +1182,30 @@
 	</string>
 	<string name="rustyshield_p">
 		<text locale="de">Rostige Schilde</text>
+	</string>
+	<string name="rustyhalberd">
+		<text locale="de">Rostige Hellebarde</text>
+		<text locale="en">rusty halberd</text>
+	</string>
+	<string name="rustyhalberd_p">
+		<text locale="de">Rostige Hellebarden</text>
+		<text locale="en">rusty halberds</text>
+	</string>
+	<string name="rustyaxe">
+		<text locale="de">Rostige Kriegsaxt</text>
+		<text locale="en">rusty axe</text>
+	</string>
+	<string name="rustyaxe_p">
+		<text locale="de">Rostige Kriegsäxte</text>
+		<text locale="en">rusty axes</text>
+	</string>
+	<string name="rustygreatsword">
+		<text locale="de">Rostiger Zweihänder</text>
+		<text locale="en">rusty claymore</text>
+	</string>
+	<string name="rustygreatsword_p">
+		<text locale="de">Rostige Zweihänder</text>
+		<text locale="en">rusty claymores</text>
 	</string>
 	<string name="rustychainmail">
 		<text locale="de">Rostiges Kettenhemd</text>
@@ -5108,31 +5134,119 @@
 		<text locale="de">AUFNEHEMEN</text>
 		<text locale="en">JOIN</text>
 	</string>
+	<string name="rm_stone">
+		<text locale="de">Steine</text>
+		<text locale="en">stones</text>
+	</string>
+
+	<string name="rm_laen">
+		<text locale="de">Laen</text>
+		<text locale="en">laen</text>
+	</string>
+
+	<string name="rm_youngtrees">
+		<text locale="de">Schößlinge</text>
+		<text locale="en">young trees</text>
+	</string>
+
+	<string name="rm_youngmallorn">
+		<text locale="de">Mallornschößlinge</text>
+		<text locale="en">young mallorn</text>
+	</string>
+
+	<string name="rm_trees">
+		<text locale="de">Bäume</text>
+		<text locale="en">trees</text>
+	</string>
+
+	<string name="rm_mallorn">
+		<text locale="de">Mallorn</text>
+		<text locale="en">mallorn</text>
+	</string>
+
+	<string name="rm_iron">
+		<text locale="de">Eisen</text>
+		<text locale="en">iron</text>
+	</string>
+
+	<string name="Winter">
+		<text locale="de">Winter</text>
+		<text locale="en">winter</text>
+	</string>
+
+	<string name="Frühling">
+		<text locale="de">Frühling</text>
+		<text locale="en">spring</text>
+	</string>
+
+	<string name="Sommer">
+		<text locale="de">Sommer</text>
+		<text locale="en">summer</text>
+	</string>
+
+	<string name="Herbst">
+		<text locale="de">Herbst</text>
+		<text locale="en">autumn</text>
+	</string>
+
+	<string name="nr_template">
+		<text locale="de">Vorlage für den nächsten Zug:</text>
+		<text locale="en">Template for the next turn:</text>
+	</string>
+
+	<string name="nr_calendar">
+		<text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s.</text>
+		<text locale="en">It is %s of the month of %s in the %d. year of %s.</text>
+	</string>
+
+	<string name="nr_calendar_season">
+		<text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s. Es ist %s.</text>
+		<text locale="en">It is %s of the month of %s in the %d. year of %s. It is %s.</text>
+	</string>
+
+	<string name="status_aggressive">
+		<text locale="de">aggressiv</text>
+		<text locale="en">aggressive</text>
+	</string>
+
+	<string name="status_front">
+		<text locale="de">vorne</text>
+		<text locale="en">front</text>
+	</string>
+
+	<string name="status_rear">
+		<text locale="de">hinten</text>
+		<text locale="en">rear</text>
+	</string>
+
+	<string name="status_defensive">
+		<text locale="de">defensiv</text>
+		<text locale="en">defensive</text>
+	</string>
+
+	<string name="status_flee">
+		<text locale="de">flieht</text>
+		<text locale="en">fleeing</text>
+	</string>
+
+	<string name="status_avoid">
+		<text locale="de">kämpft nicht</text>
+		<text locale="en">not fighting</text>
+	</string>
+
+	<string name="status_noaid">
+		<text locale="de">bekommt keine Hilfe</text>
+		<text locale="en">gets no aid</text>
+	</string>
+
+	<string name="battle_opponents">
+		<text locale="de">Kämpft gegen:</text>
+		<text locale="en">Fighting against</text>
+	</string>
+
+	<string name="unknown_faction">
+		<text locale="de">Unbekannte Partei</text>
+		<text locale="en">unknown faction</text>
+	</string>
+
 </strings>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
