@@ -948,7 +948,7 @@ showunits(region * r)
 	building *b;
 	ship *sh;
 	dbllist *eh = NULL, *unten, *oben, *hlp = NULL, *such = NULL, *tmp;
-	int line, ch, bottom, bot, f, f2;
+	int line, ch, bottom, bot, f;
 	size_t lt;
 	char *s = NULL, *txt, *suchtext = 0, str[45], lbuf[256];
 
@@ -1511,7 +1511,7 @@ showunits(region * r)
 							clipregion = r;
 							break;
 						case '\023':
-							clipship = findship(f2);
+							clipship = findship(f);
 							shipregion = r;
 							break;
 						}

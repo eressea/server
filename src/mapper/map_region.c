@@ -149,17 +149,17 @@ SpecialFunction(region *r)
 	wrefresh(win);
 	switch(getch()) {
 	case '1':
-		if(!is_cursed_internal(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
-			create_curse(NULL, &r->attribs, C_CURSED_BY_THE_GODS, 0,
+		if (get_curse(r->attribs, ct_find("godcursezone"))==NULL) {
+			curse * c = create_curse(NULL, &r->attribs, ct_find("godcursezone"),
 				100, 100, 0, 0);
-			set_curseflag(r->attribs, C_CURSED_BY_THE_GODS, 0, CURSE_ISNEW|CURSE_IMMUN);
+			curse_setflag(c, CURSE_ISNEW|CURSE_IMMUNE);
 			modified = 1;
 			break;
 		}
 	case '2':
-		if(!is_cursed_internal(r->attribs, C_PEACE, 0)) {
-			create_curse(NULL, &r->attribs, C_PEACE, 0, 100, 2, 0, 0);
-			set_curseflag(r->attribs, C_PEACE, 0, CURSE_IMMUN);
+		if(!is_cursed_internal(r->attribs, ct_find("peacezone"))) {
+			curse * c = create_curse(NULL, &r->attribs, ct_find("peacezone"), 100, 2, 0, 0);
+			curse_setflag(c, CURSE_IMMUNE);
 			modified = 1;
 		}
 	default:

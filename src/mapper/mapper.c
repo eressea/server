@@ -442,7 +442,7 @@ drawmap(boolean maponly) {
 					 (hl == -5 && has_laen(r)) ||
 					 (hl == -6 && fval(r, RF_MALLORN)) ||
 					 (hl == -7 && fval(r, RF_CHAOTIC)) ||
-					 (hl == -8 && is_cursed_internal(r->attribs, C_CURSED_BY_THE_GODS, 0)) ||
+					 (hl == -8 && get_curse(r->attribs, ct_find("godcursezone"))) ||
 					 (hl == -9 && newbie_region(r)) ||
 					 (hl == -10 && dropout_region(r)) ||
 					 (hl >= 0 && factionhere(r, hl)) ||
