@@ -2707,6 +2707,18 @@ randomized_resources(void)
 }
 #endif
 
+static int
+fix_idleout(void)
+{
+	faction *f;
+
+	f = findfaction(0);
+	fset(f, FL_NOIDLEOUT);
+	f = findfaction(atoi36("muse"));
+	fset(f, FL_NOIDLEOUT);
+	return 0;
+}
+
 void
 korrektur(void)
 {
@@ -2786,22 +2798,11 @@ korrektur(void)
 #endif
 
 	do_once("grat", fix_ratfamiliar());
-
 	do_once("fdmd", fix_demand());
 #if NEW_RESOURCEGROWTH
 	do_once("rndr", randomized_resources());
 #endif
-	{
-		/* Test der Message-Funktion. Ist leider noch nicht
-		 * Plane-übergreifend, deshalb die Waldelfen. */
-		faction *f = findfaction(atoi36("1"));
-		if(f) {
-			attrib *permission = a_find(f->attribs, &at_permissions);
-			if(!permission) permission = a_add(&f->attribs, a_new(&at_permissions));
-			a_add((attrib**)&permission->data.v, make_key(atoi36("gmmsgr")));
-			a_add((attrib**)&permission->data.v, make_key(atoi36("gmmsgu")));
-		}
-	}
+	do_once("idlo", fix_idleout());
 
   /* trade_orders(); */
 	if (global.data_version < NEWROAD_VERSION) {

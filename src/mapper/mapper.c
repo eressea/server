@@ -422,7 +422,9 @@ drawmap(boolean maponly) {
 
 			addch(' ');
 			if (r) {
+#ifdef COLOR
 				int rc = RegionColor(r);
+#endif
 				if ((hl == -2 && r->units) ||
 					 (hl == -3 && r->buildings) ||
 					 (hl == -4 && r->ships) ||
@@ -436,7 +438,9 @@ drawmap(boolean maponly) {
 				else if (is_tagged(r))
 					addch(rs | A_BOLD);
 				else {
+#ifdef COLOR
 					attrset(rc | A_NORMAL);
+#endif
 					addch(rs);
 					attrset(A_NORMAL);
 				}

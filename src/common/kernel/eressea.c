@@ -1300,7 +1300,8 @@ findfaction (int n)
 		}
 	}
 #endif /* FUZZY_BASE36 */
-	if (n==MONSTER_FACTION) return makemonsters();
+	/* Gibt komische Seiteneffekte hier! */
+	/* if (n==MONSTER_FACTION) return makemonsters(); */
 	return NULL;
 }
 
@@ -1671,7 +1672,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
 	assert(f->alive);
 	u_setfaction(u, f);
 	set_string(&u->thisorder, "");
-	set_string(&u->lastorder, LOC(u->faction->locale, keywords[K_WORK]));
+	set_string(&u->lastorder, LOC(u->faction->locale, "defaultorder"));
 	u_seteffstealth(u, -1);
 	u->race = urace;
 	u->irace = urace;
