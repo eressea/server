@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: study.c,v 1.3 2001/02/03 13:45:30 enno Exp $
+ *	$Id: study.c,v 1.4 2001/02/04 07:52:30 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -324,7 +324,7 @@ learn(void)
 	unit *u;
 	int p;
 	magic_t mtyp;
-	int i;
+	int i, l;
 	int warrior_skill;
 	int studycost;
 
@@ -485,12 +485,14 @@ learn(void)
 					}
 
 					if (get_effect(u, oldpotiontype[P_WISE])) {
-						a->data.i += min(u->number, get_effect(u, oldpotiontype[P_WISE])) * 10;
-						change_effect(u, oldpotiontype[P_WISE], -u->number);
+						l = min(u->number, get_effect(u, oldpotiontype[P_WISE]));
+						a->data.i += l * 10;
+						change_effect(u, oldpotiontype[P_WISE], -l);
 					}
 					if (get_effect(u, oldpotiontype[P_FOOL])) {	/* Trank "Dumpfbackenbrot" */
-						a->data.i -= min(u->number, get_effect(u, oldpotiontype[P_FOOL])) * 30;
-						change_effect(u, oldpotiontype[P_FOOL], -u->number);
+						l = min(u->number, get_effect(u, oldpotiontype[P_FOOL]));
+						a->data.i -= l * 30;
+						change_effect(u, oldpotiontype[P_FOOL], -l);
 					}
 
 					warrior_skill = fspecial(u->faction, FS_WARRIOR);
