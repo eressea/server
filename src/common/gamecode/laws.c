@@ -446,15 +446,15 @@ calculate_emigration(region *r)
 				/* This calculates the influence of volcanos on peasant
 				 * migration. */
 
-				if(rterrain(c) != T_VOLCANO) {
-						vfactor = 0.25;
+				if(rterrain(c) == T_VOLCANO || rterrain(c) == T_VOLCANO_SMOKING) {
+						vfactor = 0.10;
 				} else {
 						vfactor = 1.00;
 				}
 
 				for(j=0; j != MAXDIRECTIONS; j++) {
 					region *rv = rconnect(c, j);
-					if(rv && rterrain(rv) == T_VOLCANO) {
+					if(rv && (rterrain(rv) == T_VOLCANO || rterrain(rv) == T_VOLCANO_SMOKING)) {
 						vfactor *= 0.5;
 						break;
 					}
