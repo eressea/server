@@ -183,8 +183,8 @@ give_starting_equipment(struct region *r, struct unit *u)
   if (token!=NULL) {
     i_add(&u->items, i_new(token, 1));
   }
-	set_item(u, I_WOOD, 30);
-	set_item(u, I_STONE, 30);
+  set_item(u, I_WOOD, 30);
+  set_item(u, I_STONE, 30);
   set_money(u, 2000 + turn * 10);
 #endif
 

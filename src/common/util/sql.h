@@ -25,8 +25,6 @@
 extern "C" {
 #endif
 
-#include <stdio.h>
-
 extern FILE * sqlstream;
 extern void sql_init(const char * filename);
 extern void sql_done(void);

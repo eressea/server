@@ -59,7 +59,6 @@ extern struct message * msg_error(const struct unit *, const char *cmd,
                                   const char * name, const char* sig, ...);
 extern struct message * add_message(struct message_list** pm, struct message * m);
 extern void free_messages(struct message_list * m);
-extern void init_messages(void);
 
 /* message sections */
 extern struct messageclass * msgclasses;

@@ -18,7 +18,6 @@
 extern "C" {
 #endif
 
-#include <stdio.h>
 #include "variant.h"
 
 struct attrib;

@@ -117,7 +117,8 @@ RemoveNMRNewbie(void) {
 static void
 restart(unit *u, const race * rc)
 {
-  faction *f = addfaction(u->faction->email, u->faction->passw, rc, u->faction->locale, u->faction->subscription);
+  faction * oldf = u->faction;
+  faction *f = addfaction(oldf->email, oldf->passw, rc, oldf->locale, oldf->subscription);
   unit * nu = addplayer(u->region, f);
   strlist ** o=&u->orders;
   f->subscription = u->faction->subscription;
@@ -911,11 +912,9 @@ iron(region * r)
 #ifndef NO_GROWTH
 	if (rterrain(r) == T_MOUNTAIN) {
 		rsetiron(r, riron(r) + IRONPERTURN);
-#if !NEW_LAEN
 		if(a_find(r->attribs, &at_laen)) {
 			rsetlaen(r, rlaen(r) + rand() % MAXLAENPERTURN);
 		}
-#endif
 	} else if (rterrain(r) == T_GLACIER || rterrain(r) == T_ICEBERG_SLEEP) {
 		rsetiron(r, min(MAXGLIRON, riron(r)+GLIRONPERTURN));
 	}
@@ -2719,7 +2718,6 @@ renumber_factions(void)
 	for (rp=renum;rp;rp=rp->next) {
 		f = rp->faction;
 		a_remove(&f->attribs, rp->attrib);
-		if (updatelog) fprintf(updatelog, "renum %s %s\n", itoa36(f->no), itoa36(rp->want));
 		if (f->subscription) fprintf(sqlstream, "UPDATE subscriptions set faction='%s' where "
 			"id=%u;\n", itoa36(rp->want), 
 			f->subscription);
@@ -3645,11 +3643,6 @@ processorders (void)
 	puts(" - regeneration (healing & aura)");
 	monthly_healing();
 	regeneration_magiepunkte();
-
-#if NEW_LAEN
-	puts(" - Laenwachstum");
-	growlaen();
-#endif
 
 	puts(" - Defaults setzen");
 	defaultorders();

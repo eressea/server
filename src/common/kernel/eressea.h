@@ -20,6 +20,7 @@
 
 #ifndef ERESSEA_H
 #define ERESSEA_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -74,13 +75,14 @@ struct weapon_type;
 struct ship_type;
 struct building_type;
 
-#include <cvector.h>
-#include <umlaut.h>
-#include <language.h>
-#include <lists.h>
-#include <vmap.h>
-#include <vset.h>
-#include <attrib.h>
+#include <util/attrib.h>
+#include <util/cvector.h>
+#include <util/language.h>
+#include <util/lists.h>
+#include <util/log.h>
+#include <util/umlaut.h>
+#include <util/vmap.h>
+#include <util/vset.h>
 
 #define AT_PERSISTENT
 #ifdef ALLIANCES
@@ -257,7 +259,6 @@ extern void read_laen(struct region * r, int laen);
 /* Zuwachs Eisen in Bergregionen */
 #define IRONPERTURN    25
 #define MAXLAENPERTURN  6
-#define NEW_LAEN	0
 /* Eisen in Gletschern */
 #define GLIRONSTART    20
 /* Zuwachs Eisen in Gletschern */
@@ -743,7 +744,8 @@ enum {
 
 #define MAXSPEED   21
 
-int shipspeed(struct ship * sh, const struct unit * u);
+extern int shipspeed(const struct ship * sh, const struct unit * u);
+extern int init_data(const char * filename);
 
 /* MAXSPEED setzt die groesse fuer den Array, der die Kuesten Beschreibungen
  * enthaelt. MAXSPEED muss 2x +3 so gross wie die groesste Geschw. sein
@@ -886,7 +888,7 @@ typedef struct strlist {
 #define freset(u, i) ((u)->flags &= ~(i))
 
 extern int turn;
-extern const char *xmlfile;
+extern int quiet;
 
 /* parteinummern */
 extern int *used_faction_ids;
@@ -1163,7 +1165,6 @@ typedef struct settings {
 } settings;
 extern settings global;
 
-extern FILE * updatelog;
 extern int produceexp(struct unit * u, skill_t sk, int n);
 
 extern boolean sqlpatch;

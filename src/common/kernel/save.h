@@ -46,13 +46,11 @@ extern boolean is_persistent(const char *s, const struct locale * lang);
 /* Versionsänderungen: */
 #define HEX_VERSION 81
 extern int data_version;
-extern int minfaction;
 extern int maxregions;
 extern int firstx, firsty;
-extern int quiet;
+extern const char *xmlfile;
 
 extern void init_locales(void);
-extern int init_data(const char * xmlfile);
 extern int lastturn(void);
 
 extern void read_items(FILE *f, struct item **it);

@@ -1,12 +1,12 @@
 /* vi: set ts=2:
 *
 *
-*	Eressea PB(E)M host Copyright (C) 1998-2003
-*      Christian Schlittchen (corwin@amber.kn-bremen.de)
-*      Katja Zedel (katze@felidae.kn-bremen.de)
-*      Henning Peters (faroul@beyond.kn-bremen.de)
-*      Enno Rehling (enno@eressea-pbem.de)
-*      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
+* Eressea PB(E)M host Copyright (C) 1998-2003
+*   Christian Schlittchen (corwin@amber.kn-bremen.de)
+*   Katja Zedel (katze@felidae.kn-bremen.de)
+*   Henning Peters (faroul@beyond.kn-bremen.de)
+*   Enno Rehling (enno@eressea-pbem.de)
+*   Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
 *
 *  based on:
 *
@@ -65,20 +65,20 @@
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/spell.h>
 #include <kernel/message.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
-#include <kernel/region.h>
 #include <kernel/region.h>
 #include <kernel/reports.h>
 #include <kernel/resources.h>
 #include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/skill.h>
+#include <kernel/spell.h>
 #include <kernel/teleport.h>
 #include <kernel/unit.h>
 #include <kernel/xmlreader.h>
+
 
 /* util includes */
 #include <util/base36.h>
@@ -99,6 +99,7 @@
 #include <cstring>
 #include <ctime>
 #include <clocale>
+
 /**
 ** global variables we are importing from other modules
 **/
@@ -144,8 +145,8 @@ static const char * luafile = "default.lua";
 
 struct settings global = {
   "Eressea", /* gamename */
-    "eressea", /* resourcepath */
-    1000, /* maxunits */
+  "eressea", /* resourcepath */
+  1000, /* maxunits */
 };
 
 static void
@@ -626,10 +627,9 @@ main(int argc, char *argv[])
   char zText[MAX_PATH];
 
   sqlpatch = true;
-  updatelog = fopen("update.log", "w");
   log_open("eressea.log");
   printf("\n%s PBEM host\n"
-    "Copyright (C) 1996-2003 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
+    "Copyright (C) 1996-2004 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
     "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
 
   setlocale(LC_ALL, "");
@@ -663,6 +663,5 @@ main(int argc, char *argv[])
   kernel_done();
   lua_done(luaState);
   log_close();
-  fclose(updatelog);
   return 0;
 }

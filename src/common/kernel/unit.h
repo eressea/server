@@ -102,18 +102,18 @@ typedef struct unit_list {
 extern void unitlist_clear(struct unit_list **ul);
 extern void unitlist_insert(struct unit_list **ul, struct unit *u);
 
-extern attrib_type at_alias;
-extern attrib_type at_siege;
-extern attrib_type at_target;
-extern attrib_type at_potionuser;
-extern attrib_type at_contact;
-extern attrib_type at_effect;
-extern attrib_type at_private;
-extern attrib_type at_showskchange;
+extern struct attrib_type at_alias;
+extern struct attrib_type at_siege;
+extern struct attrib_type at_target;
+extern struct attrib_type at_potionuser;
+extern struct attrib_type at_contact;
+extern struct attrib_type at_effect;
+extern struct attrib_type at_private;
+extern struct attrib_type at_showskchange;
 
 int ualias(const struct unit * u);
 
-extern attrib_type at_stealth;
+extern struct attrib_type at_stealth;
 
 void u_seteffstealth(struct unit * u, int value);
 int u_geteffstealth(const struct unit * u);
@@ -167,7 +167,7 @@ extern void destroy_unit(struct unit * u);
 
 /* see resolve.h */
 extern void * resolve_unit(void * data);
-extern void write_unit_reference(const unit * u, FILE * F);
+extern void write_unit_reference(const struct unit * u, FILE * F);
 extern int read_unit_reference(unit ** up, FILE * F);
 
 extern void leave(struct region * r, struct unit * u);

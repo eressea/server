@@ -546,10 +546,6 @@ int res_changeitem(struct unit * u, const resource_type * rtype, int delta);
 extern struct attrib_type at_showitem; /* show this potion's description */
 extern struct attrib_type at_seenitem; /* knows this potion's description, no need to reshow */
 
-extern item_type * it_read(FILE * F);
-extern resource_type * rt_read(FILE * F);
-extern void it_write(FILE * F, const item_type * it);
-extern void rt_write(FILE * F, const resource_type * rt);
 extern void register_resources(void);
 extern void init_resources(void);
 

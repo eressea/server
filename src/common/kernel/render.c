@@ -168,6 +168,11 @@ render_cleanup(void)
 }
 
 static const char *
+v_order(const locale * l, void * data) {
+  return (const char *)data;
+}
+
+static const char *
 v_unit(const locale * l, void * data) {
 	unit * u = (void*)data;
 	if (u) return unitname(u);
@@ -497,7 +502,8 @@ render_init(void)
 	add_evalfun("dir", loc, v_dir);
 	add_evalfun("dir", loc, v_dir);
 	add_evalfun("travel", loc, v_travel);
-	add_evalfun("unit", loc, v_unit);
+        add_evalfun("unit", loc, v_unit);
+        add_evalfun("order", loc, v_order);
 	add_evalfun("of", loc, v_of_de);
 	add_evalfun("sink", loc, v_sink_de);
 	add_evalfun("mage", loc, v_mage_de);

@@ -1012,22 +1012,19 @@ parse_main(xmlDocPtr doc)
   for (i=0;i!=nodes->nodeNr;++i) {
     xmlNodePtr node = nodes->nodeTab[i];
     xmlChar * name = xmlGetProp(node, BAD_CAST "name");
-    xmlChar * disable = xmlGetProp(node, BAD_CAST "disable");
+    boolean disable = xml_bvalue(node, "disable", false);
 
-    if (disable!=NULL) {
-      if (strcmp((const char*)disable, "yes")==0) {
-        int k;
-        for (k=0;k!=MAXKEYWORDS;++k) {
-          if (strcmp(keywords[k], (const char*)name)==0) {
-            global.disabled[k]=1;
-            break;
-          }
-        }
-        if (k==MAXKEYWORDS) {
-          log_error(("trying to disable unknown comand %s\n", (const char*)name));
+    if (disable) {
+      int k;
+      for (k=0;k!=MAXKEYWORDS;++k) {
+        if (strcmp(keywords[k], (const char*)name)==0) {
+          global.disabled[k]=1;
+          break;
         }
       }
-      xmlFree(disable);
+      if (k==MAXKEYWORDS) {
+        log_error(("trying to disable unknown comand %s\n", (const char*)name));
+      }
     }
     xmlFree(name);
   }

@@ -133,22 +133,22 @@ addfaction(const char *email, const char * password,
 unit *
 addplayer(region *r, faction * f)
 {
-	unit *u;
+  unit *u;
 
   assert(f->units==NULL);
   set_ursprung(f, 0, r->x, r->y);
-	u = createunit(r, f, 1, f->race);
-	give_starting_equipment(r, u);
-	fset(u, UFL_ISNEW);
-	if (old_race(f->race) == RC_DAEMON) {
-		race_t urc;
-		do
-			urc = (race_t)(rand() % MAXRACES);
-		while (urc == RC_DAEMON || !playerrace(new_race[urc]));
-		u->irace = new_race[urc];
-	}
+  u = createunit(r, f, 1, f->race);
+  give_starting_equipment(r, u);
+  fset(u, UFL_ISNEW);
+  if (old_race(f->race) == RC_DAEMON) {
+    race_t urc;
+    do
+    urc = (race_t)(rand() % MAXRACES);
+    while (urc == RC_DAEMON || !playerrace(new_race[urc]));
+    u->irace = new_race[urc];
+  }
 
-	return u;
+  return u;
 }
 
 boolean

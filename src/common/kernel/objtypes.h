@@ -19,8 +19,6 @@
 extern "C" {
 #endif
 
-#include <stdio.h>
-
 typedef struct obj_ID {
 	int a, b;
 } obj_ID;

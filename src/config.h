@@ -22,6 +22,15 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#ifdef __cplusplus
+# include <cstdio>
+# include <cstdlib>
+extern "C" {
+#else
+# include <stdio.h>
+# include <stdlib.h>
+#endif
+
 /****                 ****
  ** Debugging Libraries **
  ****                 ****/
@@ -92,7 +101,7 @@
 # define __EXTENSIONS__
 #endif
 
-#ifdef _MSC_VER
+#ifdef WIN32
 # include <common/util/windir.h>
 # define HAVE_READDIR
 #endif
@@ -224,6 +233,9 @@ extern char * strdup(const char *s);
   typedef int boolean;
 # define false ((boolean)0)
 # define true ((boolean)!false)
+#endif
+#ifdef __cplusplus
+}
 #endif
 
 /* this function must be implemented in a .o file */

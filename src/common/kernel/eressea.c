@@ -84,7 +84,6 @@
 #include <errno.h>
 
 /* exported variables */
-const char *xmlfile = "eressea.xml";
 region  *regions;
 faction *factions;
 settings global;
@@ -107,6 +106,7 @@ static attrib_type at_creator = {
 	"creator"
 	/* Rest ist NULL; temporäres, nicht alterndes Attribut */
 };
+
 static int 
 MaxAge(void) {
   static int value = -1;
@@ -397,7 +397,6 @@ allied_skilllimit(const faction * f, skill_t sk)
   const char * str = get_param(global.parameters, "allied.skilllimit");
   return str?atoi(str):0;
 }
-
 #endif
 
 int
@@ -481,7 +480,7 @@ int quiet = 0;
 FILE *debug;
 
 int
-shipspeed (ship * sh, const unit * u)
+shipspeed (const ship * sh, const unit * u)
 {
 	int k = sh->type->range;
 	static const curse_type * stormwind_ct, * nodrift_ct;
@@ -3101,7 +3100,6 @@ kernel_init(void)
 	skill_init();
 	attrib_init();
 	translation_init();
-	init_messages();
 
 	if (!turn) turn = lastturn();
 	if (turn == 0)

@@ -5744,17 +5744,13 @@
 	</string>
 
 	<string name="nr_calendar">
-		<text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s.
-		</text>
-		<text locale="en">It is %s of the month of %s in the %d. year of
-		%s.</text>
+		<text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s.</text>
+		<text locale="en">It is %s of the month of %s in the %d. year of %s.</text>
 	</string>
 
 	<string name="nr_calendar_season">
-		<text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s.
-		Es ist %s.</text>
-		<text locale="en">It is %s of the month of %s in the %d. year of
-		%s. It is %s.</text>
+		<text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s. Es ist %s.</text>
+		<text locale="en">It is %s of the month of %s in the %d. year of %s. It is %s.</text>
 	</string>
 
 	<string name="status_aggressive">

@@ -499,7 +499,3 @@ read_msglevels(struct warning ** w, FILE * F)
 }
 #endif
 
-void
-init_messages(void)
-{
-}

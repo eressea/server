@@ -2,7 +2,7 @@
 <eressea xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="messages.xml"/>
 
-  <comment>Localization</comment>
+  <!-- Localization -->
   <xi:include href="de/strings.xml"/>
   <xi:include href="en/strings.xml"/>
 
@@ -10,6 +10,10 @@
   <xi:include href="resources.xml"/>
   <xi:include href="ships.xml"/>
   <xi:include href="buildings.xml"/>
+  <xi:include file="terrains.xml"/>
+  <xi:include file="alchemy.xml"/>
+  <xi:include file="technologies.xml"/>
+  <xi:include file="skills.xml"/>
 
   <game name="Eressea" welcome="eressea">
     <comment>Game specific</comment>
@@ -20,8 +24,8 @@
     <param name="nmr.timeout" value="4"/>
     <param name="nmr.removenewbie" value="1"/>
     <param name="GiveRestriction" value="3"/>
-    <param name="database.gameid" value="0"/>
     <param name="hunger.long" value="1"/>
+    <param name="database.gameid" value="0"/>
     <param name="firstturn" value="184"/>
   </game>
   <xi:include href="eressea/de/strings.xml"/>

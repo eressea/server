@@ -19,9 +19,12 @@ function wyrm()
  local map = {}
  local mapsize = 0
  local r
+
  for r in regions() do
-   mapsize=mapsize+1
-   map[mapsize] = r
+   if r.plane_id==plane then
+     mapsize=mapsize+1
+     map[mapsize] = r
+   end
  end
 
  local u
@@ -35,7 +38,7 @@ function wyrm()
  local index
  for index in map do
   local r = map[index]
-  if r.x~=grave.x or r.y~=grave.y then
+  if r~=grave then
    if (math.mod(r.x,2)==math.mod(get_turn(),2)) then
      r:add_notice("Eine Botschaft von Igjarjuk, Herr der Wyrme: 'Die Zeit des Wartens ist beinahe vorrüber. Euer Fürst kehrt aus dem Grabe zurück.'")
    else

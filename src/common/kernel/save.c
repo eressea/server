@@ -64,6 +64,7 @@
 #include <event.h>
 #include <resolve.h>
 #include <sql.h>
+#include <rand.h>
 #include <umlaut.h>
 
 /* libc includes */
@@ -78,15 +79,14 @@
 
 #define ESCAPE_FIX
 
-int minfaction = 0;
+/* exported symbols symbols */
+const char * xmlfile = "eressea.xml";
 const char * g_datadir;
-/* imported symbols */
-extern int cmsg[MAX_MSG][ML_MAX];
-extern int quiet;
-extern int dice_rand(const char *s);
+int firstx = 0, firsty = 0;
+
+/* local symbols */
 static region * current_region;
 
-int firstx = 0, firsty = 0;
 
 #if RESOURCE_CONVERSION
 int laen_read(attrib * a, FILE * F)
@@ -848,358 +848,6 @@ read_alliances(FILE * F)
 }
 #endif
 
-int
-readgame(const char * filename, int backup)
-{
-	int i, n, p;
-	faction *f, **fp;
-	region *r;
-	building *b, **bp;
-	ship *sh, **shp;
-	unit *u;
-	FILE * F;
-	int rmax = maxregions;
-
-	sprintf(buf, "%s/%s", datapath(), filename);
-  log_printf("- reading game data from %s\n", filename);
-	if (backup) create_backup(buf);
-	F = cfopen(buf, "r");
-	if (F==NULL) {
-		printf("Keine Spieldaten gefunden.\n");
-#if 0
-		printf("Neues Spiel (j/n)? ");
-		if (tolower(getchar()) != 'j') {
-			exit(0);
-		}
-		return creategame();
-#else
-		return -1;
-#endif
-	}
-
-	rc(F);
-
-	/* globale Variablen */
-
-	global.data_version = ri(F);
-	assert(global.data_version>=MIN_VERSION || !"unsupported data format");
-	assert(global.data_version<=RELEASE_VERSION || !"unsupported data format");
-	assert(global.data_version >= NEWSOURCE_VERSION);
-	if(global.data_version >= SAVEXMLNAME_VERSION) {
-		char basefile[1024];
-		const char *basearg = "(null)";
-
-		rs(F, basefile);
-		assert(xmlfile != NULL);
-		basearg = strrchr(xmlfile, '/');
-		if (basearg==NULL) {
-			basearg = xmlfile;
-		} else {
-			++basearg;
-		}
-		if (strcmp(basearg, basefile)!=0) {
-			printf("WARNING: xmlfile mismatch:\n");
-			printf("WARNING: datafile contains %s\n", basefile);
-			printf("WARNING: argument/default is %s\n", basearg);
-			printf("WARNING: any key to continue, Ctrl-C to stop\n");
-			getchar();
-		}
-	}
-	if (global.data_version >= GLOBAL_ATTRIB_VERSION) {
-		a_read(F, &global.attribs);
-	}
-#ifndef COMPATIBILITY
-	if (global.data_version < ITEMTYPE_VERSION) {
-		fprintf(stderr, "kann keine alten datenfiles einlesen");
-		exit(-1);
-	}
-#endif
-	global.data_turn = turn = ri(F);
-	/* read_dynamictypes(); */
-	/* max_unique_id = */ ri(F);
-	nextborder = ri(F);
-
-	/* Planes */
-	planes = NULL;
-	n = ri(F);
-	while(--n >= 0) {
-		plane *pl = calloc(1, sizeof(plane));
-		pl->id = ri(F);
-		rds(F, &pl->name);
-		pl->minx = ri(F);
-		pl->maxx = ri(F);
-		pl->miny = ri(F);
-		pl->maxy = ri(F);
-		pl->flags = ri(F);
-		if (global.data_version>WATCHERS_VERSION) {
-			rs(F, buf);
-			while (strcmp(buf, "end")!=0) {
-				watcher * w = calloc(sizeof(watcher),1);
-				int fno = atoi36(buf);
-				w->mode = (unsigned char)ri(F);
-				w->next = pl->watchers;
-				pl->watchers = w;
-				ur_add((void*)fno, (void**)&w->faction, resolve_faction);
-				rs(F, buf);
-			}
-		}
-		a_read(F, &pl->attribs);
-		addlist(&planes, pl);
-	}
-
-	/* Read factions */
-#ifdef ALLIANCES
-	if (global.data_version>=ALLIANCES_VERSION) {
-		read_alliances(F);
-	}
-#endif
-	n = ri(F);
-	printf(" - Einzulesende Parteien: %d\n", n);
-	fp = &factions;
-	while (*fp) fp=&(*fp)->next;
-
-	/* fflush (stdout); */
-
-	while (--n >= 0) {
-		faction * f = readfaction(F);
-		addlist2(fp, f);
-	}
-	*fp = 0;
-
-	/* Benutzte Faction-Ids */
-
-	no_used_faction_ids = ri(F);
-	/* used_faction_ids = gc_add(malloc(no_used_faction_ids*sizeof(int))); */
-	used_faction_ids = malloc(no_used_faction_ids*sizeof(int));
-	for(i=0; i < no_used_faction_ids; i++) {
-		used_faction_ids[i] = ri(F);
-	}
-
-	/* Regionen */
-
-	n = ri(F);
-	if (rmax<0) rmax = n;
-	printf(" - Einzulesende Regionen: %d/%d\r", rmax, n);
-
-	while (--n >= 0) {
-		unit **up;
-		boolean skip = false;
-		int x = ri(F);
-		int y = ri(F);
-		plane * pl = findplane(x, y);
-
-		if (firstx && firsty) {
-			if (x!=firstx || y!=firsty) {
-				skip = true;
-			} else {
-				firstx=0;
-				firsty=0;
-				if (rmax>0) rmax = min(n, rmax)-1;
-			}
-		}
-		if (loadplane && (!pl || pl->id!=loadplane)) skip = true;
-		if (rmax==0) {
-			if (dirtyload) break;
-			skip = true;
-		}
-		if ((n%1024)==0) {	/* das spart extrem Zeit */
-			printf(" - Einzulesende Regionen: %d/%d ", rmax, n);
-			printf("* %d,%d    \r", x, y);
-		}
-		if (skip) {
-			char * r;
-			do {
-				r = fgets(buf, BUFSIZE, F); /* skip region */
-			} while (r && buf[0]!='\n');
-			continue;
-		}
-		--rmax;
-
-		r = readregion(F, x, y);
-
-		/* Burgen */
-		p = ri(F);
-		bp = &r->buildings;
-
-		while (--p >= 0) {
-
-			b = (building *) calloc(1, sizeof(building));
-			b->no = rid(F);
-			bhash(b);
-			rds(F, &b->name);
-			rds(F, &b->display);
-			b->size = ri(F);
-			if (global.data_version < TYPES_VERSION) {
-				assert(!"data format is no longer supported");
-			    /* b->type = oldbuildings[ri(F)]; */
-			}
-			else {
-			    rs(F, buf);
-			    b->type = bt_find(buf);
-			}
-			b->region = r;
-			a_read(F, &b->attribs);
-			addlist2(bp, b);
-		}
-		/* Schiffe */
-
-		p = ri(F);
-		shp = &r->ships;
-
-		while (--p >= 0) {
-			sh = (ship *) calloc(1, sizeof(ship));
-
-			sh->region = r;
-			sh->no = rid(F);
-			shash(sh);
-			rds(F, &sh->name);
-			rds(F, &sh->display);
-
-			rs(F, buf);
-			sh->type = st_find(buf);
-			assert(sh->type || !"ship_type not registered!");
-			sh->size = ri(F);
-			sh->damage = ri(F);
-
-			/* Attribute rekursiv einlesen */
-
-			sh->coast = (direction_t)ri(F);
-			a_read(F, &sh->attribs);
-
-			addlist2(shp, sh);
-		}
-
-		*shp = 0;
-
-		/* Einheiten */
-
-		p = ri(F);
-		up = &r->units;
-
-		while (--p >= 0) {
-			unit * u = readunit(F);
-			assert(u->region==NULL);
-			u->region = r;
-			addlist2(up,u);
-		}
-	}
-	printf("\n");
-	if (!dirtyload) {
-		read_borders(F);
-#ifdef USE_UGROUPS
-		if (global.data_version >= UGROUPS_VERSION) read_ugroups(F);
-#endif
-	}
-
-#ifdef WEATHER
-
-	/* Wetter lesen */
-
-	weathers = NULL;
-
-	if (global.data_version >= 81) {
-		n = ri(F);
-		while(--n >= 0) {
-			weather *w;
-
-			w = calloc(1, sizeof(weather));
-
-			w->type      = ri(F);
-			w->radius    = ri(F);
-			w->center[0] = ri(F);
-			w->center[1] = ri(F);
-			w->move[0]   = ri(F);
-			w->move[1]   = ri(F);
-
-			addlist(&weathers, w);
-		}
-	}
-#endif
-	fclose(F);
-#ifdef AMIGA
-	fputs("Ok.", stderr);
-#endif
-
-        /* Unaufgeloeste Zeiger initialisieren */
-	printf("\n - Referenzen initialisieren...\n");
-	resolve();
-	resolve_IDs();
-
-	printf("\n - Leere Gruppen löschen...\n");
-	for (f=factions; f; f=f->next) {
-		group ** gp = &f->groups;
-		while (*gp) {
-			group * g = *gp;
-			if (g->members==0) {
-				*gp = g->next;
-				free_group(g);
-			} else
-				gp = &g->next;
-		}
-	}
-	resolve_IDs();
-
-#if 0
-	/* speziell für Runde 199->200 */
-	printf("Actions korrigieren...\n");
-	iuw_fix_rest();
-#endif
-
-	for (r=regions;r;r=r->next) {
-		building * b;
-		for (b=r->buildings;b;b=b->next) update_lighthouse(b);
-	}
-	printf(" - Regionen initialisieren & verbinden...\n");
-	for (r = regions; r; r = r->next) {
-		for (u = r->units; u; u = u->next) {
-			u->faction->alive = 1;
-		}
-	}
-	if(findfaction(0)) {
-		findfaction(0)->alive = 1;
-	}
-	if (loadplane || maxregions>=0) {
-		remove_empty_factions(false);
-	}
-
-#if 0
-  /* what is this doing here? ageing happens at the end of the turn. goddamn it. */
-	/* Regionen */
-	for (r=regions;r;r=r->next) {
-    building ** bp;
-		unit ** up;
-		ship ** sp;
-
-		a_age(&r->attribs);
-		handle_event(&r->attribs, "create", r);
-		/* Einheiten */
-		for (up=&r->units;*up;) {
-			unit * u = *up;
-			a_age(&u->attribs);
-			if (u==*up) handle_event(&u->attribs, "create", u);
-			if (u==*up) up = &(*up)->next;
-		}
-		/* Schiffe */
-		for (sp=&r->ships;*sp;) {
-			ship * s = *sp;
-			a_age(&s->attribs);
-			if (s==*sp) handle_event(&s->attribs, "create", s);
-			if (s==*sp) sp = &(*sp)->next;
-		}
-		/* Gebäude */
-		for (bp=&r->buildings;*bp;) {
-			building * b = *bp;
-			a_age(&b->attribs);
-			if (b==*bp) handle_event(&b->attribs, "create", b);
-			if (b==*bp) bp = &(*bp)->next;
-		}
-	}
-#endif
-
-	return 0;
-}
-/* ------------------------------------------------------------- */
-
 #define wc(F, c) putc(c, F);
 #define wnl(F) putc('\n', F);
 #define whs(F, s) fputs(s, F); putc(' ', F)
@@ -1325,178 +973,6 @@ export_players(const char * path)
 	fclose(F);
 }
 #endif
-
-int
-writegame(const char *filename, char quiet)
-{
-	char *base;
-	int i,n;
-	faction *f;
-	region *r;
-	building *b;
-	ship *sh;
-	unit *u;
-	plane *pl;
-	FILE * F;
-#ifdef USE_PLAYERS
-	char playerfile[MAX_PATH];
-#endif
-
-#ifdef USE_PLAYERS
-	sprintf(buf, "%s/%d.players", datapath(), turn);
-	export_players(playerfile);
-#endif
-
-	/* write_dynamictypes(); */
-
-	sprintf(buf, "%s/%s", datapath(), filename);
-	F = cfopen(buf, "w");
-	if (F==NULL)
-		return -1;
-
-	if (!quiet)
-		printf("Schreibe die %d. Runde...\n", turn);
-
-	/* globale Variablen */
-
-	wi(F, RELEASE_VERSION);
-	wnl(F);
-
-	base = strrchr(xmlfile, '/');
-	if(base) {
-		ws(F, base+1);
-	} else {
-		ws(F, xmlfile);
-	}
-	wnl(F);
-
-	a_write(F, global.attribs);
-	wnl(F);
-
-	wi(F, turn);
-	wi(F, 0/*max_unique_id*/);
-	wi(F, nextborder);
-
-	/* Write planes */
-	wnl(F);
-	wi(F, listlen(planes));
-	wnl(F);
-
-	for(pl = planes; pl; pl=pl->next) {
-		watcher * w;
-		wi(F, pl->id);
-		ws(F, pl->name);
-		wi(F, pl->minx);
-		wi(F, pl->maxx);
-		wi(F, pl->miny);
-		wi(F, pl->maxy);
-		wi(F, pl->flags);
-		w = pl->watchers;
-		while (w) {
-			if (w->faction) {
-				wi36(F, w->faction->no);
-				wi(F, w->mode);
-			}
-			w = w->next;
-		}
-		fputs("end ", F);
-		a_write(F, pl->attribs);
-		wnl(F);
-	}
-
-
-	/* Write factions */
-#if defined(ALLIANCES) && RELEASE_VERSION>=ALLIANCES_VERSION
-	write_alliances(F);
-#endif
-	n=listlen(factions);
-	wi(F, n);
-	wnl(F);
-
-	printf(" - Schreibe %d Parteien...\n",n);
-	for (f = factions; f; f = f->next) {
-		writefaction(F, f);
-	}
-
-	wi(F, no_used_faction_ids);
-	wnl(F);
-
-	for(i=0; i<no_used_faction_ids; i++) {
-		wi(F, used_faction_ids[i]);
-		wnl(F);
-	}
-
-	wnl(F);
-
-	/* Write regions */
-
-	n=listlen(regions);
-	wi(F, n);
-	wnl(F);
-	printf(" - Schreibe Regionen: %d  \r", n);
-
-	for (r = regions; r; r = r->next, --n) {
-		/* plus leerzeile */
-		if ((n%1024)==0) {	/* das spart extrem Zeit */
-			printf(" - Schreibe Regionen: %d  \r", n);
-			fflush(stdout);
-		}
-		wnl(F);
-		wi(F, r->x);
-		wi(F, r->y);
-		writeregion(F, r);
-
-		wi(F, listlen(r->buildings));
-		wnl(F);
-		for (b = r->buildings; b; b = b->next) {
-			wi36(F, b->no);
-			ws(F, b->name);
-			ws(F, b->display);
-			wi(F, b->size);
-			ws(F, b->type->_name);
-			wnl(F);
-			a_write(F, b->attribs);
-			wnl(F);
-		}
-
-		wi(F, listlen(r->ships));
-		wnl(F);
-		for (sh = r->ships; sh; sh = sh->next) {
-			assert(sh->region == r);
-			wi36(F, sh->no);
-			ws(F, sh->name);
-			ws(F, sh->display);
-			ws(F, sh->type->name[0]);
-			wi(F, sh->size);
-			wi(F, sh->damage);
-			wi(F, sh->coast);
-			wnl(F);
-			a_write(F, sh->attribs);
-			wnl(F);
-		}
-
-		wi(F, listlen(r->units));
-		wnl(F);
-		for (u = r->units; u; u = u->next) {
-			writeunit(F, u);
-		}
-	}
-	wnl(F);
-	write_borders(F);
-	wnl(F);
-#if RELEASE_VERSION >= UGROUPS_VERSION
-	write_ugroups(F);
-	wnl(F);
-#endif
-	fclose(F);
-	printf("\nOk.\n");
-	return 0;
-}
-/* ------------------------------------------------------------- */
-
-struct fjord { int size; faction * f; } fjord[3];
-
-/* ------------------------------------------------------------- */
 
 int
 lastturn(void)
@@ -2249,4 +1725,484 @@ writefaction(FILE * F, const faction * f)
 #ifdef REGIONOWNERS
   write_enemies(F, f->enemies);
 #endif
+}
+
+int
+readgame(const char * filename, int backup)
+{
+  int i, n, p;
+  faction *f, **fp;
+  region *r;
+  building *b, **bp;
+  ship *sh, **shp;
+  unit *u;
+  FILE * F;
+  int rmax = maxregions;
+
+  sprintf(buf, "%s/%s", datapath(), filename);
+  log_printf("- reading game data from %s\n", filename);
+  if (backup) create_backup(buf);
+  F = cfopen(buf, "r");
+  if (F==NULL) {
+    printf("Keine Spieldaten gefunden.\n");
+#if 0
+    printf("Neues Spiel (j/n)? ");
+    if (tolower(getchar()) != 'j') {
+      exit(0);
+    }
+    return creategame();
+#else
+    return -1;
+#endif
+  }
+
+  rc(F);
+
+  /* globale Variablen */
+
+  global.data_version = ri(F);
+  assert(global.data_version>=MIN_VERSION || !"unsupported data format");
+  assert(global.data_version<=RELEASE_VERSION || !"unsupported data format");
+  assert(global.data_version >= NEWSOURCE_VERSION);
+  if(global.data_version >= SAVEXMLNAME_VERSION) {
+    char basefile[1024];
+    const char *basearg = "(null)";
+
+    rs(F, basefile);
+    assert(xmlfile != NULL);
+    basearg = strrchr(xmlfile, '/');
+    if (basearg==NULL) {
+      basearg = xmlfile;
+    } else {
+      ++basearg;
+    }
+    if (strcmp(basearg, basefile)!=0) {
+      printf("WARNING: xmlfile mismatch:\n");
+      printf("WARNING: datafile contains %s\n", basefile);
+      printf("WARNING: argument/default is %s\n", basearg);
+      printf("WARNING: any key to continue, Ctrl-C to stop\n");
+      getchar();
+    }
+  }
+  if (global.data_version >= GLOBAL_ATTRIB_VERSION) {
+    a_read(F, &global.attribs);
+  }
+#ifndef COMPATIBILITY
+  if (global.data_version < ITEMTYPE_VERSION) {
+    fprintf(stderr, "kann keine alten datenfiles einlesen");
+    exit(-1);
+  }
+#endif
+  global.data_turn = turn = ri(F);
+  ri(F); /* max_unique_id = */ 
+  nextborder = ri(F);
+
+  /* Planes */
+  planes = NULL;
+  n = ri(F);
+  while(--n >= 0) {
+    plane *pl = calloc(1, sizeof(plane));
+    pl->id = ri(F);
+    rds(F, &pl->name);
+    pl->minx = ri(F);
+    pl->maxx = ri(F);
+    pl->miny = ri(F);
+    pl->maxy = ri(F);
+    pl->flags = ri(F);
+    if (global.data_version>WATCHERS_VERSION) {
+      rs(F, buf);
+      while (strcmp(buf, "end")!=0) {
+        watcher * w = calloc(sizeof(watcher),1);
+        int fno = atoi36(buf);
+        w->mode = (unsigned char)ri(F);
+        w->next = pl->watchers;
+        pl->watchers = w;
+        ur_add((void*)fno, (void**)&w->faction, resolve_faction);
+        rs(F, buf);
+      }
+    }
+    a_read(F, &pl->attribs);
+    addlist(&planes, pl);
+  }
+
+  /* Read factions */
+#ifdef ALLIANCES
+  if (global.data_version>=ALLIANCES_VERSION) {
+    read_alliances(F);
+  }
+#endif
+  n = ri(F);
+  printf(" - Einzulesende Parteien: %d\n", n);
+  fp = &factions;
+  while (*fp) fp=&(*fp)->next;
+
+  /* fflush (stdout); */
+
+  while (--n >= 0) {
+    faction * f = readfaction(F);
+    addlist2(fp, f);
+  }
+  *fp = 0;
+
+  /* Benutzte Faction-Ids */
+
+  no_used_faction_ids = ri(F);
+  /* used_faction_ids = gc_add(malloc(no_used_faction_ids*sizeof(int))); */
+  used_faction_ids = malloc(no_used_faction_ids*sizeof(int));
+  for(i=0; i < no_used_faction_ids; i++) {
+    used_faction_ids[i] = ri(F);
+  }
+
+  /* Regionen */
+
+  n = ri(F);
+  if (rmax<0) rmax = n;
+  printf(" - Einzulesende Regionen: %d/%d\r", rmax, n);
+
+  while (--n >= 0) {
+    unit **up;
+    boolean skip = false;
+    int x = ri(F);
+    int y = ri(F);
+    plane * pl = findplane(x, y);
+
+    if (firstx && firsty) {
+      if (x!=firstx || y!=firsty) {
+        skip = true;
+      } else {
+        firstx=0;
+        firsty=0;
+        if (rmax>0) rmax = min(n, rmax)-1;
+      }
+    }
+    if (loadplane && (!pl || pl->id!=loadplane)) skip = true;
+    if (rmax==0) {
+      if (dirtyload) break;
+      skip = true;
+    }
+    if ((n%1024)==0) {	/* das spart extrem Zeit */
+      printf(" - Einzulesende Regionen: %d/%d ", rmax, n);
+      printf("* %d,%d    \r", x, y);
+    }
+    if (skip) {
+      char * r;
+      do {
+        r = fgets(buf, BUFSIZE, F); /* skip region */
+      } while (r && buf[0]!='\n');
+      continue;
+    }
+    --rmax;
+
+    r = readregion(F, x, y);
+
+    /* Burgen */
+    p = ri(F);
+    bp = &r->buildings;
+
+    while (--p >= 0) {
+
+      b = (building *) calloc(1, sizeof(building));
+      b->no = rid(F);
+      bhash(b);
+      rds(F, &b->name);
+      rds(F, &b->display);
+      b->size = ri(F);
+      if (global.data_version < TYPES_VERSION) {
+        assert(!"data format is no longer supported");
+        /* b->type = oldbuildings[ri(F)]; */
+      }
+      else {
+        rs(F, buf);
+        b->type = bt_find(buf);
+      }
+      b->region = r;
+      a_read(F, &b->attribs);
+      addlist2(bp, b);
+    }
+    /* Schiffe */
+
+    p = ri(F);
+    shp = &r->ships;
+
+    while (--p >= 0) {
+      sh = (ship *) calloc(1, sizeof(ship));
+
+      sh->region = r;
+      sh->no = rid(F);
+      shash(sh);
+      rds(F, &sh->name);
+      rds(F, &sh->display);
+
+      rs(F, buf);
+      sh->type = st_find(buf);
+      assert(sh->type || !"ship_type not registered!");
+      sh->size = ri(F);
+      sh->damage = ri(F);
+
+      /* Attribute rekursiv einlesen */
+
+      sh->coast = (direction_t)ri(F);
+      a_read(F, &sh->attribs);
+
+      addlist2(shp, sh);
+    }
+
+    *shp = 0;
+
+    /* Einheiten */
+
+    p = ri(F);
+    up = &r->units;
+
+    while (--p >= 0) {
+      unit * u = readunit(F);
+      assert(u->region==NULL);
+      u->region = r;
+      addlist2(up,u);
+    }
+  }
+  printf("\n");
+  if (!dirtyload) {
+    read_borders(F);
+#ifdef USE_UGROUPS
+    if (global.data_version >= UGROUPS_VERSION) read_ugroups(F);
+#endif
+  }
+
+#ifdef WEATHER
+
+  /* Wetter lesen */
+
+  weathers = NULL;
+
+  if (global.data_version >= 81) {
+    n = ri(F);
+    while(--n >= 0) {
+      weather *w;
+
+      w = calloc(1, sizeof(weather));
+
+      w->type      = ri(F);
+      w->radius    = ri(F);
+      w->center[0] = ri(F);
+      w->center[1] = ri(F);
+      w->move[0]   = ri(F);
+      w->move[1]   = ri(F);
+
+      addlist(&weathers, w);
+    }
+  }
+#endif
+  fclose(F);
+#ifdef AMIGA
+  fputs("Ok.", stderr);
+#endif
+
+  /* Unaufgeloeste Zeiger initialisieren */
+  printf("\n - Referenzen initialisieren...\n");
+  resolve();
+  resolve_IDs();
+
+  printf("\n - Leere Gruppen löschen...\n");
+  for (f=factions; f; f=f->next) {
+    group ** gp = &f->groups;
+    while (*gp) {
+      group * g = *gp;
+      if (g->members==0) {
+        *gp = g->next;
+        free_group(g);
+      } else
+        gp = &g->next;
+    }
+  }
+  resolve_IDs();
+
+#if 0
+  /* speziell für Runde 199->200 */
+  printf("Actions korrigieren...\n");
+  iuw_fix_rest();
+#endif
+
+  for (r=regions;r;r=r->next) {
+    building * b;
+    for (b=r->buildings;b;b=b->next) update_lighthouse(b);
+  }
+  printf(" - Regionen initialisieren & verbinden...\n");
+  for (r = regions; r; r = r->next) {
+    for (u = r->units; u; u = u->next) {
+      u->faction->alive = 1;
+    }
+  }
+  if(findfaction(0)) {
+    findfaction(0)->alive = 1;
+  }
+  if (loadplane || maxregions>=0) {
+    remove_empty_factions(false);
+  }
+  return 0;
+}
+
+int
+writegame(const char *filename, char quiet)
+{
+  char *base;
+  int i,n;
+  faction *f;
+  region *r;
+  building *b;
+  ship *sh;
+  unit *u;
+  plane *pl;
+  FILE * F;
+#ifdef USE_PLAYERS
+  char playerfile[MAX_PATH];
+#endif
+
+#ifdef USE_PLAYERS
+  sprintf(buf, "%s/%d.players", datapath(), turn);
+  export_players(playerfile);
+#endif
+
+  sprintf(buf, "%s/%s", datapath(), filename);
+  F = cfopen(buf, "w");
+  if (F==NULL)
+    return -1;
+
+  if (!quiet)
+    printf("Schreibe die %d. Runde...\n", turn);
+
+  /* globale Variablen */
+
+  wi(F, RELEASE_VERSION);
+  wnl(F);
+
+  base = strrchr(xmlfile, '/');
+  if(base) {
+    ws(F, base+1);
+  } else {
+    ws(F, xmlfile);
+  }
+  wnl(F);
+
+  a_write(F, global.attribs);
+  wnl(F);
+
+  wi(F, turn);
+  wi(F, 0/*max_unique_id*/);
+  wi(F, nextborder);
+
+  /* Write planes */
+  wnl(F);
+  wi(F, listlen(planes));
+  wnl(F);
+
+  for(pl = planes; pl; pl=pl->next) {
+    watcher * w;
+    wi(F, pl->id);
+    ws(F, pl->name);
+    wi(F, pl->minx);
+    wi(F, pl->maxx);
+    wi(F, pl->miny);
+    wi(F, pl->maxy);
+    wi(F, pl->flags);
+    w = pl->watchers;
+    while (w) {
+      if (w->faction) {
+        wi36(F, w->faction->no);
+        wi(F, w->mode);
+      }
+      w = w->next;
+    }
+    fputs("end ", F);
+    a_write(F, pl->attribs);
+    wnl(F);
+  }
+
+
+  /* Write factions */
+#if defined(ALLIANCES) && RELEASE_VERSION>=ALLIANCES_VERSION
+  write_alliances(F);
+#endif
+  n=listlen(factions);
+  wi(F, n);
+  wnl(F);
+
+  printf(" - Schreibe %d Parteien...\n",n);
+  for (f = factions; f; f = f->next) {
+    writefaction(F, f);
+  }
+
+  wi(F, no_used_faction_ids);
+  wnl(F);
+
+  for(i=0; i<no_used_faction_ids; i++) {
+    wi(F, used_faction_ids[i]);
+    wnl(F);
+  }
+
+  wnl(F);
+
+  /* Write regions */
+
+  n=listlen(regions);
+  wi(F, n);
+  wnl(F);
+  printf(" - Schreibe Regionen: %d  \r", n);
+
+  for (r = regions; r; r = r->next, --n) {
+    /* plus leerzeile */
+    if ((n%1024)==0) {	/* das spart extrem Zeit */
+      printf(" - Schreibe Regionen: %d  \r", n);
+      fflush(stdout);
+    }
+    wnl(F);
+    wi(F, r->x);
+    wi(F, r->y);
+    writeregion(F, r);
+
+    wi(F, listlen(r->buildings));
+    wnl(F);
+    for (b = r->buildings; b; b = b->next) {
+      wi36(F, b->no);
+      ws(F, b->name);
+      ws(F, b->display);
+      wi(F, b->size);
+      ws(F, b->type->_name);
+      wnl(F);
+      a_write(F, b->attribs);
+      wnl(F);
+    }
+
+    wi(F, listlen(r->ships));
+    wnl(F);
+    for (sh = r->ships; sh; sh = sh->next) {
+      assert(sh->region == r);
+      wi36(F, sh->no);
+      ws(F, sh->name);
+      ws(F, sh->display);
+      ws(F, sh->type->name[0]);
+      wi(F, sh->size);
+      wi(F, sh->damage);
+      wi(F, sh->coast);
+      wnl(F);
+      a_write(F, sh->attribs);
+      wnl(F);
+    }
+
+    wi(F, listlen(r->units));
+    wnl(F);
+    for (u = r->units; u; u = u->next) {
+      writeunit(F, u);
+    }
+  }
+  wnl(F);
+  write_borders(F);
+  wnl(F);
+#if RELEASE_VERSION >= UGROUPS_VERSION
+  write_ugroups(F);
+  wnl(F);
+#endif
+  fclose(F);
+  printf("\nOk.\n");
+  return 0;
 }
