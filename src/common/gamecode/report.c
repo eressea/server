@@ -3631,7 +3631,7 @@ static void
 eval_skill(struct opstack ** stack, const void * userdata)
 {
 	const faction * report = (const faction*)userdata;
-	int sk = opop(stack, int);
+	skill_t sk = (skill_t)opop(stack, int);
 	const char * c = skillname(sk, report->locale);
 	opush(stack, strcpy(balloc(strlen(c)+1), c));
 }

@@ -288,7 +288,7 @@ static int
 cr_skill(const void * v, char * buffer, const void * userdata)
 {
 	const faction * report = (const faction*)userdata;
-	skill_t sk = (skill_t)v;
+	skill_t sk = (skill_t)(int)v;
 	if (sk!=NOSKILL) sprintf(buffer, "\"%s\"",
 		add_translation(skillname(sk, NULL), skillname(sk, report->locale)));
 	else strcpy(buffer, "\"\"");

@@ -872,7 +872,7 @@ readgame(boolean backup)
 				w->mode = (unsigned char)ri(F);
 				w->next = pl->watchers;
 				pl->watchers = w;
-				ur_add((void*)fno, &w->faction, resolve_faction);
+				ur_add((void*)fno, (void**)&w->faction, resolve_faction);
 			}
 			free(s);
 		}
