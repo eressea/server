@@ -132,11 +132,6 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
 {
 	attrib * a;
 	int n;
-#ifdef RANDOMIZED_LEARNING
-#ifdef SKILLMODIFIESLEARNING
-	int smod, lmod, learning;
-#endif
-#endif
 
 	/* learning sind die Tage, die sie schon durch andere Lehrer zugute
 	 * geschrieben bekommen haben. Total darf dies nicht über 30 Tage pro Mann
@@ -150,23 +145,7 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
 		return 0;
 	}
 
-#ifdef RANDOMIZED_LEARNING
-#ifdef SKILLMODIFIESLEARNING
-	smod = rc_skillmod(student->race, student->region, sk);
-	lmod = 5 * smod;
-	if(smod < 0) {
-		lmod -= 5;
-	} else if(smod > 0) {
-		lmod += 5;
-	}
-	learning = max(0, 30 + lmod);
-	n = student->number * dice(2, learning);
-#else
-	n = student->number * dice(2,30);
-#endif
-#else
 	n = student->number * 30;
-#endif
 	a = a_find(student->attribs, &at_learning);
 	if (a!=NULL) n -= a->data.i;
 
@@ -193,7 +172,13 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
 				/* Jeder Schüler zusätzlich +10 Tage wenn in Uni. */
 				a->data.i += (n / 30) * 10; /* learning erhöhen */
 				/* Lehrer zusätzlich +1 Tag pro Schüler. */
-				set_skill(teacher, sk, get_skill(teacher, sk) + (n / 30));
+#if SKILLPOINTS
+				change_skill(teacher, sk, n / 30);
+#else
+				if (learn_skill(teacher, sk, n / 30)) {
+					change_skill(teacher, sk, teacher->number);
+				}
+#endif
 			}	/* sonst nehmen sie nicht am Unterricht teil */
 		}
 		/* Teaching ist die Anzahl Leute, denen man noch was beibringen kann. Da
@@ -310,7 +295,7 @@ teach(region * r, unit * u)
 				if (igetkeyword(student->thisorder, student->faction->locale) == K_STUDY) {
 					/* Input ist nun von student->thisorder !! */
 					sk = getskill(student->faction->locale);
-					if (sk != NOSKILL && eff_skill(u, sk, r) > eff_skill(student, sk, r)) {
+					if (sk != NOSKILL && eff_skill(u, sk, r) >= eff_skill(student, sk, r)+TEACHDIFFERENCE) {
 						teaching -= teach_unit(u, student, teaching, sk, true);
 					}
 				}
@@ -445,11 +430,6 @@ learn(void)
 	int i, l;
 	int warrior_skill;
 	int studycost;
-#ifdef RANDOMIZED_LEARNING
-#ifdef SKILLMODIFIESLEARNING
-	int smod, lmod, learning;
-#endif
-#endif
 
 	/* lernen nach lehren */
 
@@ -492,6 +472,13 @@ learn(void)
 				if (u->race->bonus[i] == -99) {
 					cmistake(u, findorder(u, u->thisorder), 77, MSG_EVENT);
 					continue;
+				}
+				/* snotlings können Talente nur bis T8 lernen */
+				if (u->race == new_race[RC_SNOT]){
+					if (get_level(u, i) >= 8){
+						cmistake(u, findorder(u, u->thisorder), 308, MSG_EVENT);
+						continue;
+					}
 				}
 
 				p = studycost = study_cost(u,i);
@@ -657,25 +644,15 @@ learn(void)
 				}
 #endif
 
-#ifdef RANDOMIZED_LEARNING
-#ifdef SKILLMODIFIESLEARNING
-				smod = rc_skillmod(u->race, u->region, (skill_t)i);
-				lmod = 5 * smod;
-				if(smod < 0) {
-					lmod -= 5;
-				} else if(smod > 0) {
-					lmod += 5;
-				}
-				learning = max(0, 30 + lmod);
-				days = (int)((u->number * dice(2, learning) + a->data.i) * multi);
-#else
-				days = (int)((u->number * dice(2, 30) + a->data.i) * multi);
-#endif
-#else
 				days = (int)((u->number * 30 + a->data.i) * multi);
-#endif
 				if (fval(u, FL_HUNGER)) days = days / 2;
+#if SKILLPOINTS
 				change_skill(u, (skill_t)i, days);
+#else
+				if (learn_skill(u, (skill_t)i, days)) {
+					change_skill(u, (skill_t)i, u->number);
+				}
+#endif
 				if (a) {
 					a_remove(&u->attribs, a);
 					a = NULL;

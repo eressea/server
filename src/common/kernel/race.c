@@ -155,7 +155,7 @@ const struct race_syn race_synonyms[] = {
 
 /* required for old_race, do not change order! */
 static const char * oldracenames[MAXRACES] = {
-	"dwarf", "elf", "orc", "goblin", "human", "troll", "demon", "insect", "halfling", "cat", "aquarian", "uruk"
+	"dwarf", "elf", "orc", "goblin", "human", "troll", "demon", "insect", "halfling", "cat", "aquarian", "uruk" "snotling"
 	"undead", "illusion",
 	"young dragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
 	"special", "spell",

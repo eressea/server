@@ -4313,6 +4313,19 @@
 		</locale>
 	</message>
 
+	<message name="error308">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<locale name="de">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - Dieses Talent kann nicht höher gelernt werden."</text>
+			</nr>
+		</locale>
+	</message>
+
 	<message name="drown_on_ship">
 		<type>
 			<arg name="unit" type="unit"></arg>

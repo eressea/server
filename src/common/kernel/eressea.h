@@ -617,6 +617,7 @@ enum {
 	RC_CAT,
 	RC_AQUARIAN,
 	RC_URUK,
+	RC_SNOT,
 
 	RC_UNDEAD,		/* 12 - Untoter */
 	RC_ILLUSION,

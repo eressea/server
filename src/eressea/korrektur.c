@@ -2529,7 +2529,7 @@ heal_all(void)
 #if PEASANT_ADJUSTMENT == 1
 
 #define WEIGHT ((double)0.5)
-#define PLWEIGHT ((double)0.75)
+#define PLWEIGHT ((double)0.80)
 
 static int
 peasant_adjustment(void)
@@ -2575,12 +2575,10 @@ peasant_adjustment(void)
 			if(playerp * PLWEIGHT + rpeasants(r) > soll) {
 				p_weg = (int)(min(((playerp * PLWEIGHT) + rpeasants(r)) - soll, rpeasants(r)));
 				assert(p_weg >= 0);
-				/*
 				if (p_weg > 0){
 					log_printf("BAUERN: war %d, minus %d, playerp %d\n",
 							rpeasants(r), p_weg, playerp);
 				}
-				*/
 				pool += p_weg;
 				rsetpeasants(r, rpeasants(r) - p_weg);
 				assert(rpeasants(r) >= 0);

@@ -2764,8 +2764,7 @@ wage(const region *r, const unit *u, boolean img)
 	if (b) esize = buildingeffsize(b, img);
 
 	if (u) {
-		/* TODO: Snotling! */
-		wage = wagetable[esize][u->race == new_race[RC_ORC] || u->race == new_race[RC_URUK]];
+		wage = wagetable[esize][u->race == new_race[RC_ORC] || u->race == new_race[RC_SNOT] || u->race == new_race[RC_URUK]];
 		if (fspecial(u->faction, FS_URBAN)) {
 			wage += wagetable[esize][3];
 		}
