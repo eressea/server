@@ -464,7 +464,7 @@ set_movement_order(unit * u, const region * target, int moves, boolean (*allowed
 		region * prev = plan[position];
 		region * next = plan[++position];
 		direction_t dir = reldirection(prev, next);
-		assert(dir!=NODIRECTION);
+		assert(dir!=NODIRECTION && dir!=D_SPECIAL);
 		*c++ = ' ';
 		strcpy(c, locale_string(u->faction->locale, directions[dir]));
 		c += strlen(c);
@@ -848,21 +848,6 @@ static void ponnuki(unit * u)
 
 		NULL };
 	int jokes = 0;
-
-	/*
-	attrib * a = a_find(u->attribs, &at_direction);
-
-	if (!a) {
-		a_add(&u->attribs, a = a_new(&at_direction));
-		a->data.i = D_NORTHWEST;
-	}
-	if (rand() % 10 == 0) a->data.i = rand() % MAXDIRECTIONS;
-
-	travel(u->region, u, u->region->connect[a->data.i], false);
-	*/
-
-	/* Rausgenommen, übergibt irgendwann NULL, das führt zu einem
-	 * SegFault. */
 
 	while(joke[jokes]) jokes++;
 	if (jokes) addmessage(u->region, 0, joke[rand() % jokes], MSG_MESSAGE, ML_IMPORTANT);

@@ -52,24 +52,38 @@ static int g_maxluxuries = 0;
 
 const int delta_x[MAXDIRECTIONS] =
 {
-	-1, 0, 1, 1, 0, -1
+  -1, 0, 1, 1, 0, -1
 };
 
 const int delta_y[MAXDIRECTIONS] =
 {
-	1, 1, 0, -1, -1, 0
+  1, 1, 0, -1, -1, 0
 };
 
-const direction_t back[MAXDIRECTIONS] =
+static const direction_t back[MAXDIRECTIONS] =
 {
-	D_SOUTHEAST,
-	D_SOUTHWEST,
-	D_WEST,
-	D_NORTHWEST,
-	D_NORTHEAST,
-	D_EAST,
+  D_SOUTHEAST,
+    D_SOUTHWEST,
+    D_WEST,
+    D_NORTHWEST,
+    D_NORTHEAST,
+    D_EAST,
 };
 
+direction_t 
+dir_invert(direction_t dir)
+{
+  switch (dir) {
+    case D_PAUSE:
+    case D_SPECIAL:
+      return dir;
+      break;
+    default:
+      if (dir>=0 && dir<MAXDIRECTIONS) return back[dir];
+  }
+  assert(!"illegal direction");
+  return NODIRECTION;
+}
 const char *
 regionname(const region * r, const faction * f)
 {
@@ -288,6 +302,7 @@ r_connect(const region * r, direction_t dir)
 
 #ifdef FAST_CONNECT
 	region * rmodify = (region*)r;
+        assert (dir>=0 && dir<MAXDIRECTIONS);
 	if (r->connect[dir]) return r->connect[dir];
 #endif
 	assert(dir<MAXDIRECTIONS);
@@ -343,21 +358,40 @@ distance(const region * r1, const region * r2)
 	return koor_distance(r1->x, r1->y, r2->x, r2->y);
 }
 
-direction_t
+static direction_t
 koor_reldirection(int ax, int ay, int bx, int by)
 {
-	direction_t i;
-	for (i=0;i!=MAXDIRECTIONS;++i) {
-		if (bx-ax == delta_x[i] &&
-			by-ay == delta_y[i]) return i;
-	}
-	return NODIRECTION;
+  direction_t dir;
+  for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+    if (bx-ax == delta_x[dir] && by-ay == delta_y[dir]) return dir;
+  }
+  return NODIRECTION;
+}
+
+spec_direction *
+special_direction(const region * from, const region * to)
+{
+  spec_direction *sd;
+  const attrib *a = a_findc(from->attribs, &at_direction);
+  
+  while (a!=NULL) {
+    sd = (spec_direction *)a->data.v;
+    if (sd->active && sd->x==to->x && sd->y==to->y) return sd;
+    a = a->nexttype;
+  }
+  return NULL;
 }
 
 direction_t
-reldirection(region * from, region * to)
+reldirection(const region * from, const region * to)
 {
-	return koor_reldirection(from->x, from->y, to->x, to->y);
+  direction_t dir = koor_reldirection(from->x, from->y, to->x, to->y);
+
+  if (dir==NODIRECTION) {
+    spec_direction *sd = special_direction(from, to);
+    if (sd!=NULL) return D_SPECIAL;
+  }
+  return dir;
 }
 
 void

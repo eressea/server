@@ -2422,8 +2422,8 @@ aftermath(battle * b)
 					fset(du, UFL_MOVED);
 					leave(du->region, du);
 					if (df->run.region) {
-						travel(r, du, df->run.region, 1);
-						df->run.region = du->region;
+                                          travel(du, df->run.region, 1, NULL);
+                                          df->run.region = du->region;
 					}
 				} else
 #endif

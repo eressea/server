@@ -219,7 +219,7 @@ autoseed(struct region_list * rlist)
 			if (r && r->land) {
 				int k;
 				for (k=i+1;k!=nseeds;++k) if (seeds[k].region==r) {
-					seeds[k].next[back[d]] = seeds+i;
+					seeds[k].next[dir_invert(d)] = seeds+i;
 					seeds[i].next[d] = seeds+k;
 				}
 			}

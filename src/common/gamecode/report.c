@@ -1005,9 +1005,6 @@ prices(FILE * F, const region * r, const faction * f)
 	rparagraph(F, buf, 0, 0);
 
 }
-/* ------------------------------------------------------------- */
-extern const direction_t back[MAXDIRECTIONS];
-/* ------------------------------------------------------------- */
 
 boolean
 see_border(const border * b, const faction * f, const region * r)

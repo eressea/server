@@ -56,12 +56,14 @@ typedef short spellid_t;
 struct plane;
 struct spell;
 struct region;
+struct region_list;
 struct race;
 struct ship;
 struct building;
 struct faction;
 struct party;
 struct unit;
+struct unit_list;
 struct item;
 /* item */
 struct strlist;
@@ -724,6 +726,7 @@ enum {
 	D_WEST,
 	MAXDIRECTIONS,
 	D_PAUSE,
+        D_SPECIAL,
 	NODIRECTION = (direction_t) - 1
 };
 

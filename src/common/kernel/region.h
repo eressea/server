@@ -110,7 +110,7 @@ typedef struct region_list {
 extern struct message_list * r_getmessages(const struct region * r, const struct faction * viewer);
 extern struct message * r_addmessage(struct region * r, const struct faction * viewer, struct message * msg);
 
-typedef struct {
+typedef struct spec_direction {
   int  x;
   int  y;
   int  duration;
@@ -126,8 +126,7 @@ typedef struct {
 #define region_hashkey(r) (abs((r)->x + 0x100 * (r)->y))
 int distance(const struct region*, const struct region*);
 int koor_distance(int ax, int ay, int bx, int by) ;
-direction_t reldirection(struct region * from, struct region * to);
-direction_t koor_reldirection(int ax, int ay, int bx, int by) ;
+extern direction_t reldirection(const struct region * from, const struct region * to);
 extern struct region * findregion(int x, int y);
 
 extern attrib_type at_direction;
@@ -151,6 +150,7 @@ void runhash(struct region * r);
 
 void free_regionlist(region_list *rl);
 void add_regionlist(region_list **rl, struct region *r);
+extern struct spec_direction * special_direction(const region * from, const region * to);
 
 int woodcount(const struct region * r);
 int deathcount(const struct region * r);
@@ -220,8 +220,7 @@ extern void terraform(struct region * r, terrain_t terrain);
 
 extern const int delta_x[MAXDIRECTIONS];
 extern const int delta_y[MAXDIRECTIONS];
-extern const direction_t back[MAXDIRECTIONS];
-
+extern direction_t dir_invert(direction_t dir);
 extern int production(const struct region *r);
 extern int read_region_reference(struct region ** r, FILE * F);
 extern void write_region_reference(const struct region * r, FILE * F);
