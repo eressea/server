@@ -644,6 +644,7 @@ can_survive(const unit *u, const region *r)
 void
 move_unit(unit * u, region * r, unit ** ulist)
 {
+	int maxhp = unit_max_hp(u);
 	assert(u && r);
 
 	if (u->region == r) return;
@@ -660,6 +661,7 @@ move_unit(unit * u, region * r, unit ** ulist)
 	u->faction->first = 0;
 	u->faction->last = 0;
 	u->region = r;
+	u->hp = u->hp * unit_max_hp(u) / maxhp;
 }
 
 /* ist mist, aber wegen nicht skalierender attirbute notwendig: */

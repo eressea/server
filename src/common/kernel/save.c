@@ -1622,7 +1622,9 @@ readunit(FILE * F)
 		u->irace = new_race[(race_t)ri(F)];
 	} else {
 		rs(F, buf);
+		if (strcmp(buf, "giant turtle")==0) strcpy(buf, "giantturtle");
 		u->race = rc_find(buf);
+		assert(u->race);
 		rs(F, buf);
 		if (strlen(buf)) u->irace = rc_find(buf);
 		else u->irace = u->race;

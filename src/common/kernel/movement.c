@@ -2018,11 +2018,13 @@ void
 movement(void)
 {
 	region *r;
+	int ships;
 
 	/* Initialize the additional encumbrance by transported units */
 	init_drive();
 
-	for (r = regions; r; r = r->next) {
+	/* move ships in last phase, others first */
+	for (ships=0;ships<=1;++ships) for (r = regions; r; r = r->next) {
 		unit ** up = &r->units;
 		/* Bewegungen.
 		 *
@@ -2058,9 +2060,20 @@ movement(void)
 					set_string(&u->thisorder, "");
 					up = &u->next;
 				} else {
-					move(r, u, true);
-					set_string(&u->thisorder, "");
-					up = &r->units;
+					boolean moved = true;
+					if (ships) {
+						if (u->ship && fval(u, FL_OWNER)) move(r, u, true);
+						else moved=false;
+					} else {
+						if (u->ship==NULL || !fval(u, FL_OWNER)) move(r, u, true);
+						else moved=false;
+					}
+					if (moved) {
+						set_string(&u->thisorder, "");
+						up = &r->units;
+					} else {
+						up = &u->next;
+					}
 				}
 				break;
 			default:
