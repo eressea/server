@@ -7402,5 +7402,20 @@
 			</nr>
 		</locale>
 	</message>
+	
+	<message name="healall">
+		<type>
+		</type>
+		<locale name="de">
+			<nr section="events">
+				<text>Diese Woche haben die Strahlen der Sonne Eresseas eine besondere heilende Kraft.</text>
+			</nr>
+		</locale>
+		<locale name="en">
+			<nr section="events">
+				<text>This week, the sun of Eressea has special healing powers.</text>
+			</nr>
+		</locale>
+	</message>
 
 </messages>

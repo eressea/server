@@ -2750,14 +2750,30 @@ heal_all(void)
 {
 	region *r;
 	unit *u;
+	faction *f;
+
+	for(f=factions; f; f=f->next) {
+		freset(f, FL_DH);
+	}
+
 	for(r=regions; r; r=r->next) {
 		for(u=r->units;u;u=u->next) {
 			int max_hp = unit_max_hp(u) * u->number;
 			if(u->hp < max_hp) {
 				u->hp = max_hp;
+				fset(u->faction, FL_DH);
 			}
 		}
 	}
+	
+	for(f=factions; f; f=f->next) {
+		if(fval(f,FL_DH)) {
+			add_message(&f->msgs, new_message(f, "healall"));
+			freset(f, FL_DH);
+		}
+	}
+
+	return 0;
 }
 
 void
