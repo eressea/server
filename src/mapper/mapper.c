@@ -1561,29 +1561,16 @@ void
 frame_regions(void)
 {
 	region * r = regions;
-	int lastage=r->age;
-	while (r!=0) {
-		if (r->age<20) {
-			if (r->age+1<lastage) r->age = lastage;
-		}
-		lastage=r->age;
-		r = r->next;
-	}
-	r = regions;
-	while (r!=0) {
-		if (r->terrain==T_OCEAN) {
-			direction_t d;
-			for (d=0;d!=6;++d) {
-				region * rn = rconnect(r, d);
-				if (rn!=0 && rn->terrain==T_OCEAN) {
-					if ((rn->age+5)*2<r->age && r->age<50) {
-						if (rn->units) log_printf("Cannot terraform %s\n", regionname(rn, NULL));
-						else terraform(rn, T_FIREWALL);
-					}
-				}
+	for (r=regions;r;r=r->next) if (r->age>10 && r->terrain!=T_FIREWALL) {
+		direction_t d;
+		for (d=0;d!=MAXDIRECTIONS;++d) {
+			region * rn = rconnect(r, d);
+			if (rn==NULL) {
+				rn = new_region(r->x+delta_x[d], r->y+delta_y[d]);
+				terraform(rn, T_FIREWALL);
+				rn->age=r->age;
 			}
 		}
-		r=r->next;
 	}
 }
 
