@@ -887,7 +887,32 @@ readgame(const char * filename, int backup)
 #else
 	assert(global.data_version >= NEWSOURCE_VERSION);
 #endif
-	if (global.data_version >= GLOBAL_ATTRIB_VERSION) a_read(F, &global.attribs);
+	if(global.data_version >= SAVEXMLNAME_VERSION) {
+		char basefile[1024];
+		char *basearg;
+
+		rs(F, basefile);
+		if(xmlfile != NULL) {
+			basearg = strrchr(xmlfile, '/');
+			if(!basearg) {
+				basearg = xmlfile;
+			} else {
+				basearg++;
+			}
+		} else {
+			basearg = "(null)";
+		}
+		if(strcmp(basearg, basefile)) {
+			printf("WARNING: xmlfile mismatch:\n");
+			printf("WARNING: datafile contains %s\n", basefile);
+			printf("WARNING: argument/default is %s\n", basearg);
+			printf("WARNING: any key to continue, Ctrl-C to stop\n");
+			getchar();
+		}
+	}
+	if (global.data_version >= GLOBAL_ATTRIB_VERSION) {
+		a_read(F, &global.attribs);
+	}
 #ifndef COMPATIBILITY
 	if (global.data_version < ITEMTYPE_VERSION) {
 		fprintf(stderr, "kann keine alten datenfiles einlesen");
@@ -1308,6 +1333,7 @@ export_players(const char * path)
 int
 writegame(const char *filename, char quiet)
 {
+	char *base;
 	int i,n;
 	faction *f;
 	region *r;
@@ -1338,6 +1364,14 @@ writegame(const char *filename, char quiet)
 	/* globale Variablen */
 
 	wi(F, RELEASE_VERSION);
+	wnl(F);
+
+	base = strrchr(xmlfile, '/');
+	if(base) {
+		ws(F, base+1);
+	} else {
+		ws(F, xmlfile);
+	}
 	wnl(F);
 
 	a_write(F, global.attribs);

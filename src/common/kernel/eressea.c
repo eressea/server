@@ -79,6 +79,7 @@
 #include <errno.h>
 
 /* exported variables */
+char	*xmlfile;
 region  *regions;
 faction *factions;
 settings global;

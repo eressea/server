@@ -132,7 +132,6 @@ extern int fuzzy_hits;
  ** global variables that we are exporting
  **/
 static char * orders = NULL;
-static char * xmlfile = NULL;
 static int nowrite = 0;
 static boolean g_writemap = false;
 static boolean opt_reportonly = false;

@@ -164,7 +164,9 @@ struct xml_stack;
 #define ALLIANCES_VERSION 313
 #define DBLINK_VERSION 314
 #define CURSEVIGOURISFLOAT_VERSION 315
-#define REGIONOWNERS_VERSION 316
+#define SAVEXMLNAME_VERSION 316
+
+#define REGIONOWNERS_VERSION 317
 
 #define MIN_VERSION ALLIANCES_VERSION
 #define UGROUPS_VERSION 400 /* nicht aktivieren, nicht fertig */
@@ -172,7 +174,7 @@ struct xml_stack;
 #ifdef REGIONOWNERS
 # define RELEASE_VERSION REGIONOWNERS_VERSION
 #else
-# define RELEASE_VERSION CURSEVIGOURISFLOAT_VERSION
+# define RELEASE_VERSION SAVEXMLNAME_VERSION
 #endif
 
 #if RESOURCE_CONVERSION
@@ -888,6 +890,7 @@ typedef struct request {
 } request;
 
 extern int turn;
+extern char *xmlfile;
 
 /* parteinummern */
 extern int *used_faction_ids;

@@ -76,8 +76,6 @@ extern int maxregions;
 extern boolean dirtyload;
 char datafile[256];
 
-static char * xmlfile = NULL;
-
 /* -------------------- resizeterm ------------------------------------- */
 
 short Signals = 0;

@@ -121,7 +121,6 @@ extern int fuzzy_hits;
  ** global variables that we are exporting
  **/
 static char * orders = NULL;
-static char * xmlfile = NULL;
 static int nowrite = 0;
 static boolean g_writemap = false;
 static boolean g_killeiswald = false;
@@ -522,6 +521,9 @@ static int
 read_args(int argc, char **argv)
 {
 	int i;
+
+	xmlfile = NULL;
+
 	for (i=1;i!=argc;++i) {
 		if (argv[i][0]!='-') {
 			return usage(argv[0], argv[i]);
