@@ -27,6 +27,7 @@ LIBS      += \
 	-le-races \
 	-le-attributes \
 	-le-util \
+	-le-modules \
 	-lm
 
 ifeq ($(NCURSES), 1)

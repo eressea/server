@@ -1051,7 +1051,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	}
 
 #if CHANGED_CROSSBOWS == 1
-	if(fval(awtype,ARMORPIERCING)) {
+	if(fval(awtype,WTF_ARMORPIERCING)) {
 		/* crossbows */
 		ar /= 2;
 		an /= 2;
@@ -2685,8 +2685,7 @@ make_fighter(battle * b, unit * u, boolean attack)
 	int h;
 	int berserk;
 	int strongmen;
-	int speeded = 0;
-	int speed = 0;
+	int speeded = 0, speed = 1;
 	boolean pr_aid = false;
 	boolean stealth = (boolean)((fval(u, FL_PARTEITARNUNG)!=0)?true:false);
 	int rest;
