@@ -2751,19 +2751,19 @@ fwage(const region *r, const faction *f, boolean img)
 static region *
 findspecialdirection(const region *r, const char *token)
 {
-	attrib *a;
-	spec_direction *d;
+  attrib *a;
+  spec_direction *d;
 
-	if (strlen(token)==0) return NULL;
-	for (a = a_find(r->attribs, &at_direction);a;a=a->nexttype) {
-		d = (spec_direction *)(a->data.v);
+  if (strlen(token)==0) return NULL;
+  for (a = a_find(r->attribs, &at_direction);a;a=a->nexttype) {
+    d = (spec_direction *)(a->data.v);
 
-		if(strncasecmp(d->keyword, token, strlen(token)) == 0) {
-			return findregion(d->x, d->y);
-		}
-	}
+    if (d->active && strncasecmp(d->keyword, token, strlen(token)) == 0) {
+      return findregion(d->x, d->y);
+    }
+  }
 
-	return NULL;
+  return NULL;
 }
 
 region *

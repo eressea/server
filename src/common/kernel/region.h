@@ -114,6 +114,7 @@ typedef struct {
 	int  x;
 	int  y;
 	int  duration;
+        bool active;
 	char *desc;
 	char *keyword;
 } spec_direction;

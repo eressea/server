@@ -184,6 +184,7 @@ a_readdirection(attrib *a, FILE *f)
 	d->desc = strdup(cstring(buf));
 	fscanf(f, "%s ", buf);
 	d->keyword = strdup(cstring(buf));
+        d->active = true;
 	return AT_READ_OK;
 }
 

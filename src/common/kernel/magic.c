@@ -48,6 +48,7 @@
 #include <triggers/clonedied.h>
 
 /* util includes */
+#include <util/attrib.h>
 #include <util/resolve.h>
 #include <util/rand.h>
 #include <util/base36.h>
@@ -3105,6 +3106,7 @@ create_special_direction(region *r, int x, int y, int duration,
 	attrib *a = a_add(&r->attribs, a_new(&at_direction));
 	spec_direction *d = (spec_direction *)(a->data.v);
 
+        d->active = false;
 	d->x = x;
 	d->y = y;
 	d->duration = duration;

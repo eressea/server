@@ -6428,8 +6428,9 @@ sp_viewreality(castorder *co)
 	rl = all_in_range(r_astral_to_standard(r), TP_RADIUS);
 
 	/* Irgendwann mal auf Curses u/o Attribut umstellen. */
-	for(rl2=rl; rl2; rl2=rl2->next) {
+	for (rl2=rl; rl2; rl2=rl2->next) {
 		u = createunit(rl2->data, mage->faction, RS_FARVISION, new_race[RC_SPELL]);
+                set_level(u, SK_OBSERVATION, co->level/2);
 		set_string(&u->name, "Zauber: Blick in die Realität");
 		u->age = 2;
 	}

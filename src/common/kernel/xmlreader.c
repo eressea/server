@@ -46,6 +46,7 @@ static void
 xml_readtext(xmlNodePtr node, struct locale ** lang, xmlChar **text)
 {
   xmlChar * property = xmlGetProp(node, BAD_CAST "locale");
+  assert(property!=NULL);
   *lang = find_locale((const char*)property);
   if (*lang==NULL) *lang = make_locale((const char*)property);
   xmlFree(property);
@@ -910,6 +911,7 @@ xml_readstrings(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr, bool
     int k;
     char zName[128];
 
+    assert(name!=NULL);
     if (names) nspc = xmlGetProp(stringNode->parent, BAD_CAST "name");
     mkname_buf((const char*)nspc, (const char*)name, zName);
     if (nspc!=NULL) xmlFree(nspc);
