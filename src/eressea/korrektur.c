@@ -2745,6 +2745,21 @@ set_zip(void)
 	return 0;
 }
 
+static int
+heal_all(void)
+{
+	region *r;
+	unit *u;
+	for(r=regions; r; r=r->next) {
+		for(u=r->units;u;u=u->next) {
+			int max_hp = unit_max_hp(u) * u->number;
+			if(u->hp < max_hp) {
+				u->hp = max_hp;
+			}
+		}
+	}
+}
+
 void
 korrektur(void)
 {
@@ -2830,6 +2845,7 @@ korrektur(void)
 #endif
 	do_once("idlo", fix_idleout());
 	do_once("szip", set_zip());
+	do_once("heal", heal_all());
 
   /* trade_orders(); */
 	if (global.data_version < NEWROAD_VERSION) {
