@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.12 2001/02/10 19:24:05 enno Exp $
+ *	$Id: main.c,v 1.13 2001/02/10 22:02:10 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -131,9 +131,7 @@ game_init(void)
 	init_items();
 	init_attributes();
 
-#ifdef USE_GM_COMMANDS
 	init_gmcmd();
-#endif
 	init_conversion();
 
 	init_museum();

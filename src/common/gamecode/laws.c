@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.10 2001/02/10 14:18:00 enno Exp $
+ *	$Id: laws.c,v 1.11 2001/02/10 22:02:10 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -23,9 +23,7 @@
 #include <eressea.h>
 #include "laws.h"
 
-#ifdef USE_GM_COMMANDS
-# include <modules/gmcmd.h>
-#endif
+#include <modules/gmcmd.h>
 
 #ifdef OLD_TRIGGER
 # include "old/trigger.h"
