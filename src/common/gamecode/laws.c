@@ -3147,6 +3147,7 @@ new_units (void)
 					name = getstrtoken();
 					if (name && strlen(name)==0) name = NULL;
 					u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
+                                        fset(u2, UFL_ISNEW);
 
 					a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
 
