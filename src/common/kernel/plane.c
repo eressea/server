@@ -115,7 +115,7 @@ ursprung_x(const faction *f, const plane *pl)
 	}
 
 	if (pl) {
-		set_ursprung(f, id, plane_center_x(pl), plane_center_y(pl));
+		set_ursprung((faction*)f, id, plane_center_x(pl), plane_center_y(pl));
 		return plane_center_x(pl);
 	}
 
@@ -140,7 +140,7 @@ ursprung_y(const faction *f, const plane *pl)
 	}
 
 	if (pl) {
-		set_ursprung(f, id, plane_center_x(pl), plane_center_y(pl));
+		set_ursprung((faction*)f, id, plane_center_x(pl), plane_center_y(pl));
 		return plane_center_y(pl);
 	}
 
@@ -148,7 +148,7 @@ ursprung_y(const faction *f, const plane *pl)
 }
 
 int
-plane_center_x(plane *pl)
+plane_center_x(const plane *pl)
 {
 	if(pl == NULL)
 		return 0;
@@ -157,7 +157,7 @@ plane_center_x(plane *pl)
 }
 
 int
-plane_center_y(plane *pl)
+plane_center_y(const plane *pl)
 {
 	if(pl == NULL)
 		return 0;
