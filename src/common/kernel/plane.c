@@ -114,6 +114,11 @@ ursprung_x(const faction *f, const plane *pl)
 			return ur->x;
 	}
 
+	if (pl) {
+		set_ursprung(f, id, plane_center_x(pl), plane_center_y(pl));
+		return plane_center_x(pl);
+	}
+
 	return 0;
 }
 
@@ -132,6 +137,11 @@ ursprung_y(const faction *f, const plane *pl)
 	for(ur = f->ursprung; ur; ur = ur->next) {
 		if(ur->id == id)
 			return ur->y;
+	}
+
+	if (pl) {
+		set_ursprung(f, id, plane_center_x(pl), plane_center_y(pl));
+		return plane_center_y(pl);
 	}
 
 	return 0;
