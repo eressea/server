@@ -3284,6 +3284,17 @@
 		</locale>
 	</message>
 
+	<message name="error227" section="errors">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Dafür braucht ein Einheit mindestens Kräuterkunde 7."</text>
+		 <text locale="en">"$unit($unit) in $region($region): '$command' - A skill of herbalism 7 or higher is required."</text>
+	</message>
+
+
 	<message name="error228">
 		<type>
 			<arg name="unit" type="unit"></arg>
