@@ -23,6 +23,7 @@
 
 /* misc includes */
 #include <attributes/key.h>
+#include <attributes/otherfaction.h>
 #include <modules/xecmd.h>
 
 /* gamecode includes */
@@ -491,15 +492,16 @@ fix_otherfaction(void)
     unit * u;
     for (u=r->units;u;u=u->next) {
       attrib * a = a_find(u->attribs, &at_otherfaction);
-      faction * f = (faction*)a->data.v;
-      if (f==u->faction) {
-        a_remove(&u->attribs, a);
-        ++ncount;
-      }
+			if (a!=NULL) {
+				faction * f = (faction*)a->data.v;
+				if (f==u->faction) {
+					a_remove(&u->attribs, a);
+					++count;
+				}
+			}
     }
-    r = r->next;
   }
-  if (count) log_warning(("%u units had otherfaction=own faction.\n"));
+  if (count) log_warning(("%u units had otherfaction=own faction.\n", count));
 }
 
 extern attrib * make_atgmcreate(const struct item_type * itype);
