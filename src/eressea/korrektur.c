@@ -55,7 +55,6 @@
 #include <spell.h>
 #include <alchemy.h>
 #include <study.h>
-#include <unit.h>
 
 /* util includes */
 #include <attrib.h>
@@ -2624,6 +2623,8 @@ fix_astralplane(void)
 	return 0;
 }
 
+#if !SKILLPOINTS
+
 static int
 level(int days)
 {
@@ -2660,6 +2661,7 @@ convert_skills(void)
 	}
 	return 0;
 }
+#endif
 
 void
 korrektur(void)
