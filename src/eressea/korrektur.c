@@ -1058,7 +1058,7 @@ update_gms(void)
 	for (f=factions;f;f=f->next) {
 		attrib * permissions = a_find(f->attribs, &at_permissions);
 		if (permissions) {
-			const char * keys[] = { "gmgate", "gmmsgr", "gmmsgu", NULL };
+			const char * keys[] = { "gmgate", "gmmsgr", "gmkill", "gmmsgu", NULL };
 			int k;
 			item_t i;
 			for (k=0;keys[k];++k) {

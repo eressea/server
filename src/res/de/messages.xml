@@ -7320,4 +7320,14 @@
 		<text locale="en">"$resource($item,1): $description"</text>
 	</message>
 
+	<message name="killedbygm" section="events">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="string" type="string"></arg>
+			<arg name="region" type="region"></arg>
+		</type>
+		<text locale="de">"$unit($unit) wurde in $region($region) von einem GM gelöscht: \"$string\"."</text>
+		<text locale="en">"$unit($unit) in $region($region) was removed by a GM: \"$string\"."</text>
+	</message>
+
 </messages>

@@ -972,7 +972,7 @@ drain_exp(const struct unit *u, int n)
  * 30 points = 1 week
  */
 void
-drain_exp(const struct unit *u, int n)
+drain_exp(struct unit *u, int n)
 {
 	skill_t sk = (skill_t)(rand() % MAXSKILLS);
 	skill_t ssk;

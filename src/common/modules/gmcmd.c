@@ -325,6 +325,72 @@ gm_messageregion(const char * str, void * data, const char * cmd)
 }
 
 /**
+ ** GM: KILL UNIT <id> <string>
+ ** requires: permission-key "gmkill"
+ **/
+static void
+gm_killunit(const char * str, void * data, const char * cmd)
+{
+	unit * u = (unit*)data;
+	const struct plane * p = rplane(u->region);
+	unit * target = findunit(atoi36(igetstrtoken(str)));
+	const char * msg = getstrtoken();
+	region * r = target->region;
+
+	if (r==NULL || p!=rplane(r)) {
+		mistake(u, cmd, "In dieser Region kann niemand getötet werden.\n", 0);
+	} else {
+		/* checking permissions */
+		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
+		if (!permissions || !has_permission(permissions, atoi36("gmkill"))) {
+			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+		}
+		else {
+			char * zmsg = (char*)gc_add(strdup(msg));
+			scale_number(target, 0);
+			ADDMSG(&target->faction->msgs, msg_message("killedbygm", 
+				"region unit string", r, target, zmsg));
+		}
+	}
+}
+
+
+/**
+ ** GM: KILL FACTION <id> <string>
+ ** requires: permission-key "gmmsgr"
+ **/
+static void
+gm_killfaction(const char * str, void * data, const char * cmd)
+{
+	unit * u = (unit*)data;
+	int n = atoi36(igetstrtoken(str));
+	faction * f = findfaction(n);
+	const char * msg = getstrtoken();
+	plane * p = rplane(u->region);
+	attrib * permissions = a_find(u->faction->attribs, &at_permissions);
+	if (!permissions || !has_permission(permissions, atoi36("gmkill"))) {
+		mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+		return;
+	}
+	if (f!=NULL) {
+		region * r;
+		for (r=regions;r;r=r->next) if (rplane(r)==p) {
+			unit * target;
+			for (target=r->units;target;target=target->next) {
+				if (target->faction==f) {
+					char * zmsg = (char*)gc_add(strdup(msg));
+					scale_number(target, 0);
+					ADDMSG(&target->faction->msgs, msg_message("killedbygm", 
+						"region unit string", r, target, zmsg));
+					return;
+				}
+			}
+		}
+	}
+	mistake(u, cmd, "Aus dieser Partei kann niemand gelöscht werden.\n", 0);
+}
+
+/**
  ** GM: TELL <unit> <string>
  ** requires: permission-key "gmmsgr"
  **/
@@ -463,6 +529,7 @@ gm_skill(const char * str, void * data, const char * cmd)
 static tnode g_keys;
 static tnode g_root;
 static tnode g_tell;
+static tnode g_kill;
 
 static void
 gm_command(const char * str, void * data, const char * cmd)
@@ -474,6 +541,12 @@ static void
 gm_tell(const char * str, void * data, const char * cmd)
 {
 	do_command(&g_tell, data, str);
+}
+
+static void
+gm_kill(const char * str, void * data, const char * cmd)
+{
+	do_command(&g_kill, data, str);
 }
 
 void
@@ -494,6 +567,9 @@ init_gmcmd(void)
 	add_command(&g_tell, "unit", &gm_messageunit);
 	add_command(&g_tell, "plane", &gm_messageplane);
 	add_command(&g_tell, "faction", &gm_messagefaction);
+	add_command(&g_keys, "kill", &gm_kill);
+	add_command(&g_kill, "unit", &gm_killunit);
+	add_command(&g_kill, "faction", &gm_killfaction);
 }
 
 /*

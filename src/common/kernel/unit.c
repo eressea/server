@@ -781,8 +781,17 @@ transfermen(unit * u, unit * u2, int n)
 			skill * sn = get_skill(u2, sv->id);
 			if (sn==NULL) sn = add_skill(u2, sv->id);
 			/* level abrunden, wochen aufrunden. */
-			sn->level = (unsigned char)((sv->level*n+sn->level*u2->number)/(u2->number+n));
-			sn->weeks = (unsigned char)((sv->weeks*n+sn->weeks*u2->number+u2->number+n-1)/(u2->number+n));
+			if (sn->level!=sv->level) {
+				int level = (sv->level*n+sn->level*u2->number)/(u2->number+n);
+				int weeks = (sv->weeks*n*(level+1)/(sv->level+1)+sn->weeks*u2->number*(level+1)/(sn->level+1)+u2->number+n-1)/(u2->number+n);
+				sn->level = (unsigned char)level;
+				sn->weeks = (unsigned char)weeks;
+			} else {
+				/* aufgerundete wochenzahl */
+				int weeks = (sv->weeks*n+sn->weeks*u2->number+u2->number+n-1)/(u2->number+n);
+				sn->weeks = (unsigned char)weeks;
+			}
+			assert(sn->level>=0 && sn->weeks>=0 && sn->weeks<=sn->level*2+1);
 		}
 #endif
 		a = a_find(u->attribs, &at_effect);

@@ -236,6 +236,6 @@ extern boolean enemy (const struct side * a, const struct side * b);
 extern struct troop select_corpse(struct battle * b, struct fighter * af);
 extern fighter * make_fighter(struct battle * b, struct unit * u, boolean attack);
 void flee(const troop dt);
-void drain_exp(const struct unit *u, int d);
+void drain_exp(struct unit *u, int d);
 
 #endif
