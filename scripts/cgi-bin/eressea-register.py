@@ -91,7 +91,7 @@ Form = cgi.FieldStorage()
 email=GetKey(Form, "email")
 firstname=GetKey(Form, "firstname")
 lastname=GetKey(Form, "lastname")
-info=GetKey(Form, "info")
+#info=GetKey(Form, "info")
 address=GetKey(Form, "address")
 city=GetKey(Form, "city")
 country=GetKey(Form, "country")
@@ -134,9 +134,9 @@ else:
 	if phone!=None:
 	    fields=fields+", phone"
 	    values=values+", '"+phone+"'"
-	if info!=None:
-	    fields=fields+", info"
-	    values=values+", '"+info+"'"
+#	if info!=None:
+#	    fields=fields+", info"
+#	    values=values+", '"+info+"'"
 	if country!=None:
 	    fields=fields+", country"
 	    values=values+", "+country+""
@@ -161,8 +161,8 @@ else:
 	    cursor.execute("REPLACE userips (ip, user) VALUES ('"+ip+"', "+str(int(custid))+")")
 	
 	# add a subscription record
-	values="'PENDING'"
-	fields="status"
+	values="'PENDING', '"+genpasswd()+"'"
+	fields="status, password"
 	if bonus!=None:
 	    fields=fields+", bonus"
 	    if bonus=='yes':
