@@ -27,9 +27,6 @@
 #include <kernel/ship.h>
 #include <kernel/building.h>
 
-/* gamecode includes */
-#include <gamecode/economy.h>
-
 /* util includes */
 #include <util/functions.h>
 #include <util/rand.h>

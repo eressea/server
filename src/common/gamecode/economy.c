@@ -2634,24 +2634,6 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
 /* ------------------------------------------------------------- */
 
 
-int
-entertainmoney(const region *r)
-{
-	int n;
-
-	if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
-		return 0;
-	}
-
-	n = rmoney(r) / ENTERTAINFRACTION;
-
-	if (is_cursed(r->attribs, C_GENEROUS, 0)) {
-		n *= get_curseeffect(r->attribs, C_GENEROUS, 0);
-	}
-
-	return n;
-}
-
 static void
 expandentertainment(region * r)
 {

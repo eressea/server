@@ -73,7 +73,6 @@
 #include <string.h>
 #include <time.h>
 
-extern const char * orderfile;
 extern char *reportdir;
 extern char *datadir;
 extern char *basedir;
@@ -319,11 +318,11 @@ factionhere(region * r, int f)
 
 #ifdef ALLIANCES
 static boolean
-alliancehere(region * r, int alliance)
+alliancehere(region * r, int allied)
 {
 	unit *u;
 	for (u = r->units; u; u = u->next)
-		if (u->faction->alliance && u->faction->alliance->id == alliance)
+		if (u->faction->alliance && u->faction->alliance->id == allied)
 			return true;
 	return false;
 }
@@ -1642,9 +1641,6 @@ main(int argc, char *argv[])
 				firstx = atoi(argv[++i]);
 				firsty = atoi(argv[++i]);
 				break;
-			case 'v':
-				orderfile = argv[++i];
-				break;
 			case 'X':
 				dirtyload = true;
 				break;
@@ -1747,10 +1743,6 @@ main(int argc, char *argv[])
 	read_newfactions(buf);
 	sprintf(buf, "%s/dropouts.%d", basepath(), turn);
 	read_dropouts(buf);
-	if (orderfile) {
-		sprintf(buf, "%s/%s", basepath(), orderfile);
-		read_orders(buf);
-	}
 
 	if (findfaction(MONSTER_FACTION)==NULL) {
 		makemonsters();

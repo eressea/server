@@ -1,13 +1,14 @@
 /* vi: set ts=2:
- * Eressea PB(E)M host   Christian Schlittchen (corwin@amber.kn-bremen.de)
- * (C) 1998-2003         Katja Zedel (katze@felidae.kn-bremen.de)
- *                       Henning Peters (faroul@beyond.kn-bremen.de)
- *                       Enno Rehling (enno@eressea-pbem.de)
- *                       Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
- *
- * This program may not be used, modified or distributed without
- * prior permission by the authors of Eressea.
- **/
+ +-------------------+  
+ |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
+ | Eressea PBEM host |  Enno Rehling <enno@eressea-pbem.de>
+ | (c) 1998 - 2004   |  Katja Zedel <katze@felidae.kn-bremen.de>
+ |                   |
+ +-------------------+  
+
+ This program may not be used, modified or distributed
+ without prior permission by the authors of Eressea.
+*/
 
 #ifndef KRNL_ORDER_H
 #define KRNL_ORDER_H

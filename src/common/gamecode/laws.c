@@ -3619,15 +3619,10 @@ processorders (void)
 {
 	region *r;
 
-	if (turn == 0) srand(time((time_t *) NULL));
-	else srand(turn);
+  set_passw();		/* und pruefe auf illegale Befehle */
 
-	puts(" - neue Einheiten erschaffen...");
+  puts(" - neue Einheiten erschaffen...");
 	new_units();
-
-	puts(" - Monster KI...");
-	if (!nomonsters) plan_monsters();
-	set_passw();		/* und pruefe auf illegale Befehle */
 
 	puts(" - Defaults und Instant-Befehle...");
 	setdefaults();

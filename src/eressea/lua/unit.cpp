@@ -1,6 +1,7 @@
 #include <config.h>
 #include <eressea.h>
 #include "list.h"
+#include "script.h"
 
 // Atributes includes
 #include <attributes/racename.h>
@@ -302,6 +303,14 @@ unit_clearorders(unit& u)
   free_orders(&u.orders);
 }
 
+static void 
+unit_setscript(struct unit& u, const functor<void>& f)
+{
+  luabind::functor<void> * fptr = new luabind::functor<void>(f);
+  setscript(&u.attribs, fptr);
+}
+
+
 void
 bind_unit(lua_State * L) 
 {
@@ -324,6 +333,7 @@ bind_unit(lua_State * L)
     .def("get_skill", &unit_getskill)
     .def("eff_skill", &unit_effskill)
     .def("set_skill", &unit_setskill)
+    .def("set_brain", &unit_setscript)
     .def("set_racename", &unit_setracename)
     .def("add_spell", &unit_addspell)
     .def("remove_spell", &unit_removespell)

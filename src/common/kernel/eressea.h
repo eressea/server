@@ -1181,6 +1181,7 @@ extern boolean TradeDisabled(void);
 extern int SkillCap(skill_t sk);
 
 extern struct order * default_order(const struct locale * lang);
+extern int entertainmoney(const struct region * r);
 
 #ifdef __cplusplus
 }

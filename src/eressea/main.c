@@ -56,6 +56,7 @@
 /* gamecode includes */
 #include <economy.h>
 #include <goodies.h>
+#include <monster.h>
 #include <laws.h>
 
 /* kernel includes */
@@ -303,6 +304,9 @@ processturn(char *filename)
 	struct summary * begin, * end;
 	int i;
 
+  if (turn == 0) srand(time((time_t *) NULL));
+  else srand(turn);
+
 #ifdef SHORTPWDS
   readshortpwds("passwords");
 #endif
@@ -317,6 +321,12 @@ processturn(char *filename)
 #if BENCHMARK
 	exit(0);
 #endif
+  if (!nomonsters) {
+    if (turn == 0) srand(time((time_t *) NULL));
+    else srand(turn);
+    puts(" - Monster KI...");
+    plan_monsters();
+  }
 	processorders();
 	score();
 #ifdef WACH_WAFF
@@ -648,7 +658,7 @@ main(int argc, char *argv[])
 #endif
 
   sprintf(zText, "%d", turn);
-  i=readgame(zText, false);
+  i = readgame(zText, false);
   if (i!=0) return i;
 
 #ifdef NEW_STARTEQUIPMENT
@@ -702,7 +712,11 @@ main(int argc, char *argv[])
 		return crwritemap(); 
 	}
 
-	if ((i=processturn(orders))!=0) {
+  if (turn == 0) srand(time((time_t *) NULL));
+  else srand(turn);
+
+
+	if ((i = processturn(orders))!=0) {
 		return i;
 	}
 

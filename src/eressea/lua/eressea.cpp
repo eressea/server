@@ -1,20 +1,25 @@
 #include <config.h>
-#include <cstring>
 #include <eressea.h>
 
-// kernel includes
+#include "script.h"
+
 #ifdef ALLIANCES
 # include <modules/alliance.h>
 #endif
 #include <attributes/key.h>
+
+// gamecode includes
 #include <gamecode/laws.h>
-#include <kernel/race.h>
-#include <kernel/plane.h>
+#include <gamecode/monster.h>
+
+// kernel includes
+#include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/plane.h>
+#include <kernel/race.h>
 #include <kernel/reports.h>
 #include <kernel/save.h>
 #include <kernel/unit.h>
-#include <util/language.h>
 
 // lua includes
 #include <lua.hpp>
@@ -22,7 +27,11 @@
 #include <luabind/iterator_policy.hpp>
 
 // util includes
+#include <util/language.h>
 #include <util/base36.h>
+
+#include <cstring>
+#include <ctime>
 
 using namespace luabind;
 
@@ -112,6 +121,31 @@ lua_getstring(const char * lname, const char * key)
   return locale_getstring(lang, key);
 }
 
+static void
+lua_planmonsters(void)
+{
+  unit * u;
+  faction * f = findfaction(MONSTER_FACTION);
+
+  if (f==NULL) return;
+  if (turn == 0) srand(time((time_t *) NULL));
+  else srand(turn);
+  plan_monsters();
+  for (u=f->units;u;u=u->nextF) {
+    call_script(u);
+  }
+}
+
+static void 
+race_setscript(const char * rcname, const functor<void>& f)
+{
+  race * rc = rc_find(rcname);
+  if (rc!=NULL) {
+    luabind::functor<void> * fptr = new luabind::functor<void>(f);
+    setscript(&rc->attribs, fptr);
+  }
+}
+
 void
 bind_eressea(lua_State * L)
 {
@@ -127,6 +161,10 @@ bind_eressea(lua_State * L)
     def("add_equipment", &lua_addequipment),
     def("get_turn", &get_turn),
     def("remove_empty_units", &remove_empty_units),
+
+    /* scripted monsters */
+    def("plan_monsters", &lua_planmonsters),
+    def("set_brain", &race_setscript),
 
     /* localization: */
     def("set_string", &lua_setstring),

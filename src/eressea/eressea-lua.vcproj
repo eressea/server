@@ -300,6 +300,12 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\lua\script.cpp">
+			</File>
+			<File
+				RelativePath=".\lua\script.h">
+			</File>
+			<File
 				RelativePath=".\lua\ship.cpp">
 				<FileConfiguration
 					Name="Release|Win32">

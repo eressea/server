@@ -7,6 +7,7 @@ function run_wdw()
   
   -- run the turn (not yet)
   read_orders(orderfile)
+  plan_monsters()
   process_orders()
   outfile = "" .. get_turn()
 

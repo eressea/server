@@ -916,11 +916,6 @@ mapper_spunit(dbllist ** SP, unit * u, int indent)
 	}
 	dh = 0;
 
-	if (u->lastorder[0]) {
-		scat(", \"");
-		sncat(buf, u->lastorder, BUFSIZE);
-		scat("\"");
-	}
 	if (uprivate(u)) {
 		sncat(buf, " (Bem: ", BUFSIZE);
 		sncat(buf, uprivate(u), BUFSIZE);

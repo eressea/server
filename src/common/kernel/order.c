@@ -1,3 +1,15 @@
+/* vi: set ts=2:
+ +-------------------+  
+ |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
+ | Eressea PBEM host |  Enno Rehling <enno@eressea-pbem.de>
+ | (c) 1998 - 2004   |  Katja Zedel <katze@felidae.kn-bremen.de>
+ |                   |
+ +-------------------+  
+
+ This program may not be used, modified or distributed
+ without prior permission by the authors of Eressea.
+*/
+
 #include <config.h>
 #include "eressea.h"
 
@@ -92,12 +104,13 @@ char *
 write_order(const order * cmd, const struct locale * lang, char * buffer, size_t size)
 {
   if (cmd==0) {
-	buffer[0]=0;
-	return buffer;
-  }
+    buffer[0]=0;
+  } else {
 #ifndef NDEBUG
-  init_tokens_str(cmd->_str);
-  assert(findkeyword(getstrtoken(), lang)==cmd->_keyword);
+    char * s = cmd->_str;
+    assert(findkeyword(parse_token(&s), lang)==cmd->_keyword);
 #endif
-  return strncpy(buffer, cmd->_str, size);
+    strncpy(buffer, cmd->_str, size);
+  }
+  return buffer;
 }

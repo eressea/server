@@ -19,6 +19,7 @@ LUASERVER_SOURCES =
  <lua>eressea.cpp
  <lua>faction.cpp
  <lua>region.cpp
+ <lua>script.cpp
  <lua>ship.cpp
  <lua>spell.cpp
  <lua>unit.cpp

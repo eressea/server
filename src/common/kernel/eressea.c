@@ -3209,3 +3209,20 @@ default_order(const struct locale * lang)
 	return olist->ord = parse_order(locale_string(lang, "defaultorder"), lang);
 }
 
+int
+entertainmoney(const region *r)
+{
+	int n;
+
+	if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
+		return 0;
+	}
+
+	n = rmoney(r) / ENTERTAINFRACTION;
+
+	if (is_cursed(r->attribs, C_GENEROUS, 0)) {
+		n *= get_curseeffect(r->attribs, C_GENEROUS, 0);
+	}
+
+	return n;
+}

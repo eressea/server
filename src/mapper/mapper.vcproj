@@ -103,7 +103,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="curses.lib"
+				AdditionalDependencies="curses.lib libxml2.lib iconv.lib"
 				OutputFile=".\Debug/mapper.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"

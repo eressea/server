@@ -34,6 +34,7 @@ function process(orders)
 
   -- run the turn:
   read_orders(orders)
+  plan_monsters()
 
   -- igjarjuk gets called:
   -- require("igjarjuk-call.lua")

@@ -66,21 +66,10 @@
 #include <string.h>
 #include <assert.h>
 
-#ifdef HAVE_ZLIB
-#include <zlib.h>
-static gzFile dragonlog;
-#else
-static FILE * dragonlog;
-#endif
-
 #define UNDEAD_REPRODUCTION         0 	/* vermehrung */
 #define MOVECHANCE                  25	/* chance fuer bewegung */
 
-/* ------------------------------------------------------------- */
-
 #define MAXILLUSION_TEXTS   3
-
-/* ------------------------------------------------------------- */
 
 static boolean
 is_waiting(const unit * u)
@@ -417,15 +406,6 @@ set_new_dragon_target(unit * u, region * r, int range)
 		}
 		sprintf(buf, "Kommt aus: %s, Will nach: %s", regionid(r), regionid(max_region));
 		usetprivate(u, buf);
-		if (dragonlog) {
-#ifdef HAVE_ZLIB
-			gzprintf(dragonlog, "%s entscheidet sich, von %s nach %s zu wandern.\n", unitname(u), f_regionid(r, u->faction), f_regionid(max_region, u->faction));
-#elif HAVE_BZ2LIB
-			/* TODO */
-#else
-			fprintf(dragonlog, "%s entscheidet sich, von %s nach %s zu wandern.\n", unitname(u), f_regionid(r, u->faction), f_regionid(max_region, u->faction));
-#endif
-		}
 		return a;
 	}
 	return NULL;
@@ -440,15 +420,6 @@ set_movement_order(unit * u, const region * target, int moves, boolean (*allowed
 	char * c;
 
 	if (plan==NULL) {
-		if (dragonlog) {
-#ifdef HAVE_ZLIB
-			gzprintf(dragonlog, "%s fand keinen Weg von %s nach %s\n", unitname(u), f_regionid(r, u->faction), f_regionid(target, u->faction));
-#elif HAVE_BZ2LIB
-			/* TODO */
-#else
-			fprintf(dragonlog, "%s fand keinen Weg von %s nach %s\n", unitname(u), f_regionid(r, u->faction), f_regionid(target, u->faction));
-#endif
-		}
 		return false;
 	}
 
@@ -465,15 +436,6 @@ set_movement_order(unit * u, const region * target, int moves, boolean (*allowed
 		c += strlen(c);
 	}
 
-	if (dragonlog) {
-#ifdef HAVE_ZLIB
-		gzprintf(dragonlog, "%s wandert von %s nach %s: %s\n", unitname(u), f_regionid(r, u->faction), f_regionid(target, u->faction), buf);
-#elif HAVE_BZ2LIB
-			/* TODO */
-#else
-		fprintf(dragonlog, "%s wandert von %s nach %s: %s\n", unitname(u), f_regionid(r, u->faction), f_regionid(target, u->faction), buf);
-#endif
-	}
 	set_order(&u->lastorder, parse_order(buf, u->faction->locale));
         free_order(u->lastorder); /* parse_order & set_order have both increased the refcount */
 	return true;
@@ -1023,19 +985,6 @@ plan_monsters(void)
   unit *u;
   attrib *ta;
 
-  if (!dragonlog) {
-    char zText[MAX_PATH];
-#ifdef HAVE_ZLIB
-    sprintf(zText, "%s/dragonlog.gz", basepath());
-    dragonlog = gzopen(zText, "w");
-#elif HAVE_BZ2LIB
-    sprintf(zText, "%s/dragonlog.bz2", basepath());
-    dragonlog = BZ2_bzopen(zText,"w");
-#else
-    sprintf(zText, "%s/dragonlog", basepath());
-    dragonlog = fopen(zText, "w");
-#endif
-  }
   u = findunitg(atoi36("ponn"), NULL);
   if (!u) make_ponnuki();
   f = findfaction(MONSTER_FACTION);
@@ -1130,16 +1079,6 @@ plan_monsters(void)
           break;
         }
     }
-  }
-  if (dragonlog) {
-#ifdef HAVE_ZLIB
-    gzclose(dragonlog);
-#elif HAVE_BZ2LIB
-    BZ2_bzclose(dragonlog);
-#else
-    fclose(dragonlog);
-#endif
-    dragonlog = NULL;
   }
 }
 
