@@ -3616,7 +3616,7 @@ battle_stats(FILE * F, battle * b)
           slist = &(*slist)->next;
         }
         stat = *slist;
-        if (stat->wp!=wp || stat->level!=level) {
+        if (stat==NULL || stat->wp!=wp || stat->level!=level) {
           stat = calloc(1, sizeof(stat_info));
           stat->wp = wp;
           stat->level = level;
