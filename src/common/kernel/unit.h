@@ -110,17 +110,9 @@ extern const struct unit u_unknown;
 
 extern struct unit * udestroy;
 
-#if SKILLPOINTS
-extern int change_skill(struct unit * u, skill_t id, int byvalue);
-extern void set_skill(struct unit * u, skill_t id, int value);
-extern int get_skill(const struct unit * u, skill_t id);
-#define has_skill(u, id) (get_skill(u, id)>0)
-#define change_level(u, sk, bylevel) set_level(u, sk, max(0,get_level(u,sk)+bylevel));
-#else
 extern struct skill * add_skill(struct unit * u, skill_t id);
 extern struct skill * get_skill(const struct unit * u, skill_t id);
 extern boolean has_skill(const unit* u, skill_t sk);
-#endif
 
 extern void set_level(struct unit * u, skill_t id, int level);
 extern int get_level(const struct unit * u, skill_t id);

@@ -695,19 +695,6 @@ scale_number (unit * u, int n)
 		if (n==0 || u->number == 0) {
 			set_level(u, sk, 0);
 		}
-#if SKILLPOINTS
-		/* not necessary to scale in the new system */
-		else {
-			int sval = get_skill(u, sk);
-			int snew = sval / u->number * n;
-			remain = sval - snew / n * u->number;
-			snew += remain * n / u->number;
-			remain = (remain * n) % u->number;
-			if ((rand() % u->number) < remain)
-				++snew;	/* Nachkommastellen */
-			set_skill(u, sk, snew);
-		}
-#endif
 	}
 
 	set_number(u, n);

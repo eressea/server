@@ -671,13 +671,8 @@ cr_output_unit(FILE * F, const region * r,
 					pr = 1;
 					fprintf(F, "TALENTE\n");
 				}
-#if SKILLPOINTS
-				fprintf(F, "%d %d;%s\n", get_skill(u, sk), esk,
-					add_translation(skillname(sk, NULL), skillname(sk, f->locale)));
-#else
 				fprintf(F, "%d %d;%s\n", u->number*level_days(get_level(u, sk)), esk,
 					add_translation(skillname(sk, NULL), skillname(sk, f->locale)));
-#endif
 			}
 		}
 		/* spells */

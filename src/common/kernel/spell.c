@@ -141,21 +141,12 @@ do_shock(unit *u, char *reason)
 	}
 
 	/* Evt. Talenttageverlust */
-#if SKILLPOINTS
-	if(rand()%10 < 2) {
-		for (sk=0; sk < MAXSKILLS; sk++) {
-			int n = get_skill(u, sk);
-			if (n!=0) set_skill(u, sk, (n*9)/10, false);
-		}
-	}
-#else
 	for (i=0;i!=u->skill_size;++i) if (rand()%5==0) {
 		skill * sv = u->skills+i;
 		int weeks = (sv->level * sv->level - sv->level) / 2;
 		int change = (weeks+9) / 10;
 		reduce_skill(u, sv, change);
 	}
-#endif
 
 	/* Dies ist ein Hack, um das skillmod und familiar-Attribut beim Mage
 	 * zu löschen wenn der Familiar getötet wird. Da sollten wir über eine

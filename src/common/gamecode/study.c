@@ -514,10 +514,10 @@ learn(void)
 						/* Vertraute zählen nicht zu den Magiern einer Partei,
 						 * können aber nur Graue Magie lernen */
 						mtyp = M_GRAU;
-						if (!get_skill(u, SK_MAGIC)){
+						if (!has_skill(u, SK_MAGIC)) {
 							create_mage(u, mtyp);
 						}
-					} else if (!get_skill(u, SK_MAGIC)){
+					} else if (!has_skill(u, SK_MAGIC)){
 						/* Die Einheit ist noch kein Magier */
 						if (count_skill(u->faction, SK_MAGIC) + u->number >
 							max_skill(u->faction, SK_MAGIC))
@@ -570,7 +570,7 @@ learn(void)
 				}
 				if (i == SK_ALCHEMY) {
 					maxalchemy = eff_skill(u, SK_ALCHEMY, r);
-					if (get_skill(u, SK_ALCHEMY)==0
+					if (has_skill(u, SK_ALCHEMY)==0
 						&& count_skill(u->faction, SK_ALCHEMY) + u->number >
 						max_skill(u->faction, SK_ALCHEMY)) {
 						sprintf(buf, "Es kann maximal %d Alchemisten pro Partei geben",
@@ -648,9 +648,6 @@ learn(void)
 
 				days = (int)((u->number * 30 + a->data.i) * multi);
 				if (fval(u, FL_HUNGER)) days = days / 2;
-#if SKILLPOINTS
-				change_skill(u, (skill_t)i, days);
-#else
 				while (days) {
 					if (days>=u->number*30) {
 						learn_skill(u, (skill_t)i, 1.0);
@@ -661,7 +658,6 @@ learn(void)
 						days = 0;
 					}
 				}
-#endif
 				if (a) {
 					a_remove(&u->attribs, a);
 					a = NULL;

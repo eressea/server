@@ -945,29 +945,6 @@ remove_troop(troop dt)
 
 /* ------------------------------------------------------------- */
 
-#if SKILLPOINTS
-void
-drain_exp(const struct unit *u, int n)
-{
-	skill_t sk = (skill_t)(rand() % MAXSKILLS);
-	skill_t ssk;
-
-	ssk = sk;
-
-	while (get_skill(u, sk) <= 0) {
-		sk++;
-		if (sk == MAXSKILLS)
-			sk = 0;
-		if (sk == ssk) {
-			sk = NOSKILL;
-			break;
-		}
-	}
-	if (sk != NOSKILL) {
-		change_skill(u, sk, -n);
-	}
-}
-#else
 /** reduces the target's exp by an equivalent of n points learning
  * 30 points = 1 week
  */
@@ -1001,7 +978,6 @@ drain_exp(struct unit *u, int n)
 		}
 	}
 }
-#endif
 
 const char *
 rel_dam(int dam, int hp)

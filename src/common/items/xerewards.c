@@ -36,23 +36,12 @@
 static int
 use_skillpotion(struct unit * u, const struct item_type * itype, const char *cm)
 {
-#if SKILLPOINTS
-	skill_t sk;
-	for(sk = 0; sk != MAXSKILLS; sk++) {
-		int skillvalue = get_skill(u, sk)/u->number;
-		if(skillvalue > 0) {
-			int change = max(90, (skillvalue * 10)/100);
-			change_skill(u, sk, change);
-		}
-	}
-#else
 	skill * sv = u->skills;
 	while (sv!=u->skills+u->skill_size) {
 		int i;
 		for (i=0;i!=3;++i) learn_skill(u, sv->id, 1.0);
 		++sv;
 	}
-#endif
 	add_message(&u->faction->msgs, new_message(u->faction,
 		"skillpotion_use%u:unit", u));
 

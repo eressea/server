@@ -869,7 +869,7 @@ learn_monster(unit *u)
 	 * Lerntage hat. */
 
 	for(sk=0;sk<MAXSKILLS;sk++)
-		if (get_skill(u, sk)) c++;
+		if (has_skill(u, sk)) c++;
 
 	if(c == 0) return;
 
@@ -877,7 +877,7 @@ learn_monster(unit *u)
 	c = 0;
 
 	for (sk=0;sk<MAXSKILLS;sk++) {
-		if (get_skill(u, sk)) {
+		if (has_skill(u, sk)) {
 			c++;
 			if(c == n) {
 				sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_STUDY]),

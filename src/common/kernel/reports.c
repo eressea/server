@@ -630,12 +630,6 @@ spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh,
 	effsk = effskill(u, sk);
 	sbuf += sprintf(sbuf, "%d", effsk);
 
-#if SKILLPOINTS == 1
-	if (days) {
-		assert(u->number);
-		sbuf += sprintf(sbuf, " [%d]", get_skill(u, sk) / u->number);
-	}
-#else
 	if(u->faction->options & Pow(O_SHOWSKCHANGE)) {
 		skill *skill = get_skill(u, sk);
 		int oldeff = 0;
@@ -652,7 +646,6 @@ spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh,
 			sbuf += sprintf(sbuf, " (%s%hd)", (diff>0)?"+":"", diff);
 		}
 	}
-#endif
 }
 
 void

@@ -293,7 +293,6 @@ days2level(int days)
 	return l-1;
 }
 
-#if SKILLPOINTS == 0
 static void
 change_level(unit * u, skill_t sk, int bylevel)
 {
@@ -302,7 +301,6 @@ change_level(unit * u, skill_t sk, int bylevel)
 	if (sv==0) sv = add_skill(u, sk);
 	sk_set(sv, sv->level+bylevel);
 }
-#endif
 
 static void
 give_latestart_bonus(region *r, unit *u, int b)
@@ -445,7 +443,7 @@ ModifyPartei(faction * f)
 		waddnstr(win, " (", -1);
 		for (r = firstregion(f); r != lastregion(f); r = r->next)
 			for (u = r->units; u; u = u->next)
-				if (u->faction == f && get_skill(u, SK_MAGIC)) {
+				if (u->faction == f && has_skill(u, SK_MAGIC)) {
 					if (fval(f, FL_DH))
 						waddnstr(win, ", ", -1);
 					wprintw(win, (NCURSES_CONST char*)"%s(%d): %d", unitid(u), u->number, get_level(u, SK_MAGIC));
@@ -461,7 +459,7 @@ ModifyPartei(faction * f)
 		freset(f, FL_DH);
 		for (r = firstregion(f); r != lastregion(f); r = r->next)
 			for (u = r->units; u; u = u->next)
-				if (u->faction == f && get_skill(u, SK_ALCHEMY)) {
+				if (u->faction == f && has_skill(u, SK_ALCHEMY)) {
 					if (fval(f, FL_DH))
 						waddnstr(win, ", ", -1);
 					wprintw(win, (NCURSES_CONST char*)"%s(%d): %d", unitid(u), u->number, get_level(u, SK_ALCHEMY));

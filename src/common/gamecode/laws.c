@@ -370,24 +370,6 @@ live(region * r)
 		if (!is_monstrous(u)) {
 			int effect = get_effect(u, oldpotiontype[P_FOOL]);
 			if (effect > 0) {	/* Trank "Dumpfbackenbrot" */
-#if SKILLPOINTS
-				skill_t sk, ibest = NOSKILL;
-				int best = 0;
-				for (sk = 0; sk < MAXSKILLS; sk++) {
-					if (get_skill(u, sk) > best) {
-						best = get_skill(u, sk);
-						ibest = sk;
-					}
-				}				/* bestes Talent raussuchen */
-				if (best > 0) {
-					int k = get_skill(u, ibest);
-					int value = min(effect, u->number) * 30;
-					k = min(k, value);
-					change_skill(u, ibest, -k);
-					ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
-						"unit days skill", u, (k+29)/30, ibest));
-				}	/* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
-#else
 				skill * sv = u->skills, * sb = NULL;
 				while (sv!=u->skills+u->skill_size) {
 					if (sb==NULL || skill_compare(sv, sb)>0) {
@@ -401,7 +383,6 @@ live(region * r)
 					ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
 						"unit weeks skill", u, weeks, (skill_t)sb->id));
 				}	/* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
-#endif
 			}
 		}
 		age_unit(r, u);
@@ -2168,7 +2149,7 @@ set_passw(void)
 							for (r2 = firstregion(u->faction); r2 != last; r2 = r2->next) {
 								for (u2 = r->units; u2; u2 = u2->next) {
 									if(u2->faction == u->faction
-											&& get_skill(u2, SK_MAGIC)) {
+											&& has_skill(u2, SK_MAGIC)) {
 										m = get_mage(u2);
 										m->magietyp = mtyp;
 									}

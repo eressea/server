@@ -177,15 +177,10 @@ improve_all(faction * f, skill_t sk, int weeks)
 
 	for (r = firstregion(f); r != last; r = r->next) {
 		for (u = r->units; u; u = u->next) {
-			if (u->faction == f && get_skill(u, sk)) {
-#if SKILLPOINTS
-				change_skill(u, sk, u->number * weeks * 30);
-				n += u->number;
-#else
+			if (u->faction == f && has_skill(u, sk)) {
 				for (n=0;n!=weeks;++n) {
 					learn_skill(u, sk, 1.0);
 				}
-#endif
 			}
 		}
 	}
@@ -1026,22 +1021,12 @@ godcurse(void)
 		if(is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
 			unit * u;
 			for(u=r->units; u; u=u->next) {
-#if SKILLPOINTS
-				skill_t sk;
-				for(sk=0; sk < MAXSKILLS; sk++) {
-					int s = get_skill(u, sk);
-					if (s > 0) {
-						change_skill(u, sk, -min(s, (30+rand()%90)*u->number));
-					}
-				}
-#else
 				skill * sv = u->skills;
 				while (sv!=u->skills+u->skill_size) {
 					int weeks = 1+rand()%3;
 					reduce_skill(u, sv, weeks);
 					++sv;
 				}
-#endif
 			}
 		}
 	}
@@ -1091,8 +1076,7 @@ randomevents(void)
 		if (p && (p->flags & PFL_NOORCGROWTH)) continue;
 		for (u = r->units; u; u = u->next) {
 			if ( (u->race == new_race[RC_ORC] || is_cursed(u->attribs, C_ORC, 0))
-					&& !get_skill(u, SK_MAGIC)
-			    && !get_skill(u, SK_ALCHEMY)) {
+					&& !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
 				int increase = 0;
 				int num, prob;
 
@@ -1121,8 +1105,7 @@ randomevents(void)
 							{ SK_AUSDAUER, 0 }, { NOSKILL, 0 }
 						};
 						for (i=0;skills[i].skill!=NOSKILL;++i) {
-							int s = get_skill(u, skills[i].skill) / (u->number * 2);
-							int k = skill_level(skills[i].level);
+							int k = get_level(u, skills[i].skill);
 							change_skill(u, skills[i].skill, increase * max(k, s));
 						}
 					}
@@ -1193,20 +1176,6 @@ randomevents(void)
 				dc = min(dc, peasantfood);
 				dc = peasantfood - max(u->number - bauernblut, 0);
 				dc = max(0, dc);
-#if SKILLPOINTS
-				for (sk = 0; sk != MAXSKILLS; sk++) {
-					if (get_skill(u, sk) && rand() % 100 < 25) {
-						int change = rand() % 90 + 1;
-						if (rand() % 100 < 60) {
-							change_skill(u, sk, u->number * change);
-						} else {
-							int s = get_skill(u, sk);
-							s = min(s, u->number * change);
-							change_skill(u, sk, -s);
-						}
-					}
-				}
-#else
 				sv = u->skills;
 				while (sv!=u->skills+u->skill_size) {
 					if (rand() % 100 < 25) {
@@ -1216,7 +1185,6 @@ randomevents(void)
 					}
 					++sv;
 				}
-#endif
 			}
 		}
 		rsetpeasants(r, peasantfood/10);

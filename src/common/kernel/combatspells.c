@@ -540,9 +540,6 @@ sp_mindblast(fighter * fi, int level, int power, spell * sp)
 			if (sk != NOSKILL) {
 				/* Skill abziehen */
 				int n = 30+rand()%61;
-#if SKILLPOINTS
-				change_skill(du, sk, -n);
-#else
 				skill * sv = get_skill(du, sk);
 				while (n>0) {
 					if (n>=30*du->number) {
@@ -553,7 +550,6 @@ sp_mindblast(fighter * fi, int level, int power, spell * sp)
 						n = 0;
 					}
 				}
-#endif
 				--enemies;
 			} else {
 				troop t;

@@ -430,13 +430,13 @@ recruit(region * r, unit * u, strlist * S,
 	}
 	n = geti();
 
-	if (get_skill(u, SK_MAGIC)) {
+	if (has_skill(u, SK_MAGIC)) {
 		/* error158;de;{unit} in {region}: '{command}' - Magier arbeiten
 		 * grundsätzlich nur alleine! */
 		cmistake(u, S->s, 158, MSG_EVENT);
 		return;
 	}
-	if (get_skill(u, SK_ALCHEMY)
+	if (has_skill(u, SK_ALCHEMY)
 		&& count_skill(u->faction, SK_ALCHEMY) + n >
 		max_skill(u->faction, SK_ALCHEMY))
 	{
@@ -584,7 +584,7 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 		&& u2->faction != u->faction
 		&& ucontact(u2, u) == 0) {
 		error = 73;
-	} else if (u2 && (get_skill(u, SK_MAGIC) || get_skill(u2, SK_MAGIC))) {
+	} else if (u2 && (has_skill(u, SK_MAGIC) || has_skill(u2, SK_MAGIC))) {
 		error = 158;
 	} else {
 		if (n > u->number) n = u->number;
@@ -607,17 +607,17 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 			}
 		}
 	}
-	if (u2 && (get_skill(u, SK_ALCHEMY) || get_skill(u2, SK_ALCHEMY))) {
+	if (u2 && (has_skill(u, SK_ALCHEMY) || has_skill(u2, SK_ALCHEMY))) {
 
 		k = count_skill(u2->faction, SK_ALCHEMY);
 
 		/* Falls die Zieleinheit keine Alchemisten sind, werden sie nun
 		 * welche. */
-		if (!get_skill(u2, SK_ALCHEMY) && get_skill(u, SK_ALCHEMY) > 0)
+		if (!has_skill(u2, SK_ALCHEMY) && has_skill(u, SK_ALCHEMY))
 			k += u2->number;
 
 		/* Wenn in eine Alchemisteneinheit Personen verschoben werden */
-		if (get_skill(u2, SK_ALCHEMY) && !get_skill(u, SK_ALCHEMY))
+		if (has_skill(u2, SK_ALCHEMY) && !has_skill(u, SK_ALCHEMY))
 			k += n;
 
 		/* Wenn Parteigrenzen überschritten werden */
@@ -736,7 +736,7 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 			return;
 		}
 	}
-	if (get_skill(u, SK_MAGIC)) {
+	if (has_skill(u, SK_MAGIC)) {
 		if (count_skill(u2->faction, SK_MAGIC) + u->number >
 		max_skill(u2->faction, SK_MAGIC))
 		{
@@ -748,7 +748,7 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 			return;
 		}
 	}
-	if (get_skill(u, SK_ALCHEMY)
+	if (has_skill(u, SK_ALCHEMY)
 		&& count_skill(u2->faction, SK_ALCHEMY) + u->number >
 		max_skill(u2->faction, SK_ALCHEMY))
 	{
