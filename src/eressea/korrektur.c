@@ -2647,23 +2647,14 @@ fix_astralplane(void)
 static int
 fix_watchers(void)
 {
-	plane * p = getplanebyid (59034966);
+	plane * p = getplanebyid (1094969858);
 	if (p) {
-		faction * f = findfaction(atoi36("gm04"));
+		faction * f = findfaction(atoi36("rega"));
 		watcher * w = calloc(sizeof(watcher), 1);
 		w->faction = f;
 		w->mode = see_unit;
 		w->next = p->watchers;
 		p->watchers	= w;
-	}
-	p = getplanebyid(1137);
-	if (p) {
-		faction * f = findfaction(atoi36("rr"));
-		watcher * w = calloc(sizeof(watcher), 1);
-		w->faction = f;
-		w->mode = see_unit;
-		w->next = p->watchers;
-		p->watchers = w;
 	}
 	return 0;
 }
@@ -2752,7 +2743,7 @@ korrektur(void)
 	/* fix_unitrefs(); */
 	stats();
 	do_once("sql2", dump_sql());
-	do_once("fw01", fix_watchers());
+	do_once("fw02", fix_watchers());
 	do_once("fxh2", fix_plainherbs());
 #if NEW_RESOURCEGROWTH
 	/* do not remove do_once calls - old datafiles need them! */
