@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.8 2001/02/04 13:20:12 corwin Exp $
+ *	$Id: report.c,v 1.9 2001/02/04 13:47:25 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2647,7 +2647,7 @@ reports(void)
 
 			fprintf(BAT, "\n\ndate;echo %s\n", f->email);
 
-			if (f->options & wants_compressed) {
+			if (f->no > 0 && f->options & wants_compressed) {
 
 				if(f->age == 1) {
 					fprintf(BAT, "ls %s.nr %s.cr ../newbie.txt | zip -m -j -9 -@ %s.zip\n",
