@@ -282,7 +282,7 @@ seed_dropouts(void)
 			if (u==NULL) while (*nfp) {
 				newfaction * nf = *nfp;
 				if (nf->race==drop->race && !nf->bonus) {
-					unit * u = addplayer(r, nf->email, nf->race, nf->lang);
+					unit * u = addplayer(r, nf->email, nf->password, nf->race, nf->lang);
 					++numnewbies;
 					if (nf->bonus) give_latestart_bonus(r, u, nf->bonus);
 					found=true;
@@ -307,11 +307,11 @@ read_newfactions(const char * filename)
 	if (F==NULL) return;
 	for (;;) {
 		faction * f = factions;
-		char race[20], email[64], lang[8];
+		char race[20], email[64], lang[8], password[8];
 		newfaction *nf;
 		int bonus;
 		/* email;race;locale;startbonus */
-		if (fscanf(F, "%s %s %s %d", email, race, lang, &bonus)<=0) break;
+		if (fscanf(F, "%s %s %s %d %s", email, race, lang, &bonus, password)<=0) break;
 		while (f) {
 			if (strcmp(f->email, email)==0 && f->age==0) {
 				break;
@@ -325,6 +325,7 @@ read_newfactions(const char * filename)
 		if (nf) continue;
 		nf = calloc(sizeof(newfaction), 1);
 		nf->email = strdup(email);
+		nf->password = strdup(password);
 		nf->race = rc_find(race);
 		if (nf->race==NULL) nf->race = findrace(race, default_locale);
 		nf->lang = find_locale(lang);
@@ -373,6 +374,7 @@ NeuePartei(region * r)
 	const struct race * frace;
 	int late;
 	unit *u;
+	const char * passwd = NULL;
 	int locale_nr;
 	faction * f;
 
@@ -387,6 +389,7 @@ NeuePartei(region * r)
 		frace = nf->race;
 		late = nf->bonus;
 		lang = nf->lang;
+		passwd = nf->password;
 		strcpy(email, nf->email);
 		if (late) {
 			WINDOW *win = openwin(SX - 10, 3, "< Neue Partei einfügen >");
@@ -482,7 +485,7 @@ NeuePartei(region * r)
 		else nfp = &nf->next;
 	}
 	modified = 1;
-	u = addplayer(r, email, frace, lang);
+	u = addplayer(r, email, passwd, frace, lang);
 	++numnewbies;
 
 	if(late) give_latestart_bonus(r, u, late);

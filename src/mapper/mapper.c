@@ -322,37 +322,6 @@ crwritemap(void)
 	return 0;
 }
 
-static void
-readfactions(void)
-{
-	FILE * F = fopen("factions.txt", "r");
-
-	locale * german = find_locale("de");
-	while (!feof(F)) {
-		int x, y;
-		region * r;
-		unit * u;
-		const race * rc;
-		locale * lang;
-		char email[64];
-		char racename[32];
-		char langname[32];
-		fscanf(F, "%d %d %s %s %s\n", &x, &y, langname, racename, email);
-
-		rc = findrace(racename, german);
-		r = findregion(x, y);
-		lang = find_locale(langname);
-		assert(rc && r && lang);
-		u = addplayer(r, email, rc, lang);
-		++numnewbies;
-		assert(u);
-		i_change(&u->items, finditemtype("stein", german), 30);
-		i_change(&u->items, finditemtype("holz", german), 30);
-	}
-	fclose(F);
-	modified = 1;
-}
-
 int
 newbie_region(region * r)
 {
@@ -837,9 +806,6 @@ movearound(int rx, int ry) {
 					adddbllist(&reglist, " Z: Terrain Region");
 					DisplayRegList(1);
 					ch = 999999;
-					break;
-				case 18: /* ctrl-r*/
-					readfactions();
 					break;
 				case 23: /* ctrl-w*/
 					crwritemap();

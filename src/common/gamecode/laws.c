@@ -236,7 +236,7 @@ destroyfaction(faction * f)
 static void
 restart(unit *u, const race * rc)
 {
-	faction *f = addplayer(u->region, u->faction->email, rc, u->faction->locale)->faction;
+	faction *f = addplayer(u->region, u->faction->email, u->faction->passw, rc, u->faction->locale)->faction;
 	unit * nu = f->units;
 	strlist ** o=&u->orders;
 

@@ -18,7 +18,8 @@ struct newfaction;
 
 typedef struct newfaction {
 	struct newfaction * next;
-	const char * email;
+	char * email;
+	char * password;
 	const struct locale * lang;
 	const struct race * race;
 	int bonus;
