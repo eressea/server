@@ -292,6 +292,9 @@ drawmap(boolean maponly) {
 				case -7:
 					addstr("Chaos ");
 					break;
+				case -8:
+					addstr("Godcurse ");
+					break;
 				default:
 					printw((NCURSES_CONST char*)"Partei %d ",hl);
 			}
@@ -340,6 +343,7 @@ drawmap(boolean maponly) {
 					 (hl == -5 && rlaen(r) != -1) ||
 					 (hl == -6 && fval(r, RF_MALLORN)) ||
 					 (hl == -7 && fval(r, RF_CHAOTIC)) ||
+					 (hl == -8 && is_cursed_internal(r->attribs, C_CURSED_BY_THE_GODS, 0)) ||
 					 (hl >= 0 && factionhere(r, hl)) ||
 					 (x==tx && y1==ty))
 					addch(rs | A_REVERSE);
@@ -534,7 +538,7 @@ SetHighlight(void)
 	wmove(win, 1, 2);
 	wAddstr("Regionen mit P)artei, E)inheiten, B)urgen, S)chiffen,");
 	wmove(win, 2, 2);
-	wAddstr("             L)aen, C)haos oder N)icht Highlighten?");
+	wAddstr("             L)aen, C)haos, G)odcurse oder N)icht Highlighten?");
 	wrefresh(win);
 	c = tolower(getch());
 	switch (c) {
@@ -559,6 +563,9 @@ SetHighlight(void)
 		break;
 	case 'c':
 		hl = -7;
+		break;
+	case 'g':
+		hl = -8;
 		break;
 	case 'n':
 	default:
@@ -591,7 +598,7 @@ recalc_everything(int *x, int *y, int *rx, int *ry)
 void
 movearound(int rx, int ry) {
 	int hx = -1, hy = -1, ch, x, y, Rand, d, a, b, p, q, oldx=0, oldy=0;
-	int oldrx, oldry, Hx=0, Hy=0;
+	int oldrx=0, oldry=0, Hx=0, Hy=0;
 	int sel;
 	char *selc;
 	region *c, *r = NULL, *r2;
@@ -926,6 +933,18 @@ movearound(int rx, int ry) {
 					break;
 				case 'P':
 					NeuePartei(r);
+					ch = -9;
+					break;
+				case 'X':
+					if(Tagged) {
+						tag=Tagged;
+						while(tag) {
+							SpecialFunction(tag->r);
+							tag=tag->next;
+						}
+					} else {
+						SpecialFunction(r);
+					}
 					ch = -9;
 					break;
 				case 'M':

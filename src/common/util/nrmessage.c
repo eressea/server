@@ -77,9 +77,11 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
 		nrt->mtype = mtype;
 		nrt->next = messagetypes;
 		nrt->level=level;
-		nrt->section = strdup(section);
+		if (section) nrt->section = strdup(section);
+		else nrt->section = NULL;
 		messagetypes = nrt;
 		nrt->string = strdup(string);
+                *c = '\0';
 		for (i=0;i!=mtype->nparameters;++i) {
 			if (i!=0) *c++ = ' ';
 			c+= strlen(strcpy(c, mtype->pnames[i]));
@@ -90,7 +92,7 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
 }
 
 int
-nr_render(const struct message * msg, const struct locale * lang, char * buffer, const void * userdata)
+nr_render(const struct message * msg, const struct locale * lang, char * buffer, size_t bufsize, const void * userdata)
 {
 	struct nrmessage_type * nrt = nrt_find(lang, msg->type);
 
@@ -118,5 +120,11 @@ const char *
 nr_section(const struct message *msg)
 {
 	nrmessage_type * nrt = nrt_find(default_locale, msg->type);
+	return nrt->section;
+}
+
+const char * 
+nrt_section(const nrmessage_type * nrt)
+{
 	return nrt->section;
 }

@@ -1,10 +1,19 @@
+#include <config.h>
 #include <eressea.h>
+
 #include <region.h>
+#include <faction.h>
+#include <unit.h>
 #include <save.h>
 
+#include <base36.h>
+
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <locale.h>
+
+static char * orderfile = NULL;
 
 static void mark_region(region * r, boolean mark)
 {
@@ -29,6 +38,11 @@ markup(FILE * in)
 			continue;
 		}
 		if (choice[0]=='e') return; /* end */
+		if (choice[0]=='o') {
+			orderfile = strdup(command);
+			readorders(orderfile);
+			continue;
+		}
 		mark = (choice[0]=='a'); /* add/del */
 		switch (command[0]) {
 		case 'r':
@@ -76,6 +90,50 @@ reduce(void)
 	}
 }
 
+static int
+usage(void)
+{
+	fputs("usage: reduce [infile]\n", stderr);
+	fputs("\ninput file syntax:\n"
+		"\torders orderfile\n"
+		"\tadd all\n"
+		"\tadd region x y\n"
+		"\tadd area x y r\n"
+		"\tdel all\n"
+		"\tdel region x y\n"
+		"\tdel area x y r\n"
+		"\tend\n", stderr);
+	return -1;
+}
+
+static void
+writeorders(const char * orderfile)
+{
+	FILE * F = fopen(orderfile, "wt");
+	faction * f;
+	if (F==NULL) return;
+
+	/* let's leak regions, big time. */
+	for (f=factions;f;f=f->next) {
+		region * r;
+		if (f->alive==0) continue;
+		fprintf(F, "PARTEI %s \"%s\"\n", itoa36(f->no), f->passw);
+		for (r=regions;r;r=r->next) {
+			if (fval(r, FL_MARK)) {
+				unit * u;
+				for (u=r->units;u;u=u->next) {
+					strlist * o;
+					fprintf(F, "EINHEIT %s\n", itoa36(u->no));
+					for (o=u->orders;o;o=o->next) {
+						fputs(o->s, F);
+					}
+				}
+			}
+		}
+	}
+	fclose(F);
+}
+
 int
 main(int argc, char ** argv)
 {
@@ -87,8 +145,8 @@ main(int argc, char ** argv)
 
 	if (argc>1) {
 		in = fopen(argv[1], "rt+");
-		if (in==NULL) return -1;
-	}
+		if (in==NULL) return usage();
+	} 
 
 	kernel_init();
 	readgame(false);
@@ -97,6 +155,10 @@ main(int argc, char ** argv)
 	reduce();
 
 	remove_empty_factions();
+	sprintf(outfile, "%s.cut", orderfile);
+	if (orderfile) {
+		writeorders(orderfile);
+	}
 	sprintf(outfile, "%s/%d.cut", datadir, turn);
 	writegame(outfile, 0);
 

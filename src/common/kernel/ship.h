@@ -21,6 +21,7 @@
 
 /* ship_type::flags */
 #define SFL_OPENSEA 0x01
+#define SFL_FLY     0x02
 
 typedef struct ship_type {
 	const char * name[2];
@@ -54,6 +55,7 @@ extern ship_typelist *shiptypes;
 /* Alte Schiffstypen: */
 
 extern const ship_type st_boat;
+extern const ship_type st_balloon;
 extern const ship_type st_longboat;
 extern const ship_type st_dragonship;
 extern const ship_type st_caravelle;

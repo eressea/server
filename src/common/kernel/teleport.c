@@ -42,12 +42,12 @@ real2tp(int rk) {
 }
 
 static region *
-tpregion(region *r) {
+tpregion(const region *r) {
 	return findregion(TE_CENTER_X+real2tp(r->x), TE_CENTER_Y+real2tp(r->y));
 }
 
 region *
-r_standard_to_astral(region *r)
+r_standard_to_astral(const region *r)
 {
 	region *r2;
 #if 0
@@ -68,7 +68,7 @@ r_standard_to_astral(region *r)
 }
 
 region *
-r_astral_to_standard(region *r)
+r_astral_to_standard(const region *r)
 {
 	int x, y;
 	region *r2;
@@ -171,7 +171,7 @@ create_teleport_plane(void)
 }
 
 regionlist *
-allinhab_in_range(region *r, int n)
+allinhab_in_range(const region *r, int n)
 {
 	int x,y;
 	regionlist *rlist = NULL;

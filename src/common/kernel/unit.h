@@ -155,6 +155,8 @@ struct unit * findnewunit (const struct region * r, const struct faction *f, int
 extern const struct unit u_peasants;
 extern const struct unit u_unknown;
 
+extern struct unit * udestroy;
+
 int change_skill(struct unit * u, skill_t id, int byvalue);
 void set_skill(struct unit * u, skill_t id, int value);
 int get_skill(const struct unit * u, skill_t id);
@@ -183,7 +185,7 @@ extern struct building * inside_building(const struct unit * u);
 
 /* cleanup code for this module */
 extern void free_units(void);
-extern struct faction * dfindhash(int i);
+extern struct faction * dfindhash(int no);
 extern void u_setfaction(struct unit * u, struct faction * f);
 /* vorsicht Sprüche können u->number == 0 (RS_FARVISION) haben! */
 extern void set_number(struct unit * u, int count);

@@ -1,16 +1,258 @@
 <messages>
-<message name="msg_errors">
+
+<message name="Elfen">
+	<text locale="de">Elfen</text>
+	<text locale="en">elves</text>
+</message>
+
+<message name="Skelett">
+	<text locale="de">Skelett</text>
+	<text locale="en">skeleton</text>
+</message>
+
+<message name="Skelette">
+	<text locale="de">Skelette</text>
+	<text locale="en">skeletons</text>
+</message>
+
+<message name="Steingolem">
+	<text locale="de">Steingolem</text>
+	<text locale="en">stone golem</text>
+</message>
+
+<message name="Steingolems">
+	<text locale="de">Steingolems</text>
+	<text locale="en">stone golems</text>
+</message>
+
+<message name="Fee">
+	<text locale="de">Fee</text>
+	<text locale="en">fairy</text>
+</message>
+
+<message name="Feen">
+	<text locale="de">Feen</text>
+	<text locale="en">fairies</text>
+</message>
+
+<message name="Gnoll">
+	<text locale="de">Gnoll</text>
+	<text locale="en">gnoll</text>
+</message>
+
+<message name="Gnolle">
+	<text locale="de">Gnolle</text>
+	<text locale="en">gnolls</text>
+</message>
+
+<message name="Winter">
+	<text locale="de">Winter</text>
+	<text locale="en">winter</text>
+</message>
+
+<message name="Frühling">
+	<text locale="de">Frühling</text>
+	<text locale="en">spring</text>
+</message>
+
+<message name="Sommer">
+	<text locale="de">Sommer</text>
+	<text locale="en">summer</text>
+</message>
+
+<message name="Herbst">
+	<text locale="de">Herbst</text>
+	<text locale="en">autumn</text>
+</message>
+
+<message name="prefix_Dunkel">
+	<text locale="de">Dunkel</text>
+	<text locale="en">dark </text>
+</message>
+
+<message name="prefix_Licht">
+	<text locale="de">Licht</text>
+	<text locale="en">light </text>
+</message>
+
+<message name="prefix_Klein">
+	<text locale="de">Klein</text>
+	<text locale="en">gully </text>
+</message>
+
+<message name="prefix_Hoch">
+	<text locale="de">Hoch</text>
+	<text locale="en">high </text>
+</message>
+
+<message name="prefix_Huegel">
+	<text locale="de">Hügel</text>
+	<text locale="en">hill </text>
+</message>
+
+<message name="prefix_Berg">
+	<text locale="de">Berg</text>
+	<text locale="en">mountain </text>
+</message>
+
+<message name="prefix_Wald">
+	<text locale="de">Wald</text>
+	<text locale="en">wood </text>
+</message>
+
+<message name="prefix_Sumpf">
+	<text locale="de">Sumpf</text>
+	<text locale="en">swamp </text>
+</message>
+
+<message name="prefix_Schnee">
+	<text locale="de">Schnee</text>
+	<text locale="en">snow </text>
+</message>
+
+<message name="prefix_Sonnen">
+	<text locale="de">Sonnen</text>
+	<text locale="en">sun </text>
+</message>
+
+<message name="prefix_Mond">
+	<text locale="de">Mond</text>
+	<text locale="en">moon </text>
+</message>
+
+<message name="prefix_See">
+	<text locale="de">See</text>
+	<text locale="en">sea </text>
+</message>
+
+<message name="prefix_Tal">
+	<text locale="de">Tal</text>
+	<text locale="en">valley </text>
+</message>
+
+<message name="prefix_Schatten">
+	<text locale="de">Schatten</text>
+	<text locale="en">shadow </text>
+</message>
+
+<message name="prefix_Hoehlen">
+	<text locale="de">Höhlen</text>
+	<text locale="en">cave </text>
+</message>
+
+<message name="prefix_Blut">
+	<text locale="de">Blut</text>
+	<text locale="en">blood </text>
+</message>
+
+<message name="prefix_Wild">
+	<text locale="de">Wild</text>
+	<text locale="en">wild </text>
+</message>
+
+<message name="prefix_Chaos">
+	<text locale="de">Chaos</text>
+	<text locale="en">chaos </text>
+</message>
+
+<message name="prefix_Nacht">
+	<text locale="de">Nacht</text>
+	<text locale="en">night </text>
+</message>
+
+<message name="prefix_Nebel">
+	<text locale="de">Nebel</text>
+	<text locale="en">mist </text>
+</message>
+
+<message name="prefix_Grau">
+	<text locale="de">Grau</text>
+	<text locale="en">grey </text>
+</message>
+
+<message name="prefix_Frost">
+	<text locale="de">Frost</text>
+	<text locale="en">cold </text>
+</message>
+
+<message name="prefix_Finster">
+	<text locale="de">Finster</text>
+	<text locale="en">gloom </text>
+</message>
+
+<message name="prefix_Duester">
+	<text locale="de">Düster</text>
+	<text locale="en">black </text>
+</message>
+
+<message name="nr_template">
+	<text locale="de">Vorlage für den nächsten Zug:</text>
+	<text locale="en">Template for the next turn:</text>
+</message>
+
+<message name="nr_calendar">
+	<text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s.</text>
+	<text locale="en">It is %s of the month of %s in the %d. year of %s.</text>
+</message>
+
+<message name="nr_calendar_season">
+	<text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s. Es ist %s.</text>
+	<text locale="en">It's %s of the month of %s in the %d. year of %s. It's %s.</text>
+</message>
+
+<message name="status_aggressive">
+	<text locale="de">aggressiv</text>
+	<text locale="en">aggressive</text>
+</message>
+
+<message name="status_front">
+	<text locale="de">vorne</text>
+	<text locale="en">front</text>
+</message>
+
+<message name="status_rear">
+	<text locale="de">hinten</text>
+	<text locale="en">rear</text>
+</message>
+
+<message name="status_defensive">
+	<text locale="de">defensiv</text>
+	<text locale="en">defensive</text>
+</message>
+
+<message name="status_flee">
+	<text locale="de">flieht</text>
+	<text locale="en">fleeing</text>
+</message>
+
+<message name="status_avoid">
+	<text locale="de">kämpft nicht</text>
+	<text locale="en">not fighting</text>
+</message>
+
+<message name="status_noaid">
+	<text locale="de">bekommt keine Hilfe</text>
+	<text locale="en">gets no aid</text>
+</message>
+
+<message name="battle_opponents">
+	<text locale="de">Kämpft gegen:</text>
+	<text locale="en">Fighting against</text>
+</message>
+
+<message name="unknown_faction">
+	<text locale="de">Unbekannte Partei</text>
+	<text locale="en">unknown faction</text>
+</message>
+
+<message name="msg_errors" section="errors">
 	<type>
 		<arg name="string" type="string"></arg>
 	</type>
-	<locale name="de">
-		<nr section="errors">
-			<text>"$string"</text>
-		</nr>
-	</locale>
+	<text locale="de">"$string"</text>
 </message>
 
-<message name="manufacture_skills">
+<message name="manufacture_skills" section="production">
 	<type>
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
@@ -19,11 +261,7 @@
 		<arg name="minskill" type="int"></arg>
 		<arg name="product" type="resource"></arg>
 	</type>
-	<locale name="de">
-		<nr section="production">
-			<text>"$unit($unit) in $region($region): '$command' - Man benötigt mindestens $int($minskill) $skill($skill), um $resource($product,0) zu produzieren."</text>
-		</nr>
-	</locale>
+	<text locale="de">"$unit($unit) in $region($region): '$command' - Man benötigt mindestens $int($minskill) $skill($skill), um $resource($product,0) zu produzieren."</text>
 </message>
 
 <message name="skill_needed">
@@ -40,22 +278,14 @@
 	</locale>
 </message>
 
-<message name="no_attack_after_advance">
+<message name="no_attack_after_advance" section="errors">
 	<type>
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
 	</type>
-	<locale name="de">
-		<nr section="errors">
-			<text>"$unit($unit) in $region($region): '$command' - Die Einheit ist noch zu erschöpft vom Einmarsch um zu attackieren."</text>
-		</nr>
-	</locale>
-	<locale name="de">
-		<nr section="errors">
-			<text>"'$command' - $unit($unit) marched into $region($region) during the last turn and is too exhausted to attack."</text>
-		</nr>
-	</locale>
+	<text locale="de">"$unit($unit) in $region($region): '$command' - Die Einheit ist noch zu erschöpft vom Einmarsch um zu attackieren."</text>
+	<text locale="en">"'$command' - $unit($unit) marched into $region($region) during the last turn and is too exhausted to attack."</text>
 </message>
 
 <message name="mistake">
@@ -67,7 +297,7 @@
 	</type>
 	<locale name="de">
 		<nr section="errors">
-			<text>"$unit($unit) in $region($region): '$command' - $error."</text>
+			<text>"$unit($unit) in $region($region): '$command' - ${error}."</text>
 		</nr>
 	</locale>
 </message>
@@ -761,7 +991,7 @@
 	</type>
 	<locale name="de">
 		<nr section="errors">
-			<text>"$unit($unit) in $region($region): '$command' - Die Einheit ist vom Kampf erschöpft."</text>
+			<text>"$unit($unit) in $region($region): '$command' - Die Einheit kann diese Runde keinen langen Befehl mehr ausführen."</text>
 		</nr>
 	</locale>
 </message>
@@ -3023,17 +3253,14 @@
 	</locale>
 </message>
 
-<message name="error227">
+<message name="error227" section="errors">
 	<type>
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
 	</type>
-	<locale name="de">
-		<nr section="errors">
-			<text>"$unit($unit) in $region($region): '$command' - Dafür braucht ein Einheit mindestens Kräuterkunde 7."</text>
-		</nr>
-	</locale>
+	<text locale="de">"$unit($unit) in $region($region): '$command' - Dafür braucht ein Einheit mindestens Kräuterkunde 7."</text>
+	<text locale="en">"$unit($unit) in $region($region): '$command' - A skill of herbalism 7 or higher is required."</text>
 </message>
 
 <message name="error228">
@@ -3842,57 +4069,160 @@
 	</locale>
 </message>
 
-<message name="error290">
-	<param name="unit" type="unit"></param>
-	<param name="region" type="region"></param>
-	<param name="command" type="string"></param>
+<message name="error290" section="errors">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
+	<text locale="de">"$unit in $region: '$command' - Eine Einheit kann nur in einem Verband Mitglied sein."</text>
+</message>
+
+<message name="error291" section="errors">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
+	<text locale="de">"$unit in $region: '$command' - Die Einheit ist in keinem Verband."</text>
+</message>
+
+<message name="error292" section="errors">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
+	<text locale="de">"$unit in $region: '$command' - Mit sich selbst kann man keinen Verband bilden."</text>
+</message>
+
+<message name="error293" section="errors">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
+	<text locale="de">"$unit in $region: '$command' - Verbände können nur zwischen Einheiten derselben Partei gebildet werden."</text>
+</message>
+
+<message name="error294" section="errors">
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	<text locale="de">"$unit in $region: '$command' - Die Einheiten müssen sich im selben Schiff oder Gebäude aufhalten."</text>
+</message>
+
+<message name="error295" section="errors">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
+	<text locale="de">"$unit in $region: '$command' - Nur ein Magier kann einen Astralkristall benutzen."</text>
+	<text locale="en">"$unit in $region: '$command' - Only mages may use an astralcrystal."</text>
+</message>
+
+<message name="error296" section="errors">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
+	<text locale="de">"$unit in $region: '$command' - Hier werden niemals Bäume wachsen."</text>
+	<text locale="en">"$unit in $region: '$command' - Trees won't grow here."</text>
+</message>
+
+<message name="error297" section="errors">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
+	<text locale="de">"$unit in $region: '$command' - Gebäude auf dem Ozean können nicht betreten werden."</text>
+	<text locale="en">"$unit in $region: '$command' - Buildings on the ocean may not be entered."</text>
+</message>
+
+<message name="error298">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
 	<locale name="de">
-		<nr section="de">
-			<text>"$unit in $region: '$command' - Eine Einheit kann nur in einem Verband Mitglied sein."</text>
+		<nr section="errors">
+			<text>"$unit($unit) in $region($region): '$command' - Der Magier hat bereits einen Klon."</text>
 		</nr>
 	</locale>
 </message>
 
-<message name="error291">
-	<param name="unit" type="unit"></param>
-	<param name="region" type="region"></param>
-	<param name="command" type="string"></param>
+<message name="error299">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
 	<locale name="de">
-		<nr section="de">
-			<text>"$unit in $region: '$command' - Die Einheit ist in keinem Verband."</text>
+		<nr section="errors">
+			<text>"$unit($unit) in $region($region): '$command' - Ungültiges Prefix."</text>
+		</nr>
+	</locale>
+	<locale name="en">
+		<nr section="errors">
+			<text>"$unit($unit) in $region($region): '$command' - invalid prefix."</text>
 		</nr>
 	</locale>
 </message>
 
-<message name="error292">
-	<param name="unit" type="unit"></param>
-	<param name="region" type="region"></param>
-	<param name="command" type="string"></param>
+<message name="error300">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
 	<locale name="de">
-		<nr section="de">
-			<text>"$unit in $region: '$command' - Mit sich selbst kann man keinen Verband bilden."</text>
+		<nr section="errors">
+			<text>"$unit($unit) in $region($region): '$command' - Ungültiges Synonym."</text>
+		</nr>
+	</locale>
+	<locale name="en">
+		<nr section="errors">
+			<text>"$unit($unit) in $region($region): '$command' - invalid synonym."</text>
 		</nr>
 	</locale>
 </message>
 
-<message name="error293">
-	<param name="unit" type="unit"></param>
-	<param name="region" type="region"></param>
-	<param name="command" type="string"></param>
+<message name="error301">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
 	<locale name="de">
-		<nr section="de">
-			<text>"$unit in $region: '$command' - Verbände können nur zwischen Einheiten derselben Partei gebildet werden."</text>
+		<nr section="errors">
+			<text>"$unit($unit) in $region($region): '$command' - Kein Synonym angegeben."</text>
+		</nr>
+	</locale>
+	<locale name="en">
+		<nr section="errors">
+			<text>"$unit($unit) in $region($region): '$command' - synonym missing."</text>
 		</nr>
 	</locale>
 </message>
 
-<message name="error294">
-	<param name="unit" type="unit"></param>
-	<param name="region" type="region"></param>
-	<param name="command" type="string"></param>
+<message name="error302">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+	</type>
 	<locale name="de">
-		<nr section="de">
-			<text>"$unit in $region: '$command' - Die Einheiten müssen sich im selben Schiff oder Gebäude aufhalten."</text>
+		<nr section="errors">
+			<text>"$unit($unit) in $region($region): '$command' - Bereits ein Synonym gesetzt."</text>
+		</nr>
+	</locale>
+	<locale name="en">
+		<nr section="errors">
+			<text>"$unit($unit) in $region($region): '$command' - synonym already set."</text>
 		</nr>
 	</locale>
 </message>
@@ -3957,7 +4287,7 @@
 	</type>
 	<locale name="de">
 		<nr section="events">
-			<text>"$unit($unit) gibt $unit($recipient) $int($amount) Dumpfbackenbrot: $discover."</text>
+			<text>"$unit($unit) gibt $unit($recipient) $int($amount) Dumpfbackenbrot: ${discover}."</text>
 		</nr>
 	</locale>
 </message>
@@ -4144,7 +4474,7 @@
 	</type>
 	<locale name="de">
 		<nr section="events">
-			<text>"$unit($unit) benutzt $resource($potion,0)."</text>
+			<text>"$unit($unit) benutzt einen $resource($potion,1)."</text>
 		</nr>
 	</locale>
 </message>
@@ -4242,6 +4572,18 @@
 		</nr>
 	</locale>
 </message>
+
+<message name="newbie_immunity_error">
+	<type>
+		<arg name="turns" type="int"></arg>
+	</type>
+	<locale name="de">
+		<nr section="events">
+			<text>"Eine Partei muß mindestens $int($turns) Wochen alt sein, bevor sie angegriffen oder bestohlen werden kann."</text>
+		</nr>
+	</locale>
+</message>
+
 
 <message name="changebanner">
 	<type>
@@ -4489,7 +4831,7 @@
 	</type>
 	<locale name="de">
 		<nr section="events">
-			<text>"$unit($unit) in $region($region) stellt fest, daß es hier $localize($amount,$locale("en")) $resource($herb,$amount) gibt."</text>
+			<text>"$unit($unit) in $region($region) stellt fest, daß es hier $localize($amount,$locale("de")) $resource($herb,$amount) gibt."</text>
 		</nr>
 	</locale>
 	<locale name="en">
@@ -4823,11 +5165,11 @@
 	<type>
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
-		<arg name="faction" type="faction"></arg>
+		<arg name="guard" type="unit"></arg>
 	</type>
 	<locale name="de">
 		<nr section="movement">
-			<text>"$unit($unit) wurde in $region($region) von $faction($faction) aufgehalten."</text>
+			<text>"$unit($unit) wurde in $region($region) von $unit($guard) aufgehalten."</text>
 		</nr>
 	</locale>
 </message>
@@ -5157,7 +5499,7 @@
 	</type>
 	<locale name="de">
 		<nr section="economy">
-			<text>"$unit($unit) verdient in $region($region) $int($amount)$if($eq($wanted,$amount),""," statt $int($wanted)") Silber."</text>
+			<text>"$unit($unit) verdient$if($eq($mode,4)," am Handel","") in $region($region) $int($amount)$if($eq($wanted,$amount),""," statt $int($wanted)") Silber$if($eq($mode,1)," durch Unterhaltung",$if($eq($mode,2)," durch Steuern",$if($eq($mode,3)," durch Handel".$if($eq($mode,5)," durch Diebstahl",$if($eq($mode,6)," durch Zauberei","")))))."</text>
 		</nr>
 	</locale>
 	<locale name="en">
@@ -5340,6 +5682,14 @@
 	</locale>
 </message>
 
+<message name="maintenance_late" section="economy">
+	<type>
+		<arg name="building" type="building"></arg>
+	</type>
+	<text locale="de">"Der Unterhalt von $building($building) konnte nur verspätet gezahlt werden, das Gebäude war diese Woche nicht funktionstüchtig."</text>
+	<text locale="en">"The upkeep for $building($building) was paid late, the building was not operational this week."</text>
+</message>
+
 <message name="maintenancefail">
 	<type>
 		<arg name="unit" type="unit"></arg>
@@ -5377,17 +5727,13 @@
 	</locale>
 </message>
 
-<message name="buyamount">
+<message name="buyamount" section="economy">
 	<type>
 		<arg name="unit" type="unit"></arg>
 		<arg name="amount" type="int"></arg>
 		<arg name="resource" type="resource"></arg>
 	</type>
-	<locale name="de">
-		<nr section="economy">
-			<text>"$unit($unit) kauft $int($amount) $resource($resource,$amount)."</text>
-		</nr>
-	</locale>
+	<text locale="de">"$unit($unit) kauft $int($amount) $resource($resource,$amount)."</text>
 </message>
 
 <message name="sellamount">
@@ -5503,6 +5849,20 @@
 	</locale>
 </message>
 
+<message name="regionmagic_patzer">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+		<arg name="unit" type="unit"></arg>
+	</type>
+	<locale name="de">
+		<nr section="magic">
+			<text>"$unit($unit) in $region($region): '$command' - $unit($unit) gelingt es zwar die Region zu verzaubern, aber irgendwas ging schief"</text>
+		</nr>
+	</locale>
+</message>
+
 <message name="objmagic_effect">
 	<type>
 		<arg name="unit" type="unit"></arg>
@@ -5577,7 +5937,7 @@
 	</type>
 	<locale name="de">
 		<nr section="magic">
-			<text>"$unit($mage) erleidet einen Schock $reason."</text>
+			<text>"$unit($mage) erleidet einen Schock ${reason}."</text>
 		</nr>
 	</locale>
 </message>
@@ -5587,11 +5947,11 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="id" type="int36"></arg>
+		<arg name="id" type="string"></arg>
 	</type>
 	<locale name="de">
 		<nr section="magic">
-			<text>"$unit($unit) in $region($region): '$command' - Einheit $int36($id) wurde nicht gefunden."</text>
+			<text>"$unit($unit) in $region($region): '$command' - Einheit $id wurde nicht gefunden."</text>
 		</nr>
 	</locale>
 </message>
@@ -5601,7 +5961,7 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="id" type="int36"></arg>
+		<arg name="id" type="int"></arg>
 	</type>
 	<locale name="de">
 		<nr section="magic">
@@ -5615,7 +5975,7 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="id" type="int36"></arg>
+		<arg name="id" type="int"></arg>
 	</type>
 	<locale name="de">
 		<nr section="magic">
@@ -5629,11 +5989,11 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="id" type="int36"></arg>
+		<arg name="id" type="int"></arg>
 	</type>
 	<locale name="de">
 		<nr section="magic">
-			<text>"$unit($unit) in $region($region): '$command' - Einheit $int36($id) widersteht dem Zauber."</text>
+			<text>"$unit($unit) in $region($region): '$command' - Einheit $int36(id) widersteht dem Zauber."</text>
 		</nr>
 	</locale>
 </message>
@@ -5643,7 +6003,7 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="id" type="int36"></arg>
+		<arg name="id" type="int"></arg>
 	</type>
 	<locale name="de">
 		<nr section="magic">
@@ -5657,7 +6017,7 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="id" type="int36"></arg>
+		<arg name="id" type="int"></arg>
 	</type>
 	<locale name="de">
 		<nr section="magic">
@@ -6118,11 +6478,11 @@
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
 		<arg name="succ" type="string"></arg>
-		<arg name="target" type="unit"></arg>
+		<arg name="target" type="string"></arg>
 	</type>
 	<locale name="de">
 		<nr section="magic">
-			<text>"$unit($unit) in $region($region): '$command' - Der Magier zerstört $succ Flüche auf $unit($target)."</text>
+			<text>"$unit($unit) in $region($region): '$command' - Der Magier zerstört $succ Flüche auf $target."</text>
 		</nr>
 	</locale>
 </message>
@@ -6311,6 +6671,7 @@
 	<type>
 		<arg name="mage" type="unit"></arg>
 		<arg name="target" type="unit"></arg>
+		<arg name="targetrace" type="string"></arg>
 	</type>
 	<locale name="de">
 		<nr section="magic">
@@ -6323,12 +6684,12 @@
 	<type>
 		<arg name="mage" type="unit"></arg>
 		<arg name="amount" type="int"></arg>
-		<arg name="race" type="race"></arg>
+		<arg name="race" type="string"></arg>
 		<arg name="target" type="unit"></arg>
 	</type>
 	<locale name="de">
 		<nr section="magic">
-			<text>"$unit($mage) verwandelt $int($amount) $race($race,$amount) aus $unit($target)."</text>
+			<text>"$unit($mage) verwandelt $int($amount) aus $unit($target)."</text>
 		</nr>
 	</locale>
 </message>
@@ -6349,7 +6710,6 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="unit" type="unit"></arg>
 		<arg name="amount" type="int"></arg>
 	</type>
 	<locale name="de">
@@ -6359,31 +6719,24 @@
 	</locale>
 </message>
 
-<message name="msg_battle">
+<message name="msg_battle" section="battle">
 	<type>
 		<arg name="string" type="string"></arg>
 	</type>
-	<locale name="de">
-		<nr section="battle">
-			<text>"$string"</text>
-		</nr>
-	</locale>
+	<text locale="de">"$string"</text>
 </message>
 
-<message name="killsandhits">
+<message name="killsandhits" section="battle">
 	<type>
 		<arg name="unit" type="unit"></arg>
 		<arg name="hits" type="int"></arg>
 		<arg name="kills" type="int"></arg>
 	</type>
-	<locale name="de">
-		<nr section="battle">
-			<text>"$unit($unit) erzielte $int($hits) Treffer und tötete $int($kills) Gegner."</text>
-		</nr>
-	</locale>
+	<text locale="de">"$unit($unit) erzielte $int($hits) Treffer und tötete $int($kills) Gegner."</text>
+	<text locale="en">"$unit($unit) hit $int($hits) times and killed int($kills) enemies."</text>
 </message>
 
-<message name="casualties">
+<message name="casualties" section="battle">
 	<type>
 		<arg name="unit" type="unit"></arg>
 		<arg name="fallen" type="int"></arg>
@@ -6391,11 +6744,7 @@
 		<arg name="run" type="int"></arg>
 		<arg name="runto" type="region"></arg>
 	</type>
-	<locale name="de">
-		<nr section="battle">
-			<text>"$unit($unit) verlor $int($fallen) Personen, $int($alive) überlebten und $int($run) flohen nach $region($runto)."</text>
-		</nr>
-	</locale>
+	<text locale="de">"$unit($unit) verlor $int($fallen) Personen$if($alive,", $int($alive) überlebten","")$if($run," und $int($run) flohen nach $region($runto)","")."</text>
 </message>
 
 <message name="new_fspecial">
@@ -6404,7 +6753,7 @@
 	</type>
 	<locale name="de">
 		<nr section="events">
-			<text>"Die Götter gewähren uns die Kraft eines $special."</text>
+			<text>"Die Götter gewähren uns die Kraft eines ${special}."</text>
 		</nr>
 	</locale>
 </message>
@@ -6495,6 +6844,17 @@
 	<locale name="de">
 		<nr section="events">
 			<text>"Der Gletscher von $region($region) bricht und treibt davon."</text>
+		</nr>
+	</locale>
+</message>
+
+<message name="iceberg_melt">
+	<type>
+		<arg name="region" type="region"></arg>
+	</type>
+	<locale name="de">
+		<nr section="events">
+			<text>"Der Eisberg $region($region) schmilzt."</text>
 		</nr>
 	</locale>
 </message>
@@ -6763,6 +7123,145 @@
 			<text>"$unit($unit) in $region($region): '$command' - A faction must be at least $int($age) weeks old before you can steal from it."</text>
 		</nr>
 	</locale>
+</message>
+
+<message name="manacrystal_use">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="aura" type="int"></arg>
+	</type>
+	<locale name="de">
+		<nr section="events">
+			<text>"$unit($unit) benutzt einen Astralkristall und gewinnt $int($aura) Aura hinzu."</text>
+		</nr>
+	</locale>
+	<locale name="en">
+		<nr section="events">
+			<text>"$unit($unit) uses an astralcrystal and gains $int($aura) aura."</text>
+		</nr>
+	</locale>
+</message>
+
+<message name="skillpotion_use">
+	<type>
+		<arg name="unit" type="unit"></arg>
+	</type>
+	<locale name="de">
+		<nr section="events">
+			<text>"$unit($unit) benutzt einen Talenttrunk und fühlt, wie sein Wissen zunimmt."</text>
+		</nr>
+	</locale>
+	<locale name="en">
+		<nr section="events">
+			<text>"$unit($unit) uses a potion of skills and feels his knowledge grow."</text>
+		</nr>
+	</locale>
+</message>
+
+<message name="godcurse_destroy_ship">
+	<type>
+		<arg name="ship" type="ship"></arg>
+	</type>
+	<locale name="de">
+		<nr section="events">
+			<text>"Die Mannschaft krank vom vergifteten Wasser, Planken, Ruder und Segel zerfressen von den Wassern des verfluchten Meeres, ergibt sich die $ship($ship) in ihr Schicksal und sinkt."</text>
+		</nr>
+	</locale>
+	<locale name="en">
+		<nr section="events">
+			<text>"The sailors sick due to the poisened ocean, planks, rudder und sails corroded by the waters of the cursed ocean, the $ship($ship) finally succumbs to her destiny and sinks."</text>
+		</nr>
+	</locale>
+</message>
+
+<message name="newbie_password">
+	<type>
+		<arg name="password" type="string"></arg>
+	</type>
+	<text locale="de">"Dein Passwort lautet ${password}."</text>
+	<text locale="en">"Your password is ${password}."</text>
+</message>
+
+<message name="nr_vicinitystart">
+	<type>
+		<arg name="dir" type="int"></arg>
+		<arg name="region" type="region"></arg>
+	</type>
+	<text locale="de">"Im $direction($dir) der Region liegt $trail($region,$locale("de"))"</text>
+	<text locale="en">"To the $direction($dir) lies $trail($region,$locale("en"))"</text>
+</message>
+
+<message name="nr_score">
+	<type>
+		<arg name="score" type="int"></arg>
+		<arg name="average" type="int"></arg>
+	</type>
+	<text locale="de">"Deine Partei hat $int($score) Punkte. Der Durchschnitt für Parteien ähnlichen Alters ist $int($average) Punkte."</text>
+	<text locale="en">"Your faction has a score of $int($score). The average score for similar factions is $int($average)."</text>
+</message>
+
+<message name="nr_population">
+	<type>
+		<arg name="population" type="int"></arg>
+		<arg name="units" type="int"></arg>
+	</type>
+	<text locale="de">"Deine Partei hat $int($population) Personen in $int($units) Einheiten."</text>
+	<text locale="en">"Your faction has $int($population) people in $int($units) units."</text>
+</message>
+
+<message name="travelthru_trail">
+	<type>
+		<arg name="region" type="region"></arg>
+	</type>
+	<text locale="de">$trail($region,$locale("de"))</text>
+	<text locale="en">$trail($region,$locale("en"))</text>
+</message>
+
+<message name="build_required" section="errors">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+		<arg name="required" type="string"></arg>
+	</type>
+	<text locale="de">"$unit($unit) in $region($region): '$command' - Dafür braucht die Einheit${required}."</text>
+	<text locale="en">"$unit($unit) in $region($region): '$command' -$required is required to build this."</text>
+</message>
+
+<message name="teach_nolearn" section="errors">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+		<arg name="student" type="unit"></arg>
+	</type>
+	<text locale="de">"$unit($unit) in $region($region): '$command' - $unit($student) lernt nicht."</text>
+	<text locale="en">"$unit($unit) in $region($region): '$command' - $unit($student) is not learning."</text>
+</message>
+
+<message name="teach_asgood" section="errors">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+		<arg name="student" type="unit"></arg>
+	</type>
+	<text locale="de">"$unit($unit) in $region($region): '$command' - $unit($student) ist mindestens gleich gut wie wir."</text>
+	<text locale="en">"$unit($unit) in $region($region): '$command' - $unit($student) is at least as good as we are."</text>
+</message>
+
+<message name="battle_spacer" section="battle">
+	<text locale="de">" "</text>
+	<text locale="en">" "</text>
+</message>
+
+<message name="battle_critical" section="battle">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="index" type="int"></arg>
+	</type>
+	<text locale="de">"$int36(${unit}.id($unit))/$int($index) erzielt einen kritischen Treffer."</text>
+	<text locale="en">"$int36(${unit}.id($unit))/$int($index) does critical damage"</text>
 </message>
 
 

@@ -155,12 +155,12 @@ fix_skills(void)
 /* make sure that this is done only once! */
 #define do_once(magic, fun) \
 { \
-	attrib * a = find_key(global.attribs, (magic)); \
+	attrib * a = find_key(global.attribs, atoi36(magic)); \
 	if (a) { \
-		log_warning(("[do_once] a unique fix %d=\"%s\" was called a second time\n", magic, itoa36(magic))); \
+		log_warning(("[do_once] a unique fix %d=\"%s\" was called a second time\n", atoi36(magic), magic)); \
 	} else { \
 		(fun); \
-		a_add(&global.attribs, make_key(magic)); \
+		a_add(&global.attribs, make_key(atoi36(magic))); \
 	} \
 }
 #if 0
@@ -562,7 +562,7 @@ fix_regions(void) {
 			rsetpeasants(r, 0);
 			rsettrees(r, 0);
 			for (u=r->units;u;u=u->next)
-				if (humanoid(u) && u->ship==NULL) set_number(u, 0);
+				if (!race[u->race].nonplayer && u->ship==NULL) set_number(u, 0);
 		}
 	}
 }
@@ -975,8 +975,11 @@ show_newspells(void)
 	/* Alle geänderten Zauber in das array newspellids[]. mit SPL_NOSPELL
 	 * terminieren */
 
-	spellid_t newspellids[] = { 
-			SPL_NOSPELL };
+	spellid_t newspellids[] = {
+		SPL_ARTEFAKT_CHASTITYBELT,
+	  SPL_CLONECOPY,
+		SPL_SPARKLE_DREAM,
+		SPL_NOSPELL };
 
 	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]
 	 * abgelegt */
@@ -1231,9 +1234,10 @@ recurse_regions(region * r, regionlist **rlist, boolean(*fun)(const region * r))
 	}
 }
 
-static int maxluxuries = 0;
 
 #if 0
+static int maxluxuries = 0;
+
 static boolean
 f_nolux(const region * r)
 {
@@ -1317,19 +1321,61 @@ fix_demand_region(region *r)
 }
 #endif
 
+static void
+fix_firewalls(void)
+{
+	region * r = regions;
+	while (r) {
+		direction_t d;
+		for (d=0;d!=MAXDIRECTIONS;++d) {
+			region * r2 = rconnect(r, d);
+			if (r2) {
+				border * b = get_borders(r, r2);
+				while (b) {
+					if (b->type==&bt_firewall) {
+						attrib * a = a_find(b->attribs, &at_countdown);
+						if (a==NULL || a->data.i <= 0) {
+							erase_border(b);
+							log_warning(("firewall between regions %s and %s was bugged. removed.\n",
+								regionid(r), regionid(r2)));
+							b = get_borders(r, r2);
+						} else {
+							b = b->next;
+						}
+					} else {
+						b = b->next;
+					}
+				}
+			}
+		}
+		r = r->next;
+	}
+}
+
 extern attrib * make_atgmcreate(const struct item_type * itype);
 extern attrib * make_atpermissions(void);
 extern struct attrib_type at_permissions;
+extern struct attrib_type at_gmcreate;
+
 
 static void
 update_gms(void)
 {
 	faction * f;
 	for (f=factions;f;f=f->next) {
-		attrib * a = a_find(f->attribs, &at_permissions);
-		if (a) {
-			if (!find_key((attrib*)a->data.v, atoi36("gmgate"))) {
-				a_add((attrib**)&a->data.v, make_key(atoi36("gmgate")));
+		attrib * permissions = a_find(f->attribs, &at_permissions);
+		if (permissions) {
+			item_t i;
+			if (!find_key((attrib*)permissions->data.v, atoi36("gmgate"))) {
+				a_add((attrib**)&permissions->data.v, make_key(atoi36("gmgate")));
+			}
+			if (!find_key((attrib*)permissions->data.v, atoi36("gmmsgr"))) {
+				a_add((attrib**)&permissions->data.v, make_key(atoi36("gmmsgr")));
+			}
+			for (i=I_GREATSWORD;i!=I_KEKS;++i) {
+				attrib * a = a_find(permissions, &at_gmcreate);
+				while (a && a->data.v!=(void*)olditemtype[i]) a=a->nexttype;
+				if (!a) a_add((attrib**)&permissions->data.v, make_atgmcreate(olditemtype[i]));
 			}
 		}
 	}
@@ -1878,7 +1924,6 @@ undo_deadpeasants(void)
 		r = r->next;
 	}
 }
-#endif
 
 static void
 fix_undead3percent(void)
@@ -1891,7 +1936,6 @@ fix_undead3percent(void)
 	}
 }
 
-#if 0
 static void
 fix_targetregion_resolve(void)
 {
@@ -1906,7 +1950,6 @@ fix_targetregion_resolve(void)
 		}
 	}
 }
-#endif
 
 static void
 fix_herbs(void)
@@ -1976,6 +2019,7 @@ fix_herbs(void)
 		fprintf(stderr, "%s : %d\n", locale_string(NULL, resourcename(htypes[i]->itype->rtype, 0)), herbs[i]);
 	}
 }
+#endif
 
 
 #include <event.h>
@@ -2018,6 +2062,7 @@ get_timeout(trigger * td, trigger * tfind)
 	return t;
 }
 
+#if 0
 static void
 fix_timeouts(void)
 {
@@ -2079,39 +2124,24 @@ fix_timeouts(void)
 		}
 	}
 }
+#endif
 
 #include <modules/gmcmd.h>
 static void
 update_gmquests(void)
 {
-	struct faction * f;
-
-	/* Isilpetz wil keine Orks */
-	f = findfaction(atoi36("gm00"));
-	while (f && (strstr(f->name, "gelsen")==0 || find_key(f->attribs, atoi36("quest")))) f = f->next; /* Isilpetz finden */
+	/* gm04 will keine Orks */
+	faction * f = findfaction(atoi36("gm04"));
 	if (f) {
 		unit * u = f->units;
-		plane * p = rplane(u->region);
-		p->flags |= PFL_NOORCGROWTH;
+		if (u!=NULL) {
+			plane * p = rplane(u->region);
+			if (p!=NULL) p->flags |= PFL_NOORCGROWTH;
+		}
 	}
-
-	/* neue gm commands */
-	/* alle muessen noch ein gm:take kriegen */
-	for (f=factions;f;f=f->next) {
-		attrib * a;
-		if (!find_key(f->attribs, atoi36("quest"))) continue;
-		a = a_find(f->attribs, &at_permissions);
-		assert(a || !"gm-partei ohne permissions!");
-		if (!find_key((attrib*)a->data.v, atoi36("gmtake")))
-			a_add((attrib**)&a->data.v, make_key(atoi36("gmtake")));
-	}
-/*
- * f = gm_addquest("BigBear@nord-com.net", "Leonidas Vermächtnis", 15, PFL_NOMAGIC|PFL_NOSTEALTH);
- * log_printf("Neue Questenpartei %s\n", factionname(f));
- */
-
 }
 
+#if 0
 static void
 test_gmquest(void)
 {
@@ -2131,16 +2161,17 @@ test_gmquest(void)
 
 	 f = gm_addquest("feeron@aol.com", "Eternath", 11, 0);
 	 log_printf("Neue Questenpartei %s\n", factionname(f));
- 
+
 	 f = gm_addquest("BigBear@nord-com.net", "Leonidas Vermächtnis", 15, PFL_NOMAGIC|PFL_NOSTEALTH);
 	 log_printf("Neue Questenpartei %s\n", factionname(f));
 
 }
+#endif
 
 #define TEST_LOCALES 0
 #if TEST_LOCALES
 static void
-setup_locales(void) 
+setup_locales(void)
 {
 	locale * lang = find_locale("en");
 	faction * f = factions;
@@ -2181,7 +2212,7 @@ fix_unitrefs(void)
 								tkillunit = tkillunit->next;
 							}
 							if (tkillunit && !tkillunit->data.v) {
-								log_warning(("killunit-trigger für Magier %s und Vertrauten %s restauriert.\n", 
+								log_warning(("killunit-trigger für Magier %s und Vertrauten %s restauriert.\n",
 									itoa36(u->no), itoa36(ufamiliar->no)));
 								tkillunit->data.v = ufamiliar;
 							}
@@ -2205,7 +2236,7 @@ fix_unitrefs(void)
 								tshockunit = tshockunit->next;
 							}
 							if (tshockunit && !tshockunit->data.v) {
-								log_warning(("shockunit-trigger für Magier %s und Vertrauten %s restauriert.\n", 
+								log_warning(("shockunit-trigger für Magier %s und Vertrauten %s restauriert.\n",
 									itoa36(u->no), itoa36(ufamiliar->no)));
 								tshockunit->data.v = u;
 							}
@@ -2218,7 +2249,7 @@ fix_unitrefs(void)
 					}
 
 				} else {
-					log_error(("Magier %s hat ein at_familiar, aber keinen Vertrauten.\n", 
+					log_error(("Magier %s hat ein at_familiar, aber keinen Vertrauten.\n",
 						itoa36(u->no)));
 				}
 			}
@@ -2228,6 +2259,46 @@ fix_unitrefs(void)
 	}
 }
 
+static void
+update_igjarjuk_quest(void)
+{
+	unit * u;
+	faction *f = findfaction(atoi36("rr"));
+
+	if (!f) return;
+	for (u=f->units;u;u=u->nextF) {
+		u->race = RC_TEMPLATE;
+	}
+}
+
+#ifdef NEW_RESOURCEGROWTH
+static void
+new_resourcegrowth(void)
+{
+	region *r;
+	attrib *a;
+
+	for(r=regions;r;r=r->next) {
+
+		/* Iron */
+		if(rterrain(r) == T_MOUNTAIN) {
+			a_add(&r->attribs, a_new(&at_iron))->data.i = 25;
+		} else if(rterrain(r) == T_GLACIER || rterrain(r) == T_ICEBERG_SLEEP) {
+			a_add(&r->attribs, a_new(&at_iron))->data.i = 2;
+		}
+		/* Laen */
+		if(rterrain(r) == T_MOUNTAIN) {
+			a = a_find(r->attribs, &at_laen);
+			if(a) a->data.i = 6;
+		}
+		/* Stone */
+		if(terrain[rterrain(r)].quarries > 0) {
+			a_add(&r->attribs, a_new(&at_stone))->data.i = terrain[rterrain(r)].quarries;
+		}
+	}
+}
+#endif
+
 void
 korrektur(void)
 {
@@ -2235,6 +2306,7 @@ korrektur(void)
 	setup_locales();
 #endif
 
+	fix_firewalls();
 #ifdef TEST_GM_COMMANDS
 	setup_gm_faction();
 #endif
@@ -2245,12 +2317,8 @@ korrektur(void)
 	convert_triggers();
 #endif
 	fix_migrants();
+	update_igjarjuk_quest();
 	fix_allies();
-	do_once(atoi36("ud3p"), fix_undead3percent());
-	do_once(atoi36("fhrb"), fix_herbs());
-	do_once(atoi36("ftos"), fix_timeouts());
-	do_once(atoi36("fixsl"), fix_prices());
-	do_once(atoi36("gmtst"), test_gmquest()); /* test gm quests */
 	update_gmquests(); /* test gm quests */
 	fix_unitrefs();
 #ifndef SKILLFIX_SAVE
@@ -2296,7 +2364,20 @@ korrektur(void)
 		break;
 	}
 
-        /* trade_orders(); */
+#ifdef NEW_RESOURCEGROWTH
+	do_once("rgrw", new_resourcegrowth());
+#endif
+
+	{
+		/* Test der Message-Funktion. Ist leider noch nicht
+		 * Plane-übergreifend, deshalb die Waldelfen. */
+		faction *f = findfaction(atoi36("1"));
+		attrib *permission = a_find(f->attribs, &at_permissions);
+		if(!permission) permission = a_add(&f->attribs, a_new(&at_permissions));
+		a_add((attrib**)&permission->data.v, make_key(atoi36("gmmsgr")));
+	}
+
+  /* trade_orders(); */
 	if (global.data_version < NEWROAD_VERSION) {
 		newroads();
 	}

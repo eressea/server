@@ -24,6 +24,7 @@
 #include <building.h>
 #include <faction.h>
 #include <item.h>
+#include <message.h>
 #include <plane.h>
 #include <region.h>
 #include <terrain.h>
@@ -94,7 +95,7 @@ read_gmcreate(attrib * a, FILE * F)
 }
 
 /* at_gmcreate specifies that the owner can create items of a particular type */
-static attrib_type at_gmcreate = {
+attrib_type at_gmcreate = {
 	"GM:create",
 	NULL, NULL, NULL,
 	write_gmcreate, read_gmcreate
@@ -121,11 +122,23 @@ gm_create(const char * str, void * data, const char * cmd)
 	if (i>0) {
 		char * iname = getstrtoken();
 		const item_type * itype = finditemtype(iname, u->faction->locale);
-		attrib * a = a_find(permissions, &at_gmcreate);
+		if (itype==NULL) {
+			mistake(u, cmd, "Unbekannter Gegenstand.\n", 0);
+		} else {
+			attrib * a = a_find(permissions, &at_gmcreate);
 
-		while (a && a->data.v!=(void*)itype) a=a->nexttype;
-		if (a) i_change(&u->items, itype, i);
+			while (a && a->data.v!=(void*)itype) a=a->nexttype;
+			if (a) i_change(&u->items, itype, i);
+			else mistake(u, cmd, "Diesen Gegenstand darf deine Partei nicht machen.\n", 0);
+		}
 	}
+}
+
+static boolean
+has_permission(const attrib * permissions, unsigned int key)
+{
+	return (find_key((attrib*)permissions->data.v, key) ||
+		find_key((attrib*)permissions->data.v, atoi36("master")));
 }
 
 /**
@@ -148,8 +161,7 @@ gm_gate(const char * str, void * data, const char * cmd)
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
-		if (!permissions || !find_key((attrib*)permissions->data.v, atoi36("gmgate"))) return;
-		else {
+		if (permissions && has_permission(permissions, atoi36("gmgate"))) {
 			add_trigger(&u->attribs, "timer", trigger_gate(b, r));
 		}
 	}
@@ -176,7 +188,7 @@ gm_terraform(const char * str, void * data, const char * cmd)
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
-		if (!permissions || !find_key((attrib*)permissions->data.v, atoi36("gmterf"))) return;
+		if (!permissions || !has_permission(permissions, atoi36("gmterf"))) return;
 	}
 	for (t=0;t!=MAXTERRAINS;++t) {
 		if (!strcasecmp(locale_string(u->faction->locale, terrain[t].name), c)) break;
@@ -207,10 +219,38 @@ gm_teleport(const char * str, void * data, const char * cmd)
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
-		if (!permissions || !find_key((attrib*)permissions->data.v, atoi36("gmtele"))) {
+		if (!permissions || !has_permission(permissions, atoi36("gmtele"))) {
 			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else move_unit(to, r, NULL);
+	}
+}
+
+/**
+ ** GM: MESSAGE <x> <y> <string>
+ ** requires: permission-key "gmmsgr"
+ **/
+static void
+gm_messageregion(const char * str, void * data, const char * cmd)
+{
+	unit * u = (unit*)data;
+	const struct plane * p = rplane(u->region);
+	int x = rel_to_abs(p, u->faction, atoi(igetstrtoken(str)), 0);
+	int y = rel_to_abs(p, u->faction, atoi(getstrtoken()), 1);
+	const char * msg = getstrtoken();
+	region * r = findregion(x, y);
+
+	if (r==NULL || p!=rplane(r)) {
+		mistake(u, cmd, "In diese Region kann keine Nachricht gesandt werden.\n", 0);
+	} else {
+		/* checking permissions */
+		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
+		if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
+			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+		}
+		else {
+			add_message(&r->msgs, msg_message("msg_event", "string", msg));
+		}
 	}
 }
 
@@ -235,7 +275,7 @@ gm_give(const char * str, void * data, const char * cmd)
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
-		if (!permissions || !find_key((attrib*)permissions->data.v, atoi36("gmgive"))) {
+		if (!permissions || !has_permission(permissions, atoi36("gmgive"))) {
 			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
@@ -270,7 +310,7 @@ gm_take(const char * str, void * data, const char * cmd)
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
-		if (!permissions || !find_key((attrib*)permissions->data.v, atoi36("gmtake"))) {
+		if (!permissions || !has_permission(permissions, atoi36("gmtake"))) {
 			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
@@ -308,7 +348,7 @@ gm_skill(const char * str, void * data, const char * cmd)
 	} else {
 		/* checking permissions */
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
-		if (!permissions || !find_key((attrib*)permissions->data.v, atoi36("gmskil"))) {
+		if (!permissions || !has_permission(permissions, atoi36("gmskil"))) {
 			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
@@ -339,6 +379,7 @@ init_gmcmd(void)
 	add_command(&g_keys, &g_cmds, "take", &gm_take);
 	add_command(&g_keys, &g_cmds, "teleport", &gm_teleport);
 	add_command(&g_keys, &g_cmds, "skill", &gm_skill);
+	add_command(&g_keys, &g_cmds, "message", &gm_messageregion);
 }
 
 /*
@@ -443,10 +484,14 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmgive")));
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmskil")));
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmtake")));
+	a_add((attrib**)&a->data.v, make_key(atoi36("gmmsgr")));
 
 	a_add((attrib**)&a->data.v, make_atgmcreate(resource2item(r_silver)));
 
 	for (i=0;i<=I_INCENSE;++i) {
+		a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
+	}
+	for (i=I_GREATSWORD;i!=I_KEKS;++i) {
 		a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
 	}
 

@@ -72,6 +72,7 @@ int ParteiListe(void);
 int koor_distance(int a, int b, int x, int y);
 int readgame(boolean backup);
 int create_backup(char *file);
+void SpecialFunction(struct region *r);
 
 extern WINDOW *mywin;
 extern dbllist *reglist;

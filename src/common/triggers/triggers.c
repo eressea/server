@@ -36,6 +36,7 @@
 #include <triggers/shock.h>
 #include <triggers/timeout.h>
 #include <triggers/unitmessage.h>
+#include <triggers/clonedied.h>
 
 /* util includes */
 #include <event.h>
@@ -58,4 +59,5 @@ init_triggers(void)
 	tt_register(&tt_shock);
 	tt_register(&tt_unitmessage);
 	tt_register(&tt_timeout);
+	tt_register(&tt_clonedied);
 }

@@ -18,6 +18,7 @@
 
 /* kernel includes */
 #include <region.h>
+#include <faction.h>
 
 /* util includes */
 #include <attrib.h>
@@ -35,11 +36,6 @@ typedef struct namehash {
 namehash names[NMAXHASH];
 
 void nhash(const char * name);
-
-typedef struct faction_list {
-	struct faction_list * next;
-	struct faction * f;
-} faction_list;
 
 typedef struct name {
 	struct name * next;
@@ -68,7 +64,7 @@ oceanname(const struct region * r, const struct faction * f)
 		while (names) {
 			faction_list * fl = names->factions;
 			while (fl) {
-				if (fl->f==f) return names->name;
+				if (fl->data==f) return names->name;
 				fl=fl->next;
 			}
 			names = names->next;
@@ -89,7 +85,7 @@ nameocean(struct region *r, struct faction * f, const char * newname)
 		while ((names && (!newf && newname)) || !oldf) {
 			faction_list ** fli = &names->factions;
 			if (oldf==NULL) while (*fli) {
-				if ((*fli)->f==f) {
+				if ((*fli)->data==f) {
 					oldf = fli;
 					break;
 				}
@@ -109,13 +105,13 @@ nameocean(struct region *r, struct faction * f, const char * newname)
 		}
 
 		if (newf) {
-			fl->f = f;
+			fl->data = f;
 			fl->next = *newf;
 			*newf = fl;
 		} else if (newname) {
 			name * nm = calloc(1, sizeof(name));
 			nm->factions = fl;
-			fl->f = f;
+			fl->data = f;
 			fl->next = NULL;
 			nm->next = (name*)a->data.v;
 			a->data.v = nm;

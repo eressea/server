@@ -94,7 +94,7 @@ static struct vartype {
 	{ "direction", "direction" },
 	{ "dir", "direction" },
 
-	{ "id", "int36" },
+	{ "id", "int" },
 	{ NULL, NULL }
 };
 

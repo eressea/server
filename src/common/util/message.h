@@ -9,7 +9,8 @@
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
 */
-
+#ifndef UTIL_MESSAGE_H
+#define UTIL_MESSAGE_H
 struct locale;
 
 typedef struct message_type {
@@ -43,3 +44,4 @@ extern const char * mt_name(const struct message_type* mtype);
 /** message_type registry (optional): **/
 extern const struct message_type * mt_register(const struct message_type *);
 extern const struct message_type * mt_find(const char *);
+#endif

@@ -14,6 +14,7 @@
 
 #include <config.h>
 #include <curses.h>
+#include <ctype.h>
 #include <eressea.h>
 #include "mapper.h"
 
@@ -25,6 +26,7 @@
 #include <region.h>
 #include <ship.h>
 #include <unit.h>
+#include <curse.h>
 
 /* util includes */
 #include <base36.h>
@@ -133,6 +135,31 @@ DisplayRegList(int neu)
 	refresh();
 }
 
+void
+SpecialFunction(region *r)
+{
+	WINDOW *win;
+
+	win = openwin(60, 5, "< Specials Regions >");
+	wmove(win, 1, 2);
+	wAddstr("1 - set Godcurse");
+	wmove(win, 2, 2);
+	wrefresh(win);
+	switch(getch()) {
+	case '1':
+		if(!is_cursed_internal(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+			create_curse(NULL, &r->attribs, C_CURSED_BY_THE_GODS, 0,
+				100, 100, 0, 0);
+			set_curseflag(r->attribs, C_CURSED_BY_THE_GODS, 0, CURSE_ISNEW|CURSE_IMMUN);
+			modified = 1;
+			break;
+		}
+	default:
+		break;
+	}
+	delwin(win);
+}
+
 char Tchar[MAXRACES] = "ZEOGMTDIHK~uifdwtbrsz";
 
 void
@@ -172,7 +199,7 @@ showregion(region * r, char full)
 			sncat(buf, "Bäume", BUFSIZE);
 		adddbllist(&reglist, buf);
 
-		if (r->terrain == T_MOUNTAIN || r->terrain == T_GLACIER) {
+		if (riron(r) > 0 || rlaen(r) > 0) {
 			sprintf(buf, " %d Eisen, %d Laen", riron(r), rlaen(r));
 			adddbllist(&reglist, buf);
 		}

@@ -22,16 +22,18 @@
 #include "reports.h"
 
 /* kernel includes */
+#include "building.h"
+#include "faction.h"
+#include "group.h"
+#include "item.h"
+#include "karma.h"
+#include "magic.h"
+#include "race.h"
+#include "region.h"
+#include "ship.h"
 #include "skill.h"
 #include "unit.h"
-#include "item.h"
-#include "group.h"
-#include "faction.h"
-#include "building.h"
-#include "karma.h"
-#include "ship.h"
-#include "race.h"
-#include "magic.h"
+#include "plane.h"
 #ifdef USE_UGROUPS
 # include "ugroup.h"
 #endif
@@ -71,7 +73,7 @@ const char *coasts[MAXDIRECTIONS] =
 	"Westküste"
 };
 
-const char * 
+const char *
 reportpath(void)
 {
 	static char zText[MAX_PATH];
@@ -90,36 +92,23 @@ groupid(const struct group * g, const struct faction * f)
 	return buf;
 }
 
-
-char *
-report_kampfstatus(const unit * u)
+static const char *
+report_kampfstatus(const unit * u, const struct locale * lang)
 {
 	static char fsbuf[64];
+	static const char * azstatus[] = {
+		"status_aggressive", "status_front",
+		"status_rear", "status_defensive",
+		"status_avoid", "status_flee" };
 
-	switch (u->status) {
-	case ST_FIGHT:
-		strcpy(fsbuf, ", vorne");
-		break;
-
-	case ST_BEHIND:
-		strcpy(fsbuf, ", hinten");
-		break;
-
-	case ST_AVOID:
-		strcpy(fsbuf, ", kämpft nicht");
-		break;
-
-	case ST_FLEE:
-		strcpy(fsbuf, ", flieht");
-		break;
-
-	default:
-		strcpy(fsbuf, ", unbekannt");
-		break;
-	}
+	strcpy(fsbuf, LOC(lang, azstatus[u->status]));
 #ifdef NOAID
-	if(fval(u, FL_NOAID)) strcat(fsbuf, ", bekommt keine Hilfe");
+	if(fval(u, FL_NOAID)) {
+		strcat(fsbuf, ", ");
+		strcat(fsbuf, LOC(lang, "status_noaid"));
+	}
 #endif
+
 	return fsbuf;
 }
 
@@ -183,7 +172,8 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 	int i, dh;
 	skill_t sk;
 	int getarnt = fval(u, FL_PARTEITARNUNG);
-	attrib *a_otherfaction = NULL;
+	faction *fv;
+	attrib *a_otherfaction;
 	const char *pzTmp;
 	spell *sp;
 	building * b;
@@ -193,38 +183,42 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 	attrib *a_fshidden = NULL;
 	item * itm;
 	item * show;
-	
+
 	if(fspecial(u->faction, FS_HIDDEN))
 		a_fshidden = a_find(u->attribs, &at_fshidden);
 
 	strcpy(buf, unitname(u));
-	
+
+	fv = visible_faction(f,u);
 	a_otherfaction = a_find(u->attribs, &at_otherfaction);
 
 	if (u->faction == f) {
-#ifdef GROUPS
 		attrib *a = a_find(u->attribs, &at_group);
 		if (a) {
 			group * g = (group*)a->data.v;
 			scat(", ");
 			scat(groupid(g, f));
 		}
-#endif
 		if (getarnt) {
-			scat(", parteigetarnt");
+			scat(", "); scat(LOC(f->locale, "anonymous"));
 		}	else if (a_otherfaction) {
 			scat(", ");
 			scat(factionname(findfaction(a_otherfaction->data.i)));
 		}
 	} else {
 		if (getarnt) {
-			scat(", parteigetarnt");
-		} else if(a_otherfaction) {
-			scat(", ");
-			scat(factionname(findfaction(a_otherfaction->data.i)));
+			scat(", "); scat(LOC(f->locale, "anonymous"));
 		} else {
 			scat(", ");
-			scat(factionname(u->faction));
+			if(a_otherfaction
+					&& allied(u, f, HELP_FSTEALTH)) {
+				scat(factionname(findfaction(a_otherfaction->data.i)));
+				scat(" (");
+				scat(factionname(u->faction));
+				scat(")");
+			} else {
+				scat(factionname(fv));
+			}
 		}
 	}
 
@@ -240,22 +234,25 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 
 	pzTmp = get_racename(u->attribs);
 	if (pzTmp || u->irace != u->race) {
-		if (pzTmp) scat(pzTmp);
-		else scat(locale_string(f->locale, race[u->irace].name[u->number != 1]));
+		if (pzTmp)
+			scat(pzTmp);
+		else
+			scat(racename(f->locale, u, u->irace));
 		if (u->faction == f) {
 			scat(" (");
-			scat(locale_string(f->locale, race[u->race].name[u->number != 1]));
+			scat(racename(f->locale, u, u->race));
 			scat(")");
 		}
 	} else {
-		scat(locale_string(f->locale, race[u->race].name[u->number != 1]));
+		scat(racename(f->locale, u, u->race));
 	}
 
 	/* status */
 
 	if (u->number && (u->faction == f || telepath_see || isbattle)) {
 		const char * c = hp_status(u);
-		scat(report_kampfstatus(u));
+		scat(", ");
+		scat(report_kampfstatus(u, f->locale));
 		if (c || fval(u, FL_HUNGER)) {
 			scat(" (");
 			if(c) scat(c);
@@ -268,7 +265,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 	}
 	if (getguard(u)) scat(", bewacht die Region");
 
-#if NEW_FOLLOW
 	if (u->faction==f || telepath_see) {
 		attrib * a = a_find(u->attribs, &at_follow);
 		if (a) {
@@ -279,7 +275,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 			}
 		}
 	}
-#endif
 	if ((b = usiege(u))!=NULL) {
 		scat(", belagert ");
 		scat(buildingname(b));
@@ -428,14 +423,9 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 	dh=0;
 	if (!getarnt && f && f->allies) {
 		ally *sf;
-		faction *tf = u->faction; 
-		
-		/* getarnte Partei bei a_otherfaction */
-		if(a_otherfaction) {
-			tf = findfaction(a_otherfaction->data.i);
-		}
+
 		for (sf = f->allies; sf && !dh; sf = sf->next) {
-			if (sf->status > 0 && sf->status <= HELP_ALL && sf->faction == tf) {
+			if (sf->status > 0 && sf->status <= HELP_ALL && sf->faction == fv) {
 				dh = 1;
 			}
 		}
@@ -454,7 +444,7 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 {
 	int i, dh;
 	int getarnt = fval(u, FL_PARTEITARNUNG);
-	attrib *a_otherfaction = NULL;
+	faction *fv;
 	const char *pzTmp;
 	boolean itemcloak = is_cursed(u->attribs, C_ITEMCLOAK, 0);
 	attrib *a_fshidden = NULL;
@@ -463,22 +453,20 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 	ugroup *ug = findugroup(u);
 	boolean guards = false;
 	boolean sieges = false;
-	
+
 	if(fspecial(u->faction, FS_HIDDEN))
 		a_fshidden = a_find(u->attribs, &at_fshidden);
 
 	strcpy(buf, u->name);
-	
-	a_otherfaction = a_find(u->attribs, &at_otherfaction);
+
+	fv = visible_faction(f, u);
 
 	if (getarnt) {
-		scat(", parteigetarnt");
-	} else if(a_otherfaction) {
 		scat(", ");
-		scat(factionname(findfaction(a_otherfaction->data.i)));
+		scat(LOC(f->locale, "anonymous"));
 	} else {
 		scat(", ");
-		scat(factionname(u->faction));
+		scat(factionname(fv));
 	}
 
 	scat(", ");
@@ -588,14 +576,9 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 	dh=0;
 	if (!getarnt && f && f->allies) {
 		ally *sf;
-		faction *tf = u->faction; 
-		
-		/* getarnte Partei bei a_otherfaction */
-		if(a_otherfaction) {
-			tf = findfaction(a_otherfaction->data.i);
-		}
+
 		for (sf = f->allies; sf && !dh; sf = sf->next) {
-			if (sf->status > 0 && sf->status <= HELP_ALL && sf->faction == tf) {
+			if (sf->status > 0 && sf->status <= HELP_ALL && sf->faction == fv) {
 				dh = 1;
 			}
 		}
@@ -686,61 +669,85 @@ spunit(struct strlist ** SP, const struct faction * f, const unit * u, int inden
 	lparagraph(SP, buf, indent, (char) ((u->faction == f) ? '*' : (dh ? '+' : '-')));
 }
 
+/* in spy steht der Unterschied zwischen Wahrnehmung des Opfers und
+ * Spionage des Spions */
 void
 spy_message(int spy, unit *u, unit *target)
 {
 	const char *c;
-	struct region * r = u->region;
 
-	if (spy < 0) {
-		sprintf(buf, "%s konnte nichts über ", unitname(u));
-		scat(unitname(target));
-		scat(" herausbekommen.");
-		addmessage(r, u->faction, buf, MSG_EVENT, ML_WARN);
-	} else if (spy == 0) {
-		sprintf(buf, "%s gelang es, Informationen über ", unitname(u));
-		scat(unitname(target));
-		scat(" herausbekommen: Partei '");
-		scat(factionname(target->faction));
-		scat("', Talente: ");
+	change_skill(u, SK_SPY, PRODUCEEXP);
 
-		change_skill(u, SK_SPY, PRODUCEEXP / 2);
+	sprintf(buf, "%s gelang es, Informationen über ", unitname(u));
+	scat(unitname(target));
+	scat(" herausbekommen: ");
 
-		{
+	/* Infos:
+	 * - Kampfstatus
+	 * - verborgene Gegenstände: Amulette, Ringe, Phiolen, Geld
+	 * - Partei
+	 * - Talentinfo
+	 * - Zaubersprüche
+	 * - Zauberwirkungen
+	 */
+	/* mit spy=100 (magische Spionage) soll alles herausgefunden werden */
+
+	if (spy > 99){
+		/* magische Spionage */
+		/* Zauberwirkungen */
+	}
+	if (spy > 20){
+		/* bei Magiern Zaubersprüche und Magiegebiet */
+		if (is_mage(target)){
+			spell_ptr *spt;
+			spell *sp;
 			int first = 1;
 			int found = 0;
-			skill_t sk;
 
-			for (sk = 0; sk != MAXSKILLS; sk++) {
-				if (get_skill(target, sk)) {
+			scat("Magiegebiet: ");
+			scat(magietypen[find_magetype(target)]);
+			if (get_mage(target)) {
+				scat(", Sprüche: ");
+
+				for (spt = get_mage(target)->spellptr;spt; spt = spt->next){
+					sp = find_spellbyid(spt->spellid);
 					found++;
-					if (first == 1) {
+					if (first == 1){
 						first = 0;
 					} else {
 						scat(", ");
 					}
-					scat(skillname(sk, u->faction->locale));
+					scat(sp->name);
+				}
+				if (found == 0) {
+					scat("Keine");
 				}
 			}
-			if (found == 0) {
-				scat("Keine");
-			}
+			scat(". ");
 		}
-		scat(".");
-
-		addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
-
-	/* Spionage > Wahrnehmung:
-	 * Talente mit Werten, Gegenstände und Kampfstatus */
-	} else if (spy > 0) {
-		sprintf(buf, "%s gelang es, Informationen über ", unitname(u));
-		scat(unitname(target));
-		scat(" herauszubekommen: Partei '");
+	}
+	if (spy > 6){
+		/* wahre Partei */
+		scat("Partei '");
 		scat(factionname(target->faction));
-		scat("', Talente: ");
+		scat("'. ");
+	} else {
+		/* ist die Einheit in Spionage nicht gut genug, glaubt sie die
+		 * Parteitarnung */
+		faction *fv = visible_faction(u->faction,target);
 
-		change_skill(u, SK_SPY, PRODUCEEXP);
-
+		if (fv != target->faction){
+			scat("Partei '");
+			scat(factionname(fv));
+			scat("'. ");
+		} else if (!fval(target, FL_PARTEITARNUNG)){
+			scat("Partei '");
+			scat(factionname(target->faction));
+			scat("'. ");
+		}
+	}
+	if (spy > 0){
+		scat("Talente: ");
 		{
 			int first = 1;
 			int found = 0;
@@ -762,18 +769,10 @@ spy_message(int spy, unit *u, unit *target)
 			if (found == 0) {
 				scat("Keine");
 			}
+			scat(". ");
 		}
-		scat("; Kampfstatus: ");
-		scat(report_kampfstatus(target) + 2);
-		c = hp_status(target);
-		if (c && strlen(c))
-			sprintf(buf, "%s (%s)", buf, c);
-		scat("; ");
 
-		icat(get_money(target));
-		scat(" Silber;");
-
-		scat(" Im Gepäck sind");
+		scat("Im Gepäck sind");
 		{
 			boolean first = true;
 			int found = 0;
@@ -802,41 +801,24 @@ spy_message(int spy, unit *u, unit *target)
 			if (found == 0) {
 				scat(" keine verborgenen Gegenstände");
 			}
-			scat(".");
+			scat(" und ");
+			icat(get_money(target));
+			scat(" Silber");
+			scat(". ");
 		}
-
-		/* magische Spionage:
-		 * zusätzlich Magiegebiet und Zauber */
-		if (spy > 1){
-			if (eff_skill(target, SK_MAGIC, target->region) > 0){
-				spell_ptr *spt;
-				spell *sp;
-				int first = 1;
-				int found = 0;
-
-				scat(" Magiegebiet: ");
-				scat(magietypen[find_magetype(target)]);
-				if (get_mage(target)) {
-					scat(", Sprüche: ");
-
-					for (spt = get_mage(target)->spellptr;spt; spt = spt->next){
-						sp = find_spellbyid(spt->spellid);
-						found++;
-						if (first == 1){
-							first = 0;
-						} else {
-							scat(", ");
-						}
-						scat(sp->name);
-					}
-					if (found == 0) {
-						scat("Keine");
-					}
-				}
-			}
-		}
-		addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
 	}
+	/* spion ist gleich gut wie Wahrnehmung Opfer */
+	/* spion ist schlechter als Wahrnehmung Opfer */
+	{ /* immer */
+		scat("Kampfstatus: ");
+		scat(report_kampfstatus(target, u->faction->locale));
+		c = hp_status(target);
+		if (c && strlen(c))
+			sprintf(buf, "%s (%s)", buf, c);
+		scat(".");
+	}
+
+	addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
 }
 
 const struct unit *
@@ -844,4 +826,47 @@ ucansee(const struct faction *f, const struct unit *u, const struct unit *x)
 {
 	if (cansee(f, u->region, u, 0)) return u;
 	return x;
+}
+
+faction *
+visible_faction(const faction *f, const unit * u)
+{
+	if(!allied(u, f, HELP_FSTEALTH)) {
+		attrib *a = a_find(u->attribs, &at_otherfaction);
+		if (a) return get_otherfaction(a);
+	}
+	return u->faction;
+}
+
+faction_list *
+get_addresses(const faction * f, const seen_region * seenregions)
+{
+/* "TODO: travelthru" */
+	const seen_region * sr = seenregions;
+	const faction * lastf = NULL;
+	faction_list * flist = calloc(1, sizeof(faction_list));
+	flist->data = findfaction(f->no);
+	while (sr!=NULL) {
+		const region * r = sr->r;
+		const unit * u = r->units;
+		while (u!=NULL) {
+			faction * sf = visible_faction(f, u);
+			if (sf && sf!=f && sf!=lastf && !fval(u, FL_PARTEITARNUNG) && cansee(f, r, u, 0)) {
+				faction_list ** fnew = &flist;
+				while (*fnew && (*fnew)->data->no < sf->no) {
+					fnew =&(*fnew)->next;
+				}
+				if ((*fnew==NULL) || (*fnew)->data!=sf) {
+					faction_list * finsert = malloc(sizeof(faction_list));
+					finsert->next = *fnew;
+					*fnew = finsert;
+					finsert->data = sf;
+				}
+				lastf = sf;
+			}
+			u = u->next;
+		}
+		sr = sr->next;
+	}
+	return flist;
 }

@@ -37,8 +37,13 @@ mt_new(const char * name, const char * args[])
 
 	mtype->name = strdup(name);
 	mtype->nparameters = nparameters;
-	mtype->pnames = (const char**)malloc(sizeof(char*) * nparameters);
-	mtype->types = (const char**)malloc(sizeof(char*) * nparameters);
+	if(nparameters > 0) {
+		mtype->pnames = (const char**)malloc(sizeof(char*) * nparameters);
+		mtype->types = (const char**)malloc(sizeof(char*) * nparameters);
+	} else {
+		mtype->pnames = NULL;
+		mtype->types = NULL;
+	}
 	for (i=0;args[i];++i) {
 		const char * x = args[i];
 		const char * spos = strchr(x, ':');
@@ -127,7 +132,7 @@ const message_type *
 mt_find(const char * name)
 {
 	messagetype_list * mtl = messagetypes;
-	while (mtl && strcmp(mtl->type->name, name)!=0) mtl=mtl->next;
+	while (mtl && strcasecmp(mtl->type->name, name)!=0) mtl=mtl->next;
 	return mtl?mtl->type:NULL;
 }
 
@@ -142,7 +147,7 @@ msg_free(message *msg)
 void 
 msg_release(struct message * msg)
 {
-	if (--msg->refcount) return;
+	if (--msg->refcount>0) return;
 	msg_free(msg);
 }
 

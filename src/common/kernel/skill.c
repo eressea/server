@@ -135,9 +135,7 @@ int
 att_modification(const unit *u, skill_t sk)
 {
 	curse *c;
-	attrib *a;
 	unit *mage;
-	int mod;
 	int result = 0;
 
 	result += get_curseeffect(u->attribs, C_ALLSKILLS, 0);
@@ -147,25 +145,31 @@ att_modification(const unit *u, skill_t sk)
 	 * jeweils erste vom Typ C_GBDREAM zurückgegen wird, wir aber alle
 	 * durchsuchen und aufaddieren müssen */
 	if (is_cursed(u->region->attribs, C_GBDREAM, 0)){
+		attrib *a;
+		int bonus = 0, malus = 0;
+		int mod;
+
 		a = a_select(u->region->attribs, packids(C_GBDREAM, 0), cmp_oldcurse);
 		while(a) {
 			c = (curse*)a->data.v;
 			mage = c->magician;
 			mod = c->effect;
-
+			/* wir suchen jeweils den größten Bonus und den größten Malus */
 			if (mod > 0
 					&& (mage == NULL
 						|| allied(mage, u->faction, HELP_GUARD)))
 			{
-				result += mod;
+				if (mod > bonus ) bonus = mod;
+				
 			} else if (mod < 0
 				&& (mage == NULL
 					|| !allied(mage, u->faction, HELP_GUARD)))
 			{
-				result += mod;
+				if (mod < malus ) malus = mod;
 			}
 			a = a_select(a->next, packids(C_GBDREAM, 0), cmp_oldcurse);
 		}
+		result = result + bonus + malus;
 	}
 
 	return result;
@@ -194,12 +198,12 @@ skill_mod(race_t typ, skill_t sk, terrain_t t)
 	switch (sk) {
 	case SK_TACTICS:
 		if (typ == RC_DWARF) {
-			if (t == T_MOUNTAIN || t == T_GLACIER) ++result;
+			if (t == T_MOUNTAIN || t == T_GLACIER || t == T_ICEBERG_SLEEP) ++result;
 		}
 		break;
 	}
 	if (typ == RC_INSECT) {
-		if (t == T_MOUNTAIN || t == T_GLACIER)
+		if (t == T_MOUNTAIN || t == T_GLACIER || t == T_ICEBERG_SLEEP || t == T_ICEBERG)
 			--result;
 		else if (t == T_DESERT || t == T_SWAMP)
 			++result;

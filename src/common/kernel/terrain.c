@@ -42,30 +42,7 @@ static const char * highland_herbs[] = {"Windbeutel", "Fjordwuchs", "Alraune", N
 static const char * mountain_herbs[] = {"Steinbeißer", "Spaltwachs", "Höhlenglimm", NULL};
 static const char * glacier_herbs[] = {"Eisblume", "Weißer Wüterich", "Schneekristall", NULL};
 
-const char *
-trailinto(const region * r, const locale * lang)
-{
-	char ref[32];
-	const char * s;
-	if (r) {
-		terrain_t t = r->terrain;
-		if (is_cursed(r->attribs, C_MAELSTROM, 0)) {
-			/* das kostet. evtl. wäre ein FL_CURSED gut? */
-			s = locale_string(lang, "maelstrom_trail");
-		}
-		else if (terrain[t].trailname==NULL) {
-			strcat(strcpy(ref, terrain[t].name), "_trail");
-			s = locale_string(lang, ref);
-		}
-		else s = locale_string(lang, terrain[t].trailname(r));
-		if (s && *s) {
-			if (strstr(s, "%s"))	return s;
-		}
-	}
-	return "%s";
-}
-
-const char *
+static const char *
 trailintoplain(const region * r)
 {
 	assert(r->terrain==T_PLAIN);
@@ -255,8 +232,8 @@ const terraindata_t terrain[] = {
 		"iceberg", 'I',
 		NULL,
 		"auf einen Eisberg",
-		1,		/* Steine pro Runde */
-		250,	/* Steine fuer Strasse */
+		0,		/* Steine pro Runde */
+		-1,	/* Steine fuer Strasse */
 		10, 	/* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
 		glacier_herbs

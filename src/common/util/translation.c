@@ -180,10 +180,15 @@ parse_symbol(opstack ** stack, const char* in, const void * userdata)
 	 * result goes on the stack
 	 */
 {
+	boolean braces = false;
 	char symbol[32];
 	char *cp = symbol; /* current position */
 
-	while (isalnum(*in)) *cp++ = *in++;
+	if (*in=='{') {
+		braces = true;
+		++in;
+	}
+	while (isalnum(*in) || *in=='.') *cp++ = *in++;
 	*cp = '\0';
 	/* symbol will now contain the symbol name */
 	if (*in=='(') {
@@ -200,8 +205,11 @@ parse_symbol(opstack ** stack, const char* in, const void * userdata)
 		if (foo==NULL) return NULL;
 		foo->parse(stack, userdata); /* will pop parameters from stack (reverse order!) and push the result */
 	} else {
-		/* it's a constant (variable is a misnomer, but heck, const was taken;)) */
 		variable * var = find_variable(symbol);
+		if (braces && *in=='}') {
+			++in;
+		}
+		/* it's a constant (variable is a misnomer, but heck, const was taken;)) */
 		if (var==NULL) return NULL;
 		opush(stack, var->value);
 	}
@@ -321,8 +329,9 @@ translate(const char* format, const void * userdata, const char* vars, const voi
 	brelease();
 	free_variables();
 
+	assert(format);
 	assert(isalnum(*ic));
-   while (*ic) {
+	while (*ic) {
 		*oc++ = *ic++;
 		if (!isalnum(*ic)) {
 			const void * x = args[i++];
@@ -331,7 +340,7 @@ translate(const char* format, const void * userdata, const char* vars, const voi
 			add_variable(strcpy(balloc(strlen(symbol)+1), symbol), x);
 			while (*ic && !isalnum(*ic)) ++ic;
 		}
-   }
+	}
 
 	if (parse(&stack, format, userdata)==NULL) return NULL;
 	retval = strdup(opop(&stack, const char*));

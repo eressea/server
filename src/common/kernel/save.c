@@ -379,7 +379,7 @@ readunit(FILE * F, struct faction * f)
 
 			if (igetkeyword(buf, u->faction->locale) == NOKEYWORD) {
 				p = igetparam(buf, u->faction->locale);
-				if (p == P_UNIT || p == P_FACTION || p == P_NEXT)
+				if (p == P_UNIT || p == P_FACTION || p == P_NEXT || p == P_GAMENAME)
 					break;
 			}
 			if (buf[0]) {
@@ -444,9 +444,9 @@ readfaction(void)
 		 * muß in "Gänsefüßchen" stehen!! */
 
 		/* War vorher in main.c:getgarbage() */
-		if (!quiet) { 
+		if (!quiet) {
 			printf(" %4s;", factionid(f));
-			fflush(stdout); 
+			fflush(stdout);
 		}
 		freestrlist(f->mistakes);
 		f->mistakes = 0;
@@ -492,7 +492,7 @@ readorders(const char *filename)
 	 * Partei */
 
 	while (b) {
-		const struct locale * lang = f?f->locale:NULL;
+		const struct locale * lang = f?f->locale:default_locale;
 		int p;
 		const char * s;
 
@@ -512,6 +512,7 @@ readorders(const char *filename)
 
 			b = getbuf(F);
 			break;
+		case P_GAMENAME:
 		case P_FACTION:
 			f = readfaction();
 			if (f) {
@@ -532,7 +533,7 @@ readorders(const char *filename)
 				b = getbuf(F);
 				if (!b) break;
 				p = igetparam(b, lang);
-			} while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT);
+			} while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT && p != P_GAMENAME);
 			break;
 
 			/* Falls in readunit() abgebrochen wird, steht dort entweder eine neue
@@ -575,6 +576,7 @@ inner_world(region * r)
 }
 
 int maxregions = -1;
+boolean dirtyload = false;
 
 enum {
 	U_MAN,
@@ -602,7 +604,7 @@ boolean
 is_persistent(const char *s, const struct locale *lang)
 {
 	if (s==NULL) return false;
-#ifdef AT_PERSISTENT                                                          
+#ifdef AT_PERSISTENT
 	if(*s == '@') return true;
 #endif      /* Nur kurze Befehle! */
 	switch(igetkeyword(s, lang)) {
@@ -643,14 +645,14 @@ create_backup(char *file)
 #endif
 }
 
-const char * 
+const char *
 datapath(void)
 {
 	static char zText[MAX_PATH];
 	if (g_datadir) return g_datadir;
 	return strcat(strcpy(zText, basepath()), "/data");
 }
-	
+
 void
 read_dynamictypes(void)
 {
@@ -827,7 +829,7 @@ readgame(boolean backup)
 		rds(F, &f->passw);
 		if (global.data_version < LOCALE_VERSION) {
 			f->locale = find_locale("de");
-			/* if (f->no==44) f->locale=strdup("en"); */
+			if (f->no==1045674) f->locale=find_locale("en");	/* meui, amer. betatester */
 		} else {
 			rs(F, buf);
 			f->locale = find_locale(buf);
@@ -934,9 +936,7 @@ readgame(boolean backup)
 		}
 		*sfp = 0;
 
-#ifdef GROUPS
 		if (global.data_version>=GROUPS_VERSION) read_groups(F, f);
-#endif
 
 		addlist2(fp, f);
 	}
@@ -979,7 +979,12 @@ readgame(boolean backup)
 				if (maxregions>0) maxregions = min(n, maxregions)-1;
 			}
 		}
-		if (maxregions==0) skip = true;
+		if (maxregions==0) {
+			if (dirtyload) {
+				break;
+			}
+			skip = true;
+		}
 		if ((n%1024)==0) {	/* das spart extrem Zeit */
 			printf("* %d,%d    \r", x, y);
 			printf(" - Einzulesende Regionen: %d/%d      ", maxregions, n);
@@ -1033,7 +1038,17 @@ readgame(boolean backup)
 		}
 		if (global.data_version < MEMSAVE_VERSION || r->land) {
 			int i;
+#ifdef GROWING_TREES
+			if(global.data_version < GROWTREES_VERSION) {
+				i = ri(F); rsettrees(r, 2, i);
+			} else {
+				i = ri(F); rsettrees(r, 0, i);
+				i = ri(F); rsettrees(r, 1, i);
+				i = ri(F); rsettrees(r, 2, i);
+			}
+#else
 			i = ri(F); rsettrees(r, i);
+#endif
 			i = ri(F); rsethorses(r, i);
 			i = ri(F); rsetiron(r, i);
 			if (global.data_version>=ITEMTYPE_VERSION) {
@@ -1157,7 +1172,7 @@ readgame(boolean backup)
 			rds(F, &sh->display);
 
 			if (global.data_version < SHIPTYPE_VERSION) {
-				const ship_type * oldship[] = { &st_boat, &st_longboat, &st_dragonship, &st_caravelle, &st_trireme };
+				const ship_type * oldship[] = { &st_boat, &st_balloon, &st_longboat, &st_dragonship, &st_caravelle, &st_trireme };
 				int i = ri(F);
 				sh->type = oldship[i];
 			}
@@ -1413,10 +1428,12 @@ readgame(boolean backup)
 			addlist2(up,u);
 		}
 	}
-	if (global.data_version >= BORDER_VERSION) read_borders(F);
+	if (!dirtyload) {
+		if (global.data_version >= BORDER_VERSION) read_borders(F);
 #if defined(OLD_TRIGGER) || defined(CONVERT_TRIGGER)
-	if (global.data_version >= TIMEOUT_VERSION) load_timeouts(F);
+		if (global.data_version >= TIMEOUT_VERSION) load_timeouts(F);
 #endif
+	}
 
 #ifdef WEATHER
 
@@ -1485,10 +1502,11 @@ readgame(boolean backup)
 		for (u = r->units; u; u = u->next) {
 			u->faction->alive = 1;
 		}
-
 	}
 	fclose(F);
-	findfaction(0)->alive = 1;
+	if(findfaction(0)) {
+		findfaction(0)->alive = 1;
+	}
 	return 0;
 }
 /* ------------------------------------------------------------- */
@@ -1556,12 +1574,12 @@ export_players(const char * path)
 	while (p) {
 		/* name */
 		fputc('\"', F);
-		if (p->name) fputs(p->name, F); 
+		if (p->name) fputs(p->name, F);
 
 		/* email */
 		fputs("\";\"", F);
 		if (p->email) fputs(p->email, F);
-		else if (p->faction) fputs(p->faction->email, F); 
+		else if (p->faction) fputs(p->faction->email, F);
 		fputs("\";\"", F);
 
 		/* passwd */
@@ -1575,7 +1593,7 @@ export_players(const char * path)
 		/* info */
 		fputs("\";\"", F);
 		if (p->info) fputs(p->info, F);
-		else if (p->faction) fputs(p->faction->banner, F); 
+		else if (p->faction) fputs(p->faction->banner, F);
 
 		fputs("\"\n", F);
 
@@ -1677,7 +1695,7 @@ writegame(char *path, char quiet)
 		ws(F, f->passw);
 		wspace(F);
 #if RELEASE_VERSION>=LOCALE_VERSION
-		ws(F, f->locale);
+		ws(F, locale_name(f->locale));
 		wspace(F);
 #endif
 		wi(F, f->lastorders);
@@ -1736,10 +1754,8 @@ writegame(char *path, char quiet)
 			wi(F, sf->status);
 		}
 		wnl(F);
-#ifdef GROUPS
 #if RELEASE_VERSION>=GROUPS_VERSION
 	write_groups(F, f->groups);
-#endif
 #endif
 	}
 
@@ -2168,7 +2184,7 @@ read_faction_reference(faction ** f, FILE * F)
 	return 1;
 }
 
-void 
+void
 write_faction_reference(const faction * f, FILE * F)
 {
 #if RELEASE_VERSION >= BASE36IDS_VERSION

@@ -34,6 +34,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* util includes */
+#include <base36.h>
 
 /* Untote */
 
@@ -716,5 +718,13 @@ abkz(const char *s, size_t max)
 void
 name_unit(unit *u)
 {
-	set_string(&u->name, (race[u->race].generate_name(u)));
+	char name[16];
+
+	if(race[u->race].generate_name){
+		set_string(&u->name, (race[u->race].generate_name(u)));
+	} else {
+		sprintf(name, "Nummer %s", itoa36(u->no));
+		set_string(&u->name, name);
+		fset(u, FL_UNNAMED);
+	}
 }

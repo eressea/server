@@ -52,7 +52,11 @@ typedef struct land_region {
 	} * demands;
 	const struct herb_type * herbtype;
 	short herbs;
+#ifdef GROWING_TREES
+	int trees[3]; /* 0 -> Samen, 1 -> Sprößlinge, 2 -> Bäume */
+#else
 	int trees;
+#endif
 	int horses;
 	int peasants;
 	int newpeasants;
@@ -85,7 +89,7 @@ typedef struct region {
 #endif
 } region;
 
-extern struct message_list * r_getmessages(struct region * r, const struct faction * viewer);
+extern struct message_list * r_getmessages(const struct region * r, const struct faction * viewer);
 extern struct message * r_addmessage(struct region * r, const struct faction * viewer, struct message * msg);
 
 typedef struct {
@@ -119,6 +123,8 @@ extern attrib_type at_chaoscount;
 extern attrib_type at_woodcount;
 extern attrib_type at_deathcount;
 extern attrib_type at_travelunit;
+extern attrib_type at_iron;
+extern attrib_type at_stone;
 extern attrib_type at_laen;
 extern attrib_type at_road;
 
@@ -152,8 +158,13 @@ void rsetroad(struct region * r, direction_t d, int value);
 
 int is_coastregion(struct region *r);
 
+#ifdef GROWING_TREES
+int rtrees(const struct region * r, int ageclass);
+int rsettrees(region *r, int ageclass, int value);
+#else
 int rtrees(const struct region * r);
 int rsettrees(struct region * r, int value);
+#endif
 
 int rpeasants(const struct region * r);
 void rsetpeasants(struct region * r, int value);
@@ -176,10 +187,12 @@ void rsetmoney(struct region * r, int value);
 
 extern boolean r_isforest(const struct region * r);
 
+extern boolean r_isglacier(const struct region * r);
+
 #define rterrain(r) (terrain_t)((r)?(r)->terrain:T_FIREWALL)
 #define rsetterrain(r, value) (r->terrain=value)
 
-extern const char * rname(const struct region * r, const locale * lang);
+extern const char * rname(const struct region * r, const struct locale * lang);
 #define rsetname(r, str) (set_string(&(r)->land->name, str))
 
 #define rplane(r) getplane(r)

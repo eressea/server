@@ -80,7 +80,7 @@ findplane(int x, int y)
 }
 
 int
-getplaneid(region *r)
+getplaneid(const region *r)
 
 {
 	if(r) {

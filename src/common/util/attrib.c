@@ -151,6 +151,9 @@ void
 a_removeall(attrib **p, const attrib_type * at)
 {
 	attrib *find = *p, *findnext;
+	if (find && find->type != at){
+		find = a_find(find, at);
+	}
 	while(find && find->type == at) {
 		findnext = find->next;
 		a_remove(p, find);

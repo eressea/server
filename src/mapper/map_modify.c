@@ -276,17 +276,26 @@ create_region_menu(menulist ** menu, region * r)
 
 	get_region(r);
 
-	addmenulist(menu, "Bauern", &peasants);
-	addmenulist(menu, "Silber", &money);
+	addmenulist(menu, "Peasants", &peasants);
+	addmenulist(menu, "Silver", &money);
 	if (fval(r, RF_MALLORN))
-		addmenulist(menu, "Mallornbäume", &trees);
+		addmenulist(menu, "Mallorntrees", &trees);
 	else
 		addmenulist(menu, "Bäume", &trees);
-	addmenulist(menu, "Pferde", &horses);
+	addmenulist(menu, "Horses", &horses);
+#ifdef NEW_RESOURCEGROWTH
+	if(a_find(r->attribs, &at_iron)) {
+		addmenulist(menu, "Iron", &iron);
+  }
+	if(a_find(r->attribs, &at_laen)) {
+		addmenulist(menu, "Laen", &laen);
+  }
+#else
 	if (r->terrain == T_MOUNTAIN || r->terrain == T_GLACIER) {
-		addmenulist(menu, "Eisen", &iron);
+		addmenulist(menu, "Iron", &iron);
 		addmenulist(menu, "Laen", &laen);
 	}
+#endif
 	addmenulist(menu, "Chaos-Faktor", &chaotisch);
 
 	if (r->planep) {
@@ -1046,7 +1055,7 @@ choose_terrain(terrain_t t) {
 		case T_SWAMP:
 			if (q<40)
 				return T_PLAIN;
-			if (q<60)
+			if (q<65)
 				return T_HIGHLAND;
 			if (q<80)
 				return T_MOUNTAIN;
@@ -1094,9 +1103,9 @@ choose_terrain(terrain_t t) {
 		case T_GLACIER:
 			if (q<35)
 				return T_PLAIN;
-			if (q<55)
+			if (q<50)
 				return T_MOUNTAIN;
-			if (q<75)
+			if (q<70)
 				return T_HIGHLAND;
 			if (q<90)
 				return T_SWAMP;

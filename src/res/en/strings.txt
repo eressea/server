@@ -1,8 +1,79 @@
-Karavelle;en;caravelle
+## OPTION <x>
+ADRESSEN;en;ADDRESSES
+AUSWERTUNG;en;REPORT
+BZIP2;en;BZIP2
+COMPUTER;en;COMPUTER
+DEBUG;en;DEBUG
+MATERIALPOOL;en;ITEMPOOL
+PUNKTE;en;SCORE
+SILBERPOOL;en;SILVERPOOL
+STATISTIK;en;STATISTICS
+ZEITUNG;en;EXPRESS
+ZIPPED;en;ZIPPED
+ZUGVORLAGE;en;TEMPLATE
+
+INFO;en;INFO
+
+## ship types
+Karavelle;en;caravel
 Boot;en;boat
 Langboot;en;longboat
-Drachenschiff;en;dragonboat
+Drachenschiff;en;dragonship
 Trireme;en;trireme
+
+##  Terraintypen
+activevolcano;en;active volcano
+corridor1;en;corridor
+desert;en;desert
+firewall;en;firewall
+fog;en;fog
+forest;en;forest
+glacier;en;glacier
+grassland;en;steppe
+hall1;en;hallway
+hell;en;hell
+highland;en;highland
+iceberg;en;iceberg
+maelstrom;en;maelstrom
+mountain;en;mountain
+ocean;en;ocean
+plain;en;plain
+swamp;en;swamp
+thickfog;en;thick fog
+volcano;en;volcano
+magicstorm;en;magical storm
+
+activevolcano_trail;en;an %s
+corridor1_trail;en;a %s
+desert_trail;en;the deserts of %s
+firewall_trail;en;a %s
+fog_trail;en;fog_trail %s
+forest_trail;en;the forests of %s
+glacier_trail;en;the glacier of %s
+grassland_trail;en;the steppe of %s
+hall1_trail;en;the %s
+hell_trail;en;%s
+highland_trail;en;the highlands of %s
+iceberg_trail;en;an %s
+maelstrom_trail;en;a %s
+mountain_trail;en;the mountains of %s
+ocean_trail;en;the %s
+plain_trail;en;the plain of %s
+swamp_trail;en;the swamps of %s
+thickfog_trail;en;%s
+volcano_trail;en;a %s
+magicstorm_trail;en;a %s
+
+caldera;en;caldera
+xmas_exit;en;portal
+
+## directions
+dir_nw;en;NW
+dir_ne;en;NE
+dir_east;en;East
+dir_se;en;SE
+dir_sw;en;SW
+dir_west;en;West
 
 west;en;west
 northwest;en;northwest
@@ -10,13 +81,6 @@ northeast;en;northeast
 east;en;east
 southwest;en;southwest
 southeast;en;southeast
-
-dir_NW;en;NW
-dir_NO;en;NE
-dir_Ost;en;East
-dir_SO;en;SE
-dir_SW;en;SW
-dir_West;en;West
 
 unknownunit;en;an unknown unit
 
@@ -219,6 +283,10 @@ toadslime;en;toadslime
 trollbelt;en;trollbelt
 unit;en;unit
 unit_p;en;units
+skillpotion;en;potion of skills
+skillpotion_p;en;potions of skills
+manacrystal;en;astralcrystal
+manacrystal_p;en;astralcrystals
 
 ##  luxury goods
 balm;en;balm
@@ -239,50 +307,6 @@ incense_p;en;incense
 ##  Spezialitems
 lmsreward;en;Belt of Heroic Legends
 lmsreward_p;en;Belts of Heroic Legends
-
-##  Terraintypen
-activevolcano;en;active volcano
-corridor1;en;corridor
-desert;en;desert
-firewall;en;firewall
-fog;en;fog
-forest;en;forest
-glacier;en;glacier
-grassland;en;steppe
-hall1;en;hallway
-hell;en;hell
-highland;en;highland
-iceberg;en;iceberg
-maelstrom;en;maelstrom
-mountain;en;mountain
-ocean;en;ocean
-plain;en;plain
-swamp;en;swamp
-thickfog;en;thick fog
-volcano;en;volcano
-
-activevolcano_trail;en;an %s
-corridor1_trail;en;a %s
-desert_trail;en;the deserts of %s
-firewall_trail;en;a %s
-fog_trail;en;fog_trail
-forest_trail;en;the forests of %s
-glacier_trail;en;the glacier of %s
-grassland_trail;en;the steppe of %s
-hall1_trail;en;the %s
-hell_trail;en;%s
-highland_trail;en;the highlands of %s
-iceberg_trail;en;an %s
-maelstrom_trail;en;a %s
-mountain_trail;en;the mountains of %s
-ocean_trail;en;the %s
-plain_trail;en;the plain of %s
-swamp_trail;en;the swamps of %s
-thickfog_trail;en;%s
-volcano_trail;en;a %s
-
-caldera;en;caldera
-xmas_exit;en;portal
 
 viele;en;many
 sehr viele;en;a great many
@@ -328,8 +352,8 @@ h18;en;Eisblume
 h18_p;en;Eisblumen
 h19;en;Weißer Wüterich
 h19_p;en;Weiße Wüteriche
-h20;en;Schneekristall
-h20_p;en;Schneekristalle
+h20;en;Snowcrystal petal
+h20_p;en;Snowcrystal petals
 p0;en;seven mile tea
 p0_p;en;seven mile teas
 p1;en;goliath water
@@ -346,8 +370,8 @@ p6;en;brain wax
 p6_p;en;brain waxes
 p7;en;Dumpfbackenbrot
 p7_p;en;Dumpfbackenbrote
-p8;en;Nestwärme
-p8_p;en;Nestwärme
+p8;en;potion of nest warmth
+p8_p;en;potions of nest warmth
 p9;en;horsepower potion
 p9_p;en;horsepower potions
 p10;en;berserkers blood potion
@@ -372,6 +396,7 @@ BEWACHE;en;GUARD
 BURG;en;CASTLE
 DEFENSIV;en;DEFENSIVE
 EINHEIT;en;UNIT
+ERESSEA;en;ERESSEA
 FLIEHE;en;FLEE
 FREMDES;en;FOREIGN
 GEBÄUDE;en;BUILDING
@@ -386,7 +411,8 @@ KRÄUTER;en;HERBS
 KÄMPFE;en;FIGHT
 NICHT;en;NOT
 NÄCHSTER;en;NEXT
-PARTEI;en;PARTEI
+PARTEI;en;FACTION
+PARTEITARNUNG;en;FACTIONSTEALTH
 PAUSE;en;PAUSE
 PERSONEN;en;MEN
 PRIVAT;en;PRIVATE
@@ -400,7 +426,7 @@ TRÄNKE;en;POTIONS
 UM;en;FOR
 VOR;en;BEFORE
 VORNE;en;FRONT
-ZAUBERBUCH;en;SPELLBOOK
+ZAUBER;en;SPELLS
 
 ##  Skills
 sk_alchemy;en;alchemy
@@ -476,6 +502,7 @@ OPFERE;en;SACRIFICE
 OPTION;en;OPTION
 PASSWORT;en;PASSWORD
 PIRATERIE;en;PIRACY
+PRÄFIX;en;PREFIX
 REKRUTIEREN;en;RECRUIT
 REPORT;en;REPORT
 RESERVIEREN;en;RESERVE
@@ -484,6 +511,7 @@ SABOTIEREN;en;SABOTAGE
 SORTIEREN;en;SORT
 SPIONIEREN;en;SPY
 STIRB;en;QUIT
+SYNONYM;en;SYNONYM
 TARNEN;en;HIDE
 TRANSPORTIEREN;en;CARRY
 TREIBEN;en;TAX
@@ -505,7 +533,7 @@ Dämonen;en;Demons
 Einhorn;en;unicorn
 Einhörner;en;unicorns
 Elf;en;elf
-Elfen;en;elves
+# Elfen;en;elves
 Eule;en;owl
 Eulen;en;owls
 Geist;en;ghost
@@ -557,7 +585,6 @@ nr_undercons;en;under construction
 nr_damaged;en;damage
 nr_youaredead;en;Your faction has been eliminated. We hope you had a good time anyways, and encourage you to sign up you for another game.
 # TODO: calendar ist noch komplexer
-nr_calendar;en;It is %s of the month of %s in the %d. year of %s.
 nr_skills;en;skills
 nr_inventory;en;has
 nr_size;en;size
@@ -565,6 +592,17 @@ nr_spells;en;spells
 nr_combatspells;en;combat spells
 nr_nospells;en;none
 nr_addresses;en;Addresses
+anonymous;en;anonymous
+b_attacke;en;attack
+b_defense;en;defense
+b_armor;en;armor
+b_damage;en;damage
+
+## Testitem
+wand;en;wand
+wand_p;en;wands
+wand_of_tears;en;wand of tears
+wands_of_tear_p;en;wands of tears
 
 ##  Küsten
 Nordwestküste;en;northwest coast
@@ -574,23 +612,8 @@ Südostküste;en;southeast coast
 Südwestküste;en;southwest coast
 Westküste;en;west coast
 
-
-##  Reportoptionen
-AUSWERTUNG;en;REPORT
-COMPUTER;en;COMPUTER
-ZUGVORLAGE;en;TEMPLATE
-SILBERPOOL;en;SILVERPOOL
-STATISTIK;en;STATISTICS
-MATERIALPOOL;en;ITEMPOOL
-ADRESSEN;en;ADDRESSES
-ZIPPED;en;ZIPPED
-BZIP2;en;BZIP2
-PUNKTE;en;SCORE
-INFO;en;INFO
-
-## Testitem
-wand;en;wand
-wand_p;en;wands
-wand_of_tears;en;wand of tears
-wands_of_tear_p;en;wands of tears
-
+## report newbie info
+newbie_info_1;en;Remember tosend your orders to eressea@eressea.amber.kn-bremen.de with the subject ERESSEA BEFEHLE.
+newbie_info_2;en;If you fail to send in orders for one of the first two turns, your faction will be erased from the game to reduce the number of zombie players in Eressea.
+newbie_info_3;en;With the first two turns, you will get a computer report (CR). It can be used with many of the tools on http://eressea-pbem.de/download.html. If you want to continue getting it after the second turn, please make one of your units give the order OPTION COMPUTER.
+nr_nmr;en;No orders were received for your faction!

@@ -548,6 +548,13 @@ r_isforest(const region * r)
 	return false;
 }
 
+boolean
+r_isglacier(const region * r)
+{
+	if (r->terrain==T_GLACIER || r->terrain==T_ICEBERG_SLEEP) return true;
+	return false;
+}
+
 int
 is_coastregion(region *r)
 {
@@ -613,6 +620,24 @@ rname(const region * r, const locale * lang) {
 	return locale_string(lang, terrain[rterrain(r)].name);
 }
 
+#ifdef GROWING_TREES
+int
+rtrees(const region *r, int ageclass)
+{
+	return ((r)->land?(r)->land->trees[ageclass]:0);
+}
+
+int
+rsettrees(region *r, int ageclass, int value)
+{
+	if (!r->land) assert(value==0);
+	else {
+		assert(value>=0);
+		return r->land->trees[ageclass]=value;
+	}
+	return 0;
+}
+#else
 int
 rtrees(const region *r)
 {
@@ -629,6 +654,7 @@ rsettrees(region *r, int value)
 	}
 	return 0;
 }
+#endif
 
 region *
 new_region(int x, int y)
@@ -728,14 +754,50 @@ setluxuries(region * r, const luxury_type * sale)
 	}
 }
 
+#ifdef NEW_RESOURCEGROWTH
+
+static int
+new_stones(int base, int div, int skill)
+{
+		return rstone->base+
+}
+
+static void
+terraform_stone(const region *r)
+{
+	region_stone *rstone;
+	attrib *a;
+
+	switch(rterrain(r)) {
+	case T_MOUNTAIN:
+		a = a_add(&r->attribs, a_new(&at_stone));
+		rstone = (region_stone *)(a->data.v);
+		rstone->base = 100;
+		rstone->div = 1;
+		rstone->skill = 1;
+		rstone->stone = new_stones(rstone->base, rstone->div, rstone->skill);
+		break;
+	case T_GLACIER:
+		break;
+	case T_VOLCANE:
+	case T_VOLCANE_SMOKING:
+		break;
+	default:
+
+	}
+}
+#endif
+
 void
 terraform(region * r, terrain_t t)
 {
+	attrib *a;
 	const struct locale * locale_de = find_locale("de");
-	/* defaults: */
 
+	/* defaults: */
 	rsetterrain(r, t);
 	rsetlaen(r, -1);
+	rsetiron(r, 0);
 
 	if (!landregion(t)) {
 		if (r->land) {
@@ -750,8 +812,15 @@ terraform(region * r, terrain_t t)
 		rsetlaen(r, -1);
 		freset(r, RF_ENCOUNTER);
 		freset(r, RF_MALLORN);
+		/* Beschreibung und Namen löschen */
 		return;
 	}
+
+#ifdef NEW_RESOURCEGROWTH
+	a_removeall(&r->attribs, &at_iron);
+	a_removeall(&r->attribs, &at_laen);
+	a_removeall(&r->attribs, &at_stone);
+#endif
 
 	if (!r->land) {
 		static struct surround {
@@ -845,27 +914,47 @@ terraform(region * r, terrain_t t)
 		break;
 #ifndef NO_FOREST
 	case T_FOREST:
-
 		rsetterrain(r, T_PLAIN);
 		rsettrees(r, terrain[T_PLAIN].production_max * (60 + rand() % 30) / 100);
 		break;
 #endif
 	case T_MOUNTAIN:
-
+#ifndef NEW_RESOURCEGROWTH
 		rsetiron(r, IRONSTART);
 		if (rand() % 100 < 8) rsetlaen(r, 5 + rand() % 5);
+#endif
 		break;
 
 	case T_GLACIER:
-		rsetiron(r, GLIRONSTART);
+#ifndef NEW_RESOURCEGROWTH
+		if (riron(r) <= 0){
+			rsetiron(r, GLIRONSTART);
+		}
+#endif
+		break;
+
+	case T_ICEBERG_SLEEP:
+		/* Kann aus Gletscher entstehen und sollte diesem gleichen */
+#ifndef NEW_RESOURCEGROWTH
+		if (riron(r) <= 0){
+			rsetiron(r, GLIRONSTART);
+		}
+#endif
+		break;
+
+	case T_VOLCANO:
+	case T_VOLCANO_SMOKING:
 		break;
 	}
-	{
-		if (terrain[t].production_max && !fval(r, RF_CHAOTIC)) {
-			int np = MAXPEASANTS_PER_AREA * (rand() % (terrain[t].production_max / 2));
-			rsetpeasants(r, max(100, np));
-			rsetmoney(r, rpeasants(r) * ((wage(r, NULL, false)+1) + rand() % 5));
-		}
+
+#ifdef NEW_RESOURCEGROWTH
+	terraform_resources(r);
+#endif
+
+	if (terrain[t].production_max && !fval(r, RF_CHAOTIC)) {
+		int np = MAXPEASANTS_PER_AREA * (rand() % (terrain[t].production_max / 2));
+		rsetpeasants(r, max(100, np));
+		rsetmoney(r, rpeasants(r) * ((wage(r, NULL, false)+1) + rand() % 5));
 	}
 }
 
@@ -914,7 +1003,7 @@ resolve_region(void * id) {
 
 
 struct message_list *
-r_getmessages(struct region * r, const struct faction * viewer)
+r_getmessages(const struct region * r, const struct faction * viewer)
 {
 	struct individual_message * imsg = r->individual_messages;
 	while (imsg && (imsg)->viewer!=viewer) imsg = imsg->next;
@@ -938,3 +1027,5 @@ r_addmessage(struct region * r, const struct faction * viewer, struct message * 
 	}
 	return add_message(&imsg->msgs, msg);
 }
+
+

@@ -93,7 +93,11 @@ crt_register(const struct message_type * mtype)
 		crt->mtype = mtype;
 		crt->next = messagetypes;
 		messagetypes = crt;
-		crt->renderers = malloc(sizeof(tostring_f)*mtype->nparameters);
+		if(mtype->nparameters > 0) {
+			crt->renderers = malloc(sizeof(tostring_f)*mtype->nparameters);
+		} else {
+			crt->renderers = NULL;
+		}
 
 		/* TODO: can be scrapped for memory vs. speed */
 		for (i=0;i!=mtype->nparameters;++i) {

@@ -24,10 +24,10 @@
 #define RADIUS 75
 #define TP_RADIUS 2
 #endif
-struct region *r_standard_to_astral(struct region *r);
-struct region *r_astral_to_standard(struct region *);
+struct region *r_standard_to_astral(const struct region *r);
+struct region *r_astral_to_standard(const struct region *);
 struct regionlist *all_in_range(struct region *r, int n);
-struct regionlist *allinhab_in_range(struct region *r, int n);
+struct regionlist *allinhab_in_range(const struct region *r, int n);
 void create_teleport_plane(void);
 void set_teleport_plane_regiontypes(void);
 

@@ -1,3 +1,17 @@
+## OPTION <x>
+AUSWERTUNG;de;AUSWERTUNG
+COMPUTER;de;COMPUTER
+ZUGVORLAGE;de;ZUGVORLAGE
+SILBERPOOL;de;SILBERPOOL
+STATISTIK;de;STATISTIK
+DEBUG;de;DEBUG
+ZIPPED;de;ZIPPED
+ZEITUNG;de;ZEITUNG
+MATERIALPOOL;de;MATERIALPOOL
+ADRESSEN;de;ADRESSEN
+BZIP2;de;BZIP2
+PUNKTE;de;PUNKTE
+
 ## Schiffstypen
 Karavelle;de;Karavelle
 Boot;de;Boot
@@ -61,12 +75,12 @@ east;de;Osten
 southwest;de;Südwesten
 southeast;de;Südosten
 
-dir_NW;de;NW
-dir_NO;de;NO
-dir_Ost;de;Ost
-dir_SO;de;SO
-dir_SW;de;SW
-dir_West;de;West
+dir_nw;de;NW
+dir_ne;de;NO
+dir_east;de;Ost
+dir_se;de;SO
+dir_sw;de;SW
+dir_west;de;West
 
 ## Verschiedenes
 unknownunit;de;eine unbekannte Einheit
@@ -82,6 +96,7 @@ section_study;de;Lehren und Lernen
 section_battle;de;Kämpfe
 section_none;de;Verschiedenes
 section_newspells;de;Neue Zauber
+section_newpotions;de;Neue Tränke
 
 ## Gebäudetypen
 fortress_generic;de;Burg
@@ -296,6 +311,10 @@ museumticket;de;Eintrittskarte des Großen Museum
 museumticket_p;de;Eintrittskarten des Großen Museum
 museumexitticket;de;Rückkehrticket des Großen Museum
 museumexitticket_p;de;Rückkehrtickets des Großen Museum
+manacrystal;de;Astralkristall
+manacrystal_p;de;Astralkristalle
+skillpotion;de;Talenttrunk
+skillpotion_;de;Talenttrünke
 
 ## herb singular
 h0;de;Flachwurz
@@ -380,45 +399,47 @@ lmsreward;de;Gürtel der Heldentaten
 lmsreward_p;de;Gürtel der Heldentaten
 
 ## Parameter
+AGGRESSIV;de;AGGRESSIV
 ALLES;de;ALLES
+ANZAHL;de;ANZAHL
+AURA;de;AURA
 BAUERN;de;BAUERN
+BEISTAND;de;BEISTAND
+BEWACHE;de;BEWACHE
 BURG;de;BURG
+DEFENSIV;de;DEFENSIV
 EINHEIT;de;EINHEIT
-PRIVAT;de;PRIVAT
+ERESSEA;de;ERESSEA
+FLIEHE;de;FLIEHE
+FREMDES;de;FREMDES
+GEBÄUDE;de;GEBÄUDE
+GEGENSTÄNDE;de;GEGENSTÄNDE
+GIB;de;GIB
+GNADE;de;GNADE
+HELFE;de;HELFE
 HINTEN;de;HINTEN
+HINTER;de;HINTER
 KOMMANDO;de;KOMMANDO
 KRÄUTER;de;KRÄUTER
+KÄMPFE;de;KÄMPFE
 NICHT;de;NICHT
 NÄCHSTER;de;NÄCHSTER
 PARTEI;de;PARTEI
+PARTEITARNUNG;de;PARTEITARNUNG
+PAUSE;de;PAUSE
 PERSONEN;de;PERSONEN
+PRIVAT;de;PRIVAT
 REGION;de;REGION
 SCHIFF;de;SCHIFF
 SILBER;de;SILBER
 STRAßEN;de;STRAßEN
-TEMPORÄRE;de;TEMPORÄRE
-FLIEHE;de;FLIEHE
-GEBÄUDE;de;GEBÄUDE
-GIB;de;GIB
-KÄMPFE;de;KÄMPFE
-BEWACHE;de;BEWACHE
-ZAUBERBUCH;de;ZAUBERBUCH
-PAUSE;de;PAUSE
-VORNE;de;VORNE
-AGGRESSIV;de;AGGRESSIV
-DEFENSIV;de;DEFENSIV
 STUFE;de;STUFE
-HELFE;de;HELFE
-FREMDES;de;FREMDES
-AURA;de;AURA
-UM;de;UM
-BEISTAND;de;BEISTAND
-GNADE;de;GNADE
-HINTER;de;HINTER
-VOR;de;VOR
-ANZAHL;de;ANZAHL
-GEGENSTÄNDE;de;GEGENSTÄNDE
+TEMPORÄRE;de;TEMPORÄRE
 TRÄNKE;de;TRÄNKE
+UM;de;UM
+VOR;de;VOR
+VORNE;de;VORNE
+ZAUBER;de;ZAUBER
 
 ## ;Talente:
 sk_alchemy;de;Alchemie
@@ -524,7 +545,7 @@ Dämonen;de;Dämonen
 Einhorn;de;Einhorn
 Einhörner;de;Einhörner
 Elf;de;Elf
-Elfen;de;Elfen
+# Elfen;de;Elfen
 Eule;de;Eule
 Eulen;de;Eulen
 Geist;de;Geist
@@ -613,7 +634,6 @@ nr_herbsrequired;de;Benötigte Kräuter
 nr_undercons;de;im Bau
 nr_damaged;de;beschädigt
 nr_youaredead;de;Unglücklicherweise wurde deine Partei ausgelöscht. Du kannst gerne an einer anderen Stelle wieder einsteigen. Melde Dich einfach wieder an.
-nr_calendar;de;Wir schreiben %s des Monats %s im Jahre %d %s.
 nr_skills;de;Talente
 nr_inventory;de;hat
 nr_size;de;Größe
@@ -621,6 +641,11 @@ nr_spells;de;Zauber
 nr_combatspells;de;Kampfzauber
 nr_nospells;de;keiner
 nr_addresses;de;Liste aller Adressen
+anonymous;de;anonym
+b_attacke;de;Angriff
+b_defense;de;Verteidigung
+b_armor;de;Rüstung
+b_damage;de;Schaden
 
 
 ## Küsten
@@ -631,3 +656,8 @@ Südostküste;de;Südostküste
 Südwestküste;de;Südwestküste
 Westküste;de;Westküste
 
+## report newbie info
+newbie_info_1;de;Bitte denke daran, deine Befehle mit dem Betreff ERESSEA BEFEHLE an eressea@eressea.amber.kn-bremen.de zu senden. Am besten, du verwendest die Befehlsvorlage am Ende des Reports.
+newbie_info_2;de;Die ersten beiden Züge mußt du abgeben, sonst wird deine Partei sofort wieder gelöscht, um Karteileichen zu vermeiden.
+newbie_info_3;de;Mit der ersten Auswertung bekommst du einen Computerreport, den du mit vielen der Tools auf http://eressea-pbem.de/download.html benutzen kannst. Wenn du ihn weiterhin bekommen willst, gib einer deiner Einheiten den Befehl OPTION COMPUTER.
+nr_nmr;de;Deine Partei hat letzte Runde keinen Zug abgegeben!

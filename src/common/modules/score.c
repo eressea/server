@@ -263,10 +263,11 @@ score(void)
 
 	scoreFP = fopen(buf, "w");
 	for (f = factions; f; f = f->next) {
-		fprintf(scoreFP, "%8d (%7d/%4.2f%%) %32.32s (%3.3s) %5s (%3d)\n",
+		fprintf(scoreFP, "%8d (%8d/%4.2f%%/%5.2f) %30.30s (%3.3s) %5s (%3d)\n",
 			f->score, f->score - average_score_of_age(f->age, f->age / 24 + 1),
-		      ((float) f->score / (float) allscores) * 100.0, f->name,
-			race[f->race].name[0], factionid(f), f->age);
+		      ((float) f->score / (float) allscores) * 100.0,
+					(float) f->score / f->number,
+					f->name, race[f->race].name[0], factionid(f), f->age);
 	}
 
 	fclose(scoreFP);

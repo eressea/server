@@ -142,10 +142,16 @@ do_shock(unit *u, char *reason)
 		}
 	}
 
-	/*
+	/* Dies ist ein Hack, um das skillmod und familiar-Attribut beim Mage
+	 * zu löschen wenn der Familiar getötet wird. Da sollten wir über eine
+	 * saubere Implementation nachdenken. */
+
+	if(!strcmp(reason, "trigger")) {
+		remove_familiar(u);
+	}
+
 	add_message(&u->faction->msgs, new_message(u->faction,
-		"shock%u:mage%s:reason", u, reason));
-	*/
+		"shock%u:mage%s:reason", u, strdup(reason)));
 }
 
 /* ------------------------------------------------------------- */
@@ -338,7 +344,10 @@ destroy_curse(attrib **alist, int cast_level, int force,
 		c = (curse*)a->data.v;
 
 		/* Immunität prüfen */
-		if (c->flag & CURSE_IMMUN) continue;
+		if (c->flag & CURSE_IMMUN) {
+			do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
+			continue;
+		}
 
 		if(!ctype || c->type==ctype) { /* wirkt auf alle */
 			if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
@@ -869,7 +878,7 @@ sp_destroy_magic(castorder *co)
 			mage, mage->region, strdup(co->order)));
 	}
 
-	return max(succ, 0);
+	return max(succ, 1);
 }
 
 /* ------------------------------------------------------------- */
@@ -899,6 +908,13 @@ sp_transferaura(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	spellparameter *pa = co->par;
+
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
+	/* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+	 * abbrechen aber kosten lassen */
+	if(pa->param[0]->flag == TARGET_RESISTS) return cast_level;
 
 	/* Zieleinheit ermitteln */
 	u = pa->param[0]->data.u;
@@ -971,6 +987,9 @@ sp_goodwinds(castorder *co)
 	ship *sh;
 	unit *u;
 
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
 	sh = pa->param[0]->data.sh;
 
 	/* keine Probleme mit C_SHIP_SPEEDUP und C_SHIP_FLYING */
@@ -1025,7 +1044,7 @@ sp_magicstreet(castorder *co)
 		cmistake(mage, strdup(co->order), 186, MSG_MAGIC);
     return 0;
 	}
-	dir = finddirection(pa->param[0]->data.s);
+	dir = finddirection(pa->param[0]->data.s, mage->faction->locale);
 
 	if (rroad(r, dir)){
 		cmistake(mage, strdup(co->order), 187, MSG_MAGIC);
@@ -1079,14 +1098,7 @@ sp_summonent(castorder *co)
 
 	ents = min(power*power, rtrees(r));
 
-	u = createunit(r, mage->faction, ents, RC_TREEMAN);
-	if (r==mage->region) {
-		u->building = mage->building;
-		u->ship = mage->ship;
-	}
-	set_string(&u->name, race[RC_TREEMAN].name[u->number>1]);
-	if (fval(mage, FL_PARTEITARNUNG))
-		fset(u, FL_PARTEITARNUNG);
+	u = create_unit(r, mage->faction, ents, RC_TREEMAN, 0, race[RC_TREEMAN].name[ents>1], mage);
 
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 2;	/* An r->trees. */
@@ -1127,6 +1139,9 @@ sp_blessstonecircle(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	spellparameter *p = co->par;
+
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(p->param[0]->flag == TARGET_NOTFOUND) return 0;
 
 	b = p->param[0]->data.b;
 
@@ -1279,7 +1294,7 @@ sp_blessedharvest(castorder *co)
  * Gebiet:     Gwyrrd
  * Syntax:     ZAUBER [REGION x y] [STUFE 2] "Hain"
  * Wirkung:
- *     Erschafft 2-10*Stufe Bäume
+ *     Erschafft Stufe-10*Stufe Bäume
  *
  * Flag:
  * (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE)
@@ -1294,6 +1309,11 @@ sp_hain(castorder *co)
 	int cast_level = co->level;
 	int force = co->force;
 
+	if(!r->land) {
+		cmistake(mage, strdup(co->order), 296, MSG_MAGIC);
+		return cast_level;
+	}
+
 	trees = lovar(force * 10) + force;
 	rsettrees(r, rtrees(r) + trees);
 
@@ -1305,6 +1325,36 @@ sp_hain(castorder *co)
 	}
 
 	return cast_level;
+}
+
+void
+patzer_ents(castorder *co)
+{
+	int ents;
+	unit *u;
+	region *r = co->rt;
+	unit *mage = (unit *)co->magician;
+	/* int cast_level = co->level; */
+	int force = co->force;
+
+	if(!r->land) {
+		cmistake(mage, strdup(co->order), 296, MSG_MAGIC);
+		return;
+	}
+
+	ents = force*10;
+	u = create_unit(r, findfaction(MONSTER_FACTION), ents, RC_TREEMAN, 0, race[RC_TREEMAN].name[ents>1], NULL);
+
+	/* 'Erfolg' melden */
+	add_message(&mage->faction->msgs, new_message(mage->faction,
+				"regionmagic_patzer%u:unit%r:region%s:command%u:unit", mage,
+				mage->region, strdup(co->order), mage));
+
+	/* melden, 1x pro Partei */
+	{
+		message * unseen = msg_message("entrise", "region amount", r, ents);
+		report_effect(r, mage, unseen, unseen);
+	}
 }
 
 /* ------------------------------------------------------------- */
@@ -1488,6 +1538,13 @@ sp_sparkle(castorder *co)
 	int cast_level = co->level;
 	spellparameter *pa = co->par;
 
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
+	/* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+	 * abbrechen aber kosten lassen */
+	if(pa->param[0]->flag == TARGET_RESISTS) return cast_level;
+
 	u = pa->param[0]->data.u;
 	create_curse(mage, &u->attribs, C_SPARKLE, 0, cast_level,
 			cast_level, rand(), u->number);
@@ -1543,17 +1600,10 @@ sp_create_irongolem(castorder *co)
 		return 0;
 	}
 
-	u2 = createunit(r, mage->faction, force*8, RC_IRONGOLEM);
-	if (r==mage->region) {
-		u2->building = mage->building;
-		u2->ship = mage->ship;
-	}
+	u2 = create_unit(r, mage->faction, force*8, RC_IRONGOLEM, 0, race[RC_IRONGOLEM].name[1], mage);
+
 	set_skill(u2, SK_ARMORER, 30*u2->number);
 	set_skill(u2, SK_WEAPONSMITH, 30*u2->number);
-	if (fval(mage, FL_PARTEITARNUNG))
-		fset(u2, FL_PARTEITARNUNG);
-
-	set_string(&u2->name, "Eisengolems");
 
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 0;
@@ -1610,17 +1660,9 @@ sp_create_stonegolem(castorder *co)
 		return 0;
 	}
 
-	u2 = createunit(r, mage->faction, force* 5,RC_STONEGOLEM);
-	if (r==mage->region) {
-		u2->building = mage->building;
-		u2->ship = mage->ship;
-	}
+	u2 = create_unit(r, mage->faction, force*5, RC_STONEGOLEM, 0, race[RC_STONEGOLEM].name[1], mage);
 	set_skill(u2, SK_ROAD_BUILDING, 30*u2->number);
 	set_skill(u2, SK_BUILDING, 30*u2->number);
-	if (fval(mage, FL_PARTEITARNUNG))
-		fset(u2, FL_PARTEITARNUNG);
-
-	set_string(&u2->name, "Steingolems");
 
 	a = a_new(&at_unitdissolve);
 	a->data.ca[0] = 0;
@@ -2065,7 +2107,7 @@ sp_holyground(castorder *co)
 	create_curse(mage, &r->attribs, C_HOLYGROUND, 0,
 			power*power, 1, 0, 0);
 
-	set_curseflag(mage->building->attribs, C_HOLYGROUND, 0, CURSE_NOAGE);
+	set_curseflag(mage->region->attribs, C_HOLYGROUND, 0, CURSE_NOAGE);
 
 	a_removeall(&r->attribs, &at_deathcount);
 
@@ -2299,15 +2341,11 @@ sp_ironkeeper(castorder *co)
 		addmessage(r, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
-	keeper = createunit(r, mage->faction, 1, RC_IRONKEEPER);
-	if (r==mage->region) {
-		keeper->building = mage->building;
-		keeper->ship = mage->ship;
-	}
+	keeper = create_unit(r, mage->faction, 1, RC_IRONKEEPER, 0, "Bergwächter", mage);
+
 	/*keeper->age = cast_level + 2;*/
 	guard(keeper, GUARD_MINING);
 	fset(keeper, FL_ISNEW);
-	set_string(&keeper->name, "Bergwächter");
 	keeper->status = ST_AVOID;	/* kaempft nicht */
 	/* Parteitarnen, damit man nicht sofort weiß, wer dahinter steckt */
 	fset(keeper, FL_PARTEITARNUNG);
@@ -2656,6 +2694,9 @@ sp_fumblecurse(castorder *co)
 	int cast_level = co->level;
 	int force = co->force;
 	spellparameter *pa = co->par;
+
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
 	target = pa->param[0]->data.u;
 
@@ -3016,7 +3057,7 @@ sp_firewall(castorder *co)
 	direction_t dir;
 	region * r2;
 
-	dir = finddirection(pa->param[0]->data.s);
+	dir = finddirection(pa->param[0]->data.s, mage->faction->locale);
 	if (dir<MAXDIRECTIONS && dir!=NODIRECTION){
 		r2 = rconnect(r, dir);
 	} else {
@@ -3098,7 +3139,7 @@ sp_wisps(castorder *co)
 	int force = co->force;
 	spellparameter *pa = co->par;
 
-	dir = finddirection(pa->param[0]->data.s);
+	dir = finddirection(pa->param[0]->data.s, mage->faction->locale);
 	r2 = rconnect(r, dir);
 
 	if (!r2) {
@@ -3160,8 +3201,14 @@ sp_unholypower(castorder *co)
 	n = dice(co->force, 10);
 
 	for (i = 0; i < pa->length && n > 0; i++) {
-		race_t target_race;
-		unit *u = pa->param[i]->data.u;
+			unit *u;
+			race_t target_race;
+
+		if(pa->param[i]->flag == TARGET_RESISTS
+				|| pa->param[i]->flag == TARGET_NOTFOUND)
+			continue;
+
+		u = pa->param[i]->data.u;
 
 		switch(u->race) {
 		case RC_SKELETON:
@@ -3179,7 +3226,8 @@ sp_unholypower(castorder *co)
 			n -= u->number;
 			u->race = target_race;
 			add_message(&co->rt->msgs, new_message(mage->faction,
-				"unholypower_effect%u:mage%u:target%s:targetrace", mage, u));
+				"unholypower_effect%u:mage%u:target%s:targetrace", mage, u,
+				race[u->race].name[1]));
 		} else {
 			unit *un;
 
@@ -3512,7 +3560,7 @@ sp_chaossuction(castorder *co)
 	for (u = rt->units; u; u = u->next) {
 		if (!fval(u->faction, FL_DH)) {
 			fset(u->faction, FL_DH);
-			addmessage(r, u->faction, "Jemand öffnete ein Chaostor.",
+			addmessage(r, u->faction, "Ein Wirbel aus blendendem Licht erscheint.",
 				MSG_EVENT, ML_INFO);
 		}
 	}
@@ -3584,7 +3632,7 @@ sp_magicboost(castorder *co)
  * Kategorie:  Einheit, positiv
  *
  * Wirkung:
- *   Hitpoints to Aura: 
+ *   Hitpoints to Aura:
  *   skill < 8  = 4:1
  *   skill < 12 = 3:1
  *   skill < 15 = 2:1
@@ -3632,11 +3680,10 @@ sp_bloodsacrifice(castorder *co)
 
 	change_spellpoints(mage, aura);
 	use_pooled(mage, mage->region, R_HITPOINTS, damage);
-
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-		"sp_bloodsacrifice_effect%u:unit%r:region%s:command%i:amount",
+	ADDMSG(&mage->faction->msgs,
+		msg_message("sp_bloodsacrifice_effect",
+		"unit region command amount",
 		mage, mage->region, strdup(co->order), aura));
-
 	return cast_level;
 }
 
@@ -3787,6 +3834,9 @@ sp_babbler(castorder *co)
 	int cast_level = co->level;
 	spellparameter *pa = co->par;
 
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
 	target = pa->param[0]->data.u;
 
 	if (target->faction == mage->faction){
@@ -3796,7 +3846,7 @@ sp_babbler(castorder *co)
 
 	/* Magieresistenz Unit */
 	if (target_resists_magic(mage, target, TYP_UNIT, 0)){
-		spy_message(0, mage, target);
+		spy_message(5, mage, target);
 		sprintf(buf, "%s hat einen feuchtfröhlichen Abend in der Taverne "
 				"verbracht. Ausser einem fürchterlichen Brummschädel ist da auch "
 				"noch das dumme Gefühl %s seine ganze Lebensgeschichte "
@@ -3805,7 +3855,7 @@ sp_babbler(castorder *co)
 		addmessage(r, target->faction, buf, MSG_EVENT, ML_WARN);
 
 	} else {
-		spy_message(2, mage, target);
+		spy_message(100, mage, target);
 		sprintf(buf, "%s hat einen feuchtfröhlichen Abend in der Taverne "
 				"verbracht. Ausser einem fürchterlichen Brummschädel ist da auch "
 				"noch das dumme Gefühl die ganze Taverne mit seiner Lebensgeschichte "
@@ -3890,6 +3940,13 @@ sp_analysesong_unit(castorder *co)
 	int force = co->force;
 	spellparameter *pa = co->par;
 
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
+	/* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+	 * abbrechen aber kosten lassen */
+	if(pa->param[0]->flag == TARGET_RESISTS) return cast_level;
+
 	u = pa->param[0]->data.u;
 
 	magicanalyse_unit(u, mage, force);
@@ -3934,6 +3991,9 @@ sp_charmingsong(castorder *co)
 	spellparameter *pa = co->par;
 	int resist_bonus = 0;
 	int tb = 0;
+
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
 	target = pa->param[0]->data.u;
 
@@ -4226,6 +4286,9 @@ sp_migranten(castorder *co)
 	spellparameter *pa = co->par;
 	spell *sp = co->sp;
 
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
 	/* Personen unserer Rasse können problemlos normal übergeben werden */
@@ -4338,7 +4401,10 @@ sp_song_of_peace(castorder *co)
 	int cast_level = co->level;
 	int force = co->force;
 
-	duration = lovar(force/2);
+	if(force < 2)
+		duration = 0;
+	else
+		duration = lovar(force/2);
 
 	create_curse(mage,&r->attribs,C_PEACE,0,force,duration,1,0);
 
@@ -4413,7 +4479,7 @@ sp_generous(castorder *co)
  * Stufe:          4
  * Gebiet:         Cerddor
  * Wirkung:
- *         bis zu Stufe*10 Bauern schliessen sich der eigenen Partei an
+ *         Bauern schliessen sich der eigenen Partei an
  *         ist zusätzlich zur Rekrutierungsmenge in der Region
  * */
 
@@ -4434,13 +4500,9 @@ sp_recruit(castorder *co)
 		report_failure(mage, co->order);
 		return 0;
 	}
-#ifdef WAHNSINN
-	n = (int)pow(force, 1.5);
-#else
 	/* Immer noch zuviel auf niedrigen Stufen. Deshalb die Rekrutierungskosten
 	 * mit einfliessen lassen und dafür den Exponenten etwas größer. */
 	n = (int)((pow(force, 1.6) * 50)/race[f->race].rekrutieren);
-#endif
 	n = min(rpeasants(r),n);
 	n = max(n, 1);
 
@@ -4450,22 +4512,8 @@ sp_recruit(castorder *co)
 	}
 
 	rsetpeasants(r, rpeasants(r) - n);
-	u = createunit(r, f, n, f->race);
-	if (r==mage->region) {
-		u->building = mage->building;
-		u->ship = mage->ship;
-	}
-	set_string(&u->name, n == 1 ? "Bauer" : "Bauern");
+	u = create_unit(r, f, n, f->race, 0, (n == 1 ? "Bauer" : "Bauern"), mage);
 	set_string(&u->thisorder, locale_string(u->faction->locale, keywords[K_WORK]));
-	u->status = mage->status;
-
-	/* Parteitarnung */
-	if (fval(mage, FL_PARTEITARNUNG))
-		fset(u, FL_PARTEITARNUNG);
-
-	/* Daemonentarnung */
-	if(mage->race == RC_DAEMON)
-		u->irace = mage->irace;
 
 	sprintf(buf, "%s konnte %d %s anwerben", unitname(mage), n,
 			n == 1 ? "Bauer" : "Bauern");
@@ -4498,6 +4546,9 @@ sp_pump(castorder *co)
 	spellparameter *pa = co->par;
 	int cast_level = co->level;
 	spell *sp = co->sp;
+
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
@@ -4565,6 +4616,9 @@ sp_seduce(castorder *co)
 	int cast_level = co->level;
 	spell *sp = co->sp;
 	int force = co->force;
+
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
@@ -4669,6 +4723,9 @@ sp_calm_monster(castorder *co)
 
 	duration = force;
 
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
 	if (is_undead(target)){
@@ -4718,6 +4775,9 @@ sp_headache(castorder *co)
 
 	/* Macht alle nachfolgenden Zauber doppelt so teuer */
 	countspells(mage, 1);
+
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
 	target = pa->param[0]->data.u; /* Zieleinheit */
 
@@ -4778,9 +4838,8 @@ sp_raisepeasants(castorder *co)
 	bauern = min(rpeasants(r),power*250);
 	rsetpeasants(r, rpeasants(r) - bauern);
 
-	u2 = createunit(r,mage->faction, bauern,RC_PEASANT);
+	u2 = create_unit(r,mage->faction, bauern,RC_PEASANT,0,"Wilder Bauernmob",mage);
 
-	set_string(&u2->name, "Wilder Bauernmob");
 	fset(u2, FL_LOCKED);
 	fset(u2, FL_PARTEITARNUNG);
 
@@ -4860,8 +4919,8 @@ sp_puttorest(castorder *co)
 
 	deathcounts(r, -laid_to_rest);
 
-	report_effect(r, mage, 
-		msg_message("puttorest", "mage", mage), 
+	report_effect(r, mage,
+		msg_message("puttorest", "mage", mage),
 		msg_message("puttorest", "mage", NULL));
 	return co->level;
 }
@@ -4904,7 +4963,7 @@ sp_icastle(castorder *co)
 	} else {
 		b->size = b->type->maxsize;
 	}
-	sprintf(buf, "%s %s", buildingtype(b, 0, mage->faction->locale), buildingid(b));
+	sprintf(buf, "%s %s", LOC(mage->faction->locale, buildingtype(b, 0)), buildingid(b));
 	set_string(&b->name, buf);
 
 	/* TODO: Auf timeout und action_destroy umstellen */
@@ -4952,6 +5011,13 @@ sp_illusionary_shapeshift(castorder *co)
 	int cast_level = co->level;
 	int power = co->force;
 	spellparameter *pa = co->par;
+
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
+	/* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+	 * abbrechen aber kosten lassen */
+	if(pa->param[0]->flag == TARGET_RESISTS) return cast_level;
 
 	u = pa->param[0]->data.u;
 
@@ -5010,6 +5076,9 @@ sp_readmind(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	spellparameter *pa = co->par;
+
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
 	target = pa->param[0]->data.u;
 
@@ -5074,6 +5143,13 @@ sp_analysedream(castorder *co)
 	int cast_level = co->level;
 	spellparameter *pa = co->par;
 
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
+	/* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+	 * abbrechen aber kosten lassen */
+	if(pa->param[0]->flag == TARGET_RESISTS) return cast_level;
+
 	u = pa->param[0]->data.u;
 	magicanalyse_unit(u, mage, cast_level);
 
@@ -5104,7 +5180,8 @@ sp_baddreams(castorder *co)
 
 	/* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
 	 * also duration+2 */
-	duration = rand()%(power/2)+2;
+	duration = max(1, power/2); /* Stufe 1 macht sonst mist */
+	duration = 2 + rand()%duration;
 
 	/* Nichts machen als ein entsprechendes Attribut in die Region legen. */
 	create_curse(mage, &r->attribs, C_GBDREAM, 0, power, duration, -1, 0);
@@ -5141,7 +5218,8 @@ sp_gooddreams(castorder *co)
 
 	/* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
 	 * also duration+2 */
-	duration = rand()%(power/2+1)+2;
+	duration = max(1, power/2); /* Stufe 1 macht sonst mist */
+	duration = 2 + rand()%duration;
 	create_curse(mage, &r->attribs, C_GBDREAM, 0, power, duration, 1, 0);
 	set_curseflag(r->attribs, C_GBDREAM, 0, CURSE_ISNEW);
 
@@ -5149,6 +5227,49 @@ sp_gooddreams(castorder *co)
 	add_message(&mage->faction->msgs, new_message(mage->faction,
 				"regionmagic_effect%u:unit%r:region%s:command%u:unit", mage,
 				mage->region, strdup(co->order), mage));
+
+	return cast_level;
+}
+
+/* ------------------------------------------------------------- */
+/* Name:       
+ * Stufe:      9
+ * Kategorie:
+ * Wirkung:
+ * 	Es wird eine Kloneinheit erzeugt, die nichts kann. Stirbt der
+ * 	Magier, wird er mit einer Wahrscheinlichkeit von 90% in den Klon
+ * 	transferiert.
+ * Flags:
+ * (NOTFAMILARCAST)
+ */
+int
+sp_clonecopy(castorder *co)
+{
+	unit *clone;
+	region *r = co->rt;
+	region *target_region = co->rt;
+	unit *mage = (unit *)co->magician;
+	int cast_level = co->level;
+
+	if (get_clone(mage) != NULL ) {
+		cmistake(mage, strdup(co->order), 298, MSG_MAGIC);
+		return 0;
+	}
+
+	clone = createunit(target_region, mage->faction, 1, RC_CLONE);
+	if (target_region==mage->region) {
+		clone->building = mage->building;
+		clone->ship = mage->ship;
+	}
+	clone->status = ST_FLEE;
+	sprintf(buf, "Klon von %s", unitname(mage));
+	set_string(&clone->name, buf);
+	fset(clone, FL_LOCKED);
+	
+	create_newclone(mage, clone);
+
+	sprintf(buf, "%s erschafft einen Klon.", unitname(mage));
+	addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
 
 	return cast_level;
 }
@@ -5164,13 +5285,20 @@ sp_dreamreading(castorder *co)
 	spellparameter *pa = co->par;
 	int power = co->force;
 
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
+	/* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+	 * abbrechen aber kosten lassen */
+	if(pa->param[0]->flag == TARGET_RESISTS) return cast_level;
+
 	u = pa->param[0]->data.u;
 
 	/* Illusionen und Untote abfangen. */
 	if (is_undead(u) || u->race == RC_ILLUSION){
 		add_message(&mage->faction->msgs, new_message(mage->faction,
 			"spellunitnotfound%u:unit%r:region%s:command%s:id",
-			mage, mage->region, strdup(co->order), unitid(u)));
+			mage, mage->region, strdup(co->order), strdup(itoa36(u->no))));
 		return 0;
 	}
 
@@ -5389,6 +5517,9 @@ sp_itemcloak(castorder *co)
 	int cast_level = co->level;
 	int power = co->force;
 	spellparameter *pa = co->par;
+
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
 	/* Zieleinheit */
 	target = pa->param[0]->data.u;
@@ -5773,9 +5904,9 @@ sp_leaveastral(castorder *co)
 
 	/* für jede Einheit in der Kommandozeile */
 	for (n = 1; n < pa->length; n++) {
-		u = pa->param[n]->data.u;
-
 		if(pa->param[n]->flag == TARGET_NOTFOUND) continue;
+
+		u = pa->param[n]->data.u;
 
 		if(!ucontact(u, mage)) {
 			if(power > 10 && !pa->param[n]->flag == TARGET_RESISTS && can_survive(u, rt)) {
@@ -6203,6 +6334,9 @@ sp_eternizewall(castorder *co)
 	int power = co->force;
 	spellparameter *pa = co->par;
 
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
 	b = pa->param[0]->data.b;
 	success = create_curse(mage, &b->attribs, C_NOCOST, 0,
 			power*power, 1, 0, 0);
@@ -6264,6 +6398,13 @@ sp_permtransfer(castorder *co)
 	spellparameter *pa = co->par;
 	spell *sp = co->sp;
 
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
+	/* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+	 * abbrechen aber kosten lassen */
+	if(pa->param[0]->flag == TARGET_RESISTS) return cast_level;
+
 	tu = pa->param[0]->data.u;
 	aura = pa->param[0]->data.i;
 
@@ -6307,8 +6448,11 @@ sp_movecastle(castorder *co)
 	spellparameter *pa = co->par;
 	spell *sp = co->sp;
 
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
 	b = pa->param[0]->data.b;
-	dir = finddirection(pa->param[1]->data.s);
+	dir = finddirection(pa->param[1]->data.s, mage->faction->locale);
 
 	if(dir == NODIRECTION) {
 		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Ungültige Richtung %s.",
@@ -6396,6 +6540,9 @@ sp_flying_ship(castorder *co)
 	int power = co->force;
 	spellparameter *pa = co->par;
 
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+
 	sh = pa->param[0]->data.sh;
 
 	if(is_cursed(sh->attribs, C_SHIP_FLYING, 0) ) {
@@ -6457,6 +6604,9 @@ sp_stealaura(castorder *co)
 	int cast_level = co->level;
 	int power = co->force;
 	spellparameter *pa = co->par;
+
+	/* wenn kein Ziel gefunden, Zauber abbrechen */
+	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
 	/* Zieleinheit */
 	u  = pa->param[0]->data.u;
@@ -6721,6 +6871,7 @@ sp_q_antimagie(castorder *co)
 	int cast_level = co->level;
 	int force = co->force;
 	spellparameter *pa = co->par;
+	char *ts;
 
 	obj = pa->param[0]->typ;
 
@@ -6731,26 +6882,28 @@ sp_q_antimagie(castorder *co)
 	switch(obj){
 		case SPP_REGION:
 			ap = &r->attribs;
+			set_string(&ts, regionid(r));
 			break;
 
 		case SPP_UNIT:
 		{
-			unit *u;
-			u = pa->param[0]->data.u;
+			unit *u = pa->param[0]->data.u;
 			ap = &u->attribs;
+			set_string(&ts, unitid(u));
+			break;
 		}
 		case SPP_BUILDING:
 		{
-			building *b;
-			b = pa->param[0]->data.b;
+			building *b = pa->param[0]->data.b;
 			ap = &b->attribs;
+			set_string(&ts, buildingid(b));
 			break;
 		}
 		case SPP_SHIP:
 		{
-			ship *sh;
-			sh = pa->param[0]->data.sh;
+			ship *sh = pa->param[0]->data.sh;
 			ap = &sh->attribs;
+			set_string(&ts, shipid(sh));
 			break;
 		}
 		default:
@@ -6761,7 +6914,17 @@ sp_q_antimagie(castorder *co)
 
 	succ = destroy_curse(ap, cast_level, force, ctype);
 
-	return max(succ, 0);
+	if(succ) {
+		add_message(&mage->faction->msgs, new_message(mage->faction,
+			"destroy_magic_effect%u:unit%r:region%s:command%i:succ%s:target",
+			mage, mage->region, strdup(co->order), succ, strdup(ts)));
+	} else {
+		add_message(&mage->faction->msgs, new_message(mage->faction,
+			"destroy_magic_noeffect%u:unit%r:region%s:command",
+			mage, mage->region, strdup(co->order)));
+	}
+
+	return max(succ, 1);
 }
 
 int
@@ -7152,26 +7315,21 @@ spell spelldaten[] =
 	},
 
 	{SPL_TREEGROW, "Hainzauber",
-		"In einer Vollmondnacht pflanze einige geweihte Eicheln am "
-		"gewünschten Orte. "
-		"Sodann beginne dieses Ritual der Fruchtbarkeit: Dreimal sprenge "
-		"Wasser aus heiliger Quelle auf die Samen und rufe die Kräfte des "
-		"Mondes. Dreimal benetze die Samen mit Tau von geweihtem Ort und "
-		"spreche das Wort der Macht. Dreimal sprenge das Blut eines "
-		"Opfertieres und rufe die Kräfte der Erde. Sodann werden in nur "
-		"einer Nacht die Samen zur kräftigen Bäumen heranreifen.",
+		"Diese Ritual verstärkt die Wirkung des magischen Trankes um ein "
+		"vielfaches. Wo sonst aus einem Stecken nur ein Baum spießen konnte, "
+		"so treibt nun jeder Ast Wurzeln.",
 		NULL,
 		NULL,
 	 M_DRUIDE,
 	 (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
 	 5, 2,
 	 {
-		 {R_AURA, 2, SPC_LEVEL},
-		 {R_SILVER, 50, SPC_FIX},
-		 {0, 0, 0},
+		 {R_AURA, 4, SPC_LEVEL},
+		 {R_WOOD, 1, SPC_LEVEL},
+		 {R_TREES, 1, SPC_FIX},
 		 {0, 0, 0},
 		 {0, 0, 0}},
-	 (spell_f)sp_hain, patzer
+	 (spell_f)sp_hain, patzer_ents
 	},
 
 	{SPL_RUSTWEAPON, "Rostregen",
@@ -7402,7 +7560,7 @@ spell spelldaten[] =
 		NULL,
 		"s+",
 		M_DRUIDE,
-		(SHIPSPELL | ONSHIPCAST | OCEANCASTABLE | TESTRESISTANCE),
+		(SHIPSPELL | ONSHIPCAST | OCEANCASTABLE | TESTRESISTANCE | SPELLLEVEL),
 		5, 6,
 		{
 		 {R_AURA, 6, SPC_LEVEL},
@@ -7733,7 +7891,7 @@ spell spelldaten[] =
 			{0, 0, 0}},
 		(spell_f)sp_maelstrom, patzer
 	},
-	
+
 	{SPL_MALLORN, "Wurzeln der Magie",
 		"Mit Hilfe dieses aufwändigen Rituals läßt der Druide einen Teil seiner "
 		"dauerhaft in den Boden und die Wälder der Region fliessen. Dadurch wird "
@@ -8290,7 +8448,7 @@ spell spelldaten[] =
 
 	{SPL_SPARKLE_DREAM, "Traumsenden",
 		"Der Zauberer sendet dem Ziel des Spruches einen Traum.",
-	 "ZAUBERE Traumsenden <Einheit-Nr>",
+		NULL,
 		"u",
 		M_TRAUM,
 		(UNITSPELL | TESTCANSEE | SPELLLEVEL | ONETARGET | ONSHIPCAST),
@@ -8595,10 +8753,10 @@ spell spelldaten[] =
 		NULL,
 		NULL,
 		M_TRAUM,
-		(FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
+		(FARCASTING | REGIONSPELL | TESTRESISTANCE),
 		5, 8,
 		{
-			{R_AURA, 8, SPC_LEVEL},
+			{R_AURA, 80, SPC_FIX},
 		 {0, 0, 0},
 		 {0, 0, 0},
 		 {0, 0, 0},
@@ -8643,6 +8801,28 @@ spell spelldaten[] =
 			{0, 0, 0}},
 	 (spell_f)sp_summon_familiar, patzer
 	},
+	
+	{SPL_CLONECOPY, "Seelenkopie",
+		"Dieser mächtige Zauber kann einen Magier vor dem sicheren Tod "
+		"bewahren. Der Magier erschafft anhand einer kleinen Blutprobe einen "
+		"Klon von sich, und legt diesen in ein Bad aus Drachenblut und verdünntem "
+		"Wasser des Lebens. "
+		"Anschließend transferiert er in einem aufwändigen Ritual einen Teil "
+		"seiner Seele in den Klon. Stirbt der Magier, reist seine Seele in den "
+		"Klon und der erschaffene Körper dient nun dem Magier als neues Gefäß. "
+		"Es besteht allerdings eine geringer Wahrscheinlichkeit, dass die Seele "
+		"nach dem Tod zu schwach ist, das neue Gefäß zu erreichen.",
+		NULL,
+		NULL,
+	 M_TRAUM, (NOTFAMILIARCAST), 5, 9,
+	 {
+			{R_AURA, 100, SPC_FIX},
+			{R_PERMAURA, 20, SPC_FIX},
+			{R_DRACHENBLUT, 5, SPC_FIX},
+		  {R_TREES, 5, SPC_FIX},
+			{0, 0, 0}},
+	 (spell_f)sp_clonecopy, patzer
+	},
 
 	{SPL_BADDREAMS, "Schlechte Träume",
 	 "Dieser Zauber ermöglicht es dem Träumer, den Schlaf aller nichtaliierten "
@@ -8651,9 +8831,9 @@ spell spelldaten[] =
 		NULL,
 		NULL,
 		M_TRAUM,
-		(FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 5, 10,
+		(FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 10,
 		{
-			{R_AURA, 9, SPC_LEVEL},
+			{R_AURA, 90, SPC_FIX},
 		 {0, 0, 0},
 		 {0, 0, 0},
 		 {0, 0, 0},
@@ -10063,7 +10243,9 @@ spell spelldaten[] =
 	},
 
 	{SPL_ARTEFAKT_CHASTITYBELT, "Erschaffe ein Amulett der Keuschheit",
-		"",
+		"Dieses Amulett in Gestalt einer orkischen Matrone unterdrückt den "
+		"Fortpflanzungstrieb eines einzelnen Orks sehr zuverlässig. Ein Ork "
+		"mit Amulett der Keuschheit wird sich nicht mehr vermehren.",
 		NULL,
 		NULL,
 		M_GRAU, (ONSHIPCAST), 5, 7,

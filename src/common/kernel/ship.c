@@ -145,6 +145,26 @@ const ship_type st_boat = {
 	&boat_bld
 };
 
+
+static requirement balloon_req[] = {
+  {0, 0}
+};
+
+static const construction balloon_bld = {
+	SK_SHIPBUILDING, 100,
+	5, 1, balloon_req,
+	NULL
+};
+
+const ship_type st_balloon = {
+	{ "Ballon", "ein Ballon" }, 2,
+	SFL_OPENSEA|SFL_FLY, 0, 1.00, 1.00,
+	5, 50*100,
+	6, 6, 6, coast_small,
+	&balloon_bld
+};
+
+
 static requirement longboat_req[] = {
   {I_WOOD, 1},
   {0, 0}

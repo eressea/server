@@ -32,8 +32,8 @@ extern const char *neue_gebiete[];
 
 /* kann_finden speedups */
 extern boolean kann_finden(struct faction * f1, struct faction * f2);
-extern void add_find(struct faction *, struct unit *, struct faction *);
 extern struct unit * can_find(struct faction *, struct faction *);
+extern int season(int turn);
 /* funktionen zum schreiben eines reports */
 extern int read_datenames(const char *filename);
 void sparagraph(struct strlist ** SP, const char *s, int indent, char mark);
@@ -43,8 +43,6 @@ extern void spskill(const struct locale * lang, const struct unit * u, skill_t s
 extern void spunit(struct strlist ** SP, const struct faction * f, const struct unit * u, int indent, int mode);
 
 void reports(void);
-char *gamedate(const struct locale *);
-char *gamedate2(void);
 
 extern const struct unit *ucansee(const struct faction *f, const struct unit *u, const struct unit *x);
 
@@ -53,11 +51,10 @@ extern void report_summary(struct summary * n, struct summary * o, boolean full)
 extern struct summary * make_summary(boolean count_new);
 
 int hat_in_region(item_t itm, struct region * r, struct faction * f);
-int in_region(struct region * r, struct unit * u);
 
-char *translate_regions(const char *st, struct faction * f);
+char *translate_regions(const char *st, const struct faction * f);
 
-char *replace_global_coords(const char *s, struct faction * f);
+char *replace_global_coords(const char *s, const struct faction * f);
 
 #ifdef USE_MERIAN
 #ifdef FAST_REGION
@@ -66,7 +63,6 @@ void merian(FILE * out, struct faction *f);
 void merian(FILE * out, vset* regs, struct faction *f);
 #endif
 #endif
-char *report_kampfstatus(const struct unit *u);
 
 char *f_regionid(const struct region *r, const struct faction *f);
 
@@ -99,7 +95,7 @@ extern const char* resname(resource_t res, int i);
 extern char **seasonnames;
 extern char **weeknames;
 extern char **monthnames;
-extern int  *season;
+extern int  *month_season;
 extern int  *storms;
 extern char *agename;
 extern int  seasons;
@@ -116,5 +112,8 @@ extern int bufunit_ugroupleader(const struct faction * f, const struct unit * u,
 extern const char *neue_gebiete[];
 extern const char *coasts[];
 extern const char * reportpath(void);
+extern struct faction * visible_faction(const struct faction *f, const struct unit * u);
+extern struct faction_list * get_addresses(const struct faction * f, const struct seen_region * seenregions);
+extern const char * trailinto(const struct region * r, const struct locale * lang);
 
 #endif

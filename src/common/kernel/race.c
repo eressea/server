@@ -39,14 +39,20 @@
 #include "ship.h"
 #include "skill.h"
 #include "karma.h"
+#include "group.h"
 
 /* util includes */
 #include <attrib.h>
+
+/* attrib includes */
+#include <attributes/raceprefix.h>
+#include <attributes/synonym.h>
 
 /* libc includes */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <ctype.h>
 
 /* TODO: Tragkraft in die Struktur */
 
@@ -80,6 +86,45 @@ allowed_dragon(const region * src, const region * target)
 	if (src->terrain==T_GLACIER && target->terrain == T_OCEAN) return false;
 	return allowed_fly(src, target);
 }
+
+const char *race_prefixes[] = {
+	"prefix_Dunkel",
+	"prefix_Licht",
+	"prefix_Klein",
+	"prefix_Hoch",
+	"prefix_Huegel",
+	"prefix_Berg",
+	"prefix_Wald",
+	"prefix_Sumpf",
+	"prefix_Schnee",
+	"prefix_Sonnen",
+	"prefix_Mond",
+	"prefix_See",
+	"prefix_Tal",
+	"prefix_Schatten",
+	"prefix_Hoehlen",
+	"prefix_Blut",
+	"prefix_Wild",
+	"prefix_Chaos",
+	"prefix_Nacht",
+	"prefix_Nebel",
+	"prefix_Grau",
+	"prefix_Frost",
+	"prefix_Finster",
+	"prefix_Duester",
+	NULL
+};
+
+/* Die Bezeichnungen dürfen wegen der Art des Speicherns keine
+ * Leerzeichen enthalten! */
+
+const struct race_syn race_synonyms[] = {
+	{1, {"Fee", "Feen", "Feen", "Feen"}},
+	{2, {"Gnoll", "Gnolle", "Gnollen", "Gnoll"}},
+	{-1, {NULL, NULL, NULL, NULL}}
+};
+
+/*                      "den Zwergen", "Halblingsparteien" */
 
 struct racedata race[MAXRACES] =
 {
@@ -265,7 +310,7 @@ struct racedata race[MAXRACES] =
 		false,
 		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM | RCF_SHAPESHIFT,
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
+		ECF_REC_ETHEREAL | GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
 		{RC_IMP, RC_IMP, RC_WRAITH, RC_RAT, RC_WARG, RC_IMP}
 	},
 	{
@@ -471,8 +516,8 @@ struct racedata race[MAXRACES] =
 		500000, 0, 1, 20000, 1.0,
 		20, "2d40", 0, 0, 0, 0, 50,
 		{
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
-			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
+			{AT_NATURAL, {"2d40"}, 0}, {AT_NATURAL, {"2d40"}, 0}, {AT_NATURAL, {"2d40"}, 0},
+			{AT_NATURAL, {"2d40"}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
 		},
 		{
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -518,7 +563,7 @@ struct racedata race[MAXRACES] =
 	{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
 	{
-		{"Zauber", "Zauber", "Zauber", NULL},
+		{"Zauber", "Zauber", "Zauber", "Zauber"},
 		0.00, 1.00, 0.10,
 		0, 0, 1, 0, 0.0,
 		1, "1d4", 0, -2, -2, 0, 0,
@@ -535,7 +580,7 @@ struct racedata race[MAXRACES] =
 	/* ende Spezialunits */
 
 	{
-		{"Eisengolem", "Eisengolems", "Eisengolems", NULL},
+		{"Eisengolem", "Eisengolems", "Eisengolems", "Eisengolem"},
 		0.25, 1.00, 0.10,
 		5000, 0, 50, 10000, 1.0,
 		50, "2d10+4", 2, 0, 0, 4, 2,
@@ -551,7 +596,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
 	{
-		{"Steingolem", "Steingolems", "Steingolems", NULL},
+		{"Steingolem", "Steingolems", "Steingolems", "Steingolem"},
 		0.25, 1.00, 0.10,
 		5000, 0, 50, 10000, 1.0,
 		60, "2d12+6", 4, 0, 0, 4, 2,
@@ -567,7 +612,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
 	{
-		{"Schattendämon", "Schattendämonen", "Schattendämonen", NULL},
+		{"Schattendämon", "Schattendämonen", "Schattendämonen", "Schattendämon"},
 		0.75, 1.00, 1.00,
 		5000, 0, 1000, 0, 1.0,
 		50, "2d4", 3, 0, 0, 8, 11,
@@ -585,7 +630,7 @@ struct racedata race[MAXRACES] =
 		&shadow_name, NULL,
 	},
 	{
-		{"Schattenmeister", "Schattenmeister", "Schattenmeistern", NULL},
+		{"Schattenmeister", "Schattenmeister", "Schattenmeistern", "Schattenmeister"},
 		0.75, 1.00, 2.00,
 		50000, 0, 50, 0, 1.0,
 		150, "2d5", 4, 0, 0, 11, 13,
@@ -603,7 +648,7 @@ struct racedata race[MAXRACES] =
 		&shadow_name, NULL,
 	},
 	{
-		{"Bergwächter", "Bergwächter", "Bergwächtern", NULL},
+		{"Bergwächter", "Bergwächter", "Bergwächtern", "Bergwächter"},
 		0.50, 1.00, 0.50,
 		50000, 0, 1, 10000, 0.0,
 		1000, "2d40", 12, 0, 0, 6, 8,
@@ -618,7 +663,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
 	{
-		{"Alp", "Alps", "Alps", NULL},
+		{"Alp", "Alps", "Alps", "Alp"},
 		0.95, 1.00, 1.00,
 		50000, 0, 1, 0, 1.5,
 		20, "1d4", 2, 0, 0, 2, 20,
@@ -635,7 +680,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
 	{
-		{"Kröte", "Kröten", "Kröten", NULL},
+		{"Kröte", "Kröten", "Kröten", "Kröten"},
 		0.20, 1.00, 1.00,
 		50, 0, 1, 1, 1.0,
 		10, "1d2", 0, -2, -2, 0, 0,
@@ -654,7 +699,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
 	{
-		{"Hirntöter", "Hirntöter", "Hirntöter", NULL},
+		{"Hirntöter", "Hirntöter", "Hirntöter", "Hirntöter"},
 		0.90, 1.00, 1.00,
 		50000, 0, 500, 1, 1.0,
 		20, "0d0", 1, 0, 0, 6, 10,
@@ -673,7 +718,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
 	{
-		{"Bauer", "Bauern", "Bauern", NULL},
+		{"Bauer", "Bauern", "Bauern", "Bauern"},
 		0.00, 1.00, 1.00,
 		50, 0, 10000, 10, 1.0,
 		20, "1d6", 0, 0, 0, 0, 0,
@@ -692,7 +737,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
 	{
-		{"Wolf", "Wölfe", "Wölfen", NULL},
+		{"Wolf", "Wölfe", "Wölfen", "Wolfs"},
 		0.00, 0.00, 0.00,
 		50, 0, 5000, 5, 1.0,
 		20, "2d4", 0, 0, 0, 3, 1,
@@ -714,7 +759,7 @@ struct racedata race[MAXRACES] =
 	/*************************************************************/
 	/* RC_HOUSECAT */
 	{
-		{"Luchs", "Luchse", "Luchsen", NULL},
+		{"Luchs", "Luchse", "Luchsen", "Luchs"},
 		0.00, 0.00, 0.00,
 		50, 0, 99999, 5, 1.0,
 		20, "2d3", 0, 0, 0, 4, 5,
@@ -732,7 +777,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_TUNNELWORM */
 	{
-		{"Tunnelwurm", "Tunnelwürmer", "Tunnelwürmern", NULL},
+		{"Tunnelwurm", "Tunnelwürmer", "Tunnelwürmern", "Tunnelwurm"},
 		0.80, 0.00, 0.00,
 		50, 0, 99999, 30000, 1.0,
 		300, "3d20", 6, 0, 0, 6, 1,
@@ -750,7 +795,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_EAGLE */
 	{
-		{"Adler", "Adler", "Adlern", NULL},
+		{"Adler", "Adler", "Adlern", "Adler"},
 		0.00, 0.00, 0.00,
 		50, 0, 9999, 5, 1.5,
 		15, "2d3", 0, 0, 0, 6, 2,
@@ -768,7 +813,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_RAT */
 	{
-		{"Ratte", "Ratten", "Ratten", NULL},
+		{"Ratte", "Ratten", "Ratten", "Ratten"},
 		0.00, 0.00, 0.00,
 		50, 0, 9999, 1, 1.0,
 		5, "1d2", 0, 0, 0, 1, 1,
@@ -786,12 +831,12 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_PSEUDODRAGON */
 	{
-		{"Singdrache", "Singdrachen", "Singdrachen", NULL},
+		{"Singdrache", "Singdrachen", "Singdrachen", "Singdrachen"},
 		0.99, 1.00, 1.00,
 		50, 0, 9999, 10, 1.5,
 		40, "2d4", 1, 0, 0, 3, 1,
 		{
-			{AT_STANDARD, {NULL}, 0}, {AT_NATURAL, {"2d4"}, 0}, {AT_NATURAL, {"2d4"}, 0},
+			{AT_NATURAL, {"2d4"}, 0}, {AT_NATURAL, {"2d4"}, 0}, {AT_NATURAL, {"2d4"}, 0},
 			{AT_SPELL, {(void*)SPL_FIREDRAGONODEM}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
 		},
 		{
@@ -804,7 +849,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_NYMPH */
 	{
-		{"Nymphe", "Nymphen", "Nymphen", NULL},
+		{"Nymphe", "Nymphen", "Nymphen", "Nymphen"},
 		0.90, 1.00, 1.50,
 		50, 0, 9999, 10, 1.0,
 		15, "1d4", 0, 0, 0, 3, 1,
@@ -823,7 +868,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_UNICORN */
 	{
-		{"Einhorn", "Einhörner", "Einhörnern", NULL},
+		{"Einhorn", "Einhörner", "Einhörnern", "Einhorn"},
 		0.90, 1.50, 1.50,
 		50, 0, 9999, 50, 2.0,
 		40, "2d4", 0, 0, 0, 6, 4,
@@ -841,7 +886,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_WARG */
 	{
-		{"Warg", "Warge", "Wargen", NULL},
+		{"Warg", "Warge", "Wargen", "Warg"},
 		0.00, 0.00, 0.00,
 		50, 0, 5000, 5, 1.0,
 		25, "2d6", 0, 0, 0, 6, 3,
@@ -859,7 +904,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_WRAITH */
 	{
-		{"Geist", "Geister", "Geistern", NULL},
+		{"Geist", "Geister", "Geistern", "Geister"},
 		0.80, 0.50, 0.10,
 		50, 0, 5000, 5, 1.0,
 		30, "2d6", 5, 0, 0, 5, 8,
@@ -878,7 +923,7 @@ struct racedata race[MAXRACES] =
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_IMP */
 	{
-		{"Teufelchen", "Teufelchen", "Teufelchen", NULL},
+		{"Teufelchen", "Teufelchen", "Teufelchen", "Teufelchen-"},
 		0.50, 1.00, 0.00,
 		50, 0, 5000, 5, 1.0,
 		10, "1d4", 1, 0, 0, 5, 4,
@@ -1769,7 +1814,7 @@ struct racedata race[MAXRACES] =
 	/* Template */
 	{
 		/* const char *name[4] */
-		{"Schablone", "Schablonen", "Schablonen", NULL},
+		{"Schablone", "Schablonen", "Schablonen", "Schablonen"},
 		1.0,    /* Magieresistenz (0=Normal) */
 		0.0,    /* Maximale Aura (1=Durchschnitt) */
 		0.0,    /* Auraregeneration (1=Durchschnitt) */
@@ -1798,8 +1843,40 @@ struct racedata race[MAXRACES] =
 		(ECF_REC_ETHEREAL | ECF_REC_UNLIMITED | CANGUARD | GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM),  /* economy */
 		/* Vertraute für den Zauber (Gen, Ill, Tyb, Cer, Gwy, Dra) */
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
+	},
+	/* Klon */
+	{
+		/* const char *name[4] */
+		{"Klon", "Klone", "Klonen", "Klonen"},
+		0.9,    /* Magieresistenz (0=Normal) */
+		0.0,    /* Maximale Aura (1=Durchschnitt) */
+		0.0,    /* Auraregeneration (1=Durchschnitt) */
+		0, 0,   /* Rekrutierungskosten, Unterhalt pro Runde */
+		10000,  /* Splitsize */
+		1000,   /* Gewicht */
+		1.0,    /* Multiplikator Geschwindigkeit */
+		40,     /* Trefferpunkte */
+		"0d0",  /* Schaden AT_STANDARD unbewaffnet */
+		0,      /* Natürliche Rüstung */
+		-2, -2, /* Angriff, Verteidigung unbewaffnet */
+		0, 0,   /* Bonus Angriff, Verteidigung */
+		{ /* Angriffe */
+			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
+			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
+		},
+		{ 		/* Talentboni */
+ 			/* Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Krä,Mag,Pfe,Rei, Rüs,Sba,Hie,Seg, */
+			   -99,-99,-99,-99, -99,-99,-99,-99, -99,-99,-99,-99, -99,-99,-99,-99,
+			/* Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wah,Ste,Aus, WlK */
+			   -99,-99,-99,-99, -99,-99,-99,-99, -99,-99,-99,-99, -99
+		},
+		false, /* Nonplayer (bei Gelegenheit entfernen) */
+		(RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
+		(0),								                      /* battle  */
+		(0),																			/* economy */
+		/* Vertraute für den Zauber (Gen, Ill, Tyb, Cer, Gwy, Dra) */
+		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}
-
 };
 
 /* magres, {3 namen},
@@ -1849,7 +1926,7 @@ give_starting_equipment(struct region *r, struct unit *u)
 	case RC_HUMAN:
 		{
 			building *b = new_building(&bt_castle, r, u->faction->locale);
-			b->size = 2;
+			b->size = 10;
 			u->building = b;
 			fset(u, FL_OWNER);
 		}
@@ -1857,7 +1934,7 @@ give_starting_equipment(struct region *r, struct unit *u)
 	case RC_TROLL:
 		set_skill(u, SK_BUILDING, 30);
 		set_skill(u, SK_OBSERVATION, 180);
-		set_item(u, I_STONE, 10);
+		set_item(u, I_STONE, 50);
 		break;
 	case RC_DAEMON:
 		set_skill(u, SK_AUSDAUER, 3600);
@@ -1955,3 +2032,52 @@ init_races(void)
 {
 	a_add(&race[RC_TROLL].attribs, make_skillmod(NOSKILL, SMF_RIDING, NULL, 0.0, -1));
 }
+
+boolean
+r_insectstalled(const region * r)
+{
+	if (rterrain(r)==T_GLACIER || rterrain(r)==T_ICEBERG_SLEEP 
+			|| rterrain(r)==T_ICEBERG)
+		return true;
+
+	return false;
+}
+
+const char *
+racename(const locale *loc, const unit *u, const race_t r)
+{
+	static char lbuf[80];
+	attrib *a, *a2;
+	
+
+	a = a_find(u->attribs, &at_group);
+	if(a) {
+		a2 = a_find(((group *)(a->data.v))->attribs, &at_raceprefix);
+	} else {
+		a2 = a_find(u->faction->attribs, &at_raceprefix);
+	}
+
+	a = a_find(u->faction->attribs, &at_synonym);
+
+	if(a2) {
+		char s[32];
+		
+		strcpy(lbuf, locale_string(loc, (char *)a2->data.v));
+		if(a) {
+			strcpy(s, locale_string(loc,
+				((frace_synonyms *)(a->data.v))->synonyms[u->number != 1]));
+		} else {
+			strcpy(s, locale_string(loc,
+				race[r].name[u->number != 1]));
+		}
+		s[0] = tolower(s[0]);
+		strcat(lbuf, s);
+		return lbuf;
+	}
+	if(a) {
+		return(locale_string(loc,
+			((frace_synonyms *)(a->data.v))->synonyms[u->number != 1]));
+	}
+	return(locale_string(loc, race[r].name[u->number != 1]));
+}
+

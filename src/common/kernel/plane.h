@@ -52,7 +52,7 @@ struct plane *planes;
 struct plane *getplane(const struct region *r);
 struct plane *findplane(int x, int y);
 void	init_planes(void);
-int    getplaneid(struct region *r);
+int    getplaneid(const struct region *r);
 struct plane * getplanebyid(int id);
 int region_x(const struct region *r, const struct faction *f);
 int region_y(const struct region *r, const struct faction *f);

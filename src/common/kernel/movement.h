@@ -38,7 +38,7 @@ extern int personcapacity(struct unit *u);
  * wagen wird von zwei pferden gezogen und traegt total 140, davon 40 die
  * pferde, macht nur noch 100, aber samt eigenem gewicht (40) macht also 140. */
 
-extern direction_t getdirection(void);
+extern direction_t getdirection(const struct locale *);
 extern void movement(void);
 
 extern direction_t * travel(struct region * r, struct unit * u, struct region * r2, int flucht);

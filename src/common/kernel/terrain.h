@@ -82,8 +82,6 @@ typedef struct terraindata_t {
 	const char ** herbs;
 } terraindata_t;
 
-extern const char * trailinto(const struct region * r, const struct locale * lang);
-
 extern const terraindata_t terrain[];
 
 #endif /* TERRAIN_H */

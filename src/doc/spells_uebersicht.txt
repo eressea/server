@@ -100,6 +100,7 @@ Traum/Illaun (27 Sprüche):
  8  Schöne Träume              8*L     zeitweilig Bonus auf alle Talente
  8  Traumbilder entwirren      6*L     Antimagie
  9  Vertrauten rufen           100,5P  Vertrauter
+ 9  Seelenkopie                100,20P+ Reserveklon
 10  Schlechte Träume           9*L     zeitweilig -L/4 Talentstufen
 11  Tod des Geistes (K)        2*L     vermindert Talente, töten bei 0 Tagen
 12  Süße Träume                30      Vermehrung wie bei Orks

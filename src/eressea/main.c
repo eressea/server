@@ -90,6 +90,8 @@ extern boolean nomer;
 extern boolean nomsg;
 extern boolean nobattle;
 extern boolean nobattledebug;
+extern boolean dirtyload;
+
 static boolean printpotions;
 
 extern void debug_messagetypes(FILE * out);
@@ -105,10 +107,25 @@ extern int fuzzy_hits;
  **/
 static char * orders = NULL;
 static int nowrite = 0;
+static boolean g_writemap = false;
 
 struct settings global = {
 	"Eressea", /* gamename */
 };
+
+static int
+crwritemap(void)
+{
+  FILE * F = fopen("world.cr", "w+");
+  region * r;
+  for (r=regions;r;r=r->next) {
+    plane * p = rplane(r);
+    fprintf(F, "REGION %d %d %d\n", r->x, r->y, p?p->id:0);
+    fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale), LOC(default_locale, terrain[rterrain(r)].name));
+  }
+  fclose(F);
+	return 0;
+}
 
 static void
 print_potions(FILE * F)
@@ -414,6 +431,7 @@ usage(const char * prog, const char * arg)
 	return -1;
 }
 
+
 static int
 read_args(int argc, char **argv)
 {
@@ -424,6 +442,7 @@ read_args(int argc, char **argv)
 		} else if (argv[i][1]=='-') { /* long format */
 			if (strcmp(argv[i]+1, "nocr")==0) nocr = true;
 			else if (strcmp(argv[i]+2, "nosave")==0) nowrite = true;
+			else if (strcmp(argv[i]+2, "dirtyload")==0) dirtyload = true;
 			else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
 			else if (strcmp(argv[i]+2, "nocr")==0) nocr = true;
 			else if (strcmp(argv[i]+2, "nomsg")==0) nomsg = true;
@@ -470,8 +489,14 @@ read_args(int argc, char **argv)
 				maxregions = atoi(argv[++i]);
 				maxregions = (maxregions*81+80) / 81;
 				break;
+			case 'X':
+				dirtyload = true;
+				break;
 			case 'l':
 				log_open(argv[++i]);
+				break;
+			case 'w':
+ 				g_writemap = true;
 				break;
 			default:
 				usage(argv[0], argv[i]);
@@ -517,9 +542,10 @@ main(int argc, char *argv[])
 	game_init();
 
 	if ((i=readgame(false))!=0) return i;
+	if (g_writemap) return crwritemap();
 	if ((i=processturn(orders))!=0) return i;
 
-	game_done();
+	/* game_done(); */
 	kernel_done();
 	log_close();
 	return 0;

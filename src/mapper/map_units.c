@@ -44,6 +44,36 @@
 
 static region *shipregion;
 
+void
+SpecialFunctionUnit(unit *u)
+{
+	WINDOW *win;
+
+	win = openwin(60, 5, "< Specials Units >");
+	wmove(win, 1, 2);
+	wAddstr("B - give balloon");
+	wmove(win, 2, 2);
+	wrefresh(win);
+	switch(getch()) {
+	case 'b':
+	case 'B':
+		{
+			ship *sh = new_ship(&st_balloon, u->region);
+			addlist(&u->region->ships, sh);
+			set_string(&sh->name, "Ballon");
+			set_string(&sh->display, "Eine große leuchtendrote Werbeaufschrift "
+					"für den Xontormia Express prangt auf einer Seite des Luftgefährts.");
+			freset(sh, FL_UNNAMED);
+			sh->size = 5;
+			leave(u->region, u);
+			u->ship = sh;
+			fset(u, FL_OWNER);
+		}
+		break;
+	}
+	delwin(win);
+}
+
 unit *
 make_new_unit(region * r)
 {
@@ -930,10 +960,10 @@ showunits(region * r)
 
 	for (b = r->buildings; b; b = b->next) {
 		if (b->type == &bt_castle) {
-			sprintf(lbuf, "\002%s, Größe %d, %s", buildingname(b), b->size, buildingtype(b, b->size, NULL));
+			sprintf(lbuf, "\002%s, Größe %d, %s", buildingname(b), b->size, buildingtype(b, b->size /*, NULL */));
 		} else {
 			sprintf(lbuf, "\002%s, Größe %d, %s", buildingname(b),
-					b->size, buildingtype(b, b->size, NULL));
+					b->size, buildingtype(b, b->size /*, NULL */));
 			if (b->type->maxsize > 0 &&
 					b->size < b->type->maxsize) {
 				sncat(lbuf, " (im Bau)", BUFSIZE);
@@ -959,7 +989,7 @@ showunits(region * r)
 			if (u->ship == sh) f += weight(u);
 			sprintf(lbuf, "\023%s, %s, (%d/%d)", shipname(sh), sh->type->name[0],
 					(f+99)/100, shipcapacity(sh)/100);
-		if (sh->size!=sh->type->construction->maxsize) {
+		if (sh->type->construction && sh->size!=sh->type->construction->maxsize) {
 			f = 100 * (sh->size) / sh->type->construction->maxsize;
 			sncat(lbuf, ", im Bau (", BUFSIZE);
 			icat(f);
@@ -1172,6 +1202,19 @@ showunits(region * r)
 			pointer = such = oben = eh;
 			pline = 0;
 			f = -1;
+			break;
+		case 'X':
+			if(clipunit) {
+				SpecialFunctionUnit(clipunit);
+				modified = 1;
+				clipunit = 0;
+				clipregion = 0;
+				for (pline = 0, tmp = eh; tmp != pointer; tmp = tmp->next)
+					pline++;	/* Stelle merken */
+				freelist(eh);
+				delwin(mywin);
+				return 1;
+			}
 			break;
 		case 'N':
 			if ((u = make_new_unit(r))!=NULL) {

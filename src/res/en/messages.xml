@@ -2573,19 +2573,6 @@
 	</locale>
 </message>
 
-<message name="error227">
-	<type>
-		<arg name="unit" type="unit"></arg>
-		<arg name="region" type="region"></arg>
-		<arg name="command" type="string"></arg>
-	</type>
-	<locale name="en">
-		<nr section="errors">
-			<text>"$unit($unit) in $region($region): '$command' - The unit needs at least herbalism 7 to do this."</text>
-		</nr>
-	</locale>
-</message>
-
 <message name="error228">
 	<type>
 		<arg name="unit" type="unit"></arg>
@@ -2803,7 +2790,7 @@
 	</type>
 	<locale name="en">
 		<nr section="errors">
-			<text>"$unit($unit) in $region($region): '$command' - $error."</text>
+			<text>"$unit($unit) in $region($region): '$command' - ${error}."</text>
 		</nr>
 	</locale>
 </message>
@@ -3944,7 +3931,7 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="id" type="int36"></arg>
+		<arg name="id" type="int"></arg>
 	</type>
 	<locale name="en">
 		<nr section="none">
@@ -3958,7 +3945,7 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="id" type="int36"></arg>
+		<arg name="id" type="int"></arg>
 	</type>
 	<locale name="en">
 		<nr section="none">
@@ -3972,7 +3959,7 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="id" type="int36"></arg>
+		<arg name="id" type="int"></arg>
 	</type>
 	<locale name="en">
 		<nr section="none">
@@ -3986,7 +3973,7 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="id" type="int36"></arg>
+		<arg name="id" type="int"></arg>
 	</type>
 	<locale name="en">
 		<nr section="none">
@@ -4000,7 +3987,7 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="id" type="int36"></arg>
+		<arg name="id" type="int"></arg>
 	</type>
 	<locale name="en">
 		<nr section="none">
@@ -4014,7 +4001,7 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="id" type="int36"></arg>
+		<arg name="id" type="int"></arg>
 	</type>
 	<locale name="en">
 		<nr section="none">
@@ -4047,7 +4034,7 @@
 	</type>
 	<locale name="en">
 		<nr section="none">
-			<text>"$unit($unit) in $region($region): '$command' - $unit($unit) creates $int($amount) $item."</text>
+			<text>"$unit($unit) in $region($region): '$command' - $unit($unit) creates $int($amount) ${item}."</text>
 		</nr>
 	</locale>
 </message>
@@ -4260,7 +4247,7 @@
 	</type>
 	<locale name="en">
 		<nr section="events">
-			<text>"The Gods grant us the powers of $special."</text>
+			<text>"The Gods grant us the powers of ${special}."</text>
 		</nr>
 	</locale>
 </message>
@@ -4351,6 +4338,17 @@
 	<locale name="en">
 		<nr section="events">
 			<text>"The glacier in $region($region) breaks up and drifts away."</text>
+		</nr>
+	</locale>
+</message>
+
+<message name="iceberg_melt">
+	<type>
+		<arg name="region" type="region"></arg>
+	</type>
+	<locale name="en">
+		<nr section="events">
+			<text>"The iceberg $region($region) melts."</text>
 		</nr>
 	</locale>
 </message>

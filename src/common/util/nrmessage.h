@@ -21,9 +21,10 @@ extern void nrt_register(const struct message_type * mtype,
 extern struct nrmessage_type * nrt_find(const struct locale *, 
 													 const struct message_type *);
 extern const char * nrt_string(const struct nrmessage_type *type);
+extern const char * nrt_section(const struct nrmessage_type * mt);
 
 extern int nr_render(const struct message * msg, const struct locale * lang,
-                     char * buffer, const void * userdata);
+                     char * buffer, size_t size, const void * userdata);
 extern int nr_level(const struct message *msg);
 extern const char * nr_section(const struct message *msg);
 

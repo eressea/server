@@ -79,16 +79,19 @@ dhash(int no, faction * f)
 }
 
 faction *
-dfindhash(int i)
+dfindhash(int no)
 {
 	dead * old;
-	for (old = deadhash[i % DMAXHASH]; old; old = old->nexthash)
-		if (old->no == i)
+
+	if(no < 0) return 0;
+
+	for (old = deadhash[no % DMAXHASH]; old; old = old->nexthash)
+		if (old->no == no)
 			return old->f;
 	return 0;
 }
 
-static unit * udestroy = NULL;
+unit * udestroy = NULL;
 
 #undef DESTROY
 /* Einheiten werden nicht wirklich zerstört. */
@@ -97,6 +100,7 @@ destroy_unit(unit * u)
 {
 	region *r = u->region;
 	boolean zombie = false;
+	unit *clone;
 
 	if (!ufindhash(u->no)) return;
 
@@ -132,6 +136,35 @@ destroy_unit(unit * u)
 			if (*p_item == item) p_item=&item->next;
 		}
 	}
+
+	/* Wir machen das erst nach dem Löschen der Items. Der Klon darf keine
+	 * Items haben, sonst Memory-Leak. */
+	
+	clone = has_clone(u);
+	if (clone && rand()%100 < 90) {
+		attrib *a;
+		int i;
+
+		/* TODO: Messages generieren. */
+		u->region = clone->region;
+		u->ship = clone->ship;
+		u->building = clone->building;
+		u->hp = 1;
+		i = u->no;
+		u->no = clone->no;
+		clone->no = i;
+		set_number(u, 1);
+		set_spellpoints(u, 0);
+		a = a_find(u->attribs, &at_clone);
+		a_remove(&u->attribs, a);
+		a = a_find(clone->attribs, &at_clonemage);
+		a_remove(&clone->attribs, a);
+		fset(u, FL_LONGACTION);
+		set_number(clone, 0);
+		u = clone;
+		zombie = false;
+	}
+		
 	if (zombie) {
 		u_setfaction(u, findfaction(MONSTER_FACTION));
 		scale_number(u, 1);
@@ -146,13 +179,8 @@ destroy_unit(unit * u)
 		if (r) choplist(&r->units, u);
 		u->next = udestroy;
 		udestroy = u;
-#ifdef OLD_TRIGGER
-		do_trigger(u, TYP_UNIT, TR_DESTRUCT);
-#endif
 		if (u->number) set_number(u, 0);
-#ifdef NEW_TRIGGER
 		handle_event(&u->attribs, "destroy", u);
-#endif
 	}
 }
 
@@ -438,10 +466,12 @@ read_unit_reference(unit ** up, FILE * F)
 	int i;
 	fscanf(F, "%s", zId);
 	i = atoi36(zId);
-	if (i==0) *up = NULL;
-	{
-		*up = findunit(i);
-		if (*up==NULL) ur_add((void*)i, (void**)up, resolve_unit);
+	if (up) {
+		if (i==0) *up = NULL;
+		else {
+			*up = findunit(i);
+			if (*up==NULL) ur_add((void*)i, (void**)up, resolve_unit);
+		}
 	}
 }
 

@@ -45,6 +45,11 @@ typedef struct att {
 	int flags;
 } att;
 
+typedef struct race_syn {
+	race_t race;
+	const char *synonyms[4];
+} race_syn;
+
 typedef struct race_type {
 	const char *name[4]; /* neu: name[4]völker */
 	double magres;
@@ -62,7 +67,7 @@ typedef struct race_type {
 	char df_default; /* Verteidigungsskill Unbewaffnet (default: -2)*/
 	char at_bonus;   /* Verändert den Angriffsskill (default: 0)*/
 	char df_bonus;   /* Verändert den Verteidigungskill (default: 0)*/
-	att  attack[6];
+	struct att attack[6];
 	char bonus[MAXSKILLS];
 	boolean nonplayer;
 	int flags;
@@ -146,5 +151,11 @@ boolean is_undead(const struct unit *u);
 extern boolean allowed_dragon(const struct region * src, const struct region * target);
 
 extern void init_races(void);
+extern boolean r_insectstalled(const struct region *r);
+
+extern const char * racename(const struct locale *loc, const struct unit *u, const race_t race);
+
+extern const char *race_prefixes[];
+extern const struct race_syn race_synonyms[];
 
 #endif

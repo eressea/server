@@ -24,22 +24,23 @@
 #include "eressea.h"
 #include "movement.h"
 
-#include "item.h"
-#include "plane.h"
 #include "alchemy.h"
-#include "message.h"
-#include "faction.h"
-#include "region.h"
-#include "magic.h"
-#include "build.h"
-#include "race.h"
-#include "curse.h"
-#include "unit.h"
 #include "border.h"
-#include "skill.h"
-#include "ship.h"
-#include "karma.h"
+#include "build.h"
 #include "building.h"
+#include "curse.h"
+#include "faction.h"
+#include "item.h"
+#include "karma.h"
+#include "magic.h"
+#include "message.h"
+#include "plane.h"
+#include "race.h"
+#include "region.h"
+#include "render.h"
+#include "ship.h"
+#include "skill.h"
+#include "unit.h"
 
 /* util includes */
 #include <goodies.h>
@@ -130,9 +131,9 @@ attrib_type at_traveldir_new = {
 /* ------------------------------------------------------------- */
 
 direction_t
-getdirection(void)
+getdirection(const struct locale * lang)
 {
-	return finddirection(getstrtoken());
+	return finddirection(getstrtoken(), lang);
 }
 /* ------------------------------------------------------------- */
 
@@ -226,6 +227,7 @@ walkingcapacity(unit * u)
 
 	n += pferde * HORSECAPACITY;
 	n += personen * personcapacity(u);
+	/* Goliathwasser */
 	n += get_effect(u, oldpotiontype[P_STRONG]) * personcapacity(u);
 	n += min(get_item(u, I_TROLLBELT), u->number) * STRENGTHCAPACITY;
 
@@ -332,8 +334,10 @@ cansail(const region * r, ship * sh)
 	int n = 0, p = 0;
 	unit *u;
 
-	assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
-	if (sh->size!=sh->type->construction->maxsize)
+	 /* sonst ist construction:: size nicht ship_type::maxsize */
+	assert(!sh->type->construction || sh->type->construction->improvement==NULL);
+
+	if (sh->type->construction && sh->size!=sh->type->construction->maxsize)
 	  return false;
 	for (u = r->units; u; u = u->next)
 		if (u->ship == sh) {
@@ -426,7 +430,6 @@ move_ship(ship * sh, region * from, region * to, region ** route)
 					rn = ri+1;
 					if(*rn) {
 						dir = reldirection(*ri, *rn);
-						/* TODO: Speichermechanismus portabel machen. */
 						a = a_find((*ri)->attribs, &at_traveldir_new);
 						while (a) {
 							if(((traveldir *)(a->data.v))->no == sh->no) break;
@@ -643,39 +646,38 @@ caught_target(region * r, unit * u)
 unit *
 bewegung_blockiert_von(unit * reisender, region * r)
 {
-	unit *ru;
-	int chance;
-	int hat_kontaktiert;
+	unit *u;
+	int perception = 0;
+	boolean contact = false;
+	unit * guard = NULL;
 
-	for (ru = r->units; ru; ru = ru->next) {
-
-		/* Ermittle ob kontaktiert */
-
-		hat_kontaktiert = 0;
-		if (ucontact(ru, reisender)) hat_kontaktiert = 1;
-
-		if (ru->faction != reisender->faction
-		    && !allied(ru, reisender->faction, HELP_GUARD)
-		    && hat_kontaktiert == 0
-		    && !illusionary(reisender)) {
-			if (getguard(ru)&GUARD_TRAVELTHRU) {
-				if (get_item(reisender, I_RING_OF_INVISIBILITY) &&
-					get_item(reisender, I_RING_OF_INVISIBILITY) >= reisender->number &&
-					!get_item(ru, I_AMULET_OF_TRUE_SEEING)) {
-					continue;
-				}
-				chance = eff_skill(ru, SK_OBSERVATION, r) * ru->number;
-				chance -= eff_stealth(reisender, r) * eff_stealth(reisender, r);
-				chance += min(get_item(ru, I_AMULET_OF_TRUE_SEEING), ru->number);
-
-				if (rand() % 100 < chance) {
-					return ru;
-				}
+	if (illusionary(reisender)) return NULL;
+	for (u=r->units;u && !contact;u=u->next) {
+		if (getguard(u) & GUARD_TRAVELTHRU) {
+			int sk = eff_skill(u, SK_OBSERVATION, r);
+			if (get_item(reisender, I_RING_OF_INVISIBILITY) >= reisender->number &&
+				!get_item(u, I_AMULET_OF_TRUE_SEEING)) continue;
+			if (u->faction==reisender->faction
+				|| ucontact(u, reisender)
+				|| allied(u, reisender->faction, HELP_GUARD))
+			{
+				contact = true;
+			} else if (sk>=perception) {
+				perception = sk;
+				guard = u;
 			}
 		}
 	}
+	if (!contact && guard) {
+		int chance = 30; /* 30% base chance */
+		chance += 10 * (perception - eff_stealth(reisender, r));
+		chance += 10 * max(guard->number, get_item(guard, I_AMULET_OF_TRUE_SEEING));
 
-	return (unit *) NULL;
+		if (rand() % 100 < chance) {
+			return guard;
+		}
+	}
+	return NULL;
 }
 
 boolean
@@ -707,12 +709,12 @@ is_guarded(region * r, unit * u, unsigned int mask)
 
 const char *shortdirections[MAXDIRECTIONS] =
 {
-	"dir_NW",
-	"dir_NO",
-	"dir_Ost",
-	"dir_SO",
-	"dir_SW",
-	"dir_West"
+	"dir_nw",
+	"dir_ne",
+	"dir_east",
+	"dir_se",
+	"dir_sw",
+	"dir_west"
 };
 
 void
@@ -735,7 +737,7 @@ cycle_route(unit *u, int gereist)
 		const locale * lang = u->faction->locale;
 		pause = false;
 		token = getstrtoken();
-		d = finddirection(token);
+		d = finddirection(token, lang);
 		if(d == D_PAUSE) {
 			pause = true;
 		} else if (d==NODIRECTION) {
@@ -785,10 +787,12 @@ init_drive(void)
 					cmistake(u, findorder(u, u->thisorder), 64, MSG_MOVE);
 					continue;
 				}
-				for (S = ut->orders; S; S = S->next) if (igetkeyword(S->s, u->faction->locale) == K_TRANSPORT) {
-					if(getunit(r, ut->faction) == u) {
-						found = true;
-						break;
+				for (S = ut->orders; S; S = S->next) {
+					if (igetkeyword(S->s, u->faction->locale) == K_TRANSPORT) {
+						if (ut->race!=RC_UNDEAD && getunit(r, ut->faction) == u) {
+							found = true;
+							break;
+						}
 					}
 				}
 				if(found == false) {
@@ -887,7 +891,6 @@ travel(region * first, unit * u, region * next, int flucht)
 	strlist *S;
 	unit *ut, *u2;
 	int gereist = 0;
-	char buf2[80];
 	static direction_t route[MAXSPEED];
 
 	/* tech:
@@ -900,10 +903,9 @@ travel(region * first, unit * u, region * next, int flucht)
 	 * Außerdem: Wenn Einheit transportiert, nur halbe BP */
 
 	if (rterrain(current)==T_OCEAN
-			&& !(race[u->race].flags&(RCF_FLY) && rterrain(next)!=T_OCEAN))
+			&& !(race[u->race].flags & RCF_FLY) && rterrain(next) != T_OCEAN)
 	{ /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
-		if (race[u->race].flags & RCF_SWIM)
-		{
+		if (!(race[u->race].flags & RCF_SWIM) && u->race != RC_AQUARIAN) {
 			cmistake(u, findorder(u, u->thisorder), 44, MSG_MOVE);
 			return NULL;
 		} else {
@@ -968,8 +970,10 @@ travel(region * first, unit * u, region * next, int flucht)
 				mp = BP_RIDING;
 
 			/* Siebenmeilentee */
-			if (get_effect(u, oldpotiontype[P_FAST]) >= u->number)
+			if (get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
 				mp *= 2;
+				change_effect(u, oldpotiontype[P_FAST], -u->number);
+			}
 
 			/* unicorn in inventory */
 			if (u->number <= get_item(u, I_FEENSTIEFEL))
@@ -1038,8 +1042,8 @@ travel(region * first, unit * u, region * next, int flucht)
 				&& gereist != 0)
 			{
 				add_message(&u->faction->msgs, new_message(u->faction,
-					"moveblockedbyguard%u:unit%r:region%f:faction", u, next,
-					wache->faction));
+					"moveblockedbyguard%u:unit%r:region%u:guard", u, current,
+					wache));
 				break;
 			}
 			if (is_spell_active(next, C_ANTIMAGICZONE) && illusionary(u)){
@@ -1079,7 +1083,7 @@ travel(region * first, unit * u, region * next, int flucht)
 				break;
 			}
 
-			if (u->race == RC_INSECT && rterrain(next) == T_GLACIER &&
+			if (u->race == RC_INSECT && r_insectstalled(next) &&
 					!is_cursed(u->attribs, C_KAELTESCHUTZ,0)) {
 				add_message(&u->faction->msgs, new_message(u->faction,
 					"detectforbidden%u:unit%r:region", u, next));
@@ -1116,7 +1120,7 @@ travel(region * first, unit * u, region * next, int flucht)
 			mode = 2;
 
 		/* Haben Drachen ihr Ziel erreicht? */
-		if (dragon(u)) {
+		if (u->faction->no==MONSTER_FACTION) {
 			attrib * ta = a_find(u->attribs, &at_targetregion);
 			if (ta && current == (region*)ta->data.v) {
 				a_remove(&u->attribs, ta);
@@ -1131,6 +1135,7 @@ travel(region * first, unit * u, region * next, int flucht)
 			dh = 0;
 			travelthru(u, first);
 			for (i = 0; i != m; i++) {
+				char * p;
 				if (dh) {
 					if (i == m - 1)
 						scat(" und ");
@@ -1139,10 +1144,8 @@ travel(region * first, unit * u, region * next, int flucht)
 				}
 				dh = 1;
 				travelthru(u, rv[i]);
-
-				sprintf(buf2, trailinto(rv[i], u->faction->locale),
-					regionname(rv[i], u->faction));
-				scat(buf2);
+				p = buf+strlen(buf);
+				MSG(("travelthru_trail", "region", rv[i]), p, sizeof(buf)-strlen(buf), u->faction->locale, u->faction);
 			}
 		}
 		add_message(&u->faction->msgs, new_message(
@@ -1370,7 +1373,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 	while (current_point!=next_point && m < k && next_point)
 	{
 		direction_t dir = reldirection(current_point, next_point);
-		
+
 		if(terrain[rterrain(next_point)].flags & FORBIDDEN_LAND) {
 			plane *pl = getplane(next_point);
 			if(pl && fval(pl, PFL_NOCOORDS)) {
@@ -1384,7 +1387,8 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 			break;
 		}
 
-		if( !is_cursed(u->ship->attribs, C_SHIP_FLYING, 0) ) {
+		if( !is_cursed(u->ship->attribs, C_SHIP_FLYING, 0)
+				&& !(u->ship->type->flags & SFL_FLY)) {
 			if (rterrain(current_point) != T_OCEAN
 			    && rterrain(next_point) != T_OCEAN) {
 				plane *pl = getplane(next_point);
@@ -1501,7 +1505,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 		u->ship->moved = 1;
 		step++;
 		m++;
-		
+
 		last_point = current_point;
 		current_point = next_point;
 
@@ -1696,25 +1700,26 @@ move(region * r, unit * u, boolean move_on_land)
 	set_string(&u->thisorder, "");
 	/* Für den Silberpool: Bewegung ist fertig, Silber darf abgezogen werden */
 	if (fval(u, FL_FOLLOWED) && route && route[0]!=NODIRECTION) {
-		unit ** up=&r->units;
+		unit *up=r->units;
 
-		while (*up) {
-			unit * uf = *up;
-			if (fval(uf, FL_FOLLOWING) && !fval(uf, FL_MOVED)) {
-				attrib * a = a_find(uf->attribs, &at_follow);
+		while (up) {
+			unit *un = up->next;
+
+			if (fval(up, FL_FOLLOWING) && !fval(up, FL_MOVED)) {
+				attrib * a = a_find(up->attribs, &at_follow);
 				if (a && a->data.v==u) {
 					/* wir basteln ihm ein NACH */
 					int k, i = 0;
-					strcpy(buf, locale_string(u->faction->locale, keywords[K_MOVE]));
+					strcpy(buf, locale_string(up->faction->locale, keywords[K_MOVE]));
 					while (route[i]!=NODIRECTION)
-						strcat(strcat(buf, " "), locale_string(u->faction->locale, directions[route[i++]]));
-					set_string(&uf->thisorder, buf);
-					k = igetkeyword(uf->thisorder, u->faction->locale);
+						strcat(strcat(buf, " "), locale_string(up->faction->locale, directions[route[i++]]));
+					set_string(&up->thisorder, buf);
+					k = igetkeyword(up->thisorder, up->faction->locale);
 					assert(k==K_MOVE);
-					move(r, uf, true);
+					move(r, up, true);
 				}
 			}
-			if (*up==uf) up = &uf->next;
+			up = un;
 		}
 	}
 	if (u->region!=r) fset(u, FL_LONGACTION);
@@ -1828,7 +1833,7 @@ piracy(unit *u)
 		"piratesawvictim%h:ship%r:region%d:dir", sh, r, target_dir));
 
 	/* Befehl konstruieren */
-	sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), 
+	sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
 		locale_string(u->faction->locale, directions[target_dir]));
 	set_string(&u->thisorder, buf);
 
@@ -1904,7 +1909,7 @@ hunt(unit *u)
 		return false;
 	}
 
-	sprintf(command, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), 
+	sprintf(command, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
 		locale_string(u->faction->locale, directions[dir]));
 	moves = 1;
 
@@ -2066,10 +2071,10 @@ movement(void)
 				if(igetkeyword(o->s, u->faction->locale) == K_FOLLOW) {
 					if(attacked(u)) {
 						cmistake(u, o->s, 52, MSG_MOVE);
-						u = u2; break;
+						break;
 					} else if(race[u->race].flags & RCF_CANNOTMOVE) {
 						cmistake(u, o->s, 55, MSG_MOVE);
-						u = u2; break;
+						break;
 					}
 
 					p = getparam(u->faction->locale);
@@ -2077,12 +2082,12 @@ movement(void)
 						if(p != P_UNIT) {
 							cmistake(u, o->s, 240, MSG_MOVE);
 						}
-						u = u2; break;
+						break;
 					}
 
 					if (!fval(u, FL_LONGACTION) && hunt(u)) {
-						u = r->units;
-						continue;
+						u2 = r->units;
+						break;
 					}
 				}
 			}
