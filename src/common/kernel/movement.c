@@ -1350,9 +1350,7 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
           }
 
           p = buf+strlen(buf);
-          if (rlist->next) {
-            MSG(("travelthru_trail", "region", rlist->data), p, sizeof(buf)-strlen(buf), u->faction->locale, u->faction);		
-          }
+          MSG(("travelthru_trail", "region", rlist->data), p, sizeof(buf)-strlen(buf), u->faction->locale, u->faction);
         }
       }
     }
