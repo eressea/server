@@ -52,8 +52,6 @@ function process(orders)
   plan_monsters()
   process_orders()
 
-  refresh_pool()
-  
   write_passwords()
   write_reports()
 

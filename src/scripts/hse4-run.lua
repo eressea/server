@@ -32,6 +32,12 @@ function write_emails()
   end
 end
 
+function refresh_pool()
+  for f in factions() do
+    f:add_item("money", 50)
+  end
+end
+
 function process(orders)
   file = "" .. get_turn()
   if read_game(file)~=0 then
@@ -45,6 +51,8 @@ function process(orders)
 
   plan_monsters()
   process_orders()
+  
+  refresh_pool()
   
   write_passwords()
   write_reports()
