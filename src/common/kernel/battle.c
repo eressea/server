@@ -967,7 +967,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	int heiltrank = 0;
 	int faerie_level;
 	char debugbuf[512];
-	double kritchance;
 
 	/* Schild */
 	void **si;
@@ -1049,9 +1048,11 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 
 	if (type!=AT_COMBATSPELL && type!=AT_SPELL) /* Kein Zauber, normaler Waffenschaden */
 	{
-		kritchance = max((sk * 3 - sd) / 200.0, 0.005);
+    double kritchance = (sk * 3 - sd) / 200.0;
+		kritchance = max(kritchance, 0.005);
+    kritchance = min(0.9, kritchance);
 
-		while (chance(kritchance)) {
+    while (chance(kritchance)) {
 			sprintf(debugbuf,
 				"%s/%d landet einen kritischen Treffer", unitid(au), at.index);
 			battledebug(debugbuf);
@@ -1814,7 +1815,7 @@ hits(troop at, troop dt, weapon * awp)
 	if (dist>1 && (awp == NULL || !fval(awp->type, WTF_MISSILE))) return 0;
 
   /* mark this person as hit. */
-  af->person[dt.index].flags |= FL_HIT;
+  df->person[dt.index].flags |= FL_HIT;
 
 	if (af->person[at.index].flags & FL_STUNNED) {
 			af->person[at.index].flags &= ~FL_STUNNED;
