@@ -475,7 +475,7 @@ tactics_bonus(troop at, troop dt, boolean attacking)
 }
 #endif /* NEW_TACTICS */
 
-static int
+int
 statusrow(int status)
 {
 	switch (status) {

@@ -268,7 +268,7 @@ SeedPartei(void)
 	do {
 		win = openwin(SX - 10, 6, "< Neue Partei einfügen >");
 		wmove(win, y, 4);
-		for (i = 1; i < MAXRACES; i++) if(playerrace(new_race[i])) {
+		for (i = 1; i < MAXRACES; i++) if(playerrace(new_race[i]) && i != RC_ORC) {
 			sprintf(buf, "%d=%s; ", i, new_race[i]->_name[0]);
 			q += strlen(buf);
 			if (q > SX - 20) {
@@ -281,7 +281,7 @@ SeedPartei(void)
 		rc = (race_t) map_input(win, 2, 1, "Rasse", 0, MAXRACES-1, rc);
 
 		delwin(win);
-	} while(!playerrace(new_race[i]));
+	} while(!playerrace(new_race[i]) || i == RC_ORC);
 	return goodregion(rc);
 }
 

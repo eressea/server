@@ -854,7 +854,8 @@ add_skill(unit * u, skill_t id)
 	sv = (u->skills + u->skill_size - 1);
 	sv->level = (unsigned char)0;
 	sv->weeks = (unsigned char)1;
-	sv->id = (unsigned char)id;
+	sv->old   = (unsigned char)0;
+	sv->id    = (unsigned char)id;
 	return sv;
 }
 

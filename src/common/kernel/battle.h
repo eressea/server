@@ -237,5 +237,6 @@ extern struct troop select_corpse(struct battle * b, struct fighter * af);
 extern fighter * make_fighter(struct battle * b, struct unit * u, boolean attack);
 void flee(const troop dt);
 void drain_exp(struct unit *u, int d);
+extern int statusrow(int status);
 
 #endif

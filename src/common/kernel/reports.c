@@ -643,7 +643,7 @@ spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh,
 		diff   = effsk - oldeff; 
 
 		if(diff != 0) {
-			sbuf += sprintf(sbuf, " (%s%hd)", (diff>0)?"+":"", diff);
+			sbuf += sprintf(sbuf, " (%s%d)", (diff>0)?"+":"", diff);
 		}
 	}
 }
