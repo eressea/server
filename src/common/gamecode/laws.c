@@ -25,6 +25,9 @@
 
 #include <modules/gmcmd.h>
 #include <modules/infocmd.h>
+#ifdef WORMHOLE_MODULE
+#include <modules/wormhole.h>
+#endif
 
 /* gamecode includes */
 #include "economy.h"
@@ -3671,6 +3674,9 @@ processorders (void)
 	puts(" - Attribute altern");
 	ageing();
 
+#ifdef WORMHOLE_MODULE
+  create_wormholes();
+#endif
 	/* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
 	 * Beschreibungen geändert haben */
 	update_spells();

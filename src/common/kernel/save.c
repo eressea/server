@@ -860,6 +860,7 @@ readgame(const char * filename, int backup)
 	int rmax = maxregions;
 
 	sprintf(buf, "%s/%s", datapath(), filename);
+  log_printf("- reading game data from %s\n", filename);
 	if (backup) create_backup(buf);
 	F = cfopen(buf, "r");
 	if (F==NULL) {

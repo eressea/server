@@ -70,7 +70,7 @@ bt_find(const char* name)
 	return btl?btl->type:NULL;
 }
 
-static void
+void
 bt_register(building_type * type)
 {
 	struct building_typelist * btl = malloc(sizeof(building_type));

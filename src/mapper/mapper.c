@@ -41,6 +41,9 @@
 #ifdef ARENA_MODULE
 #include <modules/arena.h>
 #endif
+#ifdef WORMHOLE_MODULE
+#include <modules/wormhole.h>
+#endif
 
 /* kernel includes */
 #include <item.h>
@@ -1708,7 +1711,10 @@ main(int argc, char *argv[])
 	register_museum();
 #endif
 #ifdef ARENA_MODULE
-	register_arena();
+  register_arena();
+#endif
+#ifdef WORMHOLE_MODULE
+  register_wormholes();
 #endif
 /*	register_dungeon(); */
 

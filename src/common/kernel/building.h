@@ -59,6 +59,7 @@ typedef struct building_type {
 
 extern const building_type * bt_find(const char* name);
 extern void register_buildings(void);
+extern void bt_register(building_type * type);
 
 typedef struct building_typelist {
 	struct building_typelist * next;

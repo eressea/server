@@ -124,16 +124,28 @@
 				RelativePath=".\alliance.h">
 			</File>
 			<File
+				RelativePath=".\arena.h">
+			</File>
+			<File
+				RelativePath=".\dungeon.h">
+			</File>
+			<File
 				RelativePath=".\gmcmd.h">
 			</File>
 			<File
 				RelativePath=".\infocmd.h">
 			</File>
 			<File
+				RelativePath=".\museum.h">
+			</File>
+			<File
 				RelativePath=".\score.h">
 			</File>
 			<File
 				RelativePath=".\weather.h">
+			</File>
+			<File
+				RelativePath=".\wormhole.h">
 			</File>
 			<File
 				RelativePath=".\xecmd.h">
@@ -149,13 +161,7 @@
 			RelativePath=".\arena.c">
 		</File>
 		<File
-			RelativePath=".\arena.h">
-		</File>
-		<File
 			RelativePath=".\dungeon.c">
-		</File>
-		<File
-			RelativePath=".\dungeon.h">
 		</File>
 		<File
 			RelativePath=".\gmcmd.c">
@@ -167,13 +173,13 @@
 			RelativePath=".\museum.c">
 		</File>
 		<File
-			RelativePath=".\museum.h">
-		</File>
-		<File
 			RelativePath=".\score.c">
 		</File>
 		<File
 			RelativePath=".\weather.c">
+		</File>
+		<File
+			RelativePath=".\wormhole.c">
 		</File>
 		<File
 			RelativePath=".\xecmd.c">

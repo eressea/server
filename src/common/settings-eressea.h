@@ -44,6 +44,7 @@
 
 #define MUSEUM_MODULE
 #define ARENA_MODULE
+#define WORMHOLE_MODULE
 
 #define MAILITPATH	"/usr/sbin:$HOME/eressea/bin:/bin:/usr/bin:/usr/local/bin"
 

@@ -44,6 +44,9 @@
 #ifdef MUSEUM_MODULE
 #include <modules/museum.h>
 #endif
+#ifdef WORMHOLE_MODULE
+#include <modules/wormhole.h>
+#endif
 #ifdef ARENA_MODULE
 #include <modules/arena.h>
 #endif
@@ -184,6 +187,9 @@ game_init(void)
 #endif
 #ifdef ARENA_MODULE
 	register_arena();
+#endif
+#ifdef WORMHOLE_MODULE
+  register_wormholes();
 #endif
 #ifdef REMOVE_THIS
 	render_init();
