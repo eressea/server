@@ -1207,6 +1207,9 @@
 	<string name="AURA">
 		<text locale="de">AURA</text>
 	</string>
+	<string name="BÄUME">
+		<text locale="de">BÄUME</text>
+	</string>
 	<string name="BAUERN">
 		<text locale="de">BAUERN</text>
 	</string>
