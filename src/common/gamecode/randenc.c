@@ -786,7 +786,7 @@ volcano_outbreak(region *r)
 #endif
 
 		a = a_find(rn->attribs, &at_reduceproduction);
-		if (!a) a = a_add(&r->attribs, a_new(&at_reduceproduction));
+		if (!a) a = a_add(&rn->attribs, a_new(&at_reduceproduction));
 
 		/* Produktion vierteln ... */
 		a->data.sa[0] = 25;
