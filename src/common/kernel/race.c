@@ -335,38 +335,41 @@ rc_name(const race * rc, int n)
 }
 
 const char *
+raceprefix(const unit *u)
+{
+	attrib * agroup = a_find(u->attribs, &at_group);
+	attrib * asource = u->faction->attribs;
+	attrib * a2 = NULL;
+
+	if (agroup!=NULL) asource = ((group *)(agroup->data.v))->attribs;
+	a2 = a_find(asource, &at_raceprefix);
+
+	if (a2!=NULL) return (const char *)a2->data.v;
+	return NULL;
+}
+
+const char *
 racename(const struct locale *loc, const unit *u, const race * rc)
 {
-	static char lbuf[80];
-	attrib *a, *a2;
+	const char * prefix = raceprefix(u);
+	attrib * asyn = a_find(u->faction->attribs, &at_synonym);
 
-
-	a = a_find(u->attribs, &at_group);
-	if(a) {
-		a2 = a_find(((group *)(a->data.v))->attribs, &at_raceprefix);
-	} else {
-		a2 = a_find(u->faction->attribs, &at_raceprefix);
-	}
-
-	a = a_find(u->faction->attribs, &at_synonym);
-
-	if(a2) {
-		char s[32];
-
-		strcpy(lbuf, locale_string(loc, (char *)a2->data.v));
-		if(a) {
+	if (prefix!=NULL) {
+		static char lbuf[80];
+		char * s = lbuf;
+		strcpy(lbuf, locale_string(loc, prefix));
+		s += strlen(lbuf);
+		if (asyn!=NULL) {
 			strcpy(s, locale_string(loc,
-				((frace_synonyms *)(a->data.v))->synonyms[u->number != 1]));
+				((frace_synonyms *)(asyn->data.v))->synonyms[u->number != 1]));
 		} else {
 			strcpy(s, LOC(loc, rc_name(rc, u->number != 1)));
 		}
 		s[0] = (char)tolower(s[0]);
-		strcat(lbuf, s);
 		return lbuf;
-	}
-	if(a) {
+	} else if (asyn!=NULL) {
 		return(locale_string(loc,
-			((frace_synonyms *)(a->data.v))->synonyms[u->number != 1]));
+			((frace_synonyms *)(asyn->data.v))->synonyms[u->number != 1]));
 	}
 	return LOC(loc, rc_name(rc, u->number != 1));
 }

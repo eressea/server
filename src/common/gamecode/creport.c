@@ -593,19 +593,15 @@ cr_output_unit(FILE * F, const region * r,
 
 	{
 		/* print faction information */
-		const faction * sf = visible_faction(f,u);
-		const attrib *atyp = a_find(u->faction->attribs, &at_raceprefix);
-		const attrib *a = a_find(u->attribs, &at_group);
-		if (a) {
-			const attrib *agrp = a_find(((const group*)a->data.v)->attribs, &at_raceprefix);
-			if (agrp) atyp = agrp;
-		}
+		const faction * sf = visible_faction(f, u);
+		const char * prefix = raceprefix(u);
 		if (u->faction == f || omniscient(f)) {
 			const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
 			const faction * otherfaction = a_otherfaction?get_otherfaction(a_otherfaction):NULL;
 			/* my own faction, full info */
 			const attrib * ap = 0;
-			if (a) {
+			const attrib *a = a_find(u->attribs, &at_group);
+			if (a!=NULL) {
 				const group * g = (const group*)a->data.v;
 				ap = a_find(g->attribs, &at_raceprefix);
 				fprintf(F, "%d;gruppe\n", g->gid);
@@ -633,9 +629,8 @@ cr_output_unit(FILE * F, const region * r,
 				}
 			}
 		}
-		if (atyp) {
-			const char * name = (const char*)atyp->data.v;
-			fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
+		if (prefix) {
+			fprintf(F, "\"%s\";typprefix\n", add_translation(prefix, LOC(f->locale, prefix)));
 		}
 	}
 	if (u->faction != f && a_fshidden
