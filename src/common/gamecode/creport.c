@@ -76,7 +76,7 @@ extern const char *spelldata[];
 extern int quiet;
 
 /* globals */
-#define C_REPORT_VERSION 62
+#define C_REPORT_VERSION 63
 
 #define TAG_LOCALE "de"
 #ifdef TAG_LOCALE
@@ -1003,6 +1003,19 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 		}
 
 		fprintf(F, "\"%s\";Terrain\n", add_translation(tname, locale_string(f->locale, tname)));
+		switch (seemode) {
+#ifdef SEE_FAR
+		case see_far:
+			fputs("\"neighbourhood\";visibility\n", F);
+			break;
+#endif
+		case see_lighthouse:
+			fputs("\"lighthouse\";visibility\n", F);
+			break;
+		case see_travel:
+			fputs("\"travel\";visibility\n", F);
+			break;
+		}
 		if (seemode != see_neighbour)
 		{
 #define RESOURCECOMPAT
