@@ -1996,7 +1996,7 @@ hunt(unit *u)
 
   if (dir == NODIRECTION) {
     ship * sh = findship(id);
-    if (sh->region!=rc) {
+    if (sh==NULL || sh->region!=rc) {
       cmistake(u, findorder(u, u->thisorder), 20, MSG_MOVE);
     }
     return 0;
