@@ -330,7 +330,7 @@ mkisland(int nsize)
 	terraform(r, T_OCEAN);
 	add_regionlist(&rlist, r);
 	rsize = 1;
-	while (nsize) {
+	while (nsize && rsize) {
 		int i = rand() % rsize;
 		regionlist ** rnext = &rlist;
 		direction_t d;
