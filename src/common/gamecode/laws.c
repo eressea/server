@@ -3516,10 +3516,10 @@ use(void)
 					itype = finditemtype(t, u->faction->locale);
 
 					if (itype!=NULL) {
-						int i = use_item(u, itype, n, S->s);
-                                                assert(i<=0);
+					  int i = use_item(u, itype, n, S->s);
+					  assert(i<=0 || !"use_item should not return positive values.");
 					} else {
-						cmistake(u, S->s, 43, MSG_PRODUCE);
+					  cmistake(u, S->s, 43, MSG_PRODUCE);
 					}
 				}
 			}

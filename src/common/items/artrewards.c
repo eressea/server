@@ -127,13 +127,13 @@ use_trappedairelemental(struct unit * u, const struct item_type * itype,
   shipId = getshipid();
   if(shipId <= 0) {
     cmistake(u, cm, 20, MSG_MOVE);
-    return 0;
+    return -1;
   }
 
   sh = findshipr(u->region, shipId);
   if(!sh) {
     cmistake(u, cm, 20, MSG_MOVE);
-    return 0;
+    return -1;
   }
 
   c = create_curse(u, &sh->attribs, ct_find("shipspeedup"),
@@ -145,7 +145,7 @@ use_trappedairelemental(struct unit * u, const struct item_type * itype,
   
   itype->rtype->uchange(u, itype->rtype, -1);
 
-  return 1;
+  return 0;
 }
 
 static resource_type rt_trappedairelemental = {
@@ -171,7 +171,7 @@ use_aurapotion50(struct unit * u, const struct item_type * itype,
 {
   if(!is_mage(u)) {
     cmistake(u, cm, 214, MSG_MAGIC);
-    return 0;
+    return -1;
   }
 
   change_spellpoints(u, 50);
@@ -181,7 +181,7 @@ use_aurapotion50(struct unit * u, const struct item_type * itype,
   
   itype->rtype->uchange(u, itype->rtype, -1);
 
-  return 1;
+  return 0;
 }
 
 static resource_type rt_aurapotion50 = {
@@ -211,7 +211,7 @@ use_bagpipeoffear(struct unit * u, const struct item_type * itype,
 
   if(get_curse(u->region->attribs, ct_find("depression"))) {
     cmistake(u, cm, 58, MSG_MAGIC);
-    return 0;
+    return -1;
   }
 
   money = entertainmoney(u->region)/BAGPIPEFRACTION;
@@ -254,7 +254,7 @@ use_instantartacademy(struct unit * u, const struct item_type * itype,
 
   if(u->region->land == NULL) {
     cmistake(u, cm, 242, MSG_MAGIC);
-    return 0;
+    return -1;
   }
 
   b = new_building(bt_find("artacademy"), u->region, u->faction->locale);
@@ -267,7 +267,7 @@ use_instantartacademy(struct unit * u, const struct item_type * itype,
   
   itype->rtype->uchange(u, itype->rtype, -1);
 
-  return 1;
+  return 0;
 }
 
 static resource_type rt_instantartacademy = {
@@ -294,7 +294,7 @@ use_instantartsculpture(struct unit * u, const struct item_type * itype,
 
   if(u->region->land == NULL) {
     cmistake(u, cm, 242, MSG_MAGIC);
-    return 0;
+    return -1;
   }
 
   b = new_building(bt_find("artsculpture"), u->region, u->faction->locale);
@@ -307,7 +307,7 @@ use_instantartsculpture(struct unit * u, const struct item_type * itype,
 
   itype->rtype->uchange(u, itype->rtype, -1);
 
-  return 1;
+  return 0;
 }
 
 static resource_type rt_instantartsculpture = {
