@@ -854,6 +854,7 @@ movearound(int rx, int ry) {
 					ch = -9;	/* nur ein Redraw */
 					break;
 				case 'T':
+					if (r==NULL) break;
 					if (!Tagged) {
 						if (hx>-1) {
 							int Rx,Ry;
@@ -1601,6 +1602,8 @@ main(int argc, char *argv[])
 	}
 
 	sprintf(buf, "%s/newfactions.%d", basepath(), turn);
+	read_newfactions(buf);
+	sprintf(buf, "%s/newfactions", basepath());
 	read_newfactions(buf);
 	sprintf(buf, "%s/dropouts.%d", basepath(), turn);
 	read_dropouts(buf);

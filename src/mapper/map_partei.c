@@ -707,6 +707,7 @@ ParteiListe(void)
 				{
 					char fno[5];
 					strncpy(fno, pointer->s, 4);
+					fno[4]=0;
 					ModifyPartei(findfaction(atoi36(fno)));
 				}
 				break;

@@ -29,5 +29,6 @@ extern newfaction * newfactions;
 
 extern void autoseed(struct regionlist * rlist);
 extern void get_island(struct regionlist ** rlist);
+extern void mkisland(int nsize);
 
 #endif
