@@ -184,6 +184,7 @@ crossbow_p;en;crossbows
 dolphin;en;dolphin
 dolphin_p;en;dolphins
 dragonblood;en;dragonblood
+dragonblood_p;en;dragonblood
 dragonhead;en;dragonhead
 dragonhead_p;en;dragonheads
 dragonhoard;en;dragonhoard
@@ -194,6 +195,7 @@ elvenhorse_p;en;elven horses
 eyeofdragon;en;eye of dragon
 eyeofdragon_p;en;eye of dragons
 fairyboot;en;fairyboot
+fairyboot_p;en;fairyboot
 firesword;en;flaming sword
 firesword_p;en;flaming swords
 greatbow;en;great bow
@@ -225,8 +227,11 @@ lance_p;en;lances
 log;en;wood
 log_p;en;wood
 magicbag;en;magic bag
+magicbag_p;en;magic bags
 magicherbbag;en;bag of conservation
+magicherbbag_p;en;bags of conservation
 mallorn;en;mallorn
+mallorn_p;en;mallorn
 mallornbow;en;mallorn bow
 mallornbow_p;en;mallorn bows
 mallorncrossbow;en;mallorn crossbow
@@ -282,7 +287,9 @@ stone_p;en;stones
 sword;en;sword
 sword_p;en;swords
 toadslime;en;pot of toadslime
+toadslime_p;en;pots of toadslime
 trollbelt;en;trollbelt
+trollbelt_p;en;trollbelts
 unit;en;unit
 unit_p;en;units
 skillpotion;en;potion of skills
@@ -647,7 +654,7 @@ b_damage;en;damage
 wand;en;wand
 wand_p;en;wands
 wand_of_tears;en;wand of tears
-wands_of_tear_p;en;wands of tears
+wand_of_tears_p;en;wands of tears
 
 ##  Küsten
 Nordwestküste;en;northwest coast

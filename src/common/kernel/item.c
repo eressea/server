@@ -1325,6 +1325,7 @@ static translate_t translation[] = {
 	{ "Eisen", "iron", "iron_p", "iron", "iron_p" },
 	{ "Drachenblut", "dragonblood", "dragonblood_p", "dragonblood", "dragonblood_p" },
 	{ "Feenstiefel", "fairyboot", "fairyboot_p", "fairyboot", "fairyboot_p" },
+	{ "Gürtel der Trollstärke", "trollbelt", "trollbelt_p", "trollbelt", "trollbelt_p" },
 	{ "Mallorn", "mallorn", "mallorn_p", "mallorn", "mallorn_p" },
 	{ "Wagen", "cart", "cart_p", "cart", "cart_p" },
 	{ "Plattenpanzer", "plate", "plate_p", "plate", "plate_p" },
