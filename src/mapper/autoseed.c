@@ -372,6 +372,7 @@ mkisland(int nsize)
 		regionlist ** rbegin = &rlist;
 		int i;
 #define MINOCEANDIST 3
+#define MAXFILLDIST 10
 		for (i=0;i!=MINOCEANDIST;++i) {
 			regionlist ** rend = rbegin;
 			while (*rend) rend=&(*rend)->next;
@@ -389,6 +390,25 @@ mkisland(int nsize)
 				}
 			}
 
+		}
+		while (*rbegin) {
+			region * r = (*rbegin)->region;
+			direction_t d;
+			rbegin=&(*rbegin)->next;
+			for (d=0;d!=MAXDIRECTIONS;++d) if (rconnect(r, d)==NULL) {
+				int i;
+				for (i=1;i!=MAXFILLDIST;++i) {
+					if (findregion(r->x + i*delta_x[d], r->y + i*delta_y[d]))
+						break;
+
+				}
+				if (i!=MAXFILLDIST) {
+					while (--i) {
+						region * rn = new_region(r->x + i*delta_x[d], r->y + i*delta_y[d]);
+						terraform(rn, T_OCEAN);
+					}
+				}
+			}
 		}
 	}
 	return isize;

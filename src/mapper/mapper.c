@@ -130,6 +130,17 @@ boolean minimapx=false,minimapy=false;		/* Karte nicht vert./hor. scrollen */
 /* top, left => ? */
 /* hx, hy => ? */
 
+static void 
+runautoseed(void)
+{
+	while (newfactions) {
+		int n = listlen(newfactions);
+		int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
+		k = n / k;
+		mkisland(k);
+	}
+}
+
 void
 init_win(int x, int y) {
   if (initscr() == NULL) {
@@ -1040,6 +1051,7 @@ movearound(int rx, int ry) {
 					ch = -9;
 					break;
 				case 'a': 
+#if 0
 					if (r && r->land) {
 						regionlist * rlist = NULL;
 						add_regionlist(&rlist, r);
@@ -1047,13 +1059,12 @@ movearound(int rx, int ry) {
 						autoseed(rlist);
 						modified = 1;
 					}
-					break;
+#else
+					runautoseed();
+					modified = 1;
+#endif
 				case 's':
 					seed_dropouts();
-					modified = 1;
-					break;
-				case 'm':
-					mkisland(ISLANDSIZE);
 					modified = 1;
 					break;
 				case 'S':
@@ -1592,12 +1603,7 @@ main(int argc, char *argv[])
 	srand(time((time_t *) NULL));
 
 	if (autoseeding) {
-		while (newfactions) {
-			int n = listlen(newfactions);
-			int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
-			k = n / k;
-			mkisland(k);
-		}
+		runautoseed();
 		remove_empty_units();
 		writegame(datafile, 1);
 	} else {
