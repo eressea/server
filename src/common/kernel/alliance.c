@@ -271,6 +271,7 @@ alliancevictory(void)
 		} else {
 			freset(al, FL_MARK);
 		}
+		al = al->next;
 	}
 }
 #endif

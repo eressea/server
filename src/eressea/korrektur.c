@@ -2913,7 +2913,7 @@ korrektur(void)
 	fix_road_borders();
 	curse_emptiness();
 #ifdef ALLIANCES
-	init_alliances();
+	/* init_alliances(); */
 #endif
 	/* seems something fishy is going on, do this just
 	 * to be on the safe side:
