@@ -1785,7 +1785,6 @@ piracy(unit *u)
 {
 	region *r = u->region;
 	ship *sh = u->ship, *sh2;
-	unit *cap;
 	direction_t dir, target_dir = NODIRECTION;
 	int         aff[MAXDIRECTIONS];
 	int         saff = 0;
@@ -1840,7 +1839,7 @@ piracy(unit *u)
 					&& check_takeoff(sh, r, rc) == true) {
 
 				for(sh2 = rc->ships; sh2; sh2 = sh2->next) {
-					cap = shipowner(rc, sh2);
+					unit * cap = shipowner(rc, sh2);
 					if (cap && (intlist_find(il, cap->faction->no) || all)) {
 						aff[dir]++;
 					}
