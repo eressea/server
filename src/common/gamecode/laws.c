@@ -1091,7 +1091,7 @@ quit(void)
 			continue;
 		}
 	}
-
+#ifdef REMOVENMRNEWBIE
 	puts(" - beseitige Spieler, die sich nach der Anmeldung nicht "
 		 "gemeldet haben...");
 
@@ -1105,6 +1105,8 @@ quit(void)
 			}
 		}
 	}
+#endif
+
 	/* Clear away debris of destroyed factions */
 
 	puts(" - beseitige leere Einheiten und leere Parteien...");
@@ -2990,7 +2992,7 @@ setdefaults (void)
 				case K_BIETE:
 				case K_PIRACY:
 					if (idle (u->faction)) {
-						set_string (&u->thisorder, locale_string(u->faction->locale, keywords[K_WORK]));
+						set_string (&u->thisorder, locale_string(u->faction->locale, "defaultorder"));
 						break;
 					}
 					/* Ab hier Befehle, die auch eine idle
@@ -3000,7 +3002,7 @@ setdefaults (void)
 				case K_DRIVE:
 				case K_MOVE:
 					if(fval(u, FL_HUNGER)) {
-						set_string(&u->thisorder, locale_string(u->faction->locale, keywords[K_WORK]));
+						set_string(&u->thisorder, locale_string(u->faction->locale, "defaultorder"));
 					} else {
 						set_string(&u->thisorder, S->s);
 					}
@@ -3039,7 +3041,7 @@ setdefaults (void)
 			}
 			/* Attackiere sollte niemals Default werden */
 			if (igetkeyword(u->lastorder, u->faction->locale) == K_ATTACK)
-				set_string(&u->lastorder, locale_string(u->faction->locale, keywords[K_WORK]));
+				set_string(&u->lastorder, locale_string(u->faction->locale, "defaultorder"));
 
 		}
 	}
