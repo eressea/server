@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.7 2001/01/31 07:59:43 enno Exp $
+ *	$Id: main.c,v 1.8 2001/02/02 08:40:48 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -35,6 +35,8 @@
 #include <eressea.h>
 
 /* initialization - TODO: init in separate module */
+#include <items/lmsreward.h>
+#include <items/demonseye.h>
 #include <items/weapons.h>
 #include <attributes/attributes.h>
 
@@ -98,6 +100,13 @@ int mapdetail = 0;
 
 extern void render_init(void);
 
+static void init_items(void)
+{
+	init_weapons();
+	init_demonseye();
+	init_lmsreward();
+}
+
 static void
 init_game(void)
 {
@@ -105,8 +114,10 @@ init_game(void)
 	init_locales();
 
 	init_resources();
-	init_weapons();
+	init_items();
 	init_attributes();
+
+	init_demonseye();
 
 #ifdef USE_GM_COMMANDS
 	init_gmcmd();

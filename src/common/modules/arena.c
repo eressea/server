@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: arena.c,v 1.2 2001/01/31 07:59:42 enno Exp $
+ *	$Id: arena.c,v 1.3 2001/02/02 08:40:46 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -548,7 +548,7 @@ void
 init_arena(void)
 {
 	at_register(&at_hurting);
-	it_register(&it_demonseye);
+	init_demonseye();
 	it_register(&it_arenagate);
 	it_register(&it_gryphonwing);
 	register_function((pf_generic)use_wand_of_tears, "use_wand_of_tears");

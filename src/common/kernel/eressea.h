@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.h,v 1.6 2001/01/30 20:02:05 enno Exp $
+ *	$Id: eressea.h,v 1.7 2001/02/02 08:40:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -170,8 +170,6 @@ extern settings global;
 
 /* So lange kann die Partei nicht angegriffen werden */
 #define IMMUN_GEGEN_ANGRIFF		6
-/* erhöhen von Dämonen verspeiste Bauern den Deathcount ?*/
-#undef DAEMON_DEATHCOUNT
 #undef STUDY_IF_NOT_WORKING
 
 /** Attackierende Einheiten können keine langen Befehle ausführen */
@@ -184,11 +182,8 @@ extern settings global;
 #define DMRISE         10
 #define DMRISEHAFEN    20
 
-/* Vermehrungsrate Bauern */
-#define PEASANTGROWTH   4
-#define LIFEEXPECTANCY (27*40)
-/* Sterbechance Bauern */
-#define PEASANTDIE      2
+/* Vermehrungsrate Bauern (PEASANTDIE inklusive) */
+#define PEASANTGROWTH   2
 /* Vermehrung trotz 90% Auslastung */
 #define PEASANTFORCE   75
 

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: battle.c,v 1.3 2001/02/02 08:40:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2205,7 +2205,6 @@ aftermath(battle * b)
 		s->alive = 0;
 		s->flee = 0;
 		s->dead = 0;
-		if (s->bf->faction->no!=MONSTER_FACTION) is += s->casualties;
 
 		for_each(df, s->fighters) {
 			unit *du = df->unit;
@@ -2302,12 +2301,18 @@ aftermath(battle * b)
 					loot_items(df);
 				}
 			}
+
+			if (!nonplayer_race(du->race)) {
+				/* tote im kampf werden zu regionsuntoten: 
+				 * for each o them, a peasant will die as well */
+				is += dead;
+			}
 		} next(df);
 	} next(s);
 	dead_peasants = min(rpeasants(r), is);
-	rsetpeasants(r, rpeasants(r) - dead_peasants);
-	deathcounts(r, dead_peasants);
+	deathcounts(r, dead_peasants + is);
 	chaoscounts(r, dead_peasants / 2);
+	rsetpeasants(r, rpeasants(r) - dead_peasants);
 
 	for (bf=b->factions;bf;bf=bf->next) {
 		faction * f = bf->faction;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: names.h,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: names.h,v 1.3 2001/02/02 08:40:46 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -13,12 +13,12 @@
  */
 
 
-char *untoten_name(struct unit * u);
-char *skeleton_name(struct unit * u);
-char *zombie_name(struct unit * u);
-char *ghoul_name(struct unit * u);
-char *drachen_name(struct unit *u);
-char *dracoid_name(struct unit *u);
+const char *untoten_name(const struct unit * u);
+const char *skeleton_name(const struct unit * u);
+const char *zombie_name(const struct unit * u);
+const char *ghoul_name(const struct unit * u);
+const char *drachen_name(const struct unit *u);
+const char *dracoid_name(const struct unit *u);
 const char *shadow_name(const struct unit *u);
-const char *abkz(char *s, size_t max);
+const char *abkz(const char *s, size_t max);
 void name_unit(struct unit *u);

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.4 2001/01/28 08:01:51 enno Exp $
+ *	$Id: item.c,v 1.5 2001/02/02 08:40:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1291,12 +1291,6 @@ init_olditems(void)
 	}
 }
 
-static void
-init_items(void) {
-	init_olditems();
-}
-
-
 const char *herbdata[3][MAXHERBS] =
 {
 	{
@@ -1798,7 +1792,7 @@ init_resources(void)
 	oldresourcetype[R_UNIT] = r_unit;
 
 	/* alte typen registrieren: */
-	init_items();
+	init_olditems();
 	init_oldherbs();
 	init_oldpotions();
 }

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: randenc.c,v 1.4 2001/01/31 17:40:49 corwin Exp $
+ *	$Id: randenc.c,v 1.5 2001/02/02 08:40:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1063,9 +1063,6 @@ randomevents(void)
 				}
 				dc = max(u->number - bauernblut, 0);
 				dc = min(dc, rpeasants(r));
-#if DAEMON_DEATHCOUNT
-				deathcounts(r, dc);
-#endif
 				dc = rpeasants(r) - max(u->number - bauernblut, 0);
 				dc = max(0, dc);
 				rsetpeasants(r, dc);
@@ -1303,21 +1300,17 @@ randomevents(void)
 	/* Untote können entstehen */
 
 	for (r = regions; r; r = r->next) {
-		double average;
+		int unburied = deathcount(r);
 
 		if(is_cursed(r->attribs, C_HOLYGROUND, 0)) continue;
 
-		average = (rpeasants(r)/(PEASANTGROWTH*0.01)/LIFEEXPECTANCY);
-
 		/* Chance 0.1% * chaosfactor */
-		/* nur, wenn Gräber 50% über normal liegen */
-		if (rand() % 10000 < (100 + 100 * chaosfactor(r))
-				&& deathcount(r) > average * 1.5 && r->land) {
-			int undead = deathcount(r) / (rand() % 2 + 1);
+		if (unburied && r->land && rand() % 10000 < (100 + 100 * chaosfactor(r))) {
+			int undead = unburied / (rand() % 2 + 1);
 			race_t rc;
 			int i;
 
-			if (r->age < 20 || !undead) continue;
+			if (!undead || r->age < 20) continue;
 
 			switch(rand()%3) {
 			case 0:
@@ -1362,12 +1355,11 @@ randomevents(void)
 					"undeadrise%r:region", r));
 			}
 		} else {
-			int dead = rpeasants(r) / LIFEEXPECTANCY;
-			int peasants = rpeasants(r);
-			/* Gräber verwittern. Bauern in der Region sterben. */
-			if (rand() % LIFEEXPECTANCY < peasants % LIFEEXPECTANCY) ++dead;
-			deathcounts(r, dead-(int)(deathcount(r)*0.01));
-			if (dead) rsetpeasants(r, peasants - dead);
+			int i = deathcount(r);
+			if (i) {
+				/* Gräber verwittern, 3% der Untoten finden die ewige Ruhe */
+				deathcounts(r, (int)(1+i*0.03));
+			}
 		}
 	}
 

@@ -1,0 +1,8 @@
+- Die Variable buf
+wird an zu vielen Stellen im Source benutzt. Können wir zumindest in Zukunft versuchen, auf sie zu verzichten? Mir ist nie sehr wohl, wen ich die irgendwo sehe.
+
+- Bibliotheken, module
+Jedes Verzeichnis in common/ erzeugt eine Bibliothek. Je nach Bedarf muss aber nicht jeder Server die ganze Bibliothek linken (die ist eher was für den mapper), sondern kann die Files auch einzeln linken. 
+Jedes modul, item, attribut, usw. sollte eine Funktion zur Verfügung stellen, die seine typen initialisiert, also it_register respektive at_register o.ä. aufruft. Jede Biliothek hat ein File, das ihren Namen trägt (z.b. items.txt) mit einer eigenen init_-Funktion, die alle init_funktionen der enthaltenen objekte enthält. (init_items, init_attributes, usw).
+Neue Files hinzufügen heißt also bitte, die Registrierung in den "bibliotheks-file" zu machen.
+

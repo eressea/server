@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: names.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: names.c,v 1.3 2001/02/02 08:40:46 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -105,8 +105,8 @@ static const char *untot_nach[UNTOT_NACH] =
 	" aus der Unterwelt"
 };
 
-char *
-untoten_name(unit * u)
+const char *
+untoten_name(const unit * u)
 {
 	int uv, uu, un;
 	static char name[NAMESIZE + 1];
@@ -191,8 +191,8 @@ static const char *skel_nach[SKEL_NACH] =
 	" aus der Unterwelt"
 };
 
-char *
-skeleton_name(unit * u)
+const char *
+skeleton_name(const unit * u)
 {
 	int uv, uu, un;
 	static char name[NAMESIZE + 1];
@@ -274,8 +274,8 @@ static const char *zombie_nach[ZOM_NACH] =
 	" aus der Unterwelt"
 };
 
-char *
-zombie_name(unit * u)
+const char *
+zombie_name(const unit * u)
 {
 	int uv, uu, un;
 	static char name[NAMESIZE + 1];
@@ -359,8 +359,8 @@ static const char *ghoul_nach[GHOUL_NACH] =
 	" aus der Unterwelt"
 };
 
-char *
-ghoul_name(unit * u)
+const char *
+ghoul_name(const unit * u)
 {
 	int uv, uu, un;
 	static char name[NAMESIZE + 1];
@@ -511,8 +511,8 @@ shadow_name(const unit *u)
 	return "Schattendämonen";
 }
 
-char *
-drachen_name(unit *u)
+const char *
+drachen_name(const unit *u)
 {
 	static char name[NAMESIZE + 1];
 	region *r = u->region;
@@ -626,7 +626,8 @@ static const char *drac_suf[DRAC_SUF] = {
 		"k"
 };
 
-char *dracoid_name(unit *u)
+const char *
+dracoid_name(const unit *u)
 {
 	static char name[NAMESIZE + 1];
 	int         mid_syllabels;
@@ -646,10 +647,11 @@ char *dracoid_name(unit *u)
 	return name;
 }
 
-const char *abkz(char *s, size_t max)
+const char *
+abkz(const char *s, size_t max)
 {
 	static char buf[32];
-	char *p = s;
+	const char *p = s;
 	unsigned int c = 0;
 	int   bpt;
 	int   i;

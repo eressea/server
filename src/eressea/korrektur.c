@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.9 2001/01/31 17:40:52 corwin Exp $
+ *	$Id: korrektur.c,v 1.10 2001/02/02 08:40:48 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -83,7 +83,7 @@ fix_skills(void)
 		/* make sure that this is done only once! */
 		while (a && a->data.i!=magic) a=a->next;
 		if (a) {
-			fprintf(stderr, "WARNING: fix_deathcounts() was called a second time\n");
+			fprintf(stderr, "WARNING: fix_skills() was called a second time\n");
 			return;
 		}
 		a_add(&global.attribs, a_new(&at_key))->data.i = magic;
@@ -108,38 +108,16 @@ fix_skills(void)
 	}
 }
 
-#if 0
-static void
-fix_deathcount(double mod)
-{
-	int magic = atoi36("dcnt");
-	region * r;
-	attrib * a = a_find(global.attribs, &at_key);
-	/* make sure that this is done only once! */
-	while (a && a->data.i!=magic) a=a->next;
-	if (a) {
-		fprintf(stderr, "WARNING: fix_deathcounts() was called a second time\n");
-		return;
-	}
-	a_add(&global.attribs, make_key(magic));
-
-	for (r=regions;r;r=r->next) {
-		deathcounts(r, (int)(deathcount(r)*mod));
-	}
-}
-#endif
-
-static void
-do_once(int magic, void (*fun)(void))
-{
-	attrib * a = a_find(global.attribs, &at_key);
-	/* make sure that this is done only once! */
-	while (a && a->data.i!=magic) a=a->next;
-	if (a) {
-		fprintf(stderr, "WARNING: a unique fix was called a second time\n");
-		return;
-	}
-	else fun();
+/* make sure that this is done only once! */
+#define do_once(magic, fun) \
+{ \
+	attrib * a = a_find(global.attribs, &at_key); \
+	while (a && a->data.i!=(magic)) a=a->next; \
+	if (a) { \
+		fprintf(stderr, "WARNING: a unique fix was called a second time\n"); \
+		return; \
+	} \
+	else (fun); \
 }
 
 static void
@@ -763,10 +741,10 @@ remove_impossible_dragontargets(void)
 	for (r=regions;r;r=r->next) {
 		unit *u;
 		for (u=r->units;u;u=u->next) {
-			attrib *a, *an;
+			attrib *a;
 			if(u->faction->no != MONSTER_FACTION) continue;
 
-			a = a_find(an, &at_targetregion);
+			a = a_find(u->attribs, &at_targetregion);
 			if (a!=NULL) {
 				boolean cango = false;
 				region * r2 = a->data.v;
@@ -1265,26 +1243,6 @@ write_laenrepair(void) {
 }
 #endif
 
-#if 0
-static void
-fix_deathcounts(void)
-{
-	region * r;
-
-	/* Regionen, die sehr wenig Gräber haben, sollten einen sinnvollen Startwert bekommen. */
-
-	for (r=regions;r;r=r->next) {
-		int dc = deathcount(r);
-		int peasants = rpeasants(r);
-		int average = (int)(peasants/(PEASANTGROWTH*0.01)/LIFEEXPECTANCY);
-		if (dc<average*0.5) {
-			deathcounts(r, average);
-		}
-	}
-
-}
-#endif
-
 #include "group.h"
 static void
 fix_allies(void) {
@@ -1744,10 +1702,23 @@ convert_triggers(void)
 }
 #endif
 
+#include <items/lmsreward.h>
 static void
 lms_special(unit * u)
 {
-	/* TODO: Trollstärke-gürtel und trigger an die einheit geben */
+	i_change(&u->items, &it_lmsreward, 1);
+}
+
+#define LIFEEXPECTANCY (27*40)
+static void
+undo_deadpeasants(void)
+{
+	region * r = regions;
+	while (r) {
+		int dead = rpeasants(r) / LIFEEXPECTANCY;
+		deathcounts(r, -dead);
+		r = r->next;
+	}
 }
 
 #include <modules/gmcmd.h>
@@ -1764,7 +1735,7 @@ korrektur(void)
 
 	/* fix_herbtypes(); */
 #ifdef CONVERT_TRIGGER
-	do_once(atoi36("cvtr"), convert_triggers);
+	do_once(atoi36("cvtr"), convert_triggers());
 #endif
 	fix_migrants();
 	fix_allies();
@@ -1816,8 +1787,9 @@ korrektur(void)
 		init_mwarden();
 		break;
 	}
-	do_once(atoi36("fxfa"), fix_vertrautenmagie);
-
+	do_once(atoi36("fxfa"), fix_vertrautenmagie());
+	do_once(atoi36("uddp"), undo_deadpeasants());
+	do_once(atoi36("lmsr"), lms_special(findunit(atoi36(""))))
 	/* fix_hp(); */ /* checkt, ob irgendwer absurde hitpoints hat. */
 
 	/* trade_orders(); */

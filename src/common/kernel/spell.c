@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.c,v 1.5 2001/01/31 17:40:51 corwin Exp $
+ *	$Id: spell.c,v 1.6 2001/02/02 08:40:46 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1975,7 +1975,6 @@ sp_create_sack_of_conservation(castorder *co)
 static int
 sp_holyground(castorder *co)
 {
-	unit *u;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
@@ -1986,7 +1985,7 @@ sp_holyground(castorder *co)
 
 	set_curseflag(mage->building->attribs, C_HOLYGROUND, 0, CURSE_NOAGE);
 
-	add_message(&r->msgs, new_message(mage->faction, "holyground%u:mage", u));
+	add_message(&r->msgs, new_message(mage->faction, "holyground%u:mage", mage));
 
 	a_removeall(&r->attribs, &at_deathcount);
 
@@ -3505,7 +3504,7 @@ sp_summonundead(castorder *co)
 	int force = co->force;
 	race_t race = RC_SKELETON;
 
-	if (rterrain(r) == T_OCEAN || deathcount(r) == 0) {
+	if (!r->land || deathcount(r) == 0) {
 		sprintf(buf, "%s in %s: In %s sind keine Gräber.", unitname(mage),
 				regionid(mage->region), regionid(r));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);

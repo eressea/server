@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.5 2001/01/30 23:16:16 enno Exp $
+ *	$Id: eressea.c,v 1.6 2001/02/02 08:40:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2267,22 +2267,20 @@ hunger(unit * u, int need)
 		need -= lspp;
 	}
 
-	/* Gestorbene aus der Einheit nehmen. */
 	if (dead) {
-		attrib * a;
+		/* Gestorbene aus der Einheit nehmen,
+		 * Sie bekommen keine Beerdingung. */
 		add_message(&u->faction->msgs, new_message(u->faction,
 			"starvation%u:unit%r:region%i:dead%i:live", u, r, dead, u->number-dead));
 
 		scale_number(u, u->number - dead);
-		a = a_find(r->attribs, &at_deathcount);
-		if (!a) a = a_add(&r->attribs, a_new(&at_deathcount));
-		a->data.i += dead;
+		deathcounts(r, dead);
 	}
 	if(hpsub > 0) {
 		/* Jetzt die Schäden der nicht gestorbenen abziehen. */
 		u->hp -= hpsub;
 		/* Meldung nur, wenn noch keine für Tote generiert. */
-		if(dead == 0) {
+		if (dead == 0) {
 			/* Durch unzureichende Ernährung wird %s geschwächt */
 			add_message(&u->faction->msgs, new_message(u->faction,
 				"malnourish%u:unit%r:region", u, r));

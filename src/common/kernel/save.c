@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.6 2001/01/30 23:16:17 enno Exp $
+ *	$Id: save.c,v 1.7 2001/02/02 08:40:46 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1057,6 +1057,7 @@ readgame(boolean backup)
 			rsetmoney(r, ri(F));
 			if (global.data_version<ATTRIBFIX_VERSION) ri(F);
 		}
+
 		if (global.data_version<MEMSAVE_VERSION) {
 			int chaoscount = ri(F);
 			int deathcount = ri(F);

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: demonseye.h,v 1.3 2001/02/02 08:40:45 enno Exp $
+ * $Id: lmsreward.h,v 1.1 2001/02/02 08:40:45 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -12,5 +12,5 @@
  * prior permission by the authors of Eressea.
  */
 
-extern struct item_type it_demonseye;
-extern void init_demonseye(void);
+extern struct item_type it_lmsreward;
+extern void init_lmsreward(void);

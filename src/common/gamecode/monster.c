@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: monster.c,v 1.3 2001/01/28 08:50:45 enno Exp $
+ *	$Id: monster.c,v 1.4 2001/02/02 08:40:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -570,15 +570,12 @@ eaten_by_monster(unit * u)
 		n = rand()%(u->number/20+1);
 	}
 
-	if(n > 0) {
-		attrib * a = a_find(u->region->attribs, &at_deathcount);
-		if (!a) a = a_add(&u->region->attribs, a_new(&at_deathcount));
-
+	if (n > 0) {
 		n = lovar(n);
 		n = min(rpeasants(u->region), n);
 
 		if(n > 0) {
-			a->data.i += n;
+			deathcounts(u->region, n);
 			rsetpeasants(u->region, rpeasants(u->region) - n);
 			add_message(&u->region->msgs, new_message(NULL,
 				"eatpeasants%u:unit%i:amount", u, n));

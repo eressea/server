@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: movement.c,v 1.3 2001/02/02 08:40:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2072,10 +2072,11 @@ follow(void)
 	region * r;
 	for (r=regions;r;r=r->next) {
 		unit * u;
-		if (fval(u, FL_HADBATTLE)) continue;
 		for (u=r->units;u;u=u->next) {
-			attrib * a = a_find(u->attribs, &at_follow);
+			attrib * a;
 			strlist * o;
+			if (fval(u, FL_HADBATTLE)) continue;
+			a = a_find(u->attribs, &at_follow);
 			for (o=u->orders;o;o=o->next) {
 				if (igetkeyword(o->s) == K_FOLLOW
 						&& getparam() == P_UNIT) {

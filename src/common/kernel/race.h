@@ -70,7 +70,7 @@ struct racedata {
 	int battle_flags;
 	int ec_flags;
 	race_t familiars[MAXMAGIETYP];
-	char *(*generate_name) (struct unit *);
+	const char *(*generate_name) (const struct unit *);
 	void (*age_function)(struct unit *u);
 	boolean (*move_allowed)(struct region *, struct region *);
 };

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: region.c,v 1.4 2001/01/31 17:40:51 corwin Exp $
+ *	$Id: region.c,v 1.5 2001/02/02 08:40:46 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -105,7 +105,7 @@ woodcount(const region * r) {
 }
 
 void
-deathcounts(region * r, int fallen) {
+deathcounts (region * r, int fallen) {
 	attrib * a;
 
 	if (fallen==0) return;
@@ -115,7 +115,7 @@ deathcounts(region * r, int fallen) {
 	if (!a) a = a_add(&r->attribs, a_new(&at_deathcount));
 	a->data.i += fallen;
 
-	if (a->data.i==0) a_remove(&r->attribs, a);
+	if (a->data.i<=0) a_remove(&r->attribs, a);
 }
 
 void
@@ -128,7 +128,7 @@ chaoscounts(region * r, int fallen) {
 	if (!a) a = a_add(&r->attribs, a_new(&at_chaoscount));
 	a->data.i += fallen;
 
-	if (a->data.i==0) a_remove(&r->attribs, a);
+	if (a->data.i<=0) a_remove(&r->attribs, a);
 }
 
 void
@@ -141,7 +141,7 @@ woodcounts(region * r, int fallen) {
 	if (!a) a = a_add(&r->attribs, a_new(&at_woodcount));
 	a->data.i += fallen;
 
-	if (a->data.i==0) a_remove(&r->attribs, a);
+	if (a->data.i<=0) a_remove(&r->attribs, a);
 }
 
 /********************/
@@ -385,7 +385,8 @@ attrib_type at_horseluck = {
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
 	NO_WRITE,
-	NO_READ
+	NO_READ,
+	ATF_UNIQUE
 };
 
 
@@ -398,7 +399,8 @@ attrib_type at_peasantluck = {
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
 	NO_WRITE,
-	NO_READ
+	NO_READ,
+	ATF_UNIQUE
 };
 
 /*********************/
@@ -410,7 +412,8 @@ attrib_type at_chaoscount = {
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
 	DEFAULT_WRITE,
-	DEFAULT_READ
+	DEFAULT_READ,
+	ATF_UNIQUE
 };
 
 /*********************/
@@ -422,7 +425,8 @@ attrib_type at_deathcount = {
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
 	DEFAULT_WRITE,
-	DEFAULT_READ
+	DEFAULT_READ,
+	ATF_UNIQUE
 };
 
 /*********************/
@@ -434,7 +438,8 @@ attrib_type at_woodcount = {
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
 	DEFAULT_WRITE,
-	DEFAULT_READ
+	DEFAULT_READ,
+	ATF_UNIQUE
 };
 
 /*********************/
@@ -458,7 +463,8 @@ attrib_type at_laen = {
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
 	DEFAULT_WRITE,
-	DEFAULT_READ
+	DEFAULT_READ,
+	ATF_UNIQUE
 };
 
 void
@@ -774,10 +780,7 @@ terraform(region * r, terrain_t t)
 	{
 		if (terrain[t].production_max && !fval(r, RF_CHAOTIC)) {
 			int np = MAXPEASANTS_PER_AREA * (rand() % (terrain[t].production_max / 2));
-			int average;
 			rsetpeasants(r, max(100, np));
-			average = (int)(rpeasants(r)/(PEASANTGROWTH*0.01)/LIFEEXPECTANCY);
-			deathcounts(r, average); /* Gräber der Ahnen in der Region */
 			rsetmoney(r, rpeasants(r) * ((wage(r, NULL, false)+1) + rand() % 5));
 		}
 	}

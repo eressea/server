@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.5 2001/01/30 20:02:05 enno Exp $
+ *	$Id: laws.c,v 1.6 2001/02/02 08:40:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -436,12 +436,6 @@ peasants(region * r)
 	}
 
 	peasants = rpeasants(r);
-
-	for (n = peasants; n; n--) {
-		if (rand() % 100 < PEASANTDIE) {
-			peasants--;
-		}
-	}
 
 	for (n = peasants; n; n--) {
 		if (glueck >= 0) {		/* Sonst keine Vermehrung */
