@@ -1496,7 +1496,7 @@ sp_sparkle(castorder *co)
  * Flag:
  *  (SPELLLEVEL)
  *
- * #define GOLEM_IRON   5
+ * #define GOLEM_IRON   4
  */
 
 static int
@@ -1558,7 +1558,7 @@ sp_create_irongolem(castorder *co)
  * Flag:
  *  (SPELLLEVEL)
  *
- * #define GOLEM_STONE 5
+ * #define GOLEM_STONE 4
  */
 static int
 sp_create_stonegolem(castorder *co)
