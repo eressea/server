@@ -1031,12 +1031,11 @@ cap_route(region * r, region_list * route, region_list * route_end, int speed)
     region * next = iroute->data;
     direction_t reldir = reldirection(current, next);
 
-    iroute = iroute->next;
-
     /* adjust the range of the unit */
     if (roadto(current, reldir)) moves -= BP_ROAD;
     else moves -= BP_NORMAL;
     if (moves<0) break;
+    iroute = iroute->next;
     current = next;
   }
   return iroute;

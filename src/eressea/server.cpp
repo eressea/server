@@ -144,7 +144,7 @@ static int nowrite = 0;
 static boolean g_writemap = false;
 static boolean opt_reportonly = false;
 static const char * luafile = "default.lua";
-static const char * script_path = NULL;
+static const char * script_path = "scripts";
 
 struct settings global = {
   "Eressea", /* gamename */

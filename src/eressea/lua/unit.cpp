@@ -17,6 +17,7 @@
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/spell.h>
 #include <kernel/unit.h>
@@ -251,9 +252,28 @@ unit_getregion(const unit& u)
 }
 
 static void
+unit_setship(unit& u, ship& s)
+{
+  leave(u.region, &u);
+  if (u.region!=s.region) {
+    unit_setregion(u, *s.region);
+  }
+  u.ship = &s;
+}
+
+static ship *
+unit_getship(const unit& u)
+{
+  return u.ship;
+}
+
+static void
 unit_setbuilding(unit& u, building& b)
 {
   leave(u.region, &u);
+  if (u.region!=b.region) {
+    unit_setregion(u, *b.region);
+  }
   u.building = &b;
 }
 
@@ -538,6 +558,7 @@ bind_unit(lua_State * L)
     .property("magic", &unit_getmagic, &unit_setmagic)
     .property("aura", &unit_getaura, &unit_setaura)
     .property("building", &unit_getbuilding, &unit_setbuilding)
+    .property("ship", &unit_getship, &unit_setship)
     .property("region", &unit_getregion, &unit_setregion)
     .property("is_familiar", &unit_isfamiliar)
     .property("spells", &unit_spells, return_stl_iterator)

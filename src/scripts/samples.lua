@@ -1,24 +1,20 @@
-function test_sail()
-  r0 = terraform(0, 0, "plain")
-
-  orcs = add_faction("enno@eressea.de", "orc", "de")
-  orcs.age = 20
-
-  orc = add_unit(orcs, r0)
-  orc.number = 1
-  orc:add_item("speedsail", orc.number)
-
-  orc:clear_orders()
-  orc:add_order("NUMMER PARTEI orcs")
-  orc:add_order("NUMMER EINHEIT orc")
-  orc:add_order("BENENNE EINHEIT Orks")
-  orc:add_order("ZEIGEN \"Sonnensegel\"")
+function mkunit(f, r, num)
+  u = add_unit(f, r)
+  u.number = num
+  u:add_item("money", num*10)
+  return u
 end
 
 function test_movement()
   west = direction("west")
   east = direction("east")
 
+  -- im westen ohne strassen
+  ocean = terraform(-3, 0, "ocean")
+  terraform(-2, 0, "plain")
+  terraform(-1, 0, "plain")
+
+  -- im osten mit strassen
   r0 = terraform(0, 0, "plain")
   r1 = terraform(1, 0, "desert")
   r2 = terraform(2, 0, "glacier")
@@ -37,18 +33,28 @@ function test_movement()
   orcs = add_faction("enno@eressea.de", "orc", "de")
   orcs.age = 20
 
-  orc = add_unit(orcs, r0)
-  orc.number = 10
-  orc:add_item("money", orc.number*10)
-  orc:add_item("horse", orc.number*3)
-  orc:set_skill("sk_riding", 10)
-
   bugs = add_faction("enno@eressea.de", "insect", "de")
   bugs.age = 20
 
-  bug = add_unit(bugs, r0)
-  bug.number = 1
-  bug:add_item("money", bug.number*10)
+  orc = mkunit(orcs, r0, 10)
+  orc:add_item("horse", orc.number*3)
+  orc:set_skill("sk_riding", 10)
+
+  foot = mkunit(orcs, r0, 1)
+
+  ship = add_ship("boat", r0)
+  sail = mkunit(orcs, r0, 1)
+  sail.ship = ship
+
+  bug = mkunit(bugs, r0, 1)
+
+  sail:clear_orders()
+  sail:add_order("NACH O")
+  sail:add_order("NUMMER EINHEIT saiL")
+
+  foot:clear_orders()
+  foot:add_order("ROUTE W W")
+  foot:add_order("NUMMER EINHEIT foot")
 
   orc:clear_orders()
   orc:add_order("NUMMER PARTEI orcs")
@@ -92,6 +98,23 @@ function test_movement()
 
 end
 
+
+function test_sail()
+  r0 = terraform(0, 0, "plain")
+
+  orcs = add_faction("enno@eressea.de", "orc", "de")
+  orcs.age = 20
+
+  orc = add_unit(orcs, r0)
+  orc.number = 1
+  orc:add_item("speedsail", orc.number)
+
+  orc:clear_orders()
+  orc:add_order("NUMMER PARTEI orcs")
+  orc:add_order("NUMMER EINHEIT orc")
+  orc:add_order("BENENNE EINHEIT Orks")
+  orc:add_order("ZEIGEN \"Sonnensegel\"")
+end
 
 function test_handler()
 
@@ -323,7 +346,12 @@ end
 -- test_give()
 -- test_write()
 
-test_sail()
+-- test_sail()
+-- write_game("../testg.txt")
+-- read_game("../testg.txt")
+
+test_movement()
 run_scripts()
 process_orders()
 write_reports() 
+

@@ -2,6 +2,7 @@
 #include <eressea.h>
 
 // kernel includes
+#include <build.h>
 #include <ship.h>
 #include <region.h>
 
@@ -34,11 +35,21 @@ operator==(const ship& a, const ship& sh)
   return a.no==sh.no;
 }
 
+static ship *
+add_ship(const char * sname, region& r)
+{
+  const ship_type * stype = st_find(sname);
+  ship * sh = new_ship(stype, NULL, &r);
+  sh->size = stype->construction->maxsize;
+  return sh;
+}
+
 void
 bind_ship(lua_State * L) 
 {
   module(L)[
     def("get_ship", &findship),
+    def("add_ship", &add_ship),
 
     class_<struct ship>("ship")
     .def(self == ship())
