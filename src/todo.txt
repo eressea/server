@@ -1,3 +1,9 @@
+[11:01] <Enno`> am besten wäre, wenn mailit nur die optionen, nicht das ganze script enthielte
+[11:01] <Enno`> und ein skript dann mailit als input nähme
+[11:02] <Enno`> also nur enno@eressea.upb.de pka3 BZIP2 nr cr zv
+
+Deathcloud: Magieresistenz des Magiers in das attribut, nicht auflösen wenn magier tot.
+
 Messungen:
   Messen, was CR alleine kostet.
   Messen, was no-ZV bringt. Zugvorlage abstellen.

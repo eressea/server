@@ -19,11 +19,6 @@ extern "C" {
 extern void register_weapons(void);
 extern void init_weapons(void);
 
-extern struct item_type it_mallornspear;
-extern struct item_type it_mallornlance;
-extern struct item_type it_mallorncrossbow;
-extern struct item_type it_mallornbow;
-
 #ifdef __cplusplus
 }
 #endif

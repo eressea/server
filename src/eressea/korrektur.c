@@ -594,70 +594,6 @@ fix_icastles(void)
 	}
 }
 
-typedef struct stats_t {
-	struct stats_t * next;
-	const struct item_type * type;
-	double number;
-} stats_t;
-
-static void 
-s_change(stats_t** s, const struct item_type * type, int count)
-{
-	while (*s && (*s)->type!=type) s=&(*s)->next;
-	if (*s==NULL) {
-		*s = calloc(1, sizeof(stats_t));
-		(*s)->type = type;
-	}
-	(*s)->number += count;
-}
-
-static stats_t * 
-s_find(stats_t * s, const struct item_type * type)
-{
-	while (s && s->type!=type) s=s->next;
-	return s;
-}
-
-static void
-stats(void)
-{
-	FILE * F;
-	stats_t * items = NULL;
-	char zText[MAX_PATH];
-
-	strcat(strcpy(zText, resourcepath()), "/stats");
-	F = fopen(zText, "wt");
-	if (F) {
-		region * r;
-		const item_type * itype;
-		for (r=regions;r;r=r->next) {
-			unit * u;
-			item * itm;
-			for (u=r->units;u;u=u->next) {
-
-				for (itm=u->items;itm;itm=itm->next) {
-					if (itm->number>50000000) {
-						log_error(("unit %s has %d %s\n", unitname(u), itm->number, resourcename(itm->type->rtype, 0)));
-						/* itm->number=1; */
-					}
-					s_change(&items, itm->type, itm->number);
-				}
-			}
-		}
-		for (itype=itemtypes;itype;itype=itype->next) {
-			stats_t * itm = s_find(items, itype);
-			if (itm && itm->number>0.0)
-				fprintf(F, "%4.0f %s\n", itm->number, locale_string(NULL, resourcename(itype->rtype, 0)));
-			else
-				fprintf(F, "%4.0f %s\n", 0.0, locale_string(NULL, resourcename(itype->rtype, 0)));
-		}
-		fclose(F);
-	} else {
-		perror(zText);
-	}
-
-}
-
 #if 0
 static void
 fix_herbs(void)
@@ -1147,7 +1083,6 @@ korrektur(void)
 	fix_allies();
 	update_gmquests(); /* test gm quests */
 	/* fix_unitrefs(); */
-	stats();
 	warn_password();
 	fix_road_borders();
 	if (turn>1000) curse_emptiness(); /*** disabled ***/
