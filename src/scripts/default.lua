@@ -86,7 +86,7 @@ function process(orders)
   end
 
   -- Give out the rewards of the art contest
-  if get_gamename() == "Eressea" then
+  if get_turn()>=380 and get_gamename() == "Eressea" then
     if not get_flag("artr") then
 	  require("artrewards.lua")
     end
