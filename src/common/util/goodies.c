@@ -90,7 +90,7 @@ char *
 space_replace(char * str, char replace)
 {
 	char * c = str;
-	while (*c) {if (isspace(*c)) *c = replace; c++;}
+	while (*c) {if (isspace(*(unsigned char*)c)) *c = replace; c++;}
 	return str;
 }
 
