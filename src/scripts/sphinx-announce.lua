@@ -73,7 +73,7 @@ function sphinx_weekly()
 
   for faction in factions() do
   	faction:delete_variable("sphinxGotHintsi7z", "true");
-  	faction:delete_variable("sphinx2GotHintqcph", "true");
+  	faction:delete_variable("sphinxGotHintqcph", "true");
   end
 
 end

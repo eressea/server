@@ -486,10 +486,27 @@ allied_skilllimit(const faction * f, skill_t sk)
   return value;
 }
 
+static void
+init_maxmagicians(struct attrib *a)
+{
+	a->data.i = MAXMAGICIANS;
+}
+
+static attrib_type at_maxmagicians = {
+	"maxmagicians",
+	init_maxmagicians,
+	NULL,
+	NULL,
+	a_writedefault,
+	a_readdefault,
+	ATF_UNIQUE
+};
+
 int
 max_skill(faction * f, skill_t sk)
 {
-  int m = INT_MAX;
+	attrib *a;
+  int     m = INT_MAX;
 
   if (allied_skilllimit(f, sk)) {
     if (sk!=SK_ALCHEMY && sk!=SK_MAGIC) return INT_MAX;
@@ -504,7 +521,11 @@ max_skill(faction * f, skill_t sk)
   }
 	switch (sk) {
 	case SK_MAGIC:
-		m = MAXMAGICIANS;
+		if((a = a_find(f->attribs, &at_maxmagicians)) != NULL) {
+			m = a->data.i;
+		} else {
+			m = MAXMAGICIANS;
+		}
 		if (old_race(f->race) == RC_ELF) m += 1;
 		m += fspecial(f, FS_MAGOCRACY) * 2;
 		break;
@@ -3106,6 +3127,7 @@ attrib_init(void)
 	at_register(&at_prayer_timeout);
 	at_register(&at_wyrm);
 	at_register(&at_building_generic_type);
+	at_register(&at_maxmagicians);
 
 	/* border-typen */
 	register_bordertype(&bt_noway);
