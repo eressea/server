@@ -1533,7 +1533,7 @@ sp_create_irongolem(castorder *co)
 	int cast_level = co->level;
 	int force = co->force;
 	/* hier fehlt noch ein wenig zufall */
-	int number = 1+(int)(force*RESOURCE_QUANTITY)*8;
+	int number = 1+(int)(force*8*RESOURCE_QUANTITY);
 
 	if (rterrain(r) == T_SWAMP){
 		cmistake(mage, strdup(co->order), 188, MSG_MAGIC);
