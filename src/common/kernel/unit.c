@@ -74,7 +74,7 @@ u_unknown(void)
 	return &unknown;
 }
 
-#define DMAXHASH 8191
+#define DMAXHASH 7919
 typedef struct dead {
 	struct dead * nexthash;
 	faction * f;

@@ -562,7 +562,7 @@ ufindhash (int i)
 	return u;
 }
 
-#define FMAXHASH 2047
+#define FMAXHASH 2039
 faction * factionhash[FMAXHASH];
 
 void

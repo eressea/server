@@ -158,7 +158,7 @@ typedef struct uniquenode {
 	faction * f;
 } uniquenode;
 
-#define HASHSIZE 2047
+#define HASHSIZE 2039
 static uniquenode * uniquehash[HASHSIZE];
 
 static faction *

@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#define PMAXHASH 1023
+#define PMAXHASH 1021
 
 typedef struct player_hash {
 	struct player * entries;

@@ -137,7 +137,7 @@ buildingmaintenance(const building * b, const resource_type * rtype)
   return cost;
 }
 
-#define BMAXHASH 8191
+#define BMAXHASH 7919
 static building *buildhash[BMAXHASH];
 void
 bhash(building * b)

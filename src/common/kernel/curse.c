@@ -58,7 +58,7 @@
 
 /* ------------------------------------------------------------- */
 
-#define MAXENTITYHASH 8191
+#define MAXENTITYHASH 7919
 curse *cursehash[MAXENTITYHASH];
 
 void

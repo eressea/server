@@ -84,7 +84,7 @@ st_register(const ship_type * type) {
 	shiptypes = stl;
 }
 
-#define SMAXHASH 8191
+#define SMAXHASH 7919
 ship *shiphash[SMAXHASH];
 void
 shash(ship * s)

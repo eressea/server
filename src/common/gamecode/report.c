@@ -2594,7 +2594,7 @@ prepare_report(faction * f)
 #endif
 }
 
-#define FMAXHASH 1023
+#define FMAXHASH 1021
 
 struct fsee {
 	struct fsee * nexthash;

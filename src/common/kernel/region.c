@@ -257,7 +257,7 @@ attrib_type at_moveblock = {
 };
 
 
-#define RMAXHASH 65535
+#define RMAXHASH 65521
 region *regionhash[RMAXHASH];
 
 static region *

@@ -104,7 +104,7 @@ typedef struct translation {
 	const char * value;
 } translation;
 
-#define TRANSMAXHASH 255
+#define TRANSMAXHASH 257
 static translation * translation_table[TRANSMAXHASH];
 static translation * junkyard;
 
@@ -421,7 +421,7 @@ creport_cleanup(void)
 
 /*static int msgno; */
 
-#define MTMAXHASH 1023
+#define MTMAXHASH 1021
 
 static struct known_mtype {
 	const struct message_type * mtype;

@@ -21,7 +21,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define MAXATHASH 63
+#define MAXATHASH 61
 attrib_type * at_hash[MAXATHASH];
 
 static unsigned int

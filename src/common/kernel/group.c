@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GMAXHASH 2047
+#define GMAXHASH 2039
 static group * ghash[GMAXHASH];
 static int maxgid;
 

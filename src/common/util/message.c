@@ -126,7 +126,7 @@ typedef struct messagetype_list {
 	const struct message_type * data;
 } messagetype_list;
 
-#define MT_MAXHASH 1023
+#define MT_MAXHASH 1021
 static messagetype_list * messagetypes[MT_MAXHASH];
 
 const message_type *
