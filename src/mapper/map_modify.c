@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_modify.c,v 1.6 2001/02/18 10:06:10 enno Exp $
+ *	$Id: map_modify.c,v 1.7 2001/02/18 10:14:04 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -488,10 +488,10 @@ NeuesSchiff(region * r)
 	wAddstr(stype[q]->name[0]);
 	wrefresh(win);
 
-	s = new_ship(stype[q]);
+	s = new_ship(stype[q], r);
 	/* Ist das richtig so, Henning? */
 	addlist(&r->ships, s);
-	sh->region = r;
+	s->region = r;
 
 	strcpy(buf, my_input(win, 2, 2, "Name: ", NULL));
 	if (strlen(buf) > 0)
