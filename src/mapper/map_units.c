@@ -247,7 +247,8 @@ modify_zauber(unit * u)
 	wn = newwin(L + 2, 50, (SY - L - 2) / 2, (SX - 50) / 2);
 
 	wclear(wn);
-	wborder(wn, '|', '|', '-', '-', '.', '.', '`', '\'');
+	/* wborder(wn, '|', '|', '-', '-', '.', '.', '`', '\''); */
+	wborder(wn, 0, 0, 0, 0, 0, 0, 0, 0);
 	wmove(wn, 0, 3);
 	waddnstr(wn, "< Zauber >", -1);
 	for (i = 0; i < MAXSPELLS; i++) {
@@ -280,7 +281,8 @@ modify_zauber(unit * u)
 					wmove(wn, i + 1, 2);
 					wclrtoeol(wn);
 				}
-			wborder(wn, '|', '|', '-', '-', '.', '.', '`', '\'');
+			/* wborder(wn, '|', '|', '-', '-', '.', '.', '`', '\''); */
+				wborder(wn, 0, 0, 0, 0, 0, 0, 0, 0);
 			wmove(wn, 0, 3);
 			waddnstr(wn, "< Zauber >", -1);
 		} else {
@@ -349,7 +351,8 @@ modify_talente(unit * u, region * r)
 	wn = newwin(L + 2, 40, (SY - L - 2) / 2, (SX - 40) / 2);
 
 	wclear(wn);
-	wborder(wn, '|', '|', '-', '-', '.', '.', '`', '\'');
+	/* wborder(wn, '|', '|', '-', '-', '.', '.', '`', '\''); */
+	wborder(wn, 0, 0, 0, 0, 0, 0, 0, 0);
 	wmove(wn, 0, 3);
 	waddnstr(wn, "< Talente >", -1);
 	for (i = 0; i < MAXSKILLS; i++) {
@@ -379,7 +382,8 @@ modify_talente(unit * u, region * r)
 					wmove(wn, i + 1, 2);
 					wclrtoeol(wn);
 				}
-			wborder(wn, '|', '|', '-', '-', '.', '.', '`', '\'');
+			/* wborder(wn, '|', '|', '-', '-', '.', '.', '`', '\''); */
+			wborder(wn, 0, 0, 0, 0, 0, 0, 0, 0);
 			wmove(wn, 0, 3);
 			waddnstr(wn, "< Talente >", -1);
 		} else {

@@ -1071,7 +1071,8 @@ GetTerrain(region * r)
 	int q, y, i;
 	win = newwin(8, SX - 10, 2, 2);
 	wclear(win);
-	wborder(win, '|', '|', '-', '-', '.', '.', '`', '\'');
+/*	wborder(win, '|', '|', '-', '-', '.', '.', '`', '\'');*/
+	wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
 	wmove(win, 0, 3);
 	waddnstr(win, "< Terraform Region >", -1);
 	wrefresh(win);

@@ -315,7 +315,8 @@ do_selection(selection * sel, const char * title, void (*perform)(selection *, v
 				wmove(wn, i + 1, 4);
 				waddnstr(wn, s->str, -1);
 			}
-			wborder(wn, '|', '|', '-', '-', '+', '+', '+', '+');
+			/*wborder(wn, '|', '|', '-', '-', '+', '+', '+', '+');*/
+			wborder(wn, 0, 0, 0, 0, 0, 0, 0, 0);
 			wmove(wn, 0, 2);
 			sprintf(buf, "[ %s ]", title);
 			waddnstr(wn, buf, width);

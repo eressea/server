@@ -443,7 +443,8 @@ ModifyPartei(faction * f)
 		case 'r':
 			mywin = newwin(5, SX - 20, (SY - 5) / 2, (SX - 20) / 2);
 			wclear(mywin);
-			wborder(mywin, '|', '|', '-', '-', '.', '.', '`', '\'');
+			/*wborder(mywin, '|', '|', '-', '-', '.', '.', '`', '\'');*/
+			wborder(mywin, 0, 0, 0, 0, 0, 0, 0, 0);
 			Movexy(3, 0);
 			Addstr("< Rasse wählen >");
 			wrefresh(mywin);

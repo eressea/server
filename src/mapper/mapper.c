@@ -73,7 +73,8 @@ extern void render_init(void);
 WINDOW * openwin(int b, int h, const char* t) {
 	WINDOW * win = newwin(h,b,(SY-(h))/2,(SX-(b))/2);
 	wclear(win);
-	wborder(win, '|','|','-','-','.','.','`','\'');
+	/* wborder(win, '|','|','-','-','.','.','`','\''); */
+	wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
 	if(t) {
 		wmove(win,0,3);
 		waddnstr(win,(char*)t,-1);
@@ -270,6 +271,11 @@ has_laen(region *r)
 	for(rm=r->resources; rm; rm=rm->next) {
 		if(rm->type == &rm_laen) return true;
 	}
+	return false;
+}
+#else
+static boolean
+has_laen(region *r) {
 	return false;
 }
 #endif
@@ -495,8 +501,8 @@ modify_block(void)
 	int c, s = 0;
 	region *r;
 	tagregion *t;
-	char *name;
-	int div;
+	char *name = NULL;
+	int div = 0;
 
 	win = openwin(70, 4, "< Tag-Regionen modifizieren >");
 	wmove(win, 1, 2);
