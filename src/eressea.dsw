@@ -150,18 +150,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "skilltest"=.\skilltest\skilltest.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "spells"=.\common\spells\spells.dsp - Package Owner=<4>
 
 Package=<5>

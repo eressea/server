@@ -381,7 +381,7 @@ game_done(void)
 
 #include "magic.h"
 
-#if MALLOCDBG
+#ifdef MALLOCDBG
 void
 init_malloc_debug(void)
 {
@@ -638,7 +638,7 @@ main(int argc, char *argv[])
 		return -1;
 	}
 #endif
-#if 0
+#ifdef MALLOCDBG
 	init_malloc_debug();
 #endif
 

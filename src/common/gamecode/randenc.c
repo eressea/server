@@ -1135,7 +1135,7 @@ randomevents(void)
 	}
 #endif
 
-	/* Talente von Dämonen verschieben sich */
+	/* Talentverschiebung: Talente von Dämonen verschieben sich */
 
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) {

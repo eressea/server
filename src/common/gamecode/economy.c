@@ -892,7 +892,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 	}
 
 	/* if ((u->race->ec_flags & NOGIVE) || fval(u,FL_LOCKED)) {*/
-	if (u->race->ec_flags & NOGIVE) {
+	if (u->race->ec_flags & NOGIVE && u2!=NULL) {
 		add_message(&u->faction->msgs,
 				msg_error(u, S->s, "race_nogive", "race", u->race));
 		return;
@@ -1056,16 +1056,18 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 		return;
 	}
 
-	if (!(u->race->ec_flags & GIVEITEM)) {
-		add_message(&u->faction->msgs,
-				msg_error(u, S->s, "race_nogive", "race", u->race));
-		return;
-	}
-	if (u2 && !(u2->race->ec_flags & GETITEM)) {
-		ADDMSG(&u->faction->msgs,
-				msg_error(u, S->s, "race_notake", "race", u2->race));
-		return;
-	}
+  if (u2!=NULL) {
+    if (!(u->race->ec_flags & GIVEITEM)) {
+      add_message(&u->faction->msgs,
+        msg_error(u, S->s, "race_nogive", "race", u->race));
+      return;
+    }
+    if (!(u2->race->ec_flags & GETITEM)) {
+      ADDMSG(&u->faction->msgs,
+        msg_error(u, S->s, "race_notake", "race", u2->race));
+      return;
+    }
+  }
 
 	itype = finditemtype(s, u->faction->locale);
 	if (itype!=NULL) {
