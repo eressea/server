@@ -39,6 +39,7 @@
 #include "plane.h"
 #include "karma.h"
 #include "rand.h"
+#include "movement.h"
 
 /* util includes */
 #include <base36.h>
@@ -209,6 +210,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
 				if (academy) *academy += n;
 			}	/* sonst nehmen sie nicht am Unterricht teil */
 		}
+
 		/* Teaching ist die Anzahl Leute, denen man noch was beibringen kann. Da
 		 * hier nicht n verwendet wird, werden die Leute gezählt und nicht die
 		 * effektiv gelernten Tage. -> FALSCH ? (ENNO)
@@ -669,12 +671,23 @@ learn(void)
 					 * in einer Uni */
 					teach->value += u->number * 10;
 				}
+
 				if (is_cursed(r->attribs,C_BADLEARN,0)) {
 					teach->value -= u->number * 10;
 				}
+        
+        days = (int)((u->number * 30 + teach->value) * multi);
 
-				days = (int)((u->number * 30 + teach->value) * multi);
-				if (fval(u, UFL_HUNGER)) days = days / 2;
+        /* the artacademy currently improves the learning of entertainment
+           of all units in the region, to be able to make it cumulative with
+           with an academy */
+
+        if(buildingtype_exists(r, bt_find("artacademy"))) {
+          days *= 2;
+        }
+        
+        if (fval(u, UFL_HUNGER)) days = days / 2;
+
 				while (days) {
 					if (days>=u->number*30) {
 						learn_skill(u, sk, 1.0);

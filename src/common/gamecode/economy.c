@@ -3085,6 +3085,7 @@ expandwork(region * r)
 		if (a) verdienst = a->data.i;
 	}
 #endif
+  
 	earnings = min(n, rpeasants(r) * p_wage) + verdienst;
 	/* Mehr oder weniger durch Trank "Riesengrass" oder "Faulobstschnaps" */
 

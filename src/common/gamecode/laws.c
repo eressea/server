@@ -1375,6 +1375,10 @@ set_display(region * r, unit * u, strlist * S)
 			cmistake(u, S->s, 29, MSG_PRODUCE);
 			break;
 		}
+		if (u->building->type == bt_find("artsculpture") && u->building->display[0] != 0) {
+			cmistake(u, S->s, 29, MSG_PRODUCE);
+			break;
+		}
 		s = &u->building->display;
 		break;
 
@@ -1597,6 +1601,10 @@ set_name(region * r, unit * u, strlist * S)
 			sprintf(buf, "Monument %d", u->building->no);
 			if (u->building->type == bt_find("monument")
 				&& !strcmp(u->building->name, buf)) {
+				cmistake(u, S->s, 29, MSG_EVENT);
+				break;
+			}
+			if (u->building->type == bt_find("artsculpure")) {
 				cmistake(u, S->s, 29, MSG_EVENT);
 				break;
 			}

@@ -2694,8 +2694,10 @@ wage(const region *r, const unit *u, boolean img)
 	curse * c;
 	int      wage;
 	attrib	 *a;
+  building_type *artsculpture_type = bt_find("artsculpture");
 	static const curse_type * drought_ct, * blessedharvest_ct;
 	static boolean init;
+
 	if (!init) {
 		init = true;
 		drought_ct = ct_find("drought");
@@ -2719,6 +2721,13 @@ wage(const region *r, const unit *u, boolean img)
 		}
 		wage += curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
 	}
+
+  /* Artsculpture: Income +5 */
+  for(b=r->buildings; b; b=b->next) {
+    if(b->type == artsculpture_type) {
+      wage += 5;
+    }
+  }
 
 	/* Godcurse: Income -10 */
 	if (curse_active(get_curse(r->attribs, ct_find("godcursezone")))) {

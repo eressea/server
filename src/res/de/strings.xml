@@ -609,6 +609,14 @@
   <string name="genericbuilding">
     <text locale="de">Struktur</text>
   </string>
+  <string name="artacademy">
+    <text locale="de">Akademie der Künste</text>
+    <text locale="en">academy of arts</text>
+  </string>
+  <string name="artacademy">
+    <text locale="de">Skulptur</text>
+    <text locale="en">sculpture</text>
+  </string>
 
   <!--Testitem -->
   <string name="wand">
