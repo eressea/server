@@ -565,7 +565,7 @@ confirm_newbies(void)
 	const faction * f = factions;
 	while (f) {
 		if (f->age==0) {
-			fprintf(sqlstream, "UPDATE subscriptions SET status='ACTIVE', faction='%s' WHERE game=%d;\n", itoa36(f->no), GAME_ID);
+			fprintf(sqlstream, "UPDATE subscriptions SET status='ACTIVE', faction='%s' WHERE game=%d AND password='%s';\n", itoa36(f->no), GAME_ID, f->passw);
 		}
 		f = f->next;
 	}
