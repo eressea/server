@@ -2861,7 +2861,7 @@ give_cammo(void)
 
 	for(f=factions; f; f=f->next) {
 		for(u=f->units; u; u=u->nextF) {
-			i_change(&u->items, &it_catapultammo, i_get(u->items, olditemtype[I_CATAPULT]));
+			i_change(&u->items, &it_catapultammo, i_get(u->items, olditemtype[I_CATAPULT])*2);
 		}
 	}
 
