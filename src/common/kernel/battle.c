@@ -2837,11 +2837,11 @@ make_fighter(battle * b, unit * u, boolean attack)
 		for (i=0; i!=w; ++i) {
 			int j, o=0, d=0;
 			for (j=0; j!=i; ++j) {
-				if (fig->weapons[j].defskill>=fig->weapons[i].defskill) ++d;
+				if (fig->weapons[j].defmissile>=fig->weapons[i].defmissile) ++d;
 				if (fig->weapons[j].offskill>=fig->weapons[i].offskill) ++o;
 			}
 			for (j=i+1; j!=w; ++j) {
-				if (fig->weapons[j].defskill>fig->weapons[i].defskill) ++d;
+				if (fig->weapons[j].defmissile>fig->weapons[i].defmissile) ++d;
 				if (fig->weapons[j].offskill>fig->weapons[i].offskill) ++o;
 			}
 			owp[o] = i;
@@ -2872,7 +2872,7 @@ make_fighter(battle * b, unit * u, boolean attack)
 				++di;
 			}
 			if (di==w) break; /* no more weapons available */
-			if (fig->weapons[dwp[di]].defskill>fig->person[i].weapon->defskill) {
+			if (fig->weapons[dwp[di]].defmissile>fig->person[i].weapon->defmissile) {
 				fig->person[i].secondary = &fig->weapons[dwp[di]];
 				++fig->weapons[dwp[di]].used;
 			}
