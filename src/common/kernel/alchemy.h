@@ -83,9 +83,6 @@ void herbsearch(struct region * r, struct unit * u, int max);
 int use_potion(struct unit * u, const struct item_type * itype, int amount, struct order *);
 void init_potions(void);
 
-#ifdef OLD_DEMON_POTION
-extern struct attrib_type at_bauernblut;
-#endif
 extern int get_effect(const struct unit * u, const struct potion_type * effect);
 extern int change_effect(struct unit * u, const struct potion_type * effect, int value);
 extern attrib_type at_effect;

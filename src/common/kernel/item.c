@@ -1993,19 +1993,14 @@ use_bloodpotion(struct unit *u, const struct potion_type *ptype, int amount, str
 	assert(ptype==oldpotiontype[P_BAUERNBLUT]);
 	unused(ptype);
 	if (u->race == new_race[RC_DAEMON]  ) {
-#ifdef OLD_DEMON_POTION
-    attrib * a = (attrib*)a_find(u->attribs, &at_bauernblut);
-		if (!a) a = a_add(&u->attribs, a_new(&at_bauernblut));
-		a->data.i += 100*amount;
-#else
     change_effect(u, ptype, 100*amount);
-#endif
 	} else {
-		/* bekommt nicht: */
-		cmistake(u, ord, 165, MSG_EVENT);
-		u->race = new_race[RC_GHOUL];
-		u_setfaction(u, findfaction(MONSTER_FACTION));
-	}
+    trigger * trestore = trigger_changerace(u, u->race, u->irace);
+    int duration = 2 + rand() % 8;
+
+    add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
+    u->irace = u->race = new_race[RC_TOAD];
+  }
 	return 0;
 }
 
