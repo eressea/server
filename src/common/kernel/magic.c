@@ -551,16 +551,26 @@ getspell(const unit *u, spellid_t spellid)
 
 #include "umlaut.h"
 
-static local_names * spellnames;
-static local_names *
-init_spellnames(const struct locale * lang)
+typedef struct spell_names {
+	struct spell_names * next;
+	const struct locale * lang;
+	magic_t mtype;
+	struct tnode names;
+} spell_names;
+
+static spell_names * spellnames;
+
+static spell_names *
+init_spellnames(const struct locale * lang, magic_t mtype)
 {
 	int i;
-	local_names * sn = calloc(sizeof(local_names), 1);
+	spell_names * sn = calloc(sizeof(spell_names), 1);
 	sn->next = spellnames;
 	sn->lang = lang;
+	sn->mtype = mtype;
 	for (i=0; spelldaten[i].id != SPL_NOSPELL; i++) {
 		const char * n = spelldaten[i].sname;
+		if (spelldaten[i].magietyp!=mtype) continue;
 		if (spelldaten[i].info==NULL) n = locale_string(lang, mkname("spell", n));
 		addtoken(&sn->names, n, (void*)(spelldaten+i));
 	}
@@ -571,17 +581,17 @@ init_spellnames(const struct locale * lang)
 spell *
 find_spellbyname(unit *u, char *name, const struct locale * lang)
 {
-	local_names * sn = spellnames;
+	spell_names * sn = spellnames;
 	spell_ptr *spt;
 	sc_mage * m = get_mage(u);
 	spell * sp;
 
 	if (!m) return NULL;
 	while (sn) {
-		if (sn->lang==lang) break;
+		if (sn->mtype==m->magietyp && sn->lang==lang) break;
 		sn=sn->next;
 	}
-	if (!sn) sn = init_spellnames(lang);
+	if (!sn) sn = init_spellnames(lang, m->magietyp);
 	if (findtoken(&sn->names, name, &sp)==E_TOK_NOMATCH) return NULL;
 
 	for (spt = m->spellptr; spt; spt = spt->next) {
