@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.16 2001/02/11 13:50:39 enno Exp $
+ *	$Id: laws.c,v 1.17 2001/02/11 14:26:40 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2111,6 +2111,7 @@ reorder_owners(region * r)
 	unit ** up=&r->units, ** useek;
 	building * b=NULL;
 	ship * sh=NULL;
+	int len = listlen(r->units);
 
 	for (b = r->buildings;b;b=b->next) {
 		unit ** ubegin = up;
@@ -2144,11 +2145,13 @@ reorder_owners(region * r)
 				fprintf(stderr, "WARNING: Einheit %s war Besitzer von nichts.\n", unitname(u));
 				freset(u, FL_OWNER);
 			}
-			*useek = u->next;
-			useek = &u->next;
-			u->next = *up;
-			up = &u->next;
-		} else useek=&u->next;
+			if (useek!=up) {
+				*useek = u->next; /* raus aus der liste */
+				u->next = *up;
+				*up = u;
+			}
+		}
+		if (*useek==u) useek = &u->next;
 	}
 
 	for (sh = r->ships;sh;sh=sh->next) {
@@ -2173,6 +2176,7 @@ reorder_owners(region * r)
 		}
 		up = uend;
 	}
+	assert(len==listlen(r->units));
 }
 
 #if 0
