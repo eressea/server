@@ -232,7 +232,7 @@
 		<attack type="4" damage="1d10"></attack>
 		<attack type="4" damage="1d10"></attack>
 	</race>
-	<race name="giant turtle" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" maintenance="0" weight="5" speed="1.000000" hp="900" ac="7" damage="2d50" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="5" swim walk noteach giveitem getitem>
+	<race name="giantturtle" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" maintenance="0" weight="5" speed="1.000000" hp="900" ac="7" damage="2d50" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="5" swim walk noteach giveitem getitem>
 		<ai splitsize="5000"></ai>
 		<function name="initfamiliar" value="oldfamiliars"></function>
 		<skill name="sk_perception" modifier="1"></skill>
@@ -926,9 +926,9 @@
 		<skill name="sk_roadwork" modifier="-1"></skill>
 		<skill name="sk_unarmed" modifier="-99"></skill>
 		<attack type="1" damage="1d5"></attack>
-		<familiar race="giant turtle" default></familiar>
+		<familiar race="giantturtle" default></familiar>
 		<familiar race="dolphin"></familiar>
-		<familiar race="giant turtle"></familiar>
+		<familiar race="giantturtle"></familiar>
 		<familiar race="dolphin"></familiar>
 		<familiar race="dolphin"></familiar>
 		<familiar race="kraken"></familiar>

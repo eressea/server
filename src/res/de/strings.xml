@@ -2365,19 +2365,19 @@
 			<text locale="en">kraken</text>
 		</string>
 
-		<string name="giant turtle">
+		<string name="giantturtle">
 			<text locale="de">Riesenschildkröte</text>
 			<text locale="en">giant turtle</text>
 		</string>
-		<string name="giant turtle_p">
+		<string name="giantturtle_p">
 			<text locale="de">Riesenschildkröten</text>
 			<text locale="en">giant turtles</text>
 		</string>
-		<string name="giant turtle_d">
+		<string name="giantturtle_d">
 			<text locale="de">Riesenschildkröten</text>
 			<text locale="en">giant turtles</text>
 		</string>
-		<string name="giant turtle_x">
+		<string name="giantturtle_x">
 			<text locale="de">Riesenschildkröten</text>
 			<text locale="en">giant turtle</text>
 		</string>

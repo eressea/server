@@ -165,7 +165,7 @@ static const char * oldracenames[MAXRACES] = {
 	"braineater", "peasant",
 	"wolf", "lynx", "tunnelworm", "eagle", "rat", "songdragon", "nymph", "unicorn",
 	"direwolf", "ghost",
-	"imp", "dreamcat", "fairy", "owl", "hellcat", "tiger", "dolphin", "giant turtle", "kraken", "sea serpent",
+	"imp", "dreamcat", "fairy", "owl", "hellcat", "tiger", "dolphin", "giantturtle", "kraken", "sea serpent",
 	"shadow knight",
 	"centaur",
 	"skeleton", "skeleton lord", "zombie", "juju-zombie", "ghoul", "ghast", "museumghost", "gnome",
