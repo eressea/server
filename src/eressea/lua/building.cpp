@@ -96,7 +96,7 @@ building_setregion(building& b, region& r)
 }
 
 static std::ostream& 
-operator<<(std::ostream& stream, building& b)
+operator<<(std::ostream& stream, const building& b)
 {
   stream << b.name;
   stream << " (" << itoa36(b.no) << ")";
@@ -132,6 +132,10 @@ building_units(const building& b) {
   return eressea::list<unit *, unit *, buildingunit>(u);
 }
 
+const char *
+building_gettype(const building& b) {
+  return b.type->_name;
+}
 
 void
 bind_building(lua_State * L) 
@@ -148,6 +152,7 @@ bind_building(lua_State * L)
     .property("info", &building_getinfo, &building_setinfo)
     .property("units", &building_units, return_stl_iterator)
     .property("region", &building_getregion, &building_setregion)
+    .def("type", &building_gettype)
     .def_readonly("id", &building::no)
     .def_readwrite("size", &building::size)
     .def("add_action", &building_addaction)

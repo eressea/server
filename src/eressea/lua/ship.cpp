@@ -10,7 +10,26 @@
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
 
+#include <util/base36.h>
+
+#include <ostream>
 using namespace luabind;
+
+static std::ostream& 
+operator<<(std::ostream& stream, const ship& sh)
+{
+  stream << sh.name;
+  stream << " (" << itoa36(sh.no) << ")";
+  stream << ", " << sh.type->name;
+  stream << " size " << sh.size;
+  return stream;
+}
+
+static bool 
+operator==(const ship& a, const ship& sh)
+{
+  return a.no==sh.no;
+}
 
 void
 bind_ship(lua_State * L) 
@@ -19,6 +38,8 @@ bind_ship(lua_State * L)
     def("get_ship", &findship),
 
     class_<struct ship>("ship")
+    .def(self == ship())
+    .def(tostring(self))
     .def_readonly("name", &ship::name)
     .def_readonly("region", &ship::region)
     .def_readonly("id", &ship::no)

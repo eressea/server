@@ -80,7 +80,7 @@ region_addnotice(region& r, const char * str)
 }
 
 static std::ostream& 
-operator<<(std::ostream& stream, region& r)
+operator<<(std::ostream& stream, const region& r)
 {
   stream << regionname(&r, NULL) << ", " << region_getterrain(r);
   return stream;

@@ -325,7 +325,7 @@ set_flag(unit& u, const char * name, bool value)
 }
 
 static std::ostream& 
-operator<<(std::ostream& stream, unit& u)
+operator<<(std::ostream& stream, const unit& u)
 {
   const char * rcname = get_racename(u.attribs);
   stream << u.name << " (" << itoa36(u.no) << "), " << u.number << " " << u.race->_name[0];

@@ -74,7 +74,7 @@ faction_locale(const faction& f)
 }
 
 static std::ostream& 
-operator<<(std::ostream& stream, faction& f)
+operator<<(std::ostream& stream, const faction& f)
 {
   stream << factionname(&f);
   return stream;
