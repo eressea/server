@@ -2556,6 +2556,7 @@ peasant_adjustment(void)
 				if(lifestyle(u) > 0) sum += u->number;
 			}
 		}
+		if (c==0) continue;
 		avg = sum/c;
 		
 		for(r=regions; r; r=r->next) if(rterrain(r) == ter) {
