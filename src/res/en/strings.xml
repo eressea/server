@@ -152,7 +152,7 @@
 	</string>
 
 	<string name="activevolcano_trail">
-		<text locale="en">an %s</text>
+		<text locale="en">the volcano of %s</text>
 	</string>
 	<string name="corridor1_trail">
 		<text locale="en">a %s</text>
@@ -206,7 +206,7 @@
 		<text locale="en">%s</text>
 	</string>
 	<string name="volcano_trail">
-		<text locale="en">a %s</text>
+		<text locale="en">the volcano of %s</text>
 	</string>
 	<string name="magicstorm_trail">
 		<text locale="en">a %s</text>

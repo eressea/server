@@ -367,7 +367,7 @@
 		<text locale="de">eine %s</text>
 	</string>
 	<string name="activevolcano_trail">
-		<text locale="de">ein %s</text>
+		<text locale="de">der Vulkan von %s</text>
 	</string>
 	<string name="hall1_trail">
 		<text locale="de">die %s</text>
