@@ -11,5 +11,5 @@ CC      = gcc
 LD      = gcc
 INSTALL = cp
 
-# CFLAGS += -DIRGENDWAS
+# CFLAGS += -Wshadow
 

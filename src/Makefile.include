@@ -155,8 +155,9 @@ $(BUILD_DIR) $(PUBLISH_DIR):
 # object files:
 $(BUILD_DIR)/%:: $(BUILD_DIR)
 $(BUILD_DIR)/%.o:: %.c
-	@echo "Compiling $@"
+	@echo "***** Compiling $@ *****"
 	$(CC) $(CFLAGS) -o $@ -c $<
+	@echo
 
 ##
 ## conversion code for old triggers - should only be used for free eressea,

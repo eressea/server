@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.11 2001/02/05 16:11:58 enno Exp $
+ *	$Id: save.c,v 1.12 2001/02/10 12:50:29 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1183,7 +1183,6 @@ readgame(boolean backup)
 		while (--p >= 0) {
 			int number, n;
 			unsigned char oldtype=0, oldtypus, olditypus;
-			static unit dummyu;
 #if USE_EVENTS
 			static boolean init = false;
 			if (!init) {
