@@ -616,7 +616,7 @@ shipspeed (const ship * sh, const unit * u)
 	if (sh->damage) k = (k * (sh->size * DAMAGE_SCALE - sh->damage) + sh->size * DAMAGE_SCALE- 1) / (sh->size*DAMAGE_SCALE);
 #endif
 
-	return min (k, MAXSPEED);
+	return k;
 }
 
 /* erwartete Anzahl Einheiten x 2 */

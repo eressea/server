@@ -534,6 +534,7 @@ bind_unit(lua_State * L)
     // key-attributes for named flags:
     .def("set_flag", &set_flag)
     .def("get_flag", &get_flag)
+    .def_readwrite("flags", &unit::flags)
 
     // items:
     .def("get_item", &unit_getitem)

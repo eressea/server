@@ -220,7 +220,7 @@ region_move(region& r, int x, int y)
     }
     rn = findregion(x+delta_x[dir], y+delta_y[dir]);
     if (rn!=NULL) {
-      direction_t reldir = (dir + 3) % MAXDIRECTIONS;
+      direction_t reldir = (direction_t)((dir + 3) % MAXDIRECTIONS);
       rn->connect[reldir] = &r;
     }
     r.connect[dir] = rn;
