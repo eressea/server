@@ -197,7 +197,7 @@ a_readeffect(attrib *a, FILE *f)
 	if (ptype==NULL || power==0) return 0;
 	edata->type = ptype;
 	edata->value = power;
-	return 1;
+	return AT_READ_OK;
 }
 
 attrib_type at_effect = {

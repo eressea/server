@@ -83,10 +83,11 @@ changefaction_read(trigger * t, FILE * F)
 {
 	changefaction_data * td = (changefaction_data*)t->data.v;
 
-	read_unit_reference(&td->unit, F);
-	read_faction_reference(&td->faction, F);
+	int u = read_unit_reference(&td->unit, F);
+	int f = read_faction_reference(&td->faction, F);
 
-	return 1;
+	if (u!=AT_READ_OK || f!=AT_READ_OK) return AT_READ_FAIL;
+	return AT_READ_OK;
 }
 
 trigger_type tt_changefaction = {

@@ -242,14 +242,16 @@ write_plane_reference(const plane * u, FILE * F)
 	fprintf(F, "%d ", u?(u->id):0);
 }
 
-void
+int
 read_plane_reference(plane ** pp, FILE * F)
 {
 	int i;
 	fscanf(F, "%d", &i);
-	if (i==0) *pp = NULL;
-	{
-		*pp = getplanebyid(i);
-		if (*pp==NULL) ur_add((void*)i, (void**)pp, resolve_plane);
+	if (i==0) {
+		*pp = NULL;
+		return AT_READ_FAIL;
 	}
+	*pp = getplanebyid(i);
+	if (*pp==NULL) ur_add((void*)i, (void**)pp, resolve_plane);
+	return AT_READ_OK;
 }

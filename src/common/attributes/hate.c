@@ -44,9 +44,9 @@ read_hate(attrib * a, FILE * F)
 		fscanf(F, "%d", &i);
 		ur_add((void*)i, (void**)&a->data.v, resolve_unit);
 	} else {
-		read_unit_reference((unit**)&a->data.v, F);
+		return read_unit_reference((unit**)&a->data.v, F);
 	}
-	return 1;
+	return AT_READ_OK;
 }
 
 attrib_type at_hate = {

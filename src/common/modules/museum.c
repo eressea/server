@@ -98,7 +98,7 @@ a_readmuseumgivebackcookie(attrib *a, FILE *f)
 {
 	museumgivebackcookie *gbc = (museumgivebackcookie *)a->data.v;
 	fscanf(f, "%d %d", &gbc->warden_no, &gbc->cookie);
-	return 1;
+	return AT_READ_OK;
 }
 
 attrib_type at_museumgivebackcookie = {
@@ -141,7 +141,7 @@ a_readmuseumgiveback(attrib *a, FILE *f)
 	museumgiveback *gb = (museumgiveback *)a->data.v;
 	fscanf(f, "%d", &gb->cookie);
 	read_items(f, &gb->items);
-	return 1;
+	return AT_READ_OK;
 }
 
 attrib_type at_museumgiveback = {

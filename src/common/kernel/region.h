@@ -216,7 +216,7 @@ extern const int delta_y[MAXDIRECTIONS];
 extern const direction_t back[MAXDIRECTIONS];
 
 extern int production(const struct region *r);
-extern void read_region_reference(struct region ** r, FILE * F);
+extern int read_region_reference(struct region ** r, FILE * F);
 extern void write_region_reference(const struct region * r, FILE * F);
 
 #endif /* _REGION_H */

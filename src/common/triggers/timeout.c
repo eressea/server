@@ -83,7 +83,8 @@ timeout_read(trigger * t, FILE * F)
 			tr = tr->next;
 		}
 	}
-	return (td->triggers!=NULL && td->timer>0);
+	if (td->triggers!=NULL && td->timer>0) return AT_READ_OK;
+	return AT_READ_FAIL;
 }
 
 trigger_type tt_timeout = {

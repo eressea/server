@@ -68,7 +68,7 @@ a_readgive(attrib * a, FILE * F)
 		fscanf(F, "%d", &i);
 		if (i==0) i_add(&gdata->items, i_new(it_find(zText), i));
 	}
-	return 1;
+	return AT_READ_OK;
 }
 
 static void

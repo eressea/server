@@ -2366,9 +2366,12 @@ remove_empty_factions(void)
 			}
 			fprintf(sqlstream, "UPDATE subscriptions set status='DEAD' where "
 				"faction='%s' and game=%d;", itoa36(f->no), GAME_ID);
-			stripfaction(f);
+
 			*fp = f->next;
-			free(f);
+/*			stripfaction(f);
+ *			free(f); 
+ *		Wir können die nicht löschen, weil sie evtl. noch in attributen 
+ *    referenziert sind ! */
 		}
 		else fp = &(*fp)->next;
 	}

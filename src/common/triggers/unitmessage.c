@@ -93,7 +93,7 @@ unitmessage_read(trigger * t, FILE * F)
 	fscanf(F, "%s %d %d ", zText, &td->type, &td->level);
 	td->string = strdup(zText);
 
-	return 1;
+	return AT_READ_OK;
 }
 
 trigger_type tt_unitmessage = {

@@ -267,9 +267,9 @@ read_hurting(attrib * a, FILE * F) {
 	a->data.v = (void*)findbuilding(i);
 	if (a->data.v==NULL) {
 		log_error(("temple of pain is broken\n"));
-		return 0;
+		return AT_READ_FAIL;
 	}
-	return 1;
+	return AT_READ_OK;
 }
 
 static attrib_type at_hurting = {
@@ -446,7 +446,7 @@ caldera_read(trigger * t, FILE * F)
 	t->data.v = findbuilding(i);
 	if (t->data.v==NULL) ur_add((void*)i, &t->data.v, resolve_building);
 
-	return 1;
+	return AT_READ_OK;
 }
 
 struct trigger_type tt_caldera = {

@@ -130,7 +130,7 @@ extern void destroy_unit(struct unit * u);
 /* see resolve.h */
 extern void * resolve_unit(void * data);
 extern void write_unit_reference(const unit * u, FILE * F);
-extern void read_unit_reference(unit ** up, FILE * F);
+extern int read_unit_reference(unit ** up, FILE * F);
 
 extern void leave(struct region * r, struct unit * u);
 extern void leave_ship(unit * u);

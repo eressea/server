@@ -553,7 +553,7 @@ write_race_reference(const race * rc, FILE * F)
 	fprintf(F, "%s ", rc?rc->_name[0]:"none");
 }
 
-void
+int
 read_race_reference(const struct race ** rp, FILE * F)
 {
 	char zName[20];
@@ -564,16 +564,18 @@ read_race_reference(const struct race ** rp, FILE * F)
 			*rp = new_race[i];
 		} else {
 			*rp = NULL;
+			return AT_READ_FAIL;
 		}
 	} else {
 		fscanf(F, "%s", zName);
 		if (strcmp(zName, "none")==0) {
 			*rp = NULL;
-		} else {
-			*rp = rc_find(zName);
-			assert(*rp!=NULL);
+			return AT_READ_FAIL;
 		}
+		*rp = rc_find(zName);
+		assert(*rp!=NULL);
 	}
+	return AT_READ_OK;
 }
 
 #include <xml.h>

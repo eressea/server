@@ -94,7 +94,7 @@ removecurse_read(trigger * t, FILE * F)
 	td->curse = cfindhash(i);
 	if (td->curse==NULL) ur_add((void*)i, (void**)&td->curse, resolve_curse);
 
-	return 1;
+	return AT_READ_OK;
 }
 
 trigger_type tt_removecurse = {

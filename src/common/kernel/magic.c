@@ -148,7 +148,7 @@ a_readicastle(attrib * a, FILE * f)
 		fscanf(f, "%d", &t);
 		data->time = 0;
 		data->type = NULL;
-		return 0; /* no longer supported */
+		return AT_READ_FAIL;
 	} else {
 		int bno;
 		fscanf(f, "%s %d %d", buf, &bno, &data->time);
@@ -158,7 +158,7 @@ a_readicastle(attrib * a, FILE * f)
 			ur_add((void*)bno, (void**)&data->building, resolve_building);
 		}
 		data->type = bt_find(buf);
-		return 1;
+		return AT_READ_OK;
 	}
 }
 
@@ -246,7 +246,7 @@ read_mage(attrib * a, FILE * F)
 		(*sp)->spellid = (spellid_t)i;
 		sp = &(*sp)->next;
 	}
-	return 1;
+	return AT_READ_OK;
 }
 
 static void
@@ -2636,7 +2636,7 @@ read_familiar(attrib * a, FILE * F)
 	fscanf(F, "%s", buf);
 	i = atoi36(buf);
 	ur_add((void*)i, &a->data.v, resolve_familiar);
-	return 1;
+	return AT_READ_OK;
 }
 
 /* clones */
@@ -2713,7 +2713,7 @@ read_clone(attrib * a, FILE * F)
 	fscanf(F, "%s", buf);
 	i = atoi36(buf);
 	ur_add((void*)i, &a->data.v, resolve_clone);
-	return 1;
+	return AT_READ_OK;
 }
 
 /* mages */
@@ -2739,7 +2739,7 @@ read_magician(attrib * a, FILE * F)
 	fscanf(F, "%s", buf);
 	i = atoi36(buf);
 	ur_add((void*)i, &a->data.v, resolve_mage);
-	return 1;
+	return AT_READ_OK;
 }
 
 static int

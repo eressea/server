@@ -530,12 +530,12 @@ read_building_reference(struct building ** b, FILE * F)
 	id = atoi36(zText);
 	if (id==0) {
 		*b = NULL;
-		return 0;
+		return AT_READ_FAIL;
 	}
 	else {
 		*b = findbuilding(id);
 		if (*b==NULL) ur_add((void*)id, (void**)b, resolve_building);
-		return 1;
+		return AT_READ_OK;
 	}
 }
 

@@ -855,7 +855,6 @@ extern int max_unique_id;
 #define FL_PARTEITARNUNG  (1<<4)	/* 16 */
 #define FL_DISBELIEVES    (1<<5)	/* 32 */
 #define FL_WARMTH         (1<<6)	/* 64 */
-#define FL_TRAVELTHRU     (1<<7)	/* 128 */
 #define FL_MOVED          (1<<8)
 
 #define FL_FOLLOWING      (1<<9)

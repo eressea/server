@@ -89,15 +89,7 @@ xmasgate_write(const trigger * t, FILE * F)
 static int
 xmasgate_read(trigger * t, FILE * F)
 {
-	char zText[128];
-	int i;
-
-	fscanf(F, "%s", zText);
-	i = atoi36(zText);
-	t->data.v = findbuilding(i);
-	if (t->data.v==NULL) ur_add((void*)i, &t->data.v, resolve_building);
-
-	return 1;
+	return read_building_reference((building**)&t->data.v, F);
 }
 
 struct trigger_type tt_xmasgate = {

@@ -57,7 +57,7 @@ read_permissions(attrib * a, FILE * F)
 {
 	attrib ** p_a = (attrib**)&a->data.v;
 	a_read(F, p_a);
-	return 1;
+	return AT_READ_OK;
 }
 
 struct attrib_type at_permissions = {
@@ -93,7 +93,7 @@ read_gmcreate(attrib * a, FILE * F)
 	fscanf(F, "%s", zText);
 	*p_itype = it_find(zText);
 	assert(*p_itype);
-	return 1;
+	return AT_READ_OK;
 }
 
 /* at_gmcreate specifies that the owner can create items of a particular type */

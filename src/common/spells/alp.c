@@ -70,9 +70,10 @@ static int
 alp_read(attrib * a, FILE * F)
 {
 	alp_data * ad = (alp_data*)a->data.v;
-	read_unit_reference(&ad->mage, F);
-	read_unit_reference(&ad->target, F);
-	return 1;
+	int m = read_unit_reference(&ad->mage, F);
+	int t = read_unit_reference(&ad->target, F);
+	if (m!=AT_READ_OK || t!=AT_READ_OK) return AT_READ_FAIL;
+	return AT_READ_OK;
 }
 
 static attrib_type at_alp = { 

@@ -184,7 +184,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 
 	strcpy(buf, unitname(u));
 
-	fv = visible_faction(f,u);
+	fv = visible_faction(f, u);
 	a_otherfaction = a_find(u->attribs, &at_otherfaction);
 
 	if (u->faction == f) {

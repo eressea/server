@@ -34,9 +34,9 @@ read_targetregion(attrib * a, FILE * F)
 		a_readdefault(a, F);
 		a->data.v = findregion(a->data.sa[0], a->data.sa[1]);
 	} else {
-		read_region_reference((region**)&a->data.v, F);
+		return read_region_reference((region**)&a->data.v, F);
 	}
-	return 1;
+	return AT_READ_OK;
 }
 
 attrib_type at_targetregion = {

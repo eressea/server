@@ -83,4 +83,7 @@ extern void a_write(FILE * f, const attrib * attribs);
 #define NO_WRITE NULL
 #define NO_READ NULL
 
+#define AT_READ_OK 4711
+#define AT_READ_FAIL -4711
+
 #endif

@@ -91,7 +91,7 @@ giveitem_read(trigger * t, FILE * F)
 	td->itype = it_find(zText);
 	assert(td->itype);
 
-	return 1;
+	return AT_READ_OK;
 }
 
 trigger_type tt_giveitem = {

@@ -34,7 +34,8 @@ static int
 read_moved(attrib * a, FILE * F)
 {
 	fscanf(F, "%d", &a->data.i);
-	return a->data.i!=0;
+	if (a->data.i!=0) return AT_READ_OK;
+	else return AT_READ_FAIL;
 }
 
 attrib_type at_moved = {

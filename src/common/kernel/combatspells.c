@@ -134,7 +134,7 @@ sp_kampfzauber(fighter * fi, int level, int power, spell * sp)
 			force = lovar(get_force(power,10));
 	}
 
-	enemies = count_enemies(fi->side, FS_ENEMY,
+	enemies = count_enemies(b, fi->side, FS_ENEMY,
 			minrow, maxrow);
 	if (!enemies) {
 		scat(", aber niemand war in Reichweite.");
@@ -145,7 +145,7 @@ sp_kampfzauber(fighter * fi, int level, int power, spell * sp)
 	battlerecord(b, buf);
 
 	do {
-		dt = select_enemy(fi, minrow, maxrow);
+		dt = select_enemy(b, fi, minrow, maxrow);
 		assert(dt.fighter);
 		--force;
 		killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
@@ -175,7 +175,7 @@ sp_versteinern(fighter * fi, int level, int power, spell * sp)
 
 	force = lovar(get_force(power,0));
 
-	enemies = count_enemies(fi->side, FS_ENEMY,
+	enemies = count_enemies(b, fi->side, FS_ENEMY,
 			minrow, maxrow);
 	if (!enemies) {
 		scat(", aber niemand war in Reichweite.");
@@ -186,7 +186,7 @@ sp_versteinern(fighter * fi, int level, int power, spell * sp)
 	battlerecord(b, buf);
 
 	do {
-		troop dt = select_enemy(fi, minrow, maxrow);
+		troop dt = select_enemy(b, fi, minrow, maxrow);
 		fighter * df = dt.fighter;
 		unit * du = df->unit;
 		if (is_magic_resistant(mage, du, 0) == false) {
@@ -234,7 +234,7 @@ sp_stun(fighter * fi, int level, int power, spell * sp)
 			assert(0);
 	}
 
-	enemies = count_enemies(fi->side, FS_ENEMY, minrow, maxrow);
+	enemies = count_enemies(b, fi->side, FS_ENEMY, minrow, maxrow);
 	if (!enemies) {
 		scat(", aber niemand war in Reichweite.");
 		battlerecord(b, buf);
@@ -245,7 +245,7 @@ sp_stun(fighter * fi, int level, int power, spell * sp)
 
 	stunned = 0;
 	do {
-		troop dt = select_enemy(fi, minrow, maxrow);
+		troop dt = select_enemy(b, fi, minrow, maxrow);
 		fighter * df = dt.fighter;
 		unit * du = df->unit;
 
@@ -290,7 +290,7 @@ sp_combatrosthauch(fighter * fi, int level, int power, spell * sp)
 
 	force = lovar(power * 15);
 
-	enemies = count_enemies(fi->side, FS_ENEMY, minrow, maxrow);
+	enemies = count_enemies(b, fi->side, FS_ENEMY, minrow, maxrow);
 	if (!enemies) {
 		battlemsg(b, fi->unit, msgt[0]);
 		return 0;
@@ -376,7 +376,7 @@ sp_sleep(fighter * fi, int level, int power, spell * sp)
 
 	sprintf(buf, "%s zaubert %s", unitname(mage), sp->name);
 	force = lovar(power * 25);
-	enemies = count_enemies(fi->side, FS_ENEMY, minrow, maxrow);
+	enemies = count_enemies(b, fi->side, FS_ENEMY, minrow, maxrow);
 
 	if (!enemies) {
 		scat(", aber niemand war in Reichweite.");
@@ -387,7 +387,7 @@ sp_sleep(fighter * fi, int level, int power, spell * sp)
 	battlerecord(b, buf);
 
 	do {
-		dt = select_enemy(fi, minrow, maxrow);
+		dt = select_enemy(b, fi, minrow, maxrow);
 		assert(dt.fighter);
 		du = dt.fighter->unit;
 		if (is_magic_resistant(mage, du, 0) == false) {
@@ -522,7 +522,7 @@ sp_mindblast(fighter * fi, int level, int power, spell * sp)
 	sprintf(buf, "%s zaubert %s", unitname(mage), sp->name);
 	force = lovar(power * 25);
 
-	enemies = count_enemies(fi->side, FS_ENEMY, minrow, maxrow);
+	enemies = count_enemies(b, fi->side, FS_ENEMY, minrow, maxrow);
 	if (!enemies) {
 		scat(", aber niemand war in Reichweite.");
 		battlerecord(b, buf);
@@ -532,7 +532,7 @@ sp_mindblast(fighter * fi, int level, int power, spell * sp)
 	battlerecord(b, buf);
 
 	do {
-		dt = select_enemy(fi, minrow, maxrow);
+		dt = select_enemy(b, fi, minrow, maxrow);
 		assert(dt.fighter);
 		du = dt.fighter->unit;
 		if (humanoidrace(du->race) && is_magic_resistant(mage, du, 0) == false) {
@@ -606,7 +606,7 @@ sp_dragonodem(fighter * fi, int level, int power, spell * sp)
 	/* Jungdrache 3->54, Drache 6->216, Wyrm 12->864 Treffer */
 	force = lovar(get_force(level,6));
 
-	enemies = count_enemies(fi->side, FS_ENEMY, minrow,
+	enemies = count_enemies(b, fi->side, FS_ENEMY, minrow,
 			maxrow);
 
 	if (!enemies) {
@@ -621,7 +621,7 @@ sp_dragonodem(fighter * fi, int level, int power, spell * sp)
 	at.index = 0;
 
 	do {
-		dt = select_enemy(fi, minrow, maxrow);
+		dt = select_enemy(b, fi, minrow, maxrow);
 		assert(dt.fighter);
 		--force;
 		killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
@@ -655,7 +655,7 @@ sp_drainodem(fighter * fi, int level, int power, spell * sp)
 	/* Jungdrache 3->54, Drache 6->216, Wyrm 12->864 Treffer */
 	force = lovar(get_force(level,6));
 
-	enemies = count_enemies(fi->side, FS_ENEMY, minrow,
+	enemies = count_enemies(b, fi->side, FS_ENEMY, minrow,
 			maxrow);
 
 	if (!enemies) {
@@ -670,7 +670,7 @@ sp_drainodem(fighter * fi, int level, int power, spell * sp)
 	at.index = 0;
 
 	do {
-		dt = select_enemy(fi, minrow, maxrow);
+		dt = select_enemy(b, fi, minrow, maxrow);
 		assert(dt.fighter);
 		if (hits(at, dt, NULL)) {
 			drain_exp(dt.fighter->unit, 90);
@@ -864,7 +864,7 @@ sp_chaosrow(fighter * fi, int level, int force, spell * sp)
 			break;
 	}
 
-	enemies = count_enemies(fi->side, FS_ENEMY, minrow, maxrow);
+	enemies = count_enemies(b, fi->side, FS_ENEMY, minrow, maxrow);
 	if (!enemies) {
 		scat(", aber niemand war in Reichweite.");
 		battlerecord(b, buf);
@@ -964,7 +964,7 @@ sp_flee(fighter * fi, int level, int power, spell * sp)
 			force = get_force(power,10);
 	}
 
-	if (!count_enemies(fi->side, FS_ENEMY, minrow, maxrow)) {
+	if (!count_enemies(b, fi->side, FS_ENEMY, minrow, maxrow)) {
 		scat(", aber es gab niemanden mehr, der beeinflusst werden konnte.");
 		battlerecord(b, buf);
 		return 0;
@@ -1140,7 +1140,7 @@ sp_frighten(fighter * fi, int level, int power, spell * sp)
 	force = get_force(power, 2);
 
 	sprintf(buf, "%s zaubert %s", unitname(mage), sp->name);
-	enemies = count_enemies(fi->side, FS_ENEMY,
+	enemies = count_enemies(b, fi->side, FS_ENEMY,
 			minrow, maxrow);
 	if (!enemies) {
 		scat(", aber niemand war in Reichweite.");
@@ -1151,7 +1151,7 @@ sp_frighten(fighter * fi, int level, int power, spell * sp)
 	battlerecord(b, buf);
 
 	do {
-		troop dt = select_enemy(fi, minrow, maxrow);
+		troop dt = select_enemy(b, fi, minrow, maxrow);
 		fighter *df = dt.fighter;
 		--enemies;
 
@@ -1190,7 +1190,7 @@ sp_tiredsoldiers(fighter * fi, int level, int force, spell * sp)
 	force = force * force * 4;
 
 	sprintf(buf, "%s zaubert %s", unitname(mage), sp->name);
-	if (!count_enemies(fi->side, FS_ENEMY, FIGHT_ROW,
+	if (!count_enemies(b, fi->side, FS_ENEMY, FIGHT_ROW,
 				BEHIND_ROW)) {
 		scat(", aber niemand war in Reichweite.");
 		battlerecord(b, buf);
@@ -1198,7 +1198,7 @@ sp_tiredsoldiers(fighter * fi, int level, int force, spell * sp)
 	}
 
 	while (force) {
-		troop t = select_enemy(fi, FIGHT_ROW, BEHIND_ROW);
+		troop t = select_enemy(b, fi, FIGHT_ROW, BEHIND_ROW);
 		fighter *df = t.fighter;
 
 		if (!df)
@@ -1250,7 +1250,7 @@ sp_windshield(fighter * fi, int level, int power, spell * sp)
 			force = power;
 			at_malus = 2;
 	}
-	enemies = count_enemies(fi->side, FS_ENEMY,
+	enemies = count_enemies(b, fi->side, FS_ENEMY,
 			minrow, maxrow);
 	if (!enemies) {
 		scat(", aber niemand war in Reichweite.");
@@ -1259,7 +1259,7 @@ sp_windshield(fighter * fi, int level, int power, spell * sp)
 	}
 
 	do {
-		troop dt = select_enemy(fi, minrow, maxrow);
+		troop dt = select_enemy(b, fi, minrow, maxrow);
 		fighter *df = dt.fighter;
 		--enemies;
 

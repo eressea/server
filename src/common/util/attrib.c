@@ -174,7 +174,7 @@ a_readdefault(attrib * a, FILE * f)
 {
 	assert(sizeof(int)==sizeof(a->data));
 	fscanf(f, "%d", &a->data.i);
-	return 1;
+	return AT_READ_OK;
 }
 
 void
@@ -206,7 +206,7 @@ a_readstring(attrib * a, FILE * f)
 	char zText[4096];
 	read_quoted(f, zText, sizeof(zText));
 	a->data.v = strdup(zText);
-	return 1;
+	return AT_READ_OK;
 }
 
 void
@@ -258,10 +258,18 @@ a_read(FILE * f, attrib ** attribs)
 		}
 		if (at->read) {
 			attrib * na = a_new(at);
-			if (at->read(na, f))
+			int i = at->read(na, f);
+			switch (i) {
+			case AT_READ_OK:
 				a_add(attribs, na);
-			else
+				break;
+			case AT_READ_FAIL:
 				a_free(na);
+				break;
+			default:
+				assert(!"invalid return value");
+				break;
+			}
 		} else {
 			assert(!"fehler: keine laderoutine für attribut");
 		}

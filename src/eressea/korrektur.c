@@ -126,9 +126,8 @@ verify_owners(boolean bOnce)
 #define do_once(magic, fun) \
 { \
 	attrib * a = find_key(global.attribs, atoi36(magic)); \
-	if (a) { \
-		log_warning(("[do_once] a unique fix %d=\"%s\" was called a second time\n", atoi36(magic), magic)); \
-	} else { \
+	if (!a) { \
+		log_warning(("[do_once] a unique fix %d=\"%s\" was applied.\n", atoi36(magic), magic)); \
 		if (fun == 0) a_add(&global.attribs, make_key(atoi36(magic))); \
 	} \
 }
@@ -138,12 +137,13 @@ warn_items(void)
 {
 	boolean found = 0;
 	region * r;
+	const item_type * it_money = it_find("money");
 	for (r=regions;r;r=r->next) {
 		unit * u;
 		for (u=r->units;u;u=u->next) {
 			item * itm;
 			for (itm=u->items;itm;itm=itm->next) {
-				if (itm->number>1000000) {
+				if (itm->number>100000 && itm->type!=it_money) {
 					found = 1;
 					log_error(("Einheit %s hat %u %s\n", 
 						unitid(u), itm->number, 
@@ -187,7 +187,6 @@ santa_comes_to_town(void)
 	santa->irace = new_race[RC_DAEMON];
 	set_string(&santa->name, "Ein dicker Gnom mit einem Rentierschlitten");
 	set_string(&santa->display, "hat: 6 Rentiere, Schlitten, Sack mit Geschenken, Kekse für Khorne");
-	fset(santa, FL_TRAVELTHRU);
 
 	for (f=factions;f;f=f->next) {
 		unit * u;
@@ -1337,7 +1336,7 @@ fix_herbtypes(void)
 static int
 fix_plainherbs(void)
 {
-	region *r, *lastr;
+	region *r, *lastr = regions;
 	for (r=regions;r;r=r->next) {
 		int i;
 		const char * name;

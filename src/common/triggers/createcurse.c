@@ -103,7 +103,7 @@ createcurse_read(trigger * t, FILE * F)
 	if (td->target==NULL) ur_add((void*)i, (void**)&td->target, resolve_unit);
 
 	fscanf(F, "%d %d %d %d %d %d ", &td->id, &td->id2, &td->vigour, &td->duration, &td->effect, &td->men);
-	return 1;
+	return AT_READ_OK;
 }
 
 trigger_type tt_createcurse = {

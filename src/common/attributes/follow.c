@@ -30,39 +30,21 @@ verify_follow(attrib * a)
 	return 1;
 }
 
-#define FOLLOW_PERSISTENT 0
-
-#if FOLLOW_PERSISTENT
-static void
-write_follow(const attrib * a, FILE * F)
-{
-	write_unit_reference((unit*)a->data.v, F);
-}
-#else
-#define write_follow NULL
-#endif
-
 static int
 read_follow(attrib * a, FILE * F)
 {
 	if (global.data_version < BASE36IDS_VERSION) {
 		int i;
 		fscanf(F, "%d", &i);
-#if FOLLOW_PERSISTENT
 		ur_add((void*)i, (void**)&a->data.v, resolve_unit);
-#endif
 	} else {
-#if FOLLOW_PERSISTENT
-		read_unit_reference((unit**)&a->data.v, F);
-#else
-		read_unit_reference(NULL, F);
-#endif
+		return read_unit_reference(NULL, F);
 	}
-	return FOLLOW_PERSISTENT;
+	return AT_READ_OK;
 }
 
 attrib_type at_follow = {
-	"follow", NULL, NULL, verify_follow, write_follow, read_follow
+	"follow", NULL, NULL, verify_follow, NULL, read_follow
 };
 
 attrib *

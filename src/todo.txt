@@ -1,44 +1,53 @@
+Status:
+    *=default
+    !=critical, muss diese Runde gemacht werden.
+    +=fixed, muss überprüft werden
+    V=verified, ist getestet
+	-=war kein Bug
+
 Announcen:
-* Freigewordene Vinyambar-Parteien
-* Bugfix Kräuterverteilung
-* Schattendämonen, Gewicht
+! Schattendämonen, Gewicht
 
 Nächste Woche beachten:
-* bei der auswertung auf die resourcenanzeige achten.
-* Kräuterneuverteilung
-* Bauern in Bofintedlat aussetzen, bitte
++ bei der auswertung auf die resourcenanzeige achten.
++ Kräuterneuverteilung
+! Bauern in Bofintedlat aussetzen, bitte
 
 Bugfixes/Debugging:
+! TARNE PARTEI NICHT immer noch defekt?
 * Tragkraft von monstern unbegrenzt?
 * Unterhaltungsmaximum kann nicht ausgeschoepft werden (H. Bruns)
 * Schiff nicht abgelegt (Marc Albrecht)
-* Antimagiekristall (Stefan Schwarz)
-* NR und CR Diskrepanz: Strassen
-* shock-Attribut (u. wahrscheinlich andere) mehrfach im Datenfile
-* Kampf und Bergung (W. Edel)
-* Lernkosten (W. Edel)
-* Schattendaemonen kann man mit RESERVIERE Gegenstaende abnehmen, aber sie
++ Antimagiekristall (Stefan Schwarz)
++ NR und CR Diskrepanz: Strassen
++ shock-Attribut (u. wahrscheinlich andere) mehrfach im Datenfile
+v Kampf und Bergung (W. Edel)
+- Lernkosten (W. Edel)
+! Schattendaemonen kann man mit RESERVIERE Gegenstaende abnehmen, aber sie
   koennen kein GIB. was ist richtig?
 * Monsterroutinen nochmal anschauen, Clustering von Wyrmen
-* trigger anschauen. killunit::handle
-* Durchreiseregionen werden nicht angezeigt
-* Gewicht von Schattendämonen
+v trigger anschauen. killunit::handle
+v Durchreiseregionen werden nicht angezeigt
+v Regionen nach Straßen werden nicht angezeigt
+! Gewicht von Schattendämonen
+v remove_empty_factions darf kein free machen, weil noch attribute
+  auf die partei zeigen. Attribute mit faction 0 wurden nie eingelesen.
+* Parteien in Durchreise- und Leuchtturmregionen tauchen nicht als PARTEI Block auf
 
 Features:
 * Bauernblut-Effekt an der Einheit speichern, wie bei anderen Traenken auch
-* Passworte fuer Vinyambar, cancelling von Parteien aus DB an Server 
-  weiterreichen
+* cancelling von Parteien aus DB an Server weiterreichen
 * Automatisches Einsetzen im allgemeinen
 * buildings.xml hat keinen support fuer gebaeude mit mehreren ausbaustufen
   (castle). nachtragen, und bt_castle aus dem source werfen
-* eigener messagetype für regions-/einheitenbotschaften (nicht string)
+- eigener messagetype für regions-/einheitenbotschaften (nicht string)
 
 Webseiten, Mailinglisten:
 * mehr logging, vinyambar-accounts
 * mailman gate_news konfiguration
 * mailgate schickt postings von Arsenius nicht an die mailingliste.
-* Option fuer Start in alten Regionen im Webformular
-* Regel mit mindestens 0 NMR aus der partieboerse (standin.py) nehmen.
+! Option fuer Start in alten Regionen im Webformular
+V Regel mit mindestens 0 NMR aus der parteiboerse (standin.py) nehmen.
 
 Designideen zur Diskussion:
 * neue Waffen

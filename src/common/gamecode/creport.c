@@ -834,6 +834,53 @@ report_resource(char * buf, const char * name, const locale * loc, int amount, i
 	return buf;
 }
 
+static void
+cr_borders(const region * r, const faction * f, int seemode, FILE * F)
+{
+	direction_t d;
+	int g = 0;
+	for (d = 0; d != MAXDIRECTIONS; d++)
+	{ /* Nachbarregionen, die gesehen werden, ermitteln */
+		const region * r2 = rconnect(r, d);
+		const border * b;
+		if (!r2) continue;
+		if (seemode==see_neighbour) {
+			seen_region * sr = find_seen(r2);
+			if (sr==NULL || sr->mode<=see_neighbour) continue;
+		}
+		b = get_borders(r, r2);
+		while (b) {
+			boolean cs = b->type->fvisible(b, f, r);
+
+			if (!cs) {
+				cs = b->type->rvisible(b, r);
+				if (!cs) {
+					unit * us = r->units;
+					while (us && !cs) {
+						if (us->faction==f) {
+							cs = b->type->uvisible(b, us);
+							if (cs) break;
+						}
+						us=us->next;
+					}
+				}
+			}
+			if (cs) {
+				fprintf(F, "GRENZE %d\n", ++g);
+				fprintf(F, "\"%s\";typ\n", b->type->name(b, r, f, GF_NONE));
+				fprintf(F, "%d;richtung\n", d);
+				if (!b->type->transparent(b, f)) fputs("1;opaque\n", F);
+				/* pfusch: */
+				if (b->type==&bt_road) {
+					int p = rroad(r, d)*100/terrain[rterrain(r)].roadreq;
+					fprintf(F, "%d;prozent\n", p);
+				}
+			}
+			b = b->next;
+		}
+	}
+}
+
 /* main function of the creport. creates the header and traverses all regions */
 void
 report_computer(FILE * F, faction * f, const seen_region * seen,
@@ -989,12 +1036,11 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 			fputs("\"travel\";visibility\n", F);
 			break;
 		}
-		if (seemode != see_neighbour)
-		{
+		if (seemode == see_neighbour) {
+			cr_borders(r, f, seemode, F);
+		} else {
 #define RESOURCECOMPAT
 			char cbuf[8192], *pos = cbuf;
-			int g = 0;
-			direction_t d;
 #ifdef RESOURCECOMPAT
 			if (r->display && strlen(r->display))
 				fprintf(F, "\"%s\";Beschr\n", r->display);
@@ -1120,42 +1166,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 				}
 				if (pos!=cbuf) fputs(cbuf, F);
 			}
-			for (d = 0; d != MAXDIRECTIONS; d++)
-			{ /* Nachbarregionen, die gesehen werden, ermitteln */
-				region * r2 = rconnect(r, d);
-				border * b;
-				if (!r2) continue;
-				b  = get_borders(r, r2);
-				while (b) {
-					boolean cs = b->type->fvisible(b, f, r);
-
-					if (!cs) {
-						cs = b->type->rvisible(b, r);
-						if (!cs) {
-							unit * us = r->units;
-							while (us && !cs) {
-								if (us->faction==f) {
-									cs = b->type->uvisible(b, us);
-									if (cs) break;
-								}
-								us=us->next;
-							}
-						}
-					}
-					if (cs) {
-						fprintf(F, "GRENZE %d\n", ++g);
-						fprintf(F, "\"%s\";typ\n", b->type->name(b, r, f, GF_NONE));
-						fprintf(F, "%d;richtung\n", d);
-						if (!b->type->transparent(b, f)) fputs("1;opaque\n", F);
-						/* pfusch: */
-						if (b->type==&bt_road) {
-							int p = rroad(r, d)*100/terrain[rterrain(r)].roadreq;
-							fprintf(F, "%d;prozent\n", p);
-						}
-					}
-					b = b->next;
-				}
-			}
+			cr_borders(r, f, seemode, F);
 			if (seemode==see_unit && r->planep && r->planep->id == 1 && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
 			{
 				/* Sonderbehandlung Teleport-Ebene */

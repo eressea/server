@@ -88,12 +88,14 @@ createunit_read(trigger * t, FILE * F)
 {
 	createunit_data * td = (createunit_data*)t->data.v;
 
-	read_unit_reference(&td->u, F);
-	read_region_reference(&td->r, F);
-	read_race_reference(&td->race, F);
+	int uc = read_unit_reference(&td->u, F);
+	int rc = read_region_reference(&td->r, F);
+	int ic = read_race_reference(&td->race, F);
 
 	fscanf(F, "%d ", &td->number);
-	return 1;
+
+	if (uc!=AT_READ_OK || rc!=AT_READ_OK || ic!=AT_READ_OK) return AT_READ_FAIL;
+	return AT_READ_OK;
 }
 
 trigger_type tt_createunit = {

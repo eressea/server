@@ -89,7 +89,7 @@ int laen_read(attrib * a, FILE * F)
 	int laen;
 	fscanf(F, "%d", &laen);
 	read_laen(current_region, laen);
-	return 0;
+	return AT_READ_FAIL;
 }
 #endif
 
@@ -257,7 +257,6 @@ ri(FILE * F)
 
 	return i * vz;
 }
-
 
 static int
 ri36(FILE * F)
@@ -840,7 +839,7 @@ readgame(boolean backup)
 
 	n = ri(F);
 	if (maxregions<0) maxregions = n;
-	printf(" - Einzulesende Regionen: %d/%d ", maxregions, n);
+	printf(" - Einzulesende Regionen: %d/%d\r", maxregions, n);
 
 	while (--n >= 0) {
 		unit **up;
@@ -862,8 +861,8 @@ readgame(boolean backup)
 			skip = true;
 		}
 		if ((n%1024)==0) {	/* das spart extrem Zeit */
+			printf(" - Einzulesende Regionen: %d/%d ", maxregions, n);
 			printf("* %d,%d    \r", x, y);
-			printf(" - Einzulesende Regionen: %d/%d      ", maxregions, n);
 		}
 		if (skip) {
 			char * r;
@@ -966,6 +965,7 @@ readgame(boolean backup)
 			addlist2(up,u);
 		}
 	}
+	printf("\n");
 	if (!dirtyload) {
 		if (global.data_version >= BORDER_VERSION) read_borders(F);
 #ifdef USE_UGROUPS
@@ -1039,6 +1039,9 @@ readgame(boolean backup)
 	}
 	if(findfaction(0)) {
 		findfaction(0)->alive = 1;
+	}
+	if (maxregions>=0) {
+		remove_empty_factions();
 	}
 
 	/* Regionen */
@@ -1449,7 +1452,7 @@ curse_read(attrib * a, FILE * f) {
 	}
 	chash(c);
 
-	return 1;
+	return AT_READ_OK;
 }
 
 /* ------------------------------------------------------------- */
@@ -1499,13 +1502,13 @@ read_faction_reference(faction ** f, FILE * F)
 	} else {
 		fscanf(F, "%d ", &id);
 	}
-	if (id==0) {
+	if (id<0) {
 		*f = NULL;
-		return 0;
+		return AT_READ_FAIL;
 	}
 	*f = findfaction(id);
 	if (*f==NULL) ur_add((void*)id, (void**)f, resolve_faction);
-	return 1;
+	return AT_READ_OK;
 }
 
 void

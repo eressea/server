@@ -31,8 +31,7 @@ write_gm(const attrib * a, FILE * F)
 static int
 read_gm(attrib * a, FILE * F)
 {
-	read_plane_reference((plane**)&a->data.v, F);
-	return 1;
+	return read_plane_reference((plane**)&a->data.v, F);
 }
 
 

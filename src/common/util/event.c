@@ -47,8 +47,20 @@ read_triggers(FILE * F, trigger ** tp)
 		ttype = tt_find(zText);
 		assert(ttype || !"unknown trigger-type");
 		*tp = t_new(ttype);
-		if (ttype->read) ttype->read(*tp, F);
-		tp = &(*tp)->next;
+		if (ttype->read) {
+			int i = ttype->read(*tp, F);
+			switch (i) {
+			case AT_READ_OK:
+				tp = &(*tp)->next;
+				break;
+			case AT_READ_FAIL:
+				t_free(*tp);
+				break;
+			default:
+				assert(!"invalid return value");
+				break;
+			}
+		}
 	}
 }
 
@@ -130,7 +142,10 @@ read_handler(attrib * a, FILE * F)
 	fscanf(F, "%s ", zText);
 	hi->event = strdup(zText);
 	read_triggers(F, &hi->triggers);
-	return (hi->triggers!=NULL);
+	if (hi->triggers!=NULL) {
+		return AT_READ_OK;
+	}
+	return AT_READ_FAIL;
 }
 
 attrib_type at_eventhandler = {

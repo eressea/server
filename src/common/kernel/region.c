@@ -181,7 +181,7 @@ a_readdirection(attrib *a, FILE *f)
 	d->desc = strdup(cstring(buf));
 	fscanf(f, "%s ", buf);
 	d->keyword = strdup(cstring(buf));
-	return 1;
+	return AT_READ_OK;
 }
 
 void
@@ -224,7 +224,7 @@ a_readmoveblock(attrib *a, FILE *f)
 
 	fscanf(f, "%d", &i);
 	m->dir = (direction_t)i;
-	return 1;
+	return AT_READ_OK;
 }
 
 void
@@ -1020,16 +1020,18 @@ production(const region *r)
 	return p;
 }
 
-void
+int
 read_region_reference(region ** r, FILE * F)
 {
 	int x[2];
 	fscanf(F, "%d %d", &x[0], &x[1]);
-	if (x[0]==INT_MAX) *r = NULL;
-	else {
-		*r = findregion(x[0], x[1]);
-		if (*r==NULL) ur_add(memcpy(malloc(sizeof(x)), x, sizeof(x)), (void**)r, resolve_region);
+	if (x[0]==INT_MAX) {
+		*r = NULL;
+		return AT_READ_FAIL;
 	}
+	*r = findregion(x[0], x[1]);
+	if (*r==NULL) ur_add(memcpy(malloc(sizeof(x)), x, sizeof(x)), (void**)r, resolve_region);
+	return AT_READ_OK;
 }
 
 void

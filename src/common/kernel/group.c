@@ -99,9 +99,9 @@ read_group(attrib * a, FILE * f)
 	a->data.v = g = find_group(gid);
 	if (g!=0) {
 		g->members++;
-		return 1;
+		return AT_READ_OK;
 	}
-	return 0;
+	return AT_READ_FAIL;
 }
 
 static void

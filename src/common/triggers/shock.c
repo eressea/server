@@ -49,14 +49,25 @@ static void
 shock_write(const trigger * t, FILE * F)
 {
 	unit * u = (unit*)t->data.v;
-	write_unit_reference(u, F);
+	trigger * next = t->next;
+	while (next) {
+		/* make sure it is unique! */
+		if (next->type==t->type && next->data.v==t->data.v) break;
+		next=next->next;
+	}
+	if (next && u) {
+		log_error(("more than one shock-attribut for %s on a unit. FIXED.\n",
+			unitid(u)));
+		write_unit_reference(NULL, F);
+	} else {
+		write_unit_reference(u, F);
+	}
 }
 
 static int
 shock_read(trigger * t, FILE * F)
 {
-	read_unit_reference((unit**)&t->data.v, F);
-	return 1;
+	return read_unit_reference((unit**)&t->data.v, F);
 }
 
 trigger_type tt_shock = {

@@ -2939,7 +2939,7 @@ cw_read(attrib * a, FILE * f)
 	fscanf(f, "%d ", &br->id);
 	ur_add((void *)br->id, (void**)&wc->wall, resolve_borderid);
 	ur_add((void *)br, (void**)&wc->buddy, resolve_buddy);
-	return 1;
+	return AT_READ_OK;
 }
 
 attrib_type at_cursewall =

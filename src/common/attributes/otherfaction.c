@@ -36,8 +36,8 @@ read_of(struct attrib * a, FILE* F) /* return 1 on success, 0 if attrib needs re
 	int of;
 	fscanf(F, "%d", &of);
 	a->data.v = findfaction(of);
-	if (a->data.v) return 1;
-	return 0;
+	if (a->data.v) return AT_READ_OK;
+	return AT_READ_FAIL;
 }
 
 attrib_type at_otherfaction = {

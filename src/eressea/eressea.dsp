@@ -108,6 +108,22 @@ LINK32=link.exe
 # Name "eressea - Win32 Release"
 # Name "eressea - Win32 Debug"
 # Name "eressea - Win32 Profile"
+# Begin Group "Text Files"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\commit.txt
+# End Source File
+# Begin Source File
+
+SOURCE=..\header.txt
+# End Source File
+# Begin Source File
+
+SOURCE=..\todo.txt
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\korrektur.c

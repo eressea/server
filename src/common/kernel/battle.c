@@ -1241,10 +1241,9 @@ lovar(int n)
 
 /* ------------------------------------------------------------- */
 int
-count_enemies(side * as, int mask, int minrow, int maxrow)
+count_enemies(battle * b, side * as, int mask, int minrow, int maxrow)
 /* new implementation of count_enemies ignores mask, since it was never used */
 {
-	battle *b = as->battle;
 	int i = 0;
 	void **si;
 
@@ -1252,7 +1251,7 @@ count_enemies(side * as, int mask, int minrow, int maxrow)
 
 	for (si = b->sides.begin; si != b->sides.end; ++si) {
 		side *side = *si;
-		if (enemy(side, as))
+		if (as==NULL || enemy(side, as))
 		{
 			void **fi;
 
@@ -1275,15 +1274,14 @@ count_enemies(side * as, int mask, int minrow, int maxrow)
 
 /* ------------------------------------------------------------- */
 troop
-select_enemy(fighter * af, int minrow, int maxrow)
+select_enemy(battle * b, fighter * af, int minrow, int maxrow)
 {
-	side *as = af->side;
-	battle *b = as->battle;
+	side *as = af?af->side:NULL;
 	troop dt = no_troop;
 	void ** si;
 	int enemies;
 
-	if(af->unit->race->flags & RCF_FLY) {
+	if (af && af->unit->race->flags & RCF_FLY) {
 		/* flying races ignore min- and maxrow and can attack anyone fighting
 		 * them */
 		minrow = FIGHT_ROW;
@@ -1291,7 +1289,7 @@ select_enemy(fighter * af, int minrow, int maxrow)
 	}
 	minrow = max(minrow, FIGHT_ROW);
 
-	enemies = count_enemies(af->side, FS_ENEMY, minrow, maxrow);
+	enemies = count_enemies(b, as, FS_ENEMY, minrow, maxrow);
 
 	if (!enemies)
 		return dt;				/* Niemand ist in der angegebenen Entfernung */
@@ -1299,7 +1297,7 @@ select_enemy(fighter * af, int minrow, int maxrow)
 	for (si=b->sides.begin;!dt.fighter && si!=b->sides.end;++si) {
 		side *ds = *si;
 		void ** fi;
-		if (!enemy(as, ds)) continue;
+		if (as!=NULL && !enemy(as, ds)) continue;
 		for (fi=ds->fighters.begin;fi!=ds->fighters.end;++fi) {
 			fighter * df = *fi;
 			int dr = get_unitrow(df);
@@ -1892,11 +1890,11 @@ attack(battle *b, troop ta, const att *a)
 					boolean missile = false;
 					if (wp && fval(wp->type, WTF_MISSILE)) missile=true;
 					if (missile) {
-						if (row<=BEHIND_ROW) td = select_enemy(af, missile_range[0], missile_range[1]);
+						if (row<=BEHIND_ROW) td = select_enemy(b, af, missile_range[0], missile_range[1]);
 						else return;
 					}
 					else {
-						if (row<=FIGHT_ROW) td = select_enemy(af, melee_range[0], melee_range[1]);
+						if (row<=FIGHT_ROW) td = select_enemy(b, af, melee_range[0], melee_range[1]);
 						else return;
 					}
 					if (!td.fighter) return;
@@ -1930,7 +1928,7 @@ attack(battle *b, troop ta, const att *a)
 		do_extra_spell(ta, a);
 		break;
 	case AT_NATURAL:
-		td = select_enemy(af, melee_range[0]-offset, melee_range[1]-offset);
+		td = select_enemy(b, af, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
@@ -1945,7 +1943,7 @@ attack(battle *b, troop ta, const att *a)
 		}
 		break;
 	case AT_DRAIN_ST:
-		td = select_enemy(af, melee_range[0]-offset, melee_range[1]-offset);
+		td = select_enemy(b, af, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
@@ -1968,7 +1966,7 @@ attack(battle *b, troop ta, const att *a)
 		}
 		break;
 	case AT_DRAIN_EXP:
-		td = select_enemy(af, melee_range[0]-offset, melee_range[1]-offset);
+		td = select_enemy(b, af, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
@@ -1983,7 +1981,7 @@ attack(battle *b, troop ta, const att *a)
 		}
 		break;
 	case AT_DAZZLE:
-		td = select_enemy(af, melee_range[0]-offset, melee_range[1]-offset);
+		td = select_enemy(b, af, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
 		if(td.fighter->person[td.index].last_action < b->turn) {
 			td.fighter->person[td.index].last_action = b->turn;
@@ -1998,7 +1996,7 @@ attack(battle *b, troop ta, const att *a)
 		}
 		break;
 	case AT_STRUCTURAL:
-		td = select_enemy(af, melee_range[0]-offset, melee_range[1]-offset);
+		td = select_enemy(b, af, melee_range[0]-offset, melee_range[1]-offset);
 		if (!td.fighter) return;
 		if(ta.fighter->person[ta.index].last_action < b->turn) {
 			ta.fighter->person[ta.index].last_action = b->turn;
@@ -2045,7 +2043,7 @@ do_attack(fighter * af)
 	while (ta.index--) {
 		/* Wir suchen eine beliebige Feind-Einheit aus. An der können
 		 * wir feststellen, ob noch jemand da ist. */
-		int enemies = count_enemies(af->side, FS_ENEMY, FIGHT_ROW, LAST_ROW);
+		int enemies = count_enemies(b, af->side, FS_ENEMY, FIGHT_ROW, LAST_ROW);
 		if (!enemies) break;
 
 		for (apr=attacks_per_round(ta); apr > 0; apr--) {
@@ -2144,6 +2142,7 @@ loot_items(fighter * corpse)
 {
 	unit * u = corpse->unit;
 	item * itm = u->items;
+	battle * b = corpse->side->battle;
 	u->items = NULL;
 
 	while (itm) {
@@ -2160,7 +2159,7 @@ loot_items(fighter * corpse)
 				 */
 				if (loot>0 && (itm->type->flags & (ITF_CURSED|ITF_NOTLOST)
 						|| rand()%100 >= 50 - corpse->side->battle->keeploot)) {
-					fighter *fig = select_enemy(corpse, FIGHT_ROW, LAST_ROW).fighter;
+					fighter *fig = select_enemy(b, corpse, FIGHT_ROW, LAST_ROW).fighter;
 					if (fig) {
 						item * l = fig->loot;
 						while (l && l->type!=itm->type) l=l->next;

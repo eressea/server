@@ -888,7 +888,7 @@ f_regionid(const region * r, const faction * f)
 }
 
 static void
-prices(FILE * F, region * r, faction * f)
+prices(FILE * F, const region * r, const faction * f)
 {
 	const luxury_type *sale=NULL;
 	struct demand * dmd;
@@ -928,13 +928,13 @@ extern const direction_t back[MAXDIRECTIONS];
 /* ------------------------------------------------------------- */
 
 boolean
-see_border(border * b, faction * f, region * r)
+see_border(const border * b, const faction * f, const region * r)
 {
 	boolean cs = b->type->fvisible(b, f, r);
 	if (!cs) {
 		cs = b->type->rvisible(b, r);
 		if (!cs) {
-			unit * us = r->units;
+			const unit * us = r->units;
 			while (us && !cs) {
 				if (us->faction==f) {
 					cs = b->type->uvisible(b, us);
@@ -984,7 +984,7 @@ eval_trail(struct opstack ** stack, const void * userdata) /* (int, int) -> int 
 }
 
 static void
-describe(FILE * F, region * r, int partial, faction * f)
+describe(FILE * F, const region * r, int partial, faction * f)
 {
 	char dbuf[512];
 	int n;
@@ -1321,9 +1321,9 @@ describe(FILE * F, region * r, int partial, faction * f)
 }
 
 void
-statistics(FILE * F, region * r, faction * f)
+statistics(FILE * F, const region * r, const faction * f)
 {
-	unit *u;
+	const unit *u;
 	int number, p;
 	item *itm, *items = NULL;
 	p = rpeasants(r);
@@ -1379,7 +1379,7 @@ statistics(FILE * F, region * r, faction * f)
 }
 
 static void
-durchreisende(FILE * F, region * r, faction * f)
+durchreisende(FILE * F, const region * r, const faction * f)
 {
 	attrib *ru;
 	int wieviele;
@@ -1657,7 +1657,7 @@ allies(FILE * F, faction * f)
 }
 
 static void
-guards(FILE * F, region * r, faction * see)
+guards(FILE * F, const region * r, const faction * see)
 {				/* die Partei  see  sieht dies; wegen
 				 * "unbekannte Partei", wenn man es selbst ist... */
 
@@ -1812,7 +1812,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	char ch;
 	int dh;
 	int anyunits;
-	region *r;
+	const struct region *r;
 	building *b;
 	ship *sh;
 	unit *u;
@@ -2536,45 +2536,46 @@ init_intervals()
 }
 #endif
 
-static boolean
-add_seen(region * r, unsigned char mode, boolean dis)
+seen_region *
+find_seen(const region * r)
 {
-	seen_region * find;
-
 	int index = abs((r->x & 0xffff) + ((r->y) << 16)) % MAXSEEHASH;
-	for (find=seehash[index];find;find=find->nextHash) {
-		if (find->r==r) {
-			if (find->mode < mode) {
-				if (find->mode<=see_neighbour && find->next) {
-					find->next->prev = find->prev;
-					if (find->prev) find->prev->next = find->next;
-					else seen = find->next;
-					last->next = find;
-					find->prev = last;
-					find->next = NULL;
-					last = find;
-					append = &last->next;
-				}
-				find->mode = mode;
-				find->disbelieves |= dis;
-				return true;
-			}
-			else return false;
-		}
+	seen_region * find=seehash[index];
+	while (find) {
+		if (find->r==r) return find;
+		find=find->nextHash;
 	}
-	if (!reuse) reuse = (seen_region*)calloc(1, sizeof(seen_region));
-	*append = reuse;
-	reuse = reuse->next;
-	(*append)->next = NULL;
-	(*append)->prev = last;
-	if (last) last->next = *append;
-	last = *append;
-	(*append)->nextHash = seehash[index];
-	seehash[index] = *append;
-	(*append)->r = r;
-	(*append)->mode = mode;
-	(*append)->disbelieves = dis;
-	append = &(*append)->next;
+	return NULL;
+}
+
+static boolean
+add_seen(const struct region * r, unsigned char mode, boolean dis)
+{
+	seen_region * find = find_seen(r);
+	if (find) {
+		if (find->mode >= mode) return false;
+		if (find->mode>see_neighbour || find->next==NULL) return true;
+		/* take it out the list, so it can get processed again */
+		find->next->prev = find->prev;
+		if (find->prev) find->prev->next = find->next;
+		else seen = find->next;
+	} else {
+		int index = abs((r->x & 0xffff) + ((r->y) << 16)) % MAXSEEHASH;
+		if (!reuse) reuse = (seen_region*)calloc(1, sizeof(seen_region));
+		*append = find = reuse;
+		reuse = reuse->next;
+		find->nextHash = seehash[index];
+		seehash[index] = find;
+		find->r = r;
+	}
+	/* put it at the end of the list, where the unprocessed nodes are */
+	if (last) last->next = find;
+	find->next = NULL;
+	find->prev = last;
+	last = find;
+	append = &last->next;
+	find->mode = mode;
+	find->disbelieves |= dis;
 	return true;
 }
 
@@ -2591,6 +2592,10 @@ view_default(region *r, faction *f)
 		region * r2 = rconnect(r, dir);
 		if (r2) {
 			border * b = get_borders(r, r2);
+			while (b) {
+				if (!b->type->transparent(b, f)) break;
+				b = b->next;
+			}
 			if (!b) add_seen(r2, see_neighbour, false);
 		}
 	}

@@ -71,10 +71,11 @@ gate_read(trigger * t, FILE * F)
 {
 	gate_data * gd = (gate_data*)t->data.v;
 
-	read_building_reference(&gd->gate, F);
-	read_region_reference(&gd->target, F);
+	int bc = read_building_reference(&gd->gate, F);
+	int rc = read_region_reference(&gd->target, F);
 
-	return 1;
+	if (rc!=AT_READ_OK || bc!=AT_READ_OK) return AT_READ_FAIL;
+	return AT_READ_OK;
 }
 
 static void

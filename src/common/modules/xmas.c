@@ -32,7 +32,6 @@ santa_comes_to_town(region * r, unit * santa, void (*action)(unit*))
 	const item_type * roi = it_find("roi");
 	assert(roi);
 
-	fset(santa, FL_TRAVELTHRU);
 	for (f = factions;f;f=f->next) {
 		unit * u;
 		unit * senior = f->units;

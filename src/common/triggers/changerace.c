@@ -84,10 +84,11 @@ static int
 changerace_read(trigger * t, FILE * F)
 {
 	changerace_data * td = (changerace_data*)t->data.v;
-	read_unit_reference(&td->u, F);
-	read_race_reference(&td->race, F);
-	read_race_reference(&td->irace, F);
-	return 1;
+	int uc = read_unit_reference(&td->u, F);
+	int rc = read_race_reference(&td->race, F);
+	int ic = read_race_reference(&td->irace, F);
+	if (uc!=AT_READ_OK || rc!=AT_READ_OK || ic!=AT_READ_OK) return AT_READ_FAIL;
+	return AT_READ_OK;
 }
 
 trigger_type tt_changerace = {

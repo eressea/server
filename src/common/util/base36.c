@@ -25,13 +25,16 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#ifdef HAVE_STRTOL
 int
 atoi36(const char * s)
 {
-	return (int)(strtol(s, NULL, 36));
+	char * p = NULL;
+	int i = (int)(strtol(s, &p, 36));
+	if (*p || i<0) return -1;
+	return i;
 }
-#else
+
+#if 0
 #include <ctype.h>
 int
 atoi36(const char * s)
@@ -40,14 +43,15 @@ atoi36(const char * s)
 	assert(s);
 	if(!(*s)) return 0;
 
-	while(!isalnum((int)*s)) ++s;
+	while(isspace((int)*s)) ++s;
 	while(isalnum((int)*s)) {
 		if (isupper((int)*s)) i = i*36 + (*s)-'A' + 10;
 		else if (islower((int)*s)) i=i*36 + (*s)-'a' + 10;
 		else if (isdigit((int)*s)) i=i*36 + (*s)-'0';
+		else return -1;
 		++s;
 	}
-	if (i<0) return 0;
+	if (i<0 || !isspace(*s) && *s!='0') return -1;
 	return i;
 }
 #endif

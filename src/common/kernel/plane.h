@@ -74,6 +74,6 @@ extern int rel_to_abs(const struct plane *pl, const struct faction * f, int rel,
 
 extern void * resolve_plane(void * data);
 extern void write_plane_reference(const plane * p, FILE * F);
-extern void read_plane_reference(plane ** pp, FILE * F);
+extern int read_plane_reference(plane ** pp, FILE * F);
 
 #endif

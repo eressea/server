@@ -62,8 +62,7 @@ clonedied_write(const trigger * t, FILE * F)
 static int
 clonedied_read(trigger * t, FILE * F)
 {
-	read_unit_reference((unit**)&t->data.v, F);
-	return 1;
+	return read_unit_reference((unit**)&t->data.v, F);
 }
 
 trigger_type tt_clonedied = {

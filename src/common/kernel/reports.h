@@ -82,12 +82,14 @@ typedef struct seen_region {
 	struct seen_region * next;
 	struct seen_region * prev;
 	struct seen_region * nextHash;
-	struct region *r;
+	const struct region *r;
 	unsigned char mode;
 	boolean disbelieves;
 } seen_region;
 
-extern seen_region * seen;
+extern struct seen_region * seen;
+extern struct seen_region * find_seen(const struct region * r);
+
 extern const char* resname(resource_t res, int i);
 
 extern char **seasonnames;

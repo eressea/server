@@ -103,14 +103,14 @@ a_traveldir_new_age(attrib *a)
 int
 a_traveldir_new_read(attrib *a, FILE *f)
 {
-	  traveldir *t = (traveldir *)(a->data.v);
-	  int       no, age, dir;
+	traveldir *t = (traveldir *)(a->data.v);
+	int       no, age, dir;
 
-	  fscanf(f, "%d %d %d", &no, &dir, &age);
-	  t->no  = no;
-	  t->dir = (direction_t)dir;
-		t->age = age;
-	  return 1;
+	fscanf(f, "%d %d %d", &no, &dir, &age);
+	t->no  = no;
+	t->dir = (direction_t)dir;
+	t->age = age;
+	return AT_READ_OK;
 }
 
 void
@@ -391,12 +391,12 @@ do_maelstrom(region *r, unit *u)
 	damage_ship(u->ship, 0.01*damage);
 
 	if (u->ship->damage >= u->ship->size * DAMAGE_SCALE) {
-		add_message(&u->faction->msgs,
-			new_message(u->faction, "entermaelstrom%r:region%h:ship%i:damage%i:sink", r, u->ship, damage, 1));
+		ADDMSG(&u->faction->msgs, msg_message("entermaelstrom",
+			"region ship damage sink", r, u->ship, damage, 1));
 		destroy_ship(u->ship, r);
 	} else {
-		add_message(&u->faction->msgs,
-			new_message(u->faction, "entermaelstrom%r:region%h:ship%i:damage%i:sink", r, u->ship, damage, 0));
+		ADDMSG(&u->faction->msgs, msg_message("entermaelstrom",
+			"region ship damage sink", r, u->ship, damage, 0));
 	}
 }
 
@@ -406,7 +406,6 @@ travelthru(unit * u, region * r)
 	attrib *ru = a_add(&r->attribs, a_new(&at_travelunit));
 
 	ru->data.v = u;
-	fset(u, FL_TRAVELTHRU);
 	u->faction->first = 0;
 	u->faction->last = 0;
 }
@@ -419,8 +418,10 @@ move_ship(ship * sh, region * from, region * to, region ** route)
 	direction_t dir;
 	attrib			*a;
 
-	translist(&from->ships, &to->ships, sh);
-	sh->region = to;
+	if (from!=to) {
+		translist(&from->ships, &to->ships, sh);
+		sh->region = to;
+	}
 
 	while (u) {
 		unit *nu = u->next;
@@ -457,14 +458,12 @@ move_ship(ship * sh, region * from, region * to, region ** route)
 					travelthru(u, *ri++);
 				}
 			}
-			u->ship = NULL;		/* damit move_unit() kein leave() macht */
-			move_unit(u, to, ulist);
-#if 0
-	/* das braucht man (fast) sicher nicht. (Enno) */
-			fset(u->faction, FL_DH);
-#endif
-			ulist = &u->next;
-			u->ship = sh;
+			if (from!=to) {
+				u->ship = NULL;		/* damit move_unit() kein leave() macht */
+				move_unit(u, to, ulist);
+				ulist = &u->next;
+				u->ship = sh;
+			}
 			if (route && eff_skill(u, SK_SAILING, from) >= 1) {
 				produceexp(u, SK_SAILING, u->number);
 			}
@@ -1550,7 +1549,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 		} else {
 			sh->coast = NODIRECTION;
 		}
-		fset(sh, FL_MOVED);
+
 		sprintf(buf, "Die %s ", shipname(sh));
 		if( is_cursed(sh->attribs, C_SHIP_FLYING, 0) )
 			scat("fliegt");
@@ -1600,64 +1599,62 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 		/* Verfolgungen melden */
 		if (fval(u, FL_FOLLOWING)) caught_target(current_point, u);
 
-		if (starting_point != current_point) {
-			tt[step] = NULL;
-			sh = move_ship(sh, starting_point, current_point, tt);
+		tt[step] = NULL;
+		sh = move_ship(sh, starting_point, current_point, tt);
 
-			/* Hafengebühren ? */
+		/* Hafengebühren ? */
 
-			hafenmeister = owner_buildingtyp(current_point, bt_find("harbour"));
-			if (sh && hafenmeister != NULL) {
-				item * itm;
-				assert(trans==NULL);
-				for (u2 = current_point->units; u2; u2 = u2->next) {
-					if (u2->ship == u->ship &&
-							!allied(hafenmeister, u->faction, HELP_GUARD)) {
+		hafenmeister = owner_buildingtyp(current_point, bt_find("harbour"));
+		if (sh && hafenmeister != NULL) {
+			item * itm;
+			assert(trans==NULL);
+			for (u2 = current_point->units; u2; u2 = u2->next) {
+				if (u2->ship == u->ship &&
+						!allied(hafenmeister, u->faction, HELP_GUARD)) {
 
 
-						if (effskill(hafenmeister, SK_OBSERVATION) > effskill(u2, SK_STEALTH)) {
-							for (itm=u2->items; itm; itm=itm->next) {
-								const luxury_type * ltype = resource2luxury(itm->type->rtype);
-								if (ltype!=NULL && itm->number>0) {
-									st = itm->number * effskill(hafenmeister, SK_TRADE) / 50;
-									st = min(itm->number, st);
+					if (effskill(hafenmeister, SK_OBSERVATION) > effskill(u2, SK_STEALTH)) {
+						for (itm=u2->items; itm; itm=itm->next) {
+							const luxury_type * ltype = resource2luxury(itm->type->rtype);
+							if (ltype!=NULL && itm->number>0) {
+								st = itm->number * effskill(hafenmeister, SK_TRADE) / 50;
+								st = min(itm->number, st);
 
-									if (st > 0) {
-										i_change(&u2->items, itm->type, -st);
-										i_change(&hafenmeister->items, itm->type, st);
-										i_add(&trans, i_new(itm->type, st));
-									}
+								if (st > 0) {
+									i_change(&u2->items, itm->type, -st);
+									i_change(&hafenmeister->items, itm->type, st);
+									i_add(&trans, i_new(itm->type, st));
 								}
 							}
 						}
 					}
 				}
-				if (trans) {
-					sprintf(buf, "%s erhielt ", hafenmeister->name);
-					for (itm = trans; itm; itm=itm->next) {
-						if (first != 1) {
-							if (itm->next!=NULL && itm->next->next==NULL) {
-								scat(" und ");
-							} else {
-								scat(", ");
-							}
-						}
-						first = 0;
-						icat(trans->number);
-						scat(" ");
-						if (itm->number == 1) {
-							scat(locale_string(default_locale, resourcename(itm->type->rtype, 0)));
+			}
+			if (trans) {
+				sprintf(buf, "%s erhielt ", hafenmeister->name);
+				for (itm = trans; itm; itm=itm->next) {
+					if (first != 1) {
+						if (itm->next!=NULL && itm->next->next==NULL) {
+							scat(" und ");
 						} else {
-							scat(locale_string(default_locale, resourcename(itm->type->rtype, NMF_PLURAL)));
+							scat(", ");
 						}
 					}
-					scat(" von der ");
-					scat(shipname(u->ship));
-					scat(".");
-					addmessage(0, u->faction, buf, MSG_COMMERCE, ML_INFO);
-					addmessage(0, hafenmeister->faction, buf, MSG_INCOME, ML_INFO);
-					while (trans) i_remove(&trans, trans);
+					first = 0;
+					icat(trans->number);
+					scat(" ");
+					if (itm->number == 1) {
+						scat(locale_string(default_locale, resourcename(itm->type->rtype, 0)));
+					} else {
+						scat(locale_string(default_locale, resourcename(itm->type->rtype, NMF_PLURAL)));
+					}
 				}
+				scat(" von der ");
+				scat(shipname(u->ship));
+				scat(".");
+				addmessage(0, u->faction, buf, MSG_COMMERCE, ML_INFO);
+				addmessage(0, hafenmeister->faction, buf, MSG_INCOME, ML_INFO);
+				while (trans) i_remove(&trans, trans);
 			}
 		}
 	}

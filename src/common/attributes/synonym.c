@@ -71,7 +71,7 @@ a_readsynonym(attrib * a, FILE * F)
 	fscanf(F, "%s", lbuf);
 	frs->synonyms[3] = strdup(lbuf);
 
-	return 1;
+	return AT_READ_OK;
 }
 
 attrib_type at_synonym = {

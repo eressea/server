@@ -35,7 +35,7 @@ a_readfunction(struct attrib *a, FILE *F)
 	char buf[64];
 	fscanf(F, "%s ", buf);
 	a->data.f = get_function(buf);
-	return 1;
+	return AT_READ_OK;
 }
 
 attrib_type at_viewrange = {
