@@ -631,6 +631,95 @@
 		<text locale="de">Katapultmunition</text>
 		<text locale="en">catapult ammunition</text>
 	</string>
+	
+	<string name="elfspoil">
+		<text locale="de">Elfenohr</text>
+		<text locale="en">elven ear</text>
+	</string>
+	<string name="elfspoil_p">
+		<text locale="de">Elfenohren</text>
+		<text locale="en">elven ears</text>
+	</string>
+	<string name="demonspoil">
+		<text locale="de">Dämonenblut</text>
+		<text locale="en">demon blood</text>
+	</string>
+	<string name="demonspoil_p">
+		<text locale="de">Dämonenblut</text>
+		<text locale="en">demon blood</text>
+	</string>
+	<string name="goblinspoil">
+		<text locale="de">Goblinkopf</text>
+		<text locale="en">goblin head</text>
+	</string>
+	<string name="goblinspoil_p">
+		<text locale="de">Goblinköpfe</text>
+		<text locale="en">goblinheads</text>
+	</string>
+	<string name="dwarfspoil">
+		<text locale="de">Zwergenbart</text>
+		<text locale="en">dwarven beard</text>
+	</string>
+	<string name="dwarfspoil_p">
+		<text locale="de">Zwergenbärte</text>
+		<text locale="en">dwarven beards</text>
+	</string>
+	<string name="halflingspoil">
+		<text locale="de">Halblingfuß</text>
+		<text locale="en">halfling foot</text>
+	</string>
+	<string name="halflingspoil_p">
+		<text locale="de">Halblingfüße</text>
+		<text locale="en">halfling feet</text>
+	</string>
+	<string name="humanspoil">
+		<text locale="de">Menschenskalp</text>
+		<text locale="en">human scalp</text>
+	</string>
+	<string name="humanspoil_p">
+		<text locale="de">Menschenskalpe</text>
+		<text locale="en">human scalps</text>
+	</string>
+	<string name="aquarianspoil">
+		<text locale="de">Meermenschschuppen</text>
+		<text locale="en">aquarian scale</text>
+	</string>
+	<string name="aquarienspoil_p">
+		<text locale="de">Meermenschschupper</text>
+		<text locale="en">aquarian scales</text>
+	</string>
+	<string name="insectspoil">
+		<text locale="de">Insektenfühler</text>
+		<text locale="en">insect antenna</text>
+	</string>
+	<string name="insectspoil_p">
+		<text locale="de">Insektenfühler</text>
+		<text locale="en">insect antenna</text>
+	</string>
+	<string name="catspoil">
+		<text locale="de">Katzenschwanz</text>
+		<text locale="en">cat tail</text>
+	</string>
+	<string name="catspoil_p">
+		<text locale="de">Katzenschwänze</text>
+		<text locale="en">cat tails</text>
+	</string>
+	<string name="orcspoil">
+		<text locale="de">Orkhauer</text>
+		<text locale="en">orc tusk</text>
+	</string>
+	<string name="orcspoil_p">
+		<text locale="de">Orkhauer</text>
+		<text locale="en">orc tusks</text>
+	</string>
+	<string name="trollspoil">
+		<text locale="de">Trollhorn</text>
+		<text locale="en">troll horn</text>
+	</string>
+	<string name="trollspoil_p">
+		<text locale="de">Trollhörner</text>
+		<text locale="en">troll horns</text>
+	</string>
 
 	<comment>Resourcen</comment>
 	<string name="money">
