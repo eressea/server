@@ -1024,7 +1024,8 @@ show_newspells(void)
 	/* Alle geänderten Zauber in das array newspellids[]. mit SPL_NOSPELL
 	 * terminieren */
 
-	spellid_t newspellids[] = { SPL_UNHOLYPOWER, SPL_NOSPELL };
+	spellid_t newspellids[] = { SPL_UNHOLYPOWER, SPL_SUMMONUNDEAD, 
+		SPL_ORKDREAM, SPL_NOSPELL };
 
 	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]
 	 * abgelegt */

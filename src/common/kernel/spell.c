@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.c,v 1.13 2001/03/04 18:41:25 enno Exp $
+ *	$Id: spell.c,v 1.14 2001/03/09 06:28:24 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -5034,31 +5034,45 @@ sp_dreamreading(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
+/* Wirkt power/2 Runden auf bis zu power^2 Personen
+ * mit einer Chance von 5% vermehren sie sich  */
 int
 sp_sweetdreams(castorder *co)
 {
 	unit *u;
-	int duration;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int power = co->force;
 	spellparameter *pa = co->par;
+	int men, n;
+	int duration = power/2;
+	int opfer = power*power;
 
-	/* Zieleinheit */
-	u = pa->param[0]->data.u;
+	/* Schleife über alle angegebenen Einheiten */
+	for (n = 0; n < pa->length; n++) {
+		/* sollte nie negativ werden */
+		if (opfer < 1)
+			break;
 
-	/* Nichts machen als ein entsprechendes Attribut an die Einheit legen. */
-	/* Wirkt power/2 Runden auf bis zu power^2 Personen in einer Einheit
-	 * mit einer Chance von 5% vermehren sie sich  */
+		if(pa->param[n]->flag == TARGET_RESISTS
+				|| pa->param[n]->flag == TARGET_NOTFOUND)
+			continue;
 
-	duration = power/2;
-	create_curse(mage,&u->attribs,C_ORC,0,power,duration,5,power*power);
-	set_curseflag(u->attribs, C_ORC, 0, CURSE_ISNEW);
+		/* Zieleinheit */
+		u = pa->param[n]->data.u;
 
-	sprintf(buf, "%s verschafft %s ein interessanteres Nachtleben.",
-			unitname(mage), unitname(u));
-	addmessage(r, mage->faction, buf, MSG_EVENT, ML_INFO);
+		men = min(opfer, u->number);
+		opfer -= men;
+
+		/* Nichts machen als ein entsprechendes Attribut an die Einheit legen. */
+		create_curse(mage,&u->attribs,C_ORC,0,power,duration,5,men);
+		set_curseflag(u->attribs, C_ORC, 0, CURSE_ISNEW);
+
+		sprintf(buf, "%s verschafft %s ein interessanteres Nachtleben.",
+				unitname(mage), unitname(u));
+		addmessage(r, mage->faction, buf, MSG_EVENT, ML_INFO);
+	}
 	return cast_level;
 }
 
@@ -7645,24 +7659,6 @@ spell spelldaten[] =
 	 (spell_f)sp_magicboost, patzer
 	},
 
-	{SPL_SUMMONUNDEAD, "Mächte des Todes",
-		"Nächtelang muss der Schwarzmagier durch die Friedhöfe und Gräberfelder "
-		"der Region ziehen um dann die ausgegrabenen Leichen beleben zu können. "
-		"Die Untoten werden ihm zu Diensten sein, doch sei der Unkundige gewarnt, "
-		"dass die Beschwörung der Mächte des Todes ein zweischneidiges Schwert "
-		"sein kann.",
-		NULL,
-		NULL,
-	 M_CHAOS, (SPELLLEVEL | FARCASTING), 5, 4,
-	 {
-			{R_AURA, 5, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_summonundead, patzer_peasantmob
-	},
-
 	{SPL_BERSERK, "Blutrausch",
 		"In diesem blutigen Ritual opfert der Magier vor der Schlacht ein "
 		"Neugeborenes vor den Augen seiner Armee. Die so gerufenen Blutgeister "
@@ -7697,6 +7693,24 @@ spell spelldaten[] =
 		 {0, 0, 0},
 		 {0, 0, 0}},
 	 (spell_f)sp_fumblecurse, patzer_fumblecurse
+	},
+
+	{SPL_SUMMONUNDEAD, "Mächte des Todes",
+		"Nächtelang muss der Schwarzmagier durch die Friedhöfe und Gräberfelder "
+		"der Region ziehen um dann die ausgegrabenen Leichen beleben zu können. "
+		"Die Untoten werden ihm zu Diensten sein, doch sei der Unkundige gewarnt, "
+		"dass die Beschwörung der Mächte des Todes ein zweischneidiges Schwert "
+		"sein kann.",
+		NULL,
+		NULL,
+	 M_CHAOS, (SPELLLEVEL | FARCASTING), 5, 6,
+	 {
+			{R_AURA, 5, SPC_LEVEL},
+		 {0, 0, 0},
+		 {0, 0, 0},
+		 {0, 0, 0},
+		 {0, 0, 0}},
+	 (spell_f)sp_summonundead, patzer_peasantmob
 	},
 
 	{SPL_COMBATRUST, "Rosthauch",
@@ -8449,7 +8463,7 @@ spell spelldaten[] =
 	 "dieses Zaubers kann es daran sterben.",
 		NULL,
 		NULL,
-	 M_TRAUM, (COMBATSPELL | SPELLLEVEL ), 5, 11,
+	 M_TRAUM, (COMBATSPELL | SPELLLEVEL), 5, 11,
 	 {
 			{R_AURA, 2, SPC_LEVEL},
 		 {0, 0, 0},
@@ -8468,9 +8482,10 @@ spell spelldaten[] =
 		"es einige Wochen später...",
 		NULL,
 		"u+",
-	 M_TRAUM, (UNITSPELL | TESTRESISTANCE), 5, 12,
+	 M_TRAUM, 
+	 (UNITSPELL | TESTRESISTANCE | TESTCANSEE | SPELLLEVEL), 5, 12,
 	 {
-			{R_AURA, 30, SPC_FIX},
+			{R_AURA, 5, SPC_LEVEL},
 		 {0, 0, 0},
 		 {0, 0, 0},
 		 {0, 0, 0},
