@@ -229,6 +229,19 @@ unit_getregion(const unit& u)
   return u.region;
 }
 
+static void
+unit_setbuilding(unit& u, building& b)
+{
+  leave(u.region, u);
+  u.building = &b;
+}
+
+static building *
+unit_getbuilding(const unit& u)
+{
+  return u.building;
+}
+
 static int
 unit_getid(const unit& u)
 {
@@ -398,6 +411,7 @@ bind_unit(lua_State * L)
     .def("remove_spell", &unit_removespell)
     .property("magic", &unit_getmagic, &unit_setmagic)
     .property("aura", &unit_getaura, &unit_setaura)
+    .property("building", &unit_getbuilding, &unit_setbuilding)
     .property("region", &unit_getregion, &unit_setregion)
     .property("is_familiar", &unit_isfamiliar)
     .property("spells", &unit_spells, return_stl_iterator)

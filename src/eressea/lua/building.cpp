@@ -1,15 +1,20 @@
 #include <config.h>
 #include <cstring>
 #include <eressea.h>
+#include "list.h"
 
 // kernel includes
 #include <building.h>
 #include <region.h>
+#include <unit.h>
 
 // lua includes
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
+
+// util includes
+#include <util/base36.h>
 
 using namespace luabind;
 
@@ -130,6 +135,44 @@ building_setname(building& b, const char * name)
   set_string(&b.name, name);
 }
 
+static std::ostream& 
+operator<<(std::ostream& stream, building& b)
+{
+  stream << b.name;
+  stream << " (" << itoa36(b.no) << ")";
+  stream << ", " << b.type->_name;
+  stream << " size " << b.size;
+  return stream;
+}
+
+static bool 
+operator==(const building& a, const building&b)
+{
+  return a.no==b.no;
+}
+
+class buildingunit {
+public:
+  static unit * next(unit * node) { 
+    building * b = node->building;
+    do {
+      node = node->next;
+    } while (node !=NULL && node->building!=b);
+    return node;
+  }
+  static unit * value(unit * node) { return node; }
+};
+
+
+static eressea::list<unit *, unit *, buildingunit>
+building_units(const building& b) {
+  region * r = b.region;
+  unit * u = r->units;
+  while (u!=NULL && u->building!=&b) u=u->next;
+  return eressea::list<unit *, unit *, buildingunit>(u);
+}
+
+
 void
 bind_building(lua_State * L) 
 {
@@ -139,10 +182,13 @@ bind_building(lua_State * L)
     def("add_building", &add_building),
 
     class_<struct building>("building")
+    .def(tostring(self))
+    .def(self == building())
     .property("name", &building_getname, &building_setname)
+    .property("info", &building_getinfo, &building_setinfo)
+    .property("units", &building_units, return_stl_iterator)
     .def_readonly("region", &building::region)
     .def_readonly("id", &building::no)
-    .property("info", &building_getinfo, &building_setinfo)
     .def_readwrite("size", &building::size)
     .def("add_effect", &building_addeffect)
   ];
