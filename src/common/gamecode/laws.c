@@ -134,8 +134,19 @@ destroyfaction(faction * f)
 		if (friends && number) {
 			struct friend * nf = friends;
 			while (nf) {
-				resource_t res;
 				unit * u2 = nf->unit;
+#ifdef NEW_ITEMS
+			  const item * itm;
+				for (itm=u->items;itm;itm=itm->next) {
+					int n = itm->number;
+					if (n<=0) continue;
+					n = n * nf->number / number;
+					if (n<=0) continue;
+					i_change(&u->items, itm->type, -n);
+					i_change(&u2->items, itm->type, n);
+				}
+#else
+				resource_t res;
 				for (res = 0; res <= R_SILVER; ++res) {
 					int n = get_resource(u, res);
 					if (n<=0) continue;
@@ -144,24 +155,37 @@ destroyfaction(faction * f)
 					change_resource(u, res, -n);
 					change_resource(u2, res, n);
 				}
+#endif
 				number -= nf->number;
 				nf = nf->next;
 				free(friends);
 				friends = nf;
 			}
 			friends = NULL;
-		} else {
-			int p = rpeasants(u->region),
-				m = rmoney(u->region),
-				h = rhorses(u->region);
-			if (rterrain(r) != T_OCEAN && !!playerrace(u->race)) {
-				p += u->number;
-				m += get_money(u);
-				h += get_item(u, I_HORSE);
+		} 
+		if (rterrain(r) != T_OCEAN && !!playerrace(u->race)) {
+			const race * rc = u->race;
+			int p = rpeasants(u->region);
+			int m = rmoney(u->region);
+			int h = rhorses(u->region);
+
+			/* Personen gehen nur an die Bauern, wenn sie auch von dort
+			 * stammen */
+			if ((rc->ec_flags & ECF_REC_UNLIMITED)==0) {
+				if (rc->ec_flags & ECF_REC_HORSES) { /* Zentauren an die Pferde */
+					h += u->number;
+				} else if (rc == new_race[RC_URUK]){ /* Orks zählen nur zur Hälfte */
+					p += u->number/2;
+				} else {
+					p += u->number;
+				}
 			}
+			m += get_money(u);
+			h += get_item(u, I_HORSE);
 			rsetpeasants(r, p);
 			rsethorses(r, h);
 			rsetmoney(r, m);
+
 		}
 		set_number(u, 0);
 	}
