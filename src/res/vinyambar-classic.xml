@@ -15,6 +15,6 @@
 		<order name="MEINUNG" disable></order>
 		<order name="MAGIEGEBIET" disable></order>
 		<include file="vinyambar/races.xml"></include>
-		<include file="vinyambar/de/strings.xml"></include>
+		<include file="vinyambar/de/strings-classic.xml"></include>
 	</game>
 </eressea>
