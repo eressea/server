@@ -2282,8 +2282,17 @@ display_race(faction *f, unit *u, const race * rc)
 			at_count++;
 		}
 	}
-	if (rc->battle_flags & BF_EQUIPMENT){
+	if (rc->battle_flags & BF_EQUIPMENT) {
 		strcat(buf, " Kann Waffen benutzen.");
+	}
+	if (rc->battle_flags & BF_RES_PIERCE) {
+		strcat(buf, " Ist durch Stichwaffen, Bögen und Armbrüste schwer zu verwunden.");
+	}
+	if (rc->battle_flags & BF_RES_CUT) {
+		strcat(buf, " Ist durch Hiebwaffen schwer zu verwunden.");
+	}
+	if (rc->battle_flags & BF_RES_BASH) {
+		strcat(buf, " Ist durch Schlagwaffen und Katapulte schwer zu verwunden.");
 	}
 
 	sprintf(buf2, " Hat %d Angriff%s", at_count, (at_count>1)?"e":"");
