@@ -6008,7 +6008,7 @@
   </namespace>
 
   <string name="claimable">
-    <text locale="de">Einheiten können die folgenden Gegenstände beansprucht werden: </text>
+    <text locale="de">Einheiten können die folgenden Gegenstände beanspruchen: </text>
     <text locale="en">Units can claim the following items: </text>
   </string>
 
