@@ -73,11 +73,10 @@ mt_new_va(const char * name, ...)
 }
 
 message *
-msg_create(const struct message_type * type, struct faction *receiver, void * args[])
+msg_create(const struct message_type * type, void * args[])
 {
 	int i;
 	message * msg = (message *)malloc(sizeof(message));
-	msg->receiver = receiver;
 	msg->type = type;
 	msg->parameters = calloc(sizeof(void*), type->nparameters);
 	for (i=0;i!=type->nparameters;++i) {
@@ -87,7 +86,7 @@ msg_create(const struct message_type * type, struct faction *receiver, void * ar
 }
 
 message *
-msg_create_va(const struct message_type * type, struct faction *receiver, ...)
+msg_create_va(const struct message_type * type, ...)
 /* sets a messages parameters */
 {
 	void * args[16];
@@ -98,7 +97,7 @@ msg_create_va(const struct message_type * type, struct faction *receiver, ...)
 		args[i] = va_arg(marker, void*);
 	}
 	va_end(marker);
-	return msg_create(type, receiver, args);
+	return msg_create(type, args);
 }
 
 typedef struct messagetype_list {

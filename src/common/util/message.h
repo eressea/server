@@ -20,7 +20,6 @@ typedef struct message_type {
 } message_type;
 
 typedef struct message {
-  struct faction *receiver;
 	const struct message_type * type;
 	const void ** parameters;
 } message;
@@ -30,8 +29,8 @@ extern struct message_type * mt_new_va(const char * name, ...);
 	/* mt_new("simple_sentence", "subject:string", "predicate:string", 
     *        "object:string", "lang:locale", NULL); */
 
-extern struct message * msg_create(const struct message_type * type, struct faction *receiver, void * args[]);
-extern struct message * msg_create_va(const struct message_type * type, struct faction *receiver, ...);
+extern struct message * msg_create(const struct message_type * type, void * args[]);
+extern struct message * msg_create_va(const struct message_type * type, ...);
 	/* msg_create(&mt_simplesentence, "enno", "eats", "chocolate", &locale_de); 
 	 * parameters must be in the same order as they were for mt_new! */
 extern void msg_free(struct message *m);
