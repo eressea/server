@@ -8543,7 +8543,7 @@ static spell spelldaten[] =
     "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' REGIONn"
     "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' EINHEIT <Einheit-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' GEBÄUDE <Gebäude-Nr>\n"
-    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' SCHIFF <Schiff-Nr>\",
+    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' SCHIFF <Schiff-Nr>",
     "kc",
     M_CHAOS,
     (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
