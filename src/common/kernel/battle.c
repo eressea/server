@@ -1340,12 +1340,12 @@ count_enemies(battle * b, side * as, int minrow, int maxrow)
 troop
 select_enemy(battle * b, fighter * af, int minrow, int maxrow)
 {
-  side *as = af?af->side:NULL;
+  side *as = af->side;
   troop dt = no_troop;
-  void ** si;
+  int si;
   int enemies;
 
-  if (af && af->unit->race->flags & RCF_FLY) {
+  if (af->unit->race->flags & RCF_FLY) {
     /* flying races ignore min- and maxrow and can attack anyone fighting
     * them */
     minrow = FIGHT_ROW;
@@ -1355,16 +1355,27 @@ select_enemy(battle * b, fighter * af, int minrow, int maxrow)
 
   enemies = count_enemies(b, as, minrow, maxrow);
 
-  if (!enemies)
-    return dt;				/* Niemand ist in der angegebenen Entfernung */
+  /* Niemand ist in der angegebenen Entfernung? */
+  if (enemies<=0) return dt;
+
   enemies = rand() % enemies;
-  for (si=b->sides.begin;!dt.fighter && si!=b->sides.end;++si) {
-    side *ds = *si;
+  for (si=0;!dt.fighter && as->enemies[si];++si) {
+    side *ds = as->enemies[si];
     void ** fi;
-    if (as!=NULL && !enemy(as, ds)) continue;
+    int ui, unitrow[NUMROWS];
+
+    for (ui=0;ui!=NUMROWS;++ui) unitrow[ui] = -1;
+
     for (fi=ds->fighters.begin;fi!=ds->fighters.end;++fi) {
       fighter * df = *fi;
-      int dr = get_unitrow(df);
+      int dr;
+
+      ui = statusrow(df);
+      if (unitrow[ui]<0) {
+        unitrow[ui] = get_unitrow(df);
+      }
+      dr = unitrow[ui];
+
       if (dr < minrow || dr > maxrow) continue;
       if (df->alive - df->removed > enemies) {
         dt.index = enemies;
