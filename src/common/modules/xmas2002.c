@@ -48,7 +48,9 @@ int
 xmas2002(void)
 {
 	region * r = findregion(0, 0);
-	unit * santa = make_santa(r);
+	unit * santa;
+	if (r==NULL) r = regions;
+	santa = make_santa(r);
 
 	santa_comes_to_town(r, santa, presents);
 	return 0;
