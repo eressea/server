@@ -914,10 +914,6 @@ set_number(unit * u, int count)
 
 #if !SKILLPOINTS
 
-attrib_type at_showskchange = {
-	"showskchange", NULL, NULL, NULL, NULL, NULL, ATF_UNIQUE
-};
-
 boolean
 learn_skill(unit * u, skill_t sk, double chance)
 {
@@ -967,22 +963,6 @@ learn_skill(unit * u, skill_t sk, double chance)
 	set_skill(u, sk, level, weeks, false);
 	return heads==0;
 }
-*/
-
-/*
-	if(load == false) {
-		for(a = a_find(u->attribs, &at_showskchange);a;a = a->nexttype) {
-			if(a->data.sa[0] == id) {
-				a->data.sa[1] = (short)(a->data.sa[1] + (level-oldlevel));
-				break;
-			}
-		}
-		if(a == NULL) {
-			a = a_add(&u->attribs, a_new(&at_showskchange));
-			a->data.sa[0] = id;
-			a->data.sa[1] = (short)(level-oldlevel);
-		}
-	}
 */
 
 skill * 

@@ -637,11 +637,115 @@ sp_dragonodem(fighter * fi, int level, int power, spell * sp)
 	scat(".");
 	battlerecord(b, buf);
 	return level;
+}
 
+int
+sp_drainodem(fighter * fi, int level, int power, spell * sp)
+{
+	battle *b = fi->side->battle;
+	troop dt;
+	troop at;
+	/* Immer aus der ersten Reihe nehmen */
+	int minrow = FIGHT_ROW;
+	int maxrow = BEHIND_ROW-1;
+	int force, enemies;
+	int drained = 0;
+	int killed = 0;
+	const char *damage;
+
+	sprintf(buf, "%s zaubert %s", unitname(fi->unit), sp->name);
+	/* 11-26 HP */
+	damage = spell_damage(4);
+	/* Jungdrache 3->54, Drache 6->216, Wyrm 12->864 Treffer */
+	force = lovar(get_force(level,6));
+
+	enemies = count_enemies(fi->side, FS_ENEMY, minrow,
+			maxrow);
+
+	if (!enemies) {
+		scat(", aber niemand war in Reichweite.");
+		battlerecord(b, buf);
+		return 0;
+	}
+	scat(":");
+	battlerecord(b, buf);
+
+	at.fighter = fi;
+	at.index = 0;
+
+	do {
+		dt = select_enemy(fi, minrow, maxrow);
+		assert(dt.fighter);
+		if (hits(at, dt, NULL)) {
+			drain_exp(dt.fighter->unit, 90);
+			drained++;
+		}
+		killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
+		--force;
+	} while (force && drained < enemies);
+
+	sprintf(buf, "%d Person%s wurde ihre Lebenskraft entzogen",
+		drained, drained == 1 ? " wurde" : "en wurden");
+
+	scat(".");
+	battlerecord(b, buf);
+	return level;
 }
 
 /* ------------------------------------------------------------- */
 /* PRECOMBAT */
+
+int
+sp_shadowcall(fighter * fi, int level, int power, spell * sp)
+{
+	battle *b = fi->side->battle;
+	region *r = b->region;
+	unit *mage = fi->unit;
+	attrib *a;
+	int force = get_force(power, 3)/2;
+	race *rc;
+	int num;
+	unit *u;
+
+	unused(sp);
+
+	switch(rand()%3) {
+	case 0:
+		rc  = new_race[RC_SHADOWBAT];
+		num = 5000+dice_rand("3d5000");
+		break;
+	case 1:
+		rc = new_race[RC_NIGHTMARE];
+		num = 500+dice_rand("3d500");
+		break;
+	case 2:
+		rc = new_race[RC_VAMPUNICORN];
+		num = 500+dice_rand("3d500");
+		break;
+	}
+	
+	u = createunit(r, mage->faction, force, rc);
+	u->status = ST_FIGHT;
+
+	set_string(&u->name, racename(mage->faction->locale, u, u->race));
+	set_level(u, SK_WEAPONLESS, power/2);
+	set_level(u, SK_AUSDAUER, power/2);
+	u->hp = u->number * unit_max_hp(u);
+
+	if (fval(mage, FL_PARTEITARNUNG))
+		fset(u, FL_PARTEITARNUNG);
+
+	a = a_new(&at_unitdissolve);
+	a->data.ca[0] = 0;
+	a->data.ca[1] = 100;
+	a_add(&u->attribs, a);
+
+	make_fighter(b, u, true);
+	sprintf(buf, "%s ruft %d %s zu Hilfe", unitname(mage), force,
+		racename(default_locale, u, u->race));
+	battlerecord(b, buf);
+	return level;
+}
 
 int
 sp_wolfhowl(fighter * fi, int level, int power, spell * sp)
@@ -656,7 +760,7 @@ sp_wolfhowl(fighter * fi, int level, int power, spell * sp)
 
 	u->status = ST_FIGHT;
 
-	set_string(&u->name, force == 1 ? "Wolf" : "Wölfe");
+	set_string(&u->name, racename(mage->faction->locale, u, u->race));
 	set_level(u, SK_WEAPONLESS, power/3);
 	set_level(u, SK_AUSDAUER, power/3);
 	u->hp = u->number * unit_max_hp(u);
@@ -671,7 +775,7 @@ sp_wolfhowl(fighter * fi, int level, int power, spell * sp)
 
 	make_fighter(b, u, true);
 	sprintf(buf, "%s ruft %d %s zu Hilfe", unitname(mage), force,
-			force == 1 ? "Wolf" : "Wölfe");
+		racename(default_locale, u, u->race));
 	battlerecord(b, buf);
 	return level;
 }
@@ -840,6 +944,10 @@ sp_flee(fighter * fi, int level, int power, spell * sp)
 		case SPL_SONG_OF_FEAR:
 			sprintf(buf, "%s stimmt einen düsteren Gesang an", unitname(mage));
 			force = get_force(power,3);
+			break;
+		case SPL_AURA_OF_FEAR:
+			sprintf(buf, "%s ist von dunklen Schatten umgeben", unitname(mage));
+			force = get_force(power,5);
 			break;
 		default:
 			force = get_force(power,10);

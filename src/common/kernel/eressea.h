@@ -685,7 +685,11 @@ enum {
 	RC_GNOME,        /* 60 */
 	RC_TEMPLATE,     /* 61 */
 	RC_CLONE,        /* 62 */
-
+	
+	RC_SHADOWDRAGON,
+	RC_SHADOWBAT,
+	RC_NIGHTMARE,
+	RC_VAMPUNICORN,
 
 	MAXRACES,
 	NORACE = (race_t) - 1

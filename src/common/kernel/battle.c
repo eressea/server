@@ -946,8 +946,8 @@ remove_troop(troop dt)
 /* ------------------------------------------------------------- */
 
 #if SKILLPOINTS
-static void
-drain_exp(unit *u, int n)
+void
+drain_exp(const struct unit *u, int n)
 {
 	skill_t sk = (skill_t)(rand() % MAXSKILLS);
 	skill_t ssk;
@@ -971,8 +971,8 @@ drain_exp(unit *u, int n)
 /** reduces the target's exp by an equivalent of n points learning
  * 30 points = 1 week
  */
-static void
-drain_exp(unit *u, int n)
+void
+drain_exp(const struct unit *u, int n)
 {
 	skill_t sk = (skill_t)(rand() % MAXSKILLS);
 	skill_t ssk;
@@ -1333,6 +1333,13 @@ select_enemy(fighter * af, int minrow, int maxrow)
 	troop dt = no_troop;
 	void ** si;
 	int enemies;
+
+	if(af->unit->race->flags & RCF_FLY) {
+		/* flying races ignore min- and maxrow and can attack anyone fighting
+		 * them */
+		minrow = FIGHT_ROW;
+		maxrow = BEHIND_ROW;
+	}
 
 	enemies = count_enemies(af->side, FS_ENEMY, minrow, maxrow);
 

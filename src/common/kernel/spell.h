@@ -197,6 +197,9 @@ enum {
 	SPL_BLOODSACRIFICE,
 	SPL_MALLORN,
 	SPL_CLONECOPY,
+	SPL_DRAINODEM,		/* 174? */
+	SPL_AURA_OF_FEAR,	/* 175? */
+	SPL_SHADOWCALL,		/* 176? */
 	MAXALLSPELLS,
 	NO_SPELL = (spellid_t) -1
 };
@@ -238,6 +241,7 @@ extern int sp_reduceshield(struct fighter * fi, int level, int power, struct spe
 extern int sp_armorshield(struct fighter * fi, int level, int power, struct spell * sp);
 extern int sp_stun(struct fighter * fi, int level, int power, struct spell * sp);
 extern int sp_undeadhero(struct fighter * fi, int level, int power, struct spell * sp);
+extern int sp_shadowcall(struct fighter * fi, int level, int power, struct spell * sp);
 
 /* ------------------------------------------------------------- */
 

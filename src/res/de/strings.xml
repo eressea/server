@@ -2909,6 +2909,74 @@
 			<text locale="en">ent</text>
 		</string>
 
+		<string name="shadowdragon">
+			<text locale="de">Schattendrache</text>
+			<text locale="en">shadow dragon</text>
+		</string>
+		<string name="shadowdragon_p">
+			<text locale="de">Schattendrachen</text>
+			<text locale="en">shadow dragons</text>
+		</string>
+		<string name="shadowdragon_d">
+			<text locale="de">Schattendrachen</text>
+			<text locale="en">shadow dragons</text>
+		</string>
+		<string name="shadowdragon_x">
+			<text locale="de">Schattendrachen</text>
+			<text locale="en">shadow dragon</text>
+		</string>
+		
+		<string name="shadowbat">
+			<text locale="de">Todesflatter</text>
+			<text locale="en">darkbat</text>
+		</string>
+		<string name="shadowbat_p">
+			<text locale="de">Todesflattern</text>
+			<text locale="en">darkbats</text>
+		</string>
+		<string name="shadowbat_d">
+			<text locale="de">Todesflattern</text>
+			<text locale="en">darkbats</text>
+		</string>
+		<string name="shadowbat_x">
+			<text locale="de">Todesflatter</text>
+			<text locale="en">darkbat</text>
+		</string>
+		
+		<string name="nightmare">
+			<text locale="de">Alptraum</text>
+			<text locale="en">nightmare</text>
+		</string>
+		<string name="nightmare_p">
+			<text locale="de">Alpträume</text>
+			<text locale="en">nightmares</text>
+		</string>
+		<string name="nightmare_d">
+			<text locale="de">Alpträumen</text>
+			<text locale="en">nightmares</text>
+		</string>
+		<string name="nightmare_x">
+			<text locale="de">Alptraum</text>
+			<text locale="en">nightmare</text>
+		</string>
+		
+		<string name="vampunicorn">
+			<text locale="de">Nachteinhorn</text>
+			<text locale="en">vampiric unicorn</text>
+		</string>
+		<string name="vampunicorn_p">
+			<text locale="de">Nachteinhörner</text>
+			<text locale="en">vampiric unicorns</text>
+		</string>
+		<string name="vampunicorn_d">
+			<text locale="de">Nachteinhörnern</text>
+			<text locale="en">vampiric unicorns</text>
+		</string>
+		<string name="vampunicorn_x">
+			<text locale="de">Nachteinhorn</text>
+			<text locale="en">vampiric unicorn</text>
+		</string>
+
 		<string name="wyrm">
 			<text locale="de">Wyrm</text>
 			<text locale="en">wyrm</text>

@@ -622,8 +622,9 @@ get_combatspelllevel(const unit *u, int nr)
 {
 	sc_mage *m;
 
+	assert(nr < MAXCOMBATSPELLS);
 	m = get_mage(u);
-	if (!m || !(nr < MAXCOMBATSPELLS)) {
+	if (!m) {
 		return -1;
 	}
 
@@ -638,12 +639,15 @@ get_combatspell(const unit *u, int nr)
 {
 	sc_mage *m;
 
+	assert(nr < MAXCOMBATSPELLS);
 	m = get_mage(u);
-	if (!m || !(nr < MAXCOMBATSPELLS)) {
-		return (spell *)NULL;
+	if (m) {
+		return find_spellbyid(m->combatspell[nr]);
+	} else if(u->race->precombatspell != NO_SPELL) {
+		return find_spellbyid(u->race->precombatspell);
 	}
 
-	return find_spellbyid(m->combatspell[nr]);
+	return NULL;
 }
 
 void

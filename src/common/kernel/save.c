@@ -1474,7 +1474,7 @@ readgame(boolean backup)
 					assert(weeks>0 && weeks<=lvl+1);
 					if (lvl) {
 						skill * sv = add_skill(u, sk);
-						sv->level = (unsigned char)lvl;
+						sv->level = sv->old = (unsigned char)lvl;
 						sv->weeks = (unsigned char)weeks;
 					}
 				}
@@ -1484,7 +1484,7 @@ readgame(boolean backup)
 					int weeks = ri(F);
 					if (level) {
 						skill * sv = add_skill(u, sk);
-						sv->level = (unsigned char)level;
+						sv->level = sv->old = (unsigned char)level;
 						sv->weeks = (unsigned char)weeks;
 					}
 				}

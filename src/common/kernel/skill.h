@@ -30,6 +30,7 @@ typedef struct skill {
 	unsigned char id;
 	unsigned char level;
 	unsigned char weeks;
+	unsigned char old;
 #endif
 } skill;
 

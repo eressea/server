@@ -10369,6 +10369,48 @@ spell spelldaten[] =
 			{0, 0, 0}},
 		(spell_f)sp_dragonodem, patzer
 	},
+	
+	{ SPL_DRAINODEM, "Schattenodem",
+		"Entzieht Talentstufen und macht Schaden wie Groﬂer Odem",
+		NULL,
+		NULL,
+		M_GRAU, (COMBATSPELL), 5, 12,
+		{
+			{R_AURA, 4, SPC_FIX},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0}},
+		(spell_f)sp_dragonodem, patzer
+	},
+	
+	{SPL_AURA_OF_FEAR, "Gesang der Furcht",
+		"Panik",
+		NULL,
+		NULL,
+		M_GRAU, (COMBATSPELL), 5, 12,
+		{
+			{R_AURA, 1, SPC_LEVEL},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0}},
+	 (spell_f)sp_flee, patzer
+	},
+	
+	{SPL_SHADOWCALL, "Schattenruf",
+		"Ruft Schattenwesen.",
+		NULL,
+		NULL,
+	 M_GRAU, (PRECOMBATSPELL), 5, 12,
+	 {
+		 {R_AURA, 2, SPC_LEVEL},
+		 {0, 0, 0},
+		 {0, 0, 0},
+		 {0, 0, 0},
+		 {0, 0, 0}},
+	 (spell_f)sp_shadowcall, patzer
+	},
 
 /* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein*/
 

@@ -1263,4 +1263,41 @@
 		<familiar race="wolf"></familiar>
 		<familiar race="demon"></familiar>
 	</race>
+	<race name="shadowdragon" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" maintenance="0" weight="1" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants fly walk noteach getitem canguard>
+		<ai splitsize="1" killpeasants attackrandom learn></ai>
+		<function name="name" value="namedragon"></function>
+		<function name="move" value="movedragon"></function>
+		<function name="itemdrop" value="dragondrops"></function>
+		<skill name="sk_tactics" modifier="20"></skill>
+		<skill name="sk_perception" modifier="20"></skill>
+		<attack type="4" damage="5d30"></attack>
+		<attack type="4" damage="3d20"></attack>
+		<attack type="4" damage="3d20"></attack>
+		<attack type="4" damage="5d30"></attack>
+		<attack type="6" spell="174"></attack>
+		<attack type="6" spell="175"></attack>
+		<precombatspell spell="176"></precombatspell>
+	</race>
+	<race name="shadowbat" magres="0.800000" maxaura="0.000000" regaura="0.000000" recruitcost="500" maintenance="0" weight="5" speed="1.000000" hp="1" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants fly walk noteach getitem>
+		<ai splitsize="5000" killpeasants></ai>
+		<attack type="4" damage="1d6"></attack>
+		<attack type="3" damage="1d1"></attack>
+	</race>
+	<race name="nightmare" magres="0.500000" maxaura="0.000000" regaura="0.000000" recruitcost="500" maintenance="0" weight="1" speed="1.000000" hp="80" ac="10" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants fly walk noteach getitem invinciblenonmagic>
+		<ai splitsize="500" killpeasants></ai>
+		<attack type="4" damage="1d4"></attack>
+		<attack type="4" damage="1d4"></attack>
+		<attack type="4" damage="1d4"></attack>
+		<attack type="3" damage="1d4"></attack>
+		<attack type="2" damage="1d10"></attack>
+	</race>
+	<race name="vampunicorn" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="500" maintenance="0" weight="5" speed="1.000000" hp="30" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants walk noteach getitem>
+		<ai splitsize="5000" killpeasants></ai>
+		<attack type="4" damage="2d10"></attack>
+		<attack type="3" damage="1d4"></attack>
+		<attack type="3" damage="1d4"></attack>
+		<attack type="3" damage="1d4"></attack>
+		<attack type="3" damage="1d4"></attack>
+		<attack type="2" damage="2d60"></attack>
+	</race>
 </races>

@@ -72,6 +72,7 @@ rc_new(const char * zName)
 	rc->_name[2] = strdup(zBuffer);
 	sprintf(zBuffer, "%s_x", zName);
 	rc->_name[3] = strdup(zBuffer);
+	rc->precombatspell = NO_SPELL;
 	return rc;
 }
 
@@ -169,7 +170,7 @@ static const char * oldracenames[MAXRACES] = {
 	"centaur",
 	"skeleton", "skeleton lord", "zombie", "juju-zombie", "ghoul", "ghast", "museumghost", "gnome",
 	"template",
-	"clone"
+	"clone", "shadowdragon", "shadowbat", "nightmare", "vampunicorn"
 };
 
 /* magres, {3 namen},
@@ -659,6 +660,7 @@ tagbegin(struct xml_stack * stack)
 			if (xml_bvalue(tag, "resistbash")) rc->battle_flags |= BF_RES_BASH;
 			if (xml_bvalue(tag, "resistcut")) rc->battle_flags |= BF_RES_CUT;
 			if (xml_bvalue(tag, "resistpierce")) rc->battle_flags |= BF_RES_PIERCE;
+			
 
 			state->race = rc;
 		} else if (strcmp(tag->name, "ai")==0) {
@@ -698,6 +700,9 @@ tagbegin(struct xml_stack * stack)
 			}
 			a->type = xml_ivalue(tag, "type");
 			a->flags = xml_ivalue(tag, "flags");
+		} else if (strcmp(tag->name, "precombatspell") == 0) {
+			race * rc = state->race;
+			rc->precombatspell = xml_ivalue(tag, "spell");
 		} else if (strcmp(tag->name, "function")==0) {
 			race * rc = state->race;
 			const char * name = xml_value(tag, "name");
