@@ -18,6 +18,7 @@ LUASERVER_SOURCES =
  <lua>faction.cpp
  <lua>region.cpp
  <lua>ship.cpp
+ <lua>spell.cpp
  <lua>unit.cpp
  server.cpp
  korrektur.c
