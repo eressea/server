@@ -857,6 +857,7 @@ readgame(boolean backup)
 				w->next = pl->watchers;
 				pl->watchers = w;
 				ur_add((void*)fno, (void**)&w->faction, resolve_faction);
+				rs(F, buf);
 			}
 		}
 		a_read(F, &pl->attribs);
