@@ -175,8 +175,7 @@ attack_firesword(const troop * at, int *casualties, int row)
 	int force  = 1+rand()%10;
 
 	if (row==FIGHT_ROW) {
-		enemies = count_enemies(fi->side->battle, fi->side, FS_ENEMY,
-			minrow, maxrow);
+		enemies = count_enemies(fi->side->battle, fi->side, minrow, maxrow);
 	}
 	if (!enemies) {
 		if (casualties) *casualties = 0;
@@ -243,7 +242,7 @@ attack_catapult(const troop * at, int * casualties, int row)
 	minrow = FIGHT_ROW;
 	maxrow = FIGHT_ROW;
 
-	n = min(CATAPULT_ATTACKS, count_enemies(b, af->side, FS_ENEMY, minrow, maxrow));
+	n = min(CATAPULT_ATTACKS, count_enemies(b, af->side, minrow, maxrow));
 
 #if CATAPULT_AMMUNITION
 	new_use_pooled(au, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1);

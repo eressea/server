@@ -502,74 +502,74 @@ hpflee(int status)
 }
 
 int
-get_unitrow(fighter * af)
+get_unitrow(const fighter * af)
 {
-	static boolean * counted = NULL;
-	static size_t csize = 0;
+  static boolean * counted = NULL;
+  static size_t csize = 0;
 
-	battle * b = af->side->battle;
-	void **si;
-	int enemyfront = 0;
-	int line, result;
-	int retreat = 0;
-	int size[NUMROWS];
-	int row = statusrow(af->status);
-	int front = 0;
-	size_t bsize;
-
-#ifdef FAST_GETUNITROW
-	if (!b->nonblockers && b->alive==af->row.alive) {
-		return af->row.cached;
-	}
-#endif
-	bsize = cv_size(&b->sides);
-
-	if (csize<bsize) {
-		if (counted) free(counted);
-		csize=bsize;
-		counted = calloc(sizeof(boolean), bsize);
-	}
-	else memset(counted, 0, bsize*sizeof(boolean));
-	memset(size, 0, sizeof(size));
-	for (line=FIRST_ROW;line!=NUMROWS;++line) {
-		/* how many enemies are there in the first row? */
-		for (si = b->sides.begin; si != b->sides.end; ++si) {
-			side *s = *si;
-			if (s->size[line] && enemy(s, af->side))
-			{
-				void ** sf;
-				enemyfront += s->size[line]; /* - s->nonblockers[line] (nicht, weil angreifer) */
-				for (sf = b->sides.begin; sf != b->sides.end; ++sf) {
-					side * ally = *sf;
-					if (!counted[ally->index] && enemy(s, ally) && !enemy(ally, af->side))
-					{
-						int i;
-						counted[ally->index] = true;
-						for (i=0;i!=NUMROWS;++i) size[i] += ally->size[i] - ally->nonblockers[i];
-					}
-				}
-			}
-		}
-		if (enemyfront) break;
-	}
-	if (enemyfront) {
-		for (line=FIRST_ROW;line!=NUMROWS;++line) {
-			front += size[line];
-			if (!front || front<enemyfront/10) ++retreat;
-			else if (front) break;
-		}
-	}
-
-	/* every entry in the size[] array means someone trying to defend us.
-	 * 'retreat' is the number of rows falling.
-	 */
-	result = max(FIRST_ROW, row - retreat);
+  battle * b = af->side->battle;
+  void **si;
+  int enemyfront = 0;
+  int line, result;
+  int retreat = 0;
+  int size[NUMROWS];
+  int row = statusrow(af->status);
+  int front = 0;
+  size_t bsize;
 
 #ifdef FAST_GETUNITROW
-	af->row.alive = b->alive;
-	af->row.cached = result;
+  if (!b->nonblockers && b->alive==af->row.alive) {
+    return af->row.cached;
+  }
 #endif
-	return result;
+  bsize = cv_size(&b->sides);
+
+  if (csize<bsize) {
+    if (counted) free(counted);
+    csize=bsize;
+    counted = calloc(sizeof(boolean), bsize);
+  }
+  else memset(counted, 0, bsize*sizeof(boolean));
+  memset(size, 0, sizeof(size));
+  for (line=FIRST_ROW;line!=NUMROWS;++line) {
+    /* how many enemies are there in the first row? */
+    for (si = b->sides.begin; si != b->sides.end; ++si) {
+      side *s = *si;
+      if (s->size[line] && enemy(s, af->side))
+      {
+        void ** sf;
+        enemyfront += s->size[line]; /* - s->nonblockers[line] (nicht, weil angreifer) */
+        for (sf = b->sides.begin; sf != b->sides.end; ++sf) {
+          side * ally = *sf;
+          if (!counted[ally->index] && enemy(s, ally) && !enemy(ally, af->side))
+          {
+            int i;
+            counted[ally->index] = true;
+            for (i=0;i!=NUMROWS;++i) size[i] += ally->size[i] - ally->nonblockers[i];
+          }
+        }
+      }
+    }
+    if (enemyfront) break;
+  }
+  if (enemyfront) {
+    for (line=FIRST_ROW;line!=NUMROWS;++line) {
+      front += size[line];
+      if (!front || front<enemyfront/10) ++retreat;
+      else if (front) break;
+    }
+  }
+
+  /* every entry in the size[] array means someone trying to defend us.
+  * 'retreat' is the number of rows falling.
+  */
+  result = max(FIRST_ROW, row - retreat);
+
+#ifdef FAST_GETUNITROW
+  af->row.alive = b->alive;
+  af->row.cached = result;
+#endif
+  return result;
 }
 
 static int
@@ -1297,80 +1297,84 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	return true;
 }
 
-/* ------------------------------------------------------------- */
-int
-count_enemies(battle * b, side * as, int mask, int minrow, int maxrow)
-/* new implementation of count_enemies ignores mask, since it was never used */
+static int
+count_side(const side * s, int minrow, int maxrow)
 {
-	int i = 0;
-	void **si;
+  void **fi;
+  int people = 0;
 
-	if (maxrow<FIRST_ROW) return 0;
+  for (fi = s->fighters.begin; fi != s->fighters.end; ++fi) {
+    const fighter *fig = *fi;
+    int row;
 
-	for (si = b->sides.begin; si != b->sides.end; ++si) {
-		side *side = *si;
-		if (as==NULL || enemy(side, as))
-		{
-			void **fi;
+    if (fig->alive - fig->removed <= 0) continue;
+    row = get_unitrow(fig);
 
-			for (fi = side->fighters.begin; fi != side->fighters.end; ++fi) {
-				fighter *fig = *fi;
-				int row;
-
-				if (fig->alive - fig->removed <= 0)
-					continue;
-				else
-					row = get_unitrow(fig);
-
-				if (row >= minrow && row <= maxrow)
-					i += fig->alive - fig->removed;
-			}
-		}
-	}
-	return i;
+    if (row >= minrow && row <= maxrow) {
+      people += fig->alive - fig->removed;
+    }
+  }
+  return people;
 }
 
-/* ------------------------------------------------------------- */
+/* new implementation of count_enemies ignores mask, since it was never used */
+int
+count_enemies(battle * b, side * as, int minrow, int maxrow)
+{
+  int i = 0;
+  void **si;
+
+  if (maxrow<FIRST_ROW) return 0;
+
+  for (si = b->sides.begin; si != b->sides.end; ++si) {
+    side *side = *si;
+    if (as==NULL || enemy(side, as)) {
+      i += count_side(side, minrow, maxrow);
+    }
+  }
+  return i;
+}
+
 troop
 select_enemy(battle * b, fighter * af, int minrow, int maxrow)
 {
-	side *as = af?af->side:NULL;
-	troop dt = no_troop;
-	void ** si;
-	int enemies;
+  side *as = af?af->side:NULL;
+  troop dt = no_troop;
+  void ** si;
+  int enemies;
 
-	if (af && af->unit->race->flags & RCF_FLY) {
-		/* flying races ignore min- and maxrow and can attack anyone fighting
-		 * them */
-		minrow = FIGHT_ROW;
-		maxrow = BEHIND_ROW;
-	}
-	minrow = max(minrow, FIGHT_ROW);
+  if (af && af->unit->race->flags & RCF_FLY) {
+    /* flying races ignore min- and maxrow and can attack anyone fighting
+    * them */
+    minrow = FIGHT_ROW;
+    maxrow = BEHIND_ROW;
+  }
+  minrow = max(minrow, FIGHT_ROW);
 
-	enemies = count_enemies(b, as, FS_ENEMY, minrow, maxrow);
+  enemies = count_enemies(b, as, minrow, maxrow);
 
-	if (!enemies)
-		return dt;				/* Niemand ist in der angegebenen Entfernung */
-	enemies = rand() % enemies;
-	for (si=b->sides.begin;!dt.fighter && si!=b->sides.end;++si) {
-		side *ds = *si;
-		void ** fi;
-		if (as!=NULL && !enemy(as, ds)) continue;
-		for (fi=ds->fighters.begin;fi!=ds->fighters.end;++fi) {
-			fighter * df = *fi;
-			int dr = get_unitrow(df);
-			if (dr < minrow || dr > maxrow) continue;
-			if (df->alive - df->removed > enemies) {
-				dt.index = enemies;
-				dt.fighter = df;
-				enemies = 0;
-				break;
-			}
-			else enemies -= (df->alive - df->removed);
-		}
-	}
-	assert(!enemies);
-	return dt;
+  if (!enemies)
+    return dt;				/* Niemand ist in der angegebenen Entfernung */
+  enemies = rand() % enemies;
+  for (si=b->sides.begin;!dt.fighter && si!=b->sides.end;++si) {
+    side *ds = *si;
+    void ** fi;
+    if (as!=NULL && !enemy(as, ds)) continue;
+    for (fi=ds->fighters.begin;fi!=ds->fighters.end;++fi) {
+      fighter * df = *fi;
+      int dr = get_unitrow(df);
+      if (dr < minrow || dr > maxrow) continue;
+      if (df->alive - df->removed > enemies) {
+        dt.index = enemies;
+        dt.fighter = df;
+        enemies = 0;
+        break;
+      }
+      else enemies -= (df->alive - df->removed);
+    }
+  }
+  assert(!enemies);
+  return dt;
 }
 
 /*
@@ -2115,7 +2119,7 @@ do_attack(fighter * af)
 	while (ta.index--) {
 		/* Wir suchen eine beliebige Feind-Einheit aus. An der können
 		 * wir feststellen, ob noch jemand da ist. */
-		int enemies = count_enemies(b, af->side, FS_ENEMY, FIGHT_ROW, LAST_ROW);
+		int enemies = count_enemies(b, af->side, FIGHT_ROW, LAST_ROW);
 		if (!enemies) break;
 
 		for (apr=attacks_per_round(ta); apr > 0; apr--) {
