@@ -183,7 +183,7 @@ const char *keywords[MAXKEYWORDS] =
 	"KÄMPFEN",
 	"KAMPFZAUBER",
 	"KAUFEN",
-	"KONTAKTIERE",
+	"KONTAKTIEREN",
 	"LEHREN",
 	"LERNEN",
 	"LIEFERE",
