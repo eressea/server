@@ -2820,7 +2820,7 @@ random_region(void)
 
 	/* count the available regions */
 	for(r=regions; r; r=r->next) {
-		if(rplane(r) == NULL) c++;
+		if(rplane(r) == NULL && landregion(r)) c++;
 	}
 
 	/* choose one */
@@ -2828,7 +2828,9 @@ random_region(void)
 
 	/* this is a bit obfuscated, but should be correct */
 	for(r=regions; c > 0; r=r->next) {
-		--c;
+		if(rplane(r) == NULL && landregion(r)) {
+			--c;
+		}
 	}
 
 	return(r);
@@ -2854,7 +2856,7 @@ check_phoenix(void)
 	}
 
 	/* it is not, so we create it */
-	r = random_region();
+	r = random_land_region();
 	phoenix = createunit(r, findfaction(MONSTER_FACTION), 1, phoenix_race);
 
 	/* generate an appropriate region message */

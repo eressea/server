@@ -643,9 +643,9 @@ modify_block(void)
 	int mal = 0;
 	struct rawmaterial *res;
 
-	win = openwin(70, 4, "< Tag-Regionen modifizieren >");
+	win = openwin(90, 4, "< Tag-Regionen modifizieren >");
 	wmove(win, 1, 2);
-	wAddstr("Name, Peasants, Horses, Silver, Chaos, noResources, Mallorn (n/p/h/s/c/r/m,q)?");
+	wAddstr("Empty, Name, Peasants, Horses, Silver, Chaos, noResources, Mallorn (e/n/p/h/s/c/r/m,q)?");
 	wrefresh(win);
 	c = getch();
 	if (c == 'q') {
@@ -686,6 +686,29 @@ modify_block(void)
 		r=t->r;
 		if (production(r)) {
 			switch (c) {
+				case 'e':
+					rsetpeasants(r, 0);
+					rsetmoney(r, 0);
+					rsethorses(r, 0);
+					rsettrees(r,2,0);
+					rsettrees(r,1,0);
+					rsettrees(r,0,0);
+
+					for (res=r->resources;res;res=res->next) {
+						const item_type * itype = resource2item(res->type->rtype);
+						if(itype == olditemtype[I_IRON]) {
+							res->amount = -1;
+							res->level = -1;
+						} else if(itype == olditemtype[I_LAEN]) {
+							res->amount = -1;
+							res->level = -1;
+						} else if(itype == olditemtype[I_STONE]) {
+							res->amount = -1;
+							res->level = -1;
+						}
+					}
+					freset(r, RF_MALLORN);
+					break;
 				case 'n':
 					rsetname(r, name);
 					break;
