@@ -23,8 +23,8 @@ def Display(Content, Title=DefaultTitle):
     TemplateInput = TemplateHandle.read()
     TemplateHandle.close()                    # close the file
 
-    for key in Form.keys():
-       Content=Content+"<br>"+str(key)+"="+str(Form[key])
+#    for key in Form.keys():
+#       Content=Content+"<br>"+str(key)+"="+str(Form[key])
 
     # this defines an exception string in case our
     # template file is messed up
