@@ -2761,6 +2761,46 @@ xe_init(void)
 	return 0;
 }
 
+extern border *borders[];
+
+static void
+fix_road_borders(void)
+{
+	border *delete[10000];
+	int hash;
+	int i = 0;
+
+	for(hash=0; hash<BMAXHASH; hash++) {
+		border * b;
+    for (b=borders[hash];b;b=b->next) {
+			if(b->type == &bt_road) {
+				int x1, x2, y1, y2;
+				region *r1, *r2;
+
+				x1 = b->from->x;
+				y1 = b->from->y;
+				x2 = b->to->x;
+				y2 = b->to->y;
+
+				r1 = findregion(x1, y1);
+				r2 = findregion(x2, y2);
+
+				if(r1->land == NULL || r2->land == NULL
+						|| terrain[r1->terrain].roadreq == 0
+						|| terrain[r2->terrain].roadreq == 0) {
+					delete[i] = b;
+					i++;
+				}
+			}
+		}
+	}
+
+	while(i>0) {
+		i--;
+		erase_border(delete[i]);
+	}
+}
+
 void
 korrektur(void)
 {
@@ -2814,6 +2854,7 @@ korrektur(void)
 	do_once("qpoi", questportal_init());
 	do_once("xini", xe_init());
 	warn_password();
+	fix_road_borders();
 
 	/* seems something fishy is going on, do this just 
 	 * to be on the safe side: 
