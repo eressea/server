@@ -926,7 +926,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 				const herb_type * htype = resource2herb((*itmp)->type->rtype);
 				if (htype && (*itmp)->number>0) {
 					n = 1;
-					if (give_item((*itmp)->number, (*itmp)->type, u, u2, S->s)==0) continue;
+					if (give_item((*itmp)->number, (*itmp)->type, u, u2, S->s)!=0) break;
 				}
 				itmp = &(*itmp)->next;
 			}
@@ -974,7 +974,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 					if ((*itmp)->number > 0 
 							&& (*itmp)->number - new_get_resvalue(u, (*itmp)->type->rtype) > 0) {
 						n = (*itmp)->number - new_get_resvalue(u, (*itmp)->type->rtype);
-						if (give_item(n, (*itmp)->type, u, u2, S->s)==0) continue;
+						if (give_item(n, (*itmp)->type, u, u2, S->s)!=0) break;
 					}
 					itmp = &(*itmp)->next;
 				}
