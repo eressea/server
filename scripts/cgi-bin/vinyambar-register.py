@@ -122,9 +122,11 @@ else:
 	custid=cursor.fetchone()[0]
 	if os.environ.has_key('REMOTE_ADDR'):
 	    ip=os.environ['REMOTE_ADDR']
+	if ip!=None:
 	    cursor.execute("REPLACE userips (ip, user) VALUES ('"+ip+"', "+str(int(custid))+")")
 	cursor.execute("select count(*) from users where status='WAITING' or status='CONFIRMED'")
 	waiting=cursor.fetchone()[0]
 	Send(email, custid, firstname, password, waiting)
-	Display("<p>Deine Anmeldung wurde bearbeitet. Eine EMail mit Hinweisen ist unterwegs zu Dir.")
+	text={"de":"Deine Anmeldung wurde bearbeitet. Eine EMail mit Hinweisen ist unterwegs zu Dir", "en":"Your application was processed. An email containing further instructions is being sent to you"}
+	Display("<p>"+text[locale]+".")
     db.close()
