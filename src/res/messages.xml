@@ -5966,7 +5966,7 @@
     <text locale="en">"$unit($unit) in $region($region) creates a sculpture."</text>
   </message>
 
-  <message name="spellfail_distance" section="error">
+  <message name="spellfail_distance" section="errors">
     <type>
       <arg name="command" type="order"/>
       <arg name="region" type="region"/>
@@ -5977,7 +5977,7 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($target) is too far away."</text>
   </message>
 
-  <message name="spellfail_block" section="error">
+  <message name="spellfail_block" section="errors">
     <type>
       <arg name="command" type="order"/>
       <arg name="region" type="region"/>
