@@ -3083,7 +3083,7 @@ magic(void)
 				{ /* einige oder alle Ziele waren magieresistent */
 					spellparameter *pa = co->par;
 					int n;
-					for (n = 0; n < pa->length; n++) {
+					for (n=0; n!=pa->length;++n) {
 						if(pa->param[n]->flag != TARGET_RESISTS
 								&& pa->param[n]->flag != TARGET_NOTFOUND)
 						{ /* mindestens ein erfolgreicher Zauberversuch, wir machen
@@ -3091,15 +3091,18 @@ magic(void)
 							break;
 						}
 					}
-					/* zwar wurde mindestens ein Ziel gefunden, das widerstand
-					 * jedoch dem Zauber. Kosten abziehen und abbrechen. */
-					pay_spell(u, sp, level, co->distance);
-					countspells(u,1);
-					sprintf(buf, "%s gelingt es %s zu zaubern, doch der Spruch zeigt "
-							"keine Wirkung.", unitname(u), 
-							spell_name(sp, u->faction->locale));
-					addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
-					continue; /* äußere Schleife, nächster Zauberer */
+          if (n==pa->length) {
+            /* zwar wurde mindestens ein Ziel gefunden, das widerstand
+            * jedoch dem Zauber. Kosten abziehen und abbrechen. */
+            pay_spell(u, sp, level, co->distance);
+            countspells(u, 1);
+            sprintf(buf, "%s gelingt es %s zu zaubern, doch der Spruch zeigt "
+              "keine Wirkung.", unitname(u), 
+              spell_name(sp, u->faction->locale));
+            addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
+            continue; /* äußere Schleife, nächster Zauberer */
+          }
+          break;
 				}
 				case 2:
 				default:
@@ -3113,7 +3116,7 @@ magic(void)
 				/* zuerst bezahlen, dann evt in do_fumble alle Aura verlieren */
 				pay_spell(u, sp, level, co->distance);
 				do_fumble(co);
-				countspells(u,1);
+				countspells(u, 1);
 				continue;
 			}
 			success = ((nspell_f)sp->sp_function)(co);
