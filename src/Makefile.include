@@ -13,8 +13,8 @@ ARFLAGS = cr
 CTAGS      = ctags
 CTAGSFLAGS = --langmap=c:.c.h
 
-CC      = gcc
-CFLAGS  = -I$(ERESSEA) -Wall -Wwrite-strings -Wstrict-prototypes \
+CC      ?= @gcc
+CFLAGS  ?= -I$(ERESSEA) -Wall -Wwrite-strings -Wstrict-prototypes \
            -Wpointer-arith -Werror-implicit-function-declaration \
 	   -Wno-char-subscripts \
        	   -march=pentiumpro -fPIC $(INCLUDES)
@@ -58,7 +58,8 @@ endif
 
 ifeq ($(CONFIG), release)
   BUILD_DIR  = Release-$(ARCHITECTURE)
-  CFLAGS    += -O4 -funroll-loops -fomit-frame-pointer
+  CFLAGS    += -O4 -s -funroll-loops -fomit-frame-pointer
+  LDFLAGS   += -s
 endif
 
 ifeq ($(CONFIG), profile)
@@ -80,6 +81,7 @@ depend::
 	@echo "Creating dependencies in `pwd`/.depend";
 	$(DEPEND) $(CFLAGS) $(DEFINES) $(INCDIRS) $(SOURCES) >| .depend
 endif
+
 
 #
 ## Tags
@@ -135,7 +137,7 @@ $(BUILD_DIR) $(PUBLISH_DIR):
 $(BUILD_DIR)/%:: $(BUILD_DIR)
 $(BUILD_DIR)/%.o:: %.c
 	@echo "Compiling $@"
-	@$(CC) -o $@ -c $< $(CFLAGS)
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 ##
 ## conversion code for old triggers - should only be used for free eressea,

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.h,v 1.3 2001/01/28 08:01:51 enno Exp $
+ *	$Id: eressea.h,v 1.4 2001/01/30 16:14:16 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -932,6 +932,7 @@ int geti(void);
 keyword_t igetkeyword(const char *s);
 keyword_t getkeyword(void);
 keyword_t findkeyword(const char *s);
+char *igetstrtoken(const char *s);
 
 #define BASE36_VERSION 93
 extern int atoi36(const char * s);
