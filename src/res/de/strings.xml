@@ -3569,6 +3569,10 @@
 			<text locale="de">Hohes Lied der Gaukelei</text>
 			<text locale="en">Song of Genrosity</text>
 		</string>
+		<string name="itemcloak">
+			<text locale="de">Schleieraura</text>
+			<text locale="en">Veil</text>
+		</string>
 		<string name="gwyrrdearnsilver">
 			<text locale="de">Viehheilung</text>
 			<text locale="en">Cattle Healing</text>
