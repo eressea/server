@@ -19,11 +19,13 @@
 
 /* kernel includes */
 #include <faction.h>
+#include <item.h>
 #include <plane.h>
 #include <race.h>
 #include <region.h>
 #include <reports.h>
 #include <study.h>
+#include <skill.h>
 #include <unit.h>
 
 /* util includes */
@@ -281,6 +283,38 @@ SeedPartei(void)
 		delwin(win);
 	} while(!playerrace(new_race[i]));
 	return goodregion(rc);
+}
+
+static int
+level(int days)
+{
+	int l = 0;
+	while (level_days(l)<=days) ++l;
+	return l-1;
+}
+
+static void
+give_latestart_bonus(region *r, unit *u, int b)
+{
+	int bsk = skill_level(level(b*30));
+	change_skill(u, SK_OBSERVATION, bsk*u->number);
+	change_money(u, 200*b);
+
+	{
+		unit *u2 = createunit(r, u->faction, 1, u->race);
+		change_skill(u2, SK_TACTICS, bsk * u2->number / 2);
+		u2->irace = u->irace;
+		fset(u2, FL_PARTEITARNUNG);
+	}
+
+	{
+		unit *u2 = createunit(r, u->faction, 2*b, u->race);
+		change_skill(u2, SK_SPEAR, skill_level(3) * u2->number);
+		change_skill(u2, SK_TAXING, skill_level(3) * u2->number);
+		change_item(u2, I_SPEAR, u2->number);
+		u2->irace = u->irace;
+		fset(u2, FL_PARTEITARNUNG);
+	}
 }
 
 void
