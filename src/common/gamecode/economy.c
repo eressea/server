@@ -1608,12 +1608,13 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 		const struct building_type * btype = b?b->type:NULL;
 		if (btype==bt_find("mine"))
 			al->save *= 0.5;
-		if (u->race == new_race[RC_DWARF])
+		if (u->race == new_race[RC_DWARF]) {
 #if RACE_ADJUSTMENTS
 			al->save *= 0.75;
 #else
-		al->save *= 0.5;
+			al->save *= 0.5;
 #endif
+		}
 	} else if (itype==olditemtype[I_STONE]) {
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
@@ -1692,54 +1693,64 @@ leveled_allocation(const allocator * self, region * r, allocation * alist)
 	int need;
 	boolean first = true;
 
-	if (rm!=NULL) do {
-		int avail = rm->amount;
-		int norders = 0;
-		allocation * al;
+	if (rm!=NULL) {
+		do {
+			int avail = rm->amount;
+			int norders = 0;
+			allocation * al;
 
-		assert (avail>0);
+			if(avail <= 0) {
+				for (al=alist;al;al=al->next) {
+					al->get = 0;
+				}
+				break;
+			}
 
-		for (al=alist;al;al=al->next) if (!fval(al, AFL_DONE)) {
-			int req = required(al->want-al->get, al->save);
-			assert(al->get<=al->want && al->get >= 0);
-			if (eff_skill(al->unit, itype->construction->skill, r) >= rm->level+itype->construction->minskill-1) {
-				if (req) {
-					norders += req;
+			assert(avail>0);
+
+			for (al=alist;al;al=al->next) if (!fval(al, AFL_DONE)) {
+				int req = required(al->want-al->get, al->save);
+				assert(al->get<=al->want && al->get >= 0);
+				if (eff_skill(al->unit, itype->construction->skill, r)
+						>= rm->level+itype->construction->minskill-1) {
+					if (req) {
+						norders += req;
+					} else {
+						fset(al, AFL_DONE);
+					}
 				} else {
 					fset(al, AFL_DONE);
+					if (first) fset(al, AFL_LOWSKILL);
 				}
-			} else {
-				fset(al, AFL_DONE);
-				if (first) fset(al, AFL_LOWSKILL);
 			}
-		}
-		need = norders;
+			need = norders;
 
-		avail = min(avail, norders);
-		if (need>0) {
-			int use = 0;
-			for (al=alist;al;al=al->next) if (!fval(al, AFL_DONE)) {
-				if (avail > 0) {
-					int want = required(al->want-al->get, al->save);
-					int x = avail*want/norders;
-					/* Wenn Rest, dann würfeln, ob ich was bekomme: */
-					if (rand() % norders < (avail*want) % norders)
-						++x;
-					avail -= x;
-					use += x;
-					norders -= want;
-					need -= x;
-					al->get = min(al->want, al->get+(int)(x/al->save));
+			avail = min(avail, norders);
+			if (need>0) {
+				int use = 0;
+				for (al=alist;al;al=al->next) if (!fval(al, AFL_DONE)) {
+					if (avail > 0) {
+						int want = required(al->want-al->get, al->save);
+						int x = avail*want/norders;
+						/* Wenn Rest, dann würfeln, ob ich was bekomme: */
+						if (rand() % norders < (avail*want) % norders)
+							++x;
+						avail -= x;
+						use += x;
+						norders -= want;
+						need -= x;
+						al->get = min(al->want, al->get+(int)(x/al->save));
+					}
 				}
+				if (use) {
+					assert(use<=rm->amount);
+					rm->type->use(rm, r, use);
+				}
+				assert(avail==0 || norders==0);
 			}
-			if (use) {
-				assert(use<=rm->amount);
-				rm->type->use(rm, r, use);
-			}
-			assert(avail==0 || norders==0);
-		}
-		first = false;
-	} while (need>0);
+			first = false;
+		} while (need>0);
+	}
 }
 #endif
 
