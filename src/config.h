@@ -68,10 +68,6 @@
  ** Architecture Dependent **
  ****                    ****/
 
-#if _MSC_VER
-# define STRNCPY_HAS_ZEROTERMINATION
-#endif
-
 /* für solaris: */
 #ifdef SOLARIS
 # define _SYS_PROCSET_H
@@ -241,9 +237,6 @@ extern char * strdup(const char *s);
 # define true ((boolean)!false)
 #endif
 
-#ifdef STRNCPY_HAS_ZEROTERMINATION
-# define strnzcpy(dst, src, len)  strncpy(dst, src, len) 
-#else
-# define strnzcpy(dst, src, len) (strncpy(dst, src, len), len?dst[len]=0:0, dst)
+#define strnzcpy(dst, src, len) (strncpy(dst, src, len), len?dst[len]=0:0, dst)
 #endif
-#endif
+
