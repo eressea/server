@@ -40,6 +40,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __USE_POSIX
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
+
 const char * orderfile = NULL;
 
 void
@@ -158,14 +164,15 @@ give_latestart_bonus(region *r, unit *u, int b)
 dropout * dropouts = NULL;
 
 void
-read_orders(const char * filename)
+read_orders_file(const char * filename)
 {
 	faction * f = NULL;
-	FILE * F = fopen(filename, "r");
 	char * b;
 	char buffer[16];
+	FILE * F = fopen(filename, "r");
 
 	if (F==NULL) return;
+	
 	b = getbuf(F);
 
 	while (b) {
@@ -184,6 +191,35 @@ read_orders(const char * filename)
 		b = getbuf(F);
 	}
 	fclose(F);
+}
+
+void
+read_orders(const char * filename)
+{
+	faction *f;
+
+#ifdef __USE_POSIX	/* if filename points to a directory, read
+											 all files it contains. */
+	struct stat statbuf;
+
+	if(stat(filename, &statbuf)) {
+		if(S_ISDIR(statbuf.st_mode)) {
+			DIR *dir = opendir(filename);
+			struct dirent *d_ent;
+
+			if(dir==NULL) return;
+			while((d_ent = readdir(dir)) != NULL) {
+				read_orders_file(d_ent->d_name);
+			}
+			closedir(dir);
+		} else {
+			read_orders_file(filename);
+		}
+	}
+#else /* we do not have this functionality */
+	read_orders_file(filename);
+#endif
+	
 	for (f=factions;f;f=f->next) {
 		if (!fval(f, FL_MARK) && f->age <=1) {
 			ursprung * ur = f->ursprung;
