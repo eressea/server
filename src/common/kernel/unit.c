@@ -671,7 +671,8 @@ move_unit(unit * u, region * r, unit ** ulist)
 	u->faction->first = 0;
 	u->faction->last = 0;
 	u->region = r;
-	if (maxhp>0) u->hp = u->hp * unit_max_hp(u) / maxhp;
+	/* keine automatische hp reduzierung bei bewegung */
+	/* if (maxhp>0) u->hp = u->hp * unit_max_hp(u) / maxhp; */
 }
 
 /* ist mist, aber wegen nicht skalierender attirbute notwendig: */

@@ -3197,27 +3197,28 @@ monthly_healing(void)
 		for (u = r->units; u; u = u->next) {
 			int umhp;
 
-			/* dann wirkt bei Untoten das Elixier der Macht ewig */
+			umhp = unit_max_hp(u) * u->number;
+
+			/* hp über Maximum bauen sich ab. Wird zb durch Elixier der Macht
+			 * oder verändertes Ausdauertalent verursacht */
+			if (u->hp > umhp) {
+				u->hp -= (int) ceil((u->hp - umhp) / 2.0);
+				if (u->hp < umhp)
+					u->hp = umhp;
+			}
+
 			if((u->race->flags & RCF_NOHEAL) || fval(u, FL_HUNGER) || fspecial(u->faction, FS_UNDEAD))
 				continue;
 
 			if(rterrain(r) == T_OCEAN && !u->ship && !(canswim(u)))
 				continue;
 
-			umhp = unit_max_hp(u) * u->number;
-
 			if(fspecial(u->faction, FS_REGENERATION)) {
 					u->hp = umhp;
 					continue;
 			}
 
-			/* Effekt von Elixier der Macht schwindet */
-			if (u->hp > umhp) {
-				u->hp -= (int) ceil((u->hp - umhp) / 2.0);
-				if (u->hp < umhp)
-					u->hp = umhp;
-			}
-			else if (u->hp < umhp && (p=canheal(u)) > 0) {
+			if (u->hp < umhp && (p=canheal(u)) > 0) {
 				/* Mind 1 HP wird pro Runde geheilt, weil angenommen wird,
 				   das alle Personen mind. 10 HP haben. */
 				int max_unit = max(umhp, u->number * 10);
