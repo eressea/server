@@ -116,7 +116,7 @@ curse_emptiness(void)
 	while (r!=NULL) {
 		if (r->land && r->age>120 && !get_curse(r->attribs, ct)) {
 			unit * u = r->units;
-			while (u && u->faction->no!=MONSTER_FACTION) u=u->next;
+			while (u && u->faction->no==MONSTER_FACTION) u=u->next;
 			if (u==NULL) {
 				curse * c = create_curse(NULL, &r->attribs, ct,
 					100, 100, 0, 0);
