@@ -1947,20 +1947,24 @@ update_intervals(void)
     for (u = r->units; u; u = u->next) {
       faction * f = u->faction;
       if (f->first==NULL) f->first = r;
+      f->last = r->next;
     }
 
     for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
       faction * f = ((unit*)ru->data.v)->faction;
       if (f->first==NULL) f->first = r;
+      f->last = r->next;
     }
 
     ulist = get_lighthouses(r);
     for (uptr=ulist;uptr!=NULL;uptr=uptr->next) {
       /* check lighthouse warden's faction */
       unit * u = uptr->data;
-      if (u->faction->first==NULL) {
-        u->faction->first = r;
+      faction * f = u->faction;
+      if (f->first==NULL) {
+        f->first = r;
       }
+      f->last = r->next;
     }
     unitlist_clear(&ulist);
 
@@ -1969,6 +1973,7 @@ update_intervals(void)
       while (w) {
         faction * f = w->faction;
         if (f->first==NULL) f->first = r;
+        f->last = r->next;
         w = w->next;
       }
     }

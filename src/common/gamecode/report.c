@@ -2913,6 +2913,8 @@ reports(void)
 
 	report_donations();
 	remove_empty_units();
+  log_printf("Updating region intervals\n");
+  update_intervals();
 	log_printf("Report timestamp - %s\n", pzTime);
 	for (f = factions; f; f = f->next) {
 		faction_list * addresses;

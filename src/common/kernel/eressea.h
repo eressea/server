@@ -1053,8 +1053,10 @@ int change_hitpoints(struct unit *u, int value);
 int weight(const struct unit * u);
 void changeblockchaos(void);
 
-struct region *firstregion(struct faction * f);
-struct region *lastregion(struct faction * f);
+/* intervall, in dem die regionen der partei zu finden sind */
+extern void update_intervals(void);
+extern struct region *firstregion(struct faction * f);
+extern struct region *lastregion(struct faction * f);
 
 void inituhash(void);
 void uhash(struct unit * u);
