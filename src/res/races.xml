@@ -871,6 +871,7 @@
 		<function name="name" value="namedragon"></function>
 		<function name="move" value="movedragon"></function>
 		<function name="itemdrop" value="dragondrops"></function>
+		<skill name="sk_magic" modifier="12"></skill>
 		<skill name="sk_tactics" modifier="12"></skill>
 		<skill name="sk_perception" modifier="10"></skill>
 		<attack type="4" damage="3d20"></attack>
@@ -884,6 +885,7 @@
 		<function name="age" value="agedragon"></function>
 		<function name="move" value="movedragon"></function>
 		<function name="itemdrop" value="dragondrops"></function>
+		<skill name="sk_magic" modifier="8"></skill>
 		<skill name="sk_tactics" modifier="8"></skill>
 		<skill name="sk_perception" modifier="5"></skill>
 		<attack type="4" damage="2d20"></attack>
@@ -897,7 +899,10 @@
 		<function name="age" value="agefiredragon"></function>
 		<function name="move" value="movedragon"></function>
 		<function name="itemdrop" value="dragondrops"></function>
+		<skill name="sk_magic" modifier="4"></skill>
 		<skill name="sk_tactics" modifier="4"></skill>
+		<skill name="sk_stealth" modifier="2"></skill>
+		<skill name="sk_perception" modifier="2"></skill>
 		<attack type="4" damage="1d30"></attack>
 		<attack type="4" damage="1d30"></attack>
 		<attack type="4" damage="1d30"></attack>
