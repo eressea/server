@@ -5,6 +5,7 @@
 
 // Atributes includes
 #include <attributes/racename.h>
+#include <attributes/key.h>
 
 // kernel includes
 #include <kernel/faction.h>
@@ -269,10 +270,32 @@ unit_setinfo(unit& u, const char * info)
   set_string(&u.display, info);
 }
 
+static bool
+get_flag(const unit& u, const char * name)
+{
+  int flag = atoi36(name);
+  attrib * a = find_key(u.attribs, flag);
+  return (a!=NULL);
+}
+
+static void
+set_flag(unit& u, const char * name, bool value)
+{
+  int flag = atoi36(name);
+  attrib * a = find_key(u.attribs, flag);
+  if (a==NULL && value) {
+    add_key(&u.attribs, flag);
+  } else if (a!=NULL && !value) {
+    a_remove(&u.attribs, a);
+  }
+}
+
 static std::ostream& 
 operator<<(std::ostream& stream, unit& u)
 {
-  stream << u.name << " (" << itoa36(u.no) << ")";
+  const char * rcname = get_racename(u.attribs);
+  stream << u.name << " (" << itoa36(u.no) << "), " << u.number << " " << u.race->_name[0];
+  if (rcname) stream << "/" << rcname;
   return stream;
 }
 
@@ -358,6 +381,10 @@ bind_unit(lua_State * L)
     .def("add_order", &unit_addorder)
     .def("clear_orders", &unit_clearorders)
     .property("orders", &unit_orders, return_stl_iterator)
+
+    // key-attribute:
+    .def("set_flag", &set_flag)
+    .def("get_flag", &get_flag)
 
     // items:
     .def("get_item", &unit_getitem)
