@@ -1,16 +1,16 @@
-<building name="temple" maxsize="50" maxcapacity=2 nobuild nodestroy unique>
+<building name="temple" maxsize="50" maxcapacity=2 nobuild nodestroy unique auraregen="1.00">
 </building>
 
-<building name="xmas_exit" maxsize="10" maxcapacity=2 nobuild nodestroy unique>
+<building name="xmas_exit" maxsize="10" maxcapacity=2 nobuild nodestroy unique auraregen="1.00">
 </building>
 
-<building name="caldera" capacity="1" nodestroy nobuild>
+<building name="caldera" capacity="1" nodestroy nobuild auraregen="1.00">
 </building>
 
-<building name="genericbuilding" maxsize="1" nobuild>
+<building name="genericbuilding" maxsize="1" nobuild auraregen="1.00">
 </building>
 
-<building name="illusioncastle" capacity="0" maxcapacity="0" maxsize="0" nobuild>
+<building name="illusioncastle" capacity="0" maxcapacity="0" maxsize="0" nobuild auraregen="1.00">
 </building>
 
 <building name="blessedstonecircle" maxsize="100" nobuild magic magres="60" magresbonus="30" auraregen="1.50">
@@ -20,14 +20,14 @@
 	</construction>
 </building>
 
-<building name="stonecircle" maxsize="100">
+<building name="stonecircle" maxsize="100" auraregen="1.00">
 	<construction skill="sk_building" minskill="2" reqsize="100" maxsize="100">
 		<requirement type="log" recycle="0.5" quantity="500"></requirement>
 		<requirement type="stone" recycle="0.5" quantity="500"></requirement>
 	</construction>
 </building>
 
-<building name="inn" capacity="1">
+<building name="inn" capacity="1" auraregen="1.00">
 	<maintenance type="money" amount="5" variable vital></maintenance>
 	<construction skill="sk_building" minskill="2" reqsize="10">
 		<requirement type="iron" recycle="0.5" quantity="10"></requirement>
@@ -37,7 +37,7 @@
 	</construction>
 </building>
 
-<building name="tunnel" capacity="1" maxsize="100">
+<building name="tunnel" capacity="1" maxsize="100" auraregen="1.00">
 	<maintenance type="stone" recycle="0.5" amount="2"></maintenance>
 	<maintenance type="money" amount="100" vital></maintenance>
 	<construction skill="sk_building" minskill="6" reqsize="100" maxsize="100">
@@ -48,7 +48,7 @@
 	</construction>
 </building>
 
-<building name="caravan" capacity="1" maxsize="10">
+<building name="caravan" capacity="1" maxsize="10" auraregen="1.00">
 	<maintenance type="horse" amount="2"></maintenance>
 	<maintenance type="money" amount="3000" vital></maintenance>
 	<construction skill="sk_building" minskill="2" reqsize="10" maxsize="10">
@@ -59,7 +59,7 @@
 	</construction>
 </building>
 
-<building name="dam" capacity="1" maxsize="50">
+<building name="dam" capacity="1" maxsize="50" auraregen="1.00">
 	<maintenance type="log" recycle="0.5" amount="3"></maintenance>
 	<maintenance type="money" amount="1000" vital></maintenance>
 	<construction skill="sk_building" minskill="4" reqsize="50" maxsize="50">
@@ -70,7 +70,7 @@
 	</construction>
 </building>
 
-<building name="monument" capacity="1">
+<building name="monument" capacity="1" auraregen="1.00">
 	<construction skill="sk_building" minskill="4" reqsize="1">
 		<requirement type="log" recycle="0.5" quantity="1"></requirement>
 		<requirement type="stone" recycle="0.5" quantity="1"></requirement>
@@ -79,7 +79,7 @@
 	</construction>
 </building>
 
-<building name="stables" capacity="1">
+<building name="stables" capacity="1" auraregen="1.00">
 	<maintenance type="money" amount="150" vital></maintenance>
 	<construction skill="sk_building" minskill="2" reqsize="1">
 		<requirement type="log" recycle="0.5" quantity="4"></requirement>
@@ -89,7 +89,7 @@
 	</construction>
 </building>
 
-<building name="sawmill" capacity="1">
+<building name="sawmill" capacity="1" auraregen="1.00">
 	<maintenance type="money" amount="250" vital></maintenance>
 	<construction skill="sk_building" minskill="3" reqsize="1">
 		<requirement type="log" recycle="0.5" quantity="5"></requirement>
@@ -99,7 +99,7 @@
 	</construction>
 </building>
 
-<building name="smithy" capacity="1">
+<building name="smithy" capacity="1" auraregen="1.00">
 	<function name="init" value="init_smithy"></function>
 	<maintenance type="money" amount="300" vital></maintenance>
 	<maintenance type="log" recycle="0.5" amount="1"></maintenance>
@@ -123,7 +123,7 @@
 	</construction>
 </building>
 
-<building name="academy" maxcapacity="25" maxsize="25">
+<building name="academy" maxcapacity="25" maxsize="25" auraregen="1.00">
 	<maintenance type="money" amount="1000" vital></maintenance>
 	<construction skill="sk_building" minskill="3" reqsize="25" maxsize="25">
 		<requirement type="log" recycle="0.5" quantity="125"></requirement>
@@ -133,7 +133,7 @@
 	</construction>
 </building>
 
-<building name="harbour" capacity="1" maxcapacity="25" maxsize="25">
+<building name="harbour" capacity="1" maxcapacity="25" maxsize="25" auraregen="1.00">
 	<maintenance type="money" amount="250" vital></maintenance>
 	<construction skill="sk_building" minskill="3" reqsize="25" maxsize="25">
 		<requirement type="log" recycle="0.5" quantity="125"></requirement>
@@ -142,7 +142,7 @@
 	</construction>
 </building>
 
-<building name="quarry" capacity="1">
+<building name="quarry" capacity="1" auraregen="1.00">
 	<maintenance type="money" amount="250" vital></maintenance>
 	<construction skill="sk_building" minskill="2" reqsize="1">
 		<requirement type="iron" recycle="0.5" quantity="1"></requirement>
@@ -152,7 +152,7 @@
 	</construction>
 </building>
 
-<building name="mine" capacity="1">
+<building name="mine" capacity="1" auraregen="1.00">
 	<maintenance type="money" amount="500" vital></maintenance>
 	<construction skill="sk_building" minskill="4" reqsize="1">
 		<requirement type="iron" recycle="0.5" quantity="1"></requirement>
@@ -162,7 +162,7 @@
 	</construction>
 </building>
 
-<building name="lighthouse" capacity="1" maxcapacity="4">
+<building name="lighthouse" capacity="1" maxcapacity="4" auraregen="1.00">
 	<maintenance type="money" amount="100" vital></maintenance>
 	<construction skill="sk_building" minskill="3" reqsize="1">
 		<requirement type="iron" recycle="0.5" quantity="1"></requirement>
