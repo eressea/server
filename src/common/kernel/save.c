@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.13 2001/02/10 14:18:00 enno Exp $
+ *	$Id: save.c,v 1.14 2001/02/10 15:27:09 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -455,7 +455,7 @@ readfaction(void)
 		 * muß in "Gänsefüßchen" stehen!! */
 
 		/* War vorher in main.c:getgarbage() */
-		if (!quiet) printf(" %s;", factionid(f));
+		if (!quiet) { printf(" %s;", factionid(f)); fflush(stdout); }
 		freestrlist(f->mistakes);
 		f->mistakes = 0;
 
@@ -541,6 +541,7 @@ readorders(const char *filename)
 	}
 
 	fclose(F);
+	printf("\n");
 	return 0;
 }
 /* ------------------------------------------------------------- */
@@ -1691,6 +1692,7 @@ writegame(char *path, char quiet)
 
 		if ((n%1024)==0) {	/* das spart extrem Zeit */
 			printf(" - Schreibe Regionen: %d  \r", n);
+			fflush(stdout);
 		}
 		wnl(F);
 

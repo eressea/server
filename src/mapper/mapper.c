@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: mapper.c,v 1.10 2001/02/09 19:52:59 corwin Exp $
+ *	$Id: mapper.c,v 1.11 2001/02/10 15:27:10 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -179,25 +179,26 @@ RegionSymbol(region *r) {
 			}
 		}
 		break;
-#ifdef NEW_ITEMS
-		/* todo */
-#else
 	case 2:
 		{
-			int tg;
-
-			if(r->land) {
-				for(tg = 0; tg != MAXLUXURIES; tg++) {
-					if(!rdemand(r, tg)) break;
-				}
-				rs = (unsigned char)itemdata[FIRSTLUXURY + tg].name[1][0];
-			} else {
+			if(r->land == NULL || r->land->demands == NULL) {
 				rs = terrain[rterrain(r)].symbol;
-				if(rs == 'P' && rtrees(r) >= 600) rs = 'F';
+			} else {
+				const luxury_type *sale=NULL;
+				struct demand *dmd;
+
+				for (dmd=r->land->demands;dmd;dmd=dmd->next) {
+					if (dmd->value==0) sale = dmd->type;
+				}
+
+				if(sale == NULL) {	/* Kann nur bei einem Bug passieren */
+					rs = terrain[rterrain(r)].symbol;
+				} else {
+					rs = resourcename(sale->itype->rtype, 0)[0];
+				}
 			}
 		}
 		break;
-#endif
 	case 3:
 		{
 			const herb_type *herb = rherbtype(r);
