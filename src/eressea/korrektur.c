@@ -122,7 +122,6 @@ curse_emptiness(void)
 					100, 100, 0, 0);
 				curse_setflag(c, CURSE_ISNEW|CURSE_IMMUNE);
 			}
-			break;
 		}
 		r = r->next;
 	}
