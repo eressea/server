@@ -662,7 +662,8 @@ enum {
 	RC_GHOUL_LORD,
 
 	RC_MUS_SPIRIT,   /* 58 */
-	RC_GNOME,         /* 59 */
+	RC_GNOME,        /* 59 */
+	RC_TEMPLATE,     /* 60 */
 
 	MAXRACES,
 	NORACE = (race_t) - 1

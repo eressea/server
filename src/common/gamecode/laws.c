@@ -560,7 +560,11 @@ horses(region * r)
 	m = max(0, m);
 	if (m) {
 		double gg = (HORSEGROWTH*(rhorses(r)/1.5)*((double)m-(rhorses(r)/1.5))/(double)m)/100.0;
-		int g = (int)(normalvariate(gg,gg/4));
+		int g;
+		attrib *a = a_find(r->attribs, &at_horseluck);
+
+		if(a) gg *= log((double)(a->data.i)) + 1.0;
+		g = (int)(normalvariate(gg,gg/4));
 
 		if(g > 0) {
 			rsethorses(r, rhorses(r) + g);
@@ -2394,7 +2398,7 @@ renumber(void)
 				case P_FACTION:
 					s = getstrtoken();
 					if(strlen(s)>4) s[4]=0;
-					if (*s) {
+					if (s && *s) {
 						int i = atoi36(s);
 						attrib * a = a_find(f->attribs, &at_number);
 						if (!a) a = a_add(&f->attribs, a_new(&at_number));
@@ -2404,7 +2408,7 @@ renumber(void)
 
 				case P_UNIT:
 					s = getstrtoken();
-					if(*s == 0) {
+					if(s == NULL || *s == 0) {
 						i = newunitid();
 					} else {
 						i = atoi36(s);
@@ -2442,7 +2446,7 @@ renumber(void)
 						continue;
 					}
 					s = getstrtoken();
-					if(*s == 0) {
+					if(s == NULL || *s == 0) {
 						i = newcontainerid();
 					} else {
 						i = atoi36(s);
@@ -2690,7 +2694,6 @@ setdefaults (void)
 					if (getparam() == P_TEMP) break;
 				case K_BESIEGE:
 				case K_ENTERTAIN:
-				case K_FOLLOW:
 				case K_RESEARCH:
 				case K_SPY:
 				case K_STEAL:

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: alp.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ * $Id: alp.c,v 1.3 2001/04/01 06:58:41 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -100,6 +100,10 @@ sp_summon_alp(struct castorder *co)
 	 * sobald der Alp sein Opfer erreicht hat.
 	 */
 	alp = createunit(r, findfaction(MONSTER_FACTION), 1, RC_ALP);
+	if (r==mage->region) {
+		alp->building = mage->building;
+		alp->ship = mage->ship;
+	}
 	set_skill(alp, SK_STEALTH, alp->number * 840);	/* 840 Tage = T7 */
 	alp->status = ST_FLEE;	/* flieht */
 

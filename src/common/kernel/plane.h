@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: plane.h,v 1.4 2001/02/17 14:47:42 enno Exp $
+ *	$Id: plane.h,v 1.5 2001/04/01 06:58:40 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -63,7 +63,7 @@ int ursprung_y(const struct faction *f, const plane *pl);
 void set_ursprung(struct faction *f, int id, int x, int y);
 plane * create_new_plane(int id, const char *name, int minx, int maxx, int miny, int maxy, int flags);
 plane * getplanebyname(const char *);
-extern int rel_to_abs(struct plane *pl, struct faction * f, int rel, unsigned char index);
+extern int rel_to_abs(const struct plane *pl, const struct faction * f, int rel, unsigned char index);
 
 extern void * resolve_plane(void * data);
 extern void write_plane_reference(const plane * p, FILE * F);

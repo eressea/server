@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: mapper.c,v 1.13 2001/02/18 12:20:37 corwin Exp $
+ *	$Id: mapper.c,v 1.14 2001/04/01 06:58:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -38,6 +38,7 @@
 #include <reports.h>
 #include <save.h>
 #include <unit.h>
+#include <spells.h>
 
 #include <ctype.h>
 #include <limits.h>
@@ -872,8 +873,8 @@ movearound(int rx, int ry) {
 					}
 					ch = -9;
 					break;
-				case 0x2:	/* die altmodische Art */
-					make_new_block(rx, ry);
+				case 0x2:
+					make_ocean_block(rx, ry);
 					ch = -9;
 					break;
 				case 'S':
@@ -1238,6 +1239,7 @@ main(int argc, char *argv[])
 
 	init_triggers();
 	init_attributes();
+	init_spells();
 
 	init_resources();
 	/* init_weapons(); */

@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: monster.c,v 1.9 2001/02/22 21:46:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -696,7 +695,6 @@ make_ponnuki(void)
 	u = createunit(r, findfaction(MONSTER_FACTION), 1, RC_ILLUSION);
 	u->irace = RC_GOBLIN;
 	set_string(&u->name, "Ponnuki");
-	u->age=-1000;
 	set_string(&u->display, "Go, Ponnuki, Go.");
     uunhash(u);
 	u->no = ponn;
@@ -860,6 +858,9 @@ plan_monsters(void)
 			/* Ab hier nur noch Befehle für NPC-Einheiten. */
 
 			if (u->faction->no != MONSTER_FACTION) continue;
+
+			/* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
+			change_skill(u, SK_OBSERVATION, u->number * 10);
 
 			ta = a_find(u->attribs, &at_hate);
 			if (ta && strncmp(u->lastorder, "WARTEN", 6) != 0) {

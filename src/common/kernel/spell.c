@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.c,v 1.14 2001/03/09 06:28:24 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -692,6 +691,10 @@ sp_summon_familiar(castorder *co)
 	}
 
 	familiar = createunit(target_region, mage->faction, 1, rc);
+	if (target_region==mage->region) {
+		familiar->building = mage->building;
+		familiar->ship = mage->ship;
+	}
 	familiar->status = ST_FLEE;	/* flieht */
 	sprintf(buf, "Vertrauter von %s", unitname(mage));
 	set_string(&familiar->name, buf);
@@ -1032,6 +1035,10 @@ sp_summonent(castorder *co)
 	ents = min(power*power, rtrees(r));
 
 	u = createunit(r, mage->faction, ents, RC_TREEMAN);
+	if (r==mage->region) {
+		u->building = mage->building;
+		u->ship = mage->ship;
+	}
 	set_string(&u->name, race[RC_TREEMAN].name[u->number>1]);
 	if (fval(mage, FL_PARTEITARNUNG))
 		fset(u, FL_PARTEITARNUNG);
@@ -1473,6 +1480,10 @@ sp_create_irongolem(castorder *co)
 	}
 
 	u2 = createunit(r, mage->faction, force*8, RC_IRONGOLEM);
+	if (r==mage->region) {
+		u2->building = mage->building;
+		u2->ship = mage->ship;
+	}
 	set_skill(u2, SK_ARMORER, 30*u2->number);
 	set_skill(u2, SK_WEAPONSMITH, 30*u2->number);
 	if (fval(mage, FL_PARTEITARNUNG))
@@ -1536,6 +1547,10 @@ sp_create_stonegolem(castorder *co)
 	}
 
 	u2 = createunit(r, mage->faction, force* 5,RC_STONEGOLEM);
+	if (r==mage->region) {
+		u2->building = mage->building;
+		u2->ship = mage->ship;
+	}
 	set_skill(u2, SK_ROAD_BUILDING, 30*u2->number);
 	set_skill(u2, SK_BUILDING, 30*u2->number);
 	if (fval(mage, FL_PARTEITARNUNG))
@@ -2221,9 +2236,14 @@ sp_ironkeeper(castorder *co)
 		return 0;
 	}
 	keeper = createunit(r, mage->faction, 1, RC_IRONKEEPER);
+	if (r==mage->region) {
+		keeper->building = mage->building;
+		keeper->ship = mage->ship;
+	}
 	/*keeper->age = cast_level + 2;*/
 	guard(keeper, GUARD_MINING);
 	fset(keeper, FL_ISNEW);
+	set_string(&keeper->name, "Bergwächter");
 	keeper->status = ST_AVOID;	/* kaempft nicht */
 	/* Parteitarnen, damit man nicht sofort weiß, wer dahinter steckt */
 	fset(keeper, FL_PARTEITARNUNG);
@@ -2412,25 +2432,32 @@ patzer_peasantmob(castorder *co)
 	int anteil = 6, n;
 	unit *u;
 	attrib *a;
-	region *r = co->rt;
+	region *r;
 	unit *mage = (unit *)co->magician;
+	
+	if (mage->region->land){
+		r = mage->region;
+	} else {
+		r = co->rt;
+	}
 
-	anteil += rand() % 4;
-	n = rpeasants(r) * anteil / 10;
-	rsetpeasants(r, rpeasants(r) - n);
-	assert(rpeasants(r) >= 0);
+	if (r->land) {
+		anteil += rand() % 4;
+		n = rpeasants(r) * anteil / 10;
+		rsetpeasants(r, rpeasants(r) - n);
+		assert(rpeasants(r) >= 0);
 
-	u = createunit(r, findfaction(MONSTER_FACTION), n, RC_PEASANT);
-	guard(u, GUARD_ALL);
-	a = a_new(&at_unitdissolve);
-	a->data.ca[0] = 1;  /* An rpeasants(r). */
-	a->data.ca[1] = 10; /* 10% */
-	a_add(&u->attribs, a);
-	a_add(&u->attribs, make_hate(mage));
+		u = createunit(r, findfaction(MONSTER_FACTION), n, RC_PEASANT);
+		guard(u, GUARD_ALL);
+		a = a_new(&at_unitdissolve);
+		a->data.ca[0] = 1;  /* An rpeasants(r). */
+		a->data.ca[1] = 10; /* 10% */
+		a_add(&u->attribs, a);
+		a_add(&u->attribs, make_hate(mage));
 
-	sprintf(buf, "Ein Bauernmob erhebt sich und macht Jagd auf Schwarzmagier.");
-	addmessage(r, 0, buf, MSG_MAGIC, ML_INFO);
-
+		sprintf(buf, "Ein Bauernmob erhebt sich und macht Jagd auf Schwarzmagier.");
+		addmessage(r, 0, buf, MSG_MAGIC, ML_INFO);
+	}
 	return;
 }
 
@@ -3103,6 +3130,10 @@ sp_unholypower(castorder *co)
 			}
 
 			un = createunit(co->rt, u->faction, 0, target_race);
+			if (co->rt==u->region) {
+				un->building = u->building;
+				un->ship = u->ship;
+			}
 			transfermen(u, un, n);
 			add_message(&co->rt->msgs, new_message(mage->faction,
 				"unholypower_limitedeffect%u:mage%u:target%s:race%i:amount",
@@ -3296,6 +3327,10 @@ sp_summonshadow(castorder *co)
 	int val;
 
 	u = createunit(r, mage->faction, force*force, RC_SHADOW);
+	if (r==mage->region) {
+		u->building = mage->building;
+		u->ship = mage->ship;
+	}
 	if (fval(mage, FL_PARTEITARNUNG))
 		fset(u, FL_PARTEITARNUNG);
 
@@ -3339,6 +3374,10 @@ sp_summonshadowlords(castorder *co)
 	int force = co->force;
 
 	u = createunit(r, mage->faction, force*force, RC_SHADOWLORD);
+	if (r==mage->region) {
+		u->building = mage->building;
+		u->ship = mage->ship;
+	}
 	if (fval(mage, FL_PARTEITARNUNG))
 		fset(u, FL_PARTEITARNUNG);
 
@@ -3475,8 +3514,59 @@ sp_magicboost(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Totenruf - Mächte des Todes
+/* Name:       kleines Blutopfer
  * Stufe:      4
+ * Gebiet:     Draig
+ * Kategorie:  Einheit, positiv
+ *
+ * Wirkung:
+ *   Hitpoints to Aura: 4:1/3:1
+ * Patzer:
+ *   permanenter HP verlust
+ *
+ * Flag:
+ *  (ONSHIPCAST)
+ */
+static int
+sp_bloodsacrifice(castorder *co)
+{
+	unit *mage = (unit *)co->magician;
+	int cast_level = co->level;
+	int aura, damage;
+	int hp = mage->hp - 5; /* braucht noch 4 HP zum Bezahlen des
+																		 Spruchs, und 1 HP zum Überleben*/
+
+	if (hp <= 0){
+		report_failure(mage, co->order);
+		return 0;
+	}
+	
+	damage = min(hp, dice_rand("4d12"));
+
+	if (eff_skill(mage, SK_MAGIC, mage->region) > 8){
+		aura = damage / 3;
+	} else {
+		aura = damage / 4;
+	}
+	
+	if (aura <= 0){
+		report_failure(mage, co->order);
+		return 0;
+	}
+
+	get_mage(mage)->spellpoints += aura;
+	use_pooled(mage, mage->region, R_HITPOINTS, damage);
+
+	add_message(&mage->faction->msgs, new_message(mage->faction,
+		"sp_bloodsacrifice_effect%u:unit%r:region%s:command%i:amount",
+		mage, mage->region, strdup(co->order), aura));
+
+	return cast_level;
+}
+
+/* ------------------------------------------------------------- */
+/* Name:       Totenruf - Mächte des Todes
+ * Stufe:      6
  * Gebiet:     Draig
  * Kategorie:  Beschwörung, positiv
  * Flag:       FARCASTING
@@ -3515,6 +3605,10 @@ sp_summonundead(castorder *co)
 	}
 
 	u = make_undead_unit(r, mage->faction, undead, race);
+	if (r==mage->region) {
+		u->building = mage->building;
+		u->ship = mage->ship;
+	}
 	if (fval(mage, FL_PARTEITARNUNG))
 		fset(u, FL_PARTEITARNUNG);
 
@@ -3542,7 +3636,7 @@ sp_summonundead(castorder *co)
  * Gebiet:     Draig
  * Kategorie:  Region, negativ
  * Wirkung:
- *   Alle Magier in der betroffenen Region wird eine Teil ihrer
+ *   Allen Magier in der betroffenen Region wird eine Teil ihrer
  *   Magischen Kraft in die Gefilde des Chaos entzogen Jeder Magier im
  *   Einflussbereich verliert Stufe(Zaubernden)*5% seiner Magiepunkte.
  *   Keine Regeneration in der Woche (fehlt noch)
@@ -4281,6 +4375,10 @@ sp_recruit(castorder *co)
 
 	rsetpeasants(r, rpeasants(r) - n);
 	u = createunit(r, f, n, f->race);
+	if (r==mage->region) {
+		u->building = mage->building;
+		u->ship = mage->ship;
+	}
 	set_string(&u->name, n == 1 ? "Bauer" : "Bauern");
 	set_string(&u->thisorder, keywords[K_WORK]);
 	u->status = mage->status;
@@ -6959,7 +7057,7 @@ spell spelldaten[] =
 		"werden, bevor die Aura sich verflüchtigt. "
 		"Jeder Golem hat jede Runde eine Chance von 10% zu Staub zu zerfallen. "
 		"Gibt man den Golems die Befehle MACHE BURG oder MACHE STRASSE, "
-		"so werden pro Golem 10 Steine verbaut und der Golem löst sich auf.",
+		"so werden pro Golem 5 Steine verbaut und der Golem löst sich auf.",
 		NULL,
 		NULL,
 		M_DRUIDE, (SPELLLEVEL), 4, 1,
@@ -6977,7 +7075,7 @@ spell spelldaten[] =
 		"geschaffen werden. "
 		"Jeder Golem hat jede Runde eine Chance von 15% zu Staub zu zerfallen. "
 		"Gibt man den Golems den Befehl MACHE SCHWERT/BIHÄNDER oder "
-		"MACHE SCHILD/KETTENHEMD/PLATTENPANZER, so werden pro Golem 5 "
+		"MACHE SCHILD/KETTENHEMD/PLATTENPANZER, so werden pro Golem 4 "
 		"Eisenbarren verbaut und der Golem löst sich auf.",
 		NULL,
 		NULL,
@@ -7259,11 +7357,11 @@ spell spelldaten[] =
 		"weiterhin unentdeckt.",
 		NULL,
 		NULL,
-		M_DRUIDE, (0), 5, 6,
+		M_DRUIDE, (ONSHIPCAST), 5, 6,
 		{
 			{R_AURA, 50, SPC_FIX},
 			{R_SILVER, 3000, SPC_FIX},
-			{0, 0, 0},
+			{R_PERMAURA, 1, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0}},
 		(spell_f)sp_createitem_trueseeing, patzer_createitem
@@ -7276,11 +7374,11 @@ spell spelldaten[] =
 		"einer unsichtbaren Einheit muss jede Person einen Ring tragen.",
 		NULL,
 		NULL,
-		M_DRUIDE, (0), 5, 6,
+		M_DRUIDE, (ONSHIPCAST), 5, 6,
 		{
 			{R_AURA, 50, SPC_FIX},
 			{R_SILVER, 3000, SPC_FIX},
-			{0, 0, 0},
+			{R_PERMAURA, 1, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0}},
 		(spell_f)sp_createitem_invisibility, patzer_createitem
@@ -7440,7 +7538,7 @@ spell spelldaten[] =
 		"welches in ihm aufbewahrte Kräuter besser zu konservieren vermag.",
 		NULL,
 		NULL,
-		M_DRUIDE, (0), 5, 5,
+		M_DRUIDE, (ONSHIPCAST), 5, 5,
 		{
 		 {R_AURA, 30, SPC_FIX},
 		 {R_PERMAURA, 1, SPC_FIX},
@@ -7659,6 +7757,24 @@ spell spelldaten[] =
 	 (spell_f)sp_magicboost, patzer
 	},
 
+	{SPL_BLOODSACRIFICE, "kleines Blutopfer",
+		"Mit diesem Ritual kann der Magier einen Teil seiner Lebensenergie "
+		"opfern, um dafür an magischer Kraft zu gewinnen. Erfahrene "
+		"Ritualmagier berichten, das sich das Ritual, einmal initiiert, nur "
+		"schlecht steuern ließe und die Menge der so gewonnenen Kraft stark "
+		"schwankt.",
+		NULL,
+		NULL,
+		M_CHAOS, (ONSHIPCAST), 1, 4,
+		{
+			{R_HITPOINTS, 4, SPC_FIX},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0}},
+		(spell_f)sp_bloodsacrifice, patzer
+	},
+
 	{SPL_BERSERK, "Blutrausch",
 		"In diesem blutigen Ritual opfert der Magier vor der Schlacht ein "
 		"Neugeborenes vor den Augen seiner Armee. Die so gerufenen Blutgeister "
@@ -7695,6 +7811,7 @@ spell spelldaten[] =
 	 (spell_f)sp_fumblecurse, patzer_fumblecurse
 	},
 
+<<<<<<< spell.c
 	{SPL_SUMMONUNDEAD, "Mächte des Todes",
 		"Nächtelang muss der Schwarzmagier durch die Friedhöfe und Gräberfelder "
 		"der Region ziehen um dann die ausgegrabenen Leichen beleben zu können. "
@@ -7703,16 +7820,16 @@ spell spelldaten[] =
 		"sein kann.",
 		NULL,
 		NULL,
-	 M_CHAOS, (SPELLLEVEL | FARCASTING), 5, 6,
+	 M_CHAOS, (SPELLLEVEL | FARCASTING | ONSHIPCAST), 5, 6,
 	 {
+		{
 			{R_AURA, 5, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_summonundead, patzer_peasantmob
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0}},
+		(spell_f)sp_summonundead, patzer_peasantmob
 	},
-
 	{SPL_COMBATRUST, "Rosthauch",
 		"Mit diesem Ritual wird eine dunkle Gewitterfront "
 		"beschworen, die sich unheilverkündend über der Region auftürmt. "
@@ -7738,11 +7855,11 @@ spell spelldaten[] =
 		"weiterhin unentdeckt.",
 		NULL,
 		NULL,
-		M_CHAOS, (0), 5, 6,
+		M_CHAOS, (ONSHIPCAST), 5, 6,
 		{
 			{R_AURA, 50, SPC_FIX},
 			{R_SILVER, 3000, SPC_FIX},
-			{0, 0, 0},
+			{R_PERMAURA, 1, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0}},
 		(spell_f)sp_createitem_trueseeing, patzer_createitem
@@ -7755,11 +7872,11 @@ spell spelldaten[] =
 		"einer unsichtbaren Einheit muss jede Person einen Ring tragen.",
 		NULL,
 		NULL,
-		M_CHAOS, (0), 5, 6,
+		M_CHAOS, (ONSHIPCAST), 5, 6,
 		{
 			{R_AURA, 50, SPC_FIX},
 			{R_SILVER, 3000, SPC_FIX},
-			{0, 0, 0},
+			{R_PERMAURA, 1, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0}},
 		(spell_f)sp_createitem_invisibility, patzer_createitem
@@ -7874,7 +7991,7 @@ spell spelldaten[] =
 		"die trollisch zähe Haut positiv auswirken.",
 		NULL,
 		NULL,
-	 M_CHAOS, (0), 5, 9,
+	 M_CHAOS, (ONSHIPCAST), 5, 9,
 	 {
 			{R_AURA, 20, SPC_FIX},
 		 {R_PERMAURA, 1, SPC_FIX},
@@ -8040,14 +8157,14 @@ spell spelldaten[] =
 		"senden, das Schwert mit seiner Macht zu beseelen...'",
 		NULL,
 		NULL,
-	 M_CHAOS, (0), 5, 12,
-	 {
-		 {R_AURA, 150, SPC_FIX},
-		 {R_BERSERK, 1, SPC_FIX},
-		 {R_SWORD, 1, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	(spell_f)sp_create_firesword, patzer
+		M_CHAOS, (ONSHIPCAST), 5, 12,
+		{
+			{R_AURA, 100, SPC_FIX},
+			{R_BERSERK, 1, SPC_FIX},
+			{R_SWORD, 1, SPC_FIX},
+			{R_PERMAURA, 1, SPC_FIX},
+			{0, 0, 0}},
+		(spell_f)sp_create_firesword, patzer
 	},
 
 	{SPL_DRAIG_FAMILIAR, "Vertrauten rufen",
@@ -8056,24 +8173,24 @@ spell spelldaten[] =
 		"Magier anschließen wird.",
 		NULL,
 		NULL,
-	 M_CHAOS, (NOTFAMILIARCAST), 5, 13,
-	 {
+		M_CHAOS, (NOTFAMILIARCAST), 5, 13,
+		{
 			{R_AURA, 100, SPC_FIX},
 		 {R_PERMAURA, 5, SPC_FIX},
 		 {0, 0, 0},
 		 {0, 0, 0},
 		 {0, 0, 0}},
-	 (spell_f)sp_summon_familiar, patzer
+		(spell_f)sp_summon_familiar, patzer
 	},
 
 	{SPL_CHAOSSUCTION, "Chaossog",
-	 "Durch das Opfern von 500 Bauern kann der Chaosmagier ein Tor zur "
-	 "astralen Welt öffnen. Das Tor kann in der Folgewoche verwendet werden, "
-	 "es löst sich am Ende der Folgewoche auf.",
+		"Durch das Opfern von 500 Bauern kann der Chaosmagier ein Tor zur "
+		"astralen Welt öffnen. Das Tor kann in der Folgewoche verwendet werden, "
+		"es löst sich am Ende der Folgewoche auf.",
 		NULL,
 		NULL,
-	 M_CHAOS, (0), 5, 14,
-	 {
+		M_CHAOS, (0), 5, 14,
+		{
 			{R_AURA, 150, SPC_FIX},
 		 {R_PEASANTS, 500, SPC_FIX},
 		 {0, 0, 0},
@@ -8088,7 +8205,9 @@ spell spelldaten[] =
 		"Der Zauberer sendet dem Ziel des Spruches einen Traum.",
 	 "ZAUBERE Traumsenden <Einheit-Nr>",
 		"u",
-	 M_TRAUM, (UNITSPELL | TESTCANSEE | SPELLLEVEL | ONETARGET), 5, 1,
+		M_TRAUM,
+		(UNITSPELL | TESTCANSEE | SPELLLEVEL | ONETARGET | ONSHIPCAST),
+		5, 1,
 	 {
 		{R_AURA, 1, SPC_LEVEL},
 		 {0, 0, 0},
@@ -8305,11 +8424,11 @@ spell spelldaten[] =
 		"weiterhin unentdeckt.",
 		NULL,
 		NULL,
-		M_TRAUM, (0), 5, 6,
+		M_TRAUM, (ONSHIPCAST), 5, 6,
 		{
 			{R_AURA, 50, SPC_FIX},
 			{R_SILVER, 3000, SPC_FIX},
-			{0, 0, 0},
+			{R_PERMAURA, 1, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0}},
 		(spell_f)sp_createitem_trueseeing, patzer_createitem
@@ -8322,11 +8441,11 @@ spell spelldaten[] =
 		"einer unsichtbaren Einheit muss jede Person einen Ring tragen.",
 		NULL,
 		NULL,
-		M_TRAUM, (0), 5, 6,
+		M_TRAUM, (ONSHIPCAST), 5, 6,
 		{
 			{R_AURA, 50, SPC_FIX},
 			{R_SILVER, 3000, SPC_FIX},
-			{0, 0, 0},
+			{R_PERMAURA, 1, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0}},
 		(spell_f)sp_createitem_invisibility, patzer_createitem
@@ -8482,15 +8601,15 @@ spell spelldaten[] =
 		"es einige Wochen später...",
 		NULL,
 		"u+",
-	 M_TRAUM, 
-	 (UNITSPELL | TESTRESISTANCE | TESTCANSEE | SPELLLEVEL), 5, 12,
-	 {
+		M_TRAUM, 
+		(UNITSPELL | TESTRESISTANCE | TESTCANSEE | SPELLLEVEL), 5, 12,
+		{
 			{R_AURA, 5, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_sweetdreams, patzer
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0}},
+		(spell_f)sp_sweetdreams, patzer
 	},
 
 	{SPL_CREATE_TACTICCRYSTAL, "Erschaffe ein Traumauge",
@@ -8505,9 +8624,9 @@ spell spelldaten[] =
 		"Die Interpretation von Träumen ist eine schwierige Angelegenheit.",
 		NULL,
 		NULL,
-		M_TRAUM, (0), 5, 14,
+		M_TRAUM, (ONSHIPCAST), 5, 14,
 		{
-			{R_PERMAURA, 10, SPC_FIX},
+			{R_PERMAURA, 5, SPC_FIX},
 			{R_DRAGONHEAD, 1, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0},
@@ -8843,11 +8962,11 @@ spell spelldaten[] =
 		"weiterhin unentdeckt.",
 		NULL,
 		NULL,
-		M_BARDE, (0), 5, 6,
+		M_BARDE, (ONSHIPCAST), 5, 6,
 		{
 			{R_AURA, 50, SPC_FIX},
 			{R_SILVER, 3000, SPC_FIX},
-			{0, 0, 0},
+			{R_PERMAURA, 1, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0}},
 		(spell_f)sp_createitem_trueseeing, patzer_createitem
@@ -8860,11 +8979,11 @@ spell spelldaten[] =
 		"einer unsichtbaren Einheit muss jede Person einen Ring tragen.",
 		NULL,
 		NULL,
-		M_BARDE, (0), 5, 6,
+		M_BARDE, (ONSHIPCAST), 5, 6,
 		{
 			{R_AURA, 50, SPC_FIX},
 			{R_SILVER, 3000, SPC_FIX},
-			{0, 0, 0},
+			{R_PERMAURA, 1, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0}},
 		(spell_f)sp_createitem_invisibility, patzer_createitem
@@ -9120,7 +9239,7 @@ spell spelldaten[] =
 		"könnte dies ebenfalls von Nutzen sein.",
 		NULL,
 		NULL,
-		M_BARDE, (0), 5, 11,
+		M_BARDE, (ONSHIPCAST), 5, 11,
 		{
 			{R_AURA, 20, SPC_FIX},
 			{R_PERMAURA, 1, SPC_FIX},
@@ -9442,11 +9561,11 @@ spell spelldaten[] =
 		"weiterhin unentdeckt.",
 		NULL,
 		NULL,
-		M_ASTRAL, (0), 5, 5,
+		M_ASTRAL, (ONSHIPCAST), 5, 5,
 		{
 			{R_AURA, 50, SPC_FIX},
 			{R_SILVER, 3000, SPC_FIX},
-			{0, 0, 0},
+			{R_PERMAURA, 1, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0}},
 		(spell_f)sp_createitem_trueseeing, patzer_createitem
@@ -9533,11 +9652,11 @@ spell spelldaten[] =
 		"einer unsichtbaren Einheit muss jede Person einen Ring tragen.",
 		NULL,
 		NULL,
-		M_ASTRAL, (0), 5, 6,
+		M_ASTRAL, (ONSHIPCAST), 5, 6,
 		{
 			{R_AURA, 50, SPC_FIX},
 			{R_SILVER, 3000, SPC_FIX},
-			{0, 0, 0},
+			{R_PERMAURA, 1, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0}},
 		(spell_f)sp_createitem_invisibility, patzer_createitem
@@ -9552,7 +9671,7 @@ spell spelldaten[] =
 	 "fehlschlagen lassen.",
 		NULL,
 		NULL,
-		M_ASTRAL, (0), 5, 7,
+		M_ASTRAL, (ONSHIPCAST), 5, 7,
 		{
 			{R_AURA, 50, SPC_FIX},
 			{R_SILVER, 3000, SPC_FIX},
@@ -9593,7 +9712,7 @@ spell spelldaten[] =
 		"ZAUBER \"Mauern der Ewigkeit\" <Gebäude-Nr>",
 		"b",
 		M_ASTRAL,
-		(SPELLLEVEL | BUILDINGSPELL | ONETARGET | TESTRESISTANCE),
+		(SPELLLEVEL | BUILDINGSPELL | ONETARGET | TESTRESISTANCE | ONSHIPCAST),
 		5, 7,
 		{
 			{R_AURA, 50, SPC_FIX},
@@ -9668,11 +9787,11 @@ spell spelldaten[] =
 		"als wäre der Magier eine Stufe besser.",
 		NULL,
 		NULL,
-		M_ASTRAL, 0, 5, 9,
+		M_ASTRAL, (ONSHIPCAST), 5, 9,
 		{
 			{R_AURA, 100, SPC_FIX},
 			{R_SILVER, 4000, SPC_FIX},
-			{0, 0, 0},
+			{R_PERMAURA, 1, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0}},
 	 (spell_f)sp_createitem_power, patzer_createitem
@@ -9704,7 +9823,7 @@ spell spelldaten[] =
    "selber wiegt 1 GE.",
 		NULL,
 		NULL,
-	 M_ASTRAL, (0), 5, 10,
+	 M_ASTRAL, (ONSHIPCAST), 5, 10,
 	 {
 			{R_AURA, 30, SPC_FIX},
 			{R_PERMAURA, 1, SPC_FIX},
@@ -9830,7 +9949,7 @@ spell spelldaten[] =
 	 "Zauberers enorm größere Mengen an Aura zu beherrschen.",
 		NULL,
 		NULL,
-	 M_GRAU, 0, 5, 9,
+	 M_GRAU, (ONSHIPCAST), 5, 9,
 	 {
 			{R_AURA, 100, SPC_FIX},
 			{R_PERMAURA, 1, SPC_FIX},
@@ -9846,7 +9965,7 @@ spell spelldaten[] =
 	 "seinem Träger zukommen.",
 		NULL,
 		NULL,
-	 M_GRAU, 0, 5, 9,
+	 M_GRAU, (ONSHIPCAST), 5, 9,
 	 {
 			{R_AURA, 100, SPC_FIX},
 			{R_PERMAURA, 1, SPC_FIX},
@@ -9860,7 +9979,7 @@ spell spelldaten[] =
 		"",
 		NULL,
 		NULL,
-		M_GRAU, 0, 5, 7,
+		M_GRAU, (ONSHIPCAST), 5, 7,
 		{
 			{R_AURA, 50, SPC_FIX},
 			{R_SILVER, 3000, SPC_FIX},
@@ -9894,7 +10013,7 @@ spell spelldaten[] =
 		"und wird so gut wie immun gegen alle Formen von Magie.",
 		NULL,
 		NULL,
-		M_GRAU, 0, 5, 6,
+		M_GRAU, (ONSHIPCAST), 5, 6,
 		{
 			{R_AURA, 100, SPC_FIX},
 			{R_PERMAURA, 1, SPC_FIX},

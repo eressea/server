@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: study.c,v 1.8 2001/02/19 14:19:24 corwin Exp $
+ *	$Id: study.c,v 1.9 2001/04/01 06:58:37 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -456,9 +456,10 @@ learn(void)
 						}
 					}
 					if (i == SK_ALCHEMY) {
-						maxalchemy = get_skill(u, SK_ALCHEMY);
-						if (maxalchemy==0 && count_skill(u->faction, SK_ALCHEMY) + u->number >
-							max_skill(u->faction, SK_ALCHEMY)) {
+						maxalchemy = eff_skill(u, SK_ALCHEMY, r);
+						if (get_skill(u, SK_ALCHEMY)==0
+								&& count_skill(u->faction, SK_ALCHEMY) + u->number >
+									max_skill(u->faction, SK_ALCHEMY)) {
 							sprintf(buf, "Es kann maximal %d Alchemisten pro Partei geben",
 									max_skill(u->faction, SK_ALCHEMY));
 							mistake(u, u->thisorder, buf, MSG_EVENT);
@@ -566,7 +567,7 @@ learn(void)
 							for (ptype=potiontypes; ptype; ptype=ptype->next) {
 								if (skill == ptype->level * 2) {
 									attrib * a = a_find(f->attribs, &at_showitem);
-									while (a && a->data.v != ptype) a=a->next;
+									while (a && a->data.v != ptype) a=a->nexttype;
 									if (!a) {
 										a = a_add(&f->attribs, a_new(&at_showitem));
 										a->data.v = (void*) ptype->itype;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: relation.c,v 1.1 2001/01/27 18:15:32 enno Exp $
+ *	$Id: relation.c,v 1.2 2001/04/01 06:58:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -51,10 +51,14 @@ rel_init(attrib *a)
 static void
 rel_done(attrib *a)
 {
+#ifdef OLD_TRIGGER
 	reldata *rel = (reldata *)a->data.v;
 	if( rel->obj2 )
 		untag_pointer(&rel->obj2, rel->typ2, TAG_RELATION);
 	free(rel);
+#else
+	unused(a);
+#endif
 }
 
 #ifdef OLD_TRIGGER

@@ -158,10 +158,8 @@ fix_skills(void)
 	attrib * a = a_find(global.attribs, &at_key); \
 	while (a && a->data.i!=(magic)) a=a->next; \
 	if (a) { \
-		log_warning(("[do_once] a unique fix was called a second time\n")); \
-		return; \
-	} \
-	else { \
+		log_warning(("[do_once] a unique fix %d=\"%s\" was called a second time\n", magic, itoa36(magic))); \
+	} else { \
 		(fun); \
 		a_add(&global.attribs, make_key(magic)); \
 	} \
@@ -1024,8 +1022,8 @@ show_newspells(void)
 	/* Alle geänderten Zauber in das array newspellids[]. mit SPL_NOSPELL
 	 * terminieren */
 
-	spellid_t newspellids[] = { SPL_UNHOLYPOWER, SPL_SUMMONUNDEAD, 
-		SPL_ORKDREAM, SPL_NOSPELL };
+	spellid_t newspellids[] = { 
+	};
 
 	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]
 	 * abgelegt */
@@ -1723,7 +1721,7 @@ free_skillfix(attrib * a)
 
 attrib_type at_skillfix = { "skillfix", init_skillfix, free_skillfix };
 
-void 
+void
 skillfix(struct unit * u, skill_t skill, int from, int self, int teach)
 {
 	attrib * a = a_add(&u->attribs, a_new(&at_skillfix));
@@ -1748,7 +1746,7 @@ write_skillfix(void)
 			attrib * a = a_find(u->attribs, &at_skillfix);
 			while (a) {
 				skillfix_data * data = (skillfix_data*)a->data.v;
-				fprintf(F, "%s %d %d %d %d %d\n", 
+				fprintf(F, "%s %d %d %d %d %d\n",
 					itoa36(data->u->no),
 					data->skill,
 					data->number,
@@ -1817,7 +1815,7 @@ convert_triggers(void)
 					if (u && u2) {
 						if (nonplayer(u) || (!nonplayer(u2) && u->race==RC_GOBLIN))
 							set_familiar(u2, u);
-						else 
+						else
 							set_familiar(u, u2);
 					} else {
 						if (u2) fprintf(stderr, "WARNING: FAMILIAR info for %s may be broken!\n", unitname(u2));
@@ -2087,10 +2085,10 @@ fix_timeouts(void)
 							*tptr = (*tptr)->next;
 						} else tptr = &(*tptr)->next;
 					}
-					if (t->type == &tt_changerace || 
-						t->type == &tt_changefaction || 
-						t->type == &tt_createcurse || 
-						t->type == &tt_createunit) 
+					if (t->type == &tt_changerace ||
+						t->type == &tt_changefaction ||
+						t->type == &tt_createcurse ||
+						t->type == &tt_createunit)
 					{
 						trigger * timer = get_timeout(td->triggers, t);
 						if (toad && t->type == &tt_changerace) {
@@ -2128,6 +2126,32 @@ fix_timeouts(void)
 	}
 }
 
+#include <modules/gmcmd.h>
+static void
+test_gmquest(void)
+{
+	const struct faction * f;
+	/* enno's world */
+	f = gm_addquest("enno@eressea.upb.de", "GM Zone", 1, PFL_NOATTACK|PFL_NOALLIANCES|PFL_NOFEED|PFL_FRIENDLY);
+	log_printf("Neue Questenpartei %s\n", factionname(f));
+
+	f = gm_addquest("xandril@att.net", "Mardallas Welt", 40, 0);
+	log_printf("Neue Questenpartei %s\n", factionname(f));
+
+	f = gm_addquest("moritzsalinger@web.de", "Laen-Kaiser", 7, /*PFL_NORECRUITS |*/ PFL_NOMAGIC /*| PFL_NOBUILD*/);
+	log_printf("Neue Questenpartei %s\n", factionname(f));
+
+	f = gm_addquest("Denise.Muenstermann@home.gelsen-net.de", "Mochikas Queste", 7, PFL_NOMAGIC);
+	log_printf("Neue Questenpartei %s\n", factionname(f));
+
+	f = gm_addquest("feeron@aol.com", "Eternath", 11, 0);
+	log_printf("Neue Questenpartei %s\n", factionname(f));
+	
+	f = gm_addquest("BigBear@nord-com.net", "Leonidas Vermächtnis", 15, PFL_NOMAGIC|PFL_NOSTEALTH);
+	log_printf("Neue Questenpartei %s\n", factionname(f));
+
+}
+
 void
 korrektur(void)
 {
@@ -2146,6 +2170,7 @@ korrektur(void)
 	fix_allies();
 	do_once(atoi36("fhrb"), fix_herbs());
 	do_once(atoi36("ftos"), fix_timeouts());
+	do_once(atoi36("gmtst"), test_gmquest()); /* test gm quests */
 #ifndef SKILLFIX_SAVE
 	fix_skills();
 #endif

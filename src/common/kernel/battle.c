@@ -214,14 +214,15 @@ armedmen(const unit * u)
 	if (!(urace(u)->flags & RCF_NOWEAPONS)) {
 		if (urace(u)->ec_flags & CANGUARD) {
 			/* kann ohne waffen bewachen: fuer untote und drachen */
-			n = u->number;			
+			n = u->number;
 		} else {
 			/* alle Waffen werden gezaehlt, und dann wird auf die Anzahl
 			 * Personen minimiert */
 			for (itm=u->items;itm;itm=itm->next) {
 				const weapon_type * wtype = resource2weapon(itm->type->rtype);
 				if (wtype==NULL) continue;
-				if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number;
+				if (effskill(u, wtype->skill) >= 1) n += itm->number;
+				/* if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number; */
 				if (n>u->number) break;
 			}
 			n = min(n, u->number);
@@ -528,12 +529,13 @@ reportcasualties(battle * b, fighter * fig)
 	bfaction * bf;
 	if (fig->alive == fig->unit->number)
 		return;
-	fbattlerecord(fig->unit->faction, fig->unit->region, " ");
+	fbattlerecord(fig->unit->faction, b->region, " ");
 	for (bf = b->factions;bf;bf=bf->next) {
 		faction * f = bf->faction;
 		struct message * m = new_message(f, "casualties%u:unit%r:runto%i:run%i:alive%i:fallen",
-		fig->unit, fig->run.region, fig->run.number, fig->alive, fig->unit->number - fig->alive - fig->run.number);
-		brecord(f, fig->unit->region, m);
+			fig->unit, fig->run.region, fig->run.number, fig->alive,
+			fig->unit->number - fig->alive - fig->run.number);
+		brecord(f, b->region, m);
 	}
 }
 
@@ -558,8 +560,8 @@ contest(int skilldiff, armor_t ar, armor_t sh)
 		p = rand() % 100;
 		vw -= p;
 	}
-	while (vw > 0 && p >= 90);
-	return (vw < 0);
+	while (vw >= 0 && p >= 90);
+	return (vw <= 0);
 }
 
 static boolean
@@ -610,7 +612,7 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
 				if (skill < race[u->race].at_default) skill = race[u->race].at_default;
 			} else {
 				if (skill < race[u->race].df_default) skill = race[u->race].df_default;
-			} 
+			}
 		}
 	} else {
 		/* changed: if we own a weapon, we have at least a skill of 0 */
@@ -1784,8 +1786,8 @@ attack(battle *b, troop ta, att *a)
 					int dead;
 					standard_attack = wp->type->attack(&ta, &dead);
 					af->catmsg += dead;
-					/* TODO: dies hier ist nicht richtig. wenn die katapulte/etc. 
-					 * keinen gegner gefunden haben, sollte es nicht erhöht werden. 
+					/* TODO: dies hier ist nicht richtig. wenn die katapulte/etc.
+					 * keinen gegner gefunden haben, sollte es nicht erhöht werden.
 					 * außerdem müsste allen gegenern der counter erhöht werden.
 					 */
 					if (af->person[ta.index].last_action < b->turn) {
@@ -2082,12 +2084,25 @@ loot_items(fighter * corpse)
 }
 
 static void
-loot_fleeing(fighter* fig, unit* runner) 
+loot_fleeing(fighter* fig, unit* runner)
 {
 	/* TODO: Vernünftig fixen */
 	runner->items = NULL;
 	assert(runner->items == NULL);
 	runner->items = fig->run.items;
+	fig->run.items = NULL;
+}
+
+static void
+merge_fleeloot(fighter* fig, unit* u)
+{
+	item * itm = fig->run.items;
+	item ** ip = &u->items;
+
+	while (itm) {
+		i_add(ip, itm);
+		itm = itm->next;
+	}
 	fig->run.items = NULL;
 }
 
@@ -2217,14 +2232,12 @@ aftermath(battle * b)
 
 			if (df->alive == du->number) continue; /* nichts passiert */
 
-			reportcasualties(b, df);
 			scale_number(du, df->alive + df->run.number);
 			du->hp = sum_hp + df->run.hp;
 
 			/* die weggerannten werden später subtrahiert! */
 			assert(du->number >= 0);
 
-			/* Report the casualties */
 
 			if (df->run.hp) {
 				/* Sonderbehandlung für sich auflösende Einheiten wie Wölfe,
@@ -2237,13 +2250,17 @@ aftermath(battle * b)
 					continue;
 				}
 				if (df->alive == 0) {
+					/* Zuerst dürfen die Feinde plündern, die mitgenommenen Items
+					 * stehen in fig->run.items. Dann werden die Fliehenden auf
+					 * die leere (tote) alte Einheit gemapt */
+					if (fval(df,FIG_NOLOOT)){
+						merge_fleeloot(df, du);
+					} else {
+						loot_items(df);
+						loot_fleeing(df, du);
+					}
 					scale_number(du, df->run.number);
 					du->hp = df->run.hp;
-					/* Distribute Loot */
-					if (!fval(df,FIG_NOLOOT)){
-						loot_fleeing(df, du);
-						loot_items(df);
-					}
 				} else {
 					unit *nu = createunit(du->region, du->faction, df->run.number, du->race);
 					skill_t sk;
@@ -2280,7 +2297,10 @@ aftermath(battle * b)
 				setguard(du, GUARD_NONE);
 				fset(du, FL_MOVED);
 				leave(du->region, du);
-				if (df->run.region) travel(r, du, df->run.region, 1);
+				if (df->run.region) {
+					travel(r, du, df->run.region, 1);
+					df->run.region = du->region;
+				}
 			}
 			else if (df->alive==0) { /* alle sind tot, niemand geflohen. Einheit auflösen */
 				setguard(du, GUARD_NONE);
@@ -2289,8 +2309,11 @@ aftermath(battle * b)
 				loot_items(df);
 			}
 
+			/* Report the casualties */
+			reportcasualties(b, df);
+
 			if (!nonplayer_race(du->race)) {
-				/* tote im kampf werden zu regionsuntoten: 
+				/* tote im kampf werden zu regionsuntoten:
 				 * for each of them, a peasant will die as well */
 				is += dead;
 			}
@@ -2947,7 +2970,7 @@ make_battle(region * r)
 		bdebug = gzopen(zFilename, "w");
 #elif HAVE_BZ2LIB
 		sprintf(zFilename, "%s/battle-%d-%s.log.bz2", zText, obs_count, simplename(r));
-		bdebug = BZ2_bzopen(zFilename, "w");+                       
+		bdebug = BZ2_bzopen(zFilename, "w");+
 #else
 		sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
 		bdebug = fopen(zFilename, "w");
@@ -3206,7 +3229,7 @@ join_allies(battle * b)
 extern struct item_type * i_silver;
 
 void
-flee(const troop dt) 
+flee(const troop dt)
 {
 	fighter * fig = dt.fighter;
 	unit * u = fig->unit;
@@ -3219,7 +3242,7 @@ flee(const troop dt)
 		const item_type * itype = itm->type;
 		int keep = 0;
 
-		if (itype->capacity>0 || fval(itype, ITF_ANIMAL)) {
+		if (fval(itype, ITF_ANIMAL)) {
 			/* Regeländerung: Man muß das Tier nicht reiten können,
 			 * um es vom Schlachtfeld mitzunehmen, ist ja nur
 			 * eine Region weit. * */
@@ -3229,8 +3252,16 @@ flee(const troop dt)
 			/* if it doesn't weigh anything, it won't slow us down */
 			keep = itm->number;
 		}
-		if (itm->number==keep && keep>0) {
-			i_add(&fig->run.items, i_remove(ip, itm));
+		/* jeder troop nimmt seinen eigenen Teil der Sachen mit */
+		if (keep>0){
+			if (itm->number==keep) {
+				i_add(&fig->run.items, i_remove(ip, itm));
+			} else {
+				item *run_itm = i_new(itype);
+				run_itm->number = keep;
+				i_add(&fig->run.items, run_itm);
+				i_change(ip, itype, -keep);
+			}
 		}
 		if (*ip==itm) ip = &itm->next;
 	}
@@ -3526,13 +3557,20 @@ do_battle(void)
 					}
 				}
 			}
+
+			/* this has to be calculated before the actual attacks take
+			 * place because otherwise the dead would not strike the
+			 * round they die. */
+			for (fi = b->fighters.begin; fi != b->fighters.end; ++fi) {
+				fighter *fig = *fi;
+				fig->fighting = fig->alive - fig->removed;
+			}
+
 			for (fi = b->fighters.begin; fi != b->fighters.end; ++fi) {
 				fighter *fig = *fi;
 
-				/* Kämpfer diese Runde: */
-				fig->fighting = fig->alive - fig->removed;
 				/* ist in dieser Einheit noch jemand handlungsfähig? */
-				if (fig->fighting == 0) continue;
+				if (fig->fighting <= 0) continue;
 
 				/* Taktikrunde: */
 				if (b->turn == 0) {

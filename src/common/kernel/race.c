@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: race.c,v 1.8 2001/02/28 18:25:25 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -46,6 +45,7 @@
 
 /* libc includes */
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 /* TODO: Tragkraft in die Struktur */
@@ -263,7 +263,7 @@ struct racedata race[MAXRACES] =
 			1, 0, 0, 0,  -1, 1,-3, 1,  -2, 1, 1, 0,   -99
 		},
 		false,
-		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
+		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM | RCF_SHAPESHIFT,
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
 		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
 		{RC_IMP, RC_IMP, RC_WRAITH, RC_RAT, RC_WARG, RC_IMP}
@@ -479,7 +479,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		},
 		true,
-		( RCF_FLY | RCF_WALK | RCF_NOTEACH),
+		( RCF_FLY | RCF_WALK | RCF_NOTEACH | RCF_SHAPESHIFT ),
 		0,
 		GIVEITEM | GIVEPERSON | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
@@ -613,7 +613,7 @@ struct racedata race[MAXRACES] =
 		},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		true, RCF_CANNOTMOVE|RCF_NOLEARN|RCF_NOTEACH, 0,
+		true, RCF_CANNOTMOVE|RCF_NOLEARN|RCF_NOTEACH|RCF_NOWEAPONS, 0,
 		0,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
@@ -1136,12 +1136,12 @@ struct racedata race[MAXRACES] =
  		  Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Kräu,Mag,Pfer,Rei, Rüs,Sbau,Hie,Seg,
 		  Sta,Spi,Stei,Str, Tak,Tar,Unt,Waf, Wag,Wahr,Steu,Aus, WlK */
 		{
-			0, 1,-3, 1,  -2, 1, 0,-2,   1, 0, 4, 0,  -1,-3, 0,-3,
-			1,-1,-1, 0,   0,-1, 0, 1,   1, 1, 1, 0,   0
+			0, 1,-3, 1,  -2, 1, 0,-2,   1, 0, 4, 0,  -1,-4, 0,-4,
+			1,-1,-1, 0,   0,-1, 0, 1,   1, 0, 1, 0,   0
 		},
 
 		/* Nonplayer (bei Gelegenheit entfernen) */
-		true,
+		false,
 
 		/* Flags */
 		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM | RCF_HORSE,
@@ -1765,6 +1765,39 @@ struct racedata race[MAXRACES] =
 		/* Vertraute für den Zauber
 		   (Generisch, Illaun, Tybied, Cerddor, Gwyrrd, Draig) */
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
+	},
+	/* Template */
+	{
+		/* const char *name[4] */
+		{"Schablone", "Schablonen", "Schablonen", NULL},
+		1.0,    /* Magieresistenz (0=Normal) */
+		0.0,    /* Maximale Aura (1=Durchschnitt) */
+		0.0,    /* Auraregeneration (1=Durchschnitt) */
+		1, 0,   /* Rekrutierungskosten, Unterhalt pro Runde */
+		10000,  /* Splitsize */
+		0,      /* Gewicht */
+		10.0,   /* Multiplikator Geschwindigkeit */
+		10,     /* Trefferpunkte */
+		"1d4",  /* Schaden AT_STANDARD unbewaffnet */
+		0,      /* Natürliche Rüstung */
+		-2, -2, /* Angriff, Verteidigung unbewaffnet */
+		0, 0,   /* Bonus Angriff, Verteidigung */
+		{ /* Angriffe */
+			{AT_STANDARD, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
+			{AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0}, {AT_NONE, {NULL}, 0},
+		},
+		{ 		/* Talentboni */
+ 			/* Alc,Arm,Ber,Bog, Bur,Han,Hol,Kat, Krä,Mag,Pfe,Rei, Rüs,Sba,Hie,Seg, */
+			     0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0,
+			/* Sta,Spi,Ste,Str, Tak,Tar,Unt,Waf, Wag,Wah,Ste,Aus, WlK */
+			     0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0,   0
+		},
+		true, /* Nonplayer (bei Gelegenheit entfernen) */
+		(RCF_SHAPESHIFT | RCF_FLY | RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM), /* flags */
+		(BF_EQUIPMENT | BF_MAGIC_EQUIPMENT),                      /* battle  */
+		(CANGUARD | GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM),  /* economy */
+		/* Vertraute für den Zauber (Gen, Ill, Tyb, Cer, Gwy, Dra) */
+		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}
 
 };
@@ -1860,6 +1893,9 @@ give_starting_equipment(struct region *r, struct unit *u)
 			fset(u, FL_OWNER);
 		}
 		set_skill(u, SK_SAILING, 30);
+		break;
+	case RC_CENTAUR:
+		rsethorses(r, 250+rand()%51+rand()%51);
 		break;
 	}
 

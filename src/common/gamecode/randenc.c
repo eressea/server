@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: randenc.c,v 1.9 2001/02/10 14:18:00 enno Exp $
+ *	$Id: randenc.c,v 1.10 2001/04/01 06:58:36 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -119,11 +119,19 @@ dissolve_units(void)
 					}
 					break;
 				case 2:
-					rsettrees(r, rtrees(r) + n);
-					if (n == 1) {
-						scat("wurde zum Baum.");
-					}else{
-						scat("wurden zu Bäumen.");
+					if(r->land) {
+						rsettrees(r, rtrees(r) + n);
+						if (n == 1) {
+							scat("wurde zum Baum.");
+						}else{
+							scat("wurden zu Bäumen.");
+						}
+					} else {
+						if(n == 1) {
+							scat("verfaulte in der feuchten Seeluft.");
+						} else {
+							scat("verfaulten in der feuchten Seeluft.");
+						}
 					}
 					break;
 				default:

@@ -1394,7 +1394,9 @@ order_template(FILE * F, faction * f)
 					}
 				}
 
-				if(u->lastorder[0]) {
+				/* If the lastorder begins with an @ it should have
+				 * been printed in the loop before. */
+				if(u->lastorder[0] != 0 && u->lastorder[0] != '@') {
 					sprintf(buf, "   %s", u->lastorder);
 					rps_nowrap(F, buf);
 					rnl(F);
@@ -1713,7 +1715,7 @@ report(FILE *F, faction * f)
 	dh = 0;
 	for(a=a_find(f->attribs, &at_faction_special); a; a=a->nexttype) {
 		dh++;
-		if(fspecials[a->data.sa[0]].levels) {
+		if(fspecials[a->data.sa[0]].maxlevel) {
 			sprintf(buf2, "%s (%d)", fspecials[a->data.sa[0]].name, a->data.sa[1]);
 		} else {
 			sprintf(buf2, "%s", fspecials[a->data.sa[0]].name);
@@ -3133,7 +3135,7 @@ writeadresses(void)
 	if (!F) return;
 
 	for (f = factions; f; f = f->next) {
-		if (f->no != MONSTER_FACTION) {
+		if (f->no != MONSTER_FACTION && !nonplayer_race(f->race)) {
 			fprintf(F, "%s:%s:%s\n", factionname(f), f->email, f->banner);
 		}
 	}

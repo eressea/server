@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: build.c,v 1.9 2001/03/04 18:41:25 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -277,38 +276,59 @@ do_siege(void)
 /* ------------------------------------------------------------- */
 
 void
+destroy_road(unit *u, int n, const char *cmd)
+{
+	direction_t d = getdirection();
+	unit *u2;
+	region *r = u->region;
+
+	for (u2=r->units;u2;u2=u2->next) {
+		if (u2->faction!=u->faction && getguard(u2)&GUARD_TAX &&
+			 	!allied(u, u2->faction, HELP_GUARD)) {
+			cmistake(u, cmd, 70, MSG_EVENT);
+			return;
+		}
+	}
+
+	if (d==NODIRECTION) {
+		cmistake(u, cmd, 71, MSG_PRODUCE);
+	} else {
+#if 0
+		int salvage, divy = 2;
+#endif
+		int willdo = min(n, (1+get_skill(u, SK_ROAD_BUILDING))*u->number);
+		int road = rroad(r, d);
+		region * r2 = rconnect(r,d);
+		willdo = min(willdo, road);
+#if 0
+		salvage = willdo / divy;
+		change_item(u, I_STONE, salvage);
+#endif
+		rsetroad(r, d, road - willdo);
+		add_message(&u->faction->msgs, new_message(
+			u->faction, "destroy_road%u:unit%r:from%r:to", u, r, r2));
+	}
+}
+
+void
 destroy(region * r, unit * u, const char * cmd)
 {
 	ship *sh;
 	unit *u2;
-	int size = 0;
+#if 0
 	const construction * con = NULL;
+	int size = 0;
+#endif
+	char *s;
+	int n = INT_MAX;
 
 	if (u->number < 1)
 		return;
-	if (getparam()==P_ROAD) {
-		direction_t d = getdirection();
-		for (u2=r->units;u2;u2=u2->next) {
-			if (u2->faction!=u->faction && getguard(u2)&GUARD_TAX &&
-				 	!allied(u, u2->faction, HELP_GUARD)) {
-				cmistake(u, cmd, 70, MSG_EVENT);
-				return;
-			}
-		}
-		if (d==NODIRECTION) cmistake(u, cmd, 71, MSG_PRODUCE);
-		else {
-			int salvage, divy = 2;
-			int cando = (1+get_skill(u, SK_ROAD_BUILDING))*u->number;
-			int road = rroad(r, d);
-			region * r2 = rconnect(r,d);
-			cando = min(cando, road);
-			salvage = cando / divy;
-			change_item(u, I_STONE, salvage);
-			rsetroad(r, d, road - cando);
-			add_message(&u->faction->msgs, new_message(
-				u->faction, "destroy_road%u:unit%r:from%r:to", u, r, r2));
 
-		}
+	s = getstrtoken();
+
+	if (findparam(s)==P_ROAD) {
+		destroy_road(u, INT_MAX, cmd);
 		return;
 	}
 
@@ -317,43 +337,80 @@ destroy(region * r, unit * u, const char * cmd)
 		return;
 	}
 
+	if(s && *s) {
+		n = atoi(s);
+		if(n <= 0) {
+			cmistake(u, cmd, 288, MSG_PRODUCE);
+			return;
+		}
+	}
+
+	if(getparam() == P_ROAD) {
+		destroy_road(u, n, cmd);
+		return;
+	}
+	 
 	if (u->building) {
 		building *b = u->building;
+#if 0
 		con = b->type->construction;
 		size = b->size;
-		/* befördere alle Einheiten hinaus */
+#endif
 
-		for (u2 = r->units; u2; u2 = u2->next)
-			if (u2->building == b) {
-				u2->building = 0;
-				freset(u2, FL_OWNER);
-			}
-		add_message(&u->faction->msgs, new_message(
-			u->faction, "destroy%b:building%u:unit", b, u));
-		destroy_building(b);
+		if(n >= b->size) {
+			/* destroy completly */
+			/* all units leave the building */
+			for (u2 = r->units; u2; u2 = u2->next)
+				if (u2->building == b) {
+					u2->building = 0;
+					freset(u2, FL_OWNER);
+				}
+			add_message(&u->faction->msgs, new_message(
+				u->faction, "destroy%b:building%u:unit", b, u));
+			destroy_building(b);
+		} else {
+			/* partial destroy */
+			b->size -= n;
+			add_message(&u->faction->msgs, new_message(
+				u->faction, "destroy_partial%b:building%u:unit", b, u));
+		}
 	} else if (u->ship) {
 		sh = u->ship;
+#if 0
 		con = sh->type->construction;
 		size = (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;
+#endif
+
 		if (rterrain(r) == T_OCEAN) {
 			cmistake(u, cmd, 14, MSG_EVENT);
 			return;
 		}
 
-		for (u2 = r->units; u2; u2 = u2->next)
-			if (u2->ship == sh) {
-				u2->ship = 0;
-				freset(u2, FL_OWNER);
-			}
-		add_message(&u->faction->msgs, new_message(
-			u->faction, "shipdestroy%u:unit%r:region%h:ship", u, r, sh));
-
-		destroy_ship(sh, r);
+		if(n >= (sh->size*100)/sh->type->construction->maxsize) {
+			/* destroy completly */
+			/* all units leave the ship */
+			for (u2 = r->units; u2; u2 = u2->next)
+				if (u2->ship == sh) {
+					u2->ship = 0;
+					freset(u2, FL_OWNER);
+				}
+			add_message(&u->faction->msgs, new_message(
+				u->faction, "shipdestroy%u:unit%r:region%h:ship", u, r, sh));
+			destroy_ship(sh, r);
+		} else {
+			/* partial destroy */
+			sh->size -= (sh->type->construction->maxsize * n)/100;
+			add_message(&u->faction->msgs, new_message(
+				u->faction, "shipdestroy_partial%u:unit%r:region%h:ship", u, r, sh));
+		}
 	} else
 		printf("* Fehler im Program! Die Einheit %s von %s\n"
 			   "  (Spieler: %s) war owner eines objects,\n"
 			   "  war aber weder in einer Burg noch in einem Schiff.\n",
 			   unitname(u), u->faction->name, u->faction->email);
+
+#if 0
+	/* Achtung: Nicht an ZERSTÖRE mit Punktangabe angepaßt! */
 	if (con) {
 		/* Man sollte alle Materialien zurückkriegen können: */
 		int c;
@@ -364,6 +421,7 @@ destroy(region * r, unit * u, const char * cmd)
 			  change_resource(u, rq->type, recycle);
 		}
 	}
+#endif
 }
 /* ------------------------------------------------------------- */
 
@@ -505,7 +563,7 @@ build(unit * u, const construction * ctype, int completed, int want)
 	int made = 0;
 	int basesk, effsk;
 
-	if (want==0) return 0;
+	if (want<=0) return 0;
 	if (type==NULL) return 0;
 	if (type->improvement==NULL && completed==type->maxsize)
 		return ECOMPLETE;
@@ -582,7 +640,6 @@ build(unit * u, const construction * ctype, int completed, int want)
 		if (want>0)
 			n = min(want, n);
 		if (type->maxsize>0) {
-			/* && type->improvement!=NULL) { */
 			n = min(type->maxsize-completed, n);
 		}
 
@@ -671,8 +728,6 @@ build_building(unit * u, const building_type * btype, int want)
 	int c, built = 0;
 	building * b = getbuilding(r);
 	/* einmalige Korrektur */
-	static FILE *statfile = NULL;
-	const construction *con = btype->construction;
 	static char buffer[8 + IDSIZE + 1 + NAMESIZE + 1];
 	const char *string2;
 
@@ -706,7 +761,13 @@ build_building(unit * u, const building_type * btype, int want)
 	}
 
 	if (b) built = b->size;
-	if (want<=0) want = INT_MAX;
+	if (want<=0 || want == INT_MAX) {
+		if(b == NULL) {
+			want = btype->maxsize - built;
+		} else {
+			want = b->type->maxsize - built;
+		}
+	}
 	built = build(u, btype->construction, built, want);
 
 	switch (built) {
@@ -770,12 +831,6 @@ build_building(unit * u, const building_type * btype, int want)
 	else
 		sprintf(buffer, "%s %d %s %s", keywords[K_MAKE], want-built, string2, buildingid(b));
 	set_string(&u->lastorder, buffer);
-
-	/* einmalige Korrektur */
-	if(turn==209 && con->maxsize > 0 && con->reqsize > 1)
-		fprintf(statfile,"%d;%d;%d;%d\n",
-				b->no, u->no, b->size, built);
-	/* Korrektur ende */
 
 	b->size += built;
 	if (b->type == &bt_lighthouse)

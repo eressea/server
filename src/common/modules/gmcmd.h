@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: gmcmd.h,v 1.4 2001/01/31 07:59:42 enno Exp $
+ * $Id: gmcmd.h,v 1.5 2001/04/01 06:58:40 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -14,6 +14,7 @@
 
 struct attrib;
 struct unit;
+struct faction;
 
 extern void init_gmcmd(void);
 /* initialize this module */
@@ -21,6 +22,7 @@ extern void init_gmcmd(void);
 extern void gmcommands(void);
 /* execute commands */
 
+extern struct faction * gm_addquest(const char * email, const char * name, int radius, unsigned int flags);
 
 /*
  * doesn't belong in here:

@@ -250,7 +250,8 @@ expandrecruit(region * r, request * recruitorders)
 	for (i = 0, n = 0; i != norders && n < rfrac; i++, n++) {
 		if (!(race[oa[i].unit->race].ec_flags & REC_HORSES)) {
 			recruitcost = race[oa[i].unit->faction->race].rekrutieren;
-			use_pooled(oa[i].unit, r, R_SILVER, recruitcost);
+			if (use_pooled(oa[i].unit, r, R_SILVER, recruitcost) != recruitcost)
+				break;
 			set_number(oa[i].unit, oa[i].unit->number + 1);
 			if (oa[i].unit->faction->race != RC_DAEMON) p--;
 			oa[i].unit->race = oa[i].unit->faction->race;
@@ -263,7 +264,8 @@ expandrecruit(region * r, request * recruitorders)
 	for (i = 0, n = 0; i != norders && n < h; i++, n++) {
 		if (race[oa[i].unit->race].ec_flags & REC_HORSES) {
 			recruitcost = race[oa[i].unit->faction->race].rekrutieren;
-			use_pooled(oa[i].unit, r, R_SILVER, recruitcost);
+			if (use_pooled(oa[i].unit, r, R_SILVER, recruitcost) != recruitcost)
+				break;
 
 			set_number(oa[i].unit, oa[i].unit->number + 1);
 			if (oa[i].unit->faction->race != RC_DAEMON) h--;
@@ -1254,7 +1256,7 @@ economics(void)
 					break;
 
 				case K_GIVE:
-					dogive(r, u, S, false);
+					dogive(r, u, S, S->s[0]=='@'?true:false);
 					break;
 
 				case K_LIEFERE:

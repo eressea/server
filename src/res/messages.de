@@ -1,5 +1,5 @@
 # Kommentare sind erlaubt. Endlich.
-# $Id: messages.de,v 1.7 2001/02/04 13:20:12 corwin Exp $
+# $Id: messages.de,v 1.8 2001/04/01 06:58:45 enno Exp $
 
 # Fehlermeldungen:
 msg_errors;errors:0;de;{string}
@@ -304,7 +304,7 @@ usepotion;events:4;de;{unit} benutzt {potion}.
 spydetect;events:0;de;{target} fühlt sich durch {$unit spy} beobachtet.
 spyfail;events:0;de;{spy} gelang es nicht, etwas über {target} herauszufinden.
 stealfail;events:0;de;{unit} gelang es nicht, sich nahe genug an {target} heranzuschleichen.
-stealdetect;events:0;de;{unit} fühlt sich bebachtet.
+stealdetect;events:0;de;{unit} fühlt sich beobachtet.
 stealfatal;events:0;de;{unit} wurde beim versuchten Diebstahl ertappt.
 thiefdiscover;events:0;de;{target} ertappte {unit} beim versuchten Diebstahl.
 stealeffect;events:0;de;{unit} wurde in {region} beklaut.
@@ -486,6 +486,7 @@ puttorest;magic;0;de;{mage} befreit die gequälten Seelen der Toten.
 unholypower_effect;0;de;{mage} verwandelt {target}.
 unholypower_limitedeffect;0;de;{mage} verwandelt {amount} {race} aus {target}.
 holyground;0;de;{mage} beschwört Naturgeister in den Boden der Region.
+sp_bloodsacrifice_effect;magic:0;de;{unit} in {region}: '{command}' - {unit} gewinnt durch das Ritual {amount} Aura.
 
 # Kämpfe
 msg_battle;battle:0;de;{string}

@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.25 2001/02/28 23:28:53 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -790,7 +789,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 	int n;
 	boolean cansee = false;
 	unit *u2;
-	if (u->faction == f || f->race == RC_ILLUSION) cansee = true;
+	if (u->faction == f || omniscient(f)) cansee = true;
 	else if (u->race == RC_SPELL || u->number == 0) return false;
 	else {
 		n = eff_stealth(u, r) - modifier;
@@ -837,7 +836,7 @@ cansee(faction * f, region * r, unit * u, int modifier)
 #endif
 	int n = 0;
 	boolean ring = false;
-	if (u->faction == f || f->race == RC_ILLUSION) return true;
+	if (u->faction == f || omniscient(f)) return true;
 #if FAST_CANSEE /* buggy */
 	if (lastr==r && lastf==f) {
 		n = eff_stealth(u, r) - modifier;

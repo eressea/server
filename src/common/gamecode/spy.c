@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: spy.c,v 1.6 2001/02/22 21:46:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -107,23 +106,24 @@ setstealth(unit * u, strlist * S)
 		return;
 	}
 
-	/* Dämomen können sich als anderer race tarnen */
+	/* Pseudodrachen können sich nur als Drachen tarnen */
 
-	if (u->race == RC_DAEMON) {
-		if ((t = findrace(s)) != NORACE && !race[t].nonplayer) {
-			u->irace = t;
+	t = findrace(s);
+	if (t != NORACE) {
+		if (u->race == RC_PSEUDODRAGON || u->race == RC_BIRTHDAYDRAGON) {
+			if (t==RC_PSEUDODRAGON||t==RC_FIREDRAGON||t==RC_DRAGON||t==RC_WYRM) {
+				u->irace = t;
+			}
 			return;
 		}
-	}
 
-	/* Pseudodrachen auch */
-
-	if (u->race == RC_PSEUDODRAGON || u->race == RC_BIRTHDAYDRAGON) {
-		t = findrace(s);
-		if(t==RC_PSEUDODRAGON||t==RC_FIREDRAGON||t==RC_DRAGON||t==RC_WYRM) {
-			u->irace = t;
-			return;
+		/* Dämomen und Illusionsparteien können sich als andere race tarnen */
+		if (race[u->race].flags & RCF_SHAPESHIFT) {
+			if (!race[t].nonplayer) {
+				u->irace = t;
+			}
 		}
+		return;
 	}
 
 	switch(findparam(s)) {

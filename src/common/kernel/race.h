@@ -33,7 +33,7 @@
 #define AT_COMBATSPELL 7
 #define AT_STRUCTURAL 8
 
-#define GOLEM_IRON   5          /* Anzahl Eisen in einem Eisengolem */
+#define GOLEM_IRON   4          /* Anzahl Eisen in einem Eisengolem */
 #define GOLEM_STONE  5          /* Anzahl Steine in einem Steingolem */
 
 typedef struct att {
@@ -96,6 +96,7 @@ typedef struct race_type {
 #define RCF_ABSORBPEASANTS (1<<15)  /* Tötet und absorbiert Bauern */
 #define RCF_NOHEAL         (1<<16)  /* Einheit kann nicht geheilt werden */
 #define RCF_NOWEAPONS      (1<<17)  /* Einheit kann keine Waffen bneutzen */
+#define RCF_SHAPESHIFT     (1<<18)	/* Kann TARNE RASSE benutzen. */
 
 /* Economic flags */
 #define NOGIVE         (1<<0)   /* gibt niemals nix */
@@ -122,9 +123,9 @@ typedef struct race_type {
 	/* Wird in die Rückzugsberechnung nicht einbezogen */
 #define BF_RES_PIERCE				(1<<6)
 	/* Halber Schaden durch PIERCE */
-#define BF_RES_CUT					(1<<6)
+#define BF_RES_CUT					(1<<7)
 	/* Halber Schaden durch CUT */
-#define BF_RES_BASH					(1<<6)
+#define BF_RES_BASH					(1<<8)
 	/* Halber Schaden durch BASH */
 
 extern struct racedata race[];
@@ -138,6 +139,7 @@ boolean is_undead(const struct unit *u);
 #define nonplayer(u) (race[(u)->race].nonplayer)
 #define nonplayer_race(r) (race[r].nonplayer)
 #define illusionary(u) ((u)->race==RC_ILLUSION)
+#define omniscient(f) ((f)->race==RC_ILLUSION || (f)->race==RC_TEMPLATE)
 
 extern boolean allowed_dragon(const struct region * src, const struct region * target);
 

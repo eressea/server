@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: plane.c,v 1.3 2001/02/17 14:47:42 enno Exp $
+ *	$Id: plane.c,v 1.4 2001/04/01 06:58:40 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -148,7 +148,6 @@ plane_center_x(plane *pl)
 
 int
 plane_center_y(plane *pl)
-
 {
 	if(pl == NULL)
 		return 0;
@@ -156,8 +155,8 @@ plane_center_y(plane *pl)
 	return(pl->miny + pl->maxy)/2;
 }
 
-int region_x(const region *r, const faction *f)
-
+int
+region_x(const region *r, const faction *f)
 {
 	plane *pl;
 
@@ -165,8 +164,8 @@ int region_x(const region *r, const faction *f)
 	return r->x - ursprung_x(f, pl) - plane_center_x(pl);
 }
 
-int region_y(const region *r, const faction *f)
-
+int
+region_y(const region *r, const faction *f)
 {
 	plane *pl;
 
@@ -176,7 +175,6 @@ int region_y(const region *r, const faction *f)
 
 void
 set_ursprung(faction *f, int id, int x, int y)
-
 {
 	ursprung *ur;
 
@@ -219,7 +217,7 @@ create_new_plane(int id, const char *name, int minx, int maxx, int miny, int max
 
 /* Umrechnung Relative-Absolute-Koordinaten */
 int
-rel_to_abs(struct plane *pl, struct faction * f, int rel, unsigned char index)
+rel_to_abs(const struct plane *pl, const struct faction * f, int rel, unsigned char index)
 {
 	assert(index == 0 || index == 1);
 

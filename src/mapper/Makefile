@@ -13,6 +13,7 @@ OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
 INCLUDES  += \
 	-I../common/util \
 	-I../common/kernel \
+	-I../common/spells \
 	-I../common
 
 LIBS      += \

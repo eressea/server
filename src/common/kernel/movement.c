@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.15 2001/03/04 18:41:25 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -137,7 +136,6 @@ getdirection(void)
 }
 /* ------------------------------------------------------------- */
 
-#ifdef NEW_DRIVE
 static attrib_type at_driveweight = {
 	"driveweight", NULL, NULL, NULL, NULL, NULL
 };
@@ -151,7 +149,6 @@ eff_weight(const unit *u)
 
 	return weight(u);
 }
-#endif
 
 int
 ridingcapacity(unit * u)
@@ -248,11 +245,7 @@ canwalk(unit * u)
 	if (pferde > maxpferde)
 		return 2;
 
-#ifdef NEW_DRIVE
 	if (walkingcapacity(u) - eff_weight(u) >= 0)
-#else
-	if (walkingcapacity(u) - weight(u) >= 0)
-#endif
 		return 0;
 
 	/* Stimmt das Gewicht, impliziert dies hier, daß alle Wagen ohne
@@ -316,11 +309,7 @@ canride(unit * u)
 		return 0;
 	}
 
-#ifdef NEW_DRIVE
 	if(ridingcapacity(u) - eff_weight(u) >= 0) {
-#else
-	if(ridingcapacity(u) - weight(u) >= 0) {
-#endif
 		if(pferde == 0 && unicorns >= u->number && !(race[u->race].flags & RCF_HORSE)) {
 			return 2;
 		}
@@ -767,20 +756,47 @@ cycle_route(unit *u, int gereist)
 	set_string(&u->lastorder, neworder);
 }
 
-#ifdef NEW_DRIVE
 void
 init_drive(void)
 {
 	region *r;
 	unit *u, *ut, *u2;
-	strlist *S, *St;
+	strlist *S;
 	int w;
 
-	/* This function calculates the weights of all transported units and
-	 * adds them to an internal counter which is used by travel() to
-	 * calculate effective weight and movement. */
-
 	for (r=regions; r; r=r->next) {
+		/* This is just a simple check for non-corresponding K_TRANSPORT/
+		 * K_DRIVE. This is time consuming for an error check, but there
+		 * doesn't seem to be an easy way to speed this up. */
+
+		for(u=r->units; u; u=u->next) {
+			if(igetkeyword(u->thisorder) == K_DRIVE && !fval(u, FL_LONGACTION)) {
+				boolean found = false;
+				ut = getunit(r, u);
+				if(!ut) {
+					cmistake(u, findorder(u, u->thisorder), 64, MSG_MOVE);
+					continue;
+				}
+				for (S = ut->orders; S; S = S->next) if (igetkeyword(S->s) == K_TRANSPORT) {
+					if(getunit(r, ut) == u) {
+						found = true;
+						break;
+					}
+				}
+				if(found == false) {
+					if(cansee(u->faction, r, ut, 0)) {
+						cmistake(u, findorder(u, u->thisorder), 286, MSG_MOVE);
+					} else {
+						cmistake(u, findorder(u, u->thisorder), 64, MSG_MOVE);
+					}
+				}
+			}
+		}
+
+		/* This calculates the weights of all transported units and
+		 * adds them to an internal counter which is used by travel() to
+		 * calculate effective weight and movement. */
+
 		for (u=r->units; u; u=u->next) {
 			w = 0;
 
@@ -788,7 +804,7 @@ init_drive(void)
 				ut = getunit(r, u);
 				if(!ut) continue;
 
-				for (St = ut->orders; St; St = St->next) if (igetkeyword(St->s) == K_DRIVE) {
+				if (igetkeyword(ut->thisorder) == K_DRIVE && !fval(ut, FL_LONGACTION)) {
 					u2 = getunit(r, u);
 					if(u2 == u) {
 						w += weight(ut);
@@ -801,7 +817,6 @@ init_drive(void)
 		}
 	}
 }
-#endif
 
 int  *storms;
 
@@ -863,9 +878,6 @@ travel(region * first, unit * u, region * next, int flucht)
 	region *rv[MAXSPEED];
 	strlist *S;
 	unit *ut, *u2;
-#ifndef NEW_DRIVE
-	int restkapazitaet;
-#endif
 	int gereist = 0;
 	char buf2[80];
 	static direction_t route[MAXSPEED];
@@ -880,7 +892,9 @@ travel(region * first, unit * u, region * next, int flucht)
 	 * Normalerweise verliert man 3 BP pro Region, bei Straßen nur 2 BP.
 	 * Außerdem: Wenn Einheit transportiert, nur halbe BP */
 
-	if (!dragon(u) && rterrain(next) == T_OCEAN && (u->ship || rterrain(current)==T_OCEAN)) {
+	if (rterrain(current)==T_OCEAN 
+			&& !(race[u->race].flags&(RCF_FLY) && rterrain(next)!=T_OCEAN)) 
+	{ /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
 		if (u->race != RC_AQUARIAN)
 		{
 			cmistake(u, findorder(u, u->thisorder), 44, MSG_MOVE);
@@ -891,7 +905,7 @@ travel(region * first, unit * u, region * next, int flucht)
 				return NULL;
 			}
 		}
-	} else {
+	} else if (rterrain(current)!=T_OCEAN) {
 		/* An Land kein NACH wenn in dieser Runde Schiff VERLASSEN! */
 		if (leftship(u) && is_guarded(current, u, GUARD_LANDING)) {
 			cmistake(u, findorder(u, u->thisorder), 70, MSG_MOVE);
@@ -901,9 +915,7 @@ travel(region * first, unit * u, region * next, int flucht)
 			cmistake(u, findorder(u, u->thisorder), 143, MSG_MOVE);
 			return NULL;
 		}
-	}
-
-	if (rterrain(next) == T_OCEAN && u->ship && u->ship->moved == 1) {
+	} else if (rterrain(next) == T_OCEAN && u->ship && u->ship->moved == 1) {
 		cmistake(u, findorder(u, u->thisorder), 13, MSG_MOVE);
 		return NULL;
 	}
@@ -1125,67 +1137,46 @@ travel(region * first, unit * u, region * next, int flucht)
 
 		/* und jetzt noch die transportierten Einheiten verschieben */
 
-#ifndef NEW_DRIVE
-		if (canride(u)) {
-			restkapazitaet = ridingcapacity(u) - weight(u);
-		} else {
-			restkapazitaet = walkingcapacity(u) - weight(u);
-		}
-#endif
-
 		for (S = u->orders; S; S = S->next) {
 			if (igetkeyword(S->s) == K_TRANSPORT) {
-
 				ut = getunit(first, u);
-
 				if (ut) {
 					boolean found = false;
-					strlist * ot;
-					for(ot=ut->orders;ot && !found;ot = ot->next) {
-						if (igetkeyword(ot->s) == K_DRIVE) {
-							u2 = getunit(first, ut);
-							if (!u2) {
-								cmistake(ut, ut->thisorder, 64, MSG_MOVE);
-								continue;
-							} else {
-#ifndef NEW_DRIVE
-								restkapazitaet -= weight(ut);
-								if (restkapazitaet >= 0) {
-#endif
-									add_message(&u->faction->msgs, new_message(
-										u->faction, "transport%u:unit%u:target%r:start%r:end",
-										u, ut, first, current));
-
-									if(!(terrain[current->terrain].flags & WALK_INTO)
-											&& get_item(ut, I_HORSE)) {
-										cmistake(ut, ut->thisorder, 67, MSG_MOVE);
-										continue;
-									}
-									if(can_survive(ut, current)) {
-										for (i = 0; i != m; i++)
-											travelthru(ut, rv[i]);
-										move_unit(ut, current, NULL);
-									} else {
-										cmistake(ut, ut->thisorder, 230, MSG_MOVE);
-										continue;
-									}
-#ifndef NEW_DRIVE
-								} else {
-									sprintf(buf, "Keine Transportkapazitäten"
-											" frei für %s und deren Gepäck.", unitname(ut));
-									mistake(u, u->thisorder, buf, MSG_MOVE);
-								}
-#endif
-							}
+					if (igetkeyword(ut->thisorder) == K_DRIVE 
+							&& !fval(ut, FL_LONGACTION)) {
+						u2 = getunit(first, ut);
+						if(u2 == u) {
 							found = true;
+							add_message(&u->faction->msgs, new_message(
+								u->faction, "transport%u:unit%u:target%r:start%r:end",
+								u, ut, first, current));
+							if(!(terrain[current->terrain].flags & WALK_INTO)
+									&& get_item(ut, I_HORSE)) {
+								cmistake(u, u->thisorder, 67, MSG_MOVE);
+								cmistake(ut, ut->thisorder, 67, MSG_MOVE);
+								continue;
+							}
+							if(can_survive(ut, current)) {
+								for (i = 0; i != m; i++)
+									travelthru(ut, rv[i]);
+								move_unit(ut, current, NULL);
+							} else {
+								cmistake(u, u->thisorder, 287, MSG_MOVE);
+								cmistake(ut, ut->thisorder, 230, MSG_MOVE);
+								continue;
+							}
 						}
 					}
-					if (!found) cmistake(u, u->thisorder, 90, MSG_MOVE);
+					if (!found) {
+						if(cansee(u->faction, u->region, ut, 0)) {
+							cmistake(u, findorder(u, u->thisorder), 90, MSG_MOVE);
+						} else {
+							cmistake(u, findorder(u, u->thisorder), 64, MSG_MOVE);
+						}
+					}
 				} else {
 					if (ut) {
-						sprintf(buf,
-							"Konnte %s in dieser Region nicht finden.", unitname(ut));
-						mistake(u, u->thisorder, buf, MSG_MOVE);
+						cmistake(u, findorder(u, u->thisorder), 64, MSG_MOVE);
 					} else {
 						cmistake(u, findorder(u, u->thisorder), 99, MSG_MOVE);
 					}
@@ -1990,9 +1981,7 @@ movement(void)
 	region *r;
 
 	/* Initialize the additional encumbrance by transported units */
-#ifdef NEW_DRIVE
 	init_drive();
-#endif
 
 	for (r = regions; r; r = r->next) {
 		unit ** up = &r->units;

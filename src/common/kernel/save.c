@@ -826,6 +826,9 @@ readgame(boolean backup)
 		else
 			f->magiegebiet = (magic_t)((rand() % 5)+1);
 
+		if (nonplayer_race(f->race)) {
+			f->lastorders = turn+1;
+		}
 		if (global.data_version >= KARMA_VERSION)
 			f->karma = ri(F);
 		else

@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: karma.c,v 1.4 2001/03/07 15:00:18 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -73,7 +72,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Schaden innerhalb einer Woche und zusätzlich in jeder Kampfrunde "
 		"HP entsprechend ihres Ausdauer-Talents. Sie benötigen jedoch 11 "
 		"Unterhalt pro Woche.",
-		false
+		1
 	},
 	{
 		"Städter",
@@ -85,7 +84,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"bei einem Turm 1 Silber, bei einer Befestigung 3 Silber weniger. Gibt "
 		"es kein entsprechendes Gebäude in der Region, verringert sich ihr "
 		"Arbeitslohn um 5 Silber.",
-		false
+		1
 	},
 	{
 		"Barbar",
@@ -96,7 +95,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"In allen nichtkriegerischen Talenten einschließlich Magie und Taktik "
 		"erhalten sie die entsprechende Anzahl von Lerntagen weniger pro "
 		"Lernwoche.",
-		true
+		100
 	},
 	/* TODO: Noch nicht so implementiert. */
 	{
@@ -110,7 +109,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Ein junger Drache benötigt 1000 Silber Unterhalt pro Woche, ein "
 		"ausgewachsener Drache 5000 und ein Wyrm 10000 Silber. Bekommt er "
 		"dieses Silber nicht, besteht eine Wahrscheinlichkeit, das er desertiert!",
-		true
+		100
 	},
 	/* TODO: Relativ sinnlose Eigenschaft. */
 	{
@@ -118,7 +117,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Alle Personen dieser Partei beginnen mit 30 Talenttagen in allen "
 		"Waffentalenten, in denen ihre Rasse keinen Malus hat. Zusätzliche "
 		"Stufen bringen jeweils einen zusätzlichen Talentpunkt.",
-		true
+		100
 	},
 	{
 		"Feenreich",
@@ -128,7 +127,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"solche Waffe nehmen sie einen zusätzlichen Schadenspunkt. Zusätzliche "
 		"Stufen dieser Eigenschaft verringern das Gewicht auf 1/3, 1/4, ... und "
 		"erhöhen den Schaden durch Eisenwaffen um einen weiteren Punkt.",
-		true
+		100
 	},
 	{
 		"Administrator",
@@ -137,7 +136,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"so dass sich der Unterhalt pro Person um 1 Silberstück erhöht. Weitere "
 		"Stufen der Eigenschaft erhöhen das Limit um weitere 400 Einheiten und "
 		"den Unterhalt um ein weiteres Silberstück.",
-		true
+		100
 	},
 	/* TODO: Noch nicht so implementiert */
 	{
@@ -147,8 +146,14 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"wie eigene Einheiten, mit allen Talentwerten und Gegenständen. Leider "
 		"führt eine so intensive Beschäftigung mit dem Geistigen zur körperlichen "
 		"Verkümmerung, und die Partei erhält -1 auf alle Talente außer "
-		"Alchemie, Kräuterkunde, Magie, Spionage, Tarnung und Wahrnehmung.",
-		false
+		"Alchemie, Kräuterkunde, Magie, Spionage, Tarnung und Wahrnehmung. Wird "
+		"diese Eigenschaft ein zweites Mal erworben, so bleibt die Wirkung nicht "
+		"auf Magier beschränkt, sondern alle Einheiten einer Partei können "
+		"die Talente und Gegenstände aller fremden Einheiten sehen. Allerdings "
+		"gibt es in beiden Fällen eine Einschränkung: Die Einheit muß sich einen "
+		"Monat lang auf die psychischen Ströme einer Region einstellen, bevor "
+		"sie in der Lage ist, die Gedanken der anderen zu lesen.",
+		2
 	},
 	{
 		"Amphibium",
@@ -157,7 +162,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Ozeanfeld stehen. Pferde weigern sich, in ein Ozeanfeld zu laufen. "
 		"Zusätzliche Stufen dieser Eigenschaft reduzieren den Schaden um jeweils "
 		"5 Punkte. Achtung: Auf dem Ozean wird kein Schaden regeneriert.",
-		true
+		3
 	},
 	/* TODO: negative Eigenschaft */
 	{
@@ -165,14 +170,14 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Eine Partei mit dieser Eigenschaft hat eine so hohe magische "
 		"Affinität, dass sie pro Stufe der Eigenschaft zwei zusätzlich Magier "
 		"ausbilden kann.",
-		true
+		100
 	},
 	/* TODO: negative Eigenschaft */
 	{
 		"Sappeur",
 		"Befestigungen wirken gegen Einheiten einer Partei mit dieser "
 		"Eigenschaft nur mit ihrer halben Schutzwirkung (aufgerundet).",
-		false
+		1
 	},
 	/* TODO: Noch nicht implementiert */
 	{
@@ -185,7 +190,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"versetzen. Zusätzliche Stufen erhöhen die Reichweite um jeweils "
 		"eine Region, erhöhen jedoch die Wahrscheinlichkeit eines zufälligen "
 		"Versetzens geringfügig.",
-		true
+		100
 	},
 	{
 		"Versteckt",
@@ -197,7 +202,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Um diese Eigenschaft steuern zu können, stehen diesen Parteien die "
 		"Befehle TARNE ANZAHL [NICHT] und TARNE GEGENSTÄNDE [NICHT] zur "
 		"Verfügung.",
-		false
+		1
 	},
 	/* TODO: Noch nicht implementiert */
 	{
@@ -206,14 +211,14 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"sich mit Hilfe eines speziellen Befehls jede Woche um eine Region "
 		"bewegen. Dies macht es den Bewohnern jedoch unmöglich, in dieser "
 		"Woche ihren normalen Tätigkeiten nachzugehen.",
-		false
+		1
 	},
 	{
 		"Magische Immunität",
 		"Eine Partei mit dieser Eigenschaft ist völlig immun gegen alle Arten "
 		"von Magie. Allerdings verlieren die Magier einer solchen Partei ihre "
 		"Fähigkeit, Aura zu regenerieren, völlig.",
-		false
+		1
 	},
 	/* TODO: Noch nicht implementiert */
 	{
@@ -221,7 +226,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"Eine Partei mit dieser Eigenschaft kann einen ihrer Magier in einem "
 		"anderen als dem Parteimagiegebiet ausbilden. Weitere Stufen ermöglichen "
 		"jeweils einem weiteren Magier das Lernen eines anderen Gebiets.",
-		true
+		100
 	},
 	{
 		"Jihad",
@@ -235,7 +240,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"oder eine Rasse mehrfach, in diesem Fall addiert sich die Wirkung. "
 		"Ein einmal erklärter Jihad kann nicht wieder rückgängig gemacht "
 		"werden.",
-		true
+		100
 	},
 	/* TODO: is_undead() und Sonderbehandlungen von Untoten */
 	{
@@ -244,7 +249,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		"soviele Trefferpunkte wie normale Angehörige der entsprechenden Rasse, "
 		"verlieren jedoch ihre Fähigkeit zur Regeneration erlittenen Schadens "
 		"komplett.",
-		false
+		100
 	}
 };
 
@@ -275,7 +280,7 @@ buy_special(unit *u, strlist *S, fspecial_t special)
 	/* Alles ok, attribut geben */
 
 	if(a2) {
-		if(fspecials[special].levels) {
+		if(a2->data.sa[1] < fspecials[special].maxlevel) {
 			a2->data.sa[1]++;
 			add_message(&f->msgs, new_message(f,
 				"new_fspecial_level%S:special%d:level", special, a2->data.sa[1]));

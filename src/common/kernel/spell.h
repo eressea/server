@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.h,v 1.5 2001/01/31 17:40:51 corwin Exp $
+ *	$Id: spell.h,v 1.6 2001/04/01 06:58:40 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -194,6 +194,7 @@ enum {
 	SPL_PUTTOREST,
 	SPL_UNHOLYPOWER,
 	SPL_HOLYGROUND,
+	SPL_BLOODSACRIFICE,
 	MAXALLSPELLS,
 	NO_SPELL = (spellid_t) -1
 };

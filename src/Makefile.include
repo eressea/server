@@ -100,7 +100,7 @@ ifeq (.depend,$(wildcard .depend))
 include .depend
 endif
 # Create dependencies
-depend::
+.depend depend:: $(SOURCES)
 	@echo "Creating dependencies in `pwd`/.depend";
 	$(DEPEND) $(CFLAGS) $(DEFINES) $(INCDIRS) $(SOURCES) >| .depend
 endif
@@ -160,7 +160,7 @@ $(BUILD_DIR) $(PUBLISH_DIR):
 
 # object files:
 $(BUILD_DIR)/%:: $(BUILD_DIR)
-$(BUILD_DIR)/%.o:: %.c
+$(BUILD_DIR)/%.o:: %.c .depend
 	@echo $(MSG_COMPILE)
 	$(CC) $(CFLAGS) -o $@ -c $<
 	@echo

@@ -1,5 +1,4 @@
 # Kommentare sind erlaubt. Endlich.
-# $Id: messages.txt,v 1.4 2001/02/25 19:31:40 enno Exp $
 
 # Fehlermeldungen:
 msg_errors;errors:0;de;{string}
@@ -90,7 +89,7 @@ error86;errors:0;de;{unit} in {region}: '{command}' - Falsches Passwort.
 error87;errors:0;de;{unit} in {region}: '{command}' - Für das Elixier benötigt man Drachenblut.
 error88;errors:0;de;{unit} in {region}: '{command}' - Für den Schiffbau braucht man Holz.
 error89;errors:0;de;{unit} in {region}: '{command}' - Geldgebot fehlt.
-error90;errors:0;de;{unit} in {region}: '{command}' - Die Einheit hat keinen FAHRE-Befehl.
+error90;errors:0;de;{unit} in {region}: '{command}' - Die Einheit fährt nicht mit uns.
 error91;errors:0;de;{unit} in {region}: '{command}' - Hier gibt es keine Mallornbäume.
 error92;errors:0;de;{unit} in {region}: '{command}' - Hier gibt es keinen normalen Wald.
 error93;errors:0;de;{unit} in {region}: '{command}' - Hier gibt es schon einen Hafen.
@@ -250,7 +249,7 @@ error247;errors:0;de;{unit} in {region}: '{command}' - Die Partei hat schon eine
 error248;errors:0;de;{unit} in {region}: '{command}' - Die Partei muß mindestens 10 Runden alt sein.
 error249;errors:0;de;{unit} in {region}: '{command}' - Das Schiff kann nicht aufs offene Meer hinaus segeln.
 error250;errors:0;de;{unit} in {region}: '{command}' - Nicht genug Karma.
-error251;errors:0;de;{unit} in {region}: '{command}' - Diese Kraft haben uns die Götter schon gewährt.
+error251;errors:0;de;{unit} in {region}: '{command}' - Diese Kraft können selbst die Götter nicht mehr mächtiger machen.
 error252;errors:0;de;{unit} in {region}: '{command}' - Was und wieviel soll geopfert werden?
 error253;errors:0;de;{unit} in {region}: '{command}' - Der Magier ist nicht stark genug, sich den Göttern zu opfern.
 error254;errors:0;de;{unit} in {region}: '{command}' - Auraangabe fehlerhaft oder zuwenig Aura.
@@ -285,6 +284,9 @@ error282;errors:0;de;{unit} in {region}: '{command}' - Gegen diese Rasse kann ke
 error283;events:0;de;{unit} in {region}: '{command}' - Das Passwort darf nur Buchstaben und Ziffern enthalten.
 error284;errors:0;de;{unit} in {region}: '{command}' - Nur noch nicht gestärkte Untote können das Ziel dieses Zaubers sein.
 error285;errors:0;de;{unit} in {region}: '{command}' - Diese Einheit kennt keine Trankrezepte.
+error286;errors:0;de;{unit} in {region}: '{command}' - Die Einheit transportiert uns nicht.
+error287;errors:0;de;{unit} in {region}: '{command}' - Dorthin können wir die Einheit nicht transportieren.
+error288;errors:0;de;{unit} in {region}: '{command}' - Wieviel sollen wir einreißen?
 
 # Meldungen und Ereignisse
 msg_event;events:0;de;{string}
@@ -309,7 +311,7 @@ usepotion;events:4;de;{unit} benutzt {potion}.
 spydetect;events:0;de;{target} fühlt sich durch {$unit spy} beobachtet.
 spyfail;events:0;de;{spy} gelang es nicht, etwas über {target} herauszufinden.
 stealfail;events:0;de;{unit} gelang es nicht, sich nahe genug an {target} heranzuschleichen.
-stealdetect;events:0;de;{unit} fühlt sich bebachtet.
+stealdetect;events:0;de;{unit} fühlt sich beobachtet.
 stealfatal;events:0;de;{unit} wurde beim versuchten Diebstahl ertappt.
 thiefdiscover;events:0;de;{target} ertappte {unit} beim versuchten Diebstahl.
 stealeffect;events:0;de;{unit} wurde in {region} beklaut.
@@ -324,6 +326,7 @@ warnillusiondissolve;events:1;de;{unit} wird sich bald verflüchtigen.
 illusiondissolve;events:0;de;{unit} hat sich unbemerkt verflüchtigt.
 illusionantimagic;events:0;de;{unit} marschiert in eine Antimagiezone und löst sich auf.
 shipdestroy;events:0;de;{unit} in {region} versenkt die {ship}.
+shipdestroy_partial;events:0;de;{unit} in {region} beschädigt die {ship}.
 orcified;events:0;de;Vor den vielen Orks in {region} fliehen die anderen Einwohner.
 deorcified;events:0;de;Langsam kehren andere Völker nach {region} zurück.
 piratenovictim;events:0;de;Die {ship} in {region} kann keine Schiffe aufbringen.
@@ -332,6 +335,7 @@ itemcloak;events:0;de;{mage} legt einen Schleier um die Ausrüstung von {target}.
 scunicorn;events:0;de;{unit} schließen sich {amount} {type} an.
 buildroad;events:1;de;{unit} erweitert in {region} das Straßennetz um {size}.
 destroy;events:1;de;{unit} zerstört {building}.
+destroy_partial;events:1;de;{unit} reißt einen Teil von {building} ein.
 researchherb;events:0;de;{unit} in {region} stellt fest, daß es hier {amount} {herb} gibt.
 researchherb_none;events:0;de;{unit} in {region} kann keine Kräuter finden.
 destroy_road;events:0;de;{unit} reißt die Straße zwischen {from} und {to} ein.
@@ -490,6 +494,7 @@ puttorest;magic:0;de;{mage} befreit die gequälten Seelen der Toten.
 unholypower_effect;magic:0;de;{mage} verwandelt {target}.
 unholypower_limitedeffect;magic:0;de;{mage} verwandelt {amount} {race} aus {target}.
 holyground;magic:0;de;{mage} beschwört Naturgeister in den Boden der Region.
+sp_bloodsacrifice_effect;magic:0;de;{unit} in {region}: '{command}' - {unit} gewinnt durch das Ritual {amount} Aura.
 
 # Kämpfe
 msg_battle;battle:0;de;{string}

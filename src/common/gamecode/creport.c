@@ -373,7 +373,7 @@ cr_output_ship(FILE * F, ship * s, unit * u, int fcaptain, faction * f, region *
 		fprintf(F, "%d;Partei\n", fcaptain);
 
 	/* calculate cargo */
-	if (u && (u->faction == f || f->race == RC_ILLUSION)) {
+	if (u && (u->faction == f || omniscient(f))) {
 		for (u2 = r->units; u2; u2 = u2->next)
 			if (u2->ship == s)
 				w += weight(u2);
@@ -423,7 +423,7 @@ cr_output_unit(FILE * F, region * r,
 	if (strlen(u->display))
 		fprintf(F, "\"%s\";Beschr\n", u->display);
 
-	if ((u->faction == f || f->race == RC_ILLUSION) || !fval(u, FL_PARTEITARNUNG)) {
+	if ((u->faction == f || omniscient(f)) || !fval(u, FL_PARTEITARNUNG)) {
 #ifdef GROUPS
 		if (u->faction == f) {
 			const attrib * a = a_find(u->attribs, &at_group);
@@ -460,7 +460,7 @@ cr_output_unit(FILE * F, region * r,
 		fprintf(F, "%d;Parteitarnung\n", fval(u, FL_PARTEITARNUNG));
 
 	/* additional information for own units */
-	if (u->faction == f || f->race == RC_ILLUSION) {
+	if (u->faction == f || omniscient(f)) {
 		const char *c;
 		int i;
 		const attrib * a;
@@ -485,7 +485,7 @@ cr_output_unit(FILE * F, region * r,
 		if (c)
 			fprintf(F, "\"%s\";privat\n", c);
 		c = hp_status(u);
-		if (c && *c && (u->faction == f || f->race == RC_ILLUSION))
+		if (c && *c && (u->faction == f || omniscient(f)))
 			fprintf(F, "\"%s\";hp\n", c);
 		if (fval(u, FL_HUNGER) && (u->faction == f))
 			fputs("1;hunger\n", F);
@@ -543,7 +543,7 @@ cr_output_unit(FILE * F, region * r,
 	}
 	/* items */
 	pr = 0;
-	if (f == u->faction || u->faction->race==RC_ILLUSION) {
+	if (f == u->faction || omniscient(u->faction)) {
 		show = u->items;
 	} else if (itemcloak==false && mode>=see_unit && !(a_fshidden
 			&& a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
@@ -587,7 +587,7 @@ cr_output_unit(FILE * F, region * r,
 		fprintf(F, "%d;%s\n", in, locale_string(NULL, ic));
 	}
 
-	if ((u->faction == f || f->race == RC_ILLUSION) && u->botschaften)
+	if ((u->faction == f || omniscient(f)) && u->botschaften)
 		cr_output_str_list(F, "EINHEITSBOTSCHAFTEN", u->botschaften, f);
 
 	print_curses(F, u, TYP_UNIT, u->attribs, (u->faction == f)? 1 : 0);
@@ -857,7 +857,7 @@ report_computer(FILE * F, faction * f)
 						maxmining = 0;
 						for (u = r->units; u; u = u->next) {
 							int s = eff_skill(u, SK_MINING, r);
-							if (u->faction == f || f->race == RC_ILLUSION)
+							if (u->faction == f || omniscient(f))
 								maxmining = max(maxmining, s);
 						}
 						if (maxmining >= 4)

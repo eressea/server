@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: zombies.c,v 1.3 2001/01/31 14:32:58 corwin Exp $
+ * $Id: zombies.c,v 1.4 2001/04/01 06:58:41 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -76,9 +76,7 @@ age_undead(unit *u)
 		u2 = make_undead_unit(r, findfaction(MONSTER_FACTION), 0, RC_UNDEAD);
 		transfermen(u, u2, u->number - n);
 		u2->building = u->building;
-		if (rterrain(r) == T_OCEAN) {
-			u2->ship = u->ship;
-		}
+		u2->ship = u->ship;
 	}
 }
 

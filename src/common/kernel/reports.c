@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: reports.c,v 1.8 2001/03/07 15:00:18 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -267,7 +266,7 @@ bufunit(const faction * f, const unit * u, int indent,
 	}
 
 	dh = 0;
-	if (f == u->faction || telepath_see || u->faction->race==RC_ILLUSION) {
+	if (f == u->faction || telepath_see || omniscient(u->faction)) {
 		show = u->items;
 	} else if (!itemcloak && mode >= see_unit && !(a_fshidden
 			&& a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {

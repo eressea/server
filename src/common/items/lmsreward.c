@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: lmsreward.c,v 1.2 2001/02/02 08:58:26 enno Exp $
+ * $Id: lmsreward.c,v 1.3 2001/04/01 06:58:37 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -55,7 +55,8 @@ static attrib_type at_lmsstory = {
 	age_lmsstory,
 	a_writedefault, 
 	a_readdefault, 
-	ATF_UNIQUE | ATF_CURSE
+	ATF_UNIQUE /* | ATF_CURSE */ /* Das geht nicht, weil der Inhalt
+																	des Attributs kein curse * ist */
 };
 
 static int
@@ -86,7 +87,8 @@ item_type it_lmsreward = {
 	ITF_NOTLOST|ITF_CURSED, 0, 0,       /* flags, weight, capacity */
 	0, NOSKILL,              /* minskill, skill */
 	NULL,                    /* construction */
-	&use_lmsreward,
+	NULL,	/* anstelle von use_lmsreward */
+/*	&use_lmsreward, */
 	NULL
 };
 

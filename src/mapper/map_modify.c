@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_modify.c,v 1.7 2001/02/18 10:14:04 corwin Exp $
+ *	$Id: map_modify.c,v 1.8 2001/04/01 06:58:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -217,48 +217,6 @@ block_create(int x1, int y1, int size, char chaotisch, int special, char terrain
 		}
 	}
 	vset_destroy(&fringe);
-}
-
-
-static void
-blockcreate(int x1, int y1, int size, char chaos)
-{
-	char chaotic = 0;
-	int special = 0;
-	char terrain = T_OCEAN;
-	int local_climate = climate(y1);
-
-	if (special == 1)
-		terrain = T_OCEAN;
-	else if (special == 2)
-		terrain = terrain_create(local_climate);
-
-	/* Chaotisch ? */
-
-	if ((x1 < -36 || x1 > 36 || y1 < -36) && chaos == 1) {
-		if (rand() % 100 < 50) {
-			chaotic = 1;
-		}
-		switch (rand() % 6) {
-		case 1:
-		case 2:
-			special = 1;		/* Nur Wasser ... */
-			break;
-		case 3:
-			special = 2;		/* Ein-Terrain-Insel */
-			break;
-		case 4:				/* Miniinsel */
-			size = 3 + rand() % 5;
-			break;
-		}
-	}
-	block_create(x1, y1, size, chaotic, special, terrain);
-}
-
-void
-makeblock(int x1, int y1, char chaos)
-{
-	blockcreate(x1, y1, ISLANDSIZE, chaos);
 }
 
 static void
@@ -913,6 +871,26 @@ make_new_region(int x, int y)
 		freset(r, RF_CHAOTIC);
 	}
 	modified=1;
+}
+
+#define BLOCK_RADIUS 6
+
+void
+make_ocean_block(int x, int y)
+{
+	int cx, cy;
+	region *r;
+
+	for(cx = x - BLOCK_RADIUS; cx < x+BLOCK_RADIUS; cx++) {
+		for(cy = y - BLOCK_RADIUS; cy < y+BLOCK_RADIUS; cy++) {
+			if(koor_distance(cx, cy, x, y) < BLOCK_RADIUS) {
+				if(!findregion(cx, cy)) {
+					r = new_region(cx, cy);
+					terraform(r, T_OCEAN);
+				}
+			}
+		}
+	}
 }
 
 void
