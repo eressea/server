@@ -572,7 +572,7 @@ check_working_buildingtype(const region * r, const building_type * bt)
 }
 
 static boolean
-is_freezing(const unit * u) 
+is_freezing(const unit * u)
 {
   if (old_race(u->race)!=RC_INSECT) return false;
   if (is_cursed(u->attribs, C_KAELTESCHUTZ, 0)) return false;
@@ -1260,10 +1260,12 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
         break;
       }
 
-      if (is_freezing(u)) {
-        ADDMSG(&u->faction->msgs, msg_message("detectforbidden",
-          "unit region", u, next));
-        break;
+      if (old_race(u->race)==RC_INSECT) {
+        if (r_insectstalled(next) && is_freezing(u)) {
+          ADDMSG(&u->faction->msgs, msg_message("detectforbidden",
+                                                "unit region", u, next));
+          break;
+        }
       }
       add_regionlist(iroute, next);
       iroute = &(*iroute)->next;
