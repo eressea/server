@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+# merge two accounts. not used.
+# needs to be checked before used.
+# does not update the TRANSFERS table
+
 import MySQLdb
 import sys
 

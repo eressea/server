@@ -39,25 +39,30 @@ while os.access(patchdir+'/patch-'+str(int(patch+1))+'.sql', os.F_OK):
     os.system('mysql ' + dbname + ' < ' + patchdir+'/patch-'+str(int(patch))+'.sql')
     cursor.execute('update games set patch='+str(int(patch))+' where id='+str(gid))
 
-k = cursor.execute("select user, faction from subscriptions where game="+str(gid)+" and status='TRANSFERED' and updated<'"+date+"'")
+k = cursor.execute("select user, faction from subscriptions where game="+str(gid)+" and status='TRANSFERED' and user!=0 and updated<'"+date+"'")
 print "Removing "+str(int(k))+" transfered subscriptions."
 SetUser(cursor, int(k), 0)
 
-k = cursor.execute("select user, faction from subscriptions where game="+str(gid)+" and status='CANCELLED' and updated<'"+date+"'")
+k = cursor.execute("select user, faction from subscriptions where game="+str(gid)+" and status='CANCELLED' and user!=0 and updated<'"+date+"'")
 print "Removing "+str(int(k))+" cancelled subscriptions."
 SetUser(cursor, int(k), 0)
 
-k = cursor.execute("select user, faction from subscriptions where game="+str(gid)+" and status='DEAD'")
+k = cursor.execute("select user, faction from subscriptions where game="+str(gid)+" and user!=0 and status='DEAD'")
 print "Removing "+str(int(k))+" dead subscriptions."
 
-k = cursor.execute("UPDATE subscriptions SET status='CANCELLED' where game="+str(int(game))+" and status='ACTIVE' and lastturn+3<="+str(lastturn))
+k = cursor.execute("UPDATE subscriptions SET status='CANCELLED' where game="+str(gid)+" and status='ACTIVE' and lastturn+3<="+str(lastturn))
 if k:
     print "Cancelling subscriptions with 3+ NMRs."
 
-k = cursor.execute("SELECT users.id FROM users, subscriptions WHERE users.id=subscriptions.user and subscriptions.status='ACTIVE' and subscriptions.game="+str(gid))
-while k!=0:
-    k=k-1
-    user = int(cursor.fetchone()[0])
-    update=db.cursor()
-    update.execute("INSERT INTO transactions (user,date,balance,description) VALUES ("+str(user)+", '"+date+"', -"+str(price)+", 'ZAT-"+str(gid)+"')")
-
+cursor.execute("SELECT count(*) from transactions where date='"+date+"' and description='ZAT-"+str(gid)+"'")
+k = cursor.fetchone()[0]
+if k==0:
+    k = cursor.execute("SELECT users.id FROM users, subscriptions WHERE users.id=subscriptions.user and subscriptions.status='ACTIVE' and subscriptions.game="+str(gid))
+    print "Billing "+str(int(k))+" users."
+    while k!=0:
+	k=k-1
+	user = int(cursor.fetchone()[0])
+	update=db.cursor()
+	update.execute("INSERT INTO transactions (user,date,balance,description) VALUES ("+str(user)+", '"+date+"', -"+str(price)+", 'ZAT-"+str(gid)+"')")
+else:
+    print "ERROR: ZAT for game "+str(gid)+" has already been done."

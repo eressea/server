@@ -214,11 +214,12 @@ def ShowInfo(custid, Password):
     Display(output, "Kundendaten #"+str(custid))
     Errors = ""
 
-def TransferFaction(sid, faction, newuser, game):
+def TransferFaction(sid, faction, olduser, newuser, game, gid):
     db = MySQLdb.connect(db=dbname)
     update = db.cursor()
-    exist = update.execute("select id from users where id="+str(newuser))
+    exist = update.execute("select id from users where id="+str(int(newuser)))
     if exist==1:
+	update.execute("INSERT into transfers (subscription, src, dst, reason) values ("+str(int(sid))+", "+str(int(olduser))+", "+str(int(newuser))+", 'TRANSFER')")
 	update.execute("UPDATE subscriptions set status='TRANSFERED', user=" + str(newuser) + " where id="+str(sid))
 	SendTransfer(newuser, faction, game);
     db.close()
@@ -258,15 +259,15 @@ def Save(custid, Password):
 	else:
 	    update.execute('delete from subscriptions where user='+str(int(custid))+' and game='+str(int(gid)))
 
-    nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='ACTIVE' and s.user="+str(custid) + " and s.game=g.id")
+    nfactions = cursor.execute("select g.id, g.name, s.id, faction from games g, subscriptions s where s.status='ACTIVE' and s.user="+str(custid) + " and s.game=g.id")
     while nfactions > 0:
-        game, sid, faction = cursor.fetchone()
+	gid, game, sid, faction = cursor.fetchone()
         if Form.has_key("cancel_"+faction):
             update = db.cursor()
 	    update.execute("UPDATE subscriptions set status='CANCELLED' where id="+str(int(sid)))
 	elif Form.has_key("transfer_"+faction):
 	    newuser = int(Form["transfer_"+faction].value)
-	    TransferFaction(sid, faction, newuser, game)
+	    TransferFaction(sid, faction, custid, newuser, game, gid)
         nfactions = nfactions - 1
 
     nfactions = cursor.execute("select g.id, g.name, s.id, faction from games g, subscriptions s where s.status='TRANSFERED' and s.user="+str(custid) + " and s.game=g.id")
@@ -278,7 +279,7 @@ def Save(custid, Password):
             if i==0:
 	        update.execute("UPDATE subscriptions set status='ACTIVE' where id="+str(int(sid)))
             else:
-                Errors=Errors+"Du hast bereits eine Aktive Partei in "+game+"<br>
+                Errors=Errors+"Du hast bereits eine Aktive Partei in "+game+"<br>\n"
         nfactions = nfactions - 1
 
     nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='CANCELLED' and s.user="+str(custid) + " and s.game=g.id")

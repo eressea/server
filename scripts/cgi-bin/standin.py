@@ -89,12 +89,13 @@ if (password!=None) & (custid!=None):
     output=""
     if cursor.execute("select firstname, lastname, email, id from users where password='"+password+"' and id="+str(int(custid)))==1:
 	firstname, lastname, email, custid = cursor.fetchone()
-	c = cursor.execute("SELECT id, game, password, faction from subscriptions where status='CANCELLED'")
+	c = cursor.execute("SELECT id, game, password, faction, user from subscriptions where status='CANCELLED'")
 	while c>0:
 	    c=c-1
-	    sid, gid, newpass, faction = cursor.fetchone()
+	    sid, gid, newpass, faction, uid = cursor.fetchone()
 	    if Form.has_key("accept_"+str(int(sid))):
 		update = db.cursor()
+		update.execute("INSERT into transfers (subscription, src, dst, reason) values ("+str(int(sid))+", "+str(int(uid))+", "+str(int(custid))+", ''STANDIN')")
 		update.execute("UPDATE subscriptions set user=" + str(int(custid)) + ", status='ACTIVE' where id=" + str(int(sid)))
 		output=output+"Die Partei " + faction + " wurde Dir überschrieben. Eine Email mit dem Passwort und weiteren Hinweisen ist unterwegs zu Dir.<br>"
 		server=smtplib.SMTP(smtpserver)
