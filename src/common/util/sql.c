@@ -26,6 +26,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 static FILE * sqlstream = NULL;
 static char * sqlfilename = NULL;

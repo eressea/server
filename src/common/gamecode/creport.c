@@ -678,21 +678,26 @@ cr_output_unit(FILE * F, const region * r,
 		fprintf(F, "%d;Anzahl\n", u->number);
 	}
 
+  pzTmp = get_racename(u->attribs);
+  if (pzTmp) {
+    fprintf(F, "\"%s\";Typ\n", pzTmp);
+    if (u->faction==f && fval(u->race, RCF_SHAPESHIFTANY)) {
+      const char * zRace = rc_name(u->race, 1);
+      fprintf(F, "\"%s\";wahrerTyp\n", 
+        add_translation(zRace, locale_string(f->locale, zRace)));
+    }
+  } else {
+    const char * zRace = rc_name(u->irace, 1);
+    fprintf(F, "\"%s\";Typ\n", 
+      add_translation(zRace, locale_string(f->locale, zRace)));
+    if (u->faction==f && u->irace!=u->race) {
+      zRace = rc_name(u->race, 1);
+      fprintf(F, "\"%s\";wahrerTyp\n", 
+        add_translation(zRace, locale_string(f->locale, zRace)));
+    }
+  }
 
-	pzTmp = get_racename(u->attribs);
-	if (pzTmp==NULL) {
-		const char * zRace = rc_name(u->irace, 1);
-		fprintf(F, "\"%s\";Typ\n", 
-			add_translation(zRace, locale_string(f->locale, zRace)));
-	}
-	else fprintf(F, "\"%s\";Typ\n", pzTmp);
-	if ((pzTmp || u->irace != u->race) && u->faction==f) {
-		const char * zRace = rc_name(u->race, 1);
-		fprintf(F, "\"%s\";wahrerTyp\n",
-			add_translation(zRace, locale_string(f->locale, zRace)));
-	}
-
-	if (u->building)
+  if (u->building)
 		fprintf(F, "%d;Burg\n", u->building->no);
 	if (u->ship)
 		fprintf(F, "%d;Schiff\n", u->ship->no);

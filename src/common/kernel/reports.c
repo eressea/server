@@ -245,18 +245,20 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   }
 
   pzTmp = get_racename(u->attribs);
-  if (pzTmp || u->irace != u->race) {
-    if (pzTmp)
-      scat(pzTmp);
-    else
-      scat(racename(f->locale, u, u->irace));
-    if (u->faction == f) {
+  if (pzTmp) {
+    scat(pzTmp);
+    if (u->faction==f && fval(u->race, RCF_SHAPESHIFTANY)) {
       scat(" (");
       scat(racename(f->locale, u, u->race));
       scat(")");
     }
   } else {
-    scat(racename(f->locale, u, u->race));
+    scat(racename(f->locale, u, u->irace));
+    if (u->faction==f && u->irace!=u->race) {
+      scat(" (");
+      scat(racename(f->locale, u, u->race));
+      scat(")");
+    }
   }
 
   /* status */
