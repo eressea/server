@@ -16,6 +16,7 @@ end
 
 function get_position(aid)
 -- return the position at which alliance 'aid' will start.
+  print("Alliance " .. aid)
   local pos = positions[aid]
   
   -- hack, because i have no coordinates yet:

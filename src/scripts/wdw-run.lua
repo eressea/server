@@ -24,13 +24,16 @@ function run_wdw()
     end
   end
   
+  local outfile="wdw-setup"
   -- run the alliances setup
   if list_empty(alliances) then
     dofile("wdw-setup.lua")
+  else
+  -- run the turn (not yet)
+    read_orders(orders)
+    process_orders()
+    outfile = "" .. get_turn()
   end
-  -- -- run the turn (not yet)
-  -- read_orders(orders)
-  -- process_orders()
 
   -- siegbedingungen ausgeben
   dofile("wdw-standings.lua")
@@ -41,7 +44,7 @@ function run_wdw()
 
 
   -- write the resulting file to 'wdw-setup'
-  if write_game("wdw-setup")~=0 then 
+  if write_game(outfile)~=0 then 
     print("could not write game")
     return -1
   end
