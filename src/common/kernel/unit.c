@@ -775,21 +775,50 @@ transfermen(unit * u, unit * u2, int n)
 			}
 		}
 #else
-		skill * sv;
+		char has_skill[MAXSKILLS];
+		skill *sv, *sn;
+		skill_t i;
 		assert(u2->number+n>0);
+
+		for (i=0; i<MAXSKILLS; ++i) {
+			has_skill[i]=(char)0;
+		}
 		for (sv=u->skills;sv!=u->skills+u->skill_size;++sv) {
-			skill * sn = get_skill(u2, sv->id);
-			if (sn==NULL) sn = add_skill(u2, sv->id);
-			/* level abrunden, wochen aufrunden. */
-			if (sn->level!=sv->level) {
-				int level = (sv->level*n+sn->level*u2->number)/(u2->number+n);
-				int weeks = (sv->weeks*n*(level+1)/(sv->level+1)+sn->weeks*u2->number*(level+1)/(sn->level+1)+u2->number+n-1)/(u2->number+n);
-				sn->level = (unsigned char)level;
-				sn->weeks = (unsigned char)weeks;
+			has_skill[sv->id]=(char)1;
+		}
+		for (sv=u2->skills;sv!=u2->skills+u2->skill_size;++sv) {
+			has_skill[sv->id]=(char)1;
+		}
+		for(i=0; i<MAXSKILLS; ++i) if(has_skill[i] == (char)1) {
+			int level;
+			int weeks;
+
+			sv = get_skill(u, i);
+			sn = get_skill(u2, i);
+
+			if(sn==NULL) sn = add_skill(u2, i);
+
+			if(sv==NULL) {
+				if(sn->level > 0) {
+					level = (sn->level*u2->number)/(u2->number+n);
+					weeks = (sn->weeks*u2->number*(level+1)/(sn->level+1)+u2->number+n-1)/(u2->number+n);
+					sn->level = (unsigned char)level;
+					sn->weeks = (unsigned char)weeks;
+				} else {
+					weeks = (sn->weeks*u2->number+u2->number+n-1)/(u2->number+n);
+					sn->weeks = (unsigned char)weeks;
+				}
 			} else {
-				/* aufgerundete wochenzahl */
-				int weeks = (sv->weeks*n+sn->weeks*u2->number+u2->number+n-1)/(u2->number+n);
-				sn->weeks = (unsigned char)weeks;
+				if(sn->level != sv->level) {
+					level = (sv->level*n+sn->level*u2->number)/(u2->number+n);
+					weeks = (sv->weeks*n*(level+1)/(sv->level+1)+sn->weeks*u2->number*(level+1)/
+										(sn->level+1)+u2->number+n-1)/(u2->number+n);
+					sn->level = (unsigned char)level;
+					sn->weeks = (unsigned char)weeks;
+				} else {
+					weeks = (sv->weeks*n+sn->weeks*u2->number+u2->number+n-1)/(u2->number+n);
+					sn->weeks = (unsigned char)weeks;
+				}
 			}
 			assert(sn->level>=0 && sn->weeks>=0 && sn->weeks<=sn->level*2+1);
 		}
