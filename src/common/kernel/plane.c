@@ -161,7 +161,7 @@ int
 region_x(const region *r, const faction *f)
 {
 	plane *pl;
-
+	assert(r!=NULL);
 	pl = getplane(r);
 	return r->x - ursprung_x(f, pl, r) - plane_center_x(pl);
 }
@@ -170,7 +170,7 @@ int
 region_y(const region *r, const faction *f)
 {
 	plane *pl;
-
+	assert(r!=NULL);
 	pl = getplane(r);
 	return r->y - plane_center_y(pl) - ursprung_y(f, pl, r);
 }
@@ -179,7 +179,7 @@ void
 set_ursprung(faction *f, int id, int x, int y)
 {
 	ursprung *ur;
-
+	assert(f!=NULL);
 	for(ur=f->ursprung;ur;ur=ur->next) {
 		if(ur->id == id) {
 			ur->x += x;

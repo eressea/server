@@ -75,8 +75,9 @@ regionname(const region * r, const faction * f)
 {
 	static char buf[65];
 	plane *pl = getplane(r);
-
-	if (f == NULL) {
+	if (r==NULL) {
+		strcpy(buf, "(null)");
+	} else if (f == NULL) {
 		strncpy(buf, rname(r, NULL), 65);
 	} else if (pl && fval(pl, PFL_NOCOORDS)) {
 		strncpy(buf, rname(r, f->locale), 65);
