@@ -153,7 +153,12 @@ checkorders(void)
 		if (f->no!=MONSTER_FACTION && turn - f->lastorders == NMRTimeout() - 1)
 			ADDMSG(&f->msgs, msg_message("turnreminder", ""));
 }
-/* ------------------------------------------------------------- */
+static boolean
+help_money(const unit * u)
+{
+  if (u->race->ec_flags & GIVEITEM) return true;
+  return false;
+}
 
 static void
 get_food(region *r)
@@ -176,17 +181,17 @@ get_food(region *r)
 		if (need > 0) {
 			unit *v;
 
-			for (v = r->units; need && v; v = v->next)
-				if (v->faction == u->faction && !is_monstrous(v)) {
-					int give = get_money(v) - lifestyle(v);
-					give = max(0, give);
-					give = min(need, give);
-					if (give) {
-						change_money(v, -give);
-						change_money(u, give);
-						need -= give;
-					}
-				}
+      for (v = r->units; need && v; v = v->next) {
+        if (v->faction == u->faction && help_money(v)) {
+          int give = get_money(v) - lifestyle(v);
+          give = min(need, give);
+          if (give>0) {
+            change_money(v, -give);
+            change_money(u, give);
+            need -= give;
+          }
+        }
+      }
 		}
 	}
 
@@ -194,6 +199,7 @@ get_food(region *r)
 	 * entsprechend verteilt. */
 	for (u = r->units; u; u = u->next) {
 		int need = lifestyle(u);
+    faction * f = u->faction;
 
 		need -= max(0, get_money(u));
 
@@ -201,13 +207,11 @@ get_food(region *r)
 			unit *v;
 
 			for (v = r->units; need && v; v = v->next) {
-				if (v->faction != u->faction && alliedunit(v, u->faction, HELP_MONEY)
-           && !is_monstrous(v)) {
-					int give = lifestyle(v);
-					give = max(0, get_money(v) - give);
+				if (v->faction != f && alliedunit(v, f, HELP_MONEY) && help_money(v)) {
+					int give = get_money(v) - lifestyle(v);
 					give = min(need, give);
 
-					if (give) {
+					if (give>0) {
 						change_money(v, -give);
 						change_money(u, give);
 						need -= give;
@@ -288,36 +292,35 @@ get_food(region *r)
 static void
 live(region * r)
 {
-	unit *u, *un;
+	unit **up = &r->units;
 
 	get_food(r);
 
-	for (u = r->units; u; u = un) {
+	while (*up) {
+    unit * u = *up;
 		/* IUW: age_unit() kann u löschen, u->next ist dann
 		 * undefiniert, also müssen wir hier schon das nächste
 		 * Element bestimmen */
-		un = u->next;
 
-		if (!is_monstrous(u)) {
-			int effect = get_effect(u, oldpotiontype[P_FOOL]);
-			if (effect > 0) {	/* Trank "Dumpfbackenbrot" */
-				skill * sv = u->skills, * sb = NULL;
-				while (sv!=u->skills+u->skill_size) {
-					if (sb==NULL || skill_compare(sv, sb)>0) {
-						sb = sv;
-					}
-					++sv;
-				}				/* bestes Talent raussuchen */
-				if (sb!=NULL) {
-					int weeks = min(effect, u->number);
-					reduce_skill(u, sb, weeks);
-					ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
-						"unit weeks skill", u, weeks, (skill_t)sb->id));
-				}	/* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
-        change_effect(u, oldpotiontype[P_FOOL], -effect);
-			}
+		int effect = get_effect(u, oldpotiontype[P_FOOL]);
+		if (effect > 0) {	/* Trank "Dumpfbackenbrot" */
+			skill * sv = u->skills, * sb = NULL;
+			while (sv!=u->skills+u->skill_size) {
+				if (sb==NULL || skill_compare(sv, sb)>0) {
+					sb = sv;
+				}
+				++sv;
+			}				/* bestes Talent raussuchen */
+			if (sb!=NULL) {
+				int weeks = min(effect, u->number);
+				reduce_skill(u, sb, weeks);
+				ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
+					"unit weeks skill", u, weeks, (skill_t)sb->id));
+			}	/* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
+      change_effect(u, oldpotiontype[P_FOOL], -effect);
 		}
-		age_unit(r, u);
+    age_unit(r, u);
+    if (*up==u) up=&u->next;
 	}
 }
 

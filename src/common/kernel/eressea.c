@@ -2590,7 +2590,7 @@ lifestyle(const unit * u)
 	static plane * astralspace = NULL;
 	int need;
 
-	if(is_monstrous(u)) return 0;
+	if (u->faction->no == MONSTER_FACTION) return 0;
 
 	need = u->number * u->race->maintenance;
 

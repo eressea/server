@@ -42,7 +42,6 @@ new_group(faction * f, const char * name, int gid)
 	group ** gp = &f->groups;
 	int index = gid % GMAXHASH;
 	group * g = calloc(sizeof(group), 1);
-	attrib *a;
 
 	while (*gp) gp = &(*gp)->next;
 	*gp = g;

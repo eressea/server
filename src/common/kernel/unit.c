@@ -1085,12 +1085,6 @@ invisible(const unit *u)
 #endif
 }
 
-boolean
-is_monstrous(const unit * u)
-{
-	return (boolean) (u->faction->no == MONSTER_FACTION || !playerrace(u->race));
-}
-
 void 
 unitlist_clear(struct unit_list **ul)
 {
