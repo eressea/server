@@ -24,14 +24,6 @@
 
 
 
-/****                      ****
- ** The Eressea boolean type **
- ****                      ****/
-
-typedef int boolean;
-#define false ((boolean)0)
-#define true ((boolean)!false)
-
 
 
 /****                 ****
@@ -55,6 +47,12 @@ typedef int boolean;
 # endif
 # include <stdlib.h>
 # include <dmalloc.h>
+#endif
+
+#if defined(__GCC__)
+# include <stdbool.h>
+# define HAS_BOOLEAN
+# define boolean bool
 #endif
 
 #if defined(_DEBUG) && defined(_MSC_VER)
@@ -231,5 +229,15 @@ extern char * strdup(const char *s);
 #endif
 
 #define unused(var) var = var
+
+
+/****                      ****
+ ** The Eressea boolean type **
+ ****                      ****/
+#ifndef HAS_BOOLEAN
+  typedef int boolean;
+# define false ((boolean)0)
+# define true ((boolean)!false)
+#endif
 
 #endif
