@@ -2374,8 +2374,8 @@ sp_stormwinds(castorder *co)
 
 		/* Duration = 1, nur diese Runde */
 		create_curse(mage, &sh->attribs, ct_find("stormwind"), power, 1, 0, 0);
-		/* Da der Spruch nur diese Runde wirkt, brauchen wir kein
-		 * set_cursedisplay() zu benutzten - es sieht eh niemand...  */
+		/* Da der Spruch nur diese Runde wirkt wird er nie im Report
+		 * erscheinen */
 		erfolg++;
 		force--;
 
@@ -4101,9 +4101,10 @@ sp_song_susceptmagic(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int force = co->force;
+	int duration = force+1;
 
 	create_curse(mage, &r->attribs, ct_find("badmagicresistancezone"),
-			force, force, mr_malus, 0);
+			force, duration, mr_malus, 0);
 
 	add_message(&mage->faction->msgs, new_message(mage->faction,
 				"regionmagic_effect%u:unit%r:region%s:command%u:unit", mage,
@@ -4182,7 +4183,7 @@ sp_rallypeasantmob(castorder *co)
  *	können.
  *
  * 	Fehlt: Triggeraktion: löste Bauernmob auf und gib alles an Region,
- * 	dann können die Bauernmobs ihr Silber mitnehmen und bleiben lovar(8)
+ * 	dann können die Bauernmobs ihr Silber mitnehmen und bleiben x
  * 	Wochen bestehen
  *
  *  alternativ: Lösen sich langsam wieder auf
@@ -4199,6 +4200,8 @@ sp_raisepeasantmob(castorder *co)
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
+	int force = co->force;
+	int duration = force+1;
 
 	anteil += rand()%4;
 
@@ -4221,7 +4224,7 @@ sp_raisepeasantmob(castorder *co)
 	a->data.ca[1] = 15;	/* 15% */
 	a_add(&u->attribs, a);
 
-	create_curse(mage, &r->attribs, ct_find("riotzone"), cast_level, anteil, 0, 0);
+	create_curse(mage, &r->attribs, ct_find("riotzone"), cast_level, duration, anteil, 0);
 
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
 	for (u = r->units; u; u = u->next ) {
@@ -4421,6 +4424,7 @@ sp_generous(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int force = co->force;
+	int duration = force+1;
 
 	if(is_cursed(r->attribs, C_DEPRESSION, 0)){
 		sprintf(buf, "%s in %s: Die Stimmung in %s ist so schlecht, das "
@@ -4429,7 +4433,7 @@ sp_generous(castorder *co)
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
-	create_curse(mage,&r->attribs, ct_find("generous"), force,force,2,0);
+	create_curse(mage,&r->attribs, ct_find("generous"), force,duration,2,0);
 
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
 	for (u = r->units; u; u = u->next ) {
@@ -4881,9 +4885,10 @@ sp_depression(castorder *co)
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
-	int power = co->force;
+	int force = co->force;
+	int duration = force+1;
 
-	create_curse(mage,&r->attribs, ct_find("depression"), power, power, 0, 0);
+	create_curse(mage,&r->attribs, ct_find("depression"), force, duration, 0, 0);
 
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
 	for (u = r->units; u; u = u->next ) {
@@ -5421,7 +5426,7 @@ sp_sweetdreams(castorder *co)
 	int power = co->force;
 	spellparameter *pa = co->par;
 	int men, n;
-	int duration = power/2;
+	int duration = 1+(power/2);
 	int opfer = power*power;
 
 	/* Schleife über alle angegebenen Einheiten */
@@ -5472,7 +5477,8 @@ sp_disturbingdreams(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int power = co->force;
-	curse * c = create_curse(mage, &r->attribs, ct_find("badlearn"), power, power/6, 10, 0);
+	int duration = 1 + (power/6);
+	curse * c = create_curse(mage, &r->attribs, ct_find("badlearn"), power, duration, 10, 0);
 	curse_setflag(c, CURSE_ISNEW);
 
 	sprintf(buf, "%s sorgt für schlechten Schlaf in %s.",
@@ -5492,7 +5498,7 @@ sp_dream_of_confusion(castorder *co)
 	int cast_level = co->level;
 	int power = co->force;
 	int range = (power-14)/2-1;
-	int duration = ((power-14)/2)*2;
+	int duration = ((power-14)/2)*2+1;
 
 	rl = all_in_range(r, range);
 
@@ -5603,6 +5609,7 @@ sp_itemcloak(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int power = co->force;
+	int duration = power+1;
 	spellparameter *pa = co->par;
 
 	/* wenn kein Ziel gefunden, Zauber abbrechen */
@@ -5611,7 +5618,7 @@ sp_itemcloak(castorder *co)
 	/* Zieleinheit */
 	target = pa->param[0]->data.u;
 
-	create_curse(mage,&target->attribs, ct_find("itemcloak"), power,power,0,0);
+	create_curse(mage,&target->attribs, ct_find("itemcloak"), power,duration,0,0);
 	add_message(&mage->faction->msgs, new_message(mage->faction,
 		"itemcloak%u:mage%u:target", mage, target));
 
@@ -6304,6 +6311,7 @@ sp_disruptastral(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int power = co->force;
+	int duration = (power/3)+1;
 
 	switch(getplaneid(r)) {
 	case 0:
@@ -6369,7 +6377,7 @@ sp_disruptastral(castorder *co)
 
 		/* Kontakt unterbinden */
 		create_curse(mage,&rl2->region->attribs, ct_find("astralblock"),
-			power, power/3, 100, 0);
+			power, duration, 100, 0);
 		addmessage(r, 0, "Mächtige Magie verhindert den Kontakt zur Realität.",
 				MSG_COMMENT, ML_IMPORTANT);
 	}
@@ -6778,6 +6786,7 @@ sp_antimagiczone(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int force = co->force;
+	int duration = force+1;
 
 	/* Hält Sprüche bis zu einem summierten Gesamtlevel von power aus.
 	 * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
@@ -6787,7 +6796,7 @@ sp_antimagiczone(castorder *co)
 	/* Reduziert die Stärke jedes Spruchs um effect */
 	effect = cast_level;
 
-	create_curse(mage, &r->attribs, ct_find("antimagiczone"), power, force,
+	create_curse(mage, &r->attribs, ct_find("antimagiczone"), power, duration,
 			effect, 0);
 
 	/* Erfolg melden*/
