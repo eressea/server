@@ -1826,6 +1826,8 @@ resize_plane(struct plane * p, int radius)
 				} else if (distance(r, center)<radius) {
 					terraform(r, T_OCEAN);
 				}
+			} else if (rterrain(r)==T_FIREWALL && distance(r, center)!=radius) {
+				terraform(r, T_OCEAN);
 			}
 		}
 	}
@@ -1839,13 +1841,15 @@ regatta_quest(void)
 	if (p) {
 		fset(p, PFL_SEESPECIAL);
 		return resize_plane(p, 40);
+#ifdef REGATTA_QUESTMASTER /* "gregorjochmann@gmx.de" */
 	} else {
 		region * center;
 		p = gm_addplane(40, PFL_NORECRUITS, "Regatta");
 		center = findregion(p->minx+(p->maxx-p->minx)/2, p->miny+(p->maxy-p->miny)/2);
-		gm_addfaction("gregorjochmann@gmx.de", p, center);
-		return 0;
+		gm_addfaction(REGATTA_QUESTMASTER, p, center);
+#endif
 	}
+	return 0;
 }
 
 static int
@@ -1889,6 +1893,7 @@ update_gmquests(void)
 		do_once("et02", secondfaction(f));
 	}
 	do_once("rq02", regatta_quest());
+	do_once("rq03", regatta_quest());
 }
 
 #if 0
