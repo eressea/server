@@ -847,7 +847,14 @@ visible_faction(const faction *f, const unit * u)
 {
 	if(!allied(u, f, HELP_FSTEALTH)) {
 		attrib *a = a_find(u->attribs, &at_otherfaction);
-		if (a) return get_otherfaction(a);
+		if (a) {
+			faction *fv = get_otherfaction(a);
+			if(fv != NULL) {
+				return fv;	/* fv should never be NULL! */
+			} else {
+				a_removeall(&u->attribs, &at_otherfaction);	/* workaround, if this is triggered, it's a bug */
+			}
+		}
 	}
 	return u->faction;
 }
