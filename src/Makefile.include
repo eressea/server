@@ -138,3 +138,8 @@ ifeq ($(CONVERT_TRIGGERS), 1)
  INCLUDES += -I. -I$(ERESSEA)/eressea/old
 endif
 
+MKFILES = $(wildcard $(USER).mk $(OSTYPE).mk $(HOSTTYPE).mk $(ARCH).mk)
+ifeq ($(MKFILES), )
+else
+  include $(MKFILES)
+endif
