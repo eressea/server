@@ -399,7 +399,7 @@ updatespelllist(unit * u)
       }
     case RC_FIREDRAGON:
       sp = find_spellbyid(SPL_FIREDRAGONODEM);
-      if (sp!=NULL && has_spell(u, sp) && sp->level<=sk) {
+      if (sp!=NULL && !has_spell(u, sp) && sp->level<=sk) {
         add_spell(mage, sp->id);
       }
       break;
