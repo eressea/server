@@ -183,7 +183,7 @@
 		<familiar race="nymph"></familiar>
 		<familiar race="imp"></familiar>
 	</race>
-	<race name="shadow knight" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="1" ac="0" damage="1d1" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants walk nolearn noteach noblock>
+	<race name="shadow knight" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="1" ac="0" damage="1d1" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants nogive walk nolearn noteach noblock>
 		<ai splitsize="20000" moverandom></ai>
 		<attack type="1" damage="1d1"></attack>
 	</race>

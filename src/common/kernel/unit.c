@@ -55,8 +55,25 @@
 int demonfix = 0;
 /* ------------------------------------------------------------- */
 
-const unit u_peasants = { NULL, NULL, NULL, NULL, NULL, 2, "die Bauern" };
-const unit u_unknown = { NULL, NULL, NULL, NULL, NULL, 1, "eine unbekannte Einheit" };
+const unit *
+u_peasants(void)
+{
+	static unit peasants = { NULL, NULL, NULL, NULL, NULL, 2, NULL };
+	if (peasants.name==NULL) {
+		peasants.name = strdup("die Bauern");
+	}
+	return &peasants;
+}
+
+const unit *
+u_unknown(void)
+{
+	static unit unknown = { NULL, NULL, NULL, NULL, NULL, 1, NULL };
+	if (unknown.name==NULL) {
+		unknown.name =strdup("eine unbekannte Einheit");
+	}
+	return &unknown;
+}
 
 #define DMAXHASH 8191
 typedef struct dead {

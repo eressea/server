@@ -105,8 +105,8 @@ void usetcontact(struct unit * u, const struct unit * c);
 struct unit * findnewunit (const struct region * r, const struct faction *f, int alias);
 
 #define upotions(u) fval(u, FL_POTIONS)
-extern const struct unit u_peasants;
-extern const struct unit u_unknown;
+extern const struct unit * u_peasants(void);
+extern const struct unit * u_unknown(void);
 
 extern struct unit * udestroy;
 

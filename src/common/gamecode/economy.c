@@ -485,11 +485,11 @@ add_give(unit * u, unit * u2, int n, const resource_type * rtype, const char * c
 		assert(rtype);
 		add_message(&u->faction->msgs,
 				msg_message("give", "unit target resource amount",
-					u, u2?ucansee(u->faction, u2, &u_unknown):&u_peasants, rtype, n));
+					u, u2?ucansee(u->faction, u2, u_unknown()):u_peasants(), rtype, n));
 		if (u2) {
 			add_message(&u2->faction->msgs,
 					msg_message("give", "unit target resource amount",
-						ucansee(u2->faction, u, &u_unknown), u2, rtype, n));
+						ucansee(u2->faction, u, u_unknown()), u2, rtype, n));
 		}
 	}
 }
@@ -884,7 +884,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 		if (u->faction != u2->faction) {
 			add_message(&u2->faction->msgs,
 					msg_message("givecommand", "unit receipient",
-						ucansee(u2->faction, u, &u_unknown), u2));
+						ucansee(u2->faction, u, u_unknown()), u2));
 		}
 		return;
 	}
