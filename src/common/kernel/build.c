@@ -657,8 +657,10 @@ build(unit * u, const construction * ctype, int completed, int want)
 			}
 		}
 
-		if (want>0)
+		if (want>0) {
 			n = min(want, n);
+		}
+
 		if (type->maxsize>0) {
 			n = min(type->maxsize-completed, n);
 			if (type->improvement==NULL) {

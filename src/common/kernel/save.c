@@ -1294,11 +1294,19 @@ writegame(char *path, char quiet)
 	FILE * F;
 #ifdef USE_PLAYERS
 	char playerfile[MAX_PATH];
+#endif
 
+#ifdef USE_PLAYERS
 	sprintf(buf, "%s/%d.players", datapath(), turn);
 	export_players(playerfile);
 #endif
+
 	/* write_dynamictypes(); */
+
+	/* write turn number to file for use by external scripts */
+	F = fopen("turn","w");
+	fprintf(F, "%d", turn);
+	fclose(F);
 
 	F = cfopen(path, "w");
 	if (F==NULL)
