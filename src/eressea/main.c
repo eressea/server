@@ -113,6 +113,7 @@ extern int fuzzy_hits;
  ** global variables wthat we are exporting
  **/
 static char * orders = NULL;
+static char * xmlfile = NULL;
 static int nowrite = 0;
 static boolean g_writemap = false;
 static boolean g_killeiswald = false;
@@ -163,7 +164,7 @@ game_init(void)
 	init_items();
 	init_spells();
 
-	init_data("eressea.xml");
+	init_data(xmlfile?xmlfile:"eressea.xml");
 	init_locales();
 
 	init_resources();
@@ -449,7 +450,6 @@ usage(const char * prog, const char * arg)
 	return -1;
 }
 
-
 static int
 read_args(int argc, char **argv)
 {
@@ -460,6 +460,7 @@ read_args(int argc, char **argv)
 		} else if (argv[i][1]=='-') { /* long format */
 			if (strcmp(argv[i]+1, "nocr")==0) nocr = true;
 			else if (strcmp(argv[i]+2, "nosave")==0) nowrite = true;
+			else if (strcmp(argv[i]+2, "xml")==0) xmlfile = argv[++i];
 			else if (strcmp(argv[i]+2, "dirtyload")==0) dirtyload = true;
 			else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
 			else if (strcmp(argv[i]+2, "nocr")==0) nocr = true;
