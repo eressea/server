@@ -22,17 +22,10 @@ attrib_type at_aggressive = {
 	NULL,
 	NULL,
 	NULL,
-	NULL,
-	NULL,
+  a_writedefault,
+  a_readdefault,
+  ATF_UNIQUE
 };
-
-attrib *
-make_aggressive(int chance)
-{
-	attrib * a = a_new(&at_aggressive);
-	a->data.i = chance;
-	return a;
-}
 
 void
 init_aggressive(void)
