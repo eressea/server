@@ -470,6 +470,10 @@ unitorders(FILE * F, struct faction * f)
   if (u && u->faction == f) {
     order ** ordp;
 
+		if (!quiet) {
+			printf(",_%4s_", itoa36(u->no));
+			fflush(stdout);
+		}
     free_orders(&u->orders);
     u->orders = 0;
 

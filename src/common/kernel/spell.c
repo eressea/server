@@ -2589,6 +2589,7 @@ sp_forest_fire(castorder *co)
 		nr = rconnect(r, i);
 		assert(nr);
 		destroyed = 0;
+		vernichtet_schoesslinge = 0;
 
 #if GROWING_TREES
 		if(rtrees(nr,2) + rtrees(nr,1) >= 800) {
