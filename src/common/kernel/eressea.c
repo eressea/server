@@ -726,17 +726,6 @@ unit_has_cursed_item(unit *u)
 	return false;
 }
 
-static int
-alliance(const ally * sf, const faction * f, int mode)
-{
-	while (sf) {
-		if (sf->faction == f)
-			return sf->status & mode;
-		sf = sf->next;
-	}
-	return 0;
-}
-
 static int 
 autoalliance(const plane * pl, const faction * sf, const faction * f2)
 {
@@ -757,13 +746,33 @@ autoalliance(const plane * pl, const faction * sf, const faction * f2)
 	return mode;
 }
 
+static int
+alliance(const ally * sf, const faction * f, int mode)
+{
+	int nmode = 0;
+	while (sf) {
+		if (sf->faction == f) {
+			nmode = sf->status & mode;
+			break;
+		}
+		sf = sf->next;
+	}
+	return nmode;
+}
+
+int 
+alliedgroup(const struct plane * pl, const struct faction * f, const struct ally * sf, const struct faction * f2, int mode)
+{
+	return alliance(sf, f, mode) | (mode & autoalliance(pl, f, f2));
+}
+
 int
 alliedfaction(const struct plane * pl, const faction * sf, const faction * f2, int mode)
 {
 #ifdef ALLIANCES
 	if (sf->alliance!=f2->alliance) return 0;
 #endif
-	return alliance(sf->allies, f2, mode) | (mode & autoalliance(pl, sf, f2));
+	return alliedgroup(pl, sf, sf->allies, f2, mode);
 }
 
 /* Die Gruppe von Einheit u hat helfe zu f2 gesetzt. */
@@ -786,7 +795,7 @@ alliedunit(const unit * u, const faction * f2, int mode)
 	sf = u->faction->allies;
 	a = a_find(u->attribs, &at_group);
 	if (a!=NULL) sf = ((group*)a->data.v)->allies;
-	return alliance(sf, f2, mode) | automode;
+	return alliance(sf, f2, mode) | (mode & autoalliance(pl, u->faction, f2));
 }
 
 boolean

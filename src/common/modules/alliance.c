@@ -13,6 +13,7 @@
 #include <config.h>
 #include <eressea.h>
 #include "alliance.h"
+#ifdef ALLIANCES
 #include "command.h"
 
 /* kernel includes */
@@ -275,3 +276,4 @@ alliancevictory(void)
 		}
 	}
 }
+#endif

@@ -11,7 +11,7 @@
  * This program may not be used, modified or distributed without
  * prior permission by the authors of Eressea.
  */
-
+#ifdef ALLIANCES
 struct plane;
 struct attrib;
 struct unit;
@@ -38,3 +38,4 @@ extern void alliancekick(void);
 extern void alliancevictory(void);
 /* execute commands */
 
+#endif

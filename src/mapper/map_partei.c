@@ -452,8 +452,8 @@ NeuePartei(region * r)
 		}
 		i = 0; q = 0; y++;
 		wmove(win, y, 4);
-		while(locales[i] != NULL) {
-			sprintf(buf, "%d=%s; ", i, locales[i]);
+		while(localenames[i] != NULL) {
+			sprintf(buf, "%d=%s; ", i, localenames[i]);
 			q += strlen(buf);
 			if (q > SX - 20) {
 				q = strlen(buf);
@@ -471,7 +471,7 @@ NeuePartei(region * r)
 			delwin(win);
 			return;
 		}
-		lang = find_locale(locales[locale_nr]);
+		lang = find_locale(localenames[locale_nr]);
 
 		delwin(win);
 	}

@@ -1231,7 +1231,7 @@ quit(void)
 	age = calloc(turn+1, sizeof(int));
 	for (f = factions; f; f = f->next) if (f->no != MONSTER_FACTION) {
 #if REMOVENMRNEWBIE
-		if(!fval(f, FL_NOIDLEOUT) && f!=) {
+		if(!fval(f, FL_NOIDLEOUT)) {
 			if (f->age>=0 && f->age <= turn) ++age[f->age];
 			if (f->age == 2 || f->age == 3) {
 				if (f->lastorders == turn - 2) {

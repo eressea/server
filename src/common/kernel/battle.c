@@ -340,13 +340,12 @@ allysfm(const side * s, const faction * f, int mode)
 	return alliedfaction(s->battle->plane, s->bf->faction, f, mode);
 }
 #else
-extern int alliance(const ally * sf, const faction * f, int mode);
 static int
 allysfm(const side * s, const faction * f, int mode)
 {
 	if (s->bf->faction==f) return true;
-	if (s->group) return alliance(s->group->allies, f, mode);
-	return alliance(s->bf->faction->allies, f, mode);
+	if (s->group) return alliedgroup(s->battle->plane, s->bf->faction, s->group->allies, f, mode);
+	return alliedfaction(s->battle->plane, s->bf->faction, f, mode);
 }
 #endif
 
