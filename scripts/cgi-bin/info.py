@@ -21,7 +21,7 @@ def Display(Content, Title=DefaultTitle):
     TemplateInput = TemplateHandle.read()
     TemplateHandle.close()                    # close the file
 
-	for field in Form.keys():
+	for key in Form.keys():
 		Content=Content+"<br>"+key+"="+Form[key]
 
     # this defines an exception string in case our
