@@ -50,6 +50,11 @@
 #include <attributes/ugroup.h>
 #endif
 
+/* modules include */
+#ifdef ALLIANCES
+# include <modules/alliance.h>
+#endif
+
 /* attributes includes */
 #include <attributes/key.h>
 
@@ -717,6 +722,20 @@ read_ugroups(FILE *file)
 }
 #endif
 
+#ifdef ALLIANCES
+void 
+read_alliances(FILE * F)
+{
+	char pbuf[32];
+	rns(F, pbuf, sizeof(pbuf));
+	while (strcmp(pbuf, "end")!=0) {
+		rs(F, buf);
+		makealliance(atoi36(pbuf), buf);
+		rns(F, pbuf, sizeof(pbuf));
+	}
+}
+#endif
+
 int
 readgame(boolean backup)
 {
@@ -807,7 +826,11 @@ readgame(boolean backup)
 	}
 
 	/* Read factions */
-
+#ifdef ALLIANCES
+	if (global.data_version>ALLIANCES_VERSION) {
+		read_alliances(F);
+	}
+#endif
 	n = ri(F);
 	printf(" - Einzulesende Parteien: %d\n", n);
 	fp = &factions;
@@ -1114,6 +1137,22 @@ void wi36(FILE * F, int n)
 	fprintf(F, "%s ", itoa36(n));
 }
 
+#ifdef ALLIANCES
+void
+write_alliances(FILE * F)
+{
+	alliance * al = alliances;
+	while (al) {
+		ws(F, itoa36(al->id));
+		ws(F, al->name);
+		al = al->next;
+		wnl(F);
+	}
+	ws(F, "end");
+	wnl(F);
+}
+#endif
+
 void
 write_items(FILE *F, item *ilist)
 {
@@ -1263,7 +1302,9 @@ writegame(char *path, char quiet)
 
 
 	/* Write factions */
-
+#if defined(ALLIANCES) && RELEASE_VERSION>=ALLIANCES_VERSION
+	write_alliances(F);
+#endif
 	n=listlen(factions);
 	wi(F, n);
 	wnl(F);

@@ -725,6 +725,24 @@ unit_has_cursed_item(unit *u)
 	return false;
 }
 
+#ifdef ALLIANCES
+int
+allied(const unit * u, const faction * f2, int mode)
+{
+	if (u->faction->alliance==f2->alliance) return mode;
+	return 0;
+}
+
+int
+isallied(const plane * pl, const faction * f, const faction * f2, int mode)
+{
+	unused(pl);
+	if (f->alliance==f2->alliance) return mode;
+	return 0;
+}
+
+#else
+
 /* f hat zu f2 HELFE mode gesetzt */
 int
 isallied(const plane * pl, const faction * f, const faction * f2, int mode)
@@ -751,7 +769,7 @@ isallied(const plane * pl, const faction * f, const faction * f2, int mode)
 	return 0;
 }
 
-int
+static int
 alliance(const ally * sf, const faction * f, int mode)
 {
 	while (sf) {
@@ -792,6 +810,7 @@ allied(const unit * u, const faction * f2, int mode)
 	if (a) sf = ((group*)a->data.v)->allies;
 	return alliance(sf, f2, mode);
 }
+#endif
 
 boolean
 seefaction(const faction * f, const region * r, const unit * u, int modifier)

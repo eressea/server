@@ -86,6 +86,10 @@ LIB32=link.exe -lib
 # PROP Default_Filter "*.h"
 # Begin Source File
 
+SOURCE=.\alliance.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\arena.h
 # End Source File
 # Begin Source File
@@ -133,6 +137,10 @@ SOURCE=.\xmas2000.h
 SOURCE=.\xmas2001.h
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\alliance.c
+# End Source File
 # Begin Source File
 
 SOURCE=.\arena.c

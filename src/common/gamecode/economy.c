@@ -323,17 +323,17 @@ expandrecruit(region * r, request * recruitorders)
 			}
 			i = fspecial(unew->faction, FS_MILITIA);
 			if (i > 0) {
-				if (unew->race->bonus[SK_SPEAR] >= 0) 
+				if (unew->race->bonus[SK_SPEAR] >= 0)
 					change_level(unew, SK_SPEAR, i);
-				if (unew->race->bonus[SK_SWORD] >= 0) 
+				if (unew->race->bonus[SK_SWORD] >= 0)
 					change_level(unew, SK_SWORD, i);
-				if (unew->race->bonus[SK_LONGBOW] >= 0) 
+				if (unew->race->bonus[SK_LONGBOW] >= 0)
 					change_level(unew, SK_LONGBOW, i);
-				if (unew->race->bonus[SK_CROSSBOW] >= 0) 
+				if (unew->race->bonus[SK_CROSSBOW] >= 0)
 					change_level(unew, SK_CROSSBOW, i);
-				if (unew->race->bonus[SK_RIDING] >= 0) 
+				if (unew->race->bonus[SK_RIDING] >= 0)
 					change_level(unew, SK_RIDING, i);
-				if (unew->race->bonus[SK_AUSDAUER] >= 0) 
+				if (unew->race->bonus[SK_AUSDAUER] >= 0)
 					change_level(unew, SK_AUSDAUER, i);
 			}
 			if (unew!=u) {
@@ -341,7 +341,7 @@ expandrecruit(region * r, request * recruitorders)
 				destroy_unit(unew);
 			}
 			if (u->n < u->wants) {
-				ADDMSG(&u->faction->msgs, msg_message("recruit", 
+				ADDMSG(&u->faction->msgs, msg_message("recruit",
 					"unit region amount want", u, r, u->n, u->wants));
 			}
 		}
@@ -526,7 +526,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, const char
 	n = min(want, n);
 #define GIVERESTRICTION 3
 	if (dest && src->faction != dest->faction && src->faction->age < GIVERESTRICTION) {
-		ADDMSG(&src->faction->msgs, msg_error(src, cmd, "giverestriction", 
+		ADDMSG(&src->faction->msgs, msg_error(src, cmd, "giverestriction",
 					"turns", GIVERESTRICTION));
 		return -1;
 	} else if (n == 0) {
@@ -573,7 +573,7 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 	int error = 0;
 
 	if (u2 && u->faction != u2->faction && u->faction->age < GIVERESTRICTION) {
-		ADDMSG(&u->faction->msgs, msg_error(u, cmd, "giverestriction", 
+		ADDMSG(&u->faction->msgs, msg_error(u, cmd, "giverestriction",
 					"turns", GIVERESTRICTION));
 		return;
 	} else if (u == u2) {
@@ -971,7 +971,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 			if (u->items) {
 				item **itmp=&u->items;
 				while (*itmp) {
-					if ((*itmp)->number > 0 
+					if ((*itmp)->number > 0
 							&& (*itmp)->number - new_get_resvalue(u, (*itmp)->type->rtype) > 0) {
 						n = (*itmp)->number - new_get_resvalue(u, (*itmp)->type->rtype);
 						if (give_item(n, (*itmp)->type, u, u2, S->s)==0) continue;
@@ -1284,7 +1284,7 @@ maintain_buildings(boolean crash)
 	}
 }
 
-	void
+void
 economics(void)
 {
 	region *r;
@@ -1353,7 +1353,7 @@ economics(void)
 /* ------------------------------------------------------------- */
 
 
-	static void
+static void
 manufacture(unit * u, const item_type * itype, int want)
 {
 	int n;
@@ -2582,7 +2582,7 @@ planttrees(region *r, unit *u, int raw)
 	}
 	if (fval(r, RF_MALLORN) && skill < 7 ) {
 		add_message(&u->faction->msgs,
-				msg_error(u, findorder(u, u->thisorder), "plant_skills", 
+				msg_error(u, findorder(u, u->thisorder), "plant_skills",
 					"skill minskill product", SK_HERBALISM, 7, itype->rtype, 1));
 		return;
 	}
@@ -2610,7 +2610,7 @@ planttrees(region *r, unit *u, int raw)
 	produceexp(u, SK_HERBALISM, u->number);
 	new_use_pooled(u, itype->rtype, GET_DEFAULT, n);
 
-	ADDMSG(&u->faction->msgs, msg_message("plant", 
+	ADDMSG(&u->faction->msgs, msg_message("plant",
 				"unit region amount herb", u, r, planted, itype->rtype));
 }
 
@@ -3279,7 +3279,7 @@ produce(void)
 			if (fval(u, FL_TRADER)) {
 				attrib * a = a_find(u->attribs, &at_trades);
 				if (a && a->data.i) {
-					produceexp(u, SK_TRADE, u->number);	
+					produceexp(u, SK_TRADE, u->number);
 				}
 				u->thisorder[0]=0;
 				continue;

@@ -336,16 +336,13 @@ set_enemy(side * as, side * ds, boolean attacking)
 	if (attacking) as->enemy[ds->index] |= E_ATTACKING;
 }
 
-extern int alliance(const ally * sf, const faction * f, int mode);
-
+#ifdef ALLIANCES
 static int
-allysf(side * s, faction * f)
+allysfm(side * s, faction * f, int mode)
 {
-	if (s->bf->faction==f) return true;
-	if (s->group) return alliance(s->group->allies, f, HELP_FIGHT);
-	return alliance(s->bf->faction->allies, f, HELP_FIGHT);
+	return isallied(s->battle->plane, s->faction, f, mode);
 }
-
+#else
 static int
 allysfm(side * s, faction * f, int mode)
 {
@@ -353,6 +350,14 @@ allysfm(side * s, faction * f, int mode)
 	if (s->group) return alliance(s->group->allies, f, mode);
 	return alliance(s->bf->faction->allies, f, mode);
 }
+#endif
+
+static int
+allysf(side * s, faction * f)
+{
+	return allysfm(s, f, HELP_FIGHT);
+}
+
 
 troop
 select_corpse(battle * b, fighter * af)

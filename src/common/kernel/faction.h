@@ -14,6 +14,7 @@
 #define FACTION_H
 
 struct player;
+struct alliance;
 
 typedef struct faction {
 	struct faction *next;
@@ -55,6 +56,9 @@ typedef struct faction {
 	int number; /* enno: unterschied zu num_people ? */
 	int money;
 	int score;
+#ifdef ALLIANCES
+	struct alliance * alliance;
+#endif
 #ifdef VICTORY_DELAY
 	unsigned char victory_delay;
 #endif
