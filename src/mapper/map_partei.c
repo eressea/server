@@ -16,7 +16,7 @@
 #include <eressea.h>
 #include "mapper.h"
 
-#include "autoseed.h"
+#include <modules/autoseed.h>
 
 /* kernel includes */
 #include <kernel/alliance.h>

@@ -131,4 +131,6 @@ typedef struct dropout {
 } dropout;
 
 extern dropout * dropouts;
+extern struct newfaction * newfactions;
+
 #endif				/* MAPPER_H */

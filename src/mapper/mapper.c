@@ -138,7 +138,8 @@ boolean minimapx=false,minimapy=false;		/* Karte nicht vert./hor. scrollen */
 /* top, left => ? */
 /* hx, hy => ? */
 
-static newfaction * newfactions = NULL;
+newfaction * newfactions = NULL;
+
 static void 
 runautoseed(void)
 {
