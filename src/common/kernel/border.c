@@ -177,7 +177,7 @@ erase_border(border * b)
     if (bp->next==b) np = &bp->next;
     hp = &(*hp)->nexthash;
   }
-	assert((*np && *hp) || !"error: border is not registered");
+	assert(*hp!=NULL || !"error: border is not registered");
 	if (np!=NULL) *np = b->next;
 	*hp = b->nexthash;
 	if (b->type->destroy) b->type->destroy(b);
