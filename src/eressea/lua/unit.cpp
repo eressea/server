@@ -15,6 +15,13 @@
 
 using namespace luabind;
 
+static unit *
+add_unit(faction * f, region * r)
+{
+  if (f->units==NULL) return addplayer(r, f);
+  return createunit(r, f, 0, f->race);
+}
+
 static void
 unit_setnumber(unit& u, int number)
 {
@@ -85,6 +92,7 @@ bind_unit(lua_State * L)
 {
   module(L)[
     def("get_unit", &findunit),
+    def("add_unit", &add_unit),
 
     class_<struct unit>("unit")
     .def_readonly("name", &unit::name)

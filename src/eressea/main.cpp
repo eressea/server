@@ -82,11 +82,9 @@
 #include <base36.h>
 
 /* lua includes */
-#ifdef HAVE_LUA
 #include "lua/bindings.h"
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
-#endif
 
 /* libc includes */
 #include <cstdio>
@@ -137,8 +135,8 @@ static char * orders = NULL;
 static char * xmlfile = NULL;
 static int nowrite = 0;
 static boolean g_writemap = false;
-static boolean g_killeiswald = false;
 static boolean opt_reportonly = false;
+static const char * luafile = "default.lua";
 
 struct settings global = {
 	"Eressea", /* gamename */
@@ -241,7 +239,7 @@ writefactiondata(void)
 {
 	FILE *F;
 	char zText[128];
-	
+
 	sprintf(zText, "%s/faction-data.xml", basepath());
 	F = cfopen(zText, "w");
 	if(F) {
@@ -263,24 +261,26 @@ writefactiondata(void)
 }
 #endif
 
-static void
+int
 writepasswd(void)
 {
-	FILE * F;
-	char zText[128];
+  FILE * F;
+  char zText[128];
 
-	sprintf(zText, "%s/passwd", basepath());
-	F = cfopen(zText, "w");
-	if (F) {
-		faction *f;
-		puts("Schreibe Passwörter...");
+  sprintf(zText, "%s/passwd", basepath());
+  F = cfopen(zText, "w");
+  if (F) {
+    faction *f;
+    puts("Schreibe Passwörter...");
 
-		for (f = factions; f; f = f->next) {
-			fprintf(F, "%s:%s:%s:%s\n", 
-				factionid(f), f->email, f->passw, f->override);
-		}
-		fclose(F);
-	}
+    for (f = factions; f; f = f->next) {
+      fprintf(F, "%s:%s:%s:%s\n",
+        factionid(f), f->email, f->passw, f->override);
+    }
+    fclose(F);
+    return 0;
+  }
+  return 1;
 }
 
 #ifdef SHORTPWDS
@@ -314,13 +314,10 @@ readshortpwds()
 }
 #endif
 
-#ifdef HAVE_LUA
-lua_State * luaState;
-
-void 
+lua_State *
 lua_init(void)
 {
-  luaState = lua_open();
+  lua_State * luaState = lua_open();
   luaopen_base(luaState);
   luabind::open(luaState);
   bind_eressea(luaState);
@@ -330,20 +327,19 @@ lua_init(void)
   bind_unit(luaState);
   bind_ship(luaState);
   bind_building(luaState);
+  return luaState;
 }
 
-void 
-lua_done(void)
+void
+lua_done(lua_State * luaState)
 {
   lua_close(luaState);
 }
-#endif
 
-static int
-processturn(char *filename)
+int
+process_orders()
 {
 	struct summary * begin, * end;
-	int i;
 
 #ifdef SHORTPWDS
   readshortpwds("passwords");
@@ -351,14 +347,10 @@ processturn(char *filename)
 	begin = make_summary(false);
 	printf(" - Korrekturen Runde %d\n", turn);
 	korrektur();
-#ifdef HAVE_LUA
-  lua_dofile(luaState, "test.lua");
-#endif
 	turn++;
 	puts(" - entferne Texte der letzten Runde");
 	getgarbage();
 	puts(" - Nehme Korrekturen am Datenbestand vor");
-	if ((i=readorders(filename))!=0) return i;
 #if BENCHMARK
 	exit(0);
 #endif
@@ -368,27 +360,15 @@ processturn(char *filename)
 	remove_unequipped_guarded();
 #endif
 	korrektur_end();
-	if (!noreports) reports();
-	free_units();
-	puts(" - Beseitige leere Parteien");
-	remove_empty_factions(true);
-	end = make_summary(true);
-	report_summary(end, begin, false);
-	report_summary(end, begin, true);
-	free(end);
-	free(begin);
-	writepasswd();
-#ifdef FUZZY_BASE36
-	fputs("==--------------------------==\n", stdout);
-	fprintf(stdout, "## fuzzy base10 hits: %5d ##\n", fuzzy_hits);
-	fputs("==--------------------------==\n", stdout);
-#endif /* FUZZY_BASE36 */
-	if (!nowrite) {
-		char ztext[64];
-		sprintf(ztext, "%s/%d", datapath(), turn);
-		writegame(ztext, 0);
-	}
-	return 0;
+
+  end = make_summary(true);
+  report_summary(end, begin, false);
+  report_summary(end, begin, true);
+  free(end);
+  free(begin);
+
+  update_subscriptions();
+  return 0;
 }
 
 #ifdef CLEANUP_CODE
@@ -558,10 +538,25 @@ usage(const char * prog, const char * arg)
 	return -1;
 }
 
+static void
+setLuaString(lua_State * luaState, const char * name, const char * value)
+{
+  luabind::object globals = luabind::get_globals(luaState);
+  globals[name] = value;
+}
+
+static void
+setLuaNumber(lua_State * luaState, const char * name, double value)
+{
+  luabind::object globals = luabind::get_globals(luaState);
+  globals[name] = value;
+}
+
 static int
-read_args(int argc, char **argv)
+read_args(int argc, char **argv, lua_State * luaState)
 {
 	int i;
+  char * c;
 	for (i=1;i!=argc;++i) {
 		if (argv[i][0]!='-') {
 			return usage(argv[0], argv[i]);
@@ -577,7 +572,6 @@ read_args(int argc, char **argv)
 			else if (strcmp(argv[i]+2, "dirtyload")==0) dirtyload = true;
 			else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
 			else if (strcmp(argv[i]+2, "nomsg")==0) nomsg = true;
-			else if (strcmp(argv[i]+2, "noeiswald")==0) g_killeiswald = true;
 			else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
 			else if (strcmp(argv[i]+2, "nomonsters")==0) nomonsters = true;
 			else if (strcmp(argv[i]+2, "nodebug")==0) nobattledebug = true;
@@ -593,6 +587,9 @@ read_args(int argc, char **argv)
 			case 'o':
 				g_reportdir = argv[++i];
 				break;
+      case 'e':
+        luafile = argv[++i];
+        break;
 			case 'D': /* DEBUG */
 				demonfix = atoi(argv[++i]);
 				break;
@@ -619,8 +616,12 @@ read_args(int argc, char **argv)
 				quiet = 1;
 				break;
 			case 'v':
-				if (i<argc) orders = argv[++i];
-				else return usage(argv[0], argv[i]);
+        if (i<argc) {
+          orders = argv[++i];
+          setLuaString(luaState, "orderfile", orders);
+        } else {
+          return usage(argv[0], argv[i]);
+        }
 				break;
 			case 'p':
 				loadplane = atoi(argv[++i]);
@@ -632,6 +633,22 @@ read_args(int argc, char **argv)
 			case 'X':
 				dirtyload = true;
 				break;
+      case 's':
+        c = argv[++i];
+        while (*c && (*c!='=')) ++c;
+        if (*c) {
+          *c++ = 0;
+          setLuaString(luaState, argv[i], c);
+        }
+        break;
+      case 'n':
+        c = argv[++i];
+        while (*c && (*c!='=')) ++c;
+        if (*c) {
+          *c++ = 0;
+          setLuaNumber(luaState, argv[i], atof(c));
+        }
+        break;
 			case 'l':
 				log_open(argv[++i]);
 				break;
@@ -662,22 +679,6 @@ typedef struct lostdata {
 } lostdata;
 
 void
-confirm_newbies(void)
-{
-	faction * f = factions;
-	if (sqlstream==NULL) return;
-	while (f) {
-		if (!fval(f, FFL_DBENTRY)) {
-			if (f->subscription) {
-				fprintf(sqlstream, "UPDATE subscriptions SET status='ACTIVE', faction='%s', race='%s' WHERE id=%u;\n", itoa36(f->no), dbrace(f->race), f->subscription);
-				fset(f, FFL_DBENTRY);
-			}
-		}
-		f = f->next;
-	}
-}
-
-void
 update_subscriptions(void)
 {
 	FILE * F;
@@ -699,6 +700,16 @@ update_subscriptions(void)
 			f->subscription=subscription;
 		}
 	}
+	fclose(F);
+
+	sprintf(zText, "subscriptions.%u", turn);
+	F = fopen(zText, "w");
+	for (f=factions;f!=NULL;f=f->next) {
+		fprintf(F, "%s:%u:%s:%s:%s:%u:\n",
+				itoa36(f->no), f->subscription, f->email, f->override,
+				dbrace(f->race), f->lastorders);
+	}
+	fclose(F);
 }
 
 int
@@ -726,85 +737,23 @@ main(int argc, char *argv[])
 	init_malloc_debug();
 #endif
 
-	if ((i=read_args(argc, argv))!=0) return i;
-
-	printf(
-		"version %d.%d\n"
-		"turn    %d.\n"
-		"orders  %s.\n",
-		global.data_version / 10, global.data_version % 10, turn, orders);
+  lua_State * luaState = lua_init();
+  if ((i=read_args(argc, argv, luaState))!=0) return i;
 
 	strcat(strcpy(zText, resourcepath()), "/timestrings");
 	if ((i=read_datenames(zText))!=0) return i;
 
 	kernel_init();
-#ifdef HAVE_LUA
-  lua_init();
-#endif
 	game_init();
-#if defined(BETA_CODE)
-	/* xml_writeships(); */
-	/* xml_writebuildings(); */
-	xml_writeitems("items.xml");
-	return 0;
-#endif
 
-	if ((i=readgame(false))!=0) return i;
-	confirm_newbies();
-	update_subscriptions();
-	{
-		char zText[128];
-		FILE * F;
-		faction * f = factions;
-		sprintf(zText, "subscriptions.%u", turn);
-		F = fopen(zText, "w");
-		while (f!=NULL) {
-			fprintf(F, "%s:%u:%s:%s:%s:%u:\n",
-					itoa36(f->no), f->subscription, f->email, f->override,
-					dbrace(f->race), f->lastorders);
-			f = f->next;
-		}
-		fclose(F);
-	}
-
-#ifdef DUNGEON_MODULE
-	if (dungeonstyles) {
-		struct dungeon * d = dungeonstyles;
-		struct region * r = make_dungeon(d);
-		make_dungeongate(findregion(0, 0), r, d);
-	}
-#endif
-	writepasswd();
-	if (g_killeiswald) {
-		region * r = findregion(0, 25);
-		if (r) {
-			/* mach sie alle zur schnecke... */
-			unit * u;
-			terraform(r, T_OCEAN);
-			for (u=r->units;u;u=u->next) scale_number(u, 1);
-		}
-	}
-
-	if (opt_reportonly) {
-		reports();
-		return 0;
-	}
-
-	if (g_writemap) {
-		return crwritemap(); 
-	}
-
-	if ((i=processturn(orders))!=0) {
-		return i;
-	}
+  // run the main script
+  lua_dofile(luaState, luafile);
 
 #ifdef CLEANUP_CODE
 	game_done();
 #endif
-#ifdef HAVE_LUA
-  lua_done();
-#endif
 	kernel_done();
+  lua_done(luaState);
 	log_close();
 	fclose(updatelog);
 	return 0;

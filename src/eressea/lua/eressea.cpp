@@ -3,10 +3,10 @@
 #include <eressea.h>
 
 // kernel includes
-#include <modules/alliance.h>
-#include <kernel/faction.h>
+#include <gamecode/laws.h>
+#include <kernel/save.h>
 #include <kernel/unit.h>
-#include <kernel/region.h>
+#include <kernel/reports.h>
 #include <util/language.h>
 
 // lua includes
@@ -16,34 +16,52 @@
 
 using namespace luabind;
 
-static faction *
-add_faction(const char * email, const char * passwd, const char * racename, const char * lang)
+static int
+get_turn(void)
 {
-  const race * frace = findrace(racename, default_locale);
-  locale * loc = find_locale(lang);
-  faction * f = addfaction(email, passwd, frace, loc, 0);
-  return f;
+  return turn;
 }
 
-static unit *
-add_unit(faction * f, region * r)
+static int
+read_game(void)
 {
-  if (f->units==NULL) return addplayer(r, f);
-  return createunit(r, f, 0, f->race);
+  return readgame(false);
 }
 
-static alliance *
-add_alliance(int id, const char * name)
+static int
+write_game(void)
 {
-  return makealliance(id, name);
+  char ztext[64];
+
+  free_units();
+  remove_empty_factions(true);
+
+  sprintf(ztext, "%s/%d", datapath(), turn);
+  writegame(ztext, 0);
+  return 0;
 }
+
+extern int writepasswd(void);
+
+static int
+write_reports()
+{
+  reports();
+  return 0;
+}
+
+extern int process_orders(void);
 
 void
-bind_eressea(lua_State * L) 
+bind_eressea(lua_State * L)
 {
   module(L)[
-    def("add_unit", &add_unit),
-    def("add_faction", &add_faction),
-    def("add_alliance", &add_alliance)
+    def("read_game", &read_game),
+    def("write_game", &write_game),
+    def("write_passwords", &writepasswd),
+    def("write_reports", &write_reports),
+    def("read_orders", &readorders),
+    def("process_orders", &process_orders),
+    def("get_turn", &get_turn)
   ];
 }

@@ -14,6 +14,15 @@
 
 using namespace luabind;
 
+static faction *
+add_faction(const char * email, const char * passwd, const char * racename, const char * lang)
+{
+  const race * frace = findrace(racename, default_locale);
+  locale * loc = find_locale(lang);
+  faction * f = addfaction(email, passwd, frace, loc, 0);
+  return f;
+}
+
 static eressea::list<faction>
 get_factions(void) {
   return eressea::list<faction>(factions);
@@ -51,6 +60,7 @@ bind_faction(lua_State * L)
   module(L)[
     def("factions", &get_factions, return_stl_iterator),
     def("get_faction", &findfaction),
+    def("add_faction", &add_faction),
 
     class_<struct faction>("faction")
     .def_readonly("name", &faction::name)
