@@ -28,6 +28,7 @@ extern "C" {
 
   /* Sprüche. Neue NUR hinten anfügen, oder das Datenfile geht kaputt */
   enum {
+    SPL_DONOTUSE,
     SPL_ARTEFAKT_OF_POWER,
     SPL_ARTEFAKT_OF_AURAPOWER,
     SPL_ARTEFAKT_OF_REGENERATION,

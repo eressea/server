@@ -7739,40 +7739,44 @@ get_spellnames(const struct locale * lang, magic_t mtype)
 }
 
 static spell * 
-find_spellbyname_i(unit *u, const char *name, const struct locale * lang)
+find_spellbyname_i(const char *name, const struct locale * lang, magic_t mtype)
 {
-  spell_ptr *spt;
-  sc_mage * m = get_mage(u);
   spell * sp = NULL;
   spell_names * sn;
 
-  if (m==NULL) return NULL;
-  sn = get_spellnames(lang, m->magietyp);
+  sn = get_spellnames(lang, mtype);
   if (findtoken(&sn->names, name, (void**)&sp)==E_TOK_NOMATCH) {
-    magic_t mtype;
-    for (mtype=0;mtype!=MAXMAGIETYP;++mtype) {
-      sn = get_spellnames(lang, mtype);
+    magic_t mt;
+    /* if we could not find it in the main magic type, we look through all the others */
+    for (mt=0;mt!=MAXMAGIETYP;++mt) {
+      sn = get_spellnames(lang, mt);
       if (findtoken(&sn->names, name, (void**)&sp)!=E_TOK_NOMATCH) break;
     }
   }
 
-  if (sp!=NULL) {
-    for (spt = m->spellptr; spt; spt = spt->next) {
-      if (sp->id==spt->spellid) return sp;
-    }
-  }
+  if (sp!=NULL) return sp;
   if (lang==default_locale) return NULL;
-  return find_spellbyname_i(u, name, default_locale);
+  return find_spellbyname_i(name, default_locale, mtype);
 }
 
 spell *
 find_spellbyname(unit *u, const char *name, const struct locale * lang)
 {
-  spell * sp = find_spellbyname_i(u, name, lang);
-  if (sp==NULL) {
+  sc_mage * m = get_mage(u);
+  spell * sp;
+
+  if (m==NULL) return NULL;
+  sp = find_spellbyname_i(name, lang, m->magietyp);
+  if (sp!=NULL) {
+    spell_ptr *spt;
+
+    for (spt = m->spellptr; spt; spt = spt->next) {
+      if (sp->id==spt->spellid) return sp;
+    }
+  } else {
     log_warning(("cannot find spell by name: %s\n", name));
   }
-  return sp;
+  return NULL;
 }
 
 spell *
@@ -7780,6 +7784,7 @@ find_spellbyid(spellid_t id)
 {
   spell_list * slist;
 
+  assert(id!=SPL_DONOTUSE);
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell* sp = slist->data;
     if (sp->id == id) return sp;
