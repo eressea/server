@@ -284,6 +284,7 @@ read_newfactions(const char * filename)
 		nf = calloc(sizeof(newfaction), 1);
 		nf->email = strdup(email);
 		nf->race = rc_find(race);
+		if (nf->race==NULL) nf->race = findrace(race, default_locale);
 		nf->lang = find_locale(lang);
 		nf->bonus = bonus;
 		assert(nf->race && nf->email && nf->lang);
