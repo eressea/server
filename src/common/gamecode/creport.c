@@ -814,7 +814,7 @@ static void
 show_allies(FILE * F, const faction * f, const ally * sf)
 {
 	for (; sf; sf = sf->next) if (sf->faction) {
-		int mode = alliedfaction(NULL, f, sf->faction, HELP_ALL);
+		int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
 		if (mode!=0 && sf->status>0) {
 			fprintf(F, "ALLIANZ %d\n", sf->faction->no);
 			fprintf(F, "\"%s\";Parteiname\n", sf->faction->name);

@@ -1650,17 +1650,17 @@ show_allies(const faction * f, const ally * allies)
 	int dh = 0;
 	const ally * sf;
 	for (sf = allies; sf; sf = sf->next) {
-    int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
+		int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
 #ifdef ALLIANCES
-  	if (f->alliance!=sf->faction->alliance) continue;
+		if (f->alliance!=sf->faction->alliance) continue;
 #endif
 		if (mode > 0) ++allierte;
 	}
 
 	for (sf = allies; sf; sf = sf->next) {
-    int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
+		int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
 #ifdef ALLIANCES
-  	if (f->alliance!=sf->faction->alliance) continue;
+		if (f->alliance!=sf->faction->alliance) continue;
 #endif
 		if (mode <= 0) continue;
 		i++;

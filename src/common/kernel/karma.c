@@ -439,7 +439,7 @@ prayers(void)
 				p = findparam(s, u->faction->locale);
 				switch(p) {
 				case P_AURA:
-					if(!is_mage) {
+					if(!is_mage(u)) {
 						cmistake(u, S->s, 214, MSG_EVENT);
 						continue;
 					}
