@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: skill.h,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: skill.h,v 1.3 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -30,12 +30,14 @@ char eff_skill(const struct unit * u, skill_t sk, const struct region * r);
 int pure_skill(struct unit * u, skill_t sk, struct region * r);
 
 /* skillmod_data::flags -- wann gilt der modifier? */
-#define SMF_ALWAYS     0x01 /* immer */
-#define SMF_PRODUCTION 0x02 /* für Produktion */
+#define SMF_ALWAYS     (1<<0) /* immer */
+#define SMF_PRODUCTION (1<<1) /* für Produktion - am gebäude, an der einheit */
+#define SMF_RIDING     (1<<2) /* Bonus für berittene - an der rasse*/
 
 typedef struct skillmod_data {
+	skill_t skill;
 	int (*special)(const struct unit * u, const struct region * r, skill_t skill, int value);
-	int multiplier;
+	double multiplier;
 	int bonus;
 	int flags;
 } skillmod_data;
@@ -43,6 +45,7 @@ extern attrib_type at_skillmod;
 extern int skillmod(const attrib * a, const struct unit * u, const struct region * r, skill_t sk, int value, int flags);
 extern void skill_init(void);
 extern void skill_done(void);
+extern struct attrib * make_skillmod(skill_t skill, unsigned int flags, int(*special)(const struct unit*, const struct region*, skill_t, int), double multiplier, int bonus);
 
 int level_days(int level);
 void remove_zero_skills(void);

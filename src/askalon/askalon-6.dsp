@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
-CFG=askalon - Win32 Conversion
+CFG=askalon - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,13 +13,12 @@ CFG=askalon - Win32 Conversion
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "askalon-6.mak" CFG="askalon - Win32 Conversion"
+!MESSAGE NMAKE /f "askalon-6.mak" CFG="askalon - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "askalon - Win32 Release" (based on "Win32 (x86) Console Application")
 !MESSAGE "askalon - Win32 Debug" (based on "Win32 (x86) Console Application")
-!MESSAGE "askalon - Win32 Conversion" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -40,9 +39,10 @@ RSC=rc.exe
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "Release"
 # PROP Intermediate_Dir "Release"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /Za /W4 /GX /Z7 /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x407 /d "NDEBUG"
 # ADD RSC /l 0x407 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -50,7 +50,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386
 
 !ELSEIF  "$(CFG)" == "askalon - Win32 Debug"
 
@@ -66,34 +66,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /Za /W4 /Gm /ZI /Od /I ".." /I "../util" /I "../common" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /YX"stdafx.h" /FD /c
-# ADD BASE RSC /l 0x407 /d "_DEBUG"
-# ADD RSC /l 0x407 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-
-!ELSEIF  "$(CFG)" == "askalon - Win32 Conversion"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "askalon_"
-# PROP BASE Intermediate_Dir "askalon_"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "askalon_"
-# PROP Intermediate_Dir "askalon_"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /MDd /Za /W4 /Gm /Zi /Od /I ".." /I "../util" /I "../common" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /FD /c
-# SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /MDd /Za /W4 /Gm /ZI /Od /I ".." /I "../util" /I "../common" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_DEBUG" /D "CONVERT_TRIGGER" /FR /FD /c
-# SUBTRACT CPP /YX
+# ADD CPP /nologo /Za /W4 /Gm /ZI /Od /I ".." /I "../util" /I "../common" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /YX"stdafx.h" /FD /c
 # ADD BASE RSC /l 0x407 /d "_DEBUG"
 # ADD RSC /l 0x407 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -109,7 +82,6 @@ LINK32=link.exe
 
 # Name "askalon - Win32 Release"
 # Name "askalon - Win32 Debug"
-# Name "askalon - Win32 Conversion"
 # Begin Group "Header"
 
 # PROP Default_Filter "*.h"
@@ -147,8 +119,6 @@ SOURCE=..\old\pointertags.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "askalon - Win32 Conversion"
-
 !ENDIF 
 
 # End Source File
@@ -162,8 +132,6 @@ SOURCE=..\old\relation.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "askalon - Win32 Conversion"
-
 !ENDIF 
 
 # End Source File
@@ -176,8 +144,6 @@ SOURCE=..\old\trigger.c
 !ELSEIF  "$(CFG)" == "askalon - Win32 Debug"
 
 # PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "askalon - Win32 Conversion"
 
 !ENDIF 
 

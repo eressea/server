@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.6 2001/02/02 08:40:45 enno Exp $
+ *	$Id: eressea.c,v 1.7 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -22,6 +22,10 @@
 #include <config.h>
 #include "eressea.h"
 
+/* attributes includes */
+#include <attributes/reduceproduction.h>
+
+/* kernel includes */
 #include "message.h"
 #include "spell.h"
 #include "names.h"
@@ -45,9 +49,7 @@
 #include "objtypes.h"
 #include "ship.h"
 #include "karma.h"
-#ifdef GROUPS
 #include "group.h"
-#endif
 
 /* util includes */
 #include <base36.h>
@@ -64,14 +66,12 @@
 #include <limits.h>
 #include <time.h>
 
-/* attributes includes */
-#include <attributes/reduceproduction.h>
-
 /* exported variables */
-region *regions;
+region  *regions;
 faction *factions;
 settings global;
-char buf[BUFSIZE + 1];
+char     buf[BUFSIZE + 1];
+FILE    *logfile;
 
 const char *directions[MAXDIRECTIONS+2] =
 {
@@ -264,13 +264,22 @@ max_skill(faction * f, skill_t skill)
 	return m;
 }
 
-const char * g_basedir;
+char * g_basedir;
+char * g_resourcedir;
 
 const char *
 basepath(void)
 {
 	if (g_basedir) return g_basedir;
 	return ".";
+}
+
+const char *
+resourcepath(void)
+{
+	static char zText[MAX_PATH];
+	if (g_resourcedir) return g_resourcedir;
+	return strcat(strcpy(zText, basepath()), "/res");
 }
 
 int
@@ -1060,11 +1069,12 @@ count_all (faction * f)
 int
 count_maxmigrants (faction * f)
 {
+	int x = 0;
 	if (f->race == RC_HUMAN) {
 		int x = (int)(log10(count_all(f) / 50.0) * 20);
-		return max(0, x);
+		if (x < 0) x = 0;
 	}
-	return 0;
+	return x;
 }
 
 race_t
@@ -2097,7 +2107,7 @@ init_used_faction_ids(void)
 
 
 #if defined(OLD_TRIGGER) || defined(CONVERT_TRIGGER)
-# include "trigger.h"
+# include <eressea/old/trigger.h>
 # include <resolve.h>
 typedef struct unresolved {
 	struct unresolved * next;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.7 2001/02/02 08:40:46 enno Exp $
+ *	$Id: save.c,v 1.8 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -66,7 +66,7 @@
 #include <assert.h>
 
 #if defined(OLD_TRIGGER) || defined(CONVERT_TRIGGER)
-# include "trigger.h"
+# include <eressea/old/trigger.h>
 extern void resolve2(void);
 #endif
 
@@ -606,12 +606,6 @@ is_persistent(const char *s)
 	return false;
 }
 
-#if _MSC_VER
-#define PATH_MAX _MAX_PATH
-#elif !defined(PATH_MAX)
-#define PATH_MAX 2048
-#endif
-
 #if USE_EVENTS
 void
 print_hunger(void * data)
@@ -625,8 +619,8 @@ void
 create_backup(char *file)
 {
 #if defined(HAVE_ACCESS)
-	char bfile[PATH_MAX];
-	char command[PATH_MAX*2+10];
+	char bfile[MAX_PATH];
+	char command[MAX_PATH*2+10];
 	int c = 1;
 	do {
 		sprintf(bfile, "%s.backup%d", file, c);
@@ -640,7 +634,7 @@ create_backup(char *file)
 const char * 
 datapath(void)
 {
-	static char zText[PATH_MAX];
+	static char zText[MAX_PATH];
 	if (g_datadir) return g_datadir;
 	return strcat(strcpy(zText, basepath()), "/data");
 }
@@ -2105,7 +2099,6 @@ attrib_init(void)
 
 	/* Alle speicherbaren Attribute müssen hier registriert werden */
 	at_register(&at_unitdissolve);
-	at_register(&at_key);
 	at_register(&at_traveldir_new);
 	at_register(&at_familiar);
 	at_register(&at_familiarmage);
@@ -2203,14 +2196,17 @@ void read_strings(FILE * F);
 void read_messages(FILE * F);
 
 const char * messages[] = {
-	"res/messages.de",
-	"res/messages.en",
+	"%s/%s/messages.txt",
 	NULL
 };
 
 const char * strings[] = {
-	"res/strings.de",
-	"res/strings.en",
+	"%s/%s/strings.txt",
+	NULL
+};
+
+const char * locales[] = {
+	"de", "en",
 	NULL
 };
 
@@ -2218,29 +2214,31 @@ void
 init_locales(void)
 {
 	FILE * F;
-	int i;
-	for (i=0;strings[i];++i) {
-		char zText[PATH_MAX];
-		strcat(strcat(strcpy(zText, basepath()), "/"), strings[i]);
-		F = fopen(zText, "r+");
-		if (F) {
-			read_strings(F);
-			fclose(F);
-		} else {
-			sprintf(buf, "fopen(%s): ", zText);
-			perror(buf);
+	int l;
+	for (l=0;locales[l];++l) {
+		char zText[MAX_PATH];
+		int i;
+		for (i=0;strings[i];++i) {
+			sprintf(zText, strings[i], resourcepath(), locales[l]);
+			F = fopen(zText, "r+");
+			if (F) {
+				read_strings(F);
+				fclose(F);
+			} else {
+				sprintf(buf, "fopen(%s): ", zText);
+				perror(buf);
+			}
 		}
-	}
-	for (i=0;messages[i];++i) {
-		char zText[PATH_MAX];
-		strcat(strcat(strcpy(zText, basepath()), "/"), messages[i]);
-		F = fopen(zText, "r+");
-		if (F) {
-			read_messages(F);
-			fclose(F);
-		} else {
-			sprintf(buf, "fopen(%s): ", zText);
-			perror(buf);
+		for (i=0;messages[i];++i) {
+			sprintf(zText, messages[i], resourcepath(), locales[l]);
+			F = fopen(zText, "r+");
+			if (F) {
+				read_messages(F);
+				fclose(F);
+			} else {
+				sprintf(buf, "fopen(%s): ", zText);
+				perror(buf);
+			}
 		}
 	}
 }

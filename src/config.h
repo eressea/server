@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: config.h,v 1.3 2001/01/28 08:50:45 enno Exp $
+ *	$Id: config.h,v 1.4 2001/02/03 13:45:27 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -73,11 +73,6 @@ typedef int boolean;
  ** Architecture Dependent **
  ****                    ****/
 
-#if 0
-/* E: ?? Für welche Architektur? Bitte ein ifdef */
-# include <math.h> /* wegen __P() redefinition */
-#endif
-
 /* für solaris: */
 #ifdef SOLARIS
 # define _SYS_PROCSET_H
@@ -109,13 +104,8 @@ typedef int boolean;
 # define __EXTENSIONS__
 #endif
 
-#if 0
-/* E: für welche Architektur? Bitte ein #ifdef */
-# include <string.h>
-#endif
-
 #ifdef WIN32
-# include <util/windir.h>
+# include <common/util/windir.h>
 # define HAVE_READDIR
 #endif
 
@@ -212,10 +202,14 @@ _CRTIMP int __cdecl _mkdir(const char *);
 extern char * strdup(const char *s);
 #endif
 
-#ifdef WIN32
-# define MAX_PATH _MAX_PATH
-#elif !defined(MAX_PATH)
-# define MAX_PATH 1024
+#if !defined(MAX_PATH)
+# ifdef WIN32
+#  define MAX_PATH _MAX_PATH
+# elif defined(PATH_MAX)
+#  define MAX_PATH PATH_MAX
+# else
+#  define MAX_PATH 1024
+# endif
 #endif
 
 /****            ****

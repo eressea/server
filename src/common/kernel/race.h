@@ -45,8 +45,7 @@ typedef struct att {
 	int flags;
 } att;
 
-typedef struct racedata racedata;
-struct racedata {
+typedef struct race_type {
 	const char *name[4]; /* neu: name[4]völker */
 	double magres;
 	double maxaura; /* Faktor auf Maximale Aura */
@@ -73,27 +72,30 @@ struct racedata {
 	const char *(*generate_name) (const struct unit *);
 	void (*age_function)(struct unit *u);
 	boolean (*move_allowed)(struct region *, struct region *);
-};
+	struct attrib * attribs;
+} racetype;
+
+#define racedata race_type
 
 /* Flags */
-#define KILL_PEASANTS   (1<<0)		/* Töten Bauern. Dämonen werden nicht über
-											 							dieses Flag, sondern in randenc() behandelt. */
-#define SCARE_PEASANTS  (1<<1)
-#define ATTACK_RANDOM   (1<<2)
-#define MOVE_RANDOM     (1<<3)
-#define CANNOT_MOVE     (1<<4)
-#define SEEK_TARGET     (1<<5)		/* sucht ein bestimmtes Opfer */
-#define LEARN           (1<<6) 	/* Lernt automatisch wenn struct faction == 0 */
-#define FLY             (1<<7)   /* kann fliegen */
-#define SWIM            (1<<8)   /* kann schwimmen */
-#define WALK            (1<<9)   /* kann über Land gehen */
-#define NOLEARN         (1<<10) 	/* kann nicht normal lernen */
-#define NOTEACH         (1<<11) 	/* kann nicht lehren */
-#define HORSE           (1<<12)  /* Einheit ist Pferd, sozusagen */
-#define DESERT          (1<<13)  /* 5% Chance, das Einheit desertiert */
-#define DRAGON_LIMIT    (1<<14)  /* Kann nicht aus Gletscher in Ozean */
-#define ABSORB_PEASANTS (1<<15)  /* Tötet und absorbiert Bauern */
-#define NOHEAL          (1<<16)  /* Einheit kann nicht geheilt werden */
+#define RCF_KILLPEASANTS   (1<<0)		/* Töten Bauern. Dämonen werden nicht über dieses Flag, sondern in randenc() behandelt. */
+#define RCF_SCAREPEASANTS  (1<<1)
+#define RCF_ATTACKRANDOM   (1<<2)
+#define RCF_MOVERANDOM     (1<<3)
+#define RCF_CANNOTMOVE     (1<<4)
+#define RCF_SEEKTARGET     (1<<5)		/* sucht ein bestimmtes Opfer */
+#define RCF_LEARN          (1<<6) 	/* Lernt automatisch wenn struct faction == 0 */
+#define RCF_FLY            (1<<7)   /* kann fliegen */
+#define RCF_SWIM           (1<<8)   /* kann schwimmen */
+#define RCF_WALK           (1<<9)   /* kann über Land gehen */
+#define RCF_NOLEARN        (1<<10) 	/* kann nicht normal lernen */
+#define RCF_NOTEACH        (1<<11) 	/* kann nicht lehren */
+#define RCF_HORSE          (1<<12)  /* Einheit ist Pferd, sozusagen */
+#define RCF_DESERT         (1<<13)  /* 5% Chance, das Einheit desertiert */
+#define RCF_DRAGONLIMIT    (1<<14)  /* Kann nicht aus Gletscher in Ozean */
+#define RCF_ABSORBPEASANTS (1<<15)  /* Tötet und absorbiert Bauern */
+#define RCF_NOHEAL         (1<<16)  /* Einheit kann nicht geheilt werden */
+#define RCF_NOWEAPONS      (1<<17)  /* Einheit kann keine Waffen bneutzen */
 
 /* Economic flags */
 #define NOGIVE         (1<<0)   /* gibt niemals nix */
@@ -138,5 +140,7 @@ boolean is_undead(const struct unit *u);
 #define illusionary(u) ((u)->race==RC_ILLUSION)
 
 extern boolean allowed_dragon(const struct region * src, const struct region * target);
+
+extern void init_races(void);
 
 #endif

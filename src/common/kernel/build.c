@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: build.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: build.c,v 1.3 2001/02/03 13:45:31 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -452,13 +452,10 @@ build_road(region * r, unit * u, int size, direction_t d)
 			++golemsused;
 		}
 		scale_number(u,u->number - golemsused);
-		return;
+	} else {
+		/* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
+		change_skill(u, SK_ROAD_BUILDING, min(n, u->number) * PRODUCEEXP);
 	}
-
-	/* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-
-	change_skill(u, SK_ROAD_BUILDING, min(n, u->number) * PRODUCEEXP);
-
 	add_message(&u->faction->msgs, new_message(
 		u->faction, "buildroad%r:region%u:unit%i:size", r, u, n));
 }
@@ -569,8 +566,7 @@ build(unit * u, const construction * ctype, int completed, int want)
 		}
 
 		if (basesk < type->minskill) {
-			if (made==0) return ELOWSKILL;
-			break; /* not good enough to go on */
+			if (made==0) return ELOWSKILL; /* not good enough to go on */
 		}
 
 		/* n = maximum buildable size */
@@ -671,7 +667,7 @@ build_building(unit * u, const building_type * btype, int want)
 {
 	region * r = u->region;
 	boolean newbuilding = false;
-	int built = 0;
+	int c, built = 0;
 	building * b = getbuilding(r);
 	/* einmalige Korrektur */
 	static FILE *statfile = NULL;
@@ -717,20 +713,18 @@ build_building(unit * u, const building_type * btype, int want)
 		/* the building is already complete */
 		cmistake(u, findorder(u, u->thisorder), 4, MSG_PRODUCE);
 		return;
-	case ENOMATERIALS:
-		/* something missing from the list of materials */
-		strcpy(buf, "Dafür braucht man mindestens:");
-		{
-			int c, n;
+	case ENOMATERIALS: {
+			/* something missing from the list of materials */
 			const construction * cons = btype->construction;
 			char * ch = buf+strlen(buf);
 			assert(cons);
+			strcpy(buf, "Dafür braucht man mindestens:");
 			for (c=0;cons->materials[c].number; c++) {
-			  if (c!=0)
-				 strcat(ch++, ",");
-			  n=cons->materials[c].number / cons->reqsize;
-			  sprintf(ch, " %d %s", n?n:1, resname(cons->materials[c].type, cons->materials[c].number==1));
-			  ch = ch+strlen(ch);
+				int n;
+				if (c!=0) strcat(ch++, ",");
+				n = cons->materials[c].number / cons->reqsize;
+				sprintf(ch, " %d %s", n?n:1, resname(cons->materials[c].type, cons->materials[c].number==1));
+				ch = ch+strlen(ch);
 			}
 			strcat(ch,".");
 			mistake(u, u->thisorder, buf, MSG_PRODUCE);
@@ -973,7 +967,7 @@ do_leave(void)
 			for (S = u->orders; S; S = S->next) {
 				if(igetkeyword(S->s) == K_LEAVE) {
 					if (r->terrain == T_OCEAN && u->ship) {
-						if(!(race[u->race].flags & SWIM)) {
+						if(!(race[u->race].flags & RCF_SWIM)) {
 							cmistake(u, S->s, 11, MSG_MOVE);
 							break;
 						}
@@ -1032,8 +1026,8 @@ do_misc(char try)
 						/* Sollte momentan nicht vorkommen, da Schwimmer nicht
 						 * an Land können, und es keine Gebäude auf See gibt. */
 
-						if( !(race[u->race].flags & WALK) &&
-								!(race[u->race].flags & FLY)) {
+						if( !(race[u->race].flags & RCF_WALK) &&
+								!(race[u->race].flags & RCF_FLY)) {
 							if (try) cmistake(u, S->s, 232, MSG_MOVE);
 							S = Snext;
 							continue;
@@ -1078,8 +1072,8 @@ do_misc(char try)
 						/* Muß abgefangen werden, sonst könnten Schwimmer an
 						 * Bord von Schiffen an Land gelangen. */
 
-						if( !(race[u->race].flags & WALK) &&
-								!(race[u->race].flags & FLY)) {
+						if( !(race[u->race].flags & RCF_WALK) &&
+								!(race[u->race].flags & RCF_FLY)) {
 							cmistake(u, S->s, 233, MSG_MOVE);
 							S = Snext;
 							continue;

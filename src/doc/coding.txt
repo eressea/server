@@ -1,8 +1,24 @@
+Was ist das hier?
+Dieses File ist eine Sammlung von kleinen Artikeln zum Code - Designgedanken, hauptsächlich, keine Anleitungen.
+
 - Die Variable buf
 wird an zu vielen Stellen im Source benutzt. Können wir zumindest in Zukunft versuchen, auf sie zu verzichten? Mir ist nie sehr wohl, wen ich die irgendwo sehe.
 
 - Bibliotheken, module
-Jedes Verzeichnis in common/ erzeugt eine Bibliothek. Je nach Bedarf muss aber nicht jeder Server die ganze Bibliothek linken (die ist eher was für den mapper), sondern kann die Files auch einzeln linken. 
+Jedes Verzeichnis in common/ erzeugt eine Bibliothek. Je nach Bedarf muss aber nicht jeder Server die ganze Bibliothek linken (die ist eher was für den mapper), sondern kann die Files auch einzeln linken.
 Jedes modul, item, attribut, usw. sollte eine Funktion zur Verfügung stellen, die seine typen initialisiert, also it_register respektive at_register o.ä. aufruft. Jede Biliothek hat ein File, das ihren Namen trägt (z.b. items.txt) mit einer eigenen init_-Funktion, die alle init_funktionen der enthaltenen objekte enthält. (init_items, init_attributes, usw).
 Neue Files hinzufügen heißt also bitte, die Registrierung in den "bibliotheks-file" zu machen.
+
+- KI
+Beim Anblick des enums mit Rassen-Flags sieht man schnell, das die in mehrere Kategorien fallen. Eine davon ist die KI-Steuerung, und könnte man die vielleicht getrennt von den anderen speichern?
+
+- Worüber man nachdenken sollte, ehe man etwas neues hinzufügt
+90% aller Erweiterungen sind eigentlich optional. Ein Eressea ist z.B. auch ohne die Rasse Troll denkbar. Leider ist die rasse Troll an derart viele Stellen hartgecodet, das man Eressea ohne Trolle nie übersetzen könnte (Im Kampfsystem bekommen z.B. Trolle -1 beim Reitenbonus).
+Immer drüber nachdenken, ob man hartcoden muß, oder ob es auch einen anderen Weg gibt (in diesem Fall z.B. ein at_skillmod attribut an der Rasse Troll).
+
+- RC_SPELL
+Es gibt einen Zauber (Ferne Vision) der Einheiten vom Typ RC_SPELL erzeugt, aber 36 Stellen, an denen auf diesen Typ abgetestet werden muß (vielleicht sogar mehr?). Können wir das mal auf einen curse umstellen? Am besten in Kombination mit einem allgemeinen "diese Einheit/Region soll in den Report der PArtei x", das man dann auch für Spionage usw. benutzen kann, und das im Fall von Antimagie oder Zauberende durch einen Trigger am entsprechenden curse mit zerlegt wird?
+
+- Wie komplex macht man einen Curse?
+siehe vorangegangener Absatz. Generell gilt hier: Lieber zwei vielseitige Dinge machen, als ein unflexibles - der curse sollte lediglich der container seiin, der die wirkung aufrechterhält (das attribut an der region überwacht, und per trigger-funktion bei ende des curse oder antimagie entfernt). die eigentliche wirkung kann man in ein separates attribut stecken, dann ist sie auch in anderen kontexten als zauberei verwendbar (gebaüde oder items mit der gleichen wirkung, z.b.). Tests sollten so wenig wie möglich auf einen curse gehen (in fact, eigentlich nur bei der antimagie) sondern immer auf die wirkung (das attribut).
 

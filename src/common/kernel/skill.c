@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: skill.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: skill.c,v 1.3 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -93,17 +93,33 @@ attrib_type at_skillmod = {
 
 skillmods * modhash[MAXRACES];
 
+attrib *
+make_skillmod(skill_t skill, unsigned int flags, int(*special)(const struct unit*, const struct region*, skill_t, int), double multiplier, int bonus)
+{
+	attrib * a = a_new(&at_skillmod);
+	skillmod_data * smd = (skillmod_data*)a->data.v;
+
+	smd->skill=skill;
+	smd->special=special;
+	smd->bonus=bonus;
+	smd->multiplier=multiplier;
+	smd->flags=flags;
+
+	return a;
+}
+
 int
 skillmod(const attrib * a, const unit * u, const region * r, skill_t sk, int value, int flags)
 {
 	for (a = a_find((attrib*)a, &at_skillmod); a; a=a->nexttype) {
 		skillmod_data * smd = (skillmod_data *)a->data.v;
+		if (smd->skill!=NOSKILL && smd->skill!=sk) continue;
 		if (flags!=SMF_ALWAYS && (smd->flags & flags) == 0) continue;
 		if (smd->special) {
 			value = smd->special(u, r, sk, value);
 			if (value<0) return value; /* pass errors back to caller */
 		}
-		if (smd->multiplier) value *= smd->multiplier;
+		if (smd->multiplier) value = (int)(value*smd->multiplier);
 		value += smd->bonus;
 	}
 	return value;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.3 2001/02/02 08:40:45 enno Exp $
+ *	$Id: movement.c,v 1.4 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -166,7 +166,7 @@ ridingcapacity(unit * u)
 	 * von zwei Pferden gezogen wird */
 
 	pferde = min(get_item(u, I_HORSE), effskill(u, SK_RIDING) * u->number * 2);
-	if(race[u->race].flags & HORSE) pferde += u->number;
+	if(race[u->race].flags & RCF_HORSE) pferde += u->number;
 
 	/* maximal diese Pferde können zum Ziehen benutzt werden */
 	wagen = min(pferde / HORSESNEEDED, get_item(u, I_WAGON));
@@ -184,7 +184,7 @@ walkingcapacity(unit * u)
 	 * die Leute tragen */
 
 	pferde = get_item(u, I_HORSE);
-	if(race[u->race].flags & HORSE) {
+	if(race[u->race].flags & RCF_HORSE) {
 		pferde += u->number;
 		personen = 0;
 	} else {
@@ -277,7 +277,7 @@ canfly(unit *u)
 	if(get_item(u, I_PEGASUS) >= u->number && effskill(u, SK_RIDING) >= 4)
 		return true;
 
-	if(race[u->race].flags & FLY) return true;
+	if(race[u->race].flags & RCF_FLY) return true;
 
 	return false;
 }
@@ -292,9 +292,9 @@ canswim(unit *u)
 
 	if(fspecial(u->faction, FS_AMPHIBIAN)) return true;
 
-	if(race[u->race].flags & FLY) return true;
+	if(race[u->race].flags & RCF_FLY) return true;
 
-	if(race[u->race].flags & SWIM) return true;
+	if(race[u->race].flags & RCF_SWIM) return true;
 
 	return false;
 }
@@ -310,7 +310,7 @@ canride(unit * u)
 	maxunicorns = (skill/5) * u->number;
 	maxpferde = skill * u->number * 2;
 
-	if(!(race[u->race].flags & HORSE)
+	if(!(race[u->race].flags & RCF_HORSE)
 		&& ((pferde == 0 && unicorns == 0)
 			|| pferde > maxpferde || unicorns > maxunicorns)) {
 		return 0;
@@ -321,7 +321,7 @@ canride(unit * u)
 #else
 	if(ridingcapacity(u) - weight(u) >= 0) {
 #endif
-		if(pferde == 0 && unicorns >= u->number && !(race[u->race].flags & HORSE)) {
+		if(pferde == 0 && unicorns >= u->number && !(race[u->race].flags & RCF_HORSE)) {
 			return 2;
 		}
 		return 1;
@@ -1831,7 +1831,7 @@ hunt(unit *u)
 	} else if(attacked(u)) {
 		cmistake(u, findorder(u, u->thisorder), 52, MSG_MOVE);
 		return false;
-	} else if(race[u->race].flags & CANNOT_MOVE) {
+	} else if(race[u->race].flags & RCF_CANNOTMOVE) {
 		cmistake(u, findorder(u, u->thisorder), 55, MSG_MOVE);
 		return false;
 	}
@@ -1974,7 +1974,7 @@ movement(void)
 					cmistake(u, findorder(u, u->thisorder), 52, MSG_MOVE);
 					set_string(&u->thisorder, "");
 					u = un;
-				} else if (race[u->race].flags & CANNOT_MOVE) {
+				} else if (race[u->race].flags & RCF_CANNOTMOVE) {
 					cmistake(u, findorder(u, u->thisorder), 55, MSG_MOVE);
 					set_string(&u->thisorder, "");
 					u = un;
@@ -2006,7 +2006,7 @@ movement(void)
 					if(attacked(u)) {
 						cmistake(u, o->s, 52, MSG_MOVE);
 						u = u2; break;
-					} else if(race[u->race].flags & CANNOT_MOVE) {
+					} else if(race[u->race].flags & RCF_CANNOTMOVE) {
 						cmistake(u, o->s, 55, MSG_MOVE);
 						u = u2; break;
 					}
@@ -2040,7 +2040,7 @@ movement(void)
 				|| igetkeyword(u->thisorder) == K_ROUTE)) {
 					if (attacked(u)) {
 						cmistake(u, findorder(u, u->thisorder), 52, MSG_PRODUCE);
-					} else if (race[u->race].flags & CANNOT_MOVE) {
+					} else if (race[u->race].flags & RCF_CANNOTMOVE) {
 						cmistake(u, findorder(u, u->thisorder), 55, MSG_PRODUCE);
 					} else
 						move(r, u, true);

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: trigger.h,v 1.1 2001/01/27 18:15:32 enno Exp $
+ *	$Id: trigger.h,v 1.2 2001/02/03 13:45:34 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -19,7 +19,6 @@
 #ifndef TRIGGER_H
 #define TRIGGER_H
 
-#include <curse.h>
 #include "relation.h"
 #include "attrspread.h"
 

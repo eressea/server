@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.5 2001/01/30 23:16:16 enno Exp $
+ *	$Id: report.c,v 1.6 2001/02/03 13:45:30 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -806,19 +806,20 @@ prices(FILE * F, region * r, faction * f)
 {
 	const luxury_type *sale=NULL;
 	struct demand * dmd;
-  int n = 0;
+	int n = 0;
 
 	if (r->land==NULL || r->land->demands==NULL) return;
 	for (dmd=r->land->demands;dmd;dmd=dmd->next) {
 		if (dmd->value==0) sale = dmd->type;
+		else if (dmd->value > 0) n++;
 	}
 	assert(sale!=NULL);
 
 	for (dmd=r->land->demands;dmd;dmd=dmd->next) if(dmd->value > 0) n++;
 
 	sprintf(buf, "Auf dem Markt wird für %s %d Silber verlangt.",
-	locale_string(f->locale, resourcename(sale->itype->rtype, GR_PLURAL)),
-	sale->price);
+		locale_string(f->locale, resourcename(sale->itype->rtype, GR_PLURAL)),
+		sale->price);
 
 	if(n > 0) scat(" Geboten wird für ");
 
@@ -1285,7 +1286,7 @@ order_template(FILE * F, faction * f)
 	rps_nowrap(F, "");
 	rnl(F);
 
-	sprintf(buf, "%s %s \"%s\"", parameters[P_FACTION], factionid(f), f->passw);
+	sprintf(buf, "%s %s \"hier_passwort_eintragen\"", parameters[P_FACTION], factionid(f));
 	rps_nowrap(F, buf);
 	rnl(F);
 
@@ -1293,8 +1294,9 @@ order_template(FILE * F, faction * f)
 
 	rps_nowrap(F, "");
 	rnl(F);
-	sprintf(buf, "; ECHECK %s-w4 -r%d -v3.4", dh ? "-l " : "",
-			race[f->race].rekrutieren);		/* -v3.4: ECheck Version 3.4.x */
+	sprintf(buf, "; ECHECK %s-w4 -r%d -v%s", dh ? "-l " : "",
+			race[f->race].rekrutieren, ECHECK_VERSION);
+					/* -v3.4: ECheck Version 3.4.x */
 	rps_nowrap(F, buf);
 	rnl(F);
 
@@ -1696,6 +1698,8 @@ report(FILE *F, faction * f)
 
 	if (f->age <= 2) {
 		rnl(F);
+		sprintf(buf, "Dein Passwort lautet \"%s\".", f->passw);
+		centre(F, buf, true);
 		sprintf(buf, "Bitte denke daran, deine Befehle mit dem Betreff"
 				" ERESSEA BEFEHLE an eressea@eressea.amber.kn-bremen.de zu senden."
 				" Am besten, du verwendest die Befehlsvorlage am Ende des Reports.");
@@ -2566,7 +2570,7 @@ reports(void)
 #ifdef DMALLOC
 	assert(dmalloc_verify ( NULL ));
 #endif
-	makedir("reports", 0700);
+	makedir(reportpath(), 0700);
 
 	if (global.data_version<BASE36_VERSION) base36conversion();
 	/* öffnet file BAT (mailit batch file) */

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: curse.c,v 1.3 2001/01/31 17:40:49 corwin Exp $
+ *	$Id: curse.c,v 1.4 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -140,9 +140,24 @@ cfindhash(int i)
 #include "umlaut.h"
 extern struct tnode cursenames;
 
+typedef struct cursetype_list {
+	struct cursetype_list * next;
+	const curse_type * type;
+} cursetype_list;
+
+cursetype_list * cursetypes;
+
 void
-ct_register(curse_type * ct) {
-	assert(0);
+ct_register(const curse_type * ct)
+{
+	cursetype_list ** ctlp = &cursetypes;
+	while (*ctlp) {
+		cursetype_list * ctl = *ctlp;
+		if (ctl->type==ct) return;
+		ctlp=&ctl->next;
+	}
+	*ctlp = calloc(1, sizeof(cursetype_list));
+	(*ctlp)->type = ct;
 }
 
 const curse_type *
@@ -151,23 +166,17 @@ ct_find(const char *c)
 /* TODO: findet nur curse_types, die auch in curse_data sind.
  * da fehlt noch ene registrierung wie für attrib_type
  */
-	int i = (int)findtoken(&cursenames, c)-1;
-	if (cursedaten[i].name[0] == 0) return NULL;
+	int i = (int)findtoken(&cursenames, c);
+	if (i == -1 || cursedaten[i].name[0] == 0) {
+		cursetype_list * ctl = cursetypes;
+		while (ctl) {
+			int k = min(strlen(c), strlen(ctl->type->name));
+			if (!strncasecmp(c, ctl->type->name, k)) return ctl->type;
+			ctl = ctl->next;
+		}
+	}
 	return &cursedaten[i];
 }
-
-int
-find_cursebyname(const char *s)
-{
-	int i;
-	i = (int)findtoken(&cursenames, s)-1;
-
-	if(cursedaten[i].name[0] == 0)
-		return -1;
-
-	return i;
-}
-
 
 /* ------------------------------------------------------------- */
 boolean
@@ -488,7 +497,7 @@ set_curse(unit *mage, attrib **ap, curse_t id, int id2, int vigour,
 	c->no = newunitid();
 	chash(c);
 
-	switch (c->type->typ){
+	switch (c->type->typ) {
 		case CURSETYP_NORM:
 			break;
 
@@ -1264,7 +1273,7 @@ cinfo_riot(void * obj, typ_t typ, curse *c, int self)
  * der wohl noch etwa %s Wochen andauert.
  * %info, "Dieser Zauber blafalsel blub"
  */
-cursedata cursedaten[MAXCURSE] =
+curse_type cursedaten[MAXCURSE] =
 {
 /* struct's vom typ curse: */
 	{ /* C_FOGTRAP, */

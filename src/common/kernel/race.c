@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: race.c,v 1.3 2001/01/31 17:40:50 corwin Exp $
+ *	$Id: race.c,v 1.4 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -22,18 +22,23 @@
 #include "eressea.h"
 #include "race.h"
 
-#include "item.h"
-#include "spell.h"
+#include <races/zombies.h>
+#include <races/dragons.h>
+#include <races/illusion.h>
+
 #include "alchemy.h"
-#include "faction.h"
-#include "unit.h"
-#include "region.h"
-#include "magic.h"
 #include "build.h"
-#include "names.h"
-#include "ship.h"
 #include "building.h"
+#include "faction.h"
+#include "item.h"
+#include "magic.h"
+#include "region.h"
+#include "spell.h"
+#include "unit.h"
+#include "names.h"
 #include "pathfinder.h"
+#include "ship.h"
+#include "skill.h"
 
 /* util includes */
 #include <attrib.h>
@@ -41,9 +46,6 @@
 /* libc includes */
 #include <stdio.h>
 #include <math.h>
-#include <races/zombies.h>
-#include <races/dragons.h>
-#include <races/illusion.h>
 
 /* TODO: Tragkraft in die Struktur */
 
@@ -132,7 +134,7 @@ struct racedata race[MAXRACES] =
 		false,
 
 		/* Flags */
-		WALK | LEARN | MOVE_RANDOM | ATTACK_RANDOM,
+		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
 
 		/* Battle_flags */
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
@@ -159,7 +161,7 @@ struct racedata race[MAXRACES] =
 			 0, 0,-1,-1,   0, 1, 0, 0,   0, 1, 0, 0,  -99
 		},
 		false,
-		WALK | LEARN | MOVE_RANDOM | ATTACK_RANDOM,
+		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
 		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
 		{RC_HOUSECAT, RC_FEY, RC_OWL, RC_NYMPH, RC_UNICORN, RC_IMP}
@@ -178,7 +180,7 @@ struct racedata race[MAXRACES] =
 			0,-1, 1, 0,   1, 0,-2, 2,  -1, 0, 1, 0,   -99
 		},
 		false,
-		WALK | LEARN | MOVE_RANDOM | ATTACK_RANDOM,
+		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
 		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
 		{RC_GOBLIN, RC_WRAITH, RC_IMP, RC_RAT, RC_WARG, RC_DAEMON}
@@ -197,7 +199,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0,-2,  -2, 1,-1, 0,  -1, 0, 0, 0,   -99
 		},
 		false,
-		WALK | LEARN | MOVE_RANDOM | ATTACK_RANDOM,
+		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
 		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
 		{RC_RAT, RC_PSEUDODRAGON, RC_IMP, RC_RAT, RC_RAT, RC_IMP}
@@ -216,7 +218,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   -99
 		},
 		false,
-		WALK | LEARN | MOVE_RANDOM | ATTACK_RANDOM,
+		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
 		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
 		{RC_WARG, RC_DREAMCAT, RC_OWL, RC_OWL, RC_EAGLE, RC_IMP}
@@ -235,7 +237,7 @@ struct racedata race[MAXRACES] =
 			0,-3, 2, 2,  -1,-3,-1, 0,   0,-1, 1, 0,   -99
 		},
 		false,
-		WALK | LEARN | MOVE_RANDOM | ATTACK_RANDOM,
+		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
 		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
 		{RC_TUNNELWORM, RC_RAT, RC_RAT, RC_EAGLE, RC_TUNNELWORM, RC_WARG}
@@ -254,7 +256,7 @@ struct racedata race[MAXRACES] =
 			1, 0, 0, 0,  -1, 1,-3, 1,  -2, 1, 1, 0,   -99
 		},
 		false,
-		WALK | LEARN | MOVE_RANDOM | ATTACK_RANDOM,
+		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
 		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
 		{RC_IMP, RC_IMP, RC_WRAITH, RC_RAT, RC_WARG, RC_IMP}
@@ -273,7 +275,7 @@ struct racedata race[MAXRACES] =
 			1, 0, 0,-1,  -1,-1,-2, 0,   0, 1, 0, 0,   -99
 		},
 		false,
-		WALK | LEARN | MOVE_RANDOM | ATTACK_RANDOM,
+		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
 		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
 		{RC_WRAITH, RC_RAT, RC_OWL, RC_RAT, RC_TUNNELWORM, RC_IMP}
@@ -292,7 +294,7 @@ struct racedata race[MAXRACES] =
 			-1,1, 0, 1,   0, 1, 1, 0,   2, 1,-1, 0,   -99
 		},
 		false,
-		WALK | LEARN | MOVE_RANDOM | ATTACK_RANDOM,
+		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
 		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
 		{RC_OWL, RC_RAT, RC_EAGLE, RC_PSEUDODRAGON, RC_EAGLE, RC_RAT}
@@ -311,7 +313,7 @@ struct racedata race[MAXRACES] =
 			0, 2,-1,-1,   0, 1, 0, 0,   0, 2, 1, 0,   -99
 		},
 		false,
-		WALK | LEARN | MOVE_RANDOM | ATTACK_RANDOM,
+		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
 		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
 		{RC_HOUSECAT, RC_DREAMCAT, RC_HOUSECAT, RC_PSEUDODRAGON,
@@ -331,7 +333,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0,-1,   0, 0, 0, 0,   0, 0, 0, 0,  -99
 		},
 		false,
-		WALK | LEARN | MOVE_RANDOM | ATTACK_RANDOM,
+		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM,
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
 		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
 		{RC_OCEANTURTLE, RC_DOLPHIN, RC_OCEANTURTLE, RC_DOLPHIN,
@@ -351,7 +353,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0
 		},
 		true,
-		(SCARE_PEASANTS|ATTACK_RANDOM|MOVE_RANDOM|WALK|NOLEARN|NOTEACH|NOHEAL),
+		(RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
 		(BF_EQUIPMENT | BF_MAGIC_EQUIPMENT),
 		CANGUARD,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
@@ -370,7 +372,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0,
 			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0
 		},
-		true, WALK|NOLEARN|NOTEACH, 0, 0,
+		true, RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOWEAPONS, 0, 0,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
 		NULL, &age_illusion
 	},
@@ -389,7 +391,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0,   4, 0, 0, 0,   0, 0, 0, 0, 0
 		},
 		true,
-		KILL_PEASANTS|SCARE_PEASANTS|ATTACK_RANDOM|LEARN|FLY|WALK|NOTEACH,
+		RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_LEARN|RCF_FLY|RCF_WALK|RCF_NOTEACH,
 		BF_MAGIC_EQUIPMENT,
 		GETITEM | HOARDMONEY | CANGUARD,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
@@ -410,7 +412,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0, 	8, 0, 0, 0, 	0, 5, 0, 0, 0
 		},
 		true,
-		( KILL_PEASANTS|SCARE_PEASANTS|ATTACK_RANDOM|LEARN|FLY|WALK|NOTEACH ),
+		( RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_LEARN|RCF_FLY|RCF_WALK|RCF_NOTEACH ),
 		( BF_MAGIC_EQUIPMENT ),
 		GETITEM | HOARDMONEY | CANGUARD,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
@@ -431,7 +433,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0,  12, 0, 0, 0,   0,10, 0, 0, 0
 		},
 		true,
-		( KILL_PEASANTS|SCARE_PEASANTS|ATTACK_RANDOM|LEARN|FLY|WALK|NOTEACH ),
+		( RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_LEARN|RCF_FLY|RCF_WALK|RCF_NOTEACH ),
 		( BF_MAGIC_EQUIPMENT ),
 		GETITEM | HOARDMONEY | CANGUARD,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
@@ -451,7 +453,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		},
 		true,
-		( SCARE_PEASANTS | MOVE_RANDOM | LEARN | WALK | NOTEACH ),
+		( RCF_SCAREPEASANTS | RCF_MOVERANDOM | RCF_LEARN | RCF_WALK | RCF_NOTEACH ),
 		( BF_MAGIC_EQUIPMENT ),
 		CANGUARD,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
@@ -470,7 +472,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		},
 		true,
-		( FLY | WALK | NOTEACH),
+		( RCF_FLY | RCF_WALK | RCF_NOTEACH),
 		0,
 		GIVEITEM | GIVEPERSON | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
@@ -487,7 +489,7 @@ struct racedata race[MAXRACES] =
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		true,
-		ATTACK_RANDOM|MOVE_RANDOM|LEARN|WALK|NOTEACH,
+		RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_LEARN|RCF_WALK|RCF_NOTEACH,
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
 		GIVEITEM | GIVEPERSON | GETITEM | CANGUARD,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
@@ -537,7 +539,7 @@ struct racedata race[MAXRACES] =
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0,
 		 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0},
 		true,
-		WALK | NOLEARN | NOTEACH, 0,
+		RCF_WALK | RCF_NOLEARN | RCF_NOTEACH, 0,
 		GIVEITEM | GIVEPERSON,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
@@ -553,7 +555,7 @@ struct racedata race[MAXRACES] =
 		{0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		true,
-		WALK | NOLEARN | NOTEACH, 0,
+		RCF_WALK | RCF_NOLEARN | RCF_NOTEACH, 0,
 		GIVEITEM | GIVEPERSON,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
@@ -569,7 +571,7 @@ struct racedata race[MAXRACES] =
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		true,
-		KILL_PEASANTS|SCARE_PEASANTS|ATTACK_RANDOM|MOVE_RANDOM|LEARN|WALK|NOTEACH|DESERT,
+		RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_LEARN|RCF_WALK|RCF_NOTEACH|RCF_DESERT,
 		BF_MAGIC_EQUIPMENT,
 		0,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
@@ -587,7 +589,7 @@ struct racedata race[MAXRACES] =
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		true,
-		KILL_PEASANTS|SCARE_PEASANTS|ATTACK_RANDOM|MOVE_RANDOM|LEARN|WALK|NOTEACH|DESERT,
+		RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_LEARN|RCF_WALK|RCF_NOTEACH|RCF_DESERT,
 		BF_MAGIC_EQUIPMENT,
 		0,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
@@ -604,7 +606,7 @@ struct racedata race[MAXRACES] =
 		},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		true, CANNOT_MOVE|NOLEARN|NOTEACH, 0,
+		true, RCF_CANNOTMOVE|RCF_NOLEARN|RCF_NOTEACH, 0,
 		0,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
@@ -620,7 +622,7 @@ struct racedata race[MAXRACES] =
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		true,
-		(SEEK_TARGET|FLY|WALK|NOLEARN|NOTEACH),
+		(RCF_SEEKTARGET|RCF_FLY|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH),
 		0,
 		0,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
@@ -639,7 +641,7 @@ struct racedata race[MAXRACES] =
 			-10,-10,-10,-10,  -10, +2,-10,-10,  -10,-10,-10,-10, 0
 		},
 		true,
-		LEARN|ATTACK_RANDOM|CANNOT_MOVE,
+		RCF_LEARN|RCF_ATTACKRANDOM|RCF_CANNOTMOVE,
 		0,
 		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
@@ -658,7 +660,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		},
 		true,
-		( KILL_PEASANTS|SCARE_PEASANTS|ATTACK_RANDOM|MOVE_RANDOM|LEARN|FLY|WALK|NOTEACH),
+		( RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_LEARN|RCF_FLY|RCF_WALK|RCF_NOTEACH),
 		( BF_INV_NONMAGIC),
 		CANGUARD,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
@@ -677,7 +679,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		},
 		true,
-		CANNOT_MOVE|NOTEACH,
+		RCF_CANNOTMOVE|RCF_NOTEACH,
 		( BF_EQUIPMENT | BF_MAGIC_EQUIPMENT ),
 		CANGUARD,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
@@ -696,7 +698,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0
 		},
 		true,
-		(WALK|NOTEACH), (0), GIVEPERSON,
+		(RCF_WALK|RCF_NOTEACH), (0), GIVEPERSON,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
 
@@ -718,7 +720,7 @@ struct racedata race[MAXRACES] =
 			-99,  3,-99,-99,   -99,  3,-99,-99,   -99, 4,-99,  0,    0
 		},
 		true,
-		(WALK|NOTEACH), (0),
+		(RCF_WALK|RCF_NOTEACH), (0),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_TUNNELWORM */
@@ -736,7 +738,7 @@ struct racedata race[MAXRACES] =
 			-99,-99, 50,-99,   -99,-99,-99,-99,   -99,-99,-99, 2, 0
 		},
 		true,
-		(WALK|SCARE_PEASANTS|NOTEACH), (0),
+		(RCF_WALK|RCF_SCAREPEASANTS|RCF_NOTEACH), (0),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_EAGLE */
@@ -754,7 +756,7 @@ struct racedata race[MAXRACES] =
 			-99,  0,-99,-99,   -99,-99,-99,-99,   -99, 2,-99,  0, 0
 		},
 		true,
-		(WALK|FLY|NOTEACH), (0),
+		(RCF_WALK|RCF_FLY|RCF_NOTEACH), (0),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_RAT */
@@ -772,7 +774,7 @@ struct racedata race[MAXRACES] =
 			-99,  5,-99,-99,   -99,  4,-99,-99,   -99, 2,-99,  0, 0
 		},
 		true,
-		(WALK|NOTEACH), (0),
+		(RCF_WALK|RCF_NOTEACH), (0),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_PSEUDODRAGON */
@@ -790,7 +792,7 @@ struct racedata race[MAXRACES] =
 			-99,  0,-99,-99,   -99,  0,-99,-99,   -99, 0,-99,  0, 0
 		},
 		true,
-		(WALK|FLY|NOTEACH), (0),
+		(RCF_WALK|RCF_FLY|RCF_NOTEACH), (0),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_NYMPH */
@@ -808,7 +810,7 @@ struct racedata race[MAXRACES] =
 			 0, 2,-99,-99,   -2, 3, 10, -2,  -2, 2,-2,-1, 0
 		},
 		true,
-		(WALK|NOTEACH),
+		(RCF_WALK|RCF_NOTEACH),
 		(BF_EQUIPMENT|BF_MAGIC_EQUIPMENT),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
@@ -827,7 +829,7 @@ struct racedata race[MAXRACES] =
 			-99,  0,-99,-99,     0,  4,-99,-99,   -99, 5,-99,  0, 0
 		},
 		true,
-		(WALK|NOTEACH), (0),
+		(RCF_WALK|RCF_NOTEACH), (0),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_WARG */
@@ -845,7 +847,7 @@ struct racedata race[MAXRACES] =
 			-99,  0,-99,-99,     0,  0,-99,-99,   -99, 2,-99,  0, 0
 		},
 		true,
-		(WALK|SCARE_PEASANTS|NOTEACH), (0),
+		(RCF_WALK|RCF_SCAREPEASANTS|RCF_NOTEACH), (0),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_WRAITH */
@@ -863,7 +865,7 @@ struct racedata race[MAXRACES] =
 			  0,  0,-99,-99,   -99,  0,-99,-99,   -99, 0,-99,  0, 0
 		},
 		true,
-		(WALK|FLY|SCARE_PEASANTS|NOTEACH),
+		(RCF_WALK|RCF_FLY|RCF_SCAREPEASANTS|RCF_NOTEACH),
 		(BF_EQUIPMENT|BF_MAGIC_EQUIPMENT|BF_INV_NONMAGIC),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
@@ -881,7 +883,7 @@ struct racedata race[MAXRACES] =
 			-99,-99,-99,-99,   -99,-99,-99,-99,   -99, 1,-99, -1,  -99,-99, 0,-99,
 			  0,  1,-99,-99,   -99,  1,-99,-99,   -99, 1,  1,  0, 0
 		},
-		true, (FLY|WALK|NOTEACH), (BF_EQUIPMENT|BF_MAGIC_EQUIPMENT),
+		true, (RCF_FLY|RCF_WALK|RCF_NOTEACH), (BF_EQUIPMENT|BF_MAGIC_EQUIPMENT),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_DREAMCAT */
@@ -899,7 +901,7 @@ struct racedata race[MAXRACES] =
 			  0,  1,-99,-99,   -99,  1,-99,-99,   -99, 1,  1,  0, 0
 		},
 		true,
-		(FLY|WALK|NOTEACH), (BF_INV_NONMAGIC),
+		(RCF_FLY|RCF_WALK|RCF_NOTEACH), (BF_INV_NONMAGIC),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_FEY */
@@ -917,7 +919,7 @@ struct racedata race[MAXRACES] =
 			 -1,  2,-99,-99,   -99,  5,-99,-99,   -99, 2,-99,  0, 0
 		},
 		true,
-		(FLY|WALK|NOTEACH), (BF_EQUIPMENT|BF_MAGIC_EQUIPMENT),
+		(RCF_FLY|RCF_WALK|RCF_NOTEACH), (BF_EQUIPMENT|BF_MAGIC_EQUIPMENT),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_OWL */
@@ -935,7 +937,7 @@ struct racedata race[MAXRACES] =
 			-99,  1,-99,-99,   -99,  1,-99,-99,   -99, 5,-99,  0, 0
 		},
 		true,
-		(FLY|WALK|NOTEACH), (0),
+		(RCF_FLY|RCF_WALK|RCF_NOTEACH), (0),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_HELLCAT */
@@ -953,7 +955,7 @@ struct racedata race[MAXRACES] =
 			-99,  0,-99,-99,     0,  0,-99,-99,   -99, 1,-99,  0, 0
 		},
 		true,
-		(WALK|NOTEACH), (SCARE_PEASANTS),
+		(RCF_WALK|RCF_NOTEACH), (RCF_SCAREPEASANTS),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_TIGER */
@@ -971,7 +973,7 @@ struct racedata race[MAXRACES] =
 			-99,  0,-99,-99,     0,  0,-99,-99,   -99, 1,-99,  0, 0
 		},
 		true,
-		(WALK|NOTEACH), (0),
+		(RCF_WALK|RCF_NOTEACH), (0),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_DOLPHIN */
@@ -989,7 +991,7 @@ struct racedata race[MAXRACES] =
 			-99,  0,-99,-99,     0,  0,-99,-99,   -99, 1,-99,  0, 0
 		},
 		true,
-		(SWIM|NOTEACH), (0),
+		(RCF_SWIM|RCF_NOTEACH), (0),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_OCEANTURTLE */
@@ -1007,7 +1009,7 @@ struct racedata race[MAXRACES] =
 			-99,  0,-99,-99,     0,-99,-99,-99,   -99, 1,-99,  0, 0
 		},
 		true,
-		(SWIM|WALK|NOTEACH), (0),
+		(RCF_SWIM|RCF_WALK|RCF_NOTEACH), (0),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}, /* RC_KRAKEN */
@@ -1025,7 +1027,7 @@ struct racedata race[MAXRACES] =
 			-99,  0,-99,-99,     0,-99,-99,-99,   -99, 1,-99,  0, 0
 		},
 		true,
-		(SWIM|NOTEACH), (0),
+		(RCF_SWIM|RCF_NOTEACH), (0),
 		GIVEITEM | GETITEM,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	},
@@ -1049,7 +1051,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0,   4, 0, 0, 0,   0, 0, 0, 0, 0
 		},
 		true,
-		KILL_PEASANTS|SCARE_PEASANTS|ATTACK_RANDOM|LEARN|NOTEACH|SWIM|MOVE_RANDOM,
+		RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_LEARN|RCF_NOTEACH|RCF_SWIM|RCF_MOVERANDOM,
 		(0),
 		GETITEM | HOARDMONEY | CANGUARD,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
@@ -1072,7 +1074,7 @@ struct racedata race[MAXRACES] =
 			0, 0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0
 		},
 		true,
-		(SCARE_PEASANTS|MOVE_RANDOM|WALK|NOLEARN|NOTEACH),
+		(RCF_SCAREPEASANTS|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH),
 		(BF_NOBLOCK),
 		0,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
@@ -1135,7 +1137,7 @@ struct racedata race[MAXRACES] =
 		true,
 
 		/* Flags */
-		WALK | LEARN | MOVE_RANDOM | ATTACK_RANDOM | HORSE,
+		RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM | RCF_HORSE,
 
 		/* Battle_flags */
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
@@ -1207,7 +1209,7 @@ struct racedata race[MAXRACES] =
 		true,
 
 		/* Flags */
-		(SCARE_PEASANTS|KILL_PEASANTS|ATTACK_RANDOM|MOVE_RANDOM|WALK|NOLEARN|NOTEACH|NOHEAL),
+		(RCF_SCAREPEASANTS|RCF_KILLPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
 
 		/* Battle_flags */
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT | BF_RES_PIERCE | BF_RES_CUT,
@@ -1285,7 +1287,7 @@ struct racedata race[MAXRACES] =
 		true,
 
 		/* Flags */
-		(SCARE_PEASANTS|ABSORB_PEASANTS|ATTACK_RANDOM|MOVE_RANDOM|WALK|NOLEARN|NOTEACH|NOHEAL),
+		(RCF_SCAREPEASANTS|RCF_ABSORBPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
 
 		/* Battle_flags */
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT | BF_RES_PIERCE | BF_RES_CUT,
@@ -1361,7 +1363,7 @@ struct racedata race[MAXRACES] =
 		true,
 
 		/* Flags */
-		(SCARE_PEASANTS|KILL_PEASANTS|ATTACK_RANDOM|MOVE_RANDOM|WALK|NOLEARN|NOTEACH|NOHEAL),
+		(RCF_SCAREPEASANTS|RCF_KILLPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
 
 		/* Battle_flags */
 		BF_EQUIPMENT|BF_MAGIC_EQUIPMENT|BF_RES_PIERCE|BF_RES_CUT,
@@ -1439,7 +1441,7 @@ struct racedata race[MAXRACES] =
 		true,
 
 		/* Flags */
-		(SCARE_PEASANTS|ABSORB_PEASANTS|ATTACK_RANDOM|MOVE_RANDOM|WALK|NOLEARN|NOTEACH|NOHEAL),
+		(RCF_SCAREPEASANTS|RCF_ABSORBPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
 
 		/* Battle_flags */
 		BF_EQUIPMENT|BF_MAGIC_EQUIPMENT|BF_RES_PIERCE|BF_RES_CUT|BF_RES_BASH,
@@ -1518,7 +1520,7 @@ struct racedata race[MAXRACES] =
 		true,
 
 		/* Flags */
-		(SCARE_PEASANTS|ABSORB_PEASANTS|ATTACK_RANDOM|MOVE_RANDOM|WALK|NOLEARN|NOTEACH|NOHEAL),
+		(RCF_SCAREPEASANTS|RCF_ABSORBPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
 
 		/* Battle_flags */
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
@@ -1596,7 +1598,7 @@ struct racedata race[MAXRACES] =
 		true,
 
 		/* Flags */
-		(SCARE_PEASANTS|ABSORB_PEASANTS|ATTACK_RANDOM|MOVE_RANDOM|WALK|NOLEARN|NOTEACH|NOHEAL),
+		(RCF_SCAREPEASANTS|RCF_ABSORBPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_WALK|RCF_NOLEARN|RCF_NOTEACH|RCF_NOHEAL),
 
 		/* Battle_flags */
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
@@ -1674,7 +1676,7 @@ struct racedata race[MAXRACES] =
 		true,
 
 		/* Flags */
-		(WALK|NOTEACH),
+		(RCF_WALK|RCF_NOTEACH),
 
 		/* Battle_flags */
 		(0),
@@ -1745,7 +1747,7 @@ struct racedata race[MAXRACES] =
 		true,
 
 		/* Flags */
-		(WALK|NOTEACH),
+		(RCF_WALK|RCF_NOTEACH),
 
 		/* Battle_flags */
 		(0),
@@ -1867,6 +1869,7 @@ give_latestart_bonus(region *r, unit *u, int b)
 		unit *u2 = createunit(r, u->faction, 1, u->race);
 		change_skill(u2, SK_TACTICS, ((b*30)/2) * u2->number);
 		u2->irace = u->irace;
+		fset(u2, FL_PARTEITARNUNG);
 	}
 
 	{
@@ -1875,6 +1878,7 @@ give_latestart_bonus(region *r, unit *u, int b)
 		change_skill(u2, SK_TAXING, 180 * u2->number);
 		change_item(u2, I_SPEAR, u2->number);
 		u2->irace = u->irace;
+		fset(u2, FL_PARTEITARNUNG);
 	}
 }
 
@@ -1910,4 +1914,12 @@ boolean is_undead(const unit *u)
 		|| u->race == RC_SKELETON_LORD || u->race == RC_ZOMBIE
 		|| u->race == RC_ZOMBIE_LORD || u->race == RC_GHOUL
 		|| u->race == RC_GHOUL_LORD;
+}
+
+extern void 
+init_races(void)
+{
+#ifdef BETA_CODE
+	a_add(&race[RC_TROLL].attribs, make_skillmod(NOSKILL, SMF_RIDING, NULL, 0.0, -1));
+#endif
 }

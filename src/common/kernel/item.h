@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.h,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: item.h,v 1.3 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -132,6 +132,7 @@ typedef struct potion_type {
 	const item_type * itype;
 	int level;
 	const char * text;
+	int (*use)(struct unit *, const struct potion_type *, const char *);
 	/* --- pointers --- */
 	struct potion_type * next;
 } potion_type;
@@ -178,7 +179,7 @@ typedef struct weapon_type {
 	int reload; /* time to reload this weapon */
 	weapon_mod * modifiers;
 	/* --- functions --- */
-	int (*attack)(const struct troop *);
+	boolean (*attack)(const struct troop *, int *deaths);
 	/* --- pointers --- */
 	struct weapon_type * next;
 } weapon_type;

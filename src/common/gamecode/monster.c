@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: monster.c,v 1.4 2001/02/02 08:40:45 enno Exp $
+ *	$Id: monster.c,v 1.5 2001/02/03 13:45:30 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -810,13 +810,13 @@ monsters_kill_peasants(void)
 
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) if(!fval(u, FL_MOVED)) {
-			if(race[u->race].flags & SCARE_PEASANTS) {
+			if(race[u->race].flags & RCF_SCAREPEASANTS) {
 				scared_by_monster(u);
 			}
-			if(race[u->race].flags & KILL_PEASANTS) {
+			if(race[u->race].flags & RCF_KILLPEASANTS) {
 				eaten_by_monster(u);
 			}
-			if(race[u->race].flags & ABSORB_PEASANTS) {
+			if(race[u->race].flags & RCF_ABSORBPEASANTS) {
 				absorbed_by_monster(u);
 			}
 		}
@@ -878,12 +878,12 @@ plan_monsters(void)
 			/* Diese Verkettung ist krank und sollte durch eine 'vernünftige KI'
 			 * ersetzt werden. */
 
-			if( (race[u->race].flags & MOVE_RANDOM)
+			if( (race[u->race].flags & RCF_MOVERANDOM)
 					&& (rand()%100<MOVECHANCE || check_overpopulated(u))) {
 				move_monster(r, u);
 			} else {
 				boolean done = false;
-				if((race[u->race].flags & ATTACK_RANDOM)
+				if((race[u->race].flags & RCF_ATTACKRANDOM)
 					&& rand()%100<MONSTERATTACK 
 					&& is_moving == false) 
 				{
@@ -893,7 +893,7 @@ plan_monsters(void)
 					if(u->race == RC_SEASERPENT) {
 						set_string(&u->thisorder, keywords[K_PIRACY]);
 						set_string(&u->lastorder, keywords[K_PIRACY]);
-					} else if(race[u->race].flags & LEARN) {
+					} else if(race[u->race].flags & RCF_LEARN) {
 						learn_monster(u);
 					}
 				}

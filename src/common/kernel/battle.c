@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.3 2001/02/02 08:40:45 enno Exp $
+ *	$Id: battle.c,v 1.4 2001/02/03 13:45:30 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -56,7 +56,7 @@ typedef enum combatmagic {
 #include "ship.h"
 #include "building.h"
 #ifdef GROUPS
-#include "group.h"
+# include "group.h"
 #endif
 
 /* util includes */
@@ -81,23 +81,23 @@ typedef enum combatmagic {
 #include <fcntl.h>
 #endif
 
+
 #ifdef HAVE_ZLIB
 # include <zlib.h>
-#elif defined(HAVE_BZ2LIB)
+# define dbgprintf(a) gzprintf a;
+gzFile bdebug;
+#elif HAVE_BZ2LIB
 # include <bzlib.h>
+# define dbgprintf(a) bz2printf a;
+BZFILE *bdebug;
+#else
+# define dbgprintf(a) fprintf a;
+FILE *bdebug;
 #endif
 
 /* TODO: header cleanup */
 extern int dice_rand(const char *s);
 extern item_type it_demonseye;
-
-#ifdef HAVE_ZLIB
-gzFile bdebug;
-#elif defined(HAVE_BZ2LIB)
-BZFILE *bdebug;
-#else
-FILE *bdebug;
-#endif
 
 int  obs_count = 0;
 boolean nobattledebug = false;
@@ -167,8 +167,8 @@ fleeregion(const unit * u)
 		return NULL;
 
 	if (u->ship &&
-			!(race[u->race].flags & SWIM) &&
-			!(race[u->race].flags & FLY)) {
+			!(race[u->race].flags & RCF_SWIM) &&
+			!(race[u->race].flags & RCF_FLY)) {
 		return NULL;
 	}
 
@@ -215,48 +215,22 @@ armedmen(const unit * u)
 {
 	item * itm;
 	int n = 0;
-	switch (u->race) {
-	case RC_DWARF:
-	case RC_ELF:
-	case RC_ORC:
-	case RC_GOBLIN:
-	case RC_HUMAN:
-	case RC_TROLL:
-	case RC_DAEMON:
-	case RC_INSECT:
-	case RC_HALFLING:
-	case RC_CAT:
-	case RC_AQUARIAN:
-		/* alle Waffen werden gezaehlt, und dann wird auf die Anzahl
-		 * Personen minimiert */
-
-		for (itm=u->items;itm;itm=itm->next) {
-			if (itm->type->flags & ITF_WEAPON) n += itm->number;
-			if (n>u->number) break;
-		}
-		break;
-
-	case RC_ILLUSION:
-
-		/* eigentlich unnoetig, da sie sowieso keine skills haben */
-
-		break;
-
-	default:
-		if (race[u->race].ec_flags & CANGUARD) {
-			n = u->number;			/* fuer untote und drachen */
+	if (!urace(u)->flags & RCF_NOWEAPONS) {
+		if (urace(u)->ec_flags & CANGUARD) {
+			/* kann ohne waffen bewachen: fuer untote und drachen */
+			n = u->number;			
 		} else {
+			/* alle Waffen werden gezaehlt, und dann wird auf die Anzahl
+			 * Personen minimiert */
 			for (itm=u->items;itm;itm=itm->next) {
 				const weapon_type * wtype = resource2weapon(itm->type->rtype);
 				if (wtype==NULL) continue;
-				if (effskill(u, wtype->skill) > wtype->minskill) n += itm->number;
+				if (effskill(u, wtype->skill) >= wtype->minskill) n += itm->number;
 				if (n>u->number) break;
 			}
+			n = min(n, u->number);
 		}
-		break;
-
 	}
-	n = min(n, u->number);
 	return n;
 }
 
@@ -267,14 +241,7 @@ battledebug(const char *s)
 	printf("%s\n", translate_regions(s, NULL));
 #endif
 	if (bdebug) {
-#ifdef HAVE_ZLIB
-		gzprintf(bdebug, "%s\n", translate_regions(s, NULL));
-#elif HAVE_BZ2LIB
-		bz2printf(bdebug, "%s\n",  translate_regions(s, NULL));
-#else
-		fprintf(bdebug, "%s\n", translate_regions(s, NULL));
-		fflush(bdebug);
-#endif
+		dbgprintf((bdebug, "%s\n", translate_regions(s, NULL)));
 	}
 }
 
@@ -679,8 +646,12 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 	/* Burgenbonus, Pferdebonus. Der Waffenabhängige wird aber * nicht hier
 	 * gemacht, sondern in weapon_effskill */
 	if (riding(t) && (wtype==NULL || !fval(wtype, WTF_MISSILE))) {
-		if (tu->race == RC_TROLL) skill += 1;
-		else skill += 2;
+		skill += 2;
+#ifdef BETA_CODE
+		skill = skillmod(urace(tu)->attribs, tu, tu->region, wtype->skill, skill, SMF_RIDING);
+#else
+		if (tu->race == RC_TROLL) skill--;
+#endif
 	}
 
 	if (t.index<tf->elvenhorses) {
@@ -1776,9 +1747,13 @@ attack(battle *b, troop ta, att *a)
 			if (getreload(ta)) {
 				ta.fighter->person[ta.index].reload--;
 			} else {
+				boolean standard_attack = true;
 				if (wp && wp->type->attack) {
-					af->catmsg += wp->type->attack(&ta);
-				} else {
+					int dead;
+					standard_attack = wp->type->attack(&ta, &dead);
+					af->catmsg += dead;
+				}
+				if (standard_attack) {
 					boolean missile = false;
 					if (wp && fval(wp->type, WTF_MISSILE)) missile=true;
 					if (missile) td = select_enemy(af, missile_range[0]-row, missile_range[1]-row);
@@ -2812,7 +2787,7 @@ make_fighter(battle * b, unit * u, boolean attack)
 		s1->nonblockers[fig->status + FIGHT_ROW] += u->number;
 	}
 
-	if (race[fig->unit->race].flags & HORSE) {
+	if (race[fig->unit->race].flags & RCF_HORSE) {
 		fig->horses = fig->unit->number;
 		fig->elvenhorses = 0;
 	} else {
@@ -2925,34 +2900,24 @@ make_battle(region * r)
 	static int max_fac_no = 0; /* need this only once */
 
 	if (!nobattledebug) {
-#ifdef HAVE_ZLIB
-		sprintf(buf, "battles/battle-%d-%s.gz", obs_count, simplename(r));
-		bdebug = gzopen(buf, "w");
-#elif HAVE_BZ2LIB
-		sprintf(buf, "battles/battle-%d-%s.bz2", obs_count, simplename(r));
-		bdebug = BZ2_bzopen(buf, "w");+                       
-#else
-		sprintf(buf, "battles/battle-%d-%s", obs_count, simplename(r));
-		bdebug = fopen(buf, "w");
-#endif
+		char zText[MAX_PATH];
+		sprintf(zText, "%s/battles", basepath());
 		if (!debug) {
-			makedir("battles", 0700);
+			char zFilename[MAX_PATH];
+			makedir(zText, 0700);
 #ifdef HAVE_ZLIB
-			bdebug = gzopen(buf, "w");
+			sprintf(zFilename, "%s/battle-%d-%s.log.gz", zText, obs_count, simplename(r));
+			bdebug = gzopen(zFilename, "w");
 #elif HAVE_BZ2LIB
-			bdebug = BZ2_bzopen(buf, "w");
+			sprintf(zFilename, "%s/battle-%d-%s.log.bz2", zText, obs_count, simplename(r));
+			bdebug = BZ2_bzopen(zFilename, "w");+                       
 #else
-			bdebug = fopen(buf, "w");
+			sprintf(zFilename, "%s/battle-%d-%s.log", zText, obs_count, simplename(r));
+			bdebug = fopen(zFilename, "w");
 #endif
 			if (!bdebug) fputs("battles können nicht debugged werden\n", stderr);
 			else {
-#ifdef HAVE_ZLIB
-				gzprintf(bdebug, "In %s findet ein Kampf statt:", rname(r, NULL));
-#elif HAVE_BZ2LIB
-				bz2printf(bdebug, "In %s findet ein Kampf statt:", region_name(r));
-#else
-				fprintf(bdebug, "In %s findet ein Kampf statt:", rname(r, NULL));
-#endif
+				dbgprintf((bdebug, "In %s findet ein Kampf statt:", rname(r, NULL)));
 			}
 		}
 		obs_count++;

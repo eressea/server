@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: economy.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: economy.c,v 1.3 2001/02/03 13:45:29 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -48,6 +48,7 @@
 
 /* util includes */
 #include <attrib.h>
+#include <base36.h>
 #include <event.h>
 
 /* libs includes */
@@ -354,8 +355,8 @@ recruit(region * r, unit * u, strlist * S,
 	recruitcost = race[u->faction->race].rekrutieren;
 	pl = getplane(r);
 	if (pl && fval(pl, PFL_NORECRUITS)) {
-		sprintf(buf, "%s - In der Ebene der Herausforderung kann niemand rekrutiert werden.", S->s);
-		addmessage(0, u->faction, buf, MSG_EVENT, ML_MISTAKE);
+		add_message(&u->faction->msgs,
+			new_message(u->faction, "error_pflnorecruit%s:command%u:unit%r:region", S->s, u, r));
 		return;
 	}
 
@@ -387,8 +388,6 @@ recruit(region * r, unit * u, strlist * S,
 		max_skill(u->faction, SK_ALCHEMY))
 	{
 		cmistake(u, S->s, 156, MSG_EVENT);
-/*		sprintf(buf, "Es kann maximal %d Alchemisten pro Partei geben.",
-			max_skill(u->faction, SK_ALCHEMY)); */
 		return;
 	}
 	n = min(n, get_pooled(u, r, R_SILVER) / recruitcost);
@@ -516,7 +515,7 @@ givemen(int n, unit * u, unit * u2, strlist * S)
 				error = 129;
 			} else if (u->race != u2->faction->race) {
 				if (u2->faction->race != RC_HUMAN) {
-					error = 121;
+					error = 120;
 				} else if (count_migrants(u2->faction) + n > count_max_migrants(u2->faction)) {
 					error = 128;
 				}
@@ -806,15 +805,6 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 		freset(u, FL_OWNER);
 		fset(u2, FL_OWNER);
 
-		sprintf(buf, "%s übergibt das Kommando ", unitname(u));
-		if (u->building)
-			scat("der Burg");
-		if (u->ship)
-			scat("des Schiffes");
-		scat(" an ");
-		scat(unitname(u2));
-		scat(".");
-
 		add_message(&u2->faction->msgs, new_message(
 			u2->faction, "givecommand%u:unit%u:receipient",
 			u,
@@ -1074,6 +1064,7 @@ maintain(building * b, boolean full)
 	if (b->type->maintenance==NULL) return true;
 	if (is_cursed(b->attribs, C_NOCOST, 0)) {
 		fset(b, BLD_MAINTAINED);
+		fset(b, BLD_WORKING);
 		return true;
 	}
 	u = buildingowner(r, b);
@@ -1084,6 +1075,9 @@ maintain(building * b, boolean full)
 
 		if (fval(m, MTF_VARIABLE)) need = need * b->size;
 		if (u) {
+			/* full ist im ersten versuch true, im zweiten aber false! Das
+			 * bedeutet, das in der Runde in die Region geschafften Resourcen
+			 * nicht genutzt werden können, weil die reserviert sind! */
 			if (full) need -= get_all(u, m->type);
 			else need -= get_pooled(u, r, m->type);
 			if (full && need > 0) {
@@ -1189,8 +1183,8 @@ gebaeude_stuerzt_ein(region * r, building * b)
 	}
 
 	if (opfer > 0) {
-		scat(" ");
-		icat(opfer);
+		buf[0]=' ';
+		strcpy(buf+1, itoa10(opfer));
 		scat(" Opfer ");
 		if (opfer == 1) {
 			scat("ist");
@@ -1198,13 +1192,12 @@ gebaeude_stuerzt_ein(region * r, building * b)
 			scat("sind");
 		}
 		scat(" zu beklagen.");
-	}
+	} else buf[0] = 0;
 	addmessage(r, 0, buf, MSG_EVENT, ML_IMPORTANT);
-	sprintf(buf, "In %s stürzte %s ein.", regionid(r), buildingname(b));
 	for (f = factions; f; f = f->next)
 		if (fval(f, FL_DH))
-			addmessage(0, f, buf, MSG_EVENT, ML_IMPORTANT);
-	/* erst zum Schluß, weil sonst b schon ge-free't wurde. */
+			add_message(&f->msgs,
+				new_message(f, "buildingcrash%r:region%b:building%s:opfer", r, b, buf));
 	destroy_building(b);
 }
 
@@ -1223,10 +1216,10 @@ maintain_buildings(boolean crash)
 				} else {
 					unit * u = buildingowner(r, b);
 					if (u) {
-						sprintf(buf, "Für das Gebäude %s konnte die ganze Woche kein "
-								"Unterhalt bezahlt werden.", buildingname(b));
-						addmessage(r, u->faction, buf, MSG_EVENT, ML_WARN);
-						addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
+						add_message(&u->faction->msgs,
+							new_message(u->faction, "nomaintenance%b:building", b));
+						add_message(&r->msgs,
+							new_message(u->faction, "nomaintenance%b:building", b));
 					}
 				}
 			}
@@ -1287,8 +1280,6 @@ economics(void)
 		if (recruitorders) expandrecruit(r, recruitorders);
 
 	}
-	/* Unterhalt für Gebäude */
-	maintain_buildings(false);
 }
 /* ------------------------------------------------------------- */
 

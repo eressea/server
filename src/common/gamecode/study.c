@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: study.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: study.c,v 1.3 2001/02/03 13:45:30 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -112,7 +112,7 @@ teach(region * r, unit * u)
 	char *s;
 	skill_t sk;
 
-	if ((race[u->race].flags & NOTEACH)) {
+	if ((race[u->race].flags & RCF_NOTEACH)) {
 		cmistake(u, u->thisorder, 274, MSG_EVENT);
 		return;
 	}
@@ -358,7 +358,7 @@ learn(void)
 						cmistake(u, findorder(u, u->thisorder), 77, MSG_EVENT);
 						continue;
 					}
-					if ((race[u->race].flags & NOLEARN)) {
+					if ((race[u->race].flags & RCF_NOLEARN)) {
 						sprintf(buf, "%s können nichts lernen", race[u->race].name[1]);
 						mistake(u, u->thisorder, buf, MSG_EVENT);
 						continue;
@@ -475,6 +475,8 @@ learn(void)
 						}
 					}
 
+					if (a==NULL) a = a_add(&u->attribs, a_new(&at_learning));
+
 					if (money>0) {
 						use_pooled(u, r, R_SILVER, money);
 						add_message(&u->faction->msgs, new_message(u->faction,
@@ -483,12 +485,10 @@ learn(void)
 					}
 
 					if (get_effect(u, oldpotiontype[P_WISE])) {
-						if (a==NULL) a = a_add(&u->attribs, a_new(&at_learning));
 						a->data.i += min(u->number, get_effect(u, oldpotiontype[P_WISE])) * 10;
 						change_effect(u, oldpotiontype[P_WISE], -u->number);
 					}
 					if (get_effect(u, oldpotiontype[P_FOOL])) {	/* Trank "Dumpfbackenbrot" */
-						if (a==NULL) a = a_add(&u->attribs, a_new(&at_learning));
 						a->data.i -= min(u->number, get_effect(u, oldpotiontype[P_FOOL])) * 30;
 						change_effect(u, oldpotiontype[P_FOOL], -u->number);
 					}
@@ -499,25 +499,21 @@ learn(void)
 								|| i == SK_CATAPULT || i == SK_SWORD || i == SK_SPEAR
 								|| i == SK_AUSDAUER || i == SK_WEAPONLESS)
 						{
-							if (a==NULL) a = a_add(&u->attribs, a_new(&at_learning));
 							a->data.i += u->number * (5+warrior_skill*5);
 						} else {
-							if (a==NULL) a = a_add(&u->attribs, a_new(&at_learning));
 							a->data.i -= u->number * (5+warrior_skill*5);
 							a->data.i = max(0, a->data.i);
 						}
 					}
 
 					if (p != studycost) {
-													/* ist_in_gebaeude(r, u, BT_UNIVERSITAET) == 1) { */
-													/* p ist Kosten ohne Uni, studycost mit; wenn
-													 * p!=studycost, ist die Einheit zwangsweise
-													 * in einer Uni */
-						if (a==NULL) a = a_add(&u->attribs, a_new(&at_learning));
+						/* ist_in_gebaeude(r, u, BT_UNIVERSITAET) == 1) { */
+						/* p ist Kosten ohne Uni, studycost mit; wenn
+						 * p!=studycost, ist die Einheit zwangsweise
+						 * in einer Uni */
 						a->data.i += u->number * 10;
 					}
 					if (is_cursed(r->attribs,C_BADLEARN,0)) {
-						if (a==NULL) a = a_add(&u->attribs, a_new(&at_learning));
 						a->data.i -= u->number * 10;
 					}
 #ifdef SKILLFIX_SAVE
@@ -527,7 +523,6 @@ learn(void)
 								 (int)(u->number * 30 * multi), a->data.i);
 					}
 #endif
-					change_skill(u, (skill_t)i, (int)(u->number * 30 * multi) + (a?a->data.i:0));
 					if (a) {
 						a_remove(&u->attribs, a);
 						a = NULL;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.10 2001/02/02 08:40:48 enno Exp $
+ *	$Id: korrektur.c,v 1.11 2001/02/03 13:45:34 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -977,6 +977,7 @@ show_newspells(void)
 	 * terminieren */
 
 	spellid_t newspellids[] = { SPL_ETERNIZEWALL,
+		SPL_CERDDOR_EARN_SILVER,
 		SPL_PUTTOREST,
 		SPL_UNHOLYPOWER,
 		SPL_HOLYGROUND,
@@ -1203,6 +1204,54 @@ fix_balsamfiasko(void)
 }
 #endif
 
+int
+count_demand(const region *r)
+{
+	struct demand *dmd;
+	int c = 0;
+	for (dmd=r->land->demands;dmd;dmd=dmd->next) c++;
+	return c;
+}
+
+void
+fix_demand_region(const region *r)
+{
+	direction_t d;
+
+	for (d=0;d!=MAXDIRECTIONS;++d) {
+		region *nr = rconnect(r, d);
+		if (nr && nr->land && count_demand(nr) != 7) {
+			const luxury_type *sale=NULL;
+			const luxury_type *ltype;
+			struct demand *dmd, *dmd2;
+
+			for(dmd = nr->land->demands; dmd; dmd=dmd->next)
+				if(dmd->value == 0) sale = dmd->type;
+
+			dmd2 = NULL;
+			for (ltype = luxurytypes;ltype;ltype=ltype->next) {
+				dmd = malloc(sizeof(struct demand));
+				dmd->type = ltype;
+				if(ltype == sale) {
+					dmd->value = 0;
+				} else {
+					dmd->value = 1+rand()%5;
+				}
+			}
+		}
+	}
+}
+
+void
+fix_demand(void)
+{
+	region *r;
+
+	for(r=regions; r; r=r->next) {
+		if(count_demand(r) != 7) fix_demand_region(r);
+	}
+}
+
 #if 0
 static void
 read_laenrepair(boolean active)
@@ -1363,8 +1412,10 @@ stats(void)
 {
 	FILE * F;
 	item * items = NULL;
+	char zText[MAX_PATH];
 
-	F = fopen("res/stats", "wt");
+	strcat(strcpy(zText, resourcepath()), "/stats");
+	F = fopen(zText, "wt");
 	if (F) {
 		region * r;
 		const item_type * itype;
@@ -1387,8 +1438,7 @@ stats(void)
 		}
 		fclose(F);
 	} else {
-		sprintf(buf, "fopen(%s): ", "res/stats");
-		perror(buf);
+		perror(zText);
 	}
 
 }
@@ -1574,12 +1624,12 @@ init_mwarden(void)
 }
 
 #ifdef CONVERT_TRIGGER
-#include <old/relation.h>
-#include <old/trigger.h>
+#include "old/relation.h"
+#include "old/trigger.h"
+#include "old/trigger_internal.h"
 
 #include <event.h>
 
-#include <trigger_internal.h>
 #include <triggers/killunit.h>
 #include <triggers/timeout.h>
 #include <triggers/changerace.h>
@@ -1706,7 +1756,7 @@ convert_triggers(void)
 static void
 lms_special(unit * u)
 {
-	i_change(&u->items, &it_lmsreward, 1);
+	if (u) i_change(&u->items, &it_lmsreward, 1);
 }
 
 #define LIFEEXPECTANCY (27*40)

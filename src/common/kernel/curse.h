@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: curse.h,v 1.3 2001/01/31 17:40:50 corwin Exp $
+ *	$Id: curse.h,v 1.4 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -23,7 +23,7 @@
 
 /* ------------------------------------------------------------- */
 /* Zauberwirkungen */
-/* nicht vergessen cursedata zu aktualisieren und Reihenfolge beachten!
+/* nicht vergessen curse_type zu aktualisieren und Reihenfolge beachten!
  */
 
 enum {
@@ -131,12 +131,10 @@ enum {
 /* ------------------------------------------------------------- */
 /* Allgemeine Zauberwirkungen */
 
-typedef struct cursedata curse_type;
-
 typedef struct curse {
 	struct curse *nexthash;
 	int no;            /* 'Einheitennummer' dieses Curse */
-	curse_type * type; /* Zeiger auf ein cursedata-struct */
+	struct curse_type * type; /* Zeiger auf ein curse_type-struct */
 	curse_t cspellid;  /* Id des Cursezaubers */
 	int flag;          /* generelle Flags wie zb CURSE_ISNEW oder CURSE_NOAGE */
 	int duration;      /* Dauer der Verzauberung. Wird jede Runde vermindert */
@@ -179,7 +177,7 @@ typedef int (*cdesc_fun)(const void*, int, curse*, int);
 
 /* ------------------------------------------------------------- */
 
-typedef struct cursedata {
+typedef struct curse_type {
 	int typ;
 	int givemenacting;
 	int mergeflags;
@@ -189,9 +187,9 @@ typedef struct cursedata {
 								 Zauberanalyse angezeigt */
 	int (*curseinfo)(const void*, int, curse*, int);
 	void (*change_vigour)(curse*, int);
-} cursedata;
+} curse_type;
 
-extern cursedata cursedaten[];
+extern struct curse_type cursedaten[];
 
 extern attrib_type at_curse;
 extern void curse_write(const attrib * a,FILE * f);
@@ -280,6 +278,7 @@ struct unit * get_cursingmagician(struct attrib *ap, curse_t id, int id2);
 	 * */
 int find_cursebyname(const char *c);
 const curse_type * ct_find(const char *c);
+void ct_register(const curse_type *);
 /* Regionszauber */
 
 curse * cfindhash(int i);

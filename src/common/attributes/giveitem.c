@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: giveitem.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ * $Id: giveitem.c,v 1.3 2001/02/03 13:45:27 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -54,18 +54,19 @@ a_readgive(attrib * a, FILE * F)
 {
 	give_data * gdata = (give_data*)a->data.v;
 	int i;
+	char zText[32];
 
 	if (global.data_version<ITEMTYPE_VERSION) return a_readdefault(a, F);
 
-	fscanf(F, "%s ", buf);
-	i = atoi36(buf);
+	fscanf(F, "%s ", zText);
+	i = atoi36(zText);
 	gdata->building = findbuilding(i);
 	if (gdata->building==NULL) ur_add((void*)i, (void**)&gdata->building, resolve_building);
 	for (;;) {
-		fscanf(F, "%s", buf);
-		if (!strcmp("end", buf)) break;
+		fscanf(F, "%s", zText);
+		if (!strcmp("end", zText)) break;
 		fscanf(F, "%d", &i);
-		if (i==0) i_add(&gdata->items, i_new(it_find(buf)))->number = i;
+		if (i==0) i_add(&gdata->items, i_new(it_find(zText)))->number = i;
 	}
 	return 1;
 }
@@ -95,7 +96,6 @@ give_item(attrib * a)
 	while (gdata->items) {
 		item * itm = gdata->items;
 		i_change(&u->items, itm->type, itm->number);
-/*		sprintf(buf, "%s findet in %s %d %s", unitname(u), regionid(r), itm->number, locale_string(u->faction->locale, resourcename(itm->type->rtype, (itm->number==1)?0:GR_PLURAL))); */
 		i_free(i_remove(&gdata->items, itm));
 	}
 	return 0;

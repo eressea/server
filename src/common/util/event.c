@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: event.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: event.c,v 1.3 2001/02/03 13:45:33 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -195,7 +195,8 @@ t_add(trigger ** tlist, trigger * t)
 static trigger_type * triggertypes;
 
 void
-tt_register(trigger_type * tt) {
+tt_register(trigger_type * tt) 
+{
 	tt->next = triggertypes;
 	triggertypes = tt;
 }

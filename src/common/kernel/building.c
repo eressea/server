@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: building.c,v 1.3 2001/01/27 18:15:32 enno Exp $
+ *	$Id: building.c,v 1.4 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -755,7 +755,9 @@ findbuildingtype(const char * name, const locale * lang)
 static int
 sm_smithy(const unit * u, const region * r, skill_t sk, int value) /* skillmod */
 {
-	if (u->region == r && (sk==SK_ARMORER || sk==SK_WEAPONSMITH)) return value + 1;
+	if (sk==SK_WEAPONSMITH || sk==SK_ARMORER) {
+		if (u->region == r) return value + 1;
+	}
 	return value;
 }
 
@@ -769,14 +771,8 @@ mm_smithy(const unit * u, const resource_type * rtype, int value) /* material-mo
 void
 init_buildings(void)
 {
-	skillmod_data * smd;
-	attrib * a;
-
-	a = a_add(&bt_smithy.attribs, a_new(&at_skillmod));
-	smd = (skillmod_data *)a->data.v;
-	smd->special = sm_smithy;
-	smd->flags = SMF_PRODUCTION;
-	a = a_add(&bt_smithy.attribs, make_matmod(mm_smithy));
+	a_add(&bt_smithy.attribs, make_skillmod(NOSKILL, SMF_PRODUCTION, sm_smithy, 0, 0));
+	a_add(&bt_smithy.attribs, make_matmod(mm_smithy));
 }
 
 void

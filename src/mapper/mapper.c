@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: mapper.c,v 1.3 2001/01/28 08:20:05 enno Exp $
+ *	$Id: mapper.c,v 1.4 2001/02/03 13:45:34 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1194,7 +1194,7 @@ main(int argc, char *argv[])
 	}
 
 	initgame();
-	register_triggers();
+	init_triggers();
 	init_locales();
 	init_attributes();
 

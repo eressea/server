@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_tools.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: map_tools.c,v 1.3 2001/02/03 13:45:34 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -188,7 +188,7 @@ yes_no(WINDOW * win, const char *text, const char def)
 char *
 my_input(WINDOW * win, int x, int y, const char *text)
 {
-	static char buf[120];
+	static char buf[INPUT_BUFSIZE+1];
 	int val, ch, p, nw = 0;
 	if (!win) {
 		win = openwin(SX - 10, 3, 0);
@@ -215,16 +215,18 @@ my_input(WINDOW * win, int x, int y, const char *text)
 				wmove(win, y, val + p);
 				wrefresh(win);
 			}
-		} else if (ch == 10 || ch == 13) {
+		} else if (ch == '\n') {
 			curs_set(0);
-		} else if (isprint(ch) && x < 68) {
+		} if(val >= INPUT_BUFSIZE) {
+			beep();
+		} else if (isprint(ch)) {
 			waddch(win, ch);
 			buf[val] = (char) ch;
 			val++;
 		} else
 			beep();
 		wrefresh(win);
-	} while (!(ch == 10 || ch == 13));
+	} while (!(ch == '\n'));
 	if (nw)
 		delwin(win);
 	curs_set(0);

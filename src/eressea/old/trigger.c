@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: trigger.c,v 1.1 2001/01/27 18:15:32 enno Exp $
+ *	$Id: trigger.c,v 1.2 2001/02/03 13:45:34 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -34,6 +34,7 @@
 #include <resolve.h>
 
 #include <assert.h>
+#include <string.h>
 #include <stdlib.h>
 
 #if defined(OLD_TRIGGER) || defined(CONVERT_TRIGGER)

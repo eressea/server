@@ -1449,7 +1449,7 @@ sp_healing(fighter * fi, int level, int force, spell * sp)
 			break;
 
 		/* Untote kann man nicht heilen */
-		if (race[df->unit->race].flags & NOHEAL)
+		if (race[df->unit->race].flags & RCF_NOHEAL)
 			continue;
 
 		hp = unit_max_hp(df->unit);

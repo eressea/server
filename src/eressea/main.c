@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.8 2001/02/02 08:40:48 enno Exp $
+ *	$Id: main.c,v 1.9 2001/02/03 13:45:34 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -34,11 +34,13 @@
 #include <config.h>
 #include <eressea.h>
 
+#include "korrektur.h"
+
 /* initialization - TODO: init in separate module */
-#include <items/lmsreward.h>
-#include <items/demonseye.h>
-#include <items/weapons.h>
 #include <attributes/attributes.h>
+#include <spells/spells.h>
+#include <triggers/triggers.h>
+#include <items/items.h>
 
 /* modules includes */
 #include <modules/arena.h>
@@ -81,6 +83,7 @@ int nowrite = 0;
 extern char * g_reportdir;
 extern char * g_datadir;
 extern char * g_basedir;
+extern char * g_resourcedir;
 
 extern boolean nonr;
 extern boolean nocr;
@@ -89,35 +92,21 @@ extern boolean nomsg;
 extern boolean nobattle;
 extern boolean nobattledebug;
 
-extern void korrektur(void);
-extern void korrektur_end(void);
-extern void reorder(region * r);
-extern void freeland(land_region * lr);
-extern void init_conversion(void);
-extern void register_triggers(void);
-
 int mapdetail = 0;
 
 extern void render_init(void);
 
-static void init_items(void)
-{
-	init_weapons();
-	init_demonseye();
-	init_lmsreward();
-}
-
 static void
 init_game(void)
 {
-	register_triggers();
+	init_triggers();
 	init_locales();
 
+	init_races();
+	init_spells();
 	init_resources();
 	init_items();
 	init_attributes();
-
-	init_demonseye();
 
 #ifdef USE_GM_COMMANDS
 	init_gmcmd();
@@ -134,8 +123,8 @@ void
 create_game(void)
 {
 	assert(regions==NULL || !"game is initialized");
-	printf("Keine Spieldaten gefunden, erzeuge neues Spiel...\n");
-	makedir("data", 0700);
+	printf("Keine Spieldaten gefunden, erzeuge neues Spiel in %s...\n", datapath());
+	makedir(datapath(), 0700);
 	/* erste Insel generieren */
 	new_region(0, 0);
 	/* Monsterpartei anlegen */
@@ -202,16 +191,20 @@ int quickleave = 0;
 void
 writepasswd(void)
 {
-	faction *f;
-	FILE * F = cfopen("passwd", "w");
-	if (!F)
-		return;
-	puts("Schreibe Passwörter...");
+	FILE * F;
+	char zText[128];
 
-	for (f = factions; f; f = f->next) {
-		fprintf(F, "%s:%s:%s\n", factionid(f), f->name, f->passw);
+	sprintf(zText, "%s/passwd", basepath());
+	F = cfopen(zText, "w");
+	if (F) {
+		faction *f;
+		puts("Schreibe Passwörter...");
+
+		for (f = factions; f; f = f->next) {
+			fprintf(F, "%s:%s:%s\n", factionid(f), f->email, f->passw);
+		}
+		fclose(F);
 	}
-	fclose(F);
 }
 
 #ifdef FUZZY_BASE36
@@ -410,62 +403,15 @@ int
 main(int argc, char *argv[])
 {
 	int i, errorlevel = 0;
-	FILE * F;
 
 	setlocale(LC_ALL, "");
 #ifdef LOCALE_CHECK
-	assert(locale_check() || !"ERROR: The current locale is not suitable for international Eressea.\n");
+	if (!locale_check())
+		puts("ERROR: The current locale is not suitable for international Eressea.\n");
 #endif
 #if MALLOCDBG
 	init_malloc_debug();
 #endif
-
-	strcat(strcpy(buf, basepath()), "/res/spells");
-	F = fopen(buf, "wt");
-	if (F) {
-		int i, m = -1;
-		for (i=0;spelldaten[i].id;++i) {
-			if (spelldaten[i].magietyp!=m) {
-				m=spelldaten[i].magietyp;
-				fprintf(F, "\n%s\n", magietypen[m]);
-			}
-			fprintf(F, "%d\t%s\n", spelldaten[i].level, spelldaten[i].name);
-		}
-		fclose(F);
-	} else {
-		char zText[MAX_PATH];
-		strcat(strcpy(zText, basepath()), "/res/spells");
-		sprintf(buf, "fopen(%s): ", zText);
-		perror(buf);
-	}
-
-	strcat(strcpy(buf, basepath()), "/res/bonus");
-	F = fopen(buf, "wt");
-	if (F) {
-		race_t r;
-		for (r=0;r!=MAXRACES;++r) {
-			skill_t sk;
-			int i = 0;
-			fprintf(F, "const bonus %s_bonus = {\n\t", race[r].name[0]);
-			for (sk=0;sk!=MAXSKILLS;sk++) {
-				if (race[r].bonus[sk]) {
-					if (i==8) {
-						i = 0;
-						fputs("\n\t", F);
-					}
-					fprintf(F, "{ SK_%s, %d }, ", skillnames[sk], race[r].bonus[sk]);
-					++i;
-				}
-			}
-			fputs("{ SK_NONE, 0 }\n};\n", F);
-		}
-		fclose(F);
-	} else {
-		char zText[MAX_PATH];
-		strcat(strcpy(zText, basepath()), "/res/bonus");
-		sprintf(buf, "fopen(%s): ", zText);
-		perror(buf);
-	}
 
 	debug = 0;
 	quickleave = 0;
@@ -504,6 +450,9 @@ main(int argc, char *argv[])
 				}
 				g_datadir = argv[++i];
 				break;
+			case 'r':
+				g_resourcedir = argv[++i];
+				break;
 			case 'b':
 				g_basedir = argv[++i];
 				break;
@@ -528,9 +477,57 @@ main(int argc, char *argv[])
 			}
 	{
 		char zText[MAX_PATH];
-		strcat(strcpy(zText, basepath()), "/res/timestrings");
+		strcat(strcpy(zText, resourcepath()), "/timestrings");
 		read_datenames(zText);
 	}
+
+#ifdef WRITE_STATS
+	{
+		FILE * F;
+		char zText[MAX_PATH];
+		strcat(strcpy(zText, resourcepath()), "/spells");
+		F = fopen(zText, "wt");
+		if (F) {
+			int i, m = -1;
+			for (i=0;spelldaten[i].id;++i) {
+				if (spelldaten[i].magietyp!=m) {
+					m=spelldaten[i].magietyp;
+					fprintf(F, "\n%s\n", magietypen[m]);
+				}
+				fprintf(F, "%d\t%s\n", spelldaten[i].level, spelldaten[i].name);
+			}
+			fclose(F);
+		} else {
+			sprintf(buf, "fopen(%s): ", zText);
+			perror(buf);
+		}
+		strcat(strcpy(zText, resourcepath()), "/bonus");
+		F = fopen(buf, "wt");
+		if (F) {
+			race_t r;
+			for (r=0;r!=MAXRACES;++r) {
+				skill_t sk;
+				int i = 0;
+				fprintf(F, "const bonus %s_bonus = {\n\t", race[r].name[0]);
+				for (sk=0;sk!=MAXSKILLS;sk++) {
+					if (race[r].bonus[sk]) {
+						if (i==8) {
+							i = 0;
+							fputs("\n\t", F);
+						}
+						fprintf(F, "{ SK_%s, %d }, ", skillnames[sk], race[r].bonus[sk]);
+						++i;
+					}
+				}
+				fputs("{ SK_NONE, 0 }\n};\n", F);
+			}
+			fclose(F);
+		} else {
+			sprintf(buf, "fopen(%s): ", zText);
+			perror(zText);
+		}
+		}
+#endif
 	init_game();
 	initgame();
 	readgame(false);
@@ -557,11 +554,6 @@ main(int argc, char *argv[])
 			switch (argv[i][1]) {
 			case 'c':
 				korrektur();
-				break;
-			case 'r':
-				errorlevel = 0;
-				score();
-				doreports();
 				break;
 			case 'Q':
 				quickleave = 1;
@@ -634,6 +626,7 @@ main(int argc, char *argv[])
 				break;
 			case 'f':
 				i++;
+			case 'r':
 			case 'b':
 			case 't':
 			case 'x':
@@ -703,24 +696,12 @@ main(int argc, char *argv[])
 				processturn(buf);
 			break;
 
-		case 'r':
-			doreports();
-			break;
-
 		case 's':
 			{
 				char ztext[64];
 				sprintf(ztext, "data/%d", turn);
 				writegame(ztext, 0);
 			}
-			break;
-
-		case 'T':
-			changeblockterrain();
-			break;
-
-		case 'C':
-			changeblockchaos();
 			break;
 
 		case 'q':

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.c,v 1.6 2001/02/02 08:40:46 enno Exp $
+ *	$Id: spell.c,v 1.7 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -670,7 +670,7 @@ sp_summon_familiar(castorder *co)
 	}
 	rc = select_familiar(mage->faction->race, mage->faction->magiegebiet);
 
-	if(race[rc].flags & SWIM && !(race[rc].flags & WALK)) {
+	if(race[rc].flags & RCF_SWIM && !(race[rc].flags & RCF_WALK)) {
 		int coasts;
 
 		if((coasts = is_coastregion(r)) == 0) {
@@ -2964,15 +2964,7 @@ sp_firewall(castorder *co)
 	return cast_level;
 }
 
-#endif
-
-#if USE_FIREWALL
 /* ------------------------------------------------------------- */
-/* 1. Das ist Illaun und sollte dann auch dort stehen
- * 2. Beschreibung fehlt
- *
- * LEUTE, SO GEHT DAS NICHT!
- */
 
 static const char *
 wisps_name(const border * b, const region * r, const faction * f, int gflags)
@@ -6558,9 +6550,8 @@ sp_q_antimagie(castorder *co)
 	obj = pa->param[0]->typ;
 
 	ctype = NULL;
-	if(pa->length == 2){
-		ctype = ct_find(pa->param[2]->data.s);
-	}
+	if(pa->length == 2)
+		ctype = ct_find(pa->param[1]->data.s);
 
 	switch(obj){
 		case SPP_REGION:
@@ -8568,7 +8559,7 @@ spell spelldaten[] =
 	 (spell_f)sp_denyattack, patzer
 	},
 
-	{SPL_CERDDOR_EARN_SILVER, "Gaukelleien",
+	{SPL_CERDDOR_EARN_SILVER, "Gaukeleien",
 	"Cerddormagier sind _die_ Gaukler unter den Magiern, sie lieben es das "
 	"Volk zu unterhalten und im Mittelpunkt zu stehen. Schon Anfänger lernen "
 	"die kleinen Kunststücke und magischen Tricks, mit denen man das Volk "
@@ -9589,7 +9580,7 @@ spell spelldaten[] =
 		(SPELLLEVEL | BUILDINGSPELL | ONETARGET | TESTRESISTANCE),
 		5, 7,
 		{
-			{R_AURA, 50, SPC_LEVEL},
+			{R_AURA, 50, SPC_FIX},
 			{R_PERMAURA, 1, SPC_FIX},
 			{0, 0, 0},
 			{0, 0, 0},

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_modify.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: map_modify.c,v 1.3 2001/02/03 13:45:34 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -92,6 +92,7 @@ blockcoord(int x)
 }
 
 static char newblock[BLOCKSIZE][BLOCKSIZE];
+static int g_maxluxuries;
 
 static void
 block_create(int x1, int y1, int size, char chaotisch, int special, char terrain)
@@ -178,16 +179,14 @@ block_create(int x1, int y1, int size, char chaotisch, int special, char terrain
 		 * Landstriche werden benannt und bevoelkert, und die produkte
 		 * p1 und p2 des Kontinentes werden gesetzt. */
 		region *r;
-#ifdef NEW_ITEMS
-		static int maxluxuries = 0;
 		int i, i1, i2;
 		const luxury_type *ltype, *p1 = NULL, *p2=NULL;
-		if (maxluxuries==0) {
-			for (ltype = luxurytypes;ltype;ltype=ltype->next) ++maxluxuries;
+		if (g_maxluxuries==0) {
+			for (ltype = luxurytypes;ltype;ltype=ltype->next) ++g_maxluxuries;
 		}
-		i1 = (item_t)(rand() % maxluxuries);
+		i1 = (item_t)(rand() % g_maxluxuries);
 		do {
-			i2 = (item_t)(rand() % maxluxuries);
+			i2 = (item_t)(rand() % g_maxluxuries);
 		}
 		while (i2 == i1);
 		ltype = luxurytypes;
@@ -196,22 +195,9 @@ block_create(int x1, int y1, int size, char chaotisch, int special, char terrain
 			else if (i==i2) p2=ltype;
 			ltype=ltype->next;
 		}
-#else
-		item_t p1, p2;
-		p1 = (item_t)(rand() % MAXLUXURIES);
-		do {
-			p2 = (item_t)(rand() % MAXLUXURIES);
-		}
-		while (p2 == p1);
-#endif
 		for (x = 0; x != BLOCKSIZE; x++) {
 			for (y = 0; y != BLOCKSIZE; y++) {
-#ifdef NEW_ITEMS
-				struct demand * dmd;
 				const luxury_type * sale = (rand()%2)?p1:p2;
-#else
-				item_t i;
-#endif
 				r = findregion(x1 + x, y1 + y);
 				if (r) continue;
 				r = new_region(x1 + x, y1 + y);
@@ -226,13 +212,7 @@ block_create(int x1, int y1, int size, char chaotisch, int special, char terrain
 				} else {
 					terraform(r, newblock[x][y]);
 				}
-				if (r->land) for (ltype=luxurytypes; ltype; ltype=ltype->next) {
-					dmd = calloc(sizeof(struct demand), 1);
-					dmd->type = ltype;
-					if (ltype!=sale) dmd->value = 1 + rand() % 5;
-					dmd->next = r->land->demands;
-					r->land->demands = dmd;
-				}
+				if (r->land) setluxuries(r, sale);
 			}
 		}
 	}
@@ -916,7 +896,7 @@ make_new_region(int x, int y)
 		wAddstr(buf);
 	}
 	wrefresh(win);
-	r->terrain = (char) map_input(win, 2, 3, "Terraintyp", 0, MAXTERRAINS-1, 0);
+	terraform(r, (terrain_t) map_input(win, 2, 3, "Terraintyp", 0, MAXTERRAINS-1, 0));
 	for (; z > 3; z--) {
 		wmove(win, z, 2);
 		wclrtoeol(win);

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: weapons.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: weapons.c,v 1.3 2001/02/03 13:45:30 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -51,8 +51,8 @@ weapon_mod wm_halberd[] = {
 	{ 0, 0 }
 };
 
-static int
-attack_firesword(const troop * at)
+static boolean
+attack_firesword(const troop * at, int *casualties)
 {
 	fighter *fi = at->fighter;
 	troop dt;
@@ -67,7 +67,10 @@ attack_firesword(const troop * at)
 	enemies = count_enemies(fi->side, FS_ENEMY,
 		minrow, maxrow);
 
-	if (!enemies) return 0;
+	if (!enemies) {
+		if (casualties) *casualties = 0;
+		return false; /* if no enemy found, no use doing standarad attack */
+	}
 
 	do {
 		dt = select_enemy(fi, minrow, maxrow);
@@ -75,11 +78,12 @@ attack_firesword(const troop * at)
 		--force;
 		killed += terminate(dt, *at, AT_SPELL, damage, 1);
 	} while (force && killed < enemies);
-	return killed;
+	if (casualties) *casualties = killed;
+	return true;
 }
 
-static int
-attack_catapult(const troop * at)
+static boolean
+attack_catapult(const troop * at, int * casualties)
 {
 	fighter *af = at->fighter;
 	unit *au = af->unit;
@@ -124,7 +128,8 @@ attack_catapult(const troop * at)
 		}
 	}
 
-	return d;
+	if (casualties) *casualties = d;
+	return false;
 }
 
 enum {
@@ -224,7 +229,7 @@ init_oldweapons(void)
 		item_type * itype = olditemtype[weapontable[w].item];
 		int minskill = 1, wflags = WTF_NONE;
 		weapon_mod * modifiers = NULL;
-		int (*attack)(const troop *) = NULL;
+		int (*attack)(const troop *, int * deaths) = NULL;
 
 		switch (w) {
 		case WP_RUNESWORD:

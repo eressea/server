@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: creport.c,v 1.3 2001/01/28 08:50:45 enno Exp $
+ *	$Id: creport.c,v 1.4 2001/02/03 13:45:29 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -63,7 +63,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define C_REPORT_VERSION 52
+#define C_REPORT_VERSION 54
 #define NEWBLOCKS (C_REPORT_VERSION>=35)
 
 #define ENCODE_SPECIAL 1
@@ -718,7 +718,7 @@ report_computer(FILE * F, faction * f)
 	fprintf(F, "%d;Runde\n", turn);
 	fputs("2;Zeitalter\n", F);
 	fprintf(F, "PARTEI %d\n", f->no);
-	fprintf(F, "\"%s\";Passwort\n", f->passw);
+/*	fprintf(F, "\"%s\";Passwort\n", f->passw); */
 	fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
 	fprintf(F, "%d;Optionen\n", f->options);
 	if (f->options & want(O_SCORE) && f->age>DISPLAYSCORE) {
@@ -854,13 +854,15 @@ report_computer(FILE * F, faction * f)
 						fprintf(F, "%d;Lohn\n", fwage(r, f, true));
 					}
 					/* trade */
-					fputs("PREISE\n", F);
-					while (dmd) {
-							fprintf(F, "%d;%s\n", (dmd->value
-									  ? dmd->value*dmd->type->price
-									  : -dmd->type->price),
-									  locale_string(f->locale, resourcename(dmd->type->itype->rtype, 0)));
-						dmd=dmd->next;
+					if(rpeasants(r)/TRADE_FRACTION > 0) {
+						fputs("PREISE\n", F);
+						while (dmd) {
+								fprintf(F, "%d;%s\n", (dmd->value
+										  ? dmd->value*dmd->type->price
+										  : -dmd->type->price),
+										  locale_string(f->locale, resourcename(dmd->type->itype->rtype, 0)));
+							dmd=dmd->next;
+						}
 					}
 				}
 			}

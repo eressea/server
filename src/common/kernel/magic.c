@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: magic.c,v 1.3 2001/01/28 08:01:51 enno Exp $
+ *	$Id: magic.c,v 1.4 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -445,38 +445,50 @@ updatespelllist(unit * u)
 	}
 
 	/* Transformierte Wyrm-Magier bekommen Drachenodem */
-	if (u->race == RC_WYRM) {
-		if(!getspell(u, SPL_FIREDRAGONODEM) &&
-				find_spellbyid(SPL_FIREDRAGONODEM)->level <= max) {
+	if (dragon(u)){
+		switch (u->race){ 
+		/* keine breaks! Wyrme sollen alle drei Zauber können.*/
+			case RC_WYRM:
+			{
+				if(!getspell(u, SPL_WYRMODEM) &&
+						find_spellbyid(SPL_WYRMODEM)->level <= max) {
 
-			addspell(u, SPL_FIREDRAGONODEM);
-			if (!already_seen(u->faction, spelldaten[i].id)) {
-				a_add(&u->faction->attribs,
-						a_new(&at_reportspell))->data.i = SPL_FIREDRAGONODEM;
-				a_add(&u->faction->attribs,
-						a_new(&at_seenspell))->data.i = SPL_FIREDRAGONODEM;
+					addspell(u, SPL_WYRMODEM);
+					if (!already_seen(u->faction, spelldaten[i].id)) {
+						a_add(&u->faction->attribs,
+								a_new(&at_reportspell))->data.i = SPL_WYRMODEM;
+						a_add(&u->faction->attribs,
+								a_new(&at_seenspell))->data.i = SPL_WYRMODEM;
+					}
+				}
 			}
-		}
-		if(!getspell(u, SPL_DRAGONODEM) &&
-				find_spellbyid(SPL_DRAGONODEM)->level <= max) {
+			case RC_DRAGON:
+			{
+				if(!getspell(u, SPL_DRAGONODEM) &&
+						find_spellbyid(SPL_DRAGONODEM)->level <= max) {
 
-			addspell(u, SPL_DRAGONODEM);
-			if (!already_seen(u->faction, spelldaten[i].id)) {
-				a_add(&u->faction->attribs,
-						a_new(&at_reportspell))->data.i = SPL_DRAGONODEM;
-				a_add(&u->faction->attribs,
-						a_new(&at_seenspell))->data.i = SPL_DRAGONODEM;
+					addspell(u, SPL_DRAGONODEM);
+					if (!already_seen(u->faction, spelldaten[i].id)) {
+						a_add(&u->faction->attribs,
+								a_new(&at_reportspell))->data.i = SPL_DRAGONODEM;
+						a_add(&u->faction->attribs,
+								a_new(&at_seenspell))->data.i = SPL_DRAGONODEM;
+					}
+				}
 			}
-		}
-		if(!getspell(u, SPL_WYRMODEM) &&
-				find_spellbyid(SPL_WYRMODEM)->level <= max) {
+			case RC_FIREDRAGON:
+			{
+				if(!getspell(u, SPL_FIREDRAGONODEM) &&
+						find_spellbyid(SPL_FIREDRAGONODEM)->level <= max) {
 
-			addspell(u, SPL_WYRMODEM);
-			if (!already_seen(u->faction, spelldaten[i].id)) {
-				a_add(&u->faction->attribs,
-						a_new(&at_reportspell))->data.i = SPL_WYRMODEM;
-				a_add(&u->faction->attribs,
-						a_new(&at_seenspell))->data.i = SPL_WYRMODEM;
+					addspell(u, SPL_FIREDRAGONODEM);
+					if (!already_seen(u->faction, spelldaten[i].id)) {
+						a_add(&u->faction->attribs,
+								a_new(&at_reportspell))->data.i = SPL_FIREDRAGONODEM;
+						a_add(&u->faction->attribs,
+								a_new(&at_seenspell))->data.i = SPL_FIREDRAGONODEM;
+					}
+				}
 			}
 		}
 	}
@@ -1528,17 +1540,6 @@ verify_targets(castorder *co)
 					if (u) {
 						/* die Einheit wurde nun gefunden und befindet sich in der
 						 * Zielregion */
-						if ((sp->sptyp & TESTRESISTANCE)
-								&& target_resists_magic(mage, u, TYP_UNIT, 0))
-						{ /* Fehlermeldung */
-							spobj->flag = TARGET_RESISTS;
-							add_message(&mage->faction->msgs, new_message(mage->faction,
-								"spellunitresists%u:unit%r:region%s:command%s:id",
-								mage, mage->region, strdup(co->order),
-								strdup(itoa36(spobj->data.i))));
-							failed++;
-							break;
-						}
 
 						/* Wenn auf Sichtbarkeit geprüft werden soll und die Einheit
 						 * nicht gesehen wird und auch nicht kontaktiert, dann melde
@@ -1555,12 +1556,39 @@ verify_targets(castorder *co)
 							failed++;
 							break;
 						}
+
+						if ((sp->sptyp & TESTRESISTANCE)
+								&& target_resists_magic(mage, u, TYP_UNIT, 0))
+						{ /* Fehlermeldung */
+							spobj->flag = TARGET_RESISTS;
+							add_message(&mage->faction->msgs, new_message(mage->faction,
+								"spellunitresists%u:unit%r:region%s:command%s:id",
+								mage, mage->region, strdup(co->order),
+								strdup(itoa36(spobj->data.i))));
+							failed++;
+							break;
+						}
 						spobj->typ = SPP_UNIT;
 						spobj->data.u = u;
 					} else { /* Einheit nicht gefunden */
 						spobj->flag = TARGET_NOTFOUND;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitnotfound%u:unit%r:region%s:command%s:id",
+							mage, mage->region, strdup(co->order),
+							strdup(itoa36(spobj->data.i))));
+						failed++;
+						break;
+					}
+
+					/* TODO: Test auf Parteieigenschaft Magieresistsenz */
+					if ((sp->sptyp & TESTRESISTANCE)
+							&& target_resists_magic(mage, u, TYP_UNIT, 0))
+					{ /* Fehlermeldung */
+						spobj->typ = SPP_UNIT_ID;
+						spobj->data.i = u->no;
+						spobj->flag = TARGET_RESISTS;
+						add_message(&mage->faction->msgs, new_message(mage->faction,
+							"spellunitresists%u:unit%r:region%s:command%s:id",
 							mage, mage->region, strdup(co->order),
 							strdup(itoa36(spobj->data.i))));
 						failed++;
@@ -1580,21 +1608,6 @@ verify_targets(castorder *co)
 						spobj->flag = TARGET_NOTFOUND;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
 							"spellunitnotfound%u:unit%r:region%s:command%s:id",
-							mage, mage->region, strdup(co->order),
-							strdup(itoa36(spobj->data.i))));
-						failed++;
-						break;
-					}
-
-					/* TODO: Test auf Parteieigenschaft Magieresistsenz */
-					if ((sp->sptyp & TESTRESISTANCE)
-							&& target_resists_magic(mage, u, TYP_UNIT, 0))
-					{ /* Fehlermeldung */
-						spobj->typ = SPP_UNIT_ID;
-						spobj->data.i = u->no;
-						spobj->flag = TARGET_RESISTS;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellunitresists%u:unit%r:region%s:command%s:id",
 							mage, mage->region, strdup(co->order),
 							strdup(itoa36(spobj->data.i))));
 						failed++;
@@ -2426,6 +2439,7 @@ set_familiar(unit * mage, unit * familiar)
 		attrib * a = a_add(&mage->attribs, a_new(&at_skillmod));
 		skillmod_data * smd = (skillmod_data *)a->data.v;
 		smd->special = sm_familiar;
+		smd->skill=NOSKILL;
 		assert(!nonplayer(mage));
 	}
 

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: region.c,v 1.5 2001/02/02 08:40:46 enno Exp $
+ *	$Id: region.c,v 1.6 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -41,6 +41,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+static int g_maxluxuries;
 
 const int delta_x[MAXDIRECTIONS] =
 {
@@ -654,7 +656,13 @@ new_region(int x, int y)
 }
 
 void
-freeland(land_region * lr) {
+freeland(land_region * lr)
+{
+	while (lr->demands) {
+		struct demand * d = lr->demands;
+		lr->demands = d->next;
+		free(d);
+	}
 	if (lr->name) free(lr->name);
 	free(lr);
 }
@@ -700,6 +708,21 @@ makename(void)
 	name[0] = (char) toupper(name[0]);
 	return name;
 }
+
+void 
+setluxuries(region * r, const luxury_type * sale)
+{
+	const luxury_type * ltype;
+	assert(r->land);
+	for (ltype=luxurytypes; ltype; ltype=ltype->next) {
+		struct demand * dmd = calloc(sizeof(struct demand), 1);
+		dmd->type = ltype;
+		if (ltype!=sale) dmd->value = 1 + rand() % 5;
+		dmd->next = r->land->demands;
+		r->land->demands = dmd;
+	}
+}
+
 void
 terraform(region * r, terrain_t t)
 {
@@ -725,8 +748,62 @@ terraform(region * r, terrain_t t)
 	}
 
 	if (!r->land) {
+		static struct surround {
+			struct surround * next;
+			const luxury_type * type;
+			int value;
+		} *trash =NULL, *nb = NULL;
+		const luxury_type * ltype;
+		direction_t d;
+		int mnr = 0;
+
 		r->land = calloc(1, sizeof(land_region));
 		rsetname(r, makename());
+		for (d=0;d!=MAXDIRECTIONS;++d) {
+			region * nr = rconnect(r, d);
+			if (nr && nr->land) {
+				struct demand * sale = r->land->demands;
+				while (sale && sale->value!=0) sale=sale->next;
+				if (sale) {
+					struct surround * sr = nb;
+					while (sr && sr->type!=sale->type) sr=sr->next;
+					if (!sr) {
+						if (trash) {
+							sr = trash;
+							trash = trash->next;
+						} else {
+							sr = calloc(1, sizeof(struct surround));
+						}
+						sr->next = nb;
+						sr->type = sale->type;
+						sr->value = 1;
+						nb = sr;
+					} else sr->value++;
+					++mnr;
+				}
+			}
+		}
+		if (!nb) {
+			int i;
+			if (g_maxluxuries==0) {
+				for (ltype = luxurytypes;ltype;ltype=ltype->next) ++g_maxluxuries;
+			}
+			i = rand() % g_maxluxuries;
+			ltype = luxurytypes;
+			while (i--) ltype=ltype->next; 
+		} else {
+			int i = rand() % mnr;
+			struct surround * srd = nb;
+			while (i>srd->value) {
+				i-=srd->value;
+				srd=srd->next;
+			}
+			setluxuries(r, srd->type);
+			while (srd->next!=NULL) srd=srd->next;
+			srd->next=trash;
+			trash = nb;
+			nb = NULL;
+		}
 	}
 	
 	if (landregion(t)) {

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: main.c,v 1.3 2001/02/03 13:45:27 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -106,10 +106,11 @@ create_game(void)
 void
 map(void)
 {
+	char zText[16];
 	FILE * f;
 	region * r;
-	sprintf(buf, "map-%d.cr", turn);
-	f = fopen(buf, "wt");
+	sprintf(zText, "map-%d.cr", turn);
+	f = fopen(zText, "wt");
 	fputs("VERSION 42\n", f);
 	fputs("\"Standard\";konfiguration\n", f);
 	fprintf(f, "%d;runde\n", turn);
@@ -161,8 +162,11 @@ int quickleave = 0;
 void
 writepasswd(void)
 {
+	FILE * F;
 	faction *f;
-	FILE * F = cfopen("passwd", "w");
+	char zText[128];
+	sprintf(zText, "%s/%s", datapath(), "/passwd");
+	F = cfopen(zText, "w");
 	if (!F)
 		return;
 	puts("Schreibe Passwörter...");
@@ -456,7 +460,11 @@ main(int argc, char *argv[])
 				break;
 			}
 
-	read_datenames("res/timestrings");
+	{
+		char zText[MAX_PATH];
+		strcat(strcpy(zText, resourcepath()), "/timestrings");
+		read_datenames(zText);
+	}
 	init_game();
 	initgame();
 	readgame(false);
@@ -664,14 +672,6 @@ main(int argc, char *argv[])
 				sprintf(ztext, "data/%d", turn);
 				writegame(ztext, 0);
 			}
-			break;
-
-		case 'T':
-			changeblockterrain();
-			break;
-
-		case 'C':
-			changeblockchaos();
 			break;
 
 		case 'q':

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.h,v 1.7 2001/02/02 08:40:45 enno Exp $
+ *	$Id: eressea.h,v 1.8 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -138,6 +138,7 @@ typedef struct settings {
 extern settings global;
 
 #define RELEASE_VERSION NEWSOURCE_VERSION
+#define ECHECK_VERSION "3.9"
 
 /* changes from->to: 72->73: struct unit::lock entfernt.
  * 73->74: struct unit::flags eingeführt.
@@ -1126,6 +1127,7 @@ extern void add_income(struct unit * u, int type, int want, int qty);
 
 extern int month(int offset);
 extern const char * basepath(void);
+extern const char * resourcepath(void);
 
 #define FIRST_TURN 184
 

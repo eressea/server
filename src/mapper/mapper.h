@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: mapper.h,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: mapper.h,v 1.3 2001/02/03 13:45:34 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -14,6 +14,10 @@
 
 #ifndef MAPPER_H
 #define MAPPER_H
+
+#define INPUT_BUFSIZE 80
+
+#include <terrain.h>
 
 #ifndef ISLANDSIZE
 # define ISLANDSIZE      ((rand()%3)?(25+rand()%10):(11+rand()%14))

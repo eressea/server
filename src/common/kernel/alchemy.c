@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: alchemy.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: alchemy.c,v 1.3 2001/02/03 13:45:30 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -99,7 +99,10 @@ use_potion(unit * u, const item_type * itype, const char * cmd)
 		return ECUSTOM;
 	}
 
-	if (ptype==oldpotiontype[P_TREES]) {
+	if (ptype->use) {
+		int nRetval = ptype->use(u, ptype, cmd);
+		if (nRetval) return nRetval;
+	} else if (ptype==oldpotiontype[P_TREES]) {
 		region * r = u->region;
 		int holz = new_use_pooled(u, oldresourcetype[R_WOOD], GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10);
 		if (holz < 10)
@@ -109,28 +112,8 @@ use_potion(unit * u, const item_type * itype, const char * cmd)
 			"growtree_effect%u:unit%i:amount", u, holz));
 	} else if (ptype==oldpotiontype[P_HEAL]) {
 		return EUNUSABLE;
-	} else if (ptype==oldpotiontype[P_WARMTH]) {
-		if (u->faction->race == RC_INSECT) {
-			fset(u, FL_WARMTH);
-			cmistake(u, cmd, 164, MSG_EVENT);
-		} else {
-			/* nur für insekten: */
-			cmistake(u, cmd, 163, MSG_EVENT);
-			return ECUSTOM;
-		}
 	} else if (ptype==oldpotiontype[P_HEILWASSER]) {
 		u->hp = min(unit_max_hp(u) * u->number, u->hp + 400);
-	} else if (ptype==oldpotiontype[P_BAUERNBLUT]) {
-		if (u->race == RC_DAEMON) {
-			attrib * a = (attrib*)a_find(u->attribs, &at_bauernblut);
-			if (!a) a = a_add(&u->attribs, a_new(&at_bauernblut));
-			a->data.i += 100;
-		} else {
-			/* bekommt nicht: */
-			cmistake(u, cmd, 165, MSG_EVENT);
-			u->race = RC_GHOUL;
-			set_faction(u, findfaction(MONSTER_FACTION));
-		}
 	} else if (ptype==oldpotiontype[P_PEOPLE]) {
 		region * r = u->region;
 		attrib * a = (attrib*)a_find(r->attribs, &at_peasantluck);

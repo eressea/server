@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: unit.h,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: unit.h,v 1.3 2001/02/03 13:45:33 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -137,6 +137,8 @@ void usettarget(struct unit * u, const struct unit * b);
 
 struct unit * utarget(const struct unit * u);
 void usettarget(struct unit * u, const struct unit * b);
+
+extern const struct race_type * urace(const struct unit * u);
 
 const char* uprivate(const struct unit * u);
 void usetprivate(struct unit * u, const char * c);

@@ -20,6 +20,7 @@ CFG=gamecode - Win32 Conversion
 !MESSAGE "gamecode - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "gamecode - Win32 Debug" (based on "Win32 (x86) Static Library")
 !MESSAGE "gamecode - Win32 Conversion" (based on "Win32 (x86) Static Library")
+!MESSAGE "gamecode - Win32 Profile" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
 # Begin Project
@@ -42,7 +43,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /Za /W4 /GX /Z7 /O2 /I "../util" /I "../kernel" /I "../.." /I ".." /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE RSC /l 0x407
 # ADD RSC /l 0x407
 BSC32=bscmake.exe
@@ -65,7 +66,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../util" /I "../kernel" /I "../.." /I ".." /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR /YX"stdafx.h" /FD /c
+# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../util" /I "../kernel" /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /YX"stdafx.h" /FD /c
 # ADD BASE RSC /l 0x407
 # ADD RSC /l 0x407
 BSC32=bscmake.exe
@@ -84,13 +85,36 @@ LIB32=link.exe -lib
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "gamecode__"
-# PROP Intermediate_Dir "gamecode__"
+# PROP Output_Dir "Debug"
+# PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /Za /W4 /Z7 /Od /I ".." /I "../util" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR /FD /c
 # SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /MDd /Za /W4 /Z7 /Od /I ".." /I "../util" /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /D "CONVERT_TRIGGER" /FR /FD /c
+# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../util" /I "../kernel" /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /FD /c
 # SUBTRACT CPP /YX
+# ADD BASE RSC /l 0x407
+# ADD RSC /l 0x407
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo
+# ADD LIB32 /nologo
+
+!ELSEIF  "$(CFG)" == "gamecode - Win32 Profile"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "gamecode___Win32_Profile"
+# PROP BASE Intermediate_Dir "gamecode___Win32_Profile"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "Profile"
+# PROP Intermediate_Dir "Profile"
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /W3 /GX /O2 /I "../util" /I "../kernel" /I "../.." /I ".." /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /Za /W4 /GX- /Z7 /O2 /I "../util" /I "../kernel" /I "../.." /I ".." /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE RSC /l 0x407
 # ADD RSC /l 0x407
 BSC32=bscmake.exe
@@ -107,6 +131,7 @@ LIB32=link.exe -lib
 # Name "gamecode - Win32 Release"
 # Name "gamecode - Win32 Debug"
 # Name "gamecode - Win32 Conversion"
+# Name "gamecode - Win32 Profile"
 # Begin Group "Header"
 
 # PROP Default_Filter "*.h"

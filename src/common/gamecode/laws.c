@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.6 2001/02/02 08:40:45 enno Exp $
+ *	$Id: laws.c,v 1.7 2001/02/03 13:45:29 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -32,14 +32,15 @@
 #endif
 
 /* kernel includes */
-#include <item.h>
-#include <ship.h>
+#include <alchemy.h>
 #include <border.h>
 #include <faction.h>
-#include <alchemy.h>
+#include <item.h>
+#include <magic.h>
 #include <message.h>
-#include "skill.h"
-#include "magic.h"
+#include <save.h>
+#include <ship.h>
+#include <skill.h>
 #include "movement.h"
 #include "monster.h"
 #include "spy.h"
@@ -72,6 +73,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
 
 /* - external symbols ------------------------------------------ */
 extern int dropouts[2];
@@ -822,8 +824,10 @@ static void
 inactivefaction(faction * f)
 {
 	FILE *inactiveFILE;
+	char zText[128];
 
-	inactiveFILE = fopen("inactive", "a");
+	sprintf(zText, "%s/%s", datapath(), "/passwd");
+	inactiveFILE = fopen(zText, "a");
 
 	fprintf(inactiveFILE, "%s:%s:%d:%d\n",
 		factionid(f),
@@ -1343,10 +1347,9 @@ deliverMail(faction * f, region * r, unit * u, const char *s, unit * receiver)
 
 	strcpy(message, strcheck(s, DISPLAYSIZE));
 
-	if (!receiver) {
-		sprintf(buf, "Eine Botschaft von %s aus %s: '%s'",
-				unitname(u), regionid(r), message);
-		addmessage(0, f, buf, MSG_MESSAGE, ML_IMPORTANT);
+	if (!receiver) { /* BOTSCHAFT an PARTEI */
+		add_message(&f->msgs,
+			new_message(f, "unitmessage%r:region%u:unit%s:message", r, u, message));
 	}
 	else {					/* BOTSCHAFT an EINHEIT */
 		unit *emp = receiver;
@@ -1616,14 +1619,33 @@ set_passw(void)
 					break;
 
 				case K_PASSWORD:
-					s = getstrtoken();
+					{
+						char pbuf[32];
+						int i;
 
-					if (!s[0]) {
-						u->faction->passw[0] = 0;
-						add_message(&u->faction->msgs, new_message(u->faction,
-							"deletepasswd"));
-					} else {
-						set_string(&u->faction->passw, s);
+						s = getstrtoken();
+
+						if (!s || !*s) {
+							for(i=0; i<6; i++) pbuf[i] = (char)(97 + rand() % 26);
+							pbuf[6] = 0;
+						} else {
+							boolean pwok = true;
+							char *c;
+
+							strncpy(pbuf, s, 31);
+							pbuf[31] = 0;
+							c = pbuf;
+							while(*c) {
+								if(!isalnum(*c)) pwok = false;
+								c++;
+							}
+							if(pwok == false) {
+								cmistake(u, S->s, 283, MSG_EVENT);
+								for(i=0; i<6; i++) pbuf[i] = (char)(97 + rand() % 26);
+								pbuf[6] = 0;
+							}
+						}
+						set_string(&u->faction->passw, pbuf);
 						add_message(&u->faction->msgs, new_message(u->faction,
 							"changepasswd%s:value", gc_add(strdup(u->faction->passw))));
 					}
@@ -1713,14 +1735,18 @@ display_item(faction *f, unit *u, const item_type * itype)
 {
 	FILE *fp;
 	char t[NAMESIZE + 1];
-	char filename[256];
+	char filename[MAX_PATH];
 	const char *name;
 
 	if (u && *i_find(&u->items, itype) == NULL) return false;
 	name = locale_string(NULL, resourcename(itype->rtype, 0));
-	sprintf(filename, "showdata/%s", name);
+	sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
 	fp = fopen(filename, "r");
-	if(!fp) return false;
+	if (!fp) {
+		sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(NULL), name);
+		fp = fopen(filename, "r");
+		if (!fp) return false;
+	}
 
 	sprintf(buf, "%s: ", name);
 
@@ -2213,10 +2239,11 @@ reorder(void)
 	region * r;
 	for (r=regions;r;r=r->next) {
 		unit * u, ** up=&r->units;
+		boolean sorted=false;
 		for (u=r->units;u;u=u->next) freset(u, FL_DH);
 		while (*up) {
 			u = *up;
-			if (!fval(u, FL_DH)) {
+			if (!fval(u, FL_MARK)) {
 				strlist * o;
 				for (o=u->orders;o;o=o->next) {
 					if (igetkeyword(o->s)==K_SORT) {
@@ -2230,7 +2257,10 @@ reorder(void)
 							cmistake(u, o->s, 259, MSG_EVENT);
 						} else if (fval(u, FL_OWNER)) {
 							cmistake(u, o->s, 260, MSG_EVENT);
-						} else switch(p) {
+						} else if (v == u) {
+							cmistake(u, o->s, 10, MSG_EVENT);
+						} else {
+							switch(p) {
 							case P_AFTER:
 								*up = u->next;
 								u->next = v->next;
@@ -2247,14 +2277,17 @@ reorder(void)
 									u->next = v;
 								}
 								break;
+							}
+							fset(u, FL_MARK);
+							sorted = true;
 						}
-						fset(u, FL_DH);
 						break;
 					}
 				}
 			}
 			if (u==*up) up=&u->next;
 		}
+		if (sorted) for (u=r->units;u;u=u->next) freset(u, FL_OWNER);
 	}
 }
 
@@ -2686,7 +2719,7 @@ canheal(const unit *u)
 		return 10;
 		break;
 	}
-	if (race[u->race].flags & NOHEAL) return 0;
+	if (race[u->race].flags & RCF_NOHEAL) return 0;
 	return 10;
 }
 
@@ -2701,10 +2734,10 @@ monthly_healing(void)
 		for (u = r->units; u; u = u->next) {
 			int umhp;
 
-			if((race[u->race].flags & NOHEAL) || fval(u, FL_HUNGER))
+			if((race[u->race].flags & RCF_NOHEAL) || fval(u, FL_HUNGER))
 				continue;
 
-			if(rterrain(r) == T_OCEAN && !u->ship && !(race[u->race].flags & SWIM))
+			if(rterrain(r) == T_OCEAN && !u->ship && !(race[u->race].flags & RCF_SWIM))
 				continue;
 
 			umhp = unit_max_hp(u) * u->number;
@@ -2894,6 +2927,9 @@ processorders (void)
 
 	puts(" - Zerstören, Geben, Rekrutieren, Vergessen");
 	economics();
+
+	puts(" - Gebäudeunterhalt (1. Versuch)");
+	maintain_buildings(false);
 
 #if MALLOCDBG
 	assert(_CrtCheckMemory());

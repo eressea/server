@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: randenc.c,v 1.5 2001/02/02 08:40:45 enno Exp $
+ *	$Id: randenc.c,v 1.6 2001/02/03 13:45:30 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1365,7 +1365,7 @@ randomevents(void)
 
 	for (r = regions; r; r=r->next) {
 		for (u=r->units; u; u=u->next) {
-			if (u->faction->no != MONSTER_FACTION && (race[u->race].flags & DESERT)) {
+			if (u->faction->no != MONSTER_FACTION && (race[u->race].flags & RCF_DESERT)) {
 				if (rand()%100 < 5) {
 					add_message(&u->faction->msgs, new_message(u->faction,
 						"desertion%u:unit%r:region", u, r));

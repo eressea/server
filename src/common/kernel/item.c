@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.5 2001/02/02 08:40:45 enno Exp $
+ *	$Id: item.c,v 1.6 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -95,24 +95,26 @@ res_changepeasants(unit * u, const resource_type * rtype, int delta)
 int
 res_changeitem(unit * u, const resource_type * rtype, int delta)
 {
+	int num;
 	if (rtype == oldresourcetype[R_STONE] && u->race==RC_STONEGOLEM && delta<=0) {
 		int reduce = delta / GOLEM_STONE;
 		if (delta % GOLEM_STONE != 0) --reduce;
 		scale_number(u, u->number+reduce);
-		return u->number;
+		num = u->number;
 	} else if (rtype == oldresourcetype[R_IRON] && u->race==RC_IRONGOLEM && delta<=0) {
 		int reduce = delta / GOLEM_IRON;
 		if (delta % GOLEM_IRON != 0) --reduce;
 		scale_number(u, u->number+reduce);
-		return u->number;
+		num = u->number;
 	} else {
 		const item_type * itype = resource2item(rtype);
 		item * i;
 		assert(itype!=NULL);
 		i = i_change(&u->items, itype, delta);
 		if (i==NULL) return 0;
-		return i->number;
+		num = i->number;
 	}
+	return num;
 }
 
 const char *
@@ -1123,7 +1125,6 @@ mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 {
 	if (u->race==RC_ELF) return value;
 	unused(r);
-	unused(sk);
 	return -118;
 }
 
@@ -1262,6 +1263,7 @@ init_olditems(void)
 		case I_GREATBOW:
 			a = a_add(&con->attribs, a_new(&at_skillmod));
 			smd = (skillmod_data*)a->data.v;
+			smd->skill=NOSKILL;
 			smd->special = mod_elves_only;
 			break;
 		default:
@@ -1680,6 +1682,40 @@ const char *potiontext[MAXPOTIONS] =
 	"Verletzung angewandt.",
 };
 
+static int
+use_warmthpotion(struct unit *u, const struct potion_type *ptype, const char *cmd)
+{
+	assert(ptype==oldpotiontype[P_WARMTH]);
+	if (u->faction->race == RC_INSECT) {
+		fset(u, FL_WARMTH);
+		cmistake(u, cmd, 164, MSG_EVENT);
+	} else {
+		/* nur für insekten: */
+		cmistake(u, cmd, 163, MSG_EVENT);
+		return ECUSTOM;
+	}
+	unused(ptype);
+	return 0;
+}
+
+static int
+use_bloodpotion(struct unit *u, const struct potion_type *ptype, const char *cmd)
+{
+	assert(ptype==oldpotiontype[P_BAUERNBLUT]);
+	unused(ptype);
+	if (u->race == RC_DAEMON) {
+		attrib * a = (attrib*)a_find(u->attribs, &at_bauernblut);
+		if (!a) a = a_add(&u->attribs, a_new(&at_bauernblut));
+		a->data.i += 100;
+	} else {
+		/* bekommt nicht: */
+		cmistake(u, cmd, 165, MSG_EVENT);
+		u->race = RC_GHOUL;
+		set_faction(u, findfaction(MONSTER_FACTION));
+	}
+	return 0;
+}
+
 void
 init_oldpotions(void)
 {
@@ -1742,6 +1778,8 @@ init_oldpotions(void)
 		oldpotiontype[p]->level = potionlevel[p];
 		oldpotiontype[p]->text = potiontext[p];
 	}
+	oldpotiontype[P_WARMTH]->use = &use_warmthpotion;
+	oldpotiontype[P_BAUERNBLUT]->use = &use_bloodpotion;
 }
 
 resource_type * r_silver;

@@ -1,0 +1,157 @@
+west;en;West
+northwest;en;Northwest
+northeast;en;Northeast
+east;en;East
+southwest;en;Southwest
+southeast;en;Southeast
+unknownunit;en;an unknown unit
+section_events;en;Messages and Events
+section_errors;en;Warnings and Errors
+section_economy;en;Economy and Trade
+section_production;en;Resources and Production
+section_magic;en;Magic and Artefacts
+section_movement;en;Movement and Travel
+section_study;en;Learning and Teaching
+section_battle;en;Battles
+
+# Items
+herb;en;herb
+herbbag;en;herbbag
+vial;en;vial
+vials;en;vials
+
+# Resourcen
+money;en;money
+moneys;en;moneys
+hp;en;hp
+hps;en;hps
+aura;en;aura
+auras;en;auras
+permaura;en;permaura
+permauras;en;permauras
+peasant;en;peasant
+peasants;en;peasants
+
+#items
+iron;en;iron
+irons;en;irons
+log;en;log
+logs;en;logs
+stone;en;stone
+stones;en;stones
+cart;en;cart
+carts;en;carts
+catapult;en;catapult
+catapults;en;catapults
+sword;en;sword
+swords;en;swords
+spear;en;spear
+spears;en;spears
+crossbow;en;crossbow
+crossbows;en;crossbows
+bow;en;bow
+bows;en;bows
+# more items
+chainmail;en;chainmail
+chainmails;en;chainmails
+plate;en;plate
+plates;en;plates
+balm;en;balm
+spice;en;spice
+jewel;en;jewel
+jewels;en;jewels
+myrrh;en;myrrh
+oil;en;oil
+silk;en;silk
+incense;en;incense
+firesword;en;firesword
+fireswords;en;fireswords
+shieldstone;en;shieldstone
+shieldstones;en;shieldstones
+greatsword;en;great sword
+greatswords;en;great swords
+axe;en;axe
+axes;en;axes
+greatbow;en;great bow
+greatbows;en;great bows
+laensword;en;laen sword
+laenswords;en;laen swords
+laenshield;en;laen shield
+laenshields;en;laen shields
+laenmail;en;laen chainmail
+laenmails;en;laen chainmails
+laen;en;laen
+shield;en;shield
+shields;en;shields
+halberd;en;halberd
+halberds;en;halberds
+lance;en;lance
+lances;en;lances
+mallorn;en;mallorn
+cookie;en;cookie
+cookies;en;cookies
+apple;en;apple
+apples;en;apples
+nut;en;nut
+nuts;en;nuts
+almond;en;almond
+almonds;en;almonds
+dragonblood;en;dragonblood
+fairyboot;en;fairyboot
+healingpotion;en;healingpotion
+healingpotions;en;healingpotions
+antimagic;en;antimagic cristal
+antimagics;en;antimagic cristals
+toadslime;en;toadslime
+amulet;en;amulet
+amulets;en;amulets
+aoh;en;amulet of healing
+aohs;en;amulets of healing
+aog;en;amulet of gathering
+aogs;en;amulets of gathering
+aots;en;amulet of true seeing
+aotss;en;amulets of true seeing
+aoc;en;amulet of the kitten
+aocs;en;amulets of the kitten
+roi;en;ring of invisibility
+rois;en;rings of invisibility
+rop;en;ring of power
+rops;en;rings of power
+roqf;en;ring of quick fingers
+roqfs;en;rings of quick fingers
+horse;en;horse
+horses;en;horses
+herbbag;en;herbbag
+herbbags;en;herbbags
+moneybag;en;moneybag
+moneychest;en;moneychest
+dragonhoard;en;dragonhoard
+dragonhead;en;dragonhead
+dragonheads;en;dragonheads
+eyeofdragon;en;eye of dragon
+eyeofdragons;en;eye of dragons
+rustysword;en;rusty sword
+rustyswords;en;rusty swords
+rustyshield;en;rusty shield
+rustyshields;en;rusty shields
+rustychainmail;en;rustychainmail
+rustychainmails;en;rustychainmails
+soc;en;sack of holding
+socs;en;sacks of holding
+ror;en;ring of regeneration
+rors;en;rings of regeneration
+aod;en;amulet of darkness
+aods;en;amulets of darkness
+magicbag;en;magic bag
+dreameye;en;dreameye
+dreameyes;en;dreameyes
+seaserpenthead;en;seaserpenthead
+seaserpentheads;en;seaserpentheads
+aurafocus;en;aurafocus
+aurafocuses;en;aurafocuses
+presspass;en;presspass
+presspasses;en;presspasses
+trollbelt;en;trollbelt
+
+# Spezialitems
+lmsreward;en;Belt of Heroic Legends

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: unit.c,v 1.3 2001/01/31 17:40:51 corwin Exp $
+ *	$Id: unit.c,v 1.4 2001/02/03 13:45:32 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -609,15 +609,21 @@ leave(struct region * r, unit * u)
 	unused(r);
 }
 
+const struct race_type * 
+urace(const struct unit * u)
+{
+	return &race[u->race];
+}
+
 boolean
 can_survive(const unit *u, const region *r)
 {
   if (((terrain[rterrain(r)].flags & WALK_INTO)
-			&& (race[u->race].flags & WALK)) ||
+			&& (race[u->race].flags & RCF_WALK)) ||
 			((terrain[rterrain(r)].flags & SWIM_INTO)
-			&& (race[u->race].flags & SWIM)) ||
+			&& (race[u->race].flags & RCF_SWIM)) ||
 			((terrain[rterrain(r)].flags & FLY_INTO)
-			&& (race[u->race].flags & FLY))) {
+			&& (race[u->race].flags & RCF_FLY))) {
 
 		if (get_item(u, I_HORSE) && !(terrain[rterrain(r)].flags & WALK_INTO))
 			return false;

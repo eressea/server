@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_partei.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: map_partei.c,v 1.3 2001/02/03 13:45:34 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -350,7 +350,7 @@ NeuePartei(region * r)
 {
 	int i, q, y;
 	WINDOW *win;
-	char email[80];
+	char email[INPUT_BUFSIZE+1];
 	race_t frace;
 	int late;
 	unit *u;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: triggers.h,v 1.2 2001/01/26 16:19:41 enno Exp $
+ * $Id: triggers.h,v 1.3 2001/02/03 13:45:33 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -12,4 +12,4 @@
  * prior permission by the authors of Eressea.
  */
 
-void register_triggers(void);
+void init_triggers(void);
