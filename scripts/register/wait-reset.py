@@ -15,11 +15,23 @@ import smtplib
 dbname=sys.argv[1]
 date=sys.argv[2]
 db=MySQLdb.connect(db=dbname)
-From='accounts@eressea-pbem.de'
 cursor=db.cursor()
+From='accounts@eressea-pbem.de'
 MailTemplate="templates/register.mail"
 smtpserver='localhost'
 server=smtplib.SMTP(smtpserver)
+patchdir='/home/eressea/eressea-rsync'
+
+def Patch():
+    i = cursor.execute("select name, patch from games where id=0")
+    name, patch = cursor.fetchone()
+    print "Auswertung für " + name + " Patch Level " + str(int(patch)) + ", Runde "+str(lastturn)
+    while os.access(patchdir+'/patch-'+str(int(patch+1))+'.sql', os.F_OK):
+	patch=patch+1
+	print "  Patching to level "+str(patch)
+	os.system('mysql ' + dbname + ' < ' + patchdir+'/patch-'+str(int(patch))+'.sql')
+	cursor.execute('update games set patch='+str(int(patch))+' where id='+str(gid))
+    return
 
 def Send(email, custid, firstname, password, position, locale):
     TemplateHandle = open(MailTemplate+"."+locale, "r")  # open in read only mode
@@ -37,6 +49,7 @@ def Send(email, custid, firstname, password, position, locale):
     server.sendmail(From, email, Msg)
     return
 
+Patch()
 cursor.execute("update users set status='EXPIRED' where TO_DAYS(updated)<TO_DAYS('"+date+"') and status='WAITING'")
 cursor.execute("update users set status='WAITING' where TO_DAYS(updated)<TO_DAYS('"+date+"') and status='CONFIRMED'")
 users = cursor.execute("select firstname, locale, email, id, password from users where status='WAITING' order by id")

@@ -30,7 +30,7 @@ while users > 0:
     Msg=None
     if balance <= games*warnahead*price:
 	Msg = ("From: Vinyambar Buchhaltung <"+From+">\nTo: "+email+"\n")
-	if balance <= -games*cancelafter*price:
+	if balance < -games*cancelafter*price:
 	    Msg=Msg+"Subject: Vinyambar Abmeldung Kunde "+str(int(uid))+".\n\n"
 	    Msg = Msg+("Nachdem Dein Konto bei uns im Minus ist, haben wir deine\n"+
 	    "Anmeldung bei Vinyambar gekündigt, und die Partei(en) der Parteibörse\n"+

@@ -15,6 +15,6 @@ if num>maxnum:
 while num:
     num=num-1
     email, race, locale, bonus = cursor.fetchone()
-	if bonus=None:
-		bonus=1
+    if bonus==None:
+	bonus=0
     print email+" "+race+" "+locale+" "+str(int(bonus))
