@@ -87,9 +87,10 @@ function process(orders)
 
   -- Give out the rewards of the art contest
   if get_gamename() == "Eressea" then
-    if get_flag("arts") == 0 then
-      require "artrewards.lua"
-      set_flag("arts")
+    if not get_flag("artr") then
+      chunk = loadfile("scripts/artrewards.lua")
+      chunk()
+      set_flag("artr", true)
     end
   end
 
