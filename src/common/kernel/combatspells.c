@@ -941,7 +941,7 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
 		n = df->unit->number;
 
 		if (chance(power/n)) {
-			row = statusrow(df->status)+FIRST_ROW;
+			row = statusrow(df->status);
 			df->side->size[row] -= df->alive;
 			if (df->unit->race->battle_flags & BF_NOBLOCK) {
 				df->side->nonblockers[row] -= df->alive;
