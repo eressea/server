@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spy.c,v 1.5 2001/02/19 16:45:23 katze Exp $
+ *	$Id: spy.c,v 1.6 2001/02/22 21:46:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -118,7 +118,7 @@ setstealth(unit * u, strlist * S)
 
 	/* Pseudodrachen auch */
 
-	if (u->race == RC_PSEUDODRAGON || RC_BIRTHDAYDRAGON) {
+	if (u->race == RC_PSEUDODRAGON || u->race == RC_BIRTHDAYDRAGON) {
 		t = findrace(s);
 		if(t==RC_PSEUDODRAGON||t==RC_FIREDRAGON||t==RC_DRAGON||t==RC_WYRM) {
 			u->irace = t;

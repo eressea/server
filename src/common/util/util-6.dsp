@@ -89,7 +89,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /Za /W4 /Z7 /Od /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /YX"stdafx.h" /FD /c
-# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../.." /I ".." /D "_WINDOWS" /D "BETA_CODE" /D "WIN32" /D "_DEBUG" /FR /YX"stdafx.h" /FD /c
+# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /FR /YX"stdafx.h" /FD /c
 # ADD BASE RSC /l 0x407
 # ADD RSC /l 0x407
 BSC32=bscmake.exe
@@ -143,6 +143,10 @@ SOURCE=.\base36.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\crmessage.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\cvector.h
 # End Source File
 # Begin Source File
@@ -171,11 +175,23 @@ SOURCE=.\log.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\message.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\nrmessage.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\rand.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\resolve.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\translation.h
 # End Source File
 # Begin Source File
 

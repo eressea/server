@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /Za /W4 /GX /Z7 /O2 /I ".." /I "../common" /I "../common/util" /I "../common/kernel" /I "../common/gamecode" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "NDEBUG" /FR /YX /FD /c
+# ADD CPP /nologo /Za /W4 /GX /Z7 /O2 /I ".." /I "../common" /I "../common/util" /I "../common/kernel" /I "../common/gamecode" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x407 /d "NDEBUG"
 # ADD RSC /l 0x407 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -68,7 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /Za /W4 /Gm /ZI /Od /I "../common/gamecode" /I "../common/kernel" /I "../common/util" /I ".." /I "../common" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /YX"stdafx.h" /FD /c
+# ADD CPP /nologo /Za /W4 /Gm /ZI /Od /I "../common/kernel" /I "../common/gamecode" /I "../common/util" /I "../common" /I ".." /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /YX"stdafx.h" /FD /c
 # ADD BASE RSC /l 0x407 /d "_DEBUG"
 # ADD RSC /l 0x407 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -94,7 +94,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /Za /W4 /Gm /Zi /Od /I ".." /I "../util" /I "../common" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /FD /c
 # SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /Za /W4 /Gm /ZI /Od /I ".." /I "../common" /I "../common/util" /I "../common/kernel" /I "../common/gamecode" /D "_CONSOLE" /D "_MBCS" /D "CONVERT_TRIGGER" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /FD /c
+# ADD CPP /nologo /Za /W4 /Gm /ZI /Od /I ".." /I "../common" /I "../common/util" /I "../common/kernel" /I "../common/gamecode" /D "_CONSOLE" /D "_MBCS" /D "CONVERT_TRIGGER" /D "WIN32" /D "_DEBUG" /FR /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x407 /d "_DEBUG"
 # ADD RSC /l 0x407 /d "_DEBUG"
@@ -837,36 +837,6 @@ SOURCE=..\common\attributes\giveitem.h
 # Begin Source File
 
 SOURCE=..\common\attributes\gm.c
-
-!IF  "$(CFG)" == "eressea - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
-
-# PROP Intermediate_Dir "..\common\attributes\Debug"
-
-!ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
-
-!ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\attributes\gm.h
-
-!IF  "$(CFG)" == "eressea - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
-
-# PROP Intermediate_Dir "..\common\attributes\Debug"
-
-!ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
-
-!ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: pathfinder.h,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: pathfinder.h,v 1.3 2001/02/22 21:46:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -19,7 +19,6 @@ extern int search_len;
 
 #define NEW_PATH
 #ifdef NEW_PATH
-extern void path_init(void);
 extern struct region ** path_find(struct region *start, const struct region *target, int maxlen, boolean (*allowed)(const struct region*, const struct region*));
 extern boolean path_exists(struct region *start, const struct region *target, int maxlen, boolean (*allowed)(const struct region*, const struct region*));
 extern boolean allowed_swim(const struct region * src, const struct region * target);

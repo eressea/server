@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /Za /W4 /GX /Z7 /O2 /I "../util" /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "NDEBUG" /YX /FD /c
+# ADD CPP /nologo /Za /W4 /GX /Z7 /O2 /I "../util" /I "../.." /I ".." /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE RSC /l 0x407
 # ADD RSC /l 0x407
 BSC32=bscmake.exe
@@ -89,7 +89,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Conversion"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /Za /W4 /Z7 /Od /I "../util" /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /YX"stdafx.h" /FD /c
-# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../util" /I "../.." /I ".." /D "_WINDOWS" /D "BETA_CODE" /D "CONVERT_TRIGGER" /D "WIN32" /D "_DEBUG" /FR /YX"stdafx.h" /FD /c
+# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../util" /I "../.." /I ".." /D "CONVERT_TRIGGER" /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /FR /YX"stdafx.h" /FD /c
 # ADD BASE RSC /l 0x407
 # ADD RSC /l 0x407
 BSC32=bscmake.exe
@@ -155,7 +155,15 @@ SOURCE=.\building.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\creation.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\curse.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\economy.h
 # End Source File
 # Begin Source File
 

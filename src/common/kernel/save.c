@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.20 2001/02/18 10:06:09 enno Exp $
+ *	$Id: save.c,v 1.21 2001/02/22 21:46:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -44,9 +44,7 @@
 #include "karma.h"
 #include "ship.h"
 #include "pathfinder.h"
-#ifdef GROUPS
 #include "group.h"
-#endif
 
 /* attributes includes */
 #include <attributes/key.h>
@@ -1518,7 +1516,7 @@ write_items(FILE *F, item *ilist)
 		wi(F, itm->number);
 		wspace(F);
 	}
-	ws(F, "end");
+	fputs("end", F);
 }
 
 void
@@ -1743,7 +1741,7 @@ writegame(char *path, char quiet)
 				wi(F, demand->value);
 				wspace(F);
 			}
-			ws(F, "end");
+			fputs("end", F);
 			wnl(F);
 		}
 		a_write(F, r->attribs);

@@ -2,9 +2,7 @@
 ## enable some new features in the source:
 #
 
-CONVERT_TRIGGERS = 1
-
-#CFLAGS += -DUSE_GM_COMMANDS -DTEST_GM_COMMANDS
+#CONVERT_TRIGGERS = 1
 
 LD=gcc
 AR=ar
