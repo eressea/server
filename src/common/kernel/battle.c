@@ -2660,7 +2660,7 @@ make_fighter(battle * b, unit * u, boolean attack)
 	const attrib * a = a_find(u->attribs, &at_group);
 	const group * g = a?(const group*)a->data.v:NULL;
 	const attrib *a2 = a_find(u->attribs, &at_otherfaction);
-	const faction *stealthfaction = a2?findfaction(a2->data.i):NULL;
+	const faction *stealthfaction = a2?get_otherfaction(a2):NULL;
 
 	/* Illusionen und Zauber kaempfen nicht */
 	if (fval(u->race, RCF_ILLUSIONARY) || idle(u->faction))

@@ -180,14 +180,15 @@ setstealth(unit * u, strlist * S)
 			if(!s2 || *s2 == 0 || nr == u->faction->no) {
 				a_removeall(&u->attribs, &at_otherfaction);
 			} else {
+				struct faction * f = findfaction(nr);
 				/* TODO: Prüfung ob Partei sichtbar */
-				if(!findfaction(nr)) {
+				if(f==NULL) {
 					cmistake(u, S->s, 66, MSG_EVENT);
 				} else {
 					attrib *a;
 					a = a_find(u->attribs, &at_otherfaction);
-					if(!a) a = a_add(&u->attribs, a_new(&at_otherfaction));
-					a->data.i = nr;
+					if (!a) a = a_add(&u->attribs, make_otherfaction(f));
+					else a->data.v = f;
 				}
 			}
 		} else {

@@ -1678,9 +1678,8 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
 			a_add(&u->attribs, a_new(&at_group))->data.v = g;
 		}
 		a = a_find(creator->attribs, &at_otherfaction);
-		if (a){
-			attrib *an = a_add(&u->attribs, a_new(&at_otherfaction));
-			an->data.i = a->data.i;
+		if (a) {
+			a_add(&u->attribs, make_otherfaction(get_otherfaction(a)));
 		}
 	}
 	/* Monster sind grundsätzlich parteigetarnt */

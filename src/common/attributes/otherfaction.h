@@ -16,4 +16,4 @@ struct attrib;
 extern struct attrib_type at_otherfaction;
 extern void init_otherfaction(void);
 extern struct faction * get_otherfaction(const struct attrib * a);
-extern struct attrib * make_otherfaction(const struct faction * f);
+extern struct attrib * make_otherfaction(struct faction * f);

@@ -225,7 +225,7 @@ destroyfaction(faction * f)
 		for(u=rc->units; u; u=u->next) {
 			attrib *a = a_find(u->attribs, &at_otherfaction);
 			if(!a) continue;
-			if(a->data.i == f->no) {
+			if (get_otherfaction(a) == f) {
 				a_removeall(&u->attribs, &at_otherfaction);
 				fset(u, FL_PARTEITARNUNG);
 			}
@@ -2719,20 +2719,7 @@ renumber_factions(void)
 		}
 	}
 	for (rp=renum;rp;rp=rp->next) {
-		region *r;
-		unit *u;
 		a_remove(&rp->faction->attribs, rp->attrib);
-		/* all units disguised as belonging to this faction have their
-		 * attribute changed */
-		for(r=regions; r; r=r->next) {
-			for(u=r->units; u; u=u->next) {
-				attrib *a = a_find(u->attribs, &at_otherfaction);
-				if(!a) continue;
-				if (a->data.i == rp->faction->no){
-					a->data.i = rp->want;
-				}
-			}
-		}
 		if (updatelog) fprintf(updatelog, "renum %s %s\n", itoa36(rp->faction->no), itoa36(rp->want));
 		fprintf(sqlstream, "UPDATE subscriptions set faction='%s' where "
 			"faction='%s' and game=%d;", itoa36(rp->want), 

@@ -196,9 +196,12 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 		}
 		if (getarnt) {
 			scat(", "); scat(LOC(f->locale, "anonymous"));
-		}	else if (a_otherfaction) {
-			scat(", ");
-			scat(factionname(findfaction(a_otherfaction->data.i)));
+		} else if (a_otherfaction) {
+			faction * otherfaction = get_otherfaction(a_otherfaction);
+			if (otherfaction) {
+				scat(", ");
+				scat(factionname(otherfaction));
+			}
 		}
 	} else {
 		if (getarnt) {

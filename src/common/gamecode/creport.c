@@ -551,6 +551,7 @@ cr_output_unit(FILE * F, const region * r,
 		}
 		if (u->faction == f || omniscient(f)) {
 			const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
+			const faction * otherfaction = a_otherfaction?get_otherfaction(a_otherfaction):NULL;
 			/* my own faction, full info */
 			const attrib * ap = 0;
 			if (a) {
@@ -562,8 +563,8 @@ cr_output_unit(FILE * F, const region * r,
 			if (sf!=u->faction) fprintf(F, "%d;Verkleidung\n", sf->no);
 			if (fval(u, FL_PARTEITARNUNG))
 				fprintf(F, "%d;Parteitarnung\n", i2b(fval(u, FL_PARTEITARNUNG)));
-			if (a_otherfaction)
-				fprintf(F, "%d;Anderepartei\n", a_otherfaction->data.i);
+			if (otherfaction)
+				fprintf(F, "%d;Anderepartei\n", otherfaction->no);
 		} else {
 			if (fval(u, FL_PARTEITARNUNG)) {
 				/* faction info is hidden */

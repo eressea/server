@@ -754,7 +754,7 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 	if(u->faction == f) {
 		marker = '*';
 	} else {
-		if(a_otherfaction && f != u->faction && a_otherfaction->data.i == f->no
+		if(a_otherfaction && f != u->faction && get_otherfaction(a_otherfaction) == f
 				&& !fval(u, FL_PARTEITARNUNG)) {
 			marker = '!';
 		} else {
