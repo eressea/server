@@ -1448,8 +1448,8 @@ do_fumble(castorder *co)
 	/* Spruch schlägt fehl, alle Magiepunkte weg */
 		set_spellpoints(u, 0);
 		add_message(&u->faction->msgs, new_message(u->faction,
-					"patzer3%u:unit%r:region%s:command%u:unit%u:unit",
-					u, r, sp->name, u, u));
+					"patzer3%u:unit%r:region%s:command",
+					u, r, sp->name));
 		break;
 
 	case 5:

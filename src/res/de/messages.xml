@@ -5562,8 +5562,6 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
-		<arg name="unit" type="unit"></arg>
-		<arg name="unit" type="unit"></arg>
 	</type>
 	<locale name="de">
 		<nr section="magic">
