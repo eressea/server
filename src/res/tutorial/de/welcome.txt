@@ -14,14 +14,14 @@ Eressea:
 
 * Email-Adresse für Züge
 Testspiel:  tutorial@eressea.upb.de
-Eressea:    eressea@eressea.amber.kn-bremen.de
+Eressea:    eressea-server@eressea.upb.de
 
 * Zugabgaberhytmus:
 Testspiel:  3x die Woche, Montag, Mittwoch und Samstag um 09:00 Uhr morgens
 Eressea:    1x die Woche, Sonntags um 9:00 Uhr
 
 * Spieldauer:
-Testspiel: 5-10 Züge
+Testspiel: 5 Züge Minimum, Partei wird nach 10 Zügen gelöscht.
 Eressea:   unbegrenzt
 
 

@@ -11,14 +11,14 @@ The tutorial differs from Eressea in a few very important points:
 
 * Email-Address to send your turns to:
 Tutorial:  tutorial@eressea.upb.de
-Eressea:   eressea@eressea.amber.kn-bremen.de
+Eressea:   eressea-server@eressea.upb.de
 
 * Zugabgaberhytmus:
 Tutorial:  3x per Week, Monday, Wednesday and Saturday before 9 am CET.
 Eressea:   1x per Week, Sunday before 9 am CET.
 
 * Duration:
-Tutorial:  5-10 Turns
+Tutorial:  5 turns required. Faction is deleted after 10 turns.
 Eressea:   open-ended
 
 
@@ -33,8 +33,8 @@ the diplomatic emails between you and your future neighbours.
 
 The two other files in this email contain your report. The file with the .nr
 extendion is a normal textfile, in human-readable form. You can read it with
-any text editor, for example Notepad. The english in there is pretty bad,
-because the translation of the human.-readable report is currently a work in
+any text editor, for example Notepad. The english in there is not always good,
+because the translation of the human-readable report is currently a work in
 progress. That's why we recommend using the file with the .cr extension
 instead. It is a format that is understood by most Eressea-tools, notably
 the very good Magellan client. It is available at 
