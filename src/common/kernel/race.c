@@ -285,12 +285,23 @@ unit_max_hp(const unit * u)
 	int h;
 	double p;
 	h = u->race->hitpoints;
+	static const curse_type * heal_ct;
+	heal_ct = ct_find("healingzone");
+
 
 	p = pow(effskill(u, SK_AUSDAUER) / 2.0, 1.5) * 0.2;
 	h += (int) (h * p + 0.5);
 
 	if(fspecial(u->faction, FS_UNDEAD)) {
 		h *= 2;
+	}
+
+	/* der healing curse verändert die maximalen hp */
+	if (heal_ct) {
+		curse *c = get_curse(u->region->attribs, heal_ct);
+		if (c) {
+			h = (int) (h * (1.0+(curse_geteffect(c)/100)));
+		}
 	}
 
 	return h;

@@ -4481,10 +4481,63 @@ sp_recruit(castorder *co)
 		return 0;
 	}
 	/* Immer noch zuviel auf niedrigen Stufen. Deshalb die Rekrutierungskosten
-	 * mit einfliessen lassen und dafür den Exponenten etwas größer. */
-	n = (int)((pow(force, 1.6) * 50)/f->race->recruitcost);
+	 * mit einfliessen lassen und dafür den Exponenten etwas größer.
+	 * Wenn die Rekrutierungskosten deutlich höher sind als der Faktor,
+	 * ist das Verhältniss von ausgegebene Aura pro Bauer bei Stufe 2
+	 * ein mehrfaches von Stufe 1, denn in beiden Fällen gibt es nur 1
+	 * Bauer, nur die Kosten steigen. */
+	n = (int)((pow(force, 1.6) * 100)/f->race->recruitcost);
 	n = min(rpeasants(r),n);
 	n = max(n, 1);
+
+	if(n <= 0){
+		report_failure(mage, co->order);
+		return 0;
+	}
+
+	rsetpeasants(r, rpeasants(r) - n);
+	u = create_unit(r, f, n, f->race, 0, (n == 1 ? "Bauer" : "Bauern"), mage);
+	set_string(&u->thisorder, locale_string(u->faction->locale, "defaultorder"));
+
+	sprintf(buf, "%s konnte %d %s anwerben", unitname(mage), n,
+			n == 1 ? "Bauer" : "Bauern");
+	addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+	return cast_level;
+}
+
+/* ------------------------------------------------------------- */
+/* Name:    Wanderprediger - Große Anwerbung
+ * Stufe:   14
+ * Gebiet:  Cerddor
+ * Wirkung:
+ *	 Bauern schliessen sich der eigenen Partei an
+ *	 ist zusätzlich zur Rekrutierungsmenge in der Region
+ * */
+
+static int
+sp_bigrecruit(castorder *co)
+{
+	unit *u;
+	faction *f;
+	int n;
+	region *r = co->rt;
+	unit *mage = (unit *)co->magician;
+	int cast_level = co->level;
+	int force = co->force;
+
+	f = mage->faction;
+
+	if (rpeasants(r) == 0){
+		report_failure(mage, co->order);
+		return 0;
+	}
+	/* Für vergleichbare Erfolge bei unterschiedlichen Rassen die
+	 * Rekrutierungskosten mit einfliessen lassen. */
+	n = (int)((force * force * 1000)/f->race->recruitcost);
+	/* Zufälliger Wert mit n/2 Maximum, mindestens aber force Anzahl */
+	n = force+lovar(n);
+	/* natürlich nur maximal soviele Bauern, wie auch in der Region sind */
+	n = min(rpeasants(r),n);
 
 	if(n <= 0){
 		report_failure(mage, co->order);
@@ -7660,7 +7713,7 @@ spell spelldaten[] =
 	 5, 4,
 	 {
 		 {R_AURA, 6, SPC_LEVEL},
-		 {R_MALLORN, 2, SPC_LEVEL},
+		 {R_MALLORN, 1, SPC_LEVEL},
 		 {R_TREES, 1, SPC_FIX},
 		 {0, 0, 0},
 		 {0, 0, 0}},
@@ -9511,6 +9564,27 @@ spell spelldaten[] =
 			{0, 0, 0},
 			{0, 0, 0} },
 		(spell_f)sp_charmingsong, patzer
+	},
+
+	{SPL_BIGRECRUIT, "Hohe Kunst der Überzeugung",
+		"Aus 'Wanderungen' von Firudin dem Weisen: "
+		"'In Weilersweide, nahe dem Wytharhafen, liegt ein kleiner Gasthof, der "
+		"nur wenig besucht ist. Niemanden bekannt ist, das dieser Hof "
+		"bis vor einigen Jahren die Bleibe des verbannten Wanderpredigers Grauwolf "
+		"war. Nachdem er bei einer seiner berüchtigten flammenden Reden fast die "
+		"gesammte Bauernschaft angeworben hatte, wurde er wegen Aufruhr verurteilt "
+		"und verbannt. Nur zögerlich war er bereit mir das Geheimniss seiner "
+		"Überzeugungskraft zu lehren.'",
+		NULL,
+		NULL,
+		M_BARDE, (SPELLLEVEL), 5, 14,
+		{
+			{R_AURA, 20, SPC_LEVEL},
+		 {0, 0, 0},
+		 {0, 0, 0},
+		 {0, 0, 0},
+		 {0, 0, 0}},
+	 (spell_f)sp_bigrecruit, patzer
 	},
 
 	{SPL_RALLYPEASANTMOB, "Aufruhr beschwichtigen",

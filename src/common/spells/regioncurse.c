@@ -359,6 +359,13 @@ static struct curse_type ct_holyground = {
 	"beschützen diese vor dem der dunklen Magie des lebenden Todes.",
 	cinfo_region
 };
+static struct curse_type ct_healing = {
+	"healingzone",
+	CURSETYP_NORM, 0, (M_VIGOUR | M_DURATION),
+	"Heilung ist in dieser Region magisch beeinflusst.",
+	cinfo_region
+};
+
 
 void 
 register_regioncurse(void)
@@ -388,6 +395,7 @@ register_regioncurse(void)
 	ct_register(&ct_riotzone);
 	ct_register(&ct_godcursezone);
 	ct_register(&ct_holyground);
+	ct_register(&ct_healing);
 }
 
 

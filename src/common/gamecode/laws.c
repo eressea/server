@@ -3313,8 +3313,20 @@ monthly_healing(void)
 	region *r;
 	unit *u;
 	int  p;
+	int healingcurse = 0;
+	curse *c = NULL;
+	static const curse_type * heal_ct;
+	heal_ct = ct_find("healingzone");
 
 	for (r = regions; r; r = r->next) {
+		if (heal_ct) {
+			/* bonus zurücksetzen */
+			healingcurse = 0;
+			c = get_curse(r->attribs, heal_ct);
+			if (c) {
+				healingcurse = curse_geteffect(c);
+			}
+		}
 		for (u = r->units; u; u = u->next) {
 			int umhp;
 
@@ -3348,10 +3360,22 @@ monthly_healing(void)
 					max_unit = max_unit * 3 / 2;
 				}
 #endif
+				/* der healing curse verändert den Regenerationsprozentsatz.
+				 * Wenn dies für negative Heilung benutzt wird, kann es zu
+				 * negativen u->hp führen! */
+				if (healingcurse != 0) {
+					p += healingcurse;
+				}
+
 				/* Aufaddieren der geheilten HP. */
-				u->hp = min(u->hp + max_unit/(100/p), umhp);
-				if (u->hp < umhp && (rand() % 10 < max_unit % 10))
+				u->hp = min(u->hp + max_unit*p/100, umhp);
+				if (u->hp < umhp && (rand() % 10 < max_unit % 10)){
 					++u->hp;
+				}
+				/* soll man an negativer regeneration sterben können? */ 
+				if (u->hp <= 0){
+					u->hp = 1;
+				}
 			}
 		}
 	}
