@@ -37,7 +37,7 @@ mt_new(const char * name, const char * args[])
   message_type * mtype = (message_type *)malloc(sizeof(message_type));
 
   assert(name!=NULL);
-  if (name!=NULL) {
+  if (name==NULL) {
     log_error(("Trying to create message_type with name=0x0\n"));
     return NULL;
   }
