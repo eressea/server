@@ -634,13 +634,14 @@ int
 sp_immolation(fighter * fi, int level, double power, spell * sp)
 {
 	battle *b = fi->side->battle;
-	troop dt;
 	troop at;
 	int minrow = FIGHT_ROW;
 	int maxrow = AVOID_ROW;
 	int force, enemies;
 	int killed = 0;
 	const char *damage;
+  cvector *fgs;
+  void **fig;
 
 	sprintf(buf, "%s zaubert %s", unitname(fi->unit), 
 		spell_name(sp, default_locale));
@@ -662,12 +663,21 @@ sp_immolation(fighter * fi, int level, double power, spell * sp)
 	at.fighter = fi;
 	at.index = 0;
 
-	while (force && killed < enemies) {
-		dt = select_enemy(b, fi, minrow, maxrow, true);
-		assert(dt.fighter);
-		--force;
-		killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
+  fgs = fighters(b, fi, minrow, maxrow, FS_ENEMY);
+  for (fig = fgs->begin; fig != fgs->end; ++fig) {
+    fighter *df = *fig;
+    int n = df->alive-df->removed;
+    troop dt;
+
+    dt.fighter = df;
+    while (n!=0) {
+      dt.index = --n;
+      killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
+      if (--force==0) break;
+    }
+    if (force==0) break;
 	}
+  cv_kill(fgs);
 
 	sprintf(buf, "%d Personen %s getötet",
 			killed, killed == 1 ? "wurde" : "wurden");
