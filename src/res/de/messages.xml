@@ -4776,16 +4776,14 @@
 		</locale>
 	</message>
 
-	<message name="stealeffect">
+	<message name="stealeffect" section="events">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
+			<arg name="amount" type="int"></arg>
 		</type>
-		<locale name="de">
-			<nr section="events">
-				<text>"$unit($unit) wurde in $region($region) beklaut."</text>
-			</nr>
-		</locale>
+		<text locale="de">"$unit($unit) wurden in $region($region) $int($amount) Silberstücke geklaut."</text>
+		<text locale="en">"In $region($region), thieves stole $int($amount) silver from $unit($unit)."</text>
 	</message>
 
 	<message name="newbie_immunity_error">

@@ -804,9 +804,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 	char *s;
 	int i, n;
 	const item_type * itype;
-	int notfound_error = 64;
-
-	if (liefere) notfound_error = 63;
+	int notfound_error = 63;
 
 	u2 = getunit(r, u->faction);
 
@@ -2520,6 +2518,7 @@ expandstealing(region * r, request * stealorders)
 			use_all(u, R_SILVER, n);
 			oa[i].unit->n = n;
 			change_money(oa[i].unit, n);
+			add_message(&u->faction->msgs, msg_message("stealeffect", "unit region amount", u, u->region, n));
 		}
 		add_income(oa[i].unit, IC_STEAL, oa[i].unit->wants, oa[i].unit->n);
 	}
@@ -2980,9 +2979,6 @@ steal(region * r, unit * u, request ** stealorders)
 			goblin = true;
 		}
 	}
-	add_message(&u2->faction->msgs, new_message(u2->faction,
-				"stealeffect%u:unit%r:region", u2, u2->region));
-
 	n = max(0, n);
 
 	i = min(u->number, get_item(u,I_RING_OF_NIMBLEFINGER));

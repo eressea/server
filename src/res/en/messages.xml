@@ -3372,18 +3372,6 @@
 		</locale>
 	</message>
 
-	<message name="stealeffect">
-		<type>
-			<arg name="unit" type="unit"></arg>
-			<arg name="region" type="region"></arg>
-		</type>
-		<locale name="en">
-			<nr section="none">
-				<text>"$unit($unit) was robbed in $region($region)."</text>
-			</nr>
-		</locale>
-	</message>
-
 	<message name="newbieimmunity">
 		<type>
 			<arg name="turns" type="int"></arg>
