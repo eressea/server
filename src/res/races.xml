@@ -922,6 +922,7 @@
 	</race>
 	<race name="aquarian" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<function name="itemdrop" value="aquarianspoil"></function>
 		<skill name="sk_mining" modifier="-2"></skill>
 		<skill name="sk_building" modifier="-1"></skill>
 		<skill name="sk_trade" modifier="2"></skill>
@@ -940,6 +941,7 @@
 	</race>
 	<race name="cat" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="90" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="1" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<function name="itemdrop" value="catspoil"></function>
 		<skill name="sk_alchemy" modifier="-1"></skill>
 		<skill name="sk_mining" modifier="-2"></skill>
 		<skill name="sk_building" modifier="-1"></skill>
@@ -997,6 +999,7 @@
 	</race>
 	<race name="insect" magres="0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<function name="itemdrop" value="insectspoil"></function>
 		<skill name="sk_crossbow" modifier="1"></skill>
 		<skill name="sk_mining" modifier="1"></skill>
 		<skill name="sk_bow" modifier="-2"></skill>
@@ -1057,6 +1060,7 @@
 	</race>
 	<race name="troll" magres="0.100000" maxaura="1.000000" regaura="1.000000" recruitcost="90" maintenance="10" weight="2000" capacity="1080" speed="1.000000" hp="30" ac="1" damage="1d5+3" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<function name="itemdrop" value="trollspoil"></function>
 		<skill name="sk_mining" modifier="2"></skill>
 		<skill name="sk_bow" modifier="-2"></skill>
 		<skill name="sk_building" modifier="2"></skill>
@@ -1087,6 +1091,7 @@
 	</race>
 	<race name="human" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="75" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<function name="itemdrop" value="humanspoil"></function>
 		<skill name="sk_trade" modifier="1"></skill>
 		<skill name="sk_herbalism" modifier="-1"></skill>
 		<skill name="sk_shipcraft" modifier="1"></skill>
@@ -1158,6 +1163,7 @@
 
 	<race name="orc" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="50" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<function name="itemdrop" value="orcspoil"></function>
 		<skill name="sk_alchemy" modifier="1"></skill>
 		<skill name="sk_mining" modifier="1"></skill>
 		<skill name="sk_building" modifier="1"></skill>
