@@ -938,7 +938,7 @@ seen_done(void)
 seen_region *
 find_seen(const region * r)
 {
-	int index = abs((r->x & 0xffff) + ((r->y) << 16)) % MAXSEEHASH;
+	int index = ((int)r) % MAXSEEHASH;
 	seen_region * find=seehash[index];
 	while (find) {
 		if (find->r==r) return find;
@@ -952,7 +952,7 @@ add_seen(const struct region * r, unsigned char mode, boolean dis)
 {
 	seen_region * find = find_seen(r);
 	if (find==NULL) {
-		int index = abs((r->x & 0xffff) + ((r->y) << 16)) % MAXSEEHASH;
+		int index = ((int)r) % MAXSEEHASH;
 		if (!reuse) reuse = (seen_region*)calloc(1, sizeof(struct seen_region));
 		find = reuse;
 		reuse = reuse->nextHash;

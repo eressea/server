@@ -17,8 +17,8 @@ if ! $(CCACHE_DIR) {
 
 if $(PROFILE) = 1 {
   Echo Compiling with profiler ;
-  CCFLAGS += -pg ;
-  LINKFLAGS += -pg ;
+  CCFLAGS += -pg -g ;
+  LINKFLAGS += -pg -g ;
 }
 
 CCFLAGS += -Wall ;

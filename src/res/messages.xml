@@ -5968,7 +5968,7 @@
     <text locale="en">"$unit($unit) disappears."</text>
   </message>
 
-  <message name="fail_toheavy" section="errors">
+  <message name="fail_tooheavy" section="errors">
     <type>
       <arg name="command" type="order"/>
       <arg name="region" type="region"/>

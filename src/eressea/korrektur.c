@@ -968,7 +968,7 @@ fix_astralplane(void)
     if (ra->units!=NULL) {
       add_regionlist(&rlist, ra);
     }
-    log_printf("protecting firewall in %s by blocking astral space in %s.\n", regionname(r), regionname(ra));
+    log_printf("protecting firewall in %s by blocking astral space in %s.\n", regionname(r, NULL), regionname(ra, NULL));
     terraform(ra, T_ASTRALB);
   }
   while (rlist!=NULL) {
