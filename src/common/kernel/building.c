@@ -396,7 +396,6 @@ tagbegin(struct xml_stack * stack)
 				while (mt[len].number) ++len;
 				mt = bt->maintenance = realloc(mt, sizeof(struct maintenance)*(len+2));
 			}
-			fprintf(stderr, "maintenance %s %d %u\n", bt->_name, len, sizeof(maintenance));
 			mt[len+1].number = 0;
 			mt[len].number = xml_ivalue(tag, "amount");
 			rtype = rt_find(xml_value(tag, "type"));
