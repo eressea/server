@@ -1506,7 +1506,7 @@
 	<string name="p4">
 		<text locale="de">Wundsalbe</text>
 	</string>
-	<string name="p5">
+	<string name="peasantblood">
 		<text locale="de">Bauernblut</text>
 	</string>
 	<string name="p6">
@@ -1552,7 +1552,7 @@
 	<string name="p4_p">
 		<text locale="de">Wundsalben</text>
 	</string>
-	<string name="p5_p">
+	<string name="peasantblood_p">
 		<text locale="de">Bauernblut</text>
 	</string>
 	<string name="p6_p">

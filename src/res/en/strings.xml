@@ -1109,10 +1109,10 @@
 	<string name="p4_p">
 		<text locale="en">ointments</text>
 	</string>
-	<string name="p5">
+	<string name="peasantblood">
 		<text locale="en">peasant blood</text>
 	</string>
-	<string name="p5_p">
+	<string name="peasantblood_p">
 		<text locale="en">peasant bloods</text>
 	</string>
 	<string name="p6">

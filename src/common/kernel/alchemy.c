@@ -87,9 +87,11 @@ herbsearch(region * r, unit * u, int max)
 	}
 }
 
+#ifdef OLD_DEMON_POTION
 attrib_type at_bauernblut = {
 	"bauernblut", NULL, NULL, NULL, NULL, NULL
 };
+#endif
 
 int
 use_potion(unit * u, const item_type * itype, int amount, const char * cmd)
@@ -99,10 +101,9 @@ use_potion(unit * u, const item_type * itype, int amount, const char * cmd)
 	assert(ptype!=NULL);
 
 	if (use != NULL && use!=ptype) {
-		add_message(&u->faction->msgs,
-					new_message(u->faction,
-								"errusingpotion%u:unit%X:using%s:command",
-								u, use->itype->rtype, cmd));
+		ADDMSG(&u->faction->msgs,
+					msg_message("errusingpotion", "unit using command",
+          u, use->itype->rtype, cmd));
 		return ECUSTOM;
 	}
 

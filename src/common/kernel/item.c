@@ -428,6 +428,7 @@ static const char * it_aliases[][2] = {
 	{ "Runenschwert", "runesword" }, 
 	{ "p12", "truthpotion" },
 	{ "p1", "goliathwater" },
+  { "p5", "peasantblood" },
 	{ NULL, NULL },
 };
 static const char *
@@ -1392,7 +1393,7 @@ static translate_t translation[] = {
 	{ "Laen", "laen", "laen_p", "laen", "laen_p" },
 	{ "Goliathwasser", "goliathwater", "goliathwater_p", NULL, NULL },
 	{ "Wasser des Lebens", "p2", "p2_p", NULL, NULL },
-	{ "Bauernblut", "p5", "p5_p", NULL, NULL },
+	{ "Bauernblut", "peasantblood", "peasantblood_p", NULL, NULL },
 	{ "Gehirnschmalz", "p6", "p6_p", NULL, NULL },
 	{ "Nestwärme", "p8", "p8_p", NULL, NULL },
 	{ "Pferdeglück", "p9", "p9_p", NULL, NULL },
@@ -1997,21 +1998,21 @@ use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int 
 static int
 use_bloodpotion(struct unit *u, const struct potion_type *ptype, int amount, const char *cmd)
 {
-	int i;
 	assert(ptype==oldpotiontype[P_BAUERNBLUT]);
 	unused(ptype);
-	for (i=0;i!=amount;++i) {
-		if (old_race(u->race) == RC_DAEMON) {
-			attrib * a = (attrib*)a_find(u->attribs, &at_bauernblut);
-			if (!a) a = a_add(&u->attribs, a_new(&at_bauernblut));
-			a->data.i += 100;
-		} else {
-			/* bekommt nicht: */
-			cmistake(u, cmd, 165, MSG_EVENT);
-			u->race = new_race[RC_GHOUL];
-			u_setfaction(u, findfaction(MONSTER_FACTION));
-			break;
-		}
+	if (u->race == new_race[RC_DAEMON]  ) {
+#ifdef OLD_DEMON_POTION
+    attrib * a = (attrib*)a_find(u->attribs, &at_bauernblut);
+		if (!a) a = a_add(&u->attribs, a_new(&at_bauernblut));
+		a->data.i += 100*amount;
+#else
+    change_effect(u, ptype, 100*amount);
+#endif
+	} else {
+		/* bekommt nicht: */
+		cmistake(u, cmd, 165, MSG_EVENT);
+		u->race = new_race[RC_GHOUL];
+		u_setfaction(u, findfaction(MONSTER_FACTION));
 	}
 	return 0;
 }

@@ -3079,7 +3079,6 @@ attrib_init(void)
 	at_register(&at_eventhandler);
 	at_register(&at_stealth);
 	at_register(&at_mage);
-	at_register(&at_bauernblut);
 	at_register(&at_countdown);
 	at_register(&at_showitem);
 	at_register(&at_curse);

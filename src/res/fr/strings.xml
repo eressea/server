@@ -1133,10 +1133,10 @@
 	<string name="p4_p">
 		<text locale="fr">onguents de soin</text>
 	</string>
-	<string name="p5">
+	<string name="peasantblood">
 		<text locale="fr">fiole d'essence vitale</text>
 	</string>
-	<string name="p5_p">
+	<string name="peasantblood_p">
 		<text locale="fr">fioles d'essence vitale</text>
 	</string>
 	<string name="p6">
