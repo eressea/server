@@ -7339,5 +7339,13 @@
 		<text locale="de">"$unit($unit) wurde in $region($region) von einem GM gelöscht: \"$string\"."</text>
 		<text locale="en">"$unit($unit) in $region($region) was removed by a GM: \"$string\"."</text>
 	</message>
+	
+	<message name="victory_murder_cfulfilled" section="events">
+		<type>
+			<arg name="faction" type="faction"></arg>
+		</type>
+		<text locale="de">"Achtung: $faction($faction) hat die Siegbedingungen erfüllt und wird in $if($eq($remain,1),"einer Woche","$int($remain) Wochen") zum Sieger erklärt werden."</text>
+		<text locale="en">"Attention: $faction($faction) has fulfilled the victory condition and will be declared winner in $if($eq($remain,1),"one week","$int($remain) weeks")."</text>
+	</message>
 
 </messages>
