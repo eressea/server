@@ -232,6 +232,9 @@ setstealth(unit * u, strlist * S)
 			a->data.ca[1] = 1;
 		}
 		break;
+	case P_NOT:
+		u_seteffstealth(u, -1);
+		break;
 	default:
 		if (isdigit(s[0])) {
 			/* Tarnungslevel setzen */
