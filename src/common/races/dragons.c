@@ -47,7 +47,6 @@ age_dragon(unit *u)
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
 		u->race = new_race[RC_WYRM];
 		u->irace = new_race[RC_WYRM];
-		scale_number(u,1);
 		u->hp = (int) (unit_max_hp(u) * u->number * q);
 	}
 }

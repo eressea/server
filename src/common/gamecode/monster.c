@@ -45,6 +45,7 @@
 #include <attrib.h>
 #include <base36.h>
 #include <event.h>
+#include <rand.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -366,10 +367,12 @@ move_monster(region * r, unit * u)
 int
 dragon_affinity_value(region *r, unit *u)
 {
+	int m = count_all_money(r);
+
 	if(u->race == new_race[RC_FIREDRAGON]) {
-		return (1+rand() % 6) + (int) (count_all_money(r) * (0.1 + drand48()));
+		return (int)(normalvariate(m,m/2));
 	} else {
-		return (1+rand() % 6) + (int) (count_all_money(r) * (0.3 + drand48()));
+		return (int)(normalvariate(m,m/4));
 	}
 }
 

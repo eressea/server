@@ -38,11 +38,6 @@
 /* NormalRand aus python, random.py geklaut, dort ist Referenz auf
  * den Algorithmus. mu = Mittelwert, sigma = Standardabweichung. */
 
-/* Diese Funktion ist nicht thread-safe.
- * (enno) sicher, das irgend eine andere es ist?
- *        Nebenbei: Ich glaub, sie ist es doch
- */
-
 double nv_next;
 char valid_next = 0;
 
