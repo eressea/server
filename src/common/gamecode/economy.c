@@ -1092,7 +1092,6 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 			if (getguard(u2) & GUARD_TREES
 				&& u2->number
 				&& cansee(u2->faction,r,u,0)
-				&& !ucontact(u2, u)
 				&& !besieged(u2)
 				&& !alliedunit(u2, u->faction, HELP_GUARD)
 				&& armedmen(u2)
@@ -1114,7 +1113,6 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 			if (getguard(u) & GUARD_MINING
 				&& !fval(u2, UFL_ISNEW)
 				&& u2->number
-				&& !ucontact(u2, u)
 				&& !alliedunit(u2, u->faction, HELP_GUARD))
 			{
 				add_message(&u->faction->msgs,
