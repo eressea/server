@@ -810,6 +810,10 @@ u_setfaction(unit * u, faction * f)
 		set_number(u, 0);
 		--u->faction->no_units;
 		join_group(u, NULL);
+                freelist(u->orders);
+                u->orders = NULL;
+                set_string(&u->thisorder, "");
+                set_string(&u->lastorder, "");
 	}
 	if (u->prevF) u->prevF->nextF = u->nextF;
 	else if (u->faction) {
