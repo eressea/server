@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.h,v 1.4 2001/03/04 18:41:25 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -28,16 +27,10 @@ struct ship;
 #define SCALEWEIGHT      100	/* Faktor, um den die Anzeige von gewichten
 								 * * skaliert wird */
 
-#define INC_CAPACITIES 0
-#if INC_CAPACITIES
-#define PERSONCAPACITY(u)  (race[(u)->race].weight+600)
-#define HORSECAPACITY   7700
-#define WAGONCAPACITY  15400
-#else
-#define PERSONCAPACITY(u)  (race[(u)->race].weight+540)
+extern int personcapacity(struct unit *u);
+
 #define HORSECAPACITY   7000
 #define WAGONCAPACITY  14000
-#endif
 
 #define HORSESNEEDED    2
 
@@ -59,7 +52,7 @@ extern struct ship * move_ship(struct ship * sh, struct region * from, struct re
 
 extern attrib_type at_piracy_direction;
 
-void follow(void);
+extern void follow(void);
 
 struct building_type;
 boolean buildingtype_exists(const struct region * r, const struct building_type * bt);

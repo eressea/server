@@ -38,24 +38,27 @@
 #include <save.h>
 #include <ship.h>
 #include <skill.h>
-#include "movement.h"
-#include "monster.h"
-#include "spy.h"
-#include "race.h"
-#include "battle.h"
-#include "region.h"
-#include "unit.h"
-#include "plane.h"
-#include "study.h"
-#include "karma.h"
-#include "pool.h"
-#include "building.h"
-#include "group.h"
+#include <movement.h>
+#include <monster.h>
+#include <spy.h>
+#include <race.h>
+#include <battle.h>
+#include <region.h>
+#include <unit.h>
+#include <plane.h>
+#include <karma.h>
+#include <pool.h>
+#include <building.h>
+#include <group.h>
 
 /* gamecode includes */
+#include "study.h"
 #include "economy.h"
 #include "creation.h"
 #include "randenc.h"
+
+/* attributes includes */
+#include <attributes/racename.h>
 
 /* util includes */
 #include <event.h>
@@ -2270,7 +2273,7 @@ reorder_owners(region * r)
 
 
 static attrib_type at_number = {
-	"faction_renum", 
+	"faction_renum",
 	NULL, NULL, NULL, NULL, NULL,
 	ATF_UNIQUE
 };
@@ -2651,8 +2654,10 @@ new_units (void)
 					if (fval(u, FL_PARTEITARNUNG))
 						fset(u2, FL_PARTEITARNUNG);
 					/* Daemonentarnung */
-					if(u->race == RC_DAEMON)
+					set_racename(&u2->attribs, get_racename(u->attribs));
+					if(race[u->race].flags & RCF_SHAPESHIFT) {
 						u2->irace = u->irace;
+					}
 
 					S = S->next;
 
@@ -3121,7 +3126,7 @@ count_migrants (const faction * f)
 	int n = 0;
 	while (u) {
 		assert(u->faction == f);
-		if (u->race != f->race && u->race != RC_ILLUSION && u->race != RC_SPELL 
+		if (u->race != f->race && u->race != RC_ILLUSION && u->race != RC_SPELL
 			&& !nonplayer(u) && !(is_cursed(u->attribs, C_SLAVE, 0)))
 		{
 			n += u->number;

@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: plane.h,v 1.5 2001/04/01 06:58:40 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -22,19 +21,20 @@
 #ifndef PLANES_H
 #define PLANES_H
 
-#define PFL_NOCOORDS      1
-#define PFL_NORECRUITS    2
-#define PFL_NOALLIANCES   4
-#define PFL_LOWSTEALING   8
-#define PFL_NOGIVE       16  /* Übergaben sind unmöglich */
-#define PFL_NOATTACK     32  /* Angriffe und Diebstähle sind unmöglich */
-#define PFL_NOTERRAIN    64  /* Terraintyp wird nicht angezeigt TODO? */
-#define PFL_NOMAGIC     128  /* Zaubern ist unmöglich */
-#define PFL_NOSTEALTH   256  /* Tarnung außer Betrieb */
-#define PFL_NOTEACH     512  /* Lehre außer Betrieb */
-#define PFL_NOBUILD    1024  /* Lehre außer Betrieb */
-#define PFL_NOFEED     2048  /* Kein Unterhalt nötig TODO */
-#define PFL_FRIENDLY   4096  /* everyone is your ally */
+#define PFL_NOCOORDS        1
+#define PFL_NORECRUITS      2
+#define PFL_NOALLIANCES     4
+#define PFL_LOWSTEALING     8
+#define PFL_NOGIVE         16  /* Übergaben sind unmöglich */
+#define PFL_NOATTACK       32  /* Angriffe und Diebstähle sind unmöglich */
+#define PFL_NOTERRAIN      64  /* Terraintyp wird nicht angezeigt TODO? */
+#define PFL_NOMAGIC       128  /* Zaubern ist unmöglich */
+#define PFL_NOSTEALTH     256  /* Tarnung außer Betrieb */
+#define PFL_NOTEACH       512  /* Lehre außer Betrieb */
+#define PFL_NOBUILD      1024  /* Lehre außer Betrieb */
+#define PFL_NOFEED       2048  /* Kein Unterhalt nötig TODO */
+#define PFL_FRIENDLY     4096  /* everyone is your ally */
+#define PFL_NOORCGROWTH  8192  /* orcs don't grow */
 
 #define PFL_MUSEUM PFL_NOCOORDS | PFL_NORECRUITS | PFL_NOGIVE | PFL_NOATTACK | PFL_NOTERRAIN | PFL_NOMAGIC | PFL_NOSTEALTH | PFL_NOTEACH | PFL_NOBUILD | PFL_NOFEED
 

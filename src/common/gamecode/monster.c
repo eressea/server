@@ -55,6 +55,9 @@
 #include <attributes/targetregion.h>
 #include <attributes/hate.h>
 
+/* spezialmonster */
+#include <spells/alp.h>
+
 #ifdef HAVE_ZLIB
 #include <zlib.h>
 static gzFile dragonlog;
@@ -458,6 +461,78 @@ set_movement_order(unit * u, const region * target, int moves, boolean (*allowed
 	}
 	set_string(&u->lastorder, buf);
 	return true;
+}
+/* ------------------------------------------------------------- */
+
+void
+monster_seeks_target(region *r, unit *u)
+{
+	direction_t d;
+	strlist *S, **SP;
+	unit *target = NULL;
+	int dist, dist2;
+	direction_t i;
+	region *nr;
+
+	/* Das Monster sucht ein bestimmtes Opfer. Welches, steht
+	 * in einer Referenz/attribut
+	 * derzeit gibt es nur den alp
+	 */
+
+	switch( u->race ) {
+		case RC_ALP:
+			target = alp_target(u);
+			break;
+		default:
+			assert(!"Seeker-Monster gibt kein Ziel an");
+	}
+
+	/* TODO: prüfen, ob target überhaupt noch existiert... */
+
+	if( r == target->region ) { /* Wir haben ihn! */
+		switch( u->race ) {
+			case RC_ALP:
+				alp_findet_opfer(u, r);
+				break;
+			default:
+				assert(!"Seeker-Monster hat keine Aktion fuer Ziel");
+		}
+		return;
+	}
+
+	/* Simpler Ansatz: Nachbarregion mit gerinster Distanz suchen.
+	 * Sinnvoll momentan nur bei Monstern, die sich nicht um das
+	 * Terrain kümmern.  Nebelwände & Co machen derzeit auch nix...
+	 */
+	dist2 = distance(r, target->region);
+	d = NODIRECTION;
+	for( i = 0; i < MAXDIRECTIONS; i++ ) {
+		nr = rconnect(r, i);
+		assert(nr);
+		dist = distance(nr, target->region);
+		if( dist < dist2 ) {
+			dist2 = dist;
+			d = i;
+		}
+	}
+	assert(d != NODIRECTION );
+
+	switch( u->race ) {
+		case RC_ALP:
+			if( !(u->age % 2) )		/* bewegt sich nur jede zweite Runde */
+				d = NODIRECTION;
+			break;
+		default:
+			break;
+	}
+
+	if( d == NODIRECTION )
+		return;
+	sprintf(buf, "%s %s", keywords[K_MOVE], directions[d]);
+	SP = &u->orders;
+	S = makestrlist(buf);
+	addlist2(SP, S);
+	*SP = 0;
 }
 /* ------------------------------------------------------------- */
 
@@ -920,6 +995,10 @@ plan_monsters(void)
 			switch (u->race) {
 			case RC_ILLUSION:
 				if (u->no==atoi36("ponn")) ponnuki(u);
+				break;
+			/* Alp */
+			case RC_ALP:
+				monster_seeks_target(r, u);
 				break;
 			case RC_FIREDRAGON:
 			case RC_DRAGON:

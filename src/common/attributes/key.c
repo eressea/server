@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: key.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ * $Id: key.c,v 1.3 2001/04/12 17:21:41 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -31,6 +31,14 @@ make_key(int key)
 {
 	attrib * a = a_new(&at_key);
 	a->data.i = key;
+	return a;
+}
+
+attrib *
+find_key(attrib * alist, int key)
+{
+	attrib * a = a_find(alist, &at_key);
+	while (a && a->data.i != key) a = a->nexttype;
 	return a;
 }
 

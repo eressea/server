@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: arena.c,v 1.4 2001/02/11 20:54:01 enno Exp $
+ *	$Id: arena.c,v 1.5 2001/04/12 17:21:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -267,7 +267,7 @@ read_hurting(attrib * a, FILE * F) {
 	fscanf(F, "%d", &i);
 	a->data.v = (void*)findbuilding(i);
 	if (a->data.v==NULL) {
-		fprintf(stderr, "WARNING: temple of pain is broken\n");
+		log_error(("temple of pain is broken\n"));
 		return 0;
 	}
 	return 1;
@@ -434,7 +434,7 @@ caldera_handle(trigger * t, void * data)
 			if (*up==u) up = &u->next;
 		}
 	} else
-		fprintf(stderr, "\aERROR: could not perform caldera::handle()\n");
+		log_error(("could not perform caldera::handle()\n"));
 	unused(data);
 	return 0;
 }

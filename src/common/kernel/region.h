@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: region.h,v 1.5 2001/02/24 12:50:48 enno Exp $
+ *	$Id: region.h,v 1.6 2001/04/12 17:21:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -177,7 +177,7 @@ extern const char * rname(const struct region * r, const locale * lang);
 extern void r_setdemand(struct region * r, const struct luxury_type * ltype, int value);
 extern int r_demand(const struct region * r, const struct luxury_type * ltype);
 
-extern const char * tregionid(const struct region * r, const struct faction * f);
+extern const char * regionname(const struct region * r, const struct faction * f);
 extern void * resolve_region(void * data);
 extern struct region * new_region(int x, int y);
 extern void terraform(struct region * r, terrain_t terrain);

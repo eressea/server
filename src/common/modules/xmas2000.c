@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: xmas2000.c,v 1.5 2001/04/01 06:58:41 enno Exp $
+ *	$Id: xmas2000.c,v 1.6 2001/04/12 17:21:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -71,7 +71,7 @@ xmasgate_handle(trigger * t, void * data)
 			if (*up==u) up = &u->next;
 		}
 	} else
-		fprintf(stderr, "ERROR: could not perform xmasgate::handle()\n");
+		log_error(("could not perform xmasgate::handle()\n"));
 	unused(data);
 	return 0;
 }

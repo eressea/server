@@ -50,7 +50,6 @@ typedef struct faction {
 	int number; /* enno: unterschied zu num_people ? */
 	int money;
 	int score;
-	short index;	/*	Für die Reportgenerierung - enno: wirklich nötig? */
 #ifndef FAST_REGION
 	vset regions;
 #endif
@@ -64,7 +63,7 @@ typedef struct faction {
 	} * battles;
 } faction;
 
-extern char * factionname(const struct faction * f);
+extern const char * factionname(const struct faction * f);
 extern void * resolve_faction(void * data);
 
 #endif

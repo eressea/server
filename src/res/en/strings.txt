@@ -13,6 +13,7 @@ section_magic;en;Magic and Artefacts
 section_movement;en;Movement and Travel
 section_study;en;Learning and Teaching
 section_battle;en;Battles
+section_none;en;Miscellaneous
 
 # Items
 herb;en;herb
@@ -155,3 +156,47 @@ trollbelt;en;trollbelt
 
 # Spezialitems
 lmsreward;en;Belt of Heroic Legends
+
+# Terraintypen
+maelstrom;en;maelstrom
+ocean;en;ocean
+plain;en;plain
+forest;en;forest
+swamp;en;swamp
+desert;en;desert
+highland;en;highland
+mountain;en;mountain
+glacier;en;glacier
+firewall;en;firewall
+grassland;en;steppe
+volcano;en;volcano
+fog;en;fog
+iceberg;en;iceberg
+thickfog;en;thick fog
+hell;en;hell
+activevolcano;en;active volcano
+hall1;en;hallway
+corridor1;en;corridor
+
+maelstrom_trail;en;a %s
+ocean_trail;en;an %s
+plain_trail;en;the plain of %s
+forest_trail;en;the forests of %s
+swamp_trail;en;the swamps of %s
+desert_trail;en;the deserts of %s
+highland_trail;en;the highlands of %s
+mountain_trail;en;the mountains of %s
+glacier_trail;en;the glacier of %s
+firewall_trail;en;a %s
+grassland_trail;en;the steppe of %s
+volcano_trail;en;a %s
+fog_trail;en;fog_trail
+iceberg_trail;en;an %s
+thickfog_trail;en;%s
+hell_trail;en;%s
+activevolcano_trail;en;an %s
+hall1_trail;en;the %s
+corridor1_trail;en;a %s
+
+caldera;en;caldera
+xmas_exit;en;portal

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: giveitem.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: giveitem.c,v 1.3 2001/04/12 17:21:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -62,7 +62,7 @@ giveitem_handle(trigger * t, void * data)
 	if (td->u!=NULL) {
 		i_change(&td->u->items, td->itype, td->number);
 	} else
-		fprintf(stderr, "\aERROR: could not perform giveitem::handle()\n");
+		log_error(("could not perform giveitem::handle()\n"));
 	unused(data);
 	return 0;
 }

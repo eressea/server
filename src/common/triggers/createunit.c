@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: createunit.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: createunit.c,v 1.3 2001/04/12 17:21:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -66,7 +66,7 @@ createunit_handle(trigger * t, void * data)
 	if (td->r!=NULL && td->f!=NULL) {
 		createunit(td->r, td->f, td->number, td->race);
 	} else {
-		fprintf(stderr, "\aERROR: could not perform createunit::handle()\n");
+		log_error(("could not perform createunit::handle()\n"));
 	}
 	unused(data);
 	return 0;

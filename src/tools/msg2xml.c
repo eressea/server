@@ -9,17 +9,17 @@ static struct vartype {
 	const char * msg;
 } vartype[] = {
 	{ "from", "unit", "donation"},
+	{ "to", "unit", "donation" },
 
 	/* strange and to be changed */
-
 	{ "destruction", "int", "siege" },
+	{ "mode", "int", "travel" },
 	{ "discover", "string", "givedumb" },
 	{ "receipient", "unit", "givecommand" },
 	{ "sink", "string", "entermaelstrom" },
 	{ "sink", "string", "storm" },
 	{ "using", "resource", "errusingpotion" },
 	{ "type", "string", "scunicorn" },
-	{ "mode", "string", "travel" },
 	{ "special", "string", "new_fspecial" },
 	{ "special", "string", "new_fspecial_level" },
 
@@ -116,6 +116,7 @@ type(const char * name,const char * msg)
 static void
 parse_message(char * b, FILE * ostream)
 {
+	const char * vtype;
 	char *m, *a = NULL, message[8192];
 	char * name;
 	char * language;
@@ -166,7 +167,12 @@ parse_message(char * b, FILE * ostream)
 		case '}':
 			*b++ = '\0';
 			args[i] = strdup(a);
-			sprintf(m, "$%s", args[i]);
+			vtype = type(args[i], name);
+			if (strcmp(vtype, "string")==0) {
+				sprintf(m, "$%s", args[i]);
+			} else {
+				sprintf(m, "$%s($%s)", vtype, args[i]);
+			}
 			m+=strlen(m);
 			i++;
 			f_symbol = false;
@@ -188,12 +194,14 @@ parse_message(char * b, FILE * ostream)
 
 	/* add the messagetype */
 	fprintf(ostream, "<message name=\"%s\">\n", name);
+	fputs("\t<type>\n", ostream);
 	for (i=0;args[i];++i) {
-		fprintf(ostream, "\t<param name=\"%s\" type=\"%s\"></param>\n", args[i], type(args[i], name));
+		fprintf(ostream, "\t\t<arg name=\"%s\" type=\"%s\"></arg>\n", args[i], type(args[i], name));
 	}
+	fputs("\t</type>\n", ostream);
 	fprintf(ostream, "\t<locale name=\"%s\">\n", language);
 	fprintf(ostream, "\t\t<nr section=\"%s\">\n", 
-		language, section);
+		section);
 	fprintf(ostream, "\t\t\t<text>%s</text>\n", message);
 	fputs("\t\t</nr>\n", ostream);
 	fputs("\t</locale>\n", ostream);

@@ -14,13 +14,14 @@ struct locale;
 struct message;
 struct message_type;
 
-typedef void (*tostring_f)(const void * data, char * buffer);
+typedef int (*tostring_f)(const void * data, char * buffer, const void * userdata);
 extern void tsf_register(const char * name, tostring_f fun);
 	/* registers a new type->string-function */
 
-extern void cr_string(const void * v, char * buffer);
-extern void cr_int(const void * v, char * buffer);
+extern int cr_string(const void * v, char * buffer, const void * userdata);
+extern int cr_int(const void * v, char * buffer, const void * userdata);
+extern int cr_ignore(const void * v, char * buffer, const void * userdata);
 
-extern void crt_register(const struct message_type * mtype, const struct locale * lang);
-extern int cr_render(const struct message * msg, const struct locale * lang, char * buffer);
+extern void crt_register(const struct message_type * mtype);
+extern int cr_render(const struct message * msg, char * buffer, const void * userdata);
 

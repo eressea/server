@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: alp.h,v 1.2 2001/01/26 16:19:41 enno Exp $
+ * $Id: alp.h,v 1.3 2001/04/12 17:21:45 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -38,5 +38,10 @@ struct castorder;
 
 extern int sp_summon_alp(struct castorder *co);
 extern void init_alp(void);
+
+struct unit* alp_target(struct unit *alp);
+void alp_findet_opfer(struct unit *alp, struct region *r);
+	
+	
 
 #endif

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: region.c,v 1.9 2001/02/11 08:55:48 corwin Exp $
+ *	$Id: region.c,v 1.10 2001/04/12 17:21:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -65,7 +65,7 @@ const direction_t back[MAXDIRECTIONS] =
 };
 
 const char *
-tregionid(const region * r, const faction * f)
+regionname(const region * r, const faction * f)
 {
 	static char buf[65];
 	plane *pl = getplane(r);
@@ -636,7 +636,7 @@ new_region(int x, int y)
 	region *r = rfindhash(x, y);
 
 	if (r) {
-		fprintf(stderr, "\ndoppelte regionen entdeckt: %s\n", tregionid(r, NULL));
+		fprintf(stderr, "\ndoppelte regionen entdeckt: %s\n", regionname(r, NULL));
 		if (r->units)
 			fprintf(stderr, "doppelte region enthält einheiten\n");
 		return r;

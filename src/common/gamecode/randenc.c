@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: randenc.c,v 1.10 2001/04/01 06:58:36 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -44,6 +43,9 @@
 #include "karma.h"
 #include "ship.h"
 #include "battle.h"
+
+/* attributes includes */
+#include <attributes/racename.h>
 
 /* util includes */
 #include <rand.h>
@@ -452,7 +454,10 @@ get_allies(region * r, unit * u)
 	}
 
 	u_setfaction(newunit, u->faction);
-	if (u->race==RC_DAEMON) newunit->irace=u->irace;
+	set_racename(&newunit->attribs, get_racename(u->attribs));
+	if(race[u->race].flags & RCF_SHAPESHIFT) {
+		newunit->irace = u->irace;
+	}
 	if (fval(u, FL_PARTEITARNUNG)) fset(newunit, FL_PARTEITARNUNG);
 	fset(u, FL_ISNEW);
 
@@ -966,6 +971,9 @@ randomevents(void)
 	/* Orks vermehren sich */
 
 	for (r = regions; r; r = r->next) {
+		plane * p = rplane(r);
+		/* there is a flag for planes without orc growth: */
+		if (p && (p->flags & PFL_NOORCGROWTH)) continue;
 		for (u = r->units; u; u = u->next) {
 			if ( (u->race == RC_ORC || is_cursed(u->attribs, C_ORC, 0))
 					&& get_skill(u, SK_MAGIC) == 0
@@ -1275,7 +1283,7 @@ randomevents(void)
 			set_skill(u, SK_AUSDAUER, u->number * 30);
 			set_skill(u, SK_STEALTH, u->number * 30);
 			fprintf(stderr, "%d %s in %s.\n", u->number,
-				race[u->race].name[1], tregionid(r, NULL));
+				race[u->race].name[1], regionname(r, NULL));
 			name_unit(u);
 			set_string(&u->lastorder, "WARTEN");
 
@@ -1314,7 +1322,7 @@ randomevents(void)
 
 		/* Chance 0.1% * chaosfactor */
 		if (r->land && unburied > r->land->peasants / 20 && rand() % 10000 < (100 + 100 * chaosfactor(r))) {
-			/* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen. 
+			/* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen.
 			 * Lieber sammeln lassen, bis sie mindestens 5% der Bevölkerung sind, und
 			 * dann erst auferstehen. */
 			int undead = unburied / (rand() % 2 + 1);
@@ -1355,7 +1363,7 @@ randomevents(void)
 			name_unit(u);
 
 			fprintf(stderr, "%d %s in %s.\n", u->number,
-				race[u->race].name[1], tregionid(r, NULL));
+				race[u->race].name[1], regionname(r, NULL));
 			add_message(&r->msgs, new_message(NULL,
 				"undeadrise%r:region", r));
 			for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
@@ -1406,7 +1414,7 @@ randomevents(void)
 				else
 					set_string(&u->name, "Wütende Ents");
 
-				fprintf(stderr, "%d Ents in %s.\n", u->number, tregionid(r, NULL));
+				fprintf(stderr, "%d Ents in %s.\n", u->number, regionname(r, NULL));
 				add_message(&r->msgs, new_message(NULL,
 					"entrise%r:region", r));
 				for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);

@@ -97,6 +97,7 @@ typedef struct race_type {
 #define RCF_NOHEAL         (1<<16)  /* Einheit kann nicht geheilt werden */
 #define RCF_NOWEAPONS      (1<<17)  /* Einheit kann keine Waffen bneutzen */
 #define RCF_SHAPESHIFT     (1<<18)	/* Kann TARNE RASSE benutzen. */
+#define RCF_SHAPESHIFTANY  (1<<19)	/* Kann TARNE RASSE "string" benutzen. */
 
 /* Economic flags */
 #define NOGIVE         (1<<0)   /* gibt niemals nix */
@@ -106,7 +107,9 @@ typedef struct race_type {
 #define GETITEM        (1<<4)   /* nimmt Gegenstände an */
 #define HOARDMONEY     (1<<5)   /* geben niemals Silber weg */
 #define CANGUARD       (1<<6)   /* bewachen auch ohne Waffen */
-#define REC_HORSES     (1<<7)   /* Rekrutiert aus Pferden */
+#define ECF_REC_HORSES     (1<<7)   /* Rekrutiert aus Pferden */
+#define ECF_REC_ETHEREAL   (1<<8)   /* Rekrutiert aus dem Nichts */
+#define ECF_REC_UNLIMITED  (1<<9)   /* Rekrutiert ohne Limit */
 
 /* Battle-Flags */
 #define BF_EQUIPMENT				(1<<0)

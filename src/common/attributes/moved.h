@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: key.h,v 1.3 2001/04/12 17:21:41 enno Exp $
+ * $Id: moved.h,v 1.1 2001/04/12 17:21:41 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -12,8 +12,12 @@
  * prior permission by the authors of Eressea.
  */
 
-extern struct attrib_type at_key;
+struct attrib;
+struct attrib_type;
 
-extern struct attrib * make_key(int key);
-extern struct attrib * find_key(struct attrib * alist, int key);
-extern void init_key(void);
+extern boolean get_moved(attrib ** alist);
+extern void set_moved(struct attrib ** alist);
+extern void init_moved(void);
+
+extern struct attrib_type at_moved;
+

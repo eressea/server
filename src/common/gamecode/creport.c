@@ -7,26 +7,24 @@
  *      Enno Rehling (enno@eressea-pbem.de)
  *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
  *
- *  based on:
- *
- * Atlantis v1.0  13 September 1993 Copyright 1993 by Russell Wallace
- * Atlantis v1.7                    Copyright 1996 by Alex Schröder
- *
  * This program may not be used, modified or distributed without
  * prior permission by the authors of Eressea.
- * This program may not be sold or used commercially without prior written
- * permission from the authors.
  */
 
 #include <config.h>
 #include <eressea.h>
 #include "creport.h"
 
+/* tweakable features */
+#define ENCODE_SPECIAL 1
+#define RENDER_CRMESSAGES 1
+
 /* modules include */
 #include <modules/score.h>
 
 /* attributes include */
 #include <attributes/follow.h>
+#include <attributes/racename.h>
 
 /* gamecode includes */
 #include "laws.h"
@@ -46,7 +44,6 @@
 #include <plane.h>
 #include <race.h>
 #include <region.h>
-#include <render.h>
 #include <reports.h>
 #include <ship.h>
 #include <skill.h>
@@ -55,10 +52,11 @@
 #include <save.h>
 
 /* util includes */
+#include <util/message.h>
 #include <goodies.h>
-#ifdef NEW_MESSAGES
 #include <crmessage.h>
-#endif
+#include <nrmessage.h>
+
 /* libc includes */
 #include <math.h>
 #include <stdio.h>
@@ -66,15 +64,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define C_REPORT_VERSION 56
-#define NEWBLOCKS (C_REPORT_VERSION>=35)
-
-#define ENCODE_SPECIAL 1
-
+/* imports */
 extern const char *directions[];
 extern const char *spelldata[];
 extern int quiet;
 
+/* globals */
+#define C_REPORT_VERSION 57
+
+/* implementation */
 void
 cr_output_str_list(FILE * F, const char *title, const strlist * S, faction * f)
 {
@@ -124,181 +122,174 @@ print_curses(FILE * F, void * obj, typ_t typ, attrib *a, int self)
 	}
 }
 
-#ifdef OLD_MESSAGES
-#define CTMAXHASH 511
-struct crtype {
-	struct crtype * nexthash;
-	struct message_type * mt;
-} * crtypes[CTMAXHASH];
+static int
+cr_unit(const void * v, char * buffer, const void * userdata)
+{
+	const faction * report = (const faction*)userdata;
+	unit * u = (unit *)v;
+	sprintf(buffer, "%d", u?u->no:-1);
+	unused(report);
+	return 0;
+}
 
-static struct crtype * free_crtypes;
-#endif
+static int
+cr_ship(const void * v, char * buffer, const void * userdata)
+{
+	const faction * report = (const faction*)userdata;
+	ship * u = (ship *)v;
+	sprintf(buffer, "%d", u?u->no:-1);
+	unused(report);
+	return 0;
+}
+
+static int
+cr_building(const void * v, char * buffer, const void * userdata)
+{
+	const faction * report = (const faction*)userdata;
+	building * u = (building *)v;
+	sprintf(buffer, "%d", u?u->no:-1);
+	unused(report);
+	return 0;
+}
+
+static int
+cr_faction(const void * v, char * buffer, const void * userdata)
+{
+	const faction * report = (const faction*)userdata;
+	faction * f = (faction *)v;
+	sprintf(buffer, "%d", f?f->no:-1);
+	unused(report);
+	return 0;
+}
+
+static int
+cr_region(const void * v, char * buffer, const void * userdata)
+{
+	const faction * report = (const faction*)userdata;
+	region * r = (region *)v;
+	if (r) {
+		plane * p = rplane(r);
+		if (!p || !(p->flags & PFL_NOCOORDS)) {
+			sprintf(buffer, "%d %d %d", region_x(r, report), region_y(r, report), p?p->id:0);
+			return 0;
+		}
+	}
+	return -1;
+}
+
+static int
+cr_resource(const void * v, char * buffer, const void * userdata)
+{
+	const faction * report = (const faction*)userdata;
+	const resource_type * r = (const resource_type *)v;
+	if (r) {
+		sprintf(buffer, "\"%s\"", locale_string(report->locale, resourcename(r, 0)));
+		return 0;
+	}
+	return -1;
+}
+
+static int
+cr_skill(const void * v, char * buffer, const void * userdata)
+{
+	const faction * report = (const faction*)userdata;
+	skill_t sk = (skill_t)v;
+	if (sk!=NOSKILL) sprintf(buffer, "\"%s\"", locale_string(report->locale, skillnames[sk]));
+	else strcpy(buffer, "\"\"");
+	return 0;
+}
+
+void 
+creport_init(void)
+{
+	tsf_register("report", &cr_ignore);
+	tsf_register("string", &cr_string);
+	tsf_register("int", &cr_int);
+	tsf_register("unit", &cr_unit);
+	tsf_register("region", &cr_region);
+	tsf_register("faction", &cr_faction);
+	tsf_register("ship", &cr_ship);
+	tsf_register("building", &cr_building);
+	tsf_register("skill", &cr_skill);
+	tsf_register("resource", &cr_resource);
+}
 
 void
 creport_cleanup(void)
 {
-#ifdef OLD_MESSAGES
-	while (free_crtypes) {
-		struct crtype * ct = free_crtypes->nexthash;
-		free_crtypes = ct;
-	}
-#endif
 }
 
-#ifdef OLD_MESSAGES
+static int msgno;
+
+#define MTMAXHASH 1023
+
+static struct known_mtype {
+	const struct message_type * mtype;
+	struct known_mtype * nexthash;
+} * mtypehash[MTMAXHASH];
+
 static void
-render_message(FILE * f, faction * receiver, struct message * m)
+report_crtypes(FILE * F, const struct locale* lang)
 {
 	int i;
-	struct message_type * mt = m->type;
-	struct entry * e = mt->entries;
-
-	if (m->receiver && receiver!=m->receiver) return;
-	if (m->receiver && get_msglevel(receiver->warnings, receiver->msglevels, m->type) < msg_level(m))
-		return;
-	fprintf(f, "MESSAGE %u\n", receiver->index++);
-	fprintf(f, "%u;type\n", mt->hashkey);
-	if (receiver->options & want(O_DEBUG)) {
-		fprintf(f, "%d;level\n", mt->level);
-	}
-#define RENDER_CR
-#ifdef RENDER_CR
-	fprintf(f, "\"%s\";rendered\n", render(m, receiver->locale));
-#endif
-	for (i=0;i!=mt->argc;++i) {
-		switch (e->type) {
-			case IT_RESOURCE:
-				fprintf(f, "\"%s\";%s\n", resname((resource_t)m->data[i], 0), e->name);
-				break;
-			case IT_RESOURCETYPE:
-				fprintf(f, "\"%s\";%s\n", locale_string(receiver->locale, resourcename((const resource_type *)m->data[i], 1)), e->name);
-				break;
-			case IT_STRING:
-				fprintf(f, "\"%s\";%s\n", (char*)m->data[i], e->name);
-				break;
-			case IT_BUILDING: {
-				building * b = (building*)m->data[i];
-				fprintf(f, "%d;%s\n", b->no, e->name);
-				break;
-			}
-			case IT_SHIP: {
-				ship * s = (ship*)m->data[i];
-				fprintf(f, "%d;%s\n", s->no, e->name);
-				break;
-			}
-			case IT_UNIT: {
-				unit * u = (unit*)m->data[i];
-				/* TODO: Wilder Hack */
-				if ((int)u > 1) fprintf(f, "%d;%s\n", u->no, e->name);
-				break;
-			}
-			case IT_SKILL: {
-				skill_t sk = (skill_t)m->data[i];
-				assert(sk!=NOSKILL && sk<MAXSKILLS);
-				fprintf(f, "\"%s\";%s\n", skillnames[sk], e->name);
-				break;
-			}
-			case IT_FACTION: {
-				faction * x = (faction*)m->data[i];
-				fprintf(f, "%d;%s\n", x->no, e->name);
-				break;
-			}
-			case IT_REGION: {
-				region * r = (region*)m->data[i];
-				if (!r) break;
-				fprintf(f, "\"%d,%d\";%s\n", region_x(r, receiver), region_y(r, receiver), e->name);
-				break;
-			}
-			default:
-				fprintf(f, "%d;%s\n", (int)m->data[i], e->name);
-				break;
-		}
-		e = e->next;
-	}
-}
-
-static void
-render_messages(FILE * f, void * receiver, struct message * msgs)
-{
-	message * m;
-	for (m=msgs;m;m=m->next) {
-		render_message(f, receiver, m);
-	}
-}
-
-static void
-cr_output_messages(FILE * F, struct message * msgs, faction * f)
-{
-	message * m;
-	if (!msgs) return;
-/*	fprintf(F, "%s\n", title); */
-	for (m=msgs;m;m=m->next) {
-		static messagetype * last = NULL;
-		messagetype * mt = m->type;
-#ifdef MSG_LEVELS
-		if (get_msglevel(f->warnings, f->msglevels, mt) < m->level) continue;
-#endif
-		if (mt!=last && (!m->receiver || f==m->receiver)) {
-			unsigned int index = mt->hashkey % CTMAXHASH;
-			struct crtype * ct = crtypes[index];
-			last = mt;
-			while (ct && ct->mt->hashkey!=mt->hashkey) ct=ct->nexthash;
-			if (!ct) {
-				if (free_crtypes) {
-					ct = free_crtypes;
-					free_crtypes = free_crtypes->nexthash;
-				} else {
-					ct = calloc(1, sizeof(struct crtype));
-				}
-				ct->mt = mt;
-				ct->nexthash = crtypes[index];
-				crtypes[index] = ct;
+	fputs("MESSAGETYPES\n", F);
+	for (i=0;i!=MTMAXHASH;++i) {
+		struct known_mtype * kmt;
+		for (kmt=mtypehash[i];kmt;kmt=kmt->nexthash) {
+			const struct nrmessage_type * nrt = nrt_find(lang, kmt->mtype);
+			if (nrt) {
+				unsigned int hash = hashstring(mt_name(kmt->mtype));
+				fputc('\"', F);
+				fputs(escape_string(nrt_string(nrt), NULL, 0), F);
+				fprintf(F, "\";%d\n", hash);
 			}
 		}
-	}
-	render_messages(F, f, msgs);
-}
-
-extern void rendercr(FILE * f, struct messagetype * mt, const locale * lang);
-
-static void
-report_crtypes(FILE * f, locale * lang)
-{
-	int i;
-	fputs("MESSAGETYPES\n", f);
-	for (i=0;i!=CTMAXHASH;++i) {
-		struct crtype * ct;
-		for (ct=crtypes[i];ct;ct=ct->nexthash) {
-			rendercr(f, ct->mt, lang);
+		while (mtypehash[i]) {
+			kmt = mtypehash[i];
+			mtypehash[i] = mtypehash[i]->nexthash;
+			free(kmt);
 		}
 	}
 }
 
-static void
-reset_crtypes(void)
-{
-	int i;
-	for (i=0;i!=CTMAXHASH;++i) {
-		struct crtype * ct;
-		struct crtype * next;
-		for (ct=crtypes[i];ct;ct=next) {
-			next = ct->nexthash;
-			ct->nexthash=free_crtypes;
-			free_crtypes=ct;
-		}
-		crtypes[i] = NULL;
-	}
-}
-
-#else
 static void
 render_messages(FILE * F, faction * f, message_list *msgs)
 {
-	char buffer[1024];
 	struct mlist* m = msgs->begin;
 	while (m) {
-		if (cr_render(m->msg, f->locale, buffer)==0) fputs(buffer, F);
+		char crbuffer[1024];
+		boolean printed = false;
+		const struct message_type * mtype = m->msg->type;
+		unsigned int hash = hashstring(mtype->name);
+#if RENDER_CRMESSAGES
+		char nrbuffer[4096];
+		nrbuffer[0] = '\0';
+		if (nr_render(m->msg, f->locale, nrbuffer, f)==0 && nrbuffer[0]) {
+			fprintf(F, "MESSAGE %d\n", ++msgno);
+			fprintf(F, "%d;type\n", hash);
+			fputs("\"", F);
+			fputs(nrbuffer, F);
+			fputs("\";rendered\n", F);
+			printed = true;
+		}
+#endif
+		crbuffer[0] = '\0';
+		if (cr_render(m->msg, crbuffer, (const void*)f)==0 && crbuffer[0]) {
+			if (!printed) fprintf(F, "MESSAGE %d\n", ++msgno);
+			fputs(crbuffer, F);
+		}
 		else log_error(("could not render cr-message %p\n", m->msg));
+		if (printed) {
+			unsigned int ihash = hash % MTMAXHASH;
+			struct known_mtype * kmt = mtypehash[ihash];
+			while (kmt && kmt->mtype != mtype) kmt = kmt->nexthash;
+			if (kmt==NULL) {
+				kmt = (struct known_mtype*)malloc(sizeof(struct known_mtype));
+				kmt->nexthash = mtypehash[ihash];
+				kmt->mtype = mtype;
+				mtypehash[ihash] = kmt;
+			}
+		}
 		m = m->next;
 	}
 }
@@ -306,10 +297,8 @@ render_messages(FILE * F, faction * f, message_list *msgs)
 static void
 cr_output_messages(FILE * F, message_list *msgs, faction * f)
 {
-	render_messages(F, f, msgs);
+	if (msgs) render_messages(F, f, msgs);
 }
-
-#endif
 
 /* prints a building */
 static void
@@ -409,6 +398,7 @@ cr_output_unit(FILE * F, region * r,
 	item *itm, *show;
 	boolean itemcloak = is_cursed(u->attribs, C_ITEMCLOAK, 0);
 	building * b;
+	const char * pzTmp;
 	skill_t sk;
 	strlist *S;
 	const attrib *a_fshidden = NULL;
@@ -443,8 +433,11 @@ cr_output_unit(FILE * F, region * r,
 		fprintf(F, "%d;Anzahl\n", u->number);
 	}
 
-	fprintf(F, "\"%s\";Typ\n", race[u->irace].name[1]);
-	if (u->irace != u->race && u->faction==f) {
+
+	pzTmp = get_racename(u->attribs);
+	if (pzTmp==NULL) fprintf(F, "\"%s\";Typ\n", race[u->irace].name[1]);
+	else fprintf(F, "\"%s\";Typ\n", pzTmp);
+	if ((pzTmp || u->irace != u->race) && u->faction==f) {
 		fprintf(F, "\"%s\";wahrerTyp\n", race[u->race].name[1]);
 	}
 
@@ -631,7 +624,6 @@ cr_find_address(FILE * F, faction * uf)
 	void **fp;
 	cvector *fcts = malloc(sizeof(cvector));
 
-#if NEWBLOCKS
 	cv_init(fcts);
 	for (f = factions; f; f = f->next) {
 		if (f->no != 0 && kann_finden(uf, f) != 0) {
@@ -655,7 +647,6 @@ cr_find_address(FILE * F, faction * uf)
 		}
 	}
 	free(cv_kill(fcts));
-#endif
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
@@ -729,9 +720,7 @@ report_computer(FILE * F, faction * f)
 		fflush(stdout);
 	}
 	else printf(" - schreibe Computerreport\n");
-#ifdef OLD_MESSAGES
-	assert(crtypes[0]==NULL);
-#endif
+
 	fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
 	fprintf(F, "\"%s\";Spiel\n", global.gamename);
 	fprintf(F, "\"%s\";Konfiguration\n", "Standard");
@@ -776,7 +765,6 @@ report_computer(FILE * F, faction * f)
 	}
 #endif
 
-	f->index = 0;
 	cr_output_str_list(F, "FEHLER", f->mistakes, f);
 	cr_output_messages(F, f->msgs, f);
 	{
@@ -1009,10 +997,5 @@ report_computer(FILE * F, faction * f)
 			}
 		}			/* region traversal */
 	}
-#ifdef OLD_MESSAGES
 	report_crtypes(F, f->locale);
-	reset_crtypes();
-#else
-	/* TODO */
-#endif
 }

@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.17 2001/04/08 17:36:48 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -141,6 +140,18 @@ static attrib_type at_driveweight = {
 	"driveweight", NULL, NULL, NULL, NULL, NULL
 };
 
+int
+personcapacity(unit *u)
+{
+	int cap = race[u->race].weight+540;
+
+	if(fspecial(u->faction, FS_QUICK)) {
+		cap -= 2000;
+	}
+
+	return cap;
+}
+
 static int
 eff_weight(const unit *u)
 {
@@ -212,15 +223,8 @@ walkingcapacity(unit * u)
 	}
 
 	n += pferde * HORSECAPACITY;
-
-	if (u->race == RC_TROLL) {
-		n += personen * PERSONCAPACITY(u) * 2;
-	} else {
-		n += personen * PERSONCAPACITY(u);
-	}
-
-	n += get_effect(u, oldpotiontype[P_STRONG]) * PERSONCAPACITY(u);
-
+	n += personen * personcapacity(u);
+	n += get_effect(u, oldpotiontype[P_STRONG]) * personcapacity(u);
 	n += min(get_item(u, I_TROLLBELT), u->number) * STRENGTHCAPACITY;
 
 	return n;
@@ -883,7 +887,6 @@ travel(region * first, unit * u, region * next, int flucht)
 	char buf2[80];
 	static direction_t route[MAXSPEED];
 
-
 	/* tech:
 	 *
 	 * zu Fuß reist man 1 Region, zu Pferd 2 Regionen. Mit Straßen reist
@@ -956,9 +959,16 @@ travel(region * first, unit * u, region * next, int flucht)
 	default:
 		{
 			int mp = 1;
-			if (get_effect(u, oldpotiontype[P_FAST]) >= u->number)
-				mp *= 2; /* Siebenmeilentee */
 
+			/* faction special */
+			if(fspecial(u->faction, FS_QUICK))
+				mp = BP_RIDING;
+			
+			/* Siebenmeilentee */
+			if (get_effect(u, oldpotiontype[P_FAST]) >= u->number)
+				mp *= 2;
+
+			/* unicorn in inventory */
 			if (u->number <= get_item(u, I_FEENSTIEFEL))
 				mp *= 2;
 
@@ -1128,7 +1138,7 @@ travel(region * first, unit * u, region * next, int flucht)
 				travelthru(u, rv[i]);
 
 				sprintf(buf2, trailinto(rv[i], u->faction->locale),
-					tregionid(rv[i], u->faction));
+					regionname(rv[i], u->faction));
 				scat(buf2);
 			}
 		}
@@ -1334,9 +1344,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 		return NULL;
 
 	/* Wir suchen so lange nach neuen Richtungen, wie es geht. Diese werden
-	 * dann nacheinander ausgeführt.
-	 * Im array rv[] speichern wir die Küstenregionen ab, durch die wir
-	 * segeln (geht nur bei Halbinseln). */
+	 * dann nacheinander ausgeführt. */
 
 	k = shipspeed(u->ship, u);
 
@@ -1518,7 +1526,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 		}
 	}
 
-	if (starting_point != current_point) {
+	if (u->ship->moved) {
 		ship * sh = u->ship;
 		sh->moved = 1;
 		sprintf(buf, "Die %s ", shipname(sh));
@@ -1567,64 +1575,67 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 		/* Das Schiff und alle Einheiten darin werden nun von
 		 * starting_point nach current_point verschoben */
 
-		tt[t - 1] = 0;
-		sh = move_ship(sh, starting_point, current_point, tt);
 		/* Verfolgungen melden */
 		if (fval(u, FL_FOLLOWING)) caught_target(current_point, u);
 
-		/* Hafengebühren ? */
+		if (starting_point != current_point) {
+			tt[t - 1] = 0;
+			sh = move_ship(sh, starting_point, current_point, tt);
 
-		hafenmeister = owner_buildingtyp(current_point, &bt_harbour);
-		if (sh && hafenmeister != NULL) {
-			item * itm;
-			assert(trans==NULL);
-			for (u2 = current_point->units; u2; u2 = u2->next) {
-				if (u2->ship == u->ship &&
-						!allied(hafenmeister, u->faction, HELP_GUARD)) {
+			/* Hafengebühren ? */
+
+			hafenmeister = owner_buildingtyp(current_point, &bt_harbour);
+			if (sh && hafenmeister != NULL) {
+				item * itm;
+				assert(trans==NULL);
+				for (u2 = current_point->units; u2; u2 = u2->next) {
+					if (u2->ship == u->ship &&
+							!allied(hafenmeister, u->faction, HELP_GUARD)) {
 
 
-					if (effskill(hafenmeister, SK_OBSERVATION) > effskill(u2, SK_STEALTH)) {
-						for (itm=u2->items; itm; itm=itm->next) {
-							const luxury_type * ltype = resource2luxury(itm->type->rtype);
-							if (ltype!=NULL && itm->number>0) {
-								st = itm->number * effskill(hafenmeister, SK_TRADE) / 50;
-								st = min(itm->number, st);
+						if (effskill(hafenmeister, SK_OBSERVATION) > effskill(u2, SK_STEALTH)) {
+							for (itm=u2->items; itm; itm=itm->next) {
+								const luxury_type * ltype = resource2luxury(itm->type->rtype);
+								if (ltype!=NULL && itm->number>0) {
+									st = itm->number * effskill(hafenmeister, SK_TRADE) / 50;
+									st = min(itm->number, st);
 
-								if (st > 0) {
-									i_change(&u2->items, itm->type, -st);
-									i_change(&hafenmeister->items, itm->type, st);
-									i_add(&trans, i_new(itm->type));
+									if (st > 0) {
+										i_change(&u2->items, itm->type, -st);
+										i_change(&hafenmeister->items, itm->type, st);
+										i_add(&trans, i_new(itm->type));
+									}
 								}
 							}
 						}
 					}
 				}
-			}
-			if (trans) {
-				sprintf(buf, "%s erhielt ", hafenmeister->name);
-				for (itm = trans; itm; itm=itm->next) {
-					if (first != 1) {
-						if (itm->next!=NULL && itm->next->next==NULL) {
-							scat(" und ");
+				if (trans) {
+					sprintf(buf, "%s erhielt ", hafenmeister->name);
+					for (itm = trans; itm; itm=itm->next) {
+						if (first != 1) {
+							if (itm->next!=NULL && itm->next->next==NULL) {
+								scat(" und ");
+							} else {
+								scat(", ");
+							}
+						}
+						first = 0;
+						icat(trans->number);
+						scat(" ");
+						if (itm->number == 1) {
+							scat(locale_string(NULL, resourcename(itm->type->rtype, 0)));
 						} else {
-							scat(", ");
+							scat(locale_string(NULL, resourcename(itm->type->rtype, NMF_PLURAL)));
 						}
 					}
-					first = 0;
-					icat(trans->number);
-					scat(" ");
-					if (itm->number == 1) {
-						scat(locale_string(NULL, resourcename(itm->type->rtype, 0)));
-					} else {
-						scat(locale_string(NULL, resourcename(itm->type->rtype, NMF_PLURAL)));
-					}
+					scat(" von der ");
+					scat(shipname(u->ship));
+					scat(".");
+					addmessage(0, u->faction, buf, MSG_COMMERCE, ML_INFO);
+					addmessage(0, hafenmeister->faction, buf, MSG_INCOME, ML_INFO);
+					while (trans) i_remove(&trans, trans);
 				}
-				scat(" von der ");
-				scat(shipname(u->ship));
-				scat(".");
-				addmessage(0, u->faction, buf, MSG_COMMERCE, ML_INFO);
-				addmessage(0, hafenmeister->faction, buf, MSG_INCOME, ML_INFO);
-				while (trans) i_remove(&trans, trans);
 			}
 		}
 	}

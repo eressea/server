@@ -44,6 +44,7 @@
 
 /* attributes includes */
 #include <attributes/follow.h>
+#include <attributes/racename.h>
 
 const char * g_reportdir;
 
@@ -173,7 +174,7 @@ bufunit(const faction * f, const unit * u, int indent,
 	int i, dh;
 	skill_t sk;
 	int getarnt = fval(u, FL_PARTEITARNUNG);
-	const char *c;
+	const char *pzTmp;
 	spell *sp;
 	building * b;
 	boolean itemcloak = is_cursed(u->attribs, C_ITEMCLOAK, 0);
@@ -213,8 +214,10 @@ bufunit(const faction * f, const unit * u, int indent,
 		scat(" ");
 	}
 
-	if (u->irace != u->race) {
-		scat(race[u->irace].name[u->number != 1]);
+	pzTmp = get_racename(u->attribs);
+	if (pzTmp || u->irace != u->race) {
+		if (pzTmp) scat(pzTmp);
+		else scat(race[u->irace].name[u->number != 1]);
 		if (u->faction == f) {
 			scat(" (");
 			scat(race[u->race].name[u->number != 1]);
@@ -227,8 +230,8 @@ bufunit(const faction * f, const unit * u, int indent,
 	/* status */
 
 	if (u->number && (u->faction == f || telepath_see || isbattle)) {
+		const char * c = hp_status(u);
 		scat(report_kampfstatus(u));
-		c = hp_status(u);
 		if (c || fval(u, FL_HUNGER)) {
 			scat(" (");
 			if(c) scat(c);
@@ -391,10 +394,10 @@ bufunit(const faction * f, const unit * u, int indent,
 	if (i != '!' && i != '?' && i != '.')
 		scat(".");
 
-	c = uprivate(u);
-	if (u->faction == f && c) {
+	pzTmp = uprivate(u);
+	if (u->faction == f && pzTmp) {
 		scat(" (Bem: ");
-		scat(c);
+		scat(pzTmp);
 		scat(")");
 	}
 

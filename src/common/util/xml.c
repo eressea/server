@@ -9,8 +9,9 @@
 #include <ctype.h>
 
 static int 
-__cberror(const struct xml_stack * stack, const char* parsed, unsigned int line, int error)
+__cberror(const struct xml_stack * stack, const char* parsed, unsigned int line, int error, void *data)
 {
+	unused(data);
 	fprintf(stderr, "Error #%d in line %u while parsing \"%s\"\n", -error, line, parsed);
 	return error;
 }
@@ -72,7 +73,7 @@ pop_tag(xml_stack ** ostack)
 }
 
 int
-xml_parse(FILE * stream, struct xml_callbacks * cb)
+xml_parse(FILE * stream, struct xml_callbacks * cb, void * data)
 {
 	xml_stack * stack = NULL;
 	enum { TAG, ENDTAG, ATNAME, ATVALUE, PLAIN } state = PLAIN;
@@ -82,7 +83,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb)
 	unsigned int line = 0;
 	xml_tag * tag = NULL;
 	xml_attrib * attrib = NULL;
-	int (*cb_error)(const struct xml_stack*, const char*, unsigned int, int) = __cberror;
+	int (*cb_error)(const struct xml_stack*, const char*, unsigned int, int, void*) = __cberror;
 	if (cb && cb->error) cb_error = cb->error;
 
 	for (;;) {
@@ -93,11 +94,11 @@ xml_parse(FILE * stream, struct xml_callbacks * cb)
 		} else if (c==EOF) {
 			if (state==PLAIN) {
 				*pos='\0';
-				if (cb && cb->plaintext && pos!=tokbuffer) cb->plaintext(stack, tokbuffer);
+				if (cb && cb->plaintext && pos!=tokbuffer) cb->plaintext(stack, tokbuffer, data);
 				break;
 			} else {
 				*pos='\0';
-				return cb_error(stack, tokbuffer, line, XML_BROKENSTREAM);
+				return cb_error(stack, tokbuffer, line, XML_BROKENSTREAM, data);
 			}
 		}
 		do {
@@ -108,14 +109,14 @@ xml_parse(FILE * stream, struct xml_callbacks * cb)
 				case '<':
 				case '/':
 					*pos='\0';
-					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
+					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
 				case '"':
 					quoted = !quoted;
 					break;
 				case '>':
 					if (quoted) {
 						*pos='\0';
-						return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
+						return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
 					}
 					state = TAG;
 					/* intentional fallthrough */
@@ -146,11 +147,11 @@ xml_parse(FILE * stream, struct xml_callbacks * cb)
 				case '<':
 				case '/':
 					*pos='\0';
-					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
+					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
 				default:
 					if (isspace(c)) {
 						*pos='\0';
-						return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
+						return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
 					}
 					*pos++ = (char)c;
 				}
@@ -160,7 +161,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb)
 				case '<':
 					if (cb && cb->plaintext && pos!=tokbuffer) {
 						*pos = '\0';
-						cb->plaintext(stack, tokbuffer);
+						cb->plaintext(stack, tokbuffer, data);
 					}
 					state = TAG;
 					tag = NULL;
@@ -168,7 +169,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb)
 					break;
 				case '>':
 					*pos='\0';
-					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
+					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
 				default:
 					*pos++ = (char)c;
 				}
@@ -179,7 +180,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb)
 					if (pos==tokbuffer) state = ENDTAG;
 					else {
 						*pos='\0';
-						return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
+						return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
 					}
 					break;
 				case '>':
@@ -187,7 +188,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb)
 						*pos='\0';
 						push_tag(&stack, make_tag(tokbuffer));
 					}
-					if (cb && cb->tagbegin) cb->tagbegin(stack);
+					if (cb && cb->tagbegin) cb->tagbegin(stack, data);
 					state = PLAIN;
 					pos = tokbuffer;
 					break;
@@ -214,8 +215,8 @@ xml_parse(FILE * stream, struct xml_callbacks * cb)
 				case '>':
 					*pos = '\0';
 					while (stack && strcmp(stack->tag->name, tokbuffer)!=0) free_tag(pop_tag(&stack));
-					if (stack==NULL) return cb_error(stack, tokbuffer, line, XML_NESTINGERROR);
-					if (cb && cb->tagend) cb->tagend(stack);
+					if (stack==NULL) return cb_error(stack, tokbuffer, line, XML_NESTINGERROR, data);
+					if (cb && cb->tagend) cb->tagend(stack, data);
 					free_tag(pop_tag(&stack));
 					state = PLAIN;
 					pos = tokbuffer;
@@ -225,7 +226,7 @@ xml_parse(FILE * stream, struct xml_callbacks * cb)
 				case '=':
 				case '/':
 					*pos='\0';
-					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR);
+					return cb_error(stack, tokbuffer, line, XML_INVALIDCHAR, data);
 				default:
 					*pos++ = (char)c;
 				}
@@ -234,4 +235,13 @@ xml_parse(FILE * stream, struct xml_callbacks * cb)
 		} while (reparse);
 	}  /* for(;;) */
 	return XML_OK; /* SUCCESS */
+}
+
+const char * 
+xml_value(const xml_tag * tag, const char * name)
+{
+	const xml_attrib * xa = tag->attribs;
+	while (xa && strcmp(name, xa->name)!=0) xa = xa->next;
+	if (xa) return xa->value;
+	return NULL;
 }

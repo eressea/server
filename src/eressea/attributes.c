@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- * $Id: attributes.c,v 1.7 2001/02/18 12:20:20 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -26,6 +25,13 @@
 #include <attributes/iceberg.h>
 #include <attributes/hate.h>
 #include <attributes/overrideroads.h>
+#include <attributes/racename.h>
+#ifdef AT_OPTION
+# include <attributes/option.h>
+#endif
+#ifdef AT_MOVED
+# include <attributes/moved.h>
+#endif
 
 /* util includes */
 #include <attrib.h>
@@ -34,20 +40,19 @@ void
 init_attributes(void)
 {
 	at_register(&at_overrideroads);
-	/* at_gm */
-	init_gm();
-	/* at_iceberg */
 	init_iceberg();
-	/* at_key */
 	init_key();
-	/* at_orcification */
-	init_orcification();
-	/* at_follow */
+	init_gm();
 	init_follow();
-	/* at_targetregion */
 	init_targetregion();
-	/* at_hate */
+	init_orcification();
 	init_hate();
-	/* at_reduceproduction */
 	init_reduceproduction();
+	init_racename();
+#ifdef AT_MOVED
+	init_moved();
+#endif
+#ifdef AT_OPTION
+	init_option();
+#endif
 }

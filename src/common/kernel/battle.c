@@ -9,11 +9,11 @@
  *
  * This program may not be used, modified or distributed without
  * prior permission by the authors of Eressea.
- * This program may not be sold or used commercially without prior written
- * permission from the authors.
  */
 
 #define SHOW_KILLS
+#define DELAYED_OFFENSE /* non-guarding factions cannot attack after moving */
+#define SHORT_ATTACKS /* attacking is always a short order */
 
 #define TACTICS_RANDOM 5 /* define this as 1 to deactivate */
 #define CATAPULT_INITIAL_RELOAD 4 /* erster schuss in runde 1 + rand() % INITIAL */
@@ -62,6 +62,10 @@ typedef enum combatmagic {
 
 /* attributes includes */
 #include <attributes/key.h>
+#include <attributes/racename.h>
+#ifdef AT_MOVED
+# include <attributes/moved.h>
+#endif
 
 /* libc includes */
 #include <assert.h>
@@ -71,12 +75,9 @@ typedef enum combatmagic {
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef _MSC_VER
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
+#if !defined(AT_MOVED) && defined(DELAYED_OFFENSE)
+# error "must define AT_MOVED to use combat option DELAYED_OFFENSE"
 #endif
-
 
 #ifdef HAVE_ZLIB
 # include <zlib.h>
@@ -2216,13 +2217,14 @@ aftermath(battle * b)
 			int dead = du->number - df->alive - df->run.number;
 			int sum_hp = 0;
 			int n;
-
+#ifndef SHORT_ATTACKS
 			if (relevant && df->action_counter >= df->unit->number) {
 				fset(df->unit, FL_LONGACTION);
 				/* TODO: das sollte hier weg sobald anderswo üb
 				 * erall HADBATTLE getestet wird. */
 				set_string(&du->thisorder, "");
 			}
+#endif
 			for (n = 0; n != df->alive; ++n) {
 				if (df->person[n].hp > 0)
 					sum_hp += df->person[n].hp;
@@ -2283,6 +2285,7 @@ aftermath(battle * b)
 					if (fval(du, FL_PARTEITARNUNG))
 						fset(nu, FL_PARTEITARNUNG);
 					/* Daemonentarnung */
+					set_racename(&nu->attribs, get_racename(du->attribs));
 					nu->irace = du->irace;
 					/* Fliehenden nehmen mit, was sie tragen können*/
 
@@ -3234,7 +3237,7 @@ flee(const troop dt)
 {
 	fighter * fig = dt.fighter;
 	unit * u = fig->unit;
-	int carry = PERSONCAPACITY(u) - race[u->race].weight;
+	int carry = personcapacity(u) - race[u->race].weight;
 	int money;
 
 	item ** ip = &u->items;
@@ -3279,6 +3282,18 @@ flee(const troop dt)
 	remove_troop(dt);
 }
 
+#ifdef DELAYED_OFFENSE
+static boolean 
+guarded_by(region * r, faction * f)
+{
+	unit * u;
+	for (u=r->units;u;u=u->next) {
+		if (u->faction == f && getguard(u)) return true;
+	}
+	return false;
+}
+#endif
+
 void
 do_battle(void)
 {
@@ -3315,14 +3330,15 @@ do_battle(void)
 							list_continue(sl);
 						}
 
-						/* Fehlerbehandlung Angreifer */
-						if (is_spell_active(r, C_PEACE)) {
-							sprintf(buf, "Hier ist es so schön friedlich, %s möchte "
-									"hier niemanden angreifen.", unitname(u));
-							mistake(u, sl->s, buf, MSG_BATTLE);
-							list_continue(sl);
+						/**
+						 ** Fehlerbehandlung Angreifer 
+						 **/
+#ifdef DELAYED_OFFENSE
+						if (get_moved(&u->attribs) && !guarded_by(r, u->faction)) {
+							add_message(&u->faction->msgs, 
+								make_message("no_attack_after_advance", "unit region command", u, u->region, sl->s));
 						}
-
+#endif
 						if (fval(u, FL_HUNGER)) {
 							cmistake(u, sl->s, 225, MSG_BATTLE);
 							list_continue(sl);
@@ -3335,6 +3351,13 @@ do_battle(void)
 
 						/* ist ein Flüchtling aus einem andern Kampf */
 						if (fval(u, FL_MOVED)) list_continue(sl);
+
+						if (is_spell_active(r, C_PEACE)) {
+							sprintf(buf, "Hier ist es so schön friedlich, %s möchte "
+									"hier niemanden angreifen.", unitname(u));
+							mistake(u, sl->s, buf, MSG_BATTLE);
+							list_continue(sl);
+						}
 
 						if (is_cursed(u->attribs, C_SLAVE, 0)) {
 							sprintf(buf, "%s kämpft nicht.", unitname(u));

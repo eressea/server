@@ -8,15 +8,18 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: nrmessage.c,v 1.3 2001/02/28 22:14:59 enno Exp $
+ $Id: nrmessage.c,v 1.4 2001/04/12 17:21:45 enno Exp $
 */
 
 #include <config.h>
 #include "nrmessage.h"
 
+/* util includes */
+#include "log.h"
 #include "message.h"
 #include "translation.h"
 
+/* libc includes */
 #include <string.h>
 #include <stdlib.h>
 
@@ -32,7 +35,13 @@ typedef struct nrmessage_type {
 
 static nrmessage_type * messagetypes;
 
-static nrmessage_type * 
+const char * 
+nrt_string(const struct nrmessage_type *type)
+{
+	return type->string;
+}
+
+nrmessage_type * 
 nrt_find(const struct locale * lang, const struct message_type * mtype)
 {
 	nrmessage_type * found = NULL;
@@ -41,7 +50,10 @@ nrt_find(const struct locale * lang, const struct message_type * mtype)
 		if (type->mtype==mtype) {
 			if (found==NULL) found = type;
 			else if (type->lang==NULL) found = type;
-			if (lang==type->lang) break;
+			if (lang==type->lang) {
+				found = type;
+				break;
+			}
 		}
 		type = type->next;
 	}
@@ -76,15 +88,20 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
 	}
 }
 
-
 int
-nr_render(const struct message * msg, const struct locale * lang, char * buffer)
+nr_render(const struct message * msg, const struct locale * lang, char * buffer, const void * userdata)
 {
 	struct nrmessage_type * nrt = nrt_find(lang, msg->type);
 
 	if (nrt) {
-		strcpy(buffer, translate(nrt->string, nrt->vars, msg->parameters));
-		return 0;
+		const char * m = translate(nrt->string, userdata, nrt->vars, msg->parameters);
+		if (m) {
+			strcpy(buffer, m);
+			return 0;
+		}
+		else {
+			log_error(("Couldn't render message %s\n", nrt->mtype->name));
+		}
 	}
 	return -1;
 }

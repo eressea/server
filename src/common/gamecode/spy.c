@@ -38,11 +38,15 @@
 #include "skill.h"
 #include "unit.h"
 
+/* attributes includes */
+#include <attributes/racename.h>
+
 /* util includes */
 #include "vset.h"
 
 /* libc includes */
 #include <assert.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -113,6 +117,8 @@ setstealth(unit * u, strlist * S)
 		if (u->race == RC_PSEUDODRAGON || u->race == RC_BIRTHDAYDRAGON) {
 			if (t==RC_PSEUDODRAGON||t==RC_FIREDRAGON||t==RC_DRAGON||t==RC_WYRM) {
 				u->irace = t;
+				if (race[u->race].flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+					set_racename(&u->attribs, NULL);
 			}
 			return;
 		}
@@ -121,6 +127,8 @@ setstealth(unit * u, strlist * S)
 		if (race[u->race].flags & RCF_SHAPESHIFT) {
 			if (!race[t].nonplayer) {
 				u->irace = t;
+				if (race[u->race].flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+					set_racename(&u->attribs, NULL);
 			}
 		}
 		return;
@@ -174,14 +182,18 @@ setstealth(unit * u, strlist * S)
 		}
 		break;
 	default:
-		/* Sonst: Tarnungslevel setzen */
-		level = (char) atoip(s);
-		if (level > effskill(u, SK_STEALTH)) {
-			sprintf(buf, "%s kann sich nicht so gut tarnen.", unitname(u));
-			mistake(u, S->s, buf, MSG_EVENT);
-			return;
+		if (isdigit(s[0])) {
+			/* Tarnungslevel setzen */
+			level = (char) atoip(s);
+			if (level > effskill(u, SK_STEALTH)) {
+				sprintf(buf, "%s kann sich nicht so gut tarnen.", unitname(u));
+				mistake(u, S->s, buf, MSG_EVENT);
+				return;
+			}
+			u_seteffstealth(u, level);
+		} else if (race[u->race].flags & RCF_SHAPESHIFTANY) {
+			set_racename(&u->attribs, s);
 		}
-		u_seteffstealth(u, level);
 	}
 	return;
 }

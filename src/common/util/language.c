@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: language.c,v 1.4 2001/02/11 20:54:01 enno Exp $
+ *	$Id: language.c,v 1.5 2001/04/12 17:21:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -12,8 +12,9 @@
  * prior permission by the authors of Eressea.
  */
 #include <config.h>
-
 #include "language.h"
+
+#include "log.h"
 #include "goodies.h"
 
 #include <stdlib.h>
@@ -90,10 +91,10 @@ locale_string(const locale * lang, const char * key)
 	}
 	if (!find) {
 		if (lang==default_locale) {
-			fprintf(stderr, "WARNING: missing translation for \"%s\"\n", key);
+			log_warning(("missing translation for \"%s\"\n", key));
 			return key;
 		}
-		fprintf(stderr, "WARNING: missing translation for \"%s\" in locale %s\n", key, lang->name);
+		log_warning(("missing translation for \"%s\" in locale %s\n", key, lang->name));
 		return locale_string(default_locale, key);
 	}
 	return find->str;

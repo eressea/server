@@ -18,8 +18,6 @@ hell;de;Ebene aus Feuer und Dunkelheit
 activevolcano;de;Aktiver Vulkan
 hall1;de;Halle
 corridor1;de;Gang
-xmas_exit;de;Pforte
-caldera;de;Krater
 
 maelstrom_trail;de;ein %s
 ocean_trail;de;%s
@@ -41,6 +39,8 @@ activevolcano_trail;de;ein %s
 hall1_trail;de;die %s
 corridor1_trail;de;die %s
 
+caldera;de;Krater
+xmas_exit;de;Pforte
 coal;de;Kohlenstück
 coals;de;Kohlenstücke
 

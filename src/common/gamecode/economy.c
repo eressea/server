@@ -1,5 +1,6 @@
 /* vi: set ts=2:
  *
+ *	$Id: economy.c,v 1.11 2001/04/12 17:21:42 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -62,7 +63,8 @@
 #include <limits.h>
 
 #include <attributes/reduceproduction.h>
-extern attrib_type at_orcification;
+#include <attributes/racename.h>
+#include <attributes/orcification.h>
 
 /* - static global symbols ------------------------------------- */
 typedef struct spende {
@@ -86,7 +88,7 @@ static int entertaining;
 static int norders;
 static request *oa;
 
-int 
+int
 income(const unit * u)
 {
 	switch(u->race) {
@@ -241,39 +243,47 @@ expandrecruit(region * r, request * recruitorders)
 	/* Rekrutierung */
 
 	int i, n, p = rpeasants(r), h = rhorses(r);
-	unit *u;
-	int recruitcost, rfrac = p / RECRUITFRACTION;
+	int rfrac = p / RECRUITFRACTION;
+	unit * u;
 
 	expandorders(r, recruitorders);
 	if (!norders) return;
 
-	for (i = 0, n = 0; i != norders && n < rfrac; i++, n++) {
-		if (!(race[oa[i].unit->race].ec_flags & REC_HORSES)) {
-			recruitcost = race[oa[i].unit->faction->race].rekrutieren;
-			if (use_pooled(oa[i].unit, r, R_SILVER, recruitcost) != recruitcost)
-				break;
-			set_number(oa[i].unit, oa[i].unit->number + 1);
-			if (oa[i].unit->faction->race != RC_DAEMON) p--;
-			oa[i].unit->race = oa[i].unit->faction->race;
-			oa[i].unit->n++;
+	for (i = 0, n = 0; i != norders; i++) {
+		unit * u = oa[i].unit;
+		race_t rc = u->faction->race;
+		int recruitcost = race[rc].rekrutieren;
+
+		/* check if recruiting is limited. either horses or peasant fraction or not at all */
+		if ((race[rc].ec_flags & ECF_REC_UNLIMITED)==0) {
+			/* not unlimited, and everything's gone: */
+			if (race[rc].ec_flags & ECF_REC_HORSES) {
+				/* recruit from horses if not all gone */
+				if (h <= 0) continue;
+			}
+			else if ((race[rc].ec_flags & ECF_REC_ETHEREAL) == 0) {
+				/* recruit from peasants if any space left */
+				if (n > rfrac) continue;
+			}
+		}
+		if (recruitcost) {
+			if (get_pooled(oa[i].unit, r, R_SILVER) < recruitcost) continue;
+			use_pooled(oa[i].unit, r, R_SILVER, recruitcost);
+		}
+		if ((race[rc].ec_flags & ECF_REC_UNLIMITED)==0) {
+			if (race[rc].ec_flags & ECF_REC_HORSES) h--; /* use a horse */
+			else {
+				if ((race[rc].ec_flags & ECF_REC_ETHEREAL)==0) p--; /* use a peasant */
+				n++;
+			}
+			set_number(u, u->number + 1);
+			u->race = rc;
+			u->n++;
 		}
 	}
 
+	assert(p>=0 && h>=0);
 	rsetpeasants(r, p);
-
-	for (i = 0, n = 0; i != norders && n < h; i++, n++) {
-		if (race[oa[i].unit->race].ec_flags & REC_HORSES) {
-			recruitcost = race[oa[i].unit->faction->race].rekrutieren;
-			if (use_pooled(oa[i].unit, r, R_SILVER, recruitcost) != recruitcost)
-				break;
-
-			set_number(oa[i].unit, oa[i].unit->number + 1);
-			if (oa[i].unit->faction->race != RC_DAEMON) h--;
-			oa[i].unit->race = oa[i].unit->faction->race;
-			oa[i].unit->n++;
-		}
-	}
-
 	rsethorses(r, h);
 
 	free(oa);
@@ -286,7 +296,7 @@ expandrecruit(region * r, request * recruitorders)
 				change_skill(u, SK_SWORD, 30 * u->n);
 				change_skill(u, SK_SPEAR, 30 * u->n);
 			}
-			if (race[u->race].ec_flags & REC_HORSES) {
+			if (race[u->race].ec_flags & ECF_REC_HORSES) {
 				change_skill(u, SK_RIDING, 30 * u->n);
 			}
 			i = fspecial(u->faction, FS_MILITIA);
@@ -351,7 +361,7 @@ recruit(region * r, unit * u, strlist * S,
 	}
 
 	if (fval(r, RF_ORCIFIED) && u->faction->race != RC_ORC &&
-			!(race[u->faction->race].ec_flags & REC_HORSES)) {
+			!(race[u->faction->race].ec_flags & ECF_REC_HORSES)) {
 		cmistake(u, S->s, 238, MSG_EVENT);
 		return;
 	}
@@ -428,15 +438,14 @@ add_give(unit * u, unit * u2, int n, const resource_type * rtype, const char * c
 	else if (!u2 || u2->faction!=u->faction) {
 		assert(rtype);
 		add_message(&u->faction->msgs,
-			new_message(u->faction, "give%u:unit%u:target%r:region%X:resource%i:amount",
+			new_message(u->faction, "give%u:unit%u:target%X:resource%i:amount",
 			u,
 			u2?(cansee(u->faction, u->region, u2, 0)?u2:NULL):&u_peasants,
-			u->region, rtype, n));
+			rtype, n));
 		if (u2) add_message(&u2->faction->msgs,
-			new_message(u2->faction, "give%u:unit%u:target%r:region%X:resource%i:amount",
+			new_message(u2->faction, "give%u:unit%u:target%X:resource%i:amount",
 			u?(cansee(u2->faction, u2->region, u, 0)?u:NULL):&u_peasants,
-			u2,
-			u2->region, rtype, n));
+			u2, rtype, n));
 	}
 }
 
@@ -557,6 +566,7 @@ givemen(int n, unit * u, unit * u2, strlist * S)
 
 	if (!error) {
 		if (u2 && u2->number == 0) {
+			set_racename(&u2->attribs, get_racename(u->attribs));
 			u2->race = u->race;
 			u2->irace = u->irace;
 		} else if (u2 && u2->race != u->race) {
@@ -709,9 +719,9 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 		return;
 	}
 	add_message(&u2->faction->msgs,
-		new_message(u2->faction, "give%u:unit%u:target%r:region%X:resource%i:amount",
+		new_message(u2->faction, "give%u:unit%u:target%X:resource%i:amount",
 		u?&u_peasants:(cansee(u2->faction, u->region, u, 0)?u:NULL),
-		u2, u->region, r_unit, 1));
+		u2, r_unit, 1));
 	u_setfaction(u, u2->faction);
 	u2->faction->newbies += n;
 
@@ -737,9 +747,9 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 		}
 	}
 	add_message(&u->faction->msgs,
-		new_message(u->faction, "give%u:unit%u:target%r:region%X:resource%i:amount",
+		new_message(u->faction, "give%u:unit%u:target%X:resource%i:amount",
 		u, u2?&u_peasants:u2,
-		u->region, r_unit, 1));
+		r_unit, 1));
 }
 
 
@@ -1344,6 +1354,7 @@ manufacture(unit * u, const item_type * itype, int want)
 	}
 	if (n>0) {
 		i_change(&u->items, itype, n);
+		if (want==INT_MAX) want = n;
 		add_message(&u->faction->msgs,
 			new_message(u->faction, "manufacture%u:unit%r:region%i:amount%i:wanted%X:resource", u, u->region, n, want, itype->rtype));
 	}
@@ -1579,6 +1590,7 @@ split_allocations(region * r)
 					i_change(&al->unit->items, itype, al->get);
 					change_skill(al->unit, itype->construction->skill, al->unit->number * PRODUCEEXP);
 				}
+				if (al->want==INT_MAX) al->want = al->get;
 				add_message(&al->unit->faction->msgs, new_message(al->unit->faction, "produce%u:unit%r:region%i:amount%i:wanted%X:resource", al->unit, al->unit->region, al->get, al->want, rtype));
 			}
 			*p_al=al->next;
@@ -1631,6 +1643,7 @@ create_potion(unit * u, const potion_type * ptype, int want)
 		break;
 	default:
 		i_change(&u->items, ptype->itype, built);
+		if (want==INT_MAX) want = built;
 		add_message(&u->faction->msgs,
 					new_message(u->faction, "manufacture%u:unit%r:region%i:amount%i:wanted%X:resource", u, u->region, built, want, ptype->itype->rtype));
 		break;

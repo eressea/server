@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.19 2001/03/04 18:41:27 enno Exp $
+ *	$Id: main.c,v 1.20 2001/04/12 17:21:46 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -55,6 +55,7 @@
 #include <plane.h>
 #include <race.h>
 #include <reports.h>
+#include <creport.h>
 #include <region.h>
 #include <save.h>
 #include <ship.h>
@@ -125,6 +126,11 @@ static void
 game_init(void)
 {
 	init_triggers();
+
+	report_init();
+	creport_init();
+
+	init_locales();
 
 	init_races();
 	init_spells();
@@ -259,8 +265,6 @@ processturn(char *filename)
 	return 0;
 }
 
-extern void creport_cleanup(void);
-extern void reports_cleanup(void);
 extern void freeland(land_region * lr);
 
 static void
@@ -327,7 +331,7 @@ game_done(void)
 	leak_report(stderr);
 #endif
 	creport_cleanup();
-	reports_cleanup();
+	report_cleanup();
 }
 
 #include "magic.h"
@@ -532,7 +536,7 @@ main(int argc, char *argv[])
 	setlocale(LC_ALL, "");
 #ifdef LOCALE_CHECK
 	if (!locale_check()) {
-		puts("ERROR: The current locale is not suitable for international Eressea.\n");
+		log_error(("The current locale is not suitable for international Eressea.\n"));
 		return -1;
 	}
 #endif

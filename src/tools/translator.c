@@ -42,9 +42,9 @@ test_message(void)
 	tsf_register("string", &cr_string);
 	tsf_register("int", &cr_int);
 
-	crt_register(mt_example, NULL);
-	nrt_register(mt_example, NULL, "\"$subject hat $int($number) $object\"");
-	cr_render(msg, NULL, buffer);
+	crt_register(mt_example);
+	nrt_register(mt_example, NULL, "\"$subject hat $int($number) $object\"", 0, "default");
+	cr_render(msg, buffer);
 	puts(buffer);
 	nr_render(msg, NULL, buffer);
 	puts(buffer);
@@ -232,8 +232,8 @@ parse_message(char * b)
 
 	/* add the messagetype */
 	mtype = mt_register(mt_new(name, args));
-	nrt_register(mtype, lang, message);
-	crt_register(mtype, lang);
+	nrt_register(mtype, lang, message, 0, "default");
+	crt_register(mtype);
 }
 
 static void
@@ -250,15 +250,15 @@ static void
 test_compat()
 {
 	char buffer[1024];
-	FILE * F = fopen("res/de_DE/messages.txt", "rt");
+	FILE * F = fopen("res/de/messages.txt", "rt");
 	message * msg;
 	if (F) {
 		read_messages(F);
 		fclose(F);
+		msg = new_message(NULL, "entrise%s:region", "Porzel (8,7)");
+		if (cr_render(msg, buffer)==0) puts(buffer);
+		if (nr_render(msg, NULL, buffer)==0) puts(buffer);
 	}
-	msg = new_message(NULL, "entrise%s:region", "Porzel (8,7)");
-	if (cr_render(msg, NULL, buffer)==0) puts(buffer);
-	if (nr_render(msg, NULL, buffer)==0) puts(buffer);
 }
 
 int 

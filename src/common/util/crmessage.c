@@ -8,13 +8,14 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: crmessage.c,v 1.1 2001/02/24 12:50:50 enno Exp $
+ $Id: crmessage.c,v 1.2 2001/04/12 17:21:45 enno Exp $
 */
 
 #include <config.h>
 #include "crmessage.h"
 
 #include "message.h"
+#include "log.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,7 +62,6 @@ tsf_register(const char * name, tostring_f fun)
 /** crmesssage **/
 typedef struct crmessage_type {
 	const struct message_type * mtype;
-	const struct locale * lang;
 	tostring_f * renderers;
 	struct crmessage_type * next;
 } crmessage_type;
@@ -69,32 +69,27 @@ typedef struct crmessage_type {
 static crmessage_type * messagetypes;
 
 static crmessage_type * 
-crt_find(const struct locale * lang, const struct message_type * mtype)
+crt_find(const struct message_type * mtype)
 {
 	crmessage_type * found = NULL;
 	crmessage_type * type = messagetypes;
 	while (type) {
-		if (type->mtype==mtype) {
-			if (found==NULL) found = type;
-			else if (type->lang==NULL) found = type;
-			if (lang==type->lang) break;
-		}
+		if (type->mtype==mtype) found = type;
 		type = type->next;
 	}
 	return found;
 }
 
 void
-crt_register(const struct message_type * mtype, const struct locale * lang)
+crt_register(const struct message_type * mtype)
 {
 	crmessage_type * crt = messagetypes;
-	while (crt && (crt->lang!=lang || crt->mtype!=mtype)) {
+	while (crt && crt->mtype!=mtype) {
 		crt = crt->next;
 	}
 	if (!crt) {
 		int i;
 		crt = malloc(sizeof(crmessage_type));
-		crt->lang = lang;
 		crt->mtype = mtype;
 		crt->next = messagetypes;
 		messagetypes = crt;
@@ -108,18 +103,20 @@ crt_register(const struct message_type * mtype, const struct locale * lang)
 }
 
 int
-cr_render(const message * msg, const struct locale * lang, char * buffer)
+cr_render(const message * msg, char * buffer, const void * userdata)
 {
 	int i;
 	char * c = buffer;
-	struct crmessage_type * crt = crt_find(lang, msg->type);
+	struct crmessage_type * crt = crt_find(msg->type);
 
 	if (crt==NULL) return -1;
 	for (i=0;i!=msg->type->nparameters;++i) {
 		if (crt->renderers[i]==NULL) {
-			strcpy(c, (const char*)msg->parameters[i]);
+			log_error(("No renderer for argument %s:%s of \"%s\"\n", 
+				msg->type->pnames[i], msg->type->types[i], msg->type->name));
+			continue; /* strcpy(c, (const char*)msg->parameters[i]); */
 		} else {
-			crt->renderers[i](msg->parameters[i], c);
+			if (crt->renderers[i](msg->parameters[i], c, userdata)!=0) continue;
 		}
 		c += strlen(c);
 		sprintf(c, ";%s\n", msg->type->pnames[i]);
@@ -128,14 +125,27 @@ cr_render(const message * msg, const struct locale * lang, char * buffer)
 	return 0;
 }
 
-void
-cr_string(const void * v, char * buffer)
+int
+cr_string(const void * v, char * buffer, const void * userdata)
 {
 	sprintf(buffer, "\"%s\"", (const char *)v);
+	unused(userdata);
+	return 0;
 }
 
-void
-cr_int(const void * v, char * buffer)
+int
+cr_int(const void * v, char * buffer, const void * userdata)
 {
 	sprintf(buffer, "%d", (int)v);
+	unused(userdata);
+	return 0;
+}
+
+int
+cr_ignore(const void * v, char * buffer, const void * userdata)
+{
+	unused(v);
+	unused(buffer);
+	unused(userdata);
+	return -1;
 }

@@ -47,7 +47,7 @@ main(int argc, char** argv)
 		xml_cb.plaintext = cbplaintext;
 		xml_cb.tagbegin = cbtagbegin;
 
-		nretval = xml_parse(istream, &xml_cb);
+		nretval = xml_parse(istream, &xml_cb, NULL);
 		if (istream!=stdin) fclose(istream);
 		if (ostream!=stdout) fclose(ostream);
 	}

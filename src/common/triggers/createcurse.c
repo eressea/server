@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: createcurse.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: createcurse.c,v 1.3 2001/04/12 17:21:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -70,7 +70,7 @@ createcurse_handle(trigger * t, void * data)
 		create_curse(td->mage, &td->target->attribs,
 			td->id, td->id2, td->vigour, td->duration, td->effect, td->men);
 	} else {
-		fprintf(stderr, "\aERROR: could not perform createcurse::handle()\n");
+		log_error(("could not perform createcurse::handle()\n"));
 	}
 	unused(data);
 	return 0;

@@ -1,5 +1,8 @@
 #include <config.h>
 
+#include "translation.h"
+
+/* libc includes */
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
@@ -35,11 +38,6 @@ opstack_push(opstack ** stack, void * data)
 	os->data = data;
 	*stack = os;
 }
-
-static opstack * stack;
-
-#define opush(i) opstack_push(&stack, (void *)(i))
-#define opop(T) (T)opstack_pop(&stack)
 
 /**
  ** static buffer malloc 
@@ -132,7 +130,6 @@ find_variable(const char * symbol)
  ** constant values
  **/
 
-typedef void (*evalfun)(void);
 typedef struct function {
 	struct function * next;
 	const char * symbol;
@@ -151,7 +148,7 @@ free_functions(void)
 	}
 }
 
-static void
+void
 add_function(const char * symbol, evalfun parse)
 {
 	function * fun = (function*)malloc(sizeof(function));
@@ -174,11 +171,11 @@ find_function(const char * symbol)
 	return fun;
 }
 
-static const char * parse(const char* in);
+static const char * parse(opstack **, const char* in, const void *);
 /* static const char * sample = "\"enno and $bool($if($eq($i,0),\"noone else\",\"$i other people\"))\""; */
 
 static const char *
-parse_symbol(const char* in)
+parse_symbol(opstack ** stack, const char* in, const void * userdata)
 	/* in is the symbol name and following text, starting after the $ 
 	 * result goes on the stack
 	 */
@@ -195,24 +192,24 @@ parse_symbol(const char* in)
 		 */
 		function * foo;
 		while (*in != ')') {
-			in = parse(++in); /* will push the result on the stack */
+			in = parse(stack, ++in, userdata); /* will push the result on the stack */
 			if (in==NULL) return NULL;
 		}
 		++in;
 		foo = find_function(symbol);
 		if (foo==NULL) return NULL;
-		foo->parse(); /* will pop parameters from stack (reverse order!) and push the result */
+		foo->parse(stack, userdata); /* will pop parameters from stack (reverse order!) and push the result */
 	} else {
 		/* it's a constant (variable is a misnomer, but heck, const was taken;)) */
 		variable * var = find_variable(symbol);
 		if (var==NULL) return NULL;
-		opush(var->value);
+		opush(stack, var->value);
 	}
 	return in;
 }
 
 static const char *
-parse_string(const char* in) /* (char*) -> char* */
+parse_string(opstack ** stack, const char* in, const void * userdata) /* (char*) -> char* */
 {
 	char * c;
 	char * buffer = balloc(4*1024);
@@ -247,9 +244,9 @@ parse_string(const char* in) /* (char*) -> char* */
 				++ic;
 				break;
 			case '$':
-				ic = parse_symbol(++ic);
+				ic = parse_symbol(stack, ++ic, userdata);
 				if (ic==NULL) return NULL;
-				c = opop(char*);
+				c = opop(stack, char*);
 				oc += strlen(strcpy(oc, c));
 				bfree(c);
 				break;
@@ -260,12 +257,12 @@ parse_string(const char* in) /* (char*) -> char* */
 	}
 	*oc++ = '\0';
 	bfree(oc);
-	opush(buffer);
+	opush(stack, buffer);
 	return ic;
 }
 
 static const char *
-parse_int(const char * in)
+parse_int(opstack ** stack, const char * in)
 {
 	int k = 0;
 	int vz = 1;
@@ -286,25 +283,25 @@ parse_int(const char * in)
 	while (isdigit(*in)) {
 		k = k * 10 + (*in++)-'0';
 	}
-	opush(k*vz);
+	opush(stack, k*vz);
 	return in;
 }
 
 
 static const char *
-parse(const char* in)
+parse(opstack ** stack, const char* in, const void * userdata)
 {
 	while (*in) {
 		switch (*in) {
 		case '"':
-			return parse_string(++in);
+			return parse_string(stack, ++in, userdata);
 			break;
 		case '$':
-			return parse_symbol(++in);
+			return parse_symbol(stack, ++in, userdata);
 			break;
 		default:
 			if (isdigit(*in) || *in=='-' || *in=='+') {
-				return parse_int(in);
+				return parse_int(stack, in);
 			}
 			else ++in;
 		}
@@ -313,14 +310,14 @@ parse(const char* in)
 }
 
 char * 
-translate(const char* format, const char* vars, const void* args[])
+translate(const char* format, const void * userdata, const char* vars, const void* args[])
 {
 	int i = 0;
 	char * retval;
 	const char *ic = vars;
 	char symbol[32];
 	char *oc = symbol;
-
+	opstack * stack = NULL;
 	brelease();
 	free_variables();
 
@@ -336,21 +333,21 @@ translate(const char* format, const char* vars, const void* args[])
 		}
    }
 
-	if (parse(format)==NULL) return NULL;
-	retval = strdup(opop(const char*));
+	if (parse(&stack, format, userdata)==NULL) return NULL;
+	retval = strdup(opop(&stack, const char*));
 
 	return retval;
 }
 
 char *
-translate_va(const char* format, const char* vars, ...)
+translate_va(const char* format, const void * userdata, const char* vars, ...)
 {
 	char * retval;
 	va_list marker;
 	const char *ic = vars;
 	char symbol[32];
 	char *oc = symbol;
-
+	opstack * stack = NULL;
 	brelease();
 	free_variables();
 
@@ -368,76 +365,66 @@ translate_va(const char* format, const char* vars, ...)
    }
    va_end(marker);              /* Reset variable arguments.      */
 
-	if (parse(format)==NULL) return NULL;
-	retval = strdup(opop(const char*));
+	if (parse(&stack, format, userdata)==NULL) return NULL;
+	retval = strdup(opop(&stack, const char*));
 
 	return retval;
 }
 
 static void
-eval_eq(void) /* (int, int) -> int */
+eval_eq(opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
-	int a = opop(int);
-	int b = opop(int);
+	int a = opop(stack, int);
+	int b = opop(stack, int);
 	int rval = (a==b)?1:0;
-	opush(rval);
+	opush(stack, rval);
+	unused(userdata);
 }
 
 static void
-eval_add(void) /* (int, int) -> int */
+eval_add(opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
-	int a = opop(int);
-	int b = opop(int);
-	opush(a+b);
+	int a = opop(stack, int);
+	int b = opop(stack, int);
+	opush(stack, a+b);
+	unused(userdata);
 }
 
 static void
-eval_if(void) /* (int, int) -> int */
+eval_if(opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
-	void * a = opop(void *);
-	void * b = opop(void *);
-	int cond = opop(int);
-	opush(cond?b:a);
+	void * a = opop(stack, void *);
+	void * b = opop(stack, void *);
+	int cond = opop(stack, int);
+	opush(stack, cond?b:a);
+	unused(userdata);
 }
 
 #include "base36.h"
 static void
-eval_int(void)
+eval_int(opstack ** stack, const void * userdata)
 {
-	int i = opop(int);
+	int i = opop(stack, int);
 	const char * c = itoa10(i);
-	opush(strcpy(balloc(strlen(c)+1), c));
+	opush(stack, strcpy(balloc(strlen(c)+1), c));
+	unused(userdata);
 }
 
 #include "language.h"
 static void
-eval_localize(void) /* (locale, string) -> string */
+eval_localize(opstack ** stack, const void * userdata) /* (string, locale) -> string */
 {
-	const struct locale *lang = opop(const struct locale *);
-	const char *c = opop(const char *);
-	const char *r = locale_string(lang, c);
-
-	bfree((char*)c);
-	opush(r);
-}
-
-struct unit;
-extern const char * unitname(const struct unit *u);
-
-static void
-eval_unit(void) /* unit -> string */
-{
-	const struct unit * u = opop(const struct unit *);
-	const char * c = u?"unit u":"nobody";
-	size_t len = strlen(c);
-	opush(strcpy(balloc(len+1), c));
+	const struct locale *lang = opop(stack, const struct locale *);
+	const char *c = opop(stack, const char *);
+	c = locale_string(lang, c);
+	opush(stack, strcpy(balloc(strlen(c)+1), c));
+	unused(userdata);
 }
 
 void
 translation_init(void)
 {
 	add_function("eq", &eval_eq);
-	add_function("unit", &eval_unit);
 	add_function("int", &eval_int);
 	add_function("add", &eval_add);
 	add_function("if", &eval_if);

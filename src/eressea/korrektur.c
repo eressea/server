@@ -123,14 +123,12 @@ fix_skills(void)
 	fscanf(F, "%s", zText);
 	magic = atoi36(zText);
 	{ /* check for magic key */
-		attrib * a = a_find(global.attribs, &at_key);
-		/* make sure that this is done only once! */
-		while (a && a->data.i!=magic) a=a->next;
+		attrib * a = find_key(global.attribs, magic);
 		if (a) {
 			log_warning(("[fix_skills] function was called a second time\n"));
 			return;
 		}
-		a_add(&global.attribs, a_new(&at_key))->data.i = magic;
+		a_add(&global.attribs, make_key(magic));
 	}
 	for (;;) {
 		int from, self, teach, skill;
@@ -155,8 +153,7 @@ fix_skills(void)
 /* make sure that this is done only once! */
 #define do_once(magic, fun) \
 { \
-	attrib * a = a_find(global.attribs, &at_key); \
-	while (a && a->data.i!=(magic)) a=a->next; \
+	attrib * a = find_key(global.attribs, (magic)); \
 	if (a) { \
 		log_warning(("[do_once] a unique fix %d=\"%s\" was called a second time\n", magic, itoa36(magic))); \
 	} else { \
@@ -488,7 +485,7 @@ resolve_border(void * data)
 {
 	border_info * info = (border_info *)data;
 	region * to = rconnect(info->from, info->dir);
-	if (!to) fprintf(stderr, "WARNING: border can only exist between two regions\n");
+	if (!to) log_warning(("border can only exist between two regions\n"));
 	else {
 		border * b = new_border(info->type, info->from, to);
 		b->attribs = info->attribs;
@@ -825,21 +822,6 @@ fix_score_option(void)
 
 #if 0
 static void
-fix_randencounter(void) {
-	region * r;
-	for (r=regions;r;r=r->next) {
-		if (!r->land || rterrain(r)==T_GLACIER || r->units || r->ships || r->buildings) continue;
-		if (fval(r, RF_ENCOUNTER)) {
-			fputs("\n\nWARNING: FI_RANDENCOUNTER WAS STILL ENABLED\n\n", stderr);
-			return;
-		}
-		fset(r, RF_ENCOUNTER);
-	}
-}
-#endif
-
-#if 0
-static void
 fix_wounds(void)
 {
 	region *r;
@@ -911,37 +893,6 @@ name_seaserpents(void)
 		}
 	}
 }
-
-static void
-give_questling(void)
-{
-	unit *u1, *u2;
-
-	if((u1=findunitg(15474, NULL))==NULL)  /* Questling */
-		return;
-	if((u2=findunitg(1429665, NULL))==NULL)  /* Harmloser Wanderer */
-		return;
-	if (u1->faction==u2->faction) return;
-
-	add_message(&u1->faction->msgs,
-		new_message(u1->faction, "give%u:unit%u:target%r:region%X:resource%i:amount",
-			u1, u2, u1->region, r_unit, 1));
-	u_setfaction(u1, u2->faction);
-	add_message(&u2->faction->msgs,
-		new_message(u1->faction, "give%u:unit%u:target%r:region%X:resource%i:amount",
-			u1, u2, u1->region, r_unit, 1));
-}
-
-#if 0
-static void
-old_rsetroad(region * r, int val)
-{
-	attrib * a = a_find(r->attribs, &at_road);
-	if (!a && val) a = a_add(&r->attribs, a_new(&at_road));
-	else if (a && !val) a_remove(&r->attribs, a);
-	if (val) a->data.i = val;
-}
-#endif
 
 static int
 old_rroad(region * r)
@@ -1103,7 +1054,7 @@ fix_buildings(void)
 	int first;
 
 	if((statfile=fopen("building.txt","r"))==NULL) {
-		printf("WARNING: fix_buildings: cannot open building.txt!\n");
+		log_warning(("fix_buildings: cannot open building.txt!\n"));
 		return;
 	}
 
@@ -1602,7 +1553,7 @@ fix_prices(void)
 
 	for(r=regions; r; r=r->next) if(r->land) {
 		int sales = 0, buys = 0;
-		const luxury_type *sale, *ltype;
+		const luxury_type *sale = NULL, *ltype;
 		struct demand *dmd;
 		for (dmd=r->land->demands;dmd;dmd=dmd->next) {
 			if(dmd->value == 0) {
@@ -1620,6 +1571,7 @@ fix_prices(void)
 			r_setdemand(r, ltype, 0);
 			sale = ltype;
 		}
+		assert(sale);
 		if(buys == 0) {
 			for(ltype=luxurytypes; ltype; ltype=ltype->next) {
 				if(ltype != sale) r_setdemand(r, ltype, 1 + rand() % 5);
@@ -2132,27 +2084,58 @@ fix_timeouts(void)
 
 #include <modules/gmcmd.h>
 static void
+update_gmquests(void)
+{
+	struct faction * f;
+
+	/* Isilpetz wil keine Orks */
+	f = findfaction(atoi36("gm00"));
+	while (f && (strstr(f->name, "gelsen")==0 || find_key(f->attribs, atoi36("quest")))) f = f->next; /* Isilpetz finden */
+	if (f) {
+		unit * u = f->units;
+		plane * p = rplane(u->region);
+		p->flags |= PFL_NOORCGROWTH;
+	}
+
+	/* neue gm commands */
+	/* alle muessen noch ein gm:take kriegen */
+	for (f=factions;f;f=f->next) {
+		attrib * a;
+		if (!find_key(f->attribs, atoi36("quest"))) continue;
+		a = a_find(f->attribs, &at_permissions);
+		assert(a || !"gm-partei ohne permissions!");
+		if (!find_key((attrib*)a->data.v, atoi36("gmtake")))
+			a_add((attrib**)&a->data.v, make_key(atoi36("gmtake")));
+	}
+/*
+ * f = gm_addquest("BigBear@nord-com.net", "Leonidas Vermächtnis", 15, PFL_NOMAGIC|PFL_NOSTEALTH);
+ * log_printf("Neue Questenpartei %s\n", factionname(f));
+ */
+
+}
+
+static void
 test_gmquest(void)
 {
-	const struct faction * f;
-	/* enno's world */
-	f = gm_addquest("enno@eressea.upb.de", "GM Zone", 1, PFL_NOATTACK|PFL_NOALLIANCES|PFL_NOFEED|PFL_FRIENDLY);
-	log_printf("Neue Questenpartei %s\n", factionname(f));
+	 const struct faction * f;
+	 /* enno's world */
+	 f = gm_addquest("enno@eressea.upb.de", "GM Zone", 1, PFL_NOATTACK|PFL_NOALLIANCES|PFL_NOFEED|PFL_FRIENDLY);
+	 log_printf("Neue Questenpartei %s\n", factionname(f));
 
-	f = gm_addquest("xandril@att.net", "Mardallas Welt", 40, 0);
-	log_printf("Neue Questenpartei %s\n", factionname(f));
+	 f = gm_addquest("xandril@att.net", "Mardallas Welt", 40, 0);
+	 log_printf("Neue Questenpartei %s\n", factionname(f));
 
-	f = gm_addquest("moritzsalinger@web.de", "Laen-Kaiser", 7, /*PFL_NORECRUITS |*/ PFL_NOMAGIC /*| PFL_NOBUILD*/);
-	log_printf("Neue Questenpartei %s\n", factionname(f));
+	 f = gm_addquest("moritzsalinger@web.de", "Laen-Kaiser", 7, /*PFL_NORECRUITS |*/ PFL_NOMAGIC /*| PFL_NOBUILD*/);
+	 log_printf("Neue Questenpartei %s\n", factionname(f));
 
-	f = gm_addquest("Denise.Muenstermann@home.gelsen-net.de", "Mochikas Queste", 7, PFL_NOMAGIC);
-	log_printf("Neue Questenpartei %s\n", factionname(f));
+	 f = gm_addquest("Denise.Muenstermann@home.gelsen-net.de", "Mochikas Queste", 7, PFL_NOMAGIC);
+	 log_printf("Neue Questenpartei %s\n", factionname(f));
 
-	f = gm_addquest("feeron@aol.com", "Eternath", 11, 0);
-	log_printf("Neue Questenpartei %s\n", factionname(f));
-	
-	f = gm_addquest("BigBear@nord-com.net", "Leonidas Vermächtnis", 15, PFL_NOMAGIC|PFL_NOSTEALTH);
-	log_printf("Neue Questenpartei %s\n", factionname(f));
+	 f = gm_addquest("feeron@aol.com", "Eternath", 11, 0);
+	 log_printf("Neue Questenpartei %s\n", factionname(f));
+ 
+	 f = gm_addquest("BigBear@nord-com.net", "Leonidas Vermächtnis", 15, PFL_NOMAGIC|PFL_NOSTEALTH);
+	 log_printf("Neue Questenpartei %s\n", factionname(f));
 
 }
 
@@ -2164,8 +2147,9 @@ korrektur(void)
 #endif
 	make_gms();
 	/* Wieder entfernen! */
+#ifdef BROKEN_OWNERS
 	verify_owners(false);
-
+#endif
 	/* fix_herbtypes(); */
 #ifdef CONVERT_TRIGGER
 	convert_triggers();
@@ -2174,8 +2158,9 @@ korrektur(void)
 	fix_allies();
 	do_once(atoi36("fhrb"), fix_herbs());
 	do_once(atoi36("ftos"), fix_timeouts());
-	do_once(atoi36("gmtst"), test_gmquest()); /* test gm quests */
 	do_once(atoi36("fixsl"), fix_prices());
+	do_once(atoi36("gmtst"), test_gmquest()); /* test gm quests */
+	update_gmquests(); /* test gm quests */
 #ifndef SKILLFIX_SAVE
 	fix_skills();
 #endif
@@ -2188,12 +2173,6 @@ korrektur(void)
 		name_seaserpents();
 		break;
 	case 189:
-		break;
-	case 190:
-		give_questling();
-		break;
-	case 191:
-		give_questling(); /* try again */
 		break;
 	case 194:
 		remove_impossible_dragontargets();

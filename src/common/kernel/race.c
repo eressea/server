@@ -580,7 +580,7 @@ struct racedata race[MAXRACES] =
 		true,
 		RCF_KILLPEASANTS|RCF_SCAREPEASANTS|RCF_ATTACKRANDOM|RCF_MOVERANDOM|RCF_LEARN|RCF_WALK|RCF_NOTEACH|RCF_DESERT,
 		BF_MAGIC_EQUIPMENT,
-		0,
+		ECF_REC_ETHEREAL,
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE},
 		&shadow_name, NULL,
 	},
@@ -1150,7 +1150,7 @@ struct racedata race[MAXRACES] =
 		BF_EQUIPMENT | BF_MAGIC_EQUIPMENT,
 
 		/* Economic-Flags */
-		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM | REC_HORSES,
+		GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM | ECF_REC_HORSES,
 
 		/* Vertraute für den Zauber
 		   (Generisch, Illaun, Tybied, Cerddor, Gwyrrd, Draig) */
@@ -1793,9 +1793,9 @@ struct racedata race[MAXRACES] =
 			     0,  0,  0,  0,   0,  0,  0,  0,   0,  0,  0,  0,   0
 		},
 		true, /* Nonplayer (bei Gelegenheit entfernen) */
-		(RCF_SHAPESHIFT | RCF_FLY | RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM), /* flags */
+		(RCF_SHAPESHIFTANY | RCF_SHAPESHIFT | RCF_FLY | RCF_WALK | RCF_LEARN | RCF_MOVERANDOM | RCF_ATTACKRANDOM), /* flags */
 		(BF_EQUIPMENT | BF_MAGIC_EQUIPMENT),                      /* battle  */
-		(CANGUARD | GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM),  /* economy */
+		(ECF_REC_ETHEREAL | ECF_REC_UNLIMITED | CANGUARD | GIVEITEM | GIVEPERSON | GIVEUNIT | GETITEM),  /* economy */
 		/* Vertraute für den Zauber (Gen, Ill, Tyb, Cer, Gwy, Dra) */
 		{NORACE,NORACE,NORACE,NORACE,NORACE,NORACE}
 	}
@@ -1950,7 +1950,7 @@ boolean is_undead(const unit *u)
 		|| u->race == RC_GHOUL_LORD;
 }
 
-extern void 
+extern void
 init_races(void)
 {
 	a_add(&race[RC_TROLL].attribs, make_skillmod(NOSKILL, SMF_RIDING, NULL, 0.0, -1));

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: unitmessage.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: unitmessage.c,v 1.3 2001/04/12 17:21:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -65,7 +65,7 @@ unitmessage_handle(trigger * t, void * data)
 	if (td->target!=NULL) {
 		addmessage(td->target->region, td->target->faction, td->string, td->type, td->level);
 	} else
-		fprintf(stderr, "\aERROR: could not perform unitmessage::handle()\n");
+		log_error(("could not perform unitmessage::handle()\n"));
 	unused(data);
 	return 0;
 }
@@ -111,7 +111,7 @@ trigger_unitmessage(unit * target, const char * string, int type, int level)
 	trigger * t = t_new(&tt_unitmessage);
 	unitmessage_data * td = (unitmessage_data*)t->data.v;
 	td->target = target;
-	td->string = escape_string(strdup(string), SPACE_REPLACEMENT);
+	td->string = space_replace(strdup(string), SPACE_REPLACEMENT);
 	td->type = type;
 	td->level = level;
 	return t;

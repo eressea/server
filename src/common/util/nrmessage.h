@@ -15,14 +15,18 @@ struct message;
 struct message_type;
 struct nrmessage_type;
 
-extern int nr_render(const struct message * msg, const struct locale * lang,
-                      char * buffer);
 extern void nrt_register(const struct message_type * mtype, 
                          const struct locale * lang, const char * script, 
 								 int level, const char * section);
+extern struct nrmessage_type * nrt_find(const struct locale *, 
+													 const struct message_type *);
+extern const char * nrt_string(const struct nrmessage_type *type);
 
+extern int nr_render(const struct message * msg, const struct locale * lang,
+                     char * buffer, const void * userdata);
 extern int nr_level(const struct message *msg);
 extern const char * nr_section(const struct message *msg);
+
 
 /* before:
  * fogblock;movement:0;de;{unit} konnte von {region} nicht nach {$dir direction} ausreisen, der Nebel war zu dicht.

@@ -36,6 +36,8 @@ extern struct message * msg_create_va(const struct message_type * type, ...);
 extern void msg_free(struct message *m);
 	/* remove message and associated data from memory */
 
+extern const char * mt_name(const struct message_type* mtype);
+
 /** message_type registry (optional): **/
 extern const struct message_type * mt_register(const struct message_type *);
 extern const struct message_type * mt_find(const char *);

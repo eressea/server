@@ -8,7 +8,7 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: message.c,v 1.2 2001/02/28 22:14:58 enno Exp $
+ $Id: message.c,v 1.3 2001/04/12 17:21:45 enno Exp $
 */
 
 #include <config.h>
@@ -19,6 +19,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+
+const char * 
+mt_name(const message_type* mtype)
+{
+	return mtype->name;
+}
 
 message_type * 
 mt_new(const char * name, const char * args[])

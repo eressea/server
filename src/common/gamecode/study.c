@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: study.c,v 1.9 2001/04/01 06:58:37 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -18,6 +17,9 @@
  * This program may not be sold or used commercially without prior written
  * permission from the authors.
  */
+
+#define TEACH_ALL 1
+#define TEACH_FRIENDS 1
 
 #include <config.h>
 #include "eressea.h"
@@ -116,13 +118,95 @@ static const attrib_type at_learning = {
 	ATF_UNIQUE
 };
 
+static int
+teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean report)
+{
+	attrib * a;
+	int n;
+
+	/* learning sind die Tage, die sie schon durch andere Lehrer zugute
+	 * geschrieben bekommen haben. Total darf dies nicht über 30 Tage pro Mann
+	 * steigen.
+	 *
+	 * n ist die Anzahl zusätzlich gelernter Tage. n darf max. die Differenz
+	 * von schon gelernten Tagen zum max(30 Tage pro Mann) betragen. */
+
+#ifdef RANDOMIZED_LEARNING
+	n = student->number * dice(2,30);
+#else
+	n = student->number * 30;
+#endif
+	a = a_find(student->attribs, &at_learning);
+	if (a!=NULL) n -= a->data.i;
+
+	n = min(n, teaching);
+
+	if (n != 0) {
+		struct building * b = inside_building(teacher);
+		const struct building_type * btype = b?b->type:NULL;
+
+		if (a==NULL) a = a_add(&student->attribs, a_new(&at_learning));
+		a->data.i += n;
+
+		if (btype == &bt_academy && student->building==teacher->building && inside_building(student)!=NULL) {
+			int j = study_cost(teacher, sk);
+			j = max(50, j * 2);
+			if (get_pooled(teacher, teacher->region, R_SILVER) >= j) {		/* kann Einheit das zahlen? */
+				/* Jeder Schüler zusätzlich +10 Tage wenn in Uni. */
+				a->data.i += (n / 30) * 10; /* learning erhöhen */
+				/* Lehrer zusätzlich +1 Tag pro Schüler. */
+				set_skill(teacher, sk, get_skill(teacher, sk) + (n / 30));
+			}	/* sonst nehmen sie nicht am Unterricht teil */
+		}
+		/* Teaching ist die Anzahl Leute, denen man noch was beibringen kann. Da
+		 * hier nicht n verwendet wird, werden die Leute gezählt und nicht die
+		 * effektiv gelernten Tage. -> FALSCH ? (ENNO)
+		 *
+		 * Eine Einheit A von 11 Mann mit Talent 0 profitiert vom ersten Lehrer B
+		 * also 10x30=300 tage, und der zweite Lehrer C lehrt für nur noch 1x30=30
+		 * Tage (damit das Maximum von 11x30=330 nicht überschritten wird).
+		 *
+		 * Damit es aber in der Ausführung nicht auf die Reihenfolge drauf ankommt,
+		 * darf der zweite Lehrer C keine weiteren Einheiten D mehr lehren. Also
+		 * wird student 30 Tage gutgeschrieben, aber teaching sinkt auf 0 (300-11x30 <=
+		 * 0).
+		 *
+		 * Sonst träte dies auf:
+		 *
+		 * A: lernt B: lehrt A C: lehrt A D D: lernt
+		 *
+		 * Wenn B vor C dran ist, lehrt C nur 30 Tage an A (wie oben) und
+		 * 270 Tage an D.
+		 *
+		 * Ist C aber vor B dran, lehrt C 300 tage an A, und 0 tage an D,
+		 * und B lehrt auch 0 tage an A.
+		 *
+		 * Deswegen darf C D nie lehren dürfen.
+		 *
+		 * -> Das ist wirr. wer hat das entworfen?
+		 * Besser wäre, man macht erst vorab alle zuordnungen, und dann 
+		 * die Talentänderung (enno).
+		 */
+
+		teaching = max(0, teaching - student->number * 30);
+
+		if (report || teacher->faction != student->faction) {
+			add_message(&student->faction->msgs, new_message(student->faction,
+				"teach%u:teacher%u:student%t:skill", teacher, student, sk));
+			add_message(&teacher->faction->msgs, new_message(teacher->faction,
+				"teach%u:teacher%u:student%t:skill", teacher, student, sk));
+		}
+	}
+	return n;
+}
+
 static void
 teach(region * r, unit * u)
 {
 	/* Parameter r gebraucht, um kontrollieren zu können, daß die Ziel-Unit auch
 	 * in der selben Region ist (getunit). Lehren vor lernen. */
 	static char order[BUFSIZE];
-	int teaching, n, i, j, count;
+	int teaching, i, j, count;
 	unit *u2;
 	char *s;
 	skill_t sk;
@@ -155,8 +239,49 @@ teach(region * r, unit * u)
 
 	u2 = 0;
 	count = 0;
+#if TEACH_ALL
+	if (getparam()==P_ANY) {
+		unit * student = r->units;
+		skill_t teachskill[MAXSKILLS];
+		int i = 0;
+		do {
+			sk = getskill();
+			teachskill[i++]=sk;
+		} while (sk!=NOSKILL);
+		while (teaching && student) {
+			if (student->faction == u->faction) {
+				if (igetkeyword(student->thisorder) == K_STUDY) {
+					/* Input ist nun von student->thisorder !! */
+					sk = getskill();
+					if (sk!=NOSKILL && teachskill[0]!=NOSKILL) {
+						for (i=0;teachskill[i]!=NOSKILL;++i) if (sk==teachskill[i]) break;
+						sk = teachskill[i];
+					}
+					if (sk != NOSKILL && eff_skill(u, sk, r) > eff_skill(student, sk, r)) {
+						teaching -= teach_unit(u, student, teaching, sk, true);
+					}
+				}
+			}
+			student = student->next;
+		}
+#if TEACH_FRIENDS
+		while (teaching && student) {
+			if (student->faction != u->faction && allied(u, student->faction, HELP_GUARD)) {
+				if (igetkeyword(student->thisorder) == K_STUDY) {
+					/* Input ist nun von student->thisorder !! */
+					sk = getskill();
+					if (sk != NOSKILL && eff_skill(u, sk, r) > eff_skill(student, sk, r)) {
+						teaching -= teach_unit(u, student, teaching, sk, true);
+					}
+				}
+			}
+			student = student->next;
+		}
+#endif
+	} 
+	else
+#endif
 	for (;;) {
-		attrib * a;
 		/* Da später in der Schleife igetkeyword (u2->thisorder) verwendet wird,
 		 * muß hier wieder von vorne gelesen werden. Also merken wir uns, an
 		 * welcher Stelle wir hier waren...
@@ -259,75 +384,9 @@ teach(region * r, unit * u)
 				continue;
 			}
 		}
-		/* learning sind die Tage, die sie schon durch andere Lehrer zugute
-		 * geschrieben bekommen haben. Total darf dies nicht über 30 Tage pro Mann
-		 * steigen.
-		 *
-		 * n ist die Anzahl zusätzlich gelernter Tage. n darf max. die Differenz
-		 * von schon gelernten Tagen zum max(30 Tage pro Mann) betragen. */
 
-#ifdef RANDOMIZED_LEARNING
-		n = u2->number * dice(2,30);
-#else
-		n = u2->number * 30;
-#endif
-		a = a_find(u2->attribs, &at_learning);
-		if (a!=NULL) n -= a->data.i;
+		teaching -= teach_unit(u, u2, teaching, sk, false);
 
-		n = min(n, teaching);
-
-		if (n != 0) {
-			struct building * b = inside_building(u);
-			const struct building_type * btype = b?b->type:NULL;
-
-			if (a==NULL) a = a_add(&u2->attribs, a_new(&at_learning));
-			a->data.i += n;
-
-			if (btype == &bt_academy && u2->building==u->building && inside_building(u2)!=NULL) {
-				j = study_cost(u, sk);
-				j = max(50, j * 2);
-				if (get_pooled(u, r, R_SILVER) >= j) {		/* kann Einheit das zahlen? */
-					/* Jeder Schüler zusätzlich +10 Tage wenn in Uni. */
-					a->data.i += (n / 30) * 10; /* learning erhöhen */
-					/* Lehrer zusätzlich +1 Tag pro Schüler. */
-					set_skill(u, sk, get_skill(u, sk) + (n / 30));
-				}	/* sonst nehmen sie nicht am Unterricht teil */
-			}
-			/* Teaching ist die Anzahl Leute, denen man noch was beibringen kann. Da
-			 * hier nicht n verwendet wird, werden die Leute gezählt und nicht die
-			 * effektiv gelernten Tage.
-			 *
-			 * Eine Einheit A von 11 Mann mit Talent 0 profitiert vom ersten Lehrer B
-			 * also 10x30=300 tage, und der zweite Lehrer C lehrt für nur noch 1x30=30
-			 * Tage (damit das Maximum von 11x30=330 nicht überschritten wird).
-			 *
-			 * Damit es aber in der Ausführung nicht auf die Reihenfolge drauf ankommt,
-			 * darf der zweite Lehrer C keine weiteren Einheiten D mehr lehren. Also
-			 * wird u2 30 Tage gutgeschrieben, aber teaching sinkt auf 0 (300-11x30 <=
-			 * 0).
-			 *
-			 * Sonst träte dies auf:
-			 *
-			 * A: lernt B: lehrt A C: lehrt A D D: lernt
-			 *
-			 * Wenn B vor C dran ist, lehrt C nur 30 Tage an A (wie oben) und
-			 * 270 Tage an D.
-			 *
-			 * Ist C aber vor B dran, lehrt C 300 tage an A, und 0 tage an D,
-			 * und B lehrt auch 0 tage an A.
-			 *
-			 * Deswegen darf C D nie lehren dürfen.
-			 */
-
-			teaching = max(0, teaching - u2->number * 30);
-
-			if (u->faction != u2->faction) {
-				add_message(&u2->faction->msgs, new_message(u2->faction,
-					"teach%u:teacher%u:student%t:skill", u, u2, sk));
-				add_message(&u->faction->msgs, new_message(u->faction,
-					"teach%u:teacher%u:student%t:skill", u, u2, sk));
-			}
-		}
 	}
 }
 /* ------------------------------------------------------------- */

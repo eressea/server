@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- * $Id: alp.c,v 1.3 2001/04/01 06:58:41 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -150,7 +149,7 @@ sp_summon_alp(struct castorder *co)
 }
 
 
-static void
+void
 alp_findet_opfer(unit *alp, region *r)
 {
 	curse * c;
@@ -202,70 +201,23 @@ alp_findet_opfer(unit *alp, region *r)
 }
 
 void
-monster_seeks_target(region *r, unit *u)
-{
-	direction_t d;
-	strlist *S, **SP;
-	unit *target;
-	int dist, dist2;
-	direction_t i;
-	region *nr;
-
-	/* Das Monster sucht ein bestimmtes Opfer.  Welches, steht
-	 * in einer Referenz (alles noch nicht richtig implementiert...)
-	 */
-
-	target = NULL;	/* TODO: aus Referenz holen */
-	/* TODO: prüfen, ob target überhaupt noch existiert... */
-
-	if( r == target->region ) { /* Wir haben ihn! */
-		switch( u->race ) {
-			case RC_ALP:
-				alp_findet_opfer(u, r);
-				break;
-			default:
-				assert(!"Seeker-Monster hat keine Aktion fuer Ziel");
-		}
-		return;
-	}
-
-	/* Simpler Ansatz: Nachbarregion mit gerinster Distanz suchen.
-	 * Sinnvoll momentan nur bei Monstern, die sich nicht um das
-	 * Terrain kümmern.  Nebelwände & Co machen derzeit auch nix...
-	 */
-	dist2 = distance(r, target->region);
-	d = NODIRECTION;
-	for( i = 0; i < MAXDIRECTIONS; i++ ) {
-		nr = rconnect(r, i);
-		assert(nr);
-		dist = distance(nr, target->region);
-		if( dist < dist2 ) {
-			dist2 = dist;
-			d = i;
-		}
-	}
-	assert(d != NODIRECTION );
-
-	switch( u->race ) {
-		case RC_ALP:
-			if( !(u->age % 2) )		/* bewegt sich nur jede zweite Runde */
-				d = NODIRECTION;
-			break;
-		default:
-			break;
-	}
-
-	if( d == NODIRECTION )
-		return;
-	sprintf(buf, "%s %s", keywords[K_MOVE], directions[d]);
-	SP = &u->orders;
-	S = makestrlist(buf);
-	addlist2(SP, S);
-	*SP = 0;
-}
-
-void
 init_alp(void)
 {
 	at_register(&at_alp);
+}
+
+unit *
+alp_target(unit *alp)
+{
+	alp_data* ad;
+	unit * target = NULL;
+
+	attrib * a = a_find(alp->attribs, &at_alp);
+	
+	if (a) {
+		ad = (alp_data*) a->data.v;
+		target = ad->target;
+	}
+	return target;
+
 }

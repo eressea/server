@@ -130,14 +130,6 @@ gm_create(const char * str, struct unit * u)
 	}
 }
 
-struct attrib *
-find_key(struct attrib * attribs, int key)
-{
-	attrib * a = a_find(attribs, &at_key);
-	while (a && a->data.i!=key) a=a->nexttype;
-	return a;
-}
-
 /**
  ** GM: TERRAFORM <terrain> <x> <y>
  ** requires: permission-key "gmterf"
@@ -226,6 +218,40 @@ gm_give(const char * str, struct unit * u)
 }
 
 /**
+ ** GM: TAKE <unit> <int> <itemtype>
+ ** requires: permission-key "gmtake"
+ **/
+static void
+gm_take(const char * str, struct unit * u)
+{
+	unit * to = findunit(atoi36(igetstrtoken(str)));
+	int num = atoi(getstrtoken());
+	const item_type * itype = finditemtype(getstrtoken(), u->faction->locale);
+
+	if (to==NULL || rplane(to->region) != rplane(u->region)) {
+		/* unknown or in another plane */
+		mistake(u, str, "Die Einheit wurde nicht gefunden.\n", 0);
+	} else if (itype==NULL || i_get(to->items, itype)==0) {
+		/* unknown or not enough */
+		mistake(u, str, "So einen Gegenstand hat die Einheit nicht.\n", 0);
+	} else {
+		/* checking permissions */
+		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
+		if (!permissions || !find_key((attrib*)permissions->data.v, atoi36("gmtake"))) {
+			mistake(u, str, "Unzureichende Rechte für diesen Befehl.\n", 0);
+		}
+		else {
+			int i = i_get(to->items, itype);
+			if (i<num) num=i;
+			if (num) {
+				i_change(&to->items, itype, -num);
+				i_change(&u->items, itype, num);
+			}
+		}
+	}
+}
+
+/**
  ** GM: SKILL <unit> <skill> <tage>
  ** requires: permission-key "gmskil"
  **/
@@ -283,6 +309,7 @@ init_gmcmd(void)
 	add_gmcommand(&g_cmds, "terraform", &gm_terraform);
 	add_gmcommand(&g_cmds, "create", &gm_create);
 	add_gmcommand(&g_cmds, "give", &gm_give);
+	add_gmcommand(&g_cmds, "take", &gm_take);
 	add_gmcommand(&g_cmds, "teleport", &gm_teleport);
 	add_gmcommand(&g_cmds, "skill", &gm_skill);
 }
@@ -387,6 +414,7 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmtele")));
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmgive")));
 	a_add((attrib**)&a->data.v, make_key(atoi36("gmskil")));
+	a_add((attrib**)&a->data.v, make_key(atoi36("gmtake")));
 	
 	a_add((attrib**)&a->data.v, make_atgmcreate(resource2item(r_silver)));
 

@@ -21,22 +21,9 @@
 #ifndef ERESSEA_H
 #define ERESSEA_H
 
-#ifndef NEW_MESSAGES
-#define MSG_LEVELS /* msg-levels wieder aktiviert */
-#define OLD_MESSAGES
-#define message_type messagetype
-#define message_list message
-#define report_section message
-#else
-#undef MSG_LEVELS
-#endif
-
-#ifndef NEW_MESSAGES
-#define OLD_MESSAGES
-#define message_type messagetype
-#define message_list message
-#define report_section message
-#endif
+#define AT_MOVED
+#undef MSG_LEVELS /* msg-levels wieder aktiviert */
+#undef OLD_MESSAGES
 
 /* basic types used in the eressea "kernel" */
 typedef unsigned char order_t;
@@ -795,8 +782,6 @@ enum {
 
 extern vmap region_map;
 
-#define unused(var) var = var
-
 #define i2b(i) ((boolean)((i)?(true):(false)))
 
 typedef struct ally {
@@ -994,11 +979,9 @@ struct region *findunitregion(const struct unit * su);
 
 char *estring(const char *s);
 char *cstring(const char *s);
-char *factionname(const struct faction * f);
-char *regionid(const struct region * r);
-char *unitname(const struct unit * u);
+const char *regionid(const struct region * r);
+const char *unitname(const struct unit * u);
 char *xunitid(const struct unit * u);
-char *shipname(const struct ship * sh);
 
 struct building *largestbuilding(const struct region * r, boolean img);
 

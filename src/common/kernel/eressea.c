@@ -42,7 +42,6 @@
 #include "monster.h"
 #include "race.h"
 #include "pool.h"
-#include "study.h"
 #include "region.h"
 #include "unit.h"
 #include "skill.h"
@@ -55,9 +54,9 @@
 #include <base36.h>
 #include <event.h>
 #include <umlaut.h>
-#ifdef NEW_MESSAGES
-# include <translation.h>
-#endif
+#include <translation.h>
+#include <crmessage.h>
+
 /* libc includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -491,13 +490,13 @@ verify_data (void)
 					lf = f->no;
 					printf("Partei %s:\n", factionid(f));
 				}
-				printf("WARNUNG: Einheit %s hat %d Personen\n", unitid(u), u->number);
+				log_warning(("Einheit %s hat %d Personen\n", unitid(u), u->number));
 			}
 		}
 		if (f->no != 0 && ((mage > 3 && f->race != RC_ELF) || mage > 4))
-			printf("FEHLER: Partei %s hat %d Magier.\n", factionid(f), mage);
+			log_error(("Partei %s hat %d Magier.\n", factionid(f), mage));
 		if (alchemist > 3)
-			printf("FEHLER: Partei %s hat %d Alchemisten.\n", factionid(f), alchemist);
+			log_error(("Partei %s hat %d Alchemisten.\n", factionid(f), alchemist));
 	}
 	list_next(f);
 #endif
@@ -1416,7 +1415,7 @@ cstring(const char *s)
 	return r;
 }
 
-char *
+const char *
 regionid(const region * r)
 {
 	char	*buf = idbuf[(++nextbuf) % 8];
@@ -1461,7 +1460,7 @@ largestbuilding (const region * r, boolean img)
 	return best;
 }
 
-char *
+const char *
 unitname(const unit * u)
 {
 	char *ubuf = idbuf[(++nextbuf) % 8];
@@ -1844,25 +1843,18 @@ init_tokens(void)
 	}
 }
 
-extern void render_cleanup(void);
-
 void
 kernel_done(void) 
 {
 	/* calling this function releases memory assigned to static variables, etc.
 	 * calling it is optional, e.g. a release server will most likely not do it.
 	 */
-#ifdef OLD_MESSAGES
-	render_cleanup();
-#else
 	translation_done();
-#endif
 	skill_done();
 	gc_done();
 }
 
 extern void attrib_init(void);
-extern void render_init(void);
 
 void
 read_strings(FILE * F)
@@ -1894,12 +1886,8 @@ kernel_init(void)
 	init_tokens();
 	skill_init();
 	attrib_init();
-	init_locales();
-#ifdef OLD_MESSAGES
-	render_init();
-#else
 	translation_init();
-#endif	
+
 	if (!turn) turn = lastturn();
 	if (turn == 0)
 		srand(time((time_t *) NULL));
@@ -2238,7 +2226,7 @@ besieged(const unit * u)
 {
 	/* belagert kann man in schiffen und burgen werden */
 	return (u
-			&& u->building
+			&& u->building && u->building->besieged
 			&& u->building->besieged >= u->building->size * SIEGEFACTOR);
 }
 
@@ -2550,6 +2538,7 @@ move_blocked(const unit * u, const region *r, direction_t dir)
 void
 add_income(unit * u, int type, int want, int qty)
 {
+	if (want==INT_MAX) want = qty;
 	add_message(&u->faction->msgs, new_message(u->faction, "income%u:unit%r:region%i:mode%i:wanted%i:amount",
 		u, u->region, type, want, qty));
 }

@@ -2159,7 +2159,7 @@ extern void create_teleport_plane(void);
 void read_strings(FILE * F);
 
 const char * messages[] = {
-	"%s/%s/messages.txt",
+	"%s/%s/messages.xml",
 	NULL
 };
 

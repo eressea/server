@@ -10,7 +10,21 @@
  without prior permission by the authors of Eressea.
 */
 
+struct opstack;
+extern void * opstack_pop(struct opstack ** stack);
+extern void opstack_push(struct opstack ** stack, void * data);
+#define opush(stack, i) opstack_push(stack, (void *)(i))
+#define opop(stack, T) (T)opstack_pop(stack)
+
 extern void translation_init(void);
 extern void translation_done(void);
-extern char * translate_va(const char* format, const char* vars, ...);
-extern char * translate(const char* format, const char* vars, const void* args[]);
+extern char * translate_va(const char* format, const void * userdata, const char* vars, ...);
+extern char * translate(const char* format, const void * userdata, const char* vars, const void* args[]);
+
+/* eval_x functions */
+typedef void (*evalfun)(struct opstack ** stack, const void *);
+extern void add_function(const char * symbol, evalfun parse);
+
+/* transient memory blocks */
+extern char * balloc(size_t size);
+

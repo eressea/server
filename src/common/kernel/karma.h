@@ -34,6 +34,7 @@ typedef enum {
 	FS_VARIEDMAGIC,
 	FS_JIHAD,
 	FS_UNDEAD,
+	FS_QUICK,
 	MAXFACTIONSPECIALS
 } fspecial_t;
 

@@ -7,15 +7,8 @@
  *      Enno Rehling (enno@eressea-pbem.de)
  *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
  *
- *  based on:
- *
- * Atlantis v1.0  13 September 1993 Copyright 1993 by Russell Wallace
- * Atlantis v1.7                    Copyright 1996 by Alex Schröder
- *
  * This program may not be used, modified or distributed without
  * prior permission by the authors of Eressea.
- * This program may not be sold or used commercially without prior written
- * permission from the authors.
  */
 
 #define FAST_SEEN 0
@@ -56,7 +49,6 @@
 #include <pool.h>
 #include <race.h>
 #include <region.h>
-#include <render.h>
 #include <reports.h>
 #include <save.h>
 #include <ship.h>
@@ -67,10 +59,10 @@
 /* util includes */
 #include <goodies.h>
 #include <base36.h>
-#ifdef NEW_MESSAGES
 #include <nrmessage.h>
+#include <translation.h>
 #include <util/message.h>
-#endif
+
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
@@ -732,29 +724,17 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean
 	if (!msgs) return;
 	for (category=msgclasses; category; category=category->next) {
 		int k = 0;
-#ifdef NEW_MESSAGES
 		struct mlist * m = msgs->begin;
-#else
-		message_list * m = msgs;
-#endif
 		while (m) {
 			boolean debug = viewer->options & want(O_DEBUG);
 #ifdef MSG_LEVELS
 			if (!debug && get_msglevel(viewer->warnings, viewer->msglevels, m->type) < m->level) continue;
 #endif
 			/* messagetype * mt = m->type; */
-#ifdef NEW_MESSAGES
 			if (strcmp(nr_section(m->msg), category->name)==0)
-#else
-			if (m->receiver==NULL || !viewer || viewer==m->receiver) 
-#endif
 			{
-#ifdef OLD_MESSAGES
-				const char * s = render(m, viewer->locale);
-#else
 				char buf[4096], *s = buf;
-				nr_render(m->msg, viewer->locale, s);
-#endif
+				nr_render(m->msg, viewer->locale, s, viewer);
 				if (!k && categorized) {
 					const char * name;
 					char cat_identifier[24];
@@ -2615,7 +2595,6 @@ void
 reports(void)
 {
 	faction *f;
-	region *r;
 	boolean gotit;
 	FILE *shfp, *F, *BAT;
 	int wants_report, wants_computer_report,
@@ -2638,20 +2617,13 @@ reports(void)
 	wants_bzip2 = 1 << O_BZIP2;
 	printf("\n");
 
-	for (r=regions;r;r=r->next) {
-		invert_list(&r->msgs);
-	}
 	report_donations();
 #if FAST_SEEN
 	init_intervals();
 #endif
 	remove_empty_units();
 	for (f = factions; f; f = f->next) {
-		struct bmsg * b;
 		attrib * a = a_find(f->attribs, &at_reportspell);
-		for (b = f->battles;b;b=b->next)
-			invert_list(&b->msgs);
-		invert_list(&f->battles);
 		current_faction = f;
 		gotit = false;
 
@@ -2661,7 +2633,6 @@ reports(void)
 		}
 		else printf("%s\n", factionname(f));
 		prepare_report(f);
-		invert_list(&f->msgs);
 		if (!nonr && (f->options & wants_report))
 		{
 			sprintf(buf, "%s/%s.nr", reportpath(), factionid(f));
@@ -2776,7 +2747,7 @@ reports(void)
 }
 
 void
-reports_cleanup(void)
+report_cleanup(void)
 {
 	int i;
 	for (i=0;i!=FMAXHASH;++i) {
@@ -3147,18 +3118,20 @@ writenewssubscriptions(void)
 {
 	char zText[MAX_PATH];
 	FILE *F;
-	faction *f;
 
 	sprintf(zText, "%s/news-subscriptions", basepath());
 	F = cfopen(zText, "w");
 	if (!F) return;
 #ifdef AT_OPTION
-	for(f=factions; f; f=f->next) {
-		attrib *a = a_find(f->attribs, &at_option_news);
-		if(!a) {
-			fprintf(F, "%s:0\n", f->email);
-		} else {
-			fprintf(F, "%s:%d\n", f->email, a->data.i);
+	{
+		faction *f;
+		for(f=factions; f; f=f->next) {
+			attrib *a = a_find(f->attribs, &at_option_news);
+			if(!a) {
+				fprintf(F, "%s:0\n", f->email);
+			} else {
+				fprintf(F, "%s:%d\n", f->email, a->data.i);
+			}
 		}
 	}
 #endif
@@ -3351,3 +3324,82 @@ report_summary(summary * s, summary * o, boolean full)
 	}
 }
 /******* end summary ******/
+
+static void
+eval_unit(struct opstack ** stack, const void * userdata) /* unit -> string */
+{
+	const struct unit * u = opop(stack, const struct unit *);
+	const char * c = u?unitname(u):"nobody";
+	size_t len = strlen(c);
+	opush(stack, strcpy(balloc(len+1), c));
+}
+
+static void
+eval_faction(struct opstack ** stack, const void * userdata) /* faction -> string */
+{
+	const struct faction * f = opop(stack, const struct faction *);
+	const char * c = factionname(f);
+	size_t len = strlen(c);
+	opush(stack, strcpy(balloc(len+1), c));
+}
+
+static void
+eval_region(struct opstack ** stack, const void * userdata) /* region -> string */
+{
+	const struct faction * f = (const struct faction *)userdata;
+	const struct region * r = opop(stack, const struct region *);
+	const char * c = regionname(r, f);
+	size_t len = strlen(c);
+	opush(stack, strcpy(balloc(len+1), c));
+}
+
+static void
+eval_ship(struct opstack ** stack, const void * userdata) /* ship -> string */
+{
+	const struct ship * u = opop(stack, const struct ship *);
+	const char * c = u?shipname(u):"nobody";
+	size_t len = strlen(c);
+	opush(stack, strcpy(balloc(len+1), c));
+}
+
+static void
+eval_building(struct opstack ** stack, const void * userdata) /* building -> string */
+{
+	const struct building * u = opop(stack, const struct building *);
+	const char * c = u?buildingname(u):"nobody";
+	size_t len = strlen(c);
+	opush(stack, strcpy(balloc(len+1), c));
+}
+
+static void
+eval_resource(struct opstack ** stack, const void * userdata)
+{
+	const faction * report = (const faction*)userdata;
+	int j = opop(stack, int);
+	struct resource_type * res = opop(stack, struct resource_type *);
+	
+	const char * c = locale_string(report->locale, resourcename(res, j!=1));
+	opush(stack, strcpy(balloc(strlen(c)+1), c));
+}
+
+static void
+eval_skill(struct opstack ** stack, const void * userdata)
+{
+	const faction * report = (const faction*)userdata;
+	int sk = opop(stack, int);
+	const char * c = locale_string(report->locale, skillnames[sk]);
+	opush(stack, strcpy(balloc(strlen(c)+1), c));
+	unused(userdata);
+}
+
+void
+report_init(void)
+{
+	add_function("region", &eval_region);
+	add_function("resource", &eval_resource);
+	add_function("faction", &eval_faction);
+	add_function("ship", &eval_ship);
+	add_function("unit", &eval_unit);
+	add_function("building", &eval_building);
+	add_function("skill", &eval_skill);
+}

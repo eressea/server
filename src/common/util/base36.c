@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: base36.c,v 1.3 2001/02/09 13:53:52 corwin Exp $
+ *	$Id: base36.c,v 1.4 2001/04/12 17:21:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -67,8 +67,8 @@ itoab(int i, int base)
 	}
 	s = as[index];
 	index = (index+1) % 4;
-	dst = s+6;
-
+	dst = s+7;
+	(*dst--)=0;
 	if (i!=0) {
 		if (i<0) {
 			i=-i;

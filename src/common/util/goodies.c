@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: goodies.c,v 1.7 2001/02/14 01:38:50 enno Exp $
+ *	$Id: goodies.c,v 1.8 2001/04/12 17:21:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -70,19 +70,33 @@ hashstring(const char* s)
 }
 
 char *
-escape_string(char * str, char replace)
+space_replace(char * str, char replace)
 {
 	char * c = str;
 	while (*c) {if (isspace(*c)) *c = replace; c++;}
 	return str;
 }
 
-char *
-unescape_string(char * str, char replace)
+const char *
+escape_string(const char * str, char * buffer, size_t len)
 {
-	char * c = str;
-	while (*c) { if (*c==replace) *c = ' '; c++; }
-	return str;
+	char s_buffer[4096];
+	const char * p = str;
+	char * o;
+	if (buffer==NULL) {
+		buffer = s_buffer;
+		len = sizeof(s_buffer);
+	}
+	o = buffer;
+	do {
+		switch (*p) {
+		case '\"':
+		case '\\':
+			(*o++) = '\\';
+		}
+		(*o++) = (*p);
+	} while (*p++);
+	return buffer;
 }
 
 char *

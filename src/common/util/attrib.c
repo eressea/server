@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: attrib.c,v 1.4 2001/02/14 07:44:57 enno Exp $
+ *	$Id: attrib.c,v 1.5 2001/04/12 17:21:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -14,6 +14,8 @@
 
 #include <config.h>
 #include "attrib.h"
+
+#include "log.h"
 
 #include <assert.h>
 #include <string.h>
@@ -44,7 +46,7 @@ at_register(attrib_type * at)
 	find = at_hash[at->hashkey % MAXATHASH];
 	while (find && at->hashkey!=find->hashkey) find = find->nexthash;
 	if (find && find==at) {
-		fprintf(stderr, "WARNING: attribute '%s' was registered more than once\n", at->name);
+		log_warning(("attribute '%s' was registered more than once\n", at->name));
 		return;
 	} else {
 		assert(!find || !"hashkey is already in use");

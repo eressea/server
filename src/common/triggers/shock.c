@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: shock.c,v 1.3 2001/02/15 02:41:47 enno Exp $
+ *	$Id: shock.c,v 1.4 2001/04/12 17:21:45 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -40,7 +40,7 @@ shock_handle(trigger * t, void * data)
 	if (u!=NULL) {
 		do_shock(u, "trigger");
 	} else
-		fprintf(stderr, "\aERROR: could not perform shock::handle()\n");
+		log_error(("could not perform shock::handle()\n"));
 	unused(data);
 	return 0;
 }
