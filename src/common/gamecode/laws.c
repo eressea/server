@@ -2221,7 +2221,7 @@ display_item(faction *f, unit *u, const item_type * itype)
   key = mkname("iteminfo", name);
   info = locale_string(f->locale, key);
 
-  if (info==key) {
+  if (info==key || strcmp(info, key)==0) {
     sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
     fp = fopen(filename, "r");
     if (!fp) {
