@@ -3,9 +3,10 @@ TARGETS = subdirs
 SUBDIRS = \
   common \
   eressea \
+  mapper
+
 #  askalon \
 #  tools \
-  mapper
 
 include Makefile.include
 

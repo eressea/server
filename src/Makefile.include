@@ -133,6 +133,8 @@ $(BUILD_DIR)/%.o:: %.c
 ## and only for old datafiles.
 ##
 
-#CFLAGS += -DCONVERT_TRIGGER
-#INCLUDES += -I. -I$(ERESSEA)/eressea/old
+ifeq ($(CONVERT_TRIGGERS), 1)
+ CFLAGS += -DCONVERT_TRIGGER
+ INCLUDES += -I. -I$(ERESSEA)/eressea/old
+endif
 
