@@ -94,7 +94,7 @@ blockcoord(int x)
 static char newblock[BLOCKSIZE][BLOCKSIZE];
 static int g_maxluxuries;
 
-static void
+void
 block_create(int x1, int y1, int size, char chaotisch, int special, char terrain)
 {
 	int local_climate;
@@ -103,9 +103,9 @@ block_create(int x1, int y1, int size, char chaotisch, int special, char terrain
 
 	vset_init(&fringe);
 
-	x1 = blockcoord(x1);
+/*	x1 = blockcoord(x1);
 	y1 = blockcoord(y1);
-	local_climate = climate(y1);
+*/	local_climate = climate(y1);
 
 	memset(newblock, T_OCEAN, sizeof newblock);
 	x = BLOCKSIZE / 2;
@@ -198,9 +198,9 @@ block_create(int x1, int y1, int size, char chaotisch, int special, char terrain
 		for (x = 0; x != BLOCKSIZE; x++) {
 			for (y = 0; y != BLOCKSIZE; y++) {
 				const luxury_type * sale = (rand()%2)?p1:p2;
-				r = findregion(x1 + x, y1 + y);
-				if (r) continue;
-				r = new_region(x1 + x, y1 + y);
+				r = findregion(x1 + x - BLOCKSIZE/2, y1 + y - BLOCKSIZE/2);
+				if (r && r->terrain!=T_OCEAN) continue;
+				if (r==NULL) r = new_region(x1 + x - BLOCKSIZE/2, y1 + y - BLOCKSIZE/2);
 				if (chaotisch) fset(r, RF_CHAOTIC);
 				if (special == 1) {
 					terraform(r, terrain);
@@ -1302,7 +1302,8 @@ Create_Island(region *r, int * n, terrain_t t, int x, int y) {
 }
 
 void
-create_island(region *r, int n, terrain_t t) {
+create_island(region *r, int n, terrain_t t) 
+{
 	int sx=r->x, sy=r->y, i, x = 0, y = 0;
 	direction_t d;
 	boolean abbruch=false;

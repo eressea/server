@@ -747,6 +747,7 @@ movearound(int rx, int ry) {
 	int hx = -1, hy = -1, ch, x, y, Rand, d, a, b, p, q, oldx=0, oldy=0;
 	int oldrx=0, oldry=0, Hx=0, Hy=0;
 	int sel;
+	static int editmode=0;
 	char *selc;
 	region *c, *r = NULL, *r2;
 	tagregion *tag;
@@ -788,11 +789,28 @@ movearound(int rx, int ry) {
 		} else
 #endif
 		{
+			int edit=0;
 			ch = getch();
 			unmark(x, y, rx, ry);
 
 			oldx=x; oldy=y; oldrx=rx; oldry=ry;
-			switch (ch) {
+			if (editmode) {
+				if (ch=='E') {
+					editmode=0;
+					edit=1;
+				} else {
+					region * r = findregion(rx, ry);
+					if (r) {
+						int terrai = 0;
+						while (terrai!=MAXTERRAINS && tolower(terrain[terrai].symbol)!=tolower(ch)) ++terrai;
+						if (terrai!=MAXTERRAINS) {
+							edit=1;
+							terraform(r, (terrain_t)terrai);
+						}
+					}
+				}
+			}
+			if (!edit) switch (ch) {
 				case KEY_HELP:
 				case '?':
 					if (reglist) {
@@ -1048,6 +1066,7 @@ movearound(int rx, int ry) {
 				case 'I':
 					a=map_input(0,0,0,"Wieviele Regionen?",0,500,0);
 					if (a) {
+/*						block_create(rx, ry, a, 0, 0, T_GLACIER); */
 						create_island(r, a, (terrain_t)(rand()%(T_GLACIER)+1));
 						modified=1;
 					}
@@ -1138,10 +1157,9 @@ movearound(int rx, int ry) {
 						}
 					}
 					break;
-				case 'E':
-					clipunit = 0;
-					clipregion = 0;
-					break;
+			case 'E':
+				editmode = !editmode;
+				break;
 				case 'i':
 				case 'r':
 					showregion(r, 1);
