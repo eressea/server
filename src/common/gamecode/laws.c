@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.4 2001/01/29 19:15:12 corwin Exp $
+ *	$Id: laws.c,v 1.5 2001/01/30 20:02:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -20,19 +20,26 @@
  */
 
 #include <config.h>
-#include "eressea.h"
+#include <eressea.h>
 #include "laws.h"
 
-#include "item.h"
-#include "ship.h"
-#include "border.h"
-#include "faction.h"
-#include "alchemy.h"
-#include "economy.h"
-#include "message.h"
+#ifdef USE_GM_COMMANDS
+# include <modules/gmcmd.h>
+#endif
+
+#ifdef OLD_TRIGGER
+# include "old/trigger.h"
+#endif
+
+/* kernel includes */
+#include <item.h>
+#include <ship.h>
+#include <border.h>
+#include <faction.h>
+#include <alchemy.h>
+#include <message.h>
 #include "skill.h"
 #include "magic.h"
-#include "randenc.h"
 #include "movement.h"
 #include "monster.h"
 #include "spy.h"
@@ -40,24 +47,22 @@
 #include "battle.h"
 #include "region.h"
 #include "unit.h"
-#ifdef OLD_TRIGGER
-#include "old/trigger.h"
-#endif
-#include "economy.h"
 #include "plane.h"
 #include "study.h"
-#include "creation.h"
-#include "goodies.h"
 #include "karma.h"
 #include "pool.h"
 #include "building.h"
-#ifdef GROUPS
 #include "group.h"
-#endif
+
+/* gamecode includes */
+#include "economy.h"
+#include "creation.h"
+#include "randenc.h"
 
 /* util includes */
 #include <event.h>
 #include <base36.h>
+#include <goodies.h>
 #include <rand.h>
 
 /* libc includes */
@@ -2958,6 +2963,10 @@ processorders (void)
 	puts(" - neue Nummern und Reihenfolge");
 	renumber();
 	reorder();
+#ifdef USE_GM_COMMANDS
+	puts(" - GM Kommandos");
+	gmcommands();
+#endif
 	for (r = regions;r;r=r->next) reorder_owners(r);
 
 	puts(" - Attribute altern");

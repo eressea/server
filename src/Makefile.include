@@ -146,7 +146,7 @@ $(BUILD_DIR) $(PUBLISH_DIR):
 # object files:
 $(BUILD_DIR)/%:: $(BUILD_DIR)
 $(BUILD_DIR)/%.o:: %.c
-	@echo "Compiling $@ using $(MKFILES)"
+	@echo "Compiling $@"
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 ##

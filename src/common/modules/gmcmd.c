@@ -149,7 +149,7 @@ gm_terraform(const char * str, struct unit * u)
 	if (t!=MAXTERRAINS) terraform(u->region, t);
 }
 
-void
+static void
 gm_command(const char * cmd, struct unit * u)
 {
 	int i;
@@ -184,5 +184,30 @@ init_gmcmd(void)
 			a_add((attrib**)&a->data.v, make_key(atoi36("gmtf")));
 		}
 
+	}
+}
+
+
+/*
+ * execute gm-commands for all units in the game
+ */
+
+void
+gmcommands(void)
+{
+	region ** rp = &regions;
+	while (*rp) {
+		region * r = *rp;
+		unit **up = &r->units;
+		while (*up) {
+			unit * u = *up;
+			strlist * order;
+			for (order = u->orders; order; order = order->next)
+				if (igetkeyword(order->s) == K_GM) {
+					gm_command(u, order->s);
+				}			
+			if (u==*up) up = &u->next;
+		}
+		if (*rp==r) rp = &r->next;
 	}
 }

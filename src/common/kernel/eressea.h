@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.h,v 1.5 2001/01/30 19:32:44 enno Exp $
+ *	$Id: eressea.h,v 1.6 2001/01/30 20:02:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -403,6 +403,7 @@ enum {
 	K_PRAY,
 	K_SORT,
 	K_SETJIHAD,
+	K_GM,          /* perform GM commands */
 	MAXKEYWORDS,
 	NOKEYWORD = (keyword_t) - 1
 };
