@@ -407,9 +407,11 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
       }
     }
     if (!isbattle && u->lastorder) {
+      char * cmd = getcommand(u->lastorder);
       scat(", \"");
-      scat(getcommand(u->lastorder));
+      scat(cmd);
       scat("\"");
+      free(cmd);
     }
   }
   i = 0;

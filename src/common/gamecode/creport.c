@@ -677,101 +677,108 @@ cr_output_unit(FILE * F, const region * r,
 		fprintf(F, "%d;belagert\n", b->no);
 
 	/* additional information for own units */
-	if (u->faction == f || omniscient(f)) {
-          order * ord;
-		const char *c;
-		int i;
-		const attrib * a;
+  if (u->faction == f || omniscient(f)) {
+    order * ord;
+    const char *c;
+    char * cmd;
+    int i;
+    const attrib * a;
 
-		a = a_find(u->attribs, &at_follow);
-		if (a) {
-			unit * u = (unit*)a->data.v;
-			if (u) fprintf(F, "%d;folgt\n", u->no);
-		}
-		i = ualias(u);
-		if (i>0)
-			fprintf(F, "%d;temp\n", i);
-		else if (i<0)
-			fprintf(F, "%d;alias\n", -i);
-		i = get_money(u);
-		fprintf(F, "%d;Kampfstatus\n", u->status);
-		if(fval(u, UFL_NOAID)) {
-			fputs("1;unaided\n", F);
-		}
-		i = u_geteffstealth(u);
-		if (i >= 0)
-			fprintf(F, "%d;Tarnung\n", i);
-		c = uprivate(u);
-		if (c)
-			fprintf(F, "\"%s\";privat\n", c);
-		c = hp_status(u);
-		if (c && *c && (u->faction == f || omniscient(f)))
-			fprintf(F, "\"%s\";hp\n", add_translation(c, locale_string(u->faction->locale, c)));
-		if (fval(u, UFL_HUNGER) && (u->faction == f))
-			fputs("1;hunger\n", F);
-		if (is_mage(u)) {
-			fprintf(F, "%d;Aura\n", get_spellpoints(u));
-			fprintf(F, "%d;Auramax\n", max_spellpoints(u->region,u));
-		}
+    a = a_find(u->attribs, &at_follow);
+    if (a) {
+      unit * u = (unit*)a->data.v;
+      if (u) fprintf(F, "%d;folgt\n", u->no);
+    }
+    i = ualias(u);
+    if (i>0)
+      fprintf(F, "%d;temp\n", i);
+    else if (i<0)
+      fprintf(F, "%d;alias\n", -i);
+    i = get_money(u);
+    fprintf(F, "%d;Kampfstatus\n", u->status);
+    if(fval(u, UFL_NOAID)) {
+      fputs("1;unaided\n", F);
+    }
+    i = u_geteffstealth(u);
+    if (i >= 0)
+      fprintf(F, "%d;Tarnung\n", i);
+    c = uprivate(u);
+    if (c)
+      fprintf(F, "\"%s\";privat\n", c);
+    c = hp_status(u);
+    if (c && *c && (u->faction == f || omniscient(f)))
+      fprintf(F, "\"%s\";hp\n", add_translation(c, locale_string(u->faction->locale, c)));
+    if (fval(u, UFL_HUNGER) && (u->faction == f))
+      fputs("1;hunger\n", F);
+    if (is_mage(u)) {
+      fprintf(F, "%d;Aura\n", get_spellpoints(u));
+      fprintf(F, "%d;Auramax\n", max_spellpoints(u->region,u));
+    }
 
-		/* default commands */
-		fprintf(F, "COMMANDS\n");
-	  if (u->lastorder) fprintf(F, "\"%s\"\n", getcommand(u->lastorder));
-		for (ord = u->orders; ord; ord = ord->next) {
-                  if (is_persistent(ord) && ord!=u->lastorder) {
-                    fprintf(F, "\"%s\"\n", getcommand(ord));
-                  }
-		}
+    /* default commands */
+    fprintf(F, "COMMANDS\n");
+    if (u->lastorder) {
+      cmd = getcommand(u->lastorder);
+      fprintf(F, "\"%s\"\n", cmd);
+      free(cmd);
+    }
+    for (ord = u->orders; ord; ord = ord->next) {
+      if (is_persistent(ord) && ord!=u->lastorder) {
+        cmd = getcommand(ord);
+        fprintf(F, "\"%s\"\n", cmd);
+        free(cmd);
+      }
+    }
 
-		/* talents */
-		pr = 0;
+    /* talents */
+    pr = 0;
     for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-			if (sv->level>0) {
+      if (sv->level>0) {
         skill_t sk = sv->id;
-				int esk = eff_skill(u, sk, r);
-				if (!pr) {
-					pr = 1;
-					fprintf(F, "TALENTE\n");
-				}
-				fprintf(F, "%d %d;%s\n", u->number*level_days(sv->level), esk,
-					add_translation(skillname(sk, NULL), skillname(sk, f->locale)));
-			}
-		}
-		/* spells */
-		if (is_mage(u)) {
-			sc_mage * mage = get_mage(u);
-			spell_ptr *spt = mage->spellptr;
-			if (spt) {
-				spell *sp;
-				int i;
-				int t = effskill(u, SK_MAGIC);
-				fprintf(F, "SPRUECHE\n");
-				for (;spt; spt = spt->next) {
-					sp = find_spellbyid(spt->spellid);
-					if (sp) {
-						const char * name = sp->sname;
-						if (sp->level > t) continue;
-						if (sp->info==NULL) {
-							name = add_translation(mkname("spell", name), spell_name(sp, f->locale));
-						}
-						fprintf(F, "\"%s\"\n", name);
-					}
-				}
-				for (i=0;i!=MAXCOMBATSPELLS;++i) {
-					sp = find_spellbyid(mage->combatspell[i]);
-					if (sp) {
-						const char * name = sp->sname;
-						if (sp->info==NULL) {
-							name = add_translation(mkname("spell", name), spell_name(sp, f->locale));
-						}
-						fprintf(F, "KAMPFZAUBER %d\n", i);
-						fprintf(F, "\"%s\";name\n", name);
-						fprintf(F, "%d;level\n", mage->combatspelllevel[i]);
-					}
-				}
-			}
-		}
-	}
+        int esk = eff_skill(u, sk, r);
+        if (!pr) {
+          pr = 1;
+          fprintf(F, "TALENTE\n");
+        }
+        fprintf(F, "%d %d;%s\n", u->number*level_days(sv->level), esk,
+          add_translation(skillname(sk, NULL), skillname(sk, f->locale)));
+      }
+    }
+    /* spells */
+    if (is_mage(u)) {
+      sc_mage * mage = get_mage(u);
+      spell_ptr *spt = mage->spellptr;
+      if (spt) {
+        spell *sp;
+        int i;
+        int t = effskill(u, SK_MAGIC);
+        fprintf(F, "SPRUECHE\n");
+        for (;spt; spt = spt->next) {
+          sp = find_spellbyid(spt->spellid);
+          if (sp) {
+            const char * name = sp->sname;
+            if (sp->level > t) continue;
+            if (sp->info==NULL) {
+              name = add_translation(mkname("spell", name), spell_name(sp, f->locale));
+            }
+            fprintf(F, "\"%s\"\n", name);
+          }
+        }
+        for (i=0;i!=MAXCOMBATSPELLS;++i) {
+          sp = find_spellbyid(mage->combatspell[i]);
+          if (sp) {
+            const char * name = sp->sname;
+            if (sp->info==NULL) {
+              name = add_translation(mkname("spell", name), spell_name(sp, f->locale));
+            }
+            fprintf(F, "KAMPFZAUBER %d\n", i);
+            fprintf(F, "\"%s\";name\n", name);
+            fprintf(F, "%d;level\n", mage->combatspelllevel[i]);
+          }
+        }
+      }
+    }
+  }
 	/* items */
 	pr = 0;
 	if (f == u->faction || omniscient(u->faction)) {

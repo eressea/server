@@ -807,15 +807,15 @@ u_setfaction(unit * u, faction * f)
 {
 	int cnt = u->number;
 	if (u->faction==f) return;
-	if (u->faction) {
-		set_number(u, 0);
-		--u->faction->no_units;
-		join_group(u, NULL);
-                free_orders(&u->orders);
-                set_order(&u->thisorder, NULL);
-                set_order(&u->lastorder, NULL);
-	}
-	if (u->prevF) u->prevF->nextF = u->nextF;
+  if (u->faction) {
+    set_number(u, 0);
+    --u->faction->no_units;
+    join_group(u, NULL);
+    free_orders(&u->orders);
+    set_order(&u->thisorder, NULL);
+    set_order(&u->lastorder, NULL);
+  }
+  if (u->prevF) u->prevF->nextF = u->nextF;
 	else if (u->faction) {
 		assert(u->faction->units==u);
 		u->faction->units = u->nextF;

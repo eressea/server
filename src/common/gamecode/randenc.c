@@ -960,7 +960,7 @@ move_iceberg(region *r)
 	}
 }
 
-void
+static void
 move_icebergs(void)
 {
 	region *r;
@@ -987,6 +987,7 @@ create_icebergs(void)
 		region *rc;
 		unit *u;
 
+    freset(r, RF_DH);
 		for (dir=0; dir < MAXDIRECTIONS; dir++) {
 			rc = rconnect(r, dir);
 			if (rc && rterrain(rc) == T_OCEAN) {
@@ -1009,7 +1010,7 @@ create_icebergs(void)
 	}
 }
 
-void
+static void
 godcurse(void)
 {
   region *r;
@@ -1076,6 +1077,88 @@ check_split(void)
   }
 }
 
+/** handles the "orcish" curse that makes units grow like old orks
+ * This would probably be better handled in an age-function for the curse,
+ * but it's now being called by randomevents()
+ */
+static void
+orc_growth(void)
+{
+  region * r;
+  for (r = regions; r; r = r->next) {
+    unit *u;
+    for (u = r->units; u; u = u->next) {
+      curse *c = get_curse(u->attribs, ct_find("orcish"));
+      if (c && !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
+        int n;
+        int increase = 0;
+        int num  = get_cursedmen(u, c);
+        int prob = curse_geteffect(c);
+
+        for (n = (num - get_item(u, I_CHASTITY_BELT)); n > 0; n--) {
+          if (rand() % 100 < prob) {
+            ++increase;
+          }
+        }
+        if (increase) {
+          set_number(u, u->number + increase);
+
+          u->hp += unit_max_hp(u) * increase;
+          ADDMSG(&u->faction->msgs, msg_message("orcgrowth",
+            "unit amount race", u, increase, u->race));
+        }
+      }
+    }
+  }
+}
+
+/** Talente von Dämonen verschieben sich.
+ */
+static void
+demon_skillchanges(void)
+{
+  region * r;
+
+  for (r = regions; r; r = r->next) {
+    unit * u;
+    for (u = r->units; u; u = u->next) {
+      if (u->race == new_race[RC_DAEMON]) {
+        skill * sv = u->skills;
+        while (sv!=u->skills+u->skill_size) {
+          if (sv->level>0 && rand() % 100 < 25) {
+            int weeks = 1+rand()%3;
+            if (rand() % 100 < 40) {
+              reduce_skill(u, sv, weeks);
+            } else {
+              while (weeks--) learn_skill(u, sv->id, 1.0);
+            }
+            if (sv->old>sv->level) {
+              log_printf("%s dropped from %u to %u:%u in %s\n",
+                unitname(u), sv->old, sv->level,
+                sv->weeks, skillname(sv->id, NULL));
+            }
+          }
+          ++sv;
+        }
+      }
+    }
+  }
+}
+
+/** Eisberge entstehen und bewegen sich.
+ * Einheiten die im Wasser landen, ertrinken.
+ */
+static void 
+icebergs(void)
+{
+  region * r;
+  create_icebergs();
+  move_icebergs();
+  for (r=regions; r; r=r->next) {
+    drown(r);
+  }
+}
+
 void
 randomevents(void)
 {
@@ -1084,67 +1167,10 @@ randomevents(void)
 	building *b, *b2;
 	unit *u;
 
-	/* Eiseberge */
-	for (r=regions; r; r=r->next) freset(r, RF_DH);
-	create_icebergs();
-	move_icebergs();
-
-	godcurse();
-
-	for (r=regions; r; r=r->next) {
-		drown(r);
-	}
-
-	for (r = regions; r; r = r->next) {
-		for (u = r->units; u; u = u->next) {
-			curse *c = get_curse(u->attribs, ct_find("orcish"));
-			if (c && !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
-				int n;
-				int increase = 0;
-				int num  = get_cursedmen(u, c);
-				int prob = curse_geteffect(c);
-
-				for (n = (num - get_item(u, I_CHASTITY_BELT)); n > 0; n--) {
-					if (rand() % 100 < prob) {
-						++increase;
-					}
-				}
-				if (increase) {
-					set_number(u, u->number + increase);
-
-					u->hp += unit_max_hp(u) * increase;
-					ADDMSG(&u->faction->msgs, msg_message("orcgrowth",
-						"unit amount race", u, increase, u->race));
-				}
-			}
-		}
-	}
-
-	/* Talentverschiebung: Talente von Dämonen verschieben sich */
-
-	for (r = regions; r; r = r->next) {
-		for (u = r->units; u; u = u->next) {
-			if (u->race == new_race[RC_DAEMON]) {
-				skill * sv = u->skills;
-				while (sv!=u->skills+u->skill_size) {
-					if (sv->level>0 && rand() % 100 < 25) {
-						int weeks = 1+rand()%3;
-						if (rand() % 100 < 40) {
-							reduce_skill(u, sv, weeks);
-						} else {
-							while (weeks--) learn_skill(u, sv->id, 1.0);
-						}
-						if (sv->old>sv->level) {
-							log_printf("%s dropped from %u to %u:%u in %s\n",
-									   unitname(u), sv->old, sv->level,
-									   sv->weeks, skillname(sv->id, NULL));
-						}
-					}
-					++sv;
-				}
-			}
-		}
-	}
+  icebergs();
+  godcurse();
+  orc_growth();
+  demon_skillchanges();
 
 #if RACE_ADJUSTMENTS == 0
 	/* Orks vermehren sich */

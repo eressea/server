@@ -142,6 +142,7 @@ static int nowrite = 0;
 static boolean g_writemap = false;
 static boolean opt_reportonly = false;
 static const char * luafile = "default.lua";
+static const char * script_path = NULL;
 
 struct settings global = {
   "Eressea", /* gamename */
@@ -272,6 +273,7 @@ lua_init(void)
   luaopen_math(luaState);
   luaopen_string(luaState);
   luaopen_io(luaState);
+  luaopen_table(luaState);
   luabind::open(luaState);
   bind_eressea(luaState);
   bind_spell(luaState);
@@ -590,7 +592,7 @@ read_args(int argc, char **argv, lua_State * luaState)
         }
         break;
       case 'l':
-        log_open(argv[++i]);
+        script_path = argv[++i];
         break;
       case 'w':
         g_writemap = true;
@@ -605,6 +607,7 @@ read_args(int argc, char **argv, lua_State * luaState)
 
   /* add some more variables to the lua globals */
   setLuaString(luaState, "datapath", datapath());
+  setLuaString(luaState, "scriptpath", script_path);
   setLuaString(luaState, "basepath", basepath());
   setLuaString(luaState, "reportpath", reportpath());
   setLuaString(luaState, "resourcepath", resourcepath());
@@ -663,8 +666,25 @@ main(int argc, char *argv[])
 
   // run the main script
   if (luafile==NULL) lua_console(luaState);
-  else lua_dofile(luaState, luafile);
-
+  else {
+    try {
+      if (script_path) {
+        sprintf(buf, "%s/%s", script_path, luafile);
+        lua_dofile(luaState, buf);
+      }
+      else lua_dofile(luaState, luafile);
+    } 
+    catch (luabind::error& e) {
+      lua_State* L = e.state();
+      const char* error = lua_tostring(L, -1);
+      log_error((error));
+      lua_pop(L, 1);
+      std::terminate();
+      // L will now point to the destructed
+      // lua state and be invalid
+      /* ... */
+    }
+  }
 #ifdef CLEANUP_CODE
   game_done();
 #endif

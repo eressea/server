@@ -87,10 +87,12 @@ do_command_i(const struct tnode * keys, void * u, const char * str, struct order
 	}
 }
 
-extern const char * getcommand(struct order * ord);
+extern char * getcommand(struct order * ord);
 
 void
 do_command(const struct tnode * keys, void * u, struct order * ord)
 {
-  do_command_i(keys, u, getcommand(ord), ord);
+  char * cmd = getcommand(ord);
+  do_command_i(keys, u, cmd, ord);
+  free(cmd);
 }

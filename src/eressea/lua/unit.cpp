@@ -26,6 +26,7 @@
 #include <luabind/iterator_policy.hpp>
 
 #include <ostream>
+#include <string>
 using namespace luabind;
 
 class bind_spell_ptr {
@@ -34,12 +35,12 @@ public:
   static spell * value(spell_ptr * node) { return find_spellbyid(node->spellid); }
 };
 
-static eressea::list<spell, spell_ptr, bind_spell_ptr>
+static eressea::list<spell *, spell_ptr *, bind_spell_ptr>
 unit_spells(const unit& u) {
   sc_mage * mage = get_mage(&u);
-  if (mage==NULL) return eressea::list<spell, spell_ptr, bind_spell_ptr>(NULL);
+  if (mage==NULL) return eressea::list<spell *, spell_ptr *, bind_spell_ptr>(NULL);
   spell_ptr * splist = mage->spellptr;
-  return eressea::list<spell, spell_ptr, bind_spell_ptr>(splist);
+  return eressea::list<spell *, spell_ptr *, bind_spell_ptr>(splist);
 }
 
 class bind_spell_list {
@@ -48,10 +49,26 @@ public:
   static spell * value(spell_list * node) { return node->data; }
 };
 
-static eressea::list<spell, spell_list, bind_spell_list>
+static eressea::list<spell *, spell_list *, bind_spell_list>
 unit_familiarspells(const unit& u) {
   spell_list * spells = familiarspells(u.race);
-  return eressea::list<spell, spell_list, bind_spell_list>(spells);
+  return eressea::list<spell *, spell_list *, bind_spell_list>(spells);
+}
+
+class bind_orders {
+public:
+  static order * next(order * node) { return node->next; }
+  static std::string value(order * node) { 
+    char * cmd = getcommand(node); 
+    std::string s(cmd);
+    free(cmd);
+    return s;
+  }
+};
+
+static eressea::list<std::string, order *, bind_orders>
+unit_orders(const unit& u) {
+  return eressea::list<std::string, order *, bind_orders>(u.orders);
 }
 
 static unit *
@@ -211,6 +228,23 @@ unit_getregion(const unit& u)
   return u.region;
 }
 
+static int
+unit_getid(const unit& u)
+{
+  return u.no;
+}
+
+static void
+unit_setid(unit& u, int id)
+{
+  unit * nu = findunit(id);
+  if (nu==NULL) {
+    uunhash(&u);
+    u.no = id;
+    uhash(&u);
+  }
+}
+
 static const char *
 unit_getname(const unit& u)
 {
@@ -221,6 +255,18 @@ static void
 unit_setname(unit& u, const char * name)
 {
   set_string(&u.name, name);
+}
+
+static const char *
+unit_getinfo(const unit& u)
+{
+  return u.display;
+}
+
+static void
+unit_setinfo(unit& u, const char * info)
+{
+  set_string(&u.display, info);
 }
 
 static std::ostream& 
@@ -319,15 +365,21 @@ bind_unit(lua_State * L)
     def("add_unit", &add_unit),
 
     class_<struct unit>("unit")
-    .property("name", &unit_getname, &unit_setname)
     .def(tostring(self))
     .def(self == unit())
+    .property("name", &unit_getname, &unit_setname)
+    .property("info", &unit_getinfo, &unit_setinfo)
+    .property("id", &unit_getid, &unit_setid)
     .def_readonly("faction", &unit::faction)
-    .def_readonly("id", &unit::no)
     .def_readwrite("hp", &unit::hp)
     .def_readwrite("status", &unit::status)
+
+    // orders:
     .def("add_order", &unit_addorder)
     .def("clear_orders", &unit_clearorders)
+    .property("orders", &unit_orders, return_stl_iterator)
+
+    // items:
     .def("get_item", &unit_getitem)
     .def("add_item", &unit_additem)
     .def("get_skill", &unit_getskill)

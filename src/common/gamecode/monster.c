@@ -741,72 +741,6 @@ random_growl(void)
 extern attrib_type at_direction;
 
 static void
-make_ponnuki(void)
-{
-	int ponn = atoi36("ponn");
-	unit * u = ufindhash(ponn);
-	region * r = findregion(-67,-5);
-	if (u || !r) return;
-	u = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_ILLUSION]);
-	u->irace = new_race[RC_GOBLIN];
-	set_string(&u->name, "Ponnuki");
-	set_string(&u->display, "Go, Ponnuki, Go.");
-    uunhash(u);
-	u->no = ponn;
-	uhash(u);
-
-	/* 'andere' ponnukis mit eigener nummer */
-	ponn = atoi36("255x");
-	do {
-		u = ufindhash(ponn);
-		if (!u) break;
-		uunhash(u);
-		u->no = newunitid();
-		uhash(u);
-	} while (u);
-}
-
-static void ponnuki(unit * u)
-{
-	const char* joke[] = {
-		"Ein Bummerang ist, wenn man ihn wegwirft und er kommt nicht wieder, dann war's keiner.",
-
-		"Ein Riese und ein Zwerg sitzen an der Bar und trinken Bier. Der Zwerg spuckt - tftftf - dem Riesen ins Bier.\n"
-		"Riese: Hör auf, oder ich reiß Dir ein Ohr ab!\n"
-		"Zwerg: Mir egal, bei uns Zwergen wachsen die Ohren nach! - tftftf\n"
-		"Riese: Wenn Du nicht sofort aufhörst, reiße ich Dir ein Bein aus!\n"
-		"Zwerg: Na und, bei uns Zwergen wachsen Beine nach - tftftf\n"
-		"Riese: Jetzt reichts aber wirklich! Schluß, oder ich reiße Dir den\n"
-		"Schniedel aus.\n"
-		"Zwerg: Probier's doch, wir Zwerge haben gar keinen Schniedel - tftftf\n"
-		"Riese (verblüfft): So, und wie pinkelt Ihr dann???\n"
-		"Zwerg: tftftf",
-
-		"Ein Ingenieur und ein Mathematiker sitzen zusammen in einem Vortrag über Kulza-Klein Theorie, die sich mit\n"
-		"11, 12 und sogar höheren Dimensionen beschäftig. Der Mathematiker geniesst die Vorlesung, während der\n"
-		"Ingenieur immer mehr verwirrt aussieht. Als der Vortrag zu ende ist, hat der Ingenieur schreckliche\n"
-		"Kopfschmerzen davon.\n"
-		"\n"
-		"Ingenieur: Wie kannst du nur diesen schrecklichen, abgehobenen Vortrag verstehen?\n"
-		"Mathematiker: Ich stelle mir das ganze einfach vor.\n"
-		"Ingenieur: Wie kannst du dir einen 11-dimensionalen Raum vorstellen???\n"
-		"Mathematiker: Nun, ich stelle mir einen n-dimensionalen Raum vor und lasse dann n gegen 11 gehen..",
-
-		"Merke: Mit Schwabenwitzen soll man ganz sparsam sein.",
-
-		"F: Was bekommt man, wenn man Katzen und Elfen kreuzt?\nA: Elfen ohne Rheuma.",
-
-		"F: Was bekommt man, wenn man Insekten und Katzen kreuzt?\nA: Tiger, die Crisan benutzen.",
-
-		NULL };
-	int jokes = 0;
-
-	while(joke[jokes]) jokes++;
-	if (jokes) addmessage(u->region, 0, joke[rand() % jokes], MSG_MESSAGE, ML_IMPORTANT);
-
-}
-
-static void
 learn_monster(unit *u)
 {
 	int c = 0;
@@ -981,13 +915,10 @@ void
 plan_monsters(void)
 {
   region *r;
-  faction *f;
   unit *u;
   attrib *ta;
 
-  u = findunitg(atoi36("ponn"), NULL);
-  if (!u) make_ponnuki();
-  f = findfaction(MONSTER_FACTION);
+  faction *f = findfaction(MONSTER_FACTION);
   if (!f)
     return;
 
@@ -1065,10 +996,6 @@ plan_monsters(void)
         /* Ab hier noch nicht generalisierte Spezialbehandlungen. */
 
         switch (old_race(u->race)) {
-        case RC_ILLUSION:
-          if (u->no==atoi36("ponn")) ponnuki(u);
-          break;
-          /* Alp */
         case RC_ALP:
           monster_seeks_target(r, u);
           break;

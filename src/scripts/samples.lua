@@ -130,12 +130,26 @@ function test_write()
 end
 
 function move_north(u)
+  for order in u.orders do
+    print(order)
+  end
   u:clear_orders()
   u:add_order("NACH NORDEN")
 end
 
 function test_monsters()
   read_game("23")
+
+  -- magrathea = get_region(-67, -5)
+  local magrathea = get_region(0, 0)
+  if magrathea ~= nil then
+    if pcall(dofile, scriptpath .. "/ponnuki.lua") then
+      init_ponnuki(magrathea)
+    else
+      print("could not open ponnuki")
+    end
+  end
+
   set_brain("braineater", move_north)
   plan_monsters()
   process_orders()

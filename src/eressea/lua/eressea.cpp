@@ -146,6 +146,13 @@ race_setscript(const char * rcname, const functor<void>& f)
   }
 }
 
+#ifdef LUABIND_NO_EXCEPTIONS
+static void
+error_callback(lua_State * L)
+{
+}
+#endif
+
 void
 bind_eressea(lua_State * L)
 {
@@ -177,4 +184,7 @@ bind_eressea(lua_State * L)
     /* planes not really implemented */
     def("get_plane_id", &find_plane_id)
   ];
+#ifdef LUABIND_NO_EXCEPTIONS
+  luabind::set_error_callback(error_callback);
+#endif
 }

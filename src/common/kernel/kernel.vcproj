@@ -234,9 +234,6 @@
 				RelativePath=".\order.h">
 			</File>
 			<File
-				RelativePath=".\orders.h">
-			</File>
-			<File
 				RelativePath=".\pathfinder.h">
 			</File>
 			<File
@@ -353,9 +350,6 @@
 		</File>
 		<File
 			RelativePath=".\order.c">
-		</File>
-		<File
-			RelativePath=".\orders.c">
 		</File>
 		<File
 			RelativePath=".\pathfinder.c">

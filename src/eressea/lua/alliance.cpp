@@ -22,10 +22,10 @@ public:
   static faction * value(faction_list * node) { return node->data; }
 };
 
-static eressea::list<faction, faction_list, factionlist_iterator>
+static eressea::list<faction *, faction_list *, factionlist_iterator>
 alliance_factions(const alliance& al)
 {
-  return eressea::list<faction, faction_list, factionlist_iterator>(al.members);
+  return eressea::list<faction *, faction_list *, factionlist_iterator>(al.members);
 }
 
 static alliance *
@@ -34,9 +34,9 @@ add_alliance(int id, const char * name)
   return makealliance(id, name);
 }
 
-static eressea::list<alliance>
+static eressea::list<alliance *>
 get_alliances(void) {
-  return eressea::list<alliance>(alliances);
+  return eressea::list<alliance *>(alliances);
 }
 
 void

@@ -1218,7 +1218,10 @@ init_tokens_str(const char * initstr)
 void
 init_tokens(const struct order * ord)
 {
-  init_tokens_str(getcommand(ord));
+  static char * cmd = NULL;
+  if (cmd!=NULL) free(cmd);
+  cmd = getcommand(ord);
+  init_tokens_str(cmd);
 }
 
 void 

@@ -1859,7 +1859,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, struct order *
 	par = calloc(1, sizeof(spellparameter));
 
 	/* Temporären Puffer initialisieren */
-	tbuf = strdup(getcommand(ord));
+	tbuf = getcommand(ord);
 
 	/* Tokens zählen */
 	token = strtok(tbuf, " ");
@@ -1867,6 +1867,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, struct order *
 		par->length++;
 		token = strtok(NULL, " ");
 	}
+  free(tbuf);
 	/* length sollte nun nur noch die Anzahl der für den Zauber relevanten
 	 * Elemente enthalten */
 	par->length -= skip; /* Anzahl der Elemente ('temp 123' sind zwei!) */
@@ -1877,7 +1878,6 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, struct order *
 		/* Fehler: Ziel vergessen */
 		cmistake(u, ord, 203, MSG_MAGIC);
 		/* Aufräumen */
-		free(tbuf);
 		free(par);
 		return 0;
 	}
@@ -1886,7 +1886,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, struct order *
 	par->param = calloc(par->length, sizeof(spllprm *));
 
 	/* Tokens zuweisen */
-	strcpy(tbuf, getcommand(ord));
+	tbuf = getcommand(ord);
 	token = strtok (tbuf, " ");
 	while(token && syntax[c] != 0) {
 		if (i > skip) {
@@ -2216,6 +2216,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, struct order *
 		i++;
 		token = strtok(NULL, " ");
 	}
+  free(tbuf);
 
 	/* im Endeffekt waren es nur l parameter */
 	par->length = l;
@@ -2226,13 +2227,9 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, struct order *
 		/* Syntax Error. */
 		cmistake(u, ord, 209, MSG_MAGIC);
 		/* Aufräumen */
-		free(tbuf);
 		free_spellparameter(par);
 		return 0;
 	}
-
-	/* Aufräumen */
-	free(tbuf);
 
 	return par;
 }

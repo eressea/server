@@ -1095,12 +1095,13 @@ readunit(FILE * F)
 	free_orders(&u->orders);
 	rs(F, buf);
 	while(*buf != 0) {
-          addlist(&u->orders, parse_order(buf, u->faction->locale));
+    order * ord = parse_order(buf, u->faction->locale);
+    if (ord!=NULL) addlist(&u->orders, ord);
 		rs(F, buf);
 	}
-        rs(F, buf);
-        u->lastorder = parse_order(buf, u->faction->locale);
-        set_order(&u->thisorder, NULL);
+  rs(F, buf);
+  u->lastorder = parse_order(buf, u->faction->locale);
+  set_order(&u->thisorder, NULL);
 
 	assert(u->number >= 0);
 	assert(u->race);
@@ -1200,7 +1201,8 @@ writeunit(FILE * F, const unit * u)
 	wi(F, u->flags & UFL_SAVEMASK);
 	wnl(F);
 	for (ord = u->orders; ord; ord=ord->next) {
-		if (is_persistent(ord)) writeorder(ord, u->faction->locale, F);
+    if (is_persistent(ord) && get_keyword(ord)!=NOKEYWORD) {
+      writeorder(ord, u->faction->locale, F);
 	}
 	ws(F, ""); /* Abschluß der persistenten Befehle */
 	writeorder(u->lastorder, u->faction->locale, F);

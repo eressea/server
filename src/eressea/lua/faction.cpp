@@ -32,9 +32,9 @@ add_faction(const char * email, const char * racename, const char * lang)
   return f;
 }
 
-static eressea::list<faction>
+static eressea::list<faction *>
 get_factions(void) {
-  return eressea::list<faction>(factions);
+  return eressea::list<faction *>(factions);
 }
 
 class factionunit {
@@ -43,10 +43,10 @@ public:
   static unit * value(unit * node) { return node; }
 };
 
-static eressea::list<unit, unit, factionunit>
+static eressea::list<unit *, unit *, factionunit>
 faction_units(const faction& f)
 {
-  return eressea::list<unit, unit, factionunit>(f.units);
+  return eressea::list<unit *, unit *, factionunit>(f.units);
 }
 
 #ifdef ALLIANCES

@@ -17,24 +17,24 @@
 #include <ostream>
 using namespace luabind;
 
-static eressea::list<region>
+static eressea::list<region *>
 get_regions(void) {
-  return eressea::list<region>(regions);
+  return eressea::list<region *>(regions);
 }
 
-static eressea::list<unit>
+static eressea::list<unit *>
 region_units(const region& r) {
-  return eressea::list<unit>(r.units);
+  return eressea::list<unit *>(r.units);
 }
 
-static eressea::list<building>
+static eressea::list<building *>
 region_buildings(const region& r) {
-  return eressea::list<building>(r.buildings);
+  return eressea::list<building *>(r.buildings);
 }
 
-static eressea::list<ship>
+static eressea::list<ship *>
 region_ships(const region& r) {
-  return eressea::list<ship>(r.ships);
+  return eressea::list<ship *>(r.ships);
 }
 
 static void

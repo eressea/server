@@ -378,7 +378,7 @@ typedef struct ursprung {
 
 /* ----------------- Befehle ----------------------------------- */
 
-typedef int keyword_t;
+typedef unsigned char keyword_t;
 enum {
   K_KOMMENTAR,
   K_BANNER,
