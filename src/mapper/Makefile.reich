@@ -1,7 +1,0 @@
-WARN = -Wall -ansi -pedantic -Wno-char-subscripts -Wno-parentheses
-DEBUG = -g ${WARN}
-LIBS = -lncurses -lm -lefence
-
-CFLAGS	= ${DEBUG} -I.. -I/usr/local/include ${OPT}
-LDFLAGS = ${DEBUG}
-

@@ -70,11 +70,12 @@
 #include <attributes/synonym.h>
 
 /* util includes */
-#include <event.h>
-#include <base36.h>
-#include <goodies.h>
-#include <rand.h>
-#include <sql.h>
+#include <util/base36.h>
+#include <util/event.h>
+#include <util/goodies.h>
+#include <util/log.h>
+#include <util/rand.h>
+#include <util/sql.h>
 #include <util/message.h>
 
 #include <modules/xecmd.h>
@@ -3719,6 +3720,9 @@ use_cmd(unit * u, struct order * ord)
   if (itype!=NULL) {
     int i = use_item(u, itype, n, ord);
     assert(i<=0 || !"use_item should not return positive values.");
+    if (i<=0) {
+      log_error(("use_item returned a value>0 for %s\n", resourcename(itype->rtype, 0)));
+    }     
   } else {
     cmistake(u, ord, 43, MSG_PRODUCE);
   }

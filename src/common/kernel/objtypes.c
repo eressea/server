@@ -56,11 +56,6 @@ read_ID(FILE *f)
 	return id;
 }
 
-/****** Not implemented ******/
-obj_ID default_ID;
-/* die müssen schon ein value zurückliefern... */
-static char * notimplemented_desc(void *p) { unused(p); assert(0); return 0; }
-
 /****** Unit ******/
 static obj_ID unit_ID(void *p) {
 	obj_ID id; id.a = p ? ((unit *)p)->no : 0; id.b = 0; return id;
