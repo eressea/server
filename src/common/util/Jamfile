@@ -5,7 +5,11 @@ SubDirHdrs $(SUBDIR)/.. ;
 SubDirHdrs $(SUBDIR)/../.. ;
 SubDirHdrs $(XMLHDRS) ;
 
+SEARCH_SOURCE += 
+ [ FDirName $(SUBDIR) dl ] ;
+
 SOURCES =
+ #<dl>malloc.c
  attrib.c
  base36.c
  command.c
