@@ -9,7 +9,7 @@ function write_standings()
   print(reportpath .. "/victory.txt")
   local file = io.open(reportpath .. "/victory.txt", "w")
   
-  log(file, "** Allianzen **")
+  log(file, "** Allianzen ** " .. reportpath .. "/victory.txt")
   local alliance
   for alliance in alliances() do
     local faction
@@ -38,6 +38,3 @@ function write_standings()
 
   file:close()
 end
-
--- main body of script
-write_standings()

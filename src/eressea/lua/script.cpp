@@ -46,7 +46,16 @@ call_script(struct unit * u)
   if (a==NULL) a = a_findc(u->race->attribs, &at_script);
   if (a!=NULL && a->data.v!=NULL) {
     luabind::functor<void> * func = (luabind::functor<void> *)a->data.v;
-    func->operator()(u);
+    try {	
+      func->operator()(u);
+    }
+    catch (luabind::error& e) {
+      lua_State* L = e.state();
+      const char* error = lua_tostring(L, -1);
+      log_error((error));
+      lua_pop(L, 1);
+      std::terminate();
+    }
   }
   return -1;
 }
