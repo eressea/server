@@ -1357,6 +1357,7 @@ curse_write(const attrib * a,FILE * f) {
 	int flag;
 	int mage_no;
 	curse * c = (curse*)a->data.v;
+	curse_type * ct = c->type;
 
 	flag = (c->flag & ~(CURSE_ISNEW));
 
@@ -1366,7 +1367,7 @@ curse_write(const attrib * a,FILE * f) {
 		mage_no = -1;
 	}
 
-	fprintf(f, "%d %d %d %d %d %d %d ", c->no, (int)c->cspellid, flag,
+	fprintf(f, "%d %d %d %d %d %d %d ", c->no, (int)ct->cspellid, flag,
 			c->duration, c->vigour, mage_no, c->effect);
 
 	switch(c->type->typ){
@@ -1393,6 +1394,7 @@ curse_read(attrib * a, FILE * f) {
 	int cspellid;
 	int mageid;
 	curse * c = (curse*)a->data.v;
+	curse_type * ct;
 
 	if (global.data_version < CURSE_NO_VERSION){
 		fscanf(f, "%d %d %d %d %d %d ",&cspellid, &c->flag, &c->duration,
@@ -1403,7 +1405,9 @@ curse_read(attrib * a, FILE * f) {
 				&c->duration, &c->vigour, &mageid, &c->effect);
 	}
 
-	c->type = find_cursetype((curse_t)cspellid);
+	ct = find_cursetype((curse_t)cspellid);
+
+	c->type = ct;
 	c->cspellid = (curse_t)cspellid;
 
 	/* beim Einlesen sind noch nicht alle units da, muss also

@@ -194,7 +194,9 @@ find_cursetype(curse_t id)
 boolean
 is_normalcurse(curse_t id)
 {
-	const curse_type *ct = find_cursetype(id);
+	curse_type *ct = find_cursetype(id);
+
+	if (!ct) return false;
 
 	if (ct->typ == CURSETYP_NORM)
 		return true;
@@ -205,7 +207,9 @@ is_normalcurse(curse_t id)
 boolean
 is_curseunit(curse_t id)
 {
-	const curse_type *ct = find_cursetype(id);
+	curse_type *ct = find_cursetype(id);
+
+	if (!ct) return false;
 
 	if (ct->typ == CURSETYP_UNIT)
 		return true;
@@ -216,7 +220,9 @@ is_curseunit(curse_t id)
 boolean
 is_curseskill(curse_t id)
 {
-	const curse_type *ct = find_cursetype(id);
+	curse_type *ct = find_cursetype(id);
+
+	if (!ct) return false;
 
 	if (ct->typ == CURSETYP_SKILL)
 		return true;
