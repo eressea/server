@@ -33,8 +33,8 @@ summon_igjarjuk(struct unit * u, const struct item_type * itype, const char * cm
 }
 
 static resource_type rt_demonseye = {
-	{ "ao_daemon", "ao_daemons" },
-	{ "ao_daemon", "ao_daemons" },
+	{ "ao_daemon", "ao_daemon_p" },
+	{ "ao_daemon", "ao_daemon_p" },
 	RTF_ITEM,
 	&res_changeitem
 };

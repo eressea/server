@@ -1263,33 +1263,33 @@ use_olditem(struct unit * user, const struct item_type * itype, const char * cmd
 
 typedef const char* translate_t[5];
 static translate_t translation[] = {
-	{ "Holz", "log", "logs", "log", "logs" },
-	{ "Eisen", "iron", "irons", "iron", "irons" },
-	{ "Wagen", "cart", "carts", "cart", "carts" },
-	{ "Plattenpanzer", "plate", "plates", "plate", "plates" },
-	{ "Balsam", "balm", "balms", "balm", "balms" },
-	{ "Gewürz", "spice", "spices", "spice", "spices" },
-	{ "Myrrhe", "myrrh", "myrrhs", "myrrh", "myrrhs" },
-	{ "Öl", "oil", "oils", "oil", "oils" },
-	{ "Seide", "silk", "silks", "silk", "silks" },
-	{ "Weihrauch", "incense", "incenses", "incense", "incenses" },
-	{ "Bihänder", "greatsword", "greatswords", "greatsword", "greatswords" },
-	{ "Laen", "laen", "laens", "laen", "laens" },
-	{ "Goliathwasser", "p1", "p1s", NULL, NULL },
-	{ "Wasser des Lebens", "p2", "p2s", NULL, NULL },
-	{ "Bauernblut", "p5", "p5s", NULL, NULL },
-	{ "Gehirnschmalz", "p6", "p6s", NULL, NULL },
-	{ "Nestwärme", "p8", "p8s", NULL, NULL },
-	{ "Pferdeglück", "p9", "p9s", NULL, NULL },
-	{ "Berserkerblut", "p10", "p10s", NULL, NULL },
-	{ "Bauernlieb", "p11", "p11s", NULL, NULL },
-	{ "Heiltrank", "p14", "p14s", NULL, NULL },
+	{ "Holz", "log", "log_p", "log", "log_p" },
+	{ "Eisen", "iron", "iron_p", "iron", "iron_p" },
+	{ "Wagen", "cart", "cart_p", "cart", "cart_p" },
+	{ "Plattenpanzer", "plate", "plate_p", "plate", "plate_p" },
+	{ "Balsam", "balm", "balm_p", "balm", "balm_p" },
+	{ "Gewürz", "spice", "spice_p", "spice", "spice_p" },
+	{ "Myrrhe", "myrrh", "myrrh_p", "myrrh", "myrrh_p" },
+	{ "Öl", "oil", "oil_p", "oil", "oil_p" },
+	{ "Seide", "silk", "silk_p", "silk", "silk_p" },
+	{ "Weihrauch", "incense", "incense_p", "incense", "incense_p" },
+	{ "Bihänder", "greatsword", "greatsword_p", "greatsword", "greatsword_p" },
+	{ "Laen", "laen", "laen_p", "laen", "laen_p" },
+	{ "Goliathwasser", "p1", "p1_p", NULL, NULL },
+	{ "Wasser des Lebens", "p2", "p2_p", NULL, NULL },
+	{ "Bauernblut", "p5", "p5_p", NULL, NULL },
+	{ "Gehirnschmalz", "p6", "p6_p", NULL, NULL },
+	{ "Nestwärme", "p8", "p8_p", NULL, NULL },
+	{ "Pferdeglück", "p9", "p9_p", NULL, NULL },
+	{ "Berserkerblut", "p10", "p10_p", NULL, NULL },
+	{ "Bauernlieb", "p11", "p11_p", NULL, NULL },
+	{ "Heiltrank", "p14", "p14_p", NULL, NULL },
 
-	{ "Flachwurz", "h0", "h0s", NULL, NULL },
-	{ "Elfenlieb", "h5", "h5s", NULL, NULL },
-	{ "Wasserfinder", "h9", "h9s", NULL, NULL },
-	{ "Windbeutel", "h12", "h12s", NULL, NULL },
-	{ "Steinbeißer", "h15", "h15s", NULL, NULL },
+	{ "Flachwurz", "h0", "h0_p", NULL, NULL },
+	{ "Elfenlieb", "h5", "h5_p", NULL, NULL },
+	{ "Wasserfinder", "h9", "h9_p", NULL, NULL },
+	{ "Windbeutel", "h12", "h12_p", NULL, NULL },
+	{ "Steinbeißer", "h15", "h15_p", NULL, NULL },
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
@@ -1858,7 +1858,7 @@ init_oldpotions(void)
 {
 	potion_t p;
 	const char * names[2];
-	const char * appearance[2] = { "vial", "vials" };
+	const char * appearance[2] = { "vial", "vial_p" };
 
 	const struct locale * lang = find_locale("de");
 	assert(lang);
@@ -1946,7 +1946,15 @@ resource_type * r_person;
 resource_type * r_silver;
 item_type * i_silver;
 
-static const char * names[] = { "money", "moneys", "person", "persons", "permaura", "permauras", "hp", "hps", "peasant", "peasants", "aura", "auras", "unit", "units" };
+static const char * names[] = {
+	"money", "money_p", 
+	"person", "person_p", 
+	"permaura", "permaura_p", 
+	"hp", "hp_p", 
+	"peasant", "peasant_p", 
+	"aura", "aura_p", 
+	"unit", "unit_p" 
+};
 
 void
 init_resources(void)

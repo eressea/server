@@ -3272,19 +3272,6 @@
 	</locale>
 </message>
 
-<message name="starvation">
-	<type>
-		<arg name="unit" type="unit"></arg>
-		<arg name="dead" type="int"></arg>
-		<arg name="region" type="region"></arg>
-	</type>
-	<locale name="en">
-		<nr section="none">
-			<text>"$unit($unit) loses $int($dead) people due to starvation in $region($region)."</text>
-		</nr>
-	</locale>
-</message>
-
 <message name="pest">
 	<type>
 		<arg name="dead" type="int"></arg>

@@ -30,4 +30,7 @@ extern const char * locale_name(const struct locale * lang);
 extern const char * reverse_lookup(const struct locale * lang, const char * str);
 
 extern void debug_language(const char * log);
+
+#define LOC(s,l) locale_string(s, l)
+
 #endif

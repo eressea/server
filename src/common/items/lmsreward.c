@@ -78,8 +78,8 @@ use_lmsreward(struct unit * u, const struct item_type * itype, const char * cmd)
 #endif
 
 static resource_type rt_lmsreward = {
-	{ "lmsreward", "lmsrewards" },
-	{ "lmsreward", "lmsrewards" },
+	{ "lmsreward", "lmsreward_p" },
+	{ "lmsreward", "lmsreward_p" },
 	RTF_ITEM,
 	&res_changeitem
 };

@@ -328,7 +328,7 @@ bufunit(const faction * f, const unit * u, int indent,
 		scat(", ");
 
 		if (!dh) {
-			scat("hat: ");
+			sprintf(buf+strlen(buf), "%s: ", LOC(f->locale, "nr_inventory"));
 			dh = 1;
 		}
 		if (in == 1) {
@@ -359,7 +359,7 @@ bufunit(const faction * f, const unit * u, int indent,
 						continue;
 					}
 					if (!dh){
-						scat(", Zauber: ");
+						sprintf(buf+strlen(buf),", %s: ", LOC(f->locale, "nr_spells"));
 						dh = 1;
 					}else{
 						scat(", ");
@@ -376,7 +376,7 @@ bufunit(const faction * f, const unit * u, int indent,
 			}
 			if(dh){
 				dh = 0;
-				scat(". Kampfzauber: ");
+				sprintf(buf+strlen(buf),", %s: ", LOC(f->locale, "nr_combatspells"));
 				for (i = 0; i < MAXCOMBATSPELLS; i++){
 					if (!dh){
 						dh = 1;
@@ -393,7 +393,7 @@ bufunit(const faction * f, const unit * u, int indent,
 							scat(")");
 						}
 					}else{
-						scat("keiner");
+						scat(LOC(f->locale, "nr_nospells"));
 					}
 				}
 			}
@@ -437,6 +437,7 @@ bufunit(const faction * f, const unit * u, int indent,
 void
 spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days)
 {
+	char * sbuf = buf+strlen(buf);
 	int i, d;
 	if (!u->number)
 		return;
@@ -445,37 +446,32 @@ spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, 
 	if (!d)
 		return;
 
-	scat(", ");
+	strcat(sbuf, ", "); sbuf+=2;
 
 	if (!*dh) {
-		scat("Talente: ");
+		sbuf += sprintf(sbuf, "%s: ", LOC(lang, "nr_skills"));
 		*dh = 1;
 	}
-	scat(skillname(sk, lang));
-	scat(" ");
+	sbuf += sprintf(sbuf, "%s ", skillname(sk, lang));
 
 	if (sk == SK_MAGIC){
 		if (find_magetype(u) != M_GRAU){
-			scat(magietypen[find_magetype(u)]);
-			scat(" ");
+			sbuf += sprintf(sbuf, "%s ", magietypen[find_magetype(u)]);
 		}
 	}
 
 	if (sk == SK_STEALTH) {
 		i = u_geteffstealth(u);
 		if(i>=0) {
-			icat(i);
-			scat("/");
+			sbuf += sprintf(sbuf, "%d/", i);
 		}
 	}
-	icat(effskill(u, sk));
+	sbuf += sprintf(sbuf, "%d", effskill(u, sk));
 
 #ifndef NOVISIBLESKILLPOINTS
 	if (days) {
 		assert(u->number);
-		scat(" [");
-		icat(d / u->number);
-		scat("]");
+		sbuf += sprintf(sbuf, " [%d]", d / u->number);
 	}
 #endif
 }

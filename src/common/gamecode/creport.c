@@ -127,7 +127,7 @@ write_translations(FILE * F)
 	for (i=0;i!=TRANSMAXHASH;++i) {
 		translation * t = translation_table[i];
 		while (t) {
-			fprintf(F, "\"%s\";%s\n", t->value, t->key);
+			fprintf(F, "\"%s\";%s\n", t->value, crtag(t->key));
 			t = t->next;
 		}
 	}
@@ -333,6 +333,7 @@ static void
 report_crtypes(FILE * F, const struct locale* lang)
 {
 	int i;
+#ifdef OLD_MESSAGETYPES
 	fputs("MESSAGETYPES\n", F);
 	for (i=0;i!=MTMAXHASH;++i) {
 		struct known_mtype * kmt;
@@ -351,6 +352,26 @@ report_crtypes(FILE * F, const struct locale* lang)
 			free(kmt);
 		}
 	}
+#else
+	for (i=0;i!=MTMAXHASH;++i) {
+		struct known_mtype * kmt;
+		for (kmt=mtypehash[i];kmt;kmt=kmt->nexthash) {
+			const struct nrmessage_type * nrt = nrt_find(lang, kmt->mtype);
+			if (nrt) {
+				unsigned int hash = hashstring(mt_name(kmt->mtype));
+				fprintf(F, "MESSAGETYPE %d\n", hash);
+				fputc('\"', F);
+				fputs(escape_string(nrt_string(nrt), NULL, 0), F);
+				fputs("\";text\n", F);
+			}
+		}
+		while (mtypehash[i]) {
+			kmt = mtypehash[i];
+			mtypehash[i] = mtypehash[i]->nexthash;
+			free(kmt);
+		}
+	}
+#endif
 }
 
 static void
@@ -690,7 +711,7 @@ cr_output_unit(FILE * F, region * r,
 			pr = 1;
 			fputs("GEGENSTAENDE\n", F);
 		}
-		fprintf(F, "%d;%s\n", in, locale_string(NULL, ic));
+		fprintf(F, "%d;%s\n", in, add_translation(ic, locale_string(f->locale, ic)));
 	}
 
 	if ((u->faction == f || omniscient(f)) && u->botschaften)

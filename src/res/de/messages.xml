@@ -3910,10 +3910,16 @@
 		<arg name="unit" type="unit"></arg>
 		<arg name="region" type="region"></arg>
 		<arg name="dead" type="int"></arg>
+		<arg name="live" type="int"></arg>
 	</type>
 	<locale name="de">
 		<nr section="events">
-			<text>"$unit($unit) verliert in $region($region) $int($dead) Personen durch Unterernährung."</text>
+			<text>"$unit($unit) verliert in $region($region) $int($dead) von $int($add($live,$dead)) Personen durch Unterernährung."</text>
+		</nr>
+	</locale>
+	<locale name="en">
+		<nr section="none">
+			<text>"$unit($unit) loses $int($dead) of $int($add($live,$dead)) people due to starvation in $region($region)."</text>
 		</nr>
 	</locale>
 </message>
@@ -3952,7 +3958,7 @@
 	<type>
 		<arg name="from" type="unit"></arg>
 		<arg name="amount" type="int"></arg>
-		<arg name="to" type="region"></arg>
+		<arg name="to" type="unit"></arg>
 	</type>
 	<locale name="de">
 		<nr section="events">

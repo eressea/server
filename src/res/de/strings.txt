@@ -1,10 +1,11 @@
+## Schiffstypen
 Karavelle;de;Karavelle
 Boot;de;Boot
 Langboot;de;Langboot
 Drachenschiff;de;Drachenschiff
 Trireme;de;Trireme
 
-# Terraintypen
+## Terraintypen
 maelstrom;de;Mahlstrom
 ocean;de;Ozean
 plain;de;Ebene
@@ -50,7 +51,7 @@ xmas_exit;de;Pforte
 coal;de;Kohlenstück
 coal_p;de;Kohlenstücke
 
-# Himmelsrichtungen
+## Himmelsrichtungen
 west;de;Westen
 northwest;de;Nordwesten
 northeast;de;Nordosten
@@ -65,10 +66,10 @@ dir_SO;de;SO
 dir_SW;de;SW
 dir_West;de;West
 
-# Verschiedenes
+## Verschiedenes
 unknownunit;de;eine unbekannte Einheit
 
-# Meldungssektionen
+## Meldungssektionen
 section_event_p;de;Meldungen und Ereignisse
 section_error_p;de;Warnungen und Fehler
 section_economy;de;Wirtschaft und Handel
@@ -78,8 +79,9 @@ section_movement;de;Reisen und Bewegung
 section_study;de;Lehren und Lernen
 section_battle;de;Kämpfe
 section_none;de;Verschiedenes
+section_newspells;de;Neue Zauber
 
-# Gebäudetypen
+## Gebäudetypen
 fortress_generic;de;Burg
 lighthouse;de;Leuchtturm
 mine;de;Bergwerk
@@ -100,16 +102,16 @@ blessedstonecircle;de;Gesegneter Steinkreis
 illusioncastle;de;Traumschlößchen
 genericbuilding;de;Struktur
 
-#Testgebäude
+## Testgebäude
 temple;de;Tempel
 
-#Testitem
+## Testitem
 wand;de;Zauberstab
 wand_p;de;Zauberstäbe
 wand_of_tear_p;de;Szepter der Tränen
 wands_of_tear_p;de;Szepter der Tränen
 
-# Burgausbaustufen
+## Burgausbaustufen
 site;de;Grundmauern
 fortification;de;Befestigung
 tower;de;Turm
@@ -117,13 +119,13 @@ castle;de;Burg
 fortres_p;de;Festung
 citadel;de;Zitadelle
 
-# Items
+## Items
 herb;de;Kraut
 herbbag;de;Kräuterbeutel
 vial;de;Phiole
 vial_p;de;Phiolen
 
-# Resourcen
+## Resourcen
 money;de;Silber
 money_p;de;Silber
 hp;de;Trefferpunkt
@@ -139,7 +141,7 @@ unit_p;de;Einheiten
 person;de;Person
 person_p;de;Personen
 
-#items
+## items
 runesword;de;Runenschwert
 runesword_p;de;Runenschwerter
 iron;de;Eisen
@@ -166,7 +168,7 @@ bow;de;Bogen
 bow_p;de;Bögen
 mallornbow;de;Mallornbogen
 mallornbow_p;de;Mallornbögen
-# more items
+## more items
 chainmail;de;Kettenhemd
 chainmail_p;de;Kettenhemden
 plate;de;Plattenpanzer
@@ -293,7 +295,7 @@ museumticket_p;de;Eintrittskarten des Großen Museum
 museumexitticket;de;Rückkehrticket des Großen Museum
 museumexitticket_p;de;Rückkehrtickets des Großen Museum
 
-# herb singular
+## herb singular
 h0;de;Flachwurz
 h1;de;Würziger Wagemut
 h2;de;Eulenauge
@@ -316,7 +318,7 @@ h18;de;Eisblume
 h19;de;Weißer Wüterich
 h20;de;Schneekristall
 
-#herb plural
+## herb plural
 h0_p;de;Flachwurz
 h1_p;de;Würzige Wagemut
 h2_p;de;Eulenaugen
@@ -371,11 +373,11 @@ p12_p;de;Tränke der Wahrheit
 p13_p;de;Elixiere der Macht
 p14_p;de;Heiltränke
 
-# Spezialitems
+## Spezialitems
 lmsreward;de;Gürtel der Heldentaten
 lmsreward_p;de;Gürtel der Heldentaten
 
-# Parameter
+## Parameter
 ALLE_p;de;ALLES
 BAUERN;de;BAUERN
 BURG;de;BURG
@@ -416,7 +418,7 @@ ANZAHL;de;ANZAHL
 GEGENSTÄNDE;de;GEGENSTÄNDE
 TRÄNKE;de;TRÄNKE
 
-#;Talente:
+## ;Talente:
 sk_alchemy;de;Alchemie
 sk_crossbow;de;Armbrustschießen
 sk_stamina;de;Ausdauer
@@ -447,7 +449,7 @@ sk_unarmed;de;Waffenloser Kampf
 sk_cartmaking;de;Wagenbau
 sk_perception;de;Wahrnehmung
 
-# Befehle
+## Befehle
 //;de;//
 BANNER;de;BANNER
 ARBEITEN;de;ARBEITEN
@@ -561,7 +563,7 @@ Zombie_p;de;Zombies
 Zwerg;de;Zwerg
 Zwerge;de;Zwerge
 
-# races, future use:
+## races, future use:
 rc_lynx;de;Luchse
 rc_unicorn_p;de;Einhörner
 rc_wolve_p;de;Warge
@@ -599,3 +601,31 @@ rc_orc;de;Ork
 rc_zombie;de;Zombie
 rc_zombie_p;de;Zombies
 rc_shadowknight;de;Schattenritter
+
+
+## NR generieren
+nr_options;de;Optionen
+nr_level;de;Stufe
+nr_alliances;de;Aktueller Status
+nr_herbsrequired;de;Benötigte Kräuter
+nr_undercons;de;im Bau
+nr_damaged;de;beschädigt
+nr_youaredead;de;Unglücklicherweise wurde deine Partei ausgelöscht. Du kannst gerne an einer anderen Stelle wieder einsteigen. Melde Dich einfach wieder an.
+nr_calendar;de;Wir schreiben %s des Monats %s im Jahre %d %s.
+nr_skills;de;Talente
+nr_inventory;de;hat
+nr_size;de;Größe
+nr_spells;de;Zauber
+nr_combatspells;de;Kampfzauber
+nr_nospells;de;keiner
+nr_addresses;de;Liste aller Adressen
+
+
+## Küsten
+Nordwestküste;de;Nordwestküste
+Nordostküste;de;Nordostküste
+Ostküste;de;Ostküste
+Südostküste;de;Südostküste
+Südwestküste;de;Südwestküste
+Westküste;de;Westküste
+

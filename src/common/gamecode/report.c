@@ -165,33 +165,24 @@ read_datenames(const char *filename)
 }
 
 char *
-gamedate(void)
+gamedate(const struct locale * lang)
 {
 	int year,month,week,r;
 	static char buf[256];
 	int t = turn - FIRST_TURN;
 
 	if (t<0) t = turn;
+	assert(lang);
 
 	year  = t/(months_per_year * weeks_per_month) + 1;
 	r     = t - (year-1) * months_per_year * weeks_per_month;
 	month = r/weeks_per_month;
 	week  = r%weeks_per_month;
-	if (turn>=FIRST_TURN) {
-
-		sprintf(buf, "Wir schreiben %s des Monats %s im Jahre %d %s.",
-			weeknames[week],
-			monthnames[month],
-			year,
-			agename);
-	} else {
-		sprintf(buf, "Wir schreiben %s des Monats %s im Jahre %d %s.",
-			weeknames[week],
-			monthnames[month],
-			year,
-			"der alten Zeitrechnung");
-
-	}
+	sprintf(buf, LOC(lang, "nr_calendar"),
+		weeknames[week],
+		monthnames[month],
+		year,
+		agename);
 
 	return buf;
 }
@@ -209,20 +200,11 @@ gamedate2(void)
 	r     = t - (year-1) * months_per_year * weeks_per_month;
 	month = r/weeks_per_month;			/* 0 - months_per_year-1 */
 	week  = r%weeks_per_month;			/* 0 - weeks_per_month-1 */
-	if (turn>=FIRST_TURN) {
-
-		sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
-			weeknames2[week],
-			monthnames[month],
-			year,
-			agename);
-	} else {
-		sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
-			weeknames2[week],
-			monthnames[month],
-			year,
-			"der alten Zeitrechnung");
-	}
+	sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
+		weeknames2[week],
+		monthnames[month],
+		year,
+		agename);
 	return buf;
 }
 
@@ -653,7 +635,7 @@ print_curses(FILE *F, const void * obj, typ_t typ, const attrib *a, int self, in
 					(data->value==1 ? "t" : "en"),
 					data->value,
 					(data->value==1 ? "" : "en"),
-					locale_string(NULL, resourcename(data->type->itype->rtype, 0)));
+					LOC(NULL, resourcename(data->type->itype->rtype, 0)));
 			rnl(F);
 			rparagraph(F, buf, indent, 0);
 		}
@@ -743,7 +725,7 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean
 					char cat_identifier[24];
 
 					sprintf(cat_identifier, "section_%s", category->name);
-					name = locale_string(viewer->locale, cat_identifier);
+					name = LOC(viewer->locale, cat_identifier);
 					if (debug) {
 						if (name!=buf) strcpy(buf, name);
 						sprintf(buf+strlen(name), " [%s]", cat_identifier);
@@ -819,14 +801,14 @@ prices(FILE * F, region * r, faction * f)
 	assert(sale!=NULL);
 
 	sprintf(buf, "Auf dem Markt wird für %s %d Silber verlangt.",
-		locale_string(f->locale, resourcename(sale->itype->rtype, GR_PLURAL)),
+		LOC(f->locale, resourcename(sale->itype->rtype, GR_PLURAL)),
 		sale->price);
 
 	if(n > 0) scat(" Geboten wird für ");
 
 	for (dmd=r->land->demands;dmd;dmd=dmd->next) if(dmd->value > 0) {
 		char sbuf[80];
-		sprintf(sbuf, "%s %d Silber", locale_string(f->locale,
+		sprintf(sbuf, "%s %d Silber", LOC(f->locale,
 			resourcename(dmd->type->itype->rtype, GR_PLURAL)),
 			dmd->value * dmd->type->price);
 		scat(sbuf);
@@ -937,7 +919,7 @@ describe(FILE * F, region * r, int partial, faction * f)
 		if (r_isforest(r)) tname = "forest";
 		else tname = terrain[rterrain(r)].name;
 	}
-	scat(locale_string(f->locale, tname));
+	scat(LOC(f->locale, tname));
 
 	/* Bäume */
 
@@ -1009,7 +991,7 @@ describe(FILE * F, region * r, int partial, faction * f)
 		icat(rhorses(r));
 		scat(" ");
 #ifdef NEW_ITEMS
-		scat(locale_string(f->locale, resourcename(oldresourcetype[R_HORSE], (rhorses(r)>1)?GR_PLURAL:0)));
+		scat(LOC(f->locale, resourcename(oldresourcetype[R_HORSE], (rhorses(r)>1)?GR_PLURAL:0)));
 #else
 		scat(itemdata[I_HORSE].name[rhorses(r) > 1]);
 #endif
@@ -1049,7 +1031,7 @@ describe(FILE * F, region * r, int partial, faction * f)
 					else scat(", im ");
 				}
 				else scat(" Im ");
-				scat(locale_string(f->locale, directions[d]));
+				scat(LOC(f->locale, directions[d]));
 				scat(" ");
 				if (!dh) scat("der Region liegt ");
 				sprintf(dbuf, trailinto(r2, f->locale),
@@ -1122,7 +1104,7 @@ describe(FILE * F, region * r, int partial, faction * f)
 				if (e->lastd==d) strcat(buf, " und im ");
 				else strcat(buf, ", im ");
 			}
-			strcat(buf, locale_string(f->locale, directions[d]));
+			strcat(buf, LOC(f->locale, directions[d]));
 			first = false;
 		}
 		if (!e->transparent) strcat(buf, " versperrt ");
@@ -1196,7 +1178,7 @@ statistics(FILE * F, region * r, faction * f)
 	sprintf(buf, "Personen: %d", number);
 	rps(F, buf);
 	for (itm = items; itm; itm=itm->next) {
-		sprintf(buf, "%s: %d", locale_string(f->locale, resourcename(itm->type->rtype, GR_PLURAL)), itm->number);
+		sprintf(buf, "%s: %d", LOC(f->locale, resourcename(itm->type->rtype, GR_PLURAL)), itm->number);
 		rps(F, buf);
 	}
 	while (items) i_free(i_remove(&items, items));
@@ -1293,7 +1275,7 @@ order_template(FILE * F, faction * f)
 	rps_nowrap(F, "");
 	rnl(F);
 
-	sprintf(buf, "%s %s \"hier_passwort_eintragen\"", locale_string(f->locale, parameters[P_FACTION]), factionid(f));
+	sprintf(buf, "%s %s \"hier_passwort_eintragen\"", LOC(f->locale, parameters[P_FACTION]), factionid(f));
 	rps_nowrap(F, buf);
 	rnl(F);
 
@@ -1316,12 +1298,12 @@ order_template(FILE * F, faction * f)
 					rnl(F);
 					pl = getplane(r);
 					if (pl && fval(pl, PFL_NOCOORDS)) {
-						sprintf(buf, "%s; %s", locale_string(f->locale, parameters[P_REGION]), rname(r, f->locale));
+						sprintf(buf, "%s; %s", LOC(f->locale, parameters[P_REGION]), rname(r, f->locale));
 					} else if (pl && pl->id != 0) {
-						sprintf(buf, "%s %d,%d,%d ; %s", locale_string(f->locale, parameters[P_REGION]), region_x(r,f),
+						sprintf(buf, "%s %d,%d,%d ; %s", LOC(f->locale, parameters[P_REGION]), region_x(r,f),
 								region_y(r,f), pl->id, rname(r, f->locale));
 					} else {
-						sprintf(buf, "%s %d,%d ; %s", locale_string(f->locale, parameters[P_REGION]), region_x(r,f),
+						sprintf(buf, "%s %d,%d ; %s", LOC(f->locale, parameters[P_REGION]), region_x(r,f),
 								region_y(r,f), rname(r, f->locale));
 					}
 					rps_nowrap(F, buf);
@@ -1334,7 +1316,7 @@ order_template(FILE * F, faction * f)
 				}
 				dh = 1;
 
-				sprintf(buf, "%s %s;		%s [%d,%d$", locale_string(u->faction->locale, parameters[P_UNIT]),
+				sprintf(buf, "%s %s;		%s [%d,%d$", LOC(u->faction->locale, parameters[P_UNIT]),
 						unitid(u), u->name, u->number, get_money(u));
 				if (u->building != NULL && fval(u, FL_OWNER)) {
 					building * b = u->building;
@@ -1382,7 +1364,7 @@ order_template(FILE * F, faction * f)
 	}
 	rps_nowrap(F, "");
 	rnl(F);
-	sprintf(buf, locale_string(f->locale, parameters[P_NEXT]));
+	sprintf(buf, LOC(f->locale, parameters[P_NEXT]));
 	rps_nowrap(F, buf);
 	rnl(F);
 }
@@ -1571,7 +1553,7 @@ list_address(FILE * F, faction * uf)
 	}
 	v_sort(fcts->begin, fcts->end, fcompare);
 
-	centre(F, "Liste aller Adressen", false);
+	centre(F, LOC(uf->locale, "nr_addresses"), false);
 	rnl(F);
 	for (fp = fcts->begin; fp != fcts->end; ++fp) {
 		f = *fp;
@@ -1600,7 +1582,8 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 		type = b->type;
 	}
 
-	sprintf(buf, "%s, Größe %d, %s", buildingname(b), b->size, buildingtype(b, b->size, lang));
+	sprintf(buf, "%s, %s %d, %s", buildingname(b), LOC(f->locale, "nr_size"),
+		b->size, buildingtype(b, b->size, lang));
 	if (b->size < type->maxsize) {
 		scat(" (im Bau)");
 	}
@@ -1682,9 +1665,9 @@ report(FILE *F, faction * f)
 	else
 		printf(" - Schreibe Report\n");
 
-	centre(F, gamedate(), true);
+	centre(F, gamedate(f->locale), true);
 	rnl(F);
-	sprintf(buf, "%s, %s/%s (%s)", factionname(f), locale_string(f->locale, race[f->race].name[1]),
+	sprintf(buf, "%s, %s/%s (%s)", factionname(f), LOC(f->locale, race[f->race].name[1]),
 			neue_gebiete[f->magiegebiet], f->email);
 	centre(F, buf, true);
 
@@ -1777,11 +1760,11 @@ report(FILE *F, faction * f)
 		}
 	}
 
-	sprintf(buf, "Optionen:");
+	sprintf(buf, "%s:", LOC(f->locale, "nr_options"));
 	for (op = 0; op != MAXOPTIONS; op++) {
 		if (f->options & (int) pow(2, op)) {
 			scat(" ");
-			scat(options[op]);
+			scat(LOC(f->locale, options[op]));
 #ifdef AT_OPTION
 			if(op == O_NEWS) {
 				attrib *a = a_find(f->attribs, &at_option_news);
@@ -1817,7 +1800,7 @@ report(FILE *F, faction * f)
 	if(f->battles) {
 		struct bmsg * bm;
 		rnl(F);
-		centre(F, "Kämpfe", false);
+		centre(F, LOC(f->locale, "section_battle"), false);
 		rnl(F);
 		for (bm=f->battles;bm;bm=bm->next) {
 #ifdef HAVE_SNPRINTF
@@ -1837,14 +1820,13 @@ report(FILE *F, faction * f)
 	a = a_find(f->attribs, &at_reportspell);
 	if (a) {
 		rnl(F);
-		centre(F, "Neue Zauber", true);
+		centre(F, LOC(f->locale, "section_newspells"), true);
 		while (a) {
 			report_spell(F, (spellid_t)a->data.i);
 			a = a->nexttype;
 		}
 	}
 
-#ifdef NEW_ITEMS
 	ch = 0;
 	for (a=a_find(f->attribs, &at_showitem);a;a=a->nexttype) {
 		const potion_type * ptype = resource2potion(((const item_type*)a->data.v)->rtype);
@@ -1853,18 +1835,18 @@ report(FILE *F, faction * f)
 		m = ptype->itype->construction->materials;
 		if (ch==0) {
 			rnl(F);
-			centre(F, "Erforschte Tränke", true);
+			centre(F, LOC(f->locale, "section_newpotions"), true);
 			ch = 1;
 		}
 
 		rnl(F);
-		centre(F, locale_string(f->locale, resourcename(ptype->itype->rtype, 0)), true);
-		sprintf(buf, "Stufe %d", ptype->level);
+		centre(F, LOC(f->locale, resourcename(ptype->itype->rtype, 0)), true);
+		sprintf(buf, "%s %d", LOC(f->locale, "nr_level"), ptype->level);
 		centre(F, buf, true);
 		rnl(F);
-		sprintf(buf, "Benötigte Kräuter: ");
+		sprintf(buf, "%s: ", LOC(f->locale, "nr_herbsrequired"));
 		while (m->number) {
-			scat(locale_string(f->locale, resourcename(oldresourcetype[m->type], 0)));
+			scat(LOC(f->locale, resourcename(oldresourcetype[m->type], 0)));
 			++m;
 			if (m->number) scat(", ");
 		}
@@ -1872,47 +1854,8 @@ report(FILE *F, faction * f)
 		rnl(F);
 		centre(F, ptype->text, true);
 	}
-#else
-	for (potion = 0; potion != MAXPOTIONS; potion++)
-		if (f->showpotion[potion] == 1)
-			break;
-
-	if (potion != MAXPOTIONS) {
-
-		rnl(F);
-		centre(F, "Erforschte Tränke", true);
-
-		for (potion = 0; potion != MAXPOTIONS; ++potion) {
-			if (f->showpotion[potion] == 1) {
-				int h;
-
-				rnl(F);
-				centre(F, potionnames[0][potion], true);
-				sprintf(buf, "Stufe %d", potionlevel[potion]);
-				centre(F, buf, true);
-				rnl(F);
-				sprintf(buf, "Benötigte Kräuter: ");
-				for (h = 0; h < MAXHERBSPERPOTION; h++) {
-					if (potionherbs[potion][h] == NOHERB)
-						break;
-					if (h > 0) {
-						scat(", ");
-					}
-					scat(herbdata[0][potionherbs[potion][h]]);
-				}
-				centre(F, buf, true);
-				rnl(F);
-				centre(F, (char *) potiontext[potion], true);
-
-				/* Nicht nochmal anzeigen! */
-
-				f->showpotion[potion] = 2;
-			}
-		}
-	}
-#endif
 	rnl(F);
-	centre(F, "Aktueller Status", false);
+	centre(F, LOC(f->locale, "nr_alliances"), false);
 	rnl(F);
 
 	allies(F, f);
@@ -2034,31 +1977,29 @@ report(FILE *F, faction * f)
 				}
 				sprintf(buf, "%s, %s, (%d/%d)",
 					shipname(sh),
-					locale_string(f->locale, sh->type->name[0]),
+					LOC(f->locale, sh->type->name[0]),
 					(w + 99) / 100,	/* +99 weil sonst die Nachkommastellen ignoriert würden */
 					shipcapacity(sh) / 100);
 			} else {
 				sprintf(buf, "%s, %s", shipname(sh), 
-					locale_string(f->locale, sh->type->name[0]));
+					LOC(f->locale, sh->type->name[0]));
 			}
 
 			assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
 			if (sh->size!=sh->type->construction->maxsize) {
-				scat(", im Bau (");
-				icat(sh->size);
-				scat("/");
-				icat(sh->type->construction->maxsize);
-				scat(")");
+				sprintf(buf+strlen(buf), ", %s (%d/%d)", 
+					LOC(f->locale, "nr_undercons"), sh->size, 
+					sh->type->construction->maxsize);
 			}
 			if (sh->damage) {
-				scat(", ");
-				icat(sh->damage*100/(sh->size*DAMAGE_SCALE));
-				scat("% beschädigt");
+				sprintf(buf+strlen(buf), ", %d%% %s", 
+					sh->damage*100/(sh->size*DAMAGE_SCALE),
+					LOC(f->locale, "nr_damaged"));
 			}
 			if (rterrain(r) != T_OCEAN) {
 				if (sh->coast != NODIRECTION) {
 					scat(", ");
-					scat(coasts[sh->coast]);
+					scat(LOC(f->locale, coasts[sh->coast]));
 				}
 			}
 			ch = 0;
@@ -2097,9 +2038,7 @@ report(FILE *F, faction * f)
 	if (f->no != MONSTER_FACTION) {
 		if (!anyunits) {
 			rnl(F);
-			rparagraph(F, "Unglücklicherweise wurde deine Partei ausgelöscht. "
-				 "Du kannst gerne an einer anderen Stelle wieder "
-				   "einsteigen. Melde Dich einfach wieder an.", 0, 0);
+			rparagraph(F, LOC(f->locale, "nr_youaredead"), 0, 0);
 		} else {
 			if (wants_addresses) {
 				list_address(F, f);
@@ -3382,7 +3321,7 @@ eval_resource(struct opstack ** stack, const void * userdata)
 	int j = opop(stack, int);
 	struct resource_type * res = opop(stack, struct resource_type *);
 
-	const char * c = locale_string(report->locale, resourcename(res, j!=1));
+	const char * c = LOC(report->locale, resourcename(res, j!=1));
 	opush(stack, strcpy(balloc(strlen(c)+1), c));
 }
 
@@ -3393,7 +3332,7 @@ eval_race(struct opstack ** stack, const void * userdata)
 	int j = opop(stack, int);
 	int r = opop(stack, int);
 
-	const char * c = locale_string(report->locale, race[r].name[j!=1]);
+	const char * c = LOC(report->locale, race[r].name[j!=1]);
 	opush(stack, strcpy(balloc(strlen(c)+1), c));
 }
 
@@ -3403,7 +3342,7 @@ eval_direction(struct opstack ** stack, const void * userdata)
 	const faction * report = (const faction*)userdata;
 	int i = opop(stack, int);
 
-	const char * c = locale_string(report->locale, directions[i]);
+	const char * c = LOC(report->locale, directions[i]);
 	opush(stack, strcpy(balloc(strlen(c)+1), c));
 }
 

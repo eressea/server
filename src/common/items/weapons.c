@@ -278,8 +278,8 @@ init_oldweapons(void)
 
 /** begin mallornspear **/
 resource_type rt_mallornspear = {
-	{ "mallornspear", "mallornspears" },
-	{ "mallornspear", "mallornspears" },
+	{ "mallornspear", "mallornspear_p" },
+	{ "mallornspear", "mallornspear_p" },
 	RTF_ITEM,
 	&res_changeitem
 };
@@ -309,8 +309,8 @@ weapon_type wt_mallornspear = {
 
 /** begin mallornlance **/
 resource_type rt_mallornlance = {
-	{ "mallornlance", "mallornlances" },
-	{ "mallornlance", "mallornlances" },
+	{ "mallornlance", "mallornlance_p" },
+	{ "mallornlance", "mallornlance_p" },
 	RTF_ITEM,
 	&res_changeitem
 };
@@ -340,8 +340,8 @@ weapon_type wt_mallornlance = {
 
 /** begin mallornbow **/
 resource_type rt_mallornbow = {
-	{ "mallornbow", "mallornbows" },
-	{ "mallornbow", "mallornbows" },
+	{ "mallornbow", "mallornbow_p" },
+	{ "mallornbow", "mallornbow_p" },
 	RTF_ITEM,
 	&res_changeitem
 };
@@ -371,8 +371,8 @@ weapon_type wt_mallornbow = {
 
 /** begin mallorncrossbow **/
 resource_type rt_mallorncrossbow = {
-	{ "mallorncrossbow", "mallorncrossbows" },
-	{ "mallorncrossbow", "mallorncrossbows" },
+	{ "mallorncrossbow", "mallorncrossbow_p" },
+	{ "mallorncrossbow", "mallorncrossbow_p" },
 	RTF_ITEM,
 	&res_changeitem
 };

@@ -43,7 +43,7 @@ extern void spskill(const struct locale * lang, const struct unit * u, skill_t s
 extern void spunit(struct strlist ** SP, const struct faction * f, const struct unit * u, int indent, int mode);
 
 void reports(void);
-char *gamedate(void);
+char *gamedate(const struct locale *);
 char *gamedate2(void);
 
 struct summary;

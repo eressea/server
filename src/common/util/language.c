@@ -121,6 +121,7 @@ locale_string(const locale * lang, const char * key)
 			s = locale_string(default_locale, key);
 			if (s_debug) {
 				fprintf(s_debug, "%s;%s;%s\n", key, lang->name, s);
+				fflush(s_debug);
 				locale_setstring((struct locale*)lang, key, s);
 			}
 		}

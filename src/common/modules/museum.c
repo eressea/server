@@ -42,8 +42,8 @@
 #include <stdlib.h>
 
 resource_type rt_museumticket = {
-	{ "museumticket", "museumtickets"},
-	{ "museumticket", "museumtickets"},
+	{ "museumticket", "museumticket_p"},
+	{ "museumticket", "museumticket_p"},
 	RTF_ITEM,
 	&res_changeitem
 };
@@ -57,8 +57,8 @@ item_type it_museumticket = {
 };
 
 resource_type rt_museumexitticket = {
-	{ "museumexitticket", "museumexittickets"},
-	{ "museumexitticket", "museumexittickets"},
+	{ "museumexitticket", "museumexitticket_p"},
+	{ "museumexitticket", "museumexitticket_p"},
 	RTF_ITEM,
 	&res_changeitem
 };

@@ -103,8 +103,8 @@ leave_arena(struct unit * u, const struct item_type * itype, const char * cmd)
 }
 
 static resource_type rt_gryphonwing = {
-	{ "griphonwing", "griphonwings" },
-	{ "griphonwing", "griphonwings" },
+	{ "griphonwing", "griphonwing_p" },
+	{ "griphonwing", "griphonwing_p" },
 	RTF_ITEM,
 	&res_changeitem
 };
@@ -171,8 +171,8 @@ enter_arena(unit * u, const item_type * itype, const char * cmd)
 }
 
 static resource_type rt_arenagate = {
-	{ "eyeofdragon", "eyeofdragons" },
-	{ "eyeofdragon", "eyeofdragons" },
+	{ "eyeofdragon", "eyeofdragon_p" },
+	{ "eyeofdragon", "eyeofdragon_p" },
 	RTF_ITEM,
 	&res_changeitem
 };

@@ -20,8 +20,8 @@ dir_West;en;West
 
 unknownunit;en;an unknown unit
 
-section_event_p;en;Messages and Events
-section_error_p;en;Warnings and Errors
+section_events;en;Messages and Events
+section_errors;en;Warnings and Errors
 section_economy;en;Economy and Trade
 section_production;en;Resources and Production
 section_magic;en;Magic and Artefacts
@@ -29,8 +29,9 @@ section_movement;en;Movement and Travel
 section_study;en;Learning and Teaching
 section_battle;en;Battles
 section_none;en;Miscellaneous
+section_newspells;en;New Spells
 
-# Building Types
+##  Building Types
 academy;en;academy
 blessedstonecircle;en;blessed stonecircle
 caravan;en;caravanserei
@@ -46,24 +47,24 @@ monument;en;monument
 quarry;en;quarry
 sawmill;en;sawmill
 smithy;en;smithy
-stables;en;stables
+stables;en;stable
 stonecircle;en;stonecircle
 tunnel;en;tunnel
 
-# Burgausbaustufen
-site;en;site
+##  Burgausbaustufen
+site;en;foundation
 fortification;en;fortification
 tower;en;tower
 castle;en;castle
-fortres_p;en;fortress
+fortress;en;fortress
 citadel;en;citadel
 
-# Items
+##  Items
 herb;en;herb
 vial;en;vial
 vial_p;en;vials
 
-# Resourcen
+##  Resourcen
 money;en;silver
 money_p;en;silver
 hp;en;hp
@@ -75,7 +76,7 @@ permaura_p;en;permauras
 peasant;en;peasant
 peasant_p;en;peasants
 
-#items
+##  items
 almond;en;almond
 almond_p;en;almonds
 amulet;en;amulet
@@ -219,7 +220,7 @@ trollbelt;en;trollbelt
 unit;en;unit
 unit_p;en;units
 
-# luxury goods
+##  luxury goods
 balm;en;balm
 spice;en;spice
 jewel;en;gem
@@ -235,11 +236,11 @@ oil_p;en;oil
 silk_p;en;silk
 incense_p;en;incense
 
-# Spezialitems
+##  Spezialitems
 lmsreward;en;Belt of Heroic Legends
 lmsreward_p;en;Belts of Heroic Legends
 
-# Terraintypen
+##  Terraintypen
 activevolcano;en;active volcano
 corridor1;en;corridor
 desert;en;desert
@@ -286,7 +287,7 @@ xmas_exit;en;portal
 viele;en;many
 sehr viele;en;a great many
 
-# intranslatables:
+##  intranslatables:
 h0;en;Flachwurz
 h0_p;en;Flachwurz
 h1;en;Würziger Wagemut
@@ -329,38 +330,38 @@ h19;en;Weißer Wüterich
 h19_p;en;Weiße Wüteriche
 h20;en;Schneekristall
 h20_p;en;Schneekristalle
-p0;en;Siebenmeilentee
-p0_p;en;Siebenmeilentees
-p1;en;Goliathwasser
-p1_p;en;Goliathwasser
-p2;en;Wasser des Lebens
-p2_p;en;Wasser des Lebens
+p0;en;seven mile tea
+p0_p;en;seven mile teas
+p1;en;goliath water
+p1_p;en;goliath waters
+p2;en;water of life
+p2_p;en;waters of life
 p3;en;Schaffenstrunk
 p3_p;en;Schaffenstrünke
-p4;en;Wundsalbe
-p4_p;en;Wundsalben
-p5;en;Bauernblut
-p5_p;en;Bauernblut
-p6;en;Gehirnschmalz
-p6_p;en;Gehirnschmalz
+p4;en;ointment
+p4_p;en;ointments
+p5;en;peasant bood
+p5_p;en;peasant bloods
+p6;en;brain wax
+p6_p;en;brain waxes
 p7;en;Dumpfbackenbrot
 p7_p;en;Dumpfbackenbrote
 p8;en;Nestwärme
 p8_p;en;Nestwärme
-p9;en;Pferdeglück
-p9_p;en;Pferdeglück
-p10;en;Berserkerblut
-p10_p;en;Berserkerblut
-p11;en;Bauernlieb
-p11_p;en;Bauernlieb
-p12;en;Trank der Wahrheit
-p12_p;en;Tränke der Wahrheit
-p13;en;Elixier der Macht
-p13_p;en;Elixiere der Macht
-p14;en;Heiltrank
-p14_p;en;Heiltränke
+p9;en;horsepower potion
+p9_p;en;horsepower potions
+p10;en;berserkers blood potion
+p10_p;en;berserkers blood potions
+p11;en;peasant love potion
+p11_p;en;peasant love potion
+p12;en;potion of truth
+p12_p;en;potions of truth
+p13;en;elixir of power
+p13_p;en;elixirs of power
+p14;en;healing potion
+p14_p;en;healing potions
 
-# Parameters
+##  Parameters
 AGGRESSIV;en;AGGRESSIVE
 ALLES;en;ALL
 ANZAHL;en;NUMBER
@@ -368,7 +369,7 @@ AURA;en;AURA
 BAUERN;en;PEASANTS
 BEISTAND;en;AID
 BEWACHE;en;GUARD
-BURG;en;FORTIFICATION
+BURG;en;CASTLE
 DEFENSIV;en;DEFENSIVE
 EINHEIT;en;UNIT
 FLIEHE;en;FLEE
@@ -378,11 +379,11 @@ GEGENSTÄNDE;en;ITEMS
 GIB;en;GIVE
 GNADE;en;MERCY
 HELFE;en;HELP
-HINTEN;en;BACK
+HINTEN;en;REAR
 HINTER;en;AFTER
 KOMMANDO;en;CONTROL
 KRÄUTER;en;HERBS
-KÄMPFE;en;COMBAT
+KÄMPFE;en;FIGHT
 NICHT;en;NOT
 NÄCHSTER;en;NEXT
 PARTEI;en;PARTEI
@@ -401,7 +402,7 @@ VOR;en;BEFORE
 VORNE;en;FRONT
 ZAUBERBUCH;en;SPELLBOOK
 
-# Skills
+##  Skills
 sk_alchemy;en;alchemy
 sk_armorer;en;armorer
 sk_bow;en;bow
@@ -432,7 +433,7 @@ sk_training;en;taming
 sk_unarmed;en;unarmed combat
 sk_weaponsmithing;en;weaponsmithing
 
-# Keywords
+##  Keywords
 //;en;//
 ARBEITEN;en;WORK
 ATTACKIEREN;en;ATTACK
@@ -510,7 +511,7 @@ Eulen;en;owls
 Geist;en;ghost
 Geister;en;ghosts
 Goblin;en;goblin
-Goblin_p;en;goblins
+Goblins;en;goblins
 Halbling;en;halfling
 Halblinge;en;halflings
 Hirntöter;en;braineater
@@ -522,14 +523,14 @@ Katze;en;cat
 Katzen;en;cats
 Katzendrache;en;catdragon
 Katzendrachen;en;catdragons
-Luch_p;en;lynx
+Luchs;en;lynx
 Luchse;en;lynx
 Meermensch;en;aquarian
 Meermenschen;en;aquarians
 Mensch;en;human
 Menschen;en;humans
 Ork;en;orc
-Ork_p;en;orc
+Orks;en;orc
 Riesenschildkröte;en;giant turtle
 Riesenschildkröten;en;giant turtles
 Schablone;en;template
@@ -546,3 +547,42 @@ Zombie;en;zombie
 Zombie_p;en;zombies
 Zwerg;en;dwarf
 Zwerge;en;dwarves
+
+##  NR generieren
+nr_options;en;Options
+nr_level;en;Level
+nr_alliances;en;Political Status
+nr_herbsrequired;en;Herbs required
+nr_undercons;en;under construction
+nr_damaged;en;damage
+nr_youaredead;en;Your faction has been eliminated. We hope you had a good time anyways, and encourage you to sign up you for another game.
+# TODO: calendar ist noch komplexer
+nr_calendar;en;It is %s of the month of %s in the %d. year of %s.
+nr_skills;en;skills
+nr_inventory;en;has
+nr_size;en;size
+nr_spells;en;spells
+nr_combatspells;en;combat spells
+nr_nospells;en;none
+nr_Addresslist;en;Addresses
+
+##  Küsten
+Nordwestküste;en;northwest coast
+Nordostküste;en;northeast coast
+Ostküste;en;east coast
+Südostküste;en;southeast coast
+Südwestküste;en;southwest coast
+Westküste;en;west coast
+
+
+##  Reportoptionen
+AUSWERTUNG;en;REPORT
+COMPUTER;en;COMPUTER
+ZUGVORLAGE;en;TEMPLATE
+SILBERPOOL;en;SILVERPOOL
+STATISTIK;en;STATISTICS
+MATERIALPOOL;en;ITEMPOOL
+ADRESSEN;en;ADDRESSES
+ZIPPED;en;ZIPPED
+BZIP2;en;BZIP2
+PUNKTE;en;SCORE

@@ -1503,6 +1503,8 @@ wsn(FILE * F, const char *s)
 		wc(F, *s++);
 }
 
+#define whs(F, s) fputs(s, F)
+
 void
 ws(FILE * F, const char *s)
 {
@@ -1529,7 +1531,7 @@ write_items(FILE *F, item *ilist)
 {
 	item * itm;
 	for (itm=ilist;itm;itm=itm->next) if (itm->number) {
-		ws(F, resourcename(itm->type->rtype, 0));
+		whs(F, resourcename(itm->type->rtype, 0));
 		wspace(F);
 		wi(F, itm->number);
 		wspace(F);
