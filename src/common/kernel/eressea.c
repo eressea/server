@@ -2400,7 +2400,7 @@ remove_empty_factions(boolean writedropouts)
 				}
 			}
 			if (f->subscription) fprintf(sqlstream, "UPDATE subscriptions set status='DEAD' where "
-				"subscription=%u\n;", f->subscription);
+				"id=%u\n;", f->subscription);
 
 			*fp = f->next;
 /*			stripfaction(f);
