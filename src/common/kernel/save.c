@@ -729,6 +729,7 @@ readgame(boolean backup)
 	ship *sh, **shp;
 	unit *u;
 	FILE * F;
+	int rmax = maxregions;
 
 	sprintf(buf, "%s/%d", datapath(), turn);
 	if (backup) create_backup(buf);
@@ -838,8 +839,8 @@ readgame(boolean backup)
 	/* Regionen */
 
 	n = ri(F);
-	if (maxregions<0) maxregions = n;
-	printf(" - Einzulesende Regionen: %d/%d\r", maxregions, n);
+	if (rmax<0) rmax = n;
+	printf(" - Einzulesende Regionen: %d/%d\r", rmax, n);
 
 	while (--n >= 0) {
 		unit **up;
@@ -853,15 +854,15 @@ readgame(boolean backup)
 			} else {
 				firstx=0;
 				firsty=0;
-				if (maxregions>0) maxregions = min(n, maxregions)-1;
+				if (rmax>0) rmax = min(n, rmax)-1;
 			}
 		}
-		if (maxregions==0) {
+		if (rmax==0) {
 			if (dirtyload) break;
 			skip = true;
 		}
 		if ((n%1024)==0) {	/* das spart extrem Zeit */
-			printf(" - Einzulesende Regionen: %d/%d ", maxregions, n);
+			printf(" - Einzulesende Regionen: %d/%d ", rmax, n);
 			printf("* %d,%d    \r", x, y);
 		}
 		if (skip) {
@@ -871,7 +872,7 @@ readgame(boolean backup)
 			} while (r && buf[0]!='\n');
 			continue;
 		}
-		--maxregions;
+		--rmax;
 
 		r = readregion(F, x, y);
 
