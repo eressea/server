@@ -2752,7 +2752,7 @@ reports(void)
 		addresses = get_addresses(f, seen);
 		if (!nonr && (f->options & wants_report))
 		{
-			sprintf(buf, "%s/%s.nr", reportpath(), factionid(f));
+			sprintf(buf, "%s/%d-%s.nr", reportpath(), turn, factionid(f));
 			F = cfopen(buf, "wt");
 			if (F) {
 				report(F, f, addresses, pzTime);
@@ -2762,7 +2762,7 @@ reports(void)
 		}
 		if (!nocr && (f->options & wants_computer_report || f->age<3))
 		{
-			sprintf(buf, "%s/%s.cr", reportpath(), factionid(f));
+			sprintf(buf, "%s/%d-%s.cr", reportpath(), turn, factionid(f));
 			F = cfopen(buf, "wt");
 			if (F) {
 				report_computer(F, f, seen, addresses, ltime);
@@ -2785,12 +2785,12 @@ reports(void)
 			if (f->no > 0 && f->options & wants_compressed) {
 
 				if(f->age == 1) {
-					fprintf(BAT, "ls %s.nr %s.cr | zip -m -j -9 -@ %s.zip\n",
-						factionid(f), factionid(f), factionid(f));
-					fprintf(BAT, "zip -j -9 %s.zip ../res/%s/%s/welcome.txt\n", factionid(f), global.welcomepath, locale_name(f->locale));
+					fprintf(BAT, "ls %d-%s.nr %d-%s.cr | zip -m -j -9 -@ %s.zip\n",
+						turn, factionid(f), turn, factionid(f), factionid(f));
+					fprintf(BAT, "zip -j -9 %d-%s.zip ../res/%s/%s/welcome.txt\n", turn, factionid(f), global.welcomepath, locale_name(f->locale));
 				} else {
-					fprintf(BAT, "ls %s.nr %s.cr | zip -m -j -9 -@ %s.zip\n",
-						factionid(f), factionid(f), factionid(f));
+					fprintf(BAT, "ls %d-%s.nr %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
+						turn, factionid(f), turn, factionid(f), factionid(f));
 				}
 
 				fprintf(shfp, "eresseamail.zipped $addr \"%s %s\" \"%s-%d.zip\" "
@@ -2803,8 +2803,8 @@ reports(void)
 						" \\\n\t\"text/plain\" \"Willkommen\" ../res/%s/%s/welcome.txt", global.welcomepath, locale_name(f->locale));
 				}
 
-				fprintf(BAT, "bzip2 -9v `ls %s.nr %s.cr`\n",
-					factionid(f), factionid(f));
+				fprintf(BAT, "bzip2 -9v `ls 5D-%s.nr %d-%s.cr`\n",
+					turn, factionid(f), turn, factionid(f));
 
 				fprintf(shfp, "eresseamail.bzip2 $addr \"%s %s\"", global.gamename, gamedate_short());
 
@@ -2815,13 +2815,13 @@ reports(void)
 
 				if (!nocr && (f->options & wants_computer_report || f->age<3))
 					fprintf(shfp,
-						" \\\n\t\"application/x-bzip2\" \"Computer-Report\" %s.cr.bz2",
-						factionid(f));
+						" \\\n\t\"application/x-bzip2\" \"Computer-Report\" %d-%s.cr.bz2",
+						turn, factionid(f));
 #ifdef USE_MERIAN
 				if (!nomer && f->options & wants_merian)
 					fprintf(shfp,
-						" \\\n\t\"application/x-bzip2\" \"Merian-Karte\" %s.mer.bz2",
-						factionid(f));
+						" \\\n\t\"application/x-bzip2\" \"Merian-Karte\" %d-%s.mer.bz2",
+						turn, factionid(f));
 #endif
 			} else {
 
@@ -2834,13 +2834,13 @@ reports(void)
 
 				if (!nonr && f->options & wants_report)
 					fprintf(shfp,
-						" \\\n\t\"text/plain\" \"Report\" %s.nr",
-						factionid(f));
+						" \\\n\t\"text/plain\" \"Report\" turn, %s.nr",
+						turn, factionid(f));
 
 				if (!nocr && (f->options & wants_computer_report || f->age<3))
 					fprintf(shfp,
-						" \\\n\t\"text/x-eressea-cr\" \"Computer-Report\" %s.cr",
-						factionid(f));
+						" \\\n\t\"text/x-eressea-cr\" \"Computer-Report\" %d-%s.cr",
+						turn, factionid(f));
 			}
 
 			fprintf(BAT, ". %s.sh %s\n", factionid(f), f->email);
