@@ -226,7 +226,7 @@ magicanalyse_unit(unit *u, unit *mage, int force)
 		c = (curse*)a->data.v;
 		/* ist der curse schwächer als der Analysezauber, so ergibt sich
 		 * mehr als 100% chance und damit immer ein Erfolg. */
-		chance = chance = curse_chance(c, force);
+		chance = curse_chance(c, force);
 		mon = c->duration + (rand()%10) - 5;
 		mon = max(1,mon);
 
@@ -2867,7 +2867,7 @@ typedef struct wallcurse {
 } wallcurse;
 
 void
-wall_vigour(curse* c, int delta)
+wall_vigour(curse* c, double delta)
 {
 	wallcurse * wc = (wallcurse*)c->data;
 	assert(wc->buddy->vigour==c->vigour);

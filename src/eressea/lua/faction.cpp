@@ -57,13 +57,13 @@ faction_getalliance(const faction& f)
 {
   return f.alliance;
 }
+#endif
 
 const char *
 faction_locale(const faction& f)
 {
   return locale_name(f.locale);
 }
-#endif
 
 void
 bind_faction(lua_State * L) 

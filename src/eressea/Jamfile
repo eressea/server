@@ -31,6 +31,7 @@ LinkLibraries $(LUASERVER) :
 LINKLIBS on $(SERVER) += -lm ;
 LINKLIBS on $(LUASERVER) += -L$(LUABIND_ROOT)/lib -llua50 -llualib50 ;
 LINKLIBS on $(LUASERVER) += -lm -lluabind -ldl -lstdc++ ;
+# -Wl,-R,$(HOME)/software/$(HOST)/lib ;
 
 if $(HAVE_LUA) {
  SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;
