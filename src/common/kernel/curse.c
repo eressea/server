@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: curse.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: curse.c,v 1.3 2001/01/31 17:40:49 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -550,6 +550,9 @@ create_curse(unit *magician, attrib **ap, curse_t id, int id2, int vigour,
 		if(cursedaten[id].mergeflags & M_VIGOUR){
 			c->vigour = max(vigour, c->vigour);
 		}
+		if(cursedaten[id].mergeflags & M_VIGOUR_ADD){
+			c->vigour = vigour + c->vigour;
+		}
 		if(cursedaten[id].mergeflags & M_MEN){
 			switch (cursedaten[id].typ) {
 				case CURSETYP_UNIT:
@@ -714,6 +717,19 @@ cinfo_nocost(void * obj, typ_t typ, curse *c, int self)
 
 	assert(typ == TYP_BUILDING);
 	sprintf(buf, "Der Zahn der Zeit kann diesen Mauern nichts anhaben. (%s)",
+			curseid(c));
+	return 1;
+}
+/* C_HOLYGROUND */
+static int
+cinfo_holyground(void * obj, typ_t typ, curse *c, int self)
+{
+	unused(typ);
+	unused(obj);
+	unused(self);
+
+	assert(typ == TYP_REGION);
+	sprintf(buf, "Untote schrecken vor dieser Region zurück. (%s)",
 			curseid(c));
 	return 1;
 }
@@ -1232,7 +1248,6 @@ cinfo_riot(void * obj, typ_t typ, curse *c, int self)
 /* cursedata */
 /* ------------------------------------------------------------- */
 /* typedef struct cursedata {
- *   curse_t id;
  *   int typ;
  *   int givemenacting;
  *   int mergeflags;
@@ -1475,11 +1490,12 @@ cursedata cursedaten[MAXCURSE] =
 		"auf Ewig stehen.",
 		(cdesc_fun)cinfo_nocost
 	},
-	{ /* C_FREE_12, */
-		CURSETYP_NORM, 0, (NO_MERGE),
-		"",
-		"",
-		NULL
+	{ /* C_HOLYGROUND, */
+		CURSETYP_NORM, 0, (M_VIGOUR_ADD),
+		"Heiliger Boden",
+		"Verschiedene Naturgeistern sind im Boden der Region gebunden und "
+		"beschützen diese vor dem der dunklen Magie des lebenden Todes.",
+		(cdesc_fun)cinfo_holyground
 	},
 	{ /* C_FREE_13, */
 		CURSETYP_NORM, 0, (NO_MERGE),

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: curse.h,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: curse.h,v 1.3 2001/01/31 17:40:50 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -58,7 +58,7 @@ enum {
 	C_FUMBLE,
 	C_RIOT,           /*region in Aufruhr */
 	C_NOCOST,
-	C_FREE_12,
+	C_HOLYGROUND,
 	C_FREE_13,
 	C_FREE_14,
 	C_FREE_15,
@@ -126,6 +126,7 @@ enum {
 													 sich */
 #define M_VIGOUR     32 /* das Maximum der beiden Stärken wird die
 													 Stärke des neuen Zaubers */
+#define M_VIGOUR_ADD 64	/* Vigour wird addiert */
 
 /* ------------------------------------------------------------- */
 /* Allgemeine Zauberwirkungen */

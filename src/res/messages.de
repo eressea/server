@@ -1,5 +1,5 @@
 # Kommentare sind erlaubt. Endlich.
-# $Id: messages.de,v 1.3 2001/01/31 14:32:59 corwin Exp $
+# $Id: messages.de,v 1.4 2001/01/31 17:40:53 corwin Exp $
 
 # Fehlermeldungen:
 msg_errors;errors:0;de;{string}
@@ -279,7 +279,7 @@ error276;errors:0;de;{unit} in {region}: '{command}' - Hier kann man keine Schif
 error277;errors:0;de;{unit} in {region}: '{command}' - Das kann die Einheit nicht.
 error278;errors:0;de;{unit} in {region}: '{command}' - Der Name des Gebäudes kann nicht geändert werden.
 error279;errors:0;de;{unit} in {region}: '{command}' - Die Beschreibung des Gebäudes kann nicht geändert werden.
-error280;errors:0;de;{unit} in {region}: '{command}' - Nur Untote können das Ziel dieses Zaubers sein.
+error280;errors:0;de;{unit} in {region}: '{command}' - Nur noch nicht gestärkte Untote können das Ziel dieses Zaubers sein.
 
 # Meldungen und Ereignisse
 msg_event;events:0;de;{string}
@@ -484,6 +484,7 @@ becomewyrm;magic;2;de;{mage} verwandelt sich in einen Wyrm.
 puttorest;magic;0;de;{mage} befreit die gequälten Seelen der Toten.
 unholypower_effect;0;de;{mage} verwandelt {target}.
 unholypower_effect;0;de;{mage} verwandelt {amount} {race} aus {target}.
+holyground;0;de;{mage} beschwört Naturgeister in den Boden der Region.
 
 # Kämpfe
 msg_battle;battle:0;de;{string}

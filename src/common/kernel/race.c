@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: race.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: race.c,v 1.3 2001/01/31 17:40:50 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1904,7 +1904,7 @@ unit_old_max_hp(unit * u)
 	return h;
 }
 
-boolean is_undead(unit *u)
+boolean is_undead(const unit *u)
 {
 	return u->race == RC_UNDEAD || u->race == RC_SKELETON
 		|| u->race == RC_SKELETON_LORD || u->race == RC_ZOMBIE

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: region.c,v 1.3 2001/01/28 08:01:52 enno Exp $
+ *	$Id: region.c,v 1.4 2001/01/31 17:40:51 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -29,6 +29,7 @@
 #include "item.h"
 #include "plane.h"
 #include "region.h"
+#include "curse.h"
 
 /* util includes */
 #include <resolve.h>
@@ -108,6 +109,7 @@ deathcounts(region * r, int fallen) {
 	attrib * a;
 
 	if (fallen==0) return;
+	if (is_cursed(r->attribs, C_HOLYGROUND,0)) return;
 
 	a = a_find(r->attribs, &at_deathcount);
 	if (!a) a = a_add(&r->attribs, a_new(&at_deathcount));

@@ -129,7 +129,7 @@ extern struct racedata race[];
 void give_starting_equipment(struct region *r, struct unit *u);
 void give_latestart_bonus(struct region *r, struct unit *u, int b);
 int unit_old_max_hp(struct unit * u);
-boolean is_undead(struct unit *u);
+boolean is_undead(const struct unit *u);
 
 #define dragon(u) ((u)->race == RC_FIREDRAGON || (u)->race == RC_DRAGON || (u)->race == RC_WYRM || (u)->race == RC_BIRTHDAYDRAGON)
 #define humanoid(u) (u->race==RC_UNDEAD || u->race==RC_DRACOID || !race[(u)->race].nonplayer)

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.c,v 1.4 2001/01/31 14:32:58 corwin Exp $
+ *	$Id: spell.c,v 1.5 2001/01/31 17:40:51 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1961,6 +1961,39 @@ sp_create_sack_of_conservation(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
+/* Name:		   Heiliger Boden
+ * Stufe:		   9
+ * Kategorie:  perm. Regionszauber
+ * Gebiet:     Gwyrrd
+ * Wirkung:
+ *   Es entstehen keine Untoten mehr, Untote betreten die Region
+ *   nicht mehr.
+ *
+ * ZAUBER "Heiliger Boden"
+ * Flags: (0)
+ */
+static int
+sp_holyground(castorder *co)
+{
+	unit *u;
+	region *r = co->rt;
+	unit *mage = (unit *)co->magician;
+	int cast_level = co->level;
+	int power = co->force;
+
+	create_curse(mage, &r->attribs, C_HOLYGROUND, 0,
+			power*power, 1, 0, 0);
+
+	set_curseflag(mage->building->attribs, C_HOLYGROUND, 0, CURSE_NOAGE);
+
+	add_message(&r->msgs, new_message(mage->faction, "holyground%u:mage", u));
+
+	a_removeall(&r->attribs, &at_deathcount);
+
+	return cast_level;
+}
+
+/* ------------------------------------------------------------- */
 /* Name:		   Heimstein
  * Stufe:		   7
  * Kategorie:  Artefakt
@@ -1981,17 +2014,17 @@ sp_homestone(castorder *co)
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
-	int power = co->force;
-
+	int force = co->force;
+	
 	if(!mage->building || mage->building->type != &bt_castle){
 		cmistake(mage, strdup(co->order), 197, MSG_MAGIC);
 		return 0;
 	}
 
 	success = create_curse(mage, &mage->building->attribs, C_MAGICSTONE, 0,
-			power, 1, 0, 0);
+			force*force, 1, 0, 0);
 
-	if(!success){	/* Es gab schon einen Heimstein */
+	if(!success) {
 		cmistake(mage, strdup(co->order), 206, MSG_MAGIC);
 		return 0;
 	}
@@ -2003,7 +2036,7 @@ sp_homestone(castorder *co)
 
 	/* Magieresistenz der Burg erhöht sich um 50% */
 	create_curse(mage,  &mage->building->attribs, C_RESIST_MAGIC, 0,
-			power, 1, 50, 0);
+		force*force, 1, 50, 0);
 	set_curseflag(mage->building->attribs, C_RESIST_MAGIC, 0, CURSE_NOAGE);
 
 	/* melden, 1x pro Partei in der Burg */
@@ -2021,6 +2054,7 @@ sp_homestone(castorder *co)
 	}
 	return cast_level;
 }
+
 
 
 /* ------------------------------------------------------------- */
@@ -3040,7 +3074,7 @@ sp_unholypower(castorder *co)
 	int i;
 	int n;
 
-	n = dice(cast_level, 10);
+	n = dice(co->force, 10);
 
 	for (i = 0; i < pa->length && n > 0; i++) {
 		race_t target_race;
@@ -3076,8 +3110,8 @@ sp_unholypower(castorder *co)
 				continue;
 			}
 
-			un = createunit(co->rt, u->faction, n, target_race);
-			scale_number(u, u->number - n);
+			un = createunit(co->rt, u->faction, 0, target_race);
+			transfermen(u, un, n);
 			add_message(&co->rt->msgs, new_message(mage->faction,
 				"unholypower_limitedeffect%u:mage%u:target%s:race%i:amount",
 				mage, u, race[u->race].name[n==1?0:1], n));
@@ -6005,7 +6039,7 @@ sp_eternizewall(castorder *co)
 
 	b = pa->param[0]->data.b;
 	success = create_curse(mage, &b->attribs, C_NOCOST, 0,
-			power, 1, 0, 0);
+			power*power, 1, 0, 0);
 
 	if(!success){	/* ist bereits verzaubert */
 		cmistake(mage, strdup(co->order), 206, MSG_MAGIC);
@@ -7375,13 +7409,30 @@ spell spelldaten[] =
 		 {0, 0, 0}},
 		(spell_f)sp_treewalkexit, patzer
 	},
+	
+	{SPL_HOLYGROUND, "Heiliger Boden",
+		"Dieses Ritual beschwört verschiedene Naturgeister in den Boden der "
+		"Region, welche diese fortan bewachen. In einer so gesegneten Region "
+		"werden niemals wieder die Toten ihre Gräber verlassen, und anderswo "
+		"entstandene Untote werden sie wann immer möglich meiden.",
+		NULL,
+		NULL,
+		M_DRUIDE, (0), 5, 9,
+		{
+		 {R_AURA, 80, SPC_FIX},
+		 {R_PERMAURA, 3, SPC_FIX},
+		 {0, 0, 0},
+		 {0, 0, 0},
+		 {0, 0, 0}},
+		(spell_f)sp_holyground, patzer
+	},
 
 	{SPL_ARTEFAKT_SACK_OF_CONSERVATION, "Erschaffe einen magischen Kräuterbeutel",
-		"Der Druide nehme etwas präpäriertes Leder, welches er in einem großen Ritual "
-		"der Reinigung von allen unreinen Geistern befreie, und binde dann einige kleine "
-		"Geister der Luft und des Wassers in das Material. Aus dem so vorbereiteten "
-		"Leder fertige er nun ein kleines Beutelchen, welches in ihm aufbewahrte Kräuter "
-		"besser zu konservieren vermag.",
+		"Der Druide nehme etwas präpäriertes Leder, welches er in einem großen "
+		"Ritual der Reinigung von allen unreinen Geistern befreie, und binde "
+		"dann einige kleine Geister der Luft und des Wassers in das Material. "
+		"Aus dem so vorbereiteten Leder fertige er nun ein kleines Beutelchen, "
+		"welches in ihm aufbewahrte Kräuter besser zu konservieren vermag.",
 		NULL,
 		NULL,
 		M_DRUIDE, (0), 5, 5,

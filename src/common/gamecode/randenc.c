@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: randenc.c,v 1.3 2001/01/27 19:30:07 enno Exp $
+ *	$Id: randenc.c,v 1.4 2001/01/31 17:40:49 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1303,7 +1303,11 @@ randomevents(void)
 	/* Untote können entstehen */
 
 	for (r = regions; r; r = r->next) {
-		double average = (rpeasants(r)/(PEASANTGROWTH*0.01)/LIFEEXPECTANCY);
+		double average;
+
+		if(is_cursed(r->attribs, C_HOLYGROUND, 0)) continue;
+
+		average = (rpeasants(r)/(PEASANTGROWTH*0.01)/LIFEEXPECTANCY);
 
 		/* Chance 0.1% * chaosfactor */
 		/* nur, wenn Gräber 50% über normal liegen */

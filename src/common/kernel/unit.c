@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: unit.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: unit.c,v 1.3 2001/01/31 17:40:51 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -620,6 +620,9 @@ can_survive(const unit *u, const region *r)
 			&& (race[u->race].flags & FLY))) {
 
 		if (get_item(u, I_HORSE) && !(terrain[rterrain(r)].flags & WALK_INTO))
+			return false;
+
+		if(is_undead(u) && is_cursed(r->attribs, C_HOLYGROUND, 0))
 			return false;
 
 		return true;
