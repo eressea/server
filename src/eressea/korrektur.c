@@ -73,7 +73,7 @@
 #include <attributes/targetregion.h>
 #include <attributes/key.h>
 
-
+#if 0
 static int
 skillmodifieslearning(void)
 {
@@ -99,6 +99,7 @@ skillmodifieslearning(void)
 	}
 	return 0;
 }
+#endif
 
 extern void reorder_owners(struct region * r);
 

@@ -1204,6 +1204,7 @@ findkeyword(const char *s, const struct locale * lang)
 	if(*s == '@') s++;
 #endif
 	if (findtoken(&lnames->keywords, s, (void**)&i)==E_TOK_NOMATCH) return NOKEYWORD;
+	if (global.disabled[i]) return NOKEYWORD;
 	return (keyword_t) i;
 }
 
@@ -2094,6 +2095,17 @@ parse_tagbegin(struct xml_stack *stack, void *data)
 		} else {
 			log_printf("required tag 'file' missing from include");
 			return XML_USERERROR;
+		}
+	} else if (strcmp(tag->name, "order")==0) {
+		const char * name = xml_value(tag, "name");
+		if (xml_bvalue(tag, "disable")) {
+			int k;
+			for (k=0;k!=MAXKEYWORDS;++k) {
+				if (strncmp(keywords[k], name, strlen(name))==0) {
+					global.disabled[k]=0;
+					break;
+				}
+			}
 		}
 	} else if (strcmp(tag->name, "races")==0) {
 		read_races(stack->stream, stack);

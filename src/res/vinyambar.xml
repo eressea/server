@@ -12,6 +12,9 @@
 
 	<game name="Vinyambar">
 		<comment>Game specific</comment>
+		<order name="ARBEITEN" disable></order>
+		<order name="MEINUNG" disable></order>
+		<order name="MAGIEGEBIET" disable></order>
 		<include file="vinyambar/races.xml"></include>
 	</game>
 </eressea>

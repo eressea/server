@@ -10,8 +10,10 @@
 	<include file="races.xml"></include>
 	<include file="items.xml"></include>
 
-	<game name="eressea">
+	<game name="Eressea">
 		<comment>Game specific</comment>
+		<order name="MEINUNG" disable></order>
+		<order name="MAGIEGEBIET" disable></order>
 		<include file="eressea/races.xml"></include>
 		<include file="eressea/items.xml"></include>
 	</game>

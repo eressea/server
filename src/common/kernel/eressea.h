@@ -159,14 +159,6 @@ struct xml_stack;
 #define NEWRACE_VERSION 307
 #define UGROUPS_VERSION 400 /* nicht aktivieren, nicht fertig */
 
-/* globale settings des Spieles */
-typedef struct settings {
-	const char    *gamename;
-	struct attrib *attribs;
-	unsigned int   data_version;
-} settings;
-extern settings global;
-
 #define RELEASE_VERSION NEWRACE_VERSION
 
 /*
@@ -1174,5 +1166,14 @@ extern const char *locales[];
 /** compatibility: **/
 extern race_t old_race(const struct race *);
 extern const struct race * new_race[];
+
+/* globale settings des Spieles */
+typedef struct settings {
+	const char    *gamename;
+	struct attrib *attribs;
+	unsigned int   data_version;
+	boolean disabled[MAXKEYWORDS];
+} settings;
+extern settings global;
 
 #endif
