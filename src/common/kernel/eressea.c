@@ -2954,7 +2954,7 @@ movewhere(const unit *u, const char * token, region * r, region** resultp)
 
   case NODIRECTION:
     r2 = findspecialdirection(r, token);
-    if (r2!=NULL) {
+    if (r2==NULL) {
       return E_MOVE_NOREGION;
     }
     *resultp = r2;
