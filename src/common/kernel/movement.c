@@ -1586,7 +1586,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 		if (fval(u, FL_FOLLOWING)) caught_target(current_point, u);
 
 		if (starting_point != current_point) {
-			tt[step+1] = NULL;
+			tt[step] = NULL;
 			sh = move_ship(sh, starting_point, current_point, tt);
 
 			/* Hafengebühren ? */

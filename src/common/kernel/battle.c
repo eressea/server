@@ -1383,6 +1383,8 @@ do_combatmagic(battle *b, combatmagic_t was)
 
 			level = eff_skill(mage, SK_MAGIC, r);
 			if (level > 0) {
+				char cmd[128];
+
 				switch(was) {
 				case DO_PRECOMBATSPELL:
 					sp = get_combatspell(mage, 0);
@@ -1398,7 +1400,10 @@ do_combatmagic(battle *b, combatmagic_t was)
 				}
 				if (sp == NULL)
 					continue;
-				if (cancast(mage, sp, 1, 1) == false)
+
+				snprintf(cmd, 128, "ZAUBER %s", sp->name);
+
+				if (cancast(mage, sp, 1, 1, cmd) == false)
 					continue;
 
 				level = eff_spelllevel(mage, sp, level, 1);
@@ -1465,13 +1470,15 @@ do_combatspell(troop at)
 	int fumblechance = 0;
 	void **mg;
 	int sl;
+	char cmd[128];
 
 	sp = get_combatspell(mage, 1);
 	if (sp == NULL) {
 		fi->magic = 0; /* Hat keinen Kampfzauber, kämpft nichtmagisch weiter */
 		return;
 	}
-	if (cancast(mage, sp, 1, 1) == false) {
+	snprintf(cmd, 128, "ZAUBER %s", sp->name);
+	if (cancast(mage, sp, 1, 1, cmd) == false) {
 		fi->magic = 0; /* Kann nicht mehr Zaubern, kämpft nichtmagisch weiter */
 		return;
 	}

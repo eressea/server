@@ -2023,7 +2023,7 @@ instant_orders(void)
 					spell = find_spellbyname(u, s);
 
 					if(!spell){
-						cmistake(u, S->s, 169, MSG_MAGIC);
+						cmistake(u, S->s, 173, MSG_MAGIC);
 						break;
 					}
 

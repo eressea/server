@@ -580,7 +580,7 @@ building_type bt_caravan = {
 /** Building: tunnel */
 static const maintenance tunnel_keep[] = {
 	/* resource, number, flags */
-	{ R_HORSE,     2, MTF_NONE },
+	{ R_STONE,     2, MTF_NONE },
 	{ R_SILVER,  100, MTF_VITAL },
 	{ NORESOURCE,  0, MTF_NONE },
 };

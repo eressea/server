@@ -6,12 +6,8 @@
 #include <stdarg.h>
 #include <time.h>
 
-#define LOG_FLUSH      (1<<0)
-#define LOG_CPERROR    (1<<1)
-#define LOG_CPWARNING  (1<<1)
-
 /* TODO: set from external function */
-static int flags = LOG_FLUSH|LOG_CPERROR;
+static int flags = LOG_FLUSH|LOG_CPERROR|LOG_CPWARNING;
 static FILE * logfile;
 
 void
@@ -92,6 +88,29 @@ _log_error(const char * format, ...)
 	if (logfile!=stderr) {
 		if (flags & LOG_CPERROR) {
 			fputs("\bERROR: ", stderr);
+			va_start(marker, format);
+			vfprintf(stderr, format, marker);
+			va_end(marker);
+		}
+		if (flags & LOG_FLUSH) {
+			fflush(logfile);
+		}
+	}
+}
+
+void 
+_log_info(unsigned int flag, const char * format, ...)
+{
+	va_list marker;
+	if (!logfile) logfile = stderr;
+
+	fprintf(logfile, "INFO[%u]: ", flag);
+	va_start(marker, format);
+	vfprintf(logfile, format, marker);
+	va_end(marker);
+	if (logfile!=stderr) {
+		if (flags & flag) {
+			fprintf(stderr, "\bINFO[%u]: ", flag);
 			va_start(marker, format);
 			vfprintf(stderr, format, marker);
 			va_end(marker);

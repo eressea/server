@@ -168,7 +168,7 @@ error165;errors:0;de;{unit} in {region}: '{command}' - Der Trank bekommt der Ein
 error166;errors:0;de;{unit} in {region}: '{command}' - Diese Rasse kann eine Burg nicht belagern.
 error167;errors:0;de;{unit} in {region}: '{command}' - Die Einheit geht nicht zu den Bauern.
 error168;errors:0;de;{unit} in {region}: '{command}' - Es konnten keine Luxusgüter verkauft werden.
-error169;errors:0;de;{unit} in {region}: '{command}' - Diesen Zauber kennt die Einheit nicht.
+error169;errors:0;de;{unit} in {region}: '{command}' - Die Einheit ist nicht erfahren genug für diesen Zauber.
 error170;errors:0;de;{unit} in {region}: '{command}' - Die Bauern nehmen dieses großzügige Geschenk nicht an.
 error171;errors:0;de;{unit} in {region}: '{command}' - Diesen Kampfzauber gibt es nicht.
 error172;errors:0;de;{unit} in {region}: '{command}' - Es wurde kein Zauber angegeben.

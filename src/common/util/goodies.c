@@ -30,6 +30,23 @@
 
 /* Simple Integer-Liste */
 
+char *
+sncat(char * buffer, size_t size, const char * str)
+{
+	static char * b = NULL;
+	static char * end = NULL;
+	int n = 0;
+	if (b==buffer) {
+		end += strlen(end);
+		size -= (end-b);
+	} else {
+		end = b = buffer;
+	}
+	while (size-- > 0 && (*end++=*str++)!=0) ++n;
+	*end='\0';
+	return b;
+}
+	  
 int *
 intlist_init(void)
 {

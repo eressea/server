@@ -1642,9 +1642,9 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 	/* Leere Burgen verursachten sonst segfault! */
 	if(buildingowner(r,b) != NULL){
 		print_curses(F, b, TYP_BUILDING, b->attribs,
-				(buildingowner(r,b)->faction == f)? 1 : 0, 2);
+				(buildingowner(r,b)->faction == f)? 1 : 0, 4);
 	} else {
-		print_curses(F, b, TYP_BUILDING, b->attribs, 0, 2);
+		print_curses(F, b, TYP_BUILDING, b->attribs, 0, 4);
 	}
 
 	for (u = r->units; u; u = u->next)
@@ -2047,9 +2047,9 @@ report(FILE *F, faction * f, const char * pzTime)
 			/* Leere Schiffe verursachten sonst segfault! */
 			if(shipowner(r,sh) != NULL){
 				print_curses(F, sh, TYP_SHIP, sh->attribs,
-						(shipowner(r,sh)->faction == f)? 1 : 0, 2);
+						(shipowner(r,sh)->faction == f)? 1 : 0, 4);
 			} else {
-				print_curses(F, sh, TYP_SHIP, sh->attribs, 0, 2);
+				print_curses(F, sh, TYP_SHIP, sh->attribs, 0, 4);
 			}
 
 			for (u = r->units; u; u = u->next)
@@ -2567,7 +2567,13 @@ reports(void)
 	int wants_report, wants_computer_report,
 		wants_compressed, wants_bzip2;
 	time_t ltime = time(NULL);
-	char * pzTime = strdup(asctime( localtime( &ltime ) ));
+	char pzTime[64];
+
+#ifdef _GNU_SOURCE
+	strftime(pzTime, 64, "%A, %-e. %B %Y, %-k:%M", localtime(&ltime));
+#else
+	strftime(pzTime, 64, "%A, %e. %B %Y, %k:%M", localtime(&ltime));
+#endif
     
 	nmr_warnings();
 #ifdef DMALLOC
@@ -2591,7 +2597,7 @@ reports(void)
 	init_intervals();
 #endif
 	remove_empty_units();
-	log_printf("Report timestamp: %s", pzTime);
+	log_printf("Report timestamp - %s", pzTime);
 	for (f = factions; f; f = f->next) {
 		attrib * a = a_find(f->attribs, &at_reportspell);
 		current_faction = f;

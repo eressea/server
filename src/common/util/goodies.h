@@ -22,6 +22,8 @@ extern unsigned int hashstring(const char* s);
 extern char *space_replace(char * str, char replace);
 extern const char *escape_string(const char * str, char * buffer, size_t len);
 extern boolean locale_check(void);
+extern char *sncat(char * buffer, size_t size, const char * str);
+
 /* grammar constants: */
 #define GR_PLURAL     0x01
 /* 0x02-0x08 left unused for individual use */

@@ -635,9 +635,10 @@ set_combatspell(unit *u, spell *sp, const char * cmd, int level)
 	m = get_mage(u);
 	if (!m) return;
 
-	if (!sp) {
-		/* Diesen Zauber kennt die Einheit nicht */
-		cmistake(u, cmd, 169, MSG_MAGIC);
+	/* knowsspell prüft auf ist_magier, ist_spruch, kennt_spruch */
+	if (!sp || !knowsspell(u->region, u, sp)) {
+		/* Fehler 'Spell not found' */
+		cmistake(u, cmd, 173, MSG_MAGIC);
 		return;
 	}
 	if (getspell(u, sp->id) == false) {
@@ -976,10 +977,11 @@ pay_spell(unit * u, spell * sp, int cast_level, int range)
 
 
 /* ------------------------------------------------------------- */
-/*  Um einen Spruch zu beherrschen, muss der Magier die Stufe des
- *  Spruchs besitzen, nicht nur wissen, das es ihn gibt (also den Spruch
- *  in seiner Spruchliste haben) */
-
+/* Ein Magier kennt den Spruch und kann sich die Beschreibung anzeigen
+ * lassen, wenn diese in seiner Spruchliste steht. Zaubern muss er ihn
+ * aber dann immer noch nicht können, vieleicht ist seine Stufe derzeit
+ * nicht ausreichend oder die Komponenten fehlen.
+ */
 boolean
 knowsspell(const region * r, const unit * u, const spell * sp)
 {
@@ -989,36 +991,53 @@ knowsspell(const region * r, const unit * u, const spell * sp)
 	}
 	/* Magier? */
 	if (get_mage(u) == NULL) {
+		log_warning(("%s ist kein Magier, versucht aber zu zaubern.\n", 
+				unitname(u)));
 		return false;
 	}
-	/* reicht die Stufe aus? */
-	if (eff_skill(u, SK_MAGIC, r) < sp->level) {
+	/* steht der Spruch in der Spruchliste? */
+	if (getspell(u, sp->id) == false){
+		/* ist der Spruch aus einem anderen Magiegebiet? */
+		if (find_magetype(u) != sp->magietyp){
+			return false;
+		}
+		if (eff_skill(u, SK_MAGIC, u->region) >= sp->level){
+			log_warning(("%s ist hat die erforderliche Stufe, kennt aber %s nicht.\n", 
+				unitname(u), sp->name));
+		}
 		return false;
 	}
-	/* ist der Spruch aus einem anderen Magiegebiet? */
-	if (find_magetype(u) != sp->magietyp) {
-  	return (getspell(u, sp->id));
-	}
+	
 	/* hier sollten alle potentiellen Fehler abgefangen sein */
 	return true;
 }
 
-/* Kosten für einen Spruch können Magiepunkte, Silber, Kraeuter
+/* Um einen Spruch zu beherrschen, muss der Magier die Stufe des
+ * Spruchs besitzen, nicht nur wissen, das es ihn gibt (also den Spruch
+ * in seiner Spruchliste haben).
+ * Kosten für einen Spruch können Magiepunkte, Silber, Kraeuter
  * und sonstige Gegenstaende sein.
  */
 
 boolean
-cancast(unit * u, spell * sp, int level, int range)
+cancast(unit * u, spell * sp, int level, int range, char * cmd)
 {
 	int k;
 	resource_t res;
 	int itemanz;
 	boolean b = true;
-	const char * cmd = sp->name;
 
 	if (knowsspell(u->region, u, sp) == false) {
 		/* Diesen Zauber kennt die Einheit nicht */
-		cmistake(u, cmd, 169, MSG_MAGIC);
+		cmistake(u, strdup(cmd), 173, MSG_MAGIC);
+		return false;
+	}
+	/* reicht die Stufe aus? */
+	if (eff_skill(u, SK_MAGIC, u->region) < sp->level) {
+		log_warning(("Zauber von %s schlug fehl: %s braucht Stufe %d.\n", 
+				unitname(u), sp->name, sp->level));
+		/* die Einheit ist nicht erfahren genug für diesen Zauber */
+		cmistake(u, strdup(cmd), 169, MSG_MAGIC);
 		return false;
 	}
 
@@ -2762,6 +2781,17 @@ magic(void)
 						cmistake(u, so->s, 173, MSG_MAGIC);
 						continue;
 					}
+					/* um testen auf spruchnamen zu unterbinden sollte vor allen
+					 * fehlermeldungen die anzeigen das der magier diesen Spruch
+					 * nur in diese Situation nicht anwenden kann, noch eine
+					 * einfache Sicherheitsprüfung kommen */
+					if (knowsspell(r, u, sp) == false){
+						/* vorsicht! u kann der familiar sein */
+						if (!familiar){
+							cmistake(u, so->s, 173, MSG_MAGIC);
+							continue;
+						}
+					}
 					if (sp->sptyp & ISCOMBATSPELL) {
 						/* Fehler: "Dieser Zauber ist nur im Kampf sinnvoll" */
 						cmistake(u, so->s, 174, MSG_MAGIC);
@@ -2872,6 +2902,7 @@ magic(void)
 	}
 	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
 		for (co = cll[spellrank]; co; co = co->next) {
+			char *cmd = co->order;
 
 			u = (unit *)co->magician;
 			sp = co->sp;
@@ -2889,7 +2920,7 @@ magic(void)
 			level = eff_spelllevel(u, sp, level, co->distance);
 			if (level < 1) {
 				/* Fehlermeldung mit Komponenten generieren */
-				cancast(u, sp, co->level, co->distance);
+				cancast(u, sp, co->level, co->distance, cmd);
 				continue;
 			}
 			if (level < co->level){
@@ -2905,7 +2936,7 @@ magic(void)
 
 			/* Prüfen, ob die realen Kosten für die gewünschten Stufe bezahlt
 			 * werden können */
-			if (cancast(u, sp, level, co->distance) == false) {
+			if (cancast(u, sp, level, co->distance, cmd) == false) {
 				/* die Fehlermeldung wird in cancast generiert */
 				continue;
 			}

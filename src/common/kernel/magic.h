@@ -358,7 +358,7 @@ int spellcost(struct unit *u, spell *spruch);
 	/*	gibt die für diesen Spruch derzeit notwendigen Magiepunkte auf der
 	 *	geringstmöglichen Stufe zurück, schon um den Faktor der bereits
 	 *	zuvor gezauberten Sprüche erhöht */
-boolean cancast (struct unit *u, spell *spruch, int eff_stufe, int distance);
+boolean cancast (struct unit *u, spell *spruch, int eff_stufe, int distance, char *cmd);
 	/*	true, wenn Einheit alle Komponenten des Zaubers (incl. MP) für die
 	 *	geringstmögliche Stufe hat und den Spruch beherrscht */
 void pay_spell(struct unit *u, spell *spruch, int eff_stufe, int distance);
