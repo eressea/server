@@ -57,6 +57,12 @@ faction_getalliance(const faction& f)
 {
   return f.alliance;
 }
+
+const char *
+faction_locale(const faction& f)
+{
+  return locale_name(f.locale);
+}
 #endif
 
 void
@@ -74,6 +80,7 @@ bind_faction(lua_State * L)
     .def_readonly("id", &faction::no)
     .def_readwrite("subscription", &faction::subscription)
     .def_readwrite("lastturn", &faction::lastorders)
+    .property("locale", &faction_locale)
     .property("units", &faction_units, return_stl_iterator)
 #ifdef ALLIANCES
     .property("alliance", &faction_getalliance, &faction_setalliance)
