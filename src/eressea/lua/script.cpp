@@ -28,7 +28,8 @@
 static void 
 free_script(attrib * a) {
   if (a->data.v!=NULL) {
-    delete a->data.v;
+	luabind::functor<void> * f = (luabind::functor<void> *)a->data.v;
+    delete f;
   }
 }
 
@@ -57,7 +58,8 @@ setscript(struct attrib ** ap, void * fptr)
   if (a == NULL) {
     a = a_add(ap, a_new(&at_script));
   } else if (a->data.v!=NULL) {
-    delete a->data.v;
+	luabind::functor<void> * f = (luabind::functor<void> *)a->data.v;
+    delete f;
   }
   a->data.v = fptr;
 }

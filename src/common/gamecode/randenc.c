@@ -1054,7 +1054,7 @@ split_unit(region * r, unit *u)
   set_string(&u2->display, u->display);
   set_order(&u2->thisorder, parse_order(keywords[K_WAIT], u->faction->locale));
   set_order(&u2->lastorder, u2->thisorder);
-  free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
+  free_order(u2->lastorder); /* parse_order & set_order have each increased the refcount */
 
   transfermen(u, u2, newsize);
 }

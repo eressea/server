@@ -107,7 +107,7 @@ write_order(const order * cmd, const struct locale * lang, char * buffer, size_t
     buffer[0]=0;
   } else {
 #ifndef NDEBUG
-    char * s = cmd->_str;
+    const char * s = cmd->_str;
     assert(findkeyword(parse_token(&s), lang)==cmd->_keyword);
 #endif
     strncpy(buffer, cmd->_str, size);
