@@ -429,7 +429,7 @@ give_cmd(unit * u, order * ord)
 	}
 
 	/* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
-	if (u2 && (!cansee(u->faction,r,u2,0) && !ucontact(u2, u) && !fval(u2, UFL_TAKEALL))) {
+	if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !cansee(u->faction,r,u2,0) && !ucontact(u2, u) && !fval(u2, UFL_TAKEALL)) {
 		cmistake(u, ord, notfound_error, MSG_COMMERCE);
 		return;
 	}
