@@ -947,8 +947,7 @@ strcheck (const char *s, size_t maxlen)
 		assert(maxlen < 16 * 1024);
 		log_warning(("[strcheck] String wurde auf %d Zeichen verkürzt:\n%s\n",
 				(int)maxlen, s));
-		strncpy(buffer, s, maxlen);
-		buffer[maxlen] = 0;
+		strnzcpy(buffer, s, maxlen);
 		return buffer;
 	}
 	return s;

@@ -84,7 +84,7 @@ translate_regions(const char *st, const faction * f)
 			x = c - p;
 
 		s = temp;
-		strncpy(t, p, x);
+		strnzcpy(t, p, x);
 		t += (c - p);
 		p = c + 3;
 		koor_x = atoi(p);
@@ -385,8 +385,7 @@ new_message(struct faction * receiver, const char* sig, ...)
 	void * args[16];
 
 	memset(args, 0, sizeof(args));
-	strncpy(buffer, sig, signature-sig);
-	buffer[signature-sig] = '\0';
+	strnzcpy(buffer, sig, signature-sig);
 	mtype = mt_find(buffer);
 
 	if (!mtype) {

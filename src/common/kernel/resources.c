@@ -131,7 +131,7 @@ static void use_default(rawmaterial *res, const region * r, int amount)
 		res->amount = (int)(modifier * res->base * (1+(res->level-res->startlevel)*res->divisor/100.0));
 		/* random adjustment, +/- 91% */
 #ifdef RESOURCE_QUANTITY
-		res->amount = res->amount * RESOURCE_QUANTITY;
+		res->amount = (int)(res->amount * RESOURCE_QUANTITY);
 #endif
 	}
 }

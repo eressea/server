@@ -435,7 +435,7 @@ static faction *
 factionorders(void)
 {
 	char b[16];
-	char * fid = strncpy(b, getstrtoken(), 16);
+	char * fid = strnzcpy(b, getstrtoken(), 16);
 	char * pass = getstrtoken();
 	faction *f;
 
