@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.3 2001/01/27 18:15:32 enno Exp $
+ *	$Id: korrektur.c,v 1.4 2001/01/27 19:30:07 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1649,8 +1649,10 @@ convert_triggers(void)
 				switch (rel->id) {
 				case REL_FAMILIAR:
 					if (u && u2) {
-						if (nonplayer(u)) set_familiar(u2, u);
-						else set_familiar(u, u2);
+						if (nonplayer(u) || u->race==RC_GOBLIN)
+							set_familiar(u2, u);
+						else 
+							set_familiar(u, u2);
 					} else {
 						if (u2) fprintf(stderr, "WARNING: FAMILIAR info for %s may be broken!\n", unitname(u2));
 						if (u) fprintf(stderr, "WARNING: FAMILIAR info for %s may be broken!\n", unitname(u));

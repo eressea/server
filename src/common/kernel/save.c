@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.3 2001/01/27 18:15:32 enno Exp $
+ *	$Id: save.c,v 1.4 2001/01/27 19:30:07 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2112,7 +2112,6 @@ attrib_init(void)
 
 	/* Alle speicherbaren Attribute müssen hier registriert werden */
 	at_register(&at_unitdissolve);
-	at_register(&at_orcification);
 	at_register(&at_key);
 	at_register(&at_traveldir_new);
 	at_register(&at_familiar);
