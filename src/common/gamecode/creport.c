@@ -1042,7 +1042,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 	fputs("2;Zeitalter\n", F);
 	if (mailto!=NULL) {
 		fprintf(F, "\"%s\";mailto\n", mailto);
-		fprintf(F, "\"%s\";mailcmd\n", locale_string(NULL, "mailcmd"));
+		fprintf(F, "\"%s\";mailcmd\n", locale_string(f->locale, "mailcmd"));
 	}
 	fprintf(F, "PARTEI %d\n", f->no);
 	fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
