@@ -1,5 +1,5 @@
 # Kommentare sind erlaubt. Endlich.
-# $Id: messages.de,v 1.5 2001/02/02 15:41:49 corwin Exp $
+# $Id: messages.de,v 1.6 2001/02/04 08:58:00 corwin Exp $
 
 # Fehlermeldungen:
 msg_errors;errors:0;de;{string}
@@ -453,6 +453,7 @@ teleport_success;magic:0;de;{unit} wurde von {source} nach {target} teleportiert
 stealaura_fail;magic:0;de;{unit} konnte {target} keine Aura entziehen.
 stealaura_fail_detect;magic:0;de;{unit} fühlt sich einen Moment seltsam geschwächt.
 stealaura_detect;magic:0;de;{unit} fühlt seine magischen Kräfte schwinden und verliert {aura} Aura.
+stealaura_success;magic:0;de;{mage} entzieht {target} {aura} Aura.
 auratransfer_success;magic:0;de;{unit} transferiert {aura} Aura auf {target}.
 wind_effect;magic:0;de;{$mage mage} erfleht den Segen der Götter des Windes und des Wassers für {ship}.
 path_effect;magic:0;de;{$mage mage} sorgt für trockene Straßen in {region}.
