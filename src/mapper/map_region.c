@@ -48,7 +48,7 @@ incat(char *buf, const int n, const size_t bufsize)
 int rbottom;
 dbllist *reglist = NULL;
 static dbllist *runten = NULL, *roben = NULL;
-#define LASTLINE SY-2
+#define LASTLINE SY-3
 /* Letzte Zeile, in der Regionsinfo bei der Karte kommt */
 
 

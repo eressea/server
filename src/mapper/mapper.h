@@ -126,7 +126,15 @@ extern void read_newfactions(const char * filename);
 extern void read_orders(const char * filename);
 extern void read_dropouts(const char *filename);
 extern void seed_dropouts(void);
+extern int numnewbies;
 
 #define sncat(b, s, size) strncat ((b), s, size - strlen (b))
 
+typedef struct dropout {
+	struct dropout * next;
+	const struct race * race;
+	int x, y, fno;
+} dropout;
+
+extern dropout * dropouts;
 #endif				/* MAPPER_H */

@@ -155,13 +155,7 @@ give_latestart_bonus(region *r, unit *u, int b)
 	}
 }
 
-typedef struct dropout {
-	struct dropout * next;
-	const struct race * race;
-	int x, y, fno;
-} dropout;
-
-static dropout * dropouts;
+dropout * dropouts = NULL;
 
 void
 read_orders(const char * filename)
@@ -195,13 +189,16 @@ read_orders(const char * filename)
 			ursprung * ur = f->ursprung;
 			while (ur && ur->id!=0) ur=ur->next;
 			if (ur) {
-				dropout * drop = calloc(sizeof(dropout), 1);
-				drop->x = ur->x;
-				drop->y = ur->y;
-				drop->fno = f->no;
-				drop->race = f->race;
-				drop->next = dropouts;
-				dropouts = drop;
+				region * r = findregion(ur->x, ur->y);
+				if (r) {
+					dropout * drop = calloc(sizeof(dropout), 1);
+					drop->x = ur->x;
+					drop->y = ur->y;
+					drop->fno = f->no;
+					drop->race = f->race;
+					drop->next = dropouts;
+					dropouts = drop;
+				}
 			}
 		}
 		freset(f, FL_MARK);
@@ -216,17 +213,19 @@ read_dropouts(const char * filename)
 	for (;;) {
 		char email[64], race[20];
 		int age, x, y;
-		dropout * drop;
 		if (fscanf(F, "%s %s %d %d %d", email, race, &age, &x, &y)<=0) break;
 		if (age<=1) {
-			drop = calloc(sizeof(dropout), 1);
-			drop->race = rc_find(race);
-			if (drop->race==NULL) drop->race = findrace(race, default_locale);
-			drop->x = x;
-			drop->y = y;
-			drop->fno = -1;
-			drop->next = dropouts;
-			dropouts = drop;
+			region * r = findregion(x, y);
+			if (r) {
+				dropout * drop = calloc(sizeof(dropout), 1);
+				drop->race = rc_find(race);
+				if (drop->race==NULL) drop->race = findrace(race, default_locale);
+				drop->x = x;
+				drop->y = y;
+				drop->fno = -1;
+				drop->next = dropouts;
+				dropouts = drop;
+			}
 		}
 	}
 	fclose(F);
@@ -248,6 +247,7 @@ seed_dropouts(void)
 				newfaction * nf = *nfp;
 				if (nf->race==drop->race && !nf->bonus) {
 					unit * u = addplayer(r, nf->email, nf->race, nf->lang);
+					++numnewbies;
 					if (nf->bonus) give_latestart_bonus(r, u, nf->bonus);
 					found=true;
 					*dropp = drop->next;
@@ -447,6 +447,7 @@ NeuePartei(region * r)
 	}
 	modified = 1;
 	u = addplayer(r, email, frace, lang);
+	++numnewbies;
 
 	if(late) give_latestart_bonus(r, u, late);
 

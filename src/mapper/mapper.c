@@ -69,6 +69,7 @@ char datafile[256];
 /* -------------------- resizeterm ------------------------------------- */
 
 short Signals = 0;
+int numnewbies = 0;
 unit *clipunit;
 struct ship *clipship;
 region *clipregion;
@@ -342,6 +343,7 @@ readfactions(void)
 		lang = find_locale(langname);
 		assert(rc && r && lang);
 		u = addplayer(r, email, rc, lang);
+		++numnewbies;
 		assert(u);
 		i_change(&u->items, finditemtype("stein", german), 30);
 		i_change(&u->items, finditemtype("holz", german), 30);
@@ -362,6 +364,17 @@ newbie_region(region * r)
 	return 0;
 }
 
+int
+dropout_region(region * r)
+{
+	dropout * drop = dropouts;
+	if (r!=NULL) while (drop) {
+		if (drop->x==r->x && drop->y==r->y) return 1;
+		drop=drop->next;
+	}
+	return 0;
+}
+
 void
 drawmap(boolean maponly) {
 	int x, x1, y1, y2, s, q;
@@ -370,12 +383,15 @@ drawmap(boolean maponly) {
 
 	x1=left; y1=top;
 	if(maponly == false) {
+		movexy(SX-36,SY-2);
+		sprintf(buf, "%d gesetzt, %d Rest, %d Dropouts", numnewbies, listlen(newfactions), listlen(dropouts));
+		addstr(buf);
 		movexy(SX-39, 0);
 		vline(ACS_VLINE, SY+1);
-		movexy(SX-38, SY-2);
+		movexy(SX-38, SY-3);
 		hline(ACS_HLINE, 39);
 		if (hl != -1) {
-			movexy(SX-36,SY-2);
+			movexy(SX-36,SY-3);
 			addstr(" High: ");
 			switch (hl) {
 				case -2:
@@ -402,29 +418,32 @@ drawmap(boolean maponly) {
 				case -9:
 					addstr("Anfänger ");
 					break;
+				case -10:
+					addstr("Dropouts ");
+					break;
 				default:
 					printw((NCURSES_CONST char*)"Partei %d ", hl);
 			}
 		}
 		switch(politkarte) {
 		case 0:
-			movexy(SX-14,SY-2);
+			movexy(SX-14,SY-3);
 			addstr(" Geol.Karte ");
 			break;
 		case 1:
-			movexy(SX-14,SY-2);
+			movexy(SX-14,SY-3);
 			addstr(" Politkarte ");
 			break;
 		case 2:
-			movexy(SX-14,SY-2);
+			movexy(SX-14,SY-3);
 			addstr(" Handelskar ");
 			break;
 		case 3:
-			movexy(SX-14,SY-2);
+			movexy(SX-14,SY-3);
 			addstr(" Botanik    ");
 			break;
 		case 4:
-			movexy(SX-14,SY-2);
+			movexy(SX-14,SY-3);
 			addstr(" Demand     ");
 			break;
 		}
@@ -455,6 +474,7 @@ drawmap(boolean maponly) {
 					 (hl == -7 && fval(r, RF_CHAOTIC)) ||
 					 (hl == -8 && is_cursed_internal(r->attribs, C_CURSED_BY_THE_GODS, 0)) ||
 					 (hl == -9 && newbie_region(r)) ||
+					 (hl == -10 && dropout_region(r)) ||
 					 (hl >= 0 && factionhere(r, hl)) ||
 					 (x==tx && y1==ty))
 					addch(rs | A_REVERSE);
@@ -664,11 +684,13 @@ SetHighlight(void)
 	WINDOW *win;
 	char *fac_nr36;
 	int c;
-	win = openwin(60, 5, "< Highlighting >");
+	win = openwin(60, 6, "< Highlighting >");
 	wmove(win, 1, 2);
 	wAddstr("Regionen mit P)artei, E)inheiten, B)urgen, S)chiffen,");
 	wmove(win, 2, 2);
-	wAddstr("             A)nfängern, L)aen, C)haos, G)odcurse oder N)ichts?");
+	wAddstr("             A)nfängern, L)aen, C)haos, G)odcurse");
+	wmove(win, 3, 2);
+	wAddstr("             D)ropouts oder N)ichts?");
 	wrefresh(win);
 	c = tolower(getch());
 	switch (c) {
@@ -699,6 +721,9 @@ SetHighlight(void)
 		break;
 	case 'a':
 		hl = -9;
+		break;
+	case 'd':
+		hl = -10;
 		break;
 	case 'n':
 	default:
@@ -1447,6 +1472,7 @@ main(int argc, char *argv[])
 {
 	int x = 0, y = 0, i;
 	char *s;
+	faction * f;
 	boolean backup = true;
 	boolean logging = false;
 	boolean readlog = false;
@@ -1560,6 +1586,9 @@ main(int argc, char *argv[])
 		sprintf(datafile, "%s/%d", datapath(), turn);
 
 	readgame(backup);
+	for (f=factions;f;f=f->next) if (f->age==0) {
+		++numnewbies;
+	}
 
 	sprintf(buf, "%s/newfactions.%d", basepath(), turn);
 	read_newfactions(buf);

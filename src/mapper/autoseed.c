@@ -181,6 +181,8 @@ recalc(seed_t * seeds, int nseeds, int nplayers)
 	return quality + q;
 }
 
+extern int numnewbies;
+
 void
 autoseed(struct regionlist * rlist)
 {
@@ -252,6 +254,7 @@ autoseed(struct regionlist * rlist)
 			newfaction ** nfp = &newfactions;
 			while (*nfp!=nf) nfp=&(*nfp)->next;
 			addplayer(seeds[i].region, nf->email, nf->race, nf->lang);
+			++numnewbies;
 			*nfp = nf->next;
 			free(nf);
 		}
