@@ -2454,187 +2454,6 @@ base36conversion(void)
 extern void init_intervals(void);
 
 
-#ifdef USE_MERIAN
-
-#define xp(r, f) ((region_x((r),(f)))*2 + region_y((r),(f)))
-#define yp(r, f) (region_y((r),(f)))
-
-void
-merian(FILE * out, faction * f)
-{
-	int x1 = INT_MAX, x2=INT_MIN, y1=INT_MAX, y2=INT_MIN;
-	region *left=0, *right=0, *top=0, *bottom=0;
-	char ** line;
-	char * c;
-	int y, xw;
-
-	seen_region * sd;
-	if (!seen) return;
-	for (sd = seen; sd!=NULL; sd = sd->next) {
-		region * r = sd->r;
-		if (r->planeid != 0)
-			continue;
-
-		if (!left || xp(r, f)<xp(left, f)) left=r;
-		if (!right || xp(r, f)>xp(right, f)) right=r;
-		if (!top || yp(r, f)>yp(top, f)) top=r;
-		if (!bottom || yp(r, f)<yp(bottom, f)) bottom=r;
-	}
-
-	if(!left) return;	/* Keine normale Region gesehen */
-
-	x1 = xp(left, f);
-	x2 = xp(right, f)+1;
-	y1 = yp(bottom, f);
-	y2 = yp(top, f)+1;
-
-	xw = abs(x1); xw = max(xw, x2);
-	if (xw>99) xw = 3;
-	else if (xw>9) xw = 2;
-	else xw = 1;
-
-	fputs("CR-Version: 42\nMERIAN Version 1.02\nKartenart: Hex(Standard)\n\nLEGENDE\nHochland = H\nGletscher = G\nGebirge = B\nWald = W\nSumpf = S\nOzean = .\nWüste = D\nEbene = E\n\n", out);
-
-	line = (char**)calloc(1, (y2-y1)*sizeof(char*));
-	c = (char*)calloc(1, (y2-y1)*((x2-x1)*sizeof(char)+13));
-	memset(c, ' ', (y2-y1)*((x2-x1)*sizeof(char)+13));
-	{
-		int width = 1+x2-x1;
-		int lx = region_x(top, f) - (xp(top, f)-x1) / 2;
-		int i;
-		if ((y2-y1) % 2 ==0) ++lx;
-
-		fputs("         ", out);
-		for (i=0;i!=width;++i) {
-			int x = lx+((i+1)/2);
-			int o = abs(x1-y2);
-			if (i%2 == o % 2)
-				fprintf(out, "%c", (x<0)?'-':(x>0)?'+':' ');
-			else putc(' ', out);
-		}
-		putc('\n', out);
-		switch (xw) {
-		case 3:
-			fputs("         ", out);
-			for (i=0;i!=width;++i) {
-				int x = lx+((i+1)/2);
-				int o = abs(x1-y2);
-				if (i%2 == o % 2)
-					fprintf(out, "%c", (abs(x)/100)?((abs(x)/100)+'0'):' ');
-				else putc(' ', out);
-			}
-			putc('\n', out);
-		case 2:
-			fputs("         ", out);
-			for (i=0;i!=width;++i) {
-				int x = lx+((i+1)/2);
-				int o = abs(x1-y2);
-				if (i%2 == o % 2)
-					fprintf(out, "%c", (abs(x)%100)/10?((abs(x)%100)/10+'0'):(abs(x)<100?' ':'0'));
-				else putc(' ', out);
-			}
-			putc('\n', out);
-		default:
-			fputs("         ", out);
-			for (i=0;i!=width;++i) {
-				int x = lx+(i/2);
-				int o = abs(x1-y2);
-				if (i%2 == o % 2)
-					fprintf(out, "%c", abs(x)%10+'0');
-				else putc(' ', out);
-			}
-			putc('\n', out);
-		}
-		fputs("        ", out);
-		for (i=0;i!=width;++i) {
-			int o = abs(x1-y2);
-			if (i%2 == o % 2)
-				putc('/', out);
-			else putc(' ', out);
-		}
-	}
-	putc('\n', out);
-	for (y=y1;y!=y2;++y) {
-		line[y-y1] = c + (y-y1)*((x2-x1)*sizeof(char)+13);
-		sprintf(line[y-y1], "%4d", y);
-		line[y-y1][4] = ' ';
-		sprintf(line[y-y1]+7+(x2-x1), "%4d", y);
-	}
-
-	for (sd = seen; sd!=NULL; sd = sd->next) {
-		region * r = sd->r;
-
-		if (getplane(r))
-			continue;
-
-		line[yp(r, f)-y1][5+(xp(r, f)-x1)] = ' ';
-		line[yp(r, f)-y1][6+(xp(r, f)-x1)] = terrain[rterrain(r)].symbol;
-	}
-
-	/* print header */
-	for (y=y1;y!=y2;++y) {
-		fputs(line[y2-y-1], out);
-		putc('\n', out);
-	}
-
-	{
-		int width = 1+x2-x1;
-		int lx = region_x(bottom, f) - (xp(bottom, f)-x1) / 2;
-		int i;
-		fputs("     ", out);
-		for (i=0;i!=width;++i) {
-			int o = abs(x1-y1);
-			if (i%2 == o % 2)
-				putc('/', out);
-			else putc(' ', out);
-		}
-		putc('\n', out);
-		fputs("    ", out);
-		for (i=0;i!=width;++i) {
-			int x = lx+((i+1)/2);
-			int o = abs(x1-y1);
-			if (i%2 == o % 2)
-				fprintf(out, "%c", (x<0)?'-':(x>0)?'+':' ');
-			else putc(' ', out);
-		}
-		putc('\n', out);
-		switch (xw) {
-		case 3:
-			fputs("    ", out);
-			for (i=0;i!=width;++i) {
-				int x = lx+((i+1)/2);
-				int o = abs(x1-y1);
-				if (i%2 == o % 2)
-					fprintf(out, "%c", (abs(x)/100)?((abs(x)/100)+'0'):' ');
-				else putc(' ', out);
-			}
-			putc('\n', out);
-		case 2:
-			fputs("    ", out);
-			for (i=0;i!=width;++i) {
-				int x = lx+((i+1)/2);
-				int o = abs(x1-y1);
-				if (i%2 == o % 2)
-					fprintf(out, "%c", (abs(x)%100)/10?((abs(x)%100)/10+'0'):(abs(x)<100?' ':'0'));
-				else putc(' ', out);
-			}
-			putc('\n', out);
-		default:
-			fputs("    ", out);
-			for (i=0;i!=width;++i) {
-				int x = lx+((i+1)/2);
-				int o = abs(x1-y1);
-				if (i%2 == o % 2)
-					fprintf(out, "%c", abs(x)%10+'0');
-				else putc(' ', out);
-			}
-			putc('\n', out);
-		}
-	}
-	free(c);
-	free(line);
-}
-#endif
 seen_region * reuse;
 #define MAXSEEHASH 4095
 seen_region * seehash[MAXSEEHASH];
@@ -2884,7 +2703,7 @@ reports(void)
 	boolean gotit;
 	FILE *shfp, *F, *BAT;
 	int wants_report, wants_computer_report,
-		wants_compressed, wants_bzip2, wants_zugvorlage;
+		wants_compressed, wants_bzip2;
 	time_t ltime = time(NULL);
 	char pzTime[64];
 
@@ -2905,7 +2724,6 @@ reports(void)
 
 	BAT = openbatch();
 
-  wants_zugvorlage = 1 << O_ZUGVORLAGE;
 	wants_report = 1 << O_REPORT;
 	wants_computer_report = 1 << O_COMPUTER;
 	wants_compressed = 1 << O_COMPRESS;
@@ -2941,15 +2759,6 @@ reports(void)
 				gotit = true;
 			}
 		}
-    /* ZV schreiben: */
-    if (!nonr && (f->options & wants_zugvorlage)) {
-      sprintf(buf, "%s/%d-%s.txt", reportpath(), turn, factionid(f));
-      F = cfopen(buf, "wt");
-      if (F) {
-        order_template(F, f);
-        fclose(F);
-      }
-    }
     /* CR schreiben: */
 		if (!nocr && (f->options & wants_computer_report || f->age<3)) {
 			sprintf(buf, "%s/%d-%s.cr", reportpath(), turn, factionid(f));
@@ -2960,6 +2769,15 @@ reports(void)
 				gotit = true;
 			}
 		}
+    /* ZV schreiben: */
+    if (f->options & (1 << O_ZUGVORLAGE)) {
+      sprintf(buf, "%s/%d-%s.txt", reportpath(), turn, factionid(f));
+      F = cfopen(buf, "wt");
+      if (F) {
+        order_template(F, f);
+        fclose(F);
+      }
+    }
 		if (f->no > 0 && f->email && BAT) {
 			sprintf(buf, "%s/%s.sh", reportpath(), factionid(f));
 			shfp = fopen(buf, "w");
@@ -3014,7 +2832,7 @@ reports(void)
 						" \\\n\t\"application/x-bzip2\" \"Report\" %d-%s.nr.bz2",
 						turn,factionid(f));
 
-        if (!nonr && f->options & wants_zugvorlage)
+        if (f->options & (1 << O_ZUGVORLAGE))
           fprintf(shfp,
           " \\\n\t\"application/x-bzip2\" \"Zugvorlage\" %d-%s.txt.bz2",
           turn,factionid(f));
@@ -3023,12 +2841,6 @@ reports(void)
 					fprintf(shfp,
 						" \\\n\t\"application/x-bzip2\" \"Computer-Report\" %d-%s.cr.bz2",
 						turn, factionid(f));
-#ifdef USE_MERIAN
-				if (!nomer && f->options & wants_merian)
-					fprintf(shfp,
-						" \\\n\t\"application/x-bzip2\" \"Merian-Karte\" %d-%s.mer.bz2",
-						turn, factionid(f));
-#endif
 			} else {
 
 				fprintf(shfp, MAIL " $addr \"%s %s\"", global.gamename, gamedate_short(f->locale));
@@ -3043,7 +2855,7 @@ reports(void)
           " \\\n\t\"text/plain\" \"Report\" %d-%s.nr",
           turn, factionid(f));
 
-        if (!nonr && f->options & wants_zugvorlage)
+        if (f->options & (1 << O_ZUGVORLAGE))
           fprintf(shfp,
           " \\\n\t\"text/plain\" \"Zugvorlage\" %d-%s.txt",
           turn, factionid(f));

@@ -856,7 +856,6 @@ visible_faction(const faction *f, const unit * u)
 faction_list *
 get_addresses(faction * f)
 {
-#if 0
 /* "TODO: travelthru" */
   region *r, *last = f->last?f->last:lastregion(f);
   const faction * lastf = NULL;
@@ -906,7 +905,4 @@ get_addresses(faction * f)
 	}
 #endif
   return flist;
-#else
-  return NULL;
-#endif
 }

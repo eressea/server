@@ -477,9 +477,6 @@ usage(const char * prog, const char * arg)
 		"--nocr           : keine CRs\n"
 		"--nonr           : keine Reports\n"
 		"--crabsolute     : absolute Koordinaten im CR\n"
-#ifdef USE_MERIAN
-		"--nomer          : keine Meriankarten\n"
-#endif
 		"--help           : help\n", prog);
 	return -1;
 }
@@ -522,9 +519,6 @@ read_args(int argc, char **argv, lua_State * luaState)
 			else if (strcmp(argv[i]+2, "nomonsters")==0) nomonsters = true;
 			else if (strcmp(argv[i]+2, "nodebug")==0) nobattledebug = true;
 			else if (strcmp(argv[i]+2, "crabsolute")==0) opt_cr_absolute_coords = true;
-#ifdef USE_MERIAN
-			else if (strcmp(argv[i]+2, "nomer")==0) nomer = true;
-#endif
 			else if (strcmp(argv[i]+2, "help")==0)
 				return usage(argv[0], NULL);
 			else

@@ -607,9 +607,6 @@ main(int argc, char *argv[])
 					"-d datadir       : gibt das datenverzeichnis an\n"
 					"-o reportdir     : gibt das reportverzeichnis an\n"
 					"-nomsg           : keine Messages (RAM sparen)\n"
-#ifdef USE_MERIAN
-					"-nomer           : keine Meriankarten\n"
-#endif
 					"-nocr            : keine CRs\n"
 					"-nonr            : keine Reports\n"
 					"-nobattle        : keine Kämpfe\n"
