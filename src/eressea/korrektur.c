@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.12 2001/02/03 18:46:15 enno Exp $
+ *	$Id: korrektur.c,v 1.13 2001/02/04 08:10:17 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1839,7 +1839,7 @@ korrektur(void)
 	}
 	do_once(atoi36("fxfa"), fix_vertrautenmagie());
 	do_once(atoi36("uddp"), undo_deadpeasants());
-	do_once(atoi36("lmsr"), lms_special(findunit(atoi36(""))))
+        do_once(atoi36("lmsr"), lms_special(findunit(atoi36("tt3g"))))
 	/* fix_hp(); */ /* checkt, ob irgendwer absurde hitpoints hat. */
 
 	/* trade_orders(); */
