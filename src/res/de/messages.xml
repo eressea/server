@@ -2924,6 +2924,25 @@
 	</locale>
 </message>
 
+<message name="race_cantwork">
+	<type>
+		<arg name="unit" type="unit"></arg>
+		<arg name="region" type="region"></arg>
+		<arg name="command" type="string"></arg>
+		<arg name="race" type="race"></arg>
+	</type>
+	<locale name="de">
+		<nr section="errors">
+			<text>"$unit($unit) in $region($region): '$command' - $race($race,0) können nicht arbeiten."</text>
+		</nr>
+	</locale>
+	<locale name="en">
+		<nr section="errors">
+			<text>"$unit($unit) in $region($region): '$command' - $race($race,0) cannot work."</text>
+		</nr>
+	</locale>
+</message>
+
 <message name="error226">
 	<type>
 		<arg name="unit" type="unit"></arg>

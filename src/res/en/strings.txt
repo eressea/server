@@ -564,7 +564,7 @@ nr_size;en;size
 nr_spells;en;spells
 nr_combatspells;en;combat spells
 nr_nospells;en;none
-nr_Addresslist;en;Addresses
+nr_addresslist;en;Addresses
 
 ##  Küsten
 Nordwestküste;en;northwest coast

@@ -1498,12 +1498,11 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 		/* Falls kein Problem, eines weiter ziehen */
 
 		route[step] = dir;
+		last_point = current_point;
+		current_point = next_point;
 		tt[++step] = current_point;	/* travelthrough */
 		u->ship->moved = 1;
 		m++;
-
-		last_point = current_point;
-		current_point = next_point;
 
 		/* Falls eine Küstenregion, dann in rv[] aufnehmen (die letzte
 		 * Küste wird nachher nicht aufgelistet werden, wenn das
