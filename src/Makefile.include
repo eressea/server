@@ -20,7 +20,7 @@ INSTALL = @cp
 ARFLAGS = crs
 CTAGSFLAGS = --c-types=cdefgmnstuv
 CFLAGS  = -I$(ERESSEA) -Wall -Wwrite-strings -Wstrict-prototypes \
-           -Wpointer-arith -Werror-implicit-function-declaration \
+           -Werror-implicit-function-declaration \
 		   -Wno-char-subscripts $(INCLUDES)
 LDFLAGS = $(LIBS)
 
