@@ -8,12 +8,12 @@ CFG=ERESSEA - WIN32 DEBUG
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "eressea-6.mak".
+!MESSAGE NMAKE /f "eressea.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "eressea-6.mak" CFG="ERESSEA - WIN32 DEBUG"
+!MESSAGE NMAKE /f "eressea.mak" CFG="ERESSEA - WIN32 DEBUG"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -75,7 +75,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo /S (*.h ../*.h ../common/kernel/eressea.h ../common/gamecode/*.h ../common/util/*.h ../common/triggers/*.h) ../common/gamecode/Debug/*.sbr ../common/kernel/Debug/*.sbr ../common/triggers/Debug/*.sbr ../common/util/Debug/*.sbr
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"Debug/eressea.exe" /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
 
@@ -110,18 +110,6 @@ LINK32=link.exe
 # Name "eressea - Win32 Profile"
 # Begin Source File
 
-SOURCE=.\attributes.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\attributes.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\items.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\korrektur.c
 # End Source File
 # Begin Source File
@@ -131,18 +119,6 @@ SOURCE=.\korrektur.h
 # Begin Source File
 
 SOURCE=.\main.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\spells.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\triggers.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\triggers.h
 # End Source File
 # End Target
 # End Project

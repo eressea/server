@@ -1,33 +1,32 @@
 # Microsoft Developer Studio Project File - Name="modules" - Package Owner=<4>
-# Microsoft Developer Studio Generated Build File, Format Version 5.00
-# ** NICHT BEARBEITEN **
+# Microsoft Developer Studio Generated Build File, Format Version 6.00
+# ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Static Library" 0x0104
 
 CFG=modules - Win32 Debug
-!MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit\
- NMAKE
-!MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den\
- Befehl
-!MESSAGE
-!MESSAGE NMAKE /f "modules-5.mak".
-!MESSAGE
-!MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
-!MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
-!MESSAGE
-!MESSAGE NMAKE /f "modules-5.mak" CFG="modules - Win32 Debug"
-!MESSAGE
-!MESSAGE Für die Konfiguration stehen zur Auswahl:
-!MESSAGE
-!MESSAGE "modules - Win32 Release" (basierend auf\
-  "Win32 (x86) Static Library")
-!MESSAGE "modules - Win32 Debug" (basierend auf  "Win32 (x86) Static Library")
-!MESSAGE
+!MESSAGE This is not a valid makefile. To build this project using NMAKE,
+!MESSAGE use the Export Makefile command and run
+!MESSAGE 
+!MESSAGE NMAKE /f "modules.mak".
+!MESSAGE 
+!MESSAGE You can specify a configuration when running NMAKE
+!MESSAGE by defining the macro CFG on the command line. For example:
+!MESSAGE 
+!MESSAGE NMAKE /f "modules.mak" CFG="modules - Win32 Debug"
+!MESSAGE 
+!MESSAGE Possible choices for configuration are:
+!MESSAGE 
+!MESSAGE "modules - Win32 Release" (based on "Win32 (x86) Static Library")
+!MESSAGE "modules - Win32 Debug" (based on "Win32 (x86) Static Library")
+!MESSAGE 
 
 # Begin Project
+# PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
+RSC=rc.exe
 
 !IF  "$(CFG)" == "modules - Win32 Release"
 
@@ -42,7 +41,9 @@ CPP=cl.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /Za /W4 /GX /Z7 /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD BASE RSC /l 0x407
+# ADD RSC /l 0x407
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -63,15 +64,17 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /Za /W4 /Z7 /Od /I "../util" /I "../kernel" /I "../.." /I ".." /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR /YX"stdafx.h" /FD /c
+# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../kernel" /I "../util" /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /D "BETA_CODE" /FR /YX"stdafx.h" /FD /c
+# ADD BASE RSC /l 0x407
+# ADD RSC /l 0x407
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo /out:"Debug\modules.lib"
+# ADD LIB32 /nologo
 
-!ENDIF
+!ENDIF 
 
 # Begin Target
 
@@ -86,7 +89,15 @@ SOURCE=.\arena.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\dungeon.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\gmcmd.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\infocmd.h
 # End Source File
 # Begin Source File
 
@@ -106,7 +117,15 @@ SOURCE=.\weather.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\xmas.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\xmas2000.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\xmas2001.h
 # End Source File
 # End Group
 # Begin Source File
@@ -115,7 +134,15 @@ SOURCE=.\arena.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\dungeon.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\gmcmd.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\infocmd.c
 # End Source File
 # Begin Source File
 
@@ -135,7 +162,15 @@ SOURCE=.\weather.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\xmas.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\xmas2000.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\xmas2001.c
 # End Source File
 # End Target
 # End Project
