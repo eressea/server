@@ -1,6 +1,10 @@
 C++ = g++ ;
 CC = gcc ;
 
+if ! $(HAVE_LUA) {
+  HAVE_LUA = 1 ;
+}
+
 if ! $(DISTCC_HOSTS) {
 } else {
   CC = distcc $(CC) ;

@@ -1,5 +1,5 @@
 if gate_travel==nil then
-  dofile("gates.lua")
+  dofile(scriptpath .. "/gates.lua")
 end
 
 buildings = {}

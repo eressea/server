@@ -3,7 +3,7 @@
   <resource name="grail">
     <!-- LMS reward -->
     <function name="change" value="changeitem"/>
-    <item cursed="yes" notlost="yes" weight="0"/>
+    <item notlost="yes" weight="0"/>
   </resource>
 
   <resource name="greatbow">
