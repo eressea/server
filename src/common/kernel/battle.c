@@ -2685,7 +2685,8 @@ make_fighter(battle * b, unit * u, boolean attack)
 	int h;
 	int berserk;
 	int strongmen;
-	int speeded, speed;
+	int speeded = 0;
+	int speed = 0;
 	boolean pr_aid = false;
 	boolean stealth = (boolean)((fval(u, FL_PARTEITARNUNG)!=0)?true:false);
 	int rest;
