@@ -32,6 +32,9 @@
 
 #include <modules/xmas2000.h>
 #include <modules/gmcmd.h>
+#ifdef ALLIANCES
+#include <modules/alliance.h>
+#endif
 #ifdef MUSEUM_MODULE
 #include <modules/museum.h>
 #endif
@@ -184,6 +187,10 @@ init_win(int x, int y) {
 /* --------------------------------------------------------------------- */
 
 static int hl;
+#ifdef ALLIANCES
+static int hl_alliance;
+#endif
+
 int politkarte = 0;
 
 int
@@ -307,6 +314,16 @@ factionhere(region * r, int f)
 	return false;
 }
 
+static boolean
+alliancehere(region * r, int alliance)
+{
+	unit *u;
+	for (u = r->units; u; u = u->next)
+		if (u->faction->alliance && u->faction->alliance->id == alliance)
+			return true;
+	return false;
+}
+
 #if NEW_RESOURCEGROWTH
 static boolean
 has_laen(region *r)
@@ -410,6 +427,9 @@ drawmap(boolean maponly) {
 				case -10:
 					addstr("Dropouts ");
 					break;
+				case -11:
+					addstr("Allianz ");
+					break;
 				default:
 					printw((NCURSES_CONST char*)"Partei %d ", hl);
 			}
@@ -464,6 +484,9 @@ drawmap(boolean maponly) {
 					 (hl == -8 && get_curse(r->attribs, ct_find("godcursezone"))) ||
 					 (hl == -9 && newbie_region(r)) ||
 					 (hl == -10 && dropout_region(r)) ||
+#ifdef ALLIANCES
+					 (hl == -11 && alliancehere(r, hl_alliance)) ||
+#endif
 					 (hl >= 0 && factionhere(r, hl)) ||
 					 (x==tx && y1==ty))
 					addch(rs | A_REVERSE);
@@ -707,13 +730,14 @@ SetHighlight(void)
 	WINDOW *win;
 	char *fac_nr36;
 	int c;
+
 	win = openwin(60, 6, "< Highlighting >");
 	wmove(win, 1, 2);
 	wAddstr("Regionen mit P)artei, E)inheiten, B)urgen, S)chiffen,");
 	wmove(win, 2, 2);
 	wAddstr("             A)nfängern, L)aen, C)haos, G)odcurse");
 	wmove(win, 3, 2);
-	wAddstr("             D)ropouts oder N)ichts?");
+	wAddstr("             D)ropouts, Allian(Z) oder N)ichts?");
 	wrefresh(win);
 	c = tolower(getch());
 	switch (c) {
@@ -721,6 +745,12 @@ SetHighlight(void)
 		fac_nr36 = my_input(win, 2, 2, "Partei-Nummer: ", NULL);
 		hl = atoi36(fac_nr36);
 		break;
+#ifdef ALLIANCES
+	case 'z':
+		hl_alliance = map_input(win, 2, 2, "Allianz-Nummer: ", 0, 999, 0);
+		hl = -11;
+		break;
+#endif
 	case 'e':
 		hl = -2;
 		break;
