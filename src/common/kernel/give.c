@@ -176,6 +176,8 @@ givemen(int n, unit * u, unit * u2, struct order * ord)
                  itoa36(u->faction->no), u->race->_name[0],
                  u2->race->_name[1]));
     error = 139;
+  } else if (u2!=NULL && (get_racename(u2->attribs) || get_racename(u->attribs))) {
+    error = 139;
   } else {
     if (n > u->number) n = u->number;
     if (n == 0) {
