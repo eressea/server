@@ -2816,6 +2816,9 @@ heal_all(void)
 }
 
 #if PEASANT_ADJUSTMENT == 1
+
+#define WEIGHT ((double)0.5)
+
 static int
 peasant_adjustment(void)
 {
@@ -2828,6 +2831,7 @@ peasant_adjustment(void)
 
 		if(terrain[ter].production_max <= 0) continue;
 
+		c = 0;
 		sum = 0;
 		pool = 0;
 		freeall = 0;
@@ -2847,13 +2851,21 @@ peasant_adjustment(void)
 			unit *u;
 			int playerp = 0;
 			int p_weg;
+			int soll;
 
 			for(u = r->units; u; u=u->next) {
 				if(lifestyle(u) > 0) playerp += u->number;
 			}
-			p_weg = min((playerp + rpeasants(r)) - avg, rpeasants(r));
-			pool += p_weg;
-			rsetpeasants(r, rpeasants(r) - p_weg);
+
+			soll = (avg + playerp + rpeasants(r)) * WEIGHT;
+
+			if(playerp + rpeasants(r) > soll) {
+				p_weg = min((playerp + rpeasants(r)) - soll, rpeasants(r));
+				assert(p_weg >= 0);
+				pool += p_weg;
+				rsetpeasants(r, rpeasants(r) - p_weg);
+				assert(rpeasants(r) >= 0);
+			}
 
 			freeall += max(0,production(r) * MAXPEASANTS_PER_AREA
 				- ((rtrees(r,2)+rtrees(r,1)/2) * TREESIZE) - playerp);
@@ -2875,6 +2887,8 @@ peasant_adjustment(void)
 			newp = (pool * free)/freeall;
 
 			rsetpeasants(r, rpeasants(r)+newp);
+
+			assert(rpeasants(r) >= 0);
 		}
 	}
 
