@@ -2190,9 +2190,11 @@ display_item(faction *f, unit *u, const item_type * itype)
 	const char *name, *info;
 
 	if (u && *i_find(&u->items, itype) == NULL) return false;
+	/*
 	info = mkname("info", itype->rtype->_name[0]);
 	name = LOC(u->faction->locale, info);
-	if (name==info) {
+	if (strcmp(name, info)==0) {
+	*/
 		name = resourcename(itype->rtype, 0);
 		sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
 		fp = fopen(filename, "r");
@@ -2217,7 +2219,7 @@ display_item(faction *f, unit *u, const item_type * itype)
 		}
 		fclose(fp);
 		name = buf;
-	}
+/*	} */
 	ADDMSG(&f->msgs, msg_message("displayitem", "item description", itype->rtype, strdup(name)));
 
 	return true;
