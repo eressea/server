@@ -1321,62 +1321,64 @@ economics(void)
 static void
 manufacture(unit * u, const item_type * itype, int want)
 {
-	int n;
-	int skill;
-	int minskill = itype->construction->minskill;
-	skill_t sk = itype->construction->skill;
+  int n;
+  int skill;
+  int minskill = itype->construction->minskill;
+  skill_t sk = itype->construction->skill;
 
-	skill = effskill(u, sk);
-	skill = skillmod(itype->rtype->attribs, u, u->region, sk, skill, SMF_PRODUCTION);
+  skill = effskill(u, sk);
+  skill = skillmod(itype->rtype->attribs, u, u->region, sk, skill, SMF_PRODUCTION);
 
-	if (skill < 0) {
-		/* an error occured */
-		int err = -skill;
-		cmistake(u, findorder(u, u->thisorder), err, MSG_PRODUCE);
-		return;
-	}
+  if (skill < 0) {
+    /* an error occured */
+    int err = -skill;
+    cmistake(u, findorder(u, u->thisorder), err, MSG_PRODUCE);
+    return;
+  }
 
-	if(want==0)
-		want=maxbuild(u, itype->construction);
+  if(want==0)
+    want=maxbuild(u, itype->construction);
 
-	n = build(u, itype->construction, 0, want);
-	switch (n) {
-		case ENEEDSKILL:
-			add_message(&u->faction->msgs,
-				msg_error(u, findorder(u, u->thisorder), "skill_needed", "skill", sk));
-			return;
-		case ELOWSKILL:
-			add_message(&u->faction->msgs,
-				msg_error(u, findorder(u, u->thisorder), "manufacture_skills", "skill minskill product",
-				sk, minskill, itype->rtype, 1));
-			return;
-		case ENOMATERIALS:
-			/* something missing from the list of materials */
-			strcpy(buf, "Dafür braucht man mindestens:");
-			{
-				int c, n;
-				const construction * cons = itype->construction;
-				char * ch = buf+strlen(buf);
-				assert(cons);
-				for (c=0;cons->materials[c].number; c++) {
-					if (c!=0)
-						strcat(ch++, ",");
-					n=cons->materials[c].number / cons->reqsize;
-					sprintf(ch, " %d %s", n?n:1,
-						locale_string(u->faction->locale,
-						resname(cons->materials[c].type, cons->materials[c].number!=1)));
-					ch = ch+strlen(ch);
-				}
-				mistake(u, findorder(u, u->thisorder), buf, MSG_PRODUCE);
-				return;
-			}
-	}
-	if (n>0) {
-		i_change(&u->items, itype, n);
-		if (want==INT_MAX) want = n;
-		ADDMSG(&u->faction->msgs, msg_message("manufacture",
-			"unit region amount wanted resource", u, u->region, n, want, itype->rtype));
-	}
+  n = build(u, itype->construction, 0, want);
+  switch (n) {
+    case ENEEDSKILL:
+      ADDMSG(&u->faction->msgs,
+        msg_error(u, findorder(u, u->thisorder), "skill_needed", "skill", sk));
+      return;
+    case ELOWSKILL:
+      ADDMSG(&u->faction->msgs,
+        msg_error(u, findorder(u, u->thisorder), "manufacture_skills", "skill minskill product",
+        sk, minskill, itype->rtype, 1));
+      return;
+    case ENOMATERIALS:
+      /* something missing from the list of materials */
+      strcpy(buf, "Dafür braucht man mindestens:");
+      {
+        int c, n;
+        const construction * cons = itype->construction;
+        char * ch = buf+strlen(buf);
+        assert(cons);
+        for (c=0;cons->materials[c].number; c++) {
+          if (c!=0)
+            strcat(ch++, ",");
+          n=cons->materials[c].number / cons->reqsize;
+          sprintf(ch, " %d %s", n?n:1,
+            locale_string(u->faction->locale,
+            resname(cons->materials[c].type, cons->materials[c].number!=1)));
+          ch = ch+strlen(ch);
+        }
+        mistake(u, findorder(u, u->thisorder), buf, MSG_PRODUCE);
+        return;
+      }
+  }
+  if (n>0) {
+    i_change(&u->items, itype, n);
+    if (want==INT_MAX) want = n;
+    ADDMSG(&u->faction->msgs, msg_message("manufacture",
+      "unit region amount wanted resource", u, u->region, n, want, itype->rtype));
+  } else {
+    cmistake(u, findorder(u, u->thisorder), 125, MSG_PRODUCE);
+  }
 }
 
 typedef struct allocation {
