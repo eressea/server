@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.c,v 1.3 2001/01/31 13:03:18 corwin Exp $
+ *	$Id: spell.c,v 1.4 2001/01/31 14:32:58 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -3016,6 +3016,78 @@ sp_wisps(castorder *co)
 	return cast_level;
 }
 #endif
+
+/* ------------------------------------------------------------- */
+/* Name:       Unheilige Kraft
+ * Stufe:      10
+ * Gebiet:     Draig
+ * Kategorie:  Untote Einheit, positiv
+ *
+ * Wirkung:
+ *  transformiert (Stufe)W10 Untote in ihre stärkere Form
+ *
+ *
+ * Flag:
+ * 	(SPELLLEVEL | TESTCANSEE)
+ */
+
+static int
+sp_unholypower(castorder *co)
+{
+	unit *mage = (unit *)co->magician;
+	int cast_level = co->level;
+	spellparameter *pa = co->par;
+	int i;
+	int n;
+
+	n = dice(cast_level, 10);
+
+	for (i = 0; i < pa->length && n > 0; i++) {
+		race_t target_race;
+		unit *u = pa->param[n]->data.u;
+
+		switch(u->race) {
+		case RC_SKELETON:
+			target_race = RC_SKELETON_LORD; break;
+		case RC_ZOMBIE:
+			target_race = RC_ZOMBIE_LORD; break;
+		case RC_GHOUL:
+			target_race = RC_GHOUL_LORD; break;
+		default:
+			cmistake(mage, strdup(co->order), 280, MSG_MAGIC);
+			continue;
+		}
+
+		if(u->number <= n) {
+			n -= u->number;
+			u->race = target_race;
+			add_message(&co->rt->msgs, new_message(mage->faction,
+				"unholypower_effect%u:mage%u:target%s:targetrace", mage, u));
+		} else {
+			unit *un;
+
+			/* Wird hoffentlich niemals vorkommen. Es gibt im Source
+			 * vermutlich eine ganze Reihe von Stellen, wo das nicht
+			 * korrekt abgefangen wird. Besser (aber nicht gerade einfach)
+			 * wäre es, eine solche Konstruktion irgendwie zu kapseln. */
+			if(fval(u, FL_LOCKED) || fval(u, FL_HUNGER)
+					|| is_cursed(u->attribs, C_SLAVE, 0)) {
+				cmistake(mage, strdup(co->order), 74, MSG_MAGIC);
+				continue;
+			}
+
+			un = createunit(co->rt, u->faction, n, target_race);
+			scale_number(u, u->number - n);
+			add_message(&co->rt->msgs, new_message(mage->faction,
+				"unholypower_limitedeffect%u:mage%u:target%s:race%i:amount",
+				mage, u, race[u->race].name[n==1?0:1], n));
+			n = 0;
+		}
+	}
+
+	return cast_level;
+}
+
 /* ------------------------------------------------------------- */
 /* Name:       Todeswolke
  * Stufe:      11
@@ -7830,6 +7902,24 @@ spell spelldaten[] =
 			{0, 0, 0}},
 		(spell_f)sp_destroy_magic, patzer
 	},
+	
+	{SPL_UNHOLYPOWER, "Unheilige Kraft",
+		"Nur geflüstert wird dieses Ritual an den dunklen Akademien an die "
+		"Adepten weitergegeben, gehört es doch zu den finstersten, die je "
+		"niedergeschrieben wurden. Durch die Anrufung unheiliger Dämonen "
+		"wird die Kraft der lebenden Toten verstärkt und sie verwandeln "
+		"sich in untote Monster großer Kraft.",
+		NULL,
+		"u+",
+		M_CHAOS, (SPELLLEVEL | TESTCANSEE), 5, 10,
+		{
+			{R_AURA, 8, SPC_LEVEL},
+			{R_PEASANTS, 50, SPC_LEVEL},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0}},
+		(spell_f)sp_unholypower, patzer
+	},
 
 	{SPL_DEATHCLOUD, "Todeswolke",
 		"Mit einem düsteren Ritual und unter Opferung seines eigenen Blutes "
@@ -8001,14 +8091,15 @@ spell spelldaten[] =
 	},
 
 	{SPL_PUTTOREST, "Seelenfrieden",
-		"Dieses magische Ritual beruhigt die gequälten Seelen der gewaltsam zu Tode "
-		"gekommenen und ermöglicht es ihnen so, ihre letzte Reise in die Anderlande "
-		"zu beginnen. Je Stufe des Zaubers werden ungefähr 50 Seelen ihre Ruhe "
-		"finden. Der Zauber vermag nicht, bereits wieder auferstandene lebende Tote "
-		"zu erlösen, da deren Bindung an diese Welt zu stark ist.",
+		"Dieses magische Ritual beruhigt die gequälten Seelen der gewaltsam "
+		"zu Tode gekommenen und ermöglicht es ihnen so, ihre letzte Reise in "
+		"die Anderlande zu beginnen. Je Stufe des Zaubers werden ungefähr 50 "
+		"Seelen ihre Ruhe finden. Der Zauber vermag nicht, bereits wieder "
+		"auferstandene lebende Tote zu erlösen, da deren Bindung an diese "
+		"Welt zu stark ist.",
 		NULL,
 		NULL,
-	 M_TRAUM, (0), 5, 2,
+	 M_TRAUM, (SPELLLEVEL), 5, 2,
 	 {
 		 {R_AURA, 3, SPC_LEVEL},
 		 {R_TREES, 1, SPC_FIX},
@@ -8019,10 +8110,10 @@ spell spelldaten[] =
 	},
 
 	{SPL_ICASTLE, "Traumschlößchen",
-		"Mit Hilfe dieses Zaubers kann der Traumweber die Illusion eines beliebigen "
-		"Gebäudes erzeugen. Die Illusion kann betreten werden, ist aber ansonsten "
-		"funktionslos und benötigt auch keinen Unterhalt. Sie wird einige Wochen "
-		"bestehen bleiben.",
+		"Mit Hilfe dieses Zaubers kann der Traumweber die Illusion eines "
+		"beliebigen Gebäudes erzeugen. Die Illusion kann betreten werden, ist "
+		"aber ansonsten funktionslos und benötigt auch keinen Unterhalt. Sie "
+		"wird einige Wochen bestehen bleiben.",
 		"ZAUBERE \"Traumschlößchen\" <Gebäude-Typ>",
 		"c",
 	 M_TRAUM, (0), 5, 3,

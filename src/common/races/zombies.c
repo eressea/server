@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: zombies.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ * $Id: zombies.c,v 1.3 2001/01/31 14:32:58 corwin Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -85,7 +85,7 @@ age_undead(unit *u)
 void
 age_skeleton(unit *u)
 {
-	if (rand()%100 < age_chance(u->age, 27, 1)) {
+	if (u->faction->no == 0 && rand()%100 < age_chance(u->age, 27, 1)) {
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
 		u->race = RC_SKELETON_LORD;
 		u->irace = RC_SKELETON_LORD;
@@ -97,7 +97,7 @@ age_skeleton(unit *u)
 void
 age_zombie(unit *u)
 {
-	if (rand()%100 < age_chance(u->age, 27, 1)) {
+	if (u->faction->no == 0 && rand()%100 < age_chance(u->age, 27, 1)) {
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
 		u->race = RC_ZOMBIE_LORD;
 		u->irace = RC_ZOMBIE_LORD;
@@ -109,7 +109,7 @@ age_zombie(unit *u)
 void
 age_ghoul(unit *u)
 {
-	if (rand()%100 < age_chance(u->age, 27, 1)) {
+	if (u->faction->no == 0 && rand()%100 < age_chance(u->age, 27, 1)) {
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
 		u->race = RC_GHOUL_LORD;
 		u->irace = RC_GHOUL_LORD;
