@@ -1025,7 +1025,7 @@
     <type>
       <arg name="mage" type="unit"/>
       <arg name="ship" type="ship"/>
-      <arg name="spell" type="string"/>
+      <arg name="curse" type="string"/>
       <arg name="months" type="int"/>
     </type>
     <text locale="de">"$unit($mage) fand heraus, dass auf $ship($ship) der Zauber $spell liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
@@ -1036,7 +1036,7 @@
     <type>
       <arg name="mage" type="unit"/>
       <arg name="building" type="building"/>
-      <arg name="spell" type="string"/>
+      <arg name="curse" type="string"/>
       <arg name="months" type="int"/>
     </type>
     <text locale="de">"$unit($mage) fand heraus, dass auf $building($building) der Zauber $spell liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
@@ -1047,7 +1047,7 @@
     <type>
       <arg name="mage" type="unit"/>
       <arg name="unit" type="unit"/>
-      <arg name="spell" type="string"/>
+      <arg name="curse" type="string"/>
       <arg name="months" type="int"/>
     </type>
     <text locale="de">"$unit($mage) fand heraus, dass auf $unit($unit) der Zauber $spell liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
@@ -1058,7 +1058,7 @@
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
-      <arg name="spell" type="string"/>
+      <arg name="curse" type="string"/>
       <arg name="months" type="int"/>
     </type>
     <text locale="de">"$unit($mage) fand heraus, dass auf $region($region) der Zauber $spell liegt, der noch etwa $int($months) Wochen bestehen bleibt."</text>
@@ -1069,7 +1069,7 @@
     <type>
       <arg name="mage" type="unit"/>
       <arg name="ship" type="ship"/>
-      <arg name="spell" type="string"/>
+      <arg name="curse" type="string"/>
     </type>
     <text locale="de">"$unit($mage) fand heraus, dass auf $ship($ship) der Zauber $spell liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
     <text locale="fr">"$unit($mage) discovers that $ship($ship) is charmed with $spell, which will last for centuries."</text>
@@ -1079,7 +1079,7 @@
     <type>
       <arg name="mage" type="unit"/>
       <arg name="building" type="building"/>
-      <arg name="spell" type="string"/>
+      <arg name="curse" type="string"/>
     </type>
     <text locale="de">"$unit($mage) fand heraus, dass auf $building($building) der Zauber $spell liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
     <text locale="fr">"$unit($mage) discovers that $building($building) is charmed with $spell, which will last for centuries."</text>
@@ -1089,7 +1089,7 @@
     <type>
       <arg name="mage" type="unit"/>
       <arg name="unit" type="unit"/>
-      <arg name="spell" type="string"/>
+      <arg name="curse" type="string"/>
     </type>
     <text locale="de">"$unit($mage) fand heraus, dass auf $unit($unit) der Zauber $spell liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
     <text locale="fr">"$unit($mage) discovers that $unit($unit) is charmed with $spell, which will last for centuries."</text>
@@ -1099,7 +1099,7 @@
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
-      <arg name="spell" type="string"/>
+      <arg name="curse" type="string"/>
     </type>
     <text locale="de">"$unit($mage) fand heraus, dass auf $region($region) der Zauber $spell liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben."</text>
     <text locale="fr">"$unit($mage) discovers that $region($region) is charmed with $spell, which will last for centuries."</text>
@@ -1274,8 +1274,8 @@
       <arg name="region" type="region"/>
       <arg name="spell" type="spell"/>
     </type>
-    <text locale="de">"$unit($unit) unterläuft in $region($region) beim Zaubern von $spell ein Patzer:"</text>
-    <text locale="en">"$unit($unit) fumbles while casting $spell in $region($region):"</text>
+    <text locale="de">"$unit($unit) unterläuft in $region($region) beim Zaubern von $spell($spell) ein Patzer:"</text>
+    <text locale="en">"$unit($unit) fumbles while casting $spell($spell) in $region($region):"</text>
   </message>
   <message name="patzer3" section="magic">
     <type>

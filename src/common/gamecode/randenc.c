@@ -1384,7 +1384,7 @@ randomevents(void)
 
 			name_unit(u);
 			set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
-                        free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
+      free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
 
 			/* add message to the region */
 			ADDMSG(&r->msgs,
@@ -1451,8 +1451,8 @@ randomevents(void)
 			u->hp = unit_max_hp(u) * u->number;
 
 			deathcounts(r, -undead);
-                        set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
-                        free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
+      set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
+      free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
 			name_unit(u);
 
 			log_printf("%d %s in %s.\n", u->number,
@@ -1527,8 +1527,8 @@ randomevents(void)
 				rsettrees(r, trees);
 #endif
 				u = createunit(r, findfaction(MONSTER_FACTION),treemen, new_race[RC_TREEMAN]);
-                                set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
-                                free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
+        set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
+        free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
 				/* guard(u, GUARD_ALL); kein auto-guard! erst in monster.c! */
 
 				set_level(u, SK_OBSERVATION, 2);

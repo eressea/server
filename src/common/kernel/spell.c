@@ -195,11 +195,11 @@ magicanalyse_region(region *r, unit *mage, double force)
 		if (chance(probability)) { /* Analyse geglückt */
 			if(c->flag & CURSE_NOAGE) {
 				ADDMSG(&mage->faction->msgs, msg_message(
-					"analyse_region_noage", "mage region spell",
+					"analyse_region_noage", "mage region curse",
 					mage, r, LOC(lang, mkname("spell", c->type->cname))));
 			} else {
 				ADDMSG(&mage->faction->msgs, msg_message(
-					"analyse_region_age", "mage region spell months",
+					"analyse_region_age", "mage region curse months",
 					mage, r, LOC(lang, mkname("spell", c->type->cname)), mon));
 			}
 		} else {
@@ -236,11 +236,11 @@ magicanalyse_unit(unit *u, unit *mage, double force)
 		if (chance(probability)) { /* Analyse geglückt */
 			if(c->flag & CURSE_NOAGE){
 				ADDMSG(&mage->faction->msgs, msg_message(
-					"analyse_unit_noage", "mage unit spell",
+					"analyse_unit_noage", "mage unit curse",
 					mage, u, LOC(lang, mkname("spell", c->type->cname))));
 			}else{
 				ADDMSG(&mage->faction->msgs, msg_message(
-					"analyse_unit_age", "mage unit spell months",
+					"analyse_unit_age", "mage unit curse months",
 					mage, u, LOC(lang, mkname("spell", c->type->cname)), mon));
 			}
 		} else {
@@ -278,11 +278,11 @@ magicanalyse_building(building *b, unit *mage, double force)
 		if (chance(probability)) { /* Analyse geglückt */
 			if(c->flag & CURSE_NOAGE){
 				ADDMSG(&mage->faction->msgs, msg_message(
-					"analyse_building_age", "mage building spell",
+					"analyse_building_age", "mage building curse",
 					mage, b, LOC(lang, mkname("spell", c->type->cname))));
 			}else{
 				ADDMSG(&mage->faction->msgs, msg_message(
-					"analyse_building_age", "mage building spell months",
+					"analyse_building_age", "mage building curse months",
 					mage, b, LOC(lang, mkname("spell", c->type->cname)), mon));
 			}
 		} else {
@@ -320,11 +320,11 @@ magicanalyse_ship(ship *sh, unit *mage, double force)
 		if (chance(probability)) { /* Analyse geglückt */
 			if(c->flag & CURSE_NOAGE){
 				ADDMSG(&mage->faction->msgs, msg_message(
-					"analyse_ship_noage", "mage ship spell",
+					"analyse_ship_noage", "mage ship curse",
 					mage, sh, LOC(lang, mkname("spell", c->type->cname))));
 			}else{
 				ADDMSG(&mage->faction->msgs, msg_message(
-					"analyse_ship_age", "mage ship spell months",
+					"analyse_ship_age", "mage ship curse months",
 					mage, sh, LOC(lang, mkname("spell", c->type->cname)), mon));
 			}
 		} else {
@@ -8534,7 +8534,7 @@ static spell spelldaten[] =
   },
   {
     SPL_DRAIG_DESTROY_MAGIC, "draigdestroymagic", NULL,
-    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' REGIONn"
+    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' REGION\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' EINHEIT <Einheit-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' GEBÄUDE <Gebäude-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' SCHIFF <Schiff-Nr>",

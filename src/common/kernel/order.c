@@ -63,6 +63,7 @@ void
 free_order(order * ord)
 {
 	if (ord!=NULL && --ord->_refcount==0) {
+    assert(ord->next==NULL);
 		if (ord->_str!=NULL) free(ord->_str);
 		free(ord);
 	}
@@ -89,6 +90,7 @@ free_orders(order ** olist)
 	while (*olist) {
 		order * ord = *olist;
 		*olist = ord->next;
+    ord->next = NULL;
 		free_order(ord);
 	}
 }

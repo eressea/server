@@ -925,7 +925,7 @@ build_building(unit * u, const building_type * btype, int want)
 	else
 		sprintf(buffer, "%s %d %s %s", locale_string(u->faction->locale, keywords[K_MAKE]), want-built, string2, buildingid(b));
 	set_order(&u->lastorder, parse_order(buffer, u->faction->locale));
-        free_order(u->lastorder);
+  free_order(u->lastorder);
 
 	b->size += built;
 	update_lighthouse(b);
@@ -1248,6 +1248,7 @@ do_misc(boolean lasttry)
 						 * erfolgreich und wir löschen ihn, damit er im
 						 * zweiten Versuch nicht nochmal ausgeführt wird. */
             *ordp = ord->next;
+            ord->next = NULL;
             free_order(ord);
 						leave(r, u);
 						u->building = b;

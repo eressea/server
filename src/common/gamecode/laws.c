@@ -3210,66 +3210,67 @@ new_units (void)
   unit *u, *u2;
 
   /* neue einheiten werden gemacht und ihre befehle (bis zum "ende" zu
-   * ihnen rueberkopiert, damit diese einheiten genauso wie die alten
-   * einheiten verwendet werden koennen. */
-  
+  * ihnen rueberkopiert, damit diese einheiten genauso wie die alten
+  * einheiten verwendet werden koennen. */
+
   for (r = regions; r; r = r->next) {
-	for (u = r->units; u; u = u->next) {
-	  order ** ordp = &u->orders;
-	  while (*ordp) {
-		order * makeord = *ordp;
-		if (get_keyword(makeord) == K_MAKE) {
-		  init_tokens(makeord);
-		  skip_token();
-		  if (getparam(u->faction->locale) == P_TEMP) {
-			char * name;
-			int g, alias;
-			int mu = maxunits(u->faction);
-			order ** newordersp;
-			
-			if(u->faction->no_units >= mu) {
-			  sprintf(buf, "Eine Partei darf aus nicht mehr als %d "
-					  "Einheiten bestehen.", mu);
-			  mistake(u, makeord, buf, MSG_PRODUCE);
-			  ordp = &makeord->next;
-			  
-			  while (*ordp) {
-				order * ord = *ordp;
-				if (get_keyword(ord) == K_END) break;
-				*ordp = ord->next;
-				free_order(ord);
-			  }
-			  continue;
-			}
-			alias = getid();
-			
-			name = strdup(getstrtoken());
-			if (name && strlen(name)==0) name = NULL;
-			u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
-			if (name!=NULL) free(name);
-			fset(u2, UFL_ISNEW);
-			
-			a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
-			
-			g = getguard(u);
-			if (g) setguard(u2, g);
-			else setguard(u, GUARD_NONE);
-			
-			ordp = &makeord->next;
-			newordersp = &u2->orders;
-			while (*ordp) {
-			  order * ord = *ordp;
-			  if (get_keyword(ord) == K_END) break;
-			  *ordp = ord->next;
-			  ord->next = NULL;
-			  *newordersp = ord;
-			  newordersp = &ord->next;
-			}
-		  }
-		}
-		if (*ordp==makeord) ordp=&makeord->next;
-	  }
-	}
+    for (u = r->units; u; u = u->next) {
+      order ** ordp = &u->orders;
+      while (*ordp) {
+        order * makeord = *ordp;
+        if (get_keyword(makeord) == K_MAKE) {
+          init_tokens(makeord);
+          skip_token();
+          if (getparam(u->faction->locale) == P_TEMP) {
+            char * name;
+            int g, alias;
+            int mu = maxunits(u->faction);
+            order ** newordersp;
+
+            if(u->faction->no_units >= mu) {
+              sprintf(buf, "Eine Partei darf aus nicht mehr als %d "
+                "Einheiten bestehen.", mu);
+              mistake(u, makeord, buf, MSG_PRODUCE);
+              ordp = &makeord->next;
+
+              while (*ordp) {
+                order * ord = *ordp;
+                if (get_keyword(ord) == K_END) break;
+                *ordp = ord->next;
+                ord->next = NULL;
+                free_order(ord);
+              }
+              continue;
+            }
+            alias = getid();
+
+            name = strdup(getstrtoken());
+            if (name && strlen(name)==0) name = NULL;
+            u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
+            if (name!=NULL) free(name);
+            fset(u2, UFL_ISNEW);
+
+            a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
+
+            g = getguard(u);
+            if (g) setguard(u2, g);
+            else setguard(u, GUARD_NONE);
+
+            ordp = &makeord->next;
+            newordersp = &u2->orders;
+            while (*ordp) {
+              order * ord = *ordp;
+              if (get_keyword(ord) == K_END) break;
+              *ordp = ord->next;
+              ord->next = NULL;
+              *newordersp = ord;
+              newordersp = &ord->next;
+            }
+          }
+        }
+        if (*ordp==makeord) ordp=&makeord->next;
+      }
+    }
   }
 }
 
@@ -3543,6 +3544,7 @@ defaultorders (void)
           set_order(&u->lastorder, parse_order(getstrtoken(), u->faction->locale));
           free_order(u->lastorder); /* parse_order & set_order have both increased the refcount */
           *ordp = ord->next;
+          ord->next = NULL;
           free_order(ord);
         }
         else ordp = &ord->next;

@@ -437,7 +437,7 @@ set_movement_order(unit * u, const region * target, int moves, boolean (*allowed
 	}
 
 	set_order(&u->lastorder, parse_order(buf, u->faction->locale));
-        free_order(u->lastorder); /* parse_order & set_order have both increased the refcount */
+  free_order(u->lastorder); /* parse_order & set_order have both increased the refcount */
 	return true;
 }
 
@@ -765,7 +765,7 @@ learn_monster(unit *u)
 				sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_STUDY]),
 					skillname(sv->id, u->faction->locale));
 				set_order(&u->thisorder, parse_order(buf, u->faction->locale));
-                                free_order(u->thisorder); /* parse_order & set_order have both increased the refcount */
+        free_order(u->thisorder); /* parse_order & set_order have both increased the refcount */
 				break;
 			}
 		}
