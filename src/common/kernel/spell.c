@@ -4401,7 +4401,7 @@ sp_migranten(castorder *co)
 
   if (kontaktiert == 0) {
     ADDMSG(&mage->faction->msgs, msg_message("spellfail::contact",
-      "mage region order target", mage, mage->region, co->order,
+      "mage region command target", mage, mage->region, co->order,
       target));
     return 0;
   }

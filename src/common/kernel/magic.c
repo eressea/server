@@ -999,10 +999,12 @@ spellpower(region * r, unit * u, spell * sp, int cast_level, struct order * ord)
     force -= curse_geteffect(c);
     curse_changevigour(&r->attribs, c, -cast_level);
     cmistake(u, ord, 185, MSG_MAGIC);
-    if (force>0) {
-      ADDMSG(&mage->faction->msgs, msg_message("reduce_spell", "self mage region", mage, u, r));
-    } else {
-      ADDMSG(&mage->faction->msgs, msg_message("block_spell", "self mage region", mage, u, r));
+    if (mage!=NULL) {
+      if (force>0) {
+        ADDMSG(&mage->faction->msgs, msg_message("reduce_spell", "self mage region", mage, u, r));
+      } else {
+        ADDMSG(&mage->faction->msgs, msg_message("block_spell", "self mage region", mage, u, r));
+      }
     }
   }
 
@@ -1013,10 +1015,12 @@ spellpower(region * r, unit * u, spell * sp, int cast_level, struct order * ord)
     force -= curse_geteffect(c);
     curse_changevigour(&u->attribs, c, -1);
     cmistake(u, ord, 185, MSG_MAGIC);
-    if (force>0) {
-      ADDMSG(&mage->faction->msgs, msg_message("reduce_spell", "self mage region", mage, u, r));
-    } else {
-      ADDMSG(&mage->faction->msgs, msg_message("block_spell", "self mage region", mage, u, r));
+    if (mage!=NULL) {
+      if (force>0) {
+        ADDMSG(&mage->faction->msgs, msg_message("reduce_spell", "self mage region", mage, u, r));
+      } else {
+        ADDMSG(&mage->faction->msgs, msg_message("block_spell", "self mage region", mage, u, r));
+      }
     }
   }
 
