@@ -71,8 +71,6 @@ new_get_resource(const unit * u, const resource_type * rtype)
 		return u->hp;
 	if (rtype == oldresourcetype[R_PEASANTS])
 		return rpeasants(u->region);
-	if (rtype == oldresourcetype[R_PERSON])
-		return u->number;
 	assert(!"unbekannte ressource entdeckt");
 	return 0;
 }

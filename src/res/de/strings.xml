@@ -7,6 +7,33 @@
     _a: including article (ein Troll, a troll)
    -->
 
+  <name="school">
+    <string name="none">
+      <text locale="de">Kein Magiegebiet</text>
+      <text locale="en">no magic school</text>
+    </string>
+    <string name="illaun">
+      <text locale="de">Illaun</text>
+      <text locale="en">Illaun</text>
+    </string>
+    <string name="tybied">
+      <text locale="de">Tybied</text>
+      <text locale="en">Tybied</text>
+    </string>
+    <string name="cerddor">
+      <text locale="de">Cerddor</text>
+      <text locale="en">Cerddor</text>
+    </string>
+    <string name="gwyrrd">
+      <text locale="de">Gwyrrd</text>
+      <text locale="en">Gwyrrd</text>
+    </string>
+    <string name="draig">
+      <text locale="de">Draig</text>
+      <text locale="en">Draig</text>
+    </string>
+  </namespace>
+
   <string name="Tresen">
     <text locale="de">Tresen</text>
     <text locale="en">counter </text>
@@ -4153,10 +4180,10 @@
       und sein überlegtes Verhalten wird ihm manch Vorteil in
       der Verteidigung geben.</text>
       <text locale="en">This ancient battle chant lifts the
-	  spirit of your troops and helps them withstand even the
-	  fear-inspiring aura of demonic and undead beings. A
-	  fighter thus fortified against evil will not flee even
-	  in the face of terror, and his defenses will be strengthened.</text>
+    spirit of your troops and helps them withstand even the
+    fear-inspiring aura of demonic and undead beings. A
+    fighter thus fortified against evil will not flee even
+    in the face of terror, and his defenses will be strengthened.</text>
     </string>
     <string name="transfer_aura_song">
       <text locale="de">Mit Hilfe dieses Zaubers kann der

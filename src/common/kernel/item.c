@@ -2149,7 +2149,6 @@ resource_type * r_permaura;
 resource_type * r_peasants;
 resource_type * r_unit;
 resource_type * r_hp;
-resource_type * r_person;
 
 resource_type * r_silver;
 item_type * i_silver;
@@ -2175,9 +2174,6 @@ init_resources(void)
 	i_silver = new_itemtype(r_silver, ITF_NONE, 1/*weight*/, 0);
 	r_silver->uchange = res_changeitem;
 
-	r_person = new_resourcetype(&names[2], NULL, RTF_NONE);
-	r_person->uchange = res_changeperson;
-
 	r_permaura = new_resourcetype(&names[4], NULL, RTF_NONE);
 	r_permaura->uchange = res_changepermaura;
 
@@ -2198,7 +2194,6 @@ init_resources(void)
 	oldresourcetype[R_PERMAURA] = r_permaura;
 	oldresourcetype[R_HITPOINTS] = r_hp;
 	oldresourcetype[R_PEASANTS] = r_peasants;
-	oldresourcetype[R_PERSON] = r_person;
 	oldresourcetype[R_UNIT] = r_unit;
 
 	/* alte typen registrieren: */
@@ -2372,8 +2367,6 @@ resname(resource_t res, int index)
 		return index==1?"peasant":"peasant_p";
 	} else if (res == R_UNIT) {
 		return index==1?"unit":"unit_p";
-	} else if (res == R_PERSON) {
-		return index==1?"person":"person_p";
 	} else if (res == R_HITPOINTS) {
 		return index==1?"hp":"hp_p";
 	}

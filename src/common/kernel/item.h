@@ -264,7 +264,6 @@ extern resource_type * r_permaura;
 extern resource_type * r_peasants;
 extern resource_type * r_unit;
 extern resource_type * r_hp;
-extern resource_type * r_person;
 
 typedef struct t_item {
 	const char *name[4];
@@ -519,7 +518,6 @@ enum {
 
 
 	R_UNIT, /* Einheit (gib x einheit) */
-	R_PERSON,
 
 	MAX_RESOURCES, /* do not use outside item.c ! */
 	NORESOURCE = (resource_t) - 1

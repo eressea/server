@@ -254,7 +254,17 @@ givemen(int n, unit * u, unit * u2, struct order * ord)
       }
     }
   }
-  addgive(u, u2, n, R_PERSON, ord, error);
+  if (error) {
+    cmistake(u, ord, error, MSG_COMMERCE);
+  }
+  else if (!u2 || u2->faction!=u->faction) {
+    ADDMSG(&u->faction->msgs, msg_message("give_person", "unit target amount",
+      u, u2?ucansee(u->faction, u2, u_unknown()):u_peasants(), n));
+    if (u2) {
+      ADDMSG(&u2->faction->msgs, msg_message("give_person", "unit target amount",
+        ucansee(u2->faction, u, u_unknown()), u2, n));
+    }
+  }
 }
 
 void

@@ -1990,7 +1990,8 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	centre(F, gamedate_season(f->locale), true);
 	rnl(F);
 	sprintf(buf, "%s, %s/%s (%s)", factionname(f),
-			LOC(f->locale, rc_name(f->race, 1)), neue_gebiete[f->magiegebiet],
+			LOC(f->locale, rc_name(f->race, 1)), 
+      LOC(f->locale, mkname("school", neue_gebiete[f->magiegebiet])),
 			f->email);
 	centre(F, buf, true);
 	if (f->alliance!=NULL) {

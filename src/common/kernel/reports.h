@@ -32,6 +32,7 @@ extern "C" {
 
 extern const char *directions[];
 extern const char *neue_gebiete[];
+extern const char *coasts[];
 
 /* kann_finden speedups */
 extern boolean kann_finden(struct faction * f1, struct faction * f2);
@@ -104,8 +105,6 @@ extern int bufunit(const struct faction * f, const struct unit * u, int indent, 
 extern int bufunit_ugroupleader(const struct faction * f, const struct unit * u, int indent, int mode);
 #endif
 
-extern const char *neue_gebiete[];
-extern const char *coasts[];
 extern const char * reportpath(void);
 extern struct faction * visible_faction(const struct faction *f, const struct unit * u);
 extern struct faction_list * get_addresses(struct faction * f);

@@ -308,17 +308,20 @@ tower_init(void)
 	int i, first = newarena;
 	for (i=0;i!=6;++i) {
 		region * r = tower_region[i] = findregion(arena_center->x+delta_x[i]*3, arena_center->y+delta_y[i]*3);
-        if (r) {		                                                                                                                    
-			start_region[i] = findregion(arena_center->x+delta_x[i]*2, arena_center->y+delta_y[i]*2);                               
-			if (r->terrain!=T_DESERT) terraform(r, T_DESERT);                                                                       
-			if (!r->buildings) {                                                                                                    
+        if (r) {
+			start_region[i] = findregion(arena_center->x+delta_x[i]*2, arena_center->y+delta_y[i]*2);
+			if (r->terrain!=T_DESERT) terraform(r, T_DESERT);
+			if (!r->buildings) {
 				building * b = new_building(bt_find("castle"), r, NULL);
-				b->size = 10;                                                                                                       
-				if (i!=0) sprintf(buf, "Turm des %s", neue_gebiete[i]);                                                             
-				else sprintf(buf, "Turm der Ahnungslosen");                                                                         
-				set_string(&b->name, buf);                                                                                          
-			}                                                                                                                       
-		}          
+				b->size = 10;
+        if (i!=0) {
+          sprintf(buf, "Turm des %s", 
+            LOC(default_locale, mkname("school", neue_gebiete[i])));
+        }
+				else sprintf(buf, "Turm der Ahnungslosen");
+				set_string(&b->name, buf);
+			}
+		}
 	}
 	if (first && !arena_center->buildings) {
 		building * b = new_building(bt_find("castle"), arena_center, NULL);

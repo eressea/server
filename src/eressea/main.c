@@ -239,34 +239,6 @@ getgarbage(void)
 #endif
 }
 
-#if 0
-static void
-writefactiondata(void)
-{
-	FILE *F;
-	char zText[128];
-	
-	sprintf(zText, "%s/faction-data.xml", basepath());
-	F = cfopen(zText, "w");
-	if(F) {
-		faction *f;
-		for(f = factions; f; f=f->next) {
-			fprintf(F,"<faction>\n");
-			fprintf(F,"\t<id>%s</id>\n",itoa36(f->no));
-			fprintf(F,"\t<name>%s</name>\n",f->name);
-			fprintf(F,"\t<email>%s</email>\n",f->email);
-			fprintf(F,"\t<password>%s</password>\n",f->passw);
-			fprintf(F,"\t<race>%s</race>\n",rc_name(f->race,1));
-			fprintf(F,"\t<magic>%s</magic>\n",neue_gebiete[f->magiegebiet]);
-			fprintf(F,"\t<nmrs>%d</nmrs>\n",turn-f->lastorders);
-			fprintf(F,"\t<score>%d</score>\n",f->score);
-			fprintf(F,"</faction>\n");
-		}
-	}
-	fclose(F);
-}
-#endif
-
 #ifdef SHORTPWDS
 static void
 readshortpwds()

@@ -59,12 +59,12 @@
 const char * g_reportdir;
 
 const char *neue_gebiete[] = {
-	"Kein Magiegebiet",
-	"Illaun",
-	"Tybied",
-	"Cerddor",
-	"Gwyrrd",
-	"Draig"
+	"none",
+	"illaun",
+	"tybied",
+	"cerddor",
+	"gwyrrd",
+	"draig"
 };
 
 const char *coasts[MAXDIRECTIONS] =
