@@ -2285,9 +2285,6 @@ attrib_init(void)
 	register_bordertype(&bt_wisps);
 	register_bordertype(&bt_road);
 
-#if USE_EVENTS
-	at_register(&at_events);
-#endif
 	at_register(&at_jihad);
 	at_register(&at_skillmod);
 #if GROWING_TREES

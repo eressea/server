@@ -8,12 +8,12 @@ CFG=mapper - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "mapper-6.mak".
+!MESSAGE NMAKE /f "mapper.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "mapper-6.mak" CFG="mapper - Win32 Debug"
+!MESSAGE NMAKE /f "mapper.mak" CFG="mapper - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -74,7 +74,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo /S (*.h ../*.h ../common/kernel/*.h ../common/attributes/*.h ../common/spells/*.h ../common/triggers/*.h ../common/items/*.h ../common/modules/*.h ../common/util/*.h) ../common/util/Debug/*.sbr ../common/items/Debug/*.sbr ../common/attributes/Debug/*.sbr ../common/kernel/Debug/*.sbr ../common/spells/Debug/*.sbr ../common/modules/Debug/*.sbr
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 curses.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"Debug/mapper.exe" /pdbtype:sept
+# ADD LINK32 curses.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 
 !ENDIF 
 
@@ -85,6 +85,10 @@ LINK32=link.exe
 # Begin Group "Header"
 
 # PROP Default_Filter "*.h"
+# Begin Source File
+
+SOURCE=.\logging.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\mapper.h
@@ -106,6 +110,10 @@ SOURCE=..\common\triggers\triggers.h
 SOURCE=..\modules\weather.h
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\logging.c
+# End Source File
 # Begin Source File
 
 SOURCE=.\map_modify.c
