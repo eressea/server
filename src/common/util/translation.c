@@ -400,6 +400,14 @@ eval_if(opstack ** stack, const void * userdata) /* (int, int) -> int */
 	unused(userdata);
 }
 
+static void
+eval_strlen(opstack ** stack, const void * userdata) /* string -> int */
+{
+	const char * c = opop(stack, const char *);
+	opush(stack, c?strlen(c):0);
+	unused(userdata);
+}
+
 #include "base36.h"
 static void
 eval_int(opstack ** stack, const void * userdata)
@@ -436,6 +444,7 @@ translation_init(void)
 	add_function("eq", &eval_eq);
 	add_function("int", &eval_int);
 	add_function("add", &eval_add);
+	add_function("strlen", &eval_strlen);
 	add_function("if", &eval_if);
 	add_function("localize", &eval_localize);
 	add_function("locale", &eval_locale);

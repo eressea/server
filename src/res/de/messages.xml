@@ -4936,7 +4936,7 @@
 	</type>
 	<locale name="de">
 		<nr section="movement">
-			<text>"$unit($unit) $int($mode) von $region($start) nach $region($end).$regions"</text>
+			<text>"$unit($unit) $int($mode) von $region($start) nach $region($end).$if($strlen($regions)," Dabei wurde $regions durchquert.","")"</text>
 		</nr>
 	</locale>
 </message>
