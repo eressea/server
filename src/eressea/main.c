@@ -147,7 +147,7 @@ crwritemap(void)
 }
 
 static void
-game_init(void)
+game_init(const char *executable_name)
 {
 	init_triggers();
 	init_xmas();
@@ -163,7 +163,7 @@ game_init(void)
 	register_spells();
 	register_dungeon();
 
-	init_data(xmlfile?xmlfile:"eressea.xml");
+	init_data(xmlfile?xmlfile:executable_name);
 	init_locales();
 
 	init_attributes();
@@ -690,7 +690,7 @@ main(int argc, char *argv[])
 	if ((i=read_datenames(zText))!=0) return i;
 
 	kernel_init();
-	game_init();
+	game_init(basename(argv[0]));
 #if defined(BETA_CODE)
 	/* xml_writeships(); */
 	/* xml_writebuildings(); */

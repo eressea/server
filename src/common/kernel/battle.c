@@ -3850,7 +3850,7 @@ damage_unit(unit *u, const char *dam, boolean armor, boolean magic)
 
 	/* Auswirkungen */
 	for (i=0; i<u->number; i++) {
-		if (hp[i] < 0){
+		if (hp[i] <= 0){
 			heiltrank = 0;
 
 			/* Sieben Leben */

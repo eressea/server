@@ -1312,7 +1312,7 @@ stats(void)
 				for (itm=u->items;itm;itm=itm->next) {
 					if (itm->number>10000000) {
 						log_error(("unit %s has %d %s\n", unitname(u), itm->number, resourcename(itm->type->rtype, 0)));
-						// itm->number=1;
+						/* itm->number=1; */
 					}
 					s_change(&items, itm->type, itm->number);
 				}
@@ -2831,7 +2831,12 @@ korrektur(void)
 	convert_triggers();
 #endif
 	fix_migrants();
-	no_teurefremde(1);
+	/* In Vin3 können Parteien komplett übergeben werden. */
+#ifdef ENHANCED_QUIT
+	no_teurefremde(0);
+#else
+	no_teurefremde(1)
+#endif
 	update_igjarjuk_quest();
 	fix_allies();
 	update_gmquests(); /* test gm quests */
