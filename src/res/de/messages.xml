@@ -34,6 +34,7 @@
 		</type>
 		<text locale="de">"Bitte sende die Befehle nächste Runde ein, wenn du weiterspielen möchtest."</text>
 		<text locale="en">"Please send in orders for the next turn if you want to continue playing."</text>
+		<text locale="fr">"Merci d'envoyer vos ordres pour le tour suivant si vous désirez continuer à jouer."</text>
 	</message>
 	<message name="giverestriction" section="errors">
 		<type>
@@ -4849,6 +4850,7 @@
 		<locale name="de">
 			<nr section="events">
 				<text>"Das Passwort für diese Partei lautet ${value}."</text>
+				<text locale="fr">"Le mot de passe de cette faction est '${value}'"</text>
 			</nr>
 		</locale>
 	</message>

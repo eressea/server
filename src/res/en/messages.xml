@@ -3372,15 +3372,11 @@
 		</locale>
 	</message>
 
-	<message name="newbieimmunity">
+	<message name="newbieimmunity" section="none">
 		<type>
 			<arg name="turns" type="int"></arg>
 		</type>
-		<locale name="en">
-			<nr section="none">
-				<text>"Your faction is immune against assaults for $int($turns) more weeks."</text>
-			</nr>
-		</locale>
+		<text locale="fr">"Votre faction est immunisée contre les aggressions durant $int($turns) semaines encore."</text>
 	</message>
 
 	<message name="changebanner">
