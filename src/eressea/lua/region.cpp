@@ -187,10 +187,36 @@ region_remove(region& r)
         }
       }
 #endif
+      runhash(&r);
       break;
     }
     rp = &(*rp)->next;
   }
+}
+
+void
+region_move(region& r, int x, int y)
+{
+#ifdef FAST_CONNECT
+  direction_t dir;
+  for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+    region * rn = r.connect[dir];
+    if (rn!=NULL) {
+      direction_t reldir = reldirection(rn, &r);
+      rn->connect[reldir] = NULL;
+    }
+    rn = findregion(x+delta_x[dir], y+delta_y[dir]);
+    if (rn!=NULL) {
+      direction_t reldir = reldirection(rn, &r);
+      rn->connect[reldir] = &r;
+    }
+    r.connect[dir] = rn;
+  }
+#endif
+  runhash(&r);
+  r.x = x;
+  r.y = y;
+  rhash(&r);
 }
 
 void
@@ -214,6 +240,7 @@ bind_region(lua_State * L)
     .def("set_flag", &region_setflag)
 
     .def("remove", &region_remove)
+    .def("move", &region_move)
 
     .def("get_road", &region_getroad)
     .def("set_road", &region_setroad)
