@@ -4059,7 +4059,7 @@
 		</nr>
 	</locale>
 	<locale name="en">
-		<nr section="none">
+		<nr section="events">
 			<text>"$unit($unit) loses $int($dead) of $int($add($live,$dead)) people due to starvation in $region($region)."</text>
 		</nr>
 	</locale>
@@ -5148,7 +5148,7 @@
 		</nr>
 	</locale>
 	<locale name="en">
-		<nr section="none">
+		<nr section="economy">
 			<text>"$unit($unit) earns $int($amount)$if($eq($wanted,$amount),""," of $int($wanted)") in $region($region)."</text>
 		</nr>
 	</locale>

@@ -74,8 +74,6 @@ unknownunit;de;eine unbekannte Einheit
 ## Meldungssektionen
 section_events;de;Meldungen und Ereignisse
 section_errors;de;Warnungen und Fehler
-section_event_p;de;Meldungen und Ereignisse
-section_error_p;de;Warnungen und Fehler
 section_economy;de;Wirtschaft und Handel
 section_production;de;Rohstoffe und Produktion
 section_magic;de;Magie und Artefakte

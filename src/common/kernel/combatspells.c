@@ -1340,7 +1340,7 @@ sp_reanimate(fighter * fi, int level, int force, spell * sp)
 	}
 	if (get_item(mage, I_AMULET_OF_HEALING) > 0) {
 		scat(" und benutzt das ");
-		scat(locale_string(NULL, resourcename(oldresourcetype[R_AMULET_OF_HEALING], 0)));
+		scat(locale_string(default_locale, resourcename(oldresourcetype[R_AMULET_OF_HEALING], 0)));
 		scat(", um den Zauber zu verstärken");
 		k *= 2;
 		c += 0.10;
@@ -1421,7 +1421,7 @@ sp_healing(fighter * fi, int level, int force, spell * sp)
 
 	if (get_item(mage, I_AMULET_OF_HEALING) > 0) {
 		scat(" und benutzt das ");
-		scat(locale_string(NULL, resourcename(oldresourcetype[R_AMULET_OF_HEALING], 0)));
+		scat(locale_string(default_locale, resourcename(oldresourcetype[R_AMULET_OF_HEALING], 0)));
 		scat(", um die Heilzauber zu verstärken");
 		healhp *= 2;
 	}

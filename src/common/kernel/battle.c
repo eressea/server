@@ -1682,13 +1682,13 @@ attack_message(const troop at, const troop dt, const weapon * wp, int dist)
 	if (dist > 1) {
 		sprintf(smallbuf, "%s schießt mit %s auf %s",
 			a_unit,
-			locale_string(NULL, resourcename(wp->type->itype->rtype, GR_INDEFINITE_ARTICLE)), d_unit);
+			locale_string(default_locale, resourcename(wp->type->itype->rtype, GR_INDEFINITE_ARTICLE)), d_unit);
 		return smallbuf;
 	}
 
 		sprintf(smallbuf, "%s schlägt mit %s nach %s",
 			a_unit,
-			locale_string(NULL, resourcename(wp->type->itype->rtype, GR_INDEFINITE_ARTICLE)), d_unit);
+			locale_string(default_locale, resourcename(wp->type->itype->rtype, GR_INDEFINITE_ARTICLE)), d_unit);
 
 	return smallbuf;
 }
@@ -1731,11 +1731,11 @@ hits(troop at, troop dt, weapon * awp)
 	sprintf(debugbuf, "%.4s/%d [%6s/%d] attackiert %.4s/%d [%6s/%d] mit %d dist %d",
 			unitid(au), at.index,
 			(awp != NULL) ?
-				locale_string(NULL, resourcename(awp->type->itype->rtype, 0)) : "unbewaffnet",
+				locale_string(default_locale, resourcename(awp->type->itype->rtype, 0)) : "unbewaffnet",
 			weapon_effskill(at, dt, awp, true, dist>1),
 			unitid(du), dt.index,
 			(dwp != NULL) ?
-				locale_string(NULL, resourcename(dwp->type->itype->rtype, 0)) : "unbewaffnet",
+				locale_string(default_locale, resourcename(dwp->type->itype->rtype, 0)) : "unbewaffnet",
 			weapon_effskill(dt, at, dwp, true, dist>1),
 			skdiff, dist);
 	if (b->small) {
@@ -2494,7 +2494,7 @@ aftermath(battle * b)
 		for (l=df->loot; l; l=l->next) {
 			const item_type * itype = l->type;
 			sprintf(buf, "%s erbeute%s %d %s.", unitname(du), du->number==1?"t":"n",
-				l->number, locale_string(NULL, resourcename(itype->rtype, l->number!=1)));
+				l->number, locale_string(default_locale, resourcename(itype->rtype, l->number!=1)));
 			fbattlerecord(du->faction, r, buf);
 			i_change(&du->items, itype, l->number);
 		}

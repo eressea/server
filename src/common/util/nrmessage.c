@@ -17,6 +17,7 @@
 /* util includes */
 #include "log.h"
 #include "message.h"
+#include "language.h"
 #include "translation.h"
 
 /* libc includes */
@@ -116,6 +117,6 @@ nr_level(const struct message *msg)
 const char * 
 nr_section(const struct message *msg)
 {
-	nrmessage_type * nrt = nrt_find(NULL, msg->type);
+	nrmessage_type * nrt = nrt_find(default_locale, msg->type);
 	return nrt->section;
 }

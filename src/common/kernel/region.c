@@ -932,6 +932,7 @@ r_addmessage(struct region * r, const struct faction * viewer, struct message * 
 	if (imsg==NULL) {
 		imsg = malloc(sizeof(struct individual_message));
 		imsg->next = r->individual_messages;
+		imsg->msgs = NULL;
 		r->individual_messages = imsg;
 		imsg->viewer = viewer;
 	}

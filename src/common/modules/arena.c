@@ -420,7 +420,7 @@ caldera_handle(trigger * t, void * data)
 					while (*ip) {
 						item * i = *ip;
 						char zText[10];
-						sprintf(zText, " %d %s", i->number, locale_string(NULL, resourcename(i->type->rtype, i->number!=1)));
+						sprintf(zText, " %d %s", i->number, locale_string(default_locale, resourcename(i->type->rtype, i->number!=1)));
 						strcat(buf, zText);
 						i_remove(ip, i);
 						if (*ip==i) ip=&i->next;

@@ -1631,9 +1631,9 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 						icat(trans->number);
 						scat(" ");
 						if (itm->number == 1) {
-							scat(locale_string(NULL, resourcename(itm->type->rtype, 0)));
+							scat(locale_string(default_locale, resourcename(itm->type->rtype, 0)));
 						} else {
-							scat(locale_string(NULL, resourcename(itm->type->rtype, NMF_PLURAL)));
+							scat(locale_string(default_locale, resourcename(itm->type->rtype, NMF_PLURAL)));
 						}
 					}
 					scat(" von der ");

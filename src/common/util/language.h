@@ -33,4 +33,6 @@ extern void debug_language(const char * log);
 
 #define LOC(s,l) locale_string(s, l)
 
+extern locale * default_locale;
+
 #endif

@@ -38,8 +38,8 @@ struct locale {
 	} * strings[SMAXHASH];
 };
 
+locale * default_locale;
 static locale * locales;
-static locale * default_locale;
 
 unsigned int
 locale_hashkey(const locale * lang)

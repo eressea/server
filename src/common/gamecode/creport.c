@@ -194,7 +194,7 @@ print_curses(FILE * F, void * obj, typ_t typ, attrib *a, int self)
 				header = 1;
 				fputs("EFFECTS\n", F);
 			}
-			fprintf(F, "\"%d %s\"\n", data->value, add_translation(key, locale_string(NULL, key)));
+			fprintf(F, "\"%d %s\"\n", data->value, add_translation(key, locale_string(default_locale, key)));
 		}
 		a = a->next;
 	}
