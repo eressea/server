@@ -881,15 +881,15 @@ t_item itemdata[MAXITEMS] = {
 	 * benutze_funktion; */
 	{			/* I_IRON */
 		{"Eisen", "Eisen", "Eisen", "Eisen"}, G_N,
-		IS_RESOURCE, SK_MINING, 1, {0, 0, 0, 0, 0, 0}, 500, 0, 0, NULL
+		IS_RESOURCE, SK_MINING, 1, {0, 0, 0, 0, 0, 0}, 500, 0, FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_WOOD */
 		{"Holz", "Holz", "Holz", "Holz"}, G_N,
-		IS_RESOURCE, SK_LUMBERJACK, 1, {0, 0, 0, 0, 0, 0}, 500, 0, 0, NULL
+		IS_RESOURCE, SK_LUMBERJACK, 1, {0, 0, 0, 0, 0, 0}, 500, 0, FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_STONE */
 		{"Stein", "Steine", "Stein", "Steine"}, G_M,
-		IS_RESOURCE, SK_QUARRYING, 1, {0, 0, 0, 0, 0, 0}, 6000, 0, 0, NULL
+		IS_RESOURCE, SK_QUARRYING, 1, {0, 0, 0, 0, 0, 0}, 6000, 0, FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_HORSE */
 		{"Pferd", "Pferde", "Pferd", "Pferde"}, G_N,
