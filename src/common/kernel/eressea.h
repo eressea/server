@@ -1179,4 +1179,5 @@ typedef struct settings {
 } settings;
 extern settings global;
 
+extern FILE * updatelog;
 #endif

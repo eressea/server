@@ -78,6 +78,7 @@ faction *factions;
 settings global;
 char     buf[BUFSIZE + 1];
 FILE    *logfile;
+FILE    *updatelog;
 const struct race * new_race[MAXRACES];
 
 race_t 
@@ -2396,6 +2397,7 @@ remove_empty_factions(void)
 	faction **fp, *f3;
 	FILE *dofp;
 	char zText[MAX_PATH];
+	FILE * log = fopen("update.log", "a");
 
 	sprintf(zText, "%s/dropouts", basepath());
 
@@ -2413,6 +2415,7 @@ remove_empty_factions(void)
 			/* Einfach in eine Datei schreiben und später vermailen */
 
 			fprintf(dofp, "%s\n", f->email);
+			if (updatelog) fprintf(updatelog, "dropout %s\n", itoa36(f->no));
 
 			for (f3 = factions; f3; f3 = f3->next) {
 				ally * sf;

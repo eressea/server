@@ -2595,6 +2595,7 @@ renumber_factions(void)
 				}
 			}
 		}
+		if (updatelog) fprintf(updatelog, "renum %s %s\n", itoa36(rp->faction->no), itoa36(rp->want));
 		rp->faction->no = rp->want;
 		register_faction_id(rp->want);
 		fset(rp->faction, FF_NEWID);

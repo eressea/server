@@ -161,7 +161,6 @@ game_init(void)
 	creport_init();
 
 	debug_language("locales.log");
-
 	init_races();
 	init_items();
 	init_spells();
@@ -549,6 +548,7 @@ main(int argc, char *argv[])
 	int i;
 	char zText[MAX_PATH];
 
+	updatelog = fopen("update.log", "w");
 	log_open("eressea.log");
 	printf("\n%s PBEM host\n"
 		"Copyright (C) 1996-2001 C.Schlittchen, K.Zedel, E.Rehling, H.Peters.\n\n"
@@ -725,5 +725,6 @@ main(int argc, char *argv[])
 #endif
 	kernel_done();
 	log_close();
+	fclose(updatelog);
 	return 0;
 }
