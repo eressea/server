@@ -3290,14 +3290,17 @@ sp_unholypower(castorder *co)
  * Kategorie:  Region, negativ
  *
  * Wirkung:
- *   alle Personen in der Region verlieren 18 HP * Magieresistenz
+ *   Personen in der Region verlieren stufe/2 Trefferpunkte pro Runde.
+ *   Dauer force/2
  *   Wirkt gegen MR
  *   Rüstung wirkt nicht
  * Patzer:
  *   Magier gerät in den Staub und verliert zufällige Zahl von HP bis
  *   auf max(hp,2)
  * Besonderheiten:
- *   Magier verliert 4 HP pro Entfernung.
+ *   Nicht als curse implementiert, was schlecht ist - man kann dadurch 
+ *   kein dispell machen. Wegen fix unter Zeitdruck erstmal nicht zu
+ *   ändern...
  * Missbrauchsmöglichkeit:
  *   Hat der Magier mehr HP als Rasse des Feindes (extrem: Dämon/Goblin)
  *   so kann er per Farcasting durch mehrmaliges Zaubern eine
