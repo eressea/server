@@ -7104,7 +7104,7 @@ sp_destroy_curse(castorder *co)
 	int cast_level = co->level;
 	int force = co->force;
 	spellparameter *pa = co->par;
-	char *ts;
+	char *ts = NULL;
 
 	if(pa->length < 2){
 		/* Das Zielobjekt wurde vergessen */
