@@ -46,7 +46,7 @@
 #define ROIBONUS 4
 #endif
 
-#define  ENHANCED_QUIT
+#define ENHANCED_QUIT
 #define ALLIANCES
 #undef  ALLIANCEJOIN
 #define AUTOALLIANCE (HELP_FIGHT)

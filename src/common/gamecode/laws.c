@@ -1032,7 +1032,7 @@ transfer_faction(faction *f, faction *f2)
 	unit *u, *un;
 	
 	for (u = f->units; u;) {
-		un = u->next;
+		un = u->nextF;
 		if(!unit_has_cursed_item(u)
 				&& !has_skill(u, SK_MAGIC)
 				&& !has_skill(u, SK_ALCHEMY)) {
@@ -1079,7 +1079,7 @@ quit(void)
 #else
 #warning ENHANCED_QUIT defined without ALLIANCES
 #endif
-							} else if(alliedfaction(NULL, f, f2, HELP_MONEY)) {
+							} else if(!alliedfaction(NULL, f, f2, HELP_MONEY)) {
 								cmistake(u, S->s, 316, MSG_EVENT);
 							} else {
 								transfer_faction(f,f2);
