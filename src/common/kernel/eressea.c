@@ -276,7 +276,7 @@ const char *options[MAXOPTIONS] =
 };
 
 int
-max_skill(faction * f, skill_t sk)
+max_skill(const faction * f, skill_t sk)
 {
 	int m = INT_MAX;
 

@@ -884,6 +884,7 @@ extern int max_unique_id;
 #define FL_TAKEALL        (1<<25) /* Einheit nimmt alle Gegenstände an */
 #define FL_UNNAMED        (1<<26) /* Partei/Einheit/Gebäude/Schiff ist unbenannt */
 
+#define FFL_RESTART       (1<<2)
 #define FFL_OVERRIDE      (1<<27) /* Override-Passwort wurde benutzt */
 
 /* Flags, die gespeichert werden sollen: */
@@ -918,7 +919,7 @@ extern boolean check_leuchtturm(struct region * r, struct faction * f);
 extern void update_lighthouse(struct building * lh);
 
 /* skills */
-extern int max_skill(struct faction * f, skill_t sk);
+extern int max_skill(const struct faction * f, skill_t sk);
 extern int count_skill(struct faction * f, skill_t sk);
 extern int count_all_money(const struct region * r);
 

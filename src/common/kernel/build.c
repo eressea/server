@@ -587,8 +587,7 @@ build(unit * u, const construction * ctype, int completed, int want)
 		skills += dm * effsk;
 	}
 	for (;want>0 && skills>0;) {
-		int c, n, i = 0;
-		item * itm;
+		int c, n;
 
 		/* skip over everything that's already been done:
 		 * type->improvement==NULL means no more improvements, but no size limits
@@ -631,11 +630,14 @@ build(unit * u, const construction * ctype, int completed, int want)
 		} else {
 			n = skills;
 		}
-		itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
-		if (itm!=NULL) i = itm->number;
-		if (i>0) {
-			int rings = min(u->number, i);
-			n = n * (9*rings+u->number) / u->number;
+		if (max_skill(u->faction, type->skill)==INT_MAX) {
+			int i = 0;
+			item * itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
+			if (itm!=NULL) i = itm->number;
+			if (i>0) {
+				int rings = min(u->number, i);
+				n = n * (9*rings+u->number) / u->number;
+			}
 		}
 
 		if (want>0)

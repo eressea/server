@@ -240,6 +240,7 @@ restart(unit *u, const race * rc)
 	unit * nu = f->units;
 	strlist ** o=&u->orders;
 
+	fset(f, FFL_RESTART);
 	fprintf(sqlstream, "UPDATE subscriptions set faction='%s' where faction"
 		"='%s' and game=%d;", itoa36(u->faction->no), itoa36(f->no), GAME_ID);
 	f->magiegebiet = u->faction->magiegebiet;
@@ -1153,17 +1154,14 @@ quit(void)
 					} else {
 						s_pass = getstrtoken();
 					}
-						
-					if(frace != u->faction->race) {
-						if(u->faction->age < 81) {
-							cmistake(u, S->s, 241, MSG_EVENT);
-							continue;
-						}
-					} else {
-						if(u->faction->age < 9) {
-							cmistake(u, S->s, 305, MSG_EVENT);
-							continue;
-						}
+
+					if (frace != u->faction->race && u->faction->age < 81) {
+						cmistake(u, S->s, 241, MSG_EVENT);
+						continue;
+					}
+					if (u->faction->age > 3 || fval(u->faction, FFL_RESTART)) {
+						cmistake(u, S->s, 305, MSG_EVENT);
+						continue;
 					}
 
 					if (!playerrace(frace)) {
