@@ -172,9 +172,68 @@ cr_output_str_list(FILE * F, const char *title, const strlist * S, const faction
 #include "objtypes.h"
 
 static void
-print_curses(FILE * F, const locale * lang, const void * obj, typ_t typ, const attrib *a, int self)
+print_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
 {
 	boolean header = false;
+	attrib *a = NULL;
+	int self = 0;
+	region *r;
+
+	/* Die Sichtbarkeit eines Zaubers und die Zaubermeldung sind bei
+	 * Gebäuden und Schiffen je nach, ob man Besitzer ist, verschieden.
+	 * Bei Einheiten sieht man Wirkungen auf eigene Einheiten immer.
+	 * Spezialfälle (besonderes Talent, verursachender Magier usw. werde
+	 * bei jedem curse gesondert behandelt. */
+	if (typ == TYP_SHIP){
+		ship * sh = (ship*)obj;
+		unit * owner;
+		a = sh->attribs;
+		r = sh->region;
+		if((owner = shipowner(r,sh)) != NULL){
+			if (owner->faction == viewer){
+				self = 2;
+			} else { /* steht eine person der Partei auf dem Schiff? */
+				unit *u = NULL;
+				for (u = r->units; u; u = u->next) {
+					if (u->ship == sh) {
+						self = 1;
+						break;
+					}
+				}
+			}
+		}
+	} else if (typ == TYP_BUILDING) {
+		building * b = (building*)obj;
+		unit * owner;
+		a = b->attribs;
+		r = b->region;
+		if((owner = buildingowner(r,b)) != NULL){
+			if (owner->faction == viewer){
+				self = 2;
+			} else { /* steht eine Person der Partei in der Burg? */
+				unit *u = NULL;
+				for (u = r->units; u; u = u->next) {
+					if (u->building == b) {
+						self = 1;
+						break;
+					}
+				}
+			}
+		}
+	} else if (typ == TYP_UNIT) {
+		unit *u = (unit *)obj;
+		a = u->attribs;
+		r = u->region;
+		if (u->faction == viewer){
+			self = 2;
+		}
+	} else if (typ == TYP_REGION) {
+		r = (region *)obj;
+		a = r->attribs;
+	} else {
+		/* fehler */
+	}
+
 	while (a) {
 		int dh = 0;
 		curse *c;
@@ -183,7 +242,7 @@ print_curses(FILE * F, const locale * lang, const void * obj, typ_t typ, const a
 
 			c = (curse *)a->data.v;
 			if (c->type->curseinfo)
-				dh = c->type->curseinfo(lang, obj, typ, c, self);
+				dh = c->type->curseinfo(viewer->locale, obj, typ, c, self);
 			if (dh == 1) {
 				if (!header) {
 					header = 1;
@@ -411,7 +470,6 @@ static void
 cr_output_buildings(FILE * F, building * b, unit * u, int fno, faction *f)
 {
 	const building_type * type = b->type;
-	unit * bo = buildingowner(b->region, b);
 	const char * bname = buildingtype(b, b->size);
 
 	fprintf(F, "BURG %d\n", b->no);
@@ -436,12 +494,7 @@ cr_output_buildings(FILE * F, building * b, unit * u, int fno, faction *f)
 #endif
 	if (b->besieged)
 		fprintf(F, "%d;Belagerer\n", b->besieged);
-	if(bo != NULL){
-		print_curses(F, f->locale, b, TYP_BUILDING, b->attribs,
-				(bo->faction == f)? 1 : 0);
-	} else {
-		print_curses(F, f->locale, b, TYP_BUILDING, b->attribs, 0);
-	}
+	print_curses(F, f, b, TYP_BUILDING);
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
@@ -482,12 +535,7 @@ cr_output_ship(FILE * F, const ship * s, const unit * u, int fcaptain, const fac
 	if (w != NODIRECTION)
 		fprintf(F, "%d;Kueste\n", w);
 
-	if(shipowner(r, s) != NULL){
-		print_curses(F, f->locale, s, TYP_SHIP, s->attribs,
-				(shipowner(r, s)->faction == f)? 1 : 0);
-	} else {
-		print_curses(F, f->locale, s, TYP_SHIP, s->attribs, 0);
-	}
+	print_curses(F, f, s, TYP_SHIP);
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
@@ -731,7 +779,7 @@ cr_output_unit(FILE * F, const region * r,
 	if ((u->faction == f || omniscient(f)) && u->botschaften)
 		cr_output_str_list(F, "EINHEITSBOTSCHAFTEN", u->botschaften, f);
 
-	print_curses(F, f->locale, u, TYP_UNIT, u->attribs, (u->faction == f)? 1 : 0);
+	print_curses(F, f, u, TYP_UNIT);
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
@@ -1199,7 +1247,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 				}
 			}
 
-			print_curses(F, f->locale, r, TYP_REGION, r->attribs, 0);
+			print_curses(F, f, r, TYP_REGION);
 			/* describe both passed and inhabited regions */
 			show_active_spells(r);
 			{

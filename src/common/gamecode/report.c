@@ -664,7 +664,7 @@ hat_in_region(item_t it, region * r, faction * f)
 }
 
 static void
-print_curses(FILE *F, faction *viewer, void * obj, typ_t typ, int indent)
+print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int indent)
 {
 	attrib *a = NULL;
 	int self = 0;
@@ -834,8 +834,7 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 		if(ug) {
 			int i;
 			for(i=0; i<ug->members; i++) {
-				u = ug->unit_array[i];
-				print_curses(F, f, u, TYP_UNIT, indent);
+				print_curses(F, f, ug->unit_array[i], TYP_UNIT, indent);
 			}
 		} else
 #endif /* USE_UGROUPS */
