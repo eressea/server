@@ -1,6 +1,6 @@
 /* vi: set ts=2 ai sw=2:
  *
- * $Id: echeck.c,v 1.3 2001/02/02 22:00:15 corwin Exp $
+ * $Id: echeck.c,v 1.4 2001/02/03 23:29:26 corwin Exp $
  *
  *	Eressea PB(E)M host Copyright (C) 1997-2000
  *		Enno Rehling (rehling@usa.net)
@@ -3567,7 +3567,7 @@ checkanorder(char *Orders) {
 					if (order_unit->people>1)
 						anerror("Magiereinheiten dürfen nur eine Person haben");
 			}
-			if (!does_default) {
+			if (sk && !does_default) {
 				x=studycost(sk)*order_unit->people;
 				if (x) {
 					order_unit->money-=x;
