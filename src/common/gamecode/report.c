@@ -3849,8 +3849,12 @@ eval_direction(struct opstack ** stack, const void * userdata)
 {
 	const faction * report = (const faction*)userdata;
 	int i = opop(stack, int);
-
-	const char * c = LOC(report->locale, directions[i]);
+	const char * c;
+	if (i>=0) {
+		c = LOC(report->locale, directions[i]);
+	} else {
+		c = LOC(report->locale, "unknown_direction");
+	}
 	opush(stack, strcpy(balloc(strlen(c)+1), c));
 }
 

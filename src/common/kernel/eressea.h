@@ -37,20 +37,20 @@ extern "C" {
 /* #define MSG_LEVELS -- msg-levels active */
 
 /* basic types used in the eressea "kernel" */
-typedef unsigned char order_t;
-typedef char terrain_t;
-typedef char direction_t;
-typedef int race_t;
-typedef int magic_t;
+typedef short order_t;
+typedef short terrain_t;
+typedef short direction_t;
+typedef short race_t;
+typedef short magic_t;
 typedef short skill_t;
 typedef short typ_t;
-typedef int herb_t;
-typedef int potion_t;
-typedef int luxury_t;
-typedef int weapon_t;
-typedef int item_t;
-typedef int resource_t;
-typedef int spellid_t;
+typedef short herb_t;
+typedef short potion_t;
+typedef short luxury_t;
+typedef short weapon_t;
+typedef short item_t;
+typedef short resource_t;
+typedef short spellid_t;
 
 struct plane;
 struct spell;

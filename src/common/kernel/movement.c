@@ -1058,7 +1058,7 @@ travel(region * first, unit * u, region * next, int flucht)
 		direction_t dir = reldirection(current, next);
 		border * b = get_borders(current, next);
 
-		while (b) {
+		while (b!=NULL) {
 			if (b->type==&bt_wisps) {
 				wall_data * wd = (wall_data*)b->data;
 				if (wd->active) {
@@ -1081,15 +1081,17 @@ travel(region * first, unit * u, region * next, int flucht)
 				k -= BP_NORMAL;
 			if (k<0) break;
 			/* r2 -> Zielregion, r3 -> Momentane Region */
-			if (move_blocked(u, current, reldirection(current, next))
+			if (dir>=0 && move_blocked(u, current, dir)
 					|| curse_active(get_curse(current->attribs, fogtrap_ct)))
 			{
 				ADDMSG(&u->faction->msgs, msg_message("leavefail", 
-					"unit region", u, next));
+													  "unit region", 
+													  u, next));
 			}
-      if (!entrance_allowed(u, next)) {
+			if (!entrance_allowed(u, next)) {
 				ADDMSG(&u->faction->msgs, msg_message("regionowned", 
-					"unit region target", u, current, next));
+													  "unit region target", 
+													  u, current, next));
 				break;
       }
 			if ((wache = bewegung_blockiert_von(u, current)) != (unit *) NULL
@@ -1116,10 +1118,9 @@ travel(region * first, unit * u, region * next, int flucht)
 
 			if (rterrain(next) == T_OCEAN && !canswim(u)) {
 				plane *pl = getplane(next);
-				if(pl && fval(pl, PFL_NOCOORDS)) {
+				if (pl!=NULL && fval(pl, PFL_NOCOORDS)) {
 					add_message(&u->faction->msgs, new_message(u->faction,
-						"detectoceandir%u:unit%i:direction", u,
-						reldirection(current, next)));
+						"detectoceandir%u:unit%i:direction", u, dir));
 				} else {
 					add_message(&u->faction->msgs, new_message(u->faction,
 						"detectocean%u:unit%r:region", u, next));
@@ -1131,7 +1132,7 @@ travel(region * first, unit * u, region * next, int flucht)
 				plane *pl = getplane(next);
 				if(pl && fval(pl, PFL_NOCOORDS)) {
 					add_message(&u->faction->msgs, new_message(u->faction,
-						"detectforbiddendir%u:unit%i:direction", u, reldirection(current, next)));
+						"detectforbiddendir%u:unit%i:direction", u, dir));
 				} else {
 					add_message(&u->faction->msgs, new_message(u->faction,
 						"detectforbidden%u:unit%r:region", u, next));
