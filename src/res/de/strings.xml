@@ -1439,8 +1439,8 @@
 	<string name="BENUTZEN">
 		<text locale="de">BENUTZEN</text>
 	</string>
-	<string name="BESCHREIBE">
-		<text locale="de">BESCHREIBE</text>
+	<string name="BESCHREIBEN">
+		<text locale="de">BESCHREIBEN</text>
 	</string>
 	<string name="BETRETEN">
 		<text locale="de">BETRETEN</text>
