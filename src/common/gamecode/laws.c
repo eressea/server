@@ -2320,6 +2320,61 @@ display_race(faction *f, unit *u, const race * rc)
 }
 
 static void
+reshow(unit * u, const char* cmd, const char * s, param_t p)
+{
+  int skill, c;
+  const potion_type * ptype;
+  const item_type * itype;
+  const spell * sp;
+  const race * rc;
+
+  switch (p) {
+    case P_ZAUBER:
+      a_removeall(&u->faction->attribs, &at_seenspell);
+      break;
+    case P_POTIONS:
+      skill = effskill(u, SK_ALCHEMY);
+      c = 0;
+      for (ptype = potiontypes; ptype!=NULL; ptype=ptype->next) {
+        if (ptype->level * 2 <= skill) {
+          c += display_potion(u->faction, u, ptype);
+        }
+      }
+      if (c == 0) cmistake(u, cmd, 285, MSG_EVENT);
+      break;
+    case NOPARAM:
+      /* check if it's an item */
+      itype = finditemtype(s, u->faction->locale);
+      if (itype!=NULL) {
+        ptype = resource2potion(item2resource(itype));
+        if (ptype!=NULL) {
+          if (display_potion(u->faction, u, ptype)) break;
+        } else {
+          if (display_item(u->faction, u, itype)) break;
+        }
+      }
+      /* try for a spell */
+      sp = find_spellbyname(u, s, u->faction->locale);
+      if (sp!=NULL && has_spell(u, sp)) {
+        attrib *a = a_find(u->faction->attribs, &at_seenspell);
+        while (a!=NULL && a->data.i!=sp->id) a = a->nexttype;
+        if (a!=NULL) a_remove(&u->faction->attribs, a);
+        break;
+      }
+      /* last, check if it's a race. */
+      rc = findrace(s, u->faction->locale);
+      if (rc != NULL) {
+        if (display_race(u->faction, u, rc)) break;
+      }
+      cmistake(u, cmd, 21, MSG_EVENT);
+      break;
+    default:
+      cmistake(u, cmd, 222, MSG_EVENT);
+      break;
+  }
+}
+
+static void
 instant_orders(void)
 {
 	region *r;
@@ -2328,16 +2383,8 @@ instant_orders(void)
 	const char *s;
 	const char *param;
 	spell *spell;
-#ifdef NEW_ITEMS
-	const item_type * itype;
-#else
-	potion_t potion;
-	item_t item;
-#endif
-	const potion_type * ptype;
 	faction *f;
 	attrib *a;
-	const race * rc;
 	int level = 0;	/* 0 = MAX */
 
 	puts(" - Kontakte, Hilfe, Status, Kampfzauber, Texte, Bewachen (aus), Zeigen");
@@ -2515,60 +2562,11 @@ instant_orders(void)
 
 				case K_RESHOW:
 					s = getstrtoken();
-
-					if(findparam(s, u->faction->locale) == P_ANY) {
+					if (findparam(s, u->faction->locale) == P_ANY) {
 						param_t p = getparam(u->faction->locale);
-
-						if(p == P_ZAUBER) {
-							a_removeall(&u->faction->attribs, &at_seenspell);
-						} else if(p == P_POTIONS) {
-							int skill = effskill(u, SK_ALCHEMY);
-							potion_type *pt;
-							int c = 0;
-							for(pt = potiontypes; pt; pt=pt->next) {
-								if(pt->level * 2 <= skill) {
-									c += display_potion(u->faction, u, pt);
-								}
-							}
-							if(c == 0) {
-								cmistake(u, S->s, 285, MSG_EVENT);
-							}
-						} else {
-							cmistake(u, S->s, 222, MSG_EVENT);
-						}
-						break;
+						reshow(u, S->s, s, p);
 					}
-
-					spell = find_spellbyname(u, s, u->faction->locale);
-					rc = findrace(s, u->faction->locale);
-					itype = finditemtype(s, u->faction->locale);
-					if (spell == NULL && itype == NULL && rc==NULL) {
-						cmistake(u, S->s, 21, MSG_EVENT);
-						break;
-					}
-					if (spell && knowsspell(r, u, spell)) {
-						attrib *a = a_find(u->faction->attribs, &at_seenspell);
-						while (a && a->data.i!=spell->id) a = a->nexttype;
-						if (a!=NULL) a_remove(&u->faction->attribs, a);
-					}
-					if (itype != NULL) {
-						if((ptype = resource2potion(item2resource(itype))) != NULL) {
-							if(display_potion(u->faction, u, ptype) == false
-									&& rc==NULL) {
-								cmistake(u, S->s, 21, MSG_EVENT);
-							}
-						} else {
-							if(display_item(u->faction, u, itype) == false
-									&& rc==NULL) {
-								cmistake(u, S->s, 21, MSG_EVENT);
-							}
-						}
-					}
-					if (rc != NULL) {
-						if (display_race(u->faction, u, rc) == false){
-							cmistake(u, S->s, 21, MSG_EVENT);
-						}
-					}
+					else reshow(u, S->s, s, NOPARAM);
 					break;
 				}
 		}

@@ -122,7 +122,7 @@ FirstTurn(void)
 {
   static int value = -1;
   if (value<0) {
-    const char * str = get_param(global.parameters, "hunger.long");
+    const char * str = get_param(global.parameters, "firstturn");
     value = str?atoi(str):0;
   }
   return value;

@@ -28,7 +28,6 @@ extern "C" {
 
   /* Sprüche. Neue NUR hinten anfügen, oder das Datenfile geht kaputt */
   enum {
-    SPL_NOSPELL,
     SPL_ARTEFAKT_OF_POWER,
     SPL_ARTEFAKT_OF_AURAPOWER,
     SPL_ARTEFAKT_OF_REGENERATION,
@@ -219,9 +218,9 @@ extern "C" {
     SPL_WDWPYRAMID_BARDE,
     SPL_WDWPYRAMID_CHAOS,
 #endif
-    MAXALLSPELLS,
-    NO_SPELL = (spellid_t) -1
+    SPL_NOSPELL = (spellid_t) -1
   };
+#define NO_SPELL SPL_NOSPELL
 
   /* Prototypen */
 
