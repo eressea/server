@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.22 2001/02/12 23:06:44 enno Exp $
+ *	$Id: korrektur.c,v 1.23 2001/02/12 23:13:14 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -86,7 +86,7 @@ verify_owners(boolean bOnce)
 					bFail = true;
 					if (bOnce) break;
 				}
-				if (bo!=u && fval(bo, FL_OWNER)) {
+				if (bo!=u && fval(u, FL_OWNER)) {
 					log_error(("[verify_owners] %u ist NICHT Besitzer von %s, hat aber FL_OWNER.\n", unitname(u), buildingname(u->building)));
 					bFail = true;
 					if (bOnce) break;
@@ -99,7 +99,7 @@ verify_owners(boolean bOnce)
 					bFail = true;
 					if (bOnce) break;
 				}
-				if (bo!=u && fval(bo, FL_OWNER)) {
+				if (bo!=u && fval(u, FL_OWNER)) {
 					log_error(("[verify_owners] %u ist NICHT Besitzer von %s, hat aber FL_OWNER.\n", unitname(u), shipname(u->ship)));
 					bFail = true;
 					if (bOnce) break;
