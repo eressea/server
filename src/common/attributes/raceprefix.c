@@ -16,7 +16,32 @@
 #include <eressea.h>
 #include "raceprefix.h"
 
+#include <util/attrib.h>
+
+#include <assert.h>
+#include <string.h>
+
 attrib_type at_raceprefix = { 
   "raceprefix", NULL, a_finalizestring, NULL, a_writestring, a_readstring, ATF_UNIQUE
 };
 
+void
+set_prefix(attrib ** ap, const char * str)
+{
+  attrib * a = a_find(*ap, &at_raceprefix);
+  if (a==NULL) {
+    a = a_add(ap, a_new(&at_raceprefix));
+  } else {
+    free(a->data.v);
+  }
+  assert(a->type==&at_raceprefix);
+  a->data.v = strdup(str);
+}
+
+const char * 
+get_prefix(const attrib * a)
+{
+  a = a_findc(a, &at_raceprefix);
+  if (a==NULL) return NULL;
+  return (const char *)a->data.v;
+}

@@ -1466,7 +1466,7 @@ static int
 prefix_cmd(unit * u, struct order * ord)
 {
   attrib **ap;
-  attrib *a, *a2;
+  attrib *a;
   int i;
   const char *s;
 
@@ -1474,7 +1474,7 @@ prefix_cmd(unit * u, struct order * ord)
   skip_token();
   s = getstrtoken();
 
-  if(!*s) {
+  if (!*s) {
     a = a_find(u->attribs, &at_group);
     if (a) {
       a_removeall(&((group*)a->data.v)->attribs, &at_raceprefix);
@@ -1498,12 +1498,7 @@ prefix_cmd(unit * u, struct order * ord)
   ap = &u->faction->attribs;
   a = a_find(u->attribs, &at_group);
   if (a) ap = &((group*)a->data.v)->attribs;
-
-  a2 = a_find(*ap, &at_raceprefix);
-  if(!a2)
-    a2 = a_add(ap, a_new(&at_raceprefix));
-
-  a2->data.v = strdup(race_prefixes[i]);
+  set_prefix(ap, race_prefixes[i]);
 
   return 0;
 }

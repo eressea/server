@@ -345,13 +345,9 @@ raceprefix(const unit *u)
 {
 	const attrib * agroup = a_findc(u->attribs, &at_group);
 	const attrib * asource = u->faction->attribs;
-	const attrib * a2 = NULL;
 
 	if (agroup!=NULL) asource = ((const group *)(agroup->data.v))->attribs;
-	a2 = a_findc(asource, &at_raceprefix);
-
-	if (a2!=NULL) return (const char *)a2->data.v;
-	return NULL;
+	return get_prefix(asource);
 }
 
 const char *

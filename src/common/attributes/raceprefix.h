@@ -20,7 +20,8 @@ extern "C" {
 #endif
 
 extern struct attrib_type at_raceprefix;
-
+extern void set_prefix(struct attrib ** ap, const char * str);
+extern const char * get_prefix(const struct attrib * a);
 
 #ifdef __cplusplus
 }

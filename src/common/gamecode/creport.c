@@ -639,11 +639,9 @@ cr_output_unit(FILE * F, const region * r,
 			const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
 			const faction * otherfaction = a_otherfaction?get_otherfaction(a_otherfaction):NULL;
 			/* my own faction, full info */
-			const attrib * ap = 0;
 			const attrib *a = a_find(u->attribs, &at_group);
 			if (a!=NULL) {
 				const group * g = (const group*)a->data.v;
-				ap = a_find(g->attribs, &at_raceprefix);
 				fprintf(F, "%d;gruppe\n", g->gid);
 			} 
 			fprintf(F, "%d;Partei\n", u->faction->no);
@@ -1072,6 +1070,7 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
                 const time_t report_time)
 {
 	int i;
+  const char * prefix;
   region * r;
 	building *b;
 	ship *sh;
@@ -1116,10 +1115,9 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 		const char * zRace = rc_name(f->race, 1);
 		fprintf(F, "\"%s\";Typ\n", add_translation(zRace, LOC(f->locale, zRace)));
 	}
-	a = a_find(f->attribs, &at_raceprefix);
-	if (a) {
-		const char * name = (const char*)a->data.v;
-		fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
+  prefix = get_prefix(f->attribs);
+	if (prefix!=NULL) {
+		fprintf(F, "\"%s\";typprefix\n", add_translation(prefix, LOC(f->locale, prefix)));
 	}
 	fprintf(F, "%d;Rekrutierungskosten\n", f->race->recruitcost);
 	fprintf(F, "%d;Anzahl Personen\n", count_all(f));
@@ -1143,13 +1141,12 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 	{
 		group * g;
 		for (g=f->groups;g;g=g->next) {
-			const attrib *a = a_find(g->attribs, &at_raceprefix);
 
 			fprintf(F, "GRUPPE %d\n", g->gid);
 			fprintf(F, "\"%s\";name\n", g->name);
-			if(a) {
-				const char * name = (const char*)a->data.v;
-				fprintf(F, "\"%s\";typprefix\n", add_translation(name, LOC(f->locale, name)));
+      prefix = get_prefix(g->attribs);
+			if (prefix!=NULL) {
+				fprintf(F, "\"%s\";typprefix\n", add_translation(prefix, LOC(f->locale, prefix)));
 			}
 			show_allies(F, f, g->allies);
 		}
