@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: unit.c,v 1.5 2001/02/10 14:18:00 enno Exp $
+ *	$Id: unit.c,v 1.6 2001/02/18 09:32:13 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -213,7 +213,11 @@ uprivate(const unit * u) {
 void
 usetprivate(unit * u, const char * str) {
 	attrib * a = a_find(u->attribs, &at_private);
-	if (!a && !str) return;
+
+	if(str == NULL) {
+		if(a) a_remove(&u->attribs, a);
+		return;
+	}
 	if (!a) a = a_add(&u->attribs, a_new(&at_private));
 	if (a->data.v) free(a->data.v);
 	a->data.v = strdup(str);
