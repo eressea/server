@@ -302,9 +302,7 @@ processturn(char *filename)
   }
 	processorders();
 	score();
-#ifdef WACH_WAFF
 	remove_unequipped_guarded();
-#endif
 	korrektur_end();
 	if (!noreports) reports();
 	free_units();

@@ -352,9 +352,7 @@ process_orders()
 #endif
   processorders();
   score();
-#ifdef WACH_WAFF
   remove_unequipped_guarded();
-#endif
   korrektur_end();
 
   end = make_summary(true);

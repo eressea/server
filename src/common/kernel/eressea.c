@@ -1335,7 +1335,7 @@ parse(keyword_t kword, int (*dofun)(unit *, struct order *), boolean thisorder)
         order * ord = *ordp;
         if (get_keyword(ord) == kword) {
           if (dofun(u, ord)!=0) break;
-		  if (u->orders==NULL) break;
+          if (u->orders==NULL) break;
         }
         if (thisorder) break;
         if (*ordp==ord) ordp=&ord->next;

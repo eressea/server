@@ -2565,16 +2565,12 @@ origin_cmd(unit * u, struct order * ord)
 }
 
 static int
-guard_cmd(unit * u, struct order * ord)
+guard_off_cmd(unit * u, struct order * ord)
 {
   init_tokens(ord);
   skip_token();
 
-  if (u->faction->age < IMMUN_GEGEN_ANGRIFF) {
-    cmistake(u, ord, 304, MSG_EVENT);
-  } else if (fval(u, UFL_HUNGER)) {
-    cmistake(u, ord, 223, MSG_EVENT);
-  } else if (getparam(u->faction->locale) == P_NOT) {
+  if (getparam(u->faction->locale) == P_NOT) {
     setguard(u, GUARD_NONE);
   }
   return 0;
@@ -2765,7 +2761,7 @@ instant_orders(void)
           if (name_cmd(u, ord)!=0) ord = NULL;
           break;
         case K_GUARD:
-          if (guard_cmd(u, ord)!=0) ord = NULL;
+          if (guard_off_cmd(u, ord)!=0) ord = NULL;
           break;
         case K_RESHOW:
           if (reshow_cmd(u, ord)!=0) ord = NULL;
@@ -2791,49 +2787,34 @@ remove_unequipped_guarded(void)
 		}
 }
 
-static void
-bewache_an(void)
+static int
+guard_on_cmd(unit * u, struct order * ord)
 {
-  region *r;
-  unit *u;
+  if (fval(u, UFL_MOVED)) return 0;
 
-  /* letzte schnellen befehle - bewache */
-  for (r = regions; r; r = r->next) {
-    for (u = r->units; u; u = u->next) {
-      if (!fval(u, UFL_MOVED)) {
-        struct order * ord;
-        for (ord = u->orders; ord; ord = ord->next) {
-          if (get_keyword(ord) == K_GUARD) {
-            init_tokens(ord);
-            skip_token();
-            if (getparam(u->faction->locale) == P_NOT) continue;
-            if (rterrain(r) != T_OCEAN) {
-              if (!fval(u, RCF_ILLUSIONARY) && u->race != new_race[RC_SPELL]) {
-#ifdef WACH_WAFF
-                /* Monster der Monsterpartei dürfen immer bewachen */
-                if (u->faction == findfaction(MONSTER_FACTION)){
-                  guard(u, GUARD_ALL);
-                  continue;
-                }
+  init_tokens(ord);
+  skip_token();
 
-                if (!armedmen(u)) {
-                  ADDMSG(&u->faction->msgs,
-                    msg_feedback(u, ord, "unit_unarmed", ""));
-                  continue;
-                }
-#endif
-                guard(u, GUARD_ALL);
-              } else {
-                cmistake(u, ord, 95, MSG_EVENT);
-              }
-            } else {
-              cmistake(u, ord, 2, MSG_EVENT);
-            }
-          }
-        }
+  /* GUARD NOT is handled in goard_off_cmd earlier in the turn */
+  if (getparam(u->faction->locale) == P_NOT) return 0;
+
+  if (rterrain(u->region) != T_OCEAN) {
+    if (!fval(u, RCF_ILLUSIONARY) && u->race != new_race[RC_SPELL]) {
+      /* Monster der Monsterpartei dürfen immer bewachen */
+      if (u->faction == findfaction(MONSTER_FACTION)) {
+        guard(u, GUARD_ALL);
+      } else if (!armedmen(u)) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_unarmed", ""));
+      } else {
+        guard(u, GUARD_ALL);
       }
+    } else {
+      cmistake(u, ord, 95, MSG_EVENT);
     }
+  } else {
+    cmistake(u, ord, 2, MSG_EVENT);
   }
+  return 0;
 }
 
 static void
@@ -3835,7 +3816,7 @@ processorders (void)
 	movement();
 
 	puts(" - Bewache (an)");
-	bewache_an();
+	parse(K_USE, guard_on_cmd, false);
 
 	puts(" - Zufallsbegegnungen");
 	encounters();

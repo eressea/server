@@ -303,7 +303,6 @@ extern void plagues(struct region * r, boolean ismagic);
 #define BLOCKSIZE           9
 
 /* Nur Bewaffnete bewachen */
-#define WACH_WAFF
 #undef TROLLSAVE
 
 /* Spezialtrank für Insekten */

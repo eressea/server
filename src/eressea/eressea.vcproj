@@ -206,7 +206,7 @@
 			Name="Text Files"
 			Filter="">
 			<File
-				RelativePath="..\commit.txt">
+				RelativePath="..\changelog.txt">
 			</File>
 			<File
 				RelativePath="..\header.txt">

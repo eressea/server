@@ -781,9 +781,7 @@ is_guardian(unit * u2, unit *u, unsigned int mask)
 			&& u2->number
 			&& !ucontact(u2, u) && !besieged(u2)
 			&& alliedunit(u2, u->faction, HELP_GUARD) != HELP_GUARD
-#ifdef WACH_WAFF
 			&& armedmen(u2)
-#endif
 			&& cansee(u2->faction, u->region, u, 0)
 		) return true;
 

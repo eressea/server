@@ -1098,9 +1098,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 				&& !ucontact(u2, u)
 				&& !besieged(u2)
 				&& !alliedunit(u2, u->faction, HELP_GUARD)
-#ifdef WACH_WAFF
 				&& armedmen(u2)
-#endif
 				) {
 					add_message(&u->faction->msgs,
 						msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
