@@ -3602,7 +3602,7 @@ battle_stats(FILE * F, battle * b)
       dt.fighter = df;
       for (dt.index=0;dt.index!=du->number;++dt.index) {
         weapon * wp = preferred_weapon(dt, true);
-        int level = wp->attackskill;
+        int level = wp?wp->attackskill:0;
         stat_info ** slist = &stats;
 
         if (slast && slast->wp==wp && slast->level==level) {
@@ -3630,8 +3630,8 @@ battle_stats(FILE * F, battle * b)
 
     fprintf(F, "##STATS## Heer %u - %s:\n", s->index, factionname(s->bf->faction));
     for (stat=stats;stat!=NULL;stat=stat->next) {
-      const weapon_type * wtype = stat->wp->type;
-      fprintf(F, "%s %u : %u\n", wtype->itype->rtype->_name[0], stat->level, stat->number);
+      const weapon_type * wtype = stat->wp?stat->wp->type:NULL;
+      fprintf(F, "%s %u : %u\n", wtype?wtype->itype->rtype->_name[0]:"none", stat->level, stat->number);
     }
     freelist(stats);
   } cv_next(s);
