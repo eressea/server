@@ -103,12 +103,44 @@ region_setflag(region& r, int bit, bool set)
   else r.flags &= ~(1<<bit);
 }
 
+static region *
+terraform_region(int x, int y, const char * tname)
+{
+  terrain_t t;
+
+  if (tname==NULL) {
+    t = NOTERRAIN;
+  } else {
+    for (t=0;t!=MAXTERRAINS;++t) {
+      if (strcmp(terrain[t].name, tname)==0) break;
+    }
+    if (t==MAXTERRAINS) return NULL;
+  }
+
+  region * r = findregion(x, y);
+  if (t==NOTERRAIN) {
+    if (r!=NULL) {
+      if (r->units!=NULL) {
+        // TODO: error message
+        return r; 
+      }
+      terraform(r, T_FIREWALL);
+      // TODO: durch einen NULL-äquivalenten terraintyp ersetzen
+    }
+    return NULL;
+  }
+  if (r==NULL) r = new_region(x, y);
+  terraform(r, t);
+  return r;
+}
+
 void
 bind_region(lua_State * L) 
 {
   module(L)[
     def("regions", &get_regions, return_stl_iterator),
     def("get_region", &findregion),
+    def("terraform", &terraform_region),
 
     class_<struct region>("region")
     .def(tostring(self))

@@ -267,6 +267,19 @@ unit_setmagic(unit& u, const char * type)
   }
 }
 
+static void
+unit_addorder(unit& u, const char * str)
+{
+  addstrlist(&u.orders, str);
+}
+
+static void
+unit_clearorders(unit& u)
+{
+  freestrlist(u.orders);
+  u.orders = NULL;
+}
+
 void
 bind_unit(lua_State * L) 
 {
@@ -282,6 +295,8 @@ bind_unit(lua_State * L)
     .def_readonly("id", &unit::no)
     .def_readwrite("hp", &unit::hp)
     .def_readwrite("status", &unit::status)
+    .def("add_order", &unit_addorder)
+    .def("clear_orders", &unit_clearorders)
     .def("get_item", &unit_getitem)
     .def("add_item", &unit_additem)
     .def("get_skill", &unit_getskill)
