@@ -1004,6 +1004,23 @@ cr_borders(const region * r, const faction * f, int seemode, FILE * F)
 	}
 }
 
+void
+get_seen_interval(region ** first, region ** last)
+{
+  region * r = regions;
+  while (r!=NULL) {
+    if (find_seen(r)!=NULL) {
+      first = r;
+      break;
+    }
+  }
+  while (r!=NULL) {
+    if (find_seen(r)!=NULL) {
+      last = r;
+    }
+  }
+}
+
 /* main function of the creport. creates the header and traverses all regions */
 void
 report_computer(FILE * F, faction * f, const faction_list * addresses, 
@@ -1015,8 +1032,10 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 	ship *sh;
 	unit *u;
 	const char * mailto = locale_string(f->locale, "mailto");
-	const region * last = lastregion(f);
+  region * first, * last;
 	const attrib * a;
+
+  get_seen_interval(&first, &last);
 
 	/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
 	/* initialisations, header and lists */
@@ -1132,7 +1151,7 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 	}
 
 	/* traverse all regions */
-	for (r=firstregion(f);r!=last;r=r->next) {
+	for (r=first;r!=last;r=r->next) {
 		int modifier = 0;
 		const char * tname;
     const seen_region * sd = find_seen(r);
