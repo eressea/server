@@ -6374,7 +6374,7 @@
 		</type>
 		<locale name="de">
 			<nr section="magic">
-				<text>"$unit($mage) segnet in einem kurzen Ritual die Felder."</text>
+				<text>"$if($isnull($mage),"Ein unentdeckter Magier",$unit($mage)) segnet in einem kurzen Ritual die Felder."</text>
 			</nr>
 		</locale>
 	</message>
@@ -6386,12 +6386,12 @@
 		</type>
 		<locale name="de">
 			<nr section="magic">
-				<text>"$unit($mage) erschuf einen heiligen Hain von $int($amount) Schößlingen."</text>
+				<text>"$if($isnull($mage),"Ein unentdeckter Magier",$unit($mage)) erschuf einen heiligen Hain von $int($amount) Schößlingen."</text>
 			</nr>
 		</locale>
 		<locale name="en">
 			<nr section="magic">
-				<text>"$unit($mage) created a holy forest of $int($amount) young trees."</text>
+				<text>$if($isnull($mage),"An unknown magician ",$unit($mage)) created a holy forest of $int($amount) young trees."</text>
 			</nr>
 		</locale>
 	</message>

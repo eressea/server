@@ -411,6 +411,14 @@ eval_add(opstack ** stack, const void * userdata) /* (int, int) -> int */
 }
 
 static void
+eval_isnull(opstack ** stack, const void * userdata) /* (int, int) -> int */
+{
+	void * a = opop(stack, void *);
+	opush(stack, (a==NULL)?1:0);
+	unused(userdata);
+}
+
+static void
 eval_if(opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
 	void * a = opop(stack, void *);
@@ -466,6 +474,7 @@ translation_init(void)
 	add_function("add", &eval_add);
 	add_function("strlen", &eval_strlen);
 	add_function("if", &eval_if);
+	add_function("isnull", &eval_isnull);
 	add_function("localize", &eval_localize);
 	add_function("locale", &eval_locale);
 }
