@@ -690,7 +690,7 @@ new_region(int x, int y)
 	region *r = rfindhash(x, y);
 
 	if (r) {
-		fprintf(stderr, "\ndoppelte regionen entdeckt: %s\n", regionname(r, NULL));
+		fprintf(stderr, "\ndoppelte regionen entdeckt: %s(%d,%d)\n", regionname(r, NULL), x, y);
 		if (r->units)
 			fprintf(stderr, "doppelte region enthält einheiten\n");
 		return r;

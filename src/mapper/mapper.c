@@ -158,8 +158,25 @@ init_win(int x, int y) {
 static int hl;
 int politkarte = 0;
 
+int
+RegionColor(const region *r) {
+	static int usecolor=0;
+	if (!usecolor) {
+		start_color();
+		init_pair(T_PLAIN, COLOR_GREEN, COLOR_BLACK);
+		init_pair(T_SWAMP, COLOR_RED, COLOR_BLACK);
+		init_pair(T_OCEAN, COLOR_BLUE, COLOR_BLACK);
+		init_pair(T_GLACIER, COLOR_WHITE, COLOR_BLACK);
+		init_pair(T_HIGHLAND, COLOR_YELLOW, COLOR_BLACK);
+		init_pair(T_DESERT, COLOR_CYAN, COLOR_BLACK);
+		init_pair(T_MOUNTAIN, COLOR_WHITE, COLOR_BLACK);
+		usecolor=1;
+	}
+	return COLOR_PAIR(rterrain(r));
+}
+
 chtype
-RegionSymbol(region *r) {
+RegionSymbol(const region *r) {
 	chtype rs;
 	int p;
 
@@ -300,7 +317,7 @@ static void
 readfactions(void)
 {
 	FILE * F = fopen("factions.txt", "r");
-	region * r;
+
 	locale * german = find_locale("de");
 	while (!feof(F)) {
 		int x, y;
@@ -405,6 +422,7 @@ drawmap(boolean maponly) {
 
 			addch(' ');
 			if (r) {
+				int rc = RegionColor(r);
 				if ((hl == -2 && r->units) ||
 					 (hl == -3 && r->buildings) ||
 					 (hl == -4 && r->ships) ||
@@ -417,8 +435,11 @@ drawmap(boolean maponly) {
 					addch(rs | A_REVERSE);
 				else if (is_tagged(r))
 					addch(rs | A_BOLD);
-				else
+				else {
+					attrset(rc | A_NORMAL);
 					addch(rs);
+					attrset(A_NORMAL);
+				}
 			} else
 				addch(rs);
 		}
