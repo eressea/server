@@ -1193,7 +1193,6 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	}
 #ifdef SHOW_KILLS
   ++at.fighter->kills;
-  assert(at.fighter->kills>=at.fighter->hits);
 #endif
 
 #ifdef SMALL_BATTLE_MESSAGES
