@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+## this cgi script adds a new user to the eressea DB,
+## as well as a new subscription entry. it logs IP addresses for registrations.
+
 import sys
 import MySQLdb
 import os
