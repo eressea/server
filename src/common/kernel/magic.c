@@ -1874,6 +1874,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
 
   while (!fail && *c && i<size && param[i]!=NULL) {
     spllprm * spobj = NULL;
+    param_t pword;
     int j = 0;
     switch (*c) {
       case '+':
@@ -1911,7 +1912,9 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
         break;
       case 'k':
         ++c;
-        switch (findparam(param[i++], u->faction->locale)) {
+        pword = findparam(param[i++], u->faction->locale);
+        if (i>=size) pword = NOPARAM;
+        switch (pword) {
           case P_REGION:
             j = addparam_region(param+i, &spobj, u, ord);
             ++c;
