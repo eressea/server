@@ -1605,6 +1605,7 @@ createunitid(region * r1, faction * f, int number, race_t race, int id, const ch
 	u->race = race;
 	u->irace = race;
 	u->hp = unit_max_hp (u) * number;
+	u->status = ST_FIGHT;
 	set_number (u, number);
 
 	if (id<=0 || id > MAX_UNIT_NR || ufindhash(id) || dfindhash(id) || forbiddenid(id))

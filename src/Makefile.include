@@ -19,8 +19,7 @@ ARFLAGS = crs
 CTAGSFLAGS = --langmap=c:.c.h --c-types=-m
 CFLAGS  = -I$(ERESSEA) -Wall -Wwrite-strings -Wstrict-prototypes \
            -Wpointer-arith -Werror-implicit-function-declaration \
-		   -Wno-char-subscripts \
-       	   -march=pentiumpro $(INCLUDES)
+		   -Wno-char-subscripts $(INCLUDES)
 LDFLAGS = $(LIBS)
 
 LIBS    = -L$(PUBLISH_DIR)
