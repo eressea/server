@@ -49,14 +49,16 @@ _log_warn(const char * format, ...)
 {
 	va_list marker;
 	if (!logfile) logfile = stderr;
-	va_start(marker, format);
 	fputs("WARNING: ", logfile);
+	va_start(marker, format);
 	vfprintf(logfile, format, marker);
 	va_end(marker);
 	if (logfile!=stderr) {
 		if (flags & LOG_CPWARNING) {
 			fputs("\bWARNING: ", stderr);
+			va_start(marker, format);
 			vfprintf(stderr, format, marker);
+			va_end(marker);
 		}
 		if (flags & LOG_FLUSH) {
 			fflush(logfile);
@@ -70,14 +72,16 @@ _log_error(const char * format, ...)
 	va_list marker;
 	if (!logfile) logfile = stderr;
 
-	va_start(marker, format);
 	fputs("ERROR: ", logfile);
+	va_start(marker, format);
 	vfprintf(logfile, format, marker);
 	va_end(marker);
 	if (logfile!=stderr) {
 		if (flags & LOG_CPERROR) {
 			fputs("\bERROR: ", stderr);
+			va_start(marker, format);
 			vfprintf(stderr, format, marker);
+			va_end(marker);
 		}
 		if (flags & LOG_FLUSH) {
 			fflush(logfile);

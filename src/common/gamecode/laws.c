@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.21 2001/02/12 23:06:44 enno Exp $
+ *	$Id: laws.c,v 1.22 2001/02/13 00:41:15 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2111,8 +2111,9 @@ reorder_owners(region * r)
 	unit ** up=&r->units, ** useek;
 	building * b=NULL;
 	ship * sh=NULL;
+#ifndef NDEBUG
 	size_t len = listlen(r->units);
-
+#endif
 	for (b = r->buildings;b;b=b->next) {
 		unit ** ubegin = up;
 		unit ** uend = up;
@@ -2191,7 +2192,9 @@ reorder_owners(region * r)
 		}
 		up = uend;
 	}
+#ifndef NDEBUG
 	assert(len==listlen(r->units));
+#endif
 }
 
 #if 0

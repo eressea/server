@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.16 2001/02/11 10:06:07 enno Exp $
+ *	$Id: save.c,v 1.17 2001/02/13 00:41:15 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -70,7 +70,7 @@
 extern void resolve2(void);
 #endif
 
-#define xisdigit(c)     ((c) == '-' || ((c) >= '0' && (c) <= '9'))
+#define xisdigit(c)     (((c) >= '0' && (c) <= '9') || (c) == '-')
 #define COMMENT_CHAR    ';'
 
 #define ESCAPE_FIX

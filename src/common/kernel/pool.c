@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: pool.c,v 1.3 2001/02/09 13:53:51 corwin Exp $
+ *	$Id: pool.c,v 1.4 2001/02/13 00:41:15 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -39,36 +39,6 @@
 static int want_mp = 1 << O_MATERIALPOOL;
 static int want_sp = 1 << O_SILBERPOOL;
 
-#ifdef OLD_ITEMS
-static resource_t
-findresource(const char *name)
-{
-	item_t item;
-	herb_t herb;
-	potion_t potion;
-	param_t param;
-
-	item = finditem(name);
-	if (item != NOITEM)
-		return (resource_t) (R_MINITEM + item);
-
-	herb = findherb(name);
-	if (herb != NOHERB)
-		return (resource_t) (R_MINHERB + herb);
-
-	potion = findpotion(name);
-	if (potion != NOPOTION)
-		return (resource_t) (R_MINPOTION + potion);
-
-	param = findparam(name);
-	if (param == P_SILVER)
-		return R_SILVER;
-
-	return NORESOURCE;
-}
-#endif
-
-#ifdef NEW_ITEMS
 int
 new_get_resource(const unit * u, const resource_type * rtype)
 {
@@ -210,7 +180,7 @@ new_get_pooled(const unit * u, const resource_type * rtype, int mode)
 
 			if (u==v) continue;
 			if (fval(v, FL_LOCKED)) continue;
-			if (race[v->race].ec_flags & NOGIVE) continue;
+			if (urace(v)->ec_flags & NOGIVE) continue;
 
 			if (v->faction == f) {
 				if ((mode & GET_POOLED_FORCE)==0) {
@@ -258,6 +228,7 @@ new_use_pooled(unit * u, const resource_type * rtype, int mode, int count)
 	if (mode & ~(GET_SLACK|GET_RESERVE)) {
 		for (v = r->units; v; v = v->next) if (u!=v) {
 			int mask;
+			if (urace(v)->ec_flags & NOGIVE) continue;
 			if (v->faction == f) {
 				if ((mode & GET_POOLED_FORCE)==0) {
 					if (rtype==r_silver && !(f->options & want_sp)) continue;
@@ -273,52 +244,17 @@ new_use_pooled(unit * u, const resource_type * rtype, int mode, int count)
 	return count-use;
 }
 
-#endif /* NEW_ITEMS */
-
 int
 get_resource(const unit * u, resource_t res)
 {
-#ifdef NEW_ITEMS
 	return new_get_resource(u, oldresourcetype[res]);
-#else /* NEW_ITEMS */
-	if (res==R_STONE && u->race==RC_STONEGOLEM)
-		return u->number*GOLEM_STONE;
-	if (res==R_IRON && u->race==RC_IRONGOLEM)
-		return u->number*GOLEM_IRON;
-
-	if (is_item(res))
-		return get_item(u, res2item(res));
-	if (is_herb(res))
-		return get_herb(u, res2herb(res));
-	if (is_potion(res))
-		return get_potion(u, res2potion(res));
-	if (res == R_SILVER)
-		return u->money;
-	if (res == R_AURA)
-		return get_spellpoints(u);
-	if (res == R_PERMAURA)
-		return max_spellpoints(u->region, u);
-	if (res == R_HITPOINTS)
-		return u->hp;
-	if (res == R_PEASANTS)
-		return rpeasants(u->region);
-	/* TODO: Das ist natürlich Blödsinn. */
-	if (res == R_UNIT)
-		return 0;
-	if (res == R_PERSON)
-		return 0;
-	assert(!"unbekannte ressource entdeckt");
-	return 0;
-#endif /* NEW_ITEMS */
 }
 
 int
 change_resource(unit * u, resource_t res, int change)
 {
 	int i = 0;
-#ifdef NEW_ITEMS
 	const item_type * itype = resource2item(oldresourcetype[res]);
-#endif
 
 	if (res==R_STONE && u->race==RC_STONEGOLEM) {
 	  i = u->number - (change+GOLEM_STONE-1)/GOLEM_STONE;
@@ -328,22 +264,11 @@ change_resource(unit * u, resource_t res, int change)
 	  i = u->number - (change+GOLEM_IRON-1)/GOLEM_IRON;
 		scale_number(u, i);
 	}
-#ifdef NEW_ITEMS
 	else if (itype!=NULL) {
 		item * it = i_change(&u->items, itype, change);
 		if (it==NULL) return 0;
 		return it->number;
 	}
-#else
-	else if (is_item(res))
-		i = change_item(u, res2item(res), change);
-	else if (is_herb(res))
-		i = change_herb(u, res2herb(res), change);
-	else if (is_potion(res))
-		i = change_potion(u, res2potion(res), change);
-	else if (res == R_SILVER)
-		i = change_money(u, change);
-#endif
 	else if (res == R_AURA)
 		i = change_spellpoints(u, change);
 	else if (res == R_PERMAURA)
@@ -365,35 +290,14 @@ change_resource(unit * u, resource_t res, int change)
 int
 get_resvalue(const unit * u, resource_t resource)
 {
-#ifdef NEW_ITEMS
 	const resource_type * rtype = oldresourcetype[resource];
 	return new_get_resvalue(u, rtype);
-#else
-	if (resource==R_STONE && u->race==RC_STONEGOLEM)
-		return (u->number * GOLEM_STONE);
-	if (resource==R_IRON && u->race==RC_IRONGOLEM)
-		return (u->number * GOLEM_IRON);
-
-	if (resource == NORESOURCE)
-		return 0;
-
-	if (u->reserved) {
-		return u->reserved[resource];
-	}
-	return 0;
-#endif
 }
 
 static int
 set_resvalue(unit * u, resource_t resource, int value)
 {
-#ifdef NEW_ITEMS
 	return new_set_resvalue(u, oldresourcetype[resource], value);
-#else
-	if (!u->reserved)
-		u->reserved = (int *) calloc(MAXRESOURCES, sizeof(int));
-	return (u->reserved[resource] = value);
-#endif
 }
 
 int
@@ -405,232 +309,60 @@ change_resvalue(unit * u, resource_t resource, int value)
 int
 get_reserved(const unit * u, resource_t resource)
 {
-#ifdef NEW_ITEMS
 	return new_get_pooled(u, oldresourcetype[resource], GET_RESERVE);
-#else
-	int a = get_resvalue(u, resource);
-	int b = get_resource(u, resource);
-	return min(a, b);
-#endif /* NEW_ITEMS */
 }
 
 int
 use_reserved(unit * u, resource_t resource, int count)
 {
-#ifdef NEW_ITEMS
 	return new_use_pooled(u, oldresourcetype[resource], GET_RESERVE, count);
-#else
-	int use = get_reserved(u, resource);
-
-	use = min(use, count);
-	change_resource(u, resource, -use);
-	change_resvalue(u, resource, -use);
-
-	return use;
-#endif /* NEW_ITEMS */
 }
 
 int
 get_slack(const unit * u, resource_t resource)
 {
-#ifdef NEW_ITEMS
 	return new_get_pooled(u, oldresourcetype[resource], GET_SLACK);
-#else /* NEW_ITEMS */
-	int use = get_resource(u, resource);
-
-	if (use <= 0)
-		return 0;
-
-	use -= get_resvalue(u, resource);
-	if (use <= 0)
-		return 0;
-
-	return use;
-#endif /* NEW_ITEMS */
 }
 
 int
 use_slack(unit * u, resource_t resource, int count)
 {
-#ifdef NEW_ITEMS
 	return new_use_pooled(u, oldresourcetype[resource], GET_SLACK, count);
-#else /* NEW_ITEMS */
-	int use = get_slack(u, resource);
-
-	use = min(use, count);
-	change_resource(u, resource, -use);
-	return use;
-#endif
 }
 
 
 int
 get_pooled(const unit * u, const region * r, resource_t resource)
 {
-#ifdef NEW_ITEMS
 	return new_get_pooled(u, oldresourcetype[resource], GET_DEFAULT);
-#else /* NEW_ITEMS */
-	const faction *f = u->faction;
-	unit *v;
-	int use = get_reserved(u, resource) + get_slack(u, resource);
-
-	assert(u->region == r || r == NULL);
-	if (r == NULL)
-		r = u->region;
-	assert(r);
-	for (v = r->units; v; v = v->next)
-		if (u != v && v->faction == f) {
-			if (resource == R_SILVER && !(f->options & want_sp))
-				continue;
-			if (resource != R_SILVER && !(f->options & want_mp))
-				continue;
-			if (resource == R_SILVER || is_item(resource) || is_herb(resource) || is_potion(resource))
-				use += get_slack(v, resource);
-		}
-	return use;
-#endif /* NEW_ITEMS */
 }
 
 
 int
 use_pooled(unit * u, region * r, resource_t resource, int count)
 {
-#ifdef NEW_ITEMS
 	return new_use_pooled(u, oldresourcetype[resource], GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, count);
-#else /* NEW_ITEMS */
-	faction *f = u->faction;
-	int use = count;
-
-	assert(r == NULL || u->region == r);
-	r = u->region;
-	use -= use_reserved(u, resource, use);
-
-	if (use) {
-		use -= use_slack(u, resource, use);
-		if (resource == R_SILVER && !(f->options & want_sp))
-			return count - use;
-		if (resource != R_SILVER && !(f->options & want_mp))
-			return count - use;
-		if (use && (resource == R_SILVER || is_item(resource) || is_herb(resource) || is_potion(resource))) {
-			unit *v;
-
-			if (r == NULL)
-				r = findunitregion(u);
-			for (v = r->units; v; v = v->next)
-				if (v->faction == f
-						&& !(fval(u,FL_LOCKED))
-						&& !(race[u->race].ec_flags & NOGIVE))
-				{
-					use -= use_slack(v, resource, use);
-					if (!use)
-						break;
-				}
-		}
-	}
-	return count - use;
-#endif
 }
 
 int
 use_pooled_give(unit * u, region * r, resource_t resource, int count)
 {
-#ifdef NEW_ITEMS
 	int use = count;
 	use -= new_use_pooled(u, oldresourcetype[resource], GET_SLACK, use);
 	if (use>0) use -= new_use_pooled(u, oldresourcetype[resource], GET_RESERVE|GET_POOLED_SLACK, use);
 	return count-use;
-#else /* NEW_ITEMS */
-	faction *f = u->faction;
-	int use = count;
-
-	/* zuerst geben wir aus dem nichtreservierten Teil unserer Habe */
-	use -= use_slack(u, resource, use);
-
-	/* wenn das nicht reicht, versuchen wir erst aus unserem reservierten
-	 * Gegenständen zu bedienen */
-	if (use) {
-		use -= use_reserved(u, resource, use);
-	}
-
-	assert(r == NULL || u->region == r);
-	r = u->region;
-
-	/* hat auch das nicht gereicht, versuchen wir es über den Pool */
-	if (use) {
-		if (resource == R_SILVER && !(f->options & want_sp))
-			return count - use;
-		if (resource != R_SILVER && !(f->options & want_mp))
-			return count - use;
-		if (use && (resource == R_SILVER || is_item(resource) || is_herb(resource) || is_potion(resource))) {
-			unit *v;
-
-			if (r == NULL)
-				r = findunitregion(u);
-			for (v = r->units; v; v = v->next)
-				if (v->faction == f) {
-					use -= use_slack(v, resource, use);
-					if (!use)
-						break;
-				}
-		}
-	}
-	return count - use;
-#endif
 }
 
 int
 get_all(const unit * u, resource_t resource)
 {
-#ifdef NEW_ITEMS
 	return new_get_pooled(u, oldresourcetype[resource], GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE);
-#else
-	region * r = u->region;
-	faction * f = u->faction;
-	unit *v;
-	int use = get_resource(u, resource);
-
-	for (v = r->units; v; v = v->next)
-		if (u != v && v->faction == f) {
-			if (resource == R_SILVER || is_item(resource) || is_herb(resource) || is_potion(resource))
-				use += get_resource(v, resource);
-		}
-	return use;
-#endif
 }
 
 int
 use_all(unit * u, resource_t resource, int count)
 {
-#ifdef NEW_ITEMS
 	return new_use_pooled(u, oldresourcetype[resource], GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE, count);
-#else
-	region * r = u->region;
-	faction * f = u->faction;
-	int use = count;
-
-	assert(r == NULL || u->region == r);
-	use -= use_reserved(u, resource, use);
-
-	if (use) {
-		use -= use_slack(u, resource, use);
-		if (use && (resource == R_SILVER || is_item(resource) || is_herb(resource) || is_potion(resource))) {
-			unit *v;
-			for (v = r->units; v; v = v->next)
-				if (v->faction == f) {
-					use -= use_slack(v, resource, use);
-					if (!use)
-						break;
-				}
-			if (use) for (v = r->units; v; v = v->next)
-				if (v->faction == f) {
-					use -= use_reserved(v, resource, use);
-					if (!use)
-						break;
-				}
-		}
-	}
-	return count - use;
-#endif
 }
 
 void
@@ -647,7 +379,7 @@ init_pool(void)
 
 			list_foreach(strlist, u->orders, s) {
 				if (u->number > 0 && igetkeyword(s->s) == K_RESERVE
-						&& (race[u->race].ec_flags & GETITEM)) {
+						&& (urace(u)->ec_flags & GETITEM)) {
 					int count = geti();
 					int use;
 					char *what = getstrtoken();
