@@ -360,7 +360,7 @@
 			RelativePath=".\korrektur.h">
 		</File>
 		<File
-			RelativePath=".\main.cpp">
+			RelativePath=".\server.cpp">
 			<FileConfiguration
 				Name="Debug|Win32">
 				<Tool
