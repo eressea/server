@@ -84,10 +84,11 @@ void
 age_skeleton(unit *u)
 {
 	if (u->faction->no == 0 && rand()%100 < age_chance(u->age, 27, 1)) {
+		int n = u->number/2;
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
 		u->race = new_race[RC_SKELETON_LORD];
 		u->irace = new_race[RC_SKELETON_LORD];
-		scale_number(u,1);
+		scale_number(u,n);
 		u->hp = (int) (unit_max_hp(u) * u->number * q);
 	}
 }
@@ -96,10 +97,11 @@ void
 age_zombie(unit *u)
 {
 	if (u->faction->no == 0 && rand()%100 < age_chance(u->age, 27, 1)) {
+		int n = u->number/2;
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
 		u->race = new_race[RC_ZOMBIE_LORD];
 		u->irace = new_race[RC_ZOMBIE_LORD];
-		scale_number(u,1);
+		scale_number(u,n);
 		u->hp = (int) (unit_max_hp(u) * u->number * q);
 	}
 }
@@ -108,10 +110,11 @@ void
 age_ghoul(unit *u)
 {
 	if (u->faction->no == 0 && rand()%100 < age_chance(u->age, 27, 1)) {
+		int n = u->number/2;
 		double q = (double) u->hp / (double) (unit_max_hp(u) * u->number);
 		u->race = new_race[RC_GHOUL_LORD];
 		u->irace = new_race[RC_GHOUL_LORD];
-		scale_number(u,1);
+		scale_number(u,n);
 		u->hp = (int) (unit_max_hp(u) * u->number * q);
 	}
 }
