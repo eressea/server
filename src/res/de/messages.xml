@@ -6474,12 +6474,12 @@
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
-			<arg name="succ" type="string"></arg>
+			<arg name="succ" type="int"></arg>
 			<arg name="target" type="string"></arg>
 		</type>
 		<locale name="de">
 			<nr section="magic">
-				<text>"$unit($unit) in $region($region): '$command' - Der Magier zerstört $succ Flüche auf ${target}."</text>
+				<text>"$unit($unit) in $region($region): '$command' - Der Magier zerstört $int($succ) Flüche auf ${target}."</text>
 			</nr>
 		</locale>
 	</message>
