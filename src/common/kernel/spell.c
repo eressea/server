@@ -4416,8 +4416,7 @@ sp_song_of_peace(castorder *co)
 	int cast_level = co->level;
 	double force = co->force;
 
-	if (force < 2) duration = 0;
-	else duration = lovar(force/2);
+	duration = 2 + lovar(force/2);
 
 	create_curse(mage,&r->attribs, ct_find("peacezone"), force, duration, 1,0);
 

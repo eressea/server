@@ -3066,20 +3066,6 @@ teure_talente (const struct unit * u)
 void
 attrib_init(void)
 {
-/* these are non-persistent attributes !
-  at_register(&at_showitem);
-  at_register(&at_reportspell);
-  at_register(&at_horseluck);
-  at_register(&at_peasantluck);
-  at_register(&at_alias);
-  at_register(&at_target);
-  at_register(&at_potionuser);
-  at_register(&at_contact);
-  at_register(&at_lighthouse);
-  at_register(&at_prayer_effect);
-  at_register(&at_skillmod);
-*/
-
   /* Alle speicherbaren Attribute müssen hier registriert werden */
 	at_register(&at_unitdissolve);
 	at_register(&at_shiptrail);
