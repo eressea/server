@@ -208,6 +208,7 @@ enum {
 	SPL_MALLORNTREEGROW,
 	SPL_INVISIBILITY2_ILLAUN,
 	SPL_BIGRECRUIT,
+	SPL_IMMOLATION,
 	MAXALLSPELLS,
 	NO_SPELL = (spellid_t) -1
 };
@@ -252,6 +253,7 @@ extern int sp_armorshield(struct fighter * fi, int level, int power, struct spel
 extern int sp_stun(struct fighter * fi, int level, int power, struct spell * sp);
 extern int sp_undeadhero(struct fighter * fi, int level, int power, struct spell * sp);
 extern int sp_shadowcall(struct fighter * fi, int level, int power, struct spell * sp);
+extern int sp_immolation(struct fighter * fi, int level, int power, struct spell * sp);
 
 /* ------------------------------------------------------------- */
 

@@ -1317,4 +1317,15 @@
 		<attack type="3" damage="1d4"></attack>
 		<attack type="2" damage="2d60"></attack>
 	</race>
+	<race name="phoenix" magres="0.900000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" maintenance="0" weight="50000" capacity="30000" speed="2.000000" hp="500" ac="6" damage="1d20" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants fly walk noteach getitem canguard resistbash resistbash resistcut resistpierce>
+		<ai splitsize="2" attackrandom learn></ai>
+		<function name="itemdrop" value="phoenixdrops"></function>
+		<skill name="sk_magic" modifier="16"></skill>
+		<skill name="sk_tactics" modifier="8"></skill>
+		<skill name="sk_perception" modifier="20"></skill>
+		<attack type="4" damage="1d12"></attack>
+		<attack type="4" damage="1d10"></attack>
+		<attack type="4" damage="1d10"></attack>
+		<attack type="6" spell="180"></attack>
+	</race>
 </races>

@@ -754,6 +754,14 @@
 		<text locale="de">Trollhörner</text>
 		<text locale="en">troll horns</text>
 	</string>
+	<string name="phoenixfeather">
+		<text locale="de">Feder des Phönix</text>
+		<text locale="en">feather of the phoenix</text>
+	</string>
+	<string name="phoenixfeather_p">
+		<text locale="de">Federn des Phönix</text>
+		<text locale="en">feathers of the phoenix</text>
+	</string>
 
 	<comment>Resourcen</comment>
 	<string name="money">
@@ -3015,6 +3023,23 @@
 		<string name="young dragon_x">
 			<text locale="de">Jungdrachen</text>
 			<text locale="en">young dragon</text>
+		</string>
+		
+		<string name="phoenix">
+			<text locale="de">Phönix</text>
+			<text locale="en">phoenix</text>
+		</string>
+		<string name="troll_p">
+			<text locale="de">Phönixe</text>
+			<text locale="en">phoenixes</text>
+		</string>
+		<string name="troll_d">
+			<text locale="de">Phönixen</text>
+			<text locale="en">phoenixes</text>
+		</string>
+		<string name="troll_x">
+			<text locale="de">Phönix</text>
+			<text locale="en">phoenix</text>
 		</string>
 
 		<string name="illusion">

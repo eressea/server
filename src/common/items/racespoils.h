@@ -29,6 +29,7 @@ extern struct item_type it_insectspoil;
 extern struct item_type it_catspoil;
 extern struct item_type it_orcspoil;
 extern struct item_type it_trollspoil;
+extern struct item_type it_phoenixfeather;
 
 extern void register_racespoils(void);
 

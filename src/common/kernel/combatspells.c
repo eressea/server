@@ -59,6 +59,9 @@ spell_damage(int sp)
 		case 4:
 			/* verwundet 11-26 HP */
 			return "3d6+8";
+		case 5:
+			/* leichter Schaden */
+			return "2d4";
 		default:
 			/* schwer verwundet 14-34 HP */
 			return "4d6+10";
@@ -611,6 +614,56 @@ sp_dragonodem(fighter * fi, int level, int power, spell * sp)
 	damage = spell_damage(4);
 	/* Jungdrache 3->54, Drache 6->216, Wyrm 12->864 Treffer */
 	force = lovar(get_force(level,6));
+
+	enemies = count_enemies(b, fi->side, FS_ENEMY, minrow,
+			maxrow);
+
+	if (!enemies) {
+		scat(", aber niemand war in Reichweite.");
+		battlerecord(b, buf);
+		return 0;
+	}
+	scat(":");
+	battlerecord(b, buf);
+
+	at.fighter = fi;
+	at.index = 0;
+
+	do {
+		dt = select_enemy(b, fi, minrow, maxrow);
+		assert(dt.fighter);
+		--force;
+		killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
+	} while (force && killed < enemies);
+
+	sprintf(buf, "%d Personen %s getötet",
+			killed, killed == 1 ? "wurde" : "wurden");
+
+	scat(".");
+	battlerecord(b, buf);
+	return level;
+}
+
+/* Feuersturm: Betrifft sehr viele Gegner (in der Regel alle), 
+ * macht nur vergleichsweise geringen Schaden */
+int
+sp_immolation(fighter * fi, int level, int power, spell * sp)
+{
+	battle *b = fi->side->battle;
+	troop dt;
+	troop at;
+	int minrow = FIGHT_ROW;
+	int maxrow = AVOID_ROW;
+	int force, enemies;
+	int killed = 0;
+	const char *damage;
+
+	sprintf(buf, "%s zaubert %s", unitname(fi->unit), 
+		spell_name(sp, default_locale));
+	/* 2d4 HP */
+	damage = spell_damage(5);
+	/* Betrifft alle Gegner */
+	force = 99999;
 
 	enemies = count_enemies(b, fi->side, FS_ENEMY, minrow,
 			maxrow);

@@ -10428,6 +10428,20 @@ spell spelldaten[] =
 		 {0, 0, 0}},
 	 (spell_f)sp_shadowcall, patzer
 	},
+	
+	{SPL_IMMOLATION, "Feuersturm",
+		"Verletzt alle Gegner.",
+		NULL,
+		NULL,
+	 M_GRAU, (COMBATSPELL), 5, 12,
+	 {
+		 {R_AURA, 2, SPC_LEVEL},
+		 {0, 0, 0},
+		 {0, 0, 0},
+		 {0, 0, 0},
+		 {0, 0, 0}},
+	 (spell_f)sp_immolation, patzer
+	},
 
 /* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein*/
 

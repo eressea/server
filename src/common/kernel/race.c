@@ -546,6 +546,15 @@ dragon_drops(const struct race * rc, int size)
 	}
 	return itm;
 }
+
+static item *
+phoenix_drops(const struct race *rc, int size)
+{
+	item *itm = NULL;
+	i_add(&itm, i_new(&it_phoenixfeather, size));
+	return itm;
+}
+
 static item *
 elf_spoil(const struct race * rc, int size)
 {
@@ -784,7 +793,6 @@ tagbegin(struct xml_stack * stack)
 			if (xml_bvalue(tag, "resistbash")) rc->battle_flags |= BF_RES_BASH;
 			if (xml_bvalue(tag, "resistcut")) rc->battle_flags |= BF_RES_CUT;
 			if (xml_bvalue(tag, "resistpierce")) rc->battle_flags |= BF_RES_PIERCE;
-			
 
 			state->race = rc;
 		} else if (strcmp(tag->name, "ai")==0) {
@@ -943,6 +951,7 @@ register_races(void)
 	 * to generate battle spoils
 	 * race->itemdrop() */
 	register_function((pf_generic)dragon_drops, "dragondrops");
+	register_function((pf_generic)phoenix_drops, "phoenixdrops");
 	register_function((pf_generic)elf_spoil, "elfspoil");
 	register_function((pf_generic)demon_spoil, "demonspoil");
 	register_function((pf_generic)goblin_spoil, "goblinspoil");

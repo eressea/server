@@ -189,6 +189,21 @@ item_type it_trollspoil = {
 	NULL           /* give */
 };
 
+resource_type rt_phoenixfeather = {
+	{ "phoenixfeather", "phoenixfeather_p" },
+	{ "phoenixfeather", "phoenixfeather_p" },
+	RTF_ITEM|RTF_POOLED,
+	&res_changeitem
+};
+
+item_type it_phoenixfeather = {
+	&rt_phoenixfeather,  /* resourcetype */
+	0, 1, 0,       /* flags, weight, capacity */
+	NULL,	       /* construction */
+	NULL,          /* use */
+	NULL           /* give */
+};
+
 void
 register_racespoils(void)
 {
@@ -203,5 +218,6 @@ register_racespoils(void)
 	it_register(&it_catspoil);
 	it_register(&it_orcspoil);
 	it_register(&it_trollspoil);
+	it_register(&it_phoenixfeather);
 }
 

@@ -2811,6 +2811,56 @@ give_cammo(void)
 	return 0;
 }
 
+#ifdef WDW_PHOENIX
+static region *
+random_region(void)
+{
+	region *r;
+	int c = 0;
+
+	/* count the available regions */
+	for(r=regions; r; r=r->next) {
+		if(rplane(r) == NULL) c++;
+	}
+
+	/* choose one */
+	c = rand()%c;
+
+	/* this is a bit obfuscated, but should be correct */
+	for(r=regions; c > 0; r=r->next) {
+		--c;
+	}
+
+	return(r);
+}
+
+static void
+check_phoenix(void)
+{
+	const race * phoenix_race = rc_find("phoenix");
+	unit * phoenix;
+	region * r;
+	faction *f;
+
+	/* check if there is a phoenix in the world */
+	for(f=factions; f; f=f->next) {
+		unit *u;
+
+		for(u=f->units; u; u=u->nextF) {
+			if(u->race == phoenix_race) {
+				return;
+			}
+		}
+	}
+
+	/* it is not, so we create it */
+	r = random_region();
+	phoenix = createunit(r, findfaction(MONSTER_FACTION), 1, phoenix_race);
+
+	/* generate an appropriate region message */
+}
+#endif
+
 void
 korrektur(void)
 {
@@ -2881,7 +2931,7 @@ korrektur(void)
 	 * to be on the safe side:
 	 */
 	fix_demand();
-  /* trade_orders(); */
+	/* trade_orders(); */
 
 	/* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
 	 * Beschreibungen geändert haben */
@@ -2890,6 +2940,10 @@ korrektur(void)
 
 	/* Immer ausführen! Erschafft neue Teleport-Regionen, wenn nötig */
 	create_teleport_plane();
+
+#ifdef WDW_PHOENIX
+	check_phoenix();
+#endif
 
 	if (global.data_version<TYPES_VERSION) fix_icastles();
 #ifdef XMAS2000

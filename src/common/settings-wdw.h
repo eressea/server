@@ -48,4 +48,6 @@
 #undef  ALLIANCEJOIN
 #define AUTOALLIANCE (HELP_FIGHT)
 
+#define WDW_PHOENIX
+
 #define MAILITPATH	"/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"
