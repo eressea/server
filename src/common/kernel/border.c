@@ -263,7 +263,7 @@ age_borders(void)
 				else ap=&a->next;
 			}
 			if (!b) continue; /* bei löschung bp nicht vorziehen */
-			bp=&b->next;
+			bp=&b->nexthash;
 		}
 	}
 }
