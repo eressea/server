@@ -2631,8 +2631,10 @@ level(int days)
 	while (level_days(l)<=days) ++l;
 	return l-1;
 }
+#endif
 
-int
+#if defined(CONVERT_SKILLPOINTS) || !SKILLPOINTS
+static int
 convert_skills(void)
 {
 	region * r;

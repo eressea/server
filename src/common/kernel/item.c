@@ -2050,6 +2050,7 @@ tagend(struct xml_stack * stack)
 	const xml_tag * tag = stack->tag;
 	if (strcmp(tag->name, "resource")==0) {
 		free(stack->state);
+		init_resources();
 	}
 	return XML_OK;
 }
@@ -2158,6 +2159,9 @@ static xml_callbacks xml_resource = {
 void
 init_resources(void)
 {
+	static boolean initialized = false;
+	if (initialized) return;
+	initialized = true;
 	/* silver was never an item: */
 	r_silver = new_resourcetype(&names[0], NULL, RTF_ITEM|RTF_POOLED);
 	i_silver = new_itemtype(r_silver, ITF_NONE, 1/*weight*/, 0);
