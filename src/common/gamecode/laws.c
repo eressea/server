@@ -2980,6 +2980,7 @@ renumber(void)
 					break;
 
 				case P_BUILDING:
+				case P_GEBAEUDE:
 					if(!u->building) {
 						cmistake(u,S->s,145,MSG_EVENT);
 						continue;

@@ -1338,16 +1338,17 @@ getkeyword (const struct locale * lang)
 param_t
 findparam(const char *s, const struct locale * lang)
 {
-	struct lstr * lnames = get_lnames(lang);
-	const building_type * btype;
-
-	int i;
-	if (findtoken(&lnames->tokens[UT_PARAM], s, (void**)&i)==E_TOK_NOMATCH) {
-		btype = findbuildingtype(s, lang);
-		if (btype!=NULL) return (param_t) P_BUILDING;
-		return NOPARAM;
-	}
-	return (param_t)i;
+  struct lstr * lnames = get_lnames(lang);
+  const building_type * btype;
+  
+  int i;
+  if (findtoken(&lnames->tokens[UT_PARAM], s, (void**)&i)==E_TOK_NOMATCH) {
+	btype = findbuildingtype(s, lang);
+	if (btype!=NULL) return (param_t) P_GEBAEUDE;
+	return NOPARAM;
+  }
+  if (i==P_BUILDING) return P_GEBAEUDE;
+  return (param_t)i;
 }
 
 param_t
