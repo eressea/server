@@ -53,7 +53,19 @@ function process(orders)
 
   plan_monsters()
   process_orders()
-  
+
+  -- localechange = { de = { "bLub" } }
+  localechange = {  }
+  for loc, flist in localechange do
+	  for index, name in flist do
+      f = get_faction(atoi36(name))
+      if f ~= nil then
+        f.locale = loc
+  			print("LOCALECHANGE ", f, loc)
+			end
+    end
+  end
+
   write_passwords()
   write_reports()
 
