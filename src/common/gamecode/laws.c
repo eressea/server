@@ -2567,6 +2567,7 @@ origin_cmd(unit * u, struct order * ord)
 static int
 guard_off_cmd(unit * u, struct order * ord)
 {
+  assert(get_keyword(ord)==K_GUARD);
   init_tokens(ord);
   skip_token();
 
@@ -2791,6 +2792,7 @@ static int
 guard_on_cmd(unit * u, struct order * ord)
 {
   if (fval(u, UFL_MOVED)) return 0;
+  assert(get_keyword(ord)==K_GUARD);
 
   init_tokens(ord);
   skip_token();
@@ -3816,7 +3818,7 @@ processorders (void)
 	movement();
 
 	puts(" - Bewache (an)");
-	parse(K_USE, guard_on_cmd, false);
+	parse(K_GUARD, guard_on_cmd, false);
 
 	puts(" - Zufallsbegegnungen");
 	encounters();
