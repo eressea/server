@@ -16,10 +16,11 @@
 #include "regioncurse.h"
 
 /* kernel includes */
-#include "message.h"
-#include "nrmessage.h"
-#include "objtypes.h"
-#include "curse.h"
+#include <region.h>
+#include <message.h>
+#include <nrmessage.h>
+#include <objtypes.h>
+#include <curse.h>
 
 /* util includes */
 #include <message.h>
@@ -112,3 +113,8 @@ cinfo_magicstreet(const locale * lang,void * obj, typ_t typ, curse *c, int self)
 
 	return 1;
 }
+
+void register_regioncurse(void)
+{
+}
+

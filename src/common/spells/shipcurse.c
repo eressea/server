@@ -16,13 +16,15 @@
 #include "shipcurse.h"
 
 /* kernel includes */
-#include "message.h"
-#include "nrmessage.h"
-#include "objtypes.h"
-#include "curse.h"
+#include <message.h>
+#include <ship.h>
+#include <nrmessage.h>
+#include <objtypes.h>
+#include <curse.h>
 
 /* util includes */
 #include <message.h>
+#include <base36.h>
 
 /* libc includes */
 #include <string.h>
@@ -53,11 +55,10 @@ static int
 cinfo_ship_onlyowner(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
-	ship * sh;
-
+	
+	unused(obj);
 	unused(typ);
 	assert(typ == TYP_SHIP);
-	sh = (ship*)obj;
 
 	if (self){
 		msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);

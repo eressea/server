@@ -14,10 +14,14 @@
 #ifndef _RCURSE_H
 #define _RCURSE_H
 
+/*
 int cinfo_region(const locale *, void *, typ_t, curse *, int);
 
 int cinfo_cursed_by_the_gods(const locale *, void *, typ_t, curse *, int);
 int cinfo_dreamcurse(const locale *, void *, typ_t, curse *, int);
 int cinfo_magicstreet(const locale *, void *, typ_t, curse *, int);
+*/
+
+extern void register_regioncurse(void);
 
 #endif /* _RCURSE_H */

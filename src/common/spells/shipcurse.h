@@ -14,6 +14,8 @@
 #ifndef _SCURSE_H
 #define _SCURSE_H
 
+/*
 int cinfo_shipnodrift(const locale *, void *, typ_t, curse *, int);
+*/
 	
 #endif /* _SCURSE_H */
