@@ -379,12 +379,12 @@ render_messages(FILE * F, faction * f, message_list *msgs)
 {
 	struct mlist* m = msgs->begin;
 	while (m) {
-		char crbuffer[1024];
+		char crbuffer[1024*32]; /* gross, wegen spionage-messages :-( */
 		boolean printed = false;
 		const struct message_type * mtype = m->msg->type;
 		unsigned int hash = hashstring(mtype->name);
 #if RENDER_CRMESSAGES
-		char nrbuffer[4096];
+		char nrbuffer[1024*32];
 		nrbuffer[0] = '\0';
 		if (nr_render(m->msg, f->locale, nrbuffer, f)==0 && nrbuffer[0]) {
 			fprintf(F, "MESSAGE %d\n", ++msgno);
