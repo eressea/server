@@ -235,17 +235,18 @@ setstealth_cmd(unit * u, struct order * ord)
           unit * mu = u->faction->units;
           while (mu!=NULL) {
             unit * ru = mu->region->units;
-            if (mu->region==lastr) continue;
-            while (ru!=NULL) {
-              attrib *a = a_find(ru->attribs, &at_otherfaction);
-              if (a) {
-                faction *fv = get_otherfaction(a);
-                if (fv==f) break;
+            if (mu->region!=lastr) {
+              while (ru!=NULL) {
+                attrib *a = a_find(ru->attribs, &at_otherfaction);
+                if (a) {
+                  faction *fv = get_otherfaction(a);
+                  if (fv==f) break;
+                }
+                ru = ru->next;
               }
-              ru = ru->next;
+              if (ru!=NULL) break;
+              lastr = mu->region;
             }
-            if (ru!=NULL) break;
-            lastr = mu->region;
             mu = mu->nextF;
           }
           if (mu!=NULL) {
