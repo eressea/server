@@ -2871,11 +2871,7 @@ wahrnehmung(region * r, faction * f)
 	int w = 0;
 
 	for (u = r->units; u; u = u->next) {
-		if (u->faction == f
-#ifdef HELFE_WAHRNEHMUNG
-			|| alliedunit(u, f, HELP_OBSERVE)
-#endif
-			) {
+		if (u->faction == f) {
 				if (eff_skill(u, SK_OBSERVATION, r) > w) {
 					w = eff_skill(u, SK_OBSERVATION, r);
 				}

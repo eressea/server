@@ -1086,7 +1086,7 @@ quit(void)
 							} else if(u->faction->alliance != f2->alliance) {
 								cmistake(u, S->s, 315, MSG_EVENT);
 #else
-#warning ENHANCED_QUIT defined without ALLIANCES
+#error ENHANCED_QUIT defined without ALLIANCES
 #endif
 							} else if(!alliedfaction(NULL, f, f2, HELP_MONEY)) {
 								cmistake(u, S->s, 316, MSG_EVENT);
@@ -1310,15 +1310,6 @@ set_ally(unit * u, strlist * S)
 		else
 			sf->status = sf->status | HELP_FIGHT;
 		break;
-
-#ifdef HELFE_WAHRNEHMUNG
-	case P_OBSERVE:
-		if (not_kw == P_NOT)
-			sf->status = sf->status & (HELP_ALL - HELP_OBSERVE);
-		else
-			sf->status = sf->status | HELP_OBSERVE;
-		break;
-#endif
 
 	case P_FACTIONSTEALTH:
 		if (not_kw == P_NOT)

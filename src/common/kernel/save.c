@@ -1994,13 +1994,20 @@ addally(const faction * f, ally ** sfp, int aid, int state)
 {
 	struct faction * af = findfaction(aid);
 	ally * sf;
-#ifndef HELFE_WAHRNEHMUNG
 	state &= ~HELP_OBSERVE;
+#ifndef REGIONOWNERS
+	state &= ~HELP_TRAVEL;
 #endif
 #ifdef ALLIANCES
+# ifdef ALLIES_ONLY
+	if (af!=NULL && af->alliance!=f->alliance) state &= ~ALLIES_ONLY;;
+# else
+# endif
 	if (af!=NULL && af->alliance!=f->alliance) return;
 #endif
-	sf = calloc(1, sizeof(ally));
+  if (state==0) return;
+
+  sf = calloc(1, sizeof(ally));
 	sf->faction = af;
 	if (!sf->faction) ur_add((void*)aid, (void**)&sf->faction, resolve_faction);
 	sf->status = state;

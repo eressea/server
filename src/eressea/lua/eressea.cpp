@@ -42,8 +42,6 @@ read_game(const char * filename)
 static int
 write_game(const char *filename)
 {
-  char ztext[64];
-
   free_units();
   remove_empty_factions(true);
 

@@ -19,6 +19,8 @@
 #include "eressea.h"
 #include "item.h"
 
+#include <attributes/key.h>
+
 #include "alchemy.h"
 #include "build.h"
 #include "faction.h"
@@ -2038,6 +2040,31 @@ use_mistletoe(struct unit * user, const struct item_type * itype, int amount, co
 }
 
 static int
+use_magicboost(struct unit * user, const struct item_type * itype, int amount, const char * cmd)
+{
+  int mtoes = new_get_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK);
+  faction * f = user->faction;
+  if (user->number>mtoes) {
+    ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
+      "unit item region command", user, itype->rtype, user->region, cmd));
+    return -1;
+  }
+  if (!is_mage(user) || find_key(f->attribs, atoi36("mbst"))!=NULL) {
+    cmistake(user, user->thisorder, 214, MSG_EVENT);
+    return -1;
+  }
+  new_use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
+  
+  a_add(&f->attribs, make_key(atoi36("mbst")));
+  set_level(user, sk_find("sk_magic"), 3);
+
+  ADDMSG(&user->faction->msgs, msg_message("use_item",
+    "unit item", user, itype->rtype));
+
+  return 0;
+}
+
+static int
 use_snowball(struct unit * user, const struct item_type * itype, int amount, const char * cmd)
 {
 	return 0;
@@ -2666,7 +2693,8 @@ register_resources(void)
 	register_function((pf_generic)use_warmthpotion, "usewarmthpotion");
 	register_function((pf_generic)use_bloodpotion, "usebloodpotion");
 	register_function((pf_generic)use_foolpotion, "usefoolpotion");
-	register_function((pf_generic)use_mistletoe, "usemistletoe");
+  register_function((pf_generic)use_mistletoe, "usemistletoe");
+  register_function((pf_generic)use_magicboost, "usemagicboost");
 	register_function((pf_generic)use_snowball, "usesnowball");
 
 	register_function((pf_generic)give_horses, "givehorses");

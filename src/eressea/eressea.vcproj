@@ -387,6 +387,9 @@
 			RelativePath="..\common\settings-vinyambar.h">
 		</File>
 		<File
+			RelativePath="..\common\settings-wdw.h">
+		</File>
+		<File
 			RelativePath="..\common\settings.h">
 		</File>
 	</Files>

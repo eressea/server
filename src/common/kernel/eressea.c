@@ -62,6 +62,9 @@
 #include <xml.h>
 
 #include <modules/xecmd.h>
+#ifdef ALLIANCES
+# include <modules/alliance.h>
+#endif
 
 /* libc includes */
 #include <stdio.h>
@@ -352,11 +355,43 @@ const char *options[MAXOPTIONS] =
 	"SHOWSKCHANGE"
 };
 
-int
-max_skill(const faction * f, skill_t sk)
+#ifdef ALLIANCE_LIMITS
+int 
+allied_skillcount(const faction * f, skill_t sk)
 {
-	int m = INT_MAX;
+  int num = 0;
+  alliance * a = f->alliance;
+  faction_list * members = a->members;
+  while (members!=NULL) {
+    num += count_skill(members->data, sk);
+    members=members->next;
+  }
+  return num;
+}
 
+int 
+allied_skilllimit(const faction * f, skill_t sk)
+{
+  return atoi(get_param(global.parameters, "allied.skilllimit"));
+}
+
+#endif
+
+int
+max_skill(faction * f, skill_t sk)
+{
+  int m = INT_MAX;
+#ifdef ALLIANCE_LIMITS
+  if (sk!=SK_ALCHEMY && sk!=SK_MAGIC) return INT_MAX;
+  if (f->alliance!=NULL) {
+    int ac = listlen(f->alliance->members); /* number of factions */
+    int al = allied_skilllimit(f, sk); /* limit per alliance */
+    int fl = (al+ac-1)/ac; /* faction limit */
+    int sc = al - allied_skillcount(f, sk);
+    if (sc==0) return count_skill(f, sk);
+    return fl;
+  }
+#endif
 	switch (sk) {
 	case SK_MAGIC:
 		m = MAXMAGICIANS;
@@ -367,8 +402,7 @@ max_skill(const faction * f, skill_t sk)
 		m = MAXALCHEMISTS;
 		break;
 	}
-
-	return m;
+  return m;
 }
 
 char * g_basedir;
@@ -791,7 +825,7 @@ autoalliance(const plane * pl, const faction * sf, const faction * f2)
 }
 
 static int
-alliance(const ally * sf, int mode)
+ally_mode(const ally * sf, int mode)
 {
   if (sf==NULL) return 0;
 	return sf->status & mode;
@@ -801,14 +835,21 @@ int
 alliedgroup(const struct plane * pl, const struct faction * f, 
             const struct faction * f2, const struct ally * sf, int mode)
 {
-#ifdef ALLIANCES
-	if (f->alliance!=f2->alliance) return 0;
-#endif
   while (sf && sf->faction!=f2) sf=sf->next;
   if (sf==NULL) {
-    return mode & autoalliance(pl, f, f2);
+    mode = mode & autoalliance(pl, f, f2);
   }
-  return alliance(sf, mode) | (mode & autoalliance(pl, f, f2));
+  mode = ally_mode(sf, mode) | (mode & autoalliance(pl, f, f2));
+#ifdef ALLIANCES
+  if (f->alliance!=f2->alliance) {
+# ifdef ALLIES_ONLY
+    mode &= ~ALLIES_ONLY;
+# else
+	  mode = 0;
+# endif
+  }
+#endif
+  return mode;
 }
 
 int

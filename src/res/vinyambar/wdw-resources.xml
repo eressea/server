@@ -1,0 +1,16 @@
+<resource name="magicskillboost">
+	<comment>Boost a magician's skill to level 3</comment>
+	<item notlost weight="0">
+		<function name="use" value="usemagicboost"></function>
+	</item>
+</resource>
+<strings>
+	<string name="magicskillboost">
+		<text locale="de">Schriftrolle</text>
+		<text locale="en">scroll</text>
+	</string>
+	<string name="magicskillboost_p">
+		<text locale="de">Schriftrollen</text>
+		<text locale="en">scrolls</text>
+	</string>
+</strings>

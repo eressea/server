@@ -104,7 +104,6 @@ struct xml_stack;
 #define NEW_RECEIPIES /* Vereinfachte, besser verteilte Kräuterzutaten für Tränke */
 #define NEW_TAVERN
 #define GOBLINKILL
-#undef HELFE_WAHRNEHMUNG
 
 #define USE_FIREWALL 1
 #undef COMPATIBILITY
@@ -900,7 +899,7 @@ extern boolean check_leuchtturm(struct region * r, struct faction * f);
 extern void update_lighthouse(struct building * lh);
 
 /* skills */
-extern int max_skill(const struct faction * f, skill_t sk);
+extern int max_skill(struct faction * f, skill_t sk);
 extern int count_skill(struct faction * f, skill_t sk);
 extern int count_all_money(const struct region * r);
 

@@ -1,0 +1,34 @@
+<races>
+	<race name="halfling" magres="0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
+		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<function name="itemdrop" value="halflingspoil"></function>
+		<skill name="sk_crossbow" modifier="0"></skill>
+		<skill name="sk_mining" modifier="1"></skill>
+		<skill name="sk_bow" modifier="-1"></skill>
+		<skill name="sk_building" modifier="1"></skill>
+		<skill name="sk_trade" modifier="2"></skill>
+		<skill name="sk_catapult" modifier="-1"></skill>
+		<skill name="sk_herbalism" modifier="2"></skill>
+		<skill name="sk_training" modifier="-1"></skill>
+		<skill name="sk_riding" modifier="-1"></skill>
+		<skill name="sk_shipcraft" modifier="-1"></skill>
+		<skill name="sk_melee" modifier="-1"></skill>
+		<skill name="sk_sailing" modifier="-2"></skill>
+		<skill name="sk_polearm" modifier="-1"></skill>
+		<skill name="sk_espionage" modifier="1"></skill>
+		<skill name="sk_roadwork" modifier="1"></skill>
+		<skill name="sk_stealth" modifier="1"></skill>
+		<skill name="sk_entertainment" modifier="1"></skill>
+		<skill name="sk_cartmaking" modifier="2"></skill>
+		<skill name="sk_perception" modifier="1"></skill>
+		<skill name="sk_taxation" modifier="-1"></skill>
+		<skill name="sk_unarmed" modifier="-99"></skill>
+		<attack type="1" damage="1d5"></attack>
+		<familiar race="owl" default></familiar>
+		<familiar race="rat"></familiar>
+		<familiar race="eagle"></familiar>
+		<familiar race="songdragon"></familiar>
+		<familiar race="eagle"></familiar>
+		<familiar race="rat"></familiar>
+	</race>
+</races>

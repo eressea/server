@@ -144,6 +144,7 @@ struct settings global = {
 	1000, /* maxunits */
 };
 
+#if 0
 static int
 crwritemap(void)
 {
@@ -157,6 +158,7 @@ crwritemap(void)
   fclose(F);
 	return 0;
 }
+#endif
 
 static void
 game_init(void)
@@ -319,6 +321,9 @@ lua_init(void)
 {
   lua_State * luaState = lua_open();
   luaopen_base(luaState);
+  luaopen_math(luaState);
+  luaopen_string(luaState);
+  luaopen_io(luaState);
   luabind::open(luaState);
   bind_eressea(luaState);
   bind_alliance(luaState);
