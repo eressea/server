@@ -215,7 +215,7 @@ ridingcapacity(unit * u)
 static int
 walkingcapacity(unit * u)
 {
-	int n, personen, pferde, pferde_fuer_wagen;
+	int n, tmp, personen, pferde, pferde_fuer_wagen;
 	int wagen, wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
 	/* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
 	 * die Leute tragen */
@@ -253,9 +253,11 @@ walkingcapacity(unit * u)
 	n += pferde * HORSECAPACITY;
 	n += personen * personcapacity(u);
 	/* Goliathwasser */
-	n += get_effect(u, oldpotiontype[P_STRONG]) * personcapacity(u);
+  tmp = get_effect(u, oldpotiontype[P_STRONG]);
+	n += min(u->number, tmp) * personcapacity(u);
   /* change_effect wird in ageing gemacht */
-	n += min(get_item(u, I_TROLLBELT), u->number) * STRENGTHCAPACITY;
+  tmp = get_item(u, I_TROLLBELT);
+	n += min(tmp, u->number) * STRENGTHCAPACITY;
 
 	return n;
 }
