@@ -62,6 +62,7 @@
 #include <attrib.h>
 #include <language.h>
 #include <base36.h>
+#include <log.h>
 #include <cvector.h>
 #include <event.h>
 #include <goodies.h>
@@ -1267,11 +1268,32 @@ fix_traveldir(void)
 }
 #endif
 
+typedef struct stats_t {
+	struct stats_t * next;
+	const struct item_type * type;
+	double number;
+} stats_t;
+
+static void 
+s_change(stats_t** s, const struct item_type * type, int count)
+{
+	while (*s && (*s)->type!=type) s=&(*s)->next;
+	if (*s==NULL) *s = calloc(1, sizeof(stats_t));
+	(*s)->number += count;
+}
+
+static stats_t * 
+s_find(stats_t * s, const struct item_type * type)
+{
+	while (s && s->type!=type) s=s->next;
+	return s;
+}
+
 static void
 stats(void)
 {
 	FILE * F;
-	item * items = NULL;
+	stats_t * items = NULL;
 	char zText[MAX_PATH];
 
 	strcat(strcpy(zText, resourcepath()), "/stats");
@@ -1286,18 +1308,19 @@ stats(void)
 
 				for (itm=u->items;itm;itm=itm->next) {
 					if (itm->number>10000000) {
-						itm->number=1;
+						log_error(("unit %s has %d %s\n", unitname(u), itm->number, resourcename(itm->type->rtype, 0)));
+						// itm->number=1;
 					}
-					i_change(&items, itm->type, itm->number);
+					s_change(&items, itm->type, itm->number);
 				}
 			}
 		}
 		for (itype=itemtypes;itype;itype=itype->next) {
-			item * itm = *i_find(&items, itype);
-			if (itm && itm->number)
-				fprintf(F, "%4d %s\n", itm->number, locale_string(NULL, resourcename(itype->rtype, 0)));
+			stats_t * itm = s_find(items, itype);
+			if (itm && itm->number>0.0)
+				fprintf(F, "%4.0lf %s\n", itm->number, locale_string(NULL, resourcename(itype->rtype, 0)));
 			else
-				fprintf(F, "%4d %s\n", 0, locale_string(NULL, resourcename(itype->rtype, 0)));
+				fprintf(F, "%4.0lf %s\n", 0.0, locale_string(NULL, resourcename(itype->rtype, 0)));
 		}
 		fclose(F);
 	} else {
