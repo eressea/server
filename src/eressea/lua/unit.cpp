@@ -213,8 +213,7 @@ bind_unit(lua_State * L)
     def("add_unit", &add_unit),
 
     class_<struct unit>("unit")
-    .def_readonly("name", &unit::name)
-    .def_readonly("size", &unit::number)
+    .def_readwrite("name", &unit::name)
     .def_readonly("faction", &unit::faction)
     .def_readonly("id", &unit::no)
     .def_readwrite("hp", &unit::hp)
