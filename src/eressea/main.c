@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.5 2001/01/30 20:26:05 enno Exp $
+ *	$Id: main.c,v 1.6 2001/01/30 23:16:17 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -612,10 +612,6 @@ main(int argc, char *argv[])
 				}
 				break;
 #endif
-			case 'a':
-				writeadresses("adressen");
-				exit(0);
-				break;
 
 			case '#':
 				score();
@@ -641,7 +637,6 @@ main(int argc, char *argv[])
 					"-x n             : Lädt nur die ersten n regionen\n"
 					"-g befehlsdatei  : verarbeitet Spielleiterbefehle\n"
 					"-v befehlsdatei  : verarbeitet automatisch die angegebene Befehlsdatei\n"
-					"-a               : gibt Adressenliste aus\n"
 				    "-#               : gibt Scoreliste aus\n"
 					"-d datadir       : gibt das datenverzeichnis an\n"
 					"-o reportdir     : gibt das reportverzeichnis an\n"
@@ -674,13 +669,6 @@ main(int argc, char *argv[])
 		fgets(buf, 1024, stdin);
 
 		switch (buf[0]) {
-		case 'a':
-			puts("Schreibe Liste der Adressen...");
-			writeadresses("adressen");
-
-			fclose(F);
-			break;
-
 		case 'c':
 			korrektur();
 			break;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: render.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: render.c,v 1.3 2001/01/30 23:16:17 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -222,6 +222,14 @@ v_mage_de(const locale * l, void * data) {
 	return i>1?unitname((unit*)i):"Jemand";
 }
 
+static const char *
+v_unknown(const locale * l, void * data) {
+	unused(l);
+	unused(data);
+	/* TODO: i==1 getarnt, wilder Hack */
+	return "[an error occured]";
+}
+
 const char *
 v_dir(const locale * l, void * data) {
 	int i = (int)data;
@@ -264,9 +272,13 @@ render_immediate(const message * m, const char * find, localizer * l)
 					for (e = l->evaluators[key % RMAXHASH];e;e=e->nexthash) {
 						if (!strcmp(e->name, function)) break;
 					}
-					assert(e || !"unknown function");
+					if (!e) {
+						fun = v_unknown;
+						fprintf(stderr, "WARNING: unknown function for rendering %s\n", function);
+					}
+					else fun = e->fun;
 				}
-				fun = e->fun;
+				else fun = e->fun;
 				++p;
 			}
 			while (*p!='}') {
@@ -475,7 +487,8 @@ de_render_casualties(const message * m, const locale * lang)
 }
 
 static const char *
-v_travel(const locale * l, void * data) {
+v_travel(const locale * l, void * data) 
+{
 	int i = (int)data;
 	unused(l);
 	switch(i) {

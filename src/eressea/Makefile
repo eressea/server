@@ -50,7 +50,6 @@ LIBS += $(LIBNAMES:%=-l%) -lm
 
 $(BUILD_DIR)/$(BINARY):: subdirs-$(CONFIG) $(BUILD_DIR) $(OBJECTS)
 	$(LD) -o $@ $(OBJECTS) $(LDFLAGS)
-	$(INSTALL) $@ $(PUBLISH_DIR)/
 
 $(PUBLISH_DIR)/$(BINARY): $(BUILD_DIR)/$(BINARY)
 	$(INSTALL) $< $@

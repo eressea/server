@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.5 2001/01/28 08:01:52 enno Exp $
+ *	$Id: korrektur.c,v 1.6 2001/01/30 23:16:17 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1744,9 +1744,16 @@ lms_special(unit * u)
 	/* TODO: Trollstärke-gürtel und trigger an die einheit geben */
 }
 
+#include <modules/gmcmd.h>
+void setup_gm_faction(void);
+
 void
 korrektur(void)
 {
+#ifdef TEST_GM_COMMANDS
+	setup_gm_faction();
+#endif
+	
 	/* Wieder entfernen! */
 
 	/* fix_herbtypes(); */

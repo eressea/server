@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.4 2001/01/28 08:50:46 enno Exp $
+ *	$Id: eressea.c,v 1.5 2001/01/30 23:16:16 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -202,7 +202,8 @@ const char *keywords[MAXKEYWORDS] =
 	"OPFERE",
 	"BETEN",
 	"SORTIEREN",
-	"JIHAD"
+	"JIHAD",
+	"GM"
 };
 
 const char *report_options[MAX_MSG] =

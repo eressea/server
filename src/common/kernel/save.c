@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.5 2001/01/28 08:01:52 enno Exp $
+ *	$Id: save.c,v 1.6 2001/01/30 23:16:17 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2063,24 +2063,6 @@ curse_read(attrib * a, FILE * f) {
 /* ------------------------------------------------------------- */
 
 struct fjord { int size; faction * f; } fjord[3];
-
-
-void
-writeadresses(const char * name)
-{
-	faction *f;
-	FILE * F = cfopen(name, "w");
-
-	if (!F) return;
-	/* adressen liste */
-
-	for (f = factions; f; f = f->next) {
-		if (f->no != MONSTER_FACTION) {
-			fprintf(F, "%s:%s:%s\n", factionname(f), f->email, f->banner);
-		}
-	}
-	fclose(F);
-}
 
 /* ------------------------------------------------------------- */
 

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.h,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: save.h,v 1.3 2001/01/30 23:16:17 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -37,7 +37,6 @@ int readorders(const char *);
 int creategame(void);
 void initgame(void);
 int readgame(boolean backup);
-void writeadresses(const char * name);
 void writegame(char *path, char quiet);
 
 extern void rsf(FILE * F, char *s, size_t len);

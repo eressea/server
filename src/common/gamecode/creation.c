@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: creation.c,v 1.2 2001/01/26 16:19:39 enno Exp $
+ *	$Id: creation.c,v 1.3 2001/01/30 23:16:16 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -79,7 +79,7 @@ createmonsters(void)
 		return;
 	}
 	f = (faction *) calloc(1, sizeof(faction));
-
+	f->no = MONSTER_FACTION;
 	/* alles ist auf null gesetzt, ausser dem folgenden. achtung - partei
 	 * no 0 muss keine orders einreichen! */
 

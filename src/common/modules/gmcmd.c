@@ -108,8 +108,8 @@ gm_create(const char * str, struct unit * u)
 {
 	int i;
 	attrib * permissions = a_find(u->faction->attribs, &at_permissions);
-	if (!permissions) permissions = (attrib*)permissions->data.v;
-
+	if (permissions) permissions = (attrib*)permissions->data.v;
+	if (!permissions) return;
 	i = atoi(igetstrtoken(str));
 
 	if (i>0) {
@@ -125,7 +125,7 @@ gm_create(const char * str, struct unit * u)
 struct attrib *
 find_key(struct attrib * attribs, int key)
 {
-	attrib * a = a_find((attrib*)attribs->data.v, &at_key);
+	attrib * a = a_find(attribs, &at_key);
 	while (a && a->data.i!=key) a=a->nexttype;
 	return a;
 }
@@ -162,6 +162,7 @@ gm_command(const char * cmd, struct unit * u)
 	while (isalnum(*c)) ++c;
 	i = min(16, c-cmd);
 	strncpy(zText, cmd, i);
+	zText[i]=0;
 	cm = (command*)findtoken(&g_keys, zText);
 	if (cm && cm->perform) cm->perform(++c, u);
 }
@@ -177,13 +178,14 @@ init_gmcmd(void)
 
 	{
 		faction * f = findfaction(atoi36("rr"));
-		attrib * a = a_find(f->attribs, &at_permissions);
-		if (!a) {
-			a = a_add(&f->attribs, a_new(&at_permissions));
-			a_add((attrib**)&a->data.v, make_atgmcreate(&it_demonseye));
-			a_add((attrib**)&a->data.v, make_key(atoi36("gmtf")));
+		if (f) {
+			attrib * a = a_find(f->attribs, &at_permissions);
+			if (!a) {
+				a = a_add(&f->attribs, a_new(&at_permissions));
+				a_add((attrib**)&a->data.v, make_atgmcreate(&it_demonseye));
+				a_add((attrib**)&a->data.v, make_key(atoi36("gmtf")));
+			}
 		}
-
 	}
 }
 
@@ -211,3 +213,38 @@ gmcommands(void)
 		if (*rp==r) rp = &r->next;
 	}
 }
+#ifdef TEST_GM_COMMANDS
+void
+setup_gm_faction(void)
+{		
+	int i = atoi36("gms")-1;
+	faction * f = factions;
+	unit * newunit;
+	region * r = regions;
+	attrib * a;
+	
+	do {
+		f = findfaction(++i);
+	} while (f);
+	
+	f = (faction *) calloc(1, sizeof(faction));
+	f->no = i;
+	set_string(&f->email, "gms@eressea-pbem.de");
+	set_string(&f->passw, "geheim");
+	set_string(&f->name, "GMs");
+	f->alive = 1;
+	f->options |= (1 << O_REPORT);
+	f->options |= (1 << O_COMPUTER);
+	addlist(&factions, f);
+	
+	a = a_add(&f->attribs, a_new(&at_permissions));
+	a_add((attrib**)&a->data.v, make_atgmcreate(&it_demonseye));
+	a_add((attrib**)&a->data.v, make_key(atoi36("gmtf")));
+	
+	while (r && !r->land) r=r->next;
+	newunit = createunit(r, f, 1, RC_DAEMON);
+	set_string(&newunit->name, "Flamdring, Gott des Feuers");
+	set_money(newunit, 100);
+	fset(newunit, FL_ISNEW);
+}
+#endif		

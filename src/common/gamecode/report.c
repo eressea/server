@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.4 2001/01/28 08:50:46 enno Exp $
+ *	$Id: report.c,v 1.5 2001/01/30 23:16:16 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -3068,6 +3068,26 @@ writemonument(void)
 }
 
 static void
+writeadresses()
+{
+	faction *f;
+	FILE * F;
+	char zText[MAX_PATH];
+	sprintf(zText, "%s/adressen", basepath());
+	F = cfopen(zText, "w");
+	if (!F) return;
+
+	/* adressen liste */
+
+	for (f = factions; f; f = f->next) {
+		if (f->no != MONSTER_FACTION) {
+			fprintf(F, "%s:%s:%s\n", factionname(f), f->email, f->banner);
+		}
+	}
+	fclose(F);
+}
+
+static void
 writeforward(void)
 {
 	FILE *forwardFile;
@@ -3095,7 +3115,7 @@ writeforward(void)
 void
 report_summary(summary * s, summary * o, boolean full)
 {
-	FILE * F;
+	FILE * F = NULL;
 	int i, newplayers = 0;
 	faction * f;
 	int nmrs[ORDERGAP];
@@ -3210,30 +3230,25 @@ report_summary(summary * s, summary * o, boolean full)
 
 	fclose(F);
 
-	if (!full) {
+	if (full) {
+		FILE * F;
 #ifdef PLAYER_CSV
 		region * r;
 #endif
-		FILE * F;
-		char zText[MAX_PATH];
-		if (full) {
-			sprintf(zText, "%s/adressen", basepath());
-			F = cfopen(zText, "w");
-		}
-		if (!F) return;
 		printf("Schreibe Liste der Adressen (adressen)...\n");
-		writeadresses("adressen");
+		writeadresses();
 		writeforward();
-		fclose(F);
 
 		{
+			char zText[MAX_PATH];
 			sprintf(zText, "%s/datum", basepath());
 			F = cfopen(zText, "w");
+			if (!F) return;
 		}
-		if (!F) return;
 		printf("Schreibe Datum (datum)...\n");
 		fputs(gamedate2(), F);
 		fclose(F);
+
 #ifdef PLAYER_CSV
 		{
 			strcpy(zText, "%s/players", basepath());
