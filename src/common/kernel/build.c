@@ -68,7 +68,7 @@
 
 
 static boolean
-CheckOverload()
+CheckOverload(void)
 {
   static int value = -1;
   if (value<0) {

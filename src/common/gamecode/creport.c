@@ -419,7 +419,7 @@ creport_cleanup(void)
 	junkyard = 0;
 }
 
-static int msgno;
+/*static int msgno; */
 
 #define MTMAXHASH 1023
 

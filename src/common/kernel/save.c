@@ -1512,9 +1512,9 @@ addally(const faction * f, ally ** sfp, int aid, int state)
   if (af!=NULL && af->alliance!=f->alliance) state &= ~ALLIES_ONLY;;
 # else
 # endif
-  if (af!=NULL && af->alliance!=f->alliance) return;
+  if (af!=NULL && af->alliance!=f->alliance) return sfp;
 #endif
-  if (state==0) return;
+  if (state==0) return sfp;
 
   sf = calloc(1, sizeof(ally));
   sf->faction = af;
@@ -1523,7 +1523,7 @@ addally(const faction * f, ally ** sfp, int aid, int state)
 
   while (*sfp) sfp=&(*sfp)->next;
   *sfp = sf;
-  return &sf;
+  return &sf->next;
 }
 
 /** Reads a faction from a file.

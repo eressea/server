@@ -54,7 +54,7 @@
 #define TEACHNUMBER 10
 
 static boolean
-ExpensiveMigrants()
+ExpensiveMigrants(void)
 {
   int value = -1;
   if (value<0) {

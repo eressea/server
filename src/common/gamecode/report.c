@@ -104,7 +104,7 @@ char *agename;
 int  seasons;
 
 static const char*
-MailitPath()
+MailitPath(void)
 {
   static const char * value = NULL;
   if (value==NULL) {
