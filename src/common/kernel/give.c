@@ -74,12 +74,6 @@ add_give(unit * u, unit * u2, int n, const resource_type * rtype, struct order *
 }
 
 static void
-addgive(unit * u, unit * u2, int n, resource_t res, struct order * ord, int error)
-{
-  add_give(u, u2, n, oldresourcetype[res], ord, error);
-}
-
-static void
 give_peasants(int n, const item_type * itype, unit * src)
 {
   region *r = src->region;
