@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: creport.c,v 1.11 2001/02/25 19:31:38 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -67,7 +66,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define C_REPORT_VERSION 55
+#define C_REPORT_VERSION 56
 #define NEWBLOCKS (C_REPORT_VERSION>=35)
 
 #define ENCODE_SPECIAL 1
@@ -113,6 +112,13 @@ print_curses(FILE * F, void * obj, typ_t typ, attrib *a, int self)
 				}
 				fprintf(F, "\"%s\"\n", buf);
 			}
+		} else if (a->type==&at_effect && self) {
+			effect_data * data = (effect_data *)a->data.v;
+			if (!header) {
+				header = 1;
+				fputs("EFFECTS\n", F);
+			}
+			fprintf(F, "\"%d %s\"\n", data->value, locale_string(NULL, resourcename(data->type->itype->rtype, 0)));
 		}
 		a = a->next;
 	}
@@ -470,10 +476,6 @@ cr_output_unit(FILE * F, region * r,
 		else if (i<0)
 			fprintf(F, "%d;alias\n", -i);
 		i = get_money(u);
-#ifdef OLD_SILBER
-		if (i)
-			fprintf(F, "%d;Silber\n", i);
-#endif
 		if (u->status)
 			fprintf(F, "%d;Kampfstatus\n", u->status);
 		i = u_geteffstealth(u);
@@ -539,16 +541,6 @@ cr_output_unit(FILE * F, region * r,
 			}
 		}
 	}
-#ifdef OLD_SILBER
-	/* silver information for other units */
-	else {
-		int i = get_money(u);
-		if (i / u->number >= 5000)
-			fprintf(F, "%d;Silber\n", 5000 * u->number);
-		else if (i / u->number >= 500)
-			fprintf(F, "%d;Silber\n", 500 * u->number);
-	}
-#endif
 	/* items */
 	pr = 0;
 	if (f == u->faction || u->faction->race==RC_ILLUSION) {

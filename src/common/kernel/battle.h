@@ -169,9 +169,12 @@ typedef struct fighter {
 		struct weapon * secondary;     /* defensive weapon */
 	} * person;
 	int flags;
-	int run_number;  /* number of people who have flown */
-	int run_hp;      /* accumulated hp of fleeing people */
-	struct region *run_to;  /* destination of fleeing people */
+	struct {
+		int number;  /* number of people who have flown */
+		int hp;      /* accumulated hp of fleeing people */
+		struct region *region;  /* destination of fleeing people */
+		struct item * items; /* items they take */
+	} run;
 	int action_counter;	/* number of active actions the struct unit did in the fight */
 #ifdef SHOW_KILLS
 	int kills;
@@ -230,5 +233,6 @@ extern struct region * fleeregion(const struct unit * u);
 extern boolean enemy (const struct side * a, const struct side * b);
 extern struct troop select_corpse(struct battle * b, struct fighter * af);
 extern fighter * make_fighter(struct battle * b, struct unit * u, boolean attack);
+void flee(const troop dt);
 
 #endif

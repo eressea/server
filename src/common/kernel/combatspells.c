@@ -1153,6 +1153,9 @@ sp_reeling_arrows(fighter * fi, int level, int force, spell * sp)
 int
 sp_denyattack(fighter * fi, int level, int power, spell * sp)
 {
+/* Magier weicht dem Kampf aus. Wenn er sich bewegen kann, zieht er in
+ * eine Nachbarregion, wobei ein NACH berücksichtigt wird. Ansonsten
+ * bleibt er stehen und nimmt nicht weiter am Kampf teil. */
 	side *sf = fi->side;
 	battle *b = fi->side->battle;
 	unit *mage = fi->unit;
@@ -1173,26 +1176,26 @@ sp_denyattack(fighter * fi, int level, int power, spell * sp)
 	if (igetkeyword(mage->thisorder) == K_MOVE
 				|| igetkeyword(mage->thisorder) == K_ROUTE)
 	{
-		fi->run_to = movewhere(r, mage);
-		if (!fi->run_to) {
+		fi->run.region = movewhere(r, mage);
+		if (!fi->run.region) {
 			cmistake(mage, findorder(mage, mage->thisorder), 71, MSG_MOVE);
-			fi->run_to = fleeregion(mage);
+			fi->run.region = fleeregion(mage);
 		}
 	} else {
-		fi->run_to = fleeregion(mage);
+		fi->run.region = fleeregion(mage);
 	}
-	travel(r, mage, fi->run_to, 1);
+	travel(r, mage, fi->run.region, 1);
 
 	/* wir tun so, als wäre die Person geflohen */
-	fi->run_hp = mage->hp; /* Magier sind immer Einzelpersonen */
-	fi->run_number = mage->number;
-	fi->alive = 0;
 	fset(fi, FIG_NOLOOT);
+	fi->run.hp = mage->hp;
+	fi->run.number = mage->number;
+	fi->alive = 0;
 	sf->size[SUM_ROW] -= mage->number;
 	sf->size[mage->status + FIGHT_ROW] -= mage->number;
 
-	scat("Das Kampfgetümmel erstirbt und der Magier kann unbehelligt "
-			"seines Wege ziehen.");
+	scat("Das Kampfgetümmel erstirbt und er kann unbehelligt "
+			"seines Weges ziehen.");
 	battlerecord(b, buf);
 	return level;
 }
@@ -1529,11 +1532,11 @@ sp_undeadhero(fighter * fi, int level, int force, spell * sp)
 		if (nonplayer(du))
 			continue;
 
-		if (df->alive + df->run_number < du->number) {
+		if (df->alive + df->run.number < du->number) {
 			j = 0;
 
 			/* Wieviele Untote können wir aus dieser Einheit wecken? */
-			for (n = df->alive + df->run_number; n <= du->number; n++) {
+			for (n = df->alive + df->run.number; n <= du->number; n++) {
 				if (!k) break;
 
 				if (chance(c)) {

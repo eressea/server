@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: build.c,v 1.8 2001/02/18 10:06:09 enno Exp $
+ *	$Id: build.c,v 1.9 2001/03/04 18:41:25 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -388,19 +388,19 @@ build_road(region * r, unit * u, int size, direction_t d)
 
 	if (rterrain(r) == T_SWAMP)
 		/* wenn kein Damm existiert */
-		if (!gebaeude_vorhanden(r, &bt_dam)) {
+		if (!buildingtype_exists(r, &bt_dam)) {
 			cmistake(u, findorder(u, u->thisorder), 132, MSG_PRODUCE);
 			return;
 		}
 	if (rterrain(r) == T_DESERT)
 		/* wenn keine Karawanserei existiert */
-		if (!gebaeude_vorhanden(r, &bt_caravan)) {
+		if (!buildingtype_exists(r, &bt_caravan)) {
 			cmistake(u, findorder(u, u->thisorder), 133, MSG_PRODUCE);
 			return;
 		}
 	if (rterrain(r) == T_GLACIER)
 		/* wenn kein Tunnel existiert */
-		if (!gebaeude_vorhanden(r, &bt_tunnel)) {
+		if (!buildingtype_exists(r, &bt_tunnel)) {
 			cmistake(u, findorder(u, u->thisorder), 131, MSG_PRODUCE);
 			return;
 		}
@@ -689,7 +689,7 @@ build_building(unit * u, const building_type * btype, int want)
 	if (!b && u->building && u->building->type==btype) b = u->building;
 	if (b) btype = b->type;
 
-	if (fval(btype, BTF_UNIQUE) && gebaeude_vorhanden(r, btype) != (unit *) NULL) {
+	if (fval(btype, BTF_UNIQUE) && buildingtype_exists(r, btype)) {
 		/* only one of these per region */
 		cmistake(u, findorder(u, u->thisorder), 93, MSG_PRODUCE);
 		return;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.14 2001/02/19 16:45:23 katze Exp $
+ *	$Id: movement.c,v 1.15 2001/03/04 18:41:25 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1240,7 +1240,7 @@ ship_ready(region * r, unit * u)
 }
 
 unit *
-gebaeude_vorhanden(const region * r, const building_type * bt)
+owner_buildingtyp(const region * r, const building_type * bt)
 {
 	building *b;
 	unit *owner;
@@ -1255,6 +1255,38 @@ gebaeude_vorhanden(const region * r, const building_type * bt)
 	}
 
 	return NULL;
+}
+
+boolean
+buildingtype_exists(const region * r, const building_type * bt)
+{
+	building *b;
+
+	for (b = rbuildings(r); b; b = b->next) {
+		if (b->type == bt) {
+			if (b->size >= bt->maxsize) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+boolean
+check_working_buildingtype(const region * r, const building_type * bt)
+{
+	building *b;
+
+	for (b = rbuildings(r); b; b = b->next) {
+		if (b->type == bt) {
+			if (b->size >= bt->maxsize && fval(b, BLD_WORKING)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 /* Prüft, ob Ablegen von einer Küste in eine der erlaubten Richtungen erfolgt. */
@@ -1273,7 +1305,7 @@ check_takeoff(ship *sh, region *from, region *to)
 		coastl  = (direction_t)((coast+MAXDIRECTIONS-1) % MAXDIRECTIONS);
 
 		if(dir != coast && dir != coastl && dir != coastr
-			&& gebaeude_vorhanden(from, &bt_harbour) == NULL)
+			&& check_working_buildingtype(from, &bt_harbour) == false)
 		{
 			return false;
 		}
@@ -1282,10 +1314,11 @@ check_takeoff(ship *sh, region *from, region *to)
 	return true;
 }
 
-boolean ship_allowed(const struct ship_type * type, region * r)
+boolean 
+ship_allowed(const struct ship_type * type, region * r)
 {
 	int c = 0;
-	if (gebaeude_vorhanden(r, &bt_harbour)) return true;
+	if (check_working_buildingtype(r, &bt_harbour)) return true;
 	for (c=0;type->coast[c]!=NOTERRAIN;++c) {
 		if (type->coast[c]==rterrain(r)) return true;
 	}
@@ -1549,7 +1582,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 
 		/* Hafengebühren ? */
 
-		hafenmeister = gebaeude_vorhanden(current_point, &bt_harbour);
+		hafenmeister = owner_buildingtyp(current_point, &bt_harbour);
 		if (sh && hafenmeister != NULL) {
 			item * itm;
 			assert(trans==NULL);
@@ -2000,7 +2033,6 @@ movement(void)
 					move(r, u, true);
 					set_string(&u->thisorder, "");
 					up = &r->units;
-					/* if (u==*up) up = &u->next; Blödsinn */
 				}
 				break;
 			default:

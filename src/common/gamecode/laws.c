@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.32 2001/02/28 22:14:56 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -235,7 +234,10 @@ get_food(region *r)
 {
 	unit *u;
 
-	/* 1. Versorgung von eigenen Einheiten */
+	/* 1. Versorgung von eigenen Einheiten. Das vorhandene Silber
+	 * wird zunächst so auf die Einheiten aufgeteilt, dass idealerweise
+	 * jede Einheit genug Silber für ihren Unterhalt hat. */
+
 	for (u = r->units; u; u = u->next) {
 		int need = lifestyle(u);
 
@@ -247,7 +249,7 @@ get_food(region *r)
 			unit *v;
 
 			for (v = r->units; need && v; v = v->next)
-				if (v->faction == u->faction && !is_monstrous(u)) {
+				if (v->faction == u->faction && !is_monstrous(v)) {
 					int give = get_money(v) - lifestyle(v);
 					give = max(0, give);
 					give = min(need, give);
@@ -260,11 +262,10 @@ get_food(region *r)
 		}
 	}
 
-	/* 2. Versorgung durch Fremde: */
+	/* 2. Versorgung durch Fremde. Das Silber alliierter Einheiten wird
+	 * entsprechend verteilt. */
 	for (u = r->units; u; u = u->next) {
 		int need = lifestyle(u);
-		/* Negative Silberbeträge kommen vor (Bug), deshalb geht
-		 * need -= u->money nicht. */
 
 		need -= max(0, get_money(u));
 
@@ -273,7 +274,7 @@ get_food(region *r)
 
 			for (v = r->units; need && v; v = v->next)
 				if (v->faction != u->faction && allied(v, u->faction, HELP_MONEY)
-						&& !is_monstrous(u)) {
+						&& !is_monstrous(v)) {
 					int give = lifestyle(v);
 					give = max(0, get_money(v) - give);
 					give = min(need, give);
@@ -747,7 +748,7 @@ demographics(void)
 			if (r->land) for (dmd=r->land->demands;dmd;dmd=dmd->next) {
 				if (dmd->value>0 && dmd->value < MAXDEMAND) {
 					int rise = DMRISE;
-					if (gebaeude_vorhanden(r, &bt_harbour)) rise = DMRISEHAFEN;
+					if (buildingtype_exists(r, &bt_harbour)) rise = DMRISEHAFEN;
 					if (rand() % 100 < rise) dmd->value++;
 				}
 			}
@@ -756,7 +757,7 @@ demographics(void)
 			for (n = 0; n != MAXLUXURIES; n++) {
 				int d = rdemand(r, n);
 				if (d > 0 && d < MAXDEMAND) {
-					if (gebaeude_vorhanden(r, &bt_harbour)) {
+					if (buildingtype_exists(r, &bt_harbour)) {
 						if (rand() % 100 < DMRISEHAFEN) {
 							d++;
 						}
@@ -2901,6 +2902,27 @@ defaultorders (void)
 void write_skillfix(void);
 #endif
 
+/* ************************************************************ */
+/* GANZ WICHTIG! ALLE GEÄNDERTEN SPRÜCHE NEU ANZEIGEN */
+/* GANZ WICHTIG! FÜGT AUCH NEUE ZAUBER IN DIE LISTE DER BEKANNTEN EIN */
+/* ************************************************************ */
+static void
+update_spells(void)
+{
+	region *r;
+	for(r=regions; r; r=r->next) {
+		unit *u;
+		for(u=r->units;u;u=u->next) {
+			sc_mage *m = get_mage(u);
+			if (u->faction->no != MONSTER_FACTION && m != NULL) {
+				if (m->magietyp == M_GRAU) continue;
+				updatespelllist(u);
+			}
+		}
+	}
+
+}
+
 void
 processorders (void)
 {
@@ -3065,6 +3087,9 @@ processorders (void)
 #ifdef SKILLFIX_SAVE
 	write_skillfix();
 #endif
+	/* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
+	 * Beschreibungen geändert haben */
+	update_spells();
 }
 
 int

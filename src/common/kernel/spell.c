@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.c,v 1.12 2001/02/18 10:06:09 enno Exp $
+ *	$Id: spell.c,v 1.13 2001/03/04 18:41:25 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -3070,7 +3070,7 @@ sp_unholypower(castorder *co)
 
 	for (i = 0; i < pa->length && n > 0; i++) {
 		race_t target_race;
-		unit *u = pa->param[n]->data.u;
+		unit *u = pa->param[i]->data.u;
 
 		switch(u->race) {
 		case RC_SKELETON:

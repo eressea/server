@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.19 2001/02/28 22:14:56 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1206,7 +1205,7 @@ statistics(FILE * F, region * r, faction * f)
 				p / RECRUITFRACTION);
 		rps(F, buf);
 
-		if (gebaeude_vorhanden(r, &bt_caravan)) {
+		if (buildingtype_exists(r, &bt_caravan)) {
 			sprintf(buf, "Luxusgüter zum angegebenen Preis: %d",
 				(p * 2) / TRADE_FRACTION);
 		} else {

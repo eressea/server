@@ -28,7 +28,7 @@ forest_trail;de;der Wald von %s
 swamp_trail;de;der Sumpf von %s
 desert_trail;de;die Wüste von %s
 highland_trail;de;das Hochland von %s
-mountain_trail;de;die Berge von %s
+mountain_trail;de;das Bergland von %s
 glacier_trail;de;der Gletscher von %s
 firewall_trail;de;eine %s
 grassland_trail;de;die Steppe von %s
@@ -357,3 +357,4 @@ p14s;de;Heiltränke
 
 # Spezialitems
 lmsreward;de;Gürtel der Heldentaten
+lmsrewards;de;Gürtel der Heldentaten

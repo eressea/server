@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: economy.c,v 1.8 2001/02/25 19:31:38 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1982,7 +1981,7 @@ expandselling(region * r, request * sellorders)
 		}
 	}
 
-	hafenowner = gebaeude_vorhanden(r, &bt_harbour);
+	hafenowner = owner_buildingtyp(r, &bt_harbour);
 
 	if (maxb != (building *) NULL && maxowner != (unit *) NULL) {
 		maxeffsize = buildingeffsize(maxb, false);
@@ -2000,7 +1999,7 @@ expandselling(region * r, request * sellorders)
 	 * multiplier speichert r->demand für die debug message ab. */
 
 	max_products = rpeasants(r) / TRADE_FRACTION;
-	if (rterrain(r) == T_DESERT && gebaeude_vorhanden(r, &bt_caravan)) {
+	if (rterrain(r) == T_DESERT && buildingtype_exists(r, &bt_caravan)) {
 		max_products = rpeasants(r) * 2 / TRADE_FRACTION;
 	}
 	/* Verkauf: so programmiert, dass er leicht auf mehrere Gueter pro
@@ -2130,7 +2129,7 @@ sell(region * r, unit * u, request ** sellorders, const char * cmd)
 	s = getstrtoken();
 	if (findparam(s) == P_ANY) {
 		n = (rpeasants(r) - rpeasants(r) / RECRUITFRACTION) / TRADE_FRACTION;
-		if (rterrain(r) == T_DESERT && gebaeude_vorhanden(r, &bt_caravan))
+		if (rterrain(r) == T_DESERT && buildingtype_exists(r, &bt_caravan))
 			n *= 2;
 	} else
 		n = atoi(s);

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.h,v 1.3 2001/02/18 10:06:09 enno Exp $
+ *	$Id: movement.h,v 1.4 2001/03/04 18:41:25 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -62,5 +62,6 @@ extern attrib_type at_piracy_direction;
 void follow(void);
 
 struct building_type;
-struct unit *gebaeude_vorhanden(const struct region * r, const struct building_type * bt);
+boolean buildingtype_exists(const struct region * r, const struct building_type * bt);
+struct unit* owner_buildingtyp(const struct region * r, const struct building_type * bt);
 #endif

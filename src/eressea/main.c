@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.18 2001/02/18 10:06:10 enno Exp $
+ *	$Id: main.c,v 1.19 2001/03/04 18:41:27 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -88,6 +88,7 @@ extern boolean nomer;
 extern boolean nomsg;
 extern boolean nobattle;
 extern boolean nobattledebug;
+static boolean printpotions;
 
 #ifdef FUZZY_BASE36
 extern int fuzzy_hits;
@@ -102,7 +103,6 @@ struct settings global = {
 
 extern void render_init(void);
 
-#if 0
 static void
 print_potions(FILE * F)
 {
@@ -116,7 +116,6 @@ print_potions(FILE * F)
 		}
 	}
 }
-#endif
 
 static char * orders = NULL;
 static int nowrite = 0;
@@ -148,8 +147,11 @@ game_init(void)
 		abort();
 	}
 #endif
-/*	print_potions(stdout);
-	exit(0); */
+	if (printpotions) {
+		FILE * F = fopen("recipes.txt", "w");
+		print_potions(F);
+		fclose(F);
+	}
 }
 
 void
@@ -436,6 +438,7 @@ usage(const char * prog, const char * arg)
 		"-r resdir        : gibt das resourceverzeichnis an\n"
 		"-t turn          : read this datafile, not the most current one\n"
 		"-o reportdir     : gibt das reportverzeichnis an\n"
+		"-l logfile       : specify an alternative logfile\n"
 		"--nomsg          : keine Messages (RAM sparen)\n"
 		"--nobattle       : keine Kämpfe\n"
 		"--nodebug        : keine Logfiles für Kämpfe\n"
@@ -474,6 +477,9 @@ read_args(int argc, char **argv)
 		} else switch(argv[i][1]) {
 			case 'o':
 				g_reportdir = argv[++i];
+				break;
+			case 'D': /* DEBUG */
+				printpotions = true;
 				break;
 			case 'd':
 				g_datadir = argv[++i];

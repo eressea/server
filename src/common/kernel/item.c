@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.13 2001/02/18 08:37:57 enno Exp $
+ *	$Id: item.c,v 1.14 2001/03/04 18:41:25 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1348,8 +1348,8 @@ init_olditems(void)
 				if (!strcmp(translation[ci][0], itemdata[i].name[0])) {
 					name[0] = translation[ci][1];
 					name[1] = translation[ci][2];
-					appearance[0] = translation[ci][2];
-					appearance[1] = translation[ci][3];
+					appearance[0] = translation[ci][3];
+					appearance[1] = translation[ci][4];
 				}
 			}
 		}
@@ -1978,7 +1978,6 @@ init_resources(void)
 }
 
 int 
-
 get_money(const unit * u)
 {
 	const item * i = u->items;
@@ -1987,7 +1986,8 @@ get_money(const unit * u)
 	return i->number;
 }
 
-int set_money(unit * u, int v)
+int 
+set_money(unit * u, int v)
 {
 	item ** ip = &u->items;
 	while (*ip && (*ip)->type!=i_silver) ip = &(*ip)->next;

@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.23 2001/02/25 19:31:39 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -462,7 +461,7 @@ readfaction(void)
 		f->lastorders = turn;
 
 	} else
-		printf(" WARNUNG: Befehle für die ungültige Partei Nr. %s;", fid);
+		log_warning(("Befehle für die ungültige Partei %s\n", fid));
 
 	return f;
 }

@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.19 2001/02/24 12:50:47 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -368,7 +367,7 @@ select_corpse(battle * b, fighter * af)
 	for_each(df, b->fighters) {
 		/* Geflohene haben auch 0 hp, dürfen hier aber nicht ausgewählt
 		 * werden! */
-		int dead = df->unit->number - (df->alive + df->run_number);
+		int dead = df->unit->number - (df->alive + df->run.number);
 		if (nonplayer(df->unit)) continue;
 
 		if (af && !helping(af->side, df->side))
@@ -533,7 +532,7 @@ reportcasualties(battle * b, fighter * fig)
 	for (bf = b->factions;bf;bf=bf->next) {
 		faction * f = bf->faction;
 		struct message * m = new_message(f, "casualties%u:unit%r:runto%i:run%i:alive%i:fallen",
-		fig->unit, fig->run_to, fig->run_number, fig->alive, fig->unit->number - fig->alive - fig->run_number);
+		fig->unit, fig->run.region, fig->run.number, fig->alive, fig->unit->number - fig->alive - fig->run.number);
 		brecord(f, fig->unit->region, m);
 	}
 }
@@ -825,19 +824,19 @@ remove_troop(troop dt)
 	if (!df->alive) {
 		switch (du->race) {
 		case RC_FIREDRAGON:
-			change_item(du, I_DRACHENBLUT, du->number-df->run_number);
+			change_item(du, I_DRACHENBLUT, du->number-df->run.number);
 			break;
 		case RC_DRAGON:
-			change_item(du, I_DRACHENBLUT, (du->number-df->run_number) * 4);
-			change_item(du, I_DRAGONHEAD, du->number-df->run_number);
+			change_item(du, I_DRACHENBLUT, (du->number-df->run.number) * 4);
+			change_item(du, I_DRAGONHEAD, du->number-df->run.number);
 			break;
 		case RC_WYRM:
-			change_item(du, I_DRACHENBLUT, (du->number-df->run_number) * 10);
-			change_item(du, I_DRAGONHEAD, du->number-df->run_number);
+			change_item(du, I_DRACHENBLUT, (du->number-df->run.number) * 10);
+			change_item(du, I_DRAGONHEAD, du->number-df->run.number);
 			break;
 		case RC_SEASERPENT:
-			change_item(du, I_DRACHENBLUT, (du->number-df->run_number) * 6);
-			change_item(du, I_SEASERPENTHEAD, du->number-df->run_number);
+			change_item(du, I_DRACHENBLUT, (du->number-df->run.number) * 6);
+			change_item(du, I_SEASERPENTHEAD, du->number-df->run.number);
 			break;
 
 		}
@@ -2050,78 +2049,46 @@ loot_items(fighter * corpse)
 	u->items = NULL;
 
 	while (itm) {
-		const item_type * itype = itm->type;
 		int i;
-		int keep, give;
-		if (corpse->run_number) {
-			/* es gibt flüchtlinge */
-			if (itype->capacity>0 || fval(itype, ITF_ANIMAL)) {
-				/* Regeländerung: Man muß das Tier nicht reiten können,
-				 * um es vom Schlachtfeld mitzunehmen, ist ja nur
-				 * eine Region weit. * */
-				keep = min(corpse->run_number, itm->number);
-			} else if (itm->type->weight <= 0) {
-				/* if it doesn't weigh anything, it won't slow us down */
-				keep = min(corpse->run_number, itm->number);
-			}
-			else keep = 0;
-			give = itm->number-keep;
-		}
-		else {
-			keep = 0;
-			give = itm->number;
-		}
-		if (give) for (i = 10; i != 0; i--) {
-			int loot = give / i;
-			give -= loot;
-			/* Looten tun hier immer nur die Gegner. Das
-			 * ist als Ausgleich für die neue Loot-regel
-			 * (nur ganz tote Einheiten) fair.
-			 * zusätzlich looten auch geflohene, aber
-			 * nach anderen Regeln.
-			 */
-			if (loot>0 && (itm->type->flags & (ITF_CURSED|ITF_NOTLOST)
-					|| rand()%100 >= 50 - corpse->side->battle->keeploot)) {
-				fighter *fig = select_enemy(corpse, FIGHT_ROW, LAST_ROW).fighter;
-				if (fig) {
-					item * l = fig->loot;
-					while (l && l->type!=itm->type) l=l->next;
-					if (!l) {
-						l = calloc(sizeof(item), 1);
-						l->next = fig->loot;
-						fig->loot = l;
-						l->type = itm->type;
+		if (itm->number) {
+			for (i = 10; i != 0; i--) {
+				int loot = itm->number / i;
+				itm->number -= loot;
+				/* Looten tun hier immer nur die Gegner. Das
+				 * ist als Ausgleich für die neue Loot-regel
+				 * (nur ganz tote Einheiten) fair.
+				 * zusätzlich looten auch geflohene, aber
+				 * nach anderen Regeln.
+				 */
+				if (loot>0 && (itm->type->flags & (ITF_CURSED|ITF_NOTLOST)
+						|| rand()%100 >= 50 - corpse->side->battle->keeploot)) {
+					fighter *fig = select_enemy(corpse, FIGHT_ROW, LAST_ROW).fighter;
+					if (fig) {
+						item * l = fig->loot;
+						while (l && l->type!=itm->type) l=l->next;
+						if (!l) {
+							l = calloc(sizeof(item), 1);
+							l->next = fig->loot;
+							fig->loot = l;
+							l->type = itm->type;
+						}
+						l->number += loot;
 					}
-					l->number += loot;
 				}
 			}
 		}
-		if (keep) {
-			item * i = i_remove(&itm, itm);
-			i->number = keep;
-			i_add(&u->items, i);
-		} else {
-			i_free(i_remove(&itm, itm));
-		}
+		itm = itm->next;
 	}
 }
 
-void
-loot_fleeing(unit* u, unit* runner) {
-	/* die einheit runner nimmt von der einheit u soviel sie kann
-	 * in die nächste region mit. hier geschieht allerdings nur
-	 * der transfer, nicht die eigentliche flucht */
-	int money = get_money(u) * runner->number / (u->number + runner->number);
-
-	money = min(money, runner->number * (PERSONCAPACITY(u) - race[u->race].weight) / SILVERWEIGHT);
-	set_money(runner, money);
-	change_money(u, -money);
-	if (effskill(runner, SK_RIDING) > 0) {
-		int horses = min(get_item(u, I_HORSE), runner->number);
-
-		change_item(runner, I_HORSE, horses);
-		change_item(u, I_HORSE, -horses);
-	}
+static void
+loot_fleeing(fighter* fig, unit* runner) 
+{
+	/* TODO: Vernünftig fixen */
+	runner->items = NULL;
+	assert(runner->items == NULL);
+	runner->items = fig->run.items;
+	fig->run.items = NULL;
 }
 
 static boolean
@@ -2164,7 +2131,7 @@ aftermath(battle * b)
 		}
 
 		dead = du->number - df->alive;
-		dead -= df->run_number;
+		dead -= df->run.number;
 #ifdef TROLLSAVE
 		/* Trolle können regenerieren */
 		if (df->alive > 0 && dead && du->race == RC_TROLL)
@@ -2230,7 +2197,7 @@ aftermath(battle * b)
 
 		for_each(df, s->fighters) {
 			unit *du = df->unit;
-			int dead = du->number - df->alive - df->run_number;
+			int dead = du->number - df->alive - df->run.number;
 			int sum_hp = 0;
 			int n;
 
@@ -2246,20 +2213,20 @@ aftermath(battle * b)
 			}
 
 			s->dead += dead;
-			s->flee += df->run_number;
+			s->flee += df->run.number;
 
 			if (df->alive == du->number) continue; /* nichts passiert */
 
 			reportcasualties(b, df);
-			scale_number(du, df->alive + df->run_number);
-			du->hp = sum_hp + df->run_hp;
+			scale_number(du, df->alive + df->run.number);
+			du->hp = sum_hp + df->run.hp;
 
 			/* die weggerannten werden später subtrahiert! */
 			assert(du->number >= 0);
 
 			/* Report the casualties */
 
-			if (df->run_hp) {
+			if (df->run.hp) {
 				/* Sonderbehandlung für sich auflösende Einheiten wie Wölfe,
 				 * diese fliehen nicht in eine Nachbarregion sondern kehren
 				 * nach dem Kampf zu ihrer Einheit zurück */
@@ -2270,14 +2237,15 @@ aftermath(battle * b)
 					continue;
 				}
 				if (df->alive == 0) {
-					scale_number(du, df->run_number);
-					du->hp = df->run_hp;
+					scale_number(du, df->run.number);
+					du->hp = df->run.hp;
 					/* Distribute Loot */
-					if (!fval(df, FIG_NOLOOT)) {
+					if (!fval(df,FIG_NOLOOT)){
+						loot_fleeing(df, du);
 						loot_items(df);
 					}
 				} else {
-					unit *nu = createunit(du->region, du->faction, df->run_number, du->race);
+					unit *nu = createunit(du->region, du->faction, df->run.number, du->race);
 					skill_t sk;
 
 					for (sk = 0; sk != MAXSKILLS; ++sk) {
@@ -2300,7 +2268,7 @@ aftermath(battle * b)
 					nu->irace = du->irace;
 					/* Fliehenden nehmen mit, was sie tragen können*/
 
-					loot_fleeing(du, nu);
+					loot_fleeing(df, nu);
 					set_string(&nu->lastorder, du->lastorder);
 
 					scale_number(du, df->alive);
@@ -2308,24 +2276,22 @@ aftermath(battle * b)
 					du = nu;
 				}
 				set_string(&du->thisorder, "");
-				du->hp = df->run_hp;
+				du->hp = df->run.hp;
 				setguard(du, GUARD_NONE);
 				fset(du, FL_MOVED);
 				leave(du->region, du);
-				if (df->run_to) travel(r, du, df->run_to, 1);
+				if (df->run.region) travel(r, du, df->run.region, 1);
 			}
-			else if (df->alive==0) {
+			else if (df->alive==0) { /* alle sind tot, niemand geflohen. Einheit auflösen */
 				setguard(du, GUARD_NONE);
 				scale_number(du, 0);
 				/* Distribute Loot */
-				if (!fval(df, FIG_NOLOOT)) {
-					loot_items(df);
-				}
+				loot_items(df);
 			}
 
 			if (!nonplayer_race(du->race)) {
 				/* tote im kampf werden zu regionsuntoten: 
-				 * for each o them, a peasant will die as well */
+				 * for each of them, a peasant will die as well */
 				is += dead;
 			}
 		} next(df);
@@ -3237,6 +3203,50 @@ join_allies(battle * b)
 	}
 }
 
+extern struct item_type * i_silver;
+
+void
+flee(const troop dt) 
+{
+	fighter * fig = dt.fighter;
+	unit * u = fig->unit;
+	int carry = PERSONCAPACITY(u) - race[u->race].weight;
+	int money;
+
+	item ** ip = &u->items;
+	while (*ip) {
+		item * itm = *ip;
+		const item_type * itype = itm->type;
+		int keep = 0;
+
+		if (itype->capacity>0 || fval(itype, ITF_ANIMAL)) {
+			/* Regeländerung: Man muß das Tier nicht reiten können,
+			 * um es vom Schlachtfeld mitzunehmen, ist ja nur
+			 * eine Region weit. * */
+			keep = min(1, itm->number);
+			carry += itype->capacity; /* TODO: ist da das weight des tiers mit drin? */
+		} else if (itm->type->weight <= 0) {
+			/* if it doesn't weigh anything, it won't slow us down */
+			keep = itm->number;
+		}
+		if (itm->number==keep && keep>0) {
+			i_add(&fig->run.items, i_remove(ip, itm));
+		}
+		if (*ip==itm) ip = &itm->next;
+	}
+
+	/* we will take money with us */
+	money = get_money(u);
+	if (money > carry) money = carry;
+	i_change(&u->items, i_silver, -money);
+	i_change(&fig->run.items, i_silver, +money);
+
+	fig->run.hp += fig->person[dt.index].hp;
+	++fig->run.number;
+
+	remove_troop(dt);
+}
+
 void
 do_battle(void)
 {
@@ -3257,7 +3267,7 @@ do_battle(void)
 		}
 #endif
 
-		/* list_foreach geht nicht, wegen flee() */
+		/* list_foreach geht nicht, wegen flucht */
 		for (u = r->units; u != NULL; u = u->next) {
 			if (fval(u, FL_LONGACTION)) continue;
 			if (u->number > 0) {
@@ -3474,8 +3484,8 @@ do_battle(void)
 					if (is_undead(u) || u->race == RC_SHADOWKNIGHT) continue;
 					if (u->ship) continue;
 					dt.fighter = fig;
-					if (!fig->run_to) fig->run_to = fleeregion(u);
-					r = fig->run_to;
+					if (!fig->run.region) fig->run.region = fleeregion(u);
+					r = fig->run.region;
 					if (!r)
 						continue;
 					dt.index = fig->alive - fig->removed;
@@ -3501,9 +3511,7 @@ do_battle(void)
 							}
 							if (chance(min(fleechance(u)+ispaniced, 0.90))) {
 								++runners;
-								fig->run_hp += fig->person[dt.index].hp;
-								++fig->run_number;
-								remove_troop(dt);
+								flee(dt);
 								if (b->small) {
 									sprintf(smallbuf, "%s/%d gelingt es, vom Schlachtfeld zu entkommen.",
 										unitname(fig->unit), dt.index);
