@@ -1343,16 +1343,26 @@ static int
 fix_plainherbs(void)
 {
 	region *r, *lastr = regions;
+	int p = 0, c, n = 0;
+	int count[6];
+	for (c=0;c!=6;++c) count[c]=0;
 	for (r=regions;r;r=r->next) {
 		int i;
 		const char * name;
 		terrain_t t = rterrain(r);
 		if (t!=T_PLAIN) continue;
+		++p;
 		name = LOC(default_locale, rherbtype(r)->itype->rtype->_name[0]);
-		for (i=0;i!=3;++i) if (strcmp(terrain[t].herbs[i], name)==0) break;
-		if (i!=3) lastr=r->next;
+		for (i=0;i!=6;++i) {
+			if (strcmp(terrain[t].herbs[i], name)==0) {
+				count[i]++;
+				break;
+			}
+		}
+		if (i<3 && r->age>20) lastr=r->next;
 		r=r->next;
 	}
+	for (c=0;c!=6;++c) log_warning(("Herbs %d : %d\n", c, count[c]));
 	for (r=lastr;r;r=r->next) {
 		terrain_t t = rterrain(r);
 		if (t!=T_PLAIN) continue;
@@ -1361,8 +1371,29 @@ fix_plainherbs(void)
 			const item_type * itype = finditemtype(name, default_locale);
 			const herb_type * htype = resource2herb(itype->rtype);
 			rsetherbtype(r, htype);
+			++n;
 		}
 	}
+	log_warning(("The herbs in %d of %d plains were adjusted\n", n, p));
+	p=0;
+	for (c=0;c!=6;++c) count[c]=0;
+	for (r=regions;r;r=r->next) {
+		int i;
+		const char * name;
+		terrain_t t = rterrain(r);
+		if (t!=T_PLAIN) continue;
+		++p;
+		name = LOC(default_locale, rherbtype(r)->itype->rtype->_name[0]);
+		for (i=0;i!=6;++i) {
+			if (strcmp(terrain[t].herbs[i], name)==0) {
+				count[i]++;
+				break;
+			}
+		}
+		r=r->next;
+	}
+	log_warning(("There are %d plains\n", p));
+	for (c=0;c!=6;++c) log_warning(("Herbs %d : %d\n", c, count[c]));
 	return 0;
 }
 
@@ -2722,7 +2753,7 @@ korrektur(void)
 	stats();
 	do_once("sql2", dump_sql());
 	do_once("fw01", fix_watchers());
-	do_once("fixh", fix_plainherbs());
+	do_once("fxh2", fix_plainherbs());
 #if NEW_RESOURCEGROWTH
 	/* do not remove do_once calls - old datafiles need them! */
 	do_once("rgrw", convert_resources());
