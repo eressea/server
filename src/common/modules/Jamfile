@@ -14,11 +14,11 @@ SOURCES =
  infocmd.c
  museum.c
  score.c
- victoryconditions.c
  weather.c
  wormhole.c
  xecmd.c
  xmas.c
  ;
+
 
 Library modules : $(SOURCES) ;

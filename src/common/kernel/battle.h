@@ -113,6 +113,7 @@ extern "C" {
 #define FL_COURAGE  8 /* Helden fliehen nie */
 #define FL_SLEEPING 16
 #define FL_STUNNED	32	/* eine Runde keinen Angriff */
+#define FL_HIT    	64	/* the person at attacked */
 
   /*** fighter::flags ***/
 #define FIG_ATTACKED   1

@@ -293,13 +293,31 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 	plane * pl;
 	request *o;
 	int recruitcost;
-  const struct race * rc = u->faction->race;
+  const faction * f = u->faction;
+  const struct race * rc = f->race;
+
+  init_tokens(ord);
+  skip_token();
+  n = geti();
+  if (f->no==MONSTER_FACTION) {
+    /* Monster dürfen REKRUTIERE 15 dracoid machen */
+    const char * str = getstrtoken();
+    if (str!=NULL && *str) {
+      for (rc = races;rc;rc=rc->next) {
+        if (strncasecmp(LOC(f->locale, rc->_name[0]), str, strlen(str))==0)
+          break;
+        if (strncasecmp(LOC(f->locale, rc->_name[1]), str, strlen(str))==0)
+          break;
+      }
+    }
+    if (rc==NULL) rc = f->race;
+  }
 
 #if GUARD_DISABLES_RECRUIT == 1
 	/* this is a very special case because the recruiting unit may be empty
 	* at this point and we have to look at the creating unit instead. This
 	* is done in cansee, which is called indirectly by is_guarded(). */
-	if(is_guarded(r, u, GUARD_RECRUIT)) {
+	if (is_guarded(r, u, GUARD_RECRUIT)) {
     cmistake(u, ord, 70, MSG_EVENT);
 		return;
 	}
@@ -374,10 +392,6 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 		}
 		else u->race = rc;
 	}
-
-  init_tokens(ord);
-  skip_token();
-  n = geti();
 
 	if (has_skill(u, SK_MAGIC)) {
 		/* error158;de;{unit} in {region}: '{command}' - Magier arbeiten

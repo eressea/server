@@ -1812,6 +1812,10 @@ hits(troop at, troop dt, weapon * awp)
 	if (!df->alive) return 0;
 	if (getreload(at)) return 0;
 	if (dist>1 && (awp == NULL || !fval(awp->type, WTF_MISSILE))) return 0;
+
+  /* mark this person as hit. */
+  af->person[dt.index].flags |= FL_HIT;
+
 	if (af->person[at.index].flags & FL_STUNNED) {
 			af->person[at.index].flags &= ~FL_STUNNED;
 		return 0;
@@ -3791,6 +3795,7 @@ do_battle(void)
           int runhp = min(600,(int)(0.9+unit_max_hp(u)*hpflee(u->status)));
           side *side = fig->side;
           if (fval(u->race, RCF_UNDEAD) || old_race(u->race) == RC_SHADOWKNIGHT) continue;
+
           if (u->ship) continue;
           dt.fighter = fig;
 #ifndef NO_RUNNING
@@ -3799,6 +3804,7 @@ do_battle(void)
 #endif
           dt.index = fig->alive - fig->removed;
           while (side->size[SUM_ROW] && dt.index != 0) {
+            double ispaniced = 0.0;
             --dt.index;
             assert(dt.index>=0 && dt.index<fig->unit->number);
             assert(fig->person[dt.index].hp > 0);
@@ -3809,30 +3815,37 @@ do_battle(void)
             * - in panik (Zauber)
             * aber nicht, wenn der Zaubereffekt Held auf dir liegt!
             */
-            if ((u->status == ST_FLEE
-              || (b->turn>1 && fig->person[dt.index].hp <= runhp)
-              || (fig->person[dt.index].flags & FL_PANICED))
-              && !(fig->person[dt.index].flags & FL_COURAGE))
-            {
-              double ispaniced = 0.0;
-              if (fig->person[dt.index].flags & FL_PANICED) {
-                ispaniced = EFFECT_PANIC_SPELL;
-              }
-              if (chance(min(fleechance(u)+ispaniced, 0.90))) {
-                ++runners;
-                flee(dt);
-#ifdef SMALL_BATTLE_MESSAGES
-                if (b->small) {
-                  sprintf(smallbuf, "%s/%d gelingt es, vom Schlachtfeld zu entkommen.",
-                    unitname(fig->unit), dt.index);
-                  battlerecord(b, smallbuf);
+            switch (u->status) {
+              case ST_FLEE:
+                run = true;
+                break;
+              default:
+                if ((fig->person[dt.index].flags & FL_HIT) == 0) continue;
+                if (b->turn<=1) continue; 
+                if (fig->person[dt.index].hp <= runhp) break;
+                if (fig->person[dt.index].flags & FL_PANICED) {
+                  if ((fig->person[dt.index].flags & FL_COURAGE)==0) break;
                 }
-              } else if (b->small) {
-                sprintf(smallbuf, "%s/%d versucht zu fliehen, wird jedoch aufgehalten.",
+                continue;
+            }
+
+            if (fig->person[dt.index].flags & FL_PANICED) {
+              ispaniced = EFFECT_PANIC_SPELL;
+            }
+            if (chance(min(fleechance(u)+ispaniced, 0.90))) {
+              ++runners;
+              flee(dt);
+#ifdef SMALL_BATTLE_MESSAGES
+              if (b->small) {
+                sprintf(smallbuf, "%s/%d gelingt es, vom Schlachtfeld zu entkommen.",
                   unitname(fig->unit), dt.index);
                 battlerecord(b, smallbuf);
-#endif
               }
+            } else if (b->small) {
+              sprintf(smallbuf, "%s/%d versucht zu fliehen, wird jedoch aufgehalten.",
+                unitname(fig->unit), dt.index);
+              battlerecord(b, smallbuf);
+#endif
             }
           }
           if(runners > 0) {
