@@ -1192,10 +1192,10 @@ count_all(const faction * f)
   if (f->num_people != n) {
     log_error(("Anzahl Personen für (%s) ist != num_people: %d statt %d.\n",
       factionid(f), f->num_migrants, n));
-    f->num_people = n;
+    return n;
   }
 #endif
-	return n;
+	return f->num_people;
 }
 
 int
@@ -1216,7 +1216,7 @@ count_migrants (const faction * f)
   if (f->num_migrants != n) {
     log_error(("Anzahl Migranten für (%s) ist != num_migrants: %d statt %d.\n",
       factionid(f), f->num_migrants, n));
-    f->num_migrants = n;
+    return n;
   }
 #endif
   return f->num_migrants;

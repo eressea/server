@@ -80,17 +80,9 @@ unit_orders(const unit& u) {
   return eressea::list<std::string, order *, bind_orders>(u.orders);
 }
 
-class bind_items {
-public:
-  static item * next(item * node) { return node->next; }
-  static std::string value(item * node) { 
-    return std::string(node->type->rtype->_name[0]);
-  }
-};
-
-static eressea::list<std::string, item *, bind_items>
+static eressea::list<std::string, item *, eressea::bind_items>
 unit_items(const unit& u) {
-  return eressea::list<std::string, item *, bind_items>(u.items);
+  return eressea::list<std::string, item *, eressea::bind_items>(u.items);
 }
 
 static unit *

@@ -1,6 +1,9 @@
 #ifndef LUA_LIST_H
 #define LUA_LIST_H
 
+#include <string>
+#include <kernel/item.h>
+
 namespace eressea {
 
   template<class T, class N = T>
@@ -34,6 +37,14 @@ namespace eressea {
 
   public:
     N m_clist;
+  };
+
+  class bind_items {
+  public:
+    static item * next(item * node) { return node->next; }
+    static std::string value(item * node) { 
+      return std::string(node->type->rtype->_name[0]);
+    }
   };
 
 };

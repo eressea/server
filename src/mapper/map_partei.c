@@ -602,7 +602,7 @@ ParteiListe(void)
 					u->faction->nregions++;
 				}
 				u->faction->nunits++;
-				u->faction->num_people += u->number;
+        u->faction->num_people += u->number;
 				u->faction->money += get_money(u);
 			}
 		}

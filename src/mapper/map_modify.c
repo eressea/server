@@ -441,7 +441,7 @@ create_region_menu(menulist ** menu, region * r)
 			f->num_people = f->no_units = 0;
 		for (u = r->units; u; u = u->next) {
 			u->faction->no_units++;
-			u->faction->num_people += u->number;
+      u->faction->num_people += u->number;
 		}
 		addmenulist(menu, buf, 0);
 

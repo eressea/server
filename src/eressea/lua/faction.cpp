@@ -188,6 +188,10 @@ faction_setrace(faction& f, const char * rcname)
   }
 }
 
+static eressea::list<std::string, item *, eressea::bind_items>
+faction_items(const faction& f) {
+  return eressea::list<std::string, item *, eressea::bind_items>(f.items);
+}
 
 void
 bind_faction(lua_State * L) 
@@ -213,7 +217,10 @@ bind_faction(lua_State * L)
     .def_readwrite("age", &faction::age)
     .def_readwrite("subscription", &faction::subscription)
     .def_readwrite("lastturn", &faction::lastorders)
+
     .def("add_item", &faction_additem)
+    .property("items", &faction_items, return_stl_iterator)
+
     .def("add_notice", &faction_addnotice)
     .property("locale", &faction_getlocale, &faction_setlocale)
     .property("units", &faction_units, return_stl_iterator)
