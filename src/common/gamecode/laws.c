@@ -270,7 +270,12 @@ get_food(region *r)
 				}
 				if (hungry > 0) {
           /* nicht gefütterte dämonen hungern */
+#ifdef PEASANT_HUNGRY_DAEMONS_HAVE_FULL_SKILLS
+					/* wdw special rule */
+					hunger(hungry, u);
+#else
           if (hunger(hungry, u)) fset(u, UFL_HUNGER);
+#endif
 					/* used to be: hunger(hungry, u); */
 				}
 			}

@@ -98,7 +98,6 @@ struct building_type;
 #undef WEATHER        /* Kein Wetter-Modul */
 #define NEW_DRIVE     /* Neuer Algorithmus Transportiere/Fahre */
 #define PARTIAL_STUDY /* Wenn nicht genug Silber vorhanden, wird ein Talent anteilig gelernt */
-#define HUNGER_REDUCES_SKILL /* Hunger reduziert den Talentwert auf die Hälfte */
 #define NEW_RECEIPIES /* Vereinfachte, besser verteilte Kräuterzutaten für Tränke */
 #define GOBLINKILL
 

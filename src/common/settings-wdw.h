@@ -35,6 +35,12 @@
 #define NEW_MIGRATION 1
 #define ASTRAL_HUNGER
 
+#define HUNGER_REDUCES_SKILL /* Hunger reduziert den Talentwert
+                                auf die Hälfte */
+
+#define PEASANT_HUNGRY_DAEMONS_HAVE_FULL_SKILLS
+
+
 #define NEWATSROI 1
 #if NEWATSROI == 1
 #define ATSBONUS 2

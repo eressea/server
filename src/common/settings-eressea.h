@@ -36,6 +36,9 @@
 #define ASTRAL_HUNGER
 #define NEWATSROI 0
 
+#define HUNGER_REDUCES_SKILL /* Hunger reduziert den Talentwert
+																auf die Hälfte */
+
 #define MUSEUM_MODULE
 #define ARENA_MODULE
 #define WORMHOLE_MODULE

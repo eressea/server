@@ -232,8 +232,10 @@ give_men(int n, unit * u, unit * u2, struct order * ord)
       set_racename(&u2->attribs, get_racename(u->attribs));
       u2->race = u->race;
       u2->irace = u->irace;
+#ifdef HEROES
       if (fval(u, UFL_HERO)) fset(u2, UFL_HERO);
       else freset(u2, UFL_HERO);
+#endif
     }
     
     if (u2) {
