@@ -2076,7 +2076,7 @@ writegame(char *path, char quiet)
 #else
 			for (i=0;i!=u->skill_size;++i) {
 				skill * sv = u->skills+i;
-				assert(sv->level>=0 && sv->weeks>=0 && sv->weeks<=sv->level*2);
+				assert(sv->level>=0 && sv->weeks>=0 && sv->weeks<=sv->level*2+1);
 				if (sv->level>0) {
 					wi(F, sv->id);
 					wi(F, sv->level);
