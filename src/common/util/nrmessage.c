@@ -20,17 +20,15 @@
 #include "message.h"
 #include "language.h"
 #include "translation.h"
+#include "goodies.h"
 
 /* libc includes */
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 
-static nrmessage_type * messagetypes;
-
-nrmessage_type * get_nrmessagetypes(void) {
-	return messagetypes;
-}
+#define NRT_MAXHASH 256
+static nrmessage_type * messagetypes[NRT_MAXHASH];
 
 const char * 
 nrt_string(const struct nrmessage_type *type)
@@ -42,7 +40,8 @@ nrmessage_type *
 nrt_find(const struct locale * lang, const struct message_type * mtype)
 {
 	nrmessage_type * found = NULL;
-	nrmessage_type * type = messagetypes;
+	unsigned int hash = hashstring(mtype->name) % NRT_MAXHASH;
+	nrmessage_type * type = messagetypes[hash];
 	while (type) {
 		if (type->mtype==mtype) {
 			if (found==NULL) found = type;
@@ -60,7 +59,8 @@ nrt_find(const struct locale * lang, const struct message_type * mtype)
 void 
 nrt_register(const struct message_type * mtype, const struct locale * lang, const char * string, int level, const char * section)
 {
-	nrmessage_type * nrt = messagetypes;
+	unsigned int hash = hashstring(mtype->name) % NRT_MAXHASH;
+	nrmessage_type * nrt = messagetypes[hash];
 	while (nrt && (nrt->lang!=lang || nrt->mtype!=mtype)) {
 		nrt = nrt->next;
 	}
@@ -71,11 +71,11 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
 		nrt = malloc(sizeof(nrmessage_type));
 		nrt->lang = lang;
 		nrt->mtype = mtype;
-		nrt->next = messagetypes;
+		nrt->next = messagetypes[hash];
 		nrt->level=level;
 		if (section) nrt->section = strdup(section);
 		else nrt->section = NULL;
-		messagetypes = nrt;
+		messagetypes[hash] = nrt;
 		assert(string && *string);
 		nrt->string = strdup(string);
                 *c = '\0';
