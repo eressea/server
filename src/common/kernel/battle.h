@@ -158,11 +158,11 @@ extern "C" {
     struct item * loot;
     int catmsg;					/* Merkt sich, ob Katapultmessage schon generiert. */
     struct person {
+      int hp;    /* Trefferpunkte der Personen */
       int attack      : 8;     /* (Magie) Attackenbonus der Personen */
       int defence     : 8;     /* (Magie) Paradenbonus der Personen */
       int damage      : 8;     /* (Magie) Schadensbonus der Personen im Nahkampf */
       int damage_rear : 8;     /* (Magie) Schadensbonus der Personen im Fernkampf */
-      int hp          : 16;    /* Trefferpunkte der Personen */
       int flags       : 8;     /* (Magie) Diverse Flags auf Kämpfern */
       int speed       : 8;     /* (Magie) Geschwindigkeitsmultiplkator. */
       int reload      : 4;     /* Anzahl Runden, die die Waffe x noch laden muss.

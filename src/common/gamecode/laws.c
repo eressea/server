@@ -3665,7 +3665,7 @@ claim_cmd(unit * u, struct order * ord)
 
   if (itype!=NULL) {
     item ** iclaim = i_find(&u->faction->items, itype);
-    if (iclaim!=NULL) {
+    if (iclaim!=NULL && *iclaim!=NULL) {
       n = min(n, (*iclaim)->number);
       i_change(iclaim, itype, -n);
       i_change(&u->items, itype, n);

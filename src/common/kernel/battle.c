@@ -880,8 +880,11 @@ rmtroop(troop dt)
 	rmfighter(df, 1);
 
 	assert(dt.index >= 0 && dt.index < df->unit->number);
-	df->person[dt.index] = df->person[df->alive - df->removed];
-	df->person[df->alive - df->removed].hp = 0;
+  df->person[dt.index] = df->person[df->alive - df->removed];
+  if (df->removed) {
+    df->person[df->alive - df->removed] = df->person[df->alive];
+  }
+  df->person[df->alive].hp = 0;
 }
 
 void
@@ -2559,8 +2562,8 @@ aftermath(battle * b)
       }
       if (du->hp < du->number) {
         log_error(("%s has less hitpoints (%u) than people (%u)\n",
-          itoa36(du->no), du->hp, du->number));
-        du->hp=du->no;
+                   itoa36(du->no), du->hp, du->number));
+        du->hp = du->number;
       }
     } cv_next(df);
     s->alive+=s->healed;
