@@ -1538,30 +1538,24 @@ getunitg(const region * r, const faction * f)
 unit *
 getunit(const region * r, const faction * f)
 {
-	int n;
-	unit *u2;
-	getunitpeasants = 0;
+  int n;
+  unit *u2;
+  getunitpeasants = 0;
+  
+  n = read_unitid(f, r);
+  if (n == 0) {
+	getunitpeasants = 1;
+	return NULL;
+  }
+  if (n < 0) return 0;
 
-	n = read_unitid(f, r);
-
-	if (n == 0) {
-		getunitpeasants = 1;
-		return NULL;
+  for (u2 = r->units; u2; u2 = u2->next) {
+	if (u2->no == n) {
+	  if ((u2->flags & UFL_ISNEW) || u2->number>0) return u2;
 	}
+  }
 
-	if (n < 0) return 0;
-
-	return findunitr(r, n);
-
-	/* && u2->number>0 verhindert GIB TEMP u.ä.!
-	for (u2 = r->units; u2; u2 = u2->next) {
-		if (u2->no == n && u2->number>0) {
-			return u2;
-		}
-	}
-	*/
-
-	return 0;
+  return 0;
 }
 /* - String Listen --------------------------------------------- */
 
