@@ -136,6 +136,26 @@
 		<text locale="en">black </text>
 	</string>
 
+	<string name="tree">
+		<text locale="de">Baum</text>
+		<text locale="en">tree</text>
+	</string>
+
+	<string name="tree_p">
+		<text locale="de">Bäume</text>
+		<text locale="en">trees</text>
+	</string>
+
+	<string name="mallorntree">
+		<text locale="de">Mallornbaum</text>
+		<text locale="en">mallorn tree</text>
+	</string>
+
+	<string name="mallorntree_p">
+		<text locale="de">Mallornbäume</text>
+		<text locale="en">mallorn trees</text>
+	</string>
+
 	<comment>Küsten</comment>
 	<string name="Nordwestküste">
 		<text locale="de">Nordwestküste</text>

@@ -1072,14 +1072,14 @@ describe(FILE * F, region * r, int partial, faction * f)
 			scat(" ");
 			if (fval(r, RF_MALLORN)) {
 				if (trees == 1)
-					scat("Mallornbaum");
+					scat(LOC(f->locale, "mallorntree"));
 				else
-					scat("Mallornbäume");
+					scat(LOC(f->locale, "mallorntree_p"));
 			}
 			else if (trees == 1)
-				scat("Baum");
+				scat(LOC(f->locale, "tree"));
 			else
-				scat("Bäume");
+				scat(LOC(f->locale, "tree_p"));
 		}
 	}
 #else
@@ -1090,18 +1090,18 @@ describe(FILE * F, region * r, int partial, faction * f)
 		scat(" ");
 		if (fval(r, RF_MALLORN)) {
 			if (trees == 1)
-				scat("Mallornbaum");
+				scat(LOC(f->locale, "mallorntree"));
 			else
-				scat("Mallornbäume");
+				scat(LOC(f->locale, "mallorntree_p"));
 		}
 		else if (trees == 1)
-			scat("Baum");
+			scat(LOC(f->locale, "tree"));
 		else
-			scat("Bäume");
+			scat(LOC(f->locale, "tree_p"));
 	}
 #endif
 
-	/* Eisen */
+	/* iron & stone */
 #if NEW_RESOURCEGROWTH
 	if (partial == 0 && f != (faction *) NULL) {
 		struct rawmaterial * res;
@@ -1128,15 +1128,10 @@ describe(FILE * F, region * r, int partial, faction * f)
 					}
 				}
 			}
-			if (level>=0) {
+			if (level>=0 && visible >= 0) {
 				char * pos = buf+strlen(buf);
-				if (visible<0) {
-					snprintf(pos, sizeof(buf)-(pos-buf), ", %s",
-						LOC(f->locale, res->type->name));
-				} else {
-					snprintf(pos, sizeof(buf)-(pos-buf), ", %d %s/%d",
-						visible, LOC(f->locale, res->type->name), res->level + itype->construction->minskill - 1);
-				}
+				snprintf(pos, sizeof(buf)-(pos-buf), ", %d %s/%d",
+					visible, LOC(f->locale, res->type->name), res->level + itype->construction->minskill - 1);
 			}
 		}
 #else
@@ -1161,8 +1156,8 @@ describe(FILE * F, region * r, int partial, faction * f)
 		}
 #endif
 	}
-	/* Bauern & Geld */
 
+	/* peasants & silver */
 	if (rpeasants(r)) {
 		scat(", ");
 		icat(rpeasants(r));
