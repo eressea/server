@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.18 2001/02/11 15:16:04 enno Exp $
+ *	$Id: laws.c,v 1.19 2001/02/11 20:54:01 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2111,7 +2111,7 @@ reorder_owners(region * r)
 	unit ** up=&r->units, ** useek;
 	building * b=NULL;
 	ship * sh=NULL;
-	int len = listlen(r->units);
+	size_t len = listlen(r->units);
 
 	for (b = r->buildings;b;b=b->next) {
 		unit ** ubegin = up;

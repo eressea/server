@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: museum.c,v 1.2 2001/01/31 07:59:42 enno Exp $
+ *	$Id: museum.c,v 1.3 2001/02/11 20:54:01 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -223,7 +223,7 @@ init_museum(void)
 void
 create_museum(void)
 {
-	int museum_id = hashstring("museum");
+	unsigned int museum_id = hashstring("museum");
 	plane *museum = getplanebyid(museum_id);
 	region *r;
 	building *b;

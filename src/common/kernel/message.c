@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: message.c,v 1.5 2001/02/10 19:24:05 enno Exp $
+ *	$Id: message.c,v 1.6 2001/02/11 20:54:01 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -30,6 +30,8 @@
 #include "item.h"
 #include "building.h"
 
+#include <goodies.h>
+
 #include <stddef.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -48,8 +50,6 @@ typedef struct msg_setting {
 	const messagetype *type;
 	int level;
 } msg_setting;
-
-extern int hashstring(const char* s);
 
 /************ Compatibility function *************/
 #define MAXSTRLEN (4*DISPLAYSIZE+3)
@@ -194,17 +194,6 @@ mistake(const unit * u, const char *command, const char *comment, int mtype)
 }
 
 static messagetype * messagetypes;
-
-extern unsigned int new_hashstring(const char* s);
-void
-debug_messagetypes(FILE * out)
-{
-	messagetype * mt;
-	for (mt=messagetypes;mt;mt=mt->next) {
-		fprintf(out, "%u->%u;%s\n", mt->hashkey, new_hashstring(mt->name));
-	}
-}
-
 
 messagetype *
 new_messagetype(const char * name, int level, const char * section)

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.8 2001/02/10 14:18:00 enno Exp $
+ *	$Id: item.c,v 1.9 2001/02/11 20:54:01 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -30,6 +30,7 @@
 
 /* util includes */
 #include <functions.h>
+#include <goodies.h>
 
 /* libc includes */
 #include <assert.h>
@@ -48,9 +49,6 @@ attrib_type at_wtype = { "weapon_type" };
 attrib_type at_ltype = { "luxury_type" };
 attrib_type at_itype = { "item_type" };
 attrib_type at_htype = { "herb_type" };
-
-extern int hashstring(const char* s);
-
 
 static int
 res_changeaura(unit * u, const resource_type * rtype, int delta)

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: arena.c,v 1.3 2001/02/02 08:40:46 enno Exp $
+ *	$Id: arena.c,v 1.4 2001/02/11 20:54:01 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -44,13 +44,13 @@
 #include <resolve.h>
 #include <functions.h>
 #include <event.h>
+#include <goodies.h>
 
 /* libc include */
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
-extern int hashstring(const char* s);
 
 /* exports: */
 plane * arena = NULL;
@@ -59,7 +59,7 @@ plane * arena = NULL;
 /* local vars */
 #define CENTRAL_VOLCANO 1
 
-static int arena_id = 0;
+static unsigned int arena_id = 0;
 static region * arena_center = NULL;
 static region * tower_region[6];
 static region * start_region[6];

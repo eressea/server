@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: goodies.c,v 1.5 2001/02/10 19:24:05 enno Exp $
+ *	$Id: goodies.c,v 1.6 2001/02/11 20:54:01 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -58,20 +58,7 @@ intlist_find(int *i_p, int fi)
 }
 
 unsigned int
-old_hashstring(const char* s)
-{
-	int key = 0;
-	int i = strlen(s);
-
-	while (i) {
-		--i;
-		key = ((key >> 31) & 1) ^ (key << 1) ^ s[i];
-	}
-	return key & 0x7fff;
-}
-
-unsigned int
-new_hashstring(const char* s)
+hashstring(const char* s)
 {
 	unsigned int key = 0;
 	int i = strlen(s);
@@ -80,31 +67,6 @@ new_hashstring(const char* s)
 		key = (s[--i] + key*37);
 	}
 	return key;
-}
-
-unsigned int
-hashstring(const char* s)
-{
-#if RELEASE_VERSION < NEWHASH_VERSION
-	return old_hashstring(s);
-#else
-	return new_hashstring(s);
-#endif
-}
-/* Standardfunktion aus Sedgewick: Algorithmen in C++ */
-
-#define HASH_MAX 100001
-int
-hashstring_new(const char* s)
-{
-	int key = 0;
-	int i = strlen(s);
-
-	while (i) {
-		--i;
-		key = (256 * key + s[i])%HASH_MAX;
-	}
-	return key /* & 0x7fffffff */;
 }
 
 char *

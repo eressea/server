@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: creport.c,v 1.6 2001/02/10 10:40:10 enno Exp $
+ *	$Id: creport.c,v 1.7 2001/02/11 20:54:00 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -142,8 +142,8 @@ render_message(FILE * f, faction * receiver, message * m)
 	if (m->receiver && receiver!=m->receiver) return;
 	if (m->receiver && get_msglevel(receiver->warnings, receiver->msglevels, m->type) < msg_level(m))
 		return;
-	fprintf(f, "MESSAGE %d\n", receiver->index++);
-	fprintf(f, "%d;type\n", mt->hashkey);
+	fprintf(f, "MESSAGE %u\n", receiver->index++);
+	fprintf(f, "%u;type\n", mt->hashkey);
 	if (receiver->options & want(O_DEBUG)) {
 		fprintf(f, "%d;level\n", mt->level);
 	}
@@ -225,7 +225,7 @@ cr_output_messages(FILE * F, message * msgs, faction * f)
 		if (get_msglevel(f->warnings, f->msglevels, mt) < m->level) continue;
 #endif
 		if (mt!=last && (!m->receiver || f==m->receiver)) {
-			int index = mt->hashkey % CTMAXHASH;
+			unsigned int index = mt->hashkey % CTMAXHASH;
 			struct crtype * ct = crtypes[index];
 			last = mt;
 			while (ct && ct->mt->hashkey!=mt->hashkey) ct=ct->nexthash;

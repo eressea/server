@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: render.c,v 1.5 2001/02/10 19:24:05 enno Exp $
+ *	$Id: render.c,v 1.6 2001/02/11 20:56:20 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -357,7 +357,7 @@ render_immediate(const message * m, const char * find, localizer * l)
 void
 rendercr(FILE * f, messagetype * mt, const locale * lang)
 {
-	fprintf(f, "\"%s\";%d\n", locale_string(lang, mt->name), mt->hashkey);
+	fprintf(f, "\"%s\";%u\n", locale_string(lang, mt->name), mt->hashkey);
 }
 
 static char *
@@ -485,7 +485,7 @@ de_render_casualties(const message * m, const locale * lang)
 }
 
 static const char *
-v_travel(const locale * l, void * data) 
+v_travel(const locale * l, void * data)
 {
 	int i = (int)data;
 	unused(l);
