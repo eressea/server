@@ -98,7 +98,7 @@ free_orders(order ** olist)
 order * 
 parse_order(const char * s, const struct locale * lang)
 {
-  while (isspace(*(unsigned char*)s)) ++s;
+  while (!isalnum(*(unsigned char*)s)) ++s;
   if (*s==0) return NULL;
   else {
     const char * sptr;
