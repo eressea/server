@@ -1036,6 +1036,8 @@ SOURCE=..\common\attributes\orcification.c
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
+# PROP Intermediate_Dir "..\common\attributes\Debug"
+
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
 # PROP Intermediate_Dir "..\common\attributes\Conversion"
@@ -1043,6 +1045,52 @@ SOURCE=..\common\attributes\orcification.c
 !ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
 
 # PROP BASE Intermediate_Dir "..\common\attributes\Release"
+# PROP Intermediate_Dir "..\common\attributes\Profile"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\attributes\overrideroads.c
+
+!IF  "$(CFG)" == "eressea - Win32 Release"
+
+# PROP Intermediate_Dir "..\common\attributes\Release"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
+
+# PROP Intermediate_Dir "..\common\attributes\Debug"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
+
+# PROP Intermediate_Dir "..\common\attributes\Conversion"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
+
+# PROP Intermediate_Dir "..\common\attributes\Profile"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\attributes\overrideroads.h
+
+!IF  "$(CFG)" == "eressea - Win32 Release"
+
+# PROP Intermediate_Dir "..\common\attributes\Release"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
+
+# PROP Intermediate_Dir "..\common\attributes\Debug"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
+
+# PROP Intermediate_Dir "..\common\attributes\Conversion"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
+
 # PROP Intermediate_Dir "..\common\attributes\Profile"
 
 !ENDIF 

@@ -236,10 +236,6 @@ SOURCE=.\resolve.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\translation.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\umlaut.c
 # End Source File
 # Begin Source File

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: render.c,v 1.3 2001/01/30 23:16:17 enno Exp $
+ *	$Id: render.c,v 1.4 2001/02/10 11:38:29 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -48,7 +48,7 @@ int lastint = 0;
 
 typedef struct localizer {
 	struct localizer * nexthash;
-	int hashkey;
+	unsigned int hashkey;
 	const locale * lang;
 	struct renderer * renderers[RMAXHASH];
 	struct eval * evaluators[RMAXHASH];
@@ -58,14 +58,14 @@ typedef const char* (*eval_fun)(const locale * lang, void *);
 typedef char * (*render_fun)(const message * m, const locale * lang);
 
 typedef struct renderer {
-	int hashkey;
+	unsigned int hashkey;
 	render_fun fun;
 	char * name;
 	struct renderer * nexthash;
 } renderer;
 
 typedef struct eval {
-	int hashkey;
+	unsigned int hashkey;
 	eval_fun fun;
 	const char * name;
 	struct eval * nexthash;
@@ -74,12 +74,10 @@ typedef struct eval {
 #define LMAXHASH 32
 localizer * localizers[LMAXHASH];
 
-extern int hashstring(const char * name);
-
 static localizer *
 get_localizer(const locale * lang)
 {
-	int hkey = locale_hashkey(lang);
+	unsigned int hkey = locale_hashkey(lang);
 	int id = hkey % LMAXHASH;
 	localizer * find = localizers[id];
 	while (find && find->lang!=lang) find = find->nexthash;
@@ -96,8 +94,8 @@ get_localizer(const locale * lang)
 void
 add_renderfun(const char * name, localizer * l, render_fun fun)
 {
-	int hkey = hashstring(name);
-	int id = hkey % RMAXHASH;
+	unsigned int hkey = hashstring(name);
+	unsigned int id = hkey % RMAXHASH;
 	renderer * find = l->renderers[id];
 	while (find && find->hashkey!=hkey) find=find->nexthash;
 	if (!find) {
@@ -114,8 +112,8 @@ add_renderfun(const char * name, localizer * l, render_fun fun)
 void
 add_evalfun(const char * name, localizer * l, eval_fun fun)
 {
-	int hkey = hashstring(name);
-	int id = hkey % RMAXHASH;
+	unsigned int hkey = hashstring(name);
+	unsigned int id = hkey % RMAXHASH;
 	eval * find = l->evaluators[id];
 	while (find && find->hashkey!=hkey) find=find->nexthash;
 	if (!find) {
@@ -376,8 +374,8 @@ render_default(const message * m, const locale * lang)
 static render_fun
 get_renderfun(const char * name, const localizer * l)
 {
-	int hkey = hashstring(name);
-	int id = hkey % RMAXHASH;
+	unsigned int hkey = hashstring(name);
+	unsigned int id = hkey % RMAXHASH;
 	renderer * find = l->renderers[id];
 	while (find && find->hashkey!=hkey) find=find->nexthash;
 	if (find && !strcmp(find->name, name)) return find->fun;

@@ -22,3 +22,18 @@ Es gibt einen Zauber (Ferne Vision) der Einheiten vom Typ RC_SPELL erzeugt, aber
 - Wie komplex macht man einen Curse?
 siehe vorangegangener Absatz. Generell gilt hier: Lieber zwei vielseitige Dinge machen, als ein unflexibles - der curse sollte lediglich der container seiin, der die wirkung aufrechterhält (das attribut an der region überwacht, und per trigger-funktion bei ende des curse oder antimagie entfernt). die eigentliche wirkung kann man in ein separates attribut stecken, dann ist sie auch in anderen kontexten als zauberei verwendbar (gebaüde oder items mit der gleichen wirkung, z.b.). Tests sollten so wenig wie möglich auf einen curse gehen (in fact, eigentlich nur bei der antimagie) sondern immer auf die wirkung (das attribut).
 
+- wie benenne ich Sourcedateien?
+lang drüber nachgedacht, bin ich zum schluss gekommen: kleinbuchstaben, keien unterstriche. Es kann sich nie jemand merken, ob testplayer oder test_player jetzt richtig ist, und wir kommen sicher selten in die situation, das wir zwischen opium_bringen.c und opi_umbringen.c unterscheiden müssen.
+
+- wie benenne ich variablen?
+da gilt das gleiceh wie bei den files, mit einer ausnahme: typspezifikation, also zum beispiel at_ für attributstypen, mit einem unterstrich. dann ist auch klar, was at_work ist: ein attribut, das was mit arbeit zu tun hat, keine boolean-variable die sagt ob man auf der arbeit ist.
+
+- faction::units
+Die Variable funktioniert und kann benutzt werden. folgendes:
+for (r=regions;r;r=r->next) for (u=r->units;u;u=u->next) if (u->faction==f) {}
+schreibt sich viel einfacher so:
+for (u=f->units;u;u=u->nextF) {}
+und ja, es wird garantiert, das das funktioiniert, und regionsreihenfolge einhalten tut es auch. weshalb wahlloses erzeugen von einheiten per calloc und ohne createunit() aufruf schon seit längerem ein NoNo ist.
+
+- buffer length
+Namen von attributen, hashcodes für items, usw. sollten kurz sein. schliesslich landen sie im Datenfile. Eine Funktion, die sie einlädt, sollte mit 32 byte speicherbedarf rechnen.

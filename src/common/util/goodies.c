@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: goodies.c,v 1.3 2001/02/09 13:53:52 corwin Exp $
+ *	$Id: goodies.c,v 1.4 2001/02/10 11:38:29 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -57,17 +57,16 @@ intlist_find(int *i_p, int fi)
 	return NULL;
 }
 
-int
+unsigned int
 hashstring(const char* s)
 {
-	int key = 0;
+	unsigned int key = 0;
 	int i = strlen(s);
 
-	while (i) {
-		--i;
-		key = ((key >> 31) & 1) ^ (key << 1) ^ s[i];
+	while (i>0) {
+		key = (s[--i] + key*37);
 	}
-	return key & 0x7fff;
+	return key;
 }
 
 /* Standardfunktion aus Sedgewick: Algorithmen in C++ */

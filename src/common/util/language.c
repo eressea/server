@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: language.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: language.c,v 1.3 2001/02/10 11:38:29 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -26,10 +26,10 @@ extern int hashstring(const char* s);
 
 struct locale {
 	struct locale * next;
-	int hashkey;
+	unsigned int hashkey;
 	const char * name;
 	struct locale_string {
-		int hashkey;
+		unsigned int hashkey;
 		struct locale_string * nexthash;
 		char * str;
 		char * key;
@@ -39,7 +39,7 @@ struct locale {
 static locale * locales;
 static locale * default_locale;
 
-int
+unsigned int
 locale_hashkey(const locale * lang)
 {
 	if (lang==NULL) lang = default_locale;
@@ -49,7 +49,7 @@ locale_hashkey(const locale * lang)
 locale *
 find_locale(const char * name)
 {
-	int hkey = hashstring(name);
+	unsigned int hkey = hashstring(name);
 	locale * l = locales;
 	while (l && l->hashkey!=hkey) l=l->next;
 	return l;
@@ -58,7 +58,7 @@ find_locale(const char * name)
 locale *
 make_locale(const char * name)
 {
-	int hkey = hashstring(name);
+	unsigned int hkey = hashstring(name);
 	locale * l = calloc(sizeof(locale), 1);
 #ifndef NDEBUG
 	locale * lp = locales;
@@ -76,8 +76,8 @@ make_locale(const char * name)
 const char *
 locale_string(const locale * lang, const char * key)
 {
-	int hkey = hashstring(key);
-	int id = hkey % SMAXHASH;
+	unsigned int hkey = hashstring(key);
+	unsigned int id = hkey % SMAXHASH;
 	struct locale_string * find;
 
 	if (key==NULL || *key==0) return NULL;
@@ -102,8 +102,8 @@ void
 locale_setstring(locale * lang, const char * key, const char * value)
 {
 	int nval = atoi(key);
-	int hkey = nval?nval:hashstring(key);
-	int id = hkey % SMAXHASH;
+	unsigned int hkey = nval?nval:hashstring(key);
+	unsigned int id = hkey % SMAXHASH;
 	struct locale_string * find;
 
 	if (lang==NULL) lang = default_locale;

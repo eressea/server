@@ -42,6 +42,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "doc"=.\doc\doc.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "eressea"=".\eressea\eressea-6.dsp" - Package Owner=<4>
 
 Package=<5>
@@ -167,6 +179,21 @@ Package=<5>
 
 Package=<4>
 {{{
+}}}
+
+###############################################################################
+
+Project: "translator"=.\tools\translator.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name util
+    End Project Dependency
 }}}
 
 ###############################################################################

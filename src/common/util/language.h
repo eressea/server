@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: language.h,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: language.h,v 1.3 2001/02/10 11:38:29 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -23,7 +23,7 @@ extern locale * make_locale(const char * key);
 /** operations on locales: **/
 extern const char * locale_string(const locale * lang, const char * key);
 extern void locale_setstring(locale * lang, const char * key, const char * value);
-extern int locale_hashkey(const locale * lang);
+extern unsigned int locale_hashkey(const locale * lang);
 extern const char * locale_name(const locale * lang);
 
 extern const char * reverse_lookup(const locale * lang, const char * str);

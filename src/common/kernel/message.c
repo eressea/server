@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: message.c,v 1.3 2001/02/09 13:53:51 corwin Exp $
+ *	$Id: message.c,v 1.4 2001/02/10 11:38:29 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -208,8 +208,8 @@ new_messagetype(const char * name, int level, const char * section)
 		messagetype * mt2 = messagetypes;
 		while(mt2 && mt2->hashkey != mt->hashkey) mt2 = mt2->next;
 		if (mt2) {
-			fprintf(stderr, "duplicate hashkey for messagetype %s and %s\n",
-				name, mt2->name);
+			fprintf(stderr, "duplicate hashkey %u for messagetype %s and %s\n",
+				mt->hashkey, name, mt2->name);
 		}
 	}
 #endif
