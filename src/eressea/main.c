@@ -705,11 +705,13 @@ main(int argc, char *argv[])
 		return 0;
 	}
 	if ((i=readgame(false))!=0) return i;
+#ifdef BETA_CODE
 	if (dungeonstyles) {
 		struct dungeon * d = dungeonstyles;
 		struct region * r = make_dungeon(d);
 		make_dungeongate(findregion(0, 0), r, d);
 	}
+#endif
 	writepasswd();
 	if (g_killeiswald) {
 		region * r = findregion(0, 25);
