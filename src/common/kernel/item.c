@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.7 2001/02/10 13:20:09 enno Exp $
+ *	$Id: item.c,v 1.8 2001/02/10 14:18:00 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1772,7 +1772,7 @@ use_bloodpotion(struct unit *u, const struct potion_type *ptype, const char *cmd
 		/* bekommt nicht: */
 		cmistake(u, cmd, 165, MSG_EVENT);
 		u->race = RC_GHOUL;
-		set_faction(u, findfaction(MONSTER_FACTION));
+		u_setfaction(u, findfaction(MONSTER_FACTION));
 	}
 	return 0;
 }

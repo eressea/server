@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.9 2001/02/10 10:40:10 enno Exp $
+ *	$Id: laws.c,v 1.10 2001/02/10 14:18:00 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2527,7 +2527,7 @@ new_units (void)
 					u2 = createunitid(r, u->faction, 0, u->faction->race, alias, name);
 
 					a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
-					set_faction(u2, u->faction);
+					u_setfaction(u2, u->faction);
 					u2->building = u->building;
 					u2->ship = u->ship;
 

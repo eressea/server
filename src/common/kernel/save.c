@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.12 2001/02/10 12:50:29 corwin Exp $
+ *	$Id: save.c,v 1.13 2001/02/10 14:18:00 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1202,7 +1202,7 @@ readgame(boolean backup)
 				} else {
 					n = ri(F);
 				}
-				set_faction(u, findfaction(n));
+				u_setfaction(u, findfaction(n));
 			}
 			uhash(u);
 			rds(F, &u->name);
@@ -1227,7 +1227,7 @@ readgame(boolean backup)
 				} else {
 					n = ri(F);
 				}
-				set_faction(u, findfaction(n));
+				u_setfaction(u, findfaction(n));
 
 				u->race = typus2race(oldtypus);
 				u->irace = typus2race(olditypus);
@@ -1273,7 +1273,7 @@ readgame(boolean backup)
 				u->race = (race_t) ri(F);
 				u->irace = (race_t) ri(F);
 				if (global.data_version<GUARD_VERSION)
-					set_faction(u, findfaction(n = ri(F)));
+					u_setfaction(u, findfaction(n = ri(F)));
 			}
 			if (u->faction == NULL)
 				fprintf(stderr,"\nEinheit %s hat faction==NULL\n",unitname(u));

@@ -1542,7 +1542,7 @@ sp_undeadhero(fighter * fi, int level, int force, spell * sp)
 
 					du->race = RC_UNDEAD;
 					setguard(du, GUARD_NONE);
-					set_faction(du,mage->faction);
+					u_setfaction(du,mage->faction);
 					if (fval(mage, FL_PARTEITARNUNG))
 						fset(du, FL_PARTEITARNUNG);
 					df->alive = du->number;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: unit.h,v 1.3 2001/02/03 13:45:33 enno Exp $
+ *	$Id: unit.h,v 1.4 2001/02/10 14:18:00 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -183,4 +183,7 @@ extern struct building * inside_building(const struct unit * u);
 /* cleanup code for this module */
 extern void free_units(void);
 extern struct faction * dfindhash(int i);
+extern void u_setfaction(struct unit * u, struct faction * f);
+/* vorsicht Sprüche können u->number == 0 (RS_FARVISION) haben! */
+extern void set_number(struct unit * u, int count);
 #endif

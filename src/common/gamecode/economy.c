@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: economy.c,v 1.4 2001/02/10 10:40:10 enno Exp $
+ *	$Id: economy.c,v 1.5 2001/02/10 14:17:59 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -711,7 +711,7 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 		new_message(u2->faction, "give%u:unit%u:target%r:region%X:resource%i:amount",
 		u?&u_peasants:(cansee(u2->faction, u->region, u, 0)?u:NULL),
 		u2, u->region, r_unit, 1));
-	set_faction(u, u2->faction);
+	u_setfaction(u, u2->faction);
 	u2->faction->newbies += n;
 
 	/* "Ich gebe einer Partei eine Einheit, die den Befehl hat, effektiv

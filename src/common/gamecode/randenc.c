@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: randenc.c,v 1.8 2001/02/10 14:07:29 corwin Exp $
+ *	$Id: randenc.c,v 1.9 2001/02/10 14:18:00 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -519,7 +519,7 @@ chaos(region * r)
 					sprintf(buf, "%s scheint von einer seltsamen Krankheit befallen.",
 							unitname(u));
 					addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
-					set_faction(u, findfaction(MONSTER_FACTION));
+					u_setfaction(u, findfaction(MONSTER_FACTION));
 					u->race = RC_GHOUL;
 				}
 			}

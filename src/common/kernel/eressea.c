@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.11 2001/02/10 10:40:11 enno Exp $
+ *	$Id: eressea.c,v 1.12 2001/02/10 14:18:00 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -627,59 +627,6 @@ eff_stealth (const unit * u, const region * r)
 	es = u_geteffstealth(u);
 	if (es >=0 && es < e) return es;
 	return e;
-}
-
-void
-set_faction (unit * u, faction * f)
-{
-	int cnt = u->number;
-	if (u->faction==f) return;
-#ifndef NDEBUG
-	assert(u->debug_number == u->number);
-#endif
-	if (u->faction) {
-		set_number(u, 0);
-		join_group(u, NULL);
-	}
-	if (u->prevF) u->prevF->nextF = u->nextF;
-	else if (u->faction) {
-		assert(u->faction->units==u);
-		u->faction->units = u->nextF;
-	}
-	if (u->nextF) u->nextF->prevF = u->prevF;
-
-	if (f!=NULL) {
-		u->nextF = f->units;
-		f->units = u;
-	}
-	else u->nextF = NULL;
-	if (u->nextF) u->nextF->prevF = u;
-	u->prevF = NULL;
-
-	u->faction = f;
-	if (cnt && f) set_number(u, cnt);
-}
-
-/* vorsicht Sprüche können u->number == 0 (RS_FARVISION) haben! */
-void
-set_number (unit * u, int count)
-{
-	assert (count >= 0);
-#ifndef NDEBUG
-	assert (u->debug_number == u->number);
-	assert (u->faction != 0 || u->number > 0);
-#endif
-	if (u->faction && u->race != u->faction->race && !nonplayer(u)
-	    && u->race != RC_SPELL && u->race != RC_SPECIAL
-			&& !(is_cursed(u->attribs, C_SLAVE, 0))){
-		u->faction->num_migrants += count - u->number;
-	}
-
-	u->faction->num_people += count - u->number;
-	u->number = count;
-#ifndef NDEBUG
-	u->debug_number = count;
-#endif
 }
 
 void
@@ -1577,7 +1524,7 @@ createunitid(region * r1, faction * f, int number, race_t race, int id, const ch
 	unit * u = calloc(1, sizeof(unit));
 
 	assert(f->alive);
-	set_faction(u, f);
+	u_setfaction(u, f);
 	set_string(&u->thisorder, "");
 	set_string(&u->lastorder, keywords[K_WORK]);
 	u_seteffstealth(u, -1);

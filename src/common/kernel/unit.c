@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: unit.c,v 1.4 2001/02/03 13:45:32 enno Exp $
+ *	$Id: unit.c,v 1.5 2001/02/10 14:18:00 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -127,14 +127,14 @@ destroy_unit(unit * u)
 		}
 	}
 	if (zombie) {
-		set_faction(u, findfaction(MONSTER_FACTION));
+		u_setfaction(u, findfaction(MONSTER_FACTION));
 		scale_number(u, 1);
 		u->race = u->irace = RC_ZOMBIE;
 	} else {
 		if (r && rterrain(r) != T_OCEAN)
 			rsetmoney(r, rmoney(r) + get_money(u));
 		dhash(u->no, u->faction);
-		set_faction(u, NULL);
+		u_setfaction(u, NULL);
 		if (r) leave(r, u);
 		uunhash(u);
 		if (r) choplist(&r->units, u);
@@ -748,4 +748,57 @@ struct building * inside_building(const struct unit * u)
 		}	
 	}
 	return NULL;
+}
+
+void
+u_setfaction(unit * u, faction * f)
+{
+	int cnt = u->number;
+	if (u->faction==f) return;
+#ifndef NDEBUG
+	assert(u->debug_number == u->number);
+#endif
+	if (u->faction) {
+		set_number(u, 0);
+		join_group(u, NULL);
+	}
+	if (u->prevF) u->prevF->nextF = u->nextF;
+	else if (u->faction) {
+		assert(u->faction->units==u);
+		u->faction->units = u->nextF;
+	}
+	if (u->nextF) u->nextF->prevF = u->prevF;
+
+	if (f!=NULL) {
+		u->nextF = f->units;
+		f->units = u;
+	}
+	else u->nextF = NULL;
+	if (u->nextF) u->nextF->prevF = u;
+	u->prevF = NULL;
+
+	u->faction = f;
+	if (cnt && f) set_number(u, cnt);
+}
+
+/* vorsicht Sprüche können u->number == 0 (RS_FARVISION) haben! */
+void
+set_number (unit * u, int count)
+{
+	assert (count >= 0);
+#ifndef NDEBUG
+	assert (u->debug_number == u->number);
+	assert (u->faction != 0 || u->number > 0);
+#endif
+	if (u->faction && u->race != u->faction->race && !nonplayer(u)
+	    && u->race != RC_SPELL && u->race != RC_SPECIAL
+			&& !(is_cursed(u->attribs, C_SLAVE, 0))){
+		u->faction->num_migrants += count - u->number;
+	}
+
+	u->faction->num_people += count - u->number;
+	u->number = count;
+#ifndef NDEBUG
+	u->debug_number = count;
+#endif
 }

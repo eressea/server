@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: trigger.c,v 1.2 2001/02/03 13:45:34 enno Exp $
+ *	$Id: trigger.c,v 1.3 2001/02/10 14:18:01 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -523,7 +523,7 @@ do_actions(void)
 				faction *f;
 				assert(act->typ == TYP_UNIT);
 				f = findfaction_unique_id(act->i[0]);
-				set_faction((unit*)act->obj, f);
+				u_setfaction((unit*)act->obj, f);
 				break;
 			}
 			case AC_CREATEUNIT:{

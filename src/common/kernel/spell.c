@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.c,v 1.8 2001/02/04 09:46:47 corwin Exp $
+ *	$Id: spell.c,v 1.9 2001/02/10 14:18:00 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -3827,7 +3827,7 @@ sp_charmingsong(castorder *co)
 	create_curse(mage, &target->attribs, C_SLAVE, 0, force, duration, 0, 0);
 
 	/* setze Partei um und lösche langen Befehl aus Sicherheitsgründen */
-	set_faction(target,mage->faction);
+	u_setfaction(target,mage->faction);
 	set_string(&target->thisorder, "");
 
 	/* setze Parteitarnung, damit nicht sofort klar ist, wer dahinter
@@ -4138,7 +4138,7 @@ sp_migranten(castorder *co)
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return 0;
 	}
-	set_faction(target,mage->faction);
+	u_setfaction(target,mage->faction);
 	set_string(&target->thisorder, "");
 
 	/* Erfolg melden */

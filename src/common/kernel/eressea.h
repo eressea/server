@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.h,v 1.14 2001/02/10 13:20:09 enno Exp $
+ *	$Id: eressea.h,v 1.15 2001/02/10 14:18:00 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1015,11 +1015,8 @@ char * set_string(char **s, const char *neu);
 
 int check_option(struct faction * f, int option);
 
-void set_number(struct unit * u, int number);
-
 /* Anzahl Personen in einer Einheit festlegen. NUR (!) mit dieser Routine,
  * sonst großes Unglück. Durch asserts an ein paar Stellen abgesichert. */
-void set_faction(struct unit * u, struct faction * f);
 void verify_data(void);
 
 void stripfaction(struct faction * f);
@@ -1039,7 +1036,6 @@ struct region *lastregion(struct faction * f);
 #define f_koor_x(x)	x-f->ursprung[0]
 #define f_koor_y(y)	y-f->ursprung[1]
 
-void set_faction(struct unit * u, struct faction * f);
 void inituhash(void);
 void uhash(struct unit * u);
 void uunhash(struct unit * u);

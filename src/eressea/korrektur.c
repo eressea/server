@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.18 2001/02/10 13:20:09 enno Exp $
+ *	$Id: korrektur.c,v 1.19 2001/02/10 14:18:00 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -237,7 +237,7 @@ static void
 add_magrathea(void)
 {
 	unit * tans = ufindhash(atoi36("tans"));
-	if (tans) set_faction(tans, findfaction(999));
+	if (tans) u_setfaction(tans, findfaction(999));
 }
 #endif
 
@@ -880,7 +880,7 @@ give_questling(void)
 	add_message(&u1->faction->msgs,
 		new_message(u1->faction, "give%u:unit%u:target%r:region%X:resource%i:amount",
 			u1, u2, u1->region, r_unit, 1));
-	set_faction(u1, u2->faction);
+	u_setfaction(u1, u2->faction);
 	add_message(&u2->faction->msgs,
 		new_message(u1->faction, "give%u:unit%u:target%r:region%X:resource%i:amount",
 			u1, u2, u1->region, r_unit, 1));
