@@ -1037,8 +1037,8 @@ sp_magicstreet(castorder *co)
 
 	/* melden, 1x pro Partei */
 	{
-		message * seen = msg_message("path_effect", "mage", mage);
-		message * unseen = msg_message("path_effect", "mage", NULL);
+		message * seen = msg_message("path_effect", "mage region", mage, r);
+		message * unseen = msg_message("path_effect", "mage region", NULL, r);
 		report_effect(r, mage, seen, unseen);
 	}
 
