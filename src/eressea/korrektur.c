@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.27 2001/02/18 09:21:11 katze Exp $
+ *	$Id: korrektur.c,v 1.28 2001/02/20 22:54:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -161,9 +161,12 @@ fix_skills(void)
 		log_warning(("[do_once] a unique fix was called a second time\n")); \
 		return; \
 	} \
-	else (fun); \
+	else { \
+		(fun); \
+		a_add(&global.attribs, make_key(magic)); \
+	} \
 }
-
+#if 0
 static void
 fix_vertrautenmagie(void)
 {
@@ -228,6 +231,7 @@ fix_vertrautenmagie(void)
 		}
 	}
 }
+#endif
 
 #if 0
 static void
@@ -1243,6 +1247,7 @@ fix_balsamfiasko(void)
 }
 #endif
 
+#if 0
 static int
 count_demand(const region *r)
 {
@@ -1253,6 +1258,7 @@ count_demand(const region *r)
 	}
 	return c;
 }
+#endif
 
 static int
 recurse_regions(region * r, regionlist **rlist, boolean(*fun)(const region * r))
@@ -1276,6 +1282,7 @@ recurse_regions(region * r, regionlist **rlist, boolean(*fun)(const region * r))
 
 static int maxluxuries = 0;
 
+#if 0
 static boolean
 f_nolux(const region * r)
 {
@@ -1357,6 +1364,7 @@ fix_demand_region(region *r)
 		rlist = rl;
 	}
 }
+#endif
 
 extern attrib * make_atgmcreate(const struct item_type * itype);
 extern attrib * make_atpermissions(void);
@@ -1379,6 +1387,7 @@ make_gms(void)
 	}
 }
 
+#if 0
 static void
 fix_demand(void)
 {
@@ -1393,6 +1402,7 @@ fix_demand(void)
 		}
 	}
 }
+#endif
 
 #if 0
 static void
@@ -1894,13 +1904,16 @@ convert_triggers(void)
 }
 #endif
 
+#if 0
 #include <items/lmsreward.h>
 static void
 lms_special(unit * u)
 {
 	if (u) i_change(&u->items, &it_lmsreward, 1);
 }
+#endif
 
+#if 0
 #define LIFEEXPECTANCY (27*40)
 static void
 undo_deadpeasants(void)
@@ -1912,6 +1925,7 @@ undo_deadpeasants(void)
 		r = r->next;
 	}
 }
+#endif
 
 void
 fix_targetregion_resolve(void)
@@ -1942,10 +1956,10 @@ fix_baumringel(void)
 	}
 }
 
+#if 0
 #include <modules/gmcmd.h>
-void setup_gm_faction(void);
-
 #include <attributes/gm.h>
+void setup_gm_faction(void);
 static void
 set_atgm(faction * f)
 {
@@ -1956,6 +1970,7 @@ set_atgm(faction * f)
 		p = p->next;
 	}
 }
+#endif
 
 void
 korrektur(void)
@@ -1964,14 +1979,12 @@ korrektur(void)
 	setup_gm_faction();
 #endif
 	make_gms();
-	do_once(atoi36("rrgm"), set_atgm(findfaction(atoi36("rr"))));
 	/* Wieder entfernen! */
-	do_once(atoi36("trgr"), fix_targetregion_resolve());
 	verify_owners(false);
 
 	/* fix_herbtypes(); */
 #ifdef CONVERT_TRIGGER
-	do_once(atoi36("cvtr"), convert_triggers());
+	convert_triggers();
 #endif
 	fix_migrants();
 	fix_allies();
@@ -2023,13 +2036,8 @@ korrektur(void)
 		init_mwarden();
 		break;
 	}
-	do_once(atoi36("fxfa"), fix_vertrautenmagie());
-	do_once(atoi36("uddp"), undo_deadpeasants());
-  do_once(atoi36("lmsr"), lms_special(findunit(atoi36("tt3g"))))
-	do_once(atoi36("brng"), fix_baumringel());
-	do_once(atoi36("demd"), fix_demand());
 
-	/* trade_orders(); */
+        /* trade_orders(); */
 	if (global.data_version < NEWROAD_VERSION) {
 		newroads();
 	}

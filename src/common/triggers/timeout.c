@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: timeout.c,v 1.2 2001/01/26 16:19:41 enno Exp $
+ *	$Id: timeout.c,v 1.3 2001/02/20 22:54:05 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -16,7 +16,9 @@
 #include <eressea.h>
 #include "timeout.h"
 
+/* util includes */
 #include <event.h>
+#include <log.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,6 +74,14 @@ timeout_read(trigger * t, FILE * F)
 	timeout_data * td = (timeout_data*)t->data.v;
 	fscanf(F, "%d", &td->timer);
 	read_triggers(F, &td->triggers);
+	if (td->timer>10) {
+		trigger * tr = td->triggers;
+		log_warning(("there is a timeout lasting for another %d turns\n", td->timer));
+		while (tr) {
+			log_warning(("  timeout triggers: %s\n", tr->type->name));
+			tr = tr->next;
+		}
+	}
 	return (td->triggers!=NULL && td->timer>0);
 }
 
