@@ -6,7 +6,7 @@ import cgi
 import re
 
 # specify the filename of the template file
-scripturl='http://eressea.upb.de/~enno/cgi-bin/standin.py'
+scripturl='http://eressea.upb.de/cgi-bin/eressea/standin.py'
 TemplateFile = "vinyambar.html"
 DefaultTitle = "Vinyambar Parteibörse"
 dbname = "vinyambar"

@@ -7,8 +7,8 @@ import re
 import smtplib
 
 # specify the filename of the template file
-scripturl="http://eressea.upb.de/~enno/cgi-bin/info.py"
-TemplateFile = "vinyambar.html"
+scripturl="http://eressea.upb.de/cgi-bin/eressea/info.py"
+TemplateFile = "/home/enno/www/cgi-bin/vinyambar.html"
 DefaultTitle = "Vinyambar Datenbank"
 dbname = "vinyambar"
 From = "accounts@vinyambar.de"

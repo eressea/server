@@ -10,7 +10,7 @@ import smtplib
 from whrandom import choice
 
 # specify the filename of the template file
-scripturl="http://eressea.upb.de/~enno/cgi-bin/vinyambar-register.py"
+scripturl="http://eressea.upb.de/cgi-bin/eressea/vinyambar-register.py"
 HTMLTemplate = "vinyambar.html"
 MailTemplate="vinyambar-register.mail"
 DefaultTitle = "Vinyambar Anmeldung"

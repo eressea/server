@@ -10,7 +10,7 @@ import smtplib
 from whrandom import choice
 
 # specify the filename of the template file
-scripturl="http://eressea.upb.de/~enno/cgi-bin/eressea-register.py"
+scripturl="http://eressea.upb.de/cgi-bin/eressea/eressea-register.py"
 HTMLTemplate = "eressea.html"
 MailTemplate="register.mail"
 DefaultTitle = "Eressea Anmeldung"
@@ -124,6 +124,7 @@ else:
 		Display('Deine Email-Adresse ist für Eressea nicht zugelassen. '+reason)
 		sys.exit(0)
 
+	# create a new user record
 	password=genpasswd()
 	fields = "firstname, lastname, locale, email, address, city, status, password"
 	values = "'"+firstname+"', '"+lastname+"', '"+locale+"', '"+email+"', '"+address+"', '"+city+"', 'WAITING', '"+password+"'"
@@ -139,12 +140,6 @@ else:
 	if referrer!=None:
 	    fields=fields+", referrer"
 	    values=values+", '"+referrer+"'"
-	if bonus!=None:
-	    fields=fields+", bonus"
-	    if bonus=='yes':
-		values=values+", 1"
-	    else:
-		values=values+", 0"
 	if firsttime!=None:
 	    fields=fields+", firsttime"
 	    if firsttime=='yes':
@@ -154,12 +149,25 @@ else:
 	cursor.execute("insert into users ("+fields+") VALUES ("+values+")")
 	cursor.execute("SELECT LAST_INSERT_ID() from dual")
 	custid=cursor.fetchone()[0]
+
+	# track IP addresses
 	ip=None
 	if os.environ.has_key('REMOTE_ADDR'):
 	    ip=os.environ['REMOTE_ADDR']
 	if ip!=None:
 	    cursor.execute("REPLACE userips (ip, user) VALUES ('"+ip+"', "+str(int(custid))+")")
-	cursor.execute("insert into subscriptions (user, race, game, status) VALUES ("+str(int(custid))+", '"+race+"', 0, 'PENDING')")
+	
+	# add a subscription record
+	values="'PENDING'"
+	fields="status"
+	if bonus!=None:
+	    fields=fields+", bonus"
+	    if bonus=='yes':
+		values=values+", 1"
+	    else:
+		values=values+", 0"
+	cursor.execute("insert into subscriptions (user, race, game, "+fields+") VALUES ("+str(int(custid))+", '"+race+"', 0, "+values+")")
+
 	cursor.execute("select count(*) from users where status='WAITING' or status='CONFIRMED'")
 	Send(email, custid, firstname, password, cursor.fetchone()[0])
 	text={"de":"Deine Anmeldung wurde bearbeitet. Eine EMail mit Hinweisen ist unterwegs zu Dir", "en":"Your application was processed. An email containing further instructions is being sent to you"}

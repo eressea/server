@@ -9,7 +9,7 @@ import re
 TemplateFile = "vinyambar.html"
 DefaultTitle = "Eressea Umfrage 2001"
 dbname = "eressea"
-myurl="http://eressea.upb.de/~enno/cgi-bin/poll2001.py"
+myurl="http://eressea.upb.de/cgi-bin/eressea/poll2001.py"
 
 # define a new function called Display
 # it takes one parameter - a string to Display
