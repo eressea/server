@@ -22,8 +22,8 @@ def Display(Content, Title=DefaultTitle):
     TemplateInput = TemplateHandle.read()
     TemplateHandle.close()                    # close the file
 
-#    for key in Form.keys():
-#       Content=Content+"<br>"+str(key)+"="+str(Form[key])
+    for key in Form.keys():
+       Content=Content+"<br>"+str(key)+"="+str(Form[key])
 
     # this defines an exception string in case our
     # template file is messed up
@@ -78,7 +78,7 @@ def ShowInfo(custid, Password):
         results = cursor.execute(query);
 
         output=output+"<h3>Anmeldungen</h3>\n<div align=left><table width=80% border>\n"
-        output=output+"<tr><th>Spiel</th><th>Rasse</th><th>Status</th><th>Partei</th><th>Abmelden</th></tr>\n"
+        output=output+"<tr><th>Spiel</th><th>Rasse</th><th>Status</th><th>Partei</th><th>An-/Abmelden</th></tr>\n"
         while results>0:
             results = results - 1
             row = cursor.fetchone()
@@ -87,13 +87,18 @@ def ShowInfo(custid, Password):
             line = line + '<td align="left">'+row[1]+'</td>\n'
             line = line + '<td align="left">'+row[2]+'</td>\n'
             line = line + '<td align="left">'+row[3]+'</td>\n'
-            line = line + '<td align="left"><input type="checkbox" name="cancel" value="cancel_' + row[3] + '"></td>\n'
+            line = line + '<td align="center">'
+	    if row[2]=='ACTIVE':
+		line = line + '<input type="checkbox" name="cancel_' + row[3] + '">'
+	    if row[2]=='CANCELLED':
+		line = line + '<input type="checkbox" name="activate_' + row[3] + '">'
+	    line = line + '</td>\n'
             line = line + '</tr>\n'
             output=output+line
 
         output=output+"</table></div>"
-        query="select date, balance, text from transactions, descriptions where descriptions.handle=transactions.description and user="+str(custid)
 
+	query="select date, balance, text from transactions, descriptions where descriptions.handle=transactions.description and user="+str(custid)+" ORDER BY date"
         results = cursor.execute(query);
 
         output=output+"<h3>Transaktionen</h3>\n<div align=left><table width=80% border>\n"
@@ -128,16 +133,20 @@ def Save(custid, Password):
     cursor=db.cursor()
     cursor.execute('UPDATE users SET '+values+' where id='+str(custid))
 
-    nfactions = cursor.execute("select game, id, faction from subscriptions where status='ACTIVE' and user="+str(custid))
+    nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='ACTIVE' and s.user="+str(custid) + " and s.game=g.id")
     while nfactions > 0:
         game, sid, faction = cursor.fetchone()
         if Form.has_key("cancel_"+faction):
-            update = db.cursor("UPDATE subscriptions set status='CANCELLED' where id="+str(sid))
-            server=smtplib.SMTP(smtpserver)
-            Msg="From: accounts@vinyambar.de\nTo: admin@vinyambar.de\nSubject: Vinambar Abmeldung\n\n"
-            Msg=Msg+"Die Partei: "+faction+" hat sich aus Spiel Nr. "+game+" abgemeldet\n"
-            server.sendmail("accounts@vinyambar.de", "admin@vinyambar.de", Msg)
-            server.close()
+            update = db.cursor()
+	    update.execute("UPDATE subscriptions set status='CANCELLED' where id="+str(sid))
+        nfactions = nfactions - 1
+
+    nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='CANCELLED' and s.user="+str(custid) + " and s.game=g.id")
+    while nfactions > 0:
+        game, sid, faction = cursor.fetchone()
+        if Form.has_key("activate_"+faction):
+            update = db.cursor()
+	    update.execute("UPDATE subscriptions set status='ACTIVE' where id="+str(sid))
         nfactions = nfactions - 1
 
     db.close()
