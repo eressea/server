@@ -1364,10 +1364,10 @@ describe(FILE * F, const region * r, int partial, faction * f)
 		rparagraph(F, buf, 0, 0);
 	}
 
-	if (partial==0 && r->planep && r->planep->id == 1 &&
+	if (partial==0 && rplane(r) == get_astralplane() &&
 			!is_cursed(r->attribs, C_ASTRALBLOCK, 0))	{
 		/* Sonderbehandlung Teleport-Ebene */
-		region_list *rl = astralregions(r_astral_to_standard(r), inhabitable);
+		region_list *rl = astralregions(r, inhabitable);
 		region_list *rl2;
 
 		if (rl) {

@@ -20,7 +20,7 @@ extern "C" {
 
   struct region *r_standard_to_astral(const struct region *r);
   struct region *r_astral_to_standard(const struct region *);
-  extern struct region_list *astralregions(const struct region * r, boolean (*valid)(const struct region *));
+  extern struct region_list *astralregions(const struct region * rastral, boolean (*valid)(const struct region *));
   extern struct region_list *all_in_range(const struct region *r, int n, boolean (*valid)(const struct region *));
   extern boolean inhabitable(const struct region * r);
   extern struct plane * get_astralplane(void);

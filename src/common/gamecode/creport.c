@@ -1345,10 +1345,10 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 			}
 			print_curses(F, f, r, TYP_REGION);
 			cr_borders(r, f, sd->mode, F);
-			if (sd->mode==see_unit && r->planep && r->planep->id == 1 && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
+			if (sd->mode==see_unit && rplane(r)==get_astralplane() && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
 			{
 				/* Sonderbehandlung Teleport-Ebene */
-				region_list *rl = astralregions(r_astral_to_standard(r), inhabitable);
+				region_list *rl = astralregions(r, inhabitable);
 
 				if (rl) {
 					region_list *rl2 = rl;

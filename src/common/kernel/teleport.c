@@ -31,6 +31,9 @@
 #include "faction.h"
 #include "plane.h"
 
+/* util includes */
+#include <log.h>
+
 /* libc includes */
 #include <assert.h>
 #include <stdlib.h>
@@ -60,9 +63,13 @@ astralregions(const region * r, boolean (*valid)(const region *))
   region_list * rlist = NULL;
   int x, y;
 
-  assert(rplane(r) == NULL);
-  if (r==NULL) return NULL;
+  assert(rplane(r) == get_astralplane());
+  if (rplane(r) != get_astralplane()) {
+    log_error(("astralregions was called with a non-astral region.\n"));
+    return NULL;
+  }
   r = r_astral_to_standard(r);
+  if (r==NULL) return NULL;
 
   for (x=r->x-TP_RADIUS;x<=r->x+TP_RADIUS;++x) {
     for (y=r->y-TP_RADIUS;y<=r->y+TP_RADIUS;++y) {
