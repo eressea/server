@@ -425,6 +425,46 @@ live(region * r)
  * - movement because of low loyalty relating to present parties.
  */
 
+#if NEW_MIGRATION == 1
+
+/* Arbeitsversion */
+
+void
+calculate_emigration(region *r)
+{
+	direction_t i;
+	int overpopulation = rpeasants(r) - maxworkingpeasants(r);
+	int weight[MAXDIRECTIONS];
+	int weightall = 0;
+
+
+	for (i = 0; i != MAXDIRECTIONS; i++) {
+		region *rc = rconnect(r,i);
+		int w;
+
+		if(rterrain(rc) == T_OCEAN) {
+			w = 0;
+		} else {
+			w = rpeasants(rc) - maxworkingpeasants(rc);
+		}
+
+		if(rterrain(rc) == T_VOLCANO || rterrain(rc) == T_VOLCANO_SMOKING) {
+			w = w/10;
+		} 
+		weight[i]  = w;
+		weightall += w;
+	}
+	
+	for (i = 0; i != MAXDIRECTIONS; i++) {
+		region *rc = rconnect(r,i);
+		int wandering_peasants = (overpopulation * weight[i])/weightall;
+
+		r->land->newpeasants -= wandering_peasants;
+		rc->land->newpeasants += wandering_peasants;
+	}
+}
+
+#else
 void
 calculate_emigration(region *r)
 {
@@ -487,7 +527,7 @@ calculate_emigration(region *r)
 					}
 				}
 
-				wandering_peasants = (int) (rpeasants(r) * (gfactor + wfactor)
+				wandering_peasants = (int) (rpeasants(r) * (gfactor+wfactor)
 						* vfactor * PEASANTSWANDER_WEIGHT / 100.0);
 
 				r->land->newpeasants -= wandering_peasants;
@@ -496,6 +536,7 @@ calculate_emigration(region *r)
 		}
 	}
 }
+#endif
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
 
