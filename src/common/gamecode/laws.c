@@ -2304,37 +2304,33 @@ display_item(faction *f, unit *u, const item_type * itype)
 	const char *name;
 
 	if (u && *i_find(&u->items, itype) == NULL) return false;
-	/*
-	info = mkname("info", itype->rtype->_name[0]);
-	name = LOC(u->faction->locale, info);
-	if (strcmp(name, info)==0) {
-	*/
-		name = resourcename(itype->rtype, 0);
+
+  name = resourcename(itype->rtype, 0);
+	sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
+	fp = fopen(filename, "r");
+	if (!fp) {
+		name = locale_string(f->locale, resourcename(itype->rtype, 0));
 		sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
 		fp = fopen(filename, "r");
-		if (!fp) {
-			name = locale_string(f->locale, resourcename(itype->rtype, 0));
-			sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
-			fp = fopen(filename, "r");
-		}
-		if (!fp) {
-			name = resourcename(itype->rtype, 0);
-			sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(default_locale), name);
-			fp = fopen(filename, "r");
-		}
-		if (!fp) return false;
+	}
+	if (!fp) {
+		name = resourcename(itype->rtype, 0);
+		sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(default_locale), name);
+		fp = fopen(filename, "r");
+	}
+	if (!fp) return false;
 
-		buf[0]='\0';
-		while (fgets(t, NAMESIZE, fp) != NULL) {
-			if (t[strlen(t) - 1] == '\n') {
-				t[strlen(t) - 1] = 0;
-			}
-			strcat(buf, t);
+	buf[0]='\0';
+	while (fgets(t, NAMESIZE, fp) != NULL) {
+		if (t[strlen(t) - 1] == '\n') {
+			t[strlen(t) - 1] = 0;
 		}
-		fclose(fp);
-		name = buf;
-/*	} */
-	ADDMSG(&f->msgs, msg_message("displayitem", "item description", itype->rtype, strdup(name)));
+		strcat(buf, t);
+	}
+	fclose(fp);
+	name = buf;
+	ADDMSG(&f->msgs, msg_message("displayitem", "weight item description", 
+    itype->weight/1000, itype->rtype, strdup(name)));
 
 	return true;
 }

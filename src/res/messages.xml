@@ -272,8 +272,10 @@
     <type>
       <arg name="item" type="resource"/>
       <arg name="description" type="string"/>
+      <arg name="weight" type="int"/>
     </type>
-    <text locale="de">"$resource($item,1): $description"</text>
+    <text locale="de">"$resource($item,1) ($int($weight) GE): $description"</text>
+    <text locale="en">"$resource($item,1) ($int($weight) st): $description"</text>
   </message>
   <message name="healall" section="events">
     <type>

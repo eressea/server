@@ -499,266 +499,266 @@ learn(void)
 
         if (u->race == new_race[RC_INSECT] && r_insectstalled(r)
           && !is_cursed(u->attribs, C_KAELTESCHUTZ,0)) {
-            continue;
-          }
-          if (attacked(u)) {
-					cmistake(u, u->thisorder, 52, MSG_PRODUCE);
-            continue;
-          }
-          if ((u->race->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
-            sprintf(buf, "%s können nichts lernen", LOC(default_locale, rc_name(u->race, 1)));
-            mistake(u, u->thisorder, buf, MSG_EVENT);
-            continue;
-          }
+          continue;
+        }
+        if (attacked(u)) {
+				cmistake(u, u->thisorder, 52, MSG_PRODUCE);
+          continue;
+        }
+        if ((u->race->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
+          sprintf(buf, "%s können nichts lernen", LOC(default_locale, rc_name(u->race, 1)));
+          mistake(u, u->thisorder, buf, MSG_EVENT);
+          continue;
+        }
 
-          init_tokens(u->thisorder);
-          skip_token();
-          sk = getskill(u->faction->locale);
+        init_tokens(u->thisorder);
+        skip_token();
+        sk = getskill(u->faction->locale);
 
-          if (sk < 0) {
+        if (sk < 0) {
+				cmistake(u, u->thisorder, 77, MSG_EVENT);
+          continue;
+        }
+        if (SkillCap(sk) && SkillCap(sk) <= effskill(u, sk)) {
 					cmistake(u, u->thisorder, 77, MSG_EVENT);
+          continue;
+        }
+        /* Hack: Talente mit Malus -99 können nicht gelernt werden */
+        if (u->race->bonus[sk] == -99) {
+          cmistake(u, u->thisorder, 77, MSG_EVENT);
+          continue;
+        }
+        /* snotlings können Talente nur bis T8 lernen */
+        if (u->race == new_race[RC_SNOTLING]){
+          if (get_level(u, sk) >= 8){
+            cmistake(u, u->thisorder, 308, MSG_EVENT);
             continue;
           }
-          if (SkillCap(sk) && SkillCap(sk) <= effskill(u, sk)) {
-						cmistake(u, u->thisorder, 77, MSG_EVENT);
+        }
+
+        p = studycost = study_cost(u, sk);
+        a = a_find(u->attribs, &at_learning);
+        if (a!=NULL) {
+          teach = (teaching_info*)a->data.v;
+        }
+
+        /* keine kostenpflichtigen Talente für Migranten. Vertraute sind
+        * keine Migranten, wird in is_migrant abgefangen. Vorsicht,
+        * studycost darf hier noch nicht durch Akademie erhöht sein */
+        if (studycost > 0 && !ExpensiveMigrants() && is_migrant(u)) {
+          sprintf(buf, "Migranten können keine kostenpflichtigen Talente lernen");
+          mistake(u, u->thisorder, buf, MSG_EVENT);
+          continue;
+        }
+        /* Akademie: */
+        {
+          struct building * b = inside_building(u);
+          const struct building_type * btype = b?b->type:NULL;
+
+          if (btype == bt_find("academy")) {
+            studycost = max(50, studycost * 2);
+          }
+        }
+
+        if (sk == SK_MAGIC) {
+          if (u->number > 1){
+            cmistake(u, u->thisorder, 106, MSG_MAGIC);
             continue;
           }
-          /* Hack: Talente mit Malus -99 können nicht gelernt werden */
-          if (u->race->bonus[sk] == -99) {
-            cmistake(u, u->thisorder, 77, MSG_EVENT);
-            continue;
-          }
-          /* snotlings können Talente nur bis T8 lernen */
-          if (u->race == new_race[RC_SNOTLING]){
-            if (get_level(u, sk) >= 8){
-              cmistake(u, u->thisorder, 308, MSG_EVENT);
-              continue;
-            }
-          }
-
-          p = studycost = study_cost(u, sk);
-          a = a_find(u->attribs, &at_learning);
-          if (a!=NULL) {
-            teach = (teaching_info*)a->data.v;
-          }
-
-          /* keine kostenpflichtigen Talente für Migranten. Vertraute sind
-          * keine Migranten, wird in is_migrant abgefangen. Vorsicht,
-          * studycost darf hier noch nicht durch Akademie erhöht sein */
-          if (studycost > 0 && !ExpensiveMigrants() && is_migrant(u)) {
-            sprintf(buf, "Migranten können keine kostenpflichtigen Talente lernen");
-            mistake(u, u->thisorder, buf, MSG_EVENT);
-            continue;
-          }
-          /* Akademie: */
-          {
-            struct building * b = inside_building(u);
-            const struct building_type * btype = b?b->type:NULL;
-
-            if (btype == bt_find("academy")) {
-              studycost = max(50, studycost * 2);
-            }
-          }
-
-          if (sk == SK_MAGIC) {
-            if (u->number > 1){
-              cmistake(u, u->thisorder, 106, MSG_MAGIC);
-              continue;
-            }
-            if (is_familiar(u)){
-              /* Vertraute zählen nicht zu den Magiern einer Partei,
-              * können aber nur Graue Magie lernen */
-              mtyp = M_GRAU;
-              if (!has_skill(u, SK_MAGIC)) {
-                create_mage(u, mtyp);
-              }
-            } else if (!has_skill(u, SK_MAGIC)){
-              /* Die Einheit ist noch kein Magier */
-              if (count_skill(u->faction, SK_MAGIC) + u->number >
-                max_skill(u->faction, SK_MAGIC))
-              {
-                sprintf(buf, "Es kann maximal %d Magier pro Partei geben",
-                  max_skill(u->faction, SK_MAGIC));
-                mistake(u, u->thisorder, buf, MSG_EVENT);
-                continue;
-              }
-              mtyp = getmagicskill();
-              if (mtyp == M_NONE || mtyp == M_GRAU) {
-                /* wurde kein Magiegebiet angegeben, wird davon
-                * ausgegangen, daß das normal gelernt werden soll */
-                if(u->faction->magiegebiet != 0) {
-                  mtyp = u->faction->magiegebiet;
-                } else {
-                  /* Es wurde kein Magiegebiet angegeben und die Partei
-                  * hat noch keins gewählt. */
-                  cmistake(u, u->thisorder, 178, MSG_MAGIC);
-                  continue;
-                }
-              }
-              if (mtyp != u->faction->magiegebiet){
-                /* Es wurde versucht, ein anderes Magiegebiet zu lernen
-                * als das der Partei */
-                if (u->faction->magiegebiet != 0){
-                  cmistake(u, u->thisorder, 179, MSG_MAGIC);
-                  continue;
-                } else {
-                  /* Lernt zum ersten mal Magie und legt damit das
-                  * Magiegebiet der Partei fest */
-                  u->faction->magiegebiet = mtyp;
-                }
-              }
+          if (is_familiar(u)){
+            /* Vertraute zählen nicht zu den Magiern einer Partei,
+            * können aber nur Graue Magie lernen */
+            mtyp = M_GRAU;
+            if (!has_skill(u, SK_MAGIC)) {
               create_mage(u, mtyp);
-            } else {
-              /* ist schon ein Magier und kein Vertrauter */
-              if(u->faction->magiegebiet == 0){
-                /* die Partei hat noch kein Magiegebiet gewählt. */
-                mtyp = getmagicskill();
-                if (mtyp == M_NONE){
-                  cmistake(u, u->thisorder, 178, MSG_MAGIC);
-                  continue;
-                } else {
-                  /* Legt damit das Magiegebiet der Partei fest */
-                  u->faction->magiegebiet = mtyp;
-                }
-              }
             }
-          }
-          if (sk == SK_ALCHEMY) {
-            maxalchemy = eff_skill(u, SK_ALCHEMY, r);
-            if (has_skill(u, SK_ALCHEMY)==0
-              && count_skill(u->faction, SK_ALCHEMY) + u->number >
-              max_skill(u->faction, SK_ALCHEMY)) {
-                sprintf(buf, "Es kann maximal %d Alchemisten pro Partei geben",
-                  max_skill(u->faction, SK_ALCHEMY));
-                mistake(u, u->thisorder, buf, MSG_EVENT);
+          } else if (!has_skill(u, SK_MAGIC)){
+            /* Die Einheit ist noch kein Magier */
+            if (count_skill(u->faction, SK_MAGIC) + u->number >
+              max_skill(u->faction, SK_MAGIC))
+            {
+              sprintf(buf, "Es kann maximal %d Magier pro Partei geben",
+                max_skill(u->faction, SK_MAGIC));
+              mistake(u, u->thisorder, buf, MSG_EVENT);
+              continue;
+            }
+            mtyp = getmagicskill();
+            if (mtyp == M_NONE || mtyp == M_GRAU) {
+              /* wurde kein Magiegebiet angegeben, wird davon
+              * ausgegangen, daß das normal gelernt werden soll */
+              if(u->faction->magiegebiet != 0) {
+                mtyp = u->faction->magiegebiet;
+              } else {
+                /* Es wurde kein Magiegebiet angegeben und die Partei
+                * hat noch keins gewählt. */
+                cmistake(u, u->thisorder, 178, MSG_MAGIC);
                 continue;
               }
+            }
+            if (mtyp != u->faction->magiegebiet){
+              /* Es wurde versucht, ein anderes Magiegebiet zu lernen
+              * als das der Partei */
+              if (u->faction->magiegebiet != 0){
+                cmistake(u, u->thisorder, 179, MSG_MAGIC);
+                continue;
+              } else {
+                /* Lernt zum ersten mal Magie und legt damit das
+                * Magiegebiet der Partei fest */
+                u->faction->magiegebiet = mtyp;
+              }
+            }
+            create_mage(u, mtyp);
+          } else {
+            /* ist schon ein Magier und kein Vertrauter */
+            if(u->faction->magiegebiet == 0){
+              /* die Partei hat noch kein Magiegebiet gewählt. */
+              mtyp = getmagicskill();
+              if (mtyp == M_NONE){
+                cmistake(u, u->thisorder, 178, MSG_MAGIC);
+                continue;
+              } else {
+                /* Legt damit das Magiegebiet der Partei fest */
+                u->faction->magiegebiet = mtyp;
+              }
+            }
           }
-          if (studycost) {
-            money = get_pooled(u, r, R_SILVER);
-            money = min(money, studycost * u->number);
-          }
-          if (money < studycost * u->number) {
-            studycost = p;	/* Ohne Univertreurung */
-            money = min(money, studycost);
-            if (p>0 && money < studycost * u->number) {
+        }
+        if (sk == SK_ALCHEMY) {
+          maxalchemy = eff_skill(u, SK_ALCHEMY, r);
+          if (has_skill(u, SK_ALCHEMY)==0
+            && count_skill(u->faction, SK_ALCHEMY) + u->number >
+            max_skill(u->faction, SK_ALCHEMY)) {
+              sprintf(buf, "Es kann maximal %d Alchemisten pro Partei geben",
+                max_skill(u->faction, SK_ALCHEMY));
+              mistake(u, u->thisorder, buf, MSG_EVENT);
+              continue;
+            }
+        }
+        if (studycost) {
+          money = get_pooled(u, r, R_SILVER);
+          money = min(money, studycost * u->number);
+        }
+        if (money < studycost * u->number) {
+          studycost = p;	/* Ohne Univertreurung */
+          money = min(money, studycost);
+          if (p>0 && money < studycost * u->number) {
 #ifdef PARTIAL_STUDY
-              cmistake(u, u->thisorder, 65, MSG_EVENT);
-              multi = money / (double)(studycost * u->number);
+            cmistake(u, u->thisorder, 65, MSG_EVENT);
+            multi = money / (double)(studycost * u->number);
 #else
-              cmistake(u, u->thisorder, 65, MSG_EVENT);
-              continue;		/* nein, Silber reicht auch so nicht */
+            cmistake(u, u->thisorder, 65, MSG_EVENT);
+            continue;		/* nein, Silber reicht auch so nicht */
 #endif
-            }
           }
+        }
 
-          if (teach==NULL) {
-            a = a_add(&u->attribs, a_new(&at_learning));
-            teach = (teaching_info*)a->data.v;
-            teach->teachers[0] = 0;
+        if (teach==NULL) {
+          a = a_add(&u->attribs, a_new(&at_learning));
+          teach = (teaching_info*)a->data.v;
+          teach->teachers[0] = 0;
+        }
+        if (money>0) {
+          use_pooled(u, r, R_SILVER, money);
+          add_message(&u->faction->msgs, msg_message("studycost",
+            "unit region cost skill", u, u->region, money, sk));
+        }
+
+        if (get_effect(u, oldpotiontype[P_WISE])) {
+          l = min(u->number, get_effect(u, oldpotiontype[P_WISE]));
+          teach->value += l * 10;
+          change_effect(u, oldpotiontype[P_WISE], -l);
+        }
+        if (get_effect(u, oldpotiontype[P_FOOL])) {
+          l = min(u->number, get_effect(u, oldpotiontype[P_FOOL]));
+          teach->value -= l * 30;
+          change_effect(u, oldpotiontype[P_FOOL], -l);
+        }
+
+        warrior_skill = fspecial(u->faction, FS_WARRIOR);
+        if(warrior_skill > 0) {
+          if(sk == SK_CROSSBOW || sk == SK_LONGBOW
+            || sk == SK_CATAPULT || sk == SK_SWORD || sk == SK_SPEAR
+            || sk == SK_AUSDAUER || sk == SK_WEAPONLESS)
+          {
+            teach->value += u->number * (5+warrior_skill*5);
+          } else {
+            teach->value -= u->number * (5+warrior_skill*5);
+            teach->value = max(0, teach->value);
           }
-          if (money>0) {
-            use_pooled(u, r, R_SILVER, money);
-            add_message(&u->faction->msgs, msg_message("studycost",
-              "unit region cost skill", u, u->region, money, sk));
+        }
+
+        if (p != studycost) {
+          /* ist_in_gebaeude(r, u, BT_UNIVERSITAET) == 1) { */
+          /* p ist Kosten ohne Uni, studycost mit; wenn
+          * p!=studycost, ist die Einheit zwangsweise
+          * in einer Uni */
+          teach->value += u->number * 10;
+        }
+
+        if (is_cursed(r->attribs,C_BADLEARN,0)) {
+          teach->value -= u->number * 10;
+        }
+
+        days = (int)((u->number * 30 + teach->value) * multi);
+
+        /* the artacademy currently improves the learning of entertainment
+        of all units in the region, to be able to make it cumulative with
+        with an academy */
+
+        if(buildingtype_exists(r, bt_find("artacademy"))) {
+          days *= 2;
+        }
+
+        if (fval(u, UFL_HUNGER)) days /= 2;
+
+        while (days) {
+          if (days>=u->number*30) {
+            learn_skill(u, sk, 1.0);
+            days -= u->number*30;
+          } else {
+            double chance = (double)days/u->number/30;
+            learn_skill(u, sk, chance);
+            days = 0;
           }
-
-          if (get_effect(u, oldpotiontype[P_WISE])) {
-            l = min(u->number, get_effect(u, oldpotiontype[P_WISE]));
-            teach->value += l * 10;
-            change_effect(u, oldpotiontype[P_WISE], -l);
-          }
-          if (get_effect(u, oldpotiontype[P_FOOL])) {
-            l = min(u->number, get_effect(u, oldpotiontype[P_FOOL]));
-            teach->value -= l * 30;
-            change_effect(u, oldpotiontype[P_FOOL], -l);
-          }
-
-          warrior_skill = fspecial(u->faction, FS_WARRIOR);
-          if(warrior_skill > 0) {
-            if(sk == SK_CROSSBOW || sk == SK_LONGBOW
-              || sk == SK_CATAPULT || sk == SK_SWORD || sk == SK_SPEAR
-              || sk == SK_AUSDAUER || sk == SK_WEAPONLESS)
-            {
-              teach->value += u->number * (5+warrior_skill*5);
-            } else {
-              teach->value -= u->number * (5+warrior_skill*5);
-              teach->value = max(0, teach->value);
-            }
-          }
-
-          if (p != studycost) {
-            /* ist_in_gebaeude(r, u, BT_UNIVERSITAET) == 1) { */
-            /* p ist Kosten ohne Uni, studycost mit; wenn
-            * p!=studycost, ist die Einheit zwangsweise
-            * in einer Uni */
-            teach->value += u->number * 10;
-          }
-
-          if (is_cursed(r->attribs,C_BADLEARN,0)) {
-            teach->value -= u->number * 10;
-          }
-
-          days = (int)((u->number * 30 + teach->value) * multi);
-
-          /* the artacademy currently improves the learning of entertainment
-          of all units in the region, to be able to make it cumulative with
-          with an academy */
-
-          if(buildingtype_exists(r, bt_find("artacademy"))) {
-            days *= 2;
-          }
-
-          if (fval(u, UFL_HUNGER)) days /= 2;
-
-          while (days) {
-            if (days>=u->number*30) {
-              learn_skill(u, sk, 1.0);
-              days -= u->number*30;
-            } else {
-              double chance = (double)days/u->number/30;
-              learn_skill(u, sk, chance);
-              days = 0;
-            }
-          }
-          if (a!=NULL) {
-            if (teach!=NULL) {
-              int index = 0;
-              while (teach->teachers[index] && index!=MAXTEACHERS) {
-                unit * teacher = teach->teachers[index++];
-                if (teacher->faction != u->faction) {
-                  add_message(&u->faction->msgs, msg_message("teach_student",
-                    "teacher student skill", teacher, u, sk));
-                  add_message(&teacher->faction->msgs, msg_message("teach_teacher",
-                    "teacher student skill level", teacher, u, sk,
-                    effskill(u, sk)));
-                }
-              }
-            }
-            a_remove(&u->attribs, a);
-            a = NULL;
-          }
-
-          /* Anzeigen neuer Tränke */
-          /* Spruchlistenaktualiesierung ist in Regeneration */
-
-          if (sk == SK_ALCHEMY) {
-            const potion_type * ptype;
-            faction * f = u->faction;
-            int skill = eff_skill(u, SK_ALCHEMY, r);
-            if (skill>maxalchemy) {
-              for (ptype=potiontypes; ptype; ptype=ptype->next) {
-                if (skill == ptype->level * 2) {
-                  attrib * a = a_find(f->attribs, &at_showitem);
-                  while (a && a->data.v != ptype) a=a->nexttype;
-                  if (!a) {
-                    a = a_add(&f->attribs, a_new(&at_showitem));
-                    a->data.v = (void*) ptype->itype;
-                  }
-                }
+        }
+        if (a!=NULL) {
+          if (teach!=NULL) {
+            int index = 0;
+            while (teach->teachers[index] && index!=MAXTEACHERS) {
+              unit * teacher = teach->teachers[index++];
+              if (teacher->faction != u->faction) {
+                add_message(&u->faction->msgs, msg_message("teach_student",
+                  "teacher student skill", teacher, u, sk));
+                add_message(&teacher->faction->msgs, msg_message("teach_teacher",
+                  "teacher student skill level", teacher, u, sk,
+                  effskill(u, sk)));
               }
             }
           }
+          a_remove(&u->attribs, a);
+          a = NULL;
+        }
+
+        /* Anzeigen neuer Tränke */
+        /* Spruchlistenaktualiesierung ist in Regeneration */
+
+        if (sk == SK_ALCHEMY) {
+          const potion_type * ptype;
+          faction * f = u->faction;
+          int skill = eff_skill(u, SK_ALCHEMY, r);
+          if (skill>maxalchemy) {
+            for (ptype=potiontypes; ptype; ptype=ptype->next) {
+              if (skill == ptype->level * 2) {
+                attrib * a = a_find(f->attribs, &at_showitem);
+                while (a && a->data.v != ptype) a=a->nexttype;
+                if (!a) {
+                  a = a_add(&f->attribs, a_new(&at_showitem));
+                  a->data.v = (void*) ptype->itype;
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

@@ -1987,7 +1987,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
 	switch(a->type) {
 	case AT_STANDARD:		/* Waffen, mag. Gegenstände, Kampfzauber */
 	case AT_COMBATSPELL:
-		if (af->magic > 0) {
+		if (numattack==0 && af->magic > 0) {
 			/* Magier versuchen immer erstmal zu zaubern, erst wenn das
 			 * fehlschlägt, wird af->magic == 0 und  der Magier kämpft
 			 * konventionell weiter */
@@ -2027,11 +2027,11 @@ attack(battle *b, troop ta, const att *a, int numattack)
 					}
 					if (!td.fighter) return;
 
-					if(td.fighter->person[td.index].last_action < b->turn) {
+					if (td.fighter->person[td.index].last_action < b->turn) {
 						td.fighter->person[td.index].last_action = b->turn;
 						td.fighter->action_counter++;
 					}
-					if(ta.fighter->person[ta.index].last_action < b->turn) {
+					if (ta.fighter->person[ta.index].last_action < b->turn) {
 						ta.fighter->person[ta.index].last_action = b->turn;
 						ta.fighter->action_counter++;
 					}

@@ -213,6 +213,14 @@ function test_parser()
   write_game("parser")
 end
 
+function test_fail()
+  plain = terraform(0, 0, "plain")
+  skill = 5
+
+  f = add_faction("enno@eressea.de", "human", "de")
+  print(f)
+end
+
 test_fail()
 -- test_handler()
 -- test_parser()

@@ -1,5 +1,4 @@
-The crash of the day:
-giving units names or descriptions that exceed NAMESIZE/DISPLAYSIZE can be a bad thing.
+weights in item descriptions
 
 [11:01] <Enno`> am besten wäre, wenn mailit nur die optionen, nicht das ganze script enthielte
 [11:01] <Enno`> und ein skript dann mailit als input nähme

@@ -4050,7 +4050,7 @@ sp_charmingsong(castorder *co)
 	int tb = 0;
 
 	/* wenn kein Ziel gefunden, Zauber abbrechen */
-	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+	if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
 	target = pa->param[0]->data.u;
 
