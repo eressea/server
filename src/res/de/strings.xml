@@ -1867,6 +1867,13 @@
 	<string name="Uruks">
 		<text locale="de">Orks</text>
 	</string>
+	<string name="Snotling">
+		<text locale="de">Snotling</text>
+	</string>
+	<string name="Snotlinge">
+		<text locale="de">Snotlinge</text>
+	</string>
+
 	<string name="Riesenschildkröte">
 		<text locale="de">Riesenschildkröte</text>
 	</string>
@@ -2024,6 +2031,12 @@
 	</string>
 	<string name="rc_uruk">
 		<text locale="de">Ork</text>
+	</string>
+	<string name="rc_snotling">
+		<text locale="de">Snotling</text>
+	</string>
+	<string name="rc_snotling_p">
+		<text locale="de">Snotlinge</text>
 	</string>
 	<string name="rc_zombie">
 		<text locale="de">Zombie</text>

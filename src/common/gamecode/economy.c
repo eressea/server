@@ -397,6 +397,8 @@ recruit(region * r, unit * u, strlist * S,
 		cmistake(u, S->s, 139, MSG_EVENT);
 		return;
 	}
+	/* snotlinge sollten hiermit bereits abgefangen werden, die
+	 * parteirasse ist uruk oder ork*/
 	if (u->race != u->faction->race) {
 		if (u->number != 0) {
 			cmistake(u, S->s, 139, MSG_EVENT);
