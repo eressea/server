@@ -78,6 +78,7 @@
 extern const char *directions[];
 extern const char *spelldata[];
 extern int quiet;
+extern boolean opt_cr_absolute_coords;
 
 /* globals */
 #define C_REPORT_VERSION 64
@@ -1138,8 +1139,13 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
     unit * owner = region_owner(r);
 		sd = sd->next;
 
-		if (!rplane(r)) fprintf(F, "REGION %d %d\n", region_x(r, f), region_y(r, f));
-		else {
+		if (!rplane(r)) {
+			if(opt_cr_absolute_coords) {
+				fprintf(F, "REGION %d %d\n", r->x, r->x);
+			} else {
+				fprintf(F, "REGION %d %d\n", region_x(r, f), region_y(r, f));
+			}
+		} else {
 #if ENCODE_SPECIAL
 			if (rplane(r)->flags & PFL_NOCOORDS) fprintf(F, "SPEZIALREGION %d %d\n", encode_region(f, r), rplane(r)->id);
 #else

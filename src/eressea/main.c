@@ -118,7 +118,7 @@ extern int fuzzy_hits;
 #endif /* FUZZY_BASE36 */
 
 /**
- ** global variables wthat we are exporting
+ ** global variables that we are exporting
  **/
 static char * orders = NULL;
 static char * xmlfile = NULL;
@@ -126,6 +126,7 @@ static int nowrite = 0;
 static boolean g_writemap = false;
 static boolean g_killeiswald = false;
 static boolean opt_reportonly = false;
+boolean opt_cr_absolute_coords = false;
 
 struct settings global = {
 	"Eressea", /* gamename */
@@ -507,6 +508,7 @@ usage(const char * prog, const char * arg)
 		"--debug          : schreibt Debug-Ausgaben in die Datei debug\n"
 		"--nocr           : keine CRs\n"
 		"--nonr           : keine Reports\n"
+		"--crabsolute     : absolute Koordinaten im CR\n"
 #ifdef USE_MERIAN
 		"--nomer          : keine Meriankarten\n"
 #endif
@@ -539,6 +541,7 @@ read_args(int argc, char **argv)
 			else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
 			else if (strcmp(argv[i]+2, "nomonsters")==0) nomonsters = true;
 			else if (strcmp(argv[i]+2, "nodebug")==0) nobattledebug = true;
+			else if (strcmp(argv[i]+2, "crabsolute")==0) opt_cr_absolute_coords = true;
 #ifdef USE_MERIAN
 			else if (strcmp(argv[i]+2, "nomer")==0) nomer = true;
 #endif
