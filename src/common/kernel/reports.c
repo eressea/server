@@ -32,6 +32,7 @@
 #include "ship.h"
 #include "race.h"
 #include "magic.h"
+#include "ugroup.h"
 
 /* util includes */
 #include <base36.h>
@@ -175,8 +176,7 @@ report_item(const unit * owner, const item * i, const faction * viewer, const ch
 }
 
 int
-bufunit(const faction * f, const unit * u, int indent,
-       int mode)
+bufunit(const faction * f, const unit * u, int indent, int mode)
 {
 	int i, dh;
 	skill_t sk;
@@ -227,6 +227,7 @@ bufunit(const faction * f, const unit * u, int indent,
 	}
 
 	scat(", ");
+
 	if(u->faction != f && a_fshidden
 			&& a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {
 		scat("? ");
@@ -434,6 +435,160 @@ bufunit(const faction * f, const unit * u, int indent,
 	return dh;
 }
 
+/* TODO: telepath_see wird nicht berücksichtigt: Parteien mit
+ * telepath_see sollten immer einzelne Einheiten zu sehen
+ * bekommen, alles andere ist darstellungsteschnisch kompliziert.
+ */
+
+int
+bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
+{
+	int i, dh;
+	int getarnt = fval(u, FL_PARTEITARNUNG);
+	attrib *a_otherfaction = NULL;
+	const char *pzTmp;
+	boolean itemcloak = is_cursed(u->attribs, C_ITEMCLOAK, 0);
+	attrib *a_fshidden = NULL;
+	item * itm;
+	item * show;
+	ugroup *ug = findugroup(u);
+	boolean guards = false;
+	boolean sieges = false;
+	
+	if(fspecial(u->faction, FS_HIDDEN))
+		a_fshidden = a_find(u->attribs, &at_fshidden);
+
+	strcpy(buf, u->name);
+	
+	a_otherfaction = a_find(u->attribs, &at_otherfaction);
+
+	if (getarnt) {
+		scat(", parteigetarnt");
+	} else if(a_otherfaction) {
+		scat(", ");
+		scat(factionname(findfaction(a_otherfaction->data.i)));
+	} else {
+		scat(", ");
+		scat(factionname(u->faction));
+	}
+
+	scat(", ");
+
+	for(i = 0; i < ug->members; i++) {
+		unit *uc = ug->unit_array[i];
+		if(uc->faction != f && a_fshidden
+				&& a_fshidden->data.ca[0] == 1 && effskill(uc, SK_STEALTH) >= 6) {
+			scat("? ");
+		}	 else {
+			icat(uc->number);
+			scat(" ");
+		}
+		pzTmp = get_racename(uc->attribs);
+		if (pzTmp || u->irace != uc->race) {
+			if (pzTmp)
+				scat(pzTmp);
+			else
+				scat(locale_string(f->locale, race[uc->irace].name[uc->number != 1]));
+			scat(" (");
+			scat(itoa36(uc->no));
+			scat("), ");
+		} else {
+			scat(locale_string(f->locale, race[uc->race].name[uc->number != 1]));
+			scat(" (");
+			scat(itoa36(uc->no));
+			scat("), ");
+		}
+		if(getguard(uc)) guards = true;
+		if(usiege(uc)) sieges = true;
+	}
+
+	if(guards == true) scat(", bewacht die Region");
+
+	if(sieges == true) {
+		scat(", belagert ");
+		for(i = 0; i < ug->members; i++) {
+			building *b = usiege(ug->unit_array[i]);
+			if(b) {
+				scat(buildingname(b));
+				scat(", ");
+			}
+		}
+	}
+
+	dh = 0;
+	show = NULL;
+	for(i = 0; i < ug->members; i++) {
+		unit *uc = ug->unit_array[i];
+		if(!itemcloak && mode >= see_unit && !(a_fshidden
+				 && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
+			for (itm=uc->items;itm;itm=itm->next) {
+				item *ishow;
+				const char * ic;
+				int in;
+				report_item(u, itm, f, NULL, &ic, &in, false);
+				if (ic && *ic && in>0) {
+					for (ishow = show; ishow; ishow=ishow->next) {
+						const char * sc;
+						int sn;
+						if (ishow->type==itm->type) sc=ic;
+						else report_item(u, ishow, f, NULL, &sc, &sn, false);
+						if (sc==ic || strcmp(sc, ic)==0) {
+							ishow->number+=itm->number;
+							break;
+						}
+					}
+					if (ishow==NULL) {
+						ishow = i_add(&show, i_new(itm->type));
+						ishow->number = itm->number;
+					}
+				}
+			}
+		}
+	}
+	for (itm=show; itm; itm=itm->next) {
+		const char * ic;
+		int in;
+		report_item(u, itm, f, &ic, NULL, &in, false);
+		if (in==0 || ic==NULL) continue;
+		scat(", ");
+
+		if (!dh) {
+			sprintf(buf+strlen(buf), "%s: ", LOC(f->locale, "nr_inventory"));
+			dh = 1;
+		}
+		if (in == 1) {
+			scat(ic);
+		} else {
+			icat(in);
+			scat(" ");
+			scat(ic);
+		}
+	}
+	if(show) while(show) i_free(i_remove(&show, show));
+
+	i = 0;
+	if (u->display[0]) {
+		scat("; ");
+		scat(u->display);
+
+		i = u->display[strlen(u->display) - 1];
+	}
+	if (i != '!' && i != '?' && i != '.')
+		scat(".");
+
+	dh=0;
+	if (!getarnt && f && f->allies) {
+		ally *sf;
+		for (sf = f->allies; sf && !dh; sf = sf->next) {
+			if (sf->status > 0 && sf->status <= HELP_ALL && sf->faction == u->faction) {
+				dh = 1;
+			}
+		}
+	}
+	return dh;
+}
+
+
 void
 spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days)
 {
@@ -500,8 +655,18 @@ void
 spunit(struct strlist ** SP, const struct faction * f, const unit * u, int indent,
        int mode)
 {
-	int dh = bufunit(f, u, indent, mode);
-	assert(SP);
+	int dh;
+	ugroup *ug = findugroup(u);
+
+	if(ug) {
+		if(is_ugroupleader(u, ug)) {
+			dh = bufunit_ugroupleader(f, u, indent, mode);
+		} else {
+			return;
+		}
+	} else {
+		dh = bufunit(f, u, indent, mode);
+	}
 	lparagraph(SP, buf, indent, (char) ((u->faction == f) ? '*' : (dh ? '+' : '-')));
 }
 

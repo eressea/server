@@ -58,6 +58,7 @@
 #include <skill.h>
 #include <teleport.h>
 #include <unit.h>
+#include <ugroup.h>
 
 /* util includes */
 #include <goodies.h>
@@ -675,31 +676,56 @@ rps_nowrap(FILE * F, const char *s)
 	}
 }
 
-int rpu = 0;
-
 static void
 rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 {
 	strlist *S;
 	int dh;
 	boolean isbattle = (boolean)(mode == see_battle);
-	++rpu;
+	ugroup *ug = findugroup(u);
 
-	if(u->race == RC_SPELL)
-		return;
+	if(u->race == RC_SPELL) return;
 
-	rnl(F);
-
-	dh = bufunit(f, u, indent, mode);
+	if(isbattle || ug) {
+		if(is_ugroupleader(u, ug)) {
+			rnl(F);
+			dh = bufunit_ugroupleader(f, u, indent, mode);
+		} else {
+			return;
+		}
+	} else {
+		rnl(F);
+		dh = bufunit(f, u, indent, mode);
+	}
 	rparagraph(F, buf, indent, (char) ((u->faction == f) ? '*' : (dh ? '+' : '-')));
+
 	if(!isbattle){
-		print_curses(F, u, TYP_UNIT, u->attribs, (u->faction == f)? 1 : 0, indent);
+		if(ug) {
+			int i;
+			for(i=0; i<ug->members; i++) {
+				print_curses(F, u, TYP_UNIT, ug->unit_array[i]->attribs, (u->faction == f)? 1 : 0, indent);
+			}
+		} else {
+			print_curses(F, u, TYP_UNIT, u->attribs, (u->faction == f)? 1 : 0, indent);
+		}
 	}
 
-	if (mode==see_unit && u->faction == f && u->botschaften) {
-		for (S = u->botschaften; S; S = S->next) {
-			rnl(F);
-			rparagraph(F, S->s, indent, 0);
+	if(ug) {
+		int i;
+		for(i=0; i<ug->members; i++) {
+			if (mode==see_unit && ug->unit_array[i]->faction == f && ug->unit_array[i]->botschaften) {
+				for (S =  ug->unit_array[i]->botschaften; S; S = S->next) {
+					rnl(F);
+					rparagraph(F, S->s, indent, 0);
+				}
+			}
+		}
+	} else {
+		if (mode==see_unit && u->faction == f && u->botschaften) {
+			for (S = u->botschaften; S; S = S->next) {
+				rnl(F);
+				rparagraph(F, S->s, indent, 0);
+			}
 		}
 	}
 }

@@ -8,7 +8,7 @@
 
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
- $Id: ugroup.c,v 1.1 2001/04/28 12:03:12 corwin Exp $
+ $Id: ugroup.c,v 1.2 2001/04/28 15:39:13 corwin Exp $
  */
 
 #include <config.h>
@@ -21,8 +21,22 @@
 
 #include <stdlib.h>
 
+/* TODO:
+ * - Anzeige (CR)
+ * - Speicherung
+ * - Evt. NACH (Betrete/Verlasse?) des Leaders vererben auf Members.
+ * - Routine zur automatisch Aufsplittung.
+ */
+
 /* Nur die erste Einheit in der Liste 
 	(ugroup->unit_array[0] == u) kann NACH ausführen. */
+
+boolean
+is_ugroupleader(unit *u, ugroup *ug)
+{
+	if(ug->unit_array[0] == u) return true;
+	return false;
+}
 
 ugroup *
 findugroupid(faction *f, int id)
