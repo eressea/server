@@ -222,6 +222,7 @@ restart(unit *u, int race)
 {
 	faction *f = addplayer(u->region, u->faction->email, race)->faction;
 	f->magiegebiet = u->faction->magiegebiet;
+	f->options = u->faction->options;
 	destroyfaction(u->faction);
 }
 
