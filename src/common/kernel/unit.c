@@ -151,8 +151,12 @@ destroy_unit(unit * u)
 		u->building = clone->building;
 		u->hp = 1;
 		i = u->no;
+		uunhash(u);
+		uunhash(clone);
 		u->no = clone->no;
 		clone->no = i;
+		uhash(u);
+		uhash(clone);
 		set_number(u, 1);
 		set_spellpoints(u, 0);
 		a = a_find(u->attribs, &at_clone);
@@ -170,6 +174,8 @@ destroy_unit(unit * u)
 		scale_number(u, 1);
 		u->race = u->irace = new_race[RC_ZOMBIE];
 	} else {
+		if (u->number) set_number(u, 0);
+		handle_event(&u->attribs, "destroy", u);
 		if (r && rterrain(r) != T_OCEAN)
 			rsetmoney(r, rmoney(r) + get_money(u));
 		dhash(u->no, u->faction);
@@ -179,8 +185,6 @@ destroy_unit(unit * u)
 		if (r) choplist(&r->units, u);
 		u->next = udestroy;
 		udestroy = u;
-		if (u->number) set_number(u, 0);
-		handle_event(&u->attribs, "destroy", u);
 	}
 }
 

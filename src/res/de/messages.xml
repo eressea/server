@@ -5287,15 +5287,13 @@
 		</locale>
 	</message>
 
-	<message name="entrise">
+	<message name="entrise" section="events">
 		<type>
 			<arg name="region" type="region"></arg>
+			<arg name="amount" type="int"></arg>
 		</type>
-		<locale name="de">
-			<nr section="events">
-				<text>"In $region($region) erschienen die Herren der Bäume."</text>
-			</nr>
-		</locale>
+		<text locale="de">"In $region($region) erschienen die Herren der Bäume."</text>
+		<text locale="en">"In $region($region), the lords of the trees have risen."</text>
 	</message>
 
 	<message name="msg_movement">
