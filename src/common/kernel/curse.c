@@ -35,8 +35,9 @@
 #include "objtypes.h"
 
 /* util includes */
-#include <resolve.h>
-#include <base36.h>
+#include <util/resolve.h>
+#include <util/base36.h>
+#include <util/goodies.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -224,12 +225,14 @@ typedef struct cursetype_list {
 	const curse_type * type;
 } cursetype_list;
 
-cursetype_list * cursetypes;
+#define CMAXHASH 63
+cursetype_list * cursetypes[CMAXHASH];
 
 void
 ct_register(const curse_type * ct)
 {
-	cursetype_list ** ctlp = &cursetypes;
+  unsigned int hash = hashstring(ct->cname);
+	cursetype_list ** ctlp = &cursetypes[hash];
 	while (*ctlp) {
 		cursetype_list * ctl = *ctlp;
 		if (ctl->type==ct) return;
@@ -242,7 +245,8 @@ ct_register(const curse_type * ct)
 const curse_type *
 ct_find(const char *c)
 {
-	cursetype_list * ctl = cursetypes;
+  unsigned int hash = hashstring(c);
+	cursetype_list * ctl = cursetypes[hash];
 	while (ctl) {
 		int k = min(strlen(c), strlen(ctl->type->cname));
 		if (!strncasecmp(c, ctl->type->cname, k)) return ctl->type;

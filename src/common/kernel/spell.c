@@ -161,6 +161,12 @@ do_shock(unit *u, const char *reason)
 /* Spruchanalyse - Ausgabe von curse->info und curse->name       */
 /* ------------------------------------------------------------- */
 
+static int
+curse_chance(const struct curse * c, int force)
+{
+  return 100 + (int)((force - c->vigour)*10);
+}
+
 void
 magicanalyse_region(region *r, unit *mage, int force)
 {
@@ -178,7 +184,7 @@ magicanalyse_region(region *r, unit *mage, int force)
 
 		/* ist der curse schwächer als der Analysezauber, so ergibt sich
 		 * mehr als 100% chance und damit immer ein Erfolg. */
-		chance = (force - c->vigour)*10 + 100;
+		chance = curse_chance(c, force);
 		mon = c->duration + (rand()%10) - 5;
 		mon = max(1,mon);
 		found = true;
@@ -220,7 +226,7 @@ magicanalyse_unit(unit *u, unit *mage, int force)
 		c = (curse*)a->data.v;
 		/* ist der curse schwächer als der Analysezauber, so ergibt sich
 		 * mehr als 100% chance und damit immer ein Erfolg. */
-		chance = (force - c->vigour)*10 + 100;
+		chance = chance = curse_chance(c, force);
 		mon = c->duration + (rand()%10) - 5;
 		mon = max(1,mon);
 
@@ -261,7 +267,7 @@ magicanalyse_building(building *b, unit *mage, int force)
 		c = (curse*)a->data.v;
 		/* ist der curse schwächer als der Analysezauber, so ergibt sich
 		 * mehr als 100% chance und damit immer ein Erfolg. */
-		chance = (force - c->vigour)*10 + 100;
+		chance = curse_chance(c, force);
 		mon = c->duration + (rand()%10) - 5;
 		mon = max(1,mon);
 
@@ -303,7 +309,7 @@ magicanalyse_ship(ship *sh, unit *mage, int force)
 		c = (curse*)a->data.v;
 		/* ist der curse schwächer als der Analysezauber, so ergibt sich
 		 * mehr als 100% chance und damit immer ein Erfolg. */
-		chance = (force - c->vigour)*10 + 100;
+		chance = curse_chance(c, force);
 		mon = c->duration + (rand()%10) - 5;
 		mon = max(1,mon);
 
