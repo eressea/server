@@ -2103,7 +2103,7 @@ display_item(faction *f, unit *u, const item_type * itype)
 		fclose(fp);
 		name = buf;
 	}
-	ADDMSG(&f->msgs, msg_message("displayitem", "item description", itype->rtype, name));
+	ADDMSG(&f->msgs, msg_message("displayitem", "item description", itype->rtype, strdup(name)));
 
 	return true;
 }
