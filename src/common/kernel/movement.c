@@ -1351,7 +1351,7 @@ ship_ready(const region * r, unit * u)
 	if (eff_skill(u, SK_SAILING, r) < u->ship->type->cptskill) {
 		sprintf(buf, "Der Kapitän muß mindestens Segeln %d haben, "
 				"um %s zu befehligen ", u->ship->type->cptskill,
-				u->ship->type->name[1]);
+				LOC(u->faction->locale, u->ship->type->name[1]));
 		mistake(u, u->thisorder, buf, MSG_MOVE);
 		return false;
 	}
