@@ -63,6 +63,7 @@
 #include <base36.h>
 #include <cvector.h>
 #include <event.h>
+#include <goodies.h>
 #include <resolve.h>
 #include <sql.h>
 #include <vset.h>
@@ -102,14 +103,14 @@ convert_orders(void)
 					for (;;) {
 						const char * c = getstrtoken();
 						if (c && *c) {
-							if (strchr(c, ' ')) {
-								strcat(buf, " \"");
-								strcat(buf, c);
-								strcat(buf, "\"");
-							} else {
-								strcat(buf, " ");
-								strcat(buf, c);
+							char * p = strchr(c, ' ');
+							if (p) {
+								char zText[128];
+								c = strcpy(zText, c);
+								space_replace(zText, SPACE_REPLACEMENT);
 							}
+							strcat(buf, " ");
+							strcat(buf, c);
 						} else break;
 					}
 					set_string(&o->s, buf);
