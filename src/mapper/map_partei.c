@@ -163,7 +163,7 @@ give_latestart_bonus(region *r, unit *u, int b)
 
 dropout * dropouts = NULL;
 
-void
+int
 read_orders_file(const char * filename)
 {
 	faction * f = NULL;
@@ -171,7 +171,7 @@ read_orders_file(const char * filename)
 	char buffer[16];
 	FILE * F = fopen(filename, "r");
 
-	if (F==NULL) return;
+	if (F==NULL) return -1;
 	
 	b = getbuf(F);
 
@@ -191,12 +191,14 @@ read_orders_file(const char * filename)
 		b = getbuf(F);
 	}
 	fclose(F);
+	return 0;
 }
 
 void
 read_orders(const char * filename)
 {
 	faction *f;
+	boolean loaded = false;
 
 #ifdef __USE_POSIX	/* if filename points to a directory, read
 											 all files it contains. */
@@ -213,14 +215,14 @@ read_orders(const char * filename)
 			}
 			closedir(dir);
 		} else {
-			read_orders_file(filename);
+			if (read_orders_file(filename)==0) loaded = true;
 		}
 	}
 #else /* we do not have this functionality */
-	read_orders_file(filename);
+	if (read_orders_file(filename)==0) loaded=true;
 #endif
 	
-	for (f=factions;f;f=f->next) {
+	if (loaded) for (f=factions;f;f=f->next) {
 		if (!fval(f, FL_MARK) && f->age <=1) {
 			ursprung * ur = f->ursprung;
 			while (ur && ur->id!=0) ur=ur->next;
@@ -250,7 +252,7 @@ read_dropouts(const char * filename)
 		char email[64], race[20];
 		int age, x, y;
 		if (fscanf(F, "%s %s %d %d %d", email, race, &age, &x, &y)<=0) break;
-		if (age<=1) {
+		if (age<=2) {
 			region * r = findregion(x, y);
 			if (r) {
 				dropout * drop = calloc(sizeof(dropout), 1);

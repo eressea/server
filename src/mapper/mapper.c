@@ -1072,7 +1072,7 @@ movearound(int rx, int ry) {
 					ch = -9;
 					break;
 				case 'P':
-					NeuePartei(r);
+					if (r) NeuePartei(r);
 					ch = -9;
 					break;
 				case 'X':
@@ -1096,7 +1096,7 @@ movearound(int rx, int ry) {
 					break;
 				case 'u':
 				case 'e':
-					while (showunits(r));
+					while (r && showunits(r));
 					ch = -9;
 					break;
 				case 'U':
@@ -1573,8 +1573,10 @@ main(int argc, char *argv[])
 	read_newfactions(buf);
 	sprintf(buf, "%s/dropouts.%d", basepath(), turn);
 	read_dropouts(buf);
-	sprintf(buf, "%s/%s", basepath(), orderfile);
-	read_orders(buf);
+	if (orderfile) {
+		sprintf(buf, "%s/%s", basepath(), orderfile);
+		read_orders(buf);
+	}
 
 	if (findfaction(MONSTER_FACTION)==NULL) {
 		makemonsters();

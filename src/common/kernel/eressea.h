@@ -844,7 +844,7 @@ typedef struct ally {
 
 void remove_empty_units_in_region(struct region *r);
 void remove_empty_units(void);
-void remove_empty_factions(void);
+void remove_empty_factions(boolean writedropouts);
 
 typedef struct strlist {
 	struct strlist *next;

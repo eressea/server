@@ -3433,31 +3433,37 @@
 	<namespace name="spellinfo">
 		<string name="blessedharvest">
 			<text locale="de">Dieses Ernteritual verbessert die
-			Erträge der arbeitenden Bauern in der Region um ein
-			Silberstück. Je mehr Kraft der Druide investiert,
-			desto länger wirkt der Zauber.</text>
+				Erträge der arbeitenden Bauern in der Region
+				um ein Silberstück. Je mehr Kraft der Druide
+				investiert, desto länger wirkt der
+				Zauber.</text>
 			<text locale="en">This harvest ritual increases the
-			income of each working peasant by one silver piece.
-			The more power the druid invests, the longer the spell
-			lasts.</text>
+				income of each working peasant by one silver
+				piece. The more power the druid invests, the
+				longer the spell lasts.</text>
 		</string>
 		<string name="veterinarian">
 			<text locale="de">Die Fähigkeiten der Gwyrrd-Magier in
-			der Viehzucht und Heilung sind bei den Bauern sehr
-			begehrt. Grade auf Märkten sind ihre Dienste häufig
-			sehr gefragt. Manch einer mag auch sein Talent dazu
-			nutzen, ein Tier für einen besseren Preis zu
-			verkaufen. Pro Stufe kann der Magier so 50 Silber
-			verdienen.</text>
+				der Viehzucht und Heilung sind bei den Bauern
+				sehr begehrt. Grade auf Märkten sind ihre
+				Dienste häufig sehr gefragt. Manch einer mag
+				auch sein Talent dazu nutzen, ein Tier für
+				einen besseren Preis zu verkaufen. Pro Stufe
+				kann der Magier so 50 Silber verdienen.</text>
 			<text locale="en">The abilities of the mages of Gwyrrd
-			concerning the breeding and healing of cattle are
-			highly appreciated among the peasants. Especially at
-			the markets, their services are demanded frequently.
-			Some of them also use their talents to sell an animal
-			at a higher price. A mage can earn 50 silver pieces
-			per level in this way.</text>
+				concerning the breeding and healing of cattle
+				are highly appreciated among the peasants.
+				Especially at the markets, their services are
+				demanded frequently. Some of them also use
+				their talents to sell an animal at a higher
+				price. A mage can earn 50 silver pieces per
+				level in this way.</text>
 		</string>
 	</namespace>
 </strings>
+
+
+
+
 
 

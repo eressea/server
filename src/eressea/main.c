@@ -283,7 +283,7 @@ processturn(char *filename)
 	if (!noreports) reports();
 	free_units();
 	puts(" - Beseitige leere Parteien");
-	remove_empty_factions();
+	remove_empty_factions(true);
 	end = make_summary(true);
 	report_summary(end, begin, false);
 	report_summary(end, begin, true);

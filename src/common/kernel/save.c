@@ -1042,7 +1042,7 @@ readgame(boolean backup)
 		findfaction(0)->alive = 1;
 	}
 	if (maxregions>=0) {
-		remove_empty_factions();
+		remove_empty_factions(false);
 	}
 
 	/* Regionen */
