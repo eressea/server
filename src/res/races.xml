@@ -1,203 +1,4 @@
 <races>
-	<race name="clone" magres="0.900000" maxaura="0.000000" regaura="0.000000" recruitcost="0" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="40" ac="0" damage="0d0" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk nolearn noteach noheal>
-		<ai splitsize="10000"></ai>
-		<skill name="sk_alchemy" modifier="-99"></skill>
-		<skill name="sk_crossbow" modifier="-99"></skill>
-		<skill name="sk_mining" modifier="-99"></skill>
-		<skill name="sk_bow" modifier="-99"></skill>
-		<skill name="sk_building" modifier="-99"></skill>
-		<skill name="sk_trade" modifier="-99"></skill>
-		<skill name="sk_forestry" modifier="-99"></skill>
-		<skill name="sk_catapult" modifier="-99"></skill>
-		<skill name="sk_herbalism" modifier="-99"></skill>
-		<skill name="sk_magic" modifier="-99"></skill>
-		<skill name="sk_training" modifier="-99"></skill>
-		<skill name="sk_riding" modifier="-99"></skill>
-		<skill name="sk_armorer" modifier="-99"></skill>
-		<skill name="sk_shipcraft" modifier="-99"></skill>
-		<skill name="sk_melee" modifier="-99"></skill>
-		<skill name="sk_sailing" modifier="-99"></skill>
-		<skill name="sk_polearm" modifier="-99"></skill>
-		<skill name="sk_espionage" modifier="-99"></skill>
-		<skill name="sk_quarrying" modifier="-99"></skill>
-		<skill name="sk_roadwork" modifier="-99"></skill>
-		<skill name="sk_tactics" modifier="-99"></skill>
-		<skill name="sk_stealth" modifier="-99"></skill>
-		<skill name="sk_entertainment" modifier="-99"></skill>
-		<skill name="sk_weaponsmithing" modifier="-99"></skill>
-		<skill name="sk_cartmaking" modifier="-99"></skill>
-		<skill name="sk_perception" modifier="-99"></skill>
-		<skill name="sk_taxation" modifier="-99"></skill>
-		<skill name="sk_stamina" modifier="-99"></skill>
-		<skill name="sk_unarmed" modifier="-99"></skill>
-		<attack type="1" damage="0d0"></attack>
-	</race>
-	<race name="template" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="0" maintenance="0" weight="0" capacity="0" speed="10.000000" hp="10" ac="0" damage="1d4" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace fly swim walk shapeshift shapeshiftany giveitem giveperson giveunit getitem canguard recruitethereal recruitunlimited equipment>
-		<ai splitsize="10000" attackrandom moverandom learn></ai>
-		<attack type="1" damage="1d4"></attack>
-	</race>
-	<race name="gnome" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="50" ac="0" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk noteach canguard>
-		<ai splitsize="10000"></ai>
-		<skill name="sk_tactics" modifier="1"></skill>
-		<skill name="sk_perception" modifier="1"></skill>
-		<skill name="sk_stamina" modifier="1"></skill>
-		<skill name="sk_unarmed" modifier="1"></skill>
-		<attack type="1" damage="1d4"></attack>
-	</race>
-	<race name="museumghost" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="50" ac="0" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk noteach canguard>
-		<ai splitsize="10000"></ai>
-		<skill name="sk_tactics" modifier="1"></skill>
-		<skill name="sk_perception" modifier="1"></skill>
-		<skill name="sk_stamina" modifier="1"></skill>
-		<skill name="sk_unarmed" modifier="1"></skill>
-		<attack type="2" damage="5d600"></attack>
-		<attack type="3" damage="5d5"></attack>
-		<attack type="2" damage="5d600"></attack>
-		<attack type="2" damage="5d600"></attack>
-		<attack type="3" damage="5d5"></attack>
-		<attack type="2" damage="5d600"></attack>
-		<attack type="1" damage="1d4"></attack>
-	</race>
-	<race name="ghast" magres="0.600000" maxaura="1.000000" regaura="1.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment nogive>
-		<ai splitsize="10000" attackrandom moverandom></ai>
-		<function name="name" value="nameghoul"></function>
-		<skill name="sk_crossbow" modifier="1"></skill>
-		<skill name="sk_bow" modifier="1"></skill>
-		<skill name="sk_catapult" modifier="1"></skill>
-		<skill name="sk_riding" modifier="1"></skill>
-		<skill name="sk_melee" modifier="1"></skill>
-		<skill name="sk_polearm" modifier="1"></skill>
-		<skill name="sk_tactics" modifier="1"></skill>
-		<skill name="sk_stamina" modifier="1"></skill>
-		<skill name="sk_unarmed" modifier="1"></skill>
-		<attack type="4" damage="2d8"></attack>
-		<attack type="3" damage="1d5"></attack>
-		<attack type="3" damage="1d5"></attack>
-		<attack type="2" damage="1d30"></attack>
-		<attack type="2" damage="1d30"></attack>
-	</race>
-	<race name="ghoul" magres="0.300000" maxaura="1.000000" regaura="1.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment nogive>
-		<ai splitsize="10000" attackrandom moverandom></ai>
-		<function name="name" value="nameghoul"></function>
-		<function name="age" value="ageghoul"></function>
-		<skill name="sk_crossbow" modifier="1"></skill>
-		<skill name="sk_bow" modifier="1"></skill>
-		<skill name="sk_catapult" modifier="1"></skill>
-		<skill name="sk_riding" modifier="1"></skill>
-		<skill name="sk_melee" modifier="1"></skill>
-		<skill name="sk_polearm" modifier="1"></skill>
-		<skill name="sk_tactics" modifier="1"></skill>
-		<skill name="sk_stamina" modifier="1"></skill>
-		<skill name="sk_unarmed" modifier="1"></skill>
-		<attack type="4" damage="2d6"></attack>
-		<attack type="3" damage="1d2"></attack>
-		<attack type="3" damage="1d2"></attack>
-		<attack type="2" damage="1d30"></attack>
-	</race>
-	<race name="juju-zombie" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="8" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment resistbash resistcut resistpierce nogive>
-		<ai splitsize="10000" attackrandom moverandom></ai>
-		<function name="name" value="namezombie"></function>
-		<skill name="sk_crossbow" modifier="1"></skill>
-		<skill name="sk_bow" modifier="1"></skill>
-		<skill name="sk_catapult" modifier="1"></skill>
-		<skill name="sk_riding" modifier="1"></skill>
-		<skill name="sk_melee" modifier="1"></skill>
-		<skill name="sk_polearm" modifier="1"></skill>
-		<skill name="sk_tactics" modifier="1"></skill>
-		<skill name="sk_stamina" modifier="1"></skill>
-		<skill name="sk_unarmed" modifier="1"></skill>
-		<attack type="1" damage="1d7"></attack>
-		<attack type="3" damage="1d1"></attack>
-		<attack type="3" damage="1d1"></attack>
-	</race>
-	<race name="zombie" magres="0.200000" maxaura="1.000000" regaura="1.000000" recruitcost="4" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" scarepeasants walk nolearn noteach noheal undead canguard equipment resistcut resistpierce nogive>
-		<ai splitsize="10000" killpeasants attackrandom moverandom></ai>
-		<function name="name" value="namezombie"></function>
-		<function name="age" value="agezombie"></function>
-		<skill name="sk_crossbow" modifier="1"></skill>
-		<skill name="sk_bow" modifier="1"></skill>
-		<skill name="sk_catapult" modifier="1"></skill>
-		<skill name="sk_riding" modifier="1"></skill>
-		<skill name="sk_melee" modifier="1"></skill>
-		<skill name="sk_polearm" modifier="1"></skill>
-		<skill name="sk_tactics" modifier="1"></skill>
-		<skill name="sk_stamina" modifier="1"></skill>
-		<skill name="sk_unarmed" modifier="1"></skill>
-		<attack type="1" damage="1d7"></attack>
-	</race>
-	<race name="skeleton lord" magres="0.300000" maxaura="1.000000" regaura="1.000000" recruitcost="2" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment resistcut resistpierce nogive>
-		<ai splitsize="10000" attackrandom moverandom></ai>
-		<function name="name" value="nameskeleton"></function>
-		<skill name="sk_crossbow" modifier="1"></skill>
-		<skill name="sk_bow" modifier="1"></skill>
-		<skill name="sk_catapult" modifier="1"></skill>
-		<skill name="sk_riding" modifier="1"></skill>
-		<skill name="sk_melee" modifier="1"></skill>
-		<skill name="sk_polearm" modifier="1"></skill>
-		<skill name="sk_tactics" modifier="1"></skill>
-		<skill name="sk_stamina" modifier="1"></skill>
-		<skill name="sk_unarmed" modifier="1"></skill>
-		<attack type="1" damage="1d7"></attack>
-		<attack type="1" damage="1d7"></attack>
-	</race>
-	<race name="skeleton" magres="0.100000" maxaura="1.000000" regaura="1.000000" recruitcost="0" maintenance="0" weight="500" capacity="540" speed="1.000000" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" scarepeasants walk nolearn noteach noheal undead canguard equipment resistcut resistpierce nogive>
-		<ai splitsize="10000" killpeasants attackrandom moverandom></ai>
-		<function name="name" value="nameskeleton"></function>
-		<function name="age" value="ageskeleton"></function>
-		<skill name="sk_crossbow" modifier="1"></skill>
-		<skill name="sk_bow" modifier="1"></skill>
-		<skill name="sk_catapult" modifier="1"></skill>
-		<skill name="sk_riding" modifier="1"></skill>
-		<skill name="sk_melee" modifier="1"></skill>
-		<skill name="sk_polearm" modifier="1"></skill>
-		<skill name="sk_tactics" modifier="1"></skill>
-		<skill name="sk_stamina" modifier="1"></skill>
-		<skill name="sk_unarmed" modifier="1"></skill>
-		<attack type="1" damage="1d7"></attack>
-	</race>
-	<race name="centaur" magres="0.000000" maxaura="0.750000" regaura="0.750000" recruitcost="100" maintenance="10" weight="5000" capacity="2040" speed="1.000000" hp="30" ac="0" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="0" defensemodifier="0" playerrace walk horse giveitem giveperson giveunit getitem recruithorses equipment>
-		<ai splitsize="10000" attackrandom moverandom learn></ai>
-		<skill name="sk_crossbow" modifier="1"></skill>
-		<skill name="sk_mining" modifier="-3"></skill>
-		<skill name="sk_bow" modifier="1"></skill>
-		<skill name="sk_building" modifier="-2"></skill>
-		<skill name="sk_trade" modifier="1"></skill>
-		<skill name="sk_catapult" modifier="-2"></skill>
-		<skill name="sk_herbalism" modifier="1"></skill>
-		<skill name="sk_training" modifier="4"></skill>
-		<skill name="sk_armorer" modifier="-1"></skill>
-		<skill name="sk_shipcraft" modifier="-4"></skill>
-		<skill name="sk_sailing" modifier="-4"></skill>
-		<skill name="sk_polearm" modifier="1"></skill>
-		<skill name="sk_espionage" modifier="-1"></skill>
-		<skill name="sk_quarrying" modifier="-1"></skill>
-		<skill name="sk_stealth" modifier="-1"></skill>
-		<skill name="sk_weaponsmithing" modifier="1"></skill>
-		<skill name="sk_cartmaking" modifier="1"></skill>
-		<skill name="sk_taxation" modifier="1"></skill>
-		<attack type="1" damage="2d5"></attack>
-		<familiar race="eagle" default></familiar>
-		<familiar race="fairy"></familiar>
-		<familiar race="owl"></familiar>
-		<familiar race="unicorn"></familiar>
-		<familiar race="nymph"></familiar>
-		<familiar race="imp"></familiar>
-	</race>
-	<race name="shadow knight" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="1" ac="0" damage="1d1" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants nogive walk nolearn noteach noblock>
-		<ai splitsize="20000" moverandom></ai>
-		<attack type="1" damage="1d1"></attack>
-	</race>
-	<race name="sea serpent" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" maintenance="0" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants swim noteach getitem canguard resistbash>
-		<ai splitsize="6" killpeasants attackrandom moverandom learn></ai>
-		<function name="name" value="namedragon"></function>
-		<function name="move" value="moveswimming"></function>
-		<skill name="sk_tactics" modifier="4"></skill>
-		<attack type="4" damage="1d30"></attack>
-		<attack type="4" damage="1d30"></attack>
-		<attack type="4" damage="1d30"></attack>
-		<attack type="6" spell="81"></attack>
-		<attack type="8" damage="1d10"></attack>
-	</race>
 	<race name="kraken" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" maintenance="0" weight="500" capacity="200" speed="2.000000" hp="300" ac="0" damage="2d10" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" swim noteach giveitem getitem>
 		<ai splitsize="5000"></ai>
 		<function name="initfamiliar" value="oldfamiliars"></function>
@@ -1130,6 +931,205 @@
 		<familiar race="rat"></familiar>
 		<familiar race="rat"></familiar>
 		<familiar race="imp"></familiar>
+	</race>
+	<race name="clone" magres="0.900000" maxaura="0.000000" regaura="0.000000" recruitcost="0" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="40" ac="0" damage="0d0" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk nolearn noteach noheal>
+		<ai splitsize="10000"></ai>
+		<skill name="sk_alchemy" modifier="-99"></skill>
+		<skill name="sk_crossbow" modifier="-99"></skill>
+		<skill name="sk_mining" modifier="-99"></skill>
+		<skill name="sk_bow" modifier="-99"></skill>
+		<skill name="sk_building" modifier="-99"></skill>
+		<skill name="sk_trade" modifier="-99"></skill>
+		<skill name="sk_forestry" modifier="-99"></skill>
+		<skill name="sk_catapult" modifier="-99"></skill>
+		<skill name="sk_herbalism" modifier="-99"></skill>
+		<skill name="sk_magic" modifier="-99"></skill>
+		<skill name="sk_training" modifier="-99"></skill>
+		<skill name="sk_riding" modifier="-99"></skill>
+		<skill name="sk_armorer" modifier="-99"></skill>
+		<skill name="sk_shipcraft" modifier="-99"></skill>
+		<skill name="sk_melee" modifier="-99"></skill>
+		<skill name="sk_sailing" modifier="-99"></skill>
+		<skill name="sk_polearm" modifier="-99"></skill>
+		<skill name="sk_espionage" modifier="-99"></skill>
+		<skill name="sk_quarrying" modifier="-99"></skill>
+		<skill name="sk_roadwork" modifier="-99"></skill>
+		<skill name="sk_tactics" modifier="-99"></skill>
+		<skill name="sk_stealth" modifier="-99"></skill>
+		<skill name="sk_entertainment" modifier="-99"></skill>
+		<skill name="sk_weaponsmithing" modifier="-99"></skill>
+		<skill name="sk_cartmaking" modifier="-99"></skill>
+		<skill name="sk_perception" modifier="-99"></skill>
+		<skill name="sk_taxation" modifier="-99"></skill>
+		<skill name="sk_stamina" modifier="-99"></skill>
+		<skill name="sk_unarmed" modifier="-99"></skill>
+		<attack type="1" damage="0d0"></attack>
+	</race>
+	<race name="template" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="0" maintenance="0" weight="0" capacity="0" speed="10.000000" hp="10" ac="0" damage="1d4" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace fly swim walk shapeshift shapeshiftany giveitem giveperson giveunit getitem canguard recruitethereal recruitunlimited equipment>
+		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<attack type="1" damage="1d4"></attack>
+	</race>
+	<race name="gnome" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="50" ac="0" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk noteach canguard>
+		<ai splitsize="10000"></ai>
+		<skill name="sk_tactics" modifier="1"></skill>
+		<skill name="sk_perception" modifier="1"></skill>
+		<skill name="sk_stamina" modifier="1"></skill>
+		<skill name="sk_unarmed" modifier="1"></skill>
+		<attack type="1" damage="1d4"></attack>
+	</race>
+	<race name="museumghost" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="50" ac="0" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk noteach canguard>
+		<ai splitsize="10000"></ai>
+		<skill name="sk_tactics" modifier="1"></skill>
+		<skill name="sk_perception" modifier="1"></skill>
+		<skill name="sk_stamina" modifier="1"></skill>
+		<skill name="sk_unarmed" modifier="1"></skill>
+		<attack type="2" damage="5d600"></attack>
+		<attack type="3" damage="5d5"></attack>
+		<attack type="2" damage="5d600"></attack>
+		<attack type="2" damage="5d600"></attack>
+		<attack type="3" damage="5d5"></attack>
+		<attack type="2" damage="5d600"></attack>
+		<attack type="1" damage="1d4"></attack>
+	</race>
+	<race name="ghast" magres="0.600000" maxaura="1.000000" regaura="1.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment nogive>
+		<ai splitsize="10000" attackrandom moverandom></ai>
+		<function name="name" value="nameghoul"></function>
+		<skill name="sk_crossbow" modifier="1"></skill>
+		<skill name="sk_bow" modifier="1"></skill>
+		<skill name="sk_catapult" modifier="1"></skill>
+		<skill name="sk_riding" modifier="1"></skill>
+		<skill name="sk_melee" modifier="1"></skill>
+		<skill name="sk_polearm" modifier="1"></skill>
+		<skill name="sk_tactics" modifier="1"></skill>
+		<skill name="sk_stamina" modifier="1"></skill>
+		<skill name="sk_unarmed" modifier="1"></skill>
+		<attack type="4" damage="2d8"></attack>
+		<attack type="3" damage="1d5"></attack>
+		<attack type="3" damage="1d5"></attack>
+		<attack type="2" damage="1d30"></attack>
+		<attack type="2" damage="1d30"></attack>
+	</race>
+	<race name="ghoul" magres="0.300000" maxaura="1.000000" regaura="1.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment nogive>
+		<ai splitsize="10000" attackrandom moverandom></ai>
+		<function name="name" value="nameghoul"></function>
+		<function name="age" value="ageghoul"></function>
+		<skill name="sk_crossbow" modifier="1"></skill>
+		<skill name="sk_bow" modifier="1"></skill>
+		<skill name="sk_catapult" modifier="1"></skill>
+		<skill name="sk_riding" modifier="1"></skill>
+		<skill name="sk_melee" modifier="1"></skill>
+		<skill name="sk_polearm" modifier="1"></skill>
+		<skill name="sk_tactics" modifier="1"></skill>
+		<skill name="sk_stamina" modifier="1"></skill>
+		<skill name="sk_unarmed" modifier="1"></skill>
+		<attack type="4" damage="2d6"></attack>
+		<attack type="3" damage="1d2"></attack>
+		<attack type="3" damage="1d2"></attack>
+		<attack type="2" damage="1d30"></attack>
+	</race>
+	<race name="juju-zombie" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="8" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment resistbash resistcut resistpierce nogive>
+		<ai splitsize="10000" attackrandom moverandom></ai>
+		<function name="name" value="namezombie"></function>
+		<skill name="sk_crossbow" modifier="1"></skill>
+		<skill name="sk_bow" modifier="1"></skill>
+		<skill name="sk_catapult" modifier="1"></skill>
+		<skill name="sk_riding" modifier="1"></skill>
+		<skill name="sk_melee" modifier="1"></skill>
+		<skill name="sk_polearm" modifier="1"></skill>
+		<skill name="sk_tactics" modifier="1"></skill>
+		<skill name="sk_stamina" modifier="1"></skill>
+		<skill name="sk_unarmed" modifier="1"></skill>
+		<attack type="1" damage="1d7"></attack>
+		<attack type="3" damage="1d1"></attack>
+		<attack type="3" damage="1d1"></attack>
+	</race>
+	<race name="zombie" magres="0.200000" maxaura="1.000000" regaura="1.000000" recruitcost="4" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" scarepeasants walk nolearn noteach noheal undead canguard equipment resistcut resistpierce nogive>
+		<ai splitsize="10000" killpeasants attackrandom moverandom></ai>
+		<function name="name" value="namezombie"></function>
+		<function name="age" value="agezombie"></function>
+		<skill name="sk_crossbow" modifier="1"></skill>
+		<skill name="sk_bow" modifier="1"></skill>
+		<skill name="sk_catapult" modifier="1"></skill>
+		<skill name="sk_riding" modifier="1"></skill>
+		<skill name="sk_melee" modifier="1"></skill>
+		<skill name="sk_polearm" modifier="1"></skill>
+		<skill name="sk_tactics" modifier="1"></skill>
+		<skill name="sk_stamina" modifier="1"></skill>
+		<skill name="sk_unarmed" modifier="1"></skill>
+		<attack type="1" damage="1d7"></attack>
+	</race>
+	<race name="skeleton lord" magres="0.300000" maxaura="1.000000" regaura="1.000000" recruitcost="2" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants walk nolearn noteach absorbpeasants noheal undead canguard equipment resistcut resistpierce nogive>
+		<ai splitsize="10000" attackrandom moverandom></ai>
+		<function name="name" value="nameskeleton"></function>
+		<skill name="sk_crossbow" modifier="1"></skill>
+		<skill name="sk_bow" modifier="1"></skill>
+		<skill name="sk_catapult" modifier="1"></skill>
+		<skill name="sk_riding" modifier="1"></skill>
+		<skill name="sk_melee" modifier="1"></skill>
+		<skill name="sk_polearm" modifier="1"></skill>
+		<skill name="sk_tactics" modifier="1"></skill>
+		<skill name="sk_stamina" modifier="1"></skill>
+		<skill name="sk_unarmed" modifier="1"></skill>
+		<attack type="1" damage="1d7"></attack>
+		<attack type="1" damage="1d7"></attack>
+	</race>
+	<race name="skeleton" magres="0.100000" maxaura="1.000000" regaura="1.000000" recruitcost="0" maintenance="0" weight="500" capacity="540" speed="1.000000" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" scarepeasants walk nolearn noteach noheal undead canguard equipment resistcut resistpierce nogive>
+		<ai splitsize="10000" killpeasants attackrandom moverandom></ai>
+		<function name="name" value="nameskeleton"></function>
+		<function name="age" value="ageskeleton"></function>
+		<skill name="sk_crossbow" modifier="1"></skill>
+		<skill name="sk_bow" modifier="1"></skill>
+		<skill name="sk_catapult" modifier="1"></skill>
+		<skill name="sk_riding" modifier="1"></skill>
+		<skill name="sk_melee" modifier="1"></skill>
+		<skill name="sk_polearm" modifier="1"></skill>
+		<skill name="sk_tactics" modifier="1"></skill>
+		<skill name="sk_stamina" modifier="1"></skill>
+		<skill name="sk_unarmed" modifier="1"></skill>
+		<attack type="1" damage="1d7"></attack>
+	</race>
+	<race name="centaur" magres="0.000000" maxaura="0.750000" regaura="0.750000" recruitcost="100" maintenance="10" weight="5000" capacity="2040" speed="1.000000" hp="30" ac="0" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="0" defensemodifier="0" playerrace walk horse giveitem giveperson giveunit getitem recruithorses equipment>
+		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<skill name="sk_crossbow" modifier="1"></skill>
+		<skill name="sk_mining" modifier="-3"></skill>
+		<skill name="sk_bow" modifier="1"></skill>
+		<skill name="sk_building" modifier="-2"></skill>
+		<skill name="sk_trade" modifier="1"></skill>
+		<skill name="sk_catapult" modifier="-2"></skill>
+		<skill name="sk_herbalism" modifier="1"></skill>
+		<skill name="sk_training" modifier="4"></skill>
+		<skill name="sk_armorer" modifier="-1"></skill>
+		<skill name="sk_shipcraft" modifier="-4"></skill>
+		<skill name="sk_sailing" modifier="-4"></skill>
+		<skill name="sk_polearm" modifier="1"></skill>
+		<skill name="sk_espionage" modifier="-1"></skill>
+		<skill name="sk_quarrying" modifier="-1"></skill>
+		<skill name="sk_stealth" modifier="-1"></skill>
+		<skill name="sk_weaponsmithing" modifier="1"></skill>
+		<skill name="sk_cartmaking" modifier="1"></skill>
+		<skill name="sk_taxation" modifier="1"></skill>
+		<attack type="1" damage="2d5"></attack>
+		<familiar race="eagle" default></familiar>
+		<familiar race="fairy"></familiar>
+		<familiar race="owl"></familiar>
+		<familiar race="unicorn"></familiar>
+		<familiar race="nymph"></familiar>
+		<familiar race="imp"></familiar>
+	</race>
+	<race name="shadow knight" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="1" ac="0" damage="1d1" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants nogive walk nolearn noteach noblock>
+		<ai splitsize="20000" moverandom></ai>
+		<attack type="1" damage="1d1"></attack>
+	</race>
+	<race name="sea serpent" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" maintenance="0" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants swim noteach getitem canguard resistbash>
+		<ai splitsize="6" killpeasants attackrandom moverandom learn></ai>
+		<function name="name" value="namedragon"></function>
+		<function name="move" value="moveswimming"></function>
+		<skill name="sk_tactics" modifier="4"></skill>
+		<attack type="4" damage="1d30"></attack>
+		<attack type="4" damage="1d30"></attack>
+		<attack type="4" damage="1d30"></attack>
+		<attack type="6" spell="81"></attack>
+		<attack type="8" damage="1d10"></attack>
 	</race>
 	<race name="snotling" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="50" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>

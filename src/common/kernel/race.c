@@ -884,6 +884,8 @@ tagbegin(struct xml_stack * stack)
 			  if (zRace && rc) {
 				  race * frc = rc_find(zRace);
 				  if (frc == NULL) {
+						log_error(("%s not registered, is familiar for %s\n", zRace, rc->_name[0]));
+						assert(frc!=NULL);
 					  frc = rc_add(rc_new(zRace));
 				  }
 				  if (xml_bvalue(tag, "default")) {
