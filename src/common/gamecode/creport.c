@@ -661,21 +661,23 @@ cr_output_unit(FILE * F, const region * r,
 
 		/* talents */
 		pr = 0;
-		for (sk = 0; sk != MAXSKILLS; ++sk)
-			if (get_skill(u, sk)) {
+		for (sk = 0; sk != MAXSKILLS; ++sk) {
+			int gsk = get_skill(u, sk);
+			if (gsk) {
+				int esk = eff_skill(u, sk, r);
 				if (!pr) {
 					pr = 1;
 					fprintf(F, "TALENTE\n");
 				}
-#ifdef NOVISIBLESKILLPOINTS
-				/* 0 ist nur der Kompatibilität wegen drin, rausnehmen */
-				fprintf(F, "0 %d;%s\n", eff_skill(u, sk, r),
+#if SKILLPOINTS
+				fprintf(F, "%d %d;%s\n", gsk, esk,
 					add_translation(skillname(sk, NULL), skillname(sk, f->locale)));
 #else
-				fprintf(F, "%d %d;%s\n", get_skill(u, sk), eff_skill(u, sk, r),
+				fprintf(F, "%d %d;%s\n", level_days(gsk/u->number), esk,
 					add_translation(skillname(sk, NULL), skillname(sk, f->locale)));
 #endif
 			}
+		}
 		/* spells */
 		if (is_mage(u)) {
 			sc_mage * mage = get_mage(u);
@@ -883,6 +885,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 
 	fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
 	fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
+	fprintf(F, "%d;noskillpoints\n", !SKILLPOINTS);
 	fprintf(F, "%ld;date\n", report_time);
 	fprintf(F, "\"%s\";Spiel\n", global.gamename);
 	fprintf(F, "\"%s\";Konfiguration\n", "Standard");
@@ -891,7 +894,6 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 	fprintf(F, "%d;Runde\n", turn);
 	fputs("2;Zeitalter\n", F);
 	fprintf(F, "PARTEI %d\n", f->no);
-/*	fprintf(F, "\"%s\";Passwort\n", f->passw); */
 	fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
 	fprintf(F, "%d;Optionen\n", f->options);
 	if (f->options & want(O_SCORE) && f->age>DISPLAYSCORE) {

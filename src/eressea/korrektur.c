@@ -76,35 +76,8 @@
 
 #undef  XMAS1999
 #undef  XMAS2000
-#define XMAS2001
-
-#if 0
-static int
-skillmodifieslearning(void)
-{
-	region *r;
-	unit *u;
-	int smod, lmod, learning;
-
-	for(r=regions; r; r=r->next) {
-		for(u=r->units; u; u=u->next) {
-			skillvalue *i = u->skills;
-			for (; i != u->skills + u->skill_size; ++i) {
-				smod = rc_skillmod(u->race, u->region, i->id);
-				lmod = 5 * smod;
-				if(smod < 0) {
-					lmod -= 5;
-				} else if(smod > 0) {
-					lmod += 5;
-				}
-				learning = max(0, 30 + lmod);
-				i->value = (i->value * learning)/30;
-			}
-		}
-	}
-	return 0;
-}
-#endif
+#undef  XMAS2001
+#undef  CONVERT_SKILLPOINTS
 
 extern void reorder_owners(struct region * r);
 
@@ -474,225 +447,6 @@ bename_dracoide(void)
 }
 #endif
 
-#if 0
-static void
-repair_illusion(void)
-{
-	region * r;
-	for (r=regions;r;r=r->next) {
-		unit * u;
-		for (u=r->units;u;u=u->next) {
-			if (playerrace(u->race)
-				&& (get_item(u, I_PLATE_ARMOR) == u->number || get_item(u, I_CHAIN_MAIL) == u->number)
-				&& get_item(u, I_HORSE) == u->number && get_skill(u, SK_SPEAR) == 0 && get_skill(u, SK_SWORD) == 0
-				&& (get_item(u, I_SWORD) == u->number || get_item(u, I_SPEAR) == u->number))
-			{
-			  int i = 0;
-			  skill_t sk;
-			  for (sk=0;sk!=MAXSKILLS;++sk) if (sk!=SK_RIDING) i+=get_skill(u, sk);
-			  if (get_skill(u, SK_OBSERVATION) == i) u->race=RC_SPELL;
-			  else if (i) continue;
-			  else {
-				u->race = new_race[RC_ILLUSION];
-				log_puts("[repair_illusion] repariert: %s in Partei %s\n", unitname(u), factionid(u->faction));
-			  }
-			}
-			if(playerrace(u->race) && (
-					strcmp(u->name, "Ausgemergelte Skelette") == 0 ||
-					strcmp(u->name, "Zerfallende Zombies") == 0 ||
-					strcmp(u->name, "Keuchende Ghoule") == 0
-				)) {
-				u->race = new_race[RC_UNDEAD];
-				u->irace = new_race[RC_UNDEAD];
-			}
-		}
-	}
-}
-#endif
-
-#if 0
-typedef struct border_info {
-	border_type * type;
-	region * from;
-	direction_t dir;
-	attrib * attribs;
-} border_info;
-
-static void *
-resolve_border(void * data)
-{
-	border_info * info = (border_info *)data;
-	region * to = rconnect(info->from, info->dir);
-	if (!to) log_warning(("border can only exist between two regions\n"));
-	else {
-		border * b = new_border(info->type, info->from, to);
-		b->attribs = info->attribs;
-	}
-	free(data);
-	return NULL;
-}
-#endif
-
-#if 0
-static void
-repair_undead(void)
-{
-	int no, age;
-	FILE * f = fopen("undeads", "rt");
-	if (!f) return;
-	while (fscanf(f, "%d %d\n", &no, &age)!=EOF) {
-		unit * u = findunitg(no, NULL);
-		if (u && (u->race!=RC_UNDEAD || u->irace != new_race[RC_UNDEAD])) {
-			if (u->age>=age) u->race = u->irace = new_race[RC_UNDEAD];
-			fprintf(stderr, "Repariere %s\n", unitname(u));
-		}
-	}
-}
-#endif
-
-#if 0
-static void
-reset_dragon_irace(void)
-{
-	region *r;
-	unit *u;
-
-	for(r=regions;r;r=r->next) {
-		for(u=r->units;u;u=u->next) {
-			if(u->race == new_race[RC_DRAGON] || u->race == new_race[RC_WYRM]) {
-				u->irace = u->race;
-			}
-		}
-	}
-}
-#endif
-
-#if 0
-static void
-fix_irace(void)
-{
-	region *r;
-	unit *u;
-
-	for(r=regions; r; r=r->next) {
-		for(u=r->units; u; u=u->next) {
-			if(u->race != u->irace && u->race <= new_race[RC_AQUARIAN] && u->race!=RC_DAEMON)
-				u->irace = u->race;
-		}
-	}
-}
-#endif
-
-#if 0
-static void
-fix_regions(void) {
-	region * r;
-	for (r=regions;r;r=r->next) {
-		if (r->terrain!=T_GLACIER && r->terrain!=T_MOUNTAIN) {
-			rsetiron(r, 0);
-		}
-		if (r->terrain==T_OCEAN) {
-			unit * u;
-			rsethorses(r, 0);
-			rsetmoney(r, 0);
-			rsetpeasants(r, 0);
-			rsettrees(r, 0);
-			for (u=r->units;u;u=u->next)
-				if (playerrace(u->race) && u->ship==NULL) set_number(u, 0);
-		}
-	}
-}
-#endif
-
-#if 0
-static void
-read_herbrepair(void) {
-	FILE * f = fopen("repair.herbs", "rt");
-	if (!f) return;
-	while (!feof(f)) {
-		int n, x;
-		unit * u;
-		fscanf(f, "%d %d", &n, &x);
-		u = findunitg(x, NULL);
-		if (!u) u = findunitg(n, NULL);
-		fscanf(f, "%d", &x);
-		while (x!=-1) {
-			fscanf(f, "%d", &n);
-			if (u) change_herb(u, (herb_t)x, n);
-			fscanf(f, "%d", &x);
-		}
-	}
-	fclose(f);
-}
-
-static void
-write_herbrepair(void) {
-	FILE * f = fopen("repair.herbs", "wt");
-	region * r;
-	for (r=regions;r;r=r->next) {
-		unit * u;
-		for (u=r->units;u;u=u->next) {
-			strlist * o;
-			for (o=u->orders;o;o=o->next) {
-				if (igetkeyword(o->s)==K_GIVE) {
-					int n = read_unitid(u->faction, r);
-					herb_t h;
-					if (n<0) continue;
-					if (getparam()==P_HERBS) {
-						fprintf(f, "%d %d ", u->no, n);
-						for (h=0;h!=MAXHERBS;++h) {
-							int i = get_herb(u, h);
-							if (i) fprintf(f, "%d %d ", h, i);
-						}
-						fputs("-1\n", f);
-					}
-				}
-			}
-		}
-	}
-	fclose(f);
-}
-#endif
-
-#if 0
-static void
-write_migrepair(void)
-{
-	FILE * f = fopen("repair.migrants", "wt");
-	region * r;
-	for (r=regions;r;r=r->next) {
-		if(rterrain(r) != T_OCEAN)
-			fprintf(f, "%d %d %d %d\n", r->x, r->y, rhorses(r), rtrees(r));
-	}
-	fclose(f);
-}
-
-static void
-read_migrepair(void)
-{
-	FILE * f = fopen("repair.migrants", "rt");
-	int x, y, h, t;
-	region *r;
-
-	for(r=regions; r; r=r->next) freset(r, FL_DH);
-
-	while (fscanf(f, "%d %d %d %d\n", &x, &y, &h, &t) != EOF) {
-		r = findregion(x, y);
-		if (r) {
-			rsethorses(r, h);
-			rsettrees(r, t);
-			fset(r, FL_DH);
-		}
-	}
-
-	for(r=regions; r; r=r->next) if(!fval(r, FL_DH) && rterrain(r) == T_PLAIN) {
-		rsethorses(r, rand() % (terrain[rterrain(r)].production_max / 5));
-	}
-
-	fclose(f);
-}
-#endif
-
 static void
 fix_migrants(void) {
 	region * r;
@@ -706,50 +460,6 @@ fix_migrants(void) {
 		}
 	}
 }
-
-#if 0
-static void
-fix_folge_bug(void)
-{
-	region *td = findregion(64,-101);
-	region *tl = findregion(65,-101);
-	unit *u, *un;
-
-	for(u=td->units;u;) {
-		un = u->next;
-		if(igetkeyword(u->lastorder) == K_FOLLOW) {
-			move_unit(u, tl, NULL);
-			freset(u, FL_MOVED);
-			u = td->units;
-		} else {
-			u = un;
-		}
-	}
-}
-#endif
-
-#if 0
-static void
-katja_erschaffe_elf(void)
-{
-	region *xon = findregion(6,-4);
-	unit *u;
-	faction *mon = findfaction(MONSTER_FACTION);
-	strlist *S;
-
-	u = createunit(xon, mon, 1, new_race[RC_ELF]);
-	set_string(&u->name,"Corwin");
-	set_string(&u->display,"Ein kleiner, unscheinbarer Elf.");
-	set_item(u, I_BIRTHDAYAMULET, 1);
-	u->money = 10;
-	sprintf(buf, "GIB H 1 Katzenamulett");
-	S = makestrlist(buf); addlist(&u->orders, S);
-	sprintf(buf, "BOTSCHAFT AN EINHEIT H %s",estring("Ein kleiner Elf verbeugt sich vor euch: 'Nehmt dieses Geschenk vom Gott aller Götter. Auf das euch noch ein langes und sehr glückliches Leben beschieden sei.'"));
-	S = makestrlist(buf); addlist(&u->orders, S);
-	set_string(&u->thisorder, "LERNE WAHRNEHMUNG");
-	set_string(&u->thisorder, "LERNE WAHRNEHMUNG");
-}
-#endif
 
 static boolean
 kor_teure_talente(unit *u)
@@ -2715,14 +2425,14 @@ fix_ratfamiliar(void)
 		for(u=r->units; u; u=u->next){
 			if (old_race(u->race) == RC_RAT){
 				if (u->number > 1){
-					int hp = u->number*3;
+					int mod = skill_level(1);
 					scale_number(u, 1);
-					set_skill(u, SK_MAGIC, get_skill(u, SK_MAGIC)+30);
+					set_skill(u, SK_MAGIC, get_skill(u, SK_MAGIC)+mod);
 					create_mage(u, M_GRAU);
-					set_skill(u, SK_SPY, get_skill(u, SK_SPY)+30);
-					set_skill(u, SK_STEALTH, get_skill(u, SK_STEALTH)+30);
-					set_skill(u, SK_OBSERVATION, get_skill(u, SK_OBSERVATION)+30);
-					set_skill(u, SK_AUSDAUER, get_skill(u, SK_AUSDAUER)+hp);
+					set_skill(u, SK_SPY, get_skill(u, SK_SPY)+mod);
+					set_skill(u, SK_STEALTH, get_skill(u, SK_STEALTH)+mod);
+					set_skill(u, SK_OBSERVATION, get_skill(u, SK_OBSERVATION)+mod);
+					set_skill(u, SK_AUSDAUER, get_skill(u, SK_AUSDAUER)+skill_level(3));
 					u->hp = unit_max_hp(u);
 				}
 			}
@@ -2815,7 +2525,7 @@ heal_all(void)
 	return 0;
 }
 
-#if PEASANT_ADJUSTMENT == 1
+#if PEASANT_ADJUSTMENT
 
 #define WEIGHT ((double)0.5)
 #define PLWEIGHT ((double)0.75)
@@ -2825,7 +2535,7 @@ peasant_adjustment(void)
 {
 	terrain_t ter;
 	int sum, avg, c;
-	long long freeall, pool;
+	double freeall, pool; /* long long is illegal */
 
 	for(ter = 0; ter < MAXTERRAINS; ter++) {
 		region *r;
@@ -2858,10 +2568,10 @@ peasant_adjustment(void)
 				if(lifestyle(u) > 0) playerp += u->number;
 			}
 
-			soll = (avg + playerp + rpeasants(r)) * WEIGHT;
+			soll = (int)((avg + playerp + rpeasants(r)) * WEIGHT);
 
 			if(playerp * PLWEIGHT + rpeasants(r) > soll) {
-				p_weg = min(((playerp * PLWEIGHT) + rpeasants(r)) - soll, rpeasants(r));
+				p_weg = (int)(min(((playerp * PLWEIGHT) + rpeasants(r)) - soll, rpeasants(r)));
 				assert(p_weg >= 0);
 				/*
 				if (p_weg > 0){
@@ -2880,7 +2590,7 @@ peasant_adjustment(void)
 		
 		for(r=regions; r; r=r->next) if(rterrain(r) == ter) {
 			unit *u;
-			long long free;
+			double free;
 			int newp;
 			int playerp = 0;
 			
@@ -2891,7 +2601,7 @@ peasant_adjustment(void)
 			free = max(0,production(r) * MAXPEASANTS_PER_AREA
         - ((rtrees(r,2)+rtrees(r,1)/2) * TREESIZE) - playerp);
 
-			newp = (pool * free)/freeall;
+			newp = (int)((pool * free)/freeall);
 
 			rsetpeasants(r, rpeasants(r)+newp);
 
@@ -2912,13 +2622,45 @@ fix_astralplane(void)
 	return 0;
 }
 
+static int
+level(int days)
+{
+	int l = 0;
+	while (level_days(l)<=days) ++l;
+	return l-1;
+}
+
+int
+convert_skills(void)
+{
+	region * r;
+	for (r=regions;r;r=r->next) {
+		unit * u;
+		for (u=r->units;u;u=u->next) {
+			skill_t sk;
+			for (sk=0;sk!=MAXSKILLS;++sk) {
+				int val = get_skill(u, sk);
+				if (val) {
+					int lvl = level(val/u->number);
+					int days = val-level_days(lvl)*u->number;
+					int skip = level_days(lvl+1)-level_days(lvl);
+					set_skill(u, sk, lvl * u->number + days/skip);
+				}
+			}
+		}
+	}
+	return 0;
+}
+
 void
 korrektur(void)
 {
 #if TEST_LOCALES
 	setup_locales();
 #endif
-
+#if !SKILLPOINTS
+	do_once("nskp", convert_skills());
+#endif
 	fix_astralplane();
 	fix_firewalls();
 	fix_gates();
@@ -2992,8 +2734,8 @@ void
 korrektur_end(void)
 {
 	/* fix_balsamfiasko(); */
-#ifdef SKILLMODIFIESLEARNING
-	do_once("smle", skillmodifieslearning());
+#ifdef CONVERT_SKILLPOINTS
+	do_once("nskp", convert_skills());
 #endif
 #ifdef XMAS2001
 	do_once("2001", xmas2001());
