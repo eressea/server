@@ -899,15 +899,16 @@ build_ship(unit * u, ship * sh, int want)
 {
 	const construction * construction = sh->type->construction;
 	int size = (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;
-	int can = u->number * effskill(u, SK_SHIPBUILDING) / construction->minskill;
 	int n;
-
+#if 0
+  int can = u->number * effskill(u, SK_SHIPBUILDING) / construction->minskill;
 	if (want > 0) can = min(want, can);
 	can = min(can, construction->maxsize+sh->damage); /* 100% bauen + 100% reparieren */
-	can = build(u, construction, size, can);
+#endif
+	int can = build(u, construction, size, want);
 
-	if((n=construction->maxsize - sh->size)>0 && can>0) {
-	  if(can>=n) {
+	if ((n=construction->maxsize - sh->size)>0 && can>0) {
+	  if (can>=n) {
 		 sh->size += n;
 		 can -= n;
 	  }
