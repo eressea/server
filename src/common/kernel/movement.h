@@ -57,7 +57,7 @@ extern struct unit *is_guarded(struct region * r, struct unit * u, unsigned int 
 extern int enoughsailors(struct region * r, struct ship * sh);
 extern boolean canswim(struct unit *u);
 extern struct unit *kapitaen(struct region * r, struct ship * sh);
-extern void travelthru(struct unit * u, struct region * r);
+extern void travelthru(const struct unit * u, struct region * r);
 extern struct ship * move_ship(struct ship * sh, struct region * from, struct region * to, struct region ** route);
 
 extern void follow_unit(void);

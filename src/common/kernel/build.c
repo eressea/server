@@ -569,14 +569,13 @@ matmod(const attrib * a, const unit * u, const resource_type * material, int val
 	return value;
 }
 
+/** Use up resources for building an object. 
+* Build up to 'size' points of 'type', where 'completed'
+* of the first object have already been finished. return the
+* actual size that could be built.
+*/
 int
 build(unit * u, const construction * ctype, int completed, int want)
-	/* Use up resources for building an object. returns the actual size
-	 * being built
-	 * Build up to 'size' points of 'type', where 'completed'
-	 * of the first object have already been finished. return the
-	 * actual size that could be built.
-	 */
 {
 	const construction * type = ctype;
 	int skills; /* number of skill points remainig */

@@ -432,12 +432,19 @@ do_maelstrom(region *r, unit *u)
 	}
 }
 
+/** sets a marker in the region telling that the unit has travelled through it
+ * this is used for two distinctly different purposes:
+ * - to report that a unit has travelled through. the report function
+ *   makes sure to only report the ships of travellers, not the travellers 
+ *   themselves
+ * - to report the region to the traveller
+ */
 void
-travelthru(unit * u, region * r)
+travelthru(const unit * u, region * r)
 {
   attrib *ru = a_add(&r->attribs, a_new(&at_travelunit));
 
-  ru->data.v = u;
+  ru->data.v = (void*)u;
 
   /* the first and last region of the faction gets reset, because travelthrough
    * could be in regions that are located before the [first, last] interval,
@@ -454,7 +461,7 @@ leave_trail(unit * u, region **route, region * to)
   
   while (*ri) {
     region * r = *ri++;
-	region * rn = *ri?*ri:to;
+    region * rn = *ri?*ri:to;
     direction_t dir = reldirection(r, rn);
     attrib * a = a_find(r->attribs, &at_traveldir_new);
     traveldir * td = NULL;
@@ -473,6 +480,16 @@ leave_trail(unit * u, region **route, region * to)
     td->dir = dir;
     td->age = 2;
 
+  }
+}
+
+static void
+travel_route(const unit * u, region ** route)
+{
+  region **ri = route;
+
+  while (*ri) {
+    region * r = *ri++;
     travelthru(u, r);
   }
 }
@@ -498,6 +515,7 @@ move_ship(ship * sh, region * from, region * to, region ** route)
         leave_trail(u, route, to);
         trail=true;
       }
+      if (route!=NULL) travel_route(u, route);
       if (from!=to) {
         u->ship = NULL;		/* damit move_unit() kein leave() macht */
         move_unit(u, to, ulist);
