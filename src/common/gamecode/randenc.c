@@ -1060,6 +1060,33 @@ randomevents(void)
 		drown(r);
 	}
 
+	/* Orkische vermehren sich */
+
+	for (r = regions; r; r = r->next) {
+
+		plane * p = rplane(r);
+		for (u = r->units; u; u = u->next) {
+			if (is_cursed(u->attribs, C_ORC, 0))
+					&& !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
+				int increase = 0;
+				int num  = min(get_cursedmen(u->attribs, C_ORC, 0), u->number);
+				int prob = get_curseeffect(u->attribs, C_ORC, 0);
+
+				for (n = (num - get_item(u, I_CHASTITY_BELT)); n > 0; n--) {
+					if (rand() % 100 < prob) {
+						++increase;
+					}
+				}
+				if (increase) {
+					set_number(u, u->number + increase);
+
+					u->hp += unit_max_hp(u) * increase;
+					ADDMSG(&u->faction->msgs, msg_message("orcgrowth",
+						"unit amount race", u, increase, u->race));
+				}
+			}
+		}
+	}
 
 #if RACE_ADJUSTMENTS == 0
 	/* Orks vermehren sich */
@@ -1070,18 +1097,11 @@ randomevents(void)
 		/* there is a flag for planes without orc growth: */
 		if (p && (p->flags & PFL_NOORCGROWTH)) continue;
 		for (u = r->units; u; u = u->next) {
-			if ( (u->race == new_race[RC_ORC] || is_cursed(u->attribs, C_ORC, 0))
+			if ( (u->race == new_race[RC_ORC])
 					&& !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
 				int increase = 0;
-				int num, prob;
-
-				if (u->race == new_race[RC_ORC]) {
-					num  = u->number;
-					prob = 5;
-				} else {
-					num  = min(get_cursedmen(u->attribs, C_ORC, 0), u->number);
-					prob = get_curseeffect(u->attribs, C_ORC, 0);
-				}
+				int num  = u->number;
+				int prob = 5;
 
 				for (n = (num - get_item(u, I_CHASTITY_BELT)); n > 0; n--) {
 					if (rand() % 100 < prob) {
