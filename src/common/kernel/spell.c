@@ -9717,7 +9717,7 @@ static spell spelldaten[] =
     SPL_ENTERASTRAL, "Astraler Weg",
     "Alte arkane Formeln ermöglichen es dem Magier, sich und andere in die "
     "astrale Ebene zu bringen. Der Magier kann (Stufe-3)*15 GE durch das "
-    "kurzzeitig entstehende Tor bringen. Ist der Magier erfahren genug, "
+    "kurzzeitig entstehende Tor schicken. Ist der Magier erfahren genug, "
     "den Zauber auf Stufen von 11 oder mehr zu zaubern, kann er andere "
     "Einheiten auch gegen ihren Willen auf die andere Ebene zwingen.", NULL,
     "u+",

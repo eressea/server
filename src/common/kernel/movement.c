@@ -944,7 +944,7 @@ init_transportation(void)
     * K_DRIVE. This is time consuming for an error check, but there
     * doesn't seem to be an easy way to speed this up. */
     for (u=r->units; u; u=u->next) {
-      if (get_keyword(u->thisorder) == K_DRIVE && !fval(u, UFL_LONGACTION) && !LongHunger(u)) {
+      if (get_keyword(u->thisorder) == K_DRIVE && can_move(u) && !fval(u, UFL_LONGACTION) && !LongHunger(u)) {
         unit * ut;
 
         init_tokens(u->thisorder);
@@ -980,7 +980,7 @@ init_transportation(void)
           ut = getunit(r, u->faction);
           if (ut==NULL) continue;
 
-          if (get_keyword(ut->thisorder) == K_DRIVE && !fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
+          if (get_keyword(ut->thisorder) == K_DRIVE && can_move(u) && !fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
             init_tokens(ut->thisorder);
             skip_token();
             if (getunit(r, ut->faction) == u) {
@@ -1800,7 +1800,7 @@ travel_i(unit * u, region_list * route_begin, region_list * route_end, order * o
     ut = getunit(r, u->faction);
     if (ut!=NULL) {
       boolean found = false;
-      if (get_keyword(ut->thisorder) == K_DRIVE) {
+      if (get_keyword(ut->thisorder) == K_DRIVE && can_move(ut)) {
         if (!fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
           init_tokens(ut->thisorder);
           skip_token();

@@ -4301,9 +4301,9 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ohne eine Burg gibt es keinen Markt."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - There is no market place without a castle."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is no market place without a castle."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ohne einen Handelsposten gibt es keinen Markt."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - There is no marketplace without at least a tradepost."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - There is no marketplace without at least a tradepost."</text>
   </message>
   <message name="error118" section="errors">
     <type>

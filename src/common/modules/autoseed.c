@@ -228,79 +228,177 @@ preferred_terrain(const struct race * rc)
 }
 
 #define REGIONS_PER_FACTION 2
+#define PLAYERS_PER_ISLAND 20
+#define TURNS_PER_ISLAND 3
 #define MINFACTIONS 1
 #define MAXAGEDIFF 5
 #define VOLCANO_CHANCE 100
 
+static boolean
+virgin_region(const region * r)
+{
+  direction_t d;
+  if (r==NULL) return true;
+  if (r->age>MAXAGEDIFF) return false;
+  if (r->units) return false;
+  for (d=0;d!=MAXDIRECTIONS;++d) {
+    const region * rn = rconnect(r, d);
+    if (rn) {
+      if (rn->age>MAXAGEDIFF) return false;
+      if (rn->units) return false;
+    }
+  }
+  return true;
+}
+
+void
+get_island(region * root, region_list ** rlist)
+{
+  region_list ** rnext = rlist;
+  while (*rnext) rnext=&(*rnext)->next;
+
+  fset(root, FL_MARK);
+  add_regionlist(rnext, root);
+
+  while (*rnext) {
+    direction_t dir;
+
+    region * rcurrent = (*rnext)->data;
+    rnext = &(*rnext)->next;
+
+    for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+      region * r = rconnect(rcurrent, dir);
+      if (r!=NULL && r->land && !fval(r, FL_MARK)) {
+        fset(r, FL_MARK);
+        add_regionlist(rnext, r);
+      }
+    }
+  }
+  rnext=rlist;
+  while (*rnext) {
+    region_list * rptr = *rnext;
+    freset(rptr->data, FL_MARK);
+    rnext = &rptr->next;
+  }
+}
+
+/** create new island with up to nsize players
+ * returns the number of players placed on the new island.
+ */
 int
 autoseed(newfaction ** players, int nsize)
 {
 	int x = 0, y = 0;
-	region * r;
+	region * r = NULL;
 	region_list * rlist = NULL;
-	int rsize, isize=0;
-	region * rmin = NULL;
-	direction_t d;
-	int dist;
-
-	for (r=regions;r;r=r->next) {
-		struct plane * p = rplane(r);
-		if (r->terrain==T_OCEAN && p==NULL && (rmin==NULL || r->age<=MAXAGEDIFF)) {
-			direction_t d;
-			for (d=0;d!=MAXDIRECTIONS;++d) {
-				if (rconnect(r, d)==NULL) break;
-			}
-			if (d!=MAXDIRECTIONS) rmin=r;
-		}
-	}
-	r = NULL;
-	for (dist=1;r!=rmin;++dist) {
-		for (d=0;r!=rmin && d!=MAXDIRECTIONS;++d) {
-			int i;
-			region * rn = rmin;
-			for (i=0;i!=dist;++i) rn=rconnect(rn, d);
-			if (rn==NULL) {
-				r = rmin;
-				x = rmin->x + delta_x[d] * dist;
-				y = rmin->y + delta_y[d] * dist;
-			}
-		}
-	}
+	int rsize, tsize = 0;
+  int isize = REGIONS_PER_FACTION; /* target size for the island */
+  int psize = 0; /* players on this island */
 
   if (listlen(*players)<MINFACTIONS) return 0;
-	r = new_region(x, y);
-	terraform(r, T_OCEAN);
-	add_regionlist(&rlist, r);
-	rsize = 1;
-	while (nsize && rsize) {
+
+  if (turn % TURNS_PER_ISLAND) {
+    region * rmin = NULL;
+    /* find a spot that's adjacent to the previous island, but virgin.
+     * like the last land virgin ocean region adjacent to land.
+     */
+    for (r=regions;r;r=r->next) {
+      struct plane * p = rplane(r);
+      if (r->terrain==T_OCEAN && p==NULL && virgin_region(r)) {
+        direction_t d;
+        for (d=0;d!=MAXDIRECTIONS;++d) {
+          region * rn = rconnect(r, d);
+          if (rn && rn->land) break;
+        }
+        if (d!=MAXDIRECTIONS) rmin = r;
+      }
+    }
+    if (rmin!=NULL) {
+      region_list * rlist = NULL, * rptr;
+      faction * f;
+      get_island(rmin, &rlist);
+      for (rptr=rlist;rptr;rptr=rptr->next) {
+        region * r = rlist->data;
+        unit * u;
+        for (u=r->units;u;u->next) {
+          f = u->faction;
+          if (!fval(f, FL_MARK)) {
+            ++psize;
+            fset(f, FL_MARK);
+          }
+        }
+      }
+      free_regionlist(rlist);
+      if (psize>0) for (f=factions;f;f=f->next) freset(f, FL_MARK);
+      if (psize<PLAYERS_PER_ISLAND) {
+        r = rmin;
+      }
+    }
+  }
+  if (r==NULL) {
+    region * rmin = NULL;
+    direction_t dmin = MAXDIRECTIONS;
+    /* find an empty spot.
+     * rmin = the youngest ocean region that has a missing neighbour 
+     * dmin = direction in which it's empty
+     */
+    for (r=regions;r;r=r->next) {
+      struct plane * p = rplane(r);
+      if (r->terrain==T_OCEAN && p==NULL && (rmin==NULL || r->age<=MAXAGEDIFF)) {
+        direction_t d;
+        for (d=0;d!=MAXDIRECTIONS;++d) {
+          if (rconnect(r, d)==NULL) break;
+        }
+        if (d!=MAXDIRECTIONS) {
+          rmin=r;
+          dmin=d;
+        }
+      }
+    }
+
+    /* create a new region where we found the empty spot, and make it the first 
+    * in our island. island regions are kept in rlist, so only new regions can 
+    * get populated, and old regions are not overwritten */
+    if (rmin!=NULL) {
+      assert(virgin_region(rconnect(rmin, dmin)));
+      x = rmin->x + delta_x[dmin];
+      y = rmin->y + delta_y[dmin];
+    }
+    r = new_region(x, y);
+    terraform(r, T_OCEAN); /* we change the terrain later */
+  }
+
+  add_regionlist(&rlist, r);
+  rsize = 1;
+
+  while (rsize && (nsize || isize>=REGIONS_PER_FACTION)) {
 		int i = rand() % rsize;
 		region_list ** rnext = &rlist;
 		direction_t d;
 		while (i--) rnext=&(*rnext)->next;
 		r = (*rnext)->data;
 		*rnext = (*rnext)->next;
-		if (rsize==0) {
-			log_error(("Could not place all factions on the same island as requested\n"));
-			break;
-		}
 		--rsize;
-		assert(r->terrain==T_OCEAN);
 		for (d=0;d!=MAXDIRECTIONS;++d) {
 			region * rn = rconnect(r, d);
-			if (rn==NULL) {
-				rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
-				terraform(rn, T_OCEAN);
+			if (virgin_region(rn)) {
+        if (rn==NULL) {
+          rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
+          terraform(rn, T_OCEAN);
+        }
 				add_regionlist(&rlist, rn);
 				++rsize;
 			}
 		}
     if (rand() % VOLCANO_CHANCE == 0) {
       terraform(r, T_VOLCANO);
-    } else if (rand() % REGIONS_PER_FACTION == 0 || rsize==0) {
+    } else if (nsize && (rand() % isize == 0 || rsize==0)) {
 			newfaction ** nfp, * nextf = *players;
 			unit * u;
+
+      isize += REGIONS_PER_FACTION;
 			terraform(r, preferred_terrain(nextf->race));
-			++isize;
+			++tsize;
 			u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race, nextf->lang,
 				nextf->subscription));
 			u->faction->alliance = nextf->allies;
@@ -315,13 +413,22 @@ autoseed(newfaction ** players, int nsize)
 				}
 				else nfp = &nf->next;
 			}
+      ++psize;
 			--nsize;
-		}
-		else {
+      --isize;
+      if (psize>=PLAYERS_PER_ISLAND) break;
+		} else {
 			terraform(r, (terrain_t)((rand() % T_GLACIER)+1));
+      --isize;
 		}
 	}
-	if (rlist) {
+
+  if (nsize!=0) {
+    log_error(("Could not place all factions on the same island as requested\n"));
+  }
+
+  
+  if (rlist) {
 #define MINOCEANDIST 3
 #define MAXFILLDIST 10
 #define SPECIALCHANCE 80
@@ -378,5 +485,5 @@ autoseed(newfaction ** players, int nsize)
 			}
 		}
 	}
-	return isize;
+	return tsize;
 }

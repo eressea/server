@@ -65,10 +65,12 @@ function process(orders)
       f = get_faction(atoi36(name))
       if f ~= nil then
         f.locale = loc
-  			print("LOCALECHANGE ", f, loc)
-			end
+        print("LOCALECHANGE ", f, loc)
+      end
     end
   end
+  
+  autoseed(basepath .. "/newfactions")
 
   write_passwords()
   write_reports()

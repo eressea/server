@@ -34,6 +34,7 @@ typedef struct newfaction {
 
 extern int autoseed(newfaction ** players, int nsize);
 extern newfaction * read_newfactions(const char * filename);
+extern void get_island(struct region * root, struct region_list ** rlist);
 
 #ifdef __cplusplus
 }

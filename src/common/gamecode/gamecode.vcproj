@@ -72,12 +72,12 @@
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="0"
 				InlineFunctionExpansion="1"
-				ImproveFloatingPointConsistency="TRUE"
 				AdditionalIncludeDirectories="../kernel,../util,../..,.."
 				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS"
 				StringPooling="TRUE"
-				RuntimeLibrary="4"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
 				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="2"

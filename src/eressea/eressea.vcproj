@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="luabind.lib lua50.lib lualib50.lib libxml2.lib iconv.lib"
+				AdditionalDependencies="libxml2.lib iconv.lib"
 				OutputFile=".\Release/eressea.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -84,12 +84,12 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="0"
 				InlineFunctionExpansion="1"
-				ImproveFloatingPointConsistency="TRUE"
 				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
 				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE"
 				StringPooling="TRUE"
-				RuntimeLibrary="4"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
 				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="2"
@@ -107,9 +107,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies="libxml2.lib iconv.lib"
 				OutputFile=".\Profile/eressea.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
+				GenerateDebugInformation="TRUE"
 				SubSystem="1"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -167,7 +169,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="luabindd.lib lua50d.lib lualib50d.lib libxml2.lib iconv.lib"
+				AdditionalDependencies="libxml2.lib iconv.lib"
 				OutputFile=".\Debug/eressea.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"

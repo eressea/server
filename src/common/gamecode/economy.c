@@ -1771,7 +1771,13 @@ buy(unit * u, request ** buyorders, struct order * ord)
 		}
 	} else {
 		/* ...oder in der Region muß es eine Burg geben. */
-		if (!rbuildings(r)) {
+    building * b;
+    static const struct building_type * bt_castle;
+    if (!bt_castle) bt_castle = bt_find("castle");
+    for (b=r->buildings;b;b=b->next) {
+      if (b->type==bt_castle && b->size>2) break;
+    }
+		if (b==NULL) {
 			cmistake(u, ord, 119, MSG_COMMERCE);
 			return;
 		}
@@ -2567,6 +2573,11 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
 	unit * u2 = NULL;
   region * r = u->region;
 	faction * f = NULL;
+
+  if (rterrain(r) == T_OCEAN && u->race != new_race[RC_AQUARIAN]) {
+    cmistake(u, ord, 242, MSG_INCOME);
+    return;
+  }
 
 	if (r->planep && fval(r->planep, PFL_NOATTACK)) {
 		cmistake(u, ord, 270, MSG_INCOME);

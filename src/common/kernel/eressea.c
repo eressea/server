@@ -1862,6 +1862,7 @@ createunitid(unit *u, int id)
 unit *
 createunit(region * r, faction * f, int number, const struct race * rc)
 {
+  assert(rc);
 	return create_unit(r, f, number, rc, 0, NULL, NULL);
 }
 
@@ -1870,6 +1871,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
 {
 	unit * u = calloc(1, sizeof(unit));
 
+  assert(urace);
 	assert(f->alive);
 	u_setfaction(u, f);
 	set_order(&u->thisorder, NULL);
