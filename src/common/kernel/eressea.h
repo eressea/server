@@ -1113,6 +1113,8 @@ extern void kernel_done(void);
 
 extern void reorder_owners(struct region * r);
 
+extern const char *locales[];
+
 #define FIRST_TURN 184
 
 #include <log.h>

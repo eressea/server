@@ -64,7 +64,7 @@ unused_faction_id(void)
 }
 
 unit *
-addplayer(region *r, char *email, race_t frace)
+addplayer(region *r, char *email, race_t frace, locale *loc)
 {
 	int i;
 	unit *u;
@@ -81,6 +81,7 @@ addplayer(region *r, char *email, race_t frace)
 	f->age = 0;
 	f->race = frace;
 	f->magiegebiet = 0;
+	f->locale = loc;
 	set_ursprung(f, 0, r->x, r->y);
 
 	f->options = Pow(O_REPORT) | Pow(O_ZUGVORLAGE) | Pow(O_SILBERPOOL);

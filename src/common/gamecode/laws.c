@@ -224,10 +224,9 @@ destroyfaction(faction * f)
 void
 restart(unit *u, int race)
 {
-	faction *f = addplayer(u->region, u->faction->email, race)->faction;
+	faction *f = addplayer(u->region, u->faction->email, race, u->faction->locale)->faction;
 	f->magiegebiet = u->faction->magiegebiet;
 	f->options = u->faction->options;
-	f->locale = u->faction->locale;
 	destroyfaction(u->faction);
 }
 

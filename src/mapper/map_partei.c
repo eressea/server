@@ -28,6 +28,7 @@
 
 /* util includes */
 #include <base36.h>
+#include <language.h>
 
 /* libc includes */
 #include <ctype.h>
@@ -291,12 +292,13 @@ NeuePartei(region * r)
 	race_t frace;
 	int late;
 	unit *u;
+	int locale_nr;
 
 	if (!r->land) {
 		warnung(0, "Ungeeignete Region! <Taste>");
 		return;
 	}
-	win = openwin(SX - 10, 9, "< Neue Partei einfügen >");
+	win = openwin(SX - 10, 12, "< Neue Partei einfügen >");
 
 	strcpy(buf, my_input(win, 2, 1, "EMail-Adresse (Leer->Ende): ", NULL));
 	if (!buf[0]) {
@@ -313,28 +315,56 @@ NeuePartei(region * r)
 	  sprintf(buf, "%d=%s; ", i, race[i].name[0]);
 	  q += strlen(buf);
 	  if (q > SX - 20) {
-		q = strlen(buf);
-		y++;
-		wmove(win, y, 4);
+			q = strlen(buf);
+			y++;
+			wmove(win, y, 4);
 	  }
 	  wAddstr(buf);
 	}
 	wrefresh(win);
 
+	y++;
 	do {
-		frace = (char) map_input(win, 2, 2, "Rasse", -1, MAXRACES-1, 0);
+		frace = (char) map_input(win, 2, y, "Rasse", -1, MAXRACES-1, 0);
 	} while(race[frace].nonplayer);
 	if(frace == -1) {
 		delwin(win);
 		return;
 	}
 
-	late = (int) map_input(win, 2, 5, "Startbonus", 0, 99, 0);
+	y++;
+	late = (int) map_input(win, 2, y, "Startbonus", -1, 99, 0);
+	if(late == -1) {
+		delwin(win);
+		return;
+	}
+
+	i = 0; q = 0; y++;
+	wmove(win, y, 4);
+	while(locales[i] != NULL) {
+		sprintf(buf, "%d=%s; ", i, locales[i]);
+		q += strlen(buf);
+		if (q > SX - 20) {
+			q = strlen(buf);
+			y++;
+			wmove(win, y, 4);
+		}
+		wAddstr(buf);
+		i++;
+	}
+	wrefresh(win);
+
+	y++;
+	locale_nr = map_input(win, 2, 8, "Locale", -1, i-1, 0);
+	if(locale_nr == -1) {
+		delwin(win);
+		return;
+	}
 
 	delwin(win);
 	modified = 1;
 
-	u = addplayer(r, email, frace);
+	u = addplayer(r, email, frace, find_locale(locales[locale_nr]));
 
 	if(late) give_latestart_bonus(r, u, late);
 

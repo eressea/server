@@ -72,6 +72,6 @@ typedef struct faction {
 
 extern const char * factionname(const struct faction * f);
 extern void * resolve_faction(void * data);
-extern struct unit * addplayer(struct region *r, char *email, race_t frace);
+extern struct unit * addplayer(struct region *r, char *email, race_t frace, struct locale *loc);
 
 #endif
