@@ -429,9 +429,11 @@ drawmap(boolean maponly) {
 				case -10:
 					addstr("Dropouts ");
 					break;
+#ifdef ALLIANCES
 				case -11:
 					printw((NCURSES_CONST char*)"Allianz %d ", hl_alliance);
 					break;
+#endif
 				default:
 					printw((NCURSES_CONST char*)"Partei %d ", hl);
 			}
