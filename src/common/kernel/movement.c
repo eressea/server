@@ -918,6 +918,13 @@ roadto(const region * r, direction_t dir)
   /* wenn es hier genug strassen gibt, und verbunden ist, und es dort
   * genug strassen gibt, dann existiert eine strasse in diese richtung */
   region * r2;
+  static const curse_type * roads_ct = NULL;
+
+  if (roads_ct==NULL) roads_ct = ct_find("magicstreet"); 
+  if (roads_ct!=NULL) {
+    curse *c = get_curse(r->attribs, roads_ct);
+    if (c!=NULL) return true;
+  }
   
   if (dir>=MAXDIRECTIONS || dir<0) return false;
   r2 = rconnect(r, dir);
@@ -1208,25 +1215,26 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
 
       travelthru(u, first);
       while (rlist!=NULL) {
-		region * r = rlist->data;
+        region * r = rlist->data;
 
         travelthru(u, r);
-		rlist=rlist->next;
+        rlist=rlist->next;
         if (rlist!=NULL) {
-		  char * p;
-		  if (r!=route->data) {
-			if (rlist->next==NULL) scat(" und ");
-			else scat(", ");
-		  }
+          char * p;
+          if (r!=route->data) {
+            if (rlist->next==NULL) scat(" und ");
+            else scat(", ");
+          }
 
-		  p = buf+strlen(buf);
-		  MSG(("travelthru_trail", "region", r), p, sizeof(buf)-strlen(buf), u->faction->locale, u->faction);
-		}
+          p = buf+strlen(buf);
+          if (rlist->next) {
+            MSG(("travelthru_trail", "region", rlist->data), p, sizeof(buf)-strlen(buf), u->faction->locale, u->faction);		
+          }
+        }
       }
     }
-    add_message(&u->faction->msgs, new_message(
-      u->faction, "travel%u:unit%i:mode%r:start%r:end%s:regions",
-      u, mode, first, current, strdup(buf)));
+    ADDMSG(&u->faction->msgs, msg_message("travel", 
+      "unit mode start end regions", u, mode, first, current, strdup(buf)));
 
     /* und jetzt noch die transportierten Einheiten verschieben */
 

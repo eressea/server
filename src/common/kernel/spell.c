@@ -194,22 +194,22 @@ magicanalyse_region(region *r, unit *mage, double force)
 
 		if (chance(probability)) { /* Analyse geglückt */
 			if(c->flag & CURSE_NOAGE) {
-				add_message(&mage->faction->msgs, new_message(mage->faction,
-					"analyse_region_noage%u:mage%r:region%s:spell",
+				ADDMSG(&mage->faction->msgs, msg_message(
+					"analyse_region_noage", "mage region spell",
 					mage, r, LOC(lang, mkname("spell", c->type->cname))));
 			} else {
-				add_message(&mage->faction->msgs, new_message(mage->faction,
-					"analyse_region_age%u:mage%r:region%s:spell%i:months",
+				ADDMSG(&mage->faction->msgs, msg_message(
+					"analyse_region_age", "mage region spell months",
 					mage, r, LOC(lang, mkname("spell", c->type->cname)), mon));
 			}
 		} else {
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-				"analyse_region_fail%u:mage%r:region", mage, r));
+			ADDMSG(&mage->faction->msgs, msg_message(
+				"analyse_region_fail", "mage region", mage, r));
 		}
 	}
 	if (!found) {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"analyse_region_nospell%u:mage%r:region", mage, r));
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"analyse_region_nospell", "mage region", mage, r));
 	}
 }
 
@@ -235,22 +235,22 @@ magicanalyse_unit(unit *u, unit *mage, double force)
 
 		if (chance(probability)) { /* Analyse geglückt */
 			if(c->flag & CURSE_NOAGE){
-				add_message(&mage->faction->msgs, new_message(mage->faction,
-					"analyse_unit_noage%u:mage%u:unit%s:spell",
+				ADDMSG(&mage->faction->msgs, msg_message(
+					"analyse_unit_noage", "mage unit spell",
 					mage, u, LOC(lang, mkname("spell", c->type->cname))));
 			}else{
-				add_message(&mage->faction->msgs, new_message(mage->faction,
-					"analyse_unit_age%u:mage%u:unit%s:spell%i:months",
+				ADDMSG(&mage->faction->msgs, msg_message(
+					"analyse_unit_age", "mage unit spell months",
 					mage, u, LOC(lang, mkname("spell", c->type->cname)), mon));
 			}
 		} else {
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-				"analyse_unit_fail%u:mage%u:unit", mage, u));
+			ADDMSG(&mage->faction->msgs, msg_message(
+				"analyse_unit_fail", "mage unit", mage, u));
 		}
 	}
 	if (!found) {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"analyse_unit_nospell%u:mage%u:target", mage, u));
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"analyse_unit_nospell", "mage target", mage, u));
 	}
 }
 
@@ -277,22 +277,22 @@ magicanalyse_building(building *b, unit *mage, double force)
 
 		if (chance(probability)) { /* Analyse geglückt */
 			if(c->flag & CURSE_NOAGE){
-				add_message(&mage->faction->msgs, new_message(mage->faction,
-					"analyse_building_age%u:mage%b:building%s:spell",
+				ADDMSG(&mage->faction->msgs, msg_message(
+					"analyse_building_age", "mage building spell",
 					mage, b, LOC(lang, mkname("spell", c->type->cname))));
 			}else{
-				add_message(&mage->faction->msgs, new_message(mage->faction,
-					"analyse_building_age%u:mage%b:building%s:spell%i:months",
+				ADDMSG(&mage->faction->msgs, msg_message(
+					"analyse_building_age", "mage building spell months",
 					mage, b, LOC(lang, mkname("spell", c->type->cname)), mon));
 			}
 		} else {
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-				"analyse_building_fail%u:mage%b:building", mage, b));
+			ADDMSG(&mage->faction->msgs, msg_message(
+				"analyse_building_fail", "mage building", mage, b));
 		}
 	}
 	if (!found) {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"analyse_building_nospell%u:mage%b:building", mage, b));
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"analyse_building_nospell", "mage building", mage, b));
 	}
 
 }
@@ -319,23 +319,23 @@ magicanalyse_ship(ship *sh, unit *mage, double force)
 
 		if (chance(probability)) { /* Analyse geglückt */
 			if(c->flag & CURSE_NOAGE){
-				add_message(&mage->faction->msgs, new_message(mage->faction,
-					"analyse_ship_noage%u:mage%h:ship%s:spell",
+				ADDMSG(&mage->faction->msgs, msg_message(
+					"analyse_ship_noage", "mage ship spell",
 					mage, sh, LOC(lang, mkname("spell", c->type->cname))));
 			}else{
-				add_message(&mage->faction->msgs, new_message(mage->faction,
-					"analyse_ship_age%u:mage%h:ship%s:spell%i:months",
+				ADDMSG(&mage->faction->msgs, msg_message(
+					"analyse_ship_age", "mage ship spell months",
 					mage, sh, LOC(lang, mkname("spell", c->type->cname)), mon));
 			}
 		} else {
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-				"analyse_ship_fail%u:mage%h:ship", mage, sh));
+			ADDMSG(&mage->faction->msgs, msg_message(
+				"analyse_ship_fail", "mage ship", mage, sh));
 
 		}
 	}
 	if (!found) {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"analyse_ship_nospell%u:mage%h:ship", mage, sh));
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"analyse_ship_nospell", "mage ship", mage, sh));
 	}
 
 }
@@ -455,7 +455,7 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
 	/* Ist niemand von der Partei des Magiers in der Region, dem Magier
 	 * nochmal gesondert melden */
 	if(!fval(mage->faction, FL_DH)) {
-		add_message(&mage->faction->msgs, seen);
+		ADDMSG(&mage->faction->msgs, seen);
 	}
 	msg_release(seen);
 	if (unseen) msg_release(unseen);
@@ -738,12 +738,12 @@ sp_destroy_magic(castorder *co)
   succ = destroy_curse(ap, cast_level, force, c);
 
 	if (succ) {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"destroy_magic_effect%u:unit%r:region%s:command%i:succ%s:target",
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"destroy_magic_effect", "unit region command succ target",
 			mage, mage->region, strdup(co->order), succ, strdup(ts)));
 	} else {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"destroy_magic_noeffect%u:unit%r:region%s:command",
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"destroy_magic_noeffect", "unit region command",
 			mage, mage->region, strdup(co->order)));
 	}
 
@@ -825,8 +825,8 @@ sp_transferaura(castorder *co)
 
 /*	sprintf(buf, "%s transferiert %d Aura auf %s", unitname(mage),
 			gain, unitname(u)); */
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-		"auratransfer_success%u:unit%u:target%i:aura", mage, u, gain));
+	ADDMSG(&mage->faction->msgs, msg_message(
+		"auratransfer_success", "unit target aura", mage, u, gain));
 	return cast_level;
 }
 
@@ -903,36 +903,25 @@ sp_goodwinds(castorder *co)
 static int
 sp_magicstreet(castorder *co)
 {
-	region *r = co->rt;
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-	double power = co->force;
-	spellparameter *pa = co->par;
-	direction_t dir;
-	int duration = cast_level+1;
+  region *r = co->rt;
+  unit *mage = (unit *)co->magician;
 
-	if(!(landregion(rterrain(r)))){
-		cmistake(mage, strdup(co->order), 186, MSG_MAGIC);
+  if (!landregion(rterrain(r))) {
+    cmistake(mage, strdup(co->order), 186, MSG_MAGIC);
     return 0;
-	}
-	dir = finddirection(pa->param[0]->data.s, mage->faction->locale);
+  }
 
-	if (rroad(r, dir)){
-		cmistake(mage, strdup(co->order), 187, MSG_MAGIC);
-    return 0;
-	}
+  /* wirkt schon in der Zauberrunde! */
+  create_curse(mage, &r->attribs, ct_find("magicstreet"), co->force, co->level+1, 0, 0);
 
-	/* wirkt schon in der Zauberrunde! */
-	create_curse(mage, &r->attribs, ct_find("magicstreet"), power, duration, 0, 0);
+  /* melden, 1x pro Partei */
+  {
+    message * seen = msg_message("path_effect", "mage region", mage, r);
+    message * unseen = msg_message("path_effect", "mage region", NULL, r);
+    report_effect(r, mage, seen, unseen);
+  }
 
-	/* melden, 1x pro Partei */
-	{
-		message * seen = msg_message("path_effect", "mage region", mage, r);
-		message * unseen = msg_message("path_effect", "mage region", NULL, r);
-		report_effect(r, mage, seen, unseen);
-	}
-
-	return cast_level;
+  return co->level;
 }
 
 /* ------------------------------------------------------------- */
@@ -1293,8 +1282,8 @@ patzer_ents(castorder *co)
 		LOC(default_locale, rc_name(new_race[RC_TREEMAN], ents!=1)), NULL);
 
 	/* 'Erfolg' melden */
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-				"regionmagic_patzer%u:unit%r:region%s:command%u:unit", mage,
+	ADDMSG(&mage->faction->msgs, msg_message(
+				"regionmagic_patzer", "unit region command unit", mage,
 				mage->region, strdup(co->order), mage));
 
 	/* melden, 1x pro Partei */
@@ -1381,17 +1370,17 @@ sp_rosthauch(castorder *co)
 		if (ironweapon) {
 			/* {$mage mage} legt einen Rosthauch auf {target}. {amount} Waffen
 			 * wurden vom Rost zerfressen */
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-				"rust_effect%u:mage%u:target%i:amount", mage, u, ironweapon));
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"rust_effect%u:mage%u:target%i:amount",
+			ADDMSG(&mage->faction->msgs, msg_message(
+				"rust_effect", "mage target amount", mage, u, ironweapon));
+			ADDMSG(&u->faction->msgs, msg_message(
+				"rust_effect", "mage target amount",
 				cansee(u->faction, r, mage, 0) ? mage:NULL, u, ironweapon));
 			success += ironweapon;
 		} else {
 			/* {$mage mage} legt einen Rosthauch auf {target}, doch der
 			 * Rosthauch fand keine Nahrung */
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-				"rust_fail%u:mage%u:target", mage, u));
+			ADDMSG(&mage->faction->msgs, msg_message(
+				"rust_fail", "mage target", mage, u));
 		}
 	}
 	/* in success stehen nun die insgesamt zerstörten Waffen. Im
@@ -1457,10 +1446,10 @@ sp_kaelteschutz(castorder *co)
 				duration, 1, men);
 
 		force -= u->number;
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"heat_effect%u:mage%u:target", mage, u));
-		if (u->faction!=mage->faction) add_message(&u->faction->msgs, new_message(u->faction,
-			"heat_effect%u:mage%u:target",
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"heat_effect", "mage target", mage, u));
+		if (u->faction!=mage->faction) ADDMSG(&u->faction->msgs, msg_message(
+			"heat_effect", "mage target",
 			cansee(u->faction, r, mage, 0) ? mage:NULL, u));
 		i = cast_level;
 	}
@@ -1503,11 +1492,11 @@ sp_sparkle(castorder *co)
 	create_curse(mage, &u->attribs, ct_find("sparkle"), cast_level,
 			duration, rand(), u->number);
 
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-		"sparkle_effect%u:mage%u:target", mage, u));
+	ADDMSG(&mage->faction->msgs, msg_message(
+		"sparkle_effect", "mage target", mage, u));
 	if (u->faction!=mage->faction)
-		add_message(&u->faction->msgs, new_message(u->faction,
-		"sparkle_effect%u:mage%u:target", mage, u));
+		ADDMSG(&u->faction->msgs, msg_message(
+		"sparkle_effect", "mage target", mage, u));
 
 	return cast_level;
 }
@@ -1567,7 +1556,7 @@ sp_create_irongolem(castorder *co)
 	a->data.ca[1] = IRONGOLEM_CRUMBLE;
 	a_add(&u2->attribs, a);
 
-	add_message(&mage->faction->msgs,
+	ADDMSG(&mage->faction->msgs,
 		msg_message("magiccreate_effect", "region command unit amount object",
 		mage->region, strdup(co->order), mage, number,
 		LOC(mage->faction->locale, rc_name(new_race[RC_IRONGOLEM], 1))));
@@ -1628,7 +1617,7 @@ sp_create_stonegolem(castorder *co)
 	a->data.ca[1] = STONEGOLEM_CRUMBLE;
 	a_add(&u2->attribs, a);
 
-	add_message(&mage->faction->msgs,
+	ADDMSG(&mage->faction->msgs,
 		msg_message("magiccreate_effect", "region command unit amount object",
 		mage->region, strdup(co->order), mage, number,
 		LOC(mage->faction->locale, rc_name(new_race[RC_STONEGOLEM], 1))));
@@ -1784,8 +1773,8 @@ sp_great_drought(castorder *co)
 		}
 	}
 	if(!fval(mage->faction, FL_DH)){
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"drought_effect%u:mage%r:region", mage, r));
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"drought_effect", "mage region", mage, r));
 	}
 	return cast_level;
 }
@@ -2725,8 +2714,8 @@ sp_fumblecurse(castorder *co)
 	}
 
 	curse_setflag(c, CURSE_ONLYONE);
-	add_message(&target->faction->msgs, new_message(target->faction,
-		"fumblecurse%u:unit%r:region", target, target->region));
+	ADDMSG(&target->faction->msgs, msg_message(
+		"fumblecurse", "unit region", target, target->region));
 
 	return cast_level;
 }
@@ -2744,8 +2733,8 @@ patzer_fumblecurse(castorder *co)
 	c = create_curse(mage, &mage->attribs, ct_find("fumble"), force,
 				duration, effect, 0);
 	if (c!=NULL) {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"magic_fumble%u:unit%r:region%s:command",
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"magic_fumble", "unit region command",
 			mage, mage->region, strdup(co->order)));
 		curse_setflag(c, CURSE_ONLYONE);
 	}
@@ -2835,8 +2824,8 @@ sp_summondragon(castorder *co)
 		}
 	}
 
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-				"summondragon%u:unit%r:region%s:command%u:unit%r:region",
+	ADDMSG(&mage->faction->msgs, msg_message(
+				"summondragon", "unit region command unit region",
 				mage, mage->region, strdup(co->order),mage, co->rt));
 
 	free_regionlist(rl);
@@ -3009,38 +2998,40 @@ wall_write(const border * b, FILE * f)
 static void
 wall_move(const border * b, struct unit * u, const struct region * from, const struct region * to)
 {
-	wall_data * fd = (wall_data*)b->data;
-	int hp = dice(3, fd->force) * u->number;
-	if (fd->active) {
-		hp = min (u->hp, hp);
-		u->hp -= hp;
-		if (u->hp) add_message(&u->faction->msgs,
-			new_message(u->faction, "firewall_damage%r:region%u:unit", from, u));
-		else add_message(&u->faction->msgs,
-			new_message(u->faction, "firewall_death%r:region%u:unit", from, u));
-		if (u->number>u->hp) {
-			scale_number(u, u->hp);
-			u->hp = u->number;
-		}
-	}
-	unused(from);
-	unused(to);
+  wall_data * fd = (wall_data*)b->data;
+  int hp = dice(3, fd->force) * u->number;
+  if (fd->active) {
+    hp = min (u->hp, hp);
+    u->hp -= hp;
+    if (u->hp) {
+      ADDMSG(&u->faction->msgs,
+        msg_message( "firewall_damage", "region unit", from, u));
+    }
+    else ADDMSG(&u->faction->msgs,
+      msg_message( "firewall_death", "region unit", from, u));
+    if (u->number>u->hp) {
+      scale_number(u, u->hp);
+      u->hp = u->number;
+    }
+  }
+  unused(from);
+  unused(to);
 }
 
 border_type bt_firewall = {
-	"firewall",
-	b_transparent, /* transparent */
-	wall_init, /* init */
-	wall_destroy, /* destroy */
-	wall_read, /* read */
-	wall_write, /* write */
-	b_blocknone, /* block */
-	fire_name, /* name */
-	b_rvisible, /* rvisible */
-	b_finvisible, /* fvisible */
-	b_uinvisible, /* uvisible */
-	NULL,
-	wall_move
+  "firewall",
+  b_transparent, /* transparent */
+  wall_init, /* init */
+  wall_destroy, /* destroy */
+  wall_read, /* read */
+  wall_write, /* write */
+  b_blocknone, /* block */
+  fire_name, /* name */
+  b_rvisible, /* rvisible */
+  b_finvisible, /* fvisible */
+  b_uinvisible, /* uvisible */
+  NULL,
+  wall_move
 };
 
 static int
@@ -3101,14 +3092,14 @@ sp_firewall(castorder *co)
 	for (u = r->units; u; u = u->next ) {
 		if(!fval(u->faction, FL_DH) ) {
 			fset(u->faction, FL_DH);
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"firewall_effect%u:mage%r:region",
+			ADDMSG(&u->faction->msgs, msg_message(
+				"firewall_effect", "mage region",
 				cansee(u->faction, r, mage, 0) ? mage:NULL, r));
 		}
 	}
 	if(!fval(mage->faction, FL_DH)){
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"firewall_effect%u:mage%r:region", mage, r));
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"firewall_effect", "mage region", mage, r));
 	}
 
 	return cast_level;
@@ -3178,14 +3169,14 @@ sp_wisps(castorder *co)
 	for(u = r->units; u; u = u->next ) {
 		if(!fval(u->faction, FL_DH) ) {
 			fset(u->faction, FL_DH);
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"wisps_effect%u:mage%r:region",
+			ADDMSG(&u->faction->msgs, msg_message(
+				"wisps_effect", "mage region",
 				cansee(u->faction, r, mage, 0) ? mage:NULL, r));
 		}
 	}
 	if(!fval(mage->faction, FL_DH)){
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"wisps_effect%u:mage%r:region", mage, r));
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"wisps_effect", "mage region", mage, r));
 	}
 
 	return cast_level;
@@ -3250,7 +3241,7 @@ sp_unholypower(castorder *co)
 			n -= u->number;
 			u->race = u->irace = target_race;
 			u->hp = unit_max_hp(u)*u->number - wounds;
-			add_message(&co->rt->msgs, msg_message("unholypower_effect",
+			ADDMSG(&co->rt->msgs, msg_message("unholypower_effect",
 				"mage target race", mage, u, target_race));
 		} else {
 			unit *un;
@@ -3274,7 +3265,7 @@ sp_unholypower(castorder *co)
 			}
 			transfermen(u, un, n);
 			un->hp = unit_max_hp(un)*n - wounds;
-			add_message(&co->rt->msgs, msg_message("unholypower_limitedeffect",
+			ADDMSG(&co->rt->msgs, msg_message("unholypower_limitedeffect",
 				"mage target race amount",
 				mage, u, target_race, n));
 			n = 0;
@@ -3445,8 +3436,8 @@ patzer_deathcloud(castorder *co)
 
 	change_hitpoints(mage, -rand()%hp);
 
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-		"magic_fumble%u:unit%r:region%s:command",
+	ADDMSG(&mage->faction->msgs, msg_message(
+		"magic_fumble", "unit region command",
 		mage, mage->region, strdup(co->order)));
 
 	return;
@@ -3720,8 +3711,8 @@ sp_magicboost(castorder *co)
 	}
 
 
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-		"magicboost_effect%u:unit%r:region%s:command",
+	ADDMSG(&mage->faction->msgs, msg_message(
+		"magicboost_effect", "unit region command",
 		mage, mage->region, strdup(co->order)));
 
 	return cast_level;
@@ -4182,8 +4173,8 @@ sp_song_resistmagic(castorder *co)
 			force, duration, mr_bonus, 0);
 
 	/* Erfolg melden */
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-				"regionmagic_effect%u:unit%r:region%s:command%u:unit", mage,
+	ADDMSG(&mage->faction->msgs, msg_message(
+				"regionmagic_effect", "unit region command unit", mage,
 				mage->region, strdup(co->order), mage));
 
 	return cast_level;
@@ -4212,8 +4203,8 @@ sp_song_susceptmagic(castorder *co)
 	create_curse(mage, &r->attribs, ct_find("badmagicresistancezone"),
 			force, duration, mr_malus, 0);
 
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-				"regionmagic_effect%u:unit%r:region%s:command%u:unit", mage,
+	ADDMSG(&mage->faction->msgs, msg_message(
+				"regionmagic_effect", "unit region command unit", mage,
 				mage->region, strdup(co->order), mage));
 
 	return cast_level;
@@ -4337,14 +4328,14 @@ sp_raisepeasantmob(castorder *co)
 	for (u = r->units; u; u = u->next ) {
 		if (!fval(u->faction, FL_DH) ) {
 			fset(u->faction, FL_DH);
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"sp_raisepeasantmob_effect%u:mage%r:region",
+			ADDMSG(&u->faction->msgs, msg_message(
+				"sp_raisepeasantmob_effect", "mage region",
 				cansee(u->faction, r, mage, 0) ? mage : NULL, r ));
 		}
 	}
 	if (!fval(mage->faction, FL_DH)){
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-				"sp_raisepeasantmob_effect%u:mage%r:region", mage, r));
+			ADDMSG(&mage->faction->msgs, msg_message(
+				"sp_raisepeasantmob_effect", "mage region", mage, r));
 	}
 
 	return cast_level;
@@ -4381,8 +4372,8 @@ sp_migranten(castorder *co)
 	/* Personen unserer Rasse können problemlos normal übergeben werden */
 	if (target->race == mage->faction->race){
 		/* u ist von unserer Art, das Ritual wäre verschwendete Aura. */
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-				"sp_migranten_fail1%u:unit%r:region%s:command%u:target", mage,
+		ADDMSG(&mage->faction->msgs, msg_message(
+				"sp_migranten_fail1", "unit region command target", mage,
 				mage->region, strdup(co->order), target));
 	}
 	/* Auf eigene Einheiten versucht zu zaubern? Garantiert Tippfehler */
@@ -4462,8 +4453,8 @@ sp_migranten(castorder *co)
 	set_string(&target->thisorder, "");
 
 	/* Erfolg melden */
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-				"sp_migranten%u:unit%r:region%s:command%u:target", mage,
+	ADDMSG(&mage->faction->msgs, msg_message(
+				"sp_migranten", "unit region command target", mage,
 				mage->region, strdup(co->order), target));
 
 	return target->number;
@@ -5082,8 +5073,8 @@ sp_dragonsong(castorder *co)
 		}
 	}
 
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-				"summondragon%u:unit%r:region%s:command%u:unit%r:region",
+	ADDMSG(&mage->faction->msgs, msg_message(
+				"summondragon", "unit region command unit region",
 				mage, mage->region, strdup(co->order),mage, co->rt));
 
 	free_regionlist(rl);
@@ -5114,8 +5105,8 @@ sp_songofAttraction(castorder *co)
 
 	/* TODO Wander Effekt */
 
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-				"summon%u:unit%r:region%s:command%u:unit%r:region",
+	ADDMSG(&mage->faction->msgs, msg_message(
+				"summon", "unit region command unit region",
 				mage, mage->region, strdup(co->order),mage, r));
 
 	return cast_level;
@@ -5206,8 +5197,8 @@ sp_icastle(castorder *co)
 		mage->building = b;
 	}
 
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-		"icastle_create%u:unit%r:region%s:command", mage, mage->region,
+	ADDMSG(&mage->faction->msgs, msg_message(
+		"icastle_create", "unit region command", mage, mage->region,
 		strdup(co->order)));
 
 	addmessage(r, 0,
@@ -5313,8 +5304,8 @@ sp_readmind(castorder *co)
 	if (target_resists_magic(mage, target, TYP_UNIT, 0)){
 		report_failure(mage, co->order);
 		/* "Fühlt sich beobachtet"*/
-	  add_message(&target->faction->msgs, new_message(target->faction,
-						    "stealdetect%u:unit", target));
+	  ADDMSG(&target->faction->msgs, msg_message(
+						    "stealdetect", "unit", target));
 		return 0;
 	}
 	spy_message(2, mage, target);
@@ -5411,8 +5402,8 @@ sp_baddreams(castorder *co)
 	curse_setflag(c, CURSE_ISNEW);
 
 	/* Erfolg melden*/
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-				"regionmagic_effect%u:unit%r:region%s:command%u:unit", mage,
+	ADDMSG(&mage->faction->msgs, msg_message(
+				"regionmagic_effect", "unit region command unit", mage,
 				mage->region, strdup(co->order), mage));
 
 	return cast_level;
@@ -5448,8 +5439,8 @@ sp_gooddreams(castorder *co)
 	curse_setflag(c, CURSE_ISNEW);
 
 	/* Erfolg melden*/
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-				"regionmagic_effect%u:unit%r:region%s:command%u:unit", mage,
+	ADDMSG(&mage->faction->msgs, msg_message(
+				"regionmagic_effect", "unit region command unit", mage,
 				mage->region, strdup(co->order), mage));
 
 	return cast_level;
@@ -5520,8 +5511,8 @@ sp_dreamreading(castorder *co)
 
 	/* Illusionen und Untote abfangen. */
 	if (fval(u->race, RCF_UNDEAD|RCF_ILLUSIONARY)) {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"spellunitnotfound%u:unit%r:region%s:command%s:id",
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"spellunitnotfound", "unit region command id",
 			mage, mage->region, strdup(co->order), strdup(itoa36(u->no))));
 		return 0;
 	}
@@ -5751,8 +5742,8 @@ sp_itemcloak(castorder *co)
 	target = pa->param[0]->data.u;
 
 	create_curse(mage,&target->attribs, ct_find("itemcloak"), power,duration,0,0);
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-		"itemcloak%u:mage%u:target", mage, target));
+	ADDMSG(&mage->faction->msgs, msg_message(
+		"itemcloak", "mage target", mage, target));
 
 	return cast_level;
 }
@@ -6858,10 +6849,10 @@ sp_stealaura(castorder *co)
 	u  = pa->param[0]->data.u;
 
 	if(!get_mage(u)) {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"stealaura_fail%u:unit%u:target", mage, u));
-		add_message(&u->faction->msgs, new_message(u->faction,
-			"stealaura_fail_detect%u:unit", u));
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"stealaura_fail", "unit target", mage, u));
+		ADDMSG(&u->faction->msgs, msg_message(
+			"stealaura_fail_detect", "unit", u));
 		return 0;
 	}
 
@@ -6872,17 +6863,17 @@ sp_stealaura(castorder *co)
 		get_mage(mage)->spellpoints += taura;
 /*		sprintf(buf, "%s entzieht %s %d Aura.", unitname(mage), unitname(u),
 			taura); */
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"stealaura_success%u:mage%u:target%i:aura", mage, u, taura));
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"stealaura_success", "mage target aura", mage, u, taura));
 /*		sprintf(buf, "%s fühlt seine magischen Kräfte schwinden und verliert %d "
 			"Aura.", unitname(u), taura); */
-		add_message(&u->faction->msgs, new_message(u->faction,
-			"stealaura_detect%u:unit%i:aura", u, taura));
+		ADDMSG(&u->faction->msgs, msg_message(
+			"stealaura_detect", "unit aura", u, taura));
 	} else {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"stealaura_fail%u:unit%u:target", mage, u));
-		add_message(&u->faction->msgs, new_message(u->faction,
-			"stealaura_fail_detect%u:unit", u));
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"stealaura_fail", "unit target", mage, u));
+		ADDMSG(&u->faction->msgs, msg_message(
+			"stealaura_fail_detect", "unit", u));
 	}
 	return cast_level;
 }
@@ -6952,8 +6943,8 @@ sp_antimagiczone(castorder *co)
 			effect, 0);
 
 	/* Erfolg melden*/
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-				"regionmagic_effect%u:unit%r:region%s:command%u:unit", mage,
+	ADDMSG(&mage->faction->msgs, msg_message(
+				"regionmagic_effect", "unit region command unit", mage,
 				mage->region, strdup(co->order), mage));
 
 	return cast_level;
@@ -7013,8 +7004,8 @@ sp_magicrunes(castorder *co)
 					duration, 20, 0);
 
 			/* Erfolg melden */
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-					"objmagic_effect%u:unit%r:region%s:command%s:target", mage,
+			ADDMSG(&mage->faction->msgs, msg_message(
+					"objmagic_effect", "unit region command target", mage,
 					mage->region, strdup(co->order), buildingname(b)));
 			break;
 		}
@@ -7027,8 +7018,8 @@ sp_magicrunes(castorder *co)
 					duration, 20, 0);
 
 			/* Erfolg melden */
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-					"objmagic_effect%u:unit%r:region%s:command%s:target", mage,
+			ADDMSG(&mage->faction->msgs, msg_message(
+					"objmagic_effect", "unit region command target", mage,
 					mage->region, strdup(co->order), shipname(sh)));
 			break;
 		}
@@ -7158,12 +7149,12 @@ sp_q_antimagie(castorder *co)
 	succ = destroy_curse(ap, cast_level, force, c);
 
 	if(succ) {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"destroy_magic_effect%u:unit%r:region%s:command%i:succ%s:target",
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"destroy_magic_effect", "unit region command succ target",
 			mage, mage->region, strdup(co->order), succ, strdup(ts)));
 	} else {
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"destroy_magic_noeffect%u:unit%r:region%s:command",
+		ADDMSG(&mage->faction->msgs, msg_message(
+			"destroy_magic_noeffect", "unit region command",
 			mage, mage->region, strdup(co->order)));
 	}
 
@@ -7212,8 +7203,8 @@ sp_destroy_curse(castorder *co)
 	c = findcurse(atoi36(pa->param[1]->data.s));
 	if (!c){
 		/* Es wurde kein Ziel gefunden */
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-					"spelltargetnotfound%u:unit%r:region%s:command",
+		ADDMSG(&mage->faction->msgs, msg_message(
+					"spelltargetnotfound", "unit region command",
 					mage, mage->region, strdup(co->order)));
 	} else {
 		switch(obj){
@@ -7252,9 +7243,9 @@ sp_destroy_curse(castorder *co)
 		/* überprüfung, ob curse zu diesem objekt gehört */
 		if (!is_cursed_with(*ap, c)){
 			/* Es wurde kein Ziel gefunden */
-			add_message(&mage->faction->msgs,
-						new_message(mage->faction,
-									"spelltargetnotfound%u:unit%r:region%s:command",
+			ADDMSG(&mage->faction->msgs,
+						msg_message(
+									"spelltargetnotfound", "unit region command",
 									mage, mage->region, strdup(co->order)));
 		}
 
@@ -7264,13 +7255,13 @@ sp_destroy_curse(castorder *co)
 		if (c->vigour <= 0.0) {
 			remove_curse(ap, c);
 
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-				"destroy_magic_effect%u:unit%r:region%s:command%i:id%s:target",
+			ADDMSG(&mage->faction->msgs, msg_message(
+				"destroy_magic_effect", "unit region command id target",
 				mage, mage->region, strdup(co->order), strdup(pa->param[1]->data.s),
 				strdup(ts)));
 		} else {
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-				"destroy_magic_noeffect%u:unit%r:region%s:command",
+			ADDMSG(&mage->faction->msgs, msg_message(
+				"destroy_magic_noeffect", "unit region command",
 				mage, mage->region, strdup(co->order)));
 		}
 	}
@@ -7308,8 +7299,8 @@ sp_becomewyrm(castorder *co)
 	mage->race = new_race[RC_WYRM];
 	addspell(mage, SPL_WYRMODEM);
 
-	add_message(&mage->faction->msgs, new_message(mage->faction,
-		"becomewyrm%u:mage", mage));
+	ADDMSG(&mage->faction->msgs, msg_message(
+		"becomewyrm", "mage", mage));
 
 	return co->level;
 }
@@ -7774,8 +7765,6 @@ find_spellbyname(unit *u, const char *name, const struct locale * lang)
     for (spt = m->spellptr; spt; spt = spt->next) {
       if (sp->id==spt->spellid) return sp;
     }
-  } else {
-    log_warning(("cannot find spell by name: %s\n", name));
   }
   return NULL;
 }
@@ -7924,9 +7913,7 @@ static spell spelldaten[] =
     (spell_f)sp_ironkeeper, patzer
   },
   {
-    SPL_MAGICSTREET, "magicstreet", NULL,
-    "ZAUBERE \'Magischer Pfad\' <Richtung>",
-    "c",
+    SPL_MAGICSTREET, "magicstreet", NULL, NULL, NULL,
     M_DRUIDE,
     (FARCASTING | SPELLLEVEL | REGIONSPELL | ONSHIPCAST | TESTRESISTANCE),
     5, 4,
