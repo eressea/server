@@ -2130,39 +2130,49 @@ move_hunters(void)
   region *r;
 
   for (r = regions; r; r = r->next) {
-    unit * u;
-    for (u = r->units; u;) {
-      unit *u2 = u->next;
-      order * ord;
-      param_t p;
+    unit ** up = &r->units, * u;
+    for (u=r->units; u; u=u->next) freset(u, FL_DH);
 
-      for (ord=u->orders;ord;ord=ord->next) {
-        if (get_keyword(ord) == K_FOLLOW) {
-          if (attacked(u)) {
-            cmistake(u, ord, 52, MSG_MOVE);
-            break;
-          } else if (!can_move(u)) {
-            cmistake(u, ord, 55, MSG_MOVE);
-            break;
-          }
+    while (*up!=NULL) {
+      unit * u = *up;
 
-          init_tokens(ord);
-          skip_token();
-          p = getparam(u->faction->locale);
-          if (p != P_SHIP) {
-            if (p != P_UNIT) {
-              cmistake(u, ord, 240, MSG_MOVE);
+      if (!fval(u, FL_DH)) {
+        order * ord;
+
+        fset(u, FL_DH);
+
+        for (ord=u->orders;ord;ord=ord->next) {
+          if (get_keyword(ord) == K_FOLLOW) {
+            param_t p;
+
+            init_tokens(ord);
+            skip_token();
+            p = getparam(u->faction->locale);
+            if (p != P_SHIP) {
+              if (p != P_UNIT) {
+                cmistake(u, ord, 240, MSG_MOVE);
+              }
+              break;
             }
-            break;
-          }
 
-          if (!fval(u, UFL_LONGACTION) && !fval(u, UFL_HUNGER) && hunt(u)) {
-            u2 = r->units;
-            break;
+            /* wir folgen definitiv einem Schiff. */
+
+            if (fval(u, UFL_LONGACTION)) {
+              cmistake(u, ord, 52, MSG_MOVE);
+              break;
+            } else if (!can_move(u)) {
+              cmistake(u, ord, 55, MSG_MOVE);
+              break;
+            }
+
+            if (!fval(u, UFL_LONGACTION) && !fval(u, UFL_HUNGER) && hunt(u)) {
+              up = &r->units;
+              break;
+            }
           }
         }
       }
-      u = u2;
+      if (*up==u) up=&u->next;
     }
   }
 }

@@ -219,9 +219,6 @@
 				RelativePath=".\message.h">
 			</File>
 			<File
-				RelativePath=".\monster.h">
-			</File>
-			<File
 				RelativePath=".\movement.h">
 			</File>
 			<File
