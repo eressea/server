@@ -107,6 +107,16 @@ static attrib_type at_creator = {
 	/* Rest ist NULL; temporäres, nicht alterndes Attribut */
 };
 
+static int
+NewbieImmunity(void) {
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "NewbieImmunity");
+    value = str?atoi(str):IMMUN_GEGEN_ANGRIFF;
+  }
+  return value;
+}
+
 static int 
 MaxAge(void) {
   static int value = -1;

@@ -1181,6 +1181,7 @@ extern int NMRTimeout(void);
 extern int LongHunger(const struct unit * u);
 extern boolean TradeDisabled(void);
 extern int SkillCap(skill_t sk);
+extern int NewbieImmunity();
 extern int AllianceAuto(void); /* flags that allied factions get automatically */
 extern int AllianceRestricted(void); /* flags restricted to allied factions */
 extern struct order * default_order(const struct locale * lang);

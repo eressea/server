@@ -2580,10 +2580,10 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
 		return;
 	}
 
-	if (u2->faction->age < IMMUN_GEGEN_ANGRIFF) {
+	if (u2->faction->age < NewbieImmunity()) {
 		add_message(&u->faction->msgs,
 			msg_feedback(u, ord, "newbie_immunity_error",
-			"turns", IMMUN_GEGEN_ANGRIFF));
+			"turns", NewbieImmunity()));
 		return;
 	}
 

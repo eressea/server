@@ -2711,7 +2711,7 @@ remove_unequipped_guarded(void)
 
   for (r = regions; r; r = r->next)
     for (u = r->units; u; u = u->next) {
-      if (getguard(u) && (!armedmen(u) || u->faction->age < IMMUN_GEGEN_ANGRIFF))
+      if (getguard(u) && (!armedmen(u) || u->faction->age < NewbieImmunity()))
         setguard(u, GUARD_NONE);
     }
 }
@@ -3609,9 +3609,9 @@ age_factions(void)
 
   for (f = factions; f; f = f->next) {
     ++f->age;
-    if (f->age < IMMUN_GEGEN_ANGRIFF) {
+    if (f->age < NewbieImmunity()) {
       add_message(&f->msgs, new_message(f,
-        "newbieimmunity%i:turns", IMMUN_GEGEN_ANGRIFF - f->age));
+        "newbieimmunity%i:turns", NewbieImmunity() - f->age));
     }
   }
 }

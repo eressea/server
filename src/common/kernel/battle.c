@@ -3577,9 +3577,9 @@ init_battle(region * r, battle **bp)
               sprintf(buf, "%s ist böse gewesen...", unitname(u));
               mistake(u, ord, buf, MSG_BATTLE);
               continue;
-            } if (u2->faction->age < IMMUN_GEGEN_ANGRIFF) {
+            } if (u2->faction->age < NewbieImmunity()) {
               add_message(&u->faction->msgs,
-                msg_feedback(u, u->thisorder, "newbie_immunity_error", "turns", IMMUN_GEGEN_ANGRIFF));
+                msg_feedback(u, u->thisorder, "newbie_immunity_error", "turns", NewbieImmunity()));
               continue;
             }
             /* Fehler: "Die Einheit ist mit uns alliert" */

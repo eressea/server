@@ -30,6 +30,7 @@
     <param name="nmr.timeout" value="9999"/>
     <param name="nmr.removenewbie" value="0"/>
     <param name="GiveRestriction" value="3"/>
+    <param name="NewbieImmunity" value="4"/>
     <param name="hunger.long" value="1"/>
     <param name="database.gameid" value="3"/>
     <param name="globalreport" value="world"/>
