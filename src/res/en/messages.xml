@@ -3370,11 +3370,12 @@
 
 <message name="stealfatal">
 	<type>
+		<arg name="target" type="unit"></arg>
 		<arg name="unit" type="unit"></arg>
 	</type>
 	<locale name="en">
 		<nr section="none">
-			<text>"$unit($unit) was caught in attempted theft."</text>
+			<text>"$unit($unit) was caught by $unit($target) in attempted theft."</text>
 		</nr>
 	</locale>
 </message>

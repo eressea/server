@@ -4185,11 +4185,12 @@
 
 <message name="stealfatal">
 	<type>
+		<arg name="target" type="unit"></arg>
 		<arg name="unit" type="unit"></arg>
 	</type>
 	<locale name="de">
 		<nr section="events">
-			<text>"$unit($unit) wurde beim versuchten Diebstahl ertappt."</text>
+			<text>"$unit($unit) wurde von $unit($target) beim versuchten Diebstahl ertappt."</text>
 		</nr>
 	</locale>
 </message>
@@ -6005,12 +6006,12 @@
 
 <message name="growtree_effect">
 	<type>
-		<arg name="unit" type="unit"></arg>
+		<arg name="mage" type="unit"></arg>
 		<arg name="amount" type="int"></arg>
 	</type>
 	<locale name="de">
 		<nr section="magic">
-			<text>"$unit($unit) erschuf einen heiligen Hain von $int($amount) Bäumen."</text>
+			<text>"$unit($mage) erschuf einen heiligen Hain von $int($amount) Bäumen."</text>
 		</nr>
 	</locale>
 </message>
