@@ -1561,6 +1561,7 @@ main(int argc, char *argv[])
 
 	register_races();
 	register_resources();
+	register_buildings();
 	register_ships();
 	register_items();
 	register_spells();
