@@ -698,7 +698,7 @@
       <arg name="runto" type="region"/>
     </type>
     <text locale="de">"$unit($unit) verlor $int($fallen) Personen$if($alive,", $int($alive) überlebten","")$if($run," und $int($run) flohen$if($isnull($runto),""," nach $region($runto)")","")."</text>
-    <text locale="en">"$unit($unit) lost $int($fallen) people: $if($alive,", $int($alive) survived","")$if($run," and $int($run) fled$if($isnull($runto),""," to $region($runto)")","")."</text>
+    <text locale="en">"$unit($unit) lost $int($fallen) people$if($alive,", $int($alive) survived","")$if($run," and $int($run) fled$if($isnull($runto),""," to $region($runto)")","")."</text>
   </message>
   <message name="killsandhits" section="battle">
     <type>
@@ -5741,6 +5741,37 @@
     </type>
     <text locale="de">"$unit($mage) zaubert $spell($spell), aber niemand war in Reichweite."</text>
     <text locale="en">"$unit($mage) casts $spell($spell), but nobody was in range."</text>
+  </message>
+  <message name="battle::after" section="battle">
+    <type>
+    </type>
+    <text locale="de">"Einheiten nach dem Kampf:"</text>
+    <text locale="en">"Units after the battle:"</text>
+  </message>
+  <message name="battle::lineup" section="battle">
+    <type>
+      <arg name="turn" type="int"/>
+    </type>
+    <text locale="de">"Einheiten vor der $int($turn). Runde:"</text>
+    <text locale="en">"Units before turn $int($turn):"</text>
+  </message>
+  <message name="battle::header" section="battle">
+    <type>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"In $region($region) findet ein Kampf statt."</text>
+    <text locale="en">"There is a battle in $region($region)."</text>
+  </message>
+  <message name="battle::army_report" section="battle">
+    <type>
+      <arg name="index" type="int"/>
+      <arg name="abbrev" type="string"/>
+      <arg name="dead" type="int"/>
+      <arg name="flown" type="int"/>
+      <arg name="survived" type="int"/>
+    </type>
+    <text locale="de">"Heer $int($index)($abbrev): $int($dead) Tote, $int($flown) Geflohene, $int($survived) Überlebende."</text>
+    <text locale="en">"Army $int($index)($abbrev): $int($dead) dead, $int($flown) flown, $int($survived) survivors."</text>
   </message>
 </messages>
 

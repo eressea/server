@@ -86,16 +86,14 @@
 #include <stdlib.h>
 
 extern int quiet;
+extern int *storms;
+extern int  weeks_per_month;
+extern int  months_per_year;
 
 boolean nocr = false;
 boolean nonr = false;
 boolean nomer = false;
 boolean noreports = false;
-
-/*
- * -------------------------------------------------------------
- */
-extern int *storms;
 
 char **seasonnames;
 char **weeknames;
@@ -104,8 +102,6 @@ char **monthnames;
 int  *month_season;
 char *agename;
 int  seasons;
-extern int  weeks_per_month;
-extern int  months_per_year;
 
 int
 read_datenames(const char *filename)
@@ -278,7 +274,6 @@ gamedate_short(const struct locale * lang)
 	return buf;
 }
 
-/* ------------------------------------------------------------- */
 static void
 rpsnr(FILE * F, const char * s, int offset)
 {
@@ -579,7 +574,6 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
 
 	rnl(F);
 }
-/* ------------------------------------------------------------- */
 
 void
 nmr_warnings(void)
@@ -600,8 +594,6 @@ nmr_warnings(void)
 		}
 	}
 }
-
-/* ------------------------------------------------------------- */
 
 void
 sparagraph(strlist ** SP, const char *s, int indent, char mark)
@@ -761,8 +753,6 @@ print_curses(FILE *F, const faction *viewer, const void * obj, typ_t typ, int in
 		}
 	}
 }
-
-/* ------------------------------------------------------------- */
 
 char *
 replace_global_coords(const char *s, const faction * f)
@@ -932,8 +922,24 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean
 		}
 	}
 }
-/* ------------------------------------------------------------- */
 
+static void
+rp_battles(FILE * F, faction * f)
+{
+  if (f->battles!=NULL) {
+    struct bmsg * bm;
+    rnl(F);
+    centre(F, LOC(f->locale, "section_battle"), false);
+    rnl(F);
+    for (bm=f->battles;bm;bm=bm->next) {
+      RENDER(f, buf, 80, ("battle::header", "region", bm->r));
+      rnl(F);
+      centre(F, buf, true);
+      rnl(F);
+      rp_messages(F, bm->msgs, f, 0, true, false);
+    }
+  }
+}
 
 char *
 f_regionid(const region * r, const faction * f)
@@ -2112,26 +2118,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	 * (enno) was? wer hat das geschrieben?
 	 * Momentan ist das wegen der der Mailverschickmimik schwierig. */
 	rp_messages(F, f->msgs, f, 0, true, true);
-	if(f->battles) {
-		struct bmsg * bm;
-		rnl(F);
-		centre(F, LOC(f->locale, "section_battle"), false);
-		rnl(F);
-		for (bm=f->battles;bm;bm=bm->next) {
-#ifdef HAVE_SNPRINTF
-			snprintf(buf, 80, "In %s findet ein Kampf statt:",
-					translate_regions(regionid(bm->r), f));
-#else
-			sprintf(buf, "In %s findet ein Kampf statt:",
-					translate_regions(regionid(bm->r), f));
-			buf[80]=0;
-#endif
-			rnl(F);
-			centre(F, buf, true);
-			rnl(F);
-			rp_messages(F, bm->msgs, f, 0, true, false);
-		}
-	}
+	rp_battles(F, f);
 	a = a_find(f->attribs, &at_reportspell);
 	if (a) {
 		rnl(F);
@@ -2364,7 +2351,6 @@ report(FILE *F, faction * f, const faction_list * addresses,
 		}
 	}
 }
-/* ------------------------------------------------------------- */
 
 FILE *
 openbatch(void)
@@ -2418,7 +2404,7 @@ closebatch(FILE * BAT)
 		fclose(BAT);
 	}
 }
-/* ------------------------------------------------------------- */
+
 
 void
 base36conversion(void)

@@ -213,7 +213,7 @@ sidename(side * s, boolean truename)
 	return sidename_buf;
 }
 
-static char *
+static const char *
 sideabkz(side *s, boolean truename)
 {
 	static char sideabkz_buf[4];
@@ -659,8 +659,6 @@ select_weapon(const troop t, boolean attacking, boolean ismissile)
 	return preferred_weapon(t, attacking);
 }
 
-/* ------------------------------------------------------------- */
-
 static int
 weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
 	/* the 'pure' skill when using this weapon to attack or defend.
@@ -859,8 +857,6 @@ select_magicarmor(troop t)
 	return ma;
 }
 
-/* ------------------------------------------------------------- */
-
 /* Sind side ds und Magier des meffect verb¸ndet, dann return 1*/
 boolean
 meffect_protection(battle * b, meffect * s, side * ds)
@@ -882,7 +878,6 @@ meffect_blocked(battle *b, meffect *s, side *as)
 	return false;
 }
 
-/* ------------------------------------------------------------- */
 /* rmfighter wird schon im PRAECOMBAT gebraucht, da gibt es noch keine
  * troops */
 void
@@ -941,8 +936,6 @@ remove_troop(troop dt)
 		}
 	}
 }
-
-/* ------------------------------------------------------------- */
 
 /** reduces the target's exp by an equivalent of n points learning
  * 30 points = 1 week
@@ -2498,20 +2491,24 @@ aftermath(battle * b)
   chaoscounts(r, dead_peasants / 2);
   rsetpeasants(r, rpeasants(r) - dead_peasants);
 
-  for (bf=b->factions;bf;bf=bf->next) {
-    faction * f = bf->faction;
-    fbattlerecord(b, f, " ");
-    cv_foreach(s, b->sides) {
-      if (seematrix(f, s)) {
-        sprintf(buf, "Heer %2d(%s): %d Tote, %d Geflohene, %d ‹berlebende",
-          s->index, sideabkz(s,false), s->dead, s->flee, s->alive);
-      } else {
-        sprintf(buf, "Heer %2d(Unb): %d Tote, %d Geflohene, %d ‹berlebende",
-          s->index, s->dead, s->flee, s->alive);
-      }
-      fbattlerecord(b, f, buf);
-    } cv_next(s);
-  }
+  cv_foreach(s, b->sides) {
+    message * seen = msg_message("battle::army_report", 
+      "index abbrev dead flown survived", 
+      s->index, gc_add(strdup(sideabkz(s, false))), s->dead, s->flee, s->alive);
+    message * unseen = msg_message("battle::army_report", 
+      "index abbrev dead flown survived", 
+      s->index, "-?-", s->dead, s->flee, s->alive);
+
+    for (bf=b->factions;bf;bf=bf->next) {
+      faction * f = bf->faction;
+      message * m = seematrix(f, s)?seen:unseen;
+
+      message_faction(b, f, m);
+    }
+
+    msg_release(seen);
+    msg_release(unseen);
+  } cv_next(s);
   /* Wir benutzen drifted, um uns zu merken, ob ein Schiff
   * schonmal Schaden genommen hat. (moved und drifted
   * sollten in flags ¸berf¸hrt werden */
@@ -2661,38 +2658,30 @@ print_stats(battle * b)
 
     for (bf=b->factions;bf;bf=bf->next) {
       faction * f = bf->faction;
+      const char * loc_army = LOC(f->locale, "battle_army");
       fbattlerecord(b, f, " ");
-      sprintf(buf, "Heer %d: %s", side->index,
+      sprintf(buf, "%s %d: %s", loc_army, side->index,
         seematrix(f, side)
         ? sidename(side,false) : LOC(f->locale, "unknown_faction"));
       fbattlerecord(b, f, buf);
       strcpy(buf, LOC(f->locale, "battle_opponents"));
       komma = false;
       cv_foreach(s2, b->sides) {
-        if (enemy(s2, side))
-        {
-          if (seematrix(f, s2) == true) {
-            sprintf(buf, "%s%s Heer %d(%s)", buf, komma++ ? "," : "",
-              s2->index, sideabkz(s2,false));
-          } else {
-            sprintf(buf, "%s%s Heer %d(Unb)", buf, komma++ ? "," : "",
-              s2->index);
-          }
+        if (enemy(s2, side)) {
+          const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
+          sprintf(buf, "%s%s %s %d(%s)", buf, komma++ ? "," : "", loc_army,
+            s2->index, abbrev);
         }
       }
       cv_next(s2);
       fbattlerecord(b, f, buf);
-      strcpy(buf, "Attacke gegen:");
+      strcpy(buf, LOC(f->locale, "battle_attack"));
       komma = false;
       cv_foreach(s2, b->sides) {
         if (side->enemy[s2->index] & E_ATTACKING) {
-          if (seematrix(f, s2) == true) {
-            sprintf(buf, "%s%s Heer %d(%s)", buf, komma++ ? "," : "",
-              s2->index, sideabkz(s2,false));
-          } else {
-            sprintf(buf, "%s%s Heer %d(Unb)", buf, komma++ ? "," : "",
-              s2->index);
-          }
+          const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
+          sprintf(buf, "%s%s %s %d(%s)", buf, komma++ ? "," : "", loc_army,
+            s2->index, abbrev);
         }
       }
       cv_next(s2);
@@ -3236,36 +3225,32 @@ battle_report(battle * b)
 
 	for (bf=b->factions;bf;bf=bf->next) {
 		faction * fac = bf->faction;
+                message * m;
+                
 		fbattlerecord(b, fac, " ");
-		if (cont == true)
-			sprintf(buf2, "Einheiten vor der %d. Runde:",
-					b->turn);
-		else
-			sprintf(buf2, "Einheiten nach dem Kampf:");
-		fbattlerecord(b, fac, buf2);
+
+                if (cont) m = msg_message("battle::lineup", "turn", b->turn);
+                else m = msg_message("battle::after", "");
+                message_faction(b, fac, m);
+                msg_release(m);
+
 		buf2[0] = 0;
 		komma   = false;
 		cv_foreach(s, b->sides) {
 			if (s->alive) {
 				int r, k = 0, * alive = get_alive(b, s, fac, seematrix(fac, s));
-				if (!seematrix(fac, s)) {
-					sprintf(buf, "%sHeer %2d(Unb): ",
-						komma==true?", ":"", s->index);
-				} else {
-					sprintf(buf, "%sHeer %2d(%s): ",
-						komma==true?", ":"", s->index,sideabkz(s,false));
-				}
-				{
-					int l = FIGHT_ROW;
-					for (r=FIGHT_ROW;r!=NUMROWS;++r) {
-						if (alive[r]) {
-							if (l!=FIGHT_ROW) scat("+");
-							while(k--) scat("0+");
-							icat(alive[r]);
-							k = 0;
-							l=r+1;
-						} else ++k;
-					}
+				int l = FIGHT_ROW;
+				const char * abbrev = seematrix(fac, s)?sideabkz(s, false):"-?-";
+				const char * loc_army = LOC(fac->locale, "battle_army");
+				sprintf(buf, "%s%s %2d(%s): ", komma==true?", ":"", loc_army, abbrev);
+				for (r=FIGHT_ROW;r!=NUMROWS;++r) {
+					if (alive[r]) {
+						if (l!=FIGHT_ROW) scat("+");
+						while(k--) scat("0+");
+						icat(alive[r]);
+						k = 0;
+						l=r+1;
+					} else ++k;
 				}
 
 				strcat(buf2, buf);
@@ -3797,8 +3782,6 @@ do_battle(void)
     }
   }
 }
-
-/* ------------------------------------------------------------- */
 
 /* Funktionen, die auﬂerhalb von battle.c verwendet werden. */
 static int
