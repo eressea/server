@@ -65,8 +65,8 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /Z7 /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../util" /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /YX"stdafx.h" /FD /c
-# SUBTRACT CPP /Fr
+# ADD CPP /nologo /Za /W4 /Z7 /Od /I "../util" /I "../.." /I ".." /D "_WINDOWS" /D "WIN32" /D "_DEBUG" /FD /c
+# SUBTRACT CPP /Fr /YX
 # ADD BASE RSC /l 0x407
 # ADD RSC /l 0x407
 BSC32=bscmake.exe
@@ -115,6 +115,10 @@ SOURCE=.\alchemy.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\alliance.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\battle.h
 # End Source File
 # Begin Source File
@@ -151,6 +155,10 @@ SOURCE=.\faction.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\give.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\group.h
 # End Source File
 # Begin Source File
@@ -184,6 +192,10 @@ SOURCE=.\names.h
 # Begin Source File
 
 SOURCE=.\objtypes.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\order.h
 # End Source File
 # Begin Source File
 
@@ -273,10 +285,18 @@ SOURCE=.\ugroup.h
 
 SOURCE=.\unit.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\xmlreader.h
+# End Source File
 # End Group
 # Begin Source File
 
 SOURCE=.\alchemy.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\alliance.c
 # End Source File
 # Begin Source File
 
@@ -312,6 +332,10 @@ SOURCE=.\faction.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\give.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\group.c
 # End Source File
 # Begin Source File
@@ -341,6 +365,10 @@ SOURCE=.\names.c
 # Begin Source File
 
 SOURCE=.\objtypes.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\order.c
 # End Source File
 # Begin Source File
 
@@ -413,6 +441,10 @@ SOURCE=.\ugroup.c
 # Begin Source File
 
 SOURCE=.\unit.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\xmlreader.c
 # End Source File
 # End Target
 # End Project
