@@ -2654,8 +2654,9 @@ reports(void)
 			if (f->no > 0 && f->options & wants_compressed) {
 
 				if(f->age == 1) {
-					fprintf(BAT, "ls %s.nr %s.cr ../newbie.txt | zip -m -j -9 -@ %s.zip\n",
+					fprintf(BAT, "ls %s.nr %s.cr | zip -m -j -9 -@ %s.zip\n",
 						factionid(f), factionid(f), factionid(f));
+					fprintf(BAT, "zip -j -9 %s.zip ../newbie.txt\n", factionid(f));
 				} else {
 					fprintf(BAT, "ls %s.nr %s.cr | zip -m -j -9 -@ %s.zip\n",
 						factionid(f), factionid(f), factionid(f));
