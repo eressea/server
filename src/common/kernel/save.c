@@ -1217,7 +1217,7 @@ writeunit(FILE * F, const unit * u)
 	else wi36(F, 0);
 	wi(F, u->status);
 	wi(F, u->flags & UFL_SAVEMASK);
-	for(S=u->orders; S; S=S->next) {
+	if (u->faction->no!=MONSTER_FACTION) for(S=u->orders; S; S=S->next) {
 		if (is_persistent(S->s, u->faction->locale)) {
 			ws(F, S->s);
 		}
