@@ -422,7 +422,7 @@ static void
 b_readroad(border * b, FILE *f)
 {
 	int x, y;
-	fscanf(f, "%d %d", &x, &y);
+	fscanf(f, "%d %d ", &x, &y);
 	b->data=(void*)((x<<16) | y);
 }
 
