@@ -315,6 +315,9 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\lua\spell.cpp">
+			</File>
+			<File
 				RelativePath=".\lua\unit.cpp">
 				<FileConfiguration
 					Name="Release|Win32">

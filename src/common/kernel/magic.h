@@ -35,10 +35,6 @@ struct building;
 #define STONEGOLEM_CRUMBLE  10  /* monatlich Chance zu zerfallen */
 
 /* ------------------------------------------------------------- */
-typedef struct spell_ptr spell_ptr;
-typedef struct castorder castorder;
-
-/* ------------------------------------------------------------- */
 /* Spruchparameter
  * Wir suchen beim Parsen des Befehls erstmal nach lokalen Objekten,
  * erst in verify_targets wird dann global gesucht, da in den meisten
@@ -112,6 +108,11 @@ extern const char *magietypen[MAXMAGIETYP];
  * - Spruchliste
  */
 
+typedef struct spell_ptr {
+  struct spell_ptr *next;
+  spellid_t spellid;
+} spell_ptr;
+
 typedef struct sc_mage {
 	magic_t magietyp;
 	int spellpoints;
@@ -121,13 +122,8 @@ typedef struct sc_mage {
 	int     combatspelllevel[MAXCOMBATSPELLS];
 	int     precombataura;		/* Merker, wieviel Aura in den Präcombatzauber
 															 gegangen ist. Nicht speichern. */
-	spell_ptr *spellptr;
+	struct spell_ptr *spellptr;
 } sc_mage;
-
-struct spell_ptr {
-	spell_ptr *next;
-	spellid_t spellid;
-};
 
 /* ------------------------------------------------------------- */
 /* Spruchstukturdefinition:
@@ -144,7 +140,23 @@ struct spell_ptr {
  *
  */
 
-/* typedef struct fighter fighter; */
+/* ------------------------------------------------------------- */
+/* Zauberliste */
+
+
+typedef struct castorder {
+  struct castorder *next;
+  void *magician;        /* Magier (kann vom Typ struct unit oder fighter sein) */
+  struct unit *familiar; /* Vertrauter, gesetzt, wenn der Spruch durch
+                         den Vertrauten gezaubert wird */
+  struct spell *sp;      /* Spruch */
+  int level;             /* gewünschte Stufe oder Stufe des Magiers */
+  double force;          /* Stärke des Zaubers */
+  struct region *rt;     /* Zielregion des Spruchs */
+  int distance;          /* Entfernung zur Zielregion */
+  char *order;           /* Befehl */
+  struct spellparameter *par;  /* für weitere Parameter */
+} castorder;
 
 /* irgendwelche zauber: */
 typedef void (*spell_f) (void*);
@@ -170,25 +182,12 @@ typedef struct spell {
 	void (*patzer) (castorder*);
 } spell;
 
+typedef struct spell_list {
+  struct spell_list * next;
+  spell * data;
+} spell_list;
 
-/* ------------------------------------------------------------- */
-/* Zauberliste */
-
-
-struct castorder {
-	castorder *next;
-	void *magician;        /* Magier (kann vom Typ struct unit oder fighter sein) */
-	struct unit *familiar; /* Vertrauter, gesetzt, wenn der Spruch durch
-                            den Vertrauten gezaubert wird */
-	struct spell *sp;      /* Spruch */
-	int level;             /* gewünschte Stufe oder Stufe des Magiers */
-	double force;          /* Stärke des Zaubers */
-	struct region *rt;     /* Zielregion des Spruchs */
-	int distance;          /* Entfernung zur Zielregion */
-	char *order;           /* Befehl */
-	struct spellparameter *par;  /* für weitere Parameter */
-};
-
+extern void add_spelllist(spell_list ** lspells, spell * sp);
 /* ------------------------------------------------------------- */
 
 /* besondere Spruchtypen */

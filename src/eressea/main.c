@@ -173,6 +173,7 @@ game_init(void)
 	init_attributes();
 	init_resources();
 	init_items();
+  init_races();
 	init_economy();
 #if NEW_RESOURCEGROWTH
 	init_rawmaterials();

@@ -365,43 +365,17 @@ void
 updatespelllist(unit * u)
 {
   int max = eff_skill(u, SK_MAGIC, u->region);
-	int i, sk = max;
+	int sk = max;
+  spell * sp;
 	magic_t gebiet = find_magetype(u);
+  boolean ismonster = u->faction->no==MONSTER_FACTION;
 
-  if (u->faction->no==MONSTER_FACTION) return;
-	
-
-	/* Magier mit keinem bzw M_GRAU bekommen weder Sprüche angezeigt noch
-	 * neue Sprüche in ihre List-of-known-spells. Das sind zb alle alten
-	 * Drachen, die noch den Skill Magie haben */
-	/* if (gebiet == M_GRAU) return; */
-
-	for (i = 0; spelldaten[i].id != SPL_NOSPELL; i++) {
-		boolean know = getspell(u, spelldaten[i].id);
-		if (know || (spelldaten[i].magietyp == gebiet && spelldaten[i].level <= sk)) {
-			if (!know) addspell(u, spelldaten[i].id);
-
-			if (!already_seen(u->faction, spelldaten[i].id)) {
-				a_add(&u->faction->attribs,
-						a_new(&at_reportspell))->data.i = spelldaten[i].id;
-				a_add(&u->faction->attribs,
-						a_new(&at_seenspell))->data.i = spelldaten[i].id;
-			}
-		}
-	}
-	/* Nur Orkmagier bekommen den Keuschheitsamulettzauber */
+  /* Nur Orkmagier bekommen den Keuschheitsamulettzauber */
 	if (old_race(u->race) == RC_ORC
 			&& !getspell(u, SPL_ARTEFAKT_CHASTITYBELT)
 			&& find_spellbyid(SPL_ARTEFAKT_CHASTITYBELT)->level <= max)
 	{
-		addspell(u,SPL_ARTEFAKT_CHASTITYBELT);
-
-		if (!already_seen(u->faction, spelldaten[i].id)) {
-			a_add(&u->faction->attribs,
-					a_new(&at_reportspell))->data.i = SPL_ARTEFAKT_CHASTITYBELT;
-			a_add(&u->faction->attribs,
-					a_new(&at_seenspell))->data.i = SPL_ARTEFAKT_CHASTITYBELT;
-		}
+		addspell(u, SPL_ARTEFAKT_CHASTITYBELT);
 	}
 
 	/* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
@@ -410,12 +384,6 @@ updatespelllist(unit * u)
 			&& find_spellbyid(SPL_BECOMEWYRM)->level <= max)
 	{
 		addspell(u, SPL_BECOMEWYRM);
-		if (!already_seen(u->faction, spelldaten[i].id)) {
-			a_add(&u->faction->attribs,
-					a_new(&at_reportspell))->data.i = SPL_BECOMEWYRM;
-			a_add(&u->faction->attribs,
-					a_new(&at_seenspell))->data.i = SPL_BECOMEWYRM;
-		}
 	}
 
 	/* Transformierte Wyrm-Magier bekommen Drachenodem */
@@ -424,51 +392,41 @@ updatespelllist(unit * u)
 		switch (urc) {
 		/* keine breaks! Wyrme sollen alle drei Zauber können.*/
 			case RC_WYRM:
-			{
-				if(!getspell(u, SPL_WYRMODEM) &&
-						find_spellbyid(SPL_WYRMODEM)->level <= max) {
-
-					addspell(u, SPL_WYRMODEM);
-					if (!already_seen(u->faction, spelldaten[i].id)) {
-						a_add(&u->faction->attribs,
-								a_new(&at_reportspell))->data.i = SPL_WYRMODEM;
-						a_add(&u->faction->attribs,
-								a_new(&at_seenspell))->data.i = SPL_WYRMODEM;
-					}
-				}
-			}
+        sp = find_spellbyid(SPL_WYRMODEM);
+        if (sp!=NULL && !getspell(u, sp->id) && sp->level<=max) {
+          addspell(u, sp->id);
+        }
 			case RC_DRAGON:
-			{
-				if(!getspell(u, SPL_DRAGONODEM) &&
-						find_spellbyid(SPL_DRAGONODEM)->level <= max) {
-
-					addspell(u, SPL_DRAGONODEM);
-					if (!already_seen(u->faction, spelldaten[i].id)) {
-						a_add(&u->faction->attribs,
-								a_new(&at_reportspell))->data.i = SPL_DRAGONODEM;
-						a_add(&u->faction->attribs,
-								a_new(&at_seenspell))->data.i = SPL_DRAGONODEM;
-					}
-				}
-			}
+        sp = find_spellbyid(SPL_DRAGONODEM);
+        if (sp!=NULL && !getspell(u, sp->id) && sp->level<=max) {
+          addspell(u, sp->id);
+        }
 			case RC_FIREDRAGON:
-			{
-				if(!getspell(u, SPL_FIREDRAGONODEM) &&
-						find_spellbyid(SPL_FIREDRAGONODEM)->level <= max) {
-
-					addspell(u, SPL_FIREDRAGONODEM);
-					if (!already_seen(u->faction, spelldaten[i].id)) {
-						a_add(&u->faction->attribs,
-								a_new(&at_reportspell))->data.i = SPL_FIREDRAGONODEM;
-						a_add(&u->faction->attribs,
-								a_new(&at_seenspell))->data.i = SPL_FIREDRAGONODEM;
-					}
-				}
-			}
+        sp = find_spellbyid(SPL_FIREDRAGONODEM);
+        if (sp!=NULL && getspell(u, sp->id) && sp->level<=max) {
+          addspell(u, sp->id);
+        }
+        break;
 		}
 	}
 
-	return;
+  /* Magier mit keinem bzw M_GRAU bekommen weder Sprüche angezeigt noch
+  * neue Sprüche in ihre List-of-known-spells. Das sind zb alle alten
+  * Drachen, die noch den Skill Magie haben */
+
+  for (sp = spelldaten; sp->id != SPL_NOSPELL; ++sp) {
+    boolean know = getspell(u, sp->id);
+
+    if (know || (gebiet!=M_GRAU && sp->magietyp == gebiet && sp->level <= sk)) {
+      faction * f = u->faction;
+
+      if (!know) addspell(u, sp->id);
+      if (!ismonster && !already_seen(u->faction, sp->id)) {
+        a_add(&f->attribs, a_new(&at_reportspell))->data.i = sp->id;
+        a_add(&f->attribs, a_new(&at_seenspell))->data.i = sp->id;
+      }
+    }
+  }
 }
 
 /* ------------------------------------------------------------- */
@@ -3172,4 +3130,13 @@ spell_name(const struct spell * sp, const struct locale * lang)
 		return LOC(lang, mkname("spell", sp->sname));
 	}
 	return sp->sname;
+}
+
+void 
+add_spelllist(spell_list ** lspells, spell * sp)
+{
+  spell_list * entry = malloc(sizeof(spell_list));
+  entry->data = sp;
+  entry->next = *lspells;
+  *lspells = entry;
 }

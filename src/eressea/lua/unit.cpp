@@ -1,5 +1,6 @@
 #include <config.h>
 #include <eressea.h>
+#include "list.h"
 
 // Atributes includes
 #include <attributes/racename.h>
@@ -11,6 +12,7 @@
 #include <kernel/faction.h>
 #include <kernel/skill.h>
 #include <kernel/unit.h>
+#include <kernel/magic.h>
 
 // lua includes
 #include <lua.hpp>
@@ -18,6 +20,32 @@
 #include <luabind/iterator_policy.hpp>
 
 using namespace luabind;
+
+class bind_spell_ptr {
+public:
+  static spell_ptr * next(spell_ptr * node) { return node->next; }
+  static spell * value(spell_ptr * node) { return find_spellbyid(node->spellid); }
+};
+
+static eressea::list<spell, spell_ptr, bind_spell_ptr>
+unit_spells(const unit& u) {
+  sc_mage * mage = get_mage(&u);
+  if (mage==NULL) return eressea::list<spell, spell_ptr, bind_spell_ptr>(NULL);
+  spell_ptr * splist = mage->spellptr;
+  return eressea::list<spell, spell_ptr, bind_spell_ptr>(splist);
+}
+
+class bind_spell_list {
+public:
+  static spell_list * next(spell_list * node) { return node->next; }
+  static spell * value(spell_list * node) { return node->data; }
+};
+
+static eressea::list<spell, spell_list, bind_spell_list>
+unit_familiarspells(const unit& u) {
+  spell_list * spells = familiarspells(u.race);
+  return eressea::list<spell, spell_list, bind_spell_list>(spells);
+}
 
 static unit *
 add_unit(faction * f, region * r)
@@ -135,6 +163,8 @@ bind_unit(lua_State * L)
     .def("eff_skill", &unit_effskill)
     .def("set_skill", &unit_setskill)
     .def("set_racename", &unit_setracename)
+    .property("spells", &unit_spells, return_stl_iterator)
+    .property("familiarspells", &unit_familiarspells, return_stl_iterator)
     .property("number", &unit_getnumber, &unit_setnumber)
     .property("race", &unit_getrace, &unit_setrace)
   ];

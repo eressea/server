@@ -391,7 +391,7 @@ racename(const struct locale *loc, const unit *u, const race * rc)
 static void
 oldfamiliars(unit * familiar)
 {
-	sc_mage * m;
+	sc_mage * m = NULL;
 	race_t frt = old_race(familiar->race);
 
 	switch(frt) {
@@ -432,9 +432,6 @@ oldfamiliars(unit * familiar)
 			/* Magie+1, Spionage, Tarnung, Wahrnehmung, Ausdauer */
 			m = create_mage(familiar, M_GRAU);
 			set_level(familiar, SK_MAGIC, 1);
-			addspell(familiar, SPL_FLEE);
-			addspell(familiar, SPL_SLEEP);
-			addspell(familiar, SPL_FRIGHTEN);
 			m->combatspell[0] = SPL_FLEE;
 			m->combatspell[1] = SPL_SLEEP;
 			break;
@@ -452,10 +449,6 @@ oldfamiliars(unit * familiar)
 			set_level(familiar, SK_ENTERTAINMENT, 1);
 			set_level(familiar, SK_OBSERVATION, 1);
 			m = create_mage(familiar, M_GRAU);
-			addspell(familiar, SPL_SEDUCE);
-			addspell(familiar, SPL_CALM_MONSTER);
-			addspell(familiar, SPL_SONG_OF_CONFUSION);
-			addspell(familiar, SPL_DENYATTACK);
 			m->combatspell[0] = SPL_SONG_OF_CONFUSION;
 			break;
 		case RC_UNICORN:
@@ -464,12 +457,6 @@ oldfamiliars(unit * familiar)
 			set_level(familiar, SK_STEALTH, 1);
 			set_level(familiar, SK_OBSERVATION, 1);
 			m = create_mage(familiar, M_GRAU);
-			addspell(familiar, SPL_RESISTMAGICBONUS);
-			addspell(familiar, SPL_SONG_OF_PEACE);
-			addspell(familiar, SPL_CALM_MONSTER);
-			addspell(familiar, SPL_HERO);
-			addspell(familiar, SPL_HEALINGSONG);
-			addspell(familiar, SPL_DENYATTACK);
 			break;
 		case RC_WARG:
 			/* Spi, Tak, Tar, Wahri+2, Aus */
@@ -481,9 +468,6 @@ oldfamiliars(unit * familiar)
 			/* Mag+1, Rei-2, Hie, Sta, Spi, Tar, Wahr, Aus */
 			set_level(familiar, SK_MAGIC, 1);
 			m = create_mage(familiar, M_GRAU);
-			addspell(familiar, SPL_STEALAURA);
-			addspell(familiar, SPL_FRIGHTEN);
-			addspell(familiar, SPL_SUMMONUNDEAD);
 			break;
 		case RC_IMP:
 			/* Mag+1,Rei-1,Hie,Sta,Spi+1,Tar+1,Wahr+1,Steu+1,Aus*/
@@ -493,7 +477,6 @@ oldfamiliars(unit * familiar)
 			set_level(familiar, SK_OBSERVATION, 1);
 			set_level(familiar, SK_TAXING, 1);
 			m = create_mage(familiar, M_GRAU);
-			addspell(familiar, SPL_STEALAURA);
 			break;
 		case RC_DREAMCAT:
 			/* Mag+1,Hie,Sta,Spi+1,Tar+1,Wahr+1,Steu+1,Aus*/
@@ -503,16 +486,11 @@ oldfamiliars(unit * familiar)
 			set_level(familiar, SK_OBSERVATION, 1);
 			set_level(familiar, SK_TAXING, 1);
 			m = create_mage(familiar, M_GRAU);
-			addspell(familiar, SPL_ILL_SHAPESHIFT);
-			addspell(familiar, SPL_TRANSFERAURA_TRAUM);
 			break;
 		case RC_FEY:
 			/* Mag+1,Rei-1,Hie-1,Sta-1,Spi+2,Tar+5,Wahr+2,Aus */
 			set_level(familiar, SK_MAGIC, 1);
 			m = create_mage(familiar,M_GRAU);
-			addspell(familiar, SPL_DENYATTACK);
-			addspell(familiar, SPL_CALM_MONSTER);
-			addspell(familiar, SPL_SEDUCE);
 			break;
 		case RC_OWL:
 			/* Spi+1,Tar+1,Wahr+5,Aus */
@@ -535,6 +513,13 @@ oldfamiliars(unit * familiar)
 			m = create_mage(familiar,M_GRAU);
 			break;
 	}
+  if (m!=NULL) {
+    spell_list * fspells = familiarspells(familiar->race);
+    while (fspells!=NULL) {
+      addspell(familiar, fspells->data->id);
+      fspells=fspells->next;
+    }
+  }
 }
 
 static item *
@@ -578,6 +563,7 @@ elf_spoil(const struct race * rc, int size)
 	}
 	return itm;
 }
+
 static item *
 demon_spoil(const struct race * rc, int size)
 {
@@ -587,6 +573,7 @@ demon_spoil(const struct race * rc, int size)
 	}
 	return itm;
 }
+
 static item *
 goblin_spoil(const struct race * rc, int size)
 {
@@ -987,4 +974,91 @@ register_races(void)
 
 	sprintf(zBuffer, "%s/races.xml", resourcepath());
 	xml_register(&xml_races, "eressea races", 0);
+}
+
+/** familiars **/
+typedef struct familiar_spells {
+  struct familiar_spells * next;
+  spell_list * spells;
+  const race * familiar_race;
+} familiar_spells;
+
+static familiar_spells * racespells;
+
+spell_list *
+familiarspells(const race * rc)
+{
+  familiar_spells * fspells = racespells;
+  while (fspells && rc!=fspells->familiar_race) {
+    fspells = fspells->next;
+  }
+  if (fspells!=NULL) return fspells->spells;
+  return NULL;
+}
+
+familiar_spells *
+mkspells(const race * rc)
+{
+  familiar_spells * fspells;
+
+  fspells = malloc(sizeof(familiar_spells));
+  fspells->next = racespells;
+  racespells = fspells;
+  fspells->familiar_race = rc;
+  fspells->spells = NULL;
+  return fspells;
+}
+
+void 
+init_familiarspells(void)
+{
+  familiar_spells * fspells;
+
+  fspells = mkspells(new_race[RC_PSEUDODRAGON]);
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_FLEE));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_SLEEP));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_FRIGHTEN));
+
+  fspells = mkspells(new_race[RC_NYMPH]);
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_SEDUCE));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_SONG_OF_CONFUSION));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
+
+  fspells = mkspells(new_race[RC_NYMPH]);
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_SEDUCE));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_SONG_OF_CONFUSION));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
+  
+  fspells = mkspells(new_race[RC_UNICORN]);
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_RESISTMAGICBONUS));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_SONG_OF_PEACE));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_HERO));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_HEALINGSONG));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
+
+  fspells = mkspells(new_race[RC_WRAITH]);
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_STEALAURA));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_FRIGHTEN));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_SUMMONUNDEAD));
+
+  fspells = mkspells(new_race[RC_IMP]);
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_STEALAURA));
+
+  fspells = mkspells(new_race[RC_DREAMCAT]);
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_ILL_SHAPESHIFT));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_TRANSFERAURA_TRAUM));
+
+  fspells = mkspells(new_race[RC_FEY]);
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
+  add_spelllist(&fspells->spells, find_spellbyid(SPL_SEDUCE));
+}
+
+void 
+init_races(void)
+{
+  init_familiarspells();
 }

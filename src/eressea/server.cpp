@@ -186,6 +186,7 @@ game_init(void)
 
 	init_attributes();
 	init_resources();
+  init_races();
 	init_items();
 	init_economy();
 #if NEW_RESOURCEGROWTH
