@@ -23,9 +23,6 @@
 #define CONFIG_H
 
 
-
-
-
 /****                 ****
  ** Debugging Libraries **
  ****                 ****/
@@ -71,6 +68,10 @@
  ** Architecture Dependent **
  ****                    ****/
 
+#if _MSC_VER
+# define STRNCPY_HAS_ZEROTERMINATION
+#endif
+
 /* für solaris: */
 #ifdef SOLARIS
 # define _SYS_PROCSET_H
@@ -89,7 +90,7 @@
   /* warning C4100: <name> : unreferenced formal parameter */
 #endif
 
-#ifdef __linux__
+#ifdef __GNUC__
 # ifndef _BSD_SOURCE
 #  define _BSD_SOURCE
 #  define __USE_BSD
@@ -240,4 +241,9 @@ extern char * strdup(const char *s);
 # define true ((boolean)!false)
 #endif
 
+#ifdef STRNCPY_HAS_ZEROTERMINATION
+# define strnzcpy(dst, src, len)  strncpy(dst, src, len) 
+#else
+# define strnzcpy(dst, src, len) for(;;) { strncpy(dst, src, len); if (len) dst[len-1]=0; break; }
+#endif
 #endif
