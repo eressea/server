@@ -573,7 +573,7 @@ parse_resources(xmlDocPtr doc)
     /* reading eressea/resources/resource/function */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-    for (k=0;k!=result->nodesetval->nodeNr;++k) {
+    if (result->nodesetval!=NULL) for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       pf_generic fun;
 
@@ -607,7 +607,7 @@ parse_resources(xmlDocPtr doc)
     /* reading eressea/resources/resource/resourcelimit/function */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "resourcelimit/function", xpath);
-    for (k=0;k!=result->nodesetval->nodeNr;++k) {
+    if (result->nodesetval!=NULL) for (k=0;k!=result->nodesetval->nodeNr;++k) {
       attrib * a = a_find(rtype->attribs, &at_resourcelimit);
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       pf_generic fun;
