@@ -913,6 +913,8 @@ typedef struct strlist {
 #define FFL_OVERRIDE      (1<<27) /* Override-Passwort wurde benutzt */
 
 #define FFL_DBENTRY       (1<<28) /* Partei ist in Datenbank eingetragen */
+#define FFL_NOTIMEOUT     (1<<29) /* ignore MAXAGE */
+
 #define UFL_WERE          (1<<28)
 
 /* Flags, die gespeichert werden sollen: */

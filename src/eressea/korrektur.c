@@ -185,6 +185,17 @@ convert_orders(void)
 	return 0;
 }
 
+void
+french_testers(void)
+{
+	faction * f = factions;
+	const struct locale * french = find_locale("fr");
+	while (f!=NULL) {
+		if (f->locale==french) fset(f, FFL_NOTIMEOUT);
+		f = f->next;
+	}
+}
+
 static void
 verify_owners(boolean bOnce)
 {
@@ -2781,6 +2792,7 @@ give_cammo(void)
 void
 korrektur(void)
 {
+	french_testers();
 #if TEST_LOCALES
 	setup_locales();
 #endif

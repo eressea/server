@@ -7402,6 +7402,7 @@
 			<arg name="product" type="resource"></arg>
 		</type>
 		<text locale="de">"Auf dem Markt wird für $resource($product,0) $int($price) Silber verlangt."</text>
+		<text locale="fr">"Le marché local offre la $resource($product,0) au prix de $int($price) écus."</text>
 		<text locale="en">"The local market offers $resource($product,0) at a price of $int($price) silver."</text>
 	</message>
 

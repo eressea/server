@@ -1587,6 +1587,7 @@
 		<text locale="fr">METAMORPHOSE</text>
 	</string>
 
+	<namespace name="race">
 	<string name="Adler">
 		<text locale="fr">aigle</text>
 	</string>
@@ -1842,6 +1843,7 @@
 	<string name="Illusion">
 		<text locale="fr">illusion</text>
 	</string>
+	</namespace>
 
 	<comment>  NR generieren</comment>
 	<string name="nr_options">

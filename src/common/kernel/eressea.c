@@ -2045,45 +2045,6 @@ kernel_done(void)
 	if (sqlstream!=NULL) sql_done();
 }
 
-static void
-read_strings(FILE * F)
-{
-	char rbuf[8192];
-	while (fgets(rbuf, sizeof(rbuf), F)) {
-		char * b = rbuf;
-		struct locale * lang;
-		char * key = b;
-		char * language;
-		const char * k;
-
-		if (rbuf[0]=='#') continue;
-		rbuf[strlen(rbuf)-1] = 0; /* \n weg */
-		while (*b && *b!=';') ++b;
-		if (!*b) continue;
-		*b++ = 0;
-		language = b;
-		while (*b && *b!=';') ++b;
-		*b++ = 0;
-		lang = find_locale(language);
-		if (!lang) lang = make_locale(language);
-		k = locale_getstring(lang, key);
-		if (k) {
-			log_warning(("Trying to register %s[%s]=\"%s\", already have \"%s\"\n", key, language, k, b));
-		} else locale_setstring(lang, key, b);
-	}
-}
-
-const char * messages[] = {
-	"%s/%s/strings.xml",
-	"%s/%s/messages.xml",
-	NULL
-};
-
-const char * strings[] = {
-	"%s/%s/strings.txt",
-	NULL
-};
-
 const char * localenames[] = {
 	"de", "en", "fr",
 	NULL
@@ -2399,12 +2360,11 @@ void
 remove_empty_units_in_region(region *r)
 {
 	unit **up = &r->units;
-
 	while (*up) {
 		unit * u = *up;
 #ifdef MAXAGE
 		faction * f = u->faction;
-		if (f->age > MAXAGE) set_number(u, 0);
+		if (!fval(f, FFL_NOTIMEOUT) && f->age > MAXAGE) set_number(u, 0);
 #endif
 		if ((u->number <= 0 && u->race != new_race[RC_SPELL])
 		 	|| (u->age <= 0 && u->race == new_race[RC_SPELL])
