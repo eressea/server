@@ -1233,7 +1233,7 @@ travel(region * first, unit * u, region * next, int flucht)
 				ut = getunit(first, u->faction);
 				if (ut) {
 					boolean found = false;
-					if (igetkeyword(ut->thisorder, u->faction->locale) == K_DRIVE
+					if (igetkeyword(ut->thisorder, ut->faction->locale) == K_DRIVE
 							&& !fval(ut, UFL_LONGACTION) && !fval(ut, UFL_HUNGER)) {
 						u2 = getunit(first, ut->faction);
 						if(u2 == u) {
