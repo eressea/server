@@ -31,7 +31,7 @@ resource_type rt_elfspoil = {
 	&res_changeitem
 };
 
-item_type it_elfspoil = {
+item_type it_elvenspoil = {
 	&rt_elfspoil,  /* resourcetype */
 	0, 1, 0,       /* flags, weight, capacity */
 	NULL,	       /* construction */

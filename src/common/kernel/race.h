@@ -35,6 +35,8 @@
 #define GOLEM_IRON   4 /* Anzahl Eisen in einem Eisengolem */
 #define GOLEM_STONE  4 /* Anzahl Steine in einem Steingolem */
 
+#define RACESPOILCHANCE 5 /* Chance auf rassentypische Beute */
+
 typedef struct att {
 	int type;
 	union {

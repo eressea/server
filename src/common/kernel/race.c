@@ -41,6 +41,10 @@
 #include "karma.h"
 #include "group.h"
 
+/* item includes */
+#include <items/racespoils.h>
+
+
 /* util includes */
 #include <attrib.h>
 #include <functions.h>
@@ -525,6 +529,105 @@ dragon_drops(const struct race * rc, int size)
 	}
 	return itm;
 }
+static item *
+elf_spoil(const struct race * rc, int size)
+{
+	item * itm = NULL;
+	if (rand()%100 < RACESPOILCHANCE){
+		i_add(&itm, i_new(&it_elvenspoil, size));
+	}
+	return itm;
+}
+static item *
+demon_spoil(const struct race * rc, int size)
+{
+	item * itm = NULL;
+	if (rand()%100 < RACESPOILCHANCE){
+		i_add(&itm, i_new(&it_demonspoil, size));
+	}
+	return itm;
+}
+static item *
+goblin_spoil(const struct race * rc, int size)
+{
+	item * itm = NULL;
+	if (rand()%100 < RACESPOILCHANCE){
+		i_add(&itm, i_new(&it_goblinspoil, size));
+	}
+	return itm;
+}
+static item *
+dwarf_spoil(const struct race * rc, int size)
+{
+	item * itm = NULL;
+	if (rand()%100 < RACESPOILCHANCE){
+		i_add(&itm, i_new(&it_dwarfspoil, size));
+	}
+	return itm;
+}
+static item *
+halfling_spoil(const struct race * rc, int size)
+{
+	item * itm = NULL;
+	if (rand()%100 < RACESPOILCHANCE){
+		i_add(&itm, i_new(&it_halflingspoil, size));
+	}
+	return itm;
+}
+static item *
+human_spoil(const struct race * rc, int size)
+{
+	item * itm = NULL;
+	if (rand()%100 < RACESPOILCHANCE){
+		i_add(&itm, i_new(&it_humanspoil, size));
+	}
+	return itm;
+}
+static item *
+aquarian_spoil(const struct race * rc, int size)
+{
+	item * itm = NULL;
+	if (rand()%100 < RACESPOILCHANCE){
+		i_add(&itm, i_new(&it_aquarianspoil, size));
+	}
+	return itm;
+}
+static item *
+insect_spoil(const struct race * rc, int size)
+{
+	item * itm = NULL;
+	if (rand()%100 < RACESPOILCHANCE){
+		i_add(&itm, i_new(&it_insectspoil, size));
+	}
+	return itm;
+}
+static item *
+cat_spoil(const struct race * rc, int size)
+{
+	item * itm = NULL;
+	if (rand()%100 < RACESPOILCHANCE){
+		i_add(&itm, i_new(&it_catspoil, size));
+	}
+	return itm;
+}
+static item *
+orc_spoil(const struct race * rc, int size)
+{
+	item * itm = NULL;
+	if (rand()%100 < RACESPOILCHANCE){
+		i_add(&itm, i_new(&it_orcspoil, size));
+	}
+	return itm;
+}
+static item *
+troll_spoil(const struct race * rc, int size)
+{
+	item * itm = NULL;
+	if (rand()%100 < RACESPOILCHANCE){
+		i_add(&itm, i_new(&it_trollspoil, size));
+	}
+	return itm;
+}
 
 int
 rc_specialdamage(const race * ar, const race * dr, const struct weapon_type * wtype)
@@ -781,20 +884,26 @@ static xml_callbacks xml_races = {
 	tagbegin, tagend, NULL
 };
 
+/* Die Funktionen werden über den hier registrierten Namen in races.xml
+ * in die jeweilige Rassendefiniton eingebunden */
 void
 register_races(void)
 {
 	char zBuffer[MAX_PATH];
-	/* init_familiar functions */
+	/* function initfamiliar */
 	register_function((pf_generic)oldfamiliars, "oldfamiliars");
 
-	/* move_allowed functions */
+	/* function move
+	 * into which regiontyp moving is allowed for this race
+	 * race->move_allowed() */
 	register_function((pf_generic)allowed_swim, "moveswimming");
 	register_function((pf_generic)allowed_walk, "movewalking");
 	register_function((pf_generic)allowed_fly, "moveflying");
 	register_function((pf_generic)allowed_dragon, "movedragon");
 
-	/* generate_name functions */
+	/* function name 
+	 * generate a name for a nonplayerunit
+	 * race->generate_name() */
 	register_function((pf_generic)untoten_name, "nameundead");
 	register_function((pf_generic)skeleton_name, "nameskeleton");
 	register_function((pf_generic)zombie_name, "namezombie");
@@ -803,7 +912,8 @@ register_races(void)
 	register_function((pf_generic)dracoid_name, "namedracoid");
 	register_function((pf_generic)shadow_name, "nameshadow");
 
-	/* aging functions */
+	/* function age 
+	 * race->age() */
 	register_function((pf_generic)age_undead, "ageundead");
 	register_function((pf_generic)age_illusion, "ageillusion");
 	register_function((pf_generic)age_skeleton, "ageskeleton");
@@ -812,9 +922,22 @@ register_races(void)
 	register_function((pf_generic)age_dragon, "agedragon");
 	register_function((pf_generic)age_firedragon, "agefiredragon");
 
-	/* itemdrop functions */
+	/* function itemdrop
+	 * to generate battle spoils
+	 * race->itemdrop() */
 	register_function((pf_generic)dragon_drops, "dragondrops");
-	sprintf(zBuffer, "%s/races.xml", resourcepath());
+	register_function((pf_generic)elf_spoil, "elfspoil");
+	register_function((pf_generic)demon_spoil, "demonspoil");
+	register_function((pf_generic)goblin_spoil, "goblinspoil");
+	register_function((pf_generic)dwarf_spoil, "dwarfspoil");
+	register_function((pf_generic)halfling_spoil, "halflingspoil");
+	register_function((pf_generic)human_spoil, "humanspoil");
+	register_function((pf_generic)aquarian_spoil, "aquarianspoil");
+	register_function((pf_generic)insect_spoil, "insectspoil");
+	register_function((pf_generic)cat_spoil, "catspoil");
+	register_function((pf_generic)orc_spoil, "orcspoil");
+	register_function((pf_generic)troll_spoil, "trollspoil");
 
+	sprintf(zBuffer, "%s/races.xml", resourcepath());
 	xml_register(&xml_races, "eressea races", 0);
 }

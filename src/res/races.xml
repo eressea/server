@@ -965,6 +965,7 @@
 	</race>
 	<race name="halfling" magres="0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<function name="itemdrop" value="halflingspoil"></function>
 		<skill name="sk_crossbow" modifier="1"></skill>
 		<skill name="sk_mining" modifier="1"></skill>
 		<skill name="sk_bow" modifier="-1"></skill>
@@ -1025,6 +1026,7 @@
 	<race name="demon" magres="0.150000" maxaura="1.000000" regaura="1.250000" recruitcost="150" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="50" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk shapeshift giveitem giveperson giveunit getitem recruitethereal equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
 		<function name="initfamiliar" value="oldfamiliars"></function>
+		<function name="itemdrop" value="demonspoil"></function>
 		<skill name="sk_alchemy" modifier="2"></skill>
 		<skill name="sk_trade" modifier="-3"></skill>
 		<skill name="sk_forestry" modifier="1"></skill>
@@ -1101,6 +1103,7 @@
 	<race name="goblin" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="40" maintenance="10" weight="600" capacity="440" speed="1.000000" hp="16" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="0" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
 		<function name="initfamiliar" value="oldfamiliars"></function>
+		<function name="itemdrop" value="goblinspoil"></function>
 		<skill name="sk_alchemy" modifier="1"></skill>
 		<skill name="sk_mining" modifier="1"></skill>
 		<skill name="sk_building" modifier="1"></skill>
@@ -1184,6 +1187,7 @@
 	</race>
 	<race name="elf" magres="0.100000" maxaura="1.000000" regaura="1.250000" recruitcost="130" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<function name="itemdrop" value="elfspoil"></function>
 		<skill name="sk_alchemy" modifier="-1"></skill>
 		<skill name="sk_mining" modifier="-2"></skill>
 		<skill name="sk_bow" modifier="2"></skill>
@@ -1210,6 +1214,7 @@
 	</race>
 	<race name="dwarf" magres="0.050000" maxaura="1.000000" regaura="0.500000" recruitcost="110" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<function name="itemdrop" value="dwarfspoil"></function>
 		<skill name="sk_mining" modifier="2"></skill>
 		<skill name="sk_bow" modifier="-1"></skill>
 		<skill name="sk_building" modifier="2"></skill>

@@ -3257,3 +3257,4 @@ spell_name(const struct spell * sp, const struct locale * lang)
 	}
 	return sp->sname;
 }
+
