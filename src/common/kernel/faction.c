@@ -102,7 +102,7 @@ addplayer(region *r, char *email, const struct race * frace, locale *loc)
 	f->locale = loc;
 	set_ursprung(f, 0, r->x, r->y);
 
-	f->options = Pow(O_REPORT) | Pow(O_ZUGVORLAGE) | Pow(O_SILBERPOOL) | Pow(O_COMPUTER);
+	f->options = Pow(O_REPORT) | Pow(O_ZUGVORLAGE) | Pow(O_SILBERPOOL) | Pow(O_COMPUTER) | Pow(O_COMPRESS);
 
 	f->no = unused_faction_id();
 	register_faction_id(f->no);

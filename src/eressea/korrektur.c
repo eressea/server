@@ -2737,6 +2737,11 @@ set_zip(void)
 			f->options = f->options | (1 << O_COMPRESS);
 		}
 	}
+
+	f = findfaction(0);
+	f->options = f->options & !(1 << O_COMPRESS);
+	f->options = f->options | (1 << O_BZIP2);
+
 	return 0;
 }
 
