@@ -581,7 +581,6 @@ peasants(region * r)
 
 	/* Alle werden satt, oder halt soviele für die es auch Geld gibt */
 
-#if PEASANTS_DO_NOT_STARVE == 0
 	money = rmoney(r);
 	satiated = min(peasants, money / MAINTENANCE);
 	rsetmoney(r, money - satiated * MAINTENANCE);
@@ -592,6 +591,7 @@ peasants(region * r)
 
 	/* Es verhungert maximal die unterernährten Bevölkerung. */
 
+#if PEASANTS_DO_NOT_STARVE == 0
 	dead = 0;
 	for (n = min((peasants - satiated), rpeasants(r)); n; n--)
 		if (rand() % 100 > STARVATION_SURVIVAL)
