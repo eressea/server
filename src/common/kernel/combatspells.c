@@ -306,8 +306,9 @@ sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
 
 	for (fig = fgs->begin; fig != fgs->end; ++fig) {
 		fighter *df = *fig;
-		if (!force)
-			break;
+
+                if (df->alive==0) continue;
+                if (force<=0) break;
 
 		/* da n min(force, x), sollte force maximal auf 0 sinken */
 		assert(force >= 0);
@@ -934,6 +935,7 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
     fighter *df = *fig;
     int n = df->unit->number;
   
+    if (df->alive==0) continue;
     if (power<=0.0) break;
     /* force sollte wegen des max(0,x) nicht unter 0 fallen kˆnnen */
 
@@ -1029,7 +1031,7 @@ sp_flee(fighter * fi, int level, double power, spell * sp)
 
 	for (fig = fgs->begin; fig != fgs->end; ++fig) {
 		fighter *df = *fig;
-		for (n = 0; n < df->alive; n++) {
+		for (n=0; n!=df->alive; ++n) {
 			if (force < 0)
 				break;
 
@@ -1608,101 +1610,100 @@ sp_keeploot(fighter * fi, int level, double power, spell * sp)
 int
 sp_healing(fighter * fi, int level, double power, spell * sp)
 {
-	battle *b = fi->side->battle;
-	unit *mage = fi->unit;
-	int minrow = FIGHT_ROW;
-	int maxrow = AVOID_ROW;
-	int healhp;
-	int hp, wound;
-	int n, j = 0;
-	cvector *fgs;
-	void **fig;
+  battle *b = fi->side->battle;
+  unit *mage = fi->unit;
+  int minrow = FIGHT_ROW;
+  int maxrow = AVOID_ROW;
+  int healhp;
+  int hp, wound;
+  int n, j = 0;
+  cvector *fgs;
+  void **fig;
 
-	sprintf(buf, "%s k¸mmert sich um die Verletzten", unitname(mage));
+  sprintf(buf, "%s k¸mmert sich um die Verletzten", unitname(mage));
 
-	/* bis zu 11 Personen pro Stufe (einen HP m¸ssen sie ja noch
-	 * haben, sonst w‰ren sie tot) kˆnnen geheilt werden */
-	power *= 200;
+  /* bis zu 11 Personen pro Stufe (einen HP m¸ssen sie ja noch
+  * haben, sonst w‰ren sie tot) kˆnnen geheilt werden */
+  power *= 200;
 
-	if (get_item(mage, I_AMULET_OF_HEALING) > 0) {
-		scat(" und benutzt das ");
-		scat(locale_string(default_locale, resourcename(oldresourcetype[R_AMULET_OF_HEALING], 0)));
-		scat(", um die Heilzauber zu verst‰rken");
-		power *= 2;
-	}
+  if (get_item(mage, I_AMULET_OF_HEALING) > 0) {
+    scat(" und benutzt das ");
+    scat(locale_string(default_locale, resourcename(oldresourcetype[R_AMULET_OF_HEALING], 0)));
+    scat(", um die Heilzauber zu verst‰rken");
+    power *= 2;
+  }
 
-	/* gehe alle denen wir helfen der reihe nach durch, heile verwundete,
-	 * bis zu verteilende HP aufgebraucht sind */
+  /* gehe alle denen wir helfen der reihe nach durch, heile verwundete,
+  * bis zu verteilende HP aufgebraucht sind */
 
-	fgs = fighters(b, fi, minrow, maxrow, FS_HELP);
-	v_scramble(fgs->begin, fgs->end);
+  fgs = fighters(b, fi, minrow, maxrow, FS_HELP);
+  v_scramble(fgs->begin, fgs->end);
 
   healhp = (int)power;
-	for (fig = fgs->begin; fig != fgs->end; ++fig) {
-		fighter *df = *fig;
+  for (fig = fgs->begin; fig != fgs->end; ++fig) {
+    fighter *df = *fig;
 
-		if (healhp<=0) break;
+    if (healhp<=0) break;
 
-		/* wir heilen erstmal keine Monster */
-		if (!playerrace(df->unit->race))
-			continue;
+    /* wir heilen erstmal keine Monster */
+    if (!playerrace(df->unit->race))
+      continue;
 
-		hp = unit_max_hp(df->unit);
-		for (n = 0; n < df->unit->number; n++) {
-			if (!healhp)
-				break;
-			wound = hp - df->person[n].hp;
-			if ( wound > 0 && wound < hp) {
-				int heal = min(healhp, wound);
-				assert(heal>=0);
-				df->person[n].hp += heal;
-				healhp = max(0, healhp - heal);
-				j++;
-			}
-		}
-	}
-	/* haben wir noch HP ¸brig, so heilen wir nun auch Monster */
-	for (fig = fgs->begin; fig != fgs->end; ++fig) {
-		fighter *df = *fig;
+    hp = unit_max_hp(df->unit);
+    for (n = 0; n < df->unit->number; n++) {
+      if (!healhp)
+        break;
+      wound = hp - df->person[n].hp;
+      if ( wound > 0 && wound < hp) {
+        int heal = min(healhp, wound);
+        assert(heal>=0);
+        df->person[n].hp += heal;
+        healhp = max(0, healhp - heal);
+        j++;
+      }
+    }
+  }
+  /* haben wir noch HP ¸brig, so heilen wir nun auch Monster */
+  for (fig = fgs->begin; fig != fgs->end; ++fig) {
+    fighter *df = *fig;
 
-		if (!healhp)
-			break;
+    if (healhp<=0) break;
 
-		/* Untote kann man nicht heilen */
-		if (fval(df->unit->race, RCF_NOHEAL))
-			continue;
+    /* Untote kann man nicht heilen */
+    if (fval(df->unit->race, RCF_NOHEAL))
+      continue;
 
-		hp = unit_max_hp(df->unit);
-		for (n = 0; n < df->unit->number; n++) {
-			if (!healhp)
-				break;
-			wound = hp - df->person[n].hp;
-			if ( wound > 0 && wound < hp) {
-				int heal = min(healhp, wound);
-				assert(heal>=0);
-				df->person[n].hp += heal;
-				healhp = max(0, healhp - heal);
-				j++;
-			}
-		}
-	}
-	cv_kill(fgs);
+    hp = unit_max_hp(df->unit);
+    for (n = 0; n < df->unit->number; n++) {
+      if (healhp<=0) break;
+
+      wound = hp - df->person[n].hp;
+      if ( wound > 0 && wound < hp) {
+        int heal = min(healhp, wound);
+        assert(heal>=0);
+        df->person[n].hp += heal;
+        healhp = max(0, healhp - heal);
+        j++;
+      }
+    }
+  }
+  cv_kill(fgs);
 
 
-	if (j == 0) {
-		scat(", doch niemand muﬂte magisch geheilt werden.");
-		level = 0;
-	} else if (j == 1) {
-		scat(" und heilt einen Verwundeten.");
-		level = 1;
-	} else {
-		scat(" und heilt ");
-		icat(j);
-		scat(" Verwundete.");
-	}
-	battlerecord(b, buf);
+  if (j == 0) {
+    scat(", doch niemand muﬂte magisch geheilt werden.");
+    level = 0;
+  } else if (j == 1) {
+    scat(" und heilt einen Verwundeten.");
+    level = 1;
+  } else {
+    scat(" und heilt ");
+    icat(j);
+    scat(" Verwundete.");
+  }
+  battlerecord(b, buf);
 
-	return level;
+  return level;
 }
 
 int

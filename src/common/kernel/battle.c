@@ -1403,37 +1403,35 @@ select_enemy(battle * b, fighter * af, int minrow, int maxrow)
 cvector *
 fighters(battle *b, fighter *af, int minrow, int maxrow, int mask)
 {
-	fighter *fig;
-	cvector	*fightervp;
-	int row;
+  fighter *fig;
+  cvector	*fightervp;
+  int row;
 
-	fightervp = malloc(sizeof(cvector));
-	cv_init(fightervp);
+  fightervp = malloc(sizeof(cvector));
+  cv_init(fightervp);
 
-	cv_foreach(fig, b->fighters) {
-		if (!fig->alive) continue;
+  cv_foreach(fig, b->fighters) {
+    row = get_unitrow(fig);
+    if (row >= minrow && row <= maxrow) {
+      switch (mask) {
+        case FS_ENEMY:
+          if (enemy(fig->side, af->side)) cv_pushback(fightervp, fig);
+          break;
+        case FS_HELP:
+          if (!enemy(fig->side, af->side) && allysf(fig->side, af->side->bf->faction))
+            cv_pushback(fightervp, fig);
+          break;
+        case FS_HELP|FS_ENEMY:
+          cv_pushback(fightervp, fig);
+          break;
+        default:
+          assert(0 || !"Ungültiger Allianzstatus in fighters()");
+      }
 
-		row = get_unitrow(fig);
-		if (row >= minrow && row <= maxrow) {
-			switch (mask) {
-			case FS_ENEMY:
-				if (enemy(fig->side, af->side)) cv_pushback(fightervp, fig);
-				break;
-			case FS_HELP:
-				if (!enemy(fig->side, af->side) && allysf(fig->side, af->side->bf->faction))
-					cv_pushback(fightervp, fig);
-				break;
-			case FS_HELP|FS_ENEMY:
-				cv_pushback(fightervp, fig);
-				break;
-			default:
-				assert(0 || !"Ungültiger Allianzstatus in fighters()");
-			}
+    }
+  } cv_next(fig);
 
-		}
-	} cv_next(fig);
-
-	return fightervp;
+  return fightervp;
 }
 
 static void
