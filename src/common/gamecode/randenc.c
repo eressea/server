@@ -1060,8 +1060,6 @@ randomevents(void)
 		drown(r);
 	}
 
-	/* Orkische vermehren sich */
-
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) {
 			if (is_cursed(u->attribs, C_ORC, 0)

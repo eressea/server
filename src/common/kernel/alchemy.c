@@ -194,7 +194,7 @@ a_readeffect(attrib *a, FILE *f)
 		fscanf(f, "%s %d", zText, &power);
 		ptype = pt_find(zText);
 	}
-	if (ptype==NULL || power==0) return 0;
+	if (ptype==NULL || power==0) return AT_READ_FAIL;
 	edata->type = ptype;
 	edata->value = power;
 	return AT_READ_OK;

@@ -264,7 +264,7 @@ a_read(FILE * f, attrib ** attribs)
 				a_add(attribs, na);
 				break;
 			case AT_READ_FAIL:
-				log_warning(("reading attribute %s failed.\n", zText));
+				log_warning(("reading attribute %s failed\n", zText));
 				a_free(na);
 				break;
 			default:
