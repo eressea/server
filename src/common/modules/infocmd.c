@@ -48,8 +48,10 @@ info_name(const char * str, void * data, const char * cmd)
 	const char * name = sqlquote(igetstrtoken(str));
 
 	if (sqlstream!=NULL) {
+#ifdef SQLOUTPUT
 		fprintf(sqlstream, "UPDATE users SET firstname = '%s' WHERE id = %u;\n", 
 				name, f->unique_id);
+#endif
 	}
 }
 
@@ -61,8 +63,10 @@ info_address(const char * str, void * data, const char * cmd)
 	const char * address = sqlquote(igetstrtoken(str));
 
 	if (sqlstream!=NULL) {
+#ifdef SQLOUTPUT
 		fprintf(sqlstream, "UPDATE users SET address = '%s' WHERE id = %u;\n", 
 				address, f->unique_id);
+#endif
 	}
 }
 
@@ -74,8 +78,10 @@ info_phone(const char * str, void * data, const char * cmd)
 	const char * phone = sqlquote(igetstrtoken(str));
 
 	if (sqlstream!=NULL) {
+#ifdef SQLOUTPUT
 		fprintf(sqlstream, "UPDATE users SET phone = '%s' WHERE id = %u;\n", 
 				phone, f->unique_id);
+#endif
 	}
 }
 
@@ -92,11 +98,13 @@ info_vacation(const char * str, void * data, const char * cmd)
 	struct tm end = *localtime(&end_time);
 
 	if (sqlstream!=NULL) {
+#ifdef SQLOUTPUT
 		fprintf(sqlstream, "UPDATE factions SET vacation = '%s' WHERE id = '%s';\n", email, itoa36(f->no));
 		fprintf(sqlstream, "UPDATE factions SET vacation_start = '%04d-%02d-%02d' WHERE id = '%s';\n", 
 			start.tm_year, start.tm_mon, start.tm_mday, itoa36(f->no));
 		fprintf(sqlstream, "UPDATE factions SET vacation_end = '%04d-%02d-%02d' WHERE id = '%s';\n",
 			end.tm_year, end.tm_mon, end.tm_mday, itoa36(f->no));
+#endif
 	}
 }
 
