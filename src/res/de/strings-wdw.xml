@@ -1253,10 +1253,10 @@
 		<text locale="de">Traumaugen</text>
 	</string>
 	<string name="seaserpenthead">
-		<text locale="de">Seeschlangenkopf</text>
+		<text locale="de">Krokodilleder</text>
 	</string>
 	<string name="seaserpenthead_p">
-		<text locale="de">Seeschlangenköpfe</text>
+		<text locale="de">Krokodilleder</text>
 	</string>
 	<string name="aurafocus">
 		<text locale="de">Aurafocus</text>
@@ -2329,20 +2329,20 @@
 		</string>
 
 		<string name="sea serpent">
-			<text locale="de">Seeschlange</text>
-			<text locale="en">sea serpent</text>
+			<text locale="de">Krokodil</text>
+			<text locale="en">crocodile</text>
 		</string>
 		<string name="sea serpent_p">
-			<text locale="de">Seeschlangen</text>
-			<text locale="en">sea serpents</text>
+			<text locale="de">Krokodile</text>
+			<text locale="en">crocodiles</text>
 		</string>
 		<string name="sea serpent_d">
-			<text locale="de">Seeschlangen</text>
-			<text locale="en">sea serpents</text>
+			<text locale="de">Krokodilen</text>
+			<text locale="en">crocodiles</text>
 		</string>
 		<string name="sea serpent_x">
-			<text locale="de">Seeschlangen</text>
-			<text locale="en">sea serpent</text>
+			<text locale="de">Krokodil</text>
+			<text locale="en">crocodile</text>
 		</string>
 
 		<string name="kraken">
@@ -2686,20 +2686,20 @@
 		</string>
 
 		<string name="braineater">
-			<text locale="de">Hirntöter</text>
-			<text locale="en">braineater</text>
+			<text locale="de">Geisterschakal</text>
+			<text locale="en">ghost jackal</text>
 		</string>
 		<string name="braineater_p">
-			<text locale="de">Hirntöter</text>
-			<text locale="en">braineaters</text>
+			<text locale="de">Geisterschakale</text>
+			<text locale="en">ghost jackals</text>
 		</string>
 		<string name="braineater_d">
-			<text locale="de">Hirntöter</text>
-			<text locale="en">braineaters</text>
+			<text locale="de">Geisterschakals</text>
+			<text locale="en">ghost jackals</text>
 		</string>
 		<string name="braineater_x">
-			<text locale="de">Hirntöter</text>
-			<text locale="en">braineater</text>
+			<text locale="de">Geisterschakal</text>
+			<text locale="en">ghost jackal</text>
 		</string>
 
 		<string name="toad">

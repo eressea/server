@@ -10391,7 +10391,7 @@ spell spelldaten[] =
 		(spell_f)sp_dragonodem, patzer
 	},
 
-	{SPL_AURA_OF_FEAR, "Gesang der Furcht",
+	{SPL_AURA_OF_FEAR, "Furchteinflößende Aura",
 		"Panik",
 		NULL,
 		NULL,
@@ -10431,6 +10431,46 @@ spell spelldaten[] =
 		 {0, 0, 0},
 		 {0, 0, 0}},
 	 (spell_f)sp_immolation, patzer
+	},
+
+	{ SPL_FIREODEM, "Feuerwalze",
+		"Tötet die Feinde",
+		NULL,
+		NULL,
+		M_GRAU, (COMBATSPELL), 5, 8,
+		{
+			{R_AURA, 2, SPC_FIX},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0}},
+		(spell_f)sp_immolation, patzer
+	},
+	{ SPL_ICEODEM, "Eisnebel",
+		"Tötet die Feinde",
+		NULL,
+		NULL,
+		M_GRAU, (COMBATSPELL), 5, 8,
+		{
+			{R_AURA, 2, SPC_FIX},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0}},
+		(spell_f)sp_immolation, patzer
+	},
+	{ SPL_ACIDODEM, "Säurenebel",
+		"Tötet die Feinde",
+		NULL,
+		NULL,
+		M_GRAU, (COMBATSPELL), 5, 8,
+		{
+			{R_AURA, 2, SPC_FIX},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0}},
+		(spell_f)sp_immolation, patzer
 	},
 
 /* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein*/

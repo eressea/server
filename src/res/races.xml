@@ -1328,4 +1328,84 @@
 		<attack type="4" damage="1d10"></attack>
 		<attack type="6" spell="180"></attack>
 	</race>
+	<race name="sphinx" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" maintenance="0" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants fly walk noteach getitem canguard resistbash resistcut resistpierce>
+		<ai splitsize="1" killpeasants attackrandom learn></ai>
+		<skill name="sk_magic" modifier="12"></skill>
+		<skill name="sk_tactics" modifier="12"></skill>
+		<skill name="sk_perception" modifier="10"></skill>
+		<attack type="4" damage="3d20"></attack>
+		<attack type="4" damage="3d20"></attack>
+		<attack type="4" damage="5d30"></attack>
+		<attack type="6" spell="83"></attack>
+		<attack type="6" spell="175"></attack>
+	</race>
+	<race name="littlescarab" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" maintenance="0" weight="500" capacity="200" speed="1.000000" hp="25" ac="1" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" walk noteach giveitem getitem>
+		<ai splitsize="5000"></ai>
+		<attack type="4" damage="2d6"></attack>
+		<attack type="4" damage="1d4"></attack>
+		<attack type="4" damage="1d4"></attack>
+	</race>
+	<race name="greenscarab" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" maintenance="0" weight="500" capacity="200" speed="1.000000" hp="25" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" scarepeasants fly walk noteach giveitem getitem>
+		<ai splitsize="50"></ai>
+		<skill name="sk_magic" modifier="4"></skill>
+		<skill name="sk_tactics" modifier="4"></skill>
+		<skill name="sk_stealth" modifier="2"></skill>
+		<skill name="sk_perception" modifier="2"></skill>
+		<attack type="4" damage="2d6"></attack>
+		<attack type="4" damage="1d6"></attack>
+		<attack type="4" damage="1d6"></attack>
+		<attack type="6" spell="183"></attack>
+	</race>
+	<race name="bluescarab" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" maintenance="0" weight="500" capacity="200" speed="1.000000" hp="30" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" scarepeasants fly walk noteach giveitem getitem>
+		<ai splitsize="50"></ai>
+		<skill name="sk_magic" modifier="4"></skill>
+		<skill name="sk_tactics" modifier="4"></skill>
+		<skill name="sk_stealth" modifier="2"></skill>
+		<skill name="sk_perception" modifier="2"></skill>
+		<attack type="4" damage="2d6"></attack>
+		<attack type="4" damage="1d6"></attack>
+		<attack type="4" damage="1d6"></attack>
+		<attack type="6" spell="182"></attack>
+	</race>
+	<race name="redscarab" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" maintenance="0" weight="500" capacity="200" speed="1.000000" hp="25" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" scarepeasants fly walk noteach giveitem getitem>
+		<ai splitsize="50"></ai>
+		<skill name="sk_magic" modifier="4"></skill>
+		<skill name="sk_tactics" modifier="4"></skill>
+		<skill name="sk_stealth" modifier="2"></skill>
+		<skill name="sk_perception" modifier="2"></skill>
+		<attack type="4" damage="2d6"></attack>
+		<attack type="4" damage="1d6"></attack>
+		<attack type="4" damage="1d6"></attack>
+		<attack type="6" spell="181"></attack>
+	</race>
+	<race name="undeadpharaoh" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" maintenance="0" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants nowalk noteach getitem canguard resistbash resistcut resistpierce>
+		<ai splitsize="1" killpeasants attackrandom learn></ai>
+		<skill name="sk_tactics" modifier="20"></skill>
+		<skill name="sk_perception" modifier="20"></skill>
+		<attack type="4" damage="5d30"></attack>
+		<attack type="4" damage="3d20"></attack>
+		<attack type="4" damage="3d20"></attack>
+		<attack type="4" damage="5d30"></attack>
+		<attack type="6" spell="174"></attack>
+		<attack type="6" spell="175"></attack>
+		<precombatspell spell="176"></precombatspell>
+	</race>
+	<race name="mummy" magres="0.600000" maxaura="1.000000" regaura="1.000000" recruitcost="5" maintenance="0" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants walk nolearn noteach noheal undead canguard equipment nogive>
+		<ai splitsize="10000" attackrandom moverandom></ai>
+		<skill name="sk_crossbow" modifier="1"></skill>
+		<skill name="sk_bow" modifier="1"></skill>
+		<skill name="sk_catapult" modifier="1"></skill>
+		<skill name="sk_riding" modifier="1"></skill>
+		<skill name="sk_melee" modifier="1"></skill>
+		<skill name="sk_polearm" modifier="1"></skill>
+		<skill name="sk_tactics" modifier="1"></skill>
+		<skill name="sk_stamina" modifier="1"></skill>
+		<skill name="sk_unarmed" modifier="1"></skill>
+		<attack type="4" damage="2d8"></attack>
+		<attack type="3" damage="1d5"></attack>
+		<attack type="3" damage="1d5"></attack>
+		<attack type="2" damage="1d30"></attack>
+		<attack type="2" damage="1d30"></attack>
+	</race>
+
 </races>

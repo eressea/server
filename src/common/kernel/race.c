@@ -172,7 +172,8 @@ static const char * oldracenames[MAXRACES] = {
 	"centaur",
 	"skeleton", "skeleton lord", "zombie", "juju-zombie", "ghoul", "ghast", "museumghost", "gnome",
 	"template",
-	"clone", "shadowdragon", "shadowbat", "nightmare", "vampunicorn", "phoenix"
+	"clone", "shadowdragon", "shadowbat", "nightmare", "vampunicorn", "phoenix",
+	"sphinx", "littlescarab", "greenscarab", "bluescarab", "redscarab", "undeadpharaoh", "mummy",
 };
 
 /* magres, {3 namen},
