@@ -1988,7 +1988,7 @@ use_mistletoe(struct unit * user, const struct item_type * itype, int amount, co
 static int
 use_snowball(struct unit * user, const struct item_type * itype, int amount, const char * cmd)
 {
-	return;
+	return 0;
 }
 
 void
