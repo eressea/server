@@ -95,14 +95,9 @@ attrib_type at_luacall_building = {
   ATF_UNIQUE
 };
 
-int
-building_addeffect(building& b, const char * fname)
+static int
+building_addaction(building& b, const char * fname)
 {
-  lua_State * L = (lua_State *)global.vm_state;
-
-  luabind::object globals = luabind::get_globals(L);
-  if (globals.at(fname).type()!=LUA_TFUNCTION) return -1;
-
   attrib * a = a_add(&b.attribs, a_new(&at_luacall_building));
   lcbuilding_data * data = (lcbuilding_data*)a->data.v;
   data->b = &b;
@@ -190,6 +185,6 @@ bind_building(lua_State * L)
     .def_readonly("region", &building::region)
     .def_readonly("id", &building::no)
     .def_readwrite("size", &building::size)
-    .def("add_effect", &building_addeffect)
+    .def("add_action", &building_addaction)
   ];
 }
