@@ -1952,8 +1952,10 @@ update_intervals(void)
 
     for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
       faction * f = ((unit*)ru->data.v)->faction;
-      if (f->first==NULL) f->first = r;
-      f->last = r->next;
+      if (f!=NULL) {
+        if (f->first==NULL) f->first = r;
+        f->last = r->next;
+      }
     }
 
     ulist = get_lighthouses(r);
