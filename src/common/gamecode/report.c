@@ -111,7 +111,6 @@ MailitPath(void)
     value = get_param(global.parameters, "report.mailit");
   }
   return value;
-
 }
 
 int
@@ -1073,7 +1072,7 @@ eval_trail(struct opstack ** stack, const void * userdata) /* (int, int) -> int 
 	const struct locale * lang = opop(stack, const struct locale*);
 	const struct region * r = opop(stack, const struct region*);
 	const char * trail = trailinto(r, lang);
-	const char * rn = regionname(r, f);
+	const char * rn = f_regionid(r, f);
 	char * x = balloc(strlen(trail)+strlen(rn));
 	sprintf(x, trail, rn);
 	opush(stack, x);

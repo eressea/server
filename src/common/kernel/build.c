@@ -331,114 +331,114 @@ destroy_road(unit *u, int n, const char *cmd)
 void
 destroy(region * r, unit * u, const char * cmd)
 {
-	ship *sh;
-	unit *u2;
+  ship *sh;
+  unit *u2;
 #if 0
-	const construction * con = NULL;
-	int size = 0;
+  const construction * con = NULL;
+  int size = 0;
 #endif
-	const char *s;
-	int n = INT_MAX;
+  const char *s;
+  int n = INT_MAX;
 
-	if (u->number < 1)
-		return;
+  if (u->number < 1)
+    return;
 
-	s = getstrtoken();
+  s = getstrtoken();
 
-	if (findparam(s, u->faction->locale)==P_ROAD) {
-		destroy_road(u, INT_MAX, cmd);
-		return;
-	}
+  if (findparam(s, u->faction->locale)==P_ROAD) {
+    destroy_road(u, INT_MAX, cmd);
+    return;
+  }
 
-	if (!fval(u, UFL_OWNER)) {
-		cmistake(u, cmd, 138, MSG_PRODUCE);
-		return;
-	}
+  if (!fval(u, UFL_OWNER)) {
+    cmistake(u, cmd, 138, MSG_PRODUCE);
+    return;
+  }
 
-	if(s && *s) {
-		n = atoi(s);
-		if(n <= 0) {
-			cmistake(u, cmd, 288, MSG_PRODUCE);
-			return;
-		}
-	}
+  if(s && *s) {
+    n = atoi(s);
+    if(n <= 0) {
+      cmistake(u, cmd, 288, MSG_PRODUCE);
+      return;
+    }
+  }
 
-	if(getparam(u->faction->locale) == P_ROAD) {
-		destroy_road(u, n, cmd);
-		return;
-	}
+  if(getparam(u->faction->locale) == P_ROAD) {
+    destroy_road(u, n, cmd);
+    return;
+  }
 
-	if (u->building) {
-		building *b = u->building;
+  if (u->building) {
+    building *b = u->building;
 #if 0
-		con = b->type->construction;
-		size = b->size;
-#endif
-
-		if(n >= b->size) {
-			/* destroy completly */
-			/* all units leave the building */
-			for (u2 = r->units; u2; u2 = u2->next)
-				if (u2->building == b) {
-					u2->building = 0;
-					freset(u2, UFL_OWNER);
-				}
-			add_message(&u->faction->msgs, new_message(
-				u->faction, "destroy%b:building%u:unit", b, u));
-			destroy_building(b);
-		} else {
-			/* partial destroy */
-			b->size -= n;
-			add_message(&u->faction->msgs, new_message(
-				u->faction, "destroy_partial%b:building%u:unit", b, u));
-		}
-	} else if (u->ship) {
-		sh = u->ship;
-#if 0
-		con = sh->type->construction;
-		size = (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;
+    con = b->type->construction;
+    size = b->size;
 #endif
 
-		if (rterrain(r) == T_OCEAN) {
-			cmistake(u, cmd, 14, MSG_EVENT);
-			return;
-		}
+    if(n >= b->size) {
+      /* destroy completly */
+      /* all units leave the building */
+      for (u2 = r->units; u2; u2 = u2->next)
+        if (u2->building == b) {
+          u2->building = 0;
+          freset(u2, UFL_OWNER);
+        }
+        add_message(&u->faction->msgs, new_message(
+          u->faction, "destroy%b:building%u:unit", b, u));
+        destroy_building(b);
+    } else {
+      /* partial destroy */
+      b->size -= n;
+      add_message(&u->faction->msgs, new_message(
+        u->faction, "destroy_partial%b:building%u:unit", b, u));
+    }
+  } else if (u->ship) {
+    sh = u->ship;
+#if 0
+    con = sh->type->construction;
+    size = (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;
+#endif
 
-		if(n >= (sh->size*100)/sh->type->construction->maxsize) {
-			/* destroy completly */
-			/* all units leave the ship */
-			for (u2 = r->units; u2; u2 = u2->next)
-				if (u2->ship == sh) {
-					u2->ship = 0;
-					freset(u2, UFL_OWNER);
-				}
-			add_message(&u->faction->msgs, new_message(
-				u->faction, "shipdestroy%u:unit%r:region%h:ship", u, r, sh));
-			destroy_ship(sh, r);
-		} else {
-			/* partial destroy */
-			sh->size -= (sh->type->construction->maxsize * n)/100;
-			add_message(&u->faction->msgs, new_message(
-				u->faction, "shipdestroy_partial%u:unit%r:region%h:ship", u, r, sh));
-		}
-	} else
-		printf("* Fehler im Program! Die Einheit %s von %s\n"
-			   "  (Spieler: %s) war owner eines objects,\n"
-			   "  war aber weder in einer Burg noch in einem Schiff.\n",
-			   unitname(u), u->faction->name, u->faction->email);
+    if (rterrain(r) == T_OCEAN) {
+      cmistake(u, cmd, 14, MSG_EVENT);
+      return;
+    }
+
+    if(n >= (sh->size*100)/sh->type->construction->maxsize) {
+      /* destroy completly */
+      /* all units leave the ship */
+      for (u2 = r->units; u2; u2 = u2->next)
+        if (u2->ship == sh) {
+          u2->ship = 0;
+          freset(u2, UFL_OWNER);
+        }
+        add_message(&u->faction->msgs, new_message(
+          u->faction, "shipdestroy%u:unit%r:region%h:ship", u, r, sh));
+        destroy_ship(sh, r);
+    } else {
+      /* partial destroy */
+      sh->size -= (sh->type->construction->maxsize * n)/100;
+      add_message(&u->faction->msgs, new_message(
+        u->faction, "shipdestroy_partial%u:unit%r:region%h:ship", u, r, sh));
+    }
+  } else
+    printf("* Fehler im Program! Die Einheit %s von %s\n"
+    "  (Spieler: %s) war owner eines objects,\n"
+    "  war aber weder in einer Burg noch in einem Schiff.\n",
+    unitname(u), u->faction->name, u->faction->email);
 
 #if 0
-	/* Achtung: Nicht an ZERSTÖRE mit Punktangabe angepaßt! */
-	if (con) {
-		/* Man sollte alle Materialien zurückkriegen können: */
-		int c;
-		for (c=0;con->materials[c].number;++c) {
-			const requirement * rq = con->materials+c;
-			int recycle = (int)(rq->recycle * rq->number * size/con->reqsize);
-			if (recycle)
-			  change_resource(u, rq->type, recycle);
-		}
-	}
+  /* Achtung: Nicht an ZERSTÖRE mit Punktangabe angepaßt! */
+  if (con) {
+    /* Man sollte alle Materialien zurückkriegen können: */
+    int c;
+    for (c=0;con->materials[c].number;++c) {
+      const requirement * rq = con->materials+c;
+      int recycle = (int)(rq->recycle * rq->number * size/con->reqsize);
+      if (recycle)
+        change_resource(u, rq->type, recycle);
+    }
+  }
 #endif
 }
 /* ------------------------------------------------------------- */
