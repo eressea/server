@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: reports.c,v 1.6 2001/02/19 14:19:24 corwin Exp $
+ *	$Id: reports.c,v 1.7 2001/02/28 23:28:54 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -22,6 +22,8 @@
 #include "eressea.h"
 #include "reports.h"
 
+/* kernel includes */
+#include "skill.h"
 #include "unit.h"
 #include "item.h"
 #include "group.h"
@@ -483,3 +485,157 @@ spunit(struct strlist ** SP, const struct faction * f, const unit * u, int inden
 	assert(SP);
 	lparagraph(SP, buf, indent, (char) ((u->faction == f) ? '*' : (dh ? '+' : '-')));
 }
+
+void
+spy_message(int spy, unit *u, unit *target)
+{
+	const char *c;
+	struct region * r = u->region;
+
+	if (spy < 0) {
+		sprintf(buf, "%s konnte nichts über ", unitname(u));
+		scat(unitname(target));
+		scat(" herausbekommen.");
+		addmessage(r, u->faction, buf, MSG_EVENT, ML_WARN);
+	} else if (spy == 0) {
+		sprintf(buf, "%s gelang es, Informationen über ", unitname(u));
+		scat(unitname(target));
+		scat(" herausbekommen: Partei '");
+		scat(factionname(target->faction));
+		scat("', Talente: ");
+
+		change_skill(u, SK_SPY, PRODUCEEXP / 2);
+
+		{
+			int first = 1;
+			int found = 0;
+			skill_t sk;
+
+			for (sk = 0; sk != MAXSKILLS; sk++) {
+				if (get_skill(target, sk)) {
+					found++;
+					if (first == 1) {
+						first = 0;
+					} else {
+						scat(", ");
+					}
+					scat(skillnames[sk]);
+				}
+			}
+			if (found == 0) {
+				scat("Keine");
+			}
+		}
+		scat(".");
+
+		addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
+
+	/* Spionage > Wahrnehmung:
+	 * Talente mit Werten, Gegenstände und Kampfstatus */
+	} else if (spy > 0) {
+		sprintf(buf, "%s gelang es, Informationen über ", unitname(u));
+		scat(unitname(target));
+		scat(" herauszubekommen: Partei '");
+		scat(factionname(target->faction));
+		scat("', Talente: ");
+
+		change_skill(u, SK_SPY, PRODUCEEXP);
+
+		{
+			int first = 1;
+			int found = 0;
+			skill_t sk;
+
+			for (sk = 0; sk != MAXSKILLS; sk++) {
+				if (get_skill(target, sk)) {
+					found++;
+					if (first == 1) {
+						first = 0;
+					} else {
+						scat(", ");
+					}
+					scat(skillnames[sk]);
+					scat(" ");
+					icat(eff_skill(target, sk, target->region));
+				}
+			}
+			if (found == 0) {
+				scat("Keine");
+			}
+		}
+		scat("; Kampfstatus: ");
+		scat(report_kampfstatus(target) + 2);
+		c = hp_status(target);
+		if (c && strlen(c))
+			sprintf(buf, "%s (%s)", buf, c);
+		scat("; ");
+
+		icat(get_money(target));
+		scat(" Silber;");
+
+		scat(" Im Gepäck sind");
+		{
+			boolean first = true;
+			int found = 0;
+			item * itm;
+			for (itm=target->items;itm;itm=itm->next) {
+				if (itm->number>0) {
+					resource_type * rtype = itm->type->rtype;
+					++found;
+					if (first) {
+						first = false;
+						scat(": ");
+					} else {
+						scat(", ");
+					}
+
+					if (itm->number == 1) {
+						scat("1 ");
+						scat(locale_string(u->faction->locale, resourcename(rtype, 0)));
+					} else {
+						icat(itm->number);
+						scat(" ");
+						scat(locale_string(u->faction->locale, resourcename(rtype, NMF_PLURAL)));
+					}
+				}
+			}
+			if (found == 0) {
+				scat(" keine verborgenen Gegenstände");
+			}
+			scat(".");
+		}
+
+		/* magische Spionage:
+		 * zusätzlich Magiegebiet und Zauber */
+		if (spy > 1){
+			if (eff_skill(target, SK_MAGIC, target->region) > 0){
+				spell_ptr *spt;
+				spell *sp;
+				int first = 1;
+				int found = 0;
+
+				scat(" Magiegebiet: ");
+				scat(magietypen[find_magetype(target)]);
+				if (get_mage(target)) {
+					scat(", Sprüche: ");
+
+					for (spt = get_mage(target)->spellptr;spt; spt = spt->next){
+						sp = find_spellbyid(spt->spellid);
+						found++;
+						if (first == 1){
+							first = 0;
+						} else {
+							scat(", ");
+						}
+						scat(sp->name);
+					}
+					if (found == 0) {
+						scat("Keine");
+					}
+				}
+			}
+		}
+		addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
+	}
+}
+

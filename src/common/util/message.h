@@ -24,7 +24,7 @@ typedef struct message {
 	const void ** parameters;
 } message;
 
-extern struct message_type * mt_new(const char * name, const char * args[]);
+extern struct message_type * mt_new(const char * name, const char ** args);
 extern struct message_type * mt_new_va(const char * name, ...);
 	/* mt_new("simple_sentence", "subject:string", "predicate:string", 
     *        "object:string", "lang:locale", NULL); */

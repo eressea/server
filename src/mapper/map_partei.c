@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_partei.c,v 1.4 2001/02/09 13:53:53 corwin Exp $
+ *	$Id: map_partei.c,v 1.5 2001/02/28 23:28:55 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -318,7 +318,7 @@ addplayer(region *r, char *email, race_t frace)
 	set_ursprung(f, 0, r->x, r->y);
 
 	f->options = Pow(O_REPORT) | Pow(O_STATISTICS) | Pow(O_ZUGVORLAGE) |
-		Pow(O_SILBERPOOL) | Pow(O_MERIAN);
+		Pow(O_SILBERPOOL);
 
 	f->no = unused_faction_id();
 	register_faction_id(f->no);

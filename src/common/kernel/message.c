@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: message.c,v 1.9 2001/02/28 22:14:57 enno Exp $
+ *	$Id: message.c,v 1.10 2001/02/28 23:28:54 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -307,7 +307,7 @@ parse_message(char * b, const struct locale * deflocale)
 	args[i] = NULL;
 
 	/* add the messagetype */
-	mtype = mt_register(mt_new(name, args));
+	mtype = mt_register(mt_new(name, (const char**)args));
 	nrt_register(mtype, lang, message, level, section);
 	crt_register(mtype, lang);
 }
@@ -322,7 +322,8 @@ read_messages(FILE * F, const struct locale * lang)
 	}
 }
 
-#else
+#endif
+
 void
 addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 {
@@ -373,10 +374,10 @@ caddmessage(region * r, faction * f, char *s, msg_t mtype, int level)
 	default:
 		fprintf(stderr, "Warnung: Ungültige Msg-Klasse!");
 	}
+#ifdef OLD_MESSAGES
 	if (m) m->level = level;
+#endif
 }
-
-static messagetype * messagetypes;
 
 void
 xmistake(const unit * u, const char *s, const char *comment, int mtype)
@@ -416,6 +417,9 @@ old_hashstring(const char* s)
 	return key & 0x7fff;
 }
 
+
+#ifdef OLD_MESSAGES
+static messagetype * messagetypes;
 
 void
 debug_messagetypes(FILE * out)
@@ -582,6 +586,13 @@ get_msglevel(const struct warning * warnings, const msglevel * levels, const mes
 	return 0x7F;
 }
 
+int
+msg_level(const message * m)
+{
+	return m->level;
+}
+#endif
+
 void
 set_msglevel(struct warning ** warnings, const char * type, int level)
 {
@@ -602,13 +613,6 @@ set_msglevel(struct warning ** warnings, const char * type, int level)
 		*w = x;
 	}
 }
-
-int
-msg_level(const message * m)
-{
-	return m->level;
-}
-#endif /* NEW_MESSAGES */
 
 message * 
 add_message(message_list** pm, message * m)

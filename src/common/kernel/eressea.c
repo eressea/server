@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.24 2001/02/28 18:25:24 corwin Exp $
+ *	$Id: eressea.c,v 1.25 2001/02/28 23:28:53 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -56,7 +56,9 @@
 #include <base36.h>
 #include <event.h>
 #include <umlaut.h>
-
+#ifdef NEW_MESSAGES
+# include <translation.h>
+#endif
 /* libc includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -1851,7 +1853,11 @@ kernel_done(void)
 	/* calling this function releases memory assigned to static variables, etc.
 	 * calling it is optional, e.g. a release server will most likely not do it.
 	 */
+#ifdef OLD_MESSAGES
 	render_cleanup();
+#else
+	translation_done();
+#endif
 	skill_done();
 	gc_done();
 }
@@ -1860,13 +1866,41 @@ extern void attrib_init(void);
 extern void render_init(void);
 
 void
+read_strings(FILE * F)
+{
+	char rbuf[8192];
+	while (fgets(rbuf, sizeof(rbuf), F)) {
+		char * b = rbuf;
+		locale * lang;
+		char * key = b;
+		char * language;
+
+		if (rbuf[0]=='#') continue;
+		rbuf[strlen(rbuf)-1] = 0; /* \n weg */
+		while (*b && *b!=';') ++b;
+		if (!*b) continue;
+		*b++ = 0;
+		language = b;
+		while (*b && *b!=';') ++b;
+		*b++ = 0;
+		lang = find_locale(language);
+		if (!lang) lang = make_locale(language);
+		locale_setstring(lang, key, b);
+	}
+}
+
+void
 kernel_init(void)
 {
 	init_tokens();
 	skill_init();
 	attrib_init();
 	init_locales();
+#ifdef OLD_MESSAGES
 	render_init();
+#else
+	translation_init();
+#endif	
 	if (!turn) turn = lastturn();
 	if (turn == 0)
 		srand(time((time_t *) NULL));

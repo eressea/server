@@ -4,6 +4,8 @@
 
 #CONVERT_TRIGGERS = 1
 
+CFLAGS += -DNEW_MESSAGES
+
 LD=gcc
 AR=ar
 CC=@colorgcc

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: render.c,v 1.7 2001/02/24 12:50:48 enno Exp $
+ *	$Id: render.c,v 1.8 2001/02/28 23:28:54 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -129,31 +129,6 @@ add_evalfun(const char * name, localizer * l, eval_fun fun)
 	else assert(!strcmp(find->name, name));
 }
 
-char rbuf[8192];
-
-void
-read_strings(FILE * F)
-{
-	while (fgets(rbuf, 8192, F)) {
-		char * b = rbuf;
-		locale * lang;
-		char * key = b;
-		char * language;
-
-		if (rbuf[0]=='#') continue;
-		rbuf[strlen(rbuf)-1] = 0; /* \n weg */
-		while (*b && *b!=';') ++b;
-		if (!*b) continue;
-		*b++ = 0;
-		language = b;
-		while (*b && *b!=';') ++b;
-		*b++ = 0;
-		lang = find_locale(language);
-		if (!lang) lang = make_locale(language);
-		locale_setstring(lang, key, b);
-	}
-}
-
 void
 render_cleanup(void)
 {
@@ -238,6 +213,8 @@ v_dir(const locale * l, void * data) {
 	/* static char buffer[10]; */
 	return locale_string(l, dres[i]);
 }
+
+static char rbuf[8192];
 
 static char *
 render_immediate(const message * m, const char * find, localizer * l)
@@ -576,161 +553,6 @@ read_messages(FILE * F, const struct locale * deflocale)
 			mtype->level = level;
 		}
 		locale_setstring(lang, name, b);
-	}
-}
-
-#include "skill.h"
-#include "magic.h"
-void
-spy_message(int spy, unit *u, unit *target)
-{
-	const char *c;
-	region * r = u->region;
-
-	if (spy < 0) {
-		sprintf(buf, "%s konnte nichts über ", unitname(u));
-		scat(unitname(target));
-		scat(" herausbekommen.");
-		addmessage(r, u->faction, buf, MSG_EVENT, ML_WARN);
-	} else if (spy == 0) {
-		sprintf(buf, "%s gelang es, Informationen über ", unitname(u));
-		scat(unitname(target));
-		scat(" herausbekommen: Partei '");
-		scat(factionname(target->faction));
-		scat("', Talente: ");
-
-		change_skill(u, SK_SPY, PRODUCEEXP / 2);
-
-		{
-			int first = 1;
-			int found = 0;
-			skill_t sk;
-
-			for (sk = 0; sk != MAXSKILLS; sk++) {
-				if (get_skill(target, sk)) {
-					found++;
-					if (first == 1) {
-						first = 0;
-					} else {
-						scat(", ");
-					}
-					scat(skillnames[sk]);
-				}
-			}
-			if (found == 0) {
-				scat("Keine");
-			}
-		}
-		scat(".");
-
-		addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
-
-	/* Spionage > Wahrnehmung:
-	 * Talente mit Werten, Gegenstände und Kampfstatus */
-	} else if (spy > 0) {
-		sprintf(buf, "%s gelang es, Informationen über ", unitname(u));
-		scat(unitname(target));
-		scat(" herauszubekommen: Partei '");
-		scat(factionname(target->faction));
-		scat("', Talente: ");
-
-		change_skill(u, SK_SPY, PRODUCEEXP);
-
-		{
-			int first = 1;
-			int found = 0;
-			skill_t sk;
-
-			for (sk = 0; sk != MAXSKILLS; sk++) {
-				if (get_skill(target, sk)) {
-					found++;
-					if (first == 1) {
-						first = 0;
-					} else {
-						scat(", ");
-					}
-					scat(skillnames[sk]);
-					scat(" ");
-					icat(eff_skill(target, sk, target->region));
-				}
-			}
-			if (found == 0) {
-				scat("Keine");
-			}
-		}
-		scat("; Kampfstatus: ");
-		scat(report_kampfstatus(target) + 2);
-		c = hp_status(target);
-		if (c && strlen(c))
-			sprintf(buf, "%s (%s)", buf, c);
-		scat("; ");
-
-		icat(get_money(target));
-		scat(" Silber;");
-
-		scat(" Im Gepäck sind");
-		{
-			boolean first = true;
-			int found = 0;
-			item * itm;
-			for (itm=target->items;itm;itm=itm->next) {
-				if (itm->number>0) {
-					resource_type * rtype = itm->type->rtype;
-					++found;
-					if (first) {
-						first = false;
-						scat(": ");
-					} else {
-						scat(", ");
-					}
-
-					if (itm->number == 1) {
-						scat("1 ");
-						scat(locale_string(u->faction->locale, resourcename(rtype, 0)));
-					} else {
-						icat(itm->number);
-						scat(" ");
-						scat(locale_string(u->faction->locale, resourcename(rtype, NMF_PLURAL)));
-					}
-				}
-			}
-			if (found == 0) {
-				scat(" keine verborgenen Gegenstände");
-			}
-			scat(".");
-		}
-
-		/* magische Spionage:
-		 * zusätzlich Magiegebiet und Zauber */
-		if (spy > 1){
-			if (eff_skill(target, SK_MAGIC, target->region) > 0){
-				spell_ptr *spt;
-				spell *sp;
-				int first = 1;
-				int found = 0;
-
-				scat(" Magiegebiet: ");
-				scat(magietypen[find_magetype(target)]);
-				if (get_mage(target)) {
-					scat(", Sprüche: ");
-
-					for (spt = get_mage(target)->spellptr;spt; spt = spt->next){
-						sp = find_spellbyid(spt->spellid);
-						found++;
-						if (first == 1){
-							first = 0;
-						} else {
-							scat(", ");
-						}
-						scat(sp->name);
-					}
-					if (found == 0) {
-						scat("Keine");
-					}
-				}
-			}
-		}
-		addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
 	}
 }
 
