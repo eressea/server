@@ -1743,9 +1743,12 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
         /* transfer dead people to new unit, set hitpoints to those of old unit */
         transfermen(du, u, j);
         u->hp = u->number * unit_max_hp(du);
-		assert(j<=df->side->casualties);
+        assert(j<=df->side->casualties);
         df->side->casualties -= j;
+        /* tot sind sie eignetlich immer noch.
+         * siehe http://eressea.upb.de/mantis/view.php?id=447
         df->side->dead -= j;
+        */
 
         /* counting total number of undead */
         undead += j;
