@@ -60,7 +60,7 @@ struct skill;
 # define UFL_SAVEMASK (UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL | UFL_HERO)
 #endif
 
-#if HEROES == 1
+#ifdef HEROES
 extern int maxheroes(const struct faction * f);
 extern int countheroes(const struct faction * f);
 #endif
