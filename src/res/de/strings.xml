@@ -5783,6 +5783,66 @@
     <text locale="de">Unbekannte Partei</text>
     <text locale="en">unknown faction</text>
   </string>
+  
+  <string name="spinx00">
+    <text locale="de">Das Schiff des Elfen hat ein rotes Segel</text>
+  </string>
+  
+  <string name="spinx01">
+    <text locale="de">Der Zwerg hat eine Nuss dabei</text>
+  </string>
+  
+  <string name="spinx02">
+    <text locale="de">Die Katze führt eine Hellebarde</text>
+  </string>
+  
+  <string name="spinx03">
+    <text locale="de">Das Schiff mit dem grünen Segel liegt links neben dem mit einem weissen Segel</text>
+  </string>
+  
+  <string name="spinx04">
+    <text locale="de">Auf dem Schiff mit grünen Segeln kam der Speerkämpfer</text>
+  </string>
+  
+  <string name="spinx05">
+    <text locale="de">Der Krieger mit dem Kreis im Wappen hat einen Keks</text>
+  </string>
+  
+  <string name="spinx06">
+    <text locale="de">Der Krieger des mittleren Schiffs hat ein Schwert</text>
+  </string>
+  
+  <string name="spinx07">
+    <text locale="de">Auf dem gelben Segel prankt ein Kreuz als Wappen</text>
+  </string>
+  
+  <string name="spinx08">
+    <text locale="de">Der Mensch kam mit dem ersten Schiff</text>
+  </string>
+  
+  <string name="spinx09">
+    <text locale="de">Das Schiff mit dem Stern im Wappen liegt neben dem der einen Mandelkern hat</text>
+  </string>
+  
+  <string name="spinx10">
+    <text locale="de">Das Schiff des Kriegers, der ein Apfel hat, liegt neben dem, der ein Kreuz als Wappen hat</text>
+  </string>
+  
+  <string name="spinx11">
+    <text locale="de">Der Krieger mit dem Turm im Wappen trägt eine Axt</text>
+  </string>
+  
+  <string name="spinx12">
+    <text locale="de">Das Schiff des Menschen liegt neben dem blauen Schiff</text>
+  </string>
+  
+  <string name="spinx13">
+    <text locale="de">Das Insekt trägt einen Baum als Wappen</text>
+  </string>
+  
+  <string name="spinx14">
+    <text locale="de">Das Schiff mit dem Stern im Wappen liegt neben dem des Kriegers, der einen Zweihänder führt</text>
+  </string>
 
   <string name="hero">
     <text locale="de">Held</text>

@@ -7,6 +7,7 @@ function run_wdw()
   
   -- run the turn (not yet)
   read_orders(orderfile)
+  init_sphinx()
   plan_monsters()
   process_orders()
   outfile = "" .. get_turn()
@@ -26,7 +27,20 @@ function run_wdw()
   end
 end
 
+scripts = {
+	"sphinx-announce.lua"
+}
+
+scriptpath = "/home/vinyambar/wdw/scripts/"
+
+for index in scripts do
+	local script = scriptpath .. scripts[index]
+	if pcall(dofile, script)==0 then
+		print("Could not load " .. script)
+	end
+end
 
 --
 -- main body of the script
 run_wdw()
+
