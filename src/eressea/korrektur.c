@@ -27,6 +27,7 @@
 #include <items/catapultammo.h>
 #include <modules/xmas2000.h>
 #include <modules/xmas2001.h>
+#include <modules/xmas2002.h>
 #include <modules/xecmd.h>
 #ifdef ALLIANCES
 #include <modules/alliance.h>
@@ -84,6 +85,7 @@
 #undef  XMAS1999
 #undef  XMAS2000
 #undef  XMAS2001
+#define XMAS2002
 
 extern void reorder_owners(struct region * r);
 
@@ -2839,6 +2841,10 @@ korrektur_end(void)
 #ifdef XMAS2001
 	do_once("2001", xmas2001());
 #endif
+#ifdef XMAS2002
+	do_once("2002", xmas2002());
+#endif
+
 #if PEASANT_ADJUSTMENT == 1
 	do_once("peas", peasant_adjustment());
 	do_once("orcc", orc_conversion());
