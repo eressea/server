@@ -2620,14 +2620,15 @@ renumber_factions(void)
 		}
 	}
 	for (rp=renum;rp;rp=rp->next) {
-		a_remove(&rp->faction->attribs, rp->attrib);
-		if (updatelog) fprintf(updatelog, "renum %s %s\n", itoa36(rp->faction->no), itoa36(rp->want));
+		f = rp->faction;
+		a_remove(&f->attribs, rp->attrib);
+		if (updatelog) fprintf(updatelog, "renum %s %s\n", itoa36(f->no), itoa36(rp->want));
 		if (f->subscription) fprintf(sqlstream, "UPDATE subscriptions set faction='%s' where "
 			"subscription=%u;\n", itoa36(rp->want), 
 			f->subscription);
-		rp->faction->no = rp->want;
+		f->no = rp->want;
 		register_faction_id(rp->want);
-		fset(rp->faction, FF_NEWID);
+		fset(f, FF_NEWID);
 	}
 	while (renum) {
 		rp = renum->next;

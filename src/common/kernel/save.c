@@ -187,6 +187,18 @@ typedef struct mapnode {
 
 static mapnode * subscriptions[HASHSIZE];
 
+static const char *
+dbrace(const struct race * rc)
+{
+  static char zText[32];
+  unsigned char * zPtr = (unsigned char*)zText;
+  strcpy(zText, LOC(find_locale("en"), rc_name(rc, 0)));
+  while (*zPtr) {
+    *zPtr = (unsigned char)toupper(*(int*)zPtr); 
+    ++zPtr;
+  }
+  return zText;
+}
 void
 convertunique(faction * f)
 {
@@ -216,7 +228,11 @@ convertunique(faction * f)
 	}
 	mnode = subscriptions[f->no%HASHSIZE];
 	while (mnode!=NULL && mnode->fno!=f->no) mnode = mnode->next;
-	f->subscription = mnode->subscription;
+	if (mnode) f->subscription = mnode->subscription;
+	else {
+		log_printf("No subscription: faction %s email %s pass %s race %s\n",
+				   itoa36(f->no), f->email, f->override, dbrace(f->race));
+	}
 }
 #endif
 
@@ -1459,7 +1475,7 @@ curse_read(attrib * a, FILE * f) {
 		int cspellid;
 		if (global.data_version < CURSE_NO_VERSION) {
 			fscanf(f, "%d %d %d %d %d %d ",&cspellid, &c->flag, &c->duration,
-				&c->vigour, &mageid, &c->effect);
+				&c->vigour, &mageid, &c->effect.i);
 			c->no = newunitid();
 		} else {
 			fscanf(f, "%d %d %d %d %d %d %d ", &c->no, &cspellid, &c->flag,
@@ -2048,9 +2064,6 @@ readfaction(FILE * F)
 		while (f->attribs) a_remove(&f->attribs, f->attribs);
 	}
 	f->subscription = ri(F);
-#ifdef CONVERT_DBLINK
-	convertunique(f);
-#endif
 #ifdef ALLIANCES
 	if (global.data_version>=ALLIANCES_VERSION) {
 		int allianceid = rid(F);
@@ -2095,6 +2108,9 @@ readfaction(FILE * F)
 		f->race = rc_find(buf);
 		assert(f->race);
 	}
+#ifdef CONVERT_DBLINK
+	convertunique(f);
+#endif
 	f->magiegebiet = (magic_t)ri(F);
 	if (!playerrace(f->race)) {
 		f->lastorders = turn+1;
