@@ -16,6 +16,7 @@
 
 /* kernel includes */
 #include <region.h>
+#include <plane.h>
 #include <faction.h>
 #include <race.h>
 #include <unit.h>
@@ -277,21 +278,44 @@ preferred_terrain(const struct race * rc)
 #define REGIONS_PER_FACTION 2
 #define MINFACTIONS 1
 
-void
+int
 mkisland(int nsize)
 {
-	int x, y;
+	int x = 0, y = 0;
 	region * r;
 	regionlist * rlist = NULL;
-	int rsize;
-	
-	if (listlen(newfactions)<MINFACTIONS) return;
+	int rsize, isize=0;
+
+#ifdef RANDOM_LOCATION
 	do {
 		x = (rand() % 2001) - 1000;
 		y = (rand() % 2001) - 1000;
 		r = findregion(x, y);
 	} while (r!=NULL);
+#else
+	region * rmin = NULL;
+	direction_t d;
+	int dist;
 
+	for (r=regions;r;r=r->next) {
+		struct plane * p = rplane(r);
+		if (p==NULL && (rmin==NULL || r->age<=rmin->age)) rmin=r;
+	}
+	r = NULL;
+	for (dist=1;r!=rmin;++dist) {
+		for (d=0;r!=rmin && d!=MAXDIRECTIONS;++d) {
+			int i;
+			region * rn = rmin;
+			for (i=0;i!=dist;++i) rn=rconnect(rn, d);
+			if (rn==NULL) {
+				r = rmin;
+				x = rmin->x + delta_x[d] * dist;
+				y = rmin->y + delta_y[d] * dist;
+			}
+		}
+	}
+#endif
+	if (listlen(newfactions)<MINFACTIONS) return 0;
 	r = new_region(x, y);
 	terraform(r, T_OCEAN);
 	add_regionlist(&rlist, r);
@@ -309,6 +333,7 @@ mkisland(int nsize)
 			newfaction ** nfp, * nextf = newfactions;
 			unit * u;
 			terraform(r, preferred_terrain(nextf->race));
+			++isize;
 			u = addplayer(r, nextf->email, nextf->password, nextf->race, nextf->lang);
 
 			/* remove duplicate email addresses */
@@ -336,5 +361,28 @@ mkisland(int nsize)
 			}
 		}
 	}
-}
+	if (rlist) {
+		regionlist ** rbegin = &rlist;
+		int i;
+#define MINOCEANDIST 3
+		for (i=0;i!=MINOCEANDIST;++i) {
+			regionlist ** rend = rbegin;
+			while (*rend) rend=&(*rend)->next;
+			while (rbegin!=rend) {
+				direction_t d;
+				region * r = (*rbegin)->region;
+				rbegin=&(*rbegin)->next;
+				for (d=0;d!=MAXDIRECTIONS;++d) {
+					region * rn = rconnect(r, d);
+					if (rn==NULL) {
+						rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
+						terraform(rn, T_OCEAN);
+						add_regionlist(rend, rn);
+					}
+				}
+			}
 
+		}
+	}
+	return isize;
+}

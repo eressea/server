@@ -284,9 +284,9 @@ unit_max_hp(const unit * u)
 {
 	int h;
 	double p;
+	static const curse_type * heal_ct = NULL;
 	h = u->race->hitpoints;
-	static const curse_type * heal_ct;
-	heal_ct = ct_find("healingzone");
+	if (heal_ct==NULL) heal_ct = ct_find("healingzone");
 
 
 	p = pow(effskill(u, SK_AUSDAUER) / 2.0, 1.5) * 0.2;

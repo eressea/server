@@ -12,6 +12,7 @@
  */
 
 #define VERSION "3.3.0"
+#define ISLANDSIZE 20
 
 #define MAIN_C
 #define BOOL_DEFINED
@@ -1052,7 +1053,7 @@ movearound(int rx, int ry) {
 					modified = 1;
 					break;
 				case 'm':
-					mkisland(20);
+					mkisland(ISLANDSIZE);
 					modified = 1;
 					break;
 				case 'S':
@@ -1593,7 +1594,7 @@ main(int argc, char *argv[])
 	if (autoseeding) {
 		while (newfactions) {
 			int n = listlen(newfactions);
-			int k = (n+19)/20;
+			int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
 			k = n / k;
 			mkisland(k);
 		}

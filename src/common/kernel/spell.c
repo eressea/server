@@ -4955,6 +4955,7 @@ sp_depression(castorder *co)
 	return cast_level;
 }
 
+#if 0
 /* ------------------------------------------------------------- */
 /* Name:       Hoher Gesang der Drachen
  * Stufe:      14
@@ -4969,7 +4970,6 @@ sp_depression(castorder *co)
  *  (FARCASTING | REGIONSPELL | TESTRESISTANCE)
  */
 /* TODO zur Aktivierung in Zauberliste aufnehmen*/
-
 static int
 sp_dragonsong(castorder *co)
 {
@@ -5043,7 +5043,7 @@ sp_songofAttraction(castorder *co)
 	return cast_level;
 }
 
-
+#endif
 
 /* ------------------------------------------------------------- */
 /* TRAUM - Illaun */

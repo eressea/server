@@ -2427,8 +2427,8 @@ remove_empty_units_in_region(region *r)
 
 	while (*up) {
 		unit * u = *up;
-		faction * f = u->faction;
 #ifdef MAXAGE
+		faction * f = u->faction;
 		if (f->age > MAXAGE) set_number(u, 0);
 #endif
 		if ((u->number <= 0 && u->race != new_race[RC_SPELL])
