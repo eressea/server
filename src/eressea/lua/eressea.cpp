@@ -3,9 +3,6 @@
 
 #include "script.h"
 
-#ifdef ALLIANCES
-# include <modules/alliance.h>
-#endif
 #include <attributes/key.h>
 
 // gamecode includes
@@ -13,6 +10,7 @@
 #include <gamecode/monster.h>
 
 // kernel includes
+#include <kernel/alliance.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/plane.h>

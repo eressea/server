@@ -15,6 +15,5 @@
 void teaching(void);
 void learn(void);
 
-magic_t getmagicskill(void);
+extern magic_t getmagicskill(void);
 extern boolean is_migrant(struct unit *u);
-

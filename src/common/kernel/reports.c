@@ -887,8 +887,8 @@ get_addresses(faction * f)
 			u = u->next;
 		}
 	}
-#ifdef ALLIANCES
-	if(f->alliance != NULL) {
+
+  if (f->alliance != NULL) {
 		faction *f2;
 		for(f2 = factions; f2; f2 = f2->next) {
 			if(f2->alliance != NULL && f2->alliance == f->alliance) {
@@ -905,7 +905,6 @@ get_addresses(faction * f)
 			}
 		}
 	}
-#endif
   return flist;
 }
 

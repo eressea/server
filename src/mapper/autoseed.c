@@ -259,9 +259,7 @@ autoseed(struct region_list * rlist)
 			while (*nfp!=nf) nfp=&(*nfp)->next;
 			u = addplayer(seeds[i].region, addfaction(nf->email, nf->password, nf->race, 
         nf->lang, nf->subscription));
-#ifdef ALLIANCES
 			u->faction->alliance = nf->allies;
-#endif
 			++numnewbies;
 			*nfp = nf->next;
 			free(nf);
@@ -360,9 +358,7 @@ mkisland(int nsize)
 			++isize;
 			u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race, nextf->lang,
 				nextf->subscription));
-#ifdef ALLIANCES
 			u->faction->alliance = nextf->allies;
-#endif
 
 			/* remove duplicate email addresses */
 			nfp=&newfactions;

@@ -33,13 +33,15 @@ typedef enum combatmagic {
 #include "eressea.h"
 #include "battle.h"
 
-#include "item.h"
 #include "alchemy.h"
+#include "alliance.h"
 #include "build.h"
 #include "building.h"
 #include "curse.h"
 #include "faction.h"
 #include "goodies.h"
+#include "group.h"
+#include "item.h"
 #include "karma.h"
 #include "magic.h"
 #include "message.h"
@@ -54,7 +56,6 @@ typedef enum combatmagic {
 #include "skill.h"
 #include "spell.h"
 #include "unit.h"
-#include "group.h"
 
 /* attributes includes */
 #include <attributes/key.h>
@@ -65,11 +66,6 @@ typedef enum combatmagic {
 
 /* items includes */
 #include <items/demonseye.h>
-
-/* modules includes */
-#ifdef ALLIANCES
-#include <modules/alliance.h>
-#endif
 
 /* util includes */
 #include <base36.h>
@@ -354,14 +350,6 @@ set_enemy(side * as, side * ds, boolean attacking)
   if (attacking) as->enemy[ds->index] |= E_ATTACKING;
 }
 
-#ifdef ALLIANCES
-static int
-allysfm(const side * s, const faction * f, int mode)
-{
-	if (s->bf->faction==f) return true;
-	return alliedfaction(s->battle->plane, s->bf->faction, f, mode);
-}
-#else
 static int
 allysfm(const side * s, const faction * f, int mode)
 {
@@ -371,7 +359,6 @@ allysfm(const side * s, const faction * f, int mode)
   }
 	return alliedfaction(s->battle->plane, s->bf->faction, f, mode);
 }
-#endif
 
 static int
 allysf(const side * s, const faction * f)
@@ -2755,13 +2742,13 @@ print_stats(battle * b)
     buf[77] = (char)0;
     for (k = buf; *k; ++k) *k = '-';
     battlerecord(b, buf);
-    if(side->bf->faction) {
-#ifdef ALLIANCES
-      sprintf(buf, "##### %s (%s/%d)", side->bf->faction->name, itoa36(side->bf->faction->no),
-        side->bf->faction->alliance?side->bf->faction->alliance->id:0);
-#else
-      sprintf(buf, "##### %s (%s)", side->bf->faction->name, itoa36(side->bf->faction->no));
-#endif
+    if (side->bf->faction) {
+      if (side->bf->faction->alliance) {
+        sprintf(buf, "##### %s (%s/%d)", side->bf->faction->name, itoa36(side->bf->faction->no),
+          side->bf->faction->alliance?side->bf->faction->alliance->id:0);
+      } else {
+        sprintf(buf, "##### %s (%s)", side->bf->faction->name, itoa36(side->bf->faction->no));
+      }
       battledebug(buf);
     }
     print_fighters(b, &side->fighters);

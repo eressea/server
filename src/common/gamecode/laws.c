@@ -36,30 +36,31 @@
 #include "study.h"
 
 /* kernel includes */
-#include <alchemy.h>
-#include <battle.h>
-#include <border.h>
-#include <building.h>
-#include <faction.h>
-#include <group.h>
-#include <item.h>
-#include <karma.h>
-#include <magic.h>
-#include <message.h>
-#include <movement.h>
-#include <order.h>
-#include <plane.h>
-#include <pool.h>
-#include <race.h>
-#include <region.h>
-#include <resources.h>
-#include <save.h>
-#include <ship.h>
-#include <skill.h>
-#include <spy.h>
-#include <unit.h>
+#include <kernel/alchemy.h>
+#include <kernel/alliance.h>
+#include <kernel/battle.h>
+#include <kernel/border.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/group.h>
+#include <kernel/item.h>
+#include <kernel/karma.h>
+#include <kernel/magic.h>
+#include <kernel/message.h>
+#include <kernel/movement.h>
+#include <kernel/order.h>
+#include <kernel/plane.h>
+#include <kernel/pool.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/resources.h>
+#include <kernel/save.h>
+#include <kernel/ship.h>
+#include <kernel/skill.h>
+#include <kernel/spy.h>
+#include <kernel/unit.h>
 #ifdef USE_UGROUPS
-#  include <ugroup.h>
+#  include <kernel/ugroup.h>
 #endif
 
 /* attributes includes */
@@ -76,9 +77,6 @@
 #include <util/message.h>
 
 #include <modules/xecmd.h>
-#ifdef ALLIANCES
-#include <modules/alliance.h>
-#endif
 
 #ifdef AT_OPTION
 /* attributes includes */
@@ -1049,7 +1047,6 @@ inactivefaction(faction * f)
 	fclose(inactiveFILE);
 }
 
-#ifdef ENHANCED_QUIT
 static void
 transfer_faction(faction *f, faction *f2)
 {
@@ -1065,7 +1062,6 @@ transfer_faction(faction *f, faction *f2)
 		u = un;
 	}
 }
-#endif
 
 static int 
 restart(unit * u, struct order * ord)
@@ -1112,6 +1108,17 @@ restart(unit * u, struct order * ord)
   return 0;
 }
 
+static boolean
+EnhancedQuit()
+{
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "alliance.transferquit");
+    value = (str!=0 && strcmp(str, "true")==0);
+  }
+  return value;
+}
+
 static int 
 quit(unit * u, struct order * ord)
 {
@@ -1119,35 +1126,30 @@ quit(unit * u, struct order * ord)
   skip_token(); /* skip keyword */
 
   if (checkpasswd(u->faction, getstrtoken(), false)) {
-#ifdef ENHANCED_QUIT
-    int f2_id = getid();
+    if (EnhancedQuit()) {
+      int f2_id = getid();
 
-    if(f2_id > 0) {
-      faction *f2 = findfaction(f2_id);
-      faction * f = u->faction;
+      if (f2_id > 0) {
+        faction *f2 = findfaction(f2_id);
+        faction * f = u->faction;
 
-      if(f2 == NULL) {
-        cmistake(u, ord, 66, MSG_EVENT);
-      } else if(f == f2) {
-        cmistake(u, ord, 8, MSG_EVENT);
-#ifdef ALLIANCES
-      } else if(u->faction->alliance != f2->alliance) {
-        cmistake(u, ord, 315, MSG_EVENT);
-#else
-#error ENHANCED_QUIT defined without ALLIANCES
-#endif
-      } else if(!alliedfaction(NULL, f, f2, HELP_MONEY)) {
-        cmistake(u, ord, 316, MSG_EVENT);
+        if(f2 == NULL) {
+          cmistake(u, ord, 66, MSG_EVENT);
+        } else if(f == f2) {
+          cmistake(u, ord, 8, MSG_EVENT);
+        } else if (!u->faction->alliance || u->faction->alliance != f2->alliance) {
+          cmistake(u, ord, 315, MSG_EVENT);
+        } else if(!alliedfaction(NULL, f, f2, HELP_MONEY)) {
+          cmistake(u, ord, 316, MSG_EVENT);
+        } else {
+          transfer_faction(f,f2);
+          destroyfaction(f);
+        }
       } else {
-        transfer_faction(f,f2);
-        destroyfaction(f);
+        destroyfaction(u->faction);
       }
-    } else {
-      destroyfaction(u->faction);
     }
-#else
     destroyfaction(u->faction);
-#endif
     return -1;
   } else {
     cmistake(u, ord, 86, MSG_EVENT);
@@ -1237,7 +1239,7 @@ parse_quit(void)
         }
       }
     }
-#if defined(ALLIANCES) && !defined(ALLIANCEJOIN)
+#ifndef ALLIANCEJOIN
     if (f->alliance==NULL) {
       /* destroyfaction(f); */
       continue;
@@ -3539,9 +3541,12 @@ defaultorders (void)
       while (*ordp!=NULL) {
         order * ord = *ordp;
         if (get_keyword(ord)==K_DEFAULT) {
+          char * cmd;
           init_tokens(ord);
           skip_token(); /* skip the keyword */
-          set_order(&u->lastorder, parse_order(getstrtoken(), u->faction->locale));
+          cmd = strdup(getstrtoken());
+          set_order(&u->lastorder, parse_order(cmd, u->faction->locale));
+          free(cmd);
           free_order(u->lastorder); /* parse_order & set_order have both increased the refcount */
           *ordp = ord->next;
           ord->next = NULL;
@@ -3629,10 +3634,10 @@ processorders (void)
 	puts(" - Defaults und Instant-Befehle...");
 	setdefaults();
 	instant_orders();
-#ifdef ALLIANCES
-	alliancekick();
-#endif
-	parse(K_MAIL, mail_cmd, false);
+
+  if (alliances!=NULL) alliancekick();
+
+  parse(K_MAIL, mail_cmd, false);
 	puts(" - Altern");
 	age_factions();
 
@@ -3642,10 +3647,10 @@ processorders (void)
 	puts(" - Kontaktieren, Betreten von Schiffen und Gebäuden (1.Versuch)");
 	do_misc(false);
 
-#ifdef ALLIANCES
-	puts(" - Testen der Allianzbedingungen");
-	alliancevictory();
-#endif
+  if (alliances!=NULL) {
+    puts(" - Testen der Allianzbedingungen");
+    alliancevictory();
+  }
 
 	puts(" - GM Kommandos");
 #ifdef INFOCMD_MODULE

@@ -11,7 +11,7 @@
 */
 
 /*
- * Contains defines for the "alliance" vinyambar game (V3).
+ * Contains defines for the "alliance" vinyambar game (wdw).
  * Include this file from settings.h to make eressea work.
  */
 #define ENTERTAINFRACTION 20
@@ -30,24 +30,24 @@
 #define RECRUITFRACTION 40		/* 100/RECRUITFRACTION% */
 #define CATAPULT_AMMUNITION 1	/* Gebaut werden kann sie auch mit 0! */
 #define CHANGED_CROSSBOWS 1
-#define NEWATSROI 1
 #define COMBAT_TURNS 5
 #define PEASANTS_DO_NOT_STARVE 0
 #define NEW_MIGRATION 1
 #define ASTRAL_HUNGER
 
+#define NEWATSROI 1
 #if NEWATSROI == 1
 #define ATSBONUS 2
 #define ROIBONUS 4
 #endif
 
-#define ENHANCED_QUIT
-#define ALLIANCES
-#define ALLIES_ONLY (HELP_FIGHT|HELP_GUARD|HELP_FSTEALTH|HELP_MONEY)
 #undef  ALLIANCEJOIN
-#define ALLIANCE_LIMITS
-#define AUTOALLIANCE (HELP_FIGHT)
 
+#undef DUNGEON_MODULE
+#undef MUSEUM_MODULE
+#undef ARENA_MODULE
+#undef WORMHOLE_MODULE
+#undef XECMD_MODULE
 #define WDW_PHOENIX
 #define WDW_PYRAMIDSPELL
 #define NEW_STARTEQUIPMENT

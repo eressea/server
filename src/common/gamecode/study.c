@@ -55,17 +55,6 @@
 
 #define TEACHNUMBER 10
 
-static boolean
-ExpensiveMigrants(void)
-{
-  int value = -1;
-  if (value<0) {
-    const char * str = get_param(global.parameters, "study.expensivemigrants");
-    value = str?atoi(str):0;
-  }
-  return value;
-}
-
 static skill_t
 getskill(const struct locale * lang)
 {

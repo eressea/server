@@ -277,9 +277,7 @@ lua_init(void)
   luabind::open(luaState);
   bind_eressea(luaState);
   bind_spell(luaState);
-#ifdef ALLIANCES
   bind_alliance(luaState);
-#endif
   bind_region(luaState);
   bind_item(luaState);
   bind_faction(luaState);

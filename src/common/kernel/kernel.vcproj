@@ -298,6 +298,12 @@
 			RelativePath=".\alchemy.c">
 		</File>
 		<File
+			RelativePath=".\alliance.c">
+		</File>
+		<File
+			RelativePath=".\alliance.h">
+		</File>
+		<File
 			RelativePath=".\battle.c">
 		</File>
 		<File

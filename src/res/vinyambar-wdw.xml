@@ -25,7 +25,6 @@
     <param name="GiveRestriction" value="0"/>
     <param name="database.gameid" value="3"/>
     <param name="hunger.long" value="0"/>
-    <param name="allied.skilllimit" value="15"/>
     <param name="atsroi.ats" value="2"/>
     <param name="atsroi.roi" value="4"/>
     <param name="magic.regeneration" value="0.5"/>
@@ -33,6 +32,10 @@
     <param name="resource.factor" value="0.25"/>
     <param name="study.expensivemigrants" value="1"/>
     <param name="report.mailit" value="/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"/>
+    <param name="alliance.skilllimit" value="15"/>
+    <param name="alliance.restricted" value="fight guard stealth money"/>
+    <param name="alliance.auto" value="fight"/>
+    <param name="alliance.transferquit" value="true"/>
   </game>
 
   <xi:include href="vinyambar/wdw-strings.xml"/>

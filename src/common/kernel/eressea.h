@@ -88,11 +88,7 @@ struct building_type;
 #include <util/vset.h>
 
 #define AT_PERSISTENT
-#ifdef ALLIANCES
-# define ALLIED(f1, f2) (f1->alliance && f1->alliance==f2->alliance)
-#else
-# define ALLIED(f1, f2) (f1==f2)
-#endif
+#define ALLIED(f1, f2) (f1==f2 || (f1->alliance && f1->alliance==f2->alliance))
 
 /* eressea-defined attribute-type flags */
 #define ATF_CURSE  ATF_USER_DEFINED
@@ -167,16 +163,16 @@ struct building_type;
 #define DBLINK_VERSION 314
 #define CURSEVIGOURISFLOAT_VERSION 315
 #define SAVEXMLNAME_VERSION 316
-
-#define REGIONOWNERS_VERSION 317
+#define SAVEALLIANCE_VERSION 317
 
 #define MIN_VERSION ALLIANCES_VERSION
-#define UGROUPS_VERSION 400 /* nicht aktivieren, nicht fertig */
+#define REGIONOWNERS_VERSION 400
+#define UGROUPS_VERSION 500 /* nicht aktivieren, nicht fertig */
 
 #ifdef REGIONOWNERS
 # define RELEASE_VERSION REGIONOWNERS_VERSION
 #else
-# define RELEASE_VERSION SAVEXMLNAME_VERSION
+# define RELEASE_VERSION SAVEALLIANCE_VERSION
 #endif
 
 #if RESOURCE_CONVERSION
@@ -1173,12 +1169,14 @@ extern const char * dbrace(const struct race * rc);
 extern void set_param(struct param ** p, const char * name, const char * data);
 extern const char* get_param(const struct param * p, const char * name);
 
+extern boolean ExpensiveMigrants(void);
 extern int FirstTurn(void);
 extern int NMRTimeout(void);
 extern int LongHunger(void);
 extern boolean TradeDisabled(void);
 extern int SkillCap(skill_t sk);
-
+extern int AllianceAuto(void); /* flags that allied factions get automatically */
+extern int AllianceRestricted(void); /* flags restricted to allied factions */
 extern struct order * default_order(const struct locale * lang);
 extern int entertainmoney(const struct region * r);
 

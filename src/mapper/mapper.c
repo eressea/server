@@ -32,9 +32,6 @@
 
 #include <modules/gmcmd.h>
 #include <modules/xmas.h>
-#ifdef ALLIANCES
-#include <modules/alliance.h>
-#endif
 #ifdef MUSEUM_MODULE
 #include <modules/museum.h>
 #endif
@@ -46,20 +43,21 @@
 #endif
 
 /* kernel includes */
-#include <kernel/xmlreader.h>
+#include <kernel/alliance.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/plane.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/reports.h>
+#include <kernel/resources.h>
+#include <kernel/save.h>
+#include <kernel/ship.h>
 #include <kernel/spell.h>
-#include <item.h>
-#include <faction.h>
-#include <race.h>
-#include <region.h>
-#include <reports.h>
-#include <save.h>
-#include <ship.h>
-#include <unit.h>
-#include <plane.h>
-#include <teleport.h>
-#include <resources.h>
-#include <building.h>
+#include <kernel/teleport.h>
+#include <kernel/unit.h>
+#include <kernel/xmlreader.h>
 
 /* util includes */
 #include <base36.h>
@@ -189,9 +187,7 @@ init_win(int x, int y) {
 /* --------------------------------------------------------------------- */
 
 static int hl;
-#ifdef ALLIANCES
 static int hl_alliance;
-#endif
 
 int politkarte = 0;
 
@@ -316,7 +312,6 @@ factionhere(region * r, int f)
 	return false;
 }
 
-#ifdef ALLIANCES
 static boolean
 alliancehere(region * r, int allied)
 {
@@ -326,7 +321,6 @@ alliancehere(region * r, int allied)
 			return true;
 	return false;
 }
-#endif
 
 #if NEW_RESOURCEGROWTH
 static boolean
@@ -397,9 +391,7 @@ highlight_region(region *r)
 			(hl == -8 && get_curse(r->attribs, ct_find("godcursezone"))) ||
 			(hl == -9 && newbie_region(r)) ||
 			(hl == -10 && dropout_region(r)) ||
-#ifdef ALLIANCES
 			(hl == -11 && alliancehere(r, hl_alliance)) ||
-#endif
 			(hl >= 0 && factionhere(r, hl))) {
 		return true;
 	}
@@ -453,11 +445,9 @@ drawmap(boolean maponly) {
 				case -10:
 					addstr("Dropouts ");
 					break;
-#ifdef ALLIANCES
 				case -11:
 					printw((NCURSES_CONST char*)"Allianz %d ", hl_alliance);
 					break;
-#endif
 				default:
 					printw((NCURSES_CONST char*)"Partei %d ", hl);
 			}
@@ -773,11 +763,7 @@ SetHighlight(void)
 	wmove(win, 2, 2);
 	wAddstr("             A)nfängern, L)aen, C)haos, G)odcurse");
 	wmove(win, 3, 2);
-#ifdef ALLIANCES
 	wAddstr("             D)ropouts, Allian(Z) oder N)ichts?");
-#else
-	wAddstr("             D)ropouts oder N)ichts?");
-#endif
 	wrefresh(win);
 	c = tolower(getch());
 	switch (c) {
@@ -785,12 +771,10 @@ SetHighlight(void)
 		fac_nr36 = my_input(win, 2, 2, "Partei-Nummer: ", NULL);
 		hl = atoi36(fac_nr36);
 		break;
-#ifdef ALLIANCES
 	case 'z':
 		hl_alliance = map_input(win, 2, 2, "Allianz-Nummer: ", 0, 999, 0);
 		hl = -11;
 		break;
-#endif
 	case 'e':
 		hl = -2;
 		break;

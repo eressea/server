@@ -40,9 +40,4 @@
 #define ROIBONUS 4
 #endif
 
-#define ENHANCED_QUIT
-#define ALLIANCES
-#undef  ALLIANCEJOIN
-#define AUTOALLIANCE (HELP_FIGHT)
-
 #define MAILITPATH	"/usr/sbin:$HOME/bin:/bin:/usr/bin:/usr/local/bin"

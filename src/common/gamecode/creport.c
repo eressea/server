@@ -22,9 +22,6 @@
 
 /* modules include */
 #include <modules/score.h>
-#ifdef ALLIANCES
-#include <modules/alliance.h>
-#endif
 
 /* attributes include */
 #include <attributes/follow.h>
@@ -39,6 +36,7 @@
 
 /* kernel includes */
 #include <kernel/alchemy.h>
+#include <kernel/alliance.h>
 #include <kernel/border.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -353,7 +351,6 @@ cr_race(const void * v, char * buffer, const void * userdata)
 	return 0;
 }
 
-#ifdef ALLIANCES
 static int
 cr_alliance(const void * v, char * buffer, const void * userdata)
 {
@@ -364,7 +361,6 @@ cr_alliance(const void * v, char * buffer, const void * userdata)
 	unused(userdata);
 	return 0;
 }
-#endif
 
 static int
 cr_skill(const void * v, char * buffer, const void * userdata)
@@ -416,9 +412,7 @@ creport_init(void)
   tsf_register("resource", &cr_resource);
   tsf_register("race", &cr_race);
   tsf_register("direction", &cr_int);
-#ifdef ALLIANCES
   tsf_register("alliance", &cr_alliance);
-#endif
 }
 
 void
@@ -898,12 +892,10 @@ cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
 			fprintf(F, "\"%s\";Parteiname\n", f->name);
 			fprintf(F, "\"%s\";email\n", f->email);
 			fprintf(F, "\"%s\";banner\n", f->banner);
-#ifdef ALLIANCES
 			if (f->alliance!=NULL && f->alliance==uf->alliance) {
 				fprintf(F, "%d;alliance\n", f->alliance->id);
 				fprintf(F, "\"%s\";alliancename\n", f->alliance->name);
 			}
-#endif
 #ifdef SHORTPWDS
       if (f->shortpwds) {
         shortpwd * spwd = f->shortpwds;

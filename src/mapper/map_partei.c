@@ -20,21 +20,17 @@
 #include "autoseed.h"
 
 /* kernel includes */
-#include <faction.h>
-#include <item.h>
-#include <plane.h>
-#include <race.h>
-#include <region.h>
-#include <reports.h>
-#include <save.h>
-#include <study.h>
-#include <skill.h>
-#include <unit.h>
-
-/* modules */
-#ifdef ALLIANCES
-#include <modules/alliance.h>
-#endif
+#include <kernel/alliance.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/plane.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/reports.h>
+#include <kernel/save.h>
+#include <kernel/skill.h>
+#include <kernel/study.h>
+#include <kernel/unit.h>
 
 /* util includes */
 #include <base36.h>
@@ -211,9 +207,7 @@ seed_dropouts(void)
 				if (nf->race==drop->race && !nf->bonus) {
 					unit * u = addplayer(r, addfaction(nf->email, nf->password, nf->race, nf->lang,
 						nf->subscription));
-#ifdef ALLIANCES
 					u->faction->alliance = nf->allies;
-#endif
 					++numnewbies;
 					if (nf->bonus) give_latestart_bonus(r, u, nf->bonus);
 					found=true;
@@ -241,14 +235,15 @@ read_newfactions(const char * filename)
 		char race[20], email[64], lang[8], password[16];
 		newfaction *nf;
 		int bonus, subscription;
-#ifdef ALLIANCES
-		int alliance;
-		/* email;race;locale;startbonus;subscription;alliance */
-		if (fscanf(F, "%s %s %s %d %d %s %d", email, race, lang, &bonus, &subscription, password, &alliance)<=0) break;
-#else
-		/* email;race;locale;startbonus;subscription */
-		if (fscanf(F, "%s %s %s %d %d %s", email, race, lang, &bonus, &subscription, password)<=0) break;
-#endif
+
+    if (alliances!=NULL) {
+      int alliance;
+      /* email;race;locale;startbonus;subscription;alliance */
+      if (fscanf(F, "%s %s %s %d %d %s %d", email, race, lang, &bonus, &subscription, password, &alliance)<=0) break;
+    } else {
+      /* email;race;locale;startbonus;subscription */
+      if (fscanf(F, "%s %s %s %d %d %s", email, race, lang, &bonus, &subscription, password)<=0) break;
+    }
 		while (f) {
 			if (strcmp(f->email, email)==0 && f->subscription) {
 				break;
@@ -265,8 +260,7 @@ read_newfactions(const char * filename)
 		nf->password = strdup(password);
 		nf->race = rc_find(race);
 		nf->subscription = subscription;
-#ifdef ALLIANCES
-		{
+		if (alliances!=NULL) {
 			struct alliance * al = findalliance(alliance);
 			if (al==NULL) {
 				char zText[64];
@@ -274,8 +268,9 @@ read_newfactions(const char * filename)
 				al = makealliance(alliance, zText);
 			}
 			nf->allies = al;
-		}
-#endif
+    } else {
+      nf->allies = NULL;
+    }
 		if (nf->race==NULL) nf->race = findrace(race, default_locale);
 		nf->lang = find_locale(lang);
 		nf->bonus = bonus;
@@ -301,11 +296,11 @@ select_newfaction(const struct race * rc)
 	while (player) {
 		if (rc==NULL || player->race==rc) {
 			char str[80];
-#ifdef ALLIANCES
-			snprintf(str, 70, "%s %d %s %s", player->bonus?"!":" ", player->allies?player->allies->id:0, locale_string(default_locale, rc_name(player->race, 0)), player->email);
-#else
-			snprintf(str, 70, "%s %s %s", player->bonus?"!":" ", locale_string(default_locale, rc_name(player->race, 0)), player->email);
-#endif
+      if (alliances!=NULL) {
+        snprintf(str, 70, "%s %d %s %s", player->bonus?"!":" ", player->allies?player->allies->id:0, locale_string(default_locale, rc_name(player->race, 0)), player->email);
+      } else {
+        snprintf(str, 70, "%s %s %s", player->bonus?"!":" ", locale_string(default_locale, rc_name(player->race, 0)), player->email);
+      }
 			insert_selection(iinsert, prev, strdup(str), (void*)player);
 			prev = *iinsert;
 			iinsert = &prev->next;

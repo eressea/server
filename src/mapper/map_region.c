@@ -19,21 +19,19 @@
 #include "mapper.h"
 
 /* kernel includes */
-#include <building.h>
-#include <faction.h>
-#include <plane.h>
-#include <race.h>
-#include <region.h>
-#include <ship.h>
-#include <unit.h>
-#include <curse.h>
-#include <resources.h>
-#include <item.h>
+#include <kernel/alliance.h>
+#include <kernel/building.h>
+#include <kernel/curse.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/plane.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/resources.h>
+#include <kernel/ship.h>
+#include <kernel/unit.h>
 
 /* modules includes */
-#ifdef ALLIANCES
-# include <modules/alliance.h>
-#endif
 
 /* util includes */
 #include <base36.h>
@@ -370,15 +368,13 @@ showregion(region * r, char full)
 		}
 		for (f = factions; f; f = f->next)
 			if (f->no_units) {
-#ifdef ALLIANCES
-				if(f->alliance != NULL) {
-					sprintf(buf, " %-26.26s (%s/%d)", f->name, factionid(f), f->alliance->id);
-				} else {
-					sprintf(buf, " %-26.26s (%s/-)", f->name, factionid(f));
-				}
-#else
-				sprintf(buf, " %-29.29s (%s)", f->name, factionid(f));
-#endif
+        if (alliances==NULL) {
+          sprintf(buf, " %-29.29s (%s)", f->name, factionid(f));
+        } else if (f->alliance != NULL) {
+          sprintf(buf, " %-26.26s (%s/%d)", f->name, factionid(f), f->alliance->id);
+        } else {
+          sprintf(buf, " %-26.26s (%s/-)", f->name, factionid(f));
+        }
 				adddbllist(&reglist, buf);
 				sprintf(buf, "  Einheiten: %d; Leute: %d %c",
 				   f->no_units, f->num_people, Tchar[old_race(f->race)]);

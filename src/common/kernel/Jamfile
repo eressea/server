@@ -8,6 +8,7 @@ SubDirHdrs $(XMLHDRS) ;
 
 SOURCES =
  alchemy.c
+ alliance.c
  battle.c
  border.c
  build.c

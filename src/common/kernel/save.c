@@ -22,6 +22,7 @@
 #include "eressea.h"
 #include "save.h"
 
+#include "alliance.h"
 #include "alchemy.h"
 #include "attrib.h"
 #include "border.h"
@@ -48,11 +49,6 @@
 #ifdef USE_UGROUPS
 #include "ugroup.h"
 #include <attributes/ugroup.h>
-#endif
-
-/* modules include */
-#ifdef ALLIANCES
-# include <modules/alliance.h>
 #endif
 
 /* attributes includes */
@@ -792,19 +788,22 @@ read_ugroups(FILE *file)
 }
 #endif
 
-#ifdef ALLIANCES
-void
+static void
 read_alliances(FILE * F)
 {
-	char pbuf[32];
-	rs(F, pbuf);
+  char pbuf[32];
+
+  if (global.data_version<SAVEALLIANCE_VERSION) {
+    if (!AllianceRestricted() && !AllianceAuto()) return;
+  }
+
+  rs(F, pbuf);
 	while (strcmp(pbuf, "end")!=0) {
 		rs(F, buf);
 		makealliance(atoi36(pbuf), buf);
 		rs(F, pbuf);
 	}
 }
-#endif
 
 #define wc(F, c) putc(c, F);
 #define wnl(F) putc('\n', F);
@@ -839,7 +838,6 @@ wi36(FILE * F, int n)
 	fprintf(F, "%s ", itoa36(n));
 }
 
-#ifdef ALLIANCES
 void
 write_alliances(FILE * F)
 {
@@ -853,7 +851,6 @@ write_alliances(FILE * F)
 	fprintf(F, "end ");
 	wnl(F);
 }
-#endif
 
 void
 write_items(FILE *F, item *ilist)
@@ -1472,13 +1469,10 @@ addally(const faction * f, ally ** sfp, int aid, int state)
 #ifndef REGIONOWNERS
   state &= ~HELP_TRAVEL;
 #endif
-#ifdef ALLIANCES
-# ifdef ALLIES_ONLY
-  if (af!=NULL && af->alliance!=f->alliance) state &= ~ALLIES_ONLY;;
-# else
-# endif
-  if (af!=NULL && af->alliance!=f->alliance) return sfp;
-#endif
+
+  if (af==NULL) return sfp;
+  if (f->alliance==NULL || f->alliance!=af->alliance) state &= ~AllianceRestricted();
+  if (f->alliance==NULL || f->alliance==af->alliance) state |= AllianceAuto();
   if (state==0) return sfp;
 
   sf = calloc(1, sizeof(ally));
@@ -1513,8 +1507,8 @@ readfaction(FILE * F)
     while (f->attribs) a_remove(&f->attribs, f->attribs);
   }
   f->subscription = ri(F);
-#ifdef ALLIANCES
-  if (global.data_version>=ALLIANCES_VERSION) {
+
+  if (alliances!=NULL) {
     int allianceid = rid(F);
     if (allianceid!=0) f->alliance = findalliance(allianceid);
     if (f->alliance) {
@@ -1524,7 +1518,6 @@ readfaction(FILE * F)
       f->alliance->members = flist;
     }
   }
-#endif
 
   rds(F, &f->name);
 
@@ -1641,10 +1634,10 @@ writefaction(FILE * F, const faction * f)
 
 	wi36(F, f->no);
 	wi(F, f->subscription);
-#if defined(ALLIANCES) && RELEASE_VERSION>=ALLIANCES_VERSION
-	if (f->alliance) wi36(F, f->alliance->id);
-	else wi36(F, 0);
-#endif
+  if (alliances!=NULL) {
+    if (f->alliance) wi36(F, f->alliance->id);
+    else wi36(F, 0);
+  }
 
 	ws(F, f->name);
 	ws(F, f->banner);
@@ -1782,11 +1775,9 @@ readgame(const char * filename, int backup)
   }
 
   /* Read factions */
-#ifdef ALLIANCES
   if (global.data_version>=ALLIANCES_VERSION) {
     read_alliances(F);
   }
-#endif
   n = ri(F);
   printf(" - Einzulesende Parteien: %d\n", n);
   fp = &factions;
@@ -2076,10 +2067,10 @@ writegame(const char *filename, char quiet)
 
 
   /* Write factions */
-#if defined(ALLIANCES) && RELEASE_VERSION>=ALLIANCES_VERSION
+#if RELEASE_VERSION>=ALLIANCES_VERSION
   write_alliances(F);
 #endif
-  n=listlen(factions);
+  n = listlen(factions);
   wi(F, n);
   wnl(F);
 

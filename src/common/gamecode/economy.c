@@ -2559,12 +2559,10 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
 		return;
 	}
 
-#ifdef ALLIANCES
-	if(u->faction->alliance == u2->faction->alliance) {
+	if (u->faction->alliance!=NULL && u->faction->alliance == u2->faction->alliance) {
 		cmistake(u, ord, 47, MSG_INCOME);
 		return;
 	}
-#endif
 
 	assert(u->region==u2->region);
 	if (!can_contact(r, u, u2)) {

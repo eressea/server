@@ -30,16 +30,13 @@
 #define RECRUITFRACTION 40		/* 100/RECRUITFRACTION% */
 #define CATAPULT_AMMUNITION 1	/* Gebaut werden kann sie auch mit 0! */
 #define CHANGED_CROSSBOWS 1
-#define NEWATSROI 0
 #define COMBAT_TURNS 5
 #define PEASANTS_DO_NOT_STARVE 0
 #define NEW_MIGRATION 1
 #define ASTRAL_HUNGER
-#undef SHORTPWDS
 
-#define ZEROFOKS_QUESTMASTER "eressea@zerofoks.net"
+#define NEWATSROI 0
 
-#undef DUNGEON_MODULE
 #define MUSEUM_MODULE
 #define ARENA_MODULE
 #define WORMHOLE_MODULE

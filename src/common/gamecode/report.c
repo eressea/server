@@ -19,9 +19,6 @@
 
 /* modules includes */
 #include <modules/score.h>
-#ifdef ALLIANCES
-#include <modules/alliance.h>
-#endif
 
 /* attributes includes */
 #include <attributes/overrideroads.h>
@@ -39,6 +36,7 @@
 
 /* kernel includes */
 #include <kernel/alchemy.h>
+#include <kernel/alliance.h>
 #include <kernel/border.h>
 #include <kernel/build.h>
 #include <kernel/building.h>
@@ -1675,17 +1673,11 @@ show_allies(const faction * f, const ally * allies)
 	const ally * sf;
 	for (sf = allies; sf; sf = sf->next) {
 		int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
-#ifdef ALLIANCES
-		if (f->alliance!=sf->faction->alliance) continue;
-#endif
 		if (mode > 0) ++allierte;
 	}
 
 	for (sf = allies; sf; sf = sf->next) {
 		int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
-#ifdef ALLIANCES
-		if (f->alliance!=sf->faction->alliance) continue;
-#endif
 		if (mode <= 0) continue;
 		i++;
 		if (dh) {
@@ -2001,11 +1993,9 @@ report(FILE *F, faction * f, const faction_list * addresses,
 			LOC(f->locale, rc_name(f->race, 1)), neue_gebiete[f->magiegebiet],
 			f->email);
 	centre(F, buf, true);
-#ifdef ALLIANCES
 	if (f->alliance!=NULL) {
 		centre(F, alliancename(f->alliance), true);
 	}
-#endif
 
 	buf[0] = 0;
 	dh = 0;
@@ -3267,18 +3257,18 @@ writeturn(void)
 static void
 out_faction(FILE *file, faction *f)
 {
-#ifdef ALLIANCES
- 	fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
-		f->name, itoa36(f->no), f->alliance?f->alliance->id:0,
-		LOC(default_locale, rc_name(f->race, 0)), neue_gebiete[f->magiegebiet],
-		f->no_units, f->number, f->money, turn - f->lastorders,
-		turn - f->lastorders != 1 ? "NMRs" : "NMR ");
-#else
- 	fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
-		factionname(f), LOC(default_locale, rc_name(f->race, 0)),
-		neue_gebiete[f->magiegebiet], f->no_units, f->number, f->money,
-		turn - f->lastorders, turn - f->lastorders != 1 ? "NMRs" : "NMR ");
-#endif
+  if (alliances!=NULL) {
+    fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
+      f->name, itoa36(f->no), f->alliance?f->alliance->id:0,
+      LOC(default_locale, rc_name(f->race, 0)), neue_gebiete[f->magiegebiet],
+      f->no_units, f->number, f->money, turn - f->lastorders,
+      turn - f->lastorders != 1 ? "NMRs" : "NMR ");
+  } else {
+ 	  fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
+		  factionname(f), LOC(default_locale, rc_name(f->race, 0)),
+		  neue_gebiete[f->magiegebiet], f->no_units, f->number, f->money,
+		  turn - f->lastorders, turn - f->lastorders != 1 ? "NMRs" : "NMR ");
+  }
 }
 
 void
@@ -3505,7 +3495,6 @@ eval_faction(struct opstack ** stack, const void * userdata) /* faction -> strin
 	opush(stack, strcpy(balloc(len+1), c));
 }
 
-#ifdef ALLIANCES
 static void
 eval_alliance(struct opstack ** stack, const void * userdata) /* faction -> string */
 {
@@ -3517,7 +3506,6 @@ eval_alliance(struct opstack ** stack, const void * userdata) /* faction -> stri
 	}
 	else opush(stack, NULL);
 }
-#endif
 
 static void
 eval_region(struct opstack ** stack, const void * userdata) /* region -> string */
@@ -3614,9 +3602,7 @@ eval_int36(struct opstack ** stack, const void * userdata)
 void
 report_init(void)
 {
-#ifdef ALLIANCES
 	add_function("alliance", &eval_alliance);
-#endif
 	add_function("region", &eval_region);
 	add_function("resource", &eval_resource);
 	add_function("race", &eval_race);

@@ -23,9 +23,6 @@
 
 /* modules includes */
 #include <modules/xecmd.h>
-#ifdef ALLIANCES
-# include <modules/alliance.h>
-#endif
 
 /* attributes includes */
 #include <attributes/reduceproduction.h>
@@ -34,6 +31,7 @@
 #include <attributes/gm.h>
 
 /* kernel includes */
+#include "alliance.h"
 #include "alchemy.h"
 #include "battle.h"
 #include "border.h"
@@ -114,6 +112,69 @@ MaxAge(void) {
   if (value<0) {
     const char * str = get_param(global.parameters, "MaxAge");
     value = str?atoi(str):0;
+  }
+  return value;
+}
+
+
+static int
+ally_flag(const char * s)
+{
+  if (strcmp(s, "money")==0) return HELP_MONEY;
+  if (strcmp(s, "fight")==0) return HELP_FIGHT;
+  if (strcmp(s, "observe")==0) return HELP_OBSERVE;
+  if (strcmp(s, "give")==0) return HELP_GIVE;
+  if (strcmp(s, "guard")==0) return HELP_GUARD;
+  if (strcmp(s, "stealth")==0) return HELP_FSTEALTH;
+  if (strcmp(s, "travel")==0) return HELP_TRAVEL;
+  return 0;
+}
+
+boolean
+ExpensiveMigrants(void)
+{
+  int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "study.expensivemigrants");
+    value = str?atoi(str):0;
+  }
+  return value;
+}
+
+int 
+AllianceAuto(void)
+{
+  static int value = -1;
+  if (value<0) {
+    char * str = strdup(get_param(global.parameters, "alliance.auto"));
+    value = 0;
+    if (str!=NULL) {
+      char * tok = strtok(str, " ");
+      while (tok) {
+        value |= ally_flag(tok);
+        tok = strtok(NULL, " ");
+      }
+      free(str);
+    }
+  }
+  return value;
+}
+
+int 
+AllianceRestricted(void)
+{
+  static int value = -1;
+  if (value<0) {
+    char * str = strdup(get_param(global.parameters, "alliance.restricted"));
+    value = 0;
+    if (str!=NULL) {
+      char * tok = strtok(str, " ");
+      while (tok) {
+        value |= ally_flag(tok);
+        tok = strtok(NULL, " ");
+      }
+      free(str);
+    }
   }
   return value;
 }
@@ -378,8 +439,7 @@ const char *options[MAXOPTIONS] =
 	"SHOWSKCHANGE"
 };
 
-#ifdef ALLIANCE_LIMITS
-int 
+static int 
 allied_skillcount(const faction * f, skill_t sk)
 {
   int num = 0;
@@ -392,29 +452,33 @@ allied_skillcount(const faction * f, skill_t sk)
   return num;
 }
 
-int 
+static int 
 allied_skilllimit(const faction * f, skill_t sk)
 {
-  const char * str = get_param(global.parameters, "allied.skilllimit");
-  return str?atoi(str):0;
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "alliance.skilllimit");
+    value = str?atoi(str):0;
+  }
+  return value;
 }
-#endif
 
 int
 max_skill(faction * f, skill_t sk)
 {
   int m = INT_MAX;
-#ifdef ALLIANCE_LIMITS
-  if (sk!=SK_ALCHEMY && sk!=SK_MAGIC) return INT_MAX;
-  if (f->alliance!=NULL) {
-    int ac = listlen(f->alliance->members); /* number of factions */
-    int al = allied_skilllimit(f, sk); /* limit per alliance */
-    int fl = (al+ac-1)/ac; /* faction limit */
-    int sc = al - allied_skillcount(f, sk);
-    if (sc==0) return count_skill(f, sk);
-    return fl;
+
+  if (allied_skilllimit(f, sk)) {
+    if (sk!=SK_ALCHEMY && sk!=SK_MAGIC) return INT_MAX;
+    if (f->alliance!=NULL) {
+      int ac = listlen(f->alliance->members); /* number of factions */
+      int al = allied_skilllimit(f, sk); /* limit per alliance */
+      int fl = (al+ac-1)/ac; /* faction limit */
+      int sc = al - allied_skillcount(f, sk);
+      if (sc==0) return count_skill(f, sk);
+      return fl;
+    }
   }
-#endif
 	switch (sk) {
 	case SK_MAGIC:
 		m = MAXMAGICIANS;
@@ -855,9 +919,10 @@ autoalliance(const plane * pl, const faction * sf, const faction * f2)
       a=a->next;
     }
   }
-#ifdef AUTOALLIANCE
-	if (sf->alliance==f2->alliance) return AUTOALLIANCE;
-#endif
+
+  if (sf->alliance && AllianceAuto()) {
+    if (sf->alliance==f2->alliance) return AllianceAuto();
+  }
 
 	return 0;
 }
@@ -878,15 +943,9 @@ alliedgroup(const struct plane * pl, const struct faction * f,
     mode = mode & autoalliance(pl, f, f2);
   }
   mode = ally_mode(sf, mode) | (mode & autoalliance(pl, f, f2));
-#ifdef ALLIANCES
-  if (f->alliance!=f2->alliance) {
-# ifdef ALLIES_ONLY
-    mode &= ~ALLIES_ONLY;
-# else
-	  mode = 0;
-# endif
+  if (AllianceRestricted() && f->alliance!=f2->alliance) {
+    mode &= ~AllianceRestricted();
   }
-#endif
   return mode;
 }
 

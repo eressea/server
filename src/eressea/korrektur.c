@@ -26,37 +26,35 @@
 #include <items/questkeys.h>
 #include <items/catapultammo.h>
 #include <modules/xecmd.h>
-#ifdef ALLIANCES
-#include <modules/alliance.h>
-#endif
 
 /* gamecode includes */
-#include <economy.h>
+#include <gamecode/economy.h>
+#include <gamecode/monster.h>
 
 /* kernel includes */
-#include <border.h>
-#include <building.h>
-#include <ship.h>
-#include <faction.h>
-#include <item.h>
-#include <magic.h>
-#include <message.h>
-#include <monster.h>
-#include <movement.h>
-#include <names.h>
-#include <pathfinder.h>
-#include <plane.h>
-#include <pool.h>
-#include <race.h>
-#include <region.h>
-#include <reports.h>
-#include <resources.h>
-#include <skill.h>
-#include <teleport.h>
-#include <unit.h>
-#include <spell.h>
-#include <alchemy.h>
-#include <study.h>
+#include <kernel/alchemy.h>
+#include <kernel/alliance.h>
+#include <kernel/border.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/magic.h>
+#include <kernel/message.h>
+#include <kernel/movement.h>
+#include <kernel/names.h>
+#include <kernel/pathfinder.h>
+#include <kernel/plane.h>
+#include <kernel/pool.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/reports.h>
+#include <kernel/resources.h>
+#include <kernel/ship.h>
+#include <kernel/skill.h>
+#include <kernel/spell.h>
+#include <kernel/study.h>
+#include <kernel/teleport.h>
+#include <kernel/unit.h>
 
 /* util includes */
 #include <attrib.h>
@@ -224,29 +222,29 @@ kor_teure_talente(unit *u)
 static void
 no_teurefremde(boolean convert)
 {
-	region *r;
-	unit *u;
+  region *r;
 
-	for(r=regions;r;r=r->next) {
-		for(u=r->units;u;u=u->next) {
-			if (u->faction->no != MONSTER_FACTION
-				&& playerrace(u->faction->race)
-					&& is_migrant(u)
-					&& kor_teure_talente(u))
-			{
-				log_printf("* Warnung, teurer Migrant: %s %s\n",
-						unitname(u), factionname(u->faction));
-				if(convert) {
-					u->race = u->faction->race;
-					u->irace = u->faction->race;
-					u->faction->num_migrants -= u->number;
-					sprintf(buf, "Die Götter segnen %s mit der richtigen Rasse",
-							unitname(u));
-					addmessage(0, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
-				}
-			}
-		}
-	}
+  for(r=regions;r;r=r->next) {
+    unit *u;
+
+    for(u=r->units;u;u=u->next) {
+      if (u->faction->no != MONSTER_FACTION
+        && playerrace(u->faction->race)
+        && is_migrant(u) && kor_teure_talente(u))
+      {
+        log_warning(("Teurer Migrant: %s, Partei %s\n",
+          unitname(u), factionname(u->faction)));
+        if (convert) {
+          u->race = u->faction->race;
+          u->irace = u->faction->race;
+          u->faction->num_migrants -= u->number;
+          sprintf(buf, "Die Götter segnen %s mit der richtigen Rasse",
+            unitname(u));
+          addmessage(0, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
+        }
+      }
+    }
+  }
 }
 
 attrib_type at_roadfix = {
@@ -1166,12 +1164,10 @@ korrektur(void)
 	update_gms();
 	verify_owners(false);
 	/* fix_herbtypes(); */
-	/* In Vin3 können Parteien komplett übergeben werden. */
-#ifdef ENHANCED_QUIT
-	no_teurefremde(0);
-#else
-	no_teurefremde(1);
-#endif
+	/* In Vin 3+ können Parteien komplett übergeben werden. */
+  if (!ExpensiveMigrants()) {
+    no_teurefremde(true);
+  }
 	fix_allies();
 	update_gmquests(); /* test gm quests */
 	/* fix_unitrefs(); */
@@ -1179,9 +1175,6 @@ korrektur(void)
 	warn_password();
 	fix_road_borders();
 	if (turn>1000) curse_emptiness(); /*** disabled ***/
-#ifdef ALLIANCES
-	/* init_alliances(); */
-#endif
 	/* seems something fishy is going on, do this just
 	 * to be on the safe side:
 	 */

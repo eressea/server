@@ -22,11 +22,8 @@
 #include <config.h>
 #include "eressea.h"
 
-#ifdef ALLIANCES
-#include "alliance.h"
-#endif
-
 /* kernel includes */
+#include <kernel/alliance.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -255,8 +252,7 @@ score(void)
 	}
 	fclose(scoreFP);
 
-#ifdef ALLIANCES
-	{
+	if (alliances!=NULL) {
 		alliance *a;
     const item_type * token = it_find("conquesttoken");
 
@@ -292,7 +288,6 @@ score(void)
 		}
 		fclose(scoreFP);
 	}
-#endif
 
 }
 

@@ -25,9 +25,7 @@ typedef struct newfaction {
 	int bonus;
 	int subscription;
 	boolean oldregions;
-#ifdef ALLIANCES
 	struct alliance * allies;
-#endif
 } newfaction;
 
 extern newfaction * newfactions;

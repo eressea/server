@@ -121,9 +121,6 @@
 			Name="Header"
 			Filter="*.h">
 			<File
-				RelativePath=".\alliance.h">
-			</File>
-			<File
 				RelativePath=".\arena.h">
 			</File>
 			<File
@@ -154,9 +151,6 @@
 				RelativePath=".\xmas.h">
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\alliance.c">
-		</File>
 		<File
 			RelativePath=".\arena.c">
 		</File>

@@ -943,7 +943,7 @@ item_modification(const unit *u, skill_t sk, int val)
 		val = val * 2;
 	} else if(sk == SK_STEALTH) {
 #if NEWATSROI == 1
-		if(get_item(u, I_RING_OF_INVISIBILITY)
+		if (get_item(u, I_RING_OF_INVISIBILITY)
 				+ 100 * get_item(u, I_SPHERE_OF_INVISIBILITY) >= u->number) {
 			val += ROIBONUS;
 		}

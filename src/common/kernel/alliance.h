@@ -11,15 +11,12 @@
  * This program may not be used, modified or distributed without
  * prior permission by the authors of Eressea.
  */
-#ifndef H_MOD_ALLIANCE
-#define H_MOD_ALLIANCE
+#ifndef H_KRNL_ALLIANCE
+#define H_KRNL_ALLIANCE
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef ALLIANCES
-#error "must define ALLIANCES to use this module"
-#endif
 struct plane;
 struct attrib;
 struct unit;

@@ -11,11 +11,8 @@
 */
 
 #include <config.h>
-#include <eressea.h>
-
-#ifdef ALLIANCES
+#include "eressea.h"
 #include "alliance.h"
-#include "command.h"
 
 #include <attributes/key.h>
 
@@ -29,8 +26,9 @@
 #include <kernel/item.h>
 
 /* util includes */
-#include <umlaut.h>
-#include <base36.h>
+#include <util/command.h>
+#include <util/umlaut.h>
+#include <util/base36.h>
 
 /* libc includes */
 #include <assert.h>
@@ -329,6 +327,3 @@ victorycondition(const alliance * al, const char * name)
   }
   return -1;
 }
-
-
-#endif

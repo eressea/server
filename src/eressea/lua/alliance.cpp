@@ -1,13 +1,12 @@
 #include <config.h>
 #include <eressea.h>
 
-#ifdef ALLIANCES
 #include "list.h"
 
 // kernel includes
 #include <kernel/region.h>
 #include <kernel/faction.h>
-#include <modules/alliance.h>
+#include <kernel/alliance.h>
 
 // lua includes
 #include <lua.hpp>
@@ -53,4 +52,3 @@ bind_alliance(lua_State * L)
     .property("factions", &alliance_factions, return_stl_iterator)
   ];
 }
-#endif
