@@ -27,6 +27,7 @@
 #include "region.h"
 #include <faction.h>
 #include <building.h>
+#include "alliance.h"
 #include "race.h"
 #include "unit.h"
 #include "skill.h"
@@ -260,15 +261,37 @@ score(void)
 			allscores = 1;
 
 	sprintf(buf, "%s/score", basepath());
-
 	scoreFP = fopen(buf, "w");
-	for (f = factions; f; f = f->next) {
+	for (f = factions; f; f = f->next) if(f->number != 0) {
 		fprintf(scoreFP, "%8d (%8d/%4.2f%%/%5.2f) %30.30s (%3.3s) %5s (%3d)\n",
 			f->score, f->score - average_score_of_age(f->age, f->age / 24 + 1),
 		      ((float) f->score / (float) allscores) * 100.0,
 					(float) f->score / f->number,
 					f->name, LOC(default_locale, rc_name(f->race, 0)), factionid(f), f->age);
 	}
-
 	fclose(scoreFP);
+
+#ifdef ALLIANCES
+	{
+		alliance *a;
+
+		sprintf(buf, "%s/score.alliances", basepath());
+		scoreFP = fopen(buf, "w");
+
+		for (a = alliances; a; a = a->next) {
+			int alliance_score = 0;
+
+			for (f = factions; f; f = f->next) {
+				if(f->alliance && f->alliance->id == a->id) {
+					alliance_score += f->score;
+				}
+			}
+
+			fprintf(scoreFP, "%d:%d\n", a->id, alliance_score);
+		}
+		fclose(scoreFP);
+	}
+#endif
+
 }
+
