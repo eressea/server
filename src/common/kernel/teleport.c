@@ -199,11 +199,20 @@ create_teleport_plane(void)
   for (r=regions;r;r=r->next) if (r->planep == NULL) {
     region *ra = tpregion(r);
     if (ra==NULL) {
-      ra = new_region(TE_CENTER_X+real2tp(r->x), TE_CENTER_Y+real2tp(r->y));
-      rsetterrain(ra, T_ASTRAL);
+      int x = TE_CENTER_X+real2tp(r->x);
+      int y = TE_CENTER_Y+real2tp(r->y);
+      plane * pl = findplane(x, y);
+
+      if (pl==aplane) {
+        ra = new_region(x, y);
+        
+        rsetterrain(ra, T_ASTRAL);
+        ra->planep = aplane;
+        if (terrain[rterrain(r)].flags & FORBIDDEN_LAND) {
+          rsetterrain(ra, T_ASTRALB);
+        }
+      }
     }
-    ra->planep  = aplane;
-    if (terrain[rterrain(r)].flags & FORBIDDEN_LAND) rsetterrain(ra, T_ASTRALB);
   }
 
   for(i=0;i<4;i++) {

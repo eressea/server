@@ -172,8 +172,8 @@ region_remove(region& r)
   while (*rp) {
     if (*rp==&r) {
       unit * u;
-      for (u=r.units;u;u=u->next) {
-        destroy_unit(u);
+      while (r.units) {
+        destroy_unit(r.units);
       }
       *rp = r.next;
 #ifdef FAST_CONNECT
@@ -186,7 +186,6 @@ region_remove(region& r)
           rn->connect[reldir] = NULL;
         }
       }
-      assert (dir>=0 && dir<MAXDIRECTIONS);
 #endif
       break;
     }
