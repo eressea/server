@@ -852,7 +852,7 @@ tagbegin(struct xml_stack * stack)
 			  a->flags = xml_ivalue(tag, "flags");
 		  } else if (strcmp(tag->name, "precombatspell") == 0) {
 			  race * rc = state->race;
-			  rc->precombatspell = xml_ivalue(tag, "spell");
+			  rc->precombatspell = (spellid_t)xml_ivalue(tag, "spell");
 		  } else if (strcmp(tag->name, "function")==0) {
 			  race * rc = state->race;
 			  const char * name = xml_value(tag, "name");

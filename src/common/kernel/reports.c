@@ -854,16 +854,17 @@ visible_faction(const faction *f, const unit * u)
 }
 
 faction_list *
-get_addresses(const faction * f, const seen_region * seenregions)
+get_addresses(faction * f)
 {
 /* "TODO: travelthru" */
-	const seen_region * sr = seenregions;
+	region *r, *last = lastregion(f);
 	const faction * lastf = NULL;
 	faction_list * flist = calloc(1, sizeof(faction_list));
 	flist->data = findfaction(f->no);
-	while (sr!=NULL) {
-		const region * r = sr->r;
+	for (r=firstregion(f);r!=last;r=r->next) {
 		const unit * u = r->units;
+    const seen_region * sr = find_seen(r);
+    if (sr==NULL) continue;
 		while (u!=NULL) {
 			faction * sf = visible_faction(f, u);
 			boolean ballied = sf && sf!=f && sf!=lastf
@@ -883,7 +884,6 @@ get_addresses(const faction * f, const seen_region * seenregions)
 			}
 			u = u->next;
 		}
-		sr = sr->next;
 	}
 #ifdef ALLIANCES
 	if(f->alliance != NULL) {

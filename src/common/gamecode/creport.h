@@ -21,9 +21,7 @@ struct faction_list;
 struct seen_region;
 struct faction;
 extern void report_computer(FILE * F, struct faction * f,
-	const struct seen_region * seen, 
-	const struct faction_list * addresses, 
-	const time_t report_time);
+	const struct faction_list * addresses, const time_t report_time);
 extern void creport_cleanup(void);
 extern void creport_init(void);
 

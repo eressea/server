@@ -470,7 +470,8 @@ rparagraph(FILE *F, const char *s, int indent, char mark)
 static void
 report_spell(FILE * F, spellid_t id, const struct locale * lang)
 {
-	int k, itemanz, res, costtyp;
+	int k, itemanz, costtyp;
+  resource_t res;
 	int dh = 0;
 	spell *sp = find_spellbyid(id);
 
@@ -1962,6 +1963,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	int dh;
 	int anyunits;
 	const struct region *r;
+  region * last = lastregion(f);
 	building *b;
 	ship *sh;
 	unit *u;
@@ -1969,7 +1971,6 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	message * m;
 	int wants_stats;
 	int wants_zugvorlage;
-	seen_region * sd;
 	int ix;
 	unsigned char op;
 	char buf2[80];
@@ -2202,10 +2203,12 @@ report(FILE *F, faction * f, const faction_list * addresses,
 
 	anyunits = 0;
 
-	for (sd = seen; sd!=NULL; sd = sd->next) {
+  for (r=firstregion(f);r!=last;r=r->next) {
 		boolean unit_in_region = false;
 		boolean durchgezogen_in_region = false;
 		int turm_sieht_region = false;
+    seen_region * sd = find_seen(r);
+    if (sd==NULL) continue;
 
 		switch (sd->mode) {
 		case see_lighthouse:
@@ -2632,24 +2635,31 @@ merian(FILE * out, faction * f)
 	free(line);
 }
 #endif
-seen_region * seen;
 seen_region * reuse;
-seen_region * last;
-
 #define MAXSEEHASH 4095
 seen_region * seehash[MAXSEEHASH];
+
+static void 
+seen_init(void)
+{
+  int i;
+  for (i=0;i!=MAXSEEHASH;++i) {
+    seen_region * sd = seehash[i];
+    if (sd==NULL) continue;
+    while (sd->nextHash!=NULL) sd = sd->nextHash;
+    sd->nextHash = reuse;
+    reuse = seehash[i];
+    seehash[i] = NULL;
+  }
+}
 
 static void
 seen_done(void)
 {
-	while (seen) {
-		seen_region * r = seen;
-		seen = seen->next;
-		free(r);
-	}
+  seen_init();
 	while (reuse) {
 		seen_region * r = reuse;
-		reuse = reuse->next;
+		reuse = reuse->nextHash;
 		free(r);
 	}
 }
@@ -2666,63 +2676,18 @@ find_seen(const region * r)
 	return NULL;
 }
 
-seen_region * last;
 static boolean
 add_seen(const struct region * r, unsigned char mode, boolean dis)
 {
 	seen_region * find = find_seen(r);
 	if (find==NULL) {
-		seen_region * insert = NULL;
 		int index = abs((r->x & 0xffff) + ((r->y) << 16)) % MAXSEEHASH;
 		if (!reuse) reuse = (seen_region*)calloc(1, sizeof(struct seen_region));
 		find = reuse;
-		reuse = reuse->next;
+		reuse = reuse->nextHash;
 		find->nextHash = seehash[index];
 		seehash[index] = find;
 		find->r = r;
-
-		/* first attempt: try to put it between previous insertion point and 
-		 * last region known so far. It's quite likely to be here. */
-		if (last) {
-			for (insert=last;insert->next;insert=insert->next) {
-				region * rl;
-				seen_region * inext = insert->next;
-				for (rl=insert->r->next;rl && rl!=inext->r;rl=rl->next) {
-					if (rl==r) break;
-				}
-				if (rl==r) break;
-			}
-			/* if we did not find it, and mode is not see_neighbour, it *still* 
-			 * belongs at the end. otherwise, search more: */
-			if (insert->next==NULL && mode==see_neighbour) {
-				const region * rl = NULL;
-				seen_region * sprev;
-				for(sprev=seen;sprev!=last;sprev=sprev->next) {
-					seen_region * snext = sprev->next;
-					for (rl=sprev->r->next;rl!=snext->r;rl=rl->next) {
-						if (rl==r) break;
-					}
-					if (rl==r) break;
-				}
-				/* search it after the insertion point, all the way to the end */
-				if (rl==r) insert = sprev;
-				else {
-					for (rl=insert->r->next;rl;rl=rl->next) {
-						if (rl==r) break;
-					}
-					if (rl!=r) insert=NULL; /* in front */
-				}
-			}
-		}
-		if (mode!=see_neighbour) last=find;
-		find->prev = insert;
-		if (insert!=0) {
-			find->next = insert->next;
-			insert->next = find;
-		} else {
-			find->next = seen;
-			seen = find;
-		}
 	} else if (find->mode >= mode) {
 		return false;
 	}
@@ -2833,13 +2798,7 @@ prepare_report(faction * f)
 {
 	region * r;
 	region * end = lastregion(f);
-	seen_region ** append = &reuse;
-
-	while (*append) append = &(*append)->next;
-	*append = seen;
-	memset(seehash, 0, sizeof(seehash));
-	seen = NULL;
-	last = NULL;
+  seen_init();
 	for (r = firstregion(f); r != end; r = r->next) {
 		attrib *ru;
 		unit * u;
@@ -2967,7 +2926,7 @@ reports(void)
 		}
 		else printf("%s\n", factionname(f));
 		prepare_report(f);
-		addresses = get_addresses(f, seen);
+		addresses = get_addresses(f);
 		if (!nonr && (f->options & wants_report))
 		{
 			sprintf(buf, "%s/%d-%s.nr", reportpath(), turn, factionid(f));
@@ -2983,7 +2942,7 @@ reports(void)
 			sprintf(buf, "%s/%d-%s.cr", reportpath(), turn, factionid(f));
 			F = cfopen(buf, "wt");
 			if (F) {
-				report_computer(F, f, seen, addresses, ltime);
+				report_computer(F, f, addresses, ltime);
 				fclose(F);
 				gotit = true;
 			}

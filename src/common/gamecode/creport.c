@@ -893,7 +893,7 @@ cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
 static void
 cr_reportspell(FILE * F, spellid_t id, const struct locale * lang)
 {
-	int k, itemanz, res, costtyp;
+	int k;
 	spell *sp = find_spellbyid(id);
 	const char * name = sp->sname;
 	if (sp->info==NULL) {
@@ -918,10 +918,10 @@ cr_reportspell(FILE * F, spellid_t id, const struct locale * lang)
 	fputs("KOMPONENTEN\n", F);
 
 	for (k = 0; k < MAXINGREDIENT; k++) {
-		res = sp->komponenten[k][0];
-		itemanz = sp->komponenten[k][1];
-		costtyp = sp->komponenten[k][2];
-		if(itemanz > 0) {
+		resource_t res = sp->komponenten[k][0];
+		int itemanz = sp->komponenten[k][1];
+		int costtyp = sp->komponenten[k][2];
+		if (itemanz > 0) {
 			const char * name = resname(res, 0);
 			fprintf(F, "%d %d;%s\n", itemanz, costtyp == SPC_LEVEL || costtyp == SPC_LINEAR,
 				add_translation(name, LOC(lang, name)));
@@ -1006,15 +1006,16 @@ cr_borders(const region * r, const faction * f, int seemode, FILE * F)
 
 /* main function of the creport. creates the header and traverses all regions */
 void
-report_computer(FILE * F, faction * f, const seen_region * seen,
-	const faction_list * addresses, const time_t report_time)
+report_computer(FILE * F, faction * f, const faction_list * addresses, 
+                const time_t report_time)
 {
 	int i;
+  region * r;
 	building *b;
 	ship *sh;
 	unit *u;
 	const char * mailto = locale_string(f->locale, "mailto");
-	const seen_region * sd = seen;
+	const region * last = lastregion(f);
 	const attrib * a;
 
 	/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
@@ -1131,16 +1132,15 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 	}
 
 	/* traverse all regions */
-	while (sd!=NULL) {
+	for (r=firstregion(f);r!=last;r=r->next) {
 		int modifier = 0;
 		const char * tname;
-		unsigned char seemode = sd->mode;
-		const region * r = sd->r;
-    unit * owner = region_owner(r);
-		sd = sd->next;
+    const seen_region * sd = find_seen(r);
 
+    if (sd==NULL) continue;
+		
 		if (!rplane(r)) {
-			if(opt_cr_absolute_coords) {
+			if (opt_cr_absolute_coords) {
 				fprintf(F, "REGION %d %d\n", r->x, r->x);
 			} else {
 				fprintf(F, "REGION %d %d\n", region_x(r, f), region_y(r, f));
@@ -1162,7 +1162,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 		}
 
 		fprintf(F, "\"%s\";Terrain\n", add_translation(tname, locale_string(f->locale, tname)));
-		switch (seemode) {
+		switch (sd->mode) {
 		case see_far:
 			fputs("\"neighbourhood\";visibility\n", F);
 			break;
@@ -1173,11 +1173,14 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 			fputs("\"travel\";visibility\n", F);
 			break;
 		}
-    if (owner) {
-      fprintf(F, "%d;owner\n", owner->faction->no);
+    {
+      unit * owner = region_owner(r);
+      if (owner) {
+        fprintf(F, "%d;owner\n", owner->faction->no);
+      }
     }
-		if (seemode == see_neighbour) {
-			cr_borders(r, f, seemode, F);
+		if (sd->mode == see_neighbour) {
+			cr_borders(r, f, sd->mode, F);
 		} else {
 #define RESOURCECOMPAT
 			char cbuf[8192], *pos = cbuf;
@@ -1221,7 +1224,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 				}
 				fprintf(F, "%d;Pferde\n", rhorses(r));
 
-				if (seemode>=see_unit) {
+				if (sd->mode>=see_unit) {
 					struct demand * dmd = r->land->demands;
 #if NEW_RESOURCEGROWTH
 					struct rawmaterial * res = r->resources;
@@ -1306,8 +1309,8 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 				}
 				if (pos!=cbuf) fputs(cbuf, F);
 			}
-			cr_borders(r, f, seemode, F);
-			if (seemode==see_unit && r->planep && r->planep->id == 1 && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
+			cr_borders(r, f, sd->mode, F);
+			if (sd->mode==see_unit && r->planep && r->planep->id == 1 && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
 			{
 				/* Sonderbehandlung Teleport-Ebene */
 				regionlist *rl = allinhab_in_range(r_astral_to_standard(r),TP_RADIUS);
@@ -1382,7 +1385,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 			/* visible units */
 			for (u = r->units; u; u = u->next) {
 				boolean visible = true;
-				switch (seemode) {
+				switch (sd->mode) {
 				case see_unit:
 					modifier=0;
 					break;
@@ -1397,7 +1400,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 					visible=false;
 				}
 				if (u->building || u->ship || (visible && cansee(f, r, u, modifier)))
-					cr_output_unit(F, r, f, u, seemode);
+					cr_output_unit(F, r, f, u, sd->mode);
 			}
 		}			/* region traversal */
 	}

@@ -74,15 +74,12 @@ enum {
 };
 
 typedef struct seen_region {
-	struct seen_region * next;
-	struct seen_region * prev;
 	struct seen_region * nextHash;
 	const struct region *r;
 	unsigned char mode;
 	boolean disbelieves;
 } seen_region;
 
-extern struct seen_region * seen;
 extern struct seen_region * find_seen(const struct region * r);
 
 extern const char* resname(resource_t res, int i);
@@ -108,7 +105,7 @@ extern const char *neue_gebiete[];
 extern const char *coasts[];
 extern const char * reportpath(void);
 extern struct faction * visible_faction(const struct faction *f, const struct unit * u);
-extern struct faction_list * get_addresses(const struct faction * f, const struct seen_region * seenregions);
+extern struct faction_list * get_addresses(struct faction * f);
 extern const char * trailinto(const struct region * r, const struct locale * lang);
 
 #ifdef __cplusplus
