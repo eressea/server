@@ -785,7 +785,7 @@ volcano_outbreak(region *r)
 		rsettrees(r, 0);
 #endif
 
-		a = a_add(&rn->attribs, a_new(&at_reduceproduction));
+		a = a_find(rn->attribs, &at_reduceproduction);
 		if (!a) a = a_add(&r->attribs, a_new(&at_reduceproduction));
 
 		/* Produktion vierteln ... */
