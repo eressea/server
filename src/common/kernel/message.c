@@ -291,7 +291,7 @@ msg_error(const struct unit * u, const char * cmd, const char * name, const char
 	}
 	va_end(marker);
 
-	return msg_create(mtype, (void**)args);
+	return msg_create(mtype, u->faction, (void**)args);
 }
 
 message * 
@@ -322,7 +322,7 @@ msg_message(const char * name, const char* sig, ...)
 	}
 	va_end(marker);
 
-	return msg_create(mtype, (void**)args);
+	return msg_create(mtype, NULL, (void**)args);
 }
 
 message *
@@ -423,7 +423,7 @@ new_message(struct faction * receiver, const char* sig, ...)
 		}
 	}
 	va_end(marker);
-	return msg_create(mtype, (void**)args);
+	return msg_create(mtype, receiver, (void**)args);
 }
 
 static void

@@ -4107,7 +4107,7 @@
 		</nr>
 	</locale>
 	<locale name="en">
-		<nr section="none">
+		<nr section="events">
 			<text>"$faction($from) donates $int($amount) silver to $faction($to)."</text>
 		</nr>
 	</locale>
