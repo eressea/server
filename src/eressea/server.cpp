@@ -1,23 +1,23 @@
 /* vi: set ts=2:
- *
- *
- *	Eressea PB(E)M host Copyright (C) 1998-2003
- *      Christian Schlittchen (corwin@amber.kn-bremen.de)
- *      Katja Zedel (katze@felidae.kn-bremen.de)
- *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea-pbem.de)
- *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
- *
- *  based on:
- *
- * Atlantis v1.0  13 September 1993 Copyright 1993 by Russell Wallace
- * Atlantis v1.7                    Copyright 1996 by Alex Schröder
- *
- * This program may not be used, modified or distributed without
- * prior permission by the authors of Eressea.
- * This program may not be sold or used commercially without prior written
- * permission from the authors.
- */
+*
+*
+*	Eressea PB(E)M host Copyright (C) 1998-2003
+*      Christian Schlittchen (corwin@amber.kn-bremen.de)
+*      Katja Zedel (katze@felidae.kn-bremen.de)
+*      Henning Peters (faroul@beyond.kn-bremen.de)
+*      Enno Rehling (enno@eressea-pbem.de)
+*      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
+*
+*  based on:
+*
+* Atlantis v1.0  13 September 1993 Copyright 1993 by Russell Wallace
+* Atlantis v1.7                    Copyright 1996 by Alex Schröder
+*
+* This program may not be used, modified or distributed without
+* prior permission by the authors of Eressea.
+* This program may not be sold or used commercially without prior written
+* permission from the authors.
+*/
 
 #define LOCALE_CHECK
 #ifdef __LCC__
@@ -29,6 +29,7 @@
 #include <eressea.h>
 
 #include "korrektur.h"
+#include "console.h"
 
 /* initialization - TODO: init in separate module */
 #include <attributes/attributes.h>
@@ -97,44 +98,43 @@
 #include <cstring>
 #include <ctime>
 #include <clocale>
-
 /**
- ** global variables we are importing from other modules
- **/
+** global variables we are importing from other modules
+**/
 extern "C" {
-extern char * g_reportdir;
-extern char * g_datadir;
-extern char * g_basedir;
-extern char * g_resourcedir;
-extern item_type * i_silver;
+  extern char * g_reportdir;
+  extern char * g_datadir;
+  extern char * g_basedir;
+  extern char * g_resourcedir;
+  extern item_type * i_silver;
 
-extern boolean nonr;
-extern boolean nocr;
-extern boolean noreports;
-extern boolean nomer;
-extern boolean nomsg;
-extern boolean nobattle;
-extern boolean nomonsters;
-extern boolean nobattledebug;
-extern boolean dirtyload;
+  extern boolean nonr;
+  extern boolean nocr;
+  extern boolean noreports;
+  extern boolean nomer;
+  extern boolean nomsg;
+  extern boolean nobattle;
+  extern boolean nomonsters;
+  extern boolean nobattledebug;
+  extern boolean dirtyload;
 
-extern int demonfix;
-extern int loadplane;
+  extern int demonfix;
+  extern int loadplane;
 
-extern void debug_messagetypes(FILE * out);
-extern void free_region(region * r);
-extern void render_init(void);
-extern void free_borders(void);
-extern boolean opt_cr_absolute_coords;
+  extern void debug_messagetypes(FILE * out);
+  extern void free_region(region * r);
+  extern void render_init(void);
+  extern void free_borders(void);
+  extern boolean opt_cr_absolute_coords;
 
 #ifdef FUZZY_BASE36
-extern int fuzzy_hits;
+  extern int fuzzy_hits;
 #endif /* FUZZY_BASE36 */
 }
 
 /**
- ** global variables that we are exporting
- **/
+** global variables that we are exporting
+**/
 static char * orders = NULL;
 static int nowrite = 0;
 static boolean g_writemap = false;
@@ -142,26 +142,10 @@ static boolean opt_reportonly = false;
 static const char * luafile = "default.lua";
 
 struct settings global = {
-	"Eressea", /* gamename */
-	"eressea", /* resourcepath */
-	1000, /* maxunits */
+  "Eressea", /* gamename */
+    "eressea", /* resourcepath */
+    1000, /* maxunits */
 };
-
-#if 0
-static int
-crwritemap(void)
-{
-  FILE * F = fopen("world.cr", "w+");
-  region * r;
-  for (r=regions;r;r=r->next) {
-    plane * p = rplane(r);
-    fprintf(F, "REGION %d %d %d\n", r->x, r->y, p?p->id:0);
-    fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale), LOC(default_locale, terrain[rterrain(r)].name));
-  }
-  fclose(F);
-	return 0;
-}
-#endif
 
 static void
 game_init(void)
@@ -195,7 +179,7 @@ game_init(void)
   init_data(xmlfile);
 
   init_locales();
-/*  init_resources(); must be done inside the xml-read, because requirements use items */
+  /*  init_resources(); must be done inside the xml-read, because requirements use items */
 
   init_attributes();
   init_races();
@@ -223,24 +207,24 @@ game_init(void)
 static void
 getgarbage(void)
 {
-	faction *f;
+  faction *f;
 
-	/* Get rid of stuff that was only relevant last turn */
+  /* Get rid of stuff that was only relevant last turn */
 
-	for (f = factions; f; f = f->next) {
-/*		memset(f->showdata, 0, sizeof f->showdata); */
+  for (f = factions; f; f = f->next) {
+    /*		memset(f->showdata, 0, sizeof f->showdata); */
 
-		freestrlist(f->mistakes);
-		f->mistakes = 0;
-		/* TODO: free msgs */
-	}
+    freestrlist(f->mistakes);
+    f->mistakes = 0;
+    /* TODO: free msgs */
+  }
 #if 0
-	for (r = regions; r; r = r->next) {
-		freestrlist(r->comments);
-		r->comments = 0;
-		freestrlist(r->botschaften);
-		r->botschaften = 0;
-	}
+  for (r = regions; r; r = r->next) {
+    freestrlist(r->comments);
+    r->comments = 0;
+    freestrlist(r->botschaften);
+    r->botschaften = 0;
+  }
 #endif
 }
 
@@ -340,27 +324,27 @@ update_subscriptions(void)
 int
 process_orders()
 {
-	struct summary * begin, * end;
+  struct summary * begin, * end;
 
 #ifdef SHORTPWDS
   readshortpwds("passwords");
 #endif
-	begin = make_summary(false);
-	printf(" - Korrekturen Runde %d\n", turn);
-	korrektur();
-	turn++;
-	puts(" - entferne Texte der letzten Runde");
-	getgarbage();
-	puts(" - Nehme Korrekturen am Datenbestand vor");
+  begin = make_summary(false);
+  printf(" - Korrekturen Runde %d\n", turn);
+  korrektur();
+  turn++;
+  puts(" - entferne Texte der letzten Runde");
+  getgarbage();
+  puts(" - Nehme Korrekturen am Datenbestand vor");
 #if BENCHMARK
-	exit(0);
+  exit(0);
 #endif
-	processorders();
-	score();
+  processorders();
+  score();
 #ifdef WACH_WAFF
-	remove_unequipped_guarded();
+  remove_unequipped_guarded();
 #endif
-	korrektur_end();
+  korrektur_end();
 
   end = make_summary(true);
   report_summary(end, begin, false);
@@ -376,65 +360,65 @@ process_orders()
 static void
 game_done(void)
 {
-	/* Diese Routine enfernt allen allokierten Speicher wieder. Das ist nur
-	 * zum Debugging interessant, wenn man Leak Detection hat, und nach
-	 * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benötigt
-	 * wird (temporäre Hilsstrukturen) */
-	unit *u, *u2;
-	region *r, *r2;
-	building *b, *b2;
-	faction *f, *f2;
-	ship *s, *s2;
+  /* Diese Routine enfernt allen allokierten Speicher wieder. Das ist nur
+  * zum Debugging interessant, wenn man Leak Detection hat, und nach
+  * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benötigt
+  * wird (temporäre Hilsstrukturen) */
+  unit *u, *u2;
+  region *r, *r2;
+  building *b, *b2;
+  faction *f, *f2;
+  ship *s, *s2;
 
-	free(used_faction_ids);
-	for (r = regions; r; r = r2) {
+  free(used_faction_ids);
+  for (r = regions; r; r = r2) {
 #if 0
-		msg * m = r->msgs;
-		while (m) {
-			msg * x = m;
-			m = m->next;
-			if (x->type->finalize) x->type->finalize(x);
-			free(x);
-		}
-			rm = rm->next;
-		}
+    msg * m = r->msgs;
+    while (m) {
+      msg * x = m;
+      m = m->next;
+      if (x->type->finalize) x->type->finalize(x);
+      free(x);
+    }
+    rm = rm->next;
+  }
 #endif
-		for (u = r->units; u; u = u2) {
-			u2 = u->next;
-			stripunit(u);
-			uunhash(u);
-			free(u);
-		}
-		for (b = r->buildings; b; b = b2) {
-			free(b->name);
-			free(b->display);
-			b2 = b->next;
-			free(b);
-		}
-		for (s = r->ships; s; s = s2) {
-			free(s->name);
-			free(s->display);
-			s2 = s->next;
-			free(s);
-		}
-		r2 = r->next;
-		free_region(r);
-	}
-	for (f = factions; f; f = f2) {
-		stripfaction(f);
-		f2 = f->next;
-		free(f);
-	}
-	while (planes) {
-		plane * pl = planes;
-		planes = planes->next;
-		free(pl);
-	}
+  for (u = r->units; u; u = u2) {
+    u2 = u->next;
+    stripunit(u);
+    uunhash(u);
+    free(u);
+  }
+  for (b = r->buildings; b; b = b2) {
+    free(b->name);
+    free(b->display);
+    b2 = b->next;
+    free(b);
+  }
+  for (s = r->ships; s; s = s2) {
+    free(s->name);
+    free(s->display);
+    s2 = s->next;
+    free(s);
+  }
+  r2 = r->next;
+  free_region(r);
+}
+for (f = factions; f; f = f2) {
+  stripfaction(f);
+  f2 = f->next;
+  free(f);
+}
+while (planes) {
+  plane * pl = planes;
+  planes = planes->next;
+  free(pl);
+}
 #ifdef LEAK_DETECT
-	leak_report(stderr);
+leak_report(stderr);
 #endif
-	creport_cleanup();
-	report_cleanup();
+creport_cleanup();
+report_cleanup();
 }
 #endif
 
@@ -459,30 +443,30 @@ init_malloc_debug(void)
 static int
 usage(const char * prog, const char * arg)
 {
-	if (arg) {
-		fprintf(stderr, "unknown argument: %s\n\n", arg);
-	}
-	fprintf(stderr, "Usage: %s [options]\n"
-		"-x n             : Lädt nur die ersten n regionen\n"
-		"-f x y           : Lädt nur die regionen ab (x,y)\n"
-		"-v befehlsdatei  : verarbeitet automatisch die angegebene Befehlsdatei\n"
-		"-d datadir       : gibt das datenverzeichnis an\n"
-		"-b basedir       : gibt das basisverzeichnis an\n"
-		"-r resdir        : gibt das resourceverzeichnis an\n"
-		"-t turn          : read this datafile, not the most current one\n"
-		"-o reportdir     : gibt das reportverzeichnis an\n"
-		"-l logfile       : specify an alternative logfile\n"
-		"-R               : erstellt nur die Reports neu\n"
-		"--nomsg          : keine Messages (RAM sparen)\n"
-		"--nobattle       : keine Kämpfe\n"
-		"--nomonsters     : keine monster KI\n"
-		"--nodebug        : keine Logfiles für Kämpfe\n"
-		"--debug          : schreibt Debug-Ausgaben in die Datei debug\n"
-		"--nocr           : keine CRs\n"
-		"--nonr           : keine Reports\n"
-		"--crabsolute     : absolute Koordinaten im CR\n"
-		"--help           : help\n", prog);
-	return -1;
+  if (arg) {
+    fprintf(stderr, "unknown argument: %s\n\n", arg);
+  }
+  fprintf(stderr, "Usage: %s [options]\n"
+    "-x n             : Lädt nur die ersten n regionen\n"
+    "-f x y           : Lädt nur die regionen ab (x,y)\n"
+    "-v befehlsdatei  : verarbeitet automatisch die angegebene Befehlsdatei\n"
+    "-d datadir       : gibt das datenverzeichnis an\n"
+    "-b basedir       : gibt das basisverzeichnis an\n"
+    "-r resdir        : gibt das resourceverzeichnis an\n"
+    "-t turn          : read this datafile, not the most current one\n"
+    "-o reportdir     : gibt das reportverzeichnis an\n"
+    "-l logfile       : specify an alternative logfile\n"
+    "-R               : erstellt nur die Reports neu\n"
+    "--nomsg          : keine Messages (RAM sparen)\n"
+    "--nobattle       : keine Kämpfe\n"
+    "--nomonsters     : keine monster KI\n"
+    "--nodebug        : keine Logfiles für Kämpfe\n"
+    "--debug          : schreibt Debug-Ausgaben in die Datei debug\n"
+    "--nocr           : keine CRs\n"
+    "--nonr           : keine Reports\n"
+    "--crabsolute     : absolute Koordinaten im CR\n"
+    "--help           : help\n", prog);
+  return -1;
 }
 
 static void
@@ -502,80 +486,84 @@ setLuaNumber(lua_State * luaState, const char * name, double value)
 static int
 read_args(int argc, char **argv, lua_State * luaState)
 {
-	int i;
+  int i;
   char * c;
-	for (i=1;i!=argc;++i) {
-		if (argv[i][0]!='-') {
-			return usage(argv[0], argv[i]);
-		} else if (argv[i][1]=='-') { /* long format */
-			if (strcmp(argv[i]+2, "nocr")==0) nocr = true;
-			else if (strcmp(argv[i]+2, "nosave")==0) nowrite = true;
-			else if (strcmp(argv[i]+2, "noreports")==0) {
-				noreports = true;
-				nocr = true;
-				nocr = true;
-			}
-			else if (strcmp(argv[i]+2, "xml")==0) xmlfile = argv[++i];
-			else if (strcmp(argv[i]+2, "dirtyload")==0) dirtyload = true;
-			else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
-			else if (strcmp(argv[i]+2, "nomsg")==0) nomsg = true;
-			else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
-			else if (strcmp(argv[i]+2, "nomonsters")==0) nomonsters = true;
-			else if (strcmp(argv[i]+2, "nodebug")==0) nobattledebug = true;
-			else if (strcmp(argv[i]+2, "crabsolute")==0) opt_cr_absolute_coords = true;
-			else if (strcmp(argv[i]+2, "help")==0)
-				return usage(argv[0], NULL);
-			else
-				return usage(argv[0], argv[i]);
-		} else switch(argv[i][1]) {
-			case 'o':
-				g_reportdir = argv[++i];
-				break;
+  for (i=1;i!=argc;++i) {
+    if (argv[i][0]!='-') {
+      return usage(argv[0], argv[i]);
+    } else if (argv[i][1]=='-') { /* long format */
+      if (strcmp(argv[i]+2, "nocr")==0) nocr = true;
+      else if (strcmp(argv[i]+2, "nosave")==0) nowrite = true;
+      else if (strcmp(argv[i]+2, "noreports")==0) {
+        noreports = true;
+        nocr = true;
+        nocr = true;
+      }
+      else if (strcmp(argv[i]+2, "xml")==0) xmlfile = argv[++i];
+      else if (strcmp(argv[i]+2, "dirtyload")==0) dirtyload = true;
+      else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
+      else if (strcmp(argv[i]+2, "nomsg")==0) nomsg = true;
+      else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
+      else if (strcmp(argv[i]+2, "nomonsters")==0) nomonsters = true;
+      else if (strcmp(argv[i]+2, "nodebug")==0) nobattledebug = true;
+      else if (strcmp(argv[i]+2, "console")==0) luafile=NULL;
+      else if (strcmp(argv[i]+2, "crabsolute")==0) opt_cr_absolute_coords = true;
+      else if (strcmp(argv[i]+2, "help")==0)
+        return usage(argv[0], NULL);
+      else
+        return usage(argv[0], argv[i]);
+    } else switch(argv[i][1]) {
+      case 'C':
+        luafile=NULL;
+        break;
+      case 'o':
+        g_reportdir = argv[++i];
+        break;
       case 'e':
         luafile = argv[++i];
         break;
-			case 'D': /* DEBUG */
-				demonfix = atoi(argv[++i]);
-				break;
-			case 'd':
-				g_datadir = argv[++i];
-				break;
-			case 'r':
-				g_resourcedir = argv[++i];
-				break;
-			case 'b':
-				g_basedir = argv[++i];
-				break;
-			case 'i':
-				xmlfile = argv[++i];
-				break;
-			case 't':
-				turn = atoi(argv[++i]);
-				break;
-			case 'f':
-				firstx = atoi(argv[++i]);
-				firsty = atoi(argv[++i]);
-				break;
-			case 'q':
-				quiet = 1;
-				break;
-			case 'v':
+      case 'D': /* DEBUG */
+        demonfix = atoi(argv[++i]);
+        break;
+      case 'd':
+        g_datadir = argv[++i];
+        break;
+      case 'r':
+        g_resourcedir = argv[++i];
+        break;
+      case 'b':
+        g_basedir = argv[++i];
+        break;
+      case 'i':
+        xmlfile = argv[++i];
+        break;
+      case 't':
+        turn = atoi(argv[++i]);
+        break;
+      case 'f':
+        firstx = atoi(argv[++i]);
+        firsty = atoi(argv[++i]);
+        break;
+      case 'q':
+        quiet = 1;
+        break;
+      case 'v':
         if (i<argc) {
           orders = argv[++i];
         } else {
           return usage(argv[0], argv[i]);
         }
-				break;
-			case 'p':
-				loadplane = atoi(argv[++i]);
-				break;
-			case 'x':
-				maxregions = atoi(argv[++i]);
-				maxregions = (maxregions*81+80) / 81;
-				break;
-			case 'X':
-				dirtyload = true;
-				break;
+        break;
+      case 'p':
+        loadplane = atoi(argv[++i]);
+        break;
+      case 'x':
+        maxregions = atoi(argv[++i]);
+        maxregions = (maxregions*81+80) / 81;
+        break;
+      case 'X':
+        dirtyload = true;
+        break;
       case 's':
         c = argv[++i];
         while (*c && (*c!='=')) ++c;
@@ -592,19 +580,19 @@ read_args(int argc, char **argv, lua_State * luaState)
           setLuaNumber(luaState, argv[i], atof(c));
         }
         break;
-			case 'l':
-				log_open(argv[++i]);
-				break;
-			case 'w':
- 				g_writemap = true;
-				break;
-			case 'R':
-				opt_reportonly = true;
-				break;
-			default:
-				usage(argv[0], argv[i]);
-		}
-	}
+      case 'l':
+        log_open(argv[++i]);
+        break;
+      case 'w':
+        g_writemap = true;
+        break;
+      case 'R':
+        opt_reportonly = true;
+        break;
+      default:
+        usage(argv[0], argv[i]);
+    }
+  }
 
   /* add some more variables to the lua globals */
   setLuaString(luaState, "datapath", datapath());
@@ -623,55 +611,56 @@ extern int xml_writebuildings(void);
 #endif
 
 typedef struct lostdata {
-	int x, y;
-	int prevunit;
-	int building;
-	int ship;
+  int x, y;
+  int prevunit;
+  int building;
+  int ship;
 } lostdata;
 
 int
 main(int argc, char *argv[])
 {
-	int i;
-	char zText[MAX_PATH];
+  int i;
+  char zText[MAX_PATH];
 
-	sqlpatch = true;
-	updatelog = fopen("update.log", "w");
-	log_open("eressea.log");
-	printf("\n%s PBEM host\n"
-		"Copyright (C) 1996-2003 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
-	   "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
+  sqlpatch = true;
+  updatelog = fopen("update.log", "w");
+  log_open("eressea.log");
+  printf("\n%s PBEM host\n"
+    "Copyright (C) 1996-2003 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
+    "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
 
-	setlocale(LC_ALL, "");
-	setlocale(LC_NUMERIC, "C");
+  setlocale(LC_ALL, "");
+  setlocale(LC_NUMERIC, "C");
 #ifdef LOCALE_CHECK
-	if (!locale_check()) {
-		log_error(("The current locale is not suitable for international Eressea.\n"));
-		return -1;
-	}
+  if (!locale_check()) {
+    log_error(("The current locale is not suitable for international Eressea.\n"));
+    return -1;
+  }
 #endif
 #ifdef MALLOCDBG
-	init_malloc_debug();
+  init_malloc_debug();
 #endif
 
   lua_State * luaState = lua_init();
   if ((i=read_args(argc, argv, luaState))!=0) return i;
 
-	strcat(strcpy(zText, resourcepath()), "/timestrings");
-	if ((i=read_datenames(zText))!=0) return i;
+  strcat(strcpy(zText, resourcepath()), "/timestrings");
+  if ((i=read_datenames(zText))!=0) return i;
 
-	kernel_init();
-	game_init();
+  kernel_init();
+  game_init();
 
   // run the main script
-  lua_dofile(luaState, luafile);
+  if (luafile==NULL) lua_console(luaState);
+  else lua_dofile(luaState, luafile);
 
 #ifdef CLEANUP_CODE
-	game_done();
+  game_done();
 #endif
-	kernel_done();
+  kernel_done();
   lua_done(luaState);
-	log_close();
-	fclose(updatelog);
-	return 0;
+  log_close();
+  fclose(updatelog);
+  return 0;
 }

@@ -340,6 +340,12 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\console.c">
+		</File>
+		<File
+			RelativePath=".\console.h">
+		</File>
+		<File
 			RelativePath=".\korrektur.c">
 			<FileConfiguration
 				Name="Release|Win32">

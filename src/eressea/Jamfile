@@ -22,6 +22,7 @@ LUASERVER_SOURCES =
  <lua>unit.cpp
  server.cpp
  korrektur.c
+ console.c
  ;
 
 LinkLibraries $(SERVER) :
