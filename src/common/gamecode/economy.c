@@ -1958,7 +1958,7 @@ expandbuying(region * r, request * buyorders)
 	/* Kauf - auch so programmiert, daß er leicht erweiterbar auf mehrere
 	* Güter pro Monat ist. j sind die Befehle, i der Index des
 	* gehandelten Produktes. */
-
+  if (max_products>0) {
 	expandorders(r, buyorders);
 	if (!norders) return;
 
@@ -2016,6 +2016,7 @@ expandbuying(region * r, request * buyorders)
 		}
 		a_remove(&u->attribs, a);
 	}
+  }
 }
 
 attrib_type at_trades = {
