@@ -188,6 +188,9 @@
 				RelativePath=".\ugroup.h">
 			</File>
 			<File
+				RelativePath=".\variable.h">
+			</File>
+			<File
 				RelativePath=".\viewrange.h">
 			</File>
 		</Filter>
@@ -256,6 +259,9 @@
 		</File>
 		<File
 			RelativePath=".\ugroup.c">
+		</File>
+		<File
+			RelativePath=".\variable.c">
 		</File>
 		<File
 			RelativePath=".\viewrange.c">

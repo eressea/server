@@ -464,6 +464,12 @@ unit_capacity(const struct unit& u)
   return walkingcapacity(&u);
 }
 
+static void
+unit_addnotice(unit& u, const char * str)
+{
+  addmessage(u.region, u.faction, str, MSG_MESSAGE, ML_IMPORTANT);
+}
+
 void
 bind_unit(lua_State * L) 
 {
@@ -502,8 +508,13 @@ bind_unit(lua_State * L)
     .def("eff_skill", &unit_effskill)
     .def("set_skill", &unit_setskill)
 
+    .def("add_notice", &unit_addnotice)
+
+    // npc logic:
     .def("add_handler", &unit_addhandler)
     .def("set_brain", &unit_setscript)
+
+
     .def("set_racename", &unit_setracename)
     .def("add_spell", &unit_addspell)
     .def("remove_spell", &unit_removespell)
