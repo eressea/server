@@ -7811,7 +7811,6 @@ spell spelldaten[] =
 	 (spell_f)sp_fumblecurse, patzer_fumblecurse
 	},
 
-<<<<<<< spell.c
 	{SPL_SUMMONUNDEAD, "Mächte des Todes",
 		"Nächtelang muss der Schwarzmagier durch die Friedhöfe und Gräberfelder "
 		"der Region ziehen um dann die ausgegrabenen Leichen beleben zu können. "
@@ -7820,8 +7819,8 @@ spell spelldaten[] =
 		"sein kann.",
 		NULL,
 		NULL,
-	 M_CHAOS, (SPELLLEVEL | FARCASTING | ONSHIPCAST), 5, 6,
-	 {
+		M_CHAOS, (SPELLLEVEL | FARCASTING | ONSHIPCAST), 
+		5, 6,
 		{
 			{R_AURA, 5, SPC_LEVEL},
 			{0, 0, 0},
