@@ -77,7 +77,7 @@ def SendPass(email):
     except:
         Display('<div align="center">Beim Versenden des Passwortes ist ein Fehler aufgetreten.<br>Eventuell ist die email-Adresse unbekannt</div>', 'Kundendaten für '+email)
 
-	
+
 def ShowInfo(custid, Password):
     global Errors
     db = MySQLdb.connect(db=dbname)
@@ -101,7 +101,7 @@ def ShowInfo(custid, Password):
 	    races.append(cursor.fetchone())
 
         output = '<div align=center>Letzter Buchungstag: '+str(lastdate)[0:10]+'</div><form action="'+scripturl+'" method=post><div align=center><table  bgcolor="#e0e0e0" width=80% border>\n'
-	
+
 	query = "SELECT sum(balance) from transactions where user="+str(custid)
 	transactions = cursor.execute(query)
 	balance = 0.00
@@ -163,7 +163,7 @@ def ShowInfo(custid, Password):
 		  "from races, games, subscriptions s "+
 		  "where s.race=races.race and s.game="+str(int(gid))+" and s.game=games.id "+
 		  "and s.user="+str(custid)+" ")
-	    
+
 		fcursor = db.cursor()
 		results = fcursor.execute(query)
 		if results>0:
@@ -186,7 +186,7 @@ def ShowInfo(custid, Password):
 		continue
 	    output=output+line+'</table>\n<p>\n'
 	output=output+"</div>"
-	
+
 	query="select date, balance, text from transactions, descriptions where descriptions.handle=transactions.description and user="+str(custid)+" ORDER BY date"
         results = cursor.execute(query);
 
@@ -203,7 +203,7 @@ def ShowInfo(custid, Password):
 		line = line + "</tr>\n"
 		output=output+line
 	    output=output+"</table></div>"
-	    
+
         output=output+'<div align=center><p><input name="save" type="submit" value="Speichern"></div>'
         output=output+'<input type="hidden" name="user" value="'+str(custid)+'"></div>'
         output=output+'<input type="hidden" name="pass" value="'+Password+'"></div>'
@@ -225,6 +225,7 @@ def TransferFaction(sid, faction, newuser, game):
     return
 
 def Save(custid, Password):
+    global Errors
     validkeys=['email','address','lastname','firstname','city','password','phone']
     values='id='+str(custid)
     for key in Form.keys():
@@ -268,12 +269,16 @@ def Save(custid, Password):
 	    TransferFaction(sid, faction, newuser, game)
         nfactions = nfactions - 1
 
-    nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='TRANSFERED' and s.user="+str(custid) + " and s.game=g.id")
+    nfactions = cursor.execute("select g.id, g.name, s.id, faction from games g, subscriptions s where s.status='TRANSFERED' and s.user="+str(custid) + " and s.game=g.id")
     while nfactions > 0:
-        game, sid, faction = cursor.fetchone()
+        gid, game, sid, faction = cursor.fetchone()
         if Form.has_key("accept_"+faction):
             update = db.cursor()
-	    update.execute("UPDATE subscriptions set status='ACTIVE' where id="+str(int(sid)))
+            i = update.execute("SELECT count(*) from subscriptions where status='ACTIVE' and game="+str(int(gid)))
+            if i==0:
+	        update.execute("UPDATE subscriptions set status='ACTIVE' where id="+str(int(sid)))
+            else:
+                Errors=Errors+"Du hast bereits eine Aktive Partei in "+game+"<br>
         nfactions = nfactions - 1
 
     nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='CANCELLED' and s.user="+str(custid) + " and s.game=g.id")
