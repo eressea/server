@@ -561,6 +561,27 @@ NeuesSchiff(region * r)
 	modified = 1;
 }
 
+static const char * oldbuildings[MAXBUILDINGTYPES] = {
+    "castle",
+    "lighthouse",
+    "mine",
+    "quarry",
+    "harbour",
+    "academy",
+    "magictower",
+    "smithy",
+    "sawmill",
+    "stables",
+    "monument",
+    "dam",
+    "caravan",
+    "tunnel",
+    "inn",
+    "stonecircle",
+    "blessedstonecircle",
+    "illusion",
+};
+
 void
 NeueBurg(region * r)
 {
@@ -573,7 +594,7 @@ NeueBurg(region * r)
 	y = 2;
 	wmove(win, y, 4);
 	for (i = 0; i < MAXBUILDINGTYPES; i++) {
-		sprintf(buf, "%d=%s; ", i, oldbuildings[i]->_name);
+		sprintf(buf, "%d=%s; ", i, oldbuildings[i]);
 		q += strlen(buf);
 		if (q > SX - 20) {
 			q = strlen(buf);
@@ -597,10 +618,10 @@ NeueBurg(region * r)
 		waddch(win, '|');
 	}
 	wmove(win, 1, 2);
-	wAddstr((char*)oldbuildings[q]->_name);
+	wAddstr((char*)oldbuildings[q]);
 	wrefresh(win);
 
-	b = new_building(oldbuildings[q], r, NULL);
+	b = new_building(bt_find(oldbuildings[q]), r, NULL);
 
 	b->size = map_input(win, 2, 2, "Größe", 1, 999, 1);
 
