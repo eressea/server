@@ -277,6 +277,7 @@ preferred_terrain(const struct race * rc)
 
 #define REGIONS_PER_FACTION 2
 #define MINFACTIONS 1
+#define MAXAGEDIFF 5
 
 int
 mkisland(int nsize)
@@ -299,7 +300,13 @@ mkisland(int nsize)
 
 	for (r=regions;r;r=r->next) {
 		struct plane * p = rplane(r);
-		if (p==NULL && (rmin==NULL || r->age<=rmin->age)) rmin=r;
+		if (p==NULL && (rmin==NULL || r->age<=MAXAGEDIFF)) {
+			direction_t d;
+			for (d=0;d!=MAXDIRECTIONS;++d) {
+				if (rconnect(r, d)==NULL) break;
+			}
+			if (d!=MAXDIRECTIONS) rmin=r;
+		}
 	}
 	r = NULL;
 	for (dist=1;r!=rmin;++dist) {
