@@ -2760,10 +2760,10 @@ heal_all(void)
 	for(r=regions; r; r=r->next) {
 		for(u=r->units;u;u=u->next) {
 			int max_hp = unit_max_hp(u) * u->number;
-			if(u->hp < max_hp) {
+			if(u->hp < max_hp) { 
 				u->hp = max_hp;
 				fset(u->faction, FL_DH);
-			}
+			} 
 		}
 	}
 	

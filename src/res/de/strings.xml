@@ -5,6 +5,136 @@
 </comment>
 
 <strings>
+	<string name="prefix_Dunkel">
+		<text locale="de">Dunkel</text>
+		<text locale="en">dark </text>
+	</string>
+
+	<string name="prefix_Licht">
+		<text locale="de">Licht</text>
+		<text locale="en">light </text>
+	</string>
+
+	<string name="prefix_flame">
+		<text locale="de">Flammen</text>
+		<text locale="en">flame</text>
+	</string>
+
+	<string name="prefix_ice">
+		<text locale="de">Eis</text>
+		<text locale="en">ice</text>
+	</string>
+
+	<string name="prefix_Klein">
+		<text locale="de">Klein</text>
+		<text locale="en">gully </text>
+	</string>
+
+	<string name="prefix_Hoch">
+		<text locale="de">Hoch</text>
+		<text locale="en">high </text>
+	</string>
+
+	<string name="prefix_Huegel">
+		<text locale="de">Hügel</text>
+		<text locale="en">hill </text>
+	</string>
+
+	<string name="prefix_Berg">
+		<text locale="de">Berg</text>
+		<text locale="en">mountain </text>
+	</string>
+
+	<string name="prefix_Wald">
+		<text locale="de">Wald</text>
+		<text locale="en">wood </text>
+	</string>
+
+	<string name="prefix_Sumpf">
+		<text locale="de">Sumpf</text>
+		<text locale="en">swamp </text>
+	</string>
+
+	<string name="prefix_Schnee">
+		<text locale="de">Schnee</text>
+		<text locale="en">snow </text>
+	</string>
+
+	<string name="prefix_Sonnen">
+		<text locale="de">Sonnen</text>
+		<text locale="en">sun </text>
+	</string>
+
+	<string name="prefix_Mond">
+		<text locale="de">Mond</text>
+		<text locale="en">moon </text>
+	</string>
+
+	<string name="prefix_See">
+		<text locale="de">See</text>
+		<text locale="en">sea </text>
+	</string>
+
+	<string name="prefix_Tal">
+		<text locale="de">Tal</text>
+		<text locale="en">valley </text>
+	</string>
+
+	<string name="prefix_Schatten">
+		<text locale="de">Schatten</text>
+		<text locale="en">shadow </text>
+	</string>
+
+	<string name="prefix_Hoehlen">
+		<text locale="de">Höhlen</text>
+		<text locale="en">cave </text>
+	</string>
+
+	<string name="prefix_Blut">
+		<text locale="de">Blut</text>
+		<text locale="en">blood </text>
+	</string>
+
+	<string name="prefix_Wild">
+		<text locale="de">Wild</text>
+		<text locale="en">wild </text>
+	</string>
+
+	<string name="prefix_Chaos">
+		<text locale="de">Chaos</text>
+		<text locale="en">chaos </text>
+	</string>
+
+	<string name="prefix_Nacht">
+		<text locale="de">Nacht</text>
+		<text locale="en">night </text>
+	</string>
+
+	<string name="prefix_Nebel">
+		<text locale="de">Nebel</text>
+		<text locale="en">mist </text>
+	</string>
+
+	<string name="prefix_Grau">
+		<text locale="de">Grau</text>
+		<text locale="en">grey </text>
+	</string>
+
+	<string name="prefix_Frost">
+		<text locale="de">Frost</text>
+		<text locale="en">cold </text>
+	</string>
+
+	<string name="prefix_Finster">
+		<text locale="de">Finster</text>
+		<text locale="en">gloom </text>
+	</string>
+
+	<string name="prefix_Duester">
+		<text locale="de">Düster</text>
+		<text locale="en">black </text>
+	</string>
+
 	<comment>Küsten</comment>
 	<string name="Nordwestküste">
 		<text locale="de">Nordwestküste</text>

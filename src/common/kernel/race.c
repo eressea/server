@@ -76,7 +76,7 @@ rc_new(const char * zName)
 }
 
 race *
-rc_add(race * rc) 
+rc_add(race * rc)
 {
 	rc->next = races;
 	return races = rc;
@@ -137,6 +137,8 @@ const char *race_prefixes[] = {
 	"prefix_Frost",
 	"prefix_Finster",
 	"prefix_Duester",
+	"prefix_flame",
+	"prefix_ice",
 	NULL
 };
 
@@ -160,13 +162,13 @@ static const char * oldracenames[MAXRACES] = {
 	"irongolem", "stone golem", "shadowdemon", "shadowmaster", "mountainguard", "alp",
 	"toad",
 	"braineater", "peasant",
-	"wolf", "lynx", "tunnelworm", "eagle", "rat", "songdragon", "nymph", "unicorn", 
+	"wolf", "lynx", "tunnelworm", "eagle", "rat", "songdragon", "nymph", "unicorn",
 	"direwolf", "ghost",
 	"imp", "dreamcat", "fairy", "owl", "hellcat", "tiger", "dolphin", "giant turtle", "kraken", "sea serpent",
 	"shadow knight",
 	"centaur",
 	"skeleton", "skeleton lord", "zombie", "juju-zombie", "ghoul", "ghast", "museumghost", "gnome",
-	"template", 
+	"template",
 	"clone"
 };
 
@@ -324,7 +326,7 @@ boolean is_undead(const unit *u)
 boolean
 r_insectstalled(const region * r)
 {
-	if (rterrain(r)==T_GLACIER || rterrain(r)==T_ICEBERG_SLEEP 
+	if (rterrain(r)==T_GLACIER || rterrain(r)==T_ICEBERG_SLEEP
 			|| rterrain(r)==T_ICEBERG)
 		return true;
 
@@ -342,7 +344,7 @@ racename(const locale *loc, const unit *u, const race * rc)
 {
 	static char lbuf[80];
 	attrib *a, *a2;
-	
+
 
 	a = a_find(u->attribs, &at_group);
 	if(a) {
@@ -355,7 +357,7 @@ racename(const locale *loc, const unit *u, const race * rc)
 
 	if(a2) {
 		char s[32];
-		
+
 		strcpy(lbuf, locale_string(loc, (char *)a2->data.v));
 		if(a) {
 			strcpy(s, locale_string(loc,
@@ -547,7 +549,7 @@ dragon_drops(const struct race * rc, int size)
 	return itm;
 }
 
-int 
+int
 rc_specialdamage(const race * ar, const race * dr, const struct weapon_type * wtype)
 {
 	race_t art = old_race(ar);
@@ -605,7 +607,7 @@ typedef struct xml_state {
 	int nextattack;
 } xml_state;
 
-static int 
+static int
 tagbegin(struct xml_stack * stack)
 {
 	const xml_tag * tag = stack->tag;
@@ -616,7 +618,7 @@ tagbegin(struct xml_stack * stack)
 		if (strcmp(tag->name, "race")==0) {
 			const char * zName = xml_value(tag, "name");
 			race * rc;
-			
+
 			state->nextattack = 0;
 			state->nextfamiliar = 0;
 
@@ -764,7 +766,7 @@ tagbegin(struct xml_stack * stack)
 	return XML_OK;
 }
 
-static int 
+static int
 tagend(struct xml_stack * stack)
 {
 	const xml_tag * tag = stack->tag;
@@ -813,7 +815,7 @@ register_races(void)
 	register_function((pf_generic)drachen_name, "namedragon");
 	register_function((pf_generic)dracoid_name, "namedracoid");
 	register_function((pf_generic)shadow_name, "nameshadow");
-	
+
 	/* aging functions */
 	register_function((pf_generic)age_undead, "ageundead");
 	register_function((pf_generic)age_illusion, "ageillusion");
