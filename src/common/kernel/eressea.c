@@ -977,7 +977,7 @@ alliedunit(const unit * u, const faction * f2, int mode)
 		mode = (mode & automode) | (mode & HELP_GIVE);
 
 	sf = u->faction->allies;
-	a = a_find(u->attribs, &at_group);
+	a = a_findc(u->attribs, &at_group);
 	if (a!=NULL) sf = ((group*)a->data.v)->allies;
   return alliedgroup(pl, u->faction, f2, sf, mode);
 }

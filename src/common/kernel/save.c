@@ -1091,7 +1091,7 @@ readunit(FILE * F)
     if (ord!=NULL) addlist(&u->orders, ord);
 		freadstr(F, buf, sizeof(buf));
 	}
-  rs(F, buf);
+  freadstr(F, buf, sizeof(buf));
   u->lastorder = parse_order(buf, u->faction->locale);
   set_order(&u->thisorder, NULL);
 

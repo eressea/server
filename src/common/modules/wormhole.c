@@ -175,12 +175,12 @@ create_wormholes(void)
   }
 
   match = (region**)malloc(sizeof(region*) * count);
-  qsort(match, count, sizeof(region *), cmp_age);
   rptr = rlist;
   while (i!=count) {
     match[i++] = rptr->data;
     rptr = rptr->next;
   }
+  qsort(match, count, sizeof(region *), cmp_age);
   free_regionlist(rlist);
 
   count /= 2;
