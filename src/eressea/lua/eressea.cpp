@@ -3,6 +3,10 @@
 #include <eressea.h>
 
 // kernel includes
+#ifdef ALLIANCES
+# include <modules/alliance.h>
+#endif
+#include <attributes/key.h>
 #include <gamecode/laws.h>
 #include <kernel/race.h>
 #include <kernel/plane.h>
@@ -11,9 +15,6 @@
 #include <kernel/save.h>
 #include <kernel/unit.h>
 #include <util/language.h>
-#ifdef ALLIANCES
-# include <modules/alliance.h>
-#endif
 
 // lua includes
 #include <lua.hpp>
@@ -71,6 +72,32 @@ find_plane_id(const char * name)
   return pl?pl->id:0;
 }
 
+static bool
+get_flag(const char * name)
+{
+  int flag = atoi36(name);
+  attrib * a = find_key(global.attribs, flag);
+  return (a!=NULL);
+}
+
+static void
+set_flag(const char * name, bool value)
+{
+  int flag = atoi36(name);
+  attrib * a = find_key(global.attribs, flag);
+  if (a==NULL && value) {
+    add_key(&global.attribs, flag);
+  } else if (a!=NULL && !value) {
+    a_remove(&global.attribs, a);
+  }
+}
+
+static const char *
+get_gamename(void)
+{
+  return global.gamename;
+}
+
 void
 bind_eressea(lua_State * L)
 {
@@ -87,6 +114,10 @@ bind_eressea(lua_State * L)
     def("get_turn", &get_turn),
     def("remove_empty_units", &remove_empty_units),
 
+    def("set_flag", &set_flag),
+    def("get_flag", &get_flag),
+
+    def("get_gamename", &get_gamename),
     /* planes not really implemented */
     def("get_plane_id", &find_plane_id)
   ];
