@@ -833,7 +833,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 				cansee = true;
 				break;
 			}
-			if (get_item(u, I_RING_OF_INVISIBILITY) >= u->number
+			if (invisible(u) >= u->number
 				&& !get_item(u2, I_AMULET_OF_TRUE_SEEING))
 				continue;
 
@@ -883,7 +883,7 @@ cansee(faction * f, region * r, unit * u, int modifier)
 	else {
 		boolean xcheck = false;
 		int o = INT_MIN;
-		ring = (boolean)(ring || (get_item(u, I_RING_OF_INVISIBILITY) >= u->number));
+		ring = (boolean)(ring || (invisible(u) >= u->number));
 		n = n || eff_stealth(u, r) - modifier;
 		for (u2 = r->units; u2; u2 = u2->next) {
 			if (u2->faction == f) {
@@ -939,7 +939,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u, int mod
 					cansee = true;
 					break;
 				}
-				if (get_item(u, I_RING_OF_INVISIBILITY) >= u->number
+				if (invisible(u) >= u->number
 						&& !get_item(u2, I_AMULET_OF_TRUE_SEEING))
 					continue;
 

@@ -371,6 +371,7 @@ enum {
 	I_RUSTY_SHIELD,
 	I_RUSTY_CHAIN_MAIL,
 	I_SACK_OF_CONSERVATION,
+	I_SPHERE_OF_INVISIBILITY,
 	MAX_ITEMS /* do not use outside item.c ! */
 };
 

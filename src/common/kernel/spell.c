@@ -7225,6 +7225,26 @@ sp_createitem_invisibility(castorder *co)
 
 	return cast_level;
 }
+
+/* ------------------------------------------------------------- */
+/* Sphäre der Unsichtbarkeit */
+int
+sp_createitem_invisibility2(castorder *co)
+{
+	unit *mage = (unit *)co->magician;
+	int cast_level = co->level;
+	unit *familiar = (unit *)co->familiar;
+
+	if (familiar){
+		mage = familiar;
+	}
+
+	change_item(mage,I_SPHERE_OF_INVISIBILITY,1);
+	creation_message(mage, I_SPHERE_OF_INVISIBILITY);
+
+	return cast_level;
+}
+
 /* ------------------------------------------------------------- */
 /* Keuschheitsgürtel der Orks */
 int
@@ -9111,6 +9131,22 @@ spell spelldaten[] =
 			{0, 0, 0},
 			{0, 0, 0}},
 		(spell_f)sp_sweetdreams, patzer
+	},
+	
+	{SPL_INVISIBILITY2_ILLAUN, "Erschaffe eine Sphäre der Unsichtbarkeit",
+		"Mit diesem Spruch kann der Zauberer eine Sphäre der Unsichtbarkeit "
+		"erschaffen. Die Späre macht ihren Träger sowie einhundert weitere "
+		"Personen in derselben Einheit unsichtbar.",
+		NULL,
+		NULL,
+		M_TRAUM, (ONSHIPCAST), 5, 13,
+		{
+			{R_AURA, 150, SPC_FIX},
+			{R_SILVER, 30000, SPC_FIX},
+			{R_PERMAURA, 3, SPC_FIX},
+			{0, 0, 0},
+			{0, 0, 0}},
+		(spell_f)sp_createitem_invisibility2, patzer_createitem
 	},
 
 	{SPL_CREATE_TACTICCRYSTAL, "Erschaffe ein Traumauge",

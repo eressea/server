@@ -1041,3 +1041,10 @@ eff_skill(const unit * u, skill_t sk, const region * r)
 	}
 	return 0;
 }
+
+int
+invisible(const unit *u)
+{
+	return get_item(u, I_RING_OF_INVISIBILITY)
+		+ 100 * get_item(u, I_SPHERE_OF_INVISIBILITY);
+}

@@ -154,4 +154,6 @@ extern void set_number(struct unit * u, int count);
 extern boolean learn_skill(struct unit * u, skill_t sk, double chance);
 #endif
 
+extern int invisible(const unit *u);
+
 #endif

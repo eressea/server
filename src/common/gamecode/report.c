@@ -3183,6 +3183,8 @@ make_summary(boolean count_new)
 
 					s->artefakte += get_item(u, I_AMULET_OF_TRUE_SEEING);
 					s->artefakte += get_item(u, I_RING_OF_INVISIBILITY);
+					s->artefakte += get_item(u, I_SPHERE_OF_INVISIBILITY);
+					s->artefakte += get_item(u, I_SACK_OF_CONSERVATION);
 					s->artefakte += get_item(u, I_RING_OF_POWER);
 					s->artefakte += get_item(u, I_RUNESWORD);
 

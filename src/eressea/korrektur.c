@@ -28,6 +28,7 @@
 #include <modules/museum.h>
 #include <modules/xecmd.h>
 #include <items/questkeys.h>
+#include <items/catapultammo.h>
 
 /* gamecode includes */
 #include <creation.h>
@@ -619,10 +620,7 @@ show_newspells(void)
 	 * terminieren */
 
 	spellid_t newspellids[] = {
-		SPL_IRONKEEPER,
-		SPL_BLOODSACRIFICE,
-		SPL_TYBIED_DESTROY_MAGIC,
-		SPL_DESTROY_MAGIC,
+		SPL_INVISIBILITY2_ILLAUN,
 		SPL_NOSPELL };
 
 	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]
@@ -2855,6 +2853,21 @@ fix_road_borders(void)
 	}
 }
 
+static int
+give_cammo(void)
+{
+	faction *f;
+	unit *u;
+
+	for(f=factions; f; f=f->next) {
+		for(u=f->units; u; u=u->nextF) {
+			i_change(&u->items, &it_catapultammo, i_get(u->items, olditemtype[I_CATAPULT]));
+		}
+	}
+
+	return 0;
+}
+
 void
 korrektur(void)
 {
@@ -2950,7 +2963,7 @@ korrektur_end(void)
 	do_once("peas", peasant_adjustment());
 	do_once("orcc", orc_conversion());
 #endif
-
+	do_once("camm", give_cammo());
 }
 
 void

@@ -90,8 +90,7 @@ slipthru(const region * r, const unit * u, const building * b)
 
 	for (u2 = r->units; u2; u2 = u2->next)
 		if (usiege(u2) == b) {
-			if (get_item(u, I_RING_OF_INVISIBILITY) &&
-				get_item(u, I_RING_OF_INVISIBILITY) >= u->number &&
+			if (invisible(u) >= u->number &&
 				!get_item(u2, I_AMULET_OF_TRUE_SEEING))
 				continue;
 

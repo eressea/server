@@ -91,7 +91,7 @@ spy(region * r, unit * u)
 	 * Wahrnehmung als das Ziel Tarnung + Spionage/2 hat */
 	observe = eff_skill(target, SK_OBSERVATION, r)
 				- (effskill(u, SK_STEALTH) + eff_skill(u, SK_SPY, r)/2);
-	if (get_item(u, I_RING_OF_INVISIBILITY) >= u->number &&
+	if (invisible(u) >= u->number &&
 		get_item(target, I_AMULET_OF_TRUE_SEEING) == 0) {
 		observe = min(observe, 0);
 	}
