@@ -347,14 +347,14 @@ magicanalyse_ship(ship *sh, unit *mage, int force)
  * die Kraft des Curse um die halbe Stärke der Antimagie reduziert.
  * Zurückgegeben wird der noch unverbrauchte Rest von force.
  */
-int
-destr_curse(curse* c, int cast_level, int force)
+double
+destr_curse(curse* c, int cast_level, double force)
 {
 	if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
-		int chance;
+		double chance;
 		/* pro Stufe Unterschied -20% */
-		chance = (10 + (cast_level - c->vigour)*2);
-		if(rand()%10 >= chance){
+		chance = 0.1 + (cast_level - c->vigour)*0.2;
+		if (rand()%100 >= chance*100) {
 			force -= c->vigour;
 			if (c->type->change_vigour){
 				c->type->change_vigour(c, -(cast_level+1/2));
@@ -377,8 +377,7 @@ destr_curse(curse* c, int cast_level, int force)
 }
 
 int
-destroy_curse(attrib **alist, int cast_level, int force,
-		curse * c)
+destroy_curse(attrib **alist, int cast_level, double force, curse * c)
 {
 	int succ = 0;
 /*	attrib **a = a_find(*ap, &at_curse); */
@@ -403,18 +402,16 @@ destroy_curse(attrib **alist, int cast_level, int force,
 		 * auf alle Verzauberungen wirken. Ansonsten prüfe, ob der Curse vom
 		 * richtigen Typ ist. */
 		if(!c || c==c1) {
-			int n;
-			n = destr_curse(c1, cast_level, force);
-			if (n != force){
-				assert(n<force); /* force darf sich nur vermindert haben */
+			double remain = destr_curse(c1, cast_level, force);
+			if (remain < force) {
 				succ = cast_level;
-				force = n;
+				force = remain;
 			}
-			if(c1->vigour <= 0) {
+			if (c1->vigour <= 0) {
 				a_remove(ap, a);
 			}
 		}
-		if(*ap) ap = &(*ap)->next;
+		if (*ap) ap = &(*ap)->next;
 	}
 	return succ;
 }
@@ -731,7 +728,7 @@ sp_destroy_magic(castorder *co)
 
   succ = destroy_curse(ap, cast_level, force, c);
 
-	if(succ) {
+	if (succ) {
 		add_message(&mage->faction->msgs, new_message(mage->faction,
 			"destroy_magic_effect%u:unit%r:region%s:command%i:succ%s:target",
 			mage, mage->region, strdup(co->order), succ, strdup(ts)));
@@ -956,9 +953,9 @@ sp_summonent(castorder *co)
 	int ents;
 
 #if GROWING_TREES
-	if(rtrees(r,2) == 0) {
+	if (rtrees(r,2) == 0) {
 #else
-	if(rtrees(r) == 0) {
+	if (rtrees(r) == 0) {
 #endif
 		cmistake(mage, strdup(co->order), 204, MSG_EVENT);
 		/* nicht ohne bäume */
@@ -966,9 +963,9 @@ sp_summonent(castorder *co)
 	}
 
 #if GROWING_TREES
-	ents = min(power*power, rtrees(r,2));
+	ents = (int)min(power*power, rtrees(r,2));
 #else
-	ents = min(power*power, rtrees(r));
+	ents = (int)min(power*power, rtrees(r));
 #endif
 
 	u = create_unit(r, mage->faction, ents, new_race[RC_TREEMAN], 0, LOC(mage->faction->locale, rc_name(new_race[RC_TREEMAN], ents!=1)), mage);
@@ -1067,7 +1064,7 @@ sp_maelstrom(castorder *co)
 	int cast_level = co->level;
 	curse * c;
 	double power = co->force;
-	int duration = power+1;
+	int duration = (int)power+1;
 
 	if(rterrain(r) != T_OCEAN) {
 		cmistake(mage, strdup(co->order), 205, MSG_MAGIC);
@@ -1078,7 +1075,7 @@ sp_maelstrom(castorder *co)
 	/* Attribut auf Region.
 	 * Existiert schon ein curse, so wird dieser verstärkt
 	 * (Max(Dauer), Max(Stärke))*/
-	c = create_curse(mage, &mage->attribs, ct_find("maelstrom"), power, duration, power,0);
+	c = create_curse(mage, &mage->attribs, ct_find("maelstrom"), power, duration, (int)power, 0);
 	curse_setflag(c, CURSE_ISNEW);
 
 	/* melden, 1x pro Partei */
@@ -1157,7 +1154,7 @@ sp_blessedharvest(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double power = co->force;
-	int duration = power+1;
+	int duration = (int)power+1;
 
 	/* Attribut auf Region.
 	 * Existiert schon ein curse, so wird dieser verstärkt
@@ -1203,7 +1200,7 @@ sp_hain(castorder *co)
 		return 0;
 	}
 
-	trees = lovar((int)(force * 10 * RESOURCE_QUANTITY)) + force;
+	trees = lovar((int)(force * 10 * RESOURCE_QUANTITY)) + (int)force;
 #if GROWING_TREES
 	rsettrees(r, 1, rtrees(r,1) + trees);
 #else
@@ -1250,7 +1247,7 @@ sp_mallornhain(castorder *co)
 		return 0;
 	}
 
-	trees = lovar((int)(force * 10 * RESOURCE_QUANTITY)) + force;
+	trees = lovar((int)(force * 10 * RESOURCE_QUANTITY)) + (int)force;
 #if GROWING_TREES
 	rsettrees(r, 1, rtrees(r,1) + trees);
 #else
@@ -1282,7 +1279,7 @@ patzer_ents(castorder *co)
 		return;
 	}
 
-	ents = force*10;
+	ents = (int)(force*10);
 	u = create_unit(r, findfaction(MONSTER_FACTION), ents, new_race[RC_TREEMAN], 0,
 		LOC(default_locale, rc_name(new_race[RC_TREEMAN], ents!=1)), NULL);
 
@@ -1341,28 +1338,28 @@ sp_rosthauch(castorder *co)
 		/* Eisenwaffen: I_SWORD, I_GREATSWORD, I_AXE, I_HALBERD (50% Chance)*/
 		ironweapon = 0;
 
-		i = min(get_item(u, I_SWORD), force);
-		if (i > 0){
+		i = min(get_item(u, I_SWORD), (int)force);
+		if (i > 0) {
 			change_item(u, I_SWORD, -i);
 			change_item(u, I_RUSTY_SWORD, i);
 			force -= i;
 			ironweapon += i;
 		}
-		i = min(get_item(u, I_GREATSWORD), force);
+		i = min(get_item(u, I_GREATSWORD), (int)force);
 		if (i > 0){
 			change_item(u, I_GREATSWORD, -i);
 			change_item(u, I_RUSTY_GREATSWORD, i);
 			force -= i;
 			ironweapon += i;
 		}
-		i = min(get_item(u, I_AXE), force);
+		i = min(get_item(u, I_AXE), (int)force);
 		if (i > 0){
 			change_item(u, I_AXE, -i);
 			change_item(u, I_RUSTY_AXE, i);
 			force -= i;
 			ironweapon += i;
 		}
-		i = min(get_item(u, I_HALBERD), force);
+		i = min(get_item(u, I_HALBERD), (int)force);
 		if (i > 0){
 			if(rand()%100 < 50){
 				change_item(u, I_HALBERD, -i);
@@ -1424,7 +1421,7 @@ sp_kaelteschutz(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double force = co->force;
-	int duration = max(cast_level, force) + 1;
+	int duration = max(cast_level, (int)force) + 1;
 	spellparameter *pa = co->par;
 
 
@@ -1442,7 +1439,7 @@ sp_kaelteschutz(castorder *co)
 		u = pa->param[n]->data.u;
 
 		if (force < u->number){
-			men = force;
+			men = (int)force;
 		} else {
 			men = u->number;
 		}
@@ -1832,7 +1829,7 @@ sp_treewalkenter(castorder *co)
 
 	assert(rt != NULL);
 
-	remaining_cap = power * 500;
+	remaining_cap = (int)(power * 500);
 
 	/* fuer jede Einheit */
 	for (n = 0; n < pa->length; n++) {
@@ -1930,7 +1927,7 @@ sp_treewalkexit(castorder *co)
 		return 0;
 	}
 
-	remaining_cap = power * 500;
+	remaining_cap = (int)(power * 500);
 
 	if(pa->param[0]->typ != SPP_REGION){
 		report_failure(mage, co->order);
@@ -2160,7 +2157,7 @@ sp_drought(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double power = co->force;
-	int duration = power+1;
+	int duration = (int)power+1;
 
 	if(rterrain(r) == T_OCEAN ) {
 		cmistake(mage, strdup(co->order), 189, MSG_MAGIC);
@@ -2191,7 +2188,7 @@ sp_drought(castorder *co)
 	c = get_curse(r->attribs, ct_find("drought"));
 	if (c) {
 		c->vigour = max(c->vigour, power);
-		c->duration = max(c->duration, power);
+		c->duration = max(c->duration, (int)power);
 	} else {
 		/* Baeume und Pferde sterben */
 #if GROWING_TREES
@@ -2230,14 +2227,14 @@ sp_fog_of_confusion(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double power = co->force;
-	int range;
+	double range;
 	int duration;
 	regionlist *rl,*rl2;
 
 	range = (power-11)/3-1;
 	duration = ((power-11)/3)*2+1;
 
-	rl = all_in_range(r, range);
+	rl = all_in_range(r, (int)range);
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
 		curse * c;
@@ -2786,7 +2783,6 @@ sp_summondragon(castorder *co)
 	faction *f;
 	int time;
 	int number;
-	int range;
 	const race * race;
 
 	f = findfaction(MONSTER_FACTION);
@@ -2823,8 +2819,7 @@ sp_summondragon(castorder *co)
 		}
 	}
 
-	range = power;
-	rl = all_in_range(r, range);
+	rl = all_in_range(r, (int)power);
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
 		for(u = rl2->region->units; u; u = u->next) {
@@ -3016,7 +3011,7 @@ static void
 wall_move(const border * b, struct unit * u, const struct region * from, const struct region * to)
 {
 	wall_data * fd = (wall_data*)b->data;
-	int hp = dice(2, fd->force) * u->number;
+	int hp = dice(3, fd->force) * u->number;
 	if (fd->active) {
 		hp = min (u->hp, hp);
 		u->hp -= hp;
@@ -3055,6 +3050,7 @@ sp_firewall(castorder *co)
 	unit * u;
 	border * b;
 	wall_data * fd;
+  attrib * a;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
@@ -3076,13 +3072,28 @@ sp_firewall(castorder *co)
 		return 0;
 	}
 
-	b = new_border(&bt_firewall, r, r2);
-	fd = (wall_data*)b->data;
-	fd->force = (force+1)/2;
-	fd->mage = mage;
-	fd->active = false;
+  b = get_borders(r, r2);
+  while (b!=NULL) {
+    if (b->type == &bt_firewall) break;
+  }
+  if (b==NULL) {
+    b = new_border(&bt_firewall, r, r2);
+    fd = (wall_data*)b->data;
+    fd->force = (force+1)/2;
+    fd->mage = mage;
+    fd->active = false;
+  } else {
+    fd = (wall_data*)b->data;
+    fd->force = max(fd->force, (force+1)/2);
+  }
 
-	a_add(&b->attribs, a_new(&at_countdown))->data.i = cast_level;
+  a = a_find(b->attribs, &at_countdown);
+  if (a==NULL) {
+    a = a_add(&b->attribs, a_new(&at_countdown));
+    a->data.i = cast_level;
+  } else {
+    a->data.i = max(a->data.i, cast_level);
+  }
 
 	/* melden, 1x pro Partei */
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
@@ -4974,14 +4985,12 @@ sp_dragonsong(castorder *co)
 	double power = co->force;
 	regionlist *rl,*rl2;
 	faction *f;
-	int range;
 
 	/* TODO HP-Effekt */
 
 	f = findfaction(MONSTER_FACTION);
 
-	range = power;
-	rl = all_in_range(r, range);
+	rl = all_in_range(r, (int)power);
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
 		for(u = rl2->region->units; u; u = u->next) {
@@ -5544,10 +5553,10 @@ sp_dream_of_confusion(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double power = co->force;
-	int range = (power-14)/2-1;
+	double range = (power-14)/2-1;
 	int duration = ((power-14)/2)*2+1;
 
-	rl = all_in_range(r, range);
+	rl = all_in_range(r, (int)range);
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
 		curse * c;
@@ -5882,7 +5891,7 @@ sp_pullastral(castorder *co)
 	case 1:
 		rt = r;
 		ro = pa->param[0]->data.r;
-		rl = all_in_range(r_astral_to_standard(r),TP_RADIUS);
+		rl = all_in_range(r_astral_to_standard(r), TP_RADIUS);
 		rl2 = rl;
 		while(rl2) {
 			if(rl2->region->x == ro->x && rl2->region->y == ro->y) {
@@ -6013,7 +6022,7 @@ sp_leaveastral(castorder *co)
 				MSG_MAGIC, ML_MISTAKE);
 	    return 0;
 		}
-		rl  = allinhab_in_range(r_astral_to_standard(r),TP_RADIUS);
+		rl  = allinhab_in_range(r_astral_to_standard(r), TP_RADIUS);
 		rl2 = rl;
 		while(rl2) {
 			if(rl2->region == rt) break;
