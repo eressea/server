@@ -79,7 +79,7 @@ endif
 
 ifeq ($(CONFIG), release)
   BUILD_DIR  = Release-$(ARCHITECTURE)
-  CFLAGS    += -O4 -funroll-loops -fomit-frame-pointer -ggdb
+  CFLAGS    += -O4 -DNDEBUG -funroll-loops -fomit-frame-pointer -ggdb
   LDFLAGS   += -ggdb
 endif
 

@@ -47,8 +47,10 @@ cinfo_region(const struct locale * lang, const void * obj, typ_t typ, struct cur
 	assert(typ == TYP_REGION);
 
 	msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
-	nr_render(msg, lang, buf, sizeof(buf), NULL);
-	msg_release(msg);
+	if (msg) {
+		nr_render(msg, lang, buf, sizeof(buf), NULL);
+		msg_release(msg);
+	}
 	return 1;
 }
 

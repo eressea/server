@@ -909,6 +909,7 @@ move_iceberg(region *r)
 
 			/* Personen, Schiffe und Gebäude verschieben */
 			while (rc->buildings) {
+				rc->buildings->region = r;
 				translist(&rc->buildings, &r->buildings, rc->buildings);
 			}
 			while (rc->ships) {
