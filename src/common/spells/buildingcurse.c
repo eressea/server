@@ -78,10 +78,43 @@ cinfo_magicrunes(void * obj, typ_t typ, curse *c, int self)
 
 	return 0;
 }
+static struct curse_type ct_magicrunes = { "magicrunes",
+	CURSETYP_NORM, 0, M_SUMEFFECT,
+	"Dieses Zauber verstärkt die natürliche Widerstandskraft gegen eine "
+	"Verzauberung.",
+	cinfo_magicrunes
+};
+
+static struct curse_type ct_magicwalls = { "magicwalls",
+	CURSETYP_NORM, 0, NO_MERGE,
+	"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
+	"gebunden. Starke elementarmagische Kräfte sind zu spüren. "
+	"Vieleicht wurde gar ein Erdelementar in diese Mauern gebannt. "
+	"Ausser ebenso starkter Antimagie wird nichts je diese Mauern "
+	"gefährden können.",
+	cinfo_building
+};
+static struct curse_type ct_strongwall = { "strongwall",
+	CURSETYP_NORM, 0, NO_MERGE,
+	"",
+	cinfo_building
+};
+static struct curse_type ct_nocostbuilding = { "nocostbuilding",
+	CURSETYP_NORM, 0, NO_MERGE,
+	"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
+	"gebunden. Unbeeindruck vom Zahn der Zeit wird dieses Gebäude wohl "
+	"auf Ewig stehen.",
+	cinfo_building
+};
 
 
 void 
 register_buildingcurse(void)
 {
 	register_function((pf_generic)cinfo_magicrunes, "curseinfo::magicrunes");
+
+	ct_register(&ct_magicwalls);
+	ct_register(&ct_strongwall);
+	ct_register(&ct_magicrunes);
+	ct_register(&ct_nocostbuilding);
 }

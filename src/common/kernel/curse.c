@@ -687,32 +687,6 @@ is_cursed_with(attrib *ap, curse *c)
  * 	int (*write)(FILE * F, const curse * c); 
  * } curse_type;
  */
-static struct curse_type ct_magicwalls = { "magicwalls",
-	CURSETYP_NORM, 0, NO_MERGE,
-	"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
-	"gebunden. Starke elementarmagische Kräfte sind zu spüren. "
-	"Vieleicht wurde gar ein Erdelementar in diese Mauern gebannt. "
-	"Ausser ebenso starkter Antimagie wird nichts je diese Mauern "
-	"gefährden können."
-};
-static struct curse_type ct_strongwall = { "strongwall",
-	CURSETYP_NORM, 0, NO_MERGE,
-	"",
-	NULL
-};
-static struct curse_type ct_magicrunes = { "magicrunes",
-	CURSETYP_NORM, 0, M_SUMEFFECT,
-	"Dieses Zauber verstärkt die natürliche Widerstandskraft gegen eine "
-	"Verzauberung."
-};
-static struct curse_type ct_nocostbuilding = { "nocostbuilding",
-	CURSETYP_NORM, 0, NO_MERGE,
-	"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
-	"gebunden. Unbeeindruck vom Zahn der Zeit wird dieses Gebäude wohl "
-	"auf Ewig stehen.",
-	cinfo_region
-};
-
 
 void *
 resolve_curse(void * id)
@@ -727,11 +701,6 @@ register_curses(void)
 	register_regioncurse();
 	register_shipcurse();
 	register_buildingcurse();
-
-	ct_register(&ct_magicwalls);
-	ct_register(&ct_strongwall);
-	ct_register(&ct_magicrunes);
-	ct_register(&ct_nocostbuilding);
 }
 
 
