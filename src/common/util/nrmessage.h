@@ -36,3 +36,4 @@ extern const char * nr_section(const struct message *msg);
  * $unit($unit) konnte von $region($region) nicht nach $direction($direction) ausreisen, der Nebel war zu dicht.
  * unit:unit region:region direction:int
  */
+

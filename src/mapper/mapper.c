@@ -606,10 +606,12 @@ modify_block(void)
 	tagregion *t;
 	char *name = NULL;
 	int div = 0;
+	int mal = 0;
+	struct rawmaterial *res;
 
 	win = openwin(70, 4, "< Tag-Regionen modifizieren >");
 	wmove(win, 1, 2);
-	wAddstr("Name, Peasants, Horses, Silver, Chaos (n/p/h/s/c,q)?");
+	wAddstr("Name, Peasants, Horses, Silver, Chaos, noResources, Mallorn (n/p/h/s/c/r/m,q)?");
 	wrefresh(win);
 	c = getch();
 	if (c == 'q') {
@@ -634,6 +636,16 @@ modify_block(void)
 	case 'p':
 		div = atoi(my_input(win, 2, 2, "Divisor: ", "1"));
 		break;
+	case 'm':
+		wmove(win, 2, 2);
+		wAddstr("Mallorn (s)etzen oder (l)öschen?");
+		wrefresh(win);
+		if (getch() == 's') {
+			mal = 1;
+		} else {
+			mal = 0;
+		}
+		break;
 	}
 
 	for (t=Tagged; t; t=t->next) {
@@ -652,6 +664,28 @@ modify_block(void)
 					break;
 				case 's':
 					rsetmoney(r, production(r)*10+rand()%(production(r)*10));
+					break;
+				case 'r':
+					for (res=r->resources;res;res=res->next) {
+						const item_type * itype = resource2item(res->type->rtype);
+						if(itype == olditemtype[I_IRON]) {
+							res->amount = -1;
+							res->level = -1;
+						} else if(itype == olditemtype[I_LAEN]) {
+							res->amount = -1;
+							res->level = -1;
+						} else if(itype == olditemtype[I_STONE]) {
+							res->amount = -1;
+							res->level = -1;
+						}
+					}
+					break;
+				case 'm':
+					if(mal == 1) {
+						fset(r, RF_MALLORN);
+					} else {
+						freset(r, RF_MALLORN);
+					}
 					break;
 			}
 		}

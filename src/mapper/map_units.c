@@ -82,7 +82,7 @@ make_new_unit(region * r)
 	WINDOW *win;
 	char *fac_nr36;
 	int i, p, anz, q, y;
-	win = openwin(SX - 10, 8, "< Neue Einheit erschaffen >");
+	win = openwin(SX - 10, 17, "< Neue Einheit erschaffen >");
 
 	if (r->units)
 		p = r->units->faction->no;
