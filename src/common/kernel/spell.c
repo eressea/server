@@ -67,6 +67,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 /* triggers includes */
 #include <triggers/changefaction.h>
@@ -7267,7 +7268,7 @@ sp_wdwpyramid(castorder *co)
 			"unit region command", mage, r, co->order));
 	} else {
 		region *r2;
-		int    mindist = -1;
+		int    mindist = INT_MAX;
 		int    minshowdist;
 		int    maxshowdist;
 
