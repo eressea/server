@@ -4769,7 +4769,7 @@ sp_calm_monster(castorder *co)
 	}
 
 	c = create_curse(mage, &target->attribs, ct_find("calmmonster"), force, duration,
-				mage->faction->unique_id, 0);
+				(int)mage->faction, 0);
 	if (c==NULL) {
 		report_failure(mage, co->order);
 		return 0;

@@ -1500,135 +1500,6 @@ init_mwarden(void)
 }
 #endif
 
-#ifdef CONVERT_TRIGGER
-#include "old/relation.h"
-#include "old/trigger.h"
-#include "old/trigger_internal.h"
-
-#include <event.h>
-
-#include <triggers/killunit.h>
-#include <triggers/timeout.h>
-#include <triggers/changerace.h>
-#include <triggers/changefaction.h>
-#include <triggers/createunit.h>
-#include <triggers/giveitem.h>
-#include <triggers/createcurse.h>
-#include <triggers/shock.h>
-
-typedef struct {
-	void *obj2;
-	typ_t typ2;
-	relation_t id;
-	spread_t spread;
-} reldata;
-
-extern timeout *all_timeouts;
-
-static void
-convert_triggers(void)
-{
-	region * r=regions;
-	timeout * t;
-	while (r) {
-		unit * u = r->units;
-		while (u) {
-			attrib * a = a_find(u->attribs, &at_relation);
-			while (a) {
-				reldata *rel = (reldata *)a->data.v;
-				unit * u2 = (unit*)rel->obj2;
-				switch (rel->id) {
-				case REL_FAMILIAR:
-					if (u && u2) {
-						if (!playerrace(u->race) || (playerrace(u2->race) && u->race==RC_GOBLIN))
-							set_familiar(u2, u);
-						else
-							set_familiar(u, u2);
-					} else {
-						if (u2) fprintf(stderr, "WARNING: FAMILIAR info for %s may be broken!\n", unitname(u2));
-						if (u) fprintf(stderr, "WARNING: FAMILIAR info for %s may be broken!\n", unitname(u));
-					}
-					break;
-				case REL_CREATOR:
-					break;
-				case REL_TARGET:
-					fprintf(stderr, "WARNING: TARGET relation between %s and 0x%p not converted\n", unitname(u), u2);
-					break;
-				default:
-					fprintf(stderr, "WARNING: unknown relation %d between %s and 0x%p not converted\n", rel->id, unitname(u), u2);
-					break;
-				}
-				a = a->nexttype;
-			}
-			u = u->next;
-		}
-		r=r->next;
-	}
-	for (t=all_timeouts;t;t=t->next) {
-		actionlist * al = t->acts;
-		int time = t->ticks;
-		for (;al;al=al->next) {
-			action * act = al->act;
-			if (act) switch( act->atype ) {
-			case AC_DESTROY: {
-				/* conversion keeper */
-				unit * u = (unit*)act->obj;
-				trigger * tkill = trigger_killunit(u);
-				add_trigger(&u->attribs, "timer", trigger_timeout(time, tkill));
-			}
-			case AC_CHANGERACE: {
-				/* conversion for toads */
-				unit *u = (unit*)act->obj;
-				race_t race = (race_t)act->i[0];
-				race_t irace = (race_t)act->i[1];
-				trigger * trestore = trigger_changerace(u, race, irace);
-				if (rand()%10>2) t_add(&trestore, trigger_giveitem(u, olditemtype[I_TOADSLIME], 1));
-				add_trigger(&u->attribs, "timer", trigger_timeout(time, trestore));
-				break;
-			}
-			case AC_CHANGEIRACE: {
-				/* conversion for shapeshift */
-				unit *u = (unit*)act->obj;
-				race_t irace = (race_t)act->i[0];
-				trigger * trestore = trigger_changerace(u, NORACE, irace);
-				add_trigger(&u->attribs, "timer", trigger_timeout(time, trestore));
-				break;
-			}
-			case AC_CHANGEFACTION: {
-				/* charmingsong */
-				faction *f = findfaction_unique_id(act->i[0]);
-				unit    *u = (unit*)act->obj;
-				trigger *trestore = trigger_changefaction(u, f);
-				add_trigger(&u->attribs, "timer", trigger_timeout(time, trestore));
-				add_trigger(&u->faction->attribs, "destroy", trigger_killunit(u));
-				add_trigger(&f->attribs, "destroy", trigger_killunit(u));
-				break;
-			}
-			case AC_CREATEUNIT: {
-				/* conversion summon_dragon */
-				faction *f  = findfaction_unique_id(act->i[0]);
-				region  *r  = (region *)act->obj;
-				int      number  = act->i[1];
-				race_t   race    = (race_t)act->i[2];
-				trigger *tsummon = trigger_createunit(r, f, race, number);
-				add_trigger(&r->attribs, "timer", trigger_timeout(time, tsummon));
-				break;
-			}
-			case AC_CREATEMAGICBOOSTCURSE:{
-				/* delayed magic boost curse */
-				unit    *mage    = (unit*)act->obj;
-				trigger *tsummon = trigger_createcurse(mage, mage, C_AURA, 0, act->i[0], 6, 50, 1);
-				add_trigger(&mage->attribs, "timer", trigger_timeout(5, tsummon));
-				break;
-			}
-			default:
-				fprintf(stderr, "WARNING: timeout not converted\n");
-			}
-		}
-	}
-}
-#endif
-
 #if 0
 #include <items/lmsreward.h>
 static void
@@ -2393,9 +2264,9 @@ static int
 dump_sql(void)
 {
 	faction * f;
-	for (f=factions;f;f=f->next) {
-		if (f->unique_id==0) {
-			f->unique_id = ++max_unique_id;
+	if (sqlstream) for (f=factions;f;f=f->next) {
+		if (f->subscription==0) {
+			/* fprintf(sqlstream,) */
 		}
 	}
 	return 0;

@@ -108,9 +108,9 @@ cinfo_dreamcurse(const struct locale * lang, const void * obj, typ_t typ, curse 
 	unused(obj);
 	assert(typ == TYP_REGION);
 
-	if (c->effect > 0){
+	if (curse_geteffect(c) > 0){
 		msg = msg_message("curseinfo::gooddream", "id", c->no);
-	}else{
+	} else {
 		msg = msg_message("curseinfo::baddream", "id", c->no);
 	}
 	nr_render(msg, lang, buf, sizeof(buf), NULL);

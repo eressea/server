@@ -101,16 +101,29 @@ extern int * age;
 boolean nobattle = false;
 /* ------------------------------------------------------------- */
 
+static const char *
+dbrace(const struct race * rc)
+{
+  static char zText[32];
+  unsigned char * zPtr = (unsigned char*)zText;
+  strcpy(zText, LOC(find_locale("en"), rc_name(rc, 0)));
+  while (*zPtr) {
+    *zPtr = (unsigned char)toupper(*(int*)zPtr); 
+    ++zPtr;
+  }
+  return zText;
+}
+
 static void
 restart(unit *u, const race * rc)
 {
-	faction *f = addplayer(u->region, u->faction->email, u->faction->passw, rc, u->faction->locale)->faction;
+	faction *f = addplayer(u->region, u->faction->email, u->faction->passw, rc, u->faction->locale, u->faction->subscription)->faction;
 	unit * nu = f->units;
 	strlist ** o=&u->orders;
-
+  f->subscription = u->faction->subscription;
 	fset(f, FFL_RESTART);
-	fprintf(sqlstream, "UPDATE subscriptions set faction='%s' where faction"
-		"='%s' and game=%d;\n", itoa36(u->faction->no), itoa36(f->no), GAME_ID);
+	if (f->subscription) fprintf(sqlstream, "UPDATE subscriptions set faction='%s', race='%s' where id=%u;\n",
+    itoa36(f->no), dbrace(rc), f->subscription);
 	f->magiegebiet = u->faction->magiegebiet;
 	f->options = u->faction->options;
 	freestrlist(nu->orders);
@@ -1066,15 +1079,15 @@ quit(void)
 			char info[256];
 			sprintf(info, "%d Einheiten, %d Personen, %d Silber", 
 				f->no_units, f->number, f->money);
-			fprintf(sqlstream, 
+			if (f->subscription) fprintf(sqlstream, 
 				"UPDATE subscriptions SET lastturn=%d, password='%s', info='%s' "
-				"WHERE game=%d AND faction='%s';\n", 
-				f->lastorders, f->override, info, GAME_ID, itoa36(f->no));
+				"WHERE id=%u;\n", 
+				f->lastorders, f->override, info, f->subscription);
 		} else {
-			fprintf(sqlstream, 
+			if (f->subscription) fprintf(sqlstream, 
 				"UPDATE subscriptions SET status='ACTIVE', lastturn=%d, password='%s' "
-				"WHERE game=%d AND faction='%s';\n", 
-				f->lastorders, f->override, GAME_ID, itoa36(f->no));
+				"WHERE id=%u;\n", 
+				f->lastorders, f->override, f->subscription);
 		}
 
 		if (turn - f->lastorders >= (NMRTIMEOUT - 1)) {
@@ -2609,9 +2622,9 @@ renumber_factions(void)
 	for (rp=renum;rp;rp=rp->next) {
 		a_remove(&rp->faction->attribs, rp->attrib);
 		if (updatelog) fprintf(updatelog, "renum %s %s\n", itoa36(rp->faction->no), itoa36(rp->want));
-		fprintf(sqlstream, "UPDATE subscriptions set faction='%s' where "
-			"faction='%s' and game=%d;\n", itoa36(rp->want), 
-			itoa36(rp->faction->no), GAME_ID);
+		if (f->subscription) fprintf(sqlstream, "UPDATE subscriptions set faction='%s' where "
+			"subscription=%u;\n", itoa36(rp->want), 
+			f->subscription);
 		rp->faction->no = rp->want;
 		register_faction_id(rp->want);
 		fset(rp->faction, FF_NEWID);
@@ -2878,8 +2891,8 @@ ageing(void)
 			if (is_cursed(u->attribs, C_OLDRACE, 0)){
 				curse *c = get_curse(u->attribs, ct_find("oldrace"));
 				if (c->duration == 1 && !(c->flag & CURSE_NOAGE)) {
-					u->race = new_race[c->effect];
-					u->irace = new_race[c->effect];
+					u->race = new_race[curse_geteffect(c)];
+					u->irace = new_race[curse_geteffect(c)];
 				}
 			}
 		}

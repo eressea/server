@@ -87,17 +87,19 @@ unused_faction_id(void)
 }
 
 unit *
-addplayer(region *r, const char *email, const char * password, const struct race * frace, const struct locale *loc)
+addplayer(region *r, const char *email, const char * password, 
+					const struct race * frace, const struct locale *loc,
+					int subscription)
 {
 	int i;
 	unit *u;
 	faction *f;
-
-    assert(frace != new_race[RC_ORC]);
-    f = calloc(sizeof(faction), 1);
-
-    set_string(&f->email, email);
-
+	
+	assert(frace != new_race[RC_ORC]);
+	f = calloc(sizeof(faction), 1);
+	
+	set_string(&f->email, email);
+	
 	if (password) {
 		set_string(&f->passw, password);
 	} else {
@@ -106,26 +108,25 @@ addplayer(region *r, const char *email, const char * password, const struct race
 	}
 	for (i = 0; i < 6; i++) buf[i] = (char) (97 + rand() % 26); buf[i] = 0;
 	set_string(&f->override, buf);
-
+	
 	f->lastorders = turn;
 	f->alive = 1;
 	f->age = 0;
 	f->race = frace;
 	f->magiegebiet = 0;
 	f->locale = loc;
+	f->subscription = subscription;
 	set_ursprung(f, 0, r->x, r->y);
-
+	
 	f->options = Pow(O_REPORT) | Pow(O_ZUGVORLAGE) | Pow(O_SILBERPOOL) | Pow(O_COMPUTER) | Pow(O_COMPRESS) | Pow(O_ADRESSEN) | Pow(O_STATISTICS);
-
+	
 	f->no = unused_faction_id();
 	register_faction_id(f->no);
-
-	f->unique_id = ++max_unique_id;
 
 	sprintf(buf, "%s %s", LOC(loc, "factiondefault"), factionid(f));
 	set_string(&f->name, buf);
 	fset(f, FL_UNNAMED);
-
+	
 	addlist(&factions, f);
 
 	u = createunit(r, f, 1, f->race);

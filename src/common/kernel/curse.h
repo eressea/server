@@ -13,9 +13,7 @@
 
 #ifndef CURSE_H
 #define CURSE_H
-
 /* ------------------------------------------------------------- */
-
 /* Sprueche in der struct region und auf Einheiten, Schiffen oder Burgen
  * (struct attribute)
  */
@@ -79,6 +77,8 @@
  * - Funktionen zur Änderung der Werte
  *
  * */
+
+#include <util/variant.h>
 
 /* ------------------------------------------------------------- */
 /* Zauberwirkungen */
@@ -192,7 +192,7 @@ typedef struct curse {
 	int duration;      /* Dauer der Verzauberung. Wird jede Runde vermindert */
 	int vigour;        /* Stärke der Verzauberung, Widerstand gegen Antimagie */
 	struct unit *magician;    /* Pointer auf den Magier, der den Spruch gewirkt hat */
-	int effect;
+	variant effect;
 	void *data;        /* pointer auf spezielle curse-unterstructs*/
 } curse;
 

@@ -149,6 +149,77 @@ rc(FILE * F)
 #define rc(F) (nextc = getc(F))
 #endif
 
+#define CONVERT_DBLINK
+#ifdef CONVERT_DBLINK
+
+typedef struct uniquenode {
+	struct uniquenode * next;
+	int id;
+	faction * f;
+} uniquenode;
+
+#define HASHSIZE 2047
+static uniquenode * uniquehash[HASHSIZE];
+
+static faction *
+uniquefaction(int id)
+{
+	uniquenode * node = uniquehash[id%HASHSIZE];
+	while (node && node->id!=id) node=node->next;
+	return node?node->f:NULL;
+}
+
+static void
+addunique(int id, faction * f)
+{
+	uniquenode * fnode = calloc(1, sizeof(uniquenode));
+	fnode->f = f;
+	fnode->id = id;
+	fnode->next = uniquehash[id%HASHSIZE];
+	uniquehash[id%HASHSIZE] = fnode;
+}
+
+typedef struct mapnode {
+	struct mapnode * next;
+	int fno;
+	int subscription;
+} mapnode;
+
+static mapnode * subscriptions[HASHSIZE];
+
+void
+convertunique(faction * f)
+{
+	int unique = f->subscription;
+	static FILE * F = NULL;
+	mapnode * mnode;
+	addunique(unique, f);
+	if (F==NULL) {
+		static char zText[MAX_PATH];
+		strcat(strcpy(zText, basepath()), "/subscriptions");
+		F = fopen(zText, "r");
+		if (F==NULL) {
+			log_error(("could not open %s.\n", zText));
+			abort();
+		}
+		for (;;) {
+			char zFaction[5];
+			int subscription, fno;
+			if (fscanf(F, "%s %d", zFaction, &subscription)<=0) break;
+			mnode = calloc(1, sizeof(mapnode));
+			fno = atoi36(zFaction);
+			mnode->next = subscriptions[fno%HASHSIZE];
+			mnode->fno = fno;
+			mnode->subscription = subscription;
+			subscriptions[fno%HASHSIZE] = mnode;
+		}
+	}
+	mnode = subscriptions[f->no%HASHSIZE];
+	while (mnode!=NULL && mnode->fno!=f->no) mnode = mnode->next;
+	f->subscription = mnode->subscription;
+}
+#endif
+
 void
 rds(FILE * F, char **ds)
 {
@@ -785,7 +856,7 @@ readgame(boolean backup)
 #endif
 	turn = ri(F);
 	/* read_dynamictypes(); */
-	max_unique_id = ri(F);
+	/* max_unique_id = */ ri(F);
 	nextborder = ri(F);
 
 	/* Planes */
@@ -1229,7 +1300,7 @@ writegame(char *path, char quiet)
 	wnl(F);
 
 	wi(F, turn);
-	wi(F, max_unique_id);
+	wi(F, 0/*max_unique_id*/);
 	wi(F, nextborder);
 
 	/* Write planes */
@@ -1359,12 +1430,12 @@ curse_write(const attrib * a, FILE * f) {
 
 	if (c->magician){
 		mage_no = c->magician->no;
-	}else{
+	} else {
 		mage_no = -1;
 	}
 
 	fprintf(f, "%d %s %d %d %d %d %d ", c->no, ct->cname, flag,
-			c->duration, c->vigour, mage_no, c->effect);
+			c->duration, c->vigour, mage_no, c->effect.i);
 
 	if (c->type->write) c->type->write(f, c);
 	else if (c->type->typ == CURSETYP_UNIT) {
@@ -1382,7 +1453,7 @@ curse_read(attrib * a, FILE * f) {
 	if (global.data_version >= CURSETYPE_VERSION) {
 		char cursename[64];
 		fscanf(f, "%d %s %d %d %d %d %d ", &c->no, cursename, &c->flag,
-			&c->duration, &c->vigour, &mageid, &c->effect);
+			&c->duration, &c->vigour, &mageid, &c->effect.i);
 		ct = ct_find(cursename);
 	} else {
 		int cspellid;
@@ -1392,12 +1463,19 @@ curse_read(attrib * a, FILE * f) {
 			c->no = newunitid();
 		} else {
 			fscanf(f, "%d %d %d %d %d %d %d ", &c->no, &cspellid, &c->flag,
-				&c->duration, &c->vigour, &mageid, &c->effect);
+				&c->duration, &c->vigour, &mageid, &c->effect.i);
 		}
 		ct = ct_find(oldcursename(cspellid));
 	}
 	assert(ct!=NULL);
 
+	if (global.data_version<DBLINK_VERSION) {
+		static const curse_type * cmonster = NULL;
+		if (!cmonster) cmonster=ct_find("calmmonster");
+		if (ct==cmonster) {
+			c->effect.v = uniquefaction(c->effect.i);
+		}
+	}
 	c->type = ct;
 
 	/* beim Einlesen sind noch nicht alle units da, muss also
@@ -1969,7 +2047,10 @@ readfaction(FILE * F)
 		f->allies = NULL; /* mem leak */
 		while (f->attribs) a_remove(&f->attribs, f->attribs);
 	}
-	f->unique_id = ri(F);
+	f->subscription = ri(F);
+#ifdef CONVERT_DBLINK
+	convertunique(f);
+#endif
 #ifdef ALLIANCES
 	if (global.data_version>=ALLIANCES_VERSION) {
 		int allianceid = rid(F);
@@ -2006,13 +2087,6 @@ readfaction(FILE * F)
 	}
 	f->lastorders = ri(F);
 	f->age = ri(F);
-/*
-	if (sqlstream && f->age==0) {
-		fprintf(sqlstream,
-			"UPDATE users SET status='ACTIVE' where email='%s';\n",
-			f->email);
-	}
-*/
 	if (global.data_version < NEWRACE_VERSION) {
 		race_t rc = (char) ri(F);
 		f->race = new_race[rc];
@@ -2087,7 +2161,7 @@ writefaction(FILE * F, const faction * f)
 	ursprung *ur;
 
 	wi36(F, f->no);
-	wi(F, f->unique_id);
+	wi(F, f->subscription);
 #if defined(ALLIANCES) && RELEASE_VERSION>=ALLIANCES_VERSION
 	if (f->alliance) wi36(F, f->alliance->id);
 	else wi36(F, 0);

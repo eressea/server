@@ -287,7 +287,8 @@ seed_dropouts(void)
 			if (u==NULL) while (*nfp) {
 				newfaction * nf = *nfp;
 				if (nf->race==drop->race && !nf->bonus) {
-					unit * u = addplayer(r, nf->email, nf->password, nf->race, nf->lang);
+					unit * u = addplayer(r, nf->email, nf->password, nf->race, nf->lang,
+						nf->subscription);
 #ifdef ALLIANCES
 					u->faction->alliance = nf->allies;
 #endif
@@ -317,14 +318,14 @@ read_newfactions(const char * filename)
 		faction * f = factions;
 		char race[20], email[64], lang[8], password[16];
 		newfaction *nf;
-		int bonus;
+		int bonus, subscription;
 #ifdef ALLIANCES
 		int alliance;
-		/* email;race;locale;startbonus;alliance */
-		if (fscanf(F, "%s %s %s %d %s %d", email, race, lang, &bonus, password, &alliance)<=0) break;
+		/* email;race;locale;startbonus;subscription;alliance */
+		if (fscanf(F, "%s %s %s %d %s %d %d", email, race, lang, &bonus, &subscription, password, &alliance)<=0) break;
 #else
-		/* email;race;locale;startbonus */
-		if (fscanf(F, "%s %s %s %d %s", email, race, lang, &bonus, password)<=0) break;
+		/* email;race;locale;startbonus;subscription */
+		if (fscanf(F, "%s %s %s %d %s", email, race, lang, &bonus, &subscription, password)<=0) break;
 #endif
 		while (f) {
 			if (strcmp(f->email, email)==0 && f->age==0) {
@@ -341,6 +342,7 @@ read_newfactions(const char * filename)
 		nf->email = strdup(email);
 		nf->password = strdup(password);
 		nf->race = rc_find(race);
+		nf->subscription = subscription;
 #ifdef ALLIANCES
 		{
 			struct alliance * al = findalliance(alliance);
@@ -401,7 +403,7 @@ NeuePartei(region * r)
 	newfaction * nf, **nfp;
 	const struct locale * lang;
 	const struct race * frace;
-	int late;
+	int late, subscription = 0;
 	unit *u;
 	const char * passwd = NULL;
 	int locale_nr;
@@ -416,6 +418,7 @@ NeuePartei(region * r)
 
 	if (nf!=NULL) {
 		frace = nf->race;
+		subscription = nf->subscription;
 		late = nf->bonus;
 		lang = nf->lang;
 		passwd = nf->password;
@@ -514,7 +517,7 @@ NeuePartei(region * r)
 		else nfp = &nf->next;
 	}
 	modified = 1;
-	u = addplayer(r, email, passwd, frace, lang);
+	u = addplayer(r, email, passwd, frace, lang, subscription);
 	++numnewbies;
 
 	if(late) give_latestart_bonus(r, u, late);

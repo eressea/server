@@ -162,7 +162,8 @@ struct xml_stack;
 #define OVERRIDE_VERSION 311
 #define CURSETYPE_VERSION 312
 #define ALLIANCES_VERSION 313
- 
+#define DBLINK_VERSION 314
+
 #define MIN_VERSION TYPES_VERSION
 #define UGROUPS_VERSION 400 /* nicht aktivieren, nicht fertig */
 #define RELEASE_VERSION ALLIANCES_VERSION
@@ -860,8 +861,6 @@ typedef struct strlist {
 	char * s;
 } strlist;
 
-extern int max_unique_id;
-
 #define UFL_DEBUG         (1<<0)
 #define UFL_ISNEW         (1<<1)	/* 2 */
 #define FL_LONGACTION     (1<<2)	/* 4 */
@@ -1026,7 +1025,6 @@ extern int alliedfaction(const struct plane * pl, const struct faction * f, cons
 extern int alliedgroup(const struct plane * pl, const struct faction * f, const struct ally * sf, const struct faction * f2, int mode);
 
 struct faction *findfaction(int n);
-struct faction *findfaction_unique_id(int unique_id);
 struct faction *getfaction(void);
 
 struct region *findregion(int x, int y);

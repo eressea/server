@@ -1522,7 +1522,7 @@ makemonsters(void)
 	f->options = Pow(O_REPORT);
 	f->no=MONSTER_FACTION;
 	register_faction_id(f->no);
-	f->unique_id = ++max_unique_id;
+	f->subscription = 0;
 	f->name=strdup("Monster");
 	f->passw=strdup("abc123");
 	f->override = strdup(itoa36(rand()));

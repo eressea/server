@@ -223,8 +223,7 @@ typedef struct cid {
 boolean
 cmp_curseeffect(const curse * c, const void * data)
 {
-	int effect = (int)data;
-	return (c->effect==effect);
+	return (c->effect.v==data);
 }
 
 boolean
@@ -353,8 +352,8 @@ curse_changevigour(attrib **ap, curse *c, int vigour)
 int
 curse_geteffect(const curse *c)
 {
-	if (c) return c->effect;
-	return 0;
+	assert(c);
+	return c->effect.i;
 }
 
 /* ------------------------------------------------------------- */
@@ -472,7 +471,7 @@ set_curse(unit *mage, attrib **ap, const curse_type *ct, int vigour,
 	c->flag = 0;
 	c->vigour = vigour;
 	c->duration = duration;
-	c->effect = effect;
+	c->effect.i = effect;
 	c->magician = mage;
 
 	c->no = newunitid();
@@ -523,10 +522,10 @@ create_curse(unit *magician, attrib **ap, const curse_type *ct, int vigour,
 			c->duration += duration;
 		}
 		if(ct->mergeflags & M_SUMEFFECT){
-			c->effect += effect;
+			c->effect.i += effect;
 		}
 		if(ct->mergeflags & M_MAXEFFECT){
-			c->effect = max(c->effect, effect);
+			c->effect.i = max(c->effect.i, effect);
 		}
 		if(ct->mergeflags & M_VIGOUR){
 			c->vigour = max(vigour, c->vigour);
@@ -561,7 +560,7 @@ do_transfer_curse(curse *c, unit * u, unit * u2, int n)
 	int duration = c->duration;
 	int vigour = c->vigour;
 	unit *magician = c->magician;
-	int effect = c->effect;
+	int effect = c->effect.i;
 	int cursedmen = 0;
 	int men = 0;
 	boolean dogive = false;

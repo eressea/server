@@ -979,7 +979,7 @@ att_modification(const unit *u, skill_t sk)
 	a = a_select(u->region->attribs, gbdream_ct, cmp_cursetype);
 	while (a) {
 		curse * c = (curse*)a->data.v;
-		int mod = c->effect;
+		int mod = curse_geteffect(c);
 		unit * mage = c->magician;
 		/* wir suchen jeweils den größten Bonus und den größten Malus */
 		if (mod>0 && (mage==NULL || alliedunit(mage, u->faction, HELP_GUARD))) 

@@ -48,13 +48,6 @@ info_name(const tnode * tnext, const char * str, void * data, const char * cmd)
         unused(data);
         unused(cmd);
 	if (sqlstream!=NULL) {
-#ifdef SQLOUTPUT
-		unit * u = (unit*)data;
-		const char * name = sqlquote(igetstrtoken(str));
-		faction * f = u->faction;
-		fprintf(sqlstream, "UPDATE users SET firstname = '%s' WHERE id = %u;\n", 
-				name, f->unique_id);
-#endif
 	}
 }
 
@@ -62,13 +55,6 @@ static void
 info_address(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	if (sqlstream!=NULL) {
-#ifdef SQLOUTPUT
-		unit * u = (unit*)data;
-		faction * f = u->faction;
-		const char * address = sqlquote(igetstrtoken(str));
-		fprintf(sqlstream, "UPDATE users SET address = '%s' WHERE id = %u;\n", 
-				address, f->unique_id);
-#endif
 	}
 }
 
@@ -76,13 +62,6 @@ static void
 info_phone(const tnode * tnext, const char * str, void * data, const char * cmd)
 {
 	if (sqlstream!=NULL) {
-#ifdef SQLOUTPUT
-		unit * u = (unit*)data;
-		faction * f = u->faction;
-		const char * phone = sqlquote(igetstrtoken(str));
-		fprintf(sqlstream, "UPDATE users SET phone = '%s' WHERE id = %u;\n", 
-				phone, f->unique_id);
-#endif
 	}
 }
 
@@ -124,7 +103,7 @@ infocommands(void)
 			strlist * order;
 			for (order = u->orders; order; order = order->next)
 				if (igetkeyword(order->s, u->faction->locale) == K_INFO) {
-					do_command(&g_keys, u, order->s);
+					/* do_command(&g_keys, u, order->s); */
 				}
 			if (u==*up) up = &u->next;
 		}

@@ -88,7 +88,7 @@ cinfo_auraboost(const struct locale * lang, const void * obj, typ_t typ, struct 
 	u = (struct unit *)obj;
 
 	if (self != 0){
-		if (c->effect > 100){
+		if (curse_geteffect(c) > 100){
 			sprintf(buf, "%s fühlt sich von starken magischen Energien "
 				"durchströmt. (%s)", u->name, curseid(c));
 		}else{
@@ -324,7 +324,7 @@ cinfo_sparkle(const struct locale * lang, const void * obj, typ_t typ, struct cu
 
 	while (effects[end]!=NULL) ++end;
 	if (end==begin) return 0;
-	else sprintf(buf, effects[begin + c->effect % (end-begin)], u->name);
+	else sprintf(buf, effects[begin + curse_geteffect(c) % (end-begin)], u->name);
 	scat(" (");
 	scat(itoa36(c->no));
 	scat(")");

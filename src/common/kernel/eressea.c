@@ -370,7 +370,6 @@ shipcapacity (const ship * sh)
 	return i;
 }
 
-int max_unique_id;
 int quiet = 0;
 
 FILE *debug;
@@ -1289,18 +1288,6 @@ faction *
 getfaction (void)
 {
 	return findfaction (getid());
-}
-
-faction *
-findfaction_unique_id (int unique_id)
-{
-	faction *f;
-
-	for (f = factions; f; f = f->next)
-		if (f->unique_id == unique_id) {
-			return f;
-		}
-	return NULL;
 }
 
 unit *
@@ -2412,8 +2399,8 @@ remove_empty_factions(boolean writedropouts)
 					}
 				}
 			}
-			fprintf(sqlstream, "UPDATE subscriptions set status='DEAD' where "
-				"faction='%s' and game=%d\n;", itoa36(f->no), GAME_ID);
+			if (f->subscription) fprintf(sqlstream, "UPDATE subscriptions set status='DEAD' where "
+				"subscription=%u\n;", f->subscription);
 
 			*fp = f->next;
 /*			stripfaction(f);

@@ -1252,7 +1252,7 @@ magic_resistance(unit *target)
 		if (mage!=NULL) {
 			if (c->type == ct_find("goodmagicresistancezone")) {
 				if (alliedunit(mage, target->faction, HELP_GUARD)) {
-					chance += c->effect;
+					chance += curse_geteffect(c);
 					break;
 				}
 			}

@@ -3499,7 +3499,7 @@ do_battle(void)
 							list_continue(sl);
 						}
 						/* Fehler: "Die Einheit ist mit uns alliert" */
-						if (calm_ct && curse_active(get_cursex(u->attribs, calm_ct, (void*)u2->faction->unique_id, cmp_curseeffect))) {
+						if (calm_ct && curse_active(get_cursex(u->attribs, calm_ct, (void*)u2->faction, cmp_curseeffect))) {
 							cmistake(u, sl->s, 47, MSG_BATTLE);
 							list_continue(sl);
 						}

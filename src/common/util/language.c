@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -77,7 +77,7 @@ make_locale(const char * name)
 
 static FILE * s_debug = NULL;
 
-void 
+void
 debug_language(const char * log)
 {
 	s_debug = fopen(log, "w+");
@@ -182,7 +182,7 @@ reverse_lookup(const locale * lang, const char * str)
 	return str;
 }
 
-const char * 
+const char *
 mkname(const char * space, const char * name)
 {
 	static char zBuffer[128];
@@ -194,7 +194,7 @@ mkname(const char * space, const char * name)
 	return zBuffer;
 }
 
-locale * 
+locale *
 nextlocale(const struct locale * lang)
 {
 	return lang->next;

@@ -24,7 +24,7 @@ typedef struct faction {
 	struct region *first;
 	struct region *last;
 	int no;
-	int unique_id;
+	int subscription;
 	unsigned int flags;
 	char *name;
 	char *banner;
@@ -83,7 +83,9 @@ typedef struct faction_list {
 extern const struct unit * random_unit_in_faction(const struct faction *f);
 extern const char * factionname(const struct faction * f);
 extern void * resolve_faction(void * data);
-extern struct unit * addplayer(struct region *r, const char *email, const char* password, const struct race * frace, const struct locale *loc);
+extern struct unit * addplayer(struct region *r, const char *email, 
+															 const char* password, const struct race * frace,
+															 const struct locale *loc, int subscription);
 extern boolean checkpasswd(const faction * f, const char * passwd);
 extern void destroyfaction(faction * f);
 

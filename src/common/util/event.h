@@ -16,18 +16,10 @@
 #define EVENT_H
 
 #include <stdio.h>
+#include "variant.h"
 
 struct attrib;
 struct trigger;
-
-typedef union {
-	void *v;
-	int   i;
-	char  c;
-	short s;
-	short sa[2];
-	char  ca[4];
-} variant;
 
 typedef struct trigger_type {
 	const char * name;

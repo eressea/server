@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -26,7 +26,7 @@
 /****                 ****
  ** Debugging Libraries **
  ****                 ****/
-/* 
+/*
  * MALLOCDBG is an integer >= 0 that specifies the level of
  * debugging. 0 = no debugging, >= 1 increasing levels of
  * debugging strength.
@@ -99,7 +99,7 @@
 # define __EXTENSIONS__
 #endif
 
-#ifdef WIN32
+#ifdef _MSC_VER
 # include <common/util/windir.h>
 # define HAVE_READDIR
 #endif
