@@ -788,14 +788,15 @@ trees(region * r, const int current_season, const int last_weeks_season)
 
 		if(production(r) <= 0) return;
 
-		seedchance = FORESTGROWTH * 250;
-		/* Jeder Elf in der Region erhöht die Chance um 0.002%. */
-		seedchance += (min(elves, (production(r)*MAXPEASANTS_PER_AREA)/8)) * 20;
+		/* Grundchance 1.0% */
+		seedchance = FORESTGROWTH;
+		/* Jeder Elf in der Region erhöht die Chance um 0.0008%. */
+		seedchance += (min(elves, (production(r)*MAXPEASANTS_PER_AREA)/8)) * 8;
 		grownup_trees = rtrees(r, 2);
 		seeds = 0;
 
 		for(i=0;i<grownup_trees;i++) {
-			if(rand()%10000 < seedchance) seeds++;
+			if(rand()%1000000 < seedchance) seeds++;
 		}
 		rsettrees(r, 0, rtrees(r, 0) + seeds);
 
