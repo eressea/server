@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: monster.c,v 1.6 2001/02/04 08:01:06 enno Exp $
+ *	$Id: monster.c,v 1.7 2001/02/04 10:27:34 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -860,6 +860,7 @@ plan_monsters(void)
 			/* Ab hier nur noch Befehle für NPC-Einheiten. */
 
 			if (u->faction->no != MONSTER_FACTION) continue;
+
 			ta = a_find(u->attribs, &at_hate);
 			if (ta && strncmp(u->lastorder, "WARTEN", 6) != 0) {
 				unit * tu = (unit *)ta->data.v;
@@ -873,6 +874,19 @@ plan_monsters(void)
 				}
 				else a_remove(&u->attribs, ta);
 			}
+
+			ta = a_find(u->attribs, &at_targetregion);
+			if (ta!=NULL) {
+				tr = findregion(ta->data.sa[0], ta->data.sa[1]);
+				if (tr != r) is_moving = true;
+			}
+
+			if (!(fval(u, FL_ISNEW)) && r->terrain != T_OCEAN) { /* Monster bewachen immer */
+				strlist *S;
+				S = makestrlist(keywords[K_GUARD]);
+				addlist(&u->orders, S);
+			}
+
 			/* Diese Verkettung ist krank und sollte durch eine 'vernünftige KI'
 			 * ersetzt werden. */
 
