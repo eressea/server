@@ -3930,7 +3930,7 @@
 	</type>
 	<locale name="de">
 		<nr section="events">
-			<text>"$unit($unit) in $region($region) rekrutiert $int($amount) $int($want)Personen."</text>
+			<text>"$unit($unit) in $region($region) rekrutiert $int($amount) von $int($want) Personen."</text>
 		</nr>
 	</locale>
 </message>
