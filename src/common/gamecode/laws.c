@@ -1122,20 +1122,22 @@ void
 quit(void)
 {
 	region *r;
-	unit *u;
-	strlist *S;
+	unit *u, *un;
+	strlist *S, *Sn;
 	faction *f;
 	const race * frace;
 
 	/* Sterben erst nachdem man allen anderen gegeben hat - bzw. man kann
 	 * alles machen, was nicht ein dreißigtägiger Befehl ist. */
 
-	for (r = regions; r; r = r->next)
-		for (u = r->units; u; u = u->next)
-			for (S = u->orders; S; S = S->next)
+	for (r = regions; r; r = r->next) {
+		for (u = r->units; u;) {
+			un = u->next;
+			for (S = u->orders; S; S = S->next) {
 				if (igetkeyword(S->s, u->faction->locale) == K_QUIT) {
 					if (checkpasswd(u->faction, getstrtoken())) {
 						destroyfaction(u->faction);
+						break;
 					} else {
 						cmistake(u, S->s, 86, MSG_EVENT);
 						printf("	Warnung: STIRB mit falschem Passwort für Partei %s: %s\n",
@@ -1179,7 +1181,12 @@ quit(void)
 						continue;
 					}
 					restart(u, frace);
+					break;
 				}
+			}
+			u = un;
+		}
+	}
 
 	puts(" - beseitige Spieler, die sich zu lange nicht mehr gemeldet haben...");
 
