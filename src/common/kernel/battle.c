@@ -153,6 +153,7 @@ static armor_type armordata[AR_NONE + 1] =
 };
 
 #if 0
+/* not in use */
 static void
 validate_sides(battle * b)
 {
