@@ -52,8 +52,6 @@ extern int income(const struct unit * u);
 /* Wieviel Fremde eine Partei pro Woche aufnehmen kann */
 #define MAXNEWBIES								5
 
-const struct ship_type * findshiptype(char *s, const struct locale * lang);
-
 void scramble(void *v1, int n, size_t width);
 void economics(void);
 void produce(void);

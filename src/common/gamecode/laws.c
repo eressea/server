@@ -224,6 +224,7 @@ restart(unit *u, const race * rc)
 	strlist ** o=&u->orders;
 
 	f->magiegebiet = u->faction->magiegebiet;
+	fset(f, FL_RESTARTED);
 	f->options = u->faction->options;
 	freestrlist(nu->orders);
 	nu->orders = u->orders;
@@ -1072,10 +1073,16 @@ quit(void)
 						cmistake(u, S->s, 242, MSG_EVENT);
 						continue;
 					}
-					if (u->faction->age < 100) {
+					if (fval(u->faction, FL_RESTARTED)) {
+						/* schon einmal neustart gemacht */
+						return;
+					}
+					frace = findrace(getstrtoken(), u->faction->locale);
+					if (!frace && u->faction->age < 100) {
 						frace = u->faction->race;
-					} else {
-						frace = findrace(getstrtoken(), u->faction->locale);
+					} else if (frace == NULL || !playerrace(frace)) {
+						cmistake(u, S->s, 243, MSG_EVENT);
+						continue;
 					}
 
 					if (frace == NULL || !playerrace(frace)) {

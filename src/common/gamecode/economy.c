@@ -114,12 +114,6 @@ income(const unit * u)
 
 /* ------------------------------------------------------------- */
 
-const struct ship_type *
-findshiptype(char *s, const locale * lang)
-{
-	const struct ship_type * i = st_find(s);
-	return i;
-}
 /* ------------------------------------------------------------- */
 
 static struct scramble {

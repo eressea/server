@@ -21,7 +21,6 @@
 #include "curse.h" /* für C_NOCOST */
 #include "unit.h"
 #include "region.h"
-#include "language.h"
 #include "skill.h"
 #include "save.h"
 
@@ -29,6 +28,7 @@
 #include <base36.h>
 #include <resolve.h>
 #include <event.h>
+#include <language.h>
 
 /* libc includes */
 #include <assert.h>

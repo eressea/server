@@ -881,12 +881,13 @@ typedef struct skillvalue {
 #define FL_NOIDLEOUT			(1<<24) /* Partei stirbt nicht an NMRs */
 #define FL_TAKEALL				(1<<25) /* Einheit nimmt alle Gegenstände an */
 #define FL_UNNAMED				(1<<26) /* Partei/Einheit/Gebäude/Schiff ist unbenannt */
+#define FL_RESTARTED				(1<<27) /* Partei hat schon einen Neustart gemacht */
 
 /* Flags, die gespeichert werden sollen: */
 #ifdef NOAID
-#define FL_SAVEMASK (FL_OWNER | FL_PARTEITARNUNG | FL_LOCKED | FL_HUNGER | FL_NOAID | FL_NOIDLEOUT | FL_TAKEALL | FL_UNNAMED)
+#define FL_SAVEMASK (FL_NOAID | FL_RESTARTED | FL_OWNER | FL_PARTEITARNUNG | FL_LOCKED | FL_HUNGER | FL_NOIDLEOUT | FL_TAKEALL | FL_UNNAMED)
 #else
-#define FL_SAVEMASK (FL_OWNER | FL_PARTEITARNUNG | FL_LOCKED | FL_HUNGER | FL_NOIDLEOUT | FL_TAKEALL | FL_UNNAMED)
+#define FL_SAVEMASK (FL_RESTARTED | FL_OWNER | FL_PARTEITARNUNG | FL_LOCKED | FL_HUNGER | FL_NOIDLEOUT | FL_TAKEALL | FL_UNNAMED)
 #endif
 
 #define fval(u, i) ((u)->flags & (i))

@@ -24,6 +24,7 @@
 /* util includes */
 #include <base36.h>
 #include <event.h>
+#include <language.h>
 
 /* libc includes */
 #include <stdlib.h>
@@ -31,6 +32,34 @@
 
 
 ship_typelist *shiptypes = NULL;
+
+static local_names * snames;
+
+const ship_type *
+findshiptype(const char * name, const locale * lang)
+{
+	local_names * sn = snames;
+	void * i;
+
+	while (sn) {
+		if (sn->lang==lang) break;
+		sn=sn->next;
+	}
+	if (!sn) {
+		struct ship_typelist * stl = shiptypes;
+		sn = calloc(sizeof(local_names), 1);
+		sn->next = snames;
+		sn->lang = lang;
+		while (stl) {
+			const char * n = locale_string(lang, stl->type->name[0]);
+			addtoken(&sn->names, n, (void*)stl->type);
+			stl=stl->next;
+		}
+		snames = sn;
+	}
+	if (findtoken(&sn->names, name, &i)==E_TOK_NOMATCH) return NULL;
+	return (const ship_type*)i;
+}
 
 const ship_type *
 st_find(const char* name)

@@ -92,4 +92,7 @@ extern struct unit *shipowner(const struct region * r, const struct ship * sh);
 extern ship *new_ship(const struct ship_type * stype, struct region * r);
 extern const char *shipname(const struct ship * sh);
 extern ship *findship(int n);
+
+extern const struct ship_type * findshiptype(const char *s, const struct locale * lang);
+
 #endif
