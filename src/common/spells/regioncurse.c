@@ -56,7 +56,7 @@ cinfo_region(const struct locale * lang, const void * obj, typ_t typ, struct cur
 
 /* godcursezone */
 static int
-cinfo_cursed_by_the_gods(const locale * lang,void * obj, typ_t typ, curse *c, int self)
+cinfo_cursed_by_the_gods(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
 	region *r;
 	message * msg;
@@ -78,7 +78,7 @@ cinfo_cursed_by_the_gods(const locale * lang,void * obj, typ_t typ, curse *c, in
 }
 /* C_GBDREAM, */
 static int
-cinfo_dreamcurse(const locale * lang,void * obj, typ_t typ, curse *c, int self)
+cinfo_dreamcurse(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
 
@@ -99,7 +99,7 @@ cinfo_dreamcurse(const locale * lang,void * obj, typ_t typ, curse *c, int self)
 }
 /* C_MAGICSTREET */
 static int
-cinfo_magicstreet(const locale * lang,void * obj, typ_t typ, curse *c, int self)
+cinfo_magicstreet(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
 
@@ -121,7 +121,7 @@ cinfo_magicstreet(const locale * lang,void * obj, typ_t typ, curse *c, int self)
 	return 1;
 }
 static int
-cinfo_antimagiczone(const locale * lang,void * obj, typ_t typ, curse *c, int self)
+cinfo_antimagiczone(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
 
@@ -142,7 +142,7 @@ cinfo_antimagiczone(const locale * lang,void * obj, typ_t typ, curse *c, int sel
 	return 0;
 }
 static int
-cinfo_farvision(const locale * lang,void * obj, typ_t typ, curse *c, int self)
+cinfo_farvision(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
 
