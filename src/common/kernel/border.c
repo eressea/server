@@ -444,9 +444,9 @@ b_nameroad(const border * b, const region * r, const struct faction * f, int gfl
 	unused(f);
 	if (gflags & GF_ARTICLE) {
 		if (!(gflags & GF_DETAILED)) strcpy(buffer, "eine Straﬂe");
-		else if (terrain[rterrain(r)].roadreq==local) {
+		else if (terrain[rterrain(r)].roadreq>=local) {
 			int remote = (r!=b->to)?(rval & 0xFFFF):((rval>>16) & 0xFFFF);
-			if (terrain[rterrain(r2)].roadreq==remote) {
+			if (terrain[rterrain(r2)].roadreq>=remote) {
 				strcpy(buffer, "eine Straﬂe");
 			} else {
 				strcpy(buffer, "eine unvollst‰ndige Straﬂe");
