@@ -2163,7 +2163,7 @@ display_item(faction *f, unit *u, const item_type * itype)
 		}
 		if (!fp) {
 			name = resourcename(itype->rtype, 0);
-			sprintf(filename, "%s/items/%s", resourcepath(), name);
+			sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(default_locale), name);
 			fp = fopen(filename, "r");
 		}
 		if (!fp) return false;
