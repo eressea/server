@@ -1669,7 +1669,7 @@ getunitg(const region * r, const faction * f)
 unit *
 getunit(const region * r, const faction * f)
 {
-  int n = read_unitid(f, r);;
+  int n = read_unitid(f, r);
   unit *u2;
 
   if (n == 0) {
