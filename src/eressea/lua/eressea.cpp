@@ -5,6 +5,7 @@
 // kernel includes
 #include <gamecode/laws.h>
 #include <kernel/race.h>
+#include <kernel/plane.h>
 #include <kernel/item.h>
 #include <kernel/reports.h>
 #include <kernel/save.h>
@@ -63,6 +64,13 @@ write_reports()
 
 extern int process_orders(void);
 
+static int
+find_plane_id(const char * name)
+{
+  plane * pl = getplanebyname(name);
+  return pl?pl->id:0;
+}
+
 void
 bind_eressea(lua_State * L)
 {
@@ -76,6 +84,9 @@ bind_eressea(lua_State * L)
     def("read_orders", &readorders),
     def("process_orders", &process_orders),
     def("add_equipment", &lua_addequipment),
-    def("get_turn", &get_turn)
+    def("get_turn", &get_turn),
+
+    /* planes not really implemented */
+    def("find_plane_id", &find_plane_id)
   ];
 }

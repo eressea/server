@@ -779,43 +779,43 @@ eff_stealth (const unit * u, const region * r)
 void
 scale_number (unit * u, int n)
 {
-	skill_t sk;
-	const attrib * a;
-	int remain;
+  skill_t sk;
+  const attrib * a;
+  int remain;
 
-	if (n == u->number) return;
-	if (n && u->number) {
-		int full;
-		remain = ((u->hp%u->number) * (n % u->number)) % u->number;
+  if (n == u->number) return;
+  if (n && u->number) {
+    int full;
+    remain = ((u->hp%u->number) * (n % u->number)) % u->number;
 
-		full = u->hp/u->number; /* wieviel kriegt jede person mindestens */
-		u->hp = full * n + (u->hp-full*u->number) * n / u->number;
-		assert(u->hp>=0);
-		if ((rand() % u->number) < remain)
-			++u->hp;	/* Nachkommastellen */
-	} else {
-		remain = 0;
-		u->hp = 0;
-	}
-	for (a = a_find(u->attribs, &at_effect);a;a=a->nexttype) {
-		effect_data * data = (effect_data *)a->data.v;
-		int snew = data->value / u->number * n;
-		if (n) {
-			remain = data->value - snew / n * u->number;
-			snew += remain * n / u->number;
-			remain = (remain * n) % u->number;
-			if ((rand() % u->number) < remain)
-				++snew;	/* Nachkommastellen */
-		}
-		data->value = snew;
-	}
+    full = u->hp/u->number; /* wieviel kriegt jede person mindestens */
+    u->hp = full * n + (u->hp-full*u->number) * n / u->number;
+    assert(u->hp>=0);
+    if ((rand() % u->number) < remain)
+      ++u->hp;	/* Nachkommastellen */
+  } else {
+    remain = 0;
+    u->hp = 0;
+  }
+  for (a = a_find(u->attribs, &at_effect);a;a=a->nexttype) {
+    effect_data * data = (effect_data *)a->data.v;
+    int snew = data->value / u->number * n;
+    if (n) {
+      remain = data->value - snew / n * u->number;
+      snew += remain * n / u->number;
+      remain = (remain * n) % u->number;
+      if ((rand() % u->number) < remain)
+        ++snew;	/* Nachkommastellen */
+    }
+    data->value = snew;
+  }
   if (u->number==0 || n==0) {
     for (sk = 0; sk < MAXSKILLS; sk++) {
       remove_skill(u, sk);
     }
   }
 
-	set_number(u, n);
+  set_number(u, n);
 }
 
 boolean

@@ -61,6 +61,8 @@ unit_setnumber(unit& u, int number)
   if (u.number==0) {
     set_number(&u, number);
     u.hp = unit_max_hp(&u) * number;
+  } else {
+    scale_number(&u, number);
   }
 }
 
