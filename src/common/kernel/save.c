@@ -408,7 +408,7 @@ getbuf(FILE * F)
 			} else {
 				cont = false;
 				if (*bp==COMMENT_CHAR && !quote) {
-					bp = max(end-1, bp+1);
+/*					bp = max(end-1, bp+1); */
 					comment=true;
 				}
 				else {
@@ -421,8 +421,8 @@ getbuf(FILE * F)
 						if (!comment) *(cp++) = *bp;
 						eatwhite = (boolean)!quote;
 					}
-					++bp;
 				}
+				++bp;
 			}
 			start = false;
 		}
