@@ -188,8 +188,6 @@ typedef int (*cspell_f) (struct fighter*, int, int, struct spell * sp);
 /* zauber-patzer: */
 typedef void (*pspell_f) (castorder *);
 
-extern spell spelldaten[];
-
 /* besondere Spruchtypen */
 #define FARCASTING      (1<<0)	/* ZAUBER [struct region x y] */
 #define SPELLLEVEL      (1<<1)	/* ZAUBER [STUFE x] */
