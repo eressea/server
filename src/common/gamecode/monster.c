@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: monster.c,v 1.7 2001/02/04 10:27:34 katze Exp $
+ *	$Id: monster.c,v 1.8 2001/02/04 11:34:52 katze Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -877,7 +877,7 @@ plan_monsters(void)
 
 			ta = a_find(u->attribs, &at_targetregion);
 			if (ta!=NULL) {
-				tr = findregion(ta->data.sa[0], ta->data.sa[1]);
+				tr = (region *) ta->data.v;
 				if (tr != r) is_moving = true;
 			}
 
@@ -937,7 +937,7 @@ plan_monsters(void)
 				}
 				else ta = a_find(u->attribs, &at_targetregion);
 				if (ta!=NULL) {
-					tr = findregion(ta->data.sa[0], ta->data.sa[1]);
+					tr = (region *) ta->data.v;
 					if (tr==NULL || !path_exists(r, tr, DRAGON_RANGE, allowed_dragon)) {
 						ta = set_new_dragon_target(u, r, DRAGON_RANGE);
 						if (ta) tr = findregion(ta->data.sa[0], ta->data.sa[1]);
