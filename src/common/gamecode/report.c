@@ -2554,8 +2554,7 @@ add_seen(const struct region * r, unsigned char mode, boolean dis)
 	seen_region * find = find_seen(r);
 	if (find) {
 		if (find->mode >= mode) return false;
-		if (find->mode>see_neighbour) return true;
-		if (find->next==NULL) {
+		if (find->mode>see_neighbour || find->next==NULL) {
 			find->mode = mode;
 			find->disbelieves |= dis;
 			return true;
