@@ -829,7 +829,11 @@ transfermen(unit * u, unit * u2, int n)
 	}
 	else if (r->land)
 		if(u->race != new_race[RC_DAEMON]) {
-			rsetpeasants(r, rpeasants(r) + n);
+			if(u->race != new_race[RC_URUK]) {
+				rsetpeasants(r, rpeasants(r) + n);
+			} else {
+				rsetpeasants(r, rpeasants(r) + n/2);
+			}
 		}
 }
 
