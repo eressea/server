@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.10 2001/02/05 16:11:58 enno Exp $
+ *	$Id: main.c,v 1.11 2001/02/05 16:27:07 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -99,7 +99,23 @@ struct settings global = {
 	"Eressea", /* gamename */
 };
 
+extern void render_init(void);
 
+#if 0
+static void
+print_potions(FILE * F)
+{
+	potion_type * p;
+	for (p=potiontypes;p;p=p->next) {
+		requirement * req = p->itype->construction->materials;
+		int i;
+		fprintf(F, "%s\n", locale_string(NULL, p->itype->rtype->_name[0]));
+		for (i=0;req[i].number;++i) {
+			fprintf(F, "  %s\n", locale_string(NULL, resname(req[i].type, 0)));
+		}
+	}
+}
+#endif
 
 static char * orders = NULL;
 static int nowrite = 0;
@@ -123,6 +139,23 @@ game_init(void)
 	init_museum();
 	init_arena();
 	init_xmas2000();
+	render_init();
+/*	print_potions(stdout);
+	exit(0); */
+}
+
+void
+create_game(void)
+{
+	assert(regions==NULL || !"game is initialized");
+	printf("Keine Spieldaten gefunden, erzeuge neues Spiel in %s...\n", datapath());
+	makedir(datapath(), 0700);
+	/* erste Insel generieren */
+	new_region(0, 0);
+	/* Monsterpartei anlegen */
+	createmonsters();
+	/* Teleportebene anlegen */
+	create_teleport_plane();
 }
 
 static void
@@ -148,6 +181,8 @@ getgarbage(void)
 	}
 #endif
 }
+
+int quickleave = 0;
 
 static void
 writepasswd(void)
