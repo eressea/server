@@ -8,7 +8,7 @@ CFLAGS += -DENNO_ROXXORS
 
 LD=gcc
 AR=ar
-CC=@colorgcc
+#CC=@colorgcc
 INSTALL=install
-MSG_COMPILE = "[1m[32m---> Compiling $@ [0m"
-MSG_SUBDIR  = "[1m[37m--> Making $@ in $$subdir [0m"
+#MSG_COMPILE = "[1m[32m---> Compiling $@ [0m"
+#MSG_SUBDIR  = "[1m[37m--> Making $@ in $$subdir [0m"
