@@ -42,7 +42,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int g_maxluxuries;
+static int g_maxluxuries = 0;
 
 const int delta_x[MAXDIRECTIONS] =
 {
@@ -730,6 +730,7 @@ setluxuries(region * r, const luxury_type * sale)
 void
 terraform(region * r, terrain_t t)
 {
+	const struct locale * locale_de = find_locale("de");
 	/* defaults: */
 
 	rsetterrain(r, t);
@@ -816,7 +817,7 @@ terraform(region * r, terrain_t t)
 		if (terrain[r->terrain].herbs) name = terrain[r->terrain].herbs[rand()%3];
 
 		if (name != NULL) {
-			const item_type * itype = finditemtype(name, NULL);
+			const item_type * itype = finditemtype(name, locale_de);
 			const herb_type * htype = resource2herb(itype->rtype);
 			rsetherbtype(r, htype);
 			rsetherbs(r, (short)(50+rand()%31));

@@ -557,7 +557,6 @@ getspell(const unit *u, spellid_t spellid)
 /* Spruch identifizieren */
 
 #include "umlaut.h"
-extern struct tnode spellnames;
 
 spell *
 find_spellbyname(unit *u, char *s)
@@ -565,7 +564,6 @@ find_spellbyname(unit *u, char *s)
 	sc_mage *m;
 	spell_ptr *spt;
 	spell *sp;
-	int i;
 
 	m = get_mage(u);
 	if (!m) {
@@ -578,9 +576,9 @@ find_spellbyname(unit *u, char *s)
 			return sp;
 		}
 	}
-
+#if 0 /* enno: geht vorerst nicht mit locales */
 	if (findtoken(&spellnames, s, (void**)&i)==0 && getspell(u, spelldaten[i].id)) return &spelldaten[i];
-
+#endif
 	return (spell *) NULL;
 }
 
@@ -1940,7 +1938,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 					 * Einheitennummer kommt dahinter. In beiden Fällen wird der
 					 * Befehl um ein token weiter eingelesen und es muß geprüft
 					 * werden, ob der Befehlsstring überhaupt lang genug wäre. */
-					switch (findparam(token)) {
+					switch (findparam(token, u->faction->locale)) {
 						case P_TEMP:
 							i++;
 							if (par->length < i - skip) {
@@ -2086,7 +2084,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 				{ /* keyword, dieses Element beschreibt was für ein Typ nachfolgt */
 					c++; /* das nächste Zeichen ist immer ein c für einen
 									variablen Stringparameter */
-					switch (findparam(token)) {
+					switch (findparam(token, u->faction->locale)) {
 						case P_REGION:
 						{
 							spobj->typ = SPP_REGION;
@@ -2109,7 +2107,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 								return 0;
 							}
 							token = strtok(NULL, " ");
-							if (findparam(token) == P_TEMP) {
+							if (findparam(token, u->faction->locale) == P_TEMP) {
 								i++;
 								if (par->length < i - skip) {
 									/* Fehler: Ziel vergessen */
@@ -2611,7 +2609,7 @@ is_moving_ship(const region * r, const ship *sh)
 	int todo;
 
 	u = shipowner(r, sh);
-	todo = igetkeyword(u->thisorder);
+	todo = igetkeyword(u->thisorder, u->faction->locale);
 	if (todo == K_ROUTE || todo == K_MOVE || todo == K_FOLLOW){
 		return true;
 	}
@@ -2657,7 +2655,7 @@ magic(void)
 			}
 
 			for (so = u->orders; so; so = so->next) {
-				if (igetkeyword(so->s) == K_CAST) {
+				if (igetkeyword(so->s, u->faction->locale) == K_CAST) {
 					if (fval(u, FL_HUNGER)) {
 						cmistake(u, so->s, 224, MSG_MAGIC);
 						continue;
@@ -2674,7 +2672,7 @@ magic(void)
 					skiptokens = 1;
 					s = getstrtoken();
 					/* für Syntax ' STUFE x REGION y z ' */
-					if (findparam(s) == P_LEVEL) {
+					if (findparam(s, u->faction->locale) == P_LEVEL) {
 						s = getstrtoken();
 						level = min(atoip(s), level);
 						s = getstrtoken();
@@ -2685,7 +2683,7 @@ magic(void)
 							continue;
 						}
 					}
-					if (findparam(s) == P_REGION) {
+					if (findparam(s, u->faction->locale) == P_REGION) {
 						t_x = atoi(getstrtoken());
 						t_x = rel_to_abs(getplane(u->region),u->faction,t_x,0);
 						t_y = atoi(getstrtoken());
@@ -2701,7 +2699,7 @@ magic(void)
 					}
 					/* für Syntax ' REGION x y STUFE z '
 					 * hier nach REGION nochmal auf STUFE prüfen */
-					if (findparam(s) == P_LEVEL) {
+					if (findparam(s, u->faction->locale) == P_LEVEL) {
 						s = getstrtoken();
 						level = min(atoip(s), level);
 						s = getstrtoken();

@@ -6,9 +6,9 @@
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
- This program may not be used, modified or distributed 
+ This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
- 
+
 */
 
 #include <config.h>
@@ -68,7 +68,7 @@ typedef struct crmessage_type {
 
 static crmessage_type * messagetypes;
 
-static crmessage_type * 
+static crmessage_type *
 crt_find(const struct message_type * mtype)
 {
 	crmessage_type * found = NULL;
@@ -112,9 +112,9 @@ cr_render(const message * msg, char * buffer, const void * userdata)
 	if (crt==NULL) return -1;
 	for (i=0;i!=msg->type->nparameters;++i) {
 		if (crt->renderers[i]==NULL) {
-			log_error(("No renderer for argument %s:%s of \"%s\"\n", 
+			log_error(("No renderer for argument %s:%s of \"%s\"\n",
 				msg->type->pnames[i], msg->type->types[i], msg->type->name));
-			continue; /* strcpy(c, (const char*)msg->parameters[i]); */
+			continue; /* strcpy(c, (const char*)msg->locale_string(u->faction->locale, parameters[i])); */
 		} else {
 			if (crt->renderers[i](msg->parameters[i], c, userdata)!=0) continue;
 		}

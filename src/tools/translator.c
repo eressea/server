@@ -139,7 +139,7 @@ new_message(struct faction * receiver, const char* sig, ...)
 				args[i] = resourcename(oldresourcetype[(resource_t)va_arg(marker, resource_t)], 0);
 				break;
 			case 't':
-				args[i] = skillnames[va_arg(marker, skill_t)];
+				args[i] = skillname(va_arg(marker, skill_t), NULL);
 				break;
 			case 'd':
 				args[i] = directions[i];

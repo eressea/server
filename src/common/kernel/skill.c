@@ -36,38 +36,44 @@
 #include <stdlib.h>
 
 /* Umlaute hier drin, weil die in den Report kommen */
-const char *skillnames[MAXSKILLS] =
+static const char *skillnames[MAXSKILLS] =
 {
-	"Alchemie",
-	"Armbrustschieﬂen",
-	"Bergbau",
-	"Bogenschieﬂen",
-	"Burgenbau",
-	"Handeln",
-	"Holzf‰llen",
-	"Katapultbedienung",
-	"Kr‰uterkunde",
-	"Magie",
-	"Pferdedressur",
-	"Reiten",
-	"R¸stungsbau",
-	"Schiffbau",
-	"Hiebwaffen",
-	"Segeln",
-	"Stangenwaffen",
-	"Spionage",
-	"Steinbau",
-	"Straﬂenbau",
-	"Taktik",
-	"Tarnung",
-	"Unterhaltung",
-	"Waffenbau",
-	"Wagenbau",
-	"Wahrnehmung",
-	"Steuereintreiben",
-	"Ausdauer",
-	"Waffenloser Kampf"
+	"sk_alchemy",
+	"sk_crossbow",
+	"sk_mining",
+	"sk_bow",
+	"sk_building",
+	"sk_trade",
+	"sk_forestry",
+	"sk_catapult",
+	"sk_herbalism",
+	"sk_magic",
+	"sk_training",
+	"sk_riding",
+	"sk_armorer",
+	"sk_shipcraft",
+	"sk_melee",
+	"sk_sailing",
+	"sk_polearm",
+	"sk_espionage",
+	"sk_quarrying",
+	"sk_roadwork",
+	"sk_tactics",
+	"sk_stealth",
+	"sk_entertainment",
+	"sk_weaponsmithing",
+	"sk_cartmaking",
+	"sk_perception",
+	"sk_taxation",
+	"sk_stamina",
+	"sk_unarmed"
 };
+
+const char * 
+skillname(skill_t sk, const struct locale * lang)
+{
+	return locale_string(lang, skillnames[sk]);
+}
 
 /** skillmod attribut **/
 static void

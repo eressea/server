@@ -25,6 +25,7 @@
 
 /* kernel includes */
 #include "magic.h"
+#include "skill.h"
 #include "unit.h"
 #include "region.h"
 #include "race.h"
@@ -139,7 +140,6 @@ cfindhash(int i)
 /* Spruch identifizieren */
 
 #include "umlaut.h"
-extern struct tnode cursenames;
 
 typedef struct cursetype_list {
 	struct cursetype_list * next;
@@ -165,19 +165,15 @@ const curse_type *
 ct_find(const char *c)
 {
 /* TODO: findet nur curse_types, die auch in curse_data sind.
- * da fehlt noch ene registrierung wie für attrib_type
+ * da fehlt noch eine registrierung wie für attrib_type
  */
-	int i;
-	if (findtoken(&cursenames, c, (void**)&i)==E_TOK_NOMATCH) return NULL;
-	if (i == -1 || cursedaten[i].name[0] == 0) {
-		cursetype_list * ctl = cursetypes;
-		while (ctl) {
-			int k = min(strlen(c), strlen(ctl->type->name));
-			if (!strncasecmp(c, ctl->type->name, k)) return ctl->type;
-			ctl = ctl->next;
-		}
+	cursetype_list * ctl = cursetypes;
+	while (ctl) {
+		int k = min(strlen(c), strlen(ctl->type->name));
+		if (!strncasecmp(c, ctl->type->name, k)) return ctl->type;
+		ctl = ctl->next;
 	}
-	return &cursedaten[i];
+	return NULL;
 }
 
 /* ------------------------------------------------------------- */
@@ -1203,7 +1199,7 @@ cinfo_skill(void * obj, typ_t typ, curse *c, int self)
 
 	if (self){
 		sprintf(buf, "%s ist in %s ungewöhnlich ungeschickt. (%s)", u->name,
-				skillnames[ck->skill], curseid(c));
+				skillname(ck->skill, u->faction->locale), curseid(c));
 		return 1;
 	}
 	return 0;

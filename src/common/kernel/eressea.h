@@ -138,6 +138,7 @@ struct building_type;
 #define BASE36IDS_VERSION 197
 #define NEWSOURCE_VERSION 197
 #define NEWSTATUS_VERSION 198
+#define NEWNAMES_VERSION 199
 #define LOCALE_VERSION 300 /* TODO */
 
 /* globale settings des Spieles */
@@ -148,7 +149,7 @@ typedef struct settings {
 } settings;
 extern settings global;
 
-#define RELEASE_VERSION NEWSTATUS_VERSION
+#define RELEASE_VERSION NEWNAMES_VERSION
 #define ECHECK_VERSION "3.11"
 
 /* changes from->to: 72->73: struct unit::lock entfernt.
@@ -401,7 +402,6 @@ enum {
 	K_VOTE,
 	K_MAGIEGEBIET,
 	K_PIRACY,
-	K_LOCALE,
 	K_RESTART,
 #ifdef GROUPS
 	K_GROUP,
@@ -433,6 +433,7 @@ enum {
 
 typedef int param_t;
 enum {
+	P_LOCALE,
 	P_ANY,
 	P_PEASANT,
 	P_BUILDING,
@@ -450,13 +451,9 @@ enum {
 	P_SILVER,
 	P_ROAD,
 	P_TEMP,
-	P_ENEMY,
-	P_FRIEND,
-	P_NEUTRAL,
 	P_FLEE,
 	P_GEBAEUDE,
 	P_GIB,
-	P_OBSERVE,
 	P_KAEMPFE,
 	P_GUARD,
 	P_ZAUBER,
@@ -568,8 +565,6 @@ enum {
 	MAXSKILLS,
 	NOSKILL = (skill_t) -1
 };
-
-extern const char *skillnames[MAXSKILLS];
 
 /* ------------- Typ von Einheiten ----------------------------- */
 
@@ -910,15 +905,23 @@ int armedmen(const struct unit * u);
 void scat(const char *s);
 void icat(int n);
 
-int findstr(const char **v, const char *s, unsigned char n);
-
-skill_t findskill(const char *s);
 int atoip(const char *s);
 int geti(void);
-keyword_t igetkeyword(const char *s);
-keyword_t getkeyword(void);
-keyword_t findkeyword(const char *s);
-char *igetstrtoken(const char *s);
+
+extern int findstr(const char **v, const char *s, unsigned char n);
+
+extern char *igetstrtoken(const char *s);
+extern char *getstrtoken(void);
+
+extern skill_t findskill(const char *s, const struct locale * lang);
+
+extern keyword_t findkeyword(const char *s, const struct locale * lang);
+extern keyword_t igetkeyword(const char *s, const struct locale * lang);
+extern keyword_t getkeyword(const struct locale * lang);
+
+extern param_t findparam(const char *s, const struct locale * lang);
+extern param_t igetparam(const char *s, const struct locale * lang);
+extern param_t getparam(const struct locale * lang);
 
 #define BASE36_VERSION 93
 extern int atoi36(const char * s);
@@ -946,12 +949,6 @@ int distribute(int old, int new_value, int n);
 int newunitid(void);
 int forbiddenid(int id);
 int newcontainerid(void);
-
-char *getstrtoken(void);
-char *igetstrtoken(const char *s);
-param_t findparam(const char *s);
-param_t igetparam(const char *s);
-param_t getparam(void);
 
 extern struct unit *createunit(struct region * r, struct faction * f, int number, race_t race);
 extern struct unit *createunitid(struct region * r1, struct faction * f, int number, race_t race, int id, const char * dname);
@@ -1009,8 +1006,6 @@ void stripunit(struct unit * u);
 void freestrlist(strlist * s);
 
 int change_hitpoints(struct unit *u, int value);
-
-skill_t findskill(const char *s);
 
 int weight(const struct unit * u);
 void changeblockchaos(void);

@@ -44,6 +44,22 @@ const building_type *
 bt_find(const char* name)
 {
 	const struct building_typelist * btl = buildingtypes;
+
+	if (global.data_version < RELEASE_VERSION) {
+		const char * translation[3][2] = { 
+			{ "illusion", "illusioncastle" }, 
+			{ "generic", "genericbuilding" }, 
+			{ NULL, NULL } 
+		};
+		int i;
+		for (i=0;translation[i][0];++i) {
+			/* calling a building "illusion" was a bad idea" */
+			if (strcmp(translation[i][0], name)==0) {
+				name = translation[i][1];
+				break;
+			}
+		}
+	}
 	while (btl && strcasecmp(btl->type->_name, name)) btl = btl->next;
 	if (!btl) {
 		btl = buildingtypes;
@@ -656,7 +672,7 @@ building_type bt_blessedstonecircle = {
 
 /** Building: illusion */
 building_type bt_illusion = {
-	"illusion",     /* _name */
+	"illusioncastle",     /* _name */
 	BTF_NOBUILD,     /* flags */
 	0, 0, 0,    /* capac/size, maxcapac, maxsize */
 	NULL,  /* maintenance */
@@ -666,7 +682,7 @@ building_type bt_illusion = {
 
 /** Building: Generisches Gebäude */
 building_type bt_generic = {
-	"generic",					/* _name */
+	"genericbuilding",					/* _name */
 	BTF_NOBUILD,  			/* flags */
 	-1, -1, 1,  				/* capac/size, maxcapac, maxsize */
 	NULL,								/* maintenance */

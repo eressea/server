@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -55,9 +55,9 @@
 
 /* ------------------------------------------------------------- */
 static skill_t
-getskill(void)
+getskill(const struct locale * lang)
 {
-	return findskill(getstrtoken());
+	return findskill(getstrtoken(), lang);
 }
 
 static magic_t
@@ -185,7 +185,7 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
 		 * Deswegen darf C D nie lehren dürfen.
 		 *
 		 * -> Das ist wirr. wer hat das entworfen?
-		 * Besser wäre, man macht erst vorab alle zuordnungen, und dann 
+		 * Besser wäre, man macht erst vorab alle zuordnungen, und dann
 		 * die Talentänderung (enno).
 		 */
 
@@ -236,24 +236,24 @@ teach(region * r, unit * u)
 	if (teaching == 0)
 		return;
 
-	strcpy(order, keywords[K_TEACH]);
+	strcpy(order, locale_string(u->faction->locale, keywords[K_TEACH]));
 
 	u2 = 0;
 	count = 0;
 #if TEACH_ALL
-	if (getparam()==P_ANY) {
+	if (getparam(u->faction->locale)==P_ANY) {
 		unit * student = r->units;
 		skill_t teachskill[MAXSKILLS];
 		int i = 0;
 		do {
-			sk = getskill();
+			sk = getskill(u->faction->locale);
 			teachskill[i++]=sk;
 		} while (sk!=NOSKILL);
 		while (teaching && student) {
 			if (student->faction == u->faction) {
-				if (igetkeyword(student->thisorder) == K_STUDY) {
+				if (igetkeyword(student->thisorder, student->faction->locale) == K_STUDY) {
 					/* Input ist nun von student->thisorder !! */
-					sk = getskill();
+					sk = getskill(student->faction->locale);
 					if (sk!=NOSKILL && teachskill[0]!=NOSKILL) {
 						for (i=0;teachskill[i]!=NOSKILL;++i) if (sk==teachskill[i]) break;
 						sk = teachskill[i];
@@ -268,9 +268,9 @@ teach(region * r, unit * u)
 #if TEACH_FRIENDS
 		while (teaching && student) {
 			if (student->faction != u->faction && allied(u, student->faction, HELP_GUARD)) {
-				if (igetkeyword(student->thisorder) == K_STUDY) {
+				if (igetkeyword(student->thisorder, student->faction->locale) == K_STUDY) {
 					/* Input ist nun von student->thisorder !! */
-					sk = getskill();
+					sk = getskill(student->faction->locale);
 					if (sk != NOSKILL && eff_skill(u, sk, r) > eff_skill(student, sk, r)) {
 						teaching -= teach_unit(u, student, teaching, sk, true);
 					}
@@ -279,7 +279,7 @@ teach(region * r, unit * u)
 			student = student->next;
 		}
 #endif
-	} 
+	}
 	else
 #endif
 	for (;;) {
@@ -292,7 +292,7 @@ teach(region * r, unit * u)
 		 * LEHRE und 101 wird gelesen (und ignoriert), und dann wird
 		 * getunit die einheit 102 zurück liefern. */
 
-		igetkeyword(u->thisorder);
+		igetkeyword(u->thisorder, u->faction->locale);
 		for (j = count; j; j--)
 			getstrtoken();
 
@@ -305,7 +305,7 @@ teach(region * r, unit * u)
 
 			/* Finde den string, der den Fehler verursacht hat */
 
-			igetkeyword(u->thisorder);
+			igetkeyword(u->thisorder, u->faction->locale);
 			for (j = count; j; j--)
 				getstrtoken();
 
@@ -320,7 +320,7 @@ teach(region * r, unit * u)
 
 			strcpy(buf, "Die Einheit '");
 
-			if (findparam(s) == P_TEMP) {
+			if (findparam(s, u->faction->locale) == P_TEMP) {
 				/* Für: "Die Einheit 'TEMP ZET' wurde nicht gefunden" oder "Die Einheit
 				 * 'TEMP' wurde nicht gefunden" */
 
@@ -360,11 +360,11 @@ teach(region * r, unit * u)
 			mistake(u, u->thisorder, buf, MSG_EVENT);
 			continue;
 		}
-		i = igetkeyword(u2->thisorder);
+		i = igetkeyword(u2->thisorder, u2->faction->locale);
 
 		/* Input ist nun von u2->thisorder !! */
 
-		if (i != K_STUDY || ((sk = getskill()) == NOSKILL)) {
+		if (i != K_STUDY || ((sk = getskill(u2->faction->locale)) == NOSKILL)) {
 			sprintf(buf, "%s lernt nicht", unitname(u2));
 			mistake(u, u->thisorder, buf, MSG_EVENT);
 			continue;
@@ -412,7 +412,7 @@ learn(void)
 	for (r = regions; r; r = r->next)
 		for (u = r->units; u; u = u->next)
 			if (rterrain(r) != T_OCEAN || u->race == RC_AQUARIAN)
-				if (igetkeyword(u->thisorder) == K_STUDY) {
+				if (igetkeyword(u->thisorder, u->faction->locale) == K_STUDY) {
 					double multi = 1.0;
 					attrib * a = NULL;
 					int money = 0;
@@ -426,7 +426,7 @@ learn(void)
 						continue;
 					}
 
-					i = getskill();
+					i = getskill(u->faction->locale);
 
 					if (i < 0) {
 						cmistake(u, findorder(u, u->thisorder), 77, MSG_EVENT);
@@ -447,7 +447,7 @@ learn(void)
 
 						p = studycost = study_cost(u,i);
 						a = a_find(u->attribs, &at_learning);
-						
+
 						if (btype == &bt_academy) {
 							studycost = max(50, studycost * 2);
 						}
@@ -601,7 +601,7 @@ learn(void)
 #ifdef SKILLFIX_SAVE
 					if (a && a->data.i) {
 						int skill = get_skill(u, (skill_t)i);
-						skillfix(u, (skill_t)i, skill, 
+						skillfix(u, (skill_t)i, skill,
 								 (int)(u->number * 30 * multi), a->data.i);
 					}
 #endif
@@ -666,7 +666,7 @@ teaching(void)
 					&& !is_cursed(u->attribs, C_KAELTESCHUTZ,0))
 				continue;
 
-			switch (igetkeyword(u->thisorder)) {
+			switch (igetkeyword(u->thisorder, u->faction->locale)) {
 
 			case K_TEACH:
 				if (attacked(u)){

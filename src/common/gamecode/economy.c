@@ -733,7 +733,7 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 	 * HELFE, PASSWORT, STIRB (Katja) */
 
 	for (S = u->orders; S; S = S->next) {
-		switch (igetkeyword(S->s)) {
+		switch (igetkeyword(S->s, u->faction->locale)) {
 		case K_BIETE:
 		case K_RESEARCH:
 		case K_BUY:
@@ -791,7 +791,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 
 	s = getstrtoken();
 
-	if (findparam(s) == P_CONTROL) {
+	if (findparam(s, u->faction->locale) == P_CONTROL) {
 		if (!u2) {
 			cmistake(u, S->s, notfound_error, MSG_EVENT);
 			return;
@@ -849,7 +849,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 	}
 
 	/* Übergabe aller Kräuter */
-	if (findparam(s) == P_HERBS) {
+	if (findparam(s, u->faction->locale) == P_HERBS) {
 		if (!(race[u->race].ec_flags & GIVEITEM)) {
 			sprintf(buf, "%s geben nichts weg", race[u->race].name[1]);
 			mistake(u, S->s, buf, MSG_COMMERCE);
@@ -876,12 +876,12 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 		if (!n) cmistake(u, S->s, 38, MSG_COMMERCE);
 		return;
 	}
-	if (findparam(s) == P_ZAUBER) { /* Uebergebe alle Sprüche */
+	if (findparam(s, u->faction->locale) == P_ZAUBER) { /* Uebergebe alle Sprüche */
 		cmistake(u, S->s, 7, MSG_COMMERCE);
 		/* geht nimmer */
 		return;
 	}
-	if (findparam(s) == P_UNIT) {	/* Einheiten uebergeben */
+	if (findparam(s, u->faction->locale) == P_UNIT) {	/* Einheiten uebergeben */
 		if (!(race[u->race].ec_flags & GIVEUNIT)) {
 			cmistake(u, S->s, 167, MSG_COMMERCE);
 			return;
@@ -894,7 +894,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 		giveunit(r, u, u2, S);
 		return;
 	}
-	if (findparam(s) == P_ANY) { /* Alle Gegenstände übergeben */
+	if (findparam(s, u->faction->locale) == P_ANY) { /* Alle Gegenstände übergeben */
 		char * s = getstrtoken();
 		const resource_type * rtype = findresourcetype(s, u->faction->locale);
 		if (rtype!=NULL) {
@@ -923,7 +923,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 			}
 			return;
 		}
-		i = findparam(s);
+		i = findparam(s, u->faction->locale);
 		if (i == P_PERSON) {
 			if (!(race[u->race].ec_flags & GIVEPERSON)) {
 				sprintf(buf, "%s können nicht neu gruppiert werden.", unitname(u));
@@ -932,16 +932,6 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 			}
 			n = u->number;
 			givemen(n, u, u2, S);
-			return;
-		}
-		if (i == P_SILVER) {
-			if ((race[u->race].ec_flags & HOARDMONEY)) {
-				sprintf(buf, "%s geben kein Silber weg.", race[u->race].name[1]);
-				mistake(u, S->s, buf, MSG_COMMERCE);
-				return;
-			}
-			n = get_resource(u, R_SILVER) - get_resvalue(u, R_SILVER);
-			givesilver(n, u, r, u2, S);
 			return;
 		}
 
@@ -977,7 +967,7 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 			return;
 		}
 	}
-	i = findparam(s);
+	i = findparam(s, u->faction->locale);
 	if (i == P_PERSON) {
 		if (!(race[u->race].ec_flags & GIVEPERSON)) {
 			sprintf(buf, "%s können nicht neu gruppiert werden.", unitname(u));
@@ -985,15 +975,6 @@ dogive(region * r, unit * u, strlist * S, boolean liefere)
 			return;
 		}
 		givemen(n, u, u2, S);
-		return;
-	}
-	if (i == P_SILVER) {
-		if ((race[u->race].ec_flags & HOARDMONEY)) {
-			sprintf(buf, "%s geben kein Silber weg.", race[u->race].name[1]);
-			mistake(u, S->s, buf, MSG_COMMERCE);
-			return;
-		}
-		givesilver(n, u, r, u2, S);
 		return;
 	}
 
@@ -1018,9 +999,9 @@ forgetskill(unit * u)
 
 	s = getstrtoken();
 
-	if ((talent = findskill(s)) != NOSKILL) {
+	if ((talent = findskill(s, u->faction->locale)) != NOSKILL) {
 		set_skill(u, talent, 0);
-/*		sprintf(buf, "%s vergißt das Talent %s.", unitname(u), skillnames[talent]); */
+/*		sprintf(buf, "%s vergißt das Talent %s.", u, talent); */
 		add_message(&u->faction->msgs, new_message(u->faction,
 			"forget%u:unit%t:skill", u, talent));
 	}
@@ -1259,7 +1240,7 @@ economics(void)
 
 		for (u = r->units; u; u = u->next) {
 			for (S = u->orders; S; S = S->next) {
-				switch (igetkeyword(S->s)) {
+				switch (igetkeyword(S->s, u->faction->locale)) {
 
 				case K_DESTROY:
 					destroy(r, u, S->s);
@@ -1285,7 +1266,7 @@ economics(void)
 
 		for (u = r->units; u; u = u->next) {
 			for (S = u->orders; S; S = S->next) {
-				if (igetkeyword(S->s) == K_RECRUIT) {
+				if (igetkeyword(S->s, u->faction->locale) == K_RECRUIT) {
 					recruit(r, u, S, &recruitorders);
 					break;
 				}
@@ -1323,14 +1304,13 @@ manufacture(unit * u, const item_type * itype, int want)
 	n = build(u, itype->construction, 0, want);
 	switch (n) {
 	case ENEEDSKILL:
-		sprintf(buf, "dazu braucht man das Talent %s", skillnames[sk]);
-		mistake(u, u->thisorder, buf, MSG_PRODUCE);
+		add_message(&u->faction->msgs, 
+			msg_error(u, u->thisorder, "skill_needed", "skill", sk));
 		return;
 	case ELOWSKILL:
-		sprintf(buf, "man benötigt mindestens %s %d, um %s zu machen",
-			skillnames[sk],
-			minskill, locale_string(u->faction->locale, resourcename(itype->rtype, 1)));
-		mistake(u, u->thisorder, buf, MSG_PRODUCE);
+		add_message(&u->faction->msgs,
+			msg_error(u, u->thisorder, "manufacture_skills", "skill minskill product", 
+			sk, minskill, itype->rtype, 1));
 		return;
 	case ENOMATERIALS:
 		/* something missing from the list of materials */
@@ -1457,17 +1437,16 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 	assert(itype->construction->skill!=0 || "limited resource needs a required skill for making it");
 	skill = eff_skill(u, itype->construction->skill, u->region);
 	if (skill == 0) {
-		sprintf(buf, "dazu braucht man das Talent %s",
-				skillnames[itype->construction->skill]);
-		mistake(u, u->thisorder, buf, MSG_PRODUCE);
+		skill_t sk = itype->construction->skill;
+		add_message(&u->faction->msgs, 
+			msg_error(u, u->thisorder, "skill_needed", "skill", sk));
 		return;
 	}
 	if (skill < itype->construction->minskill) {
-		const char * iname = locale_string(u->faction->locale, resourcename(itype->rtype, 1));
-		sprintf(buf, "man benötigt mindestens %s %d, um %s zu machen",
-			skillnames[itype->construction->skill],
-			itype->construction->minskill, iname);
-		mistake(u, u->thisorder, buf, MSG_PRODUCE);
+		skill_t sk = itype->construction->skill;
+		add_message(&u->faction->msgs,
+			msg_error(u, u->thisorder, "manufacture_skills", "skill minskill product", 
+			sk, itype->construction->minskill, itype->rtype));
 		return;
 	} else {
 		struct building * b = inside_building(u);
@@ -1683,7 +1662,7 @@ make(region * r, unit * u)
 		m = INT_MAX;
 	}
 
-	p = findparam(s);
+	p = findparam(s, u->faction->locale);
 
 	/* MACHE TEMP kann hier schon gar nicht auftauchen, weil diese nicht in
 	 * thisorder abgespeichert werden - und auf den ist getstrtoken() beim
@@ -2142,7 +2121,7 @@ sell(region * r, unit * u, request ** sellorders, const char * cmd)
 	 * (das geld der region) aufgebraucht wird. */
 
 	s = getstrtoken();
-	if (findparam(s) == P_ANY) {
+	if (findparam(s, u->faction->locale) == P_ANY) {
 		n = (rpeasants(r) - rpeasants(r) / RECRUITFRACTION) / TRADE_FRACTION;
 		if (rterrain(r) == T_DESERT && buildingtype_exists(r, &bt_caravan))
 			n *= 2;
@@ -2348,7 +2327,7 @@ zuechte(region *r, unit *u)
 	int n, c;
 	int gezuechtet = 0;
 
-	if (getparam() == P_HERBS) {
+	if (getparam(u->faction->locale) == P_HERBS) {
 		plant(r, u);
 		return;
 	} else {
@@ -2404,7 +2383,7 @@ research(region *r, unit *u)
 
 	s = getstrtoken();
 
-	if (findparam(s) == P_HERBS) {
+	if (findparam(s, u->faction->locale) == P_HERBS) {
 
 		if (eff_skill(u, SK_HERBALISM, r) < 7) {
 			cmistake(u, u->thisorder, 227, MSG_EVENT);
@@ -2839,7 +2818,7 @@ produce(void)
 			}
 
 			for (s=u->orders;s;s=s->next) {
-				todo = igetkeyword(s->s);
+				todo = igetkeyword(s->s, u->faction->locale);
 				switch (todo) {
 				case K_BUY:
 					buy(r, u, &buyorders, s->s);
@@ -2859,7 +2838,7 @@ produce(void)
 				continue;
 			}
 
-			todo = igetkeyword(u->thisorder);
+			todo = igetkeyword(u->thisorder, u->faction->locale);
 			if (todo == NOKEYWORD) continue;
 
 			if (rterrain(r) == T_OCEAN && u->race != RC_AQUARIAN &&

@@ -37,7 +37,6 @@
 #include "unit.h"
 #include "skill.h"
 #include "message.h"
-#include "monster.h"
 #include "objtypes.h"
 #include "border.h"
 #include "karma.h"
@@ -377,8 +376,8 @@ readunit(FILE * F, struct faction * f)
 			if (!getbuf(F))
 				break;
 
-			if (igetkeyword(buf) == NOKEYWORD) {
-				p = igetparam(buf);
+			if (igetkeyword(buf, u->faction->locale) == NOKEYWORD) {
+				p = igetparam(buf, u->faction->locale);
 				if (p == P_UNIT || p == P_FACTION || p == P_NEXT)
 					break;
 			}
@@ -473,9 +472,6 @@ version(void)
 }
 /* ------------------------------------------------------------- */
 
-/* TODO: soll hier weg */
-extern building_type bt_caldera;
-
 int
 readorders(const char *filename)
 {
@@ -495,12 +491,31 @@ readorders(const char *filename)
 	 * Partei */
 
 	while (b) {
+		const struct locale * lang = f?f->locale:NULL;
 		int p;
+		const char * s;
 
-		switch (igetparam(b)) {
+		switch (igetparam(b, lang)) {
+		case P_LOCALE:
+			s = getstrtoken();
+#define LOCALES
+#ifdef LOCALES
+			if (f && find_locale(s)) {
+				f->locale = find_locale(s);
+			}
+#else
+			if(strcmp(s, "de") == 0) {
+				f->locale = find_locale(s);
+			}
+#endif
+
+			b = getbuf(F);
+			break;
 		case P_FACTION:
 			f = readfaction();
-			if (f) ++nfactions;
+			if (f) {
+				++nfactions;
+			}
 
 			b = getbuf(F);
 
@@ -515,7 +530,7 @@ readorders(const char *filename)
 			if (!f || !readunit(F, f)) do {
 				b = getbuf(F);
 				if (!b) break;
-				p = igetparam(b);
+				p = igetparam(b, lang);
 			} while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT);
 			break;
 
@@ -527,7 +542,7 @@ readorders(const char *filename)
 			 * einer Zeile steht, und nun die nächste gelesen werden muß. */
 
 		case P_NEXT:
-			f = 0;
+			f = NULL;
 		default:
 			b = getbuf(F);
 		}
@@ -583,12 +598,12 @@ typus2race(unsigned char typus)
 }
 
 boolean
-is_persistent(const char *s) 
+is_persistent(const char *s, const struct locale *lang) 
 {
 #ifdef AT_PERSISTENT                                                          
 	if(*s == '@') return true;                                                  
 #endif      /* Nur kurze Befehle! */
-	switch(igetkeyword(s)) {
+	switch(igetkeyword(s, lang)) {
 		case K_BUY:
 		case K_SELL:
 		case K_KOMMENTAR:
@@ -1862,7 +1877,7 @@ writegame(char *path, char quiet)
 			wi(F, getguard(u));
 #endif
 			for(S=u->orders; S; S=S->next) {
-				if (is_persistent(S->s)) {
+				if (is_persistent(S->s, u->faction->locale)) {
 					wspace(F);
 					ws(F, S->s);
 				}
@@ -2051,169 +2066,6 @@ curse_read(attrib * a, FILE * f) {
 struct fjord { int size; faction * f; } fjord[3];
 
 /* ------------------------------------------------------------- */
-
-extern attrib_type at_traveldir_new;
-void
-attrib_init(void)
-{
-	/* Gebäudetypen registrieren */
-	init_buildings();
-	bt_register(&bt_castle);
-	bt_register(&bt_lighthouse);
-	bt_register(&bt_mine);
-	bt_register(&bt_quarry);
-	bt_register(&bt_harbour);
-	bt_register(&bt_academy);
-	bt_register(&bt_magictower);
-	bt_register(&bt_smithy);
-	bt_register(&bt_sawmill);
-	bt_register(&bt_stables);
-	bt_register(&bt_monument);
-	bt_register(&bt_dam);
-	bt_register(&bt_caravan);
-	bt_register(&bt_tunnel);
-	bt_register(&bt_inn);
-	bt_register(&bt_stonecircle);
-	bt_register(&bt_blessedstonecircle);
-	bt_register(&bt_illusion);
-	bt_register(&bt_generic);
-	bt_register(&bt_caldera);
-
-	/* Schiffstypen registrieren: */
-	st_register(&st_boat);
-	st_register(&st_longboat);
-	st_register(&st_dragonship);
-	st_register(&st_caravelle);
-	st_register(&st_trireme);
-
-	/* disable: st_register(&st_transport); */
-
-	/* Alle speicherbaren Attribute müssen hier registriert werden */
-	at_register(&at_unitdissolve);
-	at_register(&at_traveldir_new);
-	at_register(&at_familiar);
-	at_register(&at_familiarmage);
-	at_register(&at_eventhandler);
-	at_register(&at_stealth);
-	at_register(&at_mage);
-	at_register(&at_bauernblut);
-	at_register(&at_countdown);
-	at_register(&at_showitem);
-	at_register(&at_curse);
-	at_register(&at_cursewall);
-
-	at_register(&at_seenspell);
-	at_register(&at_reportspell);
-	at_register(&at_deathcloud);
-
-	/* neue REGION-Attribute */
-	at_register(&at_direction);
-	at_register(&at_moveblock);
-#if AT_SALARY
-	at_register(&at_salary);
-#endif
-	at_register(&at_horseluck);
-	at_register(&at_peasantluck);
-	at_register(&at_deathcount);
-	at_register(&at_chaoscount);
-	at_register(&at_woodcount);
-	at_register(&at_laen);
-	at_register(&at_road);
-
-	/* neue UNIT-Attribute */
-	at_register(&at_alias);
-	at_register(&at_siege);
-	at_register(&at_target);
-	at_register(&at_potion);
-	at_register(&at_potionuser);
-	at_register(&at_contact);
-	at_register(&at_effect);
-	at_register(&at_private);
-
-#if defined(OLD_TRIGGER)
-	at_register(&at_pointer_tag);
-	at_register(&at_relation);
-	at_register(&at_relbackref);
-	at_register(&at_trigger);
-	at_register(&at_action);
-#endif
-	at_register(&at_icastle);
-	at_register(&at_guard);
-	at_register(&at_lighthouse);
-	at_register(&at_group);
-	at_register(&at_faction_special);
-	at_register(&at_prayer_timeout);
-	at_register(&at_prayer_effect);
-	at_register(&at_wyrm);
-	at_register(&at_building_generic_type);
-
-/* border-typen */
-	register_bordertype(&bt_noway);
-	register_bordertype(&bt_fogwall);
-	register_bordertype(&bt_wall);
-	register_bordertype(&bt_illusionwall);
-	register_bordertype(&bt_firewall);
-	register_bordertype(&bt_wisps);
-	register_bordertype(&bt_road);
-
-#if USE_EVENTS
-	at_register(&at_events);
-#endif
-	at_register(&at_jihad);
-}
-
-extern void inittokens(void);
-extern void create_teleport_plane(void);
-
-void read_strings(FILE * F);
-
-const char * messages[] = {
-	"%s/%s/messages.xml",
-	NULL
-};
-
-const char * strings[] = {
-	"%s/%s/strings.txt",
-	NULL
-};
-
-const char * locales[] = {
-	"de", "en",
-	NULL
-};
-
-void
-init_locales(void)
-{
-	FILE * F;
-	int l;
-	for (l=0;locales[l];++l) {
-		char zText[MAX_PATH];
-		int i;
-		for (i=0;strings[i];++i) {
-			sprintf(zText, strings[i], resourcepath(), locales[l]);
-			F = fopen(zText, "r+");
-			if (F) {
-				read_strings(F);
-				fclose(F);
-			} else {
-				sprintf(buf, "fopen(%s): ", zText);
-				perror(buf);
-			}
-		}
-		for (i=0;messages[i];++i) {
-			sprintf(zText, messages[i], resourcepath(), locales[l]);
-			F = fopen(zText, "r+");
-			if (F) {
-				read_messages(F, NULL);
-				fclose(F);
-			} else {
-				sprintf(buf, "fopen(%s): ", zText);
-				perror(buf);
-			}
-		}
-	}
-}
 
 int
 lastturn(void)

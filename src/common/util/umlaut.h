@@ -17,11 +17,11 @@
 
 #define E_TOK_NOMATCH (-1)
 #define E_TOK_SUCCESS 0
-
+#define NODEHASHSIZE 7
 struct tref;
 
 typedef struct tnode {
-	struct tref * next[32];
+	struct tref * next[NODEHASHSIZE];
 	unsigned char flags;
 	void * id;
 } tnode;

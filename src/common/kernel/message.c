@@ -245,11 +245,54 @@ read_messages(FILE * F, const locale * lang)
 	unused(lang);
 }
 
-message * 
-make_message(const char * name, const char* sig, ...)
-	/* make_message("oops_error", "unit region command", u, r, cmd) */
+static void
+arg_set(void * args[], const message_type * mtype, char * buffer, void * v)
 {
 	int i;
+	for (i=0;i!=mtype->nparameters;++i) {
+		if (!strcmp(buffer, mtype->pnames[i])) break;
+	}
+	if (i!=mtype->nparameters) args[i] = v;
+}
+
+struct message * 
+msg_error(const struct unit * u, const char * cmd, const char * name, const char* sig, ...)
+{
+	va_list marker;
+	const message_type * mtype = mt_find(name);
+	char buffer[64], *oc = buffer;
+	const char *ic = sig;
+	void * args[16];
+	memset(args, 0, sizeof(args));
+	if (cmd==NULL) cmd = u->thisorder;
+
+	if (!mtype) {
+		fprintf(stderr, "trying to create message of unknown type \"%s\"\n", name);
+		return NULL;
+	}
+
+	arg_set(args, mtype, "unit", (void*)u);
+	arg_set(args, mtype, "region", (void*)u->region);
+	arg_set(args, mtype, "command", (void*)cmd);
+
+	va_start(marker, sig);
+	while (*ic && !isalnum(*ic)) ic++;
+	while (*ic) {
+		void * v = va_arg(marker, void *);
+		while (isalnum(*ic)) *oc++ = *ic++;
+		*oc = '\0';
+		arg_set(args, mtype, buffer, v);
+		while (*ic && !isalnum(*ic)) ic++;
+	}
+	va_end(marker);
+
+	return msg_create(mtype, (void**)args);
+}
+
+message * 
+msg_message(const char * name, const char* sig, ...)
+	/* msg_message("oops_error", "unit region command", u, r, cmd) */
+{
 	va_list marker;
 	const message_type * mtype = mt_find(name);
 	char buffer[64], *oc = buffer;
@@ -268,10 +311,7 @@ make_message(const char * name, const char* sig, ...)
 		void * v = va_arg(marker, void *);
 		while (isalnum(*ic)) *oc++ = *ic++;
 		*oc = '\0';
-		for (i=0;i!=mtype->nparameters;++i) {
-			if (!strcmp(buffer, mtype->pnames[i])) break;
-		}
-		if (i!=mtype->nparameters) args[i] = v;
+		arg_set(args, mtype, buffer, v);
 		while (*ic && !isalnum(*ic)) ic++;
 	}
 	va_end(marker);
@@ -369,7 +409,7 @@ new_message(struct faction * receiver, const char* sig, ...)
 				args[i] = (void*)va_arg(marker, skill_t);
 				break;
 			case 'd':
-				args[i] = (void*)directions[i];
+				args[i] = (void*)i;
 				break;
 			case 'S':
 			default:

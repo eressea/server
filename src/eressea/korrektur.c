@@ -662,7 +662,7 @@ fix_migrants(void) {
 		unit * u;
 		for (u=r->units;u;u=u->next) {
 			if (u->race==RC_HUMAN) u->irace=RC_HUMAN;
-			if (u->irace!=u->race && u->race!=RC_ILLUSION && u->race!=RC_DAEMON) {
+			if (u->irace!=u->race && (race[u->race].flags & RCF_SHAPESHIFT)==0) {
 				log_warning(("[fix_migrants] %s ist ein %s, als %s getarnt\n", unitname(u), race[u->race].name[0], race[u->irace].name[0]));
 			}
 		}
@@ -2142,17 +2142,33 @@ test_gmquest(void)
 
 }
 
+#define TEST_LOCALES 0
+#if TEST_LOCALES
+static void
+setup_locales(void) 
+{
+	locale * lang = find_locale("en");
+	faction * f = factions;
+	while (f) {
+		f->locale = lang;
+		f = f->next;
+	}
+}
+#endif
+
 void
 korrektur(void)
 {
+#if TEST_LOCALES
+	setup_locales();
+#endif
+
 #ifdef TEST_GM_COMMANDS
 	setup_gm_faction();
 #endif
 	make_gms();
 	/* Wieder entfernen! */
-#ifdef BROKEN_OWNERS
 	verify_owners(false);
-#endif
 	/* fix_herbtypes(); */
 #ifdef CONVERT_TRIGGER
 	convert_triggers();

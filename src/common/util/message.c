@@ -6,9 +6,9 @@
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
- This program may not be used, modified or distributed 
+ This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
- 
+
 */
 
 #include <config.h>
@@ -20,13 +20,13 @@
 #include <string.h>
 #include <stdarg.h>
 
-const char * 
+const char *
 mt_name(const message_type* mtype)
 {
 	return mtype->name;
 }
 
-message_type * 
+message_type *
 mt_new(const char * name, const char * args[])
 {
 	int i, nparameters;
@@ -55,7 +55,7 @@ mt_new(const char * name, const char * args[])
 	return mtype;
 }
 
-message_type * 
+message_type *
 mt_new_va(const char * name, ...)
 {
 	const char * args[16];
@@ -107,7 +107,7 @@ typedef struct messagetype_list {
 
 static messagetype_list * messagetypes;
 
-const message_type * 
+const message_type *
 mt_register(const message_type * type)
 {
 	messagetype_list * mtl = messagetypes;
@@ -121,7 +121,7 @@ mt_register(const message_type * type)
 	return type;
 }
 
-const message_type * 
+const message_type *
 mt_find(const char * name)
 {
 	messagetype_list * mtl = messagetypes;

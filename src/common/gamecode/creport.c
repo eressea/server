@@ -74,6 +74,68 @@ extern int quiet;
 /* globals */
 #define C_REPORT_VERSION 57
 
+/*
+ * translation table
+ */
+typedef struct translation {
+	struct translation * next;
+	const char * key;
+	const char * value;
+} translation;
+
+#define TRANSMAXHASH 255
+static translation * translation_table[TRANSMAXHASH];
+static translation * junkyard;
+
+static const char *
+add_translation(const char * key, const char * value)
+{
+	int kk = ((key[0] << 5) + key[0]) % TRANSMAXHASH;
+	translation * t = translation_table[kk];
+	while (t && strcmp(t->key, key)!=0) t=t->next;
+	if (!t) {
+		if (junkyard) {
+			t = junkyard;
+			junkyard = junkyard->next;
+		} else t = malloc(sizeof(translation));
+		t->key = key;
+		t->value = value;
+		t->next = translation_table[kk];
+		translation_table[kk] = t;
+	}
+	return key;
+}
+
+static void
+write_translations(FILE * F)
+{
+	int i;
+	fputs("TRANSLATION\n", F);
+	for (i=0;i!=TRANSMAXHASH;++i) {
+		translation * t = translation_table[i];
+		while (t) {
+			fprintf(F, "\"%s\";%s\n", t->value, t->key);
+			t = t->next;
+		}
+	}
+}
+
+static void
+reset_translations(void)
+{
+	int i;
+	for (i=0;i!=TRANSMAXHASH;++i) {
+		translation * t = translation_table[i];
+		while (t) {
+			translation * c = t->next;
+			t->next = junkyard;
+			junkyard = t;
+			t = c;
+		}
+		translation_table[i] = 0;
+	}
+}
+
 /* implementation */
 void
 cr_output_str_list(FILE * F, const char *title, const strlist * S, faction * f)
@@ -114,11 +176,12 @@ print_curses(FILE * F, void * obj, typ_t typ, attrib *a, int self)
 			}
 		} else if (a->type==&at_effect && self) {
 			effect_data * data = (effect_data *)a->data.v;
+			const char * key = resourcename(data->type->itype->rtype, 0);
 			if (!header) {
 				header = 1;
 				fputs("EFFECTS\n", F);
 			}
-			fprintf(F, "\"%d %s\"\n", data->value, locale_string(NULL, resourcename(data->type->itype->rtype, 0)));
+			fprintf(F, "\"%d %s\"\n", data->value, add_translation(key, locale_string(NULL, key)));
 		}
 		a = a->next;
 	}
@@ -185,10 +248,23 @@ cr_resource(const void * v, char * buffer, const void * userdata)
 	const faction * report = (const faction*)userdata;
 	const resource_type * r = (const resource_type *)v;
 	if (r) {
-		sprintf(buffer, "\"%s\"", locale_string(report->locale, resourcename(r, 0)));
+		const char * key = resourcename(r, 0);
+		sprintf(buffer, "\"%s\"", 
+			add_translation(key, locale_string(report->locale, key)));
 		return 0;
 	}
 	return -1;
+}
+
+static int
+cr_race(const void * v, char * buffer, const void * userdata)
+{
+	const faction * report = (const faction*)userdata;
+	int rc = (int)v;
+	const char * key = race[rc].name[0];
+	sprintf(buffer, "\"%s\"", 
+		add_translation(key, locale_string(report->locale, key)));
+	return 0;
 }
 
 static int
@@ -196,10 +272,12 @@ cr_skill(const void * v, char * buffer, const void * userdata)
 {
 	const faction * report = (const faction*)userdata;
 	skill_t sk = (skill_t)v;
-	if (sk!=NOSKILL) sprintf(buffer, "\"%s\"", locale_string(report->locale, skillnames[sk]));
+	if (sk!=NOSKILL) sprintf(buffer, "\"%s\"", 
+		add_translation(skillname(sk, NULL), skillname(sk, report->locale)));
 	else strcpy(buffer, "\"\"");
 	return 0;
 }
+
 
 void 
 creport_init(void)
@@ -214,11 +292,19 @@ creport_init(void)
 	tsf_register("building", &cr_building);
 	tsf_register("skill", &cr_skill);
 	tsf_register("resource", &cr_resource);
+	tsf_register("race", &cr_race);
+	tsf_register("direction", &cr_int);
 }
 
 void
 creport_cleanup(void)
 {
+	while (junkyard) {
+		translation * t = junkyard;
+		junkyard = junkyard->next;
+		free(t);
+	}
+	junkyard = 0;
 }
 
 static int msgno;
@@ -315,7 +401,7 @@ cr_output_buildings(FILE * F, building * b, unit * u, int fno, faction *f)
 		const attrib * a = a_find(b->attribs, &at_icastle);
 		if (a) type = ((icastle_data*)a->data.v)->type;
 	}
-	fprintf(F, "\"%s\";Typ\n", buildingtype(b, b->size, f->locale));
+	fprintf(F, "\"%s\";Typ\n", add_translation(b->type->_name, locale_string(f->locale, b->type->_name)));
 	fprintf(F, "\"%s\";Name\n", b->name);
 	if (strlen(b->display))
 		fprintf(F, "\"%s\";Beschr\n", b->display);
@@ -352,7 +438,7 @@ cr_output_ship(FILE * F, ship * s, unit * u, int fcaptain, faction * f, region *
 	fprintf(F, "\"%s\";Name\n", s->name);
 	if (strlen(s->display))
 		fprintf(F, "\"%s\";Beschr\n", s->display);
-	fprintf(F, "\"%s\";Typ\n", s->type->name[0]);
+	fprintf(F, "\"%s\";Typ\n", add_translation(s->type->name[0], locale_string(f->locale, s->type->name[0])));
 	fprintf(F, "%d;Groesse\n", s->size);
 	if (s->damage) {
 		int percent = s->damage*100/(s->size*DAMAGE_SCALE);
@@ -444,10 +530,12 @@ cr_output_unit(FILE * F, region * r,
 
 
 	pzTmp = get_racename(u->attribs);
-	if (pzTmp==NULL) fprintf(F, "\"%s\";Typ\n", race[u->irace].name[1]);
+	if (pzTmp==NULL) fprintf(F, "\"%s\";Typ\n", 
+		add_translation(race[u->irace].name[1], locale_string(f->locale, race[u->irace].name[1])));
 	else fprintf(F, "\"%s\";Typ\n", pzTmp);
 	if ((pzTmp || u->irace != u->race) && u->faction==f) {
-		fprintf(F, "\"%s\";wahrerTyp\n", race[u->race].name[1]);
+		fprintf(F, "\"%s\";wahrerTyp\n", 
+			add_translation(race[u->race].name[1], locale_string(f->locale, race[u->race].name[1])));
 	}
 
 	if (u->building)
@@ -502,7 +590,7 @@ cr_output_unit(FILE * F, region * r,
 		fprintf(F, "COMMANDS\n");
 		if(u->lastorder[0]) fprintf(F, "\"%s\"\n", u->lastorder);
 		for (S = u->orders; S; S = S->next) {
-			if(is_persistent(S->s)) {
+			if(is_persistent(S->s, u->faction->locale)) {
 				fprintf(F, "\"%s\"\n", S->s);
 			}
 		}
@@ -519,7 +607,8 @@ cr_output_unit(FILE * F, region * r,
 				/* 0 ist nur der Kompatibilität wegen drin, rausnehmen */
 				fprintf(F, "0 %d;%s\n", eff_skill(u, sk, r), skillnames[sk]);
 #else
-				fprintf(F, "%d %d;%s\n", get_skill(u, sk), eff_skill(u, sk, r), skillnames[sk]);
+				fprintf(F, "%d %d;%s\n", get_skill(u, sk), eff_skill(u, sk, r), 
+					add_translation(skillname(sk, NULL), skillname(sk, f->locale)));
 #endif
 			}
 		/* spells */
@@ -733,6 +822,7 @@ report_computer(FILE * F, faction * f)
 	else printf(" - schreibe Computerreport\n");
 
 	fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
+	fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
 	fprintf(F, "\"%s\";Spiel\n", global.gamename);
 	fprintf(F, "\"%s\";Konfiguration\n", "Standard");
 	fprintf(F, "\"%s\";Koordinaten\n", "Hex");
@@ -748,7 +838,7 @@ report_computer(FILE * F, faction * f)
 		fprintf(F, "%d;Punkte\n", f->score);
 		fprintf(F, "%d;Punktedurchschnitt\n", average_score_of_age(f->age, f->age / 24 + 1));
 	}
-	fprintf(F, "\"%s\";Typ\n", race[f->race].name[1]);
+	fprintf(F, "\"%s\";Typ\n", add_translation(race[f->race].name[1], locale_string(f->locale, race[f->race].name[1])));
 	fprintf(F, "%d;Rekrutierungskosten\n", race[f->race].rekrutieren);
 	fprintf(F, "%d;Anzahl Personen\n", count_all(f));
 	fprintf(F, "\"%s\";Magiegebiet\n", neue_gebiete[f->magiegebiet]);
@@ -800,13 +890,14 @@ report_computer(FILE * F, faction * f)
 		m = ptype->itype->construction->materials;
 		ch = resourcename(ptype->itype->rtype, 0);
 		fprintf(F, "TRANK %d\n", hashstring(ch));
-		fprintf(F, "\"%s\";Name\n", locale_string(f->locale, ch));
+		fprintf(F, "\"%s\";Name\n", add_translation(ch, locale_string(f->locale, ch)));
 		fprintf(F, "%d;Stufe\n", ptype->level);
 		fprintf(F, "\"%s\";Beschr\n", ptype->text);
 		fprintf(F, "ZUTATEN\n");
 
 		while (m->number) {
-			fprintf(F, "\"%s\"\n", locale_string(f->locale, resourcename(oldresourcetype[m->type], 0)));
+			ch = resourcename(oldresourcetype[m->type], 0);
+			fprintf(F, "\"%s\"\n", add_translation(ch, locale_string(f->locale, ch)));
 			m++;
 		}
 	}
@@ -836,7 +927,7 @@ report_computer(FILE * F, faction * f)
 			else tname = terrain[rterrain(r)].name;
 		}
 
-		fprintf(F, "\"%s\";Terrain\n", locale_string(f->locale, tname));
+		fprintf(F, "\"%s\";Terrain\n", add_translation(tname, locale_string(f->locale, tname)));
 		if (sd->mode != see_neighbour)
 		{
 			int g = 0;
@@ -879,10 +970,11 @@ report_computer(FILE * F, faction * f)
 					if(rpeasants(r)/TRADE_FRACTION > 0) {
 						fputs("PREISE\n", F);
 						while (dmd) {
-								fprintf(F, "%d;%s\n", (dmd->value
-										  ? dmd->value*dmd->type->price
-										  : -dmd->type->price),
-										  locale_string(f->locale, resourcename(dmd->type->itype->rtype, 0)));
+							const char * ch = resourcename(dmd->type->itype->rtype, 0);
+							fprintf(F, "%d;%s\n", (dmd->value
+									  ? dmd->value*dmd->type->price
+									  : -dmd->type->price),
+									  add_translation(ch, locale_string(f->locale, ch)));
 							dmd=dmd->next;
 						}
 					}
@@ -1009,4 +1101,6 @@ report_computer(FILE * F, faction * f)
 		}			/* region traversal */
 	}
 	report_crtypes(F, f->locale);
+	write_translations(F);
+	reset_translations();
 }

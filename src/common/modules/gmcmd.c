@@ -196,7 +196,7 @@ gm_give(const char * str, struct unit * u)
 
 	if (to==NULL || rplane(to->region) != rplane(u->region)) {
 		/* unknown or in another plane */
-		mistake(u, str, "Die Einheit wurde nicht gefunden.\n", 0);
+		cmistake(u, str, 64, MSG_COMMERCE);
 	} else if (itype==NULL || i_get(u->items, itype)==0) {
 		/* unknown or not enough */
 		mistake(u, str, "So einen Gegenstand hat die Einheit nicht.\n", 0);
@@ -230,7 +230,7 @@ gm_take(const char * str, struct unit * u)
 
 	if (to==NULL || rplane(to->region) != rplane(u->region)) {
 		/* unknown or in another plane */
-		mistake(u, str, "Die Einheit wurde nicht gefunden.\n", 0);
+		cmistake(u, str, 64, MSG_COMMERCE);
 	} else if (itype==NULL || i_get(to->items, itype)==0) {
 		/* unknown or not enough */
 		mistake(u, str, "So einen Gegenstand hat die Einheit nicht.\n", 0);
@@ -259,15 +259,15 @@ static void
 gm_skill(const char * str, struct unit * u)
 {
 	unit * to = findunit(atoi36(igetstrtoken(str)));
-	skill_t skill = findskill(getstrtoken());
+	skill_t skill = findskill(getstrtoken(), u->faction->locale);
 	int num = atoi(getstrtoken());
 	
 	if (to==NULL || rplane(to->region) != rplane(u->region)) {
 		/* unknown or in another plane */
-		mistake(u, str, "Die Einheit wurde nicht gefunden.\n", 0);
+		cmistake(u, str, 64, MSG_COMMERCE);
 	} else if (skill==NOSKILL || skill==SK_MAGIC || skill==SK_ALCHEMY) {
 		/* unknown or not enough */
-		mistake(u, str, "Dieses Talent ist unbekannt, oder kann nciht erhöht werden.\n", 0);
+		mistake(u, str, "Dieses Talent ist unbekannt, oder kann nicht erhöht werden.\n", 0);
 	} else if (num<0 || num>5000) {
 		/* sanity check failed */
 		mistake(u, str, "Der gewählte Wert ist nicht zugelassen.\n", 0);
@@ -297,7 +297,7 @@ gm_command(const char * cmd, struct unit * u)
 	i = min(16, c-cmd);
 	strncpy(zText, cmd, i);
 	zText[i]=0;
-	if (findtoken(&g_keys, zText, (void**)&cm) && cm->perform) cm->perform(++c, u);
+	if (findtoken(&g_keys, zText, (void**)&cm)==E_TOK_SUCCESS && cm->perform) cm->perform(++c, u);
 }
 
 void
@@ -329,7 +329,7 @@ gmcommands(void)
 			unit * u = *up;
 			strlist * order;
 			for (order = u->orders; order; order = order->next)
-				if (igetkeyword(order->s) == K_GM) {
+				if (igetkeyword(order->s, u->faction->locale) == K_GM) {
 					gm_command(order->s, u);
 				}			
 			if (u==*up) up = &u->next;

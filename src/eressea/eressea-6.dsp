@@ -748,7 +748,7 @@ SOURCE=..\common\attributes\follow.c
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -772,7 +772,7 @@ SOURCE=..\common\attributes\follow.h
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -796,7 +796,7 @@ SOURCE=..\common\attributes\giveitem.c
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -820,7 +820,7 @@ SOURCE=..\common\attributes\giveitem.h
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -837,6 +837,19 @@ SOURCE=..\common\attributes\giveitem.h
 # Begin Source File
 
 SOURCE=..\common\attributes\gm.c
+
+!IF  "$(CFG)" == "eressea - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
+
+# PROP Intermediate_Dir "../common/attributes/Debug"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -848,7 +861,7 @@ SOURCE=..\common\attributes\hate.c
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -872,7 +885,7 @@ SOURCE=..\common\attributes\hate.h
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -896,7 +909,7 @@ SOURCE=..\common\attributes\iceberg.c
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -920,7 +933,7 @@ SOURCE=..\common\attributes\iceberg.h
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -944,7 +957,7 @@ SOURCE=..\common\attributes\key.c
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -968,7 +981,7 @@ SOURCE=..\common\attributes\key.h
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -992,7 +1005,7 @@ SOURCE=..\common\attributes\matmod.c
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -1016,7 +1029,7 @@ SOURCE=..\common\attributes\matmod.h
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -1026,6 +1039,40 @@ SOURCE=..\common\attributes\matmod.h
 
 # PROP BASE Intermediate_Dir "..\common\attributes\Release"
 # PROP Intermediate_Dir "..\common\attributes\Profile"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\attributes\moved.c
+
+!IF  "$(CFG)" == "eressea - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
+
+# PROP Intermediate_Dir "../common/attributes/Debug"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\attributes\option.c
+
+!IF  "$(CFG)" == "eressea - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
+
+# PROP Intermediate_Dir "../common/attributes/Debug"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
 
 !ENDIF 
 
@@ -1040,7 +1087,7 @@ SOURCE=..\common\attributes\orcification.c
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -1056,6 +1103,23 @@ SOURCE=..\common\attributes\orcification.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\attributes\otherfaction.c
+
+!IF  "$(CFG)" == "eressea - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
+
+# PROP Intermediate_Dir "../common/attributes/Debug"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\attributes\overrideroads.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
@@ -1064,7 +1128,7 @@ SOURCE=..\common\attributes\overrideroads.c
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -1087,7 +1151,7 @@ SOURCE=..\common\attributes\overrideroads.h
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -1102,6 +1166,23 @@ SOURCE=..\common\attributes\overrideroads.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\attributes\racename.c
+
+!IF  "$(CFG)" == "eressea - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
+
+# PROP Intermediate_Dir "../common/attributes/Debug"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
+
+!ELSEIF  "$(CFG)" == "eressea - Win32 Profile"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\attributes\reduceproduction.c
 
 !IF  "$(CFG)" == "eressea - Win32 Release"
@@ -1110,7 +1191,7 @@ SOURCE=..\common\attributes\reduceproduction.c
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -1134,7 +1215,7 @@ SOURCE=..\common\attributes\reduceproduction.h
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -1158,7 +1239,7 @@ SOURCE=..\common\attributes\targetregion.c
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 
@@ -1182,7 +1263,7 @@ SOURCE=..\common\attributes\targetregion.h
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Debug"
 
-# PROP Intermediate_Dir "..\common\attributes\Debug"
+# PROP Intermediate_Dir "../common/attributes/Debug"
 
 !ELSEIF  "$(CFG)" == "eressea - Win32 Conversion"
 

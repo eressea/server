@@ -326,7 +326,7 @@ sacrificings(void)
 
 	for(r=regions; r; r=r->next) {
 		for(u=r->units; u; u=u->next) {
-			if(igetkeyword(u->thisorder) == K_SACRIFICE) {
+			if(igetkeyword(u->thisorder, u->faction->locale) == K_SACRIFICE) {
 				int   n = 1, karma;
 				char *s = getstrtoken();
 
@@ -338,7 +338,7 @@ sacrificings(void)
 
 				s = getstrtoken();
 
-				switch(findparam(s)) {
+				switch(findparam(s, u->faction->locale)) {
 
 				case P_SILVER:
 					n = use_pooled(u, r, R_SILVER, n);
@@ -386,7 +386,7 @@ prayers(void)
 
 	for(r=regions; r; r=r->next) {
 		for(u=r->units; u; u=u->next) {
-			for(S = u->orders; S; S = S->next) if(igetkeyword(S->s) == K_PRAY) {
+			for(S = u->orders; S; S = S->next) if(igetkeyword(S->s, u->faction->locale) == K_PRAY) {
 				attrib *a, *a2;
 				unit *u2;
 				int karma_cost;
@@ -394,9 +394,9 @@ prayers(void)
 				param_t p;
 				char *s = getstrtoken();
 
-				if(findparam(s) == P_FOR) s = getstrtoken();
+				if(findparam(s, u->faction->locale) == P_FOR) s = getstrtoken();
 
-				p = findparam(s);
+				p = findparam(s, u->faction->locale);
 				switch(p) {
 				case P_AURA:
 					if(!is_mage) {
@@ -462,7 +462,7 @@ set_jihad(void)
 
 	for(r=regions; r; r=r->next) {
 		for(u=r->units; u; u=u->next) {
-			for(S = u->orders; S; S=S->next) if(igetkeyword(S->s) == K_SETJIHAD) {
+			for(S = u->orders; S; S=S->next) if(igetkeyword(S->s, u->faction->locale) == K_SETJIHAD) {
 				faction *f = u->faction;
 				int can = fspecial(f, FS_JIHAD);
 				int has = 0;
@@ -491,7 +491,7 @@ set_jihad(void)
 					cmistake(u, S->s, 282, MSG_EVENT);
 					continue;
 				}
-				
+
 				for(a = a_find(f->attribs, &at_jihad); a; a = a->nexttype) {
 					if(a->data.sa[0] == jrace) break;
 				}
@@ -532,7 +532,7 @@ jihad_attacks(void)
 	strlist *S;
 	attrib *a;
 	ally *sf, **sfp;
-	
+
 	for(f=factions; f; f=f->next) if(fspecial(f, FS_JIHAD)) {
 		for(r=f->first; r != f->last; r = r->next) if(rand()%1000 <= 1) {
 			boolean doit = false;
@@ -559,7 +559,7 @@ jihad_attacks(void)
 
 					if(sf) sf->status = sf->status & (HELP_ALL - HELP_FIGHT);
 
-					sprintf(buf, "%s %s", keywords[K_ATTACK], unitid(u));
+					sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_ATTACK]), unitid(u));
 					S = makestrlist(buf);
 					addlist(&u2->orders, S);
 				}

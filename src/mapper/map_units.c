@@ -322,7 +322,7 @@ modify_talente(unit * u, region * r)
 	waddnstr(wn, "< Talente >", -1);
 	for (i = 0; i < MAXSKILLS; i++) {
 		q = get_skill(u, i);
-		sprintf(buf, "%s %d [%d]", skillnames[i], eff_skill(u, i, r), q / u->number);
+		sprintf(buf, "%s %d [%d]", skillname(i, NULL), eff_skill(u, i, r), q / u->number);
 		TL[i] = strdup(buf);
 		if (L > 10) {
 			wmove(wn, i + 1, 4);
@@ -395,7 +395,7 @@ modify_talente(unit * u, region * r)
 					wrefresh(mywin);	/* altes Fenster überbügeln */
 				}
 				set_skill(u, x, q * u->number);
-				sprintf(buf, "%s %d [%d]", skillnames[x], eff_skill(u, x, r), q);
+				sprintf(buf, "%s %d [%d]", skillname(x, NULL), eff_skill(u, x, r), q);
 				free(TL[x]);
 				modif = 1;
 				TL[x] = strdup(buf);
@@ -467,7 +467,7 @@ modify_unit(region * r, unit * modunit)
 					Addstr(", ");
 					q += 2;
 				}
-				sprintf(buf, "%s %d [%d]", skillnames[sk], eff_skill(u, sk, r), a / u->number);
+				sprintf(buf, "%s %d [%d]", skillname(sk, NULL), eff_skill(u, sk, r), a / u->number);
 				q += strlen(buf);
 				if (q > SX - 8) {
 					q = strlen(buf);

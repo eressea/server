@@ -105,11 +105,10 @@ typedef struct race_type {
 #define GIVEPERSON     (1<<2)   /* übergibt Personen */
 #define GIVEUNIT       (1<<3)   /* Einheiten an andere Partei übergeben */
 #define GETITEM        (1<<4)   /* nimmt Gegenstände an */
-#define HOARDMONEY     (1<<5)   /* geben niemals Silber weg */
-#define CANGUARD       (1<<6)   /* bewachen auch ohne Waffen */
-#define ECF_REC_HORSES     (1<<7)   /* Rekrutiert aus Pferden */
-#define ECF_REC_ETHEREAL   (1<<8)   /* Rekrutiert aus dem Nichts */
-#define ECF_REC_UNLIMITED  (1<<9)   /* Rekrutiert ohne Limit */
+#define CANGUARD       (1<<5)   /* bewachen auch ohne Waffen */
+#define ECF_REC_HORSES     (1<<6)   /* Rekrutiert aus Pferden */
+#define ECF_REC_ETHEREAL   (1<<7)   /* Rekrutiert aus dem Nichts */
+#define ECF_REC_UNLIMITED  (1<<8)   /* Rekrutiert ohne Limit */
 
 /* Battle-Flags */
 #define BF_EQUIPMENT				(1<<0)

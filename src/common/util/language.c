@@ -44,7 +44,7 @@ static locale * default_locale;
 unsigned int
 locale_hashkey(const locale * lang)
 {
-	if (lang==NULL) lang = default_locale;
+	assert(lang);
 	return lang->hashkey;
 }
 
@@ -75,6 +75,31 @@ make_locale(const char * name)
 	return l;
 }
 
+static FILE * s_debug = NULL;
+
+void 
+debug_language(const char * log)
+{
+	s_debug = fopen(log, "w+");
+}
+
+const char *
+locale_getstring(const locale * lang, const char * key)
+{
+	unsigned int hkey = hashstring(key);
+	unsigned int id = hkey % SMAXHASH;
+	struct locale_string * find;
+
+	assert(lang);
+	if (key==NULL || *key==0) return NULL;
+	find = lang->strings[id];
+	while (find) {
+		if (find->hashkey == hkey && !strcmp(key, find->key)) return find->str;
+		find = find->nexthash;
+	}
+	return NULL;
+}
+
 const char *
 locale_string(const locale * lang, const char * key)
 {
@@ -82,22 +107,28 @@ locale_string(const locale * lang, const char * key)
 	unsigned int id = hkey % SMAXHASH;
 	struct locale_string * find;
 
-	if (key==NULL || *key==0) return NULL;
-	if (lang==NULL) lang = default_locale;
+	if (key == NULL || *key==0) return NULL;
+	if (lang == NULL) return key;
 	find = lang->strings[id];
 	while (find) {
 		if (find->hashkey == hkey && !strcmp(key, find->key)) break;
 		find = find->nexthash;
 	}
 	if (!find) {
-		if (lang==default_locale) {
-			log_warning(("missing translation for \"%s\"\n", key));
-			return key;
+		const char * s = key;
+		if (lang!=default_locale) {
+			log_warning(("missing translation for \"%s\" in locale %s\n", key, lang->name));
+			s = locale_string(default_locale, key);
+			if (s_debug) {
+				fprintf(s_debug, "%s;%s;%s\n", key, lang->name, s);
+				locale_setstring((struct locale*)lang, key, s);
+			}
 		}
-		log_warning(("missing translation for \"%s\" in locale %s\n", key, lang->name));
-		return locale_string(default_locale, key);
+		return s;
 	}
-	return find->str;
+	else {
+		return find->str;
+	}
 }
 
 void
@@ -108,7 +139,7 @@ locale_setstring(locale * lang, const char * key, const char * value)
 	unsigned int id = hkey % SMAXHASH;
 	struct locale_string * find;
 
-	if (lang==NULL) lang = default_locale;
+	assert(lang);
 	find = lang->strings[id];
 	while (find) {
 		if (find->hashkey==hkey && !strcmp(key, find->key)) break;
@@ -128,7 +159,7 @@ locale_setstring(locale * lang, const char * key, const char * value)
 const char *
 locale_name(const locale * lang)
 {
-	if (lang==NULL) lang = default_locale;
+	assert(lang);
 	return lang->name;
 }
 
@@ -136,7 +167,7 @@ const char *
 reverse_lookup(const locale * lang, const char * str)
 {
 	int i;
-	if (lang==NULL) lang = default_locale;
+	assert(lang);
 	if (lang!=NULL) {
 		for (i=0;i!=SMAXHASH;++i) {
 			struct locale_string * ls;

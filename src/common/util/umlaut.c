@@ -61,7 +61,7 @@ addtoken(tnode * root, const char* str, void * id)
 		int index, i = 0;
 		char c = *str;
 		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c);
-		index = ((unsigned char)c) % 32;
+		index = ((unsigned char)c) % NODEHASHSIZE;
 		next = root->next[index];
 		if (!(root->flags & LEAF)) root->id = id;
 		while (next && next->c != c) next = next->nexthash;
@@ -77,7 +77,7 @@ addtoken(tnode * root, const char* str, void * id)
 			root->next[index] = ref;
 			
 			if (u!=c) {
-				index = ((unsigned char)u) % 32;
+				index = ((unsigned char)u) % NODEHASHSIZE;
 				ref = malloc(sizeof(tref));
 				ref->c = u;
 				ref->node = node;
@@ -113,7 +113,7 @@ findtoken(tnode * tk, const char * str, void **result)
 
 /*		if (c<'a' || c>'z') c = (char)tolower((unsigned char)c); */
 
-		index = ((unsigned char)c) % 32;
+		index = ((unsigned char)c) % NODEHASHSIZE;
 		ref = tk->next[index];
 		while (ref && ref->c!=c) ref = ref->nexthash;
 		++str;

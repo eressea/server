@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -21,22 +21,25 @@
 
 #include <config.h>
 #include "eressea.h"
-#include "item.h"
-
 #include "monster.h"
-#include "reports.h"
-#include "message.h"
-#include "region.h"
+
 #include "economy.h"
-#include "faction.h"
-#include "movement.h"
-#include "race.h"
-#include "magic.h"
-#include "build.h"
-#include "pool.h"
-#include "names.h"
-#include "unit.h"
-#include "pathfinder.h"
+
+/* kernel includes */
+#include <item.h>
+#include <reports.h>
+#include <message.h>
+#include <region.h>
+#include <faction.h>
+#include <movement.h>
+#include <race.h>
+#include <magic.h>
+#include <skill.h>
+#include <build.h>
+#include <pool.h>
+#include <names.h>
+#include <unit.h>
+#include <pathfinder.h>
 
 /* util includes */
 #include <attrib.h>
@@ -95,7 +98,7 @@ monster_attack(unit * u, const unit * target)
 	if (is_waiting(u)) return false;
 
 	sprintf(zText, "%s %s",
-		keywords[K_ATTACK], unitid(target));
+		locale_string(u->faction->locale, keywords[K_ATTACK]), unitid(target));
 	S = makestrlist(zText);
 	addlist(&u->orders, S);
 	return true;
@@ -106,7 +109,7 @@ taxed_by_monster(unit * u)
 {
 	strlist *S;
 
-	S = makestrlist(keywords[K_TAX]);
+	S = makestrlist(locale_string(u->faction->locale, keywords[K_TAX]));
 	addlist(&u->orders, S);
 }
 
@@ -348,7 +351,7 @@ move_monster(region * r, unit * u)
 	if (d == NODIRECTION)
 		return;
 
-	sprintf(buf, "%s %s", keywords[K_MOVE], directions[d]);
+	sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), locale_string(u->faction->locale, directions[d]));
 
 	S = makestrlist(buf);
 	S->next = u->orders;
@@ -438,7 +441,7 @@ set_movement_order(unit * u, const region * target, int moves, boolean (*allowed
 		return false;
 	}
 
-	strcpy(buf, keywords[K_MOVE]);
+	strcpy(buf, locale_string(u->faction->locale, keywords[K_MOVE]));
 	c = buf + strlen(buf);
 
 	while (position!=moves && plan[position+1]) {
@@ -447,7 +450,7 @@ set_movement_order(unit * u, const region * target, int moves, boolean (*allowed
 		direction_t dir = reldirection(prev, next);
 		assert(dir!=NODIRECTION);
 		*c++ = ' ';
-		strcpy(c, directions[dir]);
+		strcpy(c, locale_string(u->faction->locale, directions[dir]));
 		c += strlen(c);
 	}
 
@@ -530,7 +533,7 @@ monster_seeks_target(region *r, unit *u)
 
 	if( d == NODIRECTION )
 		return;
-	sprintf(buf, "%s %s", keywords[K_MOVE], directions[d]);
+	sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), locale_string(u->faction->locale, directions[d]));
 	SP = &u->orders;
 	S = makestrlist(buf);
 	addlist2(SP, S);
@@ -605,14 +608,14 @@ random_attack_by_monster(const region * r, unit * u)
 		    && target != u
 		    && humanoid(target)
 			&& !illusionary(target)
-		    && target->number <= max) 
+		    && target->number <= max)
 		{
 			if (monster_attack(u, target)) {
 				unit * u2;
 				success = true;
 				for (u2 = r->units; u2; u2 = u2->next) {
-					if (u2->faction->no == MONSTER_FACTION 
-						&& rand() % 100 < 75) 
+					if (u2->faction->no == MONSTER_FACTION
+						&& rand() % 100 < 75)
 					{
 						monster_attack(u2, target);
 					}
@@ -867,7 +870,8 @@ learn_monster(unit *u)
 		if(get_skill(u, sk) > 0) {
 			c++;
 			if(c == n) {
-				sprintf(buf, "%s %s", keywords[K_STUDY], skillnames[sk]);
+				sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_STUDY]), 
+					skillname(sk, u->faction->locale));
 				set_string(&u->thisorder, buf);
 				break;
 			}
@@ -943,7 +947,7 @@ plan_monsters(void)
 			if (ta && strncmp(u->lastorder, "WARTEN", 6) != 0) {
 				unit * tu = (unit *)ta->data.v;
 				if (tu && tu->region==r) {
-					sprintf(buf, "%s %s", keywords[K_ATTACK], itoa36(tu->no));
+					sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_ATTACK]), itoa36(tu->no));
 					S = makestrlist(buf);
 					addlist(&u->orders, S);
 				} else if (tu) {
@@ -964,7 +968,7 @@ plan_monsters(void)
 
 			if (!(fval(u, FL_ISNEW)) && r->terrain != T_OCEAN) { /* Monster bewachen immer */
 				strlist *S;
-				S = makestrlist(keywords[K_GUARD]);
+				S = makestrlist(locale_string(u->faction->locale, keywords[K_GUARD]));
 				addlist(&u->orders, S);
 			}
 
@@ -977,15 +981,15 @@ plan_monsters(void)
 			} else {
 				boolean done = false;
 				if((race[u->race].flags & RCF_ATTACKRANDOM)
-					&& rand()%100<MONSTERATTACK 
-					&& is_moving == false) 
+					&& rand()%100<MONSTERATTACK
+					&& is_moving == false)
 				{
 					done = random_attack_by_monster(r, u);
-				} 
+				}
 				if (!done) {
 					if(u->race == RC_SEASERPENT) {
-						set_string(&u->thisorder, keywords[K_PIRACY]);
-						set_string(&u->lastorder, keywords[K_PIRACY]);
+						set_string(&u->thisorder, locale_string(u->faction->locale, keywords[K_PIRACY]));
+						set_string(&u->lastorder, locale_string(u->faction->locale, keywords[K_PIRACY]));
 					} else if(race[u->race].flags & RCF_LEARN) {
 						learn_monster(u);
 					}

@@ -26,6 +26,7 @@
 #include <attributes/hate.h>
 #include <attributes/overrideroads.h>
 #include <attributes/racename.h>
+#include <attributes/otherfaction.h>
 #ifdef AT_OPTION
 # include <attributes/option.h>
 #endif
@@ -49,6 +50,7 @@ init_attributes(void)
 	init_hate();
 	init_reduceproduction();
 	init_racename();
+	init_otherfaction();
 #ifdef AT_MOVED
 	init_moved();
 #endif

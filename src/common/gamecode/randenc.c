@@ -1025,8 +1025,8 @@ randomevents(void)
 
 					u->hp += unit_max_hp(u) * increase;
 					add_message(&u->faction->msgs, new_message(u->faction,
-						"orcgrowth%u:unit%i:amount%s:race",
-						u, increase, increase == 1 ? race[u->race].name[0] : race[u->race].name[1]));
+						"orcgrowth%u:unit%i:amount%i:race",
+						u, increase, u->race));
 				}
 			}
 		}
@@ -1095,7 +1095,8 @@ randomevents(void)
 #if 0
 /* ist kaputt. weiß nicht, wieso. */
 							if (r==s) {
-								sprintf(buf, "Durch Konzentrationsmangel vergißt %s das Talent %s vollständig", unitname(u), skillnames[sk]);
+								sprintf(buf, "Durch Konzentrationsmangel vergißt %s das Talent %s vollständig", 
+									unitname(u), skillname(u->faction->local, sk));
 								addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
 							}
 #endif

@@ -24,12 +24,18 @@
 struct curse_type;
 extern const struct curse_type ct_firewall;
 extern void ct_register(const struct curse_type * ct);
+extern curse_type cursedaten[MAXCURSE];
 
 void
 init_spells(void)
 {
+	int i;
 	/* sp_summon_alp */
 	init_alp();
 	/* init_firewall(); */
 	ct_register(&ct_firewall);
+
+	for (i=0;i!=MAXCURSE;++i) {
+		ct_register(&cursedaten[i]);
+	}
 }

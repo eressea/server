@@ -378,7 +378,7 @@ init_pool(void)
 			strlist *s;
 
 			list_foreach(strlist, u->orders, s) {
-				if (u->number > 0 && igetkeyword(s->s) == K_RESERVE
+				if (u->number > 0 && igetkeyword(s->s, u->faction->locale) == K_RESERVE
 						&& (urace(u)->ec_flags & GETITEM)) {
 					int count = geti();
 					int use;

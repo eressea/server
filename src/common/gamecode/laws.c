@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -29,6 +29,13 @@
 # include "old/trigger.h"
 #endif
 
+/* gamecode includes */
+#include "creation.h"
+#include "economy.h"
+#include "monster.h"
+#include "randenc.h"
+#include "study.h"
+
 /* kernel includes */
 #include <alchemy.h>
 #include <border.h>
@@ -40,7 +47,6 @@
 #include <ship.h>
 #include <skill.h>
 #include <movement.h>
-#include <monster.h>
 #include <spy.h>
 #include <race.h>
 #include <battle.h>
@@ -51,12 +57,6 @@
 #include <pool.h>
 #include <building.h>
 #include <group.h>
-
-/* gamecode includes */
-#include "study.h"
-#include "economy.h"
-#include "creation.h"
-#include "randenc.h"
 
 /* attributes includes */
 #include <attributes/racename.h>
@@ -898,7 +898,7 @@ quit(void)
 	for (r = regions; r; r = r->next)
 		for (u = r->units; u; u = u->next)
 			for (S = u->orders; S; S = S->next)
-				if (igetkeyword(S->s) == K_QUIT) {
+				if (igetkeyword(S->s, u->faction->locale) == K_QUIT) {
 					if (strcmp(getstrtoken(), u->faction->passw) == 0) {
 						destroyfaction(u->faction);
 					} else {
@@ -906,7 +906,7 @@ quit(void)
 						printf("	Warnung: STIRB mit falschem Passwort für Partei %s: %s\n",
 							   factionid(u->faction), S->s);
 					}
-				} else if(igetkeyword(S->s) == K_RESTART && u->number > 0) {
+				} else if(igetkeyword(S->s, u->faction->locale) == K_RESTART && u->number > 0) {
 					if (!landregion(rterrain(r))) {
 						cmistake(u, S->s, 242, MSG_EVENT);
 						continue;
@@ -996,7 +996,7 @@ set_ally(unit * u, strlist * S)
 	if (!s[0])
 		keyword = P_ANY;
 	else
-		keyword = findparam(s);
+		keyword = findparam(s, u->faction->locale);
 
 	sfp = &u->faction->allies;
 #ifdef GROUPS
@@ -1009,7 +1009,7 @@ set_ally(unit * u, strlist * S)
 		if (sf->faction == f)
 			break;	/* Gleich die passende raussuchen, wenn vorhanden */
 
-	not_kw = getparam();		/* HELFE partei [modus] NICHT */
+	not_kw = getparam(u->faction->locale);		/* HELFE partei [modus] NICHT */
 
 	if (!sf) {
 		if (keyword == P_NOT || not_kw == P_NOT) {
@@ -1024,7 +1024,6 @@ set_ally(unit * u, strlist * S)
 	}
 	switch (keyword) {
 	case P_NOT:
-	case P_NEUTRAL:
 		sf->status = 0;
 		break;
 
@@ -1032,7 +1031,6 @@ set_ally(unit * u, strlist * S)
 		cmistake(u, S->s, 137, MSG_EVENT);
 		return;
 
-	case P_FRIEND:
 	case P_ANY:
 		if (not_kw == P_NOT)
 			sf->status = 0;
@@ -1091,7 +1089,7 @@ set_display(region * r, unit * u, strlist * S)
 
 	s = 0;
 
-	switch (getparam()) {
+	switch (getparam(u->faction->locale)) {
 	case P_BUILDING:
 	case P_GEBAEUDE:
 		if (!u->building) {
@@ -1191,11 +1189,11 @@ set_name(region * r, unit * u, strlist * S)
 
 	s = 0;
 
-	p = getparam();
+	p = getparam(u->faction->locale);
 
 	if(p == P_FOREIGN) {
 		foreign = true;
-		p = getparam();
+		p = getparam(u->faction->locale);
 	}
 
 	switch (p) {
@@ -1456,7 +1454,7 @@ distributeMail(region * r, unit * u, strlist * S)
 	if(strcasecmp(s, "an") == 0)
 		s = getstrtoken();
 
-	switch (findparam(s)) {
+	switch (findparam(s, u->faction->locale)) {
 
 	case P_REGION:				/* können alle Einheiten in der Region sehen */
 		s = getstrtoken();
@@ -1514,7 +1512,7 @@ distributeMail(region * r, unit * u, strlist * S)
 			}
 
 			if(see == false) {
-				cmistake(u, S->s, 63, MSG_MESSAGE);
+				cmistake(u, S->s, 64, MSG_MESSAGE);
 				return;
 			}
 
@@ -1602,7 +1600,7 @@ mail(void)
 	for (r = regions; r; r = r->next)
 		for (u = r->units; u; u = u->next)
 			for (S = u->orders; S; S = S->next)
-				if (igetkeyword(S->s) == K_MAIL)
+				if (igetkeyword(S->s, u->faction->locale) == K_MAIL)
 					distributeMail(r, u, S);
 }
 /* ------------------------------------------------------------- */
@@ -1641,7 +1639,7 @@ set_passw(void)
 	for (r = regions; r; r = r->next)
 		for (u = r->units; u; u = u->next)
 			for (S = u->orders; S; S = S->next) {
-				switch (igetkeyword(S->s)) {
+				switch (igetkeyword(S->s, u->faction->locale)) {
 				case NOKEYWORD:
 					cmistake(u, S->s, 22, MSG_EVENT);
 					break;
@@ -1716,23 +1714,6 @@ set_passw(void)
 					}
 					break;
 
-				case K_LOCALE:
-					s = getstrtoken();
-#define LOCALES
-#ifdef LOCALES
-					if (find_locale(s)) {
-						u->faction->locale = find_locale(s);
-					} else {
-						cmistake(u, S->s, 257, MSG_EVENT);
-					}
-#else
-					if(strcmp(s, "de") == 0) {
-						u->faction->locale = find_locale(s);
-					} else {
-						cmistake(u, S->s, 257, MSG_EVENT);
-					}
-#endif
-					break;
 				case K_SEND:
 					s = getstrtoken();
 					o = findoption(s);
@@ -1763,7 +1744,7 @@ set_passw(void)
 						cmistake(u, S->s, 135, MSG_EVENT);
 					} else {
 						i = (int) pow(2, o);
-						if (getparam() == P_NOT) {
+						if (getparam(u->faction->locale) == P_NOT) {
 							u->faction->options = u->faction->options & ~i;
 						} else {
 							u->faction->options = u->faction->options | i;
@@ -1814,14 +1795,20 @@ display_item(faction *f, unit *u, const item_type * itype)
 	const char *name;
 
 	if (u && *i_find(&u->items, itype) == NULL) return false;
-	name = locale_string(NULL, resourcename(itype->rtype, 0));
+	name = resourcename(itype->rtype, 0);
 	sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
 	fp = fopen(filename, "r");
 	if (!fp) {
-		sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(NULL), name);
+		name = locale_string(f->locale, resourcename(itype->rtype, 0));		
+		sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(f->locale), name);
 		fp = fopen(filename, "r");
-		if (!fp) return false;
 	}
+	if (!fp) {
+		name = resourcename(itype->rtype, 0);
+		sprintf(filename, "%s/items/%s", resourcepath(), name);
+		fp = fopen(filename, "r");
+	}
+	if (!fp) return false;
 
 	sprintf(buf, "%s: ", name);
 
@@ -1937,14 +1924,14 @@ instant_orders(void)
 #ifdef GROUPS
 			for (S = u->orders; S; S = S->next)
 			{
-				if (igetkeyword(S->s)==K_GROUP) {
+				if (igetkeyword(S->s, u->faction->locale)==K_GROUP) {
 					set_group(u);
 				}
 			}
 #endif
 			for (S = u->orders; S; S = S->next)
 
-				switch (igetkeyword(S->s)) {
+				switch (igetkeyword(S->s, u->faction->locale)) {
 				case K_URSPRUNG:
 					{
 						int px, py;
@@ -1966,7 +1953,7 @@ instant_orders(void)
 
 				case K_STATUS:
 					param = getstrtoken();
-					switch (findparam(param)) {
+					switch (findparam(param, u->faction->locale)) {
 					case P_NOT:
 						u->status = ST_AVOID;
 						break;
@@ -1993,7 +1980,7 @@ instant_orders(void)
 #ifdef NOAID
 					case P_HELP:
 						param = getstrtoken();
-						if(findparam(param) == P_NOT) {
+						if(findparam(param, u->faction->locale) == P_NOT) {
 							fset(u, FL_NOAID);
 						} else {
 							fset(u, FL_NOAID);
@@ -2017,13 +2004,13 @@ instant_orders(void)
 					s = getstrtoken();
 
 					/* KAMPFZAUBER [NICHT] löscht alle gesetzten Kampfzauber */
-					if (!s || *s == 0 || findparam(s) == P_NOT) {
+					if (!s || *s == 0 || findparam(s, u->faction->locale) == P_NOT) {
 						unset_combatspell(u, 0);
 						break;
 					}
 
 					/* Optional: STUFE n */
-					if (findparam(s) == P_LEVEL) {
+					if (findparam(s, u->faction->locale) == P_LEVEL) {
 						/* Merken, setzen kommt erst später */
 						s = getstrtoken();
 						level = atoi(s);
@@ -2041,7 +2028,7 @@ instant_orders(void)
 					/* KAMPFZAUBER "<Spruchname>" NICHT  löscht diesen speziellen
 					 * Kampfzauber */
 					s = getstrtoken();
-					if(findparam(s) == P_NOT){
+					if(findparam(s, u->faction->locale) == P_NOT){
 						unset_combatspell(u,spell);
 						break;
 					}
@@ -2062,15 +2049,15 @@ instant_orders(void)
 						cmistake(u, S->s, 223, MSG_EVENT);
 						break;
 					}
-					if (getparam() == P_NOT)
+					if (getparam(u->faction->locale) == P_NOT)
 						setguard(u, GUARD_NONE);
 					break;
 
 				case K_RESHOW:
 					s = getstrtoken();
 
-					if(findparam(s) == P_ANY) {
-						param_t p = getparam();
+					if(findparam(s, u->faction->locale) == P_ANY) {
+						param_t p = getparam(u->faction->locale);
 
 						if(p == P_ZAUBER) {
 							a_removeall(&u->faction->attribs, &at_seenspell);
@@ -2152,7 +2139,7 @@ bewache_an(void)
 		for (u = r->units; u; u = u->next)
 			if (!fval(u, FL_MOVED)) {
 				for (S = u->orders; S; S = S->next) {
-					if (igetkeyword(S->s) == K_GUARD && getparam() != P_NOT) {
+					if (igetkeyword(S->s, u->faction->locale) == K_GUARD && getparam(u->faction->locale) != P_NOT) {
 						if (rterrain(r) != T_OCEAN) {
 							if (!illusionary(u) && u->race != RC_SPELL) {
 #ifdef WACH_WAFF
@@ -2297,9 +2284,9 @@ reorder(void)
 			if (!fval(u, FL_MARK)) {
 				strlist * o;
 				for (o=u->orders;o;o=o->next) {
-					if (igetkeyword(o->s)==K_SORT) {
+					if (igetkeyword(o->s, u->faction->locale)==K_SORT) {
 						const char * s = getstrtoken();
-						param_t p = findparam(s);
+						param_t p = findparam(s, u->faction->locale);
 						int id = getid();
 						unit **vp, *v = findunit(id);
 						if (v==NULL || v->faction!=u->faction || v->region!=r) {
@@ -2354,9 +2341,9 @@ renumber(void)
 	for (r=regions;r;r=r->next) {
 		for (u=r->units;u;u=u->next) {
 			faction * f = u->faction;
-			for (S = u->orders; S; S = S->next) if (igetkeyword(S->s)==K_NUMBER) {
+			for (S = u->orders; S; S = S->next) if (igetkeyword(S->s, u->faction->locale)==K_NUMBER) {
 				s = getstrtoken();
-				switch(findparam(s)) {
+				switch(findparam(s, u->faction->locale)) {
 
 				case P_FACTION:
 					s = getstrtoken();
@@ -2549,7 +2536,7 @@ new_units (void)
 	for (r = regions; r; r = r->next)
 		for (u = r->units; u; u = u->next)
 			for (S = u->orders; S;) {
-				if ((igetkeyword(S->s) == K_MAKE) && (getparam() == P_TEMP)) {
+				if ((igetkeyword(S->s, u->faction->locale) == K_MAKE) && (getparam(u->faction->locale) == P_TEMP)) {
 					const attrib * a;
 					int g;
 					char * name;
@@ -2563,7 +2550,7 @@ new_units (void)
 						S = S->next;
 
 						while (S) {
-							if (igetkeyword(S->s) == K_END)
+							if (igetkeyword(S->s, u->faction->locale) == K_END)
 								break;
 							S2 = S->next;
 							removelist(&u->orders, S);
@@ -2604,7 +2591,7 @@ new_units (void)
 					S = S->next;
 
 					while (S) {
-						if (igetkeyword(S->s) == K_END)
+						if (igetkeyword(S->s, u->faction->locale) == K_END)
 							break;
 						S2 = S->next;
 						translist(&u->orders, &u2->orders, S);
@@ -2635,7 +2622,7 @@ setdefaults (void)
 
 			set_string(&u->thisorder, u->lastorder);
 			for(S = u->orders; S; S = S->next) {
-				keyword_t keyword = igetkeyword(S->s);
+				keyword_t keyword = igetkeyword(S->s, u->faction->locale);
 
 				switch (keyword) {
 
@@ -2656,7 +2643,7 @@ setdefaults (void)
 					 * abgespeichert). */
 
 				case K_MAKE:
-					if (getparam() == P_TEMP) break;
+					if (getparam(u->faction->locale) == P_TEMP) break;
 				case K_BESIEGE:
 				case K_ENTERTAIN:
 				case K_RESEARCH:
@@ -2670,7 +2657,7 @@ setdefaults (void)
 				case K_BIETE:
 				case K_PIRACY:
 					if (idle (u->faction)) {
-						set_string (&u->thisorder, keywords[K_WORK]);
+						set_string (&u->thisorder, locale_string(u->faction->locale, keywords[K_WORK]));
 						break;
 					}
 					/* Ab hier Befehle, die auch eine idle
@@ -2683,7 +2670,7 @@ setdefaults (void)
 				case K_DRIVE:
 				case K_MOVE:
 					if(fval(u, FL_HUNGER)) {
-						set_string(&u->thisorder, keywords[K_WORK]);
+						set_string(&u->thisorder, locale_string(u->faction->locale, keywords[K_WORK]));
 					} else {
 						set_string(&u->thisorder, S->s);
 					}
@@ -2711,7 +2698,7 @@ setdefaults (void)
 			 * die Einheitsnummer ungueltig). Auch Attackiere sollte nie in
 			 * den Default übernommen werden */
 
-			switch (igetkeyword (u->thisorder)) {
+			switch (igetkeyword (u->thisorder, u->faction->locale)) {
 				case K_MOVE:
 				case K_BIETE:
 				case K_ATTACK:
@@ -2721,8 +2708,8 @@ setdefaults (void)
 				set_string(&u->lastorder, u->thisorder);
 			}
 			/* Attackiere sollte niemals Default werden */
-			if (igetkeyword(u->lastorder) == K_ATTACK)
-				set_string(&u->lastorder, keywords[K_WORK]);
+			if (igetkeyword(u->lastorder, u->faction->locale) == K_ATTACK)
+				set_string(&u->lastorder, locale_string(u->faction->locale, keywords[K_WORK]));
 
 		}
 	}
@@ -2838,7 +2825,7 @@ defaultorders (void)
 	list_foreach(region, regions, r) {
 		list_foreach(unit, r->units, u) {
 			list_foreach(strlist, u->orders, s) {
-				switch (igetkeyword(s->s)) {
+				switch (igetkeyword(s->s, u->faction->locale)) {
 				case K_DEFAULT:
 					c = getstrtoken();
 					i = atoi(c);
@@ -2849,11 +2836,11 @@ defaultorders (void)
 						s->s[0]=0;
 						break;
 					case 1 :
-						sprintf(buf, "%s \"%s\"", keywords[K_DEFAULT], getstrtoken());
+						sprintf(buf, "%s \"%s\"", locale_string(u->faction->locale, keywords[K_DEFAULT]), getstrtoken());
 						set_string(&s->s, buf);
 						break;
 					default :
-						sprintf(buf, "%s %d \"%s\"", keywords[K_DEFAULT], i-1, getstrtoken());
+						sprintf(buf, "%s %d \"%s\"", locale_string(u->faction->locale, keywords[K_DEFAULT]), i-1, getstrtoken());
 						set_string(&s->s, buf);
 						break;
 					}
@@ -2925,7 +2912,7 @@ processorders (void)
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) {
 			for (S = u->orders; S; S = S->next) {
-				if (igetkeyword(S->s) == K_USE) {
+				if (igetkeyword(S->s, u->faction->locale) == K_USE) {
 					char * t = getstrtoken();
 					const item_type * itype = finditemtype(t, u->faction->locale);
 

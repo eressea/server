@@ -3364,7 +3364,7 @@ do_battle(void)
 				strlist *sl;
 
 				list_foreach(strlist, u->orders, sl) {
-					if (igetkeyword(sl->s) == K_ATTACK) {
+					if (igetkeyword(sl->s, u->faction->locale) == K_ATTACK) {
 						unit *u2;
 						fighter *c1, *c2;
 
@@ -3379,7 +3379,7 @@ do_battle(void)
 #ifdef DELAYED_OFFENSE
 						if (get_moved(&u->attribs) && !guarded_by(r, u->faction)) {
 							add_message(&u->faction->msgs, 
-								make_message("no_attack_after_advance", "unit region command", u, u->region, sl->s));
+								msg_message("no_attack_after_advance", "unit region command", u, u->region, sl->s));
 						}
 #endif
 						if (fval(u, FL_HUNGER)) {

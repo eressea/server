@@ -267,7 +267,7 @@ do_siege(void)
 			unit *u;
 
 			for (u = r->units; u; u = u->next) {
-				if (igetkeyword(u->thisorder) == K_BESIEGE)
+				if (igetkeyword(u->thisorder, u->faction->locale) == K_BESIEGE)
 					siege(r, u);
 			}
 		}
@@ -327,7 +327,7 @@ destroy(region * r, unit * u, const char * cmd)
 
 	s = getstrtoken();
 
-	if (findparam(s)==P_ROAD) {
+	if (findparam(s, u->faction->locale)==P_ROAD) {
 		destroy_road(u, INT_MAX, cmd);
 		return;
 	}
@@ -345,11 +345,11 @@ destroy(region * r, unit * u, const char * cmd)
 		}
 	}
 
-	if(getparam() == P_ROAD) {
+	if(getparam(u->faction->locale) == P_ROAD) {
 		destroy_road(u, n, cmd);
 		return;
 	}
-	 
+
 	if (u->building) {
 		building *b = u->building;
 #if 0
@@ -834,11 +834,11 @@ build_building(unit * u, const building_type * btype, int want)
 	}
 
 	if( want == INT_MAX )
-		sprintf(buffer, "%s %s %s", keywords[K_MAKE], string2, buildingid(b));
+		sprintf(buffer, "%s %s %s", locale_string(u->faction->locale, keywords[K_MAKE]), string2, buildingid(b));
 	else if( want-built <= 0 )
-		strcpy(buffer, keywords[K_WORK]);
+		strcpy(buffer, locale_string(u->faction->locale, keywords[K_WORK]));
 	else
-		sprintf(buffer, "%s %d %s %s", keywords[K_MAKE], want-built, string2, buildingid(b));
+		sprintf(buffer, "%s %d %s %s", locale_string(u->faction->locale, keywords[K_MAKE]), want-built, string2, buildingid(b));
 	set_string(&u->lastorder, buffer);
 
 	b->size += built;
@@ -926,7 +926,7 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want)
 	u->ship = sh;
 	fset(u, FL_OWNER);
 	sprintf(buffer, "%s %s %s",
-			keywords[K_MAKE], parameters[P_SHIP], shipid(sh));
+			locale_string(u->faction->locale, keywords[K_MAKE]), locale_string(u->faction->locale, parameters[P_SHIP]), shipid(sh));
 	u->lastorder = set_string(&u->lastorder, buffer);
 
 	build_ship(u, sh, want);
@@ -1031,7 +1031,7 @@ do_leave(void)
 	for (r = regions; r; r = r->next) {
 		for (u = r->units; u; u = u->next) {
 			for (S = u->orders; S; S = S->next) {
-				if(igetkeyword(S->s) == K_LEAVE) {
+				if(igetkeyword(S->s, u->faction->locale) == K_LEAVE) {
 					if (r->terrain == T_OCEAN && u->ship) {
 						if(!(race[u->race].flags & RCF_SWIM)) {
 							cmistake(u, S->s, 11, MSG_MOVE);
@@ -1070,7 +1070,7 @@ do_misc(char try)
 
 		for (u = r->units; u; u = u->next) {
 			for (S = u->orders; S; S = S->next) {
-				switch (igetkeyword(S->s)) {
+				switch (igetkeyword(S->s, u->faction->locale)) {
 				case K_CONTACT:
 					set_contact(r, u, try);
 					break;
@@ -1082,10 +1082,10 @@ do_misc(char try)
 			for (S = u->orders; S;) {
 				Snext = S->next;
 
-				switch (igetkeyword(S->s)) {
+				switch (igetkeyword(S->s, u->faction->locale)) {
 				case K_ENTER:
 
-					switch (getparam()) {
+					switch (getparam(u->faction->locale)) {
 					case P_BUILDING:
 					case P_GEBAEUDE:
 

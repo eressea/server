@@ -137,15 +137,15 @@ setstealth(unit * u, strlist * S)
 		return;
 	}
 
-	switch(findparam(s)) {
+	switch(findparam(s, u->faction->locale)) {
 	case P_FACTION:
 		/* TARNE PARTEI [NICHT|NUMMER abcd] */
 		s = getstrtoken();
 		if(!s || *s == 0) {
 			fset(u, FL_PARTEITARNUNG);
-		} else if (findparam(s) == P_NOT) {
+		} else if (findparam(s, u->faction->locale) == P_NOT) {
 			freset(u, FL_PARTEITARNUNG);
-		} else if (findkeyword(s) == K_NUMBER) {
+		} else if (findkeyword(s, u->faction->locale) == K_NUMBER) {
 			char *s2 = getstrtoken();
 			int nr;
 			if(!s2 || *s2 == 0 || (nr = atoi36(s2)) == u->faction->no) {
@@ -176,7 +176,7 @@ setstealth(unit * u, strlist * S)
 			return;
 		}
 		s = getstrtoken();
-		if (findparam(s) == P_NOT) {
+		if (findparam(s, u->faction->locale) == P_NOT) {
 			a = a_find(u->attribs, &at_fshidden);
 			if(a) a->data.ca[0] = 0;
 			if(a->data.i == 0) a_remove(&u->attribs, a);
@@ -192,7 +192,7 @@ setstealth(unit * u, strlist * S)
 			cmistake(u, S->s, 277, MSG_EVENT);
 			return;
 		}
-		if (findparam(s) == P_NOT) {
+		if (findparam(s, u->faction->locale) == P_NOT) {
 			a = a_find(u->attribs, &at_fshidden);
 			if(a) a->data.ca[1] = 0;
 			if(a->data.i == 0) a_remove(&u->attribs, a);
@@ -427,7 +427,7 @@ sabotage(region * r, unit * u)
 
 	s = getstrtoken();
 
-	i = findparam(s);
+	i = findparam(s, u->faction->locale);
 
 	switch (i) {
 	case P_SHIP:

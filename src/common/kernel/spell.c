@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -87,11 +87,12 @@ attrib_type at_unitdissolve = {
 
 /* ----------------------------------------------------------------------- */
 
-const char *
-spellcmd(const strarray * sa) {
+#ifdef TODO
+static const char *
+spellcmd(const strarray * sa, const struct locale * lang) {
 	int i;
 	char * p = buf;
-	strcpy(p, keywords[K_CAST]);
+	strcpy(p, locale_string(lang, keywords[K_CAST]));
 	p += strlen(p);
 	for (i=0;i!=sa->length;++i) {
 		*p++ = ' ';
@@ -101,11 +102,10 @@ spellcmd(const strarray * sa) {
 	return buf;
 }
 
-#ifdef TODO
 void
 report_failure(unit * mage, const strarray * sa) {
 	/* Fehler: "Der Zauber schlägt fehl" */
-	cmistake(mage, strdup(spellcmd(sa)), 180, MSG_MAGIC);
+	cmistake(mage, strdup(spellcmd(sa, mage->faction->locale)), 180, MSG_MAGIC);
 }
 #else
 void
@@ -723,7 +723,7 @@ sp_summon_familiar(castorder *co)
 					scat(", ");
 				}
 			}
-			scat(skillnames[sk]);
+			scat(skillname(sk, mage->faction->locale));
 		}
 	}
 	scat(" lernen.");
@@ -2031,7 +2031,7 @@ sp_homestone(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int force = co->force;
-	
+
 	if(!mage->building || mage->building->type != &bt_castle){
 		cmistake(mage, strdup(co->order), 197, MSG_MAGIC);
 		return 0;
@@ -2435,7 +2435,7 @@ patzer_peasantmob(castorder *co)
 	attrib *a;
 	region *r;
 	unit *mage = (unit *)co->magician;
-	
+
 	if (mage->region->land){
 		r = mage->region;
 	} else {
@@ -3541,7 +3541,7 @@ sp_bloodsacrifice(castorder *co)
 		report_failure(mage, co->order);
 		return 0;
 	}
-	
+
 	damage = min(hp, dice_rand("4d12"));
 
 	if (eff_skill(mage, SK_MAGIC, mage->region) > 8){
@@ -3549,7 +3549,7 @@ sp_bloodsacrifice(castorder *co)
 	} else {
 		aura = damage / 4;
 	}
-	
+
 	if (aura <= 0){
 		report_failure(mage, co->order);
 		return 0;
@@ -4381,7 +4381,7 @@ sp_recruit(castorder *co)
 		u->ship = mage->ship;
 	}
 	set_string(&u->name, n == 1 ? "Bauer" : "Bauern");
-	set_string(&u->thisorder, keywords[K_WORK]);
+	set_string(&u->thisorder, locale_string(u->faction->locale, keywords[K_WORK]));
 	u->status = mage->status;
 
 	/* Parteitarnung */
@@ -4786,7 +4786,7 @@ sp_puttorest(castorder *co)
 	laid_to_rest = max(laid_to_rest, deathcount(r));
 
 	deathcounts(r, -laid_to_rest);
-	
+
 	/* melden, 1x pro partei */
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
 
@@ -6271,7 +6271,7 @@ sp_movecastle(castorder *co)
 		sprintf(buf, "%s in %s: 'ZAUBER \"%s\"': Der Erdelementar "
 				"weigert sich, nach %s zu gehen.",
 			unitname(mage), regionid(mage->region), sp->name,
-			directions[dir]);
+			locale_string(mage->faction->locale, directions[dir]));
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_MISTAKE);
 		return cast_level;
 	}
@@ -6294,7 +6294,7 @@ sp_movecastle(castorder *co)
 
 	sprintf(buf, "Ein Beben erschüttert %s. Viele kleine Pseudopodien "
 		"erheben das Gebäude und tragen es in Richtung %s.",
-		buildingname(b), directions[dir]);
+		buildingname(b), locale_string(mage->faction->locale, directions[dir]));
 
 	if((b->type==&bt_caravan || b->type==&bt_dam || b->type==&bt_tunnel)) {
 		boolean damage = false;
@@ -6743,7 +6743,7 @@ sp_becomewyrm(castorder *co)
  * Wirkung:		 der Magier verdient $50 pro Spruchstufe
  * Kosten:		 1 SP pro Stufe
  */
-#include "../gamecode/economy.h" 
+#include "../gamecode/economy.h"
 /* TODO: das ist scheisse, aber spells gehören eh nicht in den kernel */
 int
 sp_earn_silver(castorder *co)
@@ -7513,7 +7513,7 @@ spell spelldaten[] =
 		 {0, 0, 0}},
 		(spell_f)sp_treewalkexit, patzer
 	},
-	
+
 	{SPL_HOLYGROUND, "Heiliger Boden",
 		"Dieses Ritual beschwört verschiedene Naturgeister in den Boden der "
 		"Region, welche diese fortan bewachen. In einer so gesegneten Region "
@@ -7820,7 +7820,7 @@ spell spelldaten[] =
 		"sein kann.",
 		NULL,
 		NULL,
-		M_CHAOS, (SPELLLEVEL | FARCASTING | ONSHIPCAST), 
+		M_CHAOS, (SPELLLEVEL | FARCASTING | ONSHIPCAST),
 		5, 6,
 		{
 			{R_AURA, 5, SPC_LEVEL},
@@ -8075,7 +8075,7 @@ spell spelldaten[] =
 			{0, 0, 0}},
 		(spell_f)sp_destroy_magic, patzer
 	},
-	
+
 	{SPL_UNHOLYPOWER, "Unheilige Kraft",
 		"Nur geflüstert wird dieses Ritual an den dunklen Akademien an die "
 		"Adepten weitergegeben, gehört es doch zu den finstersten, die je "
@@ -8601,7 +8601,7 @@ spell spelldaten[] =
 		"es einige Wochen später...",
 		NULL,
 		"u+",
-		M_TRAUM, 
+		M_TRAUM,
 		(UNITSPELL | TESTRESISTANCE | TESTCANSEE | SPELLLEVEL), 5, 12,
 		{
 			{R_AURA, 5, SPC_LEVEL},

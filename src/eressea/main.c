@@ -132,6 +132,7 @@ game_init(void)
 	report_init();
 	creport_init();
 
+	debug_language("locales.log");
 	init_locales();
 
 	init_races();
@@ -160,20 +161,6 @@ game_init(void)
 		print_potions(F);
 		fclose(F);
 	}
-}
-
-static void
-create_game(void)
-{
-	assert(regions==NULL || !"game is initialized");
-	printf("Keine Spieldaten gefunden, erzeuge neues Spiel in %s...\n", datapath());
-	makedir(datapath(), 0700);
-	/* erste Insel generieren */
-	new_region(0, 0);
-	/* Monsterpartei anlegen */
-	createmonsters();
-	/* Teleportebene anlegen */
-	create_teleport_plane();
 }
 
 static void
@@ -384,7 +371,7 @@ write_stats(void)
 						i = 0;
 						fputs("\n\t", F);
 					}
-					fprintf(F, "{ SK_%s, %d }, ", skillnames[sk], race[r].bonus[sk]);
+					fprintf(F, "{ SK_%s, %d }, ", skillname(sk, NULL), race[r].bonus[sk]);
 					++i;
 				}
 			}

@@ -1299,6 +1299,9 @@ init_olditems(void)
 	item_t i;
 	resource_type * rtype;
 
+	const struct locale * lang = find_locale("de");
+	assert(lang);
+
 	for (i=0; i!=MAXITEMS; ++i) {
 		int iflags = ITF_NONE;
 		int rflags = RTF_ITEM|RTF_POOLED;
@@ -1354,10 +1357,10 @@ init_olditems(void)
 			}
 		}
 		if (name[0]==NULL) {
-			name[0] = reverse_lookup(NULL, itemdata[i].name[0]);
-			name[1] = reverse_lookup(NULL, itemdata[i].name[1]);
-			appearance[0] = reverse_lookup(NULL, itemdata[i].name[2]);
-			appearance[1] = reverse_lookup(NULL, itemdata[i].name[3]);
+			name[0] = reverse_lookup(lang, itemdata[i].name[0]);
+			name[1] = reverse_lookup(lang, itemdata[i].name[1]);
+			appearance[0] = reverse_lookup(lang, itemdata[i].name[2]);
+			appearance[1] = reverse_lookup(lang, itemdata[i].name[3]);
 		}
 		rtype = new_resourcetype(name, appearance, rflags);
 		itype = new_itemtype(rtype, iflags, weight, capacity, minskill, skill);
@@ -1490,6 +1493,10 @@ init_oldherbs(void)
 	herb_t h;
 	const char * names[2];
 	const char * appearance[2] = { "herbbag", "herbbag" };
+
+	const struct locale * lang = find_locale("de");
+	assert(lang);
+
 	for (h=0;h!=MAXHERBS;++h) {
 		item_type * itype;
 		terrain_t t;
@@ -1506,8 +1513,8 @@ init_oldherbs(void)
 			}
 		}
 		if (!names[0]) {
-			names[0] = reverse_lookup(NULL, herbdata[0][h]);
-			names[1] = reverse_lookup(NULL, herbdata[1][h]);
+			names[0] = reverse_lookup(lang, herbdata[0][h]);
+			names[1] = reverse_lookup(lang, herbdata[1][h]);
 		}
 
 		rtype = new_resourcetype(names, appearance, RTF_ITEM|RTF_POOLED);
@@ -1852,6 +1859,10 @@ init_oldpotions(void)
 	potion_t p;
 	const char * names[2];
 	const char * appearance[2] = { "vial", "vials" };
+
+	const struct locale * lang = find_locale("de");
+	assert(lang);
+
 	for (p=0;p!=MAXPOTIONS;++p) {
 		item_type * itype;
 		resource_type * rtype;
@@ -1906,8 +1917,8 @@ init_oldpotions(void)
 			}
 		}
 		if (!names[0]) {
-			names[0] = reverse_lookup(NULL, potionnames[0][p]);
-			names[1] = reverse_lookup(NULL, potionnames[1][p]);
+			names[0] = reverse_lookup(lang, potionnames[0][p]);
+			names[1] = reverse_lookup(lang, potionnames[1][p]);
 		}
 
 		rtype = new_resourcetype(names, appearance, RTF_ITEM|RTF_POOLED);

@@ -59,8 +59,7 @@ trailinto(const region * r, const locale * lang)
 		}
 		else s = locale_string(lang, terrain[t].trailname(r));
 		if (s && *s) {
-			assert(strstr(s, "%s"));
-			return s;
+			if (strstr(s, "%s"))	return s;
 		}
 	}
 	return "%s";

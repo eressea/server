@@ -182,7 +182,6 @@ bufunit(const faction * f, const unit * u, int indent,
 	skill_t sk;
 	int getarnt = fval(u, FL_PARTEITARNUNG);
 	attrib *a_otherfaction = NULL;
-	const char *c;
 	const char *pzTmp;
 	spell *sp;
 	building * b;
@@ -239,14 +238,14 @@ bufunit(const faction * f, const unit * u, int indent,
 	pzTmp = get_racename(u->attribs);
 	if (pzTmp || u->irace != u->race) {
 		if (pzTmp) scat(pzTmp);
-		else scat(race[u->irace].name[u->number != 1]);
+		else scat(locale_string(f->locale, race[u->irace].name[u->number != 1]));
 		if (u->faction == f) {
 			scat(" (");
-			scat(race[u->race].name[u->number != 1]);
+			scat(locale_string(f->locale, race[u->race].name[u->number != 1]));
 			scat(")");
 		}
 	} else {
-		scat(race[u->race].name[u->number != 1]);
+		scat(locale_string(f->locale, race[u->race].name[u->number != 1]));
 	}
 
 	/* status */
@@ -286,7 +285,7 @@ bufunit(const faction * f, const unit * u, int indent,
 	dh = 0;
 	if (u->faction == f || telepath_see) {
 		for (sk = 0; sk != MAXSKILLS; sk++) {
-			spskill(u, sk, &dh, 1);
+			spskill(f->locale, u, sk, &dh, 1);
 		}
 	}
 
@@ -436,7 +435,7 @@ bufunit(const faction * f, const unit * u, int indent,
 }
 
 void
-spskill(const struct unit * u, skill_t sk, int *dh, int days)
+spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days)
 {
 	int i, d;
 	if (!u->number)
@@ -452,7 +451,7 @@ spskill(const struct unit * u, skill_t sk, int *dh, int days)
 		scat("Talente: ");
 		*dh = 1;
 	}
-	scat(skillnames[sk]);
+	scat(skillname(sk, lang));
 	scat(" ");
 
 	if (sk == SK_MAGIC){
@@ -543,7 +542,7 @@ spy_message(int spy, unit *u, unit *target)
 					} else {
 						scat(", ");
 					}
-					scat(skillnames[sk]);
+					scat(skillname(sk, u->faction->locale));
 				}
 			}
 			if (found == 0) {
@@ -578,7 +577,7 @@ spy_message(int spy, unit *u, unit *target)
 					} else {
 						scat(", ");
 					}
-					scat(skillnames[sk]);
+					scat(skillname(sk, u->faction->locale));
 					scat(" ");
 					icat(eff_skill(target, sk, target->region));
 				}

@@ -39,7 +39,6 @@
 #include "magic.h"
 #include "building.h"
 #include "battle.h"
-#include "monster.h"
 #include "race.h"
 #include "pool.h"
 #include "region.h"
@@ -76,14 +75,14 @@ FILE    *logfile;
 
 const char *directions[MAXDIRECTIONS+2] =
 {
-	"Nordwesten",
-	"Nordosten",
-	"Osten",
-	"Südosten",
-	"Südwesten",
-	"Westen",
+	"northwest",
+	"northeast",
+	"east",
+	"southeast",
+	"southwest",
+	"west",
 	"",
-	"Pause"
+	"pause"
 };
 
 const char *gr_prefix[3] = {
@@ -94,6 +93,7 @@ const char *gr_prefix[3] = {
 
 const char *parameters[MAXPARAMS] =
 {
+	"LOCALE",
 	"ALLES",
 	"BAUERN",
 	"BURG",
@@ -111,13 +111,9 @@ const char *parameters[MAXPARAMS] =
 	"SILBER",
 	"STRAßEN",
 	"TEMPORÄRE",
-	"FEIND",
-	"FREUND",
-	"NEUTRAL",
 	"FLIEHE",
 	"GEBÄUDE",
 	"GIB",			/* Für HELFE */
-	"WAHRNEHMUNG",
 	"KÄMPFE",
 	"BEWACHE",
 	"ZAUBERBUCH",
@@ -198,7 +194,6 @@ const char *keywords[MAXKEYWORDS] =
 	"MEINUNG",
 	"MAGIEGEBIET",
 	"PIRATERIE",
-	"LOCALE",
 	"NEUSTART",
 #ifdef GROUPS
 	"GRUPPE",
@@ -714,7 +709,7 @@ isallied(const plane * pl, const faction * f, const faction * f2, int mode)
 		if (p==pl) return mode;
 		a=a->next;
 	}
-	
+
 	if (pl && pl->flags & PFL_FRIENDLY) return mode;
 	if (mode != HELP_GIVE && pl && (pl->flags & PFL_NOALLIANCES)) return 0;
 	for (sf = f->allies; sf; sf = sf->next)
@@ -1118,57 +1113,82 @@ enum {
 	UT_NONE,
 	UT_PARAM,
 	UT_ITEM,
-	UT_SKILL,
-	UT_KEYWORD,
 	UT_BUILDING,
 	UT_HERB,
 	UT_POTION,
 	UT_MAX
 };
 
-struct tnode tokens[UT_MAX];
-struct tnode spellnames;
-struct tnode cursenames;
+static struct lstr {
+	const struct locale * lang;
+	struct tnode tokens[UT_MAX];
+	struct tnode skillnames;
+	struct tnode keywords;
+	struct lstr * next;
+} * lstrs;
+
+static struct lstr *
+get_lnames(const struct locale * lang)
+{
+	static struct lstr * lnames = NULL;
+	static const struct locale * lastlang = NULL;
+
+	if (lastlang!=lang || lnames==NULL) {
+		lnames = lstrs;
+		while (lnames && lnames->lang!=lang) lnames = lnames->next;
+		if (lnames==NULL) {
+			lnames = calloc(sizeof(struct lstr), 1);
+			lnames->lang = lang;
+			lnames->next = lstrs;
+			lstrs = lnames;
+		}
+	}
+	return lnames;
+}
 
 skill_t
-findskill(const char *s)
+findskill(const char *s, const struct locale * lang)
 {
+	struct lstr * lnames = get_lnames(lang);
 	int i;
-	if (findtoken(&tokens[UT_SKILL], s, (void**)&i)==E_TOK_NOMATCH) return NOSKILL;
+
+	if (findtoken(&lnames->skillnames, s, (void**)&i)==E_TOK_NOMATCH) return NOSKILL;
 	return (skill_t)i;
 }
 
 keyword_t
-findkeyword(const char *s)
+findkeyword(const char *s, const struct locale * lang)
 {
+	struct lstr * lnames = get_lnames(lang);
 	int i;
 #ifdef AT_PERSISTENT
 	if(*s == '@') s++;
 #endif
-	if (findtoken(&tokens[UT_KEYWORD], s, (void**)&i)==E_TOK_NOMATCH) return NOKEYWORD;
+	if (findtoken(&lnames->keywords, s, (void**)&i)==E_TOK_NOMATCH) return NOKEYWORD;
 	return (keyword_t) i;
 }
 
 keyword_t
-igetkeyword (const char *s)
+igetkeyword (const char *s, const struct locale * lang)
 {
-	return findkeyword (igetstrtoken (s));
+	return findkeyword (igetstrtoken (s), lang);
 }
 
 keyword_t
-getkeyword (void)
+getkeyword (const struct locale * lang)
 {
-	return findkeyword (getstrtoken ());
+	return findkeyword (getstrtoken (), lang);
 }
 
 param_t
-findparam(const char *s)
+findparam(const char *s, const struct locale * lang)
 {
+	struct lstr * lnames = get_lnames(lang);
 	const building_type * btype;
 
 	int i;
-	if (findtoken(&tokens[UT_PARAM], s, (void**)&i)==E_TOK_NOMATCH) {
-		btype = findbuildingtype(s, NULL);
+	if (findtoken(&lnames->tokens[UT_PARAM], s, (void**)&i)==E_TOK_NOMATCH) {
+		btype = findbuildingtype(s, lang);
 		if (btype!=NULL) return (param_t) P_BUILDING;
 		return NOPARAM;
 	}
@@ -1176,14 +1196,14 @@ findparam(const char *s)
 }
 
 param_t
-igetparam (const char *s)
+igetparam (const char *s, const struct locale *lang)
 {
-	return findparam (igetstrtoken (s));
+	return findparam (igetstrtoken (s), lang);
 }
 param_t
-getparam (void)
+getparam (const struct locale * lang)
 {
-	return findparam (getstrtoken ());
+	return findparam (getstrtoken (), lang);
 }
 
 #ifdef FUZZY_BASE36
@@ -1307,7 +1327,7 @@ read_unitid (faction * f, region * r)
 	 * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
 	 * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
 
-	switch (findparam (s)) {
+	switch (findparam (s, f->locale)) {
 	case P_TEMP:
 		return read_newunitid(f, r);
 	}
@@ -1556,7 +1576,7 @@ createunitid(region * r1, faction * f, int number, race_t race, int id, const ch
 	assert(f->alive);
 	u_setfaction(u, f);
 	set_string(&u->thisorder, "");
-	set_string(&u->lastorder, keywords[K_WORK]);
+	set_string(&u->lastorder, locale_string(u->faction->locale, keywords[K_WORK]));
 	u_seteffstealth(u, -1);
 	u->race = race;
 	u->irace = race;
@@ -1789,6 +1809,7 @@ typedef struct t_umlaut {
  * WICHTIG: "setenv LANG en_US" sonst ist ä != Ä
  */
 
+#if 0
 static const t_umlaut umlaut[] = {
 /* Parameter */
 	{ "Straßen", P_ROAD, UT_PARAM },
@@ -1825,28 +1846,27 @@ static const t_umlaut umlaut[] = {
 	{ "Flinkfingerring", I_RING_OF_NIMBLEFINGER, UT_ITEM },
 	{ NULL, 0, 0 }
 };
+#endif
 
 static void
-init_tokens(void)
+init_tokens(const struct locale * lang)
 {
+	struct lstr * lnames = get_lnames(lang);
 	int i;
 	for (i=0;i!=MAXPARAMS;++i)
-		addtoken(&tokens[UT_PARAM], parameters[i], (void*)i);
+		addtoken(&lnames->tokens[UT_PARAM], locale_string(lang, parameters[i]), (void*)i);
 	for (i=0;i!=MAXSKILLS;++i)
-		addtoken(&tokens[UT_SKILL], skillnames[i], (void*)i);
+		addtoken(&lnames->skillnames, skillname(i, lang), (void*)i);
 	for (i=0;i!=MAXKEYWORDS;++i)
-		addtoken(&tokens[UT_KEYWORD], keywords[i], (void*)i);
+		addtoken(&lnames->keywords, locale_string(lang, keywords[i]), (void*)i);
+#if 0
 	for (i=0;umlaut[i].txt;++i)
-		addtoken(&tokens[umlaut[i].typ], umlaut[i].txt, (void*)umlaut[i].id);
-	for (i=0; spelldaten[i].id != SPL_NOSPELL; i++)
-		addtoken(&spellnames, spelldaten[i].name, (void*)i);
-	for (i=0; i!=MAXCURSE; i++){
-		addtoken(&cursenames, cursedaten[i].name, (void*)i);
-	}
+		addtoken(&lnames->tokens[umlaut[i].typ], umlaut[i].txt, (void*)umlaut[i].id);
+#endif
 }
 
 void
-kernel_done(void) 
+kernel_done(void)
 {
 	/* calling this function releases memory assigned to static variables, etc.
 	 * calling it is optional, e.g. a release server will most likely not do it.
@@ -1856,9 +1876,7 @@ kernel_done(void)
 	gc_done();
 }
 
-extern void attrib_init(void);
-
-void
+static void
 read_strings(FILE * F)
 {
 	char rbuf[8192];
@@ -1867,6 +1885,7 @@ read_strings(FILE * F)
 		locale * lang;
 		char * key = b;
 		char * language;
+		const char * k;
 
 		if (rbuf[0]=='#') continue;
 		rbuf[strlen(rbuf)-1] = 0; /* \n weg */
@@ -1878,14 +1897,181 @@ read_strings(FILE * F)
 		*b++ = 0;
 		lang = find_locale(language);
 		if (!lang) lang = make_locale(language);
-		locale_setstring(lang, key, b);
+		k = locale_getstring(lang, key);
+		if (k) {
+			log_warning(("Trying to register %s[%s]=\"%s\", already have \"%s\"\n", key, language, k, b));
+		} else locale_setstring(lang, key, b);
 	}
+}
+
+const char * messages[] = {
+	"%s/%s/messages.xml",
+	NULL
+};
+
+const char * strings[] = {
+	"%s/%s/strings.txt",
+	NULL
+};
+
+const char * locales[] = {
+	"de", "en",
+	NULL
+};
+
+void
+init_locales(void)
+{
+	FILE * F;
+	int l;
+	for (l=0;locales[l];++l) {
+		char zText[MAX_PATH];
+		int i;
+		for (i=0;strings[i];++i) {
+			sprintf(zText, strings[i], resourcepath(), locales[l]);
+			F = fopen(zText, "r+");
+			if (F) {
+				read_strings(F);
+				fclose(F);
+			} else {
+				sprintf(buf, "fopen(%s): ", zText);
+				perror(buf);
+			}
+		}
+		for (i=0;messages[i];++i) {
+			sprintf(zText, messages[i], resourcepath(), locales[l]);
+			F = fopen(zText, "r+");
+			if (F) {
+				read_messages(F, NULL);
+				fclose(F);
+			} else {
+				sprintf(buf, "fopen(%s): ", zText);
+				perror(buf);
+			}
+		}
+	}
+	for (l=0;locales[l];++l) {
+		const struct locale * lang = find_locale(locales[l]);
+		if (lang) init_tokens(lang);
+	}
+}
+
+/* TODO: soll hier weg */
+extern building_type bt_caldera;
+extern attrib_type at_traveldir_new;
+
+void
+attrib_init(void)
+{
+	/* Gebäudetypen registrieren */
+	init_buildings();
+	bt_register(&bt_castle);
+	bt_register(&bt_lighthouse);
+	bt_register(&bt_mine);
+	bt_register(&bt_quarry);
+	bt_register(&bt_harbour);
+	bt_register(&bt_academy);
+	bt_register(&bt_magictower);
+	bt_register(&bt_smithy);
+	bt_register(&bt_sawmill);
+	bt_register(&bt_stables);
+	bt_register(&bt_monument);
+	bt_register(&bt_dam);
+	bt_register(&bt_caravan);
+	bt_register(&bt_tunnel);
+	bt_register(&bt_inn);
+	bt_register(&bt_stonecircle);
+	bt_register(&bt_blessedstonecircle);
+	bt_register(&bt_illusion);
+	bt_register(&bt_generic);
+	bt_register(&bt_caldera);
+
+	/* Schiffstypen registrieren: */
+	st_register(&st_boat);
+	st_register(&st_longboat);
+	st_register(&st_dragonship);
+	st_register(&st_caravelle);
+	st_register(&st_trireme);
+
+	/* disable: st_register(&st_transport); */
+
+	/* Alle speicherbaren Attribute müssen hier registriert werden */
+	at_register(&at_unitdissolve);
+	at_register(&at_traveldir_new);
+	at_register(&at_familiar);
+	at_register(&at_familiarmage);
+	at_register(&at_eventhandler);
+	at_register(&at_stealth);
+	at_register(&at_mage);
+	at_register(&at_bauernblut);
+	at_register(&at_countdown);
+	at_register(&at_showitem);
+	at_register(&at_curse);
+	at_register(&at_cursewall);
+
+	at_register(&at_seenspell);
+	at_register(&at_reportspell);
+	at_register(&at_deathcloud);
+
+	/* neue REGION-Attribute */
+	at_register(&at_direction);
+	at_register(&at_moveblock);
+#if AT_SALARY
+	at_register(&at_salary);
+#endif
+	at_register(&at_horseluck);
+	at_register(&at_peasantluck);
+	at_register(&at_deathcount);
+	at_register(&at_chaoscount);
+	at_register(&at_woodcount);
+	at_register(&at_laen);
+	at_register(&at_road);
+
+	/* neue UNIT-Attribute */
+	at_register(&at_alias);
+	at_register(&at_siege);
+	at_register(&at_target);
+	at_register(&at_potion);
+	at_register(&at_potionuser);
+	at_register(&at_contact);
+	at_register(&at_effect);
+	at_register(&at_private);
+
+#if defined(OLD_TRIGGER)
+	at_register(&at_pointer_tag);
+	at_register(&at_relation);
+	at_register(&at_relbackref);
+	at_register(&at_trigger);
+	at_register(&at_action);
+#endif
+	at_register(&at_icastle);
+	at_register(&at_guard);
+	at_register(&at_lighthouse);
+	at_register(&at_group);
+	at_register(&at_faction_special);
+	at_register(&at_prayer_timeout);
+	at_register(&at_prayer_effect);
+	at_register(&at_wyrm);
+	at_register(&at_building_generic_type);
+
+/* border-typen */
+	register_bordertype(&bt_noway);
+	register_bordertype(&bt_fogwall);
+	register_bordertype(&bt_wall);
+	register_bordertype(&bt_illusionwall);
+	register_bordertype(&bt_firewall);
+	register_bordertype(&bt_wisps);
+	register_bordertype(&bt_road);
+
+#if USE_EVENTS
+	at_register(&at_events);
+#endif
+	at_register(&at_jihad);
 }
 
 void
 kernel_init(void)
 {
-	init_tokens();
 	skill_init();
 	attrib_init();
 	translation_init();
@@ -2054,7 +2240,7 @@ register_faction_id(int id)
 
 boolean
 faction_id_is_unused(int id)
-{  
+{
     if(used_faction_ids==NULL)
 		return(true);
 	return (boolean)(bsearch(&id, used_faction_ids, no_used_faction_ids,
@@ -2147,7 +2333,7 @@ resolve2(void)
 
 #endif
 
-static void 
+static void
 init_directions(tnode * root)
 {
 	/* mit dieser routine kann man mehrere namen für eine direction geben,
@@ -2488,9 +2674,8 @@ movewhere(region * r, const unit *u)
 			   "(%d,%d) noch nicht generiert!\n", r->x, r->y,
 			   r->x + delta_x[d], r->y + delta_y[d]);
 #else
-		sprintf(buf, "%s entdeckt, daß es keinen Weg nach %s gibt.",
-						unitname(u), directions[d]);
-		addmessage(r, u->faction, buf, MSG_MOVE, ML_WARN);
+		add_message(&u->faction->msgs, 
+			msg_message("moveblocked", "unit direction", u, d));
 		return NULL;
 #endif
 	}
@@ -2504,8 +2689,8 @@ movewhere(region * r, const unit *u)
 	}
 
 	if (move_blocked(u, r, d) == true) {
-		add_message(&u->faction->msgs,
-			new_message(u->faction, "moveblocked%u:unit%i:direction", u, d));
+		add_message(&u->faction->msgs, 
+			msg_message("moveblocked", "unit direction", u, d));
 		return NULL;
 	}
 

@@ -73,7 +73,7 @@ order_string(const order * o, char * buf, size_t len)
 		len=4096;
 	}
 	c = buf;
-	strncpy(c, keywords[o->type], len);
+	strncpy(c, locale_string(u->faction->locale, keywords[o->type]), len);
 	slen = strlen(c);
 	len -= slen;
 	c += slen;

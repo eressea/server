@@ -397,7 +397,7 @@ main(int argc, char *argv[])
 		sprintf(buf, "fopen(%s): ", "res/spells");
 		perror(buf);
 	}
-
+/*
 	F = fopen("res/bonus", "wt");
 	if (F) {
 		race_t r;
@@ -422,7 +422,7 @@ main(int argc, char *argv[])
 		sprintf(buf, "fopen(%s): ", "res/spells");
 		perror(buf);
 	}
-
+*/
 	debug = 0;
 	quickleave = 0;
 

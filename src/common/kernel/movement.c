@@ -575,7 +575,7 @@ coords_or_direction(region *r, faction *f, int dir)
 	plane *pl = getplane(r);
 
 	if(fval(pl, PFL_NOCOORDS)) {
-		strcpy(lbuf, directions[dir]);
+		strcpy(lbuf, locale_string(f->locale, directions[dir]));
 	} else {
 		sprintf(lbuf, "(%d,%d)",region_x(r,f), region_y(r,f));
 	}
@@ -703,16 +703,14 @@ is_guarded(region * r, unit * u, unsigned int mask)
 	return NULL;
 }
 
-const char *shortdirections[MAXDIRECTIONS+2] =
+const char *shortdirections[MAXDIRECTIONS] =
 {
-	"NW",
-	"NO",
-	"Ost",
-	"SO",
-	"SW",
-	"West",
-	"",
-	"Pause"
+	"dir_NW",
+	"dir_NO",
+	"dir_Ost",
+	"dir_SO",
+	"dir_SW",
+	"dir_West"
 };
 
 void
@@ -726,10 +724,10 @@ cycle_route(unit *u, int gereist)
 	boolean paused = false;
 	boolean pause;
 
-	if (igetkeyword(u->thisorder) != K_ROUTE) return;
+	if (igetkeyword(u->thisorder, u->faction->locale) != K_ROUTE) return;
 	tail[0] = '\0';
 
-	strcpy(neworder, keywords[K_ROUTE]);
+	strcpy(neworder, locale_string(u->faction->locale, keywords[K_ROUTE]));
 
 	for (cm=0;;++cm) {
 		pause = false;
@@ -742,19 +740,19 @@ cycle_route(unit *u, int gereist)
 		}
 		if (cm<gereist) {
 			/* hier sollte keine PAUSE auftreten */
-			if (!pause) strcat(strcat(tail, " "), shortdirections[d]);
+			if (!pause) strcat(strcat(tail, " "), locale_string(u->faction->locale, shortdirections[d]));
 		}
 		else if (cm==gereist && !paused && pause){
-			strcat(strcat(tail, " "), parameters[P_PAUSE]);
+			strcat(strcat(tail, " "), locale_string(u->faction->locale, parameters[P_PAUSE]));
 			paused=true;
 		}
 		/* da PAUSE nicht in ein shortdirections[d] umgesetzt wird (ist
 		 * hier keine normale direction), muss jede PAUSE einzeln
 		 * herausgefiltert und explizit gesetzt werden */
 		else if (pause) {
-			strcat(strcat(neworder, " "), parameters[P_PAUSE]);
+			strcat(strcat(neworder, " "), locale_string(u->faction->locale, parameters[P_PAUSE]));
 		} else
-			strcat(strcat(neworder, " "), shortdirections[d]);
+			strcat(strcat(neworder, " "), locale_string(u->faction->locale, shortdirections[d]));
 	}
 
 	strcat(neworder, tail);
@@ -775,14 +773,14 @@ init_drive(void)
 		 * doesn't seem to be an easy way to speed this up. */
 
 		for(u=r->units; u; u=u->next) {
-			if(igetkeyword(u->thisorder) == K_DRIVE && !fval(u, FL_LONGACTION)) {
+			if(igetkeyword(u->thisorder, u->faction->locale) == K_DRIVE && !fval(u, FL_LONGACTION)) {
 				boolean found = false;
 				ut = getunit(r, u);
 				if(!ut) {
 					cmistake(u, findorder(u, u->thisorder), 64, MSG_MOVE);
 					continue;
 				}
-				for (S = ut->orders; S; S = S->next) if (igetkeyword(S->s) == K_TRANSPORT) {
+				for (S = ut->orders; S; S = S->next) if (igetkeyword(S->s, u->faction->locale) == K_TRANSPORT) {
 					if(getunit(r, ut) == u) {
 						found = true;
 						break;
@@ -805,11 +803,11 @@ init_drive(void)
 		for (u=r->units; u; u=u->next) {
 			w = 0;
 
-			for (S = u->orders; S; S = S->next) if(igetkeyword(S->s) == K_TRANSPORT) {
+			for (S = u->orders; S; S = S->next) if(igetkeyword(S->s, u->faction->locale) == K_TRANSPORT) {
 				ut = getunit(r, u);
 				if(!ut) continue;
 
-				if (igetkeyword(ut->thisorder) == K_DRIVE && !fval(ut, FL_LONGACTION)) {
+				if (igetkeyword(ut->thisorder, u->faction->locale) == K_DRIVE && !fval(ut, FL_LONGACTION)) {
 					u2 = getunit(r, u);
 					if(u2 == u) {
 						w += weight(ut);
@@ -845,7 +843,7 @@ cantravel(const unit *u, const region *from, const region * to, boolean (*allowe
 		} else if (get_item(u, I_HORSE) > 0) {
 			return ETRAVEL_NORIDE|ETRAVEL_NOSWIM;
 		}
-	} 
+	}
 	if (!u->ship && leftship(u) && is_guarded(from, u, GUARD_LANDING)) {
 		/* An Land kein NACH wenn in dieser Runde Schiff VERLASSEN! */
 		return ETRAVEL_LEFTSHIP;
@@ -896,8 +894,8 @@ travel(region * first, unit * u, region * next, int flucht)
 	 * Normalerweise verliert man 3 BP pro Region, bei Straßen nur 2 BP.
 	 * Außerdem: Wenn Einheit transportiert, nur halbe BP */
 
-	if (rterrain(current)==T_OCEAN 
-			&& !(race[u->race].flags&(RCF_FLY) && rterrain(next)!=T_OCEAN)) 
+	if (rterrain(current)==T_OCEAN
+			&& !(race[u->race].flags&(RCF_FLY) && rterrain(next)!=T_OCEAN))
 	{ /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
 		if (u->race != RC_AQUARIAN)
 		{
@@ -963,7 +961,7 @@ travel(region * first, unit * u, region * next, int flucht)
 			/* faction special */
 			if(fspecial(u->faction, FS_QUICK))
 				mp = BP_RIDING;
-			
+
 			/* Siebenmeilentee */
 			if (get_effect(u, oldpotiontype[P_FAST]) >= u->number)
 				mp *= 2;
@@ -1149,11 +1147,11 @@ travel(region * first, unit * u, region * next, int flucht)
 		/* und jetzt noch die transportierten Einheiten verschieben */
 
 		for (S = u->orders; S; S = S->next) {
-			if (igetkeyword(S->s) == K_TRANSPORT) {
+			if (igetkeyword(S->s, u->faction->locale) == K_TRANSPORT) {
 				ut = getunit(first, u);
 				if (ut) {
 					boolean found = false;
-					if (igetkeyword(ut->thisorder) == K_DRIVE 
+					if (igetkeyword(ut->thisorder, u->faction->locale) == K_DRIVE
 							&& !fval(ut, FL_LONGACTION)) {
 						u2 = getunit(first, ut);
 						if(u2 == u) {
@@ -1316,7 +1314,7 @@ check_takeoff(ship *sh, region *from, region *to)
 	return true;
 }
 
-boolean 
+boolean
 ship_allowed(const struct ship_type * type, region * r)
 {
 	int c = 0;
@@ -1377,7 +1375,7 @@ sail(region * starting_point, unit * u, region * next_point, boolean move_on_lan
 				plane *pl = getplane(next_point);
 				if(pl && fval(pl, PFL_NOCOORDS)) {
 					sprintf(buf, "Die %s entdeckt, daß im %s Festland ist.",
-						shipname(u->ship), directions[dir]);
+						shipname(u->ship), locale_string(u->faction->locale, directions[dir]));
 				} else {
 					sprintf(buf, "Die %s entdeckt, daß (%d,%d) Festland ist.",
 						 	shipname(u->ship), region_x(next_point,u->faction),
@@ -1680,7 +1678,7 @@ move(region * r, unit * u, boolean move_on_land)
 			region * rc = rconnect(r2,d);
 			if (rc) {
 				sprintf(buf, "Im %s ist eine ungeheure magische Präsenz zu verspüren.",
-						directions[back[d]]);
+						locale_string(u->faction->locale, directions[back[d]]));
 				addmessage(rc, NULL, buf, MSG_EVENT, ML_IMPORTANT);
 			}
 		}
@@ -1697,11 +1695,11 @@ move(region * r, unit * u, boolean move_on_land)
 				if (a && a->data.v==u) {
 					/* wir basteln ihm ein NACH */
 					int k, i = 0;
-					strcpy(buf, keywords[K_MOVE]);
+					strcpy(buf, locale_string(u->faction->locale, keywords[K_MOVE]));
 					while (route[i]!=NODIRECTION)
-						strcat(strcat(buf, " "), directions[route[i++]]);
+						strcat(strcat(buf, " "), locale_string(u->faction->locale, directions[route[i++]]));
 					set_string(&uf->thisorder, buf);
-					k = igetkeyword(uf->thisorder);
+					k = igetkeyword(uf->thisorder, u->faction->locale);
 					assert(k==K_MOVE);
 					move(r, uf, true);
 				}
@@ -1820,11 +1818,12 @@ piracy(unit *u)
 		"piratesawvictim%h:ship%r:region%d:dir", sh, r, target_dir));
 
 	/* Befehl konstruieren */
-	sprintf(buf, "%s %s", keywords[K_MOVE], directions[target_dir]);
+	sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), 
+		locale_string(u->faction->locale, directions[target_dir]));
 	set_string(&u->thisorder, buf);
 
 	/* Bewegung ausführen */
-	igetkeyword(u->thisorder);	/* NACH ignorieren */
+	igetkeyword(u->thisorder, u->faction->locale);	/* NACH ignorieren */
 	move(r, u, true);
 }
 
@@ -1895,21 +1894,22 @@ hunt(unit *u)
 		return false;
 	}
 
-	sprintf(command, "%s %s", keywords[K_MOVE], directions[dir]);
+	sprintf(command, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), 
+		locale_string(u->faction->locale, directions[dir]));
 	moves = 1;
 
 	rc = rconnect(rc, dir);
 	while(moves < shipspeed(u->ship, u)
 			&& (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
 		strcat(command, " ");
-		strcat(command, directions[dir]);
+		strcat(command, locale_string(u->faction->locale, directions[dir]));
 		moves++;
 		rc = rconnect(rc, dir);
 	}
 
 	/* In command steht jetzt das NACH-Kommando. */
 
-	igetkeyword(command);		/* NACH ignorieren und Parsing initialisieren. */
+	igetkeyword(command, u->faction->locale);		/* NACH ignorieren und Parsing initialisieren. */
 	move(u->region, u, false);							/* NACH ausführen */
 	return true;						/* true -> Einheitenliste von vorne durchgehen */
 }
@@ -2018,7 +2018,7 @@ movement(void)
 				up = &u;
 				if (u==NULL) break;
 			}
-			kword = igetkeyword(u->thisorder);
+			kword = igetkeyword(u->thisorder, u->faction->locale);
 			switch (kword) {
 			case K_ROUTE:
 			case K_MOVE:
@@ -2053,7 +2053,7 @@ movement(void)
 			param_t p;
 
 			for (o=u->orders;o;o=o->next) {
-				if(igetkeyword(o->s) == K_FOLLOW) {
+				if(igetkeyword(o->s, u->faction->locale) == K_FOLLOW) {
 					if(attacked(u)) {
 						cmistake(u, o->s, 52, MSG_MOVE);
 						u = u2; break;
@@ -2062,7 +2062,7 @@ movement(void)
 						u = u2; break;
 					}
 
-					p = getparam();
+					p = getparam(u->faction->locale);
 					if(p != P_SHIP) {
 						if(p != P_UNIT) {
 							cmistake(u, o->s, 240, MSG_MOVE);
@@ -2087,8 +2087,8 @@ movement(void)
 		for (u = r->units; u;) {
 			unit * u2 = u->next;
 			if (utarget(u)
-				&& (igetkeyword(u->thisorder) == K_MOVE
-				|| igetkeyword(u->thisorder) == K_ROUTE)) {
+				&& (igetkeyword(u->thisorder, u->faction->locale) == K_MOVE
+				|| igetkeyword(u->thisorder, u->faction->locale) == K_ROUTE)) {
 					if (attacked(u)) {
 						cmistake(u, findorder(u, u->thisorder), 52, MSG_PRODUCE);
 					} else if (race[u->race].flags & RCF_CANNOTMOVE) {
@@ -2110,7 +2110,7 @@ movement(void)
 		unit * u;
 		for(u = r->units; u;) {
 			unit *un = u->next;
-			if(igetkeyword(u->thisorder) == K_PIRACY) piracy(u);
+			if(igetkeyword(u->thisorder, u->faction->locale) == K_PIRACY) piracy(u);
 			u = un;
 		}
 		a_removeall(&r->attribs, &at_piracy_direction);
@@ -2130,8 +2130,8 @@ follow(void)
 			if (fval(u, FL_LONGACTION)) continue;
 			a = a_find(u->attribs, &at_follow);
 			for (o=u->orders;o;o=o->next) {
-				if (igetkeyword(o->s) == K_FOLLOW
-						&& getparam() == P_UNIT) {
+				if (igetkeyword(o->s, u->faction->locale) == K_FOLLOW
+						&& getparam(u->faction->locale) == P_UNIT) {
 					int id = read_unitid(u->faction, r);
 					if (id>0) {
 						unit * uf = findunit(id);
@@ -2151,7 +2151,7 @@ follow(void)
 				if (!u2 || u2->region!=r || !cansee(u->faction, r, u2, 0))
 					continue;
 				for (o=u2->orders;o;o=o->next) {
-					switch (igetkeyword(o->s)) {
+					switch (igetkeyword(o->s, u2->faction->locale)) {
 					case K_MOVE:
 					case K_ROUTE:
 					case K_PIRACY:

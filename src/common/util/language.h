@@ -21,10 +21,13 @@ extern locale * find_locale(const char * name);
 extern locale * make_locale(const char * key);
 
 /** operations on locales: **/
-extern const char * locale_string(const locale * lang, const char * key);
-extern void locale_setstring(locale * lang, const char * key, const char * value);
-extern unsigned int locale_hashkey(const locale * lang);
-extern const char * locale_name(const locale * lang);
+extern void locale_setstring(struct locale * lang, const char * key, const char * value);
+extern const char * locale_getstring(const struct locale * lang, const char * key);
+extern const char * locale_string(const struct locale * lang, const char * key); /* does fallback */
+extern unsigned int locale_hashkey(const struct locale * lang);
+extern const char * locale_name(const struct locale * lang);
 
-extern const char * reverse_lookup(const locale * lang, const char * str);
+extern const char * reverse_lookup(const struct locale * lang, const char * str);
+
+extern void debug_language(const char * log);
 #endif

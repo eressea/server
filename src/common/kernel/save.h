@@ -38,7 +38,7 @@ void writegame(char *path, char quiet);
 
 extern void rsf(FILE * F, char *s, size_t len);
 
-extern boolean is_persistent(const char *s);
+extern boolean is_persistent(const char *s, const struct locale * lang);
 
 /* Versionsänderungen: */
 #define HEX_VERSION 81

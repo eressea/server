@@ -47,6 +47,8 @@ extern void skill_init(void);
 extern void skill_done(void);
 extern struct attrib * make_skillmod(skill_t skill, unsigned int flags, int(*special)(const struct unit*, const struct region*, skill_t, int), double multiplier, int bonus);
 
+extern const char * skillname(skill_t, const struct locale *);
+
 int level_days(int level);
 void remove_zero_skills(void);
 

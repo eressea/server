@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -649,9 +649,9 @@ print_curses(FILE *F, const void * obj, typ_t typ, const attrib *a, int self, in
 			}
 		} else if (a->type==&at_effect && self) {
 			effect_data * data = (effect_data *)a->data.v;
-			sprintf(buf, "Auf der Einheit lieg%s %d Wirkung%s %s.", 
+			sprintf(buf, "Auf der Einheit lieg%s %d Wirkung%s %s.",
 					(data->value==1 ? "t" : "en"),
-					data->value, 
+					data->value,
 					(data->value==1 ? "" : "en"),
 					locale_string(NULL, resourcename(data->type->itype->rtype, 0)));
 			rnl(F);
@@ -795,16 +795,10 @@ f_regionid(const region * r, const faction * f)
 	else {
 		pl = getplane(r);
 		if(pl && fval(pl,PFL_NOCOORDS)) {
-			if (rterrain(r) == T_OCEAN)
-				sprintf(buf, "Ozean");
-			else
-				sprintf(buf, "%s", rname(r, f->locale));
+			sprintf(buf, "%s", rname(r, f->locale));
 		} else {
-			if (rterrain(r) == T_OCEAN)
-				sprintf(buf, "Ozean (%d,%d%s%s)", region_x(r,f), region_y(r,f), pl?",":"", pl?pl->name:"");
-			else
-		     sprintf(buf, "%s (%d,%d%s%s)", rname(r, f->locale), region_x(r,f), region_y(r,f), pl?",":"", pl?pl->name:"");
-			}
+			sprintf(buf, "%s (%d,%d%s%s)", rname(r, f->locale), region_x(r,f), region_y(r,f), pl?",":"", pl?pl->name:"");
+		}
 	}
 
 	return buf;
@@ -1038,13 +1032,13 @@ describe(FILE * F, region * r, int partial, faction * f)
 			scat((char *)a_do->data.v);
 		} else {
 			int nrd = 0;
-			
+
 			/* Nachbarregionen, die gesehen werden, ermitteln */
 			for (d = 0; d != MAXDIRECTIONS; d++)
 				if (see[d] && rconnect(r, d)) nrd++;
-			
+
 			/* Richtungen aufzählen */
-			
+
 			dh = false;
 			for (d = 0; d != MAXDIRECTIONS; d++) if (see[d]) {
 				region * r2 = rconnect(r, d);
@@ -1055,7 +1049,7 @@ describe(FILE * F, region * r, int partial, faction * f)
 					else scat(", im ");
 				}
 				else scat(" Im ");
-				scat(directions[d]);
+				scat(locale_string(f->locale, directions[d]));
 				scat(" ");
 				if (!dh) scat("der Region liegt ");
 				sprintf(dbuf, trailinto(r2, f->locale),
@@ -1128,7 +1122,7 @@ describe(FILE * F, region * r, int partial, faction * f)
 				if (e->lastd==d) strcat(buf, " und im ");
 				else strcat(buf, ", im ");
 			}
-			strcat(buf, directions[d]);
+			strcat(buf, locale_string(f->locale, directions[d]));
 			first = false;
 		}
 		if (!e->transparent) strcat(buf, " versperrt ");
@@ -1299,7 +1293,7 @@ order_template(FILE * F, faction * f)
 	rps_nowrap(F, "");
 	rnl(F);
 
-	sprintf(buf, "%s %s \"hier_passwort_eintragen\"", parameters[P_FACTION], factionid(f));
+	sprintf(buf, "%s %s \"hier_passwort_eintragen\"", locale_string(f->locale, parameters[P_FACTION]), factionid(f));
 	rps_nowrap(F, buf);
 	rnl(F);
 
@@ -1322,12 +1316,12 @@ order_template(FILE * F, faction * f)
 					rnl(F);
 					pl = getplane(r);
 					if (pl && fval(pl, PFL_NOCOORDS)) {
-						sprintf(buf, "REGION; %s", rname(r, f->locale));
+						sprintf(buf, "%s; %s", locale_string(f->locale, parameters[P_REGION]), rname(r, f->locale));
 					} else if (pl && pl->id != 0) {
-						sprintf(buf, "REGION %d,%d,%d ; %s", region_x(r,f),
+						sprintf(buf, "%s %d,%d,%d ; %s", locale_string(f->locale, parameters[P_REGION]), region_x(r,f),
 								region_y(r,f), pl->id, rname(r, f->locale));
 					} else {
-						sprintf(buf, "REGION %d,%d ; %s", region_x(r,f),
+						sprintf(buf, "%s %d,%d ; %s", locale_string(f->locale, parameters[P_REGION]), region_x(r,f),
 								region_y(r,f), rname(r, f->locale));
 					}
 					rps_nowrap(F, buf);
@@ -1340,7 +1334,7 @@ order_template(FILE * F, faction * f)
 				}
 				dh = 1;
 
-				sprintf(buf, "%s %s;		%s [%d,%d$", parameters[P_UNIT],
+				sprintf(buf, "%s %s;		%s [%d,%d$", locale_string(u->faction->locale, parameters[P_UNIT]),
 						unitid(u), u->name, u->number, get_money(u));
 				if (u->building != NULL && fval(u, FL_OWNER)) {
 					building * b = u->building;
@@ -1370,7 +1364,7 @@ order_template(FILE * F, faction * f)
 				rnl(F);
 
 				for (S2 = u->orders; S2; S2 = S2->next) {
-					if(is_persistent(S2->s)) {
+					if(is_persistent(S2->s, u->faction->locale)) {
 						sprintf(buf, "   %s", S2->s);
 						rps_nowrap(F, buf);
 						rnl(F);
@@ -1388,7 +1382,7 @@ order_template(FILE * F, faction * f)
 	}
 	rps_nowrap(F, "");
 	rnl(F);
-	sprintf(buf, parameters[P_NEXT]);
+	sprintf(buf, locale_string(f->locale, parameters[P_NEXT]));
 	rps_nowrap(F, buf);
 	rnl(F);
 }
@@ -1690,7 +1684,7 @@ report(FILE *F, faction * f)
 
 	centre(F, gamedate(), true);
 	rnl(F);
-	sprintf(buf, "%s, %s/%s (%s)", factionname(f), race[f->race].name[1],
+	sprintf(buf, "%s, %s/%s (%s)", factionname(f), locale_string(f->locale, race[f->race].name[1]),
 			neue_gebiete[f->magiegebiet], f->email);
 	centre(F, buf, true);
 
@@ -2040,11 +2034,12 @@ report(FILE *F, faction * f)
 				}
 				sprintf(buf, "%s, %s, (%d/%d)",
 					shipname(sh),
-					sh->type->name[0],
+					locale_string(f->locale, sh->type->name[0]),
 					(w + 99) / 100,	/* +99 weil sonst die Nachkommastellen ignoriert würden */
 					shipcapacity(sh) / 100);
 			} else {
-				sprintf(buf, "%s, %s", shipname(sh), sh->type->name[0]);
+				sprintf(buf, "%s, %s", shipname(sh), 
+					locale_string(f->locale, sh->type->name[0]));
 			}
 
 			assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
@@ -2379,7 +2374,7 @@ seen_region * last;
 #define MAXSEEHASH 4095
 seen_region * seehash[MAXSEEHASH];
 
-static void 
+static void
 seen_done(void)
 {
 	while (seen) {
@@ -2395,7 +2390,7 @@ seen_done(void)
 }
 
 #if FAST_SEEN
-static void 
+static void
 init_intervals()
 {
 	region * r;
@@ -3386,8 +3381,29 @@ eval_resource(struct opstack ** stack, const void * userdata)
 	const faction * report = (const faction*)userdata;
 	int j = opop(stack, int);
 	struct resource_type * res = opop(stack, struct resource_type *);
-	
+
 	const char * c = locale_string(report->locale, resourcename(res, j!=1));
+	opush(stack, strcpy(balloc(strlen(c)+1), c));
+}
+
+static void
+eval_race(struct opstack ** stack, const void * userdata)
+{
+	const faction * report = (const faction*)userdata;
+	int j = opop(stack, int);
+	int r = opop(stack, int);
+
+	const char * c = locale_string(report->locale, race[r].name[j!=1]);
+	opush(stack, strcpy(balloc(strlen(c)+1), c));
+}
+
+static void
+eval_direction(struct opstack ** stack, const void * userdata)
+{
+	const faction * report = (const faction*)userdata;
+	int i = opop(stack, int);
+
+	const char * c = locale_string(report->locale, directions[i]);
 	opush(stack, strcpy(balloc(strlen(c)+1), c));
 }
 
@@ -3396,7 +3412,7 @@ eval_skill(struct opstack ** stack, const void * userdata)
 {
 	const faction * report = (const faction*)userdata;
 	int sk = opop(stack, int);
-	const char * c = locale_string(report->locale, skillnames[sk]);
+	const char * c = skillname(sk, report->locale);
 	opush(stack, strcpy(balloc(strlen(c)+1), c));
 	unused(userdata);
 }
@@ -3406,9 +3422,11 @@ report_init(void)
 {
 	add_function("region", &eval_region);
 	add_function("resource", &eval_resource);
+	add_function("race", &eval_race);
 	add_function("faction", &eval_faction);
 	add_function("ship", &eval_ship);
 	add_function("unit", &eval_unit);
 	add_function("building", &eval_building);
 	add_function("skill", &eval_skill);
+	add_function("direction", &eval_direction);
 }

@@ -49,8 +49,9 @@ void write_msglevels(struct warning * warnings, FILE * F);
 void read_msglevels(struct warning ** w, FILE * F);
 void set_msglevel(struct warning ** warnings, const char * type, int level);
 
-extern struct message * make_message(const char * name, const char* sig, ...);
-extern struct message * new_message(struct faction * receiver, const char * signature, ...);
+extern struct message * msg_message(const char * name, const char* sig, ...);
+extern struct message * msg_error(const struct unit *, const char *, 
+											 const char * name, const char* sig, ...);
 extern struct message * add_message(struct message_list** pm, struct message * m);
 extern void free_messages(struct message_list * m);
 extern void read_messages(FILE * F, const struct locale * lang);
@@ -59,5 +60,8 @@ extern void read_messages(FILE * F, const struct locale * lang);
 extern struct messageclass * msgclasses;
 extern const struct messageclass * mc_add(const char * name);
 extern const struct messageclass * mc_find(const char * name);
+
+/* convenience, deprecated */
+extern struct message * new_message(struct faction * receiver, const char * signature, ...);
 
 #endif

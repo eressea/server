@@ -3,14 +3,15 @@
 #include "eressea.h"
 
 /* kernel includes */
-#include "magic.h"
-#include "unit.h"
-#include "region.h"
-#include "item.h"
+#include "battle.h"
 #include "build.h"
 #include "building.h"
+#include "faction.h"
+#include "item.h"
+#include "magic.h"
+#include "region.h"
+#include "unit.h"
 #include "movement.h"
-#include "battle.h"
 #include "spell.h"
 #include "race.h"
 
@@ -1173,8 +1174,8 @@ sp_denyattack(fighter * fi, int level, int power, spell * sp)
 	fset(fi, FIG_ATTACKED);
 
 	/* Hat der Magier ein NACH, wird die angegebene Richtung bevorzugt */
-	if (igetkeyword(mage->thisorder) == K_MOVE
-				|| igetkeyword(mage->thisorder) == K_ROUTE)
+	if (igetkeyword(mage->thisorder, mage->faction->locale) == K_MOVE
+				|| igetkeyword(mage->thisorder, mage->faction->locale) == K_ROUTE)
 	{
 		fi->run.region = movewhere(r, mage);
 		if (!fi->run.region) {

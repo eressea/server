@@ -241,7 +241,7 @@
 	</type>
 	<locale name="en">
 		<nr section="errors">
-			<text>"$unit($unit) in $region($region): '$command' - Order was unrecognizable."</text>
+			<text>"$unit($unit) in $region($region): '$command' - Unknown command."</text>
 		</nr>
 	</locale>
 </message>
@@ -733,7 +733,7 @@
 		<arg name="region" type="region"></arg>
 		<arg name="command" type="string"></arg>
 	</type>
-	<locale name="de">
+	<locale name="en">
 		<nr section="errors">
 			<text>"$unit($unit) in $region($region): '$command' - The unit could not be found."</text>
 		</nr>
@@ -2869,7 +2869,7 @@
 	</type>
 	<locale name="en">
 		<nr section="none">
-			<text>"$unit($unit) hands $int($amount) $resource($resource,$amount) to $unit($target)."</text>
+			<text>"$unit($unit) gave $int($amount) $resource($resource,$amount) to $unit($target)."</text>
 		</nr>
 	</locale>
 </message>
@@ -2906,7 +2906,7 @@
 	</type>
 	<locale name="en">
 		<nr section="none">
-			<text>"$unit($unit) hands command over to $unit($receipient)."</text>
+			<text>"$unit($unit) gave control to $unit($receipient)."</text>
 		</nr>
 	</locale>
 </message>
@@ -3280,7 +3280,7 @@
 	</type>
 	<locale name="en">
 		<nr section="none">
-			<text>"$unit($unit) looses $int($dead) people due to starvation in $region($region)."</text>
+			<text>"$unit($unit) loses $int($dead) people due to starvation in $region($region)."</text>
 		</nr>
 	</locale>
 </message>
@@ -3524,7 +3524,7 @@
 		<arg name="direction" type="direction"></arg>
 	</type>
 	<locale name="en">
-		<nr section="none">
+		<nr section="movement">
 			<text>"$unit($unit) refuses to travel to the$direction($direction)."</text>
 		</nr>
 	</locale>
@@ -3536,7 +3536,7 @@
 		<arg name="region" type="region"></arg>
 	</type>
 	<locale name="en">
-		<nr section="none">
+		<nr section="movement">
 			<text>"The crew of the $ship($ship) refuses to travel to $region($region)."</text>
 		</nr>
 	</locale>
@@ -3548,7 +3548,7 @@
 		<arg name="direction" type="direction"></arg>
 	</type>
 	<locale name="en">
-		<nr section="none">
+		<nr section="movement">
 			<text>" The crew of the $ship($ship) refuses to travel to the$direction($direction)."</text>
 		</nr>
 	</locale>
@@ -3571,7 +3571,7 @@
 		<arg name="ship" type="ship"></arg>
 	</type>
 	<locale name="en">
-		<nr section="none">
+		<nr section="movement">
 			<text>"In the very last moment, the crew of the $ship($ship) saved the ship from grounding."</text>
 		</nr>
 	</locale>
@@ -3583,7 +3583,7 @@
 		<arg name="region" type="region"></arg>
 	</type>
 	<locale name="en">
-		<nr section="none">
+		<nr section="movement">
 			<text>"$unit($unit) discovered that $region($region) is Ocean."</text>
 		</nr>
 	</locale>
@@ -3595,7 +3595,7 @@
 		<arg name="direction" type="direction"></arg>
 	</type>
 	<locale name="en">
-		<nr section="none">
+		<nr section="movement">
 			<text>"$unit($unit) discovered that an Ocean lies in the $direction($direction)."</text>
 		</nr>
 	</locale>
