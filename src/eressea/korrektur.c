@@ -1342,47 +1342,50 @@ fix_herbtypes(void)
 static int
 fix_plainherbs(void)
 {
-	region *r, *lastr = regions;
-	int p = 0, c, n = 0;
+#define WINDOWSIZE 120
+#define DEVIATION 1.1
+	herb_t window[WINDOWSIZE];
+	int wbegin=0, wend=0;
+	region *r;
+	int c;
 	int count[6];
 	for (c=0;c!=6;++c) count[c]=0;
 	for (r=regions;r;r=r->next) {
-		int i;
+		herb_t herb;
+		int wnext=(wend+1) % WINDOWSIZE;
 		const char * name;
 		terrain_t t = rterrain(r);
 		if (t!=T_PLAIN) continue;
-		++p;
 		name = LOC(default_locale, rherbtype(r)->itype->rtype->_name[0]);
-		for (i=0;i!=6;++i) {
-			if (strcmp(terrain[t].herbs[i], name)==0) {
-				count[i]++;
+		for (herb=0;herb!=6;++herb) {
+			if (strcmp(terrain[t].herbs[herb], name)==0) {
+				++count[herb];
 				break;
 			}
 		}
-		if (i<3 && r->age>20) lastr=r->next;
+		if (wnext==wbegin) {
+			const struct herb_type * htype = NULL;
+			while (count[herb] > WINDOWSIZE/6*DEVIATION) {
+				--count[herb];
+				herb = rand() % 6;
+				++count[herb];
+			}
+			htype = resource2herb(finditemtype(terrain[t].herbs[herb], default_locale)->rtype);
+			rsetherbtype(r, htype);
+			--count[window[wbegin]];
+			++wbegin;
+		}
+		window[wend]=herb;
+		wend = wnext;
 		r=r->next;
 	}
-	for (c=0;c!=6;++c) log_warning(("Herbs %d : %d\n", c, count[c]));
-	for (r=lastr;r;r=r->next) {
-		terrain_t t = rterrain(r);
-		if (t!=T_PLAIN) continue;
-		if (rand()%2) {
-			const char * name = terrain[t].herbs[3+rand()%3];
-			const item_type * itype = finditemtype(name, default_locale);
-			const herb_type * htype = resource2herb(itype->rtype);
-			rsetherbtype(r, htype);
-			++n;
-		}
-	}
-	log_warning(("The herbs in %d of %d plains were adjusted\n", n, p));
-	p=0;
+	/* check, output: */
 	for (c=0;c!=6;++c) count[c]=0;
 	for (r=regions;r;r=r->next) {
 		int i;
 		const char * name;
 		terrain_t t = rterrain(r);
 		if (t!=T_PLAIN) continue;
-		++p;
 		name = LOC(default_locale, rherbtype(r)->itype->rtype->_name[0]);
 		for (i=0;i!=6;++i) {
 			if (strcmp(terrain[t].herbs[i], name)==0) {
@@ -1392,7 +1395,6 @@ fix_plainherbs(void)
 		}
 		r=r->next;
 	}
-	log_warning(("There are %d plains\n", p));
 	for (c=0;c!=6;++c) log_warning(("Herbs %d : %d\n", c, count[c]));
 	return 0;
 }
@@ -2828,7 +2830,7 @@ korrektur(void)
 	stats();
 	do_once("sql2", dump_sql());
 	do_once("fw02", fix_watchers());
-	do_once("fxh2", fix_plainherbs());
+	do_once("fxh3", fix_plainherbs());
 #if NEW_RESOURCEGROWTH
 	/* do not remove do_once calls - old datafiles need them! */
 	do_once("rgrw", convert_resources());
