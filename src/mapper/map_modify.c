@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: map_modify.c,v 1.4 2001/02/09 13:53:53 corwin Exp $
+ *	$Id: map_modify.c,v 1.5 2001/02/18 07:45:43 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -548,7 +548,7 @@ NeueBurg(region * r)
 		waddch(win, '|');
 	}
 	wmove(win, 1, 2);
-	wAddstr((char*)oldbuildings[i]->_name);
+	wAddstr((char*)oldbuildings[q]->_name);
 	wrefresh(win);
 
 	b = new_building(oldbuildings[q], r, NULL);
