@@ -244,7 +244,7 @@ extern void read_laen(struct region * r, int laen);
 #define HORSEMOVE   3
 
 /* Vermehrungschance pro Baum */
-#define FORESTGROWTH 2
+#define FORESTGROWTH 10000					/* In Millionstel */
 #define TREESIZE     (MAXPEASANTS_PER_AREA-2)
 
 /* Eisen in Bergregionen bei Erschaffung */

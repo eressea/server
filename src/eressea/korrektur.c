@@ -2640,6 +2640,20 @@ fix_questcoors(void)
 	return 0;
 }
 
+static int
+fix_seeds(void)
+{
+	region *r;
+
+	for(r=regions; r; r=r->next) {
+		if(rtrees(r,0) > 25 && rtrees(r,0) > rtrees(r,2)/2) {
+			rsettrees(r,0,rtrees(r,2)/2);
+		}
+	}
+
+	return 0;
+}
+
 void
 korrektur(void)
 {
@@ -2685,6 +2699,7 @@ korrektur(void)
 	do_once("szip", set_zip());
 	do_once("heal", heal_all());
 	do_once("fquc", fix_questcoors());
+	do_once("fsee", fix_seeds());
 
 	/* seems something fishy is going on, do this just 
 	 * to be on the safe side: 
