@@ -3854,7 +3854,7 @@
 	</type>
 	<locale name="en">
 		<nr section="none">
-			<text>"$unit($unit) $int($mode) from $region($start) to $region($end).$regions"</text>
+			<text>"$unit($unit) $if($eq($mode,1),"rides", "walks") from $region($start) to $region($end).$regions"</text>
 		</nr>
 	</locale>
 </message>
