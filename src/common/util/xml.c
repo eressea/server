@@ -72,7 +72,7 @@ static void
 free_attribs(xml_attrib * xa)
 {
 	free(xa->name);
-	free(xa->value);
+	if(xa->value) free(xa->value);
 	free(xa);
 }
 
