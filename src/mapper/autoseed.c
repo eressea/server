@@ -6,7 +6,7 @@
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
- This program may not be used, modified or distributed 
+ This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
 */
 
@@ -129,7 +129,7 @@ get_quality(struct seed_t * seed)
 	}
 
 	if (nterrains[T_DESERT]) {
-		/* +10 points for the first if we are insects, and -2 points for every 
+		/* +10 points for the first if we are insects, and -2 points for every
 		 * other desert */
 		if (seed->player->race==new_race[RC_INSECT]) q += 12;
 		q -= (nterrains[T_DESERT]*2);
@@ -195,7 +195,7 @@ autoseed(struct region_list * rlist)
 	seed_t * seeds = calloc(sizeof(seed_t), nseeds);
 	int i, nfactions = 0;
 	newfaction * nf = newfactions;
-	
+
 	while (nf) {
 		if (nf->bonus==0) ++nfactions;
 		nf = nf->next;
@@ -257,7 +257,7 @@ autoseed(struct region_list * rlist)
 			newfaction ** nfp = &newfactions;
 			unit * u;
 			while (*nfp!=nf) nfp=&(*nfp)->next;
-			u = addplayer(seeds[i].region, addfaction(nf->email, nf->password, nf->race, 
+			u = addplayer(seeds[i].region, addfaction(nf->email, nf->password, nf->race,
         nf->lang, nf->subscription));
 			u->faction->alliance = nf->allies;
 			++numnewbies;
@@ -398,6 +398,10 @@ mkisland(int nsize)
               special = 1;
             }
 						terraform(rn, terrain);
+            /* the new region has an extra 15% chance to have laen */
+            if (rand() % 100 < 15) rsetlaen(r, 5 + rand() % 5);
+            /* the new region has an extra 20% chance to have mallorn */
+            if (rand() % 100 < 20) fset(r, RF_MALLORN);
 						add_regionlist(rend, rn);
 					}
 				}
