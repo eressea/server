@@ -590,6 +590,7 @@ peasants(region * r)
 
 	/* Alle werden satt, oder halt soviele für die es auch Geld gibt */
 
+#if PEASANTS_DO_NOT_STARVE == 0
 	money = rmoney(r);
 	satiated = min(peasants, money / MAINTENANCE);
 	rsetmoney(r, money - satiated * MAINTENANCE);
@@ -610,6 +611,8 @@ peasants(region * r)
 		msg_release(msg);
 		peasants -= dead;
 	}
+#endif
+
 	rsetpeasants(r, peasants);
 }
 
