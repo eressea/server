@@ -29,6 +29,7 @@
 
 /* kernel includes */
 #include "message.h"
+#include "curse.h"
 #include "spell.h"
 #include "names.h"
 #include "faction.h"

@@ -245,7 +245,10 @@ canwalk(unit * u)
 	int wagen, maxwagen;
 	int pferde, maxpferde;
 
-	if (dragonrace(u->race)) return 0;
+	/* workaround: monsters are too stupid to drop items, therefore they have
+	 * infinite carrying capacity */
+
+	if (u->faction->no == 0) return 0;
 
 	wagen = get_item(u, I_WAGON);
 	pferde = get_item(u, I_HORSE);
@@ -932,19 +935,19 @@ travel(region * first, unit * u, region * next, int flucht)
 		cmistake(u, findorder(u, u->thisorder), 13, MSG_MOVE);
 		return NULL;
 	}
-	if (playerrace(u->race)) {
-		switch (canwalk(u)) {
-		case 1:
-			cmistake(u, findorder(u, u->thisorder), 57, MSG_MOVE);
-			return NULL;
-		case 2:
-			cmistake(u, findorder(u, u->thisorder), 56, MSG_MOVE);
-			return NULL;
-		case 3:
-			cmistake(u, findorder(u, u->thisorder), 42, MSG_MOVE);
-			return NULL;
-		}
+
+	switch (canwalk(u)) {
+	case 1:
+		cmistake(u, findorder(u, u->thisorder), 57, MSG_MOVE);
+		return NULL;
+	case 2:
+		cmistake(u, findorder(u, u->thisorder), 56, MSG_MOVE);
+		return NULL;
+	case 3:
+		cmistake(u, findorder(u, u->thisorder), 42, MSG_MOVE);
+		return NULL;
 	}
+
 	/* wir suchen so lange nach neuen Richtungen, wie es geht. Diese werden
 	 * dann nacheinander ausgeführt. */
 
