@@ -325,7 +325,6 @@ create_mage(unit * u, magic_t mtyp)
     a->data.v = mage;
   } else {
     mage = a->data.v;
-    assert(mage->magietyp == mtyp);
   }
 
 	mage->magietyp = mtyp;
