@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.17 2001/02/11 14:26:40 enno Exp $
+ *	$Id: laws.c,v 1.18 2001/02/11 15:16:04 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2150,6 +2150,7 @@ reorder_owners(region * r)
 				u->next = *up;
 				*up = u;
 			}
+			up = &u->next;
 		}
 		if (*useek==u) useek = &u->next;
 	}
