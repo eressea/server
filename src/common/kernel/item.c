@@ -798,7 +798,7 @@ destroy_curse_crystal(attrib **alist, int cast_level, int force)
 #endif
 
 /* ------------------------------------------------------------- */
-/* Kann auch von Nichtmagier benutzt werden, erzeugt eine
+/* Kann auch von Nichtmagiern benutzt werden, erzeugt eine
  * Antimagiezone, die zwei Runden bestehen bleibt */
 static void
 use_antimagiccrystal(region * r, unit * mage, int amount, strlist * cmdstrings)
@@ -841,7 +841,7 @@ use_antimagiccrystal(region * r, unit * mage, int amount, strlist * cmdstrings)
 			if(*ap) ap = &(*ap)->next;
 		}
 
-		if (force>0) {
+		if(force > 0) {
 			create_curse(mage, &r->attribs, ct_find("antimagiczone"), force, duration, effect, 0);
 		}
 
