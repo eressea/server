@@ -561,7 +561,7 @@ init_spellnames(const struct locale * lang)
 	sn->lang = lang;
 	for (i=0; spelldaten[i].id != SPL_NOSPELL; i++) {
 		const char * n = spelldaten[i].sname;
-		if (spelldaten[i].info==NULL) n = locale_string(lang, n);
+		if (spelldaten[i].info==NULL) n = locale_string(lang, mkname("spell", n));
 		addtoken(&sn->names, n, (void*)(spelldaten+i));
 	}
 	return spellnames = sn;
