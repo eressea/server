@@ -2317,7 +2317,7 @@
       <arg name="amount" type="int"/>
       <arg name="to" type="faction"/>
     </type>
-    <text locale="de">"$faction($from) gibt $faction($to) ein Almosen von $int($amount) Silber."</text>
+    <text locale="de">"$faction($from) gibt ein Almosen von $int($amount) Silber an $faction($to)."</text>
     <text locale="fr">"$faction($from) donates $int($amount) silver to $faction($to)."</text>
     <text locale="en">"$faction($from) donates $int($amount) silver to $faction($to)."</text>
   </message>
@@ -2424,7 +2424,7 @@
       <arg name="recipient" type="unit"/>
       <arg name="amount" type="int"/>
     </type>
-    <text locale="de">"$unit($unit) gibt $unit($recipient) $int($amount) Dumpfbackenbrot."</text>
+    <text locale="de">"$unit($unit) gibt $int($amount) Dumpfbackenbrot an $unit($recipient)."</text>
   </message>
   <message name="recruit" section="events">
     <type>

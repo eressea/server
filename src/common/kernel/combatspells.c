@@ -1377,7 +1377,6 @@ sp_denyattack(fighter * fi, int level, double power, spell * sp)
   }
   /* bewegung erst am Ende des Kampfes, zusammen mit den normalen
   * Flüchtlingen */
-	/* travel(r, mage, fi->run.region, 1); */
 
 	/* wir tun so, als wäre die Person geflohen */
 	fset(fi, FIG_NOLOOT);

@@ -1547,9 +1547,6 @@ readfaction(FILE * F)
   convertunique(f);
 #endif
   f->magiegebiet = (magic_t)ri(F);
-  if (!playerrace(f->race)) {
-    f->lastorders = turn+1;
-  }
   f->karma = ri(F);
   f->flags = ri(F);
   freset(f, FFL_OVERRIDE);

@@ -966,7 +966,54 @@ roadto(const region * r, direction_t dir)
   return true;
 }
 
-void
+static const char *
+direction_name(const region * from, const region * to, const struct locale * lang)
+{
+  direction_t dir = reldirection(from, to);
+  if (dir<MAXDIRECTIONS && dir>=0) return locale_string(lang, directions[dir]);
+  if (dir==D_SPECIAL) {
+    spec_direction *sd = special_direction(from, to);
+    return sd->keyword;
+  }
+  assert(!"invalid direction");
+  return NULL;
+}
+
+static int
+notify_followers(region * r, unit * target, const region_list * route)
+{
+  int followers = 0;
+  unit *up; 
+
+  for (up=r->units;up;up=up->next) {
+    if (fval(up, UFL_FOLLOWING) && !fval(up, UFL_LONGACTION)) {
+      const attrib * a = a_findc(up->attribs, &at_follow);
+      if (a && a->data.v==target) {
+        /* wir basteln ihm ein NACH */
+        const region_list * rlist = route;
+        region * from = r;
+
+        strcpy(buf, locale_string(up->faction->locale, keywords[K_MOVE]));
+        while (rlist!=NULL) {
+          strcat(strcat(buf, " "), direction_name(from, rlist->data, up->faction->locale));
+          from = rlist->data;
+          rlist = rlist->next;
+        }
+        set_order(&up->thisorder, parse_order(buf, up->faction->locale));
+        free_order(up->thisorder); /* parse_order & set_order have each increased the refcount */
+        ++followers;
+      }
+    }
+  }
+  return followers;
+}
+
+/** traveling without ships
+ * The travel unction returns the number of followers - in case it's non-null,
+ * the loop through the units in the region needs to be repeated
+ * to exceute the newly made MOVE commands of followers
+ */
+int
 travel(unit * u, region * next, int flucht, region_list ** routep)
 {
   region *first = u->region;
@@ -979,6 +1026,7 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
   region_list **iroute = &route;
   static boolean init = false;
   static const curse_type * speed_ct;
+  int followers = 0;
 
   if (routep) *routep = NULL;
   if (!init) { 
@@ -1000,38 +1048,38 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
   { /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
     if (!(u->race->flags & RCF_SWIM) && old_race(u->race) != RC_AQUARIAN) {
       cmistake(u, u->thisorder, 44, MSG_MOVE);
-      return;
+      return 0;
     } else {
       if (u->ship && get_item(u, I_HORSE) > 0) {
         cmistake(u, u->thisorder, 67, MSG_MOVE);
-        return;
+        return 0;
       }
     }
   } else if (rterrain(current)!=T_OCEAN) {
     /* An Land kein NACH wenn in dieser Runde Schiff VERLASSEN! */
     if (leftship(u) && is_guarded(current, u, GUARD_LANDING)) {
       cmistake(u, u->thisorder, 70, MSG_MOVE);
-      return;
+      return 0;
     }
     if (u->ship && !flucht && u->race->flags & RCF_SWIM) {
       cmistake(u, u->thisorder, 143, MSG_MOVE);
-      return;
+      return 0;
     }
   } else if (rterrain(next) == T_OCEAN && u->ship && fval(u->ship, SF_MOVED)) {
     cmistake(u, u->thisorder, 13, MSG_MOVE);
-    return;
+    return 0;
   }
 
   switch (canwalk(u)) {
     case 1:
       cmistake(u, u->thisorder, 57, MSG_MOVE);
-      return;
+      return 0;
     case 2:
       cmistake(u, u->thisorder, 56, MSG_MOVE);
-      return;
+      return 0;
     case 3:
       cmistake(u, u->thisorder, 42, MSG_MOVE);
-      return;
+      return 0;
   }
 
   /* wir suchen so lange nach neuen Richtungen, wie es geht. Diese werden
@@ -1156,7 +1204,7 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
           destroy_unit(u);
           if (routep) *routep = route;
           else free_regionlist(route);
-          return;
+          return 0;
         }
       }
       /* Ozeanfelder können nur von Einheiten mit Schwimmen und ohne
@@ -1290,7 +1338,9 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
                   if (can_survive(ut, current)) {
                     travel_route(ut, ut->region, route);
                     move_unit(ut, current, NULL);
-                    // FOLGE!
+                    if (fval(ut, UFL_FOLLOWED) && route!=NULL) {
+                      followers += notify_followers(first, ut, route);
+                    }
                   } else {
                     cmistake(u, u->thisorder, 287, MSG_MOVE);
                     cmistake(ut, ut->thisorder, 230, MSG_MOVE);
@@ -1326,7 +1376,7 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
   if (fval(u, UFL_FOLLOWING)) caught_target(current, u);
   if (routep) *routep = route;
   else free_regionlist(route);
-  return;
+  return followers;
 }
 
 static boolean
@@ -1711,19 +1761,6 @@ get_captain(const ship * sh)
   return NULL;
 }
 
-static const char *
-direction_name(const region * from, const region * to, const struct locale * lang)
-{
-  direction_t dir = reldirection(from, to);
-  if (dir<MAXDIRECTIONS && dir>=0) return locale_string(lang, directions[dir]);
-  if (dir==D_SPECIAL) {
-    spec_direction *sd = special_direction(from, to);
-    return sd->keyword;
-  }
-  assert(!"invalid direction");
-  return NULL;
-}
-
 /* Segeln, Wandern, Reiten 
 * when this routine returns a non-zero value, movement for the region needs 
 * to be done again because of followers that got new MOVE orders. 
@@ -1738,6 +1775,7 @@ move(unit * u, boolean move_on_land)
   region * r = u->region;
   region_list * route = NULL;
   region * r2 = movewhere(r, u);
+  int followers = 0;
 
   if (r2==NULL) {
     cmistake(u, u->thisorder, 71, MSG_MOVE);
@@ -1746,7 +1784,7 @@ move(unit * u, boolean move_on_land)
   else if (u->ship && fval(u, UFL_OWNER)) {
     route = sail(u, r2, move_on_land);
   } else {
-    travel(u, r2, 0, &route);
+    followers += travel(u, r2, 0, &route);
   }
 
   if (i_get(u->items, &it_demonseye)) {
@@ -1765,32 +1803,10 @@ move(unit * u, boolean move_on_land)
   set_order(&u->thisorder, NULL);
 
   if (fval(u, UFL_FOLLOWED) && route!=NULL) {
-    int followers = 0;
-    unit *up; 
-    for (up=r->units;up;up=up->next) {
-      if (fval(up, UFL_FOLLOWING) && !fval(up, UFL_LONGACTION)) {
-        const attrib * a = a_findc(up->attribs, &at_follow);
-        if (a && a->data.v==u) {
-          /* wir basteln ihm ein NACH */
-          region_list * rlist = route;
-          region * from = r;
-
-          strcpy(buf, locale_string(up->faction->locale, keywords[K_MOVE]));
-          while (rlist!=NULL) {
-            strcat(strcat(buf, " "), direction_name(from, rlist->data, up->faction->locale));
-            from = rlist->data;
-            rlist = rlist->next;
-          }
-          set_order(&up->thisorder, parse_order(buf, up->faction->locale));
-          free_order(up->thisorder); /* parse_order & set_order have each increased the refcount */
-          ++followers;
-        }
-      }
-    }
-    return followers;
+    return followers + notify_followers(r, u, route);
   }
   if (route!=NULL) free_regionlist(route);
-  return 0;
+  return followers;
 }
 
 typedef struct piracy_data {
