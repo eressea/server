@@ -33,7 +33,7 @@
 static boolean
 good_region(const region * r)
 {
-  return (rplane(r)==NULL && r->units!=NULL && r->land!=NULL);
+  return (!fval(r, RF_CHAOTIC) && r->age>30 && rplane(r)==NULL && r->units!=NULL && r->land!=NULL);
 }
 
 static int
@@ -78,11 +78,17 @@ wormhole_age(struct attrib * a)
   int maxtransport = 4;
 
   for (;u!=NULL && maxtransport!=0;u=u->next) {
+    message * m;
     if (u->number>maxtransport) continue;
     if (teure_talente(u)) continue;
     if (u->building!=data->entry) continue;
+
     move_unit(u, data->exit->region, NULL);
     maxtransport -= u->number;
+    m = msg_message("wormhole_exit", "unit region", u, data->exit);
+    add_message(&data->exit->region->msgs, m);
+    add_message(&u->faction->msgs, m);
+    msg_release(m);
   }
 
   destroy_building(data->entry);
@@ -130,7 +136,8 @@ make_wormhole(region * r1, region * r2)
   wormhole_data * d2 = (wormhole_data*)a2->data.v;
   d1->entry = d2->exit = b1;
   d2->entry = d1->exit = b2;
-  /* ADDMSG() */
+  ADDMSG(&r1->msgs, msg_message("wormhole_appear", "region", r1));
+  ADDMSG(&r2->msgs, msg_message("wormhole_appear", "region", r2));
 }
 
 void 
