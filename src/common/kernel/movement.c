@@ -1337,21 +1337,20 @@ travel(unit * u, region * next, int flucht, region_list ** routep)
       region_list *rlist = route;
 
       travelthru(u, first);
+
       while (rlist!=NULL) {
         region * r = rlist->data;
+        char * p;
 
         travelthru(u, r);
-        rlist=rlist->next;
-        if (rlist!=NULL) {
-          char * p;
-          if (r!=route->data) {
-            if (rlist->next==NULL) scat(" und ");
-            else scat(", ");
-          }
-
-          p = buf+strlen(buf);
-          MSG(("travelthru_trail", "region", rlist->data), p, sizeof(buf)-strlen(buf), u->faction->locale, u->faction);
+        if (rlist!=route) {
+          if (rlist->next==NULL) scat(" und ");
+          else scat(", ");
         }
+
+        p = buf+strlen(buf);
+        MSG(("travelthru_trail", "region", r), p, sizeof(buf)-strlen(buf), u->faction->locale, u->faction);
+        rlist = rlist->next;
       }
     }
     ADDMSG(&u->faction->msgs, msg_message("travel", 
