@@ -1861,7 +1861,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
 	spellparameter *par;
   int minlen = 0;
 
-  while (*c!=0) if (*c++!='+') ++minlen;
+  while (*c!=0) if (*c++!='+' && *c++!='k') ++minlen;
   c = syntax;
 
 	/* mindestens ein Ziel (Ziellose Zauber werden nicht
