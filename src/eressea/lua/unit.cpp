@@ -193,6 +193,30 @@ unit_setrace(unit& u, const char * rcname)
 }
 
 static void
+unit_castspell(unit& u, const char * name)
+{
+  spell_list * slist = spells;
+  while (slist!=NULL) {
+    spell * sp = slist->data;
+    if (strcmp(name, sp->sname)==0) {
+      castorder * co = (castorder*)malloc(sizeof(castorder));
+      co->distance = 0;
+      co->familiar = NULL;
+      co->force = sp->level;
+      co->level = sp->level;
+      co->magician = &u;
+      co->order = NULL;
+      co->par = NULL;
+      co->rt = u.region;
+      co->sp = sp;
+      sp->sp_function(co);
+      free(co);
+    }
+    slist=slist->next;
+  }
+}
+
+static void
 unit_addspell(unit& u, const char * name)
 {
   bool add = false;
@@ -556,6 +580,8 @@ bind_unit(lua_State * L)
     .def("set_racename", &unit_setracename)
     .def("add_spell", &unit_addspell)
     .def("remove_spell", &unit_removespell)
+    .def("cast_spell", &unit_castspell)
+
     .property("magic", &unit_getmagic, &unit_setmagic)
     .property("aura", &unit_getaura, &unit_setaura)
     .property("building", &unit_getbuilding, &unit_setbuilding)
