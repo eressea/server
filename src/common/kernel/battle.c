@@ -3230,8 +3230,8 @@ join_allies(battle * b)
 		for (si = 0; si != size; ++si) {
 			int se;
 			side *s = b->sides.begin[si];
-			/* Wenn alle attackierten noch FL_NOAID haben, dann kämpfe nicht mit. */
-			if (fval(s->bf->faction, FL_NOAID)) continue;
+			/* Wenn alle attackierten noch FL_NOAIDF haben, dann kämpfe nicht mit. */
+			if (fval(s->bf->faction, FL_NOAIDF)) continue;
 			if (s->bf->faction!=f) {
 				/* Wenn wir attackiert haben, kommt niemand mehr hinzu: */
 				if (s->bf->attacker) continue;
