@@ -4519,16 +4519,14 @@ static int
 sp_recruit(castorder *co)
 {
 	unit *u;
-	faction *f;
-	int n;
 	region *r = co->rt;
+  int n, maxp = rpeasants(r);
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double force = co->force;
+  faction *f = mage->faction;
 
-	f = mage->faction;
-
-	if (rpeasants(r) == 0){
+	if (maxp == 0) {
 		report_failure(mage, co->order);
 		return 0;
 	}
@@ -4539,22 +4537,26 @@ sp_recruit(castorder *co)
 	 * ein mehrfaches von Stufe 1, denn in beiden Fällen gibt es nur 1
 	 * Bauer, nur die Kosten steigen. */
 	n = (int)((pow(force, 1.6) * 100)/f->race->recruitcost);
-	n = min(rpeasants(r),n);
-	n = max(n, 1);
+  if (f->race==new_race[RC_URUK]) {
+    n = min(2*maxp, n);
+    n = max(n, 1);
+    rsetpeasants(r, maxp - (n+1) / 2);
+  } else {
+    n = min(maxp, n);
+    n = max(n, 1);
+    rsetpeasants(r, maxp - n);
+  }
 
-	if(n <= 0){
-		report_failure(mage, co->order);
-		return 0;
-	}
-
-	rsetpeasants(r, rpeasants(r) - n);
 	u = create_unit(r, f, n, f->race, 0, (n == 1 ? "Bauer" : "Bauern"), mage);
 	set_order(&u->thisorder, default_order(f->locale));
 
 	sprintf(buf, "%s konnte %d %s anwerben", unitname(mage), n,
 			n == 1 ? "Bauer" : "Bauern");
 	addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
-	return cast_level;
+
+  if (f->race==new_race[RC_URUK]) n = (n+1) / 2;
+  
+  return cast_level;
 }
 
 /* ------------------------------------------------------------- */
@@ -4570,31 +4572,31 @@ static int
 sp_bigrecruit(castorder *co)
 {
 	unit *u;
-	faction *f;
-	int n;
 	region *r = co->rt;
+  int n, maxp = rpeasants(r);
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	double force = co->force;
+  faction *f = mage->faction;
 
-	f = mage->faction;
-
-	if (rpeasants(r) == 0){
+	if (maxp <= 0) {
 		report_failure(mage, co->order);
 		return 0;
 	}
 	/* Für vergleichbare Erfolge bei unterschiedlichen Rassen die
 	 * Rekrutierungskosten mit einfliessen lassen. */
-	n = (int)force + lovar((force * force * 1000)/f->race->recruitcost);
-	/* natürlich nur maximal soviele Bauern, wie auch in der Region sind */
-	n = min(rpeasants(r), n);
 
-	if (n <= 0) {
-		report_failure(mage, co->order);
-		return 0;
-	}
+  n = (int)force + lovar((force * force * 1000)/f->race->recruitcost);
+  if (f->race==new_race[RC_URUK]) {
+    n = min(2*maxp, n);
+    n = max(n, 1);
+    rsetpeasants(r, maxp - (n+1) / 2);
+  } else {
+    n = min(maxp, n);
+    n = max(n, 1);
+    rsetpeasants(r, maxp - n);
+  }
 
-	rsetpeasants(r, rpeasants(r) - n);
 	u = create_unit(r, f, n, f->race, 0, (n == 1 ? "Bauer" : "Bauern"), mage);
 	set_order(&u->thisorder, default_order(f->locale));
 
