@@ -1086,7 +1086,7 @@ readunit(FILE * F)
 	/* Kurze persistente Befehle einlesen */
 	free_orders(&u->orders);
 	freadstr(F, buf, sizeof(buf));
-	while(*buf != 0) {
+	while (*buf != 0) {
     order * ord = parse_order(buf, u->faction->locale);
     if (ord!=NULL) addlist(&u->orders, ord);
 		freadstr(F, buf, sizeof(buf));
@@ -1198,7 +1198,10 @@ writeunit(FILE * F, const unit * u)
       fputc(' ', F);
 	  }
 	}
+  /* write an empty string to terminate the list */
+  fwriteorder(F, NULL, u->faction->locale);
 	wnl(F);
+  /* the current default order */
 	fwriteorder(F, u->lastorder, u->faction->locale);
 	wnl(F);
 
