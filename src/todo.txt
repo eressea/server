@@ -51,8 +51,6 @@ unterschiede in vin3 + wdw per config statt defines?
 
   #define WDW_PHOENIX
   #define WDW_PYRAMIDSPE
-  LL
-  #define NEW_STARTEQUIPMENT
 
   #define ARENA_MODULE
   #define WORMHOLE_MODULE

@@ -1836,7 +1836,7 @@ readgame(const char * filename, int backup)
     int y = ri(F);
     plane * pl = findplane(x, y);
 
-    if (firstx && firsty) {
+    if (firstx || firsty) {
       if (x!=firstx || y!=firsty) {
         skip = true;
       } else {

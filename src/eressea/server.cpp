@@ -652,7 +652,7 @@ main(int argc, char *argv[])
   sqlpatch = true;
   log_open("eressea.log");
   printf("\n%s PBEM host\n"
-    "Copyright (C) 1996-2004 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
+    "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
     "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
 
   setlocale(LC_ALL, "");

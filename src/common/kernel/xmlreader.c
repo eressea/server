@@ -712,6 +712,43 @@ parse_resources(xmlDocPtr doc)
 }
 
 static int
+parse_equipment(xmlDocPtr doc)
+{
+  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
+  xmlXPathObjectPtr items;
+  xmlNodeSetPtr nodes;
+  int i;
+
+  /* reading eressea/races/race */
+  items = xmlXPathEvalExpression(BAD_CAST "/eressea/equipment/item", xpath);
+  nodes = items->nodesetval;
+
+  for (i=0;i!=nodes->nodeNr;++i) {
+    xmlNodePtr node = nodes->nodeTab[i];
+    xmlChar * property;
+    const struct item_type * itype;
+
+    property = xmlGetProp(node, BAD_CAST "name");
+    assert(property!=NULL);
+    itype = it_find((const char*)property);
+    xmlFree(property);
+    if (itype!=NULL) {
+      int num = 0;
+      property = xmlGetProp(node, BAD_CAST "amount");
+      if (property!=NULL) {
+        num = atoi((const char*)property);
+        xmlFree(property);
+      }
+      add_equipment(itype, num);
+    }
+  }
+  xmlXPathFreeObject(items);
+  xmlXPathFreeContext(xpath);
+
+  return 0;
+}
+
+static int
 parse_races(xmlDocPtr doc)
 {
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -1201,4 +1238,5 @@ register_xmlreader(void)
   xml_register_callback(parse_resources);
   xml_register_callback(parse_buildings);
   xml_register_callback(parse_ships);
+  xml_register_callback(parse_equipment);
 }

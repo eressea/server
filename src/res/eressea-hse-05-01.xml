@@ -15,6 +15,10 @@
   <xi:include file="alchemy.xml"/>
   <xi:include file="technologies.xml"/>
   <xi:include file="skills.xml"/>
+  <equipment>
+    <item name="wood" amount="5"/>
+    <item name="stone" amount="10"/>
+  </equipment>
 
   <game name="HSE" welcome="eressea">
     <comment>Game specific</comment>

@@ -24,7 +24,8 @@
 #include "spy.h"
 
 /* kernel includes */
-#include "build.h"
+#include <kernel/build.h>
+#include <kernel/reports.h>
 #include "economy.h"
 #include "item.h"
 #include "karma.h"
@@ -236,16 +237,15 @@ setstealth_cmd(unit * u, struct order * ord)
           while (mu!=NULL) {
             unit * ru = mu->region->units;
             if (mu->region!=lastr) {
+              lastr = mu->region;
               while (ru!=NULL) {
-                attrib *a = a_find(ru->attribs, &at_otherfaction);
-                if (a) {
-                  faction *fv = get_otherfaction(a);
-                  if (fv==f) break;
+                faction * fv = visible_faction(f, ru);
+                if (fv==f) {
+                  if (cansee(f, lastr, ru, 0)) break;
                 }
                 ru = ru->next;
               }
               if (ru!=NULL) break;
-              lastr = mu->region;
             }
             mu = mu->nextF;
           }

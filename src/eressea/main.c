@@ -632,13 +632,6 @@ main(int argc, char *argv[])
   i = readgame(zText, false);
   if (i!=0) return i;
 
-#ifdef NEW_STARTEQUIPMENT
-  add_equipment(it_find("conquesttoken"), 1);
-  add_equipment(it_find("wood"), 30);
-  add_equipment(it_find("stone"), 30);
-  add_equipment(it_find("money"), 2000 + turn * 10);
-#endif
-  
   confirm_newbies();
 	update_subscriptions();
 	{

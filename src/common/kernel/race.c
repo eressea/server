@@ -181,21 +181,12 @@ void add_equipment(const item_type * itype, int number)
 void
 give_starting_equipment(struct region *r, struct unit *u)
 {
-#ifdef NEW_STARTEQUIPMENT
   item * itm = equipment;
   while (itm!=NULL) {
     i_add(&u->items, i_new(itm->type, itm->number));
     itm=itm->next;
   }
-#else
-  const item_type * token = it_find("conquesttoken");
-  if (token!=NULL) {
-    i_add(&u->items, i_new(token, 1));
-  }
-  set_item(u, I_WOOD, 30);
-  set_item(u, I_STONE, 30);
-  set_money(u, 2000 + turn * 10);
-#endif
+  set_money(u, turn * 10);
 
 	switch(old_race(u->race)) {
 	case RC_DWARF:

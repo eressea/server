@@ -3694,7 +3694,7 @@ processorders (void)
 
   parse(K_MAIL, prepare_mail_cmd, false);
   parse(K_MAIL, mail_cmd, false);
-  puts(" - Altern");
+  puts(" - Parteien altern");
   age_factions();
 
   puts(" - Benutzen");

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<equipment>
+ <item name="conquesttoken" amount="1"/>
+ <item name="wood" amount="30"/>
+ <item name="stone" amount="30"/>
+ <item name="money" amount="2000"/>
+</equipment>
+
