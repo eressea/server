@@ -3356,6 +3356,7 @@ fwritestr(FILE * F, const char * str)
   while (*str) {
     int c = (int)(unsigned char)*str++;
     switch (c) {
+      case '"':
       case '\\':
         fputc('\\', F);
         fputc(c, F);

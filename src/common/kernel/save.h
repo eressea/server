@@ -74,6 +74,8 @@ extern struct region * readregion(FILE * stream, int x, int y);
 extern void writefaction(FILE * stream, const struct faction * f);
 extern struct faction * readfaction(FILE * stream);
 
+extern void fwriteorder(FILE * F, const struct order * ord, const struct locale * lang);
+
 #ifdef __cplusplus
 }
 #endif

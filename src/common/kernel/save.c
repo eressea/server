@@ -988,18 +988,10 @@ write_faction_reference(const faction * f, FILE * F)
 }
 
 void
-fwrite_order(const order * ord, const struct locale * lang, FILE * F)
+fwriteorder(FILE * F, const order * ord, const struct locale * lang)
 {
-	write_order(ord, lang, buf, sizeof(buf));
-	fputs(buf, F);
-}
-
-static void
-writeorder(const order * ord, const struct locale * lang, FILE * F)
-{
-	fputc('\"', F);
-	fwrite_order(ord, lang, F);
-	fputs("\" ", F);
+  write_order(ord, lang, buf, sizeof(buf));
+	fwritestr(F, buf);
 }
 
 unit *
@@ -1093,11 +1085,11 @@ readunit(FILE * F)
 		u->flags = ri(F) & ~UFL_DEBUG;
 	/* Kurze persistente Befehle einlesen */
 	free_orders(&u->orders);
-	rs(F, buf);
+	freadstr(F, buf, sizeof(buf));
 	while(*buf != 0) {
     order * ord = parse_order(buf, u->faction->locale);
     if (ord!=NULL) addlist(&u->orders, ord);
-		rs(F, buf);
+		freadstr(F, buf, sizeof(buf));
 	}
   rs(F, buf);
   u->lastorder = parse_order(buf, u->faction->locale);
@@ -1202,11 +1194,12 @@ writeunit(FILE * F, const unit * u)
 	wnl(F);
 	for (ord = u->orders; ord; ord=ord->next) {
 	  if (is_persistent(ord)) {
-		writeorder(ord, u->faction->locale, F);
+      fwriteorder(F, ord, u->faction->locale);
+      fputc(' ', F);
 	  }
 	}
-	ws(F, ""); /* Abschluß der persistenten Befehle */
-	writeorder(u->lastorder, u->faction->locale, F);
+	wnl(F);
+	fwriteorder(F, u->lastorder, u->faction->locale);
 	wnl(F);
 
 	assert(u->number >= 0);

@@ -489,9 +489,8 @@ render_messages(FILE * F, faction * f, message_list *msgs)
 		if (nr_render(m->msg, f->locale, nrbuffer, sizeof(nrbuffer), f)==0 && nrbuffer[0]) {
 			fprintf(F, "MESSAGE %u\n", (unsigned int)m->msg);/*++msgno); */
 			fprintf(F, "%d;type\n", hash);
-			fputs("\"", F);
-			fputs(nrbuffer, F);
-			fputs("\";rendered\n", F);
+      fwritestr(F, nrbuffer);
+			fputs(";rendered\n", F);
 			printed = true;
 		}
 #endif
@@ -700,7 +699,6 @@ cr_output_unit(FILE * F, const region * r,
   if (u->faction == f || omniscient(f)) {
     order * ord;
     const char *c;
-    char * cmd;
     int i;
     const attrib * a;
 
@@ -738,15 +736,13 @@ cr_output_unit(FILE * F, const region * r,
     /* default commands */
     fprintf(F, "COMMANDS\n");
     if (u->lastorder) {
-      cmd = getcommand(u->lastorder);
-      fprintf(F, "\"%s\"\n", cmd);
-      free(cmd);
+      fwriteorder(F, u->lastorder, f->locale);
+      fputc('\n', F);
     }
     for (ord = u->orders; ord; ord = ord->next) {
       if (is_persistent(ord) && ord!=u->lastorder) {
-        cmd = getcommand(ord);
-        fprintf(F, "\"%s\"\n", cmd);
-        free(cmd);
+        fwriteorder(F, ord, f->locale);
+        fputc('\n', F);
       }
     }
 

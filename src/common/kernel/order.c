@@ -163,7 +163,7 @@ write_order(const order * ord, const struct locale * lang, char * buffer, size_t
   } else {
     char * s = getcommand(ord);
     strncpy(buffer, s, size);
-	free(s);
+    free(s);
   }
   return buffer;
 }
