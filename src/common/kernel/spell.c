@@ -7223,6 +7223,7 @@ sp_becomewyrm(castorder *co)
 	return co->level;
 }
 
+#ifdef WDW_PYRAMIDSPELL
 /* ------------------------------------------------------------- */
 /* Name:       WDW-Pyramidenfindezauber
  * Stufe:      unterschiedlich
@@ -7258,7 +7259,7 @@ sp_wdwpyramid(castorder *co)
 
 	return cast_level;
 }
-
+#endif
 
 /* ------------------------------------------------------------- */
 /* Name:       Alltagszauber, hat je nach Gebiet anderen Namen
