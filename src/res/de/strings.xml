@@ -51,6 +51,44 @@
 		<text locale="en">flame</text>
 	</string>
 
+	<string name="nr_trade_intro">
+		<text locale="de">Geboten wird für</text>
+		<text locale="en">Traders can sell</text>
+	</string>
+	<string name="nr_trade_final">
+		<text locale="de">und für</text>
+		<text locale="en">and</text>
+	</string>
+	<string name="nr_trade_end">
+		<text locale="de">.</text>
+		<text locale="en">.</text>
+	</string>
+	<string name="nr_trade_next">
+		<text locale="de">, für</text>
+		<text locale="en">,</text>
+	</string>
+
+	<string name="nr_nb_next">
+		<text locale="de">, im </text>
+		<text locale="en">, to the </text>
+	</string>
+	<string name="nr_nb_final">
+		<text locale="de">und im </text>
+		<text locale="en">and to the </text>
+	</string>
+	<string name="unitdefault">
+		<text locale="de">Einheit</text>
+		<text locale="en">Unit</text>
+	</string>
+	<string name="factiondefault">
+		<text locale="de">Partei</text>
+		<text locale="en">Faction</text>
+	</string>
+	<string name="enterpasswd">
+		<text locale="de">hier_passwort_eintragen</text>
+		<text locale="en">insert_your_password_here</text>
+	</string>
+
 	<string name="prefix_ice">
 		<text locale="de">Eis</text>
 		<text locale="en">ice</text>
@@ -5098,6 +5136,133 @@
 		</string>
 
 	</namespace>
+	<namespace name="calendar">
+		<string name="winter">
+			<text locale="de">Winter</text>
+			<text locale="en">winter</text>
+		</string>
+		<string name="summer">
+			<text locale="de">Sommer</text>
+			<text locale="en">summer</text>
+		</string>
+		<string name="spring">
+			<text locale="de">Frühling</text>
+			<text locale="en">spring</text>
+		</string>
+		<string name="fall">
+			<text locale="de">Herbst</text>
+			<text locale="en">fall</text>
+		</string>
+		<string name="firstweek">
+			<text locale="de">die erste Woche</text>
+			<text locale="en">the first week</text>
+		</string>
+		<string name="secondweek">
+			<text locale="de">die zweite Woche</text>
+			<text locale="en">the second week</text>
+		</string>
+		<string name="thirdweek">
+			<text locale="de">die letzte Woche</text>
+			<text locale="en">the last week</text>
+		</string>
+		<string name="firstweek_d">
+			<text locale="de">der ersten Woche</text>
+			<text locale="en">of the first week</text>
+		</string>
+		<string name="secondweek_d">
+			<text locale="de">der zweiten Woche</text>
+			<text locale="en">of the second week</text>
+		</string>
+		<string name="thirdweek_d">
+			<text locale="de">der letzten Woche</text>
+			<text locale="en">of the third week</text>
+		</string>
+		<string name="month_1">
+			<text locale="de">Feldsegen</text>
+			<text locale="en">harvest moon</text>
+		</string>
+		<string name="month_2">
+			<text locale="de">Nebetage</text>
+			<text locale="en">impenetrable fog</text>
+		</string>
+		<string name="month_3">
+			<text locale="de">Sturmmond</text>
+			<text locale="en">storm moon</text>
+		</string>
+		<string name="month_4">
+			<text locale="de">Herdfeuer</text>
+			<text locale="en">hearth fire</text>
+		</string>
+		<string name="month_5">
+			<text locale="de">Eiswind</text>
+			<text locale="en">icewind</text>
+		</string>
+		<string name="month_6">
+			<text locale="de">Schneeban</text>
+			<text locale="en">snowbane</text>
+		</string>
+		<string name="month_7">
+			<text locale="de">Blütenregen</text>
+			<text locale="en">flowerrain</text>
+		</string>
+		<string name="month_8">
+			<text locale="de">Mond der milden Winde</text>
+			<text locale="en">mild winds</text>
+		</string>
+		<string name="month_9">
+			<text locale="de">Sonnenfeuer</text>
+			<text locale="en">sunfire</text>
+		</string>
+		<string name="secondage">
+			<text locale="de">des zweiten Zeitalters</text>
+			<text locale="en">the second age</text>
+		</string>
+	</namespace>
+
+	<namespace name="school">
+		<string name="nomagic">
+			<text locale="de">Kein Magiegebiet</text>
+			<text locale="en">no magic school yet</text>
+		</string>
+		<string name="illaun">
+			<text locale="de">Illaun</text>
+			<text locale="en">Illaun</text>
+		</string>
+		<string name="tybied">
+			<text locale="de">Tybied</text>
+			<text locale="en">Tybied</text>
+		</string>
+		<string name="gwyrrd">
+			<text locale="de">Gwyrrd</text>
+			<text locale="en">Gwyrrd</text>
+		</string>
+		<string name="cerrdor">
+			<text locale="de">Cerrdor</text>
+			<text locale="en">Cerrdor</text>
+		</string>
+		<string name="draig">
+			<text locale="de">Draig</text>
+			<text locale="en">Draig</text>
+		</string>
+	</namespace>
+
+	<string name="nr_tree">
+		<text locale="de">Baum</text>
+		<text locale="en">tree</text>
+	</string>
+	<string name="nr_tree_p">
+		<text locale="de">Bäume</text>
+		<text locale="en">trees</text>
+	</string>
+
+	<string name="nr_mallorntree">
+		<text locale="de">Mallornbaum</text>
+		<text locale="en">mallorn tree</text>
+	</string>
+	<string name="nr_mallorntree_p">
+		<text locale="de">Mallornäume</text>
+		<text locale="en">mallorn trees</text>
+	</string>
 </strings>
 
 

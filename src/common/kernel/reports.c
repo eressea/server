@@ -620,7 +620,7 @@ spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh,
 
 	if (sk == SK_MAGIC){
 		if (find_magetype(u) != M_GRAU){
-			sbuf += sprintf(sbuf, "%s ", magietypen[find_magetype(u)]);
+			sbuf += sprintf(sbuf, "%s ", LOC(lang, magietypen[find_magetype(u)]));
 		}
 	}
 
@@ -725,7 +725,7 @@ spy_message(int spy, unit *u, unit *target)
 			int found = 0;
 
 			scat("Magiegebiet: ");
-			scat(magietypen[find_magetype(target)]);
+			scat(LOC(u->faction->locale, magietypen[find_magetype(target)]));
 			if (get_mage(target)) {
 				scat(", Sprüche: ");
 
@@ -835,7 +835,7 @@ spy_message(int spy, unit *u, unit *target)
 		scat(".");
 	}
 
-	ADDMSG(&u->faction->msgs, msg_message("spyreport", 
+	ADDMSG(&u->faction->msgs, msg_message("spyreport",
 		"spy target report", u, target, strdup(buf)));
 }
 

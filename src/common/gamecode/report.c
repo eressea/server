@@ -121,7 +121,7 @@ read_datenames(const char *filename)
 	fgets(line,255,namesFP);
 	l = strlen(line)-1;
 	if(line[l] == '\n') line[l] = 0;
-	agename = strdup(line);
+	agename = strdup(mkname("calendar", line));
 
 	fgets(line,255,namesFP);
 	seasons = strtol(line, NULL, 10);
@@ -131,7 +131,7 @@ read_datenames(const char *filename)
 		fgets(line,255,namesFP);
 		l = strlen(line)-1;
 		if(line[l] == '\n') line[l] = 0;
-		seasonnames[i] = strdup(line);
+		seasonnames[i] = strdup(mkname("calendar", line));
 	}
 
 	fgets(line,255,namesFP);
@@ -147,9 +147,9 @@ read_datenames(const char *filename)
 		if(line[l] == '\n') line[l] = 0;
 
 		np = strtok(line,":");
-		weeknames[i] = strdup(np);
+		weeknames[i] = strdup(mkname("calendar", np));
 		np = strtok(NULL,":");
-		weeknames2[i] = strdup(np);
+		weeknames2[i] = strdup(mkname("calendar", np));
 	}
 
 	fgets(line,255,namesFP);
@@ -165,7 +165,7 @@ read_datenames(const char *filename)
 		if(line[l] == '\n') line[l] = 0;
 
 		np = strtok(line,":");
-		monthnames[i] = strdup(np);
+		monthnames[i] = strdup(mkname("calendar", np));
 		month_season[i] = atoi(strtok(NULL,":"));
 		storms[i] = atoi(strtok(NULL,":"));
 	}
@@ -202,10 +202,10 @@ gamedate(const struct locale * lang)
 	month = r/weeks_per_month;
 	week  = r%weeks_per_month;
 	sprintf(buf, LOC(lang, "nr_calendar"),
-		weeknames[week],
-		monthnames[month],
-		year,
-		agename);
+		LOC(lang, weeknames[week]),
+		LOC(lang, monthnames[month]),
+		LOC(lang, year),
+		LOC(lang, agename));
 
 	return buf;
 }
@@ -226,10 +226,10 @@ gamedate_season(const struct locale * lang)
 	month = r/weeks_per_month;
 	week  = r%weeks_per_month;
 	sprintf(buf, LOC(lang, "nr_calendar_season"),
-		weeknames[week],
-		monthnames[month],
+		LOC(lang, weeknames[week]),
+		LOC(lang, monthnames[month]),
 		year,
-		agename,
+		LOC(lang, agename),
 		LOC(lang, seasonnames[month_season[month]]));
 
 	return buf;
@@ -955,6 +955,7 @@ prices(FILE * F, const region * r, const faction * f)
 {
 	const luxury_type *sale=NULL;
 	struct demand * dmd;
+	message * m;
 	int n = 0;
 
 	if (r->land==NULL || r->land->demands==NULL) return;
@@ -964,24 +965,35 @@ prices(FILE * F, const region * r, const faction * f)
 	}
 	assert(sale!=NULL);
 
-	sprintf(buf, "Auf dem Markt wird für %s %d Silber verlangt.",
-		LOC(f->locale, resourcename(sale->itype->rtype, GR_PLURAL)),
-		sale->price);
+	m = msg_message("nr_market_sale", "product price",
+		sale->itype->rtype, sale->price);
+	nr_render(m, f->locale, buf, sizeof(buf), f);
+	msg_release(m);
 
-	if(n > 0) scat(" Geboten wird für ");
+	if(n > 0) {
+		scat(" ");
+		scat(LOC(f->locale, "nr_trade_intro"));
+		scat(" ");
 
-	for (dmd=r->land->demands;dmd;dmd=dmd->next) if(dmd->value > 0) {
-		char sbuf[80];
-		sprintf(sbuf, "%s %d Silber", LOC(f->locale,
-			resourcename(dmd->type->itype->rtype, GR_PLURAL)),
-			dmd->value * dmd->type->price);
-		scat(sbuf);
-		n--;
-		if (n == 0) scat(".");
-		else if (n == 1) scat(" und für ");
-		else scat(", für ");
+		for (dmd=r->land->demands;dmd;dmd=dmd->next) if(dmd->value > 0) {
+			char sbuf[80];
+			m = msg_message("nr_market_price", "product price",
+				dmd->type->itype->rtype, dmd->value * dmd->type->price);
+			nr_render(m, f->locale, sbuf, sizeof(sbuf), f);
+			msg_release(m);
+			scat(sbuf);
+			n--;
+			if (n == 0) scat(LOC(f->locale, "nr_trade_end"));
+			else if (n == 1) {
+				scat(" ");
+				scat(LOC(f->locale, "nr_trade_final"));
+				scat(" ");
+			} else {
+				scat(LOC(f->locale, "nr_trade_next"));
+				scat(" ");
+			}
+		}
 	}
-
 	/* Schreibe Paragraphen */
 	rparagraph(F, buf, 0, 0);
 
@@ -1135,14 +1147,14 @@ describe(FILE * F, const region * r, int partial, faction * f)
 			scat(" ");
 			if (fval(r, RF_MALLORN)) {
 				if (trees == 1)
-					scat(LOC(f->locale, "mallorntree"));
+					scat(LOC(f->locale, "nr_mallorntree"));
 				else
-					scat(LOC(f->locale, "mallorntree_p"));
+					scat(LOC(f->locale, "nr_mallorntree_p"));
 			}
 			else if (trees == 1)
-				scat(LOC(f->locale, "tree"));
+				scat(LOC(f->locale, "nr_tree"));
 			else
-				scat(LOC(f->locale, "tree_p"));
+				scat(LOC(f->locale, "nr_tree_p"));
 		}
 	}
 #else
@@ -1153,14 +1165,14 @@ describe(FILE * F, const region * r, int partial, faction * f)
 		scat(" ");
 		if (fval(r, RF_MALLORN)) {
 			if (trees == 1)
-				scat(LOC(f->locale, "mallorntree"));
+				scat(LOC(f->locale, "nr_mallorntree"));
 			else
-				scat(LOC(f->locale, "mallorntree_p"));
+				scat(LOC(f->locale, "nr_mallorntree_p"));
 		}
 		else if (trees == 1)
-			scat(LOC(f->locale, "tree"));
+			scat(LOC(f->locale, "nr_tree"));
 		else
-			scat(LOC(f->locale, "tree_p"));
+			scat(LOC(f->locale, "nr_tree_p"));
 	}
 #endif
 
@@ -1226,7 +1238,8 @@ describe(FILE * F, const region * r, int partial, faction * f)
 		icat(rpeasants(r));
 
 		if(fval(r, RF_ORCIFIED)) {
-			scat(rpeasants(r)==1?" Ork":" Orks");
+			scat(" ");
+			scat(LOC(f->locale, rpeasants(r)==1?"rc_orc":"rc_orc_p"));
 		} else {
 			scat(" ");
 			scat(LOC(f->locale, resourcename(oldresourcetype[R_PEASANTS], rpeasants(r)!=1)));
@@ -1282,11 +1295,14 @@ describe(FILE * F, const region * r, int partial, faction * f)
 				if(!r2) continue;
 				nrd--;
 				if (dh) {
-					if (nrd == 0) scat(" und im ");
-					else scat(", im ");
+					if (nrd == 0) {
+						scat(" ");
+						scat(LOC(f->locale, "nr_nb_final"));
+					} else {
+						scat(LOC(f->locale, "nr_nb_next"));
+					}
 					scat(LOC(f->locale, directions[d]));
 					scat(" ");
-					if (!dh) scat("der Region liegt ");
 					sprintf(dbuf, trailinto(r2, f->locale),
 							f_regionid(r2, f));
 					scat(dbuf);
@@ -1519,7 +1535,7 @@ order_template(FILE * F, faction * f)
 	rps_nowrap(F, "");
 	rnl(F);
 
-	sprintf(buf, "%s %s \"hier_passwort_eintragen\"", LOC(f->locale, "ERESSEA"), factionid(f));
+	sprintf(buf, "%s %s \"%s\"", LOC(f->locale, "ERESSEA"), factionid(f), LOC(f->locale, "enterpasswd"));
 	rps_nowrap(F, buf);
 	rnl(F);
 
@@ -1893,8 +1909,11 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	else
 		printf(" - Schreibe Report\n");
 
-	sprintf(buf, "Report für %s, %s", global.gamename, pzTime);
+	m = msg_message("nr_header_date", "game date", global.gamename, pzTime);
+	nr_render(m, f->locale, buf, sizeof(buf), f);
+	msg_release(m);
 	centre(F, buf, true);
+
 	centre(F, gamedate_season(f->locale), true);
 	rnl(F);
 	sprintf(buf, "%s, %s/%s (%s)", factionname(f),
@@ -3649,7 +3668,7 @@ report_summary(summary * s, summary * o, boolean full)
 		}
 	}
 #endif
-	
+
 	fclose(F);
 
 	if (full) {

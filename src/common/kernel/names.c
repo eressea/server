@@ -26,6 +26,7 @@
 /* kernel includes */
 #include "unit.h"
 #include "region.h"
+#include "faction.h"
 #include "magic.h"
 #include "race.h"
 
@@ -712,7 +713,7 @@ name_unit(unit *u)
 	if (u->race->generate_name) {
 		set_string(&u->name, (u->race->generate_name(u)));
 	} else {
-		sprintf(name, "Nummer %s", itoa36(u->no));
+		sprintf(name, "%s %s", LOC(u->faction->locale, "unitdefault"), itoa36(u->no));
 		set_string(&u->name, name);
 		fset(u, FL_UNNAMED);
 	}

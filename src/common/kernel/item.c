@@ -2098,7 +2098,7 @@ typedef struct xml_state {
 	int wmods;
 } xml_state;
 
-static int 
+static int
 tagend(struct xml_stack * stack)
 {
 	const xml_tag * tag = stack->tag;
@@ -2109,7 +2109,7 @@ tagend(struct xml_stack * stack)
 	return XML_OK;
 }
 
-static int 
+static int
 tagbegin(struct xml_stack * stack)
 {
 	const xml_tag * tag = stack->tag;
@@ -2597,6 +2597,9 @@ resname(resource_t res, int index)
 void
 register_resources(void)
 {
+
+	register_function((pf_generic)limit_oldtypes, "limit_oldtypes");
+	register_function((pf_generic)mod_elves_only, "mod_elves_only");
 	register_function((pf_generic)res_changeitem, "changeitem");
 	register_function((pf_generic)res_changeperson, "changeperson");
 	register_function((pf_generic)res_changepeasants, "changepeasants");

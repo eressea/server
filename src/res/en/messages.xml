@@ -774,7 +774,7 @@
 		</type>
 		<locale name="en">
 			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - The party could not be found."</text>
+				<text>"$unit($unit) in $region($region): '$command' - The faction could not be found."</text>
 			</nr>
 		</locale>
 	</message>
@@ -813,7 +813,7 @@
 		</type>
 		<locale name="en">
 			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - This region is guarded by a non allied party."</text>
+				<text>"$unit($unit) in $region($region): '$command' - This region is guarded by a non allied faction."</text>
 			</nr>
 		</locale>
 	</message>
@@ -1541,7 +1541,7 @@
 		</type>
 		<locale name="en">
 			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Your party cannot hire so many strangers."</text>
+				<text>"$unit($unit) in $region($region): '$command' - Your faction cannot hire so many strangers."</text>
 			</nr>
 		</locale>
 	</message>
@@ -1554,7 +1554,7 @@
 		</type>
 		<locale name="en">
 			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - The party cannot hire so many strangers."</text>
+				<text>"$unit($unit) in $region($region): '$command' - The faction cannot hire so many strangers."</text>
 			</nr>
 		</locale>
 	</message>
@@ -1567,7 +1567,7 @@
 		</type>
 		<locale name="en">
 			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - The party cannot hire so many strangers."</text>
+				<text>"$unit($unit) in $region($region): '$command' - The faction cannot hire so many strangers."</text>
 			</nr>
 		</locale>
 	</message>
@@ -1879,7 +1879,7 @@
 		</type>
 		<locale name="en">
 			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Too many magicians in the party."</text>
+				<text>"$unit($unit) in $region($region): '$command' - Too many magicians in the faction."</text>
 			</nr>
 		</locale>
 	</message>
@@ -1892,7 +1892,7 @@
 		</type>
 		<locale name="en">
 			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Too many alchemists in the party."</text>
+				<text>"$unit($unit) in $region($region): '$command' - Too many alchemists in the faction."</text>
 			</nr>
 		</locale>
 	</message>
@@ -1905,7 +1905,7 @@
 		</type>
 		<locale name="en">
 			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - The party has a different magic sphere."</text>
+				<text>"$unit($unit) in $region($region): '$command' - The faction has a different magic sphere."</text>
 			</nr>
 		</locale>
 	</message>
@@ -3416,7 +3416,7 @@
 		</type>
 		<locale name="en">
 			<nr section="none">
-				<text>"Your party is immune against assaults for $int($turns) more weeks."</text>
+				<text>"Your faction is immune against assaults for $int($turns) more weeks."</text>
 			</nr>
 		</locale>
 	</message>

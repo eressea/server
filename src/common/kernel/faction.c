@@ -117,7 +117,7 @@ addplayer(region *r, const char *email, const char * password, const struct race
 
 	f->unique_id = ++max_unique_id;
 
-	sprintf(buf, "Partei %s", factionid(f));
+	sprintf(buf, "%s %s", LOC(loc, "factiondefault"), factionid(f));
 	set_string(&f->name, buf);
 	fset(f, FL_UNNAMED);
 
@@ -138,7 +138,7 @@ addplayer(region *r, const char *email, const char * password, const struct race
 	return u;
 }
 
-boolean 
+boolean
 checkpasswd(const faction * f, const char * passwd)
 {
 	if (strcasecmp(f->passw, passwd)==0) return true;

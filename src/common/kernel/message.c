@@ -299,6 +299,10 @@ arg_set(void * args[], const message_type * mtype, const char * buffer, void * v
 		if (!strcmp(buffer, mtype->pnames[i])) break;
 	}
 	if (i!=mtype->nparameters) args[i] = v;
+	else {
+		fprintf(stderr, "invalid parameter %s for message type %s\n", buffer, mtype->name);
+		assert(!"program aborted.");
+	}
 }
 
 struct message * 

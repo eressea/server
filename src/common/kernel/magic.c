@@ -64,12 +64,12 @@
 
 const char *magietypen[MAXMAGIETYP] =
 {
-	"Kein Magiegebiet",
-	"Illaun",
-	"Tybied",
-	"Cerddor",
-	"Gwyrrd",
-	"Draig"
+	"nomagic",
+	"illaun",
+	"tybied",
+	"cerddor",
+	"gwyrrd",
+	"draig"
 };
 
 attrib_type at_reportspell = {
@@ -1567,7 +1567,7 @@ regeneration_magiepunkte(void)
 
 					aura += (int)reg_aura;
 					add_message(&u->faction->msgs, msg_message(
-						"regenaura", "unit region amount", 
+						"regenaura", "unit region amount",
 						u, r, (int)reg_aura));
 				}
 				set_spellpoints(u, min(aura, auramax));
@@ -1642,7 +1642,7 @@ verify_targets(castorder *co)
 					unit *u;
 						/* Versuch 1 : Region der Zauberwirkung */
 					u = findnewunit(target_r, mage->faction, spobj->data.i);
-					if (!u){ 
+					if (!u){
 						/* Versuch 2 : Region des Magiers */
 						u = findnewunit(mage->region, mage->faction, spobj->data.i);
 					}
@@ -1806,7 +1806,7 @@ verify_targets(castorder *co)
 						failed++;
 						break;
 					}
-					
+
 					if ((sp->sptyp & TESTRESISTANCE)
 							&& target_resists_magic(mage, u, TYP_UNIT, 0))
 					{ /* Fehlermeldung */
@@ -1822,7 +1822,7 @@ verify_targets(castorder *co)
 					}
 
 					/* TODO: Test auf Parteieigenschaft Magieresistsenz */
-					
+
 					success++;
 					break;
 				}
@@ -2574,7 +2574,7 @@ remove_familiar(unit *mage)
 		smd = (skillmod_data *)a->data.v;
 	  if (smd->special==sm_familiar) a_remove(&mage->attribs, a);
 		a = an;
-	} 
+	}
 }
 
 void
@@ -2883,7 +2883,7 @@ magic(void)
 			if (old_race(u->race) == RC_SPELL || fval(u, FL_LONGACTION))
 				continue;
 
-			if (old_race(u->race) == RC_INSECT && r_insectstalled(r) && 
+			if (old_race(u->race) == RC_INSECT && r_insectstalled(r) &&
 					!is_cursed(u->attribs, C_KAELTESCHUTZ,0))
 				continue;
 
@@ -3156,7 +3156,7 @@ magic(void)
 			/* Ziele auf Existenz pr¸fen und Magieresistenz feststellen. Wurde
 			 * kein Ziel gefunden, so ist verify_targets=0. Scheitert der
 			 * Spruch an der Magieresistenz, so ist verify_targets = 1, bei
-			 * Erfolg auf ganzer Linie ist verify_targets= 2 
+			 * Erfolg auf ganzer Linie ist verify_targets= 2
 			 */
 			switch (verify_targets(co)){
 				case 0:
@@ -3167,13 +3167,13 @@ magic(void)
 					spellparameter *pa = co->par;
 					int n;
 					for (n = 0; n < pa->length; n++) {
-						if(pa->param[n]->flag != TARGET_RESISTS 
+						if(pa->param[n]->flag != TARGET_RESISTS
 								&& pa->param[n]->flag != TARGET_NOTFOUND)
 						{ /* mindestens ein erfolgreicher Zauberversuch, wir machen
 								 normal weiter */
 							break;
 						}
-					} 
+					}
 					/* zwar wurde mindestens ein Ziel gefunden, das widerstand
 					 * jedoch dem Zauber. Kosten abziehen und abbrechen. */
 					pay_spell(u, sp, level, co->distance);
@@ -3185,7 +3185,7 @@ magic(void)
 					continue; /* ‰uﬂere Schleife, n‰chster Zauberer */
 				}
 				case 2:
-				default: 
+				default:
 					/* Zauber war erfolgreich */
 					break;
 			}

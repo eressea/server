@@ -22,6 +22,9 @@
 /* kernel includes */
 #include <item.h>
 
+/* util includes */
+#include <functions.h>
+
 /* libc includes */
 #include <assert.h>
 
@@ -127,7 +130,11 @@ register_mallornseed(void)
 	it_mallornseed.rtype->flags |= RTF_LIMITED;
 	it_mallornseed.rtype->itype->flags |= ITF_NOBUILDBESIEGED;
 	it_mallornseed.rtype->flags |= RTF_POOLED;
-
+	register_function((pf_generic)limit_seeds, "limit_seeds");
+	register_function((pf_generic)produce_seeds, "produce_seeds");
+	register_function((pf_generic)limit_mallornseeds, "limit_mallornseeds");
+	register_function((pf_generic)produce_mallornseeds, "produce_mallornseeds");
+	
 	a = a_add(&it_mallornseed.rtype->attribs, a_new(&at_resourcelimit));
 	{
 		resource_limit * rdata = (resource_limit*)a->data.v;

@@ -1,20 +1,20 @@
-des zweiten Zeitalters
+secondage
 4
-Winter
-Frühling
-Sommer
-Herbst
+winter
+spring
+summer
+fall
 3
-die erste Woche:der ersten Woche
-die zweite Woche:der zweiten Woche
-die letzte Woche:der letzten Woche
+firstweek:firstweek_d
+secondweek:secondweek_d
+thirdweek:thirdweek_d
 9
-Feldsegen:2:30
-Nebeltage:3:60
-Sturmmond:3:80
-Herdfeuer:0:50
-Eiswind:0:30
-Schneebann:0:60
-Blütenregen:1:60
-Mond der milden Winde:1:10
-Sonnenfeuer:2:10
+month_1:2:30
+month_2:3:60
+month_3:3:80
+month_4:0:50
+month_5:0:30
+month_6:0:60
+month_7:1:60
+month_8:1:10
+month_9:2:10

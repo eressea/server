@@ -268,7 +268,7 @@
 
 	<message name="nr_calendar_season">
 		<text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s. Es ist %s.</text>
-		<text locale="en">It's %s of the month of %s in the %d. year of %s. It's %s.</text>
+		<text locale="en">It is %s of the month of %s in the %d. year of %s. It is %s.</text>
 	</message>
 
 	<message name="status_aggressive">
@@ -7294,6 +7294,24 @@
 		<text locale="en">"Your password is ${password}."</text>
 	</message>
 
+	<message name="nr_market_sale">
+		<type>
+			<arg name="price" type="int"></arg>
+			<arg name="product" type="resource"></arg>
+		</type>
+		<text locale="de">"Auf dem Markt wird für $resource($product,0) $int($price) verlangt."</text>
+		<text locale="en">"The local market offers $resource($product,0) at a price of $int($price)."</text>
+	</message>
+
+	<message name="nr_market_price">
+		<type>
+			<arg name="price" type="int"></arg>
+			<arg name="product" type="resource"></arg>
+		</type>
+		<text locale="de">"$resource($product,0) $int($price) Silber"</text>
+		<text locale="en">"$resource($product,0) for $int($price) silver"</text>
+	</message>
+
 	<message name="nr_vicinitystart">
 		<type>
 			<arg name="dir" type="int"></arg>
@@ -7301,6 +7319,15 @@
 		</type>
 		<text locale="de">"Im $direction($dir) der Region liegt $trail($region,$locale("de"))"</text>
 		<text locale="en">"To the $direction($dir) lies $trail($region,$locale("en"))"</text>
+	</message>
+	
+	<message name="nr_header_date">
+		<type>
+			<arg name="game" type="string"></arg>
+			<arg name="date" type="string"></arg>
+		</type>
+		<text locale="de">"Report für $game, $date"</text>
+		<text locale="en">"Report for $game, $date"</text>
 	</message>
 
 	<message name="nr_score">
