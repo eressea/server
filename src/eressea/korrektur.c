@@ -26,6 +26,7 @@
 #include <modules/xmas2000.h>
 #include <modules/xmas2001.h>
 #include <modules/museum.h>
+#include <modules/xecmd.h>
 #include <items/questkeys.h>
 
 /* gamecode includes */
@@ -2746,6 +2747,18 @@ questportal_init(void)
 	return 0;
 }
 
+static int
+xe_init(void)
+{
+	faction *f = findfaction(atoi36("a5q"));
+
+	if(f) {
+		a_add(&f->attribs, a_new(&at_xontormiaexpress));
+	}
+
+	return 0;
+}
+
 void
 korrektur(void)
 {
@@ -2797,6 +2810,7 @@ korrektur(void)
 	do_once("witm", warn_items());
 	do_once("guac", guard_conversion());
 	do_once("qpoi", questportal_init());
+	do_once("xini", xe_init());
 	warn_password();
 
 	/* seems something fishy is going on, do this just 

@@ -1551,6 +1551,16 @@
 	<string name="ZAUBER">
 		<text locale="de">ZAUBER</text>
 	</string>
+	
+	<string name="XEPOTION">
+		<text locale="de">XETRANK</text>
+	</string>
+	<string name="XEBALLOON">
+		<text locale="de">XEBALLON</text>
+	</string>
+	<string name="XELAEN">
+		<text locale="de">XELAEN</text>
+	</string>
 
 	<comment>Talente:</comment>
 	<string name="sk_alchemy">

@@ -155,7 +155,10 @@ const char *parameters[MAXPARAMS] =
 	"TRÄNKE",
 	"GRUPPE",
 	"PARTEITARNUNG",
-	"BÄUME"
+	"BÄUME",
+	"XEPOTION",
+	"XEBALLOON",
+	"XELAEN"
 };
 
 
@@ -232,7 +235,8 @@ const char *keywords[MAXKEYWORDS] =
 	"PRÄFIX",
 	"SYNONYM",
 	"PFLANZEN",
-	"WERWESEN"
+	"WERWESEN",
+	"XONTORMIA"
 };
 
 const char *report_options[MAX_MSG] =

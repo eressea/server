@@ -73,6 +73,8 @@
 #include <sql.h>
 #include <util/message.h>
 
+#include <modules/xecmd.h>
+
 #ifdef AT_OPTION
 /* attributes includes */
 #include <attributes/option.h>
@@ -3533,8 +3535,11 @@ processorders (void)
 	puts(" - Monster fressen und vertreiben Bauern");
 	monsters_kill_peasants();
 
-	puts(" - Zufallsereignisse");
+	puts(" - random events");
 	randomevents();
+	
+	puts(" - newspaper commands");
+	xecmd();
 
 	puts(" - regeneration (healing & aura)");
 	monthly_healing();

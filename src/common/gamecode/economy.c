@@ -516,7 +516,7 @@ give_peasants(int n, const item_type * itype, unit * src)
 	}
 }
 
-	void
+void
 give_item(int want, const item_type * itype, unit * src, unit * dest, const char * cmd)
 {
 	short error = 0;
@@ -791,7 +791,7 @@ giveunit(region * r, unit * u, unit * u2, strlist * S)
 	}
 }
 
-	static void
+static void
 dogive(region * r, unit * u, strlist * S, boolean liefere, int mode)
 	/*
 	 * mode=0: give to any units

@@ -1383,8 +1383,19 @@ showunits(region * r)
 			} else {
 				s = strchr(pointer->s, '(');
 				if (s) {
+					char idbuf[12];
+					int  i = 0;
+
 					s++;
-					f = atoi36(s);
+					while(*s != ')') {
+						idbuf[i] = *s;
+						i++; s++;
+						assert(i<=11);
+					}
+					idbuf[i] = '\0';
+	
+					f  = atoi36(idbuf);
+
 					x = findunit(f, r);
 					if (x && modify_unit(r, findunit(f, r))) {
 						for (pline = 0, tmp = eh; tmp != pointer; tmp = tmp->next)

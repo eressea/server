@@ -438,6 +438,7 @@ enum {
 	K_SYNONYM,
 	K_PFLANZE,
 	K_WEREWOLF,
+	K_XE,
 	MAXKEYWORDS,
 	NOKEYWORD = (keyword_t) - 1
 };
@@ -504,6 +505,9 @@ enum {
 	P_GROUP,
 	P_FACTIONSTEALTH,
 	P_TREES,
+	P_XEPOTION,
+	P_XEBALLOON,
+	P_XELAEN,
 	MAXPARAMS,
 	NOPARAM = (param_t) - 1
 };
