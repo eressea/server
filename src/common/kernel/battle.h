@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.h,v 1.3 2001/02/14 01:38:50 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -15,11 +14,18 @@
 #ifndef BATTLE_H
 #define BATTLE_H
 
+/** new code defines **/
+#define FAST_GETUNITROW
+#define FASTENEMY
+
+/** more defines **/
 #define FS_ENEMY 1
 #define FS_HELP  2
 
-#define NUMROWS 5				/* Eressea hat 4 Verteidigungslinien. 1 ist
-								 * * * vorn */
+/***** Verteidigungslinien.
+ * Eressea hat 4 Verteidigungslinien. 1 ist vorn, 5. enthält Summen 
+ */
+#define NUMROWS 5
 #define SUM_ROW 0
 #define FIGHT_ROW 1
 #define BEHIND_ROW 2
@@ -50,8 +56,12 @@ typedef struct battle {
 	boolean has_tactics_turn;
 	int     keeploot;
 	boolean reelarrow;
-	int			dh;
+	int     dh;
+	int     alive;
 	boolean small;
+#ifdef FAST_GETUNITROW
+	boolean nonblockers;
+#endif
 } battle;
 
 typedef struct tactics {
@@ -66,7 +76,6 @@ typedef struct side {
 	struct faction *faction;	/* Die Partei, die hier kämpft */
 	struct bfaction * bf; /* Die Partei, die hier kämpft */
 	const struct group * group;
-#define FASTENEMY
 #ifdef FASTENEMY
 # define E_ENEMY 1
 # define E_ATTACKING 2
@@ -168,6 +177,12 @@ typedef struct fighter {
 	int run_hp;      /* accumulated hp of fleeing people */
 	struct region *run_to;  /* destination of fleeing people */
 	int action_counter;	/* number of active actions the struct unit did in the fight */
+#ifdef FAST_GETUNITROW
+	struct {
+		int alive;
+		int cached;
+	} row;
+#endif
 } fighter;
 
 typedef struct troop {

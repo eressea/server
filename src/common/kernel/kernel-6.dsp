@@ -155,15 +155,7 @@ SOURCE=.\building.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\creation.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\curse.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\economy.h
 # End Source File
 # Begin Source File
 

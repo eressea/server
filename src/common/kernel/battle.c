@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.13 2001/02/14 08:35:12 katze Exp $
+ *	$Id: battle.c,v 1.14 2001/02/14 09:17:56 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -22,11 +22,8 @@
 
 
 typedef enum combatmagic {
-
 	DO_PRECOMBATSPELL,
-
 	DO_POSTCOMBATSPELL
-
 } combatmagic_t;
 
 
@@ -461,6 +458,11 @@ get_unitrow(const fighter * af)
 	int front = 0;
 	size_t bsize;
 
+#ifdef FAST_GETUNITROW
+	if (!b->nonblockers && b->alive==af->row.alive) {
+		return af->row.cached;
+	}
+#endif
 	bsize = cv_size(&b->sides);
 
 	if (csize<bsize) {
@@ -504,6 +506,10 @@ get_unitrow(const fighter * af)
 	 */
 	result = max(FIRST_ROW, row - retreat);
 
+#ifdef FAST_GETUNITROW
+	af->row.alive = b->alive;
+	af->row.cached = result;
+#endif
 	return result;
 }
 
@@ -797,6 +803,8 @@ rmtroop(troop dt)
 	side *ds = df->side;
 
 	--df->alive;
+	--df->side->alive;
+	--df->side->battle->alive;
 	assert(dt.index >= 0 && dt.index < df->unit->number);
 	assert(df->alive < df->unit->number);
 	df->person[dt.index] = df->person[df->alive - df->removed];
@@ -2162,16 +2170,23 @@ aftermath(battle * b)
 #ifdef TROLLSAVE
 		/* Trolle können regenerieren */
 		if (df->alive > 0 && dead && du->race == RC_TROLL)
-			for (i = 0; i != dead; ++i)
-				if (chance(TROLL_REGENERATION))
+			for (i = 0; i != dead; ++i) {
+				if (chance(TROLL_REGENERATION)) {
 					++df->alive;
+					++df->side->alive;
+					++df->side->battle->alive;
+				}
+			}
 		trollsave[df->side->index] += dead - du->number + df->alive;
 #endif
 		/* Regeneration durch PR_MERCY */
 		if (dead && pr_mercy)
 			for (i = 0; i != dead; ++i)
-				if (rand()%100 < pr_mercy)
+				if (rand()%100 < pr_mercy) {
 					++df->alive;
+					++df->side->alive;
+					++df->side->battle->alive;
+				}
 
 		/* Tote, die wiederbelebt werde können */
 		if (!nonplayer(df->unit)) {
@@ -2212,7 +2227,6 @@ aftermath(battle * b)
 		if (s->bf->lastturn+(b->has_tactics_turn?1:0)>1) {
 			relevant = true;
 		}
-		s->alive = 0;
 		s->flee = 0;
 		s->dead = 0;
 
@@ -2235,7 +2249,6 @@ aftermath(battle * b)
 
 			s->dead += dead;
 			s->flee += df->run_number;
-			s->alive += df->alive;
 
 			if (df->alive == du->number) continue; /* nichts passiert */
 
@@ -2707,6 +2720,8 @@ make_fighter(battle * b, unit * u, boolean attack)
 	fig->status = u->status;
 	fig->side = s1;
 	fig->alive = u->number;
+	fig->side->alive += u->number;
+	fig->side->battle->alive += u->number;
 	fig->catmsg = -1;
 
 	/* Freigeben nicht vergessen! */
@@ -2838,6 +2853,9 @@ make_fighter(battle * b, unit * u, boolean attack)
 	s1->size[SUM_ROW] += u->number;
 	if (race[u->race].battle_flags & BF_NOBLOCK) {
 		s1->nonblockers[fig->status + FIGHT_ROW] += u->number;
+#ifdef FAST_GETUNITROW
+		b->nonblockers = true;
+#endif
 	}
 
 	if (race[fig->unit->race].flags & RCF_HORSE) {
@@ -3094,14 +3112,6 @@ battle_report(battle * b)
 	bfaction *bf;
 
 	buf[0] = 0;
-	for_each(s, b->sides) {
-		fighter *f;
-
-		s->alive = 0;
-		for_each(f, s->fighters) {
-			s->alive += f->alive;
-		} next(f);
-	} next(s);
 
 	for_each(s, b->sides) {
 		for_each(s2, b->sides) {

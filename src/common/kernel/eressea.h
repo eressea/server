@@ -1,6 +1,5 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.h,v 1.17 2001/02/12 22:39:56 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
