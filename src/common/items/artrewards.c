@@ -101,7 +101,7 @@ static resource_type rt_hornofdancing = {
 
 item_type it_hornofdancing = {
 	&rt_hornofdancing,        /* resourcetype */
-	0, 0, 0,		  /* flags, weight, capacity */
+	0, 1, 0,            		  /* flags, weight, capacity */
 	NULL,                     /* construction */
 	&use_hornofdancing,
 	NULL,
@@ -149,12 +149,46 @@ static resource_type rt_trappedairelemental = {
 
 item_type it_trappedairelemental = {
 	&rt_trappedairelemental,        /* resourcetype */
-	0, 0, 0,		                    /* flags, weight, capacity */
+	0, 1, 0,		                    /* flags, weight, capacity */
 	NULL,                           /* construction */
 	&use_trappedairelemental,
 	NULL,
 	NULL
 };
+
+static int
+use_aurapotion50(struct unit * u, const struct item_type * itype,
+                    int amount, const char *cm)
+{
+  if(!is_mage(u)) {
+    cmistake(u, cm, 214, MSG_MAGIC);
+    return 0;
+  }
+
+  change_spellpoints(u, 50);
+
+  ADDMSG(&u->faction->msgs, msg_message("aurapotion50",
+           "unit region command", u, u->region, cm));
+
+  return 1;
+}
+
+static resource_type rt_aurapotion50 = {
+	{ "aurapotion50", "aurapotion50_p" },
+	{ "aurapotion50", "aurapotion50_p" },
+	RTF_ITEM,
+	&res_changeitem
+};
+
+item_type it_aurapotion50 = {
+	&rt_aurapotion50,               /* resourcetype */
+	0, 1, 0,		                    /* flags, weight, capacity */
+	NULL,                           /* construction */
+	&use_aurapotion50,
+	NULL,
+	NULL
+};
+
 
 void
 register_artrewards(void)
@@ -164,5 +198,7 @@ register_artrewards(void)
 	register_function((pf_generic)use_hornofdancing, "usehornofdancing");
 	it_register(&it_trappedairelemental);
 	register_function((pf_generic)use_trappedairelemental, "trappedairelemental");
+	it_register(&it_aurapotion50);
+	register_function((pf_generic)use_aurapotion50, "aurapotion50");
 }
 

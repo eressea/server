@@ -20,6 +20,7 @@ extern "C" {
 
 extern struct item_type it_hornofdancing;
 extern struct item_type it_trappedairelemental;
+extern struct item_type it_aurapotion50;
 extern struct item_type it_bagpipeoffear;
 extern struct item_type it_instantartacademie;
 extern struct item_type it_instantartsculpture;

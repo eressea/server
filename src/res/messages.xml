@@ -5862,6 +5862,16 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die $ship($ship) wird jetzt schneller ihr Ziel erreichen."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The $ship($ship) will now be faster."</text>
   </message>
+  
+  <message name="aurapotion50" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Magier fühlt sich durch den Trank magische gestärkt."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The mage is magically invigorated."</text>
+  </message>
 
 </messages>
 
