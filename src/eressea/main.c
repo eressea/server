@@ -343,7 +343,7 @@ processturn(char *filename)
 #endif /* FUZZY_BASE36 */
 	if (!nowrite) {
 		char ztext[64];
-		sprintf(ztext, "%s/%d", datapath(), turn);
+		sprintf(ztext, "%d", turn);
 		return writegame(ztext, 0);
 	}
 	return 0;

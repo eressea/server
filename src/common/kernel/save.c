@@ -1325,7 +1325,8 @@ writegame(const char *filename, char quiet)
 
 	/* write_dynamictypes(); */
 
-	F = cfopen(filename, "w");
+	sprintf(buf, "%s/%s", datapath(), filename);
+	F = cfopen(buf, "w");
 	if (F==NULL)
 		return -1;
 
