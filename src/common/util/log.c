@@ -36,6 +36,9 @@ log_printf(const char * format, ...)
 	va_start(marker, format);
 	vfprintf(logfile, format, marker);
 	va_end(marker);
+        if (flags & LOG_FLUSH) {
+          fflush(logfile);
+        }
 }
 
 void 
