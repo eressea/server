@@ -843,7 +843,7 @@ melt_iceberg(region *r)
 	}
 
 	/* in Ozean wandeln */
-	rsetterrain(r, T_OCEAN);
+	terraform(r, T_OCEAN);
 
 	/* Einheiten, die nicht schwimmen können oder in Schiffen sind,
 	 * ertrinken */
