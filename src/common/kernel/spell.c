@@ -1395,8 +1395,9 @@ sp_rosthauch(castorder *co)
  * Wirkung:
  *  schützt ein bis mehrere Einheiten mit bis zu Stufe*10 Insekten vor
  *  den Auswirkungen der Kälte. Sie können Gletscher betreten und dort
- *  ganz normal ohne jeden Malus alles machen Die Wirkung hält Stufe
- *  Wochen an
+ *  ganz normal alles machen. Die Wirkung hält Stufe Wochen an
+ *  Insekten haben in Gletschern den selben Malus wie in Bergen. Zu
+ *  lange drin, nicht mehr ändern
  *
  * Flag:
  * (UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE)
