@@ -1260,7 +1260,7 @@
 		<text locale="en">NEXT</text>
 	</string>
 	<string name="PARTEI">
-		<text locale="en">PARTEI</text>
+		<text locale="en">FACTION</text>
 	</string>
 	<string name="PARTEITARNUNG">
 		<text locale="en">FACTIONSTEALTH</text>
