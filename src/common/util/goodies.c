@@ -31,7 +31,7 @@
 /* Simple Integer-Liste */
 
 char *
-sncat(char * buffer, size_t size, const char * str)
+fstrncat(char * buffer, const char * str, unsigned int size)
 {
 	static char * b = NULL;
 	static char * end = NULL;
@@ -95,7 +95,7 @@ space_replace(char * str, char replace)
 }
 
 const char *
-escape_string(const char * str, char * buffer, size_t len)
+escape_string(const char * str, char * buffer, unsigned int len)
 {
 	char s_buffer[4096];
 	const char * p = str;

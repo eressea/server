@@ -288,6 +288,8 @@ error286;errors:0;de;{unit} in {region}: '{command}' - Die Einheit transportiert
 error287;errors:0;de;{unit} in {region}: '{command}' - Dorthin können wir die Einheit nicht transportieren.
 error288;errors:0;de;{unit} in {region}: '{command}' - Wieviel sollen wir einreißen?
 error289;errors:0;de;{unit} in {region}: '{command}' - Tarne wie?
+error290;errors:0;de;{unit} in {region}: '{command}' - Hier wachsen keine Bäume.
+error291;errors:0;de;{unit} in {region}: '{command}' - Dies ist schon eine Mallornregion.
 
 # Meldungen und Ereignisse
 msg_event;events:0;de;{string}
@@ -468,6 +470,7 @@ wind_effect;magic:0;de;{$mage mage} erfleht den Segen der Götter des Windes und 
 path_effect;magic:0;de;{$mage mage} sorgt für trockene Straßen in {region}.
 ent_effect;magic:0;de;{$mage mage} belebt {amount} Bäume.
 maelstrom_effect;magic:0;de;{$mage mage} beschwört die Mächte des Wassers und ein gigantischer Strudel bildet sich.
+mallorn_effect;magic:0;de;{$mage mage} läßt seine Kraft in die Region fliessen.
 harvest_effect;magic:0;de;{$mage mage} segnet in einem kurzen Ritual die Felder.
 growtree_effect;magic:0;de;{$mage mage} erschuf einen heiligen Hain von {amount} Bäumen.
 rust_effect;magic:0;de;{$mage mage} legt einen Rosthauch auf {target}. {amount} Waffen wurden vom Rost zerfressen.

@@ -630,7 +630,11 @@ build(unit * u, const construction * ctype, int completed, int want)
 		}
 
 		/* n = maximum buildable size */
-		n = skills / type->minskill;
+		if(type->minskill > 1) {
+			n = skills / type->minskill;
+		} else {
+			n = skills;
+		}
 		itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
 		if (itm!=NULL) i = itm->number;
 		if (i>0) {

@@ -2843,8 +2843,9 @@ produce(void)
 			todo = igetkeyword(u->thisorder, u->faction->locale);
 			if (todo == NOKEYWORD) continue;
 
-			if (rterrain(r) == T_OCEAN && u->race != RC_AQUARIAN &&
-				todo != K_STEAL && todo != K_SPY && todo != K_SABOTAGE)
+			if (rterrain(r) == T_OCEAN && u->race != RC_AQUARIAN 
+					&& !(race[u->race].flags & RCF_SWIM) 
+					&& todo != K_STEAL && todo != K_SPY && todo != K_SABOTAGE)
 				continue;
 
 			switch (todo) {

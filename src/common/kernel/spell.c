@@ -385,6 +385,7 @@ destroy_curse(attrib **alist, int cast_level, int force,
  * Allgemein sichtbare Auswirkungen in der Region sollten als
  * Regionsereignisse auch dort auftauchen.
 
+	freset(mage->faction, FL_DH);
 	for(u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
 	for(u = r->units; u; u = u->next ) {
 		if (!fval(u->faction, FL_DH) ) {
@@ -392,6 +393,7 @@ destroy_curse(attrib **alist, int cast_level, int force,
 			add_message(r, u->faction, buf,  MSG_EVENT, ML_WARN | ML_INFO);
 		}
 	}
+	Sonderbehandlung Magierpartei nicht vergessen!
 
  * Meldungen an den Magier über Erfolg sollten, wenn sie nicht als
  * Regionsereigniss auftauchen, als MSG_MAGIC level ML_INFO unter
@@ -937,6 +939,7 @@ sp_goodwinds(castorder *co)
 	create_curse(mage, &sh->attribs, C_SHIP_NODRIFT, 0, power, cast_level, 0, 0);
 
 	/* melden, 1x pro Partei */
+	freset(mage->faction, FL_DH);
 	for(u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
 	for(u = r->units; u; u = u->next ) {
 		if(u->ship != sh )		/* nur den Schiffsbesatzungen! */
@@ -947,6 +950,11 @@ sp_goodwinds(castorder *co)
 				"wind_effect%u:mage%h:ship", cansee(u->faction, r, mage, 0) ? mage:NULL, sh));
 		}
 	}
+	if(!fval(mage->faction, FL_DH)){
+		add_message(&mage->faction->msgs, new_message(mage->faction,
+			"wind_effect%u:mage%h:ship", mage, sh));
+	}
+
 	return cast_level;
 }
 
@@ -988,6 +996,7 @@ sp_magicstreet(castorder *co)
 	create_curse(mage, &r->attribs, C_MAGICSTREET, 0, power, cast_level, 0, 0);
 
 	/* melden, 1x pro Partei */
+	freset(mage->faction, FL_DH);
 	for(u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
 	for(u = r->units; u; u = u->next ) {
 		if(!fval(u->faction, FL_DH) ) {
@@ -995,6 +1004,10 @@ sp_magicstreet(castorder *co)
 			add_message(&r->msgs, new_message(u->faction,
 				"path_effect%u:mage%r:region", cansee(u->faction, r, mage, 0) ? mage:NULL, r));
 		}
+	}
+	if(!fval(mage->faction, FL_DH)){
+		add_message(&mage->faction->msgs, new_message(mage->faction,
+			"path_effect%u:mage%r:region", mage, r));
 	}
 
 	return cast_level;
@@ -1052,6 +1065,8 @@ sp_summonent(castorder *co)
 
 	rsettrees(r, rtrees(r) - ents);
 
+	/* melden, 1x pro partei */
+	freset(mage->faction, FL_DH);
 	for(u2 = r->units; u2; u2 = u2->next ) freset(u2->faction, FL_DH);
 	for(u2 = r->units; u2; u2 = u2->next ) {
 		if (!fval(u2->faction, FL_DH) ) {
@@ -1060,6 +1075,13 @@ sp_summonent(castorder *co)
 				"ent_effect%u:mage%i:amount", cansee(u2->faction, r, mage, 0)?mage:NULL, u->number));
 		}
 	}
+	if(!fval(mage->faction, FL_DH)){
+		/* dann steht niemand von der Magierpartei in der Region, sieht also
+		 * auch keine Regionsmeldung. ergo: global anzeigen */
+			add_message(&mage->faction->msgs, new_message(mage->faction,
+				"ent_effect%u:mage%i:amount", mage, u->number));
+	}
+
 	return cast_level;
 }
 
@@ -1147,6 +1169,7 @@ sp_maelstrom(castorder *co)
 	set_curseflag(r->attribs, C_MAELSTROM, 0, CURSE_ISNEW);
 
 	/* melden, 1x pro partei */
+	freset(mage->faction, FL_DH);
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
 	for (u = r->units; u; u = u->next) {
 		if (!fval(u->faction, FL_DH)) {
@@ -1155,6 +1178,65 @@ sp_maelstrom(castorder *co)
 				"maelstrom_effect%u:mage", cansee(u->faction, r, mage, 0) ? mage:NULL));
 		}
 	}
+	if(!fval(mage->faction, FL_DH)){
+		/* dann steht niemand von der Magierpartei in der Region, sieht also
+		 * auch keine Regionsmeldung. ergo: global anzeigen */
+			add_message(&mage->faction->msgs, new_message(mage->faction,
+				"maelstrom_effect%u:mage", mage));
+	}
+
+	return cast_level;
+}
+
+/* ------------------------------------------------------------- */
+/* Name:       Wurzeln der Magie
+ * Stufe:      16
+ * Kategorie:  Region, neutral
+ * Gebiet:     Gwyrrd
+ * Wirkung:
+ * 	Wandelt einen Wald permanent in eine Mallornregion
+ *
+ * Flags:
+ * (FARCASTING | REGIONSPELL | TESTRESISTANCE)
+ */
+static int
+sp_mallorn(castorder *co)
+{
+	unit *u;
+	region *r = co->rt;
+	int cast_level = co->level;
+	unit *mage = (unit *)co->magician;
+
+	if(!landregion(rterrain(r))) {
+		cmistake(mage, strdup(co->order), 290, MSG_MAGIC);
+		return 0;
+	}
+	if(fval(r, RF_MALLORN)) {
+		cmistake(mage, strdup(co->order), 291, MSG_MAGIC);
+		return 0;
+	}
+
+	/* half the trees will die */
+	rsettrees(r, rtrees(r)/2);
+	fset(r, RF_MALLORN);
+
+	/* melden, 1x pro partei */
+	freset(mage->faction, FL_DH);
+	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
+	for (u = r->units; u; u = u->next) {
+		if (!fval(u->faction, FL_DH)) {
+			fset(u->faction, FL_DH);
+			add_message(&r->msgs, new_message(u->faction,
+				"mallorn_effect%u:mage", cansee(u->faction, r, mage, 0) ? mage:NULL));
+		}
+	}
+	if(!fval(mage->faction, FL_DH)){
+		/* dann steht niemand von der Magierpartei in der Region, sieht also
+		 * auch keine Regionsmeldung. ergo: global anzeigen */
+			add_message(&mage->faction->msgs, new_message(mage->faction,
+				"mallorn_effect%u:mage", mage));
+	}
+
 	return cast_level;
 }
 
@@ -1185,6 +1267,7 @@ sp_blessedharvest(castorder *co)
 	create_curse(mage,&r->attribs,C_BLESSEDHARVEST,0,power,power,1,0);
 
 	/* melden, 1x pro partei */
+	freset(mage->faction, FL_DH);
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
 
 	for (u = r->units; u; u = u->next) {
@@ -1195,6 +1278,8 @@ sp_blessedharvest(castorder *co)
 		}
 	}
 	if (!fval(mage->faction, FL_DH)){
+		/* dann steht niemand von der Magierpartei in der Region, sieht also
+		 * auch keine Regionsmeldung. ergo: global anzeigen */
 			add_message(&mage->faction->msgs, new_message(mage->faction,
 				"harvest_effect%u:mage", mage));
 	}
@@ -1228,6 +1313,7 @@ sp_hain(castorder *co)
 	rsettrees(r, rtrees(r) + trees);
 
 	/* melden, 1x pro partei */
+	freset(mage->faction, FL_DH);
 	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
 	for (u = r->units; u; u = u->next) {
 		if (!fval(u->faction, FL_DH)) {
@@ -7349,7 +7435,9 @@ spell spelldaten[] =
 		"Die Beschwörung von Elementargeistern der Stürme ist ein uraltes "
 		"Ritual. Der Druide bannt die Elementare in die Segel der Schiffe, "
 		"wo sie helfen, das Schiff mit hoher Geschwindigkeit über die Wellen "
-		"zu tragen.",
+		"zu tragen. Je mehr Kraft der Druide in den Zauber investiert, desto "
+		"größer ist die Zahl der Elementargeister, die sich bannen lassen. "
+		"Für jedes Schiff wird ein Elementargeist benötigt.",
 		NULL,
 		"s+",
 		M_DRUIDE,
@@ -7683,6 +7771,26 @@ spell spelldaten[] =
 			{0, 0, 0},
 			{0, 0, 0}},
 		(spell_f)sp_maelstrom, patzer
+	},
+	
+	{SPL_MALLORN, "Wurzeln der Magie",
+		"Mit Hilfe dieses aufwändigen Rituals läßt der Druide einen Teil seiner "
+		"dauerhaft in den Boden und die Wälder der Region fliessen. Dadurch wird "
+		"das Gleichgewicht der Natur in der Region für immer verändert, und in "
+		"Zukunft werden nur noch die anspruchsvollen, aber kräftigen "
+		"Mallorngewächse in der Region gedeihen.",
+		NULL,
+		NULL,
+		M_DRUIDE,
+		(FARCASTING | REGIONSPELL | TESTRESISTANCE),
+		5, 16,
+		{
+			{R_AURA, 250, SPC_FIX},
+			{R_PERMAURA, 10, SPC_FIX},
+			{R_TOADSLIME, 1, SPC_FIX},
+			{0, 0, 0},
+			{0, 0, 0}},
+		(spell_f)sp_mallorn, patzer
 	},
 
 	{SPL_GREAT_DROUGHT, "Tor in die Ebene der Hitze",

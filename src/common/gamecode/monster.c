@@ -524,7 +524,7 @@ monster_seeks_target(region *r, unit *u)
 
 	switch( u->race ) {
 		case RC_ALP:
-			if( !(u->age % 2) )		/* bewegt sich nur jede zweite Runde */
+			if( (u->age % 2) )		/* bewegt sich nur jede zweite Runde */
 				d = NODIRECTION;
 			break;
 		default:

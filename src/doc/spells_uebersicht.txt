@@ -42,7 +42,8 @@ Druide/Gwyrrd (38 Sprüche):
 13  B... Hitzeelementar        600     halbiert Fruchtbarkeit der Region
 14  Nebel der Verwirrung       8*L     Bewegung wird zufällig (nur Wald+Ozean)
 15  Mahlstrom                  200,M   Ozeanfeld beschädigt Schiffe schwer
-16  T... die Ebene der Hitze   800     stärker als L13, kann Region wandeln
+16  Wurzeln der Magie          250,10P,M   Wald wird permanent Mallornwald
+17  T... die Ebene der Hitze   800     stärker als L13, kann Region wandeln
 
 
 Chaos/Draig (27 Sprüche):

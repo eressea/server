@@ -428,8 +428,14 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 	dh=0;
 	if (!getarnt && f && f->allies) {
 		ally *sf;
+		faction *tf = u->faction; 
+		
+		/* getarnte Partei bei a_otherfaction */
+		if(a_otherfaction) {
+			tf = findfaction(a_otherfaction->data.i);
+		}
 		for (sf = f->allies; sf && !dh; sf = sf->next) {
-			if (sf->status > 0 && sf->status <= HELP_ALL && sf->faction == u->faction) {
+			if (sf->status > 0 && sf->status <= HELP_ALL && sf->faction == tf) {
 				dh = 1;
 			}
 		}
@@ -582,8 +588,14 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 	dh=0;
 	if (!getarnt && f && f->allies) {
 		ally *sf;
+		faction *tf = u->faction; 
+		
+		/* getarnte Partei bei a_otherfaction */
+		if(a_otherfaction) {
+			tf = findfaction(a_otherfaction->data.i);
+		}
 		for (sf = f->allies; sf && !dh; sf = sf->next) {
-			if (sf->status > 0 && sf->status <= HELP_ALL && sf->faction == u->faction) {
+			if (sf->status > 0 && sf->status <= HELP_ALL && sf->faction == tf) {
 				dh = 1;
 			}
 		}

@@ -975,7 +975,8 @@ show_newspells(void)
 
 	spellid_t newspellids[] = { 
 			SPL_BLOODSACRIFICE,
-					SPL_NOSPELL };
+			SPL_MALLORN,
+			SPL_NOSPELL };
 
 	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]
 	 * abgelegt */

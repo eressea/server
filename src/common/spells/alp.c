@@ -104,6 +104,7 @@ sp_summon_alp(struct castorder *co)
 		alp->ship = mage->ship;
 	}
 	set_skill(alp, SK_STEALTH, alp->number * 840);	/* 840 Tage = T7 */
+	set_string(&alp->name, "Alp");
 	alp->status = ST_FLEE;	/* flieht */
 
 	{
@@ -113,7 +114,7 @@ sp_summon_alp(struct castorder *co)
 		ad->target = opfer;
 	}
 
-	sprintf(buf, "Der Alp %s starb, ohne sein Ziel zu erreichen.", unitname(alp));
+	strcpy(buf, "Ein Alp starb, ohne sein Ziel zu erreichen.");
 	{
 #ifdef NEW_TRIGGER
 		/* Wenn der Alp stirbt, den Magier nachrichtigen */
@@ -162,11 +163,11 @@ alp_findet_opfer(unit *alp, region *r)
 	assert(mage);
 
 	/* Magier und Opfer Bescheid geben */
-	sprintf(buf, "Der Alp %s hat sein Opfer gefunden!", unitname(alp));
+	strcpy(buf, "Ein Alp hat sein Opfer gefunden!");
 	addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
 
-	sprintf(buf, "Der Alp %s springt auf den Rücken von %s.",
-					unitname(alp), unitname(opfer));
+	sprintf(buf, "Ein Alp springt auf den Rücken von %s.",
+					unitname(opfer));
 	addmessage(r, opfer->faction, buf, MSG_EVENT, ML_IMPORTANT);
 
 	/* Relations werden in destroy_unit(alp) automatisch gelöscht.

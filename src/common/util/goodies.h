@@ -19,11 +19,12 @@ extern int *intlist_init(void);
 extern int *intlist_add(int *i_p, int i);
 extern int *intlist_find(int *i_p, int i);
 extern unsigned int hashstring(const char* s);
-extern char *space_replace(char * str, char replace);
-extern const char *escape_string(const char * str, char * buffer, size_t len);
-extern boolean locale_check(void);
-extern char *sncat(char * buffer, size_t size, const char * str);
 
+extern char *space_replace(char * str, char replace);
+extern const char *escape_string(const char * str, char * buffer, unsigned int len);
+extern boolean locale_check(void);
+extern char *fstrncat(char * buffer, const char * str, unsigned int size);
+/* fast strncat */
 /* grammar constants: */
 #define GR_PLURAL     0x01
 /* 0x02-0x08 left unused for individual use */

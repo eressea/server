@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	
+ *
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -594,11 +594,19 @@ contest(int skilldiff, armor_t ar, armor_t sh)
 
 	/* Hardcodet, muﬂ ge‰ndert werden. */
 
+#ifdef OLD_ARMOR
 	if (ar != AR_NONE)
 		mod *= (1 - armordata[ar].penalty);
 	if (sh != AR_NONE)
 		mod *= (1 - armordata[sh].penalty);
 	vw = (int) (vw * mod);
+#else
+	if (ar != AR_NONE)
+		mod *= (1 + armordata[ar].penalty);
+	if (sh != AR_NONE)
+		mod *= (1 + armordata[sh].penalty);
+	vw = (int)(100 - ((100 - vw) * mod));
+#endif
 
 	do {
 		p = rand() % 100;

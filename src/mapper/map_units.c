@@ -14,15 +14,16 @@
 
 #define BOOL_DEFINED
 /* wenn config.h nicht vor curses included wird, kompiliert es unter windows nicht */
+
 #include <config.h>
 #include <curses.h>
 #include <eressea.h>
 #include "mapper.h"
 
 /* kernel includes */
+#include <goodies.h>
 #include <building.h>
 #include <faction.h>
-#include <goodies.h>
 #include <item.h>
 #include <movement.h>
 #include <race.h>
@@ -37,6 +38,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
 
 #define findunit(f,r) findunitg(f,r)
 

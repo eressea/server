@@ -636,7 +636,7 @@ set_combatspell(unit *u, spell *sp, const char * cmd, int level)
 	if (!m) return;
 
 	/* knowsspell prüft auf ist_magier, ist_spruch, kennt_spruch */
-	if (!sp || !knowsspell(u->region, u, sp)) {
+	if (knowsspell(u->region, u, sp) == false){
 		/* Fehler 'Spell not found' */
 		cmistake(u, cmd, 173, MSG_MAGIC);
 		return;
@@ -2801,7 +2801,9 @@ magic(void)
 					 * normalerweise nur Meermenschen, ausgenommen explizit als
 					 * OCEANCASTABLE deklarierte Sprüche */
 					if (rterrain(r) == T_OCEAN) {
-						if (u->race != RC_AQUARIAN && !(sp->sptyp & OCEANCASTABLE)) {
+						if (u->race != RC_AQUARIAN 
+								&& !(race[u->race].flags & RCF_SWIM) 
+								&& !(sp->sptyp & OCEANCASTABLE)) {
 								continue;
 						}
 					/* Auf bewegenden Schiffen kann man nur explizit als
