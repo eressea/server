@@ -44,7 +44,7 @@ if $(HOST) = "hamunaptra" {
 } else {
   XMLHDRS = /usr/include/libxml2 ;
 }
-C++FLAGS += -DHAVE_LUABIND_B7 ;
+C++FLAGS += -DHAVE_LUABIND_$(LUABIND) ;
 
 rule iconv
 {
@@ -104,6 +104,10 @@ rule TargetDirectory
 if ! $(DEBUG) {
    ECHO Assuming DEBUG=1 ;
    DEBUG = 1 ;
+}
+
+if $(WITHOUT_LUA) {
+	 ECHO Compiling without LUA ;
 }
 
 if $(PROFILE) = 1 {

@@ -44,7 +44,7 @@ iconv $(LUASERVER) ;
 libxml2 $(LUASERVER) ;
 LINKLIBS on $(LUASERVER) += -lm -ldl -lstdc++ ;
 
-if $(HAVE_LUA) {
+if ! $(WITHOUT_LUA) {
  SEARCH_SOURCE += [ FDirName $(SUBDIR) lua ] ;
  SubDirC++Flags -DHAVE_LUA ;
  UsingLua ;
