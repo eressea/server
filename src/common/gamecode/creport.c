@@ -455,7 +455,7 @@ render_messages(FILE * F, faction * f, message_list *msgs)
 		char nrbuffer[1024*32];
 		nrbuffer[0] = '\0';
 		if (nr_render(m->msg, f->locale, nrbuffer, sizeof(nrbuffer), f)==0 && nrbuffer[0]) {
-			fprintf(F, "MESSAGE %d\n", ++msgno);
+			fprintf(F, "MESSAGE %u\n", (unsigned int)m->msg);/*++msgno); */
 			fprintf(F, "%d;type\n", hash);
 			fputs("\"", F);
 			fputs(nrbuffer, F);
@@ -465,7 +465,7 @@ render_messages(FILE * F, faction * f, message_list *msgs)
 #endif
 		crbuffer[0] = '\0';
 		if (cr_render(m->msg, crbuffer, (const void*)f)==0) {
-			if (!printed) fprintf(F, "MESSAGE %d\n", ++msgno);
+			if (!printed) fprintf(F, "MESSAGE %u\n", (unsigned int)m->msg);/*++msgno); */
 			if (crbuffer[0]) fputs(crbuffer, F);
 		} else {
 			log_error(("could not render cr-message %p: %s\n", m->msg, m->msg->type->name));

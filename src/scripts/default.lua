@@ -6,7 +6,7 @@ function teleport_all(map, grave)
     local u
     for u in r.units do
       u.region = grave
-      print ("  .teleported " .. u)
+      print ("  .teleported " .. u.name)
       grave:add_notice("Ein Portal öffnet sich, und " .. u.name .. " erscheint in " .. grave.name)
     end
   end
@@ -97,7 +97,9 @@ function process(orders)
   process_orders()
   
   -- igjarjuk special
-  wyrm()
+  if get_turn() > 374 then
+    wyrm()
+  end
 
   write_passwords()
   write_reports()
