@@ -80,9 +80,6 @@
 #include <attributes/targetregion.h>
 #include <attributes/hate.h>
 /* ----------------------------------------------------------------------- */
-attrib_type at_deathcloud = {
-	"zauber_todeswolke", NULL, NULL, NULL, NULL, NULL
-};
 
 attrib_type at_unitdissolve = {
 	"unitdissolve", NULL, NULL, NULL, a_writedefault, a_readdefault
@@ -3311,52 +3308,129 @@ sp_unholypower(castorder *co)
  *	 (FARCASTING | REGIONSPELL | TESTRESISTANCE)
  */
 
+typedef struct dc_data {
+  region * r;
+  unit * mage;
+  double strength;
+  int countdown;
+  boolean active;
+} dc_data;
+
+static void 
+dc_initialize(struct attrib *a)
+{
+  dc_data * data = (dc_data *)malloc(sizeof(dc_data));
+  a->data.v = data;
+  data->active = true;
+}
+
+static void 
+dc_finalize(struct attrib * a)
+{
+  free(a->data.v);
+}
+
+static int 
+dc_age(struct attrib * a)
+/* age returns 0 if the attribute needs to be removed, !=0 otherwise */
+{
+  dc_data * data = (dc_data *)a->data.v;
+  region * r = data->r;
+  unit ** up = &r->units;
+  unit * mage = data->mage;
+  unit * u;
+
+  if (mage==NULL) {
+    /* if the mage disappears, so does the spell. */
+    return 0;
+  }
+
+  if (data->active) while (*up!=NULL) {
+    unit * u = *up;
+    double damage = data->strength * u->number;
+
+    freset(u->faction, FL_DH);
+    if (target_resists_magic(mage, u, TYP_UNIT, 0)){
+      continue;
+    }
+
+    /* Reduziert durch Magieresistenz */
+    damage *= (1.0 - magic_resistance(u));
+    change_hitpoints(u, -(int)damage);
+
+    if (*up==u) up=&u->next;
+  }
+
+  /* melden, 1x pro Partei */
+  for (u = r->units; u; u = u->next ) {
+    if (!fval(u->faction, FL_DH) ) {
+      fset(u->faction, FL_DH);
+      ADDMSG(&u->faction->msgs, msg_message("deathcloud_effect", 
+        "mage region", cansee(u->faction, r, mage, 0) ? mage : NULL, r));
+    }
+  }
+
+  if (!fval(mage->faction, FL_DH)){
+    ADDMSG(&mage->faction->msgs, msg_message("deathcloud_effect", 
+      "mage region", mage, r));
+  }
+
+  return --data->countdown;
+}
+
+static void 
+dc_write(const struct attrib * a, FILE* F)
+{
+  const dc_data * data = (const dc_data *)a->data.v;
+  fprintf(F, "%d %lf ", data->countdown, data->strength);
+  write_unit_reference(data->mage, F);
+  write_region_reference(data->r, F);
+}
+
+static int
+dc_read(struct attrib * a, FILE* F)
+/* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
+{
+  dc_data * data = (dc_data *)a->data.v;
+  fscanf(F, "%d %lf ", &data->countdown, &data->strength);
+  read_unit_reference(&data->mage, F);
+  return read_region_reference(&data->r, F);
+}
+
+attrib_type at_deathcloud = {
+  "zauber_todeswolke", dc_initialize, dc_finalize, dc_age, dc_write, dc_read
+};
+
+static attrib *
+mk_deathcloud(unit * mage, region * r, double strength, int duration)
+{
+  attrib * a = a_new(&at_deathcloud);
+  dc_data * data = (dc_data *)a->data.v;
+  
+  data->countdown = duration;
+  data->r = r;
+  data->mage = mage;
+  data->strength = strength;
+  data->active = false;
+  return a;
+}
+
 static int
 sp_deathcloud(castorder *co)
 {
-	unit *u;
-	double damage;
-	region *r = co->rt;
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
+  region *r = co->rt;
+  unit *mage = (unit *)co->magician;
 
-	attrib *a = a_find(r->attribs, &at_deathcloud);
+  attrib *a = a_find(r->attribs, &at_deathcloud);
 
-	if(a){
-		report_failure(mage, co->order);
-		return 0;
-	}
+  if (a!=NULL) {
+    report_failure(mage, co->order);
+    return 0;
+  }
 
-	for (u = r->units; u; u = u->next){
-		if (target_resists_magic(mage, u, TYP_UNIT, 0)){
-			continue;
-		}
-		/* Jede Person verliert 18 HP */
-		damage = 18 * u->number;
-		/* Reduziert durch Magieresistenz */
-		damage *= (1.0 - magic_resistance(u));
-		change_hitpoints(u, -(int)damage);
-	}
+  a_add(&r->attribs, mk_deathcloud(mage, r, co->force/2, co->level));
 
-	a = a_add(&r->attribs, a_new(&at_deathcloud));
-
-	/* melden, 1x pro Partei */
-	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
-
-	for(u = r->units; u; u = u->next ) {
-		if(!fval(u->faction, FL_DH) ) {
-			fset(u->faction, FL_DH);
-			add_message(&u->faction->msgs, new_message(u->faction,
-				"deathcloud_effect%u:mage%r:region",
-				cansee(u->faction, r, mage, 0) ? mage:NULL, r));
-		}
-	}
-	if(!fval(mage->faction, FL_DH)){
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"deathcloud_effect%u:mage%r:region", mage, r));
-	}
-
-	return cast_level;
+  return co->level;
 }
 
 void

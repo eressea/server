@@ -465,20 +465,17 @@ write_unit_reference(const unit * u, FILE * F)
 int
 read_unit_reference(unit ** up, FILE * F)
 {
-	char zId[10];
-	int i;
-	fscanf(F, "%s", zId);
-	if (up==NULL) {
-		return AT_READ_FAIL;
-	}
-	i = atoi36(zId);
-	if (i==0) {
-		*up = NULL;
-		return AT_READ_FAIL;
-	}
-	*up = findunit(i);
-	if (*up==NULL) ur_add((void*)i, (void**)up, resolve_unit);
-	return AT_READ_OK;
+  char zId[10];
+  int i;
+
+  assert(up!=NULL);
+  fscanf(F, "%s", zId);
+  i = atoi36(zId);
+  assert(i!=0);
+
+  *up = findunit(i);
+  if (*up==NULL) ur_add((void*)i, (void**)up, resolve_unit);
+  return AT_READ_OK;
 }
 
 attrib_type at_stealth = {

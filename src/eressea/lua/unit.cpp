@@ -178,6 +178,11 @@ unit_removespell(unit& u, const spell * sp)
   }
 }
 
+static int
+unit_hpmax(const unit& u)
+{
+  return unit_max_hp(&u);
+}
 
 void
 bind_unit(lua_State * L) 
@@ -192,6 +197,8 @@ bind_unit(lua_State * L)
     .def_readonly("region", &unit::region)
     .def_readonly("faction", &unit::faction)
     .def_readonly("id", &unit::no)
+	.def_readwrite("hp", &unit::hp)
+	.def("hp_max", &unit_hpmax)
     .def("get_item", &unit_getitem)
     .def("add_item", &unit_additem)
     .def("get_skill", &unit_getskill)
