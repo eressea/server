@@ -161,6 +161,12 @@ unit_addspell(unit& u, const char * name)
   if (!add) log_error(("spell %s could not be found\n", name));
 }
 
+static bool
+unit_isfamiliar(const unit& u)
+{
+  return is_familiar(&u);
+}
+
 static void
 unit_removespell(unit& u, const spell * sp)
 {
@@ -206,6 +212,7 @@ bind_unit(lua_State * L)
     .def("set_racename", &unit_setracename)
     .def("add_spell", &unit_addspell)
     .def("remove_spell", &unit_removespell)
+    .property("is_familiar", &unit_isfamiliar)
     .property("spells", &unit_spells, return_stl_iterator)
     .property("familiarspells", &unit_familiarspells, return_stl_iterator)
     .property("number", &unit_getnumber, &unit_setnumber)
