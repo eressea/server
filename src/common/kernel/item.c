@@ -136,7 +136,9 @@ resourcename(const resource_type * rtype, int flags)
 	if (rtype->name) return rtype->name(rtype, flags);
 
 	if (flags & NMF_PLURAL) i = 1;
-	if (flags & NMF_APPEARANCE) return rtype->_appearance[i];
+	if (flags & NMF_APPEARANCE && rtype->_appearance[i]) {
+		return rtype->_appearance[i];
+	}
 	return rtype->_name[i];
 }
 
@@ -2604,11 +2606,11 @@ tagbegin(struct xml_stack * stack, void * data)
 		if (tmp!=NULL) {
 			appearance[0] = strdup(tmp);
 			appearance[1] = strcat(strcpy((char*)malloc(strlen(tmp)+3), tmp), "_p");
-			state->rtype = new_resourcetype(names, appearance, flags);
+			state->rtype = new_resourcetype((const char**)names, (const char**)appearance, flags);
 			free(appearance[0]);
 			free(appearance[1]);
 		} else {
-			state->rtype = new_resourcetype(names, NULL, flags);
+			state->rtype = new_resourcetype((const char**)names, NULL, flags);
 		}
 		free(names[0]);
 		free(names[1]);
@@ -2631,13 +2633,12 @@ tagbegin(struct xml_stack * stack, void * data)
 		int reload = xml_ivalue(tag, "reload");
 		double magres = xml_fvalue(tag, "magres");
 		unsigned int flags = WTF_NONE;
-		const char * damage[2] = { NULL, NULL };
 
 		assert(strcmp(stack->next->tag->name, "item")==0);
 		assert(state->itype!=NULL);
 		state->itype->flags |= ITF_WEAPON;
 		state->wtype = new_weapontype(state->itype,
-			flags, magres, damage, offmod, defmod, reload, skill, minskill);
+			flags, magres, NULL, offmod, defmod, reload, skill, minskill);
 	} else if (strcmp(tag->name, "damage")==0) {
 		/* damage of a weapon */
 		int pos = 0;
