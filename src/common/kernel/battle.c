@@ -682,10 +682,21 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
 		skill = effskill(u, SK_WEAPONLESS);
 		if (skill==0) {
 			/* wenn kein waffenloser kampf, dann den rassen-defaultwert */
-			if (attacking) {
-				skill = u->race->at_default;
+			if(u->race == new_race[RC_URUK]) {
+				int sword = effskill(u, SK_SWORD);
+				int spear = effskill(u, SK_SPEAR);
+				skill = max(sword, spear) - 3;
+				if (attacking) {
+					skill = max(skill, u->race->at_default);
+				} else {
+					skill = max(skill, u->race->df_default);
+				}
 			} else {
-				skill = u->race->df_default;
+				if (attacking) {
+					skill = u->race->at_default;
+				} else {
+					skill = u->race->df_default;
+				}
 			}
 		} else {
 			/* der rassen-defaultwert kann höher sein als der Talentwert von

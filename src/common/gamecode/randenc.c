@@ -1075,6 +1075,8 @@ randomevents(void)
 		drown(r);
 	}
 
+
+#if RACE_ADJUSTMENTS
 	/* Orks vermehren sich */
 
 	for (r = regions; r; r = r->next) {
@@ -1129,6 +1131,7 @@ randomevents(void)
 			}
 		}
 	}
+#endif
 
 	/* Talente von Dämonen verschieben sich und Dämonen fressen Bauern */
 

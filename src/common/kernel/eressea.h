@@ -616,34 +616,35 @@ enum {
 	RC_HALFLING,
 	RC_CAT,
 	RC_AQUARIAN,
+	RC_URUK,
 
-	RC_UNDEAD,		/* 11 - Untoter */
+	RC_UNDEAD,		/* 12 - Untoter */
 	RC_ILLUSION,
 	RC_FIREDRAGON,
 	RC_DRAGON,
 	RC_WYRM,
 	RC_TREEMAN,
 
-	RC_BIRTHDAYDRAGON,	/* 17 - Katzendrache*/
+	RC_BIRTHDAYDRAGON,	/* 18 - Katzendrache*/
 	RC_DRACOID,
 
 	RC_SPECIAL,
 	RC_SPELL,
 
-	RC_IRONGOLEM,		/* 21 - Eisengolem */
+	RC_IRONGOLEM,		/* 22 - Eisengolem */
 	RC_STONEGOLEM,
 
 	RC_SHADOW,
 	RC_SHADOWLORD,
 
-	RC_IRONKEEPER,	/* 25 - Bergwächter */
+	RC_IRONKEEPER,	/* 26 - Bergwächter */
 	RC_ALP,
 
-	RC_TOAD,		/* 27 - Kröte */
+	RC_TOAD,		/* 28 - Kröte */
 	RC_HIRNTOETER,
 
 	RC_PEASANT,
-	RC_WOLF, /* 30 */
+	RC_WOLF, /* 31 */
 
 	RC_HOUSECAT,
 	RC_TUNNELWORM,
@@ -654,7 +655,7 @@ enum {
 	RC_UNICORN,
 	RC_WARG,
 	RC_WRAITH,
-	RC_IMP, /* 40 */
+	RC_IMP, /* 41 */
 	RC_DREAMCAT,
 	RC_FEY,
 	RC_OWL,
@@ -664,7 +665,7 @@ enum {
 	RC_OCEANTURTLE,
 	RC_KRAKEN,
 	RC_SEASERPENT,
-	RC_SHADOWKNIGHT, /* 50 */
+	RC_SHADOWKNIGHT, /* 51 */
 
 	RC_CENTAUR,
 
@@ -675,10 +676,11 @@ enum {
 	RC_GHOUL,
 	RC_GHOUL_LORD,
 
-	RC_MUS_SPIRIT,   /* 58 */
-	RC_GNOME,        /* 59 */
-	RC_TEMPLATE,     /* 60 */
-	RC_CLONE,        /* 61 */
+	RC_MUS_SPIRIT,   /* 59 */
+	RC_GNOME,        /* 60 */
+	RC_TEMPLATE,     /* 61 */
+	RC_CLONE,        /* 62 */
+
 
 	MAXRACES,
 	NORACE = (race_t) - 1

@@ -1324,8 +1324,6 @@ describe(FILE * F, region * r, int partial, faction * f)
 	}
 }
 
-extern const int wagetable[6][3];
-
 void
 statistics(FILE * F, region * r, faction * f)
 {

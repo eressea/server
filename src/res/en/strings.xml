@@ -1691,7 +1691,13 @@
 		<text locale="en">orc</text>
 	</string>
 	<string name="Orks">
+		<text locale="en">orcs</text>
+	</string>
+	<string name="Uruk">
 		<text locale="en">orc</text>
+	</string>
+	<string name="Uruks">
+		<text locale="en">orcs</text>
 	</string>
 	<string name="Riesenschildkröte">
 		<text locale="en">giant turtle</text>

@@ -4287,7 +4287,7 @@
 		<text locale="en">"$unit($unit) in $region($region): '$command' - options ZIP and BZIP2 can only be switched, not turned off."</text>
 	</message>
 	
-	<message name="error305">
+	<message name="error306">
 		<type>
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
@@ -4296,6 +4296,19 @@
 		<locale name="de">
 			<nr section="errors">
 				<text>"$unit($unit) in $region($region): '$command' - Die Partei muﬂ mindestens 9 Wochen alt sein, um einen Neustart zu versuchen."</text>
+			</nr>
+		</locale>
+	</message>
+	
+	<message name="error307">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<locale name="de">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - Orks sind keine Bauern."</text>
 			</nr>
 		</locale>
 	</message>

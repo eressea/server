@@ -155,7 +155,7 @@ const struct race_syn race_synonyms[] = {
 
 /* required for old_race, do not change order! */
 static const char * oldracenames[MAXRACES] = {
-	"dwarf", "elf", "orc", "goblin", "human", "troll", "demon", "insect", "halfling", "cat", "aquarian",
+	"dwarf", "elf", "orc", "goblin", "human", "troll", "demon", "insect", "halfling", "cat", "aquarian", "uruk"
 	"undead", "illusion",
 	"young dragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
 	"special", "spell",
@@ -208,6 +208,7 @@ give_starting_equipment(struct region *r, struct unit *u)
 		set_show_item(u->faction, I_FEENSTIEFEL);
 		break;
 	case RC_ORC:
+	case RC_URUK:
 		set_level(u, SK_SPEAR, 4);
 		set_level(u, SK_SWORD, 4);
 		set_level(u, SK_CROSSBOW, 4);

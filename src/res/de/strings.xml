@@ -1861,6 +1861,12 @@
 	<string name="Orks">
 		<text locale="de">Orks</text>
 	</string>
+	<string name="Uruk">
+		<text locale="de">Ork</text>
+	</string>
+	<string name="Uruks">
+		<text locale="de">Orks</text>
+	</string>
 	<string name="Riesenschildkröte">
 		<text locale="de">Riesenschildkröte</text>
 	</string>
@@ -2011,6 +2017,12 @@
 		<text locale="de">Orks</text>
 	</string>
 	<string name="rc_orc">
+		<text locale="de">Ork</text>
+	</string>
+	<string name="rc_uruk_p">
+		<text locale="de">Orks</text>
+	</string>
+	<string name="rc_uruk">
 		<text locale="de">Ork</text>
 	</string>
 	<string name="rc_zombie">

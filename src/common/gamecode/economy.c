@@ -245,7 +245,7 @@ expandrecruit(region * r, request * recruitorders)
 {
 	/* Rekrutierung */
 
-	int i, n, p = rpeasants(r), h = rhorses(r);
+	int i, n, p = rpeasants(r), h = rhorses(r), uruks = 0;
 	int rfrac = p / RECRUITFRACTION;
 	unit * u;
 
@@ -266,7 +266,7 @@ expandrecruit(region * r, request * recruitorders)
 				if (h <= 0) continue;
 			} else if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
 				/* recruit from peasants if any space left */
-				if (n >= rfrac) continue;
+				if (n - (uruks+1)/2 >= rfrac) continue;
 			}
 		}
 		if (recruitcost) {
@@ -276,7 +276,10 @@ expandrecruit(region * r, request * recruitorders)
 		if ((rc->ec_flags & ECF_REC_UNLIMITED)==0) {
 			if (rc->ec_flags & ECF_REC_HORSES) h--; /* use a horse */
 			else {
-				if ((rc->ec_flags & ECF_REC_ETHEREAL)==0) p--; /* use a peasant */
+				if ((rc->ec_flags & ECF_REC_ETHEREAL)==0) {
+					p--; /* use a peasant */
+					if(rc == new_race[RC_URUK]) uruks++;
+				}
 				n++;
 			}
 		}
@@ -286,7 +289,7 @@ expandrecruit(region * r, request * recruitorders)
 	}
 
 	assert(p>=0 && h>=0);
-	rsetpeasants(r, p);
+	rsetpeasants(r, p+uruks/2);
 	rsethorses(r, h);
 
 	free(oa);
@@ -295,7 +298,7 @@ expandrecruit(region * r, request * recruitorders)
 		if (u->n >= 0) {
 			if (u->number)
 				u->hp += u->n * unit_max_hp(u);
-			if (u->race == new_race[RC_ORC]) {
+			if (u->race == new_race[RC_URUK]) {
 				change_skill(u, SK_SWORD, skill_level(1) * u->n);
 				change_skill(u, SK_SPEAR, skill_level(1) * u->n);
 			}
@@ -365,11 +368,16 @@ recruit(region * r, unit * u, strlist * S,
 		return;
 	}
 
+#if RACE_ADJUSTMENTS
+	if (fval(r, RF_ORCIFIED) && u->faction->race != new_race[RC_URUK] &&
+#else
 	if (fval(r, RF_ORCIFIED) && u->faction->race != new_race[RC_ORC] &&
+#endif
 			!(u->faction->race->ec_flags & ECF_REC_HORSES)) {
 		cmistake(u, S->s, 238, MSG_EVENT);
 		return;
 	}
+
 
 	recruitcost = u->faction->race->recruitcost;
 	if (recruitcost) {
@@ -537,6 +545,11 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 		return;
 	} else if (u == u2) {
 		error = 10;
+#if RACE_ADJUSTMENTS
+	} else if (u->race == new_race[RC_URUK]) {
+		/* Uruks/Snotlings können nicht an Bauern übergeben werden. */
+		error = 307;
+#endif
 	} else if ((u && unit_has_cursed_item(u)) || (u2 && unit_has_cursed_item(u2))) {
 		error = 78;
 	} else if (fval(u, FL_LOCKED) || fval(u, FL_HUNGER) || is_cursed(u->attribs, C_SLAVE, 0)) {

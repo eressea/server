@@ -1093,7 +1093,7 @@
 		<familiar race="eagle"></familiar>
 		<familiar race="imp"></familiar>
 	</race>
-	<race name="goblin" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="40" maintenance="10" weight="1000" speed="1.000000" hp="16" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="0" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
+	<race name="goblin" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="40" maintenance="10" weight="900" speed="1.000000" hp="16" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="0" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
 		<function name="initfamiliar" value="oldfamiliars"></function>
 		<skill name="sk_alchemy" modifier="1"></skill>
@@ -1173,7 +1173,7 @@
 		<familiar race="unicorn"></familiar>
 		<familiar race="imp"></familiar>
 	</race>
-	<race name="dwarf" magres="0.050000" maxaura="1.000000" regaura="0.500000" recruitcost="90" maintenance="10" weight="1000" speed="1.000000" hp="24" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
+	<race name="dwarf" magres="0.050000" maxaura="1.000000" regaura="0.500000" recruitcost="110" maintenance="10" weight="1000" speed="1.000000" hp="24" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
 		<ai splitsize="10000" attackrandom moverandom learn></ai>
 		<skill name="sk_mining" modifier="2"></skill>
 		<skill name="sk_bow" modifier="-1"></skill>
@@ -1203,5 +1203,34 @@
 		<familiar race="lynx"></familiar>
 		<familiar race="wolf"></familiar>
 		<familiar race="rat"></familiar>
+	</race>
+	<race name="uruk" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="70" maintenance="10" weight="1000" speed="1.000000" hp="24" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
+		<ai splitsize="10000" attackrandom moverandom learn></ai>
+		<skill name="sk_alchemy" modifier="1"></skill>
+		<skill name="sk_mining" modifier="1"></skill>
+		<skill name="sk_building" modifier="1"></skill>
+		<skill name="sk_trade" modifier="-3"></skill>
+		<skill name="sk_forestry" modifier="1"></skill>
+		<skill name="sk_herbalism" modifier="-2"></skill>
+		<skill name="sk_magic" modifier="-1"></skill>
+		<skill name="sk_training" modifier="-1"></skill>
+		<skill name="sk_armorer" modifier="1"></skill>
+		<skill name="sk_shipcraft" modifier="-1"></skill>
+		<skill name="sk_sailing" modifier="-1"></skill>
+		<skill name="sk_espionage" modifier="-1"></skill>
+		<skill name="sk_quarrying" modifier="1"></skill>
+		<skill name="sk_tactics" modifier="1"></skill>
+		<skill name="sk_entertainment" modifier="-2"></skill>
+		<skill name="sk_weaponsmithing" modifier="2"></skill>
+		<skill name="sk_cartmaking" modifier="-1"></skill>
+		<skill name="sk_taxation" modifier="1"></skill>
+		<skill name="sk_unarmed" modifier="-99"></skill>
+		<attack type="1" damage="1d5"></attack>
+		<familiar race="goblin" default></familiar>
+		<familiar race="ghost"></familiar>
+		<familiar race="imp"></familiar>
+		<familiar race="rat"></familiar>
+		<familiar race="wolf"></familiar>
+		<familiar race="demon"></familiar>
 	</race>
 </races>

@@ -131,8 +131,8 @@ setstealth(unit * u, strlist * S)
 		/* Dämonen können sich nur als andere Spielerrassen tarnen */
 		if (u->race == new_race[RC_DAEMON]) {
 			race_t allowed[] = { RC_DWARF, RC_ELF, RC_ORC, RC_GOBLIN, RC_HUMAN, 
-				RC_TROLL, RC_DAEMON, RC_INSECT, RC_HALFLING, RC_CAT, RC_AQUARIAN, 
-				NORACE };
+				RC_TROLL, RC_DAEMON, RC_INSECT, RC_HALFLING, RC_CAT, RC_AQUARIAN,
+				RC_URUK, NORACE };
 			int i;
 			for (i=0;allowed[i]!=NORACE;++i) if (new_race[allowed[i]]==trace) break;
 			if (new_race[allowed[i]]==trace) {
