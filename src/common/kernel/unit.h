@@ -94,6 +94,14 @@ typedef struct unit {
 	int wants;	/* enno: attribut? */
 } unit;
 
+typedef struct unit_list {
+  struct unit_list * next;
+  struct unit * data;
+} unit_list;
+
+extern void unitlist_clear(struct unit_list **ul);
+extern void unitlist_insert(struct unit_list **ul, struct unit *u);
+
 extern attrib_type at_alias;
 extern attrib_type at_siege;
 extern attrib_type at_target;

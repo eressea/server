@@ -7255,8 +7255,8 @@ sp_wdwpyramid(castorder *co)
 
 		for(r2 = regions; r2; r2 = r2->next) {
 			if(a_find(r->attribs, &at_wdwpyramid) != NULL) {
-				short dist = distance(mage->region, r2);
-				if(dist < mindist) {
+				int dist = distance(mage->region, r2);
+				if (dist < mindist) {
 					mindist = dist;
 				}
 			}
@@ -9131,7 +9131,7 @@ spell spelldaten[] =
 	 (spell_f)sp_transferaura, patzer
 	},
 
-	{SPL_UNIT_ANALYSESONG, "Gesang des Lebens analysieren", NULL, NULL,
+	{SPL_UNIT_ANALYSESONG, "analysesong_unit", NULL, NULL,
 		"u",
 		M_BARDE,
 		(UNITSPELL | ONSHIPCAST | ONETARGET | TESTCANSEE),

@@ -1828,6 +1828,40 @@ maxworkingpeasants(const struct region * r)
 	return max(i, 0);
 }
 
+unit_list *
+get_lighthouses(const region * r)
+{
+  attrib * a;
+  unit_list * ulist = NULL;
+
+  if (rterrain(r) != T_OCEAN) return NULL;
+
+  for (a = a_find(r->attribs, &at_lighthouse);a;a=a->nexttype) {
+    building *b = (building *)a->data.v;
+    region *r2 = b->region;
+
+    if (fval(b, BLD_WORKING) && b->size >= 10) {
+      boolean c = false;
+      unit *u;
+      int d = distance(r, r2);
+      int maxd = (int)log10(b->size) + 1;
+
+      if (maxd < d) break;
+
+      for (u = r2->units; u; u = u->next) {
+        if (u->building == b) {
+          c = true;
+          if (c > buildingcapacity(b)) break;
+          if (eff_skill(u, SK_OBSERVATION, r) >= d * 3) {
+            unitlist_insert(&ulist, u);
+          }
+        } else if (c) break; /* first unit that's no longer in the house ends the search */
+      }
+    }
+  }
+  return ulist;
+}
+
 boolean
 check_leuchtturm(region * r, faction * f)
 {
@@ -1897,6 +1931,48 @@ lastregion (faction * f)
 		}
 	}
 	return f->last;
+}
+
+void
+update_intervals(void)
+{
+  region *r;
+
+  for (r = regions; r; r = r->next) {
+    plane * p = rplane(r);
+    attrib *ru;
+    unit *u;
+    unit_list * ulist, *uptr;
+
+    for (u = r->units; u; u = u->next) {
+      faction * f = u->faction;
+      if (f->first==NULL) f->first = r;
+    }
+
+    for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+      faction * f = ((unit*)ru->data.v)->faction;
+      if (f->first==NULL) f->first = r;
+    }
+
+    ulist = get_lighthouses(r);
+    for (uptr=ulist;uptr!=NULL;uptr=uptr->next) {
+      /* check lighthouse warden's faction */
+      unit * u = uptr->data;
+      if (u->faction->first==NULL) {
+        u->faction->first = r;
+      }
+    }
+    unitlist_clear(&ulist);
+
+    if (p!=NULL) {
+      struct watcher * w = p->watchers;
+      while (w) {
+        faction * f = w->faction;
+        if (f->first==NULL) f->first = r;
+        w = w->next;
+      }
+    }
+  }
 }
 
 region *

@@ -51,7 +51,6 @@
 
 #define FIND_FOREIGN_TEMP
 
-
 int demonfix = 0;
 /* ------------------------------------------------------------- */
 
@@ -1090,5 +1089,26 @@ boolean
 is_monstrous(const unit * u)
 {
 	return (boolean) (u->faction->no == MONSTER_FACTION || !playerrace(u->race));
+}
+
+void 
+unitlist_clear(struct unit_list **ul)
+{
+  while (*ul) {
+    unit_list * rl2 = (*ul)->next;
+    free(*ul);
+    *ul = rl2;
+  }
+}
+
+void 
+unitlist_insert(struct unit_list **ul, struct unit *u)
+{
+  unit_list *rl2 = (unit_list*)malloc(sizeof(unit_list));
+
+  rl2->data = u;
+  rl2->next = *ul;
+
+  *ul = rl2;
 }
 

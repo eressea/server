@@ -109,7 +109,6 @@ regions_in_range(struct region * start, int maxdist, boolean (*allowed)(const st
     if (n->distance >= maxdist) break;
     for (d=0;d!=MAXDIRECTIONS; ++d) {
       region * rn = rconnect(r, d);
-      region_list * rnew;
       if (rn==NULL) continue;
       if (fval(rn, FL_MARK)) continue; /* already been there */
       if (!allowed(r, rn)) continue; /* can't go there */

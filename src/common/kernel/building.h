@@ -98,6 +98,14 @@ typedef struct building {
 	unsigned int flags;
 } building;
 
+typedef struct building_list {
+  struct building_list * next;
+  building * data;
+} building_list;
+
+extern void free_buildinglist(building_list *bl);
+extern void add_buildinglist(building_list **bl, struct building *b);
+
 extern attrib_type at_building_generic_type;
 extern const char * buildingtype(const struct building * b, int bsize);
 extern const char * buildingname(const struct building * b);
