@@ -132,6 +132,23 @@ attrib_type at_traveldir_new = {
 	a_traveldir_new_read
 };
 
+static int
+age_speedup(attrib *a)
+{
+  if(a->data.i > 0) {
+    --a->data.i;
+  }
+  return a->data.i;
+}
+
+attrib_type at_speedup = {
+  "speedup",
+  NULL, NULL,
+  age_speedup,
+  a_writedefault,
+  a_readdefault
+};
+
 /* ------------------------------------------------------------- */
 
 direction_t

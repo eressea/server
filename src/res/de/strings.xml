@@ -1389,6 +1389,22 @@
     <text locale="de">Saphirne Schlüssel</text>
     <text locale="en">sapphire keys</text>
   </string>
+  <string name="hornofdancing">
+    <text locale="de">Horn des Tanzes</text>
+    <text locale="en">horn of dancing</text>
+  </string>
+  <string name="hornofdancing_p">
+    <text locale="de">Hörner des Tanzes</text>
+    <text locale="en">horns of dancing</text>
+  </string>
+  <string name="trappedairelemental">
+    <text locale="de">Gefangener Windgeist</text>
+    <text locale="en">trapped air elemental</text>
+  </string>
+  <string name="trappedairelemental_p">
+    <text locale="de">Gefangene Windgeister</text>
+    <text locale="en">trapped air elementals</text>
+  </string>
 
   <!--herb singular -->
   <string name="h0">

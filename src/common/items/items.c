@@ -18,6 +18,7 @@
 #include "lmsreward.h"
 #include "demonseye.h"
 #include "xerewards.h"
+#include "artrewards.h"
 #include "weapons.h"
 #include "racespoils.h"
 #if GROWING_TREES
@@ -42,6 +43,7 @@ register_items(void)
 	register_questkeys();
 	register_catapultammo();
 	register_racespoils();
+  register_artrewards();
 }
 
 void

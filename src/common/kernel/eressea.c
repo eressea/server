@@ -57,6 +57,7 @@
 #include "ship.h"
 #include "karma.h"
 #include "group.h"
+#include "movement.h"
 
 /* util includes */
 #include <base36.h>
@@ -485,6 +486,9 @@ shipspeed (const ship * sh, const unit * u)
 	int k = sh->type->range;
 	static const curse_type * stormwind_ct, * nodrift_ct;
 	static boolean init;
+  attrib *a;
+  curse  *c;
+
 	if (!init) {
 		init = true;
 		stormwind_ct = ct_find("stormwind");
@@ -501,8 +505,22 @@ shipspeed (const ship * sh, const unit * u)
 			k += 1;
 
 	if (old_race(u->faction->race) == RC_AQUARIAN
-			&& old_race(u->race) == RC_AQUARIAN)
+			&& old_race(u->race) == RC_AQUARIAN) {
 		k += 1;
+  }
+
+  a = a_find(sh->attribs, &at_speedup);
+  while(a != NULL) {
+    k += a->data.i;
+    a = a->nexttype;
+  }
+ 
+  c = get_curse(sh->attribs, ct_find("shipspeedup"));
+  while(c) {
+    k += curse_geteffect(c);
+    c  = c->nexthash;
+  }
+
 #ifdef SHIPSPEED
 	k *= SHIPSPEED;
 #endif
@@ -3088,6 +3106,7 @@ attrib_init(void)
 #ifdef WDW_PYRAMIDSPELL
 	at_register(&at_wdwpyramid);
 #endif
+  at_register(&at_speedup);
 }
 
 void

@@ -87,7 +87,8 @@ extern void getshipweight(const struct ship * sh, int *weight, int *cabins);
 
 extern ship *new_ship(const struct ship_type * stype, struct region * r);
 extern const char *shipname(const struct ship * sh);
-extern ship *findship(int n);
+extern struct ship *findship(int n);
+extern struct ship *findshipr(const struct region *r, int n);
 
 extern const struct ship_type * findshiptype(const char *s, const struct locale * lang);
 

@@ -5811,5 +5811,57 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Einheit $unit($target) hat keinen Kontakt mit uns aufgenommen."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The unit $unit($target) did not contact us."</text>
   </message>
+
+  <message name="hornofpeace_u_success" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="pacified" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $int($pacified) Regionen wurden befriedet."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $int($pacified) regions have been pacified."</text>
+  </message>
+
+  <message name="hornofpeace_u_nosuccess" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="target" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Keine Region konnte befriedet werden."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - No region could be pacified."</text>
+  </message>
+
+  <message name="hornofpeace_r_success" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region) bläst das Horn des Tanzes. In der ganzen Region breitet sich eine friedliche Feststimmmung aus."</text>
+    <text locale="en">"$unit($unit) in $region($region) blows the Horn of Dancing. Peaceful harmony spreads over the region."</text>
+  </message>
+
+  <message name="hornofpeace_r_nosuccess" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region) bläst das Horn des Tanzes, doch niemand hier lässt sich von Stimmung anstecken."</text>
+    <text locale="en">"$unit($unit) in $region($region) blows the Horn of Dancing, but nobody here gets into the mood."</text>
+  </message>
+  
+  <message name="trappedairelemental_success" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="ship" type="ship"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die $ship($ship) wird jetzt schneller ihr Ziel erreichen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The $ship($ship) will now be faster."</text>
+  </message>
+
 </messages>
 

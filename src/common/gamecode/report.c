@@ -2299,9 +2299,9 @@ report(FILE *F, faction * f, const faction_list * addresses,
 						w += weight(u);
 					}
 				}
-				sprintf(buf, "%s, %s, (%d/%d)",
+				sprintf(buf, "%s, %s %s, (%d/%d)",
 					shipname(sh),
-					LOC(f->locale, sh->type->name[0]),
+          LOC(f->locale, sh->type->name[0]),
 					(w + 99) / 100,	/* +99 weil sonst die Nachkommastellen ignoriert würden */
 					shipcapacity(sh) / 100);
 			} else {

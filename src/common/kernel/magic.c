@@ -106,21 +106,6 @@ MagicPower(void)
   return value;
 }
 
-static ship *
-findshipr(const region *r, int n)
-	/* Ein Schiff in einer bestimmten Region finden: */
-{
-	ship * sh;
-
-	for (sh = r->ships; sh; sh = sh->next) {
-		if (sh->no == n) {
-			assert(sh->region == r);
-			return sh;
-		}
-	}
-	return 0;
-}
-
 static building *
 findbuildingr(const region *r, int n)
 	/* Ein Gebäude in einer bestimmten Region finden: */

@@ -4,7 +4,7 @@ ifndef ERESSEA
 endif
 
 # Hier definieren, damit nicht '@gcc'
-CC      = gcc-3.3 -D_GNU_SOURCE -ansi -pedantic
+CC      = gcc-3.3 -D_GNU_SOURCE -ansi -pedantic -I/usr/include/libxml2
 DEPEND  = @gcc-3.3 -MM -MG -r
 # CC      = gcc -D_GNU_SOURCE
 AR      = ar

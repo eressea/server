@@ -65,6 +65,8 @@ struct building_type;
 boolean buildingtype_exists(const struct region * r, const struct building_type * bt);
 struct unit* owner_buildingtyp(const struct region * r, const struct building_type * bt);
 
+extern struct attrib_type at_speedup;
+
 #ifdef __cplusplus
 }
 #endif
