@@ -2658,375 +2658,368 @@ is_moving_ship(const region * r, const ship *sh)
 void
 magic(void)
 {
-	region *r;
-	region *target_r;
-	unit *u;           /* Aktuelle unit in Region */
-	unit *familiar;    /* wenn u ein Vertrauter ist */
-	unit *mage;        /* derjenige, der den Spruch am Ende zaubert */
-	spell *sp;
-	const char *s;
-	strlist *so;
-	int spellrank;
-	int level, success;
-	int range, t_x, t_y;
-	double force;
-	int skiptokens;
-	castorder *co;
-	castorder *cll[MAX_SPELLRANK];
-	spellparameter *args;
+  region *r;
+  region *target_r;
+  unit *u;           /* Aktuelle unit in Region */
+  unit *familiar;    /* wenn u ein Vertrauter ist */
+  unit *mage;        /* derjenige, der den Spruch am Ende zaubert */
+  spell *sp;
+  const char *s;
+  strlist *so;
+  int spellrank;
+  int range, t_x, t_y;
+  int skiptokens;
+  castorder *co;
+  castorder *cll[MAX_SPELLRANK];
+  spellparameter *args;
 
-	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
-		cll[spellrank] = (castorder*)NULL;
-	}
+  for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
+    cll[spellrank] = (castorder*)NULL;
+  }
 
-	for (r = regions; r; r = r->next) {
-		for (u = r->units; u; u = u->next) {
-			boolean casted = false;
+  for (r = regions; r; r = r->next) {
+    for (u = r->units; u; u = u->next) {
+      int level;
+      boolean casted = false;
 
-			if (old_race(u->race) == RC_SPELL || fval(u, UFL_LONGACTION))
-				continue;
+      if (old_race(u->race) == RC_SPELL || fval(u, UFL_LONGACTION))
+        continue;
 
-			if (old_race(u->race) == RC_INSECT && r_insectstalled(r) &&
-					!is_cursed(u->attribs, C_KAELTESCHUTZ,0))
-				continue;
+      if (old_race(u->race) == RC_INSECT && r_insectstalled(r) &&
+        !is_cursed(u->attribs, C_KAELTESCHUTZ,0))
+        continue;
 
-			if(fval(u, UFL_WERE)) {
-				continue;
-			}
+      if(fval(u, UFL_WERE)) {
+        continue;
+      }
 
-			if (attacked(u)) {
-				continue;
-			}
+      if (attacked(u)) {
+        continue;
+      }
 
-			for (so = u->orders; so; so = so->next) {
-				if (igetkeyword(so->s, u->faction->locale) == K_CAST) {
-					if (LongHunger() && fval(u, UFL_HUNGER)) {
-						cmistake(u, so->s, 224, MSG_MAGIC);
-						continue;
-					}
-					if (r->planep && fval(r->planep, PFL_NOMAGIC)) {
-						cmistake(u, so->s, 269, MSG_MAGIC);
-						continue;
-					}
-					casted = true;
-					target_r = r;
-					mage = u;
-					level = eff_skill(u, SK_MAGIC, r);
-					familiar = NULL;
-					skiptokens = 1;
-					s = getstrtoken();
-					/* für Syntax ' STUFE x REGION y z ' */
-					if (findparam(s, u->faction->locale) == P_LEVEL) {
-						s = getstrtoken();
-						level = min(atoip(s), level);
-						s = getstrtoken();
-						skiptokens += 2;
-						if (level < 1) {
-							/* Fehler "Das macht wenig Sinn" */
-							cmistake(u, so->s, 10, MSG_MAGIC);
-							continue;
-						}
-					}
-					if (findparam(s, u->faction->locale) == P_REGION) {
-						t_x = atoi(getstrtoken());
-						t_x = rel_to_abs(getplane(u->region),u->faction,t_x,0);
-						t_y = atoi(getstrtoken());
-						t_y = rel_to_abs(getplane(u->region),u->faction,t_y,1);
-						target_r = findregion(t_x, t_y);
-						s = getstrtoken();
-						skiptokens += 3;
-						if (!target_r) {
-							/* Fehler "Es wurde kein Zauber angegeben" */
-							cmistake(u, so->s, 172, MSG_MAGIC);
-							continue;
-						}
-					}
-					/* für Syntax ' REGION x y STUFE z '
-					 * hier nach REGION nochmal auf STUFE prüfen */
-					if (findparam(s, u->faction->locale) == P_LEVEL) {
-						s = getstrtoken();
-						level = min(atoip(s), level);
-						s = getstrtoken();
-						skiptokens += 2;
-						if (level < 1) {
-							/* Fehler "Das macht wenig Sinn" */
-							cmistake(u, so->s, 10, MSG_MAGIC);
-							continue;
-						}
-					}
-					if (!s[0] || strlen(s) == 0) {
-						/* Fehler "Es wurde kein Zauber angegeben" */
-						cmistake(u, so->s, 172, MSG_MAGIC);
-						continue;
-					}
-					sp = find_spellbyname(u, s, u->faction->locale);
-
-					/* Vertraute können auch Zauber sprechen, die sie selbst nicht
-					 * können. find_spellbyname findet aber nur jene Sprüche, die
-					 * die Einheit beherrscht. */
-					if (sp == NULL && is_familiar(u)) {
-						familiar = u;
-						mage = get_familiar_mage(u);
-						sp = find_spellbyname(mage, s, mage->faction->locale);
-					}
-
-					if (sp == NULL) {
-						/* Fehler 'Spell not found' */
-						cmistake(u, so->s, 173, MSG_MAGIC);
-						continue;
-					}
-					/* um testen auf spruchnamen zu unterbinden sollte vor allen
-					 * fehlermeldungen die anzeigen das der magier diesen Spruch
-					 * nur in diese Situation nicht anwenden kann, noch eine
-					 * einfache Sicherheitsprüfung kommen */
-					if (knowsspell(r, u, sp) == false){
-						/* vorsicht! u kann der familiar sein */
-						if (!familiar){
-							cmistake(u, so->s, 173, MSG_MAGIC);
-							continue;
-						}
-					}
-					if (sp->sptyp & ISCOMBATSPELL) {
-						/* Fehler: "Dieser Zauber ist nur im Kampf sinnvoll" */
-						cmistake(u, so->s, 174, MSG_MAGIC);
-						continue;
-					}
-					/* Auf dem Ozean Zaubern als quasi-langer Befehl können
-					 * normalerweise nur Meermenschen, ausgenommen explizit als
-					 * OCEANCASTABLE deklarierte Sprüche */
-					if (rterrain(r) == T_OCEAN) {
-						if (old_race(u->race) != RC_AQUARIAN
-								&& !fval(u->race, RCF_SWIM)
-								&& !(sp->sptyp & OCEANCASTABLE)) {
-							/* Fehlermeldung */
-              ADDMSG(&u->faction->msgs, msg_message("spellfail_onocean", 
-                "unit region command", u, u->region, so->s));
-								continue;
-						}
-					/* Auf bewegenden Schiffen kann man nur explizit als
-					 * ONSHIPCAST deklarierte Zauber sprechen */
-					} else if (u->ship) {
-						if (is_moving_ship(r, u->ship)) {
-							if (!(sp->sptyp & ONSHIPCAST)) {
-								/* Fehler: "Diesen Spruch kann man nicht auf einem sich
-								 * bewegenden Schiff stehend zaubern" */
-								cmistake(u, so->s, 175, MSG_MAGIC);
-								continue;
-							}
-						}
-					}
-					/* Farcasting bei nicht farcastbaren Sprüchen abfangen */
-					range = farcasting(u, target_r);
-					if (range > 1) {
-						if (!(sp->sptyp & FARCASTING)) {
-							/* Fehler "Diesen Spruch kann man nicht in die Ferne
-							 * richten" */
-							cmistake(u, so->s, 176, MSG_MAGIC);
-							continue;
-						}
-						if (range > 1024) { /* (2^10) weiter als 10 Regionen entfernt */
-							sprintf(buf, "%s in %s: 'ZAUBER %s' Zu der Region %s kann keine "
-									"Verbindung hergestellt werden", unitname(u),
-									regionid(u->region), 
-									spell_name(sp, u->faction->locale), 
-									regionid(target_r));
-							addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
-							continue;
-						}
-					}
-					/* Stufenangabe bei nicht Stufenvariierbaren Sprüchen abfangen */
-					if (!(sp->sptyp & SPELLLEVEL)) {
-						int ilevel = eff_skill(u, SK_MAGIC, u->region);
-						if (ilevel!=level) {
-							level = ilevel;
-							sprintf(buf, "%s in %s: 'ZAUBER %s' Dieser Zauber kann nicht "
-									"mit Stufenangabe gezaubert werden.", unitname(u),
-									regionid(u->region), 
-									spell_name(sp, u->faction->locale));
-							addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
-						}
-					}
-					/* Vertrautenmagie */
-					/* Kennt der Vertraute den Spruch, so zaubert er ganz normal.
-					 * Ansonsten zaubert der Magier durch seinen Vertrauten, dh
-					 * zahlt Komponenten und Aura. Dabei ist die maximale Stufe
-					 * die des Vertrauten!
-					 * Der Spruch wirkt dann auf die Region des Vertrauten und
-					 * gilt nicht als Farcasting. */
-					if (familiar || is_familiar(u)) {
-						if ((sp->sptyp & NOTFAMILIARCAST)) {
-							/* Fehler: "Diesen Spruch kann der Vertraute nicht zaubern" */
-							cmistake(u, so->s, 177, MSG_MAGIC);
-							continue;
-						}
-						if (!knowsspell(r, u, sp)) { /* Magier zaubert durch Vertrauten */
-							mage = get_familiar_mage(u);
-							if (range > 1) { /* Fehler! Versucht zu Farcasten */
-								sprintf(buf, "%s kann Sprüche, die durch %s wirken, nicht "
-										"zusätzlich nochmal in die Ferne richten.",
-										unitname(mage), unitname(u));
-								addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
-								continue;
-							}
-							if (distance(mage->region, r) > eff_skill(mage, SK_MAGIC, mage->region)) {
-								sprintf(buf, "%s kann nicht genug Kraft aufbringen, um "
-										"durch %s zu wirken", unitname(mage), unitname(u));
-								addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
-								continue;
-							}
-							/* mage auf magier setzen, level anpassen, range für Erhöhung
-							 * der Spruchkosten nutzen, langen Befehl des Magiers
-							 * löschen, zaubern kann er noch */
-							range *= 2;
-							set_string(&mage->thisorder, "");
-							level = min(level, eff_skill(mage, SK_MAGIC, mage->region)/2);
-							familiar = u;
-						}
-					}
-					/* Weitere Argumente zusammenbasten */
-					if (sp->parameter) {
-						++skiptokens;
-						args = add_spellparameter(target_r, mage, sp->parameter,
-							    so->s, skiptokens);
-						if (!args) {
-							/* Syntax war falsch */
-							continue;
-						}
-					} else {
-						args = (spellparameter *) NULL;
-					}
-					co = new_castorder(mage, familiar, sp, target_r, level, 0, range,
-							strdup(so->s), args);
-					add_castorder(&cll[(int)(sp->rank)], co);
-				}
-			}
-			if (casted) fset(u, UFL_LONGACTION);
-		}
-	}
-	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
-		for (co = cll[spellrank]; co; co = co->next) {
-			char *cmd = co->order;
-
-			u = (unit *)co->magician;
-			sp = co->sp;
-			level = co->level; /* Talent des Magiers oder gewünschte Stufe */
-			target_r = co->rt;
-
-			/* Da sich die Aura und Komponenten in der Zwischenzeit verändert
-			 * haben können und sich durch vorherige Sprüche das Zaubern
-			 * erschwert haben kann, muss hier erneut geprüft werden, ob der
-			 * Spruch überhaupt gezaubert werden kann.
-			 * (level) die effektive Stärke des Spruchs (= Stufe, auf der der
-			 * Spruch gezaubert wird) */
-
-			/* reichen die Komponenten nicht, wird der Level reduziert. */
-			level = eff_spelllevel(u, sp, level, co->distance);
-			if (level < 1) {
-				/* Fehlermeldung mit Komponenten generieren */
-				cancast(u, sp, co->level, co->distance, cmd);
-				continue;
-			}
-			if (level < co->level){
-				/* Sprüche mit Fixkosten werden immer auf Stufe des Spruchs
-				 * gezaubert, co->level ist aber defaultmäßig Stufe des Magiers */
-				if (spl_costtyp(sp) != SPC_FIX) {
-					sprintf(buf, "%s hat nur genügend Komponenten um %s auf Stufe %d "
-							"zu zaubern.", unitname(u), 
-							spell_name(sp, u->faction->locale), level);
-					addmessage(0, u->faction, buf, MSG_MAGIC, ML_INFO);
-				}
-			}
-			co->level = level;
-
-			/* Prüfen, ob die realen Kosten für die gewünschten Stufe bezahlt
-			 * werden können */
-			if (cancast(u, sp, level, co->distance, cmd) == false) {
-				/* die Fehlermeldung wird in cancast generiert */
-				continue;
-			}
-
-			/* die Stärke kann durch Antimagie auf 0 sinken */
-			force = spellpower(target_r, u, sp, level);
-			if (force <= 0) {
-				sprintf(buf, "%s schafft es nicht genügend Kraft aufzubringen "
-						"um %s dennoch zu zaubern.", unitname(u), 
-						spell_name(sp, u->faction->locale));
-				addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
-				continue;
-			}
-			co->force = force;
-
-			/* Ziele auf Existenz prüfen und Magieresistenz feststellen. Wurde
-			 * kein Ziel gefunden, so ist verify_targets=0. Scheitert der
-			 * Spruch an der Magieresistenz, so ist verify_targets = 1, bei
-			 * Erfolg auf ganzer Linie ist verify_targets= 2
-			 */
-			switch (verify_targets(co)){
-				case 0:
-					/* kein Ziel gefunden, Fehlermeldungen sind in verify_targets */
-					continue; /* äußere Schleife, nächster Zauberer */
-				case 1:
-				{ /* einige oder alle Ziele waren magieresistent */
-					spellparameter *pa = co->par;
-					int n;
-					for (n=0; n!=pa->length;++n) {
-						if(pa->param[n]->flag != TARGET_RESISTS
-								&& pa->param[n]->flag != TARGET_NOTFOUND)
-						{ /* mindestens ein erfolgreicher Zauberversuch, wir machen
-								 normal weiter */
-							break;
-						}
-					}
-          if (n==pa->length) {
-            /* zwar wurde mindestens ein Ziel gefunden, das widerstand
-            * jedoch dem Zauber. Kosten abziehen und abbrechen. */
-            pay_spell(u, sp, level, co->distance);
-            countspells(u, 1);
-            sprintf(buf, "%s gelingt es %s zu zaubern, doch der Spruch zeigt "
-              "keine Wirkung.", unitname(u), 
-              spell_name(sp, u->faction->locale));
-            addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
-            continue; /* äußere Schleife, nächster Zauberer */
+      for (so = u->orders; so; so = so->next) {
+        if (igetkeyword(so->s, u->faction->locale) == K_CAST) {
+          if (LongHunger() && fval(u, UFL_HUNGER)) {
+            cmistake(u, so->s, 224, MSG_MAGIC);
+            continue;
           }
-          break;
-				}
-				case 2:
-				default:
-					/* Zauber war erfolgreich */
-					break;
-			}
+          if (r->planep && fval(r->planep, PFL_NOMAGIC)) {
+            cmistake(u, so->s, 269, MSG_MAGIC);
+            continue;
+          }
+          casted = true;
+          target_r = r;
+          mage = u;
+          level = eff_skill(u, SK_MAGIC, r);
+          familiar = NULL;
+          skiptokens = 1;
+          s = getstrtoken();
+          /* für Syntax ' STUFE x REGION y z ' */
+          if (findparam(s, u->faction->locale) == P_LEVEL) {
+            s = getstrtoken();
+            level = min(atoip(s), level);
+            s = getstrtoken();
+            skiptokens += 2;
+            if (level < 1) {
+              /* Fehler "Das macht wenig Sinn" */
+              cmistake(u, so->s, 10, MSG_MAGIC);
+              continue;
+            }
+          }
+          if (findparam(s, u->faction->locale) == P_REGION) {
+            t_x = atoi(getstrtoken());
+            t_x = rel_to_abs(getplane(u->region),u->faction,t_x,0);
+            t_y = atoi(getstrtoken());
+            t_y = rel_to_abs(getplane(u->region),u->faction,t_y,1);
+            target_r = findregion(t_x, t_y);
+            s = getstrtoken();
+            skiptokens += 3;
+            if (!target_r) {
+              /* Fehler "Es wurde kein Zauber angegeben" */
+              cmistake(u, so->s, 172, MSG_MAGIC);
+              continue;
+            }
+          }
+          /* für Syntax ' REGION x y STUFE z '
+          * hier nach REGION nochmal auf STUFE prüfen */
+          if (findparam(s, u->faction->locale) == P_LEVEL) {
+            s = getstrtoken();
+            level = min(atoip(s), level);
+            s = getstrtoken();
+            skiptokens += 2;
+            if (level < 1) {
+              /* Fehler "Das macht wenig Sinn" */
+              cmistake(u, so->s, 10, MSG_MAGIC);
+              continue;
+            }
+          }
+          if (!s[0] || strlen(s) == 0) {
+            /* Fehler "Es wurde kein Zauber angegeben" */
+            cmistake(u, so->s, 172, MSG_MAGIC);
+            continue;
+          }
+          sp = find_spellbyname(u, s, u->faction->locale);
 
-			/* Auch für Patzer gibt es Erfahrung, müssen die Spruchkosten
-			 * bezahlt werden und die nachfolgenden Sprüche werden teurer */
-			if (fumble(target_r, u, sp, level) == true) {
-				/* zuerst bezahlen, dann evt in do_fumble alle Aura verlieren */
-				pay_spell(u, sp, level, co->distance);
-				do_fumble(co);
-				countspells(u, 1);
-				continue;
-			}
-			success = ((nspell_f)sp->sp_function)(co);
-			if (success > 0) {
-				/* Kosten nur für real benötige Stufe berechnen */
-				pay_spell(u, sp, success, co->distance);
-				/* erst bezahlen, dann Kostenzähler erhöhen */
-				countspells(u,1);
-			}
-		}
-	}
+          /* Vertraute können auch Zauber sprechen, die sie selbst nicht
+          * können. find_spellbyname findet aber nur jene Sprüche, die
+          * die Einheit beherrscht. */
+          if (sp == NULL && is_familiar(u)) {
+            familiar = u;
+            mage = get_familiar_mage(u);
+            sp = find_spellbyname(mage, s, mage->faction->locale);
+          }
 
-	/* Sind alle Zauber gesprochen gibts Erfahrung */
-	for (r = regions; r; r = r->next) {
-		for (u = r->units; u; u = u->next) {
-			if (is_mage(u) && countspells(u,0) > 0) {
-				produceexp(u, SK_MAGIC, u->number);
-				/* Spruchlistenaktualiesierung ist in Regeneration */
-			}
-		}
-	}
-	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
-		free_castorders(cll[spellrank]);
-	}
+          if (sp == NULL) {
+            /* Fehler 'Spell not found' */
+            cmistake(u, so->s, 173, MSG_MAGIC);
+            continue;
+          }
+          /* um testen auf spruchnamen zu unterbinden sollte vor allen
+          * fehlermeldungen die anzeigen das der magier diesen Spruch
+          * nur in diese Situation nicht anwenden kann, noch eine
+          * einfache Sicherheitsprüfung kommen */
+          if (knowsspell(r, u, sp) == false){
+            /* vorsicht! u kann der familiar sein */
+            if (!familiar){
+              cmistake(u, so->s, 173, MSG_MAGIC);
+              continue;
+            }
+          }
+          if (sp->sptyp & ISCOMBATSPELL) {
+            /* Fehler: "Dieser Zauber ist nur im Kampf sinnvoll" */
+            cmistake(u, so->s, 174, MSG_MAGIC);
+            continue;
+          }
+          /* Auf dem Ozean Zaubern als quasi-langer Befehl können
+          * normalerweise nur Meermenschen, ausgenommen explizit als
+          * OCEANCASTABLE deklarierte Sprüche */
+          if (rterrain(r) == T_OCEAN) {
+            if (old_race(u->race) != RC_AQUARIAN
+              && !fval(u->race, RCF_SWIM)
+              && !(sp->sptyp & OCEANCASTABLE)) {
+                /* Fehlermeldung */
+                ADDMSG(&u->faction->msgs, msg_message("spellfail_onocean", 
+                  "unit region command", u, u->region, so->s));
+                continue;
+              }
+              /* Auf bewegenden Schiffen kann man nur explizit als
+              * ONSHIPCAST deklarierte Zauber sprechen */
+          } else if (u->ship) {
+            if (is_moving_ship(r, u->ship)) {
+              if (!(sp->sptyp & ONSHIPCAST)) {
+                /* Fehler: "Diesen Spruch kann man nicht auf einem sich
+                * bewegenden Schiff stehend zaubern" */
+                cmistake(u, so->s, 175, MSG_MAGIC);
+                continue;
+              }
+            }
+          }
+          /* Farcasting bei nicht farcastbaren Sprüchen abfangen */
+          range = farcasting(u, target_r);
+          if (range > 1) {
+            if (!(sp->sptyp & FARCASTING)) {
+              /* Fehler "Diesen Spruch kann man nicht in die Ferne
+              * richten" */
+              cmistake(u, so->s, 176, MSG_MAGIC);
+              continue;
+            }
+            if (range > 1024) { /* (2^10) weiter als 10 Regionen entfernt */
+              sprintf(buf, "%s in %s: 'ZAUBER %s' Zu der Region %s kann keine "
+                "Verbindung hergestellt werden", unitname(u),
+                regionid(u->region), 
+                spell_name(sp, u->faction->locale), 
+                regionid(target_r));
+              addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
+              continue;
+            }
+          }
+          /* Stufenangabe bei nicht Stufenvariierbaren Sprüchen abfangen */
+          if (!(sp->sptyp & SPELLLEVEL)) {
+            int ilevel = eff_skill(u, SK_MAGIC, u->region);
+            if (ilevel!=level) {
+              level = ilevel;
+              sprintf(buf, "%s in %s: 'ZAUBER %s' Dieser Zauber kann nicht "
+                "mit Stufenangabe gezaubert werden.", unitname(u),
+                regionid(u->region), 
+                spell_name(sp, u->faction->locale));
+              addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
+            }
+          }
+          /* Vertrautenmagie */
+          /* Kennt der Vertraute den Spruch, so zaubert er ganz normal.
+          * Ansonsten zaubert der Magier durch seinen Vertrauten, dh
+          * zahlt Komponenten und Aura. Dabei ist die maximale Stufe
+          * die des Vertrauten!
+          * Der Spruch wirkt dann auf die Region des Vertrauten und
+          * gilt nicht als Farcasting. */
+          if (familiar || is_familiar(u)) {
+            if ((sp->sptyp & NOTFAMILIARCAST)) {
+              /* Fehler: "Diesen Spruch kann der Vertraute nicht zaubern" */
+              cmistake(u, so->s, 177, MSG_MAGIC);
+              continue;
+            }
+            if (!knowsspell(r, u, sp)) { /* Magier zaubert durch Vertrauten */
+              mage = get_familiar_mage(u);
+              if (range > 1) { /* Fehler! Versucht zu Farcasten */
+                sprintf(buf, "%s kann Sprüche, die durch %s wirken, nicht "
+                  "zusätzlich nochmal in die Ferne richten.",
+                  unitname(mage), unitname(u));
+                addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
+                continue;
+              }
+              if (distance(mage->region, r) > eff_skill(mage, SK_MAGIC, mage->region)) {
+                sprintf(buf, "%s kann nicht genug Kraft aufbringen, um "
+                  "durch %s zu wirken", unitname(mage), unitname(u));
+                addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
+                continue;
+              }
+              /* mage auf magier setzen, level anpassen, range für Erhöhung
+              * der Spruchkosten nutzen, langen Befehl des Magiers
+              * löschen, zaubern kann er noch */
+              range *= 2;
+              set_string(&mage->thisorder, "");
+              level = min(level, eff_skill(mage, SK_MAGIC, mage->region)/2);
+              familiar = u;
+            }
+          }
+          /* Weitere Argumente zusammenbasten */
+          if (sp->parameter) {
+            ++skiptokens;
+            args = add_spellparameter(target_r, mage, sp->parameter,
+              so->s, skiptokens);
+            if (!args) {
+              /* Syntax war falsch */
+              continue;
+            }
+          } else {
+            args = (spellparameter *) NULL;
+          }
+          co = new_castorder(mage, familiar, sp, target_r, level, 0, range,
+            strdup(so->s), args);
+          add_castorder(&cll[(int)(sp->rank)], co);
+        }
+      }
+      if (casted) fset(u, UFL_LONGACTION);
+    }
+  }
+
+  /* Da sich die Aura und Komponenten in der Zwischenzeit verändert
+  * haben können und sich durch vorherige Sprüche das Zaubern
+  * erschwert haben kann, muss beim zaubern erneut geprüft werden, ob der
+  * Spruch überhaupt gezaubert werden kann.
+  * (level) die effektive Stärke des Spruchs (= Stufe, auf der der
+  * Spruch gezaubert wird) */
+
+  for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
+    for (co = cll[spellrank]; co; co = co->next) {
+      char *cmd = co->order;
+      int verify, cast_level = co->level;
+      boolean fumbled = false;
+      unit * u = (unit *)co->magician;
+      spell * sp = co->sp;
+      region * target_r = co->rt;
+
+      /* reichen die Komponenten nicht, wird der Level reduziert. */
+      co->level = eff_spelllevel(u, sp, cast_level, co->distance);       
+
+      if (co->level < 1) {
+        /* Fehlermeldung mit Komponenten generieren */
+        cancast(u, sp, co->level, co->distance, cmd);
+        continue;
+      }
+
+      if (cast_level > co->level) {
+        /* Sprüche mit Fixkosten werden immer auf Stufe des Spruchs
+        * gezaubert, co->level ist aber defaultmäßig Stufe des Magiers */
+        if (spl_costtyp(sp) != SPC_FIX) {
+          sprintf(buf, "%s hat nur genügend Komponenten um %s auf Stufe %d "
+            "zu zaubern.", unitname(u), spell_name(sp, u->faction->locale), 
+            co->level);
+          addmessage(0, u->faction, buf, MSG_MAGIC, ML_INFO);
+        }
+      }
+
+      /* Prüfen, ob die realen Kosten für die gewünschten Stufe bezahlt
+      * werden können */
+      if (cancast(u, sp, co->level, co->distance, cmd) == false) {
+        /* die Fehlermeldung wird in cancast generiert */
+        continue;
+      }
+
+      co->force = spellpower(target_r, u, sp, co->level);
+      /* die Stärke kann durch Antimagie auf 0 sinken */
+      if (co->force <= 0) {
+        co->force = 0;
+        sprintf(buf, "%s schafft es nicht genügend Kraft aufzubringen "
+          "um %s dennoch zu zaubern.", unitname(u), 
+          spell_name(sp, u->faction->locale));
+        addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
+      }
+
+      /* Ziele auf Existenz prüfen und Magieresistenz feststellen. Wurde
+      * kein Ziel gefunden, so ist verify_targets=0. Scheitert der
+      * Spruch an der Magieresistenz, so ist verify_targets = 1, bei
+      * Erfolg auf ganzer Linie ist verify_targets= 2
+      */
+      verify = verify_targets(co);
+      if (verify==0) {
+        /* kein Ziel gefunden, Fehlermeldungen sind in verify_targets */
+        /* keine kosten für den zauber */
+        continue; /* äußere Schleife, nächster Zauberer */
+      } else if (co->force>0 && verify==1) {
+        /* einige oder alle Ziele waren magieresistent */
+        spellparameter *pa = co->par;
+        int n;
+        for (n=0; n!=pa->length;++n) {
+          if ((pa->param[n]->flag & (TARGET_RESISTS|TARGET_NOTFOUND)) ==0) {
+            /* mindestens ein erfolgreicher Zauberversuch, wir machen normal weiter */
+            break;
+          }
+        }
+        if (n==pa->length) {
+          co->force = 0;
+          /* zwar wurde mindestens ein Ziel gefunden, das widerstand
+            * jedoch dem Zauber. Kosten abziehen und abbrechen. */
+          sprintf(buf, "%s gelingt es %s zu zaubern, doch der Spruch zeigt "
+            "keine Wirkung.", unitname(u), 
+            spell_name(sp, u->faction->locale));
+          addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
+          co->force = 0;
+        }
+      }
+
+      /* Auch für Patzer gibt es Erfahrung, müssen die Spruchkosten
+      * bezahlt werden und die nachfolgenden Sprüche werden teurer */
+      if (co->force>0 && fumble(target_r, u, sp, co->level)) {
+        /* zuerst bezahlen, dann evt in do_fumble alle Aura verlieren */
+        fumbled = true;
+        co->force = 0;
+      } else if (co->force>0) {
+        co->level = ((nspell_f)sp->sp_function)(co);
+        if (co->level <= 0) {
+          /* Kosten nur für real benötige Stufe berechnen */
+          continue;
+        }
+      }
+      pay_spell(u, sp, co->level, co->distance);
+      /* erst bezahlen, dann Kostenzähler erhöhen */
+      if (fumbled) do_fumble(co);
+      countspells(u, 1);
+    }
+  }
+
+  /* Sind alle Zauber gesprochen gibts Erfahrung */
+  for (r = regions; r; r = r->next) {
+    for (u = r->units; u; u = u->next) {
+      if (is_mage(u) && countspells(u,0) > 0) {
+        produceexp(u, SK_MAGIC, u->number);
+        /* Spruchlistenaktualiesierung ist in Regeneration */
+      }
+    }
+  }
+  for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
+    free_castorders(cll[spellrank]);
+  }
 }
 
 attrib *
