@@ -1107,7 +1107,7 @@ quit(void)
 	remove("inactive");
 
 	for (f = factions; f; f = f->next) if(!fval(f, FL_NOIDLEOUT)) {
-#if REMOVENMRTIMEOUT
+#if REMOVENMRTIMEOUT == 1
 		if (turn - f->lastorders >= ORDERGAP) {
 			destroyfaction(f);
 			continue;
@@ -1118,7 +1118,7 @@ quit(void)
 			continue;
 		}
 	}
-#if REMOVENMRNEWBIE
+#if REMOVENMRNEWBIE == 1
 	puts(" - beseitige Spieler, die sich nach der Anmeldung nicht "
 		 "gemeldet haben...");
 

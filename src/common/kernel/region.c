@@ -44,6 +44,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+extern int dice_rand(const char *s);
+
 static int g_maxluxuries = 0;
 
 const int delta_x[MAXDIRECTIONS] =
@@ -989,8 +991,13 @@ terraform(region * r, terrain_t t)
 #endif
 
 	if (terrain[t].production_max && !fval(r, RF_CHAOTIC)) {
-		int np = MAXPEASANTS_PER_AREA * (rand() % (terrain[t].production_max / 2));
-		rsetpeasants(r, max(100, np));
+		int peasants;
+#if REDUCED_PEASANTGROWTH == 1
+		peasants = (maxworkingpeasants(r) * (20+dice_rand("6d10")))/100;
+#else
+		peasants = MAXPEASANTS_PER_AREA * (rand() % (terrain[t].production_max / 2));
+#endif
+		rsetpeasants(r, max(100, peasants));
 		rsetmoney(r, rpeasants(r) * ((wage(r, NULL, false)+1) + rand() % 5));
 	}
 }
