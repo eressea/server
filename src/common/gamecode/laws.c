@@ -360,14 +360,21 @@ live(region * r)
 					}
 				}				/* bestes Talent raussuchen */
 				if (best > 0) {
-					int k;
 					int value = get_effect(u, oldpotiontype[P_FOOL]);
+#if SKILLPOINTS
+					int k;
 					value = min(value, u->number) * 30;
 					k = get_skill(u, ibest) - value;
 					k = max(k, 0);
 					set_skill(u, ibest, k);
-					add_message(&u->faction->msgs, new_message(u->faction,
-						"dumbeffect%u:unit%i:days%t:skill", u, value, ibest));
+#else
+					/* Talent sinkt für max. 10 Personen um 1 Stufe */
+					int k = min(u->number, value);
+					int sk = get_skill(u, ibest);
+					change_skill(u, ibest, -min(k, sk));
+#endif
+					ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
+						"unit days skill", u, value, ibest));
 				}	/* sonst Glück gehabt: wer nix weiß, kann nix vergessen... */
 			}
 		}
@@ -498,7 +505,7 @@ peasants(region * r)
 
 	for (n = peasants; n; n--) {
 		if (glueck >= 0) {		/* Sonst keine Vermehrung */
-			if (rand() % 100 < PEASANTGROWTH) {
+			if (rand() % 10000 < PEASANTGROWTH) {
 				if ((float) peasants
 					/ ((float) production(r) * MAXPEASANTS_PER_AREA)
 					< 0.9 || rand() % 100 < PEASANTFORCE) {
@@ -2061,10 +2068,10 @@ set_passw(void)
 
 							u->faction->magiegebiet = mtyp;
 
-							for(r2 = firstregion(u->faction); r2 != last; r2 = r2->next) {
-								for(u2 = r->units; u2; u2 = u2->next) {
+							for (r2 = firstregion(u->faction); r2 != last; r2 = r2->next) {
+								for (u2 = r->units; u2; u2 = u2->next) {
 									if(u2->faction == u->faction
-											&& get_skill(u2, SK_MAGIC) > 0){
+											&& get_skill(u2, SK_MAGIC)) {
 										m = get_mage(u2);
 										m->magietyp = mtyp;
 									}
@@ -2218,7 +2225,6 @@ display_race(faction *f, unit *u, const race * rc)
 			case AT_SPELL:
 			case AT_COMBATSPELL:
 			case AT_DRAIN_ST:
-			case AT_DRAIN_EXP:
 			case AT_DAZZLE:
 				sprintf(buf2, "ein magischer Angriff");
 				break;

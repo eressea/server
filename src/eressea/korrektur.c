@@ -2525,7 +2525,7 @@ heal_all(void)
 	return 0;
 }
 
-#if PEASANT_ADJUSTMENT
+#if PEASANT_ADJUSTMENT == 1
 
 #define WEIGHT ((double)0.5)
 #define PLWEIGHT ((double)0.75)
