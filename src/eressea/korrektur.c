@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.21 2001/02/12 22:39:57 enno Exp $
+ *	$Id: korrektur.c,v 1.22 2001/02/12 23:06:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -32,6 +32,7 @@
 /* kernel includes */
 #include <border.h>
 #include <building.h>
+#include <ship.h>
 #include <faction.h>
 #include <item.h>
 #include <magic.h>
@@ -65,6 +66,49 @@
 /* attributes includes */
 #include <attributes/targetregion.h>
 #include <attributes/key.h>
+
+extern void reorder_owners(struct region * r);
+
+static void
+verify_owners(boolean bOnce)
+{
+	region * r;
+
+	for (r=regions;r;r=r->next) {
+		unit * u;
+		boolean bFail = false;
+
+		for (u=r->units;u;u=u->next) {
+			if (u->building) {
+				unit * bo = buildingowner(r, u->building);
+				if (!fval(bo, FL_OWNER)) {
+					log_error(("[verify_owners] %u ist Besitzer von %s, hat aber FL_OWNER nicht.\n", unitname(bo), buildingname(u->building)));
+					bFail = true;
+					if (bOnce) break;
+				}
+				if (bo!=u && fval(bo, FL_OWNER)) {
+					log_error(("[verify_owners] %u ist NICHT Besitzer von %s, hat aber FL_OWNER.\n", unitname(u), buildingname(u->building)));
+					bFail = true;
+					if (bOnce) break;
+				}
+			}
+			if (u->ship) {
+				unit * bo = shipowner(r, u->ship);
+				if (!fval(bo, FL_OWNER)) {
+					log_error(("[verify_owners] %u ist Besitzer von %s, hat aber FL_OWNER nicht.\n", unitname(bo), shipname(u->ship)));
+					bFail = true;
+					if (bOnce) break;
+				}
+				if (bo!=u && fval(bo, FL_OWNER)) {
+					log_error(("[verify_owners] %u ist NICHT Besitzer von %s, hat aber FL_OWNER.\n", unitname(u), shipname(u->ship)));
+					bFail = true;
+					if (bOnce) break;
+				}
+			}
+		}
+		if (bFail) reorder_owners(r);
+	}
+}
 
 static void
 fix_skills(void)
@@ -1909,7 +1953,8 @@ korrektur(void)
 #endif
 	make_gms();
 	/* Wieder entfernen! */
-	do_once(atoi36("trgr"), fix_targetregion_resolve())
+	do_once(atoi36("trgr"), fix_targetregion_resolve());
+	verify_owners(false);
 
 	/* fix_herbtypes(); */
 #ifdef CONVERT_TRIGGER

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.20 2001/02/12 22:39:56 enno Exp $
+ *	$Id: laws.c,v 1.21 2001/02/12 23:06:44 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2105,7 +2105,7 @@ sinkships(void)
 #include "eressea.h"
 #include "build.h"
 
-static void
+void
 reorder_owners(region * r)
 {
 	unit ** up=&r->units, ** useek;
@@ -2122,7 +2122,14 @@ reorder_owners(region * r)
 			unit * u = *useek;
 			if (u->building==b) {
 				unit ** insert;
-				if (fval(u, FL_OWNER)) insert=ubegin;
+				if (fval(u, FL_OWNER)) {
+					unit * nu = *ubegin;
+					insert=ubegin;
+					if (nu && nu->building==u->building && fval(nu, FL_OWNER)) {
+						log_error(("[reorder_owners] %s hat mehrere Besitzer mit FL_OWNER.\n", buildingname(nu->building)));
+						freset(nu, FL_OWNER);
+					}
+				}
 				else insert = uend;
 				if (insert!=useek) {
 					*useek = u->next; /* raus aus der liste */
@@ -2164,7 +2171,14 @@ reorder_owners(region * r)
 			unit * u = *useek;
 			if (u->ship==sh) {
 				unit ** insert;
-				if (fval(u, FL_OWNER)) insert=ubegin;
+				if (fval(u, FL_OWNER)) {
+					unit * nu = *ubegin;
+					insert = ubegin;
+					if (nu && nu->ship==u->ship && fval(nu, FL_OWNER)) {
+						log_error(("[reorder_owners] %s hat mehrere Besitzer mit FL_OWNER.\n", shipname(nu->ship)));
+						freset(nu, FL_OWNER);
+					}
+				}
 				else insert = uend;
 				if (insert!=useek) {
 					*useek = u->next; /* raus aus der liste */
