@@ -2085,7 +2085,7 @@ const char * strings[] = {
 };
 
 const char * localenames[] = {
-	"de", "en",
+	"de", "en", "fr",
 	NULL
 };
 
@@ -2164,24 +2164,6 @@ init_data(const char * filename)
 	l = read_xml(filename, NULL);
 	if (l) return l;
 
-	/* old stuff, for removal: */
-	for (l=0;localenames[l];++l) {
-		char zText[MAX_PATH];
-		int i;
-		for (i=0;strings[i];++i) {
-			FILE * F;
-			sprintf(zText, strings[i], resourcepath(), localenames[l]);
-			F = fopen(zText, "r+");
-			if (F) {
-				read_strings(F);
-				fclose(F);
-			} else {
-				sprintf(buf, "fopen(%s): ", zText);
-				perror(buf);
-				return 1;
-			}
-		}
-	}
 	return 0;
 }
 

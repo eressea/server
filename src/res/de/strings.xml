@@ -2366,16 +2366,13 @@
 	<namespace name="info">
 		<string name="mistletoe">
 			<text locale="de">Im Mistelzweig ruht eine magische
-			Kraft
-			besonderer Art. Der Anwender wird von seinen Feinden
-			in Frieden
-			gelassen, eine Woche lang läßt jeder Kämpfer ihn
-			unbeschadet
-			seines Weges ziehen.</text>
-			<text locale="en">The magical misteltoe has a
-			wonderous property: It's use will make one person able
-			to escape unharmed from every conflict, no enemy will
-			lay hand on the bearer for one week.</text>
+			Kraft der besonderer Art. Der Anwender wird von seinen
+			Feinden in Frieden gelassen, eine Woche lang läßt jeder
+			Kämpfer ihn unbeschadet seines Weges ziehen.</text>
+			<text locale="en">The magical misteltoe has a wonderous
+			property: It's use will make one person able to escape
+			unharmed from every conflict, no enemy will lay hand on
+			the bearer for one week.</text>
 		</string>
 	</namespace>
 	<namespace name="race">
@@ -3577,23 +3574,20 @@
 	</namespace>
 	<namespace name="potion">
 		<string name="truthpotion">
-			<text locale="en">
-				This simple but very potent brew sharpens the senses of anyone
-				that drinks of it and makes him able to see through even the
-				most complex illusions for one week.
-			</text>
+			<text locale="en"> This simple but very potent brew
+			sharpens the senses of anyone that drinks of it and
+			makes him able to see through even the most complex
+			illusions for one week. </text>
 		</string>
 		<string name="goliathwater">
-			<text locale="en">
-				'First roast the Gurgelkraut quickly and add some Fjordwuchs to
-				spice it up. Let it all boil slowly until almost all liquid has
-				evaporated. Leave the mash over night and finally squeeze it
-				the next morning until a thick fluid drips out.' The liquid
-				thus produced, 'Goliath Water' as we call it, is enough for
-				10 men and gives each man the carrying capacity of a horse
-				for one week.
-			</text>
-			
+			<text locale="en"> 'First roast the Gurgelkraut quickly
+			and add some Fjordwuchs to spice it up. Let it all boil
+			slowly until almost all liquid has evaporated. Leave the
+			mash over night and finally squeeze it the next morning
+			until a thick fluid drips out.' The liquid thus
+			produced, 'Goliath Water' as we call it, is enough for
+			10 men and gives each man the carrying capacity of a
+			horse for one week. </text>
 		</string>
 	</namespace>
 	<namespace name="spell">
@@ -3650,7 +3644,8 @@
 			<text locale="en">Bless Mallorn Logs</text>
 		</string>
 		<string name="goodwinds">
-			<text locale="de">Beschwörung eines Wasserelementares</text>
+			<text locale="de">Beschwörung eines
+			Wasserelementares</text>
 			<text locale="en">Summon Water Elemental</text>
 		</string>
 		<string name="healing">
@@ -3678,11 +3673,13 @@
 			<text locale="en">Summon Storm Elemental</text>
 		</string>
 		<string name="trueseeinggwyrrd">
-			<text locale="de">Erschaffe ein Amulett des wahren Sehens</text>
+			<text locale="de">Erschaffe ein Amulett des wahren
+			Sehens</text>
 			<text locale="en">Create An Amulet Of True Sight</text>
 		</string>
 		<string name="invisibilitygwyrrd">
-			<text locale="de">Erschaffe einen Ring der Unsichtbarkeit</text>
+			<text locale="de">Erschaffe einen Ring der
+			Unsichtbarkeit</text>
 			<text locale="en">Create A Ring Of Invisibility</text>
 		</string>
 		<string name="homestone">
@@ -3718,7 +3715,8 @@
 			<text locale="en">Sacred Ground</text>
 		</string>
 		<string name="artefaktsackofconservation">
-			<text locale="de">Erschaffe einen magischen Kräuterbeutel</text>
+			<text locale="de">Erschaffe einen magischen
+			Kräuterbeutel</text>
 			<text locale="en">Create A Magical Herb Pouch</text>
 		</string>
 		<string name="summonent">
@@ -3770,11 +3768,13 @@
 			<text locale="en">Winds Of Rust</text>
 		</string>
 		<string name="trueseeingdraig">
-			<text locale="de">Erschaffe ein Amulett des wahren Sehens</text>
+			<text locale="de">Erschaffe ein Amulett des wahren
+			Sehens</text>
 			<text locale="en">Create An Amulet Of True Sight</text>
 		</string>
 		<string name="invisibilitydraig">
-			<text locale="de">Erschaffe einen Ring der Unsichtbarkeit</text>
+			<text locale="de">Erschaffe einen Ring der
+			Unsichtbarkeit</text>
 			<text locale="en">Create A Ring Of Invisibility</text>
 		</string>
 		<string name="tranferaurachaos">
@@ -3802,8 +3802,10 @@
 			<text locale="en">Undead Heroes</text>
 		</string>
 		<string name="strength">
-			<text locale="de">Erschaffe einen Gürtel der Trollstärke</text>
-			<text locale="en">Create A Girdle Of Troll Strength</text>
+			<text locale="de">Erschaffe einen Gürtel der
+			Trollstärke</text>
+			<text locale="en">Create A Girdle Of Troll
+			Strength</text>
 		</string>
 		<string name="auraleak">
 			<text locale="de">Astraler Riss</text>
@@ -3902,11 +3904,13 @@
 			<text locale="en">Insomnia</text>
 		</string>
 		<string name="trueseeingillaun">
-			<text locale="de">Erschaffe ein Amulett des wahren Sehens</text>
+			<text locale="de">Erschaffe ein Amulett des wahren
+			Sehens</text>
 			<text locale="en">Create An Amulet Of True Sight</text>
 		</string>
 		<string name="invisibilityillaun">
-			<text locale="de">Erschaffe einen Ring der Unsichtbarkeit</text>
+			<text locale="de">Erschaffe einen Ring der
+			Unsichtbarkeit</text>
 			<text locale="en">Create A Ring Of Invisibility</text>
 		</string>
 		<string name="sleep">
@@ -3945,116 +3949,103 @@
 	<namespace name="spellinfo">
 		<string name="blessedharvest">
 			<text locale="de">Dieses Ernteritual verbessert die
-				Erträge der arbeitenden Bauern in der Region
-				um ein Silberstück. Je mehr Kraft der Druide
-				investiert, desto länger wirkt der
-				Zauber.</text>
+			Erträge der arbeitenden Bauern in der Region um ein
+			Silberstück. Je mehr Kraft der Druide investiert, desto
+			länger wirkt der Zauber.</text>
 			<text locale="en">This harvest ritual increases the
-				income of each working peasant by one silver
-				piece. The more power the druid invests, the
-				longer the spell lasts.</text>
+			income of each working peasant by one silver piece. The
+			more power the druid invests, the longer the spell
+			lasts.</text>
 		</string>
 		<string name="gwyrrdearnsilver">
 			<text locale="de">Die Fähigkeiten der Gwyrrd-Magier in
-				der Viehzucht und Heilung sind bei den Bauern
-				sehr begehrt. Grade auf Märkten sind ihre
-				Dienste häufig sehr gefragt. Manch einer mag
-				auch sein Talent dazu nutzen, ein Tier für
-				einen besseren Preis zu verkaufen. Pro Stufe
-				kann der Magier so 50 Silber verdienen.</text>
+			der Viehzucht und Heilung sind bei den Bauern sehr
+			begehrt. Grade auf Märkten sind ihre Dienste häufig sehr
+			gefragt. Manch einer mag auch sein Talent dazu nutzen,
+			ein Tier für einen besseren Preis zu verkaufen. Pro
+			Stufe kann der Magier so 50 Silber verdienen.</text>
 			<text locale="en">The abilities of the mages of Gwyrrd
-				concerning the breeding and healing of cattle
-				are highly appreciated among the peasants.
-				Especially at the markets, their services are
-				demanded frequently. Some of them also use
-				their talents to sell an animal at a higher
-				price. A mage can earn 50 silver pieces per
-				level in this way.</text>
+			concerning the breeding and healing of cattle are highly
+			appreciated among the peasants. Especially at the
+			markets, their services are demanded frequently. Some of
+			them also use their talents to sell an animal at a
+			higher price. A mage can earn 50 silver pieces per level
+			in this way.</text>
 		</string>
 		<string name="stonegolem">
 			<text locale="de">Man befeuchte einen kluftfreien Block
-				aus feinkristallinen Gestein mit einer Phiole
-				des Lebenswassers bis dieses vollständig vom
-				Gestein aufgesogen wurde. Sodann richte man
-				seine Kraft auf die sich bildenden feine Aura
-				des Lebens und forme der ungebundenen Kraft ein
-				Gehäuse. Je mehr Kraft der Magier investiert,
-				desto mehr Golems können geschaffen werden,
-				bevor die Aura sich verflüchtigt. Jeder Golem
-				hat jede Runde eine Chance von 10 Prozent zu
-				Staub zu zerfallen. Gibt man den Golems die
-				Befehle MACHE BURG oder MACHE STRASSE, so werden
-				pro Golem 4 Steine verbaut und der Golem löst
-				sich auf.
-			</text>
+			aus feinkristallinen Gestein mit einer Phiole des
+			Lebenswassers bis dieses vollständig vom Gestein
+			aufgesogen wurde. Sodann richte man seine Kraft auf die
+			sich bildenden feine Aura des Lebens und forme der
+			ungebundenen Kraft ein Gehäuse. Je mehr Kraft der Magier
+			investiert, desto mehr Golems können geschaffen werden,
+			bevor die Aura sich verflüchtigt. Jeder Golem hat jede
+			Runde eine Chance von 10 Prozent zu Staub zu zerfallen.
+			Gibt man den Golems die Befehle MACHE BURG oder MACHE
+			STRASSE, so werden pro Golem 4 Steine verbaut und der
+			Golem löst sich auf. </text>
 			<text locale="en">'Take a flawless block of crystaline
-				stone and humidify it with a vial of Water Of
-				Life until the potion has been soaked up
-				completely. Then focus your power on the forming
-				aura of life and shape a container for the
-				unbound forces'. The more power a mage invests,
-				the more golems can be created before the aura
-				dissipates. Every week, there is a 10 percent
-				chance that the golem will crumble to dust. If
-				you command a golem to 'MAKE CASTLE' or 'MAKE
-				ROAD', it will turn itself into 4 stones that it
-				uses in construction, and disintegrate
-				afterwards.
-			</text>
+			stone and humidify it with a vial of Water Of Life until
+			the potion has been soaked up completely. Then focus
+			your power on the forming aura of life and shape a
+			container for the unbound forces'. The more power a mage
+			invests, the more golems can be created before the aura
+			dissipates. Every week, there is a 10 percent chance
+			that the golem will crumble to dust. If you command a
+			golem to 'MAKE CASTLE' or 'MAKE ROAD', it will turn
+			itself into 4 stones that it uses in construction, and
+			disintegrate afterwards. </text>
 		</string>
 		<string name="irongolem">
 			<text locale="de">Je mehr Kraft der Magier investiert,
-				desto mehr Golems können geschaffen werden.
-				Jeder Golem hat jede Runde eine Chance von 15
-				Prozent zu Staub zu zerfallen. Gibt man den
-				Golems den Befehl MACHE SCHWERT/BIHÄNDER oder
-				MACHE SCHILD/KETTENHEMD/PLATTENPANZER, so werden
-				pro Golem 4 Eisenbarren verbaut und der Golem
-				löst sich auf.
-			</text>
+			desto mehr Golems können geschaffen werden. Jeder Golem
+			hat jede Runde eine Chance von 15 Prozent zu Staub zu
+			zerfallen. Gibt man den Golems den Befehl MACHE
+			SCHWERT/BIHÄNDER oder MACHE
+			SCHILD/KETTENHEMD/PLATTENPANZER, so werden pro Golem 4
+			Eisenbarren verbaut und der Golem löst sich auf. </text>
 			<text locale="en">The more power a mage invests, the
-				more golems can be created before the aura
-				dissipates. Each golem has a 15% chance per week
-				to turn to dust. If you command a golem to 'MAKE
-				SWORD/MAKE CLAYMORE' or 'MAKE
-				SHIELD/CHAINMAIL/PLATEMAIL',it will work 5 iron
-				ingots and disintegrate afterwards.
-			</text>
+			more golems can be created before the aura dissipates.
+			Each golem has a 15% chance per week to turn to dust. If
+			you command a golem to 'MAKE SWORD/MAKE CLAYMORE' or
+			'MAKE SHIELD/CHAINMAIL/PLATEMAIL',it will work 5 iron
+			ingots and disintegrate afterwards. </text>
 		</string>
 		<string name="treegrow">
 			<text locale="de">Diese Ritual verstärkt die Wirkung des
-				magischen Trankes um ein vielfaches. Wo sonst aus
-				einem Stecken nur ein Baum spießen konnte, so
-				treibt nun jeder Ast Wurzeln.
-			</text>
+			magischen Trankes um ein vielfaches. Wo sonst aus einem
+			Stecken nur ein Baum spießen konnte, so treibt nun jeder
+			Ast Wurzeln. </text>
 			<text locale="en">This ritual greatly increases the
-				effect of the potion. Now every branch becomes a
-				sturdy oak where before only one could be grown
-				from a log.
+			effect of the potion. Now every branch becomes a sturdy
+			oak where before only one could be grown from a log.
 			</text>
 		</string>
 		<string name="rustweapon">
 			<text locale="de">Mit diesem Ritual wird eine dunkle
 				Gewitterfront beschworen, die sich
 				unheilverkündend über der Region auftürmt. Der
-				magische Regen wird alles Erz rosten lassen. Seine
-				Kraft reicht nicht aus, um Rüstungen unbrauchbar
-				zu machen, jedoch werden Eisenwaffen schartig und
-				rostig. Die Zerstörungskraft des Regens
-				ist von der investierten Kraft des Magiers
-				abhängig. Für jede Stufe können bis zu 10
-				Eisenwaffen betroffen werden. Ein Ring der Macht
-				verstärkt die Wirkung wie eine zusätzliche Stufe.
+				magische Regen wird alles Erz rosten lassen.
+				Seine Kraft reicht nicht aus, um Rüstungen
+				unbrauchbar zu machen, jedoch werden Eisenwaffen
+				schartig und rostig. Die Zerstörungskraft des
+				Regens ist von der investierten Kraft des
+				Magiers abhängig. Für jede Stufe können bis zu
+				10 Eisenwaffen betroffen werden. Ein Ring der
+				Macht verstärkt die Wirkung wie eine zusätzliche
+				Stufe.
 			</text>
 			<text locale="en">This ritual conjurs up a dark
 				thunderstorm that affects a whole region. The
-				magic rain will let rust any ore. Its power is not
-				strong enough to destroy armors, but any iron
-				weapons will get rusty. The exact number of weapons
-				affected by the rain depends on the ammount of
-				power invested by the mage. Up to ten weapons can
-				be destroyed per level - a Ring Of Power increases
-				the effect like an additional level.
+				magic rain will let rust any ore. Its power is
+				not strong enough to destroy armors, but any
+				iron weapons will get rusty. The exact number of
+				weapons affected by the rain depends on the
+				ammount of power invested by the mage. Up to ten
+				weapons can be destroyed per level - a Ring Of
+				Power increases the effect like an additional
+				level.
 			</text>
 		</string>
 		<string name="kaelteschutz">
@@ -4063,14 +4054,14 @@
 				Kälte der Gletscher zu bewahren. Sie können
 				Gletscher betreten und dort normal agieren. Der
 				Spruch wirkt auf Stufe*10 Insekten. Ein Ring der
-				Macht erhöht die Menge der verzauberbaren Insekten
-				zusätzlich um 10.
+				Macht erhöht die Menge der verzauberbaren
+				Insekten zusätzlich um 10.
 			</text>
 			<text locale="en">This spell enables the druid to
-				magically protect insects from the paralysing cold
-				of a glacier. Under the effect of this spell,
-				insects are able to enter glaciers and act
-				normally there. Ten insects per level can be
+				magically protect insects from the paralysing
+				cold of a glacier. Under the effect of this
+				spell, insects are able to enter glaciers and
+				act normally there. Ten insects per level can be
 				protected in this way. A Ring Of Power increases
 				the number by additional ten.
 			</text>
@@ -4083,47 +4074,48 @@
 			</text>
 			<text locale="en">During a battle the druid calls the
 				Elemental Spirits Of Cold and binds them to
-				himself. Then he commands them to attack his foes
-				with hail and ice missiles.
+				himself. Then he commands them to attack his
+				foes with hail and ice missiles.
 			</text>
 		</string>
 		<string name="ironkeeper">
 			<text locale="de">Erschafft einen Wächtergeist, der
-				Eisen- und Laenabbau durch nichtalliierte Parteien
-				(HELFE BEWACHE) verhindert, solange er die Region
-				bewacht. Der Bergwächter ist an den Ort der
-				Beschwörung gebunden.
+				Eisen- und Laenabbau durch nichtalliierte
+				Parteien (HELFE BEWACHE) verhindert, solange er
+				die Region bewacht. Der Bergwächter ist an den
+				Ort der Beschwörung gebunden.
 			</text>
 			<text locale="en">Creates a guardian spirit on a
 				mountain or glacier that keeps all factions that
 				are not allied (HELP GUARD) from mining iron or
-				laen as long as it guards the region. The Mountain
-				Guardian is^bound to the loaction where it has
-				been summoned.
+				laen as long as it guards the region. The
+				Mountain Guardian is bound to the loaction where
+				it has been summoned.
 			</text>
 		</string>
 		<string name="magicstreet">
 			<text locale="de">Durch Ausführung dieser Rituale ist
 				der Magier in der Lage einen mächtigen
-				Erdelementar zu beschwören. Solange dieser in den
-				Boden gebannt ist, wird kein Regen die Wege
-				aufweichen und kein Fluß Brücken zerstören können.
-				Alle Reisende erhalten damit die gleichen
-				Vorteile, die sonst nur ein ausgebautes
+				Erdelementar zu beschwören. Solange dieser in
+				den Boden gebannt ist, wird kein Regen die Wege
+				aufweichen und kein Fluß Brücken zerstören
+				können. Alle Reisende erhalten damit die
+				gleichen Vorteile, die sonst nur ein ausgebautes
 				gepflastertes Straßennetz bietet. Selbst Sümpfe
-				und Gletscher können so verzaubert werden. Je mehr
-				Kraft der Magier in den Bann legt, desto länger
-				bleibt die Straße bestehen.
+				und Gletscher können so verzaubert werden. Je
+				mehr Kraft der Magier in den Bann legt, desto
+				länger bleibt die Straße bestehen.
 			</text>
 			<text locale="en">By performing these rituals the druid
 				is able to summon a powerful earth elemental. As
-				long as this elemental remains bound to a region,
-				no rain can turn a path into mud and no river can
-				destroy a bridge. All travelers in this region
-				gain the same advantages as if they were
-				travelling on a road. Even swamps and glaciers can
-				be enchanted in this way. The more power the druid
-				invests, the longer the roads remain intact.
+				long as this elemental remains bound to a
+				region, no rain can turn a path into mud and no
+				river can destroy a bridge. All travelers in
+				this region gain the same advantages as if they
+				were travelling on a road. Even swamps and
+				glaciers can be enchanted in this way. The more
+				power the druid invests, the longer the roads
+				remain intact.
 			</text>
 		</string>
 		<string name="windshield">
@@ -4134,33 +4126,33 @@
 			</text>
 			<text locale="en">Calling the Elemental Spirits Of Wind
 				conjurs up sudden breezes, small whirlwinds and
-				minor turbulences that will hinder enemy archers.
+				minor turbulences that will hinder enemy
+				archers.
 			</text>
 		</string>
 		<string name="mallorntreegrow">
 			<text locale="de">Diese Ritual verstärkt die Wirkung des
-				magischen Trankes um ein vielfaches. Wo sonst aus
-				einem Stecken nur ein Baum spießen konnte, so
-				treibt nun jeder Ast Wurzeln.
+			magischen Trankes um ein vielfaches. Wo sonst aus einem
+			Stecken nur ein Baum spießen konnte, so treibt nun jeder
+			Ast Wurzeln.
 			</text>
 			<text locale="en">This ritual greatly increases the
-				effect of the potion. Now every branch becomes a
-				mallorn tree where before only one could be grown
-				from a log.
+			effect of the potion. Now every branch becomes a mallorn
+			tree where before only one could be grown from a log.
 			</text>
 		</string>
 		<string name="goodwinds">
 			<text locale="de">Der Magier zwingt mit diesem Ritual
-				die Elementargeister des Wassers in seinen Dienst
-				und bringt sie dazu, das angegebene Schiff
-				schneller durch das Wasser zu tragen. Zudem wird
-				das Schiff nicht durch ungünstige Winde oder
-				Strömungen beeinträchtigt.
+				die Elementargeister des Wassers in seinen
+				Dienst und bringt sie dazu, das angegebene
+				Schiff schneller durch das Wasser zu tragen.
+				Zudem wird das Schiff nicht durch ungünstige
+				Winde oder Strömungen beeinträchtigt.
 			</text>
 			<text locale="en">While being aboard a ship, the druid
-				uses this ritual to force the Elemental Spirits Of
-				Water to serve him and commands them to carry the
-				ship across the water at a higher speed. In
+				uses this ritual to force the Elemental Spirits
+				Of Water to serve him and commands them to carry
+				the ship across the water at a higher speed. In
 				addition, the ship will not be affected by
 				unfavourable winds or currents.
 			</text>
@@ -4175,7 +4167,8 @@
 			</text>
 			<text locale="en">Combat medics are not the only ones
 				who can help those who got injured during a
-				battle. Druids are, with the help of a summons of
+				battle. Druids are, with the help of a summons
+				of
 				the Elemental Spirits Of Life, able to heal
 				wounds, mend broken bones or even regenerate
 				separated limbs as well.
@@ -4183,27 +4176,27 @@
 		</string>
 		<string name="reelingarrows">
 			<text locale="de">Diese Beschwörung öffnet ein Tor in
-				die Ebene der Elementargeister des Windes. Sofort
-				erheben sich in der Umgebung des Tors starke Winde
-				oder gar Stürme und behindern alle Schützen einer
-				Schlacht.
+				die Ebene der Elementargeister des Windes.
+				Sofort erheben sich in der Umgebung des Tors
+				starke Winde oder gar Stürme und behindern alle
+				Schützen einer Schlacht.
 			</text>
 			<text locale="en">This summons opens a gate to the plane
-				of Elemental Spirits Of Wind. Immediately, strong
-				winds or even storms will rise near the gate and
-				hinder all archers during a battle.
+				of Elemental Spirits Of Wind. Immediately,
+				strong winds or even storms will rise near the
+				gate and hinder all archers during a battle.
 			</text>
 		</string>
 		<string name="gwyrrdfumbleshield">
 			<text locale="de">Dieses Ritual beschwört einige
-				Elementargeister der Magie und schickt sie in die
-				Reihen der feindlichen Magier. Diesen wird das
-				Zaubern für die Dauer des Kampfes deutlich
+				Elementargeister der Magie und schickt sie in
+				die Reihen der feindlichen Magier. Diesen wird
+				das Zaubern für die Dauer des Kampfes deutlich
 				schwerer fallen.
 			</text>
 			<text locale="en">This ritual summons some Elemental
-				Spirits Of Magic and sends them into the ranks of
-				the enemy mages. Casting spells will be much
+				Spirits Of Magic and sends them into the ranks
+				of the enemy mages. Casting spells will be much
 				harder for them during the battle.
 			</text>
 		</string>
@@ -4214,50 +4207,51 @@
 				übertragen.
 			</text>
 			<text locale="en">The caster can transfer mana at a
-				ratio of 2:1 to another member of the same school
-				of magic with the help of this spell.
+				ratio of 2:1 to another member of the same
+				school of magic with the help of this spell.
 			</text>
 		</string>
 		<string name="earthquake">
 			<text locale="de">Der Druide beschwört mit diesem Ritual
-				einen Elementargeist der Erde und bringt ihn dazu,
-				die Erde erbeben zu lassen. Dieses Erdbeben wird
-				alle Gebäude in der Region beschädigen.
+				einen Elementargeist der Erde und bringt ihn
+				dazu, die Erde erbeben zu lassen. Dieses
+				Erdbeben wird alle Gebäude in der Region
+				beschädigen.
 			</text>
 			<text locale="en">With this ritual the druid summons an
 				Elemental Spirit Of Earth that brings the ground
-				to shake. This earthquake damages all buildings in
-				the target region.
+				to shake. This earthquake damages all buildings
+				in the target region.
 			</text>
 		</string>
 		<string name="stormwinds">
 			<text locale="de">Die Beschwörung von Elementargeistern
 				der Stürme ist ein uraltes Ritual. Der Druide
-				bannt die Elementare in die Segel der Schiffe, wo
-				sie helfen, das Schiff mit hoher Geschwindigkeit
-				über die Wellen zu tragen. Je mehr Kraft der
-				Druide in den Zauber investiert, desto größer ist
-				die Zahl der Elementargeister, die sich bannen
-				lassen. Für jedes Schiff wird ein Elementargeist
-				benötigt.
+				bannt die Elementare in die Segel der Schiffe,
+				wo sie helfen, das Schiff mit hoher
+				Geschwindigkeit über die Wellen zu tragen. Je
+				mehr Kraft der Druide in den Zauber investiert,
+				desto größer ist die Zahl der Elementargeister,
+				die sich bannen lassen. Für jedes Schiff wird
+				ein Elementargeist benötigt.
 			</text>
 			<text locale="en">Calling the Elemental Spirits Of Storm
 				is an ancient ritual. The druid binds the
 				elementals to a ship's sails where they can help
-				to carry the vessel across the waves at an amazing
-				speed. The more power the druid invests, the
-				greater is the number of spirits bound. Each ship
-				needs an own spirit.
+				to carry the vessel across the waves at an
+				amazing speed. The more power the druid invests,
+				the greater is the number of spirits bound. Each
+				ship needs an own spirit.
 			</text>
 		</string>
 		<string name="trueseeinggwyrrd">
 			<text locale="de">Der Spruch ermöglicht es einem Magier,
 				ein Amulett des Wahren Sehens zu erschaffen. Das
-				Amulett erlaubt es dem Träger, alle Einheiten, die
-				durch einen Ring der Unsichtbarkeit geschützt
-				sind, zu sehen. Einheiten allerdings, die sich mit
-				ihrem Tarnungs-Talent verstecken, bleiben
-				weiterhin unentdeckt.
+				Amulett erlaubt es dem Träger, alle Einheiten,
+				die durch einen Ring der Unsichtbarkeit
+				geschützt sind, zu sehen. Einheiten allerdings,
+				die sich mit ihrem Tarnungs-Talent verstecken,
+				bleiben weiterhin unentdeckt.
 			</text>
 			<text locale="en">This spell enables the caster to
 				create an Amulet Of True Sight. Wearing such an
@@ -4270,28 +4264,28 @@
 		<string name="invisibilitygwyrrd">
 			<text locale="de">Mit diesem Spruch kann der Zauberer
 				einen Ring der Unsichtbarkeit erschaffen. Der
-				Träger des Ringes wird für alle Einheiten anderer
-				Parteien unsichtbar, egal wie gut ihre Wahrnehmung
-				auch sein mag. In einer unsichtbaren Einheit muss
-				jede Person einen Ring tragen.
+				Träger des Ringes wird für alle Einheiten
+				anderer Parteien unsichtbar, egal wie gut ihre
+				Wahrnehmung auch sein mag. In einer unsichtbaren
+				Einheit muss jede Person einen Ring tragen.
 			</text>
 			<text locale="en">With this spell the caster can create
 				a Ring Of Invisibility. The wearer of this ring
-				will be invisible to all units of other factions,
-				no matter how good their perception skill may be.
-				In an invisible unit, each person must wear a Ring
-				Of Invisibility.
+				will be invisible to all units of other
+				factions, no matter how good their perception
+				skill may be. In an invisible unit, each person
+				must wear a Ring Of Invisibility.
 			</text>
 		</string>
 		<string name="homestone">
 			<text locale="de">Mit dieser Formel bindet der Magier
 				auf ewig die Kräfte der Erde in die Mauern der
-				Burg,in der er sich gerade befindet. Weder magisch
-				noch mit schwerem Geschütz können derartig
-				gestärkte Mauern zerstört werden, und auch das
-				Alter setzt ihnen weniger zu. Das Gebäude bietet
-				sodann auch einen besseren Schutz gegen Angriffe
-				mit dem Schwert wie mit Magie.
+				Burg,in der er sich gerade befindet. Weder
+				magisch noch mit schwerem Geschütz können
+				derartig gestärkte Mauern zerstört werden, und
+				auch das Alter setzt ihnen weniger zu. Das
+				Gebäude bietet sodann auch einen besseren Schutz
+				gegen Angriffe mit dem Schwert wie mit Magie.
 			</text>
 			<text locale="en">With this spell the druid eternally
 				binds the powers of earth to the walls of the
@@ -4312,139 +4306,149 @@
 			</text>
 			<text locale="en">During their life in the wilderness,
 				many druids make friends with the wolves who are
-				the oldest friends of the great races. They learn
-				to call many of them with a single howl to aid
-				them in combat.
+				the oldest friends of the great races. They
+				learn to call many of them with a single howl to
+				aid them in combat.
 			</text>
 		</string>
 		<string name="versteinern">
 			<text locale="de">Dieser schwierige, aber effektive
-				Kampfzauber benutzt die Elementargeister des Steins,
-				um eine Reihe von Gegnern für die Dauer des Kampfes
-				in Stein zu verwandeln. Die betroffenen Personen
-				werden nicht mehr kämpfen, können jedoch auch nicht
-				verwundet werden.
+				Kampfzauber benutzt die Elementargeister des
+				Steins, um eine Reihe von Gegnern für die Dauer
+				des Kampfes in Stein zu verwandeln. Die
+				betroffenen Personen werden nicht mehr kämpfen,
+				können jedoch auch nicht verwundet werden.
 			</text>
 			<text locale="en">This complicated but effective spell
-				uses the Elemental Spirits Of Stone to turn a number
-				of enemies to stone for the duration of combat. The
-				affected persons won't be able to fight any more, but
-				they can't be wounded either.
+				uses the Elemental Spirits Of Stone to turn a
+				number of enemies to stone for the duration of
+				combat. The affected persons won't be able to
+				fight any more, but they can't be wounded
+				either.
 			</text>
 		</string>
 		<string name="strongwall">
 			<text locale="de">Mit dieser Formel bindet der Magier zu
-				Beginn eines Kampfes einige Elementargeister des Fels
-				in die Mauern des Gebäudes, in dem er sich gerade
-				befindet. Das Gebäude bietet sodann einen besseren
-				Schutz gegen Angriffe mit dem Schwert wie mit Magie.
+				Beginn eines Kampfes einige Elementargeister des
+				Fels in die Mauern des Gebäudes, in dem er sich
+				gerade befindet. Das Gebäude bietet sodann einen
+				besseren Schutz gegen Angriffe mit dem Schwert
+				wie mit Magie.
 			</text>
 			<text locale="en">At the beginning of a battle, the
-				magician binds some Elemental Spirits Of Rock to the
-				walls of the builing in which he currently is. The
-				structure will then provide a better protection against
-				attacks by sword or by magic.
+				magician binds some Elemental Spirits Of Rock to
+				the walls of the builing in which he currently
+				is. The structure will then provide a better
+				protection against attacks by sword or by magic.
 			</text>
 		</string>
 		<string name="gwyrrddestroymagic">
 			<text locale="de">Wie die alten Lehren der Druiden
-				berichten, besteht das, was die normalen Wesen Magie
-				nennen aus Elementargeistern. Der Magier beschwört
-				und bannt diese in eine Form, um den gewünschten
-				Effekt zu erzielen. Dieses Ritual nun vermag es, in
-				diese Welt gerufene Elementargeister zu vertreiben, um
-				so ein Objekt von Magie zu befreien.
+				berichten, besteht das, was die normalen Wesen
+				Magie nennen aus Elementargeistern. Der Magier
+				beschwört und bannt diese in eine Form, um den
+				gewünschten Effekt zu erzielen. Dieses Ritual
+				nun vermag es, in diese Welt gerufene
+				Elementargeister zu vertreiben, um so ein Objekt
+				von Magie zu befreien.
 			</text>
-			<text locale="en">Old legends of the druids say that what
-				normal people call 'magic' consists of elemental
-				spirits. A magician summons these spirits and binds
-				them to various forms to achieve the desired effects.
-				This ritual is able to expel any elemental spirits
-				that have been summoned to this world and thereby
-				dispels any magic on the target.
+			<text locale="en">Old legends of the druids say that
+				what normal people call 'magic' consists of
+				elemental spirits. A magician summons these
+				spirits and binds them to various forms to
+				achieve the desired effects. This ritual is able
+				to expel any elemental spirits that have been
+				summoned to this world and thereby dispels any
+				magic on the target.
 			</text>
 		</string>
 		<string name="treewalkenter">
-			<text locale="de">Große Macht liegt in Orten, an denen das
-				Leben pulsiert. Der Druide kann diese Kraft sammeln
-				und so ein Tor in die Welt der Geistwesen erschaffen.
-				Der Druide kann dann Stufe*5 Gewichtseinheiten durch
-				das Tor entsenden.
+			<text locale="de">Große Macht liegt in Orten, an denen
+				das Leben pulsiert. Der Druide kann diese Kraft
+				sammeln und so ein Tor in die Welt der
+				Geistwesen erschaffen. Der Druide kann dann
+				Stufe*5 Gewichtseinheiten durch das Tor
+				entsenden.
 			</text>
 			<text locale="en">A great power lies within those places
-				that are pulsing with life. A druid can focus this
-				power and thereby create a gate into the World Of
-				Spirits. He can then send level*5 weight units of
-				living or dead matter through the gate.
+				that are pulsing with life. A druid can focus
+				this power and thereby create a gate into the
+				World Of Spirits. He can then send level*5
+				weight units of living or dead matter through
+				the gate.
 			</text>
 		</string>
 		<string name="treewalkexit">
 			<text locale="de">Ein Druide, den es in die Welt der
-				Geister verschlagen hat, kann mit Hilfe dieses Zaubers
-				Stufe*5 Gewichtseinheiten in einen Wald auf der
-				materiellen Welt zurückschicken.
+				Geister verschlagen hat, kann mit Hilfe dieses
+				Zaubers Stufe*5 Gewichtseinheiten in einen Wald
+				auf der materiellen Welt zurückschicken.
 			</text>
-			<text locale="en">A druid who has traveled to the World Of
-				Spirits can use this spell to send level*5 weight
-				units of living or dead matter back to a forest in the
-				material world.
+			<text locale="en">A druid who has traveled to the World
+				Of Spirits can use this spell to send level*5
+				weight units of living or dead matter back to a
+				forest in the material world.
 			</text>
 		</string>
 		<string name="holyground">
 			<text locale="de">Dieses Ritual beschwört verschiedene
-				Naturgeister in den Boden der Region, welche diese
-				fortan bewachen. In einer so gesegneten Region werden
-				niemals wieder die Toten ihre Gräber verlassen, und
-				anderswo entstandene Untote werden sie wann immer
-				möglich meiden.
+				Naturgeister in den Boden der Region, welche
+				diese fortan bewachen. In einer so gesegneten
+				Region werden niemals wieder die Toten ihre
+				Gräber verlassen, und anderswo entstandene
+				Untote werden sie wann immer möglich meiden.
 			</text>
-			<text locale="en">This ritual binds various rural spirits
-				to a specific territory to guard the land. In a region
-				blessed in this way the dead won't ever rise from
-				their graves again. Existing undead also shun the
-				sacred grounds and will avoid entering the protected
-				area whenever possible.
+			<text locale="en">This ritual binds various rural
+				spirits to a specific territory to guard the
+				land. In a region blessed in this way the dead
+				won't ever rise from their graves again.
+				Existing undead also shun the sacred grounds and
+				will avoid entering the protected area whenever
+				possible.
 			</text>
 		</string>
 		<string name="artefaktsackofconservation">
 			<text locale="de">Der Druide nehme etwas präpariertes
-				Leder, welches er in einem großen Ritual der Reinigung
-				von allen unreinen Geistern befreie, und binde dann
-				einige kleine Geister der Luft und des Wassers in das
-				Material. Aus dem so vorbereiteten Leder fertige er
-				nun ein kleines Beutelchen, welches in ihm aufbewahrte
-				Kräuter besser zu konservieren vermag.
+				Leder, welches er in einem großen Ritual der
+				Reinigung von allen unreinen Geistern befreie,
+				und binde dann einige kleine Geister der Luft
+				und des Wassers in das Material. Aus dem so
+				vorbereiteten Leder fertige er nun ein kleines
+				Beutelchen, welches in ihm aufbewahrte Kräuter
+				besser zu konservieren vermag.
 			</text>
-			<text locale="en">The druid takes some specially prepared
-				leather and performes a great ritual during which the
-				leather is cleansed of all impure spirits. Then he
-				binds some minor spirits of air and water to the
-				material. After completing this process, the druid
-				works the enchanted leather into a small pouch which
-				is suitable to contain herbs, for it is able to
+			<text locale="en">The druid takes some specially
+				prepared leather and performes a great ritual
+				during which the leather is cleansed of all
+				impure spirits. Then he binds some minor spirits
+				of air and water to the material. After
+				completing this process, the druid works the
+				enchanted leather into a small pouch which is
+				suitable to contain herbs, for it is able to
 				preserve them for a long time and prevents rot.
 			</text>
 		</string>
 		<string name="summonent">
 			<text locale="de">Mit Hilfe dieses Zaubers weckt der
-				Druide die in den Wälder der Region schlummernden
-				Ents aus ihrem äonenlangen Schlaf. Die wilden
-				Baumwesen werden sich ihm anschließen und ihm
-				beistehen, jedoch nach einiger Zeit wieder in
-				Schlummer verfallen.
+				Druide die in den Wälder der Region
+				schlummernden Ents aus ihrem äonenlangen Schlaf.
+				Die wilden Baumwesen werden sich ihm anschließen
+				und ihm beistehen, jedoch nach einiger Zeit
+				wieder in Schlummer verfallen.
 			</text>
 			<text locale="en">With the help of this spell the druid
-				awakens the ents who are slumbering in the forests of
-				a region from aeons of sleep. These strange
-				tree-creatures will join him and aid his cause, but
-				after a while they will sink back into their slumber.
+				awakens the ents who are slumbering in the
+				forests of a region from aeons of sleep. These
+				strange tree-creatures will join him and aid his
+				cause, but after a while they will sink back
+				into their slumber.
 			</text>
 		</string>
 		<string name="gwyrrdfamiliar">
-			<text locale="de">Einem erfahrenen Druidem wird irgendwann
-				auf seinen Wanderungen ein ungewöhnliches Exemplar
-				einer Gattung begegnen, welches sich dem Druiden
-				anschließen wird.
+			<text locale="de">Einem erfahrenen Druidem wird
+				irgendwann auf seinen Wanderungen ein
+				ungewöhnliches Exemplar einer Gattung begegnen,
+				welches sich dem Druiden anschließen wird.
 			</text>
 			<text locale="en">Once during his travels, the seasoned
 				druid will meet an extraordinary creature of its
@@ -4453,739 +4457,781 @@
 		</string>
 		<string name="blessstonecircle">
 			<text locale="de">Dieses Ritual segnet einen Steinkreis,
-				der zuvor aus Steinen und etwas Holz gebaut werden
-				muss. Die Segnung des Druiden macht aus dem Kreis
-				eine mächtige Stätte magischen Wirkens, die Schutz 
-				vor Magie und erhöhte Aura-Regeneration bewirkt. Man
-				sagt, Jungfrauen seien in der Umgebung von Steinkreisen
-				seltsame Wesen begegnet.
+				der zuvor aus Steinen und etwas Holz gebaut
+				werden muss. Die Segnung des Druiden macht aus
+				dem Kreis eine mächtige Stätte magischen
+				Wirkens, die Schutz vor Magie und erhöhte Aura-
+				Regeneration bewirkt. Man sagt, Jungfrauen seien
+				in der Umgebung von Steinkreisen seltsame Wesen
+				begegnet.
 			</text>
 			<text locale="en">This ritual blesses a circle of stones
-				that has to be constructed from stones and some wood
-				before. The druid's blessing turns the circle into a
-				place of great magic that is suitable for rituals of
-				all kinds. It protects from hostile magic and improves
-				aura regeneration. Virgins are said to have been 
-				visited by strange creatures in the vicinity of these 
-				places.
+				that has to be constructed from stones and some
+				wood before. The druid's blessing turns the
+				circle into a place of great magic that is
+				suitable for rituals of all kinds. It protects
+				from hostile magic and improves aura
+				regeneration. Virgins are said to have been
+				visited by strange creatures in the vicinity of
+				these places.
 			</text>
 		</string>
 		<string name="sparklechaos">
 			<text locale="de">Das Ziel des Zauberers wird von einer
 				harmlosen Verwünschung heimgesucht.
 			</text>
-			<text locale="en">The target of this spell becomes subject
-				 to a harmless curse.
+			<text locale="en">The target of this spell becomes
+				 subject to a harmless curse.
 			</text>
 		</string>
 		<string name="draigearnsilver">
 			<text locale="de">In den dunkleren Gassen gibt es sie,
-				die Flüche und Verhexungen auf Bestellung. Aber auch
-				Gegenzauber hat der Jünger des Draigs natürlich im
-				Angebot. Ob nun der Sohn des Nachbarn in einen
-				Liebesbann gezogen werden soll oder die Nebenbuhlerin
-				Pickel und Warzen bekommen soll, niemand gibt gerne
-				zu, zu solchen Mitteln gegriffen zu haben.  Für diese
+				die Flüche und Verhexungen auf Bestellung. Aber
+				auch Gegenzauber hat der Jünger des Draigs
+				natürlich im Angebot. Ob nun der Sohn des
+				Nachbarn in einen Liebesbann gezogen werden soll
+				oder die Nebenbuhlerin Pickel und Warzen
+				bekommen soll, niemand gibt gerne zu, zu solchen
+				Mitteln gegriffen zu haben.  Für diese
 				Dienstleistung streicht der Magier 50 Silber pro
 				Stufe ein.
 			</text>
 			<text locale="en">In the dark alleys you can find those
-				who sell curses and hexes on demand - but you can buy
-				the apropriate counterspells from the followers of
-				Draig as well. May it be a love spell for the son of
-				a neighbour or a wart in the face of a rival. For
-				offering these services, the sorcerer charges 50
-				silver pieces per level.
+				who sell curses and hexes on demand - but you
+				can buy the apropriate counterspells from the
+				followers of Draig as well. May it be a love
+				spell for the son of a neighbour or a wart in
+				the face of a rival. For offering these
+				services, the sorcerer charges 50 silver pieces
+				per level.
 			</text>
 		</string>
 		<string name="fireball">
 			<text locale="de">Der Zauberer schleudert fokussiertes
-				Chaos in die Reihen der Gegner. Das ballförmige Chaos
-				wird jeden verwunden, den es trifft.
+				Chaos in die Reihen der Gegner. Das ballförmige
+				Chaos wird jeden verwunden, den es trifft.
 			</text>
 			<text locale="en">The sorcerer hurls a ball of
-				concentrated chaos into the ranks of his enemies. It
-				will seriously hurt anyone who gets hit.
+				concentrated chaos into the ranks of his
+				enemies. It will seriously hurt anyone who gets
+				hit.
 			</text>
 		</string>
 		<string name="magicboost">
 			<text locale="de">Der Magier öffnet seinen Geist den
-				Sphären des Chaos und wird so für einige Zeit über
-				mehr magische Kraft verfügen. Doch die Hilfe der
-				Herren der Sphären hat seinen Preis, und so wird die
-				Phase der Macht abgelöst von einer Phase der Schwäche.
+				Sphären des Chaos und wird so für einige Zeit
+				über mehr magische Kraft verfügen. Doch die
+				Hilfe der Herren der Sphären hat seinen Preis,
+				und so wird die Phase der Macht abgelöst von
+				einer Phase der Schwäche.
 			</text>
 			<text locale="en">The sorcerer opens his mind to the
 				Spheres Of Chaos so that he can access a greater
-				ammount of magical power for a while. But the help of
-				the Chaos Lords has its price - and so the period of
-				power will be followed by a period of weakness.
+				ammount of magical power for a while. But the
+				help of the Chaos Lords has its price - and so
+				the period of power will be followed by a period
+				of weakness.
 			</text>
 		</string>
 		<string name="bloodsacrifice">
-			<text locale="de">Mit diesem Ritual kann der Magier einen
-				Teil seiner Lebensenergie opfern, um dafür an
-				magischer Kraft zu gewinnen. Erfahrene Ritualmagier
-				berichten, das sich das Ritual, einmal initiiert, nur
-				schlecht steuern ließe und die Menge der so gewonnenen
-				Kraft stark schwankt. So steht im 'Buch des Blutes'
-				geschrieben: 'So richte Er aus das Zeichen der vier
-				Elemente im Kreis des Werdens und Vergehens und Weihe
-				ein jedes mit einem Tropfen Blut. Sodann begebe Er in
-				der Mitten der Ewigen Vierer sich und lasse Leben
-				verrinnen, auf das Kraft geboren werde.'
+			<text locale="de">Mit diesem Ritual kann der Magier
+				einen Teil seiner Lebensenergie opfern, um dafür
+				an magischer Kraft zu gewinnen. Erfahrene
+				Ritualmagier berichten, das sich das Ritual,
+				einmal initiiert, nur schlecht steuern ließe und
+				die Menge der so gewonnenen Kraft stark
+				schwankt. So steht im 'Buch des Blutes'
+				geschrieben: 'So richte Er aus das Zeichen der
+				vier Elemente im Kreis des Werdens und Vergehens
+				und Weihe ein jedes mit einem Tropfen Blut.
+				Sodann begebe Er in der Mitten der Ewigen Vierer
+				sich und lasse Leben verrinnen, auf das Kraft
+				geboren werde.'
 			</text>
 			<text locale="en">With this ritual the sorcerer can
-				sacrifice part of his life force in order to gain raw
-				astral power. Experienced mages report that this
-				ritual, once started, is hard to control and that the
-				ammount of power gained in this way varies.
+				sacrifice part of his life force in order to
+				gain raw astral power. Experienced mages report
+				that this ritual, once started, is hard to
+				control and that the ammount of power gained in
+				this way varies.
 			</text>
 		</string>
 		<string name="berserk">
 			<text locale="de">In diesem blutigen Ritual opfert der
-				Magier vor der Schlacht ein Neugeborenes vor den Augen
-				seiner Armee. Die so gerufenen Blutgeister werden von
-				den Soldaten Besitz ergreifen und sie in einen
-				Blutrausch versetzen.
+				Magier vor der Schlacht ein Neugeborenes vor den
+				Augen seiner Armee. Die so gerufenen Blutgeister
+				werden von den Soldaten Besitz ergreifen und sie
+				in einen Blutrausch versetzen.
 			</text>
 			<text locale="en">During this bloody ritual the sorcerer
-				sacrifices a newborn child before a battle right in
-				front of his army. In this way he attracts spirits of
-				blood that will take control of the soldiers who are
-				present and force them into a blood frenzy.
+				sacrifices a newborn child before a battle right
+				in front of his army. In this way he attracts
+				spirits of blood that will take control of the
+				soldiers who are present and force them into a
+				blood frenzy.
 			</text>
 		</string>
 		<string name="fumblecurse">
 			<text locale="de">Dieser heimtückische Fluch
-				beeinträchtigt die magischen Fähigkeiten des Opfers
-				erheblich. Eine chaosmagische Zone um das Opfer
-				vermindert seine Konzentrationsfähigkeit und macht es
-				ihm sehr schwer Zauber zu wirken.
+				beeinträchtigt die magischen Fähigkeiten des
+				Opfers erheblich. Eine chaosmagische Zone um das
+				Opfer vermindert seine Konzentrationsfähigkeit
+				und macht es ihm sehr schwer Zauber zu wirken.
 			</text>
 			<text locale="en">This wicked curse affects the magical
-				abilities of the target. A field of raw chaos magic
-				around the target lessens its concentration and makes
-				it very hard to cast any spells.
+				abilities of the target. A field of raw chaos
+				magic around the target lessens its
+				concentration and makes it very hard to cast any
+				spells.
 			</text>
 		</string>
 		<string name="summonundead">
-			<text locale="de">Nächtelang muss der Schwarzmagier durch
-				die Friedhöfe und Gräberfelder der Region ziehen um
-				dann die ausgegrabenen Leichen beleben zu können. Die
-				Untoten werden ihm zu Diensten sein, doch sei der
-				Unkundige gewarnt, dass die Beschwörung der Mächte des
-				Todes ein zweischneidiges Schwert sein kann.
+			<text locale="de">Nächtelang muss der Schwarzmagier
+				durch die Friedhöfe und Gräberfelder der Region
+				ziehen um dann die ausgegrabenen Leichen beleben
+				zu können. Die Untoten werden ihm zu Diensten
+				sein, doch sei der Unkundige gewarnt, dass die
+				Beschwörung der Mächte des Todes ein
+				zweischneidiges Schwert sein kann.
 			</text>
-			<text locale="en">For many nights the sorcerer has to roam
-				the graveyards and former battlefields of a region in
-				order to find corpses to animate. The Undead will
-				serve his will, but beware! Dealing with the mysteries
-				of unlife can be a dangerous thing.
+			<text locale="en">For many nights the sorcerer has to
+				roam the graveyards and former battlefields of a
+				region in order to find corpses to animate. The
+				Undead will serve his will, but beware! Dealing
+				with the mysteries of unlife can be a dangerous
+				thing.
 			</text>
 		</string>
 		<string name="combatrust">
 			<text locale="de">Mit diesem Ritual wird eine dunkle
-				Gewitterfront beschworen, die sich unheilverkündend
-				über der Region auftürmt. Der magische Regen wird
-				alles Erz rosten lassen und so viele Waffen des
-				Gegners zerstören.
+				Gewitterfront beschworen, die sich
+				unheilverkündend über der Region auftürmt. Der
+				magische Regen wird alles Erz rosten lassen und
+				so viele Waffen des Gegners zerstören.
 			</text>
 			<text locale="en">This ritual conjurs up a dark
-				thunderstorm that affects a whole region. The magic
-				rain will let rust any ore and thus destroy many
-				weapons of the enemy.
+				thunderstorm that affects a whole region. The
+				magic rain will let rust any ore and thus
+				destroy many weapons of the enemy.
 			</text>
 		</string>
 		<string name="trueseeingdraig">
 			<text locale="de">Der Spruch ermöglicht es einem Magier,
 				ein Amulett des Wahren Sehens zu erschaffen. Das
-				Amulett erlaubt es dem Träger, alle Einheiten, die
-				durch einen Ring der Unsichtbarkeit geschützt sind,
-				zu sehen. Einheiten allerdings, die sich mit ihrem
-				Tarnungs-Talent verstecken, bleiben weiterhin
-				unentdeckt.
+				Amulett erlaubt es dem Träger, alle Einheiten,
+				die durch einen Ring der Unsichtbarkeit
+				geschützt sind, zu sehen. Einheiten allerdings,
+				die sich mit ihrem Tarnungs-Talent verstecken,
+				bleiben weiterhin unentdeckt.
 			</text>
-			<text locale="en">This spell enables the caster to create
-				an Amulet Of True Sight. Wearing such an amulet, a
-				person can discover anyone wearing a Ring of
-				Invisibility. Anyway, units concealed by the use of
-				their stealth skill will remain undiscovered.
+			<text locale="en">This spell enables the caster to
+				create an Amulet Of True Sight. Wearing such an
+				amulet, a person can discover anyone wearing a
+				Ring of Invisibility. Anyway, units concealed by
+				the use of their stealth skill will remain
+				undiscovered.
 			</text>
 		</string>
 		<string name="invisibilitydraig">
 			<text locale="de">Mit diesem Spruch kann der Zauberer
-				einen Ring der Unsichtbarkeit erschaffen. Der Träger
-				des Ringes wird für alle Einheiten anderer Parteien
-				unsichtbar, egal wie gut ihre Wahrnehmung auch sein
-				mag. In einer unsichtbaren Einheit muss jede Person
-				einen Ring tragen.
+				einen Ring der Unsichtbarkeit erschaffen. Der
+				Träger des Ringes wird für alle Einheiten
+				anderer Parteien unsichtbar, egal wie gut ihre
+				Wahrnehmung auch sein mag. In einer unsichtbaren
+				Einheit muss jede Person einen Ring tragen.
 			</text>
-			<text locale="en">With this spell, the caster can create a
-				Ring Of Invisibility. The wearer of this ring will be
-				invisible to all units of other factions, no matter
-				how good their perception skill may be. In an invisible
-				unit, each person must wear a Ring Of Invisibility.
+			<text locale="en">With this spell, the caster can create
+				a Ring Of Invisibility. The wearer of this ring
+				will be invisible to all units of other
+				factions, no matter how good their perception
+				skill may be. In an invisible unit, each person
+				must wear a Ring Of Invisibility.
 			</text>
 		</string>
 		<string name="tranferaurachaos">
-			<text locale="de">Mit Hilfe dieses Zaubers kann der Magier
-				eigene Aura im Verhältnis 2:1 auf einen anderen Magier
-				des gleichen Magiegebietes übertragen.
+			<text locale="de">Mit Hilfe dieses Zaubers kann der
+				Magier eigene Aura im Verhältnis 2:1 auf einen
+				anderen Magier des gleichen Magiegebietes
+				übertragen.
 			</text>
-			<text locale="en">With the help of this spell, the caster
-				can transfer mana at a ratio of 2:1 to another member
-				of the same school of magic.
+			<text locale="en">With the help of this spell, the
+				caster can transfer mana at a ratio of 2:1 to
+				another member of the same school of magic.
 			</text>
 		</string>
 		<string name="firewall">
 			<text locale="de">Der Zauberer erschafft eine Wand aus
-				Feuer in der angegebenen Richtung. Sie verletzt jeden,
-				der sie durchschreitet.
+				Feuer in der angegebenen Richtung. Sie verletzt
+				jeden, der sie durchschreitet.
 			</text>
-			<text locale="en">The spell creates an opaque wall of fire
-				in the gives direction that will harm anyone passing
-				through it.
+			<text locale="en">The spell creates an opaque wall of
+				fire in the gives direction that will harm
+				anyone passing through it.
 			</text>
 		</string>
 		<string name="plague">
 			<text locale="de">In einem aufwendigen Ritual opfert der
-				Schwarzmagier einige Bauern und verteilt dann die
-				Leichen auf magische Weise in den Brunnen der Region.
+				Schwarzmagier einige Bauern und verteilt dann
+				die Leichen auf magische Weise in den Brunnen
+				der Region.
 			</text>
 			<text locale="en">In a complicated ritual the sorcerer
-				sacrifices the lives of ten peasants and magically
-				spreads their corpses within the wells of a region.
+				sacrifices the lives of ten peasants and
+				magically spreads their corpses within the wells
+				of a region.
 			</text>
 		</string>
 		<string name="chaosrow">
 			<text locale="de">Vor den Augen der feindlichen Soldaten
-				opfert der Schwarzmagier die zehn Bauern in einem
-				blutigen, grausamen Ritual und beschwört auf diese
-				Weise Geister des Wahnsinns über die feindlichen
-				Truppen. Diese werden im Kampf verwirrt reagieren und
-				nicht in der Lage sein, den Anweisungen ihrer
-				Offiziere zu folgen.
+				opfert der Schwarzmagier die zehn Bauern in
+				einem blutigen, grausamen Ritual und beschwört
+				auf diese Weise Geister des Wahnsinns über die
+				feindlichen Truppen. Diese werden im Kampf
+				verwirrt reagieren und nicht in der Lage sein,
+				den Anweisungen ihrer Offiziere zu folgen.
 			</text>
 			<text locale="en">Before the eyes of the enemy soldiers
 				the sorcerer sacrifices ten peasants in a bloody
-				ritual and thereby summons spirits of madness upon the
-				enemy troops. The enemy soldiers will be in confusion
-				during battle and no more be able to follow the
-				commands of their leaders.
+				ritual and thereby summons spirits of madness
+				upon the enemy troops. The enemy soldiers will
+				be in confusion during battle and no more be
+				able to follow the commands of their leaders.
 			</text>
 		</string>
 		<string name="summonshadow">
-			<text locale="de">Mit Hilfe dunkler Rituale beschwört der 
-				Zauberer Dämonen aus der Sphäre der Schatten. Diese 
-				gefürchteten Wesen können sich fast unsichtbar unter 
-				den Lebenden bewegen, ihre finstere Aura ist jedoch 
-				für jeden spürbar. Im Kampf sind Schattendämonen 
-				gefürchtete Gegner. Sie sind schwer zu treffen und 
-				entziehen ihrem Gegner Kraft.
+			<text locale="de">Mit Hilfe dunkler Rituale beschwört
+				der Zauberer Dämonen aus der Sphäre der
+				Schatten. Diese gefürchteten Wesen können sich
+				fast unsichtbar unter den Lebenden bewegen, ihre
+				finstere Aura ist jedoch für jeden spürbar. Im
+				Kampf sind Schattendämonen gefürchtete Gegner.
+				Sie sind schwer zu treffen und entziehen ihrem
+				Gegner Kraft.
 			</text>
-			<text locale="en">With the help of dark rituals the 
-				sorcerer summons demons from the Sphere Of Shadows. 
-				These fearsome creatures can walk almost unseen 
-				among the living, but their dark aura can be sensed 
-				by everyone. Shadow demons are feared in combat for 
-				they are hard to hit and have the ability to drain 
-				strength from their victims.
+			<text locale="en">With the help of dark rituals the
+				sorcerer summons demons from the Sphere Of
+				Shadows. These fearsome creatures can walk
+				almost unseen among the living, but their dark
+				aura can be sensed by everyone. Shadow demons
+				are feared in combat for they are hard to hit
+				and have the ability to drain strength from
+				their victims.
 			</text>
 		</string>
 		<string name="undeadhero">
-			<text locale="de">Dieses Ritual bindet die bereits 
-				entfliehenden Seelen einiger Kampfopfer an ihren 
-				toten Körper, wodurch sie zu untoten Leben 
-				wiedererweckt werden. Ob sie ehemals auf der Seite 
-				des Feindes oder der eigenen kämpften, ist für das 
-				Ritual ohne belang.
+			<text locale="de">Dieses Ritual bindet die bereits
+				entfliehenden Seelen einiger Kampfopfer an ihren
+				toten Körper, wodurch sie zu untoten Leben
+				wiedererweckt werden. Ob sie ehemals auf der
+				Seite des Feindes oder der eigenen kämpften, ist
+				für das Ritual ohne belang.
 			</text>
-			<text locale="en">This ritual binds the escaping souls of 
-				some casualties back to their dead bodies and thus 
-				condemns them to an undead existance under the control 
-				of the sorcerer. The ritual affects the corpses of 
-				allies and foes alike - no matter on which side of the 
-				battle the soldiers fought before their death.
+			<text locale="en">This ritual binds the escaping souls
+				of some casualties back to their dead bodies and
+				thus condemns them to an undead existance under
+				the control of the sorcerer. The ritual affects
+				the corpses of allies and foes alike - no matter
+				on which side of the battle the soldiers fought
+				before their death.
 			</text>
 		</string>
 		<string name="strength">
-			<text locale="de">Dieses magische Artefakt verleiht dem 
-				Träger die Stärke eines ausgewachsenen Höhlentrolls. 
-				Seine Tragkraft erhöht sich auf das 50fache und auch 
-				im Kampf werden sich die erhöhte Kraft und die 
-				trollisch zähe Haut positiv auswirken.
+			<text locale="de">Dieses magische Artefakt verleiht dem
+				Träger die Stärke eines ausgewachsenen
+				Höhlentrolls. Seine Tragkraft erhöht sich auf
+				das 50fache und auch im Kampf werden sich die
+				erhöhte Kraft und die trollisch zähe Haut
+				positiv auswirken.
 			</text>
-			<text locale="en">This artifact gives the one wearing it 
-				the strength of a cavetroll. He will be able to carry 
-				fifty times as much as normal and also in combat his 
-				enhanced strength and tough troll skin will serve him 
-				well.
+			<text locale="en">This artifact gives the one wearing it
+				the strength of a cavetroll. He will be able to
+				carry fifty times as much as normal and also in
+				combat his enhanced strength and tough troll
+				skin will serve him well.
 			</text>
 		</string>
 		<string name="auraleak">
-			<text locale="de">Der Schwarzmagier kann mit diesem 
-				dunklen Ritual einen Riss in das Gefüge der Magie 
-				bewirken, der alle magische Kraft aus der Region 
-				reißen wird. Alle magisch begabten in der Region 
-				werden einen Großteil ihrer Aura verlieren.
+			<text locale="de">Der Schwarzmagier kann mit diesem
+				dunklen Ritual einen Riss in das Gefüge der
+				Magie bewirken, der alle magische Kraft aus der
+				Region reißen wird. Alle magisch begabten in der
+				Region werden einen Großteil ihrer Aura
+				verlieren.
 			</text>
-			<text locale="en">With this dark ritual the chaossorcerer 
-				causes a deep rift to appear in the astral balance 
-				that will tear all magical power from a region. All 
-				spellcasters in that region will lose most of their 
-				mana.
+			<text locale="en">With this dark ritual the
+				chaossorcerer causes a deep rift to appear in
+				the astral balance that will tear all magical
+				power from a region. All spellcasters in that
+				region will lose most of their mana.
 			</text>
 		</string>
 		<string name="draigfumbleshield">
-			<text locale="de">Dieses Ritual, ausgeführt vor einem 
-				Kampf, verwirbelt die astralen Energien auf dem 
-				Schlachtfeld und macht es so feindlichen Magier 
+			<text locale="de">Dieses Ritual, ausgeführt vor einem
+				Kampf, verwirbelt die astralen Energien auf dem
+				Schlachtfeld und macht es so feindlichen Magier
 				schwieriger, ihre Zauber zu wirken.
 			</text>
-			<text locale="en">This ritual, performed before a battle, 
-				causes the astral energies on the battlefield to whirl 
-				and churn and thereby makes spellcasting more 
-				difficult for the enemy mages.
+			<text locale="en">This ritual, performed before a
+				battle, causes the astral energies on the
+				battlefield to whirl and churn and thereby makes
+				spellcasting more difficult for the enemy mages.
 			</text>
 		</string>
 		<string name="forestfire">
-			<text locale="de">Diese Elementarbeschwörung ruft einen 
-				Feuerteufel herbei, ein Wesen aus den tiefsten 
-				Niederungen der Flammenhöllen. Der Feuerteufel wird 
-				sich begierig auf die Wälder der Region stürzen und 
-				sie in Flammen setzen.
+			<text locale="de">Diese Elementarbeschwörung ruft einen
+				Feuerteufel herbei, ein Wesen aus den tiefsten
+				Niederungen der Flammenhöllen. Der Feuerteufel
+				wird sich begierig auf die Wälder der Region
+				stürzen und sie in Flammen setzen.
 			</text>
-			<text locale="en">This elemental summoning calls a fire 
-				fiend, a creature from the deepest hell. The demon 
-				will eagerly rush into the forests of a region and set 
-				them ablaze.
+			<text locale="en">This elemental summoning calls a fire
+				fiend, a creature from the deepest hell. The
+				demon will eagerly rush into the forests of a
+				region and set them ablaze.
 			</text>
 		</string>
 		<string name="draigdestroymagic">
-			<text locale="de">Genau um Mitternacht, wenn die Kräfte 
-				der Finsternis am größten sind, kann auch ein 
-				Schwarzmagier seine Kräfte nutzen um Verzauberungen 
-				aufzuheben. Dazu zeichnet er ein Pentagramm in das 
-				verzauberte Objekt und beginnt mit einer Anrufung der 
-				Herren der Finsternis. Die Herren werden ihm 
-				beistehen, doch ob es ihm gelingt, den Zauber zu 
-				lösen, hängt allein von seiner eigenen Kraft ab.
+			<text locale="de">Genau um Mitternacht, wenn die Kräfte
+				der Finsternis am größten sind, kann auch ein
+				Schwarzmagier seine Kräfte nutzen um
+				Verzauberungen aufzuheben. Dazu zeichnet er ein
+				Pentagramm in das verzauberte Objekt und beginnt
+				mit einer Anrufung der Herren der Finsternis.
+				Die Herren werden ihm beistehen, doch ob es ihm
+				gelingt, den Zauber zu lösen, hängt allein von
+				seiner eigenen Kraft ab.
 			</text>
-			<text locale="en">At midnight, when the Powers of 
-				Darkness are at their peak, the sorcerer can use his 
-				powers to destroy enchantments. In order to do so, he 
-				draws a pentagram on a surface of the enchanted object 
-				and begins calling the Lords Of Darkness. The Lords 
-				will aid him, but whether he is able to undo the 
-				target spell or not depends upon his own power.
+			<text locale="en">At midnight, when the Powers of
+				Darkness are at their peak, the sorcerer can use
+				his powers to destroy enchantments. In order to
+				do so, he draws a pentagram on a surface of the
+				enchanted object and begins calling the Lords Of
+				Darkness. The Lords will aid him, but whether he
+				is able to undo the target spell or not depends
+				upon his own power.
 			</text>
 		</string>
 		<string name="unholypower">
-			<text locale="de">Nur geflüstert wird dieses Ritual an 
-				den dunklen Akademien an die Adepten weitergegeben, 
-				gehört es doch zu den finstersten, die je 
-				niedergeschrieben wurden. Durch die Anrufung 
-				unheiliger Dämonen wird die Kraft der lebenden Toten 
-				verstärkt und sie verwandeln sich in untote Monster 
-				großer Kraft.
+			<text locale="de">Nur geflüstert wird dieses Ritual an
+				den dunklen Akademien an die Adepten
+				weitergegeben, gehört es doch zu den
+				finstersten, die je niedergeschrieben wurden.
+				Durch die Anrufung unheiliger Dämonen wird die
+				Kraft der lebenden Toten verstärkt und sie
+				verwandeln sich in untote Monster großer Kraft.
 			</text>
-			<text locale="en">Only whispered the knowledge of 
-				performing this ritual is passed to the adepts of the 
-				dark academies, for it is one of the darkest that has 
-				ever been written down. By calling unholy demons the 
-				strength of the living dead is greatly increased and 
-				they are turned into undead monsters of immense power.
+			<text locale="en">Only whispered the knowledge of
+				performing this ritual is passed to the adepts
+				of the dark academies, for it is one of the
+				darkest that has ever been written down. By
+				calling unholy demons the strength of the living
+				dead is greatly increased and they are turned
+				into undead monsters of immense power.
 			</text>
 		</string>
 		<string name="deathcloud">
-			<text locale="de">Mit einem düsteren Ritual und unter 
-				Opferung seines eigenen Blutes beschwört der 
-				Schwarzmagier einen großen Geist von der 
-				Elementarebene der Gifte. Der Geist manifestiert sich 
-				als giftgrüner Schwaden über der Region und wird 
-				allen, die mit ihm in Kontakt kommen, Schaden zufügen.
+			<text locale="de">Mit einem düsteren Ritual und unter
+				Opferung seines eigenen Blutes beschwört der
+				Schwarzmagier einen großen Geist von der
+				Elementarebene der Gifte. Der Geist manifestiert
+				sich als giftgrüner Schwaden über der Region und
+				wird allen, die mit ihm in Kontakt kommen,
+				Schaden zufügen.
 			</text>
-			<text locale="en">By performing a gruesome ritual and 
-				sacrificing his own blood the Sorcerer conjurs up a 
-				spirit from the Elemental Plane Of Poison. It will 
-				take the form of a green cloud of toxic gases that 
-				envelops a whole region and that will harm anyone 
-				within.
+			<text locale="en">By performing a gruesome ritual and
+				sacrificing his own blood the Sorcerer conjurs
+				up a spirit from the Elemental Plane Of Poison.
+				It will take the form of a green cloud of toxic
+				gases that envelops a whole region and that will
+				harm anyone within.
 			</text>
 		</string>
 		<string name="summondragon">
-			<text locale="de">Mit diesem dunklen Ritual erzeugt der 
-				Magier einen Köder, der für Drachen einfach 
-				unwiderstehlich riecht. Ob die Drachen aus der 
-				Umgebung oder aus der Sphäre des Chaos stammen, 
-				konnte noch nicht erforscht werden. Es soll beides 
-				bereits vorgekommen sein. Der Köder hält etwa 6 
-				Wochen, muss aber in einem drachengenehmen Terrain 
-				platziert werden.
+			<text locale="de">Mit diesem dunklen Ritual erzeugt der
+				Magier einen Köder, der für Drachen einfach
+				unwiderstehlich riecht. Ob die Drachen aus der
+				Umgebung oder aus der Sphäre des Chaos stammen,
+				konnte noch nicht erforscht werden. Es soll
+				beides bereits vorgekommen sein. Der Köder hält
+				etwa 6 Wochen, muss aber in einem
+				drachengenehmen Terrain platziert werden.
 			</text>
-			<text locale="en">Performing this dark ritual, the 
-				sorcerer creates a bait that exhales an irresistable 
-				scent to dragons. It is not known whether the dragons 
-				come from surrounding regions or if they have their 
-				origin in the Sphere Of Chaos. The bait will exist for 
-				about six weeks, but it must be placed in a tarrain 
+			<text locale="en">Performing this dark ritual, the
+				sorcerer creates a bait that exhales an
+				irresistable scent to dragons. It is not known
+				whether the dragons come from surrounding
+				regions or if they have their origin in the
+				Sphere Of Chaos. The bait will exist for about
+				six weeks, but it must be placed in a tarrain
 				that is suitable for dragons.
 			</text>
 		</string>
 		<string name="summonshadowlords">
-			<text locale="de">Mit Hilfe dunkler Rituale beschwört der 
-				Zauberer Dämonen aus der Sphäre der Schatten. Diese 
-				gefürchteten Wesen können sich fast unsichtbar unter 
-				den Lebenden bewegen, ihre finstere Aura ist jedoch 
-				für jeden spürbar. Im Kampf sind Schattenmeister 
-				gefürchtete Gegner. Sie sind schwer zu treffen und 
-				entziehen ihrem Gegner Kraft und Leben.
+			<text locale="de">Mit Hilfe dunkler Rituale beschwört
+				der Zauberer Dämonen aus der Sphäre der
+				Schatten. Diese gefürchteten Wesen können sich
+				fast unsichtbar unter den Lebenden bewegen, ihre
+				finstere Aura ist jedoch für jeden spürbar. Im
+				Kampf sind Schattenmeister gefürchtete Gegner.
+				Sie sind schwer zu treffen und entziehen ihrem
+				Gegner Kraft und Leben.
 			</text>
-			<text locale="en">With the help of dark rituals the 
-				sorcerer summons demons from the Sphere Of Shadows. 
-				These fearsome creatures can walk almost unseen among 
-				the living, but their dark aura can be sensed by 
-				everyone. Shadowmasters are feared in combat for they 
-				are hard to hit and have the ability to drain 
-				strength and life force from their victims.
+			<text locale="en">With the help of dark rituals the
+				sorcerer summons demons from the Sphere Of
+				Shadows. These fearsome creatures can walk
+				almost unseen among the living, but their dark
+				aura can be sensed by everyone. Shadowmasters
+				are feared in combat for they are hard to hit
+				and have the ability to drain strength and life
+				force from their victims.
 			</text>
 		</string>
 		<string name="firesword">
-			<text locale="de">'Und so reibe das Blut eines wilden 
-				Kämpfers in den Stahl der Klinge und beginne die 
-				Anrufung der Sphären des Chaos. Und hast du alles zu 
-				ihrem Wohlgefallen getan, so werden sie einen niederen 
-				der ihren senden, das Schwert mit seiner Macht zu 
-				beseelen...'
+			<text locale="de">'Und so reibe das Blut eines wilden
+				Kämpfers in den Stahl der Klinge und beginne die
+				Anrufung der Sphären des Chaos. Und hast du
+				alles zu ihrem Wohlgefallen getan, so werden sie
+				einen niederen der ihren senden, das Schwert mit
+				seiner Macht zu beseelen...'
 			</text>
-			<text locale="en">'So take the blood of a fierce warrior 
-				and apply it to the steel of the blade. Then start 
-				calling the Spheres Of Chaos. If you did everything 
-				to their pleasure, they will send a minor one of their 
-				kind to fulfill the sword with his power.'
+			<text locale="en">'So take the blood of a fierce warrior
+				and apply it to the steel of the blade. Then
+				start calling the Spheres Of Chaos. If you did
+				everything to their pleasure, they will send a
+				minor one of their kind to fulfill the sword
+				with his power.'
 			</text>
 		</string>
 		<string name="draigfamiliar">
-			<text locale="de">Einem erfahrenen Magier wird irgendwann 
-				auf seinen Wanderungen ein ungewöhnliches Exemplar 
-				einer Gattung begegnen, welches sich dem Magier 
-				anschließen wird.
+			<text locale="de">Einem erfahrenen Magier wird
+				irgendwann auf seinen Wanderungen ein
+				ungewöhnliches Exemplar einer Gattung begegnen,
+				welches sich dem Magier anschließen wird.
 			</text>
-			<text locale="en">Once, during his travels, the seasoned 
-				mage will meet an extraordinary creature of its 
+			<text locale="en">Once, during his travels, the seasoned
+				mage will meet an extraordinary creature of its
 				species that will join him.
 			</text>
 		</string>
 		<string name="chaossuction">
-			<text locale="de">Durch das Opfern von 500 Bauern kann 
-				der Chaosmagier ein Tor zur astralen Welt öffnen. Das 
-				Tor kann in der Folgewoche verwendet werden, es löst 
-				sich am Ende der Folgewoche auf.
+			<text locale="de">Durch das Opfern von 500 Bauern kann
+				der Chaosmagier ein Tor zur astralen Welt
+				öffnen. Das Tor kann in der Folgewoche verwendet
+				werden, es löst sich am Ende der Folgewoche auf.
 			</text>
-			<text locale="en">By sacrificing the lives of 500 
-				peasants, the chaossorcerer is able to open a planar 
-				gate. This gate can be used during the following week 
-				to transfer units to the astral plane. It dissipates 
-				at the end of the following week.
+			<text locale="en">By sacrificing the lives of 500
+				peasants, the chaossorcerer is able to open a
+				planar gate. This gate can be used during the
+				following week to transfer units to the astral
+				plane. It dissipates at the end of the following
+				week.
 			</text>
 		</string>
 		<string name="sparkledream">
-			<text locale="de">Der Zauberer sendet dem Ziel des 
+			<text locale="de">Der Zauberer sendet dem Ziel des
 				Spruches einen Traum.
 			</text>
-			<text locale="en">The mentalist send a dream to the 
+			<text locale="en">The mentalist send a dream to the
 				target of the spell.
 			</text>
 		</string>
 		<string name="illaunearnsilver">
-			<text locale="de">Niemand kann so gut die Träume deuten 
-				wie ein Magier des Illaun. Auch die Kunst der 
-				Wahrsagerei, des Kartenlegens und des Handlesens sind 
-				ihm geläufig. Dafür zahlen ihm die Bauern 50 Silber 
-				pro Stufe.
+			<text locale="de">Niemand kann so gut die Träume deuten
+				wie ein Magier des Illaun. Auch die Kunst der
+				Wahrsagerei, des Kartenlegens und des Handlesens
+				sind ihm geläufig. Dafür zahlen ihm die Bauern
+				50 Silber pro Stufe.
 			</text>
-			<text locale="en">No one can read dreams as well as the 
-				mages of Illaun. Furthermore, they are also familiar 
-				with all other common means of foretelling the 
-				future like crystal balls, tarot cards or palms. A 
-				mentalist can earn 50 silver pieces per level and 
-				week for offering these services to peasants.
+			<text locale="en">No one can read dreams as well as the
+				mages of Illaun. Furthermore, they are also
+				familiar with all other common means of
+				foretelling the future like crystal balls, tarot
+				cards or palms. A mentalist can earn 50 silver
+				pieces per level and week for offering these
+				services to peasants.
 			</text>
 		</string>
 		<string name="shadowknights">
-			<text locale="de">Dieser Zauber vermag dem Gegner ein 
-				geringfügig versetztes Bild der eigenen Truppen 
-				vorzuspiegeln. Die Schattenritter haben keinen 
-				effektiven Angriff und Verwundungen im Kampf 
+			<text locale="de">Dieser Zauber vermag dem Gegner ein
+				geringfügig versetztes Bild der eigenen Truppen
+				vorzuspiegeln. Die Schattenritter haben keinen
+				effektiven Angriff und Verwundungen im Kampf
 				zerstören sie sofort.
 			</text>
-			<text locale="en">This spell creates illusionary 
-				duplicates of allied troops. The shadow knights 
-				can't do real damage and are instantly destroyed 
+			<text locale="en">This spell creates illusionary
+				duplicates of allied troops. The shadow knights
+				can't do real damage and are instantly destroyed
 				if wounded.
 			</text>
 		</string>
 		<string name="flee">
-			<text locale="de">Der Traumweber beschwört vor dem 
-				Kampf grauenerregende Trugbilder herauf, die viele 
-				Gegner in Panik versetzen. Die Betroffenen werden 
-				versuchen, vor den Trugbildern zu fliehen.
+			<text locale="de">Der Traumweber beschwört vor dem
+				Kampf grauenerregende Trugbilder herauf, die
+				viele Gegner in Panik versetzen. Die Betroffenen
+				werden versuchen, vor den Trugbildern zu
+				fliehen.
 			</text>
-			<text locale="en">Before a battle the mentalist creates 
-				terrifying illusions of hideous creatures that will 
-				cause panic among the enemies. Those who believe in 
-				the illusions will try to flee from battle.
+			<text locale="en">Before a battle the mentalist creates
+				terrifying illusions of hideous creatures that
+				will cause panic among the enemies. Those who
+				believe in the illusions will try to flee from
+				battle.
 			</text>
 		</string>
 		<string name="puttorest">
-			<text locale="de">Dieses magische Ritual beruhigt die 
-				gequälten Seelen der gewaltsam zu Tode gekommenen und 
-				ermöglicht es ihnen so, ihre letzte Reise in die 
-				Anderlande zu beginnen. Je Stufe des Zaubers werden 
-				ungefähr 50 Seelen ihre Ruhe finden. Der Zauber 
-				vermag nicht, bereits wieder auferstandene lebende 
-				Tote zu erlösen, da deren Bindung an diese Welt zu 
-				stark ist.
+			<text locale="de">Dieses magische Ritual beruhigt die
+				gequälten Seelen der gewaltsam zu Tode
+				gekommenen und ermöglicht es ihnen so, ihre
+				letzte Reise in die Anderlande zu beginnen. Je
+				Stufe des Zaubers werden ungefähr 50 Seelen ihre
+				Ruhe finden. Der Zauber vermag nicht, bereits
+				wieder auferstandene lebende Tote zu erlösen, da
+				deren Bindung an diese Welt zu stark ist.
 			</text>
-			<text locale="en">This ritual calms the tortured souls of 
-				those who died a violent death and finally releases 
-				them to the Otherlands. About 50 souls per level of 
-				the spell will be released. The spell will not affect 
-				existing undead, because they are too strongly tied 
-				to the Material World.
+			<text locale="en">This ritual calms the tortured souls
+				of those who died a violent death and finally
+				releases them to the Otherlands. About 50 souls
+				per level of the spell will be released. The
+				spell will not affect existing undead, because
+				they are too strongly tied to the Material
+				World.
 			</text>
 		</string>
 		<string name="icastle">
-			<text locale="de">Mit Hilfe dieses Zaubers kann der 
-				Traumweber die Illusion eines beliebigen Gebäudes 
-				erzeugen. Die Illusion kann betreten werden, ist aber 
-				ansonsten funktionslos und benötigt auch keinen 
-				Unterhalt. Sie wird einige Wochen bestehen bleiben.
+			<text locale="de">Mit Hilfe dieses Zaubers kann der
+				Traumweber die Illusion eines beliebigen
+				Gebäudes erzeugen. Die Illusion kann betreten
+				werden, ist aber ansonsten funktionslos und
+				benötigt auch keinen Unterhalt. Sie wird einige
+				Wochen bestehen bleiben.
 			</text>
-			<text locale="en">With this spell the mentalist can 
-				create the illusion of any building. The illusion can 
-				be entered, but it has no function and requires no 
-				maintenance. It will remain existing for several 
-				weeks.
+			<text locale="en">With this spell the mentalist can
+				create the illusion of any building. The
+				illusion can be entered, but it has no function
+				and requires no maintenance. It will remain
+				existing for several weeks.
 			</text>
 		</string>
 		<string name="transferauratraum">
-			<text locale="de">Mit Hilfe dieses Zaubers kann der 
-				Traumweber eigene Aura im Verhältnis 2:1 auf einen 
-				anderen Traumweber übertragen.
+			<text locale="de">Mit Hilfe dieses Zaubers kann der
+				Traumweber eigene Aura im Verhältnis 2:1 auf
+				einen anderen Traumweber übertragen.
 			</text>
-			<text locale="en">With the help of this spell the 
-				mentalist can transfer mana at a ratio of 2:1 to 
+			<text locale="en">With the help of this spell the
+				mentalist can transfer mana at a ratio of 2:1 to
 				another mentalist.
 			</text>
 		</string>
 		<string name="shapeshift">
-			<text locale="de">Mit Hilfe dieses arkanen Rituals vermag 
-				der Traumweber die wahre Gestalt einer Gruppe zu 
-				verschleiern. Unbedarften Beobachtern erscheint sie 
-				dann als einer anderen Rasse zugehörig.
+			<text locale="de">Mit Hilfe dieses arkanen Rituals
+			vermag
+				der Traumweber die wahre Gestalt einer Gruppe zu
+				verschleiern. Unbedarften Beobachtern erscheint
+				sie dann als einer anderen Rasse zugehörig.
 			</text>
-			<text locale="en">With the help of this ritual the 
-				mentalist is able to conceal the true form of a 
-				target unit. To unknowing observers all persons in 
-				the target unit appear to be of a different race.
+			<text locale="en">With the help of this ritual the
+				mentalist is able to conceal the true form of a
+				target unit. To unknowing observers all persons
+				in the target unit appear to be of a different
+				race.
 			</text>
 		</string>
 		<string name="dreamreading">
-			<text locale="de">Dieser Zauber ermöglicht es dem 
-				Traumweber, in die Träume einer Einheit einzudringen 
-				und so einen Bericht über die Umgebung zu erhalten.
+			<text locale="de">Dieser Zauber ermöglicht es dem
+				Traumweber, in die Träume einer Einheit
+				einzudringen und so einen Bericht über die
+				Umgebung zu erhalten.
 			</text>
-			<text locale="en">This spell enables the mentalist to 
-				penetrate the dreams of a target unit and gather 
-				information about that unit's surroundings. He will 
-				receive a report from the corresponding region.
+			<text locale="en">This spell enables the mentalist to
+				penetrate the dreams of a target unit and gather
+				information about that unit's surroundings. He
+				will receive a report from the corresponding
+				region.
 			</text>
 		</string>
 		<string name="tiredsoldiers">
-			<text locale="de">Dieser Kampfzauber führt dazu, dass 
-				einige Gegner im Kampf unter schwerer Müdigkeit 
-				leiden. Die Soldaten verschlafen manchmal ihren Angriff 
-				und verteidigen sich schlechter.
+			<text locale="de">Dieser Kampfzauber führt dazu, dass
+				einige Gegner im Kampf unter schwerer Müdigkeit
+				leiden. Die Soldaten verschlafen manchmal ihren
+				Angriff und verteidigen sich schlechter.
 			</text>
-			<text locale="en">This combat spell causes several enemies 
-				to suffer from an unnatural tiredness during combat. 
-				The soldiers will defend themselves worse than normal 
-				and sometimes sink into a slumber instead of attacking.
+			<text locale="en">This combat spell causes several
+				enemies to suffer from an unnatural tiredness
+				during combat. The soldiers will defend
+				themselves worse than normal and sometimes sink
+				into a slumber instead of attacking.
 			</text>
 		</string>
 		<string name="reanimate">
-			<text locale="de">Stirbt ein Krieger im Kampf so macht 
-				sich seine Seele auf die lange Wanderung zu den 
-				Sternen. Mit Hilfe eines Rituals kann ein Traumweber 
-				versuchen, die Seele wieder einzufangen und in den 
-				Körper des Verstorbenen zurückzubringen. Zwar heilt 
-				der Zauber keine körperlichen Verwundungen, doch ein 
-				Behandelter wird den Kampf überleben.
+			<text locale="de">Stirbt ein Krieger im Kampf so macht
+				sich seine Seele auf die lange Wanderung zu den
+				Sternen. Mit Hilfe eines Rituals kann ein
+				Traumweber versuchen, die Seele wieder
+				einzufangen und in den Körper des Verstorbenen
+				zurückzubringen. Zwar heilt der Zauber keine
+				körperlichen Verwundungen, doch ein Behandelter
+				wird den Kampf überleben.
 			</text>
-			<text locale="en">When a warrior dies in a battle, his 
-				soul begins its long journey to the stars. With the 
-				help of this ritual, the mentalist can try to catch 
-				those escaping souls and bring them back to their 
-				bodies. The spell does not heal physical injuries, but 
-				an affected person will survive the battle.
+			<text locale="en">When a warrior dies in a battle, his
+				soul begins its long journey to the stars. With
+				the help of this ritual, the mentalist can try
+				to catch those escaping souls and bring them
+				back to their bodies. The spell does not heal
+				physical injuries, but an affected person will
+				survive the battle.
 			</text>
 		</string>
 		<string name="analysedream">
-			<text locale="de">Mit diesem Spruch kann der Traumweber 
-				versuchen, die Verzauberungen einer einzelnen Einheit 
-				zu erkennen. Von allen Sprüchen, die seine eigenen 
-				Fähigkeiten nicht überschreiten, wird er einen 
-				Eindruck ihres Wirkens erhalten können. Bei stärkeren 
-				Sprüchen benötigt er ein wenig Glück für eine 
-				gelungene Analyse.
+			<text locale="de">Mit diesem Spruch kann der Traumweber
+				versuchen, die Verzauberungen einer einzelnen
+				Einheit zu erkennen. Von allen Sprüchen, die
+				seine eigenen Fähigkeiten nicht überschreiten,
+				wird er einen Eindruck ihres Wirkens erhalten
+				können. Bei stärkeren Sprüchen benötigt er ein
+				wenig Glück für eine gelungene Analyse.
 			</text>
-			<text locale="en">With this spell the mentalist can 
-				attempt to detect enchantments on a target unit. He 
-				will get an idea of the effect of all spells that 
-				don't exceed his own abilities. If a spell is 
-				stronger, it takes a little luck for a successful 
-				analysis.
+			<text locale="en">With this spell the mentalist can
+				attempt to detect enchantments on a target unit.
+				He will get an idea of the effect of all spells
+				that don't exceed his own abilities. If a spell
+				is stronger, it takes a little luck for a
+				successful analysis.
 			</text>
 		</string>
 		<string name="disturbingdreams">
-			<text locale="de">Dieser Zauber führt in der betroffenen 
-				Region für einige Wochen zu Schlaflosigkeit und 
-				Unruhe. Den Betroffenen fällt das Lernen deutlich 
-				schwerer.
+			<text locale="de">Dieser Zauber führt in der betroffenen
+				Region für einige Wochen zu Schlaflosigkeit und
+				Unruhe. Den Betroffenen fällt das Lernen
+				deutlich schwerer.
 			</text>
-			<text locale="en">This spell causes insomnia and 
-				restlessness in a whole region for several weeks. All 
-				affected persons will learn much slower than normal.
+			<text locale="en">This spell causes insomnia and
+				restlessness in a whole region for several
+				weeks. All affected persons will learn much
+				slower than normal.
 			</text>
 		</string>
 		<string name="trueseeingillaun">
-			<text locale="de">Der Spruch ermöglicht es einem Magier, 
-				ein Amulett des Wahren Sehens zu erschaffen. Das 
-				Amulett erlaubt es dem Träger, alle Einheiten, die 
-				durch einen Ring der Unsichtbarkeit geschützt sind, zu 
-				sehen. Einheiten allerdings, die sich mit ihrem 
-				Tarnungs-Talent verstecken, bleiben weiterhin 
-				unentdeckt.
+			<text locale="de">Der Spruch ermöglicht es einem Magier,
+				ein Amulett des Wahren Sehens zu erschaffen. Das
+				Amulett erlaubt es dem Träger, alle Einheiten,
+				die durch einen Ring der Unsichtbarkeit
+				geschützt sind, zu sehen. Einheiten allerdings,
+				die sich mit ihrem Tarnungs-Talent verstecken,
+				bleiben weiterhin unentdeckt.
 			</text>
-			<text locale="en">This spell enables the caster to create 
-				an Amulet Of True Sight. Wearing such an amulet, a 
-				person can discover anyone wearing a Ring of 
-				Invisibility. Anyway, units concealed by the use of 
-				their stealth skill will remain undiscovered.
+			<text locale="en">This spell enables the caster to
+				create an Amulet Of True Sight. Wearing such an
+				amulet, a person can discover anyone wearing a
+				Ring of Invisibility. Anyway, units concealed by
+				the use of their stealth skill will remain
+				undiscovered.
 			</text>
 		</string>
 		<string name="invisibilityillaun">
-			<text locale="de">Mit diesem Spruch kann der Zauberer 
-				einen Ring der Unsichtbarkeit erschaffen. Der Träger 
-				des Ringes wird für alle Einheiten anderer Parteien 
-				unsichtbar, egal wie gut ihre Wahrnehmung auch sein 
-				mag. In einer unsichtbaren Einheit muss jede Person 
-				einen Ring tragen.
-			</text>
-			<text locale="en">With this spell the caster can create a 
-				Ring Of Invisibility. The wearer of this ring will be 
-				invisible to all units of other factions, no matter 
-				how good their perception skill may be. In an 
-				invisible unit, each person must wear a Ring Of 
-				Invisibility.
+			<text locale="de">Mit diesem Spruch kann der Zauberer
+			einen Ring der Unsichtbarkeit erschaffen. Der Träger des
+			Ringes wird für alle Einheiten anderer Parteien
+			unsichtbar, egal wie gut ihre Wahrnehmung auch sein mag.
+			In einer unsichtbaren Einheit muss jede Person einen
+			Ring tragen. </text>
+			<text locale="en">With this spell the caster can create
+			a Ring Of Invisibility. The wearer of this ring will be
+			invisible to all units of other factions, no matter how
+			good their perception skill may be. In an invisible
+			unit, each person must wear a Ring Of Invisibility.
 			</text>
 		</string>
 		<string name="sleep">
-			<text locale="de">Dieser Zauber läßt einige feindliche 
-				Kämpfer einschlafen. Schlafende Kämpfer greifen nicht 
-				an und verteidigen sich schlechter, sie wachen jedoch 
-				auf, sobald sie im Kampf getroffen werden.
-			</text>
-			<text locale="en">This spell causes several enemies to 
-				fall asleep. Sleeping warriors don't attack and defend 
-				themselves worse than normal, but they'll wake up if 
-				they get hit during combat.
-			</text>
+			<text locale="de">Dieser Zauber läßt einige feindliche
+				Kämpfer einschlafen. Schlafende Kämpfer greifen
+				nicht an und verteidigen sich schlechter, sie
+				wachen jedoch auf, sobald sie im Kampf getroffen
+				werden. </text>
+			<text locale="en">This spell causes several enemies to
+				fall asleep. Sleeping warriors don't attack and
+				defend themselves worse than normal, but they'll
+				wake up if they get hit during combat. </text>
 		</string>
 		<string name="readmind">
-			<text locale="de">Mit diesem Zauber dringt der Traumweber 
-				in die Gedanken und Traumwelt seines Opfers ein und 
-				kann so seine intimsten Geheimnisse ausspähen. Seine 
-				Fähigkeiten, seinen Besitz und seine 
-				Parteizugehörigkeit wird nicht länger ungewiss sein.
+			<text locale="de">Mit diesem Zauber dringt der
+				Traumweber in die Gedanken und Traumwelt seines
+				Opfers ein und kann so seine intimsten
+				Geheimnisse ausspähen. Seine Fähigkeiten, seinen
+				Besitz und seine Parteizugehörigkeit wird nicht
+				länger ungewiss sein.
 			</text>
-			<text locale="en">With this spell the mentalist penetrates 
-				the thoughts and dreams of his victim to reveal his 
-				most intimate secrets. The target's faction, skills 
-				and possessions will no longer be unknown.
+			<text locale="en">With this spell the mentalist
+				penetrates the thoughts and dreams of his victim
+				to reveal his most intimate secrets. The
+				target's faction, skills and possessions will no
+				longer be unknown.
 			</text>
 		</string>
 		<string name="gooddreams">
-			<text locale="de">Dieser Zauber ermöglicht es dem 
-				Traumweber, den Schlaf aller aliierten Einheiten in 
-				der Region so zu beeinflussen, dass sie für einige 
+			<text locale="de">Dieser Zauber ermöglicht es dem
+				Traumweber, den Schlaf aller aliierten Einheiten
+				in
+				der Region so zu beeinflussen, dass sie für
+				einige
 				Zeit einen Bonus in allen Talenten bekommen.
 			</text>
-			<text locale="en">This spell allows the mentalist to 
-				influence the sleep of all allied units in a region 
-				in such a way that they will gain a bonus to all 
+			<text locale="en">This spell allows the mentalist to
+				influence the sleep of all allied units in a
+				region
+				in such a way that they will gain a bonus to all
 				talents for some time.
 			</text>
 		</string>
 		<string name="illaundestroymagic">
-			<text locale="de">Dieser Zauber ermöglicht es dem 
-				Traumweber die natürlichen und aufgezwungenen 
-				Traumbilder einer Person, eines Gebäudes, Schiffes 
-				oder einer Region zu unterscheiden und diese zu 
-				entwirren.
+			<text locale="de">Dieser Zauber ermöglicht es dem
+				Traumweber die natürlichen und aufgezwungenen
+				Traumbilder einer Person, eines Gebäudes,
+				Schiffes oder einer Region zu unterscheiden und
+				diese zu entwirren.
 			</text>
-			<text locale="en">This spell allows the mentalist to 
-				distinguish between the natural and unnatural dreams 
-				of a person, a ship, a building or a region and 
-				remove those that are of magical origin.
-			</text>
+			<text locale="en">This spell allows the mentalist to
+				distinguish between the natural and unnatural
+				dreams of a person, a ship, a building or a
+				region and remove those that are of magical
+				origin. </text>
 		</string>
 		<string name="illaunfamiliar">
-			<text locale="de">Einem erfahrenen Magier wird irgendwann 
-				auf seinen Wanderungen ein ungewöhnliches Exemplar 
-				einer Gattung begegnen, welches sich dem Magier 
-				anschließen wird.
-			</text>
-			<text locale="en">Once during his travels, the seasoned 
-				mage will meet an extraordinary creature of its 
-				species that will join him.
-			</text>
+			<text locale="de">Einem erfahrenen Magier wird
+			irgendwann auf seinen Wanderungen ein ungewöhnliches
+			Exemplar einer Gattung begegnen, welches sich dem Magier
+			anschließen wird. </text>
+			<text locale="en">Once during his travels, the seasoned
+			mage will meet an extraordinary creature of its species
+			that will join him. </text>
 		</string>
 		<string name="mindblast">
-			<text locale="de">Mit diesem Zauber greift der Magier 
-				direkt den Geist seiner Gegner an. Ein Schlag aus 
-				astraler und elektrischer Energie trifft die Gegner, 
-				wird die Magieresistenz durchbrochen, verliert ein 
-				Opfer permanent einen Teil seiner Erinnerungen. Wird 
-				es zu oft ein Opfer dieses Zaubers kann es daran 
-				sterben.
-			</text>
-			<text locale="en">With this spell the mentalist directly 
-				attacks his enemies' souls. A blast of astral and 
-				electrical energy strikes the foes. If a victim fails 
-				to resist the magic, he will permanently lose part of 
-				his memories. Being the target of this spell for too 
-				many times may result in death.
-			</text>
+			<text locale="de">Mit diesem Zauber greift der Magier
+			direkt den Geist seiner Gegner an. Ein Schlag aus
+			astraler und elektrischer Energie trifft die Gegner,
+			wird die Magieresistenz durchbrochen, verliert ein Opfer
+			permanent einen Teil seiner Erinnerungen. Wird es zu oft
+			ein Opfer dieses Zaubers kann es daran sterben. </text>
+			<text locale="en">With this spell the mentalist directly
+			attacks his enemies' souls. A blast of astral and
+			electrical energy strikes the foes. If a victim fails to
+			resist the magic, he will permanently lose part of his
+			memories. Being the target of this spell for too many
+			times may result in death. </text>
 		</string>
 		<string name="orkdream">
-			<text locale="de">Dieser Zauber - dessen Anwendung in den 
-				meisten Kulturen streng verboten ist - löst im Opfer 
-				ein unkontrollierbares Verlangen nach körperlicher 
-				Liebe aus. Die betroffenen Personen werden sich Hals 
-				über Kopf in ein Liebesabenteuer stürzen, zu blind 
-				vor Verlangen, um an etwas anderes zu denken. Meistens 
-				bereuen sie es einige Wochen später...
-			</text>
-			<text locale="en">This spell - whose use is forbidden in 
-				most cultures - creates an uncontrollable desire for 
-				physical love in the victim. The affected persons 
-				will rush head over heels into a love affair, unable 
-				to think of anything else. Most of them will regret 
-				this a few months later...
-			</text>
+			<text locale="de">Dieser Zauber - dessen Anwendung in
+			den meisten Kulturen streng verboten ist - löst im Opfer
+			ein unkontrollierbares Verlangen nach körperlicher Liebe
+			aus. Die betroffenen Personen werden sich Hals über Kopf
+			in ein Liebesabenteuer stürzen, zu blind vor Verlangen,
+			um an etwas anderes zu denken. Meistens bereuen sie es
+			einige Wochen später...</text>
+			<text locale="en">This spell - whose use is forbidden in
+			most cultures - creates an uncontrollable desire for
+			physical love in the victim. The affected persons will
+			rush head over heels into a love affair, unable to think
+			of anything else. Most of them will regret this a few
+			months later... </text>
 		</string>
 
 	</namespace>
@@ -5329,6 +5375,18 @@
 		<text locale="en">JOIN</text>
 	</string>
 </strings>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
