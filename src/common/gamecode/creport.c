@@ -1150,6 +1150,10 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
   i = maxheroes(f);
   if (i>0) fprintf(F, "%d;max_heroes\n", i);
 
+  if (f->age > 1 && f->lastorders != turn) {
+    fprintf(F, "%d;nmr\n", turn-f->lastorders);
+  }
+
   fprintf(F, "\"%s\";Parteiname\n", f->name);
 	fprintf(F, "\"%s\";email\n", f->email);
 	fprintf(F, "\"%s\";banner\n", f->banner);
