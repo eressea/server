@@ -148,6 +148,7 @@ parse_plaintext(struct xml_stack *stack, const char *str)
 			if (strcmp(tagparent->name, "string")==0) {
 				locale_setstring(state->lang, mkname(state->nspc, state->mtname), str);
 			} else {
+				if (state->nrtext!=NULL) free(state->nrtext);
 				state->nrtext = strdup(str);
 			}
 		}

@@ -460,7 +460,9 @@ stripfaction (faction * f)
 #ifdef OLD_MESSAGES
 	free_messages(f->msgs);
 #else
-	/* TODO */
+	/* TODO: inhalt auch löschen */
+	if (f->msgs) free(f->msgs);
+	if (f->battles) free(f->battles);
 #endif
 	/* TODO: free msgs */
 	freestrlist(f->mistakes);

@@ -331,11 +331,10 @@ parse(opstack ** stack, const char* inn, const void * userdata)
 	return NULL;
 }
 
-char * 
+const char * 
 translate(const char* format, const void * userdata, const char* vars, const void* args[])
 {
 	int i = 0;
-	char * retval;
 	const char *ic = vars;
 	char symbol[32];
 	char *oc = symbol;
@@ -357,15 +356,12 @@ translate(const char* format, const void * userdata, const char* vars, const voi
 	}
 
 	if (parse(&stack, format, userdata)==NULL) return NULL;
-	retval = strdup(opop(&stack, const char*));
-
-	return retval;
+	return opop(&stack, const char*);
 }
 
-char *
+const char *
 translate_va(const char* format, const void * userdata, const char* vars, ...)
 {
-	char * retval;
 	va_list marker;
 	const char *ic = vars;
 	char symbol[32];
@@ -389,9 +385,7 @@ translate_va(const char* format, const void * userdata, const char* vars, ...)
    va_end(marker);              /* Reset variable arguments.      */
 
 	if (parse(&stack, format, userdata)==NULL) return NULL;
-	retval = strdup(opop(&stack, const char*));
-
-	return retval;
+	return opop(&stack, const char*);
 }
 
 static void

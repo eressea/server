@@ -29,16 +29,14 @@ void
 test_translation(void)
 {
 	int x;
-	char * c;
+	const char * c;
 
 	c = translate_va("\"$name is a godlike $role.\"", "name role", "enno", "coder");
 	if (c) puts(c);
-	free(c);
 
 	for (x=0;x!=4;++x) {
 		c = translate_va(sample, "i", x);
 		if (c) puts(c);
-		free(c);
 	}
 }
 
