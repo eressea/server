@@ -28,7 +28,6 @@
 #include <limits.h>
 #include <stdlib.h>
 
-#ifdef NEW_PATH
 boolean
 allowed_swim(const region * src, const region * target)
 {
@@ -50,8 +49,6 @@ allowed_fly(const region * src, const region * target)
 	return false;
 }
 
-#define FAST_PATH
-#ifdef FAST_PATH
 typedef struct node {
 	struct node * next;
 	region * r;
@@ -84,6 +81,53 @@ free_node(node * n)
 	n->next = node_garbage;
 	node_garbage = n;
 	return s;
+}
+
+static void
+free_nodes(node * root)
+{
+  while (root!=NULL) {
+    region * r = root->r;
+    freset(r, FL_MARK);
+    root = free_node(root);
+  }
+}
+
+struct region_list * 
+regions_in_range(struct region * start, int maxdist, boolean (*allowed)(const struct region*, const struct region*))
+{
+  region_list * rlist = NULL;
+  node * root = new_node(start, 0, NULL);
+  node ** end = &root->next;
+  node * n = root;
+
+  while (n!=NULL) {
+    region * r = n->r;
+    int depth = n->distance+1;
+    direction_t d;
+
+    if (n->distance >= maxdist) break;
+    for (d=0;d!=MAXDIRECTIONS; ++d) {
+      region * rn = rconnect(r, d);
+      region_list * rnew;
+      if (rn==NULL) continue;
+      if (fval(rn, FL_MARK)) continue; /* already been there */
+      if (!allowed(r, rn)) continue; /* can't go there */
+
+      /* add the region to the list of available ones. */
+      add_regionlist(&rlist, rn);
+
+      /* make sure we don't go here again, and put the region into the set for
+         further BFS'ing */
+      fset(rn, FL_MARK);
+      *end = new_node(rn, depth, n);
+      end = &(*end)->next;
+    }
+    n = n->next;
+  }
+  free_nodes(root);
+
+  return rlist;
 }
 
 static region **
@@ -126,11 +170,7 @@ internal_path_find(region *start, const region *target, int maxlen, boolean (*al
 		if (found) break;
 		n = n->next;
 	}
-	while (root!=NULL) {
-		region * r = root->r;
-		freset(r, FL_MARK);
-		root = free_node(root);
-	}
+  free_nodes(root);
 	if (found) return path;
 	return NULL;
 }
@@ -150,198 +190,3 @@ path_find(region *start, const region *target, int maxlen, boolean (*allowed)(co
 	assert((!fval(start, FL_MARK) && !fval(target, FL_MARK)) || !"Did you call path_init()?");
 	return internal_path_find(start, target, maxlen, allowed);
 }
-
-#else
-static boolean
-internal_path_exists(region *start, const region *target, int maxlen, int * depth, boolean (*allowed)(const region*, const region*))
-{
-	int position = *depth;
-	direction_t dir;
-
-	assert(maxlen<=MAXDEPTH);
-	assert(position<=maxlen);
-
-	*depth = INT_MAX;
-	if (start==target) {
-		*depth = position;
-		return true;
-	} else if (position==maxlen) {
-		return false; /* not found */
-	}
-	position++;
-
-	fset(start, FL_MARK);
-	for (dir=0; dir != MAXDIRECTIONS; dir++) {
-		int deep = position;
-		region * rn = rconnect(start, dir);
-		if (rn==NULL) continue;
-
-		if (fval(rn, FL_MARK)) continue; /* already been there */
-		if (!allowed(start, rn)) continue; /* can't go there */
-
-		if (internal_path_exists(rn, target, maxlen, &deep, allowed)) {
-			*depth = deep;
-			break;
-		}
-	}
-	freset(start, FL_MARK);
-	return (dir!=MAXDIRECTIONS);
-}
-
-static region **
-internal_path_find(region *start, const region *target, int maxlen, int * depth, boolean (*allowed)(const region*, const region*))
-{
-	static region * path[MAXDEPTH+2];
-	static region * bestpath[MAXDEPTH+2];
-	int position = *depth;
-	direction_t dir;
-
-	assert(maxlen<=MAXDEPTH);
-	assert(position<=maxlen);
-
-	*depth = INT_MAX;
-	path[position] = start;
-	if (start==target) {
-		*depth = position;
-		path[position+1] = NULL;
-		return path;
-	} else if (position==maxlen) {
-		return NULL; /* not found */
-	}
-	position++;
-	bestpath[position] = NULL;
-
-	fset(start, FL_MARK);
-	for (dir=0; dir != MAXDIRECTIONS; dir++) {
-		int deep = position;
-		region * rn = rconnect(start, dir);
-		region ** findpath;
-
-		if (rn==NULL) continue;
-		if (fval(rn, FL_MARK)) continue;
-		if (!allowed(start, rn)) continue;
-		findpath = internal_path_find(rn, target, maxlen, &deep, allowed);
-		if (deep<=maxlen) {
-			assert(findpath);
-			maxlen = deep;
-			memcpy(bestpath, findpath, sizeof(region*)*(maxlen+2));
-		}
-	}
-	freset(start, FL_MARK);
-	if (bestpath[position]!=NULL) return bestpath;
-	return NULL;
-}
-
-boolean
-path_exists(region *start, const region *target, int maxlen, boolean (*allowed)(const region*, const region*))
-{
-	int len = 0;
-	boolean exist;
-	assert((!fval(start, FL_MARK) && !fval(target, FL_MARK)) || !"Did you call path_init()?");
-	exist = internal_path_exists(start, target, maxlen, &len, allowed);
-	assert(exist == (path_find(start, target, maxlen, allowed)!=NULL));
-	return exist;
-}
-
-region **
-path_find(region *start, const region *target, int maxlen, boolean (*allowed)(const region*, const region*))
-{
-	int depth = 0;
-	assert((!fval(start, FL_MARK) && !fval(target, FL_MARK)) || !"Did you call path_init()?");
-	return internal_path_find(start, target, maxlen, &depth, allowed);
-}
-#endif
-
-#else
-
-static boolean
-step_store(region *r, region *target, int t, int depth)
-{
-	direction_t dir;
-
-	search[depth][0] = r->x;
-	search[depth][1] = r->y;
-	fset(r, FL_MARK);
-
-	if(depth > MAXDEPTH) return false;
-
-	for(dir=0; dir < MAXDIRECTIONS; dir++) {
-		region * rn = rconnect(r, dir);
-
-		if (rn==NULL) continue;
-		if(rn && !fval(rn, FL_MARK) && allowed_terrain(rn->terrain, r->terrain, t)) {
-			if(rn == target) {
-				search[depth+1][0] = rn->x;
-				search[depth+1][1] = rn->y;
-				search_len = depth+1;
-				return true;
-			}
-			if(step_store(rn, target, t, depth+1)) return true;
-		}
-	}
-	return false;
-}
-
-boolean
-path_find(region *start, region *target, int t)
-{
-	region *r;
-
-	for(r=regions;r;r=r->next) freset(r, FL_MARK);
-	return step_store(start, target, t, 0);
-}
-
-int search[MAXDEPTH][2];
-int search_len;
-
-static boolean
-allowed_terrain(terrain_t ter, terrain_t ter_last, int t)
-{
-	if((t & DRAGON_LIMIT) && ter == T_OCEAN && ter_last == T_GLACIER)
-		return false;
-
-	if(t & FLY && terrain[ter].flags & FLY_INTO) return true;
-	if(t & SWIM && terrain[ter].flags & SWIM_INTO) return true;
-	if(t & WALK && terrain[ter].flags & WALK_INTO) return true;
-
-	/* Alte Variante:
-	if(terrain[ter].flags & FORBIDDEN_LAND) return false;
-	if(t & FLY) return true;
-	if(t & SWIM && !(t & WALK) && ter == T_OCEAN) return true;
-	if(t & SWIM && t & WALK) return true;
-	if(t & WALK && ter != T_OCEAN) return true;
-	*/
-
-	return false;
-}
-
-boolean
-step(region *r, region *target, int t, int depth)
-{
-	direction_t dir;
-	region *rn;
-
-	fset(r, FL_MARK);
-
-	if(depth > MAXDEPTH) return false;
-
-	for(dir=0; dir < MAXDIRECTIONS; dir++) {
-		rn = rconnect(r, dir);
-		if(rn && !fval(rn, FL_MARK) && allowed_terrain(rn->terrain, r->terrain, t)) {
-			if(rn == target) return true;
-			if(step(rn, target, t, depth+1)) return true;
-		}
-	}
-	return false;
-}
-
-boolean
-path_exists(region *start, region *target, int t)
-{
-	region *r;
-
-	for(r=regions;r;r=r->next) freset(r, FL_MARK);
-	return step(start, target, t, 0);
-}
-
-#endif

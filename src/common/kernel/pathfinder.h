@@ -23,19 +23,12 @@ extern "C" {
 extern int search[MAXDEPTH][2];
 extern int search_len;
 
-#define NEW_PATH
-#ifdef NEW_PATH
 extern struct region ** path_find(struct region *start, const struct region *target, int maxlen, boolean (*allowed)(const struct region*, const struct region*));
 extern boolean path_exists(struct region *start, const struct region *target, int maxlen, boolean (*allowed)(const struct region*, const struct region*));
 extern boolean allowed_swim(const struct region * src, const struct region * target);
 extern boolean allowed_fly(const struct region * src, const struct region * target);
 extern boolean allowed_walk(const struct region * src, const struct region * target);
-#else
-extern boolean path_find(struct region *start, struct region *target, int t);
-extern boolean path_exists(struct region *start, struct region *target, int t);
-extern boolean step(struct region *r, struct region *target, int t, int depth);
-#endif
-
+extern struct region_list * regions_in_range(struct region * src, int maxdist, boolean (*allowed)(const struct region*, const struct region*));
 #ifdef __cplusplus
 }
 #endif

@@ -90,7 +90,7 @@ make_dungeon(const dungeon * data)
 	plane * p;
 	region *r, *center;
 	region * rnext;
-	regionlist * iregion, * rlist = NULL;
+	region_list * iregion, * rlist = NULL;
 
 	sprintf(name, "Die Höhlen von %s", bossrace->generate_name(NULL));
 	p = gm_addplane(data->radius, flags, name);
@@ -137,7 +137,7 @@ make_dungeon(const dungeon * data)
 
 	for (iregion=rlist;iregion;iregion=iregion->next) {
 		monster * m = data->monsters;
-		region * r = iregion->region;
+		region * r = iregion->data;
 		while (m) {
 			if ((rand() % 100) < (m->chance * 100)) {
 				/* TODO: check maxunits. */

@@ -88,11 +88,11 @@ r_astral_to_standard(const region *r)
 	return r2;
 }
 
-regionlist *
+region_list *
 all_in_range(region *r, int n)
 {
 	int x,y;
-	regionlist *rlist = NULL;
+	region_list *rlist = NULL;
 	region *r2;
 
 	if(r == NULL) return NULL;	/* Um Probleme abzufangen,
@@ -178,11 +178,11 @@ create_teleport_plane(void)
 	}
 }
 
-regionlist *
+region_list *
 allinhab_in_range(const region *r, int n)
 {
 	int x,y;
-	regionlist *rlist = NULL;
+	region_list *rlist = NULL;
 	region *r2;
 
 	if(r == NULL) return NULL;	/* Um Probleme abzufangen,

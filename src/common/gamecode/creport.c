@@ -1335,12 +1335,12 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 			if (sd->mode==see_unit && r->planep && r->planep->id == 1 && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
 			{
 				/* Sonderbehandlung Teleport-Ebene */
-				regionlist *rl = allinhab_in_range(r_astral_to_standard(r),TP_RADIUS);
+				region_list *rl = allinhab_in_range(r_astral_to_standard(r),TP_RADIUS);
 
 				if (rl) {
-					regionlist *rl2 = rl;
+					region_list *rl2 = rl;
 					while(rl2) {
-						region * r = rl2->region;
+						region * r = rl2->data;
 						fprintf(F, "SCHEMEN %d %d\n", region_x(r, f), region_y(r, f));
 						fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
 						rl2 = rl2->next;

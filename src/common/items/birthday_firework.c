@@ -38,8 +38,8 @@ const int FIREWORK_RANGE=10;
 static int
 use_birthday_firework(struct unit * u, const struct item_type * itype, int amount, const char *cm)
 {
-	regionlist *rlist = all_in_range(u->region, FIREWORK_RANGE);
-	regionlist *rl;
+	region_list *rlist = all_in_range(u->region, FIREWORK_RANGE);
+	region_list *rl;
 	message *m;
 	const char *name;
 
@@ -62,8 +62,8 @@ use_birthday_firework(struct unit * u, const struct item_type * itype, int amoun
 		add_message(&u->region->msgs, new_message(u->faction, "birthday_firework_noname_local%u:unit%s:name",u));
 	}
 
-	for(rl = rlist; rl; rl=rl->next) if(rl->region != u->region) {
-		add_message(&rl->region->msgs, m);
+	for(rl = rlist; rl; rl=rl->next) if(rl->data != u->region) {
+		add_message(&rl->data->msgs, m);
 	}
 
 	msg_release(m);

@@ -1911,7 +1911,7 @@ static int
 sp_treewalkexit(castorder *co)
 {
 	region *rt;
-	regionlist *rl, *rl2;
+	region_list *rl, *rl2;
 	int tax, tay;
 	unit *u, *u2;
 	int remaining_cap;
@@ -1951,8 +1951,8 @@ sp_treewalkexit(castorder *co)
 
 	rl2 = rl;
 	while(rl2) {
-		if(rl2->region->x == tax && rl2->region->y == tay) {
-			rt = rl2->region;
+		if(rl2->data->x == tax && rl2->data->y == tay) {
+			rt = rl2->data;
 			break;
 		}
 		rl2 = rl2->next;
@@ -2234,7 +2234,7 @@ sp_fog_of_confusion(castorder *co)
 	double power = co->force;
 	double range;
 	int duration;
-	regionlist *rl,*rl2;
+	region_list *rl,*rl2;
 
 	range = (power-11)/3-1;
 	duration = (int)((power-11)/1.5)+1;
@@ -2243,8 +2243,8 @@ sp_fog_of_confusion(castorder *co)
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
 		curse * c;
-		if(rterrain(rl2->region) != T_OCEAN
-				&& !r_isforest(rl2->region)) continue;
+		if(rterrain(rl2->data) != T_OCEAN
+				&& !r_isforest(rl2->data)) continue;
 
 		/* Magieresistenz jeder Region prüfen */
 		if (target_resists_magic(mage, r, TYP_REGION, 0)){
@@ -2252,18 +2252,18 @@ sp_fog_of_confusion(castorder *co)
 			continue;
 		}
 
-		c = create_curse(mage, &rl2->region->attribs,
+		c = create_curse(mage, &rl2->data->attribs,
 			ct_find("disorientationzone"), power, duration, cast_level*5, 0);
 		/* Soll der schon in der Zauberrunde wirken? */
 		curse_setflag(c, CURSE_ISNEW);
 
-		for (u = rl2->region->units; u; u = u->next) freset(u->faction, FL_DH);
-		for(u = rl2->region->units; u; u = u->next ) {
+		for (u = rl2->data->units; u; u = u->next) freset(u->faction, FL_DH);
+		for (u = rl2->data->units; u; u = u->next ) {
 			if(!fval(u->faction, FL_DH) ) {
 				fset(u->faction, FL_DH);
 				sprintf(buf, "%s beschwört einen Schleier der Verwirrung.",
 						cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand");
-				addmessage(rl2->region, u->faction, buf, MSG_EVENT, ML_INFO);
+				addmessage(rl2->data, u->faction, buf, MSG_EVENT, ML_INFO);
 			}
 		}
 		if(!fval(mage->faction, FL_DH)){
@@ -2774,7 +2774,7 @@ sp_summondragon(castorder *co)
 	unit *u;
 	int cast_level = co->level;
 	double power = co->force;
-	regionlist *rl,*rl2;
+	region_list *rl,*rl2;
 	faction *f;
 	int time;
 	int number;
@@ -2817,7 +2817,7 @@ sp_summondragon(castorder *co)
 	rl = all_in_range(r, (int)power);
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
-		for(u = rl2->region->units; u; u = u->next) {
+		for(u = rl2->data->units; u; u = u->next) {
 			if (u->race == new_race[RC_WYRM] || u->race == new_race[RC_DRAGON]) {
 				attrib * a = a_find(u->attribs, &at_targetregion);
 				if (!a) {
@@ -2825,7 +2825,7 @@ sp_summondragon(castorder *co)
 				} else {
 					a->data.v = co->rt;
 				}
-				sprintf(buf, "Kommt aus: %s, Will nach: %s", regionid(rl2->region), regionid(co->rt));
+				sprintf(buf, "Kommt aus: %s, Will nach: %s", regionid(rl2->data), regionid(co->rt));
 				usetprivate(u, buf);
 			}
 		}
@@ -4971,7 +4971,7 @@ sp_dragonsong(castorder *co)
 	unit *u;
 	int cast_level = co->level;
 	double power = co->force;
-	regionlist *rl,*rl2;
+	region_list *rl,*rl2;
 	faction *f;
 
 	/* TODO HP-Effekt */
@@ -4981,7 +4981,7 @@ sp_dragonsong(castorder *co)
 	rl = all_in_range(r, (int)power);
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
-		for(u = rl2->region->units; u; u = u->next) {
+		for(u = rl2->data->units; u; u = u->next) {
 			if (u->race->flags & RCF_DRAGON) {
 				attrib * a = a_find(u->attribs, &at_targetregion);
 				if (!a) {
@@ -4989,7 +4989,7 @@ sp_dragonsong(castorder *co)
 				} else {
 					a->data.v = r;
 				}
-				sprintf(buf, "Kommt aus: %s, Will nach: %s", regionid(rl2->region), regionid(r));
+				sprintf(buf, "Kommt aus: %s, Will nach: %s", regionid(rl2->data), regionid(r));
 				usetprivate(u, buf);
 			}
 		}
@@ -5536,7 +5536,7 @@ int
 sp_dream_of_confusion(castorder *co)
 {
 	unit *u;
-	regionlist *rl,*rl2;
+	region_list *rl,*rl2;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
@@ -5547,25 +5547,26 @@ sp_dream_of_confusion(castorder *co)
 	rl = all_in_range(r, (int)range);
 
 	for(rl2 = rl; rl2; rl2 = rl2->next) {
+    region * r2 = rl2->data;
 		curse * c;
 		/* Magieresistenz jeder Region prüfen */
-		if (target_resists_magic(mage, rl2->region, TYP_REGION, 0)){
+		if (target_resists_magic(mage, r2, TYP_REGION, 0)){
 			report_failure(mage, co->order);
 			continue;
 		}
 
-		c = create_curse(mage, &rl2->region->attribs,
+		c = create_curse(mage, &r2->attribs,
 			ct_find("disorientationzone"), power, duration, cast_level*5, 0);
 		/* soll der Zauber schon in der Zauberrunde wirken? */
 		curse_setflag(c, CURSE_ISNEW);
 
-		for (u = rl2->region->units; u; u = u->next) freset(u->faction, FL_DH);
-		for (u = rl2->region->units; u; u = u->next ) {
+		for (u = r2->units; u; u = u->next) freset(u->faction, FL_DH);
+		for (u = r2->units; u; u = u->next ) {
 			if(!fval(u->faction, FL_DH) ) {
 				fset(u->faction, FL_DH);
 				sprintf(buf, "%s beschwört einen Schleier der Verwirrung.",
 						cansee(u->faction, r, mage, 0) ? unitname(mage) : "Jemand");
-				addmessage(rl2->region, u->faction, buf, MSG_EVENT, ML_INFO);
+				addmessage(r2, u->faction, buf, MSG_EVENT, ML_INFO);
 			}
 		}
 		if(!fval(mage->faction, FL_DH)){
@@ -5865,7 +5866,7 @@ sp_pullastral(castorder *co)
 {
 	region *rt, *ro;
 	unit *u, *u2;
-	regionlist *rl, *rl2;
+	region_list *rl, *rl2;
 	int remaining_cap;
 	int n, w;
 	region *r = co->rt;
@@ -5881,9 +5882,10 @@ sp_pullastral(castorder *co)
 		ro = pa->param[0]->data.r;
 		rl = all_in_range(r_astral_to_standard(r), TP_RADIUS);
 		rl2 = rl;
-		while(rl2) {
-			if(rl2->region->x == ro->x && rl2->region->y == ro->y) {
-				ro = rl2->region;
+		while (rl2!=NULL) {
+      region * r2 = rl2->data;
+			if (r2->x == ro->x && r2->y == ro->y) {
+				ro = r2;
 				break;
 			}
 			rl2 = rl2->next;
@@ -5991,7 +5993,7 @@ int
 sp_leaveastral(castorder *co)
 {
 	region *rt, *ro;
-	regionlist *rl, *rl2;
+	region_list *rl, *rl2;
 	unit *u, *u2;
 	int remaining_cap;
 	int n, w;
@@ -6012,11 +6014,11 @@ sp_leaveastral(castorder *co)
     }
     rl  = allinhab_in_range(r_astral_to_standard(r), TP_RADIUS);
     rl2 = rl;
-    while(rl2) {
-      if(rl2->region == rt) break;
+    while (rl2!=NULL) {
+      if (rl2->data == rt) break;
       rl2 = rl2->next;
     }
-    if(!rl2) {
+    if (rl2==NULL) {
       addmessage(r, mage->faction, "Dorthin führt kein Weg.",
         MSG_MAGIC, ML_MISTAKE);
       free_regionlist(rl);
@@ -6230,7 +6232,7 @@ sp_showastral(castorder *co)
 	region *rt;
 	int n = 0;
 	int c = 0;
-	regionlist *rl, *rl2;
+	region_list *rl, *rl2;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
@@ -6259,8 +6261,8 @@ sp_showastral(castorder *co)
 	/* Erst Einheiten zählen, für die Grammatik. */
 
 	for(rl2=rl; rl2; rl2=rl2->next) {
-		if(!is_cursed(rl2->region->attribs, C_ASTRALBLOCK, 0)) {
-			for(u = rl2->region->units; u; u=u->next) {
+		if(!is_cursed(rl2->data->attribs, C_ASTRALBLOCK, 0)) {
+			for(u = rl2->data->units; u; u=u->next) {
 				if (u->race != new_race[RC_SPECIAL] && u->race != new_race[RC_SPELL]) n++;
 			}
 		}
@@ -6278,8 +6280,8 @@ sp_showastral(castorder *co)
 			"Nebel zu erkennen sind ", unitname(mage));
 
 		for(rl2=rl; rl2; rl2=rl2->next) {
-			if(!is_cursed(rl2->region->attribs, C_ASTRALBLOCK, 0)) {
-				for(u = rl2->region->units; u; u=u->next) {
+			if(!is_cursed(rl2->data->attribs, C_ASTRALBLOCK, 0)) {
+				for(u = rl2->data->units; u; u=u->next) {
 					if(u->race != new_race[RC_SPECIAL] && u->race != new_race[RC_SPELL]) {
 						c++;
 						scat(unitname(u));
@@ -6292,7 +6294,7 @@ sp_showastral(castorder *co)
 						scat(" ");
 						scat(LOC(mage->faction->locale, rc_name(u->race, u->number!=1)));
 						scat(", Entfernung ");
-						icat(distance(rl2->region, rt));
+						icat(distance(rl2->data, rt));
 						scat(")");
 						if(c == n-1) {
 							scat(" und ");
@@ -6319,7 +6321,7 @@ sp_showastral(castorder *co)
 int
 sp_viewreality(castorder *co)
 {
-	regionlist *rl, *rl2;
+	region_list *rl, *rl2;
 	unit *u;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
@@ -6341,7 +6343,7 @@ sp_viewreality(castorder *co)
 
 	/* Irgendwann mal auf Curses u/o Attribut umstellen. */
 	for(rl2=rl; rl2; rl2=rl2->next) {
-		u = createunit(rl2->region, mage->faction, RS_FARVISION, new_race[RC_SPELL]);
+		u = createunit(rl2->data, mage->faction, RS_FARVISION, new_race[RC_SPELL]);
 		set_string(&u->name, "Zauber: Blick in die Realität");
 		u->age = 2;
 	}
@@ -6358,7 +6360,7 @@ sp_viewreality(castorder *co)
 int
 sp_disruptastral(castorder *co)
 {
-	regionlist *rl, *rl2;
+	region_list *rl, *rl2;
 	region *rt;
 	unit *u;
 	region *r = co->rt;
@@ -6389,16 +6391,17 @@ sp_disruptastral(castorder *co)
 
 	for (rl2=rl; rl2!=NULL; rl2=rl2->next) {
 		attrib *a, *a2;
+    region * r2 = rl2->data;
 		spec_direction *sd;
     int inhab_regions = 0;
-    regionlist * trl = NULL;
+    region_list * trl = NULL;
 
-		if (is_cursed(rl2->region->attribs, C_ASTRALBLOCK, 0)) continue;
+		if (is_cursed(r2->attribs, C_ASTRALBLOCK, 0)) continue;
 
-    if (rl2->region->units!=NULL) {
-      regionlist * trl2;
+    if (r2->units!=NULL) {
+      region_list * trl2;
 
-      trl = allinhab_in_range(r_astral_to_standard(rl2->region), TP_RADIUS);
+      trl = allinhab_in_range(r_astral_to_standard(rl2->data), TP_RADIUS);
       for (trl2 = trl; trl2; trl2 = trl2->next) ++inhab_regions;
     }
 
@@ -6415,15 +6418,15 @@ sp_disruptastral(castorder *co)
 		/* Einheiten auswerfen */
 
     if (trl!=NULL) {
-      for (u=rl2->region->units;u;u=u->next) {
+      for (u=r2->units;u;u=u->next) {
 			  if (u->race != new_race[RC_SPELL]) {
-          regionlist *trl2 = trl;
+          region_list *trl2 = trl;
 				  region *tr;
           int c = rand() % inhab_regions;
 
 				  /* Zufällige Zielregion suchen */
           while (c--!=0) trl2 = trl2->next;
-				  tr = trl2->region;
+				  tr = trl2->data;
 
 				  if(!is_magic_resistant(mage, u, 0) && can_survive(u, tr)) {
 					  move_unit(u, tr, NULL);
@@ -6437,9 +6440,9 @@ sp_disruptastral(castorder *co)
     }
 
 		/* Kontakt unterbinden */
-		create_curse(mage, &rl2->region->attribs, ct_find("astralblock"),
+		create_curse(mage, &rl2->data->attribs, ct_find("astralblock"),
 			power, duration, 100, 0);
-		addmessage(rl2->region, 0, "Mächtige Magie verhindert den Kontakt zur Realität.",
+		addmessage(r2, 0, "Mächtige Magie verhindert den Kontakt zur Realität.",
 				MSG_COMMENT, ML_IMPORTANT);
 	}
 

@@ -360,22 +360,22 @@ reldirection(region * from, region * to)
 }
 
 void
-free_regionlist(regionlist *rl)
+free_regionlist(region_list *rl)
 {
 	while (rl) {
-		regionlist * rl2 = rl->next;
+		region_list * rl2 = rl->next;
 		free(rl);
 		rl = rl2;
 	}
 }
 
 void
-add_regionlist(regionlist **rl, region *r)
+add_regionlist(region_list **rl, region *r)
 {
-	regionlist *rl2 = (regionlist*)malloc(sizeof(regionlist));
+	region_list *rl2 = (region_list*)malloc(sizeof(region_list));
 
-	rl2->region = r;
-	rl2->next   = *rl;
+	rl2->data = r;
+	rl2->next = *rl;
 
 	*rl = rl2;
 }

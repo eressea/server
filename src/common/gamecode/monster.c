@@ -380,27 +380,39 @@ dragon_affinity_value(region *r, unit *u)
 static attrib *
 set_new_dragon_target(unit * u, region * r, int range)
 {
-	region *r2;
-	int x, y;
-	int affinity, max_affinity = 0;
+	int max_affinity = 0;
 	region *max_region = NULL;
 
-	for (x = r->x - range; x < r->x + range; x++) {
+#if 1
+  region_list * rptr, * rlist = regions_in_range(r, range, allowed_dragon);
+  for (rptr=rlist;rptr;rptr=rptr->next) {
+    region * r2 = rptr->data;
+    int affinity = dragon_affinity_value(r2, u);
+    if (affinity > max_affinity) {
+      max_affinity = affinity;
+      max_region = r2;
+    }
+  }
+
+  free_regionlist(rlist);
+#else
+  int x, y;
+  for (x = r->x - range; x < r->x + range; x++) {
 		for (y = r->y - range; y < r->y + range; y++) {
-			if (koor_distance (r->x, r->y, x, y) <= range
-					&& (r2 = findregion(x, y)) != 0
-					&&
-					path_exists(r, r2, range, allowed_dragon)
-				) {
-				affinity = dragon_affinity_value(r2, u);
-				if(affinity > max_affinity) {
-					max_affinity = affinity;
-					max_region = r2;
+      region * r2 = findregion(x, y);
+      if (r2!=NULL) {
+        int affinity = dragon_affinity_value(r2, u);
+        if (affinity > max_affinity) {
+          if (koor_distance (r->x, r->y, x, y) <= range && path_exists(r, r2, range, allowed_dragon)) 
+          {
+            max_affinity = affinity;
+            max_region = r2;
+          }
 				}
 			}
 		}
 	}
-
+#endif
 	if (max_region && max_region != r) {
 		attrib * a = a_find(u->attribs, &at_targetregion);
 		if (!a) {
@@ -1063,7 +1075,6 @@ plan_monsters(void)
 					}
 				}
 				if (tr!=NULL) {
-#ifdef NEW_PATH
 					switch(old_race(u->race)) {
 					case RC_FIREDRAGON:
 						set_movement_order(u, tr, 4, allowed_dragon);
@@ -1075,19 +1086,6 @@ plan_monsters(void)
 						set_movement_order(u, tr, 1, allowed_dragon);
 						break;
 					}
-#else
-					switch(old_race(u->race)) {
-					case RC_FIREDRAGON:
-						set_movement_order(u, r, ta->data.sa[0], ta->data.sa[1], 4);
-						break;
-					case RC_DRAGON:
-						set_movement_order(u, r, ta->data.sa[0], ta->data.sa[1], 3);
-						break;
-					case RC_WYRM:
-						set_movement_order(u, r, ta->data.sa[0], ta->data.sa[1], 1);
-						break;
-					}
-#endif
 					if (rand()%100 < 15) {
 						/* do a growl */
 						if (rname(tr, u->faction->locale)) {

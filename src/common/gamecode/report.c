@@ -1366,14 +1366,14 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	if (partial==0 && r->planep && r->planep->id == 1 &&
 			!is_cursed(r->attribs, C_ASTRALBLOCK, 0))	{
 		/* Sonderbehandlung Teleport-Ebene */
-		regionlist *rl = allinhab_in_range(r_astral_to_standard(r), TP_RADIUS);
-		regionlist *rl2;
+		region_list *rl = allinhab_in_range(r_astral_to_standard(r), TP_RADIUS);
+		region_list *rl2;
 
 		if (rl) {
 			strcpy(buf, "Schemen der Regionen ");
 			rl2 = rl;
 			while(rl2) {
-				scat(f_regionid(rl2->region, f));
+				scat(f_regionid(rl2->data, f));
 				rl2 = rl2->next;
 				if(rl2) scat(", ");
 			}

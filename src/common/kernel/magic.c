@@ -1160,15 +1160,7 @@ farcasting(unit *magician, region *r)
 
 	mult = (int)pow(2.0,(double)dist);
 	if (dist > 1) {
-#ifdef NEW_PATH
 		if (!path_exists(magician->region, r, dist*2, allowed_fly)) mult = 1025;
-#else
-		region *rn;
-		for (rn=regions;rn;rn=rn->next) freset(rn, FL_DH);
-		if (step(magician->region,r,FLY,dist*2) == false) {
-			mult = 1025;
-		}
-#endif
 	}
 
 	return mult;

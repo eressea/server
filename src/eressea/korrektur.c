@@ -373,15 +373,15 @@ count_demand(const region *r)
 #endif
 
 static int
-recurse_regions(region * r, regionlist **rlist, boolean(*fun)(const region * r))
+recurse_regions(region * r, region_list **rlist, boolean(*fun)(const region * r))
 {
 	if (!fun(r)) return 0;
 	else {
 		int len = 0;
 		direction_t d;
-		regionlist * rl = calloc(sizeof(regionlist), 1);
+		region_list * rl = calloc(sizeof(region_list), 1);
 		rl->next = *rlist;
-		rl->region = r;
+		rl->data = r;
 		(*rlist) = rl;
 		fset(r, FL_MARK);
 		for (d=0;d!=MAXDIRECTIONS;++d) {
@@ -406,7 +406,7 @@ f_nolux(const region * r)
 static int
 fix_demand_region(region *r)
 {
-	regionlist *rl, *rlist = NULL;
+	region_list *rl, *rlist = NULL;
 	static const luxury_type **mlux = 0, ** ltypes;
 	const luxury_type *sale = NULL;
 	int maxlux = 0;
@@ -428,7 +428,7 @@ fix_demand_region(region *r)
 		for (i=0;i!=maxluxuries;++i) mlux[i] = 0;
 	}
 	for (rl=rlist;rl;rl=rl->next) {
-		region * r = rl->region;
+		region * r = rl->data;
 		direction_t d;
 		for (d=0;d!=MAXDIRECTIONS;++d) {
 			region * nr = rconnect(r, d);
@@ -468,7 +468,7 @@ fix_demand_region(region *r)
 		maxlux=2;
 	}
 	for (rl=rlist;rl;rl=rl->next) {
-		region * r = rl->region;
+		region * r = rl->data;
 		if (!fval(r, RF_CHAOTIC)) log_warning(("fixing demand in %s\n", regionname(r, NULL)));
 		setluxuries(r, mlux[rand() % maxlux]);
 	}
@@ -974,10 +974,7 @@ fix_astralplane(void)
     if (r->terrain!=T_FIREWALL) continue;
     if (ra->terrain==T_ASTRALB) continue;
     if (ra->units!=NULL) {
-      region_list * rnew = malloc(sizeof(region_list));
-      rnew->data = ra;
-      rnew->next = rlist;
-      rlist = rnew;
+      add_regionlist(&rlist, ra);
     }
     terraform(ra, T_ASTRALB);
   }
@@ -1134,7 +1131,7 @@ fix_dissolve(unit * u, int value, char mode)
   if (a!=NULL) return;
   a = a_add(&u->attribs, a_new(&at_unitdissolve));
   a->data.ca[0] = mode;
-  a->data.ca[1] = value;
+  a->data.ca[1] = (char)value;
   log_warning(("unit %s has race %s and no dissolve-attrib\n", unitname(u), rc_name(u->race, 0)));
 }
 

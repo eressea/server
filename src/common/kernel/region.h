@@ -148,13 +148,8 @@ void initrhash(void);
 void rhash(struct region * r);
 void runhash(struct region * r);
 
-typedef struct regionlist {
-	struct regionlist *next;
-	struct region     *region;
-} regionlist;
-
-void free_regionlist(regionlist *rl);
-void add_regionlist(regionlist **rl, struct region *r);
+void free_regionlist(region_list *rl);
+void add_regionlist(region_list **rl, struct region *r);
 
 int woodcount(const struct region * r);
 int deathcount(const struct region * r);

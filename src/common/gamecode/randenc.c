@@ -1532,7 +1532,7 @@ randomevents(void)
 #if NEW_LAEN
 void growlaen(void) {
 	region *r;
-	regionlist *Berge=NULL, *rl;
+	region_list *Berge=NULL, *rl;
 	unit *u;
 	int b=0, Laen, z, add;
 	short *add_laen;
