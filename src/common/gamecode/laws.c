@@ -1222,12 +1222,11 @@ quit(void)
 			continue;
 		}
 	}
-#if NMRTIMEOUT
+#if REMOVENMRNEWBIE
 	puts(" - beseitige Spieler, die sich nach der Anmeldung nicht "
 		 "gemeldet haben...");
 
 	age = calloc(turn+1, sizeof(int));
-#if REMOVENMRNEWBIE
 	for (f = factions; f; f = f->next) if(!fval(f, FL_NOIDLEOUT)) {
 		if (f->age>=0 && f->age <= turn) ++age[f->age];
 		if (f->age == 2 || f->age == 3) {
@@ -1238,7 +1237,6 @@ quit(void)
 		}
 	}
 #endif
-
 	/* Clear away debris of destroyed factions */
 
 	puts(" - beseitige leere Einheiten und leere Parteien...");
