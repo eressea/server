@@ -47,7 +47,7 @@
       <construction skill="sk_weaponsmithing" minskill="5" reqsize="1">
         <requirement type="mallorn" quantity="1"/>
       </construction>
-      <weapon pierce="true" missile="true" skill="sk_crossbow" offmod="0" defmod="0" reload="0" magres="0.15">
+      <weapon pierce="true" missile="true" skill="sk_crossbow" offmod="0" defmod="0" reload="2" magres="0.15">
         <damage type="rider" value="3d3+5"/>
         <damage type="footman" value="3d3+5"/>
         <modifier type="missile_target" value="2"/>
