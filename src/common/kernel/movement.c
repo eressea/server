@@ -1082,13 +1082,18 @@ make_route(unit * u, order * ord, region_list ** routep)
 
     current = next;
     token = getstrtoken();
-    error = movewhere(u, token, current, &next);
-    if (error) {
-      message * msg = movement_error(u, token, ord, error);
-      if (msg!=NULL) {
-        add_message(&u->faction->msgs, msg);
-        msg_release(msg);
+    if (token[0]) {
+      error = movewhere(u, token, current, &next);
+      if (error) {
+        message * msg = movement_error(u, token, ord, error);
+        if (msg!=NULL) {
+          add_message(&u->faction->msgs, msg);
+          msg_release(msg);
+        }
+        next = NULL;
+        break;
       }
+    } else {
       next = NULL;
       break;
     }
