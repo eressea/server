@@ -125,6 +125,7 @@ static char * xmlfile = NULL;
 static int nowrite = 0;
 static boolean g_writemap = false;
 static boolean g_killeiswald = false;
+static boolean opt_reportonly = false;
 
 struct settings global = {
 	"Eressea", /* gamename */
@@ -497,6 +498,7 @@ usage(const char * prog, const char * arg)
 		"-t turn          : read this datafile, not the most current one\n"
 		"-o reportdir     : gibt das reportverzeichnis an\n"
 		"-l logfile       : specify an alternative logfile\n"
+		"-R               : erstellt nur die Reports neu\n"
 		"--noeiswald      : beruhigt ungemein\n"
 		"--nomsg          : keine Messages (RAM sparen)\n"
 		"--nobattle       : keine Kämpfe\n"
@@ -592,6 +594,9 @@ read_args(int argc, char **argv)
 				break;
 			case 'w':
  				g_writemap = true;
+				break;
+			case 'R':
+				opt_reportonly = true;
 				break;
 			default:
 				usage(argv[0], argv[i]);
@@ -733,59 +738,18 @@ main(int argc, char *argv[])
 			for (u=r->units;u;u=u->next) scale_number(u, 1);
 		}
 	}
-	if (g_writemap) return crwritemap(); 
 
-	if (demonfix==2) {
-		FILE * F = fopen("demons.fix", "r");
-		for (;;) {
-			int x, y, id, fno, size, age, number;
-			unit * u;
-			if (fscanf(F, "%d %d %d %d %d %d %d", &id, &age, &fno, &x, &y, &size, &number)<=0) break;
-			u = findunit(id);
-			if (u==NULL || u->faction->no!=fno) {
-				region * r = findregion(x, y);
-				if (r) for (u=r->units;u;u=u->next) if (u->number==number && u->age==age && u->faction->no==fno) break;
-			}
-			if (!u) {
-				log_error(("could not find unit %s and fix it!\n", itoa36(id)));
-			}
-			else u->skill_size = 0;
-			while (size--) {
-				int sk, value, weeks;
-				if (fscanf(F, "%d %d %d", &sk, &value, &weeks)<=0) break;
-				if (u) {
-					skill * sv = add_skill(u, (skill_t)sk);
-					sv->level = (unsigned char)value;
-					sv->weeks = (unsigned char)weeks;
-				}
-				else {
-					log_error(("  %s[%u] : %u/%u\n", skillname((skill_t)sk, default_locale), sk, value, weeks));
-				}
-			}
-		}
-		fclose(F);
+	if (opt_reportonly) {
+		reports();
+		return 0;
 	}
 
-	if ((i=processturn(orders))!=0) return i;
+	if (g_writemap) {
+		return crwritemap(); 
+	}
 
-	if (demonfix==1) {
-		region * r;
-		FILE * F = fopen("demons.fix", "w");
-		for (r=regions;r;r=r->next) {
-			unit * u;
-			for (u=r->units;u;u=u->next) {
-				if (u->number && fval(u, UFL_DEBUG)) {
-					skill * sv;
-					fprintf(F, "%d %d %d %d %d %d %d\n", u->no, u->age, u->faction->no, r->x, r->y, u->skill_size, u->number);
-					for (sv=u->skills;sv!=u->skills+u->skill_size;++sv) {
-						fprintf(F, "%d %d %d\n", sv->id, sv->level, sv->weeks);
-					}
-					fputc('\n', F);
-				}
-			}
-		}
-		fclose(F);
-		exit(0);
+	if ((i=processturn(orders))!=0) {
+		return i;
 	}
 
 #ifdef CLEANUP_CODE
