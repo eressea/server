@@ -2150,6 +2150,28 @@ tagbegin(struct xml_stack * stack)
 			if (xml_bvalue(tag, "animal")) flags |= ITF_ANIMAL;
 			state->rtype->flags |= RTF_ITEM;
 			state->itype = new_itemtype(state->rtype, flags, weight, capacity);
+		} else if (strcmp(tag->name, "function")==0) {
+			const char * semi = xml_value(tag, "name");
+			const char * s = xml_value(tag, "value");
+			item_type * it = state->itype;
+			int i = atoi(s);
+			switch (semi[0]) {
+			case 'c':
+				if (!strcmp(semi, "capacity")) it->capacity=i;
+				break;
+			case 'f':
+				if (!strcmp(semi, "flags")) it->flags=i;
+				break;
+			case 'g':
+				if (!strcmp(semi, "give")) it->give = (int (*)(const unit*, const unit*, const struct item_type *, int, const char *))get_function(s);
+				break;
+			case 'u':
+				if (!strcmp(semi, "use")) it->use = (int (*)(unit *, const struct item_type *, int, const char *))get_function(s);
+				break;
+			case 'w':
+				if (!strcmp(semi, "weight")) it->weight=i;
+				break;
+			}
 		} else if (strcmp(tag->name, "weapon")==0) {
 			skill_t sk = sk_find(xml_value(tag, "skill"));
 			int minskill = xml_ivalue(tag, "minskill");

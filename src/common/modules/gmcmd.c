@@ -53,10 +53,27 @@ write_permissions(const attrib * a, FILE * F)
 }
 
 static int
-read_permissions(attrib * a, FILE * F)
+read_permissions(attrib * at, FILE * F)
 {
-	attrib ** p_a = (attrib**)&a->data.v;
+	attrib ** p_a = (attrib**)&at->data.v;
 	a_read(F, p_a);
+	/* eliminate duplicates: */
+	while (*p_a) {
+		attrib * a = (*p_a)->next;
+		while (a) {
+			attrib * nexta = a->next;
+			if (a->type == (*p_a)->type && a->data.v==(*p_a)->data.v) {
+				static int print = 0;
+				a_remove((attrib**)&at->data.v, a);
+				if (!print) {
+					log_error(("duplicated entries in permission structure\n"));
+					print = 1;
+				}
+			}
+			a = nexta;
+		}
+		p_a = &(*p_a)->next;
+	}
 	return AT_READ_OK;
 }
 
