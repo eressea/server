@@ -20,9 +20,6 @@
 
 #include <curse.h>
 
-/*
-#include "firewall.h" 
-*/
 struct curse_type;
 extern const struct curse_type ct_firewall;
 extern void ct_register(const struct curse_type * ct);
@@ -30,9 +27,9 @@ extern void ct_register(const struct curse_type * ct);
 void
 register_spells(void)
 {
-	/* sp_summon_alp */
-	register_alp();
-	/* init_firewall(); */
-	ct_register(&ct_firewall);
-	register_curses();
+  /* sp_summon_alp */
+  register_alp();
+  /* init_firewall(); */
+  ct_register(&ct_firewall);
+  register_curses();
 }

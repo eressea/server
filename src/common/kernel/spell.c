@@ -53,11 +53,12 @@
 #include <spells/alp.h>
 
 /* util includes */
-#include <base36.h>
-#include <message.h>
-#include <event.h>
-#include <language.h>
-#include <rand.h>
+#include <util/umlaut.h>
+#include <util/base36.h>
+#include <util/message.h>
+#include <util/event.h>
+#include <util/language.h>
+#include <util/rand.h>
 
 /* libc includes */
 #include <assert.h>
@@ -196,7 +197,7 @@ magicanalyse_region(region *r, unit *mage, double force)
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_region_noage%u:mage%r:region%s:spell",
 					mage, r, LOC(lang, mkname("spell", c->type->cname))));
-			}else{
+			} else {
 				add_message(&mage->faction->msgs, new_message(mage->faction,
 					"analyse_region_age%u:mage%r:region%s:spell%i:months",
 					mage, r, LOC(lang, mkname("spell", c->type->cname)), mon));
@@ -7588,7 +7589,7 @@ patzer_createitem(castorder *co)
  *  &funktion, patzer}
  *
  * id:
- * SPL_NOSPELL muss der letzte Spruch in der Liste spelldaten[] sein,
+ * SPL_NOSPELL muss der letzte Spruch in der Liste spelldaten sein,
  * denn nicht auf die Reihenfolge in der Liste sondern auf die id wird
  * geprüft
  *
@@ -7685,2908 +7686,2931 @@ patzer_createitem(castorder *co)
 	* Reihenfolge wie in Spelldaten tauchen sie auch im Report auf
 	*/
 
-spell spelldaten[] =
+spell_list * spells = NULL;
+
+void
+register_spell(spell * sp)
 {
-
-/* M_DRUIDE */
-
-	{SPL_BLESSEDHARVEST, "blessedharvest",
-		NULL,
-		NULL,
-		NULL,
-		M_DRUIDE,
-		(FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL),
-		5, 1,
-		{
-			{R_AURA, 1, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_blessedharvest,
-		patzer
-	},
-
-	{SPL_GWYRRD_EARN_SILVER, "gwyrrdearnsilver",
-		NULL,
-		NULL,
-		NULL,
-		M_DRUIDE,
-		(SPELLLEVEL|ONSHIPCAST),
-		5, 1,
-		{
-			{R_AURA, 1, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_earn_silver,
-		patzer
-	},
-
-	{SPL_STONEGOLEM, "stonegolem", NULL,
-		NULL,
-		NULL,
-		M_DRUIDE, (SPELLLEVEL), 4, 1,
-		{
-		 {R_AURA, 2, SPC_LEVEL},
-		 {R_STONE, 1, SPC_LEVEL},
-		 {R_TREES, 1, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_create_stonegolem, patzer
-	},
-
-	{SPL_IRONGOLEM, "irongolem", NULL,
-		NULL,
-		NULL,
-	 M_DRUIDE, (SPELLLEVEL), 4, 2,
-	 {
-		 {R_AURA, 2, SPC_LEVEL},
-		 {R_IRON, 1, SPC_LEVEL},
-		 {R_TREES, 1, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_create_irongolem, patzer
-	},
-
-	{SPL_TREEGROW, "treegrow", NULL,
-		NULL,
-		NULL,
-	 M_DRUIDE,
-	 (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
-	 5, 2,
-	 {
-		 {R_AURA, 4, SPC_LEVEL},
-		 {R_WOOD, 1, SPC_LEVEL},
-		 {R_TREES, 1, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_hain, patzer_ents
-	},
-
-	{SPL_RUSTWEAPON, "rustweapon", NULL,
-		NULL,
-		"u+",
-		M_DRUIDE,
-		(FARCASTING | SPELLLEVEL | UNITSPELL | TESTCANSEE | TESTRESISTANCE),
-		5, 3,
-		{
-		 {R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_rosthauch, patzer
-	},
-
-	{SPL_KAELTESCHUTZ, "kaelteschutz", NULL,
-		NULL,
-		"u+",
-		M_DRUIDE,
-		(UNITSPELL | SPELLLEVEL | TESTCANSEE | ONSHIPCAST),
-		5, 3,
-		{
-		 {R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_kaelteschutz, patzer
-	},
-
-	{SPL_HAGEL, "hagel", NULL,
-		NULL,
-		NULL,
-		M_DRUIDE, (COMBATSPELL|SPELLLEVEL), 5, 3,
-		{
-			{R_AURA, 1, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_kampfzauber, patzer
-	},
-
-	{SPL_IRONKEEPER, "ironkeeper", NULL,
-		NULL,
-		NULL,
-	 M_DRUIDE,
-	 (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
-	 5, 3,
-	 {
-		 {R_AURA, 3, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_ironkeeper, patzer
-	},
-
-	{SPL_MAGICSTREET, "magicstreet", NULL,
-		"ZAUBERE \"Magischer Pfad\" <Richtung>",
-		"c",
-		M_DRUIDE,
-		(FARCASTING | SPELLLEVEL | REGIONSPELL | ONSHIPCAST | TESTRESISTANCE),
-		5, 4,
-		{
-			{R_AURA, 1, SPC_LEVEL},
-			{R_STONE, 1, SPC_FIX},
-			{R_WOOD, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_magicstreet, patzer
-	},
-
-	{SPL_WINDSHIELD, "windshield", NULL,
-		NULL,
-		NULL,
-		M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
-		{
-			{R_AURA, 2, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}
-		},
-		(spell_f)sp_windshield, patzer
-	},
-
-	{SPL_MALLORNTREEGROW, "mallorntreegrow", NULL,
-		NULL,
-		NULL,
-	 M_DRUIDE,
-	 (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
-	 5, 4,
-	 {
-		 {R_AURA, 6, SPC_LEVEL},
-		 {R_MALLORN, 1, SPC_LEVEL},
-		 {R_TREES, 1, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_mallornhain, patzer_ents
-	},
-
-	{ SPL_GOODWINDS, "goodwinds", NULL,
-		NULL,
-		"s",
-		M_DRUIDE,
-		(SHIPSPELL|ONSHIPCAST|SPELLLEVEL|ONETARGET|TESTRESISTANCE),
-		5, 4,
-		{
-			{R_AURA, 1, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}
-		},
-	 (spell_f)sp_goodwinds, patzer
-	},
-
-	{SPL_HEALING, "healing", NULL,
-		NULL,
-		NULL,
-		M_DRUIDE, (POSTCOMBATSPELL | SPELLLEVEL), 5, 5,
-	 {
-			{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_healing, patzer
-	},
-
-	{SPL_REELING_ARROWS, "reelingarrows", NULL,
-		NULL,
-		NULL,
-		M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 5,
-		{
-			{R_AURA, 15, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_reeling_arrows, patzer
-	},
-
-	{SPL_GWYRRD_FUMBLESHIELD, "gwyrrdfumbleshield", NULL,
-		NULL,
-		NULL,
-	 M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 2, 5,
-	 {
-			{R_AURA, 5, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_fumbleshield, patzer
-	},
-
-	{SPL_TRANSFERAURA_DRUIDE, "transferauradruide", NULL,
-	 "ZAUBERE \"Meditation\" <Einheit-Nr> <investierte Aura>",
-		"ui",
-	 M_DRUIDE, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 6,
-	 {
-			{R_AURA, 2, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_transferaura, patzer
-	},
-
-	{SPL_EARTHQUAKE, "earthquake", NULL,
-		NULL,
-		NULL,
-	 M_DRUIDE, (FARCASTING|REGIONSPELL|TESTRESISTANCE), 5, 6,
-	 {
-		 {R_AURA, 25, SPC_FIX},
-		 {R_EOG, 2, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_earthquake, patzer
-	},
-
-	{SPL_STORMWINDS, "stormwinds", NULL,
-		NULL,
-		"s+",
-		M_DRUIDE,
-		(SHIPSPELL | ONSHIPCAST | OCEANCASTABLE | TESTRESISTANCE | SPELLLEVEL),
-		5, 6,
-		{
-		 {R_AURA, 6, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_stormwinds, patzer
-	},
-
-	{SPL_TRUESEEING_GWYRRD, "trueseeinggwyrrd", NULL,
-		NULL,
-		NULL,
-		M_DRUIDE, (ONSHIPCAST), 5, 6,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_SILVER, 3000, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_createitem_trueseeing, patzer_createitem
-	},
-
-	{SPL_INVISIBILITY_GWYRRD, "invisibilitygwyrrd", NULL,
-		NULL,
-		NULL,
-		M_DRUIDE, (ONSHIPCAST), 5, 6,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_SILVER, 3000, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_createitem_invisibility, patzer_createitem
-	},
-
-	{SPL_HOMESTONE, "homestone", NULL,
-		NULL,
-		NULL,
-		M_DRUIDE, (0), 5, 7,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_homestone, patzer
-	},
-
-	{SPL_WOLFHOWL, "wolfhowl", NULL,
-		NULL,
-		NULL,
-	 M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL ), 5, 7,
-	 {
-		 {R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_wolfhowl, patzer
-	},
-
-	{SPL_VERSTEINERN, "versteinern", NULL,
-		NULL,
-		NULL,
-	 M_DRUIDE, (COMBATSPELL | SPELLLEVEL), 5, 8,
-	 {
-		 {R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_versteinern, patzer
-	},
-
-	{SPL_STRONG_WALL, "strongwall", NULL,
-		NULL,
-		NULL,
-	 M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
-	 {
-			{R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_strong_wall, patzer
-	},
-
-	{SPL_GWYRRD_DESTROY_MAGIC, "gwyrrddestroymagic", NULL,
-		"ZAUBERE [REGION x y] [STUFE n] \"Geister bannen\" REGION\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Geister bannen\" EINHEIT <Einheit-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Geister bannen\" BURG <Burg-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Geister bannen\" GEBÄUDE <Gebäude-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Geister bannen\" SCHIFF <Schiff-Nr>",
-		"kc",
-		M_DRUIDE,
-		(FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
-		2, 8,
-	 {
-			{R_AURA, 6, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_destroy_magic, patzer
-	},
-
-	{SPL_TREEWALKENTER, "treewalkenter", NULL,
-		NULL,
-		"u+",
-	 M_DRUIDE, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 7, 9,
-	 {
-			{R_AURA, 3, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_treewalkenter, patzer
-	},
-
-	{SPL_TREEWALKEXIT, "treewalkexit", NULL,
-		"Zauber \"Sog des Lebens\" <Ziel-X> <Ziel-Y> <Einheit> [<Einheit> ..]",
-		"ru+",
-		M_DRUIDE, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 7, 9,
-		{
-		 {R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-		(spell_f)sp_treewalkexit, patzer
-	},
-
-	{SPL_HOLYGROUND, "holyground", NULL,
-		NULL,
-		NULL,
-		M_DRUIDE, (0), 5, 9,
-		{
-		 {R_AURA, 80, SPC_FIX},
-		 {R_PERMAURA, 3, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-		(spell_f)sp_holyground, patzer
-	},
-
-	{SPL_ARTEFAKT_SACK_OF_CONSERVATION, "artefaktsackofconservation", NULL,
-		NULL,
-		NULL,
-		M_DRUIDE, (ONSHIPCAST), 5, 5,
-		{
-		 {R_AURA, 30, SPC_FIX},
-		 {R_PERMAURA, 1, SPC_FIX},
-		 {R_TREES, 1, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-		(spell_f)sp_create_sack_of_conservation, patzer
-	},
-
-	{SPL_SUMMONENT, "summonent", NULL,
-		NULL,
-		NULL,
-	 M_DRUIDE, (SPELLLEVEL), 5, 10,
-	 {
-		 {R_AURA, 6, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_summonent, patzer
-	},
-
-	{SPL_GWYRRD_FAMILIAR, "gwyrrdfamiliar", NULL,
-		NULL,
-		NULL,
-		M_DRUIDE, (NOTFAMILIARCAST), 5, 10,
-		{
-			{R_AURA, 100, SPC_FIX},
-			{R_PERMAURA, 5, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_summon_familiar, patzer
-	},
-
-	{SPL_BLESSSTONECIRCLE, "blessstonecircle", NULL,
-		NULL,
-		"b",
-		M_DRUIDE, (BUILDINGSPELL | ONETARGET), 5, 11,
-		{
-			{R_AURA, 350, SPC_FIX},
-			{R_PERMAURA, 5, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_blessstonecircle, patzer
-	},
-
-	{SPL_GWYRRD_ARMORSHIELD, "Rindenhaut",
-		"Diese vor dem Kampf zu zaubernde Ritual gibt den eigenen Truppen "
-		"einen zusätzlichen Bonus auf ihre Rüstung. Jeder Treffer "
-		"reduziert die Kraft des Zaubers, so das der Schild sich irgendwann "
-		"im Kampf auflösen wird.",
-		NULL,
-		NULL,
-	 M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 2, 12,
-	 {
-			{R_AURA, 4, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_armorshield, patzer
-	},
-
-	{SPL_DROUGHT, "Beschwörung eines Hitzeelementar",
-	"Dieses Ritual beschwört wütende Elementargeister der Hitze. "
-	"Eine Dürre sucht das Land heim. Bäume verdorren, Tiere verenden, "
-	"und die Ernte fällt aus. Für Tagelöhner gibt es kaum noch Arbeit "
-	"in der Landwirtschaft zu finden.",
-		NULL,
-		NULL,
-	 M_DRUIDE, (FARCASTING|REGIONSPELL|TESTRESISTANCE), 5, 13,
-	 {
-			{R_AURA, 600, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_drought, patzer
-	},
-
-	{SPL_FOG_OF_CONFUSION, "Nebel der Verwirrung",
-		"Der Druide beschwört die Elementargeister des Nebels. Sie werden sich "
-		"für einige Zeit in der Umgebung festsetzen und sie mit dichtem Nebel "
-		"überziehen. Personen innerhalb des magischen Nebels verlieren die "
-		"Orientierung und haben große Schwierigkeiten, sich in eine bestimmte "
-		"Richtung zu bewegen.",
-		NULL,
-		NULL,
-		M_DRUIDE,
-		(FARCASTING|SPELLLEVEL),
-		5, 14,
-		{
-			{R_AURA, 8, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_fog_of_confusion, patzer
-	},
-
-	{SPL_MAELSTROM, "Mahlstrom",
-		"Dieses Ritual beschört einen großen Wasserelementar aus den "
-		"Tiefen des Ozeans. Der Elementar erzeugt einen gewaltigen "
-		"Strudel, einen Mahlstrom, welcher alle Schiffe, die ihn passieren, "
-		"schwer beschädigen kann.",
-		NULL,
-		NULL,
-		M_DRUIDE,
-		(OCEANCASTABLE | ONSHIPCAST | REGIONSPELL | TESTRESISTANCE),
-		5, 15,
-		{
-			{R_AURA, 200, SPC_FIX},
-			{R_SEASERPENTHEAD, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_maelstrom, patzer
-	},
-
-	{SPL_MALLORN, "Wurzeln der Magie",
-		"Mit Hilfe dieses aufwändigen Rituals läßt der Druide einen Teil seiner "
-		"dauerhaft in den Boden und die Wälder der Region fliessen. Dadurch wird "
-		"das Gleichgewicht der Natur in der Region für immer verändert, und in "
-		"Zukunft werden nur noch die anspruchsvollen, aber kräftigen "
-		"Mallorngewächse in der Region gedeihen.",
-		NULL,
-		NULL,
-		M_DRUIDE,
-		(FARCASTING | REGIONSPELL | TESTRESISTANCE),
-		5, 16,
-		{
-			{R_AURA, 250, SPC_FIX},
-			{R_PERMAURA, 10, SPC_FIX},
-			{R_TOADSLIME, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_mallorn, patzer
-	},
-
-	{SPL_GREAT_DROUGHT, "Tor in die Ebene der Hitze",
-		"Dieses mächtige Ritual öffnet ein Tor in die Elementarebene der "
-		"Hitze. Eine grosse Dürre kommt über das Land. Bauern, Tiere und "
-		"Pflanzen der Region kämpfen um das nackte Überleben, aber eine "
-		"solche Dürre überlebt wohl nur die Hälfte aller Lebewesen. "
-		 "Der Landstrich kann über Jahre hinaus von den Folgen einer "
-		 "solchen Dürre betroffen sein.",
-		NULL,
-		NULL,
-	 M_DRUIDE,
-	 (FARCASTING | REGIONSPELL | TESTRESISTANCE),
-	 5, 17,
-	 {
-			{R_AURA, 800, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_great_drought, patzer
-	},
-
-/* M_CHAOS */
-	{SPL_SPARKLE_CHAOS, "sparklechaos", NULL,
-		NULL,
-		"u",
-	 M_CHAOS, (UNITSPELL | TESTCANSEE | SPELLLEVEL | ONETARGET), 5, 1,
-	 {
-		{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_sparkle, patzer
-	},
-
-	{SPL_DRAIG_EARN_SILVER, "draigearnsilver", NULL,
-	NULL,
-	NULL,
-	 M_CHAOS, (SPELLLEVEL|ONSHIPCAST), 5, 1,
-	 {
-		{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_earn_silver, patzer
-	},
-
-	{SPL_FIREBALL, "fireball", NULL,
-		NULL,
-		NULL,
-	 M_CHAOS, (COMBATSPELL | SPELLLEVEL), 5, 2,
-	 {
-			{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_kampfzauber, patzer
-	},
-
-	{SPL_MAGICBOOST, "magicboost", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (ONSHIPCAST), 3, 3,
-		{
-			{R_AURA, 2, SPC_LINEAR},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_magicboost, patzer
-	},
-
-	{SPL_BLOODSACRIFICE, "bloodsacrifice", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (ONSHIPCAST), 1, 4,
-		{
-			{R_HITPOINTS, 4, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_bloodsacrifice, patzer
-	},
-
-	{SPL_BERSERK, "berserk", NULL,
-		NULL,
-		NULL,
-	 M_CHAOS, (PRECOMBATSPELL | SPELLLEVEL), 4, 5,
-	 {
-			{R_AURA, 5, SPC_LEVEL},
-			{R_PEASANTS, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_berserk, patzer
-	},
-
-	{SPL_FUMBLECURSE, "fumblecurse", NULL,
-		NULL,
-		"u",
-		M_CHAOS,
-		(UNITSPELL | SPELLLEVEL | ONETARGET | TESTCANSEE | TESTRESISTANCE),
-		4, 5,
-		{
-			{R_AURA, 4, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_fumblecurse, patzer_fumblecurse
-	},
-
-	{SPL_SUMMONUNDEAD, "summonundead", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (SPELLLEVEL | FARCASTING | ONSHIPCAST),
-		5, 6,
-		{
-			{R_AURA, 5, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_summonundead, patzer_peasantmob
-	},
-	{SPL_COMBATRUST, "combatrust", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (COMBATSPELL | SPELLLEVEL), 5, 6,
-		{
-			{R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_combatrosthauch, patzer
-	},
-
-	{SPL_TRUESEEING_DRAIG, "trueseeingdraig", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (ONSHIPCAST), 5, 6,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_SILVER, 3000, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_createitem_trueseeing, patzer_createitem
-	},
-
-	{SPL_INVISIBILITY_DRAIG, "invisibilitydraig", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (ONSHIPCAST), 5, 6,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_SILVER, 3000, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_createitem_invisibility, patzer_createitem
-	},
-
-	{SPL_TRANSFERAURA_CHAOS, "tranferaurachaos", NULL,
-	 "ZAUBERE \"Machtübertragung\" <Einheit-Nr> <investierte Aura>",
-		"ui",
-		M_CHAOS, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 7,
-		{
-			{R_AURA, 2, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_transferaura, patzer
-	},
-
-	{SPL_FIREWALL, "firewall", NULL,
-		"ZAUBERE \"Feuerwand\" <Richtung>",
-		"c",
-		M_CHAOS, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 4, 7,
-		{
-			{R_AURA, 6, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_firewall, patzer_peasantmob
-	},
-
-	{SPL_PLAGUE, "plague", NULL,
-		NULL,
-		NULL,
-		M_CHAOS,
-		(FARCASTING | REGIONSPELL | TESTRESISTANCE),
-		5, 7,
-		{
-			{R_AURA, 30, SPC_FIX},
-		  {R_PEASANTS, 50, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_plague, patzer_peasantmob
-	},
-
-	{SPL_CHAOSROW, "chaosrow", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
-		{
-			{R_AURA, 3, SPC_LEVEL},
-			{R_PEASANTS, 10, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_chaosrow, patzer
-	},
-
-	{SPL_SUMMONSHADOW, "summonshadow", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (SPELLLEVEL), 5, 8,
-		{
-			{R_AURA, 3, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_summonshadow, patzer_peasantmob
-	},
-
-	{SPL_UNDEADHERO, "undeadhero", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (POSTCOMBATSPELL | SPELLLEVEL), 5, 9,
-		{
-			{R_AURA, 1, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_undeadhero, patzer
-	},
-
-	{SPL_STRENGTH, "strength", NULL,
-		NULL,
-		NULL,
-	 M_CHAOS, (ONSHIPCAST), 5, 9,
-	 {
-			{R_AURA, 20, SPC_FIX},
-		 {R_PERMAURA, 1, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	(spell_f)sp_create_trollbelt, patzer
-	},
-
-	{SPL_AURALEAK, "auraleak", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (REGIONSPELL | TESTRESISTANCE), 3, 9,
-		{
-			{R_AURA, 35, SPC_FIX},
-			{R_DRACHENBLUT, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_auraleak, patzer
-	},
-
-	{SPL_DRAIG_FUMBLESHIELD, "draigfumbleshield", NULL,
-		NULL,
-		NULL,
-	 M_CHAOS, (PRECOMBATSPELL | SPELLLEVEL), 2, 9,
-	 {
-			{R_AURA, 6, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_fumbleshield, patzer
-	},
-
-	{SPL_FOREST_FIRE, "forestfire", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 10,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_OIL, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_forest_fire, patzer_peasantmob
-	},
-
-	{SPL_DRAIG_DESTROY_MAGIC, "draigdestroymagic", NULL,
-		"ZAUBERE [REGION x y] [STUFE n] \"Pentagramm\" REGION\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Pentagramm\" EINHEIT <Einheit-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Pentagramm\" BURG <Burg-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Pentagramm\" GEBÄUDE <Gebäude-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Pentagramm\" SCHIFF <Schiff-Nr>",
-		"kc",
-		M_CHAOS,
-		(FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
-		2, 10,
-		{
-			{R_AURA, 10, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_destroy_magic, patzer
-	},
-
-	{SPL_UNHOLYPOWER, "unholypower", NULL,
-		NULL,
-		"u+",
-		M_CHAOS, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 14,
-		{
-			{R_AURA, 10, SPC_LEVEL},
-			{R_PEASANTS, 5, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_unholypower, patzer
-	},
-
-	{SPL_DEATHCLOUD, "deathcloud", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
-		{
-			{R_AURA, 40, SPC_FIX},
-			{R_HITPOINTS, 15, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_deathcloud, patzer_peasantmob
-	},
-
-	{SPL_SUMMONDRAGON, "summondragon", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
-	 {
-			{R_AURA, 80, SPC_FIX},
-		 {R_DRAGONHEAD, 1, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_summondragon, patzer_peasantmob
-	},
-
-	{SPL_SUMMONSHADOWLORDS, "summonshadowlords", NULL,
-		NULL,
-		NULL,
-	 M_CHAOS, (SPELLLEVEL), 5, 12,
-	 {
-			{R_AURA, 7, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_summonshadowlords, patzer_peasantmob
-	},
-
-	{SPL_FIRESWORD, "firesword", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (ONSHIPCAST), 5, 12,
-		{
-			{R_AURA, 100, SPC_FIX},
-			{R_BERSERK, 1, SPC_FIX},
-			{R_SWORD, 1, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0}},
-		(spell_f)sp_create_firesword, patzer
-	},
-
-	{SPL_DRAIG_FAMILIAR, "draigfamiliar", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (NOTFAMILIARCAST), 5, 13,
-		{
-			{R_AURA, 100, SPC_FIX},
-		 {R_PERMAURA, 5, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-		(spell_f)sp_summon_familiar, patzer
-	},
-
-	{SPL_CHAOSSUCTION, "chaossuction", NULL,
-		NULL,
-		NULL,
-		M_CHAOS, (0), 5, 14,
-		{
-			{R_AURA, 150, SPC_FIX},
-		 {R_PEASANTS, 200, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_chaossuction, patzer_peasantmob
-	},
-
-/* M_TRAUM */
-
-	{SPL_SPARKLE_DREAM, "sparkledream", NULL,
-		NULL,
-		"u",
-		M_TRAUM,
-		(UNITSPELL | TESTCANSEE | SPELLLEVEL | ONETARGET | ONSHIPCAST),
-		5, 1,
-	 {
-		{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_sparkle, patzer
-	},
-
-	{SPL_ILLAUN_EARN_SILVER, "illaunearnsilver", NULL,
-	NULL,
-	NULL,
-	 M_TRAUM, (SPELLLEVEL|ONSHIPCAST), 5, 1,
-	 {
-		{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_earn_silver, patzer
-	},
-
-	{SPL_SHADOWKNIGHTS, "shadowknights", NULL,
-		NULL,
-		NULL,
-	 M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 4, 1,
-	 {
-		 {R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_shadowknights, patzer
-	},
-
-	{SPL_FLEE, "flee", NULL,
-		NULL,
-		NULL,
-	 M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 5, 2,
-	 {
-			{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_flee, patzer
-	},
-
-	{SPL_PUTTOREST, "puttorest", NULL,
-		NULL,
-		NULL,
-	 M_TRAUM, (SPELLLEVEL), 5, 2,
-	 {
-		 {R_AURA, 3, SPC_LEVEL},
-		 {R_TREES, 1, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_puttorest, patzer
-	},
-
-	{SPL_ICASTLE, "icastle", NULL,
-		"ZAUBERE \"Traumschlößchen\" <Gebäude-Typ>",
-		"c",
-	 M_TRAUM, (0), 5, 3,
-	 {
-		 {R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_icastle, patzer
-	},
-
-	{SPL_TRANSFERAURA_TRAUM, "transferauratraum", NULL,
-		"ZAUBERE \"Traum der Magie\" <Einheit-Nr> <investierte Aura>",
-		"ui",
-	 M_TRAUM, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 3,
-	 {
-			{R_AURA, 2, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_transferaura, patzer
-	},
-
-	{SPL_ILL_SHAPESHIFT, "shapeshift", NULL,
-		"ZAUBERE [STUFE n] \"Gestaltwandlung\" <Einheit-nr> <Rasse>",
-		"uc",
-	 M_TRAUM, (UNITSPELL|SPELLLEVEL|ONETARGET), 5, 3,
-	 {
-			{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_illusionary_shapeshift, patzer
-	},
-
-	{SPL_DREAMREADING, "dreamreading", NULL,
-		NULL,
-		"u",
-	 M_TRAUM, (FARCASTING | UNITSPELL | ONETARGET | TESTRESISTANCE), 5, 4,
-	 {
-			{R_AURA, 8, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_dreamreading, patzer
-	},
-
-	{SPL_TIREDSOLDIERS, "tiredsoldiers", NULL,
-		NULL,
-		NULL,
-	 M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
-	 {
-			{R_AURA, 4, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_tiredsoldiers, patzer
-	},
-
-	{SPL_REANIMATE, "reanimate", NULL,
-		NULL,
-		NULL,
-	 M_TRAUM, (POSTCOMBATSPELL | SPELLLEVEL), 4, 5,
-	 {
-			{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_reanimate, patzer
-	},
-
-	{SPL_ANALYSEDREAM, "analysedream", NULL,
-		NULL,
-		"u",
-	 M_TRAUM, (UNITSPELL | ONSHIPCAST | ONETARGET | TESTCANSEE), 5, 5,
-	 {
-			{R_AURA, 5, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_analysedream, patzer
-	},
-
-	{SPL_DISTURBINGDREAMS, "disturbingdreams", NULL,
-		NULL,
-		NULL,
-	 M_TRAUM, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 6,
-	 {
-			{R_AURA, 18, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_disturbingdreams, patzer
-	},
-
-	{SPL_TRUESEEING_ILLAUN, "trueseeingillaun", NULL,
-		NULL,
-		NULL,
-		M_TRAUM, (ONSHIPCAST), 5, 6,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_SILVER, 3000, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_createitem_trueseeing, patzer_createitem
-	},
-
-	{SPL_INVISIBILITY_ILLAUN, "invisibilityillaun", NULL,
-		NULL,
-		NULL,
-		M_TRAUM, (ONSHIPCAST), 5, 6,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_SILVER, 3000, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_createitem_invisibility, patzer_createitem
-	},
-
-	{SPL_SLEEP, "sleep", NULL,
-		NULL,
-		NULL,
-	 M_TRAUM, (COMBATSPELL | SPELLLEVEL ), 5, 7,
-	 {
-			{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_sleep, patzer
-	},
-
-	{SPL_WISPS, "Irrlichter",
-		"Der Zauberer spricht eine Beschwörung über einen Teil der Region, "
-		"und in der Folgewoche entstehen dort Irrlichter. "
-		"Wer durch diese Nebel wandert, wird von Visionen geplagt und "
-		"in die Irre geleitet.",
-		"ZAUBERE [REGION x y] [STUFE n] \"Irrlichter\" <Richtung>",
-		"c",
-	 M_TRAUM, (SPELLLEVEL | FARCASTING), 5, 7,
-	 {
-		 {R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_wisps, patzer
-	},
-
-	{SPL_READMIND, "readmind", NULL,
-		NULL,
-		"u",
-	 M_TRAUM, (UNITSPELL | ONETARGET), 5, 7,
-	 {
-			{R_AURA, 20, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_readmind, patzer
-	},
-
-	{SPL_GOODDREAMS, "gooddreams", NULL,
-		NULL,
-		NULL,
-		M_TRAUM,
-		(FARCASTING | REGIONSPELL | TESTRESISTANCE),
-		5, 8,
-		{
-			{R_AURA, 80, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_gooddreams, patzer
-	},
-
-	{SPL_ILLAUN_DESTROY_MAGIC, "illaundestroymagic", NULL,
-		"ZAUBERE [REGION x y] [STUFE n] \"Traumbilder entwirren\" REGION\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Traumbilder entwirren\" EINHEIT <Einheit-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Traumbilder entwirren\" BURG <Burg-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Traumbilder entwirren\" GEBÄUDE <Gebäude-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Traumbilder entwirren\" SCHIFF <Schiff-Nr>",
-		"kc",
-		M_TRAUM,
-		(FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
-		2, 8,
-		{
-			{R_AURA, 6, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_destroy_magic, patzer
-	},
-
-	{SPL_ILLAUN_FAMILIAR, "illaunfamiliar", NULL,
-		NULL,
-		NULL,
-	 M_TRAUM, (NOTFAMILIARCAST), 5, 9,
-	 {
-			{R_AURA, 100, SPC_FIX},
-			{R_PERMAURA, 5, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_summon_familiar, patzer
-	},
-
-	{SPL_CLONECOPY, "Seelenkopie",
-		"Dieser mächtige Zauber kann einen Magier vor dem sicheren Tod "
-		"bewahren. Der Magier erschafft anhand einer kleinen Blutprobe einen "
-		"Klon von sich, und legt diesen in ein Bad aus Drachenblut und verdünntem "
-		"Wasser des Lebens. "
-		"Anschließend transferiert er in einem aufwändigen Ritual einen Teil "
-		"seiner Seele in den Klon. Stirbt der Magier, reist seine Seele in den "
-		"Klon und der erschaffene Körper dient nun dem Magier als neues Gefäß. "
-		"Es besteht allerdings eine geringer Wahrscheinlichkeit, dass die Seele "
-		"nach dem Tod zu schwach ist, das neue Gefäß zu erreichen.",
-		NULL,
-		NULL,
-	 M_TRAUM, (NOTFAMILIARCAST), 5, 9,
-	 {
-			{R_AURA, 100, SPC_FIX},
-			{R_PERMAURA, 20, SPC_FIX},
-			{R_DRACHENBLUT, 5, SPC_FIX},
-		  {R_TREES, 5, SPC_FIX},
-			{0, 0, 0}},
-	 (spell_f)sp_clonecopy, patzer
-	},
-
-	{SPL_BADDREAMS, "Schlechte Träume",
-	 "Dieser Zauber ermöglicht es dem Träumer, den Schlaf aller nichtaliierten "
-	 "Einheiten (HELFE BEWACHE) in der Region so stark zu stören, das sie "
-	 "vorübergehend einen Teil ihrer Erinnerungen verlieren.",
-		NULL,
-		NULL,
-		M_TRAUM,
-		(FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 10,
-		{
-			{R_AURA, 90, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-		(spell_f)sp_baddreams, patzer
-	},
-
-	{SPL_MINDBLAST, "mindblast", NULL,
-		NULL,
-		NULL,
-	 M_TRAUM, (COMBATSPELL | SPELLLEVEL), 5, 11,
-	 {
-			{R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_mindblast, patzer
-	},
-
-	{SPL_ORKDREAM, "orkdream", NULL,
-		NULL,
-		"u+",
-		M_TRAUM,
-		(UNITSPELL | TESTRESISTANCE | TESTCANSEE | SPELLLEVEL), 5, 12,
-		{
-			{R_AURA, 5, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_sweetdreams, patzer
-	},
-
-	{ SPL_INVISIBILITY2_ILLAUN, "create_invisibility_sphere", NULL, NULL, NULL,
-		M_TRAUM, (ONSHIPCAST), 5, 13,
-		{
-			{R_AURA, 150, SPC_FIX},
-			{R_SILVER, 30000, SPC_FIX},
-			{R_PERMAURA, 3, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_createitem_invisibility2, patzer_createitem
-	},
-
-	{SPL_CREATE_TACTICCRYSTAL, "create_tacticcrystal", NULL, NULL, NULL,
-		M_TRAUM, (ONSHIPCAST), 5, 14,
-		{
-			{R_PERMAURA, 5, SPC_FIX},
-			{R_DRAGONHEAD, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_create_tacticcrystal, patzer_createitem
-	},
-
-	{SPL_SUMMON_ALP, "summon_alp", NULL, NULL, "u",
-		M_TRAUM,
-		(UNITSPELL | ONETARGET | SEARCHGLOBAL | TESTRESISTANCE),
-		5, 15,
-		{
-			{R_AURA, 350, SPC_FIX},
-			{R_PERMAURA, 5, SPC_FIX},
-			{R_SWAMP_3, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_summon_alp, patzer
-	},
-
-	{SPL_DREAM_OF_CONFUSION, "dream_of_confusion", NULL,
-		NULL,
-		NULL,
-		M_TRAUM,
-		(FARCASTING | SPELLLEVEL),
-		5, 16,
-	 {
-			{R_AURA, 7, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_dream_of_confusion, patzer
-	},
-
-/* M_BARDE */
-
-	{SPL_DENYATTACK, "appeasement", NULL, NULL, NULL,
-	 M_BARDE, (PRECOMBATSPELL | SPELLLEVEL ), 5, 1,
-	 {
-			{R_AURA, 2, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_denyattack, patzer
-	},
-
-	{SPL_CERDDOR_EARN_SILVER, "jugglery", NULL,	NULL, NULL,
-	 M_BARDE, (SPELLLEVEL|ONSHIPCAST), 5, 1,
-	 {
-			{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_earn_silver, patzer
-	},
-
-	{SPL_HEALINGSONG, "song_of_healing", NULL, NULL, NULL,
-	 M_BARDE, (POSTCOMBATSPELL | SPELLLEVEL), 5, 2,
-	 {
-			{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_healing, patzer
-	},
-
-	{SPL_GENEROUS, "generous", NULL, NULL, NULL,
-		M_BARDE,
-		(FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL | TESTRESISTANCE),
-		5, 2,
-	 {
-			{R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_generous, patzer
-	},
-
-	{SPL_RAINDANCE, "raindance", NULL, NULL, NULL,
-		M_BARDE,
-		(FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL),
-		5, 3,
-	 {
-			{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_blessedharvest, patzer
-	},
-
-	{SPL_SONG_OF_FEAR, "song_of_fear", NULL, NULL, NULL,
-		M_BARDE, (COMBATSPELL | SPELLLEVEL), 5, 3,
-		{
-			{R_AURA, 1, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_flee, patzer
-	},
-
-	{SPL_RECRUIT, "courting", NULL,
-		NULL,
-		NULL,
-		M_BARDE, (SPELLLEVEL), 5, 4,
-		{
-			{R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_recruit, patzer
-	},
-
-	{SPL_SONG_OF_CONFUSION, "song_of_confusion", NULL, NULL, NULL,
-		M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
-		{
-			{R_AURA, 2, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-			(spell_f)sp_chaosrow, patzer
-	},
-
-	{SPL_BABBLER, "blabbermouth", NULL,	NULL, "u",
-	 M_BARDE, (UNITSPELL | ONETARGET | TESTCANSEE), 5, 4,
-	 {
-			{R_AURA, 10, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_babbler, patzer
-	},
-
-	{SPL_HERO, "heroic_song", NULL, NULL, NULL,
-	 M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 4, 5,
-	 {
-			{R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_hero, patzer
-	},
-
-	{SPL_TRANSFERAURA_BARDE, "transfer_aura_song", NULL, NULL,
-		"ui",
-	 M_BARDE, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 5,
-	 {
-			{R_AURA, 2, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_transferaura, patzer
-	},
-
-	{SPL_UNIT_ANALYSESONG, "analysesong_unit", NULL, NULL,
-		"u",
-		M_BARDE,
-		(UNITSPELL | ONSHIPCAST | ONETARGET | TESTCANSEE),
-		5, 5,
-	 {
-			{R_AURA, 10, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_analysesong_unit, patzer
-	},
-
-	{SPL_CERRDOR_FUMBLESHIELD, "fumbleshield", NULL, NULL, NULL,
-	 M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 2, 5,
-	 {
-			{R_AURA, 5, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_fumbleshield, patzer
-	},
-
-	{ SPL_CALM_MONSTER, "Monster friedlich stimmen",
-		"Dieser einschmeichelnde Gesang kann fast jedes intelligente Monster "
-		"zähmen. Es wird von Angriffen auf den Magier absehen und auch seine "
-		"Begleiter nicht anrühren. Doch sollte man sich nicht täuschen, es "
-		"wird dennoch ein unberechenbares Wesen bleiben.",
-		NULL,
-		"u",
-		M_BARDE,
-		(UNITSPELL | ONSHIPCAST | ONETARGET | TESTRESISTANCE | TESTCANSEE),
-		5, 6,
-		{
-			{R_AURA, 15, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_calm_monster, patzer
-	},
-
-	{ SPL_SEDUCE, "Lied der Verführung",
-		"Mit diesem Lied kann eine Einheit derartig betört werden, so dass "
-		"sie dem Barden den größten Teil ihres Bargelds und ihres Besitzes "
-		"schenkt. Sie behält jedoch immer soviel, wie sie zum Überleben "
-		"braucht.",
-		NULL,
-		"u",
-		M_BARDE,
-		(UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE),
-		5, 6,
-		{
-			{R_AURA, 12, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_seduce, patzer
-	},
-
-	{SPL_TRUESEEING_CERDDOR, "Erschaffe ein Amulett des wahren Sehens",
-		"Der Spruch ermöglicht es einem Magier, ein Amulett des Wahren Sehens "
-		"zu erschaffen. Das Amulett erlaubt es dem Träger, alle Einheiten, die "
-		"durch einen Ring der Unsichtbarkeit geschützt sind, zu sehen. Einheiten "
-		"allerdings, die sich mit ihrem Tarnungs-Talent verstecken, bleiben "
-		"weiterhin unentdeckt.",
-		NULL,
-		NULL,
-		M_BARDE, (ONSHIPCAST), 5, 6,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_SILVER, 3000, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_createitem_trueseeing, patzer_createitem
-	},
-
-	{SPL_INVISIBILITY_CERDDOR, "Erschaffe einen Ring der Unsichtbarkeit",
-		"Mit diesem Spruch kann der Zauberer einen Ring der Unsichtbarkeit "
-		"erschaffen. Der Träger des Ringes wird für alle Einheiten anderer "
-		"Parteien unsichtbar, egal wie gut ihre Wahrnehmung auch sein mag. In "
-		"einer unsichtbaren Einheit muss jede Person einen Ring tragen.",
-		NULL,
-		NULL,
-		M_BARDE, (ONSHIPCAST), 5, 6,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_SILVER, 3000, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_createitem_invisibility, patzer_createitem
-	},
-
-  {SPL_HEADACHE, "Schaler Wein",
-		"Aufzeichung des Vortrags von Selen Ard'Ragorn in Bar'Glingal: "
-		"'Es heiss, dieser Spruch wäre wohl in den Spelunken der Westgassen "
-		"entstanden, doch es kann genausogut in jedem andern verrufenen "
-		"Viertel gewesen sein. Seine wichtigste Zutat ist etwa ein Fass "
-		"schlechtesten Weines, je billiger und ungesunder, desto "
-		"wirkungsvoller wird die Essenz. Die Kunst, diesen Wein in pure "
-		"Essenz zu destillieren, die weitaus anspruchsvoller als das einfache "
-		"Rezeptmischen eines Alchemisten ist, und diese dergestalt zu binden "
-		"und konservieren, das sie sich nicht gleich wieder verflüchtigt, wie "
-		"es ihre Natur wäre, ja, dies ist etwas, das nur ein Meister des "
-		"Cerddor vollbringen kann. Nun besitzt Ihr eine kleine Phiola mit "
-		"einer rubinrotschimmernden - nun, nicht flüssig, doch auch nicht "
-		"ganz Dunst - nennen wir es einfach nur Elixier. Doch nicht dies ist "
-		"die wahre Herausforderung, sodann muss, da sich ihre Wirkung leicht "
-		"verflüchtigt, diese innerhalb weniger Tage unbemerkt in das Getränkt "
-		"des Opfers geträufelt werden. Ihr Meister der Betöhrung und "
-		"Verführung, hier nun könnt Ihr Eure ganze Kunst unter Beweis "
-		"stellen. Doch gebt Acht, nicht unbedacht selbst von dem Elixier zu "
-		"kosten, denn wer einmal gekostet hat, der kann vom Weine nicht mehr "
-		"lassen, und er säuft sicherlich eine volle Woche lang. Jedoch nicht "
-		"die Verführung zum Trunke ist die wahre Gefahr, die dem Elixier "
-		"innewohnt, sondern das der Trunkenheit so sicher ein gar "
-		"fürchterliches Leid des Kopfes folgen wird, wie der Tag auf die "
-		"Nacht folgt. Und er wird gar sicherlich von seiner besten Fähigkeit "
-		"einige Tage bis hin zu den Studien zweier Wochen vergessen haben. "
-		"Noch ein Wort der Warnung: Dieses ist sehr aufwendig, und so Ihr "
-		"noch weitere Zauber in der selben Woche wirken wollt, so werden sie Euch "
-		"schwerer fallen.'",
-		NULL,
-		"u",
-		M_BARDE,
-		(UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE),
-		5, 7,
-		{
-			{R_AURA, 4, SPC_LINEAR},
-			{R_SWAMP_2, 3, SPC_FIX},
-			{R_SILVER, 50, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_headache, patzer
-	},
-
-	{ SPL_PUMP, "Aushorchen",
-		"Erliegt die Einheit dem Zauber, so wird sie dem Magier alles erzählen, "
-		"was sie über die gefragte Region weiß. Ist in der Region niemand "
-		"ihrer Partei, so weiß sie nichts zu berichten. Auch kann sie nur das "
-		"erzählen, was sie selber sehen könnte.",
-		"ZAUBERE \"Aushorchen\" <Einheit-Nr> <Zielregion-X> <Zielregion-Y>",
-		"ur",
-		M_BARDE, (UNITSPELL | ONETARGET | TESTCANSEE), 5, 7,
-		{
-			{R_AURA, 4, SPC_FIX},
-			{R_SILVER, 100, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_pump, patzer
-	},
-
-	{SPL_BLOODTHIRST, "Kriegsgesang",
-		"Wie viele magischen Gesänge, so entstammt auch dieser den altem "
-		"Wissen der Katzen, die schon immer um die machtvolle Wirkung der "
-		"Stimme wussten. Mit diesem Lied wird die Stimmung der Krieger "
-		"aufgepeitscht, sie gar in wilde Raserrei und Blutrausch versetzt. "
-		"Ungeachtet eigener Schmerzen werden sie kämpfen bis zum "
-		"Tode und niemals fliehen. Während ihre Attacke verstärkt ist "
-		"achten sie kaum auf sich selbst.",
-		NULL,
-		NULL,
-		M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 4, 7,
-		{
-			{R_AURA, 5, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_berserk, patzer
-	},
-
-	{SPL_FRIGHTEN, "Gesang der Angst",
-		"Dieser Kriegsgesang sät Panik in der Front der Gegner und schwächt "
-		"so ihre Kampfkraft erheblich. Angst wird ihren Schwertarm schwächen "
-		"und Furcht ihren Schildarm lähmen.",
-		NULL,
-		NULL,
-	 M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
-	 {
-		{R_AURA, 5, SPC_LEVEL},
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0}},
-	 (spell_f)sp_frighten, patzer
-	},
-
-	{SPL_OBJ_ANALYSESONG, "Lied des Ortes analysieren",
-		"Wie Lebewesen, so haben auch Schiffe und Gebäude und sogar Regionen "
-		"ihr eigenes Lied, wenn auch viel schwächer und schwerer zu hören. "
-		"Und so, wie wie aus dem Lebenslied einer Person erkannt werden kann, "
-		"ob diese unter einem Zauber steht, so ist dies auch bei Burgen, "
-		"Schiffen oder Regionen möglich.",
-		"ZAUBERE [STUFE n] \"Lied des Ortes analysieren\" REGION\n"
-		"ZAUBERE [STUFE n] \"Lied des Ortes analysieren\" BURG <Burg-nr>\n"
-		"ZAUBERE [STUFE n] \"Lied des Ortes analysieren\" GEBÄUDE <Gebäude-nr>\n"
-		"ZAUBERE [STUFE n] \"Lied des Ortes analysieren\" SCHIFF <Schiff-nr>",
-		"kc",
-		M_BARDE, (SPELLLEVEL|ONSHIPCAST), 5, 8,
-		{
-			{R_AURA, 3, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_analysesong_obj, patzer
-	},
-
-	{SPL_CERDDOR_DESTROY_MAGIC, "Lebenslied festigen",
-		"Jede Verzauberung beeinflußt das Lebenslied, schwächt und verzerrt es. "
-		"Der kundige Barde kann versuchen, das Lebenslied aufzufangen und zu "
-		"verstärken und die Veränderungen aus dem Lied zu tilgen.",
-		"ZAUBERE [REGION x y] [STUFE n] \"Lebenslied festigen\" REGION\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Lebenslied festigen\" EINHEIT <Einheit-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Lebenslied festigen\" BURG <Burg-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Lebenslied festigen\" GEBÄUDE <Gebäude-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Lebenslied festigen\" SCHIFF <Schiff-Nr>",
-		"kc",
-		M_BARDE,
-		(FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
-		2, 8,
-	 {
-			{R_AURA, 5, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_destroy_magic, patzer
-	},
-
-	{SPL_MIGRANT, "Ritual der Aufnahme",
-		"Dieses Ritual ermöglicht es, eine Einheit, egal welcher Art, in die "
-		"eigene Partei aufzunehmen. Der um Aufnahme Bittende muss dazu willig "
-		"und bereit sein, seiner alten Partei abzuschwören. Dies bezeugt er "
-		"durch KONTAKTIEREn des Magiers. Auch wird er die Woche über "
-		"ausschliesslich mit Vorbereitungen auf das Ritual beschäftigt sein. "
-		"Das Ritual wird fehlschlagen, wenn er zu stark an seine alte Partei "
-		"gebunden ist, dieser etwa Dienst für seine teuere Ausbildung "
-		"schuldet. Der das Ritual leitende Magier muss für die permanente "
-		"Bindung des Aufnahmewilligen an seine Partei naturgemäß auch "
-		"permanente Aura aufwenden. Pro Stufe und pro 1 permanente Aura kann "
-		"er eine Person aufnehmen.",
-		NULL,
-		"u",
-		M_BARDE, (UNITSPELL | SPELLLEVEL | ONETARGET | TESTCANSEE), 5, 9,
-		{
-			{R_AURA, 3, SPC_LEVEL},
-			{R_PERMAURA, 1, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_migranten, patzer
-	},
-
-	{SPL_CERDDOR_FAMILIAR, "Vertrauten rufen",
-		"Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein "
-		"ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem "
-		"Magier anschließen wird.",
-		NULL,
-		NULL,
-	 M_BARDE, (NOTFAMILIARCAST), 5, 9,
-	 {
-			{R_AURA, 100, SPC_FIX},
-		 {R_PERMAURA, 5, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_summon_familiar, patzer
-	},
-
-	{SPL_RAISEPEASANTS, "Mob aufwiegeln",
-	 "Mit Hilfe dieses magischen Gesangs überzeugt der Magier die Bauern "
-	 "der Region, sich ihm anzuschließen. Die Bauern werden ihre Heimat jedoch "
-	 "nicht verlassen, und keine ihrer Besitztümer fortgeben. Jede Woche "
-	 "werden zudem einige der Bauern den Bann abwerfen und auf ihre Felder "
-	 "zurückkehren. Wie viele Bauern sich dem Magier anschließen hängt von der "
-	 "Kraft seines Gesangs ab.",
-		NULL,
-		NULL,
-	 M_BARDE, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 5, 10,
-	 {
-			{R_AURA, 4, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_raisepeasants, patzer
-	},
-
-	{SPL_SONG_RESISTMAGIC, "Gesang des wachen Geistes",
-		"Dieses magische Lied wird, einmal mit Inbrunst gesungen, sich in der "
-		"Region fortpflanzen, von Mund zu Mund springen und eine Zeitlang "
-		"überall zu vernehmen sein. Nach wie vielen Wochen der Gesang aus dem "
-		"Gedächnis der Region entschwunden ist, ist von dem Geschick des Barden "
-		"abhängig. Bis das Lied ganz verklungen ist, wird seine Magie allen "
-		"Verbündeten des Barden (HELFE BEWACHE), und natürlich auch seinen "
-		"eigenem Volk, einen einmaligen Bonus von 15% "
-		"auf die natürliche Widerstandskraft gegen eine Verzauberung "
-		"verleihen.",
-		NULL,
-		NULL,
-		M_BARDE,
-		(FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
-		2, 10,
-	 {
-			{R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_song_resistmagic, patzer
-	},
-
-	{SPL_DEPRESSION, "Gesang der Melancholie",
-	 "Mit diesem Gesang verbreitet der Barde eine melancholische, traurige "
-	 "Stimmung unter den Bauern. Einige Wochen lang werden sie sich in ihre "
-	 "Hütten zurückziehen und kein Silber in den Theatern und Tavernen lassen.",
-		NULL,
-		NULL,
-	 M_BARDE, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
-	 {
-			{R_AURA, 40, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_depression, patzer
-	},
-
-	{SPL_ARTEFAKT_NIMBLEFINGERRING, "Miriams flinke Finger",
-		"Die berühmte Bardin Miriam bhean'Meddaf war bekannt für ihr "
-		"außergewöhnliches Geschick mit der Harfe. Ihre Finger sollen sich "
-		"so schnell über die Saiten bewegt haben, das sie nicht mehr erkennbar "
-		"waren. Dieser Zauber, der recht einfach in einen Silberring zu bannen "
-		"ist, bewirkt eine um das zehnfache verbesserte Geschicklichkeit und "
-		"Gewandheit der Finger. (Das soll sie auch an anderer Stelle ausgenutzt "
-		"haben, ihr Ruf als Falschspielerin war berüchtigt.) Handwerker können "
-		"somit das zehnfache produzieren, und bei einigen anderen Tätigkeiten "
-		"könnte dies ebenfalls von Nutzen sein.",
-		NULL,
-		NULL,
-		M_BARDE, (ONSHIPCAST), 5, 11,
-		{
-			{R_AURA, 20, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{R_SILVER, 1000, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_create_nimblefingerring, patzer
-	},
-
-	{SPL_SONG_SUSCEPTMAGIC, "Gesang des schwachen Geistes",
-			"Dieses Lied, das in die magische Essenz der Region gewoben wird, "
-			"schwächt die natürliche Widerstandskraft gegen eine "
-			"Verzauberung einmalig um 15%. Nur die Verbündeten des Barden "
-			"(HELFE BEWACHE) sind gegen die Wirkung des Gesangs gefeit.",
-		NULL,
-		NULL,
-		M_BARDE,
-		(FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
-		2, 12,
-	 {
-			{R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_song_susceptmagic, patzer
-	},
-
-	{SPL_SONG_OF_PEACE, "Gesang der Friedfertigkeit",
-		"Dieser mächtige Bann verhindert jegliche Attacken. Niemand in der "
-		"ganzen Region ist fähig seine Waffe gegen irgendjemanden zu erheben. "
-		"Die Wirkung kann etliche Wochen andauern",
-		NULL,
-		NULL,
-		M_BARDE, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 5, 12,
-		{
-			{R_AURA, 20, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0} },
-		(spell_f)sp_song_of_peace, patzer
-	},
-
-	{SPL_SONG_OF_ENSLAVE, "Gesang der Versklavung",
-		"Dieser mächtige Bann raubt dem Opfer seinen freien Willen und "
-		"unterwirft sie den Befehlen des Barden. Für einige Zeit wird das Opfer "
-		"sich völlig von seinen eigenen Leuten abwenden und der Partei des Barden "
-		"zugehörig fühlen.",
-		NULL,
-		"u",
-		M_BARDE, (UNITSPELL | ONETARGET | TESTCANSEE), 5, 13,
-		{
-			{R_AURA, 40, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0} },
-		(spell_f)sp_charmingsong, patzer
-	},
-
-	{SPL_BIGRECRUIT, "Hohe Kunst der Überzeugung",
-		"Aus 'Wanderungen' von Firudin dem Weisen: "
-		"'In Weilersweide, nahe dem Wytharhafen, liegt ein kleiner Gasthof, der "
-		"nur wenig besucht ist. Niemanden bekannt ist, das dieser Hof "
-		"bis vor einigen Jahren die Bleibe des verbannten Wanderpredigers Grauwolf "
-		"war. Nachdem er bei einer seiner berüchtigten flammenden Reden fast die "
-		"gesammte Bauernschaft angeworben hatte, wurde er wegen Aufruhr verurteilt "
-		"und verbannt. Nur zögerlich war er bereit mir das Geheimniss seiner "
-		"Überzeugungskraft zu lehren.'",
-		NULL,
-		NULL,
-		M_BARDE, (SPELLLEVEL), 5, 14,
-		{
-			{R_AURA, 20, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_bigrecruit, patzer
-	},
-
-	{SPL_RALLYPEASANTMOB, "Aufruhr beschwichtigen",
-		"Mit Hilfe dieses magischen Gesangs kann der Magier eine Region in "
-		"Aufruhr wieder beruhigen. Die Bauernhorden werden sich verlaufen "
-		"und wieder auf ihre Felder zurückkehren.",
-		NULL,
-		NULL,
-	 M_BARDE, (FARCASTING), 5, 15,
-	 {
-			{R_AURA, 30, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_rallypeasantmob, patzer
-	},
-
-	{SPL_RAISEPEASANTMOB, "Aufruhr verursachen",
-		"Mit Hilfe dieses magischen Gesangs versetzt der Magier eine ganze "
-		"Region in Aufruhr. Rebellierende Bauernhorden machen jedes Besteuern "
-		"unmöglich, kaum jemand wird mehr für Gaukeleien Geld spenden und "
-		"es können keine neuen Leute angeworben werden. Nach einigen Wochen "
-		"beruhigt sich der Mob wieder.",
-		NULL,
-		NULL,
-	 M_BARDE, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 16,
-	 {
-			{R_AURA, 40, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_raisepeasantmob, patzer
-	},
-
-/* M_ASTRAL */
-
-	{SPL_ANALYSEMAGIC, "analyze_magic", NULL,
-		"ZAUBERE [STUFE n] \"Magie analysieren\" REGION\n"
-		"ZAUBERE [STUFE n] \"Magie analysieren\" EINHEIT <Einheit-Nr>\n"
-		"ZAUBERE [STUFE n] \"Magie analysieren\" BURG <Burg-Nr>\n"
-		"ZAUBERE [STUFE n] \"Magie analysieren\" GEBÄUDE <Gebäude-Nr>\n"
-		"ZAUBERE [STUFE n] \"Magie analysieren\" SCHIFF <Schiff-Nr>",
-		"kc",
-		M_ASTRAL, (UNITSPELL | ONSHIPCAST | TESTCANSEE), 5, 1,
-		{
-			{R_AURA, 1, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_analysemagic, patzer
-	},
-
-	{SPL_ITEMCLOAK, "concealing_aura", NULL,
-		NULL,
-		"u",
-		M_ASTRAL, (SPELLLEVEL | UNITSPELL | ONSHIPCAST | ONETARGET), 5, 1,
-		{
-		 {R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-		(spell_f)sp_itemcloak, patzer
-	},
-
-	{SPL_TYBIED_EARN_SILVER, "miracle_doctor", NULL,
-		NULL,
-		NULL,
-		M_ASTRAL, (SPELLLEVEL|ONSHIPCAST), 5, 1,
-		{
-		 {R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-		(spell_f)sp_earn_silver, patzer
-	},
-
-	{SPL_TYBIED_FUMBLESHIELD, "Schutz vor Magie",
-		"Dieser Zauber legt ein antimagisches Feld um die Magier der "
-		"Feinde und behindert ihre Zauber erheblich. Nur wenige werden "
-		"die Kraft besitzen, das Feld zu durchdringen und ihren Truppen "
-		"in der Schlacht zu helfen.",
-		NULL,
-		NULL,
-	 M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 2, 2,
-	 {
-		 {R_AURA, 3, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_fumbleshield, patzer
-	},
-
-	{SPL_SHOWASTRAL, "Astraler Blick",
-	"Der Magier kann kurzzeitig in die Astralebene blicken und erfährt "
-	"so alle Einheiten innerhalb eines astralen Radius von Stufe/5 Regionen.",
-		NULL,
-		NULL,
-	 M_ASTRAL, (SPELLLEVEL), 5, 2,
-	 {
-			{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_showastral, patzer
-	},
-
-	{SPL_RESISTMAGICBONUS, "Schutzzauber",
-		"Dieser Zauber verstärkt die natürliche Widerstandskraft gegen Magie. "
-		"Eine so geschützte Einheit ist auch gegen Kampfmagie weniger "
-		"empfindlich. Pro Stufe reicht die Kraft des Magiers aus, um 5 Personen "
-		"zu schützen.",
-		NULL,
-		"u+",
-		M_ASTRAL,
-		(UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE),
-		2, 3,
-		{
-			{R_AURA, 5, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-		(spell_f)sp_resist_magic_bonus, patzer
-	},
-
-	{SPL_KEEPLOOT, "Beute bewahren",
-		"Dieser Zauber verhindert, dass ein Teil der sonst im Kampf zerstörten "
-		"Gegenstände beschädigt wird. Die Verluste reduzieren sich um 5% pro "
-		"Stufe des Zaubers bis zu einem Minimum von 25%.",
-		NULL,
-		NULL,
-	 M_ASTRAL, ( POSTCOMBATSPELL | SPELLLEVEL ), 5, 3,
-	 {
-			{R_AURA, 1, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_keeploot, patzer
-	},
-
-	{SPL_ENTERASTRAL, "Astraler Weg",
-	 "Alte arkane Formeln ermöglichen es dem Magier, sich und andere in die "
-	 "astrale Ebene zu bringen. Der Magier kann (Stufe-3)*15 GE durch das "
-	 "kurzzeitig entstehende Tor bringen. Ist der Magier erfahren genug, "
-	 "den Zauber auf Stufen von 11 oder mehr zu zaubern, kann er andere "
-	 "Einheiten auch gegen ihren Willen auf die andere Ebene zwingen.",
-		NULL,
-		"u+",
-	 M_ASTRAL, (UNITSPELL|SPELLLEVEL), 7, 4,
-	 {
-		 {R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_enterastral, patzer
-	},
-
-	{SPL_LEAVEASTRAL, "Astraler Ausgang",
-		"Der Magier konzentriert sich auf die Struktur der Realität und kann "
-		"so die astrale Ebene verlassen. Er kann insgesamt (Stufe-3)*15 GE durch "
-		"das kurzzeitig entstehende Tor bringen. Ist der Magier erfahren genug, "
-		"den Zauber auf Stufen von 11 oder mehr zu zaubern, kann er andere "
-		"Einheiten auch gegen ihren Willen auf die andere Ebene zwingen.",
-		"ZAUBER [STUFE n] \"Astraler Ausgang\" <Ziel-X> <Ziel-Y> <Einheit-Nr> "
-			"[<Einheit-Nr> ...]",
-		"ru+",
-		M_ASTRAL, (UNITSPELL |SPELLLEVEL), 7, 4,
-		{
-			{R_AURA, 2, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_leaveastral, patzer
-	},
-
-	{SPL_TRANSFERAURA_ASTRAL, "Auratransfer",
-	 "Mit Hilfe dieses Zauber kann der Magier eigene Aura im Verhältnis "
-	 "2:1 auf einen anderen Magier des gleichen Magiegebietes oder im "
-	 "Verhältnis 3:1 auf einen Magier eines anderen Magiegebietes "
-	 "übertragen.",
-		"ZAUBERE \"Auratransfer\" <Einheit-Nr> <investierte Aura>",
-		"ui",
-	 M_ASTRAL, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 5,
-	 {
-			{R_AURA, 1, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_transferaura, patzer
-	},
-
-	{SPL_SHOCKWAVE, "Schockwelle",
-		"Dieser Zauber läßt eine Welle aus purer Kraft über die "
-		"gegnerischen Reihen hinwegfegen.  Viele Kämpfer wird der Schock "
-		"so benommen machen, daß sie für einen kurzen Moment nicht angreifen "
-		"können.",
-		NULL,
-		NULL,
-		M_ASTRAL, (COMBATSPELL|SPELLLEVEL), 5, 5,
-		{
-			{R_AURA, 1, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_stun, patzer
-	},
-
-	{SPL_ANTIMAGICZONE, "Astrale Schwächezone",
-		"Mit diesem Zauber kann der Magier eine Zone der astralen Schwächung "
-		"erzeugen, ein lokales Ungleichgewicht im Astralen Feld. Dieses "
-		"Zone wird bestrebt sein, wieder in den Gleichgewichtszustand "
-		"zu gelangen. Dazu wird sie jedem in dieser Region gesprochenen "
-		"Zauber einen Teil seiner Stärke entziehen, die schwächeren gar "
-		"ganz absorbieren.",
-		NULL,
-		NULL,
-		M_ASTRAL, (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
-		2, 5,
-	 {
-			{R_AURA, 3, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_antimagiczone, patzer
-	},
-
-	{SPL_TRUESEEING_TYBIED, "Erschaffe ein Amulett des wahren Sehens",
-		"Der Spruch ermöglicht es einem Magier, ein Amulett des Wahren Sehens "
-		"zu erschaffen. Das Amulett erlaubt es dem Träger, alle Einheiten, die "
-		"durch einen Ring der Unsichtbarkeit geschützt sind, zu sehen. Einheiten "
-		"allerdings, die sich mit ihrem Tarnungs-Talent verstecken, bleiben "
-		"weiterhin unentdeckt.",
-		NULL,
-		NULL,
-		M_ASTRAL, (ONSHIPCAST), 5, 5,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_SILVER, 3000, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_createitem_trueseeing, patzer_createitem
-	},
-
-	{SPL_TYBIED_DESTROY_MAGIC, "Magiefresser",
-		"Dieser Zauber ermöglicht dem Magier, Verzauberungen einer Einheit, "
-			"eines Schiffes, Gebäudes oder auch der Region aufzulösen.",
-		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" REGION\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" EINHEIT <Einheit-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" BURG <Burg-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" GEBÄUDE <Gebäude-Nr>\n"
-		"ZAUBERE [REGION x y] [STUFE n] \"Magiefresser\" SCHIFF <Schiff-Nr>",
-		"kc",
-		M_ASTRAL,
-		(FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
-		2, 5,
-		{
-			{R_AURA, 4, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_destroy_magic, patzer
-	},
-
-	{SPL_PULLASTRAL, "Astraler Ruf",
-	 "Ein Magier, der sich in der astralen Ebene befindet, kann mit Hilfe "
-	 "dieses Zaubers andere Einheiten zu sich holen. Der Magier kann "
-	 "(Stufe-3)*15 GE durch das kurzzeitig entstehende Tor bringen. Ist der "
-	 "Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu zaubern, "
-	 "kann er andere Einheiten auch gegen ihren Willen auf die andere Ebene "
-	 "zwingen.",
-		"ZAUBER [STUFE n] \"Astraler Ruf\" <Ziel-X> <Ziel-Y> <Einheit-Nr> "
-			"[<Einheit-Nr> ...]",
-	 "ru+",
-	 M_ASTRAL, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
-	 {
-		 {R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_pullastral, patzer
-	},
-
-
-	{SPL_FETCHASTRAL, "Ruf der Realität",
-		"Ein Magier, welcher sich in der materiellen Welt befindet, kann er mit "
-		"Hilfe dieses Zaubers Einheiten aus der angrenzenden Astralwelt herbeiholen. "
-		"Ist der Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu "
-		"zaubern, kann er andere Einheiten auch gegen ihren Willen in die materielle "
-		"Welt zwingen.",
-		NULL,
-		"u+",
-		M_ASTRAL, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
-		{
-			{R_AURA, 2, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_fetchastral, patzer
-	},
-
-	{SPL_STEALAURA, "Stehle Aura",
-	 "Mit Hilfe dieses Zaubers kann der Magier einem anderen Magier seine "
-	 "Aura gegen dessen Willen entziehen und sich selber zuführen.",
-		NULL,
-		"u",
-		M_ASTRAL,
-		(FARCASTING | SPELLLEVEL | UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE),
-		3, 6,
-		{
-			{R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_stealaura, patzer
-	},
-
-	{SPL_FLYING_SHIP, "Luftschiff",
-		"Diese magischen Runen bringen ein Boot oder Langboot für eine Woche "
-		"zum fliegen. Damit kann dann auch Land überquert werden. Die Zuladung "
-		"von Langbooten ist unter der Einwirkung dieses Zaubers auf 100 "
-		"Gewichtseinheiten begrenzt. Für die Farbe der Runen muss eine spezielle "
-		"Tinte aus einem Windbeutel und einem Schneekristall angerührt werden.",
-		NULL,
-		"s",
-		M_ASTRAL, (ONSHIPCAST | SHIPSPELL | ONETARGET | TESTRESISTANCE), 5, 6,
-		{
-			{R_AURA, 10, SPC_FIX},
-			{R_HIGHLAND_1, 1, SPC_FIX},
-			{R_GLACIER_3, 1, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_flying_ship, patzer
-	},
-
-	{SPL_INVISIBILITY_TYBIED, "Erschaffe einen Ring der Unsichtbarkeit",
-		"Mit diesem Spruch kann der Zauberer einen Ring der Unsichtbarkeit "
-		"erschaffen. Der Träger des Ringes wird für alle Einheiten anderer "
-		"Parteien unsichtbar, egal wie gut ihre Wahrnehmung auch sein mag. In "
-		"einer unsichtbaren Einheit muss jede Person einen Ring tragen.",
-		NULL,
-		NULL,
-		M_ASTRAL, (ONSHIPCAST), 5, 6,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_SILVER, 3000, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_createitem_invisibility, patzer_createitem
-	},
-
-	{SPL_CREATE_ANTIMAGICCRYSTAL, "Erschaffe Antimagiekristall",
-	 "Mit Hilfe dieses Zauber entzieht der Magier einem Quarzkristall "
-	 "all seine magischen Energien. Der Kristall wird dann, wenn er zu "
-	 "feinem Staub zermahlen und verteilt wird, die beim Zaubern "
-	 "freigesetzten magischen Energien aufsaugen und alle Zauber, "
-	 "welche in der betreffenden Woche in der Region gezaubert werden "
-	 "fehlschlagen lassen.",
-		NULL,
-		NULL,
-		M_ASTRAL, (ONSHIPCAST), 5, 7,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_SILVER, 3000, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_create_antimagiccrystal, patzer_createitem
-	},
-
-	{SPL_DESTROY_MAGIC, "Fluch brechen",
-		"Dieser Zauber ermöglicht dem Magier, gezielt eine bestimmte "
-			"Verzauberung einer Einheit, eines Schiffes, Gebäudes oder auch "
-			"der Region aufzulösen.",
-		"ZAUBERE [REGION x y] [STUFE n] \"Fluch brechen\" REGION <Zauber-Nr>\n"
-			"ZAUBERE [REGION x y] [STUFE n] \"Fluch brechen\" EINHEIT <Einheit-Nr> <Zauber-Nr>\n"
-			"ZAUBERE [REGION x y] [STUFE n] \"Fluch brechen\" BURG <Burg-Nr> <Zauber-Nr>\n"
-			"ZAUBERE [REGION x y] [STUFE n] \"Fluch brechen\" GEBÄUDE <Gebäude-Nr> <Zauber-Nr>\n"
-			"ZAUBERE [REGION x y] [STUFE n] \"Fluch brechen\" SCHIFF <Schiff-Nr> <Zauber-Nr>",
-		"kcc",
-		M_ASTRAL, (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE), 3, 7,
-		{
-			{R_AURA, 3, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_destroy_curse, patzer
-	},
-
-	{SPL_ETERNIZEWALL, "Mauern der Ewigkeit",
-		"Mit dieser Formel bindet der Magier auf ewig die Kräfte der Erde in "
-		"die Mauern des Gebäudes. Ein solchermaßen verzaubertes Gebäude ist "
-		"gegen den Zahn der Zeit geschützt und benötigt keinen "
-		"Unterhalt mehr.",
-		"ZAUBER \"Mauern der Ewigkeit\" <Gebäude-Nr>",
-		"b",
-		M_ASTRAL,
-		(SPELLLEVEL | BUILDINGSPELL | ONETARGET | TESTRESISTANCE | ONSHIPCAST),
-		5, 7,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_eternizewall, patzer
-	},
-
-	{SPL_SCHILDRUNEN, "Runen des Schutzes",
-		"Zeichnet man diese Runen auf die Wände eines Gebäudes oder auf die "
-		"Planken eines Schiffes, so wird es schwerer durch Zauber zu "
-		"beeinflussen sein. Jedes Ritual erhöht die Widerstandskraft des "
-		"Gebäudes oder Schiffes gegen Verzauberung um 20%. "
-		"Werden mehrere Schutzzauber übereinander gelegt, so addiert "
-		"sich ihre Wirkung, doch ein hundertprozentiger Schutz läßt sich so "
-		"nicht erreichen. Der Zauber hält mindestens drei Wochen an, je nach "
-		"Talent des Magiers aber auch viel länger.",
-		"ZAUBERE \"Runen des Schutzes\" [BURG <Burg-nr> | GEBÄUDE <Gebäude-Nr> | "
-		"SCHIFF <Schiff-Nr>]",
-		"kc",
-	 M_ASTRAL, (ONSHIPCAST | TESTRESISTANCE), 2, 8,
-	 {
-			{R_AURA, 20, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_magicrunes, patzer
-	},
-
-
-	{SPL_REDUCESHIELD, "Schild des Fisches",
-		"Dieser Zauber vermag dem Gegner ein geringfügig versetztes Bild der "
-		"eigenen Truppen vorzuspiegeln, so wie der Fisch im Wasser auch nicht "
-		"dort ist wo er zu sein scheint. Von jedem Treffer kann so die Hälfte "
-		"des Schadens unschädlich abgeleitet werden. Doch hält der Schild nur "
-		"einige Hundert Schwerthiebe aus, danach wird er sich auflösen. "
-		"Je stärker der Magier, desto mehr Schaden hält der Schild aus.",
-		NULL,
-		NULL,
-	 M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 2, 8,
-	 {
-			{R_AURA, 4, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_reduceshield, patzer
-	},
-
-	{SPL_SPEED, "Beschleunigung",
-		"Dieser Zauber beschleunigt einige Kämpfer auf der eigenen Seite "
-		"so, dass sie während des gesamten Kampfes in einer Kampfrunde zweimal "
-		"angreifen können.",
-		NULL,
-		NULL,
-	 M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 5, 9,
-	 {
-			{R_AURA, 5, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_speed, patzer
-	},
-
-	{SPL_ARTEFAKT_OF_POWER, "Erschaffe einen Ring der Macht",
-		"Dieses mächtige Ritual erschafft einen Ring der Macht. Ein Ring "
-		"der Macht erhöht die Stärke jedes Zaubers, den sein Träger zaubert, "
-		"als wäre der Magier eine Stufe besser.",
-		NULL,
-		NULL,
-		M_ASTRAL, (ONSHIPCAST), 5, 9,
-		{
-			{R_AURA, 100, SPC_FIX},
-			{R_SILVER, 4000, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_createitem_power, patzer_createitem
-	},
-
-	{SPL_VIEWREALITY, "Blick in die Realität",
-	 "Der Magier kann mit Hilfe dieses Zaubers aus der Astral- in die "
-	 "materielle Ebene blicken und die Regionen und Einheiten genau "
-	 "erkennen.",
-		NULL,
-		NULL,
-	 M_ASTRAL, (0), 5, 10,
-	 {
-			{R_AURA, 40, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_viewreality, patzer
-	},
-
-	{SPL_BAG_OF_HOLDING, "Erschaffe einen Beutel des Negativen Gewichts",
-	 "Dieser Beutel umschließt eine kleine Dimensionsfalte, in der bis "
-	 "zu 200 Gewichtseinheiten transportiert werden können, ohne dass "
-   "sie auf das Traggewicht angerechnet werden.  Pferde und andere "
-   "Lebewesen sowie besonders sperrige Dinge (Wagen und Katapulte) können "
-   "nicht in dem Beutel transportiert werden.  Auch ist es nicht möglich, "
-   "einen Zauberbeutel in einem anderen zu transportieren.  Der Beutel "
-   "selber wiegt 1 GE.",
-		NULL,
-		NULL,
-	 M_ASTRAL, (ONSHIPCAST), 5, 10,
-	 {
-			{R_AURA, 30, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-		 {R_SILVER, 5000, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_create_bag_of_holding, patzer
-	},
-
-	{SPL_SPEED2, "Zeitdehnung",
-		"Diese praktische Anwendung des theoretischen Wissens um Raum und Zeit "
-		"ermöglicht es, den Zeitfluß für einige Personen zu verändern. Auf "
-		"diese Weise veränderte Personen bekommen für einige Wochen doppelt "
-		"soviele Bewegungspunkte und doppelt soviele Angriffe pro Runde.",
-		NULL,
-		"u+",
-	 M_ASTRAL, (UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE), 5, 11,
-	 {
-			{R_AURA, 5, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_speed2, patzer
-	},
-
-	{SPL_ARMORSHIELD, "Rüstschild",
-		"Diese vor dem Kampf zu zaubernde Ritual gibt den eigenen Truppen "
-		"einen zusätzlichen Bonus auf ihre Rüstung. Jeder Treffer "
-		"reduziert die Kraft des Zaubers, so dass der Schild sich irgendwann "
-		"im Kampf auflösen wird.",
-		NULL,
-		NULL,
-	 M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 2, 12,
-	 {
-			{R_AURA, 4, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_armorshield, patzer
-	},
-
-	{SPL_TYBIED_FAMILIAR, "Vertrauten rufen",
-		"Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein "
-		"ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem "
-		"Magier anschließen wird.",
-		NULL,
-		NULL,
-	 M_ASTRAL, (NOTFAMILIARCAST), 5, 12,
-	 {
-			{R_AURA, 100, SPC_FIX},
-		 {R_PERMAURA, 5, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_summon_familiar, patzer
-	},
-
-	{SPL_MOVECASTLE, "Belebtes Gestein",
-		"Dieses kräftezehrende Ritual beschwört mit Hilfe einer Kugel aus "
-		"konzentriertem Laen einen gewaltigen Erdelementar und bannt ihn "
-		"in ein Gebäude. Dem Elementar kann dann befohlen werden, das "
-		"Gebäude mitsamt aller Bewohner in eine Nachbarregion zu tragen. "
-		"Die Stärke des beschworenen Elementars hängt vom Talent des "
-		"Magiers ab: Der Elementar kann maximal [Stufe-12]*250 Größeneinheiten "
-		"große Gebäude versetzen. Das Gebäude wird diese Prozedur nicht "
-		"unbeschädigt überstehen.",
-		"ZAUBER [STUFE n] \"Belebtes Gestein\" <Burg-Nr> <Richtung>",
-		"bc",
-		M_ASTRAL,
-		(SPELLLEVEL | BUILDINGSPELL | ONETARGET | TESTRESISTANCE),
-		5, 13,
-		{
-			{R_AURA, 10, SPC_LEVEL},
-			{R_PERMAURA, 1, SPC_FIX},
-			{R_EOG, 5, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_movecastle, patzer
-	},
-
-	{SPL_DISRUPTASTRAL, "Störe Astrale Integrität",
-	 "Dieser Zauber bewirkt eine schwere Störung des Astralraums. Innerhalb "
-	 "eines astralen Radius von Stufe/5 Regionen werden alle Astralwesen, "
-	 "die dem Zauber nicht wiederstehen können, aus der astralen Ebene "
-	 "geschleudert. Der astrale Kontakt mit allen betroffenen Regionen ist "
-	 "für Stufe/3 Wochen gestört.",
-		NULL,
-		NULL,
-	 M_ASTRAL, (REGIONSPELL), 4, 14,
-	 {
-			{R_AURA, 140, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_disruptastral, patzer
-	},
-
-	{SPL_PERMTRANSFER, "Opfere Kraft",
-	 "Mit Hilfe dieses Zaubers kann der Magier einen Teil seiner magischen "
-	 "Kraft permanent auf einen anderen Magier übertragen. Auf einen Tybied-"
-	 "Magier kann er die Hälfte der eingesetzten Kraft übertragen, auf einen "
-	 "Magier eines anderen Gebietes ein Drittel.",
-	 "ZAUBERE \"Opfere Kraft\" <Einheit-Nr> <Aura>",
-		"ui",
-	 M_ASTRAL, (UNITSPELL|ONETARGET), 1, 15,
-	 {
-			{R_AURA, 100, SPC_FIX},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_permtransfer, patzer
-	},
-
-/* M_GRAU */
-/*  Definitionen von Create_Artefaktsprüchen		    */
-
-	{SPL_ARTEFAKT_OF_AURAPOWER, "Erschaffe einen Fokus",
-	 "Der auf diesem Gegenstand liegende Zauber erleichtert es dem "
-	 "Zauberers enorm größere Mengen an Aura zu beherrschen.",
-		NULL,
-		NULL,
-	 M_GRAU, (ONSHIPCAST), 5, 9,
-	 {
-			{R_AURA, 100, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_createitem_aura, patzer_createitem
-	},
-
-	{SPL_ARTEFAKT_OF_REGENERATION, "Regeneration",
-	 "Der auf diesem Gegenstand liegende Zauber saugt die diffusen "
-	 "magischen Energien des Lebens aus der Umgebung auf und läßt sie "
-	 "seinem Träger zukommen.",
-		NULL,
-		NULL,
-	 M_GRAU, (ONSHIPCAST), 5, 9,
-	 {
-			{R_AURA, 100, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_createitem_regeneration, patzer_createitem
-	},
-
-	{SPL_ARTEFAKT_CHASTITYBELT, "Erschaffe ein Amulett der Keuschheit",
-		"Dieses Amulett in Gestalt einer orkischen Matrone unterdrückt den "
-		"Fortpflanzungstrieb eines einzelnen Orks sehr zuverlässig. Ein Ork "
-		"mit Amulett der Keuschheit wird sich nicht mehr vermehren.",
-		NULL,
-		NULL,
-		M_GRAU, (ONSHIPCAST), 5, 7,
-		{
-			{R_AURA, 50, SPC_FIX},
-			{R_SILVER, 3000, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_createitem_chastitybelt, patzer_createitem
-	},
-
-	{SPL_METEORRAIN, "Meteorregen",
-		"Ein Schauer von Meteoren regnet über das Schlachtfeld.",
-		NULL,
-		NULL,
-		M_GRAU, (COMBATSPELL | SPELLLEVEL), 5, 3,
-		{
-			{R_AURA, 1, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_kampfzauber, patzer
-	},
-
-	{SPL_ARTEFAKT_RUNESWORD, "Erschaffe ein Runenschwert",
-		"Mit diesem Spruch erzeugt man ein Runenschwert. Die Klinge des "
-		"schwarzen "
-		"Schwertes ist mit alten, magischen Runen verziert, und ein seltsames "
-		"Eigenleben erfüllt die warme Klinge. Um es zu benutzen, muss man "
-		"ein Schwertkämpfer von beachtlichem Talent (7) sein. "
-		"Der Träger des Runenschwertes erhält einen Talentbonus von +4 im Kampf "
-		"und wird so gut wie immun gegen alle Formen von Magie.",
-		NULL,
-		NULL,
-		M_GRAU, (ONSHIPCAST), 5, 6,
-		{
-			{R_AURA, 100, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{R_SILVER, 1000, SPC_FIX},
-			{R_EOGSWORD, 1, SPC_FIX},
-			{0, 0, 0}},
-		(spell_f)sp_createitem_runesword, patzer_createitem
-	},
-
-	{SPL_BECOMEWYRM, "Wyrmtransformation",
-		"Mit Hilfe dieses Zaubers kann sich der Magier permanent in einen "
-		"mächtigen Wyrm verwandeln. Der Magier behält seine Talente und "
-		"Möglichkeiten, bekommt jedoch die Kampf- und Bewegungseigenschaften "
-		"eines Wyrms. Der Odem des Wyrms wird sich mit steigendem Magie-Talent "
-		"verbessern. Der Zauber ist sehr kraftraubend und der Wyrm wird einige "
-		"Zeit brauchen, um sich zu erholen.",
-		NULL,
-		NULL,
-		M_GRAU, 0, 5, 1,
-		{
-			{R_AURA, 1, SPC_FIX},
-			{R_PERMAURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_becomewyrm, patzer
-	},
-
-	/* Monstersprüche */
-
-	{ SPL_FIREDRAGONODEM, "Feuriger Drachenodem",
-		"Verbrennt die Feinde",
-		NULL,
-		NULL,
-		M_GRAU, (COMBATSPELL), 5, 3,
-		{
-			{R_AURA, 1, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_dragonodem, patzer
-	},
-
-	{ SPL_DRAGONODEM, "Eisiger Drachenodem",
-		"Tötet die Feinde",
-		NULL,
-		NULL,
-		M_GRAU, (COMBATSPELL), 5, 6,
-		{
-			{R_AURA, 2, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_dragonodem, patzer
-	},
-
-	{ SPL_WYRMODEM, "Großer Drachenodem",
-		"Verbrennt die Feinde",
-		NULL,
-		NULL,
-		M_GRAU, (COMBATSPELL), 5, 12,
-		{
-			{R_AURA, 3, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_dragonodem, patzer
-	},
-
-	{ SPL_DRAINODEM, "Schattenodem",
-		"Entzieht Talentstufen und macht Schaden wie Großer Odem",
-		NULL,
-		NULL,
-		M_GRAU, (COMBATSPELL), 5, 12,
-		{
-			{R_AURA, 4, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_dragonodem, patzer
-	},
-
-	{SPL_AURA_OF_FEAR, "Furchteinflößende Aura",
-		"Panik",
-		NULL,
-		NULL,
-		M_GRAU, (COMBATSPELL), 5, 12,
-		{
-			{R_AURA, 1, SPC_LEVEL},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-	 (spell_f)sp_flee, patzer
-	},
-
-	{SPL_SHADOWCALL, "Schattenruf",
-		"Ruft Schattenwesen.",
-		NULL,
-		NULL,
-	 M_GRAU, (PRECOMBATSPELL), 5, 12,
-	 {
-		 {R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_shadowcall, patzer
-	},
-
-	{SPL_IMMOLATION, "Feuersturm",
-		"Verletzt alle Gegner.",
-		NULL,
-		NULL,
-	 M_GRAU, (COMBATSPELL), 5, 12,
-	 {
-		 {R_AURA, 2, SPC_LEVEL},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0},
-		 {0, 0, 0}},
-	 (spell_f)sp_immolation, patzer
-	},
-
-	{ SPL_FIREODEM, "Feuerwalze",
-		"Tötet die Feinde",
-		NULL,
-		NULL,
-		M_GRAU, (COMBATSPELL), 5, 8,
-		{
-			{R_AURA, 2, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_immolation, patzer
-	},
-	{ SPL_ICEODEM, "Eisnebel",
-		"Tötet die Feinde",
-		NULL,
-		NULL,
-		M_GRAU, (COMBATSPELL), 5, 8,
-		{
-			{R_AURA, 2, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_immolation, patzer
-	},
-	{ SPL_ACIDODEM, "Säurenebel",
-		"Tötet die Feinde",
-		NULL,
-		NULL,
-		M_GRAU, (COMBATSPELL), 5, 8,
-		{
-			{R_AURA, 2, SPC_FIX},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0},
-			{0, 0, 0}},
-		(spell_f)sp_immolation, patzer
-	},
-
-#ifdef WDW_PYRAMIDSPELL
-	{SPL_WDWPYRAMID_TRAUM, "Traum von den Göttern",
-	 "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
-	 "Region für den Pyramidenbau geeignet ist.",
-		NULL,
-		NULL,
-		M_TRAUM, (0), 5, 4,
-	 {
-		{R_AURA, 2, SPC_FIX},
-		{R_PLAIN_3, 1, SPC_FIX},
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0}},
-	 (spell_f)sp_wdwpyramid, patzer
-	},
-	
-	{SPL_WDWPYRAMID_ASTRAL, "Göttliches Netz",
-	 "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
-	 "Region für den Pyramidenbau geeignet ist.",
-		NULL,
-		NULL,
-		M_ASTRAL, (0), 5, 3,
-	 {
-		{R_AURA, 4, SPC_FIX},
-		{R_WISE, 1, SPC_FIX},
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0}},
-	 (spell_f)sp_wdwpyramid, patzer
-	},
-	
-	{SPL_WDWPYRAMID_DRUIDE, "Kraft der Natur",
-	 "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
-	 "Region für den Pyramidenbau geeignet ist.",
-		NULL,
-		NULL,
-		M_DRUIDE, (0), 5, 5,
-	 {
-		{R_AURA, 3, SPC_FIX},
-		{R_MALLORN, 5, SPC_FIX},
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0}},
-	 (spell_f)sp_wdwpyramid, patzer
-	},
-	
-	{SPL_WDWPYRAMID_BARDE, "Gesang der Götter",
-	 "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
-	 "Region für den Pyramidenbau geeignet ist.",
-		NULL,
-		NULL,
-		M_BARDE, (0), 5, 4,
-	 {
-		{R_AURA, 2, SPC_FIX},
-		{R_HIGHLAND_3, 1, SPC_FIX},
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0}},
-	 (spell_f)sp_wdwpyramid, patzer
-	},
-	
-	{SPL_WDWPYRAMID_CHAOS, "Göttliche Macht",
-	 "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
-	 "Region für den Pyramidenbau geeignet ist.",
-		NULL,
-		NULL,
-		M_CHAOS, (0), 5, 5,
-	 {
-		{R_AURA, 1, SPC_FIX},
-		{R_PERMAURA, 1, SPC_FIX},
-		{0, 0, 0},
-		{0, 0, 0},
-		{0, 0, 0}},
-	 (spell_f)sp_wdwpyramid, patzer
-	},
-#endif
-
-/* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein*/
-
-	{SPL_NOSPELL, "Keiner", NULL, NULL, NULL, 0, 0, 0, 0,
-	 {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}},
-	 NULL, NULL
-	}
+  spell_list * slist = malloc(sizeof(spell_list));
+  slist->next = spells;
+  slist->data = sp;
+}
+
+/* ------------------------------------------------------------- */
+/* Spruch identifizieren */
+
+typedef struct spell_names {
+  struct spell_names * next;
+  const struct locale * lang;
+  magic_t mtype;
+  struct tnode names;
+} spell_names;
+
+static spell_names * spellnames;
+
+static spell_names *
+init_spellnames(const struct locale * lang, magic_t mtype)
+{
+  spell_list * slist;
+  spell_names * sn = calloc(sizeof(spell_names), 1);
+  sn->next = spellnames;
+  sn->lang = lang;
+  sn->mtype = mtype;
+  for (slist=spells;slist!=NULL;slist=slist->next) {
+    spell * sp = slist->data;
+    const char * n = sp->sname;
+    if (sp->magietyp!=mtype) continue;
+    if (sp->info==NULL) n = locale_string(lang, mkname("spell", n));
+    addtoken(&sn->names, n, (void*)sp);
+  }
+  return spellnames = sn;
+}
+
+static spell_names *
+get_spellnames(const struct locale * lang, magic_t mtype)
+{
+  spell_names * sn = spellnames;
+  while (sn) {
+    if (sn->mtype==mtype && sn->lang==lang) break;
+    sn=sn->next;
+  }
+  if (!sn) return init_spellnames(lang, mtype);
+  return sn;
+}
+
+static spell * 
+find_spellbyname_i(unit *u, const char *name, const struct locale * lang)
+{
+  spell_ptr *spt;
+  sc_mage * m = get_mage(u);
+  spell * sp = NULL;
+  spell_names * sn;
+
+  if (m==NULL) return NULL;
+  sn = get_spellnames(lang, m->magietyp);
+  if (findtoken(&sn->names, name, (void**)&sp)==E_TOK_NOMATCH) {
+    magic_t mtype;
+    for (mtype=0;mtype!=MAXMAGIETYP;++mtype) {
+      sn = get_spellnames(lang, mtype);
+      if (findtoken(&sn->names, name, (void**)&sp)!=E_TOK_NOMATCH) break;
+    }
+  }
+
+  if (sp!=NULL) {
+    for (spt = m->spellptr; spt; spt = spt->next) {
+      if (sp->id==spt->spellid) return sp;
+    }
+  }
+  if (lang==default_locale) return NULL;
+  return find_spellbyname_i(u, name, default_locale);
+}
+
+spell *
+find_spellbyname(unit *u, const char *name, const struct locale * lang)
+{
+  spell * sp = find_spellbyname_i(u, name, lang);
+  if (sp==NULL) {
+    log_warning(("cannot find spell by name: %s\n", name));
+  }
+  return sp;
+}
+
+spell *
+find_spellbyid(spellid_t id)
+{
+  spell_list * slist;
+
+  for (slist=spells;slist!=NULL;slist=slist->next) {
+    spell* sp = slist->data;
+    if (sp->id == id) return sp;
+  }
+  log_error(("cannot find spell by id: %u\n", id));
+  return NULL;
+}
+
+static spell spelldaten[] =
+{
+  /* M_DRUIDE */
+  {
+    SPL_BLESSEDHARVEST, "blessedharvest", NULL, NULL, NULL,
+    M_DRUIDE,
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL),
+    5, 1,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_blessedharvest,
+    patzer
+  },
+  {
+    SPL_GWYRRD_EARN_SILVER, "gwyrrdearnsilver", NULL,
+    NULL, NULL,
+    M_DRUIDE,
+    (SPELLLEVEL|ONSHIPCAST),
+    5, 1,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_earn_silver,
+    patzer
+  },
+  {
+    SPL_STONEGOLEM, "stonegolem", NULL, NULL, NULL,
+    M_DRUIDE, (SPELLLEVEL), 4, 1,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { R_STONE, 1, SPC_LEVEL },
+      { R_TREES, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_create_stonegolem, patzer
+  },
+  {
+    SPL_IRONGOLEM, "irongolem", NULL, NULL, NULL,
+    M_DRUIDE, (SPELLLEVEL), 4, 2,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { R_IRON, 1, SPC_LEVEL },
+      { R_TREES, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_create_irongolem, patzer
+  },
+  {
+    SPL_TREEGROW, "treegrow", NULL, NULL, NULL,
+    M_DRUIDE,
+    (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
+    5, 2,
+    {
+      { R_AURA, 4, SPC_LEVEL },
+      { R_WOOD, 1, SPC_LEVEL },
+      { R_TREES, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_hain, patzer_ents
+  },
+  {
+    SPL_RUSTWEAPON, "rustweapon", NULL, NULL,
+    "u+",
+    M_DRUIDE,
+    (FARCASTING | SPELLLEVEL | UNITSPELL | TESTCANSEE | TESTRESISTANCE),
+    5, 3,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_rosthauch, patzer
+  },
+  {
+    SPL_KAELTESCHUTZ, "kaelteschutz", NULL, NULL,
+    "u+",
+    M_DRUIDE,
+    (UNITSPELL | SPELLLEVEL | TESTCANSEE | ONSHIPCAST),
+    5, 3,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_kaelteschutz, patzer
+  },
+  {
+    SPL_HAGEL, "hagel", NULL, NULL, NULL,
+    M_DRUIDE, (COMBATSPELL|SPELLLEVEL), 5, 3,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_kampfzauber, patzer
+  },
+  {
+    SPL_IRONKEEPER, "ironkeeper", NULL, NULL, NULL,
+    M_DRUIDE,
+    (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
+    5, 3,
+    {
+      { R_AURA, 3, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_ironkeeper, patzer
+  },
+  {
+    SPL_MAGICSTREET, "magicstreet", NULL,
+    "ZAUBERE \'Magischer Pfad\' <Richtung>",
+    "c",
+    M_DRUIDE,
+    (FARCASTING | SPELLLEVEL | REGIONSPELL | ONSHIPCAST | TESTRESISTANCE),
+    5, 4,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { R_STONE, 1, SPC_FIX },
+      { R_WOOD, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_magicstreet, patzer
+  },
+  {
+    SPL_WINDSHIELD, "windshield", NULL, NULL, NULL,
+    M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_windshield, patzer
+  },
+  {
+    SPL_MALLORNTREEGROW, "mallorntreegrow", NULL, NULL, NULL,
+    M_DRUIDE,
+    (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
+    5, 4,
+    {
+      { R_AURA, 6, SPC_LEVEL },
+      { R_MALLORN, 1, SPC_LEVEL },
+      { R_TREES, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_mallornhain, patzer_ents
+  },
+  { SPL_GOODWINDS, "goodwinds", NULL, NULL,
+    "s",
+    M_DRUIDE,
+    (SHIPSPELL|ONSHIPCAST|SPELLLEVEL|ONETARGET|TESTRESISTANCE),
+    5, 4,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_goodwinds, patzer
+  },
+  {
+    SPL_HEALING, "healing", NULL, NULL, NULL,
+    M_DRUIDE, (POSTCOMBATSPELL | SPELLLEVEL), 5, 5,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_healing, patzer
+  },
+  {
+    SPL_REELING_ARROWS, "reelingarrows", NULL, NULL, NULL,
+    M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 5,
+    {
+      { R_AURA, 15, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_reeling_arrows, patzer
+  },
+  {
+    SPL_GWYRRD_FUMBLESHIELD, "gwyrrdfumbleshield", NULL, NULL, NULL,
+    M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 2, 5,
+    {
+      { R_AURA, 5, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_fumbleshield, patzer
+  },
+  {
+    SPL_TRANSFERAURA_DRUIDE, "transferauradruide", NULL,
+    "ZAUBERE \'Meditation\' <Einheit-Nr> <investierte Aura>",
+    "ui",
+    M_DRUIDE, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 6,
+    {
+      { R_AURA, 2, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_transferaura, patzer
+  },
+  {
+    SPL_EARTHQUAKE, "earthquake", NULL, NULL, NULL,
+    M_DRUIDE, (FARCASTING|REGIONSPELL|TESTRESISTANCE), 5, 6,
+    {
+      { R_AURA, 25, SPC_FIX },
+      { R_EOG, 2, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_earthquake, patzer
+  },
+  {
+    SPL_STORMWINDS, "stormwinds", NULL, NULL,
+    "s+",
+    M_DRUIDE,
+    (SHIPSPELL | ONSHIPCAST | OCEANCASTABLE | TESTRESISTANCE | SPELLLEVEL),
+    5, 6,
+    {
+      { R_AURA, 6, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_stormwinds, patzer
+  },
+  {
+    SPL_TRUESEEING_GWYRRD, "trueseeinggwyrrd", NULL, NULL, NULL,
+    M_DRUIDE, (ONSHIPCAST), 5, 6,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_SILVER, 3000, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_trueseeing, patzer_createitem
+  },
+  {
+    SPL_INVISIBILITY_GWYRRD, "invisibilitygwyrrd", NULL, NULL, NULL,
+    M_DRUIDE, (ONSHIPCAST), 5, 6,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_SILVER, 3000, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_invisibility, patzer_createitem
+  },
+  {
+    SPL_HOMESTONE, "homestone", NULL, NULL, NULL,
+    M_DRUIDE, (0), 5, 7,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_homestone, patzer
+  },
+  {
+    SPL_WOLFHOWL, "wolfhowl", NULL, NULL, NULL,
+    M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL ), 5, 7,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_wolfhowl, patzer
+  },
+  {
+    SPL_VERSTEINERN, "versteinern", NULL, NULL, NULL,
+    M_DRUIDE, (COMBATSPELL | SPELLLEVEL), 5, 8,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_versteinern, patzer
+  },
+  {
+    SPL_STRONG_WALL, "strongwall", NULL, NULL, NULL,
+    M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_strong_wall, patzer
+  },
+  {
+    SPL_GWYRRD_DESTROY_MAGIC, "gwyrrddestroymagic", NULL,
+    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' REGIONn"
+    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' EINHEIT <Einheit-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' BURG <Burg-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' GEBÄUDE <Gebäude-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Geister bannen\' SCHIFF <Schiff-Nr>",
+    "kc",
+    M_DRUIDE,
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
+    2, 8,
+    {
+      { R_AURA, 6, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_destroy_magic, patzer
+  },
+  {
+    SPL_TREEWALKENTER, "treewalkenter", NULL, NULL,
+    "u+",
+    M_DRUIDE, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 7, 9,
+    {
+      { R_AURA, 3, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_treewalkenter, patzer
+  },
+  {
+    SPL_TREEWALKEXIT, "treewalkexit", NULL,
+    "ZAUBERE \'Sog des Lebens\' <Ziel-X> <Ziel-Y> <Einheit> [<Einheit> ..]",
+    "ru+",
+    M_DRUIDE, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 7, 9,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_treewalkexit, patzer
+  },
+  {
+    SPL_HOLYGROUND, "holyground", NULL, NULL, NULL,
+    M_DRUIDE, (0), 5, 9,
+    {
+      { R_AURA, 80, SPC_FIX },
+      { R_PERMAURA, 3, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_holyground, patzer
+  },
+  {
+    SPL_ARTEFAKT_SACK_OF_CONSERVATION, "artefaktsackofconservation", NULL, NULL, NULL,
+    M_DRUIDE, (ONSHIPCAST), 5, 5,
+    {
+      { R_AURA, 30, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { R_TREES, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_create_sack_of_conservation, patzer
+  },
+  {
+    SPL_SUMMONENT, "summonent", NULL, NULL, NULL,
+    M_DRUIDE, (SPELLLEVEL), 5, 10,
+    {
+      { R_AURA, 6, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_summonent, patzer
+  },
+  {
+    SPL_GWYRRD_FAMILIAR, "gwyrrdfamiliar", NULL, NULL, NULL,
+    M_DRUIDE, (NOTFAMILIARCAST), 5, 10,
+    {
+      { R_AURA, 100, SPC_FIX },
+      { R_PERMAURA, 5, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_summon_familiar, patzer
+  },
+  {
+    SPL_BLESSSTONECIRCLE, "blessstonecircle", NULL, NULL,
+    "b",
+    M_DRUIDE, (BUILDINGSPELL | ONETARGET), 5, 11,
+    {
+      { R_AURA, 350, SPC_FIX },
+      { R_PERMAURA, 5, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_blessstonecircle, patzer
+  },
+  {
+    SPL_GWYRRD_ARMORSHIELD, "Rindenhaut",
+    "Diese vor dem Kampf zu zaubernde Ritual gibt den eigenen Truppen "
+    "einen zusätzlichen Bonus auf ihre Rüstung. Jeder Treffer "
+    "reduziert die Kraft des Zaubers, so das der Schild sich irgendwann "
+    "im Kampf auflösen wird.", NULL, NULL,
+    M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 2, 12,
+    {
+      { R_AURA, 4, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_armorshield, patzer
+  },
+  {
+    SPL_DROUGHT, "Beschwörung eines Hitzeelementar",
+    "Dieses Ritual beschwört wütende Elementargeister der Hitze. "
+    "Eine Dürre sucht das Land heim. Bäume verdorren, Tiere verenden, "
+    "und die Ernte fällt aus. Für Tagelöhner gibt es kaum noch Arbeit "
+    "in der Landwirtschaft zu finden.", NULL, NULL,
+    M_DRUIDE, (FARCASTING|REGIONSPELL|TESTRESISTANCE), 5, 13,
+    {
+      { R_AURA, 600, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_drought, patzer
+  },
+  {
+    SPL_FOG_OF_CONFUSION, "Nebel der Verwirrung",
+    "Der Druide beschwört die Elementargeister des Nebels. Sie werden sich "
+    "für einige Zeit in der Umgebung festsetzen und sie mit dichtem Nebel "
+    "überziehen. Personen innerhalb des magischen Nebels verlieren die "
+    "Orientierung und haben große Schwierigkeiten, sich in eine bestimmte "
+    "Richtung zu bewegen.", NULL, NULL,
+    M_DRUIDE,
+    (FARCASTING|SPELLLEVEL),
+    5, 14,
+    {
+      { R_AURA, 8, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_fog_of_confusion, patzer
+  },
+  {
+    SPL_MAELSTROM, "Mahlstrom",
+    "Dieses Ritual beschört einen großen Wasserelementar aus den "
+    "Tiefen des Ozeans. Der Elementar erzeugt einen gewaltigen "
+    "Strudel, einen Mahlstrom, welcher alle Schiffe, die ihn passieren, "
+    "schwer beschädigen kann.", NULL, NULL,
+    M_DRUIDE,
+    (OCEANCASTABLE | ONSHIPCAST | REGIONSPELL | TESTRESISTANCE),
+    5, 15,
+    {
+      { R_AURA, 200, SPC_FIX },
+      { R_SEASERPENTHEAD, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_maelstrom, patzer
+  },
+  {
+    SPL_MALLORN, "Wurzeln der Magie",
+    "Mit Hilfe dieses aufwändigen Rituals läßt der Druide einen Teil seiner "
+    "dauerhaft in den Boden und die Wälder der Region fliessen. Dadurch wird "
+    "das Gleichgewicht der Natur in der Region für immer verändert, und in "
+    "Zukunft werden nur noch die anspruchsvollen, aber kräftigen "
+    "Mallorngewächse in der Region gedeihen.", NULL, NULL,
+    M_DRUIDE,
+    (FARCASTING | REGIONSPELL | TESTRESISTANCE),
+    5, 16,
+    {
+      { R_AURA, 250, SPC_FIX },
+      { R_PERMAURA, 10, SPC_FIX },
+      { R_TOADSLIME, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_mallorn, patzer
+  },
+  {
+    SPL_GREAT_DROUGHT, "Tor in die Ebene der Hitze",
+    "Dieses mächtige Ritual öffnet ein Tor in die Elementarebene der "
+    "Hitze. Eine grosse Dürre kommt über das Land. Bauern, Tiere und "
+    "Pflanzen der Region kämpfen um das nackte Überleben, aber eine "
+    "solche Dürre überlebt wohl nur die Hälfte aller Lebewesen. "
+    "Der Landstrich kann über Jahre hinaus von den Folgen einer "
+    "solchen Dürre betroffen sein.", NULL, NULL,
+    M_DRUIDE,
+    (FARCASTING | REGIONSPELL | TESTRESISTANCE),
+    5, 17,
+    {
+      { R_AURA, 800, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_great_drought, patzer
+  },
+  /* M_CHAOS */
+  {
+    SPL_SPARKLE_CHAOS, "sparklechaos", NULL, NULL,
+    "u",
+    M_CHAOS, (UNITSPELL | TESTCANSEE | SPELLLEVEL | ONETARGET), 5, 1,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_sparkle, patzer
+  },
+  {
+    SPL_DRAIG_EARN_SILVER, "draigearnsilver", NULL,
+    NULL,
+    NULL,
+    M_CHAOS, (SPELLLEVEL|ONSHIPCAST), 5, 1,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_earn_silver, patzer
+  },
+  {
+    SPL_FIREBALL, "fireball", NULL, NULL, NULL,
+    M_CHAOS, (COMBATSPELL | SPELLLEVEL), 5, 2,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_kampfzauber, patzer
+  },
+  {
+    SPL_MAGICBOOST, "magicboost", NULL, NULL, NULL,
+    M_CHAOS, (ONSHIPCAST), 3, 3,
+    {
+      { R_AURA, 2, SPC_LINEAR },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_magicboost, patzer
+  },
+  {
+    SPL_BLOODSACRIFICE, "bloodsacrifice", NULL, NULL, NULL,
+    M_CHAOS, (ONSHIPCAST), 1, 4,
+    {
+      { R_HITPOINTS, 4, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_bloodsacrifice, patzer
+  },
+  {
+    SPL_BERSERK, "berserk", NULL, NULL, NULL,
+    M_CHAOS, (PRECOMBATSPELL | SPELLLEVEL), 4, 5,
+    {
+      { R_AURA, 5, SPC_LEVEL },
+      { R_PEASANTS, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_berserk, patzer
+  },
+  {
+    SPL_FUMBLECURSE, "fumblecurse", NULL, NULL,
+    "u",
+    M_CHAOS,
+    (UNITSPELL | SPELLLEVEL | ONETARGET | TESTCANSEE | TESTRESISTANCE),
+    4, 5,
+    {
+      { R_AURA, 4, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_fumblecurse, patzer_fumblecurse
+  },
+  {
+    SPL_SUMMONUNDEAD, "summonundead", NULL, NULL, NULL,
+    M_CHAOS, (SPELLLEVEL | FARCASTING | ONSHIPCAST),
+    5, 6,
+    {
+      { R_AURA, 5, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_summonundead, patzer_peasantmob
+  },
+  {
+    SPL_COMBATRUST, "combatrust", NULL, NULL, NULL,
+    M_CHAOS, (COMBATSPELL | SPELLLEVEL), 5, 6,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_combatrosthauch, patzer
+  },
+  {
+    SPL_TRUESEEING_DRAIG, "trueseeingdraig", NULL, NULL, NULL,
+    M_CHAOS, (ONSHIPCAST), 5, 6,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_SILVER, 3000, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_trueseeing, patzer_createitem
+  },
+  {
+    SPL_INVISIBILITY_DRAIG, "invisibilitydraig", NULL, NULL, NULL,
+    M_CHAOS, (ONSHIPCAST), 5, 6,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_SILVER, 3000, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_invisibility, patzer_createitem
+  },
+  {
+    SPL_TRANSFERAURA_CHAOS, "tranferaurachaos", NULL,
+    "ZAUBERE \'Machtübertragung\' <Einheit-Nr> <investierte Aura>",
+    "ui",
+    M_CHAOS, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 7,
+    {
+      { R_AURA, 2, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_transferaura, patzer
+  },
+  {
+    SPL_FIREWALL, "firewall", NULL,
+    "ZAUBERE \'Feuerwand\' <Richtung>",
+    "c",
+    M_CHAOS, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 4, 7,
+    {
+      { R_AURA, 6, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_firewall, patzer_peasantmob
+  },
+  {
+    SPL_PLAGUE, "plague", NULL, NULL, NULL,
+    M_CHAOS,
+    (FARCASTING | REGIONSPELL | TESTRESISTANCE),
+    5, 7,
+    {
+      { R_AURA, 30, SPC_FIX },
+      { R_PEASANTS, 50, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_plague, patzer_peasantmob
+  },
+  {
+    SPL_CHAOSROW, "chaosrow", NULL, NULL, NULL,
+    M_CHAOS, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
+    {
+      { R_AURA, 3, SPC_LEVEL },
+      { R_PEASANTS, 10, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_chaosrow, patzer
+  },
+  {
+    SPL_SUMMONSHADOW, "summonshadow", NULL, NULL, NULL,
+    M_CHAOS, (SPELLLEVEL), 5, 8,
+    {
+      { R_AURA, 3, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_summonshadow, patzer_peasantmob
+  },
+  {
+    SPL_UNDEADHERO, "undeadhero", NULL, NULL, NULL,
+    M_CHAOS, (POSTCOMBATSPELL | SPELLLEVEL), 5, 9,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_undeadhero, patzer
+  },
+  {
+    SPL_STRENGTH, "strength", NULL, NULL, NULL,
+    M_CHAOS, (ONSHIPCAST), 5, 9,
+    {
+      { R_AURA, 20, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_create_trollbelt, patzer
+  },
+  {
+    SPL_AURALEAK, "auraleak", NULL, NULL, NULL,
+    M_CHAOS, (REGIONSPELL | TESTRESISTANCE), 3, 9,
+    {
+      { R_AURA, 35, SPC_FIX },
+      { R_DRACHENBLUT, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_auraleak, patzer
+  },
+  {
+    SPL_DRAIG_FUMBLESHIELD, "draigfumbleshield", NULL, NULL, NULL,
+    M_CHAOS, (PRECOMBATSPELL | SPELLLEVEL), 2, 9,
+    {
+      { R_AURA, 6, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_fumbleshield, patzer
+  },
+  {
+    SPL_FOREST_FIRE, "forestfire", NULL, NULL, NULL,
+    M_CHAOS, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 10,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_OIL, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_forest_fire, patzer_peasantmob
+  },
+  {
+    SPL_DRAIG_DESTROY_MAGIC, "draigdestroymagic", NULL,
+    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' REGIONn"
+    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' EINHEIT <Einheit-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' BURG <Burg-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' GEBÄUDE <Gebäude-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Pentagramm\' SCHIFF <Schiff-Nr>",
+    "kc",
+    M_CHAOS,
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
+    2, 10,
+    {
+      { R_AURA, 10, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_destroy_magic, patzer
+  },
+  {
+    SPL_UNHOLYPOWER, "unholypower", NULL, NULL,
+    "u+",
+    M_CHAOS, (UNITSPELL | SPELLLEVEL | TESTCANSEE), 5, 14,
+    {
+      { R_AURA, 10, SPC_LEVEL },
+      { R_PEASANTS, 5, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_unholypower, patzer
+  },
+  {
+    SPL_DEATHCLOUD, "deathcloud", NULL, NULL, NULL,
+    M_CHAOS, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
+    {
+      { R_AURA, 40, SPC_FIX },
+      { R_HITPOINTS, 15, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_deathcloud, patzer_peasantmob
+  },
+  {
+    SPL_SUMMONDRAGON, "summondragon", NULL, NULL, NULL,
+    M_CHAOS, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
+    {
+      { R_AURA, 80, SPC_FIX },
+      { R_DRAGONHEAD, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_summondragon, patzer_peasantmob
+  },
+  {
+    SPL_SUMMONSHADOWLORDS, "summonshadowlords", NULL, NULL, NULL,
+    M_CHAOS, (SPELLLEVEL), 5, 12,
+    {
+      { R_AURA, 7, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_summonshadowlords, patzer_peasantmob
+  },
+  {
+    SPL_FIRESWORD, "firesword", NULL, NULL, NULL,
+    M_CHAOS, (ONSHIPCAST), 5, 12,
+    {
+      { R_AURA, 100, SPC_FIX },
+      { R_BERSERK, 1, SPC_FIX },
+      { R_SWORD, 1, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_create_firesword, patzer
+  },
+  {
+    SPL_DRAIG_FAMILIAR, "draigfamiliar", NULL, NULL, NULL,
+    M_CHAOS, (NOTFAMILIARCAST), 5, 13,
+    {
+      { R_AURA, 100, SPC_FIX },
+      { R_PERMAURA, 5, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_summon_familiar, patzer
+  },
+  {
+    SPL_CHAOSSUCTION, "chaossuction", NULL, NULL, NULL,
+    M_CHAOS, (0), 5, 14,
+    {
+      { R_AURA, 150, SPC_FIX },
+      { R_PEASANTS, 200, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_chaossuction, patzer_peasantmob
+  },
+  /* M_TRAUM */
+  {
+    SPL_SPARKLE_DREAM, "sparkledream", NULL, NULL,
+    "u",
+    M_TRAUM,
+    (UNITSPELL | TESTCANSEE | SPELLLEVEL | ONETARGET | ONSHIPCAST),
+    5, 1,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_sparkle, patzer
+  },
+  {
+    SPL_ILLAUN_EARN_SILVER, "illaunearnsilver", NULL,
+    NULL,
+    NULL,
+    M_TRAUM, (SPELLLEVEL|ONSHIPCAST), 5, 1,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_earn_silver, patzer
+  },
+  {
+    SPL_SHADOWKNIGHTS, "shadowknights", NULL, NULL, NULL,
+    M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 4, 1,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_shadowknights, patzer
+  },
+  {
+    SPL_FLEE, "flee", NULL, NULL, NULL,
+    M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 5, 2,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_flee, patzer
+  },
+  {
+    SPL_PUTTOREST, "puttorest", NULL, NULL, NULL,
+    M_TRAUM, (SPELLLEVEL), 5, 2,
+    {
+      { R_AURA, 3, SPC_LEVEL },
+      { R_TREES, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_puttorest, patzer
+  },
+  {
+    SPL_ICASTLE, "icastle", NULL,
+    "ZAUBERE \'Traumschlößchen\' <Gebäude-Typ>",
+    "c",
+    M_TRAUM, (0), 5, 3,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_icastle, patzer
+  },
+  {
+    SPL_TRANSFERAURA_TRAUM, "transferauratraum", NULL,
+    "ZAUBERE \'Traum der Magie\' <Einheit-Nr> <investierte Aura>",
+    "ui",
+    M_TRAUM, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 3,
+    {
+      { R_AURA, 2, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_transferaura, patzer
+  },
+  {
+    SPL_ILL_SHAPESHIFT, "shapeshift", NULL,
+    "ZAUBERE [STUFE n] \'Gestaltwandlung\' <Einheit-nr> <Rasse>",
+    "uc",
+    M_TRAUM, (UNITSPELL|SPELLLEVEL|ONETARGET), 5, 3,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_illusionary_shapeshift, patzer
+  },
+  {
+    SPL_DREAMREADING, "dreamreading", NULL, NULL,
+    "u",
+    M_TRAUM, (FARCASTING | UNITSPELL | ONETARGET | TESTRESISTANCE), 5, 4,
+    {
+      { R_AURA, 8, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_dreamreading, patzer
+  },
+  {
+    SPL_TIREDSOLDIERS, "tiredsoldiers", NULL, NULL, NULL,
+    M_TRAUM, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
+    {
+      { R_AURA, 4, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_tiredsoldiers, patzer
+  },
+  {
+    SPL_REANIMATE, "reanimate", NULL, NULL, NULL,
+    M_TRAUM, (POSTCOMBATSPELL | SPELLLEVEL), 4, 5,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_reanimate, patzer
+  },
+  {
+    SPL_ANALYSEDREAM, "analysedream", NULL, NULL,
+    "u",
+    M_TRAUM, (UNITSPELL | ONSHIPCAST | ONETARGET | TESTCANSEE), 5, 5,
+    {
+      { R_AURA, 5, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_analysedream, patzer
+  },
+  {
+    SPL_DISTURBINGDREAMS, "disturbingdreams", NULL, NULL, NULL,
+    M_TRAUM, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 6,
+    {
+      { R_AURA, 18, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_disturbingdreams, patzer
+  },
+  {
+    SPL_TRUESEEING_ILLAUN, "trueseeingillaun", NULL, NULL, NULL,
+    M_TRAUM, (ONSHIPCAST), 5, 6,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_SILVER, 3000, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_trueseeing, patzer_createitem
+  },
+  {
+    SPL_INVISIBILITY_ILLAUN, "invisibilityillaun", NULL, NULL, NULL,
+    M_TRAUM, (ONSHIPCAST), 5, 6,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_SILVER, 3000, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_invisibility, patzer_createitem
+  },
+  {
+    SPL_SLEEP, "sleep", NULL, NULL, NULL,
+    M_TRAUM, (COMBATSPELL | SPELLLEVEL ), 5, 7,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_sleep, patzer
+  },
+  {
+    SPL_WISPS, "Irrlichter",
+    "Der Zauberer spricht eine Beschwörung über einen Teil der Region, "
+    "und in der Folgewoche entstehen dort Irrlichter. "
+    "Wer durch diese Nebel wandert, wird von Visionen geplagt und "
+    "in die Irre geleitet.",
+    "ZAUBERE [REGION x y] [STUFE n] \'Irrlichter\' <Richtung>",
+    "c",
+    M_TRAUM, (SPELLLEVEL | FARCASTING), 5, 7,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_wisps, patzer
+  },
+  {
+    SPL_READMIND, "readmind", NULL, NULL,
+    "u",
+    M_TRAUM, (UNITSPELL | ONETARGET), 5, 7,
+    {
+      { R_AURA, 20, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_readmind, patzer
+  },
+  {
+    SPL_GOODDREAMS, "gooddreams", NULL, NULL, NULL,
+    M_TRAUM,
+    (FARCASTING | REGIONSPELL | TESTRESISTANCE),
+    5, 8,
+    {
+      { R_AURA, 80, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_gooddreams, patzer
+  },
+  {
+    SPL_ILLAUN_DESTROY_MAGIC, "illaundestroymagic", NULL,
+    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' REGIONn"
+    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' EINHEIT <Einheit-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' BURG <Burg-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' GEBÄUDE <Gebäude-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Traumbilder entwirren\' SCHIFF <Schiff-Nr>",
+    "kc",
+    M_TRAUM,
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
+    2, 8,
+    {
+      { R_AURA, 6, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_destroy_magic, patzer
+  },
+  {
+    SPL_ILLAUN_FAMILIAR, "illaunfamiliar", NULL, NULL, NULL,
+    M_TRAUM, (NOTFAMILIARCAST), 5, 9,
+    {
+      { R_AURA, 100, SPC_FIX },
+      { R_PERMAURA, 5, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_summon_familiar, patzer
+  },
+  {
+    SPL_CLONECOPY, "Seelenkopie",
+    "Dieser mächtige Zauber kann einen Magier vor dem sicheren Tod "
+    "bewahren. Der Magier erschafft anhand einer kleinen Blutprobe einen "
+    "Klon von sich, und legt diesen in ein Bad aus Drachenblut und verdünntem "
+    "Wasser des Lebens. "
+    "Anschließend transferiert er in einem aufwändigen Ritual einen Teil "
+    "seiner Seele in den Klon. Stirbt der Magier, reist seine Seele in den "
+    "Klon und der erschaffene Körper dient nun dem Magier als neues Gefäß. "
+    "Es besteht allerdings eine geringer Wahrscheinlichkeit, dass die Seele "
+    "nach dem Tod zu schwach ist, das neue Gefäß zu erreichen.", NULL, NULL,
+    M_TRAUM, (NOTFAMILIARCAST), 5, 9,
+    {
+      { R_AURA, 100, SPC_FIX },
+      { R_PERMAURA, 20, SPC_FIX },
+      { R_DRACHENBLUT, 5, SPC_FIX },
+      { R_TREES, 5, SPC_FIX },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_clonecopy, patzer
+  },
+  {
+    SPL_BADDREAMS, "Schlechte Träume",
+    "Dieser Zauber ermöglicht es dem Träumer, den Schlaf aller nichtaliierten "
+    "Einheiten (HELFE BEWACHE) in der Region so stark zu stören, das sie "
+    "vorübergehend einen Teil ihrer Erinnerungen verlieren.", NULL, NULL,
+    M_TRAUM,
+    (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 10,
+    {
+      { R_AURA, 90, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_baddreams, patzer
+  },
+  {
+    SPL_MINDBLAST, "mindblast", NULL, NULL, NULL,
+    M_TRAUM, (COMBATSPELL | SPELLLEVEL), 5, 11,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_mindblast, patzer
+  },
+  {
+    SPL_ORKDREAM, "orkdream", NULL, NULL,
+    "u+",
+    M_TRAUM,
+    (UNITSPELL | TESTRESISTANCE | TESTCANSEE | SPELLLEVEL), 5, 12,
+    {
+      { R_AURA, 5, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_sweetdreams, patzer
+  },
+  { SPL_INVISIBILITY2_ILLAUN, "create_invisibility_sphere", NULL, NULL, NULL,
+    M_TRAUM, (ONSHIPCAST), 5, 13,
+    {
+      { R_AURA, 150, SPC_FIX },
+      { R_SILVER, 30000, SPC_FIX },
+      { R_PERMAURA, 3, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_invisibility2, patzer_createitem
+  },
+  {
+    SPL_CREATE_TACTICCRYSTAL, "create_tacticcrystal", NULL, NULL, NULL,
+    M_TRAUM, (ONSHIPCAST), 5, 14,
+    {
+      { R_PERMAURA, 5, SPC_FIX },
+      { R_DRAGONHEAD, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_create_tacticcrystal, patzer_createitem
+  },
+  {
+    SPL_SUMMON_ALP, "summon_alp", NULL, NULL, "u",
+    M_TRAUM,
+    (UNITSPELL | ONETARGET | SEARCHGLOBAL | TESTRESISTANCE),
+    5, 15,
+    {
+      { R_AURA, 350, SPC_FIX },
+      { R_PERMAURA, 5, SPC_FIX },
+      { R_SWAMP_3, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_summon_alp, patzer
+  },
+  {
+    SPL_DREAM_OF_CONFUSION, "dream_of_confusion", NULL, NULL, NULL,
+    M_TRAUM,
+    (FARCASTING | SPELLLEVEL),
+    5, 16,
+    {
+      { R_AURA, 7, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_dream_of_confusion, patzer
+  },
+  /* M_BARDE */
+  {
+    SPL_DENYATTACK, "appeasement", NULL, NULL, NULL,
+    M_BARDE, (PRECOMBATSPELL | SPELLLEVEL ), 5, 1,
+    {
+      { R_AURA, 2, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_denyattack, patzer
+  },
+  {
+    SPL_CERDDOR_EARN_SILVER, "jugglery", NULL, NULL, NULL,
+    M_BARDE, (SPELLLEVEL|ONSHIPCAST), 5, 1,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_earn_silver, patzer
+  },
+  {
+    SPL_HEALINGSONG, "song_of_healing", NULL, NULL, NULL,
+    M_BARDE, (POSTCOMBATSPELL | SPELLLEVEL), 5, 2,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_healing, patzer
+  },
+  {
+    SPL_GENEROUS, "generous", NULL, NULL, NULL,
+    M_BARDE,
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL | TESTRESISTANCE),
+    5, 2,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_generous, patzer
+  },
+  {
+    SPL_RAINDANCE, "raindance", NULL, NULL, NULL,
+    M_BARDE,
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL),
+    5, 3,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_blessedharvest, patzer
+  },
+  {
+    SPL_SONG_OF_FEAR, "song_of_fear", NULL, NULL, NULL,
+    M_BARDE, (COMBATSPELL | SPELLLEVEL), 5, 3,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_flee, patzer
+  },
+  {
+    SPL_RECRUIT, "courting", NULL, NULL, NULL,
+    M_BARDE, (SPELLLEVEL), 5, 4,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_recruit, patzer
+  },
+  {
+    SPL_SONG_OF_CONFUSION, "song_of_confusion", NULL, NULL, NULL,
+    M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 4,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_chaosrow, patzer
+  },
+  {
+    SPL_BABBLER, "blabbermouth", NULL, NULL, "u",
+    M_BARDE, (UNITSPELL | ONETARGET | TESTCANSEE), 5, 4,
+    {
+      { R_AURA, 10, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_babbler, patzer
+  },
+  {
+    SPL_HERO, "heroic_song", NULL, NULL, NULL,
+    M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 4, 5,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_hero, patzer
+  },
+  {
+    SPL_TRANSFERAURA_BARDE, "transfer_aura_song", NULL, NULL,
+    "ui",
+    M_BARDE, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 5,
+    {
+      { R_AURA, 2, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_transferaura, patzer
+  },
+  {
+    SPL_UNIT_ANALYSESONG, "analysesong_unit", NULL, NULL,
+    "u",
+    M_BARDE,
+    (UNITSPELL | ONSHIPCAST | ONETARGET | TESTCANSEE),
+    5, 5,
+    {
+      { R_AURA, 10, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_analysesong_unit, patzer
+  },
+  {
+    SPL_CERRDOR_FUMBLESHIELD, "fumbleshield", NULL, NULL, NULL,
+    M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 2, 5,
+    {
+      { R_AURA, 5, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_fumbleshield, patzer
+  },
+  { SPL_CALM_MONSTER, "Monster friedlich stimmen",
+    "Dieser einschmeichelnde Gesang kann fast jedes intelligente Monster "
+    "zähmen. Es wird von Angriffen auf den Magier absehen und auch seine "
+    "Begleiter nicht anrühren. Doch sollte man sich nicht täuschen, es "
+    "wird dennoch ein unberechenbares Wesen bleiben.", NULL,
+    "u",
+    M_BARDE,
+    (UNITSPELL | ONSHIPCAST | ONETARGET | TESTRESISTANCE | TESTCANSEE),
+    5, 6,
+    {
+      { R_AURA, 15, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_calm_monster, patzer
+  },
+  { SPL_SEDUCE, "Lied der Verführung",
+    "Mit diesem Lied kann eine Einheit derartig betört werden, so dass "
+    "sie dem Barden den größten Teil ihres Bargelds und ihres Besitzes "
+    "schenkt. Sie behält jedoch immer soviel, wie sie zum Überleben "
+    "braucht.", NULL,
+    "u",
+    M_BARDE,
+    (UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE),
+    5, 6,
+    {
+      { R_AURA, 12, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_seduce, patzer
+  },
+  {
+    SPL_TRUESEEING_CERDDOR, "Erschaffe ein Amulett des wahren Sehens",
+    "Der Spruch ermöglicht es einem Magier, ein Amulett des Wahren Sehens "
+    "zu erschaffen. Das Amulett erlaubt es dem Träger, alle Einheiten, die "
+    "durch einen Ring der Unsichtbarkeit geschützt sind, zu sehen. Einheiten "
+    "allerdings, die sich mit ihrem Tarnungs-Talent verstecken, bleiben "
+    "weiterhin unentdeckt.", NULL, NULL,
+    M_BARDE, (ONSHIPCAST), 5, 6,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_SILVER, 3000, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_trueseeing, patzer_createitem
+  },
+  {
+    SPL_INVISIBILITY_CERDDOR, "Erschaffe einen Ring der Unsichtbarkeit",
+    "Mit diesem Spruch kann der Zauberer einen Ring der Unsichtbarkeit "
+    "erschaffen. Der Träger des Ringes wird für alle Einheiten anderer "
+    "Parteien unsichtbar, egal wie gut ihre Wahrnehmung auch sein mag. In "
+    "einer unsichtbaren Einheit muss jede Person einen Ring tragen.", NULL, NULL,
+    M_BARDE, (ONSHIPCAST), 5, 6,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_SILVER, 3000, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_invisibility, patzer_createitem
+  },
+  {
+    SPL_HEADACHE, "Schaler Wein",
+    "Aufzeichung des Vortrags von Selen Ard'Ragorn in Bar'Glingal: "
+    "'Es heiss, dieser Spruch wäre wohl in den Spelunken der Westgassen "
+    "entstanden, doch es kann genausogut in jedem andern verrufenen "
+    "Viertel gewesen sein. Seine wichtigste Zutat ist etwa ein Fass "
+    "schlechtesten Weines, je billiger und ungesunder, desto "
+    "wirkungsvoller wird die Essenz. Die Kunst, diesen Wein in pure "
+    "Essenz zu destillieren, die weitaus anspruchsvoller als das einfache "
+    "Rezeptmischen eines Alchemisten ist, und diese dergestalt zu binden "
+    "und konservieren, das sie sich nicht gleich wieder verflüchtigt, wie "
+    "es ihre Natur wäre, ja, dies ist etwas, das nur ein Meister des "
+    "Cerddor vollbringen kann. Nun besitzt Ihr eine kleine Phiola mit "
+    "einer rubinrotschimmernden - nun, nicht flüssig, doch auch nicht "
+    "ganz Dunst - nennen wir es einfach nur Elixier. Doch nicht dies ist "
+    "die wahre Herausforderung, sodann muss, da sich ihre Wirkung leicht "
+    "verflüchtigt, diese innerhalb weniger Tage unbemerkt in das Getränkt "
+    "des Opfers geträufelt werden. Ihr Meister der Betöhrung und "
+    "Verführung, hier nun könnt Ihr Eure ganze Kunst unter Beweis "
+    "stellen. Doch gebt Acht, nicht unbedacht selbst von dem Elixier zu "
+    "kosten, denn wer einmal gekostet hat, der kann vom Weine nicht mehr "
+    "lassen, und er säuft sicherlich eine volle Woche lang. Jedoch nicht "
+    "die Verführung zum Trunke ist die wahre Gefahr, die dem Elixier "
+    "innewohnt, sondern das der Trunkenheit so sicher ein gar "
+    "fürchterliches Leid des Kopfes folgen wird, wie der Tag auf die "
+    "Nacht folgt. Und er wird gar sicherlich von seiner besten Fähigkeit "
+    "einige Tage bis hin zu den Studien zweier Wochen vergessen haben. "
+    "Noch ein Wort der Warnung: Dieses ist sehr aufwendig, und so Ihr "
+    "noch weitere Zauber in der selben Woche wirken wollt, so werden sie Euch "
+    "schwerer fallen.'", NULL,
+    "u",
+    M_BARDE,
+    (UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE),
+    5, 7,
+    {
+      { R_AURA, 4, SPC_LINEAR },
+      { R_SWAMP_2, 3, SPC_FIX },
+      { R_SILVER, 50, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_headache, patzer
+  },
+  { SPL_PUMP, "Aushorchen",
+    "Erliegt die Einheit dem Zauber, so wird sie dem Magier alles erzählen, "
+    "was sie über die gefragte Region weiß. Ist in der Region niemand "
+    "ihrer Partei, so weiß sie nichts zu berichten. Auch kann sie nur das "
+    "erzählen, was sie selber sehen könnte.",
+    "ZAUBERE \'Aushorchen\' <Einheit-Nr> <Zielregion-X> <Zielregion-Y>",
+    "ur",
+    M_BARDE, (UNITSPELL | ONETARGET | TESTCANSEE), 5, 7,
+    {
+      { R_AURA, 4, SPC_FIX },
+      { R_SILVER, 100, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_pump, patzer
+  },
+  {
+    SPL_BLOODTHIRST, "Kriegsgesang",
+    "Wie viele magischen Gesänge, so entstammt auch dieser den altem "
+    "Wissen der Katzen, die schon immer um die machtvolle Wirkung der "
+    "Stimme wussten. Mit diesem Lied wird die Stimmung der Krieger "
+    "aufgepeitscht, sie gar in wilde Raserrei und Blutrausch versetzt. "
+    "Ungeachtet eigener Schmerzen werden sie kämpfen bis zum "
+    "Tode und niemals fliehen. Während ihre Attacke verstärkt ist "
+    "achten sie kaum auf sich selbst.", NULL, NULL,
+    M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 4, 7,
+    {
+      { R_AURA, 5, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_berserk, patzer
+  },
+  {
+    SPL_FRIGHTEN, "Gesang der Angst",
+    "Dieser Kriegsgesang sät Panik in der Front der Gegner und schwächt "
+    "so ihre Kampfkraft erheblich. Angst wird ihren Schwertarm schwächen "
+    "und Furcht ihren Schildarm lähmen.", NULL, NULL,
+    M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 5, 8,
+    {
+      { R_AURA, 5, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_frighten, patzer
+  },
+  {
+    SPL_OBJ_ANALYSESONG, "Lied des Ortes analysieren",
+    "Wie Lebewesen, so haben auch Schiffe und Gebäude und sogar Regionen "
+    "ihr eigenes Lied, wenn auch viel schwächer und schwerer zu hören. "
+    "Und so, wie wie aus dem Lebenslied einer Person erkannt werden kann, "
+    "ob diese unter einem Zauber steht, so ist dies auch bei Burgen, "
+    "Schiffen oder Regionen möglich.",
+    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' REGIONn"
+    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' BURG <Burg-nr>n"
+    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' GEBÄUDE <Gebäude-nr>n"
+    "ZAUBERE [STUFE n] \'Lied des Ortes analysieren\' SCHIFF <Schiff-nr>",
+    "kc",
+    M_BARDE, (SPELLLEVEL|ONSHIPCAST), 5, 8,
+    {
+      { R_AURA, 3, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_analysesong_obj, patzer
+  },
+  {
+    SPL_CERDDOR_DESTROY_MAGIC, "Lebenslied festigen",
+    "Jede Verzauberung beeinflußt das Lebenslied, schwächt und verzerrt es. "
+    "Der kundige Barde kann versuchen, das Lebenslied aufzufangen und zu "
+    "verstärken und die Veränderungen aus dem Lied zu tilgen.",
+    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' REGIONn"
+    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' EINHEIT <Einheit-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' BURG <Burg-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' GEBÄUDE <Gebäude-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Lebenslied festigen\' SCHIFF <Schiff-Nr>",
+    "kc",
+    M_BARDE,
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
+    2, 8,
+    {
+      { R_AURA, 5, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_destroy_magic, patzer
+  },
+  {
+    SPL_MIGRANT, "Ritual der Aufnahme",
+    "Dieses Ritual ermöglicht es, eine Einheit, egal welcher Art, in die "
+    "eigene Partei aufzunehmen. Der um Aufnahme Bittende muss dazu willig "
+    "und bereit sein, seiner alten Partei abzuschwören. Dies bezeugt er "
+    "durch KONTAKTIEREn des Magiers. Auch wird er die Woche über "
+    "ausschliesslich mit Vorbereitungen auf das Ritual beschäftigt sein. "
+    "Das Ritual wird fehlschlagen, wenn er zu stark an seine alte Partei "
+    "gebunden ist, dieser etwa Dienst für seine teuere Ausbildung "
+    "schuldet. Der das Ritual leitende Magier muss für die permanente "
+    "Bindung des Aufnahmewilligen an seine Partei naturgemäß auch "
+    "permanente Aura aufwenden. Pro Stufe und pro 1 permanente Aura kann "
+    "er eine Person aufnehmen.", NULL,
+    "u",
+    M_BARDE, (UNITSPELL | SPELLLEVEL | ONETARGET | TESTCANSEE), 5, 9,
+    {
+      { R_AURA, 3, SPC_LEVEL },
+      { R_PERMAURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_migranten, patzer
+  },
+  {
+    SPL_CERDDOR_FAMILIAR, "Vertrauten rufen",
+    "Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein "
+    "ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem "
+    "Magier anschließen wird.", NULL, NULL,
+    M_BARDE, (NOTFAMILIARCAST), 5, 9,
+    {
+      { R_AURA, 100, SPC_FIX },
+      { R_PERMAURA, 5, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_summon_familiar, patzer
+  },
+  {
+    SPL_RAISEPEASANTS, "Mob aufwiegeln",
+    "Mit Hilfe dieses magischen Gesangs überzeugt der Magier die Bauern "
+    "der Region, sich ihm anzuschließen. Die Bauern werden ihre Heimat jedoch "
+    "nicht verlassen, und keine ihrer Besitztümer fortgeben. Jede Woche "
+    "werden zudem einige der Bauern den Bann abwerfen und auf ihre Felder "
+    "zurückkehren. Wie viele Bauern sich dem Magier anschließen hängt von der "
+    "Kraft seines Gesangs ab.", NULL, NULL,
+    M_BARDE, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 5, 10,
+    {
+      { R_AURA, 4, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_raisepeasants, patzer
+  },
+  {
+    SPL_SONG_RESISTMAGIC, "Gesang des wachen Geistes",
+    "Dieses magische Lied wird, einmal mit Inbrunst gesungen, sich in der "
+    "Region fortpflanzen, von Mund zu Mund springen und eine Zeitlang "
+    "überall zu vernehmen sein. Nach wie vielen Wochen der Gesang aus dem "
+    "Gedächnis der Region entschwunden ist, ist von dem Geschick des Barden "
+    "abhängig. Bis das Lied ganz verklungen ist, wird seine Magie allen "
+    "Verbündeten des Barden (HELFE BEWACHE), und natürlich auch seinen "
+    "eigenem Volk, einen einmaligen Bonus von 15% "
+    "auf die natürliche Widerstandskraft gegen eine Verzauberung "
+    "verleihen.", NULL, NULL,
+    M_BARDE,
+    (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
+    2, 10,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_song_resistmagic, patzer
+  },
+  {
+    SPL_DEPRESSION, "Gesang der Melancholie",
+    "Mit diesem Gesang verbreitet der Barde eine melancholische, traurige "
+    "Stimmung unter den Bauern. Einige Wochen lang werden sie sich in ihre "
+    "Hütten zurückziehen und kein Silber in den Theatern und Tavernen lassen.", NULL, NULL,
+    M_BARDE, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 11,
+    {
+      { R_AURA, 40, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_depression, patzer
+  },
+  {
+    SPL_ARTEFAKT_NIMBLEFINGERRING, "Miriams flinke Finger",
+    "Die berühmte Bardin Miriam bhean'Meddaf war bekannt für ihr "
+    "außergewöhnliches Geschick mit der Harfe. Ihre Finger sollen sich "
+    "so schnell über die Saiten bewegt haben, das sie nicht mehr erkennbar "
+    "waren. Dieser Zauber, der recht einfach in einen Silberring zu bannen "
+    "ist, bewirkt eine um das zehnfache verbesserte Geschicklichkeit und "
+    "Gewandheit der Finger. (Das soll sie auch an anderer Stelle ausgenutzt "
+    "haben, ihr Ruf als Falschspielerin war berüchtigt.) Handwerker können "
+    "somit das zehnfache produzieren, und bei einigen anderen Tätigkeiten "
+    "könnte dies ebenfalls von Nutzen sein.", NULL, NULL,
+    M_BARDE, (ONSHIPCAST), 5, 11,
+    {
+      { R_AURA, 20, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { R_SILVER, 1000, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_create_nimblefingerring, patzer
+  },
+  {
+    SPL_SONG_SUSCEPTMAGIC, "Gesang des schwachen Geistes",
+    "Dieses Lied, das in die magische Essenz der Region gewoben wird, "
+    "schwächt die natürliche Widerstandskraft gegen eine "
+    "Verzauberung einmalig um 15%. Nur die Verbündeten des Barden "
+    "(HELFE BEWACHE) sind gegen die Wirkung des Gesangs gefeit.", NULL, NULL,
+    M_BARDE,
+    (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
+    2, 12,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_song_susceptmagic, patzer
+  },
+  {
+    SPL_SONG_OF_PEACE, "Gesang der Friedfertigkeit",
+    "Dieser mächtige Bann verhindert jegliche Attacken. Niemand in der "
+    "ganzen Region ist fähig seine Waffe gegen irgendjemanden zu erheben. "
+    "Die Wirkung kann etliche Wochen andauern", NULL, NULL,
+    M_BARDE, (SPELLLEVEL | REGIONSPELL | TESTRESISTANCE), 5, 12,
+    {
+      { R_AURA, 20, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_song_of_peace, patzer
+  },
+  {
+    SPL_SONG_OF_ENSLAVE, "Gesang der Versklavung",
+    "Dieser mächtige Bann raubt dem Opfer seinen freien Willen und "
+    "unterwirft sie den Befehlen des Barden. Für einige Zeit wird das Opfer "
+    "sich völlig von seinen eigenen Leuten abwenden und der Partei des Barden "
+    "zugehörig fühlen.", NULL,
+    "u",
+    M_BARDE, (UNITSPELL | ONETARGET | TESTCANSEE), 5, 13,
+    {
+      { R_AURA, 40, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_charmingsong, patzer
+  },
+  {
+    SPL_BIGRECRUIT, "Hohe Kunst der Überzeugung",
+    "Aus 'Wanderungen' von Firudin dem Weisen: "
+    "'In Weilersweide, nahe dem Wytharhafen, liegt ein kleiner Gasthof, der "
+    "nur wenig besucht ist. Niemanden bekannt ist, das dieser Hof "
+    "bis vor einigen Jahren die Bleibe des verbannten Wanderpredigers Grauwolf "
+    "war. Nachdem er bei einer seiner berüchtigten flammenden Reden fast die "
+    "gesammte Bauernschaft angeworben hatte, wurde er wegen Aufruhr verurteilt "
+    "und verbannt. Nur zögerlich war er bereit mir das Geheimniss seiner "
+    "Überzeugungskraft zu lehren.'", NULL, NULL,
+    M_BARDE, (SPELLLEVEL), 5, 14,
+    {
+      { R_AURA, 20, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_bigrecruit, patzer
+  },
+  {
+    SPL_RALLYPEASANTMOB, "Aufruhr beschwichtigen",
+    "Mit Hilfe dieses magischen Gesangs kann der Magier eine Region in "
+    "Aufruhr wieder beruhigen. Die Bauernhorden werden sich verlaufen "
+    "und wieder auf ihre Felder zurückkehren.", NULL, NULL,
+    M_BARDE, (FARCASTING), 5, 15,
+    {
+      { R_AURA, 30, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_rallypeasantmob, patzer
+  },
+  {
+    SPL_RAISEPEASANTMOB, "Aufruhr verursachen",
+    "Mit Hilfe dieses magischen Gesangs versetzt der Magier eine ganze "
+    "Region in Aufruhr. Rebellierende Bauernhorden machen jedes Besteuern "
+    "unmöglich, kaum jemand wird mehr für Gaukeleien Geld spenden und "
+    "es können keine neuen Leute angeworben werden. Nach einigen Wochen "
+    "beruhigt sich der Mob wieder.", NULL, NULL,
+    M_BARDE, (FARCASTING | REGIONSPELL | TESTRESISTANCE), 5, 16,
+    {
+      { R_AURA, 40, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_raisepeasantmob, patzer
+  },
+  /* M_ASTRAL */
+  {
+    SPL_ANALYSEMAGIC, "analyze_magic", NULL,
+    "ZAUBERE [STUFE n] \'Magie analysieren\' REGIONn"
+    "ZAUBERE [STUFE n] \'Magie analysieren\' EINHEIT <Einheit-Nr>n"
+    "ZAUBERE [STUFE n] \'Magie analysieren\' BURG <Burg-Nr>n"
+    "ZAUBERE [STUFE n] \'Magie analysieren\' GEBÄUDE <Gebäude-Nr>n"
+    "ZAUBERE [STUFE n] \'Magie analysieren\' SCHIFF <Schiff-Nr>",
+    "kc",
+    M_ASTRAL, (UNITSPELL | ONSHIPCAST | TESTCANSEE), 5, 1,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_analysemagic, patzer
+  },
+  {
+    SPL_ITEMCLOAK, "concealing_aura", NULL, NULL,
+    "u",
+    M_ASTRAL, (SPELLLEVEL | UNITSPELL | ONSHIPCAST | ONETARGET), 5, 1,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_itemcloak, patzer
+  },
+  {
+    SPL_TYBIED_EARN_SILVER, "miracle_doctor", NULL, NULL, NULL,
+    M_ASTRAL, (SPELLLEVEL|ONSHIPCAST), 5, 1,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_earn_silver, patzer
+  },
+  {
+    SPL_TYBIED_FUMBLESHIELD, "Schutz vor Magie",
+    "Dieser Zauber legt ein antimagisches Feld um die Magier der "
+    "Feinde und behindert ihre Zauber erheblich. Nur wenige werden "
+    "die Kraft besitzen, das Feld zu durchdringen und ihren Truppen "
+    "in der Schlacht zu helfen.", NULL, NULL,
+    M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 2, 2,
+    {
+      { R_AURA, 3, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_fumbleshield, patzer
+  },
+  {
+    SPL_SHOWASTRAL, "Astraler Blick",
+    "Der Magier kann kurzzeitig in die Astralebene blicken und erfährt "
+    "so alle Einheiten innerhalb eines astralen Radius von Stufe/5 Regionen.", NULL, NULL,
+    M_ASTRAL, (SPELLLEVEL), 5, 2,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_showastral, patzer
+  },
+  {
+    SPL_RESISTMAGICBONUS, "Schutzzauber",
+    "Dieser Zauber verstärkt die natürliche Widerstandskraft gegen Magie. "
+    "Eine so geschützte Einheit ist auch gegen Kampfmagie weniger "
+    "empfindlich. Pro Stufe reicht die Kraft des Magiers aus, um 5 Personen "
+    "zu schützen.", NULL,
+    "u+",
+    M_ASTRAL,
+    (UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE),
+    2, 3,
+    {
+      { R_AURA, 5, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_resist_magic_bonus, patzer
+  },
+  {
+    SPL_KEEPLOOT, "Beute bewahren",
+    "Dieser Zauber verhindert, dass ein Teil der sonst im Kampf zerstörten "
+    "Gegenstände beschädigt wird. Die Verluste reduzieren sich um 5% pro "
+    "Stufe des Zaubers bis zu einem Minimum von 25%.", NULL, NULL,
+    M_ASTRAL, ( POSTCOMBATSPELL | SPELLLEVEL ), 5, 3,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_keeploot, patzer
+  },
+  {
+    SPL_ENTERASTRAL, "Astraler Weg",
+    "Alte arkane Formeln ermöglichen es dem Magier, sich und andere in die "
+    "astrale Ebene zu bringen. Der Magier kann (Stufe-3)*15 GE durch das "
+    "kurzzeitig entstehende Tor bringen. Ist der Magier erfahren genug, "
+    "den Zauber auf Stufen von 11 oder mehr zu zaubern, kann er andere "
+    "Einheiten auch gegen ihren Willen auf die andere Ebene zwingen.", NULL,
+    "u+",
+    M_ASTRAL, (UNITSPELL|SPELLLEVEL), 7, 4,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_enterastral, patzer
+  },
+  {
+    SPL_LEAVEASTRAL, "Astraler Ausgang",
+    "Der Magier konzentriert sich auf die Struktur der Realität und kann "
+    "so die astrale Ebene verlassen. Er kann insgesamt (Stufe-3)*15 GE durch "
+    "das kurzzeitig entstehende Tor bringen. Ist der Magier erfahren genug, "
+    "den Zauber auf Stufen von 11 oder mehr zu zaubern, kann er andere "
+    "Einheiten auch gegen ihren Willen auf die andere Ebene zwingen.",
+    "ZAUBER [STUFE n] \'Astraler Ausgang\' <Ziel-X> <Ziel-Y> <Einheit-Nr> "
+    "[<Einheit-Nr> ...]",
+    "ru+",
+    M_ASTRAL, (UNITSPELL |SPELLLEVEL), 7, 4,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_leaveastral, patzer
+  },
+  {
+    SPL_TRANSFERAURA_ASTRAL, "Auratransfer",
+    "Mit Hilfe dieses Zauber kann der Magier eigene Aura im Verhältnis "
+    "2:1 auf einen anderen Magier des gleichen Magiegebietes oder im "
+    "Verhältnis 3:1 auf einen Magier eines anderen Magiegebietes "
+    "übertragen.",
+    "ZAUBERE \'Auratransfer\' <Einheit-Nr> <investierte Aura>",
+    "ui",
+    M_ASTRAL, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 5,
+    {
+      { R_AURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_transferaura, patzer
+  },
+  {
+    SPL_SHOCKWAVE, "Schockwelle",
+    "Dieser Zauber läßt eine Welle aus purer Kraft über die "
+    "gegnerischen Reihen hinwegfegen.  Viele Kämpfer wird der Schock "
+    "so benommen machen, daß sie für einen kurzen Moment nicht angreifen "
+    "können.", NULL, NULL,
+    M_ASTRAL, (COMBATSPELL|SPELLLEVEL), 5, 5,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_stun, patzer
+  },
+  {
+    SPL_ANTIMAGICZONE, "Astrale Schwächezone",
+    "Mit diesem Zauber kann der Magier eine Zone der astralen Schwächung "
+    "erzeugen, ein lokales Ungleichgewicht im Astralen Feld. Dieses "
+    "Zone wird bestrebt sein, wieder in den Gleichgewichtszustand "
+    "zu gelangen. Dazu wird sie jedem in dieser Region gesprochenen "
+    "Zauber einen Teil seiner Stärke entziehen, die schwächeren gar "
+    "ganz absorbieren.", NULL, NULL,
+    M_ASTRAL, (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
+    2, 5,
+    {
+      { R_AURA, 3, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_antimagiczone, patzer
+  },
+  {
+    SPL_TRUESEEING_TYBIED, "Erschaffe ein Amulett des wahren Sehens",
+    "Der Spruch ermöglicht es einem Magier, ein Amulett des Wahren Sehens "
+    "zu erschaffen. Das Amulett erlaubt es dem Träger, alle Einheiten, die "
+    "durch einen Ring der Unsichtbarkeit geschützt sind, zu sehen. Einheiten "
+    "allerdings, die sich mit ihrem Tarnungs-Talent verstecken, bleiben "
+    "weiterhin unentdeckt.", NULL, NULL,
+    M_ASTRAL, (ONSHIPCAST), 5, 5,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_SILVER, 3000, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_trueseeing, patzer_createitem
+  },
+  {
+    SPL_TYBIED_DESTROY_MAGIC, "Magiefresser",
+    "Dieser Zauber ermöglicht dem Magier, Verzauberungen einer Einheit, "
+    "eines Schiffes, Gebäudes oder auch der Region aufzulösen.",
+    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' REGIONn"
+    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' EINHEIT <Einheit-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' BURG <Burg-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' GEBÄUDE <Gebäude-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' SCHIFF <Schiff-Nr>",
+    "kc",
+    M_ASTRAL,
+    (FARCASTING | SPELLLEVEL | ONSHIPCAST | ONETARGET | TESTCANSEE),
+    2, 5,
+    {
+      { R_AURA, 4, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_destroy_magic, patzer
+  },
+  {
+    SPL_PULLASTRAL, "Astraler Ruf",
+    "Ein Magier, der sich in der astralen Ebene befindet, kann mit Hilfe "
+    "dieses Zaubers andere Einheiten zu sich holen. Der Magier kann "
+    "(Stufe-3)*15 GE durch das kurzzeitig entstehende Tor bringen. Ist der "
+    "Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu zaubern, "
+    "kann er andere Einheiten auch gegen ihren Willen auf die andere Ebene "
+    "zwingen.",
+    "ZAUBER [STUFE n] \'Astraler Ruf\' <Ziel-X> <Ziel-Y> <Einheit-Nr> "
+    "[<Einheit-Nr> ...]",
+    "ru+",
+    M_ASTRAL, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_pullastral, patzer
+  },
+  
+  {
+    SPL_FETCHASTRAL, "Ruf der Realität",
+    "Ein Magier, welcher sich in der materiellen Welt befindet, kann er mit "
+    "Hilfe dieses Zaubers Einheiten aus der angrenzenden Astralwelt herbeiholen. "
+    "Ist der Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu "
+    "zaubern, kann er andere Einheiten auch gegen ihren Willen in die materielle "
+    "Welt zwingen.", NULL,
+    "u+",
+    M_ASTRAL, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_fetchastral, patzer
+  },
+  {
+    SPL_STEALAURA, "Stehle Aura",
+    "Mit Hilfe dieses Zaubers kann der Magier einem anderen Magier seine "
+    "Aura gegen dessen Willen entziehen und sich selber zuführen.", NULL,
+    "u",
+    M_ASTRAL,
+    (FARCASTING | SPELLLEVEL | UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE),
+    3, 6,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_stealaura, patzer
+  },
+  {
+    SPL_FLYING_SHIP, "Luftschiff",
+    "Diese magischen Runen bringen ein Boot oder Langboot für eine Woche "
+    "zum fliegen. Damit kann dann auch Land überquert werden. Die Zuladung "
+    "von Langbooten ist unter der Einwirkung dieses Zaubers auf 100 "
+    "Gewichtseinheiten begrenzt. Für die Farbe der Runen muss eine spezielle "
+    "Tinte aus einem Windbeutel und einem Schneekristall angerührt werden.", NULL,
+    "s",
+    M_ASTRAL, (ONSHIPCAST | SHIPSPELL | ONETARGET | TESTRESISTANCE), 5, 6,
+    {
+      { R_AURA, 10, SPC_FIX },
+      { R_HIGHLAND_1, 1, SPC_FIX },
+      { R_GLACIER_3, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_flying_ship, patzer
+  },
+  {
+    SPL_INVISIBILITY_TYBIED, "Erschaffe einen Ring der Unsichtbarkeit",
+    "Mit diesem Spruch kann der Zauberer einen Ring der Unsichtbarkeit "
+    "erschaffen. Der Träger des Ringes wird für alle Einheiten anderer "
+    "Parteien unsichtbar, egal wie gut ihre Wahrnehmung auch sein mag. In "
+    "einer unsichtbaren Einheit muss jede Person einen Ring tragen.", NULL, NULL,
+    M_ASTRAL, (ONSHIPCAST), 5, 6,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_SILVER, 3000, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_invisibility, patzer_createitem
+  },
+  {
+    SPL_CREATE_ANTIMAGICCRYSTAL, "Erschaffe Antimagiekristall",
+    "Mit Hilfe dieses Zauber entzieht der Magier einem Quarzkristall "
+    "all seine magischen Energien. Der Kristall wird dann, wenn er zu "
+    "feinem Staub zermahlen und verteilt wird, die beim Zaubern "
+    "freigesetzten magischen Energien aufsaugen und alle Zauber, "
+    "welche in der betreffenden Woche in der Region gezaubert werden "
+    "fehlschlagen lassen.", NULL, NULL,
+    M_ASTRAL, (ONSHIPCAST), 5, 7,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_SILVER, 3000, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_create_antimagiccrystal, patzer_createitem
+  },
+  {
+    SPL_DESTROY_MAGIC, "Fluch brechen",
+    "Dieser Zauber ermöglicht dem Magier, gezielt eine bestimmte "
+    "Verzauberung einer Einheit, eines Schiffes, Gebäudes oder auch "
+    "der Region aufzulösen.",
+    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' REGION <Zauber-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' EINHEIT <Einheit-Nr> <Zauber-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' BURG <Burg-Nr> <Zauber-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' GEBÄUDE <Gebäude-Nr> <Zauber-Nr>n"
+    "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' SCHIFF <Schiff-Nr> <Zauber-Nr>",
+    "kcc",
+    M_ASTRAL, (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE), 3, 7,
+    {
+      { R_AURA, 3, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_destroy_curse, patzer
+  },
+  {
+    SPL_ETERNIZEWALL, "Mauern der Ewigkeit",
+    "Mit dieser Formel bindet der Magier auf ewig die Kräfte der Erde in "
+    "die Mauern des Gebäudes. Ein solchermaßen verzaubertes Gebäude ist "
+    "gegen den Zahn der Zeit geschützt und benötigt keinen "
+    "Unterhalt mehr.",
+    "ZAUBERE \'Mauern der Ewigkeit\' <Gebäude-Nr>",
+    "b",
+    M_ASTRAL,
+    (SPELLLEVEL | BUILDINGSPELL | ONETARGET | TESTRESISTANCE | ONSHIPCAST),
+    5, 7,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_eternizewall, patzer
+  },
+  {
+    SPL_SCHILDRUNEN, "Runen des Schutzes",
+    "Zeichnet man diese Runen auf die Wände eines Gebäudes oder auf die "
+    "Planken eines Schiffes, so wird es schwerer durch Zauber zu "
+    "beeinflussen sein. Jedes Ritual erhöht die Widerstandskraft des "
+    "Gebäudes oder Schiffes gegen Verzauberung um 20%. "
+    "Werden mehrere Schutzzauber übereinander gelegt, so addiert "
+    "sich ihre Wirkung, doch ein hundertprozentiger Schutz läßt sich so "
+    "nicht erreichen. Der Zauber hält mindestens drei Wochen an, je nach "
+    "Talent des Magiers aber auch viel länger.",
+    "ZAUBERE \'Runen des Schutzes\' [BURG <Burg-nr> | GEBÄUDE <Gebäude-Nr> | "
+    "SCHIFF <Schiff-Nr>]",
+    "kc",
+    M_ASTRAL, (ONSHIPCAST | TESTRESISTANCE), 2, 8,
+    {
+      { R_AURA, 20, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_magicrunes, patzer
+  },
+  
+  {
+    SPL_REDUCESHIELD, "Schild des Fisches",
+    "Dieser Zauber vermag dem Gegner ein geringfügig versetztes Bild der "
+    "eigenen Truppen vorzuspiegeln, so wie der Fisch im Wasser auch nicht "
+    "dort ist wo er zu sein scheint. Von jedem Treffer kann so die Hälfte "
+    "des Schadens unschädlich abgeleitet werden. Doch hält der Schild nur "
+    "einige Hundert Schwerthiebe aus, danach wird er sich auflösen. "
+    "Je stärker der Magier, desto mehr Schaden hält der Schild aus.", NULL, NULL,
+    M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 2, 8,
+    {
+      { R_AURA, 4, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_reduceshield, patzer
+  },
+  {
+    SPL_SPEED, "Beschleunigung",
+    "Dieser Zauber beschleunigt einige Kämpfer auf der eigenen Seite "
+    "so, dass sie während des gesamten Kampfes in einer Kampfrunde zweimal "
+    "angreifen können.", NULL, NULL,
+    M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 5, 9,
+    {
+      { R_AURA, 5, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_speed, patzer
+  },
+  {
+    SPL_ARTEFAKT_OF_POWER, "Erschaffe einen Ring der Macht",
+    "Dieses mächtige Ritual erschafft einen Ring der Macht. Ein Ring "
+    "der Macht erhöht die Stärke jedes Zaubers, den sein Träger zaubert, "
+    "als wäre der Magier eine Stufe besser.", NULL, NULL,
+    M_ASTRAL, (ONSHIPCAST), 5, 9,
+    {
+      { R_AURA, 100, SPC_FIX },
+      { R_SILVER, 4000, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_power, patzer_createitem
+  },
+  {
+    SPL_VIEWREALITY, "Blick in die Realität",
+    "Der Magier kann mit Hilfe dieses Zaubers aus der Astral- in die "
+    "materielle Ebene blicken und die Regionen und Einheiten genau "
+    "erkennen.", NULL, NULL,
+    M_ASTRAL, (0), 5, 10,
+    {
+      { R_AURA, 40, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_viewreality, patzer
+  },
+  {
+    SPL_BAG_OF_HOLDING, "Erschaffe einen Beutel des Negativen Gewichts",
+    "Dieser Beutel umschließt eine kleine Dimensionsfalte, in der bis "
+    "zu 200 Gewichtseinheiten transportiert werden können, ohne dass "
+    "sie auf das Traggewicht angerechnet werden.  Pferde und andere "
+    "Lebewesen sowie besonders sperrige Dinge (Wagen und Katapulte) können "
+    "nicht in dem Beutel transportiert werden.  Auch ist es nicht möglich, "
+    "einen Zauberbeutel in einem anderen zu transportieren.  Der Beutel "
+    "selber wiegt 1 GE.", NULL, NULL,
+    M_ASTRAL, (ONSHIPCAST), 5, 10,
+    {
+      { R_AURA, 30, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { R_SILVER, 5000, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_create_bag_of_holding, patzer
+  },
+  {
+    SPL_SPEED2, "Zeitdehnung",
+    "Diese praktische Anwendung des theoretischen Wissens um Raum und Zeit "
+    "ermöglicht es, den Zeitfluß für einige Personen zu verändern. Auf "
+    "diese Weise veränderte Personen bekommen für einige Wochen doppelt "
+    "soviele Bewegungspunkte und doppelt soviele Angriffe pro Runde.", NULL,
+    "u+",
+    M_ASTRAL, (UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE), 5, 11,
+    {
+      { R_AURA, 5, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_speed2, patzer
+  },
+  {
+    SPL_ARMORSHIELD, "Rüstschild",
+    "Diese vor dem Kampf zu zaubernde Ritual gibt den eigenen Truppen "
+    "einen zusätzlichen Bonus auf ihre Rüstung. Jeder Treffer "
+    "reduziert die Kraft des Zaubers, so dass der Schild sich irgendwann "
+    "im Kampf auflösen wird.", NULL, NULL,
+    M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 2, 12,
+    {
+      { R_AURA, 4, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_armorshield, patzer
+  },
+  {
+    SPL_TYBIED_FAMILIAR, "Vertrauten rufen",
+    "Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein "
+    "ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem "
+    "Magier anschließen wird.", NULL, NULL,
+    M_ASTRAL, (NOTFAMILIARCAST), 5, 12,
+    {
+      { R_AURA, 100, SPC_FIX },
+      { R_PERMAURA, 5, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_summon_familiar, patzer
+  },
+  {
+    SPL_MOVECASTLE, "Belebtes Gestein",
+    "Dieses kräftezehrende Ritual beschwört mit Hilfe einer Kugel aus "
+    "konzentriertem Laen einen gewaltigen Erdelementar und bannt ihn "
+    "in ein Gebäude. Dem Elementar kann dann befohlen werden, das "
+    "Gebäude mitsamt aller Bewohner in eine Nachbarregion zu tragen. "
+    "Die Stärke des beschworenen Elementars hängt vom Talent des "
+    "Magiers ab: Der Elementar kann maximal [Stufe-12]*250 Größeneinheiten "
+    "große Gebäude versetzen. Das Gebäude wird diese Prozedur nicht "
+    "unbeschädigt überstehen.",
+    "ZAUBER [STUFE n] \'Belebtes Gestein\' <Burg-Nr> <Richtung>",
+    "bc",
+    M_ASTRAL,
+    (SPELLLEVEL | BUILDINGSPELL | ONETARGET | TESTRESISTANCE),
+    5, 13,
+    {
+      { R_AURA, 10, SPC_LEVEL },
+      { R_PERMAURA, 1, SPC_FIX },
+      { R_EOG, 5, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_movecastle, patzer
+  },
+  {
+    SPL_DISRUPTASTRAL, "Störe Astrale Integrität",
+    "Dieser Zauber bewirkt eine schwere Störung des Astralraums. Innerhalb "
+    "eines astralen Radius von Stufe/5 Regionen werden alle Astralwesen, "
+    "die dem Zauber nicht wiederstehen können, aus der astralen Ebene "
+    "geschleudert. Der astrale Kontakt mit allen betroffenen Regionen ist "
+    "für Stufe/3 Wochen gestört.", NULL, NULL,
+    M_ASTRAL, (REGIONSPELL), 4, 14,
+    {
+      { R_AURA, 140, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_disruptastral, patzer
+  },
+  {
+    SPL_PERMTRANSFER, "Opfere Kraft",
+    "Mit Hilfe dieses Zaubers kann der Magier einen Teil seiner magischen "
+    "Kraft permanent auf einen anderen Magier übertragen. Auf einen Tybied-"
+    "Magier kann er die Hälfte der eingesetzten Kraft übertragen, auf einen "
+    "Magier eines anderen Gebietes ein Drittel.",
+    "ZAUBERE \'Opfere Kraft\' <Einheit-Nr> <Aura>",
+    "ui",
+    M_ASTRAL, (UNITSPELL|ONETARGET), 1, 15,
+    {
+      { R_AURA, 100, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_permtransfer, patzer
+  },
+  /* M_GRAU */
+  /*  Definitionen von Create_Artefaktsprüchen    */
+  {
+    SPL_ARTEFAKT_OF_AURAPOWER, "Erschaffe einen Fokus",
+    "Der auf diesem Gegenstand liegende Zauber erleichtert es dem "
+    "Zauberers enorm größere Mengen an Aura zu beherrschen.", NULL, NULL,
+    M_GRAU, (ONSHIPCAST), 5, 9,
+    {
+      { R_AURA, 100, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_aura, patzer_createitem
+  },
+  {
+    SPL_ARTEFAKT_OF_REGENERATION, "Regeneration",
+    "Der auf diesem Gegenstand liegende Zauber saugt die diffusen "
+    "magischen Energien des Lebens aus der Umgebung auf und läßt sie "
+    "seinem Träger zukommen.", NULL, NULL,
+    M_GRAU, (ONSHIPCAST), 5, 9,
+    {
+      { R_AURA, 100, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_regeneration, patzer_createitem
+  },
+  {
+    SPL_ARTEFAKT_CHASTITYBELT, "Erschaffe ein Amulett der Keuschheit",
+    "Dieses Amulett in Gestalt einer orkischen Matrone unterdrückt den "
+    "Fortpflanzungstrieb eines einzelnen Orks sehr zuverlässig. Ein Ork "
+    "mit Amulett der Keuschheit wird sich nicht mehr vermehren.", NULL, NULL,
+    M_GRAU, (ONSHIPCAST), 5, 7,
+    {
+      { R_AURA, 50, SPC_FIX },
+      { R_SILVER, 3000, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_chastitybelt, patzer_createitem
+  },
+  {
+    SPL_METEORRAIN, "Meteorregen",
+    "Ein Schauer von Meteoren regnet über das Schlachtfeld.", NULL, NULL,
+    M_GRAU, (COMBATSPELL | SPELLLEVEL), 5, 3,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_kampfzauber, patzer
+  },
+  {
+    SPL_ARTEFAKT_RUNESWORD, "Erschaffe ein Runenschwert",
+    "Mit diesem Spruch erzeugt man ein Runenschwert. Die Klinge des "
+    "schwarzen "
+    "Schwertes ist mit alten, magischen Runen verziert, und ein seltsames "
+    "Eigenleben erfüllt die warme Klinge. Um es zu benutzen, muss man "
+    "ein Schwertkämpfer von beachtlichem Talent (7) sein. "
+    "Der Träger des Runenschwertes erhält einen Talentbonus von +4 im Kampf "
+    "und wird so gut wie immun gegen alle Formen von Magie.", NULL, NULL,
+    M_GRAU, (ONSHIPCAST), 5, 6,
+    {
+      { R_AURA, 100, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { R_SILVER, 1000, SPC_FIX },
+      { R_EOGSWORD, 1, SPC_FIX },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_createitem_runesword, patzer_createitem
+  },
+  {
+    SPL_BECOMEWYRM, "Wyrmtransformation",
+    "Mit Hilfe dieses Zaubers kann sich der Magier permanent in einen "
+    "mächtigen Wyrm verwandeln. Der Magier behält seine Talente und "
+    "Möglichkeiten, bekommt jedoch die Kampf- und Bewegungseigenschaften "
+    "eines Wyrms. Der Odem des Wyrms wird sich mit steigendem Magie-Talent "
+    "verbessern. Der Zauber ist sehr kraftraubend und der Wyrm wird einige "
+    "Zeit brauchen, um sich zu erholen.", NULL, NULL,
+    M_GRAU, 0, 5, 1,
+    {
+      { R_AURA, 1, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_becomewyrm, patzer
+  },
+  /* Monstersprüche */
+  { SPL_FIREDRAGONODEM, "Feuriger Drachenodem",
+    "Verbrennt die Feinde", NULL, NULL,
+    M_GRAU, (COMBATSPELL), 5, 3,
+    {
+      { R_AURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_dragonodem, patzer
+  },
+  { SPL_DRAGONODEM, "Eisiger Drachenodem",
+    "Tötet die Feinde", NULL, NULL,
+    M_GRAU, (COMBATSPELL), 5, 6,
+    {
+      { R_AURA, 2, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_dragonodem, patzer
+  },
+  { SPL_WYRMODEM, "Großer Drachenodem",
+    "Verbrennt die Feinde", NULL, NULL,
+    M_GRAU, (COMBATSPELL), 5, 12,
+    {
+      { R_AURA, 3, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_dragonodem, patzer
+  },
+  { SPL_DRAINODEM, "Schattenodem",
+    "Entzieht Talentstufen und macht Schaden wie Großer Odem", NULL, NULL,
+    M_GRAU, (COMBATSPELL), 5, 12,
+    {
+      { R_AURA, 4, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_dragonodem, patzer
+  },
+  {
+    SPL_AURA_OF_FEAR, "Furchteinflößende Aura",
+    "Panik", NULL, NULL,
+    M_GRAU, (COMBATSPELL), 5, 12,
+    {
+      { R_AURA, 1, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_flee, patzer
+  },
+  {
+    SPL_SHADOWCALL, "Schattenruf",
+    "Ruft Schattenwesen.", NULL, NULL,
+    M_GRAU, (PRECOMBATSPELL), 5, 12,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_shadowcall, patzer
+  },
+  {
+    SPL_IMMOLATION, "Feuersturm",
+    "Verletzt alle Gegner.", NULL, NULL,
+    M_GRAU, (COMBATSPELL), 5, 12,
+    {
+      { R_AURA, 2, SPC_LEVEL },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_immolation, patzer
+  },
+  { SPL_FIREODEM, "Feuerwalze",
+    "Tötet die Feinde", NULL, NULL,
+    M_GRAU, (COMBATSPELL), 5, 8,
+    {
+      { R_AURA, 2, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_immolation, patzer
+  },
+  { SPL_ICEODEM, "Eisnebel",
+    "Tötet die Feinde", NULL, NULL,
+    M_GRAU, (COMBATSPELL), 5, 8,
+    {
+      { R_AURA, 2, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_immolation, patzer
+  },
+  { SPL_ACIDODEM, "Säurenebel",
+    "Tötet die Feinde", NULL, NULL,
+    M_GRAU, (COMBATSPELL), 5, 8,
+    {
+      { R_AURA, 2, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_immolation, patzer
+  },
+  #ifdef WDW_PYRAMIDSPELL
+  {
+    SPL_WDWPYRAMID_TRAUM, "Traum von den Göttern",
+    "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
+    "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
+    M_TRAUM, (0), 5, 4,
+    {
+      { R_AURA, 2, SPC_FIX },
+      { R_PLAIN_3, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_wdwpyramid, patzer
+  },
+  {
+    SPL_WDWPYRAMID_ASTRAL, "Göttliches Netz",
+    "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
+    "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
+    M_ASTRAL, (0), 5, 3,
+    {
+      { R_AURA, 4, SPC_FIX },
+      { R_WISE, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_wdwpyramid, patzer
+  },
+  
+  {
+    SPL_WDWPYRAMID_DRUIDE, "Kraft der Natur",
+    "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
+    "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
+    M_DRUIDE, (0), 5, 5,
+    {
+      { R_AURA, 3, SPC_FIX },
+      { R_MALLORN, 5, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_wdwpyramid, patzer
+  },
+  {
+    SPL_WDWPYRAMID_BARDE, "Gesang der Götter",
+    "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
+    "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
+    M_BARDE, (0), 5, 4,
+    {
+      { R_AURA, 2, SPC_FIX },
+      { R_HIGHLAND_3, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_wdwpyramid, patzer
+  },
+  {
+    SPL_WDWPYRAMID_CHAOS, "Göttliche Macht",
+    "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
+    "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
+    M_CHAOS, (0), 5, 5,
+    {
+      { R_AURA, 1, SPC_FIX },
+      { R_PERMAURA, 1, SPC_FIX },
+      { 0, 0, 0 },
+      { 0, 0, 0 },
+      { 0, 0, 0 }
+    },
+    (spell_f)sp_wdwpyramid, patzer
+  },
+  #endif
+  /* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein*/
+  {
+    SPL_NOSPELL, "Keiner", NULL, NULL, NULL, 0, 0, 0, 0,
+    {
+      { 0, 0, 0 }, 
+      { 0, 0, 0 }, 
+      { 0, 0, 0 }, 
+      { 0, 0, 0 }, 
+      { 0, 0, 0 }
+    },
+    NULL, NULL
+  }
 };
 
+void
+init_spells(void)
+{
+  int i;
+
+  /* register all the old spells in the spelldata array */
+  for (i=0;spelldaten[i].id!=SPL_NOSPELL;++i) {
+    register_spell(spelldaten+i);
+  }
+}

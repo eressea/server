@@ -292,22 +292,21 @@ find_magetype(const unit * u)
 static void
 createspelllist(unit *u, magic_t mtyp)
 {
-	int sk, i;
-	if (mtyp == M_GRAU)
-		return;
+  spell_list * slist;
+  int sk;
 
-	sk = effskill(u, SK_MAGIC);
-	if (sk == 0)
-		return;
+  if (mtyp == M_GRAU) return;
 
-	for (i = 0; spelldaten[i].id != SPL_NOSPELL; i++) {
-		if (spelldaten[i].magietyp == mtyp
-			&& spelldaten[i].level <= sk)
-		{
-			if (!getspell(u, spelldaten[i].id))
-				addspell(u, spelldaten[i].id);
-		}
-	}
+  sk = effskill(u, SK_MAGIC);
+  if (sk == 0) return;
+
+  for (slist=spells;slist!=NULL;slist=slist->next) {
+    spell * sp = slist->data;
+    if (sp->magietyp == mtyp && sp->level <= sk) {
+      if (!has_spell(u, sp))
+        addspell(u, sp->id);
+    }
+  }
 }
 
 /* ------------------------------------------------------------- */
@@ -366,57 +365,55 @@ void
 updatespelllist(unit * u)
 {
   int max = eff_skill(u, SK_MAGIC, u->region);
-	int sk = max;
+  int sk = max;
+  spell_list * slist;
   spell * sp;
-	magic_t gebiet = find_magetype(u);
+  magic_t gebiet = find_magetype(u);
   boolean ismonster = u->faction->no==MONSTER_FACTION;
 
   /* Nur Orkmagier bekommen den Keuschheitsamulettzauber */
-	if (old_race(u->race) == RC_ORC
-			&& !getspell(u, SPL_ARTEFAKT_CHASTITYBELT)
-			&& find_spellbyid(SPL_ARTEFAKT_CHASTITYBELT)->level <= max)
-	{
-		addspell(u, SPL_ARTEFAKT_CHASTITYBELT);
-	}
+  sp = find_spellbyid(SPL_ARTEFAKT_CHASTITYBELT);
+  if (old_race(u->race)==RC_ORC && !has_spell(u, sp) && sp->level<=max) {
+    addspell(u, SPL_ARTEFAKT_CHASTITYBELT);
+  }
 
-	/* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
-	if (fspecial(u->faction, FS_WYRM)
-			&& !getspell(u, SPL_BECOMEWYRM)
-			&& find_spellbyid(SPL_BECOMEWYRM)->level <= max)
-	{
-		addspell(u, SPL_BECOMEWYRM);
-	}
+  /* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
+  sp = find_spellbyid(SPL_BECOMEWYRM);
+  if (fspecial(u->faction, FS_WYRM) && !has_spell(u, sp) && sp->level<=max) {
+    addspell(u, SPL_BECOMEWYRM);
+  }
 
-	/* Transformierte Wyrm-Magier bekommen Drachenodem */
-	if (dragonrace(u->race)) {
-		race_t urc = old_race(u->race);
-		switch (urc) {
-		/* keine breaks! Wyrme sollen alle drei Zauber können.*/
-			case RC_WYRM:
-        sp = find_spellbyid(SPL_WYRMODEM);
-        if (sp!=NULL && !getspell(u, sp->id) && sp->level<=max) {
-          addspell(u, sp->id);
-        }
-			case RC_DRAGON:
-        sp = find_spellbyid(SPL_DRAGONODEM);
-        if (sp!=NULL && !getspell(u, sp->id) && sp->level<=max) {
-          addspell(u, sp->id);
-        }
-			case RC_FIREDRAGON:
-        sp = find_spellbyid(SPL_FIREDRAGONODEM);
-        if (sp!=NULL && getspell(u, sp->id) && sp->level<=max) {
-          addspell(u, sp->id);
-        }
-        break;
-		}
-	}
+  /* Transformierte Wyrm-Magier bekommen Drachenodem */
+  if (dragonrace(u->race)) {
+    race_t urc = old_race(u->race);
+    switch (urc) {
+      /* keine breaks! Wyrme sollen alle drei Zauber können.*/
+    case RC_WYRM:
+      sp = find_spellbyid(SPL_WYRMODEM);
+      if (sp!=NULL && !has_spell(u, sp) && sp->level<=max) {
+        addspell(u, sp->id);
+      }
+    case RC_DRAGON:
+      sp = find_spellbyid(SPL_DRAGONODEM);
+      if (sp!=NULL && !has_spell(u, sp) && sp->level<=max) {
+        addspell(u, sp->id);
+      }
+    case RC_FIREDRAGON:
+      sp = find_spellbyid(SPL_FIREDRAGONODEM);
+      if (sp!=NULL && has_spell(u, sp) && sp->level<=max) {
+        addspell(u, sp->id);
+      }
+      break;
+    }
+  }
 
   /* Magier mit keinem bzw M_GRAU bekommen weder Sprüche angezeigt noch
   * neue Sprüche in ihre List-of-known-spells. Das sind zb alle alten
   * Drachen, die noch den Skill Magie haben */
 
-  for (sp = spelldaten; sp->id != SPL_NOSPELL; ++sp) {
-    boolean know = getspell(u, sp->id);
+  for (slist=spells;slist!=NULL;slist=slist->next) {
+    spell * sp = slist->data;
+    boolean know = has_spell(u, sp);
 
     if (know || (gebiet!=M_GRAU && sp->magietyp == gebiet && sp->level <= sk)) {
       faction * f = u->faction;
@@ -451,104 +448,17 @@ addspell(unit *u, spellid_t spellid)
 }
 
 boolean
-getspell(const unit *u, spellid_t spellid)
+has_spell(const unit *u, const spell * sp)
 {
-	sc_mage *m;
-	spell_ptr *spt;
+  spell_ptr *spt;
+  sc_mage * m = get_mage(u);
 
-  m = get_mage(u);
-  if (!m) {
-		return false;
-	}
-	for (spt = m->spellptr; spt; spt = spt->next) {
-		if (spt->spellid == spellid) {
-			return true;
-		}
-	}
-	return false;
-}
+  if (m==NULL) return false;
 
-/* ------------------------------------------------------------- */
-/* Spruch identifizieren */
-
-#include "umlaut.h"
-
-typedef struct spell_names {
-	struct spell_names * next;
-	const struct locale * lang;
-	magic_t mtype;
-	struct tnode names;
-} spell_names;
-
-static spell_names * spellnames;
-
-static spell_names *
-init_spellnames(const struct locale * lang, magic_t mtype)
-{
-	int i;
-	spell_names * sn = calloc(sizeof(spell_names), 1);
-	sn->next = spellnames;
-	sn->lang = lang;
-	sn->mtype = mtype;
-	for (i=0; spelldaten[i].id != SPL_NOSPELL; i++) {
-		const char * n = spelldaten[i].sname;
-		if (spelldaten[i].magietyp!=mtype) continue;
-		if (spelldaten[i].info==NULL) n = locale_string(lang, mkname("spell", n));
-		addtoken(&sn->names, n, (void*)(spelldaten+i));
-	}
-	return spellnames = sn;
-}
-
-static spell_names *
-get_spellnames(const struct locale * lang, magic_t mtype)
-{
-	spell_names * sn = spellnames;
-	while (sn) {
-		if (sn->mtype==mtype && sn->lang==lang) break;
-		sn=sn->next;
-	}
-	if (!sn) return init_spellnames(lang, mtype);
-  return sn;
-}
-
-spell *
-find_spellbyname(unit *u, const char *name, const struct locale * lang)
-{
-	spell_ptr *spt;
-	sc_mage * m = get_mage(u);
-	spell * sp = NULL;
-	spell_names * sn;
-
-	if (!m) return NULL;
-	sn = get_spellnames(lang, m->magietyp);
-	if (findtoken(&sn->names, name, (void**)&sp)==E_TOK_NOMATCH) {
-		magic_t mtype;
-		for(mtype=0;mtype!=MAXMAGIETYP;++mtype) {
-			sn = get_spellnames(lang, mtype);
-			if (findtoken(&sn->names, name, (void**)&sp)!=E_TOK_NOMATCH) break;
-		}
-	}
-
-	if (sp!=NULL) {
-		for (spt = m->spellptr; spt; spt = spt->next) {
-			if (sp->id==spt->spellid) return sp;
-		}
-	}
-	if (lang==default_locale) return NULL;
-	return find_spellbyname(u, name, default_locale);
-}
-
-spell *
-find_spellbyid(spellid_t id)
-{
-	int i;
-
-	for (i = 0; spelldaten[i].id != SPL_NOSPELL; i++) {
-		if (spelldaten[i].id == id) {
-			return &spelldaten[i];
-		}
-	}
-	return (spell *) NULL;
+  for (spt = m->spellptr; spt; spt = spt->next) {
+    if (spt->spellid == sp->id) return true;
+  }
+  return false;
 }
 
 /* ------------------------------------------------------------- */
@@ -601,7 +511,7 @@ set_combatspell(unit *u, spell *sp, const char * cmd, int level)
 		cmistake(u, cmd, 173, MSG_MAGIC);
 		return;
 	}
-	if (getspell(u, sp->id) == false) {
+	if (has_spell(u, sp) == false) {
 		/* Diesen Zauber kennt die Einheit nicht */
 		cmistake(u, cmd, 169, MSG_MAGIC);
 		return;
@@ -957,7 +867,7 @@ knowsspell(const region * r, const unit * u, const spell * sp)
 		return false;
 	}
 	/* steht der Spruch in der Spruchliste? */
-	if (getspell(u, sp->id) == false){
+	if (has_spell(u, sp) == false){
 		/* ist der Spruch aus einem anderen Magiegebiet? */
 		if (find_magetype(u) != sp->magietyp){
 			return false;

@@ -149,14 +149,15 @@ static void
 unit_addspell(unit& u, const char * name)
 {
   bool add = false;
-  spell * sp = spelldaten;
-  while (sp->id!=SPL_NOSPELL) {
+  spell_list * slist = spells;
+  while (slist!=NULL) {
+    spell * sp = slist->data;
     if (strcmp(name, sp->sname)==0) {
       if (add) log_error(("two spells are called %s.\n", name));
       addspell(&u, sp->id);
       add = true;
     }
-    ++sp;
+    slist=slist->next;
   }
   if (!add) log_error(("spell %s could not be found\n", name));
 }
@@ -164,7 +165,7 @@ unit_addspell(unit& u, const char * name)
 static bool
 unit_isfamiliar(const unit& u)
 {
-  return is_familiar(&u);
+  return is_familiar(&u)!=0;
 }
 
 static void

@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-extern void register_spells(void);
+  extern void register_spells(void);
 
 #ifdef __cplusplus
 }

@@ -62,7 +62,7 @@ xml_to_locale(const xmlChar * xmlStr)
   static char zText[1024];
   char * inbuf = (char*)xmlStr;
   char * outbuf = zText;
-  size_t inbytes = strlen(xmlStr)+1;
+  size_t inbytes = strlen((const char*)xmlStr)+1;
   size_t outbytes = sizeof(zText);
 
   if (context==(iconv_t)-1) {
@@ -926,15 +926,15 @@ xml_readstrings(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr, bool
       xmlChar * text;
 
       xml_readtext(textNode, &lang, &text);
-	  if (text!=NULL) {
-		assert(strcmp(zName, xml_cleanup_string(zName))==0);
-		xml_cleanup_string(text);
-		locale_setstring(lang, zName, xml_to_locale(text));
-		xmlFree(text);
-	  } else {
-		log_warning(("string %s has no text in locale %s\n",
-					 zName, locale_name(lang)));
-	  }
+      if (text!=NULL) {
+        assert(strcmp(zName, (const char*)xml_cleanup_string(BAD_CAST zName))==0);
+        xml_cleanup_string(text);
+        locale_setstring(lang, zName, xml_to_locale(text));
+        xmlFree(text);
+      } else {
+        log_warning(("string %s has no text in locale %s\n",
+          zName, locale_name(lang)));
+      }
     }
     xmlXPathFreeObject(result);
   }
@@ -946,7 +946,6 @@ parse_strings(xmlDocPtr doc)
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
   xmlXPathObjectPtr strings;
 
-  /* TODO: remember namespaces */
   /* reading eressea/strings/string */
   strings = xmlXPathEvalExpression(BAD_CAST "/eressea/strings/string", xpath);
   xml_readstrings(xpath, strings->nodesetval->nodeTab, strings->nodesetval->nodeNr, false);

@@ -117,6 +117,17 @@ MaxAge(void) {
   return value;
 }
 
+int 
+FirstTurn(void)
+{
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "hunger.long");
+    value = str?atoi(str):0;
+  }
+  return value;
+}
+
 int
 LongHunger(void) {
   static int value = -1;
@@ -2876,12 +2887,10 @@ int months_per_year;
 int
 month(int offset)
 {
-	int t = turn + offset;
+	int t = turn + offset - FirstTurn();
 	int year, r, month;
-#ifdef FIRST_TURN
-	t -= FIRST_TURN;
-#endif
-	if (t<0) t = turn;
+
+        if (t<0) t = turn;
 
 	year  = t/(months_per_year * weeks_per_month) + 1;
 	r     = t - (year-1) * months_per_year * weeks_per_month;

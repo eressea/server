@@ -2056,136 +2056,139 @@ addally(const faction * f, ally ** sfp, int aid, int state)
 faction *
 readfaction(FILE * F)
 {
-	ally **sfp;
-	int planes;
-	int i = rid(F);
-	faction * f = findfaction(i);
-	if (f==NULL) {
-		f = (faction *) calloc(1, sizeof(faction));
-		f->no = i;
-	} else {
+  ally **sfp;
+  int planes;
+  int i = rid(F);
+  faction * f = findfaction(i);
+  if (f==NULL) {
+    f = (faction *) calloc(1, sizeof(faction));
+    f->no = i;
+  } else {
 #ifdef MSG_LEVELS
-		f->warnings = NULL; /* mem leak */
+    f->warnings = NULL; /* mem leak */
 #endif
-		f->allies = NULL; /* mem leak */
-		while (f->attribs) a_remove(&f->attribs, f->attribs);
-	}
-	f->subscription = ri(F);
+    f->allies = NULL; /* mem leak */
+    while (f->attribs) a_remove(&f->attribs, f->attribs);
+  }
+  f->subscription = ri(F);
 #ifdef ALLIANCES
-	if (global.data_version>=ALLIANCES_VERSION) {
-		int allianceid = rid(F);
-		if (allianceid!=0) f->alliance = findalliance(allianceid);
-		if (f->alliance) {
-			faction_list * flist = malloc(sizeof(faction_list));
-			flist->data = f;
-			flist->next = f->alliance->members;
-			f->alliance->members = flist;
-		}
-	}
+  if (global.data_version>=ALLIANCES_VERSION) {
+    int allianceid = rid(F);
+    if (allianceid!=0) f->alliance = findalliance(allianceid);
+    if (f->alliance) {
+      faction_list * flist = malloc(sizeof(faction_list));
+      flist->data = f;
+      flist->next = f->alliance->members;
+      f->alliance->members = flist;
+    }
+  }
 #endif
 
-	rds(F, &f->name);
+  rds(F, &f->name);
 
 #ifndef AMIGA
-	if (!quiet) printf("   - Lese Partei %s (%s)\n", f->name, factionid(f));
+  if (!quiet) printf("   - Lese Partei %s (%s)\n", f->name, factionid(f));
 #endif
 
-	rds(F, &f->banner);
-	rds(F, &f->email);
-	rds(F, &f->passw);
-	if (global.data_version >= OVERRIDE_VERSION) {
-		rds(F, &f->override);
-	} else {
-		f->override = strdup(itoa36(rand()));
-	}
+  rds(F, &f->banner);
+  rds(F, &f->email);
+  rds(F, &f->passw);
+  if (global.data_version >= OVERRIDE_VERSION) {
+    rds(F, &f->override);
+  } else {
+    f->override = strdup(itoa36(rand()));
+  }
 
-	if (global.data_version < LOCALE_VERSION) {
-		f->locale = find_locale("de");
-	} else {
-		rs(F, buf);
-		f->locale = find_locale(buf);
-	}
-	f->lastorders = ri(F);
-	f->age = ri(F);
-	if (global.data_version < NEWRACE_VERSION) {
-		race_t rc = (char) ri(F);
-		f->race = new_race[rc];
-	} else {
-		rs(F, buf);
-		f->race = rc_find(buf);
-		assert(f->race);
-	}
+  if (global.data_version < LOCALE_VERSION) {
+    f->locale = find_locale("de");
+  } else {
+    rs(F, buf);
+    f->locale = find_locale(buf);
+  }
+  f->lastorders = ri(F);
+  f->age = ri(F);
+  if (global.data_version < NEWRACE_VERSION) {
+    race_t rc = (char) ri(F);
+    f->race = new_race[rc];
+  } else {
+    rs(F, buf);
+    f->race = rc_find(buf);
+    assert(f->race);
+  }
 #ifdef CONVERT_DBLINK
-	convertunique(f);
+  convertunique(f);
 #endif
-	f->magiegebiet = (magic_t)ri(F);
-	if (!playerrace(f->race)) {
-		f->lastorders = turn+1;
-	}
-	f->karma = ri(F);
-	f->flags = ri(F);
-	freset(f, FFL_OVERRIDE);
+  f->magiegebiet = (magic_t)ri(F);
+  if (!playerrace(f->race)) {
+    f->lastorders = turn+1;
+  }
+  f->karma = ri(F);
+  f->flags = ri(F);
+  freset(f, FFL_OVERRIDE);
 
-	a_read(F, &f->attribs);
+  a_read(F, &f->attribs);
 #ifdef MSG_LEVELS
-	read_msglevels(&f->warnings, F);
+  read_msglevels(&f->warnings, F);
 #else
-        for (;;) {
-          int level;
-          fscanf(F, "%s", buf);
-          if (strcmp("end", buf)==0) break;
-          fscanf(F, "%d ", &level);
-        } 
+  for (;;) {
+    int level;
+    fscanf(F, "%s", buf);
+    if (strcmp("end", buf)==0) break;
+    fscanf(F, "%d ", &level);
+  } 
 #endif
-	planes = ri(F);
-	while(--planes >= 0) {
-		int id = ri(F);
-		int ux = ri(F);
-		int uy = ri(F);
-		set_ursprung(f, id, ux, uy);
-	}
-	f->newbies = 0;
-	f->options = ri(F);
+  planes = ri(F);
+  while(--planes >= 0) {
+    int id = ri(F);
+    int ux = ri(F);
+    int uy = ri(F);
+    set_ursprung(f, id, ux, uy);
+  }
+  f->newbies = 0;
+  
+  i = f->options = ri(F);
 
-	if (((f->options & Pow(O_REPORT)) == 0)
-		&& (f->options & Pow(O_COMPUTER)) == 0) {
-		/* Kein Report eingestellt, Fehler */
-		f->options = f->options | Pow(O_REPORT) | Pow(O_ZUGVORLAGE);
-	}
+  if ((i & Pow(O_REPORT))==0 && (i & Pow(O_COMPUTER))==0) {
+    /* Kein Report eingestellt, Fehler */
+    f->options = f->options | Pow(O_REPORT) | Pow(O_ZUGVORLAGE);
+  }
 
-	if (global.data_version < TYPES_VERSION) {
-		int i, sk = ri(F); /* f->seenspell überspringen */
-		for (i = 0; spelldaten[i].id != SPL_NOSPELL; i++) {
-			if (spelldaten[i].magietyp == f->magiegebiet && spelldaten[i].level <= sk) {
-				a_add(&f->attribs, a_new(&at_seenspell))->data.i = spelldaten[i].id;
-			}
-		}
-	}
+  if (global.data_version < TYPES_VERSION) {
+    int sk = ri(F); /* f->seenspell überspringen */
+    spell_list * slist;
+    for (slist=spells;slist!=NULL;slist=slist->next) {
+      spell * sp = slist->data;
 
-	sfp = &f->allies;
-	if (global.data_version<ALLIANCES_VERSION) {
-		int p = ri(F);
-		while (--p >= 0) {
-			int aid = rid(F);
-			int state = ri(F);
-			addally(f, sfp, aid, state);
-		}
-	} else {
-		for (;;) {
-			rs(F, buf);
-			if (strcmp(buf, "end")==0) break;
-			else {
-				int aid = atoi36(buf);
-				int state = ri(F);
-				addally(f, sfp, aid, state);
-			}
-		}
-	}
-	read_groups(F, f);
+      if (sp->magietyp==f->magiegebiet && sp->level<=sk) {
+        a_add(&f->attribs, a_new(&at_seenspell))->data.i = sp->id;
+      }
+    }
+  }
+
+  sfp = &f->allies;
+  if (global.data_version<ALLIANCES_VERSION) {
+    int p = ri(F);
+    while (--p >= 0) {
+      int aid = rid(F);
+      int state = ri(F);
+      addally(f, sfp, aid, state);
+    }
+  } else {
+    for (;;) {
+      rs(F, buf);
+      if (strcmp(buf, "end")==0) break;
+      else {
+        int aid = atoi36(buf);
+        int state = ri(F);
+        addally(f, sfp, aid, state);
+      }
+    }
+  }
+  read_groups(F, f);
 #ifdef REGIONOWNERS
   read_enemies(F, f);
 #endif
-	return f;
+  return f;
 }
 
 void

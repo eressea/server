@@ -49,7 +49,3 @@
 
 #define MAILITPATH	"/usr/sbin:$HOME/eressea/bin:/bin:/usr/bin:/usr/local/bin"
 
-/* Krücke für die Berechnung der Jahreszeiten in Eressea */
-
-#define FIRST_TURN 184
-

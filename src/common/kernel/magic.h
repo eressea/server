@@ -126,23 +126,7 @@ typedef struct sc_mage {
 } sc_mage;
 
 /* ------------------------------------------------------------- */
-/* Spruchstukturdefinition:
- * id:
- *  SPL_NOSPELL muss der letzte Spruch in der Liste spelldaten[] sein,
- *  denn nicht auf die Reihenfolge in der Liste sondern auf die id wird
- *  geprüft
- * rank:
- *  gibt die Priorität und damit die Reihenfolge an, in der der Spruch
- *  gezaubert wird.
- * sptyp:
- *  besondere Spruchtypen (Artefakt, Regionszauber, Kampfzauber ..)
- * Komponenten[Anzahl mögl. Items][Art:Anzahl:Faktor]
- *
- */
-
-/* ------------------------------------------------------------- */
 /* Zauberliste */
-
 
 typedef struct castorder {
   struct castorder *next;
@@ -300,7 +284,7 @@ void unset_combatspell(struct unit *u, spell *sp);
 	/* 	löscht Kampfzauber */
 void addspell(struct unit *u, spellid_t spellid);
 	/* fügt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
-boolean getspell(const struct unit *u, spellid_t spellid);
+boolean has_spell(const struct unit *u, const struct spell * sp);
 	/* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
 void updatespelllist(struct unit *u);
 	/* fügt alle Zauber des Magiegebietes der Einheit, deren Stufe kleiner

@@ -179,10 +179,7 @@ int
 season(int turn)
 {
 	int year,month;
-	int t = turn;
-#ifdef FIRST_TURN
-	t -= FIRST_TURN;
-#endif
+	int t = turn - FirstTurn();
 
 	year  = t/(months_per_year * weeks_per_month) + 1;
 	month = (t - (year-1) * months_per_year * weeks_per_month)/weeks_per_month;
@@ -198,7 +195,7 @@ gamedate(const struct locale * lang)
 {
 	int year,month,week,r;
 	static char buf[256];
-	int t = turn - FIRST_TURN;
+	int t = turn - FirstTurn();
 
 	if (t<0) t = turn;
 	assert(lang);
@@ -222,10 +219,7 @@ gamedate_season(const struct locale * lang)
 {
 	int year,month,week,r;
 	static char buf[256];
-	int t = turn;
-#ifdef FIRST_TURN
-	t -= FIRST_TURN;
-#endif
+	int t = turn - FirstTurn();
 
 	if (t<0) t = turn;
 	assert(lang);
@@ -249,10 +243,7 @@ gamedate2(const struct locale * lang)
 {
 	int year,month,week,r;
 	static char buf[256];
-	int t = turn;
-#ifdef FIRST_TURN
-	t -= FIRST_TURN;
-#endif
+	int t = turn - FirstTurn();
 
 	if (t<0) t = turn;
 
@@ -273,10 +264,7 @@ gamedate_short(const struct locale * lang)
 {
 	int year,month,week,r;
 	static char buf[256];
-	int t = turn;
-#ifdef FIRST_TURN
-	t -= FIRST_TURN;
-#endif
+	int t = turn - FirstTurn();
 
 	if (t<0) t = turn;
 

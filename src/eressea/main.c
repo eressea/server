@@ -178,6 +178,7 @@ game_init(void)
 
   init_locales();
   init_attributes();
+  init_spells();
   init_races();
   init_items();
   init_races();

@@ -1172,6 +1172,7 @@ extern const char * dbrace(const struct race * rc);
 extern void set_param(struct param ** p, const char * name, const char * data);
 extern const char* get_param(const struct param * p, const char * name);
 
+extern int FirstTurn(void);
 extern int NMRTimeout(void);
 extern int LongHunger(void);
 extern boolean TradeDisabled(void);

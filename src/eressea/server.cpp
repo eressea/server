@@ -65,6 +65,7 @@
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/spell.h>
 #include <kernel/message.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
@@ -182,6 +183,7 @@ game_init(void)
   /*  init_resources(); must be done inside the xml-read, because requirements use items */
 
   init_attributes();
+  init_spells();
   init_races();
   init_items();
   init_economy();

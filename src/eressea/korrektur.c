@@ -269,54 +269,46 @@ attrib_type at_roadfix = {
 static void
 show_newspells(void)
 {
-	region *r;
-	/* Alle geänderten Zauber in das array newspellids[]. mit SPL_NOSPELL
-	 * terminieren */
+  region *r;
+  /* Alle geänderten Zauber in das array newspellids[]. mit SPL_NOSPELL
+  * terminieren */
 
-	spellid_t newspellids[] = {
-#ifdef WDW_PHOENIX
-		SPL_WDWPYRAMID_TRAUM,
-		SPL_WDWPYRAMID_ASTRAL,
-		SPL_WDWPYRAMID_DRUIDE,
-		SPL_WDWPYRAMID_BARDE,
-		SPL_WDWPYRAMID_CHAOS,
-#endif
-		  SPL_NOSPELL
-		};
+  spellid_t newspellids[] = {
+    SPL_NOSPELL
+  };
 
-	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]
-	 * abgelegt */
+  /* die id's der neuen oder veränderten Sprüche werden in newspellids[]
+  * abgelegt */
 
-	for(r=regions; r; r=r->next) {
-		unit *u;
-		for(u=r->units;u;u=u->next) {
-			sc_mage *m = get_mage(u);
-			if (u->faction->no == MONSTER_FACTION) continue;
-			if (m != NULL) {
-				int i;
+  for(r=regions; r; r=r->next) {
+    unit *u;
+    for(u=r->units;u;u=u->next) {
+      sc_mage *m = get_mage(u);
+      if (u->faction->no == MONSTER_FACTION) continue;
+      if (m != NULL) {
+        int i;
 
-				if (m->magietyp == M_GRAU) continue;
+        if (m->magietyp == M_GRAU) continue;
 
-				for (i = 0; newspellids[i] != SPL_NOSPELL; i++) {
-					spell *sp = find_spellbyid(newspellids[i]);
+        for (i = 0; newspellids[i] != SPL_NOSPELL; i++) {
+          spell *sp = find_spellbyid(newspellids[i]);
 
-					if (!sp) continue;
+          if (!sp) continue;
 
-					if (m->magietyp == sp->magietyp || getspell(u, sp->id)) {
-						attrib * a = a_find(u->faction->attribs, &at_reportspell);
-						while (a && a->data.i != sp->id) a = a->nexttype;
-						if (!a) {
-							/* spell is not being shown yet. if seen before, remove to show again */
-							a = a_find(u->faction->attribs, &at_seenspell);
-							while (a && a->data.i != sp->id) a = a->nexttype;
-							if (a) a_remove(&u->faction->attribs, a);
-						}
-					}
-				}
-			}
-		}
-	}
-
+          if (m->magietyp == sp->magietyp || has_spell(u, sp)) {
+            attrib * a = a_find(u->faction->attribs, &at_reportspell);
+            while (a && a->data.i != sp->id) a = a->nexttype;
+            if (!a) {
+              /* spell is not being shown yet. if seen before, remove to show again */
+              a = a_find(u->faction->attribs, &at_seenspell);
+              while (a && a->data.i != sp->id) a = a->nexttype;
+              if (a) a_remove(&u->faction->attribs, a);
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 static int
