@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.16 2001/02/09 19:12:15 corwin Exp $
+ *	$Id: korrektur.c,v 1.17 2001/02/09 19:52:59 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1781,6 +1781,20 @@ fix_targetregion_resolve(void)
 	}
 }
 
+void
+fix_baumringel(void)
+{
+	region *r;
+  const item_type *itype = finditemtype("Blauer Baumringel", NULL);
+  const herb_type *htype = resource2herb(itype->rtype);
+
+	for(r=regions; r; r=r->next) {
+		if(rterrain(r) == T_PLAIN && rand()%6 == 5) {
+     	rsetherbtype(r, htype);
+		}
+	}
+}
+
 #include <modules/gmcmd.h>
 void setup_gm_faction(void);
 
@@ -1850,8 +1864,9 @@ korrektur(void)
 	}
 	do_once(atoi36("fxfa"), fix_vertrautenmagie());
 	do_once(atoi36("uddp"), undo_deadpeasants());
-        do_once(atoi36("lmsr"), lms_special(findunit(atoi36("tt3g"))))
-	/* fix_hp(); */ /* checkt, ob irgendwer absurde hitpoints hat. */
+  do_once(atoi36("lmsr"), lms_special(findunit(atoi36("tt3g"))))
+	do_once(atoi36("brng"), fix_baumringel());
+	do_once(atoi36("demd"), fix_demand());
 
 	/* trade_orders(); */
 	if (global.data_version < NEWROAD_VERSION) {
@@ -1874,6 +1889,7 @@ korrektur(void)
 	enable_fuzzy = true;
 #endif
 }
+
 
 void
 korrektur_end(void)

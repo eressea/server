@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: terrain.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: terrain.c,v 1.3 2001/02/09 19:52:59 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -31,7 +31,7 @@
 #include <string.h>
 
 #ifdef NO_FOREST
-static const char * plain_herbs[] = {"Flachwurz", "Würziger Wagemut", "Eulenauge", "Grüner Spinnerich", "Würziger Wagemut", "Elfenlieb", NULL};
+static const char * plain_herbs[] = {"Flachwurz", "Würziger Wagemut", "Eulenauge", "Grüner Spinnerich", "Blauer Baumringel", "Elfenlieb", NULL};
 #else
 static const char * plain_herbs[] = {"Flachwurz", "Würziger Wagemut", "Eulenauge", NULL};
 static const char * forest_herbs[] = {"Grüner Spinnerich", "Blauer Baumringel", "Elfenlieb", NULL};

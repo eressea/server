@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: mapper.c,v 1.9 2001/02/09 19:12:15 corwin Exp $
+ *	$Id: mapper.c,v 1.10 2001/02/09 19:52:59 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -214,6 +214,17 @@ RegionSymbol(region *r) {
 			}
 		}
 		break;
+	case 4:
+		{
+			if(r->land) {
+				struct demand *dmd;
+				rs = '0';
+				for (dmd=r->land->demands;dmd;dmd=dmd->next) rs++;
+			} else {
+				rs = terrain[rterrain(r)].symbol;
+			}
+		}
+		break;
 	default:
 		rs = terrain[rterrain(r)].symbol;
 		if(rs == 'P' && rtrees(r) >= 600) rs = 'F';
@@ -295,6 +306,10 @@ drawmap(boolean maponly) {
 		case 3:
 			movexy(SX-14,SY-2);
 			addstr(" Botanik    ");
+			break;
+		case 4:
+			movexy(SX-14,SY-2);
+			addstr(" Demand     ");
 			break;
 		}
 	}
@@ -915,7 +930,7 @@ movearound(int rx, int ry) {
 					ch = -9;
 					break;
 				case 'k':
-					politkarte = (politkarte+1)%4;
+					politkarte = (politkarte+1)%5;
 					ch = -9;
 					break;
 				case '{':
