@@ -243,11 +243,11 @@ score(void)
 
 	sprintf(buf, "%s/score", basepath());
 	scoreFP = fopen(buf, "w");
-	for (f = factions; f; f = f->next) if(f->number != 0) {
+	for (f = factions; f; f = f->next) if (f->num_total != 0) {
 		fprintf(scoreFP, "%8d (%8d/%4.2f%%/%5.2f) %30.30s (%3.3s) %5s (%3d)\n",
 			f->score, f->score - average_score_of_age(f->age, f->age / 24 + 1),
 		      ((float) f->score / (float) allscores) * 100.0,
-					(float) f->score / f->number,
+					(float) f->score / f->num_total,
 					f->name, LOC(default_locale, rc_name(f->race, 0)), factionid(f), f->age);
 	}
 	fclose(scoreFP);
@@ -268,7 +268,7 @@ score(void)
 				if(f->alliance && f->alliance->id == a->id) {
 					alliance_factions++;
 					alliance_score  += f->score;
-					alliance_number += f->number;
+					alliance_number += f->num_total;
 					if (token!=NULL) {
 						unit * u = f->units;
 						while (u!=NULL) {

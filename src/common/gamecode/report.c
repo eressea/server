@@ -3004,7 +3004,7 @@ make_summary(boolean count_new)
 		}
 		++plang->number;
 		f->nregions = 0;
-		f->number = 0;
+		f->num_total = 0;
 		f->money = 0;
 		if (f->alive && (count_new || f->age > 0)) s->factions++;
 	}
@@ -3096,7 +3096,7 @@ make_summary(boolean count_new)
 					}
 				}
 
-				f->number += u->number;
+				f->num_total += u->number;
 				f->money += get_money(u);
 				s->poprace[old_race(u->race)] += u->number;
 			}
@@ -3338,12 +3338,12 @@ out_faction(FILE *file, faction *f)
     fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
       f->name, itoa36(f->no), f->alliance?f->alliance->id:0,
       LOC(default_locale, rc_name(f->race, 0)), neue_gebiete[f->magiegebiet],
-      f->no_units, f->number, f->money, turn - f->lastorders,
+      f->no_units, f->num_total, f->money, turn - f->lastorders,
       turn - f->lastorders != 1 ? "NMRs" : "NMR ");
   } else {
  	  fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
 		  factionname(f), LOC(default_locale, rc_name(f->race, 0)),
-		  neue_gebiete[f->magiegebiet], f->no_units, f->number, f->money,
+		  neue_gebiete[f->magiegebiet], f->no_units, f->num_total, f->money,
 		  turn - f->lastorders, turn - f->lastorders != 1 ? "NMRs" : "NMR ");
   }
 }

@@ -63,7 +63,8 @@ typedef struct faction {
 	magic_t magiegebiet;
 	int newbies;
 	int num_migrants;			/* Anzahl Migranten */
-	int num_people;				/* Anzahl Personen */
+	int num_people;				/* Anzahl Personen ohne Monster */
+  int num_total;        /* Anzahl Personen mit Monstern */
 	int options;
 	int no_units;
 	int karma;
@@ -79,7 +80,6 @@ typedef struct faction {
 	struct strlist *mistakes; /* enno: das muﬂ irgendwann noch ganz raus */
 	boolean alive; /* enno: sollte ein flag werden */
 	int nregions;
-	int number; /* enno: unterschied zu num_people ? */
 	int money;
 	int score;
 	struct alliance * alliance;

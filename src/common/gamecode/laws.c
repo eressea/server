@@ -1121,7 +1121,7 @@ parse_quit(void)
     if (turn!=f->lastorders) {
       char info[256];
       sprintf(info, "%d Einheiten, %d Personen, %d Silber",
-        f->no_units, f->number, f->money);
+        f->no_units, f->num_total, f->money);
       if (f->subscription) {
         sql_print(("UPDATE subscriptions SET lastturn=%d, password='%s', info='%s' WHERE id=%u;\n",
                    f->lastorders, f->override, info, f->subscription));

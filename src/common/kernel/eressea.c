@@ -1180,6 +1180,7 @@ update_lighthouse(building * lh)
 int
 count_all(const faction * f)
 {
+#ifndef NDEBUG
 	int n = 0;
 	unit *u;
   for (u=f->units;u;u=u->nextF) {
@@ -1188,6 +1189,12 @@ count_all(const faction * f)
 			assert(f==u->faction);
 		}
   }
+  if (f->num_people != n) {
+    log_error(("Anzahl Personen für (%s) ist != num_people: %d statt %d.\n",
+      factionid(f), f->num_migrants, n));
+    f->num_people = n;
+  }
+#endif
 	return n;
 }
 
@@ -1206,8 +1213,11 @@ count_migrants (const faction * f)
     }
     u = u->nextF;
   }
-  if (f->num_migrants != n)
-    log_error(("Anzahl Migranten für (%s) ist falsch: %d statt %d.\n", factionid(f), f->num_migrants, n));
+  if (f->num_migrants != n) {
+    log_error(("Anzahl Migranten für (%s) ist != num_migrants: %d statt %d.\n",
+      factionid(f), f->num_migrants, n));
+    f->num_migrants = n;
+  }
 #endif
   return f->num_migrants;
 }
@@ -1869,7 +1879,7 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
 
 	/* Nicht zu der Einheitenzahl zählen sollten auch alle Monster. Da
 	 * aber auf die MAXUNITS nur in MACHE TEMP geprüft wird, ist es egal */
-	if(!fval(u->race, RCF_UNDEAD)) {
+  if (playerrace(u->race)) {
 		f->no_units++;
 	}
 

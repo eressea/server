@@ -807,7 +807,9 @@ u_setfaction(unit * u, faction * f)
 	if (u->faction==f) return;
   if (u->faction) {
     set_number(u, 0);
-    --u->faction->no_units;
+    if (playerrace(u->race)) {
+      --u->faction->no_units;
+    }
     join_group(u, NULL);
     free_orders(&u->orders);
     set_order(&u->thisorder, NULL);
@@ -831,7 +833,9 @@ u_setfaction(unit * u, faction * f)
 	u->faction = f;
 	if (cnt && f) {
 		set_number(u, cnt);
-		++f->no_units;
+    if (playerrace(u->race)) {
+      ++f->no_units;
+    }
 	}
 }
 /* vorsicht Sprüche können u->number == 0 (RS_FARVISION) haben! */
@@ -844,11 +848,14 @@ set_number(unit * u, int count)
 #endif
 	if (u->faction && u->race != u->faction->race && playerrace(u->race)
 	    && old_race(u->race) != RC_SPELL && old_race(u->race) != RC_SPECIAL
-			&& !(is_cursed(u->attribs, C_SLAVE, 0))){
+			&& !(is_cursed(u->attribs, C_SLAVE, 0)))
+  {
 		u->faction->num_migrants += count - u->number;
 	}
 
-	u->faction->num_people += count - u->number;
+  if (playerrace(u->race)) {
+    u->faction->num_people += count - u->number;
+  }
 	u->number = count;
 }
 
