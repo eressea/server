@@ -1160,7 +1160,7 @@ readunit(FILE * F)
 				csp++;
 			}
 			while ((i = ri(F)) != -1) {
-				addspell(u, (spellid_t) i);
+				add_spell(mage, (spellid_t) i);
 			}
 			mage->spellcount = 0;
 			a = a_add(&u->attribs, a_new(&at_mage));

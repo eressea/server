@@ -202,7 +202,6 @@ read_mage(attrib * a, FILE * F)
 {
   int i, mtype;
   sc_mage * mage = (sc_mage*)a->data.v;
-  spell_ptr ** sp = &mage->spellptr;
 
   fscanf(F, "%d %d %d", &mtype, &mage->spellpoints, &mage->spchange);
   mage->magietyp = (magic_t)mtype;
@@ -213,15 +212,16 @@ read_mage(attrib * a, FILE * F)
     mage->combatspell[i] = (spellid_t)spid;
   }
   for (;;) {
-    int spid;
+    int i;
 
-    fscanf (F, "%d", &spid);
-    if (spid < 0) break;
-    if (find_spellbyid((spellid_t)spid)==NULL) continue;
+    fscanf (F, "%d", &i);
+    if (i < 0) break;
+    else {
+      spellid_t spid = (spellid_t)i;
 
-    *sp = calloc (sizeof(spell_ptr), 1);
-    (*sp)->spellid = (spellid_t)spid;
-    sp = &(*sp)->next;
+      if (find_spellbyid(spid)==NULL) continue;
+      add_spell(mage, spid);
+    }
   }
   return AT_READ_OK;
 }
@@ -302,7 +302,7 @@ createspelllist(unit *u, magic_t mtyp)
     spell * sp = slist->data;
     if (sp->magietyp == mtyp && sp->level <= sk) {
       if (!has_spell(u, sp)) {
-        addspell(u, sp->id);
+        add_spell(get_mage(u), sp->id);
       }
     }
   }
@@ -313,9 +313,9 @@ createspelllist(unit *u, magic_t mtyp)
 sc_mage *
 create_mage(unit * u, magic_t mtyp)
 {
-	sc_mage *mage;
-	attrib *a;
-	int i;
+  sc_mage *mage;
+  attrib *a;
+  int i;
 
   a = a_find(u->attribs, &at_mage);
   if (a==NULL) {
@@ -326,16 +326,16 @@ create_mage(unit * u, magic_t mtyp)
     mage = a->data.v;
   }
 
-	mage->magietyp = mtyp;
-	mage->spellpoints = 0;
-	mage->spchange = 0;
-	mage->spellcount = 0;
-	for (i=0;i<MAXCOMBATSPELLS;i++) {
-		mage->combatspell[i] = SPL_NOSPELL;
-	}
-	mage->spellptr = NULL;
-	createspelllist(u, mtyp);
-	return mage;
+  mage->magietyp = mtyp;
+  mage->spellpoints = 0;
+  mage->spchange = 0;
+  mage->spellcount = 0;
+  for (i=0;i<MAXCOMBATSPELLS;i++) {
+    mage->combatspell[i] = SPL_NOSPELL;
+  }
+  mage->spellptr = NULL;
+  createspelllist(u, mtyp);
+  return mage;
 }
 
 /* ------------------------------------------------------------- */
@@ -366,19 +366,20 @@ updatespelllist(unit * u)
   int sk = eff_skill(u, SK_MAGIC, u->region);
   spell_list * slist;
   spell * sp;
+  struct sc_mage * mage = get_mage(u);
   magic_t gebiet = find_magetype(u);
   boolean ismonster = u->faction->no==MONSTER_FACTION;
 
   /* Nur Orkmagier bekommen den Keuschheitsamulettzauber */
   sp = find_spellbyid(SPL_ARTEFAKT_CHASTITYBELT);
   if (old_race(u->race)==RC_ORC && !has_spell(u, sp) && sp->level<=sk) {
-    addspell(u, SPL_ARTEFAKT_CHASTITYBELT);
+    add_spell(mage, SPL_ARTEFAKT_CHASTITYBELT);
   }
 
   /* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
   sp = find_spellbyid(SPL_BECOMEWYRM);
   if (fspecial(u->faction, FS_WYRM) && !has_spell(u, sp) && sp->level<=sk) {
-    addspell(u, SPL_BECOMEWYRM);
+    add_spell(mage, SPL_BECOMEWYRM);
   }
 
   /* Transformierte Wyrm-Magier bekommen Drachenodem */
@@ -389,17 +390,17 @@ updatespelllist(unit * u)
     case RC_WYRM:
       sp = find_spellbyid(SPL_WYRMODEM);
       if (sp!=NULL && !has_spell(u, sp) && sp->level<=sk) {
-        addspell(u, sp->id);
+        add_spell(mage, sp->id);
       }
     case RC_DRAGON:
       sp = find_spellbyid(SPL_DRAGONODEM);
       if (sp!=NULL && !has_spell(u, sp) && sp->level<=sk) {
-        addspell(u, sp->id);
+        add_spell(mage, sp->id);
       }
     case RC_FIREDRAGON:
       sp = find_spellbyid(SPL_FIREDRAGONODEM);
       if (sp!=NULL && has_spell(u, sp) && sp->level<=sk) {
-        addspell(u, sp->id);
+        add_spell(mage, sp->id);
       }
       break;
     }
@@ -417,7 +418,7 @@ updatespelllist(unit * u)
       if (know || (gebiet!=M_GRAU && sp->magietyp == gebiet)) {
         faction * f = u->faction;
 
-        if (!know) addspell(u, sp->id);
+        if (!know) add_spell(mage, sp->id);
         if (!ismonster && !already_seen(u->faction, sp->id)) {
           a_add(&f->attribs, a_new(&at_reportspell))->data.i = sp->id;
           a_add(&f->attribs, a_new(&at_seenspell))->data.i = sp->id;
@@ -431,20 +432,25 @@ updatespelllist(unit * u)
 /* Funktionen für die Bearbeitung der List-of-known-spells */
 
 void
-addspell(unit *u, spellid_t spellid)
+add_spell(sc_mage* m, spellid_t spellid)
 {
-	sc_mage *m;
-	spell_ptr *newsp;
-
-	m = get_mage(u);
-	if (!m) {
-		return;
-	}
-	newsp = calloc(1, sizeof(spell_ptr));
-	newsp->spellid = spellid;
-
-	addlist(&m->spellptr, newsp);
-	return;
+  if (m==NULL) {
+    log_error(("add_spell: unit is not a mage.\n"));
+  } else {
+    spell_ptr *newsp;
+    spell_ptr **spinsert = &m->spellptr;
+    while (*spinsert && (*spinsert)->spellid<spellid) spinsert=&(*spinsert)->next;
+    newsp = *spinsert;
+    if (newsp && newsp->spellid==spellid) {
+      log_error(("add_spell: unit already has spell %d.\n", spellid));
+      return;
+    }
+    newsp = calloc(1, sizeof(spell_ptr));
+    newsp->spellid = spellid;
+    newsp->next = *spinsert;
+    *spinsert = newsp;
+  }
+  return;
 }
 
 boolean
@@ -455,9 +461,9 @@ has_spell(const unit *u, const spell * sp)
 
   if (m==NULL) return false;
 
-  for (spt = m->spellptr; spt; spt = spt->next) {
-    if (spt->spellid == sp->id) return true;
-  }
+  spt = m->spellptr;
+  while (spt && spt->spellid<sp->id) spt = spt->next;
+  if (spt && spt->spellid==sp->id) return true;
   return false;
 }
 

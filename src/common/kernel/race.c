@@ -494,7 +494,7 @@ oldfamiliars(unit * familiar)
   if (m!=NULL) {
     spell_list * fspells = familiarspells(familiar->race);
     while (fspells!=NULL) {
-      addspell(familiar, fspells->data->id);
+      add_spell(m, fspells->data->id);
       fspells=fspells->next;
     }
   }

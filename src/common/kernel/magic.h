@@ -111,15 +111,15 @@ typedef struct spell_ptr {
 } spell_ptr;
 
 typedef struct sc_mage {
-	magic_t magietyp;
-	int spellpoints;
-	int spchange;
-	int spellcount;
-	spellid_t combatspell[MAXCOMBATSPELLS];
-	int     combatspelllevel[MAXCOMBATSPELLS];
-	int     precombataura;		/* Merker, wieviel Aura in den Präcombatzauber
-															 gegangen ist. Nicht speichern. */
-	struct spell_ptr *spellptr;
+  magic_t magietyp;
+  int spellpoints;
+  int spchange;
+  int spellcount;
+  spellid_t combatspell[MAXCOMBATSPELLS];
+  int combatspelllevel[MAXCOMBATSPELLS];
+  int precombataura; /* Merker, wieviel Aura in den Präcombatzauber
+                        gegangen ist. Nicht speichern. */
+  struct spell_ptr *spellptr;
 } sc_mage;
 
 /* ------------------------------------------------------------- */
@@ -279,7 +279,7 @@ void set_combatspell(struct unit *u, spell *sp, struct order * ord, int level);
 	/* 	setzt Kampfzauber */
 void unset_combatspell(struct unit *u, spell *sp);
 	/* 	löscht Kampfzauber */
-void addspell(struct unit *u, spellid_t spellid);
+void add_spell(struct sc_mage *mage, spellid_t spellid);
 	/* fügt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
 boolean has_spell(const struct unit *u, const struct spell * sp);
 	/* prüft, ob der Spruch in der Spruchliste der Einheit steht. */

@@ -199,8 +199,9 @@ unit_addspell(unit& u, const char * name)
   while (slist!=NULL) {
     spell * sp = slist->data;
     if (strcmp(name, sp->sname)==0) {
+      struct sc_mage * mage = get_mage(&u);
       if (add) log_error(("two spells are called %s.\n", name));
-      addspell(&u, sp->id);
+      add_spell(mage, sp->id);
       add = true;
     }
     slist=slist->next;

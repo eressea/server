@@ -7219,33 +7219,33 @@ sp_destroy_curse(castorder *co)
 int
 sp_becomewyrm(castorder *co)
 {
-	unit *mage = (unit *)co->magician;
-	int wyrms_already_created = 0;
-	int wyrms_allowed;
-	attrib *a;
+  unit *u = (unit *)co->magician;
+  int wyrms_already_created = 0;
+  int wyrms_allowed;
+  attrib *a;
 
-	wyrms_allowed = fspecial(mage->faction, FS_WYRM);
-	a = a_find(mage->faction->attribs, &at_wyrm);
-	if(a) wyrms_already_created = a->data.i;
+  wyrms_allowed = fspecial(u->faction, FS_WYRM);
+  a = a_find(u->faction->attribs, &at_wyrm);
+  if(a) wyrms_already_created = a->data.i;
 
-	if(wyrms_already_created >= wyrms_allowed) {
-		cmistake(mage, co->order, 262, MSG_MAGIC);
-		return 0;
-	}
+  if(wyrms_already_created >= wyrms_allowed) {
+    cmistake(u, co->order, 262, MSG_MAGIC);
+    return 0;
+  }
 
-	if(!a) {
-		a_add(&mage->faction->attribs, a_new(&at_wyrm));
-		a->data.i = 1;
-	} else {
-		a->data.i++;
-	}
+  if(!a) {
+    a_add(&u->faction->attribs, a_new(&at_wyrm));
+    a->data.i = 1;
+  } else {
+    a->data.i++;
+  }
 
-	mage->race = new_race[RC_WYRM];
-	addspell(mage, SPL_WYRMODEM);
+  u->race = new_race[RC_WYRM];
+  add_spell(get_mage(u), SPL_WYRMODEM);
 
-	ADDMSG(&mage->faction->msgs, msg_message("becomewyrm", "mage", mage));
+  ADDMSG(&u->faction->msgs, msg_message("becomewyrm", "u", u));
 
-	return co->level;
+  return co->level;
 }
 
 #ifdef WDW_PYRAMIDSPELL
