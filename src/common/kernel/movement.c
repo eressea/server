@@ -258,13 +258,13 @@ ridingcapacity(unit * u)
 int
 walkingcapacity(const struct unit * u)
 {
-	int n, tmp, personen, pferde, pferde_fuer_wagen;
+	int n, tmp, personen, pferde_fuer_wagen;
 	int wagen, wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
 	/* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
 	 * die Leute tragen */
 
-	pferde = get_item(u, I_HORSE);
-  unicorns = get_item(u, I_UNICORN);
+	int pferde = get_item(u, I_HORSE);
+  int unicorns = get_item(u, I_UNICORN);
 	if (fval(u->race, RCF_HORSE)) {
 		pferde += u->number;
 		personen = 0;

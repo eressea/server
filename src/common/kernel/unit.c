@@ -830,7 +830,7 @@ u_setfaction(unit * u, faction * f)
 	if (u->nextF) u->nextF->prevF = u;
 	u->prevF = NULL;
 
-	u->faction = f;
+  u->faction = f;
 	if (cnt && f) {
 		set_number(u, cnt);
     if (playerrace(u->race)) {
