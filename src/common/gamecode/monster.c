@@ -59,6 +59,7 @@
 /* attributes includes */
 #include <attributes/targetregion.h>
 #include <attributes/hate.h>
+#include <attributes/aggressive.h>
 
 /* spezialmonster */
 #include <spells/alp.h>
@@ -605,7 +606,7 @@ random_attack_by_monster(const region * r, unit * u)
 		if (target
 		    && target != u
 		    && humanoidrace(target->race)
-			 && !illusionaryrace(target->race)
+			  && !illusionaryrace(target->race)
 		    && target->number <= max)
 		{
 			if (monster_attack(u, target)) {
@@ -990,11 +991,20 @@ plan_monsters(void)
 				move_monster(r, u);
 			} else {
 				boolean done = false;
-				if((u->race->flags & RCF_ATTACKRANDOM)
-					&& rand()%100<MONSTERATTACK
-					&& is_moving == false)
+				if((u->race->flags & RCF_ATTACKRANDOM) && is_moving == false)
 				{
-					done = random_attack_by_monster(r, u);
+					int chance;
+					attrib *a = a_find(u->attribs, &at_aggressive);
+
+					if(a) {
+						chance = a->data.i;
+					} else {
+						chance = MONSTERATTACK;
+					}
+
+					if(rand()%100 < chance) {
+						done = random_attack_by_monster(r, u);
+					}
 				}
 				if (!done) {
 					if(u->race == new_race[RC_SEASERPENT]) {

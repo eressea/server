@@ -38,6 +38,7 @@
 # include "option.h"
 #endif
 #include "moved.h"
+#include "aggressive.h"
 
 /* util includes */
 #include <attrib.h>
@@ -72,4 +73,5 @@ init_attributes(void)
 #ifdef USE_UGROUPS
 	init_ugroup();
 #endif
+	init_aggressive();
 }

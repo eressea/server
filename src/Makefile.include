@@ -42,7 +42,7 @@ MSG_SUBDIR  = "--> Making $@ in $$subdir"
 ## user-defined makefiles
 ##
 
-MKFILES = $(wildcard $(ERESSEA_SRC)/$(USER).mk $(ERESSEA_SRC)/$(OSTYPE).mk $(ERESSEA_SRC)/$(HOSTTYPE).mk $(ERESSEA_SRC)/$(ARCH).mk)
+MKFILES = $(wildcard $(ERESSEA_SRC)/$(USER)@$(HOST).mk $(ERESSEA_SRC)/$(OSTYPE).mk $(ERESSEA_SRC)/$(HOSTTYPE).mk $(ERESSEA_SRC)/$(ARCH).mk)
 ifeq ($(MKFILES), )
 else
   include $(MKFILES)
