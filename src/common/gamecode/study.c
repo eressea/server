@@ -289,7 +289,7 @@ teach(region * r, unit * u)
 			teachskill[i++]=sk;
 		} while (sk!=NOSKILL);
 		while (teaching && student) {
-			if (student->faction == u->faction) {
+			if (student->faction == u->faction && !fval(student, FL_HUNGER)) {
 				if (igetkeyword(student->thisorder, student->faction->locale) == K_STUDY) {
 					/* Input ist nun von student->thisorder !! */
 					sk = getskill(student->faction->locale);
@@ -306,7 +306,7 @@ teach(region * r, unit * u)
 		}
 #if TEACH_FRIENDS
 		while (teaching && student) {
-			if (student->faction != u->faction && allied(u, student->faction, HELP_GUARD)) {
+			if (student->faction != u->faction && !fval(student, FL_HUNGER) && allied(u, student->faction, HELP_GUARD)) {
 				if (igetkeyword(student->thisorder, student->faction->locale) == K_STUDY) {
 					/* Input ist nun von student->thisorder !! */
 					sk = getskill(student->faction->locale);
