@@ -48,7 +48,7 @@ numalliances = 8 -- number of alliances
 lastalliance = nil
 
 function make_faction(position, alliance, number, email, race)
-  local skillno = 27 -- es gibt 27 skills in der liste
+  local skillno = 25 -- es gibt 25 skills in der liste
   local units = (1+skillno)*6 / number -- jede allianz kriegt 168 leute
   local money = units * 5 * 10 -- jede allianz kriegt 8400 silber
   
@@ -94,7 +94,6 @@ end
 -- skills that will be given to new units
 skills = {
   "sk_roadwork",
-  "sk_alchemy",
   "sk_crossbow",
   "sk_mining",
   "sk_bow",
@@ -112,7 +111,6 @@ skills = {
   "sk_polearm",
   "sk_espionage",
   "sk_quarrying",
-  "sk_tactics",
   "sk_stealth",
   "sk_entertainment",
   "sk_weaponsmithing",
