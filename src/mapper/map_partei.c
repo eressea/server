@@ -351,8 +351,11 @@ NeuePartei(region * r)
 		lang = nf->lang;
 		strcpy(email, nf->email);
 		if (late) {
-			WINDOW *win = openwin(SX - 10, 2, "< Neue Partei einfügen >");
-			late = (int) map_input(win, 2, 1, "Startbonus", -1, 99, 0);
+			WINDOW *win = openwin(SX - 10, 3, "< Neue Partei einfügen >");
+			if(r->age >= 5)
+				late = (int) map_input(win, 2, 1, "Startbonus", -1, 99, r->age/2);
+			else
+				late = (int) map_input(win, 2, 1, "Startbonus", -1, 99, 0);
 			delwin(win);
 		}
 	} else {

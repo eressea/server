@@ -134,7 +134,7 @@ void insert_selection(struct selection ** p_sel, struct selection * prev, char *
 extern void read_newfactions(const char * filename);
 extern void read_orders(const char * filename);
 extern void read_dropouts(const char *filename);
-extern void seed_dropouts();
+extern void seed_dropouts(void);
 
 #define sncat(b, s, size) strncat ((b), s, size - strlen (b))
 
