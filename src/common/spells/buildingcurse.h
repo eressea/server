@@ -14,5 +14,10 @@
 #ifndef _BCURSE_H
 #define _BCURSE_H
 
+struct locale;
+struct curse;
+extern int cinfo_building(const struct locale * lang, void * obj, typ_t typ, struct curse *c, int self);
+
+extern void register_buildingcurse(void);
 
 #endif /* _BCURSE_H */

@@ -23,7 +23,7 @@
 #include <curse.h>
 
 /* util includes */
-#include <message.h>
+#include <functions.h>
 #include <base36.h>
 
 /* libc includes */
@@ -32,8 +32,8 @@
 #include <assert.h>
 
 
-static int
-cinfo_ship(const locale * lang, void * obj, typ_t typ, curse *c, int self)
+int
+cinfo_ship(const locale * lang, const void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
 
@@ -94,3 +94,9 @@ cinfo_disorientation(void * obj, typ_t typ, curse *c, int self)
 	return 1;
 }
 
+void 
+register_shipcurse(void)
+{
+	register_function((pf_generic)cinfo_disorientation, "curseinfo::disorientation");
+	register_function((pf_generic)cinfo_shipnodrift, "curseinfo::shipnodrift");
+}

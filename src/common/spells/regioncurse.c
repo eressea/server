@@ -32,7 +32,7 @@
 #include <assert.h>
 
 int
-cinfo_region(const struct locale * lang, const void * obj, enum typ_t typ, struct curse *c, int self)
+cinfo_region(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
 	message * msg;
 

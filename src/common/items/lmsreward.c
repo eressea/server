@@ -28,12 +28,13 @@
 #include <stdlib.h>
 
 static int
-info_lmsstory(const void* vp, int i, curse * c, int i2)
+info_lmsstory(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
-	unused(vp);
-	unused(i);
+	unused(lang);
+	unused(obj);
+	unused(typ);
 	unused(c);
-	unused(i2);
+	unused(self);
 	strcpy(buf, "Die Bauern der Region erzählen sich die Geschichte von den glorreichen Siegern des Last-Man-Standing Turniers.");
 	return 1;
 }

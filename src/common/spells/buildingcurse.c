@@ -16,14 +16,16 @@
 #include "buildingcurse.h"
 
 /* kernel includes */
-#include "message.h"
-#include "nrmessage.h"
-#include "objtypes.h"
-#include "curse.h"
+#include <message.h>
+#include <nrmessage.h>
+#include <objtypes.h>
+#include <building.h>
+#include <ship.h>
+#include <curse.h>
 
 /* util includes */
-#include <kernel/message.h>
-#include <util/message.h>
+#include <base36.h>
+#include <functions.h>
 
 /* libc includes */
 #include <string.h>
@@ -31,7 +33,7 @@
 #include <assert.h>
 
 
-static int
+int
 cinfo_building(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
@@ -77,3 +79,9 @@ cinfo_magicrunes(void * obj, typ_t typ, curse *c, int self)
 	return 0;
 }
 
+
+void 
+register_buildingcurse(void)
+{
+	register_function((pf_generic)cinfo_magicrunes, "curseinfo::magicrunes");
+}

@@ -40,6 +40,7 @@ typedef char direction_t;
 typedef int race_t;
 typedef int magic_t;
 typedef short skill_t;
+typedef short typ_t;
 typedef int herb_t;
 typedef int potion_t;
 typedef int luxury_t;

@@ -14,8 +14,9 @@
 #ifndef _SCURSE_H
 #define _SCURSE_H
 
-/*
-int cinfo_shipnodrift(const locale *, void *, typ_t, curse *, int);
-*/
+struct locale;
+struct curse;
+extern int cinfo_ship(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self);
+extern void register_shipcurse(void);
 	
 #endif /* _SCURSE_H */

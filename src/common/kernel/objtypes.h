@@ -23,7 +23,7 @@ typedef struct obj_ID {
 	int a, b;
 } obj_ID;
 
-typedef enum typ_t {
+enum {
 	TYP_UNIT,
 	TYP_REGION,
 	TYP_BUILDING,
@@ -32,7 +32,7 @@ typedef enum typ_t {
 	TYP_ACTION,
 	TYP_TRIGGER,
 	TYP_TIMEOUT
-} typ_t;
+};
 
 extern obj_ID get_ID(void *obj, typ_t typ);
 extern void write_ID(FILE *f, obj_ID id);
