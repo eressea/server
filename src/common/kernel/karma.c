@@ -243,6 +243,7 @@ struct fspecialdata fspecials[MAXFACTIONSPECIALS] = {
 		100
 	},
 	/* TODO: is_undead() und Sonderbehandlungen von Untoten */
+	/*       in dieser Form ultimative Eigenschaft für Orks */
 	{
 		"Untot",
 		"Personen einer Partei mit dieser Eigenschaft bekommen automatisch doppelt "

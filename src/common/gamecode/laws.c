@@ -226,8 +226,7 @@ restart(unit *u, int race)
 	faction *f = addplayer(u->region, u->faction->email, race)->faction;
 	f->magiegebiet = u->faction->magiegebiet;
 	f->options = u->faction->options;
-	assert(u->faction->locale);
-	f->locale = strdup(u->faction->locale);
+	f->locale = u->faction->locale;
 	destroyfaction(u->faction);
 }
 

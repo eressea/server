@@ -3402,6 +3402,14 @@ eval_skill(struct opstack ** stack, const void * userdata)
 	int sk = opop(stack, int);
 	const char * c = skillname(sk, report->locale);
 	opush(stack, strcpy(balloc(strlen(c)+1), c));
+}
+
+static void
+eval_int36(struct opstack ** stack, const void * userdata)
+{
+	int i = opop(stack, int);
+	const char * c = itoa36(i);
+	opush(stack, strcpy(balloc(strlen(c)+1), c));
 	unused(userdata);
 }
 
@@ -3417,4 +3425,5 @@ report_init(void)
 	add_function("building", &eval_building);
 	add_function("skill", &eval_skill);
 	add_function("direction", &eval_direction);
+	add_function("int36", &eval_int36);
 }
