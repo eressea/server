@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.19 2001/02/18 12:30:10 enno Exp $
+ *	$Id: eressea.c,v 1.20 2001/02/20 08:43:59 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -109,7 +109,7 @@ const char *parameters[MAXPARAMS] =
 	"REGION",
 	"SCHIFF",
 	"SILBER",
-	"STRASSEN",
+	"Straßen",
 	"TEMPORÄRE",
 	"FEIND",
 	"FREUND",
