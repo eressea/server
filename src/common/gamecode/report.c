@@ -1811,7 +1811,7 @@ list_address(FILE * F, const faction * uf, const faction_list * seenfactions)
 		const faction * f = flist->data;
 		if (f->no!=MONSTER_FACTION) {
 			sprintf(buf, "%s: %s; %s", factionname(f), f->email, f->banner);
-			rparagraph(F, buf, 4, (uf->alliance != NULL && f->alliance != NULL && uf->alliance == f->alliance)?'+':'*');
+			rparagraph(F, buf, 4, ALLIED(uf, f)?'+':'*');
 		}
 		flist = flist->next;
 	}

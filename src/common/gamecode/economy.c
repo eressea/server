@@ -2929,10 +2929,12 @@ steal(region * r, unit * u, request ** stealorders)
 		return;
 	}
 
+#ifdef ALLIANCES
 	if(u->faction->alliance == u2->faction->alliance) {
 		cmistake(u, findorder(u, u->thisorder), 47, MSG_INCOME);
 		return;
 	}
+#endif
 
 	assert(u->region==u2->region);
 	if (!can_contact(r, u, u2)) {

@@ -83,6 +83,11 @@ struct xml_stack;
 #include <attrib.h>
 
 #define AT_PERSISTENT
+#ifdef ALLIANCES
+# define ALLIED(f1, f2) (f1->alliance && f1->alliance==f2->alliance)
+#else
+# define ALLIED(f1, f2) (f1==f2)
+#endif
 
 /* eressea-defined attribute-type flags */
 #define ATF_CURSE  ATF_USER_DEFINED
