@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.14 2001/02/11 19:55:00 corwin Exp $
+ *	$Id: report.c,v 1.15 2001/02/11 19:56:49 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1322,7 +1322,7 @@ order_template(FILE * F, faction * f)
 					} else {
 						if(pl->id != 0) {
 							sprintf(buf, "REGION %d,%d,%d ; %s", region_x(r,f),
-								region_y(r,f), rname(r, f->locale), pl->id);
+								region_y(r,f), pl->id, rname(r, f->locale));
 						} else {
 							sprintf(buf, "REGION %d,%d ; %s", region_x(r,f),
 								region_y(r,f), rname(r, f->locale));
