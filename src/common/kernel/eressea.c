@@ -146,15 +146,16 @@ AllianceAuto(void)
 {
   static int value = -1;
   if (value<0) {
-    char * str = strdup(get_param(global.parameters, "alliance.auto"));
+    const char * str = get_param(global.parameters, "alliance.auto");
     value = 0;
     if (str!=NULL) {
-      char * tok = strtok(str, " ");
+	  char * sstr = strdup(str);
+      char * tok = strtok(sstr, " ");
       while (tok) {
         value |= ally_flag(tok);
         tok = strtok(NULL, " ");
       }
-      free(str);
+      free(sstr);
     }
   }
   return value;
@@ -165,15 +166,16 @@ AllianceRestricted(void)
 {
   static int value = -1;
   if (value<0) {
-    char * str = strdup(get_param(global.parameters, "alliance.restricted"));
+    const char * str = get_param(global.parameters, "alliance.restricted");
     value = 0;
     if (str!=NULL) {
-      char * tok = strtok(str, " ");
+	  char * sstr = strdup(str);
+      char * tok = strtok(sstr, " ");
       while (tok) {
         value |= ally_flag(tok);
         tok = strtok(NULL, " ");
       }
-      free(str);
+      free(sstr);
     }
   }
   return value;

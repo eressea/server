@@ -1109,7 +1109,7 @@ restart(unit * u, struct order * ord)
 }
 
 static boolean
-EnhancedQuit()
+EnhancedQuit(void)
 {
   static int value = -1;
   if (value<0) {

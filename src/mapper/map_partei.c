@@ -228,16 +228,16 @@ seed_dropouts(void)
 void
 read_newfactions(const char * filename)
 {
-	FILE * F = fopen(filename, "r");
-	if (F==NULL) return;
-	for (;;) {
-		faction * f = factions;
-		char race[20], email[64], lang[8], password[16];
-		newfaction *nf;
-		int bonus, subscription;
-
+  FILE * F = fopen(filename, "r");
+  if (F==NULL) return;
+  for (;;) {
+	faction * f = factions;
+	char race[20], email[64], lang[8], password[16];
+	newfaction *nf;
+	int bonus, subscription;
+	int alliance;
+	
     if (alliances!=NULL) {
-      int alliance;
       /* email;race;locale;startbonus;subscription;alliance */
       if (fscanf(F, "%s %s %s %d %d %s %d", email, race, lang, &bonus, &subscription, password, &alliance)<=0) break;
     } else {
