@@ -21,6 +21,9 @@ struct unit;
 
 extern void santa_comes_to_town(struct region * r, struct unit * santa, void (*action)(struct unit*));
 extern struct unit * make_santa(struct region * r);
+extern struct trigger *trigger_xmasgate(struct building * b);
+
+extern void init_xmas(void);
 
 #ifdef __cplusplus
 }

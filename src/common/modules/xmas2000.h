@@ -15,7 +15,6 @@
 #ifndef XMAS2000_H
 #define XMAS2000_H
 
-extern void init_xmas2000(void);
 extern void create_xmas2000(int x, int y);
 
 #endif

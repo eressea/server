@@ -31,7 +31,7 @@
 #include <items/items.h>
 
 #include <modules/gmcmd.h>
-#include <modules/xmas2000.h>
+#include <modules/xmas.h>
 #ifdef ALLIANCES
 #include <modules/alliance.h>
 #endif
@@ -1686,7 +1686,7 @@ main(int argc, char *argv[])
 	kernel_init();
 
 	init_triggers();
-	init_xmas2000();
+	init_xmas();
 	debug_language("locales.log");
 
 	register_races();

@@ -38,7 +38,7 @@
 /* modules includes */
 #include <modules/dungeon.h>
 #include <modules/score.h>
-#include <modules/xmas2000.h>
+#include <modules/xmas.h>
 #include <modules/gmcmd.h>
 #include <modules/infocmd.h>
 #ifdef MUSEUM_MODULE
@@ -149,7 +149,7 @@ static void
 game_init(void)
 {
 	init_triggers();
-	init_xmas2000();
+	init_xmas();
 	report_init();
 	creport_init();
 

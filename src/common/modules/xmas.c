@@ -16,7 +16,9 @@
 
 /* kernel includes */
 #include <unit.h>
+#include <building.h>
 #include <region.h>
+#include <event.h>
 #include <movement.h>
 #include <faction.h>
 #include <item.h>
@@ -24,7 +26,10 @@
 
 /* util includes */
 #include <base36.h>
+#include <goodies.h>
 
+/* libc includes */
+#include <stdlib.h>
 void
 santa_comes_to_town(region * r, unit * santa, void (*action)(unit*))
 {
@@ -76,3 +81,82 @@ make_santa(region * r)
 	}
 	return santa;
 }
+
+static int
+xmasgate_handle(trigger * t, void * data)
+{
+	/* call an event handler on xmasgate.
+	 * data.v -> ( variant event, int timer )
+	 */
+	unit * santa = ufindhash(atoi36("xmas"));
+	building *b = (building *)t->data.v;
+	if (santa && b) {
+		unit ** up = &b->region->units;
+		if (santa->region!=b->region) santa = NULL;
+		while (*up) {
+			unit * u = *up;
+			if (u->building==b) {
+				region * r = u->region;
+				faction * f = u->faction;
+				unit * home = f->units;
+				unit * u2 = r->units;
+				while (u2) {
+					if (u2->faction==f && u2!=u && u2->number) break;
+					u2 = u2->next;
+				}
+				while (home && (home->region==b->region || home->region->land==NULL)) home = home->nextF;
+				if (home==NULL) continue;
+				if (santa!=NULL && u2==NULL) {
+					char zText[256];
+					item_type * itype = olditemtype[(rand() % 4) + I_KEKS];
+					i_change(&u->items, itype, 1);
+					sprintf(zText, "%s gibt %d %s an %s.", unitname(santa), 1, locale_string(f->locale, resourcename(itype->rtype, GR_PLURAL)), unitname(u));
+					i_change(&u->items, itype, 1);
+					addmessage(home->region, u->faction, zText, MSG_COMMERCE, ML_INFO);
+				}
+				move_unit(u, home->region, NULL);
+			}
+			if (*up==u) up = &u->next;
+		}
+	} else
+		log_error(("could not perform xmasgate::handle()\n"));
+	unused(data);
+	return 0;
+}
+
+static void
+xmasgate_write(const trigger * t, FILE * F)
+{
+	building *b = (building *)t->data.v;
+	fprintf(F, "%s ", itoa36(b->no));
+}
+
+static int
+xmasgate_read(trigger * t, FILE * F)
+{
+	return read_building_reference((building**)&t->data.v, F);
+}
+
+struct trigger_type tt_xmasgate = {
+	"xmasgate",
+	NULL,
+	NULL,
+	xmasgate_handle,
+	xmasgate_write,
+	xmasgate_read
+};
+
+trigger *
+trigger_xmasgate(building * b)
+{
+	trigger * t = t_new(&tt_xmasgate);
+	t->data.v = b;
+	return t;
+}
+
+void
+init_xmas(void)
+{
+	tt_register(&tt_xmasgate);
+}
+
