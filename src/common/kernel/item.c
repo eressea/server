@@ -2034,7 +2034,7 @@ init_oldpotions(void)
 		}
 		con->skill = SK_ALCHEMY;
 		con->minskill = potionlevel[p]*2;
-		con->maxsize = 1;
+		con->maxsize = -1;
 		con->reqsize = 1;
 
 		names[0] = NULL;
