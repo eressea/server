@@ -80,6 +80,6 @@ extern const struct unit * random_unit_in_faction(const struct faction *f);
 extern const char * factionname(const struct faction * f);
 extern void * resolve_faction(void * data);
 extern struct unit * addplayer(struct region *r, const char *email, const struct race * frace, const struct locale *loc);
-extern boolean checkpasswd(faction * f, const char * passwd);
+extern boolean checkpasswd(const faction * f, const char * passwd);
 
 #endif

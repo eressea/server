@@ -136,12 +136,9 @@ addplayer(region *r, const char *email, const struct race * frace, const locale 
 }
 
 boolean 
-checkpasswd(faction * f, const char * passwd)
+checkpasswd(const faction * f, const char * passwd)
 {
 	if (strcasecmp(f->passw, passwd)==0) return true;
-	if (strcasecmp(f->override, passwd)==0) {
-		fset(f, FFL_OVERRIDE);
-		return true;
-	}
+	if (strcasecmp(f->override, passwd)==0) return true;
 	return false;
 }

@@ -208,6 +208,7 @@ getgarbage(void)
 #endif
 }
 
+#if 0
 static void
 writefactiondata(void)
 {
@@ -233,6 +234,7 @@ writefactiondata(void)
 	}
 	fclose(F);
 }
+#endif
 
 static void
 writepasswd(void)
