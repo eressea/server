@@ -176,7 +176,7 @@ gm_gate(const char * str, void * data, const char * cmd)
 
 
 /**
- ** GM: TERRAFORM <terrain> <x> <y>
+ ** GM: TERRAFORM <x> <y> <terrain>
  ** requires: permission-key "gmterf"
  **/
 static void
@@ -234,7 +234,70 @@ gm_teleport(const char * str, void * data, const char * cmd)
 }
 
 /**
- ** GM: BROADCAST <x> <y> <string>
+ ** GM: TELL PLANE <string>
+ ** requires: permission-key "gmmsgr"
+ **/
+static void
+gm_messageplane(const char * str, void * data, const char * cmd)
+{
+	unit * u = (unit*)data;
+	const struct plane * p = rplane(u->region);
+	const char * msg = igetstrtoken(str);
+	if (p==NULL) {
+		mistake(u, cmd, "In diese Ebene kann keine Nachricht gesandt werden.\n", 0);
+	} else {
+		/* checking permissions */
+		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
+		if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
+			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+		}
+		else {
+			faction * f;
+			region * r;
+			for (f=factions;f;f=f->next) {
+				freset(f, FL_DH);
+			}
+			for (r=regions;r;r=r->next) {
+				unit * u;
+				if (rplane(r)!=p) continue;
+				for (u=r->units;u;u=u->next) if (!fval(u->faction, FL_DH)) {
+					f = u->faction;
+					fset(f, FL_DH);
+					add_message(&f->msgs, msg_message("msg_event", "string", msg));
+				}
+			}
+		}
+	}
+}
+
+static void
+gm_messagefaction(const char * str, void * data, const char * cmd)
+{
+	unit * u = (unit*)data;
+	int n = atoi36(igetstrtoken(str));
+	faction * f = findfaction(n);
+	const char * msg = getstrtoken();
+	plane * p = rplane(u->region);
+	attrib * permissions = a_find(u->faction->attribs, &at_permissions);
+	if (!permissions || !has_permission(permissions, atoi36("gmmsgr"))) {
+		mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
+		return;
+	}
+	if (f!=NULL) {
+		region * r;
+		for (r=regions;r;r=r->next) if (rplane(r)==p) {
+			unit * u;
+			for (u=r->units;u;u=u->next) if (u->faction==f) {
+				add_message(&f->msgs, msg_message("msg_event", "string", msg));
+				return;
+			}
+		}
+	}
+	mistake(u, cmd, "An diese Partei kann keine Nachricht gesandt werden.\n", 0);
+}
+
+/**
+ ** GM: TELL REGION <x> <y> <string>
  ** requires: permission-key "gmmsgr"
  **/
 static void
@@ -397,8 +460,9 @@ gm_skill(const char * str, void * data, const char * cmd)
 	}
 }
 
-static struct command * g_cmds;
 static tnode g_keys;
+static tnode g_root;
+static tnode g_tell;
 
 static void
 gm_command(const char * str, void * data, const char * cmd)
@@ -406,21 +470,30 @@ gm_command(const char * str, void * data, const char * cmd)
 	do_command(&g_keys, data, str);
 }
 
+static void
+gm_tell(const char * str, void * data, const char * cmd)
+{
+	do_command(&g_tell, data, str);
+}
+
 void
 init_gmcmd(void)
 {
 	at_register(&at_gmcreate);
 	at_register(&at_permissions);
-	add_command(&g_keys, &g_cmds, "gm", &gm_command);
-	add_command(&g_keys, &g_cmds, "terraform", &gm_terraform);
-	add_command(&g_keys, &g_cmds, "create", &gm_create);
-	add_command(&g_keys, &g_cmds, "gate", &gm_gate);
-	add_command(&g_keys, &g_cmds, "give", &gm_give);
-	add_command(&g_keys, &g_cmds, "take", &gm_take);
-	add_command(&g_keys, &g_cmds, "teleport", &gm_teleport);
-	add_command(&g_keys, &g_cmds, "skill", &gm_skill);
-	add_command(&g_keys, &g_cmds, "broadcast", &gm_messageregion);
-	add_command(&g_keys, &g_cmds, "tell", &gm_messageunit);
+	add_command(&g_root, "gm", &gm_command);
+	add_command(&g_keys, "terraform", &gm_terraform);
+	add_command(&g_keys, "create", &gm_create);
+	add_command(&g_keys, "gate", &gm_gate);
+	add_command(&g_keys, "give", &gm_give);
+	add_command(&g_keys, "take", &gm_take);
+	add_command(&g_keys, "teleport", &gm_teleport);
+	add_command(&g_keys, "skill", &gm_skill);
+	add_command(&g_keys, "tell", &gm_tell);
+	add_command(&g_tell, "region", &gm_messageregion);
+	add_command(&g_tell, "unit", &gm_messageunit);
+	add_command(&g_tell, "plane", &gm_messageplane);
+	add_command(&g_tell, "faction", &gm_messagefaction);
 }
 
 /*
@@ -439,7 +512,7 @@ gmcommands(void)
 			strlist * order;
 			for (order = u->orders; order; order = order->next)
 				if (igetkeyword(order->s, u->faction->locale) == K_GM) {
-					do_command(&g_keys, u, order->s);
+					do_command(&g_root, u, order->s);
 				}
 			if (u==*up) up = &u->next;
 		}

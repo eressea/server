@@ -22,30 +22,24 @@
 #include <string.h>
 
 typedef struct command {
-	struct command * next;
-	const char * key;
-	void (*perform)(const char *, void *, const char *);
+	void(*fun)(const char*, void *, const char*);
 } command;
 
 void
-add_command(struct tnode * keys, command ** cmds, const char * str, void(*fun)(const char*, void *, const char*))
+add_command(struct tnode * keys, const char * str, void(*fun)(const char*, void *, const char*))
 {
-	command * nc = calloc(sizeof(command), 1);
-	nc->key = str;
-	nc->perform = fun;
-	nc->next = *cmds;
-	*cmds = nc;
-
-	addtoken(keys, str, (void*)nc);
+	command * cmd = malloc(sizeof(command));
+	cmd->fun = fun;
+	addtoken(keys, str, (void*)cmd);
 }
 
-void
+int
 do_command(const struct tnode * keys, void * u, const char * str)
 {
 	int i;
 	char zText[16];
 	const char * c;
-	command * cm;
+	command * cmd;
 
 	while (isspace(*str)) ++str;
 	c = str;
@@ -53,6 +47,9 @@ do_command(const struct tnode * keys, void * u, const char * str)
 	i = min(16, c-str);
 	strncpy(zText, str, i);
 	zText[i]=0;
-	if (findtoken(keys, zText, (void**)&cm)==E_TOK_SUCCESS && cm->perform) cm->perform(++c, u, str);
+	if (findtoken(keys, zText, (void**)&cmd)==E_TOK_SUCCESS) {
+		cmd->fun(++c, u, str);
+		return 0;
+	}
+	return 1;
 }
-

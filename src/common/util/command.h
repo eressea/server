@@ -13,11 +13,10 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-struct command;
 struct tnode;
 
-extern void add_command(struct tnode * keys, struct command ** cmds, const char * str, 
+extern void add_command(struct tnode * keys, const char * str, 
                         void(*fun)(const char*, void *, const char*));
-extern void do_command(const struct tnode * keys, void * u, const char * cmd);
+extern int do_command(const struct tnode * keys, void * u, const char * cmd);
 
 #endif

@@ -100,7 +100,6 @@ info_vacation(const char * str, void * data, const char * cmd)
 	}
 }
 
-static struct command * g_cmds;
 static tnode g_keys;
 
 void
@@ -133,11 +132,11 @@ info_command(const char * str, void * data, const char * cmd)
 void
 init_info(void)
 {
-	add_command(&g_keys, &g_cmds, "info", &info_command);
+	add_command(&g_keys, "info", &info_command);
 
-	add_command(&g_keys, &g_cmds, "email", &info_email);
-	add_command(&g_keys, &g_cmds, "name", &info_name);
-	add_command(&g_keys, &g_cmds, "adresse", &info_address);
-	add_command(&g_keys, &g_cmds, "telefon", &info_phone);
-	add_command(&g_keys, &g_cmds, "urlaub", &info_vacation);
+	add_command(&g_keys, "email", &info_email);
+	add_command(&g_keys, "name", &info_name);
+	add_command(&g_keys, "adresse", &info_address);
+	add_command(&g_keys, "telefon", &info_phone);
+	add_command(&g_keys, "urlaub", &info_vacation);
 }
