@@ -1,7 +1,6 @@
-
 /* vi: set ts=2:
  *
- * $Id: roads_override.h,v 1.1 2001/02/04 19:00:23 corwin Exp $
+ * $Id: overrideroads.c,v 1.1 2001/02/10 10:57:49 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -13,5 +12,11 @@
  * prior permission by the authors of Eressea.
  */
 
-extern struct attrib_type at_roads_override;
+#include <config.h>
+#include <eressea.h>
+#include "overrideroads.h"
+
+attrib_type at_overrideroads = { 
+  "roads_override", NULL, NULL, NULL, &a_writestring, &a_readstring
+};
 
