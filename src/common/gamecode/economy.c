@@ -570,8 +570,7 @@ givemen(int n, unit * u, unit * u2, const char * cmd)
 	} else if (u == u2) {
 		error = 10;
 #if RACE_ADJUSTMENTS
-	}
-	  else if (u->race == new_race[RC_SNOTLING]) {
+	} else if (!u2 && u->race == new_race[RC_SNOTLING]) {
 		/* Snotlings können nicht an Bauern übergeben werden. */
 		error = 307;
 #endif

@@ -638,8 +638,12 @@ spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh,
 #else
 	if(u->faction->options & Pow(O_SHOWSKCHANGE)) {
 		skill *skill = get_skill(u, sk);
-		int oldeff   = skill->old + get_modifier(u, sk, skill->old, u->region);
+		int oldeff = 0;
 		int diff;
+
+		if(skill->old > 0) {
+			oldeff = skill->old + get_modifier(u, sk, skill->old, u->region);
+		}
 
 		oldeff = max(0, oldeff);
 		diff   = effsk - oldeff; 

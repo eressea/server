@@ -743,6 +743,7 @@ enum {
 #define FL_ITEM_ANIMAL	(1<<3)	/* ist ein Tier */
 #define FL_ITEM_MOUNT	((1<<4) | FL_ITEM_ANIMAL)	/* ist ein Reittier */
 
+#if 0
 /* ------------------------------------------------------------- */
 /*   Sprüche auf Artefakten                                      */
 /* Benutzung magischer Gegenstände                               */
@@ -766,7 +767,7 @@ destroy_curse_crystal(attrib **alist, int cast_level, int force)
 		c = (curse*)a->data.v;
 
 		/* Immunität prüfen */
-		if (c->flag & CURSE_IMMUN) continue;
+		if (c->flag & CURSE_IMMUN);
 
 		if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
 			int chance;
@@ -794,6 +795,7 @@ destroy_curse_crystal(attrib **alist, int cast_level, int force)
 
 	return force;
 }
+#endif
 
 /* ------------------------------------------------------------- */
 /* Kann auch von Nichtmagier benutzt werden, erzeugt eine
@@ -815,7 +817,7 @@ use_antimagiccrystal(region * r, unit * mage, strlist * cmdstrings)
 	 * um seine Stufe */
 	power = sp->level * 20; /* Stufe 5 =~ 100 */
 
-	power = destroy_curse_crystal(&r->attribs, effect, power);
+	power = destroy_curse(&r->attribs, effect, power, NULL);
 
 	if(power) {
 		create_curse(mage, &r->attribs, C_ANTIMAGICZONE, 0, power, duration, effect, 0);

@@ -3371,7 +3371,7 @@ report_summary(summary * s, summary * o, boolean full)
 		fprintf(F, "Aktive Vulkane:        %d\n\n", s->active_volcanos);
 	}
 
-	for (i = 0; i < MAXRACES; i++) if (s->factionrace[i] && playerrace(new_race[i])) {
+	for (i = 0; i < MAXRACES; i++) if (s->factionrace[i] && playerrace(new_race[i]) && i != RC_TEMPLATE) {
 		fprintf(F, "%14svölker: %s\n",
 		LOC(default_locale, rc_name(new_race[i], 3)), pcomp(s->factionrace[i], o->factionrace[i]));
 	}

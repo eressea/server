@@ -158,7 +158,7 @@ SpecialFunction(region *r)
 		}
 	case '2':
 		if(!is_cursed_internal(r->attribs, C_PEACE, 0)) {
-			create_curse(NULL, &r->attribs, C_PEACE, 0, 100, 1, 0, 0);
+			create_curse(NULL, &r->attribs, C_PEACE, 0, 100, 2, 0, 0);
 			set_curseflag(r->attribs, C_PEACE, 0, CURSE_IMMUN);
 			modified = 1;
 		}
