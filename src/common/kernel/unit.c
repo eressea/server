@@ -1131,7 +1131,8 @@ unitlist_insert(struct unit_list **ul, struct unit *u)
 int 
 maxheroes(const struct faction * f)
 {
-  return (int)(log10(count_all(f) / 50.0) * 20);
+  int nmax = (int)(log10(count_all(f) / 50.0) * 20);
+  return (nmax<0)?0:nmax;
 }
 
 int 
