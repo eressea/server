@@ -1052,7 +1052,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 					struct demand * dmd = r->land->demands;
 #if NEW_RESOURCEGROWTH
 					struct rawmaterial * res = r->resources;
-
+#endif
 					fprintf(F, "%d;Silber\n", rmoney(r));
 					fprintf(F, "%d;Unterh\n", entertainmoney(r));
 
@@ -1065,6 +1065,7 @@ report_computer(FILE * F, faction * f, const seen_region * seen,
 						fprintf(F, "%d;Lohn\n", fwage(r, f, true));
 					}
 
+#if NEW_RESOURCEGROWTH
 					while (res) {
 						int maxskill = 0;
 						int level = -1;
