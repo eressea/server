@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<eressea xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="messages.xml"/>
+
+  <!-- Localization -->
+  <xi:include href="de/strings.xml"/>
+  <xi:include href="en/strings.xml"/>
+
+  <xi:include href="resources.xml"/>
+  <xi:include href="races.xml"/>
+  <xi:include href="prefixes.xml"/>
+  <xi:include href="ships.xml"/>
+  <xi:include href="buildings.xml"/>
+  <xi:include file="terrains.xml"/>
+  <xi:include file="alchemy.xml"/>
+  <xi:include file="technologies.xml"/>
+  <xi:include file="skills.xml"/>
+
+  <game name="HSE" welcome="eressea">
+    <comment>Game specific</comment>
+    <order name="MEINUNG" disable="yes"/>
+    <order name="MAGIEGEBIET" disable="yes"/>
+    <param name="entertain.base" value="15"/>
+    <param name="entertain.perlevel" value="5"/>
+    <param name="nmr.timeout" value="9999"/>
+    <param name="nmr.removenewbie" value="0"/>
+    <param name="GiveRestriction" value="3"/>
+    <param name="hunger.long" value="1"/>
+    <param name="database.gameid" value="3"/>
+    <param name="rules.check_overload" value="1"/>
+    <param name="report.mailit" value="/usr/sbin:$HOME/eressea/bin:/bin:/usr/bin:/usr/local/bin"/>
+  </game>
+  <xi:include href="eressea/de/strings.xml"/>
+  <xi:include href="eressea/en/strings.xml"/>
+  <xi:include href="eressea/races.xml"/>
+  <xi:include href="eressea/items.xml"/>
+  <xi:include href="eressea/dungeons.xml"/>
+  <xi:include href="eressea/temple.xml"/>
+  <strings>
+    <string name="mailto">
+      <text locale="de">hse-server@eressea.upb.de</text>
+      <text locale="en">hse-server@eressea.upb.de</text>
+    </string>
+    <string name="mailcmd">
+      <text locale="de">ERESSEA BEFEHLE</text>
+      <text locale="en">ERESSEA ORDERS</text>
+    </string>
+  </strings>
+</eressea>
