@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: mapper.c,v 1.8 2001/02/09 15:17:31 corwin Exp $
+ *	$Id: mapper.c,v 1.9 2001/02/09 19:12:15 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -12,7 +12,7 @@
  * prior permission by the authors of Eressea.
  */
 
-#define VERSION "3.2.0"
+#define VERSION "3.3.0"
 
 #define MAIN_C
 #define BOOL_DEFINED
@@ -198,6 +198,22 @@ RegionSymbol(region *r) {
 		}
 		break;
 #endif
+	case 3:
+		{
+			const herb_type *herb = rherbtype(r);
+			if(herb) {
+				const char *c = resourcename(herb2resource(herb),0);
+				int h = atoi(c+1);
+				if(h < 10) {
+					rs = '0'+h;
+				} else {
+					rs = 'a'+(h-10);
+				}
+			} else {
+				rs = terrain[rterrain(r)].symbol;
+			}
+		}
+		break;
 	default:
 		rs = terrain[rterrain(r)].symbol;
 		if(rs == 'P' && rtrees(r) >= 600) rs = 'F';
@@ -275,6 +291,10 @@ drawmap(boolean maponly) {
 		case 2:
 			movexy(SX-14,SY-2);
 			addstr(" Handelskar ");
+			break;
+		case 3:
+			movexy(SX-14,SY-2);
+			addstr(" Botanik    ");
 			break;
 		}
 	}
@@ -895,7 +915,7 @@ movearound(int rx, int ry) {
 					ch = -9;
 					break;
 				case 'k':
-					politkarte = (politkarte+1)%3;
+					politkarte = (politkarte+1)%4;
 					ch = -9;
 					break;
 				case '{':

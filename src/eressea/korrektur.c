@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.15 2001/02/09 13:53:53 corwin Exp $
+ *	$Id: korrektur.c,v 1.16 2001/02/09 19:12:15 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -976,12 +976,7 @@ show_newspells(void)
 	/* Alle geänderten Zauber in das array newspellids[]. mit SPL_NOSPELL
 	 * terminieren */
 
-	spellid_t newspellids[] = { SPL_ETERNIZEWALL,
-		SPL_CERDDOR_EARN_SILVER,
-		SPL_PUTTOREST,
-		SPL_UNHOLYPOWER,
-		SPL_HOLYGROUND,
-		SPL_NOSPELL };
+	spellid_t newspellids[] = { SPL_NOSPELL };
 
 	/* die id's der neuen oder veränderten Sprüche werden in newspellids[]
 	 * abgelegt */
