@@ -140,7 +140,7 @@ spc_email_isvalid(const char *address)
 {
   int        count = 0;
   const char *c, *domain;
-  static char *rfc822_specials = "()<>@,;:\\\"[]";
+  static const char *rfc822_specials = "()<>@,;:\\\"[]";
 
   /* first we validate the name portion (name@domain) */
   for (c = address;  *c;  c++) {

@@ -1492,7 +1492,7 @@ readfaction(FILE * F)
   int planes;
   int i = rid(F);
   faction * f = findfaction(i);
-  char * email;
+  char * email = NULL;
 
   if (f==NULL) {
     f = (faction *) calloc(1, sizeof(faction));

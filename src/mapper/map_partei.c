@@ -33,7 +33,8 @@
 #include <kernel/unit.h>
 
 /* util includes */
-#include <base36.h>
+#include <util/base36.h>
+#include <util/goodies.h>
 #include <language.h>
 
 /* libc includes */

@@ -60,7 +60,8 @@
 #include <kernel/xmlreader.h>
 
 /* util includes */
-#include <base36.h>
+#include <util/base36.h>
+#include <util/goodies.h>
 
 /* libc includes */
 #include <ctype.h>
