@@ -92,6 +92,9 @@
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 
+/* stdc++ includes */
+#include <stdexcept>
+
 /* libc includes */
 #include <cstdio>
 #include <cstdlib>
@@ -684,9 +687,16 @@ main(int argc, char *argv[])
 #else
     try {
 #endif
-      lua_dofile(luaState, buf);
+      if (lua_dofile(luaState, buf)!=0) {
+        std::string errmsg = "Unknown error executing lua_dofile";
+        if (lua_isstring(luaState, -1)) errmsg = lua_tostring(luaState, -1);
+        throw std::runtime_error(errmsg);
+      }
 #ifndef LUABIND_NO_EXCEPTIONS
     } 
+    catch (std::runtime_error& rte) {
+      log_error(("%s.\n", rte.what()));
+    }
     catch (luabind::error& e) {
       lua_State* L = e.state();
       my_lua_error(L);

@@ -40,3 +40,21 @@ R_PERSON fix in vin2?
 
 calendar in XML
 
+unterschiede in vin3 + wdw per config statt defines?
+
+  #define NEWATSROI 1
+  #define ATSBONUS 2
+  #define ROIBONUS 4
+
+  #define WDW_PHOENIX
+  #define WDW_PYRAMIDSPE
+  LL
+  #define NEW_STARTEQUIPMENT
+
+  #define ARENA_MODULE
+  #define WORMHOLE_MODULE
+  
+mailit-format ändern?
+
+age branch mergen
+
