@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: attrib.c,v 1.3 2001/01/27 18:15:32 enno Exp $
+ *	$Id: attrib.c,v 1.4 2001/02/14 07:44:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -77,16 +77,15 @@ at_find(unsigned int hk)
 attrib *
 a_select(attrib * a, void * data, boolean(*compare)(const attrib *, void *))
 {
-	attrib * find = a;
-	while (find && !compare(find, data)) find = find->next;
-	return find;
+	while (a && !compare(a, data)) a = a->next;
+	return a;
 }
 
 attrib *
-a_find(attrib * a, const attrib_type * at) {
-	attrib * find = a;
-	while (find && find->type!=at) find = find->next;
-	return find;
+a_find(attrib * a, const attrib_type * at) 
+{
+	while (a && a->type!=at) a = a->next;
+	return a;
 }
 
 attrib *

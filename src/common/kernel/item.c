@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.c,v 1.10 2001/02/13 02:58:51 enno Exp $
+ *	$Id: item.c,v 1.11 2001/02/14 07:44:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1288,7 +1288,7 @@ init_olditems(void)
 
 	for (i=0; i!=MAXITEMS; ++i) {
 		int iflags = ITF_NONE;
-		int rflags = RTF_ITEM;
+		int rflags = RTF_ITEM|RTF_POOLED;
 		int m, n;
 		const char * name[2];
 		const char * appearance[2];
@@ -1494,7 +1494,7 @@ init_oldherbs(void)
 			names[1] = reverse_lookup(NULL, herbdata[1][h]);
 		}
 
-		rtype = new_resourcetype(names, appearance, RTF_ITEM);
+		rtype = new_resourcetype(names, appearance, RTF_ITEM|RTF_POOLED);
 		itype = new_itemtype(rtype, ITF_HERB, 0, 0, 0, NOSKILL);
 
 		t = (terrain_t)(h/3+1);
@@ -1894,7 +1894,7 @@ init_oldpotions(void)
 			names[1] = reverse_lookup(NULL, potionnames[1][p]);
 		}
 
-		rtype = new_resourcetype(names, appearance, RTF_ITEM);
+		rtype = new_resourcetype(names, appearance, RTF_ITEM|RTF_POOLED);
 		if (p==P_FOOL) rtype->flags |= RTF_SNEAK;
 		oldresourcetype[potion2res(p)] = rtype;
 		itype = new_itemtype(rtype, ITF_POTION, 0, 0, 0, NOSKILL);
@@ -1925,7 +1925,7 @@ void
 init_resources(void)
 {
 	/* silver was never an item: */
-	r_silver = new_resourcetype(&names[0], NULL, RTF_ITEM);
+	r_silver = new_resourcetype(&names[0], NULL, RTF_ITEM|RTF_POOLED);
 	i_silver = new_itemtype(r_silver, ITF_NONE, 1/*weight*/, 0, 0, NOSKILL);
 	r_silver->uchange = res_changeitem;
 

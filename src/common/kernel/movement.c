@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.8 2001/02/09 13:53:51 corwin Exp $
+ *	$Id: movement.c,v 1.9 2001/02/14 07:44:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1945,7 +1945,6 @@ void
 movement(void)
 {
 	region *r;
-	unit *u;
 
 	/* Initialize the additional encumbrance by transported units */
 #ifdef NEW_DRIVE
@@ -1953,7 +1952,7 @@ movement(void)
 #endif
 
 	for (r = regions; r; r = r->next) {
-
+		unit ** up = &r->units;
 		/* Bewegungen.
 		 *
 		 * Zuerst müssen sich alle Einheiten ohne u->target bewegen
@@ -1963,31 +1962,38 @@ movement(void)
 		 * neue NEW_FOLLOW-Variante: Verfolger folgen sofort, FL_FOLLOW
 		 * ist bereits gesetzt.
 		 */
-		for (u = r->units; u;) {
-			unit *un = u->next;
+		while (*up) {
+			unit *u = *up;
+			keyword_t kword;
 
-			if (!fval(u,FL_FOLLOWING)
-				&& (igetkeyword(u->thisorder) == K_ROUTE ||
-					igetkeyword(u->thisorder) == K_MOVE))
-			{
+			if (fval(u, FL_FOLLOWING)) {
+				/* skip all followers */
+				do {
+					u = u->next;
+				} while (u && fval(u, FL_FOLLOWING));
+				up = &u;
+				if (u==NULL) break;
+			}
+			kword = igetkeyword(u->thisorder);
+			switch (kword) {
+			case K_ROUTE:
+			case K_MOVE:
 				if (attacked(u)) {
 					cmistake(u, findorder(u, u->thisorder), 52, MSG_MOVE);
 					set_string(&u->thisorder, "");
-					u = un;
+					up = &u->next;
 				} else if (race[u->race].flags & RCF_CANNOTMOVE) {
 					cmistake(u, findorder(u, u->thisorder), 55, MSG_MOVE);
 					set_string(&u->thisorder, "");
-					u = un;
+					up = &u->next;
 				} else {
 					move(r, u, true);
 					set_string(&u->thisorder, "");
-					/* Nach einer Bewegung muß die Schleife von vorn durchlaufen
-					 * werden, sonst bringen Schiffe die Schleife durcheinander,
-					 * weil u->next sich evt. mitbewegt hat. */
-					u = r->units;
+					if (u==*up) up = &u->next;
 				}
-			} else {
-				u = un;
+				break;
+			default:
+				up = &u->next;
 			}
 		}
 	}
@@ -1996,6 +2002,7 @@ movement(void)
 	 * bewegen sich. */
 
 	for (r = regions; r; r = r->next) {
+		unit * u;
 		for (u = r->units; u;) {
 			unit *u2 = u->next;
 			strlist *o;
@@ -2033,6 +2040,7 @@ movement(void)
 	/* Reguläre Verfolger starten */
 
 	for (r = regions; r; r = r->next) {
+		unit * u;
 		for (u = r->units; u;) {
 			unit * u2 = u->next;
 			if (utarget(u)
@@ -2056,6 +2064,7 @@ movement(void)
 	/* Piraten und Cleanup */
 
 	for (r = regions; r; r = r->next) {
+		unit * u;
 		for(u = r->units; u;) {
 			unit *un = u->next;
 			if(igetkeyword(u->thisorder) == K_PIRACY) piracy(u);

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: pool.c,v 1.4 2001/02/13 00:41:15 enno Exp $
+ *	$Id: pool.c,v 1.5 2001/02/14 07:44:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -174,7 +174,7 @@ new_get_pooled(const unit * u, const resource_type * rtype, int mode)
 		if (mode & GET_RESERVE) use = have-slack;
 		else if (mode & GET_SLACK) use = slack;
 	}
-	if (mode & ~(GET_SLACK|GET_RESERVE)) {
+	if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK|GET_RESERVE)) {
 		for (v = r->units; v; v = v->next) if (u!=v) {
 			int mask;
 
@@ -225,7 +225,7 @@ new_use_pooled(unit * u, const resource_type * rtype, int mode, int count)
 		use -= n;
 	}
 
-	if (mode & ~(GET_SLACK|GET_RESERVE)) {
+	if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK|GET_RESERVE)) {
 		for (v = r->units; v; v = v->next) if (u!=v) {
 			int mask;
 			if (urace(v)->ec_flags & NOGIVE) continue;

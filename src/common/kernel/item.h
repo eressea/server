@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: item.h,v 1.4 2001/02/13 02:58:51 enno Exp $
+ *	$Id: item.h,v 1.5 2001/02/14 07:44:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -36,6 +36,7 @@ typedef struct item {
 #define RTF_LIMITED  (1<<2) /* a resource that's freely available, but in
                              * limited supply */
 #define RTF_DYNAMIC  (1<<3) /* dynamic type, must be saved */
+#define RTF_POOLED   (1<<4) /* resource is available in pool */
 
 #undef AT_ITYPE /* should resource_type use an attribute for items ? */
 #undef AT_HTYPE /* should resource_type use an attribute for herbs ? */
