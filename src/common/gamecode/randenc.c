@@ -1163,7 +1163,7 @@ orc_growth(void)
           }
         }
         if (increase) {
-          u2 = create_unit(r, u->faction, increase, u->race, 0, NULL, u);
+          unit * u2 = create_unit(r, u->faction, increase, u->race, 0, NULL, u);
           transfermen(u2, u, u2->number);
 
           ADDMSG(&u->faction->msgs, msg_message("orcgrowth",
