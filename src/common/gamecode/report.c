@@ -664,15 +664,74 @@ hat_in_region(item_t it, region * r, faction * f)
 }
 
 static void
-print_curses(FILE *F, const locale * lang, const void * obj, typ_t typ, const attrib *a, int self, int indent)
+print_curses(FILE *F, faction *viewer, void * obj, typ_t typ, int indent)
 {
+	attrib *a = NULL;
+	int self = 0;
+	region *r;
+
+	/* Die Sichtbarkeit eines Zaubers und die Zaubermeldung sind bei
+	 * Gebäuden und Schiffen je nach, ob man Besitzer ist, verschieden.
+	 * Bei Einheiten sieht man Wirkungen auf eigene Einheiten immer.
+	 * Spezialfälle (besonderes Talent, verursachender Magier usw. werde
+	 * bei jedem curse gesondert behandelt. */
+	if (typ == TYP_SHIP){
+		ship * sh = (ship*)obj;
+		unit * owner;
+		a = sh->attribs;
+		r = sh->region;
+		if((owner = shipowner(r,sh)) != NULL){
+			if (owner->faction == viewer){
+				self = 2;
+			} else { /* steht eine person der Partei auf dem Schiff? */
+				unit *u = NULL;
+				for (u = r->units; u; u = u->next) {
+					if (u->ship == sh) {
+						self = 1;
+						break;
+					}
+				}
+			}
+		}
+	} else if (typ == TYP_BUILDING) {
+		building * b = (building*)obj;
+		unit * owner;
+		a = b->attribs;
+		r = b->region;
+		if((owner = buildingowner(r,b)) != NULL){
+			if (owner->faction == viewer){
+				self = 2;
+			} else { /* steht eine Person der Partei in der Burg? */
+				unit *u = NULL;
+				for (u = r->units; u; u = u->next) {
+					if (u->building == b) {
+						self = 1;
+						break;
+					}
+				}
+			}
+		}
+	} else if (typ == TYP_UNIT) {
+		unit *u = (unit *)obj;
+		a = u->attribs;
+		r = u->region;
+		if (u->faction == viewer){
+			self = 2;
+		}
+	} else if (typ == TYP_REGION) {
+		r = (region *)obj;
+		a = r->attribs;
+	} else {
+		/* fehler */
+	}
+
 	for(;a;a=a->next) {
 		int dh = 0;
 
 		if (fval(a->type, ATF_CURSE)) {
 			curse *c = (curse *)a->data.v;
 			if (c->type->curseinfo)
-				dh = c->type->curseinfo(lang, obj, typ, c, self);
+				dh = c->type->curseinfo(viewer->locale, obj, typ, c, self);
 			if (dh == 1) {
 				rnl(F);
 				rparagraph(F, buf, indent, 0);
@@ -775,11 +834,12 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 		if(ug) {
 			int i;
 			for(i=0; i<ug->members; i++) {
-				print_curses(F, f->locale, u, TYP_UNIT, ug->unit_array[i]->attribs, (u->faction == f)? 1 : 0, indent);
+				u = ug->unit_array[i];
+				print_curses(F, f, u, TYP_UNIT, indent);
 			}
 		} else
 #endif /* USE_UGROUPS */
-		print_curses(F, f->locale, u, TYP_UNIT, u->attribs, (u->faction == f)? 1 : 0, indent);
+		print_curses(F, f, u, TYP_UNIT, indent);
 	}
 
 #ifdef USE_UGROUPS
@@ -1281,7 +1341,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	n = 0;
 
 	/* Wirkungen permanenter Sprüche */
-	print_curses(F, f->locale, r, TYP_REGION, r->attribs, 0, 0);
+	print_curses(F, f, r, TYP_REGION,0);
 
 	/* Produktionsreduktion */
 	a = a_find(r->attribs, &at_reduceproduction);
@@ -1783,13 +1843,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 
 	if (mode<see_lighthouse) return;
 
-	/* Leere Burgen verursachten sonst segfault! */
-	if(buildingowner(r,b) != NULL){
-		print_curses(F, f->locale, b, TYP_BUILDING, b->attribs,
-				(buildingowner(r,b)->faction == f)? 1 : 0, 4);
-	} else {
-		print_curses(F, f->locale, b, TYP_BUILDING, b->attribs, 0, 4);
-	}
+	print_curses(F, f, b, TYP_BUILDING, 4);
 
 	for (u = r->units; u; u = u->next)
 		if (u->building == b && fval(u, FL_OWNER)) {
@@ -2179,13 +2233,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 
 			rparagraph(F, buf, 2, 0);
 
-			/* Leere Schiffe verursachten sonst segfault! */
-			if(shipowner(r,sh) != NULL){
-				print_curses(F, f->locale, sh, TYP_SHIP, sh->attribs,
-						(shipowner(r,sh)->faction == f)? 1 : 0, 4);
-			} else {
-				print_curses(F, f->locale, sh, TYP_SHIP, sh->attribs, 0, 4);
-			}
+			print_curses(F,f,sh,TYP_SHIP,4);
 
 			for (u = r->units; u; u = u->next)
 				if (u->ship == sh && fval(u, FL_OWNER)) {

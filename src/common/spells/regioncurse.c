@@ -147,7 +147,6 @@ cinfo_farvision(const locale * lang, const void * obj, typ_t typ, curse *c, int 
 	message * msg;
 
 	unused(typ);
-	unused(self);
 	unused(obj);
 
 	assert(typ == TYP_REGION);
