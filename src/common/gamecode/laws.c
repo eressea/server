@@ -2037,17 +2037,16 @@ set_passw(void)
 					if (o == -1) {
 						cmistake(u, S->s, 135, MSG_EVENT);
 					} else {
-						i = (int) pow(2, o);
 						if (getparam(u->faction->locale) == P_NOT) {
-							if(i == O_COMPRESS || i == O_BZIP2) {
+							if(o == O_COMPRESS || o == O_BZIP2) {
 								cmistake(u, S->s, 305, MSG_EVENT);
 							} else {
-								u->faction->options = u->faction->options & ~i;
+								u->faction->options = u->faction->options & ~((int)pow(2, o));
 							}
 						} else {
-							u->faction->options = u->faction->options | i;
-							if(i == O_COMPRESS) u->faction->options &= ~O_BZIP2;
-							if(i == O_BZIP2) u->faction->options &= ~O_COMPRESS;
+							u->faction->options = u->faction->options | ((int)pow(2,o));
+							if(o == O_COMPRESS) u->faction->options &= ~((int)pow(2,O_BZIP2));
+							if(o == O_BZIP2) u->faction->options &= ~((int)pow(2,O_COMPRESS));
 						}
 					}
 					break;
