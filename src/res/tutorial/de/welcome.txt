@@ -17,7 +17,7 @@ Testspiel:  tutorial@eressea.upb.de
 Eressea:    eressea@eressea.amber.kn-bremen.de
 
 * Zugabgaberhytmus:
-Testspiel:  3x die Woche, Sonntag, Dienstag und Freitag um 09:00 Uhr morgens
+Testspiel:  3x die Woche, Montag, Mittwoch und Samstag um 09:00 Uhr morgens
 Eressea:    1x die Woche, Sonntags um 9:00 Uhr
 
 * Spieldauer:

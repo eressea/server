@@ -14,7 +14,7 @@ Tutorial:  tutorial@eressea.upb.de
 Eressea:   eressea@eressea.amber.kn-bremen.de
 
 * Zugabgaberhytmus:
-Tutorial:  3x per Week, Sunday, Tuesday and Friday before 9 am CET.
+Tutorial:  3x per Week, Monday, Wednesday and Saturday before 9 am CET.
 Eressea:   1x per Week, Sunday before 9 am CET.
 
 * Duration:
