@@ -280,17 +280,17 @@ score(void)
 		fprintf(scoreFP, "# alliance:factions:persons:score\n");
 
 		for (a = alliances; a; a = a->next) {
-			int alliance_score = 0, alliance_number = 0, alliance_faction = 0;
+			int alliance_score = 0, alliance_number = 0, alliance_factions = 0;
 
 			for (f = factions; f; f = f->next) {
 				if(f->alliance && f->alliance->id == a->id) {
-					alliance_faction++;
+					alliance_factions++;
 					alliance_score  += f->score;
 					alliance_number += f->number;
 				}
 			}
 
-			fprintf(scoreFP, "%d:%d:%d\n", a->id, alliance_number, alliance_score);
+			fprintf(scoreFP, "%d:%d:%d:%d\n", a->id, alliance_factions, alliance_number, alliance_score);
 		}
 		fclose(scoreFP);
 	}
