@@ -230,7 +230,7 @@ a_age(attrib ** p)
 	 * hat Einfluß auf den Besitzer */
 	while(*ap) {
 		attrib * a = *ap;
-		if(a->type->age && a->type->age(a)==0) a_remove(p, a);
+		if (a->type->age && a->type->age(a)==0) a_remove(p, a);
 		else ap=&a->next;
 	}
 	return (*p!=NULL);
@@ -264,6 +264,7 @@ a_read(FILE * f, attrib ** attribs)
 				a_add(attribs, na);
 				break;
 			case AT_READ_FAIL:
+				log_warning(("reading attribute %s failed.", zText));
 				a_free(na);
 				break;
 			default:

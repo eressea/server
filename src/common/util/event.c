@@ -17,6 +17,7 @@
 
 /* util includes */
 #include "attrib.h"
+#include "log.h"
 
 /* libc includes */
 #include <assert.h>
@@ -54,7 +55,9 @@ read_triggers(FILE * F, trigger ** tp)
 				tp = &(*tp)->next;
 				break;
 			case AT_READ_FAIL:
+				log_warning(("reading trigger for %s failed.", ttype->name));
 				t_free(*tp);
+				*tp = NULL;
 				break;
 			default:
 				assert(!"invalid return value");

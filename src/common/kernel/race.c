@@ -570,7 +570,7 @@ read_race_reference(const struct race ** rp, FILE * F)
 		fscanf(F, "%s", zName);
 		if (strcmp(zName, "none")==0) {
 			*rp = NULL;
-			return AT_READ_FAIL;
+			return AT_READ_OK;
 		}
 		*rp = rc_find(zName);
 		assert(*rp!=NULL);
