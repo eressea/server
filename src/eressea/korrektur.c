@@ -1764,12 +1764,57 @@ fix_timeouts(void)
 #include <modules/gmcmd.h>
 
 static int
+resize_plane(struct plane * p, int radius)
+{
+	region * center = findregion(p->minx+(p->maxx-p->minx)/2, p->miny+(p->maxy-p->miny)/2);
+	int minx = center->x - radius;
+	int maxx = center->x + radius;
+	int miny = center->y - radius;
+	int maxy = center->y + radius;
+	int x, y;
+
+	for (x=minx;x<=maxx;++x) {
+		for (y=miny;y<=maxy;++y) {
+			region * r = findregion(x, y);
+			if (r && rplane(r)!=p) break;
+		}
+	}
+	if (x<=maxx) return -1;
+	p->maxx=maxx;
+	p->maxy=maxy;
+	p->minx=minx;
+	p->miny=miny;
+	for (x=minx;x<=maxx;++x) {
+		for (y=miny;y<=maxy;++y) {
+			region * r = findregion(x, y);
+			if (r==NULL) {
+				r = new_region(minx+x, miny+y);
+				freset(r, RF_ENCOUNTER);
+				r->planep = p;
+				if (distance(r, center)==radius) {
+					terraform(r, T_FIREWALL);
+				} else if (distance(r, center)<radius) {
+					terraform(r, T_OCEAN);
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+static int
 regatta_quest(void)
 {
-	plane * p = gm_addplane(20, PFL_NORECRUITS, "Regatta");
-	region * center = findregion(p->minx+(p->maxx-p->minx)/2, p->miny+(p->maxy-p->miny)/2);
-	gm_addfaction("gregorjochmann@gmx.de", p, center);
-	return 0;
+	plane * p = getplanebyname("Regatta");
+	if (p) {
+		return resize_plane(p, 40);
+	} else {
+		region * center;
+		p = gm_addplane(40, PFL_NORECRUITS, "Regatta");
+		center = findregion(p->minx+(p->maxx-p->minx)/2, p->miny+(p->maxy-p->miny)/2);
+		gm_addfaction("gregorjochmann@gmx.de", p, center);
+		return 0;
+	}
 }
 
 static int
@@ -1812,7 +1857,7 @@ update_gmquests(void)
 		}
 		do_once("et02", secondfaction(f));
 	}
-	do_once("rq01", regatta_quest());
+	do_once("rq02", regatta_quest());
 }
 
 #if 0
