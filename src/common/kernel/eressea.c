@@ -107,7 +107,7 @@ static attrib_type at_creator = {
 	/* Rest ist NULL; temporäres, nicht alterndes Attribut */
 };
 
-static int
+int
 NewbieImmunity(void) {
   static int value = -1;
   if (value<0) {
