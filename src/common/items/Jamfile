@@ -9,15 +9,10 @@ SubDirHdrs $(SUBDIR)/../.. ;
 
 SOURCES =
  artrewards.c
- birthday_firework.c
- catapultammo.c
  demonseye.c
  itemtypes.c
- questkeys.c
  racespoils.c
  seed.c
- speedsail.c
- studypotion.c
  weapons.c
  xerewards.c
  ;

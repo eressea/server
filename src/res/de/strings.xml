@@ -1299,6 +1299,14 @@
     <text locale="de">Lebkuchenherzen mit der Aufschrift 'Erz und
     Stein, das ist fein'</text>
   </string>
+  <string name="key">
+    <text locale="de">Schlüssel</text>
+    <text locale="en">key</text>
+  </string>
+  <string name="key_p">
+    <text locale="de">Schlüssel</text>
+    <text locale="en">keys</text>
+  </string>
   <string name="questkey1">
     <text locale="de">Achatener Schlüssel</text>
     <text locale="en">agate key</text>

@@ -124,19 +124,10 @@
 				RelativePath=".\artrewards.h">
 			</File>
 			<File
-				RelativePath=".\birthday_firework.h">
-			</File>
-			<File
-				RelativePath=".\catapultammo.h">
-			</File>
-			<File
 				RelativePath=".\demonseye.h">
 			</File>
 			<File
 				RelativePath=".\itemtypes.h">
-			</File>
-			<File
-				RelativePath=".\questkeys.h">
 			</File>
 			<File
 				RelativePath=".\racespoils.h">
@@ -155,19 +146,10 @@
 			RelativePath=".\artrewards.c">
 		</File>
 		<File
-			RelativePath=".\birthday_firework.c">
-		</File>
-		<File
-			RelativePath=".\catapultammo.c">
-		</File>
-		<File
 			RelativePath=".\demonseye.c">
 		</File>
 		<File
 			RelativePath=".\itemtypes.c">
-		</File>
-		<File
-			RelativePath=".\questkeys.c">
 		</File>
 		<File
 			RelativePath=".\racespoils.c">

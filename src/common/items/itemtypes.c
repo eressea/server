@@ -14,7 +14,6 @@
 #include <eressea.h>
 #include "itemtypes.h"
 
-#include "birthday_firework.h"
 #include "demonseye.h"
 #include "xerewards.h"
 #include "artrewards.h"
@@ -23,8 +22,6 @@
 #if GROWING_TREES
 # include "seed.h"
 #endif
-#include "questkeys.h"
-#include "catapultammo.h"
 
 void
 register_itemtypes(void)
@@ -36,10 +33,6 @@ register_itemtypes(void)
 	register_seed();
 	register_mallornseed();
 #endif
-	register_birthday_firework();
-	register_lebkuchenherz();
-	register_questkeys();
-	register_catapultammo();
 	register_racespoils();
   register_artrewards();
 }

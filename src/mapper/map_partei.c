@@ -11,7 +11,6 @@
  * prior permission by the authors of Eressea.
  */
 
-#define BOOL_DEFINED
 #include <config.h>
 #include <curses.h>
 #include <eressea.h>

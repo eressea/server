@@ -12,7 +12,6 @@
  * prior permission by the authors of Eressea.
  */
 
-#define BOOL_DEFINED
 /* wenn config.h nicht vor curses included wird, kompiliert es unter windows nicht */
 
 #include <config.h>

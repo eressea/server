@@ -11,7 +11,6 @@
  * prior permission by the authors of Eressea.
  */
 
-#define BOOL_DEFINED
 /* wenn config.h nicht vor curses included wird, kompiliert es unter windows nicht */
 /* wenn curses.h nicht vor mapper included wird, kennt es die structs nicht. TODO: curses-teil separieren (map_tools.h) */
 #include <config.h>

@@ -1,5 +1,18 @@
 <?xml version="1.0"?>
 <resources>
+
+  <resource name="questkey1" appearance="key">
+    <!-- Key for an old quest. placeholder item -->
+    <function name="change" value="changeitem"/>
+    <item notlost="yes" weight="1" />
+  </resource>
+
+  <resource name="questkey2" appearance="key">
+    <!-- Key for an old quest. placeholder item -->
+    <function name="change" value="changeitem"/>
+    <item notlost="yes" weight="1" />
+  </resource>
+
   <resource name="jadee_ring" appearance="ring">
     <!-- Wedding ring for Jadee -->
     <function name="change" value="changeitem"/>

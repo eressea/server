@@ -60,8 +60,6 @@
 /* attributes inclues */
 #include <attributes/matmod.h>
 
-#include <items/catapultammo.h>
-
 #define STONERECYCLE 50
 /* Name, MaxGroesse, MinBauTalent, Kapazitaet, {Eisen, Holz, Stein, BauSilber,
  * Laen, Mallorn}, UnterSilber, UnterSpezialTyp, UnterSpezial */
@@ -198,7 +196,12 @@ siege_cmd(unit * u, order * ord)
   int bewaffnete, katapultiere = 0;
   static boolean init = false;
   static const curse_type * magicwalls_ct;
-  if (!init) { init = true; magicwalls_ct = ct_find("magicwalls"); }
+  static item_type * it_catapultammo = NULL;
+  if (!init) {
+    init = true; 
+    magicwalls_ct = ct_find("magicwalls");
+    it_catapultammo = it_find("catapultammo");
+  }
   /* gibt es ueberhaupt Burgen? */
 
   init_tokens(ord);
@@ -218,7 +221,7 @@ siege_cmd(unit * u, order * ord)
   /* schaden durch katapulte */
 
   d = min(u->number,
-    min(new_get_pooled(u, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK), get_item(u, I_CATAPULT)));
+    min(new_get_pooled(u, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK), get_item(u, I_CATAPULT)));
   if (eff_skill(u, SK_CATAPULT, r) >= 1) {
     katapultiere = d;
     d *= eff_skill(u, SK_CATAPULT, r);
@@ -252,7 +255,7 @@ siege_cmd(unit * u, order * ord)
   /* meldung, schaden anrichten */
   if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {
     b->size -= d;
-    new_use_pooled(u, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, d);
+    new_use_pooled(u, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, d);
     d = 100 * d / b->size;
   } else d = 0;
 

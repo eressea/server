@@ -23,8 +23,6 @@
 
 /* misc includes */
 #include <attributes/key.h>
-#include <items/questkeys.h>
-#include <items/catapultammo.h>
 #include <modules/xecmd.h>
 
 /* gamecode includes */

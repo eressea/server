@@ -14,8 +14,6 @@
 #define VERSION "3.3.0"
 #define ISLANDSIZE 20
 
-#define MAIN_C
-#define BOOL_DEFINED
 /* wenn config.h nicht vor curses included wird, kompiliert es unter windows nicht */
 #include <config.h>
 #include <curses.h>
