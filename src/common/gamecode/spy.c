@@ -57,59 +57,58 @@
 void
 spy(region * r, unit * u)
 {
-	unit *target;
-	int spy, observe;
+  unit *target;
+  int spy, observe;
   double spychance, observechance;
 
-	target = getunit(r, u->faction);
+  target = getunit(r, u->faction);
 
-	if (!target) {
-		cmistake(u, findorder(u, u->thisorder), 63, MSG_EVENT);
-		return;
-	}
-	if (!can_contact(r, u, target)) {
-		cmistake(u, findorder(u, u->thisorder), 24, MSG_EVENT);
-		return;
-	}
-	if (eff_skill(u, SK_SPY, r) < 1) {
-		cmistake(u, findorder(u, u->thisorder), 39, MSG_EVENT);
-		return;
-	}
-	/* Die Grundchance für einen erfolgreichen Spionage-Versuch ist 10%.
-	 * Für jeden Talentpunkt, den das Spionagetalent das Tarnungstalent
-	 * des Opfers übersteigt, erhöht sich dieses um 5%*/
-	spy = eff_skill(u, SK_SPY, r) - eff_skill(target, SK_STEALTH, r);
-	spychance = 0.1 + max(spy*0.05, 0.0);
+  if (!target) {
+    cmistake(u, findorder(u, u->thisorder), 63, MSG_EVENT);
+    return;
+  }
+  if (!can_contact(r, u, target)) {
+    cmistake(u, findorder(u, u->thisorder), 24, MSG_EVENT);
+    return;
+  }
+  if (eff_skill(u, SK_SPY, r) < 1) {
+    cmistake(u, findorder(u, u->thisorder), 39, MSG_EVENT);
+    return;
+  }
+  /* Die Grundchance für einen erfolgreichen Spionage-Versuch ist 10%.
+  * Für jeden Talentpunkt, den das Spionagetalent das Tarnungstalent
+  * des Opfers übersteigt, erhöht sich dieses um 5%*/
+  spy = eff_skill(u, SK_SPY, r) - eff_skill(target, SK_STEALTH, r);
+  spychance = 0.1 + max(spy*0.05, 0.0);
 
-	if (chance(spychance)) {
-		spy_message(spy, u, target);
-	} else {
-		add_message(&u->faction->msgs, new_message(u->faction,
-			"spyfail%u:spy%u:target", u, target));
-	}
+  if (chance(spychance)) {
+    spy_message(spy, u, target);
+  } else {
+    ADDMSG(&u->faction->msgs, msg_message("spyfail", "spy target", u, target));
+  }
 
-	/* der Spion kann identifiziert werden, wenn das Opfer bessere
-	 * Wahrnehmung als das Ziel Tarnung + Spionage/2 hat */
-	observe = eff_skill(target, SK_OBSERVATION, r)
-				- (effskill(u, SK_STEALTH) + eff_skill(u, SK_SPY, r)/2);
+  /* der Spion kann identifiziert werden, wenn das Opfer bessere
+  * Wahrnehmung als das Ziel Tarnung + Spionage/2 hat */
+  observe = eff_skill(target, SK_OBSERVATION, r)
+    - (effskill(u, SK_STEALTH) + eff_skill(u, SK_SPY, r)/2);
 
 #if NEWATSROI == 0
-	if (invisible(u) >= u->number &&
-		get_item(target, I_AMULET_OF_TRUE_SEEING) == 0) {
-		observe = min(observe, 0);
-	}
+  if (invisible(u) >= u->number &&
+    get_item(target, I_AMULET_OF_TRUE_SEEING) == 0) {
+      observe = min(observe, 0);
+    }
 #endif
 
-	/* Anschließend wird - unabhängig vom Erfolg - gewürfelt, ob der
-	 * Spionageversuch bemerkt wurde. Die Wahrscheinlich dafür ist (100 -
-	 * SpionageSpion*5 + WahrnehmungOpfer*2)%. */
-	observechance = 1.0 - (eff_skill(u, SK_SPY, r) * 0.05)
-				+ (eff_skill(target, SK_OBSERVATION, r) * 0.02);
+    /* Anschließend wird - unabhängig vom Erfolg - gewürfelt, ob der
+    * Spionageversuch bemerkt wurde. Die Wahrscheinlich dafür ist (100 -
+    * SpionageSpion*5 + WahrnehmungOpfer*2)%. */
+    observechance = 1.0 - (eff_skill(u, SK_SPY, r) * 0.05)
+      + (eff_skill(target, SK_OBSERVATION, r) * 0.02);
 
-	if (chance(observechance)){
-		add_message(&target->faction->msgs, new_message(target->faction,
-		"spydetect%u:spy%u:target", observe>0?u:NULL, target));
-	}
+    if (chance(observechance)){
+      add_message(&target->faction->msgs, new_message(target->faction,
+        "spydetect%u:spy%u:target", observe>0?u:NULL, target));
+    }
 }
 
 void

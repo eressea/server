@@ -106,39 +106,40 @@ boolean nomonsters = false;
 
 static int 
 RemoveNMRNewbie(void) {
-	static int value = -1;
-	if (value<0) {
-		value = atoi(get_param(global.parameters, "nmr.removenewbie"));
-	}
-	return value;
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "nmr.removenewbie");
+    value = str?atoi(str):0;
+  }
+  return value;
 }
 
 static void
 restart(unit *u, const race * rc)
 {
-	faction *f = addfaction(u->faction->email, u->faction->passw, rc, u->faction->locale, u->faction->subscription);
+  faction *f = addfaction(u->faction->email, u->faction->passw, rc, u->faction->locale, u->faction->subscription);
   unit * nu = addplayer(u->region, f);
-	strlist ** o=&u->orders;
+  strlist ** o=&u->orders;
   f->subscription = u->faction->subscription;
-	fset(f, FFL_RESTART);
-	if (f->subscription) fprintf(sqlstream, "UPDATE subscriptions set faction='%s', race='%s' where id=%u;\n",
+  fset(f, FFL_RESTART);
+  if (f->subscription) fprintf(sqlstream, "UPDATE subscriptions set faction='%s', race='%s' where id=%u;\n",
     itoa36(f->no), dbrace(rc), f->subscription);
-	f->magiegebiet = u->faction->magiegebiet;
-	f->options = u->faction->options;
-	freestrlist(nu->orders);
-	nu->orders = u->orders;
-	u->orders = NULL;
-	while (*o) {
-		strlist * S = *o;
-		if (igetkeyword(S->s, u->faction->locale) == K_RESTART) {
-			*o = S->next;
-			S->next = NULL;
-			freestrlist(S);
-		} else {
-			o = &S->next;
-		}
-	}
-	destroyfaction(u->faction);
+  f->magiegebiet = u->faction->magiegebiet;
+  f->options = u->faction->options;
+  freestrlist(nu->orders);
+  nu->orders = u->orders;
+  u->orders = NULL;
+  while (*o) {
+    strlist * S = *o;
+    if (igetkeyword(S->s, u->faction->locale) == K_RESTART) {
+      *o = S->next;
+      S->next = NULL;
+      freestrlist(S);
+    } else {
+      o = &S->next;
+    }
+  }
+  destroyfaction(u->faction);
 }
 
 /* ------------------------------------------------------------- */

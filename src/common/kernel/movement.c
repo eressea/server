@@ -435,74 +435,83 @@ do_maelstrom(region *r, unit *u)
 void
 travelthru(unit * u, region * r)
 {
-	attrib *ru = a_add(&r->attribs, a_new(&at_travelunit));
+  attrib *ru = a_add(&r->attribs, a_new(&at_travelunit));
 
-	ru->data.v = u;
-	u->faction->first = 0;
-	u->faction->last = 0;
+  ru->data.v = u;
+
+  /* the first and last region of the faction gets reset, because travelthrough
+   * could be in regions that are located before the [first, last] interval,
+   * and recalculation is needed */
+  u->faction->first = 0;
+  u->faction->last = 0;
+}
+
+static void
+leave_trail(ship * sh, region **route)
+{
+  region **ri = route;
+
+  while (*ri) {
+    region *r = *ri;
+    direction_t dir = reldirection(*ri, *rn);
+    attrib * a = a_find((*ri)->attribs, &at_traveldir_new);
+    traveldir * td = NULL;
+    
+    while (a!=NULL) {
+      td = (traveldir *)a->data.v;
+      if (td->no == sh->no) break;
+      a = a->nexttype;
+    }
+
+    if (a!=NULL) {
+      a = a_add(&((*ri)->attribs), a_new(&at_traveldir_new));
+      td = (traveldir *)a->data.v;
+      td->no = sh->no;
+    }
+    td->dir = dir;
+    td->age = 2;
+
+    travelthru(u, r);
+    ++ri;
+  }
 }
 
 ship *
 move_ship(ship * sh, region * from, region * to, region ** route)
 {
-	unit *u = from->units;
-	unit **ulist = &to->units;
-	direction_t dir;
-	attrib			*a;
+  unit **iunit = &from->units;
+  unit **ulist = &to->units;
+  direction_t dir;
+  attrib *a;
+  boolean trail = (route==NULL);
 
-	if (from!=to) {
-		translist(&from->ships, &to->ships, sh);
-		sh->region = to;
-	}
+  if (from!=to) {
+    translist(&from->ships, &to->ships, sh);
+    sh->region = to;
+  }
 
-	while (u) {
-		unit *nu = u->next;
+  while (*iunit!=NULL) {
+    unit *u = *iunit;
+    assert(u->region==from);
 
-		if (u->ship == sh)
-		{
-			if (route) {
-				region **ri = route;
-				region **rn;
-
-				while (*ri) {
-					rn = ri+1;
-					if(*rn) {
-						dir = reldirection(*ri, *rn);
-						a = a_find((*ri)->attribs, &at_traveldir_new);
-						while (a) {
-							if(((traveldir *)(a->data.v))->no == sh->no) break;
-							a = a->nexttype;
-						}
-						if(!a) {
-							a = a_add(&((*ri)->attribs), a_new(&at_traveldir_new));
-							{
-								traveldir *t = (traveldir *)(a->data.v);
-								t->no = sh->no;
-								t->dir = dir;
-								t->age = 2;
-							}
-						} else {
-							traveldir *t = (traveldir *)(a->data.v);
-							t->dir = dir;
-							t->age = 2;
-						}
-					}
-					travelthru(u, *ri++);
-				}
-			}
-			if (from!=to) {
-				u->ship = NULL;		/* damit move_unit() kein leave() macht */
-				move_unit(u, to, ulist);
-				ulist = &u->next;
-				u->ship = sh;
-			}
-			if (route && eff_skill(u, SK_SAILING, from) >= 1) {
-				produceexp(u, SK_SAILING, u->number);
-			}
-		}
-		u = nu;
-	}
-	return sh;
+    if (u->ship == sh) {
+      if (!trail) {
+        leave_trail(sh, from, to, route);
+        trail=true;
+      }
+      if (from!=to) {
+        u->ship = NULL;		/* damit move_unit() kein leave() macht */
+        move_unit(u, to, ulist);
+        ulist = &u->next;
+        u->ship = sh;
+      }
+      if (route && eff_skill(u, SK_SAILING, from) >= 1) {
+        produceexp(u, SK_SAILING, u->number);
+      }
+    }
+    if (*iunit==u) iunit=&u->next;
+  }
+  return sh;
 }
 
 static void
@@ -1941,15 +1950,15 @@ age_traveldir(region *r)
 static direction_t
 hunted_dir(attrib *at, int id)
 {
-	attrib *a = a_find(at, &at_traveldir_new);
+  attrib *a = a_find(at, &at_traveldir_new);
 
-	while(a) {
-		traveldir *t = (traveldir *)(a->data.v);
-		if(t->no == id) return t->dir;
-		a = a->nexttype;
-	}
+  while (a!=NULL) {
+    traveldir *t = (traveldir *)(a->data.v);
+    if (t->no == id) return t->dir;
+    a = a->nexttype;
+  }
 
-	return NODIRECTION;
+  return NODIRECTION;
 }
 
 static boolean
@@ -1963,67 +1972,66 @@ can_move(const unit * u)
 static int
 hunt(unit *u)
 {
-	region *rc = u->region;
-	int moves, id;
-	char command[256];
-	direction_t dir;
+  region *rc = u->region;
+  int moves, id;
+  char command[256];
+  direction_t dir;
 
-	if(!u->ship) {
-		cmistake(u, findorder(u, u->thisorder), 144, MSG_MOVE);
-		return 0;
-	} else if(!fval(u, UFL_OWNER)) {
-		cmistake(u, findorder(u, u->thisorder), 146, MSG_MOVE);
-		return 0;
-	} else if(attacked(u)) {
-		cmistake(u, findorder(u, u->thisorder), 52, MSG_MOVE);
-		return 0;
-	} else if (!can_move(u)) {
-		cmistake(u, findorder(u, u->thisorder), 55, MSG_MOVE);
-		return 0;
-	}
+  if(!u->ship) {
+    cmistake(u, findorder(u, u->thisorder), 144, MSG_MOVE);
+    return 0;
+  } else if(!fval(u, UFL_OWNER)) {
+    cmistake(u, findorder(u, u->thisorder), 146, MSG_MOVE);
+    return 0;
+  } else if(attacked(u)) {
+    cmistake(u, findorder(u, u->thisorder), 52, MSG_MOVE);
+    return 0;
+  } else if (!can_move(u)) {
+    cmistake(u, findorder(u, u->thisorder), 55, MSG_MOVE);
+    return 0;
+  }
 
-	id = getshipid();
+  id = getshipid();
 
-	if (id <= 0) {
-	  cmistake(u,  findorder(u, u->thisorder), 20, MSG_MOVE);
-	  return 0;
-	}
+  if (id <= 0) {
+    cmistake(u,  findorder(u, u->thisorder), 20, MSG_MOVE);
+    return 0;
+  }
 
-	dir = hunted_dir(rc->attribs, id);
+  dir = hunted_dir(rc->attribs, id);
 
-	if(dir == NODIRECTION) {
-	  ship * sh = findship(id);
-	  if (sh->region!=rc) {
-		cmistake(u, findorder(u, u->thisorder), 20, MSG_MOVE);
-	  }
-	  return 0;
-	}
+  if (dir == NODIRECTION) {
+    ship * sh = findship(id);
+    if (sh->region!=rc) {
+      cmistake(u, findorder(u, u->thisorder), 20, MSG_MOVE);
+    }
+    return 0;
+  }
 
-	sprintf(command, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
-		locale_string(u->faction->locale, directions[dir]));
-	moves = 1;
+  sprintf(command, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
+    locale_string(u->faction->locale, directions[dir]));
+  moves = 1;
 
-	rc = rconnect(rc, dir);
-	while(moves < shipspeed(u->ship, u)
-			&& (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
-		strcat(command, " ");
-		strcat(command, locale_string(u->faction->locale, directions[dir]));
-		moves++;
-		rc = rconnect(rc, dir);
-	}
+  rc = rconnect(rc, dir);
+  while (moves < shipspeed(u->ship, u) && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) 
+  {
+    strcat(command, " ");
+    strcat(command, locale_string(u->faction->locale, directions[dir]));
+    moves++;
+    rc = rconnect(rc, dir);
+  }
 
-	/* In command steht jetzt das NACH-Kommando. */
+  /* In command steht jetzt das NACH-Kommando. */
 
-	igetkeyword(command, u->faction->locale);	/* NACH ignorieren und Parsing initialisieren. */
-  
+  igetkeyword(command, u->faction->locale);	/* NACH ignorieren und Parsing initialisieren. */
+
   /* NACH ausführen */
   if (move(u->region, u, false)!=0) {
     /* niemand sollte auf einen kapitän direkt ein folge haben, oder? */
     assert(1==0);
   }
-	fset(u, UFL_LONGACTION);								/* Von Hand setzen, um Endlosschleife zu vermeiden, 
-													 									wenn Verfolgung nicht erfolgreich */
-	return 1;   															/* true -> Einheitenliste von vorne durchgehen */
+  fset(u, UFL_LONGACTION); /* Von Hand setzen, um Endlosschleife zu vermeiden, wenn Verfolgung nicht erfolgreich */
+  return 1;   															/* true -> Einheitenliste von vorne durchgehen */
 }
 
 void

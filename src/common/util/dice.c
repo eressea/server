@@ -23,53 +23,59 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+/** rolls a number of n-sided dice.
+ * Usage: 3d6-3d4+5 = dice(3,6)-dice(3,4)+5 */
 int
 dice(int count, int value)
-{								/* Usage: 3d6-3d4+5 = dice(3,6)-dice(3,4)+5 */
-	int d = 0, c;
+{
+  int d = 0, c;
 
-	if (value<=0) return 0; /* (enno) %0 geht nicht. echt wahr. */
-	if (count >= 0)
-		for (c = count; c > 0; c--)
-			d += rand() % value + 1;
-	else
-		for (c = count; c < 0; c++)
-			d -= rand() % value + 1;
+  if (value<=0) return 0; /* (enno) %0 geht nicht. echt wahr. */
+  if (count >= 0)
+    for (c = count; c > 0; c--)
+      d += rand() % value + 1;
+  else
+    for (c = count; c < 0; c++)
+      d -= rand() % value + 1;
 
-	return d;
+  return d;
 }
 
+/** Parses a string of the form "2d6+8"
+* Kann nur simple Strings der Form "xdy[+-]z" parsen!
+* Schöner wäre eine flexibele Routine, die z.B. auch Sachen wie 2d6+3d4-1
+* parsen kann. */
 int
 dice_rand(const char *s)
 {
-	const char *c = s;
-	int m = 0, d = 0, k = 0, multi = 1;
-	int state = 1;
+  const char *c = s;
+  int m = 0, d = 0, k = 0, multi = 1;
+  int state = 1;
 
-	for (;;) {
-		if (isdigit((int)*c)) {
-			k = k*10+(*c-'0');
-		} else if (*c=='+' || *c=='-' || *c==0) {
-			if (state==1) /* konstante k addieren */
-				m+=k*multi;
-			else if (state==2) { /* dDk */
-				int i;
-				if (k == 0) k = 6; /* 3d == 3d6 */
-				for (i=0;i!=d;++i) m += (1 + rand() % k)*multi;
-			}
-			else assert(!"dice_rand: illegal token");
-			k = d = 0;
-			state = 1;
-			multi = (*c=='-')?-1:1;
-		} else if (*c=='d' || *c=='D') {
-			if (k==0) k = 1; /* d9 == 1d9 */
-			assert(state==1 || !"dice_rand: illegal token");
-			d = k;
-			k = 0;
-			state=2;
-		} else assert(!"dice_rand: illegal token");
-		if (*c==0) break;
-		c++;
-	}
-	return m;
+  for (;;) {
+    if (isdigit((int)*c)) {
+      k = k*10+(*c-'0');
+    } else if (*c=='+' || *c=='-' || *c==0) {
+      if (state==1) /* konstante k addieren */
+        m+=k*multi;
+      else if (state==2) { /* dDk */
+        int i;
+        if (k == 0) k = 6; /* 3d == 3d6 */
+        for (i=0;i!=d;++i) m += (1 + rand() % k)*multi;
+      }
+      else assert(!"dice_rand: illegal token");
+      k = d = 0;
+      state = 1;
+      multi = (*c=='-')?-1:1;
+    } else if (*c=='d' || *c=='D') {
+      if (k==0) k = 1; /* d9 == 1d9 */
+      assert(state==1 || !"dice_rand: illegal token");
+      d = k;
+      k = 0;
+      state=2;
+    } else assert(!"dice_rand: illegal token");
+    if (*c==0) break;
+    c++;
+  }
+  return m;
 }

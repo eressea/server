@@ -19,10 +19,6 @@
  * permission from the authors.
  */
 
-/* Kann nur simple Strings der Form "xdy[+-]z" parsen!
- * Schöner wäre eine flexibele Routine, die z.B. auch Sachen wie 2d6+3d4-1
- * parsen kann. */
-
 #include <config.h>
 #include "rand.h"
 
@@ -35,67 +31,65 @@
 #define drand() (((double)rand())/(double)RAND_MAX)
 #define M_PIl   3.1415926535897932384626433832795029L  /* pi */
 
+static double nv_next;
+static char valid_next = 0;
+
 /* NormalRand aus python, random.py geklaut, dort ist Referenz auf
- * den Algorithmus. mu = Mittelwert, sigma = Standardabweichung. */
-
-double nv_next;
-char valid_next = 0;
-
+* den Algorithmus. mu = Mittelwert, sigma = Standardabweichung. */
 double
 normalvariate(double mu, double sigma)
 {
-	double x2pi, g2rad, z;
-	double t1, t2;
-	double fac=1;
-	static double mu_alt, sigma_alt;
+  double x2pi, g2rad, z;
+  double t1, t2;
+  double fac=1;
+  static double mu_alt, sigma_alt;
 
-	if(mu < 10) {
-	  fac=0.01;
-	  mu*=100;
-	  sigma*=100;
-	}
+  if(mu < 10) {
+    fac=0.01;
+    mu*=100;
+    sigma*=100;
+  }
 
-	if(mu_alt!=mu || sigma_alt!= sigma)
-	  valid_next=0;
+  if(mu_alt!=mu || sigma_alt!= sigma)
+    valid_next=0;
 
-	mu_alt=mu;
-	sigma_alt=sigma;
+  mu_alt=mu;
+  sigma_alt=sigma;
 
-	if (valid_next == 0) {
-		x2pi = drand() * 2.0L * M_PIl;
-		t1   = drand();
-		t1   = 1.0 - t1;
-		t2   = log(t1);
-		g2rad = sqrt(-2.0 * t2);
-		z = cos(x2pi) * g2rad;
-		nv_next = sin(x2pi) * g2rad;
-		valid_next = 1;
-	} else {
-		z = nv_next;
-		valid_next = 0;
-	}
-	return (fac*(mu + z*sigma)); /* mu thorin */
+  if (valid_next == 0) {
+    x2pi = drand() * 2.0L * M_PIl;
+    t1   = drand();
+    t1   = 1.0 - t1;
+    t2   = log(t1);
+    g2rad = sqrt(-2.0 * t2);
+    z = cos(x2pi) * g2rad;
+    nv_next = sin(x2pi) * g2rad;
+    valid_next = 1;
+  } else {
+    z = nv_next;
+    valid_next = 0;
+  }
+  return (fac*(mu + z*sigma)); /* mu thorin */
 }
 
 int
 ntimespprob(int n, double p, double mod)
 {
-	int count = 0;
-	int i;
+  int count = 0;
+  int i;
 
-	for(i=0; i<n && p>0; i++)
-		if(drand() < p) {
-			count++;
-			p += mod;
-		}
-
-	return count;
+  for(i=0; i<n && p>0; i++) {
+    if(drand() < p) {
+      count++;
+      p += mod;
+    }
+  }
+  return count;
 }
 
 boolean
 chance(double x)
 {
   if (x>=1.0) return true;
-	return (boolean) (rand() % RAND_MAX < RAND_MAX * x);
+  return (boolean) (rand() % RAND_MAX < RAND_MAX * x);
 }
-

@@ -18,11 +18,14 @@
 extern "C" {
 #endif
 
-extern int dice_rand(const char *str);
-extern int dice(int count, int value);
-extern double normalvariate(double mu, double sigma);
-extern int ntimespprob(int n, double p, double mod);
-extern boolean chance(double x);
+  /* in dice.c: */
+  extern int dice_rand(const char *str);
+  extern int dice(int count, int value);
+
+  /* in rand.c: */
+  extern double normalvariate(double mu, double sigma);
+  extern int ntimespprob(int n, double p, double mod);
+  extern boolean chance(double x);
 
 #ifdef __cplusplus
 }

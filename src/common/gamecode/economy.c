@@ -110,11 +110,12 @@ static request *oa;
 
 static int 
 giverestriction(void) {
-	static int value = -1;
-	if (value<0) {
-		value = atoi(get_param(global.parameters, "GiveRestriction"));
-	}
-	return value;
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "GiveRestriction");
+    value = str?atoi(str):0;
+  }
+  return value;
 }
 
 int
@@ -2990,43 +2991,48 @@ expandentertainment(region * r)
 void
 entertain(region * r, unit * u)
 {
-	int max_e;
-	request *o;
-	static int entertainbase = 0;
-	static int entertainperlevel = 0;
-	if (!entertainbase) entertainbase = atoi(get_param(global.parameters, "entertain.base"));
-	if (!entertainperlevel) entertainperlevel = atoi(get_param(global.parameters, "entertain.perlevel"));
+  int max_e;
+  request *o;
+  static int entertainbase = 0;
+  static int entertainperlevel = 0;
+  if (!entertainbase) {
+    const char * str = get_param(global.parameters, "entertain.base");
+    entertainbase = str?atoi(str):0;
+  }
+  if (!entertainperlevel) {
+    const char * str = get_param(global.parameters, "entertain.perlevel");
+    entertainperlevel = str?atoi(str):0;
+  }
+  if (fval(u, UFL_WERE)) {
+    cmistake(u, findorder(u, u->thisorder), 58, MSG_INCOME);
+    return;
+  }
 
-	if (fval(u, UFL_WERE)) {
-		cmistake(u, findorder(u, u->thisorder), 58, MSG_INCOME);
-		return;
-	}
+  if (!effskill(u, SK_ENTERTAINMENT)) {
+    cmistake(u, findorder(u, u->thisorder), 58, MSG_INCOME);
+    return;
+  }
+  if (besieged(u)) {
+    cmistake(u, findorder(u, u->thisorder), 60, MSG_INCOME);
+    return;
+  }
+  if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
+    cmistake(u, findorder(u, u->thisorder), 69, MSG_INCOME);
+    return;
+  }
+  if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
+    cmistake(u, findorder(u, u->thisorder), 28, MSG_INCOME);
+    return;
+  }
 
-	if (!effskill(u, SK_ENTERTAINMENT)) {
-		cmistake(u, findorder(u, u->thisorder), 58, MSG_INCOME);
-		return;
-	}
-	if (besieged(u)) {
-		cmistake(u, findorder(u, u->thisorder), 60, MSG_INCOME);
-		return;
-	}
-	if (u->ship && is_guarded(r, u, GUARD_CREWS)) {
-		cmistake(u, findorder(u, u->thisorder), 69, MSG_INCOME);
-		return;
-	}
-	if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
-		cmistake(u, findorder(u, u->thisorder), 28, MSG_INCOME);
-		return;
-	}
+  u->wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT) * entertainperlevel);
+  if ((max_e = geti()) != 0)
+    u->wants = min(u->wants,max_e);
 
-	u->wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT) * entertainperlevel);
-	if ((max_e = geti()) != 0)
-		u->wants = min(u->wants,max_e);
-
-	o = nextentertainer++;
-	o->unit = u;
-	o->qty = u->wants;
-	entertaining += o->qty;
+  o = nextentertainer++;
+  o->unit = u;
+  o->qty = u->wants;
+  entertaining += o->qty;
 }
 
 /* ------------------------------------------------------------- */

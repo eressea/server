@@ -109,58 +109,63 @@ static attrib_type at_creator = {
 };
 static int 
 MaxAge(void) {
-	static int value = -1;
-	if (value<0) {
-		value = atoi(get_param(global.parameters, "MaxAge"));
-	}
-	return value;
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "MaxAge");
+    value = str?atoi(str):0;
+  }
+  return value;
 }
 
 int
 LongHunger(void) {
-	static int value = -1;
-	if (value<0) {
-		value = atoi(get_param(global.parameters, "hunger.long"));
-	}
-	return value;
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "hunger.long");
+    value = str?atoi(str):0;
+  }
+  return value;
 }
 
 int
 SkillCap(skill_t sk) {
-	static int value = -1;
-	if (sk==SK_MAGIC) return 0; /* no caps on magic */
-	if (value<0) {
-		value = atoi(get_param(global.parameters, "skill.maxlevel"));
-	}
-	return value;
+  static int value = -1;
+  if (sk==SK_MAGIC) return 0; /* no caps on magic */
+  if (value<0) {
+    const char * str = get_param(global.parameters, "skill.maxlevel");
+    value = str?atoi(str):0;
+  }
+  return value;
 }
 
 boolean
 TradeDisabled(void) {
-	static int value = -1;
-	if (value<0) {
-		value = (boolean)atoi(get_param(global.parameters, "trade.disabled"));
-	}
-	return value;
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "trade.disabled");
+    value = str?atoi(str):0;
+  }
+  return value;
 }
 
 int 
 NMRTimeout(void) {
-	static int value = -1;
-	if (value<0) {
-		value = atoi(get_param(global.parameters, "nmr.timeout"));
-	}
-	return value;
+  static int value = -1;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "nmr.timeout");
+    value = str?atoi(str):0;
+  }
+  return value;
 }
 
 race_t
 old_race(const struct race * rc)
 {
-	race_t i;
-	for (i=0;i!=MAXRACES;++i) {
-		if (new_race[i]==rc) return i;
-	}
-	return NORACE;
+  race_t i;
+  for (i=0;i!=MAXRACES;++i) {
+    if (new_race[i]==rc) return i;
+  }
+  return NORACE;
 }
 
 const char *directions[MAXDIRECTIONS+2] =
@@ -378,7 +383,8 @@ allied_skillcount(const faction * f, skill_t sk)
 int 
 allied_skilllimit(const faction * f, skill_t sk)
 {
-  return atoi(get_param(global.parameters, "allied.skilllimit"));
+  const char * str = get_param(global.parameters, "allied.skilllimit");
+  return str?atoi(str):0;
 }
 
 #endif
@@ -2174,37 +2180,37 @@ init_tokens(const struct locale * lang)
 }
 
 typedef struct param {
-	struct param * next;
-	char * name;
-	char * data;
+  struct param * next;
+  char * name;
+  char * data;
 } param;
 
 const char *
 get_param(const struct param * p, const char * key)
 {
-	while (p!=NULL) {
-		if (strcmp(p->name, key)==0) return p->data;
-		p = p->next;
-	}
-	return "0";
+  while (p!=NULL) {
+    if (strcmp(p->name, key)==0) return p->data;
+    p = p->next;
+  }
+  return NULL;
 }
 
 
 void
 set_param(struct param ** p, const char * key, const char * data)
 {
-	while (*p!=NULL) {
-		if (strcmp((*p)->name, key)==0) {
-			free((*p)->data);
-			(*p)->data = strdup(data);
-			return;
-		}
-		p=&(*p)->next;
-	}
-	*p = malloc(sizeof(param));
-	(*p)->name = strdup(key);
-	(*p)->data = strdup(data);
-	(*p)->next = NULL;
+  while (*p!=NULL) {
+    if (strcmp((*p)->name, key)==0) {
+      free((*p)->data);
+      (*p)->data = strdup(data);
+      return;
+    }
+    p=&(*p)->next;
+  }
+  *p = malloc(sizeof(param));
+  (*p)->name = strdup(key);
+  (*p)->data = strdup(data);
+  (*p)->next = NULL;
 }
 
 void
