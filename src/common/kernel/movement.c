@@ -553,6 +553,39 @@ move_ship(ship * sh, region * from, region * to, region_list * route)
   return sh;
 }
 
+static boolean
+check_working_buildingtype(const region * r, const building_type * bt)
+{
+	building *b;
+
+	for (b = rbuildings(r); b; b = b->next) {
+		if (b->type == bt) {
+			if (b->size >= bt->maxsize && fval(b, BLD_WORKING)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+static boolean
+ship_allowed(const struct ship_type * type, const region * r)
+{
+  int c = 0;
+  terrain_t t = rterrain(r);
+
+  static const building_type * bt_harbour=NULL;
+  if (bt_harbour==NULL) bt_harbour=bt_find("harbour");
+
+  if (check_working_buildingtype(r, bt_harbour)) return true;
+
+  for (c=0;type->coast[c]!=NOTERRAIN;++c) {
+    if (type->coast[c]==t) return true;
+  }
+  return false;
+}
+
 static void
 drifting_ships(region * r)
 {
@@ -1332,22 +1365,6 @@ buildingtype_exists(const region * r, const building_type * bt)
 	return false;
 }
 
-static boolean
-check_working_buildingtype(const region * r, const building_type * bt)
-{
-	building *b;
-
-	for (b = rbuildings(r); b; b = b->next) {
-		if (b->type == bt) {
-			if (b->size >= bt->maxsize && fval(b, BLD_WORKING)) {
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
 /* Prüft, ob Ablegen von einer Küste in eine der erlaubten Richtungen erfolgt. */
 
 static boolean
@@ -1374,23 +1391,6 @@ flying_ship(const ship * sh)
 {
   if (sh->type->flags & SFL_FLY) return true;
   if (is_cursed(sh->attribs, C_SHIP_FLYING, 0)) return true;
-  return false;
-}
-
-static boolean
-ship_allowed(const struct ship_type * type, const region * r)
-{
-  int c = 0;
-  terrain_t t = rterrain(r);
-
-  static const building_type * bt_harbour=NULL;
-  if (bt_harbour==NULL) bt_harbour=bt_find("harbour");
-
-  if (check_working_buildingtype(r, bt_harbour)) return true;
-
-  for (c=0;type->coast[c]!=NOTERRAIN;++c) {
-    if (type->coast[c]==t) return true;
-  }
   return false;
 }
 
