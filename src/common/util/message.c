@@ -14,7 +14,8 @@
 #include <config.h>
 #include "message.h"
 
-#include <stdlib.h>
+/* libc includes */
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -79,6 +80,7 @@ msg_create(const struct message_type * type, void * args[])
 	message * msg = (message *)malloc(sizeof(message));
 	msg->type = type;
 	msg->parameters = calloc(sizeof(void*), type->nparameters);
+	msg->refcount=1;
 	for (i=0;i!=type->nparameters;++i) {
 		msg->parameters[i] = args[i];
 	}
@@ -130,8 +132,24 @@ mt_find(const char * name)
 }
 
 void
-msg_free(message *m)
+msg_free(message *msg)
 {
-	free((void*)m->parameters);
-	free(m);
+	assert(msg->refcount==0);
+	free((void*)msg->parameters);
+	free(msg);
 }
+
+void 
+msg_release(struct message * msg)
+{
+	if (--msg->refcount) return;
+	msg_free(msg);
+}
+
+struct message * 
+msg_addref(struct message * msg)
+{
+	++msg->refcount;
+	return msg;
+}
+

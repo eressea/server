@@ -435,22 +435,22 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 	switch (mtype) {
 	case MSG_INCOME:
 		assert(f);
-		add_message(&f->msgs, msg_message("msg_economy", "string", s));
+		m = add_message(&f->msgs, msg_message("msg_economy", "string", s));
 		break;
 	case MSG_BATTLE:
 		assert(0 || !"battle-meldungen nicht über addmessage machen");
 		break;
 	case MSG_MOVE:
 		assert(f);
-		add_message(&f->msgs, msg_message("msg_movement", "string", s));
+		m = add_message(&f->msgs, msg_message("msg_movement", "string", s));
 		break;
 	case MSG_COMMERCE:
 		assert(f);
-		add_message(&f->msgs, msg_message("msg_economy", "string", s));
+		m = add_message(&f->msgs, msg_message("msg_economy", "string", s));
 		break;
 	case MSG_PRODUCE:
 		assert(f);
-		add_message(&f->msgs, msg_message("msg_production", "string", s));
+		m = add_message(&f->msgs, msg_message("msg_production", "string", s));
 		break;
 	case MSG_MAGIC:
 	case MSG_COMMENT:
@@ -470,6 +470,7 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 	default:
 		assert(!"Ungültige Msg-Klasse!");
 	}
+	if (m) msg_release(m);
 }
 
 void
@@ -549,7 +550,7 @@ add_message(message_list** pm, message * m)
 			*pm = malloc(sizeof(message_list));
 			(*pm)->end=&(*pm)->begin;
 		}
-		mnew->msg = m;
+		mnew->msg = msg_addref(m);
 		mnew->next = NULL;
 		*((*pm)->end) = mnew;
 		(*pm)->end=&mnew->next;
@@ -563,8 +564,7 @@ free_messages(message_list * m)
 	struct mlist * x = m->begin;
 	while (x) {
 		m->begin = x->next;
-		msg_free(x->msg);
-		free(x);
+		msg_release(x->msg);
 	}
 }
 

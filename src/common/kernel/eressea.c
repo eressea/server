@@ -59,6 +59,7 @@
 /* libc includes */
 #include <stdio.h>
 #include <stdlib.h>
+#include <message.h>
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
@@ -2544,8 +2545,8 @@ plagues(region * r, boolean ismagic)
 	gestorben = rpeasants(r) - peasants;
 
 	if (gestorben > 0) {
-		add_message(&r->msgs, new_message(NULL,
-			"pest%i:dead", gestorben));
+		message * msg = add_message(&r->msgs, msg_message("pest", "dead", gestorben));
+		msg_release(msg);
 	}
 	rsetpeasants(r, peasants);
 }

@@ -22,6 +22,7 @@ typedef struct message_type {
 typedef struct message {
 	const struct message_type * type;
 	const void ** parameters;
+	int refcount;
 } message;
 
 extern struct message_type * mt_new(const char * name, const char ** args);
@@ -33,8 +34,9 @@ extern struct message * msg_create(const struct message_type * type, void * args
 extern struct message * msg_create_va(const struct message_type * type, ...);
 	/* msg_create(&mt_simplesentence, "enno", "eats", "chocolate", &locale_de); 
 	 * parameters must be in the same order as they were for mt_new! */
-extern void msg_free(struct message *m);
-	/* remove message and associated data from memory */
+
+extern void msg_release(struct message * msg);
+extern struct message * msg_addref(struct message * msg);
 
 extern const char * mt_name(const struct message_type* mtype);
 

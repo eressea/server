@@ -86,7 +86,7 @@ typedef struct region {
 } region;
 
 extern struct message_list * r_getmessages(struct region * r, const struct faction * viewer);
-extern void r_addmessage(struct region * r, const struct faction * viewer, struct message * msg);
+extern struct message * r_addmessage(struct region * r, const struct faction * viewer, struct message * msg);
 
 typedef struct {
 	int  x;

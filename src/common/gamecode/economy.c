@@ -57,6 +57,7 @@
 #include <attrib.h>
 #include <base36.h>
 #include <event.h>
+#include <util/message.h>
 
 /* libs includes */
 #include <math.h>
@@ -1014,10 +1015,10 @@ forgetskill(unit * u)
 	s = getstrtoken();
 
 	if ((talent = findskill(s, u->faction->locale)) != NOSKILL) {
+		struct message * m = add_message(&u->faction->msgs, 
+			msg_message("forget", "unit skill", u, talent));
+		msg_release(m);
 		set_skill(u, talent, 0);
-/*		sprintf(buf, "%s vergißt das Talent %s.", u, talent); */
-		add_message(&u->faction->msgs, new_message(u->faction,
-			"forget%u:unit%t:skill", u, talent));
 	}
 }
 
@@ -1030,10 +1031,11 @@ report_donations(void)
 	for (sp = spenden; sp; sp = sp->next) {
 		region * r = sp->region;
 		if (sp->betrag > 0) {
-			add_message(&r->msgs, new_message(sp->f1,
-				"donation%f:from%f:to%i:amount", sp->f1, sp->f2, sp->betrag));
-			add_message(&r->msgs, new_message(sp->f2,
-				"donation%f:from%f:to%i:amount", sp->f1, sp->f2, sp->betrag));
+			struct message * msg = msg_message("donation", 
+				"from to amount", sp->f1, sp->f2, sp->betrag);
+			r_addmessage(r, sp->f1, msg);
+			r_addmessage(r, sp->f2, msg);
+			msg_release(msg);
 		}
 	}
 }
@@ -1112,8 +1114,9 @@ maintain(building * b, boolean full)
 	}
 	if (paid && c>0) {
 		/* TODO: wieviel von was wurde bezahlt */
-		add_message(&u->faction->msgs, new_message(u->faction,
-			"maintenance%u:unit%b:building", u, b));
+		message * msg = add_message(&u->faction->msgs, 
+			msg_message("maintenance", "unit building", u, b));
+		msg_release(msg);
 		fset(b, BLD_MAINTAINED);
 		if (work) fset(b, BLD_WORKING);
 		for (c=0;b->type->maintenance[c].number;++c) {
@@ -1143,8 +1146,9 @@ maintain(building * b, boolean full)
 			assert(cost==0);
 		}
 	} else {
-		add_message(&u->faction->msgs, new_message(u->faction,
-			"maintenancefail%u:unit%b:building", u, b));
+		message * msg = add_message(&u->faction->msgs, 
+			msg_message("maintenancefail", "unit building", u, b));
+		msg_release(msg);
 		return false;
 	}
 	return true;
@@ -1200,6 +1204,7 @@ gebaeude_stuerzt_ein(region * r, building * b)
 			add_message(&f->msgs, msg);
 		}
 	}
+	msg_release(msg);
 	destroy_building(b);
 }
 
@@ -1220,7 +1225,7 @@ maintain_buildings(boolean crash)
 					struct message * msg = msg_message("nomaintenance", "building", b);
 					if (u) {
 						add_message(&u->faction->msgs, msg);
-						add_message(&r->msgs, msg);
+						r_addmessage(r, u->faction, msg);
 					}
 				}
 			}

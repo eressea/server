@@ -53,6 +53,7 @@
 
 /* util includes */
 #include <base36.h>
+#include <message.h>
 #include <event.h>
 #include <rand.h>
 
@@ -945,14 +946,16 @@ sp_goodwinds(castorder *co)
 		if(u->ship != sh )		/* nur den Schiffsbesatzungen! */
 			continue;
 		if(!fval(u->faction, FL_DH) ) {
+			message * m = msg_message("wind_effect", "mage ship", cansee(u->faction, r, mage, 0) ? mage:NULL, sh);
+			r_addmessage(r, u->faction, m);
+			msg_release(m);
 			fset(u->faction, FL_DH);
-			add_message(&r->msgs, new_message(u->faction,
-				"wind_effect%u:mage%h:ship", cansee(u->faction, r, mage, 0) ? mage:NULL, sh));
 		}
 	}
-	if(!fval(mage->faction, FL_DH)){
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"wind_effect%u:mage%h:ship", mage, sh));
+	if (!fval(mage->faction, FL_DH)) {
+		message * m = msg_message("wind_effect", "mage ship", mage, sh);
+		r_addmessage(r, mage->faction, m);
+		msg_release(m);
 	}
 
 	return cast_level;
@@ -997,17 +1000,26 @@ sp_magicstreet(castorder *co)
 
 	/* melden, 1x pro Partei */
 	freset(mage->faction, FL_DH);
-	for(u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
-	for(u = r->units; u; u = u->next ) {
-		if(!fval(u->faction, FL_DH) ) {
-			fset(u->faction, FL_DH);
-			add_message(&r->msgs, new_message(u->faction,
-				"path_effect%u:mage%r:region", cansee(u->faction, r, mage, 0) ? mage:NULL, r));
+	{
+		message * seen = msg_message("path_effect", "mage region", mage, r);
+		message * unseen = NULL;
+		for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
+		for (u = r->units; u; u = u->next ) {
+			if (!fval(u->faction, FL_DH) ) {
+				fset(u->faction, FL_DH);
+				if (cansee(u->faction, r, mage, 0)) {
+					r_addmessage(r, u->faction, seen);
+				} else {
+					if (!unseen) unseen = msg_message("path_effect", "mage region", NULL, r);
+					r_addmessage(r, u->faction, unseen);
+				}
+			}
 		}
-	}
-	if(!fval(mage->faction, FL_DH)){
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"path_effect%u:mage%r:region", mage, r));
+		if(!fval(mage->faction, FL_DH)){
+			add_message(&mage->faction->msgs, seen);
+		}
+		msg_release(seen);
+		if (unseen) msg_release(unseen);
 	}
 
 	return cast_level;
@@ -1036,7 +1048,6 @@ sp_summonent(castorder *co)
 	int cast_level = co->level;
 	int power = co->force;
 	unit *u;
-	unit *u2;
 	attrib *a;
 	int ents;
 
@@ -1065,21 +1076,26 @@ sp_summonent(castorder *co)
 
 	rsettrees(r, rtrees(r) - ents);
 
-	/* melden, 1x pro partei */
-	freset(mage->faction, FL_DH);
-	for(u2 = r->units; u2; u2 = u2->next ) freset(u2->faction, FL_DH);
-	for(u2 = r->units; u2; u2 = u2->next ) {
-		if (!fval(u2->faction, FL_DH) ) {
-			fset(u2->faction, FL_DH);
-			add_message(&r->msgs, new_message(u2->faction,
-				"ent_effect%u:mage%i:amount", cansee(u2->faction, r, mage, 0)?mage:NULL, u->number));
+	{
+		message * seen = msg_message("ent_effect", "mage amount", mage, ents);
+		message * unseen = NULL;
+		for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
+		for (u = r->units; u; u = u->next ) {
+			if (!fval(u->faction, FL_DH) ) {
+				fset(u->faction, FL_DH);
+				if (cansee(u->faction, r, mage, 0)) {
+					r_addmessage(r, u->faction, seen);
+				} else {
+					if (!unseen) unseen = msg_message("ent_effect", "mage amount", NULL, ents);
+					r_addmessage(r, u->faction, unseen);
+				}
+			}
 		}
-	}
-	if(!fval(mage->faction, FL_DH)){
-		/* dann steht niemand von der Magierpartei in der Region, sieht also
-		 * auch keine Regionsmeldung. ergo: global anzeigen */
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-				"ent_effect%u:mage%i:amount", mage, u->number));
+		if(!fval(mage->faction, FL_DH)){
+			add_message(&mage->faction->msgs, seen);
+		}
+		msg_release(seen);
+		if (unseen) msg_release(unseen);
 	}
 
 	return cast_level;
@@ -1168,21 +1184,26 @@ sp_maelstrom(castorder *co)
 	create_curse(mage,&mage->attribs,C_MAELSTROM,0,power,power,power,0);
 	set_curseflag(r->attribs, C_MAELSTROM, 0, CURSE_ISNEW);
 
-	/* melden, 1x pro partei */
-	freset(mage->faction, FL_DH);
-	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
-	for (u = r->units; u; u = u->next) {
-		if (!fval(u->faction, FL_DH)) {
-			fset(u->faction, FL_DH);
-			add_message(&r->msgs, new_message(u->faction,
-				"maelstrom_effect%u:mage", cansee(u->faction, r, mage, 0) ? mage:NULL));
+	{
+		message * seen = msg_message("maelstrom_effect", "mage", mage);
+		message * unseen = NULL;
+		for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
+		for (u = r->units; u; u = u->next ) {
+			if (!fval(u->faction, FL_DH) ) {
+				fset(u->faction, FL_DH);
+				if (cansee(u->faction, r, mage, 0)) {
+					r_addmessage(r, u->faction, seen);
+				} else {
+					if (!unseen) unseen = msg_message("maelstrom_effect", "mage", NULL);
+					r_addmessage(r, u->faction, unseen);
+				}
+			}
 		}
-	}
-	if(!fval(mage->faction, FL_DH)){
-		/* dann steht niemand von der Magierpartei in der Region, sieht also
-		 * auch keine Regionsmeldung. ergo: global anzeigen */
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-				"maelstrom_effect%u:mage", mage));
+		if(!fval(mage->faction, FL_DH)){
+			add_message(&mage->faction->msgs, seen);
+		}
+		msg_release(seen);
+		if (unseen) msg_release(unseen);
 	}
 
 	return cast_level;
@@ -1220,21 +1241,26 @@ sp_mallorn(castorder *co)
 	rsettrees(r, rtrees(r)/2);
 	fset(r, RF_MALLORN);
 
-	/* melden, 1x pro partei */
-	freset(mage->faction, FL_DH);
-	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
-	for (u = r->units; u; u = u->next) {
-		if (!fval(u->faction, FL_DH)) {
-			fset(u->faction, FL_DH);
-			add_message(&r->msgs, new_message(u->faction,
-				"mallorn_effect%u:mage", cansee(u->faction, r, mage, 0) ? mage:NULL));
+	{
+		message * seen = msg_message("mallorn_effect", "mage", mage);
+		message * unseen = NULL;
+		for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
+		for (u = r->units; u; u = u->next ) {
+			if (!fval(u->faction, FL_DH) ) {
+				fset(u->faction, FL_DH);
+				if (cansee(u->faction, r, mage, 0)) {
+					r_addmessage(r, u->faction, seen);
+				} else {
+					if (!unseen) unseen = msg_message("mallorn_effect", "mage", NULL);
+					r_addmessage(r, u->faction, unseen);
+				}
+			}
 		}
-	}
-	if(!fval(mage->faction, FL_DH)){
-		/* dann steht niemand von der Magierpartei in der Region, sieht also
-		 * auch keine Regionsmeldung. ergo: global anzeigen */
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-				"mallorn_effect%u:mage", mage));
+		if(!fval(mage->faction, FL_DH)){
+			add_message(&mage->faction->msgs, seen);
+		}
+		msg_release(seen);
+		if (unseen) msg_release(unseen);
 	}
 
 	return cast_level;
@@ -1266,22 +1292,26 @@ sp_blessedharvest(castorder *co)
 	 * (Max(Dauer), Max(Stärke))*/
 	create_curse(mage,&r->attribs,C_BLESSEDHARVEST,0,power,power,1,0);
 
-	/* melden, 1x pro partei */
-	freset(mage->faction, FL_DH);
-	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
-
-	for (u = r->units; u; u = u->next) {
-		if (!fval(u->faction, FL_DH)) {
-			fset(u->faction, FL_DH);
-			add_message(&r->msgs, new_message(u->faction,
-				"harvest_effect%u:mage", cansee(u->faction, r, mage, 0) ? mage:NULL));
+	{
+		message * seen = msg_message("harvest_effect", "mage", mage);
+		message * unseen = NULL;
+		for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
+		for (u = r->units; u; u = u->next ) {
+			if (!fval(u->faction, FL_DH) ) {
+				fset(u->faction, FL_DH);
+				if (cansee(u->faction, r, mage, 0)) {
+					r_addmessage(r, u->faction, seen);
+				} else {
+					if (!unseen) unseen = msg_message("harvest_effect", "mage", NULL);
+					r_addmessage(r, u->faction, unseen);
+				}
+			}
 		}
-	}
-	if (!fval(mage->faction, FL_DH)){
-		/* dann steht niemand von der Magierpartei in der Region, sieht also
-		 * auch keine Regionsmeldung. ergo: global anzeigen */
-			add_message(&mage->faction->msgs, new_message(mage->faction,
-				"harvest_effect%u:mage", mage));
+		if(!fval(mage->faction, FL_DH)) {
+			add_message(&mage->faction->msgs, seen);
+		}
+		msg_release(seen);
+		if (unseen) msg_release(unseen);
 	}
 	return cast_level;
 }
@@ -1312,22 +1342,26 @@ sp_hain(castorder *co)
 	trees = lovar(force * 10) + force;
 	rsettrees(r, rtrees(r) + trees);
 
-	/* melden, 1x pro partei */
-	freset(mage->faction, FL_DH);
-	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
-	for (u = r->units; u; u = u->next) {
-		if (!fval(u->faction, FL_DH)) {
-			fset(u->faction, FL_DH);
-			add_message(&r->msgs, new_message(u->faction,
-				"growtree_effect%u:mage%i:amount",
-				cansee(u->faction, r, mage, 0) ? mage:NULL, trees));
+	{
+		message * seen = msg_message("growtree_effect", "mage amount", mage, trees);
+		message * unseen = NULL;
+		for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
+		for (u = r->units; u; u = u->next ) {
+			if (!fval(u->faction, FL_DH) ) {
+				fset(u->faction, FL_DH);
+				if (cansee(u->faction, r, mage, 0)) {
+					r_addmessage(r, u->faction, seen);
+				} else {
+					if (!unseen) unseen = msg_message("growtree_effect", "mage amount", NULL, trees);
+					r_addmessage(r, u->faction, unseen);
+				}
+			}
 		}
-	}
-	if (!fval(mage->faction, FL_DH)){
-		/* dann steht niemand von der Magierpartei in der Region, sieht also
-		 * auch keine Regionsmeldung. ergo: global anzeigen */
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"growtree_effect%u:mage%i:amount", mage, trees));
+		if(!fval(mage->faction, FL_DH)) {
+			add_message(&mage->faction->msgs, seen);
+		}
+		msg_release(seen);
+		if (unseen) msg_release(unseen);
 	}
 
 	return cast_level;
@@ -1403,7 +1437,7 @@ sp_rosthauch(castorder *co)
 			}
 		}
 
-		if (ironweapon){
+		if (ironweapon) {
 			/* {$mage mage} legt einen Rosthauch auf {target}. {amount} Waffen
 			 * wurden vom Rost zerfressen */
 			add_message(&mage->faction->msgs, new_message(mage->faction,
@@ -1424,6 +1458,30 @@ sp_rosthauch(castorder *co)
 	 * darum wird hier nur für alle Fälle in denen noch weniger Waffen
 	 * betroffen wurden ein Kostennachlass gegeben */
 	return min(success, cast_level);
+}
+
+/* Report a spell's effect to the units in the region.
+*/
+static void
+report_effect(region * r, unit * mage, message * seen, message * unseen)
+{
+	unit * u;
+	for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
+	for (u = r->units; u; u = u->next ) {
+		if (!fval(u->faction, FL_DH) ) {
+			fset(u->faction, FL_DH);
+			if (cansee(u->faction, r, mage, 0)) {
+				r_addmessage(r, u->faction, seen);
+			} else if (unseen) {
+				r_addmessage(r, u->faction, unseen);
+			}
+		}
+	}
+	if(!fval(mage->faction, FL_DH)) {
+		add_message(&mage->faction->msgs, seen);
+	}
+	msg_release(seen);
+	if (unseen) msg_release(unseen);
 }
 
 /* ------------------------------------------------------------- */
@@ -2084,13 +2142,13 @@ sp_holyground(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int power = co->force;
+	message * msg = r_addmessage(r, mage->faction, msg_message("holyground", "mage", mage));
+	msg_release(msg);
 
 	create_curse(mage, &r->attribs, C_HOLYGROUND, 0,
 			power*power, 1, 0, 0);
 
 	set_curseflag(mage->building->attribs, C_HOLYGROUND, 0, CURSE_NOAGE);
-
-	add_message(&r->msgs, new_message(mage->faction, "holyground%u:mage", mage));
 
 	a_removeall(&r->attribs, &at_deathcount);
 
@@ -4880,28 +4938,14 @@ sp_puttorest(castorder *co)
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int laid_to_rest = 0;
-	unit *u;
-
 	laid_to_rest = dice(co->force * 2, 100);
 	laid_to_rest = max(laid_to_rest, deathcount(r));
 
 	deathcounts(r, -laid_to_rest);
 
-	/* melden, 1x pro partei */
-	for (u = r->units; u; u = u->next) freset(u->faction, FL_DH);
-
-	for (u = r->units; u; u = u->next) {
-		if (!fval(u->faction, FL_DH)) {
-			fset(u->faction, FL_DH);
-			add_message(&r->msgs, new_message(u->faction,
-				"puttorest%u:mage", cansee(u->faction, r, mage, 0) ? mage:NULL));
-		}
-	}
-
-	if (!fval(mage->faction, FL_DH)){
-		add_message(&mage->faction->msgs, new_message(mage->faction,
-			"puttorest%u:mage", mage));
-	}
+	report_effect(r, mage, 
+		msg_message("puttorest", "mage", mage), 
+		msg_message("puttorest", "mage", NULL));
 	return co->level;
 }
 

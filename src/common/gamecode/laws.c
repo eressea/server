@@ -69,6 +69,7 @@
 #include <base36.h>
 #include <goodies.h>
 #include <rand.h>
+#include <util/message.h>
 
 #ifdef AT_OPTION
 /* attributes includes */
@@ -521,8 +522,9 @@ peasants(region * r)
 			dead++;
 
 	if(dead > 0) {
+		message * msg = add_message(&r->msgs, msg_message("phunger", "dead", dead));
+		msg_release(msg);
 		peasants -= dead;
-		add_message(&r->msgs, new_message(NULL, "phunger%i:dead", dead));
 	}
 	rsetpeasants(r, peasants);
 }
@@ -1397,7 +1399,6 @@ static void
 deliverMail(faction * f, region * r, unit * u, const char *s, unit * receiver)
 {
 	char message[DISPLAYSIZE + 1];
-
 
 	strcpy(message, strcheck(s, DISPLAYSIZE));
 

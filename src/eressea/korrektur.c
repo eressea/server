@@ -1880,6 +1880,17 @@ undo_deadpeasants(void)
 }
 #endif
 
+static void
+fix_undead3percent(void)
+{
+	region * r = regions;
+	while (r) {
+		int dead = deathcount(r);
+		deathcounts(r, -(dead/2));
+		r = r->next;
+	}
+}
+
 #if 0
 static void
 fix_targetregion_resolve(void)
@@ -2235,6 +2246,7 @@ korrektur(void)
 #endif
 	fix_migrants();
 	fix_allies();
+	do_once(atoi36("ud3p"), fix_undead3percent());
 	do_once(atoi36("fhrb"), fix_herbs());
 	do_once(atoi36("ftos"), fix_timeouts());
 	do_once(atoi36("fixsl"), fix_prices());

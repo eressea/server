@@ -443,34 +443,6 @@ sabotage(region * r, unit * u)
 			sink_ship(r, sh, buffer, 1, u);
 		}
 		break;
-#if 0
-	case P_BUILDING:
-		if(u->building) {
-			/* TODO: Gebäude zerstören */
-		} else {
-			building *b = getbuilding(r);
-			unit *owner;
-
-			if(!b) {
-				cmistake(u, findorder(u, u->thisorder), 6, MSG_EVENT);
-				return;
-			}
-			owner = buildingowner(r, b);
-
-			if(owner == NULL || eff_skill(u, SK_STEALTH, r) > wahrnehmung(r,owner->faction) {
-				/* Besser Curse benutzen, einfacher */
-				a = a_add(b->attribs, a_new(&at_sabotaged));
-				a->data.i = 1+rand()%(eff_skll(u, SK_SPY, r));
-			} else if(owner) { /* Ertappt */
-				add_message(&u->faction->msgs,
-					new_message(u->faction, "sabot_building_fail%u:unit", u);
-				add_message(&r->msgs,
-					new_message(owner->faction, "sabot_building_detect%u:unit", u);
-			} else {
-			}
-		}
-		break;
-#endif
 	default:
 		cmistake(u, findorder(u, u->thisorder), 9, MSG_EVENT);
 		return;

@@ -922,7 +922,7 @@ r_getmessages(struct region * r, const struct faction * viewer)
 	return NULL;
 }
 
-void 
+struct message * 
 r_addmessage(struct region * r, const struct faction * viewer, struct message * msg)
 {
 	struct individual_message * imsg;
@@ -936,5 +936,5 @@ r_addmessage(struct region * r, const struct faction * viewer, struct message * 
 		r->individual_messages = imsg;
 		imsg->viewer = viewer;
 	}
-	add_message(&imsg->msgs, msg);
+	return add_message(&imsg->msgs, msg);
 }

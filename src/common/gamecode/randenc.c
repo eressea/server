@@ -50,6 +50,7 @@
 
 /* util includes */
 #include <rand.h>
+#include <util/message.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -959,7 +960,7 @@ randomevents(void)
 {
 	region *r;
 	building *b, *b2;
-	unit *u, *u2;
+	unit *u;
 	int n;
 	int unfed;
 
@@ -1158,15 +1159,9 @@ randomevents(void)
 				if (rc && rpeasants(rc) > 0 && !fval(rc, RF_ORCIFIED)) chance += 2;
 			}
 			if (rand()%100 < chance) {
+				message * msg = add_message(&r->msgs, msg_message("deorcified", "region", r));
+				msg_release(msg);
 				freset(r, RF_ORCIFIED);
-				for (u2 = r->units; u2; u2 = u2->next ) freset(u2->faction, FL_DH);
-				for (u2 = r->units; u2; u2 = u2->next ) {
-					if (!fval(u2->faction, FL_DH)) {
-						add_message(&r->msgs, new_message(u2->faction,
-							"deorcified%r:region", r));
-						fset(u2->faction, FL_DH);
-					}
-				}
 			}
 		} else {
 			attrib *a = a_find(r->attribs, &at_orcification);
@@ -1177,14 +1172,7 @@ randomevents(void)
 				if (rand()%100 < chance) {
 					fset(r, RF_ORCIFIED);
 					a_remove(&r->attribs, a);
-					for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
-					for (u2 = r->units; u2; u2 = u2->next) {
-						if (!fval(u2->faction, FL_DH)) {
-							add_message(&r->msgs, new_message(u2->faction,
-								"orcified%r:region", r));
-							fset(u2->faction, FL_DH);
-						}
-					}
+					add_message(&r->msgs, msg_message("orcified", "region", r));
 				} else {
 					a->data.i -= max(10,a->data.i/10);
 					if (a->data.i <= 0) a_remove(&r->attribs, a);
@@ -1199,30 +1187,16 @@ randomevents(void)
 		switch(rterrain(r)) {
 		case T_VOLCANO:
 			if (rand()%100 < 5) {
+				message * msg = add_message(&r->msgs, msg_message("volcanostartsmoke", "region", r));
+				msg_release(msg);
 				rsetterrain(r, T_VOLCANO_SMOKING);
-				/* Meldungen generieren */
-				for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
-				for (u = r->units; u; u = u->next ) {
-					if (!fval(u->faction, FL_DH)) {
-						add_message(&r->msgs, new_message(u->faction,
-							"volcanostartsmoke%r:region", r));
-						fset(u->faction, FL_DH);
-					}
-				}
 			}
 			break;
 		case T_VOLCANO_SMOKING:
 			if (rand()%100 < 10) {
+				message * msg = add_message(&r->msgs, msg_message("volcanostopsmoke", "region", r));
+				msg_release(msg);
 				rsetterrain(r, T_VOLCANO);
-				/* Meldungen generieren */
-				for (u = r->units; u; u = u->next ) freset(u->faction, FL_DH);
-				for (u = r->units; u; u = u->next ) {
-					if (!fval(u->faction, FL_DH)) {
-						add_message(&r->msgs, new_message(u->faction,
-							"volcanostopsmoke%r:region", r));
-						fset(u->faction, FL_DH);
-					}
-				}
 			} else if (rand()%100 < 8) {
 				volcano_outbreak(r);
 			}
@@ -1368,20 +1342,22 @@ randomevents(void)
 			log_printf("%d %s in %s.\n", u->number,
 				race[u->race].name[1], regionname(r, NULL));
 
-			add_message(&r->msgs, new_message(NULL,
-				"undeadrise%r:region", r));
-			for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
-			for (u=r->units;u;u=u->next) {
-				if (fval(u->faction, FL_DH)) continue;
-				fset(u->faction, FL_DH);
-				add_message(&u->faction->msgs, new_message(NULL,
-					"undeadrise%r:region", r));
+			{
+				message * msg = msg_message("undeadrise", "region amount", r, undead);
+				add_message(&r->msgs, msg);
+				for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
+				for (u=r->units;u;u=u->next) {
+					if (fval(u->faction, FL_DH)) continue;
+					fset(u->faction, FL_DH);
+					add_message(&u->faction->msgs, msg);
+				}
+				msg_release(msg);
 			}
 		} else {
 			int i = deathcount(r);
 			if (i) {
 				/* Gräber verwittern, 3% der Untoten finden die ewige Ruhe */
-				deathcounts(r, (int)(1+i*0.03));
+				deathcounts(r, (int)(-i*0.03));
 			}
 		}
 	}
@@ -1405,6 +1381,8 @@ randomevents(void)
 			if (woodcount(r) >= 40 && rand()%100 < 33) {
 				int trees = rtrees(r);
 				int treemen = rand()%(max(50,trees)/3);
+				struct message * msg;
+
 				treemen = max(25, treemen);
 				woodcounts(r, -40);
 				trees = max(0, trees-treemen);
@@ -1420,15 +1398,15 @@ randomevents(void)
 
 				log_printf("%d Ents in %s.\n", u->number, regionname(r, NULL));
 
-				add_message(&r->msgs, new_message(NULL,
-					"entrise%r:region", r));
+				msg = msg_message("entrise", "region amount", r, u->number);
+				add_message(&r->msgs, msg);
 				for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
 				for (u=r->units;u;u=u->next) {
 					if (fval(u->faction, FL_DH)) continue;
 					fset(u->faction, FL_DH);
-					add_message(&u->faction->msgs, new_message(NULL,
-						"entrise%r:region", r));
+					add_message(&u->faction->msgs, msg);
 				}
+				msg_release(msg);
 			}
 		}
 	}
@@ -1511,6 +1489,7 @@ void growlaen(void) {
 		}
 		else {
 			attrib *a=a_new(&at_laen);
+			struct message * msg = NULL;
 			a_add(&rl->region->attribs, a);
 			rsetlaen(rl->region, add_laen[z]);
 
@@ -1519,11 +1498,12 @@ void growlaen(void) {
 			for (u = r->units; u; u = u->next ) {
 				if (!fval(u->faction, FL_DH) && eff_skill(u, SK_MINING, rl->region) >= olditemtype[I_EOG]->minskill)
 				{
-					add_message(&rl->region->msgs, new_message(u->faction,
-					            "unveileog%u:unit%r:region", u, rl->region));
+					if (!msg) msg = msg_message("unveileog", "unit region", u, rl->region);
+					r_addmessage(rl->region, u->faction, msg);
 					fset(u->faction, FL_DH);
 				}
 			}
+			if (msg) msg_release(msg);
 		}
 	}
   free(add_laen);
