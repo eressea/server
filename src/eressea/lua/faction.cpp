@@ -71,9 +71,15 @@ faction_getalliance(const faction& f)
 }
 
 const char *
-faction_locale(const faction& f)
+faction_getlocale(const faction& f)
 {
   return locale_name(f.locale);
+}
+
+void
+faction_setlocale(faction& f, const char * name)
+{
+	f.locale = find_locale(name);
 }
 
 static std::ostream& 
@@ -209,7 +215,7 @@ bind_faction(lua_State * L)
     .def_readwrite("lastturn", &faction::lastorders)
     .def("add_item", &faction_additem)
     .def("add_notice", &faction_addnotice)
-    .property("locale", &faction_locale)
+    .property("locale", &faction_getlocale, &faction_setlocale)
     .property("units", &faction_units, return_stl_iterator)
     .property("alliance", &faction_getalliance, &faction_setalliance)
     .property("race", &faction_getrace, &faction_setrace)
