@@ -1382,6 +1382,7 @@ static translate_t translation[] = {
 	{ "Balsam", "balm", "balm_p", "balm", "balm_p" },
 	{ "Gewürz", "spice", "spice_p", "spice", "spice_p" },
 	{ "Myrrhe", "myrrh", "myrrh_p", "myrrh", "myrrh_p" },
+	{ "Stein", "stone", "stone_p", "stone", "stone_p" },
 	{ "Öl", "oil", "oil_p", "oil", "oil_p" },
 	{ "Seide", "silk", "silk_p", "silk", "silk_p" },
 	{ "Weihrauch", "incense", "incense_p", "incense", "incense_p" },

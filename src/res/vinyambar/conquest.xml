@@ -1,0 +1,14 @@
+<resource name="conquesttoken">
+	<item cursed notlost weight="0">
+	</item>
+</resource>
+<strings>
+	<string name="conquesttoken">
+		<text locale="de">Gral</text>
+		<text locale="en">grail</text>
+	</string>
+	<string name="conquesttoken_p">
+		<text locale="de">Grale</text>
+		<text locale="en">grails</text>
+	</string>
+</strings>

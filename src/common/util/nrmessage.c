@@ -13,6 +13,7 @@
 
 #include <config.h>
 #include "nrmessage.h"
+#include "nrmessage_struct.h"
 
 /* util includes */
 #include "log.h"
@@ -25,17 +26,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct nrmessage_type {
-	const struct message_type * mtype;
-	const struct locale * lang;
-	const char * string;
-	const char * vars;
-	struct nrmessage_type * next;
-	int level;
-	const char * section;
-} nrmessage_type;
-
 static nrmessage_type * messagetypes;
+
+nrmessage_type * get_nrmessagetypes(void) {
+	return messagetypes;
+}
 
 const char * 
 nrt_string(const struct nrmessage_type *type)

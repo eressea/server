@@ -1913,57 +1913,6 @@ use_birthdayamulet(region * r, unit * magician, strlist * cmdstrings)
 	addmessage(r, 0, "Miiauuuuuu...", MSG_MESSAGE, ML_IMPORTANT);
 }
 
-typedef struct t_umlaut {
-	const char *txt;
-	int id;
-	int typ;
-} t_umlaut;
-
-/* Hier sind zum einen Umlaut-Versionen von Schlüsselworten, aber auch
- * oftmals Umlaut-umschriebene Worte, weil im "normalen" Source die
- * Umlaut-Version steht, damit die im Report erscheint.
- * WICHTIG: "setenv LANG en_US" sonst ist ä != Ä
- */
-
-#if 0
-static const t_umlaut umlaut[] = {
-/* Parameter */
-	{ "Straßen", P_ROAD, UT_PARAM },
-/* Gegenstände - alternative Namen */
-	{ "Eisenbarren", I_IRON, UT_ITEM },
-	{ "Holzstamm", I_WOOD, UT_ITEM },
-	{ "Holzstämme", I_WOOD, UT_ITEM },
-	{ "Stämme", I_WOOD, UT_ITEM },
-	{ "Stamm", I_WOOD, UT_ITEM },
-	{ "Quader", I_STONE, UT_ITEM },
-	{ "Steinquader", I_STONE, UT_ITEM },
-	{ "Langbogen", I_LONGBOW, UT_ITEM },
-	{ "Langbögen", I_LONGBOW, UT_ITEM },
-	{ "Hemden", I_CHAIN_MAIL, UT_ITEM },
-	{ "Panzer", I_PLATE_ARMOR, UT_ITEM },
-	{ "Gewürze", I_SPICES, UT_ITEM },
-	{ "Öle", I_OIL, UT_ITEM },
-	{ "Sehens", I_AMULET_OF_TRUE_SEEING, UT_ITEM },
-	{ "Heilung", I_AMULET_OF_HEALING, UT_ITEM },
-	{ "Unsichtbarkeit", I_RING_OF_INVISIBILITY, UT_ITEM },
-	{ "Macht", I_RING_OF_POWER, UT_ITEM },
-#ifdef COMPATIBILITY
-	{ "Einhornaugen", I_EYE_OF_HORAX, UT_ITEM },
-	{ "Reisekristall", I_TELEPORTCRYSTAL, UT_ITEM },
-	{ "Dunkelheit", I_AMULET_OF_DARKNESS, UT_ITEM },
-#endif
-	{ "Kopf", I_DRAGONHEAD, UT_ITEM },
-	{ "Köpfe", I_DRAGONHEAD, UT_ITEM },
-	{ "Keuschheitsamulett", I_CHASTITY_BELT, UT_ITEM },
-	{ "Zweihänder", I_GREATSWORD, UT_ITEM },
-	{ "Axt", I_AXE, UT_ITEM },
-	{ "Äxte", I_AXE, UT_ITEM },
-	{ "Treffens", I_AMULETT_DES_TREFFENS, UT_ITEM },
-	{ "Flinkfingerring", I_RING_OF_NIMBLEFINGER, UT_ITEM },
-	{ NULL, 0, 0 }
-};
-#endif
-
 static void
 init_directions(tnode * root, const struct locale * lang)
 {

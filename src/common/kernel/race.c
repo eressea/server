@@ -195,8 +195,11 @@ set_show_item(faction *f, item_t i)
 
 void
 give_starting_equipment(struct region *r, struct unit *u)
-
 {
+  const item_type * token = it_find("conquesttoken");
+  if (token!=NULL) {
+    i_add(&u->items, i_new(token, 1));
+  }
 	set_item(u, I_WOOD, 30);
 	set_item(u, I_STONE, 30);
 

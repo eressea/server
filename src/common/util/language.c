@@ -157,14 +157,17 @@ reverse_lookup(const locale * lang, const char * str)
 {
 	int i;
 	assert(lang);
-	if (lang!=NULL) {
-		for (i=0;i!=SMAXHASH;++i) {
-			struct locale_string * ls;
-			for (ls=lang->strings[i];ls;ls=ls->nexthash) {
-				if (strcasecmp(ls->key, str)==0) return ls->key;
-				if (strcasecmp(ls->str, str)==0) return ls->key;
+	if (strlen(str)) {
+		if (lang!=NULL) {
+			for (i=0;i!=SMAXHASH;++i) {
+				struct locale_string * ls;
+				for (ls=lang->strings[i];ls;ls=ls->nexthash) {
+					if (strcasecmp(ls->key, str)==0) return ls->key;
+					if (strcasecmp(ls->str, str)==0) return ls->key;
+				}
 			}
 		}
+		log_warning(("could not do a reverse_lookup for \"%s\" in locale %s\n", str, lang->name));
 	}
 	return str;
 }

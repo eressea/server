@@ -2840,7 +2840,7 @@ korrektur(void)
 	do_once("fsee", fix_seeds());
 	do_once("orc2", orc_conversion2());
 	do_once("witm", warn_items());
-	do_once("guac", guard_conversion());
+	do_once("guaf", guard_conversion());
 	do_once("qpoi", questportal_init());
 	do_once("xini", xe_init());
 	do_once("rest", fix_restart_flag());

@@ -1,0 +1,21 @@
+<eressea>
+	<include file="messages.xml"></include>
+
+	<comment>Localization</comment>
+	<include file="de/strings.xml"></include>
+	<include file="en/strings.xml"></include>
+
+	<include file="races.xml"></include>
+	<include file="resources.xml"></include>
+	<include file="ships.xml"></include>
+	<include file="buildings.xml"></include>
+
+	<game name="Kreis der Macht" units="250" welcome="vinyambar">
+		<comment>Game specific</comment>
+		<order name="ARBEITEN" disable></order>
+		<order name="MEINUNG" disable></order>
+		<order name="MAGIEGEBIET" disable></order>
+	</game>
+	<include file="vinyambar/de/strings.xml"></include>
+	<include file="vinyambar/conquest.xml"></include>
+</eressea>
