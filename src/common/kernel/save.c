@@ -1698,7 +1698,7 @@ write_items(FILE *F, item *ilist)
 		whs(F, resourcename(itm->type->rtype, 0));
 		wi(F, itm->number);
 	}
-	fputs("end", F);
+	fputs("end ", F);
 }
 
 #ifdef USE_UGROUPS
@@ -1835,7 +1835,7 @@ writegame(char *path, char quiet)
 			}
 			w = w->next;
 		}
-		ws(F, "end");
+		fputs("end ", F);
 #endif
 		a_write(F, pl->attribs);
 		wnl(F);
@@ -1956,7 +1956,7 @@ writegame(char *path, char quiet)
 					wi(F, res->divisor);
 					res = res->next;
 				}
-				ws(F, "end");
+				fputs("end ", F);
 			}
 #else
 			assert(!"invalid defines");
@@ -1974,8 +1974,7 @@ writegame(char *path, char quiet)
 				ws(F, resourcename(demand->type->itype->rtype, 0));
 				wi(F, demand->value);
 			}
-			fputs("end", F);
-			wnl(F);
+			fputs("end\n", F);
 		}
 		a_write(F, r->attribs);
 		wnl(F);
