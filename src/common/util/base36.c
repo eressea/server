@@ -23,6 +23,7 @@
 #include "base36.h"
 
 #include <stdlib.h>
+#include <assert.h>
 
 #ifdef HAVE_STRTOL
 int
@@ -36,7 +37,7 @@ int
 atoi36(const char * s)
 {
 	int i = 0;
-
+	assert(s);
 	if(!(*s)) return 0;
 
 	while(!isalnum((int)*s)) ++s;

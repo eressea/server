@@ -1930,7 +1930,7 @@ spellparameter *
 add_spellparameter(region *target_r, unit *u, const char *syntax,
 		char *s, int skip)
 {
-	int i = 0;
+	int i = 1;
 	int c = 0;
 	int l = 0;
 	char *tbuf, *token;
@@ -1970,7 +1970,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax,
 	strcpy(tbuf, s);
 	token = strtok (tbuf, " ");
 	while(token && syntax[c] != 0) {
-		if (i >= skip) {
+		if (i > skip) {
 			if (syntax[c] == '+') {
 				/* das vorhergehende Element kommt ein oder mehrmals vor, wir
 				 * springen zum key zurück */

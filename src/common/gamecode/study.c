@@ -140,6 +140,11 @@ teach_unit(unit * teacher, unit * student, int teaching, skill_t sk, boolean rep
 	 * n ist die Anzahl zusätzlich gelernter Tage. n darf max. die Differenz
 	 * von schon gelernten Tagen zum max(30 Tage pro Mann) betragen. */
 
+	if (magic_lowskill(student)){
+		cmistake(teacher, teacher->thisorder, 274, MSG_EVENT);
+		return 0;
+	}
+
 #ifdef RANDOMIZED_LEARNING
 	n = student->number * dice(2,30);
 #else
@@ -235,11 +240,6 @@ teach(region * r, unit * u)
 
 	if (r->planep && fval(r->planep, PFL_NOTEACH)) {
 		cmistake(u, u->thisorder, 273, MSG_EVENT);
-		return;
-	}
-
-	if (magic_lowskill(u2)){
-		cmistake(u, u->thisorder, 274, MSG_EVENT);
 		return;
 	}
 
