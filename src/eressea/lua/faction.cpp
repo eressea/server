@@ -67,7 +67,11 @@ bind_faction(lua_State * L)
 
     class_<struct faction>("faction")
     .def_readonly("name", &faction::name)
+    .def_readonly("password", &faction::passw)
+    .def_readonly("email", &faction::email)
     .def_readonly("id", &faction::no)
+    .def_readwrite("subscription", &faction::subscription)
+    .def_readwrite("lastturn", &faction::lastorders)
     .property("units", &faction_units, return_stl_iterator)
     .property("alliance", &faction_getalliance, &faction_setalliance)
   ];
