@@ -75,6 +75,11 @@ lucky_silver(const unit *u)
 		"lucky_item%u:unit%X:item%d:amount", u, i_silver->rtype, max));
 }
 
+typedef struct luckyitem {
+	const char * name;
+	int weight; /* weighting the item */
+} luckyitem;
+
 static void
 lucky_item(const unit *u)
 {
@@ -82,9 +87,10 @@ lucky_item(const unit *u)
 	item_type *itype;
 	int amount;
 	int luck = fspecial(u->faction, FS_LUCKY);
-	const int n_items = 35;
+#if defined(__GNUC__) && !defined(__STDC__)
+	const int nitems = 35;
 	/* ordered rougly by value */
-	item_type *it_list[] = {
+	item_type *it_list[nitems] = {
 		olditemtype[I_RUSTY_SWORD],
 		olditemtype[I_RUSTY_SHIELD],
 		olditemtype[I_RUSTY_CHAIN_MAIL],
@@ -122,14 +128,34 @@ lucky_item(const unit *u)
 		olditemtype[I_LAENSHIELD],
 		olditemtype[I_LAENCHAIN],
 	};
-
+#else
+	/* Das ist schöner so, denke ich... */
+	static int nitems = 0;
+	static int maxweight = 0;
+	struct luckyitem it_list[] = {
+		{ "mallorn", 1 },
+		{ NULL, 0 }
+	};
+	if (nitems==0) {
+		while (it_list[nitems].name) {
+			maxweight +=it_list[nitems].weight;
+			++nitems;
+		}
+	}
+	/* weight is unused */
+	r = rand()%nitems;
+#endif
 	do {
-		r = rand()%n_items;
+		r = rand()%nitems;
 		if(r > max) max = r;
 		i++;
 	} while(i <= luck);
 
+#if defined(__GNUC__) && !defined(__STDC__)
 	itype = it_list[r];
+#else
+	itype = it_find(it_list[r].name);
+#endif
 
 	if(luck)
 		amount = 10 + rand()%(luck*40) + rand()%(luck*40);
@@ -145,6 +171,7 @@ lucky_item(const unit *u)
 static void
 lucky_magic_item(const unit *u)
 {
+#if defined(__GNUC__) && !defined(__STDC__)
 	item_type *itype;
 	int amount;
 	int luck = fspecial(u->faction, FS_LUCKY);
@@ -172,7 +199,9 @@ lucky_magic_item(const unit *u)
 
 	add_message(&u->faction->msgs, new_message(u->faction,
 		"lucky_item%u:unit%X:item%d:amount", u, itype->rtype, amount));
+#endif
 }
+
 
 static void
 lucky_event(const faction *f)

@@ -2552,32 +2552,22 @@ static boolean
 add_seen(const struct region * r, unsigned char mode, boolean dis)
 {
 	seen_region * find = find_seen(r);
-	if (find) {
-		if (find->mode >= mode) return false;
-		if (find->mode>see_neighbour || find->next==NULL) {
-			find->mode = mode;
-			find->disbelieves |= dis;
-			return true;
-		}
-		/* take it out the list, so it can get processed again */
-		find->next->prev = find->prev;
-		if (find->prev) find->prev->next = find->next;
-		else seen = find->next;
-	} else {
+	if (find==NULL) {
 		int index = abs((r->x & 0xffff) + ((r->y) << 16)) % MAXSEEHASH;
-		if (!reuse) reuse = (seen_region*)calloc(1, sizeof(seen_region));
+		if (!reuse) reuse = (seen_region*)calloc(1, sizeof(struct seen_region));
 		*append = find = reuse;
 		reuse = reuse->next;
 		find->nextHash = seehash[index];
 		seehash[index] = find;
 		find->r = r;
+		if (last) last->next = find;
+		find->next = NULL;
+		find->prev = last;
+		last = find;
+		append = &last->next;
+	} else if (find->mode >= mode) {
+		return false;
 	}
-	/* put it at the end of the list, where the unprocessed nodes are */
-	if (last) last->next = find;
-	find->next = NULL;
-	find->prev = last;
-	last = find;
-	append = &last->next;
 	find->mode = mode;
 	find->disbelieves |= dis;
 	return true;
