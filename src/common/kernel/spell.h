@@ -21,6 +21,7 @@ struct border_type;
 struct attrib_type;
 struct curse_type;
 struct castorder;
+struct curse;
 
 /* Sprüche. Neue NUR hinten anfügen, oder das Datenfile geht kaputt */
 enum {
@@ -208,7 +209,7 @@ enum {
 
 /* Prototypen */
 
-void do_shock(struct unit *u, char *reason);
+void do_shock(struct unit *u, const char *reason);
 int use_item_power(struct region * r, struct unit * u);
 int use_item_regeneration(struct region * r, struct unit * u);
 void showspells(struct region *r, struct unit *u);

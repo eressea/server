@@ -1063,8 +1063,6 @@ randomevents(void)
 	/* Orkische vermehren sich */
 
 	for (r = regions; r; r = r->next) {
-
-		plane * p = rplane(r);
 		for (u = r->units; u; u = u->next) {
 			if (is_cursed(u->attribs, C_ORC, 0)
 					&& !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {

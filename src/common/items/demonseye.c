@@ -17,7 +17,12 @@
 #include "demonseye.h"
 
 /* kernel includes */
+#include <faction.h>
 #include <item.h>
+#include <message.h>
+#include <plane.h>
+#include <region.h>
+#include <unit.h>
 
 /* util includes */
 #include <functions.h>
@@ -28,12 +33,16 @@
 static int
 summon_igjarjuk(struct unit * u, const struct item_type * itype, int amount, const char * cmd)
 {
-	unused(u);
+	struct plane * p = rplane(u->region);
 	unused(amount);
 	unused(itype);
-	unused(cmd);
-	assert(!"not implemented");
-	return -1;
+	if (p!=NULL) {
+		ADDMSG(&u->faction->msgs, msg_error(u, cmd, "use_realworld_only", ""));
+		return EUNUSABLE;
+	} else {
+		assert(!"not implemented");
+		return EUNUSABLE;
+	}
 }
 
 static resource_type rt_demonseye = {

@@ -1196,6 +1196,16 @@
 		</locale>
 	</message>
 
+	<message name="use_realworld_only" section="errors">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Dieser Gegenstand kann nur in der realen Welt benutzt werden."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - This object can only be used in the real world."</text>
+	</message>
+
 	<message name="error65">
 		<type>
 			<arg name="unit" type="unit"></arg>

@@ -123,7 +123,7 @@ report_failure(unit * mage, const char * sa) {
 /* ------------------------------------------------------------- */
 
 void
-do_shock(unit *u, char *reason)
+do_shock(unit *u, const char *reason)
 {
 #if SKILLPOINTS
 	skill_t sk;
@@ -156,8 +156,8 @@ do_shock(unit *u, char *reason)
 		remove_familiar(u);
 	}
 
-	add_message(&u->faction->msgs, new_message(u->faction,
-		"shock%u:mage%s:reason", u, strdup(reason)));
+	ADDMSG(&u->faction->msgs, msg_message("shock", 
+		"mage reason", u, strdup(reason)));
 }
 
 /* ------------------------------------------------------------- */
