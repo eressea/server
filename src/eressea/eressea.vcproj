@@ -3,6 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="eressea"
+	ProjectGUID="{749A2F7C-B9C3-4CEB-B1B2-1D4587E68718}"
 	SccProjectName=""
 	SccLocalPath="">
 	<Platforms>

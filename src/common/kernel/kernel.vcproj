@@ -246,9 +246,6 @@
 				RelativePath=".\race.h">
 			</File>
 			<File
-				RelativePath=".\randenc.h">
-			</File>
-			<File
 				RelativePath=".\region.h">
 			</File>
 			<File

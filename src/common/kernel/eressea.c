@@ -2498,10 +2498,11 @@ lifestyle(const unit * u)
 		astralspace = getplanebyname("Astralraum");
 	}
 
-	/* Keinen Unterhalt im Astralraum. */
+#ifndef ASTRAL_HUNGER
+  /* Keinen Unterhalt im Astralraum. */
 	if (getplane(u->region) == astralspace)
 		return 0;
-
+#endif
 	if(u->region->planep && fval(u->region->planep, PFL_NOFEED))
 		return 0;
 

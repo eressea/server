@@ -3,6 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="gamecode"
+	ProjectGUID="{836AC507-A3BD-4F6A-8362-BEBC3EA41CC2}"
 	SccProjectName=""
 	SccLocalPath="">
 	<Platforms>

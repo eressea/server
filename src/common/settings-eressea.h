@@ -34,7 +34,7 @@
 #define COMBAT_TURNS 5
 #define PEASANTS_DO_NOT_STARVE 0
 #define NEW_MIGRATION 1
-
+#define ASTRAL_HUNGER
 #undef SHORTPWDS
 
 #define ZEROFOKS_QUESTMASTER "eressea@zerofoks.net"
