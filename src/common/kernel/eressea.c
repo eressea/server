@@ -114,7 +114,7 @@ dbrace(const struct race * rc)
 	char * zPtr = zText;
 	strcpy(zText, LOC(find_locale("en"), rc_name(rc, 0)));
 	while (*zPtr) {
-		*zPtr = toupper(*zPtr);
+		*zPtr = (char)(toupper(*zPtr));
 		++zPtr;
 	}
 	return zText;

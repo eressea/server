@@ -3000,6 +3000,16 @@
 		</locale>
 	</message>
 
+	<message name="spellfail_onocean" section="errors">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Dieser Zauber kann nicht auf hoher See gezaubert werden."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - This spell cannot be cast while you are on the ocean."</text>
+	</message>
+
 	<message name="error206">
 		<type>
 			<arg name="unit" type="unit"></arg>

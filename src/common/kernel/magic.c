@@ -1581,7 +1581,7 @@ regeneration_magiepunkte(void)
 					reg_aura = min((auramax - aura), reg_aura);
 
 					aura += (int)reg_aura;
-					add_message(&u->faction->msgs, msg_message(
+					ADDMSG(&u->faction->msgs, msg_message(
 						"regenaura", "unit region amount",
 						u, r, (int)reg_aura));
 				}
@@ -3013,6 +3013,8 @@ magic(void)
 								&& !fval(u->race, RCF_SWIM)
 								&& !(sp->sptyp & OCEANCASTABLE)) {
 							/* Fehlermeldung */
+              ADDMSG(&u->faction->msgs, msg_message("spellfail_onocean", 
+                "unit region command", u, u->region, so->s));
 								continue;
 						}
 					/* Auf bewegenden Schiffen kann man nur explizit als

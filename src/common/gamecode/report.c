@@ -1635,7 +1635,7 @@ order_template(FILE * F, faction * f)
 }
 
 static void
-report_alliances(const faction * f, const ally * sf)
+show_allies(const faction * f, const ally * sf)
 {
 	int allierte = 0;
 	int i=0, h, hh = 0;
@@ -1718,7 +1718,7 @@ allies(FILE * F, faction * f)
 		} else {
 			strcpy(buf, "Wir helfen den Parteien ");
 		}
-		report_alliances(f, f->allies);
+		show_allies(f, f->allies);
 		scat(".");
 		rparagraph(F, buf, 0, 0);
 		rnl(F);
@@ -1731,7 +1731,7 @@ allies(FILE * F, faction * f)
 			} else {
 				sprintf(buf, "%s hilft den Parteien ", g->name);
 			}
-			report_alliances(f, g->allies);
+			show_allies(f, g->allies);
 			scat(".");
 			rparagraph(F, buf, 0, 0);
 			rnl(F);
