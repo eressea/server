@@ -26,8 +26,12 @@
 #include <magic.h>
 #include <ship.h>
 
+/* gamecode includes */
+#include <economy.h>
+
 /* util includes */
 #include <functions.h>
+#include <rand.h>
 
 /* libc includes */
 #include <assert.h>
@@ -156,6 +160,7 @@ item_type it_trappedairelemental = {
 	NULL
 };
 
+
 static int
 use_aurapotion50(struct unit * u, const struct item_type * itype,
                     int amount, const char *cm)
@@ -189,6 +194,52 @@ item_type it_aurapotion50 = {
 	NULL
 };
 
+#define BAGPIPEFRACTION dice_rand("2d4+2")
+#define BAGPIPEDURATION dice_rand("2d10+4")
+
+static int
+use_bagpipeoffear(struct unit * u, const struct item_type * itype,
+                    int amount, const char *cm)
+{
+  int money;
+
+  if(get_curse(u->region->attribs, ct_find("depression"))) {
+    cmistake(u, cm, 58, MSG_MAGIC);
+    return 0;
+  }
+
+  money = entertainmoney(u->region)/BAGPIPEFRACTION;
+  change_money(u, money);
+  rsetmoney(u->region, rmoney(u->region) - money);
+
+  create_curse(u, &u->region->attribs, ct_find("depression"),
+     20, BAGPIPEDURATION, 0, 0);
+  
+  ADDMSG(&u->faction->msgs, msg_message("bagpipeoffear_faction",
+           "unit region command money", u, u->region, cm, money));
+  
+  ADDMSG(&u->region->msgs, msg_message("bagpipeoffear_region",
+           "unit money", u, money));
+
+  return 0;
+}
+
+static resource_type rt_bagpipeoffear = {
+	{ "bagpipeoffear", "bagpipeoffear_p" },
+	{ "bagpipeoffear", "bagpipeoffear_p" },
+	RTF_ITEM,
+	&res_changeitem
+};
+
+item_type it_bagpipeoffear = {
+	&rt_bagpipeoffear,              /* resourcetype */
+	0, 1, 0,		                    /* flags, weight, capacity */
+	NULL,                           /* construction */
+	&use_bagpipeoffear,
+	NULL,
+	NULL
+};
+
 
 void
 register_artrewards(void)
@@ -200,5 +251,7 @@ register_artrewards(void)
 	register_function((pf_generic)use_trappedairelemental, "trappedairelemental");
 	it_register(&it_aurapotion50);
 	register_function((pf_generic)use_aurapotion50, "aurapotion50");
+	it_register(&it_bagpipeoffear);
+	register_function((pf_generic)use_bagpipeoffear, "bagpipeoffear");
 }
 

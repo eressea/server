@@ -2995,6 +2995,7 @@ entertain(region * r, unit * u)
   request *o;
   static int entertainbase = 0;
   static int entertainperlevel = 0;
+
   if (!entertainbase) {
     const char * str = get_param(global.parameters, "entertain.base");
     entertainbase = str?atoi(str):0;
@@ -3007,7 +3008,6 @@ entertain(region * r, unit * u)
     cmistake(u, findorder(u, u->thisorder), 58, MSG_INCOME);
     return;
   }
-
   if (!effskill(u, SK_ENTERTAINMENT)) {
     cmistake(u, findorder(u, u->thisorder), 58, MSG_INCOME);
     return;
@@ -3025,7 +3025,8 @@ entertain(region * r, unit * u)
     return;
   }
 
-  u->wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT) * entertainperlevel);
+  u->wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT)
+                            * entertainperlevel);
   if ((max_e = geti()) != 0)
     u->wants = min(u->wants,max_e);
 

@@ -5872,6 +5872,26 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Der Magier fühlt sich durch den Trank magische gestärkt."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The mage is magically invigorated."</text>
   </message>
+  
+  <message name="bagpipeoffear_faction" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="money" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Ausser sich vor Furcht geben die Bauern dem Barden $int($money) Silber."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Stricken with fear the peasants give the bard $int($money) silver."</text>
+  </message>
+  
+  <message name="bagpipeoffear_region" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="money" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) spielt einen Dudelsack. Ausser sich vor Furcht geben die Bauern $int($money) Silber."</text>
+    <text locale="en">"$unit($unit) plays the bagpipe. Stricken with fear the peasants give $int($money) silver."</text>
+  </message>
 
 </messages>
 

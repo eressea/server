@@ -1405,6 +1405,22 @@
     <text locale="de">Gefangene Windgeister</text>
     <text locale="en">trapped air elementals</text>
   </string>
+  <string name="auropotion50">
+    <text locale="de">Auratrank</text>
+    <text locale="en">aura potion</text>
+  </string>
+  <string name="trappedairelemental_p">
+    <text locale="de">Auratränke</text>
+    <text locale="en">aura potions</text>
+  </string>
+  <string name="bagpipeoffear">
+    <text locale="de">Dudelsack der Furcht</text>
+    <text locale="en">bagpipe of fear</text>
+  </string>
+  <string name="bagpipeoffear_p">
+    <text locale="de">Dudelsäcke der Furcht</text>
+    <text locale="en">bagpipes of fear</text>
+  </string>
 
   <!--herb singular -->
   <string name="h0">
