@@ -1102,13 +1102,15 @@ spellpower(region * r, unit * u, spell * sp, int cast_level)
 {
 	curse * c;
 	int force = cast_level;
-	if (sp==NULL) return 0;
-	else {
+	if (sp==NULL) {
+		return 0;
+	} else {
 		/* Bonus durch Magieturm und gesegneten Steinkreis */
 		struct building * b = inside_building(u);
 		const struct building_type * btype = b?b->type:NULL;
 		if (btype && btype->flags & BTF_MAGIC) ++force;
 	}
+
 	if (get_item(u, I_RING_OF_POWER) > 0) ++force;
 
 	/* Antimagie in der Zielregion */
@@ -1126,6 +1128,10 @@ spellpower(region * r, unit * u, spell * sp, int cast_level)
 		curse_changevigour(&u->attribs, c, -1);
 		cmistake(u, findorder(u, u->thisorder), 185, MSG_MAGIC);
 	}
+
+#ifdef MAGICPOWER
+	force = force * MAGICPOWER;
+#endif
 
 	return max(force, 0);
 }
@@ -1490,6 +1496,10 @@ regeneration(unit * u)
 
 	/* Würfeln */
 	aura = (rand() % d + rand() % d)/2 + 1;
+
+#ifdef MAGICREGEN
+	aura = aura * MAGICREGEN;
+#endif
 
 	return aura;
 }
