@@ -866,15 +866,15 @@ learn_monster(unit *u)
 	 * Lerntage hat. */
 
 	for(sk=0;sk<MAXSKILLS;sk++)
-		if(get_skill(u, sk) > 0) c++;
+		if (get_skill(u, sk)) c++;
 
 	if(c == 0) return;
 
 	n = rand()%c + 1;
 	c = 0;
 
-	for(sk=0;sk<MAXSKILLS;sk++) {
-		if(get_skill(u, sk) > 0) {
+	for (sk=0;sk<MAXSKILLS;sk++) {
+		if (get_skill(u, sk)) {
 			c++;
 			if(c == n) {
 				sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_STUDY]),
@@ -948,7 +948,13 @@ plan_monsters(void)
 			if (u->faction->no != MONSTER_FACTION) continue;
 
 			/* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
+#if SKILLPOINTS
 			change_skill(u, SK_OBSERVATION, u->number * 10);
+#else
+			if (learn_skill(u, SK_OBSERVATION, u->number * 10)) {
+				change_skill(u, SK_OBSERVATION, u->number);
+			}
+#endif
 
 			ta = a_find(u->attribs, &at_hate);
 			if (ta && strncmp(u->lastorder, "WARTEN", 6) != 0) {
@@ -1090,9 +1096,15 @@ plan_monsters(void)
 							un = createunit(r, findfaction(MONSTER_FACTION), ra, new_race[RC_DRACOID]);
 							name_unit(un);
 							change_money(u, -un->number * 50);
-							set_skill(un, SK_SPEAR, un->number * (180 + rand() % 500));
-							set_skill(un, SK_SWORD, un->number * (180 + rand() % 500));
-							set_skill(un, SK_LONGBOW, un->number * (90 + rand() % 300));
+#if SKILLPOINTS
+							set_skill(un, SK_SPEAR, un->number * (level_days(3) + rand() % (level_days(6)-level_days(3))));
+							set_skill(un, SK_SWORD, un->number * (level_days(3) + rand() % (level_days(6)-level_days(3))));
+							set_skill(un, SK_LONGBOW, un->number * (level_days(2) + rand() % (level_days(4)-level_days(2))));
+#else
+							set_skill(un, SK_SPEAR, un->number * (3 + rand() % 4));
+							set_skill(un, SK_SWORD, un->number * (3 + rand() % 4));
+							set_skill(un, SK_LONGBOW, un->number * (2 + rand() % 3));
+#endif
 							switch (rand() % 3) {
 							case 0:
 								set_item(un, I_LONGBOW, un->number);

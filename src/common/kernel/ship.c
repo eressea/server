@@ -493,3 +493,4 @@ register_ships(void)
 	xml_register(&xml_ships, "eressea ship", 0);
 #endif
 }
+

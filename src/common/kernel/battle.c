@@ -953,7 +953,7 @@ drain_exp(unit *u, int n)
 		}
 	}
 	if (sk != NOSKILL) {
-		change_skill(u, sk, -1);
+		change_skill(u, sk, -n);
 	}
 }
 #else
@@ -976,7 +976,7 @@ drain_exp(unit *u, int n)
 	}
 	if (sk != NOSKILL) {
 		n = min(n, get_skill(u, sk));
-		change_skill(u, sk, -n);
+		change_skill(u, sk, -1);
 	}
 }
 #endif
