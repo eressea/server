@@ -69,6 +69,12 @@ region_plane(const region& r)
   return r.planep->id;
 }
 
+static void
+region_addnotice(region& r, const char * str)
+{
+  addmessage(&r, NULL, str, MSG_MESSAGE, ML_IMPORTANT);
+}
+
 void
 bind_region(lua_State * L) 
 {
@@ -80,6 +86,7 @@ bind_region(lua_State * L)
     .property("name", &region_getname, &region_setname)
     .property("info", &region_getinfo, &region_setinfo)
     .property("terrain", &region_getterrain)
+    .def("add_notice", &region_addnotice)
     .def_readonly("x", &region::x)
     .def_readonly("y", &region::y)
     .def_readwrite("age", &region::age)
