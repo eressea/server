@@ -76,8 +76,8 @@ rule TargetDirectory
             SubDirC++Flags -g ;
         }
         else {
-            SubDirCcFlags -DNDEBUG ; 
-            SubDirC++Flags -DNDEBUG ;
+            SubDirCcFlags -DNDEBUG -O2 ;
+            SubDirC++Flags -DNDEBUG -O2 ;
         }
 }
 

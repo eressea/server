@@ -41,6 +41,7 @@
 #define TE_CENTER_X 1000
 #define TE_CENTER_Y 1000
 #define TP_RADIUS 4
+#define TP_DISTANCE 4
 
 static int
 real2tp(int rk) {
@@ -49,7 +50,7 @@ real2tp(int rk) {
   * +4 / 5 = 0;
   * !!!!!!!!!!;
   */
-  return (rk + (TP_RADIUS*5000)) / TP_RADIUS - 5000;
+  return (rk + (TP_DISTANCE*5000)) / TP_DISTANCE - 5000;
 }
 
 static region *
@@ -77,12 +78,6 @@ astralregions(const region * r, boolean (*valid)(const region *))
       int dist = koor_distance(0, 0, x, y);
 
       if (dist > TP_RADIUS) continue;
-      if (dist==4) {
-        /* these three regions are in dispute with the NW, W & SW areas */
-        if (x==-2 && y==0) continue;
-        if (x==-2 && y==2) continue;
-        if (x==0 && y==-2) continue;
-      }
       rn = findregion(r->x+x, r->y+y);
       if (rn!=NULL && (valid==NULL || valid(rn))) add_regionlist(&rlist, rn);
     }
@@ -95,7 +90,7 @@ r_standard_to_astral(const region *r)
 {
   region *r2;
 
-  assert(rplane(r) == get_normalplane());
+  if (rplane(r) != get_normalplane()) return NULL;
 
   r2 = tpregion(r);
   if (rplane(r2) != get_astralplane() || rterrain(r2) != T_ASTRAL) return NULL;
@@ -110,8 +105,8 @@ r_astral_to_standard(const region *r)
   region *r2;
 
   assert(rplane(r) == get_astralplane());
-  x = (r->x-TE_CENTER_X)*TP_RADIUS;
-  y = (r->y-TE_CENTER_Y)*TP_RADIUS;
+  x = (r->x-TE_CENTER_X)*TP_DISTANCE;
+  y = (r->y-TE_CENTER_Y)*TP_DISTANCE;
 
   r2 = findregion(x,y);
   if (rplane(r2)!=get_normalplane()) return NULL;
