@@ -19,6 +19,7 @@
 #include <region.h>
 #include <movement.h>
 #include <faction.h>
+#include <item.h>
 #include <race.h>
 
 /* util includes */
@@ -28,6 +29,8 @@ void
 santa_comes_to_town(region * r, unit * santa, void (*action)(unit*))
 {
 	faction * f;
+	const item_type * roi = it_find("roi");
+	assert(roi);
 
 	fset(santa, FL_TRAVELTHRU);
 	for (f = factions;f;f=f->next) {
@@ -35,7 +38,7 @@ santa_comes_to_town(region * r, unit * santa, void (*action)(unit*))
 		unit * senior = f->units;
 		if (!playerrace(f->race)) continue;
 		for (u = f->units; u; u=u->nextF) {
-			if (senior->age < u->age || effstealth(senior) > effstealth(u)) senior = u;
+			if (senior->age < u->age || effstealth(senior) > effstealth(u) || i_get(senior->items, roi)) senior = u;
 		}
 		if (!senior) continue;
 
