@@ -6029,6 +6029,15 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) cannot be heroes."</text>
   </message>
 
+  <message name="hero_promotion" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="cost" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) wird mit $int($cost) Silber zum Helden ernannt."</text>
+    <text locale="en">"$unit($unit) uses $int($cost) silber for a promotion."</text>
+  </message>
+
   <message name="heroes_cost" section="errors">
     <type>
       <arg name="command" type="order"/>

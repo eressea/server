@@ -2466,6 +2466,8 @@ promote_cmd(unit * u, struct order * ord)
   }
   use_all(u, i_silver->rtype, people);
   fset(u, UFL_HERO);
+  ADDMSG(&u->faction->msgs, msg_message(u, ord, "hero_promotion", "unit cost", 
+    u, money));
   return 0;
 }
 #endif
