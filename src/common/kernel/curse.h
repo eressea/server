@@ -208,6 +208,8 @@ typedef struct curse_unit {
 
 /* ------------------------------------------------------------- */
 
+typedef int (*cdesc_fun)(const void*, int, curse*, int);
+
 typedef struct curse_type {
 	const char *cname; /* Name der Zauberwirkung, Identifizierung des curse */
 	int typ;
@@ -221,9 +223,11 @@ typedef struct curse_type {
 	int (*write)(FILE * F, const curse * c);
 } curse_type;
 
+
 extern attrib_type at_curse;
 extern void curse_write(const attrib * a,FILE * f);
 extern int curse_read(struct attrib * a,FILE * f);
+
 
 /* ------------------------------------------------------------- */
 /* Kommentare:
