@@ -6,14 +6,12 @@ import sys
 import os
 import re
 import locking
-from locking import trylock, unlock
+from locking import lock, unlock
 
 From="accounts@vinyambar.de"
 
 # lock the input file:
-if (trylock(sys.argv[1]+'.err')!=0):
-  print "Could not lock "+sys.argv[1]+".err"
-  sys.exit()
+lock(sys.argv[1]+'.err',180)
 
 # move input file then unlock it:
 if os.access(sys.argv[1]+'.err', os.F_OK)==0:

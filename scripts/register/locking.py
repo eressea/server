@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import time
 import os
 import stat
 
@@ -10,7 +11,7 @@ def trylock(file):
     return 1
   return 0
 
-def lock(file):
+def lock(file, timeout=60):
   locked=1
   while locked:
     try:
@@ -19,7 +20,7 @@ def lock(file):
     except:
       update=os.stat(file+'.lock')[stat.ST_MTIME]
       now=time.time()
-      if (now > update + 60):
+      if (now > update + timeout):
         locked=0
         print "removing stale lockfile "+file+".lock"
         os.unlink(file+'.lock')
