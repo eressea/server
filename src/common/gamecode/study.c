@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: study.c,v 1.7 2001/02/18 10:06:08 enno Exp $
+ *	$Id: study.c,v 1.8 2001/02/19 14:19:24 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -35,6 +35,7 @@
 #include "message.h"
 #include "plane.h"
 #include "karma.h"
+#include "rand.h"
 
 /* util includes */
 #include <base36.h>
@@ -265,7 +266,11 @@ teach(region * r, unit * u)
 		 * n ist die Anzahl zusätzlich gelernter Tage. n darf max. die Differenz
 		 * von schon gelernten Tagen zum max(30 Tage pro Mann) betragen. */
 
-		n = (u2->number * 30);;
+#ifdef RANDOMIZED_LEARNING
+		n = u2->number * dice(2,30);
+#else
+		n = u2->number * 30;
+#endif
 		a = a_find(u2->attribs, &at_learning);
 		if (a!=NULL) n -= a->data.i;
 
@@ -503,7 +508,7 @@ learn(void)
 						a->data.i += l * 10;
 						change_effect(u, oldpotiontype[P_WISE], -l);
 					}
-					if (get_effect(u, oldpotiontype[P_FOOL])) {	/* Trank "Dumpfbackenbrot" */
+					if (get_effect(u, oldpotiontype[P_FOOL])) {
 						l = min(u->number, get_effect(u, oldpotiontype[P_FOOL]));
 						a->data.i -= l * 30;
 						change_effect(u, oldpotiontype[P_FOOL], -l);
@@ -540,7 +545,11 @@ learn(void)
 					}
 #endif
 
+#ifdef RANDOMIZED_LEARNING
+					change_skill(u, (skill_t)i, (int)((u->number * dice(2,30) + a->data.i) * multi));
+#else
 					change_skill(u, (skill_t)i, (int)((u->number * 30 + a->data.i) * multi));
+#endif
 					if (a) {
 						a_remove(&u->attribs, a);
 						a = NULL;

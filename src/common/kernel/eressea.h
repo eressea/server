@@ -66,6 +66,8 @@ struct building_type;
 #include <attrib.h>
 
 #define AT_PERSISTENT
+#undef RANDOMIZED_LEARNING
+#undef NOVISIBLESKILLPOINTS
 
 /* eressea-defined attribute-type flags */
 #define ATF_CURSE  ATF_USER_DEFINED

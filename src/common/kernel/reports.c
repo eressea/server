@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: reports.c,v 1.5 2001/02/17 15:52:47 enno Exp $
+ *	$Id: reports.c,v 1.6 2001/02/19 14:19:24 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -436,19 +436,23 @@ spskill(const struct unit * u, skill_t sk, int *dh, int days)
 		}
 	}
 
-	i = u_geteffstealth(u);
-	if (sk == SK_STEALTH && i>=0) {
-		icat(i);
-		scat("/");
+	if (sk == SK_STEALTH) {
+		i = u_geteffstealth(u);
+		if(i>=0) {
+			icat(i);
+			scat("/");
+		}
 	}
 	icat(effskill(u, sk));
 
+#ifndef NOVISIBLESKILLPOINTS
 	if (days) {
 		assert(u->number);
 		scat(" [");
 		icat(d / u->number);
 		scat("]");
 	}
+#endif
 }
 
 void

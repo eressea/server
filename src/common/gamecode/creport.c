@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: creport.c,v 1.8 2001/02/17 15:52:46 enno Exp $
+ *	$Id: creport.c,v 1.9 2001/02/19 14:19:24 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -486,7 +486,12 @@ cr_output_unit(FILE * F, region * r,
 					pr = 1;
 					fprintf(F, "TALENTE\n");
 				}
+#ifdef NOVISIBLESKILLPOINTS
+				/* 0 ist nur der Kompatibilität wegen drin, rausnehmen */
+				fprintf(F, "0 %d;%s\n", eff_skill(u, sk, r), skillnames[sk]);
+#else
 				fprintf(F, "%d %d;%s\n", get_skill(u, sk), eff_skill(u, sk, r), skillnames[sk]);
+#endif
 			}
 		/* spells */
 		if (is_mage(u)) {
