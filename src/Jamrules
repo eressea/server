@@ -29,6 +29,8 @@ CCFLAGS += -Wwrite-strings
 		   -Wno-char-subscripts
 		   ;
 
+XMLHDRS = /usr/include/libxml2 ;
+
 rule iconv
 {
   if $(LINK_ICONV) {

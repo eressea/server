@@ -4,6 +4,7 @@ TargetDirectory ;
 SubDirHdrs $(SUBDIR)/../util ;
 SubDirHdrs $(SUBDIR)/.. ;
 SubDirHdrs $(SUBDIR)/../.. ;
+SubDirHdrs $(XMLHDRS) ;
 
 SOURCES =
  alchemy.c

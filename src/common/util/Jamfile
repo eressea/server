@@ -3,6 +3,7 @@ SubDir TOP common util ;
 TargetDirectory ;
 SubDirHdrs $(SUBDIR)/.. ;
 SubDirHdrs $(SUBDIR)/../.. ;
+SubDirHdrs $(XMLHDRS) ;
 
 SOURCES =
  attrib.c

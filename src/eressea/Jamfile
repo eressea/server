@@ -7,6 +7,8 @@ SubDirHdrs $(SUBDIR)/../common/util ;
 SubDirHdrs $(SUBDIR)/../common ;
 SubDirHdrs $(SUBDIR)/.. ;
 
+SubDirHdrs $(XMLHDRS) ;
+
 LUASERVER = eressea-lua ;
 SERVER = eressea ;
 
