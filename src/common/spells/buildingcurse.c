@@ -53,7 +53,7 @@ cinfo_building(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 
 /* CurseInfo mit Spezialabfragen */
 
-/* C_MAGICSTONE*/
+/* C_MAGICWALLS*/
 static int
 cinfo_magicrunes(void * obj, typ_t typ, curse *c, int self)
 {

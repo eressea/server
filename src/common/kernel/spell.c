@@ -2098,7 +2098,7 @@ sp_homestone(castorder *co)
 		return 0;
 	}
 
-	c = create_curse(mage, &mage->building->attribs, ct_find("magicstone"),
+	c = create_curse(mage, &mage->building->attribs, ct_find("magicwalls"),
 			force*force, 1, 0, 0);
 
 	if (c==NULL) {
@@ -2433,7 +2433,7 @@ sp_earthquake(castorder *co)
 			continue;
 
 		/* Schutzzauber */
-		if(is_cursed(burg->attribs, C_MAGICSTONE, 0))
+		if(is_cursed(burg->attribs, C_MAGICWALLS, 0))
 			continue;
 
 		/* Magieresistenz */

@@ -1639,10 +1639,10 @@ skilldiff(troop at, troop dt, int dist)
 
 	if (df->building) {
 		boolean init = false;
-		static const curse_type * strongwall_ct, * magicstone_ct;
+		static const curse_type * strongwall_ct, * magicwalls_ct;
 		if (!init) {
 			strongwall_ct = ct_find("strongwall");
-			magicstone_ct = ct_find("magicstone");
+			magicwalls_ct = ct_find("magicwalls");
 			init=true;
 		}
 		if (df->building->type->flags & BTF_PROTECTION) {
@@ -1663,7 +1663,7 @@ skilldiff(troop at, troop dt, int dist)
 				is_protected = 2;
 			}
 		}
-		if (magicstone_ct && curse_active(get_curse(df->building->attribs, magicstone_ct))) {
+		if (magicwalls_ct && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
 			/* Verdoppelt Burgenbonus */
 			skdiff -= buildingeffsize(df->building, false);
 		}

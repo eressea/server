@@ -182,8 +182,8 @@ siege(region * r, unit * u)
 	int d;
 	int bewaffnete, katapultiere = 0;
 	static boolean init = false;
-	static const curse_type * magicstone_ct;
-	if (!init) { init = true; magicstone_ct = ct_find("magicstone"); }
+	static const curse_type * magicwalls_ct;
+	if (!init) { init = true; magicwalls_ct = ct_find("magicwalls"); }
 	/* gibt es ueberhaupt Burgen? */
 
 	b = getbuilding(r);
@@ -233,7 +233,7 @@ siege(region * r, unit * u)
 	d = min(d, b->size - 1);
 
 	/* meldung, schaden anrichten */
-	if (d && !curse_active(get_curse(b->attribs, magicstone_ct))) {
+	if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {
 		b->size -= d;
 		new_use_pooled(u, &rt_catapultammo, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, d);
 		d = 100 * d / b->size;

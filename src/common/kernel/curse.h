@@ -100,7 +100,7 @@ enum {
 	C_SHIP_FLYING,		/* 10 - Luftschiff-Zauber */
 	C_SHIP_NODRIFT,		/* 11 - GünstigeWinde-Zauber */
 	C_DEPRESSION,
-	C_MAGICSTONE,     /* 13 - Heimstein */
+	C_MAGICWALLS,     /* 13 - Heimstein */
 	C_STRONGWALL,	    /* 14 - Feste Mauer - Precombat*/
 	C_ASTRALBLOCK,		/* 15 - Astralblock */
 	C_GENEROUS,	      /* 16 - Unterhaltung vermehren */
