@@ -1825,8 +1825,8 @@ verify_targets(castorder *co)
 					if (!tr) { /* Fehlermeldung */
 						failed++;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellregionresists%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
+							"spellregionresists%u:unit%r:region%s:command",
+							mage, mage->region, strdup(co->order)));
 						break;
 					}
 					if ((sp->sptyp & TESTRESISTANCE)
@@ -1834,8 +1834,8 @@ verify_targets(castorder *co)
 					{ /* Fehlermeldung */
 						spobj->flag = TARGET_RESISTS;
 						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellregionresists%u:unit%r:region%s:command%i:id",
-							mage, mage->region, strdup(co->order), spobj->data.i));
+							"spellregionresists%u:unit%r:region%s:command",
+							mage, mage->region, strdup(co->order)));
 						failed++;
 						break;
 					}
@@ -1866,8 +1866,8 @@ verify_targets(castorder *co)
 				if (target_resists_magic(mage, target_r, TYP_REGION, 0)) {
 					/* Fehlermeldung */
 					add_message(&mage->faction->msgs, new_message(mage->faction,
-						"spellregionresists%u:unit%r:region%s:command%i:id",
-						mage, mage->region, strdup(co->order), spobj->data.i));
+						"spellregionresists%u:unit%r:region%s:command",
+						mage, mage->region, strdup(co->order)));
 					spobj->flag = TARGET_RESISTS;
 					failed++;
 				}
