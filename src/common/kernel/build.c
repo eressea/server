@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: build.c,v 1.3 2001/02/03 13:45:31 enno Exp $
+ *	$Id: build.c,v 1.4 2001/02/04 08:47:39 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -160,7 +160,9 @@ set_contact(region * r, unit * u, char try)
 struct building *
 getbuilding(const struct region * r)
 {
-	return findbuilding(getid());
+	building * b = findbuilding(getid());
+	if (r!=b->region) return NULL;
+	return b;
 }
 
 ship *
