@@ -932,6 +932,14 @@ transport(unit * ut, unit * u)
   return false;
 }
 
+static boolean
+can_move(const unit * u)
+{
+  if (u->race->flags & RCF_CANNOTMOVE) return false;
+  if (get_movement(&u->attribs, MV_CANNOTMOVE)) return false;
+  return true;
+}
+
 static void
 init_transportation(void)
 {
@@ -2088,14 +2096,6 @@ hunted_dir(attrib *at, int id)
   }
 
   return NODIRECTION;
-}
-
-static boolean
-can_move(const unit * u)
-{
-  if (u->race->flags & RCF_CANNOTMOVE) return false;
-  if (get_movement(&u->attribs, MV_CANNOTMOVE)) return false;
-  return true;
 }
 
 static int

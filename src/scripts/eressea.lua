@@ -58,8 +58,7 @@ function process(orders)
   plan_monsters()
   process_orders()
 
-  -- localechange = { de = { "bLub" } }
-  localechange = {  }
+  localechange = { en = { "y7hq" } }
   for loc, flist in localechange do
 	  for index, name in flist do
       f = get_faction(atoi36(name))
@@ -70,6 +69,8 @@ function process(orders)
     end
   end
   
+  autoseed(basepath .. "/newfactions")
+
   autoseed(basepath .. "/newfactions")
 
   write_passwords()

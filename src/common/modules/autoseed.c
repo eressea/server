@@ -55,7 +55,7 @@ read_newfactions(const char * filename)
     for (f=factions;f;f=f->next) {
       if (strcmp(f->email, email)==0 && f->subscription) break;
     }
-    if (f) continue; /* skip the ones we've already got */
+    if (f && f->units) continue; /* skip the ones we've already got */
     for (nf=newfactions;nf;nf=nf->next) {
       if (strcmp(nf->email, email)==0) break;
     }
@@ -320,7 +320,7 @@ autoseed(newfaction ** players, int nsize)
       for (rptr=rlist;rptr;rptr=rptr->next) {
         region * r = rlist->data;
         unit * u;
-        for (u=r->units;u;u->next) {
+        for (u=r->units;u;u=u->next) {
           f = u->faction;
           if (!fval(f, FL_MARK)) {
             ++psize;
