@@ -3004,7 +3004,7 @@ make_summary(boolean count_new)
 		struct language * plang = s->languages;
 		while (plang && plang->locale != lang) plang=plang->next;
 		if (!plang) {
-			plang = calloc(sizeof(plang), 1);
+			plang = calloc(sizeof(struct language), 1);
 			plang->next = s->languages;
 			s->languages = plang;
 			plang->locale = lang;

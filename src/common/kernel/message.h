@@ -15,11 +15,11 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-struct faction;
-struct warning;
+#include <util/message.h>
 
 struct message;
 struct messageclass;
+struct faction;
 struct warning;
 struct msglevel;
 

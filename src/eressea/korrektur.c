@@ -2751,6 +2751,7 @@ heal_all(void)
 	region *r;
 	unit *u;
 	faction *f;
+	struct message * msg = msg_message("healall", "");
 
 	for(f=factions; f; f=f->next) {
 		freset(f, FL_DH);
@@ -2766,12 +2767,14 @@ heal_all(void)
 		}
 	}
 	
-	for(f=factions; f; f=f->next) {
+	for (f=factions; f; f=f->next) {
 		if(fval(f,FL_DH)) {
-			add_message(&f->msgs, new_message(f, "healall"));
+			add_message(&f->msgs, msg);
 			freset(f, FL_DH);
 		}
 	}
+
+	msg_release(msg);
 
 	return 0;
 }

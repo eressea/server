@@ -1374,8 +1374,8 @@ manufacture(unit * u, const item_type * itype, int want)
 	if (n>0) {
 		i_change(&u->items, itype, n);
 		if (want==INT_MAX) want = n;
-		add_message(&u->faction->msgs,
-			new_message(u->faction, "manufacture%u:unit%r:region%i:amount%i:wanted%X:resource", u, u->region, n, want, itype->rtype));
+		ADDMSG(&u->faction->msgs, msg_message("manufacture",
+			"unit region amount wanted resource", u, u->region, n, want, itype->rtype));
 	}
 }
 
@@ -1807,8 +1807,8 @@ create_potion(unit * u, const potion_type * ptype, int want)
 	default:
 		i_change(&u->items, ptype->itype, built);
 		if (want==INT_MAX) want = built;
-		add_message(&u->faction->msgs,
-					new_message(u->faction, "manufacture%u:unit%r:region%i:amount%i:wanted%X:resource", u, u->region, built, want, ptype->itype->rtype));
+		ADDMSG(&u->faction->msgs, msg_message(u->faction, "manufacture",
+			"unit region amount wanted resource", u, u->region, built, want, ptype->itype->rtype));
 		break;
 	}
 }
