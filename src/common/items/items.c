@@ -1,5 +1,6 @@
-#include <items/lmsreward.h>
-#include <items/demonseye.h>
+#include "lmsreward.h"
+#include "demonseye.h"
+#include "weapons.h"
 
 void
 init_items(void)

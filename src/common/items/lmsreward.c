@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- * $Id: lmsreward.c,v 1.1 2001/02/02 08:40:45 enno Exp $
+ * $Id: lmsreward.c,v 1.2 2001/02/02 08:58:26 enno Exp $
  * Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -25,6 +25,7 @@
 /* libc includes */
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 
 static int
 info_lmsstory(const void* vp, int i, curse * c, int i2)
