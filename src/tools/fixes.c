@@ -73,6 +73,7 @@ static struct attrib_type at_age = {
 	} \
 }
 
+#if NEW_RESOURCEGROWTH
 static void
 convert_resources(void)
 {
@@ -210,6 +211,7 @@ convert_resources(void)
 	log_close();
 	fclose(fixes);
 }
+#endif
 
 static void
 fix_age(void)

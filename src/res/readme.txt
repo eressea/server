@@ -7,7 +7,7 @@ Probleme haben, weil dir vielleicht die Regeln noch unklar sind, so gibt es
 mehrere Informationsquellen, die dir hoffentlich helfen können.
 
 Die wichtigste Hilfe für das Spiel ist nach wie vor die Anleitung, im Netz zu
-finden unter http://eressea.faroul.de/.
+finden unter http://eressea.upb.de/rules/.
 
 Eine Gruppe engagierter Mitspieler hat sich zum Ziel gesetzt, Neulingen zu
 helfen. Diese Spieler können per EMail unter eressea-help@eressea.kn-bremen.de

@@ -10,7 +10,7 @@
 	<include file="races.xml"></include>
 	<include file="items.xml"></include>
 
-	<game name="Vinyambar II" units="250">
+	<game name="Vinyambar II" units="250" welcome="vinyambar">
 		<comment>Game specific</comment>
 		<order name="ARBEITEN" disable></order>
 		<order name="MEINUNG" disable></order>

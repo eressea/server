@@ -2097,8 +2097,12 @@ parse_tagbegin(struct xml_stack *stack, void *data)
 			return XML_USERERROR;
 		}
 	} else if (strcmp(tag->name, "game")==0) {
+		const char * welcome = xml_value(tag, "welcome");
 		const char * name = xml_value(tag, "name");
 		int maxunits = xml_ivalue(tag, "units");
+		if (welcome!=NULL) {
+			global.welcomepath = strdup(welcome);
+		}
 		if (name!=NULL) {
 			global.gamename = strdup(name);
 		}

@@ -136,4 +136,6 @@ init_mallornseed(void)
 	}
 }
 
+#else
+int __xx_nonempty=0; /* to prevent this from being an empty translation unit */
 #endif

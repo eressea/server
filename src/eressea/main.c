@@ -120,6 +120,7 @@ static boolean g_killeiswald = false;
 
 struct settings global = {
 	"Eressea", /* gamename */
+	"eressea", /* resourcepath */
 	1000, /* maxunits */
 };
 
