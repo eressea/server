@@ -3435,9 +3435,6 @@ processorders (void)
 	if (turn == 0) srand(time((time_t *) NULL));
 	else srand(turn);
 
-	puts(" - Heilung");
-	monthly_healing();
-
 	puts(" - Belagern");
 	do_siege();
 
@@ -3497,7 +3494,8 @@ processorders (void)
 	puts(" - Zufallsereignisse");
 	randomevents();
 
-	puts(" - Auraregeneration");
+	puts(" - regeneration (healing & aura)");
+	monthly_healing();
 	regeneration_magiepunkte();
 
 #if NEW_LAEN
