@@ -2938,11 +2938,33 @@ korrektur(void)
 #endif
 }
 
+int
+astral_penger(void)
+{
+	plane * astralplane = getplanebyname("Astralraum");
+	region * r;
+	const item_type * itype = it_find("money");
+	assert(itype);
+	for (r=regions;r;r=r->next) {
+		unit * u;
+		if (rplane(r)!=astralplane) continue;
+		for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
+		for (u=r->units;u;u=u->next) {
+			if (u->faction->no==MONSTER_FACTION) continue;
+			if (!fval(u->faction, FL_DH)) {
+				fset(u->faction, FL_DH);
+				i_change(&u->items, itype, 300);
+			}
+		}
+	}
+	return 0;
+}
 
 void
 korrektur_end(void)
 {
 	/* fix_balsamfiasko(); */
+	do_once("peng", astral_penger());
 #ifdef XMAS2001
 	do_once("2001", xmas2001());
 #endif
