@@ -553,7 +553,7 @@ move_ship(ship * sh, region * from, region * to, region_list * route)
   }
   
 #ifndef NDEBUG
-  if (rterrain(sh->region)!=T_OCEAN) {
+  if (rterrain(sh->region)!=T_OCEAN && sh->coast!=NODIRECTION) {
     region * rcoast = rconnect(sh->region, sh->coast);
     if (rterrain(rcoast)!=T_OCEAN) {
       log_error(("ship %s sailed into a coast with no ocean neighbours.\n",
