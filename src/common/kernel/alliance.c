@@ -243,6 +243,7 @@ alliancevictory(void)
 	const struct building_type * btype = bt_find("stronghold");
 	region * r = regions;
 	alliance * al = alliances;
+	if (btype==NULL) return;
 	while (r!=NULL) {
 		building * b = r->buildings;
 		while (b!=NULL) {

@@ -67,7 +67,6 @@ bt_find(const char* name)
 		btl = buildingtypes;
 		while (btl && strncasecmp(btl->type->_name, name, strlen(name))) btl = btl->next;
 	}
-	assert(btl);
 	return btl?btl->type:NULL;
 }
 

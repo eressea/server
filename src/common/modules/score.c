@@ -293,7 +293,7 @@ score(void)
         if (token!=NULL) {
           unit * u = f->units;
           while (u!=NULL) {
-            const item ** iitem = i_find(&u->items, token);
+            item ** iitem = i_find(&u->items, token);
             if (iitem!=NULL && *iitem!=NULL) {
               grails += (*iitem)->number;
             }
