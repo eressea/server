@@ -400,11 +400,12 @@ render_messages(FILE * F, faction * f, message_list *msgs)
 		}
 #endif
 		crbuffer[0] = '\0';
-		if (cr_render(m->msg, crbuffer, (const void*)f)==0 && crbuffer[0]) {
+		if (cr_render(m->msg, crbuffer, (const void*)f)==0) {
 			if (!printed) fprintf(F, "MESSAGE %d\n", ++msgno);
-			fputs(crbuffer, F);
+			if (crbuffer[0]) fputs(crbuffer, F);
+		} else {
+			log_error(("could not render cr-message %p: %s\n", m->msg, m->msg->type->name));
 		}
-		else log_error(("could not render cr-message %p: %s\n", m->msg, m->msg->type->name));
 		if (printed) {
 			unsigned int ihash = hash % MTMAXHASH;
 			struct known_mtype * kmt = mtypehash[ihash];
