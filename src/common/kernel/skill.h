@@ -23,15 +23,10 @@ extern signed char skill_bonus(struct unit * u, struct region * r);
 #define SMF_RIDING     (1<<2) /* Bonus für berittene - an der rasse*/
 
 typedef struct skill {
-#if SKILLPOINTS
-	skill_t id;
-	int value;
-#else
 	unsigned char id;
 	unsigned char level;
 	unsigned char weeks;
 	unsigned char old;
-#endif
 } skill;
 
 typedef struct skillmod_data {
@@ -54,16 +49,12 @@ extern skill_t sk_find(const char * name);
 extern int level_days(int level);
 extern int level(int days);
 
-#if SKILLPOINTS
-# define skill_level(level) level_days(level)
-#else
-# define skill_level(level) (level)
+#define skill_level(level) (level)
 extern void reduce_skill(struct unit *u, skill * sv, int change);
 extern int skill_weeks(int level);
 extern int skill_compare(const skill * sk, const skill * sc);
 
 extern void sk_set(skill * sv, int level);
-#endif
 
 
 #endif

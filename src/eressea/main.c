@@ -52,15 +52,16 @@
 
 /* kernel includes */
 #include <building.h>
-#include <unit.h>
-#include <message.h>
-#include <teleport.h>
+#include <creport.h>
 #include <faction.h>
+#include <message.h>
 #include <plane.h>
 #include <race.h>
-#include <reports.h>
-#include <creport.h>
+#include <skill.h>
+#include <teleport.h>
+#include <unit.h>
 #include <region.h>
+#include <reports.h>
 #include <resources.h>
 #include <save.h>
 #include <ship.h>
@@ -97,9 +98,6 @@ extern boolean nomsg;
 extern boolean nobattle;
 extern boolean nobattledebug;
 extern boolean dirtyload;
-
-static boolean printpotions;
-static int insertfaction;
 
 extern void debug_messagetypes(FILE * out);
 extern void free_region(region * r);
@@ -138,20 +136,6 @@ crwritemap(void)
   }
   fclose(F);
 	return 0;
-}
-
-static void
-print_potions(FILE * F)
-{
-	potion_type * p;
-	for (p=potiontypes;p;p=p->next) {
-		requirement * req = p->itype->construction->materials;
-		int i;
-		fprintf(F, "%s\n", locale_string(NULL, p->itype->rtype->_name[0]));
-		for (i=0;req[i].number;++i) {
-			fprintf(F, "  %s\n", locale_string(NULL, resname(req[i].type, 0)));
-		}
-	}
 }
 
 static void
@@ -197,11 +181,6 @@ game_init(void)
 		abort();
 	}
 #endif
-	if (printpotions) {
-		FILE * F = fopen("recipes.txt", "w");
-		print_potions(F);
-		fclose(F);
-	}
 }
 
 static void
@@ -455,6 +434,8 @@ usage(const char * prog, const char * arg)
 	return -1;
 }
 
+extern int demonfix;
+
 static int
 read_args(int argc, char **argv)
 {
@@ -489,7 +470,7 @@ read_args(int argc, char **argv)
 				g_reportdir = argv[++i];
 				break;
 			case 'D': /* DEBUG */
-				printpotions = true;
+				demonfix = atoi(argv[++i]);
 				break;
 			case 'd':
 				g_datadir = argv[++i];
@@ -502,9 +483,6 @@ read_args(int argc, char **argv)
 				break;
 			case 't':
 				turn = atoi(argv[++i]);
-				break;
-			case 'i':
-				insertfaction = atoi36(argv[++i]);
 				break;
 			case 'f':
 				firstx = atoi(argv[++i]);
@@ -593,124 +571,6 @@ main(int argc, char *argv[])
 	return 0;
 #endif
 
-	if (insertfaction) {
-		faction * lostf;
-		unit *ulost, **ulostp = &lostunits;
-		faction **fp = &factions;
-		region **rp = &regions;
-
-		if ((i=readgame(false))!=0) return i;
-
-		lostf = findfaction(insertfaction);
-		lostf->lastorders = turn;
-		lostf->allies = NULL;
-		lostf->groups = NULL;
-
-		free(used_faction_ids);
-		while (*rp) {
-			building *b, *b2;
-			ship *s, *s2;
-			region *r  = *rp;
-			int prevunit = 0;
-			unit ** up = &r->units;
-			while(*up) {
-				unit * u = *up;
-				if (u->faction != lostf) {
-					*up = u->next;
-					prevunit = u->no;
-					stripunit(u);
-					uunhash(u);
-					free(u);
-				} else {
-					lostdata * ld = calloc(sizeof(lostdata), 1);
-					ld->x = r->x;
-					ld->y = r->y;
-					ld->ship = u->ship?u->ship->no:0;
-					ld->building = u->building?u->building->no:0;
-					ld->prevunit = prevunit;
-					u->building = (building*)ld; /* hack */
-					u->ship = NULL;
-					u->region = NULL;
-					u->items = i_new(i_silver, 10);
-					prevunit = u->no;
-					*ulostp = u;
-					ulostp = &u->next;
-					up = &u->next;
-				}
-			}
-			for (b = r->buildings; b; b = b2) {
-				bunhash(b);
-				free(b->name);
-				free(b->display);
-				b2 = b->next;
-				free(b);
-			}
-			for (s = r->ships; s; s = s2) {
-				sunhash(s);
-				free(s->name);
-				free(s->display);
-				s2 = s->next;
-				free(s);
-			}
-			*rp = r->next;
-			free_region(r);
-		}
-		while (*fp) {
-			faction * f = *fp;
-			if (f!=lostf) {
-				stripfaction(f);
-				*fp = f->next;
-				free(f);
-			} else {
-				fp = &f->next;
-			}
-		}
-		while (planes) {
-			plane * pl = planes;
-			planes = planes->next;
-			free(pl);
-		}
-		free_borders();
-
-		++turn;
-		if ((i=readgame(false))!=0) return i;
-
-		ulost=lostunits;
-		while (ulost) {
-			unit * u = ulost;
-			lostdata * ld = (lostdata*)u->building;
-			region * r = findregion(ld->x, ld->y);
-			ulost = u->next;
-
-			u->items = NULL;
-			if (r) {
-				unit ** up = &r->units;
-				u->region = r;
-				if (ld->prevunit) {
-					while (*up && (*up)->no!=ld->prevunit) up = &(*up)->next;
-					if (*up) up=&(*up)->next;
-				}
-				u->next = *up;
-				*up = u;
-				if (ld->building) {
-					building * b = r->buildings;
-					while (b && b->no!=ld->building) b = b->next;
-					if (b) u->building = b;
-				}
-				if (ld->ship) {
-					ship * s = r->ships;
-					while (s && s->no!=ld->ship) s = s->next;
-					if (s) u->ship = s;
-				}
-			}
-		}
-		if (!nowrite) {
-			char ztext[64];
-			sprintf(ztext, "%s/%d.fix", datapath(), turn);
-			writegame(ztext, 0);
-		}
-		return 0;
-	}
 	if ((i=readgame(false))!=0) return i;
 #ifdef BETA_CODE
 	if (dungeonstyles) {
@@ -730,12 +590,59 @@ main(int argc, char *argv[])
 		}
 	}
 	if (g_writemap) return crwritemap(); 
-/*	{
- * faction * monster = findfaction(MONSTER_FACTION);
- * 		display_item(monster, monster->units, it_find("mistletoe"));
- * 	}
- * */
+
+	if (demonfix==2) {
+		FILE * F = fopen("demons.fix", "r");
+		for (;;) {
+			int x, y, id, fno, size, age, number;
+			unit * u;
+			if (fscanf(F, "%d %d %d %d %d %d %d", &id, &age, &fno, &x, &y, &size, &number)<=0) break;
+			u = findunit(id);
+			if (u==NULL || u->faction->no!=fno) {
+				region * r = findregion(x, y);
+				if (r) for (u=r->units;u;u=u->next) if (u->number==number && u->age==age && u->faction->no==fno) break;
+			}
+			if (!u) {
+				log_error(("could not find unit %s and fix it!\n", itoa36(id)));
+			}
+			else u->skill_size = 0;
+			while (size--) {
+				int sk, value, weeks;
+				if (fscanf(F, "%d %d %d", &sk, &value, &weeks)<=0) break;
+				if (u) {
+					skill * sv = add_skill(u, (skill_t)sk);
+					sv->level = (unsigned char)value;
+					sv->weeks = (unsigned char)weeks;
+				}
+				else {
+					log_error(("  %s[%u] : %u/%u\n", skillname((skill_t)sk, default_locale), sk, value, weeks));
+				}
+			}
+		}
+		fclose(F);
+	}
+
 	if ((i=processturn(orders))!=0) return i;
+
+	if (demonfix==1) {
+		region * r;
+		FILE * F = fopen("demons.fix", "w");
+		for (r=regions;r;r=r->next) {
+			unit * u;
+			for (u=r->units;u;u=u->next) {
+				if (u->number && fval(u, UFL_DEBUG)) {
+					skill * sv;
+					fprintf(F, "%d %d %d %d %d %d %d\n", u->no, u->age, u->faction->no, r->x, r->y, u->skill_size, u->number);
+					for (sv=u->skills;sv!=u->skills+u->skill_size;++sv) {
+						fprintf(F, "%d %d %d\n", sv->id, sv->level, sv->weeks);
+					}
+					fputc('\n', F);
+				}
+			}
+		}
+		fclose(F);
+		exit(0);
+	}
 
 #ifdef CLEANUP_CODE
 	game_done();

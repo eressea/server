@@ -845,8 +845,8 @@ typedef struct strlist {
 
 extern int max_unique_id;
 
-#define FL_GUARD          (1<<0)	/* 1 */
-#define FL_ISNEW          (1<<1)	/* 2 */
+#define UFL_DEBUG         (1<<0)
+#define UFL_ISNEW         (1<<1)	/* 2 */
 #define FL_LONGACTION     (1<<2)	/* 4 */
 #define FL_OWNER          (1<<3)	/* 8 */
 #define FL_PARTEITARNUNG  (1<<4)	/* 16 */

@@ -1669,10 +1669,10 @@ readunit(FILE * F)
 			guard(u, GUARD_NONE);
 		}
 	} else
-		u->flags = ri(F);
+		u->flags = ri(F) & ~UFL_DEBUG;
 	if (global.data_version < GUARD_VERSION) {
 #if RELEASE_VERSION < GUARDFIX_VERSION
-		if (fval(u, FL_GUARD)) guard(u, GUARD_ALL);
+		if (fval(u, 1)) guard(u, GUARD_ALL);
 #endif
 	}
 	/* Kurze persistente Befehle einlesen */

@@ -120,7 +120,7 @@ addplayer(region *r, const char *email, const struct race * frace, const locale 
 
 	u = createunit(r, f, 1, f->race);
 	give_starting_equipment(r, u);
-	fset(u, FL_ISNEW);
+	fset(u, UFL_ISNEW);
 	if (old_race(f->race) == RC_DAEMON) {
 		race_t urc;
 		do

@@ -3804,9 +3804,11 @@ int
 damage_unit(unit *u, const char *dam, boolean armor, boolean magic)
 {
 	int *hp = malloc(u->number * sizeof(int));
-	int   h = u->hp/u->number;
+	int   h;
 	int   i, dead = 0, hp_rem = 0, heiltrank;
 
+	if (u->number==0) return 0;
+	h = u->hp/u->number;
 	/* HP verteilen */
 	for (i=0; i<u->number; i++) hp[i] = h;
 	h = u->hp - (u->number * h);

@@ -240,8 +240,6 @@ expandorders(region * r, request * requests)
 }
 /* ------------------------------------------------------------- */
 
-#if SKILLPOINTS == 0
-
 static void
 change_level(unit * u, skill_t sk, int bylevel)
 {
@@ -250,7 +248,6 @@ change_level(unit * u, skill_t sk, int bylevel)
 	if (sv==0) sv = add_skill(u, sk);
 	sk_set(sv, sv->level+bylevel);
 }
-#endif
 
 static void
 expandrecruit(region * r, request * recruitorders)
@@ -1502,7 +1499,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 	{
 		for (u2 = r->units; u2; u2 = u2->next ) {
 			if (getguard(u) & GUARD_MINING
-				&& !fval(u2, FL_ISNEW)
+				&& !fval(u2, UFL_ISNEW)
 				&& u2->number
 				&& !ucontact(u2, u)
 				&& !allied(u2, u->faction, HELP_GUARD))

@@ -693,7 +693,7 @@ scale_number (unit * u, int n)
 	}
 	for (sk = 0; sk < MAXSKILLS; sk++) {
 		if (n==0 || u->number == 0) {
-			set_level(u, sk, 0);
+			remove_skill(u, sk);
 		}
 	}
 
@@ -1382,7 +1382,7 @@ getunit(const region * r, const faction * f)
 	if (n < 0) return 0;
 
 	for (u2 = r->units; u2; u2 = u2->next) {
-		if (u2->no == n && !fval(u2, FL_ISNEW)) {
+		if (u2->no == n && !fval(u2, UFL_ISNEW)) {
 			return u2;
 		}
 	}
@@ -2512,7 +2512,7 @@ make_undead_unit(region * r, faction * f, int n, const struct race * rc)
 	u = createunit(r, f, n, rc);
 	set_string(&u->lastorder, "");
 	name_unit(u);
-	fset(u, FL_ISNEW);
+	fset(u, UFL_ISNEW);
 	return u;
 }
 
@@ -2991,13 +2991,8 @@ int
 produceexp(struct unit * u, skill_t sk, int n)
 {
 	if (n==0 || !playerrace(u->race)) return 0;
-#if SKILLPOINTS
-	change_skill(u, sk, PRODUCEEXP * n);
-	return 1;
-#else
 	learn_skill(u, sk, PRODUCEEXP/30.0);
 	return 0;
-#endif
 }
 
 boolean

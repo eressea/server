@@ -294,12 +294,8 @@ find_manual(region * r, unit * u)
 	addmessage(r, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
 
 	if (improve_all(u->faction, skill, 3) == 0) {
-#if SKILLPOINTS
-		change_skill(u, skill, 270);
-#else
 		int i;
 		for (i=0;i!=9;++i) learn_skill(u, skill, 1.0);
-#endif
 	}
 }
 
@@ -317,7 +313,7 @@ get_unit(region * r, unit * u)
 	newunit = createunit(r, u->faction, rand() % 20 + 3, u->faction->race);
 	set_string(&newunit->name, "Dorfbewohner");
 	set_money(newunit, (rand() % 26 + 10) * newunit->number);
-	fset(newunit, FL_ISNEW);
+	fset(newunit, UFL_ISNEW);
 	if (fval(u, FL_PARTEITARNUNG)) fset(newunit, FL_PARTEITARNUNG);
 	switch (rand() % 4) {
 	case 0:
@@ -472,7 +468,7 @@ get_allies(region * r, unit * u)
 		newunit->irace = u->irace;
 	}
 	if (fval(u, FL_PARTEITARNUNG)) fset(newunit, FL_PARTEITARNUNG);
-	fset(u, FL_ISNEW);
+	fset(u, UFL_ISNEW);
 
 	sprintf(buf, "Plötzlich stolper%c %s über einige %s. Nach kurzem "
 		"Zögern entschließen sich die %s, sich Deiner Partei anzuschließen.",
@@ -1448,7 +1444,7 @@ randomevents(void)
 		for (u=r->units; u; u=u->next) {
 			if (u->faction->no != MONSTER_FACTION
 					&& (u->race->flags & RCF_DESERT)) {
-				if (fval(u, FL_ISNEW)) continue;
+				if (fval(u, UFL_ISNEW)) continue;
 				if (rand()%100 < 5) {
 					ADDMSG(&u->faction->msgs, msg_message("desertion",
 						"unit region", u, r));

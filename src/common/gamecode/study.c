@@ -424,12 +424,8 @@ teach(region * r, unit * u)
 
 	}
 	if (academy) {
-#if SKILLPOINTS
-		change_skill(u, sk, academy / 30);
-#else
 		academy = academy/30;
 		learn_skill(u, sk, academy/30.0/TEACHNUMBER);
-#endif
 	}
 }
 /* ------------------------------------------------------------- */

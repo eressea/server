@@ -257,53 +257,6 @@ level(int days)
 	return i;
 }
 
-#if !SKILLPOINTS
-
-/*
-#define MAXLEVEL 32
-static struct {
-	int permutations;
-	int * chances;
-} upgrade[MAXLEVEL];
-
-static double
-fak(int n)
-{
-	int i;
-	double f=1;
-	for (i=2;i<n;++i) f=f*i;
-	return f;
-}
-
-void
-sk_set(skill * sv, int level)
-{
-	double i;
-	int weeks;
-	int multi=1+(level/16);
-	if (upgrade[level].permutations==0) {
-		int m;
-		int ctr = 1;
-		int n = level * 2 / multi;
-		upgrade[level].permutations = 1 << n;
-		if (n>0) upgrade[level].chances = malloc(sizeof(double)*n);
-		for (m=0;m!=n;++m) {
-			upgrade[level].chances[m] = (int)(fak(n)/(fak(m)*fak(n-m)));
-			ctr += upgrade[level].chances[m];
-		}
-		assert(ctr==upgrade[level].permutations);
-	}
-	i = rand() % upgrade[level].permutations;
-	for (weeks=0;weeks!=level*2/multi;++weeks) {
-		if (i<=upgrade[level].chances[weeks]) break;
-		else i-=upgrade[level].chances[weeks];
-	}
-	weeks*=multi;
-	sv->weeks = (unsigned char)(weeks+1);
-	sv->level = (unsigned char)level;
-}
-*/
-
 void
 sk_set(skill * sv, int level)
 {
@@ -354,4 +307,3 @@ skill_compare(const skill * sk, const skill * sc)
 	if (sk->weeks > sc->weeks) return -1;
 	return 0;
 }
-#endif

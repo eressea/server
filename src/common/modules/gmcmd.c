@@ -520,11 +520,7 @@ gm_skill(const char * str, void * data, const char * cmd)
 			mistake(u, cmd, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
-#if SKILLPOINTS
-			set_skill(to, skill, num*to->number);
-#else
 			set_level(to, skill, num);
-#endif
 		}
 	}
 }

@@ -82,7 +82,7 @@ static FILE * dragonlog;
 static boolean
 is_waiting(const unit * u)
 {
-	if (fval(u, FL_ISNEW)) return true;
+	if (fval(u, UFL_ISNEW)) return true;
 	if (strncasecmp(u->lastorder, "WARTEN", 6) == 0) return true;
 
 	return false;
@@ -976,7 +976,7 @@ plan_monsters(void)
 				if (tr != r) is_moving = true;
 			}
 
-			if (!(fval(u, FL_ISNEW)) && r->terrain != T_OCEAN) { /* Monster bewachen immer */
+			if (!(fval(u, UFL_ISNEW)) && r->terrain != T_OCEAN) { /* Monster bewachen immer */
 				strlist *S;
 				S = makestrlist(locale_string(u->faction->locale, keywords[K_GUARD]));
 				addlist(&u->orders, S);

@@ -51,6 +51,8 @@
 
 #define FIND_FOREIGN_TEMP
 
+
+int demonfix = 0;
 /* ------------------------------------------------------------- */
 
 const unit u_peasants = { NULL, NULL, NULL, NULL, NULL, 2, "die Bauern" };
@@ -678,6 +680,8 @@ transfermen(unit * u, unit * u2, int n)
 		skill *sv, *sn;
 		skill_t sk;
 		assert(u2->number+n>0);
+
+		if (demonfix && u2->race==new_race[RC_DAEMON]) fset(u2, UFL_DEBUG);
 
 		for (sk=0; sk!=MAXSKILLS; ++sk) {
 			double dlevel = 0.0;
