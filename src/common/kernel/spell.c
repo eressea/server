@@ -150,7 +150,7 @@ do_shock(unit *u, char *reason)
 #else
 	for (i=0;i!=u->skill_size;++i) if (rand()%5==0) {
 		skill * sv = u->skills+i;
-		int weeks = (sv->level * sv->level - sv->level) / 2 + sv->learning;
+		int weeks = (sv->level * sv->level - sv->level) / 2;
 		int change = (weeks+9) / 10;
 		reduce_skill(u, sv, change);
 	}

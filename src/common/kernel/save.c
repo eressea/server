@@ -1468,18 +1468,25 @@ readgame(boolean backup)
 			if (global.data_version<NEWSKILL_VERSION) {
 				/* convert old data */
 				while ((sk = (skill_t) ri(F)) != NOSKILL) {
-					int skill = ri(F) / u->number;
-					int lvl = level(skill);
-					int weeks = (skill - level_days(lvl))/30;
-					if (weeks || lvl) {
-						set_skill(u, sk, lvl, 2*weeks, true);
+					int days = ri(F) / u->number;
+					int lvl = level(days);
+					int weeks = lvl + 1 - (days - level_days(lvl))/30;
+					assert(weeks>0 && weeks<=lvl+1);
+					if (lvl) {
+						skill * sv = add_skill(u, sk);
+						sv->level = (unsigned char)lvl;
+						sv->weeks = (unsigned char)weeks;
 					}
 				}
 			} else {
 				while ((sk = (skill_t) ri(F)) != NOSKILL) {
 					int level = ri(F);
 					int weeks = ri(F);
-					set_skill(u, sk, level, weeks, true);
+					if (level) {
+						skill * sv = add_skill(u, sk);
+						sv->level = (unsigned char)level;
+						sv->weeks = (unsigned char)weeks;
+					}
 				}
 			}
 #endif
@@ -2069,11 +2076,11 @@ writegame(char *path, char quiet)
 #else
 			for (i=0;i!=u->skill_size;++i) {
 				skill * sv = u->skills+i;
-				assert(sv->level>=0 && sv->learning>=0 && sv->learning<=sv->level*2);
-				if (sv->learning || sv->level) {
+				assert(sv->level>=0 && sv->weeks>=0 && sv->weeks<=sv->level*2);
+				if (sv->level>0) {
 					wi(F, sv->id);
 					wi(F, sv->level);
-					wi(F, sv->learning);
+					wi(F, sv->weeks);
 				}
 			}
 #endif

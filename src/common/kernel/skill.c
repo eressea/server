@@ -34,6 +34,7 @@
 
 /* libc includes */
 #include <assert.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -257,46 +258,86 @@ level(int days)
 }
 
 #if !SKILLPOINTS
-void 
-reduce_skill(unit *u, skill * sv, int change)
+
+/*
+#define MAXLEVEL 32
+static struct {
+	int permutations;
+	int * chances;
+} upgrade[MAXLEVEL];
+
+static double
+fak(int n)
 {
-	if (sv->learning>=change) {
-		/* just forget a few weeks */
-		sv->learning = (unsigned char)(sv->learning-change);
-	} else {
-		int weeks;
-		unsigned char oldlevel = sv->level;
-		attrib *a;
+	int i;
+	double f=1;
+	for (i=2;i<n;++i) f=f*i;
+	return f;
+}
 
-		change -= sv->learning;
-		while (change>=sv->level && sv->level > 0) {
-			change -= sv->level;
-			--sv->level;
+void
+sk_set(skill * sv, int level)
+{
+	double i;
+	int weeks;
+	int multi=1+(level/16);
+	if (upgrade[level].permutations==0) {
+		int m;
+		int ctr = 1;
+		int n = level * 2 / multi;
+		upgrade[level].permutations = 1 << n;
+		if (n>0) upgrade[level].chances = malloc(sizeof(double)*n);
+		for (m=0;m!=n;++m) {
+			upgrade[level].chances[m] = (int)(fak(n)/(fak(m)*fak(n-m)));
+			ctr += upgrade[level].chances[m];
 		}
-		if (change && sv->level > 0 && change<sv->level) {
-			/* this is not an exact science... it would be better to set
-			 * sv->learning so that the average time to rise was = change.
-			 */
-			--sv->level;
-			weeks = (sv->level-change)*2;
-		} else {
-			weeks = 0;
-		}
-		sv->learning = (unsigned char)weeks;
-
-		for(a = a_find(u->attribs, &at_showskchange);a;a = a->nexttype) {
-			if(a->data.sa[0] == sv->id) {
-				a->data.sa[1] = (short)(a->data.sa[1] + (sv->level-oldlevel));
-				break;
-			}
-		}
-		if(a == NULL) {
-			a = a_add(&u->attribs, a_new(&at_showskchange));
-			a->data.sa[0] = sv->id;
-			a->data.sa[1] = (short)(sv->level-oldlevel);
-		}
+		assert(ctr==upgrade[level].permutations);
 	}
-	assert(sv->level>=0 && sv->learning>=0 && sv->learning<=sv->level*2);
+	i = rand() % upgrade[level].permutations;
+	for (weeks=0;weeks!=level*2/multi;++weeks) {
+		if (i<=upgrade[level].chances[weeks]) break;
+		else i-=upgrade[level].chances[weeks];
+	}
+	weeks*=multi;
+	sv->weeks = (unsigned char)(weeks+1);
+	sv->level = (unsigned char)level;
+}
+*/
+
+void
+sk_set(skill * sv, int level)
+{
+	sv->weeks = (unsigned char)skill_weeks(level);
+	sv->level = (unsigned char)level;
+}
+
+int
+skill_weeks(int level)
+/* how many weeks must i study to get from level to level+1 */
+{
+	/* derzeit gleichverteilt. MUSS geändert werden! */
+	return (1+rand()%(level*2+1));
+}
+
+void 
+reduce_skill(unit *u, skill * sv, int weeks)
+{
+	boolean reroll = false;
+	while (sv->level>0 && weeks>sv->level) {
+		weeks -= sv->level;
+		--sv->level;
+	}
+	if (sv->level*2+1<sv->weeks) reroll = true;
+	if (sv->level>0) {
+		if (rand()%sv->level < weeks) {
+			--sv->level;
+			reroll = true;
+		}
+	} else {
+		reroll = true;
+	}
+	if (reroll) sv->weeks = (unsigned char)skill_weeks(sv->level);
+	assert(sv->level>=0 && sv->weeks>=0 && sv->weeks<=sv->level*2);
 }
 
 int 
@@ -304,8 +345,8 @@ skill_compare(const skill * sk, const skill * sc)
 {
 	if (sk->level > sc->level) return 1;
 	if (sk->level < sc->level) return -1;
-	if (sk->learning > sc->learning) return 1;
-	if (sk->learning < sc->learning) return -1;
+	if (sk->weeks < sc->weeks) return 1;
+	if (sk->weeks > sc->weeks) return -1;
 	return 0;
 }
 #endif

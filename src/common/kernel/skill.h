@@ -29,7 +29,7 @@ typedef struct skill {
 #else
 	unsigned char id;
 	unsigned char level;
-	unsigned char learning;
+	unsigned char weeks;
 #endif
 } skill;
 
@@ -58,7 +58,10 @@ extern int level(int days);
 #else
 # define skill_level(level) (level)
 extern void reduce_skill(struct unit *u, skill * sv, int change);
+extern int skill_weeks(int level);
 extern int skill_compare(const skill * sk, const skill * sc);
+
+extern void sk_set(skill * sv, int level);
 #endif
 
 
