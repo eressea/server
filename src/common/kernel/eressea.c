@@ -1675,18 +1675,22 @@ getunit(const region * r, const faction * f)
   int n;
   unit *u2;
   getunitpeasants = 0;
-  
+
   n = read_unitid(f, r);
   if (n == 0) {
-	getunitpeasants = 1;
-	return NULL;
+    getunitpeasants = 1;
+    return NULL;
   }
   if (n < 0) return 0;
 
   for (u2 = r->units; u2; u2 = u2->next) {
-	if (u2->no == n) {
-	  if ((u2->flags & UFL_ISNEW) || u2->number>0) return u2;
-	}
+    if (u2->no == n) {
+      /* there used to be a '|| u2->number>0' condition here, but it got 
+       * removed because of a bug that made units disappear:
+       * http://eressea.upb.de/mantis/bug_view_page.php?bug_id=0000172
+       */
+      if (u2->flags & UFL_ISNEW) return u2;
+    }
   }
 
   return 0;
