@@ -241,6 +241,7 @@ expandorders(region * r, request * requests)
 /* ------------------------------------------------------------- */
 
 #if SKILLPOINTS == 0
+
 static void
 change_level(unit * u, skill_t sk, int bylevel)
 {
@@ -2339,7 +2340,7 @@ sell(region * r, unit * u, request ** sellorders, const char * cmd)
 
 	s = getstrtoken();
 	if (findparam(s, u->faction->locale) == P_ANY) {
-		n = (rpeasants(r) - rpeasants(r) / RECRUITFRACTION) / TRADE_FRACTION;
+		n = rpeasants(r) / TRADE_FRACTION;
 		if (rterrain(r) == T_DESERT && buildingtype_exists(r, &bt_caravan))
 			n *= 2;
 		if (n==0) {
