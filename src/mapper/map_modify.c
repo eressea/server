@@ -85,12 +85,6 @@ terrain_create(int climate)
 	return terrain;
 }
 
-static int
-blockcoord(int x)
-{
-	return ((x<0)?((x-BLOCKSIZE+1) / BLOCKSIZE):(x / BLOCKSIZE)) * BLOCKSIZE;
-}
-
 static char newblock[BLOCKSIZE][BLOCKSIZE];
 static int g_maxluxuries;
 

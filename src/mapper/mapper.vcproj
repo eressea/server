@@ -80,7 +80,7 @@
 				AdditionalIncludeDirectories="$(CURSES_ROOT)/include;../common/kernel,../common/gamecode,../common/util,../common,.."
 				PreprocessorDefinitions="_CONSOLE,WIN32"
 				BasicRuntimeChecks="0"
-				RuntimeLibrary="4"
+				RuntimeLibrary="5"
 				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"

@@ -136,7 +136,7 @@
 				AdditionalIncludeDirectories="../common/kernel,../common/gamecode,../common/util,../common,.."
 				PreprocessorDefinitions="_CONSOLE,WIN32"
 				BasicRuntimeChecks="0"
-				RuntimeLibrary="4"
+				RuntimeLibrary="5"
 				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
@@ -203,6 +203,9 @@
 		</File>
 		<File
 			RelativePath="..\common\settings-eressea.h">
+		</File>
+		<File
+			RelativePath="..\common\settings-tutorial.h">
 		</File>
 		<File
 			RelativePath="..\common\settings-vinyambar-classic.h">

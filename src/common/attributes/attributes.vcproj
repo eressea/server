@@ -24,7 +24,7 @@
 				AdditionalIncludeDirectories="../kernel,../util,../..,.."
 				PreprocessorDefinitions="_WINDOWS,WIN32,_DEBUG"
 				BasicRuntimeChecks="0"
-				RuntimeLibrary="4"
+				RuntimeLibrary="5"
 				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"

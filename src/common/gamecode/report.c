@@ -1410,7 +1410,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	}
 }
 
-void
+static void
 statistics(FILE * F, const region * r, const faction * f)
 {
 	const unit *u;

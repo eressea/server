@@ -1588,259 +1588,259 @@
 	</string>
 
 	<namespace name="race">
-	<string name="Adler">
+	<string name="eagle">
 		<text locale="fr">aigle</text>
 	</string>
-	<string name="Drache">
+	<string name="eagle_p">
 		<text locale="fr">dragon</text>
 	</string>
-	<string name="Drachen">
+	<string name="dragon_p">
 		<text locale="fr">dragons</text>
 	</string>
-	<string name="Dämon">
+	<string name="demon">
 		<text locale="fr">démon</text>
 	</string>
-	<string name="Dämonen">
+	<string name="demon_p">
 		<text locale="fr">démons</text>
 	</string>
-	<string name="Einhorn">
+	<string name="unicorn">
 		<text locale="fr">licorne</text>
 	</string>
-	<string name="Einhörner">
+	<string name="unicorn_p">
 		<text locale="fr">licornes</text>
 	</string>
-	<string name="Elf">
+	<string name="elf">
 		<text locale="fr">elfe</text>
 	</string>
-	<string name="Elfen">
+	<string name="elf_p">
 		<text locale="fr">elfes</text>
 	</string>
-	<string name="Eule">
+	<string name="owl">
 		<text locale="fr">hibou</text>
 	</string>
-	<string name="Eulen">
+	<string name="owl_p">
 		<text locale="fr">hibous</text>
 	</string>
-	<string name="Geist">
+	<string name="ghost">
 		<text locale="fr">fantôme</text>
 	</string>
-	<string name="Geister">
+	<string name="ghost_p">
 		<text locale="fr">fantômes</text>
 	</string>
-	<string name="Goblin">
+	<string name="goblin">
 		<text locale="fr">gobelin</text>
 	</string>
-	<string name="Goblins">
+	<string name="goblin_p">
 		<text locale="fr">gobelins</text>
 	</string>
-	<string name="Halbling">
+	<string name="halfling">
 		<text locale="fr">hobbit</text>
 	</string>
-	<string name="Halblinge">
+	<string name="halfling_p">
 		<text locale="fr">hobbits</text>
 	</string>
-	<string name="Hirntöter">
+	<string name="braineater">
 		<text locale="fr">céphalophage</text>
 	</string>
-	<string name="Insekt">
+	<string name="insect">
 		<text locale="fr">insecte</text>
 	</string>
-	<string name="Insekten">
+	<string name="insect_p">
 		<text locale="fr">insectes</text>
 	</string>
-	<string name="Jungdrache">
+	<string name="young dragon">
 		<text locale="fr">dragonnet</text>
 	</string>
-	<string name="Jungdrachen">
+	<string name="young dragon_p">
 		<text locale="fr">dragonnets</text>
 	</string>
-	<string name="Katze">
+	<string name="cat">
 		<text locale="fr">chat</text>
 	</string>
-	<string name="Katzen">
+	<string name="cat_p">
 		<text locale="fr">chats</text>
 	</string>
-	<string name="Katzendrache">
+	<string name="catdragon">
 		<text locale="fr">dragon-chat</text>
 	</string>
-	<string name="Katzendrachen">
+	<string name="catdragon_p">
 		<text locale="fr">dragons-chats</text>
 	</string>
-	<string name="Luchs">
+	<string name="lynx">
 		<text locale="fr">lynx</text>
 	</string>
-	<string name="Luchse">
+	<string name="lynx_p">
 		<text locale="fr">lynx</text>
 	</string>
-	<string name="Meermensch">
+	<string name="aquarian">
 		<text locale="fr">atlante</text>
 	</string>
-	<string name="Meermenschen">
+	<string name="aquarian_p">
 		<text locale="fr">atlantes</text>
 	</string>
-	<string name="Mensch">
+	<string name="human">
 		<text locale="fr">humain</text>
 	</string>
-	<string name="Menschen">
+	<string name="human_p">
 		<text locale="fr">humains</text>
 	</string>
-	<string name="Ork">
+	<string name="orc">
 		<text locale="fr">orque</text>
 	</string>
-	<string name="Orks">
+	<string name="orc_p">
 		<text locale="fr">orques</text>
 	</string>
-	<string name="Uruk">
+	<string name="uruk">
 		<text locale="fr">orque</text>
 	</string>
-	<string name="Uruks">
+	<string name="uruk_p">
 		<text locale="fr">orques</text>
 	</string>
-	<string name="Riesenschildkröte">
+	<string name="giantturtle">
 		<text locale="fr">tortue géante</text>
 	</string>
-	<string name="Riesenschildkröten">
+	<string name="giantturtle_p">
 		<text locale="fr">tortues géantes</text>
 	</string>
-	<string name="Schablone">
+	<string name="template">
 		<text locale="fr">modèle</text>
 	</string>
-	<string name="Schablonen">
+	<string name="template_p">
 		<text locale="fr">modèles</text>
 	</string>
-	<string name="Schattenritter">
+	<string name="shadow knight">
 		<text locale="fr">guerrier illusoire</text>
 	</string>
-	<string name="Seeschlange">
+	<string name="sea serpent">
 		<text locale="fr">serpent de mer</text>
 	</string>
-	<string name="Troll">
+	<string name="troll">
 		<text locale="fr">troll</text>
 	</string>
-	<string name="Trolle">
+	<string name="troll_p">
 		<text locale="fr">trolls</text>
 	</string>
-	<string name="Untote">
+	<string name="undead">
 		<text locale="fr">mort-vivant</text>
 	</string>
-	<string name="Untoter">
+	<string name="undead_p">
 		<text locale="fr">morts-vivants</text>
 	</string>
-	<string name="Warg">
+	<string name="direwolf">
 		<text locale="fr">warg</text>
 	</string>
-	<string name="Warge">
+	<string name="direwolf_p">
 		<text locale="fr">wargs</text>
 	</string>
-	<string name="Zombie">
+	<string name="zombie">
 		<text locale="fr">zombie</text>
 	</string>
-	<string name="Zombie_p">
+	<string name="zombie_p">
 		<text locale="fr">zombies</text>
 	</string>
-	<string name="Zwerg">
+	<string name="dwarf">
 		<text locale="fr">nain</text>
 	</string>
-	<string name="Zwerge">
+	<string name="dwarf_p">
 		<text locale="fr">nains</text>
 	</string>
-	<string name="Kröte">
+	<string name="toad">
 		<text locale="fr">crapaud</text>
 	</string>
-	<string name="Kröten">
+	<string name="toad_p">
 		<text locale="fr">crapauds</text>
 	</string>
-	<string name="Klon">
+	<string name="clone">
 		<text locale="fr">métamorphe</text>
 	</string>
-	<string name="Gnom">
+	<string name="gnome">
 		<text locale="fr">gnome</text>
 	</string>
-	<string name="Museumsgeist">
+	<string name="museumghost">
 		<text locale="fr">fantôme du musée</text>
 	</string>
-	<string name="Ghast">
+	<string name="ghast">
 		<text locale="fr">spectre</text>
 	</string>
-	<string name="Ghoul">
+	<string name="ghoul">
 		<text locale="fr">goule</text>
 	</string>
-	<string name="Juju-Zombie">
+	<string name="juju-zombie">
 		<text locale="fr">zombie juju</text>
 	</string>
-	<string name="Skelettherr">
+	<string name="skeleton lord">
 		<text locale="fr">liche</text>
 	</string>
-	<string name="Zentaur">
+	<string name="centaur">
 		<text locale="fr">centaure</text>
 	</string>
-	<string name="Krake">
+	<string name="kraken">
 		<text locale="fr">kraken</text>
 	</string>
-	<string name="Delphin">
+	<string name="dolphin">
 		<text locale="fr">dauphin</text>
 	</string>
-	<string name="Tiger">
+	<string name="tiger">
 		<text locale="fr">tigre</text>
 	</string>
-	<string name="Höllenkatze">
+	<string name="hellcat">
 		<text locale="fr">chat de l'Enfer</text>
 	</string>
-	<string name="Traumkatze">
+	<string name="dreamcat">
 		<text locale="fr">chat des rêves</text>
 	</string>
-	<string name="Teufelchen">
+	<string name="imp">
 		<text locale="fr">diablotin</text>
 	</string>
-	<string name="Nymphe">
+	<string name="nymph">
 		<text locale="fr">nymphe</text>
 	</string>
-	<string name="Singdrache">
+	<string name="songdragon">
 		<text locale="fr">dragon chinois</text>
 	</string>
-	<string name="Ratte">
+	<string name="rat">
 		<text locale="fr">rat</text>
 	</string>
-	<string name="Tunnelwurm">
+	<string name="tunnelworm">
 		<text locale="fr">ver des profondeurs</text>
 	</string>
-	<string name="Wolf">
+	<string name="wolf">
 		<text locale="fr">loup</text>
 	</string>
-	<string name="Bauer">
+	<string name="peasant">
 		<text locale="fr">paysan</text>
 	</string>
-	<string name="Alp">
+	<string name="alp">
 		<text locale="fr">quauquemaire</text>
 	</string>
-	<string name="Bergwächter">
+	<string name="mountainguard">
 		<text locale="fr">yéti</text>
 	</string>
-	<string name="Schattenmeister">
+	<string name="shadowmaster">
 		<text locale="fr">lémure</text>
 	</string>
-	<string name="Schattendämon">
+	<string name="shadowdemon">
 		<text locale="fr">ombre</text>
 	</string>
-	<string name="Eisengolem">
+	<string name="irongolem">
 		<text locale="fr">golem de fer</text>
 	</string>
-	<string name="Zauber">
+	<string name="spell">
 		<text locale="fr">enchantement</text>
 	</string>
-	<string name="Spezial">
+	<string name="special">
 		<text locale="fr">spécial</text>
 	</string>
-	<string name="Dracoid">
+	<string name="dracoid">
 		<text locale="fr">draconien</text>
 	</string>
-	<string name="Ent">
+	<string name="ent">
 		<text locale="fr">ent</text>
 	</string>
-	<string name="Wyrm">
+	<string name="wyrm">
 		<text locale="fr">wyrm</text>
 	</string>
-	<string name="Illusion">
+	<string name="illusion">
 		<text locale="fr">illusion</text>
 	</string>
 	</namespace>

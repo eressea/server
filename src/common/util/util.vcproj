@@ -116,7 +116,7 @@
 				AdditionalIncludeDirectories="../..,.."
 				PreprocessorDefinitions="_WINDOWS,WIN32,_DEBUG"
 				BasicRuntimeChecks="0"
-				RuntimeLibrary="4"
+				RuntimeLibrary="5"
 				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
@@ -182,6 +182,9 @@
 			</File>
 			<File
 				RelativePath=".\language.h">
+			</File>
+			<File
+				RelativePath="language_struct.h">
 			</File>
 			<File
 				RelativePath=".\lists.h">

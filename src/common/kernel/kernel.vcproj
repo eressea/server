@@ -70,7 +70,7 @@
 				AdditionalIncludeDirectories="../util,../..,.."
 				PreprocessorDefinitions="_WINDOWS,WIN32"
 				BasicRuntimeChecks="0"
-				RuntimeLibrary="4"
+				RuntimeLibrary="5"
 				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"

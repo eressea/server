@@ -13,6 +13,7 @@
  */
 #include <config.h>
 #include "language.h"
+#include "language_struct.h"
 
 #include "log.h"
 #include "goodies.h"
@@ -22,21 +23,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define SMAXHASH 512
-
 /** importing **/
-
-typedef struct locale {
-	struct locale * next;
-	unsigned int hashkey;
-	const char * name;
-	struct locale_string {
-		unsigned int hashkey;
-		struct locale_string * nexthash;
-		char * str;
-		char * key;
-	} * strings[SMAXHASH];
-} locale;
 
 locale * default_locale;
 locale * locales;
