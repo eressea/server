@@ -9716,7 +9716,7 @@ static spell spelldaten[] =
   {
     SPL_ENTERASTRAL, "Astraler Weg",
     "Alte arkane Formeln ermöglichen es dem Magier, sich und andere in die "
-    "astrale Ebene zu bringen. Der Magier kann (Stufe-3)*15 GE durch das "
+    "astrale Ebene zu schicken. Der Magier kann (Stufe-3)*15 GE durch das "
     "kurzzeitig entstehende Tor schicken. Ist der Magier erfahren genug, "
     "den Zauber auf Stufen von 11 oder mehr zu zaubern, kann er andere "
     "Einheiten auch gegen ihren Willen auf die andere Ebene zwingen.", NULL,
@@ -9735,7 +9735,7 @@ static spell spelldaten[] =
     SPL_LEAVEASTRAL, "Astraler Ausgang",
     "Der Magier konzentriert sich auf die Struktur der Realität und kann "
     "so die astrale Ebene verlassen. Er kann insgesamt (Stufe-3)*15 GE durch "
-    "das kurzzeitig entstehende Tor bringen. Ist der Magier erfahren genug, "
+    "das kurzzeitig entstehende Tor schicken. Ist der Magier erfahren genug, "
     "den Zauber auf Stufen von 11 oder mehr zu zaubern, kann er andere "
     "Einheiten auch gegen ihren Willen auf die andere Ebene zwingen.",
     "ZAUBER [STUFE n] \'Astraler Ausgang\' <Ziel-X> <Ziel-Y> <Einheit-Nr> "
@@ -9846,7 +9846,7 @@ static spell spelldaten[] =
     SPL_PULLASTRAL, "Astraler Ruf",
     "Ein Magier, der sich in der astralen Ebene befindet, kann mit Hilfe "
     "dieses Zaubers andere Einheiten zu sich holen. Der Magier kann "
-    "(Stufe-3)*15 GE durch das kurzzeitig entstehende Tor bringen. Ist der "
+    "(Stufe-3)*15 GE durch das kurzzeitig entstehende Tor schicken. Ist der "
     "Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu zaubern, "
     "kann er andere Einheiten auch gegen ihren Willen auf die andere Ebene "
     "zwingen.",
