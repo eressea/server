@@ -21,8 +21,8 @@ From = "accounts@eressea-pbem.de"
 locale="de"
 smtpserver = 'localhost'
 db=None
-game_id=0  # Eressea Main game
-tutorial_id=None # 1 to active, None to disable tutorials
+game_id=0     # Eressea Main game
+tutorial_id=1 # 1 to active, None to disable tutorials
 
 # define a new function called Display
 # it takes one parameter - a string to Display

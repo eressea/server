@@ -8,30 +8,36 @@
 # * Will mark CONFIRMED users as WAITING, and send them another mail.
 
 import MySQLdb
+import string
 import re
 import sys
+import os
 import smtplib
 
 dbname=sys.argv[1]
 date=sys.argv[2]
-db=MySQLdb.connect(db=dbname)
-cursor=db.cursor()
 From='accounts@eressea-pbem.de'
-MailTemplate="templates/register.mail"
 smtpserver='localhost'
 server=smtplib.SMTP(smtpserver)
 patchdir='/home/eressea/eressea-rsync'
 game_id=0
 
+db=MySQLdb.connect(db=dbname)
+cursor=db.cursor()
+cursor.execute("select name, patch from games where id="+str(game_id))
+game, patch = cursor.fetchone()
+
+MailTemplate="templates/register.mail."+string.lower(game)
+
 def Patch():
-    i = cursor.execute("select name, patch from games where id="+str(game_id))
-    name, patch = cursor.fetchone()
-    print "Auswertung für " + name + " Patch Level " + str(int(patch)) + ", Runde "+str(lastturn)
+    global patch
+    
+    print "Auswertung für " + game + " Patch Level " + str(int(patch))
     while os.access(patchdir+'/patch-'+str(int(patch+1))+'.sql', os.F_OK):
 	patch=patch+1
 	print "  Patching to level "+str(patch)
 	os.system('mysql ' + dbname + ' < ' + patchdir+'/patch-'+str(int(patch))+'.sql')
-	cursor.execute('update games set patch='+str(int(patch))+' where id='+str(gid))
+	cursor.execute('update games set patch='+str(int(patch))+' where id='+str(game_id))
     return
 
 def Send(email, custid, firstname, password, position, locale):
@@ -51,11 +57,9 @@ def Send(email, custid, firstname, password, position, locale):
     return
 
 Patch()
-print "must update this. only partially done"
-sys.exit(-1)
-
 # remove all illegal and banned users:
 users = cursor.execute("SELECT s.id from users u, subscriptions s where u.id=s.user and u.status in ('BANNED', 'ILLEGAL')")
+update=db.cursor()
 while users:
     users=users-1
     sid = cursor.fetchone()[0]
@@ -66,12 +70,14 @@ cursor.execute("update subscriptions set status='EXPIRED' where TO_DAYS(updated)
 cursor.execute("update subscriptions set status='WAITING' where TO_DAYS(updated)<TO_DAYS('"+date+"') and status='CONFIRMED'")
 
 # remind everyone who is left on the waiting list.
-waiting = cursor.execute("select firstname, locale, email, u.id, s.password from users u, subscriptions s where u.id=s.users and s.status='WAITING'")
+waiting = cursor.execute("select firstname, locale, email, u.id, s.password, u.password from users u, subscriptions s where u.id=s.user and s.status='WAITING'")
 position=0
 while waiting:
     waiting=waiting-1
     position=position+1
-    firstname, locale, email, custid, password = cursor.fetchone()
+    firstname, locale, email, custid, password, altpass = cursor.fetchone()
+    if password==None:
+	password=altpass
     print "Sending reminder email to "+str(int(custid))+" "+email
     Send(email, custid, firstname, password, position, locale)
 
