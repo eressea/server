@@ -1206,7 +1206,7 @@ magic_resistance(unit *target)
 	chance = (int)(target->race->magres * 100);
 
 	/* Magier haben einen Resistenzbonus vom Magietalent * 5%*/
-	chance += (effskill((target, SK_MAGIC))*5;
+	chance += effskill(target, SK_MAGIC)*5;
 
 	/* Auswirkungen von Zaubern auf der Einheit */
 	if (is_cursed(target->attribs, C_MAGICRESISTANCE, 0)) {
