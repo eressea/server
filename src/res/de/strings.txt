@@ -48,7 +48,7 @@ corridor1_trail;de;die %s
 caldera;de;Krater
 xmas_exit;de;Pforte
 coal;de;Kohlenstück
-coals;de;Kohlenstücke
+coal_p;de;Kohlenstücke
 
 # Himmelsrichtungen
 west;de;Westen
@@ -69,8 +69,8 @@ dir_West;de;West
 unknownunit;de;eine unbekannte Einheit
 
 # Meldungssektionen
-section_events;de;Meldungen und Ereignisse
-section_errors;de;Warnungen und Fehler
+section_event_p;de;Meldungen und Ereignisse
+section_error_p;de;Warnungen und Fehler
 section_economy;de;Wirtschaft und Handel
 section_production;de;Rohstoffe und Produktion
 section_magic;de;Magie und Artefakte
@@ -89,7 +89,7 @@ academy;de;Akademie
 magictower;de;Magierturm
 smithy;de;Schmiede
 sawmill;de;Sägewerk
-stables;de;Pferdezucht
+stable_p;de;Pferdezucht
 monument;de;Monument
 dam;de;Damm
 caravan;de;Karawanserei
@@ -105,193 +105,193 @@ temple;de;Tempel
 
 #Testitem
 wand;de;Zauberstab
-wands;de;Zauberstäbe
-wand_of_tears;de;Szepter der Tränen
-wands_of_tears;de;Szepter der Tränen
+wand_p;de;Zauberstäbe
+wand_of_tear_p;de;Szepter der Tränen
+wands_of_tear_p;de;Szepter der Tränen
 
 # Burgausbaustufen
 site;de;Grundmauern
 fortification;de;Befestigung
 tower;de;Turm
 castle;de;Burg
-fortress;de;Festung
+fortres_p;de;Festung
 citadel;de;Zitadelle
 
 # Items
 herb;de;Kraut
 herbbag;de;Kräuterbeutel
 vial;de;Phiole
-vials;de;Phiolen
+vial_p;de;Phiolen
 
 # Resourcen
 money;de;Silber
-moneys;de;Silber
+money_p;de;Silber
 hp;de;Trefferpunkt
-hps;de;Trefferpunkte
+hp_p;de;Trefferpunkte
 aura;de;Aura
-auras;de;Aura
+aura_p;de;Aura
 permaura;de;permanente Aura
-permauras;de;permanente Aura
+permaura_p;de;permanente Aura
 peasant;de;Bauer
-peasants;de;Bauern
+peasant_p;de;Bauern
 unit;de;Einheit
-units;de;Einheiten
+unit_p;de;Einheiten
 person;de;Person
-persons;de;Personen
+person_p;de;Personen
 
 #items
 runesword;de;Runenschwert
-runeswords;de;Runenschwerter
+runesword_p;de;Runenschwerter
 iron;de;Eisen
-irons;de;Eisen
+iron_p;de;Eisen
 log;de;Holz
-logs;de;Holz
+log_p;de;Holz
 stone;de;Stein
-stones;de;Steine
+stone_p;de;Steine
 cart;de;Wagen
-carts;de;Wagen
+cart_p;de;Wagen
 catapult;de;Katapult
-catapults;de;Katapulte
+catapult_p;de;Katapulte
 sword;de;Schwert
-swords;de;Schwerter
+sword_p;de;Schwerter
 spear;de;Speer
-spears;de;Speere
+spear_p;de;Speere
 mallornspear;de;Mallornspeer
-mallornspears;de;Mallornspeere
+mallornspear_p;de;Mallornspeere
 crossbow;de;Armbrust
-crossbows;de;Armbrüste
+crossbow_p;de;Armbrüste
 mallorncrossbow;de;Mallornarmbrust
-mallorncrossbows;de;Mallornarmbrüste
+mallorncrossbow_p;de;Mallornarmbrüste
 bow;de;Bogen
-bows;de;Bögen
+bow_p;de;Bögen
 mallornbow;de;Mallornbogen
-mallornbows;de;Mallornbögen
+mallornbow_p;de;Mallornbögen
 # more items
 chainmail;de;Kettenhemd
-chainmails;de;Kettenhemden
+chainmail_p;de;Kettenhemden
 plate;de;Plattenpanzer
-plates;de;Plattenpanzer
+plate_p;de;Plattenpanzer
 balm;de;Balsam
-balms;de;Balsam
+balm_p;de;Balsam
 spice;de;Gewürz
-spices;de;Gewürze
+spice_p;de;Gewürze
 jewel;de;Juwel
-jewels;de;Juwelen
+jewel_p;de;Juwelen
 myrrh;de;Myrrhe
-myrrhs;de;Myrrhe
+myrrh_p;de;Myrrhe
 oil;de;Öl
-oils;de;Öl
+oil_p;de;Öl
 silk;de;Seide
-silks;de;Seide
+silk_p;de;Seide
 incense;de;Weihrauch
-incenses;de;Weihrauch
+incense_p;de;Weihrauch
 firesword;de;Flammenschwert
-fireswords;de;Flammenschwerter
+firesword_p;de;Flammenschwerter
 shieldstone;de;Schildstein
-shieldstones;de;Schildsteine
+shieldstone_p;de;Schildsteine
 greatsword;de;Bihänder
-greatswords;de;Bihänder
+greatsword_p;de;Bihänder
 axe;de;Kriegsaxt
-axes;de;Kriegsäxte
+axe_p;de;Kriegsäxte
 greatbow;de;Elfenbogen
-greatbows;de;Elfenbögen
+greatbow_p;de;Elfenbögen
 laensword;de;Laenschwert
-laenswords;de;Laenschwerter
+laensword_p;de;Laenschwerter
 laenshield;de;Laenschild
-laenshields;de;Laenschilde
+laenshield_p;de;Laenschilde
 laenmail;de;Laenkettenhemd
-laenmails;de;Laenkettenhemden
+laenmail_p;de;Laenkettenhemden
 laen;de;Laen
-laens;de;Laen
+laen_p;de;Laen
 shield;de;Schild
-shields;de;Schilde
+shield_p;de;Schilde
 halberd;de;Hellebarde
-halberds;de;Hellebarden
+halberd_p;de;Hellebarden
 lance;de;Lanze
-lances;de;Lanzen
+lance_p;de;Lanzen
 mallornlance;de;Mallornlanze
-mallornlances;de;Mallornlanzen
+mallornlance_p;de;Mallornlanzen
 mallorn;de;Mallorn
 cookie;de;Keks
-cookies;de;Kekse
+cookie_p;de;Kekse
 apple;de;Apfel
-apples;de;Äpfel
+apple_p;de;Äpfel
 nut;de;Nuß
-nuts;de;Nüsse
+nut_p;de;Nüsse
 almond;de;Mandelkern
-almonds;de;Mandelkerne
+almond_p;de;Mandelkerne
 dragonblood;de;Drachenblut
 fairyboot;de;Feenstiefel
 healingpotion;de;Heiltrank
-healingpotions;de;Heiltränke
+healingpotion_p;de;Heiltränke
 antimagic;de;Antimagiekristall
-antimagics;de;Antimagiekristalle
+antimagic_p;de;Antimagiekristalle
 toadslime;de;Tiegel mit Krötenschleim
 amulet;de;Amulett
-amulets;de;Amulette
+amulet_p;de;Amulette
 ao_daemon;de;Auge des Dämon
-ao_daemons;de;Augen des Dämon
+ao_daemon_p;de;Augen des Dämon
 griphonwing;de;Schwinge des Greifen
-griphonwings;de;Schwingen des Greifen
+griphonwing_p;de;Schwingen des Greifen
 ao_chastity;de;Amulett der Keuschheit
-ao_chastitys;de;Amulette der Keuschheit
+ao_chastity_p;de;Amulette der Keuschheit
 aoh;de;Amulett der Heilung
-aohs;de;Amulette der Heilung
+aoh_p;de;Amulette der Heilung
 aog;de;Amulett des Treffens
-aogs;de;Amulette des Treffens
+aog_p;de;Amulette des Treffens
 aots;de;Amulett des wahren Sehens
-aotss;de;Amulette des wahren Sehens
+aots_p;de;Amulette des wahren Sehens
 aoc;de;Katzenamulett
-aocs;de;Katzenamulette
+aoc_p;de;Katzenamulette
 roi;de;Ring der Unsichtbarkeit
-rois;de;Ringe der Unsichtbarkeit
+roi_p;de;Ringe der Unsichtbarkeit
 rop;de;Ring der Macht
-rops;de;Ringe der Macht
+rop_p;de;Ringe der Macht
 roqf;de;Ring der flinken Finger
-roqfs;de;Ringe der flinken Finger
+roqf_p;de;Ringe der flinken Finger
 horse;de;Pferd
-horses;de;Pferde
+horse_p;de;Pferde
 magicherbbag;de;Magischer Kräuterbeutel
-magicherbbags;de;Magische Kräuterbeutel
+magicherbbag_p;de;Magische Kräuterbeutel
 moneybag;de;Silberbeutel
 moneychest;de;Silberkassette
 dragonhoard;de;Drachenhort
 dragonhead;de;Drachenkopf
-dragonheads;de;Drachenköpfe
+dragonhead_p;de;Drachenköpfe
 eyeofdragon;de;Auge des Drachen
-eyeofdragons;de;Augen des Drachen
+eyeofdragon_p;de;Augen des Drachen
 rustysword;de;Schartiges Schwert
-rustyswords;de;Schartige Schwerter
+rustysword_p;de;Schartige Schwerter
 rustyshield;de;Rostiges Schild
-rustyshields;de;Rostige Schilde
+rustyshield_p;de;Rostige Schilde
 rustychainmail;de;Rostiges Kettenhemd
-rustychainmails;de;Rostige Kettenhemden
+rustychainmail_p;de;Rostige Kettenhemden
 soc;de;Magischer Kräuterbeutel
-socs;de;Magische Kräuterbeutel
+soc_p;de;Magische Kräuterbeutel
 ror;de;Ring der Regeneration
-rors;de;Ringe der Regeneration
+ror_p;de;Ringe der Regeneration
 aod;de;Amulett der Dunkelheit
-aods;de;Amulette der Dunkelheit
+aod_p;de;Amulette der Dunkelheit
 magicbag;de;Zauberbeutel
 dreameye;de;Traumauge
-dreameyes;de;Traumaugen
+dreameye_p;de;Traumaugen
 seaserpenthead;de;Seeschlangenkopf
-seaserpentheads;de;Seeschlangenköpfe
-aurafocus;de;Aurafocus
-aurafocuses;de;Aurafocuse
+seaserpenthead_p;de;Seeschlangenköpfe
+aurafocu_p;de;Aurafocus
+aurafocuse_p;de;Aurafocuse
 presspass;de;Akkredition des Xontormia-Expreß
-presspasses;de;Akkreditionen des Xontormia-Expreß
+presspass_p;de;Akkreditionen des Xontormia-Expreß
 trollbelt;de;Gürtel der Trollstärke
 elvenhorse;de;Elfenpferd
-elvenhorses;de;Elfenpferde
-pegasus;de;Pegasus
+elvenhorse_p;de;Elfenpferde
+pegasu_p;de;Pegasus
 pegasi;de;Pegasi
 dolphin;de;Delphin
-dolphins;de;Delphine
+dolphin_p;de;Delphine
 museumticket;de;Eintrittskarte des Großen Museum
-museumtickets;de;Eintrittskarten des Großen Museum
+museumticket_p;de;Eintrittskarten des Großen Museum
 museumexitticket;de;Rückkehrticket des Großen Museum
-museumexittickets;de;Rückkehrtickets des Großen Museum
+museumexitticket_p;de;Rückkehrtickets des Großen Museum
 
 # herb singular
 h0;de;Flachwurz
@@ -317,27 +317,27 @@ h19;de;Weißer Wüterich
 h20;de;Schneekristall
 
 #herb plural
-h0s;de;Flachwurz
-h1s;de;Würzige Wagemut
-h2s;de;Eulenaugen
-h3s;de;Grüne Spinneriche
-h4s;de;Blaue Baumringel
-h5s;de;Elfenlieb
-h6s;de;Gurgelkräuter
-h7s;de;Knotige Saugwurze
-h8s;de;Blasenmorcheln
-h9s;de;Wasserfinder
-h10s;de;Kakteenschwitze
-h11s;de;Sandfäulen
-h12s;de;Windbeutel
-h13s;de;Fjordwuchse
-h14s;de;Alraunen
-h15s;de;Steinbeißer
-h16s;de;Spaltwachse
-h17s;de;Höhlenglimme
-h18s;de;Eisblumen
-h19s;de;Weiße Wüteriche
-h20s;de;Schneekristalle
+h0_p;de;Flachwurz
+h1_p;de;Würzige Wagemut
+h2_p;de;Eulenaugen
+h3_p;de;Grüne Spinneriche
+h4_p;de;Blaue Baumringel
+h5_p;de;Elfenlieb
+h6_p;de;Gurgelkräuter
+h7_p;de;Knotige Saugwurze
+h8_p;de;Blasenmorcheln
+h9_p;de;Wasserfinder
+h10_p;de;Kakteenschwitze
+h11_p;de;Sandfäulen
+h12_p;de;Windbeutel
+h13_p;de;Fjordwuchse
+h14_p;de;Alraunen
+h15_p;de;Steinbeißer
+h16_p;de;Spaltwachse
+h17_p;de;Höhlenglimme
+h18_p;de;Eisblumen
+h19_p;de;Weiße Wüteriche
+h20_p;de;Schneekristalle
 
 p0;de;Siebenmeilentee
 p1;de;Goliathwasser
@@ -355,28 +355,28 @@ p12;de;Trank der Wahrheit
 p13;de;Elixier der Macht
 p14;de;Heiltrank
 
-p0s;de;Siebenmeilentees
-p1s;de;Goliathwasser
-p2s;de;Wasser des Lebens
-p3s;de;Schaffenstrünke
-p4s;de;Wundsalben
-p5s;de;Bauernblut
-p6s;de;Gehirnschmalz
-p7s;de;Dumpfbackenbrote
-p8s;de;Nestwärme
-p9s;de;Pferdeglück
-p10s;de;Berserkerblut
-p11s;de;Bauernlieb
-p12s;de;Tränke der Wahrheit
-p13s;de;Elixiere der Macht
-p14s;de;Heiltränke
+p0_p;de;Siebenmeilentees
+p1_p;de;Goliathwasser
+p2_p;de;Wasser des Lebens
+p3_p;de;Schaffenstrünke
+p4_p;de;Wundsalben
+p5_p;de;Bauernblut
+p6_p;de;Gehirnschmalz
+p7_p;de;Dumpfbackenbrote
+p8_p;de;Nestwärme
+p9_p;de;Pferdeglück
+p10_p;de;Berserkerblut
+p11_p;de;Bauernlieb
+p12_p;de;Tränke der Wahrheit
+p13_p;de;Elixiere der Macht
+p14_p;de;Heiltränke
 
 # Spezialitems
 lmsreward;de;Gürtel der Heldentaten
-lmsrewards;de;Gürtel der Heldentaten
+lmsreward_p;de;Gürtel der Heldentaten
 
 # Parameter
-ALLES;de;ALLES
+ALLE_p;de;ALLES
 BAUERN;de;BAUERN
 BURG;de;BURG
 EINHEIT;de;EINHEIT
@@ -393,7 +393,6 @@ SCHIFF;de;SCHIFF
 SILBER;de;SILBER
 STRAßEN;de;STRAßEN
 TEMPORÄRE;de;TEMPORÄRE
-FEIND;de;FEIND
 FLIEHE;de;FLIEHE
 GEBÄUDE;de;GEBÄUDE
 GIB;de;GIB
@@ -406,7 +405,7 @@ AGGRESSIV;de;AGGRESSIV
 DEFENSIV;de;DEFENSIV
 STUFE;de;STUFE
 HELFE;de;HELFE
-FREMDES;de;FREMDES
+FREMDE_p;de;FREMDES
 AURA;de;AURA
 UM;de;UM
 BEISTAND;de;BEISTAND
@@ -440,7 +439,7 @@ sk_polearm;de;Stangenwaffen
 sk_quarrying;de;Steinbau
 sk_taxation;de;Steuereintreiben
 sk_roadwork;de;Straßenbau
-sk_tactics;de;Taktik
+sk_tactic_p;de;Taktik
 sk_stealth;de;Tarnung
 sk_entertainment;de;Unterhaltung
 sk_weaponsmithing;de;Waffenbau
@@ -527,7 +526,7 @@ Eulen;de;Eulen
 Geist;de;Geist
 Geister;de;Geister
 Goblin;de;Goblin
-Goblins;de;Goblins
+Goblin_p;de;Goblins
 Halbling;de;Halbling
 Halblinge;de;Halblinge
 Hirntöter;de;Hirntöter
@@ -537,14 +536,14 @@ Jungdrache;de;Jungdrache
 Jungdrachen;de;Jungdrachen
 Katze;de;Katze
 Katzen;de;Katzen
-Luchs;de;Luchs
+Luch_p;de;Luchs
 Luchse;de;Luchse
 Meermensch;de;Meermensch
 Meermenschen;de;Meermenschen
 Mensch;de;Mensch
 Menschen;de;Menschen
 Ork;de;Ork
-Orks;de;Orks
+Ork_p;de;Orks
 Riesenschildkröte;de;Riesenschildkröte
 Riesenschildkröten;de;Riesenschildkröten
 Schablone;de;Schablone
@@ -558,45 +557,45 @@ Untoter;de;Untoter
 Warg;de;Warg
 Warge;de;Warge
 Zombie;de;Zombie
-Zombies;de;Zombies
+Zombie_p;de;Zombies
 Zwerg;de;Zwerg
 Zwerge;de;Zwerge
 
 # races, future use:
 rc_lynx;de;Luchse
-rc_unicorns;de;Einhörner
-rc_wolves;de;Warge
-rc_dragons;de;Drachen
-rc_catdragons;de;Katzendrachen
-rc_ghosts;de;Geister
-rc_cats;de;Katzen
-rc_humans;de;Menschen
+rc_unicorn_p;de;Einhörner
+rc_wolve_p;de;Warge
+rc_dragon_p;de;Drachen
+rc_catdragon_p;de;Katzendrachen
+rc_ghost_p;de;Geister
+rc_cat_p;de;Katzen
+rc_human_p;de;Menschen
 rc_cat;de;Katze
 rc_elf;de;Elf
 rc_human;de;Mensch
-rc_elves;de;Elfen
+rc_elve_p;de;Elfen
 rc_aquarian;de;Meermensch
-rc_dwarves;de;Zwerge
-rc_lynxs;de;Luchs
+rc_dwarve_p;de;Zwerge
+rc_lynx_p;de;Luchs
 rc_unicorn;de;Einhorn
 rc_wolf;de;Warg
 rc_dragon;de;Drache
 rc_catdragon;de;Katzendrache
 rc_dwarf;de;Zwerg
-rc_aquarians;de;Meermenschen
-rc_insects;de;Insekten
+rc_aquarian_p;de;Meermenschen
+rc_insect_p;de;Insekten
 rc_insect;de;Insekt
 rc_ghost;de;Geist
 rc_halfling;de;Halbling
-rc_halflings;de;Halblinge
-rc_trolls;de;Trolle
+rc_halfling_p;de;Halblinge
+rc_troll_p;de;Trolle
 rc_troll;de;Troll
 rc_undead;de;Untote
-rc_undeads;de;Untoter
+rc_undead_p;de;Untoter
 rc_owl;de;Eule
 rc_giantturtle;de;Riesenschildkröte
-rc_orcs;de;Orks
+rc_orc_p;de;Orks
 rc_orc;de;Ork
 rc_zombie;de;Zombie
-rc_zombies;de;Zombies
+rc_zombie_p;de;Zombies
 rc_shadowknight;de;Schattenritter

@@ -58,6 +58,7 @@
 #include <goodies.h>
 #include <crmessage.h>
 #include <nrmessage.h>
+#include <language.h>
 
 /* libc includes */
 #include <math.h>
@@ -74,6 +75,18 @@ extern int quiet;
 /* globals */
 #define C_REPORT_VERSION 57
 
+#define TAG_LOCALE "de"
+#ifdef TAG_LOCALE
+static const char * 
+crtag(const char * key) 
+{
+	static const locale * lang = NULL;
+	if (!lang) lang = find_locale(TAG_LOCALE);
+	return locale_string(lang, key);
+}
+#else
+#define crtag(x) (x)
+#endif
 /*
  * translation table
  */
@@ -103,7 +116,7 @@ add_translation(const char * key, const char * value)
 		t->next = translation_table[kk];
 		translation_table[kk] = t;
 	}
-	return key;
+	return crtag(key);
 }
 
 static void

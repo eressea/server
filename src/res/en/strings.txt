@@ -20,8 +20,8 @@ dir_West;en;West
 
 unknownunit;en;an unknown unit
 
-section_events;en;Messages and Events
-section_errors;en;Warnings and Errors
+section_event_p;en;Messages and Events
+section_error_p;en;Warnings and Errors
 section_economy;en;Economy and Trade
 section_production;en;Resources and Production
 section_magic;en;Magic and Artefacts
@@ -31,255 +31,254 @@ section_battle;en;Battles
 section_none;en;Miscellaneous
 
 # Building Types
-genericbuilding;en;structure
-illusioncastle;en;fairy castle
+academy;en;academy
 blessedstonecircle;en;blessed stonecircle
-stonecircle;en;stonecircle
-inn;en;inn
-tunnel;en;tunnel
 caravan;en;caravanserei
 dam;en;dam
+genericbuilding;en;structure
+harbour;en;harbour
+illusioncastle;en;fairy castle
+inn;en;inn
+lighthouse;en;lighthouse
+magictower;en;magic tower
+mine;en;mine
 monument;en;monument
-stables;en;stables
+quarry;en;quarry
 sawmill;en;sawmill
 smithy;en;smithy
-magictower;en;magic tower
-academy;en;academy
-harbour;en;harbour
-quarry;en;quarry
-mine;en;mine
-lighthouse;en;lighthouse
+stables;en;stables
+stonecircle;en;stonecircle
+tunnel;en;tunnel
 
 # Burgausbaustufen
 site;en;site
 fortification;en;fortification
 tower;en;tower
 castle;en;castle
-fortress;en;fortress
+fortres_p;en;fortress
 citadel;en;citadel
 
 # Items
 herb;en;herb
 vial;en;vial
-vials;en;vials
+vial_p;en;vials
 
 # Resourcen
 money;en;silver
-moneys;en;silver
+money_p;en;silver
 hp;en;hp
-hps;en;hps
+hp_p;en;hps
 aura;en;aura
-auras;en;auras
+aura_p;en;auras
 permaura;en;permaura
-permauras;en;permauras
+permaura_p;en;permauras
 peasant;en;peasant
-peasants;en;peasants
+peasant_p;en;peasants
 
 #items
-iron;en;iron
-irons;en;irons
-log;en;log
-logs;en;logs
-stone;en;stone
-stones;en;stones
-cart;en;cart
-carts;en;carts
-catapult;en;catapult
-catapults;en;catapults
-sword;en;sword
-swords;en;swords
-spear;en;spear
-spears;en;spears
-crossbow;en;crossbow
-crossbows;en;crossbows
-bow;en;bow
-bows;en;bows
-# more items
-chainmail;en;chainmail
-chainmails;en;chainmails
-plate;en;plate
-plates;en;plates
-firesword;en;flaming sword
-fireswords;en;flaming swords
-shieldstone;en;shieldstone
-shieldstones;en;shieldstones
-greatsword;en;great sword
-greatswords;en;great swords
-axe;en;axe
-axes;en;axes
-greatbow;en;great bow
-greatbows;en;great bows
-laensword;en;laen sword
-laenswords;en;laen swords
-laenshield;en;laen shield
-laenshields;en;laen shields
-laenmail;en;laen chainmail
-laenmails;en;laen chainmails
-laen;en;laen
-shield;en;shield
-shields;en;shields
-halberd;en;halberd
-halberds;en;halberds
-lance;en;lance
-lances;en;lances
-mallorn;en;mallorn
-cookie;en;cookie
-cookies;en;cookies
-apple;en;apple
-apples;en;apples
-nut;en;nut
-nuts;en;nuts
 almond;en;almond
-almonds;en;almonds
-dragonblood;en;dragonblood
-fairyboot;en;fairyboot
-healingpotion;en;healingpotion
-healingpotions;en;healingpotions
-antimagic;en;antimagic cristal
-antimagics;en;antimagic cristals
-toadslime;en;toadslime
+almond_p;en;almonds
 amulet;en;amulet
-amulets;en;amulets
-aoh;en;amulet of healing
-aohs;en;amulets of healing
-aog;en;amulet of gathering
-aogs;en;amulets of gathering
-aots;en;amulet of true seeing
-aotss;en;amulets of true seeing
-aoc;en;amulet of the kitten
-aocs;en;amulets of the kitten
-roi;en;ring of invisibility
-rois;en;rings of invisibility
-rop;en;ring of power
-rops;en;rings of power
-roqf;en;ring of quick fingers
-roqfs;en;rings of quick fingers
-horse;en;horse
-horses;en;horses
-herbbag;en;herbbag
-herbbags;en;herbbags
-moneybag;en;moneybag
-moneychest;en;moneychest
-dragonhoard;en;dragonhoard
-dragonhead;en;dragonhead
-dragonheads;en;dragonheads
-eyeofdragon;en;eye of dragon
-eyeofdragons;en;eye of dragons
-rustysword;en;rusty sword
-rustyswords;en;rusty swords
-rustyshield;en;rusty shield
-rustyshields;en;rusty shields
-rustychainmail;en;rustychainmail
-rustychainmails;en;rustychainmails
-soc;en;sack of holding
-socs;en;sacks of holding
-ror;en;ring of regeneration
-rors;en;rings of regeneration
-aod;en;amulet of darkness
-aods;en;amulets of darkness
-magicbag;en;magic bag
-dreameye;en;dreameye
-dreameyes;en;dreameyes
-seaserpenthead;en;seaserpenthead
-seaserpentheads;en;seaserpentheads
-aurafocus;en;aurafocus
-aurafocuses;en;aurafocuses
-presspass;en;presspass
-presspasses;en;presspasses
-trollbelt;en;trollbelt
-person;en;man
-persons;en;men
-unit;en;unit
-units;en;units
+amulet_p;en;amulets
+antimagic;en;antimagic cristal
+antimagic_p;en;antimagic cristals
 ao_chastity;en;amulet of chastity
-ao_chastitys;en;amulets of chastity
-laens;en;laen
-pegasus;en;pegasus
-pegasi;en;pegasi
-elvenhorse;en;elven horse
-elvenhorses;en;elven horses
-dolphin;en;dolphin
-dolphins;en;dolphins
-runesword;en;runesword
-runeswords;en;runeswords
-magicherbbag;en;bag of conservation
-mallornspear;en;mallorn spear
-mallornspears;en;mallorn spear
-mallornlance;en;mallorn lance
-mallornlances;en;mallorn lances
-mallornbow;en;mallorn bow
-mallornbows;en;mallorn bows
-mallorncrossbow;en;mallorn crossbow
-mallorncrossbows;en;mallorn crossbows
+ao_chastity_p;en;amulets of chastity
 ao_daemon;en;eye of the Demon
-ao_daemons;en;eye of the Demon
-museumticket;en;ticket to the grand museum
-museumtickets;en;tickets to the grand museum
-museumexitticket;en;returnticket for the grand museum
-museumexittickets;en;returntickets for the grand museum
+ao_daemon_p;en;eye of the Demon
+aoc;en;amulet of the kitten
+aoc_p;en;amulets of the kitten
+aod;en;amulet of darkness
+aod_p;en;amulets of darkness
+aog;en;amulet of gathering
+aog_p;en;amulets of gathering
+aoh;en;amulet of healing
+aoh_p;en;amulets of healing
+aots;en;amulet of true seeing
+aots_p;en;amulets of true seeing
+apple;en;apple
+apple_p;en;apples
+aurafocu_p;en;aurafocus
+aurafocuse_p;en;aurafocuses
+axe;en;axe
+axe_p;en;axes
+bow;en;bow
+bow_p;en;bows
+cart;en;cart
+cart_p;en;carts
+catapult;en;catapult
+catapult_p;en;catapults
+chainmail;en;chainmail
+chainmail_p;en;chainmails
+cookie;en;cookie
+cookie_p;en;cookies
+crossbow;en;crossbow
+crossbow_p;en;crossbows
+dolphin;en;dolphin
+dolphin_p;en;dolphins
+dragonblood;en;dragonblood
+dragonhead;en;dragonhead
+dragonhead_p;en;dragonheads
+dragonhoard;en;dragonhoard
+dreameye;en;dreameye
+dreameye_p;en;dreameyes
+elvenhorse;en;elven horse
+elvenhorse_p;en;elven horses
+eyeofdragon;en;eye of dragon
+eyeofdragon_p;en;eye of dragons
+fairyboot;en;fairyboot
+firesword;en;flaming sword
+firesword_p;en;flaming swords
+greatbow;en;great bow
+greatbow_p;en;great bows
+greatsword;en;great sword
+greatsword_p;en;great swords
 griphonwing;en;wing of the gryphon
-griphonwings;en;wings of the gryphon
+griphonwing_p;en;wings of the gryphon
+halberd;en;halberd
+halberd_p;en;halberds
+healingpotion;en;healingpotion
+healingpotion_p;en;healingpotions
+herbbag;en;herbbag
+herbbag_p;en;herbbags
+horse;en;horse
+horse_p;en;horses
+iron;en;iron
+iron_p;en;irons
+laen;en;laen
+laen_p;en;laen
+laenmail;en;laen chainmail
+laenmail_p;en;laen chainmails
+laenshield;en;laen shield
+laenshield_p;en;laen shields
+laensword;en;laen sword
+laensword_p;en;laen swords
+lance;en;lance
+lance_p;en;lances
+log;en;log
+log_p;en;logs
+magicbag;en;magic bag
+magicherbbag;en;bag of conservation
+mallorn;en;mallorn
+mallornbow;en;mallorn bow
+mallornbow_p;en;mallorn bows
+mallorncrossbow;en;mallorn crossbow
+mallorncrossbow_p;en;mallorn crossbows
+mallornlance;en;mallorn lance
+mallornlance_p;en;mallorn lances
+mallornspear;en;mallorn spear
+mallornspear_p;en;mallorn spear
+moneybag;en;silverbag
+moneychest;en;silverchest
+museumexitticket;en;returnticket for the grand museum
+museumexitticket_p;en;returntickets for the grand museum
+museumticket;en;ticket to the grand museum
+museumticket_p;en;tickets to the grand museum
+nut;en;nut
+nut_p;en;nuts
+pegasi;en;pegasi
+pegasu_p;en;pegasus
+person;en;man
+person_p;en;men
+plate;en;plate
+plate_p;en;plates
+presspass;en;presspass
+presspass_p;en;presspasses
+roi;en;ring of invisibility
+roi_p;en;rings of invisibility
+rop;en;ring of power
+rop_p;en;rings of power
+roqf;en;ring of quick fingers
+roqf_p;en;rings of quick fingers
+ror;en;ring of regeneration
+ror_p;en;rings of regeneration
+runesword;en;runesword
+runesword_p;en;runeswords
+rustychainmail;en;rustychainmail
+rustychainmail_p;en;rustychainmails
+rustyshield;en;rusty shield
+rustyshield_p;en;rusty shields
+rustysword;en;rusty sword
+rustysword_p;en;rusty swords
+seaserpenthead;en;seaserpenthead
+seaserpenthead_p;en;seaserpentheads
+shield;en;shield
+shield_p;en;shields
+shieldstone;en;shieldstone
+shieldstone_p;en;shieldstones
+soc;en;sack of holding
+soc_p;en;sacks of holding
+spear;en;spear
+spear_p;en;spears
+stone;en;stone
+stone_p;en;stones
+sword;en;sword
+sword_p;en;swords
+toadslime;en;toadslime
+trollbelt;en;trollbelt
+unit;en;unit
+unit_p;en;units
 
 # luxury goods
 balm;en;balm
 spice;en;spice
-jewel;en;jewel
-jewels;en;jewels
+jewel;en;gem
+jewel_p;en;gems
 myrrh;en;myrrh
 oil;en;oil
 silk;en;silk
 incense;en;incense
-balms;en;balm
-spices;en;spice
-myrrhs;en;myrrh
-oils;en;oil
-silks;en;silk
-incenses;en;incense
+balm_p;en;balm
+spice_p;en;spice
+myrrh_p;en;myrrh
+oil_p;en;oil
+silk_p;en;silk
+incense_p;en;incense
 
 # Spezialitems
 lmsreward;en;Belt of Heroic Legends
-lmsrewards;en;Belts of Heroic Legends
+lmsreward_p;en;Belts of Heroic Legends
 
 # Terraintypen
+activevolcano;en;active volcano
+corridor1;en;corridor
+desert;en;desert
+firewall;en;firewall
+fog;en;fog
+forest;en;forest
+glacier;en;glacier
+grassland;en;steppe
+hall1;en;hallway
+hell;en;hell
+highland;en;highland
+iceberg;en;iceberg
 maelstrom;en;maelstrom
+mountain;en;mountain
 ocean;en;ocean
 plain;en;plain
-forest;en;forest
 swamp;en;swamp
-desert;en;desert
-highland;en;highland
-mountain;en;mountain
-glacier;en;glacier
-firewall;en;firewall
-grassland;en;steppe
-volcano;en;volcano
-fog;en;fog
-iceberg;en;iceberg
 thickfog;en;thick fog
-hell;en;hell
-activevolcano;en;active volcano
-hall1;en;hallway
-corridor1;en;corridor
+volcano;en;volcano
 
+activevolcano_trail;en;an %s
+corridor1_trail;en;a %s
+desert_trail;en;the deserts of %s
+firewall_trail;en;a %s
+fog_trail;en;fog_trail
+forest_trail;en;the forests of %s
+glacier_trail;en;the glacier of %s
+grassland_trail;en;the steppe of %s
+hall1_trail;en;the %s
+hell_trail;en;%s
+highland_trail;en;the highlands of %s
+iceberg_trail;en;an %s
 maelstrom_trail;en;a %s
+mountain_trail;en;the mountains of %s
 ocean_trail;en;the %s
 plain_trail;en;the plain of %s
-forest_trail;en;the forests of %s
 swamp_trail;en;the swamps of %s
-desert_trail;en;the deserts of %s
-highland_trail;en;the highlands of %s
-mountain_trail;en;the mountains of %s
-glacier_trail;en;the glacier of %s
-firewall_trail;en;a %s
-grassland_trail;en;the steppe of %s
-volcano_trail;en;a %s
-fog_trail;en;fog_trail
-iceberg_trail;en;an %s
 thickfog_trail;en;%s
-hell_trail;en;%s
-activevolcano_trail;en;an %s
-hall1_trail;en;the %s
-corridor1_trail;en;a %s
+volcano_trail;en;a %s
 
 caldera;en;caldera
 xmas_exit;en;portal
@@ -289,261 +288,261 @@ sehr viele;en;a great many
 
 # intranslatables:
 h0;en;Flachwurz
-h0s;en;Flachwurz
+h0_p;en;Flachwurz
 h1;en;Würziger Wagemut
-h1s;en;Würzige Wagemut
+h1_p;en;Würzige Wagemut
 h2;en;Eulenauge
-h2s;en;Eulenaugen
+h2_p;en;Eulenaugen
 h3;en;Grüner Spinnerich
-h3s;en;Grüne Spinneriche
+h3_p;en;Grüne Spinneriche
 h4;en;Blauer Baumringel
-h4s;en;Blaue Baumringel
+h4_p;en;Blaue Baumringel
 h5;en;Elfenlieb
-h5s;en;Elfenlieb
+h5_p;en;Elfenlieb
 h6;en;Gurgelkraut
-h6s;en;Gurgelkräuter
+h6_p;en;Gurgelkräuter
 h7;en;Knotiger Saugwurz
-h7s;en;Knotige Saugwurze
+h7_p;en;Knotige Saugwurze
 h8;en;Blasenmorchel
-h8s;en;Blasenmorcheln
+h8_p;en;Blasenmorcheln
 h9;en;Wasserfinder
-h9s;en;Wasserfinder
+h9_p;en;Wasserfinder
 h10;en;Kakteenschwitz
-h10s;en;Kakteenschwitze
+h10_p;en;Kakteenschwitze
 h11;en;Sandfäule
-h11s;en;Sandfäulen
+h11_p;en;Sandfäulen
 h12;en;Windbeutel
-h12s;en;Windbeutel
+h12_p;en;Windbeutel
 h13;en;Fjordwuchs
-h13s;en;Fjordwuchse
+h13_p;en;Fjordwuchse
 h14;en;Alraune
-h14s;en;Alraunen
+h14_p;en;Alraunen
 h15;en;Steinbeißer
-h15s;en;Steinbeißer
+h15_p;en;Steinbeißer
 h16;en;Spaltwachs
-h16s;en;Spaltwachse
+h16_p;en;Spaltwachse
 h17;en;Höhlenglimm
-h17s;en;Höhlenglimme
+h17_p;en;Höhlenglimme
 h18;en;Eisblume
-h18s;en;Eisblumen
+h18_p;en;Eisblumen
 h19;en;Weißer Wüterich
-h19s;en;Weiße Wüteriche
+h19_p;en;Weiße Wüteriche
 h20;en;Schneekristall
-h20s;en;Schneekristalle
+h20_p;en;Schneekristalle
 p0;en;Siebenmeilentee
-p0s;en;Siebenmeilentees
+p0_p;en;Siebenmeilentees
 p1;en;Goliathwasser
-p1s;en;Goliathwasser
+p1_p;en;Goliathwasser
 p2;en;Wasser des Lebens
-p2s;en;Wasser des Lebens
+p2_p;en;Wasser des Lebens
 p3;en;Schaffenstrunk
-p3s;en;Schaffenstrünke
+p3_p;en;Schaffenstrünke
 p4;en;Wundsalbe
-p4s;en;Wundsalben
+p4_p;en;Wundsalben
 p5;en;Bauernblut
-p5s;en;Bauernblut
+p5_p;en;Bauernblut
 p6;en;Gehirnschmalz
-p6s;en;Gehirnschmalz
+p6_p;en;Gehirnschmalz
 p7;en;Dumpfbackenbrot
-p7s;en;Dumpfbackenbrote
+p7_p;en;Dumpfbackenbrote
 p8;en;Nestwärme
-p8s;en;Nestwärme
+p8_p;en;Nestwärme
 p9;en;Pferdeglück
-p9s;en;Pferdeglück
+p9_p;en;Pferdeglück
 p10;en;Berserkerblut
-p10s;en;Berserkerblut
+p10_p;en;Berserkerblut
 p11;en;Bauernlieb
-p11s;en;Bauernlieb
+p11_p;en;Bauernlieb
 p12;en;Trank der Wahrheit
-p12s;en;Tränke der Wahrheit
+p12_p;en;Tränke der Wahrheit
 p13;en;Elixier der Macht
-p13s;en;Elixiere der Macht
+p13_p;en;Elixiere der Macht
 p14;en;Heiltrank
-p14s;en;Heiltränke
+p14_p;en;Heiltränke
 
 # Parameters
+AGGRESSIV;en;AGGRESSIVE
 ALLES;en;ALL
+ANZAHL;en;NUMBER
+AURA;en;AURA
 BAUERN;en;PEASANTS
+BEISTAND;en;AID
+BEWACHE;en;GUARD
 BURG;en;FORTIFICATION
+DEFENSIV;en;DEFENSIVE
 EINHEIT;en;UNIT
-PRIVAT;en;PRIVATE
+FLIEHE;en;FLEE
+FREMDES;en;FOREIGN
+GEBÄUDE;en;BUILDING
+GEGENSTÄNDE;en;ITEMS
+GIB;en;GIVE
+GNADE;en;MERCY
+HELFE;en;HELP
 HINTEN;en;BACK
+HINTER;en;AFTER
 KOMMANDO;en;CONTROL
 KRÄUTER;en;HERBS
+KÄMPFE;en;COMBAT
 NICHT;en;NOT
 NÄCHSTER;en;NEXT
 PARTEI;en;PARTEI
+PAUSE;en;PAUSE
 PERSONEN;en;MEN
+PRIVAT;en;PRIVATE
 REGION;en;REGION
 SCHIFF;en;SHIP
+SILBER;en;SILVER
 STRAßEN;en;ROADS
-TEMPORÄRE;en;TEMPORARY
-FLIEHE;en;FLEE
-GEBÄUDE;en;BUILDING
-GIB;en;GIVE
-KÄMPFE;en;COMBAT
-BEWACHE;en;GUARD
-ZAUBERBUCH;en;SPELLBOOK
-PAUSE;en;PAUSE
-VORNE;en;FRONT
-AGGRESSIV;en;AGGRESSIVE
-DEFENSIV;en;DEFENSIVE
 STUFE;en;LEVEL
-HELFE;en;HELP
-FREMDES;en;ALIEN
-AURA;en;AURA
-UM;en;FOR
-BEISTAND;en;AID
-GNADE;en;MERCY
-HINTER;en;AFTER
-VOR;en;BEFORE
-ANZAHL;en;NUMBER
-GEGENSTÄNDE;en;ITEMS
+TEMPORÄRE;en;TEMPORARY
 TRÄNKE;en;POTIONS
-SILBER;en;MONEY
+UM;en;FOR
+VOR;en;BEFORE
+VORNE;en;FRONT
+ZAUBERBUCH;en;SPELLBOOK
 
 # Skills
 sk_alchemy;en;alchemy
-sk_crossbow;en;crossbow
-sk_stamina;en;stamina
-sk_mining;en;mining
+sk_armorer;en;armorer
 sk_bow;en;bow
 sk_building;en;building
-sk_trade;en;trade
-sk_melee;en;melee
-sk_forestry;en;forestry
+sk_cartmaking;en;cartmaking
 sk_catapult;en;catapult
+sk_crossbow;en;crossbow
+sk_entertainment;en;entertainment
+sk_espionage;en;espionage
+sk_forestry;en;forestry
 sk_herbalism;en;herbalism
 sk_magic;en;magic
-sk_training;en;training
-sk_riding;en;riding
-sk_armorer;en;armorer
-sk_shipcraft;en;shipcraft
-sk_sailing;en;sailing
-sk_espionage;en;espionage
+sk_melee;en;melee
+sk_mining;en;mining
+sk_perception;en;perception
 sk_polearm;en;polearm
 sk_quarrying;en;quarrying
-sk_taxation;en;taxation
+sk_riding;en;riding
 sk_roadwork;en;roadwork
-sk_tactics;en;tactics
+sk_sailing;en;sailing
+sk_shipcraft;en;shipcraft
+sk_stamina;en;endurance
 sk_stealth;en;stealth
-sk_entertainment;en;entertainment
-sk_weaponsmithing;en;weaponsmithing
+sk_tactics;en;tactics
+sk_taxation;en;taxation
+sk_trade;en;trade
+sk_training;en;taming
 sk_unarmed;en;unarmed combat
-sk_cartmaking;en;cartmaking
-sk_perception;en;perception
+sk_weaponsmithing;en;weaponsmithing
 
 # Keywords
 //;en;//
-BANNER;en;BANNER
 ARBEITEN;en;WORK
 ATTACKIEREN;en;ATTACK
-BIETEN;en;BIDD
+BANNER;en;BANNER
 BEKLAUEN;en;STEAL
 BELAGERE;en;BESIEGE
 BENENNEN;en;NAME
 BENUTZEN;en;USE
 BESCHREIBE;en;DESCRIBE
+BETEN;en;PRAY
 BETRETEN;en;ENTER
 BEWACHEN;en;GUARD
+BIETEN;en;BID
 BOTSCHAFT;en;MESSAGE
+DEFAULT;en;DEFAULT
+EMAIL;en;EMAIL
 ENDE;en;END
-FAHREN;en;HITCH
-NUMMER;en;NUMBER
+FAHREN;en;RIDE
 FOLGEN;en;FOLLOW
 FORSCHEN;en;RESEARCH
+GM;en;GM
+GRUPPE;en;GROUP
 HELFEN;en;HELP
-KÄMPFEN;en;COMBAT
+JIHAD;en;JIHAD
 KAMPFZAUBER;en;COMBATSPELL
 KAUFEN;en;BUY
 KONTAKTIERE;en;CONTACT
+KÄMPFEN;en;COMBAT
 LEHREN;en;TEACH
 LERNEN;en;LEARN
 LIEFERE;en;SUPPLY
+LOCALE;en;LOCALE
 MACHEN;en;MAKE
+MAGIEGEBIET;en;SCHOOL
+MEINUNG;en;OPINION
 NACH;en;MOVE
+NEUSTART;en;RESTART
+NUMMER;en;NUMBER
+OPFERE;en;SACRIFICE
+OPTION;en;OPTION
 PASSWORT;en;PASSWORD
+PIRATERIE;en;PIRACY
 REKRUTIEREN;en;RECRUIT
+REPORT;en;REPORT
 RESERVIEREN;en;RESERVE
 ROUTE;en;ROUTE
 SABOTIEREN;en;SABOTAGE
-OPTION;en;OPTION
+SORTIEREN;en;SORT
 SPIONIEREN;en;SPY
 STIRB;en;QUIT
-TARNEN;en;TARN
-TRANSPORTIEREN;en;TRANSPORT
+TARNEN;en;HIDE
+TRANSPORTIEREN;en;CARRY
 TREIBEN;en;TAX
 UNTERHALTEN;en;ENTERTAIN
+URSPRUNG;en;ORIGIN
+VERGESSE;en;FORGET
 VERKAUFE;en;SELL
 VERLASSE;en;LEAVE
-VERGESSE;en;FORGET
 ZAUBERE;en;CAST
 ZEIGEN;en;SHOW
 ZERSTÖREN;en;DESTROY
 ZÜCHTEN;en;BREED
-DEFAULT;en;DEFAULT
-REPORT;en;REPORT
-URSPRUNG;en;ORIGIN
-EMAIL;en;EMAIL
-MEINUNG;en;OPINION
-MAGIEGEBIET;en;CIRCLE
-PIRATERIE;en;PIRACY
-LOCALE;en;LOCALE
-NEUSTART;en;RESTART
-GRUPPE;en;GROUP
-OPFERE;en;SACRIFICE
-BETEN;en;PRAY
-SORTIEREN;en;SORT
-JIHAD;en;JIHAD
-GM;en;GM
 
-Luchse;en;lynx
-Einhörner;en;unicorns
-Warge;en;wolves
-Drachen;en;dragons
-Katzendrachen;en;catdragons
-Geister;en;ghosts
-Katzen;en;cats
-Menschen;en;humans
-Katze;en;cat
-Elf;en;elf
-Mensch;en;human
-Elfen;en;elves
-Meermensch;en;aquarian
-Zwerge;en;dwarves
-Luchs;en;lynx
-Einhorn;en;unicorn
-Warg;en;wolf
+Adler;en;eagle
 Drache;en;dragon
-Katzendrache;en;catdragon
-Zwerg;en;dwarf
-Meermenschen;en;aquarians
-Insekten;en;insects
-Insekt;en;insect
+Drachen;en;dragons
+Dämon;en;Demon
+Dämonen;en;Demons
+Einhorn;en;unicorn
+Einhörner;en;unicorns
+Elf;en;elf
+Elfen;en;elves
+Eule;en;owl
+Eulen;en;owls
 Geist;en;ghost
+Geister;en;ghosts
+Goblin;en;goblin
+Goblin_p;en;goblins
 Halbling;en;halfling
 Halblinge;en;halflings
-Trolle;en;trolls
+Hirntöter;en;braineater
+Insekt;en;insect
+Insekten;en;insects
+Jungdrache;en;young dragons
+Jungdrachen;en;young dragons
+Katze;en;cat
+Katzen;en;cats
+Katzendrache;en;catdragon
+Katzendrachen;en;catdragons
+Luch_p;en;lynx
+Luchse;en;lynx
+Meermensch;en;aquarian
+Meermenschen;en;aquarians
+Mensch;en;human
+Menschen;en;humans
+Ork;en;orc
+Ork_p;en;orc
+Riesenschildkröte;en;giant turtle
+Riesenschildkröten;en;giant turtles
+Schablone;en;template
+Schablonen;en;templates
+Schattenritter;en;shadow knight
+Seeschlange;en;sea serpent
 Troll;en;troll
+Trolle;en;trolls
 Untote;en;undead
 Untoter;en;undead
-Eule;en;owl
-Riesenschildkröte;en;giant turtle
-Orks;en;orc
+Warg;en;wolf
+Warge;en;wolves
 Zombie;en;zombie
-Zombies;en;zombies
-Schattenritter;en;shadow knight
-Adler;en;eagle
-Hirntöter;en;braineater
-Jungdrachen;en;young dragons
-Jungdrache;en;young dragons
-Seeschlange;en;sea serpent
-Eulen;en;owls
-Riesenschildkröten;en;giant turtles
-Dämon;en;Demon
-Ork;en;orc
-Dämonen;en;Demons
-Schablonen;en;templates
-Goblin;en;goblin
-Schablone;en;template
-Goblins;en;goblins
+Zombie_p;en;zombies
+Zwerg;en;dwarf
+Zwerge;en;dwarves
