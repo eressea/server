@@ -4117,7 +4117,7 @@
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<text locale="de">"$unit in $region: '$command' - Eine Einheit kann nur in einem Verband Mitglied sein."</text>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Eine Einheit kann nur in einem Verband Mitglied sein."</text>
 	</message>
 
 	<message name="error291" section="errors">
@@ -4126,7 +4126,7 @@
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<text locale="de">"$unit in $region: '$command' - Die Einheit ist in keinem Verband."</text>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Die Einheit ist in keinem Verband."</text>
 	</message>
 
 	<message name="error292" section="errors">
@@ -4135,7 +4135,7 @@
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<text locale="de">"$unit in $region: '$command' - Mit sich selbst kann man keinen Verband bilden."</text>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Mit sich selbst kann man keinen Verband bilden."</text>
 	</message>
 
 	<message name="error293" section="errors">
@@ -4144,14 +4144,14 @@
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<text locale="de">"$unit in $region: '$command' - Verbände können nur zwischen Einheiten derselben Partei gebildet werden."</text>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Verbände können nur zwischen Einheiten derselben Partei gebildet werden."</text>
 	</message>
 
 	<message name="error294" section="errors">
 			<arg name="unit" type="unit"></arg>
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
-		<text locale="de">"$unit in $region: '$command' - Die Einheiten müssen sich im selben Schiff oder Gebäude aufhalten."</text>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Die Einheiten müssen sich im selben Schiff oder Gebäude aufhalten."</text>
 	</message>
 
 	<message name="error295" section="errors">
@@ -4160,8 +4160,8 @@
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<text locale="de">"$unit in $region: '$command' - Nur ein Magier kann einen Astralkristall benutzen."</text>
-		<text locale="en">"$unit in $region: '$command' - Only mages may use an astralcrystal."</text>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Nur ein Magier kann einen Astralkristall benutzen."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - Only mages may use an astralcrystal."</text>
 	</message>
 
 	<message name="error296" section="errors">
@@ -4170,8 +4170,8 @@
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<text locale="de">"$unit in $region: '$command' - Hier werden niemals Bäume wachsen."</text>
-		<text locale="en">"$unit in $region: '$command' - Trees won't grow here."</text>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Hier werden niemals Bäume wachsen."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - Trees won't grow here."</text>
 	</message>
 
 	<message name="error297" section="errors">
@@ -4180,8 +4180,8 @@
 			<arg name="region" type="region"></arg>
 			<arg name="command" type="string"></arg>
 		</type>
-		<text locale="de">"$unit in $region: '$command' - Gebäude auf dem Ozean können nicht betreten werden."</text>
-		<text locale="en">"$unit in $region: '$command' - Buildings on the ocean may not be entered."</text>
+		<text locale="de">"$unit($unit) in $region($region): '$command' - Gebäude auf dem Ozean können nicht betreten werden."</text>
+		<text locale="en">"$unit($unit) in $region($region): '$command' - Buildings on the ocean may not be entered."</text>
 	</message>
 
 	<message name="error298">
