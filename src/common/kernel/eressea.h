@@ -21,6 +21,13 @@
 #ifndef ERESSEA_H
 #define ERESSEA_H
 
+#ifndef NEW_MESSAGES
+#define OLD_MESSAGES
+#define message_type messagetype
+#define message_list message
+#define report_section message
+#endif
+
 /* basic types used in the eressea "kernel" */
 typedef unsigned char order_t;
 typedef char terrain_t;

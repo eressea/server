@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: render.c,v 1.6 2001/02/11 20:56:20 enno Exp $
+ *	$Id: render.c,v 1.7 2001/02/24 12:50:48 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -23,9 +23,11 @@
 #include "eressea.h"
 #include "render.h"
 
+#include "message.h"
+
+#ifdef OLD_MESSAGES
 #include "item.h"
 #include "faction.h"
-#include "message.h"
 #include "language.h"
 #include "goodies.h"
 #include "region.h"
@@ -531,13 +533,14 @@ render_init(void)
 }
 
 void
-read_messages(FILE * F)
+read_messages(FILE * F, const struct locale * deflocale)
 {
+	unused(deflocale);
 	while (fgets(buf, 8192, F)) {
 		char * b = buf;
 		char * name = b;
 		char * language;
-		static locale * lang;
+		struct locale * lang;
 		char * section = NULL;
 		int level = 0;
 		messagetype * mtype;
@@ -730,3 +733,5 @@ spy_message(int spy, unit *u, unit *target)
 		addmessage(0, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
 	}
 }
+
+#endif

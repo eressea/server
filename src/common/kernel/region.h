@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: region.h,v 1.4 2001/02/10 19:24:05 enno Exp $
+ *	$Id: region.h,v 1.5 2001/02/24 12:50:48 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -68,7 +68,7 @@ typedef struct region {
 	struct plane *planep;
 	char *display;
 	unsigned int flags;
-	struct message *msgs;
+	struct message_list *msgs;
 	struct attrib *attribs;
 	struct region *nexthash;
 	terrain_t terrain;

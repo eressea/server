@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: battle.c,v 1.18 2001/02/18 19:07:31 katze Exp $
+ *	$Id: battle.c,v 1.19 2001/02/24 12:50:47 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -196,7 +196,7 @@ fleeregion(const unit * u)
 }
 
 static void
-brecord(faction * f, region * r, message * m)
+brecord(faction * f, region * r, struct message * m)
 {
 	if (!f->battles || f->battles->r!=r) {
 		struct bmsg * bm = calloc(1, sizeof(struct bmsg));
@@ -257,7 +257,7 @@ battlerecord(battle * b, const char *s)
 	s = gc_add(strdup(s));
 	for (bf = b->factions;bf;bf=bf->next) {
 		faction * f = bf->faction;
-		message * m = new_message(f, "msg_battle%s:string", s);
+		struct message * m = new_message(f, "msg_battle%s:string", s);
 		brecord(f, b->region, m);
 	}
 }
@@ -532,7 +532,7 @@ reportcasualties(battle * b, fighter * fig)
 	fbattlerecord(fig->unit->faction, fig->unit->region, " ");
 	for (bf = b->factions;bf;bf=bf->next) {
 		faction * f = bf->faction;
-		message * m = new_message(f, "casualties%u:unit%r:runto%i:run%i:alive%i:fallen",
+		struct message * m = new_message(f, "casualties%u:unit%r:runto%i:run%i:alive%i:fallen",
 		fig->unit, fig->run_to, fig->run_number, fig->alive, fig->unit->number - fig->alive - fig->run_number);
 		brecord(f, fig->unit->region, m);
 	}
@@ -678,11 +678,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 	/* Burgenbonus, Pferdebonus */
 	if (riding(t) && (wtype==NULL || !fval(wtype, WTF_MISSILE))) {
 		skill += 2;
-#ifdef BETA_CODE
 		if (wtype) skill = skillmod(urace(tu)->attribs, tu, tu->region, wtype->skill, skill, SMF_RIDING);
-#else
-		if (tu->race == RC_TROLL) skill--;
-#endif
 	}
 
 	if (t.index<tf->elvenhorses) {
@@ -2196,7 +2192,7 @@ aftermath(battle * b)
 		}
 #ifdef SHOW_KILLS
 		if (df->hits + df->kills) {
-			message * m = new_message(du->faction, "killsandhits%u:unit%i:hits%i:kills", du, df->hits, df->kills);
+			struct message * m = new_message(du->faction, "killsandhits%u:unit%i:hits%i:kills", du, df->hits, df->kills);
 			brecord(du->faction, b->region, m);
 		}
 #endif

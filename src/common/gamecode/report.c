@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: report.c,v 1.16 2001/02/12 23:44:30 enno Exp $
+ *	$Id: report.c,v 1.17 2001/02/24 12:50:47 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -65,7 +65,10 @@
 /* util includes */
 #include <goodies.h>
 #include <base36.h>
-
+#ifdef NEW_MESSAGES
+#include <nrmessage.h>
+#include <util/message.h>
+#endif
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
@@ -721,14 +724,18 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 }
 
 static void
-rp_messages(FILE * F, message * msgs, faction * viewer, int indent, boolean centered, boolean categorized)
+rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean centered, boolean categorized)
 {
 	messageclass * category;
 	if (!msgs) return;
 	for (category=msgclasses; category; category=category->next) {
 		int k = 0;
-		message * m;
-		for (m=msgs; m; m=m->next) {
+#ifdef NEW_MESSAGES
+		struct mlist * m = msgs->begin;
+#else
+		message_list * m = msgs;
+#endif
+		while (m) {
 			boolean debug = viewer->options & want(O_DEBUG);
 			if (m->type->section!=category) continue;
 #ifdef MSG_LEVELS
@@ -772,6 +779,7 @@ rp_messages(FILE * F, message * msgs, faction * viewer, int indent, boolean cent
 				}
 				rpsnr(F, s, 2);
 			}
+			m=m->next;
 		}
 	}
 }
@@ -1547,7 +1555,7 @@ rpline(FILE * F)
 }
 
 int
-fcompare(const void *a, const void *b)
+fcompare(const void * a, const void * b)
 {
 	faction * f1 = *(faction**)a;
 	faction * f2 = *(faction**)b;
@@ -2566,7 +2574,6 @@ struct fsee {
 		unit * proof;
 	} * see;
 } * fsee[FMAXHASH];
-
 
 void
 reports(void)

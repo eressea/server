@@ -56,12 +56,11 @@ typedef struct faction {
 #endif
 	struct unit * units;
 	struct attrib *attribs;
-
-	struct message * msgs;
+	struct message_list * msgs;
 	struct bmsg {
 		struct bmsg * next;
 		struct region * r;
-		struct message * msgs;
+		struct message_list * msgs;
 	} * battles;
 } faction;
 

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.21 2001/02/22 21:46:44 enno Exp $
+ *	$Id: save.c,v 1.22 2001/02/24 12:50:48 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2163,7 +2163,6 @@ extern void inittokens(void);
 extern void create_teleport_plane(void);
 
 void read_strings(FILE * F);
-void read_messages(FILE * F);
 
 const char * messages[] = {
 	"%s/%s/messages.txt",
@@ -2203,7 +2202,7 @@ init_locales(void)
 			sprintf(zText, messages[i], resourcepath(), locales[l]);
 			F = fopen(zText, "r+");
 			if (F) {
-				read_messages(F);
+				read_messages(F, NULL);
 				fclose(F);
 			} else {
 				sprintf(buf, "fopen(%s): ", zText);

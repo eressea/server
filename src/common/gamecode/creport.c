@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: creport.c,v 1.9 2001/02/19 14:19:24 corwin Exp $
+ *	$Id: creport.c,v 1.10 2001/02/24 12:50:47 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -56,7 +56,9 @@
 
 /* util includes */
 #include <goodies.h>
-
+#ifdef NEW_MESSAGES
+#include <crmessage.h>
+#endif
 /* libc includes */
 #include <math.h>
 #include <stdio.h>
@@ -88,14 +90,6 @@ cr_output_str_list(FILE * F, const char *title, const strlist * S, faction * f)
 	}
 }
 
-#define CTMAXHASH 511
-struct crtype {
-	struct crtype * nexthash;
-	messagetype * mt;
-} * crtypes[CTMAXHASH];
-
-struct crtype * free_crtypes;
-
 #include "objtypes.h"
 
 static void
@@ -123,20 +117,33 @@ print_curses(FILE * F, void * obj, typ_t typ, attrib *a, int self)
 	}
 }
 
+#ifdef OLD_MESSAGES
+#define CTMAXHASH 511
+struct crtype {
+	struct crtype * nexthash;
+	struct message_type * mt;
+} * crtypes[CTMAXHASH];
+
+static struct crtype * free_crtypes;
+#endif
+
 void
 creport_cleanup(void)
 {
+#ifdef OLD_MESSAGES
 	while (free_crtypes) {
 		struct crtype * ct = free_crtypes->nexthash;
 		free_crtypes = ct;
 	}
+#endif
 }
 
+#ifdef OLD_MESSAGES
 static void
-render_message(FILE * f, faction * receiver, message * m)
+render_message(FILE * f, faction * receiver, struct message * m)
 {
 	int i;
-	messagetype * mt = m->type;
+	struct message_type * mt = m->type;
 	struct entry * e = mt->entries;
 
 	if (m->receiver && receiver!=m->receiver) return;
@@ -204,7 +211,7 @@ render_message(FILE * f, faction * receiver, message * m)
 }
 
 static void
-render_messages(FILE * f, void * receiver, message * msgs)
+render_messages(FILE * f, void * receiver, struct message * msgs)
 {
 	message * m;
 	for (m=msgs;m;m=m->next) {
@@ -213,7 +220,7 @@ render_messages(FILE * f, void * receiver, message * msgs)
 }
 
 static void
-cr_output_messages(FILE * F, message * msgs, faction * f)
+cr_output_messages(FILE * F, struct message * msgs, faction * f)
 {
 	message * m;
 	if (!msgs) return;
@@ -245,7 +252,7 @@ cr_output_messages(FILE * F, message * msgs, faction * f)
 	render_messages(F, f, msgs);
 }
 
-extern void rendercr(FILE * f, messagetype * mt, const locale * lang);
+extern void rendercr(FILE * f, struct messagetype * mt, const locale * lang);
 
 static void
 report_crtypes(FILE * f, locale * lang)
@@ -275,6 +282,27 @@ reset_crtypes(void)
 		crtypes[i] = NULL;
 	}
 }
+
+#else
+static void
+render_messages(FILE * F, faction * f, message_list *msgs)
+{
+	char buffer[1024];
+	struct mlist* m = msgs->begin;
+	while (m) {
+		if (cr_render(m->msg, f->locale, buffer)==0) fputs(buffer, F);
+		else log_error(("could not render cr-message %p\n", m->msg));
+		m = m->next;
+	}
+}
+
+static void
+cr_output_messages(FILE * F, message_list *msgs, faction * f)
+{
+	render_messages(F, f, msgs);
+}
+
+#endif
 
 /* prints a building */
 static void
@@ -714,7 +742,9 @@ report_computer(FILE * F, faction * f)
 		fflush(stdout);
 	}
 	else printf(" - schreibe Computerreport\n");
+#ifdef OLD_MESSAGES
 	assert(crtypes[0]==NULL);
+#endif
 	fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
 	fprintf(F, "\"%s\";Spiel\n", global.gamename);
 	fprintf(F, "\"%s\";Konfiguration\n", "Standard");
@@ -992,6 +1022,10 @@ report_computer(FILE * F, faction * f)
 			}
 		}			/* region traversal */
 	}
+#ifdef OLD_MESSAGES
 	report_crtypes(F, f->locale);
 	reset_crtypes();
+#else
+	/* TODO */
+#endif
 }

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.21 2001/02/22 21:46:44 enno Exp $
+ *	$Id: eressea.c,v 1.22 2001/02/24 12:50:48 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -422,7 +422,11 @@ ffindhash(int no)
 void
 stripfaction (faction * f)
 {
+#ifdef OLD_MESSAGES
 	free_messages(f->msgs);
+#else
+	/* TODO */
+#endif
 	/* TODO: free msgs */
 	freestrlist(f->mistakes);
 	freelist(f->allies);

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: race.c,v 1.6 2001/02/18 10:06:09 enno Exp $
+ *	$Id: race.c,v 1.7 2001/02/24 12:50:48 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1925,7 +1925,5 @@ boolean is_undead(const unit *u)
 extern void 
 init_races(void)
 {
-#ifdef BETA_CODE
 	a_add(&race[RC_TROLL].attribs, make_skillmod(NOSKILL, SMF_RIDING, NULL, 0.0, -1));
-#endif
 }

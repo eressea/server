@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: message.c,v 1.7 2001/02/14 01:38:50 enno Exp $
+ *	$Id: message.c,v 1.8 2001/02/24 12:50:48 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -19,19 +19,32 @@
  * permission from the authors.
  */
 
-
+/** defines:
+ *
+ * NEW_MESSAGES - new message-classes
+ *
+ */
 #include <config.h>
 #include "eressea.h"
 #include "message.h"
 
+/* kernel includes */
 #include "plane.h"
 #include "faction.h"
 #include "unit.h"
 #include "item.h"
 #include "building.h"
 
+/* util includes */
 #include <goodies.h>
+#include <base36.h>
+#ifdef NEW_MESSAGES
+#include <message.h>
+#include <nrmessage.h>
+#include <crmessage.h>
+#endif
 
+/* libc includes */
 #include <stddef.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -41,13 +54,13 @@
 
 typedef struct warning {
 	struct warning * next;
-	const messageclass * section;
+	const struct messageclass * section;
 	int level;
 } warning;
 
 typedef struct msg_setting {
 	struct msg_setting *next;
-	const messagetype *type;
+	const struct message_type *type;
 	int level;
 } msg_setting;
 
@@ -116,6 +129,200 @@ translate_regions(const char *st, faction * f)
 	return s;
 }
 
+#ifdef NEW_MESSAGES
+message *
+new_message(struct faction * receiver, const char* sig, ...)
+	/* compatibility function, to keep the old function calls valid *
+	 * all old messagetypes are converted into a message with ONLY string parameters,
+	 * this function will convert given parameters to a string representation
+	 * based on the signature - like render() once did */
+{
+	const message_type * mtype;
+	va_list marker;
+	const char * signature = strchr(sig, '%');
+	char buffer[128];
+	int i=0;
+	const char * c = sig;
+	const char * args[16];
+
+	strncpy(buffer, sig, signature-sig);
+	buffer[signature-sig] = '\0';
+	mtype = mt_find(buffer);
+
+	if (!mtype) {
+		fprintf(stderr, "trying to create message of unknown type \"%s\"\n", buffer);
+		return NULL;
+	}
+
+	while(*c!='%') buffer[i++] = *(c++);
+	buffer[i] = 0;
+
+	va_start(marker, sig);
+	while (*c) {
+		char type;
+		char *p = buffer;
+		assert(*c=='%');
+		type = *(++c);
+	/*
+			case 'f': (*ep)->type = IT_FACTION; break;
+			case 'u': (*ep)->type = IT_UNIT; break;
+			case 'r': (*ep)->type = IT_REGION; break;
+			case 'h': (*ep)->type = IT_SHIP; break;
+			case 'b': (*ep)->type = IT_BUILDING; break;
+			case 'X': (*ep)->type = IT_RESOURCETYPE; break;
+			case 'x': (*ep)->type = IT_RESOURCE; break;
+			case 't': (*ep)->type = IT_SKILL; break;
+			case 's': (*ep)->type = IT_STRING; break;
+			case 'i': (*ep)->type = IT_INT; break;
+			case 'd': (*ep)->type = IT_DIRECTION; break;
+			case 'S': (*ep)->type = IT_FSPECIAL; break;
+*/
+		c+=2;
+		while (*c && isalnum(*(unsigned char*)c)) *(p++) = *(c++);
+		*p = '\0';
+		for (i=0;i!=mtype->nparameters;++i) {
+			if (!strcmp(buffer, mtype->pnames[i])) break;
+		}
+		assert(i!=mtype->nparameters || !"unknown parameter");
+
+		switch(type) {
+			case 's':
+				args[i] = va_arg(marker, const char *);
+				break;
+			case 'i':
+				args[i] = strdup(itoa10(va_arg(marker, int)));
+				break;
+			case 'f':
+				args[i] = factionname(va_arg(marker, const struct faction*));
+				break;
+			case 'u':
+				args[i] = unitname(va_arg(marker, const struct unit*));
+				break;
+			case 'r':
+				args[i] = rname(va_arg(marker, const struct region*), receiver->locale);
+				break;
+			case 'h':
+				args[i] = shipname(va_arg(marker, const struct ship*));
+				break;
+			case 'b':
+				args[i] = buildingname(va_arg(marker, const struct building*));
+				break;
+			case 'X':
+				args[i] = resourcename(va_arg(marker, const resource_type *), 0);
+				break;
+			case 'x':
+				args[i] = resourcename(oldresourcetype[(resource_t)va_arg(marker, resource_t)], 0);
+				break;
+			case 't':
+				args[i] = skillnames[va_arg(marker, skill_t)];
+				break;
+			case 'd':
+				args[i] = directions[i];
+				break;
+			case 'S':
+			default:
+				args[i] = NULL;
+		}
+	}
+	return msg_create(mtype, (void**)args);
+}
+
+static void
+parse_message(char * b, const struct locale * deflocale)
+{
+	char *m, *a = NULL, message[8192];
+	char * name;
+	char * language;
+	const struct locale * lang;
+	char * section = NULL;
+	int i, level = 0;
+	char * args[16];
+	boolean f_symbol = false;
+	const struct message_type * mtype;
+
+	/* skip comments */
+	if (b[0]=='#' || b[0]==0) return;
+
+	/* the name of this type */
+	name = b;
+	while (*b && *b!=';') ++b;
+	if (!*b) return;
+	*b++ = 0;
+
+	/* the section for this type */
+	section = b;
+	while (*b && *b!=';' && *b!=':') ++b;
+	if (!strcmp(section, "none")) section=NULL;
+
+	/* if available, the level for this type */
+	if (*b==':') {
+		char * x;
+		*b++ = 0;
+		x = b;
+		while (*b && *b!=';') ++b;
+		level=atoi(x);
+	}
+	*b++ = 0;
+
+	/* the locale */
+	language = b;
+	while (*b && *b!=';') ++b;
+	*b++ = 0;
+	if (strlen(language)==0) lang = deflocale;
+	else {
+		lang = find_locale(language);
+		if (!lang) lang = make_locale(language);
+	}
+	/* parse the message */
+	i = 0;
+	m = message;
+	*m++='\"';
+	while (*b) {
+		switch (*b) {
+		case '{':
+			f_symbol = true;
+			a = ++b;
+			break;
+		case '}':
+			*b++ = '\0';
+			args[i] = strdup(a);
+			sprintf(m, "$%s", args[i]);
+			m+=strlen(m);
+			i++;
+			f_symbol = false;
+			break;
+		case ' ':
+			if (f_symbol) {
+				a = ++b;
+				break;
+			}
+			/* fall-through intended */
+		default:
+			if (!f_symbol) {
+				*m++ = *b++;
+			} else b++;
+		}
+	}
+	strcpy(m, "\"");
+	args[i] = NULL;
+
+	/* add the messagetype */
+	mtype = mt_register(mt_new(name, args));
+	nrt_register(mtype, lang, message);
+	crt_register(mtype, lang);
+}
+
+void
+read_messages(FILE * F, const struct locale * lang)
+{
+	char buf[8192];
+	while (fgets(buf, sizeof(buf), F)) {
+		buf[strlen(buf)-1] = 0; /* \n weg */
+		parse_message(buf, lang);
+	}
+}
+
+#else
 void
 caddmessage(region * r, faction * f, char *s, msg_t mtype, int level)
 {
@@ -169,6 +376,8 @@ addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 	caddmessage(r, f, gc_add(strdup(translate_regions(s, f))), mtype, level);
 }
 
+static messagetype * messagetypes;
+
 void
 xmistake(const unit * u, const char *s, const char *comment, int mtype)
 {
@@ -192,8 +401,6 @@ mistake(const unit * u, const char *command, const char *comment, int mtype)
 	if (u->faction->no == MONSTER_FACTION) return;
 	xmistake(u, command, gc_add(strdup(translate_regions(comment, u->faction))), mtype);
 }
-
-static messagetype * messagetypes;
 
 extern unsigned int new_hashstring(const char* s);
 
@@ -288,7 +495,7 @@ messagetype *
 find_messagetype(const char * name)
 {
 	messagetype * mt = messagetypes;
-	while(mt && strcmp(mt->name, name)) mt = mt->next;
+	while(mt && strcmp(mt->name, name)!=0) mt = mt->next;
 	return mt;
 }
 
@@ -358,56 +565,6 @@ new_message(struct faction * receiver, const char* sig, ...)
 	return m;
 }
 
-message *
-add_message(message** pm, message * m)
-{
-	if (m==NULL) return NULL;
-	m->next = *pm;
-	return (*pm) = m;
-}
-
-void
-free_messages(message * m)
-{
-	while (m) {
-		message * x = m;
-		m = x->next;
-		free(x->data);
-		free(x);
-	}
-}
-
-messageclass * msgclasses;
-
-const messageclass *
-mc_add(const char * name)
-{
-	messageclass ** mcp = &msgclasses;
-	if (name==NULL) return NULL;
-	for (;*mcp;mcp=&(*mcp)->next) {
-		messageclass * mc = *mcp;
-		if (!strcmp(mc->name, name)) break;
-	}
-	if (!*mcp) {
-		messageclass * mc = calloc(sizeof(messageclass), 1);
-		mc->name = strdup(name);
-		*mcp = mc;
-	}
-	return *mcp;
-}
-
-const messageclass *
-mc_find(const char * name)
-{
-	messageclass ** mcp = &msgclasses;
-	if (name==NULL) return NULL;
-	for (;*mcp;mcp=&(*mcp)->next) {
-		messageclass * mc = *mcp;
-		if (!strcmp(mc->name, name)) break;
-	}
-	return *mcp;
-}
-
 int
 get_msglevel(const struct warning * warnings, const msglevel * levels, const messagetype * mtype)
 {
@@ -446,6 +603,87 @@ set_msglevel(struct warning ** warnings, const char * type, int level)
 	}
 }
 
+int
+msg_level(const message * m)
+{
+	return m->level;
+}
+#endif /* NEW_MESSAGES */
+
+message * 
+add_message(message_list** pm, message * m)
+{
+	if (m==NULL) return NULL;
+#ifdef NEW_MESSAGES
+	else {
+		struct mlist * mnew = malloc(sizeof(struct mlist));
+		if (*pm==NULL) {
+			*pm = malloc(sizeof(message_list));
+			(*pm)->end=&(*pm)->begin;
+		}
+		mnew->msg = m;
+		mnew->next = NULL;
+		*((*pm)->end) = mnew;
+		(*pm)->end=&mnew->next;
+	}
+#else
+	m->next = *pm;
+	*pm = m;
+#endif
+	return m;
+}
+
+void
+free_messages(message_list * m)
+{
+#ifdef NEW_MESSAGES
+	struct mlist * x = m->begin;
+	while (x) {
+		m->begin = x->next;
+		msg_free(x->msg);
+		free(x);
+	}
+#else
+	while (m) {
+		message_list * x = m;
+		m = x->next;
+		free(x->data);
+		free(x);
+	}
+#endif
+}
+
+messageclass * msgclasses;
+
+const messageclass *
+mc_add(const char * name)
+{
+	messageclass ** mcp = &msgclasses;
+	if (name==NULL) return NULL;
+	for (;*mcp;mcp=&(*mcp)->next) {
+		messageclass * mc = *mcp;
+		if (!strcmp(mc->name, name)) break;
+	}
+	if (!*mcp) {
+		messageclass * mc = calloc(sizeof(messageclass), 1);
+		mc->name = strdup(name);
+		*mcp = mc;
+	}
+	return *mcp;
+}
+
+const messageclass *
+mc_find(const char * name)
+{
+	messageclass ** mcp = &msgclasses;
+	if (name==NULL) return NULL;
+	for (;*mcp;mcp=&(*mcp)->next) {
+		messageclass * mc = *mcp;
+		if (!strcmp(mc->name, name)) break;
+	}
+	return *mcp;
+}
+
 void
 write_msglevels(struct warning * warnings, FILE * F)
 {
@@ -476,10 +714,4 @@ read_msglevels(struct warning ** w, FILE * F)
 		}
 		fscanf(F, "%s", buf);
 	}
-}
-
-int
-msg_level(const message * m)
-{
-	return m->level;
 }
