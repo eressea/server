@@ -27,6 +27,9 @@
 #include <faction.h>
 #include <race.h>
 
+/* gamecode includes */
+#include <xmas.h>
+
 /* util includes */
 #include <goodies.h>
 #include <resolve.h>
@@ -132,29 +135,6 @@ make_gates(region * r)
 	b->name = strdup("Der Weg nach Hause");
 	b->display = strdup("Achtung, hier gibt es die Geschenke!");
 	add_trigger(&b->attribs, "timer", trigger_xmasgate(b));
-}
-
-static void
-santa_comes_to_town(region * r)
-{
-	unit * santa = make_santa(r);
-	faction * f;
-
-	fset(santa, FL_TRAVELTHRU);
-	for (f = factions;f;f=f->next) {
-		unit * u;
-		unit * senior = f->units;
-		if (!playerrace(f->race)) continue;
-		for (u = f->units; u; u=u->nextF) {
-			if (senior->age < u->age) senior = u;
-		}
-		if (!senior) continue;
-
-		sprintf(buf, "von %s: 'Ho ho ho. Frohe Weihnachten, und alles Gute für dein Volk, %s.'", unitname(santa), unitname(senior));
-		addmessage(senior->region, 0, buf, MSG_MESSAGE, ML_IMPORTANT);
-
-		travelthru(santa, senior->region);
-	}
 }
 
 void

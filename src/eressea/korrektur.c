@@ -24,6 +24,7 @@
 /* misc includes */
 #include <attributes/key.h>
 #include <modules/xmas2000.h>
+#include <modules/xmas2001.h>
 #include <modules/museum.h>
 
 /* gamecode includes */
@@ -72,6 +73,10 @@
 /* attributes includes */
 #include <attributes/targetregion.h>
 #include <attributes/key.h>
+
+#undef  XMAS1999
+#undef  XMAS2000
+#define XMAS2001
 
 #if 0
 static int
@@ -317,7 +322,7 @@ add_magrathea(void)
 }
 #endif
 
-#ifdef XMAS
+#ifdef XMAS1999
 #include "race.h"
 #include "movement.h"
 
@@ -2822,7 +2827,7 @@ korrektur(void)
 	create_teleport_plane();
 
 	if (global.data_version<TYPES_VERSION) fix_icastles();
-#ifdef XMAS
+#ifdef XMAS2000
 	santa_comes_to_town();
 #endif
 #ifdef FUZZY_BASE36
@@ -2837,6 +2842,9 @@ korrektur_end(void)
 	/* fix_balsamfiasko(); */
 #ifdef SKILLMODIFIESLEARNING
 	do_once("smle", skillmodifieslearning());
+#endif
+#ifdef XMAS2001
+	do_once("2001", xmas2001());
 #endif
 }
 

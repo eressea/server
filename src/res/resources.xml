@@ -1,3 +1,20 @@
+<resource name="mistletoe">
+	<comment>Sets the chance of escape in a fight to 100 percent</comment>
+	<item notlost weight="0">
+		<function name="use" value="usemistletoe"></function>
+	</item>
+</resource>
+<strings>
+	<string name="mistletoe">
+		<text locale="de">Mistelzweig</text>
+		<text locale="en">mistletoe</text>
+	</string>
+	<string name="mistletoe_p">
+		<text locale="de">Mistelzweige</text>
+		<text locale="en">mistletoes</text>
+	</string>
+</strings>
+
 <resource name="magicbox">
 	<comment>A magic box that increases the user's capacity by 10 WU</comment>
 	<item cursed weight="0" capacity="1000">
