@@ -1227,6 +1227,7 @@ quit(void)
 		 "gemeldet haben...");
 
 	age = calloc(turn+1, sizeof(int));
+#if REMOVENMRNEWBIE
 	for (f = factions; f; f = f->next) if(!fval(f, FL_NOIDLEOUT)) {
 		if (f->age>=0 && f->age <= turn) ++age[f->age];
 		if (f->age == 2 || f->age == 3) {
