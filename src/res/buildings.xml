@@ -5,6 +5,7 @@
   <building name="caldera" capacity="1" nodestroy="yes" nobuild="yes" auraregen="1.00"/>
   <building name="genericbuilding" maxsize="1" nobuild="yes" auraregen="1.00"/>
   <building name="artacademy" maxsize="100" nobuild="yes" nodestroy="yes" unique="yes" auraregen="1.00"/>
+  <building name="artsculpture" maxsize="100" nobuild="yes" nodestroy="yes" unique="yes" auraregen="1.00"/>
   <building name="blessedstonecircle" maxsize="100" nobuild="yes" magic="yes" magres="60" magresbonus="30" auraregen="1.50">
     <construction skill="sk_building" minskill="2" reqsize="100" maxsize="100">
       <requirement type="log" recycle="0.5" quantity="500"/>
