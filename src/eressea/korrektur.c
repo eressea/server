@@ -2815,6 +2815,73 @@ heal_all(void)
 	return 0;
 }
 
+#if PEASANT_ADJUSTMENT == 1
+static int
+peasant_adjustment(void)
+{
+	terrain_t ter;
+	int sum, avg, c;
+	long long freeall, pool;
+
+	for(ter = 0; ter < MAXTERRAINS; ter++) {
+		region *r;
+
+		if(terrain[ter].production_max <= 0) continue;
+
+		sum = 0;
+		pool = 0;
+		freeall = 0;
+
+		for(r=regions; r; r=r->next) if(rterrain(r) == ter) {
+			unit *u;
+
+			c++;
+			sum += rpeasants(r);
+			for(u = r->units; u; u=u->next) {
+				if(lifestyle(u) > 0) sum += u->number;
+			}
+		}
+		avg = sum/c;
+		
+		for(r=regions; r; r=r->next) if(rterrain(r) == ter) {
+			unit *u;
+			int playerp = 0;
+			int p_weg;
+
+			for(u = r->units; u; u=u->next) {
+				if(lifestyle(u) > 0) playerp += u->number;
+			}
+			p_weg = min((playerp + rpeasants(r)) - avg, rpeasants(r));
+			pool += p_weg;
+			rsetpeasants(r, rpeasants(r) - p_weg);
+
+			freeall += max(0,production(r) * MAXPEASANTS_PER_AREA
+				- ((rtrees(r,2)+rtrees(r,1)/2) * TREESIZE) - playerp);
+		}
+		
+		for(r=regions; r; r=r->next) if(rterrain(r) == ter) {
+			unit *u;
+			long long free;
+			int newp;
+			int playerp = 0;
+			
+			for(u = r->units; u; u=u->next) {
+				if(lifestyle(u) > 0) playerp += u->number;
+			}
+
+			free = max(0,production(r) * MAXPEASANTS_PER_AREA
+        - ((rtrees(r,2)+rtrees(r,1)/2) * TREESIZE) - playerp);
+
+			newp = (pool * free)/freeall;
+
+			rsetpeasants(r, rpeasants(r)+newp);
+		}
+	}
+
+	return 0;
+}
+#endif
+
 static int
 fix_astralplane(void)
 {
@@ -2873,6 +2940,9 @@ korrektur(void)
 	do_once("idlo", fix_idleout());
 	do_once("szip", set_zip());
 	do_once("heal", heal_all());
+#if PEASANT_ADJUSTMENT == 1
+	do_once("peas", peasant_adjustment());
+#endif
 
   /* trade_orders(); */
 	if (global.data_version < NEWROAD_VERSION) {

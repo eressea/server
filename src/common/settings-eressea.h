@@ -24,3 +24,5 @@
 #define REDUCED_PEASANTGROWTH 1
 #define RACE_ADJUSTMENTS 1
 
+/* Einmalig! */
+#define PEASANT_ADJUSTMENT 1

@@ -3480,7 +3480,7 @@
 		</type>
 		<locale name="de">
 			<nr section="errors">
-				<text>"$unit($unit) in $region($region): '$command' - Die Partei muß mindestens 100 Wochen alt sein."</text>
+				<text>"$unit($unit) in $region($region): '$command' - Die Partei muß mindestens 81 Wochen alt sein, um einen Neustart mit einer anderen Rasse zu versuchen."</text>
 			</nr>
 		</locale>
 	</message>
@@ -4298,6 +4298,19 @@
 		</type>
 		<text locale="de">"$unit($unit) in $region($region): '$command' - Die Optionen ZIP und BZIP2 können nur um, nicht ausgeschaltet werden."</text>
 		<text locale="en">"$unit($unit) in $region($region): '$command' - options ZIP and BZIP2 can only be switched, not turned off."</text>
+	</message>
+	
+	<message name="error305">
+		<type>
+			<arg name="unit" type="unit"></arg>
+			<arg name="region" type="region"></arg>
+			<arg name="command" type="string"></arg>
+		</type>
+		<locale name="de">
+			<nr section="errors">
+				<text>"$unit($unit) in $region($region): '$command' - Die Partei muß mindestens 9 Wochen alt sein, um einen Neustart zu versuchen."</text>
+			</nr>
+		</locale>
 	</message>
 
 	<message name="drown_on_ship">
