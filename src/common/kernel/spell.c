@@ -844,6 +844,7 @@ sp_goodwinds(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int power = co->force;
+	int duration = cast_level+1;
 	spellparameter *pa = co->par;
 	ship *sh;
 	unit *u;
@@ -855,7 +856,7 @@ sp_goodwinds(castorder *co)
 
 	/* keine Probleme mit C_SHIP_SPEEDUP und C_SHIP_FLYING */
 	/* NODRIFT bewirkt auch +1 Geschwindigkeit */
-	create_curse(mage, &sh->attribs, ct_find("nodrift"), power, cast_level, 0, 0);
+	create_curse(mage, &sh->attribs, ct_find("nodrift"), power, duration, 0, 0);
 
 	/* melden, 1x pro Partei */
 	freset(mage->faction, FL_DH);
@@ -900,6 +901,7 @@ sp_magicstreet(castorder *co)
 	int power = co->force;
 	spellparameter *pa = co->par;
 	direction_t dir;
+	int duration = cast_level+1;
 
 	if(!(landregion(rterrain(r)))){
 		cmistake(mage, strdup(co->order), 186, MSG_MAGIC);
@@ -913,7 +915,7 @@ sp_magicstreet(castorder *co)
 	}
 
 	/* wirkt schon in der Zauberrunde! */
-	create_curse(mage, &r->attribs, ct_find("magicstreet"), power, cast_level, 0, 0);
+	create_curse(mage, &r->attribs, ct_find("magicstreet"), power, duration, 0, 0);
 
 	/* melden, 1x pro Partei */
 	{
@@ -1063,6 +1065,7 @@ sp_maelstrom(castorder *co)
 	int cast_level = co->level;
 	curse * c;
 	int power = co->force;
+	int duration = power+1;
 
 	if(rterrain(r) != T_OCEAN) {
 		cmistake(mage, strdup(co->order), 205, MSG_MAGIC);
@@ -1073,7 +1076,7 @@ sp_maelstrom(castorder *co)
 	/* Attribut auf Region.
 	 * Existiert schon ein curse, so wird dieser verstärkt
 	 * (Max(Dauer), Max(Stärke))*/
-	c = create_curse(mage, &mage->attribs, ct_find("maelstrom"), power, power, power,0);
+	c = create_curse(mage, &mage->attribs, ct_find("maelstrom"), power, duration, power,0);
 	curse_setflag(c, CURSE_ISNEW);
 
 	/* melden, 1x pro Partei */
@@ -1152,11 +1155,12 @@ sp_blessedharvest(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int power = co->force;
+	int duration = power+1;
 
 	/* Attribut auf Region.
 	 * Existiert schon ein curse, so wird dieser verstärkt
 	 * (Max(Dauer), Max(Stärke))*/
-	create_curse(mage,&r->attribs, ct_find("blessedharvest"), power, power, 1, 0);
+	create_curse(mage,&r->attribs, ct_find("blessedharvest"), power, duration, 1, 0);
 	{
 		message * seen = msg_message("harvest_effect", "mage", mage);
 		message * unseen = msg_message("harvest_effect", "mage", NULL);
@@ -1413,7 +1417,7 @@ sp_kaelteschutz(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int force = co->force;
-	int duration = max(cast_level, force);
+	int duration = max(cast_level, force) + 1;
 	spellparameter *pa = co->par;
 
 
@@ -1473,6 +1477,7 @@ sp_sparkle(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	spellparameter *pa = co->par;
+	int duration = cast_level+1;
 
 	/* wenn kein Ziel gefunden, Zauber abbrechen */
 	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -1483,7 +1488,7 @@ sp_sparkle(castorder *co)
 
 	u = pa->param[0]->data.u;
 	create_curse(mage, &u->attribs, ct_find("sparkle"), cast_level,
-			cast_level, rand(), u->number);
+			duration, rand(), u->number);
 
 	add_message(&mage->faction->msgs, new_message(mage->faction,
 		"sparkle_effect%u:mage%u:target", mage, u));
@@ -1657,6 +1662,7 @@ sp_great_drought(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int force = co->force;
+	int duration = 2;
 
 	if(rterrain(r) == T_OCEAN ) {
 		cmistake(mage, strdup(co->order), 189, MSG_MAGIC);
@@ -1676,7 +1682,7 @@ sp_great_drought(castorder *co)
 	rsethorses(r, rhorses(r)/2);
 
 	/* Arbeitslohn = 1/4 */
-	create_curse(mage, &r->attribs, ct_find("drought"), force, 1, 4, 0);
+	create_curse(mage, &r->attribs, ct_find("drought"), force, duration, 4, 0);
 
   /* terraforming */
 	if (rand() % 100 < 25){
@@ -2099,7 +2105,6 @@ sp_homestone(castorder *co)
 		cmistake(mage, strdup(co->order), 206, MSG_MAGIC);
 		return 0;
 	}
-
 	curse_setflag(c, CURSE_NOAGE|CURSE_ONLYONE);
 
 	/* Magieresistenz der Burg erhöht sich um 50% */
@@ -2148,6 +2153,7 @@ sp_drought(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int power = co->force;
+	int duration = power+1;
 
 	if(rterrain(r) == T_OCEAN ) {
 		cmistake(mage, strdup(co->order), 189, MSG_MAGIC);
@@ -2190,7 +2196,7 @@ sp_drought(castorder *co)
 #endif
 		rsethorses(r, rhorses(r)/2);
 
-		create_curse(mage, &r->attribs, ct_find("drought"), power, power, 4, 0);
+		create_curse(mage, &r->attribs, ct_find("drought"), power, duration, 4, 0);
 	}
 	return cast_level;
 }
@@ -2222,7 +2228,7 @@ sp_fog_of_confusion(castorder *co)
 	regionlist *rl,*rl2;
 
 	range = (power-11)/3-1;
-	duration = ((power-11)/3)*2;
+	duration = ((power-11)/3)*2+1;
 
 	rl = all_in_range(r, range);
 
@@ -2702,12 +2708,12 @@ sp_fumblecurse(castorder *co)
 
 	rx = rand()%3;
 	sx = cast_level - effskill(target, SK_MAGIC);
-	duration = max(sx, rx);
+	duration = max(sx, rx) + 1;
 
 	effect = force/2;
 
 	c = create_curse(mage, &target->attribs, ct_find("fumble"),
-				force, duration+1, effect, 0);
+				force, duration, effect, 0);
 	if (c == NULL) {
 		report_failure(mage, co->order);
 		return 0;
@@ -2728,11 +2734,12 @@ patzer_fumblecurse(castorder *co)
 	int force = co->force;
 	int effect;
 	curse * c;
+	int duration = (cast_level/2)+1;
 
 	effect = force/2;
 
 	c = create_curse(mage, &mage->attribs, ct_find("fumble"), force,
-				(cast_level/2)+1, effect, 0);
+				duration, effect, 0);
 	if (c!=NULL) {
 		add_message(&mage->faction->msgs, new_message(mage->faction,
 			"magic_fumble%u:unit%r:region%s:command",
@@ -4063,10 +4070,10 @@ sp_song_resistmagic(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	int force = co->force;
-
+	int duration = force+1;
 
 	create_curse(mage, &r->attribs, ct_find("goodmagicresistancezone"),
-			force, force, mr_bonus, 0);
+			force, duration, mr_bonus, 0);
 
 	/* Erfolg melden */
 	add_message(&mage->faction->msgs, new_message(mage->faction,
