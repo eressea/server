@@ -554,7 +554,7 @@ give_cmd(unit * u, order * ord)
 			cmistake(u, ord, 40, MSG_COMMERCE);
 			return;
 		}
-		giveunit(u, u2, ord);
+		give_unit(u, u2, ord);
 		return;
 	}
 	if (findparam(s, u->faction->locale) == P_ANY) { /* Alle Gegenstände übergeben */
@@ -600,7 +600,7 @@ give_cmd(unit * u, order * ord)
 				return;
 			}
 			n = u->number;
-			givemen(n, u, u2, ord);
+			give_men(n, u, u2, ord);
 			return;
 		}
 
@@ -649,7 +649,7 @@ give_cmd(unit * u, order * ord)
 				msg_feedback(u, ord, "race_noregroup", "race", u->race));
 			return;
 		}
-		givemen(n, u, u2, ord);
+		give_men(n, u, u2, ord);
 		return;
 	}
 

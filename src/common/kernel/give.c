@@ -142,7 +142,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
 }
 
 void
-givemen(int n, unit * u, unit * u2, struct order * ord)
+give_men(int n, unit * u, unit * u2, struct order * ord)
 {
   ship *sh;
   int k = 0;
@@ -160,7 +160,7 @@ givemen(int n, unit * u, unit * u2, struct order * ord)
     error = 307;
 #endif
 #ifdef HEROES
-  } else if (u2 && (fval(u, UFL_HERO)!=fval(u2, UFL_HERO))) {
+  } else if (u2 && u2->number>0 && fval(u, UFL_HERO)!=fval(u2, UFL_HERO)) {
     error = 75;
 #endif
   } else if ((u && unit_has_cursed_item(u)) || (u2 && unit_has_cursed_item(u2))) {
@@ -232,6 +232,8 @@ givemen(int n, unit * u, unit * u2, struct order * ord)
       set_racename(&u2->attribs, get_racename(u->attribs));
       u2->race = u->race;
       u2->irace = u->irace;
+      if (fval(u, UFL_HERO)) fset(u2, UFL_HERO);
+      else freset(u2, UFL_HERO);
     }
     
     if (u2) {
@@ -273,7 +275,7 @@ givemen(int n, unit * u, unit * u2, struct order * ord)
 }
 
 void
-giveunit(unit * u, unit * u2, order * ord)
+give_unit(unit * u, unit * u2, order * ord)
 {
   region * r = u->region;
   int n = u->number;
@@ -314,7 +316,7 @@ giveunit(unit * u, unit * u2, order * ord)
           }
         }
       }
-      givemen(u->number, u, NULL, ord);
+      give_men(u->number, u, NULL, ord);
       cmistake(u, ord, 153, MSG_COMMERCE);
     } else {
       cmistake(u, ord, 63, MSG_COMMERCE);
