@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.24 2001/02/13 18:43:54 katze Exp $
+ *	$Id: korrektur.c,v 1.25 2001/02/17 14:47:43 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1945,6 +1945,17 @@ fix_baumringel(void)
 #include <modules/gmcmd.h>
 void setup_gm_faction(void);
 
+#include <attributes/gm.h>
+static void
+set_atgm(faction * f)
+{
+	plane * p = planes;
+	if (!f) return;
+	while (p) {
+		a_add(&f->attribs, make_gm(p));
+	}
+}
+
 void
 korrektur(void)
 {
@@ -1952,6 +1963,7 @@ korrektur(void)
 	setup_gm_faction();
 #endif
 	make_gms();
+	do_once(atoi36("rrgm"), set_atgm(findfaction(atoi36("rr"))));
 	/* Wieder entfernen! */
 	do_once(atoi36("trgr"), fix_targetregion_resolve());
 	verify_owners(false);

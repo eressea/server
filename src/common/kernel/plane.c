@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: plane.c,v 1.2 2001/01/26 16:19:40 enno Exp $
+ *	$Id: plane.c,v 1.3 2001/02/17 14:47:42 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -26,6 +26,9 @@
 /* kernel includes */
 #include "region.h"
 #include "faction.h"
+
+/* util includes */
+#include <resolve.h>
 
 /* libc includes */
 #include <string.h>
@@ -224,4 +227,29 @@ rel_to_abs(struct plane *pl, struct faction * f, int rel, unsigned char index)
 		return (rel + ursprung_x(f,pl));
 
 	return (rel + ursprung_y(f,pl));
+}
+
+
+void *
+resolve_plane(void * id)
+{
+   return getplanebyid((int)id);
+}
+
+void
+write_plane_reference(const plane * u, FILE * F)
+{
+	fprintf(F, "%d ", u?(u->id):0);
+}
+
+void
+read_plane_reference(plane ** up, FILE * F)
+{
+	int i;
+	fscanf(F, "%d", &i);
+	if (i==0) *up = NULL;
+	{
+		*up = getplanebyid(i);
+		if (*up==NULL) ur_add((void*)i, (void**)&up, resolve_plane);
+	}
 }

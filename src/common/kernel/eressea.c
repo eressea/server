@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.15 2001/02/15 02:41:46 enno Exp $
+ *	$Id: eressea.c,v 1.16 2001/02/17 14:47:42 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -24,6 +24,7 @@
 
 /* attributes includes */
 #include <attributes/reduceproduction.h>
+#include <attributes/gm.h>
 
 /* kernel includes */
 #include "message.h"
@@ -695,11 +696,18 @@ int
 isallied(const plane * pl, const faction * f, const faction * f2, int mode)
 {
 	ally *sf;
+	attrib * a;
 
-	if (f == f2)
-		return mode;
+	if (f == f2) return mode;
 	if (f2==NULL) return 0;
 
+	a = a_find(f->attribs, &at_gm);
+	while (a) {
+		plane * p = (plane*)a->data.v;
+		if (p==pl) return mode;
+		a=a->next;
+	}
+	
 	if (pl && pl->flags & PFL_FRIENDLY) return mode;
 	if (mode != HELP_GIVE && pl && (pl->flags & PFL_NOALLIANCES)) return 0;
 	for (sf = f->allies; sf; sf = sf->next)
