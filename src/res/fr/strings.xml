@@ -978,220 +978,220 @@
 
 	<comment>  intranslatables:</comment>
 	<string name="h0">
-		<text locale="fr">Flachwurz</text>
+		<text locale="fr">astragale</text>
 	</string>
 	<string name="h0_p">
-		<text locale="fr">Flachwurz</text>
+		<text locale="fr">astragales</text>
 	</string>
 	<string name="h1">
-		<text locale="fr">Würziger Wagemut</text>
+		<text locale="fr">méritoine</text>
 	</string>
 	<string name="h1_p">
-		<text locale="fr">Würzige Wagemut</text>
+		<text locale="fr">méritoines</text>
 	</string>
 	<string name="h2">
-		<text locale="fr">Eulenauge</text>
+		<text locale="fr">oeil de hibou</text>
 	</string>
 	<string name="h2_p">
-		<text locale="fr">Eulenaugen</text>
+		<text locale="fr">yeux de hibou</text>
 	</string>
 	<string name="h3">
-		<text locale="fr">Grüner Spinnerich</text>
+		<text locale="fr">soie d'araignée</text>
 	</string>
 	<string name="h3_p">
-		<text locale="fr">Grüne Spinneriche</text>
+		<text locale="fr">soies d'araignée</text>
 	</string>
 	<string name="h4">
-		<text locale="fr">Blauer Baumringel</text>
+		<text locale="fr">obbadion</text>
 	</string>
 	<string name="h4_p">
-		<text locale="fr">Blaue Baumringel</text>
+		<text locale="fr">obbadions</text>
 	</string>
 	<string name="h5">
-		<text locale="fr">Elfenlieb</text>
+		<text locale="fr">cheveux d'elfe</text>
 	</string>
 	<string name="h5_p">
-		<text locale="fr">Elfenlieb</text>
+		<text locale="fr">cheveux d'elfe</text>
 	</string>
 	<string name="h6">
-		<text locale="fr">Gurgelkraut</text>
+		<text locale="fr">ortigal</text>
 	</string>
 	<string name="h6_p">
-		<text locale="fr">Gurgelkräuter</text>
+		<text locale="fr">ortigals</text>
 	</string>
 	<string name="h7">
-		<text locale="fr">Knotiger Saugwurz</text>
+		<text locale="fr">tubercule de respiplante</text>
 	</string>
 	<string name="h7_p">
-		<text locale="fr">Knotige Saugwurze</text>
+		<text locale="fr">tubercules de respiplante</text>
 	</string>
 	<string name="h8">
-		<text locale="fr">Blasenmorchel</text>
+		<text locale="fr">oreille de morille</text>
 	</string>
 	<string name="h8_p">
-		<text locale="fr">Blasenmorcheln</text>
+		<text locale="fr">oreilles de morille</text>
 	</string>
 	<string name="h9">
-		<text locale="fr">Wasserfinder</text>
+		<text locale="fr">hydropousse</text>
 	</string>
 	<string name="h9_p">
-		<text locale="fr">Wasserfinder</text>
+		<text locale="fr">hydropousses</text>
 	</string>
 	<string name="h10">
-		<text locale="fr">Kakteenschwitz</text>
+		<text locale="fr">ossiphage</text>
 	</string>
 	<string name="h10_p">
-		<text locale="fr">Kakteenschwitze</text>
+		<text locale="fr">ossiphages</text>
 	</string>
 	<string name="h11">
-		<text locale="fr">Sandfäule</text>
+		<text locale="fr">fleur de souffre</text>
 	</string>
 	<string name="h11_p">
-		<text locale="fr">Sandfäulen</text>
+		<text locale="fr">fleurs de souffre</text>
 	</string>
 	<string name="h12">
-		<text locale="fr">Windbeutel</text>
+		<text locale="fr">feuille de Tshaï</text>
 	</string>
 	<string name="h12_p">
-		<text locale="fr">Windbeutel</text>
+		<text locale="fr">feuilles de Tshaï</text>
 	</string>
 	<string name="h13">
-		<text locale="fr">Fjordwuchs</text>
+		<text locale="fr">bélidane</text>
 	</string>
 	<string name="h13_p">
-		<text locale="fr">Fjordwuchse</text>
+		<text locale="fr">bélidanes</text>
 	</string>
 	<string name="h14">
-		<text locale="fr">Alraune</text>
+		<text locale="fr">racine de mandragore</text>
 	</string>
 	<string name="h14_p">
-		<text locale="fr">Alraunen</text>
+		<text locale="fr">racines de mandragore</text>
 	</string>
 	<string name="h15">
-		<text locale="fr">Steinbeißer</text>
+		<text locale="fr">percepierre</text>
 	</string>
 	<string name="h15_p">
-		<text locale="fr">Steinbeißer</text>
+		<text locale="fr">percepierres</text>
 	</string>
 	<string name="h16">
-		<text locale="fr">Spaltwachs</text>
+		<text locale="fr">tanemiel</text>
 	</string>
 	<string name="h16_p">
-		<text locale="fr">Spaltwachse</text>
+		<text locale="fr">tanemiels</text>
 	</string>
 	<string name="h17">
-		<text locale="fr">Höhlenglimm</text>
+		<text locale="fr">boralme</text>
 	</string>
 	<string name="h17_p">
-		<text locale="fr">Höhlenglimme</text>
+		<text locale="fr">boralmes</text>
 	</string>
 	<string name="h18">
-		<text locale="fr">Eisblume</text>
+		<text locale="fr">ficoïde à cristaux</text>
 	</string>
 	<string name="h18_p">
-		<text locale="fr">Eisblumen</text>
+		<text locale="fr">ficoïdes à cristaux</text>
 	</string>
 	<string name="h19">
-		<text locale="fr">Weißer Wüterich</text>
+		<text locale="fr">blémissure</text>
 	</string>
 	<string name="h19_p">
-		<text locale="fr">Weiße Wüteriche</text>
+		<text locale="fr">blémissures</text>
 	</string>
 	<string name="h20">
-		<text locale="fr">Snowcrystal petal</text>
+		<text locale="fr">rose des neiges</text>
 	</string>
 	<string name="h20_p">
-		<text locale="fr">Snowcrystal petals</text>
+		<text locale="fr">roses des neiges</text>
 	</string>
 	<string name="p0">
-		<text locale="fr">seven mile tea</text>
+		<text locale="fr">thé de sept lieues</text>
 	</string>
 	<string name="p0_p">
-		<text locale="fr">seven mile teas</text>
+		<text locale="fr">thé de sept lieues</text>
 	</string>
 	<string name="p1">
-		<text locale="fr">goliath water</text>
+		<text locale="fr">breuvage de Goliath</text>
 	</string>
 	<string name="p1_p">
-		<text locale="fr">goliath waters</text>
+		<text locale="fr">breuvage de Goliath</text>
 	</string>
 	<string name="p2">
-		<text locale="fr">water of life</text>
+		<text locale="fr">élixir de vie</text>
 	</string>
 	<string name="p2_p">
-		<text locale="fr">waters of life</text>
+		<text locale="fr">élixir de vie</text>
 	</string>
 	<string name="p3">
-		<text locale="fr">Schaffenstrunk</text>
+		<text locale="fr">vin du travail acharné</text>
 	</string>
 	<string name="p3_p">
-		<text locale="fr">Schaffenstrünke</text>
+		<text locale="fr">vin du travail acharné</text>
 	</string>
 	<string name="p4">
-		<text locale="fr">ointment</text>
+		<text locale="fr">onguent de soin</text>
 	</string>
 	<string name="p4_p">
-		<text locale="fr">ointments</text>
+		<text locale="fr">onguents de soin</text>
 	</string>
 	<string name="p5">
-		<text locale="fr">peasant bood</text>
+		<text locale="fr">fiole d'essence vitale</text>
 	</string>
 	<string name="p5_p">
-		<text locale="fr">peasant bloods</text>
+		<text locale="fr">fioles d'essence vitale</text>
 	</string>
 	<string name="p6">
-		<text locale="fr">brain wax</text>
+		<text locale="fr">huile de cogitation</text>
 	</string>
 	<string name="p6_p">
-		<text locale="fr">brain waxes</text>
+		<text locale="fr">huile de cogitation</text>
 	</string>
 	<string name="p7">
-		<text locale="fr">Dumpfbackenbrot</text>
+		<text locale="fr">petit pain rance</text>
 	</string>
 	<string name="p7_p">
-		<text locale="fr">Dumpfbackenbrote</text>
+		<text locale="fr">petits pains rances</text>
 	</string>
 	<string name="p8">
-		<text locale="fr">potion of nest warmth</text>
+		<text locale="fr">extrait de canicule</text>
 	</string>
 	<string name="p8_p">
-		<text locale="fr">potions of nest warmth</text>
+		<text locale="fr">extraits de canicule</text>
 	</string>
 	<string name="p9">
-		<text locale="fr">horsepower potion</text>
+		<text locale="fr">fourrage de l'étalon</text>
 	</string>
 	<string name="p9_p">
-		<text locale="fr">horsepower potions</text>
+		<text locale="fr">fourrage de l'étalon</text>
 	</string>
 	<string name="p10">
-		<text locale="fr">berserkers blood potion</text>
+		<text locale="fr">vin de folie</text>
 	</string>
 	<string name="p10_p">
-		<text locale="fr">berserkers blood potions</text>
+		<text locale="fr">vin de folie</text>
 	</string>
 	<string name="p11">
-		<text locale="fr">peasant love potion</text>
+		<text locale="fr">philtre d'amour</text>
 	</string>
 	<string name="p11_p">
-		<text locale="fr">peasant love potion</text>
+		<text locale="fr">philtres d'amour</text>
 	</string>
 	<string name="p12">
-		<text locale="fr">potion of truth</text>
+		<text locale="fr">sirop de claivoyance</text>
 	</string>
 	<string name="p12_p">
-		<text locale="fr">potions of truth</text>
+		<text locale="fr">sirops de claivoyance</text>
 	</string>
 	<string name="p13">
-		<text locale="fr">elixir of power</text>
+		<text locale="fr">elixir d'endurance</text>
 	</string>
 	<string name="p13_p">
-		<text locale="fr">elixirs of power</text>
+		<text locale="fr">elixir d'endurance</text>
 	</string>
 	<string name="p14">
-		<text locale="fr">healing potion</text>
+		<text locale="fr">potion de survie</text>
 	</string>
 	<string name="p14_p">
-		<text locale="fr">healing potions</text>
+		<text locale="fr">potions de survie</text>
 	</string>
 
 	<comment>  Parameters</comment>
