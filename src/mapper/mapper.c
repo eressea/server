@@ -1533,6 +1533,8 @@ main(int argc, char *argv[])
 	read_newfactions(buf);
 	sprintf(buf, "%s/dropouts.%d", basepath(), turn);
 	read_dropouts(buf);
+	sprintf(buf, "%s/%s", basepath(), orderfile);
+	read_orders(buf);
 
 	if (findfaction(MONSTER_FACTION)==NULL) {
 		makemonsters();
