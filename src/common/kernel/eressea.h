@@ -162,7 +162,7 @@ typedef struct settings {
 extern settings global;
 
 #define RELEASE_VERSION NEWSOURCE_VERSION
-#define ECHECK_VERSION "3.10"
+#define ECHECK_VERSION "3.11"
 
 /* changes from->to: 72->73: struct unit::lock entfernt.
  * 73->74: struct unit::flags eingeführt.

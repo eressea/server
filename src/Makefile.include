@@ -6,7 +6,7 @@ endif
 
 default: debug
 
-DEPEND  = @g++ -MM -MG -r
+DEPEND  = @gcc -MM -MG -r
 AR      = @ar
 CTAGS   = @ctags
 CC      = @gcc

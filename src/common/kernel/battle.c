@@ -133,7 +133,7 @@ typedef struct armor_type {
 } armor_type;
 
 static armor_type armordata[AR_NONE + 1] =
-/* penalty; prot; shield; item; */
+/* penalty; magres; prot; shield; item; */
 {
 #ifdef COMPATIBILITY
 	{-0.80, 5, 0, I_CLOAK_OF_INVULNERABILITY },
