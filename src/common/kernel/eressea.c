@@ -3035,6 +3035,7 @@ attrib_init(void)
 #endif
 	at_register(&at_laen); /* required for old datafiles */
 	at_register(&at_xontormiaexpress); /* required for old datafiles */
+	at_register(&at_wdwpyramid);
 }
 
 void
