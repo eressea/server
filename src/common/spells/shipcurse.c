@@ -34,12 +34,10 @@ static int
 cinfo_ship(const locale * lang, void * obj, typ_t typ, curse *c, int self)
 {
 	message * msg;
-	ship * sh;
 
 	unused(typ);
-
+	unused(obj);
 	assert(typ == TYP_SHIP);
-	sh = (ship*)obj;
 
 	if (self){
 		msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
@@ -58,7 +56,6 @@ cinfo_ship_onlyowner(const locale * lang, void * obj, typ_t typ, curse *c, int s
 	ship * sh;
 
 	unused(typ);
-
 	assert(typ == TYP_SHIP);
 	sh = (ship*)obj;
 

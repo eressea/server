@@ -14,8 +14,10 @@
 #ifndef _RCURSE_H
 #define _RCURSE_H
 
-/*
 static int cinfo_region(const locale * lang, void * obj, typ_t typ, curse *c, int self);
-*/
+
+static int cinfo_cursed_by_the_gods(void * obj, typ_t typ, curse *c, int self);
+static int cinfo_dreamcurse(void * obj, typ_t typ, curse *c, int self);
+static int cinfo_magicstreet(void * obj, typ_t typ, curse *c, int self);
 
 #endif /* _RCURSE_H */

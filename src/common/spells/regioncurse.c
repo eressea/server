@@ -62,19 +62,8 @@ cinfo_cursed_by_the_gods(void * obj, typ_t typ, curse *c, int self)
 	r = (region *)obj;
 	if (rterrain(r)!=T_OCEAN){
 		msg = msg_message("curseinfo::godcurse", "id", c->no);
-		sprintf(buf,
-			"Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen "
-			"über die tote Erde und furchtbare Kreaturen ziehen über das Land. Die Brunnen "
-			"sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz "
-			"überzogen. Niemand kann hier lange überleben. (%s)", curseid(c));
 	} else {
 		msg = msg_message("curseinfo::godcurseocean", "id", c->no);
-		sprintf(buf,
-			"Diese Region wurde von den Göttern verflucht. Das Meer ist eine ekelige Brühe, "
-			"braunschwarze, stinkende Gase steigen aus den unergründlichen Tiefen hervor, und "
-			"untote Seeungeheuer, Schiffe zerfressend und giftige grüne Galle "
-			"geifernd, sind der Schrecken aller Seeleute, die diese Gewässer durchqueren. "
-			"Niemand kann hier lange überleben. (%s)", curseid(c));
 	}
 	nr_render(msg, lang, buf, sizeof(buf), NULL);
 	msg_release(msg);

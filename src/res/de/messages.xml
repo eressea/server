@@ -7583,5 +7583,19 @@
 		<text locale="de">"Ein Schleier der Verwirrung liegt über der Region. ($int36($id))"</text>
 		<text locale="en">""</text>
 	</message>
+	<message name="curseinfo::godcurse">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen über die tote Erde und furchtbare Kreaturen ziehen über das Land. Die Brunnen sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz überzogen. Niemand kann hier lange überleben. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
+	<message name="curseinfo::godcurseocean">
+		<type>
+			<arg name="id" type="int"></arg>
+		</type>
+		<text locale="de">"Diese Region wurde von den Göttern verflucht. Das Meer ist eine ekelige Brühe, braunschwarze, stinkende Gase steigen aus den unergründlichen Tiefen hervor, und untote Seeungeheuer, Schiffe zerfressend und giftige grüne Galle geifernd, sind der Schrecken aller Seeleute, die diese Gewässer durchqueren. Niemand kann hier lange überleben. ($int36($id))"</text>
+		<text locale="en">""</text>
+	</message>
 
 </messages>

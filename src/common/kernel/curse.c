@@ -46,6 +46,13 @@
 #include <assert.h>
 #include <math.h>
 
+/* spells includes */
+#include <spells/regioncurse.h>
+#include <spells/unitcurse.h>
+#include <spells/shipcurse.h>
+#include <spells/buildingcurse.h>
+
+
 /* ------------------------------------------------------------- */
 direction_t
 dirmirror(direction_t dir)
@@ -942,7 +949,7 @@ static curse_type cursedaten[MAXCURSE] =
 		"fogtrap",
 		CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
 		"",
-		/* cinfo_fogtrap*/
+		(cdesc_fun)cinfo_region
 	},
 	{ 
 		"antimagiczone",
@@ -986,14 +993,14 @@ static curse_type cursedaten[MAXCURSE] =
 		"blessedharvest",
 		CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
 		"Dieser Fruchtbarkeitszauber erhöht die Erträge der Felder.",
-		/* cinfo_blessedharvest */
+		(cdesc_fun)cinfo_region
 	},
 	{
 		"drought",
 		CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR ),
 		"Dieser Zauber strahlt starke negative Energien aus. Warscheinlich "
 		"ist er die Ursache der Dürre."	,
-		/* cinfo_drought */
+		(cdesc_fun)cinfo_region
 	},
 	{
 		"badlearn",
@@ -1001,7 +1008,7 @@ static curse_type cursedaten[MAXCURSE] =
 		"Dieser Zauber scheint die Ursache für die Schlaflosigkeit und "
 		"Mattigkeit zu sein, unter der die meisten Leute hier leiden und "
 		"die dazu führt, das Lernen weniger Erfolg bringt. ",
-		/* cinfo_badlearn */
+		(cdesc_fun)cinfo_region
 	},
 	{ /* Sturmwind-Zauber, wirkt nur 1 Runde */
 		"stormwind",
@@ -1032,7 +1039,7 @@ static curse_type cursedaten[MAXCURSE] =
 		"hat sich wie ein bleiernes Tuch auf die Gemüter der Bevölkerung "
 		"gelegt und eh er nicht gebrochen oder verklungen ist, wird keiner "
 		"sich an Gaukelleien erfreuen können.",
-		/* cinfo_depression */
+		(cdesc_fun)cinfo_region
 	},
 	{ /* Heimstein-Zauber */
 		"magicwalls",
@@ -1054,27 +1061,27 @@ static curse_type cursedaten[MAXCURSE] =
 		"astralblock",
 		CURSETYP_NORM, 0, NO_MERGE,
 		"",
-		/* cinfo_astralblock */
+		(cdesc_fun)cinfo_region
 	},
 	{ /* Unterhaltungsanteil vermehren */
 		"generous",
 		CURSETYP_NORM, 0, ( M_DURATION | M_VIGOUR | M_MAXEFFECT ),
 		"Dieser Zauber beeinflusst die allgemeine Stimmung in der Region positiv. "
 		"Die gute Laune macht die Leute freigiebiger.",
-		/* cinfo_generous */
+		(cdesc_fun)cinfo_region
 	},
 	{ /* verhindert Attackiere regional */
 		"peacezone",
 		CURSETYP_NORM, 0, NO_MERGE,
 		"Dieser machtvoller Beeinflussungszauber erstickt jeden Streit schon im "
 		"Keim.",
-		/* cinfo_peacezone */
+		(cdesc_fun)cinfo_region
 	},
 	{  /* erschwert geordnete Bewegungen */
 		"disorientationzone",
 		CURSETYP_NORM, 0, NO_MERGE,
 		"",
-		/* cinfo_regconf */
+		(cdesc_fun)cinfo_region
 	},
 	{ /*  erzeugt Straßennetz */
 		"magicstreet",
@@ -1147,7 +1154,7 @@ static curse_type cursedaten[MAXCURSE] =
 		"riotzone",
 		CURSETYP_NORM, 0, (M_DURATION),
 		"Eine Wolke negativer Energie liegt über der Region.",
-		/* cinfo_riot */
+		(cdesc_fun)cinfo_region
 	},
 	{ /* Ewige Mauern-Zauber */
 		"nocostbuilding",
@@ -1155,14 +1162,14 @@ static curse_type cursedaten[MAXCURSE] =
 		"Die Macht dieses Zaubers ist fast greifbar und tief in die Mauern "
 		"gebunden. Unbeeindruck vom Zahn der Zeit wird dieses Gebäude wohl "
 		"auf Ewig stehen.",
-		/* cinfo_nocost */
+		(cdesc_fun)cinfo_region
 	},
 	{
 		"holyground",
 		CURSETYP_NORM, 0, (M_VIGOUR_ADD),
 		"Verschiedene Naturgeistern sind im Boden der Region gebunden und "
 		"beschützen diese vor dem der dunklen Magie des lebenden Todes.",
-		/* cinfo_holyground */
+		(cdesc_fun)cinfo_region
 	},
 	{
 		"godcursezone",
