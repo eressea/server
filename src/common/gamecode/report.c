@@ -3375,7 +3375,8 @@ report_summary(summary * s, summary * o, boolean full)
 		fprintf(F, "Aktive Vulkane:        %d\n\n", s->active_volcanos);
 	}
 
-	for (i = 0; i < MAXRACES; i++) if (s->factionrace[i] && playerrace(new_race[i]) && i != RC_TEMPLATE) {
+	for (i = 0; i < MAXRACES; i++) if (s->factionrace[i] && playerrace(new_race[i])
+			&& i != RC_TEMPLATE && i != RC_CLONE) {
 		fprintf(F, "%14svölker: %s\n",
 		LOC(default_locale, rc_name(new_race[i], 3)), pcomp(s->factionrace[i], o->factionrace[i]));
 	}
@@ -3403,7 +3404,8 @@ report_summary(summary * s, summary * o, boolean full)
 				rcomp(s->poprace[i],o->poprace[i]));
 		}
 	} else {
-		for (i = 0; i < MAXRACES; i++) if (s->poprace[i] && playerrace(new_race[i]) && i != RC_TEMPLATE) {
+		for (i = 0; i < MAXRACES; i++) if (s->poprace[i] && playerrace(new_race[i])
+				&& i != RC_TEMPLATE && i != RC_CLONE) {
 			fprintf(F, "%20s: %s\n", LOC(default_locale, rc_name(new_race[i], 1)),
 				rcomp(s->poprace[i],o->poprace[i]));
 		}
