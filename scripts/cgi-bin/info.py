@@ -13,6 +13,7 @@ DefaultTitle = "Vinyambar Datenbank"
 dbname = "vinyambar"
 From = "accounts@vinyambar.de"
 smtpserver = 'localhost'
+Errors = ""
 
 # define a new function called Display
 # it takes one parameter - a string to Display
@@ -22,8 +23,8 @@ def Display(Content, Title=DefaultTitle):
     TemplateInput = TemplateHandle.read()
     TemplateHandle.close()                    # close the file
 
-    for key in Form.keys():
-       Content=Content+"<br>"+str(key)+"="+str(Form[key])
+#    for key in Form.keys():
+#       Content=Content+"<br>"+str(key)+"="+str(Form[key])
 
     # this defines an exception string in case our
     # template file is messed up
@@ -36,122 +37,25 @@ def Display(Content, Title=DefaultTitle):
 
     print "Content-Type: text/html\n\n"
     print SubResult[0]
+    return
 
 
-def ShowInfo(custid, Password):
-    db = MySQLdb.connect(db=dbname)
-    cursor = db.cursor()
-    cursor.execute("select max(date), max(id) from transactions")
-    lastdate, id = cursor.fetchone()
-
-    query=("select info, firstname, lastname, email, address, city, country, phone, sum(t.balance), status "+
-      "from users u, transactions t "+
-      "where u.id=t.user and u.id="+str(custid)+" and u.password='"+Password+"' "+
-      "GROUP BY u.id")
-
-    #print query
-    results = cursor.execute(query);
-    if results > 0:
-
-        output = "<div align=center>Letzte Aktualisierung: "+str(lastdate)[0:10]+"</div><form action=\""+scripturl+"\" method=post><div align=left><table width=80% border>\n"
-        while results>0:
-            results = results - 1
-            row = cursor.fetchone()
-            line = "<tr>"
-            line = line + "<tr><th height=30>Vorname</th><td><input size=40 name=firstname value=\""+row[1]+"\"></td></tr>\n"
-            line = line + "<tr><th height=30>Nachname</th><td><input size=40 name=lastname value=\""+row[2]+"\"></td></tr>\n"
-            line = line + "<tr><th height=30>EMail Adresse</th><td><input size=40 name=email value=\""+row[3]+"\"></td></tr>\n"
-            line = line + "<tr><th height=30>Adresse</th><td><input size=40 name=address value=\""+row[4]+"\"></td></tr>\n"
-            line = line + "<tr><th height=30>Wohnort</th><td><input size=40 name=city value=\""+row[5]+"\"></td></tr>\n"
-            line = line + "<tr><th height=30>Telefon</th><td><input size=40 name=phone value=\""+row[7]+"\"></td></tr>\n"
-            line = line + "<tr><th height=30>Kontostand</th><td>"+str(row[8])+" EUR</td></tr>\n"
-            line = line + "<tr><th height=30>Status</th><td>"+row[9]+"</td></tr>\n"
-            output = output + line;
-
-        output=output+"</table></div>"
-
-        query = ("select games.name, races.name, s.status, s.faction "+
-          "from races, games, subscriptions s "+
-          "where s.race=races.race and s.game=games.id "+
-          "and s.user="+str(custid)+" ");
-
-        results = cursor.execute(query);
-
-        output=output+"<h3>Anmeldungen</h3>\n<div align=left><table width=80% border>\n"
-        output=output+"<tr><th>Spiel</th><th>Rasse</th><th>Status</th><th>Partei</th><th>An-/Abmelden</th></tr>\n"
-        while results>0:
-            results = results - 1
-            row = cursor.fetchone()
-            line = "<tr>"
-            line = line + '<td align="left">'+row[0]+'</td>\n'
-            line = line + '<td align="left">'+row[1]+'</td>\n'
-            line = line + '<td align="left">'+row[2]+'</td>\n'
-            line = line + '<td align="left">'+row[3]+'</td>\n'
-            line = line + '<td align="center">'
-	    if row[2]=='ACTIVE':
-		line = line + '<input type="checkbox" name="cancel_' + row[3] + '">'
-	    if row[2]=='CANCELLED':
-		line = line + '<input type="checkbox" name="activate_' + row[3] + '">'
-	    line = line + '</td>\n'
-            line = line + '</tr>\n'
-            output=output+line
-
-        output=output+"</table></div>"
-
-	query="select date, balance, text from transactions, descriptions where descriptions.handle=transactions.description and user="+str(custid)+" ORDER BY date"
-        results = cursor.execute(query);
-
-        output=output+"<h3>Transaktionen</h3>\n<div align=left><table width=80% border>\n"
-        output=output+"<tr><th>Datum</th><th>Betrag</th><th>Verwendung</th></tr>\n"
-        while results>0:
-            results = results - 1
-            row = cursor.fetchone()
-            line = "<tr>"
-            line = line + "<td align=left>"+str(row[0])[0:10]+"</td>\n"
-            line = line + "<td align=right>"+str(row[1])+" EUR</td>\n"
-            line = line + "<td align=left>"+row[2]+"</td>\n"
-            line = line + "</tr>\n"
-            output=output+line
-
-        output=output+"</table></div>"
-        output=output+'<div align=left><input name="save" type="submit" value="Speichern"></div>'
-        output=output+'<input type="hidden" name="user" value="'+str(custid)+'"></div>'
-        output=output+'<input type="hidden" name="pass" value="'+Password+'"></div>'
-        output=output+"</form>"
-    else:
-        output = "Die Kundennummer oder das angegebene Passwort sind nicht korrekt."
-    db.close()
-    Display(output, "Kundendaten #"+str(custid))
-
-def Save(custid, Password):
-    validkeys=['email','address','lastname','firstname','city','password','phone']
-    values='id='+str(custid)
-    for key in Form.keys():
-        if key in validkeys:
-            values=values+", "+key+"='"+Form[key].value+"'"
+def SendTransfer(userid, factionid, game):
     db = MySQLdb.connect(db=dbname)
     cursor=db.cursor()
-    cursor.execute('UPDATE users SET '+values+' where id='+str(custid))
-
-    nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='ACTIVE' and s.user="+str(custid) + " and s.game=g.id")
-    while nfactions > 0:
-        game, sid, faction = cursor.fetchone()
-        if Form.has_key("cancel_"+faction):
-            update = db.cursor()
-	    update.execute("UPDATE subscriptions set status='CANCELLED' where id="+str(sid))
-        nfactions = nfactions - 1
-
-    nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='CANCELLED' and s.user="+str(custid) + " and s.game=g.id")
-    while nfactions > 0:
-        game, sid, faction = cursor.fetchone()
-        if Form.has_key("activate_"+faction):
-            update = db.cursor()
-	    update.execute("UPDATE subscriptions set status='ACTIVE' where id="+str(sid))
-        nfactions = nfactions - 1
-
+    cursor.execute("select email, firstname from users where id="+str(userid))
+    email, firstname = cursor.fetchone()
+    Msg="From: "+From+"\nTo: "+email+"\nSubject: Vinambar Passwort\n\n"
+    Msg=Msg+"Hallo,  "+firstname+"\n"
+    Msg=Msg+"Ein Spieler hat Dir seine Partei " + factionid + " im Spiel " + game + "\n"
+    Msg=Msg+"übertragen. Um die Partei zu übernehmen, gehe bitte auf die Webseite \n"
+    Msg=Msg+"http://www.vinyambar.de/accounts.shtml, und akzeptiere dort den Transfer.\n"
+    server=smtplib.SMTP(smtpserver)
+    server.sendmail(From, email, Msg)
+    server.close()
     db.close()
-    ShowInfo(custid, Password)
-#    Display("Noch nicht implementiert", "Daten speichern für Kunde #"+str(custid))
+    return
+
 
 def SendPass(email):
     try:
@@ -172,6 +76,187 @@ def SendPass(email):
         Display('<div align="center">Das Passwort wurde verschickt</div>', 'Kundendaten #'+str(custid))
     except:
         Display('<div align="center">Beim Versenden des Passwortes ist ein Fehler aufgetreten.<br>Eventuell ist die email-Adresse unbekannt</div>', 'Kundendaten für '+email)
+
+	
+def ShowInfo(custid, Password):
+    global Errors
+    db = MySQLdb.connect(db=dbname)
+    cursor = db.cursor()
+    cursor.execute("select max(date), max(id) from transactions")
+    lastdate, id = cursor.fetchone()
+
+    query=("select firstname, lastname, email, address, city, country, phone, status "+
+      "from users "+
+      "where id="+str(custid)+" and password='"+Password+"' ")
+
+    #print query
+    results = cursor.execute(query);
+    if results != 0:
+
+        output = '<div align=center>Letzter Buchungstag: '+str(lastdate)[0:10]+'</div><form action="'+scripturl+'" method=post><div align=center><table  bgcolor="#e0e0e0" width=80% border>\n'
+	firstname, lastname, email, address, city, country, phone, status = cursor.fetchone()
+	
+	query = "SELECT sum(balance) from transactions where user="+str(custid)
+	transactions = cursor.execute(query)
+	balance = 0.00
+	if transactions != 0:
+	    balance = cursor.fetchone()[0]
+	    if balance == None:
+		balance=0.00
+
+	line = "<font color=red>"+Errors+"</font><tr>"
+	line = line + "<tr><th height=30>Vorname</th><td><input size=40 name=firstname value=\""+firstname+"\"></td></tr>\n"
+	line = line + "<tr><th height=30>Nachname</th><td><input size=40 name=lastname value=\""+lastname+"\"></td></tr>\n"
+	if email==None:
+	    email=""
+	line = line + "<tr><th height=30>EMail Adresse</th><td><input size=40 name=email value=\""+email+"\"></td></tr>\n"
+	if address==None:
+	    address=""
+	line = line + "<tr><th height=30>Adresse</th><td><input size=40 name=address value=\""+address+"\"></td></tr>\n"
+	if city==None:
+	    city=""
+	line = line + "<tr><th height=30>Wohnort</th><td><input size=40 name=city value=\""+city+"\"></td></tr>\n"
+	if phone==None:
+	    phone=""
+	line = line + "<tr><th height=30>Telefon</th><td><input size=40 name=phone value=\""+phone+"\"></td></tr>\n"
+	line = line + "<tr><th height=30>Kontostand</th><td>"+str(balance)+" EUR</td></tr>\n"
+	line = line + "<tr><th height=30>Status</th><td>"+status+"</td></tr>\n"
+	output = output + line;
+
+        output=output+"</table></div>"
+
+	output=output+"<div align=center><h3>Partien</h3>\n"
+	games = cursor.execute("select id, name, status, info from games order by id")
+	while games>0:
+	    games=games-1
+	    gid, game, status, info = cursor.fetchone()
+	    
+	    line = '<table  bgcolor="#e0e0e0" width=80% border>\n<tr><th align=center><em>' + game + '</em>: ' + info + '</th></tr>'
+	    if status=='WAITING':
+		line = line+'<tr><td>'
+		line = line + 'Ich möchte an diesem Spiel teilnehmen, und bevorzuge folgende Rasse:<br>\n'
+		line = line + '<select name="oldrace" size=1>'
+		line = line + '<OPTION selected value="">Keine Anmeldung'
+		line = line + '<option value="GOBLIN">Goblin'
+		line = line + '<option value="DWARF">Zwerg'
+		line = line + '<option value="ELF">Elf'
+		line = line + '<option value="HALFLING">Halbling'
+		line = line + '<option value="INSECT">Insekt'
+		line = line + '<option value="AQUARIAN">Meermensch'
+		line = line + '<option value="HUMAN">Mensch'
+		line = line + '<option value="CAT">Katze'
+		line = line + '<option value="TROLL">Troll'
+		line = line + '<option value="ORC">Ork'
+		line = line + '<option value="DEMON">Dämon'
+		line = line + '</select>'
+		line = line+'</td></tr>'
+	    elif status=='RUNNING':
+		query = ("select games.name, races.name, s.status, s.faction "+
+		  "from races, games, subscriptions s "+
+		  "where s.race=races.race and s.game="+str(int(gid))+" and s.game=games.id "+
+		  "and s.user="+str(custid)+" ")
+	    
+		fcursor = db.cursor()
+		results = fcursor.execute(query)
+		if results>0:
+		    while results>0:
+			results = results - 1
+			game, race, status, faction = fcursor.fetchone()
+			line = line + '<tr><td><em>Partei ' + faction + ', ' + race + ", " + status + "</em></td></tr>"
+			line = line + "<tr><td>"
+			if status=='ACTIVE':
+			    line = line + 'Ich möchte diese Partei aufgeben: <input type="checkbox" name="cancel_' + faction + '"><br>\n'
+			    line = line + 'Ich möchte die Partei an Spieler #<input size=4 name="transfer_' + faction + '"> übergeben.\n'
+			elif status=='CANCELLED':
+			    line = line + 'Reaktivieren: <input type="checkbox" name="activate_' + faction + '">\n'
+			elif status=='TRANSFERED':
+			    line = line + 'Transfer akzeptieren: <input type="checkbox" name="accept_' + faction + '">\n'
+			line = line+'</td></tr>'
+		else:
+		    continue
+	    else:
+		continue
+	    output=output+line+'</table>\n<p>\n'
+	output=output+"</div>"
+	
+	query="select date, balance, text from transactions, descriptions where descriptions.handle=transactions.description and user="+str(custid)+" ORDER BY date"
+        results = cursor.execute(query);
+
+        if results>0:
+	    output=output+'<div align=center>\n<h3>Transaktionen</h3>\n<table width=80% bgcolor="#e0e0e0" border>\n'
+	    output=output+"<tr><th>Datum</th><th>Betrag</th><th>Verwendung</th></tr>\n"
+	    while results>0:
+		results = results - 1
+		row = cursor.fetchone()
+		line = "<tr>"
+		line = line + "<td align=left>"+str(row[0])[0:10]+"</td>\n"
+		line = line + "<td align=right>"+str(row[1])+" EUR</td>\n"
+		line = line + "<td align=left>"+row[2]+"</td>\n"
+		line = line + "</tr>\n"
+		output=output+line
+	    output=output+"</table></div>"
+	    
+        output=output+'<div align=center><p><input name="save" type="submit" value="Speichern"></div>'
+        output=output+'<input type="hidden" name="user" value="'+str(custid)+'"></div>'
+        output=output+'<input type="hidden" name="pass" value="'+Password+'"></div>'
+        output=output+"</form>"
+    else:
+        output = "Die Kundennummer oder das angegebene Passwort sind nicht korrekt."
+    db.close()
+    Display(output, "Kundendaten #"+str(custid))
+    Errors = ""
+
+def TransferFaction(sid, faction, newuser, game):
+    db = MySQLdb.connect(db=dbname)
+    update = db.cursor()
+    exist = update.execute("select id from users where id="+str(newuser))
+    if exist==1:
+	update.execute("UPDATE subscriptions set status='TRANSFERED', user=" + str(newuser) + " where id="+str(sid))
+	SendTransfer(newuser, faction, game);
+    db.close()
+    return
+
+def Save(custid, Password):
+    validkeys=['email','address','lastname','firstname','city','password','phone']
+    values='id='+str(custid)
+    for key in Form.keys():
+        if key in validkeys:
+            values=values+", "+key+"='"+Form[key].value+"'"
+    db = MySQLdb.connect(db=dbname)
+    cursor=db.cursor()
+    cursor.execute('UPDATE users SET '+values+' where id='+str(custid))
+
+    nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='ACTIVE' and s.user="+str(custid) + " and s.game=g.id")
+    while nfactions > 0:
+        game, sid, faction = cursor.fetchone()
+        if Form.has_key("cancel_"+faction):
+            update = db.cursor()
+	    update.execute("UPDATE subscriptions set status='CANCELLED' where id="+str(sid))
+	elif Form.has_key("transfer_"+faction):
+	    newuser = int(Form["transfer_"+faction].value)
+	    TransferFaction(sid, faction, newuser, game)
+        nfactions = nfactions - 1
+
+    nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='TRANSFERED' and s.user="+str(custid) + " and s.game=g.id")
+    while nfactions > 0:
+        game, sid, faction = cursor.fetchone()
+        if Form.has_key("accept_"+faction):
+            update = db.cursor()
+	    update.execute("UPDATE subscriptions set status='ACTIVE' where id="+str(sid))
+        nfactions = nfactions - 1
+
+    nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='CANCELLED' and s.user="+str(custid) + " and s.game=g.id")
+    while nfactions > 0:
+        game, sid, faction = cursor.fetchone()
+        if Form.has_key("activate_"+faction):
+            update = db.cursor()
+	    update.execute("UPDATE subscriptions set status='ACTIVE' where id="+str(sid))
+        nfactions = nfactions - 1
+
+    db.close()
+    ShowInfo(custid, Password)
+#    Display("Noch nicht implementiert", "Daten speichern für Kunde #"+str(custid))
+
 
 Form = cgi.FieldStorage()
 
