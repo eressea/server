@@ -678,14 +678,14 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	/* generic permissions */
 	a = a_add(&f->attribs, a_new(&at_permissions));
 
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmterf")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmgate")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmtele")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmgive")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmskil")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmtake")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmmsgr")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmmsgu")));
+	add_key((attrib**)&a->data.v, atoi36("gmterf"));
+	add_key((attrib**)&a->data.v, atoi36("gmtele"));
+	add_key((attrib**)&a->data.v, atoi36("gmgive"));
+	add_key((attrib**)&a->data.v, atoi36("gmskil"));
+	add_key((attrib**)&a->data.v, atoi36("gmtake"));
+	add_key((attrib**)&a->data.v, atoi36("gmmsgr"));
+	add_key((attrib**)&a->data.v, atoi36("gmmsgu"));
+	add_key((attrib**)&a->data.v, atoi36("gmgate"));
 
 	a_add((attrib**)&a->data.v, make_atgmcreate(resource2item(r_silver)));
 
@@ -716,7 +716,7 @@ gm_addfaction(const char * email, plane * p, region * r)
 	assert(p!=NULL);
 
 	/* GM faction */
-	a_add(&f->attribs, make_key(atoi36("quest")));
+	add_key(&f->attribs, atoi36("quest"));
 	f->banner = strdup("Questenpartei");
 	f->passw = strdup(itoa36(rand()));
 	f->email = strdup(email);
@@ -740,14 +740,14 @@ gm_addfaction(const char * email, plane * p, region * r)
 	/* generic permissions */
 	a = a_add(&f->attribs, a_new(&at_permissions));
 
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmterf")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmgate")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmtele")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmgive")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmskil")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmtake")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmmsgr")));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmmsgu")));
+	add_key((attrib**)&a->data.v, atoi36("gmterf"));
+	add_key((attrib**)&a->data.v, atoi36("gmtele"));
+	add_key((attrib**)&a->data.v, atoi36("gmgive"));
+	add_key((attrib**)&a->data.v, atoi36("gmskil"));
+	add_key((attrib**)&a->data.v, atoi36("gmtake"));
+	add_key((attrib**)&a->data.v, atoi36("gmmsgr"));
+	add_key((attrib**)&a->data.v, atoi36("gmmsgu"));
+	add_key((attrib**)&a->data.v, atoi36("gmgate"));
 
 	a_add((attrib**)&a->data.v, make_atgmcreate(resource2item(r_silver)));
 
@@ -809,39 +809,3 @@ gm_addplane(int radius, unsigned int flags, const char * name)
 	}
 	return p;
 }
-
-#ifdef TEST_GM_COMMANDS
-void
-setup_gm_faction(void)
-{
-	int i = atoi36("gms")-1;
-	faction * f = factions;
-	unit * newunit;
-	region * r = regions;
-	attrib * a;
-
-	do {
-		f = findfaction(++i);
-	} while (f);
-
-	f = (faction *) calloc(1, sizeof(faction));
-	f->no = i;
-	set_string(&f->email, "gms@eressea-pbem.de");
-	set_string(&f->passw, "geheim");
-	set_string(&f->name, "GMs");
-	f->alive = 1;
-	f->options |= (1 << O_REPORT);
-	f->options |= (1 << O_COMPUTER);
-	addlist(&factions, f);
-
-	a = a_add(&f->attribs, a_new(&at_permissions));
-	a_add((attrib**)&a->data.v, make_atgmcreate(&it_demonseye));
-	a_add((attrib**)&a->data.v, make_key(atoi36("gmtf")));
-
-	while (r && !r->land) r=r->next;
-	newunit = createunit(r, f, 1, RC_DAEMON);
-	set_string(&newunit->name, "Flamdring, Gott des Feuers");
-	set_money(newunit, 100);
-	fset(newunit, FL_ISNEW);
-}
-#endif

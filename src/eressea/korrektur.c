@@ -1064,9 +1064,7 @@ update_gms(void)
 			int k;
 			item_t i;
 			for (k=0;keys[k];++k) {
-				if (!find_key((attrib*)permissions->data.v, atoi36(keys[k]))) {
-					a_add((attrib**)&permissions->data.v, make_key(atoi36(keys[k])));
-				}
+				add_key((attrib**)&permissions->data.v, atoi36(keys[k]));
 			}
 			for (i=I_GREATSWORD;i!=I_KEKS;++i) {
 				attrib * a = a_find(permissions, &at_gmcreate);
@@ -1937,30 +1935,6 @@ test_gmquest(void)
 	 f = gm_addquest("BigBear@nord-com.net", "Leonidas Vermächtnis", 15, PFL_NOMAGIC|PFL_NOSTEALTH);
 	 log_printf("Neue Questenpartei %s\n", factionname(f));
 
-}
-#endif
-
-#if 0
-static int
-create_xe(void)
-{
-	 attrib *a;
-	 plane * p = gm_addplane(4, PFL_NOCOORDS | PFL_NORECRUITS | 
-		 PFL_NOGIVE | PFL_NOATTACK | PFL_NOTERRAIN | PFL_NOMAGIC | 
-		 PFL_NOSTEALTH | PFL_NOTEACH | PFL_NOBUILD | PFL_NOFEED, 
-		 "Xontormia-Expreß");
-	 region * center = findregion(p->minx+(p->maxx-p->minx)/2, p->miny+(p->maxy-p->miny)/2);
-	 faction * f = gm_addfaction("abeer@gmx.de", p, center);
-
-	 log_printf("Xe-Partei %s\n", factionname(f));
-
-	 a = a_find(f->attribs, &at_permissions);
-	 a_remove(&f->attribs, a);
-	 a = a_add(&f->attribs, a_new(&at_permissions));
-	 a_add((attrib**)&a->data.v, make_key(atoi36("gmterf")));
-	 a_add((attrib**)&a->data.v, make_key(atoi36("gmmsgr")));
-	 a_add((attrib**)&a->data.v, make_key(atoi36("gmmsgu")));
-	 return 0;
 }
 #endif
 

@@ -26,6 +26,14 @@ attrib_type at_key = {
 	a_readdefault,
 };
 
+attrib * 
+add_key(attrib ** alist, int key)
+{
+	attrib * a = find_key(*alist, key);
+	if (a==NULL) a = a_add(alist, make_key(key));
+	return a;
+}
+
 attrib *
 make_key(int key)
 {

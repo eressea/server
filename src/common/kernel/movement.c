@@ -38,6 +38,7 @@
 #include "race.h"
 #include "region.h"
 #include "render.h"
+#include "spell.h"
 #include "ship.h"
 #include "skill.h"
 #include "unit.h"
@@ -1020,13 +1021,16 @@ travel(region * first, unit * u, region * next, int flucht)
 
 		while (b) {
 			if (b->type==&bt_wisps) {
-				region * rl = rconnect(current, (direction_t)((dir+MAXDIRECTIONS-1)%MAXDIRECTIONS));
-				region * rr = rconnect(current, (direction_t)((dir+1)%MAXDIRECTIONS));
-				int j = rand() % 3;
-				if (j==0) break;
-				else if (j==1 && rl && landregion(rterrain(rl))==landregion(rterrain(next))) next = rl;
-				else if (j==2 && rr && landregion(rterrain(rr))==landregion(rterrain(next))) next = rr;
-				break;
+				wall_data * wd = (wall_data*)b->data;
+				if (wd->active) {
+					region * rl = rconnect(current, (direction_t)((dir+MAXDIRECTIONS-1)%MAXDIRECTIONS));
+					region * rr = rconnect(current, (direction_t)((dir+1)%MAXDIRECTIONS));
+					int j = rand() % 3;
+					if (j==0) break;
+					else if (j==1 && rl && landregion(rterrain(rl))==landregion(rterrain(next))) next = rl;
+					else if (j==2 && rr && landregion(rterrain(rr))==landregion(rterrain(next))) next = rr;
+					break;
+				}
 			}
 			if (b->type->move) b->type->move(b, u, current, next);
 			b = b->next;
