@@ -1188,7 +1188,7 @@ quit(void)
 	puts(" - beseitige Spieler, die sich nach der Anmeldung nicht "
 		 "gemeldet haben...");
 
-	age = calloc(turn+1, sizeof(int));
+	age = calloc(max(4,turn+1), sizeof(int));
 	for (f = factions; f; f = f->next) if (f->no != MONSTER_FACTION) {
 		if (RemoveNMRNewbie() && !fval(f, FFL_NOIDLEOUT)) {
 			if (f->age>=0 && f->age <= turn) ++age[f->age];

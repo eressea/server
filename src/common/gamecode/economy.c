@@ -159,6 +159,7 @@ scramble(void *data, int n, size_t width)
 			char * src = ((char*)data)+width*i;
 			int k = i;
 			int dest = vec[k].index;
+
 			if (temp==NULL) {
 				temp = malloc(width);
 			}
@@ -166,7 +167,7 @@ scramble(void *data, int n, size_t width)
 			do {
 				char * target = ((char*)data)+width*dest;
 				memcpy(buffer, target, width);
-				memcpy(target, src, width);
+				memmove(target, src, width);
 				k = dest; /* wo das gerettete target hin soll */
 				dest = vec[dest].index;
 				vec[k].index = k; /* dest ist an der richtigen stelle */

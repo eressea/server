@@ -407,8 +407,13 @@ rps(FILE * F, const char * src)
 {
 	char * s;
 
-	if (strstr(src, "\\r(")) s = replace_global_coords(src, current_faction);
-	else s = strcpy(buf, src);
+	if (strstr(src, "\\r(")) {
+		s = replace_global_coords(src, current_faction);
+	} else if(src != buf) {
+		s = strcpy(buf, src);
+	} else {
+		s = src;
+	}
 	rpsnr(F, s, 0);
 }
 
