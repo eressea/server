@@ -1,6 +1,7 @@
+<?xml version="1.0"?>
 <races>
-	<race name="halfling" magres="0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace walk giveitem giveperson giveunit getitem equipment>
-		<ai splitsize="10000" attackrandom moverandom learn></ai>
+	<race name="halfling" magres="0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" ac="0" damage="1d5" unarmedattack="-2" unarmeddefense="-2" attackmodifier="0" defensemodifier="0" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+		<ai splitsize="10000" attackrandom="yes" moverandom="yes" learn="yes"></ai>
 		<function name="itemdrop" value="halflingspoil"></function>
 		<skill name="sk_crossbow" modifier="0"></skill>
 		<skill name="sk_mining" modifier="1"></skill>
@@ -24,7 +25,7 @@
 		<skill name="sk_taxation" modifier="-1"></skill>
 		<skill name="sk_unarmed" modifier="-99"></skill>
 		<attack type="1" damage="1d5"></attack>
-		<familiar race="owl" default></familiar>
+		<familiar race="owl" default="yes"></familiar>
 		<familiar race="rat"></familiar>
 		<familiar race="eagle"></familiar>
 		<familiar race="songdragon"></familiar>

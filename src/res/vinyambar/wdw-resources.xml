@@ -1,139 +1,33 @@
-<resource name="magicskillboost">
-	<comment>Boost a magician's skill to level 3</comment>
-	<item notlost weight="0">
-		<function name="use" value="usemagicboost"></function>
-	</item>
-</resource>
-<strings>
-	<string name="magicskillboost">
-		<text locale="de">Schriftrolle</text>
-		<text locale="en">scroll</text>
-	</string>
-	<string name="magicskillboost_p">
-		<text locale="de">Schriftrollen</text>
-		<text locale="en">scrolls</text>
-	</string>
-</strings>
-
-<strings>
-	<string name="gem">
-		<text locale="de">Edelstein</text>
-		<text locale="en">gem</text>
-	</string>
-	<string name="gem_p">
-		<text locale="de">Edelsteine</text>
-		<text locale="en">gems</text>
-	</string>
-</strings>
-
-<resource name="opal" appearance="gem">
-	<item weight="0"></item>
-</resource>
-<strings>
-	<string name="opal">
-		<text locale="de">Opal</text>
-		<text locale="en">opal</text>
-	</string>
-	<string name="opal_p">
-		<text locale="de">Opale</text>
-		<text locale="en">opals</text>
-	</string>
-</strings>
-
-<resource name="diamond" appearance="gem">
-	<item weight="0"></item>
-</resource>
-<strings>
-	<string name="diamond">
-		<text locale="de">Diamant</text>
-		<text locale="en">diamond</text>
-	</string>
-	<string name="diamond_p">
-		<text locale="de">Diamanten</text>
-		<text locale="en">diamonds</text>
-	</string>
-</strings>
-
-<resource name="zaphire" appearance="gem">
-	<item weight="0"></item>
-</resource>
-<strings>
-	<string name="zaphire">
-		<text locale="de">Saphir</text>
-		<text locale="en">zaphire</text>
-	</string>
-	<string name="zaphire_p">
-		<text locale="de">Saphire</text>
-		<text locale="en">zaphires</text>
-	</string>
-</strings>
-
-<resource name="topaz" appearance="gem">
-	<item weight="0"></item>
-</resource>
-<strings>
-	<string name="topaz">
-		<text locale="de">Topas</text>
-		<text locale="en">topaz</text>
-	</string>
-	<string name="topaz_p">
-		<text locale="de">Topase</text>
-		<text locale="en">topazes</text>
-	</string>
-</strings>
-
-<resource name="beryl" appearance="gem">
-	<item weight="0"></item>
-</resource>
-<strings>
-	<string name="beryl">
-		<text locale="de">Beryll</text>
-		<text locale="en">beryl</text>
-	</string>
-	<string name="beryl_p">
-		<text locale="de">Berylle</text>
-		<text locale="en">beryls</text>
-	</string>
-</strings>
-
-<resource name="agate" appearance="gem">
-	<item weight="0"></item>
-</resource>
-<strings>
-	<string name="agate">
-		<text locale="de">Achat</text>
-		<text locale="en">agate</text>
-	</string>
-	<string name="agate_p">
-		<text locale="de">Achate</text>
-		<text locale="en">agates</text>
-	</string>
-</strings>
-
-<resource name="garnet" appearance="gem">
-	<item weight="0"></item>
-</resource>
-<strings>
-	<string name="garnet">
-		<text locale="de">Granat</text>
-		<text locale="en">garnet</text>
-	</string>
-	<string name="garnet_p">
-		<text locale="de">Granate</text>
-		<text locale="en">garnets</text>
-	</string>
-</strings>
-
-<resource name="emerald" appearance="gem">
-	<item weight="0"></item>
-</resource>
-<strings>
-	<string name="emerald">
-		<text locale="de">Smaragd</text>
-		<text locale="en">emerald</text>
-	</string>
-	<string name="emerald_p">
-		<text locale="de">Smaragde</text>
-		<text locale="en">emeralds</text>
-	</string>
-</strings>
+<?xml version="1.0"?>
+<resources>
+	<resource name="magicskillboost">
+		<comment>Boost a magician's skill to level 3</comment>
+		<item notlost="yes" weight="0">
+			<function name="use" value="usemagicboost"></function>
+		</item>
+	</resource>
+	<resource name="opal" appearance="gem">
+		<item weight="0"></item>
+	</resource>
+	<resource name="diamond" appearance="gem">
+		<item weight="0"></item>
+	</resource>
+	<resource name="zaphire" appearance="gem">
+		<item weight="0"></item>
+	</resource>
+	<resource name="topaz" appearance="gem">
+		<item weight="0"></item>
+	</resource>
+	<resource name="beryl" appearance="gem">
+		<item weight="0"></item>
+	</resource>
+	<resource name="agate" appearance="gem">
+		<item weight="0"></item>
+	</resource>
+	<resource name="garnet" appearance="gem">
+		<item weight="0"></item>
+	</resource>
+	<resource name="emerald" appearance="gem">
+		<item weight="0"></item>
+	</resource>
+</resources>

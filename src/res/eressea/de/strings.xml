@@ -16,4 +16,10 @@
 		<text locale="de">Tempel</text>
 		<text locale="en">temple</text>
 	</string>
+	<string name="seaserpenthead">
+		<text locale="de">Seeschlangenkopf</text>
+	</string>
+	<string name="seaserpenthead_p">
+		<text locale="de">Seeschlangenköpfe</text>
+	</string>
 </strings>

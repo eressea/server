@@ -1,32 +1,38 @@
-<eressea>
+<?xml version="1.0"?>
+<eressea xmlns:xi="http://www.w3.org/2001/XInclude">
+	<xi:include href="messages.xml"/>
+
 	<comment>Localization</comment>
 	<comment>Strings MUST always be read first</comment>
-	<include file="vinyambar/de/strings.xml"></include>
-	<include file="de/strings-wdw.xml"></include>
-	<include file="en/strings.xml"></include>
-	<include file="messages.xml"></include>
 
-	<include file="vinyambar/wdw-resources.xml"></include>
+	<xi:include href="de/strings.xml"/>
+	<xi:include href="en/strings.xml"/>
 
-	<include file="races.xml"></include>
-	<include file="resources.xml"></include>
-	<include file="ships.xml"></include>
-	<include file="buildings.xml"></include>
+	<xi:include href="races.xml"/>
+	<xi:include href="resources.xml"/>
+	<xi:include href="ships.xml"/>
+	<xi:include href="buildings.xml"/>
 
 	<game name="Wettstreit der Weisen" units="250" welcome="vinyambar">
 		<comment>Game specific</comment>
-		<order name="ARBEITEN" disable></order>
-		<order name="MEINUNG" disable></order>
-		<order name="MAGIEGEBIET" disable></order>
-		<param name="entertain.base" value="15"></param>
-		<param name="entertain.perlevel" value="5"></param>
-		<param name="nmr.timeout" value="5"></param>
-		<param name="nmr.removenewbie" value="0"></param>
-		<param name="GiveRestriction" value="0"></param>
-		<param name="database.gameid" value="3"></param>
-		<param name="hunger.long" value="0"></param>
-		<param name="allied.skilllimit" value="15"></param>
+		<order name="ARBEITEN" disable="yes"/>
+		<order name="MEINUNG" disable="yes"/>
+		<order name="MAGIEGEBIET" disable="yes"/>
+		<param name="entertain.base" value="15"/>
+		<param name="entertain.perlevel" value="5"/>
+		<param name="nmr.timeout" value="5"/>
+		<param name="nmr.removenewbie" value="0"/>
+		<param name="GiveRestriction" value="0"/>
+		<param name="database.gameid" value="3"/>
+		<param name="hunger.long" value="0"/>
+		<param name="allied.skilllimit" value="15"/>
 	</game>
+
+	<xi:include href="vinyambar/wdw-strings.xml"/>
+	<xi:include href="vinyambar/wdw-resources.xml" />
+	<xi:include href="vinyambar/wdw-races.xml"/>
+	<xi:include href="vinyambar/de/strings.xml"/>
+
 	<strings>
 		<string name="mailto">
 			<text>vinyambar@eressea.amber.kn-bremen.de</text>
