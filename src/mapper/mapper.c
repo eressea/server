@@ -494,6 +494,7 @@ modify_block(void)
 	region *r;
 	tagregion *t;
 	char *name;
+	int div;
 
 	win = openwin(70, 4, "< Tag-Regionen modifizieren >");
 	wmove(win, 1, 2);
@@ -517,7 +518,10 @@ modify_block(void)
 		}
 		break;
 	case 'n':
-		name = my_input(win, 2, 2, "Name: ", NULL);
+		name    = my_input(win, 2, 2, "Name: ", NULL);
+		break;
+	case 'p':
+		div = atoi(my_input(win, 2, 2, "Divisor: ", "1"));
 		break;
 	}
 
@@ -529,7 +533,8 @@ modify_block(void)
 					rsetname(r, name);
 					break;
 				case 'p':
-					rsetpeasants(r, production(r)*3+rand()%(production(r)*3));
+					rsetpeasants(r, (production(r)*3+rand()%(production(r)*3))/div);
+					rsetmoney(r, (production(r)*10+rand()%(production(r)*10))/div);
 					break;
 				case 'h':
 					rsethorses(r, rand()%(production(r) / 10));

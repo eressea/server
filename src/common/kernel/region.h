@@ -192,7 +192,7 @@ void rsetlaen(struct region * r, int value);
 #define rsetherbs(r, value) ((r)->land?((r)->land->herbs=(short)(value)):(value),0)
 
 extern boolean r_isforest(const struct region * r);
-
+extern boolean r_issea(const struct region * r);
 extern boolean r_isglacier(const struct region * r);
 
 #define rterrain(r) (terrain_t)((r)?(r)->terrain:T_FIREWALL)

@@ -564,6 +564,18 @@ r_isforest(const region * r)
 }
 
 boolean
+r_issea(const region * r)
+{
+	direction_t d;
+
+	for(d=0; d < MAXDIRECTIONS; d++) {
+		region *rc = rconnect(r,d);
+		if(rc && rterrain(rc) == T_OCEAN) return false;
+	}
+	return true;
+}
+
+boolean
 r_isglacier(const region * r)
 {
 	if (r->terrain==T_GLACIER || r->terrain==T_ICEBERG_SLEEP) return true;
