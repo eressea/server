@@ -852,11 +852,8 @@ visible_faction(const faction *f, const unit * u)
 		attrib *a = a_find(u->attribs, &at_otherfaction);
 		if (a) {
 			faction *fv = get_otherfaction(a);
-			if(fv != NULL) {
-				return fv;	/* fv should never be NULL! */
-			} else {
-				a_removeall(&u->attribs, &at_otherfaction);	/* workaround, if this is triggered, it's a bug */
-			}
+			assert (fv != NULL);	/* fv should never be NULL! */
+			return fv;
 		}
 	}
 	return u->faction;
