@@ -6384,9 +6384,17 @@ sp_disruptastral(castorder *co)
 	for (rl2=rl; rl2!=NULL; rl2=rl2->next) {
 		attrib *a, *a2;
 		spec_direction *sd;
+    int inhab_regions = 0;
+    regionlist * trl = NULL;
 
-		if(is_cursed(rl2->region->attribs, C_ASTRALBLOCK, 0))
-			continue;
+		if (is_cursed(rl2->region->attribs, C_ASTRALBLOCK, 0)) continue;
+
+    if (rl2->region->units!=NULL) {
+      regionlist * trl2;
+
+      trl = allinhab_in_range(r_astral_to_standard(rl2->region), TP_RADIUS);
+      for (trl2 = trl; trl2; trl2 = trl2->next) ++inhab_regions;
+    }
 
 		/* Nicht-Permanente Tore zerstören */
 		a = a_find(r->attribs, &at_direction);
@@ -6394,34 +6402,33 @@ sp_disruptastral(castorder *co)
 		while (a!=NULL) {
 			a2 = a->nexttype;
 			sd = (spec_direction *)(a->data.v);
-			if(sd->duration != -1) a_remove(&r->attribs, a);
+			if (sd->duration != -1) a_remove(&r->attribs, a);
 			a = a2;
 		}
 
 		/* Einheiten auswerfen */
 
-		for(u=rl2->region->units;u;u=u->next) {
-			if(u->race != new_race[RC_SPELL]) {
-				regionlist *trl, *trl2;
-				region *tr;
-				int c = 0;
+    if (trl!=NULL) {
+      for (u=rl2->region->units;u;u=u->next) {
+			  if (u->race != new_race[RC_SPELL]) {
+          regionlist *trl2 = trl;
+				  region *tr;
+          int c = rand() % inhab_regions;
 
-				/* Zufällige Zielregion suchen */
-				trl = allinhab_in_range(r_astral_to_standard(rl2->region), TP_RADIUS);
-				for(trl2 = trl; trl2; trl2 = trl2->next) c++;
-				c = rand()%c;
-				for(trl2 = trl; trl2 && c != 0; trl2 = trl2->next) c--;
-				tr = trl2->region;
-				free_regionlist(trl);
+				  /* Zufällige Zielregion suchen */
+          while (c--!=0) trl2 = trl2->next;
+				  tr = trl2->region;
 
-				if(!is_magic_resistant(mage, u, 0) && can_survive(u, tr)) {
-					move_unit(u, tr, NULL);
-					sprintf(buf, "%s wird aus der astralen Ebene nach %s geschleudert.",
-						unitname(u), regionid(tr));
-					addmessage(0, u->faction, buf, MSG_MAGIC, ML_INFO);
-				}
-			}
-		}
+				  if(!is_magic_resistant(mage, u, 0) && can_survive(u, tr)) {
+					  move_unit(u, tr, NULL);
+					  sprintf(buf, "%s wird aus der astralen Ebene nach %s geschleudert.",
+						  unitname(u), regionid(tr));
+					  addmessage(0, u->faction, buf, MSG_MAGIC, ML_INFO);
+				  }
+			  }
+		  }
+      free_regionlist(trl);
+    }
 
 		/* Kontakt unterbinden */
 		create_curse(mage, &rl2->region->attribs, ct_find("astralblock"),
