@@ -1,5 +1,5 @@
 # Kommentare sind erlaubt. Endlich.
-# $Id: messages.de,v 1.4 2001/01/31 17:40:53 corwin Exp $
+# $Id: messages.de,v 1.5 2001/02/02 15:41:49 corwin Exp $
 
 # Fehlermeldungen:
 msg_errors;errors:0;de;{string}
@@ -483,7 +483,7 @@ wisps_effect;magic:0;de;{mage} ruft Irrlichter in {region}.
 becomewyrm;magic;2;de;{mage} verwandelt sich in einen Wyrm.
 puttorest;magic;0;de;{mage} befreit die gequälten Seelen der Toten.
 unholypower_effect;0;de;{mage} verwandelt {target}.
-unholypower_effect;0;de;{mage} verwandelt {amount} {race} aus {target}.
+unholypower_limitedeffect;0;de;{mage} verwandelt {amount} {race} aus {target}.
 holyground;0;de;{mage} beschwört Naturgeister in den Boden der Region.
 
 # Kämpfe
