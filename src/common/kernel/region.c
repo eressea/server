@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: region.c,v 1.8 2001/02/10 19:24:05 enno Exp $
+ *	$Id: region.c,v 1.9 2001/02/11 08:55:48 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -713,7 +713,11 @@ void
 setluxuries(region * r, const luxury_type * sale)
 {
 	const luxury_type * ltype;
+
 	assert(r->land);
+
+	if(r->land->demands) freelist(r->land->demands);
+
 	for (ltype=luxurytypes; ltype; ltype=ltype->next) {
 		struct demand * dmd = calloc(sizeof(struct demand), 1);
 		dmd->type = ltype;

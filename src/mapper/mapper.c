@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: mapper.c,v 1.11 2001/02/10 15:27:10 corwin Exp $
+ *	$Id: mapper.c,v 1.12 2001/02/11 08:55:48 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -30,6 +30,7 @@
 #include <modules/xmas2000.h>
 #include <modules/arena.h>
 #include <modules/museum.h>
+#include <modules/gmcmd.h>
 
 #include <item.h>
 #include <faction.h>
@@ -1245,6 +1246,8 @@ main(int argc, char *argv[])
 	init_museum();
 	init_arena();
 	init_xmas2000();
+
+	init_gmcmd();
 
 	if(!*datafile)
 		sprintf(datafile, "%s/%d", datapath(), turn);
