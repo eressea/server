@@ -317,7 +317,6 @@ fbattlerecord(faction * f, region * r, const char *s)
 boolean
 enemy(const side * as, const side * ds)
 {
-#ifdef FASTENEMY
 	switch(as->enemy[ds->index]) {
 	case E_ENEMY:
 	case E_ENEMY|E_ATTACKING:
@@ -325,38 +324,14 @@ enemy(const side * as, const side * ds)
 	default:
 		return false;
 	}
-#else
-	const struct enemy * e = as->enemies[ds->index % 16];
-	while (e && e->side!=ds) e=e->nexthash;
-	if (e) return true;
-	return false;
-#endif
 }
 
 static void
 set_enemy(side * as, side * ds, boolean attacking)
 {
-#ifdef FASTENEMY
 	ds->enemy[as->index] |= E_ENEMY;
 	as->enemy[ds->index] |= E_ENEMY;
 	if (attacking) as->enemy[ds->index] |= E_ATTACKING;
-#else
-	struct enemy * e = as->enemies[ds->index % 16];
-	while (e && e->side!=ds) e=e->nexthash;
-	if (e==NULL) {
-		e = calloc(sizeof(struct enemy), 1);
-		e->side = ds;
-		e->attacking = attacking;
-		e->nexthash = as->enemies[ds->index % 16];
-		as->enemies[ds->index % 16] = e;
-
-		e = calloc(sizeof(struct enemy), 1);
-		e->side = as;
-		e->nexthash = ds->enemies[as->index % 16];
-		ds->enemies[as->index % 16] = e;
-	}
-	else e->attacking |= attacking;
-#endif
 }
 
 extern int alliance(const ally * sf, const faction * f, int mode);
@@ -2139,11 +2114,7 @@ fleechance(unit * u)
 
 int nextside = 0;
 side *
-#ifdef STEALTHFACTION
 make_side(battle * b, const faction * f, const group * g, boolean stealth, const faction *stealthfaction)
-#else
-make_side(battle * b, const faction * f, const group * g, boolean stealth)
-#endif
 {
 	side *s1 = calloc(sizeof(struct side), 1);
 	bfaction * bf;
@@ -2151,9 +2122,7 @@ make_side(battle * b, const faction * f, const group * g, boolean stealth)
 	s1->battle = b;
 	s1->group = g;
 	s1->stealth = stealth;
-#ifdef STEALTHFACTION
 	s1->stealthfaction = stealthfaction;
-#endif
 	cv_pushback(&b->sides, s1);
 	for (bf = b->factions;bf;bf=bf->next) {
 		faction * f2 = bf->faction;
@@ -2596,9 +2565,6 @@ print_stats(battle * b)
 
 		for (bf=b->factions;bf;bf=bf->next) {
 			faction * f = bf->faction;
-#ifndef FASTENEMY
-			struct enemy * e;
-#endif
 			fbattlerecord(f, b->region, " ");
 			sprintf(buf, "Heer %d: %s", side->index,
 					seematrix(f, side)
@@ -2622,7 +2588,6 @@ print_stats(battle * b)
 			fbattlerecord(f, b->region, buf);
 			strcpy(buf, "Attacke gegen:");
 			komma = false;
-#ifdef FASTENEMY
 			for_each(s2, b->sides) {
 				if (side->enemy[s2->index] & E_ATTACKING) {
 					if (seematrix(f, s2) == true) {
@@ -2635,19 +2600,6 @@ print_stats(battle * b)
 				}
 			}
 			next(s2);
-#else
-			for (i=0;i!=16;i++)
-			for (e=side->enemies[i]; e; e=e->nexthash) if (e->attacking) {
-				struct side * s2 = e->side;
-				if (seematrix(f, s2) == true) {
-					sprintf(buf, "%s%s Heer %d(%s)", buf, komma++ ? "," : "",
-							s2->index, sideabkz(s2,false));
-				} else {
-					sprintf(buf, "%s%s Heer %d(Unb)", buf, komma++ ? "," : "",
-							s2->index);
-				}
-			}
-#endif
 			fbattlerecord(f, b->region, buf);
 		}
 		buf[77] = (char)0;
@@ -2707,10 +2659,8 @@ make_fighter(battle * b, unit * u, boolean attack)
 	int rest;
 	const attrib * a = a_find(u->attribs, &at_group);
 	const group * g = a?(const group*)a->data.v:NULL;
-#ifdef STEALTHFACTION
 	const attrib *a2 = a_find(u->attribs, &at_otherfaction);
 	const faction *stealthfaction = a2?findfaction(a2->data.i):NULL;
-#endif
 
 	/* Illusionen und Zauber kaempfen nicht */
 	if (fval(u->race, RCF_ILLUSIONARY) || idle(u->faction))
@@ -2719,9 +2669,7 @@ make_fighter(battle * b, unit * u, boolean attack)
 	for_each(s2, b->sides) {
 		if (s2->bf->faction == u->faction
 				&& s2->stealth==stealth
-#ifdef STEALTHFACTION
 				&& s2->stealthfaction == stealthfaction
-#endif
 				) {
 			if (s2->group==g) {
 				s1 = s2;
@@ -2731,11 +2679,7 @@ make_fighter(battle * b, unit * u, boolean attack)
 	} next(s2);
 
 	/* aliances are moved out of make_fighter and will be handled later */
-#ifdef STEALTHFACTION
 	if (!s1) s1 = make_side(b, u->faction, g, stealth, stealthfaction);
-#else
-	if (!s1) s1 = make_side(b, u->faction, g, stealth);
-#endif
 	/* Zu diesem Zeitpunkt ist attacked noch 0, da die Einheit für noch
 	 * keinen Kampf ausgewählt wurde (sonst würde ein fighter existieren) */
 	fig = calloc(1, sizeof(struct fighter));
@@ -3067,14 +3011,6 @@ make_battle(region * r)
 static void
 free_side(side * si)
 {
-#ifndef FASTENEMY
-	int i;
-	for (i=0;i!=16;++i) while (si->enemies[i]) {
-		struct enemy * e = si->enemies[i]->nexthash;
-		free(si->enemies[i]);
-		si->enemies[i] = e;
-	}
-#endif
 	cv_kill(&si->fighters);
 }
 
@@ -3242,7 +3178,6 @@ join_allies(battle * b)
 				if (s->bf->faction!=f && s->bf->attacker) continue;
 				/* alliiert müssen wir schon sein, sonst ist's eh egal : */
 				if (!allied(u, s->bf->faction, HELP_FIGHT)) continue;
-#ifdef STEALTHFACTION
 				/* wenn die partei verborgen ist, oder gar eine andere
 				 * vorgespiegelt wird, und er sich uns gegenüber nicht zu
 				 * erkennen gibt, helfen wir ihm nicht */
@@ -3251,7 +3186,6 @@ join_allies(battle * b)
 						continue;
 					}
 				}
-#endif
 			}
 			/* einen alliierten angreifen dürfen sie nicht, es sei denn, der
 			 * ist mit einem alliierten verfeindet, der nicht attackiert
@@ -3456,7 +3390,6 @@ do_battle(void)
 							list_continue(sl);
 						}
 						/* Fehler: "Die Einheit ist mit uns alliert" */
-#ifdef STEALTHFACTION
 						/* alliances are dissolved */
 						if (allied(u, u2->faction, HELP_FIGHT)) {
 							ally *sf, **sfp;
@@ -3490,12 +3423,6 @@ do_battle(void)
 								}
 							}
 						}
-#else
-						if (allied(u, u2->faction, HELP_FIGHT)) {
-							cmistake(u, sl->s, 47, MSG_BATTLE);
-							list_continue(sl);
-						}
-#endif
 						/* xmas */
 						if (u2->no==atoi36("xmas") && old_race(u2->irace)==RC_GNOME) {
 							a_add(&u->attribs, a_new(&at_key))->data.i = atoi36("coal");

@@ -4552,7 +4552,7 @@
 		</type>
 		<locale name="de">
 			<nr section="events">
-				<text>"$unit($target) fühlt sich durch $unit($spy) beobachtet."</text>
+				<text>"$unit($target) fühlt sich $if($isnull($spy),"","durch $unit($spy) ")beobachtet."</text>
 			</nr>
 		</locale>
 	</message>

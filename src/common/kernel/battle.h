@@ -16,7 +16,6 @@
 
 /** new code defines **/
 #define FAST_GETUNITROW
-#define FASTENEMY
 
 /** more defines **/
 #define FS_ENEMY 1
@@ -76,17 +75,9 @@ typedef struct side {
 	struct faction *faction;	/* Die Partei, die hier kämpft */
 	struct bfaction * bf; /* Die Partei, die hier kämpft */
 	const struct group * group;
-#ifdef FASTENEMY
 # define E_ENEMY 1
 # define E_ATTACKING 2
 	int enemy[128];
-#else
-	struct enemy {
-		struct enemy * nexthash;
-		boolean attacking;
-		struct side * side;
-	} * enemies[16];
-#endif
 	cvector fighters;	/* vector der Einheiten dieser Fraktion */
 	int index;		/* Eintrag der Fraktion in b->matrix/b->enemies */
 	int size[NUMROWS];	/* Anzahl Personen in Reihe X. 0 = Summe */

@@ -30,8 +30,6 @@
  */
 #include <settings.h>
 
-#define STEALTHFACTION
-
 /* Features currently in development (change makefile please): */
 /* #define MSG_LEVELS -- msg-levels active */
 
