@@ -119,11 +119,11 @@ static weapondata weapontable[WP_MAX + 1] =
 	/* Laenschwert */
 	{0.30, "3d6+10", "3d6+10", I_LAENSWORD, SK_SWORD, 1, 1, false, false, { RL_NONE, 0}, CUT },
 	/* Katapult */
-	{0.00, "3d10+5", "3d10+5", I_CATAPULT, SK_CATAPULT, -4, 0, true, false, { RL_CATAPULT, 5 }, BASH },
+	{0.00, "3d10+5", "3d10+5", I_CATAPULT, SK_CATAPULT, 0, 0, true, false, { RL_CATAPULT, 5 }, BASH },
 	/* Elfenbogen */
-	{0.00, "2d6+4", "2d6+4", I_GREATBOW, SK_LONGBOW, -2, 0, true, false, { RL_NONE, 0 }, PIERCE },
+	{0.00, "2d6+4", "2d6+4", I_GREATBOW, SK_LONGBOW, 0, 0, true, false, { RL_NONE, 0 }, PIERCE },
 	/* Langbogen */
-	{0.00, "1d11+1", "1d11+1", I_LONGBOW, SK_LONGBOW, -2, 0, true, false, { RL_NONE, 0 }, PIERCE },
+	{0.00, "1d11+1", "1d11+1", I_LONGBOW, SK_LONGBOW, 0, 0, true, false, { RL_NONE, 0 }, PIERCE },
 	/* Armbrust */
 #if CHANGED_CROSSBOWS == 1
 	{0.00, "3d3+5", "3d3+5", I_CROSSBOW, SK_CROSSBOW, 0, 0, true, false, { RL_CROSSBOW, 2 }, PIERCE | ARMORPIERCING },
@@ -405,7 +405,7 @@ weapon_type wt_mallornbow = {
 	{ "1d11+2", "1d11+2" }, /* on foot, on horse */
 	WTF_BOW|WTF_MISSILE|WTF_PIERCE, /* flags */
 	SK_LONGBOW, 5,          /* skill, minskill */
-	-2, 0, 0.15, 0,           /* offmod, defmod, magres, reload */
+	0, 0, 0.15, 0,           /* offmod, defmod, magres, reload */
 	wm_bow
 };
 /** end mallornbow **/
