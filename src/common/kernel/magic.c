@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: magic.c,v 1.6 2001/02/09 13:53:51 corwin Exp $
+ *	$Id: magic.c,v 1.7 2001/02/12 22:39:56 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2414,7 +2414,7 @@ sm_familiar(const unit * u, const region * r, skill_t sk, int value) /* skillmod
 		int mod;
 		unit * familiar = get_familiar(u);
 		if (familiar==NULL) {
-			fprintf(stderr, "WARNING: %s has a familiar-skillmod, but no familiar\n", unitname(u));
+			log_error(("[sm_familiar] %s has a familiar-skillmod, but no familiar\n", unitname(u)));
 			return value;
 		}
 		mod = eff_skill(familiar, sk, r)/2;

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: border.c,v 1.4 2001/02/10 10:40:11 enno Exp $
+ *	$Id: border.c,v 1.5 2001/02/12 22:39:56 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -117,7 +117,7 @@ read_borders(FILE * f)
 		if (to==from) {
 			direction_t dir = (direction_t) (rand() % MAXDIRECTIONS);
 			region * r = rconnect(from, dir);
-			fprintf(stderr, "WARNING: invalid %s in %s\n", type->__name, tregionid(from, NULL));
+			log_error(("[read_borders] invalid %s in %s\n", type->__name, tregionid(from, NULL)));
 			if (r!=NULL) to = r;
 		}
 		b = new_border(type, from, to);

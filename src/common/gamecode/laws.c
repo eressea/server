@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: laws.c,v 1.19 2001/02/11 20:54:01 enno Exp $
+ *	$Id: laws.c,v 1.20 2001/02/12 22:39:56 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -2142,7 +2142,7 @@ reorder_owners(region * r)
 		assert(!u->building);
 		if (u->ship==NULL) {
 			if (fval(u, FL_OWNER)) {
-				fprintf(stderr, "WARNING: Einheit %s war Besitzer von nichts.\n", unitname(u));
+				log_warning(("[reorder_owners] Einheit %s war Besitzer von nichts.\n", unitname(u)));
 				freset(u, FL_OWNER);
 			}
 			if (useek!=up) {

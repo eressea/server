@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: main.c,v 1.14 2001/02/11 19:55:00 corwin Exp $
+ *	$Id: main.c,v 1.15 2001/02/12 22:39:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -491,6 +491,9 @@ read_args(int argc, char **argv)
 				maxregions = atoi(argv[++i]);
 				maxregions = (maxregions*81+80) / 81;
 				break;
+			case 'l':
+				log_open(argv[++i]);
+				break;
 			default:
 				usage(argv[0], argv[i]);
 		}
@@ -504,6 +507,7 @@ main(int argc, char *argv[])
 	int i;
 	char zText[MAX_PATH];
 
+	log_open("eressea.log");
 	printf("\n%s PBEM host\n"
 		"Copyright (C) 1996-2001 C.Schlittchen, K.Zedel, E.Rehling, H.Peters.\n\n"
 	   "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
@@ -538,6 +542,6 @@ main(int argc, char *argv[])
 
 	game_done();
 	kernel_done();
-
+	log_close();
 	return 0;
 }

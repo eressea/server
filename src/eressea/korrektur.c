@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: korrektur.c,v 1.20 2001/02/10 19:24:05 enno Exp $
+ *	$Id: korrektur.c,v 1.21 2001/02/12 22:39:57 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -83,7 +83,7 @@ fix_skills(void)
 		/* make sure that this is done only once! */
 		while (a && a->data.i!=magic) a=a->next;
 		if (a) {
-			fprintf(stderr, "WARNING: fix_skills() was called a second time\n");
+			log_warning(("[fix_skills] function was called a second time\n"));
 			return;
 		}
 		a_add(&global.attribs, a_new(&at_key))->data.i = magic;
@@ -95,7 +95,7 @@ fix_skills(void)
 		if (fscanf(F, "%s %d %d %d %d %d\n", zText, &skill, &number, &from, &self, &teach)<=0) break;
 		u = findunit(atoi36(zText));
 		if (u==NULL) {
-			fprintf(stderr, "unit %s not found!\n", zText);
+			log_warning(("[fix_skills] unit %s not found!\n", zText));
 			continue;
 		}
 		myskill = get_skill(u, (skill_t)skill);
@@ -114,7 +114,7 @@ fix_skills(void)
 	attrib * a = a_find(global.attribs, &at_key); \
 	while (a && a->data.i!=(magic)) a=a->next; \
 	if (a) { \
-		fprintf(stderr, "WARNING: a unique fix was called a second time\n"); \
+		log_warning(("[do_once] a unique fix was called a second time\n")); \
 		return; \
 	} \
 	else (fun); \
@@ -413,7 +413,7 @@ repair_illusion(void)
 			  else if (i) continue;
 			  else {
 				u->race = RC_ILLUSION;
-				fprintf(stderr, "Illusion repariert: %s in Partei %s\n", unitname(u), factionid(u->faction));
+				log_puts("[repair_illusion] repariert: %s in Partei %s\n", unitname(u), factionid(u->faction));
 			  }
 			}
 			if(!race[u->race].nonplayer && (
@@ -620,7 +620,7 @@ fix_migrants(void) {
 		for (u=r->units;u;u=u->next) {
 			if (u->race==RC_HUMAN) u->irace=RC_HUMAN;
 			if (u->irace!=u->race && u->race!=RC_ILLUSION && u->race!=RC_DAEMON) {
-				fprintf(stderr, "WARNUNG: %s ist ein %s, als %s getarnt\n", unitname(u), race[u->race].name[0], race[u->irace].name[0]);
+				log_warning(("[fix_migrants] %s ist ein %s, als %s getarnt\n", unitname(u), race[u->race].name[0], race[u->irace].name[0]));
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: eressea.c,v 1.12 2001/02/10 14:18:00 enno Exp $
+ *	$Id: eressea.c,v 1.13 2001/02/12 22:39:56 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -915,8 +915,8 @@ strcheck (const char *s, size_t maxlen)
 	static char buffer[16 * 1024];
 	if (strlen(s) > maxlen) {
 		assert(maxlen < 16 * 1024);
-		fprintf(stderr, "\nWARNUNG: String wurde auf %d Zeichen verkürzt:\n%s\n",
-				(int)maxlen, s);
+		log_warning(("[strcheck] String wurde auf %d Zeichen verkürzt:\n%s\n",
+				(int)maxlen, s));
 		strncpy(buffer, s, maxlen);
 		buffer[maxlen] = 0;
 		return buffer;
