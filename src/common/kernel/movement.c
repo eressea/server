@@ -1299,7 +1299,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
 
   if (iroute!=route_begin) {
     /* the unit has moved at least one region */
-    int mode;
+    int walkmode;
     region_list *rlist = route_begin;
     char * p = buf;
     region * next = r;
@@ -1307,12 +1307,14 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
     setguard(u, GUARD_NONE);
     cycle_route(u, steps);
 
-    if (canride(u)) {
-      mode = 1;
+    if (mode==TRAVEL_RUNNING) {
+      walkmode = 0;
+    } if (canride(u)) {
+      walkmode = 1;
       produceexp(u, SK_RIDING, u->number);
     } else {
-      mode = 2;
-    } /* TODO: Flucht mit 0, was mit transport? */
+      walkmode = 2;
+    }
 
     /* Berichte über Durchreiseregionen */
 
@@ -1330,8 +1332,10 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
       next = rlist->data;
       rlist = rlist->next;
     }
-    ADDMSG(&u->faction->msgs, msg_message("travel", 
-      "unit mode start end regions", u, mode, r, current, strdup(buf)));
+    if (mode!=TRAVEL_TRANSPORTED) {
+      ADDMSG(&u->faction->msgs, msg_message("travel", 
+        "unit mode start end regions", u, walkmode, r, current, strdup(buf)));
+    }
 
     mark_travelthru(u, r, route_begin, iroute);
     move_unit(u, current, NULL);

@@ -586,7 +586,7 @@ shipspeed (const ship * sh, const unit * u)
   }
 
   a = a_find(sh->attribs, &at_speedup);
-  while(a != NULL) {
+  while (a != NULL) {
     k += a->data.i;
     a = a->nexttype;
   }
