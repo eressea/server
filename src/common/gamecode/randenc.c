@@ -1068,6 +1068,7 @@ randomevents(void)
 		for (u = r->units; u; u = u->next) {
 			if (is_cursed(u->attribs, C_ORC, 0)
 					&& !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
+				int n;
 				int increase = 0;
 				int num  = min(get_cursedmen(u->attribs, C_ORC, 0), u->number);
 				int prob = get_curseeffect(u->attribs, C_ORC, 0);
@@ -1099,6 +1100,7 @@ randomevents(void)
 		for (u = r->units; u; u = u->next) {
 			if ( (u->race == new_race[RC_ORC])
 					&& !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)) {
+				int n;
 				int increase = 0;
 				int num  = u->number;
 				int prob = 5;
