@@ -1905,7 +1905,7 @@ attack(battle *b, troop ta, const att *a)
 						ta.fighter->action_counter++;
 					}
 
-					if (wp && hits(ta, td, wp)) {
+					if (hits(ta, td, wp)) {
 						const char * d;
 						if (wp == NULL) d = au->race->def_damage;
 						else if (riding(ta)) d = wp->type->damage[1];

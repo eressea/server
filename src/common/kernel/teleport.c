@@ -150,7 +150,7 @@ create_teleport_plane(void)
 		astral_plane = create_new_plane(1, "Astralraum",
 			TE_CENTER_X-500, TE_CENTER_X+500,
 			TE_CENTER_Y-500, TE_CENTER_Y+500,
-			PFL_NOCOORDS);
+			0);
 	}
 
 	/* Regionsbereich aufbauen. */

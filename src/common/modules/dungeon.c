@@ -127,7 +127,10 @@ make_dungeon(const dungeon * data)
 			if (rn && rn->terrain==T_OCEAN) terraform(rn, T_FIREWALL);
 		}
 		if (size==0) break;
-		assert(r!=rnext);
+		if (r==rnext) {
+			/* error */
+			break;
+		}
 		r = rnext;
 		n = (n+1) % 2;
 	}
@@ -161,7 +164,8 @@ void
 make_dungeongate(region * source, region * target, const struct dungeon * d)
 {
 	building *bsource, *btarget;
-	
+
+	if (source==NULL || target==NULL || d==NULL) return;
 	bsource = new_building(bt_find("castle"), source, default_locale);
 	set_string(&bsource->name, "Pforte zur Hölle");
 	bsource->size = 50;

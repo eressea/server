@@ -745,10 +745,11 @@ transfermen(unit * u, unit * u2, int n)
 		/* TODO: Das ist schnarchlahm! und gehört ncht hierhin */
 		a = a_find(u2->attribs, &at_effect);
 		while (a) {
+			attrib * an = a->nexttype;
 			effect_data * olde = (effect_data*)a->data.v;
 			int e = get_effect(u, olde->type);
 			if (e!=0) change_effect(u2, olde->type, -e);
-			a = a->nexttype;
+			a = an;
 		}
 	}
 	else if (r->land)

@@ -433,7 +433,7 @@ create_underworld(void)
 	int x, y;
 	region *r;
 	attrib *a;
-	plane * hell = create_new_plane(-1, "Hölle", 100000, 100000, 100020, 100020, PFL_NOCOORDS);
+	plane * hell = create_new_plane(-1, "Hölle", 100000, 100000, 100020, 100020, PFL_NONE);
 
 	for(x=0;x<=20;x++) {
 		for(y=0;y<=20;y++) {
@@ -2779,6 +2779,13 @@ heal_all(void)
 	return 0;
 }
 
+static void
+fix_astralplane(void)
+{
+	plane * astralplane = getplanebyname("Astralraum");
+	freset(astralplane, PFL_NOCOORDS);
+}
+
 void
 korrektur(void)
 {
@@ -2786,6 +2793,7 @@ korrektur(void)
 	setup_locales();
 #endif
 
+	fix_astralplane();
 	fix_firewalls();
 	fix_gates();
 #ifdef TEST_GM_COMMANDS
