@@ -23,8 +23,8 @@ def Display(Content, Title=DefaultTitle):
     TemplateInput = TemplateHandle.read()
     TemplateHandle.close()                    # close the file
 
-#    for key in Form.keys():
-#       Content=Content+"<br>"+str(key)+"="+str(Form[key])
+    for key in Form.keys():
+       Content=Content+"<br>"+str(key)+"="+str(Form[key])
 
     # this defines an exception string in case our
     # template file is messed up
@@ -238,8 +238,8 @@ def Save(custid, Password):
 	ngames=ngames - 1
 	gid = cursor.fetchone()[0]
 	key="race_"+str(int(gid))
+	update = db.cursor()
 	if Form.has_key(key):
-	    update = db.cursor()
 	    newrace=Form[key].value
 	    if newrace=='':
 		newrace=None
@@ -252,7 +252,9 @@ def Save(custid, Password):
 		    if race!=newrace:
 			update.execute("update subscriptions  set race='"+newrace+"' where id="+str(int(sid)))
 		else:
-		    update.execute("insert subscriptions (race, user, status, game) values ('"+newrace+"', "+str(int(custid))+", 'WAITING', "+str(int(gid))+") where id="+str(int(sid)))
+		    update.execute("insert subscriptions (race, user, status, game) values ('"+newrace+"', "+str(int(custid))+", 'WAITING', "+str(int(gid))+")")
+	else:
+	    update.execute('delete from subscriptions where user='+str(int(custid))+' and game='+str(int(gid)))
 
     nfactions = cursor.execute("select g.name, s.id, faction from games g, subscriptions s where s.status='ACTIVE' and s.user="+str(custid) + " and s.game=g.id")
     while nfactions > 0:

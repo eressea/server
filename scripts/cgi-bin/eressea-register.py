@@ -142,7 +142,7 @@ else:
 	    ip=os.environ['REMOTE_ADDR']
 	    cursor.execute("REPLACE userips (ip, user) VALUES ('"+ip+"', "+str(int(custid))+")")
 	cursor.execute("insert into subscriptions (user, race, game, status) VALUES ("+str(int(custid))+", '"+race+"', 0, 'PENDING')")
-	cursor.execute("select count(*) from users")
+	cursor.execute("select count(*) from users where status='WAITING' or status='CONFIRMED'")
 	Send(email, custid, firstname, password, cursor.fetchone()[0])
 	Display("<p>Deine Anmeldung wurde bearbeitet. Eine EMail mit Hinweisen ist unterwegs zu Dir.")
     db.close()
