@@ -82,24 +82,25 @@ def ShowInfo(custid, Password):
     global Errors
     db = MySQLdb.connect(db=dbname)
     cursor = db.cursor()
-    cursor.execute("select max(date), max(id) from transactions")
-    lastdate, id = cursor.fetchone()
-
-    nraces = cursor.execute("select distinct race, name from races where locale='de'")
-    races=[('', 'Keine Anmeldung')]
-    while nraces>0:
-	nraces = nraces - 1
-	races.append(cursor.fetchone())
     query=("select firstname, lastname, email, address, city, country, phone, status "+
       "from users "+
       "where id="+str(custid)+" and password='"+Password+"' ")
 
-    #print query
-    results = cursor.execute(query);
+    results = cursor.execute(query)
     if results != 0:
+	firstname, lastname, email, address, city, country, phone, status = cursor.fetchone()
+	if status=='WAITING':
+	    cursor.execute("update users set status='CONFIRMED' where id="+str(custid))
+	cursor.execute("select max(date), max(id) from transactions")
+	lastdate, id = cursor.fetchone()
+
+	nraces = cursor.execute("select distinct race, name from races where locale='de'")
+	races=[('', 'Keine Anmeldung')]
+	while nraces>0:
+	    nraces = nraces - 1
+	    races.append(cursor.fetchone())
 
         output = '<div align=center>Letzter Buchungstag: '+str(lastdate)[0:10]+'</div><form action="'+scripturl+'" method=post><div align=center><table  bgcolor="#e0e0e0" width=80% border>\n'
-	firstname, lastname, email, address, city, country, phone, status = cursor.fetchone()
 	
 	query = "SELECT sum(balance) from transactions where user="+str(custid)
 	transactions = cursor.execute(query)
