@@ -9,6 +9,11 @@
 
 // util includes
 #include <util/base36.h>
+#include <util/attrib.h>
+
+// attrib includes
+#include <attributes/attributes.h>
+#include <attributes/variable.h>
 
 // lua includes
 #include <lua.hpp>
@@ -120,6 +125,24 @@ faction_setpolicy(faction& a, faction& b, const char * flag, bool value)
   }
 }
 
+static const char *
+faction_get_variable(faction& f, const char *key)
+{
+	return get_variable((&f)->attribs, key);
+}
+
+static void
+faction_set_variable(faction& f, const char *key, const char *value)
+{
+	set_variable(&((&f)->attribs), key, value);
+}
+
+static void
+faction_delete_variable(faction& f, const char *key)
+{
+	return delete_variable(&((&f)->attribs), key);
+}
+
 void
 bind_faction(lua_State * L) 
 {
@@ -133,6 +156,9 @@ bind_faction(lua_State * L)
     .def(self == faction())
     .def("set_policy", &faction_setpolicy)
     .def("get_policy", &faction_getpolicy)
+    .def("set_variable", &faction_set_variable)
+    .def("get_variable", &faction_get_variable)
+    .def("delete_variable", &faction_delete_variable)
     .def_readonly("name", &faction::name)
     .def_readonly("password", &faction::passw)
     .def_readonly("email", &faction::email)

@@ -7,7 +7,8 @@ function run_wdw()
   
   -- run the turn (not yet)
   read_orders(orderfile)
-  init_sphinx()
+  sphinx_initfactions()
+  sphinx_weekly()
   plan_monsters()
   process_orders()
   outfile = "" .. get_turn()
@@ -28,6 +29,7 @@ function run_wdw()
 end
 
 scripts = {
+	"spinx-initfactions.lua",
 	"sphinx-announce.lua"
 }
 
