@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: reports.h,v 1.3 2001/02/05 16:11:58 enno Exp $
+ *	$Id: reports.h,v 1.4 2001/02/17 15:52:47 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -105,7 +105,7 @@ extern int  seasons;
 extern int  weeks_per_month;
 extern int  months_per_year;
 
-extern void report_item(const struct unit * owner, const struct item * i, const struct faction * viewer, const char ** name, const char ** basename, int * number);
+extern void report_item(const struct unit * owner, const struct item * i, const struct faction * viewer, const char ** name, const char ** basename, int * number, boolean singular);
 extern void report_building(FILE *F, const struct region * r, const struct building * b, const struct faction * f, int mode);
 extern int bufunit(const struct faction * f, const struct unit * u, int indent, int mode);
 

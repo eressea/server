@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: reports.c,v 1.4 2001/02/09 13:53:52 corwin Exp $
+ *	$Id: reports.c,v 1.5 2001/02/17 15:52:47 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -131,10 +131,10 @@ hp_status(const unit * u)
 }
 
 void
-report_item(const unit * owner, const item * i, const faction * viewer, const char ** name, const char ** basename, int * number)
+report_item(const unit * owner, const item * i, const faction * viewer, const char ** name, const char ** basename, int * number, boolean singular)
 {
 	if (owner->faction == viewer) {
-		if (name) *name = locale_string(viewer->locale, resourcename(i->type->rtype, ((i->number!=1)?GR_PLURAL:0)));
+		if (name) *name = locale_string(viewer->locale, resourcename(i->type->rtype, ((i->number!=1 && !singular)?GR_PLURAL:0)));
 		if (basename) *basename = resourcename(i->type->rtype, 0);
 		if (number) *number = i->number;
 	} else if (i->type->rtype==r_silver) {
@@ -155,7 +155,7 @@ report_item(const unit * owner, const item * i, const faction * viewer, const ch
 			if (basename) *basename = NULL;
 		}
 	} else {
-		if (name) *name = locale_string(viewer->locale, resourcename(i->type->rtype, NMF_APPEARANCE|((i->number!=1)?GR_PLURAL:0)));
+		if (name) *name = locale_string(viewer->locale, resourcename(i->type->rtype, NMF_APPEARANCE|((i->number!=1 && !singular)?GR_PLURAL:0)));
 		if (basename) *basename = resourcename(i->type->rtype, NMF_APPEARANCE);
 		if (number) {
 			const herb_type * htype = resource2herb(i->type->rtype);
@@ -274,13 +274,13 @@ bufunit(const faction * f, const unit * u, int indent,
 			item * ishow;
 			const char * ic;
 			int in;
-			report_item(u, itm, f, NULL, &ic, &in);
+			report_item(u, itm, f, NULL, &ic, &in, false);
 			if (ic && *ic && in>0) {
 				for (ishow = show; ishow; ishow=ishow->next) {
 					const char * sc;
 					int sn;
 					if (ishow->type==itm->type) sc=ic;
-					else report_item(u, ishow, f, NULL, &sc, &sn);
+					else report_item(u, ishow, f, NULL, &sc, &sn, false);
 					if (sc==ic || strcmp(sc, ic)==0) {
 						ishow->number+=itm->number;
 						break;
@@ -298,7 +298,7 @@ bufunit(const faction * f, const unit * u, int indent,
 	for (itm=show; itm; itm=itm->next) {
 		const char * ic;
 		int in;
-		report_item(u, itm, f, &ic, NULL, &in);
+		report_item(u, itm, f, &ic, NULL, &in, false);
 		if (in==0 || ic==NULL) continue;
 		scat(", ");
 

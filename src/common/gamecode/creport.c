@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: creport.c,v 1.7 2001/02/11 20:54:00 enno Exp $
+ *	$Id: creport.c,v 1.8 2001/02/17 15:52:46 enno Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -64,7 +64,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define C_REPORT_VERSION 54
+#define C_REPORT_VERSION 55
 #define NEWBLOCKS (C_REPORT_VERSION>=35)
 
 #define ENCODE_SPECIAL 1
@@ -154,7 +154,7 @@ render_message(FILE * f, faction * receiver, message * m)
 	for (i=0;i!=mt->argc;++i) {
 		switch (e->type) {
 			case IT_RESOURCE:
-				fprintf(f, "\"%s\";%s\n", resname((resource_t)m->data[i], 1), e->name);
+				fprintf(f, "\"%s\";%s\n", resname((resource_t)m->data[i], 0), e->name);
 				break;
 			case IT_RESOURCETYPE:
 				fprintf(f, "\"%s\";%s\n", locale_string(receiver->locale, resourcename((const resource_type *)m->data[i], 1)), e->name);
@@ -532,13 +532,13 @@ cr_output_unit(FILE * F, region * r,
 			item * ishow;
 			const char * ic;
 			int in;
-			report_item(u, itm, f, NULL, &ic, &in);
+			report_item(u, itm, f, NULL, &ic, &in, true);
 			if (in>0 && ic && *ic) {
 				for (ishow = show; ishow; ishow=ishow->next) {
 					const char * sc;
 					int sn;
 					if (ishow->type==itm->type) sc=ic;
-					else report_item(u, ishow, f, NULL, &sc, &sn);
+					else report_item(u, ishow, f, NULL, &sc, &sn, true);
 					if (sc==ic || strcmp(sc, ic)==0) {
 						ishow->number+=itm->number;
 						break;
@@ -558,7 +558,7 @@ cr_output_unit(FILE * F, region * r,
 		const char * ic;
 		int in;
 		assert(itm->type!=lasttype || !"error: list contains two objects of the same item");
-		report_item(u, itm, f, NULL, &ic, &in);
+		report_item(u, itm, f, NULL, &ic, &in, true);
 		if (in==0) continue;
 		if (!pr) {
 			pr = 1;
