@@ -186,7 +186,8 @@ attack_firesword(const troop * at, int *casualties, int row)
 	if (fi->catmsg == -1) {
 		int i, k=0;
 		for (i=0;i<=at->index;++i) {
-			if (fi->person[i].melee->type == oldweapontype[WP_FIRESWORD]) ++k;
+			struct weapon * wp = fi->person[i].melee;
+			if (wp!=NULL && wp->type == oldweapontype[WP_FIRESWORD]) ++k;
 		}
 		sprintf(buf, "%d Kämpfer aus %s benutz%s Flammenschwert%s:", k, unitname(fi->unit),
 			(k==1)?"t sein ":"en ihre",(k==1)?"":"er");
