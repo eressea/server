@@ -2579,7 +2579,11 @@ int
 lifestyle(const unit * u)
 {
 	static plane * astralspace = NULL;
-	int need = u->number * u->race->maintenance;
+	int need;
+
+	if(is_monstrous(u)) return 0;
+
+	need = u->number * u->race->maintenance;
 
 	if (!astralspace) {
 		astralspace = getplanebyname("Astralraum");

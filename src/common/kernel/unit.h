@@ -154,4 +154,6 @@ extern boolean learn_skill(struct unit * u, skill_t sk, double chance);
 
 extern int invisible(const unit *u);
 
+extern boolean is_monstrous(const unit * u);
+
 #endif

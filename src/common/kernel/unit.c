@@ -1048,3 +1048,10 @@ invisible(const unit *u)
 	return get_item(u, I_RING_OF_INVISIBILITY)
 		+ 100 * get_item(u, I_SPHERE_OF_INVISIBILITY);
 }
+
+boolean
+is_monstrous(const unit * u)
+{
+	return (boolean) (u->faction->no == MONSTER_FACTION || !playerrace(u->race));
+}
+

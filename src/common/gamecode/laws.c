@@ -143,12 +143,6 @@ checkorders(void)
 }
 /* ------------------------------------------------------------- */
 
-static boolean
-is_monstrous(unit * u)
-{
-	return (boolean) (u->faction->no == MONSTER_FACTION || !playerrace(u->race));
-}
-
 static void
 get_food(region *r)
 {
