@@ -1072,7 +1072,6 @@ randomevents(void)
 				int increase = 0;
 				int num  = min(get_cursedmen(u->attribs, C_ORC, 0), u->number);
 				int prob = get_curseeffect(u->attribs, C_ORC, 0);
-				int n;
 
 				for (n = (num - get_item(u, I_CHASTITY_BELT)); n > 0; n--) {
 					if (rand() % 100 < prob) {
