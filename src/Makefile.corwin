@@ -1,8 +1,0 @@
-
-ifndef ERESSEA
-	export ERESSEA=$(PWD)
-endif
-
-# Hier definieren, damit nicht '@gcc'
-export CC=gcc
-

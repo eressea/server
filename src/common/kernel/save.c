@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: save.c,v 1.9 2001/02/04 09:26:58 enno Exp $
+ *	$Id: save.c,v 1.10 2001/02/04 09:46:47 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1139,9 +1139,7 @@ readgame(boolean backup)
 				sh->no = rid(F);
 			else
 				sh->no = ri(F);
-
 			shash(sh);
-
 			rds(F, &sh->name);
 			rds(F, &sh->display);
 

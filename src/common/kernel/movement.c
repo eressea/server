@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: movement.c,v 1.5 2001/02/04 09:44:16 enno Exp $
+ *	$Id: movement.c,v 1.6 2001/02/04 09:46:47 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -1662,7 +1662,7 @@ move(region * r, unit * u, boolean move_on_land)
 					move(r, uf, true);
 				}
 			}
-			if (*up==uf) up = &ue->next;
+			if (*up==uf) up = &uf->next;
 		}
 	}
 }

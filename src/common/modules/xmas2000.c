@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: xmas2000.c,v 1.3 2001/01/31 07:59:42 enno Exp $
+ *	$Id: xmas2000.c,v 1.4 2001/02/04 09:46:48 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -42,7 +42,7 @@ xmasgate_handle(trigger * t, void * data)
 	 */
 	unit * santa = ufindhash(atoi36("xmas"));
 	building *b = (building *)t->data.v;
-	if (b!=NULL) {
+	if (santa && b) {
 		unit ** up = &b->region->units;
 		if (santa->region!=b->region) santa = NULL;
 		while (*up) {

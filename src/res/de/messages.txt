@@ -1,5 +1,5 @@
 # Kommentare sind erlaubt. Endlich.
-# $Id: messages.txt,v 1.1 2001/02/03 13:45:34 enno Exp $
+# $Id: messages.txt,v 1.2 2001/02/04 09:46:48 corwin Exp $
 
 # Fehlermeldungen:
 msg_errors;errors:0;de;{string}
@@ -283,6 +283,7 @@ error280;errors:0;de;{unit} in {region}: '{command}' - Dazu muss erst die Spezia
 error281;errors:0;de;{unit} in {region}: '{command}' - Gegen welche Rasse soll der Jihad ausgerufen werden?
 error282;errors:0;de;{unit} in {region}: '{command}' - Gegen diese Rasse kann kein Jihad ausgerufen werden.
 error283;events:0;de;{unit} in {region}: '{command}' - Das Passwort darf nur Buchstaben und Ziffern enthalten.
+error284;errors:0;de;{unit} in {region}: '{command}' - Nur noch nicht gestärkte Untote können das Ziel dieses Zaubers sein.
 
 # Meldungen und Ereignisse
 msg_event;events:0;de;{string}
@@ -455,6 +456,7 @@ teleport_success;magic:0;de;{unit} wurde von {source} nach {target} teleportiert
 stealaura_fail;magic:0;de;{unit} konnte {target} keine Aura entziehen.
 stealaura_fail_detect;magic:0;de;{unit} fühlt sich einen Moment seltsam geschwächt.
 stealaura_detect;magic:0;de;{unit} fühlt seine magischen Kräfte schwinden und verliert {aura} Aura.
+stealaura_success;magic:0;de;{mage} entzieht {target} {aura} Aura.
 auratransfer_success;magic:0;de;{unit} transferiert {aura} Aura auf {target}.
 wind_effect;magic:0;de;{$mage mage} erfleht den Segen der Götter des Windes und des Wassers für {ship}.
 path_effect;magic:0;de;{$mage mage} sorgt für trockene Straßen in {region}.
@@ -483,6 +485,10 @@ sp_raisepeasantmob_effect;magic:0;de;{$mage mage} wiegelt in {region} die Bauern
 firewall_effect;magic:0;de;{mage} erschafft in {region} eine Wand aus Feuer.
 wisps_effect;magic:0;de;{mage} ruft Irrlichter in {region}.
 becomewyrm;magic;2;de;{mage} verwandelt sich in einen Wyrm.
+puttorest;magic;0;de;{mage} befreit die gequälten Seelen der Toten.
+unholypower_effect;0;de;{mage} verwandelt {target}.
+unholypower_limitedeffect;0;de;{mage} verwandelt {amount} {race} aus {target}.
+holyground;0;de;{mage} beschwört Naturgeister in den Boden der Region.
 
 # Kämpfe
 msg_battle;battle:0;de;{string}

@@ -1,6 +1,6 @@
 /* vi: set ts=2:
  *
- *	$Id: spell.c,v 1.7 2001/02/03 13:45:32 enno Exp $
+ *	$Id: spell.c,v 1.8 2001/02/04 09:46:47 corwin Exp $
  *	Eressea PB(E)M host Copyright (C) 1998-2000
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
@@ -3079,7 +3079,7 @@ sp_unholypower(castorder *co)
 		case RC_GHOUL:
 			target_race = RC_GHOUL_LORD; break;
 		default:
-			cmistake(mage, strdup(co->order), 280, MSG_MAGIC);
+			cmistake(mage, strdup(co->order), 284, MSG_MAGIC);
 			continue;
 		}
 

@@ -1,4 +1,6 @@
 
+CONVERT_TRIGGERS = 1
+
 ifndef ERESSEA
 	export ERESSEA=$(PWD)
 endif
