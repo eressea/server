@@ -599,19 +599,19 @@ find_spellbyname(unit *u, const char *name, const struct locale * lang)
 
 	if (!m) return NULL;
 	sn = get_spellnames(lang, m->magietyp);
-  if (findtoken(&sn->names, name, (void**)&sp)==E_TOK_NOMATCH) {
-    magic_t mtype;
-    for(mtype=0;mtype!=MAXMAGIETYP;++mtype) {
-	    sn = get_spellnames(lang, m->magietyp);
-      if (findtoken(&sn->names, name, (void**)&sp)!=E_TOK_NOMATCH) break;
-    }
-  }
+	if (findtoken(&sn->names, name, (void**)&sp)==E_TOK_NOMATCH) {
+		magic_t mtype;
+		for(mtype=0;mtype!=MAXMAGIETYP;++mtype) {
+			sn = get_spellnames(lang, mtype);
+			if (findtoken(&sn->names, name, (void**)&sp)!=E_TOK_NOMATCH) break;
+		}
+	}
 
-  if (sp!=NULL) {
-    for (spt = m->spellptr; spt; spt = spt->next) {
-		  if (sp->id==spt->spellid) return sp;
-    }
-  }
+	if (sp!=NULL) {
+		for (spt = m->spellptr; spt; spt = spt->next) {
+			if (sp->id==spt->spellid) return sp;
+		}
+	}
 	if (lang==default_locale) return NULL;
 	return find_spellbyname(u, name, default_locale);
 }
