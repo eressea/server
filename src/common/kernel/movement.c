@@ -598,7 +598,7 @@ drifting_ships(region * r)
       for (d = 0; d != MAXDIRECTIONS; ++d) {
         region * rn = rconnect(r, (direction_t)((d + d_offset) % MAXDIRECTIONS));
         terrain_t t = rterrain(rn);
-        if (rn!=NULL && (terrain[t].flags & SAIL_INTO)) {
+        if (rn!=NULL && (terrain[t].flags & SAIL_INTO) && ship_allowed(sh->type, rn)) {
           rnext = rn;
           if (t!=T_OCEAN) break;
         }
