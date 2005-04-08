@@ -308,22 +308,17 @@ autoseed(newfaction ** players, int nsize)
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * rn = rconnect(r, d);
-          if (rn && rn->land) break;
+          if (rn && rn->land) {
+            rmin = rn;
+            break;
+          }
         }
-        if (d!=MAXDIRECTIONS) rmin = r;
       }
     }
     if (rmin!=NULL) {
       region_list * rlist = NULL, * rptr;
       faction * f;
-			direction_t d;
-			for (d=0;d!=MAXDIRECTIONS;++d) {
-				region * rn = rconnect(rmin, d);
-				if (rn && rn->land) {
-					get_island(rn, &rlist);
-					break;
-				}
-			}
+      get_island(rmin, &rlist);
       for (rptr=rlist;rptr;rptr=rptr->next) {
         region * r = rlist->data;
         unit * u;
