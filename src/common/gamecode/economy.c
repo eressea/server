@@ -1775,7 +1775,7 @@ buy(unit * u, request ** buyorders, struct order * ord)
     static const struct building_type * bt_castle;
     if (!bt_castle) bt_castle = bt_find("castle");
     for (b=r->buildings;b;b=b->next) {
-      if (b->type==bt_castle && b->size>2) break;
+      if (b->type==bt_castle && b->size>=2) break;
     }
 		if (b==NULL) {
 			cmistake(u, ord, 119, MSG_COMMERCE);
@@ -2061,7 +2061,14 @@ sell(unit * u, request ** sellorders, struct order * ord)
 			return false;
 		}
 	} else {
-		if (!rbuildings(r)) {
+    /* ...oder in der Region muß es eine Burg geben. */
+    building * b;
+    static const struct building_type * bt_castle;
+    if (!bt_castle) bt_castle = bt_find("castle");
+    for (b=r->buildings;b;b=b->next) {
+      if (b->type==bt_castle && b->size>=2) break;
+    }
+		if (b==NULL) {
 			cmistake(u, ord, 119, MSG_COMMERCE);
 			return false;
 		}
