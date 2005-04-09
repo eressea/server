@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 <equipment>
+<!-- removed. only used by the mapper's seed function.
  <item name="conquesttoken" amount="1"/>
  <item name="log" amount="30"/>
  <item name="stone" amount="30"/>
- <item name="money" amount="2000"/>
+ <item name="money" amount="4200"/>
+-->
 </equipment>
 

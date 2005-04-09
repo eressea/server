@@ -25,20 +25,22 @@ function process(orders)
     return -1
   end
 
+  -- run the turn:
+  read_orders(orders)  
+
+  plan_monsters()
+  process_orders()
+  
   -- initialize starting equipment for new players
   -- probably not necessary, since mapper sets new players, not server
   add_equipment("conquesttoken", 1);
   add_equipment("wood", 30);
   add_equipment("stone", 30);
-  add_equipment("money", 2000 + get_turn() * 10);
+  add_equipment("money", 4200);
 
-  -- run the turn:
-  read_orders(orders)  
-  plan_monsters()
+  -- use newfactions file to place out new players
+  autoseed(basepath .. "/newfactions")
 
-  --
-  process_orders()
-  
   write_passwords()
   write_reports()
 

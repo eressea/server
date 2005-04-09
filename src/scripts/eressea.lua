@@ -6,6 +6,21 @@ function loadscript(name)
   end
 end
 
+function change_locales()
+  local localechange = { }
+  -- local localechange = { en = { "y7hq" } }
+  
+  for loc, flist in localechange do
+    for index, name in flist do
+      f = get_faction(atoi36(name))
+      if f ~= nil then
+        f.locale = loc
+        print("LOCALECHANGE ", f, loc)
+      end
+    end
+  end
+end
+
 function run_scripts()
   scripts = { 
     "eternath.lua",
@@ -44,13 +59,6 @@ function process(orders)
     return -1
   end
 
-  -- initialize starting equipment for new players
-  -- probably not necessary, since mapper sets new players, not server
-  add_equipment("conquesttoken", 1);
-  add_equipment("wood", 30);
-  add_equipment("stone", 30);
-  add_equipment("money", 2000 + get_turn() * 10);
-
   -- run the turn:
   read_orders(orders)
   run_scripts()
@@ -58,17 +66,16 @@ function process(orders)
   plan_monsters()
   process_orders()
 
-  localechange = { en = { "y7hq" } }
-  for loc, flist in localechange do
-	  for index, name in flist do
-      f = get_faction(atoi36(name))
-      if f ~= nil then
-        f.locale = loc
-        print("LOCALECHANGE ", f, loc)
-      end
-    end
-  end
+  change_locales()
   
+  -- initialize starting equipment for new players
+  -- probably not necessary, since mapper sets new players, not server
+  add_equipment("conquesttoken", 1);
+  add_equipment("log", 30);
+  add_equipment("stone", 30);
+  add_equipment("money", 4200);
+
+  -- use newfactions file to place out new players
   autoseed(basepath .. "/newfactions")
 
   write_passwords()
