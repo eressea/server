@@ -397,6 +397,38 @@
     <text locale="fr">"Your faction has $int($population) people in $int($units) units."</text>
     <text locale="en">"Your faction has $int($population) people in $int($units) units."</text>
   </message>
+  <message name="nr_stat_header" section="events">
+    <type>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"Statistik für $region($region):"</text>
+    <text locale="en">"Statistics for $region($region):"</text>
+    <text locale="fr">"Statistics for $region($region):"</text>
+  </message>
+  <message name="nr_stat_maxentertainment" section="events">
+    <type>
+      <arg name="max" type="int"/>
+    </type>
+    <text locale="de">"Unterhaltung: max. $int($max) Silber."</text>
+    <text locale="en">"Entertainment: max. $int($max) silver."</text>
+    <text locale="fr">"Entertainment: max. $int($max) silver."</text>
+  </message>
+  <message name="nr_stat_salary" section="events">
+    <type>
+      <arg name="max" type="int"/>
+    </type>
+    <text locale="de">"Lohn für Arbeit: $int($max) Silber."</text>
+    <text locale="en">"Worker's salary: $int($max) silver."</text>
+    <text locale="fr">"Worker's salary: $int($max) silver."</text>
+  </message>
+  <message name="nr_stat_recruits" section="events">
+    <type>
+      <arg name="max" type="int"/>
+    </type>
+    <text locale="de">"Rekruten: max. $int($max) Bauern."</text>
+    <text locale="en">"Recruits: $int($max) peasants."</text>
+    <text locale="fr">"Recruits: $int($max) peasants."</text>
+  </message>
   <message name="nr_score" section="events">
     <type>
       <arg name="score" type="int"/>

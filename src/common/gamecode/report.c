@@ -1419,53 +1419,61 @@ describe(FILE * F, const region * r, int partial, faction * f)
 static void
 statistics(FILE * F, const region * r, const faction * f)
 {
-	const unit *u;
-	int number, p;
-	item *itm, *items = NULL;
-	p = rpeasants(r);
-	number = 0;
+    const unit *u;
+    int number, p;
+    message * m;
+    item *itm, *items = NULL;
+    p = rpeasants(r);
+    number = 0;
+    
+    /* zählen */
+    for (u = r->units; u; u = u->next)
+	if (u->faction == f && u->race != new_race[RC_SPELL]) {
+	    for (itm=u->items;itm;itm=itm->next) {
+		i_change(&items, itm->type, itm->number);
+	    }
+	    number += u->number;
+	}
+    
+    /* Ausgabe */
+    rnl(F);
+    m = msg_message("nr_stat_header", "region", r);
+    nr_render(m, f->locale, buf, sizeof(buf), f);
+    rps(F, buf);
+    msg_release(m);
+    rnl(F);
 
-	/* zählen */
-	for (u = r->units; u; u = u->next)
-		if (u->faction == f && u->race != new_race[RC_SPELL]) {
-			for (itm=u->items;itm;itm=itm->next) {
-				i_change(&items, itm->type, itm->number);
-			}
-			number += u->number;
-		}
-
-	/* Ausgabe */
-	rnl(F);
-	sprintf(buf, "Statistik für %s:", f_regionid(r, f));
+    /* Region */
+    if (landregion(rterrain(r)) && rmoney(r)) {
+	m = msg_message("nr_stat_maxentertainment", "max", entertainmoney(r));
+	nr_render(m, f->locale, buf, sizeof(buf), f);
 	rps(F, buf);
-	rnl(F);
+	msg_release(m);
+    }
+    if (production(r) && (!rterrain(r) == T_OCEAN || f->race == new_race[RC_AQUARIAN])) {
+	m = msg_message("nr_stat_salary", "max", fwage(r, f, true));
+	nr_render(m, f->locale, buf, sizeof(buf), f);
+	rps(F, buf);
+	msg_release(m);
+    }
+    if (p) {
+	m = msg_message("nr_stat_recruits", "max", p / RECRUITFRACTION);
+	nr_render(m, f->locale, buf, sizeof(buf), f);
+	rps(F, buf);
+	msg_release(m);
 
-	/* Region */
-	if (landregion(rterrain(r)) && rmoney(r)) {
-		sprintf(buf, "Unterhaltung: max. %d Silber", entertainmoney(r));
-		rps(F, buf);
+	if (!TradeDisabled()) {
+	    if (buildingtype_exists(r, bt_find("caravan"))) {
+		sprintf(buf, "Luxusgüter zum angegebenen Preis: %d",
+			(p * 2) / TRADE_FRACTION);
+	    } else {
+		sprintf(buf, "Luxusgüter zum angegebenen Preis: %d",
+			p / TRADE_FRACTION);
+	    }
+	    rps(F, buf);
 	}
-	if (production(r) && (!rterrain(r) == T_OCEAN || f->race == new_race[RC_AQUARIAN])) {
-		sprintf(buf, "Lohn für Arbeit: %d Silber", fwage(r, f, true));
-		rps(F, buf);
-	}
-	if (p) {
-		sprintf(buf, "Rekrutieren: max. %d Bauern",
-				p / RECRUITFRACTION);
-		rps(F, buf);
-
-		if (!TradeDisabled()) {
-			if (buildingtype_exists(r, bt_find("caravan"))) {
-				sprintf(buf, "Luxusgüter zum angegebenen Preis: %d",
-					(p * 2) / TRADE_FRACTION);
-			} else {
-				sprintf(buf, "Luxusgüter zum angegebenen Preis: %d",
-					p / TRADE_FRACTION);
-			}
-			rps(F, buf);
-		}
-	}
-	/* Info über Einheiten */
+    }
+    /* Info über Einheiten */
 
 	sprintf(buf, "Personen: %d", number);
 	rps(F, buf);
