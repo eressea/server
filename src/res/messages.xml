@@ -388,7 +388,7 @@
     <text locale="fr">$trail($region,$locale("en"))</text>
     <text locale="en">$trail($region,$locale("en"))</text>
   </message>
-  <message name="nr_population" section="events">
+  <message name="nr_population" section="nr">
     <type>
       <arg name="population" type="int"/>
       <arg name="units" type="int"/>
@@ -397,7 +397,7 @@
     <text locale="fr">"Your faction has $int($population) people in $int($units) units."</text>
     <text locale="en">"Your faction has $int($population) people in $int($units) units."</text>
   </message>
-  <message name="nr_stat_header" section="events">
+  <message name="nr_stat_header" section="nr">
     <type>
       <arg name="region" type="region"/>
     </type>
@@ -405,23 +405,39 @@
     <text locale="en">"Statistics for $region($region):"</text>
     <text locale="fr">"Statistics for $region($region):"</text>
   </message>
-  <message name="nr_stat_maxentertainment" section="events">
+  <message name="nr_stat_maxentertainment" section="nr">
     <type>
       <arg name="max" type="int"/>
     </type>
-    <text locale="de">"Unterhaltung: max. $int($max) Silber."</text>
-    <text locale="en">"Entertainment: max. $int($max) silver."</text>
-    <text locale="fr">"Entertainment: max. $int($max) silver."</text>
+    <text locale="de">"Unterhaltung: max. $int($max) Silber"</text>
+    <text locale="en">"Entertainment: max. $int($max) silver"</text>
+    <text locale="fr">"Entertainment: max. $int($max) silver"</text>
   </message>
-  <message name="nr_stat_salary" section="events">
+  <message name="nr_stat_luxuries" section="nr">
     <type>
       <arg name="max" type="int"/>
     </type>
-    <text locale="de">"Lohn für Arbeit: $int($max) Silber."</text>
-    <text locale="en">"Worker's salary: $int($max) silver."</text>
-    <text locale="fr">"Worker's salary: $int($max) silver."</text>
+    <text locale="de">"Luxusgüter zum angegebenen Preis: $int($max)"</text>
+    <text locale="en">"Luxury goods at this price: $int($max)"</text>
+    <text locale="fr">"Luxury goods at this price: $int($max)"</text>
   </message>
-  <message name="nr_stat_recruits" section="events">
+  <message name="nr_stat_salary" section="nr">
+    <type>
+      <arg name="max" type="int"/>
+    </type>
+    <text locale="de">"Lohn für Arbeit: $int($max) Silber"</text>
+    <text locale="en">"Worker's salary: $int($max) silver"</text>
+    <text locale="fr">"Worker's salary: $int($max) silver"</text>
+  </message>
+  <message name="nr_stat_people" section="nr">
+    <type>
+      <arg name="max" type="int"/>
+    </type>
+    <text locale="de">"Personen: $int($max)"</text>
+    <text locale="en">"People: $int($max)"</text>
+    <text locale="fr">"People: $int($max)"</text>
+  </message>
+  <message name="nr_stat_recruits" section="nr">
     <type>
       <arg name="max" type="int"/>
     </type>
@@ -429,7 +445,7 @@
     <text locale="en">"Recruits: $int($max) peasants."</text>
     <text locale="fr">"Recruits: $int($max) peasants."</text>
   </message>
-  <message name="nr_score" section="events">
+  <message name="nr_score" section="nr">
     <type>
       <arg name="score" type="int"/>
       <arg name="average" type="int"/>
@@ -438,7 +454,7 @@
     <text locale="fr">"Your faction has a score of $int($score). The average score for similar factions is $int($average)."</text>
     <text locale="en">"Your faction has a score of $int($score). The average score for similar factions is $int($average)."</text>
   </message>
-  <message name="nr_header_date" section="events">
+  <message name="nr_header_date" section="nr">
     <type>
       <arg name="game" type="string"/>
       <arg name="date" type="string"/>
@@ -447,7 +463,7 @@
     <text locale="fr">"Report for $game, $date"</text>
     <text locale="en">"Report for $game, $date"</text>
   </message>
-  <message name="nr_vicinitystart" section="events">
+  <message name="nr_vicinitystart" section="nr">
     <type>
       <arg name="dir" type="int"/>
       <arg name="region" type="region"/>
@@ -456,7 +472,7 @@
     <text locale="fr">"To the $direction($dir) lies $trail($region,$locale("en"))"</text>
     <text locale="en">"To the $direction($dir) lies $trail($region,$locale("en"))"</text>
   </message>
-  <message name="nr_market_price" section="events">
+  <message name="nr_market_price" section="nr">
     <type>
       <arg name="price" type="int"/>
       <arg name="product" type="resource"/>
@@ -465,7 +481,7 @@
     <text locale="fr">"$resource($product,0) for $int($price) silver"</text>
     <text locale="en">"$resource($product,0) for $int($price) silver"</text>
   </message>
-  <message name="nr_market_sale" section="events">
+  <message name="nr_market_sale" section="nr">
     <type>
       <arg name="price" type="int"/>
       <arg name="product" type="resource"/>
@@ -578,9 +594,9 @@
       <arg name="region" type="region"/>
       <arg name="string" type="string"/>
     </type>
-    <text locale="de">"Eine Botschaft von $unit($unit) aus $region($region): '$string'""</text>
-    <text locale="fr">"A message by $unit($unit) from $region($region): '$string'""</text>
-    <text locale="en">"A message by $unit($unit) from $region($region): '$string'""</text>
+    <text locale="de">"Eine Botschaft von $unit($unit) aus $region($region): '$string'"</text>
+    <text locale="fr">"A message by $unit($unit) from $region($region): '$string'"</text>
+    <text locale="en">"A message by $unit($unit) from $region($region): '$string'"</text>
   </message>
   <message name="nomaintenance" section="events">
     <type>

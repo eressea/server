@@ -1445,43 +1445,50 @@ statistics(FILE * F, const region * r, const faction * f)
 
     /* Region */
     if (landregion(rterrain(r)) && rmoney(r)) {
-	m = msg_message("nr_stat_maxentertainment", "max", entertainmoney(r));
-	nr_render(m, f->locale, buf, sizeof(buf), f);
-	rps(F, buf);
-	msg_release(m);
+      m = msg_message("nr_stat_maxentertainment", "max", entertainmoney(r));
+      nr_render(m, f->locale, buf, sizeof(buf), f);
+      rps(F, buf);
+      msg_release(m);
     }
     if (production(r) && (!rterrain(r) == T_OCEAN || f->race == new_race[RC_AQUARIAN])) {
-	m = msg_message("nr_stat_salary", "max", fwage(r, f, true));
-	nr_render(m, f->locale, buf, sizeof(buf), f);
-	rps(F, buf);
-	msg_release(m);
+      m = msg_message("nr_stat_salary", "max", fwage(r, f, true));
+      nr_render(m, f->locale, buf, sizeof(buf), f);
+      rps(F, buf);
+      msg_release(m);
     }
     if (p) {
-	m = msg_message("nr_stat_recruits", "max", p / RECRUITFRACTION);
+      m = msg_message("nr_stat_recruits", "max", p / RECRUITFRACTION);
+      nr_render(m, f->locale, buf, sizeof(buf), f);
+      rps(F, buf);
+      msg_release(m);
+      
+      if (!TradeDisabled()) {
+	if (buildingtype_exists(r, bt_find("caravan"))) {
+	  m = msg_message("nr_stat_luxuries", "max", 
+			  (p * 2) / TRADE_FRACTION);
+	} else {
+	  m = msg_message("nr_stat_luxuries", "max", 
+			  p / TRADE_FRACTION);
+	}
 	nr_render(m, f->locale, buf, sizeof(buf), f);
 	rps(F, buf);
 	msg_release(m);
-
-	if (!TradeDisabled()) {
-	    if (buildingtype_exists(r, bt_find("caravan"))) {
-		sprintf(buf, "Luxusgüter zum angegebenen Preis: %d",
-			(p * 2) / TRADE_FRACTION);
-	    } else {
-		sprintf(buf, "Luxusgüter zum angegebenen Preis: %d",
-			p / TRADE_FRACTION);
-	    }
-	    rps(F, buf);
-	}
+      }
     }
     /* Info über Einheiten */
 
-	sprintf(buf, "Personen: %d", number);
-	rps(F, buf);
-	for (itm = items; itm; itm=itm->next) {
-		sprintf(buf, "%s: %d", LOC(f->locale, resourcename(itm->type->rtype, GR_PLURAL)), itm->number);
-		rps(F, buf);
-	}
-	while (items) i_free(i_remove(&items, items));
+    m = msg_message("nr_stat_people", "max", number);
+    nr_render(m, f->locale, buf, sizeof(buf), f);
+    rps(F, buf);
+    msg_release(m);
+
+    for (itm = items; itm; itm=itm->next) {
+      sprintf(buf, "%s: %d", 
+	      LOC(f->locale, resourcename(itm->type->rtype, GR_PLURAL)),
+	      itm->number);
+      rps(F, buf);
+    }
+    while (items) i_free(i_remove(&items, items));
 }
 
 static void
