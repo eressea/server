@@ -412,21 +412,14 @@ update_gms(void)
 	}
 }
 
-static int maxluxuries = 0;
-
 static int
 fix_demands(void)
 {
   region *r;
-  const luxury_type *sale = NULL;
-
-  if (maxluxuries==0) for (sale=luxurytypes;sale;sale=sale->next) ++maxluxuries;
 
   for (r=regions; r; r=r->next) {
-    if (r->land!=NULL && r->land->peasants>=100) {
-      if (count_demand(r) != maxluxuries) {
-        fix_demand(r);
-      }
+    if (r->land!=NULL && r->land->demands==NULL) {
+      fix_demand(r);
     }
   }
   return 0;
