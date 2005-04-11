@@ -21,20 +21,21 @@ struct region_list;
 struct newfaction;
 
 typedef struct newfaction {
-	struct newfaction * next;
-	char * email;
-	char * password;
-	const struct locale * lang;
-	const struct race * race;
-	int bonus;
-	int subscription;
-	boolean oldregions;
-	struct alliance * allies;
+  struct newfaction * next;
+  char * email;
+  char * password;
+  const struct locale * lang;
+  const struct race * race;
+  int bonus;
+  int subscription;
+  boolean oldregions;
+  struct alliance * allies;
 } newfaction;
 
 extern int autoseed(newfaction ** players, int nsize);
 extern newfaction * read_newfactions(const char * filename);
 extern void get_island(struct region * root, struct region_list ** rlist);
+extern int fix_demand(struct region *r);
 
 #ifdef __cplusplus
 }

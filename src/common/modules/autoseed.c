@@ -16,6 +16,7 @@
 
 /* kernel includes */
 #include <kernel/alliance.h>
+#include <kernel/item.h>
 #include <kernel/region.h>
 #include <kernel/plane.h>
 #include <kernel/faction.h>
@@ -32,6 +33,126 @@
 #include <string.h>
 #include <stdlib.h>
 
+
+static int
+count_demand(const region *r)
+{
+  struct demand *dmd;
+  int c = 0;
+  if (r->land) {
+    for (dmd=r->land->demands;dmd;dmd=dmd->next) c++;
+  }
+  return c;
+}
+
+static int
+recurse_regions(region *r, region_list **rlist, boolean(*fun)(const region *r))
+{
+  if (!fun(r)) return 0;
+  else {
+    int len = 0;
+    direction_t d;
+    region_list * rl = calloc(sizeof(region_list), 1);
+    rl->next = *rlist;
+    rl->data = r;
+    (*rlist) = rl;
+    fset(r, FL_MARK);
+    for (d=0;d!=MAXDIRECTIONS;++d) {
+      region * nr = rconnect(r, d);
+      if (nr && !fval(nr, FL_MARK)) len += recurse_regions(nr, rlist, fun);
+    }
+    return len+1;
+  }
+}
+
+static int maxluxuries = 0;
+
+static boolean
+f_nolux(const region * r)
+{
+  if (r->land && count_demand(r) != maxluxuries) return true;
+  return false;
+}
+
+int
+fix_demand(region *r)
+{
+  region_list *rl, *rlist = NULL;
+  static const struct luxury_type **mlux = 0, ** ltypes;
+  const luxury_type *sale = NULL;
+  int maxlux = 0;
+  
+  if (maxluxuries==0) for (sale=luxurytypes;sale;sale=sale->next) {
+    ++maxluxuries;
+  }
+  recurse_regions(r, &rlist, f_nolux);
+  if (mlux==0) {
+    int i = 0;
+    mlux = (const luxury_type **)gc_add(calloc(maxluxuries, sizeof(const luxury_type *)));
+    ltypes = (const luxury_type **)gc_add(calloc(maxluxuries, sizeof(const luxury_type *)));
+    for (sale=luxurytypes;sale;sale=sale->next) {
+      ltypes[i++] = sale;
+    }
+  }
+  else {
+    int i;
+    for (i=0;i!=maxluxuries;++i) mlux[i] = 0;
+  }
+  for (rl=rlist;rl;rl=rl->next) {
+    region * r = rl->data;
+    direction_t d;
+    for (d=0;d!=MAXDIRECTIONS;++d) {
+      region * nr = rconnect(r, d);
+      if (nr && nr->land && nr->land->demands) {
+        struct demand * dmd;
+        for (dmd = nr->land->demands;dmd;dmd=dmd->next) {
+          if (dmd->value == 0) {
+            int i;
+            for (i=0;i!=maxluxuries;++i) {
+              if (mlux[i]==NULL) {
+                maxlux = i;
+                mlux[i] = dmd->type;
+                break;
+              } else if (mlux[i]==dmd->type) {
+                break;
+              }
+            }
+            break;
+          }
+        }
+      }
+    }
+    freset(r, FL_MARK); /* undo recursive marker */
+  }
+  if (maxlux<2) {
+    int i;
+    for (i=maxlux;i!=2;++i) {
+      int j;
+      do {
+        int k = rand() % maxluxuries;
+        mlux[i] = ltypes[k];
+        for (j=0;j!=i;++j) {
+          if (mlux[j]==mlux[i]) break;
+        }
+      } while (j!=i);
+    }
+    maxlux=2;
+  }
+  for (rl=rlist;rl;rl=rl->next) {
+    region * r = rl->data;
+    if (!fval(r, RF_CHAOTIC)) {
+      log_warning(("fixing demand in %s\n", regionname(r, NULL)));
+    }
+    setluxuries(r, mlux[rand() % maxlux]);
+  }
+  while (rlist) {
+    rl = rlist->next;
+    free(rlist);
+    rlist = rl;
+  }
+  return 0;
+}
+
 newfaction *
 read_newfactions(const char * filename)
 {
@@ -47,10 +168,12 @@ read_newfactions(const char * filename)
 
     if (alliances!=NULL) {
       /* email;race;locale;startbonus;subscription;alliance */
-      if (fscanf(F, "%s %s %s %d %d %s %d", email, race, lang, &bonus, &subscription, password, &alliance)<=0) break;
+      if (fscanf(F, "%s %s %s %d %d %s %d", email, race, lang, &bonus, 
+                 &subscription, password, &alliance)<=0) break;
     } else {
       /* email;race;locale;startbonus;subscription */
-      if (fscanf(F, "%s %s %s %d %d %s", email, race, lang, &bonus, &subscription, password)<=0) break;
+      if (fscanf(F, "%s %s %s %d %d %s", email, race, lang, &bonus, 
+                 &subscription, password)<=0) break;
     }
     for (f=factions;f;f=f->next) {
       if (strcmp(f->email, email)==0 && f->subscription) break;
@@ -62,7 +185,8 @@ read_newfactions(const char * filename)
     if (nf) continue;
     nf = calloc(sizeof(newfaction), 1);
     if (set_email(&nf->email, email)!=0) {
-      log_error(("Invalid email address for subscription %s: %s\n", itoa36(subscription), email));
+      log_error(("Invalid email address for subscription %s: %s\n", 
+                 itoa36(subscription), email));
       continue;
     }
     nf->password = strdup(password);
@@ -346,7 +470,7 @@ autoseed(newfaction ** players, int nsize)
      */
     for (r=regions;r;r=r->next) {
       struct plane * p = rplane(r);
-      if (r->terrain==T_OCEAN && p==NULL && (rmin==NULL || r->age<=MAXAGEDIFF)) {
+      if (r->terrain==T_OCEAN && p==0 && (rmin==NULL || r->age<=MAXAGEDIFF)) {
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {
           if (rconnect(r, d)==NULL) break;
@@ -374,82 +498,87 @@ autoseed(newfaction ** players, int nsize)
   rsize = 1;
 
   while (rsize && (nsize || isize>=REGIONS_PER_FACTION)) {
-		int i = rand() % rsize;
-		region_list ** rnext = &rlist;
-		direction_t d;
-		while (i--) rnext=&(*rnext)->next;
-		r = (*rnext)->data;
-		*rnext = (*rnext)->next;
-		--rsize;
-		for (d=0;d!=MAXDIRECTIONS;++d) {
-			region * rn = rconnect(r, d);
-			if (virgin_region(rn)) {
+    int i = rand() % rsize;
+    region_list ** rnext = &rlist;
+    direction_t d;
+    while (i--) rnext=&(*rnext)->next;
+    r = (*rnext)->data;
+    *rnext = (*rnext)->next;
+    --rsize;
+    for (d=0;d!=MAXDIRECTIONS;++d) {
+      region * rn = rconnect(r, d);
+      if (virgin_region(rn)) {
         if (rn==NULL) {
           rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
           terraform(rn, T_OCEAN);
         }
-				add_regionlist(&rlist, rn);
-				++rsize;
-			}
-		}
+        add_regionlist(&rlist, rn);
+        ++rsize;
+      }
+    }
     if (rand() % VOLCANO_CHANCE == 0) {
       terraform(r, T_VOLCANO);
     } else if (nsize && (rand() % isize == 0 || rsize==0)) {
-			newfaction ** nfp, * nextf = *players;
-			unit * u;
+      newfaction ** nfp, * nextf = *players;
+      unit * u;
 
       isize += REGIONS_PER_FACTION;
-			terraform(r, preferred_terrain(nextf->race));
-			++tsize;
-			u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race, nextf->lang,
-				nextf->subscription));
-			u->faction->alliance = nextf->allies;
+      terraform(r, preferred_terrain(nextf->race));
+      ++tsize;
+      u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race,
+                                  nextf->lang, nextf->subscription));
+      u->faction->alliance = nextf->allies;
 
-			/* remove duplicate email addresses */
-			nfp = players;
-			while (*nfp) {
-				newfaction * nf = *nfp;
-				if (strcmp(nextf->email, nf->email)==0) {
-					*nfp = nf->next;
-					if (nextf!=nf) free(nf);
-				}
-				else nfp = &nf->next;
-			}
+      /* remove duplicate email addresses */
+      nfp = players;
+      while (*nfp) {
+        newfaction * nf = *nfp;
+        if (strcmp(nextf->email, nf->email)==0) {
+          *nfp = nf->next;
+          if (nextf!=nf) free(nf);
+        }
+        else nfp = &nf->next;
+      }
       ++psize;
-			--nsize;
+      --nsize;
       --isize;
       if (psize>=PLAYERS_PER_ISLAND) break;
-		} else {
-			terraform(r, (terrain_t)((rand() % T_GLACIER)+1));
+    } else {
+      terraform(r, (terrain_t)((rand() % T_GLACIER)+1));
       --isize;
-		}
-	}
+    }
+  }
 
+  if (r!=NULL) {
+    /* reicht das? */
+    fix_demand(r);
+  }
+  
   if (nsize!=0) {
     log_error(("Could not place all factions on the same island as requested\n"));
   }
-
+  
   
   if (rlist) {
 #define MINOCEANDIST 3
 #define MAXFILLDIST 10
 #define SPECIALCHANCE 80
-		region_list ** rbegin = &rlist;
-		int i;
+    region_list ** rbegin = &rlist;
+    int i;
     int special = 1;
-
+    
     for (i=0;i!=MINOCEANDIST;++i) {
-			region_list ** rend = rbegin;
-			while (*rend) rend=&(*rend)->next;
-			while (rbegin!=rend) {
-				direction_t d;
-				region * r = (*rbegin)->data;
-				rbegin=&(*rbegin)->next;
-				for (d=0;d!=MAXDIRECTIONS;++d) {
-					region * rn = rconnect(r, d);
-					if (rn==NULL) {
+      region_list ** rend = rbegin;
+      while (*rend) rend=&(*rend)->next;
+      while (rbegin!=rend) {
+        direction_t d;
+        region * r = (*rbegin)->data;
+        rbegin=&(*rbegin)->next;
+        for (d=0;d!=MAXDIRECTIONS;++d) {
+          region * rn = rconnect(r, d);
+          if (rn==NULL) {
             terrain_t terrain = T_OCEAN;
-						rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
+            rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
             if (rand() % SPECIALCHANCE < special) {
               terrain = (terrain_t)(1 + rand() % T_GLACIER);
               special = SPECIALCHANCE / 3; /* 33% chance auf noch eines */
@@ -461,31 +590,31 @@ autoseed(newfaction ** players, int nsize)
             if (rand() % 100 < 15) rsetlaen(r, 5 + rand() % 5);
             /* the new region has an extra 20% chance to have mallorn */
             if (rand() % 100 < 20) fset(r, RF_MALLORN);
-						add_regionlist(rend, rn);
-					}
-				}
-			}
-
-		}
-		while (*rbegin) {
-			region * r = (*rbegin)->data;
-			direction_t d;
-			rbegin=&(*rbegin)->next;
-			for (d=0;d!=MAXDIRECTIONS;++d) if (rconnect(r, d)==NULL) {
-				int i;
-				for (i=1;i!=MAXFILLDIST;++i) {
-					if (findregion(r->x + i*delta_x[d], r->y + i*delta_y[d]))
-						break;
-
-				}
-				if (i!=MAXFILLDIST) {
-					while (--i) {
-						region * rn = new_region(r->x + i*delta_x[d], r->y + i*delta_y[d]);
-						terraform(rn, T_OCEAN);
-					}
-				}
-			}
-		}
-	}
-	return tsize;
+            add_regionlist(rend, rn);
+          }
+        }
+      }
+      
+    }
+    while (*rbegin) {
+      region * r = (*rbegin)->data;
+      direction_t d;
+      rbegin=&(*rbegin)->next;
+      for (d=0;d!=MAXDIRECTIONS;++d) if (rconnect(r, d)==NULL) {
+        int i;
+        for (i=1;i!=MAXFILLDIST;++i) {
+          if (findregion(r->x + i*delta_x[d], r->y + i*delta_y[d]))
+            break;
+          
+        }
+        if (i!=MAXFILLDIST) {
+          while (--i) {
+            region * rn = new_region(r->x + i*delta_x[d], r->y + i*delta_y[d]);
+            terraform(rn, T_OCEAN);
+          }
+        }
+      }
+    }
+  }
+  return tsize;
 }

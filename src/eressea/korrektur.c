@@ -25,6 +25,7 @@
 #include <attributes/key.h>
 #include <attributes/otherfaction.h>
 #include <modules/xecmd.h>
+#include <modules/autoseed.h>
 
 /* gamecode includes */
 #include <gamecode/economy.h>
@@ -330,127 +331,6 @@ fix_age(void)
 	}
 }
 
-#if 1
-static int
-count_demand(const region *r)
-{
-	struct demand *dmd;
-	int c = 0;
-	if (r->land) {
-		for (dmd=r->land->demands;dmd;dmd=dmd->next) c++;
-	}
-	return c;
-}
-#endif
-
-static int
-recurse_regions(region * r, region_list **rlist, boolean(*fun)(const region * r))
-{
-	if (!fun(r)) return 0;
-	else {
-		int len = 0;
-		direction_t d;
-		region_list * rl = calloc(sizeof(region_list), 1);
-		rl->next = *rlist;
-		rl->data = r;
-		(*rlist) = rl;
-		fset(r, FL_MARK);
-		for (d=0;d!=MAXDIRECTIONS;++d) {
-			region * nr = rconnect(r, d);
-			if (nr && !fval(nr, FL_MARK)) len += recurse_regions(nr, rlist, fun);
-		}
-		return len+1;
-	}
-}
-
-
-#if 1
-static int maxluxuries = 0;
-
-static boolean
-f_nolux(const region * r)
-{
-	if (r->land && count_demand(r) != maxluxuries) return true;
-	return false;
-}
-
-static int
-fix_demand_region(region *r)
-{
-	region_list *rl, *rlist = NULL;
-	static const luxury_type **mlux = 0, ** ltypes;
-	const luxury_type *sale = NULL;
-	int maxlux = 0;
-
-	recurse_regions(r, &rlist, f_nolux);
-	if (mlux==0) {
-		int i = 0;
-		if (maxluxuries==0) for (sale=luxurytypes;sale;sale=sale->next) {
-			maxluxuries++;
-		}
-		mlux = (const luxury_type **)gc_add(calloc(maxluxuries, sizeof(const luxury_type *)));
-		ltypes = (const luxury_type **)gc_add(calloc(maxluxuries, sizeof(const luxury_type *)));
-		for (sale=luxurytypes;sale;sale=sale->next) {
-			ltypes[i++] = sale;
-		}
-	}
-	else {
-		int i;
-		for (i=0;i!=maxluxuries;++i) mlux[i] = 0;
-	}
-	for (rl=rlist;rl;rl=rl->next) {
-		region * r = rl->data;
-		direction_t d;
-		for (d=0;d!=MAXDIRECTIONS;++d) {
-			region * nr = rconnect(r, d);
-			if (nr && nr->land && nr->land->demands) {
-				struct demand * dmd;
-				for (dmd = nr->land->demands;dmd;dmd=dmd->next) {
-					if (dmd->value == 0) {
-						int i;
-						for (i=0;i!=maxluxuries;++i) {
-							if (mlux[i]==NULL) {
-								maxlux = i;
-								mlux[i] = dmd->type;
-								break;
-							} else if (mlux[i]==dmd->type) {
-								break;
-							}
-						}
-						break;
-					}
-				}
-			}
-		}
-		freset(r, FL_MARK); /* undo recursive marker */
-	}
-	if (maxlux<2) {
-		int i;
-		for (i=maxlux;i!=2;++i) {
-			int j;
-			do {
-				int k = rand() % maxluxuries;
-				mlux[i] = ltypes[k];
-				for (j=0;j!=i;++j) {
-					if (mlux[j]==mlux[i]) break;
-				}
-			} while (j!=i);
-		}
-		maxlux=2;
-	}
-	for (rl=rlist;rl;rl=rl->next) {
-		region * r = rl->data;
-		if (!fval(r, RF_CHAOTIC)) log_warning(("fixing demand in %s\n", regionname(r, NULL)));
-		setluxuries(r, mlux[rand() % maxlux]);
-	}
-	while (rlist) {
-		rl = rlist->next;
-		free(rlist);
-		rlist = rl;
-	}
-	return 0;
-}
-#endif
 
 static void
 fix_firewalls(void)
@@ -532,23 +412,25 @@ update_gms(void)
 	}
 }
 
-#if 1
+static int maxluxuries = 0;
+
 static int
-fix_demand(void)
+fix_demands(void)
 {
-	region *r;
-	const luxury_type *sale = NULL;
+  region *r;
+  const luxury_type *sale = NULL;
 
-	if (maxluxuries==0) for (sale=luxurytypes;sale;sale=sale->next) ++maxluxuries;
+  if (maxluxuries==0) for (sale=luxurytypes;sale;sale=sale->next) ++maxluxuries;
 
-	for (r=regions; r; r=r->next) {
-		if (r->land!=NULL && r->land->peasants>=100 && count_demand(r) != maxluxuries) {
-			fix_demand_region(r);
-		}
-	}
-	return 0;
+  for (r=regions; r; r=r->next) {
+    if (r->land!=NULL && r->land->peasants>=100) {
+      if (count_demand(r) != maxluxuries) {
+        fix_demand(r);
+      }
+    }
+  }
+  return 0;
 }
-#endif
 
 #include "group.h"
 static void
@@ -1105,27 +987,27 @@ korrektur(void)
   if (!ExpensiveMigrants()) {
     no_teurefremde(true);
   }
-	fix_allies();
-	update_gmquests(); /* test gm quests */
-	/* fix_unitrefs(); */
-	warn_password();
-	fix_road_borders();
-	if (turn>1000) curse_emptiness(); /*** disabled ***/
-	/* seems something fishy is going on, do this just
-	 * to be on the safe side:
-	 */
-	fix_demand();
+  fix_allies();
+  update_gmquests(); /* test gm quests */
+  /* fix_unitrefs(); */
+  warn_password();
+  fix_road_borders();
+  if (turn>1000) curse_emptiness(); /*** disabled ***/
+  /* seems something fishy is going on, do this just
+   * to be on the safe side:
+   */
+  fix_demands();
   fix_otherfaction();
-	/* trade_orders(); */
-
-	/* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
-	 * Beschreibungen geändert haben */
-	show_newspells();
-	fix_age();
-
-	/* Immer ausführen! Erschafft neue Teleport-Regionen, wenn nötig */
-	create_teleport_plane();
-
+  /* trade_orders(); */
+  
+  /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
+   * Beschreibungen geändert haben */
+  show_newspells();
+  fix_age();
+  
+  /* Immer ausführen! Erschafft neue Teleport-Regionen, wenn nötig */
+  create_teleport_plane();
+  
 #ifdef WDW_PHOENIX
 	check_phoenix();
 #endif
