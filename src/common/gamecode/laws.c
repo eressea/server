@@ -996,12 +996,13 @@ restart_cmd(unit * u, struct order * ord)
       s_pass = getstrtoken();
     }
 
-    if (frace != u->faction->race && u->faction->age < 81) {
-      cmistake(u, ord, 241, MSG_EVENT);
-      return 0;
-    }
     if (u->faction->age > 3 && fval(u->faction, FFL_RESTART)) {
       cmistake(u, ord, 314, MSG_EVENT);
+      return 0;
+    }
+
+    if (/* frace != u->faction->race && */ u->faction->age < 81) {
+      cmistake(u, ord, 241, MSG_EVENT);
       return 0;
     }
 
