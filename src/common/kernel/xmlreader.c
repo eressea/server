@@ -807,6 +807,7 @@ parse_races(xmlDocPtr doc)
     if (xml_bvalue(node, "scarepeasants", false)) rc->flags |= RCF_SCAREPEASANTS;
     if (xml_bvalue(node, "cannotmove", false)) rc->flags |= RCF_CANNOTMOVE;
     if (xml_bvalue(node, "fly", false)) rc->flags |= RCF_FLY;
+    if (xml_bvalue(node, "coastal", false)) rc->flags |= RCF_COASTAL;
     if (xml_bvalue(node, "swim", false)) rc->flags |= RCF_SWIM;
     if (xml_bvalue(node, "walk", false)) rc->flags |= RCF_WALK;
     if (xml_bvalue(node, "nolearn", false)) rc->flags |= RCF_NOLEARN;

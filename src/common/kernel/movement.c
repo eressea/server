@@ -1219,10 +1219,10 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
      * aquarian special, flying units, horses, the works */
     if ((u->race->flags & RCF_FLY) == 0) {
       if (rterrain(current)==T_OCEAN && rterrain(next) != T_OCEAN) {
-        int moving = u->race->flags & (RCF_SWIM|RCF_WALK);
+        int moving = u->race->flags & (RCF_SWIM|RCF_WALK|RCF_COASTAL);
         /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
-        if (moving != (RCF_SWIM|RCF_WALK) && old_race(u->race) != RC_AQUARIAN) {
-          /* can't swim+walk and isn't an aquarian */
+        if (moving != (RCF_SWIM|RCF_WALK) && (moving|RCF_COASTAL)==0) {
+          /* can't swim+walk and isn't allowed to enter coast from sea */
           if (ord!=NULL) cmistake(u, ord, 44, MSG_MOVE);
           break;
         }
