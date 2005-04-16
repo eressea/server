@@ -965,20 +965,21 @@ check_dissolve(void)
 static int 
 fix_familiars(void)
 {
+	const struct locale * lang = find_locale("en");
   region * r;
   for (r=regions;r;r=r->next) {
     unit * u;
     for (u=r->units;u;u=u->next) if (u->faction->no!=MONSTER_FACTION) {
-      if (u->race->init_familiar) {
+      if (u->race->init_familiar && u->race->maintenance==0) {
         /* this is a familiar */
         unit * mage = get_familiar_mage(u);
         if (mage==0) {
-          log_error(("%s is a %s familiar with no mage for faction %s", 
-										 unitid(u), racename(0, u, u->race), 
+          log_error(("%s is a %s familiar with no mage for faction %s\n",
+										 unitid(u), racename(lang, u, u->race), 
 										 factionid(u->faction)));
         } else if (!is_mage(mage)) {
-          log_error(("%s is a %s familiar, but %s is not a mage for faction %s", 
-										 unitid(u), racename(0, u, u->race), unitid(mage), 
+          log_error(("%s is a %s familiar, but %s is not a mage for faction %s\n",
+										 unitid(u), racename(lang, u, u->race), unitid(mage), 
 										 factionid(u->faction)));
         }
       }
