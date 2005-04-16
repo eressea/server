@@ -525,6 +525,7 @@ autoseed(newfaction ** players, int nsize)
       isize += REGIONS_PER_FACTION;
       terraform(r, preferred_terrain(nextf->race));
       ++tsize;
+      assert(r->land && r->units==0);
       u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race,
                                   nextf->lang, nextf->subscription));
       u->faction->alliance = nextf->allies;
