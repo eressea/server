@@ -520,6 +520,7 @@ autoseed(newfaction ** players, int nsize)
       terraform(r, T_VOLCANO);
     } else if (nsize && (rand() % isize == 0 || rsize==0)) {
       newfaction ** nfp, * nextf = *players;
+      faction * f;
       unit * u;
 
       isize += REGIONS_PER_FACTION;
@@ -528,7 +529,12 @@ autoseed(newfaction ** players, int nsize)
       assert(r->land && r->units==0);
       u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race,
                                   nextf->lang, nextf->subscription));
-      u->faction->alliance = nextf->allies;
+      f = u->faction;
+      f->alliance = nextf->allies;
+      if (f->subscription) {
+        sql_print(("UPDATE subscriptions SET status='ACTIVE', faction='%s', lastturn=%d, password='%s', info='%s' WHERE id=%u;\n",
+          factionid(f), f->lastorders, f->override, info, f->subscription));
+      }
 
       /* remove duplicate email addresses */
       nfp = players;

@@ -71,6 +71,28 @@ write_reports()
   return 0;
 }
 
+static summary * sum_begin = 0;
+
+static int
+init_summary()
+{
+  sum_begin = make_summary(false);
+  return 0;
+}
+
+static int
+write_summary()
+{
+  if (sum_begin) {
+    summary * sum_end = make_summary(true);
+    report_summary(sum_end, sum_begin, false);
+    report_summary(sum_end, sum_begin, true);
+    return 0;
+  }
+  return -1;
+}
+ 
+
 extern int process_orders(void);
 
 static int
@@ -184,6 +206,8 @@ bind_eressea(lua_State * L)
     def("write_game", &write_game),
     def("write_passwords", &writepasswd),
     def("write_reports", &write_reports),
+    def("init_summary", &init_summary),
+    def("write_summary", &write_summary),
     def("read_orders", &readorders),
     def("process_orders", &process_orders),
     def("add_equipment", &lua_addequipment),

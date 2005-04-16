@@ -24,6 +24,7 @@ function process(orders)
     print("could not read game")
     return -1
   end
+  init_summary()
 
   -- run the turn:
   read_orders(orders)  
@@ -43,8 +44,8 @@ function process(orders)
 
   write_passwords()
   write_reports()
-
   write_emails()
+  write_summary()
 
   file = "" .. get_turn()
   if write_game(file)~=0 then 

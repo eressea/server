@@ -346,7 +346,6 @@ process_orders()
 #ifdef SHORTPWDS
   readshortpwds("passwords");
 #endif
-  begin = make_summary(false);
   printf(" - Korrekturen Runde %d\n", turn);
   korrektur();
   turn++;
@@ -360,12 +359,6 @@ process_orders()
   score();
   remove_unequipped_guarded();
   korrektur_end();
-
-  end = make_summary(true);
-  report_summary(end, begin, false);
-  report_summary(end, begin, true);
-  free(end);
-  free(begin);
 
   update_subscriptions();
   return 0;
