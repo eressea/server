@@ -962,6 +962,29 @@ check_dissolve(void)
   }
 }
 
+static int 
+fix_familiars(void)
+{
+  region * r;
+  for (r=regions;r;r=r->next) {
+    unit * u;
+    for (u=r->units;u;u=u->next) if (u->faction->no!=MONSTER_FACTION) {
+      if (u->race->init_familiar) {
+        /* this is a familiar */
+        unit * mage = get_familiar_mage(u);
+        if (mage==0) {
+          log_error(("%s is a familiar with no mage for faction %s", 
+            unitname(u), factionid(u->faction)));
+        } else if (!is_mage(mage)) {
+          log_error(("%s is a familiar , but %s is not a mage for faction %s", 
+            unitname(u), unitname(mage), factionid(u->faction)));
+        }
+      }
+    }
+  }
+  return 0;
+}
+
 void
 korrektur(void)
 {
@@ -991,6 +1014,7 @@ korrektur(void)
    */
   fix_demands();
   fix_otherfaction();
+  fix_familiars();
   /* trade_orders(); */
   
   /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
