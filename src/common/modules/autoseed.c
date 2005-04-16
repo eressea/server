@@ -26,6 +26,7 @@
 /* util includes */
 #include <util/base36.h>
 #include <util/goodies.h>
+#include <util/sql.h>
 
 /* libc includes */
 #include <limits.h>
@@ -530,10 +531,12 @@ autoseed(newfaction ** players, int nsize)
       u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race,
                                   nextf->lang, nextf->subscription));
       f = u->faction;
-      f->alliance = nextf->allies;
+			f->alliance = nextf->allies;
+			log_printf("New faction (%s), %s at %s\n", itoa36(f->no),
+								 f->email, regionname(r, NULL));
       if (f->subscription) {
-        sql_print(("UPDATE subscriptions SET status='ACTIVE', faction='%s', lastturn=%d, password='%s', info='%s' WHERE id=%u;\n",
-          factionid(f), f->lastorders, f->override, info, f->subscription));
+        sql_print(("UPDATE subscriptions SET status='ACTIVE', faction='%s', lastturn=%d, password='%s' WHERE id=%u;\n",
+          factionid(f), f->lastorders, f->override, f->subscription));
       }
 
       /* remove duplicate email addresses */

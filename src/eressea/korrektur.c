@@ -973,11 +973,13 @@ fix_familiars(void)
         /* this is a familiar */
         unit * mage = get_familiar_mage(u);
         if (mage==0) {
-          log_error(("%s is a familiar with no mage for faction %s", 
-            unitname(u), factionid(u->faction)));
+          log_error(("%s is a %s familiar with no mage for faction %s", 
+										 unitid(u), racename(0, u, u->race), 
+										 factionid(u->faction)));
         } else if (!is_mage(mage)) {
-          log_error(("%s is a familiar , but %s is not a mage for faction %s", 
-            unitname(u), unitname(mage), factionid(u->faction)));
+          log_error(("%s is a %s familiar, but %s is not a mage for faction %s", 
+										 unitid(u), racename(0, u, u->race), unitid(mage), 
+										 factionid(u->faction)));
         }
       }
     }
