@@ -1552,6 +1552,29 @@ durchreisende(FILE * F, const region * r, const faction * f)
 	}
 }
 
+static int
+buildingmaintenance(const building * b, const resource_type * rtype)
+{
+  const building_type * bt = b->type;
+  int c, cost=0;
+  static boolean init = false;
+  static const curse_type * nocost_ct;
+  if (!init) { init = true; nocost_ct = ct_find("nocost"); }
+  if (curse_active(get_curse(b->attribs, nocost_ct))) {
+    return 0;
+  }
+  for (c=0;bt->maintenance && bt->maintenance[c].number;++c) {
+    const maintenance * m = bt->maintenance + c;
+    if (m->rtype==rtype) {
+      if (fval(m, MTF_VARIABLE))
+        cost += (b->size * m->number);
+      else
+        cost += m->number;
+    }
+  }
+  return cost;
+}
+
 static void
 order_template(FILE * F, faction * f)
 {

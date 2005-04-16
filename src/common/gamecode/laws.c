@@ -1037,10 +1037,12 @@ EnhancedQuit(void)
 static int
 quit(unit * u, struct order * ord)
 {
+  const char * passwd;
   init_tokens(ord);
   skip_token(); /* skip keyword */
 
-  if (checkpasswd(u->faction, getstrtoken(), false)) {
+  passwd = getstrtoken();
+  if (checkpasswd(u->faction, passwd, false)) {
     if (EnhancedQuit()) {
       int f2_id = getid();
 
@@ -1069,7 +1071,7 @@ quit(unit * u, struct order * ord)
   } else {
     cmistake(u, ord, 86, MSG_EVENT);
     log_warning(("STIRB mit falschem Passwort für Partei %s: %s\n",
-      factionid(u->faction), ord));
+      factionid(u->faction), passwd));
   }
   return 0;
 }

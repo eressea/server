@@ -812,11 +812,13 @@ check_overpopulated(unit *u)
 static void
 plan_dragon(unit * u)
 {
-  attrib *ta;
+  attrib * ta = a_find(u->attribs, &at_targetregion);
+  region * r = u->region;
   region * tr = NULL;
   int horses = get_resource(u,R_HORSE);
   int capacity = walkingcapacity(u);
   item ** itmp = &u->items;
+  boolean move = false;
 
   if (horses > 0) {
     change_resource(u, R_HORSE, - min(horses,(u->number*2)));
@@ -832,7 +834,13 @@ plan_dragon(unit * u)
     }
     if (*itmp==itm) itmp=&itm->next;
   }
-  if (rand() % 100 < 4) {
+
+  if (ta==NULL) {
+    move |= (r->land==0 || r->land->peasants==0); /* when no peasants, move */
+    move |= (r->land==0 || r->land->money==0); /* when no money, move */
+  }
+  move |= chance(0.04); /* 4% chance to change your mind */
+  if (move) {
     /* dragon gets bored and looks for a different place to go */
     ta = set_new_dragon_target(u, u->region, DRAGON_RANGE);
   }
