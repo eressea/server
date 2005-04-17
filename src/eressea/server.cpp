@@ -338,8 +338,6 @@ update_subscriptions(void)
 int
 process_orders()
 {
-  struct summary * begin, * end;
-
   if (turn == 0) srand(time((time_t *) NULL));
   else srand(turn);
 

@@ -433,8 +433,9 @@ cansail(const region * r, ship * sh)
 	if (sh->type->construction && sh->size!=sh->type->construction->maxsize)
 	  return false;
 	getshipweight(sh, &n, &p);
+  n = (n/100) * 100; /* Silberreste abrunden */
 
-	if( is_cursed(sh->attribs, C_SHIP_FLYING, 0) ) {
+  if( is_cursed(sh->attribs, C_SHIP_FLYING, 0) ) {
 		if (sh->type->cargo>500*100)
 			assert(!"Ein Schiff wurde verzaubert, das zu groß ist");
 		if (n > 10000) return false;

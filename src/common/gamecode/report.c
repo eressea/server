@@ -2330,83 +2330,83 @@ report(FILE *F, faction * f, const faction_list * addresses,
 		/* Schiffe und ihre Einheiten */
 
 		for (sh = r->ships; sh; sh = sh->next) {
-			int w = 0;
 			faction *of = NULL;
 
 			rnl(F);
 
 			/* Gewicht feststellen */
 
-			for (u = r->units; u; u = u->next)
-				if (u->ship == sh && fval(u, UFL_OWNER)) {
-					of = u->faction;
-					break;
-				}
-			if (of == f) {
-				for (u = r->units; u; u = u->next) {
-					if (u->ship == sh) {
-						w += weight(u);
-					}
-				}
-				sprintf(buf, "%s, %s, (%d/%d)",
-						shipname(sh), LOC(f->locale, sh->type->name[0]),
-						(w + 99) / 100, shipcapacity(sh) / 100);
-			} else {
-				sprintf(buf, "%s, %s", shipname(sh), LOC(f->locale, sh->type->name[0]));
-			}
+      for (u = r->units; u; u = u->next) {
+        if (u->ship == sh && fval(u, UFL_OWNER)) {
+          of = u->faction;
+          break;
+        }
+      }
+      if (of == f) {
+        int n = 0, p = 0;
+        getshipweight(sh, &n, &p);
 
-			assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
-			if (sh->size!=sh->type->construction->maxsize) {
-				sprintf(buf+strlen(buf), ", %s (%d/%d)",
-					LOC(f->locale, "nr_undercons"), sh->size,
-					sh->type->construction->maxsize);
-			}
-			if (sh->damage) {
-				sprintf(buf+strlen(buf), ", %d%% %s",
-					sh->damage*100/(sh->size*DAMAGE_SCALE),
-					LOC(f->locale, "nr_damaged"));
-			}
-			if (rterrain(r) != T_OCEAN) {
-				if (sh->coast != NODIRECTION) {
-					scat(", ");
-					scat(LOC(f->locale, coasts[sh->coast]));
-				}
-			}
-			ch = 0;
-			if (sh->display[0]) {
-				scat("; ");
-				scat(sh->display);
+        sprintf(buf, "%s, %s, (%d/%d)", shipname(sh), 
+          LOC(f->locale, sh->type->name[0]), n / 100, shipcapacity(sh) / 100);
+      } else {
+        sprintf(buf, "%s, %s", shipname(sh), LOC(f->locale, sh->type->name[0]));
+      }
 
-				ch = sh->display[strlen(sh->display) - 1];
-			}
-			if (ch != '!' && ch != '?' && ch != '.')
-				scat(".");
+      assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
+      if (sh->size!=sh->type->construction->maxsize) {
+        sprintf(buf+strlen(buf), ", %s (%d/%d)",
+          LOC(f->locale, "nr_undercons"), sh->size,
+          sh->type->construction->maxsize);
+      }
+      if (sh->damage) {
+        sprintf(buf+strlen(buf), ", %d%% %s",
+          sh->damage*100/(sh->size*DAMAGE_SCALE),
+          LOC(f->locale, "nr_damaged"));
+      }
+      if (rterrain(r) != T_OCEAN) {
+        if (sh->coast != NODIRECTION) {
+          scat(", ");
+          scat(LOC(f->locale, coasts[sh->coast]));
+        }
+      }
+      ch = 0;
+      if (sh->display[0]) {
+        scat("; ");
+        scat(sh->display);
 
-			rparagraph(F, buf, 2, 0);
+        ch = sh->display[strlen(sh->display) - 1];
+      }
+      if (ch != '!' && ch != '?' && ch != '.')
+        scat(".");
 
-			print_curses(F,f,sh,TYP_SHIP,4);
+      rparagraph(F, buf, 2, 0);
 
-			for (u = r->units; u; u = u->next)
-				if (u->ship == sh && fval(u, UFL_OWNER)) {
-					rpunit(F, f, u, 6, sd->mode);
-					break;
-				}
-			for (u = r->units; u; u = u->next)
-				if (u->ship == sh && !fval(u, UFL_OWNER))
-					rpunit(F, f, u, 6, sd->mode);
-		}
+      print_curses(F,f,sh,TYP_SHIP,4);
 
-		rnl(F);
-		rpline(F);
-	}
-	if (f->no != MONSTER_FACTION) {
-		if (!anyunits) {
-			rnl(F);
-			rparagraph(F, LOC(f->locale, "nr_youaredead"), 0, 0);
-		} else {
-			list_address(F, f, addresses);
-		}
-	}
+      for (u = r->units; u; u = u->next) {
+        if (u->ship == sh && fval(u, UFL_OWNER)) {
+          rpunit(F, f, u, 6, sd->mode);
+          break;
+        }
+      }
+      for (u = r->units; u; u = u->next) {
+        if (u->ship == sh && !fval(u, UFL_OWNER)) {
+          rpunit(F, f, u, 6, sd->mode);
+        }
+      }
+    }
+
+    rnl(F);
+    rpline(F);
+  }
+  if (f->no != MONSTER_FACTION) {
+    if (!anyunits) {
+      rnl(F);
+      rparagraph(F, LOC(f->locale, "nr_youaredead"), 0, 0);
+    } else {
+      list_address(F, f, addresses);
+    }
+  }
 }
 
 FILE *
