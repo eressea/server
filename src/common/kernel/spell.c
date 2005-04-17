@@ -2278,6 +2278,11 @@ sp_ironkeeper(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 
+  if (rterrain(r) != T_MOUNTAIN && rterrain(r) != T_GLACIER) {
+    report_failure(mage, co->order);
+    return 0;
+  }
+
 	keeper = create_unit(r, mage->faction, 1, new_race[RC_IRONKEEPER], 0, "Bergwächter", mage);
 
 	/*keeper->age = cast_level + 2;*/

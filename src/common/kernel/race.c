@@ -368,7 +368,6 @@ oldfamiliars(unit * familiar)
 			set_level(familiar, SK_MAGIC, 1);
 			set_level(familiar, SK_MINING, 1);
 			set_level(familiar, SK_LUMBERJACK, 1);
-			set_level(familiar, SK_ROAD_BUILDING, 1);
 			set_level(familiar, SK_AUSDAUER, 1);
 			m = create_mage(familiar, M_GRAU);
 			break;
