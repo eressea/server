@@ -974,11 +974,11 @@ showunits(region * r)
 		}
 	}
 	for (sh = r->ships; sh; sh = sh->next) {
-		f=0;
-		for (u = r->units; u; u = u->next)
-			if (u->ship == sh) f += weight(u);
-			sprintf(lbuf, "\023%s, %s, (%d/%d)", shipname(sh), sh->type->name[0],
-					(f+99)/100, shipcapacity(sh)/100);
+    int n = 0, p = 0;
+    getshipweight(sh, &n, &p);
+    n = (n+99) / 100; /* 1 Silber = 1 GE */
+    sprintf(lbuf, "\023%s, %s, (%d/%d)", shipname(sh), sh->type->name[0],
+      n, shipcapacity(sh)/100);
 		if (sh->type->construction && sh->size!=sh->type->construction->maxsize) {
 			f = 100 * (sh->size) / sh->type->construction->maxsize;
 			sncat(lbuf, ", im Bau (", BUFSIZE);

@@ -2345,9 +2345,10 @@ report(FILE *F, faction * f, const faction_list * addresses,
       if (of == f) {
         int n = 0, p = 0;
         getshipweight(sh, &n, &p);
+        n = (n+99) / 100; /* 1 Silber = 1 GE */
 
         sprintf(buf, "%s, %s, (%d/%d)", shipname(sh), 
-          LOC(f->locale, sh->type->name[0]), n / 100, shipcapacity(sh) / 100);
+          LOC(f->locale, sh->type->name[0]), n, shipcapacity(sh) / 100);
       } else {
         sprintf(buf, "%s, %s", shipname(sh), LOC(f->locale, sh->type->name[0]));
       }

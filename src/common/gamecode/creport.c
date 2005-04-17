@@ -562,19 +562,19 @@ cr_output_buildings(FILE * F, building * b, unit * u, int fno, faction *f)
 
 /* prints a ship */
 static void
-cr_output_ship(FILE * F, const ship * s, const unit * u, int fcaptain, const faction * f, const region * r)
+cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const faction * f, const region * r)
 {
 	unit *u2;
 	int w = 0;
-	assert(s);
-	fprintf(F, "SCHIFF %d\n", s->no);
-	fprintf(F, "\"%s\";Name\n", s->name);
-	if (strlen(s->display))
-		fprintf(F, "\"%s\";Beschr\n", s->display);
-	fprintf(F, "\"%s\";Typ\n", add_translation(s->type->name[0], locale_string(f->locale, s->type->name[0])));
-	fprintf(F, "%d;Groesse\n", s->size);
-	if (s->damage) {
-		int percent = s->damage*100/(s->size*DAMAGE_SCALE);
+	assert(sh);
+	fprintf(F, "SCHIFF %d\n", sh->no);
+	fprintf(F, "\"%s\";Name\n", sh->name);
+	if (strlen(sh->display))
+		fprintf(F, "\"%s\";Beschr\n", sh->display);
+	fprintf(F, "\"%s\";Typ\n", add_translation(sh->type->name[0], locale_string(f->locale, sh->type->name[0])));
+	fprintf(F, "%d;Groesse\n", sh->size);
+	if (sh->damage) {
+		int percent = sh->damage*100/(sh->size*DAMAGE_SCALE);
 		fprintf(F, "%d;Schaden\n", percent);
 	}
 	if (u)
@@ -584,20 +584,20 @@ cr_output_ship(FILE * F, const ship * s, const unit * u, int fcaptain, const fac
 
 	/* calculate cargo */
 	if (u && (u->faction == f || omniscient(f))) {
-		for (u2 = r->units; u2; u2 = u2->next)
-			if (u2->ship == s)
-				w += weight(u2);
+    int n = 0, p = 0;
+    getshipweight(sh, &n, &p);
+    n = (n+99) / 100; /* 1 Silber = 1 GE */
 
-		fprintf(F, "%d;Ladung\n", (w + 99) / 100);
-		fprintf(F, "%d;MaxLadung\n", shipcapacity(s) / 100);
+		fprintf(F, "%d;Ladung\n", n);
+		fprintf(F, "%d;MaxLadung\n", shipcapacity(sh) / 100);
 	}
 	/* shore */
 	w = NODIRECTION;
-	if (rterrain(r) != T_OCEAN) w = s->coast;
+	if (rterrain(r) != T_OCEAN) w = sh->coast;
 	if (w != NODIRECTION)
 		fprintf(F, "%d;Kueste\n", w);
 
-	print_curses(F, f, s, TYP_SHIP);
+	print_curses(F, f, sh, TYP_SHIP);
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
