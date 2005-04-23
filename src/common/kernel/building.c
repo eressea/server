@@ -329,7 +329,7 @@ building_type bt_castle = {
 	"castle",
 	BFL_NONE,
 	1, 4, -1,
-	0, 0, 0, 0.0,
+	0, 0, 0, 1.0,
 	NULL,
 	&castle_bld[0],
 	castle_name

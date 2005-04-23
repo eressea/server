@@ -2351,7 +2351,6 @@ init_locales(void)
 }
 
 /* TODO: soll hier weg */
-extern building_type bt_caldera;
 extern attrib_type at_shiptrail;
 
 attrib_type at_germs = {
