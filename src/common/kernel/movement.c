@@ -1513,7 +1513,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
       int stormchance = storms[month(0)] * 5 / shipspeed(sh, u);
       if (check_leuchtturm(next_point, NULL)) stormchance /= 3;
 
-      if (rand()%10000 < stormchance && next_point->terrain == T_OCEAN) {
+      if (rand()%10000 < stormchance && current_point->terrain == T_OCEAN) {
         if (!is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
           region * rnext = NULL;
           boolean storm = true;
