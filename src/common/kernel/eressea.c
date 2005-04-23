@@ -1697,7 +1697,7 @@ freestrlist (strlist * s)
 
 /* - Meldungen und Fehler ------------------------------------------------- */
 
-boolean nomsg = false;
+boolean lomem = false;
 
 /* - Namen der Strukturen -------------------------------------- */
 typedef char name[OBJECTIDSIZE + 1];

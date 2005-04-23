@@ -108,7 +108,6 @@ extern boolean nonr;
 extern boolean nocr;
 extern boolean noreports;
 extern boolean nomer;
-extern boolean nomsg;
 extern boolean nobattle;
 extern boolean nomonsters;
 extern boolean nobattledebug;
@@ -432,7 +431,7 @@ usage(const char * prog, const char * arg)
 		"-l logfile       : specify an alternative logfile\n"
 		"-R               : erstellt nur die Reports neu\n"
 		"--noeiswald      : beruhigt ungemein\n"
-		"--nomsg          : keine Messages (RAM sparen)\n"
+		"--lomem          : keine Messages (RAM sparen)\n"
 		"--nobattle       : keine Kämpfe\n"
 		"--nomonsters     : keine monster KI\n"
 		"--nodebug        : keine Logfiles für Kämpfe\n"
@@ -465,7 +464,7 @@ read_args(int argc, char **argv)
 			else if (strcmp(argv[i]+2, "xml")==0) xmlfile = argv[++i];
 			else if (strcmp(argv[i]+2, "dirtyload")==0) dirtyload = true;
 			else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
-			else if (strcmp(argv[i]+2, "nomsg")==0) nomsg = true;
+			else if (strcmp(argv[i]+2, "lomem")==0) lomem = true;
 			else if (strcmp(argv[i]+2, "noeiswald")==0) g_killeiswald = true;
 			else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
 			else if (strcmp(argv[i]+2, "nomonsters")==0) nomonsters = true;

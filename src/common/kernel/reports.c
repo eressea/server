@@ -424,7 +424,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   }
   i = 0;
 
-  if (u->display[0]) {
+  if (u->display && u->display[0]) {
     scat("; ");
     scat(u->display);
 
@@ -579,7 +579,7 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 	if(show) while(show) i_free(i_remove(&show, show));
 
 	i = 0;
-	if (u->display[0]) {
+	if (u->display && u->display[0]) {
 		scat("; ");
 		scat(u->display);
 

@@ -353,8 +353,7 @@ extern unsigned int new_hashstring(const char* s);
 message * 
 add_message(message_list** pm, message * m)
 {
-	if (m==NULL) return NULL;
-	else {
+	if (!lomem && m!=NULL) {
 		struct mlist * mnew = malloc(sizeof(struct mlist));
 		if (*pm==NULL) {
 			*pm = malloc(sizeof(message_list));

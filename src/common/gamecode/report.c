@@ -1274,7 +1274,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	}
 	scat(".");
 
-	if (r->display[0]) {
+	if (r->display && r->display[0]) {
 		scat(" ");
 		scat(r->display);
 
@@ -1954,7 +1954,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 		}
 	}
 	i = 0;
-	if (b->display[0]) {
+	if (b->display && b->display[0]) {
 		scat("; ");
 		scat(b->display);
 		i = b->display[strlen(b->display) - 1];
@@ -2371,7 +2371,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
         }
       }
       ch = 0;
-      if (sh->display[0]) {
+      if (sh->display && sh->display[0]) {
         scat("; ");
         scat(sh->display);
 

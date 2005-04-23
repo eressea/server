@@ -458,8 +458,6 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
   if (!fval(mage->faction, FL_DH)) {
     add_message(&mage->faction->msgs, seen);
   }
-  msg_release(seen);
-  if (unseen) msg_release(unseen);
 }
 
 /* ------------------------------------------------------------- */
@@ -922,6 +920,8 @@ sp_magicstreet(castorder *co)
     message * seen = msg_message("path_effect", "mage region", mage, r);
     message * unseen = msg_message("path_effect", "mage region", NULL, r);
     report_effect(r, mage, seen, unseen);
+    msg_release(seen);
+    msg_release(unseen);
   }
 
   return co->level;
@@ -988,6 +988,8 @@ sp_summonent(castorder *co)
 		message * seen = msg_message("ent_effect", "mage amount", mage, ents);
 		message * unseen = msg_message("ent_effect", "mage amount", NULL, ents);
 		report_effect(r, mage, seen, unseen);
+    msg_release(seen);
+    msg_release(unseen);
 	}
 	return cast_level;
 }
@@ -1081,6 +1083,8 @@ sp_maelstrom(castorder *co)
 		message * seen = msg_message("maelstrom_effect", "mage", mage);
 		message * unseen = msg_message("maelstrom_effect", "mage", NULL);
 		report_effect(r, mage, seen, unseen);
+    msg_release(seen);
+    msg_release(unseen);
 	}
 
 	return cast_level;
@@ -1128,6 +1132,8 @@ sp_mallorn(castorder *co)
 		message * seen = msg_message("mallorn_effect", "mage", mage);
 		message * unseen = msg_message("mallorn_effect", "mage", NULL);
 		report_effect(r, mage, seen, unseen);
+    msg_release(seen);
+    msg_release(unseen);
 	}
 
 	return cast_level;
@@ -1162,6 +1168,8 @@ sp_blessedharvest(castorder *co)
 		message * seen = msg_message("harvest_effect", "mage", mage);
 		message * unseen = msg_message("harvest_effect", "mage", NULL);
 		report_effect(r, mage, seen, unseen);
+    msg_release(seen);
+    msg_release(unseen);
 	}
 
 	return cast_level;
@@ -1210,6 +1218,8 @@ sp_hain(castorder *co)
 		message * seen = msg_message("growtree_effect", "mage amount", mage, trees);
 		message * unseen = msg_message("growtree_effect", "mage amount", NULL, trees);
 		report_effect(r, mage, seen, unseen);
+    msg_release(seen);
+    msg_release(unseen);
 	}
 
 	return cast_level;
@@ -1257,6 +1267,8 @@ sp_mallornhain(castorder *co)
 		message * seen = msg_message("growtree_effect", "mage amount", mage, trees);
 		message * unseen = msg_message("growtree_effect", "mage amount", NULL, trees);
 		report_effect(r, mage, seen, unseen);
+    msg_release(seen);
+    msg_release(unseen);
 	}
 
 	return cast_level;
@@ -1290,6 +1302,7 @@ patzer_ents(castorder *co)
 	{
 		message * unseen = msg_message("entrise", "region", r);
 		report_effect(r, mage, unseen, unseen);
+    msg_release(unseen);
 	}
 }
 
@@ -3061,6 +3074,8 @@ sp_firewall(castorder *co)
     message * seen = msg_message("firewall_effect", "mage region", mage, r);
     message * unseen = msg_message("firewall_effect", "mage region", NULL, r);
     report_effect(r, mage, seen, unseen);
+    msg_release(seen);
+    msg_release(unseen);
   }
 
   return cast_level;
@@ -3149,6 +3164,8 @@ sp_wisps(castorder *co)
           message * seen = msg_message("wisps_effect", "mage region", mage, r);
           message * unseen = msg_message("wisps_effect", "mage region", NULL, r);
           report_effect(r, mage, seen, unseen);
+          msg_release(seen);
+          msg_release(unseen);
         }
 
         return cast_level;
@@ -5078,13 +5095,16 @@ sp_puttorest(castorder *co)
 	unit *mage = (unit *)co->magician;
   int dead = deathcount(r);
   int laid_to_rest = dice((int)(co->force * 2), 100);
-	laid_to_rest = max(laid_to_rest, dead);
+  message * seen = msg_message("puttorest", "mage", mage);
+  message * unseen = msg_message("puttorest", "mage", NULL);
+
+  laid_to_rest = max(laid_to_rest, dead);
 
 	deathcounts(r, -laid_to_rest);
 
-	report_effect(r, mage,
-		msg_message("puttorest", "mage", mage),
-		msg_message("puttorest", "mage", NULL));
+  report_effect(r, mage, seen, unseen);
+  msg_release(seen);
+  msg_release(unseen);
 	return co->level;
 }
 

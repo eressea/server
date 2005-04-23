@@ -101,28 +101,44 @@ parse_order(const char * s, const struct locale * lang)
   while (*s && !isalnum(*(unsigned char*)s) && !ispunct(*(unsigned char*)s)) ++s;
   if (*s==0) return NULL;
   else {
+    keyword_t kwd;
     const char * sptr;
-    order * ord = (order*)malloc(sizeof(order));
+    order * ord = NULL;
+    int persistent = 0;
     int i;
 
+#ifdef AT_PERSISTENT
+    while (*s=='@') {
+      persistent = 1;
+      ++s;
+    }
+#endif
+    sptr = s;
+    kwd = findkeyword(parse_token(&sptr), lang);
+
+    /* if this is just nonsense, then we skip it. */
+    if (lomem) {
+      switch (kwd) {
+        case K_KOMMENTAR:
+        case NOKEYWORD:
+          return NULL;
+        default:
+          break;
+      }
+    }
+
+    ord = (order*)malloc(sizeof(order));
     for (i=0;i!=nlocales;++i) {
       if (locale_array[i]==lang) break;
     }
     if (i==nlocales) locale_array[nlocales++] = lang;
     ord->_lindex = (unsigned char)i;
     ord->_str = NULL;
-    ord->_persistent = 0;
+    ord->_persistent = persistent;
     ord->_refcount = 1;
     ord->next = NULL;
 
-#ifdef AT_PERSISTENT
-    while (*s=='@') {
-      ord->_persistent = 1;
-      ++s;
-    }
-#endif
-    sptr = s;
-    ord->_keyword = findkeyword(parse_token(&sptr), lang);
+    ord->_keyword = kwd;
 #ifdef SHORT_STRINGS
     if (ord->_keyword==NOKEYWORD) {
       ord->_str = strdup(s);

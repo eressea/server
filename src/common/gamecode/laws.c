@@ -1380,6 +1380,7 @@ synonym_cmd(unit * u, struct order * ord)
 static int
 display_cmd(unit * u, struct order * ord)
 {
+  building * b = u->building;
   char **s = NULL;
   region * r = u->region;
 
@@ -1389,7 +1390,7 @@ display_cmd(unit * u, struct order * ord)
   switch (getparam(u->faction->locale)) {
   case P_BUILDING:
   case P_GEBAEUDE:
-    if (!u->building) {
+    if (!b) {
       cmistake(u, ord, 145, MSG_PRODUCE);
       break;
     }
@@ -1397,19 +1398,19 @@ display_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 5, MSG_PRODUCE);
       break;
     }
-    if (u->building->type == bt_find("generic")) {
+    if (b->type == bt_find("generic")) {
       cmistake(u, ord, 279, MSG_PRODUCE);
       break;
     }
-    if (u->building->type == bt_find("monument") && u->building->display[0] != 0) {
+    if (b->type == bt_find("monument") && b->display && b->display[0] != 0) {
       cmistake(u, ord, 29, MSG_PRODUCE);
       break;
     }
-    if (u->building->type == bt_find("artsculpture") && u->building->display[0] != 0) {
+    if (b->type == bt_find("artsculpture") && b->display && b->display[0] != 0) {
       cmistake(u, ord, 29, MSG_PRODUCE);
       break;
     }
-    s = &u->building->display;
+    s = &b->display;
     break;
 
   case P_SHIP:
@@ -1440,7 +1441,7 @@ display_cmd(unit * u, struct order * ord)
     break;
 
   case P_REGION:
-    if (!u->building) {
+    if (!b) {
       cmistake(u, ord, 145, MSG_EVENT);
       break;
     }
@@ -1448,7 +1449,7 @@ display_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 148, MSG_EVENT);
       break;
     }
-    if (u->building != largestbuilding(r,false)) {
+    if (b != largestbuilding(r,false)) {
       cmistake(u, ord, 147, MSG_EVENT);
       break;
     }
@@ -1478,6 +1479,7 @@ display_cmd(unit * u, struct order * ord)
 static int
 name_cmd(unit * u, struct order * ord)
 {
+  building * b = u->building;
   region * r = u->region;
   char **s = NULL;
   param_t p;
@@ -1534,7 +1536,7 @@ name_cmd(unit * u, struct order * ord)
       }
       s = &b->name;
     } else {
-      if (!u->building) {
+      if (!b) {
         cmistake(u, ord, 145, MSG_PRODUCE);
         break;
       }
@@ -1542,21 +1544,21 @@ name_cmd(unit * u, struct order * ord)
         cmistake(u, ord, 148, MSG_PRODUCE);
         break;
       }
-      if (u->building->type == bt_find("generic")) {
+      if (b->type == bt_find("generic")) {
         cmistake(u, ord, 278, MSG_EVENT);
         break;
       }
-      sprintf(buf, "Monument %d", u->building->no);
-      if (u->building->type == bt_find("monument")
-        && !strcmp(u->building->name, buf)) {
+      sprintf(buf, "Monument %d", b->no);
+      if (b->type == bt_find("monument")
+        && !strcmp(b->name, buf)) {
           cmistake(u, ord, 29, MSG_EVENT);
           break;
         }
-        if (u->building->type == bt_find("artsculpure")) {
+        if (b->type == bt_find("artsculpure")) {
           cmistake(u, ord, 29, MSG_EVENT);
           break;
         }
-        s = &u->building->name;
+        s = &b->name;
     }
     break;
 
@@ -1682,7 +1684,7 @@ name_cmd(unit * u, struct order * ord)
     break;
 
   case P_REGION:
-    if (!u->building) {
+    if (!b) {
       cmistake(u, ord, 145, MSG_EVENT);
       break;
     }
@@ -1690,7 +1692,7 @@ name_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 148, MSG_EVENT);
       break;
     }
-    if (u->building != largestbuilding(r,false)) {
+    if (b != largestbuilding(r,false)) {
       cmistake(u, ord, 147, MSG_EVENT);
       break;
     }
@@ -3468,9 +3470,19 @@ setdefaults (void)
             /* Über dieser Zeile nur Befehle, die auch eine idle Faction machen darf */
             if (idle (u->faction)) {
               set_order(&u->thisorder, default_order(u->faction->locale));
-              break;
+            } else {
+              set_order(&u->thisorder, ord);
             }
-            /* else fall through */
+            break;
+
+          case K_FOLLOW:
+            /* FOLLOW is only a long order if we are following a ship. */
+            init_tokens(ord);
+            skip_token();
+            if (getparam(u->faction->locale) == P_SHIP) {
+              set_order(&u->thisorder, ord);
+            }
+            break;
 
           case K_ROUTE:
           case K_WORK:

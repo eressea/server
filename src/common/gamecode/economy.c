@@ -798,7 +798,7 @@ maintain(building * b, boolean first)
 	}
 	if (paid && c>0) {
 		/* TODO: wieviel von was wurde bezahlt */
-		message * msg;
+		message * msg = NULL;
 		if (first) {
 			msg = add_message(&u->faction->msgs,
 				msg_message("maintenance", "unit building", u, b));
@@ -806,7 +806,7 @@ maintain(building * b, boolean first)
 			msg = add_message(&u->faction->msgs,
 				msg_message("maintenance_late", "building", b));
 		}
-		msg_release(msg);
+		if (msg) msg_release(msg);
 		fset(b, BLD_MAINTAINED);
 		if (work) fset(b, BLD_WORKING);
 		for (c=0;b->type->maintenance[c].number;++c) {

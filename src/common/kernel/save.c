@@ -249,9 +249,10 @@ rds(FILE * F, char **ds)
 	rc(F);
 	assert(s <= buffer + DISPLAYSIZE + 1);
 	*s = 0;
-	(*ds) = realloc(*ds, sizeof(char) * (strlen(buffer) + 1));
-
-	strcpy(*ds, buffer);
+  if (ds) {
+    (*ds) = realloc(*ds, sizeof(char) * (strlen(buffer) + 1));
+    strcpy(*ds, buffer);
+  }
 }
 
 #define rcf(F) (getc(F));
@@ -509,7 +510,7 @@ unitorders(FILE * F, struct faction * f)
       if (buf[0]) {
         /* Nun wird der Befehl erzeut und eingehängt */
         *ordp = parse_order(buf, u->faction->locale);
-        ordp = &(*ordp)->next;
+        if (*ordp) ordp = &(*ordp)->next;
       }
     }
 
@@ -618,7 +619,6 @@ readorders(const char *filename)
 			}
 
 			b = getbuf(F);
-
 			break;
 
 			/* in factionorders wird nur eine zeile gelesen:
@@ -643,8 +643,12 @@ readorders(const char *filename)
 
 		case P_NEXT:
 			f = NULL;
-		default:
+      b = getbuf(F);
+      break;
+
+    default:
 			b = getbuf(F);
+      break;
 		}
 	}
 
@@ -1034,10 +1038,11 @@ readunit(FILE * F)
 		if (f!=u->faction) u_setfaction(u, f);
 	}
 	rds(F, &u->name);
-  rds(F, &u->display);
+  if (lomem) rds(F, 0);
+  else rds(F, &u->display);
 #ifndef NDEBUG
   if (strlen(u->name)>=NAMESIZE) u->name[NAMESIZE] = 0;
-  if (strlen(u->display)>=DISPLAYSIZE) u->name[DISPLAYSIZE] = 0;
+  if (u->display && strlen(u->display)>=DISPLAYSIZE) u->display[DISPLAYSIZE] = 0;
 #endif
 	number = ri(F);
 	if (global.data_version<ITEMTYPE_VERSION)
@@ -1191,7 +1196,7 @@ writeunit(FILE * F, const unit * u)
 	wi36(F, u->no);
 	wi36(F, u->faction->no);
 	ws(F, u->name);
-	ws(F, u->display);
+  ws(F, u->display?u->display:"");
 	wi(F, u->number);
 	wi(F, u->age);
 	ws(F, u->race->_name[0]);
@@ -1266,8 +1271,10 @@ readregion(FILE * F, int x, int y)
 		}
 		r->land = 0;
 	}
-	rds(F, &r->display);
-	ter = ri(F);
+  if (lomem) rds(F, 0);
+  else rds(F, &r->display);
+
+  ter = ri(F);
 	if (global.data_version < NOFOREST_VERSION) {
 		if (ter>T_PLAIN) --ter;
 	}
@@ -1416,7 +1423,7 @@ readregion(FILE * F, int x, int y)
 void
 writeregion(FILE * F, const region * r)
 {
-	ws(F, r->display);
+  ws(F, r->display?r->display:"");
 	wi(F, rterrain(r));
 	wi(F, r->flags & RF_SAVEMASK);
 	wi(F, r->age);
@@ -1878,10 +1885,11 @@ readgame(const char * filename, int backup)
       b->no = rid(F);
       bhash(b);
       rds(F, &b->name);
-      rds(F, &b->display);
+      if (lomem) rds(F, 0);
+      else rds(F, &b->display);
 #ifndef NDEBUG
       if (strlen(b->name)>=NAMESIZE) b->name[NAMESIZE] = 0;
-      if (strlen(b->display)>=DISPLAYSIZE) b->name[DISPLAYSIZE] = 0;
+      if (b->display && strlen(b->display)>=DISPLAYSIZE) b->display[DISPLAYSIZE] = 0;
 #endif
       b->size = ri(F);
       if (global.data_version < TYPES_VERSION) {
@@ -1908,10 +1916,11 @@ readgame(const char * filename, int backup)
       sh->no = rid(F);
       shash(sh);
       rds(F, &sh->name);
-      rds(F, &sh->display);
+      if (lomem) rds(F, 0);
+      else rds(F, &sh->display);
 #ifndef NDEBUG
-      if (strlen(sh->name)>=NAMESIZE) sh->name[NAMESIZE] = 0;
-      if (strlen(sh->display)>=DISPLAYSIZE) sh->name[DISPLAYSIZE] = 0;
+      if (sh->name && strlen(sh->name)>=NAMESIZE) sh->name[NAMESIZE] = 0;
+      if (sh->display && strlen(sh->display)>=DISPLAYSIZE) sh->display[DISPLAYSIZE] = 0;
 #endif
 
       rs(F, buf);
@@ -2140,7 +2149,7 @@ writegame(const char *filename, char quiet)
     for (b = r->buildings; b; b = b->next) {
       wi36(F, b->no);
       ws(F, b->name);
-      ws(F, b->display);
+      ws(F, b->display?b->display:"");
       wi(F, b->size);
       ws(F, b->type->_name);
       wnl(F);
@@ -2154,7 +2163,7 @@ writegame(const char *filename, char quiet)
       assert(sh->region == r);
       wi36(F, sh->no);
       ws(F, sh->name);
-      ws(F, sh->display);
+      ws(F, sh->display?sh->display:"");
       ws(F, sh->type->name[0]);
       wi(F, sh->size);
       wi(F, sh->damage);
