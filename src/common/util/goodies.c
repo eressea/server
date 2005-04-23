@@ -111,8 +111,16 @@ escape_string(const char * str, char * buffer, unsigned int len)
 char *
 set_string (char **s, const char *neu)
 {
-	*s = realloc(*s, strlen(neu) + 1);
-	return strcpy(*s, neu);
+  if (neu==NULL) {
+    free(*s);
+    *s = NULL;
+  } else if (*s == NULL) {
+    *s = malloc(strlen(neu)+1);
+  } else {
+    *s = realloc(*s, strlen(neu) + 1);
+    strcpy(*s, neu);
+  }
+	return *s;
 }
 
 boolean

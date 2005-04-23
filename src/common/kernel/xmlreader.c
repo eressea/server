@@ -224,7 +224,7 @@ parse_buildings(xmlDocPtr doc)
     bt->magres = xml_ivalue(node, "magres", 0);
     bt->magresbonus = xml_ivalue(node, "magresbonus", 0);
     bt->fumblebonus = xml_ivalue(node, "fumblebonus", 0);
-    bt->auraregen = xml_fvalue(node, "auraregen", 0.0);
+    bt->auraregen = xml_fvalue(node, "auraregen", 1.0);
 
     if (xml_bvalue(node, "nodestroy", false)) bt->flags |= BTF_INDESTRUCTIBLE;
     if (xml_bvalue(node, "nobuild", false)) bt->flags |= BTF_NOBUILD;
@@ -331,12 +331,12 @@ parse_ships(xmlDocPtr doc)
     st->cargo = xml_ivalue(node, "cargo", 0);
     st->combat = xml_ivalue(node, "combat", 0);
     st->cptskill = xml_ivalue(node, "cptskill", 0);
-    st->damage = xml_fvalue(node, "damage", 0);
+    st->damage = xml_fvalue(node, "damage", 0.0);
     if (xml_bvalue(node, "fly", false)) st->flags |= SFL_FLY;
     if (xml_bvalue(node, "opensea", false)) st->flags |= SFL_OPENSEA;
     st->minskill = xml_ivalue(node, "minskill", 0);
     st->range = xml_ivalue(node, "range", 0);
-    st->storm = xml_fvalue(node, "storm", 0.0);
+    st->storm = xml_fvalue(node, "storm", 1.0);
     st->sumskill = xml_ivalue(node, "sumskill", 0);
 
 	/* reading eressea/ships/ship/construction */
@@ -787,7 +787,7 @@ parse_races(xmlDocPtr doc)
 
     rc->magres = xml_fvalue(node, "magres", 0.0);
     rc->maxaura = xml_fvalue(node, "maxaura", 0.0);
-    rc->regaura = xml_fvalue(node, "regaura", 0.0);
+    rc->regaura = xml_fvalue(node, "regaura", 1.0);
     rc->recruitcost = xml_ivalue(node, "recruitcost", 0);
     rc->maintenance = xml_ivalue(node, "maintenance", 0);
     rc->weight = xml_ivalue(node, "weight", 0);

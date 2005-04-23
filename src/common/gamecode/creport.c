@@ -541,7 +541,7 @@ cr_output_buildings(FILE * F, building * b, unit * u, int fno, faction *f)
 	}
 	fprintf(F, "\"%s\";Typ\n", add_translation(bname, LOC(f->locale, bname)));
 	fprintf(F, "\"%s\";Name\n", b->name);
-	if (strlen(b->display))
+	if (b->display && strlen(b->display))
 		fprintf(F, "\"%s\";Beschr\n", b->display);
 	if (b->size)
 		fprintf(F, "%d;Groesse\n", b->size);
@@ -564,12 +564,11 @@ cr_output_buildings(FILE * F, building * b, unit * u, int fno, faction *f)
 static void
 cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const faction * f, const region * r)
 {
-	unit *u2;
 	int w = 0;
 	assert(sh);
 	fprintf(F, "SCHIFF %d\n", sh->no);
 	fprintf(F, "\"%s\";Name\n", sh->name);
-	if (strlen(sh->display))
+	if (sh->display && strlen(sh->display))
 		fprintf(F, "\"%s\";Beschr\n", sh->display);
 	fprintf(F, "\"%s\";Typ\n", add_translation(sh->type->name[0], locale_string(f->locale, sh->type->name[0])));
 	fprintf(F, "%d;Groesse\n", sh->size);
@@ -625,7 +624,7 @@ cr_output_unit(FILE * F, const region * r,
 
 	fprintf(F, "EINHEIT %d\n", u->no);
 	fprintf(F, "\"%s\";Name\n", u->name);
-	if (strlen(u->display))
+	if (u->display && strlen(u->display))
 		fprintf(F, "\"%s\";Beschr\n", u->display);
 
 	{
