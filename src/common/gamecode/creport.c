@@ -1083,7 +1083,7 @@ get_seen_interval(region ** first, region ** last)
 }
 
 /* main function of the creport. creates the header and traverses all regions */
-void
+int
 report_computer(FILE * F, faction * f, const faction_list * addresses, 
                 const time_t report_time)
 {
@@ -1525,4 +1525,5 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 	report_crtypes(F, f->locale);
 	write_translations(F);
 	reset_translations();
+  return 0;
 }

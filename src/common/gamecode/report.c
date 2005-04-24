@@ -1575,7 +1575,7 @@ buildingmaintenance(const building * b, const resource_type * rtype)
   return cost;
 }
 
-static void
+static int
 order_template(FILE * F, faction * f)
 {
   region *r;
@@ -1690,6 +1690,7 @@ order_template(FILE * F, faction * f)
   sprintf(buf, LOC(f->locale, parameters[P_NEXT]));
   rps_nowrap(F, buf);
   rnl(F);
+  return 0;
 }
 
 static void
@@ -1978,7 +1979,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 			rpunit(F, f, u, 6, mode);
 }
 
-static void
+static int
 report(FILE *F, faction * f, const faction_list * addresses,
 	const char * pzTime)
 {
@@ -2408,6 +2409,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
       list_address(F, f, addresses);
     }
   }
+  return 0;
 }
 
 FILE *
@@ -2685,7 +2687,7 @@ struct fsee {
 	} * see;
 } * fsee[FMAXHASH];
 
-void
+int
 reports(void)
 {
 	faction *f;
@@ -2741,9 +2743,10 @@ reports(void)
 			sprintf(buf, "%s/%d-%s.nr", reportpath(), turn, factionid(f));
 			F = cfopen(buf, "wt");
 			if (F) {
-				report(F, f, addresses, pzTime);
+				int status = report(F, f, addresses, pzTime);
 				fclose(F);
 				gotit = true;
+        if (status!=0) return status; /* catch errors */
 			}
 		}
     /* CR schreiben: */
@@ -2751,9 +2754,10 @@ reports(void)
 			sprintf(buf, "%s/%d-%s.cr", reportpath(), turn, factionid(f));
 			F = cfopen(buf, "wt");
 			if (F) {
-				report_computer(F, f, addresses, ltime);
+				int status = report_computer(F, f, addresses, ltime);
 				fclose(F);
 				gotit = true;
+        if (status!=0) return status; /* catch errors */
 			}
 		}
     /* ZV schreiben: */
@@ -2761,8 +2765,9 @@ reports(void)
       sprintf(buf, "%s/%d-%s.txt", reportpath(), turn, factionid(f));
       F = cfopen(buf, "wt");
       if (F) {
-        order_template(F, f);
+        int status = order_template(F, f);
         fclose(F);
+        if (status!=0) return status; /* catch errors */
       }
     }
 		if (f->no > 0 && f->email && BAT) {
@@ -2895,6 +2900,7 @@ reports(void)
   closebatch(BAT);
   current_faction = NULL;
   seen_done();
+  return 0;
 }
 
 void
@@ -3024,7 +3030,7 @@ typedef struct summary {
 } summary;
 
 summary *
-make_summary(boolean count_new)
+make_summary(void)
 {
 	faction *f;
 	region *r;
@@ -3045,8 +3051,14 @@ make_summary(boolean count_new)
 		f->nregions = 0;
 		f->num_total = 0;
 		f->money = 0;
-		if (f->alive && (count_new || f->age > 0)) s->factions++;
-	}
+    if (f->alive && f->units) {
+      s->factions++;
+      /* Problem mit Monsterpartei ... */
+      if (f->no!=MONSTER_FACTION) {
+        s->factionrace[old_race(f->race)]++;
+      }
+    }
+  }
 
 	/* Alles zählen */
 
@@ -3142,13 +3154,6 @@ make_summary(boolean count_new)
 		}
 	}
 
-	/* jetzt noch parteienweise zählen */
-	/* Problem mit Monsterpartei ... */
-	for (f = factions; f; f = f->next) if (f->no!=MONSTER_FACTION) {
-		if (f->alive && (count_new || f->age > 0)) {
-			s->factionrace[old_race(f->race)]++;
-		}
-	}
 	return s;
 }
 

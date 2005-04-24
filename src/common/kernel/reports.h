@@ -46,13 +46,13 @@ const char *hp_status(const struct unit * u);
 extern void spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days); /* mapper */
 extern void spunit(struct strlist ** SP, const struct faction * f, const struct unit * u, int indent, int mode);
 
-void reports(void);
+int reports(void);
 
 extern const struct unit *ucansee(const struct faction *f, const struct unit *u, const struct unit *x);
 
 struct summary;
 extern void report_summary(struct summary * n, struct summary * o, boolean full);
-extern struct summary * make_summary(boolean count_new);
+extern struct summary * make_summary();
 
 int hat_in_region(item_t itm, struct region * r, struct faction * f);
 

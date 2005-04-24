@@ -285,7 +285,7 @@ processturn(char *filename)
 #ifdef SHORTPWDS
   readshortpwds("passwords");
 #endif
-	begin = make_summary(false);
+	begin = make_summary();
 	printf(" - Korrekturen Runde %d\n", turn);
 	korrektur();
 	turn++;
@@ -310,7 +310,7 @@ processturn(char *filename)
 	free_units();
 	puts(" - Beseitige leere Parteien");
 	remove_empty_factions(true);
-	end = make_summary(true);
+	end = make_summary();
 	report_summary(end, begin, false);
 	report_summary(end, begin, true);
 	free(end);
