@@ -52,7 +52,7 @@ extern const struct unit *ucansee(const struct faction *f, const struct unit *u,
 
 struct summary;
 extern void report_summary(struct summary * n, struct summary * o, boolean full);
-extern struct summary * make_summary();
+extern struct summary * make_summary(void);
 
 int hat_in_region(item_t itm, struct region * r, struct faction * f);
 
