@@ -116,6 +116,7 @@ set_string (char **s, const char *neu)
     *s = NULL;
   } else if (*s == NULL) {
     *s = malloc(strlen(neu)+1);
+    strcpy(*s, neu);
   } else {
     *s = realloc(*s, strlen(neu) + 1);
     strcpy(*s, neu);
