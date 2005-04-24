@@ -64,19 +64,12 @@ write_game(const char *filename)
   return writegame(filename, 0);
 }
 
-static int
-write_reports()
-{
-  reports();
-  return 0;
-}
-
 static summary * sum_begin = 0;
 
 static int
 init_summary()
 {
-  sum_begin = make_summary(false);
+  sum_begin = make_summary();
   return 0;
 }
 
@@ -84,7 +77,7 @@ static int
 write_summary()
 {
   if (sum_begin) {
-    summary * sum_end = make_summary(true);
+    summary * sum_end = make_summary();
     report_summary(sum_end, sum_begin, false);
     report_summary(sum_end, sum_begin, true);
     return 0;
@@ -205,7 +198,7 @@ bind_eressea(lua_State * L)
     def("read_game", &read_game),
     def("write_game", &write_game),
     def("write_passwords", &writepasswd),
-    def("write_reports", &write_reports),
+    def("write_reports", &reports),
     def("init_summary", &init_summary),
     def("write_summary", &write_summary),
     def("read_orders", &readorders),

@@ -2259,10 +2259,8 @@ move_hunters(void)
     while (*up!=NULL) {
       unit * u = *up;
 
-      if (!fval(u, FL_DH)) {
+      if (!fval(u, UFL_MOVED)) {
         order * ord;
-
-        fset(u, FL_DH);
 
         for (ord=u->orders;ord;ord=ord->next) {
           if (get_keyword(ord) == K_FOLLOW) {
