@@ -61,7 +61,10 @@ function process(orders)
   init_summary()
 
   -- run the turn:
-  read_orders(orders)
+  if read_orders(orders) ~= 0 then
+    print("could not read " .. orders)
+    return -1
+  end
   run_scripts()
 
   plan_monsters()
