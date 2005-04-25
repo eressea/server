@@ -1246,12 +1246,15 @@ count_migrants (const faction * f)
 int
 count_maxmigrants(const faction * f)
 {
-	int x = 0;
-	if (old_race(f->race) == RC_HUMAN) {
-		x = (int)(log10(count_all(f) / 50.0) * 20);
-		if (x < 0) x = 0;
-	}
-	return x;
+  int x = 0;
+  if (old_race(f->race) == RC_HUMAN) {
+    int nsize = count_all(f);
+    if (nsize>0) {
+      x = (int)(log10(nsize / 50.0) * 20);
+      if (x < 0) x = 0;
+    }
+  }
+  return x;
 }
 
 /*------------------------------------------------------------------*/

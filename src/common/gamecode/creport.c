@@ -67,9 +67,10 @@
 #include <language.h>
 
 /* libc includes */
+#include <assert.h>
+#include <errno.h>
 #include <math.h>
 #include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 

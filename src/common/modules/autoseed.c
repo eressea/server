@@ -25,6 +25,7 @@
 
 /* util includes */
 #include <util/base36.h>
+#include <util/sql.h>
 #include <util/goodies.h>
 #include <util/sql.h>
 
