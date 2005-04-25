@@ -1104,14 +1104,11 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 	/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
 	/* initialisations, header and lists */
 
-	if (quiet) {
-		printf(" CR");
-		fflush(stdout);
-	}
-	else printf(" - schreibe Computerreport\n");
+	fprintf(stdout, "Reports für %s: CR\r", factionname(f));
+	fflush(stdout);
 
-	fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
-	fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
+  fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
+  fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
 	fprintf(F, "%d;noskillpoints\n", 1);
 	fprintf(F, "%ld;date\n", report_time);
 	fprintf(F, "\"%s\";Spiel\n", global.gamename);
@@ -1525,5 +1522,9 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 	report_crtypes(F, f->locale);
 	write_translations(F);
 	reset_translations();
+  if (errno) {
+    log_error(("%s\n", strerror(errno)));
+    errno = 0;
+  }
   return 0;
 }

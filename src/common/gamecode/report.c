@@ -1582,12 +1582,9 @@ order_template(FILE * F, faction * f)
   plane *pl;
   region *last = f->last?f->last:lastregion(f);
 
-  if (quiet) {
-    printf(" ZV");
-    fflush(stdout);
-  }
-  else
-    printf(" - Schreibe Zugvorlage\n");
+	fprintf(stdout, "Reports für %s: ZV\r", factionname(f));
+	fflush(stdout);
+
   rps_nowrap(F, "");
   rnl(F);
   rps_nowrap(F, LOC(f->locale, "nr_template"));
@@ -2004,16 +2001,12 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	ix = Pow(O_STATISTICS);
 	wants_stats = (f->options & ix);
 
-	if (quiet) {
-		printf(" NR");
-		fflush(stdout);
-	}
-	else
-		printf(" - Schreibe Report\n");
+	fprintf(stdout, "Reports für %s: NR\r", factionname(f));
+	fflush(stdout);
 
-	m = msg_message("nr_header_date", "game date", global.gamename, pzTime);
-	nr_render(m, f->locale, buf, sizeof(buf), f);
-	msg_release(m);
+  m = msg_message("nr_header_date", "game date", global.gamename, pzTime);
+  nr_render(m, f->locale, buf, sizeof(buf), f);
+  msg_release(m);
 	centre(F, buf, true);
 
 	centre(F, gamedate_season(f->locale), true);
@@ -2730,11 +2723,8 @@ reports(void)
 		current_faction = f;
 		gotit = false;
 
-		if (quiet) {
-			printf("Reports für %s: ", factionname(f));
-			fflush(stdout);
-		}
-		else printf("%s\n", factionname(f));
+		printf("Reports für %s: \r", factionname(f));
+		fflush(stdout);
 		prepare_report(f);
 		addresses = get_addresses(f);
 
@@ -2886,9 +2876,8 @@ reports(void)
 			a = a->nexttype;
 			a_remove(&f->attribs, a_old);
 		}
-		if (quiet)
-			printf("\n");
 		freelist(addresses);
+    putc('\n', stdout);
 	}
 
   str = get_param(global.parameters, "globalreport"); 
