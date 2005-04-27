@@ -2624,7 +2624,7 @@ get_regions_distance(region * root, int radius)
     rp = &r->next;
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * rn = rconnect(r->data, d);
-      if (!fval(rn, FL_MARK) && distance(rn, root)<=radius) {
+      if (rn!=NULL && !fval(rn, FL_MARK) && distance(rn, root)<=radius) {
         add_regionlist(rp, rn);
         fset(rn, FL_MARK);
       }
