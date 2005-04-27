@@ -64,6 +64,7 @@
 #include <message.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #define dbgprintf(a) fprintf a;
 static FILE *bdebug;
