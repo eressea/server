@@ -2958,7 +2958,6 @@ reports(void)
 			fprintf(BAT, ". %s.sh %s\n", factionid(f), f->email);
 			fclose(shfp);
 		}
-    putc('\n', stdout);
 	}
 
   str = get_param(global.parameters, "globalreport"); 
