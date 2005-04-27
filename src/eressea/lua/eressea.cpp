@@ -196,6 +196,13 @@ lua_writereport(faction * f)
   return write_reports(f, ltime);
 }
 
+int
+lua_writereports(void)
+{
+  init_reports();
+  return reports();
+}
+
 void
 bind_eressea(lua_State * L)
 {
@@ -205,7 +212,8 @@ bind_eressea(lua_State * L)
     def("read_game", &read_game),
     def("write_game", &write_game),
     def("write_passwords", &writepasswd),
-    def("write_reports", &reports),
+    def("init_reports", &init_reports),
+    def("write_reports", &lua_writereports),
     def("write_report", &lua_writereport),
     def("init_summary", &init_summary),
     def("write_summary", &write_summary),

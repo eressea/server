@@ -867,12 +867,12 @@ faction_list *
 get_addresses(faction * f)
 {
 /* "TODO: travelthru" */
-  region *r, *last = f->last?f->last:lastregion(f);
+  region *r, *last = lastregion(f);
   const faction * lastf = NULL;
   faction_list * flist = calloc(1, sizeof(faction_list));
   flist->data = f;
 
-  for (r=f->first?f->first:firstregion(f);r!=last;r=r->next) {
+  for (r=firstregion(f);r!=last;r=r->next) {
     const unit * u = r->units;
     const seen_region * sr = find_seen(r);
 

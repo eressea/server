@@ -1584,7 +1584,7 @@ order_template(FILE * F, faction * f)
 {
   region *r;
   plane *pl;
-  region *last = f->last?f->last:lastregion(f);
+  region *last = lastregion(f);
 
   rps_nowrap(F, "");
   rnl(F);
@@ -1605,7 +1605,7 @@ order_template(FILE * F, faction * f)
   rps_nowrap(F, buf);
   rnl(F);
 
-  for (r = f->first?f->first:firstregion(f); r != last; r = r->next) {
+  for (r = firstregion(f); r != last; r = r->next) {
     unit *u;
 
     int dh = 0;
@@ -1989,7 +1989,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	int dh;
 	int anyunits;
 	const struct region *r;
-  region * last = f->last?f->last:lastregion(f);
+  region * last = lastregion(f);
 	building *b;
 	ship *sh;
 	unit *u;
@@ -2230,7 +2230,7 @@ report(FILE *F, faction * f, const faction_list * addresses,
 
 	anyunits = 0;
 
-  for (r=f->first?f->first:firstregion(f);r!=last;r=r->next) {
+  for (r=firstregion(f);r!=last;r=r->next) {
 		boolean unit_in_region = false;
 		boolean durchgezogen_in_region = false;
 		int turm_sieht_region = false;
@@ -2598,9 +2598,9 @@ static void
 prepare_report(faction * f)
 {
   region * r;
-  region * end = f->last?f->last:lastregion(f);
+  region * end = lastregion(f);
   seen_init();
-  for (r = f->first?f->first:firstregion(f); r != end; r = r->next) {
+  for (r = firstregion(f); r != end; r = r->next) {
 		attrib *ru;
 		unit * u;
 		plane * p = rplane(r);
@@ -2691,35 +2691,16 @@ write_reports(faction * f, time_t ltime)
   boolean gotit = false;
   faction_list * addresses;
   char zTime[64];
-  static boolean dir_exists = false;
-
-#ifdef HAVE_STAT
-  stat_type st;
-  if (!dir_exists && stat(reportpath(), &st)==-1) {
-    errno = 0;
-    makedir(reportpath(), 0700);
-    dir_exists = true;
-  }
-#else
-  if (!dir_exists) {
-    if (makedir(reportpath(), 0700)!=0) {
-      if (errno!=EEXIST) {
-        perror("could not create reportpath");
-        return -1;
-    }
-    dir_exists = true;
-  }
-#endif
 
   strftime(zTime, sizeof(zTime), "%A, %d. %B %Y, %H:%M", localtime(&ltime));
-  printf("Reports für %s: \r", factionname(f));
+  printf("Reports for %s: \r", factionname(f));
   fflush(stdout);
   prepare_report(f);
   addresses = get_addresses(f);
 
   /* NR schreiben: */
   if (!nonr && (f->options & REPORT_NR)) {
-    fprintf(stdout, "Reports für %s: NR\r", factionname(f));
+    fprintf(stdout, "Reports for %s: NR\r", factionname(f));
     fflush(stdout);
 
     sprintf(buf, "%s/%d-%s.nr", reportpath(), turn, factionid(f));
@@ -2733,7 +2714,7 @@ write_reports(faction * f, time_t ltime)
   }
   /* CR schreiben: */
   if (!nocr && (f->options & REPORT_CR || f->age<3)) {
-    fprintf(stdout, "Reports für %s: CR\r", factionname(f));
+    fprintf(stdout, "Reports for %s: CR\r", factionname(f));
     fflush(stdout);
 
     sprintf(buf, "%s/%d-%s.cr", reportpath(), turn, factionid(f));
@@ -2747,7 +2728,7 @@ write_reports(faction * f, time_t ltime)
   }
   /* ZV schreiben: */
   if (f->options & REPORT_ZV) {
-    fprintf(stdout, "Reports für %s: ZV\r", factionname(f));
+    fprintf(stdout, "Reports for %s: ZV\r", factionname(f));
     fflush(stdout);
 
     sprintf(buf, "%s/%d-%s.txt", reportpath(), turn, factionid(f));
@@ -2758,13 +2739,33 @@ write_reports(faction * f, time_t ltime)
       if (status!=0) return status; /* catch errors */
     }
   }
+  fprintf(stdout, "Reports for %s: DONE\n", factionname(f));
 
   if (!gotit) {
-    log_error(("no report for faction %s!\n", factionid(f)));
+    log_error(("No report for faction %s!\n", factionid(f)));
   }
   freelist(addresses);
-  putc('\n', stdout);
 
+  return 0;
+}
+
+int
+init_reports(void)
+{
+  update_intervals();
+
+#ifdef HAVE_STAT
+  {
+    stat_type st;
+    if (stat(reportpath(), &st)==0) return 0;
+  }
+#endif
+  if (makedir(reportpath(), 0700)!=0) {
+    if (errno!=EEXIST) {
+      perror("could not create reportpath");
+      return -1;
+    }
+  }
   return 0;
 }
 
@@ -2777,17 +2778,12 @@ reports(void)
   const char * str;
   int retval = 0;
 
-	nmr_warnings();
-
-	BAT = openbatch();
-
-	printf("\n");
-
+  nmr_warnings();
 	report_donations();
 	remove_empty_units();
-  log_printf("Updating region intervals\n");
-  update_intervals();
-	for (f = factions; f; f = f->next) {
+
+  BAT = openbatch();
+  for (f = factions; f; f = f->next) {
     int error = write_reports(f, ltime);
     if (error) retval = error;
 

@@ -175,9 +175,9 @@ improve_all(faction * f, skill_t sk, int weeks)
 	region *r;
 	unit *u;
 	int n = 0;
-	region *last = f->last?f->last:lastregion(f);
+	region *last = lastregion(f);
 
-	for (r = f->first?f->first:firstregion(f); r != last; r = r->next) {
+	for (r = firstregion(f); r != last; r = r->next) {
 		for (u = r->units; u; u = u->next) {
 			if (u->faction == f && has_skill(u, sk)) {
 				for (n=0;n!=weeks;++n) {

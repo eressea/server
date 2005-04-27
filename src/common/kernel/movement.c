@@ -505,8 +505,10 @@ travelthru(const unit * u, region * r)
   /* the first and last region of the faction gets reset, because travelthrough
    * could be in regions that are located before the [first, last] interval,
    * and recalculation is needed */
+#ifdef SMART_INTERVALS
   u->faction->first = 0;
   u->faction->last = 0;
+#endif
 }
 
 static void

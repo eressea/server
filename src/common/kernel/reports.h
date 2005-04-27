@@ -48,6 +48,7 @@ extern void spunit(struct strlist ** SP, const struct faction * f, const struct 
 
 extern int reports(void);
 extern int write_reports(struct faction * f, time_t ltime);
+extern int init_reports(void);
 
 extern const struct unit *ucansee(const struct faction *f, const struct unit *u, const struct unit *x);
 

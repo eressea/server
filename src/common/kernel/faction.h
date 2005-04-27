@@ -19,6 +19,8 @@ extern "C" {
 struct player;
 struct alliance;
 
+#undef SMART_INTERVALS /* define to speed up finding the interval of regions that a faction is in */
+
 #ifdef SHORTPWDS
 typedef struct shortpwd {
   struct shortpwd * next;
@@ -42,8 +44,10 @@ typedef struct faction {
 	struct faction *nexthash;
 
 	struct player *owner;
+#ifdef SMART_INTERVALS
 	struct region *first;
 	struct region *last;
+#endif
 	int no;
 	int subscription;
 	unsigned int flags;

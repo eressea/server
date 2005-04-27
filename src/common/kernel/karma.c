@@ -562,7 +562,8 @@ jihad_attacks(void)
 	ally *sf, **sfp;
 
 	for(f=factions; f; f=f->next) if(fspecial(f, FS_JIHAD)) {
-		for(r=f->first; r != f->last; r = r->next) if(rand()%1000 <= 1) {
+    region * last = lastregion(f);
+		for (r=firstregion(f); r != last; r = r->next) if (rand()%1000 <= 1) {
 			boolean doit = false;
 
 			for(u=r->units; u; u=u->next) if(jihad(f, u->race)) {

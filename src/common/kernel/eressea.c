@@ -572,9 +572,9 @@ count_skill(faction * f, skill_t sk)
   int n = 0;
   region *r;
   unit *u;
-  region *last = f->last?f->last:lastregion(f);
+  region *last = lastregion(f);
   
-  for (r =f->first?f->first:firstregion(f); r != last; r = r->next) {
+  for (r =firstregion(f); r != last; r = r->next) {
 	for (u = r->units; u; u = u->next) {
 	  if (u->faction == f && has_skill(u, sk)) {
 		if (!is_familiar(u)) n += u->number;
@@ -2044,6 +2044,7 @@ check_leuchtturm(region * r, faction * f)
 region *
 lastregion (faction * f)
 {
+#ifdef SMART_INTERVALS
 	region *r = f->last;
 	if (r==NULL && f->units!=NULL) {
 		for (r = f->units->region; r; r = r->next) {
@@ -2075,13 +2076,16 @@ lastregion (faction * f)
 		}
 	}
 	return f->last;
+#else
+  return NULL;
+#endif
 }
 
 void
 update_intervals(void)
 {
+#ifdef SMART_INTERVALS
   region *r;
-
   for (r = regions; r; r = r->next) {
     plane * p = rplane(r);
     attrib *ru;
@@ -2126,11 +2130,13 @@ update_intervals(void)
       }
     }
   }
+#endif
 }
 
 region *
 firstregion (faction * f)
 {
+#ifdef SMART_INTERVALS
 	region *r;
 	if (f->first || !f->units)
 		return f->first;
@@ -2160,6 +2166,9 @@ firstregion (faction * f)
 		}
 	}
 	return f->first = regions;
+#else
+  return regions;
+#endif
 }
 
 void ** blk_list[1024];
