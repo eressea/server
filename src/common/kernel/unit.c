@@ -666,8 +666,7 @@ move_unit(unit * u, region * r, unit ** ulist)
 		addlist(ulist, u);
 
 #ifdef SMART_INTERVALS
-	u->faction->first = 0;
-	u->faction->last = 0;
+  update_interval(u->faction, r);
 #endif
 	u->region = r;
 	/* keine automatische hp reduzierung bei bewegung */

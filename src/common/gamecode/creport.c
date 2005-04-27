@@ -1016,7 +1016,7 @@ report_resource(char * buf, const char * name, const struct locale * loc, int am
 }
 
 static void
-cr_borders(const region * r, const faction * f, int seemode, FILE * F)
+cr_borders(seen_region ** seen, const region * r, const faction * f, int seemode, FILE * F)
 {
 	direction_t d;
 	int g = 0;
@@ -1026,7 +1026,7 @@ cr_borders(const region * r, const faction * f, int seemode, FILE * F)
 		const border * b;
 		if (!r2) continue;
 		if (seemode==see_neighbour) {
-			seen_region * sr = find_seen(r2);
+			seen_region * sr = find_seen(seen, r2);
 			if (sr==NULL || sr->mode<=see_neighbour) continue;
 		}
 		b = get_borders(r, r2);
@@ -1063,18 +1063,20 @@ cr_borders(const region * r, const faction * f, int seemode, FILE * F)
 }
 
 void
-get_seen_interval(region ** first, region ** last)
+get_seen_interval(struct seen_region ** seen, region ** first, region ** last)
 {
+/* #ifdef ENUM_REGIONS : can speed stuff up */
+
   region * r = regions;
   while (r!=NULL) {
-    if (find_seen(r)!=NULL) {
+    if (find_seen(seen, r)!=NULL) {
       *first = r;
       break;
     }
     r = r->next;
   }
   while (r!=NULL) {
-    if (find_seen(r)!=NULL) {
+    if (find_seen(seen, r)!=NULL) {
       *last = r->next;
     }
     r = r->next;
@@ -1083,7 +1085,7 @@ get_seen_interval(region ** first, region ** last)
 
 /* main function of the creport. creates the header and traverses all regions */
 int
-report_computer(FILE * F, faction * f, const faction_list * addresses, 
+report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction_list * addresses, 
                 const time_t report_time)
 {
 	int i;
@@ -1098,7 +1100,7 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
   region * first = NULL, * last = NULL;
 	const attrib * a;
 
-  get_seen_interval(&first, &last);
+  get_seen_interval(seen, &first, &last);
 
 	/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
 	/* initialisations, header and lists */
@@ -1246,7 +1248,7 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 	for (r=first;r!=last;r=r->next) {
 		int modifier = 0;
 		const char * tname;
-    const seen_region * sd = find_seen(r);
+    const seen_region * sd = find_seen(seen, r);
 
     if (sd==NULL) continue;
 		
@@ -1291,7 +1293,7 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
       }
     }
 		if (sd->mode == see_neighbour) {
-			cr_borders(r, f, sd->mode, F);
+			cr_borders(seen, r, f, sd->mode, F);
 		} else {
 #define RESOURCECOMPAT
 			char cbuf[8192], *pos = cbuf;
@@ -1421,7 +1423,7 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 				if (pos!=cbuf) fputs(cbuf, F);
 			}
 			print_curses(F, f, r, TYP_REGION);
-			cr_borders(r, f, sd->mode, F);
+			cr_borders(seen, r, f, sd->mode, F);
 			if (sd->mode==see_unit && rplane(r)==get_astralplane() && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
 			{
 				/* Sonderbehandlung Teleport-Ebene */

@@ -1959,30 +1959,6 @@ readgame(const char * filename, int backup)
 #endif
   }
 
-#ifdef WEATHER
-
-  /* Wetter lesen */
-
-  weathers = NULL;
-
-  if (global.data_version >= 81) {
-    n = ri(F);
-    while(--n >= 0) {
-      weather *w;
-
-      w = calloc(1, sizeof(weather));
-
-      w->type      = ri(F);
-      w->radius    = ri(F);
-      w->center[0] = ri(F);
-      w->center[1] = ri(F);
-      w->move[0]   = ri(F);
-      w->move[1]   = ri(F);
-
-      addlist(&weathers, w);
-    }
-  }
-#endif
   fclose(F);
 
   /* Unaufgeloeste Zeiger initialisieren */

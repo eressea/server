@@ -80,10 +80,11 @@ typedef struct seen_region {
 	boolean disbelieves;
 } seen_region;
 
-extern struct seen_region * find_seen(const struct region * r);
-extern boolean add_seen(const struct region * r, unsigned char mode, boolean dis);
-extern void seen_done(void);
-extern void seen_init(void);
+extern struct seen_region * find_seen(struct seen_region * seehash[], const struct region * r);
+extern boolean add_seen(struct seen_region * seehash[], const struct region * r, unsigned char mode, boolean dis);
+extern struct seen_region ** seen_init(void);
+extern void seen_done(struct seen_region * seehash[]);
+extern void free_seen(void);
   
 extern const char* resname(resource_t res, int i);
 
@@ -106,7 +107,7 @@ extern int bufunit_ugroupleader(const struct faction * f, const struct unit * u,
 
 extern const char * reportpath(void);
 extern struct faction * visible_faction(const struct faction *f, const struct unit * u);
-extern struct faction_list * get_addresses(struct faction * f);
+extern struct faction_list * get_addresses(struct faction * f, struct seen_region * seehash[]);
 extern const char * trailinto(const struct region * r, const struct locale * lang);
 
 #ifdef __cplusplus

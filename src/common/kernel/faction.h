@@ -19,7 +19,9 @@ extern "C" {
 struct player;
 struct alliance;
 
-#undef SMART_INTERVALS /* define to speed up finding the interval of regions that a faction is in */
+/* SMART_INTERVALS: define to speed up finding the interval of regions that a 
+   faction is in. defining this speeds up the turn by 30-40% */
+#define SMART_INTERVALS
 
 #ifdef SHORTPWDS
 typedef struct shortpwd {
@@ -126,6 +128,10 @@ extern int get_alliance(const struct faction * a, const struct faction * b);
 extern boolean is_enemy(const struct faction * f, const struct faction * enemy);
 extern void add_enemy(struct faction * f, struct faction * enemy);
 extern void remove_enemy(struct faction * f, struct faction * enemy);
+#endif
+
+#ifdef SMART_INTERVALS
+extern void update_interval(struct faction * f, struct region * r);
 #endif
 
 #ifdef __cplusplus

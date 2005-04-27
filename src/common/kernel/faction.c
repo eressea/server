@@ -340,6 +340,24 @@ set_alliance(faction * a, faction * b, int status)
   (*sfp)->status |= status;
 }
 
+#ifdef SMART_INTERVALS
+void 
+update_interval(struct faction * f, struct region * r)
+{
+#ifdef ENUM_REGIONS
+  if (f->first==NULL || f->first->index>r->index) {
+    f->first = r;
+  }
+  if (f->last==NULL || f->last->index<=r->index) {
+    f->last = r;
+  }
+#else
+  f->first = 0;
+  f->last = 0;
+#endif
+}
+#endif
+
 #ifdef REGIONOWNERS
 boolean
 is_enemy(const struct faction * f, const struct faction * enemy)

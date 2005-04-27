@@ -432,20 +432,6 @@ add_regionlist(region_list **rl, region *r)
 	*rl = rl2;
 }
 
-#if AT_SALARY
-/*****************/
-/*   at_salary   */
-/*****************/
-attrib_type at_salary = {
-	"salary",
-	DEFAULT_INIT,
-	DEFAULT_FINALIZE,
-	DEFAULT_AGE,
-	NO_WRITE,
-	NO_READ,
-	ATF_UNIQUE
-};
-#endif
 /********************/
 /*   at_horseluck   */
 /********************/
@@ -764,6 +750,9 @@ rsettrees(const region *r, int value)
 
 static region *last;
 
+#ifdef ENUM_REGIONS
+static unsigned int max_index = 0;
+#endif
 region *
 new_region(int x, int y)
 {
@@ -786,6 +775,10 @@ new_region(int x, int y)
 	else
 		addlist(&regions, r);
 	last = r;
+#ifdef ENUM_REGIONS
+  assert(r->next==NULL);
+  r->index = ++max_index;
+#endif
 	return r;
 }
 

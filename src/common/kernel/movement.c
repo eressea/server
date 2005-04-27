@@ -506,8 +506,7 @@ travelthru(const unit * u, region * r)
    * could be in regions that are located before the [first, last] interval,
    * and recalculation is needed */
 #ifdef SMART_INTERVALS
-  u->faction->first = 0;
-  u->faction->last = 0;
+  update_interval(u->faction, r);
 #endif
 }
 

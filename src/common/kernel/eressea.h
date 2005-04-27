@@ -95,7 +95,6 @@ struct building_type;
 
 #define OLD_FAMILIAR_MOD /* conversion required */
 /* feature-dis/en-able */
-#undef WEATHER        /* Kein Wetter-Modul */
 #define NEW_DRIVE     /* Neuer Algorithmus Transportiere/Fahre */
 #define PARTIAL_STUDY /* Wenn nicht genug Silber vorhanden, wird ein Talent anteilig gelernt */
 #define NEW_RECEIPIES /* Vereinfachte, besser verteilte Kräuterzutaten für Tränke */
@@ -903,6 +902,7 @@ extern boolean faction_id_is_unused(int);
 extern boolean check_leuchtturm(struct region * r, struct faction * f);
 extern void update_lighthouse(struct building * lh);
 extern struct unit_list * get_lighthouses(const struct region * r);
+extern int lighthouse_range(const struct building * b, const struct faction * f);
 
 /* skills */
 extern int max_skill(struct faction * f, skill_t sk);

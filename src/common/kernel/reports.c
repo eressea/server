@@ -864,7 +864,7 @@ visible_faction(const faction *f, const unit * u)
 }
 
 faction_list *
-get_addresses(faction * f)
+get_addresses(faction * f, struct seen_region * seehash[])
 {
 /* "TODO: travelthru" */
   region *r, *last = lastregion(f);
@@ -874,7 +874,7 @@ get_addresses(faction * f)
 
   for (r=firstregion(f);r!=last;r=r->next) {
     const unit * u = r->units;
-    const seen_region * sr = find_seen(r);
+    const seen_region * sr = find_seen(seehash, r);
 
     if (sr==NULL) continue;
     while (u!=NULL) {
@@ -918,12 +918,17 @@ get_addresses(faction * f)
   return flist;
 }
 
-seen_region * reuse;
 #define MAXSEEHASH 10007
-seen_region * seehash[MAXSEEHASH];
+seen_region * reuse;
 
-void 
+seen_region **
 seen_init(void)
+{
+  return (seen_region **)calloc(MAXSEEHASH, sizeof(seen_region*));
+}
+
+void
+seen_done(seen_region * seehash[])
 {
   int i;
   for (i=0;i!=MAXSEEHASH;++i) {
@@ -937,18 +942,17 @@ seen_init(void)
 }
 
 void
-seen_done(void)
+free_seen(void)
 {
-  seen_init();
-	while (reuse) {
-		seen_region * r = reuse;
-		reuse = reuse->nextHash;
-		free(r);
-	}
+  while (reuse) {
+    seen_region * r = reuse;
+    reuse = reuse->nextHash;
+    free(r);
+  }
 }
 
 seen_region *
-find_seen(const region * r)
+find_seen(struct seen_region * seehash[], const region * r)
 {
 	int index = ((int)r) % MAXSEEHASH;
 	seen_region * find=seehash[index];
@@ -960,9 +964,9 @@ find_seen(const region * r)
 }
 
 boolean
-add_seen(const struct region * r, unsigned char mode, boolean dis)
+add_seen(struct seen_region * seehash[], const struct region * r, unsigned char mode, boolean dis)
 {
-	seen_region * find = find_seen(r);
+	seen_region * find = find_seen(seehash, r);
 	if (find==NULL) {
 		int index = ((int)r) % MAXSEEHASH;
 		if (!reuse) reuse = (seen_region*)calloc(1, sizeof(struct seen_region));

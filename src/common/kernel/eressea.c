@@ -570,16 +570,12 @@ int
 count_skill(faction * f, skill_t sk)
 {
   int n = 0;
-  region *r;
   unit *u;
-  region *last = lastregion(f);
   
-  for (r =firstregion(f); r != last; r = r->next) {
-	for (u = r->units; u; u = u->next) {
-	  if (u->faction == f && has_skill(u, sk)) {
-		if (!is_familiar(u)) n += u->number;
+	for (u = f->units; u; u = u->nextF) {
+	  if (has_skill(u, sk)) {
+      if (!is_familiar(u)) n += u->number;
 	  }
-	}
   }
   return n;
 }
@@ -2006,6 +2002,32 @@ get_lighthouses(const region * r)
   return ulist;
 }
 
+int
+lighthouse_range(const building * b, const faction * f)
+{
+  int d = 0;
+  if (fval(b, BLD_WORKING) && b->size >= 10) {
+    region * r = b->region;
+    unit *u;
+    int maxd = (int)log10(b->size) + 1;
+    int c = 0;
+
+    for (u = r->units; u; u = u->next) {
+      if (u->building == b) {
+        c += u->number;
+        if (c > buildingcapacity(b)) break;
+        if (f==NULL || u->faction == f) {
+          int sk = eff_skill(u, SK_OBSERVATION, r) / 3;
+          d = max(d, sk);
+          d = min(maxd, d);
+          if (d==maxd) break;
+        }
+      } else if (c) break; /* first unit that's no longer in the house ends the search */
+    }
+  }
+  return d;
+}
+
 boolean
 check_leuchtturm(region * r, faction * f)
 {
@@ -2045,91 +2067,54 @@ region *
 lastregion (faction * f)
 {
 #ifdef SMART_INTERVALS
+  unit * u = f->units;
 	region *r = f->last;
-	if (r==NULL && f->units!=NULL) {
-		for (r = f->units->region; r; r = r->next) {
-			plane * p = rplane(r);
-			unit *u;
-			attrib *ru;
-			for (u = r->units; u; u = u->next) {
-				if (u->faction == f) {
-					f->last = r->next;
-					break;
-				}
-			}
-			if (f->last == r->next)
-				continue;
-			for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
-				u = (unit*)ru->data.v;
-				if (u->faction == f) {
-					f->last = r->next;
-					break;
-				}
-			}
-			if (f->last == r->next)
-				continue;
-			if (check_leuchtturm(r, f))
-				f->last = r->next;
-			if (p && is_watcher(p, f)) {
-				f->last = r->next;
+
+  if (u==NULL) return NULL;
+  if (r!=NULL) return r->next;
+
+  /* it is safe to start in the region of the first unit. */
+  f->last = u->region;
+#ifdef ENUM_REGIONS
+  /* if regions have indices, we can skip ahead: */
+  for (u=u->nextF; u!=NULL; u=u->nextF) {
+    r = u->region;
+    if (r->index > f->last->index) f->last = r;
+  }
+#endif
+  /* we continue from the best region and look for travelthru etc. */
+	for (r = f->last->next; r; r = r->next) {
+		plane * p = rplane(r);
+		attrib *ru;
+
+#ifndef ENUM_REGIONS
+    /* for index-regions we don't need this, we already did it earlier */
+    for (u = r->units; u; u = u->next) {
+			if (u->faction == f) {
+				f->last = r;
+				break;
 			}
 		}
+    if (f->last == r) continue;
+#endif
+    /* search the region for travelthru-attributes: */
+		for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+			u = (unit*)ru->data.v;
+			if (u->faction == f) {
+				f->last = r;
+				break;
+			}
+		}
+		if (f->last == r) continue;
+		if (check_leuchtturm(r, f))
+			f->last = r;
+		if (p && is_watcher(p, f)) {
+			f->last = r;
+		}
 	}
-	return f->last;
+	return f->last->next;
 #else
   return NULL;
-#endif
-}
-
-void
-update_intervals(void)
-{
-#ifdef SMART_INTERVALS
-  region *r;
-  for (r = regions; r; r = r->next) {
-    plane * p = rplane(r);
-    attrib *ru;
-    unit *u;
-    unit_list * ulist, *uptr;
-
-    for (u = r->units; u; u = u->next) {
-      faction * f = u->faction;
-      if (f->first==NULL) f->first = r;
-      f->last = r->next;
-    }
-
-    for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
-      faction * f = ((unit*)ru->data.v)->faction;
-      if (f!=NULL) {
-        if (f->first==NULL) f->first = r;
-        f->last = r->next;
-      }
-    }
-
-    ulist = get_lighthouses(r);
-    for (uptr=ulist;uptr!=NULL;uptr=uptr->next) {
-      /* check lighthouse warden's faction */
-      unit * u = uptr->data;
-      faction * f = u->faction;
-      if (f->first==NULL) {
-        f->first = r;
-      }
-      f->last = r->next;
-    }
-    unitlist_clear(&ulist);
-
-    if (p!=NULL) {
-      struct watcher * w = p->watchers;
-      while (w) {
-        faction * f = w->faction;
-        if (f!=NULL) {
-          if (f->first==NULL) f->first = r;
-          f->last = r->next;
-        }
-        w = w->next;
-      }
-    }
-  }
 #endif
 }
 
@@ -2137,10 +2122,12 @@ region *
 firstregion (faction * f)
 {
 #ifdef SMART_INTERVALS
-	region *r;
-	if (f->first || !f->units)
-		return f->first;
+	region *r = f->first;
 
+  if (f->units==NULL) return NULL;
+  if (r!=NULL) return r;
+
+#ifndef ENUM_REGIONS
 	for (r = regions; r; r = r->next) {
 		attrib *ru;
 		unit *u;
@@ -2165,9 +2152,31 @@ firstregion (faction * f)
 			return f->first = r;
 		}
 	}
+#endif
 	return f->first = regions;
 #else
   return regions;
+#endif
+}
+
+void
+update_intervals(void)
+{
+#ifdef SMART_INTERVALS
+  region *r;
+  for (r = regions; r; r = r->next) {
+    plane * p = rplane(r);
+
+    if (p!=NULL) {
+      struct watcher * w = p->watchers;
+      while (w) {
+        if (w->faction!=NULL) {
+          update_interval(w->faction, r);
+        }
+        w = w->next;
+      }
+    }
+  }
 #endif
 }
 
@@ -3120,9 +3129,6 @@ attrib_init(void)
 	/* neue REGION-Attribute */
 	at_register(&at_direction);
 	at_register(&at_moveblock);
-#if AT_SALARY
-	at_register(&at_salary);
-#endif
 	at_register(&at_deathcount);
 	at_register(&at_chaoscount);
 	at_register(&at_woodcount);

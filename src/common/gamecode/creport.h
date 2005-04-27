@@ -20,7 +20,7 @@ extern "C" {
 struct faction_list;
 struct seen_region;
 struct faction;
-extern int report_computer(FILE * F, struct faction * f,
+extern int report_computer(FILE * F, struct faction * f, struct seen_region ** seen, 
 	const struct faction_list * addresses, const time_t report_time);
 extern void creport_cleanup(void);
 extern void creport_init(void);

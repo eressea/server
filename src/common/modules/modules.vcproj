@@ -193,9 +193,6 @@
 				RelativePath=".\score.h">
 			</File>
 			<File
-				RelativePath=".\weather.h">
-			</File>
-			<File
 				RelativePath=".\wormhole.h">
 			</File>
 			<File
@@ -225,9 +222,6 @@
 		</File>
 		<File
 			RelativePath=".\score.c">
-		</File>
-		<File
-			RelativePath=".\weather.c">
 		</File>
 		<File
 			RelativePath=".\wormhole.c">

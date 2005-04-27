@@ -172,22 +172,17 @@ dissolve_units(void)
 static int
 improve_all(faction * f, skill_t sk, int weeks)
 {
-	region *r;
 	unit *u;
-	int n = 0;
-	region *last = lastregion(f);
 
-	for (r = firstregion(f); r != last; r = r->next) {
-		for (u = r->units; u; u = u->next) {
-			if (u->faction == f && has_skill(u, sk)) {
-				for (n=0;n!=weeks;++n) {
-					learn_skill(u, sk, 1.0);
-				}
+	for (u = f->units; u; u = u->nextF) {
+		if (has_skill(u, sk)) {
+			while (weeks--) {
+				learn_skill(u, sk, 1.0);
 			}
 		}
 	}
 
-	return n;
+	return weeks;
 }
 
 void
@@ -295,7 +290,7 @@ find_manual(region * r, unit * u)
 	scat(". Der Wissensschub ist enorm.");
 	addmessage(r, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
 
-	if (improve_all(u->faction, skill, 3) == 0) {
+	if (improve_all(u->faction, skill, 3) == 3) {
 		int i;
 		for (i=0;i!=9;++i) learn_skill(u, skill, 1.0);
 	}

@@ -21,7 +21,14 @@ extern "C" {
 #include "language.h"
 #include <assert.h>
 
+/* FAST_CONNECT: regions are directly connected to neighbours, saves doing
+   a hash-access each time a neighbour is needed */
 #define FAST_CONNECT
+
+/* ENUM_REGIONS: regions have an ascending number, to improve the speed of 
+   determining the interval in which a faction has its units. See the 
+   implementations of firstregion and lastregion */
+#define ENUM_REGIONS
 
 #define RF_CHAOTIC     (1<<0)
 #define RF_MALLORN     (1<<1)
@@ -94,14 +101,14 @@ typedef struct region {
   struct attrib *attribs;
   struct region *nexthash;
   terrain_t terrain;
-#ifdef WEATHER
-  weather_t weathertype;
-#endif
 #if NEW_RESOURCEGROWTH
   struct rawmaterial * resources;
 #endif
 #ifdef FAST_CONNECT
   struct region * connect[MAXDIRECTIONS];
+#endif
+#ifdef ENUM_REGIONS
+  unsigned int index;
 #endif
 } region;
 
@@ -135,9 +142,6 @@ extern struct region * findregion(int x, int y);
 extern attrib_type at_direction;
 extern attrib_type at_moveblock;
 /* new: */
-#if AT_SALARY
-extern attrib_type at_salary;
-#endif
 extern attrib_type at_peasantluck;
 extern attrib_type at_horseluck;
 extern attrib_type at_chaoscount;
