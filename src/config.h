@@ -107,10 +107,11 @@ extern "C" {
 # define HAVE_STRCASECMP
 # define HAVE_STRNCASECMP
 # define HAVE_ACCESS
+# define HAVE_STAT
+typedef struct stat stat_type;
 # include <dirent.h>
 # define HAVE_READDIR
 # define HAVE_OPENDIR
-# include <sys/stat.h>
 # define HAVE_MKDIR_WITH_PERMISSION
 # include <string.h>
 # define HAVE_STRDUP
@@ -130,6 +131,8 @@ extern "C" {
 # include <io.h>
 # define HAVE_MKDIR_WITHOUT_PERMISSION
 # define HAVE_ACCESS
+# define HAVE_STAT
+typedef struct stat stat_type;
 # define HAVE_STRICMP
 # define HAVE_STRNICMP
 # define HAVE_STRDUP
@@ -148,9 +151,14 @@ extern "C" {
 # define snprintf _snprintf
 # define HAVE_SNPRINTF
 
-/* MSVC has _access */
+/* MSVC has _access, not access */
 # define access(f, m) _access(f, m)
 # define HAVE_ACCESS
+
+/* MSVC has _stat, not stat */
+# define HAVE_STAT
+# define stat(a, b) _stat(a, b)
+typedef struct _stat stat_type;
 
 /* MSVC has _strdup */
 # define strdup _strdup

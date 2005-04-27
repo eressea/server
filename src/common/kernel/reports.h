@@ -46,7 +46,8 @@ const char *hp_status(const struct unit * u);
 extern void spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days); /* mapper */
 extern void spunit(struct strlist ** SP, const struct faction * f, const struct unit * u, int indent, int mode);
 
-int reports(void);
+extern int reports(void);
+extern int write_reports(struct faction * f, time_t ltime);
 
 extern const struct unit *ucansee(const struct faction *f, const struct unit *u, const struct unit *x);
 

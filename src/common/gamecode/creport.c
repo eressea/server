@@ -918,8 +918,6 @@ static void
 cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
 {
 	const faction_list * flist = addresses;
-	if (!quiet)
-		puts(" - gebe Adressen heraus (CR)");
 	while (flist!=NULL) {
 		const faction * f = flist->data;
 		if (uf!=f && f->no != MONSTER_FACTION) {
@@ -1104,9 +1102,6 @@ report_computer(FILE * F, faction * f, const faction_list * addresses,
 
 	/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
 	/* initialisations, header and lists */
-
-	fprintf(stdout, "Reports für %s: CR\r", factionname(f));
-	fflush(stdout);
 
   fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
   fprintf(F, "\"%s\";locale\n", locale_name(f->locale));

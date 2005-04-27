@@ -189,6 +189,13 @@ get_direction(const char * name)
   return NODIRECTION;
 }
 
+int
+lua_writereport(faction * f)
+{
+  time_t ltime = time(0);
+  return write_reports(f, ltime);
+}
+
 void
 bind_eressea(lua_State * L)
 {
@@ -199,6 +206,7 @@ bind_eressea(lua_State * L)
     def("write_game", &write_game),
     def("write_passwords", &writepasswd),
     def("write_reports", &reports),
+    def("write_report", &lua_writereport),
     def("init_summary", &init_summary),
     def("write_summary", &write_summary),
     def("read_orders", &readorders),

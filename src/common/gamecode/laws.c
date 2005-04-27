@@ -1109,8 +1109,6 @@ parse_quit(void)
 
   puts(" - beseitige Spieler, die sich zu lange nicht mehr gemeldet haben...");
 
-  remove("inactive");
-
   for (f = factions; f; f = f->next) {
     if(fval(f, FFL_NOIDLEOUT)) f->lastorders = turn;
     if (NMRTimeout()>0 && turn - f->lastorders >= NMRTimeout()) {

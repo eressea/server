@@ -83,6 +83,11 @@
 #include <limits.h>
 #include <stdlib.h>
 
+#ifdef HAVE_STAT
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
+
 extern int quiet;
 extern int *storms;
 extern int  weeks_per_month;
@@ -325,8 +330,6 @@ rpsnr(FILE * F, const char * s, int offset)
 		s = l+1; ui=1;
 	}
 }
-
-static faction *current_faction = NULL;
 
 int outi;
 char outbuf[4096];
@@ -1582,9 +1585,6 @@ order_template(FILE * F, faction * f)
   plane *pl;
   region *last = f->last?f->last:lastregion(f);
 
-	fprintf(stdout, "Reports für %s: ZV\r", factionname(f));
-	fflush(stdout);
-
   rps_nowrap(F, "");
   rnl(F);
   rps_nowrap(F, LOC(f->locale, "nr_template"));
@@ -2000,9 +2000,6 @@ report(FILE *F, faction * f, const faction_list * addresses,
 	char buf2[80];
 	ix = Pow(O_STATISTICS);
 	wants_stats = (f->options & ix);
-
-	fprintf(stdout, "Reports für %s: NR\r", factionname(f));
-	fflush(stdout);
 
   m = msg_message("nr_header_date", "game date", global.gamename, pzTime);
   nr_render(m, f->locale, buf, sizeof(buf), f);
@@ -2680,87 +2677,120 @@ struct fsee {
 	} * see;
 } * fsee[FMAXHASH];
 
+#define REPORT_NR (1 << O_REPORT)
+#define REPORT_CR (1 << O_COMPUTER)
+#define REPORT_ZV (1 << O_ZUGVORLAGE)
+#define REPORT_ZIP (1 << O_COMPRESS)
+#define REPORT_BZIP2 (1 << O_BZIP2)
+
+int
+write_reports(faction * f, time_t ltime)
+{
+  FILE * F;
+  boolean gotit = false;
+  faction_list * addresses;
+  char zTime[64];
+  static boolean dir_exists = false;
+
+#ifdef HAVE_STAT
+  stat_type st;
+  if (!dir_exists && stat(reportpath(), &st)==-1) {
+    errno = 0;
+    makedir(reportpath(), 0700);
+    dir_exists = true;
+  }
+#else
+  if (!dir_exists) {
+    if (makedir(reportpath(), 0700)!=0) {
+      if (errno!=EEXIST) {
+        perror("could not create reportpath");
+        return -1;
+    }
+    dir_exists = true;
+  }
+#endif
+
+  strftime(zTime, sizeof(zTime), "%A, %d. %B %Y, %H:%M", localtime(&ltime));
+  printf("Reports für %s: \r", factionname(f));
+  fflush(stdout);
+  prepare_report(f);
+  addresses = get_addresses(f);
+
+  /* NR schreiben: */
+  if (!nonr && (f->options & REPORT_NR)) {
+    fprintf(stdout, "Reports für %s: NR\r", factionname(f));
+    fflush(stdout);
+
+    sprintf(buf, "%s/%d-%s.nr", reportpath(), turn, factionid(f));
+    F = cfopen(buf, "wt");
+    if (F) {
+      int status = report(F, f, addresses, zTime);
+      fclose(F);
+      gotit = true;
+      if (status!=0) return status; /* catch errors */
+    }
+  }
+  /* CR schreiben: */
+  if (!nocr && (f->options & REPORT_CR || f->age<3)) {
+    fprintf(stdout, "Reports für %s: CR\r", factionname(f));
+    fflush(stdout);
+
+    sprintf(buf, "%s/%d-%s.cr", reportpath(), turn, factionid(f));
+    F = cfopen(buf, "wt");
+    if (F) {
+      int status = report_computer(F, f, addresses, ltime);
+      fclose(F);
+      gotit = true;
+      if (status!=0) return status; /* catch errors */
+    }
+  }
+  /* ZV schreiben: */
+  if (f->options & REPORT_ZV) {
+    fprintf(stdout, "Reports für %s: ZV\r", factionname(f));
+    fflush(stdout);
+
+    sprintf(buf, "%s/%d-%s.txt", reportpath(), turn, factionid(f));
+    F = cfopen(buf, "wt");
+    if (F) {
+      int status = order_template(F, f);
+      fclose(F);
+      if (status!=0) return status; /* catch errors */
+    }
+  }
+
+  if (!gotit) {
+    log_error(("no report for faction %s!\n", factionid(f)));
+  }
+  freelist(addresses);
+  putc('\n', stdout);
+
+  return 0;
+}
+
 int
 reports(void)
 {
 	faction *f;
-	boolean gotit;
-	FILE *shfp, *F, *BAT;
-	int wants_report, wants_computer_report,
-		wants_compressed, wants_bzip2;
+	FILE *shfp, *BAT;
 	time_t ltime = time(NULL);
-	char pzTime[64];
   const char * str;
-
-#ifdef _GNU_SOURCE
-	strftime(pzTime, 64, "%A, %-e. %B %Y, %-k:%M", localtime(&ltime));
-#else
-	strftime(pzTime, 64, "%A, %d. %B %Y, %H:%M", localtime(&ltime));
-#endif
+  int retval = 0;
 
 	nmr_warnings();
-#ifdef DMALLOC
-	assert(dmalloc_verify ( NULL ));
-#endif
-	makedir(reportpath(), 0700);
 
 	BAT = openbatch();
 
-	wants_report = 1 << O_REPORT;
-	wants_computer_report = 1 << O_COMPUTER;
-	wants_compressed = 1 << O_COMPRESS;
-	wants_bzip2 = 1 << O_BZIP2;
 	printf("\n");
 
 	report_donations();
 	remove_empty_units();
   log_printf("Updating region intervals\n");
   update_intervals();
-	log_printf("Report timestamp - %s\n", pzTime);
 	for (f = factions; f; f = f->next) {
-		faction_list * addresses;
-		attrib * a = a_find(f->attribs, &at_reportspell);
-		current_faction = f;
-		gotit = false;
+    int error = write_reports(f, ltime);
+    if (error) retval = error;
 
-		printf("Reports für %s: \r", factionname(f));
-		fflush(stdout);
-		prepare_report(f);
-		addresses = get_addresses(f);
-
-    /* NR schreiben: */
-		if (!nonr && (f->options & wants_report)) {
-			sprintf(buf, "%s/%d-%s.nr", reportpath(), turn, factionid(f));
-			F = cfopen(buf, "wt");
-			if (F) {
-				int status = report(F, f, addresses, pzTime);
-				fclose(F);
-				gotit = true;
-        if (status!=0) return status; /* catch errors */
-			}
-		}
-    /* CR schreiben: */
-		if (!nocr && (f->options & wants_computer_report || f->age<3)) {
-			sprintf(buf, "%s/%d-%s.cr", reportpath(), turn, factionid(f));
-			F = cfopen(buf, "wt");
-			if (F) {
-				int status = report_computer(F, f, addresses, ltime);
-				fclose(F);
-				gotit = true;
-        if (status!=0) return status; /* catch errors */
-			}
-		}
-    /* ZV schreiben: */
-    if (f->options & (1 << O_ZUGVORLAGE)) {
-      sprintf(buf, "%s/%d-%s.txt", reportpath(), turn, factionid(f));
-      F = cfopen(buf, "wt");
-      if (F) {
-        int status = order_template(F, f);
-        fclose(F);
-        if (status!=0) return status; /* catch errors */
-      }
-    }
-		if (f->no > 0 && f->email && BAT) {
+    if (f->no > 0 && f->email && BAT) {
 			sprintf(buf, "%s/%s.sh", reportpath(), factionid(f));
 			shfp = fopen(buf, "w");
 			fprintf(shfp,"#!/bin/sh\n\nPATH=%s\n\n",MailitPath());
@@ -2772,7 +2802,7 @@ reports(void)
 
 			fprintf(BAT, "\n\ndate;echo %s\n", f->email);
 
-			if (f->no > 0 && f->options & wants_compressed) {
+			if (f->no > 0 && f->options & REPORT_ZIP) {
 
 				if(f->age == 1) {
 #if KEEP_UNZIPPED == 1
@@ -2811,7 +2841,7 @@ reports(void)
             turn, factionid(f), 
             turn, factionid(f));
 
-			} else if(f->options & wants_bzip2) {
+			} else if(f->options & REPORT_BZIP2) {
 
 				if (f->age == 1) {
 					fprintf(shfp,
@@ -2825,7 +2855,7 @@ reports(void)
 
 				fprintf(shfp, "eresseamail.bzip2 $addr \"%s %s\"", global.gamename, gamedate_short(f->locale));
 
-				if (!nonr && f->options & wants_report)
+				if (!nonr && f->options & REPORT_NR)
 					fprintf(shfp,
 						" \\\n\t\"application/x-bzip2\" \"Report\" %d-%s.nr.bz2",
 						turn,factionid(f));
@@ -2835,7 +2865,7 @@ reports(void)
           " \\\n\t\"application/x-bzip2\" \"Zugvorlage\" %d-%s.txt.bz2",
           turn,factionid(f));
 
-				if (!nocr && (f->options & wants_computer_report || f->age<3))
+				if (!nocr && (f->options & REPORT_CR || f->age<3))
 					fprintf(shfp,
 						" \\\n\t\"application/x-bzip2\" \"Computer-Report\" %d-%s.cr.bz2",
 						turn, factionid(f));
@@ -2848,7 +2878,7 @@ reports(void)
 						" \\\n\t\"text/plain\" \"Willkommen\" ../res/%s/%s/welcome.txt", global.welcomepath, locale_name(f->locale));
 				}
 
-        if (!nonr && f->options & wants_report)
+        if (!nonr && f->options & REPORT_NR)
           fprintf(shfp,
           " \\\n\t\"text/plain\" \"Report\" %d-%s.nr",
           turn, factionid(f));
@@ -2858,7 +2888,7 @@ reports(void)
           " \\\n\t\"text/plain\" \"Zugvorlage\" %d-%s.txt",
           turn, factionid(f));
 
-				if (!nocr && (f->options & wants_computer_report || f->age<3))
+				if (!nocr && (f->options & REPORT_CR || f->age<3))
 					fprintf(shfp,
 						" \\\n\t\"text/x-eressea-cr\" \"Computer-Report\" %d-%s.cr",
 						turn, factionid(f));
@@ -2867,16 +2897,6 @@ reports(void)
 			fprintf(BAT, ". %s.sh %s\n", factionid(f), f->email);
 			fclose(shfp);
 		}
-
-		if (!gotit)
-			printf("* Fehler: Kein Report für Partei Nr. %s!\n",
-			       factionid(f));
-		while (a) {
-			attrib * a_old = a;
-			a = a->nexttype;
-			a_remove(&f->attribs, a_old);
-		}
-		freelist(addresses);
     putc('\n', stdout);
 	}
 
@@ -2887,9 +2907,8 @@ reports(void)
   }
   /* schliesst BAT und verschickt Zeitungen und Kommentare */
   closebatch(BAT);
-  current_faction = NULL;
   seen_done();
-  return 0;
+  return retval;
 }
 
 void
