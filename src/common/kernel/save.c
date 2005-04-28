@@ -1949,6 +1949,7 @@ readgame(const char * filename, int backup)
       assert(u->region==NULL);
       u->region = r;
       addlist2(up,u);
+      update_interval(u->faction, u->region);
     }
   }
   printf("\n");

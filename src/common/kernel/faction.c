@@ -344,6 +344,7 @@ set_alliance(faction * a, faction * b, int status)
 void 
 update_interval(struct faction * f, struct region * r)
 {
+  if (r==NULL || f==NULL) return;
 #ifdef ENUM_REGIONS
   if (f->first==NULL || f->first->index>r->index) {
     f->first = r;

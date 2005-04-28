@@ -832,7 +832,7 @@ u_setfaction(unit * u, faction * f)
 	u->prevF = NULL;
 
   u->faction = f;
-  update_interval(f, u->region);
+  if (u->region) update_interval(f, u->region);
 	if (cnt && f) {
 		set_number(u, cnt);
     if (playerrace(u->race)) {
