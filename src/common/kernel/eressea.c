@@ -1044,7 +1044,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 		return false;
 	} else if (u->number == 0) {
 		attrib *a = a_find(u->attribs, &at_creator);
-		if(a) {	/* u is an empty temporary unit. In this special case
+		if (a) {	/* u is an empty temporary unit. In this special case
 							 we look at the creating unit. */
 			u = (unit *)a->data.v;
 		} else {
@@ -1052,6 +1052,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 		}
 	}
 
+  if (leftship(u)) return true;
   if (itype_grail==(const item_type *)0xdeadbeef) itype_grail = it_find("grail");
   if (itype_grail!=NULL && i_get(u->items, itype_grail)) return true;
 
