@@ -2470,25 +2470,6 @@ base36conversion(void)
 extern void init_intervals(void);
 
 static void
-view_lighthouse(struct seen_region ** seen, region *r, faction *f)
-{
-  /* TODO */
-  direction_t dir;
-  assert(!"must implement this");
-  for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-    region * r2 = rconnect(r, dir);
-    if (r2) {
-      border * b = get_borders(r, r2);
-      while (b) {
-        if (!b->type->transparent(b, f)) break;
-        b = b->next;
-      }
-      if (!b) add_seen(seen, r2, see_lighthouse, false);
-    }
-  }
-}
-
-static void
 view_default(struct seen_region ** seen, region *r, faction *f)
 {
 	direction_t dir;
