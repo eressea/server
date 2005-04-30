@@ -174,9 +174,6 @@
 			Name="Header"
 			Filter="*.h">
 			<File
-				RelativePath=".\aggressive.h">
-			</File>
-			<File
 				RelativePath=".\attributes.h">
 			</File>
 			<File
@@ -246,9 +243,6 @@
 				RelativePath=".\viewrange.h">
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\aggressive.c">
-		</File>
 		<File
 			RelativePath=".\at_movement.c">
 		</File>

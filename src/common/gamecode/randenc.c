@@ -308,9 +308,9 @@ get_unit(region * r, unit * u)
 	addmessage(r, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
 
 	newunit = createunit(r, u->faction, rand() % 20 + 3, u->faction->race);
+  fset(newunit, UFL_ISNEW|UFL_MOVED);
 	set_string(&newunit->name, "Dorfbewohner");
 	set_money(newunit, (rand() % 26 + 10) * newunit->number);
-	fset(newunit, UFL_ISNEW);
 	if (fval(u, UFL_PARTEITARNUNG)) fset(newunit, UFL_PARTEITARNUNG);
 	switch (rand() % 4) {
 	case 0:
@@ -576,7 +576,7 @@ chaos(region * r)
 					break;
 				}
 				if (mfac) set_money(u, u->number * (rand() % mfac));
-				guard(u, GUARD_ALL);
+        fset(u, UFL_ISNEW|UFL_MOVED);
 			}
 		case 2:	/* Terrainveränderung */
 			if (!(terrain[rterrain(r)].flags & FORBIDDEN_LAND)) {
@@ -1101,7 +1101,7 @@ godcurse(void)
   }
 }
 
-static void
+static unit *
 split_unit(region * r, unit *u)
 {
   unit *u2 = createunit(r, u->faction, 0, u->race);
@@ -1109,11 +1109,8 @@ split_unit(region * r, unit *u)
 
   set_string(&u2->name, u->name);
   set_string(&u2->display, u->display);
-  set_order(&u2->thisorder, parse_order(keywords[K_WAIT], u->faction->locale));
-  set_order(&u2->lastorder, u2->thisorder);
-  free_order(u2->lastorder); /* parse_order & set_order have each increased the refcount */
-
   transfermen(u, u2, newsize);
+  return u2;
 }
 
 static void
@@ -1126,7 +1123,8 @@ check_split(void)
     for(u=r->units;u;u=u->next) {
       if(u->faction->no == MONSTER_FACTION) {
         if(u->number > u->race->splitsize) {
-          split_unit(r, u);
+          unit * u2 = split_unit(r, u);
+          fset(u2, UFL_ISNEW|UFL_MOVED);
         }
       }
     }
@@ -1386,6 +1384,7 @@ randomevents(void)
 		message * msg;
 		if (rterrain(r) == T_OCEAN && rand()%10000 < 1) {
 			u = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_SEASERPENT]);
+      fset(u, UFL_ISNEW|UFL_MOVED);
 			set_level(u, SK_MAGIC, 4);
 			set_level(u, SK_OBSERVATION, 3);
 			set_level(u, SK_STEALTH, 2);
@@ -1393,25 +1392,14 @@ randomevents(void)
 			set_string(&u->name, "Seeschlange");
 		}
 
-		if ((rterrain(r) == T_GLACIER
-				|| rterrain(r) == T_SWAMP || rterrain(r) == T_DESERT)
-		    && rand() % 10000 < (5 + 100 * chaosfactor(r))) {
-
-			switch (rand() % 10) {
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-			case 5:
-			case 6:
-			case 7:
+		if ((rterrain(r) == T_GLACIER || rterrain(r) == T_SWAMP || rterrain(r) == T_DESERT) && rand() % 10000 < (5 + 100 * chaosfactor(r))) 
+    {
+      if (chance(0.80)) {
 				u = createunit(r, findfaction(MONSTER_FACTION), nrand(60, 20) + 1, new_race[RC_FIREDRAGON]);
-				break;
-			default:
-				u = createunit(r, findfaction(MONSTER_FACTION), nrand(30, 20) + 1, new_race[RC_DRAGON]);
-				break;
-			}
+      } else {
+        u = createunit(r, findfaction(MONSTER_FACTION), nrand(30, 20) + 1, new_race[RC_DRAGON]);
+      }
+      fset(u, UFL_ISNEW|UFL_MOVED);
 
 			set_money(u, u->number * (rand() % 500 + 100));
 			set_level(u, SK_MAGIC, 4);
@@ -1422,8 +1410,6 @@ randomevents(void)
 				LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
 
 			name_unit(u);
-			set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
-      free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
 
 			/* add message to the region */
 			ADDMSG(&r->msgs,
@@ -1472,6 +1458,7 @@ randomevents(void)
 			}
 
 			u = createunit(r, findfaction(MONSTER_FACTION), undead, rc);
+      fset(u, UFL_ISNEW|UFL_MOVED);
 			if ((rc == new_race[RC_SKELETON] || rc == new_race[RC_ZOMBIE]) && rand()%10 < 4) {
 				set_item(u, I_RUSTY_SWORD, undead);
 				if (rand()%10 < 3) {
@@ -1490,14 +1477,12 @@ randomevents(void)
 			u->hp = unit_max_hp(u) * u->number;
 
 			deathcounts(r, -undead);
-      set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
-      free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
-			name_unit(u);
+      name_unit(u);
 
-			log_printf("%d %s in %s.\n", u->number,
-				LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
+      log_printf("%d %s in %s.\n", u->number,
+        LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
 
-			{
+      {
 				message * msg = msg_message("undeadrise", "region", r);
 				add_message(&r->msgs, msg);
 				for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
@@ -1566,9 +1551,7 @@ randomevents(void)
 				rsettrees(r, trees);
 #endif
 				u = createunit(r, findfaction(MONSTER_FACTION),treemen, new_race[RC_TREEMAN]);
-        set_order(&u->lastorder, parse_order(keywords[K_WAIT], u->faction->locale));
-        free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
-				/* guard(u, GUARD_ALL); kein auto-guard! erst in monster.c! */
+        fset(u, UFL_ISNEW|UFL_MOVED);
 
 				set_level(u, SK_OBSERVATION, 2);
 				if (u->number == 1)

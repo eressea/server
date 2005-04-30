@@ -111,7 +111,7 @@ regions_in_range(struct region * start, int maxdist, boolean (*allowed)(const st
       region * rn = rconnect(r, d);
       if (rn==NULL) continue;
       if (fval(rn, FL_MARK)) continue; /* already been there */
-      if (!allowed(r, rn)) continue; /* can't go there */
+      if (allowed && !allowed(r, rn)) continue; /* can't go there */
 
       /* add the region to the list of available ones. */
       add_regionlist(&rlist, rn);

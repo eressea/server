@@ -55,9 +55,9 @@ struct skill;
 
 /* Flags, die gespeichert werden sollen: */
 #ifndef HEROES
-# define UFL_SAVEMASK (UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL)
+# define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL)
 #else
-# define UFL_SAVEMASK (UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL | UFL_HERO)
+# define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL | UFL_HERO)
 #endif
 
 #ifdef HEROES
@@ -94,7 +94,9 @@ typedef struct unit {
 	/* orders */
 	struct order *orders;
 	struct order * thisorder;
+#ifdef LASTORDER
 	struct order * lastorder;
+#endif
 
 	/* race and illusionary race */
 	const struct race * race;

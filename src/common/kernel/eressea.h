@@ -161,6 +161,7 @@ struct building_type;
 #define SAVEALLIANCE_VERSION 317
 #define CLAIM_VERSION 318
 #define BACTION_VERSION 319 /* building action gets a param string */
+#define NOLASTORDER_VERSION 320 /* do not use lastorder */
 
 #define MIN_VERSION ALLIANCES_VERSION
 #define REGIONOWNERS_VERSION 400
@@ -168,8 +169,10 @@ struct building_type;
 
 #ifdef REGIONOWNERS
 # define RELEASE_VERSION REGIONOWNERS_VERSION
-#else
+#elif defined(LASTORDER)
 # define RELEASE_VERSION BACTION_VERSION
+#else
+# define RELEASE_VERSION NOLASTORDER_VERSION
 #endif
 
 #if RESOURCE_CONVERSION
@@ -377,7 +380,6 @@ enum {
   K_BANNER,
   K_WORK,
   K_ATTACK,
-  K_BIETE,
   K_STEAL,
   K_BESIEGE,
   K_NAME,
@@ -431,7 +433,6 @@ enum {
   K_MAGIEGEBIET,
   K_PIRACY,
   K_RESTART,
-  K_WAIT,
   K_GROUP,
   K_SACRIFICE,
   K_PRAY,
@@ -944,6 +945,8 @@ extern void init_tokens_str(const char * initstr); /* initialize token parsing *
 extern void init_tokens(const struct order * ord); /* initialize token parsing */
 extern void skip_token(void);
 extern const char * parse_token(const char ** str);
+extern void parser_pushstate(void);
+extern void parser_popstate(void);
 
 extern skill_t findskill(const char *s, const struct locale * lang);
 

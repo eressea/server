@@ -114,6 +114,7 @@ extern "C" {
   extern char * g_resourcedir;
 
   extern boolean nonr;
+  extern boolean nosh;
   extern boolean nocr;
   extern boolean noreports;
   extern boolean nomer;
@@ -471,6 +472,7 @@ usage(const char * prog, const char * arg)
     "--debug          : schreibt Debug-Ausgaben in die Datei debug\n"
     "--nocr           : keine CRs\n"
     "--nonr           : keine Reports\n"
+    "--nosh           : keine Mail-Skripte\n"
     "--crabsolute     : absolute Koordinaten im CR\n"
     "--help           : help\n", prog);
   return -1;
@@ -509,6 +511,7 @@ read_args(int argc, char **argv, lua_State * luaState)
       else if (strcmp(argv[i]+2, "xml")==0) xmlfile = argv[++i];
       else if (strcmp(argv[i]+2, "dirtyload")==0) dirtyload = true;
       else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
+      else if (strcmp(argv[i]+2, "nosh")==0) nosh = true;
       else if (strcmp(argv[i]+2, "lomem")==0) lomem = true;
       else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
       else if (strcmp(argv[i]+2, "nomonsters")==0) nomonsters = true;

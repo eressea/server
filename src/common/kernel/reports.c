@@ -414,6 +414,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
         }
       }
     }
+#ifdef LASTORDER
     if (!isbattle && u->lastorder) {
       char * cmd = getcommand(u->lastorder);
       scat(", \"");
@@ -421,6 +422,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
       scat("\"");
       free(cmd);
     }
+#endif
   }
   i = 0;
 

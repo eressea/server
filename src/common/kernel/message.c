@@ -332,7 +332,7 @@ mistake(const unit * u, struct order * ord, const char *comment, int mtype)
   if (u->faction->no != MONSTER_FACTION) {
     char * cmt = strdup(comment);
     ADDMSG(&u->faction->msgs, msg_message("mistake",
-      "command error unit region", copy_order(ord), cmt, u, u->region));
+      "command error unit region", duplicate_order(ord), cmt, u, u->region));
   }
 }
 
@@ -345,7 +345,7 @@ cmistake(const unit * u, struct order *ord, int mno, int mtype)
 	if (u->faction->no == MONSTER_FACTION) return;
 	sprintf(ebuf, "error%d", mno);
 	ADDMSG(&u->faction->msgs, msg_message(ebuf, 
-		"command unit region", copy_order(ord), u, u->region));
+		"command unit region", duplicate_order(ord), u, u->region));
 }
 
 extern unsigned int new_hashstring(const char* s);

@@ -1101,7 +1101,7 @@ readunit(FILE * F)
 		}
 	} else
 		u->flags = ri(F) & ~UFL_DEBUG;
-	/* Kurze persistente Befehle einlesen */
+	/* Persistente Befehle einlesen */
 	free_orders(&u->orders);
 	freadstr(F, buf, sizeof(buf));
 	while (*buf != 0) {
@@ -1109,8 +1109,19 @@ readunit(FILE * F)
     if (ord!=NULL) addlist(&u->orders, ord);
 		freadstr(F, buf, sizeof(buf));
 	}
-  freadstr(F, buf, sizeof(buf));
-  u->lastorder = parse_order(buf, u->faction->locale);
+  if (global.data_version<NOLASTORDER_VERSION) {
+    order * ord;
+    freadstr(F, buf, sizeof(buf));
+    ord = parse_order(buf, u->faction->locale);
+    if (ord!=NULL) {
+#ifdef LASTORDER
+      set_order(&u->lastorder, ord);
+      free_order(ord);
+#else
+      addlist(&u->orders, ord);
+#endif
+    }
+  }
   set_order(&u->thisorder, NULL);
 
 	assert(u->number >= 0);
@@ -1219,9 +1230,11 @@ writeunit(FILE * F, const unit * u)
   /* write an empty string to terminate the list */
   fwriteorder(F, NULL, u->faction->locale);
 	wnl(F);
+#if RELEASE_VERSION<NOLASTORDER_VERSION
   /* the current default order */
 	fwriteorder(F, u->lastorder, u->faction->locale);
 	wnl(F);
+#endif
 
 	assert(u->number >= 0);
 	assert(u->race);

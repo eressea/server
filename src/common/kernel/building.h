@@ -112,7 +112,7 @@ extern const char * buildingtype(const struct building * b, int bsize);
 extern const char * buildingname(const struct building * b);
 extern int buildingcapacity(const struct building * b);
 extern struct building *new_building(const struct building_type * typ, struct region * r, const struct locale * lang);
-void build_building(struct unit * u, const struct building_type * typ, int size);
+void build_building(struct unit * u, const struct building_type * typ, int size, struct order * ord);
 
 /* Alte Gebäudetypen: */
 

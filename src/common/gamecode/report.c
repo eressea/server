@@ -1676,12 +1676,14 @@ order_template(FILE * F, faction * f)
 
         /* If the lastorder begins with an @ it should have
         * been printed in the loop before. */
+#ifdef LASTORDER
         if (u->lastorder && !is_persistent(u->lastorder)) {
           strcpy(buf, "   ");
           write_order(u->lastorder, u->faction->locale, buf+2, sizeof(buf)-2);
           rps_nowrap(F, buf);
           rnl(F);
         }
+#endif
       }
   }
   rps_nowrap(F, "");
@@ -3776,7 +3778,7 @@ report_init(void)
   add_function("spell", &eval_spell);
 
   register_argtype("string", free, (void*(*)(void*))strdup);
-  register_argtype("order", (void(*)(void*))free_order, (void*(*)(void*))copy_order);
+  register_argtype("order", (void(*)(void*))free_order, (void*(*)(void*))duplicate_order);
   register_function((pf_generic)view_neighbours, "view_neighbours");
 	register_function((pf_generic)view_regatta, "view_regatta");
 }

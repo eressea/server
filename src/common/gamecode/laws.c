@@ -139,7 +139,9 @@ restart_race(unit *u, const race * rc)
       *ordp = ord->next;
       ord->next = NULL;
       if (u->thisorder == ord) set_order(&u->thisorder, NULL);
+#ifdef LASTORDER
       if (u->lastorder == ord) set_order(&u->lastorder, NULL);
+#endif
     } else {
       ordp = &ord->next;
     }
@@ -2662,6 +2664,7 @@ instant_orders(void)
     unit * u;
     for (u = r->units; u; u = u->next) {
       order * ord;
+      freset(u, UFL_MOVED);
       for (ord = u->orders; ord; ord = ord->next) {
         switch (get_keyword(ord)) {
         case K_URSPRUNG:
@@ -3413,86 +3416,48 @@ setdefaults (void)
         set_order(&u->thisorder, default_order(u->faction->locale));
         continue;
       }
-
+#ifdef LASTORDER
       /* by default the default long order becomes the new long order. */
-      u->thisorder = copy_order(u->lastorder);
-
+      u->thisorder = duplicate_order(u->lastorder);
+#endif
       /* check all orders for a potential new long order this round: */
       for (ord = u->orders; ord; ord = ord->next) {
-        keyword_t keyword = get_keyword(ord);
-
-        switch (keyword) {
-          /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
-          * werden. Da Handel erst nach anderen langen Befehlen kommt,
-          * muß das vorher abgefangen werden. Wir merken uns also
-          * hier, ob die Einheit handelt. */
-          case K_BUY:
-          case K_SELL:
-            /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
-            * werden. */
-            trade = true;
-            break;
-
-          case K_CAST:
-            /* dient dazu, das neben Zaubern kein weiterer Befehl
-            * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
-            set_order(&u->thisorder, NULL);
-            break;
-
-          case K_MAKE:
-            /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
-            * Arten von MACHE zaehlen aber als neue defaults und werden
-            * behandelt wie die anderen (deswegen kein break nach case
-            * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
-            * abgespeichert). */
-            init_tokens(ord); /* initialize token-parser */
-            skip_token();
-            if (getparam(u->faction->locale) == P_TEMP) break;
-            /* else fall through */
-
-#if GROWING_TREES
-          case K_PFLANZE:
-#endif
-          case K_BESIEGE:
-          case K_ENTERTAIN:
-          case K_TAX:
-          case K_RESEARCH:
-          case K_SPY:
-          case K_STEAL:
-          case K_SABOTAGE:
-          case K_STUDY:
-          case K_TEACH:
-          case K_ZUECHTE:
-          case K_BIETE:
-          case K_PIRACY:
-            /* Über dieser Zeile nur Befehle, die auch eine idle Faction machen darf */
-            if (idle (u->faction)) {
-              set_order(&u->thisorder, default_order(u->faction->locale));
-            } else {
-              set_order(&u->thisorder, ord);
-            }
-            break;
-
-          case K_FOLLOW:
-            /* FOLLOW is only a long order if we are following a ship. */
-            init_tokens(ord);
-            skip_token();
-            if (getparam(u->faction->locale) == P_SHIP) {
-              set_order(&u->thisorder, ord);
-            }
-            break;
-
-          case K_ROUTE:
-          case K_WORK:
-          case K_DRIVE:
-          case K_MOVE:
-          case K_WEREWOLF:
+        if (is_exclusive(ord)) {
+          /* Über dieser Zeile nur Befehle, die auch eine idle Faction machen darf */
+          if (idle(u->faction)) {
+            set_order(&u->thisorder, default_order(u->faction->locale));
+          } else {
             set_order(&u->thisorder, ord);
-            break;
+          }
+          break;
+        } else {
+          keyword_t keyword = get_keyword(ord);
+          switch (keyword) {
+            /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
+            * werden. Da Handel erst nach anderen langen Befehlen kommt,
+            * muß das vorher abgefangen werden. Wir merken uns also
+            * hier, ob die Einheit handelt. */
+            case K_BUY:
+            case K_SELL:
+              /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
+              * werden. */
+              trade = true;
+              break;
 
-            /* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
-            * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
-            * nicht moeglich ist, Schulden zu machen. */
+            case K_CAST:
+              /* dient dazu, das neben Zaubern kein weiterer Befehl
+              * ausgeführt werden kann, Zaubern ist ein kurzer Befehl */
+              set_order(&u->thisorder, NULL);
+              break;
+
+            case K_WEREWOLF:
+              set_order(&u->thisorder, ord);
+              break;
+
+              /* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
+              * mit der Reihenfolge von Kaufen, Verkaufen etc., damit es Spielern
+              * nicht moeglich ist, Schulden zu machen. */
+          }
         }
       }
 
@@ -3512,21 +3477,19 @@ setdefaults (void)
       * die Einheitsnummer ungueltig). Auch Attackiere sollte nie in
       * den Default übernommen werden */
 
+#ifdef LASTORDER
       switch (get_keyword(u->thisorder)) {
         case K_MOVE:
-        case K_BIETE:
         case K_ATTACK:
         case K_WEREWOLF:
         case NOKEYWORD:
+          /* these can never be default orders */
           break;
 
         default:
           set_order(&u->lastorder, u->thisorder);
-          /* Attackiere sollte niemals Default werden */
-          if (get_keyword(u->lastorder) == K_ATTACK) {
-            set_order(&u->lastorder, default_order(u->faction->locale));
-          }
       }
+#endif
     }
   }
 }
@@ -3648,6 +3611,7 @@ monthly_healing(void)
   }
 }
 
+#ifdef LASTORDER
 static void
 defaultorders (void)
 {
@@ -3675,6 +3639,7 @@ defaultorders (void)
     }
   }
 }
+#endif
 
 /* ************************************************************ */
 /* GANZ WICHTIG! ALLE GEÄNDERTEN SPRÜCHE NEU ANZEIGEN */
@@ -3900,8 +3865,10 @@ processorders (void)
   monthly_healing();
   regeneration_magiepunkte();
 
+#ifdef LASTORDER
   puts(" - Defaults setzen");
   defaultorders();
+#endif
 
   puts(" - Unterhaltskosten, Nachfrage, Seuchen, Wachstum, Auswanderung");
   demographics();

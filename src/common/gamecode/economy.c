@@ -1534,21 +1534,21 @@ make_cmd(unit * u, struct order * ord)
 	if (p == P_ROAD) {
 		direction_t d;
 		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
-			cmistake(u, u->thisorder, 275, MSG_PRODUCE);
+			cmistake(u, ord, 275, MSG_PRODUCE);
 			return;
 		}
 		d = finddirection(getstrtoken(), u->faction->locale);
 		if (d!=NODIRECTION) {
 			if(r->planep && fval(r->planep, PFL_NOBUILD)) {
-				cmistake(u, u->thisorder, 94, MSG_PRODUCE);
+				cmistake(u, ord, 94, MSG_PRODUCE);
 				return;
 			}
 			build_road(r, u, m, d);
-		} else cmistake(u, u->thisorder, 71, MSG_PRODUCE);
+		} else cmistake(u, ord, 71, MSG_PRODUCE);
 		return;
 	} else if (p == P_SHIP) {
 		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
-			cmistake(u, u->thisorder, 276, MSG_PRODUCE);
+			cmistake(u, ord, 276, MSG_PRODUCE);
 			return;
 		}
 		continue_ship(r, u, m);
@@ -1592,19 +1592,19 @@ make_cmd(unit * u, struct order * ord)
   
 	if (stype != NOSHIP) {
 		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
-			cmistake(u, u->thisorder, 276, MSG_PRODUCE);
+			cmistake(u, ord, 276, MSG_PRODUCE);
 			return;
 		}
-		create_ship(r, u, stype, m);
+		create_ship(r, u, stype, m, ord);
 		return;
 	}
 
 	if (btype != NOBUILDING) {
 		if(r->planep && fval(r->planep, PFL_NOBUILD)) {
-			cmistake(u, u->thisorder, 94, MSG_PRODUCE);
+			cmistake(u, ord, 94, MSG_PRODUCE);
 			return;
 		}
-		build_building(u, btype, m);
+		build_building(u, btype, m, ord);
 		return;
 	}
 
@@ -1613,7 +1613,7 @@ make_cmd(unit * u, struct order * ord)
 		return;
 	}
 
-	cmistake(u, u->thisorder, 125, MSG_PRODUCE);
+	cmistake(u, ord, 125, MSG_PRODUCE);
 }
 /* ------------------------------------------------------------- */
 

@@ -814,7 +814,9 @@ u_setfaction(unit * u, faction * f)
     join_group(u, NULL);
     free_orders(&u->orders);
     set_order(&u->thisorder, NULL);
+#ifdef LASTORDER
     set_order(&u->lastorder, NULL);
+#endif
   }
   if (u->prevF) u->prevF->nextF = u->nextF;
 	else if (u->faction) {

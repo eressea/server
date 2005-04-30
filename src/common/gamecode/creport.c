@@ -760,12 +760,17 @@ cr_output_unit(FILE * F, const region * r,
     }
     /* default commands */
     fprintf(F, "COMMANDS\n");
+#ifdef LASTORDER
     if (u->lastorder) {
       fwriteorder(F, u->lastorder, f->locale);
       fputc('\n', F);
     }
+#endif
     for (ord = u->orders; ord; ord = ord->next) {
-      if (is_persistent(ord) && ord!=u->lastorder) {
+#ifdef LASTORDER
+      if (ord==u->lastorder) continue;
+#endif
+      if (is_persistent(ord)) {
         fwriteorder(F, ord, f->locale);
         fputc('\n', F);
       }

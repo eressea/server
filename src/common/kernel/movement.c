@@ -860,7 +860,7 @@ static const char *shortdirections[MAXDIRECTIONS] =
 };
 
 static void
-cycle_route(unit *u, int gereist)
+cycle_route(order * ord, unit *u, int gereist)
 {
 	int cm = 0;
 	char tail[1024];
@@ -869,13 +869,14 @@ cycle_route(unit *u, int gereist)
 	direction_t d = NODIRECTION;
 	boolean paused = false;
 	boolean pause;
+  order * norder;
 
-	if (get_keyword(u->thisorder) != K_ROUTE) return;
+	if (get_keyword(ord) != K_ROUTE) return;
 	tail[0] = '\0';
 
 	strcpy(neworder, locale_string(u->faction->locale, keywords[K_ROUTE]));
 
-  init_tokens(u->thisorder);
+  init_tokens(ord);
   skip_token();
 
 	for (cm=0;;++cm) {
@@ -909,8 +910,13 @@ cycle_route(unit *u, int gereist)
 	}
 
 	strcat(neworder, tail);
-	set_order(&u->lastorder, parse_order(neworder, u->faction->locale));
-  free_order(u->lastorder); /* parse_order & set_order have each increased the refcount */
+  norder = parse_order(neworder, u->faction->locale);
+#ifdef LASTORDER
+	set_order(&u->lastorder, norder);
+#else
+  copy_order(ord, norder);
+#endif
+  free_order(norder);
 }
 
 static boolean 
@@ -1311,7 +1317,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
     region * next = r;
 
     setguard(u, GUARD_NONE);
-    cycle_route(u, steps);
+    cycle_route(ord, u, steps);
 
     if (mode==TRAVEL_RUNNING) {
       walkmode = 0;
@@ -1659,7 +1665,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
     unit * hafenmeister;
     /* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
     * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
-    cycle_route(u, step);
+    cycle_route(ord, u, step);
     set_order(&u->thisorder, NULL);
     set_coast(sh, last_point, current_point);
 

@@ -344,7 +344,6 @@ const char *keywords[MAXKEYWORDS] =
 	"BANNER",
 	"ARBEITEN",
 	"ATTACKIEREN",
-	"BIETEN",
 	"BEKLAUEN",
 	"BELAGERE",
 	"BENENNEN",
@@ -398,7 +397,6 @@ const char *keywords[MAXKEYWORDS] =
 	"MAGIEGEBIET",
 	"PIRATERIE",
 	"NEUSTART",
-	"WARTEN",
 	"GRUPPE",
 	"OPFERE",
 	"BETEN",
@@ -1259,21 +1257,50 @@ count_maxmigrants(const faction * f)
 /* GET STR, I zur Eingabe von Daten liest diese aus dem Buffer, der beim ersten
  * Aufruf inititialisiert wird? */
 
-static const unsigned char *current_token;
+typedef struct parser_state {
+  const unsigned char *current_token;
+  char * current_cmd;
+  struct parser_state * next;
+} parser_state;
+
+static parser_state * state;
 
 void
 init_tokens_str(const char * initstr)
 {
-  current_token = (const unsigned char *)initstr;
+  if (state==NULL) {
+    state = malloc(sizeof(parser_state));
+    state->current_cmd = NULL;
+  }
+  state->current_token = (const unsigned char *)initstr;
 }
 
 void
 init_tokens(const struct order * ord)
 {
-  static char * cmd = NULL;
-  if (cmd!=NULL) free(cmd);
-  cmd = getcommand(ord);
-  init_tokens_str(cmd);
+  if (state==NULL) state = malloc(sizeof(parser_state));
+  else if (state->current_cmd!=NULL) free(state->current_cmd);
+  state->current_cmd = getcommand(ord);
+  init_tokens_str(state->current_cmd);
+}
+
+void
+parser_pushstate(void)
+{
+  parser_state * new_state = malloc(sizeof(parser_state));
+  new_state->current_cmd = NULL;
+  new_state->current_token = NULL;
+  new_state->next = state;
+  state = new_state;
+}
+
+void
+parser_popstate(void)
+{
+  parser_state * new_state = state->next;
+  if (state->current_cmd!=NULL) free(state->current_cmd);
+  free(state);
+  state = new_state;
 }
 
 void 
@@ -1281,23 +1308,23 @@ skip_token(void)
 {
   char quotechar = 0;
 
-  while (isspace(*current_token)) ++current_token;
-  while (*current_token) {
-    if (isspace(*current_token) && quotechar==0) {
+  while (isspace(*state->current_token)) ++state->current_token;
+  while (*state->current_token) {
+    if (isspace(*state->current_token) && quotechar==0) {
       return;
     } else {
-      switch(*current_token) {
+      switch(*state->current_token) {
         case '"':
         case '\'':
-          if (*current_token==quotechar) return;
-          quotechar = *current_token;
+          if (*state->current_token==quotechar) return;
+          quotechar = *state->current_token;
           break;
         case ESCAPE_CHAR:
-          ++current_token;
+          ++state->current_token;
           break;
       }
     }
-    ++current_token;
+    ++state->current_token;
   }
 }
 
@@ -1377,13 +1404,13 @@ igetstrtoken(const char * initstr)
     init_tokens_str(initstr);
   }
 
-  return parse_token((const char**)&current_token);
+  return parse_token((const char**)&state->current_token);
 }
 
 const char *
 getstrtoken(void)
 {
-  return parse_token((const char**)&current_token);
+  return parse_token((const char**)&state->current_token);
 }
 
 int
@@ -1870,12 +1897,17 @@ unit *
 create_unit(region * r, faction * f, int number, const struct race *urace, int id, const char * dname, unit *creator)
 {
 	unit * u = calloc(1, sizeof(unit));
+  order * deford = default_order(f->locale);
 
   assert(urace);
 	assert(f->alive);
 	u_setfaction(u, f);
 	set_order(&u->thisorder, NULL);
-	set_order(&u->lastorder, default_order(f->locale));
+#ifdef LASTORDER
+	set_order(&u->lastorder, deford);
+#else
+  addlist(&u->orders, deford);
+#endif
 	u_seteffstealth(u, -1);
 	u->race = urace;
 	u->irace = urace;
@@ -2600,7 +2632,10 @@ init_used_faction_ids(void)
 void
 make_undead_unit(unit * u)
 {
+#ifdef LASTORDER
 	set_order(&u->lastorder, NULL);
+#endif
+  free_orders(&u->orders);
 	name_unit(u);
 	fset(u, UFL_ISNEW);
 }

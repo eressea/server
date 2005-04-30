@@ -68,7 +68,7 @@ extern boolean can_contact(const struct region *r, const struct unit *u, const s
 
 void do_siege(void);
 void build_road(struct region * r, struct unit * u, int size, direction_t d);
-void create_ship(struct region * r, struct unit * u, const struct ship_type * newtype, int size);
+void create_ship(struct region * r, struct unit * u, const struct ship_type * newtype, int size, struct order * ord);
 void continue_ship(struct region * r, struct unit * u, int size);
 
 struct building * getbuilding(const struct region * r);

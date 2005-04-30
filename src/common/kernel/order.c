@@ -26,6 +26,16 @@ static int nlocales = 0;
 
 #undef SHORT_STRINGS
 
+void
+copy_order(order * dst, const order * src)
+{
+  if (dst->_str) free(dst->_str);
+  dst->_str = strdup(src->_str);
+  dst->_keyword = src->_keyword;
+  dst->_lindex = src->_lindex;
+  dst->_persistent = src->_persistent;
+}
+
 keyword_t
 get_keyword(const order * ord)
 {
@@ -70,7 +80,7 @@ free_order(order * ord)
 }
 
 order *
-copy_order(order * ord)
+duplicate_order(order * ord)
 {
 	if (ord!=NULL) ++ord->_refcount;
 	return ord;
@@ -81,7 +91,7 @@ set_order(struct order ** destp, struct order * src)
 {
   if (*destp==src) return;
   free_order(*destp);
-  *destp = copy_order(src);
+  *destp = duplicate_order(src);
 }
 
 void
@@ -156,19 +166,82 @@ parse_order(const char * s, const struct locale * lang)
 }
 
 boolean
-is_persistent(const order * cmd)
+is_exclusive(const order * ord)
 {
-	switch (cmd->_keyword) {
+  const struct locale * lang = locale_array[ord->_lindex];
+  param_t param;
+
+  switch (ord->_keyword) {
+    case K_MOVE:
+    case K_WEREWOLF:
+      /* these should not become persistent */
+    case K_ROUTE:
+    case K_DRIVE:
+    case K_WORK:
+    case K_BESIEGE:
+    case K_ENTERTAIN:
+    case K_TAX:
+    case K_RESEARCH:
+    case K_SPY:
+    case K_STEAL:
+    case K_SABOTAGE:
+    case K_STUDY:
+    case K_TEACH:
+    case K_ZUECHTE:
+    case K_PIRACY:
+      return true;
+
+#if GROWING_TREES
+    case K_PFLANZE:
+      return true;
+#endif
+
+    case K_FOLLOW:
+      /* FOLLOW is only a long order if we are following a ship. */
+      parser_pushstate();
+      init_tokens(ord);
+      skip_token();
+      param = getparam(lang);
+      parser_popstate();
+
+      if (param == P_SHIP) return true;
+      break;
+
+    case K_MAKE:
+      /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
+       * Arten von MACHE zaehlen aber als neue defaults und werden
+       * behandelt wie die anderen (deswegen kein break nach case
+       * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
+       * abgespeichert). */
+      parser_pushstate();
+      init_tokens(ord); /* initialize token-parser */
+      skip_token();
+      param = getparam(lang);
+      parser_popstate();
+
+      if (param != P_TEMP) return true;
+      break;
+  }
+  return false;
+}
+
+boolean
+is_persistent(const order * ord)
+{
+  boolean persist = ord->_persistent!=0;
+	switch (ord->_keyword) {
+    case K_MOVE:
+    case K_WEREWOLF:
     case NOKEYWORD:
+      /* lang, aber niemals persistent! */
       return false;
+
     case K_KOMMENTAR:
     case K_LIEFERE:
       return true;
 	}
-#ifdef AT_PERSISTENT
-  if (cmd->_persistent) return true;
-#endif      /* Nur kurze Befehle! */
-	return false;
+
+	return persist || is_exclusive(ord);
 }
 
 char * 

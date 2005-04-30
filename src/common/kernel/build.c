@@ -795,7 +795,7 @@ maxbuild(const unit * u, const construction * cons)
 /** old build routines */
 
 void
-build_building(unit * u, const building_type * btype, int want)
+build_building(unit * u, const building_type * btype, int want, order * ord)
 {
   region * r = u->region;
   boolean newbuilding = false;
@@ -804,9 +804,10 @@ build_building(unit * u, const building_type * btype, int want)
   /* einmalige Korrektur */
   static char buffer[8 + IDSIZE + 1 + NAMESIZE + 1];
   const char *string2;
+  order * new_order;
 
   if (eff_skill(u, SK_BUILDING, r) == 0) {
-    cmistake(u, u->thisorder, 101, MSG_PRODUCE);
+    cmistake(u, ord, 101, MSG_PRODUCE);
     return;
   }
 
@@ -825,7 +826,7 @@ build_building(unit * u, const building_type * btype, int want)
         b = u->building;
       } else {
         /* keine neue Burg anfangen wenn eine Nummer angegeben war */
-        cmistake(u, u->thisorder, 6, MSG_PRODUCE);
+        cmistake(u, ord, 6, MSG_PRODUCE);
         return;
       }
     }
@@ -835,17 +836,17 @@ build_building(unit * u, const building_type * btype, int want)
 
   if (b && fval(btype, BTF_UNIQUE) && buildingtype_exists(r, btype)) {
     /* only one of these per region */
-    cmistake(u, u->thisorder, 93, MSG_PRODUCE);
+    cmistake(u, ord, 93, MSG_PRODUCE);
     return;
   }
   if (besieged(u)) {
     /* units under siege can not build */
-    cmistake(u, u->thisorder, 60, MSG_PRODUCE);
+    cmistake(u, ord, 60, MSG_PRODUCE);
     return;
   }
   if (btype->flags & BTF_NOBUILD) {
     /* special building, cannot be built */
-    cmistake(u, u->thisorder, 221, MSG_PRODUCE);
+    cmistake(u, ord, 221, MSG_PRODUCE);
     return;
   }
 
@@ -870,7 +871,7 @@ build_building(unit * u, const building_type * btype, int want)
   switch (built) {
   case ECOMPLETE:
     /* the building is already complete */
-    cmistake(u, u->thisorder, 4, MSG_PRODUCE);
+    cmistake(u, ord, 4, MSG_PRODUCE);
     return;
   case ENOMATERIALS: {
     /* something missing from the list of materials */
@@ -887,14 +888,14 @@ build_building(unit * u, const building_type * btype, int want)
           );
       ch = ch+strlen(ch);
     }
-    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "build_required",
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "build_required",
       "required", buf));
     return;
   }
   case ELOWSKILL:
   case ENEEDSKILL:
     /* no skill, or not enough skill points to build */
-    cmistake(u, u->thisorder, 50, MSG_PRODUCE);
+    cmistake(u, ord, 50, MSG_PRODUCE);
     return;
   }
 
@@ -928,8 +929,14 @@ build_building(unit * u, const building_type * btype, int want)
     strcpy(buffer, locale_string(u->faction->locale, "defaultorder"));
   else
     sprintf(buffer, "%s %d %s %s", locale_string(u->faction->locale, keywords[K_MAKE]), want-built, string2, buildingid(b));
-  set_order(&u->lastorder, parse_order(buffer, u->faction->locale));
-  free_order(u->lastorder);
+
+  new_order = parse_order(buffer, u->faction->locale);
+#ifdef LASTORDER
+  set_order(&u->lastorder, new_order);
+#else
+  copy_order(ord, new_order);
+#endif
+  free_order(new_order);
 
   b->size += built;
   update_lighthouse(b);
@@ -976,19 +983,20 @@ build_ship(unit * u, ship * sh, int want)
 }
 
 void
-create_ship(region * r, unit * u, const struct ship_type * newtype, int want)
+create_ship(region * r, unit * u, const struct ship_type * newtype, int want, order * ord)
 {
   static char buffer[IDSIZE + 2 * KEYWORDSIZE + 3];
   ship *sh;
   int msize;
   const construction * cons = newtype->construction;
+  order * new_order;
 
   if (!eff_skill(u, SK_SHIPBUILDING, r)) {
-    cmistake(u, u->thisorder, 100, MSG_PRODUCE);
+    cmistake(u, ord, 100, MSG_PRODUCE);
     return;
   }
   if (besieged(u)) {
-    cmistake(u, u->thisorder, 60, MSG_PRODUCE);
+    cmistake(u, ord, 60, MSG_PRODUCE);
     return;
   }
 
@@ -996,13 +1004,13 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want)
   if (eff_skill(u, cons->skill, r) < cons->minskill) {
     sprintf(buf, "Um %s zu bauen, braucht man ein Talent von "
       "mindestens %d.", newtype->name[1], cons->minskill);
-    mistake(u, u->thisorder, buf, MSG_PRODUCE);
+    mistake(u, ord, buf, MSG_PRODUCE);
     return;
   }
 
   msize = maxbuild(u, cons);
   if (msize==0) {
-    cmistake(u, u->thisorder, 88, MSG_PRODUCE);
+    cmistake(u, ord, 88, MSG_PRODUCE);
     return;
   }
   if (want>0) want = min(want, msize);
@@ -1015,8 +1023,14 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want)
   fset(u, UFL_OWNER);
   sprintf(buffer, "%s %s %s",
     locale_string(u->faction->locale, keywords[K_MAKE]), locale_string(u->faction->locale, parameters[P_SHIP]), shipid(sh));
-  set_order(&u->lastorder, parse_order(buffer, u->faction->locale));
-  free_order(u->lastorder);
+
+  new_order = parse_order(buffer, u->faction->locale);
+#ifdef LASTORDER
+  set_order(&u->lastorder, new_order);
+#else
+  copy_order(ord, new_order);
+#endif
+  free_order(new_order);
 
   build_ship(u, sh, want);
 }
