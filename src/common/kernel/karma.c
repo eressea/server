@@ -351,13 +351,14 @@ buy_special(unit *u, struct order * ord, fspecial_t special)
 int
 fspecial(const faction *f, fspecial_t special)
 {
-	attrib *a;
+#ifdef KARMA_MODULE
+  attrib *a;
 
-	for(a=a_find(f->attribs, &at_faction_special); a; a=a->nexttype) {
-		if(a->data.sa[0] == special) return a->data.sa[1];
-	}
-
-	return 0;
+  for(a=a_find(f->attribs, &at_faction_special); a; a=a->nexttype) {
+    if(a->data.sa[0] == special) return a->data.sa[1];
+  }
+#endif
+  return 0;
 }
 
 static int

@@ -153,6 +153,41 @@ struct settings global = {
   1000, /* maxunits */
 };
 
+#ifdef __GNUC__
+#include <execinfo.h>
+#include <signal.h>
+
+static void
+report_segfault(int signo, siginfo_t * sinf, void * arg)
+{
+  void * btrace[50];
+  size_t size;
+  int fd = fileno(stderr);
+
+  fputs("\n\nProgram received SIGSEGV, backtrace follows.\n", stderr);
+  size = backtrace(btrace, 50);
+  backtrace_symbols_fd(btrace, size, fd);
+  abort();
+}
+
+static int
+setup_signal_handler(void)
+{
+  struct sigaction act;
+  
+  act.sa_flags = SA_ONESHOT | SA_SIGINFO;
+  act.sa_sigaction = report_segfault;
+  sigfillset(&act.sa_mask);
+  return sigaction(SIGSEGV, &act, NULL);
+}
+#else
+static int
+setup_signal_handler(void)
+{
+  return 0;
+}
+#endif
+
 static void
 game_init(void)
 {
@@ -643,6 +678,8 @@ main(int argc, char *argv[])
 {
   int i;
   char zText[MAX_PATH];
+
+  setup_signal_handler();
 
   global.data_version = RELEASE_VERSION;
   sqlpatch = true;

@@ -1124,7 +1124,7 @@ readunit(FILE * F)
   }
   set_order(&u->thisorder, NULL);
 
-	assert(u->number >= 0);
+  assert(u->number <= UNIT_MAXSIZE);
 	assert(u->race);
 	if (global.data_version<NEWSKILL_VERSION) {
 		/* convert old data */
@@ -1236,7 +1236,7 @@ writeunit(FILE * F, const unit * u)
 	wnl(F);
 #endif
 
-	assert(u->number >= 0);
+  assert(u->number <= UNIT_MAXSIZE);
 	assert(u->race);
 
 	for (i=0;i!=u->skill_size;++i) {

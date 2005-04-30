@@ -2482,9 +2482,6 @@ aftermath(battle * b)
           sum_hp += df->person[n].hp;
       }
 
-      /* die weggerannten werden später subtrahiert! */
-      assert(du->number >= 0);
-
       if (df->alive == du->number) {
         du->hp = sum_hp;
         continue; /* nichts passiert */

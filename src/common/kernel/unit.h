@@ -60,6 +60,7 @@ struct skill;
 # define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL | UFL_HERO)
 #endif
 
+#define UNIT_MAXSIZE 50000
 #ifdef HEROES
 extern int maxheroes(const struct faction * f);
 extern int countheroes(const struct faction * f);
@@ -78,7 +79,7 @@ typedef struct unit {
 	struct building *building;
 	struct ship *ship;
   short age;
-  short number;
+  unsigned short number;
 
 	/* skill data */
 	short skill_size;

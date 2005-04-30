@@ -1,6 +1,8 @@
 C++ = g++ ;
 CC = gcc ;
 
+LINKFLAGS += -rdynamic ;
+
 if ! $(HAVE_LUA) {
   HAVE_LUA = 1 ;
 }

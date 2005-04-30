@@ -807,9 +807,9 @@ inside_building(const struct unit * u)
 void
 u_setfaction(unit * u, faction * f)
 {
-	int cnt = u->number;
+  int cnt = u->number;
   unit ** iunit;
-	if (u->faction==f) return;
+  if (u->faction==f) return;
   if (u->faction) {
     set_number(u, 0);
     if (playerrace(u->race)) {
@@ -823,17 +823,20 @@ u_setfaction(unit * u, faction * f)
 #endif
   }
 
-  iunit = &f->units;
-  while (*iunit!=u) iunit=&(*iunit)->next;
-  assert(*iunit);
+  if (u->faction!=NULL) {
+    iunit = &u->faction->units;
+    while (*iunit && *iunit!=u) {
+      iunit=&(*iunit)->nextF;
+    }
+    assert(*iunit);
+    *iunit = u->nextF;
+  }
 
-  *iunit = u->nextF;
-
-	if (f!=NULL) {
-		u->nextF = f->units;
-		f->units = u;
-	}
-	else u->nextF = NULL;
+  if (f!=NULL) {
+    u->nextF = f->units;
+    f->units = u;
+  }
+  else u->nextF = NULL;
 
   u->faction = f;
   if (u->region) update_interval(f, u->region);
@@ -844,27 +847,28 @@ u_setfaction(unit * u, faction * f)
     }
 	}
 }
+
 /* vorsicht Sprüche können u->number == 0 (RS_FARVISION) haben! */
 void
 set_number(unit * u, int count)
 {
-	assert (count >= 0);
-  assert (count <= SHRT_MAX);
+  assert (count >= 0);
+  assert (count <= USHRT_MAX);
 
 #ifndef NDEBUG
-	assert (u->faction != 0 || u->number > 0);
+  assert (u->faction != 0 || u->number > 0);
 #endif
-	if (u->faction && u->race != u->faction->race && playerrace(u->race)
-	    && old_race(u->race) != RC_SPELL && old_race(u->race) != RC_SPECIAL
-			&& !(is_cursed(u->attribs, C_SLAVE, 0)))
+  if (u->faction && u->race != u->faction->race && playerrace(u->race)
+      && old_race(u->race) != RC_SPELL && old_race(u->race) != RC_SPECIAL
+      && !(is_cursed(u->attribs, C_SLAVE, 0)))
   {
-		u->faction->num_migrants += count - u->number;
-	}
-
+    u->faction->num_migrants += count - u->number;
+  }
+  
   if (playerrace(u->race)) {
     u->faction->num_people += count - u->number;
   }
-	u->number = (short)count;
+  u->number = (unsigned short)count;
 }
 
 boolean
