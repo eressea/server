@@ -1553,6 +1553,7 @@ readfaction(FILE * F)
     log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), email));
     set_email(&f->email, "");
   }
+  free(email);
   rds(F, &f->passw);
   if (global.data_version >= OVERRIDE_VERSION) {
     rds(F, &f->override);
