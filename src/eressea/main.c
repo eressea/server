@@ -40,6 +40,7 @@
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
 #include <modules/infocmd.h>
+#include <modules/autoseed.h>
 #ifdef MUSEUM_MODULE
 #include <modules/museum.h>
 #endif
@@ -96,6 +97,8 @@
 #include <time.h>
 #include <locale.h>
 
+#define ISLANDSIZE 20
+
 /**
  ** global variables we are importing from other modules
  **/
@@ -105,6 +108,7 @@ extern char * g_basedir;
 extern char * g_resourcedir;
 
 extern boolean nonr;
+extern boolean nosh;
 extern boolean nocr;
 extern boolean noreports;
 extern boolean nomer;
@@ -277,6 +281,7 @@ static int
 processturn(char *filename)
 {
 	struct summary * begin, * end;
+  newfaction * players;
 	int i;
 
   if (turn == 0) srand(time((time_t *) NULL));
@@ -303,6 +308,14 @@ processturn(char *filename)
     plan_monsters();
   }
 	processorders();
+  sprintf(buf, "%s/newfactions", basepath());
+  players = read_newfactions(filename);
+  while (players) {
+    int n = listlen(players);
+    int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
+    k = n / k;
+    autoseed(&players, k);
+  }
 	score();
 	remove_unequipped_guarded();
 	korrektur_end();
@@ -438,6 +451,7 @@ usage(const char * prog, const char * arg)
 		"--debug          : schreibt Debug-Ausgaben in die Datei debug\n"
 		"--nocr           : keine CRs\n"
 		"--nonr           : keine Reports\n"
+    "--nosh           : keine Mail-skripte\n"
 		"--crabsolute     : absolute Koordinaten im CR\n"
 		"--help           : help\n", prog);
 	return -1;
@@ -464,6 +478,7 @@ read_args(int argc, char **argv)
 			else if (strcmp(argv[i]+2, "xml")==0) xmlfile = argv[++i];
 			else if (strcmp(argv[i]+2, "dirtyload")==0) dirtyload = true;
 			else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
+      else if (strcmp(argv[i]+2, "nosh")==0) nosh = true;
 			else if (strcmp(argv[i]+2, "lomem")==0) lomem = true;
 			else if (strcmp(argv[i]+2, "noeiswald")==0) g_killeiswald = true;
 			else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
