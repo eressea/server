@@ -69,20 +69,19 @@ typedef struct unit {
 	struct unit *next; /* needs to be first entry, for region's unitlist */
 	struct unit *nexthash;
 	struct unit *nextF; /* nächste Einheit der Partei */
-	struct unit *prevF; /* letzte Einheit der Partei */
 	struct region *region;
-	int no;
+  int no;
+  int hp;
 	char *name;
 	char *display;
-	int number;
-	int hp;
-	short age;
 	struct faction *faction;
 	struct building *building;
 	struct ship *ship;
+  short age;
+  short number;
 
 	/* skill data */
-	int skill_size;
+	short skill_size;
 	struct skill *skills;
 	struct item * items;
 	struct reservation {

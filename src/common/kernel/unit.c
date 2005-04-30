@@ -46,9 +46,10 @@
 #include <resolve.h>
 
 /* libc includes */
-#include <string.h>
 #include <assert.h>
+#include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #define FIND_FOREIGN_TEMP
@@ -59,9 +60,10 @@ int demonfix = 0;
 const unit *
 u_peasants(void)
 {
-	static unit peasants = { NULL, NULL, NULL, NULL, NULL, 2, NULL };
+	static unit peasants = { 0 };
 	if (peasants.name==NULL) {
 		peasants.name = strdup("die Bauern");
+    peasants.no = 2;
 	}
 	return &peasants;
 }
@@ -69,9 +71,10 @@ u_peasants(void)
 const unit *
 u_unknown(void)
 {
-	static unit unknown = { NULL, NULL, NULL, NULL, NULL, 1, NULL };
+	static unit unknown = { 0 };
 	if (unknown.name==NULL) {
 		unknown.name =strdup("eine unbekannte Einheit");
+    unknown.no = 1;
 	}
 	return &unknown;
 }
@@ -805,6 +808,7 @@ void
 u_setfaction(unit * u, faction * f)
 {
 	int cnt = u->number;
+  unit ** iunit;
 	if (u->faction==f) return;
   if (u->faction) {
     set_number(u, 0);
@@ -818,20 +822,18 @@ u_setfaction(unit * u, faction * f)
     set_order(&u->lastorder, NULL);
 #endif
   }
-  if (u->prevF) u->prevF->nextF = u->nextF;
-	else if (u->faction) {
-		assert(u->faction->units==u);
-		u->faction->units = u->nextF;
-	}
-	if (u->nextF) u->nextF->prevF = u->prevF;
+
+  iunit = &f->units;
+  while (*iunit!=u) iunit=&(*iunit)->next;
+  assert(*iunit);
+
+  *iunit = u->nextF;
 
 	if (f!=NULL) {
 		u->nextF = f->units;
 		f->units = u;
 	}
 	else u->nextF = NULL;
-	if (u->nextF) u->nextF->prevF = u;
-	u->prevF = NULL;
 
   u->faction = f;
   if (u->region) update_interval(f, u->region);
@@ -847,6 +849,8 @@ void
 set_number(unit * u, int count)
 {
 	assert (count >= 0);
+  assert (count <= SHRT_MAX);
+
 #ifndef NDEBUG
 	assert (u->faction != 0 || u->number > 0);
 #endif
@@ -860,7 +864,7 @@ set_number(unit * u, int count)
   if (playerrace(u->race)) {
     u->faction->num_people += count - u->number;
   }
-	u->number = count;
+	u->number = (short)count;
 }
 
 boolean
