@@ -114,11 +114,11 @@ static int missile_range[2] = {FIGHT_ROW, BEHIND_ROW};
 static int melee_range[2] = {FIGHT_ROW, FIGHT_ROW};
 
 typedef struct armor_type {
-	double penalty;
-	double magres;
-	int prot;
-	char shield;
-	char item;
+  double penalty;
+  double magres;
+  int prot;
+  char shield;
+  char item;
 } armor_type;
 
 static armor_type armordata[AR_NONE + 1] =
@@ -3215,7 +3215,8 @@ free_side(side * si)
 static void
 free_fighter(fighter * fig)
 {
-	free(fig->person);
+  free(fig->person);
+  free(fig->weapons);    
 }
 
 static void
