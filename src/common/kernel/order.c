@@ -30,7 +30,8 @@ void
 copy_order(order * dst, const order * src)
 {
   if (dst->_str) free(dst->_str);
-  dst->_str = strdup(src->_str);
+  if (src->_str) dst->_str = strdup(src->_str);
+  else dst->_str = NULL;
   dst->_keyword = src->_keyword;
   dst->_lindex = src->_lindex;
   dst->_persistent = src->_persistent;
@@ -65,18 +66,18 @@ getcommand(const order * ord)
     }
   }
 #endif
-  strcpy(str, ord->_str);
+  if (ord->_str) strcpy(str, ord->_str);
   return strdup(sbuffer);
 }
 
 void 
 free_order(order * ord)
 {
-	if (ord!=NULL && --ord->_refcount==0) {
+  if (ord!=NULL && --ord->_refcount==0) {
     assert(ord->next==NULL);
-		if (ord->_str!=NULL) free(ord->_str);
-		free(ord);
-	}
+    if (ord->_str!=NULL) free(ord->_str);
+    free(ord);
+  }
 }
 
 order *
