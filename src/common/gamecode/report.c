@@ -96,6 +96,7 @@ extern int  months_per_year;
 
 boolean nocr = false;
 boolean nonr = false;
+boolean nosh = false;
 boolean nomer = false;
 boolean noreports = false;
 
@@ -2832,7 +2833,7 @@ reports(void)
     if (f->no != MONSTER_FACTION) {
       int error = write_reports(f, ltime);
       if (error) retval = error;
-      if (f->email && BAT) {
+      if (!nosh && f->email && BAT) {
         sprintf(buf, "%s/%s.sh", reportpath(), factionid(f));
         shfp = fopen(buf, "w");
         fprintf(shfp,"#!/bin/sh\n\nPATH=%s\n\n",MailitPath());
@@ -2846,36 +2847,14 @@ reports(void)
 
         if (f->options & REPORT_ZIP) {
 
-          if(f->age == 1) {
-#if KEEP_UNZIPPED == 1
-            fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -j -9 -@ %d-%s.zip\n",
-                    turn, factionid(f), 
-                    turn, factionid(f), 
-                    turn, factionid(f), 
-                    turn, factionid(f));
-#else
-            fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
-                    turn, factionid(f), 
-                    turn, factionid(f), 
-                    turn, factionid(f), 
-                    turn, factionid(f));
-#endif
-            fprintf(BAT, "zip -j -9 %d-%s.zip ../res/%s/%s/welcome.txt\n", 
-                    turn, factionid(f), global.welcomepath, locale_name(f->locale));
-          } else {
-#if KEEP_UNZIPPED == 1
-            fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -j -9 -@ %d-%s.zip\n",
-                    turn, factionid(f), 
-                    turn, factionid(f), 
-                    turn, factionid(f), 
-                    turn, factionid(f));
-#else
-            fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
-                    turn, factionid(f), 
-                    turn, factionid(f), 
-                    turn, factionid(f), 
-                    turn, factionid(f));
-#endif
+          fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
+                  turn, factionid(f), 
+                  turn, factionid(f), 
+                  turn, factionid(f), 
+                  turn, factionid(f));
+          if (f->age == 1) {
+            fprintf(BAT, "zip -j -9 %d-%s.zip %s/%s/%s/welcome.txt\n", 
+                    turn, factionid(f), resourcepath(), global.welcomepath, locale_name(f->locale));
           }
           
           fprintf(shfp, "eresseamail.zipped $addr \"%s %s\" \"%d-%s.zip\" "
@@ -2887,7 +2866,8 @@ reports(void)
           
           if (f->age == 1) {
             fprintf(shfp,
-                    " \\\n\t\"text/plain\" \"Willkommen\" ../res/%s/%s/welcome.txt", global.welcomepath, locale_name(f->locale));
+                    " \\\n\t\"text/plain\" \"Willkommen\" %s/%s/%s/welcome.txt", 
+                    resourcepath(), global.welcomepath, locale_name(f->locale));
           }
           
           fprintf(BAT, "bzip2 -9v `ls %d-%s.nr %d-%s.txt %d-%s.cr`\n",
@@ -2917,7 +2897,8 @@ reports(void)
           
           if (f->age == 1) {
             fprintf(shfp,
-                    " \\\n\t\"text/plain\" \"Willkommen\" ../res/%s/%s/welcome.txt", global.welcomepath, locale_name(f->locale));
+                    " \\\n\t\"text/plain\" \"Willkommen\" %s/%s/%s/welcome.txt", 
+                    resourcepath(), global.welcomepath, locale_name(f->locale));
           }
           
           if (!nonr && f->options & REPORT_NR)
