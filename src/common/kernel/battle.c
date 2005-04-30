@@ -3215,8 +3215,14 @@ free_side(side * si)
 static void
 free_fighter(fighter * fig)
 {
+  while (fig->loot) {
+    item * itm = fig->loot;
+    fig->loot = itm->next;
+    i_free(itm);
+  }
   free(fig->person);
-  free(fig->weapons);    
+  free(fig->weapons);
+  
 }
 
 static void
