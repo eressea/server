@@ -3216,9 +3216,7 @@ static void
 free_fighter(fighter * fig)
 {
   while (fig->loot) {
-    item * itm = fig->loot;
-    fig->loot = itm->next;
-    i_free(itm);
+    i_free(i_remove(&fig->loot, fig->loot));
   }
   free(fig->person);
   free(fig->weapons);
