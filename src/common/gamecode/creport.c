@@ -864,19 +864,17 @@ cr_output_unit(FILE * F, const region * r,
 		}
 		fprintf(F, "%d;%s\n", in, add_translation(ic, locale_string(f->locale, ic)));
 	}
-    if (show!=u->items) {
-	/* free the temporary items */
-	while (show) {
-	    item * ishow = show;
-	    show = show->next;
-	    i_free(ishow);
-	}
+  if (show!=u->items) {
+    /* free the temporary items */
+    while (show) {
+      i_free(i_remove(&show, show));
     }
+  }
     
-	if ((u->faction == f || omniscient(f)) && u->botschaften)
-		cr_output_str_list(F, "EINHEITSBOTSCHAFTEN", u->botschaften, f);
-
-	print_curses(F, f, u, TYP_UNIT);
+  if ((u->faction == f || omniscient(f)) && u->botschaften)
+      cr_output_str_list(F, "EINHEITSBOTSCHAFTEN", u->botschaften, f);
+  
+  print_curses(F, f, u, TYP_UNIT);
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 

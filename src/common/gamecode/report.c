@@ -2832,7 +2832,7 @@ reports(void)
     if (f->no != MONSTER_FACTION) {
       int error = write_reports(f, ltime);
       if (error) retval = error;
-      if (!nosh && f->email && BAT) {
+      if (f->email && BAT) {
         sprintf(buf, "%s/%s.sh", reportpath(), factionid(f));
         shfp = fopen(buf, "w");
         fprintf(shfp,"#!/bin/sh\n\nPATH=%s\n\n",MailitPath());
