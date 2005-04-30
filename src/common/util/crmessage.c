@@ -15,6 +15,7 @@
 #include "crmessage.h"
 
 #include "message.h"
+#include "goodies.h"
 #include "log.h"
 
 #include <stdio.h>
@@ -61,49 +62,52 @@ tsf_register(const char * name, tostring_f fun)
 
 /** crmesssage **/
 typedef struct crmessage_type {
-	const struct message_type * mtype;
-	tostring_f * renderers;
-	struct crmessage_type * next;
+  const struct message_type * mtype;
+  tostring_f * renderers;
+  struct crmessage_type * next;
 } crmessage_type;
 
-static crmessage_type * messagetypes;
+#define CRMAXHASH 63
+static crmessage_type * messagetypes[CRMAXHASH];
 
 static crmessage_type *
 crt_find(const struct message_type * mtype)
 {
-	crmessage_type * found = NULL;
-	crmessage_type * type = messagetypes;
-	while (type) {
-		if (type->mtype==mtype) found = type;
-		type = type->next;
-	}
-	return found;
+  unsigned int hash = hashstring(mtype->name) % CRMAXHASH;
+  crmessage_type * found = NULL;
+  crmessage_type * type = messagetypes[hash];
+  while (type) {
+    if (type->mtype==mtype) found = type;
+    type = type->next;
+  }
+  return found;
 }
 
 void
 crt_register(const struct message_type * mtype)
 {
-	crmessage_type * crt = messagetypes;
-	while (crt && crt->mtype!=mtype) {
-		crt = crt->next;
-	}
-	if (!crt) {
-		int i;
-		crt = malloc(sizeof(crmessage_type));
-		crt->mtype = mtype;
-		crt->next = messagetypes;
-		messagetypes = crt;
-		if(mtype->nparameters > 0) {
-			crt->renderers = malloc(sizeof(tostring_f)*mtype->nparameters);
-		} else {
-			crt->renderers = NULL;
-		}
-
-		/* can be scrapped for memory vs. speed */
-		for (i=0;i!=mtype->nparameters;++i) {
-			crt->renderers[i] = tsf_find(mtype->types[i]);
-		}
-	}
+  unsigned int hash = hashstring(mtype->name) % CRMAXHASH;
+  crmessage_type * crt = messagetypes[hash];
+  while (crt && crt->mtype!=mtype) {
+    crt = crt->next;
+  }
+  if (!crt) {
+    int i;
+    crt = malloc(sizeof(crmessage_type));
+    crt->mtype = mtype;
+    crt->next = messagetypes[hash];
+    messagetypes[hash] = crt;
+    if(mtype->nparameters > 0) {
+      crt->renderers = malloc(sizeof(tostring_f)*mtype->nparameters);
+    } else {
+      crt->renderers = NULL;
+    }
+    
+    /* can be scrapped for memory vs. speed */
+    for (i=0;i!=mtype->nparameters;++i) {
+      crt->renderers[i] = tsf_find(mtype->types[i]);
+    }
+  }
 }
 
 int
