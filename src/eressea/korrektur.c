@@ -988,6 +988,28 @@ fix_familiars(void)
   return 0;
 }
 
+#define REPORT_NR (1 << O_REPORT)
+#define REPORT_CR (1 << O_COMPUTER)
+#define REPORT_ZV (1 << O_ZUGVORLAGE)
+
+static int
+disable_templates(void)
+{
+  faction * f;
+  for (f=factions;f;f=f->next) {
+    if (f->options & REPORT_CR) {
+      f->options &= ~REPORT_ZV;
+    }
+  }
+  return 0;
+}
+
+static int
+nothing(void)
+{
+  return 0;
+}
+
 void
 korrektur(void)
 {
@@ -996,6 +1018,12 @@ korrektur(void)
 #if TEST_LOCALES
 	setup_locales();
 #endif
+  if (turn>400) {
+    do_once("zvrm", disable_templates());
+  } else {
+    do_once("zvrm", nothing());
+  }
+
 	fix_astralplane();
 	fix_firewalls();
 	fix_gates();
