@@ -164,6 +164,7 @@ report_segfault(int signo, siginfo_t * sinf, void * arg)
   size_t size;
   int fd = fileno(stderr);
 
+  fflush(stdout);
   fputs("\n\nProgram received SIGSEGV, backtrace follows.\n", stderr);
   size = backtrace(btrace, 50);
   backtrace_symbols_fd(btrace, size, fd);

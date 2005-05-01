@@ -74,17 +74,18 @@ enum {
 };
 
 typedef struct seen_region {
-	struct seen_region * nextHash;
-	const struct region *r;
-	unsigned char mode;
-	boolean disbelieves;
+  struct seen_region * nextHash;
+  struct region *r;
+  unsigned char mode;
+  boolean disbelieves;
 } seen_region;
 
 extern struct seen_region * find_seen(struct seen_region * seehash[], const struct region * r);
-extern boolean add_seen(struct seen_region * seehash[], const struct region * r, unsigned char mode, boolean dis);
+extern boolean add_seen(struct seen_region * seehash[], struct region * r, unsigned char mode, boolean dis);
 extern struct seen_region ** seen_init(void);
 extern void seen_done(struct seen_region * seehash[]);
 extern void free_seen(void);
+extern void get_seen_interval(struct seen_region ** seen, struct region ** first, struct region ** last);
   
 extern const char* resname(resource_t res, int i);
 

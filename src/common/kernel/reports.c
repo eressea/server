@@ -966,8 +966,46 @@ find_seen(struct seen_region * seehash[], const region * r)
 	return NULL;
 }
 
+void
+get_seen_interval(struct seen_region ** seen, region ** first, region ** last)
+{
+  /* this is required to find the neighbour regions of the ones we are in,
+   * which may well be outside of [firstregion, lastregion) */
+#ifdef ENUM_REGIONS
+  int i;
+  for (i=0;i!=MAXSEEHASH;++i) {
+    seen_region * sr = seen[i];
+    while (sr!=NULL) {
+      if (*first==NULL || sr->r->index<(*first)->index) {
+        *first = sr->r;
+      }
+      if (*last!=NULL && sr->r->index>=(*last)->index) {
+        *last = sr->r->next;
+      }
+      sr = sr->nextHash;
+    }
+  }
+#else
+  region * r = regions;
+  while (r!=first) {
+    if (find_seen(seen, r)!=NULL) {
+      *first = r;
+      break;
+    }
+    r = r->next;
+  }
+  r = *last;
+  while (r!=NULL) {
+    if (find_seen(seen, r)!=NULL) {
+      *last = r->next;
+    }
+    r = r->next;
+  }
+#endif
+}
+
 boolean
-add_seen(struct seen_region * seehash[], const struct region * r, unsigned char mode, boolean dis)
+add_seen(struct seen_region * seehash[], struct region * r, unsigned char mode, boolean dis)
 {
 	seen_region * find = find_seen(seehash, r);
 	if (find==NULL) {

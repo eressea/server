@@ -1073,48 +1073,27 @@ cr_borders(seen_region ** seen, const region * r, const faction * f, int seemode
 	}
 }
 
-void
-get_seen_interval(struct seen_region ** seen, region ** first, region ** last)
-{
-/* #ifdef ENUM_REGIONS : can speed stuff up */
-
-  region * r = regions;
-  while (r!=NULL) {
-    if (find_seen(seen, r)!=NULL) {
-      *first = r;
-      break;
-    }
-    r = r->next;
-  }
-  while (r!=NULL) {
-    if (find_seen(seen, r)!=NULL) {
-      *last = r->next;
-    }
-    r = r->next;
-  }
-}
-
 /* main function of the creport. creates the header and traverses all regions */
 int
 report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction_list * addresses, 
                 const time_t report_time)
 {
-	int i;
+  int i;
   item * itm;
   const char * prefix;
   region * r;
-	building *b;
-	ship *sh;
-	unit *u;
+  building *b;
+  ship *sh;
+  unit *u;
   int score = 0, avgscore = 0;
-	const char * mailto = locale_string(f->locale, "mailto");
-  region * first = NULL, * last = NULL;
-	const attrib * a;
+  const char * mailto = locale_string(f->locale, "mailto");
+  region * first = firstregion(f), * last = lastregion(f);
+  const attrib * a;
 
+  /* must call this to get all the neighbour regions */
   get_seen_interval(seen, &first, &last);
-
-	/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
-	/* initialisations, header and lists */
+  /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
+  /* initialisations, header and lists */
 
   fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
   fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
@@ -1255,12 +1234,12 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 		}
 	}
 
-	/* traverse all regions */
-	for (r=first;r!=last;r=r->next) {
-		int modifier = 0;
-		const char * tname;
+  /* traverse all regions */
+  for (r=first;r!=last;r=r->next) {
+    int modifier = 0;
+    const char * tname;
     const seen_region * sd = find_seen(seen, r);
-
+    
     if (sd==NULL) continue;
 		
 		if (!rplane(r)) {
