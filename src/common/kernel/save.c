@@ -479,7 +479,24 @@ unitorders(FILE * F, struct faction * f)
 			printf(",_%4s_", itoa36(u->no));
 			fflush(stdout);
 		}
-    free_orders(&u->orders);
+
+    if (!fval(u, UFL_ORDERS)) {
+      /* alle wiederholbaren, langen befehle werden gesichert: */
+      fset(u, UFL_ORDERS);
+      u->old_orders = u->orders;
+      ordp = &u->old_orders;
+      while (*ordp) {
+        order * ord = *ordp;
+        if (!is_repeated(ord)) {
+          ordp = &ord->next;
+          free_order(ord);
+        } else {
+          ordp = &ord->next;
+        }
+      }
+    } else {
+      free_orders(&u->orders);
+    }
     u->orders = 0;
 
     ordp = &u->orders;
@@ -1221,6 +1238,12 @@ writeunit(FILE * F, const unit * u)
 	wi(F, u->status);
 	wi(F, u->flags & UFL_SAVEMASK);
 	wnl(F);
+#ifndef LASTORDER
+  for (ord = u->old_orders; ord; ord=ord->next) {
+    fwriteorder(F, ord, u->faction->locale);
+    fputc(' ', F);
+  }
+#endif
 	for (ord = u->orders; ord; ord=ord->next) {
 	  if (is_persistent(ord)) {
       fwriteorder(F, ord, u->faction->locale);

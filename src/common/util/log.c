@@ -30,6 +30,7 @@ log_flush(void)
 void
 log_puts(const char * str)
 {
+  fflush(stdout);
   if (!logfile) logfile = stderr;
   fputs(str, logfile);
 }
@@ -78,6 +79,7 @@ void
 _log_warn(const char * format, ...)
 {
   va_list marker;
+  fflush(stdout);
   if (!logfile) logfile = stderr;
   fputs("WARNING: ", logfile);
   va_start(marker, format);
@@ -100,6 +102,7 @@ void
 _log_error(const char * format, ...)
 {
   va_list marker;
+  fflush(stdout);
   if (!logfile) logfile = stderr;
 
   fputs("ERROR: ", logfile);
@@ -114,13 +117,14 @@ _log_error(const char * format, ...)
       va_end(marker);
     }
     log_flush();
-    }
   }
+}
 
 void 
 _log_info(unsigned int flag, const char * format, ...)
 {
   va_list marker;
+  fflush(stdout);
   if (!logfile) logfile = stderr;
 
   fprintf(logfile, "INFO[%u]: ", flag);

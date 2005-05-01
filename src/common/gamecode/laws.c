@@ -3422,6 +3422,12 @@ setdefaults (void)
 #endif
       /* check all orders for a potential new long order this round: */
       for (ord = u->orders; ord; ord = ord->next) {
+#ifndef LASTORDER
+        if (u->old_orders && is_repeated(ord)) {
+          /* this new order will replace the old defaults */
+          free_orders(&u->old_orders);
+        }
+#endif
         if (is_exclusive(ord)) {
           /* Über dieser Zeile nur Befehle, die auch eine idle Faction machen darf */
           if (idle(u->faction)) {

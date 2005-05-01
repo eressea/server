@@ -50,7 +50,7 @@ struct skill;
 #define UFL_TRADER        (1<<20) /* Händler, pseudolang */
 
 #define UFL_NOAID         (1<<22) /* Einheit hat Noaid-Status */
-
+#define UFL_ORDERS        (1<<24) /* Einheit hat Befehle erhalten */
 #define UFL_TAKEALL       (1<<25) /* Einheit nimmt alle Gegenstände an */
 
 /* Flags, die gespeichert werden sollen: */
@@ -92,10 +92,12 @@ typedef struct unit {
 	} * reservations;
 
 	/* orders */
-	struct order *orders;
+	struct order * orders;
 	struct order * thisorder;
 #ifdef LASTORDER
 	struct order * lastorder;
+#else
+  struct order * old_orders;
 #endif
 
 	/* race and illusionary race */

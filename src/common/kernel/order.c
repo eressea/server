@@ -167,6 +167,66 @@ parse_order(const char * s, const struct locale * lang)
 }
 
 boolean
+is_repeated(const order * ord)
+{
+  const struct locale * lang = locale_array[ord->_lindex];
+  param_t param;
+
+  switch (ord->_keyword) {
+    case K_CAST:
+    case K_BUY:
+    case K_SELL:
+    case K_ROUTE:
+    case K_DRIVE:
+    case K_WORK:
+    case K_BESIEGE:
+    case K_ENTERTAIN:
+    case K_TAX:
+    case K_RESEARCH:
+    case K_SPY:
+    case K_STEAL:
+    case K_SABOTAGE:
+    case K_STUDY:
+    case K_TEACH:
+    case K_ZUECHTE:
+    case K_PIRACY:
+      return true;
+
+#if GROWING_TREES
+    case K_PFLANZE:
+      return true;
+#endif
+
+    case K_FOLLOW:
+      /* FOLLOW is only a long order if we are following a ship. */
+      parser_pushstate();
+      init_tokens(ord);
+      skip_token();
+      param = getparam(lang);
+      parser_popstate();
+
+      if (param == P_SHIP) return true;
+      break;
+
+    case K_MAKE:
+      /* Falls wir MACHE TEMP haben, ignorieren wir es. Alle anderen
+      * Arten von MACHE zaehlen aber als neue defaults und werden
+      * behandelt wie die anderen (deswegen kein break nach case
+      * K_MAKE) - und in thisorder (der aktuelle 30-Tage Befehl)
+      * abgespeichert). */
+      parser_pushstate();
+      init_tokens(ord); /* initialize token-parser */
+      skip_token();
+      param = getparam(lang);
+      parser_popstate();
+
+      if (param != P_TEMP) return true;
+      break;
+  }
+  return false;
+}
+
+boolean
 is_exclusive(const order * ord)
 {
   const struct locale * lang = locale_array[ord->_lindex];
@@ -242,7 +302,7 @@ is_persistent(const order * ord)
       return true;
 	}
 
-	return persist || is_exclusive(ord);
+	return persist || is_repeated(ord);
 }
 
 char * 

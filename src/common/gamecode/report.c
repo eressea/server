@@ -1665,6 +1665,15 @@ order_template(FILE * F, faction * f)
         rps_nowrap(F, buf);
         rnl(F);
 
+#ifndef LASTORDER
+        for (ord = u->old_orders; ord; ord = ord->next) {
+          /* this new order will replace the old defaults */
+          strcpy(buf, "   ");
+          write_order(ord, u->faction->locale, buf+2, sizeof(buf)-2);
+          rps_nowrap(F, buf);
+          rnl(F);
+        }
+#endif
         for (ord = u->orders; ord; ord = ord->next) {
           if (is_persistent(ord)) {
             strcpy(buf, "   ");

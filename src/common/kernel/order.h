@@ -50,6 +50,8 @@ extern void set_order(struct order ** destp, struct order * src);
 extern char * getcommand(const struct order * ord);
 extern boolean is_persistent(const struct order *ord);
 extern boolean is_exclusive(const struct order *ord);
+extern boolean is_repeated(const order * ord);
+
 extern char * write_order(const struct order * ord, const struct locale * lang, char * buffer, size_t size);
 #ifdef __cplusplus
 }

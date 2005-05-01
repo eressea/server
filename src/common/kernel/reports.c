@@ -179,12 +179,13 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   item * itm;
   item * show;
   faction *fv = visible_faction(f, u);
+  char * bufp = buf;
 
   if (fspecial(u->faction, FS_HIDDEN))
     a_fshidden = a_find(u->attribs, &at_fshidden);
 
-  strcpy(buf, unitname(u));
-
+  strcpy(bufp, unitname(u));
+  bufp += strlen(bufp);
 
   if (!isbattle) {
     attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
@@ -192,21 +193,27 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
       attrib *a = a_find(u->attribs, &at_group);
       if (a) {
         group * g = (group*)a->data.v;
-        scat(", ");
-        scat(groupid(g, f));
+        strcat(bufp, ", ");
+        strcat(bufp + 2, groupid(g, f));
+        bufp += strlen(bufp);
       }
       if (getarnt) {
-        scat(", "); scat(LOC(f->locale, "anonymous"));
+        strcat(bufp, ", ");
+        strcat(bufp + 2, LOC(f->locale, "anonymous"));
+        bufp += 2 + strlen(bufp);
       } else if (a_otherfaction) {
         faction * otherfaction = get_otherfaction(a_otherfaction);
         if (otherfaction) {
-          scat(", ");
-          scat(factionname(otherfaction));
+          strcat(bufp, ", ");
+          strcat(bufp + 2, factionname(otherfaction));
+          bufp += 2 + strlen(bufp);
         }
       }
     } else {
       if (getarnt) {
-        scat(", "); scat(LOC(f->locale, "anonymous"));
+        strcat(bufp, ", ");
+        strcat(bufp + 2, LOC(f->locale, "anonymous"));
+        bufp += 2 + strlen(bufp);
       } else {
         scat(", ");
         if(a_otherfaction
