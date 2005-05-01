@@ -1307,7 +1307,7 @@ boolean
 parser_end(void)
 {
   while (isspace(*state->current_token)) ++state->current_token;
-  return *state->current_token == NULL;
+  return *state->current_token == 0;
 }
 
 void 
