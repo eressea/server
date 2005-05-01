@@ -1303,6 +1303,13 @@ parser_popstate(void)
   state = new_state;
 }
 
+boolean
+parser_end(void)
+{
+  while (isspace(*state->current_token)) ++state->current_token;
+  return *state->current_token == NULL;
+}
+
 void 
 skip_token(void)
 {

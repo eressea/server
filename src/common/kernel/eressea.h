@@ -947,6 +947,7 @@ extern void skip_token(void);
 extern const char * parse_token(const char ** str);
 extern void parser_pushstate(void);
 extern void parser_popstate(void);
+extern boolean parser_end(void);
 
 extern skill_t findskill(const char *s, const struct locale * lang);
 

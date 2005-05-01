@@ -243,7 +243,6 @@ teach(unit * u, struct order * ord)
   region * r = u->region;
   int teaching, i, j, count, academy=0;
   unit *u2;
-  const char *s;
   skill_t sk = NOSKILL;
 
   if ((u->race->flags & RCF_NOTEACH) || fval(u, UFL_WERE)) {
@@ -340,68 +339,49 @@ teach(unit * u, struct order * ord)
     skip_token();
 
     strcpy(zOrder, locale_string(u->faction->locale, keywords[K_TEACH]));
-    for (;;) {
 
-      u2 = getunit(r, u->faction);
+    while (!parser_end()) {
+      unit * u2 = getunit(r, u->faction);
+      ++count;
 
-      /* Falls keine Unit gefunden, abbrechen - außer es gibt überhaupt keine
-      * Unit, dann gibt es zusätzlich noch einen Fehler */
+      /* Falls die Unit nicht gefunden wird, Fehler melden */
 
       if (!u2) {
-
+        const char * token;
         /* Finde den string, der den Fehler verursacht hat */
         parser_pushstate();
         init_tokens(ord);
         skip_token();
-        for (j = count; j; j--) {
+
+        for (j=0; j!=count-1; ++j) {
           /* skip over the first 'count' units */
           getunit(r, u->faction);
         }
 
-        s = getstrtoken();
-
-        if (!s[0]) {
-          /* Falls es keinen String gibt, ist einfach nur die Liste der Einheiten
-          * zu ende. dann raus hier */
-          parser_popstate();
-          break;
-        }
+        token = getstrtoken();
 
         /* Beginne die Fehlermeldung */
-
         strcpy(buf, "Die Einheit '");
 
-        if (findparam(s, u->faction->locale) == P_TEMP) {
+        if (findparam(token, u->faction->locale) == P_TEMP) {
           /* Für: "Die Einheit 'TEMP ZET' wurde nicht gefunden" oder "Die Einheit
           * 'TEMP' wurde nicht gefunden" */
-
-          scat(s);
-          s = getstrtoken();
-          if (s[0])
-            scat(" ");
-
-          /* count++; -- unnötig/alt? Um nachher weiter einlesen zu koennen */
-          
+          scat(token);
+          token = getstrtoken();
+          if (*token) scat(" ");
         }
-        scat(s);
+        scat(token);
         scat("' wurde nicht gefunden");
         mistake(u, ord, buf, MSG_EVENT);
 
-        count++;
         parser_popstate();
         continue;
       }
-      /* Defaultorder zusammenbauen. TEMP-Einheiten werden automatisch in
-      * ihre neuen Nummern übersetzt. */
+
+      /* Neuen Befehl zusammenbauen. TEMP-Einheiten werden automatisch in
+       * ihre neuen Nummern übersetzt. */
       strcat(zOrder, " ");
       strcat(zOrder, unitid(u2));
-
-      /* Wir müssen nun hochzählen, wieviele Einheiten wir schon abgearbeitet
-      * haben, damit mit getstrtoken() die richtige Einheit geholt werden kann.
-      * Falls u2 ein Alias hat, ist sie neu, und es wurde ein TEMP verwendet, um
-      * sie zu beschreiben. */
-
-      count++;
 
       if (get_keyword(u2->thisorder) != K_STUDY) {
         add_message(&u->faction->msgs,
