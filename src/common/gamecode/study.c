@@ -337,8 +337,6 @@ teach(unit * u, struct order * ord)
     order * new_order;
 
     strcpy(zOrder, locale_string(u->faction->locale, keywords[K_TEACH]));
-    init_tokens(ord);
-    skip_token();
     for (;;) {
 
       u2 = getunit(r, u->faction);
@@ -407,10 +405,14 @@ teach(unit * u, struct order * ord)
           msg_feedback(u, ord, "teach_nolearn", "student", u2));
         continue;
       }
+
       /* Input ist nun von u2->thisorder !! */
+      parser_pushstate();
       init_tokens(u2->thisorder);
       skip_token();
       sk = getskill(u2->faction->locale);
+      parser_pushstate();
+
       if (sk == NOSKILL) {
         add_message(&u->faction->msgs,
           msg_feedback(u, ord, "teach_nolearn", "student", u2));
