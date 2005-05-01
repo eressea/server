@@ -489,6 +489,7 @@ unitorders(FILE * F, struct faction * f)
         order * ord = *ordp;
         if (!is_repeated(ord)) {
           *ordp = ord->next;
+          ord->next = NULL;
           free_order(ord);
         } else {
           ordp = &ord->next;

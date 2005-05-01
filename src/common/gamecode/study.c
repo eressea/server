@@ -411,7 +411,7 @@ teach(unit * u, struct order * ord)
       init_tokens(u2->thisorder);
       skip_token();
       sk = getskill(u2->faction->locale);
-      parser_pushstate();
+      parser_popstate();
 
       if (sk == NOSKILL) {
         add_message(&u->faction->msgs,
