@@ -336,6 +336,9 @@ teach(unit * u, struct order * ord)
     static char zOrder[BUFSIZE];
     order * new_order;
 
+    init_tokens(ord);
+    skip_token();
+
     strcpy(zOrder, locale_string(u->faction->locale, keywords[K_TEACH]));
     for (;;) {
 
