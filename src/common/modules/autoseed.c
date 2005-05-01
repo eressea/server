@@ -514,7 +514,7 @@ autoseed(newfaction ** players, int nsize)
     --rsize;
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * rn = rconnect(r, d);
-      if (fval(rn, FL_MARK)) continue;
+      if (rn && fval(rn, FL_MARK)) continue;
       if (virgin_region(rn)) {
         if (rn==NULL) {
           rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
