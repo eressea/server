@@ -497,24 +497,31 @@ autoseed(newfaction ** players, int nsize)
   }
 
   add_regionlist(&rlist, r);
+  fset(r, FL_MARK);
   rsize = 1;
 
   while (rsize && (nsize || isize>=REGIONS_PER_FACTION)) {
     int i = rand() % rsize;
     region_list ** rnext = &rlist;
+    region_list * rfind;
     direction_t d;
     while (i--) rnext=&(*rnext)->next;
-    r = (*rnext)->data;
-    *rnext = (*rnext)->next;
+    rfind = *rnext;
+    r = rfind->data;
+    freset(r, FL_MARK);
+    *rnext = rfind->next;
+    free(rfind);
     --rsize;
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * rn = rconnect(r, d);
+      if (fval(rn, FL_MARK)) continue;
       if (virgin_region(rn)) {
         if (rn==NULL) {
           rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
           terraform(rn, T_OCEAN);
         }
         add_regionlist(&rlist, rn);
+        fset(rn, FL_MARK);
         ++rsize;
       }
     }
@@ -558,6 +565,13 @@ autoseed(newfaction ** players, int nsize)
       terraform(r, (terrain_t)((rand() % T_GLACIER)+1));
       --isize;
     }
+  }
+
+  while (rlist) {
+    region_list * self = rlist;
+    rlist = rlist->next;
+    freset(self->data, FL_MARK);
+    free(self);
   }
 
   if (r!=NULL) {
