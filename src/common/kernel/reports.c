@@ -58,6 +58,13 @@
 
 const char * g_reportdir;
 
+static size_t
+strlcpy(char * dst, const char * src) {
+  size_t s = 0;
+  while ((*dst++ = *src++)!=0) ++s;
+  return s;
+}
+
 const char *neue_gebiete[] = {
 	"none",
 	"illaun",
@@ -184,8 +191,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   if (fspecial(u->faction, FS_HIDDEN))
     a_fshidden = a_find(u->attribs, &at_fshidden);
 
-  strcpy(bufp, unitname(u));
-  bufp += strlen(bufp);
+  bufp += strlcpy(bufp, unitname(u));
 
   if (!isbattle) {
     attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
@@ -193,124 +199,116 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
       attrib *a = a_find(u->attribs, &at_group);
       if (a) {
         group * g = (group*)a->data.v;
-        strcat(bufp, ", ");
-        strcat(bufp + 2, groupid(g, f));
-        bufp += strlen(bufp);
+        bufp += strlcpy(bufp, ", ");
+        bufp += strlcpy(bufp, groupid(g, f));
       }
       if (getarnt) {
-        strcat(bufp, ", ");
-        strcat(bufp + 2, LOC(f->locale, "anonymous"));
-        bufp += 2 + strlen(bufp);
+        bufp += strlcpy(bufp, ", ");
+        bufp += strlcpy(bufp, LOC(f->locale, "anonymous"));
       } else if (a_otherfaction) {
         faction * otherfaction = get_otherfaction(a_otherfaction);
         if (otherfaction) {
-          strcat(bufp, ", ");
-          strcat(bufp + 2, factionname(otherfaction));
-          bufp += 2 + strlen(bufp);
+          bufp += strlcpy(bufp, ", ");
+          bufp += strlcpy(bufp, factionname(otherfaction));
         }
       }
     } else {
       if (getarnt) {
-        strcat(bufp, ", ");
-        strcat(bufp + 2, LOC(f->locale, "anonymous"));
-        bufp += 2 + strlen(bufp);
+        bufp += strlcpy(bufp, ", ");
+        bufp += strlcpy(bufp, LOC(f->locale, "anonymous"));
       } else {
-        scat(", ");
-        if(a_otherfaction
-          && alliedunit(u, f, HELP_FSTEALTH)) {
-            scat(factionname(get_otherfaction(a_otherfaction)));
-            scat(" (");
-            scat(factionname(u->faction));
-            scat(")");
-          } else {
-            scat(factionname(fv));
-          }
+        if (a_otherfaction && alliedunit(u, f, HELP_FSTEALTH)) {
+          faction * f = get_otherfaction(a_otherfaction);
+          bufp += sprintf(bufp, ", %s (%s)", factionname(f), factionname(u->faction));
+        } else {
+          bufp += strlcpy(bufp, ", ");
+          bufp += strlcpy(bufp, factionname(fv));
+        }
       }
     }
   }
 #ifdef USE_UGROUPS
   if (u->faction == f) {
     attrib *a = a_find(u->attribs, &at_ugroup);
-    if(a) {
+    if (a) {
       ugroup *ug = findugroupid(u->faction, a->data.i);
-      if(is_ugroupleader(u, ug)) {
-        scat("*");
+      if (is_ugroupleader(u, ug)) {
+        strcpy(bufp++, "*");
       }
-      scat(itoa36(ug->id));
+      bufp += strlcpy(bufp, itoa36(ug->id));
     }
-    scat(", ");
   }
 #endif
 
-  scat(", ");
+  bufp += strlcpy(bufp, ", ");
 
   if (u->faction != f && a_fshidden && a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {
-    scat("? ");
+    bufp += strlcpy(bufp, "? ");
   } else {
-    icat(u->number);
-    scat(" ");
+    bufp += sprintf(bufp, "%d ", u->number);
   }
 
   pzTmp = get_racename(u->attribs);
   if (pzTmp) {
     scat(pzTmp);
     if (u->faction==f && fval(u->race, RCF_SHAPESHIFTANY)) {
-      scat(" (");
-      scat(racename(f->locale, u, u->race));
-      scat(")");
+      bufp += strlcpy(bufp, " (");
+      bufp += strlcpy(bufp, racename(f->locale, u, u->race));
+      strcpy(bufp++, ")");
     }
   } else {
-    scat(racename(f->locale, u, u->irace));
+    bufp += strlcpy(bufp, racename(f->locale, u, u->irace));
     if (u->faction==f && u->irace!=u->race) {
-      scat(" (");
-      scat(racename(f->locale, u, u->race));
-      scat(")");
+      bufp += strlcpy(bufp, " (");
+      bufp += strlcpy(bufp, racename(f->locale, u, u->race));
+      strcpy(bufp++, ")");
     }
   }
 
 #ifdef HEROES
   if (fval(u, UFL_HERO) && (u->faction == f || omniscient(f))) {
-    scat(", ");
-    scat(LOC(f->locale, "hero"));
+    bufp += strlcpy(bufp, ", ");
+    bufp += strlcpy(bufp, LOC(f->locale, "hero"));
   }
 #endif
   /* status */
 
   if (u->number && (u->faction == f || telepath_see || isbattle)) {
     const char * c = locale_string(f->locale, hp_status(u));
-    scat(", ");
-    scat(report_kampfstatus(u, f->locale));
+    bufp += strlcpy(bufp, ", ");
+    bufp += strlcpy(bufp, report_kampfstatus(u, f->locale));
     if (c || fval(u, UFL_HUNGER)) {
-      scat(" (");
-      if(c) scat(c);
-      if(fval(u, UFL_HUNGER)) {
-        if (c) scat(", hungert");
-        else  scat("hungert");
+      bufp += strlcpy(bufp, " (");
+      if (c) bufp += strlcpy(bufp, c);
+      if (fval(u, UFL_HUNGER)) {
+        if (c) bufp += strlcpy(bufp, ", hungert");
+        else bufp += strlcpy(bufp, "hungert");
       }
-      scat(")");
+      strcpy(bufp++, ")");
     }
   }
-  if (getguard(u)) scat(", bewacht die Region");
+  if (getguard(u)) bufp += strlcpy(bufp, ", bewacht die Region");
 
   if (u->faction==f || telepath_see) {
     attrib * a = a_find(u->attribs, &at_follow);
     if (a) {
       unit * uf = (unit*)a->data.v;
       if (uf) {
-        scat(", folgt ");
-        scat(itoa36(uf->no));
+        bufp += strlcpy(bufp, ", folgt ");
+        bufp += strlcpy(bufp, itoa36(uf->no));
       }
     }
   }
   if ((b = usiege(u))!=NULL) {
-    scat(", belagert ");
-    scat(buildingname(b));
+    bufp += strlcpy(bufp, ", belagert ");
+    bufp += strlcpy(bufp, buildingname(b));
   }
 
   dh = 0;
   if (u->faction == f || telepath_see) {
     for (sk = 0; sk != MAXSKILLS; sk++) {
       spskill(f->locale, u, sk, &dh, 1);
+      bufp += strlen(bufp);
     }
   }
 
@@ -350,18 +348,16 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
     int in;
     report_item(u, itm, f, &ic, NULL, &in, false);
     if (in==0 || ic==NULL) continue;
-    scat(", ");
+    bufp += strlcpy(bufp, ", ");
 
     if (!dh) {
-      sprintf(buf+strlen(buf), "%s: ", LOC(f->locale, "nr_inventory"));
+      bufp += sprintf(bufp, "%s: ", LOC(f->locale, "nr_inventory"));
       dh = 1;
     }
     if (in == 1) {
-      scat(ic);
+      bufp += strlcpy(bufp, ic);
     } else {
-      icat(in);
-      scat(" ");
-      scat(ic);
+      bufp += sprintf(bufp, "%d %s", in, ic);
     }
   }
   if (show!=u->items) while (show) i_free(i_remove(&show, show));
@@ -370,10 +366,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
     dh = 0;
 
     if (is_mage(u) == true) {
-      scat(". Aura ");
-      icat(get_spellpoints(u));
-      scat("/");
-      icat(max_spellpoints(u->region,u));
+      bufp += sprintf(bufp, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region,u));
       {
         spell_ptr *spt;
         int t = effskill(u, SK_MAGIC);
@@ -382,12 +375,12 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
           sp = find_spellbyid(spt->spellid);
           if (sp->level > t) continue;
           if (!dh) {
-            sprintf(buf+strlen(buf),", %s: ", LOC(f->locale, "nr_spells"));
+            bufp += sprintf(bufp, ", %s: ", LOC(f->locale, "nr_spells"));
             dh = 1;
           } else {
-            scat(", ");
+            bufp += strlcpy(bufp, ", ");
           }
-          scat(spell_name(sp, f->locale));
+          bufp += strlcpy(bufp, spell_name(sp, f->locale));
         }
       }
       dh = 0;
@@ -399,24 +392,22 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
       }
       if(dh){
         dh = 0;
-        sprintf(buf+strlen(buf),", %s: ", LOC(f->locale, "nr_combatspells"));
+        bufp += sprintf(bufp, ", %s: ", LOC(f->locale, "nr_combatspells"));
         for (i = 0; i < MAXCOMBATSPELLS; i++){
           if (!dh){
             dh = 1;
-          }else{
-            scat(", ");
+          } else {
+            bufp += strlcpy(bufp, ", ");
           }
           sp = get_combatspell(u,i);
           if (sp) {
             int sl;
-            scat(spell_name(sp, u->faction->locale));
-            if((sl = get_combatspelllevel(u,i)) > 0) {
-              scat(" (");
-              icat(sl);
-              scat(")");
+            bufp += strlcpy(bufp, spell_name(sp, u->faction->locale));
+            if ((sl = get_combatspelllevel(u,i)) > 0) {
+              bufp += sprintf(bufp, " (%d)", sl);
             }
-          }else{
-            scat(LOC(f->locale, "nr_nospells"));
+          } else {
+            bufp += strlcpy(bufp, LOC(f->locale, "nr_nospells"));
           }
         }
       }
@@ -424,9 +415,9 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 #ifdef LASTORDER
     if (!isbattle && u->lastorder) {
       char * cmd = getcommand(u->lastorder);
-      scat(", \"");
-      scat(cmd);
-      scat("\"");
+      bufp += strlcpy(bufp, ", \"");
+      bufp += strlcpy(bufp, cmd);
+      strcpy(bufp++, "\"");
       free(cmd);
     }
 #endif
@@ -434,19 +425,19 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   i = 0;
 
   if (u->display && u->display[0]) {
-    scat("; ");
-    scat(u->display);
+    bufp += strlcpy(bufp, "; ");
+    bufp += strlcpy(bufp, u->display);
 
     i = u->display[strlen(u->display) - 1];
   }
   if (i != '!' && i != '?' && i != '.')
-    scat(".");
+    strcpy(bufp++, ".");
 
   pzTmp = uprivate(u);
   if (u->faction == f && pzTmp) {
-    scat(" (Bem: ");
-    scat(pzTmp);
-    scat(")");
+    bufp += strlcpy(bufp, " (Bem: ");
+    bufp += strlcpy(bufp, pzTmp);
+    bufp += strlcpy(bufp, ")");
   }
 
   dh=0;
@@ -464,7 +455,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
  */
 
 #ifdef USE_UGROUPS
- int
+int
 bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 {
 	int i, dh;
