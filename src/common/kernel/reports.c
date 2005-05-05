@@ -307,8 +307,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   dh = 0;
   if (u->faction == f || telepath_see) {
     for (sk = 0; sk != MAXSKILLS; sk++) {
-      spskill(f->locale, u, sk, &dh, 1);
-      bufp += strlen(bufp);
+      bufp += spskill(bufp, f->locale, u, sk, &dh, 1);
     }
   }
 
@@ -602,47 +601,50 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 }
 #endif
 
-void
-spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days)
+size_t
+spskill(char * buffer, const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days)
 {
-	char * sbuf = buf+strlen(buf);
+  char * pbuf = buffer;
 	int i, effsk;
 
 	if (!u->number)
-		return;
+		return 0;
 
 	if (!has_skill(u, sk)) return;
 
-	strcat(sbuf, ", "); sbuf+=2;
+	pbuf += strlcpy(pbuf, ", "); sbuf+=2;
 
 	if (!*dh) {
-		sbuf += sprintf(sbuf, "%s: ", LOC(lang, "nr_skills"));
+    pbuf += strlcpy(pbuf, LOC(lang, "nr_skills"));
+    strcpy(pbuf++, " ");
 		*dh = 1;
 	}
-	sbuf += sprintf(sbuf, "%s ", skillname(sk, lang));
+	pbuf += strlcpy(pbuf, skillname(sk, lang));
+  strcpy(pbuf++, " ");
 
 	if (sk == SK_MAGIC){
 		if (find_magetype(u) != M_GRAU){
-			sbuf += sprintf(sbuf, "%s ", LOC(lang, mkname("school", magietypen[find_magetype(u)])));
+      pbuf += strlcpy(pbuf, LOC(lang, mkname("school", magietypen[find_magetype(u)])));
+      strcpy(pbuf++, " ");
 		}
 	}
 
 	if (sk == SK_STEALTH) {
 		i = u_geteffstealth(u);
 		if(i>=0) {
-			sbuf += sprintf(sbuf, "%d/", i);
+			pbuf += dprintf(pbuf, "%d/", i);
 		}
 	}
 
 	effsk = effskill(u, sk);
-	sbuf += sprintf(sbuf, "%d", effsk);
+	pbuf += sprintf(pbuf, "%d", effsk);
 
 	if(u->faction->options & Pow(O_SHOWSKCHANGE)) {
 		skill *skill = get_skill(u, sk);
 		int oldeff = 0;
 		int diff;
 
-		if(skill->old > 0) {
+		if (skill->old > 0) {
 			oldeff = skill->old + get_modifier(u, sk, skill->old, u->region, false);
 		}
 
@@ -650,9 +652,10 @@ spskill(const struct locale * lang, const struct unit * u, skill_t sk, int *dh, 
 		diff   = effsk - oldeff; 
 
 		if(diff != 0) {
-			sbuf += sprintf(sbuf, " (%s%d)", (diff>0)?"+":"", diff);
+			pbuf += sprintf(pbuf, " (%s%d)", (diff>0)?"+":"", diff);
 		}
 	}
+  return pbuf-buffer;
 }
 
 void

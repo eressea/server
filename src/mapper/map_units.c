@@ -896,7 +896,7 @@ mapper_spunit(dbllist ** SP, unit * u, int indent)
 
 	dh = 0;
 	for (sk = 0; sk != MAXSKILLS; sk++)
-		spskill(find_locale("de"), u, sk, &dh, 1);
+		spskill(buf, find_locale("de"), u, sk, &dh, 1);
 	dh = 0;
 
 	for (itm = u->items;itm;itm=itm->next) {

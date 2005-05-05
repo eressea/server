@@ -40,6 +40,22 @@
 static int want_mp = 1 << O_MATERIALPOOL;
 static int want_sp = 1 << O_SILBERPOOL;
 
+static const race * rc_stonegolem;
+static const race * rc_irongolem;
+
+static void
+init_static(void)
+{
+  static boolean init = false;
+  if (!init) {
+    init = true;
+    rc_stonegolem = rc_find("stone golem");
+    if (rc_stonegolem==NULL) log_error(("Could not find race: stone golem\n"));
+    rc_irongolem = rc_find("irongolem");
+    if (rc_irongolem==NULL) log_error(("Could not find race: irongolem\n"));
+  }
+}
+
 int
 new_get_resource(const unit * u, const resource_type * rtype)
 {
@@ -51,11 +67,10 @@ new_get_resource(const unit * u, const resource_type * rtype)
 		if (i>=0) return i;
 	}
 	if (itype!=NULL) {
-		race_t urc = old_race(u->race);
-		/* resouce is an item */
-		if (urc==RC_STONEGOLEM && itype == olditemtype[R_STONE]) {
+    if (!rc_stonegolem) init_static();
+		if (itype == olditemtype[R_STONE] && u->race==rc_stonegolem) {
 			return u->number*GOLEM_STONE;
-		} else if (urc==RC_IRONGOLEM && itype == olditemtype[R_IRON]) {
+		} else if (itype==olditemtype[R_IRON] && u->race==rc_irongolem) {
 			return u->number*GOLEM_IRON;
 		} else {
 			const item * i = *i_find((item**)&u->items, itype);
@@ -103,11 +118,13 @@ new_change_resource(unit * u, const resource_type * rtype, int change)
 int
 new_get_resvalue(const unit * u, const resource_type * rtype)
 {
-	race_t urc = old_race(u->race);
 	struct reservation * res = u->reservations;
-	if (rtype==oldresourcetype[R_STONE] && urc==RC_STONEGOLEM)
+
+  if (!rc_stonegolem) init_static();
+  
+  if (rtype==oldresourcetype[R_STONE] && u->race==rc_stonegolem)
 		return (u->number * GOLEM_STONE);
-	if (rtype==oldresourcetype[R_IRON] && urc==RC_IRONGOLEM)
+	if (rtype==oldresourcetype[R_IRON] && u->race==rc_irongolem)
 		return (u->number * GOLEM_IRON);
 	while (res && res->type!=rtype) res=res->next;
 	if (res) return res->value;
@@ -256,13 +273,14 @@ change_resource(unit * u, resource_t res, int change)
 {
 	int i = 0;
 	const item_type * itype = resource2item(oldresourcetype[res]);
-	race_t urc = old_race(u->race);
 
-	if (res==R_STONE && urc==RC_STONEGOLEM) {
+  if (!rc_stonegolem) init_static();
+
+	if (res==R_STONE && u->race==rc_stonegolem) {
 	  i = u->number - (change+GOLEM_STONE-1)/GOLEM_STONE;
 		scale_number(u, i);
 	}
-	else if (res==R_IRON && urc==RC_IRONGOLEM) {
+	else if (res==R_IRON && u->race==rc_irongolem) {
 	  i = u->number - (change+GOLEM_IRON-1)/GOLEM_IRON;
 		scale_number(u, i);
 	}

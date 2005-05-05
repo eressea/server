@@ -808,9 +808,10 @@ void
 u_setfaction(unit * u, faction * f)
 {
   int cnt = u->number;
-  unit ** iunit;
+
   if (u->faction==f) return;
   if (u->faction) {
+    unit ** iunit;
     set_number(u, 0);
     if (playerrace(u->race)) {
       --u->faction->no_units;
@@ -821,9 +822,7 @@ u_setfaction(unit * u, faction * f)
 #ifdef LASTORDER
     set_order(&u->lastorder, NULL);
 #endif
-  }
 
-  if (u->faction!=NULL) {
     iunit = &u->faction->units;
     while (*iunit && *iunit!=u) {
       iunit=&(*iunit)->nextF;
