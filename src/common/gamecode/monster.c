@@ -110,7 +110,7 @@ get_money_for_dragon(region * r, unit * u, int wanted)
 	/* falls genug geld in der region ist, treiben wir steuern ein. */
   if (rmoney(r) >= wanted) {
     /* 5% chance, dass der drache aus einer laune raus attackiert */
-    if (chance(0.95)) return parse_order(keywords[K_TAX], default_locale);
+    if (chance(1.0-u->race->aggression)) return parse_order(keywords[K_TAX], default_locale);
   }
 
   /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an */

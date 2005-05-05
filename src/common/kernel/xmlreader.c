@@ -785,16 +785,16 @@ parse_races(xmlDocPtr doc)
     rc->def_damage = strdup((const char*)property);
     xmlFree(property);
 
-    rc->magres = xml_fvalue(node, "magres", 0.0);
-    rc->maxaura = xml_fvalue(node, "maxaura", 0.0);
-    rc->regaura = xml_fvalue(node, "regaura", 1.0);
+    rc->magres = (float)xml_fvalue(node, "magres", 0.0);
+    rc->maxaura = (float)xml_fvalue(node, "maxaura", 0.0);
+    rc->regaura = (float)xml_fvalue(node, "regaura", 1.0);
     rc->recruitcost = xml_ivalue(node, "recruitcost", 0);
     rc->maintenance = xml_ivalue(node, "maintenance", 0);
     rc->weight = xml_ivalue(node, "weight", 0);
 #if RACE_CAPACITY
     rc->capacity = xml_ivalue(node, "capacity", 0);
 #endif
-    rc->speed = xml_fvalue(node, "speed", 0);
+    rc->speed = (float)xml_fvalue(node, "speed", 1.0F);
     rc->hitpoints = xml_ivalue(node, "hp", 0);
     rc->armor = (char)xml_ivalue(node, "ac", 0);
 
@@ -847,8 +847,8 @@ parse_races(xmlDocPtr doc)
       xmlNodePtr node = result->nodesetval->nodeTab[k];
 
       rc->splitsize = xml_ivalue(node, "splitsize", 0);
+      rc->aggression = (float)xml_fvalue(node, "aggression", 0.04);
       if (xml_bvalue(node, "killpeasants", false)) rc->flags |= RCF_KILLPEASANTS;
-      if (xml_bvalue(node, "attackrandom", false)) rc->flags |= RCF_ATTACKRANDOM;
       if (xml_bvalue(node, "moverandom", false)) rc->flags |= RCF_MOVERANDOM;
       if (xml_bvalue(node, "learn", false)) rc->flags |= RCF_LEARN;
     }
