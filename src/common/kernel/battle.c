@@ -1061,8 +1061,9 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 		}
 
 		da += rc_specialdamage(au->race, du->race, awtype);
+#ifdef KARMA_MODULE
 		da += jihad(au->faction, du->race);
-
+#endif
 		faerie_level = fspecial(du->faction, FS_FAERIE);
 		if (type == AT_STANDARD && faerie_level) {
 			int c;
@@ -1679,9 +1680,10 @@ skilldiff(troop at, troop dt, int dist)
 	    af->side->size[SUM_ROW] >= df->side->size[SUM_ROW] * 10)
 		skdiff += 1;
 
+#ifdef KARMA_MODULE
 	/* TODO this should be a skillmod */
 	skdiff += jihad(au->faction, du->race);
-
+#endif
 	skdiff += af->person[at.index].attack;
 	skdiff -= df->person[dt.index].defence;
 

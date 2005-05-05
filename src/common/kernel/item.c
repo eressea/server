@@ -1266,7 +1266,7 @@ const item_t matresource[] = {
 static int
 mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 {
-	if (old_race(u->race) == RC_ELF) return value;
+	if (u->race == new_race[RC_ELF]) return value;
 	unused(r);
 	return -118;
 }
@@ -1968,7 +1968,7 @@ static int
 use_warmthpotion(struct unit *u, const struct potion_type *ptype, int amount, struct order * ord)
 {
 	assert(ptype==oldpotiontype[P_WARMTH]);
-	if (old_race(u->faction->race) == RC_INSECT) {
+	if (u->faction->race == new_race[RC_INSECT]) {
 		fset(u, UFL_WARMTH);
 	} else {
 		/* nur für insekten: */

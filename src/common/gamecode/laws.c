@@ -3790,8 +3790,10 @@ processorders (void)
   puts(" - Kontakte löschen");
   remove_contacts();
 
+#ifdef KARMA_MODULE
   puts(" - Jihad-Angriffe");
   jihad_attacks();
+#endif
 
   puts(" - Attackieren");
   if(nobattle == false) do_battle();
@@ -3882,8 +3884,10 @@ processorders (void)
   puts(" - Gebäudeunterhalt (2. Versuch)");
   maintain_buildings(true);
 
+#ifdef KARMA_MODULE
   puts(" - Jihads setzen");
   karma();
+#endif
 
 #ifdef USE_UGROUPS
   puts(" - Verbände bilden");

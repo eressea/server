@@ -550,7 +550,6 @@ jihad(faction *f, const race * rc)
 	for(a = a_find(f->attribs, &at_jihad); a; a = a->nexttype) {
 		if(a->data.sa[0] == jrt) return a->data.sa[1];
 	}
-
 	return 0;
 }
 

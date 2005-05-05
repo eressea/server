@@ -1034,11 +1034,17 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 	int n;
 	boolean cansee = false;
 	unit *u2;
-  static const item_type * itype_grail = (const item_type *)0xdeadbeef;
+  static const item_type * itype_grail;
+  static boolean init;
+
+  if (!init) {
+    init = true;
+    itype_grail = it_find("grail");
+  }
 
 	if (u->faction == f || omniscient(f)) {
 		return true;
-	} else if (old_race(u->race) == RC_SPELL) {
+	} else if (u->race == new_race[RC_SPELL]) {
 		return false;
 	} else if (u->number == 0) {
 		attrib *a = a_find(u->attribs, &at_creator);
@@ -1051,7 +1057,6 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 	}
 
   if (leftship(u)) return true;
-  if (itype_grail==(const item_type *)0xdeadbeef) itype_grail = it_find("grail");
   if (itype_grail!=NULL && i_get(u->items, itype_grail)) return true;
 
   n = eff_stealth(u, r) - modifier;
@@ -1094,7 +1099,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u, int mod
 	int n;
 	boolean cansee = false;
 	unit *u2;
-	if (old_race(u->race) == RC_SPELL || u->number == 0) return false;
+	if (u->race == new_race[RC_SPELL] || u->number == 0) return false;
 	else if (u->faction == f) cansee = true;
 	else {
 

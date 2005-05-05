@@ -607,12 +607,11 @@ spskill(char * buffer, const struct locale * lang, const struct unit * u, skill_
   char * pbuf = buffer;
 	int i, effsk;
 
-	if (!u->number)
-		return 0;
+	if (!u->number) return 0;
 
-	if (!has_skill(u, sk)) return;
+	if (!has_skill(u, sk)) return 0;
 
-	pbuf += strlcpy(pbuf, ", "); sbuf+=2;
+	pbuf += strlcpy(pbuf, ", ");
 
 	if (!*dh) {
     pbuf += strlcpy(pbuf, LOC(lang, "nr_skills"));
@@ -632,7 +631,7 @@ spskill(char * buffer, const struct locale * lang, const struct unit * u, skill_
 	if (sk == SK_STEALTH) {
 		i = u_geteffstealth(u);
 		if(i>=0) {
-			pbuf += dprintf(pbuf, "%d/", i);
+			pbuf += sprintf(pbuf, "%d/", i);
 		}
 	}
 
