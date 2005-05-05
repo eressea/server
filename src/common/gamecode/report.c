@@ -108,6 +108,13 @@ int  *month_season;
 char *agename;
 int  seasons;
 
+static size_t
+strlcpy(char * dst, const char * src) {
+  size_t s = 0;
+  while ((*dst++ = *src++)!=0) ++s;
+  return s;
+}
+
 static const char*
 MailitPath(void)
 {
@@ -457,6 +464,7 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
   resource_t res;
 	int dh = 0;
 	spell *sp = find_spellbyid(id);
+  char * bufp;
 
 	rnl(F);
 	centre(F, spell_name(sp, lang), true);
@@ -467,15 +475,15 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
 	rnl(F);
 
 
-	strcpy(buf, "Art: ");
+	bufp = strcpy(buf, "Art: ");
 	if (sp->sptyp & PRECOMBATSPELL) {
-		scat("Präkampfzauber");
+		bufp += strlcpy(bufp, "Präkampfzauber");
 	} else if (sp->sptyp & COMBATSPELL) {
-		scat("Kampfzauber");
+		bufp += strlcpy(bufp, "Kampfzauber");
 	} else if (sp->sptyp & POSTCOMBATSPELL) {
-		scat("Postkampfzauber");
+		bufp += strlcpy(bufp, "Postkampfzauber");
 	} else {
-		scat("Normaler Zauber");
+		bufp += strlcpy(bufp, "Normaler Zauber");
 	}
 	rps(F, buf);
 
@@ -487,9 +495,9 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
 		costtyp = sp->komponenten[k][2];
 		if(itemanz > 0){
       if (sp->sptyp & SPELLLEVEL) {
-        sprintf(buf, "  %d %s", itemanz, LOC(lang, resname(res, itemanz!=1)));
+        bufp = buf + sprintf(buf, "  %d %s", itemanz, LOC(lang, resname(res, itemanz!=1)));
         if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR ) {
-          scat(" * Stufe");
+          bufp += strlcpy(bufp, " * Stufe");
         }
       } else {
         if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR ) {
@@ -501,35 +509,35 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
 		}
 	}
 
-	strcpy(buf, "Modifikationen: ");
+	bufp = buf + strlcpy(buf, "Modifikationen: ");
 	if (sp->sptyp & FARCASTING) {
-		scat("Fernzauber");
+		bufp += strlcpy(bufp, "Fernzauber");
 		dh = 1;
 	}
 	if (sp->sptyp & OCEANCASTABLE) {
 		if (dh == 1){
-			scat(", ");
+			bufp += strlcpy(bufp, ", ");
 		}
-		scat("Seezauber");
+		bufp += strlcpy(bufp, "Seezauber");
 		dh = 1;
 	}
 	if (sp->sptyp & ONSHIPCAST) {
 		if (dh == 1){
-			scat(", ");
+			bufp += strlcpy(bufp, ", ");
 		}
-		scat("Schiffszauber");
+		bufp += strlcpy(bufp, "Schiffszauber");
 		dh = 1;
 	}
 	if (sp->sptyp & NOTFAMILIARCAST) {
 		if (dh == 1){
-			scat(", k");
+			bufp += strlcpy(bufp, ", k");
 		} else {
-			scat("K");
+			bufp += strlcpy(bufp, "K");
 		}
-		scat("ann nicht vom Vertrauten gezaubert werden");
+		bufp += strlcpy(bufp, "ann nicht vom Vertrauten gezaubert werden");
 		dh = 1;
 	}
-	if(dh == 0) scat("Keine");
+	if(dh == 0) bufp += strlcpy(bufp, "Keine");
 
 	rps(F, buf);
 
@@ -538,48 +546,48 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
 
 	sprintf(buf, "Rang: %d", sp->rank);
 	rps(F, buf);
-
 	rnl(F);
-	strcpy(buf, "Syntax: ");
+
+  strcpy(buf, "Syntax: ");
 	rps(F, buf);
-	if(!sp->syntax){
-		if(sp->sptyp & ISCOMBATSPELL){
-			strcpy(buf, "KAMPFZAUBER ");
-		}else{
-			strcpy(buf, "ZAUBERE ");
+
+  if (!sp->syntax) {
+		if (sp->sptyp & ISCOMBATSPELL) {
+			bufp = buf + strlcpy(buf, "KAMPFZAUBER ");
+		} else {
+			bufp = buf + strlcpy(buf, "ZAUBERE ");
 		}
 		/* Reihenfolge beachten: Erst REGION, dann STUFE! */
 		if (sp->sptyp & FARCASTING) {
-			scat("[REGION x y] ");
+			bufp += strlcpy(bufp, "[REGION x y] ");
 		}
 		if (sp->sptyp & SPELLLEVEL) {
-			scat("[STUFE n] ");
+			bufp += strlcpy(bufp, "[STUFE n] ");
 		}
-		scat("\"");
-		scat(spell_name(sp, lang));
-		scat("\" ");
+		bufp += strlcpy(bufp, "\"");
+		bufp += strlcpy(bufp, spell_name(sp, lang));
+		bufp += strlcpy(bufp, "\" ");
 		if (sp->sptyp & ONETARGET){
 			if (sp->sptyp & UNITSPELL) {
-				scat("<Einheit-Nr>");
+				bufp += strlcpy(bufp, "<Einheit-Nr>");
 			} else if (sp->sptyp & SHIPSPELL) {
-				scat("<Schiff-Nr>");
+				bufp += strlcpy(bufp, "<Schiff-Nr>");
 			} else if (sp->sptyp & BUILDINGSPELL) {
-				scat("<Gebäude-Nr>");
+				bufp += strlcpy(bufp, "<Gebäude-Nr>");
 			}
-		}else {
+		} else {
 			if (sp->sptyp & UNITSPELL) {
-				scat("<Einheit-Nr> [<Einheit-Nr> ...]");
+				bufp += strlcpy(bufp, "<Einheit-Nr> [<Einheit-Nr> ...]");
 			} else if (sp->sptyp & SHIPSPELL) {
-				scat("<Schiff-Nr> [<Schiff-Nr> ...]");
+				bufp += strlcpy(bufp, "<Schiff-Nr> [<Schiff-Nr> ...]");
 			} else if (sp->sptyp & BUILDINGSPELL) {
-				scat("<Gebäude-Nr> [<Gebäude-Nr> ...]");
+				bufp += strlcpy(bufp, "<Gebäude-Nr> [<Gebäude-Nr> ...]");
 			}
 		}
-	}else{
-		strcpy(buf, sp->syntax);
+	} else {
+		bufp += strlcpy(bufp, sp->syntax);
 	}
 	rps(F, buf);
-
 	rnl(F);
 }
 
@@ -984,29 +992,31 @@ prices(FILE * F, const region * r, const faction * f)
 	m = msg_message("nr_market_sale", "product price",
 		sale->itype->rtype, sale->price);
 	nr_render(m, f->locale, buf, sizeof(buf), f);
-	msg_release(m);
+  msg_release(m);
 
-	if(n > 0) {
-		scat(" ");
-		scat(LOC(f->locale, "nr_trade_intro"));
-		scat(" ");
+	if (n > 0) {
+    char * bufp = buf + strlen(buf);
+		bufp += strlcpy(bufp, " ");
+		bufp += strlcpy(bufp, LOC(f->locale, "nr_trade_intro"));
+		bufp += strlcpy(bufp, " ");
 
 		for (dmd=r->land->demands;dmd;dmd=dmd->next) if(dmd->value > 0) {
-			char sbuf[80];
 			m = msg_message("nr_market_price", "product price",
 				dmd->type->itype->rtype, dmd->value * dmd->type->price);
-			nr_render(m, f->locale, sbuf, sizeof(sbuf), f);
+			nr_render(m, f->locale, bufp, sizeof(buf)-(bufp-buf), f);
 			msg_release(m);
-			scat(sbuf);
 			n--;
-			if (n == 0) scat(LOC(f->locale, "nr_trade_end"));
+      bufp += strlen(bufp);
+      if (n == 0) {
+        bufp += strlcpy(bufp, LOC(f->locale, "nr_trade_end"));
+      }
 			else if (n == 1) {
-				scat(" ");
-				scat(LOC(f->locale, "nr_trade_final"));
-				scat(" ");
+				strcpy(bufp++, " ");
+				bufp += strlcpy(bufp, LOC(f->locale, "nr_trade_final"));
+				strcpy(bufp++, " ");
 			} else {
-				scat(LOC(f->locale, "nr_trade_next"));
-				scat(" ");
+				bufp += strlcpy(bufp, LOC(f->locale, "nr_trade_next"));
+				strcpy(bufp++, " ");
 			}
 		}
 	}
@@ -1074,7 +1084,6 @@ eval_trail(struct opstack ** stack, const void * userdata) /* (int, int) -> int 
 static void
 describe(FILE * F, const region * r, int partial, faction * f)
 {
-	char dbuf[512];
 	int n;
 	boolean dh;
 	direction_t d;
@@ -1093,9 +1102,10 @@ describe(FILE * F, const region * r, int partial, faction * f)
 		direction_t lastd;
 	} * edges = NULL, * e;
 	boolean see[MAXDIRECTIONS];
+  char * bufp = buf;
 
-	for (d = 0; d != MAXDIRECTIONS; d++)
-	{ /* Nachbarregionen, die gesehen werden, ermitteln */
+	for (d = 0; d != MAXDIRECTIONS; d++) {
+    /* Nachbarregionen, die gesehen werden, ermitteln */
 		region *r2 = rconnect(r, d);
 		border *b;
 		see[d] = true;
@@ -1124,27 +1134,27 @@ describe(FILE * F, const region * r, int partial, faction * f)
 		}
 	}
 
-	strcpy(buf, f_regionid(r, f));
+	bufp += strlcpy(bufp, f_regionid(r, f));
 
 	if (partial == 1) {
-		scat(" (durchgereist)");
+		bufp += strlcpy(bufp, " (durchgereist)");
 	}
 	else if (partial == 3) {
-		scat(" (benachbart)");
+		bufp += strlcpy(bufp, " (benachbart)");
 	}
 	else if (partial == 2) {
-		scat(" (vom Turm erblickt)");
+		bufp += strlcpy(bufp, " (vom Turm erblickt)");
 	}
 	/* Terrain */
 
-	scat(", ");
+	bufp += strlcpy(bufp, ", ");
 	if(is_cursed(r->attribs,C_MAELSTROM, 0))
 		tname = "maelstrom";
 	else {
 		if (r_isforest(r)) tname = "forest";
 		else tname = terrain[rterrain(r)].name;
 	}
-	scat(LOC(f->locale, tname));
+	bufp += strlcpy(bufp, LOC(f->locale, tname));
 
 	/* Bäume */
 
@@ -1152,40 +1162,34 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	trees  = rtrees(r,2);
 	ytrees = rtrees(r,1);
 	if (production(r)) {
-		if(trees > 0 || ytrees > 0) {
-			scat(", ");
-			icat(trees);
-			scat("/");
-			icat(ytrees);
-			scat(" ");
+		if (trees > 0 || ytrees > 0) {
+      bufp += sprintf(bufp, ", %d/%d", trees, ytrees);
 			if (fval(r, RF_MALLORN)) {
 				if (trees == 1)
-					scat(LOC(f->locale, "nr_mallorntree"));
+					bufp += strlcpy(bufp, LOC(f->locale, "nr_mallorntree"));
 				else
-					scat(LOC(f->locale, "nr_mallorntree_p"));
+					bufp += strlcpy(bufp, LOC(f->locale, "nr_mallorntree_p"));
 			}
 			else if (trees == 1)
-				scat(LOC(f->locale, "nr_tree"));
+				bufp += strlcpy(bufp, LOC(f->locale, "nr_tree"));
 			else
-				scat(LOC(f->locale, "nr_tree_p"));
+				bufp += strlcpy(bufp, LOC(f->locale, "nr_tree_p"));
 		}
 	}
 #else
 	trees = rtrees(r);
 	if (production(r) && trees > 0) {
-		scat(", ");
-		icat(trees);
-		scat(" ");
+		bufp += sprintf(bufp, ", %d ", trees);
 		if (fval(r, RF_MALLORN)) {
 			if (trees == 1)
-				scat(LOC(f->locale, "nr_mallorntree"));
+				bufp += strlcpy(bufp, LOC(f->locale, "nr_mallorntree"));
 			else
-				scat(LOC(f->locale, "nr_mallorntree_p"));
+				bufp += strlcpy(bufp, LOC(f->locale, "nr_mallorntree_p"));
 		}
 		else if (trees == 1)
-			scat(LOC(f->locale, "nr_tree"));
+			bufp += strlcpy(bufp, LOC(f->locale, "nr_tree"));
 		else
-			scat(LOC(f->locale, "nr_tree_p"));
+			bufp += strlcpy(bufp, LOC(f->locale, "nr_tree_p"));
 	}
 #endif
 
@@ -1217,9 +1221,9 @@ describe(FILE * F, const region * r, int partial, faction * f)
 				}
 			}
 			if (level>=0 && visible >= 0) {
-				char * pos = buf+strlen(buf);
-				snprintf(pos, sizeof(buf)-(pos-buf), ", %d %s/%d",
-					visible, LOC(f->locale, res->type->name), res->level + itype->construction->minskill - 1);
+				bufp += snprintf(bufp, sizeof(buf)-(bufp-buf), ", %d %s/%d", 
+          visible, LOC(f->locale, res->type->name), 
+          res->level + itype->construction->minskill - 1);
 			}
 		}
 #else
@@ -1233,75 +1237,66 @@ describe(FILE * F, const region * r, int partial, faction * f)
 			}
 		}
 		if (riron(r) > 0 && maxmining >= 4) {
-			scat(", ");
-			icat(riron(r));
-			scat(" Eisen");
+			bufp += sprinf(bufp, ", %d Eisen", riron(r));
 		}
 		if (rlaen(r)>=0 && maxmining >= 7) {
-			scat(", ");
-			icat(rlaen(r));
-			scat(" Laen");
+			bufp += sprintf(bufp, ", %d Laen", rlaen(r));
 		}
 #endif
 	}
 
 	/* peasants & silver */
 	if (rpeasants(r)) {
-		scat(", ");
-		icat(rpeasants(r));
+		bufp += sprintf(bufp, ", %d", rpeasants(r));
 
 		if(fval(r, RF_ORCIFIED)) {
-			scat(" ");
-			scat(LOC(f->locale, rpeasants(r)==1?"rc_orc":"rc_orc_p"));
+			strcpy(bufp++, " ");
+			bufp += strlcpy(bufp, LOC(f->locale, rpeasants(r)==1?"rc_orc":"rc_orc_p"));
 		} else {
-			scat(" ");
-			scat(LOC(f->locale, resourcename(oldresourcetype[R_PEASANTS], rpeasants(r)!=1)));
+			strcpy(bufp++, " ");
+			bufp += strlcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_PEASANTS], rpeasants(r)!=1)));
 		}
 
 		if (rmoney(r) && partial == 0) {
-			scat(", ");
-			icat(rmoney(r));
-			scat(" ");
-			scat(LOC(f->locale, resourcename(oldresourcetype[R_SILVER], rmoney(r)!=1)));
+			bufp += sprintf(bufp, ", %d ", rmoney(r));
+			bufp += strlcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_SILVER], rmoney(r)!=1)));
 		}
 	}
 	/* Pferde */
 
 	if (rhorses(r)) {
-		scat(", ");
-		icat(rhorses(r));
-		scat(" ");
+		bufp += sprintf(bufp, ", %d ", rhorses(r));
 #ifdef NEW_ITEMS
-		scat(LOC(f->locale, resourcename(oldresourcetype[R_HORSE], (rhorses(r)>1)?GR_PLURAL:0)));
+		bufp += strlcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_HORSE], (rhorses(r)>1)?GR_PLURAL:0)));
 #else
-		scat(itemdata[I_HORSE].name[rhorses(r) > 1]);
+		bufp += strlcpy(bufp, itemdata[I_HORSE].name[rhorses(r) > 1]);
 #endif
 	}
-	scat(".");
+	strcpy(bufp++, ".");
 
 	if (r->display && r->display[0]) {
-		scat(" ");
-		scat(r->display);
+		strcpy(bufp++, " ");
+		bufp += strlcpy(bufp, r->display);
 
 		n = r->display[strlen(r->display) - 1];
 		if (n != '!' && n != '?' && n != '.')
-			scat(".");
+			strcpy(bufp++, ".");
 	}
 
   {
     const unit * u = region_owner(r);
     if (u) {
-      scat(" Die Region ist im Besitz von ");
-      scat(factionname(u->faction));
-      scat(".");
+      bufp += strlcpy(bufp, " Die Region ist im Besitz von ");
+      bufp += strlcpy(bufp, factionname(u->faction));
+      strcpy(bufp++, ".");
     }
   }
 
   if (!is_cursed(r->attribs, C_REGCONF, 0)) {
 		attrib *a_do = a_find(r->attribs, &at_overrideroads);
 		if(a_do) {
-			scat(" ");
-			scat((char *)a_do->data.v);
+			strcpy(bufp++, " ");
+			bufp += strlcpy(bufp, (char *)a_do->data.v);
 		} else {
 			int nrd = 0;
 
@@ -1318,44 +1313,40 @@ describe(FILE * F, const region * r, int partial, faction * f)
 				nrd--;
 				if (dh) {
 					if (nrd == 0) {
-						scat(" ");
-						scat(LOC(f->locale, "nr_nb_final"));
+						strcpy(bufp++, " ");
+						bufp += strlcpy(bufp, LOC(f->locale, "nr_nb_final"));
 					} else {
-						scat(LOC(f->locale, "nr_nb_next"));
+						bufp += strlcpy(bufp, LOC(f->locale, "nr_nb_next"));
 					}
-					scat(LOC(f->locale, directions[d]));
-					scat(" ");
-					sprintf(dbuf, trailinto(r2, f->locale),
+					bufp += strlcpy(bufp, LOC(f->locale, directions[d]));
+					strcpy(bufp++, " ");
+					bufp += sprintf(bufp, trailinto(r2, f->locale),
 							f_regionid(r2, f));
-					scat(dbuf);
 				}
 				else {
-					scat(" ");
-					MSG(("nr_vicinitystart", "dir region", d, r2), dbuf, sizeof(dbuf), f->locale, f);
-					scat(dbuf);
+					strcpy(bufp++, " ");
+					MSG(("nr_vicinitystart", "dir region", d, r2), bufp, sizeof(buf)-(bufp-buf), f->locale, f);
 					dh = true;
 				}
 			}
 			/* Spezielle Richtungen */
 			for (a = a_find(r->attribs, &at_direction);a;a = a->nexttype) {
 				spec_direction * d = (spec_direction *)(a->data.v);
-				scat(" ");
-				scat(d->desc);
-				scat(" (\"");
-				scat(d->keyword);
-				scat("\")");
-				scat(".");
+				strcpy(bufp++, " ");
+				bufp += strlcpy(bufp, d->desc);
+				bufp += strlcpy(bufp, " (\"");
+				bufp += strlcpy(bufp, d->keyword);
+				bufp += strlcpy(bufp, "\")");
+				strcpy(bufp++, ".");
 				dh = 1;
 			}
-			if (dh) scat(".");
+			if (dh) strcpy(bufp++, ".");
 		}
-		rnl(F);
-		rparagraph(F, buf, 0, 0);
 	} else {
-		scat(" Große Verwirrung befällt alle Reisenden in dieser Region.");
-		rnl(F);
-		rparagraph(F, buf, 0, 0);
+		bufp += strlcpy(bufp, " Große Verwirrung befällt alle Reisenden in dieser Region.");
 	}
+  rnl(F);
+  rparagraph(F, buf, 0, 0);
 
 	if (partial==0 && rplane(r) == get_astralplane() &&
 			!is_cursed(r->attribs, C_ASTRALBLOCK, 0))	{
@@ -1395,20 +1386,21 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	for (e=edges;e;e=e->next) {
 		boolean first = true;
 		for (d=0;d!=MAXDIRECTIONS;++d) {
+      char * bufp = buf;
 			if (!e->exist[d]) continue;
-			if (first) strcpy(buf, "Im ");
+			if (first) bufp += strlcpy(bufp, "Im ");
 			else {
-				if (e->lastd==d) strcat(buf, " und im ");
-				else strcat(buf, ", im ");
+				if (e->lastd==d) bufp += strlcpy(bufp, " und im ");
+				else bufp += strlcpy(bufp, ", im ");
 			}
-			strcat(buf, LOC(f->locale, directions[d]));
+			bufp += strlcpy(bufp, LOC(f->locale, directions[d]));
 			first = false;
 		}
-		if (!e->transparent) strcat(buf, " versperrt ");
-		else strcat(buf, " befindet sich ");
-		strcat(buf, e->name);
-		if (!e->transparent) strcat(buf, " die Sicht.");
-		else strcat(buf, ".");
+		if (!e->transparent) bufp += strlcpy(bufp, " versperrt ");
+		else bufp += strlcpy(bufp, " befindet sich ");
+		bufp += strlcpy(bufp, e->name);
+		if (!e->transparent) bufp += strlcpy(bufp, " die Sicht.");
+		else strcpy(bufp++, ".");
 		rparagraph(F, buf, 0, 0);
 	}
 	if (edges) {
