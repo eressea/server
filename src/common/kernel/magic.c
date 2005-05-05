@@ -372,7 +372,7 @@ updatespelllist(unit * u)
 
   /* Nur Orkmagier bekommen den Keuschheitsamulettzauber */
   sp = find_spellbyid(SPL_ARTEFAKT_CHASTITYBELT);
-  if (old_race(u->race)==RC_ORC && !has_spell(u, sp) && sp->level<=sk) {
+  if (u->race == new_race[RC_ORC] && !has_spell(u, sp) && sp->level<=sk) {
     add_spell(mage, SPL_ARTEFAKT_CHASTITYBELT);
   }
 
@@ -2432,10 +2432,10 @@ magic(void)
       boolean casted = false;
       order * ord;
 
-      if (old_race(u->race) == RC_SPELL || fval(u, UFL_LONGACTION))
+      if (u->race == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
         continue;
 
-      if (old_race(u->race) == RC_INSECT && r_insectstalled(r) &&
+      if (u->race == new_race[RC_INSECT] && r_insectstalled(r) &&
         !is_cursed(u->attribs, C_KAELTESCHUTZ,0))
         continue;
 
@@ -2542,7 +2542,7 @@ magic(void)
           * normalerweise nur Meermenschen, ausgenommen explizit als
           * OCEANCASTABLE deklarierte Sprüche */
           if (rterrain(r) == T_OCEAN) {
-            if (old_race(u->race) != RC_AQUARIAN
+            if (u->race != new_race[RC_AQUARIAN]
               && !fval(u->race, RCF_SWIM)
               && !(sp->sptyp & OCEANCASTABLE)) {
                 /* Fehlermeldung */

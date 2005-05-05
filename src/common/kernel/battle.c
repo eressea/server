@@ -1168,7 +1168,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 
 	if (df->person[dt.index].hp > 0) {	/* Hat überlebt */
 		battledebug(debugbuf);
-		if (old_race(au->race) == RC_DAEMON) {
+		if (au->race == new_race[RC_DAEMON]) {
 #ifdef TODO_RUNESWORD
 			if (select_weapon(dt, 0, -1) == WP_RUNESWORD) continue;
 #endif
@@ -1197,7 +1197,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 #endif
 
 	/* Sieben Leben */
-	if (old_race(du->race) == RC_CAT && (chance(1.0 / 7))) {
+	if (du->race == new_race[RC_CAT] && (chance(1.0 / 7))) {
 #ifdef SMALL_BATTLE_MESSAGES
     if (b->small) {
       strcat(smallbuf, ", doch die Katzengöttin ist gnädig");
@@ -1676,7 +1676,7 @@ skilldiff(troop at, troop dt, int dist)
 		skdiff += fspecial(au->faction, FS_LYCANTROPE);
 	}
 
-	if (old_race(au->race) == RC_GOBLIN &&
+	if (au->race == new_race[RC_GOBLIN] &&
 	    af->side->size[SUM_ROW] >= df->side->size[SUM_ROW] * 10)
 		skdiff += 1;
 
@@ -2249,7 +2249,7 @@ fleechance(unit * u)
 	else if (get_item(u, I_HORSE) >= u->number && eff_skill(u, SK_RIDING, r) >= 1)
 		c += 0.10;
 
-	if (old_race(u->race) == RC_HALFLING) {
+	if (u->race == new_race[RC_HALFLING]) {
 		c += 0.20;
 		c = min(c, 0.90);
 	} else {
@@ -2392,7 +2392,7 @@ aftermath(battle * b)
 
 #ifdef TROLLSAVE
     /* Trolle können regenerieren */
-    if (df->alive > 0 && dead>0 && old_race(du->race) == RC_TROLL) {
+    if (df->alive > 0 && dead>0 && du->race == new_race[RC_TROLL]) {
       for (i = 0; i != dead; ++i) {
         if (chance(TROLL_REGENERATION)) {
           ++df->alive;
@@ -3067,17 +3067,17 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 	if (fig->horses) {
 		if ((r->terrain != T_PLAIN && r->terrain != T_HIGHLAND
 				&& r->terrain != T_DESERT) || r_isforest(r)
-				|| eff_skill(u, SK_RIDING, r) < 2 || old_race(u->race) == RC_TROLL || fval(u, UFL_WERE))
+				|| eff_skill(u, SK_RIDING, r) < 2 || u->race == new_race[RC_TROLL] || fval(u, UFL_WERE))
 			fig->horses = 0;
 	}
 
 	if (fig->elvenhorses) {
-		if (eff_skill(u, SK_RIDING, r) < 5 || old_race(u->race) == RC_TROLL || fval(u, UFL_WERE))
+		if (eff_skill(u, SK_RIDING, r) < 5 || u->race == new_race[RC_TROLL] || fval(u, UFL_WERE))
 			fig->elvenhorses = 0;
 	}
 
 	/* Schauen, wie gut wir in Taktik sind. */
-	if (t > 0 && old_race(u->race) == RC_INSECT)
+	if (t > 0 && u->race == new_race[RC_INSECT])
 		t -= 1 - (int) log10(fig->side->size[SUM_ROW]);
 	if (t > 0 && get_unitrow(fig) == FIGHT_ROW)
 		t += 1;
@@ -3583,7 +3583,7 @@ init_battle(region * r, battle **bp)
               continue;
             }
             /* xmas */
-            if (u2->no==atoi36("xmas") && old_race(u2->irace)==RC_GNOME) {
+            if (u2->no==atoi36("xmas") && u2->irace==new_race[RC_GNOME]) {
               a_add(&u->attribs, a_new(&at_key))->data.i = atoi36("coal");
               sprintf(buf, "%s ist böse gewesen...", unitname(u));
               mistake(u, ord, buf, MSG_BATTLE);
@@ -3800,7 +3800,7 @@ do_battle(void)
           /* Flucht nicht bei mehr als 600 HP. Damit Wyrme tötbar bleiben. */
           int runhp = min(600,(int)(0.9+unit_max_hp(u)*hpflee(u->status)));
           side *side = fig->side;
-          if (fval(u->race, RCF_UNDEAD) || old_race(u->race) == RC_SHADOWKNIGHT) continue;
+          if (fval(u->race, RCF_UNDEAD) || u->race == new_race[RC_SHADOWKNIGHT]) continue;
 
           if (u->ship) continue;
           dt.fighter = fig;
