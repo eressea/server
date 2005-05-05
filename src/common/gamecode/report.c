@@ -1163,7 +1163,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	ytrees = rtrees(r,1);
 	if (production(r)) {
 		if (trees > 0 || ytrees > 0) {
-      bufp += sprintf(bufp, ", %d/%d", trees, ytrees);
+      bufp += sprintf(bufp, ", %d/%d ", trees, ytrees);
 			if (fval(r, RF_MALLORN)) {
 				if (trees == 1)
 					bufp += strlcpy(bufp, LOC(f->locale, "nr_mallorntree"));
@@ -1385,9 +1385,9 @@ describe(FILE * F, const region * r, int partial, faction * f)
 
 	if (edges) rnl(F);
 	for (e=edges;e;e=e->next) {
+    char * bufp = buf;
 		boolean first = true;
 		for (d=0;d!=MAXDIRECTIONS;++d) {
-      char * bufp = buf;
 			if (!e->exist[d]) continue;
 			if (first) bufp += strlcpy(bufp, "Im ");
 			else {
