@@ -1326,6 +1326,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 				else {
 					strcpy(bufp++, " ");
 					MSG(("nr_vicinitystart", "dir region", d, r2), bufp, sizeof(buf)-(bufp-buf), f->locale, f);
+          bufp += strlen(bufp);
 					dh = true;
 				}
 			}

@@ -615,7 +615,7 @@ spskill(char * buffer, const struct locale * lang, const struct unit * u, skill_
 
 	if (!*dh) {
     pbuf += strlcpy(pbuf, LOC(lang, "nr_skills"));
-    strcpy(pbuf++, " ");
+    pbuf += strlcpy(pbuf, ": ");
 		*dh = 1;
 	}
 	pbuf += strlcpy(pbuf, skillname(sk, lang));
