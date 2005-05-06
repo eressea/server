@@ -1,7 +1,6 @@
 #include <config.h>
-#include "bsdstring.h"
-
 #include <string.h>
+#include "bsdstring.h"
 
 #if !defined(HAVE_STRLCPY)
 INLINE_FUNCTION size_t

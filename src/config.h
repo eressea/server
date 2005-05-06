@@ -46,6 +46,11 @@ extern "C" {
 # include <mpatrol.h>
 #endif
 
+#if defined __GNUC__
+# define HAVE_INLINE
+# define INLINE_FUNCTION __inline
+#endif
+  
 #ifdef DMALLOC
 # ifndef MALLOCDBG
 #  define MALLOCDBG 1
@@ -148,8 +153,8 @@ typedef struct stat stat_type;
 # define R_OK 4
 # define HAVE__MKDIR_WITHOUT_PERMISSION
 
-#define HAVE_INLINE
-#define INLINE_FUNCTION __inline
+# define HAVE_INLINE
+# define INLINE_FUNCTION __inline
 
 # define snprintf _snprintf
 # define HAVE_SNPRINTF
@@ -245,6 +250,9 @@ extern char * strdup(const char *s);
 }
 #endif
 
+#ifndef INLINE_FUNCTION
+# define INLINE_FUNCTION
+#endif
 /* this function must be implemented in a .o file */
 extern char * strnzcpy(char * dst, const char *src, size_t len);
 #endif

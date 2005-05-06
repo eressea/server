@@ -302,7 +302,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   dh = 0;
   if (u->faction == f || telepath_see) {
     for (sk = 0; sk != MAXSKILLS; sk++) {
-      bufp += spskill(bufp, f->locale, u, sk, &dh, 1);
+      bufp += spskill(bufp, sizeof(buf)-(bufp-buf), f->locale, u, sk, &dh, 1);
     }
   }
 
@@ -597,59 +597,59 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 #endif
 
 size_t
-spskill(char * buffer, const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days)
+spskill(char * buffer, size_t siz, const struct locale * lang, const struct unit * u, skill_t sk, int *dh, int days)
 {
-  char * pbuf = buffer;
-	int i, effsk;
+  char * bufp = buffer;
+  int i, effsk;
 
-	if (!u->number) return 0;
+  if (!u->number) return 0;
 
-	if (!has_skill(u, sk)) return 0;
+  if (!has_skill(u, sk)) return 0;
+  
+  bufp += strlcpy(bufp, ", ", siz);
 
-	pbuf += strlcpy(pbuf, ", ", sizeof(buf));
-
-	if (!*dh) {
-    pbuf += strlcpy(pbuf, LOC(lang, "nr_skills"), sizeof(buf)-(bufp-buf));
-    pbuf += strlcpy(pbuf, ": ", sizeof(buf)-(bufp-buf));
-		*dh = 1;
-	}
-	pbuf += strlcpy(pbuf, skillname(sk, lang), sizeof(buf)-(bufp-buf));
-  strcpy(pbuf++, " ");
-
-	if (sk == SK_MAGIC){
-		if (find_magetype(u) != M_GRAU){
-      pbuf += strlcpy(pbuf, LOC(lang, mkname("school", magietypen[find_magetype(u)])), sizeof(buf)-(bufp-buf));
-      strcpy(pbuf++, " ");
-		}
-	}
-
-	if (sk == SK_STEALTH) {
-		i = u_geteffstealth(u);
-		if(i>=0) {
-			pbuf += sprintf(pbuf, "%d/", i);
-		}
-	}
-
-	effsk = effskill(u, sk);
-	pbuf += sprintf(pbuf, "%d", effsk);
-
-	if(u->faction->options & Pow(O_SHOWSKCHANGE)) {
-		skill *skill = get_skill(u, sk);
-		int oldeff = 0;
-		int diff;
-
-		if (skill->old > 0) {
-			oldeff = skill->old + get_modifier(u, sk, skill->old, u->region, false);
-		}
-
-		oldeff = max(0, oldeff);
-		diff   = effsk - oldeff; 
-
-		if(diff != 0) {
-			pbuf += sprintf(pbuf, " (%s%d)", (diff>0)?"+":"", diff);
-		}
-	}
-  return pbuf-buffer;
+  if (!*dh) {
+    bufp += strlcpy(bufp, LOC(lang, "nr_skills"), siz-(bufp-buffer));
+    bufp += strlcpy(bufp, ": ", sizeof(buf)-(bufp-buf));
+    *dh = 1;
+  }
+  bufp += strlcpy(bufp, skillname(sk, lang), siz-(bufp-buffer));
+  strcpy(bufp++, " ");
+  
+  if (sk == SK_MAGIC){
+    if (find_magetype(u) != M_GRAU){
+      bufp += strlcpy(bufp, LOC(lang, mkname("school", magietypen[find_magetype(u)])), siz-(bufp-buffer));
+      strcpy(bufp++, " ");
+    }
+  }
+  
+  if (sk == SK_STEALTH) {
+    i = u_geteffstealth(u);
+    if(i>=0) {
+      bufp += sprintf(bufp, "%d/", i);
+    }
+  }
+  
+  effsk = effskill(u, sk);
+  bufp += sprintf(bufp, "%d", effsk);
+  
+  if(u->faction->options & Pow(O_SHOWSKCHANGE)) {
+    skill *skill = get_skill(u, sk);
+    int oldeff = 0;
+    int diff;
+    
+    if (skill->old > 0) {
+      oldeff = skill->old + get_modifier(u, sk, skill->old, u->region, false);
+    }
+    
+    oldeff = max(0, oldeff);
+    diff   = effsk - oldeff; 
+    
+    if(diff != 0) {
+      bufp += sprintf(bufp, " (%s%d)", (diff>0)?"+":"", diff);
+    }
+  }
+  return bufp-buffer;
 }
 
 void
