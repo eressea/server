@@ -56,14 +56,9 @@
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 
-const char * g_reportdir;
+#include <util/bsdstring.h>
 
-static size_t
-strlcpy(char * dst, const char * src) {
-  size_t s = 0;
-  while ((*dst++ = *src++)!=0) ++s;
-  return s;
-}
+const char * g_reportdir;
 
 const char *neue_gebiete[] = {
 	"none",
@@ -191,7 +186,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   if (fspecial(u->faction, FS_HIDDEN))
     a_fshidden = a_find(u->attribs, &at_fshidden);
 
-  bufp += strlcpy(bufp, unitname(u));
+  bufp += strlcpy(bufp, unitname(u), sizeof(buf));
 
   if (!isbattle) {
     attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
@@ -199,30 +194,30 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
       attrib *a = a_find(u->attribs, &at_group);
       if (a) {
         group * g = (group*)a->data.v;
-        bufp += strlcpy(bufp, ", ");
-        bufp += strlcpy(bufp, groupid(g, f));
+        bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
+        bufp += strlcpy(bufp, groupid(g, f), sizeof(buf)-(bufp-buf));
       }
       if (getarnt) {
-        bufp += strlcpy(bufp, ", ");
-        bufp += strlcpy(bufp, LOC(f->locale, "anonymous"));
+        bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
+        bufp += strlcpy(bufp, LOC(f->locale, "anonymous"), sizeof(buf)-(bufp-buf));
       } else if (a_otherfaction) {
         faction * otherfaction = get_otherfaction(a_otherfaction);
         if (otherfaction) {
-          bufp += strlcpy(bufp, ", ");
-          bufp += strlcpy(bufp, factionname(otherfaction));
+          bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
+          bufp += strlcpy(bufp, factionname(otherfaction), sizeof(buf)-(bufp-buf));
         }
       }
     } else {
       if (getarnt) {
-        bufp += strlcpy(bufp, ", ");
-        bufp += strlcpy(bufp, LOC(f->locale, "anonymous"));
+        bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
+        bufp += strlcpy(bufp, LOC(f->locale, "anonymous"), sizeof(buf)-(bufp-buf));
       } else {
         if (a_otherfaction && alliedunit(u, f, HELP_FSTEALTH)) {
           faction * f = get_otherfaction(a_otherfaction);
           bufp += sprintf(bufp, ", %s (%s)", factionname(f), factionname(u->faction));
         } else {
-          bufp += strlcpy(bufp, ", ");
-          bufp += strlcpy(bufp, factionname(fv));
+          bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
+          bufp += strlcpy(bufp, factionname(fv), sizeof(buf)-(bufp-buf));
         }
       }
     }
@@ -235,15 +230,15 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
       if (is_ugroupleader(u, ug)) {
         strcpy(bufp++, "*");
       }
-      bufp += strlcpy(bufp, itoa36(ug->id));
+      bufp += strlcpy(bufp, itoa36(ug->id), sizeof(buf)-(bufp-buf));
     }
   }
 #endif
 
-  bufp += strlcpy(bufp, ", ");
+  bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
 
   if (u->faction != f && a_fshidden && a_fshidden->data.ca[0] == 1 && effskill(u, SK_STEALTH) >= 6) {
-    bufp += strlcpy(bufp, "? ");
+    bufp += strlcpy(bufp, "? ", sizeof(buf)-(bufp-buf));
   } else {
     bufp += sprintf(bufp, "%d ", u->number);
   }
@@ -252,56 +247,56 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   if (pzTmp) {
     scat(pzTmp);
     if (u->faction==f && fval(u->race, RCF_SHAPESHIFTANY)) {
-      bufp += strlcpy(bufp, " (");
-      bufp += strlcpy(bufp, racename(f->locale, u, u->race));
+      bufp += strlcpy(bufp, " (", sizeof(buf)-(bufp-buf));
+      bufp += strlcpy(bufp, racename(f->locale, u, u->race), sizeof(buf)-(bufp-buf));
       strcpy(bufp++, ")");
     }
   } else {
-    bufp += strlcpy(bufp, racename(f->locale, u, u->irace));
+    bufp += strlcpy(bufp, racename(f->locale, u, u->irace), sizeof(buf)-(bufp-buf));
     if (u->faction==f && u->irace!=u->race) {
-      bufp += strlcpy(bufp, " (");
-      bufp += strlcpy(bufp, racename(f->locale, u, u->race));
+      bufp += strlcpy(bufp, " (", sizeof(buf)-(bufp-buf));
+      bufp += strlcpy(bufp, racename(f->locale, u, u->race), sizeof(buf)-(bufp-buf));
       strcpy(bufp++, ")");
     }
   }
 
 #ifdef HEROES
   if (fval(u, UFL_HERO) && (u->faction == f || omniscient(f))) {
-    bufp += strlcpy(bufp, ", ");
-    bufp += strlcpy(bufp, LOC(f->locale, "hero"));
+    bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
+    bufp += strlcpy(bufp, LOC(f->locale, "hero"), sizeof(buf)-(bufp-buf));
   }
 #endif
   /* status */
 
   if (u->number && (u->faction == f || telepath_see || isbattle)) {
     const char * c = locale_string(f->locale, hp_status(u));
-    bufp += strlcpy(bufp, ", ");
-    bufp += strlcpy(bufp, report_kampfstatus(u, f->locale));
+    bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
+    bufp += strlcpy(bufp, report_kampfstatus(u, f->locale), sizeof(buf)-(bufp-buf));
     if (c || fval(u, UFL_HUNGER)) {
-      bufp += strlcpy(bufp, " (");
-      if (c) bufp += strlcpy(bufp, c);
+      bufp += strlcpy(bufp, " (", sizeof(buf)-(bufp-buf));
+      if (c) bufp += strlcpy(bufp, c, sizeof(buf)-(bufp-buf));
       if (fval(u, UFL_HUNGER)) {
-        if (c) bufp += strlcpy(bufp, ", hungert");
-        else bufp += strlcpy(bufp, "hungert");
+        if (c) bufp += strlcpy(bufp, ", hungert", sizeof(buf)-(bufp-buf));
+        else bufp += strlcpy(bufp, "hungert", sizeof(buf)-(bufp-buf));
       }
       strcpy(bufp++, ")");
     }
   }
-  if (getguard(u)) bufp += strlcpy(bufp, ", bewacht die Region");
+  if (getguard(u)) bufp += strlcpy(bufp, ", bewacht die Region", sizeof(buf)-(bufp-buf));
 
   if (u->faction==f || telepath_see) {
     attrib * a = a_find(u->attribs, &at_follow);
     if (a) {
       unit * uf = (unit*)a->data.v;
       if (uf) {
-        bufp += strlcpy(bufp, ", folgt ");
-        bufp += strlcpy(bufp, itoa36(uf->no));
+        bufp += strlcpy(bufp, ", folgt ", sizeof(buf)-(bufp-buf));
+        bufp += strlcpy(bufp, itoa36(uf->no), sizeof(buf)-(bufp-buf));
       }
     }
   }
   if ((b = usiege(u))!=NULL) {
-    bufp += strlcpy(bufp, ", belagert ");
-    bufp += strlcpy(bufp, buildingname(b));
+    bufp += strlcpy(bufp, ", belagert ", sizeof(buf)-(bufp-buf));
+    bufp += strlcpy(bufp, buildingname(b), sizeof(buf)-(bufp-buf));
   }
 
   dh = 0;
@@ -347,14 +342,14 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
     int in;
     report_item(u, itm, f, &ic, NULL, &in, false);
     if (in==0 || ic==NULL) continue;
-    bufp += strlcpy(bufp, ", ");
+    bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
 
     if (!dh) {
       bufp += sprintf(bufp, "%s: ", LOC(f->locale, "nr_inventory"));
       dh = 1;
     }
     if (in == 1) {
-      bufp += strlcpy(bufp, ic);
+      bufp += strlcpy(bufp, ic, sizeof(buf)-(bufp-buf));
     } else {
       bufp += sprintf(bufp, "%d %s", in, ic);
     }
@@ -377,9 +372,9 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
             bufp += sprintf(bufp, ", %s: ", LOC(f->locale, "nr_spells"));
             dh = 1;
           } else {
-            bufp += strlcpy(bufp, ", ");
+            bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
           }
-          bufp += strlcpy(bufp, spell_name(sp, f->locale));
+          bufp += strlcpy(bufp, spell_name(sp, f->locale), sizeof(buf)-(bufp-buf));
         }
       }
       dh = 0;
@@ -396,17 +391,17 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
           if (!dh){
             dh = 1;
           } else {
-            bufp += strlcpy(bufp, ", ");
+            bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
           }
           sp = get_combatspell(u,i);
           if (sp) {
             int sl;
-            bufp += strlcpy(bufp, spell_name(sp, u->faction->locale));
+            bufp += strlcpy(bufp, spell_name(sp, u->faction->locale), sizeof(buf)-(bufp-buf));
             if ((sl = get_combatspelllevel(u,i)) > 0) {
               bufp += sprintf(bufp, " (%d)", sl);
             }
           } else {
-            bufp += strlcpy(bufp, LOC(f->locale, "nr_nospells"));
+            bufp += strlcpy(bufp, LOC(f->locale, "nr_nospells"), sizeof(buf)-(bufp-buf));
           }
         }
       }
@@ -414,8 +409,8 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 #ifdef LASTORDER
     if (!isbattle && u->lastorder) {
       char * cmd = getcommand(u->lastorder);
-      bufp += strlcpy(bufp, ", \"");
-      bufp += strlcpy(bufp, cmd);
+      bufp += strlcpy(bufp, ", \"", sizeof(buf)-(bufp-buf));
+      bufp += strlcpy(bufp, cmd, sizeof(buf)-(bufp-buf));
       strcpy(bufp++, "\"");
       free(cmd);
     }
@@ -424,8 +419,8 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   i = 0;
 
   if (u->display && u->display[0]) {
-    bufp += strlcpy(bufp, "; ");
-    bufp += strlcpy(bufp, u->display);
+    bufp += strlcpy(bufp, "; ", sizeof(buf)-(bufp-buf));
+    bufp += strlcpy(bufp, u->display, sizeof(buf)-(bufp-buf));
 
     i = u->display[strlen(u->display) - 1];
   }
@@ -434,9 +429,9 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 
   pzTmp = uprivate(u);
   if (u->faction == f && pzTmp) {
-    bufp += strlcpy(bufp, " (Bem: ");
-    bufp += strlcpy(bufp, pzTmp);
-    bufp += strlcpy(bufp, ")");
+    bufp += strlcpy(bufp, " (Bem: ", sizeof(buf)-(bufp-buf));
+    bufp += strlcpy(bufp, pzTmp, sizeof(buf)-(bufp-buf));
+    bufp += strlcpy(bufp, ")", sizeof(buf)-(bufp-buf));
   }
 
   dh=0;
@@ -611,19 +606,19 @@ spskill(char * buffer, const struct locale * lang, const struct unit * u, skill_
 
 	if (!has_skill(u, sk)) return 0;
 
-	pbuf += strlcpy(pbuf, ", ");
+	pbuf += strlcpy(pbuf, ", ", sizeof(buf));
 
 	if (!*dh) {
-    pbuf += strlcpy(pbuf, LOC(lang, "nr_skills"));
-    pbuf += strlcpy(pbuf, ": ");
+    pbuf += strlcpy(pbuf, LOC(lang, "nr_skills"), sizeof(buf)-(bufp-buf));
+    pbuf += strlcpy(pbuf, ": ", sizeof(buf)-(bufp-buf));
 		*dh = 1;
 	}
-	pbuf += strlcpy(pbuf, skillname(sk, lang));
+	pbuf += strlcpy(pbuf, skillname(sk, lang), sizeof(buf)-(bufp-buf));
   strcpy(pbuf++, " ");
 
 	if (sk == SK_MAGIC){
 		if (find_magetype(u) != M_GRAU){
-      pbuf += strlcpy(pbuf, LOC(lang, mkname("school", magietypen[find_magetype(u)])));
+      pbuf += strlcpy(pbuf, LOC(lang, mkname("school", magietypen[find_magetype(u)])), sizeof(buf)-(bufp-buf));
       strcpy(pbuf++, " ");
 		}
 	}

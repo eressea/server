@@ -265,11 +265,11 @@ extern "C" {
 
   /* ------------------------------------------------------------- */
 
-#if USE_FIREWALL
   /* für Feuerwände: in movement muß das noch explizit getestet werden.
   * besser wäre eine blcok_type::move() routine, die den effekt
   * der Bewegung auf eine struct unit anwendet.
   */
+  extern struct border_type bt_chaosgate;
   extern struct border_type bt_firewall;
   extern struct border_type bt_wisps;
   typedef struct wall_data {
@@ -277,7 +277,6 @@ extern "C" {
     int force;
     boolean active;
   } wall_data;
-#endif
 
   extern struct attrib_type at_cursewall;
   extern struct attrib_type at_unitdissolve;

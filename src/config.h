@@ -148,6 +148,9 @@ typedef struct stat stat_type;
 # define R_OK 4
 # define HAVE__MKDIR_WITHOUT_PERMISSION
 
+#define HAVE_INLINE
+#define INLINE_FUNCTION __inline
+
 # define snprintf _snprintf
 # define HAVE_SNPRINTF
 

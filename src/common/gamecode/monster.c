@@ -986,18 +986,3 @@ plan_monsters(void)
     }
   }
 }
-
-void
-age_unit(region * r, unit * u)
-{
-  if (u->race == new_race[RC_SPELL]) {
-    if (--u->age <= 0) {
-      destroy_unit(u);
-    }
-  } else {
-    ++u->age;
-    if (u->race->age) {
-      u->race->age(u);
-    }
-  }
-}

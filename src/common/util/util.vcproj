@@ -180,6 +180,9 @@
 				RelativePath=".\base36.h">
 			</File>
 			<File
+				RelativePath=".\bsdstring.h">
+			</File>
+			<File
 				RelativePath=".\command.h">
 			</File>
 			<File

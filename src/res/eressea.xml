@@ -24,7 +24,7 @@
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="1"/>
     <param name="database.gameid" value="0"/>
-    <param name="rules.check_overload" value="1"/>
+    <param name="rules.check_overload" value="0"/>
     <param name="firstturn" value="184"/>
     <param name="report.mailit" value="/usr/sbin:$HOME/eressea/bin:/bin:/usr/bin:/usr/local/bin"/>
   </game>
@@ -42,7 +42,7 @@
     </string>
     <string name="newbie_info_1">
       <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff ERESSEA BEFEHLE an eressea-server@eressea.upb.de zu senden. Am besten, du verwendest die Befehlsvorlage am Ende des Reports.</text>
-  		<text locale="en">Remember to send your orders to eressea-server@eressea.upb.de with the subject ERESSEA ORDERS.</text>
+      <text locale="en">Remember to send your orders to eressea-server@eressea.upb.de with the subject ERESSEA ORDERS.</text>
     </string>
     <string name="mailcmd">
       <text locale="de">ERESSEA BEFEHLE</text>

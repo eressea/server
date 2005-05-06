@@ -2817,7 +2817,6 @@ sp_summondragon(castorder *co)
 	return cast_level;
 }
 
-#if USE_FIREWALL
 /* ------------------------------------------------------------- */
 /* Name:       Feuerwand
  * Stufe:
@@ -3170,7 +3169,6 @@ sp_wisps(castorder *co)
 
         return cast_level;
 }
-#endif
 
 /* ------------------------------------------------------------- */
 /* Name:       Unheilige Kraft
@@ -3614,6 +3612,7 @@ sp_chaossuction(castorder *co)
 	create_special_direction(rt, r, 2,
 			"Ein Wirbel aus reinem Chaos zieht über die Region.",
 			"Wirbel");
+  new_border(&bt_chaosgate, r, rt);
 
 	for (f = factions; f; f = f->next) freset(f, FL_DH);
 	for (u = r->units; u; u = u->next) {
@@ -10546,3 +10545,40 @@ init_spells(void)
     register_spell(spelldaten+i);
   }
 }
+
+static boolean 
+chaosgate_valid(const border * b)
+{
+  const attrib * a = a_findc(b->from->attribs, &at_direction);
+  if (!a) a = a_findc(b->to->attribs, &at_direction);
+  if (!a) return false;
+  return true;
+}
+
+struct region * 
+chaosgate_move(const border * b, struct unit * u, struct region * from, struct region * to, boolean routing)
+{
+  if (!routing) {
+    int maxhp = u->hp / 4;
+    if (maxhp<u->number) maxhp = u->number;
+    u->hp = maxhp;
+  }
+  return to;
+}
+
+border_type bt_chaosgate = {
+  "chaosgate",
+  b_transparent, /* transparent */
+  NULL, /* init */
+  NULL, /* destroy */
+  NULL, /* read */
+  NULL, /* write */
+  b_blocknone, /* block */
+  NULL, /* name */
+  b_rinvisible, /* rvisible */
+  b_finvisible, /* fvisible */
+  b_uinvisible, /* uvisible */
+  chaosgate_valid,
+  chaosgate_move
+};
+

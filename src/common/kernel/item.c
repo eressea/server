@@ -1159,15 +1159,15 @@ static t_item itemdata[MAXITEMS] = {
 	},
 	{			/* I_PEGASUS 60 */
 		{"Pegasus", "Pegasi", "Pegasus", "Pegasi" }, G_M,
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG, NULL
+		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_UNICORN 61 */
 		{"Elfenpferd", "Elfenpferde", "Elfenpferd", "Elfenpferde"}, G_N,
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG, NULL
+		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_DOLPHIN 62 */
 		{"Delphin", "Delphine", "Delphin", "Delphine"}, G_M,
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG, NULL
+		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_ANTIMAGICCRYSTAL 63 */
 		{"Antimagiekristall", "Antimagiekristalle", "Amulett", "Amulette"}, G_M,
@@ -1216,7 +1216,7 @@ static t_item itemdata[MAXITEMS] = {
 	},
 	{
 		{"Zauberbeutel", "Zauberbeutel", "Zauberbeutel", "Zauberbeutel"}, G_M,
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, FL_ITEM_NOTINBAG, NULL
+		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, FL_ITEM_NOTINBAG|FL_ITEM_NOTLOST, NULL
 	},
 	{	/* I_RUSTY_SWORD */
 		{"Schartiges Schwert", "Schartige Schwerter", "Schartiges Schwert", "Schartige Schwerter"}, G_N,

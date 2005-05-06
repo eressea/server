@@ -296,6 +296,38 @@ get_food(region *r)
 }
 
 static void
+age_unit(region * r, unit * u)
+{
+  if (u->race == new_race[RC_SPELL]) {
+    if (--u->age <= 0) {
+      destroy_unit(u);
+    }
+  } else {
+    ++u->age;
+    if (u->race->age) {
+      u->race->age(u);
+    }
+  }
+
+#ifdef ASTRAL_ITEM_RESTRICTIONS
+  if (u->region->planep==astral_plane) {
+    item ** itemp = &u->items;
+    while (*itemp) {
+      item * itm = *itemp;
+      if (itm->type->flags & ITF_NOTLOST == 0) {
+        if (itm->type->flags & (ITF_BIG|ITF_ANIMAL|ITF_CURSED)) {
+          i_free(i_remove(itemp, itm));
+          continue;
+        }
+      }
+      itemp=&itm->next;
+    }
+  }
+#endif
+}
+
+
+static void
 live(region * r)
 {
   unit **up = &r->units;

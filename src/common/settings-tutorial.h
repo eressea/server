@@ -6,7 +6,7 @@
  |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
  +-------------------+  Stefan Reich <reich@halbling.de>
 
- This program may not be used, modified or distributed 
+ This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
 */
 
@@ -27,10 +27,12 @@
 #define GUARD_DISABLES_RECRUIT 1
 #define GUARD_DISABLES_PRODUCTION 1
 #define RESOURCE_QUANTITY 0.5
-#define RECRUITFRACTION 40		/* 100/RECRUITFRACTION% */
+#define RECRUITFRACTION 40    /* 100/RECRUITFRACTION% */
 #define CHANGED_CROSSBOWS 1
 #define NEWATSROI 0
 #define COMBAT_TURNS 5
 #define PEASANTS_DO_NOT_STARVE 0
 #define NEW_MIGRATION 1
 #define ASTRAL_HUNGER
+
+#undef ASTRAL_ITEM_RESTRICTIONS /* keine grossen dinge im astralraum */

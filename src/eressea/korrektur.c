@@ -1010,6 +1010,30 @@ nothing(void)
   return 0;
 }
 
+static int 
+fix_chaosgates(void)
+{
+  region * r;
+  for (r = regions; r; r=r->next) {
+    const attrib *a = a_findc(r->attribs, &at_direction);
+
+    while (a!=NULL) {
+      spec_direction * sd = (spec_direction *)a->data.v;
+      region * r2 = findregion(sd->x, sd->y);
+      border * b = get_borders(r, r2);
+      while (b) {
+        if (b->type==&bt_chaosgate) break;
+        b = b->next;
+      }
+      if (b==NULL) {
+        b = new_border(&bt_chaosgate, r, r2);
+      }
+      a = a->nexttype;
+    }
+  }
+  return 0;
+}
+
 void
 korrektur(void)
 {
@@ -1024,6 +1048,7 @@ korrektur(void)
     do_once("zvrm", nothing());
   }
 
+  do_once("chgt", fix_chaosgates());
 	fix_astralplane();
 	fix_firewalls();
 	fix_gates();

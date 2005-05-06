@@ -31,7 +31,6 @@ void age_illusion(struct unit *u);
 
 void monsters_kill_peasants(void);
 void plan_monsters(void);
-void age_unit(struct region * r, struct unit * u);
 struct unit *random_unit(const struct region * r);
 
 #ifdef __cplusplus
