@@ -227,13 +227,6 @@ getgarbage(void)
 
 	/* Get rid of stuff that was only relevant last turn */
 
-	for (f = factions; f; f = f->next) {
-/*		memset(f->showdata, 0, sizeof f->showdata); */
-
-		freestrlist(f->mistakes);
-		f->mistakes = 0;
-		/* TODO: free msgs */
-	}
 #if 0
 	for (r = regions; r; r = r->next) {
 		freestrlist(r->comments);

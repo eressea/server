@@ -702,7 +702,6 @@ stripfaction (faction * f)
 	if (f->battles) free(f->battles);
 
         /* TODO: free msgs */
-	freestrlist(f->mistakes);
 	freelist(f->allies);
 	free(f->email);
 	free(f->banner);

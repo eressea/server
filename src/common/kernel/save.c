@@ -560,12 +560,11 @@ factionorders(void)
 			printf(" %4s;", factionid(f));
 			fflush(stdout);
 		}
-		freestrlist(f->mistakes);
-		f->mistakes = 0;
 
 		if (checkpasswd(f, pass, true) == false) {
 		  log_warning(("Invalid password for faction %s\n", fid));
-			addstrlist(&f->mistakes, "Das Passwort wurde falsch eingegeben");
+      ADDMSG(&f->msgs, msg_message("msg_errors", "string",
+        "Das Passwort wurde falsch eingegeben"));
 			return 0;
 		}
 		/* Die Partei hat sich zumindest gemeldet, so daß sie noch

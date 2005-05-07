@@ -255,30 +255,6 @@ game_init(void)
 #endif
 }
 
-static void
-getgarbage(void)
-{
-  faction *f;
-
-  /* Get rid of stuff that was only relevant last turn */
-
-  for (f = factions; f; f = f->next) {
-    /*		memset(f->showdata, 0, sizeof f->showdata); */
-
-    freestrlist(f->mistakes);
-    f->mistakes = 0;
-    /* TODO: free msgs */
-  }
-#if 0
-  for (r = regions; r; r = r->next) {
-    freestrlist(r->comments);
-    r->comments = 0;
-    freestrlist(r->botschaften);
-    r->botschaften = 0;
-  }
-#endif
-}
-
 #ifdef SHORTPWDS
 static void
 readshortpwds()
@@ -387,9 +363,6 @@ process_orders()
   printf(" - Korrekturen Runde %d\n", turn);
   korrektur();
   turn++;
-  puts(" - entferne Texte der letzten Runde");
-  getgarbage();
-  puts(" - Nehme Korrekturen am Datenbestand vor");
   processorders();
   score();
   remove_unequipped_guarded();

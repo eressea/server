@@ -83,7 +83,6 @@ typedef struct faction {
 	struct msglevel * msglevels;
 	struct ally *allies;
 	struct group *groups;
-	struct strlist *mistakes; /* enno: das muß irgendwann noch ganz raus */
 	boolean alive; /* enno: sollte ein flag werden */
 	int nregions;
 	int money;

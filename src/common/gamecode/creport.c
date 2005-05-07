@@ -1189,7 +1189,6 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 		}
 	}
 
-	cr_output_str_list(F, "FEHLER", f->mistakes, f);
 	cr_output_messages(F, f->msgs, f);
 	{
 		struct bmsg * bm;
