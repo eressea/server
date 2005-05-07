@@ -350,6 +350,19 @@ cmistake(const unit * u, struct order *ord, int mno, int mtype)
 
 extern unsigned int new_hashstring(const char* s);
 
+void
+free_messagelist(message_list * msgs)
+{
+  struct mlist ** mlistptr = &msgs->begin;
+  while (*mlistptr) {
+    struct mlist * ml = *mlistptr;
+    *mlistptr = ml->next;
+    msg_release(ml->msg);
+    free(ml);
+  }
+  free(msgs);
+}
+
 message * 
 add_message(message_list** pm, message * m)
 {

@@ -28,16 +28,17 @@ struct msglevel;
 struct message_type;
 
 typedef struct message_list {
-	struct mlist {
-		struct mlist * next;
-		struct message *msg;
-	} * begin, **end;
+  struct mlist {
+    struct mlist * next;
+    struct message *msg;
+  } * begin, **end;
 } message_list;
 
-typedef struct messageclass
-{
-	struct messageclass * next;
-	const char * name;
+extern void free_messagelist(message_list * msgs);
+
+typedef struct messageclass {
+  struct messageclass * next;
+  const char * name;
 } messageclass;
 
 typedef struct msglevel {

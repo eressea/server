@@ -414,18 +414,6 @@ game_done(void)
     region *r = regions;
     regions = r->next;
 
-    if (r->msgs) {
-      message_list::mlist ** mlistptr = &r->msgs->begin;
-      while (*mlistptr) {
-        message_list::mlist * ml = *mlistptr;
-        *mlistptr = ml->next;
-        msg_release(ml->msg);
-        free(ml);
-      }
-      free(r->msgs);
-      r->msgs = 0;
-    }
-
     while (r->units) {
       unit * u = r->units;
       r->units = u->next;

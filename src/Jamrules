@@ -8,7 +8,12 @@ if ! $(HAVE_LUA) {
 }
 
 if ! $(DISTCC_HOSTS) {
-} else {
+}
+else {
+  DISTCC = 1 ;
+}
+
+if $(DISTCC) {
   CC = distcc $(CC) ;
   C++ = distcc $(C++) ;
   Echo Compiling with distcc ;
@@ -24,6 +29,7 @@ if ! $(CCACHE_DIR) {
 if $(DMALLOC) {
   Echo Compiling with dmalloc ;
   CCFLAGS += -DUSE_DMALLOC ;
+  C++FLAGS += -DUSE_DMALLOC ;
   LINKFLAGS += -ldmalloc ;
 }
 

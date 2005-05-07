@@ -797,12 +797,30 @@ freeland(land_region * lr)
 void
 free_region(region * r)
 {
-	runhash(r);
-	if (last == r) last = NULL;
-	free(r->display);
-	if (r->land) freeland(r->land);
-	while (r->attribs) a_remove (&r->attribs, r->attribs);
-	free(r);
+  runhash(r);
+  if (last == r) last = NULL;
+  free(r->display);
+  if (r->land) freeland(r->land);
+
+  if (r->msgs) {
+    free_messagelist(r->msgs);
+    r->msgs = 0;
+  }
+  
+  while (r->individual_messages) {
+    struct individual_message * msg = r->individual_messages;
+    r->individual_messages = msg->next;
+    free_messagelist(msg->msgs);
+    free(msg);
+  }
+
+  while (r->attribs) a_remove (&r->attribs, r->attribs);
+  while (r->resources) {
+    rawmaterial * res = r->resources;
+    r->resources = res->next;
+    free(res);
+  }
+  free(r);
 }
 
 static char *
