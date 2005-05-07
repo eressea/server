@@ -289,7 +289,7 @@ message_all(battle * b, message * m)
 void
 battlerecord(battle * b, const char *s)
 {
-  struct message * m = msg_message("msg_battle", "string", strdup(s));
+  struct message * m = msg_message("msg_battle", "string", s);
   message_all(b, m);
   msg_release(m);
 }
@@ -303,7 +303,7 @@ battlemsg(battle * b, unit * u, const char * s)
 	watcher * w;
 
 	sprintf(buf, "%s %s", unitname(u), s);
-	m = msg_message("msg_battle", "string", strdup(buf));
+	m = msg_message("msg_battle", "string", buf);
 	for (bf=b->factions;bf;bf=bf->next) {
 		message_faction(b, bf->faction, m);
 	}
@@ -317,7 +317,7 @@ battlemsg(battle * b, unit * u, const char * s)
 static void
 fbattlerecord(battle * b, faction * f, const char *s)
 {
-  message * m = msg_message("msg_battle", "string", gc_add(strdup(s)));
+  message * m = msg_message("msg_battle", "string", s);
   message_faction(b, f, m);
   msg_release(m);
 }

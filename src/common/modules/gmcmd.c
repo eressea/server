@@ -276,7 +276,7 @@ gm_messageplane(const tnode * tnext, const char * str, void * data, struct order
 			mistake(u, ord, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
-			message * msg = msg_message("msg_event", "string", strdup(zmsg));
+			message * msg = msg_message("msg_event", "string", zmsg);
 			faction * f;
 			region * r;
 			for (f=factions;f;f=f->next) {
@@ -372,10 +372,9 @@ gm_killunit(const tnode * tnext, const char * str, void * data, struct order * o
 			mistake(u, ord, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
-			char * zmsg = (char*)gc_add(strdup(msg));
 			scale_number(target, 0);
 			ADDMSG(&target->faction->msgs, msg_message("killedbygm", 
-				"region unit string", r, target, zmsg));
+				"region unit string", r, target, msg));
 		}
 	}
 }
@@ -445,9 +444,8 @@ gm_messageunit(const tnode * tnext, const char * str, void * data, struct order 
 			mistake(u, ord, "Unzureichende Rechte für diesen Befehl.\n", 0);
 		}
 		else {
-			char * m = (char*)gc_add(strdup(msg));
 			add_message(&target->faction->msgs,
-				msg_message("unitmessage", "region unit string", r, u, m));
+				msg_message("unitmessage", "region unit string", r, u, msg));
 		}
 	}
 }
