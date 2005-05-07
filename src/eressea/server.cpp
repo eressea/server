@@ -104,6 +104,10 @@
 #include <ctime>
 #include <clocale>
 
+#ifdef USE_DMALLOC
+# define CLEANUP_CODE
+#endif
+
 /**
 ** global variables we are importing from other modules
 **/
@@ -386,9 +390,6 @@ process_orders()
   puts(" - entferne Texte der letzten Runde");
   getgarbage();
   puts(" - Nehme Korrekturen am Datenbestand vor");
-#if BENCHMARK
-  exit(0);
-#endif
   processorders();
   score();
   remove_unequipped_guarded();
@@ -406,61 +407,66 @@ game_done(void)
   * zum Debugging interessant, wenn man Leak Detection hat, und nach
   * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benötigt
   * wird (temporäre Hilsstrukturen) */
-  unit *u, *u2;
-  region *r, *r2;
-  building *b, *b2;
-  faction *f, *f2;
-  ship *s, *s2;
 
   free(used_faction_ids);
-  for (r = regions; r; r = r2) {
-#if 0
-    msg * m = r->msgs;
-    while (m) {
-      msg * x = m;
-      m = m->next;
-      if (x->type->finalize) x->type->finalize(x);
-      free(x);
+
+  while (regions) {
+    region *r = regions;
+    regions = r->next;
+
+    if (r->msgs) {
+      message_list::mlist ** mlistptr = &r->msgs->begin;
+      while (*mlistptr) {
+        message_list::mlist * ml = *mlistptr;
+        *mlistptr = ml->next;
+        msg_release(ml->msg);
+        free(ml);
+      }
+      free(r->msgs);
+      r->msgs = 0;
     }
-    rm = rm->next;
+
+    while (r->units) {
+      unit * u = r->units;
+      r->units = u->next;
+      stripunit(u);
+      uunhash(u);
+      free(u);
+    }
+
+    while (r->buildings) {
+      building * b = r->buildings;
+      r->buildings = b->next;
+      free(b->name);
+      free(b->display);
+      free(b);
+    }
+
+    while (r->ships) {
+      ship * s = r->ships;
+      r->ships = s->next;
+      free(s->name);
+      free(s->display);
+      free(s);
+    }
+    free_region(r);
   }
-#endif
-  for (u = r->units; u; u = u2) {
-    u2 = u->next;
-    stripunit(u);
-    uunhash(u);
-    free(u);
+
+  while (factions) {
+    faction * f = factions;
+    factions = f->next;
+    stripfaction(f);
+    free(f);
   }
-  for (b = r->buildings; b; b = b2) {
-    free(b->name);
-    free(b->display);
-    b2 = b->next;
-    free(b);
+
+  while (planes) {
+    plane * pl = planes;
+    planes = planes->next;
+    free(pl);
   }
-  for (s = r->ships; s; s = s2) {
-    free(s->name);
-    free(s->display);
-    s2 = s->next;
-    free(s);
-  }
-  r2 = r->next;
-  free_region(r);
-}
-for (f = factions; f; f = f2) {
-  stripfaction(f);
-  f2 = f->next;
-  free(f);
-}
-while (planes) {
-  plane * pl = planes;
-  planes = planes->next;
-  free(pl);
-}
-#ifdef LEAK_DETECT
-leak_report(stderr);
-#endif
-creport_cleanup();
-report_cleanup();
+
+  creport_cleanup();
+  report_cleanup();
 }
 #endif
 

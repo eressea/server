@@ -298,9 +298,6 @@ processturn(char *filename)
 	getgarbage();
 	puts(" - Nehme Korrekturen am Datenbestand vor");
 	if ((i=readorders(filename))!=0) return i;
-#if BENCHMARK
-	exit(0);
-#endif
   if (!nomonsters) {
     if (turn == 0) srand(time((time_t *) NULL));
     else srand(turn);
@@ -400,9 +397,6 @@ game_done(void)
 		planes = planes->next;
 		free(pl);
 	}
-#ifdef LEAK_DETECT
-	leak_report(stderr);
-#endif
 	creport_cleanup();
 	report_cleanup();
 }
