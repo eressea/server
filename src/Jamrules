@@ -21,6 +21,12 @@ if ! $(CCACHE_DIR) {
   Echo Compiling with ccache ;
 }
 
+if $(DMALLOC) {
+  Echo Compiling with dmalloc ;
+  CCFLAGS += -DUSE_DMALLOC ;
+  LINKFLAGS += -ldmalloc ;
+}
+
 if $(PROFILE) = 1 {
   Echo Compiling with profiler ;
   CCFLAGS += -pg -g ;

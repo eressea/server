@@ -97,7 +97,6 @@ promotelist(void *l, void *p)
 	insertlist((void_list **)l, (void_list *)p);
 }
 
-#ifndef MALLOCDBG
 void
 removelist(void *l, void *p)
 {
@@ -124,7 +123,6 @@ freelist(void *p1)
 		p = p2;
 	}
 }
-#endif
 
 void
 invert_list(void * heap)

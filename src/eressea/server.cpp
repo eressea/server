@@ -466,9 +466,9 @@ report_cleanup();
 
 #include "magic.h"
 
-#ifdef MALLOCDBG
+#ifdef CRTDBG
 void
-init_malloc_debug(void)
+init_crtdbg(void)
 {
 #if (defined(_MSC_VER))
 # if MALLOCDBG == 2
@@ -678,6 +678,8 @@ int
 main(int argc, char *argv[])
 {
   int i;
+  char * lc_ctype;
+  char * lc_numeric;
   char zText[MAX_PATH];
 
   setup_signal_handler();
@@ -689,16 +691,18 @@ main(int argc, char *argv[])
     "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
     "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %f\n\n", global.gamename, version());
 
-  setlocale(LC_ALL, "");
-  setlocale(LC_NUMERIC, "C");
+  lc_ctype = setlocale(LC_CTYPE, "");
+  lc_numeric = setlocale(LC_NUMERIC, "C");
+  if (lc_ctype) lc_ctype = strdup(lc_ctype);
+  if (lc_numeric) lc_numeric = strdup(lc_numeric);
 #ifdef LOCALE_CHECK
   if (!locale_check()) {
     log_error(("The current locale is not suitable for international Eressea.\n"));
     return -1;
   }
 #endif
-#ifdef MALLOCDBG
-  init_malloc_debug();
+#ifdef CRTDBG
+  init_crtdbg();
 #endif
 
   lua_State * luaState = lua_init();
@@ -739,5 +743,11 @@ main(int argc, char *argv[])
   kernel_done();
   lua_done(luaState);
   log_close();
+
+  setlocale(LC_CTYPE, lc_ctype);
+  setlocale(LC_NUMERIC, lc_numeric);
+  free(lc_ctype);
+  free(lc_numeric);
+
   return 0;
 }

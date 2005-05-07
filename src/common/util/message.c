@@ -89,7 +89,7 @@ mt_new_va(const char * name, ...)
 typedef struct arg_type {
   struct arg_type * next;
   const char * name;
-  void  (*free)(void*);
+  void  (*release)(void*);
   void* (*copy)(void*);
 } arg_type;
 
@@ -101,7 +101,7 @@ register_argtype(const char * name, void(*free_arg)(void*), void*(*copy_arg)(voi
   arg_type * atype = (arg_type *)malloc(sizeof(arg_type));
   atype->name = name;
   atype->next = argtypes;
-  atype->free = free_arg;
+  atype->release = free_arg;
   atype->copy = copy_arg;
   argtypes = atype;
 }
@@ -130,7 +130,7 @@ static void
 free_arg(const char * type, void * data)
 {
   arg_type * atype = find_argtype(type);
-  if (atype && atype->free) atype->free(data);
+  if (atype && atype->release) atype->release(data);
 }
 
 message *

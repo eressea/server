@@ -410,9 +410,9 @@ game_done(void)
 
 #include "magic.h"
 
-#ifdef MALLOCDBG
+#ifdef CRTDBG
 void
-init_malloc_debug(void)
+init_crtdbg(void)
 {
 #if (defined(_MSC_VER))
 # if MALLOCDBG == 2
@@ -621,8 +621,11 @@ main(int argc, char *argv[])
 		return -1;
 	}
 #endif
-#ifdef MALLOCDBG
-	init_malloc_debug();
+#ifdef CRTDBG
+	init_crtdbg();
+#endif
+#ifdef DMALLOC
+  init_dmalloc();
 #endif
 
 	if ((i=read_args(argc, argv))!=0) return i;

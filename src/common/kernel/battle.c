@@ -3911,11 +3911,6 @@ do_battle(void)
 
     /* Auswirkungen berechnen: */
     aftermath(b);
-    /*
-    #ifdef MALLOCDBG
-    assert(_CrtCheckMemory());
-    #endif
-    */
     /* Hier ist das Gefecht beendet, und wir können die
     * Hilfsstrukturen * wieder löschen: */
 

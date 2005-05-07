@@ -34,37 +34,22 @@ extern "C" {
 /****                 ****
  ** Debugging Libraries **
  ****                 ****/
-/*
- * MALLOCDBG is an integer >= 0 that specifies the level of
- * debugging. 0 = no debugging, >= 1 increasing levels of
- * debugging strength.
- */
-#ifdef MPATROL
-# ifndef MALLOCDBG
-#  define MALLOCDBG 1
-# endif
-# include <mpatrol.h>
-#endif
-
 #if defined __GNUC__
 # define HAVE_INLINE
 # define INLINE_FUNCTION __inline
 #endif
-  
-#ifdef DMALLOC
-# ifndef MALLOCDBG
-#  define MALLOCDBG 1
-# endif
+
+/* define USE_DMALLOC to enable use of the dmalloc library */
+#ifdef USE_DMALLOC
 # include <stdlib.h>
+# include <string.h>
 # include <dmalloc.h>
 #endif
 
-#if defined(_DEBUG) && defined(_MSC_VER)
-/* define MALLOCDBG in project settings, not here! */
-# ifdef MALLOCDBG
-#  include <crtdbg.h>
-#  define _CRTDBG_MAP_ALLOC
-# endif
+/* define CRTDBG to enable MSVC CRT Debug library functions */
+#if defined(_DEBUG) && defined(_MSC_VER) && defined(CRTDBG)
+# include <crtdbg.h>
+# define _CRTDBG_MAP_ALLOC
 #endif
 
 /****                    ****
