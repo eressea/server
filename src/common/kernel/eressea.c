@@ -697,20 +697,28 @@ ffindhash(int no)
 void
 stripfaction (faction * f)
 {
-	/* TODO: inhalt auch löschen */
-	if (f->msgs) free(f->msgs);
-	if (f->battles) free(f->battles);
+  /* TODO: inhalt auch löschen */
+  if (f->msgs) free_messagelist(f->msgs);
+  while (f->battles) {
+    struct bmsg * b = f->battles;
+    f->battles = b->next;
+    free_messagelist(b->msgs);
+  }
 
-        /* TODO: free msgs */
-	freelist(f->allies);
-	free(f->email);
-	free(f->banner);
-	free(f->passw);
-	free(f->override);
-	free(f->name);
-	while (f->attribs) a_remove (&f->attribs, f->attribs);
-	freelist(f->ursprung);
-	funhash(f);
+  freelist(f->allies);
+
+  free(f->email);
+  free(f->banner);
+  free(f->passw);
+  free(f->override);
+  free(f->name);
+
+  while (f->attribs) a_remove (&f->attribs, f->attribs);
+
+  i_freeall(f->items);
+
+  freelist(f->ursprung);
+  funhash(f);
 }
 
 void

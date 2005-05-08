@@ -104,7 +104,7 @@
 #include <ctime>
 #include <clocale>
 
-#ifdef USE_DMALLOC
+#if defined(USE_DMALLOC)
 # define CLEANUP_CODE
 #endif
 
@@ -372,6 +372,9 @@ process_orders()
   return 0;
 }
 
+#ifndef CLEANUP_CODE
+# define CLEANUP_CODE
+#endif
 #ifdef CLEANUP_CODE
 static void
 game_done(void)
