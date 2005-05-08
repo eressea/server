@@ -220,23 +220,6 @@ game_init(void)
 #endif
 }
 
-static void
-getgarbage(void)
-{
-	faction *f;
-
-	/* Get rid of stuff that was only relevant last turn */
-
-#if 0
-	for (r = regions; r; r = r->next) {
-		freestrlist(r->comments);
-		r->comments = 0;
-		freestrlist(r->botschaften);
-		r->botschaften = 0;
-	}
-#endif
-}
-
 #ifdef SHORTPWDS
 static void
 readshortpwds()
@@ -287,9 +270,6 @@ processturn(char *filename)
 	printf(" - Korrekturen Runde %d\n", turn);
 	korrektur();
 	turn++;
-	puts(" - entferne Texte der letzten Runde");
-	getgarbage();
-	puts(" - Nehme Korrekturen am Datenbestand vor");
 	if ((i=readorders(filename))!=0) return i;
   if (!nomonsters) {
     if (turn == 0) srand(time((time_t *) NULL));

@@ -1,15 +1,17 @@
 C++ = g++ ;
 CC = gcc ;
 
+if $(JAMUNAME[5]) = "GNU/Linux" {
+ DEBIAN = 1 ;
+}
+
 LINKFLAGS += -rdynamic ;
 
 if ! $(HAVE_LUA) {
   HAVE_LUA = 1 ;
 }
 
-if ! $(DISTCC_HOSTS) {
-}
-else {
+if $(DISTCC_HOSTS) {
   DISTCC = 1 ;
 }
 
@@ -53,8 +55,11 @@ if ! $(LUABIND) {
 }
 
 C++FLAGS += -DHAVE_LUABIND_$(LUABIND) ;
-if $(HOST) = "hamunaptra" {
-  XMLHDRS = /homes2/info-f/enno/software/hamunaptra/include/libxml2 ;
+if $(LOCAL_USR) {
+  XMLHDRS = $(LOCAL_USR)/include/libxml2 ;
+  C++FLAGS += -I$(LOCAL_USR)/include ;
+  CFLAGS += -I$(LOCAL_USR)/include ;
+  LINKLIBS += -L$(LOCAL_USR)/lib ;
 } else {
   XMLHDRS = /usr/include/libxml2 ;
 }
@@ -70,10 +75,10 @@ rule iconv
 rule luabind
 {
   LINKLIBS on $(<) += -L$(LUABIND_ROOT)/lib ;
-  if $(HOST) = "hamunaptra" {
-    LINKLIBS on $(<) += -llua -llualib ;
-  } else { 
+  if $(DEBIAN) {
     LINKLIBS on $(<) += -llua50 -llualib50 ;
+  } else {
+    LINKLIBS on $(<) += -llua -llualib ;
   }
   LINKLIBS on $(<) += -lm -lluabind ;
 }
