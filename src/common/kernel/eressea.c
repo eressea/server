@@ -3208,7 +3208,8 @@ attrib_init(void)
 	register_bordertype(&bt_wall);
 	register_bordertype(&bt_illusionwall);
 	register_bordertype(&bt_firewall);
-	register_bordertype(&bt_wisps);
+  register_bordertype(&bt_wisps);
+  register_bordertype(&bt_chaosgate);
 	register_bordertype(&bt_road);
 	register_bordertype(&bt_questportal);
 
