@@ -1,9 +1,7 @@
 C++ = g++ ;
 CC = gcc ;
 
-if $(JAMUNAME[5]) = "GNU/Linux" {
- DEBIAN = 1 ;
-}
+# ECHO $(JAMUNAME) ;
 
 LINKFLAGS += -rdynamic ;
 
@@ -75,11 +73,7 @@ rule iconv
 rule luabind
 {
   LINKLIBS on $(<) += -L$(LUABIND_ROOT)/lib ;
-  if $(DEBIAN) {
-    LINKLIBS on $(<) += -llua50 -llualib50 ;
-  } else {
-    LINKLIBS on $(<) += -llua -llualib ;
-  }
+  LINKLIBS on $(<) += -llua50 -llualib50 ;
   LINKLIBS on $(<) += -lm -lluabind ;
 }
 
