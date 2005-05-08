@@ -227,7 +227,7 @@ extern char * strdup(const char *s);
  ** The Eressea boolean type **
  ****                      ****/
 #ifdef __cplusplus
-  typedef bool boolean;
+  typedef int boolean; /* not bool! wrong size. */
 #else
   typedef int boolean;
 # define false ((boolean)0)
