@@ -1915,15 +1915,15 @@ createunit(region * r, faction * f, int number, const struct race * rc)
 unit *
 create_unit(region * r, faction * f, int number, const struct race *urace, int id, const char * dname, unit *creator)
 {
-	unit * u = calloc(1, sizeof(unit));
+  unit * u = calloc(1, sizeof(unit));
   order * deford = default_order(f->locale);
 
   assert(urace);
-	assert(f->alive);
-	u_setfaction(u, f);
-	set_order(&u->thisorder, NULL);
+  assert(f->alive);
+  u_setfaction(u, f);
+  set_order(&u->thisorder, NULL);
 #ifdef LASTORDER
-	set_order(&u->lastorder, deford);
+  set_order(&u->lastorder, deford);
 #else
   addlist(&u->orders, deford);
 #endif
@@ -3250,21 +3250,7 @@ kernel_init(void)
 order *
 default_order(const struct locale * lang)
 {
-	static struct orders {
-		const struct locale * lang;
-		struct order * ord;
-		struct orders * next;
-	} * defaults = NULL;
-	struct orders * olist = defaults;
-	while (olist) {
-		if (olist->lang==lang) return olist->ord;
-		olist = olist->next;
-	}
-	olist = (struct orders*)malloc(sizeof(struct orders));
-	defaults = olist;
-	olist->next = defaults;
-	olist->lang = lang;
-	return olist->ord = parse_order(locale_string(lang, "defaultorder"), lang);
+  return parse_order(locale_string(lang, "defaultorder"), lang);
 }
 
 int
