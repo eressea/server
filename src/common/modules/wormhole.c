@@ -172,6 +172,8 @@ create_wormholes(void)
     r=r->next;
   }
 
+  if (count<2) return;
+
   match = (region**)malloc(sizeof(region*) * count);
   rptr = rlist;
   while (i!=count) {

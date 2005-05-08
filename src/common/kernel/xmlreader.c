@@ -185,6 +185,7 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
       if (property!=NULL) {
         pf_generic foo = get_function((const char*)property);
         a_add(&con->attribs, make_skillmod(NOSKILL, SMF_PRODUCTION, (skillmod_fun)foo, 1.0, 0));
+        xmlFree(property);
       }
 
     }
