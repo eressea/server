@@ -1617,8 +1617,14 @@ make_cmd(unit * u, struct order * ord)
 }
 /* ------------------------------------------------------------- */
 
+static void 
+free_luxuries(struct attrib * a)
+{
+  i_freeall((item*)a->data.v);
+}
+
 const attrib_type at_luxuries = {
-	"luxuries", NULL, NULL, NULL, NULL, NULL
+	"luxuries", NULL, free_luxuries, NULL, NULL, NULL
 };
 
 static void

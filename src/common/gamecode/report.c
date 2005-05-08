@@ -2592,8 +2592,8 @@ global_report(const char * filename)
     add_seen(seen, r, see_unit, true);
   }
   report_computer(F, monsters, seen, addresses, time(NULL));
+  freelist(addresses);
   seen_done(seen);
-
   fclose(F);
 }
 

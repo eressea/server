@@ -3228,16 +3228,18 @@ free_battle(battle * b)
 	side *side;
 	fighter *fighter;
 	meffect *meffect;
-	bfaction * bf;
 	int max_fac_no = 0;
 
 	if (bdebug) {
 		fclose(bdebug);
 	}
 
-	for (bf=b->factions;bf;bf=bf->next) {
+	while (b->factions) {
+    bfaction * bf = b->factions;
 		faction * f = bf->faction;
+    b->factions = bf->next;
 		max_fac_no = max(max_fac_no, f->no);
+    free(bf);
 	}
 
 	cv_foreach(side, b->sides) {
@@ -3257,9 +3259,6 @@ free_battle(battle * b)
 	}
 	cv_next(meffect);
 	cv_kill(&b->meffects);
-/*
-	cv_kill(&b->factions);
-*/
 }
 
 static int *

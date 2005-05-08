@@ -504,6 +504,7 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
         xmlFree(property);
       }
     }
+    xmlXPathFreeObject(races);
   }
   xmlXPathFreeObject(result);
 
