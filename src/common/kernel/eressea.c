@@ -3242,7 +3242,7 @@ kernel_init(void)
 order *
 default_order(const struct locale * lang)
 {
-	struct orders {
+	static struct orders {
 		const struct locale * lang;
 		struct order * ord;
 		struct orders * next;
