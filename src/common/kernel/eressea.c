@@ -2734,7 +2734,7 @@ hunger(int number, unit * u)
 	if (dead) {
 		/* Gestorbene aus der Einheit nehmen,
 		 * Sie bekommen keine Beerdingung. */
-		add_message(&u->faction->msgs, new_message(u->faction,
+		ADDMSG(&u->faction->msgs, new_message(u->faction,
 			"starvation%u:unit%r:region%i:dead%i:live", u, r, dead, u->number-dead));
 
 		scale_number(u, u->number - dead);
@@ -3247,7 +3247,7 @@ default_order(const struct locale * lang)
 		struct order * ord;
 		struct orders * next;
 	} * defaults = NULL;
-	struct orders * olist = NULL;
+	struct orders * olist = defaults;
 	while (olist) {
 		if (olist->lang==lang) return olist->ord;
 		olist = olist->next;

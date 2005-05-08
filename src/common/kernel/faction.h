@@ -78,9 +78,9 @@ typedef struct faction {
 	struct ugroup *ugroups;
 #endif
 #ifdef MSG_LEVELS
+  struct msglevel * msglevels;
 	struct warning * warnings;
 #endif
-	struct msglevel * msglevels;
 	struct ally *allies;
 	struct group *groups;
 	boolean alive; /* enno: sollte ein flag werden */
