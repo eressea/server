@@ -21,15 +21,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define SHORT_STRINGS
+#define SHARE_ORDERS
+
 typedef struct locale_data {
+#ifdef SHARE_ORDERS
   struct order_data * short_orders[MAXKEYWORDS];
+#endif
   const struct locale * lang;
 } locale_data;
 
 static struct locale_data * locale_array[16];
 static int nlocales = 0;
-
-#undef SHORT_STRINGS
 
 typedef struct order_data {
   char * _str; 
@@ -178,15 +181,16 @@ parse_order(const char * s, const struct locale * lang)
     ord = (order*)malloc(sizeof(order));
     ord->_persistent = persistent;
     ord->next = NULL;
+    ord->data = NULL;
 
+#ifdef SHARE_ORDERS
     if (kwd!=NOKEYWORD && *sptr == 0) {
       ord->data = locale_array[i]->short_orders[kwd];
       if (ord->data != NULL) {
         ++ord->data->_refcount;
       }
-    } else {
-      ord->data = NULL;
     }
+#endif
 
     if (ord->data==NULL) {
       ord->data = (order_data*)malloc(sizeof(order_data));
@@ -194,10 +198,12 @@ parse_order(const char * s, const struct locale * lang)
       ord->data->_str = NULL;
       ord->data->_refcount = 1;
       ord->data->_keyword = kwd;
+#ifdef SHARE_ORDERS
       if (kwd!=NOKEYWORD && *sptr == 0) {
         locale_array[i]->short_orders[kwd] = ord->data;
         ++ord->data->_refcount;
       }
+#endif
 #ifdef SHORT_STRINGS
       if (ord->data->_keyword==NOKEYWORD) {
         ord->data->_str = strdup(s);
