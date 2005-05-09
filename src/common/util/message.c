@@ -145,7 +145,7 @@ msg_create(const struct message_type * type, void * args[])
     return NULL;
   }
   msg->type = type;
-  msg->parameters = (void**)calloc(sizeof(void*), type->nparameters);
+  msg->parameters = (void**)calloc(type->nparameters, sizeof(void*));
   msg->refcount=1;
   for (i=0;i!=type->nparameters;++i) {
     msg->parameters[i] = copy_arg(type->types[i], args[i]);
