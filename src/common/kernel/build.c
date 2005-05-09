@@ -260,9 +260,8 @@ siege_cmd(unit * u, order * ord)
   } else d = 0;
 
   /* meldung fuer belagerer */
-  add_message(&u->faction->msgs,
-    new_message(u->faction, "siege%u:unit%b:building%i:destruction",
-    u, b, d));
+  ADDMSG(&u->faction->msgs, msg_message("siege", 
+    "unit building destruction", u, b, d));
 
   for (u2 = r->units; u2; u2 = u2->next) freset(u2->faction, FL_DH);
   fset(u->faction, FL_DH);
@@ -271,9 +270,8 @@ siege_cmd(unit * u, order * ord)
   for (u2 = r->units; u2; u2 = u2->next) {
     if (u2->building == b && !fval(u2->faction, FL_DH)) {
       fset(u2->faction, FL_DH);
-      add_message(&u2->faction->msgs,
-        new_message(u2->faction, "siege%u:unit%b:building%i:destruction",
-        u, b, d));
+      ADDMSG(&u2->faction->msgs, msg_message("siege", 
+        "unit building destruction", u, b, d));
     }
   }
 }
@@ -332,8 +330,8 @@ destroy_road(unit *u, int n, struct order * ord)
 #endif
     rsetroad(r, d, road - willdo);
     if (road!=0 && road <= willdo) {
-      add_message(&u->faction->msgs, new_message(
-        u->faction, "destroy_road%u:unit%r:from%r:to", u, r, r2));
+      ADDMSG(&u->faction->msgs, msg_message("destroy_road", 
+        "unit from to", u, r, r2));
     }
   }
 }
@@ -401,14 +399,14 @@ destroy_cmd(unit * u, struct order * ord)
           u2->building = 0;
           freset(u2, UFL_OWNER);
         }
-        add_message(&u->faction->msgs, new_message(
-          u->faction, "destroy%b:building%u:unit", b, u));
+        ADDMSG(&u->faction->msgs, msg_message("destroy", 
+          "building unit", b, u));
         destroy_building(b);
     } else {
       /* partial destroy */
       b->size -= n;
-      add_message(&u->faction->msgs, new_message(
-        u->faction, "destroy_partial%b:building%u:unit", b, u));
+      ADDMSG(&u->faction->msgs, msg_message("destroy_partial", 
+        "building unit", b, u));
     }
   } else if (u->ship) {
     sh = u->ship;
@@ -435,14 +433,14 @@ destroy_cmd(unit * u, struct order * ord)
           u2->ship = 0;
           freset(u2, UFL_OWNER);
         }
-        add_message(&u->faction->msgs, new_message(
-          u->faction, "shipdestroy%u:unit%r:region%h:ship", u, r, sh));
+        ADDMSG(&u->faction->msgs, msg_message("shipdestroy", 
+          "unit region ship", u, r, sh));
         destroy_ship(sh);
     } else {
       /* partial destroy */
       sh->size -= (sh->type->construction->maxsize * n)/100;
-      add_message(&u->faction->msgs, new_message(
-        u->faction, "shipdestroy_partial%u:unit%r:region%h:ship", u, r, sh));
+      ADDMSG(&u->faction->msgs, msg_message("shipdestroy_partial", 
+        "unit region ship", u, r, sh));
     }
   } else {
     log_error(("Die Einheit %s von %s war owner eines objects, war aber weder in einer Burg noch in einem Schiff.\n",
@@ -568,8 +566,8 @@ build_road(region * r, unit * u, int size, direction_t d)
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
     produceexp(u, SK_ROAD_BUILDING, min(n, u->number));
   }
-  add_message(&u->faction->msgs, new_message(
-    u->faction, "buildroad%r:region%u:unit%i:size", r, u, n));
+  ADDMSG(&u->faction->msgs, msg_message("buildroad", 
+    "region unit size", r, u, n));
 }
 /* ------------------------------------------------------------- */
 
@@ -941,8 +939,8 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   b->size += built;
   update_lighthouse(b);
 
-  add_message(&u->faction->msgs, new_message(
-    u->faction, "buildbuilding%b:building%u:unit%i:size", b, u, built));
+  ADDMSG(&u->faction->msgs, msg_message("buildbuilding", 
+    "building unit size", b, u, built));
 }
 
 static void
@@ -977,9 +975,8 @@ build_ship(unit * u, ship * sh, int want)
     sh->damage = sh->damage - repair;
   }
 
-  if(n)
-    add_message(&u->faction->msgs, new_message(
-      u->faction, "buildship%h:ship%u:unit%i:size", sh, u, n));
+  if (n) ADDMSG(&u->faction->msgs, 
+    msg_message("buildship", "ship unit size", sh, u, n));
 }
 
 void

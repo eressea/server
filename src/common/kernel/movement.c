@@ -470,8 +470,8 @@ do_maelstrom(region *r, unit *u)
   damage = rand()%150 - eff_skill(u, SK_SAILING, r)*5;
 
   if(damage <= 0) {
-    add_message(&u->faction->msgs,
-      new_message(u->faction, "entermaelstrom%r:region%h:ship%i:damage%i:sink", r, u->ship, damage, 1));
+    ADDMSG(&u->faction->msgs, msg_message("entermaelstrom", 
+      "region ship damage sink", r, u->ship, damage, 1));
     return u->ship;
   }
 
@@ -2054,14 +2054,14 @@ piracy_cmd(unit *u, struct order * ord)
 
 	/* Wenn kein Ziel gefunden, entsprechende Meldung generieren */
 	if (target_dir == NODIRECTION) {
-		add_message(&u->faction->msgs,
-			new_message(u->faction, "piratenovictim%h:ship%r:region", sh, r));
+		ADDMSG(&u->faction->msgs, msg_message("piratenovictim", 
+      "ship region", sh, r));
 		return;
 	}
 
 	/* Meldung generieren */
-	add_message(&u->faction->msgs, new_message(u->faction,
-		"piratesawvictim%h:ship%r:region%d:dir", sh, r, target_dir));
+	ADDMSG(&u->faction->msgs, msg_message("piratesawvictim",
+    "ship region dir", sh, r, target_dir));
 
 	/* Befehl konstruieren */
 	sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
