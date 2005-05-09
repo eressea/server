@@ -98,6 +98,7 @@ void
 free_order(order * ord)
 {
   if (ord!=NULL) {
+    assert(ord->next==0);
     release_data(ord->data);
     free(ord);
   }
@@ -122,7 +123,7 @@ set_order(struct order ** destp, struct order * src)
 {
   if (*destp==src) return;
   free_order(*destp);
-  *destp = copy_order(src);
+  *destp = src;
 }
 
 void

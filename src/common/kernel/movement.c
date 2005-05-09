@@ -915,8 +915,8 @@ cycle_route(order * ord, unit *u, int gereist)
 	set_order(&u->lastorder, norder);
 #else
   replace_order(ord, norder);
-#endif
   free_order(norder);
+#endif
 }
 
 static boolean 
@@ -2067,7 +2067,6 @@ piracy_cmd(unit *u, struct order * ord)
 	sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
 		locale_string(u->faction->locale, directions[target_dir]));
 	set_order(&u->thisorder, parse_order(buf, u->faction->locale));
-  free_order(u->thisorder); /* parse_order & set_order have each increased the refcount */
 
 	/* Bewegung ausführen */
   init_tokens(u->thisorder);

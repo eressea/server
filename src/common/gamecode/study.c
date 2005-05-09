@@ -428,8 +428,8 @@ teach(unit * u, struct order * ord)
     set_order(&u->lastorder, new_order);
 #else
     replace_order(ord, new_order);
-#endif
     free_order(new_order); /* parse_order & set_order have each increased the refcount */
+#endif
   }
   if (academy && sk!=NOSKILL) {
     academy = academy/30; /* anzahl gelehrter wochen, max. 10 */

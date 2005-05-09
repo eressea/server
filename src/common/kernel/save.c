@@ -1133,7 +1133,6 @@ readunit(FILE * F)
     if (ord!=NULL) {
 #ifdef LASTORDER
       set_order(&u->lastorder, ord);
-      free_order(ord);
 #else
       addlist(&u->orders, ord);
 #endif

@@ -3465,7 +3465,7 @@ setdefaults (void)
           if (idle(u->faction)) {
             set_order(&u->thisorder, default_order(u->faction->locale));
           } else {
-            set_order(&u->thisorder, ord);
+            set_order(&u->thisorder, copy_order(ord));
           }
           break;
         } else {
@@ -3489,7 +3489,7 @@ setdefaults (void)
               break;
 
             case K_WEREWOLF:
-              set_order(&u->thisorder, ord);
+              set_order(&u->thisorder, copy_order(ord));
               break;
 
               /* Wird je diese Ausschliesslichkeit aufgehoben, muss man aufpassen
@@ -3525,7 +3525,7 @@ setdefaults (void)
           break;
 
         default:
-          set_order(&u->lastorder, u->thisorder);
+          set_order(&u->lastorder, copy_order(u->thisorder));
       }
 #endif
     }
@@ -3667,7 +3667,6 @@ defaultorders (void)
           cmd = strdup(getstrtoken());
           set_order(&u->lastorder, parse_order(cmd, u->faction->locale));
           free(cmd);
-          free_order(u->lastorder); /* parse_order & set_order have both increased the refcount */
           *ordp = ord->next;
           ord->next = NULL;
           free_order(ord);

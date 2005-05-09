@@ -783,7 +783,6 @@ recruit_dracoids(unit * dragon, int size)
   new_order = parse_order(buf, default_locale);
 #ifdef LASTORDER
   set_order(&un->lastorder, new_order);
-  free_order(new_order);
 #else
   addlist(&un->orders, new_order);
 #endif
@@ -974,10 +973,9 @@ plan_monsters(void)
             break;
         }
         if (long_order) {
-          set_order(&u->thisorder, long_order);
+          set_order(&u->thisorder, copy_order(long_order));
 #ifdef LASTORDER
-          set_order(&u->lastorder, long_order);
-          free_order(new_order); /* parse_order & set_order have both increased the refcount */
+          set_order(&u->lastorder, copy_order(long_order));
 #else
           addlist(&u->orders, long_order);
 #endif
