@@ -36,9 +36,9 @@ static int nlocales = 0;
 
 typedef struct order_data {
   char * _str; 
-  keyword_t _keyword;
-  int _lindex : 7;
   int _refcount : 16;
+  int _lindex : 8;
+  keyword_t _keyword;
 } order_data;
 
 static void
