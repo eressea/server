@@ -934,7 +934,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
 #ifdef LASTORDER
   set_order(&u->lastorder, new_order);
 #else
-  copy_order(ord, new_order);
+  replace_order(ord, new_order);
 #endif
   free_order(new_order);
 
@@ -1028,7 +1028,7 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want, or
 #ifdef LASTORDER
   set_order(&u->lastorder, new_order);
 #else
-  copy_order(ord, new_order);
+  replace_order(ord, new_order);
 #endif
   free_order(new_order);
 

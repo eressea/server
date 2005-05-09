@@ -914,7 +914,7 @@ cycle_route(order * ord, unit *u, int gereist)
 #ifdef LASTORDER
 	set_order(&u->lastorder, norder);
 #else
-  copy_order(ord, norder);
+  replace_order(ord, norder);
 #endif
   free_order(norder);
 }

@@ -21,19 +21,40 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const struct locale * locale_array[16];
+typedef struct locale_data {
+  struct order_data * short_orders[MAXKEYWORDS];
+  const struct locale * lang;
+} locale_data;
+
+static struct locale_data * locale_array[16];
 static int nlocales = 0;
 
 #undef SHORT_STRINGS
 
-void
-copy_order(order * dst, const order * src)
+typedef struct order_data {
+  char * _str; 
+  keyword_t _keyword;
+  int _lindex : 7;
+  int _refcount : 16;
+} order_data;
+
+static void
+release_data(order_data * data)
 {
-  if (dst->_str) free(dst->_str);
-  if (src->_str) dst->_str = strdup(src->_str);
-  else dst->_str = NULL;
-  dst->_keyword = src->_keyword;
-  dst->_lindex = src->_lindex;
+  if (data) {
+    if (--data->_refcount == 0) {
+      if (data->_str) free(data->_str);
+      free(data);
+    }
+  }
+}
+
+void
+replace_order(order * dst, const order * src)
+{
+  release_data(dst->data);
+  dst->data = src->data;
+  ++src->data->_refcount;
   dst->_persistent = src->_persistent;
 }
 
@@ -43,7 +64,7 @@ get_keyword(const order * ord)
   if (ord==NULL) {
     return NOKEYWORD;
   }
-  return ord->_keyword;
+  return ord->data->_keyword;
 }
 
 char *
@@ -52,39 +73,45 @@ getcommand(const order * ord)
   char sbuffer[DISPLAYSIZE*2];
   char * str = sbuffer;
   
-  assert(ord->_lindex<nlocales);
+  assert(ord->data->_lindex<nlocales);
   if (ord->_persistent) *str++ = '@';
 #ifdef SHORT_STRINGS
-  if (ord->_keyword!=NOKEYWORD) {
-    const struct locale * lang = locale_array[ord->_lindex];
+  if (ord->data->_keyword!=NOKEYWORD) {
+    const struct locale * lang = locale_array[ord->data->_lindex]->lang;
 
-    strcpy(str, LOC(lang, keywords[ord->_keyword]));
+    strcpy(str, LOC(lang, keywords[ord->data->_keyword]));
     str += strlen(str);
-    if (ord->_str) {
+    if (ord->data->_str) {
       *str++ = ' ';
       *str = 0;
     }
   }
 #endif
-  if (ord->_str) strcpy(str, ord->_str);
+  if (ord->data->_str) strcpy(str, ord->data->_str);
   return strdup(sbuffer);
 }
 
 void 
 free_order(order * ord)
 {
-  if (ord!=NULL && --ord->_refcount==0) {
-    assert(ord->next==NULL);
-    if (ord->_str!=NULL) free(ord->_str);
+  if (ord!=NULL) {
+    release_data(ord->data);
     free(ord);
   }
 }
 
 order *
-duplicate_order(order * ord)
+copy_order(order * src)
 {
-	if (ord!=NULL) ++ord->_refcount;
-	return ord;
+  if (src!=NULL) {
+    order * ord = (order*)malloc(sizeof(order));
+    ord->next = NULL;
+    ord->_persistent = src->_persistent;
+    ord->data = src->data;
+    ++ord->data->_refcount;
+    return ord;
+  }
+  return NULL;
 }
 
 void 
@@ -92,7 +119,7 @@ set_order(struct order ** destp, struct order * src)
 {
   if (*destp==src) return;
   free_order(*destp);
-  *destp = duplicate_order(src);
+  *destp = copy_order(src);
 }
 
 void
@@ -126,6 +153,7 @@ parse_order(const char * s, const struct locale * lang)
 #endif
     sptr = s;
     kwd = findkeyword(parse_token(&sptr), lang);
+    while (isspace(*(unsigned char*)sptr)) ++sptr;
 
     /* if this is just nonsense, then we skip it. */
     if (lomem) {
@@ -138,30 +166,50 @@ parse_order(const char * s, const struct locale * lang)
       }
     }
 
-    ord = (order*)malloc(sizeof(order));
     for (i=0;i!=nlocales;++i) {
-      if (locale_array[i]==lang) break;
+      if (locale_array[i]->lang==lang) break;
     }
-    if (i==nlocales) locale_array[nlocales++] = lang;
-    ord->_lindex = (unsigned char)i;
-    ord->_str = NULL;
+    if (i==nlocales) {
+      locale_array[nlocales] = (locale_data*)calloc(1, sizeof(locale_data));
+      locale_array[nlocales]->lang = lang;
+      ++nlocales;
+    }
+
+    ord = (order*)malloc(sizeof(order));
     ord->_persistent = persistent;
-    ord->_refcount = 1;
     ord->next = NULL;
 
-    ord->_keyword = kwd;
-#ifdef SHORT_STRINGS
-    if (ord->_keyword==NOKEYWORD) {
-      ord->_str = strdup(s);
-    } else {
-      while (isspace(*(unsigned char*)sptr)) ++sptr;
-      if (*sptr) {
-        ord->_str = strdup(sptr);
+    if (kwd!=NOKEYWORD && *sptr == 0) {
+      ord->data = locale_array[i]->short_orders[kwd];
+      if (ord->data != NULL) {
+        ++ord->data->_refcount;
       }
+    } else {
+      ord->data = NULL;
     }
+
+    if (ord->data==NULL) {
+      ord->data = (order_data*)malloc(sizeof(order_data));
+      ord->data->_lindex = (unsigned char)i;
+      ord->data->_str = NULL;
+      ord->data->_refcount = 1;
+      ord->data->_keyword = kwd;
+      if (kwd!=NOKEYWORD && *sptr == 0) {
+        locale_array[i]->short_orders[kwd] = ord->data;
+        ++ord->data->_refcount;
+      }
+#ifdef SHORT_STRINGS
+      if (ord->data->_keyword==NOKEYWORD) {
+        ord->data->_str = strdup(s);
+      } else {
+        if (*sptr) {
+          ord->data->_str = strdup(sptr);
+        }
+      }
 #else
-    ord->_str = strdup(s);
+      ord->data->_str = strdup(s);
 #endif
+    }
     return ord;
   }
 }
@@ -169,10 +217,10 @@ parse_order(const char * s, const struct locale * lang)
 boolean
 is_repeated(const order * ord)
 {
-  const struct locale * lang = locale_array[ord->_lindex];
+  const struct locale * lang = locale_array[ord->data->_lindex]->lang;
   param_t param;
 
-  switch (ord->_keyword) {
+  switch (ord->data->_keyword) {
     case K_CAST:
     case K_BUY:
     case K_SELL:
@@ -229,10 +277,10 @@ is_repeated(const order * ord)
 boolean
 is_exclusive(const order * ord)
 {
-  const struct locale * lang = locale_array[ord->_lindex];
+  const struct locale * lang = locale_array[ord->data->_lindex]->lang;
   param_t param;
 
-  switch (ord->_keyword) {
+  switch (ord->data->_keyword) {
     case K_MOVE:
     case K_WEREWOLF:
       /* these should not become persistent */
@@ -290,7 +338,7 @@ boolean
 is_persistent(const order * ord)
 {
   boolean persist = ord->_persistent!=0;
-	switch (ord->_keyword) {
+	switch (ord->data->_keyword) {
     case K_MOVE:
     case K_WEREWOLF:
     case NOKEYWORD:
@@ -308,7 +356,7 @@ is_persistent(const order * ord)
 char * 
 write_order(const order * ord, const struct locale * lang, char * buffer, size_t size)
 {
-  if (ord==0 || ord->_keyword==NOKEYWORD) {
+  if (ord==0 || ord->data->_keyword==NOKEYWORD) {
     buffer[0]=0;
   } else {
     char * s = getcommand(ord);

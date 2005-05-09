@@ -3450,7 +3450,7 @@ setdefaults (void)
       }
 #ifdef LASTORDER
       /* by default the default long order becomes the new long order. */
-      u->thisorder = duplicate_order(u->lastorder);
+      u->thisorder = copy_order(u->lastorder);
 #endif
       /* check all orders for a potential new long order this round: */
       for (ord = u->orders; ord; ord = ord->next) {

@@ -25,22 +25,21 @@ extern "C" {
  * implemented yet) saving approx. 50% of all string-related memory.
  */
 
+struct order_data;
+
 typedef struct order {
   struct order * next;
   /* do not access this data: */
-  char * _str; 
-  keyword_t _keyword;
-  int _lindex : 7;
+  struct order_data * data;
   int _persistent : 1;
-  int _refcount : 16;
 } order;
 
 /* constructor */
 extern struct order * parse_order(const char * s, const struct locale * lang);
-extern void copy_order(order * dst, const order * src);
+extern void replace_order(order * dst, const order * src);
 
 /* reference counted copies of orders: */
-extern struct order * duplicate_order(struct order * ord);
+extern struct order * copy_order(struct order * ord);
 extern void free_order(struct order * ord);
 extern void free_orders(struct order ** olist);
 

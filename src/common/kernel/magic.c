@@ -2004,7 +2004,7 @@ new_castorder(void *u, unit *u2, spell *sp, region *r, int lev,
 	corder->force = force;
 	corder->rt = r;
 	corder->distance = range;
-	corder->order = duplicate_order(ord);
+	corder->order = copy_order(ord);
 	corder->par = p;
 
 	return corder;

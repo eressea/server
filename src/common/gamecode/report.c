@@ -3780,7 +3780,7 @@ report_init(void)
   add_function("spell", &eval_spell);
 
   register_argtype("string", free, (void*(*)(void*))strdup);
-  register_argtype("order", (void(*)(void*))free_order, (void*(*)(void*))duplicate_order);
+  register_argtype("order", (void(*)(void*))free_order, (void*(*)(void*))copy_order);
   register_function((pf_generic)view_neighbours, "view_neighbours");
 	register_function((pf_generic)view_regatta, "view_regatta");
 }
