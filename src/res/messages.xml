@@ -2244,8 +2244,9 @@
     <type>
       <arg name="unit" type="unit"/>
       <arg name="amount" type="int"/>
+      <arg name="race" type="race"/>
     </type>
-    <text locale="de">"$unit($unit) tötete $int($amount) Bauern."</text>
+    <text locale="de">"$int($amount) Bauern werden zu $race($race,1) und schliessen sich $unit($unit) an."</text>
   </message>
   <message name="eathorse" section="events">
     <type>

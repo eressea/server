@@ -561,14 +561,12 @@ eaten_by_monster(unit * u)
 		if (n > 0) {
 			deathcounts(u->region, n);
 			rsetpeasants(u->region, rpeasants(u->region) - n);
-			add_message(&u->region->msgs, new_message(NULL,
-				"eatpeasants%u:unit%i:amount", u, n));
+			ADDMSG(&u->region->msgs, msg_message("eatpeasants", "unit amount", u, n));
 		}
 	}
 	if (horse > 0) {
 		set_item(u, I_HORSE, 0);
-		add_message(&u->region->msgs, new_message(NULL,
-					"eathorse%u:unit%i:amount", u, horse));
+    ADDMSG(&u->region->msgs, msg_message("eathorse", "unit amount", u, horse));
 	}
 }
 
@@ -585,11 +583,11 @@ absorbed_by_monster(unit * u)
 	if(n > 0) {
 		n = lovar(n);
 		n = min(rpeasants(u->region), n);
-		if(n > 0){
+		if (n > 0){
 			rsetpeasants(u->region, rpeasants(u->region) - n);
 			scale_number(u, u->number + n);
-			add_message(&u->region->msgs, new_message(NULL,
-				"absorbpeasants%u:unit%i:amount", u, n));
+			ADDMSG(&u->region->msgs, msg_message("absorbpeasants", 
+        "unit race amount", u, u->race, n));
 		}
 	}
 }
@@ -720,13 +718,13 @@ monsters_kill_peasants(void)
 
   for (r = regions; r; r = r->next) {
     for (u = r->units; u; u = u->next) if(!fval(u, UFL_MOVED)) {
-      if(u->race->flags & RCF_SCAREPEASANTS) {
+      if (u->race->flags & RCF_SCAREPEASANTS) {
         scared_by_monster(u);
       }
-      if(u->race->flags & RCF_KILLPEASANTS) {
+      if (u->race->flags & RCF_KILLPEASANTS) {
         eaten_by_monster(u);
       }
-      if(u->race->flags & RCF_ABSORBPEASANTS) {
+      if (u->race->flags & RCF_ABSORBPEASANTS) {
         absorbed_by_monster(u);
       }
     }
