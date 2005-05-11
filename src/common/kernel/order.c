@@ -27,6 +27,7 @@
 typedef struct locale_data {
 #ifdef SHARE_ORDERS
   struct order_data * short_orders[MAXKEYWORDS];
+  struct order_data * study_orders[MAXSKILLS];
 #endif
   const struct locale * lang;
 } locale_data;
@@ -137,6 +138,50 @@ free_orders(order ** olist)
 	}
 }
 
+static order_data *
+create_data(keyword_t kwd, const char * s, const char * sptr, int lindex)
+{
+  order_data * data;
+#ifdef SHARE_ORDERS
+  const struct locale * lang = locale_array[lindex]->lang;
+  if (kwd==K_STUDY) {
+    skill_t sk = findskill(parse_token(&sptr), lang);
+    if (sk!=NOSKILL) {
+      data = locale_array[lindex]->study_orders[sk];
+      if (data==NULL) {
+        data = (order_data*)malloc(sizeof(order_data));
+        locale_array[lindex]->study_orders[sk] = data;
+        data->_keyword = kwd;
+        data->_lindex = lindex;
+        data->_str = s?strdup(s):NULL;
+        data->_refcount = 1;
+      }
+      ++data->_refcount;
+      return data;
+    }
+  }
+  if (kwd!=NOKEYWORD && *sptr == 0) {
+    data = locale_array[lindex]->short_orders[kwd];
+    if (data == NULL) {
+      data = (order_data*)malloc(sizeof(order_data));
+      locale_array[lindex]->short_orders[kwd] = data;
+      data->_keyword = kwd;
+      data->_lindex = lindex;
+      data->_str = s?strdup(s):NULL;
+      data->_refcount = 1;
+    }
+    ++data->_refcount;
+    return data;
+  }
+#endif
+  data = (order_data*)malloc(sizeof(order_data));
+  data->_keyword = kwd;
+  data->_lindex = lindex;
+  data->_str = s?strdup(s):NULL;
+  data->_refcount = 1;
+  return data;
+}
+
 order * 
 parse_order(const char * s, const struct locale * lang)
 {
@@ -147,7 +192,7 @@ parse_order(const char * s, const struct locale * lang)
     const char * sptr;
     order * ord = NULL;
     int persistent = 0;
-    int i;
+    int lindex;
 
 #ifdef AT_PERSISTENT
     while (*s=='@') {
@@ -170,10 +215,10 @@ parse_order(const char * s, const struct locale * lang)
       }
     }
 
-    for (i=0;i!=nlocales;++i) {
-      if (locale_array[i]->lang==lang) break;
+    for (lindex=0;lindex!=nlocales;++lindex) {
+      if (locale_array[lindex]->lang==lang) break;
     }
-    if (i==nlocales) {
+    if (lindex==nlocales) {
       locale_array[nlocales] = (locale_data*)calloc(1, sizeof(locale_data));
       locale_array[nlocales]->lang = lang;
       ++nlocales;
@@ -182,41 +227,22 @@ parse_order(const char * s, const struct locale * lang)
     ord = (order*)malloc(sizeof(order));
     ord->_persistent = persistent;
     ord->next = NULL;
-    ord->data = NULL;
 
-#ifdef SHARE_ORDERS
-    if (kwd!=NOKEYWORD && *sptr == 0) {
-      ord->data = locale_array[i]->short_orders[kwd];
-      if (ord->data != NULL) {
-        ++ord->data->_refcount;
-      }
-    }
-#endif
-
-    if (ord->data==NULL) {
-      ord->data = (order_data*)malloc(sizeof(order_data));
-      ord->data->_lindex = (unsigned char)i;
-      ord->data->_str = NULL;
-      ord->data->_refcount = 1;
-      ord->data->_keyword = kwd;
-#ifdef SHARE_ORDERS
-      if (kwd!=NOKEYWORD && *sptr == 0) {
-        locale_array[i]->short_orders[kwd] = ord->data;
-        ++ord->data->_refcount;
-      }
-#endif
 #ifdef SHORT_STRINGS
-      if (ord->data->_keyword==NOKEYWORD) {
-        ord->data->_str = strdup(s);
-      } else {
-        if (*sptr) {
-          ord->data->_str = strdup(sptr);
-        }
-      }
-#else
-      ord->data->_str = strdup(s);
-#endif
+    if (kwd!=NOKEYWORD) {
+      if (*sptr) s = strdup(sptr);
+      else s = NULL;
     }
+#else
+    ord->data->_str = strdup(s);
+#endif
+
+#ifdef SHARE_ORDERS
+    ord->data = create_data(kwd, s, sptr, lindex);
+#else
+    ord->data = NULL;
+#endif
+
     return ord;
   }
 }

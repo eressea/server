@@ -595,8 +595,8 @@ absorbed_by_monster(unit * u)
 static int
 scareaway(region * r, int anzahl)
 {
-	int n, p, d = 0, emigrants[MAXDIRECTIONS];
-	direction_t i;
+	int n, p, diff = 0, emigrants[MAXDIRECTIONS];
+	direction_t d;
 
 	anzahl = min(max(1, anzahl),rpeasants(r));
 
@@ -605,8 +605,8 @@ scareaway(region * r, int anzahl)
 	 * emigrants[] ist local, weil r->newpeasants durch die Monster
 	 * vielleicht schon hochgezaehlt worden ist. */
 
-	for (i = 0; i != MAXDIRECTIONS; i++)
-		emigrants[i] = 0;
+	for (d = 0; d != MAXDIRECTIONS; d++)
+		emigrants[d] = 0;
 
 	p = rpeasants(r);
 	assert(p >= 0 && anzahl >= 0);
@@ -615,14 +615,14 @@ scareaway(region * r, int anzahl)
 		region * c = rconnect(r, dir);
 
 		if (c && landregion(rterrain(c))) {
-			d++;
+			++diff;
 			c->land->newpeasants++;
 			emigrants[dir]++;
 		}
 	}
-	rsetpeasants(r, p-d);
-	assert(p >= d);
-	return d;
+	rsetpeasants(r, p-diff);
+	assert(p >= diff);
+	return diff;
 }
 
 static void
@@ -650,9 +650,8 @@ scared_by_monster(unit * u)
 		if(n > 0) {
 			n = scareaway(u->region, n);
 			if(n > 0) {
-				add_message(&u->region->msgs,
-							new_message(NULL,
-										"fleescared%i:amount%u:unit", n, u));
+        ADDMSG(&u->region->msgs, msg_message("fleescared", 
+          "amount unit", n, u));
 			}
 		}
 	}
