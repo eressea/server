@@ -419,13 +419,17 @@ is_persistent(const order * ord)
 char * 
 write_order(const order * ord, const struct locale * lang, char * buffer, size_t size)
 {
-  keyword_t kwd = ORD_KEYWORD(ord);
-  if (ord==0 || kwd==NOKEYWORD) {
+  if (ord==0) {
     buffer[0]=0;
   } else {
-    char * s = getcommand(ord);
-    strncpy(buffer, s, size);
-    free(s);
+    keyword_t kwd = ORD_KEYWORD(ord);
+    if (kwd==NOKEYWORD) {
+      buffer[0]=0;
+    } else {
+      char * s = getcommand(ord);
+      strncpy(buffer, s, size);
+      free(s);
+    }
   }
   return buffer;
 }
