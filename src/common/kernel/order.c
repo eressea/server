@@ -22,7 +22,17 @@
 #include <string.h>
 
 #define SHORT_STRINGS
-#define SHARE_ORDERS
+
+#ifdef SHARE_ORDERS
+# define ORD_KEYWORD(ord) (ord)->data->_keyword
+# define ORD_LOCALE(ord) locale_array[(ord)->data->_lindex]->lang
+# define ORD_STRING(ord) (ord)->data->_str
+#else
+# define ORD_KEYWORD(ord) (ord)->data._keyword
+# define ORD_LOCALE(ord) locale_array[ord->data._lindex]->lang
+# define ORD_STRING(ord) (ord)->data._str
+#endif
+
 
 typedef struct locale_data {
 #ifdef SHARE_ORDERS
@@ -35,13 +45,16 @@ typedef struct locale_data {
 static struct locale_data * locale_array[16];
 static int nlocales = 0;
 
+#ifdef SHARE_ORDERS
 typedef struct order_data {
   char * _str; 
   int _refcount : 16;
   int _lindex : 8;
   keyword_t _keyword;
 } order_data;
+#endif
 
+#ifdef SHARE_ORDERS
 static void
 release_data(order_data * data)
 {
@@ -52,13 +65,18 @@ release_data(order_data * data)
     }
   }
 }
+#endif
 
 void
 replace_order(order * dst, const order * src)
 {
+#ifdef SHARE_ORDERS
   release_data(dst->data);
-  dst->data = src->data;
   ++src->data->_refcount;
+#else
+  if (dst->data._str) free(dst->data._str);
+#endif
+  dst->data = src->data;
   dst->_persistent = src->_persistent;
 }
 
@@ -68,7 +86,11 @@ get_keyword(const order * ord)
   if (ord==NULL) {
     return NOKEYWORD;
   }
+#ifdef SHARE_ORDERS
   return ord->data->_keyword;
+#else
+  return ord->data._keyword;
+#endif
 }
 
 char *
@@ -76,22 +98,24 @@ getcommand(const order * ord)
 {
   char sbuffer[DISPLAYSIZE*2];
   char * str = sbuffer;
-  
-  assert(ord->data->_lindex<nlocales);
+  const char * text = ORD_STRING(ord);
+#ifdef SHORT_STRINGS
+  keyword_t kwd = ORD_KEYWORD(ord);
+#endif
+
   if (ord->_persistent) *str++ = '@';
 #ifdef SHORT_STRINGS
-  if (ord->data->_keyword!=NOKEYWORD) {
-    const struct locale * lang = locale_array[ord->data->_lindex]->lang;
-
-    strcpy(str, LOC(lang, keywords[ord->data->_keyword]));
+  if (kwd!=NOKEYWORD) {
+    const struct locale * lang = ORD_LOCALE(ord);
+    strcpy(str, LOC(lang, keywords[kwd]));
     str += strlen(str);
-    if (ord->data->_str) {
+    if (text) {
       *str++ = ' ';
       *str = 0;
     }
   }
 #endif
-  if (ord->data->_str) strcpy(str, ord->data->_str);
+  if (text) strcpy(str, text);
   return strdup(sbuffer);
 }
 
@@ -100,7 +124,12 @@ free_order(order * ord)
 {
   if (ord!=NULL) {
     assert(ord->next==0);
+
+#ifdef SHARE_ORDERS
     release_data(ord->data);
+#else
+    if (ord->data._str) free(ord->data._str);
+#endif
     free(ord);
   }
 }
@@ -113,7 +142,9 @@ copy_order(order * src)
     ord->next = NULL;
     ord->_persistent = src->_persistent;
     ord->data = src->data;
+#ifdef SHARE_ORDERS
     ++ord->data->_refcount;
+#endif
     return ord;
   }
   return NULL;
@@ -138,11 +169,11 @@ free_orders(order ** olist)
 	}
 }
 
+#ifdef SHARE_ORDERS
 static order_data *
 create_data(keyword_t kwd, const char * s, const char * sptr, int lindex)
 {
   order_data * data;
-#ifdef SHARE_ORDERS
   const struct locale * lang = locale_array[lindex]->lang;
   if (kwd==K_STUDY) {
     skill_t sk = findskill(parse_token(&sptr), lang);
@@ -173,7 +204,6 @@ create_data(keyword_t kwd, const char * s, const char * sptr, int lindex)
     ++data->_refcount;
     return data;
   }
-#endif
   data = (order_data*)malloc(sizeof(order_data));
   data->_keyword = kwd;
   data->_lindex = lindex;
@@ -181,6 +211,7 @@ create_data(keyword_t kwd, const char * s, const char * sptr, int lindex)
   data->_refcount = 1;
   return data;
 }
+#endif
 
 order * 
 parse_order(const char * s, const struct locale * lang)
@@ -229,13 +260,15 @@ parse_order(const char * s, const struct locale * lang)
     ord->next = NULL;
 
 #ifdef SHORT_STRINGS
-    if (kwd!=NOKEYWORD) {
-      s = (*sptr)?sptr:NULL;
-    }
-#else
-    ord->data->_str = strdup(s);
+    if (kwd!=NOKEYWORD) s = (*sptr)?sptr:NULL;
 #endif
+#ifdef SHARE_ORDERS
     ord->data = create_data(kwd, s, sptr, lindex);
+#else
+    ord->data._keyword = kwd;
+    ord->data._lindex = lindex;
+    ord->data._str = s?strdup(s):NULL;
+#endif
 
     return ord;
   }
@@ -244,10 +277,11 @@ parse_order(const char * s, const struct locale * lang)
 boolean
 is_repeated(const order * ord)
 {
-  const struct locale * lang = locale_array[ord->data->_lindex]->lang;
+  keyword_t kwd = ORD_KEYWORD(ord);
+  const struct locale * lang = ORD_LOCALE(ord);
   param_t param;
 
-  switch (ord->data->_keyword) {
+  switch (kwd) {
     case K_CAST:
     case K_BUY:
     case K_SELL:
@@ -263,12 +297,12 @@ is_repeated(const order * ord)
     case K_SABOTAGE:
     case K_STUDY:
     case K_TEACH:
-    case K_ZUECHTE:
+    case K_BREED:
     case K_PIRACY:
       return true;
 
 #if GROWING_TREES
-    case K_PFLANZE:
+    case K_PLANT:
       return true;
 #endif
 
@@ -304,10 +338,11 @@ is_repeated(const order * ord)
 boolean
 is_exclusive(const order * ord)
 {
-  const struct locale * lang = locale_array[ord->data->_lindex]->lang;
+  keyword_t kwd = ORD_KEYWORD(ord);
+  const struct locale * lang = ORD_LOCALE(ord);
   param_t param;
 
-  switch (ord->data->_keyword) {
+  switch (kwd) {
     case K_MOVE:
     case K_WEREWOLF:
       /* these should not become persistent */
@@ -323,12 +358,12 @@ is_exclusive(const order * ord)
     case K_SABOTAGE:
     case K_STUDY:
     case K_TEACH:
-    case K_ZUECHTE:
+    case K_BREED:
     case K_PIRACY:
       return true;
 
 #if GROWING_TREES
-    case K_PFLANZE:
+    case K_PLANT:
       return true;
 #endif
 
@@ -364,8 +399,9 @@ is_exclusive(const order * ord)
 boolean
 is_persistent(const order * ord)
 {
+  keyword_t kwd = ORD_KEYWORD(ord);
   boolean persist = ord->_persistent!=0;
-	switch (ord->data->_keyword) {
+	switch (kwd) {
     case K_MOVE:
     case K_WEREWOLF:
     case NOKEYWORD:
@@ -383,7 +419,8 @@ is_persistent(const order * ord)
 char * 
 write_order(const order * ord, const struct locale * lang, char * buffer, size_t size)
 {
-  if (ord==0 || ord->data->_keyword==NOKEYWORD) {
+  keyword_t kwd = ORD_KEYWORD(ord);
+  if (ord==0 || kwd==NOKEYWORD) {
     buffer[0]=0;
   } else {
     char * s = getcommand(ord);

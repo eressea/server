@@ -423,7 +423,7 @@ enum {
   K_CAST,
   K_RESHOW,
   K_DESTROY,
-  K_ZUECHTE,
+  K_BREED,
   K_DEFAULT,
   K_REPORT,
   K_URSPRUNG,
@@ -445,7 +445,7 @@ enum {
 #endif
   K_PREFIX,
   K_SYNONYM,
-  K_PFLANZE,
+  K_PLANT,
   K_WEREWOLF,
   K_XE,
   K_ALLIANCE,

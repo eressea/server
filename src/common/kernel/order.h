@@ -25,6 +25,9 @@ extern "C" {
  * implemented yet) saving approx. 50% of all string-related memory.
  */
 
+#define SHARE_ORDERS
+
+#ifdef SHARE_ORDERS
 struct order_data;
 
 typedef struct order {
@@ -33,6 +36,20 @@ typedef struct order {
   struct order_data * data;
   int _persistent : 1;
 } order;
+#else
+typedef struct order_data {
+  char * _str; 
+  int _lindex : 8;
+  keyword_t _keyword;
+} order_data;
+
+typedef struct order {
+  struct order * next;
+  /* do not access this data: */
+  struct order_data data;
+  int _persistent : 1;
+} order;
+#endif
 
 /* constructor */
 extern struct order * parse_order(const char * s, const struct locale * lang);

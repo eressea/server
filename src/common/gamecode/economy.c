@@ -3056,11 +3056,11 @@ produce(void)
           sabotage_cmd(u, u->thisorder);
           break;
 
-        case K_ZUECHTE:
+        case K_BREED:
           breed_cmd(u, u->thisorder);
           break;
 
-        case K_PFLANZE:
+        case K_PLANT:
           plant_cmd(u, u->thisorder);
           break;
 
