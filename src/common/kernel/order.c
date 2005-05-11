@@ -230,13 +230,11 @@ parse_order(const char * s, const struct locale * lang)
 
 #ifdef SHORT_STRINGS
     if (kwd!=NOKEYWORD) {
-      if (*sptr) s = strdup(sptr);
-      else s = NULL;
+      s = (*sptr)?sptr:NULL;
     }
 #else
     ord->data->_str = strdup(s);
 #endif
-
     ord->data = create_data(kwd, s, sptr, lindex);
 
     return ord;
