@@ -237,11 +237,7 @@ parse_order(const char * s, const struct locale * lang)
     ord->data->_str = strdup(s);
 #endif
 
-#ifdef SHARE_ORDERS
     ord->data = create_data(kwd, s, sptr, lindex);
-#else
-    ord->data = NULL;
-#endif
 
     return ord;
   }
