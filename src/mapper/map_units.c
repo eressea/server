@@ -830,6 +830,7 @@ mapper_spunit(dbllist ** SP, unit * u, int indent)
 	int i, dh;
 	skill_t sk;
 	item * itm;
+  char * bufp;
 
 	strcpy(buf, "\025");
 	sncat(buf, unitname(u), BUFSIZE);
@@ -895,8 +896,9 @@ mapper_spunit(dbllist ** SP, unit * u, int indent)
 	sncat(buf, " Silber", BUFSIZE);
 
 	dh = 0;
+  bufp = buf + strlen(buf);
 	for (sk = 0; sk != MAXSKILLS; sk++)
-		spskill(buf, sizeof(buf), find_locale("de"), u, sk, &dh, 1);
+		bufp += spskill(bufp, sizeof(buf)-(bufp-buf), find_locale("de"), u, sk, &dh, 1);
 	dh = 0;
 
 	for (itm = u->items;itm;itm=itm->next) {
