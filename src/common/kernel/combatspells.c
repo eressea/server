@@ -1654,13 +1654,13 @@ sp_healing(fighter * fi, int level, double power, spell * sp)
 
   /* bis zu 11 Personen pro Stufe (einen HP müssen sie ja noch
   * haben, sonst wären sie tot) können geheilt werden */
-  power *= 200;
+  healhp *= 200;
 
   if (get_item(mage, I_AMULET_OF_HEALING) > 0) {
     scat(" und benutzt das ");
     scat(locale_string(default_locale, resourcename(oldresourcetype[R_AMULET_OF_HEALING], 0)));
     scat(", um die Heilzauber zu verstärken");
-    power *= 2;
+    healhp *= 2;
   }
 
   /* gehe alle denen wir helfen der reihe nach durch, heile verwundete,
