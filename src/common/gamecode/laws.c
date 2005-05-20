@@ -3425,15 +3425,15 @@ new_units (void)
             int g, alias;
             order ** newordersp;
 
-            if(checkunitnumber(u->faction) == false) {
-							if(global.unitsperalliance == false) {
+            if (checkunitnumber(u->faction) == false) {
+							if (global.unitsperalliance == false) {
   							ADDMSG(&u->faction->msgs, msg_message("too_many_units_in_faction",
 									"command unit region allowed",
-									getcommand(makeord), u, r, maxunits(u->faction)));
+									makeord, u, r, maxunits(u->faction)));
 							} else {
   							ADDMSG(&u->faction->msgs, msg_message("too_many_units_in_alliance",
 									"command unit region allowed",
-									getcommand(makeord), u, r, maxunits(u->faction)));
+									makeord, u, r, maxunits(u->faction)));
 							}
               ordp = &makeord->next;
 
