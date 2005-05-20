@@ -3362,7 +3362,7 @@ maxunits(faction *f)
 
 		for(f2 = factions; f2; f2 = f2->next) {
 			if(f2->alliance == f->alliance) {
-				mult += 0.4 * fspecial(f2, FS_ADMINISTRATOR);
+				mult += 0.4f * fspecial(f2, FS_ADMINISTRATOR);
 			}
 		}
 		return (int) (global.maxunits * mult);

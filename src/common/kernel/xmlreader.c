@@ -1178,14 +1178,7 @@ parse_main(xmlDocPtr doc)
     xmlFree(property);
   }
  
-	global.unitsperalliance = false;
-	property = xmlGetProp(node, BAD_CAST "unitsperalliance");
-  if (property!=NULL) {
-		if(!strcmp(property, "yes")) {
-	    global.unitsperalliance = true;
-		}
-    xmlFree(property);
-  }
+  global.unitsperalliance = xml_bvalue(node, "unitsperalliance", false);
 
   property = xmlGetProp(node, BAD_CAST "units");
   if (property!=NULL) {
