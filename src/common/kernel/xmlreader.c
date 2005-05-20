@@ -39,6 +39,7 @@ without prior permission by the authors of Eressea.
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <string.h>
 
 static boolean gamecode_enabled = false;
@@ -1179,12 +1180,7 @@ parse_main(xmlDocPtr doc)
   }
  
   global.unitsperalliance = xml_bvalue(node, "unitsperalliance", false);
-
-  property = xmlGetProp(node, BAD_CAST "units");
-  if (property!=NULL) {
-    global.maxunits = atoi((const char*)property);
-    xmlFree(property);
-  }
+  global.maxunits = xml_ivalue(node, "units", INT_MAX);
 
   property = xmlGetProp(node, BAD_CAST "name");
   if (property!=NULL) {
