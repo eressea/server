@@ -14,7 +14,7 @@
   <xi:include href="buildings.xml"/>
   <xi:include href="equipment.xml"/>
 
-  <game name="Wettstreit der Weisen" units="250" welcome="vinyambar">
+  <game name="Wettstreit der Weisen" unitsperalliance="yes" units="1000" welcome="vinyambar">
     <comment>Game specific</comment>
     <order name="ARBEITEN" disable="yes"/>
     <order name="MEINUNG" disable="yes"/>

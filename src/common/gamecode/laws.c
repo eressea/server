@@ -3356,7 +3356,49 @@ ageing(void)
 static int
 maxunits(faction *f)
 {
-  return (int) (global.maxunits * (1 + 0.4 * fspecial(f, FS_ADMINISTRATOR)));
+	if(global.unitsperalliance == true) {
+		faction *f2;
+		float    mult = 1.0;
+
+		for(f2 = factions; f2; f2 = f2->next) {
+			if(f2->alliance == f->alliance) {
+				mult += 0.4 * fspecial(f2, FS_ADMINISTRATOR);
+			}
+		}
+		return (int) (global.maxunits * mult);
+	}
+
+  return (int) (global.maxunits * 
+									(1 + 0.4 * fspecial(f, FS_ADMINISTRATOR)));
+}
+
+static boolean
+checkunitnumber(faction *f)
+{
+	if(global.unitsperalliance == true) {
+		faction *f2;
+		int      unitsinalliance = 0;
+		
+		for(f2 = factions; f2; f2 = f2->next) {
+			if(f->alliance == f2->alliance) {
+				unitsinalliance += f2->no_units;
+			}
+		}
+
+		/* if unitsperalliance is true, maxunits returns the
+		   number of units allowed in an alliance */
+		if(unitsinalliance >= maxunits(f)) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	if(f->no_units >= maxunits(f)) {
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -3381,13 +3423,18 @@ new_units (void)
           if (getparam(u->faction->locale) == P_TEMP) {
             char * name;
             int g, alias;
-            int mu = maxunits(u->faction);
             order ** newordersp;
 
-            if(u->faction->no_units >= mu) {
-              sprintf(buf, "Eine Partei darf aus nicht mehr als %d "
-                "Einheiten bestehen.", mu);
-              mistake(u, makeord, buf, MSG_PRODUCE);
+            if(checkunitnumber(u->faction) == false) {
+							if(global.unitsperalliance == false) {
+  							ADDMSG(&u->faction->msgs, msg_message("too_many_units_in_faction",
+									"command unit region allowed",
+									getcommand(makeord), u, r, maxunits(u->faction)));
+							} else {
+  							ADDMSG(&u->faction->msgs, msg_message("too_many_units_in_alliance",
+									"command unit region allowed",
+									getcommand(makeord), u, r, maxunits(u->faction)));
+							}
               ordp = &makeord->next;
 
               while (*ordp) {

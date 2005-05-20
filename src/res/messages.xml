@@ -6186,5 +6186,27 @@
     <text locale="en">"$unit($unit) sends the plague on $region($region)."</text>
   </message>
 
+  <message name="too_many_units_in_faction" section="errors">
+    <type>
+      <arg name="command" type="order"/>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="allowed" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Eine Partei darf aus nicht mehr als $int($allowed) Einheiten bestehen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - A faction may not consist of more than $int($allowed) units."</text>
+  </message>
+  
+  <message name="too_many_units_in_alliance" section="errors">
+    <type>
+      <arg name="command" type="order"/>
+      <arg name="region" type="region"/>
+      <arg name="unit" type="unit"/>
+      <arg name="allowed" type="int"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Eine Allianz darf aus nicht mehr als $int($allowed) Einheiten bestehen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - An alliance may not consist of more than $int($allowed) units."</text>
+  </message>
+
 </messages>
 
