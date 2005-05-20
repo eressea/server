@@ -3489,15 +3489,17 @@ setdefaults (void)
     for (u = r->units; u; u = u->next) {
       order *ord;
       boolean trade = false;
+      boolean hunger = LongHunger(u);
 
-      if (LongHunger(u)) {
+      if (hunger) {
         /* Hungernde Einheiten führen NUR den default-Befehl aus */
         set_order(&u->thisorder, default_order(u->faction->locale));
-        continue;
       }
 #ifdef LASTORDER
-      /* by default the default long order becomes the new long order. */
-      u->thisorder = copy_order(u->lastorder);
+      else {
+        /* by default the default long order becomes the new long order. */
+        u->thisorder = copy_order(u->lastorder);
+      }
 #endif
       /* check all orders for a potential new long order this round: */
       for (ord = u->orders; ord; ord = ord->next) {
@@ -3505,8 +3507,11 @@ setdefaults (void)
         if (u->old_orders && is_repeated(ord)) {
           /* this new order will replace the old defaults */
           free_orders(&u->old_orders);
+          if (hunger) break;
         }
 #endif
+        if (hunger) continue;
+
         if (is_exclusive(ord)) {
           /* Über dieser Zeile nur Befehle, die auch eine idle Faction machen darf */
           if (idle(u->faction)) {
@@ -3545,6 +3550,8 @@ setdefaults (void)
           }
         }
       }
+
+      if (hunger) continue;
 
       /* Wenn die Einheit handelt, muß der Default-Befehl gelöscht
       * werden. */

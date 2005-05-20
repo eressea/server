@@ -165,6 +165,22 @@ report_item(const unit * owner, const item * i, const faction * viewer, const ch
 	}
 }
 
+
+size_t
+buforder(char * bufp, size_t size, const order * ord)
+{
+  char * cmd = getcommand(ord);
+  size_t len = 0;
+  len += strlcpy(bufp+len, ", \"", size);
+  len += strlcpy(bufp+len, cmd, size-len);
+  if (len>=2) {
+    strcpy(bufp+len, "\"");
+    ++len;
+  }
+  free(cmd);
+  return len;
+}
+
 int
 bufunit(const faction * f, const unit * u, int indent, int mode)
 {
@@ -408,11 +424,27 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
     }
 #ifdef LASTORDER
     if (!isbattle && u->lastorder) {
-      char * cmd = getcommand(u->lastorder);
-      bufp += strlcpy(bufp, ", \"", sizeof(buf)-(bufp-buf));
-      bufp += strlcpy(bufp, cmd, sizeof(buf)-(bufp-buf));
-      strcpy(bufp++, "\"");
-      free(cmd);
+      bufp += buforder(bufp, sizeof(buf)-(bufp-buf), u->lastorder);
+    }
+#else
+    if (!isbattle) {
+      boolean printed = 0;
+      int i;
+      for (i=0;i!=2;++i) {
+        order * ord = (i==0)?u->old_orders:u->orders;
+        while (ord) {
+          if (is_repeated(ord)) {
+            if (printed==0) {
+              bufp += buforder(bufp, sizeof(buf)-(bufp-buf), ord);
+            } else if (printed==1) {
+              bufp += strlcpy(bufp, ", ...", sizeof(buf)-(bufp-buf));
+            }
+            ++printed;
+            break;
+          }
+          ord=ord->next;
+        }
+      }
     }
 #endif
   }
