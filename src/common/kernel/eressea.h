@@ -907,7 +907,6 @@ extern int lighthouse_range(const struct building * b, const struct faction * f)
 /* skills */
 extern int max_skill(struct faction * f, skill_t sk);
 extern int count_skill(struct faction * f, skill_t sk);
-extern int count_all_money(const struct region * r);
 
 /* direction, geography */
 extern const char *directions[];

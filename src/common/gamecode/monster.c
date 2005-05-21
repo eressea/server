@@ -116,13 +116,14 @@ get_money_for_dragon(region * r, unit * u, int wanted)
   /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an */
 	n = 0;
   for (u2 = r->units; u2; u2 = u2->next) {
-    if (u2->faction != u->faction && get_money(u2)) {
-      if (getguard(u2) & GUARD_TAX) continue;
+    if (u2->faction != u->faction && cansee(u->faction, r, u2, 0)) {
+      int m = get_money(u2);
+      if (m==0 || (getguard(u2) & GUARD_TAX)) continue;
       else {
         order * ord = monster_attack(u, u2);
         if (ord) {
           addlist(&u->orders, ord);
-          n += get_money(u2);
+          n += m;
         }
       }
     }
@@ -139,19 +140,22 @@ get_money_for_dragon(region * r, unit * u, int wanted)
 }
 
 static int
-money(region * r)
+all_money(region * r, faction * f)
 {
 	unit *u;
 	int m;
 
 	m = rmoney(r);
-	for (u = r->units; u; u = u->next)
-		m += get_money(u);
+  for (u = r->units; u; u = u->next) {
+    if (f!=u->faction) {
+      m += get_money(u);
+    }
+	}
 	return m;
 }
 
 static direction_t
-richest_neighbour(region * r, int absolut)
+richest_neighbour(region * r, faction * f, int absolut)
 {
 
 	/* m - maximum an Geld, d - Richtung, i - index, t = Geld hier */
@@ -161,9 +165,9 @@ richest_neighbour(region * r, int absolut)
 	direction_t d = NODIRECTION, i;
 
 	if (absolut == 1 || rpeasants(r) == 0) {
-		m = (double) money(r);
+		m = (double) all_money(r, f);
 	} else {
-		m = (double) money(r) / (double) rpeasants(r);
+		m = (double) all_money(r, f) / (double) rpeasants(r);
 	}
 
 	/* finde die region mit dem meisten geld */
@@ -171,9 +175,9 @@ richest_neighbour(region * r, int absolut)
 	for (i = 0; i != MAXDIRECTIONS; i++)
 		if (rconnect(r, i) && rterrain(rconnect(r, i)) != T_OCEAN) {
 			if (absolut == 1 || rpeasants(r) == 0) {
-				t = (double) money(rconnect(r, i));
+				t = (double) all_money(rconnect(r, i), f);
 			} else {
-				t = (double) money(rconnect(r, i)) / (double) rpeasants(r);
+				t = (double) all_money(rconnect(r, i), f) / (double) rpeasants(r);
 			}
 
 			if (t > m) {
@@ -304,7 +308,7 @@ monster_move(region * r, unit * u)
     case RC_FIREDRAGON:
     case RC_DRAGON:
     case RC_WYRM:
-      d = richest_neighbour(r, 1);
+      d = richest_neighbour(r, u->faction, 1);
       break;
     case RC_TREEMAN:
       d = treeman_neighbour(r);
@@ -333,7 +337,7 @@ monster_move(region * r, unit * u)
 static int
 dragon_affinity_value(region *r, unit *u)
 {
-	int m = count_all_money(r);
+	int m = all_money(r, u->faction);
 
 	if(u->race == new_race[RC_FIREDRAGON]) {
 		return (int)(normalvariate(m,m/2));

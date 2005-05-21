@@ -171,6 +171,18 @@ SpecialFunction(region *r)
 	delwin(win);
 }
 
+static int
+count_all_money(const region * r)
+{
+  const unit *u;
+  int m = rmoney(r);
+
+  for (u = r->units; u; u = u->next)
+    m += get_money(u);
+
+  return m;
+}
+
 char Tchar[MAXRACES] = "ZEOGMTDIHK~uifdwtbrsz";
 
 void

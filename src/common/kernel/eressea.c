@@ -553,18 +553,6 @@ resourcepath(void)
 }
 
 int
-count_all_money(const region * r)
-{
-	const unit *u;
-	int m = rmoney(r);
-
-	for (u = r->units; u; u = u->next)
-		m += get_money(u);
-
-	return m;
-}
-
-int
 count_skill(faction * f, skill_t sk)
 {
   int n = 0;
