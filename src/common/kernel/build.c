@@ -801,8 +801,9 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   building * b = NULL;
   /* einmalige Korrektur */
   static char buffer[8 + IDSIZE + 1 + NAMESIZE + 1];
-  const char *string2;
-  order * new_order;
+  const char *btname = NULL;
+  order * new_order = NULL;
+  const struct locale * lang = u->faction->locale;
 
   if (eff_skill(u, SK_BUILDING, r) == 0) {
     cmistake(u, ord, 101, MSG_PRODUCE);
@@ -881,9 +882,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
       if (c!=0) strcat(ch++, ",");
       n = cons->materials[c].number / cons->reqsize;
       sprintf(ch, " %d %s", n?n:1,
-          locale_string(u->faction->locale,
-            resname(cons->materials[c].type, cons->materials[c].number!=1))
-          );
+        LOC(lang, resname(cons->materials[c].type, cons->materials[c].number!=1)));
       ch = ch+strlen(ch);
     }
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "build_required",
@@ -901,7 +900,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   /* at this point, the building size is increased. */
   if (b==NULL) {
     /* build a new building */
-    b = new_building(btype, r, u->faction->locale);
+    b = new_building(btype, r, lang);
     b->type = btype;
     fset(b, BLD_MAINTAINED);
 
@@ -910,31 +909,42 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     u->building = b;
     fset(u, UFL_OWNER);
 
-    newbuilding = 1;
+    newbuilding = true;
   }
 
-  if (b->type->name) {
-      string2 = LOC(u->faction->locale, b->type->_name);
-  } else {
-      string2 = LOC(u->faction->locale, buildingtype(b, b->size));
-      if( newbuilding && b->type->maxsize != -1 )
+  if (newbuilding) {
+    if (b->type->name==NULL) {
+      btname = LOC(lang, b->type->_name);
+    } else {
+      btname = LOC(lang, buildingtype(b, b->size));
+      if (b->type->maxsize != -1) {
         want = b->type->maxsize - b->size;
+      }
+    }
   }
 
-  if( want == INT_MAX )
-    sprintf(buffer, "%s %s %s", locale_string(u->faction->locale, keywords[K_MAKE]), string2, buildingid(b));
-  else if( want-built <= 0 )
-    strcpy(buffer, locale_string(u->faction->locale, "defaultorder"));
-  else
-    sprintf(buffer, "%s %d %s %s", locale_string(u->faction->locale, keywords[K_MAKE]), want-built, string2, buildingid(b));
+  if (want-built <= 0) {
+    /* gebäude fertig */
+    strcpy(buffer, locale_string(lang, "defaultorder"));
+    new_order = parse_order(buffer, lang);
+  } else if (want!=INT_MAX) {
+    /* reduzierte restgröße */
+    sprintf(buffer, "%s %d %s %s", LOC(lang, keywords[K_MAKE]), want-built, btname, buildingid(b));
+    new_order = parse_order(buffer, lang);
+  } else if (btname) {
+    /* Neues Haus, Befehl mit Gebäudename */
+    sprintf(buffer, "%s %s %s", LOC(lang, keywords[K_MAKE]), btname, buildingid(b));
+    new_order = parse_order(buffer, u->faction->locale);
+  }
 
-  new_order = parse_order(buffer, u->faction->locale);
+  if (new_order) {
 #ifdef LASTORDER
-  set_order(&u->lastorder, new_order);
+    set_order(&u->lastorder, new_order);
 #else
-  replace_order(ord, new_order);
-  free_order(new_order);
+    replace_order(&u->orders, ord, new_order);
+    free_order(new_order);
 #endif
+  }
 
   b->size += built;
   update_lighthouse(b);
@@ -1025,7 +1035,7 @@ create_ship(region * r, unit * u, const struct ship_type * newtype, int want, or
 #ifdef LASTORDER
   set_order(&u->lastorder, new_order);
 #else
-  replace_order(ord, new_order);
+  replace_order(&u->orders, ord, new_order);
   free_order(new_order);
 #endif
 

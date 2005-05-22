@@ -14,6 +14,7 @@
 #include "eressea.h"
 
 #include "order.h"
+#include "skill.h"
 
 /* libc includes */
 #include <assert.h>
@@ -21,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#undef SHORT_STRINGS
+#define SHORT_STRINGS
 
 #ifdef SHARE_ORDERS
 # define ORD_KEYWORD(ord) (ord)->data->_keyword
@@ -68,16 +69,19 @@ release_data(order_data * data)
 #endif
 
 void
-replace_order(order * dst, const order * src)
+replace_order(order ** dlist, order * orig, const order * src)
 {
-#ifdef SHARE_ORDERS
-  release_data(dst->data);
-  ++src->data->_refcount;
-#else
-  if (dst->data._str) free(dst->data._str);
-#endif
-  dst->data = src->data;
-  dst->_persistent = src->_persistent;
+  while (*dlist!=NULL) {
+    order * dst = *dlist;
+    if (dst->data==orig->data) {
+      order * cpy = copy_order(src);
+      *dlist = cpy;
+      cpy->next = dst->next;
+      dst->next = 0;
+      free_order(dst);
+    }
+    dlist = &(*dlist)->next;
+  }
 }
 
 keyword_t
@@ -86,11 +90,7 @@ get_keyword(const order * ord)
   if (ord==NULL) {
     return NOKEYWORD;
   }
-#ifdef SHARE_ORDERS
-  return ord->data->_keyword;
-#else
-  return ord->data._keyword;
-#endif
+  return ORD_KEYWORD(ord);
 }
 
 char *
@@ -135,7 +135,7 @@ free_order(order * ord)
 }
 
 order *
-copy_order(order * src)
+copy_order(const order * src)
 {
   if (src!=NULL) {
     order * ord = (order*)malloc(sizeof(order));
@@ -175,6 +175,8 @@ create_data(keyword_t kwd, const char * s, const char * sptr, int lindex)
 {
   order_data * data;
   const struct locale * lang = locale_array[lindex]->lang;
+
+  /* learning, only one order_data per skill required */
   if (kwd==K_STUDY) {
     skill_t sk = findskill(parse_token(&sptr), lang);
     if (sk!=NOSKILL) {
@@ -184,13 +186,20 @@ create_data(keyword_t kwd, const char * s, const char * sptr, int lindex)
         locale_array[lindex]->study_orders[sk] = data;
         data->_keyword = kwd;
         data->_lindex = lindex;
-        data->_str = s?strdup(s):NULL;
+#ifdef SHORT_STRINGS
+        data->_str = strdup(skillname(sk, lang));
+#else
+        sprintf(buf, "%s %s", LOC(lang, keywords[kwd]), skillname(sk, lang));
+        data->_str = strdup(buf);
+#endif
         data->_refcount = 1;
       }
       ++data->_refcount;
       return data;
     }
   }
+
+  /* orders with no parameter, only one order_data per order required */
   if (kwd!=NOKEYWORD && *sptr == 0) {
     data = locale_array[lindex]->short_orders[kwd];
     if (data == NULL) {
@@ -198,7 +207,11 @@ create_data(keyword_t kwd, const char * s, const char * sptr, int lindex)
       locale_array[lindex]->short_orders[kwd] = data;
       data->_keyword = kwd;
       data->_lindex = lindex;
-      data->_str = s?strdup(s):NULL;
+#ifdef SHORT_STRINGS
+      data->_str = NULL;
+#else
+      data->_str = strdup(LOC(lang, keywords[kwd]));
+#endif
       data->_refcount = 1;
     }
     ++data->_refcount;

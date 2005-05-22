@@ -25,7 +25,7 @@ extern "C" {
  * implemented yet) saving approx. 50% of all string-related memory.
  */
 
-#undef SHARE_ORDERS
+#define SHARE_ORDERS
 
 #ifdef SHARE_ORDERS
 struct order_data;
@@ -52,23 +52,23 @@ typedef struct order {
 #endif
 
 /* constructor */
-extern struct order * parse_order(const char * s, const struct locale * lang);
-extern void replace_order(order * dst, const order * src);
+extern order * parse_order(const char * s, const struct locale * lang);
+extern void replace_order(order ** dst, order * orig, const order * src);
 
 /* reference counted copies of orders: */
-extern struct order * copy_order(struct order * ord);
-extern void free_order(struct order * ord);
-extern void free_orders(struct order ** olist);
+extern order * copy_order(const order * ord);
+extern void free_order(order * ord);
+extern void free_orders(order ** olist);
 
 /* access functions for orders */
-extern keyword_t get_keyword(const struct order * ord);
-extern void set_order(struct order ** destp, struct order * src);
-extern char * getcommand(const struct order * ord);
-extern boolean is_persistent(const struct order *ord);
-extern boolean is_exclusive(const struct order *ord);
+extern keyword_t get_keyword(const order * ord);
+extern void set_order(order ** destp, order * src);
+extern char * getcommand(const order * ord);
+extern boolean is_persistent(const order *ord);
+extern boolean is_exclusive(const order *ord);
 extern boolean is_repeated(const order * ord);
 
-extern char * write_order(const struct order * ord, const struct locale * lang, char * buffer, size_t size);
+extern char * write_order(const order * ord, const struct locale * lang, char * buffer, size_t size);
 #ifdef __cplusplus
 }
 #endif
