@@ -179,23 +179,27 @@ create_data(keyword_t kwd, const char * s, const char * sptr, int lindex)
   /* learning, only one order_data per skill required */
   if (kwd==K_STUDY) {
     skill_t sk = findskill(parse_token(&sptr), lang);
-    if (sk!=NOSKILL) {
-      data = locale_array[lindex]->study_orders[sk];
-      if (data==NULL) {
-        data = (order_data*)malloc(sizeof(order_data));
-        locale_array[lindex]->study_orders[sk] = data;
-        data->_keyword = kwd;
-        data->_lindex = lindex;
+    switch (sk) {
+      case NOSKILL: /* fehler */
+      case SK_MAGIC: /* kann parameter haben */
+        break;
+      default: /* nur skill als Parameter, keine extras */
+        data = locale_array[lindex]->study_orders[sk];
+        if (data==NULL) {
+          data = (order_data*)malloc(sizeof(order_data));
+          locale_array[lindex]->study_orders[sk] = data;
+          data->_keyword = kwd;
+          data->_lindex = lindex;
 #ifdef SHORT_STRINGS
-        data->_str = strdup(skillname(sk, lang));
+          data->_str = strdup(skillname(sk, lang));
 #else
-        sprintf(buf, "%s %s", LOC(lang, keywords[kwd]), skillname(sk, lang));
-        data->_str = strdup(buf);
+          sprintf(buf, "%s %s", LOC(lang, keywords[kwd]), skillname(sk, lang));
+          data->_str = strdup(buf);
 #endif
-        data->_refcount = 1;
-      }
-      ++data->_refcount;
-      return data;
+          data->_refcount = 1;
+        }
+        ++data->_refcount;
+        return data;
     }
   }
 
