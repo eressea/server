@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SHORT_STRINGS
+#undef SHORT_STRINGS
 
 #ifdef SHARE_ORDERS
 # define ORD_KEYWORD(ord) (ord)->data->_keyword

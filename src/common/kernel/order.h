@@ -25,7 +25,7 @@ extern "C" {
  * implemented yet) saving approx. 50% of all string-related memory.
  */
 
-#define SHARE_ORDERS
+#undef SHARE_ORDERS
 
 #ifdef SHARE_ORDERS
 struct order_data;
