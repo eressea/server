@@ -427,7 +427,7 @@ teach(unit * u, struct order * ord)
 #ifdef LASTORDER
     set_order(&u->lastorder, new_order);
 #else
-    replace_order(ord, new_order);
+    replace_order(&u->orders, ord, new_order);
     free_order(new_order); /* parse_order & set_order have each increased the refcount */
 #endif
   }
