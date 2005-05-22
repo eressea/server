@@ -585,7 +585,7 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
 			}
 		}
 	} else {
-		bufp += strxcpy(bufp, sp->syntax);
+		bufp = buf + strxcpy(bufp, sp->syntax);
 	}
 	rps(F, buf);
 	rnl(F);
