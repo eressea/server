@@ -758,6 +758,8 @@ recruit_dracoids(unit * dragon, int size)
   order * new_order;
   unit *un = createunit(r, f, size, new_race[RC_DRACOID]);
 
+  fset(un, UFL_ISNEW|UFL_MOVED);
+
   name_unit(un);
   change_money(dragon, -un->number * 50);
 

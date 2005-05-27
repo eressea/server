@@ -2499,6 +2499,7 @@ patzer_peasantmob(castorder *co)
 	  assert(rpeasants(r) >= 0);
 
 	  u = createunit(r, f, n, new_race[RC_PEASANT]);
+    fset(u, UFL_ISNEW);
 	  set_string(&u->name, "Bauernmob");
 	  /* guard(u, GUARD_ALL);  hier zu früh! Befehl BEWACHE setzten */
 	  addlist(&u->orders, parse_order(LOC(lang, keywords[K_GUARD]), lang));
@@ -4281,6 +4282,7 @@ sp_raisepeasantmob(castorder *co)
 	assert(rpeasants(r) >= 0);
 
 	u = createunit(r, findfaction(MONSTER_FACTION), n, new_race[RC_PEASANT]);
+  fset(u, UFL_ISNEW);
   set_string(&u->name, "Aufgebrachte Bauern");
 	guard(u, GUARD_ALL);
 	a = a_new(&at_unitdissolve);

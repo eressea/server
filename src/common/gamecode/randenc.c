@@ -465,7 +465,7 @@ get_allies(region * r, unit * u)
 		newunit->irace = u->irace;
 	}
 	if (fval(u, UFL_PARTEITARNUNG)) fset(newunit, UFL_PARTEITARNUNG);
-	fset(u, UFL_ISNEW);
+	fset(newunit, UFL_ISNEW);
 
 	sprintf(buf, "Plötzlich stolper%c %s über einige %s. Nach kurzem "
 		"Zögern entschließen sich die %s, sich Deiner Partei anzuschließen.",
