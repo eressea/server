@@ -456,11 +456,11 @@ learn(void)
       int days;
       if (rterrain(r) == T_OCEAN){
         /* sonderbehandlung aller die auf Ozeanen lernen können */
-        if (u->race != new_race[RC_AQUARIAN]
-        && !(u->race->flags & RCF_SWIM)) {
+        if (u->race!=new_race[RC_AQUARIAN] && !(u->race->flags & RCF_SWIM)) {
           continue;
         }
       }
+      if (fval(u, UFL_LONGACTION)) continue;
       if (get_keyword(u->thisorder) == K_STUDY) {
         double multi = 1.0;
         attrib * a = NULL;
