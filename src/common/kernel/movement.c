@@ -2117,15 +2117,19 @@ hunt(unit *u)
     return 0;
   } else if (u->ship==NULL) {
     cmistake(u, u->thisorder, 144, MSG_MOVE);
+    fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if(!fval(u, UFL_OWNER)) {
     cmistake(u, u->thisorder, 146, MSG_MOVE);
+    fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if(attacked(u)) {
     cmistake(u, u->thisorder, 52, MSG_MOVE);
+    fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   } else if (!can_move(u)) {
     cmistake(u, u->thisorder, 55, MSG_MOVE);
+    fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   }
 
@@ -2133,6 +2137,7 @@ hunt(unit *u)
 
   if (id <= 0) {
     cmistake(u,  u->thisorder, 20, MSG_MOVE);
+    fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   }
 
@@ -2143,6 +2148,7 @@ hunt(unit *u)
     if (sh==NULL || sh->region!=rc) {
       cmistake(u, u->thisorder, 20, MSG_MOVE);
     }
+    fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
   }
 
@@ -2165,8 +2171,7 @@ hunt(unit *u)
   igetstrtoken(command);
   /* NACH ausführen */
   move(u, false);
-  fset(u, UFL_LONGACTION); /* Von Hand setzen, um Endlosschleife zu vermeiden, wenn Verfolgung nicht erfolgreich */
-  return 1;   															/* true -> Einheitenliste von vorne durchgehen */
+  return 1; /* true -> Einheitenliste von vorne durchgehen */
 }
 
 void
