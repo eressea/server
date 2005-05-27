@@ -287,7 +287,7 @@ parse_buildings(xmlDocPtr doc)
       property = xmlGetProp(node, BAD_CAST "type");
       assert(property!=NULL);
       mt->rtype = rt_find((const char*)property);
-	  assert(mt->rtype!=NULL);
+      assert(mt->rtype!=NULL);
       xmlFree(property);
 
       if (xml_bvalue(node, "variable", false)) mt->flags |= MTF_VARIABLE;
@@ -1054,7 +1054,7 @@ parse_messages(xmlDocPtr doc)
       xmlChar * text;
 
       xml_readtext(node, &lang, &text);
-	  xml_cleanup_string(text);
+      xml_cleanup_string(text);
       nrt_register(mtype, lang, xml_to_locale(text), 0, (const char*)section);
       xmlFree(text);
 

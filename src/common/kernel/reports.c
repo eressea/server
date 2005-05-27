@@ -261,7 +261,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 
   pzTmp = get_racename(u->attribs);
   if (pzTmp) {
-    scat(pzTmp);
+    bufp += strlcpy(bufp, pzTmp, sizeof(buf)-(bufp-buf));
     if (u->faction==f && fval(u->race, RCF_SHAPESHIFTANY)) {
       bufp += strlcpy(bufp, " (", sizeof(buf)-(bufp-buf));
       bufp += strlcpy(bufp, racename(f->locale, u, u->race), sizeof(buf)-(bufp-buf));
