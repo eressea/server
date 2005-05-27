@@ -471,7 +471,7 @@ unitorders(FILE * F, struct faction * f)
   i = getid();
   u = findunitg(i, NULL);
 
-  if (u && old_race(u->race) == RC_SPELL) return NULL;
+  if (u && u->race == new_race[RC_SPELL]) return NULL;
   if (u && u->faction == f) {
     order ** ordp;
 

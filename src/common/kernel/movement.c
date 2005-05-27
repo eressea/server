@@ -207,10 +207,10 @@ personcapacity(const unit *u)
 #else
 	int cap = u->race->weight+540;
 
-	if (old_race(u->race) == RC_TROLL)
+	if (u->race == new_race[RC_TROLL])
 		cap += 540;
 #if RACE_ADJUSTMENTS
-	else if(old_race(u->race) == RC_GOBLIN)
+	else if (u->race == new_race[RC_GOBLIN])
 		cap -= 100;
 #endif
 #endif
@@ -281,7 +281,7 @@ walkingcapacity(const struct unit * u)
 
 	n = wagen_mit_pferden * WAGONCAPACITY;
 
-	if (old_race(u->race) == RC_TROLL) {
+	if (u->race == new_race[RC_TROLL]) {
 		/* 4 Trolle ziehen einen Wagen. */
 		/* Unbesetzte Wagen feststellen */
 		wagen_ohne_pferde = wagen - wagen_mit_pferden;
@@ -329,7 +329,7 @@ canwalk(unit * u)
 	pferde = get_item(u, I_HORSE);
 
 	maxwagen = effskill(u, SK_RIDING) * u->number * 2;
-	if (old_race(u->race) == RC_TROLL) {
+	if (u->race == new_race[RC_TROLL]) {
 		maxwagen = max(maxwagen, u->number / 4);
 	}
 	maxpferde = effskill(u, SK_RIDING) * u->number * 4 + u->number;
@@ -622,7 +622,7 @@ check_working_buildingtype(const region * r, const building_type * bt)
 static boolean
 is_freezing(const unit * u)
 {
-  if (old_race(u->race)!=RC_INSECT) return false;
+  if (u->race!=new_race[RC_INSECT]) return false;
   if (is_cursed(u->attribs, C_KAELTESCHUTZ, 0)) return false;
   return true;
 }
@@ -1287,7 +1287,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
     }
 
     /* unit is an insect and cannot move into a glacier */
-    if (old_race(u->race)==RC_INSECT) {
+    if (u->race==new_race[RC_INSECT]) {
       if (r_insectstalled(next) && is_freezing(u)) {
         ADDMSG(&u->faction->msgs, msg_message("detectforbidden",
           "unit region", u, next));

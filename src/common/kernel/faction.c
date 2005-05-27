@@ -142,7 +142,7 @@ addplayer(region *r, faction * f)
   u = createunit(r, f, 1, f->race);
   give_starting_equipment(r, u);
   fset(u, UFL_ISNEW);
-  if (old_race(f->race) == RC_DAEMON) {
+  if (f->race == new_race[RC_DAEMON]) {
     race_t urc;
     do
     urc = (race_t)(rand() % MAXRACES);

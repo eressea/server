@@ -1733,7 +1733,7 @@ sp_great_drought(castorder *co)
 					rsetterrain(r, T_OCEAN);
 					/* Einheiten dürfen hier auf keinen Fall gelöscht werden! */
 					for (u = r->units; u; u = u->next) {
-						if (old_race(u->race) != RC_SPELL && u->ship == 0) {
+						if (u->race != new_race[RC_SPELL] && u->ship == 0) {
 							set_number(u, 0);
 						}
 					}

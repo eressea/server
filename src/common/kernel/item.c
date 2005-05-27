@@ -117,12 +117,12 @@ int
 res_changeitem(unit * u, const resource_type * rtype, int delta)
 {
 	int num;
-	if (rtype == oldresourcetype[R_STONE] && old_race(u->race)==RC_STONEGOLEM && delta<=0) {
+	if (rtype == oldresourcetype[R_STONE] && u->race==new_race[RC_STONEGOLEM] && delta<=0) {
 		int reduce = delta / GOLEM_STONE;
 		if (delta % GOLEM_STONE != 0) --reduce;
 		scale_number(u, u->number+reduce);
 		num = u->number;
-	} else if (rtype == oldresourcetype[R_IRON] && old_race(u->race) == RC_IRONGOLEM && delta<=0) {
+	} else if (rtype == oldresourcetype[R_IRON] && u->race==new_race[RC_IRONGOLEM] && delta<=0) {
 		int reduce = delta / GOLEM_IRON;
 		if (delta % GOLEM_IRON != 0) --reduce;
 		scale_number(u, u->number+reduce);

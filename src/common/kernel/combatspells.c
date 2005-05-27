@@ -1548,7 +1548,7 @@ sp_reanimate(fighter * fi, int level, double power, spell * sp)
 	while (healable--) {
 		fighter * tf = select_corpse(b, fi);
 		if (tf!=NULL && tf->side->casualties > 0
-                  && old_race(tf->unit->race) != RC_DAEMON
+                  && tf->unit->race != new_race[RC_DAEMON]
                   && (chance(c)))
 		{
 			assert(tf->alive < tf->unit->number);

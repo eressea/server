@@ -513,7 +513,7 @@ build_road(region * r, unit * u, int size, direction_t d)
       return;
     }
   }
-  if (!get_pooled(u, r, R_STONE) && old_race(u->race) != RC_STONEGOLEM) {
+  if (!get_pooled(u, r, R_STONE) && u->race != new_race[RC_STONEGOLEM]) {
     cmistake(u, u->thisorder, 151, MSG_PRODUCE);
     return;
   }
@@ -545,7 +545,7 @@ build_road(region * r, unit * u, int size, direction_t d)
   }             /* Auswirkung Schaffenstrunk */
 
   /* und anhand der rohstoffe */
-  if (old_race(u->race) == RC_STONEGOLEM){
+  if (u->race == new_race[RC_STONEGOLEM]){
     n = min(n, u->number * GOLEM_STONE);
   } else {
     n = use_pooled(u, r, R_STONE, n);
@@ -556,7 +556,7 @@ build_road(region * r, unit * u, int size, direction_t d)
    * maximum. */
   rsetroad(r, d, rroad(r, d) + min(n, left));
 
-  if (old_race(u->race) == RC_STONEGOLEM){
+  if (u->race == new_race[RC_STONEGOLEM]){
     int golemsused = n / GOLEM_STONE;
     if (n%GOLEM_STONE != 0){
       ++golemsused;

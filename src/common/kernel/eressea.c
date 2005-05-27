@@ -524,7 +524,7 @@ max_skill(faction * f, skill_t sk)
 		} else {
 			m = MAXMAGICIANS;
 		}
-		if (old_race(f->race) == RC_ELF) m += 1;
+		if (f->race == new_race[RC_ELF]) m += 1;
 		m += fspecial(f, FS_MAGOCRACY) * 2;
 		break;
 	case SK_ALCHEMY:
@@ -594,8 +594,8 @@ shipspeed (const ship * sh, const unit * u)
 	if( curse_active(get_curse(sh->attribs, nodrift_ct)))
 			k += 1;
 
-	if (old_race(u->faction->race) == RC_AQUARIAN
-			&& old_race(u->race) == RC_AQUARIAN) {
+	if (u->faction->race == new_race[RC_AQUARIAN]
+			&& u->race == new_race[RC_AQUARIAN]) {
 		k += 1;
   }
 
@@ -737,7 +737,7 @@ verify_data(void)
 				log_warning(("Einheit %s hat %d Personen\n", unitid(u), u->number));
 			}
 		}
-		if (f->no != 0 && ((mage > 3 && old_race(f->race) != RC_ELF) || mage > 4))
+		if (f->no != 0 && ((mage > 3 && f->race != new_race[RC_ELF]) || mage > 4))
 			log_error(("Partei %s hat %d Magier.\n", factionid(f), mage));
 		if (alchemist > 3)
 			log_error(("Partei %s hat %d Alchemisten.\n", factionid(f), alchemist));
@@ -1242,7 +1242,7 @@ int
 count_maxmigrants(const faction * f)
 {
   int x = 0;
-  if (old_race(f->race) == RC_HUMAN) {
+  if (f->race == new_race[RC_HUMAN]) {
     int nsize = count_all(f);
     if (nsize>0) {
       x = (int)(log10(nsize / 50.0) * 20);
@@ -2705,7 +2705,7 @@ lifestyle(const unit * u)
 		need += 1;
 	if(fspecial(u->faction, FS_ADMINISTRATOR))
 		need += 1;
-	if(fspecial(u->faction, FS_WYRM) && old_race(u->race) == RC_WYRM)
+	if(fspecial(u->faction, FS_WYRM) && u->race == new_race[RC_WYRM])
 		need *= 500;
 
 	return need;
@@ -2719,7 +2719,7 @@ hunger(int number, unit * u)
 	int hp = u->hp / u->number;
 
 	while (number--) {
-		int dam = old_race(u->race)==RC_HALFLING?15+rand()%14:(13+rand()%12);
+		int dam = u->race==new_race[RC_HALFLING]?15+rand()%14:(13+rand()%12);
 		if (dam >= hp) {
 			++dead;
 		} else {
@@ -2886,7 +2886,7 @@ fwage(const region *r, const faction *f, boolean img)
 	if (b) esize = buildingeffsize(b, img);
 
 	if (f) {
-		wage = wagetable[esize][old_race(f->race) == RC_ORC];
+		wage = wagetable[esize][f->race == new_race[RC_ORC]];
 		if (fspecial(f, FS_URBAN)) {
 			wage += wagetable[esize][3];
 		}
