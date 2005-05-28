@@ -185,6 +185,10 @@ new_get_pooled(const unit * u, const resource_type * rtype, int mode)
 	region * r = u->region;
 	int have = new_get_resource(u, rtype);
 
+  if ((u->race->ec_flags & GETITEM) == 0) {
+    mode &= ~(GET_SLACK|GET_RESERVE);
+  }
+
 	if ((mode & GET_SLACK) && (mode & GET_RESERVE)) use = have;
 	else {
 		int reserve = new_get_resvalue(u, rtype);
@@ -223,6 +227,10 @@ new_use_pooled(unit * u, const resource_type * rtype, int mode, int count)
 	int use = count;
 	region * r = u->region;
 	int n = 0, have = new_get_resource(u, rtype);
+
+  if ((u->race->ec_flags & GETITEM) == 0) {
+    mode &= ~(GET_SLACK|GET_RESERVE);
+  }
 
 	if ((mode & GET_SLACK) && (mode & GET_RESERVE)) {
 		n = min(use, have);
