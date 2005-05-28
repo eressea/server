@@ -1116,8 +1116,10 @@ readunit(FILE * F)
 		} else {
 			guard(u, GUARD_NONE);
 		}
-	} else
+	} else {
 		u->flags = ri(F) & ~UFL_DEBUG;
+    u->flags &= UFL_SAVEMASK;
+  }
 	/* Persistente Befehle einlesen */
 	free_orders(&u->orders);
 	freadstr(F, buf, sizeof(buf));

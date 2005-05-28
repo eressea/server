@@ -45,19 +45,21 @@ struct skill;
 
 /* warning: von 512/1024 gewechslet, wegen konflikt mit NEW_FOLLOW */
 #define UFL_LOCKED        (1<<16) /* Einheit kann keine Personen aufnehmen oder weggeben, nicht rekrutieren. */
+#define UFL_DH            (1<<18) /* same as FL_DH */
 
 #define UFL_STORM         (1<<19) /* Kapitän war in einem Sturm */
 #define UFL_TRADER        (1<<20) /* Händler, pseudolang */
 
 #define UFL_NOAID         (1<<22) /* Einheit hat Noaid-Status */
+#define UFL_MARK          (1<<23) /* same as FL_MARK */
 #define UFL_ORDERS        (1<<24) /* Einheit hat Befehle erhalten */
 #define UFL_TAKEALL       (1<<25) /* Einheit nimmt alle Gegenstände an */
 
 /* Flags, die gespeichert werden sollen: */
 #ifndef HEROES
-# define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL)
+# define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | UFL_TAKEALL)
 #else
-# define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | FFL_NOIDLEOUT | UFL_TAKEALL | UFL_HERO)
+# define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | UFL_TAKEALL | UFL_HERO)
 #endif
 
 #define UNIT_MAXSIZE 50000

@@ -874,8 +874,6 @@ typedef struct strlist {
 	char * s;
 } strlist;
 
-#define FL_POTIONS        (1<<15) /* speedup: hat ein oder mehr tränke, statt potionptr */
-
 #define FL_DH             (1<<18) /* ehemals f->dh, u->dh, r->dh, etc... */
 
 /* alle vierstelligen zahlen: */
