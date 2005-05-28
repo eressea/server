@@ -2672,9 +2672,18 @@ prepare_report(faction * f)
       region_list * rlist = get_regions_distance(r, light);
       region_list * rp = rlist;
       while (rp) {
-        region * r = rp->data;
-        if (rterrain(r) == T_OCEAN) {
-          add_seen(seen, r, see_lighthouse, false);
+        region * rl = rp->data;
+        if (rterrain(rl) == T_OCEAN) {
+          add_seen(seen, rl, see_lighthouse, false);
+          if (distance(rl, r)==light) {
+            direction_t d;
+            for (d=0;d!=MAXDIRECTIONS;++d) {
+              region * rn = rconnect(rl, d);
+              if (rn!=NULL) {
+                add_seen(seen, rn, see_neighbour, false);
+              }
+            }
+          }
         }
         rp = rp->next;
       }
