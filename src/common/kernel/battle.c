@@ -1172,7 +1172,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 #ifdef TODO_RUNESWORD
 			if (select_weapon(dt, 0, -1) == WP_RUNESWORD) continue;
 #endif
-			if (!(df->person[dt.index].flags & FL_COURAGE)) {
+			if (!(df->person[dt.index].flags & (FL_COURAGE|FL_DAZZLED))) {
 				df->person[dt.index].flags |= FL_DAZZLED;
 				df->person[dt.index].defence--;
 			}
