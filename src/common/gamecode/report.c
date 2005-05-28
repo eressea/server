@@ -2674,14 +2674,12 @@ prepare_report(faction * f)
       while (rp) {
         region * rl = rp->data;
         if (rterrain(rl) == T_OCEAN) {
+          direction_t d;
           add_seen(seen, rl, see_lighthouse, false);
-          if (distance(rl, r)==light) {
-            direction_t d;
-            for (d=0;d!=MAXDIRECTIONS;++d) {
-              region * rn = rconnect(rl, d);
-              if (rn!=NULL) {
-                add_seen(seen, rn, see_neighbour, false);
-              }
+          for (d=0;d!=MAXDIRECTIONS;++d) {
+            region * rn = rconnect(rl, d);
+            if (rn!=NULL) {
+              add_seen(seen, rn, see_neighbour, false);
             }
           }
         }
