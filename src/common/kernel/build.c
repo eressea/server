@@ -801,7 +801,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   building * b = NULL;
   /* einmalige Korrektur */
   static char buffer[8 + IDSIZE + 1 + NAMESIZE + 1];
-  const char *btname = NULL;
+  const char * btname;
   order * new_order = NULL;
   const struct locale * lang = u->faction->locale;
 
@@ -912,20 +912,11 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     newbuilding = true;
   }
 
-  if (newbuilding) {
-    if (b->type->name==NULL) {
-      btname = LOC(lang, b->type->_name);
-    } else {
-      btname = LOC(lang, buildingtype(b, b->size));
-      if (b->type->maxsize != -1) {
-        want = b->type->maxsize - b->size;
-      }
-    }
-  }
+  btname = LOC(lang, btype->_name);
 
   if (want-built <= 0) {
     /* gebäude fertig */
-    strcpy(buffer, locale_string(lang, "defaultorder"));
+    strcpy(buffer, LOC(lang, "defaultorder"));
     new_order = parse_order(buffer, lang);
   } else if (want!=INT_MAX) {
     /* reduzierte restgröße */
