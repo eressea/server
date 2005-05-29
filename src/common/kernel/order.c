@@ -181,8 +181,9 @@ create_data(keyword_t kwd, const char * s, const char * sptr, int lindex)
     skill_t sk = findskill(parse_token(&sptr), lang);
     switch (sk) {
       case NOSKILL: /* fehler */
-      case SK_MAGIC: /* kann parameter haben */
         break;
+      case SK_MAGIC: /* kann parameter haben */
+        if (*sptr != 0) break;
       default: /* nur skill als Parameter, keine extras */
         data = locale_array[lindex]->study_orders[sk];
         if (data==NULL) {
@@ -204,7 +205,7 @@ create_data(keyword_t kwd, const char * s, const char * sptr, int lindex)
   }
 
   /* orders with no parameter, only one order_data per order required */
-  if (kwd!=NOKEYWORD && *sptr == 0) {
+  else if (kwd!=NOKEYWORD && *sptr == 0) {
     data = locale_array[lindex]->short_orders[kwd];
     if (data == NULL) {
       data = (order_data*)malloc(sizeof(order_data));
