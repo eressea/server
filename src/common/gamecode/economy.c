@@ -2198,7 +2198,7 @@ expandstealing(region * r, request * stealorders)
 			ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount", u, u->region, n));
 		}
 		add_income(oa[i].unit, IC_STEAL, oa[i].unit->wants, oa[i].unit->n);
-    fset(u, UFL_LONGACTION);
+    fset(oa[i].unit, UFL_LONGACTION);
 	}
 	free(oa);
 }
