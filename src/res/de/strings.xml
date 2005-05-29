@@ -476,8 +476,21 @@
   </string>
 
   <!--Verschiedenes -->
-  <string name="unknownunit">
+  <string name="an_unknown_building">
+    <text locale="de">eine unbekanntes Gebäude</text>
+    <text locale="de">an unknown building</text>
+  </string>
+  <string name="an_unknown_spell">
+    <text locale="de">eine unbekannter zauber</text>
+    <text locale="de">an unknown spell</text>
+  </string>
+  <string name="an_unknown_ship">
+    <text locale="de">eine unbekanntes Schiff</text>
+    <text locale="de">an unknown ship</text>
+  </string>
+  <string name="an_unknown_unit">
     <text locale="de">eine unbekannte Einheit</text>
+    <text locale="de">an unknown unit</text>
   </string>
 
   <!--Meldungssektionen -->

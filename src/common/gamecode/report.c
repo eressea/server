@@ -3618,8 +3618,9 @@ report_summary(summary * s, summary * o, boolean full)
 static void
 eval_unit(struct opstack ** stack, const void * userdata) /* unit -> string */
 {
+  const struct faction * f = (const struct faction *)userdata;
 	const struct unit * u = opop(stack, const struct unit *);
-	const char * c = u?unitname(u):"nobody";
+	const char * c = u?unitname(u):LOC(f->locale, "an_unknown_unit");
 	size_t len = strlen(c);
 	opush(stack, strcpy(balloc(len+1), c));
 }
@@ -3629,7 +3630,7 @@ eval_spell(struct opstack ** stack, const void * userdata) /* unit -> string */
 {
   const struct faction * f = (const struct faction *)userdata;
   const struct spell * sp = opop(stack, const struct spell *);
-  const char * c = sp?spell_name(sp, f->locale):"an unknown spell";
+  const char * c = sp?spell_name(sp, f->locale):LOC(f->locale, "an_unknown_spell");
   size_t len = strlen(c);
   opush(stack, strcpy(balloc(len+1), c));
 }
@@ -3637,8 +3638,9 @@ eval_spell(struct opstack ** stack, const void * userdata) /* unit -> string */
 static void
 eval_unitname(struct opstack ** stack, const void * userdata) /* unit -> string */
 {
+  const struct faction * f = (const struct faction *)userdata;
 	const struct unit * u = opop(stack, const struct unit *);
-	const char * c = u?u->name:"nobody";
+	const char * c = u?u->name:LOC(f->locale, "an_unknown_unit");
 	size_t len = strlen(c);
 	opush(stack, strcpy(balloc(len+1), c));
 }
@@ -3647,8 +3649,9 @@ eval_unitname(struct opstack ** stack, const void * userdata) /* unit -> string 
 static void
 eval_unitid(struct opstack ** stack, const void * userdata) /* unit -> int */
 {
+  const struct faction * f = (const struct faction *)userdata;
 	const struct unit * u = opop(stack, const struct unit *);
-	const char * c = u?u->name:"nobody";
+	const char * c = u?u->name:LOC(f->locale, "an_unknown_unit");
 	size_t len = strlen(c);
 	opush(stack, strcpy(balloc(len+1), c));
 }
@@ -3687,8 +3690,9 @@ eval_region(struct opstack ** stack, const void * userdata) /* region -> string 
 static void
 eval_ship(struct opstack ** stack, const void * userdata) /* ship -> string */
 {
+  const struct faction * f = (const struct faction *)userdata;
 	const struct ship * u = opop(stack, const struct ship *);
-	const char * c = u?shipname(u):"nobody";
+	const char * c = u?shipname(u):LOC(f->locale, "an_unknown_ship");
 	size_t len = strlen(c);
 	opush(stack, strcpy(balloc(len+1), c));
 }
@@ -3696,8 +3700,9 @@ eval_ship(struct opstack ** stack, const void * userdata) /* ship -> string */
 static void
 eval_building(struct opstack ** stack, const void * userdata) /* building -> string */
 {
+  const struct faction * f = (const struct faction *)userdata;
 	const struct building * u = opop(stack, const struct building *);
-	const char * c = u?buildingname(u):"nobody";
+	const char * c = u?buildingname(u):LOC(f->locale, "an_unknown_building");
 	size_t len = strlen(c);
 	opush(stack, strcpy(balloc(len+1), c));
 }
