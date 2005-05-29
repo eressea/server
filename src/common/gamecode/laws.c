@@ -3701,6 +3701,7 @@ static void
 defaultorders (void)
 {
   region *r;
+  return;
   for (r=regions;r;r=r->next) {
     unit *u;
     for (u=r->units;u;u=u->next) {

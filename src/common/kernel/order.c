@@ -49,8 +49,8 @@ static int nlocales = 0;
 #ifdef SHARE_ORDERS
 typedef struct order_data {
   char * _str; 
-  int _refcount : 16;
-  int _lindex : 8;
+  int _refcount : 20;
+  int _lindex : 4;
   keyword_t _keyword;
 } order_data;
 #endif
