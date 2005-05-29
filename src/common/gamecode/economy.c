@@ -2887,8 +2887,8 @@ expandtax(region * r, request * taxorders)
   for (u = r->units; u; u = u->next) {
     if (u->n >= 0) {
       add_income(u, IC_TAX, u->wants, u->n);
+      fset(u, UFL_LONGACTION);
     }
-    fset(u, UFL_LONGACTION);
 	}
 }
 
