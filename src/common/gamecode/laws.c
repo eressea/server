@@ -3696,13 +3696,15 @@ monthly_healing(void)
   }
 }
 
-#ifdef LASTORDER
 static void
 defaultorders (void)
 {
   region *r;
   return;
   for (r=regions;r;r=r->next) {
+#ifndef LASTORDER
+    boolean neworders = false;
+#endif
     unit *u;
     for (u=r->units;u;u=u->next) {
       order ** ordp = &u->orders;
@@ -3713,7 +3715,15 @@ defaultorders (void)
           init_tokens(ord);
           skip_token(); /* skip the keyword */
           cmd = strdup(getstrtoken());
+#ifdef LASTORDER
           set_order(&u->lastorder, parse_order(cmd, u->faction->locale));
+#else
+          if (!neworders) {
+            neworders = true;
+            free_orders(&u->old_orders);
+          }
+          addlist(&u->old_orders, parse_order(cmd, u->faction->locale));
+#endif
           free(cmd);
           *ordp = ord->next;
           ord->next = NULL;
@@ -3724,7 +3734,6 @@ defaultorders (void)
     }
   }
 }
-#endif
 
 /* ************************************************************ */
 /* GANZ WICHTIG! ALLE GEÄNDERTEN SPRÜCHE NEU ANZEIGEN */
@@ -3952,10 +3961,8 @@ processorders (void)
   monthly_healing();
   regeneration_magiepunkte();
 
-#ifdef LASTORDER
   puts(" - Defaults setzen");
   defaultorders();
-#endif
 
   puts(" - Unterhaltskosten, Nachfrage, Seuchen, Wachstum, Auswanderung");
   demographics();
