@@ -1832,8 +1832,6 @@ buy(unit * u, request ** buyorders, struct order * ord)
 	o->unit = u;
 	o->qty = n;
 	addlist(buyorders, o);
-
-	if (n) fset(u, UFL_TRADER);
 }
 /* ------------------------------------------------------------- */
 
@@ -2151,7 +2149,6 @@ sell(unit * u, request ** sellorders, struct order * ord)
 		o->type.ltype = ltype;
 		addlist(sellorders, o);
 
-		if (n) fset(u, UFL_TRADER);
     return unlimited;
 	}
 }
@@ -3001,24 +2998,27 @@ produce(void)
 
       if (!TradeDisabled()) {
         order * ord;
+        boolean trader = false;
         for (ord = u->orders;ord;ord=ord->next) {
           switch (get_keyword(ord)) {
           case K_BUY:
             buy(u, &buyorders, ord);
+            trader = true;
             break;
           case K_SELL:
             /* sell returns true if the sale is not limited
              * by the region limit */
             limited &= !sell(u, &sellorders, ord);
+            trader = true;
             break;
           }
         }
-        if (fval(u, UFL_TRADER)) {
+        if (trader) {
           attrib * a = a_find(u->attribs, &at_trades);
           if (a && a->data.i) {
             produceexp(u, SK_TRADE, u->number);
           }
-          set_order(&u->thisorder, NULL);
+          fset(u, UFL_LONGACTION);
           continue;
         }
       }

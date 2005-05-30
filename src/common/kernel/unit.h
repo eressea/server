@@ -48,7 +48,6 @@ struct skill;
 #define UFL_DH            (1<<18) /* same as FL_DH */
 
 #define UFL_STORM         (1<<19) /* Kapitän war in einem Sturm */
-#define UFL_TRADER        (1<<20) /* Händler, pseudolang */
 
 #define UFL_NOAID         (1<<22) /* Einheit hat Noaid-Status */
 #define UFL_MARK          (1<<23) /* same as FL_MARK */
