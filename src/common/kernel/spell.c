@@ -811,7 +811,7 @@ sp_transferaura(castorder *co)
   }
 
   gain = min(aura, scm_src->spellpoints) / multi;
-  scm_src->spellpoints -= gain*2;
+  scm_src->spellpoints -= gain*multi;
 	scm_dst->spellpoints += gain;
 
 /*	sprintf(buf, "%s transferiert %d Aura auf %s", unitname(mage),
