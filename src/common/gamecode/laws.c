@@ -3700,7 +3700,6 @@ static void
 defaultorders (void)
 {
   region *r;
-  return;
   for (r=regions;r;r=r->next) {
 #ifndef LASTORDER
     boolean neworders = false;
