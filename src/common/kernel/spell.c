@@ -772,12 +772,13 @@ sp_destroy_magic(castorder *co)
 static int
 sp_transferaura(castorder *co)
 {
-	unit *u;
-	int aura;
-	int  cost, gain;
+	int aura, gain, multi = 2;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	spellparameter *pa = co->par;
+  unit * u = pa->param[0]->data.u;
+  sc_mage * scm_src = get_mage(mage);
+  sc_mage * scm_dst = get_mage(u);
 
 	/* wenn kein Ziel gefunden, Zauber abbrechen */
 	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -786,43 +787,32 @@ sp_transferaura(castorder *co)
 	 * abbrechen aber kosten lassen */
 	if(pa->param[0]->flag == TARGET_RESISTS) return cast_level;
 
-	/* Zieleinheit ermitteln */
-	u = pa->param[0]->data.u;
-
 	/* Wieviel Transferieren? */
 	aura = pa->param[1]->data.i;
 
-	if(aura < 2) {
-/*		"Auraangabe fehlerhaft." */
-		cmistake(mage, co->order, 208, MSG_MAGIC);
-		return 0;
-	}
+  if (scm_dst==NULL) {
+    /* "Zu dieser Einheit kann ich keine Aura übertragen." */
+    cmistake(mage, co->order, 207, MSG_MAGIC);
+    return 0;
+  } else if (scm_src->magietyp==M_ASTRAL) {
+		if (scm_src->magietyp != scm_dst->magietyp) multi = 3;
+  } else if (scm_src->magietyp==M_GRAU) {
+    if (scm_src->magietyp != scm_dst->magietyp) multi = 4;
+  } else if (scm_dst->magietyp!=scm_src->magietyp) {
+    /* "Zu dieser Einheit kann ich keine Aura übertragen." */
+    cmistake(mage, co->order, 207, MSG_MAGIC);
+    return 0;
+  }
 
-	if(get_mage(mage)->magietyp != M_ASTRAL) {
-		if (!get_mage(u) || get_mage(u)->magietyp != get_mage(mage)->magietyp) {
-/*			"Zu dieser Einheit kann ich keine Aura übertragen." */
-			cmistake(mage, co->order, 207, MSG_MAGIC);
-			return 0;
-		}
-		gain = min(aura,get_mage(mage)->spellpoints)/2;
-		cost = 2 * gain;
-	} else {
-		if (!get_mage(u)) {
-/*			"Zu dieser Einheit kann ich keine Aura übertragen."); */
-			cmistake(mage, co->order, 207, MSG_MAGIC);
-			return 0;
-		}
-		if(get_mage(u)->magietyp == get_mage(mage)->magietyp) {
-			gain = min(aura,get_mage(mage)->spellpoints)/2;
-			cost = 2 * gain;
-		} else {
-			gain = min(aura,get_mage(mage)->spellpoints)/3;
-			cost = 3 * gain;
-		}
-	}
+  if (aura < multi) {
+    /* "Auraangabe fehlerhaft." */
+    cmistake(mage, co->order, 208, MSG_MAGIC);
+    return 0;
+  }
 
-	get_mage(u)->spellpoints += gain;
-	get_mage(mage)->spellpoints -= cost;
+  gain = min(aura, scm_src->spellpoints) / multi;
+  scm_src->spellpoints -= gain*2;
+	scm_dst->spellpoints += gain;
 
 /*	sprintf(buf, "%s transferiert %d Aura auf %s", unitname(mage),
 			gain, unitname(u)); */
