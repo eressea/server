@@ -924,7 +924,7 @@ transport(unit * ut, unit * u)
 {
   order * ord;
 
-  if (LongHunger(u)) {
+  if (LongHunger(u) || ut->region==T_OCEAN) {
     return false;
   }
 
