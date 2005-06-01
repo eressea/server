@@ -924,7 +924,7 @@ transport(unit * ut, unit * u)
 {
   order * ord;
 
-  if (LongHunger(u) || ut->region==T_OCEAN) {
+  if (LongHunger(u) || ut->region->terrain==T_OCEAN) {
     return false;
   }
 
@@ -1170,7 +1170,7 @@ movement_speed(unit * u)
     if (fspecial(u->faction, FS_QUICK)) mp = BP_RIDING;
 
     /* Siebenmeilentee */
-    if (get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
+    if (u->region->terrain!=T_OCEAN && get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
       mp *= 2;
       change_effect(u, oldpotiontype[P_FAST], -u->number);
     }
