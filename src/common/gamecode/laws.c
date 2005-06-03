@@ -3711,17 +3711,19 @@ defaultorders (void)
         order * ord = *ordp;
         if (get_keyword(ord)==K_DEFAULT) {
           char * cmd;
+          order * new_order;
           init_tokens(ord);
           skip_token(); /* skip the keyword */
           cmd = strdup(getstrtoken());
+          new_order = parse_order(cmd, u->faction->locale);
 #ifdef LASTORDER
-          set_order(&u->lastorder, parse_order(cmd, u->faction->locale));
+          if (new_order) set_order(&u->lastorder, new_order);
 #else
           if (!neworders) {
             neworders = true;
             free_orders(&u->old_orders);
           }
-          addlist(&u->old_orders, parse_order(cmd, u->faction->locale));
+          if (new_order) addlist(&u->old_orders, new_order);
 #endif
           free(cmd);
           *ordp = ord->next;
