@@ -79,8 +79,6 @@ typedef struct donation {
 	int amount;
 } donation;
 
-static donation *donations = 0;
-
 typedef struct request {
   struct request * next;
   struct unit *unit;

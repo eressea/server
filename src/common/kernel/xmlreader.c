@@ -841,30 +841,32 @@ parse_equipment(xmlDocPtr doc)
 {
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
   xmlXPathObjectPtr items;
-  xmlNodeSetPtr nodes;
+  xmlNodeSetPtr nsetItems;
   int i;
 
   /* reading eressea/races/race */
   items = xmlXPathEvalExpression(BAD_CAST "/eressea/equipment/item", xpath);
-  nodes = items->nodesetval;
+  nsetItems = items->nodesetval;
 
-  for (i=0;i!=nodes->nodeNr;++i) {
-    xmlNodePtr node = nodes->nodeTab[i];
-    xmlChar * property;
-    const struct item_type * itype;
+  if (nsetItems!=NULL) {
+    for (i=0;i!=nsetItems->nodeNr;++i) {
+      xmlNodePtr node = nsetItems->nodeTab[i];
+      xmlChar * property;
+      const struct item_type * itype;
 
-    property = xmlGetProp(node, BAD_CAST "name");
-    assert(property!=NULL);
-    itype = it_find((const char*)property);
-    xmlFree(property);
-    if (itype!=NULL) {
-      int num = 0;
-      property = xmlGetProp(node, BAD_CAST "amount");
-      if (property!=NULL) {
-        num = atoi((const char*)property);
-        xmlFree(property);
+      property = xmlGetProp(node, BAD_CAST "name");
+      assert(property!=NULL);
+      itype = it_find((const char*)property);
+      xmlFree(property);
+      if (itype!=NULL) {
+        int num = 0;
+        property = xmlGetProp(node, BAD_CAST "amount");
+        if (property!=NULL) {
+          num = atoi((const char*)property);
+          xmlFree(property);
+        }
+        add_equipment(itype, num);
       }
-      add_equipment(itype, num);
     }
   }
   xmlXPathFreeObject(items);
