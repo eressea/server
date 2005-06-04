@@ -1,7 +1,0 @@
-common/gamecode/economy.c
-common/gamecode/randenc.c
-common/gamecode/report.c
-common/kernel/karma.c
-common/kernel/message.c
-common/kernel/reports.c
-mapper/map_partei.c

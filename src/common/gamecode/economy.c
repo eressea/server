@@ -187,102 +187,234 @@ change_level(unit * u, skill_t sk, int bylevel)
 	sk_set(sv, sv->level+bylevel);
 }
 
+typedef struct recruitment {
+  struct recruitment * next;
+  faction * f;
+  request * requests;
+  int total, assigned;
+} recruitment;
+
+static recruitment *
+select_recruitment(request ** rop, int (*quantify)(const struct race*, int), int * total)
+{
+  recruitment * recruits = NULL;
+
+  while (*rop) {
+    recruitment * rec = recruits;
+    request * ro = *rop;
+    unit * u = ro->unit;
+    const race * rc = u->number?u->race:u->faction->race;
+    int qty = quantify(rc, ro->qty);
+
+    if (qty<0) {
+      rop = &ro->next; /* skip this one */
+    } else {
+      *rop = ro->next; /* remove this one */
+      while (rec && rec->f!=u->faction) rec = rec->next;
+      if (rec==NULL) {
+        rec = malloc(sizeof(recruitment));
+        rec->f = u->faction;
+        rec->total = 0;
+        rec->assigned = 0;
+        rec->requests = NULL;
+        rec->next = recruits;
+        recruits = rec;
+      }
+      *total += qty;
+      rec->total += qty;
+      ro->next = rec->requests;
+      rec->requests = ro;
+    }
+  }
+  return recruits;
+}
+
+static void
+add_recruits(unit * u, int number, int wanted)
+{
+  if (number > 0) {
+    unit * unew;
+    int i = fspecial(u->faction, FS_MILITIA);
+
+    if (u->number==0) {
+      set_number(u, number);
+      u->hp = number * unit_max_hp(u);
+      unew = u;
+    } else {
+      unew = create_unit(u->region, u->faction, number, u->race, 0, NULL, u);
+    }
+
+    if (unew->race == new_race[RC_URUK]) {
+      change_level(unew, SK_SWORD, 1);
+      change_level(unew, SK_SPEAR, 1);
+    }
+    if (unew->race->ec_flags & ECF_REC_HORSES) {
+      change_level(unew, SK_RIDING, 1);
+    }
+
+    if (i > 0) {
+      if (unew->race->bonus[SK_SPEAR] >= 0)
+        change_level(unew, SK_SPEAR, i);
+      if (unew->race->bonus[SK_SWORD] >= 0)
+        change_level(unew, SK_SWORD, i);
+      if (unew->race->bonus[SK_LONGBOW] >= 0)
+        change_level(unew, SK_LONGBOW, i);
+      if (unew->race->bonus[SK_CROSSBOW] >= 0)
+        change_level(unew, SK_CROSSBOW, i);
+      if (unew->race->bonus[SK_RIDING] >= 0)
+        change_level(unew, SK_RIDING, i);
+      if (unew->race->bonus[SK_AUSDAUER] >= 0)
+        change_level(unew, SK_AUSDAUER, i);
+    }
+    if (unew!=u) {
+      transfermen(unew, u, unew->number);
+      destroy_unit(unew);
+    }
+  }
+  if (number < wanted) {
+    ADDMSG(&u->faction->msgs, msg_message("recruit",
+      "unit region amount want", u, u->region, number, wanted));
+  }
+}
+
+static int
+any_recruiters(const struct race * rc, int qty)
+{
+  if (rc==new_race[RC_URUK]) return qty;
+  return qty * 2;
+}
+
+static int
+peasant_recruiters(const struct race * rc, int qty)
+{
+  if (rc->ec_flags & ECF_REC_UNLIMITED) return -1;
+  if (rc->ec_flags & ECF_REC_HORSES) return -1;
+  if (rc==new_race[RC_URUK]) return qty;
+  return qty * 2;
+}
+
+static int
+horse_recruiters(const struct race * rc, int qty)
+{
+  if (rc->ec_flags & ECF_REC_UNLIMITED) return -1;
+  if (rc->ec_flags & ECF_REC_HORSES) return qty * 2;
+  return -1;
+}
+
+static int
+do_recruiting(recruitment * recruits, int available)
+{
+  recruitment * rec;
+  int recruited = 0;
+
+  while (available>0) {
+    int n = 0;
+    int rest, mintotal = INT_MAX;
+
+    for (rec=recruits;rec!=NULL;rec=rec->next) {
+      int want = rec->total - rec->assigned;
+      if (want>0) {
+        if (mintotal>want) mintotal = want;
+        ++n;
+      }
+    }
+    if (n==0) break;
+    if (mintotal*n>available) {
+      mintotal = available/n;
+    }
+    rest = available - mintotal*n;
+
+    for (rec=recruits;rec!=NULL;rec=rec->next) {
+      int want = rec->total - rec->assigned;
+
+      if (want>0) {
+        int get = mintotal;
+        if (want>mintotal && rest<n && (rand() % n) < rest) {
+          --rest;
+          ++get;
+        }
+        assert(get<=want);
+        available -= get;
+        rec->assigned += get;
+      }
+    }
+  }
+
+  for (rec=recruits;rec!=NULL;rec=rec->next) {
+    request * req;
+    int get = rec->assigned;
+
+    for (req=rec->requests;req;req=req->next) {
+      unit * u = req->unit;
+      const race * rc = u->faction->race;
+      int number, multi = 2;
+
+      if (rc==new_race[RC_URUK]) multi = 1;
+
+      number = min(req->qty * 2, get) / multi;
+      if (rc->recruitcost) {
+        int afford = get_pooled(u, u->region, R_SILVER) / rc->recruitcost;
+        number = min(number, afford);
+        use_pooled(u, u->region, R_SILVER, rc->recruitcost*number);
+      }
+      add_recruits(u, number, req->qty);
+      if ((rc->ec_flags & ECF_REC_ETHEREAL)==0) {
+        recruited += number * multi;
+      }
+
+      get -= number * multi;
+    }
+  }
+  return recruited;
+}
+
+void
+free_recruitments(recruitment * recruits)
+{
+  while (recruits) {
+    recruitment * rec = recruits;
+    recruits = rec->next;
+    free(rec);
+  }
+}
+
+/* Rekrutierung */
 static void
 expandrecruit(region * r, request * recruitorders)
 {
-	/* Rekrutierung */
-	int i, n, p = rpeasants(r), h = rhorses(r), uruks = 0;
-	int rfrac = p / RECRUITFRACTION;
-	unit * u;
+  recruitment * recruits = NULL;
 
-	expandorders(r, recruitorders);
-	if (!norders) return;
+  int total = 0;
 
-	for (i = 0, n = 0; i != norders; i++) {
-		unit * u = oa[i].unit;
-		const race * rc = u->faction->race;
-		int recruitcost = rc->recruitcost;
+  /* centaurs: */
+  recruits = select_recruitment(&recruitorders, horse_recruiters, &total);
+  if (recruits) {
+    int horses = rhorses(r) * 2;
+    if (total<horses) horses = total;
+    horses = horses / 2 - do_recruiting(recruits, horses);
+    rsethorses(r, horses);
+    free_recruitments(recruits);
+  }
 
-		/* check if recruiting is limited.
-		* either horses or peasant fraction or not at all */
-		if ((rc->ec_flags & ECF_REC_UNLIMITED)==0) {
-			/* not unlimited, and everything's gone: */
-			if (rc->ec_flags & ECF_REC_HORSES) {
-				/* recruit from horses if not all gone */
-				if (h <= 0) continue;
-			} else {
-				/* recruit, watch peasants if any space left */
-				if (n - (uruks+1)/2 >= rfrac) continue;
-			}
-		}
-		if (recruitcost) {
-			if (get_pooled(oa[i].unit, r, R_SILVER) < recruitcost) continue;
-			use_pooled(oa[i].unit, r, R_SILVER, recruitcost);
-		}
-		if ((rc->ec_flags & ECF_REC_UNLIMITED)==0) {
-			if (rc->ec_flags & ECF_REC_HORSES) h--; /* use a horse */
-			else {
-				if ((rc->ec_flags & ECF_REC_ETHEREAL)==0) {
-					p--; /* use a peasant */
-					if (rc == new_race[RC_URUK]) uruks++;
-				}
-				n++;
-			}
-		}
-		/*		set_number(u, u->number + 1); */
-		u->race = rc;
-		u->n++;
-	}
+  /* peasant limited: */
+  recruits = select_recruitment(&recruitorders, peasant_recruiters, &total);
+  if (recruits) {
+    int peasants = rpeasants(r);
+    int rfrac = (2 * peasants) / RECRUITFRACTION; /* anzahl orks. 2 ork = 1 bauer */
+    if (total<rfrac) rfrac = total;
+    peasants = peasants - (1 + do_recruiting(recruits, rfrac))/2;
+    rsetpeasants(r, peasants);
+    free_recruitments(recruits);
+  }
 
-	assert(p>=0 && h>=0);
-	rsetpeasants(r, p+uruks/2);
-	rsethorses(r, h);
+  /* no limit: */
+  recruits = select_recruitment(&recruitorders, any_recruiters, &total);
+  if (recruits) {
+    do_recruiting(recruits, INT_MAX);
+    free_recruitments(recruits);
+  }
 
-	free(oa);
-
-	for (u = r->units; u; u = u->next) {
-		if (u->n >= 0) {
-			unit * unew;
-			if (u->number==0) {
-				set_number(u, u->n);
-				u->hp = u->n * unit_max_hp(u);
-				unew = u;
-			} else {
-				unew = create_unit(r, u->faction, u->n, u->race, 0, NULL, u);
-			}
-
-			if (unew->race == new_race[RC_URUK]) {
-				change_level(unew, SK_SWORD, 1);
-				change_level(unew, SK_SPEAR, 1);
-			}
-			if (unew->race->ec_flags & ECF_REC_HORSES) {
-				change_level(unew, SK_RIDING, 1);
-			}
-			i = fspecial(unew->faction, FS_MILITIA);
-			if (i > 0) {
-				if (unew->race->bonus[SK_SPEAR] >= 0)
-					change_level(unew, SK_SPEAR, i);
-				if (unew->race->bonus[SK_SWORD] >= 0)
-					change_level(unew, SK_SWORD, i);
-				if (unew->race->bonus[SK_LONGBOW] >= 0)
-					change_level(unew, SK_LONGBOW, i);
-				if (unew->race->bonus[SK_CROSSBOW] >= 0)
-					change_level(unew, SK_CROSSBOW, i);
-				if (unew->race->bonus[SK_RIDING] >= 0)
-					change_level(unew, SK_RIDING, i);
-				if (unew->race->bonus[SK_AUSDAUER] >= 0)
-					change_level(unew, SK_AUSDAUER, i);
-			}
-			if (unew!=u) {
-				transfermen(unew, u, unew->number);
-				destroy_unit(unew);
-			}
-			if (u->n < u->wants) {
-				ADDMSG(&u->faction->msgs, msg_message("recruit",
-					"unit region amount want", u, r, u->n, u->wants));
-			}
-		}
-	}
+  assert(recruitorders==NULL);
 }
 
 static void
@@ -3131,4 +3263,3 @@ init_economy(void)
 	add_allocator(make_allocator(item2resource(olditemtype[I_LAEN]), attrib_allocation));
 #endif
 }
-
