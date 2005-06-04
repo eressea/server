@@ -776,12 +776,11 @@ sp_transferaura(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	spellparameter *pa = co->par;
-  unit * u = pa->param[0]->data.u;
-  sc_mage * scm_src = get_mage(mage);
-  sc_mage * scm_dst = get_mage(u);
+  unit * u;
+  sc_mage * scm_dst, * scm_src = get_mage(mage);
 
 	/* wenn kein Ziel gefunden, Zauber abbrechen */
-	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
+	if (pa->param[0]->flag == TARGET_NOTFOUND) return 0;
 
 	/* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
 	 * abbrechen aber kosten lassen */
@@ -789,6 +788,8 @@ sp_transferaura(castorder *co)
 
 	/* Wieviel Transferieren? */
 	aura = pa->param[1]->data.i;
+  u = pa->param[0]->data.u;
+  scm_dst = get_mage(u);
 
   if (scm_dst==NULL) {
     /* "Zu dieser Einheit kann ich keine Aura übertragen." */
