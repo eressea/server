@@ -24,6 +24,7 @@ without prior permission by the authors of Eressea.
 #include "ship.h"
 #include "skill.h"
 #include "spell.h"
+#include "calendar.h"
 
 /* util includes */
 #include <util/functions.h>
@@ -74,13 +75,13 @@ xml_to_locale(const xmlChar * xmlStr)
   size_t outbytes = sizeof(zText);
 
   if (context==(iconv_t)-1) {
-	context = iconv_open("", "UTF-8");
+    context = iconv_open("", "UTF-8");
   }
   assert(context!=(iconv_t)-1);
 
   iconv(context, &inbuf, &inbytes, &outbuf, &outbytes);
   if (inbytes!=0) {
-	log_error(("string is too long: %d chars remain in %s.\n", inbytes, (const char*)xmlStr));
+    log_error(("string is too long: %d chars remain in %s.\n", inbytes, (const char*)xmlStr));
   }
   return zText;
 }
@@ -303,6 +304,119 @@ parse_buildings(xmlDocPtr doc)
 
   xmlXPathFreeContext(xpath);
   return 0;
+}
+
+static int
+parse_calendar(xmlDocPtr doc)
+{
+  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
+  xmlXPathObjectPtr xpathCalendars;
+  xmlNodeSetPtr nsetCalendars;
+  int rv = 0;
+
+  /* reading eressea/buildings/building */
+  xpathCalendars = xmlXPathEvalExpression(BAD_CAST "/eressea/calendar", xpath);
+  nsetCalendars = xpathCalendars->nodesetval;
+  if (nsetCalendars==NULL || nsetCalendars->nodeNr!=1) {
+    log_error(("invalid or missing calendar data in %s\n", doc->name));
+    rv = -1;
+  } else {
+    xmlNodePtr calendar = nsetCalendars->nodeTab[0];
+    xmlXPathObjectPtr xpathWeeks, xpathMonths, xpathSeasons;
+    xmlNodeSetPtr nsetWeeks, nsetMonths, nsetSeasons;
+    xmlChar * property = xmlGetProp(calendar, BAD_CAST "name");
+    xmlChar * newyear = xmlGetProp(calendar, BAD_CAST "newyear");
+
+    first_turn = xml_ivalue(calendar, "start", 0);
+    if (property) {
+      agename = strdup(mkname("calendar", (const char*)property));
+      xmlFree(property);
+    }
+
+    xpath->node = calendar;
+    xpathWeeks = xmlXPathEvalExpression(BAD_CAST "week", xpath);
+    nsetWeeks = xpathWeeks->nodesetval;
+    if (nsetWeeks!=NULL) {
+      int i;
+
+      weeks_per_month = nsetWeeks->nodeNr;
+      weeknames = malloc(sizeof(char *) * weeks_per_month);
+      weeknames2 = malloc(sizeof(char *) * weeks_per_month);
+      for (i=0;i!=nsetWeeks->nodeNr;++i) {
+        xmlNodePtr week = nsetWeeks->nodeTab[i];
+        xmlChar * property = xmlGetProp(week, BAD_CAST "name");
+        if (property) {
+          weeknames[i] = strdup(mkname("calendar", (const char*)property));
+          weeknames2[i] = malloc(strlen(weeknames[i])+3);
+          sprintf(weeknames2[i], "%s_d", weeknames[i]);
+          xmlFree(property);
+        }
+      }
+    }
+    xmlXPathFreeObject(xpathWeeks);
+
+    months_per_year = 0;
+    xpathSeasons = xmlXPathEvalExpression(BAD_CAST "season", xpath);
+    nsetSeasons = xpathSeasons->nodesetval;
+    if (nsetSeasons!=NULL) {
+      int i;
+
+      seasons = nsetSeasons->nodeNr;
+      seasonnames = malloc(sizeof(char *) * seasons);
+      storms = malloc(sizeof(int) * seasons);
+
+      for (i=0;i!=nsetSeasons->nodeNr;++i) {
+        xmlNodePtr season = nsetSeasons->nodeTab[i];
+        xmlChar * property = xmlGetProp(season, BAD_CAST "name");
+        if (property) {
+          seasonnames[i] = strdup(mkname("calendar", (const char*)property));
+          xmlFree(property);
+        }
+      }
+    }
+
+    xpathMonths = xmlXPathEvalExpression(BAD_CAST "season/month", xpath);
+    nsetMonths = xpathMonths->nodesetval;
+    if (nsetMonths!=NULL) {
+      int i;
+
+      months_per_year = nsetMonths->nodeNr;
+      monthnames = malloc(sizeof(char *) * months_per_year);
+      month_season = malloc(sizeof(int) * months_per_year);
+      storms = malloc(sizeof(int) * months_per_year);
+
+      for (i=0;i!=nsetMonths->nodeNr;++i) {
+        xmlNodePtr month = nsetMonths->nodeTab[i];
+        xmlChar * property = xmlGetProp(month, BAD_CAST "name");
+        int j;
+
+        if (property) {
+          if (newyear && strcmp((const char*)newyear, (const char*)property)==0) {
+            first_month = i;
+            xmlFree(newyear);
+            newyear = NULL;
+          }
+          monthnames[i] = strdup(mkname("calendar", (const char*)property));
+          xmlFree(property);
+        }
+        for (j=0;j!=seasons;++j) {
+          xmlNodePtr season = month->parent;
+          if (season==nsetSeasons->nodeTab[j]) {
+            month_season[i] = j;
+            break;
+          }
+        }
+        assert(j!=seasons);
+        storms[i] = xml_ivalue(nsetMonths->nodeTab[i], "storm", 0);
+      }
+    }
+    xmlXPathFreeObject(xpathMonths);
+    xmlXPathFreeObject(xpathSeasons);
+  }
+  xmlXPathFreeObject(xpathCalendars);
+  xmlXPathFreeContext(xpath);
+ 
+  return rv;
 }
 
 static int
@@ -1248,4 +1362,5 @@ register_xmlreader(void)
   xml_register_callback(parse_buildings);
   xml_register_callback(parse_ships);
   xml_register_callback(parse_equipment);
+  xml_register_callback(parse_calendar);
 }

@@ -11,10 +11,8 @@
   <xi:include href="prefixes.xml"/>
   <xi:include href="ships.xml"/>
   <xi:include href="buildings.xml"/>
-  <xi:include file="terrains.xml"/>
-  <xi:include file="alchemy.xml"/>
-  <xi:include file="technologies.xml"/>
-  <xi:include file="skills.xml"/>
+  <xi:include href="calendar.xml"/>
+
   <equipment>
     <item name="wood" amount="5"/>
     <item name="stone" amount="10"/>
@@ -46,7 +44,7 @@
   <strings>
     <string name="newbie_info_1">
       <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff ERESSEA BEFEHLE an hse-server@eressea.de zu senden. Am besten, du verwendest die Befehlsvorlage am Ende des Reports.</text>
-  		<text locale="en">Remember to send your orders to hse-server@eressea.de with the subject ERESSEA ORDERS.</text>
+      <text locale="en">Remember to send your orders to hse-server@eressea.de with the subject ERESSEA ORDERS.</text>
     </string>
     <string name="mailto">
       <text locale="de">hse-server@eressea.de</text>

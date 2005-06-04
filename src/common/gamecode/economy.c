@@ -30,6 +30,7 @@
 /* kernel includes */
 #include <kernel/alchemy.h>
 #include <kernel/building.h>
+#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/give.h>
 #include <kernel/item.h>

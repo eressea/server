@@ -5695,6 +5695,10 @@
       <text locale="de">des zweiten Zeitalters</text>
       <text locale="en">the second age</text>
     </string>
+    <string name="newage">
+      <text locale="de">neuer Zeitrechnung</text>
+      <text locale="en">of the new age</text>
+    </string>
   </namespace>
 
   <namespace name="school">

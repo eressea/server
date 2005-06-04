@@ -190,6 +190,9 @@
 				RelativePath=".\building.h">
 			</File>
 			<File
+				RelativePath=".\calendar.h">
+			</File>
+			<File
 				RelativePath=".\creation.h">
 			</File>
 			<File
@@ -309,6 +312,9 @@
 		</File>
 		<File
 			RelativePath=".\building.c">
+		</File>
+		<File
+			RelativePath=".\calendar.c">
 		</File>
 		<File
 			RelativePath=".\combatspells.c">

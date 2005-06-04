@@ -40,6 +40,7 @@
 #include <kernel/border.h>
 #include <kernel/build.h>
 #include <kernel/building.h>
+#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
@@ -99,14 +100,6 @@ boolean nonr = false;
 boolean nosh = false;
 boolean nomer = false;
 boolean noreports = false;
-
-char **seasonnames;
-char **weeknames;
-char **weeknames2;
-char **monthnames;
-int  *month_season;
-char *agename;
-int  seasons;
 
 static size_t
 strxcpy(char * dst, const char * src) {
@@ -207,46 +200,28 @@ season(int turn)
 	return month_season[month];
 }
 
-#if 0
-static char *
-gamedate(const struct locale * lang)
+static void
+get_gamedate(int * year, int * month, int * week)
 {
-	int year,month,week,r;
-	static char buf[256];
-	int t = turn - FirstTurn();
+  int weeks_per_year = months_per_year * weeks_per_month;
+  int t = turn - FirstTurn();
 
-	if (t<0) t = turn;
-	assert(lang);
+  if (t<0) t = turn;
 
-	year  = t/(months_per_year * weeks_per_month) + 1;
-	r     = t - (year-1) * months_per_year * weeks_per_month;
-	month = r/weeks_per_month;
-	week  = r%weeks_per_month;
-	sprintf(buf, LOC(lang, "nr_calendar"),
-		LOC(lang, weeknames[week]),
-		LOC(lang, monthnames[month]),
-		LOC(lang, year),
-		LOC(lang, agename));
-
-	return buf;
+  *week  = t%weeks_per_month;			/* 0 - weeks_per_month-1 */
+  *month = (t/weeks_per_month + first_month)%months_per_year;			/* 0 - months_per_year-1 */
+  *year  = t/(weeks_per_year) + 1;
 }
-#endif
 
 static char *
 gamedate_season(const struct locale * lang)
 {
-	int year,month,week,r;
 	static char buf[256];
-	int t = turn - FirstTurn();
+  int year, month, week;
 
-	if (t<0) t = turn;
-	assert(lang);
+  get_gamedate(&year, &month, &week);
 
-	year  = t/(months_per_year * weeks_per_month) + 1;
-	r     = t - (year-1) * months_per_year * weeks_per_month;
-	month = r/weeks_per_month;
-	week  = r%weeks_per_month;
-	sprintf(buf, LOC(lang, "nr_calendar_season"),
+  sprintf(buf, LOC(lang, "nr_calendar_season"),
 		LOC(lang, weeknames[week]),
 		LOC(lang, monthnames[month]),
 		year,
@@ -259,38 +234,25 @@ gamedate_season(const struct locale * lang)
 static char *
 gamedate2(const struct locale * lang)
 {
-	int year,month,week,r;
 	static char buf[256];
-	int t = turn - FirstTurn();
+  int year, month, week;
 
-	if (t<0) t = turn;
-
-	year  = t/(months_per_year * weeks_per_month) + 1;
-	r     = t - (year-1) * months_per_year * weeks_per_month;
-	month = r/weeks_per_month;			/* 0 - months_per_year-1 */
-	week  = r%weeks_per_month;			/* 0 - weeks_per_month-1 */
-	sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
-			LOC(lang, weeknames2[week]),
-			LOC(lang, monthnames[month]),
-			year,
-			LOC(lang, agename));
-	return buf;
+  get_gamedate(&year, &month, &week);
+  sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
+    LOC(lang, weeknames2[week]),
+    LOC(lang, monthnames[month]),
+    year,
+    LOC(lang, agename));
+  return buf;
 }
 
 static char *
 gamedate_short(const struct locale * lang)
 {
-	int year,month,week,r;
 	static char buf[256];
-	int t = turn - FirstTurn();
+  int year, month, week;
 
-	if (t<0) t = turn;
-
-	year  = t/(months_per_year * weeks_per_month) + 1;
-	r     = t - (year-1) * months_per_year * weeks_per_month;
-	month = r/weeks_per_month;			/* 0 - months_per_year-1 */
-	week  = r%weeks_per_month;			/* 0 - weeks_per_month-1 */
-
+  get_gamedate(&year, &month, &week);
 	sprintf(buf, "%d/%s/%d", week+1, LOC(lang, monthnames[month]), year);
 
 	return buf;

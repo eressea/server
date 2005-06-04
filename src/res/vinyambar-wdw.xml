@@ -3,16 +3,15 @@
   <xi:include href="messages.xml"/>
 
   <!-- Localization -->
-
   <xi:include href="de/strings.xml"/>
   <xi:include href="en/strings.xml"/>
 
+  <xi:include href="resources.xml"/>
   <xi:include href="races.xml"/>
   <xi:include href="prefixes.xml"/>
-  <xi:include href="resources.xml"/>
   <xi:include href="ships.xml"/>
   <xi:include href="buildings.xml"/>
-  <xi:include href="equipment.xml"/>
+  <xi:include href="calendar.xml"/>
 
   <game name="Wettstreit der Weisen" unitsperalliance="yes" units="1000" welcome="vinyambar">
     <comment>Game specific</comment>

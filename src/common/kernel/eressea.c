@@ -36,6 +36,7 @@
 #include "battle.h"
 #include "border.h"
 #include "building.h"
+#include "calendar.h"
 #include "curse.h"
 #include "faction.h"
 #include "group.h"
@@ -195,12 +196,7 @@ AllianceRestricted(void)
 int 
 FirstTurn(void)
 {
-  static int value = -1;
-  if (value<0) {
-    const char * str = get_param(global.parameters, "firstturn");
-    value = str?atoi(str):0;
-  }
-  return value;
+  return first_turn;
 }
 
 int
@@ -690,7 +686,7 @@ stripfaction (faction * f)
   while (f->battles) {
     struct bmsg * b = f->battles;
     f->battles = b->next;
-    free_messagelist(b->msgs);
+    if (b->msgs) free_messagelist(b->msgs);
   }
 
   freelist(f->allies);
@@ -3010,9 +3006,6 @@ add_income(unit * u, int type, int want, int qty)
 	add_message(&u->faction->msgs, new_message(u->faction, "income%u:unit%r:region%i:mode%i:wanted%i:amount",
 		u, u->region, type, want, qty));
 }
-
-int weeks_per_month;
-int months_per_year;
 
 int
 month(int offset)

@@ -11,7 +11,7 @@
   <xi:include href="prefixes.xml"/>
   <xi:include href="ships.xml"/>
   <xi:include href="buildings.xml"/>
-  <xi:include href="equipment.xml"/>
+  <xi:include href="eressea/calendar.xml"/>
 
   <game name="Eressea" welcome="eressea">
     <comment>Game specific</comment>
@@ -25,7 +25,6 @@
     <param name="hunger.long" value="1"/>
     <param name="database.gameid" value="0"/>
     <param name="rules.check_overload" value="0"/>
-    <param name="firstturn" value="184"/>
     <param name="report.mailit" value="/usr/sbin:$HOME/eressea/bin:/bin:/usr/bin:/usr/local/bin"/>
   </game>
   <xi:include href="eressea/de/strings.xml"/>

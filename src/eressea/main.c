@@ -603,9 +603,6 @@ main(int argc, char *argv[])
 		"orders  %s.\n",
 		global.data_version / 10, global.data_version % 10, turn, orders);
 
-	strcat(strcpy(zText, resourcepath()), "/timestrings");
-	if ((i=read_datenames(zText))!=0) return i;
-
 	kernel_init();
 	game_init();
 #if defined(BETA_CODE)

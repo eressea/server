@@ -650,7 +650,6 @@ main(int argc, char *argv[])
   int i;
   char * lc_ctype;
   char * lc_numeric;
-  char zText[MAX_PATH];
 
   setup_signal_handler();
 
@@ -678,9 +677,6 @@ main(int argc, char *argv[])
   lua_State * luaState = lua_init();
   global.vm_state = luaState;
   if ((i=read_args(argc, argv, luaState))!=0) return i;
-
-  strcat(strcpy(zText, resourcepath()), "/timestrings");
-  if ((i=read_datenames(zText))!=0) return i;
 
   kernel_init();
   game_init();

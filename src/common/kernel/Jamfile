@@ -13,6 +13,7 @@ SOURCES =
  border.c
  build.c
  building.c
+ calendar.c
  combatspells.c
  curse.c
  eressea.c
