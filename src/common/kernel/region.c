@@ -810,7 +810,7 @@ free_region(region * r)
   while (r->individual_messages) {
     struct individual_message * msg = r->individual_messages;
     r->individual_messages = msg->next;
-    free_messagelist(msg->msgs);
+    if (msg->msgs) free_messagelist(msg->msgs);
     free(msg);
   }
 

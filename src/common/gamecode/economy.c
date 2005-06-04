@@ -389,21 +389,22 @@ expandrecruit(region * r, request * recruitorders)
   /* centaurs: */
   recruits = select_recruitment(&recruitorders, horse_recruiters, &total);
   if (recruits) {
-    int horses = rhorses(r) * 2;
+    int recruited, horses = rhorses(r) * 2;
     if (total<horses) horses = total;
-    horses = horses / 2 - do_recruiting(recruits, horses);
-    rsethorses(r, horses);
+    recruited = do_recruiting(recruits, horses);
+    rsethorses(r, (horses - recruited) / 2);
     free_recruitments(recruits);
   }
 
   /* peasant limited: */
   recruits = select_recruitment(&recruitorders, peasant_recruiters, &total);
   if (recruits) {
-    int peasants = rpeasants(r);
-    int rfrac = (2 * peasants) / RECRUITFRACTION; /* anzahl orks. 2 ork = 1 bauer */
+    int recruited, peasants = rpeasants(r) * 2;
+    int rfrac = peasants / RECRUITFRACTION; /* anzahl orks. 2 ork = 1 bauer */
     if (total<rfrac) rfrac = total;
-    peasants = peasants - (1 + do_recruiting(recruits, rfrac))/2;
-    rsetpeasants(r, peasants);
+    recruited = do_recruiting(recruits, rfrac);
+    assert(recruited<=rfrac);
+    rsetpeasants(r, (peasants - recruited)/2);
     free_recruitments(recruits);
   }
 
