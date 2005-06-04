@@ -186,9 +186,8 @@ give_starting_equipment(struct region *r, struct unit *u)
     i_add(&u->items, i_new(itm->type, itm->number));
     itm=itm->next;
   }
-  set_money(u, turn * 10);
 
-	switch(old_race(u->race)) {
+  switch(old_race(u->race)) {
 	case RC_DWARF:
 		set_level(u, SK_SWORD, 1);
 		set_item(u, I_AXE, 1);

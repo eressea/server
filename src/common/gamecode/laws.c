@@ -135,7 +135,7 @@ restart_race(unit *u, const race * rc)
   u->orders = NULL;
   while (*ordp) {
     order * ord = *ordp;
-    if (get_keyword(ord) == K_RESTART) {
+    if (get_keyword(ord) != K_RESTART) {
       *ordp = ord->next;
       ord->next = NULL;
       if (u->thisorder == ord) set_order(&u->thisorder, NULL);

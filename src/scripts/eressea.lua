@@ -67,18 +67,17 @@ function process(orders)
   end
   run_scripts()
 
-  plan_monsters()
-  process_orders()
-
-  change_locales()
-  
   -- initialize starting equipment for new players
-  -- probably not necessary, since mapper sets new players, not server
   add_equipment("conquesttoken", 1);
   add_equipment("log", 30);
   add_equipment("stone", 30);
   add_equipment("money", 4200);
 
+  plan_monsters()
+  process_orders()
+
+  change_locales()
+  
   -- use newfactions file to place out new players
   autoseed(basepath .. "/newfactions")
 
