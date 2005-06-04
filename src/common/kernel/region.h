@@ -56,6 +56,7 @@ extern "C" {
 struct message;
 struct message_list;
 struct rawmaterial;
+struct donation;
 
 typedef struct land_region {
   char *name;
@@ -100,6 +101,7 @@ typedef struct region {
   } * individual_messages;
   struct attrib *attribs;
   struct region *nexthash;
+  struct donation * donations;
   terrain_t terrain;
 #if NEW_RESOURCEGROWTH
   struct rawmaterial * resources;

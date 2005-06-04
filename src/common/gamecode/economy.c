@@ -73,15 +73,13 @@
 # include <items/seed.h>
 #endif
 
-/* - static global symbols ------------------------------------- */
-typedef struct spende {
-	struct spende *next;
+typedef struct donation {
+	struct donation *next;
 	struct faction *f1, *f2;
-	struct region *region;
-	int betrag;
-} spende;
-static spende *spenden;
-/* ------------------------------------------------------------- */
+	int amount;
+} donation;
+
+static donation *donations = 0;
 
 typedef struct request {
   struct request * next;
@@ -846,41 +844,42 @@ forget_cmd(unit * u, order * ord)
 void
 report_donations(void)
 {
-	spende * sp;
-	for (sp = spenden; sp; sp = sp->next) {
-		region * r = sp->region;
-		if (sp->betrag > 0) {
-			struct message * msg = msg_message("donation",
-				"from to amount", sp->f1, sp->f2, sp->betrag);
-			r_addmessage(r, sp->f1, msg);
-			r_addmessage(r, sp->f2, msg);
-			msg_release(msg);
-		}
-	}
+  region * r;
+  for (r=regions;r;r=r->next) {
+    donation * sp;
+    for (sp = r->donations; sp; sp = sp->next) {
+		  if (sp->amount > 0) {
+			  struct message * msg = msg_message("donation",
+				  "from to amount", sp->f1, sp->f2, sp->amount);
+			  r_addmessage(r, sp->f1, msg);
+			  r_addmessage(r, sp->f2, msg);
+			  msg_release(msg);
+		  }
+	  }
+  }
 }
 
 void
-add_spende(faction * f1, faction * f2, int betrag, region * r)
+add_spende(faction * f1, faction * f2, int amount, region * r)
 {
-	spende *sp;
+	donation *sp;
 
-	sp = spenden;
+	sp = r->donations;
 
 	while (sp) {
-		if (sp->f1 == f1 && sp->f2 == f2 && sp->region == r) {
-			sp->betrag += betrag;
+		if (sp->f1 == f1 && sp->f2 == f2) {
+			sp->amount += amount;
 			return;
 		}
 		sp = sp->next;
 	}
 
-	sp = calloc(1, sizeof(spende));
+	sp = calloc(1, sizeof(donation));
 	sp->f1 = f1;
 	sp->f2 = f2;
-	sp->region = r;
-	sp->betrag = betrag;
-	sp->next = spenden;
-	spenden = sp;
+	sp->amount = amount;
+	sp->next = r->donations;
+	r->donations = sp;
 }
 
 static boolean
