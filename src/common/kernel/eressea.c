@@ -987,6 +987,9 @@ alliedgroup(const struct plane * pl, const struct faction * f,
 	if((a = a_find(f->attribs, &at_npcfaction)) != NULL) {
 		return mode;
 	}
+	if((a = a_find(f2->attribs, &at_npcfaction)) != NULL) {
+		return mode;
+	}
   if (AllianceRestricted() && f->alliance!=f2->alliance) {
     mode &= ~AllianceRestricted();
   }
