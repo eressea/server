@@ -480,13 +480,6 @@ monster_seeks_target(region *r, unit *u)
 	}
 	assert(d != NODIRECTION );
 
-	if (u->race == new_race[RC_ALP]) {
-		if( (u->age % 2) )		/* bewegt sich nur jede zweite Runde */
-			d = NODIRECTION;
-	}
-
-	if( d == NODIRECTION )
-		return NULL;
 	sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), locale_string(u->faction->locale, directions[d]));
 	return parse_order(buf, u->faction->locale);
 }

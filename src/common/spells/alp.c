@@ -113,10 +113,10 @@ sp_summon_alp(struct castorder *co)
 		ad->target = opfer;
 	}
 
-	strcpy(buf, "Ein Alp starb, ohne sein Ziel zu erreichen.");
 	{
 		/* Wenn der Alp stirbt, den Magier nachrichtigen */
-		add_trigger(&alp->attribs, "destroy", trigger_unitmessage(mage, buf, MSG_EVENT, ML_INFO));
+		add_trigger(&alp->attribs, "destroy", trigger_unitmessage(mage, 
+      "Ein Alp starb, ohne sein Ziel zu erreichen.", MSG_EVENT, ML_INFO));
 		/* Wenn Opfer oder Magier nicht mehr existieren, dann stirbt der Alp */
 		add_trigger(&mage->attribs, "destroy", trigger_killunit(alp));
 		add_trigger(&opfer->attribs, "destroy", trigger_killunit(alp));
