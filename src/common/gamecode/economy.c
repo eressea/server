@@ -229,6 +229,7 @@ select_recruitment(request ** rop, int (*quantify)(const struct race*, int), int
 static void
 add_recruits(unit * u, int number, int wanted)
 {
+  assert(number<=wanted);
   if (number > 0) {
     unit * unew;
     int i = fspecial(u->faction, FS_MILITIA);
@@ -348,7 +349,7 @@ do_recruiting(recruitment * recruits, int available)
 
       if (rc==new_race[RC_URUK]) multi = 1;
 
-      number = min(req->qty * 2, get) / multi;
+      number = min(req->qty, get / multi);
       if (rc->recruitcost) {
         int afford = get_pooled(u, u->region, R_SILVER) / rc->recruitcost;
         number = min(number, afford);
@@ -381,32 +382,32 @@ expandrecruit(region * r, request * recruitorders)
 {
   recruitment * recruits = NULL;
 
-  int total = 0;
+  int orc_total = 0;
 
   /* centaurs: */
-  recruits = select_recruitment(&recruitorders, horse_recruiters, &total);
+  recruits = select_recruitment(&recruitorders, horse_recruiters, &orc_total);
   if (recruits) {
     int recruited, horses = rhorses(r) * 2;
-    if (total<horses) horses = total;
+    if (orc_total<horses) horses = orc_total;
     recruited = do_recruiting(recruits, horses);
     rsethorses(r, (horses - recruited) / 2);
     free_recruitments(recruits);
   }
 
   /* peasant limited: */
-  recruits = select_recruitment(&recruitorders, peasant_recruiters, &total);
+  recruits = select_recruitment(&recruitorders, peasant_recruiters, &orc_total);
   if (recruits) {
-    int recruited, peasants = rpeasants(r) * 2;
-    int rfrac = peasants / RECRUITFRACTION; /* anzahl orks. 2 ork = 1 bauer */
-    if (total<rfrac) rfrac = total;
-    recruited = do_recruiting(recruits, rfrac);
-    assert(recruited<=rfrac);
-    rsetpeasants(r, (peasants - recruited)/2);
+    int orc_recruited, orc_peasants = rpeasants(r) * 2;
+    int orc_frac = orc_peasants / RECRUITFRACTION; /* anzahl orks. 2 ork = 1 bauer */
+    if (orc_total<orc_frac) orc_frac = orc_total;
+    orc_recruited = do_recruiting(recruits, orc_frac);
+    assert(orc_recruited<=orc_frac);
+    rsetpeasants(r, (orc_peasants - orc_recruited)/2);
     free_recruitments(recruits);
   }
 
   /* no limit: */
-  recruits = select_recruitment(&recruitorders, any_recruiters, &total);
+  recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
   if (recruits) {
     do_recruiting(recruits, INT_MAX);
     free_recruitments(recruits);
