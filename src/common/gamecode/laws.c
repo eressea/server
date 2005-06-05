@@ -247,7 +247,7 @@ get_food(region *r)
       int hungry = u->number;
 
       while (donor!=NULL && hungry>0) {
-        /* alwayy start with the first known uint that may have some blood */
+        /* always start with the first known unit that may have some blood */
         static const struct potion_type * pt_blood;
         if (pt_blood==NULL) pt_blood = pt_find("peasantblood");
         while (donor!=NULL) {

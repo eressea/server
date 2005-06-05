@@ -1603,6 +1603,7 @@ order_template(FILE * F, faction * f)
         }
 #endif
         for (ord = u->orders; ord; ord = ord->next) {
+          if (u->old_orders && is_repeated(ord)) continue; /* unit has defaults */
           if (is_persistent(ord)) {
             strcpy(buf, "   ");
             write_order(ord, u->faction->locale, buf+2, sizeof(buf)-2);

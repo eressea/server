@@ -442,6 +442,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
             ++printed;
             break;
           }
+          if (printed) break; /* ein DEFAULT reicht */
           ord=ord->next;
         }
       }

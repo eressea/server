@@ -778,6 +778,7 @@ cr_output_unit(FILE * F, const region * r,
 #ifdef LASTORDER
       if (ord==u->lastorder) continue;
 #endif
+      if (u->old_orders && is_repeated(ord)) continue; /* unit has defaults */
       if (is_persistent(ord)) {
         fwriteorder(F, ord, f->locale);
         fputc('\n', F);

@@ -1246,6 +1246,7 @@ writeunit(FILE * F, const unit * u)
   }
 #endif
 	for (ord = u->orders; ord; ord=ord->next) {
+    if (u->old_orders && is_repeated(ord)) continue; /* has new defaults */
 	  if (is_persistent(ord)) {
       fwriteorder(F, ord, u->faction->locale);
       fputc(' ', F);
