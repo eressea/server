@@ -496,6 +496,23 @@ static attrib_type at_maxmagicians = {
 	ATF_UNIQUE
 };
 
+static void
+init_npcfaction(struct attrib *a)
+{
+	a->data.i = 1;
+}
+
+
+static attrib_type at_npcfaction = {
+	"npcfaction",
+	init_npcfaction,
+	NULL,
+	NULL,
+	a_writedefault,
+	a_readdefault,
+	ATF_UNIQUE
+};
+
 int
 max_skill(faction * f, skill_t sk)
 {
@@ -967,11 +984,15 @@ int
 alliedgroup(const struct plane * pl, const struct faction * f, 
             const struct faction * f2, const struct ally * sf, int mode)
 {
+	attrib *a;
   while (sf && sf->faction!=f2) sf=sf->next;
   if (sf==NULL) {
     mode = mode & autoalliance(pl, f, f2);
   }
   mode = ally_mode(sf, mode) | (mode & autoalliance(pl, f, f2));
+	if((a = a_find(f->attribs, &at_npcfaction)) != NULL) {
+		return mode;
+	}
   if (AllianceRestricted() && f->alliance!=f2->alliance) {
     mode &= ~AllianceRestricted();
   }
@@ -3182,6 +3203,7 @@ attrib_init(void)
 	at_register(&at_wyrm);
 	at_register(&at_building_generic_type);
 	at_register(&at_maxmagicians);
+	at_register(&at_npcfaction);
 
 	/* border-typen */
 	register_bordertype(&bt_noway);
