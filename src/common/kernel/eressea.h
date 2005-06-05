@@ -1128,7 +1128,6 @@ extern struct message * movement_error(struct unit * u, const char * token, stru
 extern boolean move_blocked(const struct unit * u, const struct region *src, const struct region *dest);
 extern void add_income(struct unit * u, int type, int want, int qty);
 
-extern int month(int offset);
 extern const char * basepath(void);
 extern const char * resourcepath(void);
 extern void kernel_init(void);
@@ -1175,7 +1174,6 @@ extern void set_param(struct param ** p, const char * name, const char * data);
 extern const char* get_param(const struct param * p, const char * name);
 
 extern boolean ExpensiveMigrants(void);
-extern int FirstTurn(void);
 extern int NMRTimeout(void);
 extern int LongHunger(const struct unit * u);
 extern boolean TradeDisabled(void);

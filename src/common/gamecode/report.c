@@ -186,47 +186,20 @@ read_datenames(const char *filename)
 	return 0;
 }
 
-int
-season(int turn)
-{
-	int year,month;
-	int t = turn - FirstTurn();
-
-	year  = t/(months_per_year * weeks_per_month) + 1;
-	month = (t - (year-1) * months_per_year * weeks_per_month)/weeks_per_month;
-
-	assert(month >= 0 && month < months_per_year);
-
-	return month_season[month];
-}
-
-static void
-get_gamedate(int * year, int * month, int * week)
-{
-  int weeks_per_year = months_per_year * weeks_per_month;
-  int t = turn - FirstTurn();
-
-  if (t<0) t = turn;
-
-  *week  = t%weeks_per_month;			/* 0 - weeks_per_month-1 */
-  *month = (t/weeks_per_month + first_month)%months_per_year;			/* 0 - months_per_year-1 */
-  *year  = t/(weeks_per_year) + 1;
-}
-
 static char *
 gamedate_season(const struct locale * lang)
 {
 	static char buf[256];
-  int year, month, week;
+  gamedate gd;
 
-  get_gamedate(&year, &month, &week);
+  get_gamedate(turn, &gd);
 
   sprintf(buf, LOC(lang, "nr_calendar_season"),
-		LOC(lang, weeknames[week]),
-		LOC(lang, monthnames[month]),
-		year,
+		LOC(lang, weeknames[gd.week]),
+		LOC(lang, monthnames[gd.month]),
+		gd.year,
 		LOC(lang, agename),
-		LOC(lang, seasonnames[month_season[month]]));
+		LOC(lang, seasonnames[gd.season]));
 
 	return buf;
 }
@@ -235,13 +208,13 @@ static char *
 gamedate2(const struct locale * lang)
 {
 	static char buf[256];
-  int year, month, week;
+  gamedate gd;
 
-  get_gamedate(&year, &month, &week);
+  get_gamedate(turn, &gd);
   sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
-    LOC(lang, weeknames2[week]),
-    LOC(lang, monthnames[month]),
-    year,
+    LOC(lang, weeknames2[gd.week]),
+    LOC(lang, monthnames[gd.month]),
+    gd.year,
     LOC(lang, agename));
   return buf;
 }
@@ -250,10 +223,10 @@ static char *
 gamedate_short(const struct locale * lang)
 {
 	static char buf[256];
-  int year, month, week;
+  gamedate gd;
 
-  get_gamedate(&year, &month, &week);
-	sprintf(buf, "%d/%s/%d", week+1, LOC(lang, monthnames[month]), year);
+  get_gamedate(turn, &gd);
+	sprintf(buf, "%d/%s/%d", gd.week+1, LOC(lang, monthnames[gd.month]), gd.year);
 
 	return buf;
 }
@@ -2084,16 +2057,22 @@ report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * ad
 
 	/* Insekten-Winter-Warnung */
 	if(f->race == new_race[RC_INSECT]) {
-		if(month_season[month(1)] == 0) {
+    static int thisseason = -1;
+    if (thisseason<0) thisseason = get_gamedate(turn+1, 0)->season;
+		if (thisseason == 0) {
 			strcpy(buf, "Es ist Winter, und Insekten können nur in Wüsten oder mit "
 				"Hilfe des Nestwärme-Tranks Personen rekrutieren.");
 			centre(F, buf, true);
 			rnl(F);
-		} else if(month_season[month(2)] == 0) {
-			strcpy(buf, "Es ist Spätherbst, und diese Woche ist die letzte vor dem "
-				"Winter, in der Insekten rekrutieren können.");
-			centre(F, buf, true);
-			rnl(F);
+    } else {
+      static int nextseason = -1;
+      if (nextseason<0) nextseason = get_gamedate(turn+2, 0)->season;
+      if (nextseason == 0) {
+        strcpy(buf, "Es ist Spätherbst, und diese Woche ist die letzte vor dem "
+          "Winter, in der Insekten rekrutieren können.");
+        centre(F, buf, true);
+        rnl(F);
+      }
 		}
 	}
 

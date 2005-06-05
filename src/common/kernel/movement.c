@@ -26,6 +26,7 @@
 #include "border.h"
 #include "build.h"
 #include "building.h"
+#include "calendar.h"
 #include "curse.h"
 #include "faction.h"
 #include "item.h"
@@ -1515,9 +1516,16 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
     }
 
     if (!flying_ship(sh)) {
+      static int stormyness = -1;
+      int stormchance;
+
+      if (stormyness==-1) {
+        int thismonth = get_gamedate(turn, 0)->month;
+        stormyness = storms[thismonth] * 5;
+      }
 
       /* storms should be the first thing we do. */
-      int stormchance = storms[month(0)] * 5 / shipspeed(sh, u);
+      stormchance = stormyness / shipspeed(sh, u);
       if (check_leuchtturm(next_point, NULL)) stormchance /= 3;
 
       if (rand()%10000 < stormchance && current_point->terrain == T_OCEAN) {
@@ -2223,8 +2231,9 @@ regain_orientation(region * r)
 	ship *sh;
 	curse *c;
 	unit *u, *cap;
+  static int thismonth = get_gamedate(turn, 0)->month;
 
-	for(sh = r->ships; sh; sh = sh->next) {
+	for (sh = r->ships; sh; sh = sh->next) {
 		c = get_curse(sh->attribs, C_DISORIENTATION, 0);
 		if(!c) continue;
 
@@ -2237,7 +2246,7 @@ regain_orientation(region * r)
 
 		cap = shipowner(r, sh);
 
-		if(r->terrain != T_OCEAN || rand() % 10 >= storms[month(0)]) {
+		if (r->terrain != T_OCEAN || rand() % 10 >= storms[thismonth]) {
 			remove_curse(&sh->attribs, C_DISORIENTATION, 0);
 				ADDMSG(&cap->faction->msgs, msg_message("shipnoconf", "ship", sh));
         continue;

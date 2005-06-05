@@ -17,4 +17,13 @@ extern char **weeknames;
 extern char **weeknames2;
 extern int  weeks_per_month;
 
+typedef struct gamedate {
+  int year;
+  int season;
+  int month;
+  int week;
+} gamedate;
+
+extern gamedate * get_gamedate(int turn, gamedate * gd);
+
 #endif

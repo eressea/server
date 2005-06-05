@@ -193,12 +193,6 @@ AllianceRestricted(void)
   return value;
 }
 
-int 
-FirstTurn(void)
-{
-  return first_turn;
-}
-
 int
 LongHunger(const struct unit * u) {
   static int value = -1;
@@ -2414,7 +2408,7 @@ init_data(const char * filename)
   l = read_xml(zText);
   if (l) return l;
   
-  if (turn<FirstTurn()) turn = FirstTurn();
+  if (turn<first_turn) turn = first_turn;
   return 0;
 }
 
@@ -3026,21 +3020,6 @@ add_income(unit * u, int type, int want, int qty)
 	if (want==INT_MAX) want = qty;
 	add_message(&u->faction->msgs, new_message(u->faction, "income%u:unit%r:region%i:mode%i:wanted%i:amount",
 		u, u->region, type, want, qty));
-}
-
-int
-month(int offset)
-{
-	int t = turn + offset - FirstTurn();
-	int year, r, month;
-
-        if (t<0) t = turn;
-
-	year  = t/(months_per_year * weeks_per_month) + 1;
-	r     = t - (year-1) * months_per_year * weeks_per_month;
-	month = r/weeks_per_month;
-
-	return month;
 }
 
 void

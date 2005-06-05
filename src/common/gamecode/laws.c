@@ -41,6 +41,7 @@
 #include <kernel/battle.h>
 #include <kernel/border.h>
 #include <kernel/building.h>
+#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
@@ -867,18 +868,19 @@ iron(region * r)
 
 }
 #endif /* NEW_RESOURCEGROWTH */
-/* ------------------------------------------------------------- */
-
-
-extern int season(int turn);
 
 void
 demographics(void)
 {
   region *r;
 #if GROWING_TREES
-  int current_season = season(turn);
-  int last_weeks_season = season(turn-1);
+  static int last_weeks_season = -1;
+  static int current_season = -1;
+
+  if (current_season<0) {
+    current_season = get_gamedate(turn, NULL)->season;
+    last_weeks_season = get_gamedate(turn-1, NULL)->season;
+  }
 #endif
 
   for (r = regions; r; r = r->next) {

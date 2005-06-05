@@ -455,7 +455,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 #endif
 
 	if (rc == new_race[RC_INSECT]) {
-		if (month_season[month(0)] == 0 && rterrain(r) != T_DESERT) {
+		if (get_gamedate(turn, 0)->season == 0 && rterrain(r) != T_DESERT) {
 #ifdef INSECT_POTION
 			boolean usepotion = false;
 			unit *u2;
@@ -2454,7 +2454,9 @@ breedtrees(region *r, unit *u, int raw)
 {
 	int n, i, skill, planted = 0;
 	const item_type * itype;
-	int current_season = season(turn);
+	static int current_season = -1;
+  
+  if (current_season<0) current_season = get_gamedate(turn, NULL)->season;
 
 	/* Bäume züchten geht nur im Frühling */
 	if (current_season != SEASON_SPRING){
