@@ -1166,4 +1166,5 @@ countheroes(const struct faction * f)
   }
   return n;
 }
+
 #endif

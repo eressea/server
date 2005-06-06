@@ -879,20 +879,6 @@ ucansee(const struct faction *f, const struct unit *u, const struct unit *x)
 	return x;
 }
 
-faction *
-visible_faction(const faction *f, const unit * u)
-{
-	if (!alliedunit(u, f, HELP_FSTEALTH)) {
-		attrib *a = a_find(u->attribs, &at_otherfaction);
-		if (a) {
-			faction *fv = get_otherfaction(a);
-			assert (fv != NULL);	/* fv should never be NULL! */
-			return fv;
-		}
-	}
-	return u->faction;
-}
-
 faction_list *
 get_addresses(faction * f, struct seen_region * seehash[])
 {

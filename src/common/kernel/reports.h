@@ -97,7 +97,6 @@ extern int bufunit_ugroupleader(const struct faction * f, const struct unit * u,
 #endif
 
 extern const char * reportpath(void);
-extern struct faction * visible_faction(const struct faction *f, const struct unit * u);
 extern struct faction_list * get_addresses(struct faction * f, struct seen_region * seehash[]);
 extern const char * trailinto(const struct region * r, const struct locale * lang);
 

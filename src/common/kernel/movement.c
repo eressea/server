@@ -61,6 +61,7 @@
 #include <attributes/follow.h>
 #include <attributes/targetregion.h>
 #include <attributes/at_movement.h>
+#include <attributes/otherfaction.h>
 
 extern border_type bt_wisps;
 int * storms;
@@ -2037,14 +2038,18 @@ piracy_cmd(unit *u, struct order * ord)
 		for(dir = 0; dir < MAXDIRECTIONS; dir++) {
 			region *rc = rconnect(r, dir);
 			aff[dir] = 0;
-			if(rc && (terrain[rterrain(rc)].flags & SWIM_INTO)
+			if (rc && (terrain[rterrain(rc)].flags & SWIM_INTO)
 					&& check_takeoff(sh, r, rc) == true) {
 
-				for(sh2 = rc->ships; sh2; sh2 = sh2->next) {
+				for (sh2 = rc->ships; sh2; sh2 = sh2->next) {
 					unit * cap = shipowner(sh2);
-					if (cap && (intlist_find(il, cap->faction->no) || all)) {
-						aff[dir]++;
-					}
+          if (cap) {
+            faction * f = visible_faction(cap->faction, cap);
+            if (alliedunit(u, f, HELP_GUARD)) continue;
+            if (all || intlist_find(il, cap->faction->no)) {
+              aff[dir]++;
+            }
+          }
 				}
 
 				/* Und aufaddieren. */
