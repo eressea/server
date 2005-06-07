@@ -237,7 +237,7 @@ static int
 ridingcapacity(unit * u)
 {
 	int n;
-	int wagen, pferde, unicorns;
+	int wagen, pferde;
 
 	n = 0;
 
@@ -245,15 +245,14 @@ ridingcapacity(unit * u)
 	 * tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
 	 * von zwei Pferden gezogen wird */
 
-  unicorns = get_item(u, I_UNICORN);
-  pferde = get_item(u, I_HORSE);
+  pferde = get_item(u, I_HORSE) + get_item(u, I_UNICORN);
   pferde = min(pferde, effskill(u, SK_RIDING) * u->number * 2);
 	if (fval(u->race, RCF_HORSE)) pferde += u->number;
 
 	/* maximal diese Pferde können zum Ziehen benutzt werden */
 	wagen = min(pferde / HORSESNEEDED, get_item(u, I_WAGON));
 
-	n = wagen * WAGONCAPACITY + (pferde + unicorns) * HORSECAPACITY;
+	n = wagen * WAGONCAPACITY + pferde * HORSECAPACITY;
 	return n;
 }
 
@@ -265,8 +264,7 @@ walkingcapacity(const struct unit * u)
 	/* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
 	 * die Leute tragen */
 
-	int pferde = get_item(u, I_HORSE);
-  int unicorns = get_item(u, I_UNICORN);
+	int pferde = get_item(u, I_HORSE) + get_item(u, I_UNICORN);
 	if (fval(u->race, RCF_HORSE)) {
 		pferde += u->number;
 		personen = 0;
@@ -297,7 +295,6 @@ walkingcapacity(const struct unit * u)
 	}
 
 	n += pferde * HORSECAPACITY;
-  n += unicorns * HORSECAPACITY;
 	n += personen * personcapacity(u);
 	/* Goliathwasser */
   tmp = get_effect(u, oldpotiontype[P_STRONG]);
@@ -328,7 +325,7 @@ canwalk(unit * u)
 	if (u->faction->no == 0) return E_CANWALK_OK;
 
 	wagen = get_item(u, I_WAGON);
-	pferde = get_item(u, I_HORSE);
+	pferde = get_item(u, I_HORSE) + get_item(u, I_UNICORN);
 
 	maxwagen = effskill(u, SK_RIDING) * u->number * 2;
 	if (u->race == new_race[RC_TROLL]) {
@@ -361,9 +358,9 @@ canfly(unit *u)
 {
 	if (get_movement(&u->attribs, MV_CANNOTMOVE)) return false;
 
-	if(get_item(u, I_HORSE) || get_item(u, I_UNICORN)) return false;
+	if (get_item(u, I_HORSE) || get_item(u, I_UNICORN)) return false;
 
-	if(get_item(u, I_PEGASUS) >= u->number && effskill(u, SK_RIDING) >= 4)
+	if (get_item(u, I_PEGASUS) >= u->number && effskill(u, SK_RIDING) >= 4)
 		return true;
 
 	if (fval(u->race, RCF_FLY)) return true;
@@ -378,8 +375,7 @@ canswim(unit *u)
 {
 	if (get_movement(&u->attribs, MV_CANNOTMOVE)) return false;
 
-	if (get_item(u, I_HORSE)) return false;
-  if (get_item(u, I_UNICORN)) return false;
+	if (get_item(u, I_HORSE) || get_item(u, I_UNICORN)) return false;
 
 	if (get_item(u, I_DOLPHIN) >= u->number && effskill(u, SK_RIDING) >= 4)
 		return true;
@@ -414,7 +410,7 @@ canride(unit * u)
 		return 0;
 	}
 
-	if(ridingcapacity(u) - eff_weight(u) >= 0) {
+	if (ridingcapacity(u) - eff_weight(u) >= 0) {
 		if(pferde == 0 && unicorns >= u->number && !(u->race->flags & RCF_HORSE)) {
 			return 2;
 		}
@@ -1240,7 +1236,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
 
       if (rterrain(current)==T_OCEAN || rterrain(next) == T_OCEAN) {
         /* trying to enter or exit ocean with horses, are we? */
-        if (get_item(u, I_HORSE) > 0) {
+        if (get_item(u, I_HORSE) > 0 || get_item(u, I_UNICORN) > 0) {
           /* tries to do it with horses */
           if (ord!=NULL) cmistake(u, ord, 67, MSG_MOVE);
           break;
