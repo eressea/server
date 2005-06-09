@@ -42,9 +42,16 @@ if $(PROFILE) = 1 {
 CCFLAGS += -Wall ;
 
 CCFLAGS += -Wwrite-strings 
+#		   -W
 		   -Wstrict-prototypes 
 		   -Werror-implicit-function-declaration
 		   -Wno-char-subscripts
+		   -Wpointer-arith
+#		   -Wshadow
+#		   -Wcast-qual
+#		   -Wcast-align
+#		   -Wconversion
+#		   -Wunreachable-code
 		   ;
 
 # this require the latet luabind from CVS
