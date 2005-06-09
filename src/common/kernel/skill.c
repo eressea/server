@@ -30,7 +30,9 @@
 #include "curse.h"
 #include "region.h"
 #include "karma.h"
-#include "attrib.h"
+
+#include <util/attrib.h>
+#include <util/goodies.h>
 
 /* libc includes */
 #include <assert.h>
@@ -195,7 +197,7 @@ int
 rc_skillmod(const struct race * rc, const region *r, skill_t sk)
 {
 	int mods;
-	unsigned int index = ((unsigned int)rc) % RCMODMAXHASH;
+	unsigned int index = hashstring(rc->_name[0]) % RCMODMAXHASH;
 	struct skillmods **imods = &modhash[index];
 	while (*imods && (*imods)->race!=rc) imods = &(*imods)->next;
 	if (*imods==NULL) {

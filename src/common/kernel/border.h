@@ -14,6 +14,9 @@
 
 #ifndef H_KRNL_BORDER
 #define H_KRNL_BORDER
+
+#include <util/variant.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,7 +31,7 @@ extern "C" {
     struct border * nexthash; /* next border between these regions */
     struct region * from, * to; /* borders can be directed edges */
     attrib * attribs;
-    void * data;
+    variant data;
     unsigned int id; /* unique id */
   } border;
 
@@ -39,6 +42,7 @@ extern "C" {
 
   typedef struct border_type {
     const char* __name; /* internal use only */
+    variant_type datatype;
     boolean (*transparent)(const border *, const struct faction *);
     /* is it possible to see through this? */
     void (*init)(border *);
@@ -85,7 +89,7 @@ extern "C" {
 
 
   extern border * find_border(unsigned int id);
-  void * resolve_borderid(void * data);
+  void * resolve_borderid(variant data);
 
   extern border * get_borders(const struct region * r1, const struct region * r2);
   /* returns the list of borders between r1 and r2 or r2 and r1 */

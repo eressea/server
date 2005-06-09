@@ -144,6 +144,8 @@ void
 SpecialFunction(region *r)
 {
 	WINDOW *win;
+  variant zero_effect;
+  zero_effect.i = 0;
 
 	win = openwin(60, 5, "< Specials Regions >");
 	wmove(win, 1, 2);
@@ -154,14 +156,14 @@ SpecialFunction(region *r)
 	case '1':
 		if (get_curse(r->attribs, ct_find("godcursezone"))==NULL) {
 			curse * c = create_curse(NULL, &r->attribs, ct_find("godcursezone"),
-				100, 100, 0, 0);
+				100, 100, zero_effect, 0);
 			curse_setflag(c, CURSE_ISNEW|CURSE_IMMUNE);
 			modified = 1;
 			break;
 		}
 	case '2':
 		if(!is_cursed_internal(r->attribs, ct_find("peacezone"))) {
-			curse * c = create_curse(NULL, &r->attribs, ct_find("peacezone"), 100, 2, 0, 0);
+			curse * c = create_curse(NULL, &r->attribs, ct_find("peacezone"), 100, 2, zero_effect, 0);
 			curse_setflag(c, CURSE_IMMUNE);
 			modified = 1;
 		}

@@ -80,7 +80,7 @@ void
 listnames(void)
 {
 	region *r;
-	int i;
+	size_t i;
 
 	puts("Die Liste der benannten Regionen ist:");
 

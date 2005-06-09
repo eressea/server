@@ -29,7 +29,7 @@
 #include <config.h>
 #include "vmap.h"
 
-unsigned int
+size_t
 vmap_lowerbound(const vmap * vm, const int key)
 /* returns the index of the entry which has the greatest key  that is less or
  * equal to 'key' */
@@ -57,7 +57,7 @@ vmap_init(vmap * map)
 	map->data = calloc(4, sizeof(vmapentry));
 }
 
-unsigned int
+size_t
 vmap_upperbound(const vmap * vm, const int key)
 /* returns the index of the entry which has the smallest key  that is greater
  * or equal to 'key' */
@@ -78,10 +78,10 @@ vmap_upperbound(const vmap * vm, const int key)
 	return first - vm->data;
 }
 
-unsigned int
+size_t
 vmap_get(vmap * vm, const int key)
 {
-	unsigned int insert = vmap_lowerbound(vm, key);
+	size_t insert = vmap_lowerbound(vm, key);
 	vmapentry *at;
 
 	/* make sure it's a unique key: */
@@ -101,12 +101,12 @@ vmap_get(vmap * vm, const int key)
 	return insert;
 }
 
-unsigned int
+size_t
 vmap_insert(vmap * vm, const int key, void *data)
 /* inserts an object into the vmap, identifies it with the 'key' which must be
  * unique, and returns the vmapentry it created. */
 {
-	unsigned int insert = vmap_lowerbound(vm, key);
+	size_t insert = vmap_lowerbound(vm, key);
 	vmapentry *at;
 
 	/* make sure it's a unique key: */
@@ -125,7 +125,7 @@ vmap_insert(vmap * vm, const int key, void *data)
 	return insert;
 }
 
-unsigned int
+size_t
 vmap_find(const vmap * vm, const int key)
 /* returns the index of the vmapentry that's identified by the key or size (a
  * past-the-end value) if it is not found. */

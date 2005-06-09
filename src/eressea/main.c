@@ -260,7 +260,7 @@ processturn(char *filename)
   newfaction * players;
 	int i;
 
-  if (turn == 0) srand(time((time_t *) NULL));
+  if (turn == 0) srand((int)time(0));
   else srand(turn);
 
 #ifdef SHORTPWDS
@@ -272,7 +272,7 @@ processturn(char *filename)
 	turn++;
 	if ((i=readorders(filename))!=0) return i;
   if (!nomonsters) {
-    if (turn == 0) srand(time((time_t *) NULL));
+    if (turn == 0) srand((int)time(0));
     else srand(turn);
     puts(" - Monster KI...");
     plan_monsters();
@@ -660,7 +660,7 @@ main(int argc, char *argv[])
 		return crwritemap(); 
 	}
 
-  if (turn == 0) srand(time((time_t *) NULL));
+  if (turn == 0) srand((int)time(0));
   else srand(turn);
 
 

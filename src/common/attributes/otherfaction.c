@@ -12,11 +12,14 @@
  */
 
 #include <config.h>
+#include <eressea.h>
 #include "otherfaction.h"
 
-#include <eressea.h>
 #include <faction.h>
+#include <unit.h>
 #include <attrib.h>
+
+#include <assert.h>
 
 /*
  * simple attributes that do not yet have their own file 
@@ -62,4 +65,18 @@ void
 init_otherfaction(void)
 {
 	at_register(&at_otherfaction);
+}
+
+faction *
+visible_faction(const faction *f, const unit * u)
+{
+	if (!alliedunit(u, f, HELP_FSTEALTH)) {
+		attrib *a = a_find(u->attribs, &at_otherfaction);
+		if (a) {
+			faction *fv = get_otherfaction(a);
+			assert (fv != NULL);	/* fv should never be NULL! */
+			return fv;
+		}
+	}
+	return u->faction;
 }

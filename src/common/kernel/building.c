@@ -342,8 +342,8 @@ static local_names * bnames;
 const building_type *
 findbuildingtype(const char * name, const struct locale * lang)
 {
+  variant type;
 	local_names * bn = bnames;
-	void * i;
 
 	while (bn) {
 		if (bn->lang==lang) break;
@@ -356,13 +356,14 @@ findbuildingtype(const char * name, const struct locale * lang)
 		bn->lang = lang;
 		while (btl) {
 			const char * n = locale_string(lang, btl->type->_name);
-			addtoken(&bn->names, n, (void*)btl->type);
+      type.v = (void*)btl->type;
+			addtoken(&bn->names, n, type);
 			btl=btl->next;
 		}
 		bnames = bn;
 	}
-	if (findtoken(&bn->names, name, &i)==E_TOK_NOMATCH) return NULL;
-	return (const building_type*)i;
+	if (findtoken(&bn->names, name, &type)==E_TOK_NOMATCH) return NULL;
+	return (const building_type*)type.v;
 }
 
 
@@ -389,8 +390,8 @@ bt_make(const char * name, int flags, int capacity, int maxcapacity, int maxsize
 }
 
 void *
-resolve_building(void * id) {
-   return findbuilding((int)id);
+resolve_building(variant id) {
+   return findbuilding(id.i);
 }
 
 void
@@ -402,17 +403,17 @@ write_building_reference(const struct building * b, FILE * F)
 int
 read_building_reference(struct building ** b, FILE * F)
 {
-	int id;
+	variant var;
 	char zText[10];
 	fscanf(F, "%s ", zText);
-	id = atoi36(zText);
-	if (id==0) {
+	var.i = atoi36(zText);
+	if (var.i==0) {
 		*b = NULL;
 		return AT_READ_FAIL;
 	}
 	else {
-		*b = findbuilding(id);
-		if (*b==NULL) ur_add((void*)id, (void**)b, resolve_building);
+		*b = findbuilding(var.i);
+		if (*b==NULL) ur_add(var, (void**)b, resolve_building);
 		return AT_READ_OK;
 	}
 }

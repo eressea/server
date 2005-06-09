@@ -118,12 +118,12 @@ a_readicastle(attrib * a, FILE * f)
 		data->type = NULL;
 		return AT_READ_FAIL;
 	} else {
-		int bno;
-		fscanf(f, "%s %d %d", buf, &bno, &data->time);
-		data->building = findbuilding(bno);
+		variant bno;
+		fscanf(f, "%s %d %d", buf, &bno.i, &data->time);
+		data->building = findbuilding(bno.i);
 		if (!data->building) {
 			/* this shouldn't happen, but just in case it does: */
-			ur_add((void*)bno, (void**)&data->building, resolve_building);
+			ur_add(bno, (void**)&data->building, resolve_building);
 		}
 		data->type = bt_find(buf);
 		return AT_READ_OK;
@@ -1279,6 +1279,7 @@ do_fumble(castorder *co)
   spell * sp = co->sp;
   int level = co->level;
   int duration;
+  variant effect;
   const char * sp_name = spell_name(sp, u->faction->locale);
 
   ADDMSG(&u->faction->msgs, msg_message("patzer", "unit region spell",
@@ -1312,9 +1313,10 @@ do_fumble(castorder *co)
   case 2:
     /* temporärer Stufenverlust */
     duration = max(rand()%level/2, 2);
+    effect.i = -(level/2);
     c = create_curse(u, &u->attribs, ct_find("skil"), level, duration,
-      -(level/2), 1);
-    c->data = (void*)SK_MAGIC;
+      effect, 1);
+    c->data.i = SK_MAGIC;
     ADDMSG(&u->faction->msgs, msg_message("patzer2", "unit region", u, r));
     break;
   case 3:
@@ -1805,8 +1807,8 @@ addparam_region(char ** param, spllprm ** spobjp, const unit * u, order * ord)
     return -1;
   } else {
     int tx = atoi(param[0]), ty = atoi(param[1]);
-    int x = rel_to_abs(0, u->faction, tx, 0);
-    int y = rel_to_abs(0, u->faction, ty, 1);
+    short x = rel_to_abs(0, u->faction, (short)tx, 0);
+    short y = rel_to_abs(0, u->faction, (short)ty, 1);
     region *rt = findregion(x,y);
 
     if (rt!=NULL) {
@@ -2168,7 +2170,7 @@ create_newfamiliar(unit * mage, unit * familiar)
 }
 
 static void *
-resolve_familiar(void * data)
+resolve_familiar(variant data)
 {
 	unit * familiar = resolve_unit(data);
 	if (familiar) {
@@ -2184,10 +2186,10 @@ resolve_familiar(void * data)
 static int
 read_familiar(attrib * a, FILE * F)
 {
-	int i;
+	variant id;
 	fscanf(F, "%s", buf);
-	i = atoi36(buf);
-	ur_add((void*)i, &a->data.v, resolve_familiar);
+	id.i = atoi36(buf);
+	ur_add(id, &a->data.v, resolve_familiar);
 	return AT_READ_OK;
 }
 
@@ -2245,7 +2247,7 @@ has_clone(unit *mage)
 }
 
 static void *
-resolve_clone(void * data)
+resolve_clone(variant data)
 {
 	unit * clone = resolve_unit(data);
 	if (clone) {
@@ -2261,17 +2263,17 @@ resolve_clone(void * data)
 static int
 read_clone(attrib * a, FILE * F)
 {
-	int i;
+	variant id;
 	fscanf(F, "%s", buf);
-	i = atoi36(buf);
-	ur_add((void*)i, &a->data.v, resolve_clone);
+	id.i = atoi36(buf);
+	ur_add(id, &a->data.v, resolve_clone);
 	return AT_READ_OK;
 }
 
 /* mages */
 
 static void *
-resolve_mage(void * data)
+resolve_mage(variant data)
 {
 	unit * mage = resolve_unit(data);
 	if (mage) {
@@ -2287,10 +2289,10 @@ resolve_mage(void * data)
 static int
 read_magician(attrib * a, FILE * F)
 {
-	int i;
+	variant id;
 	fscanf(F, "%s", buf);
-	i = atoi36(buf);
-	ur_add((void*)i, &a->data.v, resolve_mage);
+	id.i = atoi36(buf);
+	ur_add(id, &a->data.v, resolve_mage);
 	return AT_READ_OK;
 }
 
@@ -2417,7 +2419,8 @@ magic(void)
   spell *sp;
   const char *s;
   int spellrank;
-  int range, t_x, t_y;
+  int range;
+  short t_x, t_y;
   castorder *co;
   castorder *cll[MAX_SPELLRANK];
   spellparameter *args;
@@ -2477,9 +2480,9 @@ magic(void)
             }
           }
           if (findparam(s, u->faction->locale) == P_REGION) {
-            t_x = atoi(getstrtoken());
+            t_x = (short)atoi(getstrtoken());
             t_x = rel_to_abs(getplane(u->region),u->faction,t_x,0);
-            t_y = atoi(getstrtoken());
+            t_y = (short)atoi(getstrtoken());
             t_y = rel_to_abs(getplane(u->region),u->faction,t_y,1);
             target_r = findregion(t_x, t_y);
             s = getstrtoken();
@@ -2574,7 +2577,7 @@ magic(void)
             if (range > 1024) { /* (2^10) weiter als 10 Regionen entfernt */
               ADDMSG(&u->faction->msgs, msg_message("spellfail::nocontact",
                 "mage region command target", u, u->region, ord, 
-                gc_add(strdup(regionname(target_r, u->faction)))));
+                regionname(target_r, u->faction)));
               continue;
             }
           }
@@ -2627,7 +2630,7 @@ magic(void)
           /* Weitere Argumente zusammenbasten */
           if (sp->parameter) {
             char ** params = malloc(2*sizeof(char*));
-            size_t p = 0, size = 2;
+            int p = 0, size = 2;
             for (;;) {
               s = getstrtoken();
               if (*s==0) break;

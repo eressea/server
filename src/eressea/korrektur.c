@@ -112,8 +112,10 @@ curse_emptiness(void)
 				}
 			}
 			if (d!=MAXDIRECTIONS) {
-				curse * c = create_curse(NULL, &r->attribs, ct,
-										 100, 100, 0, 0);
+        variant effect;
+				curse * c;
+        effect.i = 0;
+        c = create_curse(NULL, &r->attribs, ct, 100, 100, effect, 0);
 				curse_setflag(c, CURSE_ISNEW|CURSE_IMMUNE);
 			}
 			freset(r, FL_MARK);
@@ -841,7 +843,7 @@ fix_road_borders(void)
       border * b;
       for (b=bhash;b && i!=MAXDEL;b=b->next) {
         if (b->type == &bt_road) {
-          int x1, x2, y1, y2;
+          short x1, x2, y1, y2;
           region *r1, *r2;
 
           x1 = b->from->x;

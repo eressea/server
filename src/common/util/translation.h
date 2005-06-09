@@ -16,16 +16,21 @@
 extern "C" {
 #endif
 
+#include "variant.h"
 struct opstack;
-extern void * opstack_pop(struct opstack ** stack);
-extern void opstack_push(struct opstack ** stack, void * data);
-#define opush(stack, i) opstack_push(stack, (void *)(i))
-#define opop(stack, T) (T)opstack_pop(stack)
+extern void opstack_push(struct opstack ** stack, variant data);
+#define opush_i(stack, x) { variant localvar; localvar.i = x; opstack_push(stack, localvar); }
+#define opush_v(stack, x) { variant localvar; localvar.v = x; opstack_push(stack, localvar); }
+#define opush(stack, i) opstack_push(stack, i)
+
+extern variant opstack_pop(struct opstack ** stack);
+#define opop_v(stack) opstack_pop(stack).v
+#define opop_i(stack) opstack_pop(stack).i
+#define opop(stack) opstack_pop(stack)
 
 extern void translation_init(void);
 extern void translation_done(void);
-extern const char * translate_va(const char* format, const void * userdata, const char* vars, ...);
-extern const char * translate(const char* format, const void * userdata, const char* vars, void* args[]);
+extern const char * translate(const char* format, const void * userdata, const char* vars, variant args[]);
 
 /* eval_x functions */
 typedef void (*evalfun)(struct opstack ** stack, const void *);

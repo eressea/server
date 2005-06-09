@@ -47,7 +47,7 @@ mt_new(const char * name, const char * args[])
   mtype->nparameters = nparameters;
   if (nparameters > 0) {
     mtype->pnames = (const char**)malloc(sizeof(char*) * nparameters);
-    mtype->types = (const char**)malloc(sizeof(char*) * nparameters);
+    mtype->types = (const arg_type**)malloc(sizeof(arg_type*) * nparameters);
   } else {
     mtype->pnames = NULL;
     mtype->types = NULL;
@@ -63,7 +63,7 @@ mt_new(const char * name, const char * args[])
       cp[spos-x] = '\0';
       mtype->pnames[i] = cp;
       /* optimierung: Typ-Strings zentral verwalten. */
-      mtype->types[i] = strdup(spos+1);
+      mtype->types[i] = find_argtype(spos+1);
     }
   }
   return mtype;
@@ -86,27 +86,21 @@ mt_new_va(const char * name, ...)
 	return mt_new(name, args);
 }
 
-typedef struct arg_type {
-  struct arg_type * next;
-  const char * name;
-  void  (*release)(void*);
-  void* (*copy)(void*);
-} arg_type;
-
 arg_type * argtypes = NULL;
 
 void
-register_argtype(const char * name, void(*free_arg)(void*), void*(*copy_arg)(void*))
+register_argtype(const char * name, void(*free_arg)(variant), variant (*copy_arg)(variant), variant_type type)
 {
   arg_type * atype = (arg_type *)malloc(sizeof(arg_type));
   atype->name = name;
   atype->next = argtypes;
   atype->release = free_arg;
   atype->copy = copy_arg;
+  atype->vtype = type;
   argtypes = atype;
 }
 
-static arg_type *
+const arg_type *
 find_argtype(const char * name)
 {
   arg_type * atype = argtypes;
@@ -117,55 +111,39 @@ find_argtype(const char * name)
   return NULL;
 }
 
-static void *
-copy_arg(const char * type, void * data)
+static variant
+copy_arg(const arg_type * atype, variant data)
 {
-  arg_type * atype = find_argtype(type);
-  if (atype==NULL) return data;
+  assert(atype!=NULL);
   if (atype->copy==NULL) return data;
   return atype->copy(data);
 }
 
 static void
-free_arg(const char * type, void * data)
+free_arg(const arg_type * atype, variant data)
 {
-  arg_type * atype = find_argtype(type);
-  if (atype && atype->release) atype->release(data);
+  assert(atype!=NULL);
+  if (atype->release) atype->release(data);
 }
 
 message *
-msg_create(const struct message_type * type, void * args[])
+msg_create(const struct message_type * mtype, variant args[])
 {
   int i;
   message * msg = (message *)malloc(sizeof(message));
 
-  assert(type!=NULL);
-  if (type==NULL) {
+  assert(mtype!=NULL);
+  if (mtype==NULL) {
     log_error(("Trying to create message with type=0x0\n"));
     return NULL;
   }
-  msg->type = type;
-  msg->parameters = (void**)calloc(type->nparameters, sizeof(void*));
+  msg->type = mtype;
+  msg->parameters = (variant*)calloc(mtype->nparameters, sizeof(variant));
   msg->refcount=1;
-  for (i=0;i!=type->nparameters;++i) {
-    msg->parameters[i] = copy_arg(type->types[i], args[i]);
+  for (i=0;i!=mtype->nparameters;++i) {
+    msg->parameters[i] = copy_arg(mtype->types[i], args[i]);
   }
   return msg;
-}
-
-message *
-msg_create_va(const struct message_type * type, ...)
-/* sets a messages parameters */
-{
-	void * args[16];
-	va_list marker;
-	int i;
-	va_start(marker, type);
-	for (i=0;i!=type->nparameters;++i) {
-		args[i] = va_arg(marker, void*);
-	}
-	va_end(marker);
-	return msg_create(type, args);
 }
 
 typedef struct messagetype_list {

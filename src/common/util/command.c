@@ -57,18 +57,21 @@ add_command(struct tnode * keys, struct tnode * tnext,
 				const char * str, parser fun)
 {
 	command * cmd = (command *)malloc(sizeof(command));
-	cmd->fun = fun;
+  variant var;
+
+  cmd->fun = fun;
 	cmd->nodes = tnext;
-	addtoken(keys, str, (void*)cmd);
+  var.v = cmd;
+	addtoken(keys, str, var);
 }
 
 static void
 do_command_i(const struct tnode * keys, void * u, const char * str, struct order * ord)
 {
-	int i;
+	size_t i;
 	char zText[16];
 	const char * c;
-	command * cmd;
+  variant var;
 
 	while (isspace(*str)) ++str;
 	c = str;
@@ -76,7 +79,8 @@ do_command_i(const struct tnode * keys, void * u, const char * str, struct order
 	i = min(16, c-str);
 	strncpy(zText, str, i);
 	zText[i]=0;
-	if (findtoken(keys, zText, (void**)&cmd)==E_TOK_SUCCESS) {
+	if (findtoken(keys, zText, &var)==E_TOK_SUCCESS) {
+    command * cmd = (command *)var.v;
 		if (cmd->nodes) {
 			assert(!cmd->fun);
 			do_command_i(cmd->nodes, u, ++c, ord);

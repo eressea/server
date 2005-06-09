@@ -139,13 +139,13 @@ invert_list(void * heap)
 	*(void **)heap = x;
 }
 
-size_t
+unsigned int
 listlen(void *l)
 {
 
 	/* count entries p in list l */
 
-	size_t i;
+	unsigned int i;
 	void_list *p;
 
 	for (p = (void_list *)l, i = 0; p; p = p->next, i++);

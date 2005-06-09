@@ -201,28 +201,6 @@ add_trigger(struct attrib ** ap, const char * eventname, struct trigger * t)
 }
 
 void
-handle_event_va(attrib ** attribs, const char * eventname, const char * format, ...)
-{
-  event_arg args[9];
-  int argc = 0;
-  va_list marker;
-  char * toks = strdup(format);
-  char * tok = strtok(toks, " ");
-
-  va_start(marker, format);
-  while (tok && argc!=8) {
-    args[argc].data = va_arg(marker, void *);
-    args[argc].type = tok;
-    ++argc;
-    tok = strtok(NULL, " ");
-  }
-  args[argc].type=NULL;
-  va_end(marker);
-  handle_event(attribs, eventname, args);
-  free (toks);
-}
-
-void
 handle_event(attrib ** attribs, const char * eventname, void * data)
 {
 	while (*attribs) {

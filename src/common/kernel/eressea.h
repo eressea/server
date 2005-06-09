@@ -84,6 +84,7 @@ struct building_type;
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/umlaut.h>
+#include <util/variant.h>
 #include <util/vmap.h>
 #include <util/vset.h>
 
@@ -368,7 +369,7 @@ extern void plagues(struct region * r, boolean ismagic);
 typedef struct ursprung {
 	struct ursprung *next;
 	int id;
-	int x, y;
+	short x, y;
 } ursprung;
 
 /* ----------------- Befehle ----------------------------------- */
@@ -998,7 +999,6 @@ extern int alliedgroup(const struct plane * pl, const struct faction * f,
 struct faction *findfaction(int n);
 struct faction *getfaction(void);
 
-struct region *findregion(int x, int y);
 struct unit *findunitg(int n, const struct region * hint);
 struct unit *findunit(int n);
 

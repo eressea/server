@@ -42,7 +42,7 @@ const ship_type *
 findshiptype(const char * name, const struct locale * lang)
 {
 	local_names * sn = snames;
-	void * i;
+	variant var;
 
 	while (sn) {
 		if (sn->lang==lang) break;
@@ -54,14 +54,16 @@ findshiptype(const char * name, const struct locale * lang)
 		sn->next = snames;
 		sn->lang = lang;
 		while (stl) {
+      variant var;
 			const char * n = locale_string(lang, stl->type->name[0]);
-			addtoken(&sn->names, n, (void*)stl->type);
-			stl=stl->next;
+      var.v = (void*)stl->type;
+			addtoken(&sn->names, n, var);
+			stl = stl->next;
 		}
 		snames = sn;
 	}
-	if (findtoken(&sn->names, name, &i)==E_TOK_NOMATCH) return NULL;
-	return (const ship_type*)i;
+	if (findtoken(&sn->names, name, &var)==E_TOK_NOMATCH) return NULL;
+	return (const ship_type*)var.v;
 }
 
 const ship_type *

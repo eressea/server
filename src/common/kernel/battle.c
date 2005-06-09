@@ -2583,7 +2583,7 @@ aftermath(battle * b)
   cv_foreach(s, b->sides) {
     message * seen = msg_message("battle::army_report", 
       "index abbrev dead flown survived", 
-      s->index, gc_add(strdup(sideabkz(s, false))), s->dead, s->flee, s->alive);
+      s->index, sideabkz(s, false), s->dead, s->flee, s->alive);
     message * unseen = msg_message("battle::army_report", 
       "index abbrev dead flown survived", 
       s->index, "-?-", s->dead, s->flee, s->alive);
@@ -3350,16 +3350,16 @@ join_allies(battle * b)
   * Deshalb muß das Ende des Vektors vorher gemerkt werden, damit
   * neue Parteien nicht mit betrachtet werden:
   */
-  int size = cv_size(&b->sides);
+  size_t size = cv_size(&b->sides);
   for (u=r->units;u;u=u->next)
     /* Was ist mit Schiffen? */
     if (u->status != ST_FLEE && u->status != ST_AVOID && !fval(u, UFL_LONGACTION) && u->number > 0)
     {
-      int si;
+      size_t si;
       faction * f = u->faction;
       fighter * c = NULL;
       for (si = 0; si != size; ++si) {
-        int se;
+        size_t se;
         side *s = b->sides.begin[si];
         /* Wenn alle attackierten noch FFL_NOAID haben, dann kämpfe nicht mit. */
         if (fval(s->bf->faction, FFL_NOAID)) continue;
@@ -3593,9 +3593,14 @@ init_battle(region * r, battle **bp)
               continue;
             }
             /* Fehler: "Die Einheit ist mit uns alliert" */
-            if (calm_ct && curse_active(get_cursex(u->attribs, calm_ct, (void*)u2->faction, cmp_curseeffect))) {
-              cmistake(u, ord, 47, MSG_BATTLE);
-              continue;
+
+            if (calm_ct) {
+              variant var;
+              var.i = u2->faction->subscription;
+              if (curse_active(get_cursex(u->attribs, calm_ct, var, cmp_curseeffect_int))) {
+                cmistake(u, ord, 47, MSG_BATTLE);
+                continue;
+              }
             }
             /* Ende Fehlerbehandlung */
 

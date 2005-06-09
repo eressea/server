@@ -19,10 +19,6 @@
 extern "C" {
 #endif
 
-typedef struct obj_ID {
-	int a, b;
-} obj_ID;
-
 enum {
 	TYP_UNIT,
 	TYP_REGION,
@@ -33,29 +29,6 @@ enum {
 	TYP_TRIGGER,
 	TYP_TIMEOUT
 };
-
-extern obj_ID get_ID(void *obj, typ_t typ);
-extern void write_ID(FILE *f, obj_ID id);
-extern obj_ID read_ID(FILE *f);
-
-extern void add_ID_resolve(obj_ID id, void *objPP, typ_t typ);
-extern void resolve_IDs(void);
-
-
-typedef obj_ID (*ID_fun)(void *obj);
-typedef void *(*find_fun)(obj_ID id);
-typedef attrib **(*attrib_fun)(void *obj);
-typedef void (*set_fun)(void *ptrptr, void *obj);	/* 	*ptrptr = obj  */
-
-
-typedef struct {
-	ID_fun		getID;		/* liefert obj_ID zu struct unit* */
-	find_fun	find;		/* liefert struct unit* zu obj_ID  */
-	attrib_fun	getattribs;	/* liefert &u->attribs */
-	set_fun		ppset;		/* setzt *(struct unit **) zu struct unit*  */
-} typdata_t;
-
-extern typdata_t typdata[];
 
 #ifdef __cplusplus
 }

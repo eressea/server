@@ -103,9 +103,9 @@ __cv_scramblecmp(const void *p1, const void *p2)
 #define addptr(p,i)         ((void *)(((char *)p) + i))
 
 void
-__cv_scramble(void *v1, int n, size_t width)
+__cv_scramble(void *v1, size_t n, size_t width)
 {
-	int i;
+	size_t i;
 	static size_t s = 0;
 	static void *v = 0;
 

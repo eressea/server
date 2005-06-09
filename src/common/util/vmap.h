@@ -30,11 +30,11 @@ struct vmap {
 	unsigned int maxsize;
 };
 
-unsigned int vmap_lowerbound(const vmap * vm, const int key);
-unsigned int vmap_upperbound(const vmap * vm, const int key);
-unsigned int vmap_insert(vmap * vm, const int key, void *data);
-unsigned int vmap_find(const vmap * vm, const int key);
-unsigned int vmap_get(vmap * vm, const int key);
+size_t vmap_lowerbound(const vmap * vm, const int key);
+size_t vmap_upperbound(const vmap * vm, const int key);
+size_t vmap_insert(vmap * vm, const int key, void *data);
+size_t vmap_find(const vmap * vm, const int key);
+size_t vmap_get(vmap * vm, const int key);
 void vmap_init(vmap * vm);
 
 #ifdef __cplusplus

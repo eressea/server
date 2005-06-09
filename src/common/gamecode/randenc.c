@@ -930,7 +930,7 @@ move_iceberg(region *r)
 		if (rterrain(rc) == T_OCEAN) {	/* Eisberg treibt */
 			ship *sh, *shn;
 			unit *u;
-			int x, y;
+			short x, y;
 
 
 			for (u=r->units; u; u=u->next) freset(u->faction, FL_DH);

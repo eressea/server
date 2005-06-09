@@ -25,7 +25,6 @@ extern unsigned int hashstring(const char* s);
 
 extern const char *escape_string(const char * str, char * buffer, unsigned int len);
 extern boolean locale_check(void);
-extern char *fstrncat(char * buffer, const char * str, unsigned int size);
 
 extern int set_email(char** pemail, const char *newmail);
 /* fast strncat */

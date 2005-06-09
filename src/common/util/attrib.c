@@ -28,7 +28,7 @@ static unsigned int
 __at_hashkey(const char* s)
 {
 	int key = 0;
-	int i = strlen(s);
+	size_t i = strlen(s);
 
 	while (i) {
 		--i;

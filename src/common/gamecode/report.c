@@ -123,7 +123,8 @@ read_datenames(const char *filename)
 {
 	FILE *namesFP;
 	char line[256];
-	int  i, l;
+	int  i;
+  size_t l;
 
 	if( (namesFP=fopen(filename,"r")) == NULL) {
 		log_error(("Kann Datei '%s' nicht öffnen, Abbruch\n", filename));
@@ -709,7 +710,7 @@ static void
 rps_nowrap(FILE * F, const char *s)
 {
 	const char *x = s;
-	int indent = 0;
+	size_t indent = 0;
 
 	while (*x++ == ' ');
 	indent = x - s - 1;
@@ -1007,13 +1008,14 @@ static void
 eval_trail(struct opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
 	const struct faction * f = (const struct faction *)userdata;
-	const struct locale * lang = opop(stack, const struct locale*);
-	const struct region * r = opop(stack, const struct region*);
+	const struct locale * lang = (const struct locale*)opop(stack).v;
+	const struct region * r = (const struct region*)opop(stack).v;
 	const char * trail = trailinto(r, lang);
 	const char * rn = f_regionid(r, f);
-	char * x = balloc(strlen(trail)+strlen(rn));
+  variant var;
+  char * x = var.v = balloc(strlen(trail)+strlen(rn));
 	sprintf(x, trail, rn);
-	opush(stack, x);
+	opush(stack, var);
 }
 
 static void
@@ -1982,7 +1984,7 @@ report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * ad
 	if (f->age <= 2) {
 		if (f->age <= 1) {
 			ADDMSG(&f->msgs, msg_message("changepasswd",
-				"value", gc_add(strdup(f->passw))));
+				"value", f->passw));
 		}
 		RENDER(f, buf, sizeof(buf), ("newbie_password", "password", f->passw));
 		rnl(F);
@@ -3561,30 +3563,39 @@ static void
 eval_unit(struct opstack ** stack, const void * userdata) /* unit -> string */
 {
   const struct faction * f = (const struct faction *)userdata;
-	const struct unit * u = opop(stack, const struct unit *);
+	const struct unit * u = (const struct unit *)opop(stack).v;
 	const char * c = u?unitname(u):LOC(f->locale, "an_unknown_unit");
 	size_t len = strlen(c);
-	opush(stack, strcpy(balloc(len+1), c));
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+	opush(stack, var);
 }
 
 static void
 eval_spell(struct opstack ** stack, const void * userdata) /* unit -> string */
 {
   const struct faction * f = (const struct faction *)userdata;
-  const struct spell * sp = opop(stack, const struct spell *);
+  const struct spell * sp = (const struct spell *)opop(stack).v;
   const char * c = sp?spell_name(sp, f->locale):LOC(f->locale, "an_unknown_spell");
   size_t len = strlen(c);
-  opush(stack, strcpy(balloc(len+1), c));
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
 }
 
 static void
 eval_unitname(struct opstack ** stack, const void * userdata) /* unit -> string */
 {
   const struct faction * f = (const struct faction *)userdata;
-	const struct unit * u = opop(stack, const struct unit *);
+	const struct unit * u = (const struct unit *)opop(stack).v;
 	const char * c = u?u->name:LOC(f->locale, "an_unknown_unit");
 	size_t len = strlen(c);
-	opush(stack, strcpy(balloc(len+1), c));
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
 }
 
 
@@ -3592,125 +3603,186 @@ static void
 eval_unitid(struct opstack ** stack, const void * userdata) /* unit -> int */
 {
   const struct faction * f = (const struct faction *)userdata;
-	const struct unit * u = opop(stack, const struct unit *);
+	const struct unit * u = (const struct unit *)opop(stack).v;
 	const char * c = u?u->name:LOC(f->locale, "an_unknown_unit");
 	size_t len = strlen(c);
-	opush(stack, strcpy(balloc(len+1), c));
+  variant var;
+  
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
 }
 
 static void
 eval_faction(struct opstack ** stack, const void * userdata) /* faction -> string */
 {
-	const struct faction * f = opop(stack, const struct faction *);
+	const struct faction * f = (const struct faction *)opop(stack).v;
 	const char * c = factionname(f);
 	size_t len = strlen(c);
-	opush(stack, strcpy(balloc(len+1), c));
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
 }
 
 static void
 eval_alliance(struct opstack ** stack, const void * userdata) /* faction -> string */
 {
-	const struct alliance * al = opop(stack, const struct alliance *);
+	const struct alliance * al = (const struct alliance *)opop(stack).v;
 	const char * c = alliancename(al);
+  variant var;
 	if (c!=NULL) {
 		size_t len = strlen(c);
-		opush(stack, strcpy(balloc(len+1), c));
+    var.v = strcpy(balloc(len+1), c);
 	}
-	else opush(stack, NULL);
+	else var.v = NULL;
+  opush(stack, var);
 }
 
 static void
 eval_region(struct opstack ** stack, const void * userdata) /* region -> string */
 {
 	const struct faction * f = (const struct faction *)userdata;
-	const struct region * r = opop(stack, const struct region *);
+	const struct region * r = (const struct region *)opop(stack).v;
 	const char * c = regionname(r, f);
 	size_t len = strlen(c);
-	opush(stack, strcpy(balloc(len+1), c));
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
 }
 
 static void
 eval_ship(struct opstack ** stack, const void * userdata) /* ship -> string */
 {
   const struct faction * f = (const struct faction *)userdata;
-	const struct ship * u = opop(stack, const struct ship *);
+	const struct ship * u = (const struct ship *)opop(stack).v;
 	const char * c = u?shipname(u):LOC(f->locale, "an_unknown_ship");
 	size_t len = strlen(c);
-	opush(stack, strcpy(balloc(len+1), c));
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
 }
 
 static void
 eval_building(struct opstack ** stack, const void * userdata) /* building -> string */
 {
   const struct faction * f = (const struct faction *)userdata;
-	const struct building * u = opop(stack, const struct building *);
+	const struct building * u = (const struct building *)opop(stack).v;
 	const char * c = u?buildingname(u):LOC(f->locale, "an_unknown_building");
 	size_t len = strlen(c);
-	opush(stack, strcpy(balloc(len+1), c));
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
 }
 
 static void
 eval_resource(struct opstack ** stack, const void * userdata)
 {
 	const faction * report = (const faction*)userdata;
-	int j = opop(stack, int);
-	struct resource_type * res = opop(stack, struct resource_type *);
-
+	int j = opop(stack).i;
+	const struct resource_type * res = (const struct resource_type *)opop(stack).v;
 	const char * c = LOC(report->locale, resourcename(res, j!=1));
-	opush(stack, strcpy(balloc(strlen(c)+1), c));
+	size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
 }
 
 static void
 eval_race(struct opstack ** stack, const void * userdata)
 {
 	const faction * report = (const faction*)userdata;
-	int j = opop(stack, int);
-	const race * r = opop(stack, const race *);
-
+	int j = opop(stack).i;
+	const race * r = (const race *)opop(stack).v;
 	const char * c = LOC(report->locale, rc_name(r, j!=1));
-	opush(stack, strcpy(balloc(strlen(c)+1), c));
+	size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
 }
 
 static void
 eval_order(struct opstack ** stack, const void * userdata) /* order -> string */
 {
 	const faction * report = (const faction*)userdata;
-	struct order * ord = opop(stack, struct order *);
+	const struct order * ord = (const struct order *)opop(stack).v;
 	static char buf[256];
-	write_order(ord, report->locale, buf, sizeof(buf));
-	opush(stack, strcpy(balloc(strlen(buf)+1), buf));
+  size_t len;
+  variant var;
+
+  write_order(ord, report->locale, buf, sizeof(buf));
+  len = strlen(buf);
+  var.v = strcpy(balloc(len+1), buf);
+  opush(stack, var);
 }
 
 static void
 eval_direction(struct opstack ** stack, const void * userdata)
 {
 	const faction * report = (const faction*)userdata;
-	int i = opop(stack, int);
-	const char * c;
-	if (i>=0) {
-		c = LOC(report->locale, directions[i]);
-	} else {
-		c = LOC(report->locale, "unknown_direction");
-	}
-	opush(stack, strcpy(balloc(strlen(c)+1), c));
+	int i = opop(stack).i;
+	const char * c = LOC(report->locale, (i>=0)?directions[i]:"unknown_direction");
+	size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
 }
 
 static void
 eval_skill(struct opstack ** stack, const void * userdata)
 {
 	const faction * report = (const faction*)userdata;
-	skill_t sk = (skill_t)opop(stack, int);
+	skill_t sk = (skill_t)opop(stack).i;
 	const char * c = skillname(sk, report->locale);
-	opush(stack, strcpy(balloc(strlen(c)+1), c));
+	size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
 }
 
 static void
 eval_int36(struct opstack ** stack, const void * userdata)
 {
-	int i = opop(stack, int);
+	int i = opop(stack).i;
 	const char * c = itoa36(i);
-	opush(stack, strcpy(balloc(strlen(c)+1), c));
+	size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
 	unused(userdata);
+}
+
+static variant
+var_copy_string(variant x)
+{
+  x.v = strdup((const char*)x.v);
+  return x;
+}
+
+static void
+var_free_string(variant x)
+{
+  free(x.v);
+}
+
+static variant
+var_copy_order(variant x)
+{
+  x.v = copy_order((order*)x.v);
+  return x;
+}
+
+static void
+var_free_order(variant x)
+{
+  free_order(x.v);
 }
 
 void
@@ -3733,8 +3805,21 @@ report_init(void)
 	add_function("trail", &eval_trail);
   add_function("spell", &eval_spell);
 
-  register_argtype("string", free, (void*(*)(void*))strdup);
-  register_argtype("order", (void(*)(void*))free_order, (void*(*)(void*))copy_order);
+  register_argtype("alliance", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("building", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("direction", NULL, NULL, VAR_INT);
+  register_argtype("faction", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("race", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("region", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("resource", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("ship", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("skill", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("spell", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("unit", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("int", NULL, NULL, VAR_INT);
+  register_argtype("string", var_free_string, var_copy_string, VAR_VOIDPTR);
+  register_argtype("order", var_free_order, var_copy_order, VAR_VOIDPTR);
+
   register_function((pf_generic)view_neighbours, "view_neighbours");
 	register_function((pf_generic)view_regatta, "view_regatta");
 }

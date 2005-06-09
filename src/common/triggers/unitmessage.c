@@ -85,12 +85,12 @@ unitmessage_read(trigger * t, FILE * F)
 {
 	unitmessage_data * td = (unitmessage_data*)t->data.v;
 	char zText[256];
-	int i;
+	variant var;
 
 	fscanf(F, "%s", zText);
-	i = atoi36(zText);
-	td->target = findunit(i);
-	if (td->target==NULL) ur_add((void*)i, (void**)&td->target, resolve_unit);
+	var.i = atoi36(zText);
+	td->target = findunit(var.i);
+	if (td->target==NULL) ur_add(var, (void**)&td->target, resolve_unit);
 
   freadstr(F, zText, sizeof(zText));
 	fscanf(F, "%d %d ", &td->type, &td->level);

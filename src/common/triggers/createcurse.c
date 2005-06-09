@@ -66,8 +66,10 @@ createcurse_handle(trigger * t, void * data)
 	 */
 	createcurse_data * td = (createcurse_data*)t->data.v;
 	if (td->mage!=NULL && td->target!=NULL) {
+    variant var;
+    var.i = td->effect;
 		create_curse(td->mage, &td->target->attribs,
-			td->type, td->vigour, td->duration, td->effect, td->men);
+			td->type, td->vigour, td->duration, var, td->men);
 	} else {
 		log_error(("could not perform createcurse::handle()\n"));
 	}
@@ -89,17 +91,17 @@ createcurse_read(trigger * t, FILE * F)
 {
 	createcurse_data * td = (createcurse_data*)t->data.v;
 	char zText[128];
-	int i;
+	variant var;
 
 	fscanf(F, "%s", zText);
-	i = atoi36(zText);
-	td->mage = findunit(i);
-	if (td->mage==NULL) ur_add((void*)i, (void**)&td->mage, resolve_unit);
+	var.i = atoi36(zText);
+	td->mage = findunit(var.i);
+	if (td->mage==NULL) ur_add(var, (void**)&td->mage, resolve_unit);
 
 	fscanf(F, "%s", zText);
-	i = atoi36(zText);
-	td->target = findunit(i);
-	if (td->target==NULL) ur_add((void*)i, (void**)&td->target, resolve_unit);
+	var.i = atoi36(zText);
+	td->target = findunit(var.i);
+	if (td->target==NULL) ur_add(var, (void**)&td->target, resolve_unit);
 
 	if (global.data_version<CURSETYPE_VERSION) {
 		int id1, id2;

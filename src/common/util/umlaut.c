@@ -37,7 +37,7 @@ typedef struct tref {
 #define SHARED 2 /* at least two words share the node */
 
 void
-addtoken(tnode * root, const char* str, void * id)
+addtoken(tnode * root, const char* str, variant id)
 {
 	static struct replace {
 		char c;
@@ -86,7 +86,7 @@ addtoken(tnode * root, const char* str, void * id)
 			next=ref;
 		} else {
 			next->node->flags |= SHARED;
-			if ((next->node->flags & LEAF) == 0) next->node->id = NULL;
+			if ((next->node->flags & LEAF) == 0) next->node->id.v = NULL; /* why?*/
 		}
 		addtoken(next->node, str+1, id);
 		while (replace[i].str) {
@@ -102,7 +102,7 @@ addtoken(tnode * root, const char* str, void * id)
 }
 
 int
-findtoken(const tnode * tk, const char * str, void **result)
+findtoken(const tnode * tk, const char * str, variant* result)
 {
 	if (!str) return E_TOK_NOMATCH;
 	if (*str == 0) return E_TOK_NOMATCH;

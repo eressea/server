@@ -1179,8 +1179,8 @@ void
 update_lighthouse(building * lh)
 {
 	region * r = lh->region;
-	int d = (int)log10(lh->size) + 1;
-	int x, y;
+	short d = (short)log10(lh->size) + 1;
+	short x, y;
 	static const struct building_type * bt_lighthouse;
 	if (!bt_lighthouse) bt_lighthouse = bt_find("lighthouse");
 	assert(bt_lighthouse);
@@ -1506,10 +1506,10 @@ const struct race *
 findrace(const char * s, const struct locale * lang)
 {
 	struct lstr * lnames = get_lnames(lang);
-	const struct race * rc;
+  variant token;
 
-	if (findtoken(&lnames->races, s, (void **)&rc)==E_TOK_SUCCESS) {
-		return rc;
+	if (findtoken(&lnames->races, s, &token)==E_TOK_SUCCESS) {
+		return (const struct race *)token.v;
 	}
 	return NULL;
 }
@@ -1518,10 +1518,10 @@ int
 findoption(const char *s, const struct locale * lang)
 {
 	struct lstr * lnames = get_lnames(lang);
-	int dir;
+  variant token;
 
-	if (findtoken(&lnames->options, s, (void**)&dir)==E_TOK_SUCCESS) {
-		return (direction_t)dir;
+  if (findtoken(&lnames->options, s, &token)==E_TOK_SUCCESS) {
+		return (direction_t)token.i;
 	}
 	return NODIRECTION;
 }
@@ -1530,23 +1530,23 @@ skill_t
 findskill(const char *s, const struct locale * lang)
 {
 	struct lstr * lnames = get_lnames(lang);
-	int i;
+	variant token;
 
-	if (findtoken(&lnames->skillnames, s, (void**)&i)==E_TOK_NOMATCH) return NOSKILL;
-	return (skill_t)i;
+	if (findtoken(&lnames->skillnames, s, &token)==E_TOK_NOMATCH) return NOSKILL;
+	return (skill_t)token.i;
 }
 
 keyword_t
 findkeyword(const char *s, const struct locale * lang)
 {
 	struct lstr * lnames = get_lnames(lang);
-	int i;
+  variant token;
 #ifdef AT_PERSISTENT
 	if (*s == '@') s++;
 #endif
-	if (findtoken(&lnames->keywords, s, (void**)&i)==E_TOK_NOMATCH) return NOKEYWORD;
-	if (global.disabled[i]) return NOKEYWORD;
-	return (keyword_t) i;
+	if (findtoken(&lnames->keywords, s, &token)==E_TOK_NOMATCH) return NOKEYWORD;
+	if (global.disabled[token.i]) return NOKEYWORD;
+	return (keyword_t) token.i;
 }
 
 param_t
@@ -1554,15 +1554,15 @@ findparam(const char *s, const struct locale * lang)
 {
   struct lstr * lnames = get_lnames(lang);
   const building_type * btype;
-  
-  int i;
-  if (findtoken(&lnames->tokens[UT_PARAM], s, (void**)&i)==E_TOK_NOMATCH) {
-	btype = findbuildingtype(s, lang);
-	if (btype!=NULL) return (param_t) P_GEBAEUDE;
-	return NOPARAM;
+  variant token;
+
+  if (findtoken(&lnames->tokens[UT_PARAM], s, &token)==E_TOK_NOMATCH) {
+    btype = findbuildingtype(s, lang);
+    if (btype!=NULL) return (param_t) P_GEBAEUDE;
+    return NOPARAM;
   }
-  if (i==P_BUILDING) return P_GEBAEUDE;
-  return (param_t)i;
+  if (token.i==P_BUILDING) return P_GEBAEUDE;
+  return (param_t)token.i;
 }
 
 param_t
@@ -2309,7 +2309,9 @@ init_directions(tnode * root, const struct locale * lang)
 	int i;
 	struct lstr * lnames = get_lnames(lang);
 	for (i=0; dirs[i].direction!=NODIRECTION;++i) {
-		addtoken(&lnames->directions, LOC(lang, dirs[i].name), (void*)dirs[i].direction);
+    variant token;
+    token.i = dirs[i].direction;
+		addtoken(&lnames->directions, LOC(lang, dirs[i].name), token);
 	}
 }
 
@@ -2317,10 +2319,10 @@ direction_t
 finddirection(const char *s, const struct locale * lang)
 {
 	struct lstr * lnames = get_lnames(lang);
-	int dir;
+	variant token;
 
-	if (findtoken(&lnames->directions, s, (void**)&dir)==E_TOK_SUCCESS) {
-		return (direction_t)dir;
+	if (findtoken(&lnames->directions, s, &token)==E_TOK_SUCCESS) {
+		return (direction_t)token.i;
 	}
 	return NODIRECTION;
 }
@@ -2329,25 +2331,34 @@ static void
 init_locale(const struct locale * lang)
 {
 	struct lstr * lnames = get_lnames(lang);
+  variant var;
 	int i;
 	const struct race * rc;
 
 	init_directions(&lnames->directions, lang);
 	for (rc=races;rc;rc=rc->next) {
-		addtoken(&lnames->races, LOC(lang, rc_name(rc, 1)), (void*)rc);
-		addtoken(&lnames->races, LOC(lang, rc_name(rc, 0)), (void*)rc);
+    var.v = (void*)rc;
+		addtoken(&lnames->races, LOC(lang, rc_name(rc, 1)), var);
+		addtoken(&lnames->races, LOC(lang, rc_name(rc, 0)), var);
 	}
-	for (i=0;i!=MAXPARAMS;++i)
-		addtoken(&lnames->tokens[UT_PARAM], LOC(lang, parameters[i]), (void*)i);
+  for (i=0;i!=MAXPARAMS;++i) {
+    var.i = i;
+    addtoken(&lnames->tokens[UT_PARAM], LOC(lang, parameters[i]), var);
+	}
 	for (i=0;i!=MAXSKILLS;++i) {
 		if (i!=SK_TRADE || !TradeDisabled()) {
-			addtoken(&lnames->skillnames, skillname((skill_t)i, lang), (void*)i);
+      var.i = i;
+			addtoken(&lnames->skillnames, skillname((skill_t)i, lang), var);
 		}
 	}
-	for (i=0;i!=MAXKEYWORDS;++i)
-		addtoken(&lnames->keywords, LOC(lang, keywords[i]), (void*)i);
-	for (i=0;i!=MAXOPTIONS;++i)
-		addtoken(&lnames->options, LOC(lang, options[i]), (void*)i);
+  for (i=0;i!=MAXKEYWORDS;++i) {
+    var.i = i;
+    addtoken(&lnames->keywords, LOC(lang, keywords[i]), var);
+	}
+  for (i=0;i!=MAXOPTIONS;++i) {
+    var.i = i;
+    addtoken(&lnames->options, LOC(lang, options[i]), var);
+	}
 }
 
 typedef struct param {
@@ -3224,7 +3235,7 @@ kernel_init(void)
 
 	if (!turn) turn = lastturn();
 	if (turn == 0)
-		srand(time((time_t *) NULL));
+		srand((int)time(0));
 	else
 		srand(turn);
 	if (sqlpatch) {

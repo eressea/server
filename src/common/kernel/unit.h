@@ -21,6 +21,9 @@
 
 #ifndef H_KRNL_UNIT_H
 #define H_KRNL_UNIT_H
+
+#include <util/variant.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -185,7 +188,7 @@ extern int get_modifier(const struct unit * u, skill_t sk, int lvl, const struct
 extern void destroy_unit(struct unit * u);
 
 /* see resolve.h */
-extern void * resolve_unit(void * data);
+extern void * resolve_unit(variant data);
 extern void write_unit_reference(const struct unit * u, FILE * F);
 extern int read_unit_reference(unit ** up, FILE * F);
 

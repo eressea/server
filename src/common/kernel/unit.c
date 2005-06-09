@@ -44,6 +44,7 @@
 #include <event.h>
 #include <goodies.h>
 #include <resolve.h>
+#include <variant.h>
 
 /* libc includes */
 #include <assert.h>
@@ -436,13 +437,6 @@ ucontact(const unit * u, const unit * u2)
 	return false;
 }
 
-void *
-resolve_unit(void * id)
-{
-   return ufindhash((int)id);
-}
-
-
 /***
  ** init & cleanup module
  **/
@@ -464,21 +458,27 @@ write_unit_reference(const unit * u, FILE * F)
 	fprintf(F, "%s ", (u!=NULL && u->no!=0)?itoa36(u->no):"0");
 }
 
+void *
+resolve_unit(variant id)
+{
+  return ufindhash(id.i);
+}
+
 int
 read_unit_reference(unit ** up, FILE * F)
 {
   char zId[10];
-  int i;
+  variant var;
 
   assert(up!=NULL);
   fscanf(F, "%s", zId);
-  i = atoi36(zId);
-  if (i==0) {
-	*up = NULL;
-	return AT_READ_FAIL;
+  var.i = atoi36(zId);
+  if (var.i==0) {
+    *up = NULL;
+    return AT_READ_FAIL;
   }
-  *up = findunit(i);
-  if (*up==NULL) ur_add((void*)i, (void**)up, resolve_unit);
+  *up = findunit(var.i);
+  if (*up==NULL) ur_add(var, (void**)up, resolve_unit);
   return AT_READ_OK;
 }
 
@@ -995,7 +995,10 @@ att_modification(const unit *u, skill_t sk)
 
 	result += get_curseeffect(u->attribs, C_ALLSKILLS, 0);
 	if (skillmod_ct) {
-		curse * c = get_cursex(u->attribs, skillmod_ct, (void*)(int)sk, cmp_cursedata);
+    curse * c;
+    variant var;
+    var.i = sk;
+		c = get_cursex(u->attribs, skillmod_ct, var, cmp_cursedata_int);
 		result += curse_geteffect(c);
 	}
 

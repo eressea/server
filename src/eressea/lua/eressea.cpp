@@ -142,7 +142,7 @@ lua_planmonsters(void)
   faction * f = findfaction(MONSTER_FACTION);
 
   if (f==NULL) return;
-  if (turn == 0) srand(time((time_t *) NULL));
+  if (turn == 0) srand((int)time(0));
   else srand(turn);
   plan_monsters();
   for (u=f->units;u;u=u->nextF) {

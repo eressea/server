@@ -599,7 +599,7 @@ migration * free_migrants;
 static migration *
 get_migrants(region * r)
 {
-  int key = region_hashkey(r);
+  int key = reg_hashkey(r);
   int index = key % MSIZE;
   migration * m = migrants[index];
   while (m && m->r != r)
@@ -624,7 +624,7 @@ get_migrants(region * r)
 static void
 migrate(region * r)
 {
-  int key = region_hashkey(r);
+  int key = reg_hashkey(r);
   int index = key % MSIZE;
   migration ** hp = &migrants[index];
   fset(r, RF_MIGRATION);
@@ -1782,9 +1782,8 @@ static void
 deliverMail(faction * f, region * r, unit * u, const char *s, unit * receiver)
 {
   if (!receiver) { /* BOTSCHAFT an PARTEI */
-    char * message = (char*)gc_add(strdup(s));
     add_message(&f->msgs,
-      msg_message("unitmessage", "region unit string", r, u, message));
+      msg_message("unitmessage", "region unit string", r, u, s));
   }
   else {          /* BOTSCHAFT an EINHEIT */
     unit *emp = receiver;
@@ -1842,7 +1841,13 @@ prepare_mail_cmd(unit * u, struct order * ord)
       }
       u2 = findunitr(r,n);
       if(u2 && cansee(u->faction, r, u2, 0)) {
-        handle_event_va(&u2->attribs, "message", "string unit", s, u);
+        event_arg args[3];
+        args[0].data.v = (void*)s;
+        args[0].type = "string";
+        args[1].data.v = (void*)u;
+        args[1].type = "unit";
+        args[2].type = NULL;
+        handle_event(&u2->attribs, "message", args);
       }
     }
     break;
@@ -1863,7 +1868,6 @@ mailunit(region * r, unit * u, int n, struct order * ord, const char * s)
   if (u2 && cansee(u->faction, r, u2, 0)) {
     deliverMail(u2->faction, r, u, s, u2);
     /* now done in prepare_mail_cmd */
-    /* handle_event_va(&u2->attribs, "message", "string unit", s, u); */
   }
   else {
     /* Immer eine Meldung - sonst könnte man so getarnte EHs enttarnen:
@@ -2062,8 +2066,8 @@ banner_cmd(unit * u, struct order * ord)
   skip_token();
 
   set_string(&u->faction->banner, getstrtoken());
-  add_message(&u->faction->msgs, new_message(u->faction,
-    "changebanner%s:value", gc_add(strdup(u->faction->banner))));
+  add_message(&u->faction->msgs, msg_message("changebanner", "value",
+    u->faction->banner));
 
   return 0;
 }
@@ -2083,11 +2087,9 @@ email_cmd(unit * u, struct order * ord)
     faction * f = u->faction;
     if (set_email(&f->email, s)!=0) {
       log_error(("Invalid email address for faction %s: %s\n", itoa36(f->no), s));
-      ADDMSG(&f->msgs, msg_message("changemail_invalid", "value",
-        gc_add(strdup(s))));
+      ADDMSG(&f->msgs, msg_message("changemail_invalid", "value", s));
     } else {
-      ADDMSG(&f->msgs, msg_message("changemail", "value",
-        gc_add(strdup(f->email))));
+      ADDMSG(&f->msgs, msg_message("changemail", "value", f->email));
     }
   }
   return 0;
@@ -2127,7 +2129,7 @@ password_cmd(unit * u, struct order * ord)
   set_string(&u->faction->passw, pbuf);
   fset(u->faction, FFL_OVERRIDE);
   ADDMSG(&u->faction->msgs, msg_message("changepasswd",
-    "value", gc_add(strdup(u->faction->passw))));
+    "value", u->faction->passw));
   return 0;
 }
 
@@ -2523,13 +2525,13 @@ group_cmd(unit * u, struct order * ord)
 static int
 origin_cmd(unit * u, struct order * ord)
 {
-  int px, py;
+  short px, py;
 
   init_tokens(ord);
   skip_token();
 
-  px = atoi(getstrtoken());
-  py = atoi(getstrtoken());
+  px = (short)atoi(getstrtoken());
+  py = (short)atoi(getstrtoken());
 
   set_ursprung(u->faction, getplaneid(u->region), px, py);
   return 0;
@@ -3210,9 +3212,11 @@ renumber(void)
 static building *
 age_building(building * b)
 {
-  static const building_type * bt_blessed = (const building_type*)0xdeadbeef;
-  static const curse_type * ct_astralblock = NULL;
-  if (bt_blessed==(const building_type*)0xdeadbeef) {
+  static boolean init = false;
+  static const building_type * bt_blessed;
+  static const curse_type * ct_astralblock;
+  if (!init) {
+    init = true;
     bt_blessed = bt_find("blessedstonecircle");
     ct_astralblock = ct_find("astralblock");
   }
@@ -3260,9 +3264,11 @@ age_building(building * b)
       if (c==NULL) {
         if (mage!=NULL) {
           int sk = effskill(mage, SK_MAGIC);
+          variant effect;
+          effect.i = 100;
           /* the mage reactivates the circle */
           c = create_curse(mage, &rt->attribs, ct_astralblock,
-            sk, sk/2, 100, 0);
+            sk, sk/2, effect, 0);
           ADDMSG(&r->msgs, msg_message("astralshield_activate", 
             "region unit", r, mage));
         }
@@ -3887,8 +3893,8 @@ processorders (void)
 #endif
 
   puts(" - Attackieren");
-  if(nobattle == false) do_battle();
-  if (turn == 0) srand(time((time_t *) NULL));
+  if (nobattle == false) do_battle();
+  if (turn == 0) srand((int)time(0));
   else srand(turn);
 
   puts(" - Belagern");
@@ -3903,7 +3909,7 @@ processorders (void)
   puts(" - Folge auf Einheiten ersetzen");
   follow_unit();
 
-  if (turn == 0) srand(time((time_t *) NULL));
+  if (turn == 0) srand((int)time(0));
   else srand(turn);
 
   puts(" - Zerstören, Geben, Rekrutieren, Vergessen");
@@ -3946,7 +3952,7 @@ processorders (void)
   puts(" - Zufallsbegegnungen");
   encounters();
 
-  if (turn == 0) srand(time((time_t *) NULL));
+  if (turn == 0) srand((int)time(0));
   else srand(turn);
 
   puts(" - Monster fressen und vertreiben Bauern");

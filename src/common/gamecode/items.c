@@ -146,6 +146,7 @@ use_bagpipeoffear(struct unit * u, const struct item_type * itype,
                   int amount, struct order * ord)
 {
   int money;
+  variant effect;
 
   if(get_curse(u->region->attribs, ct_find("depression"))) {
     cmistake(u, ord, 58, MSG_MAGIC);
@@ -156,8 +157,9 @@ use_bagpipeoffear(struct unit * u, const struct item_type * itype,
   change_money(u, money);
   rsetmoney(u->region, rmoney(u->region) - money);
 
+  effect.i = 0;
   create_curse(u, &u->region->attribs, ct_find("depression"),
-    20, BAGPIPEDURATION, 0, 0);
+    20, BAGPIPEDURATION, effect, 0);
 
   ADDMSG(&u->faction->msgs, msg_message("bagpipeoffear_faction",
     "unit region command money", u, u->region, ord, money));

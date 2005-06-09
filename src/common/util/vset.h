@@ -27,7 +27,7 @@ struct vset {
 };
 extern void vset_init(vset * s);
 extern void vset_destroy(vset * s);
-extern unsigned int vset_add(vset * s, void *);
+extern size_t vset_add(vset * s, void *);
 extern int vset_erase(vset * s, void *);
 extern int vset_count(vset *s, void * i);
 extern void *vset_pop(vset *s);

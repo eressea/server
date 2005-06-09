@@ -69,7 +69,7 @@ getplanebyname(const char * name)
 }
 
 plane *
-findplane(int x, int y)
+findplane(short x, short y)
 {
 	plane *pl;
 
@@ -100,7 +100,7 @@ getplaneid(const region *r)
 	return 0;
 }
 
-static int
+static short
 ursprung_x(const faction *f, const plane *pl, const region * rdefault)
 {
 	ursprung *ur;
@@ -121,7 +121,7 @@ ursprung_x(const faction *f, const plane *pl, const region * rdefault)
 	return rdefault->x - plane_center_x(pl);
 }
 
-static int
+static short
 ursprung_y(const faction *f, const plane *pl, const region * rdefault)
 {
 	ursprung *ur;
@@ -142,7 +142,7 @@ ursprung_y(const faction *f, const plane *pl, const region * rdefault)
 	return rdefault->y - plane_center_y(pl);
 }
 
-int
+short 
 plane_center_x(const plane *pl)
 {
 	if(pl == NULL)
@@ -151,7 +151,7 @@ plane_center_x(const plane *pl)
 	return(pl->minx + pl->maxx)/2;
 }
 
-int
+short 
 plane_center_y(const plane *pl)
 {
 	if(pl == NULL)
@@ -160,7 +160,7 @@ plane_center_y(const plane *pl)
 	return(pl->miny + pl->maxy)/2;
 }
 
-int
+short
 region_x(const region *r, const faction *f)
 {
 	plane *pl;
@@ -169,7 +169,7 @@ region_x(const region *r, const faction *f)
 	return r->x - ursprung_x(f, pl, r) - plane_center_x(pl);
 }
 
-int
+short
 region_y(const region *r, const faction *f)
 {
 	plane *pl;
@@ -179,14 +179,14 @@ region_y(const region *r, const faction *f)
 }
 
 void
-set_ursprung(faction *f, int id, int x, int y)
+set_ursprung(faction *f, int id, short x, short y)
 {
 	ursprung *ur;
 	assert(f!=NULL);
 	for(ur=f->ursprung;ur;ur=ur->next) {
-		if(ur->id == id) {
-			ur->x += x;
-			ur->y += y;
+		if (ur->id == id) {
+			ur->x = ur->x + x;
+			ur->y = ur->y + y;
 			return;
 		}
 	}
@@ -200,7 +200,7 @@ set_ursprung(faction *f, int id, int x, int y)
 }
 
 plane *
-create_new_plane(int id, const char *name, int minx, int maxx, int miny, int maxy, int flags)
+create_new_plane(int id, const char *name, short minx, short maxx, short miny, short maxy, int flags)
 {
 	plane *pl = getplanebyid(id);
 
@@ -221,8 +221,8 @@ create_new_plane(int id, const char *name, int minx, int maxx, int miny, int max
 }
 
 /* Umrechnung Relative-Absolute-Koordinaten */
-int
-rel_to_abs(const struct plane *pl, const struct faction * f, int rel, unsigned char index)
+short 
+rel_to_abs(const struct plane *pl, const struct faction * f, short rel, unsigned char index)
 {
 	assert(index == 0 || index == 1);
 
@@ -234,9 +234,9 @@ rel_to_abs(const struct plane *pl, const struct faction * f, int rel, unsigned c
 
 
 void *
-resolve_plane(void * id)
+resolve_plane(variant id)
 {
-   return getplanebyid((int)id);
+   return getplanebyid(id.i);
 }
 
 void
@@ -248,14 +248,14 @@ write_plane_reference(const plane * u, FILE * F)
 int
 read_plane_reference(plane ** pp, FILE * F)
 {
-	int i;
-	fscanf(F, "%d", &i);
-	if (i==0) {
+	variant id;
+	fscanf(F, "%d", &id.i);
+	if (id.i==0) {
 		*pp = NULL;
 		return AT_READ_FAIL;
 	}
-	*pp = getplanebyid(i);
-	if (*pp==NULL) ur_add((void*)i, (void**)pp, resolve_plane);
+	*pp = getplanebyid(id.i);
+	if (*pp==NULL) ur_add(id, (void**)pp, resolve_plane);
 	return AT_READ_OK;
 }
 

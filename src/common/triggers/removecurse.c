@@ -83,16 +83,16 @@ removecurse_read(trigger * t, FILE * F)
 {
 	removecurse_data * td = (removecurse_data*)t->data.v;
 	char zText[128];
-	int i;
+	variant var;
 
 	fscanf(F, "%s", zText);
-	i = atoi36(zText);
-	td->target = findunit(i);
-	if (td->target==NULL) ur_add((void*)i, (void**)&td->target, resolve_unit);
+	var.i = atoi36(zText);
+	td->target = findunit(var.i);
+	if (td->target==NULL) ur_add(var, (void**)&td->target, resolve_unit);
 
-	fscanf(F, "%d", &i);
-	td->curse = cfindhash(i);
-	if (td->curse==NULL) ur_add((void*)i, (void**)&td->curse, resolve_curse);
+	fscanf(F, "%d", &var.i);
+	td->curse = cfindhash(var.i);
+	if (td->curse==NULL) ur_add(var, (void**)&td->curse, resolve_curse);
 
 	return AT_READ_OK;
 }

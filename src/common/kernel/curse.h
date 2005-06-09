@@ -13,6 +13,9 @@
 
 #ifndef CURSE_H
 #define CURSE_H
+
+#include <util/variant.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -196,7 +199,7 @@ typedef struct curse {
 	double vigour;        /* Stärke der Verzauberung, Widerstand gegen Antimagie */
 	struct unit *magician;    /* Pointer auf den Magier, der den Spruch gewirkt hat */
 	variant effect;
-	void *data;        /* pointer auf spezielle curse-unterstructs*/
+	variant data;        /* pointer auf spezielle curse-unterstructs*/
 } curse;
 
 /* Die Unterattribute curse->data: */
@@ -244,7 +247,7 @@ extern int curse_read(struct attrib * a,FILE * f);
 */
 
 curse * create_curse(struct unit *magician, struct attrib**ap, const curse_type * ctype,
-		double vigour, int duration, int ceffect, int men);
+		double vigour, int duration, variant ceffect, int men);
 	/* Verzweigt automatisch zum passenden struct-typ. Sollte es schon
 	 * einen Zauber dieses Typs geben, so wird der neue dazuaddiert. Die
 	 * Zahl der verzauberten Personen sollte beim Aufruf der Funktion
@@ -282,8 +285,8 @@ void transfer_curse(struct unit * u, struct unit * u2, int n);
 	 * unterschiedlich gewünscht sein
 	 * */
 
-extern curse * get_cursex(attrib *ap, const curse_type * ctype, void * data, 
-						  boolean(*compare)(const curse *, const void *));
+extern curse * get_cursex(attrib *ap, const curse_type * ctype, variant data, 
+						  boolean(*compare)(const curse *, variant));
 	/* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
 	 * und für die compare() true liefert, oder einen NULL-pointer.
 	 * */
@@ -308,10 +311,11 @@ extern int curse_age(struct attrib * a);
 
 extern boolean cmp_curse(const attrib * a, const void * data);
 extern boolean cmp_cursetype(const attrib * a, const void * data);
-extern boolean cmp_curseeffect(const curse * c, const void * data);
-extern boolean cmp_cursedata(const curse * c, const void * data);
+extern boolean cmp_curseeffect_vptr(const curse * c, variant data);
+extern boolean cmp_curseeffect_int(const curse * c, variant data);
+extern boolean cmp_cursedata_int(const curse * c, variant data);
 
-extern void * resolve_curse(void * data);
+extern void * resolve_curse(variant data);
 extern boolean is_cursed_with(attrib *ap, curse *c);
 
 extern boolean curse_active(const curse * c);

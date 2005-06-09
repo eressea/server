@@ -645,8 +645,7 @@ abkz(const char *s, size_t max)
 	static char buf[32];
 	const char *p = s;
 	unsigned int c = 0;
-	int   bpt;
-	int   i;
+	size_t bpt, i;
 
 	max = min(max, 79);
 

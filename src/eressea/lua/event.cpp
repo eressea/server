@@ -25,19 +25,19 @@ event::get_type(int i) const
 struct unit * 
 event::get_unit(int i) const 
 {
-  return (struct unit *)args[i].data; 
+  return (struct unit *)args[i].data.v; 
 }
 
 const char * 
 event::get_string(int i) const 
 { 
-  return (const char*)args[i].data; 
+  return (const char*)args[i].data.v; 
 }
 
 int 
 event::get_int(int i) const 
 {
-  return (int)args[i].data; 
+  return args[i].data.i;
 }
 
 void

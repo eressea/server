@@ -414,7 +414,7 @@ get_island(region * root, region_list ** rlist)
 int
 autoseed(newfaction ** players, int nsize)
 {
-	int x = 0, y = 0;
+	short x = 0, y = 0;
 	region * r = NULL;
 	region_list * rlist = NULL;
 	int rsize, tsize = 0;
@@ -626,7 +626,7 @@ autoseed(newfaction ** players, int nsize)
       direction_t d;
       rbegin=&(*rbegin)->next;
       for (d=0;d!=MAXDIRECTIONS;++d) if (rconnect(r, d)==NULL) {
-        int i;
+        short i;
         for (i=1;i!=MAXFILLDIST;++i) {
           if (findregion(r->x + i*delta_x[d], r->y + i*delta_y[d]))
             break;

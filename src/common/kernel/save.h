@@ -69,7 +69,7 @@ extern void writeunit(FILE * stream, const struct unit * u);
 extern struct unit * readunit(FILE * stream);
 
 extern void writeregion(FILE * stream, const struct region * r);
-extern struct region * readregion(FILE * stream, int x, int y);
+extern struct region * readregion(FILE * stream, short x, short y);
 
 extern void writefaction(FILE * stream, const struct faction * f);
 extern struct faction * readfaction(FILE * stream);

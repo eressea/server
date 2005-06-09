@@ -31,7 +31,7 @@ extern void gmcommands(void);
 /* execute commands */
 
 extern struct faction * gm_addfaction(const char * email, struct plane * p, struct region * r);
-extern struct plane * gm_addplane(int radius, unsigned int flags, const char * name);
+extern struct plane * gm_addplane(short radius, unsigned int flags, const char * name);
 
 /*
  * doesn't belong in here:

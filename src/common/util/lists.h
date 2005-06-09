@@ -48,7 +48,7 @@ void removelist(void *l, void *p);
 #define removelist(l,p) { choplist(l, p); free(p); }
 #endif
 
-size_t listlen(void *l);
+unsigned int listlen(void *l);
 void invert_list(void * heap);
 #define addlist2(l, p)       (*l = p, l = &p->next)
 

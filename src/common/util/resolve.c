@@ -23,13 +23,14 @@
 #include <assert.h>
 #include <stdlib.h>
 #include "resolve.h"
+#include "variant.h"
 
 typedef struct unresolved {
 	struct unresolved * next;
 	void ** ptrptr;
 		/* pointer to the location where the unresolved object
 		 * should be, or NULL if special handling is required */
-	void * data;
+	variant data;
 		/* information on how to resolve the missing object */
 	resolve_fun resolve;
 		/* function to resolve the unknown object */
@@ -38,7 +39,7 @@ typedef struct unresolved {
 unresolved * ur_list;
 
 void
-ur_add(void * data, void ** ptrptr, resolve_fun fun) {
+ur_add(variant data, void ** ptrptr, resolve_fun fun) {
    unresolved * ur = malloc(sizeof(unresolved));
    ur->data = data;
    ur->resolve = fun;

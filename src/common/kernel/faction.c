@@ -26,6 +26,7 @@
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/goodies.h>
+#include <util/variant.h>
 
 #include <attributes/otherfaction.h>
 
@@ -70,8 +71,8 @@ factionname(const faction * f)
 }
 
 void *
-resolve_faction(void * id) {
-   return findfaction((int)id);
+resolve_faction(variant id) {
+   return findfaction(id.i);
 }
 
 #define MAX_FACTION_ID (36*36*36*36)

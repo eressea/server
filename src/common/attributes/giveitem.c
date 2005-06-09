@@ -53,16 +53,17 @@ static int
 a_readgive(attrib * a, FILE * F)
 {
 	give_data * gdata = (give_data*)a->data.v;
-	int i;
+	variant var;
 	char zText[32];
 
 	if (global.data_version<ITEMTYPE_VERSION) return a_readdefault(a, F);
 
 	fscanf(F, "%s ", zText);
-	i = atoi36(zText);
-	gdata->building = findbuilding(i);
-	if (gdata->building==NULL) ur_add((void*)i, (void**)&gdata->building, resolve_building);
+	var.i = atoi36(zText);
+	gdata->building = findbuilding(var.i);
+	if (gdata->building==NULL) ur_add(var, (void**)&gdata->building, resolve_building);
 	for (;;) {
+    int i;
 		fscanf(F, "%s", zText);
 		if (!strcmp("end", zText)) break;
 		fscanf(F, "%d", &i);

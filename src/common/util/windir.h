@@ -33,7 +33,7 @@ typedef struct dirent {
 	char d_drive[_MAX_DRIVE];
 	char d_dir[_MAX_DIR];
 	char d_ext[_MAX_EXT];
-	long hnd;
+	intptr_t hnd;
 } dirent;
 
 DIR *opendir(const char *name);

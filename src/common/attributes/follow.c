@@ -20,6 +20,7 @@
 
 #include <attrib.h>
 #include <resolve.h>
+#include <variant.h>
 
 static int
 verify_follow(attrib * a)
@@ -34,9 +35,9 @@ static int
 read_follow(attrib * a, FILE * F)
 {
 	if (global.data_version < BASE36IDS_VERSION) {
-		int i;
-		fscanf(F, "%d", &i);
-		ur_add((void*)i, (void**)&a->data.v, resolve_unit);
+		variant var;
+		fscanf(F, "%d", &var.i);
+		ur_add(var, (void**)&a->data.v, resolve_unit);
 	} else {
 		return read_unit_reference(NULL, F);
 	}

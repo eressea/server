@@ -869,7 +869,9 @@ use_antimagiccrystal(region * r, unit * mage, int amount, struct order * ord)
 		}
 
 		if(force > 0) {
-			create_curse(mage, &r->attribs, ct_find("antimagiczone"), force, duration, effect, 0);
+      variant var ;
+      var.i = effect;
+			create_curse(mage, &r->attribs, ct_find("antimagiczone"), force, duration, var, 0);
 		}
 
 	}
@@ -887,14 +889,17 @@ use_tacticcrystal(region * r, unit * u, int amount, struct order * ord)
 {
 	int i;
 	for (i=0;i!=amount;++i) {
-		int effect = rand()%6 - 1;
 		int duration = 1; /* wirkt nur eine Runde */
 		int power = 5; /* Widerstand gegen Antimagiesprüche, ist in diesem
 											Fall egal, da der curse für den Kampf gelten soll,
 											der vor den Antimagiezaubern passiert */
-		curse * c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
+		curse * c;
+    variant effect;
+
+    effect.i = rand()%6 - 1;
+    c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
 			duration, effect, u->number);
-		c->data = (void*)SK_TACTICS;
+		c->data.i = SK_TACTICS;
 		unused(ord);
 	}
 	use_pooled(u, u->region, R_TACTICCRYSTAL, amount);
@@ -2261,11 +2266,11 @@ const resource_type *
 findresourcetype(const char * name, const struct locale * lang)
 {
 	local_names * rn = rnames;
-	void * i;
+  variant token;
 
 	while (rn) {
 		if (rn->lang==lang) break;
-		rn=rn->next;
+		rn = rn->next;
 	}
 	if (!rn) {
 		const resource_type * rtl = resourcetypes;
@@ -2273,15 +2278,16 @@ findresourcetype(const char * name, const struct locale * lang)
 		rn->next = rnames;
 		rn->lang = lang;
 		while (rtl) {
-			addtoken(&rn->names, locale_string(lang, rtl->_name[0]), (void*)rtl);
-			addtoken(&rn->names, locale_string(lang, rtl->_name[1]), (void*)rtl);
+      token.v = (void*)rtl;
+			addtoken(&rn->names, locale_string(lang, rtl->_name[0]), token);
+			addtoken(&rn->names, locale_string(lang, rtl->_name[1]), token);
 			rtl=rtl->next;
 		}
 		rnames = rn;
 	}
 
-	if (findtoken(&rn->names, name, &i)==E_TOK_NOMATCH) return NULL;
-	return (const resource_type*)i;
+	if (findtoken(&rn->names, name, &token)==E_TOK_NOMATCH) return NULL;
+	return (const resource_type*)token.v;
 }
 
 attrib_type at_showitem = {
@@ -2315,11 +2321,12 @@ init_itemnames(void)
       for (key=0;key!=IMAXHASH;++key) {
         const item_type * itl;
         for (itl=itemtypes[key];itl;itl=itl->next) {
-          void * result = NULL;
+          variant var;
           const char * iname = locale_string(lang, itl->rtype->_name[0]);
-          if (findtoken(&in->names, iname, &result)==E_TOK_NOMATCH || result!=itl) {
-            addtoken(&in->names, iname, (void*)itl);
-            addtoken(&in->names, locale_string(lang, itl->rtype->_name[1]), (void*)itl);
+          if (findtoken(&in->names, iname, &var)==E_TOK_NOMATCH || var.v!=itl) {
+            var.v = (void*)itl;
+            addtoken(&in->names, iname, var);
+            addtoken(&in->names, locale_string(lang, itl->rtype->_name[1]), var);
           }
         }
       }
@@ -2332,7 +2339,7 @@ const item_type *
 finditemtype(const char * name, const struct locale * lang)
 {
   local_names * in = inames;
-  void * i;
+  variant var;
 
   while (in!=NULL) {
     if (in->lang==lang) break;
@@ -2342,8 +2349,8 @@ finditemtype(const char * name, const struct locale * lang)
     init_itemnames();
     for (in=inames;in->lang!=lang;in=in->next) ;
   }
-  if (findtoken(&in->names, name, &i)==E_TOK_NOMATCH) return NULL;
-  return (const item_type*)i;
+  if (findtoken(&in->names, name, &var)==E_TOK_NOMATCH) return NULL;
+  return (const item_type*)var.v;
 }
 
 static void

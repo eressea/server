@@ -11,22 +11,33 @@
 */
 #ifndef UTIL_MESSAGE_H
 #define UTIL_MESSAGE_H
+
+#include "variant.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct locale;
 
+typedef struct arg_type {
+  struct arg_type * next;
+  variant_type vtype;
+  const char * name;
+  void  (*release)(variant);
+  variant (*copy)(variant);
+} arg_type;
+
 typedef struct message_type {
 	const char * name;
 	int nparameters;
 	const char ** pnames;
-	const char ** types;
+	const struct arg_type ** types;
 } message_type;
 
 typedef struct message {
 	const struct message_type * type;
-	void ** parameters;
+	variant * parameters;
 	int refcount;
 } message;
 
@@ -35,8 +46,7 @@ extern struct message_type * mt_new_va(const char * name, ...);
 	/* mt_new("simple_sentence", "subject:string", "predicate:string", 
     *        "object:string", "lang:locale", NULL); */
 
-extern struct message * msg_create(const struct message_type * type, void * args[]);
-extern struct message * msg_create_va(const struct message_type * type, ...);
+extern struct message * msg_create(const struct message_type * type, variant args[]);
 	/* msg_create(&mt_simplesentence, "enno", "eats", "chocolate", &locale_de); 
 	 * parameters must be in the same order as they were for mt_new! */
 
@@ -49,7 +59,8 @@ extern const char * mt_name(const struct message_type* mtype);
 extern const struct message_type * mt_register(const struct message_type *);
 extern const struct message_type * mt_find(const char *);
 
-extern void register_argtype(const char * name, void(*free_arg)(void*), void*(*copy_arg)(void*));
+extern void register_argtype(const char * name, void(*free_arg)(variant), variant (*copy_arg)(variant), variant_type);
+extern const struct arg_type * find_argtype(const char * name);
 
 #ifdef __cplusplus
 }

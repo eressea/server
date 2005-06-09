@@ -176,8 +176,8 @@ gm_gate(const tnode * tnext, const char * str, void * data, struct order * ord)
   unit * u = (unit*)data;
   const struct plane * p = rplane(u->region);
   int id = atoi36(igetstrtoken(str));
-	int x = rel_to_abs(p, u->faction, atoi(getstrtoken()), 0);
-	int y = rel_to_abs(p, u->faction, atoi(getstrtoken()), 1);
+	short x = rel_to_abs(p, u->faction, (short)atoi(getstrtoken()), 0);
+	short y = rel_to_abs(p, u->faction, (short)atoi(getstrtoken()), 1);
 	region * r = findregion(x, y);
 	building * b = findbuilding(id);
 	if (b==NULL || r==NULL || p!=rplane(b->region) || p!=rplane(r)) {
@@ -208,8 +208,8 @@ gm_terraform(const tnode * tnext, const char * str, void * data, struct order * 
 {
   unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
-	int x = rel_to_abs(p, u->faction, atoi(igetstrtoken(str)), 0);
-	int y = rel_to_abs(p, u->faction, atoi(getstrtoken()), 1);
+	short x = rel_to_abs(p, u->faction, (short)atoi(igetstrtoken(str)), 0);
+	short y = rel_to_abs(p, u->faction, (short)atoi(getstrtoken()), 1);
 	const char * c = getstrtoken();
 	region * r = findregion(x, y);
 	terrain_t t;
@@ -237,8 +237,8 @@ gm_teleport(const tnode * tnext, const char * str, void * data, struct order * o
   unit * u = (unit*)data;
 	const struct plane * p = rplane(u->region);
 	unit * to = findunit(atoi36(igetstrtoken(str)));
-	int x = rel_to_abs(p, u->faction, atoi(getstrtoken()), 0);
-	int y = rel_to_abs(p, u->faction, atoi(getstrtoken()), 1);
+	short x = rel_to_abs(p, u->faction, (short)atoi(getstrtoken()), 0);
+	short y = rel_to_abs(p, u->faction, (short)atoi(getstrtoken()), 1);
 	region * r = findregion(x, y);
 
 	if (r==NULL || p!=rplane(r)) {
@@ -331,8 +331,8 @@ gm_messageregion(const tnode * tnext, const char * str, void * data, struct orde
 {
   unit * u = (unit*)data;
   const struct plane * p = rplane(u->region);
-  int x = rel_to_abs(p, u->faction, atoi(igetstrtoken(str)), 0);
-	int y = rel_to_abs(p, u->faction, atoi(getstrtoken()), 1);
+  short x = rel_to_abs(p, u->faction, (short)atoi(igetstrtoken(str)), 0);
+	short y = rel_to_abs(p, u->faction, (short)atoi(getstrtoken()), 1);
 	const char * msg = getstrtoken();
 	region * r = findregion(x, y);
 
@@ -403,10 +403,9 @@ gm_killfaction(const tnode * tnext, const char * str, void * data, struct order 
 			unit * target;
 			for (target=r->units;target;target=target->next) {
 				if (target->faction==f) {
-					char * zmsg = (char*)gc_add(strdup(msg));
 					scale_number(target, 0);
 					ADDMSG(&target->faction->msgs, msg_message("killedbygm", 
-						"region unit string", r, target, zmsg));
+						"region unit string", r, target, msg));
 					return;
 				}
 			}
@@ -609,7 +608,7 @@ gmcommands(void)
 #define EXTENSION 10000
 
 faction *
-gm_addquest(const char * email, const char * name, int radius, unsigned int flags)
+gm_addquest(const char * email, const char * name, short radius, unsigned int flags)
 {
 	plane * p;
 	attrib * a;
@@ -617,8 +616,9 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	watcher * w = calloc(sizeof(watcher), 1);
 	region * center;
 	boolean invalid = false;
-	int minx, miny, maxx, maxy, cx, cy;
-	int x, y, i;
+	short minx, miny, maxx, maxy, cx, cy;
+	short x;
+  int i;
 	faction * f = calloc(1, sizeof(faction));
 
 	/* GM faction */
@@ -651,9 +651,10 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 
 	/* GM playfield */
 	do {
-		minx = (rand() % (2*EXTENSION)) - EXTENSION;
-		miny = (rand() % (2*EXTENSION)) - EXTENSION;
+		minx = (short)((rand() % (2*EXTENSION)) - EXTENSION);
+		miny = (short)((rand() % (2*EXTENSION)) - EXTENSION);
 		for (x=0;!invalid && x<=radius*2;++x) {
+      short y;
 			for (y=0;!invalid && y<=radius*2;++y) {
 				region * r = findregion(minx+x, miny+y);
 				if (r) invalid = true;
@@ -665,7 +666,7 @@ gm_addquest(const char * email, const char * name, int radius, unsigned int flag
 	p = create_new_plane(rand(), name, minx, maxx, miny, maxy, flags);
 	center = new_region(cx, cy);
 	for (x=0;x<=2*radius;++x) {
-		int y;
+		short y;
 		for (y=0;y<=2*radius;++y) {
 			region * r = findregion(minx+x, miny+y);
 			if (!r) r = new_region(minx+x, miny+y);
@@ -783,19 +784,20 @@ gm_addfaction(const char * email, plane * p, region * r)
 }
 
 plane *
-gm_addplane(int radius, unsigned int flags, const char * name)
+gm_addplane(short radius, unsigned int flags, const char * name)
 {
 	region * center;
 	plane * p;
 	boolean invalid = false;
-	int minx, miny, maxx, maxy, cx, cy;
-	int x, y;
+	short minx, miny, maxx, maxy, cx, cy;
+	short x;
 
 	/* GM playfield */
 	do {
-		minx = (rand() % (2*EXTENSION)) - EXTENSION;
-		miny = (rand() % (2*EXTENSION)) - EXTENSION;
+		minx = (short)(rand() % (2*EXTENSION)) - EXTENSION;
+		miny = (short)(rand() % (2*EXTENSION)) - EXTENSION;
 		for (x=0;!invalid && x<=radius*2;++x) {
+      short y;
 			for (y=0;!invalid && y<=radius*2;++y) {
 				region * r = findregion(minx+x, miny+y);
 				if (r) invalid = true;
@@ -807,7 +809,7 @@ gm_addplane(int radius, unsigned int flags, const char * name)
 	p = create_new_plane(rand(), name, minx, maxx, miny, maxy, flags);
 	center = new_region(cx, cy);
 	for (x=0;x<=2*radius;++x) {
-		int y;
+		short y;
 		for (y=0;y<=2*radius;++y) {
 			region * r = findregion(minx+x, miny+y);
 			if (!r) r = new_region(minx+x, miny+y);

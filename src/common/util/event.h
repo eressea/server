@@ -45,8 +45,8 @@ typedef struct trigger {
 } trigger;
 
 typedef struct event_arg {
-  char * type;
-  void * data;
+  const char * type;
+  variant data;
 } event_arg;
 
 extern trigger * t_new(trigger_type * ttype);
@@ -60,7 +60,6 @@ extern void remove_triggers(struct attrib ** ap, const char * eventname, const t
 extern struct trigger ** get_triggers(struct attrib * ap, const char * eventname);
 /* calls handle() for each of these. e.g. used in timeout */
 extern void handle_event(struct attrib ** attribs, const char * eventname, void * data);
-extern void handle_event_va(struct attrib ** attribs, const char * eventname, const char * format, ...);
 
 /* functions for making complex triggers: */
 extern void free_triggers(trigger * triggers); /* release all these triggers */

@@ -43,8 +43,8 @@
 #define TP_RADIUS 2
 #define TP_DISTANCE 4
 
-static int
-real2tp(int rk) {
+static short
+real2tp(short rk) {
   /* in C:
   * -4 / 5 = 0;
   * +4 / 5 = 0;
@@ -64,7 +64,7 @@ region_list *
 astralregions(const region * r, boolean (*valid)(const region *))
 {
   region_list * rlist = NULL;
-  int x, y;
+  short x, y;
 
   assert(rplane(r) == get_astralplane());
   if (rplane(r) != get_astralplane()) {
@@ -103,7 +103,7 @@ r_standard_to_astral(const region *r)
 region *
 r_astral_to_standard(const region *r)
 {
-  int x, y;
+  short x, y;
   region *r2;
 
   assert(rplane(r) == get_astralplane());
@@ -117,9 +117,9 @@ r_astral_to_standard(const region *r)
 }
 
 region_list *
-all_in_range(const region *r, int n, boolean (*valid)(const region *))
+all_in_range(const region *r, short n, boolean (*valid)(const region *))
 {
-  int x,y;
+  short x, y;
   region_list *rlist = NULL;
 
   if (r == NULL) return NULL;
@@ -127,7 +127,7 @@ all_in_range(const region *r, int n, boolean (*valid)(const region *))
   for (x = r->x-n; x <= r->x+n; x++) {
     for (y = r->y-n; y <= r->y+n; y++) {
       if (koor_distance(r->x, r->y, x, y) <= n) {
-        region * r2 = findregion(x,y);
+        region * r2 = findregion(x, y);
         if (r2!=NULL && (valid==NULL || valid(r2))) add_regionlist(&rlist, r2);
       }
     }
@@ -199,8 +199,8 @@ create_teleport_plane(void)
   for (r=regions;r;r=r->next) if (r->planep == NULL) {
     region *ra = tpregion(r);
     if (ra==NULL) {
-      int x = TE_CENTER_X+real2tp(r->x);
-      int y = TE_CENTER_Y+real2tp(r->y);
+      short x = TE_CENTER_X+real2tp(r->x);
+      short y = TE_CENTER_Y+real2tp(r->y);
       plane * pl = findplane(x, y);
 
       if (pl==aplane) {

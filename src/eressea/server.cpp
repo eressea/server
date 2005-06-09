@@ -354,7 +354,7 @@ update_subscriptions(void)
 int
 process_orders()
 {
-  if (turn == 0) srand(time((time_t *) NULL));
+  if (turn == 0) srand((int)time(0));
   else srand(turn);
 
 #ifdef SHORTPWDS

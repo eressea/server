@@ -50,12 +50,12 @@ extern int dice_rand(const char *s);
 
 static int g_maxluxuries = 0;
 
-const int delta_x[MAXDIRECTIONS] =
+const short delta_x[MAXDIRECTIONS] =
 {
   -1, 0, 1, 1, 0, -1
 };
 
-const int delta_y[MAXDIRECTIONS] =
+const short delta_y[MAXDIRECTIONS] =
 {
   1, 1, 0, -1, -1, 0
 };
@@ -193,7 +193,7 @@ int
 a_readdirection(attrib *a, FILE *f)
 {
 	spec_direction *d = (spec_direction *)(a->data.v);
-	fscanf(f, "%d %d %d", &d->x, &d->y, &d->duration);
+	fscanf(f, "%hd %hd %d", &d->x, &d->y, &d->duration);
 	fscanf(f, "%s ", buf);
 	d->desc = strdup(cstring(buf));
 	fscanf(f, "%s ", buf);
@@ -279,10 +279,10 @@ attrib_type at_moveblock = {
 region *regionhash[RMAXHASH];
 
 static region *
-rfindhash(int x, int y)
+rfindhash(short x, short y)
 {
 	region *old;
-	for (old = regionhash[abs(x + 0x100 * y) % RMAXHASH]; old; old = old->nexthash)
+	for (old = regionhash[coor_hashkey(x, y) % RMAXHASH]; old; old = old->nexthash)
 		if (old->x == x && old->y == y)
 			return old;
 	return 0;
@@ -291,8 +291,9 @@ rfindhash(int x, int y)
 void
 rhash(region * r)
 {
-	region *old = regionhash[region_hashkey(r) % RMAXHASH];
-	regionhash[region_hashkey(r) % RMAXHASH] = r;
+  int key = coor_hashkey(r->x, r->y) % RMAXHASH;
+	region *old = regionhash[key];
+	regionhash[key] = r;
 	r->nexthash = old;
 }
 
@@ -300,7 +301,7 @@ void
 runhash(region * r)
 {
 	region **show;
-	for (show = &regionhash[abs(r->x + 0x100 * r->y) % RMAXHASH]; *show; show = &(*show)->nexthash) {
+	for (show = &regionhash[coor_hashkey(r->x, r->y) % RMAXHASH]; *show; show = &(*show)->nexthash) {
 		if ((*show)->x == r->x && (*show)->y == r->y)
 			break;
 	}
@@ -339,7 +340,7 @@ r_connect(const region * r, direction_t dir)
 }
 
 region *
-findregion(int x, int y)
+findregion(short x, short y)
 {
 	return rfindhash(x, y);
 }
@@ -553,7 +554,7 @@ rlaen(const region * r)
 /*   at_road   */
 /***************/
 attrib_type at_road = {
-	"road",
+	"road", 
 	DEFAULT_INIT,
 	DEFAULT_FINALIZE,
 	DEFAULT_AGE,
@@ -576,12 +577,12 @@ rsetroad(region * r, direction_t d, int val)
 	b = get_borders(r, r2);
 	while (b && b->type!=&bt_road) b = b->next;
 	if (!b) b = new_border(&bt_road, r, r2);
-	rval = (int)b->data;
+	rval = b->data.i;
 	if (b->from==r)
 		rval = (rval & 0xFFFF) | (val<<16);
 	else
 		rval = (rval & 0xFFFF0000) | val;
-	b->data = (void*)rval;
+	b->data.i = rval;
 }
 
 int
@@ -595,7 +596,7 @@ rroad(const region * r, direction_t d)
 	b = get_borders(r, r2);
 	while (b && b->type!=&bt_road) b = b->next;
 	if (!b) return 0;
-	rval = (int)b->data;
+	rval = b->data.i;
 	if (b->to==r)
 		rval = (rval & 0xFFFF);
 	else
@@ -754,7 +755,7 @@ static region *last;
 static unsigned int max_index = 0;
 #endif
 region *
-new_region(int x, int y)
+new_region(short x, short y)
 {
 	region *r = rfindhash(x, y);
 
@@ -827,7 +828,7 @@ static char *
 makename(void)
 {
 	int s, v, k, e, p = 0, x = 0;
-	int nk, ne, nv, ns;
+	size_t nk, ne, nv, ns;
 	static char name[16];
 	const char *kons = "bcdfghklmnprstvwz",
 		*end = "nlrdst",
@@ -841,19 +842,19 @@ makename(void)
 
 	for (s = rand() % 3 + 2; s > 0; s--) {
 		if (x > 0) {
-			k = rand() % nk;
+			k = rand() % (int)nk;
 			name[p] = kons[k];
 			p++;
 		} else {
-			k = rand() % ns;
+			k = rand() % (int)ns;
 			name[p] = start[k];
 			p++;
 		}
-		v = rand() % nv;
+		v = rand() % (int)nv;
 		name[p] = vokal[v];
 		p++;
 		if (rand() % 3 == 2 || s == 1) {
-			e = rand() % ne;
+			e = rand() % (int)ne;
 			name[p] = end[e];
 			p++;
 			x = 1;
@@ -1112,14 +1113,17 @@ production(const region *r)
 int
 read_region_reference(region ** r, FILE * F)
 {
-	int x[2];
-	fscanf(F, "%d %d", &x[0], &x[1]);
-	if (x[0]==INT_MAX) {
+	variant coor;
+	fscanf(F, "%hd %hd", &coor.sa[0], &coor.sa[1]);
+	if (coor.sa[0]==SHRT_MAX) {
 		*r = NULL;
 		return AT_READ_FAIL;
 	}
-	*r = findregion(x[0], x[1]);
-	if (*r==NULL) ur_add(memcpy(malloc(sizeof(x)), x, sizeof(x)), (void**)r, resolve_region);
+	*r = findregion(coor.sa[0], coor.sa[1]);
+
+  if (*r==NULL) {
+    ur_add(coor, (void**)r, resolve_region);
+  }
 	return AT_READ_OK;
 }
 
@@ -1127,15 +1131,12 @@ void
 write_region_reference(const region * r, FILE * F)
 {
 	if (r) fprintf(F, "%d %d ", r->x, r->y);
-	else fprintf(F, "%d %d ", INT_MAX, INT_MAX);
+	else fprintf(F, "%d %d ", SHRT_MAX, SHRT_MAX);
 }
 
 void *
-resolve_region(void * id) {
-	int * c = (int*)id;
-	int x = c[0], y = c[1];
-	free(c);
-	return findregion(x, y);
+resolve_region(variant id) {
+	return findregion(id.sa[0], id.sa[1]);
 }
 
 

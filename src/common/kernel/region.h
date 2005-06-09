@@ -88,7 +88,7 @@ typedef struct region {
   struct unit *units;
   struct ship *ships;
   struct building *buildings;
-  int x, y;
+  short x, y;
   struct plane *planep;
   char *display;
   unsigned int flags;
@@ -123,8 +123,7 @@ extern struct message_list * r_getmessages(const struct region * r, const struct
 extern struct message * r_addmessage(struct region * r, const struct faction * viewer, struct message * msg);
 
 typedef struct spec_direction {
-  int  x;
-  int  y;
+  short x, y;
   int  duration;
   boolean active;
   char *desc;
@@ -135,11 +134,18 @@ typedef struct {
   direction_t dir;
 } moveblock;
 
-#define region_hashkey(r) (abs((r)->x + 0x100 * (r)->y))
+#ifdef ENUM_REGIONS
+# define reg_hashkey(r) (r->index)
+# define coor_hashkey(x, y) (abs(x + 0x100 * y))
+#else
+# define reg_hashkey(r) (abs((r)->x + 0x100 * (r)->y))
+# define coor_hashkey(x, y) (abs(x + 0x100 * y))
+#endif
+
 int distance(const struct region*, const struct region*);
 int koor_distance(int ax, int ay, int bx, int by) ;
 extern direction_t reldirection(const struct region * from, const struct region * to);
-extern struct region * findregion(int x, int y);
+extern struct region * findregion(short x, short y);
 
 extern attrib_type at_direction;
 extern attrib_type at_moveblock;
@@ -227,12 +233,12 @@ extern void r_setdemand(struct region * r, const struct luxury_type * ltype, int
 extern int r_demand(const struct region * r, const struct luxury_type * ltype);
 
 extern const char * regionname(const struct region * r, const struct faction * f);
-extern void * resolve_region(void * data);
-extern struct region * new_region(int x, int y);
+extern void * resolve_region(variant data);
+extern struct region * new_region(short x, short y);
 extern void terraform(struct region * r, terrain_t terrain);
 
-extern const int delta_x[MAXDIRECTIONS];
-extern const int delta_y[MAXDIRECTIONS];
+extern const short delta_x[MAXDIRECTIONS];
+extern const short delta_y[MAXDIRECTIONS];
 extern direction_t dir_invert(direction_t dir);
 extern int production(const struct region *r);
 extern int read_region_reference(struct region ** r, FILE * F);

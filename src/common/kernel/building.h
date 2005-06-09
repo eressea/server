@@ -13,6 +13,8 @@
 
 #ifndef H_KRNL_BUILDING
 #define H_KRNL_BUILDING
+
+#include <util/variant.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -130,7 +132,7 @@ extern struct building_type * bt_make(const char * name, int flags, int capacity
 #include "build.h"
 #define NOBUILDING NULL
 
-extern void * resolve_building(void * data);
+extern void * resolve_building(variant data);
 extern void write_building_reference(const struct building * b, FILE * F);
 extern int read_building_reference(struct building ** b, FILE * F);
 

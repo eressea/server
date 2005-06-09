@@ -87,6 +87,7 @@
 				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="1"
 				CompileAs="0"/>
 			<Tool
@@ -351,9 +352,6 @@
 		</File>
 		<File
 			RelativePath=".\names.c">
-		</File>
-		<File
-			RelativePath=".\objtypes.c">
 		</File>
 		<File
 			RelativePath=".\order.c">

@@ -535,7 +535,7 @@ unitorders(FILE * F, struct faction * f)
     u->botschaften = NULL;	/* Sicherheitshalber */
 
   } else {
-    /* cmistake(?, gc_add(strdup(buf)), 160, MSG_EVENT); */
+    /* cmistake(?, buf, 160, MSG_EVENT); */
     return NULL;
   }
   return u;
@@ -995,20 +995,20 @@ lastturn(void)
 int
 read_faction_reference(faction ** f, FILE * F)
 {
-	int id;
+	variant id;
 	if (global.data_version >= BASE36IDS_VERSION) {
 		char zText[10];
 		fscanf(F, "%s ", zText);
-		id = atoi36(zText);
+		id.i = atoi36(zText);
 	} else {
-		fscanf(F, "%d ", &id);
+		fscanf(F, "%d ", &id.i);
 	}
-	if (id<0) {
+	if (id.i<0) {
 		*f = NULL;
 		return AT_READ_FAIL;
 	}
-	*f = findfaction(id);
-	if (*f==NULL) ur_add((void*)id, (void**)f, resolve_faction);
+	*f = findfaction(id.i);
+	if (*f==NULL) ur_add(id, (void**)f, resolve_faction);
 	return AT_READ_OK;
 }
 
@@ -1288,7 +1288,7 @@ writeunit(FILE * F, const unit * u)
 }
 
 region *
-readregion(FILE * F, int x, int y)
+readregion(FILE * F, short x, short y)
 {
 	region * r = findregion(x, y);
 	int ter;
@@ -1524,6 +1524,7 @@ addally(const faction * f, ally ** sfp, int aid, int state)
 {
   struct faction * af = findfaction(aid);
   ally * sf;
+
   state &= ~HELP_OBSERVE;
 #ifndef REGIONOWNERS
   state &= ~HELP_TRAVEL;
@@ -1533,7 +1534,11 @@ addally(const faction * f, ally ** sfp, int aid, int state)
 
   sf = calloc(1, sizeof(ally));
   sf->faction = af;
-  if (!sf->faction) ur_add((void*)aid, (void**)&sf->faction, resolve_faction);
+  if (!sf->faction) {
+    variant id;
+    id.i = aid;
+    ur_add(id, (void**)&sf->faction, resolve_faction);
+  }
   sf->status = state & HELP_ALL;
 
   while (*sfp) sfp=&(*sfp)->next;
@@ -1640,8 +1645,8 @@ readfaction(FILE * F)
   planes = ri(F);
   while(--planes >= 0) {
     int id = ri(F);
-    int ux = ri(F);
-    int uy = ri(F);
+    short ux = (short)ri(F);
+    short uy = (short)ri(F);
     set_ursprung(f, id, ux, uy);
   }
   f->newbies = 0;
@@ -1822,20 +1827,21 @@ readgame(const char * filename, int backup)
     plane *pl = calloc(1, sizeof(plane));
     pl->id = ri(F);
     rds(F, &pl->name);
-    pl->minx = ri(F);
-    pl->maxx = ri(F);
-    pl->miny = ri(F);
-    pl->maxy = ri(F);
+    pl->minx = (short)ri(F);
+    pl->maxx = (short)ri(F);
+    pl->miny = (short)ri(F);
+    pl->maxy = (short)ri(F);
     pl->flags = ri(F);
     if (global.data_version>WATCHERS_VERSION) {
       rs(F, buf);
       while (strcmp(buf, "end")!=0) {
         watcher * w = calloc(sizeof(watcher),1);
-        int fno = atoi36(buf);
+        variant fno;
+        fno.i = atoi36(buf);
         w->mode = (unsigned char)ri(F);
         w->next = pl->watchers;
         pl->watchers = w;
-        ur_add((void*)fno, (void**)&w->faction, resolve_faction);
+        ur_add(fno, (void**)&w->faction, resolve_faction);
         rs(F, buf);
       }
     }
@@ -1881,8 +1887,8 @@ readgame(const char * filename, int backup)
   while (--n >= 0) {
     unit **up;
     boolean skip = false;
-    int x = ri(F);
-    int y = ri(F);
+    short x = (short)ri(F);
+    short y = (short)ri(F);
     plane * pl = findplane(x, y);
 
     if (firstx || firsty) {
@@ -2004,7 +2010,6 @@ readgame(const char * filename, int backup)
   /* Unaufgeloeste Zeiger initialisieren */
   printf("\n - Referenzen initialisieren...\n");
   resolve();
-  resolve_IDs();
 
   printf("\n - Leere Gruppen löschen...\n");
   for (f=factions; f; f=f->next) {
@@ -2018,7 +2023,6 @@ readgame(const char * filename, int backup)
         gp = &g->next;
     }
   }
-  resolve_IDs();
 
   for (r=regions;r;r=r->next) {
     building * b;

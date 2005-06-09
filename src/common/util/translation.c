@@ -27,14 +27,14 @@
 
 typedef struct opstack {
 	struct opstack * next;
-	void * data;
+	variant data;
 } opstack;
 
-void * 
+variant
 opstack_pop(opstack ** stack)
 {
 	opstack * os;
-	void * data;
+	variant data;
 
 	assert(stack);
 	os = *stack;
@@ -46,7 +46,7 @@ opstack_pop(opstack ** stack)
 }
 
 void
-opstack_push(opstack ** stack, void * data)
+opstack_push(opstack ** stack, variant data)
 {
 	opstack * os = (opstack*)malloc(sizeof(opstack));
 	os->next = *stack;
@@ -107,7 +107,7 @@ brelease(void)
 typedef struct variable {
 	struct variable * next;
 	const char * symbol;
-	const void * value;
+	variant value;
 } variable;
 
 static variable * variables;
@@ -119,7 +119,7 @@ free_variables(void)
 }
 
 static void
-add_variable(const char * symbol, const void * value)
+add_variable(const char * symbol, variant value)
 {
 	variable * var = (variable*)balloc(sizeof(variable));
 
@@ -241,6 +241,7 @@ parse_string(opstack ** stack, const char* in, const void * userdata) /* (char*)
 	/* mode flags */
 	boolean f_escape = false;
 	boolean bDone = false;
+  variant var;
 
 	while (*ic && !bDone) {
 		if (f_escape) {
@@ -269,7 +270,7 @@ parse_string(opstack ** stack, const char* in, const void * userdata) /* (char*)
 			case '$':
 				ic = parse_symbol(stack, ++ic, userdata);
 				if (ic==NULL) return NULL;
-				c = opop(stack, char*);
+				c = (char*)opop_v(stack);
 				oc += strlen(strcpy(oc, c));
 				bfree(c);
 				break;
@@ -280,7 +281,8 @@ parse_string(opstack ** stack, const char* in, const void * userdata) /* (char*)
 	}
 	*oc++ = '\0';
 	bfree(oc);
-	opush(stack, buffer);
+  var.v = buffer;
+	opush(stack, var);
 	return ic;
 }
 
@@ -290,6 +292,7 @@ parse_int(opstack ** stack, const char * in)
 	int k = 0;
 	int vz = 1;
 	boolean ok = false;
+  variant var;
 	do {
 		switch (*in) {
 		case '+':
@@ -306,7 +309,8 @@ parse_int(opstack ** stack, const char * in)
 	while (isdigit(*in)) {
 		k = k * 10 + (*in++)-'0';
 	}
-	opush(stack, k*vz);
+  var.i = k*vz;
+	opush(stack, var);
 	return in;
 }
 
@@ -335,7 +339,7 @@ parse(opstack ** stack, const char* inn, const void * userdata)
 }
 
 const char * 
-translate(const char* format, const void * userdata, const char* vars, void* args[])
+translate(const char* format, const void * userdata, const char* vars, variant args[])
 {
 	int i = 0;
 	const char *ic = vars;
@@ -350,7 +354,7 @@ translate(const char* format, const void * userdata, const char* vars, void* arg
 	while (*ic) {
 		*oc++ = *ic++;
 		if (!isalnum(*ic)) {
-			const void * x = args[i++];
+			variant x = args[i++];
 			*oc = '\0';
 			oc = symbol;
 			add_variable(strcpy(balloc(strlen(symbol)+1), symbol), x);
@@ -359,80 +363,51 @@ translate(const char* format, const void * userdata, const char* vars, void* arg
 	}
 
 	if (parse(&stack, format, userdata)==NULL) return NULL;
-	return opop(&stack, const char*);
-}
-
-const char *
-translate_va(const char* format, const void * userdata, const char* vars, ...)
-{
-	va_list marker;
-	const char *ic = vars;
-	char symbol[32];
-	char *oc = symbol;
-	opstack * stack = NULL;
-	brelease();
-	free_variables();
-
-   va_start(marker, vars);     /* Initialize variable arguments. */
-	assert(isalnum(*ic));
-   while (*ic) {
-		*oc++ = *ic++;
-		if (!isalnum(*ic)) {
-			void * x = va_arg(marker, void *);
-			*oc = '\0';
-			oc = symbol;
-			add_variable(strcpy(balloc(strlen(symbol)+1), symbol), x);
-			while (*ic && !isalnum(*ic)) ++ic;
-		}
-   }
-   va_end(marker);              /* Reset variable arguments.      */
-
-	if (parse(&stack, format, userdata)==NULL) return NULL;
-	return opop(&stack, const char*);
+	return (const char*)opop(&stack).v;
 }
 
 static void
 eval_eq(opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
-	int a = opop(stack, int);
-	int b = opop(stack, int);
+	int a = opop_i(stack);
+	int b = opop_i(stack);
 	int rval = (a==b)?1:0;
-	opush(stack, rval);
+	opush_i(stack, rval);
 	unused(userdata);
 }
 
 static void
 eval_add(opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
-	int a = opop(stack, int);
-	int b = opop(stack, int);
-	opush(stack, a+b);
+	int a = opop_i(stack);
+	int b = opop_i(stack);
+	opush_i(stack, a+b);
 	unused(userdata);
 }
 
 static void
 eval_isnull(opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
-	void * a = opop(stack, void *);
-	opush(stack, (a==NULL)?1:0);
+	void * a = opop_v(stack);
+	opush_i(stack, (a==NULL)?1:0);
 	unused(userdata);
 }
 
 static void
 eval_if(opstack ** stack, const void * userdata) /* (int, int) -> int */
 {
-	void * a = opop(stack, void *);
-	void * b = opop(stack, void *);
-	int cond = opop(stack, int);
-	opush(stack, cond?b:a);
+	void * a = opop_v(stack);
+	void * b = opop_v(stack);
+	int cond = opop_i(stack);
+	opush_v(stack, cond?b:a);
 	unused(userdata);
 }
 
 static void
 eval_strlen(opstack ** stack, const void * userdata) /* string -> int */
 {
-	const char * c = opop(stack, const char *);
-	opush(stack, c?strlen(c):0);
+	const char * c = (const char *)opop_v(stack);
+	opush_i(stack, c?(int)strlen(c):0);
 	unused(userdata);
 }
 
@@ -440,29 +415,32 @@ eval_strlen(opstack ** stack, const void * userdata) /* string -> int */
 static void
 eval_int(opstack ** stack, const void * userdata)
 {
-	int i = opop(stack, int);
+	int i = opop_i(stack);
 	const char * c = itoa10(i);
-	opush(stack, strcpy(balloc(strlen(c)+1), c));
-	unused(userdata);
+  size_t len = strlen(c);
+  variant var;
+
+  var.v = strcpy(balloc(len+1), c);
+  opush(stack, var);
 }
 
 #include "language.h"
 static void
 eval_localize(opstack ** stack, const void * userdata) /* (string, locale) -> string */
 {
-	const struct locale *lang = opop(stack, const struct locale *);
-	const char *c = opop(stack, const char *);
+	const struct locale *lang = (const struct locale *)opop_v(stack);
+	const char *c = (const char *)opop_v(stack);
 	c = locale_string(lang, c);
-	opush(stack, strcpy(balloc(strlen(c)+1), c));
+	opush_v(stack, strcpy(balloc(strlen(c)+1), c));
 	unused(userdata);
 }
 
 static void
 eval_locale(opstack ** stack, const void * userdata) /* (string) -> locale */
 {
-	const char *c = opop(stack, const char *);
-	const struct locale *lang = find_locale(c);
-	opush(stack, lang);
+	const char *c = (const char *)opop_v(stack);
+  struct locale * lang = find_locale(c);
+	opush_v(stack, lang);
 	unused(userdata);
 }
 

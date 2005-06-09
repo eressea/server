@@ -26,7 +26,6 @@ SOURCES =
  message.c
  movement.c
  names.c
- objtypes.c
  order.c
  pathfinder.c
  plane.c

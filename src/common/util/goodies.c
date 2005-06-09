@@ -30,23 +30,6 @@
 
 /* Simple Integer-Liste */
 
-char *
-fstrncat(char * buffer, const char * str, unsigned int size)
-{
-	static char * b = NULL;
-	static char * end = NULL;
-	int n = 0;
-	if (b==buffer) {
-		end += strlen(end);
-		size -= (end-b);
-	} else {
-		end = b = buffer;
-	}
-	while (size-- > 0 && (*end++=*str++)!=0) ++n;
-	*end='\0';
-	return b;
-}
-	  
 int *
 intlist_init(void)
 {
@@ -78,7 +61,7 @@ unsigned int
 hashstring(const char* s)
 {
 	unsigned int key = 0;
-	int i = strlen(s);
+	size_t i = strlen(s);
 
 	while (i>0) {
 		key = (s[--i] + key*37);

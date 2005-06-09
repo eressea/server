@@ -90,14 +90,13 @@ mc_add(const char * name)
 }
 
 static void
-arg_set(void * args[], const message_type * mtype, const char * buffer, void * v)
+arg_set(variant args[], const message_type * mtype, const char * buffer, variant v)
 {
 	int i;
 	for (i=0;i!=mtype->nparameters;++i) {
 		if (!strcmp(buffer, mtype->pnames[i])) break;
 	}
   if (i!=mtype->nparameters) {
-    assert(args[i]==NULL);
     args[i] = v;
   } else {
 		fprintf(stderr, "invalid parameter %s for message type %s\n", buffer, mtype->name);
@@ -110,9 +109,10 @@ msg_feedback(const struct unit * u, struct order * ord, const char * name, const
 {
 	va_list marker;
 	const message_type * mtype = mt_find(name);
-	char buffer[64], *oc = buffer;
+	char paramname[64];
 	const char *ic = sig;
-	void * args[16];
+	variant args[16];
+  variant var;
 	memset(args, 0, sizeof(args));
 
 	if (ord==NULL) ord = u->thisorder;
@@ -122,23 +122,42 @@ msg_feedback(const struct unit * u, struct order * ord, const char * name, const
 		return NULL;
 	}
 
-	arg_set(args, mtype, "unit", (void*)u);
-	arg_set(args, mtype, "region", (void*)u->region);
-	arg_set(args, mtype, "command", (void*)ord);
+  var.v = (void*)u;
+	arg_set(args, mtype, "unit", var);
+  var.v = (void*)u->region;
+	arg_set(args, mtype, "region", var);
+  var.v = (void*)ord;
+	arg_set(args, mtype, "command", var);
 
 	va_start(marker, sig);
 	while (*ic && !isalnum(*ic)) ic++;
 	while (*ic) {
-		void * v = va_arg(marker, void *);
-		oc = buffer;
-		while (isalnum(*ic)) *oc++ = *ic++;
+		char * oc = paramname;
+    int i;
+
+    while (isalnum(*ic)) *oc++ = *ic++;
 		*oc = '\0';
-		arg_set(args, mtype, buffer, v);
-		while (*ic && !isalnum(*ic)) ic++;
+
+    for (i=0;i!=mtype->nparameters;++i) {
+      if (!strcmp(paramname, mtype->pnames[i])) break;
+    }
+    if (i!=mtype->nparameters) {
+      if (mtype->types[i]->vtype==VAR_VOIDPTR) {
+        args[i].v = va_arg(marker, void*);
+      } else if (mtype->types[i]->vtype==VAR_INT) {
+        args[i].i = va_arg(marker, int);
+      } else {
+        assert(!"unknown variant type");
+      }
+    } else {
+      log_error(("invalid parameter %s for message type %s\n", paramname, mtype->name));
+      assert(!"program aborted.");
+    }
+    while (*ic && !isalnum(*ic)) ic++;
 	}
 	va_end(marker);
 
-	return msg_create(mtype, (void**)args);
+	return msg_create(mtype, args);
 }
 
 message * 
@@ -147,9 +166,9 @@ msg_message(const char * name, const char* sig, ...)
 {
 	va_list marker;
 	const message_type * mtype = mt_find(name);
-	char buffer[64], *oc = buffer;
+	char paramname[64];
 	const char *ic = sig;
-	void * args[16];
+	variant args[16];
 	memset(args, 0, sizeof(args));
 
 	if (!mtype) {
@@ -160,16 +179,32 @@ msg_message(const char * name, const char* sig, ...)
 	va_start(marker, sig);
 	while (*ic && !isalnum(*ic)) ic++;
 	while (*ic) {
-		void * v = va_arg(marker, void *);
-		oc = buffer;
-		while (isalnum(*ic)) *oc++ = *ic++;
-		*oc = '\0';
-		arg_set(args, mtype, buffer, v);
-		while (*ic && !isalnum(*ic)) ic++;
-	}
-	va_end(marker);
+		char * oc = paramname;
+    int i;
 
-	return msg_create(mtype, (void**)args);
+    while (isalnum(*ic)) *oc++ = *ic++;
+		*oc = '\0';
+
+    for (i=0;i!=mtype->nparameters;++i) {
+      if (!strcmp(paramname, mtype->pnames[i])) break;
+    }
+    if (i!=mtype->nparameters) {
+      if (mtype->types[i]->vtype==VAR_VOIDPTR) {
+        args[i].v = va_arg(marker, void*);
+      } else if (mtype->types[i]->vtype==VAR_INT) {
+        args[i].i = va_arg(marker, int);
+      } else {
+        assert(!"unknown variant type");
+      }
+    } else {
+      log_error(("invalid parameter %s for message type %s\n", paramname, mtype->name));
+      assert(!"program aborted.");
+    }
+    while (*ic && !isalnum(*ic)) ic++;
+  }
+  va_end(marker);
+
+  return msg_create(mtype, args);
 }
 
 message *
@@ -185,7 +220,7 @@ new_message(struct faction * receiver, const char* sig, ...)
 	char buffer[128];
 	int i=0;
 	const char * c = sig;
-	void * args[16];
+	variant args[16];
 
 	memset(args, 0, sizeof(args));
 	assert(signature-sig < sizeof(buffer));
@@ -232,45 +267,43 @@ new_message(struct faction * receiver, const char* sig, ...)
 		}
 		switch(type) {
 			case 's':
-				args[i] = (void*)va_arg(marker, const char *);
-				break;
-			case 'i':
-				args[i] = (void*)va_arg(marker, int);
+				args[i].v = (void*)va_arg(marker, const char *);
 				break;
 			case 'f':
-				args[i] = (void*)va_arg(marker, const struct faction*);
+				args[i].v = (void*)va_arg(marker, const struct faction*);
 				break;
 			case 'u':
-				args[i] = (void*)va_arg(marker, const struct unit*);
+				args[i].v = (void*)va_arg(marker, const struct unit*);
 				break;
 			case 'r':
-				args[i] = (void*)va_arg(marker, const struct region*);
+				args[i].v = (void*)va_arg(marker, const struct region*);
 				break;
 			case 'h':
-				args[i] = (void*)va_arg(marker, const struct ship*);
+				args[i].v = (void*)va_arg(marker, const struct ship*);
 				break;
 			case 'b':
-				args[i] = (void*)va_arg(marker, const struct building*);
+				args[i].v = (void*)va_arg(marker, const struct building*);
 				break;
 			case 'X':
-				args[i] = (void*)va_arg(marker, const resource_type *);
+				args[i].v = (void*)va_arg(marker, const resource_type *);
 				break;
 			case 'x':
-				args[i] = (void*)oldresourcetype[(resource_t)va_arg(marker, int)];
+				args[i].v = oldresourcetype[(resource_t)va_arg(marker, int)];
 				break;
 			case 't':
-				args[i] = (void*)va_arg(marker, int);
+      case 'i':
+				args[i].i = va_arg(marker, int);
 				break;
 			case 'd':
-				args[i] = (void*)i;
+				args[i].i = i;
 				break;
 			case 'S':
 			default:
-				args[i] = NULL;
+				args[i].v = NULL;
 		}
 	}
 	va_end(marker);
-	return msg_create(mtype, (void**)args);
+	return msg_create(mtype, args);
 }
 
 static void
@@ -323,7 +356,7 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 void
 addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 {
-  caddmessage(r, f, gc_add(strdup(s)), mtype, level);
+  caddmessage(r, f, s, mtype, level);
 }
 
 void

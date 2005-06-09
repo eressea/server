@@ -197,7 +197,7 @@ cinfo_speed(const struct locale * lang, const void * obj, typ_t typ, struct curs
 
 	assert(typ == TYP_UNIT);
 	u = (unit *)obj;
-	cu = (curse_unit *)c->data;
+	cu = (curse_unit *)c->data.v;
 
 	if (self != 0){
 		sprintf(buf, "%d Person%s von %s %s noch %d Woche%s beschleunigt. (%s)",
@@ -259,7 +259,7 @@ cinfo_kaelteschutz(const struct locale * lang, const void * obj, typ_t typ, stru
 
 	assert(typ == TYP_UNIT);
 	u = (unit *)obj;
-	cu = (curse_unit *)c->data;
+	cu = (curse_unit *)c->data.v;
 
 	if (self != 0){
 		sprintf(buf, "%d Person%s von %s %s sich vor Kälte geschützt. (%s)",
@@ -474,13 +474,13 @@ read_skill(FILE * F, curse * c)
 	} else {
 		fscanf(F, "%d", &skill);
 	}
-	c->data = (void*)skill;
+	c->data.i = skill;
 	return 0;
 }
 static int
 write_skill(FILE * F, const curse * c)
 {
-	fprintf(F, "%d ", (int)c->data);
+	fprintf(F, "%d ", c->data.i);
 	return 0;
 }
 
@@ -488,7 +488,7 @@ static int
 cinfo_skill(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
 	unit *u = (unit *)obj;
-	int sk = (int)c->data;
+	int sk = c->data.i;
 
 	unused(typ);
 

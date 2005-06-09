@@ -386,9 +386,9 @@ guardian_faction(plane * pl, int id)
 }
 
 static void 
-block_create(int x1, int y1, char terrain)
+block_create(short x1, short y1, char terrain)
 {
-	int x, y;
+	short x, y;
 	for (x=0;x!=BLOCKSIZE;++x) {
 		for (y=0;y!=BLOCKSIZE;++y) {
 			region * r = new_region(x1 + x, y1 + y);
@@ -448,12 +448,12 @@ static int
 caldera_read(trigger * t, FILE * F)
 {
 	char zText[128];
-	int i;
+	variant var;
 
 	fscanf(F, "%s", zText);
-	i = atoi36(zText);
-	t->data.v = findbuilding(i);
-	if (t->data.v==NULL) ur_add((void*)i, &t->data.v, resolve_building);
+	var.i = atoi36(zText);
+	t->data.v = findbuilding(var.i);
+	if (t->data.v==NULL) ur_add(var, &t->data.v, resolve_building);
 
 	return AT_READ_OK;
 }
@@ -495,7 +495,7 @@ init_volcano(void)
 void
 create_arena(void)
 {
-	int x;
+	short x;
 	arena_id = hashstring("arena");
 	arena = getplanebyid(arena_id);
 	if (arena!=NULL) return;
@@ -508,7 +508,7 @@ create_arena(void)
 		block_create(arena->minx, arena->miny, T_OCEAN);
 		arena_center = findregion(plane_center_x(arena), plane_center_y(arena));
 		for (x=0;x!=BLOCKSIZE;++x) {
-			int y;
+			short y;
 			for (y=0;y!=BLOCKSIZE;++y) {
 				region * r = findregion(arena->minx+x, arena->miny+y);
 				freset(r, RF_ENCOUNTER);

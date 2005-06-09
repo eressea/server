@@ -21,6 +21,7 @@
 
 /* libc includes */
 #include <assert.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -58,16 +59,16 @@ find_border(unsigned int id)
 }
 
 void *
-resolve_borderid(void * id) {
-   return (void*)find_border((unsigned int)id);
+resolve_borderid(variant id) {
+   return (void*)find_border(id.i);
 }
 
 static border **
 get_borders_i(const region * r1, const region * r2)
 {
   border ** bp;
-  int key = region_hashkey(r1);
-  int k2 = region_hashkey(r2);
+  int key = reg_hashkey(r1);
+  int k2 = reg_hashkey(r2);
 
   key = min(k2, key) % BMAXHASH;
   bp = &borders[key];
@@ -155,15 +156,40 @@ find_bordertype(const char * name)
 void
 b_read(border * b, FILE *f)
 {
-	assert(sizeof(int)==sizeof(b->data));
-	fscanf(f, "%x ", (unsigned int*)&b->data);
+  switch (b->type->datatype) {
+    case VAR_NONE:
+    case VAR_INT:
+      fscanf(f, "%x ", &b->data.i);
+      break;
+    case VAR_VOIDPTR:
+      fscanf(f, "%p ", &b->data.v);
+      break;
+    case VAR_SHORTA:
+      fscanf(f, "%hd %hd ", &b->data.sa[0], &b->data.sa[1]);
+      break;
+    default:
+      assert(!"unhandled variant type in border");
+  }
 }
 
 void
 b_write(const border * b, FILE *f)
 {
 	assert(sizeof(int)==sizeof(b->data));
-	fprintf(f, "%x ", (int)b->data);
+  switch (b->type->datatype) {
+    case VAR_NONE:
+    case VAR_INT:
+      fprintf(f, "%x ", b->data.i);
+      break;
+    case VAR_VOIDPTR:
+      fprintf(f, "%p ", b->data.v);
+      break;
+    case VAR_SHORTA:
+      fprintf(f, "%d %d ", b->data.sa[0], b->data.sa[1]);
+      break;
+    default:
+      assert(!"unhandled variant type in border");
+  }
 }
 
 boolean b_transparent(const border * b, const struct faction * f) { unused(b); unused(f); return true; }
@@ -253,7 +279,7 @@ b_namewall(const border * b, const region * r, const struct faction * f, int gfl
 }
 
 border_type bt_wall = {
-	"wall",
+	"wall", VAR_INT,
 	b_opaque,
 	NULL, /* init */
 	NULL, /* destroy */
@@ -267,7 +293,7 @@ border_type bt_wall = {
 };
 
 border_type bt_noway = {
-	"noway",
+	"noway", VAR_INT,
 	b_transparent,
 	NULL, /* init */
 	NULL, /* destroy */
@@ -300,7 +326,7 @@ b_blockfogwall(const border * b, const unit * u, const region * r)
 }
 
 border_type bt_fogwall = {
-	"fogwall",
+	"fogwall", VAR_INT,
 	b_transparent, /* transparent */
 	NULL, /* init */
 	NULL, /* destroy */
@@ -317,15 +343,15 @@ static const char *
 b_nameillusionwall(const border * b, const region * r, const struct faction * f, int gflags)
 {
 	/* TODO: f->locale bestimmt die Sprache */
-	int fno = (int)b->data;
+	int fno = b->data.i;
 	unused(b);
 	unused(r);
-	if (gflags & GF_ARTICLE) return (f && fno==f->no)?"eine Illusionswand":"eine Wand";
+	if (gflags & GF_ARTICLE) return (f && fno==f->subscription)?"eine Illusionswand":"eine Wand";
 	return (f && fno==f->no)?"Illusionswand":"Wand";
 }
 
 border_type bt_illusionwall = {
-	"illusionwall",
+	"illusionwall", VAR_INT,
 	b_opaque,
 	NULL, /* init */
 	NULL, /* destroy */
@@ -343,7 +369,7 @@ border_type bt_illusionwall = {
  ***/
 
 boolean b_blockquestportal(const border * b, const unit * u, const region * r) {
-	if((int)b->data > 0) return true;
+	if(b->data.i > 0) return true;
 	return false;
 }
 
@@ -351,7 +377,7 @@ static const char *
 b_namequestportal(const border * b, const region * r, const struct faction * f, int gflags)
 {
 	/* TODO: f->locale bestimmt die Sprache */
-	int lock = (int)b->data;
+	int lock = b->data.i;
 	unused(b);
 	unused(r);
 
@@ -371,7 +397,7 @@ b_namequestportal(const border * b, const region * r, const struct faction * f, 
 }
 
 border_type bt_questportal = {
-	"questportal",
+	"questportal", VAR_INT,
 	b_opaque,
 	NULL, /* init */
 	NULL, /* destroy */
@@ -392,15 +418,14 @@ static const char *
 b_nameroad(const border * b, const region * r, const struct faction * f, int gflags)
 {
 	region * r2 = (r==b->to)?b->from:b->to;
-	int rval = (int)b->data;
-	int local = (r==b->to)?(rval & 0xFFFF):((rval>>16) & 0xFFFF);
+	int local = (r==b->to)?b->data.sa[0]:b->data.sa[1];
 	static char buffer[64];
 
 	unused(f);
 	if (gflags & GF_ARTICLE) {
 		if (!(gflags & GF_DETAILED)) strcpy(buffer, "eine Straﬂe");
 		else if (terrain[rterrain(r)].roadreq<=local) {
-			int remote = (r!=b->to)?(rval & 0xFFFF):((rval>>16) & 0xFFFF);
+      int remote = (r!=b->to)?b->data.sa[0]:b->data.sa[1];
 			if (terrain[rterrain(r2)].roadreq<=remote) {
 				strcpy(buffer, "eine Straﬂe");
 			} else {
@@ -423,40 +448,33 @@ b_nameroad(const border * b, const region * r, const struct faction * f, int gfl
 static void
 b_readroad(border * b, FILE *f)
 {
-	int x, y;
-	fscanf(f, "%d %d ", &x, &y);
-	b->data=(void*)((x<<16) | y);
+	fscanf(f, "%hd %hd ", &b->data.sa[0], &b->data.sa[1]);
 }
 
 static void
 b_writeroad(const border * b, FILE *f)
 {
-	int x, y;
-	x = (int)b->data;
-	y = x & 0xFFFF;
-	x = (x >> 16) & 0xFFFF;
-	fprintf(f, "%d %d ", x, y);
+  fprintf(f, "%d %d ", b->data.sa[0], b->data.sa[1]);
 }
 
 static boolean
 b_validroad(const border * b)
 {
-	int x = (int)b->data;
-	if (x==0) return false;
+	if (b->data.sa[0]==SHRT_MAX) return false;
 	return true;
 }
 
 static boolean
 b_rvisibleroad(const border * b, const region * r)
 {
-	int x = (int)b->data;
+	int x = b->data.i;
 	x = (r==b->to)?(x & 0xFFFF):((x>>16) & 0xFFFF);
 	if (x==0) return false;
 	return (boolean)(b->to==r || b->from==r);
 }
 
 border_type bt_road = {
-	"road",
+	"road", VAR_INT,
 	b_transparent,
 	NULL, /* init */
 	NULL, /* destroy */
@@ -496,7 +514,7 @@ void
 read_borders(FILE * f)
 {
   for (;;) {
-    int fx, fy, tx, ty;
+    short fx, fy, tx, ty;
     unsigned int bid = 0;
     char zText[32];
     border * b;
@@ -505,9 +523,7 @@ read_borders(FILE * f)
 
     fscanf(f, "%s", zText);
     if (!strcmp(zText, "end")) break;
-    fscanf(f, "%u %d %d %d %d", &bid, &fx, &fy, &tx, &ty);
-    type = find_bordertype(zText);
-    assert(type || !"border type not registered");
+    fscanf(f, "%u %hd %hd %hd %hd", &bid, &fx, &fy, &tx, &ty);
     from = findregion(fx, fy);
     if (from==NULL) {
       if (!incomplete_data) log_error(("border for unknown region %d,%d\n", fx, fy));
@@ -518,6 +534,13 @@ read_borders(FILE * f)
       if (!incomplete_data) log_error(("border for unknown region %d,%d\n", tx, ty));
       to = new_region(tx, ty);
     }
+
+    type = find_bordertype(zText);
+    if (type==NULL) {
+      log_error(("[read_borders] unknown border type %s in %s\n", zText, regionname(from, NULL)));
+      assert(type || !"border type not registered");
+    }
+
     if (to==from) {
       direction_t dir = (direction_t) (rand() % MAXDIRECTIONS);
       region * r = rconnect(from, dir);

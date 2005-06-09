@@ -180,16 +180,16 @@ read_groups(FILE * F, faction * f)
 		pa = &g->allies;
 		for (;;) {
 			ally * a;
-			int aid;
+			variant aid;
 			fscanf(F, "%s ", buf);
-			aid = atoi36(buf);
-			if (aid==0) break;
+			aid.i = atoi36(buf);
+			if (aid.i==0) break;
 			a = calloc(sizeof(ally), 1);
 			*pa = a;
 			pa = &a->next;
 			fscanf(F, "%d ", &a->status);
-			a->faction = findfaction(aid);
-			if (!a->faction) ur_add((void*)aid, (void**)&a->faction, resolve_faction);
+			a->faction = findfaction(aid.i);
+			if (!a->faction) ur_add(aid, (void**)&a->faction, resolve_faction);
 		}
 		if(global.data_version >= GROUPATTRIB_VERSION) {
 			a_read(F, &g->attribs);

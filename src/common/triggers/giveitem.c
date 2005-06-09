@@ -80,12 +80,12 @@ giveitem_read(trigger * t, FILE * F)
 {
 	giveitem_data * td = (giveitem_data*)t->data.v;
 	char zText[128];
-	int i;
+	variant var;
 
 	fscanf(F, "%s", zText);
-	i = atoi36(zText);
-	td->u = findunit(i);
-	if (td->u==NULL) ur_add((void*)i, (void**)&td->u, resolve_unit);
+	var.i = atoi36(zText);
+	td->u = findunit(var.i);
+	if (td->u==NULL) ur_add(var, (void**)&td->u, resolve_unit);
 
 	fscanf(F, "%d %s", &td->number, zText);
 	td->itype = it_find(zText);

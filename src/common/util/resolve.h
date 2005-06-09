@@ -14,14 +14,16 @@
 
 #ifndef RESOLVE_H
 #define RESOLVE_H
+
+#include <util/variant.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef void * (*resolve_fun)(void * data);
-
-extern void ur_add(void * data, void ** ptrptr, resolve_fun fun);
-extern void resolve(void);
+  typedef void * (*resolve_fun)(variant data);
+  extern void ur_add(variant data, void ** ptrptr, resolve_fun fun);
+  extern void resolve(void);
 
 #ifdef __cplusplus
 }

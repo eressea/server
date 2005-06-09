@@ -14,6 +14,9 @@
 
 #ifndef _UMLAUT_H
 #define _UMLAUT_H
+
+#include "variant.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,11 +29,11 @@ struct tref;
 typedef struct tnode {
 	struct tref * next[NODEHASHSIZE];
 	unsigned char flags;
-	void * id;
+	variant id;
 } tnode;
 
-int findtoken(const struct tnode * tk, const char * str, void** result);
-void addtoken(struct tnode * root, const char* str, void * id);
+int findtoken(const struct tnode * tk, const char * str, variant* result);
+void addtoken(struct tnode * root, const char* str, variant id);
 
 #ifdef __cplusplus
 }

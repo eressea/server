@@ -52,7 +52,7 @@ vset_erase(vset * s, void *item)
 	return 0;
 }
 
-unsigned int
+size_t
 vset_add(vset * s, void *item)
 {
 	size_t i;
