@@ -58,6 +58,16 @@ typedef struct node {
 
 static node * node_garbage;
 
+void
+pathfinder_cleanup(void)
+{
+  while (node_garbage) {
+    node * n = node_garbage;
+    node_garbage = n->next;
+    free(n);
+  }
+}
+
 static node *
 new_node(region * r, int distance, node * prev)
 {

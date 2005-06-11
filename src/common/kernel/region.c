@@ -821,6 +821,13 @@ free_region(region * r)
     r->resources = res->next;
     free(res);
   }
+
+  while (r->donations) {
+    donation * don = r->donations;
+    r->donations = don->next;
+    free(don);
+  }
+
   free(r);
 }
 

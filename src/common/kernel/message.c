@@ -378,7 +378,7 @@ cmistake(const unit * u, struct order *ord, int mno, int mtype)
 	if (u->faction->no == MONSTER_FACTION) return;
 	sprintf(ebuf, "error%d", mno);
 	ADDMSG(&u->faction->msgs, msg_message(ebuf, 
-		"command unit region", copy_order(ord), u, u->region));
+		"command unit region", ord, u, u->region));
 }
 
 extern unsigned int new_hashstring(const char* s);

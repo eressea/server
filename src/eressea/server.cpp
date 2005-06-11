@@ -64,6 +64,7 @@
 /* kernel includes */
 #include <kernel/border.h>
 #include <kernel/building.h>
+#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/message.h>
@@ -431,6 +432,7 @@ game_done(void)
 
   creport_cleanup();
   report_cleanup();
+  calendar_cleanup();
 }
 #endif
 

@@ -399,7 +399,8 @@ cr_order(variant var, char * buffer, const void * userdata)
     }
     *wp++ = '\"';
     *wp++ = 0;
-    /*	 sprintf(buffer, "\"%s\"", cmd); */
+    
+    free(cmd);
   }
   else strcpy(buffer, "\"\"");
   return 0;

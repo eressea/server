@@ -73,12 +73,6 @@
 # include <items/seed.h>
 #endif
 
-typedef struct donation {
-	struct donation *next;
-	struct faction *f1, *f2;
-	int amount;
-} donation;
-
 typedef struct request {
   struct request * next;
   struct unit *unit;
@@ -372,6 +366,11 @@ free_recruitments(recruitment * recruits)
   while (recruits) {
     recruitment * rec = recruits;
     recruits = rec->next;
+    while (rec->requests) {
+      request * req = rec->requests;
+      rec->requests = req->next;
+      free(req);
+    }
     free(rec);
   }
 }
@@ -845,8 +844,8 @@ report_donations(void)
 {
   region * r;
   for (r=regions;r;r=r->next) {
-    donation * sp;
-    for (sp = r->donations; sp; sp = sp->next) {
+    while (r->donations) {
+      donation * sp = r->donations;
 		  if (sp->amount > 0) {
 			  struct message * msg = msg_message("donation",
 				  "from to amount", sp->f1, sp->f2, sp->amount);
@@ -854,6 +853,8 @@ report_donations(void)
 			  r_addmessage(r, sp->f2, msg);
 			  msg_release(msg);
 		  }
+      r->donations = sp->next;
+      free(sp);
 	  }
   }
 }

@@ -979,4 +979,5 @@ plan_monsters(void)
       }
     }
   }
+  pathfinder_cleanup();
 }

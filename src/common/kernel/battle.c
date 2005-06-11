@@ -1416,7 +1416,7 @@ select_opponent(battle * b, troop at, int minrow, int maxrow)
  *
  * }
  *
- * cv_kill(fgs); Nicht vergessen
+ * cv_kill(fgs); free(fgs); Nicht vergessen
  */
 
 cvector *

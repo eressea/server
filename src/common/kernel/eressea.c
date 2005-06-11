@@ -3032,7 +3032,7 @@ void
 add_income(unit * u, int type, int want, int qty)
 {
 	if (want==INT_MAX) want = qty;
-	add_message(&u->faction->msgs, new_message(u->faction, "income%u:unit%r:region%i:mode%i:wanted%i:amount",
+	ADDMSG(&u->faction->msgs, msg_message("income", "unit region mode wanted amount",
 		u, u->region, type, want, qty));
 }
 

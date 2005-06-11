@@ -29,6 +29,9 @@ extern boolean allowed_swim(const struct region * src, const struct region * tar
 extern boolean allowed_fly(const struct region * src, const struct region * target);
 extern boolean allowed_walk(const struct region * src, const struct region * target);
 extern struct region_list * regions_in_range(struct region * src, int maxdist, boolean (*allowed)(const struct region*, const struct region*));
+
+extern void pathfinder_cleanup(void);
+
 #ifdef __cplusplus
 }
 #endif

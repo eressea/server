@@ -1786,6 +1786,7 @@ run_to(unit * u, region * to)
   region_list * route = NULL;
   add_regionlist(&route, to);
   travel_route(u, route, NULL, NULL, TRAVEL_RUNNING);
+  free_regionlist(route);
   /* weder transport noch follow */
 }
 

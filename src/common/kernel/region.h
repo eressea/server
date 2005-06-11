@@ -82,6 +82,12 @@ typedef struct land_region {
 #endif
 } land_region;
 
+typedef struct donation {
+  struct donation *next;
+  struct faction *f1, *f2;
+  int amount;
+} donation;
+
 typedef struct region {
   struct region *next;
   struct land_region *land;

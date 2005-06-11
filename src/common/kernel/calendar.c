@@ -30,3 +30,29 @@ get_gamedate(int turn, gamedate * gd)
   return gd;
 }
 
+void
+calendar_cleanup(void)
+{
+  int i;
+
+  free(agename);
+
+  for (i=0;i!=seasons;++i) {
+    free(seasonnames[i]);
+  }
+  free(seasonnames);
+
+  for (i=0;i!=months_per_year;++i) {
+    free(monthnames[i]);
+  }
+  free(storms);
+  free(month_season);
+  free(monthnames);
+
+  for (i=0;i!=weeks_per_month;++i) {
+    free(weeknames[i]);
+    free(weeknames2[i]);
+  }
+  free(weeknames);
+  free(weeknames2);
+}

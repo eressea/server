@@ -1122,6 +1122,11 @@ stripunit(unit * u)
 		u->items = it;
 	}
 	while (u->attribs) a_remove (&u->attribs, u->attribs);
+  while (u->reservations) {
+    struct reservation *res = u->reservations;
+    u->reservations = res->next;
+    free(res);
+  }
 }
 
 

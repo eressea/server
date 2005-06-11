@@ -1,6 +1,10 @@
 #ifndef KRNL_CALENDAR_H
 #define KRNL_CALENDAR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern char *agename;
 extern int  first_turn;
 extern int  first_month;
@@ -25,5 +29,9 @@ typedef struct gamedate {
 } gamedate;
 
 extern gamedate * get_gamedate(int turn, gamedate * gd);
+extern void calendar_cleanup(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

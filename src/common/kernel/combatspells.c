@@ -355,6 +355,7 @@ sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
 		}
 	}
 	cv_kill(fgs);
+  free(fgs);
 
 	if (k == 0) {
 		/* keine Waffen mehr da, die zerstˆrt werden kˆnnten */
@@ -678,6 +679,7 @@ sp_immolation(fighter * fi, int level, double power, spell * sp)
     if (force==0) break;
 	}
   cv_kill(fgs);
+  free(fgs);
 
 	sprintf(buf, "%d Personen %s getˆtet",
 			killed, killed == 1 ? "wurde" : "wurden");
@@ -968,6 +970,7 @@ sp_chaosrow(fighter * fi, int level, double power, spell * sp)
     power = max(0, power-n);
   }
   cv_kill(fgs);
+  free(fgs);
 
   scat("Ein plˆtzlicher Tumult entsteht");
   if (k > 0) {
@@ -1045,6 +1048,7 @@ sp_flee(fighter * fi, int level, double power, spell * sp)
 		}
 	}
 	cv_kill(fgs);
+  free(fgs);
 
 	sprintf(buf, "%d Krieger %s von Furcht gepackt.", panik,
 			panik == 1 ? "wurde" : "wurden");
@@ -1672,6 +1676,7 @@ sp_healing(fighter * fi, int level, double power, spell * sp)
   j += heal_fighters(fgs, &healhp, false);
   j += heal_fighters(fgs, &healhp, true);
   cv_kill(fgs);
+  free(fgs);
 
   if (j == 0) {
     scat(", doch niemand muﬂte magisch geheilt werden.");
@@ -1754,6 +1759,7 @@ sp_undeadhero(fighter * fi, int level, double power, spell * sp)
     }
   }
   cv_kill(fgs);
+  free(fgs);
 
   if (undead == 0) {
     sprintf(buf, "%s kann keine Untoten rufen.", unitname(mage));
