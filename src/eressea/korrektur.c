@@ -1021,14 +1021,15 @@ fix_attribflags(void)
     for (u=r->units;u!=NULL;u=u->next) {
       const attrib *a = r->attribs;
       while (a) {
-        if (a->type!=&at_guard) {
+        if (a->type==&at_guard) {
           fset(u, UFL_GUARD);
+		  break;
         }
         a = a->next;
-        return a;
       }
     }
   }
+  return 0;
 }
 
 static int 

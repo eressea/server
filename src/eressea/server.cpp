@@ -87,6 +87,7 @@
 #include <util/log.h>
 #include <util/rand.h>
 #include <util/sql.h>
+#include <util/dl/malloc.h>
 
 /* lua includes */
 #include "lua/bindings.h"
@@ -700,6 +701,7 @@ main(int argc, char *argv[])
     }
 #endif
   }
+  malloc_stats();
 #ifdef CLEANUP_CODE
   game_done();
 #endif
