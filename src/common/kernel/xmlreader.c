@@ -363,7 +363,6 @@ parse_calendar(xmlDocPtr doc)
 
       seasons = nsetSeasons->nodeNr;
       seasonnames = malloc(sizeof(char *) * seasons);
-      storms = malloc(sizeof(int) * seasons);
 
       for (i=0;i!=nsetSeasons->nodeNr;++i) {
         xmlNodePtr season = nsetSeasons->nodeTab[i];

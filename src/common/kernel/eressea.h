@@ -462,7 +462,7 @@ extern const char *keywords[MAXKEYWORDS];
 
 /* ------------------ Status von Einheiten --------------------- */
 
-typedef int status_t;
+typedef unsigned char status_t;
 enum {
   ST_AGGRO,
   ST_FIGHT,
@@ -474,7 +474,7 @@ enum {
 
 /* ----------------- Parameter --------------------------------- */
 
-typedef int param_t;
+typedef unsigned char param_t;
 enum {
 	P_LOCALE,
 	P_ANY,

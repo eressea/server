@@ -82,8 +82,8 @@ typedef struct unit {
 	struct faction *faction;
 	struct building *building;
 	struct ship *ship;
-  short age;
   unsigned short number;
+  short age;
 
 	/* skill data */
 	short skill_size;
@@ -112,8 +112,8 @@ typedef struct unit {
 	unsigned int flags;
 	struct attrib * attribs;
 	status_t status;
-	int n;	/* enno: attribut? */
-	int wants;	/* enno: attribut? */
+	int n; /* enno: attribut? */
+	int wants; /* enno: attribut? */
 } unit;
 
 typedef struct unit_list {
