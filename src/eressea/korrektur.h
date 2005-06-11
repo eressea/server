@@ -14,8 +14,7 @@ extern "C" {
 #endif
 
   extern void korrektur(void);
-  extern void korrektur_end(void);
-  extern void init_conversion(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -27,8 +27,6 @@
 #include <config.h>
 #include "eressea.h"
 
-#include "korrektur.h"
-
 /* initialization - TODO: init in separate module */
 #include <attributes/attributes.h>
 #include <spells/spells.h>
@@ -198,7 +196,6 @@ game_init(void)
 #ifdef INFOCMD_MODULE
 	init_info();
 #endif
-  init_conversion();
 
 #ifdef MUSEUM_MODULE
 	register_museum();
@@ -267,8 +264,6 @@ processturn(char *filename)
   readshortpwds("passwords");
 #endif
 	begin = make_summary();
-	printf(" - Korrekturen Runde %d\n", turn);
-	korrektur();
 	turn++;
 	if ((i=readorders(filename))!=0) return i;
   if (!nomonsters) {
@@ -288,7 +283,6 @@ processturn(char *filename)
   }
 	score();
 	remove_unequipped_guarded();
-	korrektur_end();
 	if (!noreports) reports();
 	free_units();
 	puts(" - Beseitige leere Parteien");

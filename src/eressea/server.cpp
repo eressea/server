@@ -28,7 +28,6 @@
 #include <config.h>
 #include <eressea.h>
 
-#include "korrektur.h"
 #include "console.h"
 
 /* initialization - TODO: init in separate module */
@@ -243,7 +242,6 @@ game_init(void)
 #ifdef INFOCMD_MODULE
   init_info();
 #endif
-  init_conversion();
 
 #ifdef REMOVE_THIS
   render_init();
@@ -361,13 +359,10 @@ process_orders()
 #ifdef SHORTPWDS
   readshortpwds("passwords");
 #endif
-  printf(" - Korrekturen Runde %d\n", turn);
-  korrektur();
   turn++;
   processorders();
   score();
   remove_unequipped_guarded();
-  korrektur_end();
 
   update_subscriptions();
   return 0;

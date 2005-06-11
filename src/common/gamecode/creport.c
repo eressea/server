@@ -1443,7 +1443,7 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 
 			/* describe both passed and inhabited regions */
 			show_active_spells(r);
-			{
+			if (fval(r, RF_TRAVELUNIT)) {
 				boolean seeunits = false, seeships = false;
 				const attrib * ru;
 				/* show units pulled through region */

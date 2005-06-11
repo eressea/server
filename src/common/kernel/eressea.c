@@ -978,20 +978,21 @@ int
 alliedgroup(const struct plane * pl, const struct faction * f, 
             const struct faction * f2, const struct ally * sf, int mode)
 {
-	attrib *a;
   while (sf && sf->faction!=f2) sf=sf->next;
   if (sf==NULL) {
     mode = mode & autoalliance(pl, f, f2);
   }
   mode = ally_mode(sf, mode) | (mode & autoalliance(pl, f, f2));
-	if((a = a_find(f->attribs, &at_npcfaction)) != NULL) {
-		return mode;
-	}
-	if((a = a_find(f2->attribs, &at_npcfaction)) != NULL) {
-		return mode;
-	}
-  if (AllianceRestricted() && f->alliance!=f2->alliance) {
-    mode &= ~AllianceRestricted();
+  if (AllianceRestricted()) {
+    if (a_findc(f->attribs, &at_npcfaction)) {
+      return mode;
+    }
+    if (a_findc(f2->attribs, &at_npcfaction)) {
+      return mode;
+    }
+    if (f->alliance!=f2->alliance) {
+      mode &= ~AllianceRestricted();
+    }
   }
   return mode;
 }
@@ -2152,14 +2153,16 @@ lastregion (faction * f)
     if (f->last == r) continue;
 #endif
     /* search the region for travelthru-attributes: */
-		for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
-			u = (unit*)ru->data.v;
-			if (u->faction == f) {
-				f->last = r;
-				break;
-			}
-		}
-		if (f->last == r) continue;
+    if (fval(r, RF_TRAVELUNIT)) {
+      for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+        u = (unit*)ru->data.v;
+        if (u->faction == f) {
+          f->last = r;
+          break;
+        }
+      }
+    }
+    if (f->last == r) continue;
 		if (check_leuchtturm(r, f))
 			f->last = r;
 		if (p && is_watcher(p, f)) {
@@ -2193,11 +2196,13 @@ firstregion (faction * f)
 		}
 		if (f->first == r->next)
 			continue;
-		for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
-			u = (unit*)ru->data.v;
-			if (u->faction == f) {
-				return f->first = r;
-			}
+    if (fval(r, RF_TRAVELUNIT)) {
+  		for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+	  		u = (unit*)ru->data.v;
+		  	if (u->faction == f) {
+			  	return f->first = r;
+  			}
+      }
 		}
 		if (check_leuchtturm(r, f)) {
 			return f->first = r;
@@ -2452,7 +2457,7 @@ attrib_type at_germs = {
 /*********************/
 /*   at_guard   */
 /*********************/
-static attrib_type at_guard = {
+attrib_type at_guard = {
 	"guard",
 	DEFAULT_INIT,
 	DEFAULT_FINALIZE,
@@ -2466,11 +2471,16 @@ void
 setguard(unit * u, unsigned int flags)
 {
 	/* setzt die guard-flags der Einheit */
-	attrib * a = a_find(u->attribs, &at_guard);
-	if(flags == GUARD_NONE) {
-		if(a) a_remove(&u->attribs, a);
+	attrib * a = NULL;
+  if (fval(u, UFL_GUARD)) {
+    a = a_find(u->attribs, &at_guard);
+  }
+	if (flags == GUARD_NONE) {
+    freset(u, UFL_GUARD);
+		if (a) a_remove(&u->attribs, a);
 		return;
 	}
+  fset(u, UFL_GUARD);
 	if (!a) a = a_add(&u->attribs, a_new(&at_guard));
 	a->data.i = (int)flags;
 }
@@ -2478,11 +2488,12 @@ setguard(unit * u, unsigned int flags)
 unsigned int
 getguard(const unit * u)
 {
-	attrib *a;
 
-	if(u->region->terrain == T_OCEAN) return GUARD_NONE;
-	a = a_find(u->attribs, &at_guard);
-	if (a) return (unsigned int)a->data.i;
+	if (u->region->terrain == T_OCEAN) return GUARD_NONE;
+  if (fval(u, UFL_GUARD)) {
+    attrib * a = a_find(u->attribs, &at_guard);
+    if (a) return (unsigned int)a->data.i;
+  }
 	return GUARD_NONE;
 }
 

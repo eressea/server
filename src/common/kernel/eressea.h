@@ -1187,6 +1187,7 @@ extern int entertainmoney(const struct region * r);
 extern int freadstr(FILE * F, char * str, size_t size);
 extern int fwritestr(FILE * F, const char * str);
 
+extern attrib_type at_guard;
 #ifdef __cplusplus
 }
 #endif

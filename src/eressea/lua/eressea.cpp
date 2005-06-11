@@ -2,6 +2,7 @@
 #include <eressea.h>
 
 #include "script.h"
+#include "../korrektur.h"
 
 #include <attributes/key.h>
 #include <modules/autoseed.h>
@@ -52,7 +53,10 @@ get_turn(void)
 static int
 read_game(const char * filename)
 {
-  return readgame(filename, false);
+  int rv = readgame(filename, false);
+  printf(" - Korrekturen Runde %d\n", turn);
+  korrektur();
+  return rv;
 }
 
 static int

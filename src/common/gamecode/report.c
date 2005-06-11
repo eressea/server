@@ -1434,24 +1434,26 @@ static void
 durchreisende(FILE * F, const region * r, const faction * f)
 {
 	attrib *ru;
-	int wieviele;
+	int maxtravel;
 	int counter;
 
-	wieviele = counter = 0;
+	maxtravel = counter = 0;
 
 	/* Wieviele sind aufzulisten? Für die Grammatik. */
 
-	for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
-		unit * u = (unit*)ru->data.v;
-		if (cansee_durchgezogen(f, r, u, 0) > 0 && r!=u->region) {
-			if (u->ship && !fval(u, UFL_OWNER))
-				continue;
-			wieviele++;
-		}
-	}
+  if (fval(r, RF_TRAVELUNIT)) {
+    for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+      unit * u = (unit*)ru->data.v;
+      if (cansee_durchgezogen(f, r, u, 0) > 0 && r!=u->region) {
+        if (u->ship && !fval(u, UFL_OWNER))
+          continue;
+        maxtravel++;
+      }
+    }
 
-	if (!wieviele)
-		return;
+    if (!maxtravel)
+      return;
+  } else return;
 
 	/* Auflisten. */
 
@@ -1474,15 +1476,15 @@ durchreisende(FILE * F, const region * r, const faction * f)
 			} else {
 				scat(unitname(u));
 			}
-			if (counter + 1 < wieviele) {
+			if (counter + 1 < maxtravel) {
 				scat(", ");
-			} else if (counter + 1 == wieviele) {
+			} else if (counter + 1 == maxtravel) {
 				scat(" und ");
 			}
 		}
 	}
 
-	if (wieviele == 1) {
+	if (maxtravel == 1) {
 		scat(" hat die Region durchquert.");
 		rparagraph(F, buf, 0, 0);
 	} else {
@@ -2636,11 +2638,13 @@ prepare_report(faction * f)
       free_regionlist(rlist);
     }
 
-		if (mode<see_travel) for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
-			unit * u = (unit*)ru->data.v;
-			if (u->faction == f) {
-				mode = see_travel;
-				break;
+    if (mode<see_travel && fval(r, RF_TRAVELUNIT)) {
+      for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+  			unit * u = (unit*)ru->data.v;
+	  		if (u->faction == f) {
+		  		mode = see_travel;
+			  	break;
+        }
 			}
 		}
 

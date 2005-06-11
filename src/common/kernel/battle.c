@@ -689,39 +689,39 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 	int skill;
 	const weapon_type * wtype = w?w->type:NULL;
 
-	if (wtype==NULL) {
-		/* Ohne Waffe: Waffenlose Angriffe */
-		skill = weapon_skill(NULL, tu, attacking);
-	} else {
-		if (attacking) {
-			skill = w->attackskill;
-		} else {
-			skill = w->defenseskill;
-		}
-		if (wtype->modifiers!=NULL) {
-			/* Pferdebonus, Lanzenbonus, usw. */
-			int m;
-			unsigned int flags = WMF_SKILL|(attacking?WMF_OFFENSIVE:WMF_DEFENSIVE);
+  if (wtype==NULL) {
+    /* Ohne Waffe: Waffenlose Angriffe */
+    skill = weapon_skill(NULL, tu, attacking);
+  } else {
+    if (attacking) {
+      skill = w->attackskill;
+    } else {
+      skill = w->defenseskill;
+    }
+    if (wtype->modifiers!=NULL) {
+      /* Pferdebonus, Lanzenbonus, usw. */
+      int m;
+      unsigned int flags = WMF_SKILL|(attacking?WMF_OFFENSIVE:WMF_DEFENSIVE);
 
-			if (riding(t)) flags |= WMF_RIDING;
-			else flags |= WMF_WALKING;
-			if (riding(enemy)) flags |= WMF_AGAINST_RIDING;
-			else flags |= WMF_AGAINST_WALKING;
+      if (riding(t)) flags |= WMF_RIDING;
+      else flags |= WMF_WALKING;
+      if (riding(enemy)) flags |= WMF_AGAINST_RIDING;
+      else flags |= WMF_AGAINST_WALKING;
 
-                        for (m=0;wtype->modifiers[m].value;++m) {
-                          if ((wtype->modifiers[m].flags & flags) == flags) {
-                            race_list * rlist = wtype->modifiers[m].races;
-                            if (rlist!=NULL) {
-                              while (rlist) {
-                                if (rlist->data == tu->race) break;
-                                rlist = rlist->next;
-                              }
-                              if (rlist==NULL) continue;
-                            }
-                            skill += wtype->modifiers[m].value;
-                          }
-			}
-		}
+      for (m=0;wtype->modifiers[m].value;++m) {
+        if ((wtype->modifiers[m].flags & flags) == flags) {
+          race_list * rlist = wtype->modifiers[m].races;
+          if (rlist!=NULL) {
+            while (rlist) {
+              if (rlist->data == tu->race) break;
+              rlist = rlist->next;
+            }
+            if (rlist==NULL) continue;
+          }
+          skill += wtype->modifiers[m].value;
+        }
+      }
+    }
 	}
 
 	/* Burgenbonus, Pferdebonus */

@@ -1012,6 +1012,25 @@ nothing(void)
   return 0;
 }
 
+static int
+fix_attribflags(void)
+{
+  region * r;
+  for (r = regions; r; r=r->next) {
+    unit * u = r->units;
+    for (u=r->units;u!=NULL;u=u->next) {
+      const attrib *a = r->attribs;
+      while (a) {
+        if (a->type!=&at_guard) {
+          fset(u, UFL_GUARD);
+        }
+        a = a->next;
+        return a;
+      }
+    }
+  }
+}
+
 static int 
 fix_chaosgates(void)
 {
@@ -1051,6 +1070,7 @@ korrektur(void)
   }
 
   do_once("chgt", fix_chaosgates());
+  do_once("attr", fix_attribflags());
 	fix_astralplane();
 	fix_firewalls();
 	fix_gates();
@@ -1091,14 +1111,4 @@ korrektur(void)
 #ifdef FUZZY_BASE36
 	enable_fuzzy = true;
 #endif
-}
-
-void
-korrektur_end(void)
-{
-}
-
-void
-init_conversion(void)
-{
 }

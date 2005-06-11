@@ -498,6 +498,8 @@ travelthru(const unit * u, region * r)
 {
   attrib *ru = a_add(&r->attribs, a_new(&at_travelunit));
 
+  fset(r, RF_TRAVELUNIT);
+
   ru->data.v = (void*)u;
 
   /* the first and last region of the faction gets reset, because travelthrough

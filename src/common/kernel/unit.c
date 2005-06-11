@@ -1038,7 +1038,7 @@ get_modifier(const unit *u, skill_t sk, int level, const region *r, boolean noit
 	skill += rc_skillmod(u->race, r, sk);
 	skill += att_modification(u, sk);
 
-	if(noitem == false) {
+	if (noitem == false) {
 		skill = item_modification(u, sk, skill);
 	}
 	skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
