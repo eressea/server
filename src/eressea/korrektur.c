@@ -1019,7 +1019,7 @@ fix_attribflags(void)
   for (r = regions; r; r=r->next) {
     unit * u = r->units;
     for (u=r->units;u!=NULL;u=u->next) {
-      const attrib *a = r->attribs;
+      const attrib *a = u->attribs;
       while (a) {
         if (a->type==&at_guard) {
           fset(u, UFL_GUARD);
