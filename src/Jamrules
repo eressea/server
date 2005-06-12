@@ -5,6 +5,11 @@ CC = gcc ;
 
 LINKFLAGS += -rdynamic ;
 
+if $(MSPACES) {
+  CCFLAGS += -DMSPACES ;
+  C++FLAGS += -DMSPACES ;
+}
+
 if ! $(HAVE_LUA) {
   HAVE_LUA = 1 ;
 }

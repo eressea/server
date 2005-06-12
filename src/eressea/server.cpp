@@ -87,7 +87,9 @@
 #include <util/log.h>
 #include <util/rand.h>
 #include <util/sql.h>
-#include <util/dl/malloc.h>
+#ifdef MSPACES
+# include <util/dl/malloc.h>
+#endif
 
 /* lua includes */
 #include "lua/bindings.h"
@@ -701,7 +703,9 @@ main(int argc, char *argv[])
     }
 #endif
   }
+#ifdef MSPACES
   malloc_stats();
+#endif
 #ifdef CLEANUP_CODE
   game_done();
 #endif

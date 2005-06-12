@@ -40,7 +40,7 @@
 #include <attributes/moved.h>
 
 /* util includes */
-#include <base36.h>
+#include <util/base36.h>
 #include <event.h>
 #include <goodies.h>
 #include <resolve.h>
@@ -56,7 +56,6 @@
 #define FIND_FOREIGN_TEMP
 
 int demonfix = 0;
-/* ------------------------------------------------------------- */
 
 const unit *
 u_peasants(void)
@@ -911,20 +910,20 @@ remove_skill(unit *u, skill_t sk)
 skill * 
 add_skill(unit * u, skill_t id)
 {
-	skill * sv = u->skills;
+  skill * sv = u->skills;
 #ifndef NDEBUG
-	for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-		assert(sv->id != id);
-	}
+  for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+	assert(sv->id != id);
+  }
 #endif
-	++u->skill_size;
-	u->skills = realloc(u->skills, u->skill_size * sizeof(skill));
-	sv = (u->skills + u->skill_size - 1);
-	sv->level = (unsigned char)0;
-	sv->weeks = (unsigned char)1;
-	sv->old   = (unsigned char)0;
-	sv->id    = (unsigned char)id;
-	return sv;
+  ++u->skill_size;
+  u->skills = realloc(u->skills, u->skill_size * sizeof(skill));
+  sv = (u->skills + u->skill_size - 1);
+  sv->level = (unsigned char)0;
+  sv->weeks = (unsigned char)1;
+  sv->old   = (unsigned char)0;
+  sv->id    = (unsigned char)id;
+  return sv;
 }
 
 skill *

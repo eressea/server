@@ -9,7 +9,7 @@ SEARCH_SOURCE +=
  [ FDirName $(SUBDIR) dl ] ;
 
 SOURCES =
- #<dl>malloc.c
+ <dl>malloc.c
  attrib.c
  base36.c
  command.c

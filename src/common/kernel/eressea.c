@@ -2470,19 +2470,19 @@ attrib_type at_guard = {
 void
 setguard(unit * u, unsigned int flags)
 {
-	/* setzt die guard-flags der Einheit */
-	attrib * a = NULL;
+  /* setzt die guard-flags der Einheit */
+  attrib * a = NULL;
   if (fval(u, UFL_GUARD)) {
     a = a_find(u->attribs, &at_guard);
   }
-	if (flags == GUARD_NONE) {
+  if (flags == GUARD_NONE) {
     freset(u, UFL_GUARD);
-		if (a) a_remove(&u->attribs, a);
-		return;
-	}
+	if (a) a_remove(&u->attribs, a);
+	return;
+  }
   fset(u, UFL_GUARD);
-	if (!a) a = a_add(&u->attribs, a_new(&at_guard));
-	a->data.i = (int)flags;
+  if (!a) a = a_add(&u->attribs, a_new(&at_guard));
+  a->data.i = (int)flags;
 }
 
 unsigned int
