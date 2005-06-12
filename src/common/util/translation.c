@@ -26,32 +26,36 @@
  **/
 
 typedef struct opstack {
-	struct opstack * next;
-	variant data;
+	variant * begin;
+  variant * top;
+  int size;
 } opstack;
 
 variant
-opstack_pop(opstack ** stack)
+opstack_pop(opstack ** stackp)
 {
-	opstack * os;
-	variant data;
-
+  opstack * stack = *stackp;
 	assert(stack);
-	os = *stack;
-	assert(os);
-	data = os->data;
-	*stack = os->next;
-	free(os);
-	return data;
+  assert(stack->top>stack->begin);
+	return *(--stack->top);
 }
 
 void
-opstack_push(opstack ** stack, variant data)
+opstack_push(opstack ** stackp, variant data)
 {
-	opstack * os = (opstack*)malloc(sizeof(opstack));
-	os->next = *stack;
-	os->data = data;
-	*stack = os;
+  opstack * stack = *stackp;
+  if (stack==NULL) {
+    stack = (opstack*)malloc(sizeof(opstack));
+    stack->size = 4;
+    stack->begin = malloc(sizeof(variant) * stack->size);
+    stack->top = stack->begin;
+    *stackp = stack;
+  }
+  if (stack->top - stack->begin == stack->size) {
+    stack->size += stack->size;
+    stack->begin = realloc(stack->begin, sizeof(variant) * stack->size);
+	}
+  *stack->top++ = data;
 }
 
 /**
