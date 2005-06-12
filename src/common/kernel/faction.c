@@ -18,6 +18,7 @@
 #include "unit.h"
 #include "race.h"
 #include "region.h"
+#include "message.h"
 #include "plane.h"
 #include "item.h"
 #include "group.h"
@@ -179,7 +180,14 @@ destroyfaction(faction * f)
 	unit *u;
 	faction *ff;
 
-	if( !f->alive ) return;
+	if (!f->alive) return;
+
+  while (f->battles) {
+    struct bmsg * bm = f->battles;
+    f->battles = bm->next;
+    free_messagelist(bm->msgs);
+    free(bm);
+  }
 
 	for (u=f->units;u;u=u->nextF) {
 		region * r = u->region;

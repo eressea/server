@@ -883,8 +883,6 @@ rp_battles(FILE * F, faction * f)
       centre(F, buf, true);
       rnl(F);
       rp_messages(F, bm->msgs, f, 0, true, false);
-      free_messagelist(bm->msgs);
-      free(bm);
     }
   }
 }

@@ -325,8 +325,6 @@ extern boolean curse_active(const curse * c);
 extern const char * oldcursename(int id);
 extern void register_curses(void);
 
-#define get_oldcurse(id) \
-	get_curse(a, ct_find(oldcursename(id)))
 #define is_cursed(a, id, id2) \
 	curse_active(get_curse(a, ct_find(oldcursename(id))))
 #define get_curseeffect(a, id, id2) \
