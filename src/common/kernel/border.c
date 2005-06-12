@@ -418,14 +418,14 @@ static const char *
 b_nameroad(const border * b, const region * r, const struct faction * f, int gflags)
 {
 	region * r2 = (r==b->to)?b->from:b->to;
-	int local = (r==b->to)?b->data.sa[0]:b->data.sa[1];
+	int local = (r==b->from)?b->data.sa[0]:b->data.sa[1];
 	static char buffer[64];
 
 	unused(f);
 	if (gflags & GF_ARTICLE) {
 		if (!(gflags & GF_DETAILED)) strcpy(buffer, "eine Straﬂe");
 		else if (terrain[rterrain(r)].roadreq<=local) {
-      int remote = (r!=b->to)?b->data.sa[0]:b->data.sa[1];
+      int remote = (r2==b->from)?b->data.sa[0]:b->data.sa[1];
 			if (terrain[rterrain(r2)].roadreq<=remote) {
 				strcpy(buffer, "eine Straﬂe");
 			} else {
@@ -468,7 +468,7 @@ static boolean
 b_rvisibleroad(const border * b, const region * r)
 {
 	int x = b->data.i;
-	x = (r==b->to)?(x & 0xFFFF):((x>>16) & 0xFFFF);
+  x = (r==b->from)?b->data.sa[0]:b->data.sa[1];
 	if (x==0) return false;
 	return (boolean)(b->to==r || b->from==r);
 }
