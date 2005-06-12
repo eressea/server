@@ -131,12 +131,18 @@ free_group(group * g)
 boolean
 join_group(unit * u, const char * name)
 {
-	attrib * a = a_find(u->attribs, &at_group);
+	attrib * a = NULL;
 	group * g;
+  if (fval(u, UFL_GROUP)) {
+    a = a_find(u->attribs, &at_group);
+  }
 
 	if (a) ((group *)(a->data.v))->members--;
 	if (!name || !strlen(name)) {
-		if (a) a_remove(&u->attribs, a);
+    if (a) {
+      a_remove(&u->attribs, a);
+      freset(u, UFL_GROUP);
+    }
 		return true;
 	}
 	g = find_groupbyname(u->faction->groups, name);
@@ -144,7 +150,10 @@ join_group(unit * u, const char * name)
 		g = new_group(u->faction, name, ++maxgid);
 		init_group(u->faction, g);
 	}
-	if (!a) a = a_add(&u->attribs, a_new(&at_group));
+  if (!a) {
+    a = a_add(&u->attribs, a_new(&at_group));
+    fset(u, UFL_GROUP);
+  }
 	a->data.v = g;
 	g->members++;
 	return true;

@@ -207,11 +207,13 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   if (!isbattle) {
     attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
     if (u->faction == f) {
-      attrib *a = a_find(u->attribs, &at_group);
-      if (a) {
-        group * g = (group*)a->data.v;
-        bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
-        bufp += strlcpy(bufp, groupid(g, f), sizeof(buf)-(bufp-buf));
+      if (fval(u, UFL_GROUP)) {
+        attrib *a = a_find(u->attribs, &at_group);
+        if (a) {
+          group * g = (group*)a->data.v;
+          bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
+          bufp += strlcpy(bufp, groupid(g, f), sizeof(buf)-(bufp-buf));
+        }
       }
       if (getarnt) {
         bufp += strlcpy(bufp, ", ", sizeof(buf)-(bufp-buf));
@@ -559,7 +561,7 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 	show = NULL;
 	for(i = 0; i < ug->members; i++) {
 		unit *uc = ug->unit_array[i];
-		if(!itemcloak && mode >= see_unit && !(a_fshidden
+		if (!itemcloak && mode >= see_unit && !(a_fshidden
 				 && a_fshidden->data.ca[1] == 1 && effskill(u, SK_STEALTH) >= 3)) {
 			for (itm=uc->items;itm;itm=itm->next) {
 				item *ishow;
@@ -656,7 +658,7 @@ spskill(char * buffer, size_t siz, const struct locale * lang, const struct unit
     }
   }
   
-  if (sk == SK_STEALTH) {
+  if (sk == SK_STEALTH && fval(u, UFL_STEALTH)) {
     i = u_geteffstealth(u);
     if(i>=0) {
       bufp += sprintf(bufp, "%d/", i);

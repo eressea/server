@@ -1237,7 +1237,7 @@ ally_cmd(unit * u, struct order * ord)
     keyword = findparam(s, u->faction->locale);
 
   sfp = &u->faction->allies;
-  {
+  if (fval(u, UFL_GROUP)) {
     attrib * a = a_find(u->attribs, &at_group);
     if (a) sfp = &((group*)a->data.v)->allies;
   }
@@ -1327,7 +1327,6 @@ static int
 prefix_cmd(unit * u, struct order * ord)
 {
   attrib **ap;
-  attrib *a;
   int i;
   const char *s;
 
@@ -1336,9 +1335,13 @@ prefix_cmd(unit * u, struct order * ord)
   s = getstrtoken();
 
   if (!*s) {
-    a = a_find(u->attribs, &at_group);
+    attrib *a = NULL;
+    if (fval(u, UFL_GROUP)) {
+      a = a_find(u->attribs, &at_group);
+    }
     if (a) {
-      a_removeall(&((group*)a->data.v)->attribs, &at_raceprefix);
+      group * g = (group*)a->data.v;
+      a_removeall(&g->attribs, &at_raceprefix);
     } else {
       a_removeall(&u->faction->attribs, &at_raceprefix);
     }
@@ -1358,8 +1361,11 @@ prefix_cmd(unit * u, struct order * ord)
   }
 
   ap = &u->faction->attribs;
-  a = a_find(u->attribs, &at_group);
-  if (a) ap = &((group*)a->data.v)->attribs;
+  if (fval(u, UFL_GROUP)) {
+    attrib * a = a_find(u->attribs, &at_group);
+    group * g = (group*)a->data.v;
+    if (a) ap = &g->attribs;
+  }
   set_prefix(ap, race_prefixes[i]);
 
   return 0;
@@ -1735,10 +1741,11 @@ name_cmd(unit * u, struct order * ord)
 
   case P_GROUP:
     {
-      attrib * a = a_find(u->attribs, &at_group);
-      if (a){
+      attrib * a = NULL;
+      if (fval(u, UFL_GROUP)) a = a_find(u->attribs, &at_group);
+      if (a) {
         group * g = (group*)a->data.v;
-        s= &g->name;
+        s = &g->name;
         break;
       } else {
         cmistake(u, ord, 109, MSG_EVENT);

@@ -851,27 +851,32 @@ effskill(const unit * u, skill_t sk)
 int
 effstealth(const unit * u)
 {
-	int e, es;
+	int e;
 
 	/* Auf dem Ozean keine Tarnung! */
 	if (u->region->terrain == T_OCEAN) return 0;
 
 	e = effskill(u, SK_STEALTH);
 
-	es = u_geteffstealth(u);
-	if (es >=0 && es < e) return es;
+  if (fval(u, UFL_STEALTH)) {
+    int es = u_geteffstealth(u);
+    if (es >=0 && es < e) return es;
+  }
 	return e;
 }
 
 int
 eff_stealth (const unit * u, const region * r)
 {
-	int e, es;
+	int e;
 
+  if (r->terrain == T_OCEAN) return 0;
 	e = eff_skill (u, SK_STEALTH, r);
 
-	es = u_geteffstealth(u);
-	if (es >=0 && es < e) return es;
+  if (fval(u, UFL_STEALTH)) {
+  	int es = u_geteffstealth(u);
+	  if (es >=0 && es < e) return es;
+  }
 	return e;
 }
 
@@ -1009,7 +1014,6 @@ int
 alliedunit(const unit * u, const faction * f2, int mode)
 {
 	ally * sf;
-	const attrib * a;
 	const plane * pl = getplane(u->region);
 	int automode;
 
@@ -1022,8 +1026,10 @@ alliedunit(const unit * u, const faction * f2, int mode)
 		mode = (mode & automode) | (mode & HELP_GIVE);
 
 	sf = u->faction->allies;
-	a = a_findc(u->attribs, &at_group);
-	if (a!=NULL) sf = ((group*)a->data.v)->allies;
+  if (fval(u, UFL_GROUP)) {
+    const attrib * a = a_findc(u->attribs, &at_group);
+    if (a!=NULL) sf = ((group*)a->data.v)->allies;
+  }
   return alliedgroup(pl, u->faction, f2, sf, mode);
 }
 
@@ -1983,11 +1989,14 @@ create_unit(region * r, faction * f, int number, const struct race *urace, int i
 		}
 
 		/* Gruppen */
-		a = a_find(creator->attribs, &at_group);
-		if (a) {
-			group * g = (group*)a->data.v;
-			a_add(&u->attribs, a_new(&at_group))->data.v = g;
-		}
+    if (fval(creator, UFL_GROUP)) {
+      a = a_find(creator->attribs, &at_group);
+      if (a) {
+        group * g = (group*)a->data.v;
+        a_add(&u->attribs, a_new(&at_group))->data.v = g;
+        fset(u, UFL_GROUP);
+      }
+    }
 		a = a_find(creator->attribs, &at_otherfaction);
 		if (a) {
 			a_add(&u->attribs, make_otherfaction(get_otherfaction(a)));

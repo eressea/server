@@ -559,7 +559,6 @@ jihad_attacks(void)
 	faction *f;
 	region *r;
 	unit *u, *u2;
-	attrib *a;
 	ally *sf, **sfp;
 
 	for(f=factions; f; f=f->next) if(fspecial(f, FS_JIHAD)) {
@@ -580,8 +579,10 @@ jihad_attacks(void)
 				for(u=r->units; u; u=u->next) if(jihad(f, u->race)) {
 					/* Allianz auflösen */
 					sfp = &u2->faction->allies;
-					a = a_find(u2->attribs, &at_group);
-					if (a) sfp = &((group*)a->data.v)->allies;
+          if (fval(u, UFL_GROUP)) {
+  					attrib * a = a_find(u2->attribs, &at_group);
+	  				if (a) sfp = &((group*)a->data.v)->allies;
+          }
 
 					for (sf=*sfp; sf; sf = sf->next) {
 						if(sf->faction == u->faction) break;

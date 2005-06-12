@@ -613,11 +613,22 @@ cr_output_unit(FILE * F, const region * r,
 	const item_type * lasttype;
 	int pr;
 	item *itm, *show;
-	boolean itemcloak = is_cursed(u->attribs, C_ITEMCLOAK, 0);
 	building * b;
 	const char * pzTmp;
 	skill * sv;
 	const attrib *a_fshidden = NULL;
+  boolean itemcloak = false;
+  static const curse_type * itemcloak_ct = 0;
+  static boolean init = false;
+
+  if (!init) {
+    init = true;
+    itemcloak_ct = ct_find("itemcloak");
+  }
+
+  if (itemcloak_ct!=NULL) {
+    itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
+  }
 
 	assert(u);
 
@@ -637,7 +648,8 @@ cr_output_unit(FILE * F, const region * r,
 			const attrib * a_otherfaction = a_find(u->attribs, &at_otherfaction);
 			const faction * otherfaction = a_otherfaction?get_otherfaction(a_otherfaction):NULL;
 			/* my own faction, full info */
-			const attrib *a = a_find(u->attribs, &at_group);
+			const attrib *a = NULL;
+      if (fval(u, UFL_GROUP)) a = a_find(u->attribs, &at_group);
 			if (a!=NULL) {
 				const group * g = (const group*)a->data.v;
 				fprintf(F, "%d;gruppe\n", g->gid);
@@ -731,12 +743,14 @@ cr_output_unit(FILE * F, const region * r,
       fprintf(F, "%d;alias\n", -i);
     i = get_money(u);
     fprintf(F, "%d;Kampfstatus\n", u->status);
-    if(fval(u, UFL_NOAID)) {
+    if (fval(u, UFL_NOAID)) {
       fputs("1;unaided\n", F);
     }
-    i = u_geteffstealth(u);
-    if (i >= 0) {
-      fprintf(F, "%d;Tarnung\n", i);
+    if (fval(u, UFL_STEALTH)) {
+      i = u_geteffstealth(u);
+      if (i >= 0) {
+        fprintf(F, "%d;Tarnung\n", i);
+      }
     }
     c = uprivate(u);
     if (c) {

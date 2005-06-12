@@ -2852,10 +2852,14 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 	boolean pr_aid = false;
 	boolean stealth = (boolean)((fval(u, UFL_PARTEITARNUNG)!=0)?true:false);
 	int rest;
-	const attrib * a = a_find(u->attribs, &at_group);
-	const group * g = a?(const group*)a->data.v:NULL;
-	const attrib *a2 = a_find(u->attribs, &at_otherfaction);
-	const faction *stealthfaction = a2?get_otherfaction(a2):NULL;
+	const group * g = NULL;
+	const attrib *a = a_find(u->attribs, &at_otherfaction);
+	const faction *stealthfaction = a?get_otherfaction(a):NULL;
+
+  if (fval(u, UFL_GROUP)) {
+    const attrib * agroup = a_find(u->attribs, &at_group);
+    if (agroup!=NULL) g = (const group*)agroup->data.v;
+  }
 
 	/* Illusionen und Zauber kaempfen nicht */
 	if (fval(u->race, RCF_ILLUSIONARY) || idle(u->faction))

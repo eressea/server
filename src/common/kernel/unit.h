@@ -58,13 +58,15 @@ struct skill;
 #define UFL_TAKEALL       (1<<25) /* Einheit nimmt alle Gegenstände an */
 
 /* flags that speed up attribute access: */
+#define UFL_STEALTH       (1<<26)
 #define UFL_GUARD         (1<<27)
+#define UFL_GROUP         (1<<28)
 
 /* Flags, die gespeichert werden sollen: */
 #ifndef HEROES
-# define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | UFL_TAKEALL | UFL_GUARD)
+# define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | UFL_TAKEALL | UFL_GUARD | UFL_STEALTH)
 #else
-# define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | UFL_TAKEALL | UFL_GUARD | UFL_HERO)
+# define UFL_SAVEMASK (UFL_MOVED | UFL_NOAID | UFL_OWNER | UFL_PARTEITARNUNG | UFL_LOCKED | UFL_HUNGER | UFL_TAKEALL | UFL_GUARD | UFL_STEALTH | UFL_HERO)
 #endif
 
 #define UNIT_MAXSIZE 50000

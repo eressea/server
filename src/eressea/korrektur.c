@@ -1023,7 +1023,12 @@ fix_attribflags(void)
       while (a) {
         if (a->type==&at_guard) {
           fset(u, UFL_GUARD);
-          break;
+        }
+        else if (a->type==&at_group) {
+          fset(u, UFL_GROUP);
+        }
+        else if (a->type==&at_stealth) {
+          fset(u, UFL_STEALTH);
         }
         a = a->next;
       }
@@ -1071,7 +1076,7 @@ korrektur(void)
   }
 
   do_once("chgt", fix_chaosgates());
-  do_once("attr", fix_attribflags());
+  do_once("atri", fix_attribflags());
 	fix_astralplane();
 	fix_firewalls();
 	fix_gates();

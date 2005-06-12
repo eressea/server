@@ -305,7 +305,7 @@ destroyfaction(faction * f)
 
 	/* units of other factions that were disguised as this faction
 	 * have their disguise replaced by ordinary faction hiding. */
-	for(rc=regions; rc; rc=rc->next) {
+	for (rc=regions; rc; rc=rc->next) {
 		for(u=rc->units; u; u=u->next) {
 			attrib *a = a_find(u->attribs, &at_otherfaction);
 			if(!a) continue;
