@@ -3493,7 +3493,7 @@ init_battle(region * r, battle **bp)
       order * ord;
       
       for (ord=u->orders;ord;ord=ord->next) {
-        boolean init=false;
+        static boolean init = false;
         static const curse_type * peace_ct, * slave_ct, * calm_ct;
 
         if (!init) {

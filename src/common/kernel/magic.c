@@ -670,7 +670,7 @@ max_spellpoints(const region * r, const unit * u)
 	sk = eff_skill(u, SK_MAGIC, r);
 	msp = u->race->maxaura*(pow(sk, potenz)/divisor+1) + get_spchange(u);
 
-	if (get_item(u,I_AURAKULUM) > 0) {
+	if (get_item(u, I_AURAKULUM) > 0) {
 		msp += use_item_aura(r, u);
 	}
 	n = get_curseeffect(u->attribs, C_AURA, 0);

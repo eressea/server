@@ -984,15 +984,15 @@ att_modification(const unit *u, skill_t sk)
 	attrib * a;
 	int result = 0;
 	static boolean init = false;
-	static const curse_type * skillmod_ct;
-	static const curse_type * gbdream_ct;
+	static const curse_type * skillmod_ct, * gbdream_ct, * worse_ct;
 	if (!init) { 
 		init = true; 
 		skillmod_ct = ct_find("skillmod"); 
 		gbdream_ct = ct_find("gbdream");
+    worse_ct = ct_find("worse");
 	}
 
-	result += get_curseeffect(u->attribs, C_ALLSKILLS, 0);
+	result += curse_geteffect(get_curse(u->attribs, worse_ct));
 	if (skillmod_ct) {
     curse * c;
     variant var;

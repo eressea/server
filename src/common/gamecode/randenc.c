@@ -1142,7 +1142,12 @@ orc_growth(void)
   for (r = regions; r; r = r->next) {
     unit *u;
     for (u = r->units; u; u = u->next) {
-      curse *c = get_curse(u->attribs, ct_find("orcish"));
+      static boolean init = false;
+      static curse *c = 0;
+      if (!init) {
+        init = true;
+        c = get_curse(u->attribs, ct_find("orcish"));
+      }
 
       if (c && !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY) && !fval(u, UFL_HERO)) {
         int n;
