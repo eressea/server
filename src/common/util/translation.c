@@ -52,8 +52,10 @@ opstack_push(opstack ** stackp, variant data)
     *stackp = stack;
   }
   if (stack->top - stack->begin == stack->size) {
+    int pos = stack->top - stack->begin;
     stack->size += stack->size;
     stack->begin = realloc(stack->begin, sizeof(variant) * stack->size);
+    stack->top = stack->begin + pos;
 	}
   *stack->top++ = data;
 }
