@@ -35,7 +35,8 @@ variant
 opstack_pop(opstack ** stackp)
 {
   opstack * stack = *stackp;
-	assert(stack);
+  
+  assert(stack);
   assert(stack->top>stack->begin);
 	return *(--stack->top);
 }
@@ -46,13 +47,13 @@ opstack_push(opstack ** stackp, variant data)
   opstack * stack = *stackp;
   if (stack==NULL) {
     stack = (opstack*)malloc(sizeof(opstack));
-    stack->size = 4;
+    stack->size = 1;
     stack->begin = malloc(sizeof(variant) * stack->size);
     stack->top = stack->begin;
     *stackp = stack;
   }
   if (stack->top - stack->begin == stack->size) {
-    int pos = stack->top - stack->begin;
+    size_t pos = stack->top - stack->begin;
     stack->size += stack->size;
     stack->begin = realloc(stack->begin, sizeof(variant) * stack->size);
     stack->top = stack->begin + pos;
@@ -352,7 +353,9 @@ translate(const char* format, const void * userdata, const char* vars, variant a
 	char symbol[32];
 	char *oc = symbol;
 	opstack * stack = NULL;
-	brelease();
+  const char * rv;
+
+  brelease();
 	free_variables();
 
 	assert(format);
@@ -369,7 +372,10 @@ translate(const char* format, const void * userdata, const char* vars, variant a
 	}
 
 	if (parse(&stack, format, userdata)==NULL) return NULL;
-	return (const char*)opop(&stack).v;
+	rv = (const char*)opop(&stack).v;
+  free(stack->begin);
+  free(stack);
+  return rv;
 }
 
 static void
