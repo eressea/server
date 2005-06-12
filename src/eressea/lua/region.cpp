@@ -119,7 +119,7 @@ region_getresource(const region& r, const char * type)
 static void
 region_setroad(region& r, int dir, lua_Number size)
 {
-  rsetroad(&r, (direction_t)dir, (int)(terrain[rterrain(&r)].roadreq * size));
+  rsetroad(&r, (direction_t)dir, (short)(terrain[rterrain(&r)].roadreq * size));
 }
 
 static lua_Number

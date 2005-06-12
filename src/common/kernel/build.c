@@ -296,11 +296,15 @@ do_siege(void)
 /* ------------------------------------------------------------- */
 
 static void
-destroy_road(unit *u, int n, struct order * ord)
+destroy_road(unit *u, int nmax, struct order * ord)
 {
   direction_t d = getdirection(u->faction->locale);
   unit *u2;
   region *r = u->region;
+  short n = (short)nmax;
+
+  if (nmax>SHRT_MAX) n = SHRT_MAX;
+  else if (nmax<0) n = 0;
 
   for (u2=r->units;u2;u2=u2->next) {
     if (u2->faction!=u->faction && getguard(u2)&GUARD_TAX
@@ -314,22 +318,18 @@ destroy_road(unit *u, int n, struct order * ord)
   if (d==NODIRECTION) {
     cmistake(u, ord, 71, MSG_PRODUCE);
   } else {
-#if 0
-    int salvage, divy = 2;
-#endif
-    int willdo = min(n, eff_skill(u, SK_ROAD_BUILDING, r)*u->number);
-    int road = rroad(r, d);
-    region * r2 = rconnect(r,d);
-    willdo = min(willdo, road);
-    if (willdo==0) {
-      /* TODO: error message */
-    }
-#if 0
-    salvage = willdo / divy;
-    change_item(u, I_STONE, salvage);
-#endif
-    rsetroad(r, d, road - willdo);
-    if (road!=0 && road <= willdo) {
+    short road = rroad(r, d);
+    road = min(n, road);
+    if (road!=0) {
+      region * r2 = rconnect(r,d);
+      int willdo = eff_skill(u, SK_ROAD_BUILDING, r)*u->number;
+      willdo = min(willdo, road);
+      if (willdo==0) {
+        /* TODO: error message */
+      }
+      if (willdo>SHRT_MAX) road = 0;
+      else road = road - (short)willdo;
+      rsetroad(r, d, road);
       ADDMSG(&u->faction->msgs, msg_message("destroy_road", 
         "unit from to", u, r, r2));
     }
@@ -554,7 +554,7 @@ build_road(region * r, unit * u, int size, direction_t d)
   /* n is now modified by several special effects, so we have to
    * minimize it again to make sure the road will not grow beyond
    * maximum. */
-  rsetroad(r, d, rroad(r, d) + min(n, left));
+  rsetroad(r, d, rroad(r, d) + (short)min(n, left));
 
   if (u->race == new_race[RC_STONEGOLEM]){
     int golemsused = n / GOLEM_STONE;

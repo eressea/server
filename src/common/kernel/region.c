@@ -567,9 +567,8 @@ attrib_type at_road = {
 };
 
 void
-rsetroad(region * r, direction_t d, int val)
+rsetroad(region * r, direction_t d, short val)
 {
-	int rval;
 	border * b;
 	region * r2 = rconnect(r, d);
 
@@ -577,15 +576,11 @@ rsetroad(region * r, direction_t d, int val)
 	b = get_borders(r, r2);
 	while (b && b->type!=&bt_road) b = b->next;
 	if (!b) b = new_border(&bt_road, r, r2);
-	rval = b->data.i;
-	if (b->from==r)
-		rval = (rval & 0xFFFF) | (val<<16);
-	else
-		rval = (rval & 0xFFFF0000) | val;
-	b->data.i = rval;
+	if (r==b->from) b->data.sa[0] = val;
+	else b->data.sa[1] = val;
 }
 
-int
+short
 rroad(const region * r, direction_t d)
 {
 	int rval;
@@ -597,11 +592,8 @@ rroad(const region * r, direction_t d)
 	while (b && b->type!=&bt_road) b = b->next;
 	if (!b) return 0;
 	rval = b->data.i;
-	if (b->to==r)
-		rval = (rval & 0xFFFF);
-	else
-		rval = (rval & 0xFFFF0000) >> 16;
-	return rval;
+  if (r==b->from) return b->data.sa[0];
+  return b->data.sa[1];
 }
 
 boolean

@@ -1659,13 +1659,13 @@ sp_create_stonegolem(castorder *co)
  * (FARCASTING | REGIONSPELL | TESTRESISTANCE)
  */
 
-void
-destroy_all_roads(region *r, int val)
+static void
+destroy_all_roads(region *r)
 {
 	int i;
 
 	for(i = 0; i < MAXDIRECTIONS; i++){
-		rsetroad(r,(direction_t)i, val);
+		rsetroad(r,(direction_t)i, 0);
 	}
 }
 
@@ -1710,17 +1710,17 @@ sp_great_drought(castorder *co)
 		switch(rterrain(r)){
 			case T_PLAIN:
 			   rsetterrain(r, T_GRASSLAND);
-				destroy_all_roads(r, 0);
+				destroy_all_roads(r);
 				break;
 
 			case T_SWAMP:
 			   rsetterrain(r, T_GRASSLAND);
-				destroy_all_roads(r, 0);
+				destroy_all_roads(r);
 				break;
 
 			case T_GRASSLAND:
 				rsetterrain(r, T_DESERT);
-				destroy_all_roads(r, 0);
+				destroy_all_roads(r);
 				break;
 
 			case T_GLACIER:
@@ -1730,9 +1730,9 @@ sp_great_drought(castorder *co)
 #endif
 				if (rand() % 100 < 50){
 					rsetterrain(r, T_SWAMP);
-					destroy_all_roads(r, 0);
+					destroy_all_roads(r);
 				} else {   /* Ozean */
-					destroy_all_roads(r, 0);
+					destroy_all_roads(r);
 					rsetterrain(r, T_OCEAN);
 					/* Einheiten dürfen hier auf keinen Fall gelöscht werden! */
 					for (u = r->units; u; u = u->next) {

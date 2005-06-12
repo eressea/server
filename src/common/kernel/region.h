@@ -189,8 +189,8 @@ void chaoscounts(struct region * r, int delta);
 
 void setluxuries(struct region * r, const struct luxury_type * sale);
 
-int rroad(const struct region * r, direction_t d);
-void rsetroad(struct region * r, direction_t d, int value);
+short rroad(const struct region * r, direction_t d);
+void rsetroad(struct region * r, direction_t d, short value);
 
 int is_coastregion(struct region *r);
 

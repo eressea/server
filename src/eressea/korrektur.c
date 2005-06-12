@@ -1023,7 +1023,7 @@ fix_attribflags(void)
       while (a) {
         if (a->type==&at_guard) {
           fset(u, UFL_GUARD);
-		  break;
+          break;
         }
         a = a->next;
       }

@@ -73,7 +73,7 @@ typedef struct terraindata_t {
 	                         /* ist NULL, wenn kein Strassenbau möglich */
 
 	int quarries;			/* abbaubare Steine pro Runde */
-	int roadreq;			/* Steine fuer Strasse (-1 = nicht machbar) */
+	short roadreq;			/* Steine fuer Strasse (-1 = nicht machbar) */
 	int production_max;		/* bebaubare Parzellen (10 Leute pro Parzelle) */
 	/* Achtung: Produktion wird durch Flueche (zB Duerre) beeinflusst.
 	 * Die Funktion production(struct region *r) in economic.c ermittelt den
