@@ -467,7 +467,7 @@ destroy_cmd(unit * u, struct order * ord)
 void
 build_road(region * r, unit * u, int size, direction_t d)
 {
-  int n, dm, left;
+  int n, left;
 
   if (!eff_skill(u, SK_ROAD_BUILDING, r)) {
     cmistake(u, u->thisorder, 103, MSG_PRODUCE);
@@ -520,49 +520,59 @@ build_road(region * r, unit * u, int size, direction_t d)
 
   /* left kann man noch bauen */
   left = terrain[rterrain(r)].roadreq - rroad(r, d);
-  if (size > 0) {
-    n = min(size, left);
-  } else {
-    n = left;
-  }
-
   /* hoffentlich ist r->road <= terrain[rterrain(r)].roadreq, n also >= 0 */
-
-  if (n <= 0) {
+  if (left <= 0) {
     sprintf(buf, "In %s gibt es keine Brücken und Straßen "
       "mehr zu bauen", regionname(r, u->faction));
     mistake(u, u->thisorder, buf, MSG_PRODUCE);
     return;
   }
 
-  /* max Bauten anhand des Talentes */
-  n = min(n, u->number * eff_skill(u, SK_ROAD_BUILDING, r));
-
-  if ((dm = get_effect(u, oldpotiontype[P_DOMORE])) != 0) {
-    dm = min(dm, u->number);
-    change_effect(u, oldpotiontype[P_DOMORE], -dm);
-    n += dm * eff_skill(u, SK_ROAD_BUILDING, r);
-  }             /* Auswirkung Schaffenstrunk */
-
-  /* und anhand der rohstoffe */
+  /* baumaximum anhand der rohstoffe */
   if (u->race == new_race[RC_STONEGOLEM]){
-    n = min(n, u->number * GOLEM_STONE);
+    n = u->number * GOLEM_STONE;
   } else {
-    n = use_pooled(u, r, R_STONE, n);
+    n = get_pooled(u, r, R_STONE);
   }
+  left = min(n, left);
+  if (size>0) left = min(size, left);
+
+  /* n = maximum by skill. try to maximize it */
+  n = u->number * eff_skill(u, SK_ROAD_BUILDING, r);
+  if (n < left) {
+    item * itm = *i_find(&u->items, olditemtype[I_RING_OF_NIMBLEFINGER]);
+    if (itm!=NULL && itm->number>0) {
+      int rings = min(u->number, itm->number);
+      n = n * (9*rings+u->number) / u->number;
+    }
+  }
+  if (n < left) {
+    int dm = get_effect(u, oldpotiontype[P_DOMORE]);
+    if (dm != 0) {
+      int sk = eff_skill(u, SK_ROAD_BUILDING, r);
+      dm = (left - n + sk - 1) / sk;
+      dm = min(dm, u->number);
+      change_effect(u, oldpotiontype[P_DOMORE], -dm);
+      n += dm * sk;
+    }             /* Auswirkung Schaffenstrunk */
+  }
+
+  /* make minimum of possible and available: */
+  n = min(left, n);
 
   /* n is now modified by several special effects, so we have to
    * minimize it again to make sure the road will not grow beyond
    * maximum. */
-  rsetroad(r, d, rroad(r, d) + (short)min(n, left));
+  rsetroad(r, d, rroad(r, d) + (short)n);
 
-  if (u->race == new_race[RC_STONEGOLEM]){
+  if (u->race == new_race[RC_STONEGOLEM]) {
     int golemsused = n / GOLEM_STONE;
     if (n%GOLEM_STONE != 0){
       ++golemsused;
     }
-    scale_number(u,u->number - golemsused);
+    scale_number(u, u->number - golemsused);
   } else {
+    use_pooled(u, r, R_STONE, n);
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
     produceexp(u, SK_ROAD_BUILDING, min(n, u->number));
   }
@@ -678,7 +688,7 @@ build(unit * u, const construction * ctype, int completed, int want)
     }
 
     /* n = maximum buildable size */
-    if(type->minskill > 1) {
+    if (type->minskill > 1) {
       n = skills / type->minskill;
     } else {
       n = skills;
