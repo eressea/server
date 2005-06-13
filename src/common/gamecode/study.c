@@ -710,6 +710,7 @@ learn(void)
           a_remove(&u->attribs, a);
           a = NULL;
         }
+        fset(u, UFL_LONGACTION);
 
         /* Anzeigen neuer Tränke */
         /* Spruchlistenaktualiesierung ist in Regeneration */

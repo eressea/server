@@ -625,7 +625,6 @@ cr_output_unit(FILE * F, const region * r,
     init = true;
     itemcloak_ct = ct_find("itemcloak");
   }
-
   if (itemcloak_ct!=NULL) {
     itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
   }
