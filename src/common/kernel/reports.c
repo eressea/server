@@ -190,7 +190,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   const char *pzTmp;
   spell *sp;
   building * b;
-  boolean itemcloak = is_cursed(u->attribs, C_ITEMCLOAK, 0);
   boolean isbattle = (boolean)(mode == see_battle);
   int telepath_see = fspecial(f, FS_TELEPATHY);
   attrib *a_fshidden = NULL;
@@ -198,6 +197,17 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   item * show;
   faction *fv = visible_faction(f, u);
   char * bufp = buf;
+  boolean itemcloak = false;
+  static const curse_type * itemcloak_ct = 0;
+  static boolean init = false;
+
+  if (!init) {
+    init = true;
+    itemcloak_ct = ct_find("itemcloak");
+  }
+  if (itemcloak_ct!=NULL) {
+    itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
+  }
 
   if (fspecial(u->faction, FS_HIDDEN))
     a_fshidden = a_find(u->attribs, &at_fshidden);
@@ -491,13 +501,23 @@ bufunit_ugroupleader(const faction * f, const unit * u, int indent, int mode)
 	int getarnt = fval(u, UFL_PARTEITARNUNG);
 	faction *fv;
 	const char *pzTmp;
-	boolean itemcloak = is_cursed(u->attribs, C_ITEMCLOAK, 0);
 	attrib *a_fshidden = NULL;
 	item * itm;
 	item * show;
 	ugroup *ug = findugroup(u);
 	boolean guards = false;
 	boolean sieges = false;
+  boolean itemcloak = false;
+  static const curse_type * itemcloak_ct = 0;
+  static boolean init = false;
+
+  if (!init) {
+    init = true;
+    itemcloak_ct = ct_find("itemcloak");
+  }
+  if (itemcloak_ct!=NULL) {
+    itemcloak = curse_active(get_curse(u->attribs, itemcloak_ct));
+  }
 
 	if(fspecial(u->faction, FS_HIDDEN))
 		a_fshidden = a_find(u->attribs, &at_fshidden);

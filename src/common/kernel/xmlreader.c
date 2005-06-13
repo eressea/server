@@ -1356,7 +1356,9 @@ register_xmlreader(void)
 
   xml_register_callback(parse_strings);
   xml_register_callback(parse_prefixes);
-  xml_register_callback(parse_messages);
+  if (gamecode_enabled) {
+    xml_register_callback(parse_messages);
+  }
 
   xml_register_callback(parse_races);
   xml_register_callback(parse_resources);
