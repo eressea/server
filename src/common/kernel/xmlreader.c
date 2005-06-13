@@ -1098,10 +1098,14 @@ parse_races(xmlDocPtr doc)
 static int
 parse_messages(xmlDocPtr doc)
 {
-  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
+  xmlXPathContextPtr xpath;
   xmlXPathObjectPtr messages;
   xmlNodeSetPtr nodes;
   int i;
+
+  if (!gamecode_enabled) return 0;
+
+  xpath = xmlXPathNewContext(doc);
 
   /* reading eressea/strings/string */
   messages = xmlXPathEvalExpression(BAD_CAST "/eressea/messages/message", xpath);
@@ -1356,9 +1360,7 @@ register_xmlreader(void)
 
   xml_register_callback(parse_strings);
   xml_register_callback(parse_prefixes);
-  if (gamecode_enabled) {
-    xml_register_callback(parse_messages);
-  }
+  xml_register_callback(parse_messages);
 
   xml_register_callback(parse_races);
   xml_register_callback(parse_resources);

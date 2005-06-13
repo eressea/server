@@ -163,7 +163,7 @@ struct building_type;
 #define BACTION_VERSION 319 /* building action gets a param string */
 #define NOLASTORDER_VERSION 320 /* do not use lastorder */
 
-#define MIN_VERSION ALLIANCES_VERSION
+#define MIN_VERSION CURSETYPE_VERSION
 #define REGIONOWNERS_VERSION 400
 #define UGROUPS_VERSION 500 /* nicht aktivieren, nicht fertig */
 
