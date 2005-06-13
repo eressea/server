@@ -366,8 +366,6 @@ extern void create_newfamiliar(struct unit * mage, struct unit * familiar);
 extern void create_newclone(struct unit * mage, struct unit * familiar);
 extern struct unit * has_clone(struct unit * mage);
 
-extern struct plane * astral_plane;
-
 extern const char * spell_info(const struct spell * sp, const struct locale * lang);
 extern const char * spell_name(const struct spell * sp, const struct locale * lang);
 

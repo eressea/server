@@ -1064,7 +1064,7 @@ fix_astral_firewalls(void)
 {
   region * r;
   for (r = regions; r; r=r->next) {
-    if (r->planep==astral_plane && r->terrain==T_FIREWALL) {
+    if (r->planep==get_astralplane() && r->terrain==T_FIREWALL) {
       terraform(r, T_ASTRALB);
     }
   }
