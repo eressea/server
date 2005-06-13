@@ -747,6 +747,28 @@ fix_gates(void)
 	}
 }
 
+static void
+frame_regions(void)
+{
+  region * r = regions;
+  for (r=regions;r;r=r->next) {
+    direction_t d;
+
+    if (r->age<10) continue;
+    if (r->planep) continue;
+    if (r->terrain==T_FIREWALL) continue;
+
+    for (d=0;d!=MAXDIRECTIONS;++d) {
+      region * rn = rconnect(r, d);
+      if (rn==NULL) {
+        rn = new_region(r->x+delta_x[d], r->y+delta_y[d]);
+        terraform(rn, T_FIREWALL);
+        rn->age=r->age;
+      }
+    }
+  }
+}
+
 static int
 fix_astralplane(void)
 {
@@ -1038,6 +1060,18 @@ fix_attribflags(void)
 }
 
 static int 
+fix_astral_firewalls(void)
+{
+  region * r;
+  for (r = regions; r; r=r->next) {
+    if (r->planep==astral_plane && r->terrain==T_FIREWALL) {
+      terraform(r, T_ASTRALB);
+    }
+  }
+  return 0;
+}
+
+static int 
 fix_chaosgates(void)
 {
   region * r;
@@ -1077,6 +1111,8 @@ korrektur(void)
 
   do_once("chgt", fix_chaosgates());
   do_once("atri", fix_attribflags());
+  do_once("asfi", fix_astral_firewalls());
+  frame_regions();
 	fix_astralplane();
 	fix_firewalls();
 	fix_gates();

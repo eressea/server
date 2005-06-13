@@ -1555,23 +1555,6 @@ log_newstuff(void)
 	}
 }
 
-void
-frame_regions(void)
-{
-	region * r = regions;
-	for (r=regions;r;r=r->next) if (r->age>10 && r->terrain!=T_FIREWALL) {
-		direction_t d;
-		for (d=0;d!=MAXDIRECTIONS;++d) {
-			region * rn = rconnect(r, d);
-			if (rn==NULL) {
-				rn = new_region(r->x+delta_x[d], r->y+delta_y[d]);
-				terraform(rn, T_FIREWALL);
-				rn->age=r->age;
-			}
-		}
-	}
-}
-
 int
 main(int argc, char *argv[])
 {
@@ -1731,7 +1714,6 @@ main(int argc, char *argv[])
 	setminmax();
 	srand(time((time_t *) NULL));
 
-	frame_regions();
 	if (autoseeding) {
 		runautoseed();
 		remove_empty_units();
