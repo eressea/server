@@ -62,8 +62,12 @@ mt_new(const char * name, const char * args[])
       char * cp = strncpy((char*)malloc(spos-x+1), x, spos-x);
       cp[spos-x] = '\0';
       mtype->pnames[i] = cp;
-      /* optimierung: Typ-Strings zentral verwalten. */
       mtype->types[i] = find_argtype(spos+1);
+      if (mtype->types[i]==NULL) {
+        log_error(("unknown argument type %s for message type %s\n", 
+          spos+1, mtype->name));
+      }
+      assert(mtype->types[i]);
     }
   }
   return mtype;
