@@ -51,17 +51,17 @@
 #include <items/demonseye.h>
 
 /* util includes */
-#include <base36.h>
-#include <cvector.h>
-#include <rand.h>
-#include <log.h>
+#include <util/base36.h>
+#include <util/bsdstring.h>
+#include <util/cvector.h>
+#include <util/rand.h>
+#include <util/log.h>
 
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
 #include <limits.h>
 #include <math.h>
-#include <message.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -3284,7 +3284,7 @@ battle_report(battle * b)
 	side *s, *s2;
 	boolean cont = false;
 	boolean komma;
-	char buf2[1024];
+	char * bufp = buf;
 	bfaction *bf;
 
 	buf[0] = 0;
@@ -3301,46 +3301,49 @@ battle_report(battle * b)
 	} cv_next(s);
 
 	printf(" %d", b->turn);
-	fflush(stdout);
+  fflush(stdout);
 
-	for (bf=b->factions;bf;bf=bf->next) {
-		faction * fac = bf->faction;
-                message * m;
-                
-		fbattlerecord(b, fac, " ");
+  for (bf=b->factions;bf;bf=bf->next) {
+    faction * fac = bf->faction;
+    message * m;
 
-                if (cont) m = msg_message("battle::lineup", "turn", b->turn);
-                else m = msg_message("battle::after", "");
-                message_faction(b, fac, m);
-                msg_release(m);
+    fbattlerecord(b, fac, " ");
 
-		buf2[0] = 0;
-		komma   = false;
-		cv_foreach(s, b->sides) {
-			if (s->alive) {
+    if (cont) m = msg_message("battle::lineup", "turn", b->turn);
+    else m = msg_message("battle::after", "");
+    message_faction(b, fac, m);
+    msg_release(m);
+
+    komma   = false;
+    cv_foreach(s, b->sides) {
+      if (s->alive) {
 				int r, k = 0, * alive = get_alive(b, s, fac, seematrix(fac, s));
 				int l = FIGHT_ROW;
 				const char * abbrev = seematrix(fac, s)?sideabkz(s, false):"-?-";
 				const char * loc_army = LOC(fac->locale, "battle_army");
-				sprintf(buf, "%s%s %2d(%s): ", (komma==true?", ":""), 
-						loc_army, s->index, abbrev);
+        char buffer[32];
+
+        if (komma) bufp += strlcpy(bufp, ", ", sizeof(buf) - (bufp - buf));
+        snprintf(buffer, sizeof(buffer), "%s %2d(%s): ", 
+          loc_army, s->index, abbrev);
+        buffer[sizeof(buffer)-1] = 0;
+
+        bufp += strlcpy(bufp, buffer, sizeof(buf) - (bufp - buf));
+
 				for (r=FIGHT_ROW;r!=NUMROWS;++r) {
 					if (alive[r]) {
 						if (l!=FIGHT_ROW) scat("+");
 						while(k--) scat("0+");
 						icat(alive[r]);
 						k = 0;
-						l=r+1;
+						l = r+1;
 					} else ++k;
 				}
 
-				strcat(buf2, buf);
-				if (komma == false) {
-					komma = true;
-				}
+        komma = true;
 			}
 		} cv_next(s);
-		fbattlerecord(b, fac, buf2);
+		fbattlerecord(b, fac, buf);
 	}
 	return cont;
 }
