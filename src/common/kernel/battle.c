@@ -3284,7 +3284,6 @@ battle_report(battle * b)
 	side *s, *s2;
 	boolean cont = false;
 	boolean komma;
-	char * bufp = buf;
 	bfaction *bf;
 
 	buf[0] = 0;
@@ -3305,6 +3304,7 @@ battle_report(battle * b)
 
   for (bf=b->factions;bf;bf=bf->next) {
     faction * fac = bf->faction;
+    char * bufp = buf;
     message * m;
 
     fbattlerecord(b, fac, " ");
@@ -3332,9 +3332,14 @@ battle_report(battle * b)
 
 				for (r=FIGHT_ROW;r!=NUMROWS;++r) {
 					if (alive[r]) {
-						if (l!=FIGHT_ROW) scat("+");
-						while(k--) scat("0+");
-						icat(alive[r]);
+            if (l!=FIGHT_ROW) {
+              bufp += strlcpy(bufp, "+", sizeof(buf) - (bufp - buf));
+            }
+            while (k--) {
+              bufp += strlcpy(bufp, "0+", sizeof(buf) - (bufp - buf));
+            }
+            sprintf(buffer, "%d", alive[r]);
+            bufp += strlcpy(bufp, buffer, sizeof(buf) - (bufp - buf));
 						k = 0;
 						l = r+1;
 					} else ++k;
