@@ -1081,13 +1081,15 @@ fix_chaosgates(void)
     while (a!=NULL) {
       spec_direction * sd = (spec_direction *)a->data.v;
       region * r2 = findregion(sd->x, sd->y);
-      border * b = get_borders(r, r2);
-      while (b) {
-        if (b->type==&bt_chaosgate) break;
-        b = b->next;
-      }
-      if (b==NULL) {
-        b = new_border(&bt_chaosgate, r, r2);
+	  if (r2!=NULL) {
+        border * b = get_borders(r, r2);
+        while (b) {
+          if (b->type==&bt_chaosgate) break;
+          b = b->next;
+        }
+        if (b==NULL) {
+          b = new_border(&bt_chaosgate, r, r2);
+        }
       }
       a = a->nexttype;
     }

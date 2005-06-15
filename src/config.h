@@ -36,7 +36,7 @@ extern "C" {
  ****                 ****/
 #if defined __GNUC__
 # define HAVE_INLINE
-# define INLINE_FUNCTION __inline
+# define INLINE_FUNCTION static __inline
 #endif
 
 /* define USE_DMALLOC to enable use of the dmalloc library */
