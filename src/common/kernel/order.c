@@ -16,6 +16,8 @@
 #include "order.h"
 #include "skill.h"
 
+#include <util/bsdstring.h>
+
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
@@ -107,15 +109,18 @@ getcommand(const order * ord)
 #ifdef SHORT_STRINGS
   if (kwd!=NOKEYWORD) {
     const struct locale * lang = ORD_LOCALE(ord);
-    strcpy(str, LOC(lang, keywords[kwd]));
-    str += strlen(str);
+    size_t size = sizeof(sbuffer)-(str-sbuffer);
+    if (text) --size;
+    str += strlcpy(str, LOC(lang, keywords[kwd]), size);
     if (text) {
       *str++ = ' ';
       *str = 0;
     }
   }
 #endif
-  if (text) strcpy(str, text);
+  if (text) {
+    str += strlcpy(str, text, sizeof(sbuffer)-(str-sbuffer));
+  }
   return strdup(sbuffer);
 }
 

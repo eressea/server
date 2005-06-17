@@ -72,6 +72,7 @@
 
 /* util includes */
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/log.h>
@@ -2264,6 +2265,8 @@ display_item(faction *f, unit *u, const item_type * itype)
   const char *name;
   const char *info;
   const char *key;
+  char * bufp = buf;
+  size_t size = sizeof(buf), rsize;
 
   if (u && *i_find(&u->items, itype) == NULL) return false;
 
@@ -2287,10 +2290,14 @@ display_item(faction *f, unit *u, const item_type * itype)
     if (fp!=NULL) {
       buf[0]='\0';
       while (fgets(t, NAMESIZE, fp) != NULL) {
-        if (t[strlen(t) - 1] == '\n') {
-          t[strlen(t) - 1] = 0;
+        size_t len = strlen(t);
+        if (len>0 && t[len - 1] == '\n') {
+          t[len - 1] = 0;
         }
-        strcat(buf, t);
+        rsize = strlcpy(bufp, t, size);
+        if (rsize>size) rsize = size-1;
+        size -= rsize;
+        bufp += rsize;
       }
       fclose(fp);
       info = buf;
@@ -2336,11 +2343,16 @@ display_race(faction *f, unit *u, const race * rc)
   const char *name;
   int a, at_count;
   char buf2[2048];
+  char * bufp = buf;
+  size_t size = sizeof(buf), rsize;
 
   if (u && u->race != rc) return false;
   name = rc_name(rc, 0);
 
-  sprintf(buf, "%s: ", LOC(f->locale, name));
+  rsize = slprintf(bufp, size, "%s: ", LOC(f->locale, name));
+  if (rsize>size) rsize = size-1;
+  size -= rsize;
+  bufp += rsize;
 
   sprintf(filename, "showdata/%s", LOC(default_locale, name));
   fp = fopen(filename, "r");
@@ -2349,29 +2361,52 @@ display_race(faction *f, unit *u, const race * rc)
       if (t[strlen(t) - 1] == '\n') {
         t[strlen(t) - 1] = 0;
       }
-      strcat(buf, t);
+      rsize = strlcpy(bufp, t, size);
+      if (rsize>size) rsize = size-1;
+      size -= rsize;
+      bufp += rsize;
     }
     fclose(fp);
-    strcat(buf, ". ");
+    rsize = strlcpy(bufp, ". ", size);
+    if (rsize>size) rsize = size-1;
+    size -= rsize;
+    bufp += rsize;
   }
 
   /* hp_p : Trefferpunkte */
   sprintf(buf2, "Trefferpunkte: %d", rc->hitpoints);
-  strcat(buf, buf2);
+
+  rsize = strlcpy(bufp, buf2, size);
+  if (rsize>size) rsize = size-1;
+  size -= rsize;
+  bufp += rsize;
+
   /* b_armor : Rüstung */
   if (rc->armor > 0){
     sprintf(buf2, ", Rüstung: %d", rc->armor);
-    strcat(buf, buf2);
+    rsize += strlcpy(bufp, buf2, size);
+    if (rsize>size) rsize = size-1;
+    size -= rsize;
+    bufp += rsize;
   }
   /* b_attacke : Angriff */
   sprintf(buf2, ", Angriff: %d", (rc->at_default+rc->at_bonus));
-  strcat(buf, buf2);
+  rsize = strlcpy(bufp, buf2, size);
+  if (rsize>size) rsize = size-1;
+  size -= rsize;
+  bufp += rsize;
 
   /* b_defense : Verteidigung */
   sprintf(buf2, ", Verteidigung: %d", (rc->df_default+rc->df_bonus));
-  strcat(buf, buf2);
+  rsize = strlcpy(bufp, buf2, size);
+  if (rsize>size) rsize = size-1;
+  size -= rsize;
+  bufp += rsize;
 
-  strcat(buf, ".");
+  if (size>1) {
+    strcpy(bufp++, ".");
+    --size;
+  }
 
   /* b_damage : Schaden */
   at_count=0;
@@ -2381,26 +2416,43 @@ display_race(faction *f, unit *u, const race * rc)
     }
   }
   if (rc->battle_flags & BF_EQUIPMENT) {
-    strcat(buf, " Kann Waffen benutzen.");
+    rsize = strlcpy(bufp, " Kann Waffen benutzen.", size);
+    if (rsize>size) rsize = size-1;
+    size -= rsize;
+    bufp += rsize;
   }
   if (rc->battle_flags & BF_RES_PIERCE) {
-    strcat(buf, " Ist durch Stichwaffen, Bögen und Armbrüste schwer zu verwunden.");
+    rsize = strlcpy(bufp, " Ist durch Stichwaffen, Bögen und Armbrüste schwer zu verwunden.", size);
+    if (rsize>size) rsize = size-1;
+    size -= rsize;
+    bufp += rsize;
   }
   if (rc->battle_flags & BF_RES_CUT) {
-    strcat(buf, " Ist durch Hiebwaffen schwer zu verwunden.");
+    rsize = strlcpy(bufp, " Ist durch Hiebwaffen schwer zu verwunden.", size);
+    if (rsize>size) rsize = size-1;
+    size -= rsize;
+    bufp += rsize;
   }
   if (rc->battle_flags & BF_RES_BASH) {
-    strcat(buf, " Ist durch Schlagwaffen und Katapulte schwer zu verwunden.");
+    rsize = strlcpy(bufp, " Ist durch Schlagwaffen und Katapulte schwer zu verwunden.", size);
+    if (rsize>size) rsize = size-1;
+    size -= rsize;
+    bufp += rsize;
   }
 
   sprintf(buf2, " Hat %d Angriff%s", at_count, (at_count>1)?"e":"");
-  strcat(buf, buf2);
+  rsize = strlcpy(bufp, buf2, size);
+  if (rsize>size) rsize = size-1;
+  size -= rsize;
+  bufp += rsize;
+
   for (a = 0; a < 6; a++) {
     if (rc->attack[a].type != AT_NONE){
-      if (a!=0){
-        strcat(buf, ", ");
-      } else {
-        strcat(buf, ": ");
+      if (size>2) {
+        if (a!=0) strcat(bufp, ", ");
+        else strcat(bufp, ": ");
+        size -= 2;
+        bufp += 2;
       }
       switch(rc->attack[a].type) {
       case AT_STANDARD:
@@ -2418,11 +2470,17 @@ display_race(faction *f, unit *u, const race * rc)
       case AT_STRUCTURAL:
         sprintf(buf2, "ein Angriff, der %s Gebäudeschaden verursacht", rc->attack[a].data.dice);
       }
-      strcat(buf, buf2);
+      rsize = strlcpy(bufp, buf2, size);
+      if (rsize>size) rsize = size-1;
+      size -= rsize;
+      bufp += rsize;
     }
   }
 
-  strcat(buf, ".");
+  if (size>1) {
+    strcat(bufp++, ".");
+    --size;
+  }
 
   addmessage(0, f, buf, MSG_EVENT, ML_IMPORTANT);
 

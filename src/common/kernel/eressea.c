@@ -3339,7 +3339,9 @@ freadstr(FILE * F, char * start, size_t size)
         }
         break;
       default:
-        *str++ = (char)c;
+        if ((size_t)(str-start+1)<size) {
+          *str++ = (char)c;
+        }
     }
   }
 }

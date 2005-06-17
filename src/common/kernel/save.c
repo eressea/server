@@ -223,7 +223,6 @@ rds(FILE * F, char **ds)
 			fprintf(stderr, "Die Datei bricht vorzeitig ab.\n");
 			abort();
 		}
-		assert(s <= buffer + DISPLAYSIZE + 1);
 		rc(F);
 	}
 
@@ -231,26 +230,20 @@ rds(FILE * F, char **ds)
 
 	while (nextc != '"') {
 		if (nextc == EOF) {
-			assert(s <= buffer + DISPLAYSIZE + 1);
 			*s = 0;
 			fprintf(stderr, "Die Datei bricht vorzeitig ab.\n");
 			abort();
 		}
-		*s++ = (char)nextc;
-		if (s - buffer > DISPLAYSIZE) {
-			assert(s <= buffer + DISPLAYSIZE + 1);
-			*s = 0;
-			log_error(("\nDer String %s wurde nicht terminiert.\n", s));
-			exit(1);
-		}
+    if (s - buffer < DISPLAYSIZE) {
+      *s++ = (char)nextc;
+    }
 		rc(F);
 	}
 
 	rc(F);
-	assert(s <= buffer + DISPLAYSIZE + 1);
 	*s = 0;
   if (ds) {
-    (*ds) = realloc(*ds, sizeof(char) * (strlen(buffer) + 1));
+    *ds = realloc(*ds, sizeof(char) * (strlen(buffer) + 1));
     strcpy(*ds, buffer);
   }
 }

@@ -2749,7 +2749,7 @@ print_stats(battle * b)
       faction * f = bf->faction;
       const char * loc_army = LOC(f->locale, "battle_army");
       fbattlerecord(b, f, " ");
-      sprintf(buf, "%s %d: %s", loc_army, side->index,
+      slprintf(buf, sizeof(buf), "%s %d: %s", loc_army, side->index,
         seematrix(f, side)
         ? sidename(side,false) : LOC(f->locale, "unknown_faction"));
       fbattlerecord(b, f, buf);
@@ -2758,7 +2758,7 @@ print_stats(battle * b)
       cv_foreach(s2, b->sides) {
         if (enemy(s2, side)) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
-          sprintf(buf, "%s%s %s %d(%s)", buf, komma++ ? "," : "", loc_army,
+          slprintf(buf, sizeof(buf), "%s%s %s %d(%s)", buf, komma++ ? "," : "", loc_army,
             s2->index, abbrev);
         }
       }
@@ -2769,7 +2769,7 @@ print_stats(battle * b)
       cv_foreach(s2, b->sides) {
         if (side->enemy[s2->index] & E_ATTACKING) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
-          sprintf(buf, "%s%s %s %d(%s)", buf, komma++ ? "," : "", loc_army,
+          slprintf(buf, sizeof(buf), "%s%s %s %d(%s)", buf, komma++ ? "," : "", loc_army,
             s2->index, abbrev);
         }
       }
@@ -2781,10 +2781,10 @@ print_stats(battle * b)
     battlerecord(b, buf);
     if (side->bf->faction) {
       if (side->bf->faction->alliance) {
-        sprintf(buf, "##### %s (%s/%d)", side->bf->faction->name, itoa36(side->bf->faction->no),
+        slprintf(buf, sizeof(buf), "##### %s (%s/%d)", side->bf->faction->name, itoa36(side->bf->faction->no),
           side->bf->faction->alliance?side->bf->faction->alliance->id:0);
       } else {
-        sprintf(buf, "##### %s (%s)", side->bf->faction->name, itoa36(side->bf->faction->no));
+        slprintf(buf, sizeof(buf), "##### %s (%s)", side->bf->faction->name, itoa36(side->bf->faction->no));
       }
       battledebug(buf);
     }
@@ -3037,7 +3037,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 		while (*s) *c++ = (char)toupper(*s++);
 	 	*c = 0;
 		fig->person[0].hp = unit_max_hp(u) * 3;
-		sprintf(buf, "Eine Stimme ertönt über dem Schlachtfeld. 'DIESES %sKIND IST MEIN. IHR SOLLT ES NICHT HABEN.'. Eine leuchtende Aura umgibt %s", lbuf, unitname(u));
+		slprintf(buf, sizeof(buf), "Eine Stimme ertönt über dem Schlachtfeld. 'DIESES %sKIND IST MEIN. IHR SOLLT ES NICHT HABEN.'. Eine leuchtende Aura umgibt %s", lbuf, unitname(u));
 		battlerecord(b, buf);
 	}
 
@@ -3305,6 +3305,7 @@ battle_report(battle * b)
   for (bf=b->factions;bf;bf=bf->next) {
     faction * fac = bf->faction;
     char * bufp = buf;
+    size_t size = sizeof(buf), rsize;
     message * m;
 
     fbattlerecord(b, fac, " ");
@@ -3323,24 +3324,43 @@ battle_report(battle * b)
 				const char * loc_army = LOC(fac->locale, "battle_army");
         char buffer[32];
 
-        if (komma) bufp += strlcpy(bufp, ", ", sizeof(buf) - (bufp - buf));
+        if (komma) {
+          rsize = strlcpy(bufp, ", ", size);
+          if (rsize>size) rsize = size-1;
+          size -= rsize;
+          bufp += rsize;
+        }
         snprintf(buffer, sizeof(buffer), "%s %2d(%s): ", 
           loc_army, s->index, abbrev);
         buffer[sizeof(buffer)-1] = 0;
 
-        bufp += strlcpy(bufp, buffer, sizeof(buf) - (bufp - buf));
+        rsize = strlcpy(bufp, buffer, size);
+        if (rsize>size) rsize = size-1;
+        size -= rsize;
+        bufp += rsize;
 
 				for (r=FIGHT_ROW;r!=NUMROWS;++r) {
 					if (alive[r]) {
             if (l!=FIGHT_ROW) {
-              bufp += strlcpy(bufp, "+", sizeof(buf) - (bufp - buf));
+              rsize = strlcpy(bufp, "+", size);
+              if (rsize>size) rsize = size-1;
+              size -= rsize;
+              bufp += rsize;
             }
             while (k--) {
-              bufp += strlcpy(bufp, "0+", sizeof(buf) - (bufp - buf));
+              rsize = strlcpy(bufp, "0+", size);
+              if (rsize>size) rsize = size-1;
+              size -= rsize;
+              bufp += rsize;
             }
             sprintf(buffer, "%d", alive[r]);
-            bufp += strlcpy(bufp, buffer, sizeof(buf) - (bufp - buf));
-						k = 0;
+
+            rsize = strlcpy(bufp, buffer, size);
+            if (rsize>size) rsize = size-1;
+            size -= rsize;
+            bufp += rsize;
+
+            k = 0;
 						l = r+1;
 					} else ++k;
 				}

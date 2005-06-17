@@ -36,7 +36,8 @@
 #include <string.h>
 
 /* util includes */
-#include <base36.h>
+#include <util/base36.h>
+#include <util/bsdstring.h>
 
 /* Untote */
 
@@ -293,15 +294,15 @@ zombie_name(const unit * u)
 	/* nur 50% aller Namen haben "Nach-Teil", wenn kein Vor-Teil */
 
 	if (uv < ZOM_VOR) {
-		strcpy(name, zombie_vor[uv]);
+		strlcpy(name, zombie_vor[uv], sizeof(name));
 	} else {
 		name[0] = 0;
 	}
 
-	strcat(name, zombie[uu]);
+	strlcat(name, zombie[uu], sizeof(name));
 
 	if (un < ZOM_NACH)
-		strcat(name, zombie_nach[un]);
+		strlcat(name, zombie_nach[un], sizeof(name));
 
 	return name;
 }
