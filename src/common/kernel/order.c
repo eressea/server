@@ -187,14 +187,24 @@ create_data(keyword_t kwd, const char * s, const char * sptr, int lindex)
       default: /* nur skill als Parameter, keine extras */
         data = locale_array[lindex]->study_orders[sk];
         if (data==NULL) {
+          const char * skname = skillname(sk, lang);
           data = (order_data*)malloc(sizeof(order_data));
           locale_array[lindex]->study_orders[sk] = data;
           data->_keyword = kwd;
           data->_lindex = lindex;
 #ifdef SHORT_STRINGS
-          data->_str = strdup(skillname(sk, lang));
+          if (strchr(skname, ' ')!=NULL) {
+            sprintf(buf, "\"%s\"", skname);
+            data->_str = strdup(buf);
+          } else {
+            data->_str = strdup(skname);
+          }
 #else
-          sprintf(buf, "%s %s", LOC(lang, keywords[kwd]), skillname(sk, lang));
+          if (strchr(skname, ' ')!=NULL) {
+            sprintf(buf, "%s \"%s\"", LOC(lang, keywords[kwd]), skname);
+          } else {
+            sprintf(buf, "%s %s", LOC(lang, keywords[kwd]), skname);
+          }
           data->_str = strdup(buf);
 #endif
           data->_refcount = 1;
