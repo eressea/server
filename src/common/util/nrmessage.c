@@ -16,6 +16,7 @@
 #include "nrmessage_struct.h"
 
 /* util includes */
+#include "bsdstring.h"
 #include "log.h"
 #include "message.h"
 #include "language.h"
@@ -88,21 +89,21 @@ nrt_register(const struct message_type * mtype, const struct locale * lang, cons
 	}
 }
 
-int
-nr_render(const struct message * msg, const struct locale * lang, char * buffer, size_t bufsize, const void * userdata)
+size_t
+nr_render(const struct message * msg, const struct locale * lang, char * buffer, size_t size, const void * userdata)
 {
 	struct nrmessage_type * nrt = nrt_find(lang, msg->type);
 
 	if (nrt) {
 		const char * m = translate(nrt->string, userdata, nrt->vars, msg->parameters);
 		if (m) {
-			strcpy(buffer, m);
-			return 0;
+			return strlcpy(buffer, m, size);
 		} else {
 			log_error(("Couldn't render message %s\n", nrt->mtype->name));
 		}
 	}
-	return -1;
+  if (size>0 && buffer) buffer[0] = 0;
+	return 0;
 }
 
 int 

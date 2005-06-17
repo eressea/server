@@ -66,6 +66,7 @@
 #endif
 
 /* util includes */
+#include <util/bsdstring.h>
 #include <functions.h>
 #include <goodies.h>
 #include <base36.h>
@@ -816,26 +817,21 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean
 		int k = 0;
 		struct mlist * m = msgs->begin;
 		while (m) {
-			boolean debug = viewer->options & want(O_DEBUG);
 #ifdef MSG_LEVELS
 			if (!debug && get_msglevel(viewer->warnings, viewer->msglevels, m->type) < m->level) continue;
 #endif
 			/* messagetype * mt = m->type; */
 			if (strcmp(nr_section(m->msg), category->name)==0)
 			{
-				char lbuf[8192], *s = lbuf;
-				nr_render(m->msg, viewer->locale, s, sizeof(lbuf), viewer);
+				char lbuf[8192], *bufp = lbuf;
+        size_t rsize, size = sizeof(lbuf);
+
 				if (!k && categorized) {
 					const char * name;
 					char cat_identifier[24];
 
 					sprintf(cat_identifier, "section_%s", category->name);
 					name = LOC(viewer->locale, cat_identifier);
-					if (debug) {
-						if (name!=lbuf) strcpy(lbuf, name);
-						sprintf(lbuf+strlen(name), " [%s]", cat_identifier);
-						name = lbuf;
-					}
 					k = 1;
 					rnl(F);
 					if (centered) centre(F, name, true);
@@ -847,22 +843,19 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean
 					rnl(F);
 				}
 				if (indent>0) {
-					strcpy(lbuf, "          ");
-					strcpy(lbuf+indent, s);
-					s = lbuf;
+					rsize = strlcpy(lbuf, "          ", indent);
+          if (rsize>size) rsize = size-1;
+          size -= rsize;
+          bufp += rsize;
+
+          rsize = nr_render(m->msg, viewer->locale, bufp, size, viewer);
+          if (rsize>size) rsize = size-1;
+          size -= rsize;
+          bufp += rsize;
 				}
-#ifdef MSG_LEVELS
-				if (debug) {
-					int mylevel = get_msglevel(viewer->warnings, viewer->msglevels, m->type);
-					int level = msg_level(m);
-					if (s!=lbuf) strcpy(lbuf, s);
-					sprintf(buf+strlen(s), " [%d:%d(%d)]", m->type->hashkey, level, mylevel);
-					s = lbuf;
-				}
-#endif
-				rpsnr(F, s, 2);
+				rpsnr(F, lbuf, 2);
 			}
-			m=m->next;
+			m = m->next;
 		}
 	}
 }
