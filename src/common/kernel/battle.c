@@ -2748,29 +2748,50 @@ print_stats(battle * b)
     for (bf=b->factions;bf;bf=bf->next) {
       faction * f = bf->faction;
       const char * loc_army = LOC(f->locale, "battle_army");
+      char * bufp = buf;
+      size_t rsize, size = sizeof(buf);
+
       fbattlerecord(b, f, " ");
-      slprintf(buf, sizeof(buf), "%s %d: %s", loc_army, side->index,
-        seematrix(f, side)
-        ? sidename(side,false) : LOC(f->locale, "unknown_faction"));
+
+      slprintf(buf, size, "%s %d: %s", loc_army, side->index,
+        seematrix(f, side) ? sidename(side, false) : LOC(f->locale, "unknown_faction"));
       fbattlerecord(b, f, buf);
-      strcpy(buf, LOC(f->locale, "battle_opponents"));
+
+      rsize = strlcpy(buf, LOC(f->locale, "battle_opponents"), size);
+      if (rsize>size) rsize = size-1;
+      size -= rsize;
+      bufp += rsize;
+
       komma = false;
       cv_foreach(s2, b->sides) {
         if (enemy(s2, side)) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
-          slprintf(buf, sizeof(buf), "%s%s %s %d(%s)", buf, komma++ ? "," : "", loc_army,
-            s2->index, abbrev);
+          rsize = slprintf(bufp, size, "%s%s %s %d(%s)", buf, 
+            komma++ ? "," : "", loc_army, s2->index, abbrev);
+          if (rsize>size) rsize = size-1;
+          size -= rsize;
+          bufp += rsize;
         }
       }
       cv_next(s2);
       fbattlerecord(b, f, buf);
-      strcpy(buf, LOC(f->locale, "battle_attack"));
+
+      bufp = buf;
+      size = sizeof(buf);
+      rsize = strlcpy(buf, LOC(f->locale, "battle_attack"), size);
+      if (rsize>size) rsize = size-1;
+      size -= rsize;
+      bufp += rsize;
+
       komma = false;
       cv_foreach(s2, b->sides) {
         if (side->enemy[s2->index] & E_ATTACKING) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
-          slprintf(buf, sizeof(buf), "%s%s %s %d(%s)", buf, komma++ ? "," : "", loc_army,
+          rsize = slprintf(bufp, size, "%s%s %s %d(%s)", buf, komma++ ? "," : "", loc_army,
             s2->index, abbrev);
+          if (rsize>size) rsize = size-1;
+          size -= rsize;
+          bufp += rsize;
         }
       }
       cv_next(s2);
