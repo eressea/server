@@ -2749,6 +2749,7 @@ print_stats(battle * b)
       faction * f = bf->faction;
       const char * loc_army = LOC(f->locale, "battle_army");
       char * bufp;
+      const char * header = LOC(f->locale, "battle_opponents");
       size_t rsize, size;
 
       fbattlerecord(b, f, " ");
@@ -2759,16 +2760,12 @@ print_stats(battle * b)
 
       bufp = buf;
       size = sizeof(buf);
-      rsize = strlcpy(bufp, LOC(f->locale, "battle_opponents"), size);
-      if (rsize>size) rsize = size-1;
-      size -= rsize;
-      bufp += rsize;
 
       komma = false;
       cv_foreach(s2, b->sides) {
         if (enemy(s2, side)) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
-          rsize = slprintf(bufp, size, "%s%s %s %d(%s)", buf, 
+          rsize = slprintf(bufp, size, "%s%s %s %d(%s)", header, 
             komma++ ? "," : "", loc_army, s2->index, abbrev);
           if (rsize>size) rsize = size-1;
           size -= rsize;
