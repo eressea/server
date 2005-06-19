@@ -8,6 +8,14 @@
    -->
 
   <namespace name="iteminfo">
+    <string name="aots">
+      <text locale="de">
+      Das Amulett erlaubt es dem Träger, alle Einheiten, die durch einen
+      Ring der Unsichtbarkeit geschützt sind, zu sehen. Einheiten allerdings,
+      die sich mit ihrem Tarnungs-Talent verstecken, bleiben weiterhin
+      unentdeckt. Die Herstellung des Amulettes kostet 3000 Silber.
+      </text>
+    </string>
     <string name="toadslime">
       <text locale="de">
       Dieser Tiegel enthält die seltenste alchemistische Substanz
@@ -75,6 +83,16 @@
       A unit setting this sail on a ship temporarily increases the
       ship's range by 50 regions.
       </text>
+    </string>
+    <string name="mistletoe">
+      <text locale="de">Im Mistelzweig ruht eine magische
+      Kraft der besonderer Art. Der Anwender wird von seinen
+      Feinden in Frieden gelassen, eine Woche lang läßt jeder
+      Kämpfer ihn unbeschadet seines Weges ziehen.</text>
+      <text locale="en">The magical misteltoe has a wonderous
+      property: It's use will make one person able to escape
+      unharmed from every conflict, no enemy will lay hand on
+      the bearer for one week.</text>
     </string>
   </namespace>
 
@@ -2205,18 +2223,6 @@
     abgegeben!</text>
   </string>
 
-  <namespace name="info">
-    <string name="mistletoe">
-      <text locale="de">Im Mistelzweig ruht eine magische
-      Kraft der besonderer Art. Der Anwender wird von seinen
-      Feinden in Frieden gelassen, eine Woche lang läßt jeder
-      Kämpfer ihn unbeschadet seines Weges ziehen.</text>
-      <text locale="en">The magical misteltoe has a wonderous
-      property: It's use will make one person able to escape
-      unharmed from every conflict, no enemy will lay hand on
-      the bearer for one week.</text>
-    </string>
-  </namespace>
   <namespace name="race">
     <string name="clone">
       <text locale="de">Klon</text>

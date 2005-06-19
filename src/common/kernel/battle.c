@@ -2748,16 +2748,18 @@ print_stats(battle * b)
     for (bf=b->factions;bf;bf=bf->next) {
       faction * f = bf->faction;
       const char * loc_army = LOC(f->locale, "battle_army");
-      char * bufp = buf;
-      size_t rsize, size = sizeof(buf);
+      char * bufp;
+      size_t rsize, size;
 
       fbattlerecord(b, f, " ");
 
-      slprintf(buf, size, "%s %d: %s", loc_army, side->index,
+      slprintf(buf, sizeof(buf), "%s %d: %s", loc_army, side->index,
         seematrix(f, side) ? sidename(side, false) : LOC(f->locale, "unknown_faction"));
       fbattlerecord(b, f, buf);
 
-      rsize = strlcpy(buf, LOC(f->locale, "battle_opponents"), size);
+      bufp = buf;
+      size = sizeof(buf);
+      rsize = strlcpy(bufp, LOC(f->locale, "battle_opponents"), size);
       if (rsize>size) rsize = size-1;
       size -= rsize;
       bufp += rsize;

@@ -864,18 +864,18 @@ static void
 rp_battles(FILE * F, faction * f)
 {
   if (f->battles!=NULL) {
+    struct bmsg * bm = f->battles;
     rnl(F);
     centre(F, LOC(f->locale, "section_battle"), false);
     rnl(F);
 
-    while (f->battles) {
-      struct bmsg * bm = f->battles;
-      f->battles = bm->next;
+    while (bm) {
       RENDER(f, buf, 80, ("battle::header", "region", bm->r));
       rnl(F);
       centre(F, buf, true);
       rnl(F);
       rp_messages(F, bm->msgs, f, 0, true, false);
+      bm = bm->next;
     }
   }
 }
