@@ -2741,7 +2741,7 @@ write_reports(faction * f, time_t ltime)
   fprintf(stdout, "Reports for %s: DONE\n", factionname(f));
 
   if (!gotit) {
-    log_error(("No report for faction %s!\n", factionid(f)));
+    log_warning(("No report for faction %s!\n", factionid(f)));
   }
   freelist(addresses);
 
@@ -2784,96 +2784,94 @@ reports(void)
 
   BAT = openbatch();
   for (f = factions; f; f = f->next) {
-    if (f->no != MONSTER_FACTION) {
-      int error = write_reports(f, ltime);
-      if (error) retval = error;
-      if (!nosh && f->email && BAT) {
-        sprintf(buf, "%s/%s.sh", reportpath(), factionid(f));
-        shfp = fopen(buf, "w");
-        fprintf(shfp,"#!/bin/sh\n\nPATH=%s\n\n",MailitPath());
-        fprintf(shfp,"if [ $# -ge 1 ]; then\n");
-        fprintf(shfp,"\taddr=$1\n");
-        fprintf(shfp,"else\n");
-        fprintf(shfp,"\taddr=%s\n", f->email);
-        fprintf(shfp,"fi\n\n");
-        
-        fprintf(BAT, "\n\ndate;echo %s\n", f->email);
+    int error = write_reports(f, ltime);
+    if (error) retval = error;
+    if (!nosh && f->email && BAT) {
+      sprintf(buf, "%s/%s.sh", reportpath(), factionid(f));
+      shfp = fopen(buf, "w");
+      fprintf(shfp,"#!/bin/sh\n\nPATH=%s\n\n",MailitPath());
+      fprintf(shfp,"if [ $# -ge 1 ]; then\n");
+      fprintf(shfp,"\taddr=$1\n");
+      fprintf(shfp,"else\n");
+      fprintf(shfp,"\taddr=%s\n", f->email);
+      fprintf(shfp,"fi\n\n");
+      
+      fprintf(BAT, "\n\ndate;echo %s\n", f->email);
 
-        if (f->options & REPORT_ZIP) {
+      if (f->options & REPORT_ZIP) {
 
-          fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
-                  turn, factionid(f), 
-                  turn, factionid(f), 
-                  turn, factionid(f), 
-                  turn, factionid(f));
-          if (f->age == 1) {
-            fprintf(BAT, "zip -j -9 %d-%s.zip %s/%s/%s/welcome.txt\n", 
-                    turn, factionid(f), resourcepath(), global.welcomepath, locale_name(f->locale));
-          }
-          
-          fprintf(shfp, "eresseamail.zipped $addr \"%s %s\" \"%d-%s.zip\" "
-                  "%d-%s.zip\n", global.gamename, gamedate_short(f->locale), 
-                  turn, factionid(f), 
-                  turn, factionid(f));
-          
-        } else if(f->options & REPORT_BZIP2) {
-          
-          if (f->age == 1) {
-            fprintf(shfp,
-                    " \\\n\t\"text/plain\" \"Willkommen\" %s/%s/%s/welcome.txt", 
-                    resourcepath(), global.welcomepath, locale_name(f->locale));
-          }
-          
-          fprintf(BAT, "bzip2 -9v `ls %d-%s.nr %d-%s.txt %d-%s.cr`\n",
-                  turn, factionid(f), 
-                  turn, factionid(f), 
-                  turn, factionid(f));
-          
-          fprintf(shfp, "eresseamail.bzip2 $addr \"%s %s\"", global.gamename, gamedate_short(f->locale));
-          
-          if (!nonr && f->options & REPORT_NR)
-              fprintf(shfp,
-                      " \\\n\t\"application/x-bzip2\" \"Report\" %d-%s.nr.bz2",
-                      turn,factionid(f));
-          
-          if (f->options & (1 << O_ZUGVORLAGE))
-              fprintf(shfp,
-                      " \\\n\t\"application/x-bzip2\" \"Zugvorlage\" %d-%s.txt.bz2",
-                      turn,factionid(f));
-          
-          if (!nocr && (f->options & REPORT_CR || f->age<3))
-              fprintf(shfp,
-                      " \\\n\t\"application/x-bzip2\" \"Computer-Report\" %d-%s.cr.bz2",
-                      turn, factionid(f));
-        } else {
-          
-          fprintf(shfp, MAIL " $addr \"%s %s\"", global.gamename, gamedate_short(f->locale));
-          
-          if (f->age == 1) {
-            fprintf(shfp,
-                    " \\\n\t\"text/plain\" \"Willkommen\" %s/%s/%s/welcome.txt", 
-                    resourcepath(), global.welcomepath, locale_name(f->locale));
-          }
-          
-          if (!nonr && f->options & REPORT_NR)
-              fprintf(shfp,
-                      " \\\n\t\"text/plain\" \"Report\" %d-%s.nr",
-                      turn, factionid(f));
-          
-          if (f->options & (1 << O_ZUGVORLAGE))
-              fprintf(shfp,
-                      " \\\n\t\"text/plain\" \"Zugvorlage\" %d-%s.txt",
-                      turn, factionid(f));
-          
-          if (!nocr && (f->options & REPORT_CR || f->age<3))
-              fprintf(shfp,
-                      " \\\n\t\"text/x-eressea-cr\" \"Computer-Report\" %d-%s.cr",
-                      turn, factionid(f));
+        fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
+                turn, factionid(f), 
+                turn, factionid(f), 
+                turn, factionid(f), 
+                turn, factionid(f));
+        if (f->age == 1) {
+          fprintf(BAT, "zip -j -9 %d-%s.zip %s/%s/%s/welcome.txt\n", 
+                  turn, factionid(f), resourcepath(), global.welcomepath, locale_name(f->locale));
         }
         
-        fprintf(BAT, ". %s.sh %s\n", factionid(f), f->email);
-        fclose(shfp);
+        fprintf(shfp, "eresseamail.zipped $addr \"%s %s\" \"%d-%s.zip\" "
+                "%d-%s.zip\n", global.gamename, gamedate_short(f->locale), 
+                turn, factionid(f), 
+                turn, factionid(f));
+        
+      } else if(f->options & REPORT_BZIP2) {
+        
+        if (f->age == 1) {
+          fprintf(shfp,
+                  " \\\n\t\"text/plain\" \"Willkommen\" %s/%s/%s/welcome.txt", 
+                  resourcepath(), global.welcomepath, locale_name(f->locale));
+        }
+        
+        fprintf(BAT, "bzip2 -9v `ls %d-%s.nr %d-%s.txt %d-%s.cr`\n",
+                turn, factionid(f), 
+                turn, factionid(f), 
+                turn, factionid(f));
+        
+        fprintf(shfp, "eresseamail.bzip2 $addr \"%s %s\"", global.gamename, gamedate_short(f->locale));
+        
+        if (!nonr && f->options & REPORT_NR)
+            fprintf(shfp,
+                    " \\\n\t\"application/x-bzip2\" \"Report\" %d-%s.nr.bz2",
+                    turn,factionid(f));
+        
+        if (f->options & (1 << O_ZUGVORLAGE))
+            fprintf(shfp,
+                    " \\\n\t\"application/x-bzip2\" \"Zugvorlage\" %d-%s.txt.bz2",
+                    turn,factionid(f));
+        
+        if (!nocr && (f->options & REPORT_CR || f->age<3))
+            fprintf(shfp,
+                    " \\\n\t\"application/x-bzip2\" \"Computer-Report\" %d-%s.cr.bz2",
+                    turn, factionid(f));
+      } else {
+        
+        fprintf(shfp, MAIL " $addr \"%s %s\"", global.gamename, gamedate_short(f->locale));
+        
+        if (f->age == 1) {
+          fprintf(shfp,
+                  " \\\n\t\"text/plain\" \"Willkommen\" %s/%s/%s/welcome.txt", 
+                  resourcepath(), global.welcomepath, locale_name(f->locale));
+        }
+        
+        if (!nonr && f->options & REPORT_NR)
+            fprintf(shfp,
+                    " \\\n\t\"text/plain\" \"Report\" %d-%s.nr",
+                    turn, factionid(f));
+        
+        if (f->options & (1 << O_ZUGVORLAGE))
+            fprintf(shfp,
+                    " \\\n\t\"text/plain\" \"Zugvorlage\" %d-%s.txt",
+                    turn, factionid(f));
+        
+        if (!nocr && (f->options & REPORT_CR || f->age<3))
+            fprintf(shfp,
+                    " \\\n\t\"text/x-eressea-cr\" \"Computer-Report\" %d-%s.cr",
+                    turn, factionid(f));
       }
+      
+      fprintf(BAT, ". %s.sh %s\n", factionid(f), f->email);
+      fclose(shfp);
     }
   }
   str = get_param(global.parameters, "globalreport"); 
