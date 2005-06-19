@@ -616,6 +616,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
           if (printed) break; /* ein DEFAULT reicht */
           ord=ord->next;
         }
+        if (u->old_orders) break;
       }
     }
 #endif
