@@ -847,13 +847,13 @@ rp_messages(FILE * F, message_list * msgs, faction * viewer, int indent, boolean
           if (rsize>size) rsize = size-1;
           size -= rsize;
           bufp += rsize;
+        }
+        rsize = nr_render(m->msg, viewer->locale, bufp, size, viewer);
+        if (rsize>size) rsize = size-1;
+        size -= rsize;
+        bufp += rsize;
 
-          rsize = nr_render(m->msg, viewer->locale, bufp, size, viewer);
-          if (rsize>size) rsize = size-1;
-          size -= rsize;
-          bufp += rsize;
-				}
-				rpsnr(F, lbuf, 2);
+        rpsnr(F, lbuf, 2);
 			}
 			m = m->next;
 		}
