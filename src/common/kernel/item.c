@@ -2372,7 +2372,7 @@ attrib_type at_resourcelimit = {
 };
 
 const char*
-resname(resource_t res, int plural)
+resname(resource_t res, int index)
 {
 	const item_type * itype = resource2item(oldresourcetype[res]);
 	if (itype!=NULL) {
