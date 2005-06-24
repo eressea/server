@@ -3598,17 +3598,19 @@ init_battle(region * r, battle **bp)
             continue;
           }
 
-          /* Fehler: "Das Schiff muß erst verlassen werden" */
-          if (u->ship != NULL && rterrain(r) != T_OCEAN) {
-            cmistake(u, ord, 19, MSG_BATTLE);
-            continue;
-          }
 
-          if (leftship(u)) {
-            cmistake(u, ord, 234, MSG_BATTLE);
-            continue;
-          }
+          if (is_guarded(r, u, GUARD_TRAVELTHRU)) {
+            /* Fehler: "Das Schiff muß erst verlassen werden" */
+            if (u->ship != NULL && rterrain(r) != T_OCEAN) {
+              cmistake(u, ord, 19, MSG_BATTLE);
+              continue;
+            }
 
+            if (leftship(u)) {
+              cmistake(u, ord, 234, MSG_BATTLE);
+              continue;
+            }
+          }
 
           /* Ende Fehlerbehandlung Angreifer */
 
