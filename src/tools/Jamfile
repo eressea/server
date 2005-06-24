@@ -1,0 +1,18 @@
+SubDir TOP tools ;
+
+TargetDirectory ;
+SubDirHdrs $(SUBDIR)/../common/gamecode ;
+SubDirHdrs $(SUBDIR)/../common/kernel ;
+SubDirHdrs $(SUBDIR)/../common/util ;
+SubDirHdrs $(SUBDIR)/../common ;
+SubDirHdrs $(SUBDIR)/.. ;
+
+SubDirHdrs $(XMLHDRS) ;
+
+Main atoi36 : atoi36.c ;
+LinkLibraries atoi36 :
+ util ;
+
+#iconv mapper ;
+#libxml2 mapper ;
+#LINKLIBS on mapper += -L$(LUABIND_ROOT)/lib -lm -lncurses ;
