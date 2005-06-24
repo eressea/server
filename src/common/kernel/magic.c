@@ -946,17 +946,14 @@ cancast(unit * u, spell * sp, int level, int range, struct order * ord)
 					 * Meldung weiter zusammen */
 					scat(", ");
 					icat(itemanz);
-					scat(locale_string(u->faction->locale,
-							resname(res, (itemanz == 1 ? 0 : 1))));
+					scat(LOC(u->faction->locale, resname(res, itemanz!=1)));
 				} else {
 					/* Noch fehlte keine Komponente, wir generieren den Anfang der
 					 * Fehlermeldung */
-					sprintf(buf, "%s in %s: 'ZAUBER %s' Für diesen Zauber fehlen "
+					sprintf(buf, "%s in %s: 'ZAUBER %s' - Für diesen Zauber fehlen "
 							"noch %d ", unitname(u), regionname(u->region, u->faction),
-							spell_name(sp, u->faction->locale),
-							itemanz);
-					scat(locale_string(u->faction->locale,
-								resname(res, (itemanz == 1 ? 0 : 1))));
+							spell_name(sp, u->faction->locale), itemanz);
+					scat(LOC(u->faction->locale, resname(res, itemanz!=1)));
 					b = false;
 				}
 			}

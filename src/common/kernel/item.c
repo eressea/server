@@ -2372,22 +2372,22 @@ attrib_type at_resourcelimit = {
 };
 
 const char*
-resname(resource_t res, int index)
+resname(resource_t res, int plural)
 {
 	const item_type * itype = resource2item(oldresourcetype[res]);
 	if (itype!=NULL) {
 		return locale_string(NULL, resourcename(oldresourcetype[res], index));
 	}
 	else if (res == R_AURA) {
-		return index==1?"aura":"aura_p";
+		return index?"aura_p":"aura";
 	} else if (res == R_PERMAURA) {
-		return index==1?"permaura":"permaura_p";
+		return index?"permaura_p":"permaura";
 	} else if (res == R_PEASANTS) {
-		return index==1?"peasant":"peasant_p";
+		return index?"peasant_p":"peasant";
 	} else if (res == R_UNIT) {
-		return index==1?"unit":"unit_p";
+		return index?"unit_p":"unit";
 	} else if (res == R_HITPOINTS) {
-		return index==1?"hp":"hp_p";
+		return index?"hp_p":"hp";
 	}
 	return NULL;
 }
