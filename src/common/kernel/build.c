@@ -319,11 +319,11 @@ destroy_road(unit *u, int nmax, struct order * ord)
     cmistake(u, ord, 71, MSG_PRODUCE);
   } else {
     short road = rroad(r, d);
-    road = min(n, road);
-    if (road!=0) {
+    n = min(n, road);
+    if (n!=0) {
       region * r2 = rconnect(r,d);
       int willdo = eff_skill(u, SK_ROAD_BUILDING, r)*u->number;
-      willdo = min(willdo, road);
+      willdo = min(willdo, n);
       if (willdo==0) {
         /* TODO: error message */
       }
