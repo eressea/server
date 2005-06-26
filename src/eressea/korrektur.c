@@ -1112,7 +1112,7 @@ korrektur(void)
   }
 
   do_once("chgt", fix_chaosgates());
-  do_once("atri", fix_attribflags());
+  do_once("atrx", fix_attribflags());
   do_once("asfi", fix_astral_firewalls());
   frame_regions();
 	fix_astralplane();
