@@ -1999,7 +1999,7 @@ piracy_cmd(unit *u, struct order * ord)
 	}
 
 	if (!fval(u, UFL_OWNER)) {
-		cmistake(u, ord, 46, MSG_MOVE);
+		cmistake(u, ord, 146, MSG_MOVE);
 		return;
 	}
 
