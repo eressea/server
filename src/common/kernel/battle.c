@@ -2741,7 +2741,6 @@ print_stats(battle * b)
   cv_foreach(side, b->sides) {
     bfaction *bf;
     char *k;
-    boolean komma;
 
     ++i;
 
@@ -2749,8 +2748,9 @@ print_stats(battle * b)
       faction * f = bf->faction;
       const char * loc_army = LOC(f->locale, "battle_army");
       char * bufp;
-      const char * header = LOC(f->locale, "battle_opponents");
+      const char * header;
       size_t rsize, size;
+      int komma;
 
       fbattlerecord(b, f, " ");
 
@@ -2760,33 +2760,31 @@ print_stats(battle * b)
 
       bufp = buf;
       size = sizeof(buf);
+      komma = 0;
+      header = LOC(f->locale, "battle_opponents");
 
-      komma = false;
       cv_foreach(s2, b->sides) {
         if (enemy(s2, side)) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
-          rsize = slprintf(bufp, size, "%s%s %s %d(%s)", header, 
-            komma++ ? "," : "", loc_army, s2->index, abbrev);
+          rsize = slprintf(bufp, size, "%s %s %d(%s)",  
+            komma++ ? "," : header, loc_army, s2->index, abbrev);
           if (rsize>size) rsize = size-1;
           size -= rsize;
           bufp += rsize;
         }
       }
       cv_next(s2);
-      fbattlerecord(b, f, buf);
+      if (komma) fbattlerecord(b, f, buf);
 
       bufp = buf;
       size = sizeof(buf);
-      rsize = strlcpy(buf, LOC(f->locale, "battle_attack"), size);
-      if (rsize>size) rsize = size-1;
-      size -= rsize;
-      bufp += rsize;
+      komma = 0;
+      header = LOC(f->locale, "battle_attack");
 
-      komma = false;
       cv_foreach(s2, b->sides) {
         if (side->enemy[s2->index] & E_ATTACKING) {
           const char * abbrev = seematrix(f, s2)?sideabkz(s2, false):"-?-";
-          rsize = slprintf(bufp, size, "%s%s %s %d(%s)", buf, komma++ ? "," : "", loc_army,
+          rsize = slprintf(bufp, size, "%s %s %d(%s)", komma++ ? "," : header, loc_army,
             s2->index, abbrev);
           if (rsize>size) rsize = size-1;
           size -= rsize;
@@ -2794,7 +2792,7 @@ print_stats(battle * b)
         }
       }
       cv_next(s2);
-      fbattlerecord(b, f, buf);
+      if (komma) fbattlerecord(b, f, buf);
     }
     buf[77] = (char)0;
     for (k = buf; *k; ++k) *k = '-';
