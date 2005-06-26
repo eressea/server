@@ -522,7 +522,7 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
 			}
 		}
 	} else {
-		bufp = buf + strxcpy(bufp, sp->syntax);
+		bufp = buf + strxcpy(buf, sp->syntax);
 	}
 	rps(F, buf);
 	rnl(F);
