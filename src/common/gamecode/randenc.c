@@ -125,11 +125,11 @@ dissolve_units(void)
 					}
 					break;
 				case 2:
-					if (r->land) {
+					if (r->land && !fval(r, RF_MALLORN)) {
 #if GROWING_TREES
-						rsettrees(r, 2, rtrees(r,2) + n);
+  					rsettrees(r, 2, rtrees(r,2) + n);
 #else
-						rsettrees(r, rtrees(r) + n);
+	  				rsettrees(r, rtrees(r) + n);
 #endif
 						if (n == 1) {
 							str = "wurde zum Baum.";
@@ -138,9 +138,9 @@ dissolve_units(void)
 						}
 					} else {
 						if(n == 1) {
-							str = "verfaulte in der feuchten Seeluft.";
+							str = "verfaulte.";
 						} else {
-							str = "verfaulten in der feuchten Seeluft.";
+							str = "verfaulten.";
 						}
 					}
 					break;
