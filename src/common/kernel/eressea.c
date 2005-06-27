@@ -851,18 +851,18 @@ effskill(const unit * u, skill_t sk)
 int
 effstealth(const unit * u)
 {
-	int e;
+  int e;
 
-	/* Auf dem Ozean keine Tarnung! */
-	if (u->region->terrain == T_OCEAN) return 0;
-
-	e = effskill(u, SK_STEALTH);
-
+  /* Auf Schiffen keine Tarnung! */
+  if (u->ship) return 0;
+  
+  e = effskill(u, SK_STEALTH);
+  
   if (fval(u, UFL_STEALTH)) {
     int es = u_geteffstealth(u);
     if (es >=0 && es < e) return es;
   }
-	return e;
+  return e;
 }
 
 int
