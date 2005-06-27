@@ -2306,7 +2306,7 @@ display_item(faction *f, unit *u, const item_type * itype)
     }
   }
   ADDMSG(&f->msgs, msg_message("displayitem", "weight item description",
-    itype->weight/1000, itype->rtype, strdup(info)));
+    itype->weight, itype->rtype, strdup(info)));
 
   return true;
 }
@@ -2354,7 +2354,7 @@ display_race(faction *f, unit *u, const race * rc)
   size -= rsize;
   bufp += rsize;
 
-  sprintf(filename, "showdata/%s", LOC(default_locale, name));
+  sprintf(filename, "%s/%s/items/%s", resourcepath(), locale_name(default_locale), LOC(default_locale, name));
   fp = fopen(filename, "r");
   if(fp) {
     while (fgets(t, NAMESIZE, fp) != NULL) {

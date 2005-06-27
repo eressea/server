@@ -3675,6 +3675,33 @@ eval_building(struct opstack ** stack, const void * userdata) /* building -> str
 }
 
 static void
+eval_weight(struct opstack ** stack, const void * userdata) /* region -> string */
+{
+  char buffer[32];
+  const struct faction * f = (const struct faction *)userdata;
+  const struct locale * lang = f->locale;
+  int weight = opop_i(stack);
+  variant var;
+
+  if (weight % SCALEWEIGHT == 0) {
+    if (weight==SCALEWEIGHT) {
+      sprintf(buffer, "1 %s", LOC(lang, "weight_unit"));
+    } else {
+      sprintf(buffer, "%u %s", weight/SCALEWEIGHT, LOC(lang, "weight_unit_p"));
+    }
+  } else {
+    if (weight==1) {
+      sprintf(buffer, "1 %s %u", LOC(lang, "weight_per"), SCALEWEIGHT);
+    } else {
+      sprintf(buffer, "%u %s %u", weight, LOC(lang, "weight_per_p"), SCALEWEIGHT);
+    }
+  }
+
+  var.v = strcpy(balloc(strlen(buffer)+1), buffer);
+  opush(stack, var);
+}
+
+static void
 eval_resource(struct opstack ** stack, const void * userdata)
 {
 	const faction * report = (const faction*)userdata;
@@ -3787,6 +3814,7 @@ report_init(void)
 {
 	add_function("alliance", &eval_alliance);
 	add_function("region", &eval_region);
+  add_function("weight", &eval_weight);
 	add_function("resource", &eval_resource);
 	add_function("race", &eval_race);
 	add_function("faction", &eval_faction);
