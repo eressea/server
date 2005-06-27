@@ -6133,4 +6133,24 @@
     <text locale="en">brain boosts</text>
   </string>
 
+  <string name="weight_per">
+    <text locale="de">GE je</text>
+    <text locale="en">stone per</text>
+  </string>
+
+  <string name="weight_per_p">
+    <text locale="de">GE je</text>
+    <text locale="en">stones per</text>
+  </string>
+
+  <string name="weight_unit">
+    <text locale="de">GE</text>
+    <text locale="en">stone</text>
+  </string>
+
+  <string name="weight_unit_p">
+    <text locale="de">GE</text>
+    <text locale="en">stones</text>
+  </string>
+
 </strings>

@@ -282,8 +282,8 @@
       <arg name="description" type="string"/>
       <arg name="weight" type="int"/>
     </type>
-    <text locale="de">"$resource($item,1) ($int($weight) GE): $description"</text>
-    <text locale="en">"$resource($item,1) ($int($weight) st): $description"</text>
+    <text locale="de">"$resource($item,1) ($weight($weight)): $description"</text>
+    <text locale="en">"$resource($item,1) ($weight($weight)): $description"</text>
   </message>
   <message name="healall" section="events">
     <type>
@@ -6196,7 +6196,7 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Eine Partei darf aus nicht mehr als $int($allowed) Einheiten bestehen."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - A faction may not consist of more than $int($allowed) units."</text>
   </message>
-  
+
   <message name="too_many_units_in_alliance" section="errors">
     <type>
       <arg name="command" type="order"/>
