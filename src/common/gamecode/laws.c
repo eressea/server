@@ -316,7 +316,7 @@ age_unit(region * r, unit * u)
     item ** itemp = &u->items;
     while (*itemp) {
       item * itm = *itemp;
-      if (itm->type->flags & ITF_NOTLOST == 0) {
+      if ((itm->type->flags & ITF_NOTLOST) == 0) {
         if (itm->type->flags & (ITF_BIG|ITF_ANIMAL|ITF_CURSED)) {
           ADDMSG(&u->faction->msgs, msg_message("itemcrumble", "unit region item amount",
             u, u->region, itm->type->rtype, itm->number));
