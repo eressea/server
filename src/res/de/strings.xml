@@ -3295,6 +3295,23 @@
       <text locale="en">undead</text>
     </string>
 
+    <string name="apepsnake">
+      <text locale="de">Apepschlange</text>
+      <text locale="en">apepsnake</text>
+    </string>
+    <string name="apepsnake_p">
+      <text locale="de">Apepschlangen</text>
+      <text locale="en">apepsnakes</text>
+    </string>
+    <string name="apepsnake_d">
+      <text locale="de">Apepschlangen</text>
+      <text locale="en">apepsnakes</text>
+    </string>
+    <string name="apepsnake_x">
+      <text locale="de">Apepschlange</text>
+      <text locale="en">apepsnake</text>
+    </string>
+
     <string name="aquarian">
       <text locale="de">Meermensch</text>
       <text locale="en">aquarian</text>
