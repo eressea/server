@@ -35,4 +35,4 @@
 #define NEW_MIGRATION 1
 #define ASTRAL_HUNGER
 
-#undef ASTRAL_ITEM_RESTRICTIONS /* keine grossen dinge im astralraum */
+#define ASTRAL_ITEM_RESTRICTIONS /* keine grossen dinge im astralraum */
