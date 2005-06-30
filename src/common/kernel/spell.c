@@ -5553,6 +5553,10 @@ sp_sweetdreams(castorder *co)
 		/* Zieleinheit */
 		u = pa->param[n]->data.u;
 
+    if (!ucontact(u, mage, HELP_GUARD)) {
+			cmistake(mage, co->order, 40, MSG_EVENT);
+      continue;
+    }
 		men = min(opfer, u->number);
 		opfer -= men;
 
