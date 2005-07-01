@@ -5553,7 +5553,7 @@ sp_sweetdreams(castorder *co)
 		/* Zieleinheit */
 		u = pa->param[n]->data.u;
 
-    if (!ucontact(u, mage, HELP_GUARD)) {
+    if (!ucontact(u, mage)) {
 			cmistake(mage, co->order, 40, MSG_EVENT);
       continue;
     }

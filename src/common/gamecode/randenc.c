@@ -737,7 +737,7 @@ drown(region *r)
 					ADDMSG(&u->faction->msgs, new_message(u->faction,
 						"drown_amphibian_nodead%u:unit%r:region",u, r));
 				}
-			} else if (!canswim(u)) {
+      } else if (!(canswim(u) || canfly(u))) {
 				scale_number(u, 0);
 				ADDMSG(&u->faction->msgs, new_message(u->faction,
 					"drown%u:unit%r:region", u, r));

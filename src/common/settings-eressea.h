@@ -37,7 +37,7 @@
 #define HUNGER_REDUCES_SKILL /* Hunger reduziert den Talentwert
                                 auf die Hälfte */
 
-#define ASTRAL_ITEM_RESTRICTIONS /* keine grossen dinge im astralraum */
+#undef ASTRAL_ITEM_RESTRICTIONS /* keine grossen dinge im astralraum */
 
 #define MUSEUM_MODULE
 #define ARENA_MODULE

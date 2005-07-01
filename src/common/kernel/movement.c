@@ -356,10 +356,6 @@ canwalk(unit * u)
 boolean
 canfly(unit *u)
 {
-	if (get_movement(&u->attribs, MV_CANNOTMOVE)) return false;
-
-	if (get_item(u, I_HORSE) || get_item(u, I_UNICORN)) return false;
-
 	if (get_item(u, I_PEGASUS) >= u->number && effskill(u, SK_RIDING) >= 4)
 		return true;
 
@@ -373,10 +369,6 @@ canfly(unit *u)
 boolean
 canswim(unit *u)
 {
-	if (get_movement(&u->attribs, MV_CANNOTMOVE)) return false;
-
-	if (get_item(u, I_HORSE) || get_item(u, I_UNICORN)) return false;
-
 	if (get_item(u, I_DOLPHIN) >= u->number && effskill(u, SK_RIDING) >= 4)
 		return true;
 
@@ -1247,11 +1239,14 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
 
       /* Ozeanfelder können nur von Einheiten mit Schwimmen und ohne
        * Pferde betreten werden. */
-      if (rterrain(next) == T_OCEAN && !canswim(u)) {
-        ADDMSG(&u->faction->msgs, msg_message("detectocean",
-          "unit region", u, next));
-        break;
+      if (rterrain(next) == T_OCEAN) {
+        if (!(canswim(u) || canfly(u))) {
+          ADDMSG(&u->faction->msgs, msg_message("detectocean",
+            "unit region", u, next));
+          break;
+        }
       }
+
     }
 
     /* movement blocked by a wall */

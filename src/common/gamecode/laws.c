@@ -3733,7 +3733,7 @@ monthly_healing(void)
       if (fval(u, UFL_HUNGER)) continue;
       if (fspecial(u->faction, FS_UNDEAD)) continue;
 
-      if (rterrain(r)==T_OCEAN && u->ship==NULL && !canswim(u)) continue;
+      if (rterrain(r)==T_OCEAN && u->ship==NULL && !(canswim(u) || canfly(u))) continue;
 
       if(fspecial(u->faction, FS_REGENERATION)) {
         u->hp = umhp;
