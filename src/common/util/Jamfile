@@ -11,6 +11,7 @@ SEARCH_SOURCE +=
 SOURCES =
  attrib.c
  base36.c
+ bsdstring.c
  command.c
  crmessage.c
  cvector.c
@@ -38,10 +39,6 @@ SOURCES =
 
 if $(MSPACES) {
  SOURCES += <dl>malloc.c ;
-}
-
-if $(NO_INLINE) {
- SOURCES += bsdstring.c ;
 }
 
 Library util : $(SOURCES) ;

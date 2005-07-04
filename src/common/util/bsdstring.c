@@ -2,6 +2,11 @@
 #include <string.h>
 #include "bsdstring.h"
 
+#ifndef HAVE_INLINE
+# undef INLINE_FUNCTION
+# define INLINE_FUNCTION
+#endif
+
 #if !defined(HAVE_STRLCPY)
 INLINE_FUNCTION size_t
 strlcpy(char *dst, const char *src, size_t siz)   /* copied from OpenBSD source code */
