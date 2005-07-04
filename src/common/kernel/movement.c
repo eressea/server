@@ -1940,7 +1940,8 @@ move(unit * u, boolean move_on_land)
 }
 
 typedef struct piracy_data {
-  const struct faction * follow;
+  const struct faction * pirate;
+  const struct faction * target;
   direction_t dir;
 } piracy_data;
 
@@ -1966,11 +1967,12 @@ static attrib_type at_piracy_direction = {
 };
 
 static attrib * 
-mk_piracy(const faction * f, direction_t target_dir)
+mk_piracy(const faction * pirate, const faction * target, direction_t target_dir)
 {
   attrib * a = a_new(&at_piracy_direction);
   piracy_data * data = a->data.v;
-  data->follow = f;
+  data->pirate = pirate;
+  data->target = target;
   data->dir = target_dir;
   return a;
 }
@@ -1981,11 +1983,13 @@ piracy_cmd(unit *u, struct order * ord)
 	region *r = u->region;
 	ship *sh = u->ship, *sh2;
 	direction_t dir, target_dir = NODIRECTION;
-	int         aff[MAXDIRECTIONS];
+  struct {
+    const faction * target;
+    int value;
+  } aff[MAXDIRECTIONS];
 	int         saff = 0;
-	int					*il;
+	int					*il = NULL;
 	const char *s;
-	boolean     all = true;
 	attrib      *a;
 
 	if (!sh) {
@@ -2001,22 +2005,24 @@ piracy_cmd(unit *u, struct order * ord)
 	/* Feststellen, ob schon ein anderer alliierter Pirat ein
 	 * Ziel gefunden hat. */
 
-	il = intlist_init();
 
   init_tokens(ord);
   skip_token();
 	s = getstrtoken();
-	while(s && *s) {
-		il = intlist_add(il, atoi(s));
-		all = false;
-		s = getstrtoken();
-	}
+  if (s!=NULL && *s) {
+    il = intlist_init();
+    while (s && *s) {
+      il = intlist_add(il, atoi36(s));
+      s = getstrtoken();
+    }
+  }
 
 	for (a = a_find(r->attribs, &at_piracy_direction); a; a=a->nexttype) {
     piracy_data * data = a->data.v;
-		const faction *f = data->follow;
+		const faction * p = data->pirate;
+    const faction * t = data->target;
 
-		if (alliedunit(u, f, HELP_FIGHT) && intlist_find(il, a->data.sa[1])) {
+		if (alliedunit(u, p, HELP_FIGHT) && (il==0 || intlist_find(il, t->no))) {
 			target_dir = data->dir;
 			break;
 		}
@@ -2031,7 +2037,8 @@ piracy_cmd(unit *u, struct order * ord)
 
 		for(dir = 0; dir < MAXDIRECTIONS; dir++) {
 			region *rc = rconnect(r, dir);
-			aff[dir] = 0;
+			aff[dir].value = 0;
+      aff[dir].target = 0;
 			if (rc && (terrain[rterrain(rc)].flags & SWIM_INTO)
 					&& check_takeoff(sh, r, rc) == true) {
 
@@ -2039,26 +2046,29 @@ piracy_cmd(unit *u, struct order * ord)
 					unit * cap = shipowner(sh2);
           if (cap) {
             faction * f = visible_faction(cap->faction, cap);
-            if (alliedunit(u, f, HELP_GUARD)) continue;
-            if (all || intlist_find(il, cap->faction->no)) {
-              aff[dir]++;
+            if (alliedunit(u, f, HELP_FIGHT)) continue;
+            if (il==0 || intlist_find(il, cap->faction->no)) {
+              ++aff[dir].value;
+              if (rand() % aff[dir].value == 0) {
+                aff[dir].target = f;
+              }
             }
           }
 				}
 
 				/* Und aufaddieren. */
-				saff += aff[dir];
+				saff += aff[dir].value;
 			}
 		}
 
-		if(saff != 0) {
-			saff = rand()%saff;
-			for(dir = 0; dir < MAXDIRECTIONS; dir++) {
-				if(saff < aff[dir]) break;
-				saff -= aff[dir];
+		if (saff != 0) {
+			saff = rand() % saff;
+			for (dir=0; dir!=MAXDIRECTIONS; ++dir) {
+				if (saff!=aff[dir].value) break;
+				saff -= aff[dir].value;
 			}
 			target_dir = dir;
-      a = a_add(&r->attribs, mk_piracy(u->faction, target_dir));
+      a = a_add(&r->attribs, mk_piracy(u->faction, aff[dir].target, target_dir));
 		}
 	}
 
