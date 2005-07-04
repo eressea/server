@@ -2369,14 +2369,10 @@ display_race(faction *f, unit *u, const race * rc)
       bufp += rsize;
     }
     fclose(fp);
-    rsize = strlcpy(bufp, ". ", size);
-    if (rsize>size) rsize = size-1;
-    size -= rsize;
-    bufp += rsize;
   }
 
   /* hp_p : Trefferpunkte */
-  sprintf(buf2, "Trefferpunkte: %d", rc->hitpoints);
+  sprintf(buf2, " %d Trefferpunkte", rc->hitpoints);
 
   rsize = strlcpy(bufp, buf2, size);
   if (rsize>size) rsize = size-1;
@@ -2386,7 +2382,7 @@ display_race(faction *f, unit *u, const race * rc)
   /* b_armor : Rüstung */
   if (rc->armor > 0){
     sprintf(buf2, ", Rüstung: %d", rc->armor);
-    rsize += strlcpy(bufp, buf2, size);
+    rsize = strlcpy(bufp, buf2, size);
     if (rsize>size) rsize = size-1;
     size -= rsize;
     bufp += rsize;
