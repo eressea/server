@@ -2505,24 +2505,42 @@ follow_unit(void)
 
       if (a && !fval(u, UFL_MOVED)) {
         unit * u2 = a->data.v;
+        boolean follow = false;
 
         if (!u2 || u2->region!=r || !cansee(u->faction, r, u2, 0))
           continue;
-        for (ord=u2->orders;ord;ord=ord->next) {
-          switch (get_keyword(ord)) {
-            case K_MOVE:
-            case K_ROUTE:
-            case K_DRIVE:
-            case K_FOLLOW:
-            case K_PIRACY:
-              fset(u, UFL_FOLLOWING);
-              fset(u2, UFL_FOLLOWED);
-              set_order(&u->thisorder, NULL);
+    
+        switch (get_keyword(u2->thisorder)) {
+          case K_MOVE:
+          case K_ROUTE:
+          case K_DRIVE:
+            follow = true;
+            break;
+          default:
+            for (ord=u2->orders;ord;ord=ord->next) {
+              switch (get_keyword(ord)) {
+                case K_FOLLOW:
+                case K_PIRACY:
+                  follow = true;
+                  break;
+                default:
+                  continue;
+              }
               break;
-            default:
-              continue;
+            }
+            break;
+        }
+        if (!follow) {
+          attrib * a2 = a_find(u2->attribs, &at_follow);
+          if (a2!=NULL) {
+            unit * u3 = a2->data.v;
+            follow = (u3 && u2->region==u2->region);
           }
-          break;
+        }
+        if (follow) {
+          fset(u, UFL_FOLLOWING);
+          fset(u2, UFL_FOLLOWED);
+          set_order(&u->thisorder, NULL);
         }
       }
     }
