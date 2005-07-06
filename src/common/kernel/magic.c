@@ -2526,9 +2526,9 @@ magic(void)
           * fehlermeldungen die anzeigen das der magier diesen Spruch
           * nur in diese Situation nicht anwenden kann, noch eine
           * einfache Sicherheitsprüfung kommen */
-          if (knowsspell(r, u, sp) == false) {
+          if (!knowsspell(r, u, sp)) {
             /* vorsicht! u kann der familiar sein */
-            if (!familiar){
+            if (!familiar) {
               cmistake(u, ord, 173, MSG_MAGIC);
               continue;
             }

@@ -1048,6 +1048,38 @@ cap_route(region * r, region_list * route, region_list * route_end, int speed)
   return iroute;
 }
 
+static region *
+next_region(unit * u, region * current, region * next)
+{
+  border * b = get_borders(current, next);
+  while (b!=NULL) {
+    if (b->type->move) {
+      region * rto = b->type->move(b, u, current, next, true);
+      if (rto!=next) {
+        /* the target region was changed (bt_wisps, for example). check the
+        * new target region for borders */
+        next = rto;
+        b = get_borders(current, next);
+        continue;
+      }
+    }
+    b = b->next;
+  }
+  return next;
+}
+
+static region_list *
+reroute(unit * u, region_list * route, region_list * route_end)
+{
+  region * current = u->region;
+  while (route!=route_end) {
+    region * next = next_region(u, current, route->data);
+    if (next!=route->data) break;
+    route=route->next;
+  }
+  return route;
+}
+
 static void
 make_route(unit * u, order * ord, region_list ** routep)
 {
@@ -1067,27 +1099,13 @@ make_route(unit * u, order * ord, region_list ** routep)
   }
 
   while (next!=NULL) {
-    border * b = get_borders(current, next);
     direction_t reldir;
 
     if (current==next) {
       /* PAUSE */
       break;
     }
-    while (b!=NULL) {
-      if (b->type->move) {
-        region * rto = b->type->move(b, u, current, next, true);
-        if (rto!=next) {
-          /* the target region was changed (bt_wisps, for example). check the
-           * new target region for borders */
-          next = rto;
-          b = get_borders(current, next);
-          continue;
-        }
-      }
-      b = b->next;
-    }
-    
+    next = next_region(u, current, next);
     reldir = reldirection(current, next);
     
     add_regionlist(iroute, next);
@@ -1914,7 +1932,8 @@ travel(unit * u, region_list ** routep)
         itoa36(ut->no));
       follow_order = parse_order(str, uf->faction->locale);
 
-      route_end = travel_i(uf, route_begin, route_end, follow_order, TRAVEL_FOLLOWING, &followers);
+      route_end = reroute(uf, route_begin, route_end);
+      travel_i(uf, route_begin, route_end, follow_order, TRAVEL_FOLLOWING, &followers);
       caught_target(uf->region, uf);
       free_order(follow_order);
     }

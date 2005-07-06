@@ -258,6 +258,9 @@
 			RelativePath=".\base36.c">
 		</File>
 		<File
+			RelativePath=".\bsdstring.c">
+		</File>
+		<File
 			RelativePath=".\command.c">
 		</File>
 		<File
