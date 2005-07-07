@@ -1273,7 +1273,6 @@ describe(FILE * F, const region * r, int partial, faction * f)
 				strcpy(bufp++, ".");
 				dh = 1;
 			}
-			if (dh) strcpy(bufp++, ".");
 		}
 	} else {
 		bufp += strxcpy(bufp, " Groﬂe Verwirrung bef‰llt alle Reisenden in dieser Region.");

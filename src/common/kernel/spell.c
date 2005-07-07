@@ -3002,8 +3002,7 @@ static region *
 wall_move(const border * b, struct unit * u, struct region * from, struct region * to, boolean routing)
 {
   wall_data * fd = (wall_data*)b->data.v;
-  if (routing) return to;
-  if (fd->active) {
+  if (!routing && fd->active) {
     int hp = dice(3, fd->force) * u->number;
     hp = min (u->hp, hp);
     u->hp -= hp;
@@ -3017,7 +3016,7 @@ wall_move(const border * b, struct unit * u, struct region * from, struct region
       u->hp = u->number;
     }
   }
-  return NULL;
+  return to;
 }
 
 border_type bt_firewall = {
@@ -3120,8 +3119,7 @@ wisps_move(const border * b, struct unit * u, struct region * from, struct regio
   wall_data * wd = (wall_data*)b->data.v;
   assert(reldir!=D_SPECIAL);
 
-  if (!routing) return NULL;
-  if (wd->active) {
+  if (routing && wd->active) {
     /* pick left and right region: */
     region * rl = rconnect(from, (direction_t)((reldir+MAXDIRECTIONS-1)%MAXDIRECTIONS));
     region * rr = rconnect(from, (direction_t)((reldir+1)%MAXDIRECTIONS));
@@ -3626,10 +3624,10 @@ sp_chaossuction(castorder *co)
 	}
 
 	create_special_direction(r, rt, 2,
-			"Ein Wirbel aus reinem Chaos zieht über die Region.",
+			"Ein Wirbel aus reinem Chaos zieht über die Region",
 			"Wirbel");
 	create_special_direction(rt, r, 2,
-			"Ein Wirbel aus reinem Chaos zieht über die Region.",
+			"Ein Wirbel aus reinem Chaos zieht über die Region",
 			"Wirbel");
   new_border(&bt_chaosgate, r, rt);
 
