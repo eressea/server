@@ -931,17 +931,15 @@ maintain(building * b, boolean first)
 	}
 	if (paid && c>0) {
 		/* TODO: wieviel von was wurde bezahlt */
-		message * msg = NULL;
 		if (first) {
-			msg = add_message(&u->faction->msgs,
-				msg_message("maintenance", "unit building", u, b));
+			ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
 		} else {
-			msg = add_message(&u->faction->msgs,
-				msg_message("maintenance_late", "building", b));
+			ADDMSG(&u->faction->msgs, msg_message("maintenance_late", "building", b));
 		}
-		if (msg) msg_release(msg);
 		fset(b, BLD_MAINTAINED);
-		if (work) fset(b, BLD_WORKING);
+    if (work) {
+      fset(b, BLD_WORKING);
+    }
 		for (c=0;b->type->maintenance[c].number;++c) {
 			const maintenance * m = b->type->maintenance+c;
 			int cost = m->number;
@@ -1035,19 +1033,27 @@ maintain_buildings(boolean crash)
 		building **bp = &r->buildings;
 		while (*bp) {
 			building * b = *bp;
-			if (!maintain(b, !crash) && crash) {
-				if (rand() % 100 < EINSTURZCHANCE) {
-					gebaeude_stuerzt_ein(r, b);
-					continue;
-				} else {
-					unit * u = buildingowner(r, b);
-					struct message * msg = msg_message("nomaintenance", "building", b);
-					if (u) {
+      boolean maintained = maintain(b, !crash);
+
+      /* the second time, send a message */
+      if (crash) {
+        if (!maintained && (rand() % 100 < EINSTURZCHANCE)) {
+  				gebaeude_stuerzt_ein(r, b);
+	  			continue;
+        } else if (!fval(b, BLD_WORKING)) {
+          unit * u = buildingowner(r, b);
+          const char * msgtype = maintained?"maintenance_none":"maintenance_nowork";
+  	  		struct message * msg = msg_message(msgtype, "building", b);
+
+          if (u) {
 						add_message(&u->faction->msgs, msg);
 						r_addmessage(r, u->faction, msg);
-					}
-				}
-			}
+          } else {
+            add_message(&r->msgs, msg);
+          }
+          msg_release(msg);
+        }
+      }
 			bp=&b->next;
 		}
 	}
