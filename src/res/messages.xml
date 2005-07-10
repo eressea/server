@@ -1258,11 +1258,11 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-      <arg name="id" type="int"/>
+      <arg name="ship" type="ship"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Schiff $int36($id) konnte nicht verzaubert werden."</text>
-    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - Ship $int36($id) could not be charmed."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Ship $int36($id) could not be charmed."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $ship($ship) widersteht dem Zauber."</text>
+    <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $ship($ship) resists the spell."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $ship($ship) resists the spell."</text>
   </message>
   <message name="spellbuildingresists" section="magic">
     <type>

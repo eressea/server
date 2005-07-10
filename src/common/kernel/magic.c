@@ -1630,9 +1630,8 @@ verify_targets(castorder *co)
 						spobj->data.i = sh->no;
 						spobj->flag = TARGET_RESISTS;
 						resists++;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellshipresists%u:unit%r:region%s:command%d:id",
-							mage, mage->region, co->order, spobj->data.i));
+						ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, 
+              "spellshipresists", "ship", sh));
 						break;
 					}
 					success++;
