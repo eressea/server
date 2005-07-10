@@ -4950,7 +4950,7 @@ sp_raisepeasants(castorder *co)
 	bauern = (int)min(rpeasants(r), power*250);
 	rsetpeasants(r, rpeasants(r) - bauern);
 
-	u2 = create_unit(r,mage->faction, bauern, new_race[RC_PEASANT], 0,"Wilder Bauernmob",mage);
+	u2 = create_unit(r, mage->faction, bauern, new_race[RC_PEASANT], 0, "Wilder Bauernmob", mage);
   set_string(&u2->name, "Erzürnte Bauern");
 
 	fset(u2, UFL_LOCKED);

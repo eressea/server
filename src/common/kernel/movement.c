@@ -793,8 +793,7 @@ bewegung_blockiert_von(unit * reisender, region * r)
 	for (u=r->units;u && !contact;u=u->next) {
 		if (getguard(u) & GUARD_TRAVELTHRU) {
 			int sk = eff_skill(u, SK_OBSERVATION, r);
-			if (invisible(reisender) >= reisender->number &&
-				!get_item(u, I_AMULET_OF_TRUE_SEEING)) continue;
+			if (invisible(reisender, u) >= reisender->number) continue;
 			if (u->faction==reisender->faction) contact = true;
       else if (ucontact(u, reisender)) contact = true;
 			else if (alliedunit(u, reisender->faction, HELP_GUARD)) contact = true;

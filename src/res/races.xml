@@ -565,11 +565,11 @@
     <ai splitsize="5000"/>
     <attack type="4" damage="2d4"/>
   </race>
-  <race name="peasant" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d6" unarmedattack="0" unarmeddefense="0" cannotmove="yes" teach="no" canguard="yes">
+  <race name="peasant" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d6" unarmedattack="0" unarmeddefense="0" cannotmove="yes" teach="no">
     <ai splitsize="10000"/>
     <attack type="1" damage="1d6"/>
   </race>
-  <race name="braineater" magres="0.900000" maxaura="1.000000" regaura="1.000000" recruitcost="50000" weight="100" capacity="50" speed="1.000000" hp="20" ac="1" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" canguard="yes" invinciblenonmagic="yes">
+  <race name="braineater" magres="0.900000" maxaura="1.000000" regaura="1.000000" recruitcost="50000" weight="100" capacity="50" speed="1.000000" hp="20" ac="1" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" invinciblenonmagic="yes">
     <ai splitsize="500" killpeasants="yes" moverandom="yes" learn="yes"/>
     <attack type="2" damage="3d15"/>
     <attack type="3" damage="1d1"/>
@@ -611,7 +611,7 @@
     <ai splitsize="1"/>
     <attack type="1" damage="1d4"/>
   </race>
-  <race name="mountainguard" magres="0.500000" maxaura="1.000000" regaura="0.500000" recruitcost="50000" weight="10000" capacity="2000" speed="0.000000" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove="yes" nolearn="yes" teach="no" noweapons="yes" canguard="yes" giveitem="yes">
+  <race name="mountainguard" magres="0.500000" maxaura="1.000000" regaura="0.500000" recruitcost="50000" weight="10000" capacity="2000" speed="0.000000" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove="yes" nolearn="yes" teach="no" noweapons="yes" giveitem="yes">
     <ai splitsize="1"/>
     <attack type="4" damage="2d40"/>
   </race>
@@ -648,7 +648,7 @@
     <ai splitsize="1"/>
     <attack type="1" damage="1d4"/>
   </race>
-  <race name="dracoid" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" walk="yes" teach="no" giveitem="yes" giveperson="yes" getitem="yes" canguard="yes" equipment="yes">
+  <race name="dracoid" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="50" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" walk="yes" teach="no" giveitem="yes" giveperson="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="name" value="namedracoid"/>
     <attack type="4" damage="1d6"/>
@@ -663,12 +663,12 @@
     <attack type="4" damage="2d40"/>
     <attack type="4" damage="2d40"/>
   </race>
-  <race name="ent" magres="0.250000" maxaura="1.000000" regaura="0.500000" recruitcost="5000" weight="5000" capacity="2500" speed="1.000000" hp="50" ac="4" damage="2d4+12" unarmedattack="0" unarmeddefense="0" attackmodifier="9" defensemodifier="7" scarepeasants="yes" walk="yes" teach="no" canguard="yes">
+  <race name="ent" magres="0.250000" maxaura="1.000000" regaura="0.500000" recruitcost="5000" weight="5000" capacity="2500" speed="1.000000" hp="50" ac="4" damage="2d4+12" unarmedattack="0" unarmeddefense="0" attackmodifier="9" defensemodifier="7" scarepeasants="yes" walk="yes" teach="no">
     <ai splitsize="1000" moverandom="yes" learn="yes"/>
     <attack type="4" damage="2d12"/>
     <attack type="4" damage="2d12"/>
   </race>
-  <race name="wyrm" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" canguard="yes" resistbash="yes">
+  <race name="wyrm" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="move" value="movedragon"/>
@@ -681,7 +681,7 @@
     <attack type="4" damage="5d30"/>
     <attack type="6" spell="83"/>
   </race>
-  <race name="dragon" magres="0.700000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="1000000" capacity="990000" speed="1.500000" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" canguard="yes" resistbash="yes">
+  <race name="dragon" magres="0.700000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="1000000" capacity="990000" speed="1.500000" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="2" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="age" value="agedragon"/>
@@ -695,7 +695,7 @@
     <attack type="4" damage="3d30"/>
     <attack type="6" spell="82"/>
   </race>
-  <race name="young dragon" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="10000" weight="20000" capacity="10000" speed="1.000000" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" canguard="yes" resistbash="yes">
+  <race name="young dragon" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="10000" weight="20000" capacity="10000" speed="1.000000" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="6" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="age" value="agefiredragon"/>
@@ -716,7 +716,7 @@
     <skill name="sk_unarmed" modifier="-99"/>
     <attack type="1" damage="1d1"/>
   </race>
-  <race name="undead" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="2" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d7" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" noheal="yes" undead="yes" canguard="yes" equipment="yes">
+  <race name="undead" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="2" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d7" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" noheal="yes" undead="yes" equipment="yes">
     <ai splitsize="20000" moverandom="yes"/>
     <function name="name" value="nameundead"/>
     <function name="age" value="ageundead"/>
@@ -967,11 +967,11 @@
     <skill name="sk_unarmed" modifier="-99"/>
     <attack type="1" damage="0d0"/>
   </race>
-  <race name="template" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="0" weight="0" capacity="0" speed="10.000000" hp="10" damage="1d4" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" fly="yes" swim="yes" walk="yes" shapeshift="yes" shapeshiftany="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" canguard="yes" recruitethereal="yes" recruitunlimited="yes" equipment="yes">
+  <race name="template" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="0" weight="0" capacity="0" speed="10.000000" hp="10" damage="1d4" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" fly="yes" swim="yes" walk="yes" shapeshift="yes" shapeshiftany="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" recruitunlimited="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <attack type="1" damage="1d4"/>
   </race>
-  <race name="gnome" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="50" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk="yes" teach="no" canguard="yes">
+  <race name="gnome" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="50" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk="yes" teach="no">
     <ai splitsize="10000"/>
     <skill name="sk_tactics" modifier="1"/>
     <skill name="sk_perception" modifier="1"/>
@@ -979,7 +979,7 @@
     <skill name="sk_unarmed" modifier="1"/>
     <attack type="1" damage="1d4"/>
   </race>
-  <race name="museumghost" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="50" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk="yes" teach="no" canguard="yes">
+  <race name="museumghost" magres="1.000000" maxaura="0.000000" regaura="0.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="50" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk="yes" teach="no">
     <ai splitsize="10000"/>
     <skill name="sk_tactics" modifier="1"/>
     <skill name="sk_perception" modifier="1"/>
@@ -993,7 +993,7 @@
     <attack type="2" damage="5d600"/>
     <attack type="1" damage="1d4"/>
   </race>
-  <race name="ghast" magres="0.600000" maxaura="1.000000" regaura="1.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" canguard="yes" equipment="yes" nogive="yes">
+  <race name="ghast" magres="0.600000" maxaura="1.000000" regaura="1.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" nogive="yes">
     <ai splitsize="2000" aggression="0.02" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="nameghoul"/>
     <skill name="sk_crossbow" modifier="1"/>
@@ -1011,7 +1011,7 @@
     <attack type="2" damage="1d30"/>
     <attack type="2" damage="1d30"/>
   </race>
-  <race name="ghoul" magres="0.300000" maxaura="1.000000" regaura="1.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" canguard="yes" equipment="yes" nogive="yes">
+  <race name="ghoul" magres="0.300000" maxaura="1.000000" regaura="1.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" nogive="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="nameghoul"/>
     <function name="age" value="ageghoul"/>
@@ -1029,7 +1029,7 @@
     <attack type="3" damage="1d2"/>
     <attack type="2" damage="1d30"/>
   </race>
-  <race name="juju-zombie" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="8" weight="1000" capacity="540" speed="1.000000" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" canguard="yes" equipment="yes" resistbash="yes" resistcut="yes" resistpierce="yes" nogive="yes">
+  <race name="juju-zombie" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="8" weight="1000" capacity="540" speed="1.000000" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" resistbash="yes" resistcut="yes" resistpierce="yes" nogive="yes">
     <ai splitsize="2000" aggression="0.02" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="namezombie"/>
     <skill name="sk_crossbow" modifier="1"/>
@@ -1045,7 +1045,7 @@
     <attack type="3" damage="1d1"/>
     <attack type="3" damage="1d1"/>
   </race>
-  <race name="zombie" magres="0.200000" maxaura="1.000000" regaura="1.000000" recruitcost="4" weight="1000" capacity="540" speed="1.000000" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" noheal="yes" undead="yes" canguard="yes" equipment="yes" resistcut="yes" resistpierce="yes" nogive="yes">
+  <race name="zombie" magres="0.200000" maxaura="1.000000" regaura="1.000000" recruitcost="4" weight="1000" capacity="540" speed="1.000000" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" nogive="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="namezombie"/>
     <function name="age" value="agezombie"/>
@@ -1060,7 +1060,7 @@
     <skill name="sk_unarmed" modifier="1"/>
     <attack type="1" damage="1d7"/>
   </race>
-  <race name="skeleton lord" magres="0.300000" maxaura="1.000000" regaura="1.000000" recruitcost="2" weight="1000" capacity="540" speed="1.000000" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" canguard="yes" equipment="yes" resistcut="yes" resistpierce="yes" nogive="yes">
+  <race name="skeleton lord" magres="0.300000" maxaura="1.000000" regaura="1.000000" recruitcost="2" weight="1000" capacity="540" speed="1.000000" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" nogive="yes">
     <ai splitsize="2000" aggression="0.02" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="nameskeleton"/>
     <skill name="sk_crossbow" modifier="1"/>
@@ -1075,7 +1075,7 @@
     <attack type="1" damage="1d7"/>
     <attack type="1" damage="1d7"/>
   </race>
-  <race name="skeleton" magres="0.100000" maxaura="1.000000" regaura="1.000000" recruitcost="0" weight="500" capacity="540" speed="1.000000" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" noheal="yes" undead="yes" canguard="yes" equipment="yes" resistcut="yes" resistpierce="yes" nogive="yes">
+  <race name="skeleton" magres="0.100000" maxaura="1.000000" regaura="1.000000" recruitcost="0" weight="500" capacity="540" speed="1.000000" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" nogive="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="nameskeleton"/>
     <function name="age" value="ageskeleton"/>
@@ -1122,7 +1122,7 @@
     <ai splitsize="20000" moverandom="yes"/>
     <attack type="1" damage="1d1"/>
   </race>
-  <race name="sea serpent" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" swim="yes" teach="no" getitem="yes" canguard="yes" resistbash="yes">
+  <race name="sea serpent" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="5000" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" swim="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="6" killpeasants="yes" moverandom="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="move" value="moveswimming"/>
@@ -1282,7 +1282,7 @@
     <familiar race="wolf"/>
     <familiar race="demon"/>
   </race>
-  <race name="shadowdragon" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" canguard="yes" resistbash="yes">
+  <race name="shadowdragon" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="move" value="movedragon"/>
@@ -1319,7 +1319,7 @@
     <attack type="3" damage="1d4"/>
     <attack type="2" damage="2d60"/>
   </race>
-  <race name="phoenix" magres="0.900000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="50000" capacity="30000" speed="2.000000" hp="500" ac="6" damage="1d20" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" canguard="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
+  <race name="phoenix" magres="0.900000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="50000" capacity="30000" speed="2.000000" hp="500" ac="6" damage="1d20" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
     <ai splitsize="2" learn="yes"/>
     <function name="itemdrop" value="phoenixdrops"/>
     <skill name="sk_magic" modifier="16"/>
@@ -1330,7 +1330,7 @@
     <attack type="4" damage="1d10"/>
     <attack type="6" spell="180"/>
   </race>
-  <race name="sphinx" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" canguard="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
+  <race name="sphinx" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <skill name="sk_magic" modifier="12"/>
     <skill name="sk_tactics" modifier="12"/>
@@ -1380,7 +1380,7 @@
     <attack type="4" damage="1d6"/>
     <attack type="6" spell="181"/>
   </race>
-  <race name="undeadpharaoh" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants="yes" cannotmove="yes" teach="no" getitem="yes" canguard="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
+  <race name="undeadpharaoh" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants="yes" cannotmove="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <skill name="sk_tactics" modifier="20"/>
     <skill name="sk_perception" modifier="20"/>
@@ -1392,7 +1392,7 @@
     <attack type="6" spell="175"/>
     <precombatspell spell="176"/>
   </race>
-  <race name="mummy" magres="0.600000" maxaura="1.000000" regaura="1.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" noheal="yes" undead="yes" canguard="yes" equipment="yes" nogive="yes">
+  <race name="mummy" magres="0.600000" maxaura="1.000000" regaura="1.000000" recruitcost="5" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" nolearn="yes" teach="no" noheal="yes" undead="yes" equipment="yes" nogive="yes">
     <ai splitsize="10000" moverandom="yes"/>
     <skill name="sk_crossbow" modifier="1"/>
     <skill name="sk_bow" modifier="1"/>
@@ -1410,7 +1410,7 @@
     <attack type="2" damage="1d30"/>
   </race>
 <!--
-  <race name="skeletal_wyrm" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" canguard="yes" resistbash="yes">
+  <race name="skeletal_wyrm" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="move" value="movedragon"/>

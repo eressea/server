@@ -1110,14 +1110,20 @@ eff_skill_study(const unit * u, skill_t sk, const region * r)
 }
 
 int
-invisible(const unit *u)
+invisible(const unit *target, const unit * viewer)
 {
 #if NEWATSROI == 1
 	return 0;
 #else
-	return get_item(u, I_RING_OF_INVISIBILITY)
-		+ 100 * get_item(u, I_SPHERE_OF_INVISIBILITY);
-
+  if (viewer->faction==target->faction) return 0;
+  else {
+    int hidden = get_item(target, I_RING_OF_INVISIBILITY) + 100 * get_item(target, I_SPHERE_OF_INVISIBILITY);
+    if (hidden) {
+      hidden = min(hidden, target->number);
+      hidden -= get_item(viewer, I_AMULET_OF_TRUE_SEEING);
+    }
+    return hidden;
+  }
 #endif
 }
 

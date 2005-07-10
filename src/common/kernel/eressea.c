@@ -1085,11 +1085,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 				break;
 			}
 
-#if NEWATSROI == 0
-			if (invisible(u) >= u->number
-				&& !get_item(u2, I_AMULET_OF_TRUE_SEEING))
-				continue;
-#endif
+			if (invisible(u, u2) >= u->number) continue;
 
 			o = eff_skill(u2, SK_OBSERVATION, r);
 #ifdef NIGHTEYES
@@ -1132,11 +1128,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u, int mod
 			if (u2->faction == f) {
 				int o;
 
-#if NEWATSROI == 0
-				if (invisible(u) >= u->number
-						&& !get_item(u2, I_AMULET_OF_TRUE_SEEING))
-					continue;
-#endif
+				if (invisible(u, u2) >= u->number) continue;
 
 				o = eff_skill(u2, SK_OBSERVATION, r);
 

@@ -96,11 +96,9 @@ spy_cmd(unit * u, struct order * ord)
   observe = eff_skill(target, SK_OBSERVATION, r)
     - (effskill(u, SK_STEALTH) + eff_skill(u, SK_SPY, r)/2);
 
-#if NEWATSROI == 0
-  if (invisible(u) >= u->number && get_item(target, I_AMULET_OF_TRUE_SEEING) == 0) {
+  if (invisible(u, target) >= u->number) {
     observe = min(observe, 0);
   }
-#endif
 
   /* Anschließend wird - unabhängig vom Erfolg - gewürfelt, ob der
   * Spionageversuch bemerkt wurde. Die Wahrscheinlich dafür ist (100 -

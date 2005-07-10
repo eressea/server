@@ -947,6 +947,19 @@ plan_monsters(void)
           }
         }
       }
+
+      if (long_order==NULL) {
+        /* Einheiten, die Waffenlosen Kampf lernen könnten, lernen es um 
+        * zu bewachen: */
+        if (u->race->bonus[SK_WEAPONLESS] != -99) {
+          if (eff_skill(u, SK_WEAPONLESS, u->region) < 1) {
+            sprintf(buf, "%s %s", locale_string(f->locale, keywords[K_STUDY]),
+              skillname(SK_WEAPONLESS, f->locale));
+            long_order = parse_order(buf, f->locale);
+          }
+        }
+      }
+
       if (long_order==NULL) {
         /* Ab hier noch nicht generalisierte Spezialbehandlungen. */
 

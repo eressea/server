@@ -217,7 +217,7 @@ extern void set_number(struct unit * u, int count);
 
 extern boolean learn_skill(struct unit * u, skill_t sk, double chance);
 
-extern int invisible(const unit *u);
+extern int invisible(const struct unit *target, const struct unit * viewer);
 
 #ifdef __cplusplus
 }
