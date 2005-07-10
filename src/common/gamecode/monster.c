@@ -80,16 +80,17 @@ is_waiting(const unit * u)
 static order *
 monster_attack(unit * u, const unit * target)
 {
-	char zText[20];
-
-	if (u->region!=target->region) return NULL;
+  char zText[20];
+  
+  if (u->region!=target->region) return NULL;
   if (u->faction==target->faction) return NULL;
-	if (!cansee(u->faction, u->region, target, 0)) return NULL;
-	if (is_waiting(u)) return NULL;
-
-	sprintf(zText, "%s %s",
-		locale_string(u->faction->locale, keywords[K_ATTACK]), unitid(target));
-	return parse_order(zText, u->faction->locale);
+  if (!cansee(u->faction, u->region, target, 0)) return NULL;
+  if (is_waiting(u)) return NULL;
+  
+  sprintf(zText, "%s %s",
+          locale_string(u->faction->locale, keywords[K_ATTACK]), 
+          unitid(target));
+  return parse_order(zText, u->faction->locale);
 }
 
 
@@ -324,7 +325,8 @@ monster_move(region * r, unit * u)
   if (d == NODIRECTION)
     return NULL;
 
-  sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), locale_string(u->faction->locale, directions[d]));
+  sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), 
+          locale_string(u->faction->locale, directions[d]));
 
   return parse_order(buf, u->faction->locale);
 }
@@ -453,35 +455,36 @@ monster_seeks_target(region *r, unit *u)
     return NULL; /* this is a bug workaround! remove!! */
   }
 
-	if(r == target->region ) { /* Wir haben ihn! */
-		if (u->race == new_race[RC_ALP]) {
-			alp_findet_opfer(u, r);
-		}
-		else {
-			assert(!"Seeker-Monster hat keine Aktion fuer Ziel");
-		}
-		return NULL;
-	}
-
-	/* Simpler Ansatz: Nachbarregion mit gerinster Distanz suchen.
-	 * Sinnvoll momentan nur bei Monstern, die sich nicht um das
-	 * Terrain kümmern.  Nebelwände & Co machen derzeit auch nix...
-	 */
-	dist2 = distance(r, target->region);
-	d = NODIRECTION;
-	for( i = 0; i < MAXDIRECTIONS; i++ ) {
-		nr = rconnect(r, i);
-		assert(nr);
-		dist = distance(nr, target->region);
-		if( dist < dist2 ) {
-			dist2 = dist;
-			d = i;
-		}
-	}
-	assert(d != NODIRECTION );
-
-	sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), locale_string(u->faction->locale, directions[d]));
-	return parse_order(buf, u->faction->locale);
+  if(r == target->region ) { /* Wir haben ihn! */
+    if (u->race == new_race[RC_ALP]) {
+      alp_findet_opfer(u, r);
+    }
+    else {
+      assert(!"Seeker-Monster hat keine Aktion fuer Ziel");
+    }
+    return NULL;
+  }
+  
+  /* Simpler Ansatz: Nachbarregion mit gerinster Distanz suchen.
+   * Sinnvoll momentan nur bei Monstern, die sich nicht um das
+   * Terrain kümmern.  Nebelwände & Co machen derzeit auch nix...
+   */
+  dist2 = distance(r, target->region);
+  d = NODIRECTION;
+  for( i = 0; i < MAXDIRECTIONS; i++ ) {
+    nr = rconnect(r, i);
+    assert(nr);
+    dist = distance(nr, target->region);
+    if( dist < dist2 ) {
+      dist2 = dist;
+      d = i;
+    }
+  }
+  assert(d != NODIRECTION );
+  
+  sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]),
+          locale_string(u->faction->locale, directions[d]));
+  return parse_order(buf, u->faction->locale);
 }
 
 unit *
@@ -677,32 +680,32 @@ extern attrib_type at_direction;
 static order *
 monster_learn(unit *u)
 {
-	int c = 0;
-	int n;
-	skill * sv;
+  int c = 0;
+  int n;
+  skill * sv;
   const struct locale * lang = u->faction->locale;
-
-	/* Monster lernt ein zufälliges Talent aus allen, in denen es schon
-	 * Lerntage hat. */
-
+  
+  /* Monster lernt ein zufälliges Talent aus allen, in denen es schon
+   * Lerntage hat. */
+  
   for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
     if (sv->level>0) ++c;
   }
-
-	if(c == 0) return NULL;
-
-	n = rand()%c + 1;
-	c = 0;
-
+  
+  if(c == 0) return NULL;
+  
+  n = rand()%c + 1;
+  c = 0;
+  
   for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-		if (sv->level>0) {
-			if (++c == n) {
-				sprintf(buf, "%s %s", locale_string(lang, keywords[K_STUDY]),
-					skillname(sv->id, lang));
-				return parse_order(buf, lang);
-			}
-		}
-	}
+    if (sv->level>0) {
+      if (++c == n) {
+        sprintf(buf, "%s \"%s\"", locale_string(lang, keywords[K_STUDY]),
+                skillname(sv->id, lang));
+        return parse_order(buf, lang);
+      }
+    }
+  }
   return NULL;
 }
 
@@ -775,7 +778,8 @@ recruit_dracoids(unit * dragon, int size)
   if (weapon->rtype->wtype->flags & WTF_MISSILE) un->status = ST_BEHIND;
   else un->status = ST_FIGHT;
 
-  sprintf(buf, "%s \"%s\"", keywords[K_STUDY], skillname(weapon->rtype->wtype->skill, f->locale));
+  sprintf(buf, "%s \"%s\"", keywords[K_STUDY], 
+          skillname(weapon->rtype->wtype->skill, f->locale));
   new_order = parse_order(buf, default_locale);
 #ifdef LASTORDER
   set_order(&un->lastorder, new_order);
@@ -870,7 +874,8 @@ plan_dragon(unit * u)
     }
   }
   if (long_order==NULL) {
-    sprintf(buf, "%s \"%s\"", keywords[K_STUDY], skillname(SK_OBSERVATION, u->faction->locale));
+    sprintf(buf, "%s \"%s\"", keywords[K_STUDY], 
+            skillname(SK_OBSERVATION, u->faction->locale));
     long_order = parse_order(buf, default_locale);
   }
   return long_order;
@@ -953,8 +958,9 @@ plan_monsters(void)
         * zu bewachen: */
         if (u->race->bonus[SK_WEAPONLESS] != -99) {
           if (eff_skill(u, SK_WEAPONLESS, u->region) < 1) {
-            sprintf(buf, "%s %s", locale_string(f->locale, keywords[K_STUDY]),
-              skillname(SK_WEAPONLESS, f->locale));
+            sprintf(buf, "%s \"%s\"", 
+                    locale_string(f->locale, keywords[K_STUDY]),
+                    skillname(SK_WEAPONLESS, f->locale));
             long_order = parse_order(buf, f->locale);
           }
         }
