@@ -987,14 +987,14 @@ plan_monsters(void)
             }
             break;
         }
-        if (long_order) {
-          set_order(&u->thisorder, copy_order(long_order));
+      }
+      if (long_order) {
+        set_order(&u->thisorder, copy_order(long_order));
 #ifdef LASTORDER
-          set_order(&u->lastorder, copy_order(long_order));
+        set_order(&u->lastorder, copy_order(long_order));
 #else
-          addlist(&u->orders, long_order);
+        addlist(&u->orders, long_order);
 #endif
-        }
       }
     }
   }
