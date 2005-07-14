@@ -1480,9 +1480,7 @@ do_combatmagic(battle *b, combatmagic_t was)
 	for (fi = b->fighters.begin; fi != b->fighters.end; ++fi) {
 		fighter * fig = *fi;
 		unit * mage = fig->unit;
-		int row = get_unitrow(fig);
 
-		if (row>BEHIND_ROW) continue;
 		if (fig->alive <= 0) continue; /* fighter kann im Kampf getötet worden sein */
 
 		level = eff_skill(mage, SK_MAGIC, r);
@@ -1549,9 +1547,6 @@ do_combatmagic(battle *b, combatmagic_t was)
 			level = ((cspell_f)sp->sp_function)(fig, level, power, sp);
 			if (level > 0) {
 				pay_spell(fig->unit, sp, level, 1);
-				if (was == DO_PRECOMBATSPELL) {
-					get_mage(fig->unit)->precombataura = level;
-				}
 			}
 		}
 	}
@@ -2432,24 +2427,6 @@ aftermath(battle * b)
     }
 #endif
   }
-
-  /* Wenn die Schlacht kurz war, dann gib Aura für den Präcombatzauber
-  * zurück. Nicht logisch, aber die einzige Lösung, den Verlust der
-  * Aura durch Dummy-Angriffe zu verhindern. */
-
-  cv_foreach(s, b->sides) {
-    if (s->bf->lastturn+(b->has_tactics_turn?1:0)<=1) continue;
-    /* Prüfung, ob faction angegriffen hat. Geht nur über die Faction */
-    if (!s->bf->attacker) {
-      fighter *fig;
-      cv_foreach(fig, s->fighters) {
-        sc_mage * mage = get_mage(fig->unit);
-        if (mage)
-          mage->spellpoints += mage->precombataura;
-      } cv_next(fig);
-    }
-    /* Alle Fighter durchgehen, Mages suchen, Precombataura zurück */
-  } cv_next(s);
 
   /* validate_sides(b); */
   /* POSTCOMBAT */

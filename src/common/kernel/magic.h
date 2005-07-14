@@ -117,8 +117,6 @@ typedef struct sc_mage {
   int spellcount;
   spellid_t combatspell[MAXCOMBATSPELLS];
   int combatspelllevel[MAXCOMBATSPELLS];
-  int precombataura; /* Merker, wieviel Aura in den Präcombatzauber
-                        gegangen ist. Nicht speichern. */
   struct spell_ptr *spellptr;
 } sc_mage;
 
