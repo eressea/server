@@ -1154,7 +1154,6 @@ movearound(int rx, int ry) {
 				case 'I':
 					a=map_input(0,0,0,"Wieviele Regionen?",0,500,0);
 					if (a) {
-/*						block_create(rx, ry, a, 0, 0, T_GLACIER); */
 						create_island(r, a, (terrain_t)(rand()%(T_GLACIER)+1));
 						modified=1;
 					}

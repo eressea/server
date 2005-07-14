@@ -171,7 +171,8 @@ read_dropouts(const char * filename)
 	if (F==NULL) return;
 	for (;;) {
 		char email[64], race[20];
-		int age, x, y;
+		int age;
+    short x, y;
 		if (fscanf(F, "%s %s %d %d %d", email, race, &age, &x, &y)<=0) break;
 		if (age<=2) {
 			region * r = findregion(x, y);

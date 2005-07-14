@@ -90,8 +90,8 @@ static int g_maxluxuries;
 void
 block_create(int x1, int y1, int size, char chaotisch, int special, char terrain)
 {
-	int local_climate;
-	int x, y, k;
+	int local_climate, k;
+	short x, y;
 	vset fringe;
 
 	vset_init(&fringe);

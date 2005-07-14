@@ -127,7 +127,8 @@ extern int numnewbies;
 typedef struct dropout {
 	struct dropout * next;
 	const struct race * race;
-	int x, y, fno;
+	short x, y;
+  int fno;
 } dropout;
 
 extern dropout * dropouts;
