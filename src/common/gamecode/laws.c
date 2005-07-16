@@ -3768,15 +3768,30 @@ monthly_healing(void)
 }
 
 static void
+remove_exclusive(order ** ordp) 
+{
+  while (*ordp) {
+    order * ord = *ordp;
+    if (is_exclusive(ord)) {
+      *ordp = ord->next;
+      ord->next = NULL;
+      free_order(ord);
+    } else {
+      ordp = &ord->next;
+    }
+  }
+}
+
+static void
 defaultorders (void)
 {
   region *r;
   for (r=regions;r;r=r->next) {
-#ifndef LASTORDER
-    boolean neworders = false;
-#endif
     unit *u;
     for (u=r->units;u;u=u->next) {
+#ifndef LASTORDER
+      boolean neworders = false;
+#endif
       order ** ordp = &u->orders;
       while (*ordp!=NULL) {
         order * ord = *ordp;
@@ -3791,8 +3806,10 @@ defaultorders (void)
           if (new_order) set_order(&u->lastorder, new_order);
 #else
           if (!neworders) {
+            /* lange Befehle aus orders und old_orders löschen zu gunsten des neuen */
+            remove_exclusive(&u->orders);
+            remove_exclusive(&u->old_orders);
             neworders = true;
-            free_orders(&u->old_orders);
           }
           if (new_order) addlist(&u->old_orders, new_order);
 #endif
