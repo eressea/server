@@ -165,10 +165,10 @@ report_item(const unit * owner, const item * i, const faction * viewer, const ch
 }
 
 
+#define ORDERS_IN_NR 1
 static size_t
-buforder(char * bufp, size_t size, const order * ord)
+buforder(char * bufp, size_t size, const order * ord, int mode)
 {
-  char * cmd = getcommand(ord);
   size_t tsize = 0, rsize;
 
   rsize = strlcpy(bufp, ", \"", size);
@@ -176,8 +176,13 @@ buforder(char * bufp, size_t size, const order * ord)
   if (rsize>size) rsize = size-1;
   size -= rsize;
   bufp += rsize;
-
-  rsize = strlcpy(bufp, cmd, size);
+  if (mode<ORDERS_IN_NR) {
+    char * cmd = getcommand(ord);
+    rsize = strlcpy(bufp, cmd, size);
+    free(cmd);
+  } else {
+    rsize = strlcpy(bufp, "...", size);
+  }
   tsize += rsize;
   if (rsize>size) rsize = size-1;
   size -= rsize;
@@ -187,7 +192,6 @@ buforder(char * bufp, size_t size, const order * ord)
     strcpy(bufp, "\"");
     ++tsize;
   }
-  free(cmd);
   return tsize;
 }
 
@@ -589,7 +593,7 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
     }
 #ifdef LASTORDER
     if (!isbattle && u->lastorder) {
-      rsize = buforder(bufp, size, u->lastorder);
+      rsize = buforder(bufp, size, u->lastorder, 0);
       if (rsize>size) rsize = size-1;
       size -= rsize;
       bufp += rsize;
@@ -597,26 +601,24 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
 #else
     if (!isbattle) {
       boolean printed = 0;
-      int i;
-      for (i=0;i!=2;++i) {
-        order * ord = (i==0)?u->old_orders:u->orders;
-        while (ord) {
-          if (is_repeated(ord)) {
-            if (printed==0) {
-              rsize = buforder(bufp, size, ord);
-            } else if (printed==1) {
-              rsize = strlcpy(bufp, ", ...", size);
-            }
-            if (rsize>size) rsize = size-1;
+      order * ord;;
+      for (ord=u->old_orders;ord;ord=ord->next) {
+        if (is_repeated(ord)) {
+          if (printed<ORDERS_IN_NR) {
+            rsize = buforder(bufp, size, ord, printed++);
             size -= rsize;
             bufp += rsize;
-            ++printed;
-            break;
-          }
-          if (printed) break; /* ein DEFAULT reicht */
-          ord=ord->next;
+          } else break;
         }
-        if (u->old_orders) break;
+      }
+      if (printed<ORDERS_IN_NR) for (ord=u->orders;ord;ord=ord->next) {
+        if (is_repeated(ord)) {
+          if (printed<ORDERS_IN_NR) {
+            rsize = buforder(bufp, size, ord, printed++);
+            size -= rsize;
+            bufp += rsize;
+          } else break;
+        }
       }
     }
 #endif

@@ -3802,6 +3802,9 @@ defaultorders (void)
           skip_token(); /* skip the keyword */
           cmd = strdup(getstrtoken());
           new_order = parse_order(cmd, u->faction->locale);
+          *ordp = ord->next;
+          ord->next = NULL;
+          free_order(ord);
 #ifdef LASTORDER
           if (new_order) set_order(&u->lastorder, new_order);
 #else
@@ -3810,13 +3813,11 @@ defaultorders (void)
             remove_exclusive(&u->orders);
             remove_exclusive(&u->old_orders);
             neworders = true;
+            ordp = &u->orders; /* we could have broken ordp */
           }
           if (new_order) addlist(&u->old_orders, new_order);
 #endif
           free(cmd);
-          *ordp = ord->next;
-          ord->next = NULL;
-          free_order(ord);
         }
         else ordp = &ord->next;
       }
