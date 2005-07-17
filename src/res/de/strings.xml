@@ -8,6 +8,23 @@
    -->
 
   <namespace name="iteminfo">
+    <string name="roi">
+      <text locale="en">
+      This magical artifact has been used since ancient times by Elves to
+      conceal themselves from their enemies. Other races have also learned
+      the value of these rings after encountering Elves - after all the ring
+      makes its wearer invisible to normal eyes, and only magical methods
+      enable the wearer to be discovered.
+      </text>
+      <text locale="de">
+      Dieses magische Artefakt wurde seit Urzeiten von den Elfen benutzt,
+      auf der Jagd oder um sich vor Feinden zu verbergen. Doch auch andere
+      Rassen haben nach der Begegnung mit den Elfenvölkern den Wert des Rings
+      schnell schätzen gelernt - schließlich macht er den Träger für jedes
+      noch so scharfe Auge unsichtbar - nur mit magischen Mitteln ist der
+      Verborgene noch zu entdecken.
+      </text>
+    </string>
     <string name="aots">
       <text locale="de">
       Das Amulett erlaubt es dem Träger, alle Einheiten, die durch einen
