@@ -547,8 +547,16 @@ set_level(unit * u, skill_t sk, int value)
 	sk_set(add_skill(u, sk), value);
 }
 
+static int  
+leftship_age(struct attrib * a)
+{
+  /* must be aged, so it doesn't affect report generation (cansee) */
+  unused(a);
+  return 0; /* remove me */
+}
+
 static attrib_type at_leftship = {
-	"leftship",
+	"leftship", NULL, NULL, leftship_age
 };
 
 static attrib *
@@ -1115,12 +1123,12 @@ invisible(const unit *target, const unit * viewer)
 #if NEWATSROI == 1
 	return 0;
 #else
-  if (viewer->faction==target->faction) return 0;
+  if (viewer && viewer->faction==target->faction) return 0;
   else {
     int hidden = get_item(target, I_RING_OF_INVISIBILITY) + 100 * get_item(target, I_SPHERE_OF_INVISIBILITY);
     if (hidden) {
       hidden = min(hidden, target->number);
-      hidden -= get_item(viewer, I_AMULET_OF_TRUE_SEEING);
+      if (viewer) hidden -= get_item(viewer, I_AMULET_OF_TRUE_SEEING);
     }
     return hidden;
   }

@@ -1340,7 +1340,7 @@
       <arg name="mage" type="unit"/>
       <arg name="reason" type="string"/>
     </type>
-    <text locale="de">"$unit($mage) erleidet einen Schock ${reason}."</text>
+    <text locale="de">"$unit($mage) erleidet durch den Tod seines Vertrauten einen Schock."</text>
   </message>
   <message name="patzer" section="magic">
     <type>

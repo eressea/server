@@ -1646,7 +1646,7 @@ readfaction(FILE * F)
   
   i = f->options = ri(F);
 
-  if ((i & Pow(O_REPORT))==0 && (i & Pow(O_COMPUTER))==0) {
+  if ((i & ((1<<O_REPORT)|(1<<O_COMPUTER)))==0 && f->no!=MONSTER_FACTION) {
     /* Kein Report eingestellt, Fehler */
     f->options = f->options | Pow(O_REPORT) | Pow(O_ZUGVORLAGE);
   }

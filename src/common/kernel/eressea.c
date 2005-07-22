@@ -1032,9 +1032,8 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 	/* und es muss niemand aus f in der region sein, wenn sie vom Turm
 	 * erblickt wird */
 {
-	int n;
-	boolean cansee = false;
-	unit *u2;
+	int stealth, rings;
+	unit *u2 = r->units;
   static const item_type * itype_grail;
   static boolean init;
 
@@ -1060,30 +1059,36 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
   if (leftship(u)) return true;
   if (itype_grail!=NULL && i_get(u->items, itype_grail)) return true;
 
-  n = eff_stealth(u, r) - modifier;
-	for (u2 = r->units; u2; u2 = u2->next) {
-		if (u2->faction == f) {
-			int o;
+	while (u2 && u2->faction != f) u2 = u2->next;
+  if (u2==NULL) return false;
 
-			if (getguard(u) || usiege(u) || u->building || u->ship) {
-				cansee = true;
-				break;
-			}
+  /* simple visibility, just gotta have a unit in the region to see 'em */
+  if (getguard(u) || usiege(u) || u->building || u->ship) {
+    return true;
+  }
 
-			if (invisible(u, u2) >= u->number) continue;
+  stealth = eff_stealth(u, r) - modifier;
 
-			o = eff_skill(u2, SK_OBSERVATION, r);
+  rings = invisible(u, NULL);
+  while (u2) {
+    if (rings<u->number || invisible(u, u2) < u->number) {
+      int observation = eff_skill(u2, SK_OBSERVATION, r);
+
 #ifdef NIGHTEYES
-			if (u2->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
-				o = NIGHT_EYE_TALENT;
+      if (u2->enchanted == SP_NIGHT_EYES && o < NIGHT_EYE_TALENT)
+        observation = NIGHT_EYE_TALENT;
 #endif
-			if (o >= n) {
-				cansee = true;
-				break;
-			}
-		}
+      if (observation >= stealth) {
+        return true;
+      }
+    }
+
+    /* find next unit in our faction */
+    do { 
+      u2=u2->next;
+    } while (u2 && u2->faction != f);
 	}
-	return cansee;
+	return false;
 }
 
 
