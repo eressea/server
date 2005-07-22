@@ -429,22 +429,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
     bufp += rsize;
   }
 
-  if (u->faction==f || telepath_see) {
-    attrib * a = a_find(u->attribs, &at_follow);
-    if (a) {
-      unit * uf = (unit*)a->data.v;
-      if (uf) {
-        rsize = strlcpy(bufp, ", folgt ", size);
-        if (rsize>size) rsize = size-1;
-        size -= rsize;
-        bufp += rsize;
-        rsize = strlcpy(bufp, itoa36(uf->no), size);
-        if (rsize>size) rsize = size-1;
-        size -= rsize;
-        bufp += rsize;
-      }
-    }
-  }
   if ((b = usiege(u))!=NULL) {
     rsize = strlcpy(bufp, ", belagert ", size);
     if (rsize>size) rsize = size-1;

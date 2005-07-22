@@ -728,13 +728,7 @@ cr_output_unit(FILE * F, const region * r,
     order * ord;
     const char *c;
     int i;
-    const attrib * a;
 
-    a = a_find(u->attribs, &at_follow);
-    if (a) {
-      unit * u = (unit*)a->data.v;
-      if (u) fprintf(F, "%d;folgt\n", u->no);
-    }
     i = ualias(u);
     if (i>0)
       fprintf(F, "%d;temp\n", i);
