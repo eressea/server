@@ -3682,7 +3682,15 @@ sp_magicboost(castorder *co)
 	double power = co->force;
   variant effect;
   trigger * tsummon;
+  static const curse_type * ct_auraboost;
+  static const curse_type * ct_magicboost;
 
+  if (!ct_auraboost) {
+    ct_auraboost = ct_find("auraboost");
+    ct_magicboost = ct_find("magicboost");
+    assert(ct_auraboost!=NULL);
+    assert(ct_magicboost!=NULL);
+  }
 	/* fehler, wenn schon ein boost */
 	if(is_cursed(mage->attribs, C_MBOOST, 0) == true){
 		report_failure(mage, co->order);
@@ -3690,14 +3698,16 @@ sp_magicboost(castorder *co)
 	}
 
   effect.i = 6;
-	c = create_curse(mage, &mage->attribs, ct_find("magicboost"), power, 10, effect, 1);
+	c = create_curse(mage, &mage->attribs, ct_magicboost, power, 10, effect, 1);
 	/* kann nicht durch Antimagie beeinflusst werden */
 	curse_setflag(c, CURSE_IMMUNE);
 
+  /* one aura boost with 200% aura now: */
   effect.i = 200;
-	c = create_curse(mage, &mage->attribs, ct_find("aura"), power, 4, effect, 1);
+	c = create_curse(mage, &mage->attribs, ct_auraboost, power, 4, effect, 1);
 
-	tsummon = trigger_createcurse(mage, mage, c->type, power, 6, 50, 1);
+  /* and one aura boost with 50% aura in 5 weeks: */
+	tsummon = trigger_createcurse(mage, mage, ct_auraboost, power, 6, 50, 1);
   add_trigger(&mage->attribs, "timer", trigger_timeout(5, tsummon));
 
 	ADDMSG(&mage->faction->msgs, msg_message("magicboost_effect", 
