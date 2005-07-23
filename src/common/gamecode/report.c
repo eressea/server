@@ -1863,20 +1863,36 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 {
 	int i;
 	unit *u;
-	attrib * a = a_find(b->attribs, &at_icastle);
+  const char * bname;
 	const struct locale * lang = NULL;
 	const building_type * type = b->type;
+  static const struct building_type * bt_illusion;
 
+  if (!bt_illusion) bt_illusion = bt_find("illusion");
 	if (f) lang = f->locale;
 
-	if (a!=NULL) {
-		type = ((icastle_data*)a->data.v)->type;
-	} else {
-		type = b->type;
-	}
+  sprintf(buf, "%s, %s %d, ", buildingname(b), LOC(f->locale, "nr_size"),
+    b->size);
 
-	sprintf(buf, "%s, %s %d, %s", buildingname(b), LOC(f->locale, "nr_size"),
-		b->size, LOC(lang, buildingtype(b, b->size)));
+  if (b->type==bt_illusion) {
+    attrib * a = a_find(b->attribs, &at_icastle);
+    if (a!=NULL) {
+      type = ((icastle_data*)a->data.v)->type;
+    }
+  }
+  bname = LOC(lang, buildingtype(type, b, b->size));
+  strcat(buf, bname);
+  if (type!=b->type) {
+    unit * owner = buildingowner(r, b);
+    if (owner && owner->faction==f) {
+      /* illusion. report real type */
+      char lbuf[32];
+      bname = LOC(lang, buildingtype(b->type, b, b->size));
+      sprintf(lbuf, " (%s)", bname);
+      strcat(buf, lbuf);
+    }
+  }
+
 	if (b->size < type->maxsize) {
 		scat(" (im Bau)");
 	}

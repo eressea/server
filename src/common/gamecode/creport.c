@@ -531,31 +531,37 @@ cr_output_messages(FILE * F, message_list *msgs, faction * f)
 
 /* prints a building */
 static void
-cr_output_buildings(FILE * F, building * b, unit * u, int fno, faction *f)
+cr_output_buildings(FILE * F, building * b, const unit * owner, int fno, faction *f)
 {
-	const building_type * type = b->type;
-	const char * bname = buildingtype(b, b->size);
+  const char * bname;
+  static const struct building_type * bt_illusion;
+  const building_type * type = b->type;
+
+  if (!bt_illusion) bt_illusion = bt_find("illusion");
 
 	fprintf(F, "BURG %d\n", b->no);
-	if (!u || u->faction != f) {
-		const attrib * a = a_find(b->attribs, &at_icastle);
-		if (a) type = ((icastle_data*)a->data.v)->type;
-	}
-	fprintf(F, "\"%s\";Typ\n", add_translation(bname, LOC(f->locale, bname)));
-	fprintf(F, "\"%s\";Name\n", b->name);
+
+  if (b->type==bt_illusion) {
+    const attrib * a = a_findc(b->attribs, &at_icastle);
+    if (a!=NULL) {
+      type = ((icastle_data*)a->data.v)->type;
+    }
+    bname = buildingtype(b->type, b, b->size);
+    if (owner!=NULL && owner->faction==f) {
+      fprintf(F, "\"%s\";wahrerTyp\n", add_translation(bname, LOC(f->locale, bname)));
+    }
+  }
+  bname = buildingtype(type, b, b->size);
+  fprintf(F, "\"%s\";Typ\n", add_translation(bname, LOC(f->locale, bname)));
+  fprintf(F, "\"%s\";Name\n", b->name);
 	if (b->display && strlen(b->display))
 		fprintf(F, "\"%s\";Beschr\n", b->display);
 	if (b->size)
 		fprintf(F, "%d;Groesse\n", b->size);
-	if (u)
-		fprintf(F, "%d;Besitzer\n", u ? u->no : -1);
+	if (owner)
+		fprintf(F, "%d;Besitzer\n", owner ? owner->no : -1);
 	if (fno >= 0)
 		fprintf(F, "%d;Partei\n", fno);
-#ifdef TODO
-	int cost = buildingdaten[b->type].per_size * b->size + buildingdaten[b->type].unterhalt;
-	if (u && u->faction == f && cost)
-		fprintf(F, "%d;Unterhalt\n", cost);
-#endif
 	if (b->besieged)
 		fprintf(F, "%d;Belagerer\n", b->besieged);
 	print_curses(F, f, b, TYP_BUILDING);

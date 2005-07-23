@@ -5161,14 +5161,14 @@ sp_icastle(castorder *co)
 	b = new_building(bt_find("illusion"), r, mage->faction->locale);
 
 	/* Größe festlegen. */
-	if(type == bt_find("illusion")) {
+	if (type == bt_find("illusion")) {
 		b->size = (rand()%(int)((power*power)+1)*10);
-	} else if (b->type->maxsize == -1) {
+	} else if (type->maxsize == -1) {
 		b->size = ((rand()%(int)(power))+1)*5;
 	} else {
-		b->size = b->type->maxsize;
+		b->size = type->maxsize;
 	}
-	sprintf(buf, "%s %s", LOC(mage->faction->locale, buildingtype(b, 0)), buildingid(b));
+	sprintf(buf, "%s %s", LOC(mage->faction->locale, buildingtype(type, b, 0)), buildingid(b));
 	set_string(&b->name, buf);
 
 	/* TODO: Auf timeout und action_destroy umstellen */

@@ -23,6 +23,7 @@
 #include "unit.h"
 #include "region.h"
 #include "skill.h"
+#include "magic.h"
 #include "save.h"
 
 /* util includes */
@@ -170,15 +171,17 @@ attrib_type at_building_generic_type = {
 };
 
 const char *
-buildingtype(const building * b, int bsize)
+buildingtype(const building_type * btype, const building * b, int bsize)
 {
 	const char * s = NULL;
-	const building_type * btype = b->type;
 	static const struct building_type * bt_generic;
-	if (!bt_generic) bt_generic = bt_find("generic");
-	assert(bt_generic);
 
-	if (btype == bt_generic) {
+  if (!bt_generic) {
+    bt_generic = bt_find("generic");
+    assert(bt_generic);
+  }
+
+  if (btype == bt_generic) {
 		const attrib *a = a_find(b->attribs, &at_building_generic_type);
 		if (a) s = (const char*)a->data.v;
 	}
@@ -457,7 +460,7 @@ new_building(const struct building_type * btype, region * r, const struct locale
 		if (b->type->name)
 			sprintf(buffer, "%s", locale_string(lang, btype->_name));
 		else
-			sprintf(buffer, "%s", LOC(lang, buildingtype(b, 0)));
+			sprintf(buffer, "%s", LOC(lang, buildingtype(btype, b, 0)));
 		set_string(&b->name, buffer);
 	}
 	return b;

@@ -952,10 +952,11 @@ showunits(region * r)
 
 	for (b = r->buildings; b; b = b->next) {
 		if (b->type == bt_find("castle")) {
-			sprintf(lbuf, "\002%s, Größe %d, %s", buildingname(b), b->size, buildingtype(b, b->size /*, NULL */));
+			sprintf(lbuf, "\002%s, Größe %d, %s", buildingname(b), b->size, 
+        buildingtype(b->type, b, b->size /*, NULL */));
 		} else {
 			sprintf(lbuf, "\002%s, Größe %d, %s", buildingname(b),
-					b->size, buildingtype(b, b->size /*, NULL */));
+					b->size, buildingtype(b->type, b, b->size /*, NULL */));
 			if (b->type->maxsize > 0 &&
 					b->size < b->type->maxsize) {
 				sncat(lbuf, " (im Bau)", BUFSIZE);

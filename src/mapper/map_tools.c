@@ -69,7 +69,7 @@ Buildingid(building * b)
 {
 	static char buf[35];
 	sprintf(buf, "\002%s (%s), Größe %d",
-			buildingtype(b, b->size /*, NULL */),
+			buildingtype(b->type, b, b->size /*, NULL */),
 			buildingid(b), b->size);
 	return buf;
 }
@@ -87,7 +87,7 @@ BuildingName(building * b)
 {
 	static char buf[35];
 	sprintf(buf, "%s (%s)",
-			buildingtype(b, b->size /*, NULL*/), buildingid(b));
+			buildingtype(b->type, b, b->size /*, NULL*/), buildingid(b));
 	return buf;
 }
 
