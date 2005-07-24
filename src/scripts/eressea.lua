@@ -62,7 +62,6 @@ function process(orders)
 
   -- kill multi-players (external script)
   loadscript("eressea-multis.lua")
-  kill_multis()
 
   -- run the turn:
   if read_orders(orders) ~= 0 then
