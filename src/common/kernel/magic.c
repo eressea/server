@@ -144,8 +144,7 @@ a_ageicastle(struct attrib * a)
 	if (data->time<=0) {
 		building * b = data->building;
 		region * r = b->region;
-		sprintf(buf, "Plötzlich löst sich %s in kleine Traumwolken auf.", buildingname(b));
-		addmessage(r, 0, buf, MSG_EVENT, ML_INFO);
+    ADDMSG(&r->msgs, msg_message("icastle_dissolve", "building", b));
 		/* destroy_building lets units leave the building */
 		destroy_building(b);
 		return 0;
@@ -945,27 +944,20 @@ cancast(unit * u, spell * sp, int level, int range, struct order * ord)
 					/* es fehlte schon eine andere Komponente, wir basteln die
 					 * Meldung weiter zusammen */
 					scat(", ");
-					icat(itemanz);
-					scat(LOC(u->faction->locale, resname(res, itemanz!=1)));
-				} else {
-					/* Noch fehlte keine Komponente, wir generieren den Anfang der
-					 * Fehlermeldung */
-					sprintf(buf, "%s in %s: 'ZAUBER %s' - Für diesen Zauber fehlen "
-							"noch %d ", unitname(u), regionname(u->region, u->faction),
-							spell_name(sp, u->faction->locale), itemanz);
-					scat(LOC(u->faction->locale, resname(res, itemanz!=1)));
-					b = false;
-				}
+        } else {
+          b = false;
+          buf[0] = 0;
+        }
+				icat(itemanz);
+				scat(LOC(u->faction->locale, resname(res, itemanz!=1)));
 			}
 		}
 	}
-	if (b == false) {
-		scat(".");
-		addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
-		return false;
+	if (!b) {
+    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "missing_components_list", "list", buf));
 	}
 
-	return true;
+	return b;
 }
 
 /* ------------------------------------------------------------- */
@@ -1277,7 +1269,6 @@ do_fumble(castorder *co)
   int level = co->level;
   int duration;
   variant effect;
-  const char * sp_name = spell_name(sp, u->faction->locale);
 
   ADDMSG(&u->faction->msgs, msg_message("patzer", "unit region spell",
     u, r, sp));
@@ -1303,8 +1294,8 @@ do_fumble(castorder *co)
     }
     u->race = new_race[RC_TOAD];
     u->irace = new_race[RC_TOAD];
-    sprintf(buf, "Eine Botschaft von %s: 'Ups! Quack, Quack!'", unitname(u));
-    addmessage(r, 0, buf, MSG_MAGIC, ML_MISTAKE);
+    ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell",
+      u, r, sp));
     break;
 
   case 2:
@@ -1329,13 +1320,8 @@ do_fumble(castorder *co)
     /* Spruch gelingt, aber alle Magiepunkte weg */
     ((nspell_f)sp->sp_function)(co);
     set_spellpoints(u, 0);
-    sprintf(buf, "Als %s versucht, '%s' zu zaubern erhebt sich "
-      "plötzlich ein dunkler Wind. Bizarre geisterhafte "
-      "Gestalten kreisen um den Magier und scheinen sich von "
-      "den magischen Energien des Zaubers zu ernähren. Mit letzter "
-      "Kraft gelingt es %s dennoch den Spruch zu zaubern.",
-      unitname(u), sp_name, unitname(u));
-    addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
+    ADDMSG(&u->faction->msgs, msg_message("patzer4", "unit region spell",
+      u, r, sp));
     break;
 
   case 7:
@@ -1344,10 +1330,8 @@ do_fumble(castorder *co)
   default:
     /* Spruch gelingt, alle nachfolgenden Sprüche werden 2^4 so teuer */
     ((nspell_f)sp->sp_function)(co);
-    sprintf(buf, "%s fühlt sich nach dem Zaubern von %s viel erschöpfter "
-      "als sonst und hat das Gefühl, dass alle weiteren Zauber deutlich "
-      "mehr Kraft als normalerweise kosten werden.", unitname(u), sp_name);
-    addmessage(0, u->faction, buf, MSG_MAGIC, ML_WARN);
+    ADDMSG(&u->faction->msgs, msg_message("patzer5", "unit region spell",
+      u, r, sp));
     countspells(u, 3);
   }
 
@@ -2602,16 +2586,13 @@ magic(void)
             if (!knowsspell(r, u, sp)) { /* Magier zaubert durch Vertrauten */
               mage = get_familiar_mage(u);
               if (range > 1) { /* Fehler! Versucht zu Farcasten */
-                sprintf(buf, "%s kann Sprüche, die durch %s wirken, nicht "
-                  "zusätzlich nochmal in die Ferne richten.",
-                  unitname(mage), unitname(u));
-                addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "familiar_farcast", 
+                  "mage", mage));
                 continue;
               }
               if (distance(mage->region, r) > eff_skill(mage, SK_MAGIC, mage->region)) {
-                sprintf(buf, "%s kann nicht genug Kraft aufbringen, um "
-                  "durch %s zu wirken", unitname(mage), unitname(u));
-                addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "familiar_toofar", 
+                  "mage", mage));
                 continue;
               }
               /* mage auf magier setzen, level anpassen, range für Erhöhung
@@ -2685,10 +2666,8 @@ magic(void)
         /* Sprüche mit Fixkosten werden immer auf Stufe des Spruchs
         * gezaubert, co->level ist aber defaultmäßig Stufe des Magiers */
         if (spl_costtyp(sp) != SPC_FIX) {
-          sprintf(buf, "%s hat nur genügend Komponenten um %s auf Stufe %d "
-            "zu zaubern.", unitname(u), spell_name(sp, u->faction->locale),
-            co->level);
-          addmessage(0, u->faction, buf, MSG_MAGIC, ML_INFO);
+          ADDMSG(&u->faction->msgs, msg_message("missing_components", 
+            "unit spell level", u, sp, level));
         }
       }
 
@@ -2703,9 +2682,8 @@ magic(void)
       /* die Stärke kann durch Antimagie auf 0 sinken */
       if (co->force <= 0) {
         co->force = 0;
-        sprintf(buf, "%s schafft es nicht genügend Kraft aufzubringen "
-          "um %s dennoch zu zaubern.", unitname(u),
-          spell_name(sp, u->faction->locale));
+        ADDMSG(&u->faction->msgs, msg_message("missing_force", 
+          "unit spell level", u, sp, level));
         addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
       }
 
@@ -2733,10 +2711,8 @@ magic(void)
           co->force = 0;
           /* zwar wurde mindestens ein Ziel gefunden, das widerstand
             * jedoch dem Zauber. Kosten abziehen und abbrechen. */
-          sprintf(buf, "%s gelingt es %s zu zaubern, doch der Spruch zeigt "
-            "keine Wirkung.", unitname(u),
-            spell_name(sp, u->faction->locale));
-          addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
+          ADDMSG(&u->faction->msgs, msg_message("spell_resist", "unit region spell",
+            u, r, sp));
           co->force = 0;
         }
       }

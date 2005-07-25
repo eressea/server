@@ -388,6 +388,22 @@
     <text locale="fr">$trail($region,$locale("en"))</text>
     <text locale="en">$trail($region,$locale("en"))</text>
   </message>
+  <message name="nr_migrants" section="nr">
+    <type>
+      <arg name="units" type="int"/>
+      <arg name="maxunits" type="int"/>
+    </type>
+    <text locale="de">"Deine Partei hat $int($units) Migranten und kann maximal $int($maxunits) Migranten aufnehmen."</text>
+    <text locale="en">"Your faction has $int($units) migrants out of a possible total of $int($maxunits)."</text>
+  </message>
+  <message name="nr_heroes" section="nr">
+    <type>
+      <arg name="units" type="int"/>
+      <arg name="maxunits" type="int"/>
+    </type>
+    <text locale="de">"Deine Partei hat $int($units) Helden und kann maximal $int($maxunits) Helden ernennen."</text>
+    <text locale="en">"Your faction has promoted $int($units) heroes out of a possible total of $int($maxunits)."</text>
+  </message>
   <message name="nr_population" section="nr">
     <type>
       <arg name="population" type="int"/>
@@ -604,6 +620,13 @@
     </type>
     <text locale="de">"$building($building) hat diese Woche nicht funktioniert, da der Unterhalt nicht rechtzeitig gezahlt wurde."</text>
     <text locale="en">"$building($building) did not function this week because upkeep could not be paid."</text>
+  </message>
+  <message name="icastle_dissolve" section="events">
+    <type>
+      <arg name="building" type="building"/>
+    </type>
+    <text locale="de">"Plötzlich löst sich $building($building) in kleine Traumwolken auf."</text>
+    <text locale="en">"$building($building) suddenly dissolves into small pink clouds."</text>
   </message>
   <message name="maintenance_none" section="events">
     <type>
@@ -1334,6 +1357,7 @@
       <arg name="command" type="order"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Ziel gefunden."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The spell could not find a target."</text>
   </message>
   <message name="shock" section="magic">
     <type>
@@ -1341,6 +1365,35 @@
       <arg name="reason" type="string"/>
     </type>
     <text locale="de">"$unit($mage) erleidet durch den Tod seines Vertrauten einen Schock."</text>
+    <text locale="en">"$unit($mage) receives a shock when his familiar dies."</text>
+  </message>
+  <message name="missing_force" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="level" type="int"/>
+      <arg name="spell" type="spell"/>
+    </type>
+    <text locale="de">"$unit($unit) schafft es nicht, genug Kraft aufzubringen, um $spell($spell) auf Stufe $int($level) zu zaubern."</text>
+    <text locale="en">"$unit($unit) cannot muster enough energy to cast $spell($spell) on level $level($level)."</text>
+  </message>
+  <message name="missing_components_list" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="list" type="string"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Für diesen Zauber fehlen noch $string($list)."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Casting this spell requires an additional $string($list)."</text>
+  </message>
+  <message name="missing_components" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="level" type="int"/>
+      <arg name="spell" type="spell"/>
+    </type>
+    <text locale="de">"$unit($unit) hat nur genügend Komponenten um $spell($spell) auf Stufe $int($level) zu zaubern."</text>
+    <text locale="en">"$unit($unit) has insufficient components to cast $spell($spell) on level $level($level)."</text>
   </message>
   <message name="patzer" section="magic">
     <type>
@@ -1358,6 +1411,63 @@
       <arg name="spell" type="spell"/>
     </type>
     <text locale="de">"Als $unit($unit) in $region($region) versucht, $spell($spell) zu zaubern, scheint plötzlich ein Beben durch die magische Essenz zu laufen und ein furchtbarer Sog versucht $unit($unit) in eine andere Dimension zu ziehen. Mit letzter Kraft gelingt es $unit($unit) sich zu retten."</text>
+    <text locale="en">"When $unit($unit) in $region($region) tries to cast $spell($spell), a sudden disturbance ripples through the magical realm and a terrible force attempts to drag the magician to another dimension. However, with a final effort of strength, $unit($unit) manages to save himself."</text>
+  </message>
+  <message name="patzer4" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="spell" type="spell"/>
+    </type>
+    <text locale="de">"Als $unit($unit) in $region($region) versucht, $spell($spell) zu zaubern erhebt sich plötzlich ein dunkler Wind. Bizarre geisterhafte Gestalten kreisen um den Magier und scheinen sich von den magischen Energien des Zaubers zu ernähren. Mit letzter Kraft gelingt es $unit($unit) dennoch den Spruch zu zaubern."</text>
+    <text locale="en">"When $unit($unit) in $region($region) tries to cast $spell($spell), strong winds suddenly rise. Bizare ghostlike creatures circle around the magician and seem to be leeching his magical energy. However, with a final effort of strength, $unit($unit) manages to complete the spell."</text>
+  </message>
+  <message name="patzer6" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="spell" type="spell"/>
+    </type>
+    <text locale="de">"Eine Botschaft von $unit($unit) in $region($region): 'Ups! Quack, Quack!'"</text>
+    <text locale="en">"A message from $unit($unit) in $region($region): 'Oops! Croak, Croak!'"</text>
+  </message>
+  <message name="familiar_farcast" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($mage) kann Zauber, die durch $unit($unit) gewirkt werden, nicht zusätzlich in die Ferne richten."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($mage) cannot direct spells that are channeled through $unit($unit) into distant regions."</text>
+  </message>
+  <message name="familiar_toofar" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $unit($mage) kann  durch $unit($unit) zu wirken."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $unit($mage) cannot raise enough energy to channel the spell through $unit($unit)."</text>
+  </message>
+  <message name="spell_resist" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="spell" type="spell"/>
+    </type>
+    <text locale="de">"$unit($unit) gelingt es $spell($spell) zu zaubern, doch der Spruch zeigt keine Wirkung."</text>
+    <text locale="en">"$unit($unit) manages to cast $spell($spell), but the spell seems to have no effect."</text>
+  </message>
+  <message name="patzer5" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="spell" type="spell"/>
+    </type>
+    <text locale="de">"$unit($unit) fühlt sich nach dem Zaubern von $spell($spell) viel erschöpfter als sonst und hat das Gefühl, dass alle weiteren Zauber deutlich mehr Kraft als normalerweise kosten werden."</text>
+    <text locale="en">"$unit($unit) feels far more exhausted than he should after casting $spell($spell) and assumes that any following spells will cost far more energy than usual."</text>
   </message>
   <message name="patzer2" section="magic">
     <type>
@@ -1365,6 +1475,7 @@
       <arg name="region" type="region"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region) hat rasende Kopfschmerzen und kann sich nicht mehr richtig konzentrieren. Irgendwas bei diesem Zauber ist fürchterlich schiefgelaufen."</text>
+    <text locale="en">"$unit($unit) in $region($region) is hit by a massive headacheand cannot concentrate on the spell. Some part of this ritual has gone very wrong indeed."</text>
   </message>
   <message name="magic_fumble" section="magic">
     <type>
@@ -6224,8 +6335,7 @@
       <arg name="amount" type="int"/>
     </type>
     <text locale="de">"$unit($unit) in $region($region): $int($amount) $resource($item,$amount) zerfallen zu Staub."</text>
-    <text locale="de">"$unit($unit) in $region($region): $int($amount) $resource($item,$amount) turn to dust."</text>
+    <text locale="en">"$unit($unit) in $region($region): $int($amount) $resource($item,$amount) turn to dust."</text>
   </message>
 
 </messages>
-

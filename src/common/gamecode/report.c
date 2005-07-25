@@ -2022,16 +2022,18 @@ report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * ad
 	centre(F, buf, true);
 	if (f->race == new_race[RC_HUMAN]) {
 		int maxmig = count_maxmigrants(f);
-    m = msg_message("nr_migrants", "units max_units", count_migrants(f), maxmig);
+    m = msg_message("nr_migrants", "units maxunits", count_migrants(f), maxmig);
     nr_render(m, f->locale, buf, sizeof(buf), f);
+    msg_release(m);
 		centre(F, buf, true);
 	}
 #ifdef HEROES
   {
     int maxh = maxheroes(f);
     if (maxh) {
-      m = msg_message("nr_heroes", "units max_units", countheroes(f), maxh);
+      m = msg_message("nr_heroes", "units maxunits", countheroes(f), maxh);
       nr_render(m, f->locale, buf, sizeof(buf), f);
+      msg_release(m);
       centre(F, buf, true);
     }
   }
