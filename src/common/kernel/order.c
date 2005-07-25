@@ -274,6 +274,12 @@ parse_order(const char * s, const struct locale * lang)
         case K_KOMMENTAR:
         case NOKEYWORD:
           return NULL;
+#ifdef SHORT_STRINGS
+        case K_LIEFERE:
+          kwd = K_GIVE;
+          persistent = 1;
+          break;
+#endif
         default:
           break;
       }
