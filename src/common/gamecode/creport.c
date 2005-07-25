@@ -899,9 +899,6 @@ cr_output_unit(FILE * F, const region * r,
     }
   }
     
-  if ((u->faction == f || omniscient(f)) && u->botschaften)
-      cr_output_str_list(F, "EINHEITSBOTSCHAFTEN", u->botschaften, f);
-  
   print_curses(F, f, u, TYP_UNIT);
 }
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */

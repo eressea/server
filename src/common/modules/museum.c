@@ -312,8 +312,7 @@ use_museumexitticket(unit *u, const struct item_type *itype, int amount, order *
 			for(it = gb->items; it; it = it->next) {
 				i_change(&u->items, it->type, it->number);
 			}
-			sprintf(buf, "von %s: 'Hier habt ihr eure Sachen zurück.'", unitname(warden));
-			addstrlist(&u->botschaften, buf);
+      ADDMSG(&u->faction->msgs, msg_message("unitmessage", "region unit sender string", r, u, warden, buf));
 			a_remove(&warden->attribs, a);
 		}
 	}

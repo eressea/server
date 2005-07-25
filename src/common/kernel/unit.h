@@ -113,7 +113,6 @@ typedef struct unit {
 	const struct race * race;
 	const struct race * irace;
 
-	struct strlist *botschaften;
 	unsigned int flags;
 	struct attrib * attribs;
 	status_t status;

@@ -1791,17 +1791,13 @@ name_cmd(unit * u, struct order * ord)
 static void
 deliverMail(faction * f, region * r, unit * u, const char *s, unit * receiver)
 {
-  if (!receiver) { /* BOTSCHAFT an PARTEI */
-    add_message(&f->msgs,
-      msg_message("unitmessage", "region unit string", r, u, s));
+  if (!cansee(f, r, u, 0)) {
+    u = NULL;
   }
-  else {          /* BOTSCHAFT an EINHEIT */
-    unit *emp = receiver;
-    if (cansee(f, r, u, 0))
-      sprintf(buf, "Eine Botschaft von %s: '%s'", unitname(u), s);
-    else
-      sprintf(buf, "Eine anonyme Botschaft: '%s'", s);
-    addstrlist(&emp->botschaften, strdup(buf));
+  if (!receiver) { /* BOTSCHAFT an PARTEI */
+    ADDMSG(&f->msgs, msg_message("regionmessage", "region sender string", r, u, s));
+  } else {          /* BOTSCHAFT an EINHEIT */
+    ADDMSG(&f->msgs, msg_message("unitmessage", "region unit sender string", r, receiver, u, s));
   }
 }
 

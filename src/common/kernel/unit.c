@@ -1141,7 +1141,6 @@ stripunit(unit * u)
 	free(u->name);
 	free(u->display);
 	free_orders(&u->orders);
-	freestrlist(u->botschaften);
 	if(u->skills) free(u->skills);
 	while (u->items) {
 		item * it = u->items->next;

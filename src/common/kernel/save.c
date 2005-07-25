@@ -525,8 +525,6 @@ unitorders(FILE * F, struct faction * f)
       }
     }
 
-    u->botschaften = NULL;	/* Sicherheitshalber */
-
   } else {
     /* cmistake(?, buf, 160, MSG_EVENT); */
     return NULL;

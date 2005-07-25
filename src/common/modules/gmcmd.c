@@ -444,7 +444,7 @@ gm_messageunit(const tnode * tnext, const char * str, void * data, struct order 
 		}
 		else {
 			add_message(&target->faction->msgs,
-				msg_message("unitmessage", "region unit string", r, u, msg));
+				msg_message("regionmessage", "region sender string", r, u, msg));
 		}
 	}
 }

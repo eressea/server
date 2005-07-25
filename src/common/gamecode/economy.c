@@ -2126,7 +2126,7 @@ expandselling(region * r, request * sellorders, int limit)
 			change_money(maxowner, (int) taxcollected);
 			add_income(maxowner, IC_TRADETAX, taxcollected, taxcollected);
 			/* TODO: Meldung
-       * sprintf(buf, "%s verdient %d Silber durch den Handel in %s.",
+       * "%s verdient %d Silber durch den Handel in %s.",
        * unitname(maxowner), (int) taxcollected, regionname(r)); */
 		}
 	}

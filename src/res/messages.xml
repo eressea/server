@@ -604,15 +604,24 @@
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) do not give things away."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $race($race,0) do not give things away."</text>
   </message>
+  <message name="regionmessage" section="events">
+    <type>
+      <arg name="sender" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="string" type="string"/>
+    </type>
+    <text locale="de">"Eine Botschaft von $unit($sender) aus $region($region): '$string'"</text>
+    <text locale="en">"A message by $unit($sender) from $region($region): '$string'"</text>
+  </message>
   <message name="unitmessage" section="events">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="string" type="string"/>
+      <arg name="sender" type="unit"/>
     </type>
-    <text locale="de">"Eine Botschaft von $unit($unit) aus $region($region): '$string'"</text>
-    <text locale="fr">"A message by $unit($unit) from $region($region): '$string'"</text>
-    <text locale="en">"A message by $unit($unit) from $region($region): '$string'"</text>
+    <text locale="de">"In $region($region) erhielt $unit($unit) eine Botschaft von $unit($sender): '$string'"</text>
+    <text locale="en">"In $region($region), $unit($unit) received a message by $unit($sender): '$string'"</text>
   </message>
   <message name="maintenance_nowork" section="events">
     <type>

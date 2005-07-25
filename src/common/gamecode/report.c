@@ -787,25 +787,6 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 		print_curses(F, f, u, TYP_UNIT, indent);
 	}
 
-#ifdef USE_UGROUPS
-	if(ug) {
-		int i;
-		for(i=0; i<ug->members; i++) {
-			if (mode==see_unit && ug->unit_array[i]->faction == f && ug->unit_array[i]->botschaften) {
-				for (S =  ug->unit_array[i]->botschaften; S; S = S->next) {
-					rnl(F);
-					rparagraph(F, S->s, indent, 0);
-				}
-			}
-		}
-	} else
-#endif
-		if (mode==see_unit && u->faction == f && u->botschaften) {
-			for (S = u->botschaften; S; S = S->next) {
-				rnl(F);
-				rparagraph(F, S->s, indent, 0);
-			}
-		}
 }
 
 static void
