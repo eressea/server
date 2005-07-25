@@ -733,7 +733,6 @@ rpunit(FILE * F, const faction * f, const unit * u, int indent, int mode)
 {
 	attrib *a_otherfaction;
 	char marker;
-	strlist *S;
 	int dh;
 	boolean isbattle = (boolean)(mode == see_battle);
 #ifdef USE_UGROUPS

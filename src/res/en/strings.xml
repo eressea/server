@@ -955,22 +955,22 @@
 
   <!--  intranslatables: -->
   <string name="h0">
-    <text locale="en">Flachwurz</text>
+    <text locale="en">flatroot</text>
   </string>
   <string name="h0_p">
-    <text locale="en">Flachwurz</text>
+    <text locale="en">flatroots</text>
   </string>
   <string name="h1">
-    <text locale="en">Wuerziger Wagemut</text>
+    <text locale="en">tangy temerity</text>
   </string>
   <string name="h1_p">
-    <text locale="en">Wuerzige Wagemut</text>
+    <text locale="en">tangy temerities</text>
   </string>
   <string name="h2">
-    <text locale="en">Eulenauge</text>
+    <text locale="en">owlsgaze</text>
   </string>
   <string name="h2_p">
-    <text locale="en">Eulenaugen</text>
+    <text locale="en">owlsgazes</text>
   </string>
   <string name="h3">
     <text locale="en">spider ivy</text>
@@ -979,16 +979,16 @@
     <text locale="en">spider ivies</text>
   </string>
   <string name="h4">
-    <text locale="en">Blauer Baumringel</text>
+    <text locale="en">cobalt fungus</text>
   </string>
   <string name="h4_p">
-    <text locale="en">Blaue Baumringel</text>
+    <text locale="en">cobalt fungi</text>
   </string>
   <string name="h5">
-    <text locale="en">Elfenlieb</text>
+    <text locale="en">elvendear</text>
   </string>
   <string name="h5_p">
-    <text locale="en">Elfenlieb</text>
+    <text locale="en">elvendears</text>
   </string>
   <string name="h6">
     <text locale="en">bugleweed</text>
@@ -997,22 +997,22 @@
     <text locale="en">bugleweeds</text>
   </string>
   <string name="h7">
-    <text locale="en">Knotiger Saugwurz</text>
+    <text locale="en">knotroot</text>
   </string>
   <string name="h7_p">
-    <text locale="en">Knotige Saugwurze</text>
+    <text locale="en">knotroots</text>
   </string>
   <string name="h8">
-    <text locale="en">Blasenmorchel</text>
+    <text locale="en">bubblemorel</text>
   </string>
   <string name="h8_p">
-    <text locale="en">Blasenmorcheln</text>
+    <text locale="en">bubblemorels</text>
   </string>
   <string name="h9">
-    <text locale="en">Wasserfinder</text>
+    <text locale="en">waterfinder</text>
   </string>
   <string name="h9_p">
-    <text locale="en">Wasserfinder</text>
+    <text locale="en">waterfinders</text>
   </string>
   <string name="h10">
     <text locale="en">peyote</text>
@@ -1039,10 +1039,10 @@
     <text locale="en">fjord fungi</text>
   </string>
   <string name="h14">
-    <text locale="en">Alraune</text>
+    <text locale="en">mandrake</text>
   </string>
   <string name="h14_p">
-    <text locale="en">Alraunen</text>
+    <text locale="en">mandrakes</text>
   </string>
   <string name="h15">
     <text locale="en">rock weed</text>
@@ -1051,10 +1051,10 @@
     <text locale="en">rock weed</text>
   </string>
   <string name="h16">
-    <text locale="en">Spaltwachs</text>
+    <text locale="en">gapgrowth</text>
   </string>
   <string name="h16_p">
-    <text locale="en">Spaltwachse</text>
+    <text locale="en">gapgrowths</text>
   </string>
   <string name="h17">
     <text locale="en">cave lichen</text>
