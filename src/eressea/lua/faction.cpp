@@ -194,6 +194,30 @@ faction_items(const faction& f) {
 }
 
 void
+faction_set_passw(faction& f, const char * passw)
+{
+  set_string(&f.passw, passw);
+}
+
+const char *
+faction_get_passw(const faction& f)
+{
+  return f.passw;
+}
+
+void
+faction_set_email(faction& f, const char * email)
+{
+  set_string(&f.email, email);
+}
+
+const char *
+faction_get_email(const faction& f)
+{
+  return f.email;
+}
+
+void
 bind_faction(lua_State * L) 
 {
   module(L)[
@@ -211,8 +235,6 @@ bind_faction(lua_State * L)
     .def("delete_variable", &faction_delete_variable)
     .def_readonly("info", &faction::banner)
     .def_readonly("name", &faction::name)
-    .def_readonly("password", &faction::passw)
-    .def_readonly("email", &faction::email)
     .def_readonly("id", &faction::no)
     .def_readwrite("age", &faction::age)
     .def_readwrite("subscription", &faction::subscription)
@@ -222,6 +244,8 @@ bind_faction(lua_State * L)
     .property("items", &faction_items, return_stl_iterator)
 
     .def("add_notice", &faction_addnotice)
+    .property("password", &faction_get_passw, &faction_set_passw)
+    .property("email", &faction_get_email, &faction_set_email)
     .property("locale", &faction_getlocale, &faction_setlocale)
     .property("units", &faction_units, return_stl_iterator)
     .property("alliance", &faction_getalliance, &faction_setalliance)
