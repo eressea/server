@@ -35,7 +35,6 @@
 #include "region.h"
 #include "ship.h"
 #include "skill.h"
-#include "spell.h"
 #include "unit.h"
 #ifdef USE_UGROUPS
 # include "ugroup.h"

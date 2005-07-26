@@ -251,7 +251,7 @@ print_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
       }
       if (dh==0) {
         if (c->type->info_str!=NULL) {
-          strcpy(buf, c->type->info_str);
+          sprintf(buf, "%s (%s)", c->type->info_str, itoa36(c->no));
         } else {
           sprintf(buf, "an unknown curse lies on the region. (%s)", itoa36(c->no));
         }

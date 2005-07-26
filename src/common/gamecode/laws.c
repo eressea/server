@@ -1157,6 +1157,7 @@ parse_quit(void)
     if (fval(f, FFL_OVERRIDE)) {
       free(f->override);
       f->override = strdup(itoa36(rand()));
+      freset(f, FFL_OVERRIDE);
     }
     if (turn!=f->lastorders) {
       char info[256];

@@ -8224,11 +8224,7 @@ static spell spelldaten[] =
     (spell_f)sp_blessstonecircle, patzer
   },
   {
-    SPL_GWYRRD_ARMORSHIELD, "Rindenhaut",
-    "Dieses vor dem Kampf zu zaubernde Ritual gibt den eigenen Truppen "
-    "einen zusätzlichen Bonus auf ihre Rüstung. Jeder Treffer "
-    "reduziert die Kraft des Zaubers, so dass der Schild sich irgendwann "
-    "im Kampf auflösen wird.", NULL, NULL,
+    SPL_GWYRRD_ARMORSHIELD, "barkskin", NULL, NULL, NULL,
     M_DRUIDE, (PRECOMBATSPELL | SPELLLEVEL), 2, 12,
     {
       { R_AURA, 4, SPC_LEVEL },
@@ -8240,11 +8236,7 @@ static spell spelldaten[] =
     (spell_f)sp_armorshield, patzer
   },
   {
-    SPL_DROUGHT, "Beschwörung eines Hitzeelementar",
-    "Dieses Ritual beschwört wütende Elementargeister der Hitze. "
-    "Eine Dürre sucht das Land heim. Bäume verdorren, Tiere verenden, "
-    "und die Ernte fällt aus. Für Tagelöhner gibt es kaum noch Arbeit "
-    "in der Landwirtschaft zu finden.", NULL, NULL,
+    SPL_DROUGHT, "summonfireelemental", NULL, NULL, NULL,
     M_DRUIDE, (FARCASTING|REGIONSPELL|TESTRESISTANCE), 5, 13,
     {
       { R_AURA, 600, SPC_FIX },
@@ -8256,12 +8248,7 @@ static spell spelldaten[] =
     (spell_f)sp_drought, patzer
   },
   {
-    SPL_FOG_OF_CONFUSION, "Nebel der Verwirrung",
-    "Der Druide beschwört die Elementargeister des Nebels. Sie werden sich "
-    "für einige Zeit in der Umgebung festsetzen und sie mit dichtem Nebel "
-    "überziehen. Personen innerhalb des magischen Nebels verlieren die "
-    "Orientierung und haben große Schwierigkeiten, sich in eine bestimmte "
-    "Richtung zu bewegen.", NULL, NULL,
+    SPL_FOG_OF_CONFUSION, "fogofconfusion", NULL, NULL, NULL,
     M_DRUIDE,
     (FARCASTING|SPELLLEVEL),
     5, 14,
@@ -10602,6 +10589,14 @@ init_spells(void)
   for (i=0;spelldaten[i].id!=SPL_NOSPELL;++i) {
     register_spell(spelldaten+i);
   }
+  at_register(&at_cursewall);
+  at_register(&at_unitdissolve);
+#ifdef WDW_PYRAMIDSPELL
+  at_register(&at_wdwpyramid);
+#endif
+  register_bordertype(&bt_firewall);
+  register_bordertype(&bt_wisps);
+  register_bordertype(&bt_chaosgate);
 }
 
 static boolean 

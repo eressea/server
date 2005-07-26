@@ -6347,4 +6347,22 @@
     <text locale="en">"$unit($unit) in $region($region): $int($amount) $resource($item,$amount) turn to dust."</text>
   </message>
 
+  <message name="curseinfo::magicrunes_building" section="events">
+    <type>
+      <arg name="building" type="building"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Auf den Mauern von $building($building) erkennt man seltsame Runen. ($int36($id))"</text>
+    <text locale="en">"The walls of $building($building) are inscribed with strange runes. ($int36($id))"</text>
+  </message>
+
+  <message name="curseinfo::magicrunes_ship" section="events">
+    <type>
+      <arg name="ship" type="ship"/>
+      <arg name="id" type="int"/>
+    </type>
+    <text locale="de">"Auf den Planken von $ship($ship) erkennt man seltsame Runen. ($int36($id))"</text>
+    <text locale="en">"The plank of $ship($ship) are inscribed with strange runes. ($int36($id))"</text>
+  </message>
+
 </messages>

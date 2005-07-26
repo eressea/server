@@ -38,7 +38,6 @@
 #include "race.h"
 #include "region.h"
 #include "render.h"
-#include "spell.h"
 #include "ship.h"
 #include "skill.h"
 #include "teleport.h"

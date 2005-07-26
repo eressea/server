@@ -401,7 +401,8 @@ highlight_region(region *r)
 
 void
 drawmap(boolean maponly) {
-	int x, x1, y1, y2, s, q;
+	short x, x1, y1, y2;
+  int s, q;
 	chtype rs;
 	region *r;
 
@@ -592,7 +593,7 @@ mark(int x, int y, int rx, int ry) {
 	refresh();
 }
 
-void unmark(int x, int y, int rx, int ry) {
+static void unmark(short x, short y, short rx, short ry) {
 	int q;
 	region *r=findregion(rx,ry);
 	chtype rs;
@@ -830,10 +831,11 @@ recalc_everything(int *x, int *y, int *rx, int *ry)
 
 #define restore { x=oldx; y=oldy; rx=oldrx; ry=oldry; }
 
-void
-movearound(int rx, int ry) {
-	int hx = -1, hy = -1, ch, x, y, Rand, d, a, b, p, q, oldx=0, oldy=0;
+static void
+movearound(short rx, short ry) {
+	int hx = -1, hy = -1, ch, Rand, d, a, b, p, q, oldx=0, oldy=0;
 	int oldrx=0, oldry=0, Hx=0, Hy=0;
+  short x, y;
 	int sel;
 	static int editmode=0;
 	char *selc;

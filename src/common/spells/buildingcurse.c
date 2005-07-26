@@ -57,30 +57,31 @@ cinfo_building(const struct locale * lang, const void * obj, typ_t typ, curse *c
 static int
 cinfo_magicrunes(const struct locale* lang, const void * obj, typ_t typ, curse *c, int self)
 {
-
+  message * msg = NULL;
 	if (typ == TYP_BUILDING){
 		building * b;
 		b = (building*)obj;
-		if (self != 0){
-			sprintf(buf, "Auf den Mauern von %s erkennt man seltsame Runen. (%s)",
-					b->name, curseid(c));
-			return 1;
+		if (self != 0) {
+      msg = msg_message(mkname("curseinfo", "magicrunes_building"), "building id", b, c->no);
 		}
 	} else if (typ == TYP_SHIP) {
 		ship *sh;
 		sh = (ship*)obj;
 		if (self != 0){
-			sprintf(buf, "Auf den Planken von %s erkennt man seltsame Runen. (%s)",
-					sh->name, curseid(c));
-			return 1;
-		}
+      msg = msg_message(mkname("curseinfo", "magicrunes_ship"), "ship id", sh, c->no);
+    }
 	}
 
+  if (msg!=NULL) {
+    nr_render(msg, lang, buf, sizeof(buf), NULL);
+    msg_release(msg);
+    return 1;
+  }
 	return 0;
 }
 static struct curse_type ct_magicrunes = { "magicrunes",
 	CURSETYP_NORM, 0, M_SUMEFFECT,
-	"Dieses Zauber verstärkt die natürliche Widerstandskraft gegen eine "
+	"Dieser Zauber verstärkt die natürliche Widerstandskraft gegen eine "
 	"Verzauberung.",
 	cinfo_magicrunes
 };

@@ -3824,6 +3824,10 @@
       <text locale="de">Segne Steinkreis</text>
       <text locale="en">Bless Stone Circle</text>
     </string>
+    <string name="barkskin">
+      <text locale="de">Rindenhaut</text>
+      <text locale="en">Barkskin</text>
+    </string>
     <string name="sparklechaos">
       <text locale="de">Verwünschung</text>
       <text locale="en">Hex</text>
@@ -3889,6 +3893,14 @@
     <string name="summonshadow">
       <text locale="de">Beschwöre Schattendämonen</text>
       <text locale="en">Summon Shadowdemons</text>
+    </string>
+    <string name="summonfireelemental">
+      <text locale="de">Beschwörung eines Hitzeelementar</text>
+      <text locale="en">Summon Fire Elemental</text>
+    </string>
+    <string name="fogofconfusion">
+      <text locale="de">Nebel der Verwirrung</text>
+      <text locale="en">Fog of Confusion</text>
     </string>
     <string name="undeadhero">
       <text locale="de">Untote Helden</text>
@@ -4826,6 +4838,17 @@
         per level.
       </text>
     </string>
+    <string name="barkskin">
+      <text locale="de">Dieses vor dem Kampf zu zaubernde Ritual gibt den
+        eigenen Truppen einen zusätzlichen Bonus auf ihre Rüstung. Jeder
+        Treffer reduziert die Kraft des Zaubers, so dass der Schild sich
+        irgendwann im Kampf auflösen wird.
+      </text>
+      <text locale="en">Performing this ritual before going into battle gives
+        your troups an additional bonus to their armor. Every hit reduces the
+        energy of the spell, dissolving it at some point during battle.
+      </text>
+    </string>
     <string name="fireball">
       <text locale="de">Der Zauberer schleudert fokussiertes
         Chaos in die Reihen der Gegner. Das ballförmige
@@ -5036,6 +5059,31 @@
         are feared in combat for they are hard to hit
         and have the ability to drain strength from
         their victims.
+      </text>
+    </string>
+    <string name="fogofconfusion">
+      <text locale="de">Der Druide beschwört die Elementargeister des Nebels.
+        Sie werden sich für einige Zeit in der Umgebung festsetzen und sie mit
+        dichtem Nebel überziehen. Personen innerhalb des magischen Nebels
+        verlieren die Orientierung und haben große Schwierigkeiten, sich in
+        eine bestimmte Richtung zu bewegen.
+      </text>
+      <text locale="en">The druid summons a group of water elementals that
+        cover the region in a thick fog. People inside this magical fog lose
+        their orientation and have great difficulties moving in a specific
+        direction.
+      </text>
+    </string>
+    <string name="summonfireelemental">
+      <text locale="de">Dieses Ritual beschwört wütende Elementargeister der
+        Hitze. Eine Dürre sucht das Land heim. Bäume verdorren, Tiere
+        verenden, und die Ernte fällt aus. Für Tagelöhner gibt es kaum noch
+        Arbeit in der Landwirtschaft zu finden.
+      </text>
+      <text locale="en">This Ritual summons an angry elemental spirit that
+        puts a drought on the entire region. Trees wither, animals die of
+        thirst and the harvest is destroyed. Workers find little to no work
+        in farming.
       </text>
     </string>
     <string name="undeadhero">

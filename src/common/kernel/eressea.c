@@ -55,7 +55,6 @@
 #include "save.h"
 #include "ship.h"
 #include "skill.h"
-#include "spell.h"
 #include "unit.h"
 
 /* util includes */
@@ -3161,7 +3160,6 @@ void
 attrib_init(void)
 {
   /* Alle speicherbaren Attribute müssen hier registriert werden */
-	at_register(&at_unitdissolve);
 	at_register(&at_shiptrail);
 	at_register(&at_familiar);
 	at_register(&at_familiarmage);
@@ -3172,7 +3170,6 @@ attrib_init(void)
 	at_register(&at_mage);
 	at_register(&at_countdown);
 	at_register(&at_curse);
-	at_register(&at_cursewall);
 
 	at_register(&at_seenspell);
 	at_register(&at_deathcloud);
@@ -3205,9 +3202,6 @@ attrib_init(void)
 	register_bordertype(&bt_fogwall);
 	register_bordertype(&bt_wall);
 	register_bordertype(&bt_illusionwall);
-	register_bordertype(&bt_firewall);
-  register_bordertype(&bt_wisps);
-  register_bordertype(&bt_chaosgate);
 	register_bordertype(&bt_road);
 	register_bordertype(&bt_questportal);
 
@@ -3218,9 +3212,6 @@ attrib_init(void)
 	at_register(&at_laen); /* required for old datafiles */
 #ifdef XECMD_MODULE
 	at_register(&at_xontormiaexpress); /* required for old datafiles */
-#endif
-#ifdef WDW_PYRAMIDSPELL
-	at_register(&at_wdwpyramid);
 #endif
   at_register(&at_speedup);
   at_register(&at_nodestroy);
