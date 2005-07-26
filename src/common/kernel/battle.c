@@ -37,7 +37,6 @@
 #include "reports.h"
 #include "ship.h"
 #include "skill.h"
-#include "spell.h"
 #include "unit.h"
 
 /* attributes includes */
@@ -2436,6 +2435,7 @@ aftermath(battle * b)
     int snumber = 0;
     fighter *df;
     boolean relevant = false; /* Kampf relevant für dieses Heer? */
+    boolean active_army = false; /* anyone in this army done much? */
     if (s->bf->lastturn+(b->has_tactics_turn?1:0)>1) {
       relevant = true;
     }
@@ -2446,15 +2446,24 @@ aftermath(battle * b)
       int dead = du->number - df->alive - df->run.number;
       int sum_hp = 0;
       int n;
+      boolean involved = relevant && df->action_counter >= du->number;
       snumber += du->number;
-      if (relevant && df->action_counter >= du->number) {
-        ship * sh = du->ship?du->ship:leftship(du);
 
+      if (involved) {
+        ship * sh = du->ship?du->ship:leftship(du);
         if (sh) fset(sh, SF_DAMAGED);
+      }
+      if (active_army || involved) {
+        if (!active_army) {
+          /* make sur to stop everyone else in this army */
+          fighter * fig;
+          cv_foreach(fig, s->fighters) {
+            if (fig==df) break;
+            fset(fig->unit, UFL_LONGACTION);
+          } cv_next(fig);
+          active_army = true;
+        }
         fset(du, UFL_LONGACTION);
-        /* TODO: das sollte hier weg sobald anderswo üb
-        * erall UFL_LONGACTION getestet wird. */
-        set_order(&du->thisorder, NULL);
       }
       for (n = 0; n != df->alive; ++n) {
         if (df->person[n].hp > 0)
