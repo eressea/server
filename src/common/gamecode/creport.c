@@ -1535,3 +1535,18 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
   }
   return 0;
 }
+
+int
+crwritemap(const char * filename)
+{
+  FILE * F = fopen(filename, "w+");
+  region * r;
+  for (r=regions;r;r=r->next) {
+    plane * p = rplane(r);
+    fprintf(F, "REGION %d %d %d\n", r->x, r->y, p?p->id:0);
+    fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale), LOC(default_locale, terrain[rterrain(r)].name));
+  }
+  fclose(F);
+	return 0;
+}
+

@@ -1,10 +1,6 @@
 TODO:
 
-parteien- oder gruppenweises aftermath-markieren.
-
 XUL for Eressea
-
-weights in item descriptions
 
 [11:01] <Enno`> am besten wäre, wenn mailit nur die optionen, nicht das ganze script enthielte
 [11:01] <Enno`> und ein skript dann mailit als input nähme
@@ -12,16 +8,7 @@ weights in item descriptions
 
 Deathcloud: Magieresistenz des Magiers in das attribut, nicht auflösen wenn magier tot.
 
-Messungen:
-  Messen, was CR alleine kostet.
-  Messen, was no-ZV bringt. Zugvorlage abstellen.
-  Conan:
-  Auswertung 0:30 h
-  Verpacken: 1:35 h
-
 error handling in lua/luabind?
-
-mapper: parteien sofort aussetzen.
 
 english registration confirmation is deutsch!
 
@@ -42,8 +29,6 @@ Make asserts into fails!
 getstrtoken() - das static loswerden
 
 R_PERSON fix in vin2?
-
-calendar in XML
 
 unterschiede in vin3 + wdw per config statt defines?
 

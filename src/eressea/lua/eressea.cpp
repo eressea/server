@@ -10,6 +10,7 @@
 // gamecode includes
 #include <gamecode/laws.h>
 #include <gamecode/monster.h>
+#include <gamecode/creport.h>
 
 // kernel includes
 #include <kernel/alliance.h>
@@ -214,6 +215,7 @@ bind_eressea(lua_State * L)
     def("atoi36", &atoi36),
     def("itoa36", &itoa36),
     def("read_game", &read_game),
+    def("write_map", &crwritemap),
     def("write_game", &write_game),
     def("write_passwords", &writepasswd),
     def("init_reports", &init_reports),

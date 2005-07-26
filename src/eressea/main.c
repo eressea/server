@@ -143,20 +143,6 @@ struct settings global = {
 	1000, /* maxunits */
 };
 
-static int
-crwritemap(void)
-{
-  FILE * F = fopen("world.cr", "w+");
-  region * r;
-  for (r=regions;r;r=r->next) {
-    plane * p = rplane(r);
-    fprintf(F, "REGION %d %d %d\n", r->x, r->y, p?p->id:0);
-    fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale), LOC(default_locale, terrain[rterrain(r)].name));
-  }
-  fclose(F);
-	return 0;
-}
-
 static void
 game_init(void)
 {
@@ -651,7 +637,7 @@ main(int argc, char *argv[])
 	}
 
 	if (g_writemap) {
-		return crwritemap(); 
+		return crwritemap("world.cr"); 
 	}
 
   if (turn == 0) srand((int)time(0));

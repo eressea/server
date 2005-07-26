@@ -28,6 +28,8 @@ extern void creport_init(void);
 extern void report_init(void);
 extern void report_cleanup(void);
 
+extern int crwritemap(const char * filename);
+
 #ifdef __cplusplus
 }
 #endif
