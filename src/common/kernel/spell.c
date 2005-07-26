@@ -1373,7 +1373,7 @@ sp_rosthauch(castorder *co)
 		if (i > 0){
 			if(rand()%100 < 50){
 				i_change(&u->items, it_halberd, -i);
-				change_item(u, I_RUSTY_HALBERD, i);
+				i_change(&u->items, olditemtype[I_RUSTY_HALBERD], i);
 				force -= i;
 				ironweapon += i;
 			}
@@ -2015,13 +2015,11 @@ sp_treewalkexit(castorder *co)
   return erfolg;
 }
 
-void
-creation_message(unit * mage, item_t i)
+static void
+creation_message(unit * mage, const item_type * itype)
 {
-	region * r = mage->region;
-	sprintf(buf, "%s erschafft ein %s.", unitname(mage),
-			locale_string(mage->faction->locale, resourcename(olditemtype[i]->rtype, 0)));
-	addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
+  ADDMSG(&mage->faction->msgs, msg_message("item_create_spell", 
+    "mage number item", mage, itype->rtype, 1));
 }
 
 static int
@@ -2032,7 +2030,7 @@ sp_create_sack_of_conservation(castorder *co)
 
 	change_item(mage,I_SACK_OF_CONSERVATION,1);
 
-	creation_message(mage, I_SACK_OF_CONSERVATION);
+	creation_message(mage, olditemtype[I_SACK_OF_CONSERVATION]);
 
 	return cast_level;
 }
@@ -3455,12 +3453,13 @@ patzer_deathcloud(castorder *co)
 static int
 sp_create_trollbelt(castorder *co)
 {
+  const item_type * itype = it_find("trollbelt");
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 
-	change_item(mage,I_TROLLBELT,1);
+	i_change(&mage->items, itype, 1);
 
-	creation_message(mage, I_TROLLBELT);
+	creation_message(mage, itype);
 	return cast_level;
 }
 
@@ -3481,7 +3480,7 @@ sp_create_firesword(castorder *co)
 	int cast_level = co->level;
 
 	change_item(mage,I_FIRESWORD,1);
-	creation_message(mage, I_FIRESWORD);
+	creation_message(mage, olditemtype[I_FIRESWORD]);
 	return cast_level;
 }
 
@@ -4763,7 +4762,7 @@ sp_seduce(castorder *co)
 	}
 	scat(" Silber");
 	itmp=&target->items;
-	while(*itmp) {
+	while (*itmp) {
 		item * itm = *itmp;
 		loot = itm->number/2;
 		if (itm->number % 2) {
@@ -4776,8 +4775,7 @@ sp_seduce(castorder *co)
 			scat(" ");
 			scat(locale_string(mage->faction->locale, resourcename(itm->type->rtype, (loot==1)?0:GR_PLURAL)));
 			i_change(&mage->items, itm->type, loot);
-			if (loot!=itm->number) itm->number-=loot;
-			else i_free(i_remove(itmp, itm));
+      i_change(&target->items, itm->type, -loot);
 		}
 		if (*itmp==itm) itmp=&itm->next;
 	}
@@ -4809,7 +4807,7 @@ sp_create_nimblefingerring(castorder *co)
 	int cast_level = co->level;
 
 	change_item(mage,I_RING_OF_NIMBLEFINGER,1);
-	creation_message(mage, I_RING_OF_NIMBLEFINGER);
+	creation_message(mage, olditemtype[I_RING_OF_NIMBLEFINGER]);
 	return cast_level;
 }
 
@@ -5588,7 +5586,7 @@ sp_create_tacticcrystal(castorder *co)
 	int cast_level = co->level;
 
 	change_item(mage,I_TACTICCRYSTAL,1);
-	creation_message(mage, I_TACTICCRYSTAL);
+	creation_message(mage, olditemtype[I_TACTICCRYSTAL]);
 	return cast_level;
 }
 
@@ -6542,7 +6540,7 @@ sp_create_bag_of_holding(castorder *co)
 
 	change_item(mage,I_BAG_OF_HOLDING,1);
 
-	creation_message(mage, I_BAG_OF_HOLDING);
+	creation_message(mage, olditemtype[I_BAG_OF_HOLDING]);
 	return cast_level;
 }
 
@@ -6889,7 +6887,7 @@ sp_create_antimagiccrystal(castorder *co)
 	int cast_level = co->level;
 
 	change_item(mage,I_ANTIMAGICCRYSTAL,1);
-	creation_message(mage, I_ANTIMAGICCRYSTAL);
+	creation_message(mage, olditemtype[I_ANTIMAGICCRYSTAL]);
 	return cast_level;
 }
 
@@ -7409,7 +7407,7 @@ sp_createitem_trueseeing(castorder *co)
 	}
 
 	change_item(mage,I_AMULET_OF_TRUE_SEEING,1);
-	creation_message(mage, I_AMULET_OF_TRUE_SEEING);
+	creation_message(mage, olditemtype[I_AMULET_OF_TRUE_SEEING]);
 
 	return cast_level;
 }
@@ -7428,7 +7426,7 @@ sp_createitem_invisibility(castorder *co)
 	}
 
 	change_item(mage,I_RING_OF_INVISIBILITY,1);
-	creation_message(mage, I_RING_OF_INVISIBILITY);
+	creation_message(mage, olditemtype[I_RING_OF_INVISIBILITY]);
 
 	return cast_level;
 }
@@ -7447,7 +7445,7 @@ sp_createitem_invisibility2(castorder *co)
 	}
 
 	change_item(mage,I_SPHERE_OF_INVISIBILITY,1);
-	creation_message(mage, I_SPHERE_OF_INVISIBILITY);
+	creation_message(mage, olditemtype[I_SPHERE_OF_INVISIBILITY]);
 
 	return cast_level;
 }
@@ -7466,7 +7464,7 @@ sp_createitem_chastitybelt(castorder *co)
 	}
 
 	change_item(mage,I_CHASTITY_BELT,1);
-	creation_message(mage, I_CHASTITY_BELT);
+	creation_message(mage, olditemtype[I_CHASTITY_BELT]);
 
 	return cast_level;
 }
@@ -7485,7 +7483,7 @@ sp_createitem_power(castorder *co)
 	}
 
 	change_item(mage,I_RING_OF_POWER,1);
-	creation_message(mage, I_RING_OF_POWER);
+	creation_message(mage, olditemtype[I_RING_OF_POWER]);
 
 	return cast_level;
 }
@@ -7503,7 +7501,7 @@ sp_createitem_runesword(castorder *co)
 	}
 
 	change_item(mage,I_RUNESWORD,1);
-	creation_message(mage, I_RUNESWORD);
+	creation_message(mage, olditemtype[I_RUNESWORD]);
 
 	return cast_level;
 }
@@ -7523,7 +7521,7 @@ sp_createitem_aura(castorder *co)
 	}
 
 	change_item(mage,I_AURAKULUM,1);
-	creation_message(mage, I_AURAKULUM);
+	creation_message(mage, olditemtype[I_AURAKULUM]);
 
 	return cast_level;
 }
@@ -7545,7 +7543,7 @@ sp_createitem_regeneration(castorder *co)
 	}
 
 	change_item(mage,I_RING_OF_REGENERATION,1);
-	creation_message(mage, I_RING_OF_REGENERATION);
+	creation_message(mage, olditemtype[I_RING_OF_REGENERATION]);
 
 	return cast_level;
 }

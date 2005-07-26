@@ -6356,6 +6356,16 @@
     <text locale="en">"The walls of $building($building) are inscribed with strange runes. ($int36($id))"</text>
   </message>
 
+  <message name="item_create_spell" section="events">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="item" type="resource"/>
+      <arg name="number" type="int"/>
+    </type>
+    <text locale="de">"$unit(mage) erschafft $int($number) $resource($item, $number)."</text>
+    <text locale="en">"$unit(mage) creates $int($number) $resource($item, $number)."</text>
+  </message>
+
   <message name="curseinfo::magicrunes_ship" section="events">
     <type>
       <arg name="ship" type="ship"/>
