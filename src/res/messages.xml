@@ -1402,7 +1402,7 @@
       <arg name="spell" type="spell"/>
     </type>
     <text locale="de">"$unit($unit) hat nur genügend Komponenten um $spell($spell) auf Stufe $int($level) zu zaubern."</text>
-    <text locale="en">"$unit($unit) has insufficient components to cast $spell($spell) on level $level($level)."</text>
+    <text locale="en">"$unit($unit) has insufficient components to cast $spell($spell) on level $int($level)."</text>
   </message>
   <message name="patzer" section="magic">
     <type>

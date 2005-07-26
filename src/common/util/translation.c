@@ -224,7 +224,10 @@ parse_symbol(opstack ** stack, const char* in, const void * userdata)
 		}
 		++in;
 		foo = find_function(symbol);
-		if (foo==NULL) return NULL;
+    if (foo==NULL) {
+      log_error(("parser does not know about \"%s\" function.\n", symbol));
+      return NULL;
+    }
 		foo->parse(stack, userdata); /* will pop parameters from stack (reverse order!) and push the result */
 	} else {
 		variable * var = find_variable(symbol);
@@ -232,7 +235,10 @@ parse_symbol(opstack ** stack, const char* in, const void * userdata)
 			++in;
 		}
 		/* it's a constant (variable is a misnomer, but heck, const was taken;)) */
-		if (var==NULL) return NULL;
+    if (var==NULL) {
+      log_error(("parser does not know about \"%s\" variable.\n", symbol));
+      return NULL;
+    }
 		opush(stack, var->value);
 	}
 	return in;
