@@ -26,6 +26,7 @@
 
 /* kernel includes */
 #include <kernel/building.h>
+#include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/movement.h>
 #include <kernel/message.h>

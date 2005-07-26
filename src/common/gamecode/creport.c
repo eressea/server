@@ -158,19 +158,6 @@ reset_translations(void)
 	}
 }
 
-/* implementation */
-static void
-cr_output_str_list(FILE * F, const char *title, const strlist * S, const faction * f)
-{
-	if (!S) return;
-
-	fprintf(F, "%s\n", title);
-	while (S) {
-		fprintf(F, "\"%s\"\n", S->s);
-		S = S->next;
-	}
-}
-
 #include "objtypes.h"
 
 static void

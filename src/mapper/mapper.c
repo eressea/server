@@ -812,7 +812,7 @@ SetHighlight(void)
 }
 
 void
-recalc_everything(int *x, int *y, int *rx, int *ry)
+recalc_everything(short *x, short *y, short *rx, short *ry)
 {
 	int eingerueckt;
 
