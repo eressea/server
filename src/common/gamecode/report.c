@@ -3479,7 +3479,7 @@ report_summary(summary * s, summary * o, boolean full)
 	}
 
 	for (f = factions; f; f = f->next) {
-		if (f->age <= 1 && turn - f->lastorders == 1) {
+		if (f->age <= 1 && turn - f->lastorders <= 1) {
 			newplayers++;
 		} else if (f->no != MONSTER_FACTION) {
       int nmr = turn-f->lastorders;
