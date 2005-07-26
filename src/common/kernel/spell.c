@@ -2019,7 +2019,7 @@ static void
 creation_message(unit * mage, const item_type * itype)
 {
   ADDMSG(&mage->faction->msgs, msg_message("item_create_spell", 
-    "mage number item", mage, itype->rtype, 1));
+    "mage number item", mage, 1, itype->rtype));
 }
 
 static int
