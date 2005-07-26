@@ -341,7 +341,7 @@ parse(opstack ** stack, const char* inn, const void * userdata)
 			else ++b;
 		}
 	}
-	log_error(("could not parse %s. Missing \"\"?", inn));
+	log_error(("could not parse \"%s\". Probably invalid message syntax.", inn));
 	return NULL;
 }
 

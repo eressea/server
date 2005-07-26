@@ -1392,8 +1392,8 @@
       <arg name="command" type="order"/>
       <arg name="list" type="string"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Für diesen Zauber fehlen noch $list."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Casting this spell requires an additional $list."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Für diesen Zauber fehlen noch ${list}."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Casting this spell requires an additional ${list}."</text>
   </message>
   <message name="missing_components" section="magic">
     <type>
@@ -6362,8 +6362,8 @@
       <arg name="item" type="resource"/>
       <arg name="number" type="int"/>
     </type>
-    <text locale="de">"$unit(mage) erschafft $int($number) $resource($item, $number)."</text>
-    <text locale="en">"$unit(mage) creates $int($number) $resource($item, $number)."</text>
+    <text locale="de">"$unit($mage) erschafft $int($number) $resource($item,$number)."</text>
+    <text locale="en">"$unit($mage) creates $int($number) $resource($item,$number)."</text>
   </message>
 
   <message name="curseinfo::magicrunes_ship" section="events">

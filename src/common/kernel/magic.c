@@ -949,6 +949,7 @@ cancast(unit * u, spell * sp, int level, int range, struct order * ord)
           buf[0] = 0;
         }
 				icat(itemanz);
+        scat(" ");
 				scat(LOC(u->faction->locale, resname(res, itemanz!=1)));
 			}
 		}
