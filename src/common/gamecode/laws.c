@@ -3552,6 +3552,7 @@ setdefaults (void)
       boolean trade = false;
       boolean hunger = LongHunger(u);
 
+      freset(u, UFL_LONGACTION);
       if (hunger) {
         /* Hungernde Einheiten führen NUR den default-Befehl aus */
         set_order(&u->thisorder, default_order(u->faction->locale));

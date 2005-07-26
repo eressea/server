@@ -8,6 +8,149 @@
    -->
 
   <namespace name="iteminfo">
+    <string name="trollbelt">
+      <text locale="en">
+        This artifact grants its wearer the strength of a cavetroll. He will be
+        able to carry fifty times as much as normal and also in combat his
+        enhanced strength and tough troll skin will serve him well.
+      </text>
+      <text locale="de">
+        Dieses magische Artefakt verleiht seinem Träger die Stärke eines
+        ausgewachsenen Höhlentrolls. Seine Tragkraft erhöht sich auf das 50fache
+        und auch im Kampf werden sich die erhöhte Kraft und die trollisch zähe
+        Haut positiv auswirken.
+      </text>
+    </string>
+    <string name="antimagic">
+      <text locale="en">
+        It may look like just another quartz, but your magician will tell you
+        tha great power emenates from these crystals. Using it at the begining
+        of a week will release a strong negative energy that attacks all spells
+        cast in the region during that week.
+      </text>
+      <text locale="de">
+        Für den ungeübten Betrachter mag der Antimagiekristall wie ein
+        gewöhnlicher Quarzkristall ausschauen, doch ein Magier spürt, das ihm
+        ganz besondere Kräfte innewohnen. Durch spezielle Rituale antimagisch
+        aufgeladen wird der Kristall, wenn er zu feinem Staub zermahlen und
+        verteilt wird, die beim Zaubern freigesetzten magischen Energien
+        aufsaugen und alle Zauber, welche in der betreffenden Woche in der
+        Region gezaubert werden fehlschlagen lassen.
+      </text>
+    </string>
+    <string name="rop">
+      <text locale="en">
+        A ring of power increases a magicin's power. The level of all the spells
+        he casts will be increased by one without increasing their costs.
+      </text>
+      <text locale="de">
+        Ein Ring der Macht verstärkt die Kraft des Magiers. Jeder Zauber wird,
+        ohne das sich die Kosten erhöhen, so gezaubert als hätte der Magier eine
+        Stufe mehr.
+      </text>
+    </string>
+    <string name="magicherbbag">
+      <text locale="en">
+        Herbs stored in this bag will be much better preserved.
+      </text>
+      <text locale="de">
+        Kräuter, die in diesem Beutelchen aufbewahrt werden, sind erheblich
+        besser konserviert.
+      </text>
+    </string>
+    <string name="apple">
+      <text locale="en">
+        A tasty fruit.
+      </text>
+      <text locale="de">
+        Frucht aus der Gattung Malus (ca. 25 Arten), gehört zur Familie der
+        Rosengewächse. Die am häufigsten kultivierte Baumfrucht. Der Apfel
+        gehört zu den fleischigen Früchten, in dem der gereifte Fruchtknoten und
+        das umgebende Gewebe fleischig und eßbar werden. Die Apfelblüte der
+        meisten Varianten erfordert Kreuzbestäubung zur Befruchtung. Form und
+        Größe des Apfels bei der Ernte variieren abhängig von kulturellen und
+        umweltbedingten Einflüssen in Größe, Form, Farbe und Geschmack, sind
+        jedoch nichtsdestotrotz üblicherweise rund, zwischen 50 und 100mm im
+        Durchmesser und weisen röt- oder gelbliche Farbtöne auf.
+      </text>
+    </string>
+    <string name="magicbag">
+      <text locale="en">
+        This bag encloses a dimensional fold, which can store up to 200
+        stones of weight without any extra burden on the bearer. Large items
+        such as horses or carts cannot be placed inside.
+      </text>
+      <text locale="de">
+        Dieser Beutel umschließt eine kleine Dimensionsfalte, in der bis
+        zu 200 Gewichtseinheiten transportiert werden können, ohne dass
+        sie auf das Traggewicht angerechnet werden.  Pferde und andere
+        Lebewesen sowie besonders sperrige Dinge (Wagen und Katapulte) können
+        nicht in dem Beutel transportiert werden.  Auch ist es nicht möglich,
+        einen Zauberbeutel in einem anderen zu transportieren.  Der Beutel
+        selber wiegt 1 GE.
+      </text>
+    </string>
+    <string name="fairyboot">
+      <text locale="en">
+        These leather boots are embroidere with unicorn hair and allow
+        their wearer to walk at twice his normal speed.
+      </text>
+      <text locale="de">
+        Diese aus Leder gefertigten und mit Einhornfell verzierten Stiefel
+        ermöglichen es ihrem Träger, sich mit der doppelten Geschwindigkeit
+        fortzubewegen, wenn er zu Fuß reist.
+      </text>
+    </string>
+    <string name="snowman">
+      <text locale="en">
+        Orange nose, black hat, frosty character. A snowman.
+      </text>
+      <text locale="de">
+        Rübennase, schwarzer Hut, kaltes Herz. Ein Schneemann.
+      </text>
+    </string>
+    <string name="snowball">
+      <text locale="en">
+        These items stay frozen all year round. Nobody knows what they
+        are good for.
+      </text>
+      <text locale="de">
+        Schneebälle sind leider noch nicht vollständig implementiert.
+        Frohe Weihnachten und einen guten Rutsch ins Jahr 2003 wünscht
+        das Eressea-Team!
+      </text>
+    </string>
+    <string name="firesword">
+      <text locale="en">
+        The flaming sword gives its bearer an attack of 3d6+10 plus
+        an additional fireball causing 2d6 damage to 1-10 victims.
+        Using a flaming sword requires a minimum skill of 7. It grants an
+        additional +1 to your skill and your resistance to magic will be
+        increased.
+      </text>
+      <text locale="de">
+        Ein Flammenschwert gibt dem Träger, der kein Magier sein muß,
+        zusätzlich zu seinem normalen Angriff (3d6+10) einen kleinen
+        Feuerballangriff, der bei 1-10 Opfern 2d6 magischen Schaden
+        verursacht. Um ein Flammenschwert führen zu können, muss man
+        mindestens Hiebwaffen 7 haben, dann verleiht es einem auch
+        einen zusätzlichen Kampfbonus von +1. Ein Flammenschwert
+        erhöht die Magieresistenz seines Trägers wie ein Laenschwert.
+      </text>
+    </string>
+    <string name="roqf">
+      <text locale="en">
+        The magic in this ring makes the fingers ten times more nimble. a
+        craftsman can produce ten times his normal quota, and other abilities
+        might also be improved.
+      </text>
+      <text locale="de">
+        Der Zauber in diesem Ring bewirkt eine um das zehnfache verbesserte
+        Geschicklichkeit und Gewandheit der Finger. Handwerker können somit
+        das zehnfache produzieren, und bei einigen anderen Tätigkeiten könnte
+        dies ebenfalls von Nutzen sein.
+      </text>
+    </string>
     <string name="roi">
       <text locale="en">
       This magical artifact has been used since ancient times by Elves to
@@ -4173,8 +4316,12 @@
       their escape.</text>
     </string>
     <string name="blessedharvest">
-      <text locale="de">Dieses Ernteritual verbessert die Erträge der arbeitenden Bauern in der Region um ein Silberstück. Je mehr Kraft der Druide investiert, desto länger wirkt der Zauber.</text>
-      <text locale="en">This ritual increases the output of the local farms. Peasants in the region produce an extra silverpiece. The stronger the druid's spell is, the longer the effect will last.</text>
+      <text locale="de">Dieses Ernteritual verbessert die Erträge der
+      arbeitenden Bauern in der Region um ein Silberstück. Je mehr Kraft der
+      Druide investiert, desto länger wirkt der Zauber.</text>
+      <text locale="en">This ritual increases the output of the local farms.
+      Peasants in the region produce an extra silverpiece. The stronger the
+      druid's spell is, the longer the effect will last.</text>
     </string>
     <string name="song_of_confusion">
       <text locale="de">Aus den uralten Gesängen der Katzen
@@ -5579,7 +5726,13 @@
       der Magier einen kleinen Teil seiner Aura für immer.
       </text>
       <text locale="en">
-      The mage spawns a little monster, a nightmare. The nightmare slowly approaches its victim (which may be at an arbitrary place in eressea, it is not needed for the mage or his party  to see the victim). As soon as the victim is reached the nightmare starts to torment it  without mercy, only a powerfull counter spell or the death of the casting mage can redeem the victim. When spawning the nightmare the mage loses a small amount of his aura forever.
+      The mage spawns a little monster, a nightmare. The nightmare slowly
+      approaches its victim (which may be at an arbitrary place in eressea, it
+      is not needed for the mage or his party  to see the victim). As soon as
+      the victim is reached the nightmare starts to torment it  without mercy,
+      only a powerfull counter spell or the death of the casting mage can redeem
+      the victim. When spawning the nightmare the mage loses a small amount of
+      his aura forever.
       </text>
     </string>
     <string name="create_tacticcrystal">
@@ -5595,20 +5748,29 @@
       Die Interpretation von Träumen ist eine schwierige Angelegenheit.
       </text>
       <text locale="en">
-      An enchanted eye of a dragon gives the person who eats it for supper the power to see
-      other people's dreams. For a long time this abillity was counted as beeing useless until
-      the former elfish mistress for theurgy of war, Liarana Sonnentau from the academy Thall,
-      presented a special appliance for this artefact: Before a battle captains often have an
-      uncomfortable sleep and betray their plans in their dreams. This might give the user of
-      the artefact a small advantage in the upcoming battle, but be warned: Interpreting dreams
+      An enchanted eye of a dragon gives the person who eats it for supper the
+      power to see
+      other people's dreams. For a long time this abillity was counted as beeing
+      useless until
+      the former elfish mistress for theurgy of war, Liarana Sonnentau from the
+      academy Thall,
+      presented a special appliance for this artefact: Before a battle captains
+      often have an
+      uncomfortable sleep and betray their plans in their dreams. This might
+      give the user of
+      the artefact a small advantage in the upcoming battle, but be warned:
+      Interpreting dreams
       is a difficult exercise.
       </text>
     </string>
     <string name="create_invisibility_sphere">
-      <text locale="de">Mit diesem Spruch kann der Zauberer eine Sphäre der Unsichtbarkeit
+      <text locale="de">Mit diesem Spruch kann der Zauberer eine Sphäre der
+      Unsichtbarkeit
       erschaffen. Die Späre macht ihren Träger sowie neunundneunzig weitere
       Personen in derselben Einheit unsichtbar.</text>
-      <text locale="en">Using this spell the mage can create a Sphere of Invisibility. This artefact hides the person bearing it and one hundred persons in the same unit.</text>
+      <text locale="en">Using this spell the mage can create a Sphere of
+      Invisibility. This artefact hides the person bearing it and one hundred
+      persons in the same unit.</text>
     </string>
     <string name="gooddreams">
       <text locale="de">Dieser Zauber ermöglicht es dem
@@ -5911,8 +6073,10 @@
   </string>
 
   <string name="nr_calendar_season">
-    <text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s. Es ist %s.</text>
-    <text locale="en">It is %s of the month of %s in the %d. year of %s. It is %s.</text>
+    <text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s. Es ist %s.
+    </text>
+    <text locale="en">It is %s of the month of %s in the %d. year of %s. It is
+    %s.</text>
   </string>
 
   <string name="status_aggressive">
@@ -5983,11 +6147,13 @@
   </string>
 
   <string name="spinx03">
-    <text locale="de">Das Schiff mit dem grünen Segel liegt links neben dem mit einem weissen Segel</text>
+    <text locale="de">Das Schiff mit dem grünen Segel liegt links neben dem mit
+    einem weissen Segel</text>
   </string>
 
   <string name="spinx04">
-    <text locale="de">Auf dem Schiff mit grünen Segeln kam der Speerkämpfer</text>
+    <text locale="de">Auf dem Schiff mit grünen Segeln kam der Speerkämpfer
+    </text>
   </string>
 
   <string name="spinx05">
@@ -6007,11 +6173,13 @@
   </string>
 
   <string name="spinx09">
-    <text locale="de">Das Schiff mit dem Stern im Wappen liegt neben dem der einen Mandelkern hat</text>
+    <text locale="de">Das Schiff mit dem Stern im Wappen liegt neben dem der
+    einen Mandelkern hat</text>
   </string>
 
   <string name="spinx10">
-    <text locale="de">Das Schiff des Kriegers, der ein Apfel hat, liegt neben dem, der ein Kreuz als Wappen hat</text>
+    <text locale="de">Das Schiff des Kriegers, der ein Apfel hat, liegt neben
+    dem, der ein Kreuz als Wappen hat</text>
   </string>
 
   <string name="spinx11">
@@ -6019,7 +6187,8 @@
   </string>
 
   <string name="spinx12">
-    <text locale="de">Das Schiff des Menschen liegt neben dem blauen Schiff</text>
+    <text locale="de">Das Schiff des Menschen liegt neben dem blauen Schiff
+    </text>
   </string>
 
   <string name="spinx13">
@@ -6027,7 +6196,8 @@
   </string>
 
   <string name="spinx14">
-    <text locale="de">Das Schiff mit dem Stern im Wappen liegt neben dem des Kriegers, der einen Zweihänder führt</text>
+    <text locale="de">Das Schiff mit dem Stern im Wappen liegt neben dem des
+    Kriegers, der einen Zweihänder führt</text>
   </string>
 
   <string name="hero">
@@ -6179,7 +6349,8 @@
   </namespace>
 
   <string name="claimable">
-    <text locale="de">Einheiten können die folgenden Gegenstände beanspruchen: </text>
+    <text locale="de">Einheiten können die folgenden Gegenstände beanspruchen:
+    </text>
     <text locale="en">Units can claim the following items: </text>
   </string>
 
@@ -6236,3 +6407,8 @@
   </string>
 
 </strings>
+
+
+
+
+
