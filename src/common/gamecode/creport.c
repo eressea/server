@@ -1173,7 +1173,7 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 	fprintf(F, "\"%s\";banner\n", f->banner);
   for (itm=f->items; itm; itm=itm->next) {
     int in = itm->number;
-    const char * ic = LOC(f->locale, resourcename(itm->type->rtype, in));
+    const char * ic = resourcename(itm->type->rtype, in);
     if (itm==f->items) fputs("GEGENSTAENDE\n", F);
     fprintf(F, "%d;%s\n", in, add_translation(ic, LOC(f->locale, ic)));
   }
