@@ -35,6 +35,7 @@
 #include <kernel/save.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
+#include <kernel/faction.h>
 
 /* util includes */
 #include <attrib.h>

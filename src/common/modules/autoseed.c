@@ -567,13 +567,6 @@ autoseed(newfaction ** players, int nsize)
     }
   }
 
-  while (rlist) {
-    region_list * self = rlist;
-    rlist = rlist->next;
-    freset(self->data, FL_MARK);
-    free(self);
-  }
-
   if (r!=NULL) {
     /* reicht das? */
     fix_demand(r);
@@ -639,6 +632,12 @@ autoseed(newfaction ** players, int nsize)
           }
         }
       }
+    }
+    while (rlist) {
+      region_list * self = rlist;
+      rlist = rlist->next;
+      freset(self->data, FL_MARK);
+      free(self);
     }
   }
   return tsize;
