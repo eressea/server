@@ -311,6 +311,7 @@
   <string name="sehr viele">
     <text locale="de">sehr viele</text>
     <text locale="en">a great many </text>
+    <text locale="fr">beaucoup de </text>
   </string>
 
   <string name="nr_trade_intro">

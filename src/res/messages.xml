@@ -6310,8 +6310,8 @@
       <arg name="region" type="region"/>
       <arg name="mage" type="unit"/>
     </type>
-    <text locale="de">"$unit($unit) ruft in $region($region) eine Pest hervor."</text>
-    <text locale="en">"$unit($unit) sends the plague on $region($region)."</text>
+    <text locale="de">"$unit($mage) ruft in $region($region) eine Pest hervor."</text>
+    <text locale="en">"$unit($mage) sends the plague on $region($region)."</text>
   </message>
 
   <message name="too_many_units_in_faction" section="errors">
