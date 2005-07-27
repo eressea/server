@@ -1021,7 +1021,8 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region) wird von einem Unbekannten verflucht."    <text locale="en">"$unit($unit) in $region($region) was cursed by an unknown magician."</text>
+    <text locale="de">"$unit($unit) in $region($region) wird von einem Unbekannten verflucht."</text>
+    <text locale="en">"$unit($unit) in $region($region) was cursed by an unknown magician."</text>
   </message>
   <message name="drought_effect" section="magic">
     <type>
@@ -1160,7 +1161,8 @@
       <arg name="source" type="region"/>
       <arg name="target" type="unit"/>
     </type>
-    <text locale="de">"$unit($unit) wurde von $region($source) nach $unit($target) teleportiert."    <text locale="en">"$unit($unit) was teleported from $region($source) to $unit($target)."</text>
+    <text locale="de">"$unit($unit) wurde von $region($source) nach $unit($target) teleportiert."</text>
+    <text locale="en">"$unit($unit) was teleported from $region($source) to $unit($target)."</text>
   </message>
   <message name="analyse_ship_age" section="magic">
     <type>
