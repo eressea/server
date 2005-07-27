@@ -88,7 +88,7 @@ static terrain_t newblock[BLOCKSIZE][BLOCKSIZE];
 static int g_maxluxuries;
 
 void
-block_create(int x1, int y1, int size, char chaotisch, int special, char terrain)
+block_create(short x1, short y1, int size, char chaotisch, int special, char terrain)
 {
 	int local_climate, k;
 	short x, y;

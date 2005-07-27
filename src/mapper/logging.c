@@ -40,10 +40,10 @@ log_read(const char * filename)
 	while (!feof(log)) {
 		if(fscanf(log, "%s", buf) == EOF) break;
 		if (strcmp(buf, "UNIT")==0) {
-			int x, y;
+			short x, y;
 			unit * u;
 			region * r;
-			fscanf(log, "%s %d %d", buf, &x, &y);
+			fscanf(log, "%s %hd %hd", buf, &x, &y);
 			u = readunit(log);
 			r = findregion(x, y);
 			if (r==NULL) {
@@ -52,8 +52,8 @@ log_read(const char * filename)
 			}
 			if (u->region!=r) move_unit(u, r, NULL);
 		} else if (strcmp(buf, "REGION")==0) {
-			int x, y;
-			fscanf(log, "%d %d", &x, &y);
+			short x, y;
+			fscanf(log, "%hd %hd", &x, &y);
 			readregion(log, x, y);
 		} else if (strcmp(buf, "FACTION")==0) {
 			faction * f;

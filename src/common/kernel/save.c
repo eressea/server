@@ -75,6 +75,8 @@
 #define COMMENT_CHAR    ';'
 
 #define ESCAPE_FIX
+#define MAXORDERS 256
+#define MAXPERSISTENT 16
 
 /* exported symbols symbols */
 const char * xmlfile = "eressea.xml";
@@ -1024,7 +1026,7 @@ readunit(FILE * F)
 	herb_t herb;
 	potion_t potion;
 	unit * u;
-	int number, n;
+	int number, n, p;
 
 	n = rid(F);
 	u = findunit(n);
@@ -1114,9 +1116,20 @@ readunit(FILE * F)
 	/* Persistente Befehle einlesen */
 	free_orders(&u->orders);
 	freadstr(F, buf, sizeof(buf));
+  p = n = 0;
 	while (*buf != 0) {
     order * ord = parse_order(buf, u->faction->locale);
-    if (ord!=NULL) addlist(&u->orders, ord);
+    if (ord!=NULL) {
+      if (++n<MAXORDERS) {
+        if (!is_persistent(ord) || ++p<MAXPERSISTENT) {
+          addlist(&u->orders, ord);
+        } else if (p==MAXPERSISTENT) {
+          log_error(("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT));
+        }
+      } else if (n==MAXORDERS) {
+        log_error(("%s had %d or more orders\n", unitname(u), MAXPERSISTENT));
+      }
+    }
 		freadstr(F, buf, sizeof(buf));
 	}
   if (global.data_version<NOLASTORDER_VERSION) {

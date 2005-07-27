@@ -879,12 +879,6 @@ set_number(unit * u, int count)
 #ifndef NDEBUG
   assert (u->faction != 0 || u->number > 0);
 #endif
-  if (u->faction && u->race != u->faction->race && playerrace(u->race)
-      && u->race != new_race[RC_SPELL] && u->race != new_race[RC_SPECIAL]
-      && !(is_cursed(u->attribs, C_SLAVE, 0)))
-  {
-    u->faction->num_migrants += count - u->number;
-  }
   
   if (playerrace(u->race)) {
     u->faction->num_people += count - u->number;

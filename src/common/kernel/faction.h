@@ -68,7 +68,6 @@ typedef struct faction {
 	const struct race * race;
 	magic_t magiegebiet;
 	int newbies;
-	int num_migrants;			/* Anzahl Migranten */
 	int num_people;				/* Anzahl Personen ohne Monster */
   int num_total;        /* Anzahl Personen mit Monstern */
 	int options;

@@ -128,7 +128,8 @@ signal_init(void)
 }
 #endif	/* ndef Win32 */
 
-int left = 0, top = 0, breit, hoch, tx=-999, ty=-999;
+short left = 0, top = 0, tx=-999, ty=-999;
+int breit, hoch;
 int MINX=0, MINY=0, MAXX=0, MAXY=0;
 boolean minimapx=false,minimapy=false;		/* Karte nicht vert./hor. scrollen */
 
@@ -165,21 +166,23 @@ init_win(int x, int y) {
 	clear();
 	refresh();
 
-	breit=(SX-45)/2; hoch=SY-6;
+	breit = (short)(SX-45)/2; hoch = (short)SY-6;
 
 	if (breit > MAXX-MINX+(MAXY-MINY)/2) {
-		left=MINX-(breit-MAXX-MINX)/2+y/2;
-		breit=MAXX-MINX+(MAXY-MINY)/2;
+		left = (short)(MINX-(breit-MAXX-MINX)/2+y/2);
+		breit = MAXX-MINX+(MAXY-MINY)/2;
 		minimapx=true;
 	} else {
-		left=x-breit/2+y/2;
+		left = (short)(x-breit/2+y/2);
 	}
 
 	if (hoch > MAXY-MINY) {
 		minimapy=true;
-		top=MAXY+(hoch-MAXY-MINY)/2;
-		hoch=MAXY-MINY;
-	} else top=y+hoch/2;
+		top = (short)(MAXY+(hoch-MAXY-MINY)/2);
+		hoch = MAXY-MINY;
+  } else {
+    top = (short)(y+hoch/2);
+  }
 
 	/* breit=(SX-45)/2; hoch=SY-6; */	/* zum Darstellen schon alles nehmen */
 }
@@ -406,7 +409,7 @@ drawmap(boolean maponly) {
 	chtype rs;
 	region *r;
 
-	x1=left; y1=top;
+	x1 = left; y1=top;
 	if(maponly == false) {
 		movexy(SX-36,SY-2);
 		sprintf(buf, "%d gesetzt, %d Rest, %d Dropouts", numnewbies, listlen(newfactions), listlen(dropouts));

@@ -242,7 +242,6 @@ no_teurefremde(boolean convert)
         if (convert) {
           u->race = u->faction->race;
           u->irace = u->faction->race;
-          u->faction->num_migrants -= u->number;
           sprintf(buf, "Die Götter segnen %s mit der richtigen Rasse",
             unitname(u));
           addmessage(0, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
