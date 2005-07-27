@@ -8,8 +8,6 @@ XUL for Eressea
 
 Deathcloud: Magieresistenz des Magiers in das attribut, nicht auflösen wenn magier tot.
 
-error handling in lua/luabind?
-
 english registration confirmation is deutsch!
 
 NO_RUNNING
@@ -46,3 +44,4 @@ mailit-format ändern?
 
 age branch mergen
 
+readline()
