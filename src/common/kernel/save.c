@@ -1027,6 +1027,7 @@ readunit(FILE * F)
 	potion_t potion;
 	unit * u;
 	int number, n, p;
+  order ** orderp;
 
 	n = rid(F);
 	u = findunit(n);
@@ -1117,12 +1118,14 @@ readunit(FILE * F)
 	free_orders(&u->orders);
 	freadstr(F, buf, sizeof(buf));
   p = n = 0;
+  orderp = &u->orders;
 	while (*buf != 0) {
     order * ord = parse_order(buf, u->faction->locale);
     if (ord!=NULL) {
       if (++n<MAXORDERS) {
         if (!is_persistent(ord) || ++p<MAXPERSISTENT) {
-          addlist(&u->orders, ord);
+          *orderp = ord;
+          orderp = &ord->next;
         } else if (p==MAXPERSISTENT) {
           log_error(("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT));
         }
