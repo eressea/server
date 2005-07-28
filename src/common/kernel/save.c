@@ -76,7 +76,7 @@
 
 #define ESCAPE_FIX
 #define MAXORDERS 256
-#define MAXPERSISTENT 16
+#define MAXPERSISTENT 128
 
 /* exported symbols symbols */
 const char * xmlfile = "eressea.xml";
