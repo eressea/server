@@ -22,6 +22,8 @@
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
+#include <luabind/out_value_policy.hpp>
+#include <luabind/copy_policy.hpp>
 #ifdef HAVE_LUABIND_B7
 # include <luabind/operator.hpp>
 #endif
@@ -218,12 +220,36 @@ faction_get_email(const faction& f)
 }
 
 void
+faction_getorigin(const faction& f, int &x, int &y)
+{
+  ursprung * origin = f.ursprung;
+  while (origin!=NULL && origin->id!=0) {
+    origin = origin->next;
+  }
+  if (origin) {
+    x = origin->x;
+    y = origin->y;
+  } else {
+    x = 0;
+    y = 0;
+  }
+}
+
+void
+faction_setorigin(faction& f, int x, int y)
+{
+  x = 0;
+  y = 0;
+}
+
+void
 bind_faction(lua_State * L) 
 {
   module(L)[
     def("factions", &get_factions, return_stl_iterator),
     def("get_faction", &findfaction),
     def("add_faction", &add_faction),
+    def("faction_origin", &faction_getorigin, pure_out_value(_2) + pure_out_value(_3)),
 
     class_<struct faction>("faction")
     .def(tostring(self))
@@ -242,6 +268,7 @@ bind_faction(lua_State * L)
 
     .def("add_item", &faction_additem)
     .property("items", &faction_items, return_stl_iterator)
+    //.property("origin", &faction_getorigin, &faction_setorigin, pure_out_value(_2) + pure_out_value(_3), copy)
 
     .def("add_notice", &faction_addnotice)
     .property("password", &faction_get_passw, &faction_set_passw)
