@@ -1580,18 +1580,8 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
         if (tnext != T_OCEAN) {
           if (!move_on_land) {
             /* check that you're not traveling from one land region to another. */
-            plane *pl = getplane(next_point);
-
-            if (pl!=NULL && fval(pl, PFL_NOCOORDS)) {
-              /* we don't have that case yet, but hey... */
-              sprintf(buf, "Die %s entdeckt, daß im %s Festland ist.",
-                shipname(sh), locale_string(u->faction->locale, directions[dir]));
-            } else {
-              sprintf(buf, "Die %s entdeckt, daß (%d,%d) Festland ist.",
-                shipname(sh), region_x(next_point,u->faction),
-                region_y(next_point,u->faction));
-            }
-            addmessage(0, u->faction, buf, MSG_MOVE, ML_WARN);
+            ADDMSG(&u->faction->msgs, msg_message("shipnoshore",
+              "ship region", sh, next_point));
             break;
           }
         } else {
@@ -1687,17 +1677,11 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
     set_order(&u->thisorder, NULL);
     set_coast(sh, last_point, current_point);
 
-    sprintf(buf, "Die %s ", shipname(sh));
-    if( is_cursed(sh->attribs, C_SHIP_FLYING, 0) )
-      scat("fliegt");
-    else
-      scat("segelt");
-    scat(" von ");
-    scat(regionname(starting_point, u->faction));
-    scat(" nach ");
-    scat(regionname(current_point, u->faction));
-    scat(".");
-    addmessage(0, u->faction, buf, MSG_MOVE, ML_INFO);
+    if( is_cursed(sh->attribs, C_SHIP_FLYING, 0) ) {
+      ADDMSG(&f->msgs, msg_message("shipfly", "ship from to", sh, starting_point, current_point));
+    } else {
+      ADDMSG(&f->msgs, msg_message("shipsail", "ship from to", sh, starting_point, current_point));
+    }
 
     /* Das Schiff und alle Einheiten darin werden nun von
     * starting_point nach current_point verschoben */

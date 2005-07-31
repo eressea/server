@@ -1219,7 +1219,6 @@ count_all(const faction * f)
 int
 count_migrants (const faction * f)
 {
-#ifndef NDEBUG
   unit *u = f->units;
   int n = 0;
   while (u) {
@@ -1231,7 +1230,6 @@ count_migrants (const faction * f)
     }
     u = u->nextF;
   }
-#endif
   return n;
 }
 

@@ -15,7 +15,7 @@
 #ifndef RESOLVE_H
 #define RESOLVE_H
 
-#include <util/variant.h>
+#include "variant.h"
 
 #ifdef __cplusplus
 extern "C" {

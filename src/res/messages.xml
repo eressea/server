@@ -2632,6 +2632,32 @@
     <text locale="fr">"The $ship($ship) suffers too heavy damage and sinks."</text>
     <text locale="en">"The $ship($ship) suffers too heavy damage and sinks."</text>
   </message>
+  <message name="shipnoshore" section="movement">
+    <type>
+      <arg name="ship" type="ship"/>
+      <arg name="region" type="region"/>
+    </type>
+    <text locale="de">"Die $ship($ship) entdeckt, dass $region($region) Festland ist."</text>
+    <text locale="en">"The $ship($ship) discovers that $region($region) has no shore."</text>
+  </message>
+  <message name="shipfly" section="movement">
+    <type>
+      <arg name="ship" type="ship"/>
+      <arg name="from" type="region"/>
+      <arg name="to" type="region"/>
+    </type>
+    <text locale="de">"Die $ship($ship) fliegt von $region($from) nach $region($to)."</text>
+    <text locale="en">"The $ship($ship) flies from $region($from) to $region($to)."</text>
+  </message>
+  <message name="shipsail" section="movement">
+    <type>
+      <arg name="ship" type="ship"/>
+      <arg name="from" type="region"/>
+      <arg name="to" type="region"/>
+    </type>
+    <text locale="de">"Die $ship($ship) segelt von $region($from) nach $region($to)."</text>
+    <text locale="en">"The $ship($ship) sails from $region($from) to $region($to)."</text>
+  </message>
   <message name="shipnoconf" section="events">
     <type>
       <arg name="ship" type="ship"/>
