@@ -2684,8 +2684,7 @@ magic(void)
       if (co->force <= 0) {
         co->force = 0;
         ADDMSG(&u->faction->msgs, msg_message("missing_force", 
-          "unit spell level", u, sp, level));
-        addmessage(0, u->faction, buf, MSG_MAGIC, ML_MISTAKE);
+          "unit spell level", u, sp, co->level));
       }
 
       /* Ziele auf Existenz prüfen und Magieresistenz feststellen. Wurde
