@@ -965,8 +965,8 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	sd = weapon_effskill(dt, at, weapon, false, false);
 	if (weapon!=NULL) dwtype=weapon->type;
 
-	ar = armor->prot;
-	ar += shield->prot;
+	if (armor) ar = armor->prot;
+	if (shield) ar += shield->prot;
 
 	/* natürliche Rüstung */
 	an = du->race->armor;
@@ -1054,8 +1054,8 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 			if (dwp == WP_RUNESWORD) res -= 0.80;
 #endif
 			/* der Effekt von Laen steigt nicht linear */
-      if (fval(armor, ATF_LAEN)) res *= (1-armor->magres);
-			if (fval(shield, ATF_LAEN)) res *= (1-shield->magres);
+      if (armor && fval(armor, ATF_LAEN)) res *= (1-armor->magres);
+			if (shield && fval(shield, ATF_LAEN)) res *= (1-shield->magres);
 			if (dwtype) res *= (1-dwtype->magres);
 		}
 
