@@ -70,6 +70,48 @@
 
 #define MAXILLUSION_TEXTS   3
 
+static void
+reduce_weight(unit * u)
+{
+  int horses = get_resource(u,R_HORSE);
+  int capacity = walkingcapacity(u);
+  item ** itmp = &u->items;
+  int weight = 0;
+
+  if (horses > 0) {
+    change_resource(u, R_HORSE, - min(horses,(u->number*2)));
+  }
+
+  /* 1. get rid of anything that isn't silver or really lightweight */
+  while (capacity>0 && *itmp!=NULL) {
+    item * itm = *itmp;
+    const item_type * itype = itm->type;
+    weight += itm->number*itype->weight;
+    if (weight>capacity) {
+      if (itype->weight>=10) {
+        if (itype->capacity < itype->weight) {
+          int reduce = min(itm->number, -((capacity-weight)/itype->weight));
+          give_item(reduce, itm->type, u, NULL, NULL);
+          weight -= reduce * itype->weight;
+        }
+      }
+    }
+    if (*itmp==itm) itmp=&itm->next;
+  }
+
+  for (itmp = &u->items;*itmp && weight>capacity;) {
+    item * itm = *itmp;
+    const item_type * itype = itm->type;
+    weight += itm->number*itype->weight;
+    if (itype->capacity < itype->weight) {
+      int reduce = min(itm->number, -((capacity-weight)/itype->weight));
+      give_item(reduce, itm->type, u, NULL, NULL);
+      weight -= reduce * itype->weight;
+    }
+    if (*itmp==itm) itmp=&itm->next;
+  }
+}
+
 static boolean
 is_waiting(const unit * u)
 {
@@ -328,6 +370,7 @@ monster_move(region * r, unit * u)
   sprintf(buf, "%s %s", locale_string(u->faction->locale, keywords[K_MOVE]), 
           locale_string(u->faction->locale, directions[d]));
 
+  reduce_weight(u);
   return parse_order(buf, u->faction->locale);
 }
 
@@ -794,26 +837,10 @@ plan_dragon(unit * u)
   attrib * ta = a_find(u->attribs, &at_targetregion);
   region * r = u->region;
   region * tr = NULL;
-  int horses = get_resource(u,R_HORSE);
-  int capacity = walkingcapacity(u);
-  item ** itmp = &u->items;
   boolean move = false;
   order * long_order = NULL;
 
-  if (horses > 0) {
-    change_resource(u, R_HORSE, - min(horses,(u->number*2)));
-  }
-  while (capacity>0 && *itmp!=NULL) {
-    item * itm = *itmp;
-    if (itm->type->capacity<itm->type->weight) {
-      int weight = itm->number*itm->type->capacity;
-      if (weight > capacity) {
-        int error = give_item(itm->number, itm->type, u, NULL, NULL);
-        if (error!=0) break;
-      }
-    }
-    if (*itmp==itm) itmp=&itm->next;
-  }
+  reduce_weight(u);
 
   if (ta==NULL) {
     move |= (r->land==0 || r->land->peasants==0); /* when no peasants, move */
