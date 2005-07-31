@@ -108,7 +108,7 @@ static resource_type rt_gryphonwing = {
 static item_type it_gryphonwing = {
 	&rt_gryphonwing,           /* resourcetype */
 	ITF_NOTLOST|ITF_CURSED, 0, 0,       /* flags, weight, capacity */
-	NULL,                    /* construction */
+	NULL,                     /* construction, score */
 	&leave_arena,
 	NULL,
 	&give_igjarjuk
@@ -177,7 +177,7 @@ static resource_type rt_arenagate = {
 static item_type it_arenagate = {
 	&rt_arenagate,           /* resourcetype */
 	ITF_NONE, 0, 0,          /* flags, weight, capacity */
-	NULL,                    /* construction */
+	NULL,                   /* construction, score */
 	&enter_arena
 };
 

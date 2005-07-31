@@ -661,6 +661,9 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
   if (xml_bvalue(node, "big", false)) flags |= ITF_BIG;
   if (xml_bvalue(node, "animal", false)) flags |= ITF_ANIMAL;
   itype = new_itemtype(rtype, flags, weight, capacity);
+#ifdef SCORE_MODULE
+  itype->score = xml_ivalue(node, "score", 0);
+#endif
 
   /* reading item/construction */
   xpath->node = node;

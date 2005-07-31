@@ -18,7 +18,6 @@
 #include "xerewards.h"
 #include "artrewards.h"
 #include "weapons.h"
-#include "racespoils.h"
 #if GROWING_TREES
 # include "seed.h"
 #endif
@@ -33,7 +32,6 @@ register_itemtypes(void)
 	register_seed();
 	register_mallornseed();
 #endif
-	register_racespoils();
   register_artrewards();
 }
 

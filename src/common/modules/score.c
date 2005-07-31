@@ -21,6 +21,7 @@
 
 #include <config.h>
 #include "eressea.h"
+#ifdef SCORE_MODULE
 
 /* kernel includes */
 #include <kernel/alliance.h>
@@ -41,87 +42,6 @@
 
 /* libc includes */
 #include <math.h>
-
-static attrib_type at_score = {
-	"score"
-};
-
-static int 
-item_score(item_t i)
-{
-  const luxury_type * ltype;
-
-  switch (i) {
-    case I_IRON:
-    case I_WOOD:
-    case I_STONE:
-    case I_HORSE:
-      return 10;
-    case I_MALLORN:
-      return 30;
-    case I_LAEN:
-      return 100;
-    case I_WAGON:
-      return 60;
-    case I_SHIELD:
-      return 30;
-    case I_LAENSHIELD:
-    case I_LAENSWORD:
-      return 400;
-    case I_LAENCHAIN:
-      return 1000;
-    case I_CHAIN_MAIL:
-      return 40;
-    case I_PLATE_ARMOR:
-      return 60;
-    case I_BALM:
-    case I_SPICES:
-    case I_JEWELERY:
-    case I_MYRRH:
-    case I_OIL:
-    case I_SILK:
-    case I_INCENSE:
-      ltype = resource2luxury(olditemtype[i]->rtype);
-      if (ltype) return ltype->price / 5;
-      return 0;
-    case I_AMULET_OF_HEALING:
-    case I_AMULET_OF_TRUE_SEEING:
-    case I_RING_OF_INVISIBILITY:
-    case I_RING_OF_POWER:
-    case I_CHASTITY_BELT:
-    case I_TROLLBELT:
-    case I_RING_OF_NIMBLEFINGER:
-    case I_FEENSTIEFEL:
-      return 6000;
-    case I_ANTIMAGICCRYSTAL:
-      return 2000;
-  }
-  return 0;
-}
-
-void
-init_scores(void)
-{
-  item_t i;
-
-  for (i = 0;olditemtype[i];i++) {
-    const item_type * itype = olditemtype[i];
-    attrib * a = a_add(&itype->rtype->attribs, a_new(&at_score));
-
-    if (itype->flags & ITF_WEAPON) {
-      int m;
-      if (itype->construction->materials==NULL) {
-        a->data.i = 6000;
-      } else for (m=0;itype->construction->materials[m].number;++m) {
-        const resource_type * rtype = oldresourcetype[itype->construction->materials[m].number];
-        const attrib * ascore = a_findc(rtype->attribs, &at_score);
-        int score = ascore?ascore->data.i:5;
-        a->data.i += 2*itype->construction->materials[m].number * score;
-      }
-    }
-    else a->data.i = item_score(i);
-  }
-}
 
 int
 average_score_of_age(int age, int a)
@@ -153,12 +73,7 @@ score(void)
 	ship *s;
 	int allscores = 0;
 	int c;
-	static boolean init = false;
 
-	if (!init) {
-		init=true;
-		init_scores();
-	}
 	for (f = factions; f; f = f->next) f->score = 0;
 
 	for (r = regions; r; r = r->next) {
@@ -194,6 +109,7 @@ score(void)
 		for (u = r->units; u; u = u->next) {
 			char index;
 			item * itm;
+      int itemscore = 0;
 			if (u->race == new_race[RC_SPELL] || u->race == new_race[RC_BIRTHDAYDRAGON])
 				continue;
 
@@ -204,9 +120,9 @@ score(void)
 			}
 			f->score += get_money(u) / 50;
 			for (itm=u->items; itm; itm=itm->next) {
-				attrib * a = a_find(itm->type->rtype->attribs, &at_score);
-				if (a!=NULL) f->score += itm->number * a->data.i / 10;
+        itemscore +=  itm->number * itm->type->score;
 			}
+      f->score += itemscore / 10;
 
 			for (index = 0; index != MAXSKILLS; index++) {
 				switch (index) {
@@ -291,3 +207,4 @@ score(void)
 
 }
 
+#endif

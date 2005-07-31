@@ -41,10 +41,6 @@
 #include "karma.h"
 #include "group.h"
 
-/* item includes */
-#include <items/racespoils.h>
-
-
 /* util includes */
 #include <attrib.h>
 #include <functions.h>
@@ -509,109 +505,26 @@ dragon_drops(const struct race * rc, int size)
 static item *
 phoenix_drops(const struct race *rc, int size)
 {
+  const item_type * it_phoenixfeather = it_find("phoenixfeather");
 	item *itm = NULL;
-	i_add(&itm, i_new(&it_phoenixfeather, size));
+	if (it_phoenixfeather!=NULL) i_add(&itm, i_new(it_phoenixfeather, size));
 	return itm;
 }
 
 static item *
-elf_spoil(const struct race * rc, int size)
+default_spoil(const struct race * rc, int size)
 {
-	item * itm = NULL;
-	if (rand()%100 < RACESPOILCHANCE){
-		i_add(&itm, i_new(&it_elfspoil, size));
-	}
-	return itm;
-}
+  item * itm = NULL;
 
-static item *
-demon_spoil(const struct race * rc, int size)
-{
-	item * itm = NULL;
-	if (rand()%100 < RACESPOILCHANCE){
-		i_add(&itm, i_new(&it_demonspoil, size));
-	}
-	return itm;
-}
+  if (rand()%100 < RACESPOILCHANCE) {
+    char spoilname[32];
+    const item_type * itype;
 
-static item *
-goblin_spoil(const struct race * rc, int size)
-{
-	item * itm = NULL;
-	if (rand()%100 < RACESPOILCHANCE){
-		i_add(&itm, i_new(&it_goblinspoil, size));
-	}
-	return itm;
-}
-static item *
-dwarf_spoil(const struct race * rc, int size)
-{
-	item * itm = NULL;
-	if (rand()%100 < RACESPOILCHANCE){
-		i_add(&itm, i_new(&it_dwarfspoil, size));
-	}
-	return itm;
-}
-static item *
-halfling_spoil(const struct race * rc, int size)
-{
-	item * itm = NULL;
-	if (rand()%100 < RACESPOILCHANCE){
-		i_add(&itm, i_new(&it_halflingspoil, size));
-	}
-	return itm;
-}
-static item *
-human_spoil(const struct race * rc, int size)
-{
-	item * itm = NULL;
-	if (rand()%100 < RACESPOILCHANCE){
-		i_add(&itm, i_new(&it_humanspoil, size));
-	}
-	return itm;
-}
-static item *
-aquarian_spoil(const struct race * rc, int size)
-{
-	item * itm = NULL;
-	if (rand()%100 < RACESPOILCHANCE){
-		i_add(&itm, i_new(&it_aquarianspoil, size));
-	}
-	return itm;
-}
-static item *
-insect_spoil(const struct race * rc, int size)
-{
-	item * itm = NULL;
-	if (rand()%100 < RACESPOILCHANCE){
-		i_add(&itm, i_new(&it_insectspoil, size));
-	}
-	return itm;
-}
-static item *
-cat_spoil(const struct race * rc, int size)
-{
-	item * itm = NULL;
-	if (rand()%100 < RACESPOILCHANCE){
-		i_add(&itm, i_new(&it_catspoil, size));
-	}
-	return itm;
-}
-static item *
-orc_spoil(const struct race * rc, int size)
-{
-	item * itm = NULL;
-	if (rand()%100 < RACESPOILCHANCE){
-		i_add(&itm, i_new(&it_orcspoil, size));
-	}
-	return itm;
-}
-static item *
-troll_spoil(const struct race * rc, int size)
-{
-	item * itm = NULL;
-	if (rand()%100 < RACESPOILCHANCE){
-		i_add(&itm, i_new(&it_trollspoil, size));
+    sprintf(spoilname,  "%sspoil", rc->_name[0]);
+    itype = it_find(spoilname);
+    if (itype!=NULL) {
+      i_add(&itm, i_new(itype, size));
+    }
 	}
 	return itm;
 }
@@ -722,17 +635,7 @@ register_races(void)
 	 * race->itemdrop() */
 	register_function((pf_generic)dragon_drops, "dragondrops");
 	register_function((pf_generic)phoenix_drops, "phoenixdrops");
-	register_function((pf_generic)elf_spoil, "elfspoil");
-	register_function((pf_generic)demon_spoil, "demonspoil");
-	register_function((pf_generic)goblin_spoil, "goblinspoil");
-	register_function((pf_generic)dwarf_spoil, "dwarfspoil");
-	register_function((pf_generic)halfling_spoil, "halflingspoil");
-	register_function((pf_generic)human_spoil, "humanspoil");
-	register_function((pf_generic)aquarian_spoil, "aquarianspoil");
-	register_function((pf_generic)insect_spoil, "insectspoil");
-	register_function((pf_generic)cat_spoil, "catspoil");
-	register_function((pf_generic)orc_spoil, "orcspoil");
-	register_function((pf_generic)troll_spoil, "trollspoil");
+  register_function((pf_generic)default_spoil, "defaultdrops");
 
 	sprintf(zBuffer, "%s/races.xml", resourcepath());
 }

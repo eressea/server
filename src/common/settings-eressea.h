@@ -41,6 +41,7 @@
 
 #define MUSEUM_MODULE
 #define ARENA_MODULE
+#define SCORE_MODULE
 #define WORMHOLE_MODULE
 #define XECMD_MODULE
 

@@ -7,6 +7,7 @@
   <xi:include href="en/strings.xml"/>
 
   <xi:include href="resources.xml"/>
+  <xi:include href="spoils.xml"/>
   <xi:include href="races.xml"/>
   <xi:include href="prefixes.xml"/>
   <xi:include href="ships.xml"/>
@@ -52,4 +53,12 @@
       <text locale="de">WDW BEFEHLE</text>
     </string>
   </strings>
+
+  <resources>
+    <resource name="phoenixfeather">
+      <function name="change" value="changeitem"/>
+      <item weight="1"/>
+    </resource>
+  </resources>
+
 </eressea>

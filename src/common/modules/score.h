@@ -25,6 +25,11 @@
 extern "C" {
 #endif
 
+#ifndef SCORE_MODULE
+#error "must define SCORE_MODULE to use this module"
+#endif
+
+
 extern void score(void);
 extern int average_score_of_age(int age, int a);
 

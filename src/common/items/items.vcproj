@@ -183,9 +183,6 @@
 				RelativePath=".\itemtypes.h">
 			</File>
 			<File
-				RelativePath=".\racespoils.h">
-			</File>
-			<File
 				RelativePath=".\seed.h">
 			</File>
 			<File
@@ -203,9 +200,6 @@
 		</File>
 		<File
 			RelativePath=".\itemtypes.c">
-		</File>
-		<File
-			RelativePath=".\racespoils.c">
 		</File>
 		<File
 			RelativePath=".\seed.c">

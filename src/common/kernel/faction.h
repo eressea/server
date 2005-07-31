@@ -85,7 +85,9 @@ typedef struct faction {
 	boolean alive; /* enno: sollte ein flag werden */
 	int nregions;
 	int money;
-	int score;
+#ifdef SCORE_MODULE
+  int score;
+#endif
 	struct alliance * alliance;
 #ifdef VICTORY_DELAY
 	unsigned char victory_delay;

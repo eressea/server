@@ -8,6 +8,7 @@
   <xi:include file="fr/strings.xml"/>
 
   <xi:include href="resources.xml"/>
+  <xi:include href="spoils.xml"/>
   <xi:include href="races.xml"/>
   <xi:include href="prefixes.xml"/>
   <xi:include href="ships.xml"/>

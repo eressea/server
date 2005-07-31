@@ -725,7 +725,7 @@
   </race>
   <race name="aquarian" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" coastal="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="aquarianspoil"/>
+    <function name="itemdrop" value="defaultdrops"/>
     <skill name="sk_mining" modifier="-2"/>
     <skill name="sk_building" modifier="-1"/>
     <skill name="sk_trade" modifier="2"/>
@@ -744,7 +744,7 @@
   </race>
   <race name="cat" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="90" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" defensemodifier="1" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="catspoil"/>
+    <function name="itemdrop" value="defaultdrops"/>
     <skill name="sk_alchemy" modifier="-1"/>
     <skill name="sk_mining" modifier="-2"/>
     <skill name="sk_building" modifier="-1"/>
@@ -770,7 +770,7 @@
   </race>
   <race name="halfling" magres="0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="halflingspoil"/>
+    <function name="itemdrop" value="defaultdrops"/>
     <skill name="sk_crossbow" modifier="1"/>
     <skill name="sk_mining" modifier="1"/>
     <skill name="sk_bow" modifier="-1"/>
@@ -802,7 +802,7 @@
   </race>
   <race name="insect" magres="0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="insectspoil"/>
+    <function name="itemdrop" value="defaultdrops"/>
     <skill name="sk_crossbow" modifier="1"/>
     <skill name="sk_mining" modifier="1"/>
     <skill name="sk_bow" modifier="-2"/>
@@ -832,7 +832,7 @@
   <race name="demon" magres="0.150000" maxaura="1.000000" regaura="1.250000" recruitcost="150" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="50" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" shapeshift="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="initfamiliar" value="oldfamiliars"/>
-    <function name="itemdrop" value="demonspoil"/>
+    <function name="itemdrop" value="defaultdrops"/>
     <skill name="sk_alchemy" modifier="2"/>
     <skill name="sk_trade" modifier="-3"/>
     <skill name="sk_forestry" modifier="1"/>
@@ -863,7 +863,7 @@
   </race>
   <race name="troll" magres="0.100000" maxaura="1.000000" regaura="1.000000" recruitcost="90" maintenance="10" weight="2000" capacity="1080" speed="1.000000" hp="30" ac="1" damage="1d5+3" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="trollspoil"/>
+    <function name="itemdrop" value="defaultdrops"/>
     <skill name="sk_mining" modifier="2"/>
     <skill name="sk_bow" modifier="-2"/>
     <skill name="sk_building" modifier="2"/>
@@ -894,7 +894,7 @@
   </race>
   <race name="human" magres="0.000000" maxaura="1.000000" regaura="1.000000" recruitcost="75" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="humanspoil"/>
+    <function name="itemdrop" value="defaultdrops"/>
     <skill name="sk_trade" modifier="1"/>
     <skill name="sk_herbalism" modifier="-1"/>
     <skill name="sk_shipcraft" modifier="1"/>
@@ -911,7 +911,7 @@
   <race name="goblin" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="40" maintenance="10" weight="600" capacity="440" speed="1.000000" hp="16" damage="1d5" unarmedattack="-2" unarmeddefense="0" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="initfamiliar" value="oldfamiliars"/>
-    <function name="itemdrop" value="goblinspoil"/>
+    <function name="itemdrop" value="defaultdrops"/>
     <skill name="sk_alchemy" modifier="1"/>
     <skill name="sk_mining" modifier="1"/>
     <skill name="sk_building" modifier="1"/>
@@ -1135,7 +1135,7 @@
   </race>
   <race name="snotling" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="50" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="orcspoil"/>
+    <function name="itemdrop" value="defaultdrops"/>
     <skill name="sk_alchemy" modifier="1"/>
     <skill name="sk_mining" modifier="1"/>
     <skill name="sk_building" modifier="1"/>
@@ -1166,7 +1166,7 @@
 
   <race name="orc" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="50" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="orcspoil"/>
+    <function name="itemdrop" value="defaultdrops"/>
     <skill name="sk_alchemy" modifier="1"/>
     <skill name="sk_mining" modifier="1"/>
     <skill name="sk_building" modifier="1"/>
@@ -1196,7 +1196,7 @@
   </race>
   <race name="elf" magres="0.100000" maxaura="1.000000" regaura="1.250000" recruitcost="130" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="elfspoil"/>
+    <function name="itemdrop" value="defaultdrops"/>
     <skill name="sk_alchemy" modifier="-1"/>
     <skill name="sk_mining" modifier="-2"/>
     <skill name="sk_bow" modifier="2"/>
@@ -1223,7 +1223,7 @@
   </race>
   <race name="dwarf" magres="0.050000" maxaura="1.000000" regaura="0.500000" recruitcost="110" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="dwarfspoil"/>
+    <function name="itemdrop" value="defaultdrops"/>
     <skill name="sk_mining" modifier="2"/>
     <skill name="sk_bow" modifier="-1"/>
     <skill name="sk_building" modifier="2"/>

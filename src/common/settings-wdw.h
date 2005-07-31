@@ -48,6 +48,7 @@
 
 #undef  ALLIANCEJOIN
 
+#define SCORE_MODULE
 #undef DUNGEON_MODULE
 #undef MUSEUM_MODULE
 #undef ARENA_MODULE

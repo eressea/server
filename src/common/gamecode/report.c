@@ -1992,10 +1992,12 @@ report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * ad
 		}
 	}
 	rnl(F);
+#ifdef SCORE_MODULE
 	if (f->options & want(O_SCORE) && f->age > DISPLAYSCORE) {
 		RENDER(f, buf, sizeof(buf), ("nr_score", "score average", f->score, average_score_of_age(f->age, f->age / 24 + 1)));
 		centre(F, buf, true);
 	}
+#endif
 	m = msg_message("nr_population", "population units", count_all(f), f->no_units);
 	nr_render(m, f->locale, buf, sizeof(buf), f);
 	msg_release(m);

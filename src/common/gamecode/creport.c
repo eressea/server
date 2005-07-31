@@ -1092,10 +1092,12 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
   building *b;
   ship *sh;
   unit *u;
-  int score = 0, avgscore = 0;
   const char * mailto = locale_string(f->locale, "mailto");
   region * first = firstregion(f), * last = lastregion(f);
   const attrib * a;
+#ifdef SCORE_MODULE
+  int score = 0, avgscore = 0;
+#endif
 
   /* must call this to get all the neighbour regions */
   get_seen_interval(seen, &first, &last);
@@ -1119,13 +1121,15 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 	fprintf(F, "PARTEI %d\n", f->no);
 	fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
 	fprintf(F, "%d;Optionen\n", f->options);
+#ifdef SCORE_MODULE
 	if (f->options & want(O_SCORE) && f->age>DISPLAYSCORE) {
     score = f->score;
     avgscore = average_score_of_age(f->age, f->age / 24 + 1);
   }
   fprintf(F, "%d;Punkte\n", score);
   fprintf(F, "%d;Punktedurchschnitt\n", avgscore);
-	{
+#endif
+  {
 		const char * zRace = rc_name(f->race, 1);
 		fprintf(F, "\"%s\";Typ\n", add_translation(zRace, LOC(f->locale, zRace)));
 	}

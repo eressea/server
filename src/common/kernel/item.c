@@ -2131,6 +2131,82 @@ static const char * names[] = {
 	"unit", "unit_p"
 };
 
+
+static int 
+item_score(item_t i)
+{
+  const luxury_type * ltype;
+
+  switch (i) {
+    case I_IRON:
+    case I_WOOD:
+    case I_STONE:
+    case I_HORSE:
+      return 10;
+    case I_MALLORN:
+      return 30;
+    case I_LAEN:
+      return 100;
+    case I_WAGON:
+      return 60;
+    case I_SHIELD:
+      return 30;
+    case I_LAENSHIELD:
+    case I_LAENSWORD:
+      return 400;
+    case I_LAENCHAIN:
+      return 1000;
+    case I_CHAIN_MAIL:
+      return 40;
+    case I_PLATE_ARMOR:
+      return 60;
+    case I_BALM:
+    case I_SPICES:
+    case I_JEWELERY:
+    case I_MYRRH:
+    case I_OIL:
+    case I_SILK:
+    case I_INCENSE:
+      ltype = resource2luxury(olditemtype[i]->rtype);
+      if (ltype) return ltype->price / 5;
+      return 0;
+    case I_AMULET_OF_HEALING:
+    case I_AMULET_OF_TRUE_SEEING:
+    case I_RING_OF_INVISIBILITY:
+    case I_RING_OF_POWER:
+    case I_CHASTITY_BELT:
+    case I_TROLLBELT:
+    case I_RING_OF_NIMBLEFINGER:
+    case I_FEENSTIEFEL:
+      return 6000;
+    case I_ANTIMAGICCRYSTAL:
+      return 2000;
+  }
+  return 0;
+}
+
+static void
+init_oldscores(void)
+{
+  item_t i;
+
+  for (i = 0;olditemtype[i];i++) {
+    item_type * itype = olditemtype[i];
+
+    if (itype->flags & ITF_WEAPON) {
+      int m;
+      if (itype->construction->materials==NULL) {
+        itype->score = 6000;
+      } else for (m=0;itype->construction->materials[m].number;++m) {
+        const resource_type * rtype = oldresourcetype[itype->construction->materials[m].type];
+        int score = rtype->itype?rtype->itype->score:5;
+        itype->score += 2*itype->construction->materials[m].number * score;
+      }
+    }
+    else itype->score = item_score(i);
+  }
+}
+
 void
 init_resources(void)
 {
@@ -2168,6 +2244,7 @@ init_resources(void)
 	init_olditems();
 	init_oldherbs();
 	init_oldpotions();
+  init_oldscores();
 }
 
 int
