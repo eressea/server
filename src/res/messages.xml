@@ -2136,7 +2136,7 @@
       <arg name="region" type="region"/>
     </type>
     <text locale="de">"In $region($region) erhoben sich die Toten aus den Gräbern."</text>
-    <text locale="de">"The dead rise from their graves in $region($region)."</text>
+    <text locale="en">"The dead rise from their graves in $region($region)."</text>
   </message>
   <message name="orcgrowth" section="events">
     <type>
