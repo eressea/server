@@ -3013,11 +3013,11 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
     for (itm=u->items; itm; itm=itm->next) {
       if (itm->type->rtype->atype) {
         struct armor * adata = malloc(sizeof(armor)), **aptr;
+        adata->atype = itm->type->rtype->atype;
+        adata->count = itm->number;
         for (aptr=&fig->armors;*aptr;aptr=&(*aptr)->next) {
           if (adata->atype->prot > (*aptr)->atype->prot) break;
         }
-        adata->count = itm->number;
-        adata->atype = itm->type->rtype->atype;
         adata->next = *aptr;
         *aptr = adata;
       }
@@ -3185,6 +3185,11 @@ free_fighter(fighter * fig)
 {
   while (fig->loot) {
     i_free(i_remove(&fig->loot, fig->loot));
+  }
+  while (fig->armors) {
+    armor * a = fig->armors;
+    fig->armors = a->next;
+    free(a);
   }
   free(fig->person);
   free(fig->weapons);
