@@ -112,31 +112,6 @@ extern weapon_type * oldweapontype[];
 static int missile_range[2] = {FIGHT_ROW, BEHIND_ROW};
 static int melee_range[2] = {FIGHT_ROW, FIGHT_ROW};
 
-typedef struct armor_type {
-  double penalty;
-  double magres;
-  int prot;
-  char shield;
-  char item;
-} armor_type;
-
-static armor_type armordata[AR_NONE + 1] =
-/* penalty; magres; prot; shield; item; */
-{
-#ifdef COMPATIBILITY
-	{-0.80, 5, 0, I_CLOAK_OF_INVULNERABILITY },
-#endif
-	{ 0.30, 0.00, 5, 0, I_PLATE_ARMOR},
-	{ 0.15, 0.00, 3, 0, I_CHAIN_MAIL},
-	{ 0.30, 0.00, 3, 0, I_RUSTY_CHAIN_MAIL},
-	{-0.15, 0.00, 1, 1, I_SHIELD},
-	{ 0.00, 0.00, 1, 1, I_RUSTY_SHIELD},
-	{-0.25, 0.30, 2, 1, I_LAENSHIELD},
-	{ 0.00, 0.30, 6, 0, I_LAENCHAIN},
-	{ 0.00, 0.00, 0, 0, I_SWORD},
-	{ 0.00, 0.00, 0, 0, I_SWORD}
-};
-
 #if 0
 /* not in use */
 static void
@@ -553,15 +528,15 @@ reportcasualties(battle * b, fighter * fig, int dead)
 
 
 static int
-contest(int skilldiff, armor_t ar, armor_t sh)
+contest(int skilldiff, const armor_type * ar, const armor_type * sh)
 {
 	int p, vw = BASE_CHANCE - TDIFF_CHANGE * skilldiff;
 	double mod = 1.0;
 
-	if (ar != AR_NONE)
-		mod *= (1 + armordata[ar].penalty);
-	if (sh != AR_NONE)
-		mod *= (1 + armordata[sh].penalty);
+	if (ar != NULL)
+		mod *= (1 + ar->penalty);
+	if (sh != NULL)
+		mod *= (1 + sh->penalty);
 	vw = (int)(100 - ((100 - vw) * mod));
 
 	do {
@@ -747,58 +722,33 @@ weapon_effskill(troop t, troop enemy, const weapon * w, boolean attacking, boole
 	return skill;
 }
 
-static char
-select_armor(troop t)
+static const armor_type *
+select_armor(troop t, boolean shield)
 {
-	armor_t a = 0;
+  unit * u = t.fighter->unit;
+	const armor * a = t.fighter->armors;
 	int geschuetzt = 0;
 
 	/* Drachen benutzen keine Rüstungen */
-	if (!(t.fighter->unit->race->battle_flags & BF_EQUIPMENT))
-		return AR_NONE;
+	if (!(u->race->battle_flags & BF_EQUIPMENT))
+		return NULL;
 
 	/* ... und Werwölfe auch nicht */
-	if(fval(t.fighter->unit, UFL_WERE)) {
-		return AR_NONE;
+	if (fval(u, UFL_WERE)) {
+		return NULL;
 	}
 
-	do {
-		if (armordata[a].shield == 0) {
-			geschuetzt += t.fighter->armor[a];
+	for (;a;a=a->next) {
+		if (a->atype->flags & ATF_SHIELD) {
+			geschuetzt += a->count;
 			if (geschuetzt > t.index)	/* unser Kandidat wird geschuetzt */
-				return a;
+				return a->atype;
 		}
-		++a;
 	}
-	while (a != AR_MAX);
 
-	return AR_NONE;
+	return NULL;
 }
 
-static char
-select_shield(troop t)
-{
-	armor_t a = 0;
-	int geschuetzt = 0;
-
-	/* Drachen benutzen keine Rüstungen */
-
-	if (!(t.fighter->unit->race->battle_flags & BF_EQUIPMENT))
-		return AR_NONE;
-
-	do {
-		if (armordata[a].shield == 1) {
-			geschuetzt += t.fighter->armor[a];
-			if (geschuetzt > t.index)	/* unser Kandidat wird
-										 * * * geschuetzt */
-				return a;
-		}
-		++a;
-	}
-	while (a != AR_MAX);
-
-	return AR_NONE;
-}
 
 /* Hier ist zu beachten, ob und wie sich Zauber und Artefakte, die
  * Rüstungschutz geben, addieren.
@@ -974,8 +924,8 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	int hp;
 
 	int ar, an, am;
-	int armor = select_armor(dt);
-	int shield = select_shield(dt);
+	const armor_type * armor = select_armor(dt, true);
+	const armor_type * shield = select_armor(dt, false);
 
 	const weapon_type *dwtype = NULL;
 	const weapon_type *awtype = NULL;
@@ -1015,8 +965,8 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	sd = weapon_effskill(dt, at, weapon, false, false);
 	if (weapon!=NULL) dwtype=weapon->type;
 
-	ar = armordata[armor].prot;
-	ar += armordata[shield].prot;
+	ar = armor->prot;
+	ar += shield->prot;
 
 	/* natürliche Rüstung */
 	an = du->race->armor;
@@ -1104,8 +1054,8 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 			if (dwp == WP_RUNESWORD) res -= 0.80;
 #endif
 			/* der Effekt von Laen steigt nicht linear */
-			if (armor == AR_EOGCHAIN) res *= (1-armordata[armor].magres);
-			if (shield == AR_EOGSHIELD) res *= (1-armordata[shield].magres);
+      if (fval(armor, ATF_LAEN)) res *= (1-armor->magres);
+			if (fval(shield, ATF_LAEN)) res *= (1-shield->magres);
 			if (dwtype) res *= (1-dwtype->magres);
 		}
 
@@ -1802,7 +1752,7 @@ hits(troop at, troop dt, weapon * awp)
 	fighter *af = at.fighter, *df = dt.fighter;
 	unit *au = af->unit, *du = df->unit;
 	char debugbuf[512];
-	armor_t armor, shield;
+  const armor_type * armor, * shield;
 	int skdiff = 0;
 	int dist = get_unitrow(af) + get_unitrow(df) - 1;
 	weapon * dwp = select_weapon(dt, false, dist>1);
@@ -1831,8 +1781,8 @@ hits(troop at, troop dt, weapon * awp)
 	skdiff = skilldiff(at, dt, dist);
 
 	/* Verteidiger bekommt eine Rüstung */
-	armor = select_armor(dt);
-	shield = select_shield(dt);
+	armor = select_armor(dt, true);
+	shield = select_armor(dt, false);
 	sprintf(debugbuf, "%.4s/%d [%6s/%d] attackiert %.4s/%d [%6s/%d] mit %d dist %d",
 			unitid(au), at.index,
 			(awp != NULL) ?
@@ -3059,9 +3009,20 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 		fig->elvenhorses = get_item(u, I_UNICORN);
 	}
 
-	for (i = 0; i != AR_MAX; ++i)
-		if (u->race->battle_flags & BF_EQUIPMENT)
-			fig->armor[i] = get_item(u, armordata[i].item);
+  if (u->race->battle_flags & BF_EQUIPMENT) {
+    for (itm=u->items; itm; itm=itm->next) {
+      if (itm->type->rtype->atype) {
+        struct armor * adata = malloc(sizeof(armor)), **aptr;
+        for (aptr=&fig->armors;*aptr;aptr=&(*aptr)->next) {
+          if (adata->atype->prot > (*aptr)->atype->prot) break;
+        }
+        adata->count = itm->number;
+        adata->atype = itm->type->rtype->atype;
+        adata->next = *aptr;
+        *aptr = adata;
+      }
+    }
+  }
 
 
 	/* Jetzt muß noch geschaut werden, wo die Einheit die jeweils besten
@@ -3962,41 +3923,3 @@ do_battle(void)
     }
   }
 }
-
-int
-nb_armor(const unit *u, int index)
-{
-  int a, av = 0;
-  int geschuetzt = 0;
-
-  if (!(u->race->battle_flags & BF_EQUIPMENT)) return AR_NONE;
-
-  /* Normale Rüstung */
-
-  a = 0;
-  do {
-    if (armordata[a].shield == 0) {
-      geschuetzt += get_item(u, armordata[a].item);
-      if (geschuetzt > index)
-        av += armordata[a].prot;
-    }
-    ++a;
-  }
-  while (a != AR_MAX);
-
-  /* Schild */
-
-  a = 0;
-  do {
-    if (armordata[a].shield == 1) {
-      geschuetzt += get_item(u, armordata[a].item);
-      if (geschuetzt > index)
-        av += armordata[a].prot;
-    }
-    ++a;
-  }
-  while (a != AR_MAX);
-
-  return av;
-}
-

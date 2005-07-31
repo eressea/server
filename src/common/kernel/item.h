@@ -40,12 +40,6 @@ typedef struct item {
 #define RTF_DYNAMIC  (1<<3) /* dynamic type, must be saved */
 #define RTF_POOLED   (1<<4) /* resource is available in pool */
 
-#undef AT_ITYPE /* should resource_type use an attribute for items ? */
-#undef AT_HTYPE /* should resource_type use an attribute for herbs ? */
-#undef AT_PTYPE /* should resource_type use an attribute for potions ? */
-#undef AT_LTYPE /* should resource_type use an attribute for luxuries ? */
-#undef AT_WTYPE /* should resource_type use an attribute for weapons ? */
-
 /* flags for resource_type::name() */
 #define NMF_PLURAL     0x01
 #define NMF_APPEARANCE 0x02
@@ -66,21 +60,12 @@ typedef struct resource_type {
 	struct attrib * attribs;
 	struct resource_type * next;
 	unsigned int hashkey;
-#ifndef AT_ITYPE
 	struct item_type * itype;
-#endif
-#ifndef AT_HTYPE
 	struct herb_type * htype;
-#endif
-#ifndef AT_PTYPE
 	struct potion_type * ptype;
-#endif
-#ifndef AT_LTYPE
 	struct luxury_type * ltype;
-#endif
-#ifndef AT_WTYPE
 	struct weapon_type * wtype;
-#endif
+  struct armor_type * atype;
 } resource_type;
 extern resource_type * resourcetypes;
 extern const char* resourcename(const resource_type * rtype, int flags);
@@ -184,6 +169,18 @@ typedef struct weapon_mod {
   struct race_list * races;
 } weapon_mod;
 
+#define ATF_NONE   0x00
+#define ATF_SHIELD 0x01
+#define ATF_LAEN   0x02
+
+typedef struct armor_type {
+  const item_type * itype;
+  double penalty;
+  double magres;
+  int prot;
+  unsigned int flags;
+} armor_type;
+
 #define WTF_NONE         0x00
 #define WTF_MISSILE      0x01
 #define WTF_MAGICAL      0x02
@@ -205,10 +202,7 @@ typedef struct weapon_type {
 	weapon_mod * modifiers;
 	/* --- functions --- */
 	boolean (*attack)(const struct troop *, int *deaths, int row);
-	/* --- pointers --- */
-	struct weapon_type * next;
 } weapon_type;
-extern weapon_type * weapontypes;
 
 extern void rt_register(resource_type * it);
 extern resource_type * rt_find(const char * name);
@@ -216,7 +210,6 @@ extern item_type * it_find(const char * name);
 extern herb_type * ht_find(const char * name);
 extern luxury_type * lt_find(const char * name);
 extern potion_type * pt_find(const char * name);
-extern weapon_type * wt_find(const char * name);
 
 extern void it_register(item_type * it);
 extern void wt_register(weapon_type * wt);
@@ -251,6 +244,7 @@ extern resource_type * new_resourcetype(const char ** names, const char ** appea
 extern item_type * new_itemtype(resource_type * rtype, int iflags, int weight, int capacity);
 extern luxury_type * new_luxurytype(item_type * itype, int price);
 extern weapon_type * new_weapontype(item_type * itype, int wflags, double magres, const char* damage[], int offmod, int defmod, int reload, skill_t sk, int minskill);
+extern armor_type * new_armortype(item_type * itype, double penalty, double magres, int prot, unsigned int flags);
 extern potion_type * new_potiontype(item_type * itype, int level);
 extern herb_type * new_herbtype(item_type * itype, terrain_t terrain);
 

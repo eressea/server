@@ -264,6 +264,57 @@ attack_catapult(const troop * at, int * casualties, int row)
 	return false; /* keine weitren attacken */
 }
 
+enum {
+#ifdef COMPATIBILITY
+  AR_MAGICAL,
+#endif
+  AR_PLATE,
+  AR_CHAIN,
+  AR_RUSTY_CHAIN,
+  AR_SHIELD,
+  AR_RUSTY_SHIELD,
+  AR_EOGSHIELD,
+  AR_EOGCHAIN,
+  AR_MAX
+};
+
+typedef struct armordata {
+  double penalty;
+  double magres;
+  int prot;
+  boolean shield;
+  item_t item;
+} armordata;
+
+static armordata armortable[] =
+/* penalty; magres; prot; shield; item; */
+{
+#ifdef COMPATIBILITY
+  {-0.80, 5, 0, I_CLOAK_OF_INVULNERABILITY },
+#endif
+  { 0.30, 0.00, 5, 0, I_PLATE_ARMOR},
+  { 0.15, 0.00, 3, 0, I_CHAIN_MAIL},
+  { 0.30, 0.00, 3, 0, I_RUSTY_CHAIN_MAIL},
+  {-0.15, 0.00, 1, 1, I_SHIELD},
+  { 0.00, 0.00, 1, 1, I_RUSTY_SHIELD},
+  {-0.25, 0.30, 2, 1, I_LAENSHIELD},
+  { 0.00, 0.30, 6, 0, I_LAENCHAIN},
+  { 0.00, 0.00, 0, 0, MAX_ITEMS }
+};
+static void
+init_oldarmor(void)
+{
+  armordata * ad = armortable;
+  for (;ad->item!=MAX_ITEMS;++ad) {
+    item_type * itype = olditemtype[ad->item];
+    unsigned int flags = 0;
+    
+    if (ad->shield) flags |= ATF_SHIELD;
+    if (ad->item==I_LAENSHIELD) flags |= ATF_LAEN;
+    if (ad->item==I_LAENCHAIN) flags |= ATF_LAEN;
+    new_armortype(itype, ad->penalty, ad->magres, ad->prot, flags);
+  }
+}
 
 static void
 init_oldweapons(void)
@@ -327,4 +378,5 @@ void
 init_weapons(void)
 {
 	init_oldweapons();
+  init_oldarmor();
 }

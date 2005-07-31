@@ -651,8 +651,36 @@ chaosfactor(region * r)
 	return ((double) a->data.i / 1000.0);
 }
 
+
 static int
-damage_unit(unit *u, const char *dam, boolean armor, boolean magic)
+nb_armor(const unit *u, int index)
+{
+  const item * itm;
+  int av = 0;
+  int s = 0, a = 0;
+
+  if (!(u->race->battle_flags & BF_EQUIPMENT)) return 0;
+
+  /* Normale Rüstung */
+
+  for (itm=u->items;itm;itm=itm->next) {
+    const armor_type * atype = itm->type->rtype->atype;
+    if (atype!=NULL) {
+      int * schutz = &a;
+      if (atype->flags & ATF_SHIELD) schutz = &s;
+      if (*schutz <= index) {
+        *schutz += itm->number;
+        if (*schutz > index) {
+          av += atype->prot;
+        }
+      }
+    }
+  }
+  return av;
+}
+
+static int
+damage_unit(unit *u, const char *dam, boolean physical, boolean magic)
 {
   int *hp = malloc(u->number * sizeof(int));
   int   h;
@@ -669,7 +697,7 @@ damage_unit(unit *u, const char *dam, boolean armor, boolean magic)
   for (i=0; i<u->number; i++) {
     int damage = dice_rand(dam);
     if (magic) damage = (int)(damage * (1.0 - magic_resistance(u)));
-    if (armor) damage -= nb_armor(u, i);
+    if (physical) damage -= nb_armor(u, i);
     hp[i] -= damage;
   }
 

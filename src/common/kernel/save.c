@@ -1130,7 +1130,7 @@ readunit(FILE * F)
           log_error(("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT));
         }
       } else if (n==MAXORDERS) {
-        log_error(("%s had %d or more orders\n", unitname(u), MAXPERSISTENT));
+        log_error(("%s had %d or more orders\n", unitname(u), MAXORDERS));
       }
     }
 		freadstr(F, buf, sizeof(buf));

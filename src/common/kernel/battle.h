@@ -119,26 +119,16 @@ extern "C" {
 #define FIG_ATTACKED   1
 #define FIG_NOLOOT     2
 
-  typedef unsigned char armor_t;
-  enum {
-#ifdef COMPATIBILITY
-    AR_MAGICAL,
-#endif
-    AR_PLATE,
-    AR_CHAIN,
-    AR_RUSTY_CHAIN,
-    AR_SHIELD,
-    AR_RUSTY_SHIELD,
-    AR_EOGSHIELD,
-    AR_EOGCHAIN,
-    AR_MAX,
-    AR_NONE
-  };
-
   typedef struct troop {
     struct fighter *fighter;
     int index;
   } troop;
+
+  typedef struct armor {
+    struct armor * next;
+    const struct armor_type * atype;
+    int count;
+  } armor;
 
   typedef struct fighter {
     struct side *side;
@@ -146,7 +136,7 @@ extern "C" {
     struct building *building;        /* Gebäude, in dem die Einheit evtl. steht */
     status_t status;           /* Kampfstatus */
     struct weapon * weapons;
-    int armor[AR_MAX];         /* Anzahl Rüstungen jeden Typs */
+    struct armor *armors;         /* Anzahl Rüstungen jeden Typs */
     int alive;                 /* Anzahl der noch nicht Toten in der Einheit */
     int fighting;              /* Anzahl der Kämpfer in der aktuellen Runde */
     int removed;               /* Anzahl Kaempfer, die nicht tot sind, aber
@@ -214,7 +204,6 @@ extern "C" {
   extern void do_battle(void);
 
   /* for combar spells and special attacks */
-  extern int nb_armor(const struct unit *u, int index);
   extern troop select_enemy(struct battle * b, struct fighter * af, int minrow, int maxrow, boolean advance);
   extern int count_enemies(struct battle * b, struct side * as, int minrow, int maxrow, boolean advance);
   extern boolean terminate(troop dt, troop at, int type, const char *damage, boolean missile);

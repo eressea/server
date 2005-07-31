@@ -528,6 +528,23 @@ race_compat(void)
   }
 }
 
+static armor_type *
+xml_readarmor(xmlXPathContextPtr xpath, item_type * itype)
+{
+  xmlNodePtr node = xpath->node;
+  armor_type * atype = NULL;
+  unsigned int flags = ATF_NONE;
+  int ac = xml_ivalue(node, "ac", 0);
+  double penalty = xml_fvalue(node, "penalty", 0.0);
+  double magres = xml_fvalue(node, "magres", 0.0);
+
+  if (xml_bvalue(node, "laen", false)) flags |= ATF_LAEN;
+  if (xml_bvalue(node, "shield", false)) flags |= ATF_SHIELD;
+
+  atype = new_armortype(itype, penalty, magres, ac, flags);
+  return atype;
+}
+
 static weapon_type *
 xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
 {
@@ -659,6 +676,17 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     itype->flags |= ITF_WEAPON;
     xpath->node = result->nodesetval->nodeTab[0];
     rtype->wtype = xml_readweapon(xpath, itype);
+  }
+  xmlXPathFreeObject(result);
+
+  /* reading item/armor */
+  xpath->node = node;
+  result = xmlXPathEvalExpression(BAD_CAST "armor", xpath);
+  assert(result->nodesetval->nodeNr<=1);
+  if (result->nodesetval->nodeNr!=0) {
+    itype->flags |= ITF_WEAPON;
+    xpath->node = result->nodesetval->nodeTab[0];
+    rtype->atype = xml_readarmor(xpath, itype);
   }
   xmlXPathFreeObject(result);
 

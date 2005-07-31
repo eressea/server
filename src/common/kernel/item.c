@@ -49,29 +49,12 @@
 #include <string.h>
 
 resource_type * resourcetypes;
-weapon_type * weapontypes;
 luxury_type * luxurytypes;
 potion_type * potiontypes;
 herb_type * herbtypes;
 
 #define IMAXHASH 127
 static item_type * itemtypes[IMAXHASH];
-
-#ifdef AT_PTYPE
-static attrib_type at_ptype = { "potion_type" };
-#endif
-#ifdef AT_WTYPE
-static attrib_type at_wtype = { "weapon_type" };
-#endif
-#ifdef AT_LTYPE
-static attrib_type at_ltype = { "luxury_type" };
-#endif
-#ifdef AT_ITYPE
-static attrib_type at_itype = { "item_type" };
-#endif
-#ifdef AT_HTYPE
-static attrib_type at_htype = { "herb_type" };
-#endif
 
 static int
 res_changeaura(unit * u, const resource_type * rtype, int delta)
@@ -185,11 +168,7 @@ it_register(item_type * itype)
 	item_type ** p_itype = &itemtypes[key];
 	while (*p_itype && *p_itype != itype) p_itype = &(*p_itype)->next;
 	if (*p_itype==NULL) {
-#ifdef AT_ITYPE
-		a_add(&itype->rtype->attribs, a_new(&at_itype))->data.v = (void*) itype;
-#else
 		itype->rtype->itype = itype;
-#endif
 		*p_itype = itype;
 		rt_register(itype->rtype);
 	}
@@ -219,11 +198,7 @@ new_itemtype(resource_type * rtype,
 static void
 lt_register(luxury_type * ltype)
 {
-#ifdef AT_LTYPE
-	a_add(&ltype->itype->rtype->attribs, a_new(&at_ltype))->data.v = (void*) ltype;
-#else
 	ltype->itype->rtype->ltype = ltype;
-#endif
 	ltype->next = luxurytypes;
 	luxurytypes = ltype;
 }
@@ -242,18 +217,6 @@ new_luxurytype(item_type * itype, int price)
 	lt_register(ltype);
 
 	return ltype;
-}
-
-void
-wt_register(weapon_type * wtype)
-{
-#ifdef AT_WTYPE
-	a_add(&wtype->itype->rtype->attribs, a_new(&at_wtype))->data.v = (void*) wtype;
-#else
-	wtype->itype->rtype->wtype = wtype;
-#endif
-	wtype->next = weapontypes;
-	weapontypes = wtype;
 }
 
 weapon_type *
@@ -278,20 +241,35 @@ new_weapontype(item_type * itype,
 	wtype->offmod = offmod;
 	wtype->reload = reload;
 	wtype->skill = sk;
-	wt_register(wtype);
+	itype->rtype->wtype = wtype;
 
 	return wtype;
 }
 
 
+armor_type *
+new_armortype(item_type * itype, double penalty, double magres, int prot, unsigned int flags)
+{
+  armor_type * atype;
+
+  assert(itype->rtype->atype==NULL);
+
+  atype = calloc(sizeof(armor_type), 1);
+
+  atype->itype = itype;
+  atype->penalty = penalty;
+  atype->magres = magres;
+  atype->prot = prot;
+  atype->flags = flags;
+  itype->rtype->atype = atype;
+
+  return atype;
+}
+
 static void
 pt_register(potion_type * ptype)
 {
-#ifdef AT_PTYPE
-	a_add(&ptype->itype->rtype->attribs, a_new(&at_ptype))->data.v = (void*) ptype;
-#else
 	ptype->itype->rtype->ptype = ptype;
-#endif
 	ptype->next = potiontypes;
 	potiontypes = ptype;
 }
@@ -317,11 +295,7 @@ new_potiontype(item_type * itype,
 static void
 ht_register(herb_type * htype)
 {
-#ifdef AT_HTYPE
-	a_add(&htype->itype->rtype->attribs, a_new(&at_htype))->data.v = (void*) htype;
-#else
 	htype->itype->rtype->htype = htype;
-#endif
 	htype->next = herbtypes;
 	herbtypes = htype;
 }
@@ -365,36 +339,18 @@ item2resource(const item_type * itype)
 const item_type *
 resource2item(const resource_type * rtype)
 {
-#ifdef AT_ITYPE
-	attrib * a = a_find(rtype->attribs, &at_itype);
-	if (a) return (const item_type *)a->data.v;
-	return NULL;
-#else
 	return rtype->itype;
-#endif
 }
 
 const herb_type *
 resource2herb(const resource_type * rtype)
 {
-#ifdef AT_HTYPE
-	attrib * a = a_find(rtype->attribs, &at_htype);
-	if (a) return (const herb_type *)a->data.v;
-	return NULL;
-#else
 	return rtype->htype;
-#endif
 }
 
 const weapon_type *
 resource2weapon(const resource_type * rtype) {
-#ifdef AT_WTYPE
-	attrib * a = a_find(rtype->attribs, &at_wtype);
-	if (a) return (const weapon_type *)a->data.v;
-	return NULL;
-#else
 	return rtype->wtype;
-#endif
 }
 
 const luxury_type *

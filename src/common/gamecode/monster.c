@@ -82,13 +82,13 @@ reduce_weight(unit * u)
     change_resource(u, R_HORSE, - min(horses,(u->number*2)));
   }
 
-  /* 1. get rid of anything that isn't silver or really lightweight */
+  /* 1. get rid of anything that isn't silver or really lightweight or helpful in combat */
   while (capacity>0 && *itmp!=NULL) {
     item * itm = *itmp;
     const item_type * itype = itm->type;
     weight += itm->number*itype->weight;
     if (weight>capacity) {
-      if (itype->weight>=10) {
+      if (itype->weight>=10 && itype->rtype->wtype==0 && itype->rtype->atype==0) {
         if (itype->capacity < itype->weight) {
           int reduce = min(itm->number, -((capacity-weight)/itype->weight));
           give_item(reduce, itm->type, u, NULL, NULL);
