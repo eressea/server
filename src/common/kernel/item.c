@@ -2429,4 +2429,7 @@ register_resources(void)
   register_function((pf_generic)use_snowball, "usesnowball");
 
   register_function((pf_generic)give_horses, "givehorses");
+
+  /* make sure noone has deleted an I_ tpe without deleting the R_ type that goes with it! */
+  assert((int)I_SACK_OF_CONSERVATION == (int)R_SACK_OF_CONSERVATION);
 }
