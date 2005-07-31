@@ -2121,6 +2121,7 @@
       <arg name="string" type="string"/>
     </type>
     <text locale="de">"$string"</text>
+    <text locale="en">"$string"</text>
   </message>
   <message name="entrise" section="events">
     <type>
