@@ -120,7 +120,7 @@ score(void)
 			}
 			f->score += get_money(u) / 50;
 			for (itm=u->items; itm; itm=itm->next) {
-        itemscore +=  itm->number * itm->type->score;
+        itemscore += itm->number * itm->type->score;
 			}
       f->score += itemscore / 10;
 

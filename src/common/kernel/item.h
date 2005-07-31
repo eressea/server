@@ -265,7 +265,6 @@ typedef struct t_item {
 	const char *name[4];
 	/* [0]: Einzahl für eigene; [1]: Mehrzahl für eigene;
 	 * [2]: Einzahl für Fremde; [3]: Mehrzahl für Fremde */
-	int gr_geschlecht;
 	item_t typ;
 	skill_t skill;
 	int minskill;
@@ -275,12 +274,6 @@ typedef struct t_item {
 	unsigned int flags;
 	void (*benutze_funktion) (struct region *, struct unit *, int amount, struct order *);
 } t_item;
-
-enum {
-	G_M,
-	G_F,
-	G_N
-};
 
 enum {
 	I_IRON,						/* 0 */
@@ -329,8 +322,6 @@ enum {
 	I_GREATSWORD,
 	I_AXE,
 	I_LAENSWORD,
-	I_LAENSHIELD,
-	I_LAENCHAIN,
 	I_LAEN,
 	I_SHIELD,
 	I_LANCE,

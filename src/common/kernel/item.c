@@ -868,347 +868,339 @@ static t_item itemdata[MAXITEMS] = {
 	/* name[4]; typ; sk; minskill; material[6]; gewicht; preis;
 	 * benutze_funktion; */
 	{			/* I_IRON */
-		{"Eisen", "Eisen", "Eisen", "Eisen"}, G_N,
+		{"Eisen", "Eisen", "Eisen", "Eisen"},
 		IS_RESOURCE, SK_MINING, 1, {0, 0, 0, 0, 0, 0}, 500, 0, FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_WOOD */
-		{"Holz", "Holz", "Holz", "Holz"}, G_N,
+		{"Holz", "Holz", "Holz", "Holz"},
 		IS_RESOURCE, SK_LUMBERJACK, 1, {0, 0, 0, 0, 0, 0}, 500, 0, FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_STONE */
-		{"Stein", "Steine", "Stein", "Steine"}, G_M,
+		{"Stein", "Steine", "Stein", "Steine"},
 		IS_RESOURCE, SK_QUARRYING, 1, {0, 0, 0, 0, 0, 0}, 6000, 0, FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_HORSE */
-		{"Pferd", "Pferde", "Pferd", "Pferde"}, G_N,
+		{"Pferd", "Pferde", "Pferd", "Pferde"},
 		IS_RESOURCE, SK_HORSE_TRAINING, 1, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_MOUNT | FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG, NULL
 	},
 	{			/* I_WAGON */
-		{"Wagen", "Wagen", "Wagen", "Wagen"}, G_M,
+		{"Wagen", "Wagen", "Wagen", "Wagen"},
 		IS_PRODUCT, SK_CARTMAKER, 1, {0, 5, 0, 0, 0, 0}, 4000, 0, FL_ITEM_NOTINBAG, NULL
 	},
 	{			/* I_CATAPULT */
-		{"Katapult", "Katapulte", "Katapult", "Katapulte"}, G_N,
+		{"Katapult", "Katapulte", "Katapult", "Katapulte"},
 		IS_PRODUCT, SK_CARTMAKER, 5, {0, 10, 0, 0, 0, 0}, 10000, 0, FL_ITEM_NOTINBAG, NULL
 	},
 	{			/* I_SWORD */
-		{"Schwert", "Schwerter", "Schwert", "Schwerter"}, G_N,
+		{"Schwert", "Schwerter", "Schwert", "Schwerter"},
 		IS_PRODUCT, SK_WEAPONSMITH, 3, {1, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_SPEAR */
-		{"Speer", "Speere", "Speer", "Speere"}, G_M,
+		{"Speer", "Speere", "Speer", "Speere"},
 		IS_PRODUCT, SK_WEAPONSMITH, 2, {0, 1, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_CROSSBOW */
-		{"Armbrust", "Armbrüste", "Armbrust", "Armbrüste"}, G_F,
+		{"Armbrust", "Armbrüste", "Armbrust", "Armbrüste"},
 		IS_PRODUCT, SK_WEAPONSMITH, 3, {0, 1, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_LONGBOW */
-		{"Bogen", "Bögen", "Bogen", "Bögen"}, G_M,
+		{"Bogen", "Bögen", "Bogen", "Bögen"},
 		IS_PRODUCT, SK_WEAPONSMITH, 2, {0, 1, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_CHAIN_MAIL */
-		{"Kettenhemd", "Kettenhemden", "Kettenhemd", "Kettenhemden"}, G_N,
+		{"Kettenhemd", "Kettenhemden", "Kettenhemd", "Kettenhemden"},
 		IS_PRODUCT, SK_ARMORER, 3, {3, 0, 0, 0, 0, 0}, 200, 0, 0, NULL
 	},
 	{			/* I_PLATE_ARMOR */
-		{"Plattenpanzer", "Plattenpanzer", "Plattenpanzer", "Plattenpanzer"}, G_M,
+		{"Plattenpanzer", "Plattenpanzer", "Plattenpanzer", "Plattenpanzer"},
 		IS_PRODUCT, SK_ARMORER, 4, {5, 0, 0, 0, 0, 0}, 400, 0, 0, NULL
 	},
 	{			/* I_BALM */
-		{"Balsam", "Balsam", "Balsam", "Balsam"}, G_N,
+		{"Balsam", "Balsam", "Balsam", "Balsam"},
 		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 200, 4, 0, NULL
 	},
 	{			/* I_SPICES */
-		{"Gewürz", "Gewürz", "Gewürz", "Gewürz"}, G_N,
+		{"Gewürz", "Gewürz", "Gewürz", "Gewürz"},
 		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 200, 5, 0, NULL
 	},
 	{			/* I_JEWELERY */
-		{"Juwel", "Juwelen", "Juwel", "Juwelen"}, G_N,
+		{"Juwel", "Juwelen", "Juwel", "Juwelen"},
 		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 7, 0, NULL
 	},
 	{			/* I_MYRRH */
-		{"Myrrhe", "Myrrhe", "Myrrhe", "Myrrhe"}, G_F,
+		{"Myrrhe", "Myrrhe", "Myrrhe", "Myrrhe"},
 		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 200, 5, 0, NULL
 	},
 	{			/* I_OIL */
-		{"Öl", "Öl", "Öl", "Öl"}, G_N,
+		{"Öl", "Öl", "Öl", "Öl"},
 		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 300, 3, 0, NULL
 	},
 	{			/* I_SILK */
-		{"Seide", "Seide", "Seide", "Seide"}, G_F,
+		{"Seide", "Seide", "Seide", "Seide"},
 		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 300, 6, 0, NULL
 	},
 	{			/* I_INCENSE */
-		{"Weihrauch", "Weihrauch", "Weihrauch", "Weihrauch"}, G_M,
+		{"Weihrauch", "Weihrauch", "Weihrauch", "Weihrauch"},
 		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 200, 4, 0, NULL
 	},
 #ifdef COMPATIBILITY
 	{			/* I_AMULET_OF_DARKNESS */
-		{"Amulett der Dunkelheit", "Amulette der Dunkelheit", "Amulett", "Amulette"}, G_N,
+		{"Amulett der Dunkelheit", "Amulette der Dunkelheit", "Amulett", "Amulette"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_AMULET_OF_DEATH */
-		{"Amulett des Todes", "Amulette des Todes", "Amulett", "Amulette"}, G_N,
+		{"Amulett des Todes", "Amulette des Todes", "Amulett", "Amulette"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 #endif
 	{			/* I_AMULET_OF_HEALING */
-		{"Amulett der Heilung", "Amulette der Heilung", "Amulett", "Amulette"}, G_N,
+		{"Amulett der Heilung", "Amulette der Heilung", "Amulett", "Amulette"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_AMULET_OF_TRUE_SEEING 22 */
 		{"Amulett des wahren Sehens", "Amulette des wahren Sehens", "Amulett",
-		"Amulette"}, G_N,
+		"Amulette"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 #ifdef COMPATIBILITY
 	{			/* I_CLOAK_OF_INVULNERABILITY 23 */
 		{"Mantel der Unverletzlichkeit", "Mäntel der Unverletzlichkeit",
-			"Kettenhemd", "Kettenhemden"}, G_M,
+			"Kettenhemd", "Kettenhemden"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 #endif
 	{			/* I_RING_OF_INVISIBILITY 24 */
-		{"Ring der Unsichtbarkeit", "Ringe der Unsichtbarkeit", "", ""}, G_M,
+		{"Ring der Unsichtbarkeit", "Ringe der Unsichtbarkeit", "", ""},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_RING_OF_POWER 25 */
-		{"Ring der Macht", "Ringe der Macht", "", ""}, G_M,
+		{"Ring der Macht", "Ringe der Macht", "", ""},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_FIRESWORD */
 		{"Flammenschwert", "Flammenschwerter",
-		 "Flammenschwert", "Flammenschwerter"}, G_N,
+		 "Flammenschwert", "Flammenschwerter"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 #ifdef COMPATIBILITY
 	{			/* I_SHIELDSTONE 27 */
-		{"Schildstein", "Schildsteine", "Amulett", "Amulette"}, G_M,
+		{"Schildstein", "Schildsteine", "Amulett", "Amulette"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_STAFF_OF_FIRE 28 */
 		{"Zauberstab des Feuers", "Zauberstäbe des Feuers", "Zauberstab",
-		"Zauberstäbe"}, G_M,
+		"Zauberstäbe"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_STAFF_OF_LIGHTNING 29 */
 		{"Zauberstab der Blitze", "Zauberstäbe der Blitze", "Zauberstab",
-		"Zauberstäbe"}, G_M,
+		"Zauberstäbe"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_WAND_OF_TELEPORTATION 30 */
 		{"Zauberstab der Teleportation", "Zauberstäbe der Teleportation",
-			"Zauberstab", "Zauberstäbe"}, G_M,
+			"Zauberstab", "Zauberstäbe"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_EYE_OF_HORAX 31 */
 		{"Kristallauge des Einhorns", "Kristallaugen des Einhorns",
-			"Kristallauge des Einhorns", "Kristallaugen des Einhorns"}, G_N,
+			"Kristallauge des Einhorns", "Kristallaugen des Einhorns"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_TELEPORTCRYSTAL 32 */
 		{"Kristall der Weiten Reise", "Kristalle der Weiten Reise",
-			"Kristall der Weiten Reise", "Kristalle der Weiten Reise"}, G_M,
+			"Kristall der Weiten Reise", "Kristalle der Weiten Reise"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 #endif
 	{			/* I_DRAGONHEAD 33 */
-		{"Drachenkopf", "Drachenköpfe", "Drachenkopf", "Drachenköpfe"}, G_M,
+		{"Drachenkopf", "Drachenköpfe", "Drachenkopf", "Drachenköpfe"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 500, 0, 0, NULL
 	},
 	{			/* I_CHASTITY_BELT 34 */
 		{"Amulett der Keuschheit", "Amulette der Keuschheit",
-			"Amulett", "Amulette"}, G_N,
+			"Amulett", "Amulette"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_GREATSWORD 35 */
-		{"Bihänder", "Bihänder", "Bihänder", "Bihänder"}, G_M,
+		{"Bihänder", "Bihänder", "Bihänder", "Bihänder"},
 		IS_PRODUCT, SK_WEAPONSMITH, 4, {2, 0, 0, 0, 0, 0}, 200, 0, 0, NULL
 	},
 	{			/* I_AXE 36 */
-		{"Kriegsaxt", "Kriegsäxte", "Kriegsaxt", "Kriegsäxte"}, G_F,
+		{"Kriegsaxt", "Kriegsäxte", "Kriegsaxt", "Kriegsäxte"},
 		IS_PRODUCT, SK_WEAPONSMITH, 3, {1, 1, 0, 0, 0, 0}, 200, 0, 0, NULL
 	},
 	{			/* I_LAENSWORD 38 */
-		{"Laenschwert", "Laenschwerter", "Laenschwert", "Laenschwerter"}, G_N,
+		{"Laenschwert", "Laenschwerter", "Laenschwert", "Laenschwerter"},
 		IS_PRODUCT, SK_WEAPONSMITH, 8, {0, 0, 0, 0, 1, 0}, 100, 0, 0, NULL
 	},
-	{			/* I_LAENSHIELD 39 */
-		{"Laenschild", "Laenschilde", "Laenschild", "Laenschilde"}, G_N,
-		IS_PRODUCT, SK_ARMORER, 7, {0, 0, 0, 0, 1, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_LAENCHAIN 40 */
-		{"Laenkettenhemd", "Laenkettenhemden", "Laenkettenhemd", "Laenkettenhemden"}, G_N,
-		IS_PRODUCT, SK_ARMORER, 9, {0, 0, 0, 0, 3, 0}, 100, 0, 0, NULL
-	},
 	{			/* I_LAEN 41 */
-		{"Laen", "Laen", "Laen", "Laen"}, G_N,
+		{"Laen", "Laen", "Laen", "Laen"},
 		IS_RESOURCE, SK_MINING, 7, {0, 0, 0, 0, 0, 0}, 200, 0, 0, NULL
 	},
 	{			/* I_SHIELD 42 */
-		{"Schild", "Schilde", "Schild", "Schilde"}, G_N,
+		{"Schild", "Schilde", "Schild", "Schilde"},
 		IS_PRODUCT, SK_ARMORER, 2, {1, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_LANCE 44 */
-		{"Lanze", "Lanzen", "Lanze", "Lanzen"}, G_F,
+		{"Lanze", "Lanzen", "Lanze", "Lanzen"},
 		IS_PRODUCT, SK_WEAPONSMITH, 2, {0, 2, 0, 0, 0, 0}, 200, 0, 0, NULL
 	},
 	{			/* I_MALLORN 45 */
-		{"Mallorn", "Mallorn", "Mallorn", "Mallorn"}, G_N,
+		{"Mallorn", "Mallorn", "Mallorn", "Mallorn"},
 		IS_RESOURCE, SK_LUMBERJACK, 2, {0, 0, 0, 0, 0, 0}, 500, 0, 0, NULL
 	},
 	{			/* I_KEKS 46 *//* Item für Questenzwecke */
-		{"Keks", "Kekse", "Keks", "Kekse"}, G_M,
+		{"Keks", "Kekse", "Keks", "Kekse"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_APFEL 47 *//* Item für Questenzwecke */
-		{"Apfel", "Äpfel", "Apfel", "Äpfel"}, G_M,
+		{"Apfel", "Äpfel", "Apfel", "Äpfel"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_NUSS 48 *//* Item für Questenzwecke */
-		{"Nuß", "Nüsse", "Nuß", "Nüsse"}, G_F,
+		{"Nuß", "Nüsse", "Nuß", "Nüsse"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_MANDELKERN 49 *//* Item für Questenzwecke */
-		{"Mandelkern", "Mandelkerne", "Mandelkern", "Mandelkerne"}, G_M,
+		{"Mandelkern", "Mandelkerne", "Mandelkern", "Mandelkerne"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 #ifdef COMPATIBILITY
 	{			/* I_STAB_DES_SCHICKSALS 53 */
 		{"Stab des Schicksals", "Stäbe des Schicksals",
-			"Stab des Schicksals", "Stäbe des Schicksals"}, G_M,
+			"Stab des Schicksals", "Stäbe des Schicksals"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_STAB_DER_VERDAMMNIS 54 */
 		{"Stab der Verdammnis", "Stäbe der Verdammnis",
-			"Stab der Verdammnis", "Stäbe der Verdammnis"}, G_M,
+			"Stab der Verdammnis", "Stäbe der Verdammnis"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_STAB_DES_TODES 55 */
 		{"Stab des Todes", "Stäbe des Todes",
-			"Stab des Todes", "Stäbe des Todes"}, G_M,
+			"Stab des Todes", "Stäbe des Todes"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_STAB_DES_CHAOS 56 */
 		{"Stab des Chaos", "Stäbe des Chaos",
-			"Stab des Chaos", "Stäbe des Chaos"}, G_M,
+			"Stab des Chaos", "Stäbe des Chaos"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_STECKEN_DER_MACHT 57 */
 		{"Stecken der Macht", "Stecken der Macht",
-			"Stecken der Macht", "Stecken der Macht"}, G_M,
+			"Stecken der Macht", "Stecken der Macht"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 #endif
 	{			/* I_AMULETT_DES_TREFFENS 58 */
 		{"Amulett des Treffens", "Amulette des Treffens",
-			"Amulett des Treffens", "Amulette des Treffens"}, G_N,
+			"Amulett des Treffens", "Amulette des Treffens"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_DRACHENBLUT 59 */
-		{"Drachenblut", "Drachenblut", "Drachenblut", "Drachenblut"}, G_N,
+		{"Drachenblut", "Drachenblut", "Drachenblut", "Drachenblut"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_FEENSTIEFEL 60 */
-		{"Feenstiefel", "Feenstiefel", "Feenstiefel", "Feenstiefel"}, G_M,
+		{"Feenstiefel", "Feenstiefel", "Feenstiefel", "Feenstiefel"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_BIRTHDAYAMULET 69 */
-		{"Katzenamulett", "Katzenamulette", "Amulett", "Amulette"}, G_N,
+		{"Katzenamulett", "Katzenamulette", "Amulett", "Amulette"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, &use_birthdayamulet
 	},
 	{			/* I_PEGASUS 60 */
-		{"Pegasus", "Pegasi", "Pegasus", "Pegasi" }, G_M,
+		{"Pegasus", "Pegasi", "Pegasus", "Pegasi" },
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_UNICORN 61 */
-		{"Elfenpferd", "Elfenpferde", "Elfenpferd", "Elfenpferde"}, G_N,
+		{"Elfenpferd", "Elfenpferde", "Elfenpferd", "Elfenpferde"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_DOLPHIN 62 */
-		{"Delphin", "Delphine", "Delphin", "Delphine"}, G_M,
+		{"Delphin", "Delphine", "Delphin", "Delphine"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
 	},
 	{			/* I_ANTIMAGICCRYSTAL 63 */
-		{"Antimagiekristall", "Antimagiekristalle", "Amulett", "Amulette"}, G_M,
+		{"Antimagiekristall", "Antimagiekristalle", "Amulett", "Amulette"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, &use_antimagiccrystal
 	},
 	{			/* I_RING_OF_NIMBLEFINGER 64 */
-		{"Ring der flinken Finger", "Ringe der flinken Finger", "", ""}, G_M,
+		{"Ring der flinken Finger", "Ringe der flinken Finger", "", ""},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_TROLLBELT 65 */
-		{"Gürtel der Trollstärke", "Gürtel der Trollstärke", "", ""}, G_M,
+		{"Gürtel der Trollstärke", "Gürtel der Trollstärke", "", ""},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
 	{			/* I_PRESSCARD 67 */
 		{"Akkredition des Xontormia-Expreß", "Akkreditionen des Xontormia-Expreß",
-		 "Akkredition des Xontormia-Expreß", "Akkreditionen des Xontormia-Expreß"}, G_F,
+		 "Akkredition des Xontormia-Expreß", "Akkreditionen des Xontormia-Expreß"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, FL_ITEM_CURSED, NULL
 	},
 	{			/* I_RUNESWORD 68 */
-		{"Runenschwert", "Runenschwerter", "Runenschwert", "Runenschwerter"}, G_N,
+		{"Runenschwert", "Runenschwerter", "Runenschwert", "Runenschwerter"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_AURAKULUM 69 */
-		{"Aurafocus", "Aurafocuse", "Amulett", "Amulette"}, G_M,
+		{"Aurafocus", "Aurafocuse", "Amulett", "Amulette"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_SEASERPENTHEAD 70 */
 		{"Seeschlangenkopf", "Seeschlangenköpfe",
-			"Seeschlangenkopf", "Seeschlangenköpfe"}, G_M,
+			"Seeschlangenkopf", "Seeschlangenköpfe"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 500, 0, 0, NULL
 	},
 	{			/* I_TACTICCRYSTAL 71 */
 		{"Traumauge", "Traumaugen",
-			"", ""}, G_N,
+			"", ""},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, &use_tacticcrystal
 	},
 	{			/* I_RING_OF_REGENERATION 72 */
 		{"Ring der Regeneration", "Ringe der Regeneration",
-			"", ""}, G_M,
+			"", ""},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_TOADSLIME 73 */
 		{"Tiegel mit Krötenschleim", "Tiegel mit Krötenschleim",
-			"", ""}, G_M,
+			"", ""},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{
-		{"Zauberbeutel", "Zauberbeutel", "Zauberbeutel", "Zauberbeutel"}, G_M,
+		{"Zauberbeutel", "Zauberbeutel", "Zauberbeutel", "Zauberbeutel"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, FL_ITEM_NOTINBAG|FL_ITEM_NOTLOST, NULL
 	},
 	{	/* I_RUSTY_SWORD */
-		{"Schartiges Schwert", "Schartige Schwerter", "Schartiges Schwert", "Schartige Schwerter"}, G_N,
+		{"Schartiges Schwert", "Schartige Schwerter", "Schartiges Schwert", "Schartige Schwerter"},
 		IS_PRODUCT, SK_WEAPONSMITH, 3, {1, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{	/* I_RUSTY_SHIELD 42 */
-		{"Rostiges Schild", "Rostige Schilde", "Rostiges Schild", "Rostige Schilde"}, G_N,
+		{"Rostiges Schild", "Rostige Schilde", "Rostiges Schild", "Rostige Schilde"},
 		IS_PRODUCT, SK_ARMORER, 2, {1, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_RUSTY_CHAIN_MAIL */
-		{"Rostiges Kettenhemd", "Rostige Kettenhemden", "Rostiges Kettenhemd", "Rostige Kettenhemden"}, G_N,
+		{"Rostiges Kettenhemd", "Rostige Kettenhemden", "Rostiges Kettenhemd", "Rostige Kettenhemden"},
 		IS_PRODUCT, SK_ARMORER, 3, {3, 0, 0, 0, 0, 0}, 200, 0, 0, NULL
 	},
 	{			/* I_SACK_OF_CONSERVATION */
-		{"Magischer Kräuterbeutel", "Magische Kräuterbeutel", "", ""}, G_M,
+		{"Magischer Kräuterbeutel", "Magische Kräuterbeutel", "", ""},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_SPHERE_OF_INVISIBILITY */
-		{"Sphäre der Unsichtbarkeit", "Sphären der Unsichtbarkeit", "", ""}, G_M,
+		{"Sphäre der Unsichtbarkeit", "Sphären der Unsichtbarkeit", "", ""},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_RUSTY_GREATSWORD */
-		{"Rostiger Zweihänder", "Rostige Zweihänder", "Rostiger Zweihänder", "Rostige Zweihänder"}, G_M,
+		{"Rostiger Zweihänder", "Rostige Zweihänder", "Rostiger Zweihänder", "Rostige Zweihänder"},
 		IS_PRODUCT, SK_WEAPONSMITH, 4, {2, 0, 0, 0, 0, 0}, 200, 0, 0, NULL
 	},
 	{			/* I_RUSTY_AXE */
-		{"Rostige Kriegsaxt", "Rostige Kriegsäxte", "Rostige Kriegsaxt", "Rostige Kriegsäxte"}, G_F,
+		{"Rostige Kriegsaxt", "Rostige Kriegsäxte", "Rostige Kriegsaxt", "Rostige Kriegsäxte"},
 		IS_PRODUCT, SK_WEAPONSMITH, 3, {1, 1, 0, 0, 0, 0}, 200, 0, 0, NULL
 	},
 	{			/* I_RUSTY_HALBERD */
-		{"Rostige Hellebarde", "Rostige Hellebarden", "Rostige Hellebarde", "Rostige Hellebarden"}, G_F,
+		{"Rostige Hellebarde", "Rostige Hellebarden", "Rostige Hellebarde", "Rostige Hellebarden"},
 		IS_PRODUCT, SK_WEAPONSMITH, 3, {1, 1, 0, 0, 0, 0}, 200, 0, 0, NULL
 	}
 };
@@ -2131,7 +2123,6 @@ static const char * names[] = {
 	"unit", "unit_p"
 };
 
-
 static int 
 item_score(item_t i)
 {
@@ -2151,11 +2142,8 @@ item_score(item_t i)
       return 60;
     case I_SHIELD:
       return 30;
-    case I_LAENSHIELD:
     case I_LAENSWORD:
       return 400;
-    case I_LAENCHAIN:
-      return 1000;
     case I_CHAIN_MAIL:
       return 40;
     case I_PLATE_ARMOR:
@@ -2192,18 +2180,7 @@ init_oldscores(void)
 
   for (i = 0;olditemtype[i];i++) {
     item_type * itype = olditemtype[i];
-
-    if (itype->flags & ITF_WEAPON) {
-      int m;
-      if (itype->construction->materials==NULL) {
-        itype->score = 6000;
-      } else for (m=0;itype->construction->materials[m].number;++m) {
-        const resource_type * rtype = oldresourcetype[itype->construction->materials[m].type];
-        int score = rtype->itype?rtype->itype->score:5;
-        itype->score += 2*itype->construction->materials[m].number * score;
-      }
-    }
-    else itype->score = item_score(i);
+    itype->score = item_score(i);
   }
 }
 

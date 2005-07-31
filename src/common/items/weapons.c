@@ -297,10 +297,9 @@ static armordata armortable[] =
   { 0.30, 0.00, 3, 0, I_RUSTY_CHAIN_MAIL},
   {-0.15, 0.00, 1, 1, I_SHIELD},
   { 0.00, 0.00, 1, 1, I_RUSTY_SHIELD},
-  {-0.25, 0.30, 2, 1, I_LAENSHIELD},
-  { 0.00, 0.30, 6, 0, I_LAENCHAIN},
   { 0.00, 0.00, 0, 0, MAX_ITEMS }
 };
+
 static void
 init_oldarmor(void)
 {
@@ -310,8 +309,6 @@ init_oldarmor(void)
     unsigned int flags = 0;
     
     if (ad->shield) flags |= ATF_SHIELD;
-    if (ad->item==I_LAENSHIELD) flags |= ATF_LAEN;
-    if (ad->item==I_LAENCHAIN) flags |= ATF_LAEN;
     new_armortype(itype, ad->penalty, ad->magres, ad->prot, flags);
   }
 }
@@ -324,6 +321,7 @@ init_oldweapons(void)
 		const char * damage[2];
 		item_type * itype = olditemtype[weapontable[w].item];
 		int minskill = 1, wflags = WTF_NONE;
+    int m;
 		weapon_mod * modifiers = NULL;
 		boolean (*attack)(const troop *, int * deaths, int row) = NULL;
 
@@ -365,7 +363,17 @@ init_oldweapons(void)
 		oldweapontype[w] = new_weapontype(itype, wflags, weapontable[w].magres, damage, weapontable[w].attmod, weapontable[w].defmod, weapontable[w].reload.time, weapontable[w].skill, minskill);
 		oldweapontype[w]->modifiers = modifiers;
 		oldweapontype[w]->attack = attack;
-	}
+
+#ifdef SCORE_MODULE
+    if (itype->construction->materials==NULL) {
+      itype->score = 6000;
+    } else for (m=0;itype->construction->materials[m].number;++m) {
+      const resource_type * rtype = oldresourcetype[itype->construction->materials[m].type];
+      int score = rtype->itype?rtype->itype->score:5;
+      itype->score = 2*itype->construction->materials[m].number * score;
+    }
+#endif
+  }
 }
 
 void
