@@ -627,8 +627,8 @@
     <type>
       <arg name="building" type="building"/>
     </type>
-    <text locale="de">"$building($building) hat diese Woche nicht funktioniert, da der Unterhalt nicht rechtzeitig gezahlt wurde."</text>
-    <text locale="en">"$building($building) did not function this week because upkeep could not be paid."</text>
+    <text locale="de">"$building($building) hat diese Woche nicht funktioniert, da zu Beginn der Woche der Unterhalt nicht gezahlt werden konnte."</text>
+    <text locale="en">"$building($building) was nonfunctional because upkeep could not be paid at the beginning of the week."</text>
   </message>
   <message name="icastle_dissolve" section="events">
     <type>
