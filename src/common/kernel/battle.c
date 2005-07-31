@@ -923,7 +923,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	side *ds = df->side;
 	int hp;
 
-	int ar, an, am;
+	int ar = 0, an, am;
 	const armor_type * armor = select_armor(dt, true);
 	const armor_type * shield = select_armor(dt, false);
 
@@ -965,7 +965,7 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 	sd = weapon_effskill(dt, at, weapon, false, false);
 	if (weapon!=NULL) dwtype=weapon->type;
 
-	if (armor) ar = armor->prot;
+	if (armor) ar += armor->prot;
 	if (shield) ar += shield->prot;
 
 	/* natürliche Rüstung */
