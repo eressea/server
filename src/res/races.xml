@@ -1126,6 +1126,7 @@
     <ai splitsize="6" killpeasants="yes" moverandom="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="move" value="moveswimming"/>
+    <function name="itemdrop" value="dragondrops"/>
     <skill name="sk_tactics" modifier="4"/>
     <attack type="4" damage="1d30"/>
     <attack type="4" damage="1d30"/>
