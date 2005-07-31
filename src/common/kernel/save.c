@@ -1817,12 +1817,10 @@ readgame(const char * filename, int backup)
   if (global.data_version >= GLOBAL_ATTRIB_VERSION) {
     a_read(F, &global.attribs);
   }
-#ifndef COMPATIBILITY
   if (global.data_version < ITEMTYPE_VERSION) {
     fprintf(stderr, "kann keine alten datenfiles einlesen");
     exit(-1);
   }
-#endif
   global.data_turn = turn = ri(F);
   ri(F); /* max_unique_id = */ 
   nextborder = ri(F);

@@ -3096,18 +3096,6 @@ make_summary(void)
 					s->ruestungen += get_item(u, I_CHAIN_MAIL);
 					s->ruestungen += get_item(u, I_PLATE_ARMOR);
 
-#ifdef COMPATIBILITY
-					s->ruestungen += get_item(u, I_CLOAK_OF_INVULNERABILITY);
-
-					s->artefakte += get_item(u, I_AMULET_OF_DARKNESS);
-					s->artefakte += get_item(u, I_AMULET_OF_HEALING);
-					s->artefakte += get_item(u, I_CLOAK_OF_INVULNERABILITY);
-					s->artefakte += get_item(u, I_SHIELDSTONE);
-					s->artefakte += get_item(u, I_STAFF_OF_FIRE);
-					s->artefakte += get_item(u, I_STAFF_OF_LIGHTNING);
-					s->artefakte += get_item(u, I_WAND_OF_TELEPORTATION);
-#endif
-
 					s->artefakte += get_item(u, I_AMULET_OF_TRUE_SEEING);
 					s->artefakte += get_item(u, I_RING_OF_INVISIBILITY);
 					s->artefakte += get_item(u, I_SPHERE_OF_INVISIBILITY);

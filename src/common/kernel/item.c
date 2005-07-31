@@ -943,16 +943,6 @@ static t_item itemdata[MAXITEMS] = {
 		{"Weihrauch", "Weihrauch", "Weihrauch", "Weihrauch"},
 		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 200, 4, 0, NULL
 	},
-#ifdef COMPATIBILITY
-	{			/* I_AMULET_OF_DARKNESS */
-		{"Amulett der Dunkelheit", "Amulette der Dunkelheit", "Amulett", "Amulette"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_AMULET_OF_DEATH */
-		{"Amulett des Todes", "Amulette des Todes", "Amulett", "Amulette"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-#endif
 	{			/* I_AMULET_OF_HEALING */
 		{"Amulett der Heilung", "Amulette der Heilung", "Amulett", "Amulette"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
@@ -962,13 +952,6 @@ static t_item itemdata[MAXITEMS] = {
 		"Amulette"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
-#ifdef COMPATIBILITY
-	{			/* I_CLOAK_OF_INVULNERABILITY 23 */
-		{"Mantel der Unverletzlichkeit", "Mäntel der Unverletzlichkeit",
-			"Kettenhemd", "Kettenhemden"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-#endif
 	{			/* I_RING_OF_INVISIBILITY 24 */
 		{"Ring der Unsichtbarkeit", "Ringe der Unsichtbarkeit", "", ""},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
@@ -982,37 +965,6 @@ static t_item itemdata[MAXITEMS] = {
 		 "Flammenschwert", "Flammenschwerter"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
-#ifdef COMPATIBILITY
-	{			/* I_SHIELDSTONE 27 */
-		{"Schildstein", "Schildsteine", "Amulett", "Amulette"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_STAFF_OF_FIRE 28 */
-		{"Zauberstab des Feuers", "Zauberstäbe des Feuers", "Zauberstab",
-		"Zauberstäbe"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_STAFF_OF_LIGHTNING 29 */
-		{"Zauberstab der Blitze", "Zauberstäbe der Blitze", "Zauberstab",
-		"Zauberstäbe"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_WAND_OF_TELEPORTATION 30 */
-		{"Zauberstab der Teleportation", "Zauberstäbe der Teleportation",
-			"Zauberstab", "Zauberstäbe"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_EYE_OF_HORAX 31 */
-		{"Kristallauge des Einhorns", "Kristallaugen des Einhorns",
-			"Kristallauge des Einhorns", "Kristallaugen des Einhorns"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_TELEPORTCRYSTAL 32 */
-		{"Kristall der Weiten Reise", "Kristalle der Weiten Reise",
-			"Kristall der Weiten Reise", "Kristalle der Weiten Reise"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-#endif
 	{			/* I_DRAGONHEAD 33 */
 		{"Drachenkopf", "Drachenköpfe", "Drachenkopf", "Drachenköpfe"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 500, 0, 0, NULL
@@ -1066,33 +1018,6 @@ static t_item itemdata[MAXITEMS] = {
 		{"Mandelkern", "Mandelkerne", "Mandelkern", "Mandelkerne"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
-#ifdef COMPATIBILITY
-	{			/* I_STAB_DES_SCHICKSALS 53 */
-		{"Stab des Schicksals", "Stäbe des Schicksals",
-			"Stab des Schicksals", "Stäbe des Schicksals"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_STAB_DER_VERDAMMNIS 54 */
-		{"Stab der Verdammnis", "Stäbe der Verdammnis",
-			"Stab der Verdammnis", "Stäbe der Verdammnis"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_STAB_DES_TODES 55 */
-		{"Stab des Todes", "Stäbe des Todes",
-			"Stab des Todes", "Stäbe des Todes"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_STAB_DES_CHAOS 56 */
-		{"Stab des Chaos", "Stäbe des Chaos",
-			"Stab des Chaos", "Stäbe des Chaos"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_STECKEN_DER_MACHT 57 */
-		{"Stecken der Macht", "Stecken der Macht",
-			"Stecken der Macht", "Stecken der Macht"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-#endif
 	{			/* I_AMULETT_DES_TREFFENS 58 */
 		{"Amulett des Treffens", "Amulette des Treffens",
 			"Amulett des Treffens", "Amulette des Treffens"},

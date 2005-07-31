@@ -265,9 +265,6 @@ attack_catapult(const troop * at, int * casualties, int row)
 }
 
 enum {
-#ifdef COMPATIBILITY
-  AR_MAGICAL,
-#endif
   AR_PLATE,
   AR_CHAIN,
   AR_RUSTY_CHAIN,
@@ -287,9 +284,6 @@ typedef struct armordata {
 static armordata armortable[] =
 /* penalty; magres; prot; shield; item; */
 {
-#ifdef COMPATIBILITY
-  {-0.80, 5, 0, I_CLOAK_OF_INVULNERABILITY },
-#endif
   { 0.30, 0.00, 5, 0, I_PLATE_ARMOR},
   { 0.15, 0.00, 3, 0, I_CHAIN_MAIL},
   { 0.30, 0.00, 3, 0, I_RUSTY_CHAIN_MAIL},

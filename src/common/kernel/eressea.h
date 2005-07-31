@@ -101,8 +101,6 @@ struct building_type;
 #define NEW_RECEIPIES /* Vereinfachte, besser verteilte Kräuterzutaten für Tränke */
 #define GOBLINKILL
 
-#undef COMPATIBILITY
-
 #define MONSTER_FACTION 0 /* Die Partei, in der die Monster sind. */
 
 /**
