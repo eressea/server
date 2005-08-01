@@ -36,3 +36,5 @@
 #define ASTRAL_HUNGER
 
 #define ASTRAL_ITEM_RESTRICTIONS /* keine grossen dinge im astralraum */
+
+#define SCORE_MODULE
