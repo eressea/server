@@ -166,15 +166,16 @@ race_setscript(const char * rcname, const functor<void>& f)
 }
 
 #define ISLANDSIZE 20
+#define TURNS_PER_ISLAND 3
 static void 
-lua_autoseed(const char * filename)
+lua_autoseed(const char * filename, bool new_island)
 {
   newfaction * players = read_newfactions(filename);
   while (players) {
     int n = listlen(players);
     int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
     k = n / k;
-    autoseed(&players, k);
+    autoseed(&players, k, new_island || (turn % TURNS_PER_ISLAND)==0);
   }
 }
 

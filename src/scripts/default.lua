@@ -40,7 +40,7 @@ function process(orders)
   add_equipment("money", 4200);
 
   -- use newfactions file to place out new players
-  autoseed(basepath .. "/newfactions")
+  autoseed(basepath .. "/newfactions", true)
 
   write_passwords()
   write_reports()

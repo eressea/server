@@ -144,12 +144,12 @@ newfaction * newfactions = NULL;
 static void 
 runautoseed(void)
 {
-	while (newfactions) {
-		int n = listlen(newfactions);
-		int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
-		k = n / k;
-		autoseed(&newfactions, k);
-	}
+  while (newfactions) {
+    int n = listlen(newfactions);
+    int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
+    k = n / k;
+    autoseed(&newfactions, k, true);
+  }
 }
 
 void

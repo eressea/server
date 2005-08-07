@@ -82,7 +82,7 @@ function process(orders)
   change_locales()
   
   -- use newfactions file to place out new players
-  autoseed(basepath .. "/newfactions")
+  autoseed(basepath .. "/newfactions", false)
 
   write_passwords()
   write_reports()

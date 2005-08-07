@@ -1015,7 +1015,7 @@ void
 fwriteorder(FILE * F, const order * ord, const struct locale * lang)
 {
   write_order(ord, lang, buf, sizeof(buf));
-	fwritestr(F, buf);
+  if (buf[0]) fwritestr(F, buf);
 }
 
 unit *
@@ -1252,24 +1252,24 @@ writeunit(FILE * F, const unit * u)
     fputc(' ', F);
   }
 #endif
-	for (ord = u->orders; ord; ord=ord->next) {
+  for (ord = u->orders; ord; ord=ord->next) {
     if (u->old_orders && is_repeated(ord)) continue; /* has new defaults */
-	  if (is_persistent(ord)) {
+    if (is_persistent(ord)) {
       fwriteorder(F, ord, u->faction->locale);
       fputc(' ', F);
-	  }
-	}
+    }
+  }
   /* write an empty string to terminate the list */
-  fwriteorder(F, NULL, u->faction->locale);
-	wnl(F);
+  fputs("\"\"", F);
+  wnl(F);
 #if RELEASE_VERSION<NOLASTORDER_VERSION
   /* the current default order */
-	fwriteorder(F, u->lastorder, u->faction->locale);
-	wnl(F);
+  fwriteorder(F, u->lastorder, u->faction->locale);
+  wnl(F);
 #endif
 
   assert(u->number <= UNIT_MAXSIZE);
-	assert(u->race);
+  assert(u->race);
 
 	for (i=0;i!=u->skill_size;++i) {
 		skill * sv = u->skills+i;

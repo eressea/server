@@ -265,7 +265,7 @@ processturn(char *filename)
     int n = listlen(players);
     int k = (n+ISLANDSIZE-1)/ISLANDSIZE;
     k = n / k;
-    autoseed(&players, k);
+    autoseed(&players, k, true);
   }
 	score();
 	remove_unequipped_guarded();

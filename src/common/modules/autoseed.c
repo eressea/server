@@ -355,7 +355,6 @@ preferred_terrain(const struct race * rc)
 
 #define REGIONS_PER_FACTION 2
 #define PLAYERS_PER_ISLAND 20
-#define TURNS_PER_ISLAND 3
 #define MINFACTIONS 1
 #define MAXAGEDIFF 5
 #define VOLCANO_CHANCE 100
@@ -412,18 +411,18 @@ get_island(region * root, region_list ** rlist)
  * returns the number of players placed on the new island.
  */
 int
-autoseed(newfaction ** players, int nsize)
+autoseed(newfaction ** players, int nsize, boolean new_island)
 {
-	short x = 0, y = 0;
-	region * r = NULL;
-	region_list * rlist = NULL;
-	int rsize, tsize = 0;
+  short x = 0, y = 0;
+  region * r = NULL;
+  region_list * rlist = NULL;
+  int rsize, tsize = 0;
   int isize = REGIONS_PER_FACTION; /* target size for the island */
   int psize = 0; /* players on this island */
 
   if (listlen(*players)<MINFACTIONS) return 0;
 
-  if (turn % TURNS_PER_ISLAND) {
+  if (!new_island) {
     region * rmin = NULL;
     /* find a spot that's adjacent to the previous island, but virgin.
      * like the last land virgin ocean region adjacent to land.
