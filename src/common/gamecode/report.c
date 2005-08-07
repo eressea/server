@@ -2785,7 +2785,7 @@ reports(void)
   for (f = factions; f; f = f->next) {
     int error = write_reports(f, ltime);
     if (error) retval = error;
-    if (!nosh && f->email && BAT) {
+    if (!nosh && f->email && strlen(f->email) && BAT) {
       sprintf(buf, "%s/%s.sh", reportpath(), factionid(f));
       shfp = fopen(buf, "w");
       fprintf(shfp,"#!/bin/sh\n\nPATH=%s\n\n",MailitPath());
@@ -2816,12 +2816,6 @@ reports(void)
         
       } else if(f->options & REPORT_BZIP2) {
         
-        if (f->age == 1) {
-          fprintf(shfp,
-                  " \\\n\t\"text/plain\" \"Willkommen\" %s/%s/%s/welcome.txt", 
-                  resourcepath(), global.welcomepath, locale_name(f->locale));
-        }
-        
         fprintf(BAT, "bzip2 -9v `ls %d-%s.nr %d-%s.txt %d-%s.cr`\n",
                 turn, factionid(f), 
                 turn, factionid(f), 
@@ -2843,15 +2837,16 @@ reports(void)
             fprintf(shfp,
                     " \\\n\t\"application/x-bzip2\" \"Computer-Report\" %d-%s.cr.bz2",
                     turn, factionid(f));
+
+        if (f->age == 1) {
+          fprintf(shfp,
+            " \\\n\t\"text/plain\" \"Willkommen\" %s/%s/%s/welcome.txt", 
+            resourcepath(), global.welcomepath, locale_name(f->locale));
+        }
+
       } else {
         
         fprintf(shfp, MAIL " $addr \"%s %s\"", global.gamename, gamedate_short(f->locale));
-        
-        if (f->age == 1) {
-          fprintf(shfp,
-                  " \\\n\t\"text/plain\" \"Willkommen\" %s/%s/%s/welcome.txt", 
-                  resourcepath(), global.welcomepath, locale_name(f->locale));
-        }
         
         if (!nonr && f->options & REPORT_NR)
             fprintf(shfp,
@@ -2867,6 +2862,13 @@ reports(void)
             fprintf(shfp,
                     " \\\n\t\"text/x-eressea-cr\" \"Computer-Report\" %d-%s.cr",
                     turn, factionid(f));
+
+        if (f->age == 1) {
+          fprintf(shfp,
+            " \\\n\t\"text/plain\" \"Willkommen\" %s/%s/%s/welcome.txt", 
+            resourcepath(), global.welcomepath, locale_name(f->locale));
+        }
+
       }
       
       fprintf(BAT, ". %s.sh %s\n", factionid(f), f->email);
