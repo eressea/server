@@ -668,7 +668,7 @@
     <attack type="4" damage="2d12"/>
     <attack type="4" damage="2d12"/>
   </race>
-  <race name="wyrm" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
+  <race name="wyrm" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="18000" capacity="1000000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="move" value="movedragon"/>
@@ -681,7 +681,7 @@
     <attack type="4" damage="5d30"/>
     <attack type="6" spell="83"/>
   </race>
-  <race name="dragon" magres="0.700000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="1000000" capacity="990000" speed="1.500000" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
+  <race name="dragon" magres="0.700000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="10000" capacity="1000000" speed="1.500000" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="2" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="age" value="agedragon"/>
