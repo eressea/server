@@ -3473,6 +3473,23 @@
       <text locale="en">apepsnake</text>
     </string>
 
+    <string name="apophis">
+      <text locale="de">Apophis</text>
+      <text locale="en">apophis</text>
+    </string>
+    <string name="apophis_p">
+      <text locale="de">Apophis</text>
+      <text locale="en">apophis</text>
+    </string>
+    <string name="apophis_d">
+      <text locale="de">Apophis</text>
+      <text locale="en">apophis</text>
+    </string>
+    <string name="apophis_x">
+      <text locale="de">Apophis</text>
+      <text locale="en">apophis</text>
+    </string>
+
     <string name="aquarian">
       <text locale="de">Meermensch</text>
       <text locale="en">aquarian</text>
