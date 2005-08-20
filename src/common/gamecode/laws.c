@@ -1592,17 +1592,18 @@ name_cmd(unit * u, struct order * ord)
         cmistake(u, ord, 278, MSG_EVENT);
         break;
       }
-      sprintf(buf, "Monument %d", b->no);
-      if (b->type == bt_find("monument")
-        && !strcmp(b->name, buf)) {
+      if (b->type == bt_find("monument")) {
+        sprintf(buf, "Monument %d", b->no);
+        if (strcmp(b->name, buf)!=0) {
           cmistake(u, ord, 29, MSG_EVENT);
           break;
         }
-        if (b->type == bt_find("artsculpure")) {
-          cmistake(u, ord, 29, MSG_EVENT);
-          break;
-        }
-        s = &b->name;
+      }
+      if (b->type == bt_find("artsculpure")) {
+        cmistake(u, ord, 29, MSG_EVENT);
+        break;
+      }
+      s = &b->name;
     }
     break;
 
