@@ -2521,19 +2521,19 @@
       <text locale="en">zombie</text>
     </string>
 
-    <string name="skeleton lord">
+    <string name="skeletonlord">
       <text locale="de">Skelettherr</text>
       <text locale="en">skeleton lord</text>
     </string>
-    <string name="skeleton lord_p">
+    <string name="skeletonlord_p">
       <text locale="de">Skelettherren</text>
       <text locale="en">skeleton lords</text>
     </string>
-    <string name="skeleton lord_d">
+    <string name="skeletonlord_d">
       <text locale="de">Skelettherren</text>
       <text locale="en">skeleton lords</text>
     </string>
-    <string name="skeleton lord_x">
+    <string name="skeletonlord_x">
       <text locale="de">Skelettherren</text>
       <text locale="en">skeleton lord</text>
     </string>
@@ -2572,36 +2572,36 @@
       <text locale="en">centaur</text>
     </string>
 
-    <string name="shadow knight">
+    <string name="shadowknight">
       <text locale="de">Schattenritter</text>
       <text locale="en">shadow knight</text>
     </string>
-    <string name="shadow knight_p">
+    <string name="shadowknight_p">
       <text locale="de">Schattenritter</text>
       <text locale="en">shadow knight</text>
     </string>
-    <string name="shadow knight_d">
+    <string name="shadowknight_d">
       <text locale="de">Schattenrittern</text>
       <text locale="en">shadow knights</text>
     </string>
-    <string name="shadow knight_x">
+    <string name="shadowknight_x">
       <text locale="de">Schattenritter</text>
       <text locale="en">shadow knight</text>
     </string>
 
-    <string name="sea serpent">
+    <string name="seaserpent">
       <text locale="de">Seeschlange</text>
       <text locale="en">sea serpent</text>
     </string>
-    <string name="sea serpent_p">
+    <string name="seaserpent_p">
       <text locale="de">Seeschlangen</text>
       <text locale="en">sea serpents</text>
     </string>
-    <string name="sea serpent_d">
+    <string name="seaserpent_d">
       <text locale="de">Seeschlangen</text>
       <text locale="en">sea serpents</text>
     </string>
-    <string name="sea serpent_x">
+    <string name="seaserpent_x">
       <text locale="de">Seeschlangen</text>
       <text locale="en">sea serpent</text>
     </string>
@@ -3048,19 +3048,19 @@
       <text locale="en">shadowdemon</text>
     </string>
 
-    <string name="stone golem">
+    <string name="stonegolem">
       <text locale="de">Steingolem</text>
       <text locale="en">stone golem</text>
     </string>
-    <string name="stone golem_p">
+    <string name="stonegolem_p">
       <text locale="de">Steingolems</text>
       <text locale="en">stone golems</text>
     </string>
-    <string name="stone golem_d">
+    <string name="stonegolem_d">
       <text locale="de">Steingolems</text>
       <text locale="en">stone golems</text>
     </string>
-    <string name="stone golem_x">
+    <string name="stonegolem_x">
       <text locale="de">Steingolem</text>
       <text locale="en">stone golem</text>
     </string>
@@ -3269,19 +3269,19 @@
       <text locale="en">dragon</text>
     </string>
 
-    <string name="young dragon">
+    <string name="youngdragon">
       <text locale="de">Jungdrache</text>
       <text locale="en">young dragon</text>
     </string>
-    <string name="young dragon_p">
+    <string name="youngdragon_p">
       <text locale="de">Jungdrachen</text>
       <text locale="en">young dragons</text>
     </string>
-    <string name="young dragon_d">
+    <string name="youngdragon_d">
       <text locale="de">Jungdrachen</text>
       <text locale="en">young dragons</text>
     </string>
-    <string name="young dragon_x">
+    <string name="youngdragon_x">
       <text locale="de">Jungdrachen</text>
       <text locale="en">young dragon</text>
     </string>

@@ -1055,22 +1055,31 @@ readunit(FILE * F)
   if (strlen(u->name)>=NAMESIZE) u->name[NAMESIZE] = 0;
   if (u->display && strlen(u->display)>=DISPLAYSIZE) u->display[DISPLAYSIZE] = 0;
 #endif
-	number = ri(F);
-	if (global.data_version<ITEMTYPE_VERSION)
-		set_money(u, ri(F));
-	u->age = (short)ri(F);
-	if (global.data_version<NEWRACE_VERSION) {
-		u->race = new_race[(race_t)ri(F)];
-		u->irace = new_race[(race_t)ri(F)];
-	} else {
-		rs(F, buf);
-		if (strcmp(buf, "giant turtle")==0) strcpy(buf, "giantturtle");
-		u->race = rc_find(buf);
-		assert(u->race);
-		rs(F, buf);
-		if (strlen(buf)) u->irace = rc_find(buf);
-		else u->irace = u->race;
-	}
+  number = ri(F);
+  if (global.data_version<ITEMTYPE_VERSION)
+      set_money(u, ri(F));
+  u->age = (short)ri(F);
+  if (global.data_version<NEWRACE_VERSION) {
+    u->race = new_race[(race_t)ri(F)];
+    u->irace = new_race[(race_t)ri(F)];
+  } else {
+    char * space;
+    
+    rs(F, buf);
+    space = strchr(buf, ' ');
+    while (space!=NULL) {
+      strcpy(space, space+1);
+      space=strchr(space, ' ');
+    }
+/*    if (strcmp(buf, "giant turtle")==0) strcpy(buf, "giantturtle");
+    if (strcmp(buf, "young dragon")==0) strcpy(buf, "youngdragon");
+    if (strcmp(buf, "young dragon")==0) strcpy(buf, "youngdragon"); */
+    u->race = rc_find(buf);
+    assert(u->race);
+    rs(F, buf);
+    if (strlen(buf)) u->irace = rc_find(buf);
+    else u->irace = u->race;
+  }
 	if (u->faction == NULL) {
 		log_error(("unit %s has faction == NULL\n", unitname(u)));
 #if 0

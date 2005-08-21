@@ -83,18 +83,22 @@ racelist_insert(struct race_list **rl, const struct race *r)
 race *
 rc_new(const char * zName)
 {
-	char zBuffer[80];
-	race * rc = calloc(sizeof(race), 1);
-	strcpy(zBuffer, zName);
-	rc->_name[0] = strdup(zBuffer);
-	sprintf(zBuffer, "%s_p", zName);
-	rc->_name[1] = strdup(zBuffer);
-	sprintf(zBuffer, "%s_d", zName);
-	rc->_name[2] = strdup(zBuffer);
-	sprintf(zBuffer, "%s_x", zName);
-	rc->_name[3] = strdup(zBuffer);
-	rc->precombatspell = SPL_NOSPELL;
-	return rc;
+  char zBuffer[80];
+  race * rc = calloc(sizeof(race), 1);
+  if (strchr(zName, ' ')!=NULL) {
+    log_error(("race '%s' has an invalid name. remove spaces\n", zName));
+    assert(strchr(zName, ' ')==NULL);
+  }
+  strcpy(zBuffer, zName);
+  rc->_name[0] = strdup(zBuffer);
+  sprintf(zBuffer, "%s_p", zName);
+  rc->_name[1] = strdup(zBuffer);
+  sprintf(zBuffer, "%s_d", zName);
+  rc->_name[2] = strdup(zBuffer);
+  sprintf(zBuffer, "%s_x", zName);
+  rc->_name[3] = strdup(zBuffer);
+  rc->precombatspell = SPL_NOSPELL;
+  return rc;
 }
 
 race *
