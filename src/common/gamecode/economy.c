@@ -1042,7 +1042,7 @@ maintain_buildings(boolean crash)
 	  			continue;
         } else if (!fval(b, BLD_WORKING)) {
           unit * u = buildingowner(r, b);
-          const char * msgtype = maintained?"maintenance_none":"maintenance_nowork";
+          const char * msgtype = maintained?"maintenance_nowork":"maintenance_none";
   	  		struct message * msg = msg_message(msgtype, "building", b);
 
           if (u) {

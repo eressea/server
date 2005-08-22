@@ -4071,10 +4071,6 @@ processorders (void)
 
   puts(" - Einheiten Sortieren");
   reorder();
-#if 0
-  puts(" - Einheiten aus Gebäuden/Schiffen weisen");
-  evict();
-#endif
 #ifdef ALLIANCEJOIN
   alliancejoin();
 #endif
