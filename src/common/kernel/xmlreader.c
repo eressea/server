@@ -509,7 +509,7 @@ race_compat(void)
       "wolf", "lynx", "tunnelworm", "eagle", "rat", "songdragon", "nymph",
       "unicorn", "direwolf", "ghost", "imp", "dreamcat", "fairy", "owl",
       "hellcat", "tiger", "dolphin", "giantturtle", "kraken", "seaserpent",
-      "shadow knight", "centaur", "skeleton", "skeleton lord", "zombie",
+      "shadowknight", "centaur", "skeleton", "skeletonlord", "zombie",
       "juju-zombie", "ghoul", "ghast", "museumghost", "gnome", "template",
       "clone", "shadowdragon", "shadowbat", "nightmare", "vampunicorn",
       "phoenix", "sphinx", "littlescarab", "greenscarab", "bluescarab",
