@@ -524,6 +524,9 @@ race_compat(void)
       if (rc == new_race[RC_TROLL]) {
         a_add(&rc->attribs, make_skillmod(NOSKILL, SMF_RIDING, NULL, 0.0, -1));
       }
+    } else {
+      log_error(("could not find old race %s\n", oldracenames[i]));
+      assert(rc);
     }
   }
 }
