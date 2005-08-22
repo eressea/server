@@ -303,12 +303,12 @@ set_enemy(side * as, side * ds, boolean attacking)
 {
   int i;
   for (i=0;i!=128;++i) {
-	if (ds->enemies[i]==NULL) ds->enemies[i]=as;
-	if (ds->enemies[i]==as) break;
+    if (ds->enemies[i]==NULL) ds->enemies[i]=as;
+    if (ds->enemies[i]==as) break;
   }
   for (i=0;i!=128;++i) {
-	if (as->enemies[i]==NULL) as->enemies[i]=ds;
-	if (as->enemies[i]==ds) break;
+    if (as->enemies[i]==NULL) as->enemies[i]=ds;
+    if (as->enemies[i]==ds) break;
   }
   ds->enemy[as->index] |= E_ENEMY;
   as->enemy[ds->index] |= E_ENEMY;

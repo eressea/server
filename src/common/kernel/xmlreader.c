@@ -503,7 +503,7 @@ race_compat(void)
   const char * oldracenames[MAXRACES] = {
     "dwarf", "elf", "orc", "goblin", "human", "troll", "demon", "insect",
       "halfling", "cat", "aquarian", "uruk", "snotling", "undead", "illusion",
-      "young dragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
+      "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
       "special", "spell", "irongolem", "stonegolem", "shadowdemon",
       "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
       "wolf", "lynx", "tunnelworm", "eagle", "rat", "songdragon", "nymph",
