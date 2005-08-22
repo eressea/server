@@ -1237,7 +1237,7 @@ void
 writeunit(FILE * F, const unit * u)
 {
 	order * ord;
-	int i;
+	int i, p = 0;
 	wi36(F, u->no);
 	wi36(F, u->faction->no);
 	ws(F, u->name);
@@ -1257,15 +1257,25 @@ writeunit(FILE * F, const unit * u)
 	wnl(F);
 #ifndef LASTORDER
   for (ord = u->old_orders; ord; ord=ord->next) {
-    fwriteorder(F, ord, u->faction->locale);
-    fputc(' ', F);
+    if (++p<MAXPERSISTENT) {
+      fwriteorder(F, ord, u->faction->locale);
+      fputc(' ', F);
+    } else {
+      log_error(("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT));
+      break;
+    }
   }
 #endif
   for (ord = u->orders; ord; ord=ord->next) {
     if (u->old_orders && is_repeated(ord)) continue; /* has new defaults */
     if (is_persistent(ord)) {
-      fwriteorder(F, ord, u->faction->locale);
-      fputc(' ', F);
+      if (++p<MAXPERSISTENT) {
+        fwriteorder(F, ord, u->faction->locale);
+        fputc(' ', F);
+      } else {
+        log_error(("%s had %d or more persistent orders\n", unitname(u), MAXPERSISTENT));
+        break;
+      }
     }
   }
   /* write an empty string to terminate the list */
