@@ -887,7 +887,10 @@ demographics(void)
 #endif
 
   for (r = regions; r; r = r->next) {
-    ++r->age;
+    if (r->age>0 || rterrain(r)!=T_OCEAN) {
+      /* oceans get their initial age in frame_regions() */
+      ++r->age;
+    }
     live(r);
     /* check_split_dragons(); */
 

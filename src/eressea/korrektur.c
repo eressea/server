@@ -749,14 +749,25 @@ fix_gates(void)
 static void
 frame_regions(void)
 {
-  unsigned short page = turn;
+  unsigned short ocean_age = turn;
   region * r = regions;
   for (r=regions;r;r=r->next) {
     direction_t d;
-    if (rterrain(r) == T_OCEAN && r->age+1<page) {
-      r->age = page;
-    } else if (r->age<page) {
-      page = r->age;
+    if (rterrain(r) == T_OCEAN && r->age==0) {
+      unsigned short age = 0;
+      direction_t d;
+      for (d=0;d!=MAXDIRECTIONS;++d) {
+        region * rn = rconnect(r, d);
+        if (rn && rn->age>age) {
+          age = rn->age;
+        }
+      }
+      if (age!=0 && age < ocean_age) {
+        ocean_age = age;
+      }
+      r->age = ocean_age;
+    } else if (r->age>ocean_age) {
+      ocean_age = r->age;
     }
 
     if (r->age<16) continue;
