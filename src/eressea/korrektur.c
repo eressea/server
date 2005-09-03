@@ -24,8 +24,9 @@
 /* misc includes */
 #include <attributes/key.h>
 #include <attributes/otherfaction.h>
-#include <modules/xecmd.h>
+#include <attributes/targetregion.h>
 #include <modules/autoseed.h>
+#include <modules/xecmd.h>
 
 /* gamecode includes */
 #include <gamecode/economy.h>
@@ -57,26 +58,23 @@
 #include <kernel/unit.h>
 
 /* util includes */
-#include <attrib.h>
-#include <language.h>
-#include <base36.h>
-#include <log.h>
-#include <cvector.h>
+#include <util/attrib.h>
+#include <util/base36.h>
+#include <util/cvector.h>
 #include <util/event.h>
-#include <goodies.h>
-#include <resolve.h>
-#include <sql.h>
-#include <vset.h>
+#include <util/goodies.h>
+#include <util/language.h>
+#include <util/log.h>
+#include <util/rand.h>
+#include <util/resolve.h>
+#include <util/sql.h>
+#include <util/vset.h>
 
 /* libc includes */
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-
-/* attributes includes */
-#include <attributes/targetregion.h>
-#include <attributes/key.h>
 
 #undef XMAS1999
 #undef XMAS2000
@@ -749,7 +747,7 @@ fix_gates(void)
 static void
 frame_regions(void)
 {
-  unsigned short ocean_age = turn;
+  unsigned short ocean_age = (unsigned short)turn;
   region * r = regions;
   for (r=regions;r;r=r->next) {
     direction_t d;
@@ -784,6 +782,46 @@ frame_regions(void)
     }
   }
 }
+
+#define GLOBAL_WARMING 200
+
+#ifdef GLOBAL_WARMING
+static void
+global_warming(void)
+{
+  region * r;
+  for (r=regions;r;r=r->next) {
+    if (r->age<GLOBAL_WARMING) continue;
+    if (r->terrain==T_GLACIER) {
+      /* 1% chance that an existing glacier gets unstable */
+      if (chance(0.01)) {
+        direction_t d;
+        for (d=0;d!=MAXDIRECTIONS;++d) {
+          region * rn = rconnect(r, d);
+          if (rn!=NULL) {
+            terrain_t rt = rn->terrain;
+            if (rt!=T_ICEBERG && rt!=T_ICEBERG_SLEEP && rt!=T_GLACIER && rt!=T_OCEAN) {
+              break;
+            }
+          }
+        }
+        if (d==MAXDIRECTIONS) {
+          terraform(r, T_ICEBERG_SLEEP);
+        }
+      }
+    } else if (r->terrain==T_ICEBERG || r->terrain==T_ICEBERG_SLEEP) {
+      direction_t d;
+      for (d=0;d!=MAXDIRECTIONS;++d) {
+        region * rn = rconnect(r, d);
+        if (rn && rn->terrain==T_GLACIER && chance(0.10)) {
+          /* 10% chance that a glacier next to an iceberg gets unstable */
+          terraform(rn, T_ICEBERG_SLEEP);
+        }
+      }
+    }
+  }
+}
+#endif
 
 static int
 fix_astralplane(void)
@@ -949,10 +987,10 @@ check_phoenix(void)
 				return;
 			}
 		}
-	}
+  }
 
-        f = findfaction(MONSTER_FACTION);
-        if (f==NULL) return;
+  f = findfaction(MONSTER_FACTION);
+  if (f==NULL) return;
 
 	/* it is not, so we create it */
 	r = random_land_region();
@@ -1131,6 +1169,9 @@ korrektur(void)
   do_once("atrx", fix_attribflags());
   do_once("asfi", fix_astral_firewalls());
   frame_regions();
+#ifdef GLOBAL_WARMING
+  global_warming();
+#endif
 	fix_astralplane();
 	fix_firewalls();
 	fix_gates();

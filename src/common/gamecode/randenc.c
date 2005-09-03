@@ -909,8 +909,7 @@ melt_iceberg(region *r)
 	for (u=r->units; u; u=u->next) freset(u->faction, FL_DH);
 	for (u=r->units; u; u=u->next) if (!fval(u->faction, FL_DH)) {
 		fset(u->faction, FL_DH);
-		ADDMSG(&u->faction->msgs, new_message(u->faction,
-			"iceberg_melt%r:region", r));
+		ADDMSG(&u->faction->msgs, msg_message("iceberg_melt", "region", r));
 	}
 
 	/* driftrichtung löschen */
@@ -1049,13 +1048,18 @@ move_icebergs(void)
 {
 	region *r;
 
-	for (r=regions; r; r=r->next) if (rterrain(r) == T_ICEBERG && !fval(r, RF_DH)) {
-		if (rand()%100 < 60) {
-			fset(r, RF_DH);
-			move_iceberg(r);
-		} else if (rand()%100 < 10){
-			fset(r, RF_DH);
-			melt_iceberg(r);
+  for (r=regions; r; r=r->next) {
+    if (rterrain(r) == T_ICEBERG && !fval(r, RF_DH)) {
+      int select = rand() % 10;
+      if (select < 4) {
+        /* 4% chance */
+  			fset(r, RF_DH);
+	  		melt_iceberg(r);
+      } else if (select<64) {
+        /* 60% chance */
+        fset(r, RF_DH);
+        move_iceberg(r);
+      }
 		}
 	}
 }
@@ -1065,32 +1069,38 @@ create_icebergs(void)
 {
 	region *r;
 
-	for (r=regions; r; r=r->next) if (rterrain(r) == T_ICEBERG_SLEEP && rand()%100 < 5) {
-		boolean has_ocean_neighbour = false;
-		direction_t dir;
-		region *rc;
-		unit *u;
+  for (r=regions; r; r=r->next) {
+    if (rterrain(r) == T_ICEBERG_SLEEP && chance(0.05)) {
+      boolean has_ocean_neighbour = false;
+      direction_t dir;
+      region *rc;
+      unit *u;
 
-    freset(r, RF_DH);
-		for (dir=0; dir < MAXDIRECTIONS; dir++) {
-			rc = rconnect(r, dir);
-			if (rc && rterrain(rc) == T_OCEAN) {
-				has_ocean_neighbour = true;
-				break;
-			}
-		}
-		if (!has_ocean_neighbour) continue;
+      freset(r, RF_DH);
+      for (dir=0; dir < MAXDIRECTIONS; dir++) {
+        rc = rconnect(r, dir);
+        if (rc && rterrain(rc) == T_OCEAN) {
+          has_ocean_neighbour = true;
+          break;
+        }
+      }
+      if (!has_ocean_neighbour) continue;
 
-		rsetterrain(r, T_ICEBERG);
+      rsetterrain(r, T_ICEBERG);
 
-		fset(r, RF_DH);
-		move_iceberg(r);
+      fset(r, RF_DH);
+      move_iceberg(r);
 
-		for (u=r->units; u; u=u->next) freset(u->faction, FL_DH);
-		for (u=r->units; u; u=u->next) if (!fval(u->faction, FL_DH)) {
-			fset(u->faction, FL_DH);
-			ADDMSG(&u->faction->msgs, msg_message("iceberg_create", "region", r));
-		}
+      for (u=r->units; u; u=u->next) {
+        freset(u->faction, FL_DH);
+      }
+      for (u=r->units; u; u=u->next) {
+        if (!fval(u->faction, FL_DH)) {
+          fset(u->faction, FL_DH);
+          ADDMSG(&u->faction->msgs, msg_message("iceberg_create", "region", r));
+        }
+      }
+    }
 	}
 }
 
