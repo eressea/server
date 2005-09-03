@@ -887,6 +887,7 @@ demographics(void)
 #endif
 
   for (r = regions; r; r = r->next) {
+    ++r->age;
     live(r);
     /* check_split_dragons(); */
 
@@ -926,7 +927,6 @@ demographics(void)
       peasants(r);
       plagues(r, false);
 
-      r->age++;
       horses(r);
 #if GROWING_TREES
       if(current_season != SEASON_WINTER) {

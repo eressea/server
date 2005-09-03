@@ -749,11 +749,17 @@ fix_gates(void)
 static void
 frame_regions(void)
 {
+  unsigned short page = turn;
   region * r = regions;
   for (r=regions;r;r=r->next) {
     direction_t d;
+    if (rterrain(r) == T_OCEAN && r->age+1<page) {
+      r->age = page;
+    } else if (r->age<page) {
+      page = r->age;
+    }
 
-    if (r->age<10) continue;
+    if (r->age<16) continue;
     if (r->planep) continue;
     if (r->terrain==T_FIREWALL) continue;
 

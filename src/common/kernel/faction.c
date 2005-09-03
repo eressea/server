@@ -146,9 +146,9 @@ addplayer(region *r, faction * f)
   fset(u, UFL_ISNEW);
   if (f->race == new_race[RC_DAEMON]) {
     race_t urc;
-    do
-    urc = (race_t)(rand() % MAXRACES);
-    while (urc == RC_DAEMON || !playerrace(new_race[urc]));
+    do {
+      urc = (race_t)(rand() % MAXRACES);
+    } while (urc == RC_DAEMON || !playerrace(new_race[urc]));
     u->irace = new_race[urc];
   }
 

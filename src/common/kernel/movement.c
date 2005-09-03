@@ -203,7 +203,7 @@ entrance_allowed(const struct unit * u, const struct region * r)
 int
 personcapacity(const unit *u)
 {
-#if RACE_CAPACITY
+#ifdef RACE_CAPACITY
 	int cap = u->race->weight+u->race->capacity;
 #else
 	int cap = u->race->weight+540;

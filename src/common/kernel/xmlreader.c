@@ -512,8 +512,7 @@ race_compat(void)
       "shadowknight", "centaur", "skeleton", "skeletonlord", "zombie",
       "juju-zombie", "ghoul", "ghast", "museumghost", "gnome", "template",
       "clone", "shadowdragon", "shadowbat", "nightmare", "vampunicorn",
-      "phoenix", "sphinx", "littlescarab", "greenscarab", "bluescarab",
-      "redscarab", "undeadpharaoh", "mummy"
+      "phoenix"
   };
   int i;
 
@@ -943,7 +942,7 @@ parse_races(xmlDocPtr doc)
     rc->recruitcost = xml_ivalue(node, "recruitcost", 0);
     rc->maintenance = xml_ivalue(node, "maintenance", 0);
     rc->weight = xml_ivalue(node, "weight", 0);
-#if RACE_CAPACITY
+#ifdef RACE_CAPACITY
     rc->capacity = xml_ivalue(node, "capacity", 0);
 #endif
     rc->speed = (float)xml_fvalue(node, "speed", 1.0F);
