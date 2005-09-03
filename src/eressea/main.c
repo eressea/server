@@ -395,6 +395,7 @@ usage(const char * prog, const char * arg)
 		"--nobattle       : keine Kämpfe\n"
 		"--nomonsters     : keine monster KI\n"
 		"--nodebug        : keine Logfiles für Kämpfe\n"
+    "--noreports      : absolut keine Reporte schreiben\n"
 		"--debug          : schreibt Debug-Ausgaben in die Datei debug\n"
 		"--nocr           : keine CRs\n"
 		"--nonr           : keine Reports\n"

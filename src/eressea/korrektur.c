@@ -786,6 +786,25 @@ frame_regions(void)
 #define GLOBAL_WARMING 200
 
 #ifdef GLOBAL_WARMING
+
+static void
+iceberg(region * r)
+{
+  direction_t d;
+  for (d=0;d!=MAXDIRECTIONS;++d) {
+    region * rn = rconnect(r, d);
+    if (rn!=NULL) {
+      terrain_t rt = rn->terrain;
+      if (rt!=T_ICEBERG && rt!=T_ICEBERG_SLEEP && rt!=T_GLACIER && rt!=T_OCEAN) {
+        break;
+      }
+    }
+  }
+  if (d==MAXDIRECTIONS) {
+    terraform(r, T_ICEBERG_SLEEP);
+  }
+}
+
 static void
 global_warming(void)
 {
@@ -795,19 +814,7 @@ global_warming(void)
     if (r->terrain==T_GLACIER) {
       /* 1% chance that an existing glacier gets unstable */
       if (chance(0.01)) {
-        direction_t d;
-        for (d=0;d!=MAXDIRECTIONS;++d) {
-          region * rn = rconnect(r, d);
-          if (rn!=NULL) {
-            terrain_t rt = rn->terrain;
-            if (rt!=T_ICEBERG && rt!=T_ICEBERG_SLEEP && rt!=T_GLACIER && rt!=T_OCEAN) {
-              break;
-            }
-          }
-        }
-        if (d==MAXDIRECTIONS) {
-          terraform(r, T_ICEBERG_SLEEP);
-        }
+        iceberg(r);
       }
     } else if (r->terrain==T_ICEBERG || r->terrain==T_ICEBERG_SLEEP) {
       direction_t d;
@@ -815,7 +822,7 @@ global_warming(void)
         region * rn = rconnect(r, d);
         if (rn && rn->terrain==T_GLACIER && chance(0.10)) {
           /* 10% chance that a glacier next to an iceberg gets unstable */
-          terraform(rn, T_ICEBERG_SLEEP);
+          iceberg(rn);
         }
       }
     }
