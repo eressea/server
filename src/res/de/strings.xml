@@ -10,13 +10,15 @@
   <namespace name="iteminfo">
     <string name="trollbelt">
       <text locale="en">
-        This artifact grants its wearer the strength of a cavetroll. He will be
+        This artifact grants its wearer the strength of a cavetroll. He will
+        be
         able to carry fifty times as much as normal and also in combat his
         enhanced strength and tough troll skin will serve him well.
       </text>
       <text locale="de">
         Dieses magische Artefakt verleiht seinem Träger die Stärke eines
-        ausgewachsenen Höhlentrolls. Seine Tragkraft erhöht sich auf das 50fache
+        ausgewachsenen Höhlentrolls. Seine Tragkraft erhöht sich auf das
+        50fache
         und auch im Kampf werden sich die erhöhte Kraft und die trollisch zähe
         Haut positiv auswirken.
       </text>
@@ -25,7 +27,8 @@
       <text locale="en">
         It may look like just another quartz, but your magician will tell you
         tha great power emenates from these crystals. Using it at the begining
-        of a week will release a strong negative energy that attacks all spells
+        of a week will release a strong negative energy that attacks all
+        spells
         cast in the region during that week.
       </text>
       <text locale="de">
@@ -40,12 +43,14 @@
     </string>
     <string name="rop">
       <text locale="en">
-        A ring of power increases a magicin's power. The level of all the spells
+        A ring of power increases a magicin's power. The level of all the
+        spells
         he casts will be increased by one without increasing their costs.
       </text>
       <text locale="de">
         Ein Ring der Macht verstärkt die Kraft des Magiers. Jeder Zauber wird,
-        ohne das sich die Kosten erhöhen, so gezaubert als hätte der Magier eine
+        ohne das sich die Kosten erhöhen, so gezaubert als hätte der Magier
+        eine
         Stufe mehr.
       </text>
     </string>
@@ -65,7 +70,8 @@
       <text locale="de">
         Frucht aus der Gattung Malus (ca. 25 Arten), gehört zur Familie der
         Rosengewächse. Die am häufigsten kultivierte Baumfrucht. Der Apfel
-        gehört zu den fleischigen Früchten, in dem der gereifte Fruchtknoten und
+        gehört zu den fleischigen Früchten, in dem der gereifte Fruchtknoten
+        und
         das umgebende Gewebe fleischig und eßbar werden. Die Apfelblüte der
         meisten Varianten erfordert Kreuzbestäubung zur Befruchtung. Form und
         Größe des Apfels bei der Ernte variieren abhängig von kulturellen und
@@ -3781,6 +3787,14 @@
     </string>
   </namespace>
   <namespace name="spell">
+    <string name="keeploot">
+      <text locale="de">Beute Bewahren</text>
+      <text locale="en">Save Spoils</text>
+    </string>
+    <string name="tybiedfumbleshield">
+      <text locale="de">Schutz vor Magie</text>
+      <text locale="en">Protection from Magic</text>
+    </string>
     <string name="miracle_doctor">
       <text locale="de">Wunderdoktor</text>
       <text locale="en">Miracle Doctor</text>
@@ -3825,7 +3839,7 @@
       <text locale="de">Gesang des Lebens analysieren</text>
       <text locale="en">Analyze Song of Life</text>
     </string>
-    <string name="fumbleshield">
+    <string name="cerrdorfumbleshield">
       <text locale="de">Bannlied</text>
       <text locale="en">Countersong</text>
     </string>
@@ -4283,6 +4297,31 @@
       way.
       </text>
     </string>
+    <string name="tybiedfumbleshield">
+      <text locale="de">
+         Dieser Zauber legt ein antimagisches Feld um die Magier der Feinde
+         und behindert ihre Zauber erheblich. Nur wenige werden die Kraft
+         besitzen, das Feld zu durchdringen und ihren Truppen in der Schlacht
+         zu helfen.
+      </text>
+      <text locale="en">
+        This spell creates an antimagic field around the mages of the enemies
+        and considerably hinders their spells. Only few will have the power to
+        break through the field and be able to help their troops in battle.
+      </text>
+    </string>
+    <string name="keeploot">
+      <text locale="de">
+        Dieser Zauber verhindert, dass ein Teil der sonst im Kampf zerstörten
+        Gegenstände beschädigt wird. Die Verluste reduzieren sich um 5% pro
+        Stufe des Zaubers bis zu einem Minimum von 25%.
+      </text>
+      <text locale="en">
+        This spell prevents damage to a portion of the items that would
+        otherwise be lost in battle. The loss of items is reduced by 5% for
+        every level of the spell, up to a minimum of 25%.
+      </text>
+    </string>
 
     <string name="appeasement">
       <text locale="de">Dieses Lied zähmt selbst den wildesten
@@ -4410,7 +4449,7 @@
       able to decipher all enchantments or spells, which
       aren't disguised beyond your capability.</text>
     </string>
-    <string name="fumbleshield">
+    <string name="cerrdorfumbleshield">
       <text locale="de">Dieser schrille Gesang hallt über das
       ganze Schlachtfeld. Die besonderen Dissonanzen in den
       Melodien machen es Magier fast unmöglich, sich auf ihre
@@ -5748,7 +5787,8 @@
       approaches its victim (which may be at an arbitrary place in eressea, it
       is not needed for the mage or his party  to see the victim). As soon as
       the victim is reached the nightmare starts to torment it  without mercy,
-      only a powerfull counter spell or the death of the casting mage can redeem
+      only a powerfull counter spell or the death of the casting mage can
+      redeem
       the victim. When spawning the nightmare the mage loses a small amount of
       his aura forever.
       </text>
@@ -5768,11 +5808,14 @@
       <text locale="en">
       An enchanted eye of a dragon gives the person who eats it for supper the
       power to see
-      other people's dreams. For a long time this abillity was counted as beeing
+      other people's dreams. For a long time this abillity was counted as
+      beeing
       useless until
-      the former elfish mistress for theurgy of war, Liarana Sonnentau from the
+      the former elfish mistress for theurgy of war, Liarana Sonnentau from
+      the
       academy Thall,
-      presented a special appliance for this artefact: Before a battle captains
+      presented a special appliance for this artefact: Before a battle
+      captains
       often have an
       uncomfortable sleep and betray their plans in their dreams. This might
       give the user of
@@ -6087,11 +6130,13 @@
 
   <string name="nr_calendar">
     <text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s.</text>
-    <text locale="en">It is %s of the month of %s in the %d. year of %s.</text>
+    <text locale="en">It is %s of the month of %s in the %d. year of %s.</text
+    >
   </string>
 
   <string name="nr_calendar_season">
-    <text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s. Es ist %s.
+    <text locale="de">Wir schreiben %s des Monats %s im Jahre %d %s. Es ist
+    %s.
     </text>
     <text locale="en">It is %s of the month of %s in the %d. year of %s. It is
     %s.</text>
@@ -6165,7 +6210,8 @@
   </string>
 
   <string name="spinx03">
-    <text locale="de">Das Schiff mit dem grünen Segel liegt links neben dem mit
+    <text locale="de">Das Schiff mit dem grünen Segel liegt links neben dem
+    mit
     einem weissen Segel</text>
   </string>
 
@@ -6175,7 +6221,8 @@
   </string>
 
   <string name="spinx05">
-    <text locale="de">Der Krieger mit dem Kreis im Wappen hat einen Keks</text>
+    <text locale="de">Der Krieger mit dem Kreis im Wappen hat einen Keks</text
+    >
   </string>
 
   <string name="spinx06">
@@ -6425,6 +6472,9 @@
   </string>
 
 </strings>
+
+
+
 
 
 

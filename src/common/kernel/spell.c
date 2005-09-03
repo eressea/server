@@ -9236,7 +9236,7 @@ static spell spelldaten[] =
     (spell_f)sp_analysesong_unit, patzer
   },
   {
-    SPL_CERRDOR_FUMBLESHIELD, "fumbleshield", NULL, NULL, NULL,
+    SPL_CERRDOR_FUMBLESHIELD, "cerrdorfumbleshield", NULL, NULL, NULL,
     M_BARDE, (PRECOMBATSPELL | SPELLLEVEL), 2, 5,
     {
       { R_AURA, 5, SPC_LEVEL },
@@ -9715,11 +9715,7 @@ static spell spelldaten[] =
     (spell_f)sp_earn_silver, patzer
   },
   {
-    SPL_TYBIED_FUMBLESHIELD, "Schutz vor Magie",
-    "Dieser Zauber legt ein antimagisches Feld um die Magier der "
-    "Feinde und behindert ihre Zauber erheblich. Nur wenige werden "
-    "die Kraft besitzen, das Feld zu durchdringen und ihren Truppen "
-    "in der Schlacht zu helfen.", NULL, NULL,
+    SPL_TYBIED_FUMBLESHIELD, "tybiedfumbleshield", NULL, NULL, NULL,
     M_ASTRAL, (PRECOMBATSPELL | SPELLLEVEL), 2, 2,
     {
       { R_AURA, 3, SPC_LEVEL },
@@ -9766,10 +9762,7 @@ static spell spelldaten[] =
     (spell_f)sp_resist_magic_bonus, patzer
   },
   {
-    SPL_KEEPLOOT, "Beute bewahren",
-    "Dieser Zauber verhindert, dass ein Teil der sonst im Kampf zerstörten "
-    "Gegenstände beschädigt wird. Die Verluste reduzieren sich um 5% pro "
-    "Stufe des Zaubers bis zu einem Minimum von 25%.", NULL, NULL,
+    SPL_KEEPLOOT, "keeploot", NULL, NULL, NULL,
     M_ASTRAL, ( POSTCOMBATSPELL | SPELLLEVEL ), 5, 3,
     {
       { R_AURA, 1, SPC_LEVEL },
