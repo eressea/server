@@ -7,8 +7,8 @@ function loadscript(name)
 end
 
 function change_locales()
-  local localechange = { }
-  -- local localechange = { en = { "y7hq" } }
+  -- local localechange = { }
+  local localechange = { en = { "bLub" } }
   
   for loc, flist in localechange do
     for index, name in flist do
