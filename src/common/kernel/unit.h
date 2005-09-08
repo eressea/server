@@ -186,10 +186,9 @@ extern int eff_skill_study(const struct unit * u, skill_t sk, const struct regio
 
 extern int get_modifier(const struct unit * u, skill_t sk, int lvl, const struct region * r, boolean noitem);
 
-#undef DESTROY
-
 /* Einheiten werden nicht wirklich zerstört. */
 extern void destroy_unit(struct unit * u);
+extern void distribute_items(struct unit * u);
 
 /* see resolve.h */
 extern void * resolve_unit(variant data);

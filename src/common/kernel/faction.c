@@ -191,66 +191,7 @@ destroyfaction(faction * f)
 
   for (u=f->units;u;u=u->nextF) {
     region * r = u->region;
-    unit * au;
-    int number = 0;
-    struct friend {
-      struct friend * next;
-      int number;
-      faction * faction;
-      unit * unit;
-    } * friends = NULL;
-    for (au=r->units;au;au=au->next) if (au->faction!=f) {
-      if (alliedunit(u, au->faction, HELP_ALL)) {
-        struct friend * nf, ** fr = &friends;
-
-        while (*fr && (*fr)->faction->no<au->faction->no) fr = &(*fr)->next;
-        nf = *fr;
-        if (nf==NULL || nf->faction!=au->faction) {
-          nf = calloc(sizeof(struct friend), 1);
-          nf->next = *fr;
-          nf->faction = au->faction;
-          nf->unit = au;
-          *fr = nf;
-        }
-        nf->number += au->number;
-        number += au->number;
-      }
-    }
-    if (friends && number) {
-      struct friend * nf = friends;
-      while (nf) {
-        unit * u2 = nf->unit;
-#ifdef NEW_ITEMS
-        item * itm = u->items;
-        while(itm){
-          const item_type * itype = itm->type;
-          item * itn = itm->next;
-          int n = itm->number;
-          n = n * nf->number / number;
-          if (n>0) {
-            i_change(&u->items, itype, -n);
-            i_change(&u2->items, itype, n);
-          }
-          itm = itn;
-        }
-#else
-        resource_t res;
-        for (res = 0; res <= R_SILVER; ++res) {
-          int n = get_resource(u, res);
-          if (n<=0) continue;
-          n = n * nf->number / number;
-          if (n<=0) continue;
-          change_resource(u, res, -n);
-          change_resource(u2, res, n);
-        }
-#endif
-        number -= nf->number;
-        nf = nf->next;
-        free(friends);
-        friends = nf;
-      }
-      friends = NULL;
-    }
+    distribute_items(u);
     if (rterrain(r) != T_OCEAN && !!playerrace(u->race)) {
       const race * rc = u->race;
       int p = rpeasants(u->region);

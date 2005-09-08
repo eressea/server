@@ -1236,7 +1236,7 @@ shift(void)
 	t_queue_len--;
 	return r;
 }
-#ifdef NEW_ITEMS
+
 static const luxury_type * tradegood = NULL;
 
 void
@@ -1259,22 +1259,6 @@ settg(region *r)
 		}
 	}
 }
-
-#else
-int tradegood;
-
-void
-settg(region *r)
-{
-	int i;
-
-	for(i=0; i <= MAXLUXURIES; i++) {
-		rsetdemand(r, i, 1+rand()%5);
-	}
-	rsetdemand(r, tradegood, 0);
-	if(rand()%100 < 20) tradegood = rand()%7;
-}
-#endif
 
 boolean
 Create_Island(region *r, int * n, terrain_t t, int x, int y) {
@@ -1303,11 +1287,7 @@ create_island(region *r, int n, terrain_t t)
 	for(r2=regions; r2; r2=r2->next) {
 		r2->msgs = (void *)0;
 	}
-#ifdef NEW_ITEMS
 	tradegood = NULL;
-#else
-	tradegood = rand()%7;
-#endif
 	terraform(r,t);
 	if(r->land) settg(r);
 	r->msgs = (void *)(rand()%6);

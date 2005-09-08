@@ -1608,7 +1608,7 @@
     <text locale="en">damage</text>
   </string>
   <string name="nr_youaredead">
-    <text locale="en">Your faction has been eliminated. We hope you had a good time anyways, and encourage you to sign up you for another game.</text>
+    <text locale="en">Your faction has been eliminated. We hope that you had a good time, and if you liked the game, you should sign up and play again.</text>
   </string>
   <!-- TODO: calendar ist noch komplexer -->
   <string name="nr_skills">

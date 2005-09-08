@@ -114,8 +114,69 @@ dfindhash(int no)
 
 unit * udestroy = NULL;
 
-#undef DESTROY
-/* Einheiten werden nicht wirklich zerstört. */
+/** distributes a unit's posessions to friendly units
+* this happens when units die and no own units are in the region
+*/
+void
+distribute_items(unit * u)
+{
+  faction * f = u->faction;
+  region * r = u->region;
+  unit * au;
+  int number = 0;
+  struct friend {
+    struct friend * next;
+    int number;
+    faction * faction;
+    unit * unit;
+  } * friends = NULL;
+
+  if (u->items==NULL) return;
+
+  for (au=r->units;au;au=au->next) if (au->faction!=f) {
+    if (alliedunit(u, au->faction, HELP_ALL)) {
+      struct friend * nf, ** fr = &friends;
+
+      while (*fr && (*fr)->faction->no<au->faction->no) fr = &(*fr)->next;
+      nf = *fr;
+      if (nf==NULL || nf->faction!=au->faction) {
+        nf = malloc(sizeof(struct friend));
+        nf->next = *fr;
+        nf->faction = au->faction;
+        nf->unit = au;
+        nf->number = 0;
+        *fr = nf;
+      }
+      nf->number += au->number;
+      number += au->number;
+    }
+  }
+
+  if (friends && number) {
+    struct friend * nf = friends;
+    while (nf) {
+      unit * u2 = nf->unit;
+      item * itm = u->items;
+      while (itm!=NULL) {
+        const item_type * itype = itm->type;
+        item * itn = itm->next;
+        int n = itm->number;
+        n = n * nf->number / number;
+        if (n>0) {
+          i_change(&u->items, itype, -n);
+          i_change(&u2->items, itype, n);
+        }
+        itm = itn;
+      }
+      number -= nf->number;
+      nf = nf->next;
+      free(friends);
+      friends = nf;
+    }
+    friends = NULL;
+  }
+}
+
 void
 destroy_unit(unit * u)
 {
@@ -156,6 +217,7 @@ destroy_unit(unit * u)
 			}
 			if (*p_item == item) p_item=&item->next;
 		}
+    if (u->items) distribute_items(u);
 	}
 
 	/* Wir machen das erst nach dem Löschen der Items. Der Klon darf keine

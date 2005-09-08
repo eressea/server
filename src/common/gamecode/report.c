@@ -1178,11 +1178,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 
 	if (rhorses(r)) {
 		bufp += sprintf(bufp, ", %d ", rhorses(r));
-#ifdef NEW_ITEMS
 		bufp += strxcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_HORSE], (rhorses(r)>1)?GR_PLURAL:0)));
-#else
-		bufp += strxcpy(bufp, itemdata[I_HORSE].name[rhorses(r) > 1]);
-#endif
 	}
 	strcpy(bufp++, ".");
 
@@ -1916,9 +1912,6 @@ static int
 report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * addresses,
 	const char * pzTime)
 {
-#ifndef NEW_ITEMS
-	potion_t potion;
-#endif
 	int flag = 0;
 	char ch;
 	int dh;

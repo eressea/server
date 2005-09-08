@@ -179,7 +179,6 @@ input_string(const char * text, char * result, size_t len) {
 	return res;
 }
 
-#ifdef NEW_ITEMS
 static boolean i_modif = false;
 
 static void
@@ -200,7 +199,6 @@ chg_item(selection * s, void * data) {
 		s->str = strdup(buf);
 	}
 }
-#endif
 
 boolean
 modify_items(unit * u)
@@ -456,9 +454,7 @@ modify_unit(region * r, unit * modunit)
 	int q, a, x, y, zt, zg;
 	char modif = 0;
 	int at;
-#ifdef NEW_ITEMS
 	const item * itm;
-#endif
 
 	wclear(mywin);
 	sprintf(buf, "< Einheit modifizieren: %s,%s >",

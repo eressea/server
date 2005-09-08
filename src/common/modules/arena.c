@@ -139,9 +139,9 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
 		if (get_level(u, sk)>1 && enter_fail(u)) return -1;
 	}
 	for (u2=r->units;u2;u2=u2->next) if (u2->faction==u->faction) break;
-#ifdef NEW_ITEMS
-	assert(!"not implemented");
-#else
+
+  assert(!"not implemented");
+/*
 	for (res=0;res!=MAXRESOURCES;++res) if (res!=R_SILVER && res!=R_ARENA_GATE && (is_item(res) || is_herb(res) || is_potion(res))) {
 		int x = get_resource(u, res);
 		if (x) {
@@ -152,7 +152,7 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
 			else if (enter_fail(u)) return -1;
 		}
 	}
-#endif
+*/
 	if (get_money(u) > fee) {
 		if (u2) change_money(u2, get_money(u) - fee);
 		else if (enter_fail(u)) return -1;

@@ -896,7 +896,6 @@ demographics(void)
 
     if (rterrain(r) != T_OCEAN) {
       /* die Nachfrage nach Produkten steigt. */
-#ifdef NEW_ITEMS
       struct demand * dmd;
       if (r->land) for (dmd=r->land->demands;dmd;dmd=dmd->next) {
         if (dmd->value>0 && dmd->value < MAXDEMAND) {
@@ -905,24 +904,6 @@ demographics(void)
           if (rand() % 100 < rise) dmd->value++;
         }
       }
-#else
-      item_t n;
-      for (n = 0; n != MAXLUXURIES; n++) {
-        int d = rdemand(r, n);
-        if (d > 0 && d < MAXDEMAND) {
-          if (buildingtype_exists(r, &bt_harbour)) {
-            if (rand() % 100 < DMRISEHAFEN) {
-              d++;
-            }
-          } else {
-            if (rand() % 100 < DMRISE) {
-              d++;
-            }
-          }
-        }
-        rsetdemand(r, n, (char)d);
-      }
-#endif
       /* Seuchen erst nachdem die Bauern sich vermehrt haben
        * und gewandert sind */
 
@@ -2737,7 +2718,6 @@ instant_orders(void)
 
   for (f = factions; f; f = f->next) {
     attrib *a;
-#ifdef NEW_ITEMS
     a = a_find(f->attribs, &at_showitem);
     while(a!=NULL) {
       const item_type * itype = (const item_type *)a->data.v;
@@ -2750,13 +2730,6 @@ instant_orders(void)
         a = n;
       } else a = a->nexttype;
     }
-#else
-    a = a_find(f->attribs, &at_show_item_description);
-    while (a!=NULL) {
-      display_item(f, NULL, (item_t)(a->data.i));
-      a_remove(&f->attribs, a);
-    }
-#endif
   }
 
   parse(K_GROUP, group_cmd, false);

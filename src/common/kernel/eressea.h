@@ -205,10 +205,6 @@ extern void read_laen(struct region * r, int laen);
 
 #define MAXPEASANTS_PER_AREA    10
 
-#if !defined(NEW_ITEMS)
-# define NEW_ITEMS
-#endif
-
 /* So lange kann die Partei nicht angegriffen werden */
 #undef STUDY_IF_NOT_WORKING
 
