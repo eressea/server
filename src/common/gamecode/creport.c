@@ -1120,6 +1120,7 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 	}
 	fprintf(F, "PARTEI %d\n", f->no);
 	fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
+  fprintf(F, "%d;age\n", f->age);
 	fprintf(F, "%d;Optionen\n", f->options);
 #ifdef SCORE_MODULE
 	if (f->options & want(O_SCORE) && f->age>DISPLAYSCORE) {
