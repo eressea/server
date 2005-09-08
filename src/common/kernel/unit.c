@@ -217,7 +217,9 @@ destroy_unit(unit * u)
 			}
 			if (*p_item == item) p_item=&item->next;
 		}
-    if (u->items) distribute_items(u);
+    if (u->items && strlen(u->faction->passw)>0) {
+      distribute_items(u);
+    }
 	}
 
 	/* Wir machen das erst nach dem Löschen der Items. Der Klon darf keine
