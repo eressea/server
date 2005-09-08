@@ -134,7 +134,7 @@ distribute_items(unit * u)
   if (u->items==NULL) return;
 
   for (au=r->units;au;au=au->next) if (au->faction!=f) {
-    if (alliedunit(u, au->faction, HELP_ALL)) {
+    if (alliedunit(u, au->faction, HELP_MONEY) && alliedunit(au, f, HELP_GIVE)) {
       struct friend * nf, ** fr = &friends;
 
       while (*fr && (*fr)->faction->no<au->faction->no) fr = &(*fr)->next;
