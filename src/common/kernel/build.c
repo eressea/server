@@ -546,8 +546,9 @@ build_road(region * r, unit * u, int size, direction_t d)
     int dm = get_effect(u, oldpotiontype[P_DOMORE]);
     if (dm != 0) {
       int sk = eff_skill(u, SK_ROAD_BUILDING, r);
-      dm = (left - n + sk - 1) / sk;
-      dm = min(dm, u->number);
+      int todo = (left - n + sk - 1) / sk;
+      todo = min(todo, u->number);
+      dm = min(dm, todo);
       change_effect(u, oldpotiontype[P_DOMORE], -dm);
       n += dm * sk;
     }             /* Auswirkung Schaffenstrunk */
