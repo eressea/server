@@ -355,6 +355,7 @@ preferred_terrain(const struct race * rc)
 
 #define REGIONS_PER_FACTION 2
 #define PLAYERS_PER_ISLAND 20
+#define MAXISLANDSIZE 50
 #define MINFACTIONS 1
 #define MAXAGEDIFF 5
 #define VOLCANO_CHANCE 100
@@ -407,6 +408,34 @@ get_island(region * root, region_list ** rlist)
   }
 }
 
+int
+island_size(region * r)
+{
+  int size = 0;
+  region_list * rlist = NULL;
+  region_list * island = NULL;
+  add_regionlist(&rlist, r);
+  island = rlist;
+  fset(r, FL_MARK);
+  while (rlist) {
+    direction_t d;
+    r = rlist->data;
+    ++size;
+    for (d=0;d!=MAXDIRECTIONS;++d) {
+      region * rn = rconnect(r, d);
+      if (rn && !fval(rn, FL_MARK) && rn->land) {
+        add_regionlist(&rlist->next, rn);
+      }
+    }
+    rlist = rlist->next;
+  }
+  for (rlist=island;rlist;rlist=rlist->next) {
+    freset(rlist->data, FL_MARK);
+  }
+  free_regionlist(island);
+  return size;
+}
+
 /** create new island with up to nsize players
  * returns the number of players placed on the new island.
  */
@@ -434,8 +463,12 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * rn = rconnect(r, d);
           if (rn && rn->land) {
-            rmin = rn;
-            break;
+            /* only expand islands that aren't single-islands and not too big already */
+            int n = island_size(rn);
+            if (n>2 && n<MAXISLANDSIZE) {
+              rmin = rn;
+              break;
+            }
           }
         }
       }
