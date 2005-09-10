@@ -1166,11 +1166,7 @@ limit_oldtypes(const region * r, const resource_type * rtype)
 		/* TODO: split into seperate functions. really much nicer. */
 {
 	if (rtype==oldresourcetype[R_WOOD]) {
-#if GROWING_TREES
 		return rtrees(r,2) + rtrees(r,1);
-#else
-		return rtrees(r);
-#endif
 #if NEW_RESOURCEGROWTH == 0
 	} else if (rtype==oldresourcetype[R_EOG]) {
 		return rlaen(r);
@@ -1180,11 +1176,7 @@ limit_oldtypes(const region * r, const resource_type * rtype)
 		return terrain[rterrain(r)].quarries;
 #endif
 	} else if (rtype==oldresourcetype[R_MALLORN]) {
-#if GROWING_TREES
 		return rtrees(r,2) + rtrees(r,1);
-#else
-		return rtrees(r);
-#endif
 	} else if (rtype==oldresourcetype[R_HORSE]) {
 		return rhorses(r);
 	} else {
@@ -1200,7 +1192,6 @@ use_oldresource(region * r, const resource_type * rtype, int norders)
 {
 	assert(norders>0);
 	if (rtype==oldresourcetype[R_WOOD] || rtype==oldresourcetype[R_MALLORN]) {
-#if GROWING_TREES
 		int avail_grownup = rtrees(r,2);
 		int avail_young   = rtrees(r,1);
 		int wcount;
@@ -1220,12 +1211,6 @@ use_oldresource(region * r, const resource_type * rtype, int norders)
 		} else {
 			woodcounts(r, wcount*2);
 		}
-#else
-		int avail = rtrees(r);
-		assert(norders <= avail);
-		rsettrees(r, avail-norders);
-		woodcounts(r, norders);
-#endif
 #if NEW_RESOURCEGROWTH == 0
 	} else if (rtype==oldresourcetype[R_EOG]) {
 		int avail = rlaen(r);

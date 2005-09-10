@@ -69,9 +69,7 @@
 #include <attributes/racename.h>
 #include <attributes/orcification.h>
 
-#if GROWING_TREES
-# include <items/seed.h>
-#endif
+#include <items/seed.h>
 
 typedef struct request {
   struct request * next;
@@ -2395,7 +2393,6 @@ plant(region *r, unit *u, int raw)
 		"plant%u:unit%r:region%i:amount%X:herb", u, r, planted, htype->itype->rtype));
 }
 
-#if GROWING_TREES
 static void
 planttrees(region *r, unit *u, int raw)
 {
@@ -2515,8 +2512,6 @@ breedtrees(region *r, unit *u, int raw)
 		"plant%u:unit%r:region%i:amount%X:herb", u, r, planted, itype->rtype));
 }
 
-#endif
-
 static void
 plant_cmd(unit *u, struct order * ord)
 {
@@ -2555,7 +2550,6 @@ plant_cmd(unit *u, struct order * ord)
 		plant(r, u, m);
 		return;
 	}
-#if GROWING_TREES
 	else if (p==P_TREES){
 		breedtrees(r, u, m);
 		return;
@@ -2566,7 +2560,6 @@ plant_cmd(unit *u, struct order * ord)
 			return;
 		}
 	}
-#endif
 }
 
 
@@ -2636,11 +2629,9 @@ breed_cmd(unit *u, struct order * ord)
 		case P_HERBS:
 			plant(r, u, m);
 			return;
-#if GROWING_TREES
 		case P_TREES:
 			breedtrees(r, u, m);
 			return;
-#endif
 		default:
 			breedhorses(r, u);
 			return;
@@ -3262,10 +3253,8 @@ init_economy(void)
 	add_allocator(make_allocator(item2resource(olditemtype[I_STONE]), leveled_allocation));
 	add_allocator(make_allocator(item2resource(olditemtype[I_IRON]), leveled_allocation));
 	add_allocator(make_allocator(item2resource(olditemtype[I_LAEN]), leveled_allocation));
-#if GROWING_TREES
 	add_allocator(make_allocator(&rt_seed, attrib_allocation));
 	add_allocator(make_allocator(&rt_mallornseed, attrib_allocation));
-#endif
 #else
 	add_allocator(make_allocator(item2resource(olditemtype[I_STONE]), attrib_allocation));
 	add_allocator(make_allocator(item2resource(olditemtype[I_IRON]), attrib_allocation));

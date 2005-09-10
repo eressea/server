@@ -1359,7 +1359,6 @@ readregion(FILE * F, short x, short y)
 	}
 	if (r->land) {
 		int i;
-#if GROWING_TREES
 		if(global.data_version < GROWTREE_VERSION) {
 			i = ri(F); rsettrees(r, 2, i);
 		} else {
@@ -1385,9 +1384,6 @@ readregion(FILE * F, short x, short y)
 			}
 			rsettrees(r, 2, i);
 		}
-#else
-		i = ri(F); rsettrees(r, i);
-#endif
 		i = ri(F); rsethorses(r, i);
 #if NEW_RESOURCEGROWTH
 		if (global.data_version < NEWRESOURCE_VERSION) {
@@ -1496,16 +1492,12 @@ writeregion(FILE * F, const region * r)
 		const herb_type *rht;
 		struct demand * demand;
 		ws(F, r->land->name);
-#if GROWING_TREES
 		assert(rtrees(r,0)>=0);
 		assert(rtrees(r,1)>=0);
 		assert(rtrees(r,2)>=0);
 		wi(F, rtrees(r,0));
 		wi(F, rtrees(r,1));
 		wi(F, rtrees(r,2));
-#else
-		wi(F, rtrees(r));
-#endif
 		wi(F, rhorses(r));
 #if NEW_RESOURCEGROWTH == 0
 		wi(F, riron(r));

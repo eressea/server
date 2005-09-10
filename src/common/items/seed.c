@@ -13,7 +13,6 @@
 #include <config.h>
 #include <eressea.h>
 
-#if GROWING_TREES
 #include "seed.h"
 
 #include <build.h>
@@ -142,7 +141,3 @@ register_mallornseed(void)
 		rdata->use = produce_mallornseeds;
 	}
 }
-
-#else
-int __xx_nonempty=0; /* to prevent this from being an empty translation unit */
-#endif

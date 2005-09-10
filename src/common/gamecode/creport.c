@@ -1303,9 +1303,8 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 				fprintf(F, "\"%s\";Beschr\n", r->display);
 #endif
 			if (landregion(rterrain(r))) {
-#if GROWING_TREES
-				int trees = rtrees(r,2);
-				int ytrees = rtrees(r,1);
+				int trees = rtrees(r, 2);
+				int ytrees = rtrees(r, 1);
 # ifdef RESOURCECOMPAT
 				if (trees > 0) fprintf(F, "%d;Baeume\n", trees);
 				if (ytrees > 0) fprintf(F, "%d;Schoesslinge\n", ytrees);
@@ -1319,19 +1318,6 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 					if (ytrees) pos = report_resource(pos, "rm_youngmallorn", f->locale, ytrees, -1);
 					if (trees) pos = report_resource(pos, "rm_mallorn", f->locale, trees, -1);
 				}
-#else
-				int trees = rtrees(r);
-# ifdef RESOURCECOMPAT
-				fprintf(F, "%d;Baeume\n", trees);
-				if (fval(r, RF_MALLORN) && trees)
-					fprintf(F, "1;Mallorn\n");
-# endif
-				if (!fval(r, RF_MALLORN)) {
-					if (trees) pos = report_resource(pos, "rm_trees", f->locale, trees, -1);
-				} else {
-					if (trees) pos = report_resource(pos, "rm_mallorn", f->locale, trees, -1);
-				}
-#endif
 				fprintf(F, "%d;Bauern\n", rpeasants(r));
 				if(fval(r, RF_ORCIFIED)) {
 					fprintf(F, "1;Verorkt\n");

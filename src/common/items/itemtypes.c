@@ -18,9 +18,7 @@
 #include "xerewards.h"
 #include "artrewards.h"
 #include "weapons.h"
-#if GROWING_TREES
-# include "seed.h"
-#endif
+#include "seed.h"
 
 void
 register_itemtypes(void)
@@ -28,10 +26,8 @@ register_itemtypes(void)
 	register_weapons();
 	register_demonseye();
 	register_xerewards();
-#if GROWING_TREES
 	register_seed();
 	register_mallornseed();
-#endif
   register_artrewards();
 }
 

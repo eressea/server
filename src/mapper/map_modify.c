@@ -237,9 +237,7 @@ addmenulist(menulist ** SP, const char *s, int *val)
 
 static int peasants, money, trees, horses, iron, laen, chaotisch;
 
-#if GROWING_TREES
 static int ytrees, seeds;
-#endif
 
 #if NEW_RESOURCEGROWTH
 static int ironlevel, laenlevel, stone, stonelevel;
@@ -253,13 +251,9 @@ get_region(region *r) {
 
 	peasants  = rpeasants(r);
 	money     = rmoney(r);
-#if GROWING_TREES
 	trees     = rtrees(r,2);
 	ytrees    = rtrees(r,1);
 	seeds     = rtrees(r,0);
-#else
-	trees     = rtrees(r);
-#endif
 	horses    = rhorses(r);
 #if NEW_RESOURCEGROWTH
 	iron = -1;
@@ -296,13 +290,9 @@ put_region(region *r) {
 
 	rsetpeasants(r, peasants);
 	rsetmoney(r,money);
-#if GROWING_TREES
 	rsettrees(r,2,trees);
 	rsettrees(r,1,ytrees);
 	rsettrees(r,0,seeds);
-#else
-	rsettrees(r,trees);
-#endif
 	rsethorses(r, horses);
 #if NEW_RESOURCEGROWTH
 	for (res=r->resources;res;res=res->next) {
@@ -340,16 +330,12 @@ create_region_menu(menulist ** menu, region * r)
 	addmenulist(menu, "Silver", &money);
 	if (fval(r, RF_MALLORN)) {
 		addmenulist(menu, "Mallorntrees", &trees);
-#if GROWING_TREES
 		addmenulist(menu, "Mallornsprouts", &ytrees);
 		addmenulist(menu, "Mallornseeds", &seeds);
-#endif
 	} else {
 		addmenulist(menu, "Trees", &trees);
-#if GROWING_TREES
 		addmenulist(menu, "Sprouts", &ytrees);
 		addmenulist(menu, "Seeds", &seeds);
-#endif
 	}
 	addmenulist(menu, "Horses", &horses);
 #if NEW_RESOURCEGROWTH

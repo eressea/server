@@ -38,9 +38,7 @@ void remove_unequipped_guarded(void);
 #include "resolve.h"
 
 void processorders(void);
-#if GROWING_TREES
 extern attrib_type at_germs;
-#endif
 
 #ifdef __cplusplus
 }

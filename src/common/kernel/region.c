@@ -599,11 +599,7 @@ rroad(const region * r, direction_t d)
 boolean
 r_isforest(const region * r)
 {
-#if GROWING_TREES
 	if (r->terrain==T_PLAIN && rtrees(r,2) + rtrees(r,1) >= 600) return true;
-#else
-	if (r->terrain==T_PLAIN && rtrees(r) >= 600) return true;
-#endif
 	return false;
 }
 
@@ -705,7 +701,6 @@ rname(const region * r, const struct locale * lang) {
 	return locale_string(lang, terrain[rterrain(r)].name);
 }
 
-#if GROWING_TREES
 int
 rtrees(const region *r, int ageclass)
 {
@@ -722,24 +717,6 @@ rsettrees(const region *r, int ageclass, int value)
 	}
 	return 0;
 }
-#else
-int
-rtrees(const region *r)
-{
-	return ((r)->land?(r)->land->trees:0);
-}
-
-int
-rsettrees(const region *r, int value)
-{
-	if (!r->land) assert(value==0);
-	else {
-		assert(value>=0);
-		return r->land->trees=value;
-	}
-	return 0;
-}
-#endif
 
 static region *last;
 
@@ -921,13 +898,9 @@ terraform(region * r, terrain_t t)
 			freeland(r->land);
 			r->land = NULL;
 		}
-#if GROWING_TREES
 		rsettrees(r, 0, 0);
 		rsettrees(r, 1, 0);
 		rsettrees(r, 2, 0);
-#else
-		rsettrees(r, 0);
-#endif
 		rsethorses(r, 0);
 #if NEW_RESOURCEGROWTH == 0
 		rsetiron(r, 0);
@@ -1030,13 +1003,9 @@ terraform(region * r, terrain_t t)
 	case T_PLAIN:
 		rsethorses(r, rand() % (terrain[t].production_max / 5));
 		if(rand()%100 < 40) {
-#if GROWING_TREES
 			rsettrees(r, 2, terrain[t].production_max * (30+rand()%40)/100);
 			rsettrees(r, 1, rtrees(r, 2)/4);
 			rsettrees(r, 0, rtrees(r, 2)/2);
-#else
-			rsettrees(r, terrain[t].production_max * (30+rand()%40)/100);
-#endif
 		}
 		break;
 	case T_MOUNTAIN:
@@ -1068,14 +1037,12 @@ terraform(region * r, terrain_t t)
 		break;
 	}
 
-#if GROWING_TREES
 	/* Initialisierung irgendwann über rm_-Mechamismus machen */
 	if(t != T_PLAIN && rand()%100 < 20) {
 		rsettrees(r, 2, terrain[t].production_max * (30 + rand() % 40) / 100);
 		rsettrees(r, 1, rtrees(r, 2)/4);
 		rsettrees(r, 0, rtrees(r, 2)/2);
 	}
-#endif
 
 #if NEW_RESOURCEGROWTH
 	terraform_resources(r);

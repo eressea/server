@@ -947,21 +947,13 @@ sp_summonent(castorder *co)
 	attrib *a;
 	int ents;
 
-#if GROWING_TREES
 	if (rtrees(r,2) == 0) {
-#else
-	if (rtrees(r) == 0) {
-#endif
 		cmistake(mage, co->order, 204, MSG_EVENT);
 		/* nicht ohne bäume */
     return 0;
 	}
 
-#if GROWING_TREES
 	ents = (int)min(power*power, rtrees(r,2));
-#else
-	ents = (int)min(power*power, rtrees(r));
-#endif
 
 	u = create_unit(r, mage->faction, ents, new_race[RC_TREEMAN], 0, LOC(mage->faction->locale, rc_name(new_race[RC_TREEMAN], ents!=1)), mage);
 
@@ -971,11 +963,7 @@ sp_summonent(castorder *co)
 	a_add(&u->attribs, a);
 	fset(u, UFL_LOCKED);
 
-#if GROWING_TREES
 	rsettrees(r, 2, rtrees(r,2) - ents);
-#else
-	rsettrees(r, rtrees(r) - ents);
-#endif
 
 	/* melden, 1x pro Partei */
 	{
@@ -1114,13 +1102,9 @@ sp_mallorn(castorder *co)
 	}
 
 	/* half the trees will die */
-#if GROWING_TREES
 	rsettrees(r, 2, rtrees(r,2)/2);
 	rsettrees(r, 1, rtrees(r,1)/2);
 	rsettrees(r, 0, rtrees(r,0)/2);
-#else
-	rsettrees(r, rtrees(r)/2);
-#endif
 	fset(r, RF_MALLORN);
 
 	/* melden, 1x pro Partei */
@@ -1205,11 +1189,7 @@ sp_hain(castorder *co)
 	}
 
 	trees = lovar((int)(force * 10 * RESOURCE_QUANTITY)) + (int)force;
-#if GROWING_TREES
 	rsettrees(r, 1, rtrees(r,1) + trees);
-#else
-	rsettrees(r, rtrees(r) + trees);
-#endif
 
 	/* melden, 1x pro Partei */
 	{
@@ -1254,11 +1234,7 @@ sp_mallornhain(castorder *co)
 	}
 
 	trees = lovar((int)(force * 10 * RESOURCE_QUANTITY)) + (int)force;
-#if GROWING_TREES
 	rsettrees(r, 1, rtrees(r,1) + trees);
-#else
-	rsettrees(r, rtrees(r) + trees);
-#endif
 
 	/* melden, 1x pro Partei */
 	{
@@ -1690,13 +1666,9 @@ sp_great_drought(castorder *co)
 
   /* sterben */
 	rsetpeasants(r, rpeasants(r)/2); /* evtl wuerfeln */
-#if GROWING_TREES
 	rsettrees(r, 2, rtrees(r,2)/2);
 	rsettrees(r, 1, rtrees(r,1)/2);
 	rsettrees(r, 0, rtrees(r,0)/2);
-#else
-	rsettrees(r, rtrees(r)/2);
-#endif
 	rsethorses(r, rhorses(r)/2);
 
 	/* Arbeitslohn = 1/4 */
@@ -2188,13 +2160,9 @@ sp_drought(castorder *co)
 	} else {
     variant effect;
 		/* Baeume und Pferde sterben */
-#if GROWING_TREES
 		rsettrees(r, 2, rtrees(r,2)/2);
 		rsettrees(r, 1, rtrees(r,1)/2);
 		rsettrees(r, 0, rtrees(r,0)/2);
-#else
-		rsettrees(r, rtrees(r)/2);
-#endif
 		rsethorses(r, rhorses(r)/2);
 
     effect.i = 4;
@@ -2563,24 +2531,16 @@ sp_forest_fire(castorder *co)
   double probability;
 	double percentage = (rand() % 8 + 1) * 0.1;	 /* 10 - 80% */
 
-#if GROWING_TREES
   int vernichtet_schoesslinge = (int)(rtrees(r, 1) * percentage);
 	int destroyed = (int)(rtrees(r, 2) * percentage);
-#else
-	int destroyed = (int)(rtrees(r) * percentage);
-#endif
 
 	if (destroyed<1) {
 		cmistake(mage, co->order, 198, MSG_MAGIC);
 		return 0;
 	}
 
-#if GROWING_TREES
 	rsettrees(r, 2, rtrees(r,2) - destroyed);
 	rsettrees(r, 1, rtrees(r,1) - vernichtet_schoesslinge);
-#else
-	rsettrees(r, rtrees(r) - destroyed);
-#endif
 	probability = destroyed * 0.001;	/* Chance, dass es sich ausbreitet */
 
 	/* melden, 1x pro Partei */
@@ -2598,15 +2558,9 @@ sp_forest_fire(castorder *co)
 		}
 	}
 	if(!fval(mage->faction, FL_DH)){
-#if GROWING_TREES
 		sprintf(buf, "%s erzeugt eine verheerende Feuersbrunst.  %d %s "
 				"den Flammen zum Opfer.", unitname(mage), destroyed+vernichtet_schoesslinge,
 				destroyed+vernichtet_schoesslinge == 1 ? "Baum fiel" : "Bäume fielen");
-#else
-		sprintf(buf, "%s erzeugt eine verheerende Feuersbrunst.  %d %s "
-				"den Flammen zum Opfer.", unitname(mage), destroyed,
-				destroyed == 1 ? "Baum fiel" : "Bäume fielen");
-#endif
 		addmessage(0, mage->faction, buf, MSG_MAGIC, ML_INFO);
 	}
 
@@ -2616,7 +2570,6 @@ sp_forest_fire(castorder *co)
 		destroyed = 0;
 		vernichtet_schoesslinge = 0;
 
-#if GROWING_TREES
 		if(rtrees(nr,2) + rtrees(nr,1) >= 800) {
 			if (chance(probability)) {
 				destroyed = (int)(rtrees(nr,2) * percentage/2);
@@ -2640,22 +2593,6 @@ sp_forest_fire(castorder *co)
       rsettrees(nr, 2, rtrees(nr,2) - destroyed);
       rsettrees(nr, 1, rtrees(nr,1) - vernichtet_schoesslinge);
     }
-#else
-		if (rtrees(nr) >= 800) {
-			if (chance(probability)) destroyed = (int)(rtrees(nr) * percentage/2);
-		} else if (rtrees(nr) >= 600) {
-			if(chance(probability/2)) destroyed = (int)(rtrees(nr) * percentage/4);
-		}
-
-		if (destroyed > 0 ) {
-      message * m = msg_message("forestfire_spread", "region next trees",
-        r, nr, destroyed);
-      add_message(&r->msgs, m);
-      add_message(&mage->faction->msgs, m);
-      msg_release(m);
-			rsettrees(nr, rtrees(nr) - destroyed);
-		}
-#endif
 	}
 	return cast_level;
 }

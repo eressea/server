@@ -642,9 +642,6 @@ migrate(region * r)
      * das hatte ich geändert. jemand hat es wieder gelöscht, toll.
      * ich habe es wieder aktiviert, muß getestet werden.
      */
-#if GROWING_TREES == 0
-    rsettrees(r, rtrees(r) + m->trees);
-#endif
     *hp = m->next;
     m->next = free_migrants;
     free_migrants = m;
@@ -876,7 +873,6 @@ void
 demographics(void)
 {
   region *r;
-#if GROWING_TREES
   static int last_weeks_season = -1;
   static int current_season = -1;
 
@@ -884,7 +880,6 @@ demographics(void)
     current_season = get_gamedate(turn, NULL)->season;
     last_weeks_season = get_gamedate(turn-1, NULL)->season;
   }
-#endif
 
   for (r = regions; r; r = r->next) {
     if (r->age>0 || rterrain(r)!=T_OCEAN) {
@@ -912,13 +907,9 @@ demographics(void)
       plagues(r, false);
 
       horses(r);
-#if GROWING_TREES
       if(current_season != SEASON_WINTER) {
         trees(r, current_season, last_weeks_season);
       }
-#else
-      trees(r);
-#endif
 #if NEW_RESOURCEGROWTH
       update_resources(r);
 #else

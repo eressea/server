@@ -19,7 +19,6 @@ extern "C" {
 #endif
 
 
-#if GROWING_TREES
 extern struct item_type it_seed;
 extern struct resource_type rt_seed;
 extern void register_seed(void);
@@ -27,9 +26,6 @@ extern void register_seed(void);
 extern struct item_type it_mallornseed;
 extern struct resource_type rt_mallornseed;
 extern void register_mallornseed(void);
-#else
-#error seed.h should not be included when building with GROWING_TREES==0
-#endif
 
 #ifdef __cplusplus
 }

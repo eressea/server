@@ -71,11 +71,7 @@ typedef struct land_region {
   } * demands;
   const struct herb_type * herbtype;
   short herbs;
-#if GROWING_TREES
   int trees[3]; /* 0 -> Samen, 1 -> Sprößlinge, 2 -> Bäume */
-#else
-  int trees;
-#endif
   int horses;
   int peasants;
   int newpeasants;
@@ -194,13 +190,8 @@ void rsetroad(struct region * r, direction_t d, short value);
 
 int is_coastregion(struct region *r);
 
-#if GROWING_TREES
 int rtrees(const struct region * r, int ageclass);
 int rsettrees(const struct region *r, int ageclass, int value);
-#else
-int rtrees(const struct region * r);
-int rsettrees(const struct region * r, int value);
-#endif
 
 int rpeasants(const struct region * r);
 void rsetpeasants(struct region * r, int value);

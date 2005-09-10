@@ -117,11 +117,7 @@ use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 					GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10*amount);
 		}
 	  if (r->land==0) holz=0;
-#if GROWING_TREES
 		rsettrees(r, 1, rtrees(r, 1) + holz);
-#else
-		rsettrees(r, rtrees(r) + holz);
-#endif
 		add_message(&u->faction->msgs, new_message(u->faction,
 			"growtree_effect%u:mage%i:amount", u, holz));
 	} else if (ptype==oldpotiontype[P_HEAL]) {

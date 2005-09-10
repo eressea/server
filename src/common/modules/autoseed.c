@@ -530,9 +530,23 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
       newfaction ** nfp, * nextf = *players;
       faction * f;
       unit * u;
+      int n;
 
       isize += REGIONS_PER_FACTION;
       terraform(r, preferred_terrain(nextf->race));
+      n = rhorses(r);
+      if (n<terrain[r->terrain].production_max/20) {
+        n = terrain[r->terrain].production_max/20;
+        rsethorses(r, n);
+      }
+      n = rtrees(r, 2);
+      if (n<terrain[r->terrain].production_max/10) {
+        n = terrain[r->terrain].production_max/10;
+        rsettrees(r, 2, n);
+        rsettrees(r, 2, n/4);
+        rsettrees(r, 2, n/2);
+      }
+      n = rhorses(r);
       ++tsize;
       assert(r->land && r->units==0);
       u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race,

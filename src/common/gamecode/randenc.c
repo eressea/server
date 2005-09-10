@@ -126,11 +126,7 @@ dissolve_units(void)
 					break;
 				case 2:
 					if (r->land && !fval(r, RF_MALLORN)) {
-#if GROWING_TREES
   					rsettrees(r, 2, rtrees(r,2) + n);
-#else
-	  				rsettrees(r, rtrees(r) + n);
-#endif
 						if (n == 1) {
 							str = "wurde zum Baum.";
 						} else {
@@ -820,13 +816,9 @@ volcano_outbreak(region *r)
 
 	/* Vulkan-Region verwüsten */
 
-#if GROWING_TREES
 	rsettrees(r, 2, 0);
 	rsettrees(r, 1, 0);
 	rsettrees(r, 0, 0);
-#else
-	rsettrees(r, 0);
-#endif
 
 	a = a_find(r->attribs, &at_reduceproduction);
 	if (!a) a = a_add(&r->attribs, a_new(&at_reduceproduction));
@@ -864,13 +856,9 @@ volcano_outbreak(region *r)
 
 	if (rn) {
 
-#if GROWING_TREES
 		rsettrees(r, 2, 0);
 		rsettrees(r, 1, 0);
 		rsettrees(r, 0, 0);
-#else
-		rsettrees(r, 0);
-#endif
 
 		a = a_find(rn->attribs, &at_reduceproduction);
 		if (!a) a = a_add(&rn->attribs, a_new(&at_reduceproduction));
@@ -1323,11 +1311,7 @@ randomevents(void)
 #if !RACE_ADJUSTMENTS
 	/* Elfen generieren Wald */
 		if (r->land && !fval(r, RF_MALLORN)) {
-#if GROWING_TREES
 			int trees = rtrees(r, 2);
-#else
-			int trees = rtrees(r);
-#endif
 			int maxgen = (production(r) * MAXPEASANTS_PER_AREA)/8;
 			for (u = r->units; u && maxgen > 0; u = u->next) {
 				if (u->race == new_race[RC_ELF]) {
@@ -1339,11 +1323,7 @@ randomevents(void)
 					}
 				}
 			}
-#if GROWING_TREES
 			rsettrees(r, 2, trees);
-#else
-			rsettrees(r, trees);
-#endif /* GROWING_TREES */
 		} /* !RACE_ADJUSTMENTS */
 #endif
 
@@ -1578,22 +1558,14 @@ randomevents(void)
 	for (r = regions; r; r = r->next) {
 		if (fval(r, RF_CHAOTIC) ||(r->x >= -13  && r->x <= -6  && r->y >= 50 && r->y <= 57)) {
 			if (woodcount(r) >= 40 && rand()%100 < 33) {
-#if GROWING_TREES
 				int trees = rtrees(r,2);
-#else
-				int trees = rtrees(r);
-#endif
 				int treemen = rand()%(max(50,trees)/3);
 				struct message * msg;
 
 				treemen = max(25, treemen);
 				woodcounts(r, -40);
 				trees = max(0, trees-treemen);
-#if GROWING_TREES
 				rsettrees(r, 2, trees);
-#else
-				rsettrees(r, trees);
-#endif
 				u = createunit(r, findfaction(MONSTER_FACTION),treemen, new_race[RC_TREEMAN]);
         fset(u, UFL_ISNEW|UFL_MOVED);
 

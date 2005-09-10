@@ -1997,12 +1997,8 @@ idle (faction * f)
 int
 maxworkingpeasants(const struct region * r)
 {
-#if GROWING_TREES
 	int i = production(r) * MAXPEASANTS_PER_AREA
 		- ((rtrees(r,2)+rtrees(r,1)/2) * TREESIZE);
-#else
-	int i = production(r) * MAXPEASANTS_PER_AREA - rtrees(r) * TREESIZE;
-#endif
 	return max(i, 0);
 }
 
@@ -3199,9 +3195,7 @@ attrib_init(void)
 	register_bordertype(&bt_questportal);
 
 	at_register(&at_jihad);
-#if GROWING_TREES
 	at_register(&at_germs);
-#endif
 	at_register(&at_laen); /* required for old datafiles */
 #ifdef XECMD_MODULE
 	at_register(&at_xontormiaexpress); /* required for old datafiles */

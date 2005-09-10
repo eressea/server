@@ -340,10 +340,8 @@ is_repeated(const order * ord)
     case K_PIRACY:
       return true;
 
-#if GROWING_TREES
     case K_PLANT:
       return true;
-#endif
 
     case K_FOLLOW:
       /* FOLLOW is only a long order if we are following a ship. */
@@ -401,10 +399,8 @@ is_exclusive(const order * ord)
     case K_PIRACY:
       return true;
 
-#if GROWING_TREES
     case K_PLANT:
       return true;
-#endif
 
     case K_FOLLOW:
       /* FOLLOW is only a long order if we are following a ship. */

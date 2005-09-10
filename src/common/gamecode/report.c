@@ -1000,9 +1000,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	boolean dh;
 	direction_t d;
 	int trees;
-#if GROWING_TREES
 	int ytrees;
-#endif
 	attrib *a;
 	const char *tname;
 	struct edge {
@@ -1070,7 +1068,6 @@ describe(FILE * F, const region * r, int partial, faction * f)
 
 	/* Bäume */
 
-#if GROWING_TREES
 	trees  = rtrees(r,2);
 	ytrees = rtrees(r,1);
 	if (production(r)) {
@@ -1088,22 +1085,6 @@ describe(FILE * F, const region * r, int partial, faction * f)
 				bufp += strxcpy(bufp, LOC(f->locale, "nr_tree_p"));
 		}
 	}
-#else
-	trees = rtrees(r);
-	if (production(r) && trees > 0) {
-		bufp += sprintf(bufp, ", %d ", trees);
-		if (fval(r, RF_MALLORN)) {
-			if (trees == 1)
-				bufp += strxcpy(bufp, LOC(f->locale, "nr_mallorntree"));
-			else
-				bufp += strxcpy(bufp, LOC(f->locale, "nr_mallorntree_p"));
-		}
-		else if (trees == 1)
-			bufp += strxcpy(bufp, LOC(f->locale, "nr_tree"));
-		else
-			bufp += strxcpy(bufp, LOC(f->locale, "nr_tree_p"));
-	}
-#endif
 
 	/* iron & stone */
 #if NEW_RESOURCEGROWTH

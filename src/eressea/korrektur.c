@@ -673,7 +673,6 @@ init_resourcefix(void)
 
 #endif
 
-#if GROWING_TREES
 int
 growing_trees(void)
 {
@@ -687,7 +686,6 @@ growing_trees(void)
 	}
 	return 0;
 }
-#endif
 
 #include <triggers/gate.h>
 #include <triggers/unguard.h>
