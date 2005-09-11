@@ -223,20 +223,12 @@ showregion(region * r, char full)
 	if (r->terrain != T_OCEAN && r->terrain!=T_FIREWALL) {
 		sprintf(buf, " %d peasants, %d(%d) silver", rpeasants(r), rmoney(r), count_all_money(r));
 		adddbllist(&reglist, buf);
-#if GROWING_TREES
 		sprintf(buf, " %d horses, %d/%d/%d ",
 				rhorses(r), rtrees(r,2), rtrees(r,1), rtrees(r,0));
 		if (fval(r,RF_MALLORN))
 			sncat(buf, "mallorn", BUFSIZE);
 		else
 			sncat(buf, "trees", BUFSIZE);
-#else
-		sprintf(buf, " %d Pferde, %d ", rhorses(r), rtrees(r));
-		if (fval(r,RF_MALLORN))
-			sncat(buf, "mallorn", BUFSIZE);
-		else
-			sncat(buf, "trees", BUFSIZE);
-#endif
 		adddbllist(&reglist, buf);
 
 #if NEW_RESOURCEGROWTH
