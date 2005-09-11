@@ -2561,7 +2561,7 @@
       <arg name="target" type="unit"/>
       <arg name="report" type="string"/>
     </type>
-    <text locale="de">"$unit($spy) gelang es Informationen über $unit($target) herauszubekommen: '$report'."</text>
+    <text locale="de">"$unit($spy) gelang es, Informationen über $unit($target) herauszubekommen: '$report'."</text>
     <text locale="fr">"$unit($spy) managed to gather information about $unit($target): '$report'."</text>
     <text locale="en">"$unit($spy) managed to gather information about $unit($target): '$report'."</text>
   </message>

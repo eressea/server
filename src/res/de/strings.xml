@@ -814,6 +814,16 @@
   <string name="citadel">
     <text locale="de">Zitadelle</text>
   </string>
+ 
+  <!-- wdw Pyramide -->
+  <string name="wdw_pyramid">
+    <text locale="de">Pyramide</text>
+    <text locale="en">pyramid</text>
+  </string>
+  <string name="pyramid">
+    <text locale="de">Pyramide</text>
+    <text locale="en">pyramid</text>
+  </string>
 
   <!--Items -->
   <string name="sphereofinv">
@@ -852,7 +862,14 @@
     <text locale="de">Sonnensegel</text>
     <text locale="en">solar sails</text>
   </string>
-
+  <string name="papyrus">
+    <text locale="de">Papyrus</text>
+    <text locale="en">papyrus</text>
+  </string>
+  <string name="papyrus_p">
+    <text locale="de">Papyri</text>
+    <text locale="en">papyri</text>
+  </string>
   <string name="elfspoil">
     <text locale="de">Elfenohr</text>
     <text locale="en">elven ear</text>

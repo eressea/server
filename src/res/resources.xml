@@ -32,7 +32,7 @@
       <function name="use" value="use_speedsail"/>
     </item>
   </resource>
-
+  
   <resource name="snowman">
     <!-- xmas gimmik -->
     <item notlost="yes" weight="1"/>

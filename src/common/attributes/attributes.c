@@ -74,4 +74,7 @@ init_attributes(void)
 	init_ugroup();
 #endif
 	init_variable();
+#ifdef WDW_PYRAMID
+  init_alliance();
+#endif
 }

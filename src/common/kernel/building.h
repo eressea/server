@@ -143,6 +143,11 @@ extern struct unit * buildingowner(const struct region * r, const struct buildin
 extern attrib_type at_nodestroy;
 extern attrib_type at_building_action;
 
+#if WDW_PYRAMID
+extern int wdw_pyramid_size(const struct building *b);
+extern int wdw_pyramid_size_for_next_level(const struct building *b);
+#endif
+
 typedef struct building_action {
   building * b;
   char * fname;

@@ -30,4 +30,8 @@
 	<resource name="emerald" appearance="gem">
 		<item weight="0"></item>
 	</resource>
+        <resource name="papyrus">
+                <item weight="1">
+                </item>
+        </resource>
 </resources>

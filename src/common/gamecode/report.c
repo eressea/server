@@ -1873,6 +1873,19 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 	if (i != '!' && i != '?' && i != '.')
 		scat(".");
 
+#if WDW_PYRAMID
+  if(b->type == bt_find("wdw_pyramid")) {
+    attrib *a = a_find(b->attribs, &at_alliance));
+    if(f->alliance && f->alliance->id == a->data.i) {
+      scat("Die Größenstufe dieser Pyramide ist ");
+      icat(wdw_pyramid_level(b));
+      scat(". Die nächste Größenstufe wird mit ");
+      icat(wdw_pyramid_size_for_next_level(b));
+      scat(" Größenpunkten erreicht. Baukosten pro Größenpunkt: ");
+    }
+  }
+#endif
+
 	rparagraph(F, buf, 2, 0);
 
 	if (mode<see_lighthouse) return;

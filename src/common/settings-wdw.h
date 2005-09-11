@@ -55,6 +55,7 @@
 #undef XECMD_MODULE
 #define WDW_PHOENIX
 #define WDW_PYRAMIDSPELL
+/* #define WDW_PYRAMID 1 */
 
 #define KEEP_UNZIPPED 1
-
+#define NO_RANDOM_BRAINEATERS 1

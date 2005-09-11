@@ -145,6 +145,8 @@ random_in_teleport_plane(void)
 
   if (f0==NULL) return;
 
+  /* Für WDW abschaltbar machen */
+#if NO_RANDOM_BRAINEATERS == 1
   for (r=regions; r; r=r->next) {
     if (rplane(r) != get_astralplane() || rterrain(r) != T_ASTRAL) continue;
 
@@ -159,6 +161,7 @@ random_in_teleport_plane(void)
       next = rand() % 100;
     }
   }
+#endif
 }
 
 plane *

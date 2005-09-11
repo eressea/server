@@ -149,5 +149,12 @@
       <requirement type="money" quantity="100"/>
     </construction>
   </building>
+  <building name="pyramid" capacity="1" maxcapacity="10000" nodestroy="yes">
+    <construction skill="sk_building" minskill="10" reqsize="1">
+      <requirement type="iron" quantity="100"/>
+      <requirement type="log" quantity="100"/>
+      <requirement type="stone" quantity="100"/>
+    </construction>
+  </building>
 </buildings>
 

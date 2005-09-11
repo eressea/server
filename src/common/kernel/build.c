@@ -916,6 +916,13 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     u->building = b;
     fset(u, UFL_OWNER);
 
+#if WDW_PYRAMID
+    if(b->type == bt_find("wdw_pyramid") && u->faction->alliance != NULL) {
+      attrib * a = a_add(&b->attribs, a_new(&at_alliance));
+      a->data.i = u->faction->alliance->id;
+    }
+#endif
+
     newbuilding = true;
   }
 
@@ -946,6 +953,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
 
   b->size += built;
   update_lighthouse(b);
+
 
   ADDMSG(&u->faction->msgs, msg_message("buildbuilding", 
     "building unit size", b, u, built));
