@@ -1495,6 +1495,20 @@ display_cmd(unit * u, struct order * ord)
   return 0;
 }
 
+static boolean
+renamed_building(const building * b)
+{
+  const struct locale * lang = locales;
+  for (;lang;lang=nextlocale(lang)) {
+    const char * bdname = LOC(lang, b->type->_name);
+    size_t bdlen = strlen(bdname);
+    if (strlen(b->name)>=bdlen && strncmp(b->name, bdname, bdlen)==0) {
+      return false;
+    }
+  }
+  return true;
+}
+
 static int
 name_cmd(unit * u, struct order * ord)
 {
@@ -1529,15 +1543,7 @@ name_cmd(unit * u, struct order * ord)
         cmistake(u, ord, 278, MSG_EVENT);
         break;
       } else {
-        const struct locale * lang = locales;
-        for (;lang;lang=nextlocale(lang)) {
-          const char * bdname = LOC(lang, b->type->_name);
-          size_t bdlen = strlen(bdname);
-          if (strlen(b->name)>=bdlen && strncmp(b->name, bdname, bdlen)==0) {
-            break;
-          }
-        }
-        if (lang==NULL) {
+        if (renamed_building(b)) {
           cmistake(u, ord, 246, MSG_EVENT);
           break;
         }
@@ -1568,8 +1574,7 @@ name_cmd(unit * u, struct order * ord)
         break;
       }
       if (b->type == bt_find("monument")) {
-        sprintf(buf, "Monument %d", b->no);
-        if (strcmp(b->name, buf)!=0) {
+        if (renamed_building(b)) {
           cmistake(u, ord, 29, MSG_EVENT);
           break;
         }
