@@ -742,6 +742,52 @@ fix_gates(void)
 	}
 }
 
+static int
+road_decay(void)
+{
+  const struct building_type * bt_caravan, * bt_dam, * bt_tunnel;
+  region * r;
+
+  bt_caravan = bt_find("caravan");
+  bt_dam = bt_find("dam");
+  bt_tunnel = bt_find("tunnel");
+
+  for (r=regions;r;r=r->next) {
+    boolean half = false;
+    if (rterrain(r) == T_SWAMP) {
+      /* wenn kein Damm existiert */
+      if (!buildingtype_exists(r, bt_dam)) {
+        half = true;
+      }
+    }
+    else if (rterrain(r) == T_DESERT) {
+      /* wenn keine Karawanserei existiert */
+      if (!buildingtype_exists(r, bt_caravan)) {
+        half = true;
+      }
+    }
+    else if (rterrain(r) == T_GLACIER) {
+      /* wenn kein Tunnel existiert */
+      if (!buildingtype_exists(r, bt_tunnel)) {
+        half = true;
+      }
+    }
+
+    if (half) {
+      direction_t d;
+      short maxt = terrain[rterrain(r)].roadreq;
+      /* Falls Karawanserei, Damm oder Tunnel einstürzen, wird die schon
+       * gebaute Straße zur Hälfte vernichtet */
+      for (d=0;d!=MAXDIRECTIONS;++d) {
+        if (rroad(r, d) > maxt) {
+          rsetroad(r, d, maxt);
+        }
+      }
+    }
+  }
+  return 0;
+}
+
 static void
 frame_regions(void)
 {
@@ -1169,6 +1215,7 @@ korrektur(void)
   } else {
     do_once("zvrm", nothing());
   }
+  do_once("rdec", road_decay());
 
   do_once("chgt", fix_chaosgates());
   do_once("atrx", fix_attribflags());
