@@ -814,7 +814,7 @@
   <string name="citadel">
     <text locale="de">Zitadelle</text>
   </string>
- 
+
   <!-- wdw Pyramide -->
   <string name="wdw_pyramid">
     <text locale="de">Pyramide</text>
@@ -1391,7 +1391,7 @@
     <text locale="de">Schartige Schwerter</text>
   </string>
   <string name="rustyshield">
-    <text locale="de">Rostiges Schild</text>
+    <text locale="de">Rostiger Schild</text>
   </string>
   <string name="rustyshield_p">
     <text locale="de">Rostige Schilde</text>
