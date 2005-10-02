@@ -1001,15 +1001,6 @@ gebaeude_stuerzt_ein(region * r, building * b)
 		}
 	}
 
-  /* Falls Karawanserei, Damm oder Tunnel einstürzen, wird die schon
-  * gebaute Straße zur Hälfte vernichtet */
-  if (b->type == bt_find("caravan") || b->type == bt_find("dam") || b->type == bt_find("tunnel")) {
-    for (d=0;d!=MAXDIRECTIONS;++d) if (rroad(r, d) > 0) {
-      road = 1;
-      /* vernichtung findet erst in destroy_building statt! */
-      break;
-    }
-  }
 	msg = msg_message("buildingcrash", "region building opfer road", r, b, opfer, road);
 	add_message(&r->msgs, msg);
 	for (u=r->units; u; u=u->next) {

@@ -455,19 +455,21 @@ get_allies(region * r, unit * u)
 		break;
 	}
 
-	u_setfaction(newunit, u->faction);
-	set_racename(&newunit->attribs, get_racename(u->attribs));
-	if(u->race->flags & RCF_SHAPESHIFT) {
-		newunit->irace = u->irace;
-	}
-	if (fval(u, UFL_PARTEITARNUNG)) fset(newunit, UFL_PARTEITARNUNG);
-	fset(newunit, UFL_ISNEW);
+  if (newunit!=NULL) {
+	  u_setfaction(newunit, u->faction);
+	  set_racename(&newunit->attribs, get_racename(u->attribs));
+	  if(u->race->flags & RCF_SHAPESHIFT) {
+		  newunit->irace = u->irace;
+	  }
+	  if (fval(u, UFL_PARTEITARNUNG)) fset(newunit, UFL_PARTEITARNUNG);
+	  fset(newunit, UFL_ISNEW);
 
-	sprintf(buf, "Plötzlich stolper%c %s über einige %s. Nach kurzem "
-		"Zögern entschließen sich die %s, sich Deiner Partei anzuschließen.",
-	 u->number == 1 ? 't' : 'n', unitname(u), newunit->name, newunit->name);
+	  sprintf(buf, "Plötzlich stolper%c %s über einige %s. Nach kurzem "
+		  "Zögern entschließen sich die %s, sich Deiner Partei anzuschließen.",
+	  u->number == 1 ? 't' : 'n', unitname(u), newunit->name, newunit->name);
 
-	addmessage(r, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
+	  addmessage(r, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
+  }
 }
 
 static void
