@@ -28,6 +28,7 @@ extern "C" {
 
   void create_teleport_plane(void);
   void set_teleport_plane_regiontypes(void);
+  void spawn_braineaters(float chance);
 
 #ifdef __cplusplus
 }

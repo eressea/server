@@ -76,6 +76,7 @@ function process(orders)
   end
   run_scripts()
 
+  spawn_braineaters(0.25)
   plan_monsters()
   process_orders()
 

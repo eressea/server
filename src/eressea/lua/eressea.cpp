@@ -20,6 +20,7 @@
 #include <kernel/race.h>
 #include <kernel/reports.h>
 #include <kernel/save.h>
+#include <kernel/teleport.h>
 #include <kernel/unit.h>
 
 // lua includes
@@ -234,6 +235,7 @@ bind_eressea(lua_State * L)
 
     /* scripted monsters */
     def("plan_monsters", &lua_planmonsters),
+    def("spawn_braineaters", &spawn_braineaters),
     def("set_brain", &race_setscript),
 
     /* map making */

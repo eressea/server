@@ -15,6 +15,7 @@ function process(orders)
   sphinx_weekly()
 
   -- run the turn:
+  -- (no more braineaters) spawn_braineaters(0.25)
   plan_monsters()
   process_orders()
   outfile = "" .. get_turn()

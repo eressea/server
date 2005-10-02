@@ -137,17 +137,15 @@ all_in_range(const region *r, short n, boolean (*valid)(const region *))
 }
 
 void
-random_in_teleport_plane(void)
+spawn_braineaters(float chance)
 {
   region *r;
   faction *f0 = findfaction(MONSTER_FACTION);
-  int next = rand() % 100;
-
+  int next = rand() % (int)(chance*100);
+  
   if (f0==NULL) return;
 
-  /* Für WDW abschaltbar machen */
-#if NO_RANDOM_BRAINEATERS == 0
-  for (r=regions; r; r=r->next) {
+  for (r = regions; r; r = r->next) {
     if (rplane(r) != get_astralplane() || rterrain(r) != T_ASTRAL) continue;
 
     /* Neues Monster ? */
@@ -158,10 +156,9 @@ random_in_teleport_plane(void)
       set_string(&u->display, "Wabernde grüne Schwaden treiben durch den Nebel und verdichten sich zu einer unheimlichen Kreatur, die nur aus einem langen Ruderschwanz und einem riesigen runden Maul zu bestehen scheint.");
       set_level(u, SK_STEALTH, 1);
       set_level(u, SK_OBSERVATION, 1);
-      next = rand() % 100;
+      next = rand() % (int)(chance*100);
     }
   }
-#endif
 }
 
 plane *
@@ -189,7 +186,6 @@ void
 create_teleport_plane(void)
 {
   region *r;
-  int i;
   plane * aplane = get_astralplane();
 
   /* Regionsbereich aufbauen. */
@@ -216,10 +212,6 @@ create_teleport_plane(void)
         }
       }
     }
-  }
-
-  for(i=0;i<4;i++) {
-    random_in_teleport_plane();
   }
 }
 
