@@ -92,7 +92,7 @@
     <item name="sword" amount="1"/>
     <item name="money" amount="d40+59"/>
     <subset chance="0.6">
-      <set name="random_plate"/>
+      <set name="item_plate"/>
     </subset>
   </set>
 
@@ -126,7 +126,7 @@
       <set name="random_bow" chance="0.25"/>
     </subset>
     <subset chance="0.4">
-      <set name="random_chain"/>
+      <set name="item_chain"/>
     </subset>
     <subset chance="0.3">
       <set name="random_rider"/>
@@ -153,17 +153,57 @@
     <item name="bow" amount="1"/>
   </set>
 
-  <set name="random_plate">
-    <item name="plate" amount="1"/>
-  </set>
-
-  <set name="random_chain">
-    <item name="chainmail" amount="1"/>
-  </set>
-
   <set name="random_rider">
     <item name="horse" amount="1"/>
     <skill name="sk_riding" level="d3"/>
+  </set>
+
+  <set name="recruited_dracoid">
+    <!-- dracoiden, von drachen rekrutiert -->
+    <skill name="sk_spear" level="d4+2"/>
+    <skill name="sk_melee" level="d4+2"/>
+    <skill name="sk_bow" level="d3+1"/>
+    <subset>
+      <!-- dracoiden haben immer eine von drei waffen -->
+      <set name="item_sword" chance="0.33"/>
+      <set name="item_spear" chance="0.33"/>
+      <set name="item_bow" chance="0.34"/>
+    </subset>
+  </set>
+
+  <set name="rising_undead">
+    <!-- untote, von den graebern auferstanden -->
+    <item name="rustysword" amount="1"/>
+    <item name="rustychainmail" amount="d2-1"/>
+    <subset chance="0.3">
+      <set name="item_rustyshield"/>
+    </subset>
+  </set>
+
+
+  <!-- single-item sets (that can be given a percentage-chance in a subset) -->
+  <set name="item_plate">
+    <item name="plate" amount="1"/>
+  </set>
+
+  <set name="item_spear">
+    <item name="spear" amount="1"/>
+  </set>
+
+  <set name="item_bow">
+    <item name="bow" amount="1"/>
+  </set>
+
+  <set name="item_sword">
+    <item name="sword" amount="1"/>
+  </set>
+
+  <set name="item_chain">
+    <item name="chainmail" amount="1"/>
+  </set>
+
+  <set name="item_rustychain">
+    <item name="rustychainmail" amount="1"/>
   </set>
 
 </equipment>

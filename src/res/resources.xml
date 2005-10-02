@@ -54,6 +54,30 @@
     </item>
   </resource>
 
+  <resource name="sword">
+    <item weight="100">
+      <construction skill="sk_weaponsmithing" minskill="3" reqsize="1">
+        <requirement type="iron" quantity="1"/>
+      </construction>
+      <weapon cut="true" skill="sk_melee">
+        <damage type="rider" value="1d9+2"/>
+        <damage type="footman" value="1d9+2"/>
+      </weapon>
+    </item>
+  </resource>
+
+  <resource name="rustysword">
+    <item weight="100">
+      <construction skill="sk_weaponsmithing" minskill="3" reqsize="1">
+        <requirement type="iron" quantity="1"/>
+      </construction>
+      <weapon cut="true" skill="sk_melee" offmod="-1" defmod="-1">
+        <damage type="rider" value="1d9"/>
+        <damage type="footman" value="1d9"/>
+      </weapon>
+    </item>
+  </resource>
+
   <resource name="axe">
     <item weight="200">
       <construction skill="sk_weaponsmithing" minskill="3" reqsize="1">

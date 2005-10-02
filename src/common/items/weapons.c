@@ -60,11 +60,8 @@ enum {
 	WP_CROSSBOW,
 	WP_SPEAR,
 	WP_GREATSWORD,
-	WP_SWORD,
 	WP_LANCE,
-	WP_RUSTY_SWORD,
 	WP_RUSTY_GREATSWORD,
-	WP_RUSTY_AXE,
 	WP_RUSTY_HALBERD,
 	WP_NONE,
 	WP_MAX
@@ -125,12 +122,8 @@ static weapondata weapontable[WP_MAX + 1] =
 	{0.00, "1d10+0", "1d12+2", I_SPEAR, SK_SPEAR, 0, 0, false, false, { RL_NONE, 0}, PIERCE },
 	/* Zweihänder */
 	{0.00, "2d8+3", "2d8+3", I_GREATSWORD, SK_MELEE, -1, -2, false, false, { RL_NONE, 0}, CUT },
-	/* Schwert */
-	{0.00, "1d9+2", "1d9+2", I_SWORD, SK_MELEE, 0, 0, false, false, { RL_NONE, 0}, CUT },
 	/* Lanze */
 	{0.00, "1d5", "2d6+5", I_LANCE, SK_SPEAR, 0, -2, false, false, { RL_NONE, 0}, PIERCE },
-	/* Rostiges Schwert */
-	{0.00, "1d9", "1d9", I_RUSTY_SWORD, SK_MELEE, -1, -1, false, false, { RL_NONE, 0}, CUT },
 	/* Rostiger Zweihänder */
 	{0.00, "2d8", "2d8", I_RUSTY_GREATSWORD, SK_MELEE, -2, -3, false, false, { RL_NONE, 0}, CUT },
 	/* Rostige Hellebarde */

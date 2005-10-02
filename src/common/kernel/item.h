@@ -282,7 +282,6 @@ enum {
 	I_HORSE,
 	I_WAGON,
 	I_CATAPULT,
-	I_SWORD,
 	I_SPEAR,
 	I_CROSSBOW,
 	I_LONGBOW,
@@ -338,7 +337,6 @@ enum {
 	I_RING_OF_REGENERATION,
 	I_TOADSLIME,
 	I_BAG_OF_HOLDING,
-	I_RUSTY_SWORD,
 	I_RUSTY_SHIELD,
 	I_RUSTY_CHAIN_MAIL,
 	I_SACK_OF_CONSERVATION,
@@ -356,7 +354,6 @@ enum {
 	R_HORSE,
 	R_WAGON,
 	R_CATAPULT,
-	R_SWORD,
 	R_SPEAR,
 	R_CROSSBOW,
 	R_LONGBOW,
@@ -404,7 +401,6 @@ enum {
 	R_RING_OF_REGENERATION,
 	R_TOADSLIME,
 	R_BAG_OF_HOLDING,
-	R_RUSTY_SWORD,
 	R_RUSTY_SHIELD,
 	R_RUSTY_CHAIN_MAIL,
 	R_SACK_OF_CONSERVATION,
@@ -462,6 +458,7 @@ enum {
 
 
 	R_UNIT, /* Einheit (gib x einheit) */
+  R_SWORD, /* for spells */
 
 	MAX_RESOURCES, /* do not use outside item.c ! */
 	NORESOURCE = (resource_t) - 1

@@ -893,10 +893,6 @@ static t_item itemdata[MAXITEMS] = {
 		{"Katapult", "Katapulte", "Katapult", "Katapulte"},
 		IS_PRODUCT, SK_CARTMAKER, 5, {0, 10, 0, 0, 0, 0}, 10000, 0, FL_ITEM_NOTINBAG, NULL
 	},
-	{			/* I_SWORD */
-		{"Schwert", "Schwerter", "Schwert", "Schwerter"},
-		IS_PRODUCT, SK_WEAPONSMITH, 3, {1, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
-	},
 	{			/* I_SPEAR */
 		{"Speer", "Speere", "Speer", "Speere"},
 		IS_PRODUCT, SK_WEAPONSMITH, 2, {0, 1, 0, 0, 0, 0}, 100, 0, 0, NULL
@@ -1093,10 +1089,6 @@ static t_item itemdata[MAXITEMS] = {
 	{
 		{"Zauberbeutel", "Zauberbeutel", "Zauberbeutel", "Zauberbeutel"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, FL_ITEM_NOTINBAG|FL_ITEM_NOTLOST, NULL
-	},
-	{	/* I_RUSTY_SWORD */
-		{"Schartiges Schwert", "Schartige Schwerter", "Schartiges Schwert", "Schartige Schwerter"},
-		IS_PRODUCT, SK_WEAPONSMITH, 3, {1, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{	/* I_RUSTY_SHIELD 42 */
 		{"Rostiger Schild", "Rostige Schilde", "Rostiger Schild", "Rostige Schilde"},
@@ -2094,7 +2086,14 @@ init_resources(void)
 	static boolean initialized = false;
 	if (initialized) return;
 	initialized = true;
-	/* silver was never an item: */
+
+  /* alte typen registrieren: */
+  init_olditems();
+  init_oldherbs();
+  init_oldpotions();
+  init_oldscores();
+  
+  /* silver was never an item: */
 	r_silver = new_resourcetype(&names[0], NULL, RTF_ITEM|RTF_POOLED);
 	i_silver = new_itemtype(r_silver, ITF_NONE, 1/*weight*/, 0);
 	r_silver->uchange = res_changeitem;
@@ -2114,6 +2113,7 @@ init_resources(void)
 	r_unit = new_resourcetype(&names[12], NULL, RTF_NONE);
 	r_unit->uchange = res_changeperson;
 
+  oldresourcetype[R_SWORD] = rt_find("sword");
 	oldresourcetype[R_SILVER] = r_silver;
 	oldresourcetype[R_AURA] = r_aura;
 	oldresourcetype[R_PERMAURA] = r_permaura;
@@ -2121,11 +2121,6 @@ init_resources(void)
 	oldresourcetype[R_PEASANTS] = r_peasants;
 	oldresourcetype[R_UNIT] = r_unit;
 
-	/* alte typen registrieren: */
-	init_olditems();
-	init_oldherbs();
-	init_oldpotions();
-  init_oldscores();
 }
 
 int

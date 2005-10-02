@@ -3066,6 +3066,7 @@ make_summary(void)
 				f = u->faction;
 				if (u->faction->no != MONSTER_FACTION) {
           skill * sv;
+          item * itm;
 
 					s->nunits++;
 					s->playerpop += u->number;
@@ -3075,16 +3076,14 @@ make_summary(void)
 					s->spielerpferde += get_item(u, I_HORSE);
 					s->playermoney += get_money(u);
 					s->armed_men += armedmen(u);
-					s->waffen += get_item(u, I_SWORD);
-					s->waffen += get_item(u, I_SPEAR);
-					s->waffen += get_item(u, I_CATAPULT);
-					s->waffen += get_item(u, I_CROSSBOW);
-					s->waffen += get_item(u, I_LONGBOW);
-					s->waffen += get_item(u, I_RUNESWORD);
-
-					s->ruestungen += get_item(u, I_CHAIN_MAIL);
-					s->ruestungen += get_item(u, I_PLATE_ARMOR);
-
+          for (itm=u->items;itm;itm=itm->next) {
+            if (itm->type->rtype->wtype) {
+              s->waffen += itm->number;
+            }
+            if (itm->type->rtype->atype) {
+              s->ruestungen += itm->number;
+            }
+          }
 					s->artefakte += get_item(u, I_AMULET_OF_TRUE_SEEING);
 					s->artefakte += get_item(u, I_RING_OF_INVISIBILITY);
 					s->artefakte += get_item(u, I_SPHERE_OF_INVISIBILITY);

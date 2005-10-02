@@ -38,6 +38,7 @@
 
 /* kernel includes */
 #include <kernel/build.h>
+#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/give.h>
 #include <kernel/item.h>
@@ -793,42 +794,32 @@ recruit_dracoids(unit * dragon, int size)
 {
   faction * f = dragon->faction;
   region * r = dragon->region;
-  const struct item_type * weapon = NULL;
-  order * new_order;
+  const struct item * weapon = NULL;
+  order * new_order = NULL;
   unit *un = createunit(r, f, size, new_race[RC_DRACOID]);
 
   fset(un, UFL_ISNEW|UFL_MOVED);
 
   name_unit(un);
   change_money(dragon, -un->number * 50);
+  equip_unit(un, get_equipment("recruited_dracoid"));
 
-  set_level(un, SK_SPEAR, (3 + rand() % 4));
-  set_level(un, SK_MELEE, (3 + rand() % 4));
-  set_level(un, SK_LONGBOW, (2 + rand() % 3));
-
-  switch (rand() % 3) {
-    case 0:
-      weapon = olditemtype[I_LONGBOW];
-      break;
-    case 1:
-      weapon = olditemtype[I_SWORD];
-      break;
-    default:
-      weapon = olditemtype[I_SPEAR];
-      break;
+  un->status = ST_FIGHT;
+  for (weapon=un->items;weapon;weapon=weapon->next) {
+    const weapon_type * wtype = weapon->type->rtype->wtype;
+    if (wtype && (wtype->flags & WTF_MISSILE)) un->status = ST_BEHIND;
+    sprintf(buf, "%s \"%s\"", keywords[K_STUDY], 
+      skillname(weapon->type->rtype->wtype->skill, f->locale));
+    new_order = parse_order(buf, default_locale);
   }
-  i_change(&un->items, weapon, un->number);
-  if (weapon->rtype->wtype->flags & WTF_MISSILE) un->status = ST_BEHIND;
-  else un->status = ST_FIGHT;
 
-  sprintf(buf, "%s \"%s\"", keywords[K_STUDY], 
-          skillname(weapon->rtype->wtype->skill, f->locale));
-  new_order = parse_order(buf, default_locale);
+  if (new_order!=NULL) {
 #ifdef LASTORDER
-  set_order(&un->lastorder, new_order);
+    set_order(&un->lastorder, new_order);
 #else
-  addlist(&un->orders, new_order);
+    addlist(&un->orders, new_order);
 #endif
+  }
 }
 
 static order *

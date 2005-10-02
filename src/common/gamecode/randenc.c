@@ -1435,13 +1435,7 @@ randomevents(void)
 			u = createunit(r, findfaction(MONSTER_FACTION), undead, rc);
       fset(u, UFL_ISNEW|UFL_MOVED);
 			if ((rc == new_race[RC_SKELETON] || rc == new_race[RC_ZOMBIE]) && rand()%10 < 4) {
-				set_item(u, I_RUSTY_SWORD, undead);
-				if (rand()%10 < 3) {
-					set_item(u, I_RUSTY_SHIELD, undead);
-				}
-				if (rand()%10 < 2) {
-					set_item(u, I_RUSTY_CHAIN_MAIL, undead);
-				}
+        equip_unit(u, get_equipment("rising_undead"));
 			}
 
 			for (i=0;i < MAXSKILLS;i++) {
