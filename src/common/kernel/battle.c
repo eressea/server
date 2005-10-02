@@ -602,7 +602,7 @@ weapon_skill(const weapon_type * wtype, const unit * u, boolean attacking)
 		if (skill<=0) {
 			/* wenn kein waffenloser kampf, dann den rassen-defaultwert */
 			if(u->race == new_race[RC_URUK]) {
-				int sword = effskill(u, SK_SWORD);
+				int sword = effskill(u, SK_MELEE);
 				int spear = effskill(u, SK_SPEAR);
 				skill = max(sword, spear) - 3;
 				if (attacking) {

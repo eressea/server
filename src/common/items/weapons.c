@@ -106,11 +106,11 @@ static weapondata weapontable[WP_MAX + 1] =
  * missile, is_magic */
 {
 	/* Runenschwert */
-	{0.00, "3d10+10", "3d10+10", I_RUNESWORD, SK_SWORD, 2, 2, false, true, { RL_NONE, 0}, CUT },
+	{0.00, "3d10+10", "3d10+10", I_RUNESWORD, SK_MELEE, 2, 2, false, true, { RL_NONE, 0}, CUT },
 	/* Flammenschwert */
-	{0.30, "3d6+10", "3d6+10", I_FIRESWORD, SK_SWORD, 1, 1, false, false, { RL_NONE, 0}, CUT },
+	{0.30, "3d6+10", "3d6+10", I_FIRESWORD, SK_MELEE, 1, 1, false, false, { RL_NONE, 0}, CUT },
 	/* Laenschwert */
-	{0.30, "3d6+10", "3d6+10", I_LAENSWORD, SK_SWORD, 1, 1, false, false, { RL_NONE, 0}, CUT },
+	{0.30, "3d6+10", "3d6+10", I_LAENSWORD, SK_MELEE, 1, 1, false, false, { RL_NONE, 0}, CUT },
 	/* Katapult */
 	{0.00, "3d10+5", "3d10+5", I_CATAPULT, SK_CATAPULT, 0, 0, true, false, { RL_CATAPULT, 5 }, BASH },
 	/* Langbogen */
@@ -124,21 +124,21 @@ static weapondata weapontable[WP_MAX + 1] =
 	/* Speer */
 	{0.00, "1d10+0", "1d12+2", I_SPEAR, SK_SPEAR, 0, 0, false, false, { RL_NONE, 0}, PIERCE },
 	/* Zweihänder */
-	{0.00, "2d8+3", "2d8+3", I_GREATSWORD, SK_SWORD, -1, -2, false, false, { RL_NONE, 0}, CUT },
+	{0.00, "2d8+3", "2d8+3", I_GREATSWORD, SK_MELEE, -1, -2, false, false, { RL_NONE, 0}, CUT },
 	/* Schwert */
-	{0.00, "1d9+2", "1d9+2", I_SWORD, SK_SWORD, 0, 0, false, false, { RL_NONE, 0}, CUT },
+	{0.00, "1d9+2", "1d9+2", I_SWORD, SK_MELEE, 0, 0, false, false, { RL_NONE, 0}, CUT },
 	/* Lanze */
 	{0.00, "1d5", "2d6+5", I_LANCE, SK_SPEAR, 0, -2, false, false, { RL_NONE, 0}, PIERCE },
 	/* Rostiges Schwert */
-	{0.00, "1d9", "1d9", I_RUSTY_SWORD, SK_SWORD, -1, -1, false, false, { RL_NONE, 0}, CUT },
+	{0.00, "1d9", "1d9", I_RUSTY_SWORD, SK_MELEE, -1, -1, false, false, { RL_NONE, 0}, CUT },
 	/* Rostiger Zweihänder */
-	{0.00, "2d8", "2d8", I_RUSTY_GREATSWORD, SK_SWORD, -2, -3, false, false, { RL_NONE, 0}, CUT },
+	{0.00, "2d8", "2d8", I_RUSTY_GREATSWORD, SK_MELEE, -2, -3, false, false, { RL_NONE, 0}, CUT },
 	/* Rostige Hellebarde */
 	{0.00, "2d6", "2d6", I_RUSTY_HALBERD, SK_SPEAR, -2, 1, false, false, { RL_NONE, 0}, CUT },
 	/* Unbewaffnet */
-	{0.00, "1d5+0", "1d6+0", I_WOOD, SK_SWORD, 0, 0, false, false, { RL_NONE, 0}, BASH },
+	{0.00, "1d5+0", "1d6+0", I_WOOD, SK_MELEE, 0, 0, false, false, { RL_NONE, 0}, BASH },
 	/* Dummy */
-	{0.00, "0d0+0", "0d0+0", I_WOOD, SK_SWORD, 0, 0, false, false, { RL_NONE, 0}, 0 }
+	{0.00, "0d0+0", "0d0+0", I_WOOD, SK_MELEE, 0, 0, false, false, { RL_NONE, 0}, 0 }
 };
 
 weapon_type * oldweapontype[WP_MAX];

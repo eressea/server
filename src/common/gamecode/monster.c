@@ -803,7 +803,7 @@ recruit_dracoids(unit * dragon, int size)
   change_money(dragon, -un->number * 50);
 
   set_level(un, SK_SPEAR, (3 + rand() % 4));
-  set_level(un, SK_SWORD, (3 + rand() % 4));
+  set_level(un, SK_MELEE, (3 + rand() % 4));
   set_level(un, SK_LONGBOW, (2 + rand() % 3));
 
   switch (rand() % 3) {

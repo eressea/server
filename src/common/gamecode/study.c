@@ -649,7 +649,7 @@ learn(void)
         warrior_skill = fspecial(u->faction, FS_WARRIOR);
         if(warrior_skill > 0) {
           if(sk == SK_CROSSBOW || sk == SK_LONGBOW
-            || sk == SK_CATAPULT || sk == SK_SWORD || sk == SK_SPEAR
+            || sk == SK_CATAPULT || sk == SK_MELEE || sk == SK_SPEAR
             || sk == SK_AUSDAUER || sk == SK_WEAPONLESS)
           {
             teach->value += u->number * (5+warrior_skill*5);

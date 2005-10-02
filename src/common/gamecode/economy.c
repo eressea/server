@@ -235,7 +235,7 @@ add_recruits(unit * u, int number, int wanted)
     }
 
     if (unew->race == new_race[RC_URUK]) {
-      change_level(unew, SK_SWORD, 1);
+      change_level(unew, SK_MELEE, 1);
       change_level(unew, SK_SPEAR, 1);
     }
     if (unew->race->ec_flags & ECF_REC_HORSES) {
@@ -245,8 +245,8 @@ add_recruits(unit * u, int number, int wanted)
     if (i > 0) {
       if (unew->race->bonus[SK_SPEAR] >= 0)
         change_level(unew, SK_SPEAR, i);
-      if (unew->race->bonus[SK_SWORD] >= 0)
-        change_level(unew, SK_SWORD, i);
+      if (unew->race->bonus[SK_MELEE] >= 0)
+        change_level(unew, SK_MELEE, i);
       if (unew->race->bonus[SK_LONGBOW] >= 0)
         change_level(unew, SK_LONGBOW, i);
       if (unew->race->bonus[SK_CROSSBOW] >= 0)
