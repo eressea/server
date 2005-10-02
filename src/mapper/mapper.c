@@ -371,17 +371,6 @@ newbie_region(region * r)
 	return 1;
 }
 
-int
-dropout_region(region * r)
-{
-	dropout * drop = dropouts;
-	if (r!=NULL) while (drop) {
-		if (drop->x==r->x && drop->y==r->y) return 1;
-		drop=drop->next;
-	}
-	return 0;
-}
-
 static boolean
 highlight_region(region *r)
 {
@@ -393,7 +382,6 @@ highlight_region(region *r)
 			(hl == -7 && fval(r, RF_CHAOTIC)) ||
 			(hl == -8 && get_curse(r->attribs, ct_find("godcursezone"))) ||
 			(hl == -9 && newbie_region(r)) ||
-			(hl == -10 && dropout_region(r)) ||
 			(hl == -11 && alliancehere(r, hl_alliance)) ||
 			(hl >= 0 && factionhere(r, hl))) {
 		return true;
@@ -412,7 +400,7 @@ drawmap(boolean maponly) {
 	x1 = left; y1=top;
 	if(maponly == false) {
 		movexy(SX-36,SY-2);
-		sprintf(buf, "%d gesetzt, %d Rest, %d Dropouts", numnewbies, listlen(newfactions), listlen(dropouts));
+		sprintf(buf, "%d gesetzt, %d Rest", numnewbies, listlen(newfactions));
 		addstr(buf);
 		movexy(SX-39, 0);
 		vline(ACS_VLINE, SY+1);
@@ -1172,10 +1160,6 @@ movearound(short rx, short ry) {
 				case 'a':
 					runautoseed();
 					modified = 1;
-				case 's':
-					seed_dropouts();
-					modified = 1;
-					break;
 				case 'S':
 					if (modified)
 						if (yes_no(0, "Daten abspeichern?", 'j')) {
@@ -1703,8 +1687,6 @@ main(int argc, char *argv[])
     sprintf(buf, "%s/newfactions", basepath());
     newfactions = read_newfactions(buf);
   }
-	sprintf(buf, "%s/dropouts.%d", basepath(), turn);
-	read_dropouts(buf);
 
 	if (findfaction(MONSTER_FACTION)==NULL) {
 		makemonsters();

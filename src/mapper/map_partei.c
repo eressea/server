@@ -162,69 +162,6 @@ give_latestart_bonus(region *r, unit *u, int b)
 	}
 }
 
-dropout * dropouts = NULL;
-
-void
-read_dropouts(const char * filename)
-{
-	FILE * F = fopen(filename, "r");
-	if (F==NULL) return;
-	for (;;) {
-		char email[64], race[20];
-		int age;
-    short x, y;
-		if (fscanf(F, "%s %s %d %hd %hd", email, race, &age, &x, &y)<=0) break;
-		if (age<=2) {
-			region * r = findregion(x, y);
-			if (r) {
-				dropout * drop = calloc(sizeof(dropout), 1);
-				drop->race = rc_find(race);
-				if (drop->race==NULL) drop->race = findrace(race, default_locale);
-				drop->x = x;
-				drop->y = y;
-				drop->fno = -1;
-				drop->next = dropouts;
-				dropouts = drop;
-			}
-		}
-	}
-	fclose(F);
-}
-
-void
-seed_dropouts(void)
-{
-	dropout ** dropp = &dropouts;
-	while (*dropp) {
-		dropout *drop = *dropp;
-		region * r = findregion(drop->x, drop->y);
-		if (r) {
-			boolean found = false;
-			newfaction **nfp = &newfactions;
-			unit * u;
-			for (u=r->units;u;u=u->next) if (u->faction->no!=drop->fno) break;
-			if (u==NULL) while (*nfp) {
-				newfaction * nf = *nfp;
-				if (nf->race==drop->race && !nf->bonus) {
-					unit * u = addplayer(r, addfaction(nf->email, nf->password, nf->race, nf->lang,
-						nf->subscription));
-					u->faction->alliance = nf->allies;
-					++numnewbies;
-					if (nf->bonus) give_latestart_bonus(r, u, nf->bonus);
-					found=true;
-					*dropp = drop->next;
-					*nfp = nf->next;
-					free(nf);
-					break;
-				}
-				nfp = &nf->next;
-			}
-			if (!found) dropp=&drop->next;
-		} else {
-			*dropp = drop->next;
-		}
-	}
-}
 
 newfaction *
 select_newfaction(const struct race * rc)

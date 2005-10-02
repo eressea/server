@@ -118,20 +118,10 @@ void insert_selection(struct selection ** p_sel, struct selection * prev, char *
 void block_create(short x1, short y1, int size, char chaotisch, int special, char terrain);
 
 extern void read_orders(const char * filename);
-extern void read_dropouts(const char *filename);
-extern void seed_dropouts(void);
 extern int numnewbies;
 
 #define sncat(b, s, size) strncat ((b), s, size - strlen (b))
 
-typedef struct dropout {
-	struct dropout * next;
-	const struct race * race;
-	short x, y;
-  int fno;
-} dropout;
-
-extern dropout * dropouts;
 extern struct newfaction * newfactions;
 
 #endif				/* MAPPER_H */
