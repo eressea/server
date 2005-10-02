@@ -17,6 +17,7 @@ SOURCES =
  combatspells.c
  curse.c
  eressea.c
+ equipment.c
  faction.c
  group.c
  give.c
