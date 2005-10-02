@@ -176,7 +176,8 @@ reverse_lookup(const locale * lang, const char * str)
 				}
 			}
 		}
-		log_warning(("could not do a reverse_lookup for \"%s\" in locale %s\n", str, lang->name));
+		log_error(("could not do a reverse_lookup for \"%s\" in locale %s\n", str, lang->name));
+    assert(!"failed to do a reverse_lookup");
 	}
 	return str;
 }

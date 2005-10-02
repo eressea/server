@@ -382,11 +382,6 @@ destroy_cmd(unit * u, struct order * ord)
       return 0;
     }
 
-#if 0
-    con = b->type->construction;
-    size = b->size;
-#endif
-
     if(n >= b->size) {
       /* destroy completly */
       /* all units leave the building */
@@ -410,11 +405,6 @@ destroy_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 14, MSG_EVENT);
       return 0;
     }
-
-#if 0
-    con = sh->type->construction;
-    size = (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;
-#endif
 
     if (rterrain(r) == T_OCEAN) {
       cmistake(u, ord, 14, MSG_EVENT);
