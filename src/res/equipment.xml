@@ -6,5 +6,53 @@
  <item name="stone" amount="30"/>
  <item name="money" amount="4200"/>
 -->
+  <startup race="dwarf">
+    <item name="axe" amount="1"/>
+    <item name="chainmail" amount="1"/>
+    <skill name="sk_sword" level="1"/>
+  </startup>
+  <startup race="elf">
+    <item name="fairyboot" amount="1"/>
+  </startup>
+  <startup race="uruk">
+    <skill name="sk_spear" level="4"/>
+    <skill name="sk_sword" level="4"/>
+    <skill name="sk_crossbow" level="4"/>
+    <skill name="sk_catapult" level="4"/>
+    <skill name="sk_bow" level="4"/>
+  </startup>
+  <startup race="goblin">
+    <item name="roi" amount="1"/>
+  </startup>
+  <startup race="troll">
+    <skill name="sk_building" level="1"/>
+    <skill name="sk_perception" level="3"/>
+    <item name="stone" amount="50"/>
+  </startup>
+  <startup race="daemon">
+    <skill name="sk_stamina" level="15"/>
+  </startup>
+  <startup race="insect">
+    <item name="nestwarmth" amount="9"/>
+  </startup>
+  <startup race="halfling">
+    <skill name="sk_trade" level="1"/>
+    <skill name="sk_riding" level="2"/>
+    <item name="horse" amount="2"/>
+    <item name="cart" amount="1"/>
+    <item name="balm" amount="5"/>
+    <item name="spice" amount="5"/>
+    <item name="myrrh" amount="5"/>
+    <item name="jewel" amount="5"/>
+    <item name="oil" amount="5"/>
+    <item name="silk" amount="5"/>
+    <item name="incense" amount="5"/>
+  </startup>
+  <startup race="cat">
+    <item name="roi" amount="1"/>
+  </startup>
+  <startup race="aquarian">
+    <skill name="sk_sailing" level="1"/>
+  </startup>
 </equipment>
 

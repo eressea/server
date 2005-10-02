@@ -978,7 +978,6 @@ gebaeude_stuerzt_ein(region * r, building * b)
 {
 	unit *u;
 	int n, i;
-	direction_t d;
 	int opfer = 0;
 	int road = 0;
 	struct message * msg;

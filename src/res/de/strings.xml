@@ -1799,7 +1799,7 @@
   <string name="p7">
     <text locale="de">Dumpfbackenbrot</text>
   </string>
-  <string name="p8">
+  <string name="nestwarmth">
     <text locale="de">Nestwärme</text>
   </string>
   <string name="p9">
@@ -1845,7 +1845,7 @@
   <string name="p7_p">
     <text locale="de">Dumpfbackenbrote</text>
   </string>
-  <string name="p8_p">
+  <string name="nestwarmth_p">
     <text locale="de">Nestwärme</text>
   </string>
   <string name="p9_p">

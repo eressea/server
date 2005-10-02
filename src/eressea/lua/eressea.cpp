@@ -37,11 +37,13 @@
 using namespace luabind;
 
 static int
-lua_addequipment(const char * iname, int number)
+lua_addequipment(const char * iname, int number, const char * rcname)
 {
+  race * rc = rc_find(rcname);
   const struct item_type * itype = it_find(iname);
+  if (rc==NULL && strlen(rcname)>0) return -1;
   if (itype==NULL) return -1;
-  add_equipment(itype, number);
+  startup_equipment(itype, number, rc);
   return 0;
 }
 
@@ -226,7 +228,7 @@ bind_eressea(lua_State * L)
     def("write_summary", &write_summary),
     def("read_orders", &readorders),
     def("process_orders", &process_orders),
-    def("add_equipment", &lua_addequipment),
+    def("startup_equipment", &lua_addequipment),
     def("get_turn", &get_turn),
     def("remove_empty_units", &remove_empty_units),
 

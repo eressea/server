@@ -53,6 +53,12 @@ function write_emails()
 end
 
 function process(orders)
+  -- initialize starting equipment for new players
+  startup_equipment("conquesttoken", 1, "");
+  startup_equipment("log", 30, "");
+  startup_equipment("stone", 30, "");
+  startup_equipment("money", 4200, "");
+
   file = "" .. get_turn()
   if read_game(file)~=0 then
     print("could not read game")
@@ -69,12 +75,6 @@ function process(orders)
     return -1
   end
   run_scripts()
-
-  -- initialize starting equipment for new players
-  add_equipment("conquesttoken", 1);
-  add_equipment("log", 30);
-  add_equipment("stone", 30);
-  add_equipment("money", 4200);
 
   plan_monsters()
   process_orders()

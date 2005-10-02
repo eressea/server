@@ -13,6 +13,7 @@
   <xi:include href="ships.xml"/>
   <xi:include href="buildings.xml"/>
   <xi:include href="eressea/calendar.xml"/>
+  <xi:include href="equipment.xml"/>
 
   <game name="Eressea" welcome="eressea">
     <comment>Game specific</comment>

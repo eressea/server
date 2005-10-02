@@ -19,6 +19,12 @@ function write_emails()
 end
 
 function process(orders)
+  -- initialize starting equipment for new players
+  startup_equipment("conquesttoken", 1, "");
+  startup_equipment("wood", 30, "");
+  startup_equipment("stone", 30, "");
+  startup_equipment("money", 4200, "");
+
   file = "" .. get_turn()
   if read_game(file)~=0 then
     print("could not read game")
@@ -32,13 +38,6 @@ function process(orders)
   plan_monsters()
   process_orders()
   
-  -- initialize starting equipment for new players
-  -- probably not necessary, since mapper sets new players, not server
-  add_equipment("conquesttoken", 1);
-  add_equipment("wood", 30);
-  add_equipment("stone", 30);
-  add_equipment("money", 4200);
-
   -- use newfactions file to place out new players
   autoseed(basepath .. "/newfactions", true)
 

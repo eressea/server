@@ -14,6 +14,7 @@
   <xi:include href="ships.xml"/>
   <xi:include href="buildings.xml"/>
   <xi:include href="calendar.xml"/>
+  <xi:include href="equipment.xml"/>
 
   <game name="Tutorial" welcome="tutorial">
     <comment>Game specific</comment>

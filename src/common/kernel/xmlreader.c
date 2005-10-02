@@ -868,19 +868,11 @@ parse_resources(xmlDocPtr doc)
   return 0;
 }
 
-static int
-parse_equipment(xmlDocPtr doc)
+static void
+add_items(xmlNodeSetPtr nsetItems, const race * rc)
 {
-  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-  xmlXPathObjectPtr items;
-  xmlNodeSetPtr nsetItems;
-  int i;
-
-  /* reading eressea/races/race */
-  items = xmlXPathEvalExpression(BAD_CAST "/eressea/equipment/item", xpath);
-  nsetItems = items->nodesetval;
-
   if (nsetItems!=NULL) {
+    int i;
     for (i=0;i!=nsetItems->nodeNr;++i) {
       xmlNodePtr node = nsetItems->nodeTab[i];
       xmlChar * property;
@@ -897,11 +889,75 @@ parse_equipment(xmlDocPtr doc)
           num = atoi((const char*)property);
           xmlFree(property);
         }
-        add_equipment(itype, num);
+        startup_equipment(itype, num, rc);
       }
     }
   }
-  xmlXPathFreeObject(items);
+}
+
+static void
+add_skills(xmlNodeSetPtr nsetSkills, const race * rc)
+{
+  if (nsetSkills!=NULL) {
+    int i;
+    for (i=0;i!=nsetSkills->nodeNr;++i) {
+      xmlNodePtr node = nsetSkills->nodeTab[i];
+      xmlChar * property;
+      skill_t sk;
+
+      property = xmlGetProp(node, BAD_CAST "name");
+      assert(property!=NULL);
+      sk = sk_find((const char*)property);
+      xmlFree(property);
+      if (sk!=NOSKILL) {
+        int num = 0;
+        property = xmlGetProp(node, BAD_CAST "level");
+        if (property!=NULL) {
+          num = atoi((const char*)property);
+          xmlFree(property);
+        }
+        startup_skill(sk, num, rc);
+      }
+    }
+  }
+}
+
+static int
+parse_equipment(xmlDocPtr doc)
+{
+  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
+  xmlXPathObjectPtr xpathRaces;
+
+  /* reading eressea/races/race */
+  xpathRaces = xmlXPathEvalExpression(BAD_CAST "/eressea/equipment/startup", xpath);
+  if (xpathRaces->nodesetval) {
+    xmlNodeSetPtr nsetRaces = xpathRaces->nodesetval;
+    int i;
+
+    for (i=0;i!=nsetRaces->nodeNr;++i) {
+      xmlNodePtr node = nsetRaces->nodeTab[i];
+      const struct race * rc = NULL;
+      xmlChar * property = xmlGetProp(node, BAD_CAST "race");
+      xmlXPathObjectPtr xpathResult;
+
+      if (property!=NULL) {
+        rc = rc_find((const char*)property);
+        assert(rc!=NULL);
+      }
+
+      xpath->node = node;
+      xpathResult = xmlXPathEvalExpression(BAD_CAST "item", xpath);
+      add_items(xpathResult->nodesetval, rc);
+      xmlXPathFreeObject(xpathResult);
+
+      xpath->node = node;
+      xpathResult = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
+      add_skills(xpathResult->nodesetval, rc);
+      xmlXPathFreeObject(xpathResult);
+    }
+  }
+
+  xmlXPathFreeObject(xpathRaces);
   xmlXPathFreeContext(xpath);
 
   return 0;

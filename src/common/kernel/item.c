@@ -394,8 +394,10 @@ static const char * it_aliases[][2] = {
 	{ "p12", "truthpotion" },
 	{ "p1", "goliathwater" },
   { "p5", "peasantblood" },
+  { "p8", "nestwarmth" },
 	{ NULL, NULL },
 };
+
 static const char *
 it_alias(const char * zname)
 {

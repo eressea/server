@@ -124,7 +124,7 @@ skills = {
 
 function wdw_setup()
   -- initialize starting equipment for new players
-  -- add_equipment("magicskillboost", 1)
+  -- startup_equipment("magicskillboost", 1, "")
 
   init_positions()
 
