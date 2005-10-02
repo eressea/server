@@ -1101,7 +1101,7 @@ static t_item itemdata[MAXITEMS] = {
 		IS_PRODUCT, SK_WEAPONSMITH, 3, {1, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{	/* I_RUSTY_SHIELD 42 */
-		{"Rostiger Schild", "Rostige Schilde", "Rostiges Schild", "Rostige Schilde"},
+		{"Rostiger Schild", "Rostige Schilde", "Rostiger Schild", "Rostige Schilde"},
 		IS_PRODUCT, SK_ARMORER, 2, {1, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_RUSTY_CHAIN_MAIL */
