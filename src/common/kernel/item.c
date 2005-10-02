@@ -972,10 +972,6 @@ static t_item itemdata[MAXITEMS] = {
 			"Amulett", "Amulette"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
 	},
-	{			/* I_GREATSWORD 35 */
-		{"Bihänder", "Bihänder", "Bihänder", "Bihänder"},
-		IS_PRODUCT, SK_WEAPONSMITH, 4, {2, 0, 0, 0, 0, 0}, 200, 0, 0, NULL
-	},
 	{			/* I_LAENSWORD 38 */
 		{"Laenschwert", "Laenschwerter", "Laenschwert", "Laenschwerter"},
 		IS_PRODUCT, SK_WEAPONSMITH, 8, {0, 0, 0, 0, 1, 0}, 100, 0, 0, NULL
@@ -1105,10 +1101,6 @@ static t_item itemdata[MAXITEMS] = {
 	{			/* I_SPHERE_OF_INVISIBILITY */
 		{"Sphäre der Unsichtbarkeit", "Sphären der Unsichtbarkeit", "", ""},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
-	},
-	{			/* I_RUSTY_GREATSWORD */
-		{"Rostiger Zweihänder", "Rostige Zweihänder", "Rostiger Zweihänder", "Rostige Zweihänder"},
-		IS_PRODUCT, SK_WEAPONSMITH, 4, {2, 0, 0, 0, 0, 0}, 200, 0, 0, NULL
 	},
 	{			/* I_RUSTY_HALBERD */
 		{"Rostige Hellebarde", "Rostige Hellebarden", "Rostige Hellebarde", "Rostige Hellebarden"},

@@ -302,7 +302,6 @@ enum {
 	I_FIRESWORD, /* Runenschwert ersetzen durch Flammenschwert */
 	I_DRAGONHEAD,
 	I_CHASTITY_BELT, /* bleibt */
-	I_GREATSWORD,
 	I_LAENSWORD,
 	I_LAEN,
 	I_SHIELD,
@@ -341,7 +340,6 @@ enum {
 	I_RUSTY_CHAIN_MAIL,
 	I_SACK_OF_CONSERVATION,
 	I_SPHERE_OF_INVISIBILITY,
-	I_RUSTY_GREATSWORD,
 	I_RUSTY_HALBERD,
 	MAX_ITEMS /* do not use outside item.c ! */
 };
@@ -373,7 +371,6 @@ enum {
 	R_FIRESWORD,
 	R_DRAGONHEAD,
 	R_CHASTITY_BELT,
-	R_GREATSWORD,
 	R_EOGSWORD,
 	R_EOG,
 	R_SHIELD,

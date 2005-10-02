@@ -54,6 +54,30 @@
     </item>
   </resource>
 
+  <resource name="rustygreatsword">
+    <item weight="200">
+      <construction skill="sk_weaponsmithing" minskill="4" reqsize="1">
+        <requirement type="iron" quantity="2"/>
+      </construction>
+      <weapon cut="true" skill="sk_melee" offmod="-2" defmod="-3">
+        <damage type="rider" value="2d8"/>
+        <damage type="footman" value="2d8"/>
+      </weapon>
+    </item>
+  </resource>
+
+  <resource name="greatsword">
+    <item weight="200">
+      <construction skill="sk_weaponsmithing" minskill="4" reqsize="1">
+        <requirement type="iron" quantity="2"/>
+      </construction>
+      <weapon cut="true" skill="sk_melee" offmod="-1" defmod="-2">
+        <damage type="rider" value="2d8+3"/>
+        <damage type="footman" value="2d8+3"/>
+      </weapon>
+    </item>
+  </resource>
+
   <resource name="sword">
     <item weight="100">
       <construction skill="sk_weaponsmithing" minskill="3" reqsize="1">

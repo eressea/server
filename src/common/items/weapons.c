@@ -59,9 +59,7 @@ enum {
 	WP_LONGBOW,
 	WP_CROSSBOW,
 	WP_SPEAR,
-	WP_GREATSWORD,
 	WP_LANCE,
-	WP_RUSTY_GREATSWORD,
 	WP_RUSTY_HALBERD,
 	WP_NONE,
 	WP_MAX
@@ -113,19 +111,11 @@ static weapondata weapontable[WP_MAX + 1] =
 	/* Langbogen */
 	{0.00, "1d11+1", "1d11+1", I_LONGBOW, SK_LONGBOW, 0, 0, true, false, { RL_NONE, 0 }, PIERCE },
 	/* Armbrust */
-#if CHANGED_CROSSBOWS == 1
 	{0.00, "3d3+5", "3d3+5", I_CROSSBOW, SK_CROSSBOW, 0, 0, true, false, { RL_CROSSBOW, 2 }, PIERCE | ARMORPIERCING },
-#else
-	{0.00, "3d3+5", "3d3+5", I_CROSSBOW, SK_CROSSBOW, 0, 0, true, false, { RL_CROSSBOW, 1 }, PIERCE },
-#endif
 	/* Speer */
 	{0.00, "1d10+0", "1d12+2", I_SPEAR, SK_SPEAR, 0, 0, false, false, { RL_NONE, 0}, PIERCE },
-	/* Zweihänder */
-	{0.00, "2d8+3", "2d8+3", I_GREATSWORD, SK_MELEE, -1, -2, false, false, { RL_NONE, 0}, CUT },
 	/* Lanze */
 	{0.00, "1d5", "2d6+5", I_LANCE, SK_SPEAR, 0, -2, false, false, { RL_NONE, 0}, PIERCE },
-	/* Rostiger Zweihänder */
-	{0.00, "2d8", "2d8", I_RUSTY_GREATSWORD, SK_MELEE, -2, -3, false, false, { RL_NONE, 0}, CUT },
 	/* Rostige Hellebarde */
 	{0.00, "2d6", "2d6", I_RUSTY_HALBERD, SK_SPEAR, -2, 1, false, false, { RL_NONE, 0}, CUT },
 	/* Unbewaffnet */
