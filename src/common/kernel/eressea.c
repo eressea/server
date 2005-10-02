@@ -2506,7 +2506,11 @@ remove_empty_factions(boolean writedropouts)
 
 			/* Einfach in eine Datei schreiben und später vermailen */
 
-			if (dofp) fprintf(dofp, "%s %s %d %d %d\n", f->email, LOC(default_locale, rc_name(f->race, 0)), f->age, ur?ur->x:0, ur?ur->y:0);
+      if (dofp) {
+        fprintf(dofp, "%3d %s %s %s\n", 
+          f->age, LOC(default_locale, rc_name(f->race, 0)), f->email, 
+          factionname(f));
+      }
 			if (updatelog) fprintf(updatelog, "dropout %s\n", itoa36(f->no));
 
 			for (f3 = factions; f3; f3 = f3->next) {
