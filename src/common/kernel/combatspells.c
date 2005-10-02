@@ -314,8 +314,6 @@ sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
 		/* da n min(force, x), sollte force maximal auf 0 sinken */
 		assert(force >= 0);
 
-		/* Eisenwaffen: I_SWORD, I_GREATSWORD, I_AXE, I_HALBERD (50%) */
-
 		if (df->weapons) {
 			int w;
 			for (w=0;df->weapons[w].type!=NULL;++w) {

@@ -9,14 +9,14 @@
   <startup race="dwarf">
     <item name="axe" amount="1"/>
     <item name="chainmail" amount="1"/>
-    <skill name="sk_sword" level="1"/>
+    <skill name="sk_melee" level="1"/>
   </startup>
   <startup race="elf">
     <item name="fairyboot" amount="1"/>
   </startup>
   <startup race="uruk">
     <skill name="sk_spear" level="4"/>
-    <skill name="sk_sword" level="4"/>
+    <skill name="sk_melee" level="4"/>
     <skill name="sk_crossbow" level="4"/>
     <skill name="sk_catapult" level="4"/>
     <skill name="sk_bow" level="4"/>

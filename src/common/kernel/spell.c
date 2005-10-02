@@ -1287,75 +1287,85 @@ patzer_ents(castorder *co)
  * Gebiet:     Gwyrrd
  * Wirkung:
  *  Zerstört zwischen Stufe und Stufe*10 Eisenwaffen
- *  Eisenwaffen: I_SWORD, I_GREATSWORD, I_AXE, I_HALBERD
  *
  * Flag:
  * (FARCASTING | SPELLLEVEL | UNITSPELL | TESTCANSEE | TESTRESISTANCE)
  */
 /* Syntax: ZAUBER [REGION x y] [STUFE 2] "Rosthauch" 1111 2222 3333 */
 
+typedef struct iron_weapon {
+  const struct item_type * type;
+  const struct item_type * rusty;
+  float chance;
+  struct iron_weapon * next;
+} iron_weapon;
+
+static iron_weapon * ironweapons = NULL;
+
+void
+add_ironweapon(const struct item_type * type, const struct item_type * rusty, float chance)
+{
+  iron_weapon * iweapon = malloc(sizeof(iron_weapon));
+  iweapon->type = type;
+  iweapon->rusty = rusty;
+  iweapon->chance = chance;
+  iweapon->next = ironweapons;
+  ironweapons = iweapon;
+}
+
 static int
 sp_rosthauch(castorder *co)
 {
-	unit *u;
-	int ironweapon;
-	int i, n;
+	int n;
 	int success = 0;
 	region *r = co->rt;
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
-	double force = co->force;
+	int force = (int)co->force;
 	spellparameter *pa = co->par;
+
+  if (ironweapons==NULL) {
+    add_ironweapon(it_find("sword"), it_find("rustysword"), 1.0);
+    add_ironweapon(it_find("axe"), it_find("rustyaxe"), 1.0);
+    add_ironweapon(it_find("greatsword"), it_find("rustygreatsword"), 1.0);
+    add_ironweapon(it_find("halberd"), it_find("rustyhalberd"), 0.5f);
+#ifndef NO_RUSTY_ARMOR
+    add_ironweapon(it_find("shield"), it_find("rustyshield"), 0.5f);
+    add_ironweapon(it_find("chainmail"), it_find("rustychainmail"), 0.2f);
+#endif
+  }
 
 	force = rand()%((int)(force * 10)) + force;
 
 	/* fuer jede Einheit */
-	for (n = 0; n < pa->length; n++) {
-          static const item_type * it_halberd = NULL;
-          if (it_halberd==NULL) it_halberd = it_find("halberd");
-          if (force<=0) break;
+  for (n = 0; n < pa->length; n++) {
+    unit *u = pa->param[n]->data.u;
+    int ironweapon = 0;
+    iron_weapon * iweapon = ironweapons;
 
-		if(pa->param[n]->flag == TARGET_RESISTS
-				|| pa->param[n]->flag == TARGET_NOTFOUND)
-			continue;
+    if (force<=0) break;
+    if (pa->param[n]->flag & (TARGET_RESISTS|TARGET_NOTFOUND)) continue;
 
-		u = pa->param[n]->data.u;
+    for (;iweapon!=NULL;iweapon=iweapon->next) {
+      item ** ip = i_find(&u->items, iweapon->type);
+      if (ip) {
+        int i = min((*ip)->number, force);
+        if (iweapon->chance<1.0) {
+          i = (int)(i*iweapon->chance);
+        }
+        if (i>0) {
+          force -= i;
+          ironweapon += i;
+          i_change(ip, iweapon->type, -i);
+          if (iweapon->rusty) {
+            i_change(&u->items, iweapon->rusty, i);
+          }
+        }
+      }
+      if (force<=0) break;
+    }
 
-		/* Eisenwaffen: I_SWORD, I_GREATSWORD, I_AXE, I_HALBERD (50% Chance)*/
-		ironweapon = 0;
-
-		i = min(get_item(u, I_SWORD), (int)force);
-		if (i > 0) {
-			change_item(u, I_SWORD, -i);
-			change_item(u, I_RUSTY_SWORD, i);
-			force -= i;
-			ironweapon += i;
-		}
-		i = min(get_item(u, I_GREATSWORD), (int)force);
-		if (i > 0){
-			change_item(u, I_GREATSWORD, -i);
-			change_item(u, I_RUSTY_GREATSWORD, i);
-			force -= i;
-			ironweapon += i;
-		}
-		i = min(get_item(u, I_AXE), (int)force);
-		if (i > 0){
-			change_item(u, I_AXE, -i);
-			change_item(u, I_RUSTY_AXE, i);
-			force -= i;
-			ironweapon += i;
-		}
-		i = min(i_get(u->items, it_halberd), (int)force);
-		if (i > 0){
-			if(rand()%100 < 50){
-				i_change(&u->items, it_halberd, -i);
-				i_change(&u->items, olditemtype[I_RUSTY_HALBERD], i);
-				force -= i;
-				ironweapon += i;
-			}
-		}
-
-		if (ironweapon) {
+		if (ironweapon>0) {
 			/* {$mage mage} legt einen Rosthauch auf {target}. {amount} Waffen
 			 * wurden vom Rost zerfressen */
 			ADDMSG(&mage->faction->msgs, msg_message(

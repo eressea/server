@@ -61,7 +61,6 @@ enum {
 	WP_SPEAR,
 	WP_GREATSWORD,
 	WP_SWORD,
-	WP_AXE,
 	WP_LANCE,
 	WP_RUSTY_SWORD,
 	WP_RUSTY_GREATSWORD,
@@ -128,16 +127,12 @@ static weapondata weapontable[WP_MAX + 1] =
 	{0.00, "2d8+3", "2d8+3", I_GREATSWORD, SK_SWORD, -1, -2, false, false, { RL_NONE, 0}, CUT },
 	/* Schwert */
 	{0.00, "1d9+2", "1d9+2", I_SWORD, SK_SWORD, 0, 0, false, false, { RL_NONE, 0}, CUT },
-	/* Kriegsaxt */
-	{0.00, "2d6+4", "2d6+4", I_AXE, SK_SWORD, 1, -2, false, false, { RL_NONE, 0}, CUT },
 	/* Lanze */
 	{0.00, "1d5", "2d6+5", I_LANCE, SK_SPEAR, 0, -2, false, false, { RL_NONE, 0}, PIERCE },
 	/* Rostiges Schwert */
 	{0.00, "1d9", "1d9", I_RUSTY_SWORD, SK_SWORD, -1, -1, false, false, { RL_NONE, 0}, CUT },
 	/* Rostiger Zweihänder */
 	{0.00, "2d8", "2d8", I_RUSTY_GREATSWORD, SK_SWORD, -2, -3, false, false, { RL_NONE, 0}, CUT },
-	/* Rostige Axt */
-	{0.00, "2d6", "2d6", I_RUSTY_AXE, SK_SWORD, 0, -3, false, false, { RL_NONE, 0}, CUT },
 	/* Rostige Hellebarde */
 	{0.00, "2d6", "2d6", I_RUSTY_HALBERD, SK_SPEAR, -2, 1, false, false, { RL_NONE, 0}, CUT },
 	/* Unbewaffnet */

@@ -32,7 +32,7 @@
       <function name="use" value="use_speedsail"/>
     </item>
   </resource>
-  
+
   <resource name="snowman">
     <!-- xmas gimmik -->
     <item notlost="yes" weight="1"/>
@@ -50,6 +50,32 @@
         <modifier type="damage" value="1">
           <race name="elf"/>
         </modifier>
+      </weapon>
+    </item>
+  </resource>
+
+  <resource name="axe">
+    <item weight="200">
+      <construction skill="sk_weaponsmithing" minskill="3" reqsize="1">
+        <requirement type="log" quantity="1"/>
+        <requirement type="iron" quantity="1"/>
+      </construction>
+      <weapon cut="true" skill="sk_melee" offmod="1" defmod="-2">
+        <damage type="rider" value="2d6+4"/>
+        <damage type="footman" value="2d6+4"/>
+      </weapon>
+    </item>
+  </resource>
+
+  <resource name="rustyaxe">
+    <item weight="200">
+      <construction skill="sk_weaponsmithing" minskill="3" reqsize="1">
+        <requirement type="log" quantity="1"/>
+        <requirement type="iron" quantity="1"/>
+      </construction>
+      <weapon cut="true" skill="sk_melee" offmod="0" defmod="-3">
+        <damage type="rider" value="2d6"/>
+        <damage type="footman" value="2d6"/>
       </weapon>
     </item>
   </resource>
