@@ -29,7 +29,7 @@
     <skill name="sk_perception" level="3"/>
     <item name="stone" amount="50"/>
   </startup>
-  <startup race="daemon">
+  <startup race="demon">
     <skill name="sk_stamina" level="15"/>
   </startup>
   <startup race="insect">
