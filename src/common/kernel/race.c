@@ -172,118 +172,6 @@ set_show_item(faction *f, item_t i)
 	a->data.v = (void*)olditemtype[i];
 }
 
-typedef struct equipment {
-  const struct race * rc;
-  item * items;
-  int skills[MAXSKILLS];
-  struct equipment * next;
-} equipment;
-
-static equipment * starting_equipment;
-
-static equipment *
-make_equipment(const struct race * rc)
-{
-  equipment ** eqp = &starting_equipment;
-  while (*eqp) {
-    struct equipment * eq = *eqp;
-    if (eq->rc==rc) break;
-    eqp = &eq->next;
-  }
-  if (*eqp == NULL) {
-    struct equipment * eq = malloc(sizeof(equipment));
-    eq->rc = rc;
-    eq->next = NULL;
-    eq->items = NULL;
-    memset(eq->skills, 0, sizeof(eq->skills));
-    *eqp = eq;
-  } else {
-    struct equipment * eq = *eqp;
-    eq->rc = rc;
-    eq->items = NULL;
-  }
-  return *eqp;
-}
-
-void
-startup_skill(skill_t sk, int value, const struct race * rc)
-{
-  if (value>0) {
-    equipment * eq = make_equipment(rc);
-    eq->skills[sk] = value;
-  }
-}
-
-void 
-startup_equipment(const item_type * itype, int number, const struct race * rc)
-{
-  if (itype!=NULL && number>0) {
-    equipment * eq = make_equipment(rc);
-    i_change(&eq->items, itype, number);
-  }
-}
-
-void
-give_equipment(unit * u, const struct race * rc)
-{
-  equipment * eq = starting_equipment;
-  while (eq && eq->rc!=rc) {
-    eq = eq->next;
-  }
-  if (eq) {
-    skill_t sk;
-    item * itm;
-    for (sk=0;sk!=MAXSKILLS;++sk) {
-      if (eq->skills[sk]>0) {
-        set_level(u, sk, eq->skills[sk]);
-      }
-    }
-    for (itm=eq->items;itm!=NULL;itm=itm->next) {
-      i_add(&u->items, i_new(itm->type, itm->number));
-    }
-  }
-}
-
-void
-give_starting_equipment(struct region *r, struct unit *u)
-{
-  give_equipment(u, NULL);
-  give_equipment(u, u->race);
-
-  switch(old_race(u->race)) {
-	case RC_ELF:
-		set_show_item(u->faction, I_FEENSTIEFEL);
-		break;
-	case RC_GOBLIN:
-		set_show_item(u->faction, I_RING_OF_INVISIBILITY);
-		scale_number(u, 10);
-		break;
-	case RC_HUMAN:
-		{
-			building *b = new_building(bt_find("castle"), r, u->faction->locale);
-			b->size = 10;
-			u->building = b;
-			fset(u, UFL_OWNER);
-		}
-		break;
-	case RC_CAT:
-		set_show_item(u->faction, I_RING_OF_INVISIBILITY);
-		break;
-	case RC_AQUARIAN:
-		{
-			ship *sh = new_ship(st_find("boat"), u->faction->locale, r);
-			sh->size = sh->type->construction->maxsize;
-			u->ship = sh;
-			fset(u, UFL_OWNER);
-		}
-		break;
-	case RC_CENTAUR:
-		rsethorses(r, 250+rand()%51+rand()%51);
-		break;
-	}
-  u->hp = unit_max_hp(u);
-}
-
 int
 unit_max_hp(const unit * u)
 {
@@ -310,6 +198,45 @@ unit_max_hp(const unit * u)
 	}
 
 	return h;
+}
+
+void
+give_starting_equipment(struct unit *u)
+{
+  struct region *r = u->region;
+
+  switch(old_race(u->race)) {
+  case RC_ELF:
+    set_show_item(u->faction, I_FEENSTIEFEL);
+    break;
+  case RC_GOBLIN:
+    set_show_item(u->faction, I_RING_OF_INVISIBILITY);
+    scale_number(u, 10);
+    break;
+  case RC_HUMAN:
+    {
+      building *b = new_building(bt_find("castle"), r, u->faction->locale);
+      b->size = 10;
+      u->building = b;
+      fset(u, UFL_OWNER);
+    }
+    break;
+  case RC_CAT:
+    set_show_item(u->faction, I_RING_OF_INVISIBILITY);
+    break;
+  case RC_AQUARIAN:
+    {
+      ship *sh = new_ship(st_find("boat"), u->faction->locale, r);
+      sh->size = sh->type->construction->maxsize;
+      u->ship = sh;
+      fset(u, UFL_OWNER);
+    }
+    break;
+  case RC_CENTAUR:
+    rsethorses(r, 250+rand()%51+rand()%51);
+    break;
+  }
+  u->hp = unit_max_hp(u);
 }
 
 boolean

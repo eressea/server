@@ -20,10 +20,10 @@ end
 
 function process(orders)
   -- initialize starting equipment for new players
-  startup_equipment("conquesttoken", 1, "");
-  startup_equipment("wood", 30, "");
-  startup_equipment("stone", 30, "");
-  startup_equipment("money", 4200, "");
+  equipment_setitem("new_faction", "conquesttoken", "1");
+  equipment_setitem("new_faction", "wood", "30");
+  equipment_setitem("new_faction", "stone", "30");
+  equipment_setitem("new_faction", "money", "4200");
 
   file = "" .. get_turn()
   if read_game(file)~=0 then

@@ -15,6 +15,8 @@
 #include <config.h>
 #include "eressea.h"
 #include "faction.h"
+
+#include "equipment.h"
 #include "unit.h"
 #include "race.h"
 #include "region.h"
@@ -142,7 +144,9 @@ addplayer(region *r, faction * f)
   assert(f->units==NULL);
   set_ursprung(f, 0, r->x, r->y);
   u = createunit(r, f, 1, f->race);
-  give_starting_equipment(r, u);
+  equip_unit(u, get_equipment("new_faction"));
+  equip_unit(u, get_equipment(u->race->_name[0]));
+  give_starting_equipment(u);
   fset(u, UFL_ISNEW);
   if (f->race == new_race[RC_DAEMON]) {
     race_t urc;

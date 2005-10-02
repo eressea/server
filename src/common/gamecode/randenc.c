@@ -32,6 +32,7 @@
 #include <kernel/battle.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
+#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/karma.h>
@@ -339,33 +340,7 @@ get_allies(region * r, unit * u)
 				return;
 			newunit = createunit(r, u->faction, rand() % 8 + 2, u->faction->race);
 			set_string(&newunit->name, "Söldner");
-			set_money(newunit, (rand() % 80 + 20) * newunit->number);
-
-			switch (rand() % 4) {
-			case 0:
-				set_level(newunit, SK_MELEE, 1+rand()%3);
-				set_item(newunit, I_SWORD, newunit->number);
-				break;
-			case 1:
-				set_level(newunit, SK_SPEAR, 1+rand()%3);
-				set_item(newunit, I_SPEAR, newunit->number);
-				break;
-			case 2:
-				set_level(newunit, SK_CROSSBOW, 1+rand()%3);
-				set_item(newunit, I_CROSSBOW, newunit->number);
-				break;
-			case 3:
-				set_level(newunit, SK_LONGBOW, 1+rand()%3);
-				set_item(newunit, I_LONGBOW, newunit->number);
-				break;
-			}
-			if (rand() % 100 < 40) {
-				set_item(newunit, I_CHAIN_MAIL, rand() % (newunit->number + 1));
-			}
-			if (rand() % 100 < 30) {
-				set_item(newunit, I_HORSE, newunit->number);
-				set_level(newunit, SK_RIDING, 1+rand()%3);
-			}
+      equip_unit(newunit, get_equipment("random_plain"));
 			break;
 		} else {
 			if (eff_skill(u, SK_LONGBOW, r) < 3
@@ -375,14 +350,7 @@ get_allies(region * r, unit * u)
 			}
 			newunit = createunit(r, u->faction, rand() % 6 + 2, u->faction->race);
 			set_string(&newunit->name, "Waldbewohner");
-			set_money(newunit, (rand() % 20 + 10) * newunit->number);
-			set_level(newunit, SK_LONGBOW, 2+rand()%3);
-			set_item(newunit, I_LONGBOW, newunit->number);
-			set_level(newunit, SK_OBSERVATION, 2+rand()%2);
-			set_level(newunit, SK_STEALTH, 1+rand()%2);
-			if (rand() % 100 < 20) {
-				set_level(newunit, SK_HERBALISM, 1+rand()%2);
-			}
+      equip_unit(newunit, get_equipment("random_forest"));
 		}
 		break;
 
@@ -392,10 +360,7 @@ get_allies(region * r, unit * u)
 		}
 		newunit = createunit(r, u->faction, rand() % 6 + 2, u->faction->race);
 		set_string(&newunit->name, "Sumpfbewohner");
-		set_money(newunit, (rand() % 20 + 10) * newunit->number);
-		set_level(newunit, SK_SPEAR, 2+rand()%3);
-		set_item(newunit, I_SPEAR, newunit->number);
-		set_level(newunit, SK_STEALTH, 2+rand()%3);
+    equip_unit(newunit, get_equipment("random_swamp"));
 		break;
 
 	case T_DESERT:
@@ -404,13 +369,7 @@ get_allies(region * r, unit * u)
 		}
 		newunit = createunit(r, u->faction, rand() % 12 + 2, u->faction->race);
 		set_string(&newunit->name, "Berber");
-		set_money(newunit, (rand() % 30 + 20) * newunit->number);
-		set_level(newunit, SK_MELEE, 1+rand()%2);
-		set_item(newunit, I_SWORD, newunit->number);
-		set_level(newunit, SK_TRADE, 1+rand()%3);
-		set_level(newunit, SK_RIDING, 2+rand()%2);
-		set_item(newunit, I_HORSE, newunit->number);
-		set_level(newunit, SK_HORSE_TRAINING, 2+rand()%2);
+    equip_unit(newunit, get_equipment("random_desert"));
 		break;
 
 	case T_HIGHLAND:
@@ -419,9 +378,7 @@ get_allies(region * r, unit * u)
 		}
 		newunit = createunit(r, u->faction, rand() % 8 + 2, u->faction->race);
 		set_string(&newunit->name, "Hochlandbarbaren");
-		set_money(newunit, (rand() % 10 + 20) * newunit->number);
-		set_level(newunit, SK_MELEE, 1+rand()%2);
-		set_item(newunit, I_SWORD, newunit->number);
+    equip_unit(newunit, get_equipment("random_highland"));
 		break;
 
 	case T_MOUNTAIN:
@@ -431,14 +388,8 @@ get_allies(region * r, unit * u)
 		}
 		newunit = createunit(r, u->faction, rand() % 6 + 2, u->faction->race);
 		set_string(&newunit->name, "Bergbewohner");
-		set_money(newunit, (rand() % 40 + 60) * newunit->number);
-		set_level(newunit, SK_MELEE, 2+rand()%2);
-		set_item(newunit, I_SWORD, newunit->number);
-		set_level(newunit, SK_ARMORER, 2+rand()%2);
-		set_level(newunit, SK_TRADE, 1+rand()%3);
-		if (rand() % 100 < 60) {
-			set_item(newunit, I_PLATE_ARMOR, newunit->number);
-		}
+    equip_unit(newunit, get_equipment("random_mountain"));
+
 		break;
 
 	case T_GLACIER:
@@ -448,10 +399,8 @@ get_allies(region * r, unit * u)
 		}
 		newunit = createunit(r, u->faction, rand() % 4 + 2, u->faction->race);
 		set_string(&newunit->name, "Eisleute");
-		set_money(newunit, (rand() % 20 + 20) * newunit->number);
-		set_level(newunit, SK_MELEE, 2+rand()%2);
-		set_item(newunit, I_SWORD, newunit->number);
-		set_level(newunit, SK_ARMORER, 2+rand()%2);
+    equip_unit(newunit, get_equipment("random_glacier"));
+
 		break;
 	}
 

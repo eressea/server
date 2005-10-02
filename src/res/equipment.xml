@@ -1,41 +1,44 @@
 <?xml version="1.0"?>
 <equipment>
-<!-- removed. only used by the mapper's seed function.
- <item name="conquesttoken" amount="1"/>
- <item name="log" amount="30"/>
- <item name="stone" amount="30"/>
- <item name="money" amount="4200"/>
--->
-  <startup race="dwarf">
+
+  <!-- one equipment-set per player-race for the first unit in a faction -->
+  <set name="dwarf">
     <item name="axe" amount="1"/>
     <item name="chainmail" amount="1"/>
     <skill name="sk_melee" level="1"/>
-  </startup>
-  <startup race="elf">
+  </set>
+
+  <set name="elf">
     <item name="fairyboot" amount="1"/>
-  </startup>
-  <startup race="uruk">
+  </set>
+
+  <set name="uruk">
     <skill name="sk_spear" level="4"/>
     <skill name="sk_melee" level="4"/>
     <skill name="sk_crossbow" level="4"/>
     <skill name="sk_catapult" level="4"/>
     <skill name="sk_bow" level="4"/>
-  </startup>
-  <startup race="goblin">
+  </set>
+
+  <set name="goblin">
     <item name="roi" amount="1"/>
-  </startup>
-  <startup race="troll">
+  </set>
+
+  <set name="troll">
     <skill name="sk_building" level="1"/>
     <skill name="sk_perception" level="3"/>
     <item name="stone" amount="50"/>
-  </startup>
-  <startup race="demon">
+  </set>
+
+  <set name="demon">
     <skill name="sk_stamina" level="15"/>
-  </startup>
-  <startup race="insect">
+  </set>
+
+  <set name="insect">
     <item name="nestwarmth" amount="9"/>
-  </startup>
-  <startup race="halfling">
+  </set>
+
+  <set name="halfling">
     <skill name="sk_trade" level="1"/>
     <skill name="sk_riding" level="2"/>
     <item name="horse" amount="2"/>
@@ -47,12 +50,121 @@
     <item name="oil" amount="5"/>
     <item name="silk" amount="5"/>
     <item name="incense" amount="5"/>
-  </startup>
-  <startup race="cat">
+  </set>
+
+  <set name="cat">
     <item name="roi" amount="1"/>
-  </startup>
-  <startup race="aquarian">
+  </set>
+
+  <set name="aquarian">
     <skill name="sk_sailing" level="1"/>
-  </startup>
+  </set>
+
+  <!-- equipment-sets for random encounters -->
+  <set name="random_desert">
+    <skill name="sk_melee" level="d2"/>
+    <skill name="sk_trade" level="d3"/>
+    <skill name="sk_riding" level="d2+1"/>
+    <skill name="sk_training" level="d2+1"/>
+    <item name="horse" amount="1"/>
+    <item name="sword" amount="1"/>
+    <item name="money" amount="d30+19"/>
+  </set>
+
+  <set name="random_swamp">
+    <skill name="sk_stealth" level="d3+1"/>
+    <skill name="sk_spear" level="d3+1"/>
+    <item name="spear" amount="1"/>
+    <item name="money" amount="d20+9"/>
+  </set>
+
+  <set name="random_glacier">
+    <skill name="sk_armorer" level="d2+1"/>
+    <skill name="sk_melee" level="d2+1"/>
+    <item name="sword" amount="1"/>
+    <item name="money" amount="d20+19"/>
+  </set>
+
+  <set name="random_mountain">
+    <skill name="sk_armorer" level="d2+1"/>
+    <skill name="sk_melee" level="d2+1"/>
+    <skill name="sk_trade" level="d3"/>
+    <item name="sword" amount="1"/>
+    <item name="money" amount="d40+59"/>
+    <subset chance="0.6">
+      <set name="random_plate"/>
+    </subset>
+  </set>
+
+  <set name="random_highland">
+    <skill name="sk_melee" level="d2"/>
+    <item name="sword" amount="1"/>
+    <item name="money" amount="d10+19"/>
+  </set>
+
+  <set name="random_forest">
+    <skill name="sk_stealth" level="d2"/>
+    <skill name="sk_perception" level="d2+1"/>
+    <skill name="sk_bow" level="d3+1"/>
+    <item name="bow" amount="1"/>
+    <item name="money" amount="d20+9"/>
+    <subset chance="0.2">
+      <set name="random_herbalist"/>
+    </subset>
+  </set>
+
+  <set name="random_herbalist">
+    <skill name="sk_herbalism" level="d2"/>
+  </set>
+
+  <set name="random_plain">
+    <item name="money" amount="d80+19"/>
+    <subset>
+      <set name="random_sword" chance="0.25"/>
+      <set name="random_spear" chance="0.25"/>
+      <set name="random_crossbow" chance="0.25"/>
+      <set name="random_bow" chance="0.25"/>
+    </subset>
+    <subset chance="0.4">
+      <set name="random_chain"/>
+    </subset>
+    <subset chance="0.3">
+      <set name="random_rider"/>
+    </subset>
+  </set>
+
+  <set name="random_spear">
+    <skill name="sk_spear" level="d3"/>
+    <item name="spear" amount="1"/>
+  </set>
+
+  <set name="random_sword">
+    <skill name="sk_sword" level="d3"/>
+    <item name="sword" amount="1"/>
+  </set>
+
+  <set name="random_crossbow">
+    <skill name="sk_crossbow" level="d3"/>
+    <item name="crossbow" amount="1"/>
+  </set>
+
+  <set name="random_bow">
+    <skill name="sk_bow" level="d3"/>
+    <item name="bow" amount="1"/>
+  </set>
+
+  <set name="random_plate">
+    <item name="plate" amount="1"/>
+  </set>
+
+  <set name="random_chain">
+    <item name="chainmail" amount="1"/>
+  </set>
+
+  <set name="random_rider">
+    <item name="horse" amount="1"/>
+    <skill name="sk_riding" level="d3"/>
+  </set>
+
 </equipment>
 

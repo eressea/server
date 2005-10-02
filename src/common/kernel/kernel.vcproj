@@ -179,6 +179,9 @@
 				RelativePath=".\alchemy.h">
 			</File>
 			<File
+				RelativePath=".\alliance.h">
+			</File>
+			<File
 				RelativePath=".\battle.h">
 			</File>
 			<File
@@ -198,6 +201,9 @@
 			</File>
 			<File
 				RelativePath=".\curse.h">
+			</File>
+			<File
+				RelativePath=".\equipment.h">
 			</File>
 			<File
 				RelativePath=".\eressea.h">
@@ -300,9 +306,6 @@
 			RelativePath=".\alliance.c">
 		</File>
 		<File
-			RelativePath=".\alliance.h">
-		</File>
-		<File
 			RelativePath=".\battle.c">
 		</File>
 		<File
@@ -322,6 +325,9 @@
 		</File>
 		<File
 			RelativePath=".\curse.c">
+		</File>
+		<File
+			RelativePath=".\equipment.c">
 		</File>
 		<File
 			RelativePath=".\eressea.c">

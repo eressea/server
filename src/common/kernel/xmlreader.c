@@ -18,6 +18,7 @@ without prior permission by the authors of Eressea.
 
 /* kernel includes */
 #include "building.h"
+#include "equipment.h"
 #include "item.h"
 #include "message.h"
 #include "race.h"
@@ -869,9 +870,9 @@ parse_resources(xmlDocPtr doc)
 }
 
 static void
-add_items(xmlNodeSetPtr nsetItems, const race * rc)
+add_items(equipment * eq, xmlNodeSetPtr nsetItems)
 {
-  if (nsetItems!=NULL) {
+  if (nsetItems!=NULL && nsetItems->nodeNr>0) {
     int i;
     for (i=0;i!=nsetItems->nodeNr;++i) {
       xmlNodePtr node = nsetItems->nodeTab[i];
@@ -883,22 +884,20 @@ add_items(xmlNodeSetPtr nsetItems, const race * rc)
       itype = it_find((const char*)property);
       xmlFree(property);
       if (itype!=NULL) {
-        int num = 0;
         property = xmlGetProp(node, BAD_CAST "amount");
         if (property!=NULL) {
-          num = atoi((const char*)property);
+          equipment_setitem(eq, itype, (const char*)property);
           xmlFree(property);
         }
-        startup_equipment(itype, num, rc);
       }
     }
   }
 }
 
 static void
-add_skills(xmlNodeSetPtr nsetSkills, const race * rc)
+add_skills(equipment * eq, xmlNodeSetPtr nsetSkills)
 {
-  if (nsetSkills!=NULL) {
+  if (nsetSkills!=NULL && nsetSkills->nodeNr>0) {
     int i;
     for (i=0;i!=nsetSkills->nodeNr;++i) {
       xmlNodePtr node = nsetSkills->nodeTab[i];
@@ -910,16 +909,71 @@ add_skills(xmlNodeSetPtr nsetSkills, const race * rc)
       sk = sk_find((const char*)property);
       xmlFree(property);
       if (sk!=NOSKILL) {
-        int num = 0;
         property = xmlGetProp(node, BAD_CAST "level");
         if (property!=NULL) {
-          num = atoi((const char*)property);
+          equipment_setskill(eq, sk, (const char*)property);
           xmlFree(property);
-        }
-        startup_skill(sk, num, rc);
+        } 
       }
     }
   }
+}
+
+static void
+add_subsets(xmlDocPtr doc, equipment * eq, xmlNodeSetPtr nsetSkills)
+{
+  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
+  if (nsetSkills!=NULL && nsetSkills->nodeNr>0) {
+    int i;
+
+    eq->subsets = calloc(nsetSkills->nodeNr+1, sizeof(subset));
+    for (i=0;i!=nsetSkills->nodeNr;++i) {
+      xmlXPathObjectPtr xpathResult;
+      xmlNodePtr node = nsetSkills->nodeTab[i];
+      xmlChar * property;
+
+      eq->subsets[i].chance = 1.0f;
+      property = xmlGetProp(node, BAD_CAST "chance");
+      if (property!=NULL) {
+        eq->subsets[i].chance = (float)atof((const char *)property);
+        xmlFree(property);
+      }
+      xpath->node = node;
+      xpathResult = xmlXPathEvalExpression(BAD_CAST "set", xpath);
+      if (xpathResult->nodesetval) {
+        xmlNodeSetPtr nsetSets = xpathResult->nodesetval;
+        float totalChance = 0.0f;
+
+        if (nsetSets->nodeNr>0) {
+          int set;
+          eq->subsets[i].sets = calloc(nsetSets->nodeNr+1, sizeof(subsetitem));
+          for (set=0;set!=nsetSets->nodeNr;++set) {
+            xmlNodePtr nodeSet = nsetSets->nodeTab[set];
+            float chance = 1.0f;
+
+            property = xmlGetProp(nodeSet, BAD_CAST "chance");
+            if (property!=NULL) {
+              chance = (float)atof((const char *)property);
+              xmlFree(property);
+            }
+            totalChance += chance;
+
+            property = xmlGetProp(nodeSet, BAD_CAST "name");
+            assert(property!=NULL);
+            eq->subsets[i].sets[set].chance = chance;
+            eq->subsets[i].sets[set].set = create_equipment((const char*)property);
+            xmlFree(property);
+          }
+        }
+        if (totalChance>1.0f) {
+          log_error(("total chance exceeds 1.0: %f in equipment set %s.\n", 
+            totalChance, eq->name));
+        }
+      }
+      xmlXPathFreeObject(xpathResult);
+    }
+  }
+  xmlXPathFreeContext(xpath);
 }
 
 static int
@@ -929,31 +983,35 @@ parse_equipment(xmlDocPtr doc)
   xmlXPathObjectPtr xpathRaces;
 
   /* reading eressea/races/race */
-  xpathRaces = xmlXPathEvalExpression(BAD_CAST "/eressea/equipment/startup", xpath);
+  xpathRaces = xmlXPathEvalExpression(BAD_CAST "/eressea/equipment/set", xpath);
   if (xpathRaces->nodesetval) {
     xmlNodeSetPtr nsetRaces = xpathRaces->nodesetval;
     int i;
 
     for (i=0;i!=nsetRaces->nodeNr;++i) {
       xmlNodePtr node = nsetRaces->nodeTab[i];
-      const struct race * rc = NULL;
-      xmlChar * property = xmlGetProp(node, BAD_CAST "race");
-      xmlXPathObjectPtr xpathResult;
+      xmlChar * property = xmlGetProp(node, BAD_CAST "name");
 
       if (property!=NULL) {
-        rc = rc_find((const char*)property);
-        assert(rc!=NULL);
+        equipment * eq = create_equipment((const char*)property);
+        xmlXPathObjectPtr xpathResult;
+
+        xpath->node = node;
+
+        xpathResult = xmlXPathEvalExpression(BAD_CAST "item", xpath);
+        add_items(eq, xpathResult->nodesetval);
+        xmlXPathFreeObject(xpathResult);
+
+        xpathResult = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
+        add_skills(eq, xpathResult->nodesetval);
+        xmlXPathFreeObject(xpathResult);
+
+        xpathResult = xmlXPathEvalExpression(BAD_CAST "subset", xpath);
+        add_subsets(doc, eq, xpathResult->nodesetval);
+        xmlXPathFreeObject(xpathResult);
+
+        xmlFree(property);
       }
-
-      xpath->node = node;
-      xpathResult = xmlXPathEvalExpression(BAD_CAST "item", xpath);
-      add_items(xpathResult->nodesetval, rc);
-      xmlXPathFreeObject(xpathResult);
-
-      xpath->node = node;
-      xpathResult = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
-      add_skills(xpathResult->nodesetval, rc);
-      xmlXPathFreeObject(xpathResult);
     }
   }
 

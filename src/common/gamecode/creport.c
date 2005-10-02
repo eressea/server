@@ -18,7 +18,7 @@
 
 /* tweakable features */
 #define ENCODE_SPECIAL 1
-#define RENDER_CRMESSAGES 1
+#define RENDER_CRMESSAGES
 
 /* modules include */
 #include <modules/score.h>
@@ -477,7 +477,7 @@ render_messages(FILE * F, faction * f, message_list *msgs)
 		boolean printed = false;
 		const struct message_type * mtype = m->msg->type;
 		unsigned int hash = hashstring(mtype->name);
-#if RENDER_CRMESSAGES
+#ifdef RENDER_CRMESSAGES
 		char nrbuffer[1024*32];
 		nrbuffer[0] = '\0';
 		if (nr_render(m->msg, f->locale, nrbuffer, sizeof(nrbuffer), f)>0 && nrbuffer[0]) {
