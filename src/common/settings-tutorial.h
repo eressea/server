@@ -18,7 +18,6 @@
 #define IMMUN_GEGEN_ANGRIFF 8
 #define RESOURCE_CONVERSION 1
 #define NEW_RESOURCEGROWTH 1
-#define LARGE_CASTLES 1
 #define REDUCED_PEASANTGROWTH 1
 #define RACE_ADJUSTMENTS 1
 #define TEACHDIFFERENCE 2
@@ -28,12 +27,18 @@
 #define RESOURCE_QUANTITY 0.5
 #define RECRUITFRACTION 40    /* 100/RECRUITFRACTION% */
 #define CHANGED_CROSSBOWS 1
-#define NEWATSROI 0
 #define COMBAT_TURNS 5
 #define PEASANTS_DO_NOT_STARVE 0
 #define NEW_MIGRATION 1
 #define ASTRAL_HUNGER
+#define NEWATSROI 0
+#define HUNGER_REDUCES_SKILL /* Hunger reduziert den Talentwert
+ auf die Hälfte */
 
 #define ASTRAL_ITEM_RESTRICTIONS /* keine grossen dinge im astralraum */
+#define NEW_DAEMONHUNGER_RULE
+#define NEW_COMBATSKILLS_RULE
+#define ROW_FACTOR 3 /* factor for combat row advancement rule */
+#define HEROES
 
 #define SCORE_MODULE

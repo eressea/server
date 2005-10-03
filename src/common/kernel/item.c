@@ -992,27 +992,6 @@ static t_item itemdata[MAXITEMS] = {
 		{"Mallorn", "Mallorn", "Mallorn", "Mallorn"},
 		IS_RESOURCE, SK_LUMBERJACK, 2, {0, 0, 0, 0, 0, 0}, 500, 0, 0, NULL
 	},
-	{			/* I_KEKS 46 *//* Item für Questenzwecke */
-		{"Keks", "Kekse", "Keks", "Kekse"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_APFEL 47 *//* Item für Questenzwecke */
-		{"Apfel", "Äpfel", "Apfel", "Äpfel"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_NUSS 48 *//* Item für Questenzwecke */
-		{"Nuß", "Nüsse", "Nuß", "Nüsse"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_MANDELKERN 49 *//* Item für Questenzwecke */
-		{"Mandelkern", "Mandelkerne", "Mandelkern", "Mandelkerne"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_AMULETT_DES_TREFFENS 58 */
-		{"Amulett des Treffens", "Amulette des Treffens",
-			"Amulett des Treffens", "Amulette des Treffens"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
 	{			/* I_DRACHENBLUT 59 */
 		{"Drachenblut", "Drachenblut", "Drachenblut", "Drachenblut"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL

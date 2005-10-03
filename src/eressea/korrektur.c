@@ -402,7 +402,7 @@ update_gms(void)
 			for (k=0;keys[k];++k) {
 				add_key((attrib**)&permissions->data.v, atoi36(keys[k]));
 			}
-			for (i=I_LAENSWORD;i!=I_KEKS;++i) {
+			for (i=I_LAENSWORD;i!=I_DRACHENBLUT;++i) {
 				attrib * a = a_find((attrib*)permissions->data.v, &at_gmcreate);
 				while (a && a->data.v!=(void*)olditemtype[i]) a=a->nexttype;
 				if (!a) a_add((attrib**)&permissions->data.v, make_atgmcreate(olditemtype[i]));

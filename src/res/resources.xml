@@ -2,7 +2,6 @@
 <resources>
   <resource name="mistletoe">
     <!-- Sets the chance of escape in a fight to 100 percent -->
-    <function name="change" value="changeitem"/>
     <item notlost="yes" weight="0">
       <function name="use" value="usemistletoe"/>
     </item>
@@ -12,6 +11,27 @@
     <item notlost="yes" weight="1" capacity="0">
       <function name="use" value="use_wand_of_tears"/>
     </item>
+  </resource>
+
+  <resource name="aog">
+    <!-- Amulett des Treffens -->
+    <item notlost="yes" weight="0"/>
+  </resource>
+
+  <resource name="almond">
+    <item weight="0"/>
+  </resource>
+
+  <resource name="apple">
+    <item weight="0"/>
+  </resource>
+
+  <resource name="nut">
+    <item weight="0"/>
+  </resource>
+
+  <resource name="cookie">
+    <item weight="0"/>
   </resource>
 
   <resource name="snowball">

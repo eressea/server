@@ -705,7 +705,7 @@ gm_addquest(const char * email, const char * name, short radius, unsigned int fl
 	for (i=0;i<=I_INCENSE;++i) {
 		a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
 	}
-	for (i=I_LAENSWORD;i!=I_KEKS;++i) {
+	for (i=I_LAENSWORD;i!=I_DRACHENBLUT;++i) {
 		a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
 	}
 
@@ -770,7 +770,7 @@ gm_addfaction(const char * email, plane * p, region * r)
 	for (i=0;i<=I_INCENSE;++i) {
 		a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
 	}
-	for (i=I_LAENSWORD;i!=I_KEKS;++i) {
+	for (i=I_LAENSWORD;i!=I_DRACHENBLUT;++i) {
 		a_add((attrib**)&a->data.v, make_atgmcreate(olditemtype[i]));
 	}
 

@@ -18,7 +18,6 @@
 #define IMMUN_GEGEN_ANGRIFF 8
 #define RESOURCE_CONVERSION 1
 #define NEW_RESOURCEGROWTH 1
-#define LARGE_CASTLES 1
 #define REDUCED_PEASANTGROWTH 1
 #define RACE_ADJUSTMENTS 1
 #define TEACHDIFFERENCE 2
@@ -37,14 +36,14 @@
                                 auf die Hälfte */
 
 #define ASTRAL_ITEM_RESTRICTIONS /* keine grossen dinge im astralraum */
-
-#define MUSEUM_MODULE
-#define ARENA_MODULE
-#define SCORE_MODULE
-#define WORMHOLE_MODULE
-#define XECMD_MODULE
-
 #define NEW_DAEMONHUNGER_RULE
 #define NEW_COMBATSKILLS_RULE
 #define ROW_FACTOR 3 /* factor for combat row advancement rule */
 #define HEROES
+
+#define SCORE_MODULE
+#define MUSEUM_MODULE
+#define ARENA_MODULE
+#define WORMHOLE_MODULE
+#define XECMD_MODULE
+

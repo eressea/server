@@ -160,8 +160,8 @@ block_create(short x1, short y1, int size, char chaotisch, int special, char ter
 		newblock[x][y] = terrain_create(local_climate);
 		vset_erase(&fringe, (void *) c);
 		for (d = 0; d != MAXDIRECTIONS; ++d) {
-			int dx = x+delta_x[d];
-			int dy = y+delta_y[d];
+			short dx = x+delta_x[d];
+			short dy = y+delta_y[d];
 			if (dx >= 0 && dx < BLOCKSIZE && dy >= 0 && dy < BLOCKSIZE && newblock[dx][dy] == T_OCEAN)
 				vset_add(&fringe, (void *) (((short) (dx) << 16) +
 											((short) (dy) & 0xFFFF)));

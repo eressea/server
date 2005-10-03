@@ -240,9 +240,7 @@ findbuilding(int i)
 /** Building: Fortification */
 enum {
 	B_SITE,
-#if LARGE_CASTLES
 	B_TRADEPOST,
-#endif
 	B_FORTIFICATION,
 	B_TOWER,
 	B_CASTLE,
@@ -277,9 +275,7 @@ castle_name(int bsize)
 {
 	const char * fname[MAXBUILDINGS] = {
 	  "site",
-#if LARGE_CASTLES
 		"tradepost",
-#endif
 	  "fortification",
 	  "tower",
 	  "castle",
@@ -301,42 +297,6 @@ castle_name(int bsize)
 	}
 	return fname[i];
 }
-
-static requirement castle_req[] = {
-	{ R_STONE, 1, 0.5 },
-	{ NORESOURCE, 0, 0.0 },
-};
-
-#if LARGE_CASTLES
-static construction castle_bld[MAXBUILDINGS] = {
-	{ SK_BUILDING, 1,     2, 1, castle_req, &castle_bld[1] },
-	{ SK_BUILDING, 1,     8, 1, castle_req, &castle_bld[2] },
-	{ SK_BUILDING, 2,    40, 1, castle_req, &castle_bld[3] },
-	{ SK_BUILDING, 3,   200, 1, castle_req, &castle_bld[4] },
-	{ SK_BUILDING, 4,  1000, 1, castle_req, &castle_bld[5] },
-	{ SK_BUILDING, 5,  5000, 1, castle_req, &castle_bld[6] },
-	{ SK_BUILDING, 6,    -1, 1, castle_req, NULL }
-};
-#else
-static construction castle_bld[MAXBUILDINGS] = {
-	{ SK_BUILDING, 1,    2, 1, castle_req, &castle_bld[1] },
-	{ SK_BUILDING, 2,    8, 1, castle_req, &castle_bld[2] },
-	{ SK_BUILDING, 3,   40, 1, castle_req, &castle_bld[3] },
-	{ SK_BUILDING, 4,  200, 1, castle_req, &castle_bld[4] },
-	{ SK_BUILDING, 5, 1000, 1, castle_req, &castle_bld[5] },
-	{ SK_BUILDING, 6,   -1, 1, castle_req, NULL }
-};
-#endif
-
-building_type bt_castle = {
-	"castle",
-	BTF_NONE,
-	1, 4, -1,
-	0, 0, 0, 1.0,
-	NULL,
-	&castle_bld[0],
-	castle_name
-};
 
 #if WDW_PYRAMID
 static requirement wdw_pyramid_req[][] = {
@@ -452,7 +412,6 @@ register_buildings(void)
 {
 	register_function((pf_generic)init_smithy, "init_smithy");
 	register_function((pf_generic)castle_name, "castle_name");
-	bt_register(&bt_castle);
 
 #if WDW_PYRAMID
 	register_function((pf_generic)wdw_pyramid_name, "wdw_pyramid_name");

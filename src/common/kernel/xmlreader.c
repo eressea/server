@@ -159,7 +159,8 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
     int m;
 
     assert(*consPtr==NULL);
-    con = *consPtr = calloc(sizeof(construction), 1);
+    *consPtr = con = calloc(sizeof(construction), 1);
+    consPtr = &con->improvement;
 
     property = xmlGetProp(node, BAD_CAST "skill");
     assert(property!=NULL);
