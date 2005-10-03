@@ -744,6 +744,9 @@ parse_resources(xmlDocPtr doc)
   xmlNodeSetPtr nodes;
   int i;
 
+  /* make sure old items (used in requirements) are available */
+  init_resources();
+
   /* reading eressea/resources/resource */
   resources = xmlXPathEvalExpression(BAD_CAST "/eressea/resources/resource", xpath);
   nodes = resources->nodesetval;
@@ -865,7 +868,8 @@ parse_resources(xmlDocPtr doc)
 
   xmlXPathFreeContext(xpath);
 
-  init_resources();
+  /* old resources now extern (for spells */
+  oldresourcetype[R_SWORD] = rt_find("sword");
 
   return 0;
 }

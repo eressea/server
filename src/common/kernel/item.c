@@ -2074,7 +2074,6 @@ init_resources(void)
 	r_unit = new_resourcetype(&names[12], NULL, RTF_NONE);
 	r_unit->uchange = res_changeperson;
 
-  oldresourcetype[R_SWORD] = rt_find("sword");
 	oldresourcetype[R_SILVER] = r_silver;
 	oldresourcetype[R_AURA] = r_aura;
 	oldresourcetype[R_PERMAURA] = r_permaura;
@@ -2082,6 +2081,11 @@ init_resources(void)
 	oldresourcetype[R_PEASANTS] = r_peasants;
 	oldresourcetype[R_UNIT] = r_unit;
 
+  /* alte typen registrieren: */
+  init_olditems();
+  init_oldherbs();
+  init_oldpotions();
+  init_oldscores();
 }
 
 int
@@ -2292,10 +2296,4 @@ register_resources(void)
 
   /* make sure noone has deleted an I_ tpe without deleting the R_ type that goes with it! */
   assert((int)I_SACK_OF_CONSERVATION == (int)R_SACK_OF_CONSERVATION);
-
-  /* alte typen registrieren: */
-  init_olditems();
-  init_oldherbs();
-  init_oldpotions();
-  init_oldscores();
 }
