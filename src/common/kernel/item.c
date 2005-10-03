@@ -1221,7 +1221,7 @@ static translate_t translation[] = {
 	{ "Wasser des Lebens", "p2", "p2_p", NULL, NULL },
 	{ "Bauernblut", "peasantblood", "peasantblood_p", NULL, NULL },
 	{ "Gehirnschmalz", "p6", "p6_p", NULL, NULL },
-	{ "Nestwärme", "p8", "p8_p", NULL, NULL },
+	{ "Nestwärme", "nestwarmth", "nestwarmth_p", NULL, NULL },
 	{ "Pferdeglück", "p9", "p9_p", NULL, NULL },
 	{ "Berserkerblut", "p10", "p10_p", NULL, NULL },
 	{ "Bauernlieb", "p11", "p11_p", NULL, NULL },
