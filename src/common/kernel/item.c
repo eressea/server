@@ -897,10 +897,6 @@ static t_item itemdata[MAXITEMS] = {
 		{"Speer", "Speere", "Speer", "Speere"},
 		IS_PRODUCT, SK_WEAPONSMITH, 2, {0, 1, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
-	{			/* I_CROSSBOW */
-		{"Armbrust", "Armbrüste", "Armbrust", "Armbrüste"},
-		IS_PRODUCT, SK_WEAPONSMITH, 3, {0, 1, 0, 0, 0, 0}, 100, 0, 0, NULL
-	},
 	{			/* I_LONGBOW */
 		{"Bogen", "Bögen", "Bogen", "Bögen"},
 		IS_PRODUCT, SK_WEAPONSMITH, 2, {0, 1, 0, 0, 0, 0}, 100, 0, 0, NULL

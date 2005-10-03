@@ -75,4 +75,19 @@
     </item>
   </resource>
 
+  <!-- christmas items: start -->
+  <resource name="almond">
+    <item weight="0"/>
+  </resource>
+  <resource name="apple">
+    <item weight="0"/>
+  </resource>
+  <resource name="nut">
+    <item weight="0"/>
+  </resource>
+  <resource name="cookie">
+    <item weight="0"/>
+  </resource>
+  <!-- christmas items: end -->
+
 </resources>

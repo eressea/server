@@ -57,7 +57,6 @@ enum {
 	WP_EOGSWORD,
 	WP_CATAPULT,
 	WP_LONGBOW,
-	WP_CROSSBOW,
 	WP_SPEAR,
 	WP_LANCE,
 	WP_RUSTY_HALBERD,
@@ -67,7 +66,6 @@ enum {
 
 enum {
 	RL_CATAPULT,
-	RL_CROSSBOW,
 	RL_MAX,
 	RL_NONE
 };
@@ -110,8 +108,6 @@ static weapondata weapontable[WP_MAX + 1] =
 	{0.00, "3d10+5", "3d10+5", I_CATAPULT, SK_CATAPULT, 0, 0, true, false, { RL_CATAPULT, 5 }, BASH },
 	/* Langbogen */
 	{0.00, "1d11+1", "1d11+1", I_LONGBOW, SK_LONGBOW, 0, 0, true, false, { RL_NONE, 0 }, PIERCE },
-	/* Armbrust */
-	{0.00, "3d3+5", "3d3+5", I_CROSSBOW, SK_CROSSBOW, 0, 0, true, false, { RL_CROSSBOW, 2 }, PIERCE | ARMORPIERCING },
 	/* Speer */
 	{0.00, "1d10+0", "1d12+2", I_SPEAR, SK_SPEAR, 0, 0, false, false, { RL_NONE, 0}, PIERCE },
 	/* Lanze */
