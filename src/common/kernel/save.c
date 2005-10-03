@@ -747,7 +747,10 @@ read_items(FILE *F, item **ilist)
 		rs(F, buf);
 		if (!strcmp("end", buf)) break;
     itype = it_find(buf);
-		if (itype!=NULL) i_change(ilist, itype, ri(F));
+    assert(itype!=NULL);
+    if (itype!=NULL) {
+      i_change(ilist, itype, ri(F));
+    }
 	}
 }
 

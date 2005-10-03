@@ -1667,7 +1667,6 @@ main(int argc, char *argv[])
   init_locales();
   init_attributes();
 
-  init_resources();
 #if NEW_RESOURCEGROWTH
 	init_rawmaterials();
 #endif

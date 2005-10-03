@@ -2054,12 +2054,6 @@ init_resources(void)
 	if (initialized) return;
 	initialized = true;
 
-  /* alte typen registrieren: */
-  init_olditems();
-  init_oldherbs();
-  init_oldpotions();
-  init_oldscores();
-  
   /* silver was never an item: */
 	r_silver = new_resourcetype(&names[0], NULL, RTF_ITEM|RTF_POOLED);
 	i_silver = new_itemtype(r_silver, ITF_NONE, 1/*weight*/, 0);
@@ -2298,4 +2292,10 @@ register_resources(void)
 
   /* make sure noone has deleted an I_ tpe without deleting the R_ type that goes with it! */
   assert((int)I_SACK_OF_CONSERVATION == (int)R_SACK_OF_CONSERVATION);
+
+  /* alte typen registrieren: */
+  init_olditems();
+  init_oldherbs();
+  init_oldpotions();
+  init_oldscores();
 }
