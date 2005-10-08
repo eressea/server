@@ -1269,7 +1269,8 @@ do_fumble(castorder *co)
   switch (rand() % 10) {
   case 0:
     /* wenn vorhanden spezieller Patzer, ansonsten nix */
-    sp->patzer(co);
+    if (sp->patzer) sp->patzer(co);
+    else patzer(co);
     break;
 
   case 1:

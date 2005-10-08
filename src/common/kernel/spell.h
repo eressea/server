@@ -177,7 +177,7 @@ extern "C" {
     SPL_TYBIED_FUMBLESHIELD,
     SPL_SHADOWKNIGHTS,
     LUASPL_FIRESWORD,
-    SPL_CREATE_TACTICCRYSTAL,
+    LUASPL_CREATE_TACTICCRYSTAL,
     SPL_ITEMCLOAK,
     SPL_FIREWALL,
     SPL_WISPS,
@@ -287,7 +287,8 @@ extern "C" {
   extern struct spell_list * spells;
   extern void init_spells(void);
   extern void register_spell(struct spell * sp);
-  struct spell * find_spell(magic_t mtype, const char * name);
+  extern struct spell * find_spell(magic_t mtype, const char * name);
+  extern void patzer(struct castorder *co);
 
 #ifdef __cplusplus
 }
