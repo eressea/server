@@ -279,7 +279,7 @@
     <attack type="4" damage="1d4"/>
     <attack type="4" damage="1d4"/>
     <attack type="1" damage="1d4"/>
-    <attack type="6" spell="81"/>
+    <attack type="6" spell="fiery_dragonbreath"/>
   </race>
   <race name="ghost" magres="0.800000" maxaura="0.500000" regaura="0.100000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="30" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="8" scarepeasants="yes" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes" equipment="yes" invinciblenonmagic="yes">
     <ai splitsize="5000"/>
@@ -433,7 +433,7 @@
     <attack type="4" damage="2d4"/>
     <attack type="4" damage="2d4"/>
     <attack type="4" damage="2d4"/>
-    <attack type="6" spell="81"/>
+    <attack type="6" spell="fiery_dragonbreath"/>
   </race>
   <race name="rat" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="100" capacity="50" speed="1.000000" hp="10" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="9999"/>
@@ -679,7 +679,7 @@
     <attack type="4" damage="3d20"/>
     <attack type="4" damage="3d20"/>
     <attack type="4" damage="5d30"/>
-    <attack type="6" spell="83"/>
+    <attack type="6" spell="powerful_dragonbreath"/>
   </race>
   <race name="dragon" magres="0.700000" maxaura="1.000000" regaura="2.000000" recruitcost="50000" weight="10000" capacity="1000000" speed="1.500000" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="2" killpeasants="yes" learn="yes"/>
@@ -693,7 +693,7 @@
     <attack type="4" damage="2d20"/>
     <attack type="4" damage="2d20"/>
     <attack type="4" damage="3d30"/>
-    <attack type="6" spell="82"/>
+    <attack type="6" spell="icy_dragonbreath"/>
   </race>
   <race name="youngdragon" magres="0.500000" maxaura="1.000000" regaura="1.000000" recruitcost="10000" weight="20000" capacity="10000" speed="1.000000" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="6" killpeasants="yes" learn="yes"/>
@@ -708,7 +708,7 @@
     <attack type="4" damage="1d30"/>
     <attack type="4" damage="1d30"/>
     <attack type="4" damage="1d30"/>
-    <attack type="6" spell="81"/>
+    <attack type="6" spell="fiery_dragonbreath"/>
   </race>
   <race name="illusion" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="0" capacity="0" speed="1.000000" hp="1" damage="1d1" unarmedattack="0" unarmeddefense="0" walk="yes" nolearn="yes" teach="no" noweapons="yes" illusionary="yes">
     <ai splitsize="999999"/>
@@ -1131,7 +1131,7 @@
     <attack type="4" damage="1d30"/>
     <attack type="4" damage="1d30"/>
     <attack type="4" damage="1d30"/>
-    <attack type="6" spell="81"/>
+    <attack type="6" spell="fiery_dragonbreath"/>
     <attack type="8" damage="1d10"/>
   </race>
   <race name="snotling" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="50" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveitem="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
@@ -1294,7 +1294,7 @@
     <attack type="4" damage="3d20"/>
     <attack type="4" damage="3d20"/>
     <attack type="4" damage="5d30"/>
-    <attack type="6" spell="174"/>
+    <attack type="6" spell="drain_skills"/>
     <attack type="6" spell="aura_of_fear"/>
     <precombatspell spell="shadowcall"/>
   </race>
@@ -1329,7 +1329,7 @@
     <attack type="4" damage="1d12"/>
     <attack type="4" damage="1d10"/>
     <attack type="4" damage="1d10"/>
-    <attack type="6" spell="180"/>
+    <attack type="6" spell="immolation"/>
   </race>
   <race name="sphinx" magres="0.900000" maxaura="1.000000" regaura="3.000000" recruitcost="250000" weight="180000" capacity="100000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
@@ -1339,7 +1339,7 @@
     <attack type="4" damage="3d20"/>
     <attack type="4" damage="3d20"/>
     <attack type="4" damage="5d30"/>
-    <attack type="6" spell="83"/>
+    <attack type="6" spell="powerful_dragonbreath"/>
     <attack type="6" spell="aura_of_fear"/>
   </race>
   <race name="littlescarab" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="25" ac="1" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" walk="yes" teach="no" giveitem="yes" getitem="yes">
@@ -1357,7 +1357,7 @@
     <attack type="4" damage="2d6"/>
     <attack type="4" damage="1d6"/>
     <attack type="4" damage="1d6"/>
-    <attack type="6" spell="183"/>
+    <attack type="6" spell="acidrain"/>
   </race>
   <race name="bluescarab" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="30" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="50"/>
@@ -1368,7 +1368,7 @@
     <attack type="4" damage="2d6"/>
     <attack type="4" damage="1d6"/>
     <attack type="4" damage="1d6"/>
-    <attack type="6" spell="182"/>
+    <attack type="6" spell="coldfront"/>
   </race>
   <race name="redscarab" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="1.000000" hp="25" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="50"/>
@@ -1379,7 +1379,7 @@
     <attack type="4" damage="2d6"/>
     <attack type="4" damage="1d6"/>
     <attack type="4" damage="1d6"/>
-    <attack type="6" spell="181"/>
+    <attack type="6" spell="firestorm"/>
   </race>
   <race name="undeadpharaoh" magres="0.950000" maxaura="1.000000" regaura="3.000000" recruitcost="2500000" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants="yes" cannotmove="yes" teach="no" getitem="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
@@ -1389,7 +1389,7 @@
     <attack type="4" damage="3d20"/>
     <attack type="4" damage="3d20"/>
     <attack type="4" damage="5d30"/>
-    <attack type="6" spell="174"/>
+    <attack type="6" spell="drain_skills"/>
     <attack type="6" spell="aura_of_fear"/>
     <precombatspell spell="shadowcall"/>
   </race>
@@ -1421,8 +1421,8 @@
     <attack type="4" damage="3d20"/>
     <attack type="4" damage="5d30"/>
     <attack type="4" damage="3d20"/>
-    <attack type="6" spell="83"/>
-    <attack type="6" spell="83"/>
+    <attack type="6" spell="powerful_dragonbreath"/>
+    <attack type="6" spell="powerful_dragonbreath"/>
   </race>
 -->
 </races>

@@ -10040,7 +10040,7 @@ static spell spelldaten[] =
     (spell_f)sp_shadowcall, patzer
   },
   {
-    SPL_IMMOLATION, "firestorm",
+    SPL_IMMOLATION, "immolation",
     "Verletzt alle Gegner.", NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 12,
     {
@@ -10052,7 +10052,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_immolation, patzer
   },
-  { SPL_FIREODEM, "immolation",
+  { SPL_FIREODEM, "firestorm",
     "Tötet die Feinde", NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 8,
     {
