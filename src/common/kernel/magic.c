@@ -355,7 +355,7 @@ already_seen(const faction * f, spellid_t id)
 	attrib *a;
 
 	for (a = a_find(f->attribs, &at_seenspell); a; a=a->nexttype)
-		if (a->data.i==id) return true;
+		if (a->data.i==(int)id) return true;
 	return false;
 }
 

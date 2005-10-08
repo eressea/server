@@ -285,6 +285,9 @@
 				RelativePath=".\lua\list.h">
 			</File>
 			<File
+				RelativePath=".\lua\message.cpp">
+			</File>
+			<File
 				RelativePath=".\lua\region.cpp">
 				<FileConfiguration
 					Name="Release|Win32">

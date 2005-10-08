@@ -13,10 +13,14 @@
   <xi:include href="ships.xml"/>
   <xi:include href="buildings.xml"/>
   <xi:include href="calendar.xml"/>
+  <xi:include href="equipment.xml"/>
+  <xi:include href="spells.xml"/>
 
   <equipment>
-    <item name="wood" amount="5"/>
-    <item name="stone" amount="10"/>
+    <set name="new_faction">
+      <item name="wood" amount="5"/>
+      <item name="stone" amount="10"/>
+    </set>
   </equipment>
 
   <game name="HSE4" welcome="eressea">

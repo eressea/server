@@ -51,7 +51,7 @@ typedef short luxury_t;
 typedef short weapon_t;
 typedef short item_t;
 typedef short resource_t;
-typedef short spellid_t;
+typedef unsigned int spellid_t;
 
 struct plane;
 struct order;

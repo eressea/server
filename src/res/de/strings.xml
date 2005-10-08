@@ -3957,15 +3957,19 @@
       <text locale="de">Beschwöre einen Sturmelementar</text>
       <text locale="en">Summon Storm Elemental</text>
     </string>
-    <string name="trueseeinggwyrrd">
+    <string name="create_aots">
       <text locale="de">Erschaffe ein Amulett des wahren
       Sehens</text>
       <text locale="en">Create An Amulet Of True Sight</text>
     </string>
-    <string name="invisibilitygwyrrd">
+    <string name="create_roi">
       <text locale="de">Erschaffe einen Ring der
       Unsichtbarkeit</text>
       <text locale="en">Create A Ring Of Invisibility</text>
+    </string>
+    <string name="create_roqf">
+      <text locale="de">Miriams flinke Finger</text>
+      <text locale="en">Quick Fingers</text>
     </string>
     <string name="homestone">
       <text locale="de">Heimstein</text>
@@ -3999,7 +4003,7 @@
       <text locale="de">Heiliger Boden</text>
       <text locale="en">Sacred Ground</text>
     </string>
-    <string name="artefaktsackofconservation">
+    <string name="create_magicherbbag">
       <text locale="de">Erschaffe einen magischen
       Kräuterbeutel</text>
       <text locale="en">Create A Magical Herb Pouch</text>
@@ -4056,17 +4060,7 @@
       <text locale="de">Rosthauch</text>
       <text locale="en">Winds Of Rust</text>
     </string>
-    <string name="trueseeingdraig">
-      <text locale="de">Erschaffe ein Amulett des wahren
-      Sehens</text>
-      <text locale="en">Create An Amulet Of True Sight</text>
-    </string>
-    <string name="invisibilitydraig">
-      <text locale="de">Erschaffe einen Ring der
-      Unsichtbarkeit</text>
-      <text locale="en">Create A Ring Of Invisibility</text>
-    </string>
-    <string name="tranferaurachaos">
+    <string name="transferaurachaos">
       <text locale="de">Machtübertragung</text>
       <text locale="en">Transfer Power</text>
     </string>
@@ -4098,7 +4092,7 @@
       <text locale="de">Untote Helden</text>
       <text locale="en">Undead Heroes</text>
     </string>
-    <string name="strength">
+    <string name="create_trollbelt">
       <text locale="de">Erschaffe einen Gürtel der
       Trollstärke</text>
       <text locale="en">Create A Girdle Of Troll
@@ -4136,7 +4130,7 @@
       <text locale="de">Beschwöre Schattenmeister</text>
       <text locale="en">Summon Shadowmasters</text>
     </string>
-    <string name="firesword">
+    <string name="create_firesword">
       <text locale="de">Erschaffe ein Flammenschwert</text>
       <text locale="en">Create A Flamesword</text>
     </string>
@@ -4200,16 +4194,6 @@
       <text locale="de">Schlechter Schlaf</text>
       <text locale="en">Insomnia</text>
     </string>
-    <string name="trueseeingillaun">
-      <text locale="de">Erschaffe ein Amulett des wahren
-      Sehens</text>
-      <text locale="en">Create An Amulet Of True Sight</text>
-    </string>
-    <string name="invisibilityillaun">
-      <text locale="de">Erschaffe einen Ring der
-      Unsichtbarkeit</text>
-      <text locale="en">Create A Ring Of Invisibility</text>
-    </string>
     <string name="sleep">
       <text locale="de">Schlaf</text>
       <text locale="en">Sleep</text>
@@ -4226,7 +4210,7 @@
       <text locale="de">Alp</text>
       <text locale="en">Nightmare</text>
     </string>
-    <string name="create_tacticcrystal">
+    <string name="create_dreameye">
       <text locale="de">Erschaffe ein Traumauge</text>
       <text locale="en">Create a Visioneye</text>
     </string>
@@ -4797,7 +4781,7 @@
         ship needs an own spirit.
       </text>
     </string>
-    <string name="trueseeinggwyrrd">
+    <string name="create_aots">
       <text locale="de">Der Spruch ermöglicht es einem Magier,
         ein Amulett des Wahren Sehens zu erschaffen. Das
         Amulett erlaubt es dem Träger, alle Einheiten,
@@ -4814,7 +4798,23 @@
         undiscovered.
       </text>
     </string>
-    <string name="invisibilitygwyrrd">
+    <string name="create_roqf">
+      <text locale="de">Die berühmte Bardin Miriam bhean'Meddaf war bekannt
+      für ihr außergewöhnliches Geschick mit der Harfe. Ihre Finger sollen
+      sich so schnell über die Saiten bewegt haben, das sie nicht mehr
+      erkennbar waren. Dieser Zauber, der recht einfach in einen Silberring
+      zu bannen ist, bewirkt eine um das zehnfache verbesserte
+      Geschicklichkeit und Gewandheit der Finger. (Das soll sie auch an
+      anderer Stelle ausgenutzt haben, ihr Ruf als Falschspielerin war
+      berüchtigt). Handwerker können somit das zehnfache produzieren,
+      und bei einigen anderen Tätigkeiten könnte dies ebenfalls von Nutzen
+      sein.</text>
+      <text locale="en">The famous bard Mirim was known for exceptionally limber
+      play of the harp. Her spell, which is easy to ban into a little silver
+      ring, increases the wearer's dexterity by a factor of ten, which is siad
+      to be useful to both craftsmen and shady natures.</text>
+    </string>
+    <string name="create_roi">
       <text locale="de">Mit diesem Spruch kann der Zauberer
         einen Ring der Unsichtbarkeit erschaffen. Der
         Träger des Ringes wird für alle Einheiten
@@ -4960,7 +4960,7 @@
         possible.
       </text>
     </string>
-    <string name="artefaktsackofconservation">
+    <string name="create_magicherbbag">
       <text locale="de">Der Druide nehme etwas präpariertes
         Leder, welches er in einem großen Ritual der
         Reinigung von allen unreinen Geistern befreie,
@@ -5179,40 +5179,7 @@
         destroy many weapons of the enemy.
       </text>
     </string>
-    <string name="trueseeingdraig">
-      <text locale="de">Der Spruch ermöglicht es einem Magier,
-        ein Amulett des Wahren Sehens zu erschaffen. Das
-        Amulett erlaubt es dem Träger, alle Einheiten,
-        die durch einen Ring der Unsichtbarkeit
-        geschützt sind, zu sehen. Einheiten allerdings,
-        die sich mit ihrem Tarnungs-Talent verstecken,
-        bleiben weiterhin unentdeckt.
-      </text>
-      <text locale="en">This spell enables the caster to
-        create an Amulet Of True Sight. Wearing such an
-        amulet, a person can discover anyone wearing a
-        Ring of Invisibility. Anyway, units concealed by
-        the use of their stealth skill will remain
-        undiscovered.
-      </text>
-    </string>
-    <string name="invisibilitydraig">
-      <text locale="de">Mit diesem Spruch kann der Zauberer
-        einen Ring der Unsichtbarkeit erschaffen. Der
-        Träger des Ringes wird für alle Einheiten
-        anderer Parteien unsichtbar, egal wie gut ihre
-        Wahrnehmung auch sein mag. In einer unsichtbaren
-        Einheit muss jede Person einen Ring tragen.
-      </text>
-      <text locale="en">With this spell, the caster can create
-        a Ring Of Invisibility. The wearer of this ring
-        will be invisible to all units of other
-        factions, no matter how good their perception
-        skill may be. In an invisible unit, each person
-        must wear a Ring Of Invisibility.
-      </text>
-    </string>
-    <string name="tranferaurachaos">
+    <string name="transferaurachaos">
       <text locale="de">Mit Hilfe dieses Zaubers kann der
         Magier eigene Aura im Verhältnis 2:1 auf einen
         anderen Magier des gleichen Magiegebietes
@@ -5324,7 +5291,7 @@
         before their death.
       </text>
     </string>
-    <string name="strength">
+    <string name="create_trollbelt">
       <text locale="de">Dieses magische Artefakt verleiht dem
         Träger die Stärke eines ausgewachsenen
         Höhlentrolls. Seine Tragkraft erhöht sich auf
@@ -5475,7 +5442,7 @@
         force from their victims.
       </text>
     </string>
-    <string name="firesword">
+    <string name="create_firesword">
       <text locale="de">'Und so reibe das Blut eines wilden
         Kämpfers in den Stahl der Klinge und beginne die
         Anrufung der Sphären des Chaos. Und hast du
@@ -5717,37 +5684,6 @@
         slower than normal.
       </text>
     </string>
-    <string name="trueseeingillaun">
-      <text locale="de">Der Spruch ermöglicht es einem Magier,
-        ein Amulett des Wahren Sehens zu erschaffen. Das
-        Amulett erlaubt es dem Träger, alle Einheiten,
-        die durch einen Ring der Unsichtbarkeit
-        geschützt sind, zu sehen. Einheiten allerdings,
-        die sich mit ihrem Tarnungs-Talent verstecken,
-        bleiben weiterhin unentdeckt.
-      </text>
-      <text locale="en">This spell enables the caster to
-        create an Amulet Of True Sight. Wearing such an
-        amulet, a person can discover anyone wearing a
-        Ring of Invisibility. Anyway, units concealed by
-        the use of their stealth skill will remain
-        undiscovered.
-      </text>
-    </string>
-    <string name="invisibilityillaun">
-      <text locale="de">Mit diesem Spruch kann der Zauberer
-      einen Ring der Unsichtbarkeit erschaffen. Der Träger des
-      Ringes wird für alle Einheiten anderer Parteien
-      unsichtbar, egal wie gut ihre Wahrnehmung auch sein mag.
-      In einer unsichtbaren Einheit muss jede Person einen
-      Ring tragen. </text>
-      <text locale="en">With this spell the caster can create
-      a Ring Of Invisibility. The wearer of this ring will be
-      invisible to all units of other factions, no matter how
-      good their perception skill may be. In an invisible
-      unit, each person must wear a Ring Of Invisibility.
-      </text>
-    </string>
     <string name="sleep">
       <text locale="de">Dieser Zauber läßt einige feindliche
         Kämpfer einschlafen. Schlafende Kämpfer greifen
@@ -5810,7 +5746,7 @@
       his aura forever.
       </text>
     </string>
-    <string name="create_tacticcrystal">
+    <string name="create_dreameye">
       <text locale="de">
       Ein mit diesem Zauber belegtes Drachenauge, welches zum Abendmahle
       verzehrt wird, erlaubt es dem Benutzer, in die Träume einer anderen
@@ -6489,6 +6425,8 @@
   </string>
 
 </strings>
+
+
 
 
 

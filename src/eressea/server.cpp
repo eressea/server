@@ -310,6 +310,7 @@ lua_init(void)
   bind_ship(luaState);
   bind_building(luaState);
   bind_event(luaState);
+  bind_message(luaState);
   return luaState;
 }
 
@@ -640,7 +641,7 @@ my_lua_error(lua_State * L)
 {
   const char* error = lua_tostring(L, -1);
 
-  log_error((error));
+  log_error(("A LUA error occured: %s\n", error));
   lua_pop(L, 1);
   std::terminate();
 }

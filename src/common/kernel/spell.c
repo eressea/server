@@ -2004,19 +2004,6 @@ creation_message(unit * mage, const item_type * itype)
     "mage number item", mage, 1, itype->rtype));
 }
 
-static int
-sp_create_sack_of_conservation(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-
-	change_item(mage,I_SACK_OF_CONSERVATION,1);
-
-	creation_message(mage, olditemtype[I_SACK_OF_CONSERVATION]);
-
-	return cast_level;
-}
-
 /* ------------------------------------------------------------- */
 /* Name:		   Heiliger Boden
  * Stufe:		   9
@@ -3389,49 +3376,6 @@ patzer_deathcloud(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:	   Trollgürtel
- * Stufe:	  9
- * Gebiet:	 Draig
- * Kategorie:      Artefakt
- * Wirkung:
- *   Artefakt. *50 GE, +2 Schaden, +1 Rüstung
-*/
-
-static int
-sp_create_trollbelt(castorder *co)
-{
-  const item_type * itype = it_find("trollbelt");
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-
-	i_change(&mage->items, itype, 1);
-
-	creation_message(mage, itype);
-	return cast_level;
-}
-
-/* ------------------------------------------------------------- */
-/* Name:       Erschaffe ein Flammenschwert
- * Stufe:      12
- * Gebiet:     Draig
- * Kategorie:      Artefakt
- * Wirkung:
- *   Artefakt.
- *   3d6+10 Schaden, +1 auf AT, +1 auf DF, schleudert Feuerball
- */
-
-static int
-sp_create_firesword(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-
-	change_item(mage,I_FIRESWORD,1);
-	creation_message(mage, olditemtype[I_FIRESWORD]);
-	return cast_level;
-}
-
-/* ------------------------------------------------------------- */
 /* Name:      Pest
  * Stufe:     7
  * Gebiet:    Draig
@@ -4737,28 +4681,6 @@ sp_seduce(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:	   Miriams flinke Finger
- * Stufe:	  11
- * Gebiet:	 Cerddor
- * Wirkung:
- *	 Erschafft Artefakt I_RING_OF_NIMBLEFINGER, Ring der flinken Finger. Der
- *	 Ring verzehnfacht die Produktion seines Trägers (wirkt nur auf
- *	 'Handwerker') und erhöht Menge des geklauten Geldes auf 500 Silber
- *	 pro Talentpunkt Unterschied
- */
-
-static int
-sp_create_nimblefingerring(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-
-	change_item(mage,I_RING_OF_NIMBLEFINGER,1);
-	creation_message(mage, olditemtype[I_RING_OF_NIMBLEFINGER]);
-	return cast_level;
-}
-
-/* ------------------------------------------------------------- */
 /* Name:	   Monster friedlich stimmen
  * Stufe:	  6
  * Gebiet:	 Cerddor
@@ -5522,18 +5444,6 @@ sp_sweetdreams(castorder *co)
 				unitname(mage), unitname(u));
 		addmessage(r, mage->faction, buf, MSG_EVENT, ML_INFO);
 	}
-	return cast_level;
-}
-
-/* ------------------------------------------------------------- */
-int
-sp_create_tacticcrystal(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-
-	change_item(mage,I_TACTICCRYSTAL,1);
-	creation_message(mage, olditemtype[I_TACTICCRYSTAL]);
 	return cast_level;
 }
 
@@ -7339,46 +7249,6 @@ patzer(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* allgemeine Artefakterschaffungszauber (Gebietsunspezifisch)   */
-/* ------------------------------------------------------------- */
-/* Amulett des wahren Sehens */
-int
-sp_createitem_trueseeing(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-	unit *familiar = (unit *)co->familiar;
-
-	if (familiar){
-		mage = familiar;
-	}
-
-	change_item(mage,I_AMULET_OF_TRUE_SEEING,1);
-	creation_message(mage, olditemtype[I_AMULET_OF_TRUE_SEEING]);
-
-	return cast_level;
-}
-
-/* ------------------------------------------------------------- */
-/* Ring der Unsichtbarkeit */
-int
-sp_createitem_invisibility(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-	unit *familiar = (unit *)co->familiar;
-
-	if (familiar){
-		mage = familiar;
-	}
-
-	change_item(mage,I_RING_OF_INVISIBILITY,1);
-	creation_message(mage, olditemtype[I_RING_OF_INVISIBILITY]);
-
-	return cast_level;
-}
-
-/* ------------------------------------------------------------- */
 /* Sphäre der Unsichtbarkeit */
 int
 sp_createitem_invisibility2(castorder *co)
@@ -7625,6 +7495,9 @@ register_spell(spell * sp)
   spell_list * slist = malloc(sizeof(spell_list));
   slist->next = spells;
   slist->data = sp;
+  if (sp->id==0) {
+    sp->id = hashstring(sp->sname);
+  }
   spells = slist;
 }
 
@@ -7990,30 +7863,6 @@ static spell spelldaten[] =
     (spell_f)sp_stormwinds, patzer
   },
   {
-    SPL_TRUESEEING_GWYRRD, "trueseeinggwyrrd", NULL, NULL, NULL,
-    M_DRUIDE, (ONSHIPCAST), 5, 6,
-    {
-      { R_AURA, 50, SPC_FIX },
-      { R_SILVER, 3000, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_trueseeing, patzer_createitem
-  },
-  {
-    SPL_INVISIBILITY_GWYRRD, "invisibilitygwyrrd", NULL, NULL, NULL,
-    M_DRUIDE, (ONSHIPCAST), 5, 6,
-    {
-      { R_AURA, 50, SPC_FIX },
-      { R_SILVER, 3000, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_invisibility, patzer_createitem
-  },
-  {
     SPL_HOMESTONE, "homestone", NULL, NULL, NULL,
     M_DRUIDE, (0), 5, 7,
     {
@@ -8118,18 +7967,6 @@ static spell spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_holyground, patzer
-  },
-  {
-    SPL_ARTEFAKT_SACK_OF_CONSERVATION, "artefaktsackofconservation", NULL, NULL, NULL,
-    M_DRUIDE, (ONSHIPCAST), 5, 5,
-    {
-      { R_AURA, 30, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { R_TREES, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_create_sack_of_conservation, patzer
   },
   {
     SPL_SUMMONENT, "summonent", NULL, NULL, NULL,
@@ -8380,31 +8217,7 @@ static spell spelldaten[] =
     (spell_f)sp_combatrosthauch, patzer
   },
   {
-    SPL_TRUESEEING_DRAIG, "trueseeingdraig", NULL, NULL, NULL,
-    M_CHAOS, (ONSHIPCAST), 5, 6,
-    {
-      { R_AURA, 50, SPC_FIX },
-      { R_SILVER, 3000, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_trueseeing, patzer_createitem
-  },
-  {
-    SPL_INVISIBILITY_DRAIG, "invisibilitydraig", NULL, NULL, NULL,
-    M_CHAOS, (ONSHIPCAST), 5, 6,
-    {
-      { R_AURA, 50, SPC_FIX },
-      { R_SILVER, 3000, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_invisibility, patzer_createitem
-  },
-  {
-    SPL_TRANSFERAURA_CHAOS, "tranferaurachaos", NULL,
+    SPL_TRANSFERAURA_CHAOS, "transferaurachaos", NULL,
     "ZAUBERE \'Machtübertragung\' <Einheit-Nr> <investierte Aura>",
     "ui",
     M_CHAOS, (UNITSPELL|ONSHIPCAST|ONETARGET), 1, 7,
@@ -8480,18 +8293,6 @@ static spell spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_undeadhero, patzer
-  },
-  {
-    SPL_STRENGTH, "strength", NULL, NULL, NULL,
-    M_CHAOS, (ONSHIPCAST), 5, 9,
-    {
-      { R_AURA, 20, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_create_trollbelt, patzer
   },
   {
     SPL_AURALEAK, "auraleak", NULL, NULL, NULL,
@@ -8596,18 +8397,6 @@ static spell spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_summonshadowlords, patzer_peasantmob
-  },
-  {
-    SPL_FIRESWORD, "firesword", NULL, NULL, NULL,
-    M_CHAOS, (ONSHIPCAST), 5, 12,
-    {
-      { R_AURA, 100, SPC_FIX },
-      { R_BERSERK, 1, SPC_FIX },
-      { R_SWORD, 1, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_create_firesword, patzer
   },
   {
     SPL_DRAIG_FAMILIAR, "draigfamiliar", NULL, NULL, NULL,
@@ -8804,30 +8593,6 @@ static spell spelldaten[] =
     (spell_f)sp_disturbingdreams, patzer
   },
   {
-    SPL_TRUESEEING_ILLAUN, "trueseeingillaun", NULL, NULL, NULL,
-    M_TRAUM, (ONSHIPCAST), 5, 6,
-    {
-      { R_AURA, 50, SPC_FIX },
-      { R_SILVER, 3000, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_trueseeing, patzer_createitem
-  },
-  {
-    SPL_INVISIBILITY_ILLAUN, "invisibilityillaun", NULL, NULL, NULL,
-    M_TRAUM, (ONSHIPCAST), 5, 6,
-    {
-      { R_AURA, 50, SPC_FIX },
-      { R_SILVER, 3000, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_invisibility, patzer_createitem
-  },
-  {
     SPL_SLEEP, "sleep", NULL, NULL, NULL,
     M_TRAUM, (COMBATSPELL | SPELLLEVEL ), 5, 7,
     {
@@ -8988,18 +8753,6 @@ static spell spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_createitem_invisibility2, patzer_createitem
-  },
-  {
-    SPL_CREATE_TACTICCRYSTAL, "create_tacticcrystal", NULL, NULL, NULL,
-    M_TRAUM, (ONSHIPCAST), 5, 14,
-    {
-      { R_PERMAURA, 5, SPC_FIX },
-      { R_DRAGONHEAD, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_create_tacticcrystal, patzer_createitem
   },
   {
     SPL_SUMMON_ALP, "summon_alp", NULL, NULL, "u",
@@ -9229,39 +8982,6 @@ static spell spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_seduce, patzer
-  },
-  {
-    SPL_TRUESEEING_CERDDOR, "Erschaffe ein Amulett des wahren Sehens",
-    "Der Spruch ermöglicht es einem Magier, ein Amulett des Wahren Sehens "
-    "zu erschaffen. Das Amulett erlaubt es dem Träger, alle Einheiten, die "
-    "durch einen Ring der Unsichtbarkeit geschützt sind, zu sehen. Einheiten "
-    "allerdings, die sich mit ihrem Tarnungs-Talent verstecken, bleiben "
-    "weiterhin unentdeckt.", NULL, NULL,
-    M_BARDE, (ONSHIPCAST), 5, 6,
-    {
-      { R_AURA, 50, SPC_FIX },
-      { R_SILVER, 3000, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_trueseeing, patzer_createitem
-  },
-  {
-    SPL_INVISIBILITY_CERDDOR, "Erschaffe einen Ring der Unsichtbarkeit",
-    "Mit diesem Spruch kann der Zauberer einen Ring der Unsichtbarkeit "
-    "erschaffen. Der Träger des Ringes wird für alle Einheiten anderer "
-    "Parteien unsichtbar, egal wie gut ihre Wahrnehmung auch sein mag. In "
-    "einer unsichtbaren Einheit muss jede Person einen Ring tragen.", NULL, NULL,
-    M_BARDE, (ONSHIPCAST), 5, 6,
-    {
-      { R_AURA, 50, SPC_FIX },
-      { R_SILVER, 3000, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_invisibility, patzer_createitem
   },
   {
     SPL_HEADACHE, "Schaler Wein",
@@ -9494,27 +9214,6 @@ static spell spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_depression, patzer
-  },
-  {
-    SPL_ARTEFAKT_NIMBLEFINGERRING, "Miriams flinke Finger",
-    "Die berühmte Bardin Miriam bhean'Meddaf war bekannt für ihr "
-    "außergewöhnliches Geschick mit der Harfe. Ihre Finger sollen sich "
-    "so schnell über die Saiten bewegt haben, das sie nicht mehr erkennbar "
-    "waren. Dieser Zauber, der recht einfach in einen Silberring zu bannen "
-    "ist, bewirkt eine um das zehnfache verbesserte Geschicklichkeit und "
-    "Gewandheit der Finger. (Das soll sie auch an anderer Stelle ausgenutzt "
-    "haben, ihr Ruf als Falschspielerin war berüchtigt.) Handwerker können "
-    "somit das zehnfache produzieren, und bei einigen anderen Tätigkeiten "
-    "könnte dies ebenfalls von Nutzen sein.", NULL, NULL,
-    M_BARDE, (ONSHIPCAST), 5, 11,
-    {
-      { R_AURA, 20, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { R_SILVER, 1000, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_create_nimblefingerring, patzer
   },
   {
     SPL_SONG_SUSCEPTMAGIC, "Gesang des schwachen Geistes",
@@ -9812,23 +9511,6 @@ static spell spelldaten[] =
     (spell_f)sp_antimagiczone, patzer
   },
   {
-    SPL_TRUESEEING_TYBIED, "Erschaffe ein Amulett des wahren Sehens",
-    "Der Spruch ermöglicht es einem Magier, ein Amulett des Wahren Sehens "
-    "zu erschaffen. Das Amulett erlaubt es dem Träger, alle Einheiten, die "
-    "durch einen Ring der Unsichtbarkeit geschützt sind, zu sehen. Einheiten "
-    "allerdings, die sich mit ihrem Tarnungs-Talent verstecken, bleiben "
-    "weiterhin unentdeckt.", NULL, NULL,
-    M_ASTRAL, (ONSHIPCAST), 5, 5,
-    {
-      { R_AURA, 50, SPC_FIX },
-      { R_SILVER, 3000, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_trueseeing, patzer_createitem
-  },
-  {
     SPL_TYBIED_DESTROY_MAGIC, "Magiefresser",
     "Dieser Zauber ermöglicht dem Magier, Verzauberungen einer Einheit, "
     "eines Schiffes, Gebäudes oder auch der Region aufzulösen.",
@@ -9923,22 +9605,6 @@ static spell spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_flying_ship, patzer
-  },
-  {
-    SPL_INVISIBILITY_TYBIED, "Erschaffe einen Ring der Unsichtbarkeit",
-    "Mit diesem Spruch kann der Zauberer einen Ring der Unsichtbarkeit "
-    "erschaffen. Der Träger des Ringes wird für alle Einheiten anderer "
-    "Parteien unsichtbar, egal wie gut ihre Wahrnehmung auch sein mag. In "
-    "einer unsichtbaren Einheit muss jede Person einen Ring tragen.", NULL, NULL,
-    M_ASTRAL, (ONSHIPCAST), 5, 6,
-    {
-      { R_AURA, 50, SPC_FIX },
-      { R_SILVER, 3000, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_invisibility, patzer_createitem
   },
   {
     SPL_CREATE_ANTIMAGICCRYSTAL, "Erschaffe Antimagiekristall",

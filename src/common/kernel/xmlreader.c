@@ -200,6 +200,23 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
 }
 
 static int
+parse_function(xmlNodePtr node, pf_generic * funPtr, xmlChar ** namePtr)
+{
+  pf_generic fun;
+  xmlChar * property = xmlGetProp(node, BAD_CAST "value");
+  assert(property!=NULL);
+  fun = get_function((const char*)property);
+  if (fun!=NULL) {
+    xmlFree(property);
+
+    property = xmlGetProp(node, BAD_CAST "name");
+  }
+  *namePtr = property;
+  *funPtr = fun;
+  return 0;
+}
+
+static int
 parse_buildings(xmlDocPtr doc)
 {
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -250,26 +267,22 @@ parse_buildings(xmlDocPtr doc)
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       pf_generic fun;
+      parse_function(node, &fun, &property);
 
-      property = xmlGetProp(node, BAD_CAST "value");
-      assert(property!=NULL);
-      fun = get_function((const char*)property);
       if (fun==NULL) {
         log_error(("unknown function name '%s' for building %s\n",
           (const char*)property, bt->_name));
         xmlFree(property);
         continue;
       }
-      xmlFree(property);
-
-      property = xmlGetProp(node, BAD_CAST "name");
       assert(property!=NULL);
       if (strcmp((const char*)property, "name")==0) {
         bt->name = (const char * (*)(int size))fun;
       } else if (strcmp((const char*)property, "init")==0) {
         bt->init = (void (*)(struct building_type*))fun;
       } else {
-        log_error(("unknown function type '%s' for building %s\n", (const char*)property, bt->_name));
+        log_error(("unknown function type '%s' for building %s\n",
+          (const char*)property, bt->_name));
       }
       xmlFree(property);
     }
@@ -706,18 +719,13 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
       xmlChar * property;
       pf_generic fun;
 
-      property = xmlGetProp(node, BAD_CAST "value");
-      assert(property!=NULL);
-      fun = get_function((const char*)property);
+      parse_function(node, &fun, &property);
       if (fun==NULL) {
         log_error(("unknown function name '%s' for item '%s'\n",
           (const char*)property, rtype->_name[0]));
         xmlFree(property);
         continue;
       }
-      xmlFree(property);
-
-      property = xmlGetProp(node, BAD_CAST "name");
       assert(property!=NULL);
       if (strcmp((const char*)property, "give")==0) {
         itype->give = (boolean (*)(const struct unit*, const struct unit*, const struct item_type *, int, struct order *))fun;
@@ -789,18 +797,14 @@ parse_resources(xmlDocPtr doc)
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       pf_generic fun;
 
-      property = xmlGetProp(node, BAD_CAST "value");
-      assert(property!=NULL);
-      fun = get_function((const char*)property);
+      parse_function(node, &fun, &property);
       if (fun==NULL) {
         log_error(("unknown function name '%s' for resource %s\n",
           (const char*)property, rtype->_name[0]));
         xmlFree(property);
         continue;
       }
-      xmlFree(property);
 
-      property = xmlGetProp(node, BAD_CAST "name");
       assert(property!=NULL);
       if (strcmp((const char*)property, "change")==0) {
         rtype->uchange = (rtype_uchange)fun;
@@ -1027,6 +1031,113 @@ parse_equipment(xmlDocPtr doc)
 }
 
 static int
+parse_spells(xmlDocPtr doc)
+{
+  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
+  xmlXPathObjectPtr spells;
+  xmlNodeSetPtr nodes;
+  int i;
+
+  /* reading eressea/spells/spell */
+  spells = xmlXPathEvalExpression(BAD_CAST "/eressea/spells/spell", xpath);
+  nodes = spells->nodesetval;
+  for (i=0;i!=nodes->nodeNr;++i) {
+    xmlXPathObjectPtr result;
+    xmlNodePtr node = nodes->nodeTab[i];
+    xmlChar * property;
+    int k;
+    spell * sp = calloc(1, sizeof(spell));
+
+    /* spellname */
+    property = xmlGetProp(node, BAD_CAST "name");
+    assert(property!=NULL);
+    sp->sname = strdup((const char*)property);
+    xmlFree(property);
+
+    /* magic type */
+    property = xmlGetProp(node, BAD_CAST "type");
+    assert(property!=NULL);
+    for (sp->magietyp=0;sp->magietyp!=MAXMAGIETYP;++sp->magietyp) {
+      if (strcmp(magietypen[sp->magietyp], (const char *)property)==0) break;
+    }
+    assert(sp->magietyp!=MAXMAGIETYP);
+    xmlFree(property);
+
+    /* level, rank and flags */
+    sp->level = xml_ivalue(node, "level", -1);
+    sp->rank = (char)xml_ivalue(node, "rank", -1);
+    if (xml_bvalue(node, "ship", false)) sp->sptyp |= ONSHIPCAST;
+    if (xml_bvalue(node, "ocean", false)) sp->sptyp |= OCEANCASTABLE;
+    if (xml_bvalue(node, "far", false)) sp->sptyp |= FARCASTING;
+
+    /* reading eressea/spells/spell/function */
+    xpath->node = node;
+    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+    for (k=0;k!=result->nodesetval->nodeNr;++k) {
+      xmlNodePtr node = result->nodesetval->nodeTab[k];
+      pf_generic fun;
+
+      parse_function(node, &fun, &property);
+      if (fun==NULL) {
+        log_error(("unknown function name '%s' for spell '%s'\n",
+          (const char*)property, sp->sname));
+        xmlFree(property);
+        continue;
+      }
+      assert(property!=NULL);
+      if (strcmp((const char*)property, "cast")==0) {
+        sp->sp_function = (spell_f)fun;
+      } else if (strcmp((const char*)property, "fumble")==0) {
+        sp->patzer = (pspell_f)fun;
+      } else {
+        log_error(("unknown function type '%s' for spell %s\n", 
+          (const char*)property, sp->sname));
+      }
+      xmlFree(property);
+    }
+    xmlXPathFreeObject(result);
+
+    /* reading eressea/spells/spell/resource */
+    xpath->node = node;
+    result = xmlXPathEvalExpression(BAD_CAST "resource", xpath);
+    for (k=0;k!=result->nodesetval->nodeNr && k!=MAXINGREDIENT;++k) {
+      xmlNodePtr node = result->nodesetval->nodeTab[k];
+      resource_t res;
+      sp->komponenten[k][0] = 0;
+      property = xmlGetProp(node, BAD_CAST "name");
+      assert(property);
+      for (res=0;res!=MAX_RESOURCES;++res) {
+        if (strcmp(oldresourcetype[res]->_name[0], (const char *)property)==0) {
+          sp->komponenten[k][0] = res;
+          break;
+        }
+      }
+      xmlFree(property);
+      sp->komponenten[k][1] = (resource_t)xml_ivalue(node, "amount", 1);
+      sp->komponenten[k][2] = SPC_FIX;
+      property = xmlGetProp(node, BAD_CAST "cost");
+      if (property!=NULL) {
+        if (strcmp((const char *)property, "linear")==0) {
+          sp->komponenten[k][2] = SPC_LINEAR;
+        } else if (strcmp((const char *)property, "level")==0) {
+          sp->komponenten[k][2] = SPC_LEVEL;
+        }
+        xmlFree(property);
+      }
+    }
+    if (k<MAXINGREDIENT) sp->komponenten[k][0] = 0;
+    xmlXPathFreeObject(result);
+    sp->id = 0; 
+    register_spell(sp);
+  }
+
+  xmlXPathFreeObject(spells);
+
+  xmlXPathFreeContext(xpath);
+  return 0;
+}
+
+static int
 parse_races(xmlDocPtr doc)
 {
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -1153,18 +1264,13 @@ parse_races(xmlDocPtr doc)
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       pf_generic fun;
 
-      property = xmlGetProp(node, BAD_CAST "value");
-      assert(property!=NULL);
-      fun = get_function((const char*)property);
+      parse_function(node, &fun, &property);
       if (fun==NULL) {
         log_error(("unknown function name '%s' for race %s\n",
           (const char*)property, rc->_name[0]));
         xmlFree(property);
         continue;
       }
-      xmlFree(property);
-
-      property = xmlGetProp(node, BAD_CAST "name");
       assert(property!=NULL);
       if (strcmp((const char*)property, "name")==0) {
         rc->generate_name = (const char* (*)(const struct unit*))fun;
@@ -1520,4 +1626,5 @@ register_xmlreader(void)
   xml_register_callback(parse_ships);
   xml_register_callback(parse_equipment);
   xml_register_callback(parse_calendar);
+  xml_register_callback(parse_spells);
 }

@@ -298,11 +298,11 @@ show_newspells(void)
 
           if (m->magietyp == sp->magietyp || has_spell(u, sp)) {
             attrib * a = a_find(u->faction->attribs, &at_reportspell);
-            while (a && a->data.i != sp->id) a = a->nexttype;
+            while (a && a->data.i != (int)sp->id) a = a->nexttype;
             if (!a) {
               /* spell is not being shown yet. if seen before, remove to show again */
               a = a_find(u->faction->attribs, &at_seenspell);
-              while (a && a->data.i != sp->id) a = a->nexttype;
+              while (a && a->data.i != (int)sp->id) a = a->nexttype;
               if (a) a_remove(&u->faction->attribs, a);
             }
           }
