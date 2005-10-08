@@ -1,3 +1,11 @@
+function loadscript(name)
+  local script = scriptpath .. "/" .. name
+  print("- loading " .. script)
+  if pcall(dofile, script)==0 then
+    print("Could not load " .. script)
+  end
+end
+
 function write_emails()
   local locales = { "de", "en" }
   local files = {}
@@ -63,6 +71,7 @@ end
 if orderfile==nil then
   print "you must specify an orderfile"
 else
+  loadscript("spells.lua")
   process(orderfile)
 end
 

@@ -40,7 +40,8 @@ end
 
 print("- Running wdw-run.lua")
 
-scripts = { 
+scripts = {
+  "spells.lua",
   "wdw-sphinx.lua",
   "wdw-standings.lua"
 }
