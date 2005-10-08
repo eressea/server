@@ -4,7 +4,9 @@
 
 // kernel includes
 #include <kernel/magic.h>
+#include <kernel/region.h>
 #include <kernel/spell.h>
+#include <kernel/unit.h>
 
 // util includes
 #include <util/functions.h>

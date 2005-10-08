@@ -339,7 +339,7 @@ create_mage(unit * u, magic_t mtyp)
     a->data.v = mage;
   } else {
     mage = a->data.v;
-    memset(&mage, 0, sizeof(sc_mage));
+    memset(mage, 0, sizeof(sc_mage));
   }
 
   mage->magietyp = mtyp;
