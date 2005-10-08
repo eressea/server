@@ -7596,6 +7596,27 @@ get_spellfromtoken(unit *u, const char *name, const struct locale * lang)
 spell *
 find_spellbyid(spellid_t id)
 {
+  struct {
+    spellid_t id;
+    const char * name;
+    magic_t mtype;
+  } * oldspell, oldspells[] = {
+    { LUASPL_ARTEFAKT_NIMBLEFINGERRING, "create_roqf", M_BARDE }, 
+    { LUASPL_ARTEFAKT_SACK_OF_CONSERVATION, "create_magicherbbag", M_DRUIDE }, 
+    { LUASPL_FIRESWORD, "create_firesword", M_CHAOS }, 
+    { LUASPL_INVISIBILITY_CERDDOR, "create_roi", M_BARDE }, 
+    { LUASPL_INVISIBILITY_DRAIG, "create_roi", M_CHAOS }, 
+    { LUASPL_INVISIBILITY_GWYRRD, "create_roi", M_DRUIDE }, 
+    { LUASPL_INVISIBILITY_ILLAUN, "create_roi", M_TRAUM }, 
+    { LUASPL_INVISIBILITY_TYBIED, "create_roi", M_ASTRAL }, 
+    { LUASPL_STRENGTH, "create_trollbelt", M_CHAOS }, 
+    { LUASPL_TRUESEEING_CERDDOR, "create_aots", M_BARDE }, 
+    { LUASPL_TRUESEEING_DRAIG, "create_aots", M_CHAOS }, 
+    { LUASPL_TRUESEEING_GWYRRD, "create_aots", M_DRUIDE }, 
+    { LUASPL_TRUESEEING_ILLAUN, "create_aots", M_TRAUM }, 
+    { LUASPL_TRUESEEING_TYBIED, "create_aots", M_ASTRAL }, 
+    { 0, NULL, 0 }
+  };
   spell_list * slist;
 
   assert(id>=0);
@@ -7607,6 +7628,10 @@ find_spellbyid(spellid_t id)
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell* sp = slist->data;
     if (sp->id == id) return sp;
+  }
+
+  for (oldspell=oldspells;oldspell->name;++oldspell) {
+    if (oldspell->id==id) return find_spell(oldspell->mtype, oldspell->name);
   }
   log_warning(("cannot find spell by id: %u\n", id));
   return NULL;

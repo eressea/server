@@ -23,6 +23,12 @@
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
+  <spell name="create_trollbelt" type="draig" ship="true" rank="5" level="9">
+    <function name="cast" value="luaspell"/>
+    <resource name="aura" amount="20" cost="fixed"/>
+    <resource name="dragonblood" amount="1" cost="fixed"/>
+  </spell>
+
   <!-- gwyrrd spells -->
   <spell name="create_roi" type="gwyrrd" ship="true" rank="5" level="6">
     <function name="cast" value="luaspell"/>
