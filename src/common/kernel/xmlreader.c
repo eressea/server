@@ -648,7 +648,7 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
       property = xmlGetProp(node, BAD_CAST "name");
       if (property!=NULL) {
         const race * rc = rc_find((const char*)property);
-        assert(rc!=NULL);
+        if (rc==NULL) rc = rc_add(rc_new((const char*)property));
         racelist_insert(&wtype->modifiers[k].races, rc);
         xmlFree(property);
       }
@@ -1327,12 +1327,13 @@ parse_races(xmlDocPtr doc)
       xmlNodePtr node = result->nodesetval->nodeTab[k];
       xmlChar * property = xmlGetProp(node, BAD_CAST "spell");
       if (property!=NULL) {
-        const spell * sp = find_spell(M_NONE, (const char *)property);
+        const spell * sp = NULL;
+        int i = atoi((const char *)property);
+        if (i>0) {
+          sp = find_spellbyid((spellid_t)i);
+        }
         if (sp==NULL) {
-          int i = atoi((const char *)property);
-          if (i>0) {
-            sp = find_spellbyid((spellid_t)i);
-          }
+          sp = find_spell(M_NONE, (const char *)property);
         }
         assert(sp);
         rc->precombatspell = sp;
@@ -1634,12 +1635,12 @@ register_xmlreader(void)
   xml_register_callback(parse_strings);
   xml_register_callback(parse_prefixes);
   xml_register_callback(parse_messages);
-
-  xml_register_callback(parse_races);
   xml_register_callback(parse_resources);
-  xml_register_callback(parse_buildings);
-  xml_register_callback(parse_ships);
-  xml_register_callback(parse_equipment);
+
+  xml_register_callback(parse_buildings); /* requires resources */
+  xml_register_callback(parse_ships); /* requires resources */
+  xml_register_callback(parse_equipment); /* requires resources */
+  xml_register_callback(parse_spells); /* requires resources */
+  xml_register_callback(parse_races); /* requires spells */
   xml_register_callback(parse_calendar);
-  xml_register_callback(parse_spells);
 }
