@@ -69,3 +69,12 @@ function create_dreameye(r, mage, level, force)
   return level
 end
 
+-- Erschaffe einen Antimagiekristall
+function create_antimagic(r, mage, level, force)
+  mage:add_item("", 1);
+
+  local msg = creation_message(mage, "antimagic")
+  msg:send_faction(mage.faction)
+  return level
+end
+

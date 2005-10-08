@@ -227,7 +227,6 @@ game_init(void)
 
   register_xmlreader();
   enable_xml_gamecode();
-  init_spells();
   init_data(xmlfile);
 
   init_locales();

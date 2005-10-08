@@ -74,7 +74,7 @@ typedef struct race {
 	char df_default; /* Verteidigungsskill Unbewaffnet (default: -2)*/
 	char at_bonus;   /* Verändert den Angriffsskill (default: 0)*/
 	char df_bonus;   /* Verändert den Verteidigungskill (default: 0)*/
-	spellid_t precombatspell;
+	const spell * precombatspell;
 	struct att attack[10];
 	char bonus[MAXSKILLS];
 	boolean __remove_me_nonplayer;

@@ -430,10 +430,10 @@
     <text locale="en">amulets</text>
   </string>
   <string name="antimagic">
-    <text locale="en">antimagic cristal</text>
+    <text locale="en">antimagic crystal</text>
   </string>
   <string name="antimagic_p">
-    <text locale="en">antimagic cristals</text>
+    <text locale="en">antimagic crystals</text>
   </string>
   <string name="ao_chastity">
     <text locale="en">amulet of chastity</text>

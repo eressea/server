@@ -497,8 +497,8 @@ get_combatspell(const unit *u, int nr)
 	m = get_mage(u);
 	if (m) {
 		return m->combatspells[nr].sp;
-	} else if (u->race->precombatspell != SPL_NOSPELL) {
-		return find_spellbyid(u->race->precombatspell);
+	} else if (u->race->precombatspell != NULL) {
+		return u->race->precombatspell;
 	}
 
 	return NULL;
@@ -2755,10 +2755,7 @@ spell_info(const spell * sp, const struct locale * lang)
 const char *
 spell_name(const spell * sp, const struct locale * lang)
 {
-	if (sp->info==NULL) {
-		return LOC(lang, mkname("spell", sp->sname));
-	}
-	return sp->sname;
+	return LOC(lang, mkname("spell", sp->sname));
 }
 
 void

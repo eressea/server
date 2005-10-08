@@ -6731,24 +6731,6 @@ sp_stealaura(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Erschaffe Antimagiekristall
- * Stufe:      7
- * Kategorie:  Artefakt
- * Wirkung:
- *	  Erzeugt Antimagiekristall
- */
-int
-sp_create_antimagiccrystal(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-
-	change_item(mage,I_ANTIMAGICCRYSTAL,1);
-	creation_message(mage, olditemtype[I_ANTIMAGICCRYSTAL]);
-	return cast_level;
-}
-
-/* ------------------------------------------------------------- */
 /* Name:       Astrale Schwächezone
  * Stufe:      5
  * Kategorie:
@@ -7492,6 +7474,11 @@ spell_list * spells = NULL;
 void
 register_spell(spell * sp)
 {
+#ifndef NDEBUG
+  const char * name = mkname("spell", sp->sname);
+  assert(name!=LOC(default_locale, name));
+  assert(strchr(sp->sname, ' ')==NULL);
+#endif
   if (sp->id==0) {
     sp->id = hashstring(sp->sname);
   }
@@ -7512,6 +7499,9 @@ find_spell(magic_t mtype, const char * name)
       spx = sp;
     }
     slist = slist->next;
+  }
+  if (spx==NULL) {
+    log_error(("cannot find spell by name: %s\n", name));
   }
   return spx;
 }
@@ -7618,7 +7608,7 @@ find_spellbyid(spellid_t id)
     spell* sp = slist->data;
     if (sp->id == id) return sp;
   }
-  log_error(("cannot find spell by id: %u\n", id));
+  log_warning(("cannot find spell by id: %u\n", id));
   return NULL;
 }
 
@@ -8063,7 +8053,7 @@ static spell spelldaten[] =
     (spell_f)sp_fog_of_confusion, patzer
   },
   {
-    SPL_MAELSTROM, "Mahlstrom",
+    SPL_MAELSTROM, "maelstrom",
     "Dieses Ritual beschört einen großen Wasserelementar aus den "
     "Tiefen des Ozeans. Der Elementar erzeugt einen gewaltigen "
     "Strudel, einen Mahlstrom, welcher alle Schiffe, die ihn passieren, "
@@ -8081,7 +8071,7 @@ static spell spelldaten[] =
     (spell_f)sp_maelstrom, patzer
   },
   {
-    SPL_MALLORN, "Wurzeln der Magie",
+    SPL_MALLORN, "magic_roots",
     "Mit Hilfe dieses aufwändigen Rituals läßt der Druide einen Teil seiner "
     "dauerhaft in den Boden und die Wälder der Region fliessen. Dadurch wird "
     "das Gleichgewicht der Natur in der Region für immer verändert, und in "
@@ -8100,7 +8090,7 @@ static spell spelldaten[] =
     (spell_f)sp_mallorn, patzer
   },
   {
-    SPL_GREAT_DROUGHT, "Tor in die Ebene der Hitze",
+    SPL_GREAT_DROUGHT, "great_drought",
     "Dieses mächtige Ritual öffnet ein Tor in die Elementarebene der "
     "Hitze. Eine grosse Dürre kommt über das Land. Bauern, Tiere und "
     "Pflanzen der Region kämpfen um das nackte Überleben, aber eine "
@@ -8624,7 +8614,7 @@ static spell spelldaten[] =
     (spell_f)sp_sleep, patzer
   },
   {
-    SPL_WISPS, "Irrlichter",
+    SPL_WISPS, "wisps",
     "Der Zauberer spricht eine Beschwörung über einen Teil der Region, "
     "und in der Folgewoche entstehen dort Irrlichter. "
     "Wer durch diese Nebel wandert, wird von Visionen geplagt und "
@@ -8700,7 +8690,7 @@ static spell spelldaten[] =
     (spell_f)sp_summon_familiar, patzer
   },
   {
-    SPL_CLONECOPY, "Seelenkopie",
+    SPL_CLONECOPY, "clone",
     "Dieser mächtige Zauber kann einen Magier vor dem sicheren Tod "
     "bewahren. Der Magier erschafft anhand einer kleinen Blutprobe einen "
     "Klon von sich, und legt diesen in ein Bad aus Drachenblut und verdünntem "
@@ -8721,7 +8711,7 @@ static spell spelldaten[] =
     (spell_f)sp_clonecopy, patzer
   },
   {
-    SPL_BADDREAMS, "Schlechte Träume",
+    SPL_BADDREAMS, "bad_dreams",
     "Dieser Zauber ermöglicht es dem Träumer, den Schlaf aller nichtaliierten "
     "Einheiten (HELFE BEWACHE) in der Region so stark zu stören, das sie "
     "vorübergehend einen Teil ihrer Erinnerungen verlieren.", NULL, NULL,
@@ -8966,7 +8956,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_fumbleshield, patzer
   },
-  { SPL_CALM_MONSTER, "Monster friedlich stimmen",
+  { SPL_CALM_MONSTER, "calm_monster",
     "Dieser einschmeichelnde Gesang kann fast jedes intelligente Monster "
     "zähmen. Es wird von Angriffen auf den Magier absehen und auch seine "
     "Begleiter nicht anrühren. Doch sollte man sich nicht täuschen, es "
@@ -8984,7 +8974,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_calm_monster, patzer
   },
-  { SPL_SEDUCE, "Lied der Verführung",
+  { SPL_SEDUCE, "seduction",
     "Mit diesem Lied kann eine Einheit derartig betört werden, so dass "
     "sie dem Barden den größten Teil ihres Bargelds und ihres Besitzes "
     "schenkt. Sie behält jedoch immer soviel, wie sie zum Überleben "
@@ -9003,7 +8993,7 @@ static spell spelldaten[] =
     (spell_f)sp_seduce, patzer
   },
   {
-    SPL_HEADACHE, "Schaler Wein",
+    SPL_HEADACHE, "headache",
     "Aufzeichung des Vortrags von Selen Ard'Ragorn in Bar'Glingal: "
     "'Es heiss, dieser Spruch wäre wohl in den Spelunken der Westgassen "
     "entstanden, doch es kann genausogut in jedem andern verrufenen "
@@ -9045,7 +9035,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_headache, patzer
   },
-  { SPL_PUMP, "Aushorchen",
+  { SPL_PUMP, "sound_out",
     "Erliegt die Einheit dem Zauber, so wird sie dem Magier alles erzählen, "
     "was sie über die gefragte Region weiß. Ist in der Region niemand "
     "ihrer Partei, so weiß sie nichts zu berichten. Auch kann sie nur das "
@@ -9063,7 +9053,7 @@ static spell spelldaten[] =
     (spell_f)sp_pump, patzer
   },
   {
-    SPL_BLOODTHIRST, "Kriegsgesang",
+    SPL_BLOODTHIRST, "bloodthirst",
     "Wie viele magischen Gesänge, so entstammt auch dieser den altem "
     "Wissen der Katzen, die schon immer um die machtvolle Wirkung der "
     "Stimme wussten. Mit diesem Lied wird die Stimmung der Krieger "
@@ -9082,7 +9072,7 @@ static spell spelldaten[] =
     (spell_f)sp_berserk, patzer
   },
   {
-    SPL_FRIGHTEN, "Gesang der Angst",
+    SPL_FRIGHTEN, "frighten",
     "Dieser Kriegsgesang sät Panik in der Front der Gegner und schwächt "
     "so ihre Kampfkraft erheblich. Angst wird ihren Schwertarm schwächen "
     "und Furcht ihren Schildarm lähmen.", NULL, NULL,
@@ -9097,7 +9087,7 @@ static spell spelldaten[] =
     (spell_f)sp_frighten, patzer
   },
   {
-    SPL_OBJ_ANALYSESONG, "Lied des Ortes analysieren",
+    SPL_OBJ_ANALYSESONG, "analyse_object",
     "Wie Lebewesen, so haben auch Schiffe und Gebäude und sogar Regionen "
     "ihr eigenes Lied, wenn auch viel schwächer und schwerer zu hören. "
     "Und so, wie wie aus dem Lebenslied einer Person erkannt werden kann, "
@@ -9118,7 +9108,7 @@ static spell spelldaten[] =
     (spell_f)sp_analysesong_obj, patzer
   },
   {
-    SPL_CERDDOR_DESTROY_MAGIC, "Lebenslied festigen",
+    SPL_CERDDOR_DESTROY_MAGIC, "cerddor_destroymagic",
     "Jede Verzauberung beeinflußt das Lebenslied, schwächt und verzerrt es. "
     "Der kundige Barde kann versuchen, das Lebenslied aufzufangen und zu "
     "verstärken und die Veränderungen aus dem Lied zu tilgen.",
@@ -9140,7 +9130,7 @@ static spell spelldaten[] =
     (spell_f)sp_destroy_magic, patzer
   },
   {
-    SPL_MIGRANT, "Ritual der Aufnahme",
+    SPL_MIGRANT, "migration",
     "Dieses Ritual ermöglicht es, eine Einheit, egal welcher Art, in die "
     "eigene Partei aufzunehmen. Der um Aufnahme Bittende muss dazu willig "
     "und bereit sein, seiner alten Partei abzuschwören. Dies bezeugt er "
@@ -9164,7 +9154,7 @@ static spell spelldaten[] =
     (spell_f)sp_migranten, patzer
   },
   {
-    SPL_CERDDOR_FAMILIAR, "Vertrauten rufen",
+    SPL_CERDDOR_FAMILIAR, "summon_familiar",
     "Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein "
     "ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem "
     "Magier anschließen wird.", NULL, NULL,
@@ -9179,7 +9169,7 @@ static spell spelldaten[] =
     (spell_f)sp_summon_familiar, patzer
   },
   {
-    SPL_RAISEPEASANTS, "Mob aufwiegeln",
+    SPL_RAISEPEASANTS, "raise_mob",
     "Mit Hilfe dieses magischen Gesangs überzeugt der Magier die Bauern "
     "der Region, sich ihm anzuschließen. Die Bauern werden ihre Heimat jedoch "
     "nicht verlassen, und keine ihrer Besitztümer fortgeben. Jede Woche "
@@ -9197,7 +9187,7 @@ static spell spelldaten[] =
     (spell_f)sp_raisepeasants, patzer
   },
   {
-    SPL_SONG_RESISTMAGIC, "Gesang des wachen Geistes",
+    SPL_SONG_RESISTMAGIC, "song_resist_magic",
     "Dieses magische Lied wird, einmal mit Inbrunst gesungen, sich in der "
     "Region fortpflanzen, von Mund zu Mund springen und eine Zeitlang "
     "überall zu vernehmen sein. Nach wie vielen Wochen der Gesang aus dem "
@@ -9220,7 +9210,7 @@ static spell spelldaten[] =
     (spell_f)sp_song_resistmagic, patzer
   },
   {
-    SPL_DEPRESSION, "Gesang der Melancholie",
+    SPL_DEPRESSION, "melancholy",
     "Mit diesem Gesang verbreitet der Barde eine melancholische, traurige "
     "Stimmung unter den Bauern. Einige Wochen lang werden sie sich in ihre "
     "Hütten zurückziehen und kein Silber in den Theatern und Tavernen lassen.", NULL, NULL,
@@ -9235,7 +9225,7 @@ static spell spelldaten[] =
     (spell_f)sp_depression, patzer
   },
   {
-    SPL_SONG_SUSCEPTMAGIC, "Gesang des schwachen Geistes",
+    SPL_SONG_SUSCEPTMAGIC, "song_suscept_magic",
     "Dieses Lied, das in die magische Essenz der Region gewoben wird, "
     "schwächt die natürliche Widerstandskraft gegen eine "
     "Verzauberung einmalig um 15%. Nur die Verbündeten des Barden "
@@ -9253,7 +9243,7 @@ static spell spelldaten[] =
     (spell_f)sp_song_susceptmagic, patzer
   },
   {
-    SPL_SONG_OF_PEACE, "Gesang der Friedfertigkeit",
+    SPL_SONG_OF_PEACE, "song_of_peace",
     "Dieser mächtige Bann verhindert jegliche Attacken. Niemand in der "
     "ganzen Region ist fähig seine Waffe gegen irgendjemanden zu erheben. "
     "Die Wirkung kann etliche Wochen andauern", NULL, NULL,
@@ -9268,7 +9258,7 @@ static spell spelldaten[] =
     (spell_f)sp_song_of_peace, patzer
   },
   {
-    SPL_SONG_OF_ENSLAVE, "Gesang der Versklavung",
+    SPL_SONG_OF_ENSLAVE, "song_of_slavery",
     "Dieser mächtige Bann raubt dem Opfer seinen freien Willen und "
     "unterwirft sie den Befehlen des Barden. Für einige Zeit wird das Opfer "
     "sich völlig von seinen eigenen Leuten abwenden und der Partei des Barden "
@@ -9285,7 +9275,7 @@ static spell spelldaten[] =
     (spell_f)sp_charmingsong, patzer
   },
   {
-    SPL_BIGRECRUIT, "Hohe Kunst der Überzeugung",
+    SPL_BIGRECRUIT, "big_recruit",
     "Aus 'Wanderungen' von Firudin dem Weisen: "
     "'In Weilersweide, nahe dem Wytharhafen, liegt ein kleiner Gasthof, der "
     "nur wenig besucht ist. Niemanden bekannt ist, das dieser Hof "
@@ -9305,7 +9295,7 @@ static spell spelldaten[] =
     (spell_f)sp_bigrecruit, patzer
   },
   {
-    SPL_RALLYPEASANTMOB, "Aufruhr beschwichtigen",
+    SPL_RALLYPEASANTMOB, "calm_riot",
     "Mit Hilfe dieses magischen Gesangs kann der Magier eine Region in "
     "Aufruhr wieder beruhigen. Die Bauernhorden werden sich verlaufen "
     "und wieder auf ihre Felder zurückkehren.", NULL, NULL,
@@ -9320,7 +9310,7 @@ static spell spelldaten[] =
     (spell_f)sp_rallypeasantmob, patzer
   },
   {
-    SPL_RAISEPEASANTMOB, "Aufruhr verursachen",
+    SPL_RAISEPEASANTMOB, "incite_riot",
     "Mit Hilfe dieses magischen Gesangs versetzt der Magier eine ganze "
     "Region in Aufruhr. Rebellierende Bauernhorden machen jedes Besteuern "
     "unmöglich, kaum jemand wird mehr für Gaukeleien Geld spenden und "
@@ -9393,7 +9383,7 @@ static spell spelldaten[] =
   },
 #ifdef SHOWASTRAL_NOT_BORKED
   {
-    SPL_SHOWASTRAL, "Astraler Blick",
+    SPL_SHOWASTRAL, "show_astral",
     "Der Magier kann kurzzeitig in die Astralebene blicken und erfährt "
     "so alle Einheiten innerhalb eines astralen Radius von Stufe/5 Regionen.", NULL, NULL,
     M_ASTRAL, (SPELLLEVEL), 5, 2,
@@ -9408,7 +9398,7 @@ static spell spelldaten[] =
   },
 #endif
   {
-    SPL_RESISTMAGICBONUS, "Schutzzauber",
+    SPL_RESISTMAGICBONUS, "resist_magic",
     "Dieser Zauber verstärkt die natürliche Widerstandskraft gegen Magie. "
     "Eine so geschützte Einheit ist auch gegen Kampfmagie weniger "
     "empfindlich. Pro Stufe reicht die Kraft des Magiers aus, um 5 Personen "
@@ -9439,7 +9429,7 @@ static spell spelldaten[] =
     (spell_f)sp_keeploot, patzer
   },
   {
-    SPL_ENTERASTRAL, "Astraler Weg",
+    SPL_ENTERASTRAL, "enterastral",
     "Alte arkane Formeln ermöglichen es dem Magier, sich und andere in die "
     "astrale Ebene zu schicken. Der Magier kann (Stufe-3)*15 GE durch das "
     "kurzzeitig entstehende Tor schicken. Ist der Magier erfahren genug, "
@@ -9457,7 +9447,7 @@ static spell spelldaten[] =
     (spell_f)sp_enterastral, patzer
   },
   {
-    SPL_LEAVEASTRAL, "Astraler Ausgang",
+    SPL_LEAVEASTRAL, "leaveastral",
     "Der Magier konzentriert sich auf die Struktur der Realität und kann "
     "so die astrale Ebene verlassen. Er kann insgesamt (Stufe-3)*15 GE durch "
     "das kurzzeitig entstehende Tor schicken. Ist der Magier erfahren genug, "
@@ -9477,7 +9467,7 @@ static spell spelldaten[] =
     (spell_f)sp_leaveastral, patzer
   },
   {
-    SPL_TRANSFERAURA_ASTRAL, "Auratransfer",
+    SPL_TRANSFERAURA_ASTRAL, "auratransfer",
     "Mit Hilfe dieses Zauber kann der Magier eigene Aura im Verhältnis "
     "2:1 auf einen anderen Magier des gleichen Magiegebietes oder im "
     "Verhältnis 3:1 auf einen Magier eines anderen Magiegebietes "
@@ -9495,7 +9485,7 @@ static spell spelldaten[] =
     (spell_f)sp_transferaura, patzer
   },
   {
-    SPL_SHOCKWAVE, "Schockwelle",
+    SPL_SHOCKWAVE, "shockwave",
     "Dieser Zauber läßt eine Welle aus purer Kraft über die "
     "gegnerischen Reihen hinwegfegen.  Viele Kämpfer wird der Schock "
     "so benommen machen, daß sie für einen kurzen Moment nicht angreifen "
@@ -9511,7 +9501,7 @@ static spell spelldaten[] =
     (spell_f)sp_stun, patzer
   },
   {
-    SPL_ANTIMAGICZONE, "Astrale Schwächezone",
+    SPL_ANTIMAGICZONE, "antimagiczone",
     "Mit diesem Zauber kann der Magier eine Zone der astralen Schwächung "
     "erzeugen, ein lokales Ungleichgewicht im Astralen Feld. Dieses "
     "Zone wird bestrebt sein, wieder in den Gleichgewichtszustand "
@@ -9530,7 +9520,7 @@ static spell spelldaten[] =
     (spell_f)sp_antimagiczone, patzer
   },
   {
-    SPL_TYBIED_DESTROY_MAGIC, "Magiefresser",
+    SPL_TYBIED_DESTROY_MAGIC, "destroy_magic",
     "Dieser Zauber ermöglicht dem Magier, Verzauberungen einer Einheit, "
     "eines Schiffes, Gebäudes oder auch der Region aufzulösen.",
     "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' REGION\n"
@@ -9551,7 +9541,7 @@ static spell spelldaten[] =
     (spell_f)sp_destroy_magic, patzer
   },
   {
-    SPL_PULLASTRAL, "Astraler Ruf",
+    SPL_PULLASTRAL, "pull_astral",
     "Ein Magier, der sich in der astralen Ebene befindet, kann mit Hilfe "
     "dieses Zaubers andere Einheiten zu sich holen. Der Magier kann "
     "(Stufe-3)*15 GE durch das kurzzeitig entstehende Tor schicken. Ist der "
@@ -9573,7 +9563,7 @@ static spell spelldaten[] =
   },
 
   {
-    SPL_FETCHASTRAL, "Ruf der Realität",
+    SPL_FETCHASTRAL, "fetch_astral",
     "Ein Magier, welcher sich in der materiellen Welt befindet, kann er mit "
     "Hilfe dieses Zaubers Einheiten aus der angrenzenden Astralwelt herbeiholen. "
     "Ist der Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu "
@@ -9591,7 +9581,7 @@ static spell spelldaten[] =
     (spell_f)sp_fetchastral, patzer
   },
   {
-    SPL_STEALAURA, "Stehle Aura",
+    SPL_STEALAURA, "steal_aura",
     "Mit Hilfe dieses Zaubers kann der Magier einem anderen Magier seine "
     "Aura gegen dessen Willen entziehen und sich selber zuführen.", NULL,
     "u",
@@ -9608,7 +9598,7 @@ static spell spelldaten[] =
     (spell_f)sp_stealaura, patzer
   },
   {
-    SPL_FLYING_SHIP, "Luftschiff",
+    SPL_FLYING_SHIP, "airship",
     "Diese magischen Runen bringen ein Boot oder Langboot für eine Woche "
     "zum fliegen. Damit kann dann auch Land überquert werden. Die Zuladung "
     "von Langbooten ist unter der Einwirkung dieses Zaubers auf 100 "
@@ -9626,25 +9616,7 @@ static spell spelldaten[] =
     (spell_f)sp_flying_ship, patzer
   },
   {
-    SPL_CREATE_ANTIMAGICCRYSTAL, "Erschaffe Antimagiekristall",
-    "Mit Hilfe dieses Zauber entzieht der Magier einem Quarzkristall "
-    "all seine magischen Energien. Der Kristall wird dann, wenn er zu "
-    "feinem Staub zermahlen und verteilt wird, die beim Zaubern "
-    "freigesetzten magischen Energien aufsaugen und alle Zauber, "
-    "welche in der betreffenden Woche in der Region gezaubert werden "
-    "fehlschlagen lassen.", NULL, NULL,
-    M_ASTRAL, (ONSHIPCAST), 5, 7,
-    {
-      { R_AURA, 50, SPC_FIX },
-      { R_SILVER, 3000, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_create_antimagiccrystal, patzer_createitem
-  },
-  {
-    SPL_DESTROY_MAGIC, "Fluch brechen",
+    SPL_DESTROY_MAGIC, "break_curse",
     "Dieser Zauber ermöglicht dem Magier, gezielt eine bestimmte "
     "Verzauberung einer Einheit, eines Schiffes, Gebäudes oder auch "
     "der Region aufzulösen.",
@@ -9664,7 +9636,7 @@ static spell spelldaten[] =
     (spell_f)sp_destroy_curse, patzer
   },
   {
-    SPL_ETERNIZEWALL, "Mauern der Ewigkeit",
+    SPL_ETERNIZEWALL, "eternal_walls",
     "Mit dieser Formel bindet der Magier auf ewig die Kräfte der Erde in "
     "die Mauern des Gebäudes. Ein solchermaßen verzaubertes Gebäude ist "
     "gegen den Zahn der Zeit geschützt und benötigt keinen "
@@ -9684,7 +9656,7 @@ static spell spelldaten[] =
     (spell_f)sp_eternizewall, patzer
   },
   {
-    SPL_SCHILDRUNEN, "Runen des Schutzes",
+    SPL_SCHILDRUNEN, "protective_runes",
     "Zeichnet man diese Runen auf die Wände eines Gebäudes oder auf die "
     "Planken eines Schiffes, so wird es schwerer durch Zauber zu "
     "beeinflussen sein. Jedes Ritual erhöht die Widerstandskraft des "
@@ -9708,7 +9680,7 @@ static spell spelldaten[] =
   },
 
   {
-    SPL_REDUCESHIELD, "Schild des Fisches",
+    SPL_REDUCESHIELD, "fish_shield",
     "Dieser Zauber vermag dem Gegner ein geringfügig versetztes Bild der "
     "eigenen Truppen vorzuspiegeln, so wie der Fisch im Wasser auch nicht "
     "dort ist wo er zu sein scheint. Von jedem Treffer kann so die Hälfte "
@@ -9726,7 +9698,7 @@ static spell spelldaten[] =
     (spell_f)sp_reduceshield, patzer
   },
   {
-    SPL_SPEED, "Beschleunigung",
+    SPL_SPEED, "combat_speed",
     "Dieser Zauber beschleunigt einige Kämpfer auf der eigenen Seite "
     "so, dass sie während des gesamten Kampfes in einer Kampfrunde zweimal "
     "angreifen können.", NULL, NULL,
@@ -9741,7 +9713,7 @@ static spell spelldaten[] =
     (spell_f)sp_speed, patzer
   },
   {
-    SPL_ARTEFAKT_OF_POWER, "Erschaffe einen Ring der Macht",
+    SPL_ARTEFAKT_OF_POWER, "create_rop",
     "Dieses mächtige Ritual erschafft einen Ring der Macht. Ein Ring "
     "der Macht erhöht die Stärke jedes Zaubers, den sein Träger zaubert, "
     "als wäre der Magier eine Stufe besser.", NULL, NULL,
@@ -9756,7 +9728,7 @@ static spell spelldaten[] =
     (spell_f)sp_createitem_power, patzer_createitem
   },
   {
-    SPL_VIEWREALITY, "Blick in die Realität",
+    SPL_VIEWREALITY, "view_reality",
     "Der Magier kann mit Hilfe dieses Zaubers aus der Astral- in die "
     "materielle Ebene blicken und die Regionen und Einheiten genau "
     "erkennen.", NULL, NULL,
@@ -9771,7 +9743,7 @@ static spell spelldaten[] =
     (spell_f)sp_viewreality, patzer
   },
   {
-    SPL_BAG_OF_HOLDING, "Erschaffe einen Beutel des Negativen Gewichts",
+    SPL_BAG_OF_HOLDING, "create_bagofholding",
     "Dieser Beutel umschließt eine kleine Dimensionsfalte, in der bis "
     "zu 200 Gewichtseinheiten transportiert werden können, ohne dass "
     "sie auf das Traggewicht angerechnet werden.  Pferde und andere "
@@ -9790,7 +9762,7 @@ static spell spelldaten[] =
     (spell_f)sp_create_bag_of_holding, patzer
   },
   {
-    SPL_SPEED2, "Zeitdehnung",
+    SPL_SPEED2, "double_time",
     "Diese praktische Anwendung des theoretischen Wissens um Raum und Zeit "
     "ermöglicht es, den Zeitfluß für einige Personen zu verändern. Auf "
     "diese Weise veränderte Personen bekommen für einige Wochen doppelt "
@@ -9807,7 +9779,7 @@ static spell spelldaten[] =
     (spell_f)sp_speed2, patzer
   },
   {
-    SPL_ARMORSHIELD, "Rüstschild",
+    SPL_ARMORSHIELD, "armor_shield",
     "Diese vor dem Kampf zu zaubernde Ritual gibt den eigenen Truppen "
     "einen zusätzlichen Bonus auf ihre Rüstung. Jeder Treffer "
     "reduziert die Kraft des Zaubers, so dass der Schild sich irgendwann "
@@ -9823,7 +9795,7 @@ static spell spelldaten[] =
     (spell_f)sp_armorshield, patzer
   },
   {
-    SPL_TYBIED_FAMILIAR, "Vertrauten rufen",
+    SPL_TYBIED_FAMILIAR, "summon_familiar",
     "Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein "
     "ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem "
     "Magier anschließen wird.", NULL, NULL,
@@ -9838,7 +9810,7 @@ static spell spelldaten[] =
     (spell_f)sp_summon_familiar, patzer
   },
   {
-    SPL_MOVECASTLE, "Belebtes Gestein",
+    SPL_MOVECASTLE, "living_rock",
     "Dieses kräftezehrende Ritual beschwört mit Hilfe einer Kugel aus "
     "konzentriertem Laen einen gewaltigen Erdelementar und bannt ihn "
     "in ein Gebäude. Dem Elementar kann dann befohlen werden, das "
@@ -9862,7 +9834,7 @@ static spell spelldaten[] =
     (spell_f)sp_movecastle, patzer
   },
   {
-    SPL_DISRUPTASTRAL, "Störe Astrale Integrität",
+    SPL_DISRUPTASTRAL, "astral_disruption",
     "Dieser Zauber bewirkt eine schwere Störung des Astralraums. Innerhalb "
     "eines astralen Radius von Stufe/5 Regionen werden alle Astralwesen, "
     "die dem Zauber nicht wiederstehen können, aus der astralen Ebene "
@@ -9879,7 +9851,7 @@ static spell spelldaten[] =
     (spell_f)sp_disruptastral, patzer
   },
   {
-    SPL_PERMTRANSFER, "Opfere Kraft",
+    SPL_PERMTRANSFER, "sacrifice_strength",
     "Mit Hilfe dieses Zaubers kann der Magier einen Teil seiner magischen "
     "Kraft permanent auf einen anderen Magier übertragen. Auf einen Tybied-"
     "Magier kann er die Hälfte der eingesetzten Kraft übertragen, auf einen "
@@ -9899,7 +9871,7 @@ static spell spelldaten[] =
   /* M_GRAU */
   /*  Definitionen von Create_Artefaktsprüchen    */
   {
-    SPL_ARTEFAKT_OF_AURAPOWER, "Erschaffe einen Fokus",
+    SPL_ARTEFAKT_OF_AURAPOWER, "create_focus",
     "Der auf diesem Gegenstand liegende Zauber erleichtert es dem "
     "Zauberers enorm größere Mengen an Aura zu beherrschen.", NULL, NULL,
     M_GRAU, (ONSHIPCAST), 5, 9,
@@ -9913,7 +9885,7 @@ static spell spelldaten[] =
     (spell_f)sp_createitem_aura, patzer_createitem
   },
   {
-    SPL_ARTEFAKT_OF_REGENERATION, "Regeneration",
+    SPL_ARTEFAKT_OF_REGENERATION, "regeneration",
     "Der auf diesem Gegenstand liegende Zauber saugt die diffusen "
     "magischen Energien des Lebens aus der Umgebung auf und läßt sie "
     "seinem Träger zukommen.", NULL, NULL,
@@ -9928,7 +9900,7 @@ static spell spelldaten[] =
     (spell_f)sp_createitem_regeneration, patzer_createitem
   },
   {
-    SPL_ARTEFAKT_CHASTITYBELT, "Erschaffe ein Amulett der Keuschheit",
+    SPL_ARTEFAKT_CHASTITYBELT, "create_chastitybelt",
     "Dieses Amulett in Gestalt einer orkischen Matrone unterdrückt den "
     "Fortpflanzungstrieb eines einzelnen Orks sehr zuverlässig. Ein Ork "
     "mit Amulett der Keuschheit wird sich nicht mehr vermehren.", NULL, NULL,
@@ -9943,7 +9915,7 @@ static spell spelldaten[] =
     (spell_f)sp_createitem_chastitybelt, patzer_createitem
   },
   {
-    SPL_METEORRAIN, "Meteorregen",
+    SPL_METEORRAIN, "meteor_rain",
     "Ein Schauer von Meteoren regnet über das Schlachtfeld.", NULL, NULL,
     M_GRAU, (COMBATSPELL | SPELLLEVEL), 5, 3,
     {
@@ -9956,7 +9928,7 @@ static spell spelldaten[] =
     (spell_f)sp_kampfzauber, patzer
   },
   {
-    SPL_ARTEFAKT_RUNESWORD, "Erschaffe ein Runenschwert",
+    SPL_ARTEFAKT_RUNESWORD, "create_runesword",
     "Mit diesem Spruch erzeugt man ein Runenschwert. Die Klinge des "
     "schwarzen "
     "Schwertes ist mit alten, magischen Runen verziert, und ein seltsames "
@@ -9975,7 +9947,7 @@ static spell spelldaten[] =
     (spell_f)sp_createitem_runesword, patzer_createitem
   },
   {
-    SPL_BECOMEWYRM, "Wyrmtransformation",
+    SPL_BECOMEWYRM, "wyrm_transformation",
     "Mit Hilfe dieses Zaubers kann sich der Magier permanent in einen "
     "mächtigen Wyrm verwandeln. Der Magier behält seine Talente und "
     "Möglichkeiten, bekommt jedoch die Kampf- und Bewegungseigenschaften "
@@ -9993,7 +9965,7 @@ static spell spelldaten[] =
     (spell_f)sp_becomewyrm, patzer
   },
   /* Monstersprüche */
-  { SPL_FIREDRAGONODEM, "Feuriger Drachenodem",
+  { SPL_FIREDRAGONODEM, "fiery_dragonbreath",
     "Verbrennt die Feinde", NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 3,
     {
@@ -10005,7 +9977,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_dragonodem, patzer
   },
-  { SPL_DRAGONODEM, "Eisiger Drachenodem",
+  { SPL_DRAGONODEM, "icy_dragonbreath",
     "Tötet die Feinde", NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 6,
     {
@@ -10017,7 +9989,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_dragonodem, patzer
   },
-  { SPL_WYRMODEM, "Großer Drachenodem",
+  { SPL_WYRMODEM, "powerful_dragonbreath",
     "Verbrennt die Feinde", NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 12,
     {
@@ -10029,7 +10001,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_dragonodem, patzer
   },
-  { SPL_DRAINODEM, "Schattenodem",
+  { SPL_DRAINODEM, "drain_skills",
     "Entzieht Talentstufen und macht Schaden wie Großer Odem", NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 12,
     {
@@ -10042,7 +10014,7 @@ static spell spelldaten[] =
     (spell_f)sp_dragonodem, patzer
   },
   {
-    SPL_AURA_OF_FEAR, "Furchteinflößende Aura",
+    SPL_AURA_OF_FEAR, "aura_of_fear",
     "Panik", NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 12,
     {
@@ -10055,7 +10027,7 @@ static spell spelldaten[] =
     (spell_f)sp_flee, patzer
   },
   {
-    SPL_SHADOWCALL, "Schattenruf",
+    SPL_SHADOWCALL, "shadowcall",
     "Ruft Schattenwesen.", NULL, NULL,
     M_GRAU, (PRECOMBATSPELL), 5, 12,
     {
@@ -10068,7 +10040,7 @@ static spell spelldaten[] =
     (spell_f)sp_shadowcall, patzer
   },
   {
-    SPL_IMMOLATION, "Feuersturm",
+    SPL_IMMOLATION, "firestorm",
     "Verletzt alle Gegner.", NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 12,
     {
@@ -10080,7 +10052,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_immolation, patzer
   },
-  { SPL_FIREODEM, "Feuerwalze",
+  { SPL_FIREODEM, "immolation",
     "Tötet die Feinde", NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 8,
     {
@@ -10092,7 +10064,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_immolation, patzer
   },
-  { SPL_ICEODEM, "Eisnebel",
+  { SPL_ICEODEM, "coldfront",
     "Tötet die Feinde", NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 8,
     {
@@ -10104,7 +10076,7 @@ static spell spelldaten[] =
     },
     (spell_f)sp_immolation, patzer
   },
-  { SPL_ACIDODEM, "Säurenebel",
+  { SPL_ACIDODEM, "acidrain",
     "Tötet die Feinde", NULL, NULL,
     M_GRAU, (COMBATSPELL), 5, 8,
     {
@@ -10191,7 +10163,7 @@ static spell spelldaten[] =
   #endif
   /* SPL_NOSPELL  MUSS der letzte Spruch der Liste sein*/
   {
-    SPL_NOSPELL, "Keiner", NULL, NULL, NULL, 0, 0, 0, 0,
+    SPL_NOSPELL, "no spell", NULL, NULL, NULL, 0, 0, 0, 0,
     {
       { 0, 0, 0 },
       { 0, 0, 0 },

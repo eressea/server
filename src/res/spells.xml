@@ -103,4 +103,10 @@
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
+  <spell name="create_antimagic" type="tybied" ship="true" rank="5" level="7">
+    <function name="cast" value="luaspell"/>
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="money" amount="3000" cost="fixed"/>
+  </spell>
+
 </spells>

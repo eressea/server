@@ -3804,6 +3804,242 @@
     </string>
   </namespace>
   <namespace name="spell">
+    <string name="create_rop">
+      <text locale="de">Erschaffe einen Ring der Macht</text>
+      <text locale="en">Create A Ring Of Power</text>
+    </string>
+    <string name="fish_shield">
+      <text locale="de">Schild des Fisches</text>
+      <text locale="en">Shield Of The Fish</text>
+    </string>
+    <string name="protective_runes">
+      <text locale="de">Runen des Schutzes</text>
+      <text locale="en">Protective Runes</text>
+    </string>
+    <string name="fetch_astral">
+      <text locale="de">Ruf der Realität</text>
+      <text locale="en">Call Of Reality</text>
+    </string>
+    <string name="pull_astral">
+      <text locale="de">Astraler Ruf</text>
+      <text locale="en">Astral Call</text>
+    </string>
+    <string name="destroy_magic">
+      <text locale="de">Magiefresser</text>
+      <text locale="en">Destroy Magic</text>
+    </string>
+    <string name="eternal_walls">
+      <text locale="de">Mauern der Ewigkeit</text>
+      <text locale="en">Eternal Walls</text>
+    </string>
+    <string name="steal_aura">
+      <text locale="de">Stehle Aura</text>
+      <text locale="en">Steal Aura</text>
+    </string>
+    <string name="resist_magic">
+      <text locale="de">Schutzzauber</text>
+      <text locale="en">Resist Magic</text>
+    </string>
+    <string name="show_astral">
+      <text locale="de">Astraler Blick</text>
+      <text locale="en">Astral Gaze</text>
+    </string>
+    <string name="auratransfer">
+      <text locale="de">Auratransfer</text>
+      <text locale="en">Transfer Aura</text>
+    </string>
+    <string name="calm_monster">
+      <text locale="de">Monster friedlich stimmen</text>
+      <text locale="en">Calm Monster</text>
+    </string>
+    <string name="airship">
+      <text locale="de">Luftschiff</text>
+      <text locale="en">Airship</text>
+    </string>
+    <string name="seduction">
+      <text locale="de">Lied der Verführung</text>
+      <text locale="en">Song Of Seduction</text>
+    </string>
+    <string name="headache">
+      <text locale="de">Schaler Wein</text>
+      <text locale="en">Hangover</text>
+    </string>
+    <string name="sound_out">
+      <text locale="de">Aushorchen</text>
+      <text locale="en">sound_out</text>
+    </string>
+    <string name="bloodthirst">
+      <text locale="de">Kriegsgesang</text>
+      <text locale="en">Song Of War</text>
+    </string>
+    <string name="frighten">
+      <text locale="de">Gesang der Angst</text>
+      <text locale="en">Song Of Fear</text>
+    </string>
+    <string name="analyse_object">
+      <text locale="de">Lied des Ortes analysieren</text>
+      <text locale="en">Analysis</text>
+    </string>
+    <string name="shockwave">
+      <text locale="de">Schockwelle</text>
+      <text locale="en">Shockwave</text>
+    </string>
+    <string name="break_curse">
+      <text locale="de">Fluch brechen</text>
+      <text locale="en">Negate Curse</text>
+    </string>
+    <string name="create_chastitybelt">
+      <text locale="de">Erschaffe ein Amulett der Keuschheit</text>
+      <text locale="en">Create An Amulet Of Chastity</text>
+    </string>
+    <string name="combat_speed">
+      <text locale="de">Beschleunigung</text>
+      <text locale="en">Acceleration</text>
+    </string>
+    <string name="powerful_dragonbreath">
+      <text locale="de">Großer Drachenodem</text>
+      <text locale="en">Powerful Dragonbreath</text>
+    </string>
+    <string name="sacrifice_strength">
+      <text locale="de">Opfere Kraft</text>
+      <text locale="en">Sacrifice Strength</text>
+    </string>
+    <string name="living_rock">
+      <text locale="de">Belebtes Gestein</text>
+      <text locale="en">Living Rock</text>
+    </string>
+    <string name="melancholy">
+      <text locale="de">Gesang der Melancholie</text>
+      <text locale="en">Song of Melancholy</text>
+    </string>
+    <string name="song_resist_magic">
+      <text locale="de">Gesang des wachen Geistes</text>
+      <text locale="en">Song Of The Youthful Spirit</text>
+    </string>
+    <string name="song_suscept_magic">
+      <text locale="de">Gesang des schwachen Geistes</text>
+      <text locale="en">Song Of The Aging Spirit</text>
+    </string>
+    <string name="song_of_peace">
+      <text locale="de">Gesang der Friedfertigkeit</text>
+      <text locale="en">Song Of Peace</text>
+    </string>
+    <string name="song_of_slavery">
+      <text locale="de">Gesang der Versklavung</text>
+      <text locale="en">Song Of Slavery</text>
+    </string>
+    <string name="big_recruit">
+      <text locale="de">Hohe Kunst der Überzeugung</text>
+      <text locale="en">Song Of Slavery</text>
+    </string>
+    <string name="double_time">
+      <text locale="de">Zeitdehnung</text>
+      <text locale="en">Double Time</text>
+    </string>
+    <string name="summon_familiar">
+      <text locale="de">Vertrauten rufen</text>
+      <text locale="en">Summon Familiar</text>
+    </string>
+    <string name="armor_shield">
+      <text locale="de">Rüstschild</text>
+      <text locale="en">Shield Shine</text>
+    </string>
+    <string name="wyrm_transformation">
+      <text locale="de">Wyrmtransformation</text>
+      <text locale="en">Wyrmtransformation</text>
+    </string>
+    <string name="drain_skills">
+      <text locale="de">Schattenodem</text>
+      <text locale="en">Shadowbreath</text>
+    </string>
+    <string name="firestorm">
+      <text locale="de">Feuersturm</text>
+      <text locale="en">Firestorm</text>
+    </string>
+    <string name="immolation">
+      <text locale="de">Feuerwalze</text>
+      <text locale="en">Immolation</text>
+    </string>
+    <string name="coldfront">
+      <text locale="de">Eisnebel</text>
+      <text locale="en">Coldfront</text>
+    </string>
+    <string name="acidrain">
+      <text locale="de">Säurenebel</text>
+      <text locale="en">Acid Rain</text>
+    </string>
+    <string name="aura_of_fear">
+      <text locale="de">Furchteinflößende Aura</text>
+      <text locale="en">Panic</text>
+    </string>
+    <string name="meteor_rain">
+      <text locale="de">Meteorregen</text>
+      <text locale="en">Meteor Shower</text>
+    </string>
+    <string name="shadowcall">
+      <text locale="de">Schattenruf</text>
+      <text locale="en">Shadow Call</text>
+    </string>
+    <string name="regeneration">
+      <text locale="de">Regeneration</text>
+      <text locale="en">Regeneration</text>
+    </string>
+    <string name="raise_mob">
+      <text locale="de">Mob aufwiegeln</text>
+      <text locale="en">Mob Rule</text>
+    </string>
+    <string name="calm_riot">
+      <text locale="de">Aufruhr beschwichtigen</text>
+      <text locale="en">Calm Riot</text>
+    </string>
+    <string name="incite_riot">
+      <text locale="de">Aufruhr verursachen</text>
+      <text locale="en">Riot</text>
+    </string>
+    <string name="view_reality">
+      <text locale="de">Blick in die Realität</text>
+      <text locale="en">Gaze Upon Reality</text>
+    </string>
+    <string name="astral_disruption">
+      <text locale="de">Störe Astrale Integrität</text>
+      <text locale="en">Astral Disruption</text>
+    </string>
+    <string name="icy_dragonbreath">
+      <text locale="de">Eisiger Drachenodem</text>
+      <text locale="en">Icy Dragonbreath</text>
+    </string>
+    <string name="fiery_dragonbreath">
+      <text locale="de">Eisiger Drachenodem</text>
+      <text locale="en">Icy Dragonbreath</text>
+    </string>
+    <string name="create_runesword">
+      <text locale="de">Erschaffe ein Runenschwert</text>
+      <text locale="en">Create A Runesword</text>
+    </string>
+    <string name="create_bagofholding">
+      <text locale="de">Erschaffe einen Beutel des Negativen Gewichts</text>
+      <text locale="en">Create A Bag Of Holding</text>
+    </string>
+    <string name="create_focus">
+      <text locale="de">Erschaffe einen Aurafocus</text>
+      <text locale="en">Create An Aurafocus</text>
+    </string>
+    <string name="create_antimagic">
+      <text locale="de">Erschaffe Antimagiekristall</text>
+      <text locale="en">Create An Antimagic Crystal</text>
+    </string>
+    <string name="antimagiczone">
+      <text locale="de">Astrale Schwächezone</text>
+      <text locale="en">Antimagic</text>
+    </string>
+    <string name="leaveastral">
+      <text locale="de">Astraler Ausgang</text>
+      <text locale="en">Astral Exit</text>
+    </string>
+    <string name="enterastral">
+      <text locale="de">Astraler Weg</text>
+      <text locale="en">Astral Path</text>
+    </string>
     <string name="keeploot">
       <text locale="de">Beute Bewahren</text>
       <text locale="en">Save Spoils</text>
@@ -3912,6 +4148,18 @@
       <text locale="de">Hagel</text>
       <text locale="en">Hail</text>
     </string>
+    <string name="clone">
+      <text locale="de">Seelenkopie</text>
+      <text locale="en">Doppelganger</text>
+    </string>
+    <string name="wisps">
+      <text locale="de">Irrlichter</text>
+      <text locale="en">Wisps</text>
+    </string>
+    <string name="bad_dreams">
+      <text locale="de">Schlechte Träume</text>
+      <text locale="en">Bad Dreams</text>
+    </string>
     <string name="ironkeeper">
       <text locale="de">Bergwächter</text>
       <text locale="en">Mountain Guardian</text>
@@ -3919,6 +4167,18 @@
     <string name="magicstreet">
       <text locale="de">Magischer Pfad</text>
       <text locale="en">Magic Path</text>
+    </string>
+    <string name="great_drought">
+      <text locale="de">Tor in die Ebene der Hitze</text>
+      <text locale="en">Great Drought</text>
+    </string>
+    <string name="magic_roots">
+      <text locale="de">Wurzeln der Magie</text>
+      <text locale="en">Roots Of Magic</text>
+    </string>
+    <string name="maelstrom">
+      <text locale="de">Mahlstrom</text>
+      <text locale="en">Maelstrom</text>
     </string>
     <string name="windshield">
       <text locale="de">Windschild</text>
@@ -3990,6 +4250,14 @@
     <string name="gwyrrddestroymagic">
       <text locale="de">Geister bannen</text>
       <text locale="en">Banish Spirits</text>
+    </string>
+    <string name="cerddor_destroymagic">
+      <text locale="de">Lebenslied festigen</text>
+      <text locale="en">Silence Dissonance</text>
+    </string>
+    <string name="migration">
+      <text locale="de">Ritual der Aufnahme</text>
+      <text locale="en">Rit of Acceptance</text>
     </string>
     <string name="treewalkenter">
       <text locale="de">Weg der Bäume</text>
@@ -4796,6 +5064,18 @@
         Ring of Invisibility. Anyway, units concealed by
         the use of their stealth skill will remain
         undiscovered.
+      </text>
+    </string>
+    <string name="create_antimagic">
+      <text locale="de">Mit Hilfe dieses Zauber entzieht der Magier einem
+      Quarzkristall all seine magischen Energien. Der Kristall wird dann, wenn
+      er zu feinem Staub zermahlen und verteilt wird, die beim Zaubern
+      freigesetzten magischen Energien aufsaugen und alle Zauber, welche in der
+      betreffenden Woche in der Region gezaubert werden fehlschlagen lassen.
+      </text>
+      <text locale="en">This spell creates a portable crystal of antimagic
+      which can be used by anybody to reduce or even eliminate the power of all
+      spells cast in the region during the same week.
       </text>
     </string>
     <string name="create_roqf">
@@ -6425,6 +6705,8 @@
   </string>
 
 </strings>
+
+
 
 
 

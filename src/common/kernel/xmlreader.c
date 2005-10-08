@@ -1134,6 +1134,9 @@ parse_spells(xmlDocPtr doc)
   xmlXPathFreeObject(spells);
 
   xmlXPathFreeContext(xpath);
+
+  init_spells();
+
   return 0;
 }
 
@@ -1319,10 +1322,22 @@ parse_races(xmlDocPtr doc)
     /* reading eressea/races/race/precombatspell */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "precombatspell", xpath);
-    assert(rc->precombatspell==SPL_NOSPELL || !"precombatspell is already initialized");
+    assert(rc->precombatspell==NULL || !"precombatspell is already initialized");
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
-      rc->precombatspell = (spellid_t)xml_ivalue(node, "spell", SPL_NOSPELL);
+      xmlChar * property = xmlGetProp(node, BAD_CAST "spell");
+      if (property!=NULL) {
+        const spell * sp = find_spell(M_NONE, (const char *)property);
+        if (sp==NULL) {
+          int i = atoi((const char *)property);
+          if (i>0) {
+            sp = find_spellbyid((spellid_t)i);
+          }
+        }
+        assert(sp);
+        rc->precombatspell = sp;
+        xmlFree(property);
+      }
     }
     xmlXPathFreeObject(result);
 

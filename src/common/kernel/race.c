@@ -97,7 +97,7 @@ rc_new(const char * zName)
   rc->_name[2] = strdup(zBuffer);
   sprintf(zBuffer, "%s_x", zName);
   rc->_name[3] = strdup(zBuffer);
-  rc->precombatspell = SPL_NOSPELL;
+  rc->precombatspell = NULL;
   return rc;
 }
 
