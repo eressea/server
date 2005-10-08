@@ -1587,12 +1587,11 @@ do_combatspell(troop at, int row)
 static void
 do_extra_spell(troop at, const att *a)
 {
-	spell *sp;
+	const spell *sp = a->data.sp;
 	fighter *fi = at.fighter;
 	unit *au = fi->unit;
 	int power;
 
-	sp = find_spellbyid((spellid_t)(a->data.iparam));
 	/* nur bei Monstern können mehrere 'Magier' in einer Einheit sein */
 	power = sp->level * au->number;
 	((cspell_f)sp->sp_function)(fi, sp->level, power, sp);

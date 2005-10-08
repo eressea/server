@@ -64,6 +64,24 @@ xml_readtext(xmlNodePtr node, struct locale ** lang, xmlChar **text)
   *text = xmlNodeListGetString(node->doc, node->children, 1);
 }
 
+static const spell *
+xml_spell(xmlNode * node, const char * name)
+{
+  const spell * sp = NULL;
+  xmlChar * property = xmlGetProp(node, BAD_CAST name);
+  if (property!=NULL) {
+    int i = atoi((const char *)property);
+    if (i>0) {
+      sp = find_spellbyid((spellid_t)i);
+    }
+    if (sp==NULL) {
+      sp = find_spell(M_NONE, (const char *)property);
+    }
+    assert(sp);
+    xmlFree(property);
+  }
+  return sp;
+}
 
 static const char *
 xml_to_locale(const xmlChar * xmlStr)
@@ -1325,20 +1343,7 @@ parse_races(xmlDocPtr doc)
     assert(rc->precombatspell==NULL || !"precombatspell is already initialized");
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
-      xmlChar * property = xmlGetProp(node, BAD_CAST "spell");
-      if (property!=NULL) {
-        const spell * sp = NULL;
-        int i = atoi((const char *)property);
-        if (i>0) {
-          sp = find_spellbyid((spellid_t)i);
-        }
-        if (sp==NULL) {
-          sp = find_spell(M_NONE, (const char *)property);
-        }
-        assert(sp);
-        rc->precombatspell = sp;
-        xmlFree(property);
-      }
+      rc->precombatspell = xml_spell(node, "spell");
     }
     xmlXPathFreeObject(result);
 
@@ -1354,7 +1359,7 @@ parse_races(xmlDocPtr doc)
         a->data.dice = strdup((const char*)property);
         xmlFree(property);
       } else {
-        a->data.iparam = xml_ivalue(node, "spell", 0);
+        a->data.sp = xml_spell(node, "spell");
       }
       a->type = xml_ivalue(node, "type", 0);
       a->flags = xml_ivalue(node, "flags", 0);

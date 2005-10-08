@@ -45,7 +45,7 @@ typedef struct att {
 	int type;
 	union {
 		const char * dice;
-		int iparam;
+		const spell * sp;
 	} data;
 	int flags;
 } att;
