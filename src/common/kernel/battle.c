@@ -1403,7 +1403,7 @@ fighters(battle *b, fighter *af, int minrow, int maxrow, int mask)
 }
 
 static void
-report_failed_spell(battle * b, unit * mage, spell * sp)
+report_failed_spell(battle * b, unit * mage, const spell * sp)
 {
   message * m = msg_message("battle::spell_failed", "unit spell", mage, sp);
   message_all(b, m);
@@ -1414,7 +1414,6 @@ void
 do_combatmagic(battle *b, combatmagic_t was)
 {
 	void **fi;
-	spell *sp;
 	region *r = b->region;
 	castorder *co;
 	castorder *cll[MAX_SPELLRANK];
@@ -1435,6 +1434,7 @@ do_combatmagic(battle *b, combatmagic_t was)
 		level = eff_skill(mage, SK_MAGIC, r);
 		if (level > 0) {
       double power;
+      const spell *sp;
 			const struct locale * lang = mage->faction->locale;
 			char cmd[128];
       order * ord;
@@ -1489,7 +1489,7 @@ do_combatmagic(battle *b, combatmagic_t was)
 	for (spellrank = 0; spellrank < MAX_SPELLRANK; spellrank++) {
 		for (co = cll[spellrank]; co; co = co->next) {
 			fighter * fig = (fighter*)co->magician;
-			spell * sp = co->sp;
+			const spell * sp = co->sp;
 			int level = co->level;
 			double power = co->force;
 
@@ -1508,7 +1508,7 @@ do_combatmagic(battle *b, combatmagic_t was)
 static void
 do_combatspell(troop at, int row)
 {
-  spell *sp;
+  const spell *sp;
   fighter *fi = at.fighter;
   unit *mage = fi->unit;
   battle *b = fi->side->battle;

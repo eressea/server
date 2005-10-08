@@ -127,7 +127,7 @@ typedef struct castorder {
   void *magician;        /* Magier (kann vom Typ struct unit oder fighter sein) */
   struct unit *familiar; /* Vertrauter, gesetzt, wenn der Spruch durch
                          den Vertrauten gezaubert wird */
-  struct spell *sp;      /* Spruch */
+  const struct spell *sp; /* Spruch */
   int level;             /* gewünschte Stufe oder Stufe des Magiers */
   double force;          /* Stärke des Zaubers */
   struct region *rt;     /* Zielregion des Spruchs */
@@ -141,7 +141,7 @@ typedef void (*spell_f) (void*);
 /* normale zauber: */
 typedef int (*nspell_f)(castorder*);
 /* kampfzauber: */
-typedef int (*cspell_f) (struct fighter*, int, double, struct spell * sp);
+typedef int (*cspell_f) (struct fighter*, int, double, const struct spell * sp);
 /* zauber-patzer: */
 typedef void (*pspell_f) (castorder *);
 
@@ -306,13 +306,13 @@ int change_maxspellpoints(struct unit * u, int csp);
    /* verändert die maximalen Magiepunkte einer Einheit */
 
 /* Zaubern */
-extern double spellpower(struct region *r, struct unit *u, spell *spruch, int cast_level, struct order * ord);
+extern double spellpower(struct region *r, struct unit *u, const spell *sp, int cast_level, struct order * ord);
 	/*	ermittelt die Stärke eines Spruchs */
-boolean fumble (struct region *r, struct unit *u, spell *spruch, int cast_level);
+boolean fumble (struct region *r, struct unit *u, const spell *sp, int cast_level);
 	/*	true, wenn der Zauber misslingt, bei false gelingt der Zauber */
 
 /* */
-castorder *new_castorder(void *u, struct unit *familiar, spell *sp, struct region *r,
+castorder *new_castorder(void *u, struct unit *familiar, const spell *sp, struct region *r,
 		int lev, double force, int distance, struct order * ord, spellparameter *p);
 	/* Zwischenspreicher für Zauberbefehle, notwendig für Prioritäten */
 void add_castorder(castorder **cll, castorder *co);
@@ -324,18 +324,18 @@ void free_castorders(castorder *co);
 int countspells(struct unit *u, int step);
 	/*	erhöht den Counter für Zaubersprüche um 'step' und gibt die neue
 	 *	Anzahl der gezauberten Sprüche zurück. */
-int spellcost(struct unit *u, spell *spruch);
+int spellcost(struct unit *u, const spell *sp);
 	/*	gibt die für diesen Spruch derzeit notwendigen Magiepunkte auf der
 	 *	geringstmöglichen Stufe zurück, schon um den Faktor der bereits
 	 *	zuvor gezauberten Sprüche erhöht */
-boolean cancast (struct unit *u, spell *spruch, int eff_stufe, int distance, struct order * ord);
+boolean cancast (struct unit *u, const spell *spruch, int eff_stufe, int distance, struct order * ord);
 	/*	true, wenn Einheit alle Komponenten des Zaubers (incl. MP) für die
 	 *	geringstmögliche Stufe hat und den Spruch beherrscht */
-void pay_spell(struct unit *u, spell *spruch, int eff_stufe, int distance);
+void pay_spell(struct unit *u, const spell *sp, int eff_stufe, int distance);
 	/*	zieht die Komponenten des Zaubers aus dem Inventory der Einheit
 	 *	ab. Die effektive Stufe des gezauberten Spruchs ist wichtig für
 	 *	die korrekte Bestimmung der Magiepunktkosten */
-int eff_spelllevel(struct unit *u, spell * sp, int cast_level, int distance);
+int eff_spelllevel(struct unit *u, const spell * sp, int cast_level, int distance);
 	/*	ermittelt die effektive Stufe des Zaubers. Dabei ist cast_level
 	 *	die gewünschte maximale Stufe (im Normalfall Stufe des Magiers,
 	 *	bei Farcasting Stufe*2^Entfernung) */

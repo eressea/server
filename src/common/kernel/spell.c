@@ -4248,7 +4248,7 @@ sp_migranten(castorder *co)
   unit *mage = (unit *)co->magician;
   int cast_level = co->level;
   spellparameter *pa = co->par;
-  spell *sp = co->sp;
+  const spell *sp = co->sp;
 
   /* wenn kein Ziel gefunden, Zauber abbrechen */
   if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -4553,7 +4553,7 @@ sp_pump(castorder *co)
 	unit *mage = (unit *)co->magician;
 	spellparameter *pa = co->par;
 	int cast_level = co->level;
-	spell *sp = co->sp;
+	const spell *sp = co->sp;
 
 	/* wenn kein Ziel gefunden, Zauber abbrechen */
 	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -4623,7 +4623,7 @@ sp_seduce(castorder *co)
 	unit *mage = (unit *)co->magician;
 	spellparameter *pa = co->par;
 	int cast_level = co->level;
-	spell *sp = co->sp;
+	const spell *sp = co->sp;
 	double force = co->force;
 
 	/* wenn kein Ziel gefunden, Zauber abbrechen */
@@ -4706,7 +4706,7 @@ sp_calm_monster(castorder *co)
 	spellparameter *pa = co->par;
 	int cast_level = co->level;
 	double force = co->force;
-	spell *sp = co->sp;
+	const spell *sp = co->sp;
   variant effect;
 
 	/* wenn kein Ziel gefunden, Zauber abbrechen */
@@ -5700,7 +5700,7 @@ sp_enterastral(castorder *co)
 	int cast_level = co->level;
 	double power = co->force;
 	spellparameter *pa = co->par;
-	spell *sp = co->sp;
+	const spell *sp = co->sp;
 
 	switch(getplaneid(r)) {
 	case 0:
@@ -5815,7 +5815,7 @@ sp_pullastral(castorder *co)
   int cast_level = co->level;
   double power = co->force;
   spellparameter *pa = co->par;
-  spell *sp = co->sp;
+  const spell *sp = co->sp;
 
   switch (getplaneid(r)) {
     case 1:
@@ -6483,7 +6483,7 @@ sp_permtransfer(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	spellparameter *pa = co->par;
-	spell *sp = co->sp;
+	const spell *sp = co->sp;
 
 	/* wenn kein Ziel gefunden, Zauber abbrechen */
 	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -6533,7 +6533,7 @@ sp_movecastle(castorder *co)
 	unit *mage = (unit *)co->magician;
 	int cast_level = co->level;
 	spellparameter *pa = co->par;
-	spell *sp = co->sp;
+	const spell *sp = co->sp;
 
 	/* wenn kein Ziel gefunden, Zauber abbrechen */
 	if(pa->param[0]->flag == TARGET_NOTFOUND) return 0;
@@ -7492,13 +7492,10 @@ spell_list * spells = NULL;
 void
 register_spell(spell * sp)
 {
-  spell_list * slist = malloc(sizeof(spell_list));
-  slist->next = spells;
-  slist->data = sp;
   if (sp->id==0) {
     sp->id = hashstring(sp->sname);
   }
-  spells = slist;
+  spelllist_add(&spells, sp);
 }
 
 /** versucht einen Spruch über gebiet + bame zu identifizieren.

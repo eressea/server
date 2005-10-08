@@ -717,12 +717,10 @@ countspells(unit *u, int step)
  * Parameter count ist dabei die Anzahl der bereits gezauberten Sprüche
  */
 int
-spellcost(unit *u, spell * sp)
+spellcost(unit *u, const spell * sp)
 {
 	int k, aura = 0;
-	int count;
-
-	count = countspells(u,0);
+	int count = countspells(u, 0);
 
 	for (k = 0; k < MAXINGREDIENT; k++) {
 		if (sp->komponenten[k][0] == R_AURA) {
@@ -741,7 +739,7 @@ spellcost(unit *u, spell * sp)
  * niedrigstwertigen und sollte von den beiden anderen Typen
  * überschrieben werden */
 static int
-spl_costtyp(spell * sp)
+spl_costtyp(const spell * sp)
 {
 	int k;
 	int costtyp = SPC_FIX;
@@ -769,7 +767,7 @@ spl_costtyp(spell * sp)
  * generiert werden.
  * */
 int
-eff_spelllevel(unit *u, spell * sp, int cast_level, int range)
+eff_spelllevel(unit *u, const spell * sp, int cast_level, int range)
 {
 	int k;
 	int maxlevel;
@@ -824,7 +822,7 @@ eff_spelllevel(unit *u, spell * sp, int cast_level, int range)
  * multipliziert.
  */
 void
-pay_spell(unit * u, spell * sp, int cast_level, int range)
+pay_spell(unit * u, const spell * sp, int cast_level, int range)
 {
 	int k;
 	int resuse;
@@ -891,7 +889,7 @@ knowsspell(const region * r, const unit * u, const spell * sp)
  */
 
 boolean
-cancast(unit * u, spell * sp, int level, int range, struct order * ord)
+cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
 {
 	int k;
 	resource_t res;
@@ -968,7 +966,7 @@ cancast(unit * u, spell * sp, int level, int range, struct order * ord)
  */
 
 double
-spellpower(region * r, unit * u, spell * sp, int cast_level, struct order * ord)
+spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order * ord)
 {
   curse * c;
   double force = cast_level;
@@ -1202,7 +1200,7 @@ is_magic_resistant(unit *magician, unit *target, int resist_bonus)
  */
 
 boolean
-fumble(region * r, unit * u, spell * sp, int cast_grade)
+fumble(region * r, unit * u, const spell * sp, int cast_grade)
 {
 /* X ergibt Zahl zwischen 1 und 0, je kleiner, desto besser der Magier.
  * 0,5*40-20=0, dh wenn der Magier doppelt so gut ist, wie der Spruch
@@ -1261,7 +1259,7 @@ do_fumble(castorder *co)
   curse * c;
   region * r = co->rt;
   unit * u = (unit*)co->magician;
-  spell * sp = co->sp;
+  const spell *sp = co->sp;
   int level = co->level;
   int duration;
   variant effect;
@@ -1523,7 +1521,7 @@ static int
 verify_targets(castorder *co)
 {
 	unit *mage = (unit *)co->magician;
-	spell *sp = co->sp;
+	const spell *sp = co->sp;
 	region *target_r = co->rt;
 	spellparameter *sa = co->par;
 	int failed = 0;
@@ -1969,7 +1967,7 @@ add_spellparameter(region *target_r, unit *u, const char *syntax, char ** param,
 /* ------------------------------------------------------------- */
 
 castorder *
-new_castorder(void *u, unit *u2, spell *sp, region *r, int lev,
+new_castorder(void *u, unit *u2, const spell *sp, region *r, int lev,
 		double force, int range, struct order * ord, spellparameter *p)
 {
 	castorder *corder;
@@ -2646,7 +2644,7 @@ magic(void)
       int verify, cast_level = co->level;
       boolean fumbled = false;
       unit * u = (unit *)co->magician;
-      spell * sp = co->sp;
+      const spell *sp = co->sp;
       region * target_r = co->rt;
 
       /* reichen die Komponenten nicht, wird der Level reduziert. */
@@ -2746,7 +2744,7 @@ magic(void)
 }
 
 const char *
-spell_info(const struct spell * sp, const struct locale * lang)
+spell_info(const spell * sp, const struct locale * lang)
 {
 	if (sp->info==NULL) {
 		return LOC(lang, mkname("spellinfo", sp->sname));
@@ -2755,7 +2753,7 @@ spell_info(const struct spell * sp, const struct locale * lang)
 }
 
 const char *
-spell_name(const struct spell * sp, const struct locale * lang)
+spell_name(const spell * sp, const struct locale * lang)
 {
 	if (sp->info==NULL) {
 		return LOC(lang, mkname("spell", sp->sname));
@@ -2766,7 +2764,20 @@ spell_name(const struct spell * sp, const struct locale * lang)
 void
 spelllist_add(spell_list ** lspells, spell * sp)
 {
-  spell_list * entry = malloc(sizeof(spell_list));
+  spell_list * entry;
+
+  while (*lspells) {
+    spell_list * slist = *lspells;
+    if (slist->data->id==sp->id) {
+      if (slist->data==sp) {
+        log_error(("trying to add spell '%s' to a list twice.\n", sp->sname));
+        return;
+      }
+    }
+    if (slist->data->id>sp->id) break;
+    lspells = &slist->next;
+  }
+  entry = malloc(sizeof(spell_list));
   entry->data = sp;
   entry->next = *lspells;
   *lspells = entry;
