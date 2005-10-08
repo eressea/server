@@ -7601,6 +7601,8 @@ find_spellbyid(spellid_t id)
     const char * name;
     magic_t mtype;
   } * oldspell, oldspells[] = {
+    { LUASPL_CREATE_TACTICCRYSTAL, "create_dreameye", M_TRAUM }, 
+    { LUASPL_CREATE_ANTIMAGICCRYSTAL, "create_antimagic", M_ASTRAL }, 
     { LUASPL_ARTEFAKT_NIMBLEFINGERRING, "create_roqf", M_BARDE }, 
     { LUASPL_ARTEFAKT_SACK_OF_CONSERVATION, "create_magicherbbag", M_DRUIDE }, 
     { LUASPL_FIRESWORD, "create_firesword", M_CHAOS }, 
