@@ -287,6 +287,7 @@ extern "C" {
   extern struct spell_list * spells;
   extern void init_spells(void);
   extern void register_spell(struct spell * sp);
+  struct spell * find_spell(magic_t mtype, const char * name);
 
 #ifdef __cplusplus
 }

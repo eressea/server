@@ -340,8 +340,6 @@ oldfamiliars(unit * familiar)
 			/* Magie+1, Spionage, Tarnung, Wahrnehmung, Ausdauer */
 			m = create_mage(familiar, M_GRAU);
 			set_level(familiar, SK_MAGIC, 1);
-			m->combatspell[0] = SPL_FLEE;
-			m->combatspell[1] = SPL_SLEEP;
 			break;
 		case RC_NYMPH:
 			/* Alc, Arm, Bog+2, Han-2, Kräu+4, Mag+1, Pfer+5, Rei+5,
@@ -357,7 +355,6 @@ oldfamiliars(unit * familiar)
 			set_level(familiar, SK_ENTERTAINMENT, 1);
 			set_level(familiar, SK_OBSERVATION, 1);
 			m = create_mage(familiar, M_GRAU);
-			m->combatspell[0] = SPL_SONG_OF_CONFUSION;
 			break;
 		case RC_UNICORN:
 			/* Mag+2, Spi, Tak, Tar+4, Wahr+4, Aus */
@@ -424,7 +421,7 @@ oldfamiliars(unit * familiar)
   if (m!=NULL) {
     spell_list * fspells = familiarspells(familiar->race);
     while (fspells!=NULL) {
-      add_spell(m, fspells->data->id);
+      add_spell(m, fspells->data);
       fspells=fspells->next;
     }
   }
@@ -631,46 +628,46 @@ init_familiarspells(void)
   familiar_spells * fspells;
 
   fspells = mkspells(new_race[RC_PSEUDODRAGON]);
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_FLEE));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_SLEEP));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_FRIGHTEN));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_FLEE));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_SLEEP));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_FRIGHTEN));
 
   fspells = mkspells(new_race[RC_NYMPH]);
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_SEDUCE));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_SONG_OF_CONFUSION));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_SEDUCE));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_SONG_OF_CONFUSION));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
 
   fspells = mkspells(new_race[RC_NYMPH]);
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_SEDUCE));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_SONG_OF_CONFUSION));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_SEDUCE));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_SONG_OF_CONFUSION));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
   
   fspells = mkspells(new_race[RC_UNICORN]);
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_RESISTMAGICBONUS));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_SONG_OF_PEACE));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_HERO));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_HEALINGSONG));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_RESISTMAGICBONUS));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_SONG_OF_PEACE));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_HERO));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_HEALINGSONG));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
 
   fspells = mkspells(new_race[RC_WRAITH]);
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_STEALAURA));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_FRIGHTEN));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_SUMMONUNDEAD));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_STEALAURA));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_FRIGHTEN));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_SUMMONUNDEAD));
 
   fspells = mkspells(new_race[RC_IMP]);
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_STEALAURA));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_STEALAURA));
 
   fspells = mkspells(new_race[RC_DREAMCAT]);
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_ILL_SHAPESHIFT));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_TRANSFERAURA_TRAUM));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_ILL_SHAPESHIFT));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_TRANSFERAURA_TRAUM));
 
   fspells = mkspells(new_race[RC_FEY]);
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
-  add_spelllist(&fspells->spells, find_spellbyid(SPL_SEDUCE));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
+  spelllist_add(&fspells->spells, find_spellbyid(SPL_SEDUCE));
 }
 
 void 

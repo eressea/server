@@ -160,6 +160,7 @@ struct building_type;
 #define CLAIM_VERSION 318
 #define BACTION_VERSION 319 /* building action gets a param string */
 #define NOLASTORDER_VERSION 320 /* do not use lastorder */
+#define SPELLNAME_VERSION 321 /* reference spells by name */
 
 #define MIN_VERSION CURSETYPE_VERSION
 #define REGIONOWNERS_VERSION 400
@@ -170,7 +171,7 @@ struct building_type;
 #elif defined(LASTORDER)
 # define RELEASE_VERSION BACTION_VERSION
 #else
-# define RELEASE_VERSION NOLASTORDER_VERSION
+# define RELEASE_VERSION SPELLNAME_VERSION
 #endif
 
 #if RESOURCE_CONVERSION

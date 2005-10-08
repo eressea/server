@@ -40,16 +40,16 @@ using namespace luabind;
 
 class bind_spell_ptr {
 public:
-  static spell_ptr * next(spell_ptr * node) { return node->next; }
-  static spell * value(spell_ptr * node) { return find_spellbyid(node->spellid); }
+  static spell_list * next(spell_list * node) { return node->next; }
+  static spell * value(spell_list * node) { return node->data; }
 };
 
-static eressea::list<spell *, spell_ptr *, bind_spell_ptr>
+static eressea::list<spell *, spell_list *, bind_spell_ptr>
 unit_spells(const unit& u) {
   sc_mage * mage = get_mage(&u);
-  if (mage==NULL) return eressea::list<spell *, spell_ptr *, bind_spell_ptr>(NULL);
-  spell_ptr * splist = mage->spellptr;
-  return eressea::list<spell *, spell_ptr *, bind_spell_ptr>(splist);
+  if (mage==NULL) return eressea::list<spell *, spell_list *, bind_spell_ptr>(NULL);
+  spell_list * splist = mage->spells;
+  return eressea::list<spell *, spell_list *, bind_spell_ptr>(splist);
 }
 
 class bind_spell_list {
@@ -218,7 +218,7 @@ unit_addspell(unit& u, const char * name)
     if (strcmp(name, sp->sname)==0) {
       struct sc_mage * mage = get_mage(&u);
       if (add) log_error(("two spells are called %s.\n", name));
-      add_spell(mage, sp->id);
+      add_spell(mage, sp);
       add = true;
     }
     slist=slist->next;
@@ -237,12 +237,12 @@ unit_removespell(unit& u, const spell * sp)
 {
   sc_mage * mage = get_mage(&u);
   if (mage!=NULL) {
-    spell_ptr ** isptr = &mage->spellptr;
-    while (*isptr && (*isptr)->spellid != sp->id) {
+    spell_list ** isptr = &mage->spells;
+    while (*isptr && (*isptr)->data != sp) {
       isptr = &(*isptr)->next;
     }
     if (*isptr) {
-      spell_ptr * sptr = *isptr;
+      spell_list * sptr = *isptr;
       *isptr = sptr->next;
       free(sptr);
     }

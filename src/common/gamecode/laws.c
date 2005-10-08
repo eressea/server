@@ -2498,10 +2498,10 @@ reshow(unit * u, struct order * ord, const char * s, param_t p)
         }
       }
       /* try for a spell */
-      sp = find_spellbyname(u, s, u->faction->locale);
+      sp = get_spellfromtoken(u, s, u->faction->locale);
       if (sp!=NULL && has_spell(u, sp)) {
         attrib *a = a_find(u->faction->attribs, &at_seenspell);
-        while (a!=NULL && a->data.i!=sp->id) a = a->nexttype;
+        while (a!=NULL && a->data.i!=(int)sp->id) a = a->nexttype;
         if (a!=NULL) a_remove(&u->faction->attribs, a);
         break;
       }
@@ -2682,7 +2682,7 @@ combatspell_cmd(unit * u, struct order * ord)
     s = getstrtoken();
   }
 
-  spell = find_spellbyname(u, s, u->faction->locale);
+  spell = get_spellfromtoken(u, s, u->faction->locale);
 
   if(!spell){
     cmistake(u, ord, 173, MSG_MAGIC);

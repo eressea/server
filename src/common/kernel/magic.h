@@ -105,19 +105,18 @@ extern const char *magietypen[MAXMAGIETYP];
  * - Spruchliste
  */
 
-typedef struct spell_ptr {
-  struct spell_ptr *next;
-  spellid_t spellid;
-} spell_ptr;
+typedef struct combatspell {
+  int level;
+  const struct spell * sp;
+} combatspell;
 
 typedef struct sc_mage {
   magic_t magietyp;
   int spellpoints;
   int spchange;
   int spellcount;
-  spellid_t combatspell[MAXCOMBATSPELLS];
-  int combatspelllevel[MAXCOMBATSPELLS];
-  struct spell_ptr *spellptr;
+  combatspell combatspells[MAXCOMBATSPELLS];
+  struct spell_list * spells;
 } sc_mage;
 
 /* ------------------------------------------------------------- */
@@ -166,7 +165,8 @@ typedef struct spell_list {
   spell * data;
 } spell_list;
 
-extern void add_spelllist(spell_list ** lspells, spell * sp);
+extern void spelllist_add(spell_list ** lspells, struct spell * sp);
+extern spell_list ** spelllist_find(spell_list ** lspells, const struct spell * sp);
 /* ------------------------------------------------------------- */
 
 /* besondere Spruchtypen */
@@ -262,22 +262,22 @@ boolean is_familiar(const struct unit *u);
 	/*	gibt true, wenn eine Familiar-Relation besteht.  */
 
 /* Sprüche */
-spell *find_spellbyname(struct unit *u, const char *s, const struct locale * lang);
+spell *get_spellfromtoken(struct unit *u, const char *s, const struct locale * lang);
 	/*	versucht einen Spruch über den Namen zu identifizieren, gibt
 	 *	ansonsten NULL zurück */
 spell *find_spellbyid(spellid_t i);
-	/*	versucht einen Spruch über seine Id zu identifizieren, gibt
-	 *	ansonsten NULL zurück */
+/*	versucht einen Spruch über seine Id zu identifizieren, gibt
+*	ansonsten NULL zurück */
 int get_combatspelllevel(const struct unit *u, int nr);
 	/*  versucht, eine eingestellte maximale Kampfzauberstufe
 	 *  zurückzugeben. 0 = Maximum, -1 u ist kein Magier. */
-spell *get_combatspell(const struct unit *u, int nr);
+const spell *get_combatspell(const struct unit *u, int nr);
 	/*	gibt den Kampfzauber nr [pre/kampf/post] oder NULL zurück */
 void set_combatspell(struct unit *u, spell *sp, struct order * ord, int level);
 	/* 	setzt Kampfzauber */
 void unset_combatspell(struct unit *u, spell *sp);
 	/* 	löscht Kampfzauber */
-void add_spell(struct sc_mage *mage, spellid_t spellid);
+void add_spell(struct sc_mage *mage, spell *sp);
 	/* fügt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
 boolean has_spell(const struct unit *u, const struct spell * sp);
 	/* prüft, ob der Spruch in der Spruchliste der Einheit steht. */

@@ -201,7 +201,6 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   skill_t sk;
   int getarnt = fval(u, UFL_PARTEITARNUNG);
   const char *pzTmp;
-  spell *sp;
   building * b;
   boolean isbattle = (boolean)(mode == see_battle);
   int telepath_see = fspecial(f, FS_TELEPATHY);
@@ -507,16 +506,16 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
   if (show!=u->items) while (show) i_free(i_remove(&show, show));
 
   if (u->faction == f || telepath_see) {
-    dh = 0;
+    sc_mage * m = get_mage(u);
 
-    if (is_mage(u) == true) {
-      spell_ptr *spt;
+    if (m!=NULL) {
+      spell_list *slist = m->spells;
       int t = effskill(u, SK_MAGIC);
       bufp += snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region,u));
       size = sizeof(buf)-(bufp-buf);
 
-      for (spt = get_mage(u)->spellptr;spt; spt = spt->next) {
-        sp = find_spellbyid(spt->spellid);
+      for (dh=0; slist; slist=slist->next) {
+        spell * sp = slist->data;
         if (sp->level > t) continue;
         if (!dh) {
           rsize = snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_spells"));
@@ -533,18 +532,15 @@ bufunit(const faction * f, const unit * u, int indent, int mode)
         bufp += rsize;
       }
 
-      dh = 0;
-      for (i = 0; i < MAXCOMBATSPELLS; i++){
-        sp = get_combatspell(u,i);
-        if (sp) {
-          dh = 1;
-        }
+      for (i=0; i!=MAXCOMBATSPELLS; ++i) {
+        if (get_combatspell(u, i)) break;
       }
-      if (dh) {
-        dh = 0;
+      if (i!=MAXCOMBATSPELLS) {
         bufp += snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_combatspells"));
         size = sizeof(buf)-(bufp-buf);
+        dh = 0;
         for (i = 0; i < MAXCOMBATSPELLS; i++){
+          const spell *sp;
           if (!dh){
             dh = 1;
           } else {
@@ -982,32 +978,26 @@ spy_message(int spy, unit *u, unit *target)
 		/* Zauberwirkungen */
 	}
 	if (spy > 20){
+    sc_mage * m = get_mage(target);
 		/* bei Magiern Zaubersprüche und Magiegebiet */
-		if (is_mage(target)){
-			spell_ptr *spt;
-			spell *sp;
-			int first = 1;
-			int found = 0;
+		if (m) {
+			spell_list *slist = m->spells;
+			boolean first = true;
 
 			scat("Magiegebiet: ");
 			scat(LOC(u->faction->locale, magietypen[find_magetype(target)]));
-			if (get_mage(target)) {
-				scat(", Sprüche: ");
+			scat(", Sprüche: ");
 
-				for (spt = get_mage(target)->spellptr;spt; spt = spt->next){
-					sp = find_spellbyid(spt->spellid);
-					found++;
-					if (first == 1){
-						first = 0;
-					} else {
-						scat(", ");
-					}
-					scat(spell_name(sp, u->faction->locale));
+			for (;slist; slist=slist->next) {
+				spell * sp = slist->data;
+				if (first) {
+					first = false;
+				} else {
+					scat(", ");
 				}
-				if (found == 0) {
-					scat("Keine");
-				}
+				scat(spell_name(sp, u->faction->locale));
 			}
+			if (first) scat("Keine");
 			scat(". ");
 		}
 	}

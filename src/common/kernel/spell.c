@@ -7152,7 +7152,7 @@ sp_becomewyrm(castorder *co)
   }
 
   u->race = new_race[RC_WYRM];
-  add_spell(get_mage(u), SPL_WYRMODEM);
+  add_spell(get_mage(u), find_spellbyid(SPL_WYRMODEM));
 
   ADDMSG(&u->faction->msgs, msg_message("becomewyrm", "u", u));
 
@@ -7501,6 +7501,25 @@ register_spell(spell * sp)
   spells = slist;
 }
 
+/** versucht einen Spruch über gebiet + bame zu identifizieren.
+ * gibt ansonsten NULL zurück */
+spell * 
+find_spell(magic_t mtype, const char * name)
+{
+  spell_list * slist = spells;
+  spell * spx = NULL;
+  while (slist) {
+    spell * sp = slist->data;
+    if (strcmp(name, sp->sname)==0) {
+      if (sp->magietyp==mtype) return sp;
+      spx = sp;
+    }
+    slist = slist->next;
+  }
+  return spx;
+}
+
+
 /* ------------------------------------------------------------- */
 /* Spruch identifizieren */
 
@@ -7546,7 +7565,7 @@ get_spellnames(const struct locale * lang, magic_t mtype)
 }
 
 static spell *
-find_spellbyname_i(const char *name, const struct locale * lang, magic_t mtype)
+get_spellfromtoken_i(const char *name, const struct locale * lang, magic_t mtype)
 {
   variant token = { 0 };
   spell_names * sn;
@@ -7556,29 +7575,32 @@ find_spellbyname_i(const char *name, const struct locale * lang, magic_t mtype)
     magic_t mt;
     /* if we could not find it in the main magic type, we look through all the others */
     for (mt=0;mt!=MAXMAGIETYP;++mt) {
-      sn = get_spellnames(lang, mt);
-      if (findtoken(&sn->names, name, &token)!=E_TOK_NOMATCH) break;
+      if (mt!=mtype) {
+        sn = get_spellnames(lang, mt);
+        if (findtoken(&sn->names, name, &token)!=E_TOK_NOMATCH) break;
+      }
     }
   }
 
   if (token.v!=NULL) return (spell*)token.v;
   if (lang==default_locale) return NULL;
-  return find_spellbyname_i(name, default_locale, mtype);
+  return get_spellfromtoken_i(name, default_locale, mtype);
 }
 
 spell *
-find_spellbyname(unit *u, const char *name, const struct locale * lang)
+get_spellfromtoken(unit *u, const char *name, const struct locale * lang)
 {
   sc_mage * m = get_mage(u);
   spell * sp;
 
   if (m==NULL) return NULL;
-  sp = find_spellbyname_i(name, lang, m->magietyp);
+  sp = get_spellfromtoken_i(name, lang, m->magietyp);
   if (sp!=NULL) {
-    spell_ptr *spt;
+    spell_list * slist = m->spells;
 
-    for (spt = m->spellptr; spt; spt = spt->next) {
-      if (sp->id==spt->spellid) return sp;
+    while (slist && slist->data->id<=sp->id) {
+      if (sp==slist->data) return sp;
+      slist = slist->next;
     }
   }
   return NULL;

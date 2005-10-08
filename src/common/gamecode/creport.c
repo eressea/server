@@ -803,25 +803,22 @@ cr_output_unit(FILE * F, const region * r,
     /* spells */
     if (is_mage(u)) {
       sc_mage * mage = get_mage(u);
-      spell_ptr *spt = mage->spellptr;
-      if (spt) {
-        spell *sp;
+      spell_list * slist = mage->spells;
+      if (slist) {
         int i;
         int t = effskill(u, SK_MAGIC);
         fprintf(F, "SPRUECHE\n");
-        for (;spt; spt = spt->next) {
-          sp = find_spellbyid(spt->spellid);
-          if (sp) {
-            const char * name = sp->sname;
-            if (sp->level > t) continue;
-            if (sp->info==NULL) {
-              name = add_translation(mkname("spell", name), spell_name(sp, f->locale));
-            }
-            fprintf(F, "\"%s\"\n", name);
+        for (;slist; slist = slist->next) {
+          spell * sp = slist->data;
+          const char * name = sp->sname;
+          if (sp->level > t) continue;
+          if (sp->info==NULL) {
+            name = add_translation(mkname("spell", name), spell_name(sp, f->locale));
           }
+          fprintf(F, "\"%s\"\n", name);
         }
         for (i=0;i!=MAXCOMBATSPELLS;++i) {
-          sp = find_spellbyid(mage->combatspell[i]);
+          const spell * sp = mage->combatspells[i].sp;
           if (sp) {
             const char * name = sp->sname;
             if (sp->info==NULL) {
@@ -829,7 +826,7 @@ cr_output_unit(FILE * F, const region * r,
             }
             fprintf(F, "KAMPFZAUBER %d\n", i);
             fprintf(F, "\"%s\";name\n", name);
-            fprintf(F, "%d;level\n", mage->combatspelllevel[i]);
+            fprintf(F, "%d;level\n", mage->combatspells[i].level);
           }
         }
       }
