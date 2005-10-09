@@ -72,6 +72,13 @@
     <resource name="permaura" amount="5" cost="fixed"/>
   </spell>
 
+  <spell name="create_invisibility_sphere" type="illaun" ship="true" rank="5" level="13">
+    <function name="cast" value="luaspell"/>
+    <resource name="aura" amount="150" cost="fixed"/>
+    <resource name="money" amount="30000" cost="fixed"/>
+    <resource name="permaura" amount="3" cost="fixed"/>
+  </spell>
+
   <!-- cerddor spells -->
   <spell name="create_roi" type="cerddor" ship="true" rank="5" level="6">
     <function name="cast" value="luaspell"/>
@@ -113,6 +120,48 @@
     <function name="cast" value="luaspell"/>
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="money" amount="3000" cost="fixed"/>
+  </spell>
+
+  <spell name="create_rop" type="tybied" ship="true" rank="5" level="9">
+    <function name="cast" value="luaspell"/>
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+    <resource name="money" amount="4000" cost="fixed"/>
+  </spell>
+
+  <spell name="create_bagofholding" type="tybied" ship="true" rank="5" level="10">
+    <function name="cast" value="luaspell"/>
+    <resource name="aura" amount="30" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+    <resource name="money" amount="5000" cost="fixed"/>
+  </spell>
+
+  <!-- gray magic -->
+  <spell name="create_runesword" type="gray" ship="true" rank="5" level="6">
+    <function name="cast" value="luaspell"/>
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+    <resource name="money" amount="1000" cost="fixed"/>
+    <resource name="laensword" amount="1" cost="fixed"/>
+  </spell>
+
+  <spell name="create_chastitybelt" type="gray" ship="true" rank="5" level="7">
+    <function name="cast" value="luaspell"/>
+    <resource name="aura" amount="50" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+    <resource name="money" amount="3000" cost="fixed"/>
+  </spell>
+
+  <spell name="create_focus" type="gray" ship="true" rank="5" level="9">
+    <function name="cast" value="luaspell"/>
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
+  </spell>
+
+  <spell name="create_ror" type="gray" ship="true" rank="5" level="9">
+    <function name="cast" value="luaspell"/>
+    <resource name="aura" amount="100" cost="fixed"/>
+    <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
 </spells>

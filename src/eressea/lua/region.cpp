@@ -117,6 +117,15 @@ region_getresource(const region& r, const char * type)
 }
 
 static void
+region_setresource(const region& r, const char * type, int value)
+{
+  const resource_type * rtype = rt_find(type);
+  if (rtype==rt_find("money")) rsetmoney(&r, value);
+  if (rtype==rt_find("peasant")) return rsetpeasants(&r, value);
+  return 0;
+}
+
+static void
 region_setroad(region& r, int dir, lua_Number size)
 {
   rsetroad(&r, (direction_t)dir, (short)(terrain[rterrain(&r)].roadreq * size));
@@ -260,6 +269,7 @@ bind_region(lua_State * L)
 
     .def("next", &region_next)
     .def("get_resource", &region_getresource)
+    .def("set_resource", &region_setresource)
     .def_readonly("x", &region::x)
     .def_readonly("y", &region::y)
     .def_readwrite("age", &region::age)

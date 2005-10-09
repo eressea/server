@@ -98,33 +98,11 @@ attrib_type at_wdwpyramid = {
 
 /* ----------------------------------------------------------------------- */
 
-#ifdef TODO
-static const char *
-spellcmd(const strarray * sa, const struct locale * lang) {
-	int i;
-	char * p = buf;
-	strcpy(p, locale_string(lang, keywords[K_CAST]));
-	p += strlen(p);
-	for (i=0;i!=sa->length;++i) {
-		*p++ = ' ';
-		strcpy(p, sa->strings[i]);
-		p += strlen(p);
-	}
-	return buf;
-}
-
-static void
-report_failure(unit * mage, const strarray * sa) {
-	/* Fehler: "Der Zauber schlägt fehl" */
-	cmistake(mage, strdup(spellcmd(sa, mage->faction->locale)), 180, MSG_MAGIC);
-}
-#else
 static void
 report_failure(unit * mage, struct order * ord) {
 	/* Fehler: "Der Zauber schlägt fehl" */
 	cmistake(mage, ord, 180, MSG_MAGIC);
 }
-#endif
 
 /* ------------------------------------------------------------- */
 /* do_shock - Schockt die Einheit, z.B. bei Verlust eines	*/
@@ -6382,26 +6360,6 @@ sp_disruptastral(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:	   Erschaffe einen Beutel des Negativen Gewichts
- * Stufe:	  10
- * Gebiet:	 Tybied
- * Kategorie:      Artefakt
- * Wirkung:	Von transportierten Items werden bis zu 200 GE nicht auf
- *		 das Traggewicht angerechnet.
-*/
-int
-sp_create_bag_of_holding(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-
-	change_item(mage,I_BAG_OF_HOLDING,1);
-
-	creation_message(mage, olditemtype[I_BAG_OF_HOLDING]);
-	return cast_level;
-}
-
-/* ------------------------------------------------------------- */
 /* Name:		   Mauern der Ewigkeit
  * Stufe:		   7
  * Kategorie:  Artefakt
@@ -7228,123 +7186,6 @@ patzer(castorder *co)
 
 	report_failure(mage, co->order);
 	return;
-}
-
-/* ------------------------------------------------------------- */
-/* Sphäre der Unsichtbarkeit */
-int
-sp_createitem_invisibility2(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-	unit *familiar = (unit *)co->familiar;
-
-	if (familiar){
-		mage = familiar;
-	}
-
-	change_item(mage,I_SPHERE_OF_INVISIBILITY,1);
-	creation_message(mage, olditemtype[I_SPHERE_OF_INVISIBILITY]);
-
-	return cast_level;
-}
-
-/* ------------------------------------------------------------- */
-/* Keuschheitsgürtel der Orks */
-int
-sp_createitem_chastitybelt(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-	unit *familiar = (unit *)co->familiar;
-
-	if (familiar){
-		mage = familiar;
-	}
-
-	change_item(mage,I_CHASTITY_BELT,1);
-	creation_message(mage, olditemtype[I_CHASTITY_BELT]);
-
-	return cast_level;
-}
-/* ------------------------------------------------------------- */
-/* Ring der Macht
- * erhöht effektive Stufe +1 */
-int
-sp_createitem_power(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-	unit *familiar = (unit *)co->familiar;
-
-	if (familiar){
-		mage = familiar;
-	}
-
-	change_item(mage,I_RING_OF_POWER,1);
-	creation_message(mage, olditemtype[I_RING_OF_POWER]);
-
-	return cast_level;
-}
-/* ------------------------------------------------------------- */
-/* Runenschwert */
-int
-sp_createitem_runesword(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-	unit *familiar = (unit *)co->familiar;
-
-	if (familiar){
-		mage = familiar;
-	}
-
-	change_item(mage,I_RUNESWORD,1);
-	creation_message(mage, olditemtype[I_RUNESWORD]);
-
-	return cast_level;
-}
-/* ------------------------------------------------------------- */
-/* Artefakt der Stärke
- * Ermöglicht dem Magier mehr Magiepunkte zu 'speichern'
- */
-int
-sp_createitem_aura(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-	unit *familiar = (unit *)co->familiar;
-
-	if (familiar){
-		mage = familiar;
-	}
-
-	change_item(mage,I_AURAKULUM,1);
-	creation_message(mage, olditemtype[I_AURAKULUM]);
-
-	return cast_level;
-}
-
-/* ------------------------------------------------------------- */
-/* Artefakt der Regeneration
- * Heilt pro Runde HP
- * noch nicht implementiert
- */
-int
-sp_createitem_regeneration(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-	int cast_level = co->level;
-	unit *familiar = (unit *)co->familiar;
-
-	if (familiar){
-		mage = familiar;
-	}
-
-	change_item(mage,I_RING_OF_REGENERATION,1);
-	creation_message(mage, olditemtype[I_RING_OF_REGENERATION]);
-
-	return cast_level;
 }
 
 /* ------------------------------------------------------------- */
@@ -8767,17 +8608,6 @@ static spell spelldaten[] =
     },
     (spell_f)sp_sweetdreams, patzer
   },
-  { SPL_INVISIBILITY2_ILLAUN, "create_invisibility_sphere", NULL, NULL, NULL,
-    M_TRAUM, (ONSHIPCAST), 5, 13,
-    {
-      { R_AURA, 150, SPC_FIX },
-      { R_SILVER, 30000, SPC_FIX },
-      { R_PERMAURA, 3, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_invisibility2, patzer
-  },
   {
     SPL_SUMMON_ALP, "summon_alp", NULL, NULL, "u",
     M_TRAUM,
@@ -9728,21 +9558,6 @@ static spell spelldaten[] =
     (spell_f)sp_speed, patzer
   },
   {
-    SPL_ARTEFAKT_OF_POWER, "create_rop",
-    "Dieses mächtige Ritual erschafft einen Ring der Macht. Ein Ring "
-    "der Macht erhöht die Stärke jedes Zaubers, den sein Träger zaubert, "
-    "als wäre der Magier eine Stufe besser.", NULL, NULL,
-    M_ASTRAL, (ONSHIPCAST), 5, 9,
-    {
-      { R_AURA, 100, SPC_FIX },
-      { R_SILVER, 4000, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_power, patzer
-  },
-  {
     SPL_VIEWREALITY, "view_reality",
     "Der Magier kann mit Hilfe dieses Zaubers aus der Astral- in die "
     "materielle Ebene blicken und die Regionen und Einheiten genau "
@@ -9756,25 +9571,6 @@ static spell spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_viewreality, patzer
-  },
-  {
-    SPL_BAG_OF_HOLDING, "create_bagofholding",
-    "Dieser Beutel umschließt eine kleine Dimensionsfalte, in der bis "
-    "zu 200 Gewichtseinheiten transportiert werden können, ohne dass "
-    "sie auf das Traggewicht angerechnet werden.  Pferde und andere "
-    "Lebewesen sowie besonders sperrige Dinge (Wagen und Katapulte) können "
-    "nicht in dem Beutel transportiert werden.  Auch ist es nicht möglich, "
-    "einen Zauberbeutel in einem anderen zu transportieren.  Der Beutel "
-    "selber wiegt 1 GE.", NULL, NULL,
-    M_ASTRAL, (ONSHIPCAST), 5, 10,
-    {
-      { R_AURA, 30, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { R_SILVER, 5000, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_create_bag_of_holding, patzer
   },
   {
     SPL_SPEED2, "double_time",
@@ -9886,50 +9682,6 @@ static spell spelldaten[] =
   /* M_GRAU */
   /*  Definitionen von Create_Artefaktsprüchen    */
   {
-    SPL_ARTEFAKT_OF_AURAPOWER, "create_focus",
-    "Der auf diesem Gegenstand liegende Zauber erleichtert es dem "
-    "Zauberers enorm größere Mengen an Aura zu beherrschen.", NULL, NULL,
-    M_GRAU, (ONSHIPCAST), 5, 9,
-    {
-      { R_AURA, 100, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_aura, patzer
-  },
-  {
-    SPL_ARTEFAKT_OF_REGENERATION, "regeneration",
-    "Der auf diesem Gegenstand liegende Zauber saugt die diffusen "
-    "magischen Energien des Lebens aus der Umgebung auf und läßt sie "
-    "seinem Träger zukommen.", NULL, NULL,
-    M_GRAU, (ONSHIPCAST), 5, 9,
-    {
-      { R_AURA, 100, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_regeneration, patzer
-  },
-  {
-    SPL_ARTEFAKT_CHASTITYBELT, "create_chastitybelt",
-    "Dieses Amulett in Gestalt einer orkischen Matrone unterdrückt den "
-    "Fortpflanzungstrieb eines einzelnen Orks sehr zuverlässig. Ein Ork "
-    "mit Amulett der Keuschheit wird sich nicht mehr vermehren.", NULL, NULL,
-    M_GRAU, (ONSHIPCAST), 5, 7,
-    {
-      { R_AURA, 50, SPC_FIX },
-      { R_SILVER, 3000, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { 0, 0, 0 },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_chastitybelt, patzer
-  },
-  {
     SPL_METEORRAIN, "meteor_rain",
     "Ein Schauer von Meteoren regnet über das Schlachtfeld.", NULL, NULL,
     M_GRAU, (COMBATSPELL | SPELLLEVEL), 5, 3,
@@ -9941,25 +9693,6 @@ static spell spelldaten[] =
       { 0, 0, 0 }
     },
     (spell_f)sp_kampfzauber, patzer
-  },
-  {
-    SPL_ARTEFAKT_RUNESWORD, "create_runesword",
-    "Mit diesem Spruch erzeugt man ein Runenschwert. Die Klinge des "
-    "schwarzen "
-    "Schwertes ist mit alten, magischen Runen verziert, und ein seltsames "
-    "Eigenleben erfüllt die warme Klinge. Um es zu benutzen, muss man "
-    "ein Schwertkämpfer von beachtlichem Talent (7) sein. "
-    "Der Träger des Runenschwertes erhält einen Talentbonus von +4 im Kampf "
-    "und wird so gut wie immun gegen alle Formen von Magie.", NULL, NULL,
-    M_GRAU, (ONSHIPCAST), 5, 6,
-    {
-      { R_AURA, 100, SPC_FIX },
-      { R_PERMAURA, 1, SPC_FIX },
-      { R_SILVER, 1000, SPC_FIX },
-      { R_EOGSWORD, 1, SPC_FIX },
-      { 0, 0, 0 }
-    },
-    (spell_f)sp_createitem_runesword, patzer
   },
   {
     SPL_BECOMEWYRM, "wyrm_transformation",

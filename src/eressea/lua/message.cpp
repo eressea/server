@@ -5,6 +5,7 @@
 // kernel includes
 #include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/region.h>
 #include <kernel/unit.h>
 
 // util includes
@@ -76,6 +77,22 @@ public:
     }
 
     args[i].v = (void*)&u;
+
+    return E_OK;
+  }
+
+  int set_region(const char * param, const region& r) {
+    if (mtype==0) return E_INVALID_MESSAGE;
+
+    int i = get_param(param);
+    if (i==mtype->nparameters) {
+      return E_INVALID_PARAMETER_NAME;
+    }
+    if (strcmp(mtype->types[i]->name, "region")!=0) {
+      return E_INVALID_PARAMETER_TYPE;
+    }
+
+    args[i].v = (void*)&r;
 
     return E_OK;
   }
@@ -155,6 +172,7 @@ bind_message(lua_State * L)
       .def(tostring(self))
 
       .def("set_unit", &lua_message::set_unit)
+      .def("set_region", &lua_message::set_region)
       .def("set_resource", &lua_message::set_resource)
       .def("set_int", &lua_message::set_int)
       .def("set_string", &lua_message::set_string)

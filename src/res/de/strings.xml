@@ -3980,9 +3980,9 @@
       <text locale="de">Schattenruf</text>
       <text locale="en">Shadow Call</text>
     </string>
-    <string name="regeneration">
-      <text locale="de">Regeneration</text>
-      <text locale="en">Regeneration</text>
+    <string name="create_ror">
+      <text locale="de">Erscahffe einen Ring der Regeneration</text>
+      <text locale="en">Create A Ring Of Regeneration</text>
     </string>
     <string name="raise_mob">
       <text locale="de">Mob aufwiegeln</text>
@@ -5068,6 +5068,37 @@
         the greater is the number of spirits bound. Each
         ship needs an own spirit.
       </text>
+    </string>
+    <string name="create_runesword">
+      <text locale="de">Mit diesem Spruch erzeugt man ein Runenschwert. Die
+      Klinge des schwarzen  Schwertes ist mit alten, magischen Runen verziert,
+      und ein seltsames  Eigenleben erfüllt die warme Klinge. Um es zu benutzen,
+      muss man  ein Schwertkämpfer von beachtlichem Talent (7) sein.  Der Träger
+      des Runenschwertes erhält einen Talentbonus von +4 im Kampf und wird so
+      gut wie immun gegen alle Formen von Magie.</text>
+      <text locale="en">This spell creates a magical sword. It requires a skill
+      of at least 7, but adds +4 to the combat skill of its' owner as well as
+      making them almost immune against magical attacks.</text>
+    </string>
+    <string name="create_bagofholding">
+      <text locale="de">Dieser Beutel umschließt eine kleine Dimensionsfalte, in
+      der bis zu 200 Gewichtseinheiten transportiert werden können, ohne dass
+      sie auf das Traggewicht angerechnet werden.  Pferde und andere Lebewesen
+      sowie besonders sperrige Dinge (Wagen und Katapulte) können nicht in dem
+      Beutel transportiert werden. Auch ist es nicht möglich, einen
+      Zauberbeutel in einem anderen zu transportieren. Der Beutel selber wiegt 1
+      GE.</text>
+      <text locale="en">This bag encloses a dimensional rift in which up to 200
+      units of weight can be carries. Horses and other large objects cannot be
+      put into the bag. The bag itself has a weight of 1.</text>
+    </string>
+    <string name="create_rop">
+      <text locale="de">Dieses mächtige Ritual erschafft einen Ring der Macht.
+      Ein Ring der Macht erhöht die Stärke jedes Zaubers, den sein Träger
+      zaubert, als wäre der Magier eine Stufe besser.
+      </text>
+      <text locale="en">A ring of power adds +1 to the power of each spell cast
+      by its' wearer.</text>
     </string>
     <string name="create_aots">
       <text locale="de">Der Spruch ermöglicht es einem Magier,
@@ -6725,6 +6756,12 @@
   </string>
 
 </strings>
+
+
+
+
+
+
 
 
 
