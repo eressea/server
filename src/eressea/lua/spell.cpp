@@ -36,7 +36,18 @@ call_spell(castorder *co)
     mage = co->familiar;
   }
 
-  return luabind::call_function<int>(luaState, fname, co->rt, mage, co->level, co->force);
+  try {
+    return luabind::call_function<int>(luaState, fname, co->rt, mage, co->level, co->force);
+  }
+  catch (luabind::error& e) {
+    lua_State* L = e.state();
+    const char* error = lua_tostring(L, -1);
+    
+    log_error((error));
+    lua_pop(L, 1);
+    std::terminate();
+  }
+  return -1;
 }
 
 
