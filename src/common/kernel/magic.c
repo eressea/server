@@ -1626,7 +1626,7 @@ verify_targets(castorder *co)
 					{ /* Fehlermeldung */
 						spobj->flag = TARGET_RESISTS;
 						resists++;
-						ADD_MSG(&mage->faction->msgs, msg_message("spellregionresists",
+						ADDMSG(&mage->faction->msgs, msg_message("spellregionresists",
               "unit region command", mage, mage->region, co->order));
 						break;
 					}
@@ -2461,7 +2461,7 @@ magic(void)
             target_r = findregion(t_x, t_y);
             if (!target_r) {
               /* Fehler "Die Region konnte nicht verzaubert werden" */
-              ADD_MSG(&mage->faction->msgs, msg_message("spellregionresists",
+              ADDMSG(&mage->faction->msgs, msg_message("spellregionresists",
                 "unit region command", mage, mage->region, co->order));
               continue;
             }
