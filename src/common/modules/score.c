@@ -107,10 +107,11 @@ score(void)
 			}
 		}
 		for (u = r->units; u; u = u->next) {
-			char index;
 			item * itm;
       int itemscore = 0;
-			if (u->race == new_race[RC_SPELL] || u->race == new_race[RC_BIRTHDAYDRAGON])
+      int i;
+
+      if (u->race == new_race[RC_SPELL] || u->race == new_race[RC_BIRTHDAYDRAGON])
 				continue;
 
 			f = u->faction;
@@ -124,28 +125,25 @@ score(void)
 			}
       f->score += itemscore / 10;
 
-			for (index = 0; index != MAXSKILLS; index++) {
-				switch (index) {
-				case SK_MAGIC:
-					f->score += u->number * ((int) pow((double) eff_skill(u, index, r),
-													   (double) 4));
-					break;
-				case SK_TACTICS:
-					f->score += u->number * ((int) pow((double) eff_skill(u, index, r),
-													   (double) 3));
-					break;
-				case SK_SPY:
-				case SK_ALCHEMY:
-				case SK_HERBALISM:
-					f->score += u->number * ((int) pow((double) eff_skill(u, index, r),
-													   (double) 2.5));
-					break;
-				default:
-					f->score += u->number * ((int) pow((double) eff_skill(u, index, r),
-													   (double) 2.5)) / 10;
-					break;
-				}
-			}
+      for (i=0;i!=u->skill_size;++i) {
+        skill * sv = u->skills+i;
+        switch (sv->id) {
+        case SK_MAGIC:
+          f->score += (int)(u->number * pow(sv->level, 4));
+          break;
+        case SK_TACTICS:
+          f->score += (int)(u->number * pow(sv->level, 3));
+          break;
+        case SK_SPY:
+        case SK_ALCHEMY:
+        case SK_HERBALISM:
+          f->score += (int)(u->number * pow(sv->level, 2.5));
+          break;
+        default:
+          f->score += (int)(u->number * pow(sv->level, 2.5) / 10);
+          break;
+        }
+      }
 		}
 	}
 
