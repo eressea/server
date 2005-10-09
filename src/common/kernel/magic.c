@@ -379,12 +379,6 @@ updatespelllist(unit * u)
   magic_t gebiet = find_magetype(u);
   boolean ismonster = u->faction->no==MONSTER_FACTION;
 
-  /* Nur Orkmagier bekommen den Keuschheitsamulettzauber */
-  sp = find_spellbyid(SPL_ARTEFAKT_CHASTITYBELT);
-  if (u->race == new_race[RC_ORC] && !has_spell(u, sp) && sp->level<=sk) {
-    add_spell(mage, find_spellbyid(SPL_ARTEFAKT_CHASTITYBELT));
-  }
-
   /* Nur Wyrm-Magier bekommen den Wyrmtransformationszauber */
   sp = find_spellbyid(SPL_BECOMEWYRM);
   if (fspecial(u->faction, FS_WYRM) && !has_spell(u, sp) && sp->level<=sk) {

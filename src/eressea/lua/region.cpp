@@ -117,12 +117,11 @@ region_getresource(const region& r, const char * type)
 }
 
 static void
-region_setresource(const region& r, const char * type, int value)
+region_setresource(region& r, const char * type, int value)
 {
   const resource_type * rtype = rt_find(type);
   if (rtype==rt_find("money")) rsetmoney(&r, value);
   if (rtype==rt_find("peasant")) return rsetpeasants(&r, value);
-  return 0;
 }
 
 static void
