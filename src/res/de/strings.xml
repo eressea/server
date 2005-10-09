@@ -4140,11 +4140,11 @@
       <text locale="de">Rostregen</text>
       <text locale="en">Rain Of Rust</text>
     </string>
-    <string name="kaelteschutz">
+    <string name="cold_protection">
       <text locale="de">Firuns Fell</text>
       <text locale="en">Firun's Coat</text>
     </string>
-    <string name="hagel">
+    <string name="hail">
       <text locale="de">Hagel</text>
       <text locale="en">Hail</text>
     </string>

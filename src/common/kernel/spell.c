@@ -113,13 +113,13 @@ spellcmd(const strarray * sa, const struct locale * lang) {
 	return buf;
 }
 
-void
+static void
 report_failure(unit * mage, const strarray * sa) {
 	/* Fehler: "Der Zauber schlägt fehl" */
 	cmistake(mage, strdup(spellcmd(sa, mage->faction->locale)), 180, MSG_MAGIC);
 }
 #else
-void
+static void
 report_failure(unit * mage, struct order * ord) {
 	/* Fehler: "Der Zauber schlägt fehl" */
 	cmistake(mage, ord, 180, MSG_MAGIC);
@@ -7348,18 +7348,6 @@ sp_createitem_regeneration(castorder *co)
 }
 
 /* ------------------------------------------------------------- */
-/* Dummy-Zauberpatzer, Platzhalter für speziel auf die Sprüche
- * zugeschnittene Patzer */
-void
-patzer_createitem(castorder *co)
-{
-	unit *mage = (unit *)co->magician;
-
-	report_failure(mage, co->order);
-	return;
-}
-
-/* ------------------------------------------------------------- */
 /* Erläuterungen zu den Spruchdefinitionen
  *
  * Spruchstukturdefinition:
@@ -7727,7 +7715,7 @@ static spell spelldaten[] =
     (spell_f)sp_rosthauch, patzer
   },
   {
-    SPL_KAELTESCHUTZ, "kaelteschutz", NULL, NULL,
+    SPL_KAELTESCHUTZ, "cold_protection", NULL, NULL,
     "u+",
     M_DRUIDE,
     (UNITSPELL | SPELLLEVEL | TESTCANSEE | ONSHIPCAST),
@@ -7742,7 +7730,7 @@ static spell spelldaten[] =
     (spell_f)sp_kaelteschutz, patzer
   },
   {
-    SPL_HAGEL, "hagel", NULL, NULL, NULL,
+    SPL_HAGEL, "hail", NULL, NULL, NULL,
     M_DRUIDE, (COMBATSPELL|SPELLLEVEL), 5, 3,
     {
       { R_AURA, 1, SPC_LEVEL },
@@ -8788,7 +8776,7 @@ static spell spelldaten[] =
       { 0, 0, 0 },
       { 0, 0, 0 }
     },
-    (spell_f)sp_createitem_invisibility2, patzer_createitem
+    (spell_f)sp_createitem_invisibility2, patzer
   },
   {
     SPL_SUMMON_ALP, "summon_alp", NULL, NULL, "u",
@@ -9752,7 +9740,7 @@ static spell spelldaten[] =
       { 0, 0, 0 },
       { 0, 0, 0 }
     },
-    (spell_f)sp_createitem_power, patzer_createitem
+    (spell_f)sp_createitem_power, patzer
   },
   {
     SPL_VIEWREALITY, "view_reality",
@@ -9909,7 +9897,7 @@ static spell spelldaten[] =
       { 0, 0, 0 },
       { 0, 0, 0 }
     },
-    (spell_f)sp_createitem_aura, patzer_createitem
+    (spell_f)sp_createitem_aura, patzer
   },
   {
     SPL_ARTEFAKT_OF_REGENERATION, "regeneration",
@@ -9924,7 +9912,7 @@ static spell spelldaten[] =
       { 0, 0, 0 },
       { 0, 0, 0 }
     },
-    (spell_f)sp_createitem_regeneration, patzer_createitem
+    (spell_f)sp_createitem_regeneration, patzer
   },
   {
     SPL_ARTEFAKT_CHASTITYBELT, "create_chastitybelt",
@@ -9939,7 +9927,7 @@ static spell spelldaten[] =
       { 0, 0, 0 },
       { 0, 0, 0 }
     },
-    (spell_f)sp_createitem_chastitybelt, patzer_createitem
+    (spell_f)sp_createitem_chastitybelt, patzer
   },
   {
     SPL_METEORRAIN, "meteor_rain",
@@ -9971,7 +9959,7 @@ static spell spelldaten[] =
       { R_EOGSWORD, 1, SPC_FIX },
       { 0, 0, 0 }
     },
-    (spell_f)sp_createitem_runesword, patzer_createitem
+    (spell_f)sp_createitem_runesword, patzer
   },
   {
     SPL_BECOMEWYRM, "wyrm_transformation",
