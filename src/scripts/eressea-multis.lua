@@ -1,5 +1,5 @@
 local function kill_multis()
-  local multis = { "aLuk", "3", "rd2r", "aaa", "no3i", "1Lru", "heLd" }
+  local multis = {}
   for k, v in multis do
     local f = get_faction(atoi36(v))
     if f~=nil then
