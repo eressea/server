@@ -1626,9 +1626,8 @@ verify_targets(castorder *co)
 					{ /* Fehlermeldung */
 						spobj->flag = TARGET_RESISTS;
 						resists++;
-						add_message(&mage->faction->msgs, new_message(mage->faction,
-							"spellregionresists%u:unit%r:region%s:command",
-							mage, mage->region, co->order));
+						ADD_MSG(&mage->faction->msgs, msg_message("spellregionresists",
+              "unit region command", mage, mage->region, co->order));
 						break;
 					}
 					success++;
@@ -2447,12 +2446,12 @@ magic(void)
           if (findparam(s, u->faction->locale) == P_LEVEL) {
             s = getstrtoken();
             level = min(atoip(s), level);
-            s = getstrtoken();
             if (level < 1) {
               /* Fehler "Das macht wenig Sinn" */
               cmistake(u, ord, 10, MSG_MAGIC);
               continue;
             }
+            s = getstrtoken();
           }
           if (findparam(s, u->faction->locale) == P_REGION) {
             t_x = (short)atoi(getstrtoken());
@@ -2460,12 +2459,13 @@ magic(void)
             t_y = (short)atoi(getstrtoken());
             t_y = rel_to_abs(getplane(u->region),u->faction,t_y,1);
             target_r = findregion(t_x, t_y);
-            s = getstrtoken();
             if (!target_r) {
-              /* Fehler "Es wurde kein Zauber angegeben" */
-              cmistake(u, ord, 172, MSG_MAGIC);
+              /* Fehler "Die Region konnte nicht verzaubert werden" */
+              ADD_MSG(&mage->faction->msgs, msg_message("spellregionresists",
+                "unit region command", mage, mage->region, co->order));
               continue;
             }
+            s = getstrtoken();
           }
           /* für Syntax ' REGION x y STUFE z '
           * hier nach REGION nochmal auf STUFE prüfen */
