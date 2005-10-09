@@ -42,8 +42,8 @@ call_spell(castorder *co)
   catch (luabind::error& e) {
     lua_State* L = e.state();
     const char* error = lua_tostring(L, -1);
-    
-    log_error((error));
+    log_error(("An exception occured while %s tried to call '%s': %s.\n",
+               unitname(mage), fname, error));
     lua_pop(L, 1);
     std::terminate();
   }
