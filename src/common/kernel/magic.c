@@ -68,7 +68,7 @@
 
 const char *magietypen[MAXMAGIETYP] =
 {
-	"nomagic",
+	"gray",
 	"illaun",
 	"tybied",
 	"cerddor",
