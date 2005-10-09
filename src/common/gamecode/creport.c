@@ -810,20 +810,15 @@ cr_output_unit(FILE * F, const region * r,
         fprintf(F, "SPRUECHE\n");
         for (;slist; slist = slist->next) {
           spell * sp = slist->data;
-          const char * name = sp->sname;
-          if (sp->level > t) continue;
-          if (sp->info==NULL) {
-            name = add_translation(mkname("spell", name), spell_name(sp, f->locale));
+          if (sp->level <= t) {
+            const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
+            fprintf(F, "\"%s\"\n", name);
           }
-          fprintf(F, "\"%s\"\n", name);
         }
         for (i=0;i!=MAXCOMBATSPELLS;++i) {
           const spell * sp = mage->combatspells[i].sp;
           if (sp) {
-            const char * name = sp->sname;
-            if (sp->info==NULL) {
-              name = add_translation(mkname("spell", name), spell_name(sp, f->locale));
-            }
+            const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, f->locale));
             fprintf(F, "KAMPFZAUBER %d\n", i);
             fprintf(F, "\"%s\";name\n", name);
             fprintf(F, "%d;level\n", mage->combatspells[i].level);
@@ -968,10 +963,7 @@ cr_reportspell(FILE * F, spellid_t id, const struct locale * lang)
 {
 	int k;
 	spell *sp = find_spellbyid(id);
-	const char * name = sp->sname;
-	if (sp->info==NULL) {
-		name = add_translation(mkname("spell", name), spell_name(sp, lang));
-	}
+	const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, lang));
 
 	fprintf(F, "ZAUBER %d\n", hashstring(spell_name(sp, default_locale)));
 	fprintf(F, "\"%s\";name\n", name);

@@ -7517,12 +7517,12 @@ init_spellnames(const struct locale * lang, magic_t mtype)
   sn->mtype = mtype;
   for (slist=spells;slist!=NULL;slist=slist->next) {
     spell * sp = slist->data;
-    const char * n = sp->sname;
-    variant token;
-    if (sp->magietyp!=mtype) continue;
-    if (sp->info==NULL) n = locale_string(lang, mkname("spell", n));
-    token.v = sp;
-    addtoken(&sn->names, n, token);
+    if (sp->magietyp==mtype) {
+      const char * n = spell_name(sp, lang);
+      variant token;
+      token.v = sp;
+      addtoken(&sn->names, n, token);
+    }
   }
   return spellnames = sn;
 }
