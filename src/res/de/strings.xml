@@ -4506,6 +4506,26 @@
       <text locale="de">Süße Träume</text>
       <text locale="en">Sweet Dreams</text>
     </string>
+    <string name="wdwpyramid_illaun">
+      <text locale="de">Traum von den Göttern</text>
+      <text locale="en">Dream of the gods</text>
+    </string>
+    <string name="wdwpyramid_tybied">
+      <text locale="de">Göttliches Netz</text>
+      <text locale="en">Web of the Gods</text>
+    </string>
+    <string name="wdwpyramid_gwyrrd">
+      <text locale="de">Kraft der Natur</text>
+      <text locale="en">force of nature</text>
+    </string>
+    <string name="wdwpyramid_cerrdor">
+      <text locale="de">Gesang der Götter</text>
+      <text locale="en">Song of the Gods</text>
+    </string>
+    <string name="wdwpyramid_draig">
+      <text locale="de">Göttliche Macht</text>
+      <text locale="en">Power of the Gods</text>
+    </string>
   </namespace>
   <namespace name="spellinfo">
     <string name="analyze_magic">

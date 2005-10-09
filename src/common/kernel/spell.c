@@ -10105,7 +10105,7 @@ static spell spelldaten[] =
   },
   #ifdef WDW_PYRAMIDSPELL
   {
-    SPL_WDWPYRAMID_TRAUM, "Traum von den Göttern",
+    SPL_WDWPYRAMID_TRAUM, "wdwpyramid_illaun",
     "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
     "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
     M_TRAUM, (0), 5, 4,
@@ -10119,7 +10119,7 @@ static spell spelldaten[] =
     (spell_f)sp_wdwpyramid, patzer
   },
   {
-    SPL_WDWPYRAMID_ASTRAL, "Göttliches Netz",
+    SPL_WDWPYRAMID_ASTRAL, "wdwpyramid_tybied",
     "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
     "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
     M_ASTRAL, (0), 5, 3,
@@ -10134,7 +10134,7 @@ static spell spelldaten[] =
   },
 
   {
-    SPL_WDWPYRAMID_DRUIDE, "Kraft der Natur",
+    SPL_WDWPYRAMID_DRUIDE, "wdwpyramid_gwyrrd",
     "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
     "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
     M_DRUIDE, (0), 5, 5,
@@ -10148,7 +10148,7 @@ static spell spelldaten[] =
     (spell_f)sp_wdwpyramid, patzer
   },
   {
-    SPL_WDWPYRAMID_BARDE, "Gesang der Götter",
+    SPL_WDWPYRAMID_BARDE, "wdwpyramid_cerrdor",
     "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
     "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
     M_BARDE, (0), 5, 4,
@@ -10162,7 +10162,7 @@ static spell spelldaten[] =
     (spell_f)sp_wdwpyramid, patzer
   },
   {
-    SPL_WDWPYRAMID_CHAOS, "Göttliche Macht",
+    SPL_WDWPYRAMID_CHAOS, "wdwpyramid_draig",
     "Mit Hilfe dieses Zaubers kann der Magier erkennen, ob eine "
     "Region für den Pyramidenbau geeignet ist.", NULL, NULL,
     M_CHAOS, (0), 5, 5,
