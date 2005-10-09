@@ -1348,7 +1348,7 @@ sp_rosthauch(castorder *co)
 
     for (;iweapon!=NULL;iweapon=iweapon->next) {
       item ** ip = i_find(&u->items, iweapon->type);
-      if (ip) {
+      if (*ip) {
         int i = min((*ip)->number, force);
         if (iweapon->chance<1.0) {
           i = (int)(i*iweapon->chance);
@@ -1365,27 +1365,27 @@ sp_rosthauch(castorder *co)
       if (force<=0) break;
     }
 
-		if (ironweapon>0) {
-			/* {$mage mage} legt einen Rosthauch auf {target}. {amount} Waffen
-			 * wurden vom Rost zerfressen */
-			ADDMSG(&mage->faction->msgs, msg_message(
-				"rust_effect", "mage target amount", mage, u, ironweapon));
-			ADDMSG(&u->faction->msgs, msg_message(
-				"rust_effect", "mage target amount",
-				cansee(u->faction, r, mage, 0) ? mage:NULL, u, ironweapon));
-			success += ironweapon;
-		} else {
-			/* {$mage mage} legt einen Rosthauch auf {target}, doch der
-			 * Rosthauch fand keine Nahrung */
-			ADDMSG(&mage->faction->msgs, msg_message(
-				"rust_fail", "mage target", mage, u));
-		}
-	}
-	/* in success stehen nun die insgesamt zerstörten Waffen. Im
-	 * ungünstigsten Fall kann pro Stufe nur eine Waffe verzaubert werden,
-	 * darum wird hier nur für alle Fälle in denen noch weniger Waffen
-	 * betroffen wurden ein Kostennachlass gegeben */
-	return min(success, cast_level);
+    if (ironweapon>0) {
+      /* {$mage mage} legt einen Rosthauch auf {target}. {amount} Waffen
+       * wurden vom Rost zerfressen */
+      ADDMSG(&mage->faction->msgs, msg_message("rust_effect",
+        "mage target amount", mage, u, ironweapon));
+      ADDMSG(&u->faction->msgs, msg_message("rust_effect", 
+        "mage target amount",
+        cansee(u->faction, r, mage, 0) ? mage:NULL, u, ironweapon));
+      success += ironweapon;
+    } else {
+      /* {$mage mage} legt einen Rosthauch auf {target}, doch der
+       * Rosthauch fand keine Nahrung */
+      ADDMSG(&mage->faction->msgs, msg_message(
+        "rust_fail", "mage target", mage, u));
+    }
+  }
+  /* in success stehen nun die insgesamt zerstörten Waffen. Im
+   * ungünstigsten Fall kann pro Stufe nur eine Waffe verzaubert werden,
+   * darum wird hier nur für alle Fälle in denen noch weniger Waffen
+   * betroffen wurden ein Kostennachlass gegeben */
+  return min(success, cast_level);
 }
 
 

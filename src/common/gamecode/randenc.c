@@ -167,130 +167,133 @@ dissolve_units(void)
 }
 
 static int
-improve_all(faction * f, skill_t sk, int weeks)
+improve_all(faction * f, skill_t sk, int by_weeks)
 {
-	unit *u;
-
-	for (u = f->units; u; u = u->nextF) {
-		if (has_skill(u, sk)) {
-			while (weeks--) {
-				learn_skill(u, sk, 1.0);
-			}
-		}
-	}
-
-	return weeks;
+  unit *u;
+  boolean ret = by_weeks;
+  
+  for (u = f->units; u; u = u->nextF) {
+    if (has_skill(u, sk)) {
+      int weeks = 0;
+      for (;weeks!=by_weeks;++weeks) {
+        learn_skill(u, sk, 1.0);
+        ret = 0;
+      }
+    }
+  }
+  
+  return ret;
 }
 
 void
 find_manual(region * r, unit * u)
 {
-	skill_t skill = NOSKILL;
-	sprintf(buf, "%s stolper%c bei der Erforschung der Region über ",
-		unitname(u), "nt"[u->number == 1]);
+  skill_t skill = NOSKILL;
+  sprintf(buf, "%s stolper%c bei der Erforschung der Region über ",
+          unitname(u), "nt"[u->number == 1]);
+  
+  switch (rand() % 4) {
+  case 0:
+    scat("die Ruine eines alten Tempels");
+    break;
+  case 1:
+    scat("eine alte Burgruine");
+    break;
+  case 2:
+    scat("ein zerfallenes Bauernhaus");
+    break;
+  case 3:
+    scat("eine Leiche am Wegesrand");
+    break;
+  }
+  
+  scat(". Bei der Durchsuchung ");
+  if (u->number == 1) {
+    scat("stößt");
+  } else {
+    scat("stoßen");
+  }
+  scat(" sie auf das zerfledderte Exemplar eines alten Buches, betitelt ");
+  
+  switch (rand() % 36) {
+  case 0:
+    scat("\'Magie der Elemente\'");
+    skill = SK_MAGIC;
+    break;
+  case 1:
+  case 2:
+  case 3:
+  case 4:
+    scat("\'Schwerter, Armbrüste, Langbögen\'");
+    skill = SK_WEAPONSMITH;
+    break;
+  case 5:
+  case 6:
+    scat("\'Gorms Almanach der Rationellen Kriegsführung\'");
+    skill = SK_TACTICS;
+    break;
+  case 7:
+  case 8:
+  case 9:
+  case 10:
+    scat("\'Katamarane, Koggen, Karavellen\'");
+    skill = SK_SHIPBUILDING;
+    break;
+  case 11:
+  case 12:
+  case 13:
+  case 14:
+    scat("\'Wege der Sterne\'");
+    skill = SK_SAILING;
+    break;
+  case 15:
+  case 16:
+  case 17:
+    scat("\'Nadishahs Kleine Gift- und Kräuterkunde\'");
+    skill = SK_HERBALISM;
+    break;
+  case 18:
+  case 19:
+    scat("\'Mandricks Kompendium der Alchemie\'");
+    skill = SK_ALCHEMY;
+    break;
+  case 20:
+  case 21:
+  case 22:
+  case 23:
+    scat("\'Die Konstruktion der Burgen und Schlösser von Zentralandune\'");
+    skill = SK_BUILDING;
+    break;
+  case 24:
+  case 25:
+  case 26:
+  case 27:
+    scat("\'Die Esse\'");
+    skill = SK_ARMORER;
+    break;
+  case 28:
+  case 29:
+  case 30:
+  case 31:
+    scat("\'Über die Gewinnung von Erzen\'");
+    skill = SK_MINING;
+    break;
+  case 32:
+  case 33:
+  case 34:
+  case 35:
+    scat("\'Barinions Lieder, eine Einführung für Unbedarfte\'");
+    skill = SK_ENTERTAINMENT;
+    break;
+  }
+  
+  scat(". Der Wissensschub ist enorm.");
+  addmessage(r, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
 
-	switch (rand() % 4) {
-	case 0:
-		scat("die Ruine eines alten Tempels");
-		break;
-	case 1:
-		scat("eine alte Burgruine");
-		break;
-	case 2:
-		scat("ein zerfallenes Bauernhaus");
-		break;
-	case 3:
-		scat("eine Leiche am Wegesrand");
-		break;
-	}
-
-	scat(". Bei der Durchsuchung ");
-	if (u->number == 1) {
-		scat("stößt");
-	} else {
-		scat("stoßen");
-	}
-	scat(" sie auf das zerfledderte Exemplar eines alten Buches, betitelt ");
-
-	switch (rand() % 36) {
-	case 0:
-		scat("\'Magie der Elemente\'");
-		skill = SK_MAGIC;
-		break;
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-		scat("\'Schwerter, Armbrüste, Langbögen\'");
-		skill = SK_WEAPONSMITH;
-		break;
-	case 5:
-	case 6:
-		scat("\'Gorms Almanach der Rationellen Kriegsführung\'");
-		skill = SK_TACTICS;
-		break;
-	case 7:
-	case 8:
-	case 9:
-	case 10:
-		scat("\'Katamarane, Koggen, Karavellen\'");
-		skill = SK_SHIPBUILDING;
-		break;
-	case 11:
-	case 12:
-	case 13:
-	case 14:
-		scat("\'Wege der Sterne\'");
-		skill = SK_SAILING;
-		break;
-	case 15:
-	case 16:
-	case 17:
-		scat("\'Nadishahs Kleine Gift- und Kräuterkunde\'");
-		skill = SK_HERBALISM;
-		break;
-	case 18:
-	case 19:
-		scat("\'Mandricks Kompendium der Alchemie\'");
-		skill = SK_ALCHEMY;
-		break;
-	case 20:
-	case 21:
-	case 22:
-	case 23:
-		scat("\'Die Konstruktion der Burgen und Schlösser von Zentralandune\'");
-		skill = SK_BUILDING;
-		break;
-	case 24:
-	case 25:
-	case 26:
-	case 27:
-		scat("\'Die Esse\'");
-		skill = SK_ARMORER;
-		break;
-	case 28:
-	case 29:
-	case 30:
-	case 31:
-		scat("\'Über die Gewinnung von Erzen\'");
-		skill = SK_MINING;
-		break;
-	case 32:
-	case 33:
-	case 34:
-	case 35:
-		scat("\'Barinions Lieder, eine Einführung für Unbedarfte\'");
-		skill = SK_ENTERTAINMENT;
-		break;
-	}
-
-	scat(". Der Wissensschub ist enorm.");
-	addmessage(r, u->faction, buf, MSG_EVENT, ML_IMPORTANT);
-
-	if (improve_all(u->faction, skill, 3) == 3) {
-		int i;
-		for (i=0;i!=9;++i) learn_skill(u, skill, 1.0);
-	}
+  if (improve_all(u->faction, skill, 3) == 3) {
+    int i;
+    for (i=0;i!=9;++i) learn_skill(u, skill, 1.0);
+  }
 }
 
 static void

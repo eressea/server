@@ -408,7 +408,7 @@ get_island(region * root, region_list ** rlist)
   }
 }
 
-int
+static int
 island_size(region * r)
 {
   int size = 0;
@@ -424,7 +424,11 @@ island_size(region * r)
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * rn = rconnect(r, d);
       if (rn && !fval(rn, FL_MARK) && rn->land) {
-        add_regionlist(&rlist->next, rn);
+        region_list * rnew = malloc(sizeof(region_list));
+        rnew->data = rn;
+        rnew->next = rlist->next;
+        rlist->next = rnew;
+        fset(rn, FL_MARK);
       }
     }
     rlist = rlist->next;
