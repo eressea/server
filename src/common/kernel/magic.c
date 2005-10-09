@@ -2462,7 +2462,7 @@ magic(void)
             if (!target_r) {
               /* Fehler "Die Region konnte nicht verzaubert werden" */
               ADDMSG(&mage->faction->msgs, msg_message("spellregionresists",
-                "unit region command", mage, mage->region, co->order));
+                "unit region command", mage, mage->region, ord));
               continue;
             }
             s = getstrtoken();
