@@ -47,8 +47,8 @@
   <spell name="create_magicherbbag" type="gwyrrd" ship="true" rank="5" level="5">
     <function name="cast" value="luaspell"/>
     <resource name="aura" amount="30" cost="fixed"/>
-    <resource name="log" amount="1" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
+    <resource name="p2" amount="1" cost="fixed"/>
   </spell>
 
   <!-- illaun spells -->
