@@ -155,6 +155,8 @@ fix_demand(region *r)
   return 0;
 }
 
+/* nach 150 Rudnen ist Neustart erlaubt */
+#define MINAGE_MULTI 150
 newfaction *
 read_newfactions(const char * filename)
 {
@@ -178,7 +180,7 @@ read_newfactions(const char * filename)
                  &subscription, password)<=0) break;
     }
     for (f=factions;f;f=f->next) {
-      if (strcmp(f->email, email)==0 && f->subscription) break;
+      if (strcmp(f->email, email)==0 && f->subscription && f->age<MINAGE_MULTI) break;
     }
     if (f && f->units) continue; /* skip the ones we've already got */
     for (nf=newfactions;nf;nf=nf->next) {
