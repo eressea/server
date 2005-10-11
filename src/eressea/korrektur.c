@@ -791,10 +791,13 @@ road_decay(void)
 static void
 frame_regions(void)
 {
+#ifdef AGE_FIX
   unsigned short ocean_age = (unsigned short)turn;
+endif
   region * r = regions;
   for (r=regions;r;r=r->next) {
     direction_t d;
+#ifdef AGE_FIX
     if (rterrain(r) == T_OCEAN && r->age==0) {
       unsigned short age = 0;
       direction_t d;
@@ -811,7 +814,7 @@ frame_regions(void)
     } else if (r->age>ocean_age) {
       ocean_age = r->age;
     }
-
+#endif
     if (r->age<16) continue;
     if (r->planep) continue;
     if (r->terrain==T_FIREWALL) continue;
