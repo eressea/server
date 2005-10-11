@@ -1661,7 +1661,6 @@ main(int argc, char *argv[])
 /*	register_dungeon(); */
 
   register_xmlreader();
-  init_spells();
   init_data(xmlfile);
 
   init_locales();
