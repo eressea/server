@@ -793,7 +793,7 @@ frame_regions(void)
 {
 #ifdef AGE_FIX
   unsigned short ocean_age = (unsigned short)turn;
-endif
+#endif
   region * r = regions;
   for (r=regions;r;r=r->next) {
     direction_t d;
