@@ -1144,7 +1144,7 @@ parse_quit(void)
       }
     } else {
       if (f->subscription) {
-        sql_print(("UPDATE subscriptions SET status='ACTIVE', lastturn=%d, firstturn=%d, password='%s' WHERE id=%u;\n",
+        sql_print(("UPDATE subscriptions SET status='ACTIVE', lastturn=%d, firstturn=greatest(firstturn,%d), password='%s' WHERE id=%u;\n",
                    f->lastorders, f->lastorders-f->age,
                    f->override, f->subscription));
       }
