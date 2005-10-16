@@ -454,6 +454,9 @@ void
 build_road(region * r, unit * u, int size, direction_t d)
 {
   int n, left;
+  region * rn = rconnect(r,d);
+  terrain_t rt = T_OCEAN;
+  if (rn) rt = rterrain(rn);
 
   if (!eff_skill(u, SK_ROAD_BUILDING, r)) {
     cmistake(u, u->thisorder, 103, MSG_PRODUCE);
@@ -464,12 +467,18 @@ build_road(region * r, unit * u, int size, direction_t d)
     return;
   }
 
-  if (terrain[rterrain(r)].roadreq < 0) {
+  if (terrain[rt].roadreq < 0) {
     cmistake(u, u->thisorder, 94, MSG_PRODUCE);
     return;
   }
 
-  if (rterrain(r) == T_SWAMP) {
+  rt = rterrain(r);
+  if (terrain[rt].roadreq < 0) {
+    cmistake(u, u->thisorder, 94, MSG_PRODUCE);
+    return;
+  }
+
+  if (rt == T_SWAMP) {
     /* wenn kein Damm existiert */
     static const struct building_type * bt_dam;
     if (!bt_dam) bt_dam = bt_find("dam");
@@ -478,8 +487,7 @@ build_road(region * r, unit * u, int size, direction_t d)
       cmistake(u, u->thisorder, 132, MSG_PRODUCE);
       return;
     }
-  }
-  if (rterrain(r) == T_DESERT) {
+  } else if (rt == T_DESERT) {
     static const struct building_type * bt_caravan;
     if (!bt_caravan) bt_caravan = bt_find("caravan");
     assert(bt_caravan);
@@ -488,8 +496,7 @@ build_road(region * r, unit * u, int size, direction_t d)
       cmistake(u, u->thisorder, 133, MSG_PRODUCE);
       return;
     }
-  }
-  if (rterrain(r) == T_GLACIER) {
+  } else if (rt == T_GLACIER) {
     static const struct building_type * bt_tunnel;
     if (!bt_tunnel) bt_tunnel = bt_find("tunnel");
     assert(bt_tunnel);
@@ -505,7 +512,7 @@ build_road(region * r, unit * u, int size, direction_t d)
   }
 
   /* left kann man noch bauen */
-  left = terrain[rterrain(r)].roadreq - rroad(r, d);
+  left = terrain[rt].roadreq - rroad(r, d);
   /* hoffentlich ist r->road <= terrain[rterrain(r)].roadreq, n also >= 0 */
   if (left <= 0) {
     sprintf(buf, "In %s gibt es keine Brücken und Straßen "
