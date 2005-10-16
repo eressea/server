@@ -112,6 +112,9 @@
   <string name="glacier">
     <text locale="en">glacier</text>
   </string>
+  <string name="iceberg_sleep">
+    <text locale="en">glacier</text>
+  </string>
   <string name="grassland">
     <text locale="en">steppe</text>
   </string>

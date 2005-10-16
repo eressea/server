@@ -243,7 +243,7 @@ const terraindata_t terrain[] = {
 	},
 	/* T_ICEBERG_SLEEP */
 	{
-		"glacier", 'i',
+		"iceberg_sleep", 'i',
 		NULL,
 		"auf den Gletscher von %s",
 		1, /* Steine pro Runde */

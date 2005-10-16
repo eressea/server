@@ -507,6 +507,9 @@
   <string name="glacier">
     <text locale="de">Gletscher</text>
   </string>
+  <string name="iceberg_sleep">
+    <text locale="de">Gletscher</text>
+  </string>
   <string name="firewall">
     <text locale="de">Feuerwand</text>
   </string>
