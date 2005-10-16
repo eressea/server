@@ -1940,14 +1940,16 @@ attack(battle *b, troop ta, const att *a, int numattack)
 	int offset = row - FIGHT_ROW;
 
 	switch(a->type) {
+  case AT_COMBATSPELL:
+    if (numattack==0 && af->magic > 0) {
+      /* Magier versuchen immer erstmal zu zaubern, erst wenn das
+      * fehlschlägt, wird af->magic == 0 und  der Magier kämpft
+      * konventionell weiter */
+      do_combatspell(ta, row);
+    }
+    break;
 	case AT_STANDARD:		/* Waffen, mag. Gegenstände, Kampfzauber */
-	case AT_COMBATSPELL:
-		if (numattack==0 && af->magic > 0) {
-			/* Magier versuchen immer erstmal zu zaubern, erst wenn das
-			 * fehlschlägt, wird af->magic == 0 und  der Magier kämpft
-			 * konventionell weiter */
-			do_combatspell(ta, row);
-		} else {
+    if (numattack > 0 || af->magic <= 0) {
 			weapon * wp = ta.fighter->person[ta.index].missile;
 			if (row==FIGHT_ROW) wp = preferred_weapon(ta, true);
 			/* Sonderbehandlungen */

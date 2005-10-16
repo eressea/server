@@ -98,6 +98,9 @@ rc_new(const char * zName)
   sprintf(zBuffer, "%s_x", zName);
   rc->_name[3] = strdup(zBuffer);
   rc->precombatspell = NULL;
+
+  rc->attack[0].type = AT_COMBATSPELL;
+  rc->attack[1].type = AT_NONE;
   return rc;
 }
 

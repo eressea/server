@@ -1181,6 +1181,7 @@ parse_races(xmlDocPtr doc)
     race * rc;
     xmlXPathObjectPtr result;
     int k;
+    struct att * attack;
 
     property = xmlGetProp(node, BAD_CAST "name");
     assert(property!=NULL);
@@ -1358,19 +1359,20 @@ parse_races(xmlDocPtr doc)
     /* reading eressea/races/race/attack */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "attack", xpath);
+    attack = rc->attack;
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
-      struct att * a = &rc->attack[k];
+      while (attack->type!=AT_NONE) ++attack;
 
       property = xmlGetProp(node, BAD_CAST "damage");
       if (property!=NULL) {
-        a->data.dice = strdup((const char*)property);
+        attack->data.dice = strdup((const char*)property);
         xmlFree(property);
       } else {
-        a->data.sp = xml_spell(node, "spell");
+        attack->data.sp = xml_spell(node, "spell");
       }
-      a->type = xml_ivalue(node, "type", 0);
-      a->flags = xml_ivalue(node, "flags", 0);
+      attack->type = xml_ivalue(node, "type", 0);
+      attack->flags = xml_ivalue(node, "flags", 0);
     }
     xmlXPathFreeObject(result);
   }

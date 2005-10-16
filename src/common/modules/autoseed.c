@@ -155,7 +155,7 @@ fix_demand(region *r)
   return 0;
 }
 
-/* nach 150 Rudnen ist Neustart erlaubt */
+/* nach 150 Runden ist Neustart erlaubt */
 #define MINAGE_MULTI 150
 newfaction *
 read_newfactions(const char * filename)
@@ -513,7 +513,8 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
       if (r->terrain==T_OCEAN && p==0 && (rmin==NULL || r->age<=MAXAGEDIFF)) {
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {
-          if (rconnect(r, d)==NULL) break;
+          region * rn  = rconnect(r, d);
+          if (rn==NULL) break;
         }
         if (d!=MAXDIRECTIONS) {
           rmin=r;
