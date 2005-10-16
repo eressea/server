@@ -4855,9 +4855,8 @@
         Gewitterfront beschworen, die sich
         unheilverkündend über der Region auftürmt. Der
         magische Regen wird alles Erz rosten lassen.
-        Seine Kraft reicht nicht aus, um Rüstungen
-        unbrauchbar zu machen, jedoch werden Eisenwaffen
-        schartig und rostig. Die Zerstörungskraft des
+        Eisenwaffen und Rüstungen werden schartig und rostig.
+        Die Zerstörungskraft des
         Regens ist von der investierten Kraft des
         Magiers abhängig. Für jede Stufe können bis zu
         10 Eisenwaffen betroffen werden. Ein Ring der
@@ -4866,10 +4865,9 @@
       </text>
       <text locale="en">This ritual conjurs up a dark
         thunderstorm that affects a whole region. The
-        magic rain will let rust any ore. Its power is
-        not strong enough to destroy armors, but any
-        iron weapons will get rusty. The exact number of
-        weapons affected by the rain depends on the
+        magic rain will let rust any ore. Iron weapons and
+        armor will get rusty. The exact number of
+        items affected by the rain depends on the
         ammount of power invested by the mage. Up to ten
         weapons can be destroyed per level - a Ring Of
         Power increases the effect like an additional
