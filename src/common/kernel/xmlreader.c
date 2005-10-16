@@ -279,32 +279,34 @@ parse_buildings(xmlDocPtr doc)
     xml_readconstruction(xpath, result->nodesetval->nodeTab, result->nodesetval->nodeNr, &bt->construction);
     xmlXPathFreeObject(result);
 
-    /* reading eressea/buildings/building/function */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-    for (k=0;k!=result->nodesetval->nodeNr;++k) {
-      xmlNodePtr node = result->nodesetval->nodeTab[k];
-      pf_generic fun;
-      parse_function(node, &fun, &property);
+    if (gamecode_enabled) {
+      /* reading eressea/buildings/building/function */
+      xpath->node = node;
+      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+      for (k=0;k!=result->nodesetval->nodeNr;++k) {
+        xmlNodePtr node = result->nodesetval->nodeTab[k];
+        pf_generic fun;
+        parse_function(node, &fun, &property);
 
-      if (fun==NULL) {
-        log_error(("unknown function name '%s' for building %s\n",
-          (const char*)property, bt->_name));
+        if (fun==NULL) {
+          log_error(("unknown function name '%s' for building %s\n",
+            (const char*)property, bt->_name));
+          xmlFree(property);
+          continue;
+        }
+        assert(property!=NULL);
+        if (strcmp((const char*)property, "name")==0) {
+          bt->name = (const char * (*)(int size))fun;
+        } else if (strcmp((const char*)property, "init")==0) {
+          bt->init = (void (*)(struct building_type*))fun;
+        } else {
+          log_error(("unknown function type '%s' for building %s\n",
+            (const char*)property, bt->_name));
+        }
         xmlFree(property);
-        continue;
       }
-      assert(property!=NULL);
-      if (strcmp((const char*)property, "name")==0) {
-        bt->name = (const char * (*)(int size))fun;
-      } else if (strcmp((const char*)property, "init")==0) {
-        bt->init = (void (*)(struct building_type*))fun;
-      } else {
-        log_error(("unknown function type '%s' for building %s\n",
-          (const char*)property, bt->_name));
-      }
-      xmlFree(property);
+      xmlXPathFreeObject(result);
     }
-    xmlXPathFreeObject(result);
 
     /* reading eressea/buildings/building/maintenance */
     result = xmlXPathEvalExpression(BAD_CAST "maintenance", xpath);
@@ -808,35 +810,37 @@ parse_resources(xmlDocPtr doc)
     free(names[0]);
     free(names[1]);
 
-    /* reading eressea/resources/resource/function */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-    if (result->nodesetval!=NULL) for (k=0;k!=result->nodesetval->nodeNr;++k) {
-      xmlNodePtr node = result->nodesetval->nodeTab[k];
-      pf_generic fun;
+    if (gamecode_enabled) {
+      /* reading eressea/resources/resource/function */
+      xpath->node = node;
+      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+      if (result->nodesetval!=NULL) for (k=0;k!=result->nodesetval->nodeNr;++k) {
+        xmlNodePtr node = result->nodesetval->nodeTab[k];
+        pf_generic fun;
 
-      parse_function(node, &fun, &property);
-      if (fun==NULL) {
-        log_error(("unknown function name '%s' for resource %s\n",
-          (const char*)property, rtype->_name[0]));
+        parse_function(node, &fun, &property);
+        if (fun==NULL) {
+          log_error(("unknown function name '%s' for resource %s\n",
+            (const char*)property, rtype->_name[0]));
+          xmlFree(property);
+          continue;
+        }
+
+        assert(property!=NULL);
+        if (strcmp((const char*)property, "change")==0) {
+          rtype->uchange = (rtype_uchange)fun;
+        } else if (strcmp((const char*)property, "get")==0) {
+          rtype->uget = (rtype_uget)fun;
+        } else if (strcmp((const char*)property, "name")==0) {
+          rtype->name = (rtype_name)fun;
+        } else {
+          log_error(("unknown function type '%s' for resource %s\n",
+            (const char*)property, rtype->_name[0]));
+        }
         xmlFree(property);
-        continue;
       }
-
-      assert(property!=NULL);
-      if (strcmp((const char*)property, "change")==0) {
-        rtype->uchange = (rtype_uchange)fun;
-      } else if (strcmp((const char*)property, "get")==0) {
-        rtype->uget = (rtype_uget)fun;
-      } else if (strcmp((const char*)property, "name")==0) {
-        rtype->name = (rtype_name)fun;
-      } else {
-        log_error(("unknown function type '%s' for resource %s\n",
-          (const char*)property, rtype->_name[0]));
-      }
-      xmlFree(property);
+      xmlXPathFreeObject(result);
     }
-    xmlXPathFreeObject(result);
 
     /* reading eressea/resources/resource/resourcelimit/function */
     xpath->node = node;
@@ -1088,32 +1092,34 @@ parse_spells(xmlDocPtr doc)
     if (xml_bvalue(node, "ocean", false)) sp->sptyp |= OCEANCASTABLE;
     if (xml_bvalue(node, "far", false)) sp->sptyp |= FARCASTING;
 
-    /* reading eressea/spells/spell/function */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-    for (k=0;k!=result->nodesetval->nodeNr;++k) {
-      xmlNodePtr node = result->nodesetval->nodeTab[k];
-      pf_generic fun;
+    if (gamecode_enabled) {
+      /* reading eressea/spells/spell/function */
+      xpath->node = node;
+      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+      for (k=0;k!=result->nodesetval->nodeNr;++k) {
+        xmlNodePtr node = result->nodesetval->nodeTab[k];
+        pf_generic fun;
 
-      parse_function(node, &fun, &property);
-      if (fun==NULL) {
-        log_error(("unknown function name '%s' for spell '%s'\n",
-          (const char*)property, sp->sname));
+        parse_function(node, &fun, &property);
+        if (fun==NULL) {
+          log_error(("unknown function name '%s' for spell '%s'\n",
+            (const char*)property, sp->sname));
+          xmlFree(property);
+          continue;
+        }
+        assert(property!=NULL);
+        if (strcmp((const char*)property, "cast")==0) {
+          sp->sp_function = (spell_f)fun;
+        } else if (strcmp((const char*)property, "fumble")==0) {
+          sp->patzer = (pspell_f)fun;
+        } else {
+          log_error(("unknown function type '%s' for spell %s\n", 
+            (const char*)property, sp->sname));
+        }
         xmlFree(property);
-        continue;
       }
-      assert(property!=NULL);
-      if (strcmp((const char*)property, "cast")==0) {
-        sp->sp_function = (spell_f)fun;
-      } else if (strcmp((const char*)property, "fumble")==0) {
-        sp->patzer = (pspell_f)fun;
-      } else {
-        log_error(("unknown function type '%s' for spell %s\n", 
-          (const char*)property, sp->sname));
-      }
-      xmlFree(property);
+      xmlXPathFreeObject(result);
     }
-    xmlXPathFreeObject(result);
 
     /* reading eressea/spells/spell/resource */
     xpath->node = node;
@@ -1278,38 +1284,40 @@ parse_races(xmlDocPtr doc)
     }
     xmlXPathFreeObject(result);
 
-    /* reading eressea/races/race/function */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-    for (k=0;k!=result->nodesetval->nodeNr;++k) {
-      xmlNodePtr node = result->nodesetval->nodeTab[k];
-      pf_generic fun;
+    if (gamecode_enabled) {
+      /* reading eressea/races/race/function */
+      xpath->node = node;
+      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+      for (k=0;k!=result->nodesetval->nodeNr;++k) {
+        xmlNodePtr node = result->nodesetval->nodeTab[k];
+        pf_generic fun;
 
-      parse_function(node, &fun, &property);
-      if (fun==NULL) {
-        log_error(("unknown function name '%s' for race %s\n",
-          (const char*)property, rc->_name[0]));
+        parse_function(node, &fun, &property);
+        if (fun==NULL) {
+          log_error(("unknown function name '%s' for race %s\n",
+            (const char*)property, rc->_name[0]));
+          xmlFree(property);
+          continue;
+        }
+        assert(property!=NULL);
+        if (strcmp((const char*)property, "name")==0) {
+          rc->generate_name = (const char* (*)(const struct unit*))fun;
+        } else if (strcmp((const char*)property, "age")==0) {
+          rc->age = (void(*)(struct unit*))fun;
+        } else if (strcmp((const char*)property, "move")==0) {
+          rc->move_allowed = (boolean(*)(const struct region *, const struct region *))fun;
+        } else if (strcmp((const char*)property, "itemdrop")==0) {
+          rc->itemdrop = (struct item *(*)(const struct race *, int))fun;
+        } else if (strcmp((const char*)property, "initfamiliar")==0) {
+          rc->init_familiar = (void(*)(struct unit *))fun;
+        } else {
+          log_error(("unknown function type '%s' for race %s\n",
+            (const char*)property, rc->_name[0]));
+        }
         xmlFree(property);
-        continue;
       }
-      assert(property!=NULL);
-      if (strcmp((const char*)property, "name")==0) {
-        rc->generate_name = (const char* (*)(const struct unit*))fun;
-      } else if (strcmp((const char*)property, "age")==0) {
-        rc->age = (void(*)(struct unit*))fun;
-      } else if (strcmp((const char*)property, "move")==0) {
-        rc->move_allowed = (boolean(*)(const struct region *, const struct region *))fun;
-      } else if (strcmp((const char*)property, "itemdrop")==0) {
-        rc->itemdrop = (struct item *(*)(const struct race *, int))fun;
-      } else if (strcmp((const char*)property, "initfamiliar")==0) {
-        rc->init_familiar = (void(*)(struct unit *))fun;
-      } else {
-        log_error(("unknown function type '%s' for race %s\n",
-          (const char*)property, rc->_name[0]));
-      }
-      xmlFree(property);
+      xmlXPathFreeObject(result);
     }
-    xmlXPathFreeObject(result);
 
     /* reading eressea/races/race/familiar */
     xpath->node = node;
