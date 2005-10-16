@@ -7446,6 +7446,9 @@ find_spellbyid(spellid_t id)
     { LUASPL_TRUESEEING_GWYRRD, "create_aots", M_DRUIDE }, 
     { LUASPL_TRUESEEING_ILLAUN, "create_aots", M_TRAUM }, 
     { LUASPL_TRUESEEING_TYBIED, "create_aots", M_ASTRAL }, 
+    { LUASPL_ARTEFAKT_OF_POWER, "create_rop", M_ASTRAL },
+    { LUASPL_BAG_OF_HOLDING, "create_bagofholding", M_ASTRAL },
+    { LUASPL_INVISIBILITY2_ILLAUN, "create_invisibility_sphere", M_TRAUM },
     { 0, NULL, 0 }
   };
   spell_list * slist;
