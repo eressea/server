@@ -1123,11 +1123,13 @@ orc_growth(void)
     unit *u;
     for (u = r->units; u; u = u->next) {
       static boolean init = false;
-      static curse *c = 0;
+      static const curse_type *ct_orcish = 0;
+      curse *c = 0;
       if (!init) {
         init = true;
-        c = get_curse(u->attribs, ct_find("orcish"));
+        ct_orcish = ct_find("orcish");
       }
+      if (ct_orcish) c = get_curse(u->attribs, ct_orcish);
 
       if (c && !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY) && !fval(u, UFL_HERO)) {
         int n;
