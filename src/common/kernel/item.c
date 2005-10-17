@@ -1683,8 +1683,8 @@ static const char *potiontext[MAXPOTIONS] =
 	"man etwas Steinbeißer dazu. Das ganze muß "
 	"genau siebenmal rechtsherum und siebenmal linksherum mit einem großen "
 	"Löffel gerührt werden. Wenn keine Bewegung mehr zu erkennen ist, "
-	"fülle man den Saft ab. Der Saft erhöht die Lernfähigkeit von bis zu "
-	"zehn Personen um zehn Tage.",
+	"fülle man den Saft ab. Der Saft gibt mit einer Chance von 1/3 bis zu "
+	"zehn Personen einen zusätzlichen Lernversuch.",
 
 	"Das Dumpfbackenbrot ist eine sehr gemeine Sache, macht es doch jeden "
 	"Lernerfolg zunichte oder läßt einen gar Dinge vergessen! Für zehn "
