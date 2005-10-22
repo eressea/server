@@ -4531,6 +4531,124 @@
     </string>
   </namespace>
   <namespace name="spellinfo">
+    <string name="break_curse">
+      <text locale="de">Dieser Zauber ermöglicht dem Magier, gezielt eine
+      bestimmte Verzauberung einer Einheit, eines Schiffes, Gebäudes oder auch
+      der Region aufzulösen.</text>
+      <text locale="en">This spell allows a magician to remove a specific
+      enchantment from a unit, ship, bulding or region. </text>
+    </string>
+    <string name="eternal_walls">
+      <text locale="de">Mit dieser Formel bindet der Magier auf ewig die Kräfte
+      der Erde in die Mauern des Gebäudes. Ein solchermaßen verzaubertes Gebäude
+      ist  gegen den Zahn der Zeit geschützt und benötigt keinen Unterhalt
+      mehr.</text>
+      <text locale="en">With this spell, the magician binds the power of the
+      earth into the walls of a building for all eternity. Such a building is
+      immune to the sands of time and needs no maintenance cost.</text>
+    </string>
+    <string name="pull_astral">
+      <text locale="de">Ein Magier, der sich in der astralen Ebene befindet,
+      kann mit Hilfe dieses Zaubers andere Einheiten zu sich holen. Der Magier
+      kann  (Stufe-3)*15 GE durch das kurzzeitig entstehende Tor schicken. Ist
+      der  Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu
+      zaubern,  kann er andere Einheiten auch gegen ihren Willen auf die andere
+      Ebene  zwingen.</text>
+      <text locale="en">A magician in the astral plane can summon units from the
+      material world. The magician can bring (level-3)*15 GE through the
+      temporary portal. If he is experienced enough to cast the spell at at
+      least level 13, he can even summon units against their will. </text>
+    </string>
+    <string name="fetch_astral">
+      <text locale="de">Ein Magier, welcher sich in der materiellen Welt
+      befindet, kann er mit Hilfe dieses Zaubers Einheiten aus der angrenzenden
+      Astralwelt herbeiholen. Ist der Magier erfahren genug, den Zauber auf
+      Stufen von 13 oder mehr zu zaubern, kann er andere Einheiten auch gegen
+      ihren Willen in die materielle  Welt zwingen.</text>
+      <text locale="en">A magician in the material world can summon units from
+      the adjacent part of the astral plane. If he is experienced enough to cast
+      the spell at at least level 13, he can even summon units against their
+      will. </text>
+    </string>
+    <string name="steal_aura">
+      <text locale="de">Mit Hilfe dieses Zaubers kann der Magier einem anderen
+      Magier seine Aura gegen dessen Willen entziehen und sich selber zuführen.
+      </text>
+      <text locale="en">Aided by this spell, a magician can steal another
+      magician's aura against his will.</text>
+    </string>
+    <string name="airship">
+      <text locale="de">Diese magischen Runen bringen ein Boot oder Langboot für
+      eine Woche zum fliegen. Damit kann dann auch Land überquert werden. Die
+      Zuladung  von Langbooten ist unter der Einwirkung dieses Zaubers auf 100
+      Gewichtseinheiten begrenzt. Für die Farbe der Runen muss eine spezielle
+      Tinte aus einem Windbeutel und einem Schneekristall angerührt werden.
+      </text>
+      <text locale="en">These magic runes allow a boat or longboat to fly for a
+      week. The boat can only carry 100 weight units. The enchanted ink's
+      components include a windbag and a snowcrystal petal.</text>
+    </string>
+    <string name="shockwave">
+      <text locale="de">Dieser Zauber läßt eine Welle aus purer Kraft über die
+      gegnerischen Reihen hinwegfegen. Viele Kämpfer wird der Schock so
+      benommen machen, daß sie für einen kurzen Moment nicht angreifen
+      können.</text>
+      <text locale="en">A wave of pure force spreads out from the magician,
+      crashing into the enemy ranks. Many warriors are thrown off balance and
+      are briefly unable to attack.</text>
+    </string>
+    <string name="antimagiczone">
+      <text locale="de">Mit diesem Zauber kann der Magier eine Zone der astralen
+      Schwächung erzeugen, ein lokales Ungleichgewicht im Astralen Feld. Dieses
+      Zone wird bestrebt sein, wieder in den Gleichgewichtszustand  zu gelangen.
+      Dazu wird sie jedem in dieser Region gesprochenen  Zauber einen Teil
+      seiner Stärke entziehen, die schwächeren gar  ganz absorbieren.</text>
+      <text locale="en">This spell allows a magician to create a local
+      instability in the astral field. This zone needs to return to its
+      equilibrium, soaking up part of the power of all spells cast in the region
+      - or even all of some of the weaker ones. </text>
+    </string>
+    <string name="destroy_magic">
+      <text locale="de">Dieser Zauber ermöglicht dem Magier, Verzauberungen
+      einer Einheit, eines Schiffes, Gebäudes oder auch der Region aufzulösen.
+      </text>
+      <text locale="en">This spell lets a magician destroy spells on a ship,
+      building or region.</text>
+    </string>
+    <string name="resist_magic">
+      <text locale="de">Dieser Zauber verstärkt die natürliche Widerstandskraft
+      gegen Magie. Eine so geschützte Einheit ist auch gegen Kampfmagie weniger
+      empfindlich. Pro Stufe reicht die Kraft des Magiers aus, um 5 Personen zu
+      schützen.</text>
+      <text locale="en">This spell enhances natural magic resistence. Protected
+      units are less vulnerable to battle magic. The spell protects 5 people per
+      level.</text>
+    </string>
+    <string name="enterastral">
+      <text locale="de">Alte arkane Formeln ermöglichen es dem Magier, sich und
+      andere in die astrale Ebene zu schicken. Der Magier kann (Stufe-3)*15 GE
+      durch das kurzzeitig entstehende Tor schicken. Ist der Magier erfahren
+      genug, den Zauber auf Stufen von 11 oder mehr zu zaubern, kann er andere
+      Einheiten auch gegen ihren Willen auf die andere Ebene zwingen. </text>
+      <text locale="en">Ancient arcane formulae permit the magician to transport
+      himself or other units into the astral plane. The magician can transport
+      (level-3) * 15 GE through the transient portal. If the magician is
+      experienced enough to cast level 11 spells, he can also transport units
+      against their will.</text>
+    </string>
+    <string name="leaveastral">
+      <text locale="de">Der Magier konzentriert sich auf die Struktur der
+      Realität und kann so die astrale Ebene verlassen. Er kann insgesamt
+      (Stufe-3)*15 GE durch das kurzzeitig entstehende Tor schicken. Ist der
+      Magier erfahren genug, den Zauber auf Stufen von 11 oder mehr zu zaubern,
+      kann er andere Einheiten auch gegen ihren Willen auf die andere Ebene
+      zwingen.</text>
+      <text locale="en">By concentrating on the structure of reality, the
+      magician can breach it and thus briefly make a gateway to leave the astral
+      plane. He can transport up to (level-3)*15 GE through the portal. If the
+      magician is able to cast at at least level 11, he can even transport other
+      units against their will.</text>
+    </string>
     <string name="analyze_magic">
       <text locale="de">
       Mit diesem Spruch kann der Magier versuchen, die
@@ -6757,6 +6875,29 @@
   </string>
 
 </strings>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

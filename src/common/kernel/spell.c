@@ -9246,12 +9246,7 @@ static spell spelldaten[] =
   },
 #endif
   {
-    SPL_RESISTMAGICBONUS, "resist_magic",
-    "Dieser Zauber verstärkt die natürliche Widerstandskraft gegen Magie. "
-    "Eine so geschützte Einheit ist auch gegen Kampfmagie weniger "
-    "empfindlich. Pro Stufe reicht die Kraft des Magiers aus, um 5 Personen "
-    "zu schützen.", NULL,
-    "u+",
+    SPL_RESISTMAGICBONUS, "resist_magic", NULL, NULL, "u+",
     M_ASTRAL,
     (UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE),
     2, 3,
@@ -9277,13 +9272,7 @@ static spell spelldaten[] =
     (spell_f)sp_keeploot, patzer
   },
   {
-    SPL_ENTERASTRAL, "enterastral",
-    "Alte arkane Formeln ermöglichen es dem Magier, sich und andere in die "
-    "astrale Ebene zu schicken. Der Magier kann (Stufe-3)*15 GE durch das "
-    "kurzzeitig entstehende Tor schicken. Ist der Magier erfahren genug, "
-    "den Zauber auf Stufen von 11 oder mehr zu zaubern, kann er andere "
-    "Einheiten auch gegen ihren Willen auf die andere Ebene zwingen.", NULL,
-    "u+",
+    SPL_ENTERASTRAL, "enterastral", 0, 0, "u+",
     M_ASTRAL, (UNITSPELL|SPELLLEVEL), 7, 4,
     {
       { R_AURA, 2, SPC_LEVEL },
@@ -9295,12 +9284,7 @@ static spell spelldaten[] =
     (spell_f)sp_enterastral, patzer
   },
   {
-    SPL_LEAVEASTRAL, "leaveastral",
-    "Der Magier konzentriert sich auf die Struktur der Realität und kann "
-    "so die astrale Ebene verlassen. Er kann insgesamt (Stufe-3)*15 GE durch "
-    "das kurzzeitig entstehende Tor schicken. Ist der Magier erfahren genug, "
-    "den Zauber auf Stufen von 11 oder mehr zu zaubern, kann er andere "
-    "Einheiten auch gegen ihren Willen auf die andere Ebene zwingen.",
+    SPL_LEAVEASTRAL, "leaveastral", 0,
     "ZAUBER [STUFE n] \'Astraler Ausgang\' <Ziel-X> <Ziel-Y> <Einheit-Nr> "
     "[<Einheit-Nr> ...]",
     "ru+",
@@ -9333,11 +9317,7 @@ static spell spelldaten[] =
     (spell_f)sp_transferaura, patzer
   },
   {
-    SPL_SHOCKWAVE, "shockwave",
-    "Dieser Zauber läßt eine Welle aus purer Kraft über die "
-    "gegnerischen Reihen hinwegfegen.  Viele Kämpfer wird der Schock "
-    "so benommen machen, daß sie für einen kurzen Moment nicht angreifen "
-    "können.", NULL, NULL,
+    SPL_SHOCKWAVE, "shockwave", NULL, NULL, NULL,
     M_ASTRAL, (COMBATSPELL|SPELLLEVEL), 5, 5,
     {
       { R_AURA, 1, SPC_LEVEL },
@@ -9349,13 +9329,7 @@ static spell spelldaten[] =
     (spell_f)sp_stun, patzer
   },
   {
-    SPL_ANTIMAGICZONE, "antimagiczone",
-    "Mit diesem Zauber kann der Magier eine Zone der astralen Schwächung "
-    "erzeugen, ein lokales Ungleichgewicht im Astralen Feld. Dieses "
-    "Zone wird bestrebt sein, wieder in den Gleichgewichtszustand "
-    "zu gelangen. Dazu wird sie jedem in dieser Region gesprochenen "
-    "Zauber einen Teil seiner Stärke entziehen, die schwächeren gar "
-    "ganz absorbieren.", NULL, NULL,
+    SPL_ANTIMAGICZONE, "antimagiczone", NULL, NULL, NULL,
     M_ASTRAL, (FARCASTING | SPELLLEVEL | REGIONSPELL | TESTRESISTANCE),
     2, 5,
     {
@@ -9368,9 +9342,7 @@ static spell spelldaten[] =
     (spell_f)sp_antimagiczone, patzer
   },
   {
-    SPL_TYBIED_DESTROY_MAGIC, "destroy_magic",
-    "Dieser Zauber ermöglicht dem Magier, Verzauberungen einer Einheit, "
-    "eines Schiffes, Gebäudes oder auch der Region aufzulösen.",
+    SPL_TYBIED_DESTROY_MAGIC, "destroy_magic", NULL,
     "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' REGION\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' EINHEIT <Einheit-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Magiefresser\' GEBÄUDE <Gebäude-Nr>\n"
@@ -9389,13 +9361,7 @@ static spell spelldaten[] =
     (spell_f)sp_destroy_magic, patzer
   },
   {
-    SPL_PULLASTRAL, "pull_astral",
-    "Ein Magier, der sich in der astralen Ebene befindet, kann mit Hilfe "
-    "dieses Zaubers andere Einheiten zu sich holen. Der Magier kann "
-    "(Stufe-3)*15 GE durch das kurzzeitig entstehende Tor schicken. Ist der "
-    "Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu zaubern, "
-    "kann er andere Einheiten auch gegen ihren Willen auf die andere Ebene "
-    "zwingen.",
+    SPL_PULLASTRAL, "pull_astral", NULL,
     "ZAUBER [STUFE n] \'Astraler Ruf\' <Ziel-X> <Ziel-Y> <Einheit-Nr> "
     "[<Einheit-Nr> ...]",
     "ru+",
@@ -9411,13 +9377,7 @@ static spell spelldaten[] =
   },
 
   {
-    SPL_FETCHASTRAL, "fetch_astral",
-    "Ein Magier, welcher sich in der materiellen Welt befindet, kann er mit "
-    "Hilfe dieses Zaubers Einheiten aus der angrenzenden Astralwelt herbeiholen. "
-    "Ist der Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu "
-    "zaubern, kann er andere Einheiten auch gegen ihren Willen in die materielle "
-    "Welt zwingen.", NULL,
-    "u+",
+    SPL_FETCHASTRAL, "fetch_astral", NULL, NULL, "u+",
     M_ASTRAL, (UNITSPELL | SEARCHGLOBAL | SPELLLEVEL), 7, 6,
     {
       { R_AURA, 2, SPC_LEVEL },
@@ -9429,10 +9389,7 @@ static spell spelldaten[] =
     (spell_f)sp_fetchastral, patzer
   },
   {
-    SPL_STEALAURA, "steal_aura",
-    "Mit Hilfe dieses Zaubers kann der Magier einem anderen Magier seine "
-    "Aura gegen dessen Willen entziehen und sich selber zuführen.", NULL,
-    "u",
+    SPL_STEALAURA, "steal_aura", NULL, NULL, "u",
     M_ASTRAL,
     (FARCASTING | SPELLLEVEL | UNITSPELL | ONETARGET | TESTRESISTANCE | TESTCANSEE),
     3, 6,
@@ -9446,13 +9403,7 @@ static spell spelldaten[] =
     (spell_f)sp_stealaura, patzer
   },
   {
-    SPL_FLYING_SHIP, "airship",
-    "Diese magischen Runen bringen ein Boot oder Langboot für eine Woche "
-    "zum fliegen. Damit kann dann auch Land überquert werden. Die Zuladung "
-    "von Langbooten ist unter der Einwirkung dieses Zaubers auf 100 "
-    "Gewichtseinheiten begrenzt. Für die Farbe der Runen muss eine spezielle "
-    "Tinte aus einem Windbeutel und einem Schneekristall angerührt werden.", NULL,
-    "s",
+    SPL_FLYING_SHIP, "airship", NULL, NULL, "s",
     M_ASTRAL, (ONSHIPCAST | SHIPSPELL | ONETARGET | TESTRESISTANCE), 5, 6,
     {
       { R_AURA, 10, SPC_FIX },
@@ -9464,10 +9415,7 @@ static spell spelldaten[] =
     (spell_f)sp_flying_ship, patzer
   },
   {
-    SPL_DESTROY_MAGIC, "break_curse",
-    "Dieser Zauber ermöglicht dem Magier, gezielt eine bestimmte "
-    "Verzauberung einer Einheit, eines Schiffes, Gebäudes oder auch "
-    "der Region aufzulösen.",
+    SPL_DESTROY_MAGIC, "break_curse", NULL,
     "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' REGION <Zauber-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' EINHEIT <Einheit-Nr> <Zauber-Nr>\n"
     "ZAUBERE [REGION x y] [STUFE n] \'Fluch brechen\' GEBÄUDE <Gebäude-Nr> <Zauber-Nr>\n"
@@ -9484,11 +9432,7 @@ static spell spelldaten[] =
     (spell_f)sp_destroy_curse, patzer
   },
   {
-    SPL_ETERNIZEWALL, "eternal_walls",
-    "Mit dieser Formel bindet der Magier auf ewig die Kräfte der Erde in "
-    "die Mauern des Gebäudes. Ein solchermaßen verzaubertes Gebäude ist "
-    "gegen den Zahn der Zeit geschützt und benötigt keinen "
-    "Unterhalt mehr.",
+    SPL_ETERNIZEWALL, "eternal_walls", NULL,
     "ZAUBERE \'Mauern der Ewigkeit\' <Gebäude-Nr>",
     "b",
     M_ASTRAL,
