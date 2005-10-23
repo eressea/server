@@ -267,6 +267,7 @@ parse_buildings(xmlDocPtr doc)
     bt->auraregen = xml_fvalue(node, "auraregen", 1.0);
 
     if (xml_bvalue(node, "nodestroy", false)) bt->flags |= BTF_INDESTRUCTIBLE;
+    if (xml_bvalue(node, "oneperturn", false)) bt->flags |= BTF_ONEPERTURN;
     if (xml_bvalue(node, "nobuild", false)) bt->flags |= BTF_NOBUILD;
     if (xml_bvalue(node, "unique", false)) bt->flags |= BTF_UNIQUE;
     if (xml_bvalue(node, "decay", false)) bt->flags |= BTF_DECAY;

@@ -90,6 +90,48 @@
       <text locale="de">Smaragde</text>
       <text locale="en">emeralds</text>
     </string>
-
-
+    <string name="pyramid0">
+      <text locale="de">Pyramide des Hapi</text>
+      <text locale="en">pyramid of Hapi</text>
+    </string>
+    <string name="pyramid1">
+      <text locale="de">Pyramide der Tayet</text>
+      <text locale="en">pyramid of Tayet</text>
+    </string>
+    <string name="pyramid2">
+      <text locale="de">Pyramide der Tefnut</text>
+      <text locale="en">pyramid of Tefnut</text>
+    </string>
+    <string name="pyramid3">
+      <text locale="de">Pyramide des Shu</text>
+      <text locale="en">pyramid of Shu</text>
+    </string>
+    <string name="pyramid4">
+      <text locale="de">Pyramide der Nuit</text>
+      <text locale="en">pyramid of Nuit</text>
+    </string>
+    <string name="pyramid5">
+      <text locale="de">Pyramide der Bastet</text>
+      <text locale="en">pyramid of Bastet</text>
+    </string>
+    <string name="pyramid6">
+      <text locale="de">Pyramide des Horus</text>
+      <text locale="en">pyramid of Horus </text>
+    </string>
+    <string name="pyramid7">
+      <text locale="de">Pyramide der Maat</text>
+      <text locale="en">pyramid of Maat</text>
+    </string>
+    <string name="pyramid8">
+      <text locale="de">Pyramide des Osiris</text>
+      <text locale="en">pyramid of Osiris</text>
+    </string>
+    <string name="pyramid9">
+      <text locale="de">Pyramide des Set</text>
+      <text locale="en">pyramid of Set</text>
+    </string>
+    <string name="pyramid10">
+      <text locale="de">Pyramide des Thoth</text>
+      <text locale="en">pyramid of Thoth</text>
+    </string>
 </strings>

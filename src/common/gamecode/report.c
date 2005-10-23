@@ -24,6 +24,7 @@
 #include <attributes/overrideroads.h>
 #include <attributes/viewrange.h>
 #include <attributes/otherfaction.h>
+#include <attributes/alliance.h>
 #ifdef AT_OPTION
 # include <attributes/option.h>
 #endif
@@ -61,6 +62,7 @@
 #include <kernel/skill.h>
 #include <kernel/teleport.h>
 #include <kernel/unit.h>
+#include <kernel/alliance.h>
 #ifdef USE_UGROUPS
 #  include <ugroup.h>
 #endif
@@ -1870,20 +1872,59 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 		scat(b->display);
 		i = b->display[strlen(b->display) - 1];
 	}
+
+#ifdef WDW_PYRAMID
+
+	if (i != '!' && i != '?' && i != '.')
+		scat(", ");
+
+  if(b->type == bt_find("pyramid")) {
+    unit * owner = buildingowner(r, b);
+    scat("Größenstufe ");
+    icat(wdw_pyramid_level(b));
+    scat(".");
+
+    if (owner && owner->faction==f) {
+      const construction *ctype = b->type->construction;
+      int completed = b->size;
+      int c;
+      
+      scat(" Baukosten pro Größenpunkt: ");
+
+      while(ctype->improvement != NULL &&
+         ctype->improvement != ctype &&
+         ctype->maxsize > 0 &&
+         ctype->maxsize <= completed)
+      {
+        completed -= ctype->maxsize;
+        ctype = ctype->improvement;
+      }
+
+      assert(ctype->materials != NULL);
+
+      for (c=0;ctype->materials[c].number;c++) {
+        resource_t rtype = ctype->materials[c].type;
+        int number = ctype->materials[c].number;
+
+        if(c > 0) {
+          scat(", ");
+        }
+        icat(number);
+        scat(" ");
+        scat(locale_string(lang,
+            resourcename(oldresourcetype[rtype],
+            number!=1?GR_PLURAL:0)));
+      }
+
+      scat(".");
+    }
+  }
+
+#else
+
 	if (i != '!' && i != '?' && i != '.')
 		scat(".");
 
-#if WDW_PYRAMID
-  if(b->type == bt_find("wdw_pyramid")) {
-    attrib *a = a_find(b->attribs, &at_alliance));
-    if(f->alliance && f->alliance->id == a->data.i) {
-      scat("Die Größenstufe dieser Pyramide ist ");
-      icat(wdw_pyramid_level(b));
-      scat(". Die nächste Größenstufe wird mit ");
-      icat(wdw_pyramid_size_for_next_level(b));
-      scat(" Größenpunkten erreicht. Baukosten pro Größenpunkt: ");
-    }
-  }
 #endif
 
 	rparagraph(F, buf, 2, 0);

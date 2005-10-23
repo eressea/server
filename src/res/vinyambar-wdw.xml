@@ -46,6 +46,7 @@
   <xi:include href="vinyambar/wdw-strings.xml"/>
   <xi:include href="vinyambar/wdw-resources.xml" />
   <xi:include href="vinyambar/wdw-races.xml"/>
+  <xi:include href="vinyambar/wdw-buildings.xml"/>
 
   <strings>
     <string name="mailto">

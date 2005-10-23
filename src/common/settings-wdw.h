@@ -53,4 +53,4 @@
 #undef XECMD_MODULE
 #define WDW_PHOENIX
 #define WDW_PYRAMIDSPELL
-/* #define WDW_PYRAMID 1 */
+#define WDW_PYRAMID

@@ -37,6 +37,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 /* attributes includes */
 #include <attributes/matmod.h>
@@ -298,81 +299,51 @@ castle_name(int bsize)
 	return fname[i];
 }
 
-#if WDW_PYRAMID
-static requirement wdw_pyramid_req[][] = {
-  {{R_STONE, 100, 0}, {R_WOOD, 100, 0}, {R_IRON, 100, 0}, {NORESOURCE, 0, 0.0 }},
-  {{R_STONE,   1, 0}, {R_WOOD,   1, 0}, {R_IRON,   1, 0}, {NORESOURCE, 0, 0.0 }},
-  {{R_STONE,   1, 0}, {R_WOOD,   1, 0}, {R_IRON,   1, 0},
-          {R_MALLORN, 1, 0}, {NORESOURCE, 0, 0.0 }},
-  {{R_STONE,   1, 0}, {R_WOOD,   1, 0}, {R_IRON,   1, 0},
-          {R_LAEN, 1, 0}, {NORESOURCE, 0, 0.0 }},
-  {{R_STONE,   1, 0}, {R_WOOD,   1, 0}, {R_IRON,   1, 0},
-          {R_TOADSLIME, 1, 0}, {NORESOURCE, 0, 0.0 }},
-  {{R_STONE,   1, 0}, {R_WOOD,   1, 0}, {R_IRON,   1, 0},
-          {R_BALM, 1, 0.0 }, {R_SPICES, 1, 0.0 }, {R_JEWELERY, 1, 0.0 },
-          {R_MYRRH, 1, 0.0 }, {R_OIL, 1, 0.0 }, {R_SILK, 1, 0.0 },
-          {R_INCENSE, 1, 0.0 }, {NORESOURCE, 0, 0.0 }}
-}
+#ifdef WDW_PYRAMID
 
+static const char *
+pyramid_name(int bsize)
+{
+	static const struct building_type * bt_pyramid;
+  static char p_name_buf[32];
+  int level=0;
+  const construction * ctype;
 
-static construction wdw_pyramid_bld[] = {
-  { SK_BUILDING,  10,      1, 1, pyramid_req[0], wdw_pyramid_bld[0] }, /* 0 -> 1  */
-  { SK_BUILDING,   3,      6, 1, pyramid_req[1], wdw_pyramid_bld[1] }, /*   -> 7 */
-  { SK_BUILDING,   4,      1, 1, pyramid_req[2], wdw_pyramid_bld[2] }, /*   -> 8 */
-  { SK_BUILDING,   5,     13, 1, pyramid_req[1], wdw_pyramid_bld[3] }, /*   -> 21 */
-  { SK_BUILDING,   6,      1, 1, pyramid_req[3], wdw_pyramid_bld[4] }, /*   -> 22 */
-  { SK_BUILDING,   7,     41, 1, pyramid_req[1], wdw_pyramid_bld[5] }, /*   -> 63 */
-  { SK_BUILDING,   8,      1, 1, pyramid_req[4], wdw_pyramid_bld[6] }, /*   -> 64 */
-  { SK_BUILDING,   9,    125, 1, pyramid_req[1], wdw_pyramid_bld[7] }, /*   -> 189 */
-  { SK_BUILDING,  10,      1, 1, pyramid_req[5], wdw_pyramid_bld[8] }, /*   -> 190 */
-  { SK_BUILDING, 100, 100000, 1, pyramid_req[0], NULL }                /* should never be seen */
+  if(!bt_pyramid) bt_pyramid = bt_find("pyramid");
+  assert(bt_pyramid);
+	
+  ctype = bt_pyramid->construction;
+  
+	while (ctype && ctype->maxsize != -1 && ctype->maxsize<=bsize) {
+    bsize-=ctype->maxsize;
+    ctype=ctype->improvement;
+    ++level;
+  }
+
+  sprintf(p_name_buf, "pyramid%d", level);
+
+  return p_name_buf;
 }
 
 int
 wdw_pyramid_level(const struct building *b)
 {
-  int size = 0;
-  int level;
+  const construction *ctype = b->type->construction;
+  int completed = b->size;
+  int level = 0;
 
-  for(level=0; wdw_pyramid_bld[level].improvement != NULL; level++) {
-    size += wdw_pyramid_bld[level].maxsize;
-    if(size > b->size) break;
+  while(ctype->improvement != NULL &&
+      ctype->improvement != ctype &&
+      ctype->maxsize > 0 &&
+      ctype->maxsize <= completed)
+  {
+    ++level;
+    completed-=ctype->maxsize;
+    ctype = ctype->improvement;
   }
 
   return level;
 }
-
-int
-wdw_pyramid_size_for_next_level(const struct building *b)
-{
-  int size = 0;
-  int level;
-
-  for(level=0; wdw_pyramid_bld[level].improvement != NULL; level++) {
-    size += wdw_pyramid_bld[level].maxsize;
-    if(size > b->size) {
-      return size - b->size;
-    }
-  }
-
-  return INT_MAX;
-}
-
-static const char *
-wdw_pyramid_name(int bsize)
-{
-  return "wdw_pyramid";
-}
-
-building_type bt_wdw_pyramid = {
-	"wdw_pyramid",
-	BTF_INDESTRUCTIBLE,
-	1, 4, -1,
-	0, 0, 0, 1.0,
-	NULL,
-	&wdw_pyramid_bld[0],
-	wdw_pyramid_name
-};
 #endif
 
 /* for finding out what was meant by a particular building string */
@@ -412,10 +383,8 @@ register_buildings(void)
 {
 	register_function((pf_generic)init_smithy, "init_smithy");
 	register_function((pf_generic)castle_name, "castle_name");
-
-#if WDW_PYRAMID
-	register_function((pf_generic)wdw_pyramid_name, "wdw_pyramid_name");
-  bt_register(&bt_wdw_pyramid);
+#ifdef WDW_PYRAMID
+	register_function((pf_generic)pyramid_name, "pyramid_name");
 #endif
 }
 

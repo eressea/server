@@ -39,6 +39,9 @@
 #endif
 #include "moved.h"
 #include "variable.h"
+#ifdef WDW_PYRAMID
+#include "alliance.h"
+#endif
 
 /* util includes */
 #include <attrib.h>

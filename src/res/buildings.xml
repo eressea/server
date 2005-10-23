@@ -166,14 +166,6 @@
     </construction>
   </building>
 
-  <building name="pyramid" capacity="1" maxcapacity="10000" nodestroy="yes">
-    <construction skill="sk_building" minskill="10" reqsize="1">
-      <requirement type="iron" quantity="100"/>
-      <requirement type="log" quantity="100"/>
-      <requirement type="stone" quantity="100"/>
-    </construction>
-  </building>
-
   <building name="castle" capacity="1" maxcapacity="4">
     <function name="name" value="castle_name"/>
     <construction skill="sk_building" minskill="1" maxsize="2" reqsize="1">

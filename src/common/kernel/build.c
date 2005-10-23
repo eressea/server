@@ -40,6 +40,7 @@
 #include "ship.h"
 #include "skill.h"
 #include "unit.h"
+#include "alliance.h"
 
 /* from libutil */
 #include <attrib.h>
@@ -59,6 +60,7 @@
 
 /* attributes inclues */
 #include <attributes/matmod.h>
+#include <attributes/alliance.h>
 
 #define STONERECYCLE 50
 /* Name, MaxGroesse, MinBauTalent, Kapazitaet, {Eisen, Holz, Stein, BauSilber,
@@ -627,16 +629,19 @@ build(unit * u, const construction * ctype, int completed, int want)
 
   effsk = basesk;
   if (inside_building(u)) {
-    effsk = skillmod(u->building->type->attribs, u, u->region, type->skill, effsk, SMF_PRODUCTION);
+    effsk = skillmod(u->building->type->attribs, u, u->region, type->skill,
+        effsk, SMF_PRODUCTION);
   }
-  effsk = skillmod(type->attribs, u, u->region, type->skill, effsk, SMF_PRODUCTION);
+  effsk = skillmod(type->attribs, u, u->region, type->skill,
+      effsk, SMF_PRODUCTION);
   if (effsk<0) return effsk; /* pass errors to caller */
   if (effsk==0) return ENEEDSKILL;
 
   skills = effsk * u->number;
 
-  /* technically, nimblefinge and domore should be in a global set of "game"-attributes,
-   * (as at_skillmod) but for a while, we're leaving them in here. */
+  /* technically, nimblefinge and domore should be in a global set of
+   * "game"-attributes, (as at_skillmod) but for a while, we're leaving
+   * them in here. */
 
   if (dm != 0) {
     /* Auswirkung Schaffenstrunk */
@@ -649,9 +654,9 @@ build(unit * u, const construction * ctype, int completed, int want)
 
     /* skip over everything that's already been done:
      * type->improvement==NULL means no more improvements, but no size limits
-     * type->improvement==type means build another object of the same time while material lasts
-     * type->improvement==x means build x when type is finished
-     */
+     * type->improvement==type means build another object of the same time
+     * while material lasts type->improvement==x means build x when type
+     * is finished */
     while (type->improvement!=NULL &&
          type->improvement!=type &&
          type->maxsize>0 &&
@@ -852,6 +857,13 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     cmistake(u, ord, 221, MSG_PRODUCE);
     return;
   }
+  if (btype->flags & BTF_ONEPERTURN) {
+    if(b && fval(b, BLD_EXPANDED)) {
+      cmistake(u, ord, 318, MSG_PRODUCE);
+      return;
+    }
+    want = 1;
+  }
 
   if (b) built = b->size;
   if (want<=0 || want == INT_MAX) {
@@ -913,8 +925,8 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
     u->building = b;
     fset(u, UFL_OWNER);
 
-#if WDW_PYRAMID
-    if(b->type == bt_find("wdw_pyramid") && u->faction->alliance != NULL) {
+#ifdef WDW_PYRAMID
+    if(b->type == bt_find("pyramid") && u->faction->alliance != NULL) {
       attrib * a = a_add(&b->attribs, a_new(&at_alliance));
       a->data.i = u->faction->alliance->id;
     }
@@ -949,6 +961,8 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
   }
 
   b->size += built;
+  fset(b, BLD_EXPANDED);
+
   update_lighthouse(b);
 
 

@@ -39,6 +39,7 @@ typedef struct maintenance {
 #define BTF_DYNAMIC        0x10 /* dynamic type, needs bt_write */
 #define BTF_PROTECTION     0x20 /* protection in combat */
 #define BTF_MAGIC          0x40 /* magical effect */
+#define BTF_ONEPERTURN     0x80 /* one one sizepoint can be added per turn */
 
 typedef struct building_type {
 	const char * _name;
@@ -82,6 +83,7 @@ extern struct building_typelist *buildingtypes;
 #define BLD_MAINTAINED     0x01 /* vital maintenance paid for */
 #define BLD_WORKING        0x02 /* full maintenance paid, it works */
 #define BLD_UNGUARDED      0x04 /* you can enter this building anytime */
+#define BLD_EXPANDED       0x08 /* has been expanded this turn */
 
 #define BLD_SAVEMASK       0x00 /* mask for persistent flags */
 
@@ -143,9 +145,8 @@ extern struct unit * buildingowner(const struct region * r, const struct buildin
 extern attrib_type at_nodestroy;
 extern attrib_type at_building_action;
 
-#if WDW_PYRAMID
-extern int wdw_pyramid_size(const struct building *b);
-extern int wdw_pyramid_size_for_next_level(const struct building *b);
+#ifdef WDW_PYRAMID
+extern int wdw_pyramid_level(const struct building *b);
 #endif
 
 typedef struct building_action {
