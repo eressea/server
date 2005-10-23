@@ -46,6 +46,7 @@ create_equipment(const char * eqname)
       eq->name = strdup(eqname);
       eq->next = *eqp;
       eq->items = NULL;
+      eq->spells = NULL;
       eq->subsets = NULL;
       memset(eq->skills, 0, sizeof(eq->skills));
       *eqp = eq;
