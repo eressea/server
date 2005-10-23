@@ -98,7 +98,13 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
 static void
 use_antimagiccrystal(region * r, unit * mage, int amount, struct order * ord)
 {
+  const resource_type rt_crystal = NULL;
   int i;
+
+  if (rt_crystal == NULL) {
+    rt_crystal = rt_find("antimagic");
+    assert(rt_crystal!=NULL);
+  }
   for (i=0;i!=amount;++i) {
     int effect, duration = 2;
     double force;
@@ -143,9 +149,8 @@ use_antimagiccrystal(region * r, unit * mage, int amount, struct order * ord)
       var.i = effect;
       create_curse(mage, &r->attribs, ct_find("antimagiczone"), force, duration, var, 0);
     }
-
   }
-  use_pooled(mage, mage->region, R_ANTIMAGICCRYSTAL, amount);
+  new_use_pooled(mage, rt_crystal, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
   ADDMSG(&mage->faction->msgs, msg_message("use_antimagiccrystal", 
     "unit region", mage, r));
   return;
