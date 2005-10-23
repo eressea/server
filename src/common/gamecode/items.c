@@ -96,8 +96,9 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
 /* Kann auch von Nichtmagiern benutzt werden, erzeugt eine
 * Antimagiezone, die zwei Runden bestehen bleibt */
 static void
-use_antimagiccrystal(region * r, unit * mage, int amount, struct order * ord)
+use_antimagiccrystal(unit * u, const struct item_type * itype, int amount, struct order * ord)
 {
+  region * r = u->region;
   const resource_type * rt_crystal = NULL;
   int i;
 
@@ -147,12 +148,12 @@ use_antimagiccrystal(region * r, unit * mage, int amount, struct order * ord)
     if(force > 0) {
       variant var ;
       var.i = effect;
-      create_curse(mage, &r->attribs, ct_find("antimagiczone"), force, duration, var, 0);
+      create_curse(u, &r->attribs, ct_find("antimagiczone"), force, duration, var, 0);
     }
   }
-  new_use_pooled(mage, rt_crystal, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
-  ADDMSG(&mage->faction->msgs, msg_message("use_antimagiccrystal", 
-    "unit region", mage, r));
+  new_use_pooled(u, rt_crystal, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
+  ADDMSG(&u->faction->msgs, msg_message("use_antimagiccrystal", 
+    "unit region", u, r));
   return;
 }
 
