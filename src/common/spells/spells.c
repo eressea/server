@@ -17,6 +17,7 @@
 #include "spells.h"
 
 #include "alp.h"
+#include "combatspells.h"
 
 #include <curse.h>
 
@@ -28,7 +29,6 @@ extern void ct_register(const struct curse_type * ct);
 #include <kernel/battle.h> /* für lovar */
 #include <kernel/border.h>
 #include <kernel/building.h>
-#include <kernel/combatspells.h>
 #include <kernel/curse.h>
 #include <kernel/spellid.h>
 #include <kernel/faction.h>

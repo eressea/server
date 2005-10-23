@@ -321,9 +321,6 @@
 			RelativePath=".\calendar.c">
 		</File>
 		<File
-			RelativePath=".\combatspells.c">
-		</File>
-		<File
 			RelativePath=".\curse.c">
 		</File>
 		<File

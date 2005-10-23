@@ -14,7 +14,6 @@ SOURCES =
  build.c
  building.c
  calendar.c
- combatspells.c
  curse.c
  eressea.c
  equipment.c

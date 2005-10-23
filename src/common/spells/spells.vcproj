@@ -180,6 +180,9 @@
 				RelativePath=".\buildingcurse.h">
 			</File>
 			<File
+				RelativePath=".\combatspells.h">
+			</File>
+			<File
 				RelativePath=".\regioncurse.h">
 			</File>
 			<File
@@ -197,6 +200,9 @@
 		</File>
 		<File
 			RelativePath=".\buildingcurse.c">
+		</File>
+		<File
+			RelativePath=".\combatspells.c">
 		</File>
 		<File
 			RelativePath=".\regioncurse.c">

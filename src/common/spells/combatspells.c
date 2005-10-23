@@ -14,21 +14,21 @@
 #include "combatspells.h"
 
 /* kernel includes */
-#include "battle.h"
-#include "build.h"
-#include "building.h"
-#include "faction.h"
-#include "item.h"
-#include "magic.h"
-#include "message.h"
-#include "order.h"
-#include "region.h"
-#include "unit.h"
-#include "movement.h"
-#include "spell.h"
-#include "spellid.h"
-#include "race.h"
-#include "skill.h"
+#include <kernel/battle.h>
+#include <kernel/build.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/magic.h>
+#include <kernel/message.h>
+#include <kernel/order.h>
+#include <kernel/region.h>
+#include <kernel/unit.h>
+#include <kernel/movement.h>
+#include <kernel/spell.h>
+#include <kernel/spellid.h>
+#include <kernel/race.h>
+#include <kernel/skill.h>
 
 /* util includes */
 #include <rand.h>
