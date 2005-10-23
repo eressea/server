@@ -28,11 +28,11 @@
 #include "alchemy.h"
 #include "build.h"
 #include "building.h"
+#include "equipment.h"
 #include "faction.h"
 #include "item.h"
 #include "magic.h"
 #include "region.h"
-#include "spell.h"
 #include "unit.h"
 #include "names.h"
 #include "pathfinder.h"
@@ -301,133 +301,13 @@ racename(const struct locale *loc, const unit *u, const race * rc)
 }
 
 static void
-oldfamiliars(unit * familiar)
+oldfamiliars(unit * u)
 {
-	sc_mage * m = NULL;
-	race_t frt = old_race(familiar->race);
-
-	switch(frt) {
-		case RC_HOUSECAT:
-			/* Kräu+1, Mag, Pfer+1, Spi+3, Tar+3, Wahr+4, Aus */
-			set_level(familiar, SK_MAGIC, 1);
-			set_level(familiar, SK_SPY, 1);
-			set_level(familiar, SK_STEALTH, 1);
-			set_level(familiar, SK_OBSERVATION, 1);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_TUNNELWORM:
-			/* Ber+50,Hol+50,Sbau+50,Aus+2*/
-			set_level(familiar, SK_MAGIC, 1);
-			set_level(familiar, SK_MINING, 1);
-			set_level(familiar, SK_LUMBERJACK, 1);
-			set_level(familiar, SK_AUSDAUER, 1);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_EAGLE:
-			/* Spi, Wahr+2, Aus */
-			set_level(familiar, SK_MAGIC, 1);
-			set_level(familiar, SK_OBSERVATION, 1);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_RAT:
-			/* Spionage+5, Tarnung+4, Wahrnehmung+2, Ausdauer */
-			set_level(familiar, SK_MAGIC, 1);
-			set_level(familiar, SK_SPY, 1);
-			set_level(familiar, SK_STEALTH, 1);
-			set_level(familiar, SK_OBSERVATION, 1);
-			set_level(familiar, SK_AUSDAUER, 1+rand()%8);
-			/* set_number(familiar, 50+rand()%500+rand()%500); */
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_PSEUDODRAGON:
-			/* Magie+1, Spionage, Tarnung, Wahrnehmung, Ausdauer */
-			m = create_mage(familiar, M_GRAU);
-			set_level(familiar, SK_MAGIC, 1);
-			break;
-		case RC_NYMPH:
-			/* Alc, Arm, Bog+2, Han-2, Kräu+4, Mag+1, Pfer+5, Rei+5,
-			 * Rüs-2, Sbau, Seg-2, Sta, Spi+2, Tak-2, Tar+3, Unt+10,
-			 * Waf-2, Wag-2, Wahr+2, Steu-2, Aus-1 */
-			set_level(familiar, SK_MAGIC, 1);
-			set_level(familiar, SK_LONGBOW, 1);
-			set_level(familiar, SK_HERBALISM, 1);
-			set_level(familiar, SK_HORSE_TRAINING, 1);
-			set_level(familiar, SK_RIDING, 1);
-			set_level(familiar, SK_SPY, 1);
-			set_level(familiar, SK_STEALTH, 1);
-			set_level(familiar, SK_ENTERTAINMENT, 1);
-			set_level(familiar, SK_OBSERVATION, 1);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_UNICORN:
-			/* Mag+2, Spi, Tak, Tar+4, Wahr+4, Aus */
-			set_level(familiar, SK_MAGIC, 1);
-			set_level(familiar, SK_STEALTH, 1);
-			set_level(familiar, SK_OBSERVATION, 1);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_WARG:
-			/* Spi, Tak, Tar, Wahri+2, Aus */
-			set_level(familiar, SK_MAGIC, 1);
-			set_level(familiar, SK_OBSERVATION, 1);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_WRAITH:
-			/* Mag+1, Rei-2, Hie, Sta, Spi, Tar, Wahr, Aus */
-			set_level(familiar, SK_MAGIC, 1);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_IMP:
-			/* Mag+1,Rei-1,Hie,Sta,Spi+1,Tar+1,Wahr+1,Steu+1,Aus*/
-			set_level(familiar, SK_MAGIC, 1);
-			set_level(familiar, SK_SPY, 1);
-			set_level(familiar, SK_STEALTH, 1);
-			set_level(familiar, SK_OBSERVATION, 1);
-			set_level(familiar, SK_TAXING, 1);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_DREAMCAT:
-			/* Mag+1,Hie,Sta,Spi+1,Tar+1,Wahr+1,Steu+1,Aus*/
-			set_level(familiar, SK_MAGIC, 1);
-			set_level(familiar, SK_SPY, 1);
-			set_level(familiar, SK_STEALTH, 1);
-			set_level(familiar, SK_OBSERVATION, 1);
-			set_level(familiar, SK_TAXING, 1);
-			m = create_mage(familiar, M_GRAU);
-			break;
-		case RC_FEY:
-			/* Mag+1,Rei-1,Hie-1,Sta-1,Spi+2,Tar+5,Wahr+2,Aus */
-			set_level(familiar, SK_MAGIC, 1);
-			m = create_mage(familiar,M_GRAU);
-			break;
-		case RC_OWL:
-			/* Spi+1,Tar+1,Wahr+5,Aus */
-			set_level(familiar, SK_MAGIC, 1);
-			set_level(familiar, SK_SPY, 1);
-			set_level(familiar, SK_STEALTH, 1);
-			set_level(familiar, SK_OBSERVATION, 1);
-			m = create_mage(familiar,M_GRAU);
-			break;
-		case RC_HELLCAT:
-			/* Spi, Tak, Tar, Wahr+1, Aus */
-			set_level(familiar, SK_MAGIC, 1);
-			set_level(familiar, SK_OBSERVATION, 1);
-			m = create_mage(familiar,M_GRAU);
-			break;
-		case RC_TIGER:
-			/* Spi, Tak, Tar, Wahr+1, Aus */
-			set_level(familiar, SK_MAGIC, 1);
-			set_level(familiar, SK_OBSERVATION, 1);
-			m = create_mage(familiar,M_GRAU);
-			break;
-	}
-  if (m!=NULL) {
-    spell_list * fspells = familiarspells(familiar->race);
-    while (fspells!=NULL) {
-      add_spell(m, fspells->data);
-      fspells=fspells->next;
-    }
-  }
+  char fname[64];
+  /* these familiars have no special skills.
+   */
+  snprintf(fname, sizeof(fname), "%s_familiar", u->race->_name[0]);
+  equip_unit(u, get_equipment(fname));
 }
 
 static item *
@@ -592,89 +472,7 @@ register_races(void)
 	sprintf(zBuffer, "%s/races.xml", resourcepath());
 }
 
-/** familiars **/
-typedef struct familiar_spells {
-  struct familiar_spells * next;
-  spell_list * spells;
-  const race * familiar_race;
-} familiar_spells;
-
-static familiar_spells * racespells;
-
-spell_list *
-familiarspells(const race * rc)
-{
-  familiar_spells * fspells = racespells;
-  while (fspells && rc!=fspells->familiar_race) {
-    fspells = fspells->next;
-  }
-  if (fspells!=NULL) return fspells->spells;
-  return NULL;
-}
-
-familiar_spells *
-mkspells(const race * rc)
-{
-  familiar_spells * fspells;
-
-  fspells = malloc(sizeof(familiar_spells));
-  fspells->next = racespells;
-  racespells = fspells;
-  fspells->familiar_race = rc;
-  fspells->spells = NULL;
-  return fspells;
-}
-
-void 
-init_familiarspells(void)
-{
-  familiar_spells * fspells;
-
-  fspells = mkspells(new_race[RC_PSEUDODRAGON]);
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_FLEE));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_SLEEP));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_FRIGHTEN));
-
-  fspells = mkspells(new_race[RC_NYMPH]);
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_SEDUCE));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_SONG_OF_CONFUSION));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
-
-  fspells = mkspells(new_race[RC_NYMPH]);
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_SEDUCE));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_SONG_OF_CONFUSION));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
-  
-  fspells = mkspells(new_race[RC_UNICORN]);
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_RESISTMAGICBONUS));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_SONG_OF_PEACE));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_HERO));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_HEALINGSONG));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
-
-  fspells = mkspells(new_race[RC_WRAITH]);
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_STEALAURA));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_FRIGHTEN));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_SUMMONUNDEAD));
-
-  fspells = mkspells(new_race[RC_IMP]);
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_STEALAURA));
-
-  fspells = mkspells(new_race[RC_DREAMCAT]);
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_ILL_SHAPESHIFT));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_TRANSFERAURA_TRAUM));
-
-  fspells = mkspells(new_race[RC_FEY]);
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_DENYATTACK));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_CALM_MONSTER));
-  spelllist_add(&fspells->spells, find_spellbyid(SPL_SEDUCE));
-}
-
 void 
 init_races(void)
 {
-  init_familiarspells();
 }

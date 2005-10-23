@@ -11,9 +11,11 @@
 #include <kernel/movement.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
+#include <kernel/pool.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/skill.h>
+#include <kernel/spell.h>
 #include <kernel/study.h>
 #include <kernel/unit.h>
 
@@ -89,6 +91,65 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
   return EUNUSABLE;
 }
 /* END speedsail */
+
+/* ------------------------------------------------------------- */
+/* Kann auch von Nichtmagiern benutzt werden, erzeugt eine
+* Antimagiezone, die zwei Runden bestehen bleibt */
+static void
+use_antimagiccrystal(region * r, unit * mage, int amount, struct order * ord)
+{
+  int i;
+  for (i=0;i!=amount;++i) {
+    int effect, duration = 2;
+    double force;
+    spell *sp = find_spell(M_GRAU, "antimagiczone");
+    attrib ** ap = &r->attribs;
+    unused(ord);
+    assert(sp);
+
+    /* Reduziert die Stärke jedes Spruchs um effect */
+    effect = sp->level; 
+
+    /* Hält Sprüche bis zu einem summierten Gesamtlevel von power aus.
+    * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
+    * um seine Stufe */
+    force = sp->level * 20; /* Stufe 5 =~ 100 */
+
+    /* Regionszauber auflösen */
+    while (*ap && force > 0) {
+      curse * c;
+      attrib * a = *ap;
+      if (!fval(a->type, ATF_CURSE)) {
+        do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
+        continue;
+      }
+      c = (curse*)a->data.v;
+
+      /* Immunität prüfen */
+      if (c->flag & CURSE_IMMUNE) {
+        do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
+        continue;
+      }
+
+      force = destr_curse(c, effect, force);
+      if(c->vigour <= 0) {
+        a_remove(&r->attribs, a);
+      }
+      if(*ap) ap = &(*ap)->next;
+    }
+
+    if(force > 0) {
+      variant var ;
+      var.i = effect;
+      create_curse(mage, &r->attribs, ct_find("antimagiczone"), force, duration, var, 0);
+    }
+
+  }
+  use_pooled(mage, mage->region, R_ANTIMAGICCRYSTAL, amount);
+  ADDMSG(&mage->faction->msgs, msg_message("use_antimagiccrystal", 
+    "unit region", mage, r));
+  return;
+}
 
 static int
 use_instantartsculpture(struct unit * u, const struct item_type * itype,
@@ -193,6 +254,7 @@ use_aurapotion50(struct unit * u, const struct item_type * itype,
 void
 register_itemimplementations(void)
 {
+  register_function((pf_generic)use_antimagiccrystal, "use_antimagiccrystal");
   register_function((pf_generic)use_instantartsculpture, "use_instantartsculpture");
   register_function((pf_generic)use_studypotion, "use_studypotion");
 	register_function((pf_generic)use_speedsail, "use_speedsail");

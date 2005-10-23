@@ -23,6 +23,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+  struct spell;
 
   typedef struct itemdata {
     const struct item_type * itype;
@@ -44,6 +45,7 @@ extern "C" {
     char * name;
     struct itemdata * items;
     char * skills[MAXSKILLS];
+    struct spell_list * spells;
     struct subset * subsets;
     struct equipment * next;
   } equipment;
@@ -54,6 +56,7 @@ extern "C" {
 
   extern void equipment_setitem(struct equipment * eq, const struct item_type * itype, const char * value);
   extern void equipment_setskill(struct equipment * eq, skill_t sk, const char * value);
+  extern void equipment_addspell(struct equipment * eq, struct spell * sp);
 
   extern void equip_unit(struct unit * u, const struct equipment * eq);
 

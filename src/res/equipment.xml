@@ -1,6 +1,131 @@
 <?xml version="1.0"?>
 <equipment>
 
+  <!-- equipment given to familiars -->
+  <set name="lynx_familiar">
+    <skill name="sk_espionage" level="1"/>
+    <skill name="sk_magic" level="1"/>
+    <skill name="sk_stealth" level="1"/>
+    <skill name="sk_perception" level="1"/>
+  </set>
+
+  <set name="tunnelworm_familiar">
+    <skill name="sk_magic" level="1"/>
+    <skill name="sk_mining" level="1"/>
+    <skill name="sk_forestry" level="1"/>
+    <skill name="sk_stamina" level="1"/>
+  </set>
+
+  <set name="eagle_familiar">
+    <skill name="sk_magic" level="1"/>
+    <skill name="sk_perception" level="1"/>
+  </set>
+
+  <set name="rat_familiar">
+    <skill name="sk_magic" level="1"/>
+    <skill name="sk_espionage" level="1"/>
+    <skill name="sk_stealth" level="1"/>
+    <skill name="sk_perception" level="1"/>
+    <skill name="sk_stamina" level="6"/>
+  </set>
+
+  <set name="songdragon_familiar">
+    <skill name="sk_magic" level="1"/>
+    <!-- spells -->
+    <spell name="flee" school="gray"/>
+    <spell name="sleep" school="gray"/>
+    <spell name="frighten" school="gray"/>
+  </set>
+
+  <set name="nymph_familiar">
+    <skill name="sk_magic" level="1"/>
+    <skill name="sk_bow" level="1"/>
+    <skill name="sk_herbalism" level="1"/>
+    <skill name="sk_training" level="1"/>
+    <skill name="sk_riding" level="1"/>
+    <skill name="sk_espionage" level="1"/>
+    <skill name="sk_stealth" level="1"/>
+    <skill name="sk_entertainment" level="1"/>
+    <skill name="sk_perception" level="1"/>
+    <!-- spells -->
+    <spell name="seduction" school="gray"/>
+    <spell name="calm_monster" school="gray"/>
+    <spell name="song_of_confusion" school="gray"/>
+    <spell name="appeasement" school="gray"/>
+  </set>
+
+  <set name="unicorn_familiar">
+    <skill name="sk_magic" level="1"/>
+    <skill name="sk_stealth" level="1"/>
+    <skill name="sk_perception" level="1"/>
+    <!-- spells -->
+    <spell name="resist_magic" school="gray"/>
+    <spell name="song_of_peace" school="gray"/>
+    <spell name="calm_monster" school="gray"/>
+    <spell name="heroic_song" school="gray"/>
+    <spell name="song_of_healing" school="gray"/>
+    <spell name="appeasement" school="gray"/>
+  </set>
+
+  <set name="direwolf_familiar">
+    <skill name="sk_magic" level="1"/>
+    <skill name="sk_perception" level="1"/>
+  </set>
+
+  <set name="ghost_familiar">
+    <skill name="sk_magic" level="1"/>
+    <!-- spells -->
+    <spell name="steal_aura" school="gray"/>
+    <spell name="frighten" school="gray"/>
+    <spell name="summonundead" school="gray"/>
+  </set>
+
+  <set name="imp_familiar">
+    <skill name="sk_magic" level="1"/>
+    <skill name="sk_espionage" level="1"/>
+    <skill name="sk_stealth" level="1"/>
+    <skill name="sk_perception" level="1"/>
+    <skill name="sk_taxation" level="1"/>
+    <!-- spells -->
+    <spell name="steal_aura" school="gray"/>
+  </set>
+
+  <set name="dreamcat_familiar">
+    <skill name="sk_magic" level="1"/>
+    <skill name="sk_espionage" level="1"/>
+    <skill name="sk_stealth" level="1"/>
+    <skill name="sk_perception" level="1"/>
+    <skill name="sk_taxation" level="1"/>
+    <!-- spells -->
+    <spell name="shapeshift" school="gray"/>
+    <spell name="transferauratraum" school="gray"/>
+  </set>
+
+  <set name="fairy_familiar">
+    <skill name="sk_magic" level="1"/>
+    <!-- spells -->
+    <spell name="appeasement" school="gray"/>
+    <spell name="calm_monster" school="gray"/>
+    <spell name="seduction" school="gray"/>
+  </set>
+
+  <set name="owl_familiar">
+    <skill name="sk_magic" level="1"/>
+    <skill name="sk_espionage" level="1"/>
+    <skill name="sk_stealth" level="1"/>
+    <skill name="sk_perception" level="1"/>
+  </set>
+
+  <set name="hellcat_familiar">
+    <skill name="sk_magic" level="1"/>
+    <skill name="sk_perception" level="1"/>
+  </set>
+
+  <set name="tiger_familiar">
+    <skill name="sk_magic" level="1"/>
+    <skill name="sk_perception" level="1"/>
+  </set>
+
   <!-- one equipment-set per player-race for the first unit in a faction -->
   <set name="dwarf">
     <item name="axe" amount="1"/>

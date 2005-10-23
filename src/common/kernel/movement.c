@@ -62,7 +62,6 @@
 #include <attributes/at_movement.h>
 #include <attributes/otherfaction.h>
 
-extern border_type bt_wisps;
 int * storms;
 
 typedef struct traveldir {
@@ -1054,7 +1053,7 @@ next_region(unit * u, region * current, region * next)
     if (b->type->move) {
       region * rto = b->type->move(b, u, current, next, true);
       if (rto!=next) {
-        /* the target region was changed (bt_wisps, for example). check the
+        /* the target region was changed (wisps, for example). check the
         * new target region for borders */
         next = rto;
         b = get_borders(current, next);
@@ -1146,7 +1145,7 @@ movement_speed(unit * u)
     case RC_WYRM:
     case RC_FIREDRAGON:
     case RC_BIRTHDAYDRAGON:
-    case RC_PSEUDODRAGON:
+    case RC_SONGDRAGON:
       return BP_DRAGON;
   }
 

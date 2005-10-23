@@ -186,9 +186,9 @@ setstealth_cmd(unit * u, struct order * ord)
       return 0;
     }
 
-    /* Pseudodrachen können sich nur als Drachen tarnen */
-    if (u->race == new_race[RC_PSEUDODRAGON] || u->race == new_race[RC_BIRTHDAYDRAGON]) {
-      if (trace==new_race[RC_PSEUDODRAGON]||trace==new_race[RC_FIREDRAGON]||trace==new_race[RC_DRAGON]||trace==new_race[RC_WYRM]) {
+    /* Singdrachen können sich nur als Drachen tarnen */
+    if (u->race == new_race[RC_SONGDRAGON] || u->race == new_race[RC_BIRTHDAYDRAGON]) {
+      if (trace==new_race[RC_SONGDRAGON]||trace==new_race[RC_FIREDRAGON]||trace==new_race[RC_DRAGON]||trace==new_race[RC_WYRM]) {
         u->irace = trace;
         if (u->race->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
           set_racename(&u->attribs, NULL);

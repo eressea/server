@@ -27,6 +27,7 @@
 #include <attributes/targetregion.h>
 #include <modules/autoseed.h>
 #include <modules/xecmd.h>
+#include <spells/spells.h>
 
 /* gamecode includes */
 #include <gamecode/economy.h>
@@ -53,6 +54,7 @@
 #include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/spell.h>
+#include <kernel/spellid.h>
 #include <kernel/study.h>
 #include <kernel/teleport.h>
 #include <kernel/unit.h>

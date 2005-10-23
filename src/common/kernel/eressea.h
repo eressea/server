@@ -57,6 +57,7 @@ struct plane;
 struct order;
 struct spell;
 struct region;
+struct fighter;
 struct region_list;
 struct race;
 struct ship;
@@ -653,18 +654,18 @@ enum {
 	RC_PEASANT,
 	RC_WOLF, /* 31 */
 
-	RC_HOUSECAT,
+	RC_LYNX,
 	RC_TUNNELWORM,
 	RC_EAGLE,
 	RC_RAT,
-	RC_PSEUDODRAGON,
+	RC_SONGDRAGON,
 	RC_NYMPH,
 	RC_UNICORN,
-	RC_WARG,
-	RC_WRAITH,
+	RC_DIREWOLF,
+	RC_GHOST,
 	RC_IMP, /* 41 */
 	RC_DREAMCAT,
-	RC_FEY,
+	RC_FAIRY,
 	RC_OWL,
 	RC_HELLCAT,
 	RC_TIGER,

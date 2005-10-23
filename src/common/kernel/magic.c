@@ -39,6 +39,7 @@
 #include "ship.h"
 #include "skill.h"
 #include "spell.h"
+#include "spellid.h"
 #include "unit.h"
 
 #include <triggers/timeout.h>
@@ -1243,6 +1244,18 @@ fumble(region * r, unit * u, const spell * sp, int cast_grade)
 	return true;
 }
 
+/* ------------------------------------------------------------- */
+/* Dummy-Zauberpatzer, Platzhalter für speziel auf die Sprüche
+* zugeschnittene Patzer */
+static void
+patzer(castorder *co)
+{
+  unit *mage = (unit *)co->magician;
+
+  cmistake(mage, co->order, 180, MSG_MAGIC);
+
+  return;
+}
 /* Die normalen Spruchkosten müssen immer bezahlt werden, hier noch
  * alle weiteren Folgen eines Patzers
  */

@@ -82,6 +82,14 @@ equipment_setskill(equipment * eq, skill_t sk, const char * value)
   }
 }
 
+void
+equipment_addspell(equipment * eq, spell * sp)
+{
+  if (eq!=NULL) {
+    spelllist_add(&eq->spells, sp);
+  }
+}
+
 void 
 equipment_setitem(equipment * eq, const item_type * itype, const char * value)
 {
@@ -108,6 +116,14 @@ equip_unit(struct unit * u, const struct equipment * eq)
   if (eq) {
     skill_t sk;
     itemdata * idata;
+    sc_mage * m = get_mage(u);
+    if (m!=NULL) {
+      spell_list * sp = eq->spells;
+      while (sp) {
+        add_spell(m, sp->data);
+        sp = sp->next;
+      }
+    }
     for (sk=0;sk!=MAXSKILLS;++sk) {
       if (eq->skills[sk]!=NULL) {
         int i = dice_rand(eq->skills[sk]);

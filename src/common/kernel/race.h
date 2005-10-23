@@ -169,8 +169,6 @@ extern boolean allowed_dragon(const struct region * src, const struct region * t
 extern void register_races(void);
 extern void init_races(void);
 extern boolean r_insectstalled(const struct region *r);
-extern spell_list * familiarspells(const struct race * rc);
-
 
 extern void add_raceprefix(const char *);
 extern char ** race_prefixes;

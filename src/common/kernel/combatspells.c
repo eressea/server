@@ -11,6 +11,7 @@
 */
 #include <config.h>
 #include "eressea.h"
+#include "combatspells.h"
 
 /* kernel includes */
 #include "battle.h"
@@ -25,6 +26,7 @@
 #include "unit.h"
 #include "movement.h"
 #include "spell.h"
+#include "spellid.h"
 #include "race.h"
 #include "skill.h"
 

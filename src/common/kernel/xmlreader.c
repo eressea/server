@@ -926,6 +926,38 @@ add_items(equipment * eq, xmlNodeSetPtr nsetItems)
 }
 
 static void
+add_spells(equipment * eq, xmlNodeSetPtr nsetItems)
+{
+  if (nsetItems!=NULL && nsetItems->nodeNr>0) {
+    int i;
+    for (i=0;i!=nsetItems->nodeNr;++i) {
+      xmlNodePtr node = nsetItems->nodeTab[i];
+      xmlChar * property;
+      magic_t mtype = M_GRAU;
+      struct spell * sp;
+
+      property = xmlGetProp(node, BAD_CAST "school");
+      if (property!=NULL) {
+        for (mtype=0;mtype!=MAXMAGIETYP;++mtype) {
+          if (strcmp((const char*)property, magietypen[mtype])==0) break;
+        }
+        assert(mtype!=MAXMAGIETYP);
+        xmlFree(property);
+      }
+
+      property = xmlGetProp(node, BAD_CAST "name");
+      assert(property!=NULL);
+      sp = find_spell(mtype, (const char*)property);
+      assert(sp);
+      xmlFree(property);
+      if (sp!=NULL) {
+        equipment_addspell(eq, sp);
+      }
+    }
+  }
+}
+
+static void
 add_skills(equipment * eq, xmlNodeSetPtr nsetSkills)
 {
   if (nsetSkills!=NULL && nsetSkills->nodeNr>0) {
@@ -1031,6 +1063,10 @@ parse_equipment(xmlDocPtr doc)
 
         xpathResult = xmlXPathEvalExpression(BAD_CAST "item", xpath);
         add_items(eq, xpathResult->nodesetval);
+        xmlXPathFreeObject(xpathResult);
+
+        xpathResult = xmlXPathEvalExpression(BAD_CAST "spell", xpath);
+        add_spells(eq, xpathResult->nodesetval);
         xmlXPathFreeObject(xpathResult);
 
         xpathResult = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
@@ -1654,8 +1690,8 @@ register_xmlreader(void)
 
   xml_register_callback(parse_buildings); /* requires resources */
   xml_register_callback(parse_ships); /* requires resources */
-  xml_register_callback(parse_equipment); /* requires resources */
   xml_register_callback(parse_spells); /* requires resources */
+  xml_register_callback(parse_equipment); /* requires spells */
   xml_register_callback(parse_races); /* requires spells */
   xml_register_callback(parse_calendar);
 }

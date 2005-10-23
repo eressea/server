@@ -7,8 +7,14 @@
     </item>
   </resource>
 
+  <resource name="antimagic" appearance="amulet">
+    <item weight="0" score="2000">
+      <function name="use" value="use_antimagiccrystal"/>
+    </item>
+  </resource>
+
   <resource name="wand_of_tears">
-    <item notlost="yes" weight="1" capacity="0">
+    <item notlost="yes" weight="1">
       <function name="use" value="use_wand_of_tears"/>
     </item>
   </resource>

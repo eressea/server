@@ -1933,7 +1933,7 @@ report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * ad
 	rnl(F);
 	sprintf(buf, "%s, %s/%s (%s)", factionname(f),
 			LOC(f->locale, rc_name(f->race, 1)), 
-      LOC(f->locale, mkname("school", neue_gebiete[f->magiegebiet])),
+      LOC(f->locale, mkname("school", magietypen[f->magiegebiet])),
 			f->email);
 	centre(F, buf, true);
 	if (f->alliance!=NULL) {
@@ -3338,13 +3338,13 @@ out_faction(FILE *file, faction *f)
   if (alliances!=NULL) {
     fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
       f->name, itoa36(f->no), f->alliance?f->alliance->id:0,
-      LOC(default_locale, rc_name(f->race, 0)), neue_gebiete[f->magiegebiet],
+      LOC(default_locale, rc_name(f->race, 0)), magietypen[f->magiegebiet],
       f->no_units, f->num_total, f->money, turn - f->lastorders,
       turn - f->lastorders != 1 ? "NMRs" : "NMR ");
   } else {
  	  fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d %s\n",
 		  factionname(f), LOC(default_locale, rc_name(f->race, 0)),
-		  neue_gebiete[f->magiegebiet], f->no_units, f->num_total, f->money,
+		  magietypen[f->magiegebiet], f->no_units, f->num_total, f->money,
 		  turn - f->lastorders, turn - f->lastorders != 1 ? "NMRs" : "NMR ");
   }
 }

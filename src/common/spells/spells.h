@@ -20,6 +20,18 @@ extern "C" {
 
   extern void register_spells(void);
 
+  /* für Feuerwände: in movement muß das noch explizit getestet werden.
+  * besser wäre eine blcok_type::move() routine, die den effekt
+  * der Bewegung auf eine struct unit anwendet.
+  */
+  extern struct border_type bt_chaosgate;
+  extern struct border_type bt_firewall;
+  typedef struct wall_data {
+    struct unit * mage;
+    int force;
+    boolean active;
+  } wall_data;
+
 #ifdef __cplusplus
 }
 #endif

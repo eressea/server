@@ -31,7 +31,6 @@ extern "C" {
 #define REPORTWIDTH 78
 
 extern const char *directions[];
-extern const char *neue_gebiete[];
 extern const char *coasts[];
 
 /* kann_finden speedups */

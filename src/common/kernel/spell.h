@@ -12,8 +12,8 @@
 * prior permission by the authors of Eressea.
 */
 
-#ifndef H_KRNL_SPELLS
-#define H_KRNL_SPELLS
+#ifndef H_KRNL_SPELL
+#define H_KRNL_SPELL
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,201 +26,6 @@ extern "C" {
   struct castorder;
   struct curse;
 
-  /* Sprüche. Neue NUR hinten anfügen, oder das Datenfile geht kaputt */
-  enum {
-    SPL_NOSPELL,
-    LUASPL_ARTEFAKT_OF_POWER,
-    LUASPL_ARTEFAKT_OF_AURAPOWER,
-    LUASPL_ARTEFAKT_OF_REGENERATION,
-    SPL_FIREBALL,
-    SPL_HAGEL,
-    SPL_RUSTWEAPON,
-    SPL_COMBATRUST,
-    SPL_TREEGROW,
-    SPL_HEALING,
-    SPL_HEALINGSONG,
-    SPL_BADDREAMS,
-    SPL_GOODDREAMS,
-    SPL_DREAMREADING,
-    SPL_SWEETDREAMS,
-    SPL_TIREDSOLDIERS,
-    SPL_PLAGUE,
-    SPL_MAGICBOOST,
-    SPL_CHAOSROW,
-    SPL_SONG_OF_CONFUSION,
-    SPL_FLEE,
-    SPL_SONG_OF_FEAR,
-    SPL_BERSERK,
-    SPL_BLOODTHIRST,
-    SPL_MAELSTROM,
-    SPL_BLESSEDHARVEST,
-    SPL_RAINDANCE,
-    SPL_TRANSFERAURA_DRUIDE,
-    SPL_TRANSFERAURA_BARDE,
-    SPL_TRANSFERAURA_CHAOS,
-    SPL_TRANSFERAURA_TRAUM,
-    SPL_TRANSFERAURA_ASTRAL,
-    SPL_STONEGOLEM,
-    SPL_IRONGOLEM,
-    SPL_SUMMONSHADOW,
-    SPL_SUMMONSHADOWLORDS,
-    SPL_REELING_ARROWS,
-    SPL_ANTIMAGICZONE,
-    LUASPL_CREATE_ANTIMAGICCRYSTAL,
-    SPL_KAELTESCHUTZ,
-    SPL_STEALAURA,
-    SPL_SUMMONUNDEAD,
-    SPL_AURALEAK,
-    SPL_GREAT_DROUGHT,
-    SPL_STRONG_WALL,
-    SPL_HOMESTONE,
-    SPL_DROUGHT,
-    SPL_FOREST_FIRE,
-    LUASPL_STRENGTH,
-    SPL_SUMMONENT,
-    SPL_DISTURBINGDREAMS,
-    SPL_DENYATTACK,
-    SPL_SLEEP,
-    SPL_EARTHQUAKE,
-    SPL_IRONKEEPER,
-    SPL_STORMWINDS,
-    SPL_GOODWINDS,
-    SPL_FLYING_SHIP,
-    SPL_SUMMON_ALP,
-    SPL_WINDSHIELD,
-    SPL_RAISEPEASANTS,
-    SPL_DEPRESSION,
-    SPL_HEADACHE,
-    LUASPL_ARTEFAKT_NIMBLEFINGERRING,
-    SPL_ENTERASTRAL,
-    SPL_LEAVEASTRAL,
-    SPL_SHOWASTRAL,
-    SPL_VERSTEINERN,
-    SPL_TREEWALKENTER,
-    SPL_TREEWALKEXIT,
-    SPL_CHAOSSUCTION,
-    SPL_VIEWREALITY,
-    SPL_DISRUPTASTRAL,
-    SPL_SEDUCE,
-    SPL_PUMP,
-    SPL_CALM_MONSTER,
-    SPL_HERO,
-    SPL_FRIGHTEN,
-    SPL_MINDBLAST,
-    SPL_SPEED,
-    SPL_SPEED2,
-    SPL_FIREDRAGONODEM,
-    SPL_DRAGONODEM,
-    SPL_WYRMODEM, /* 83 */
-    SPL_MAGICSTREET,
-    SPL_REANIMATE,
-    SPL_RECRUIT,
-    SPL_GENEROUS,
-    SPL_PERMTRANSFER,
-    SPL_SONG_OF_PEACE,
-    SPL_MIGRANT,
-    SPL_RALLYPEASANTMOB,
-    SPL_RAISEPEASANTMOB,
-    SPL_ILL_SHAPESHIFT,
-    SPL_WOLFHOWL,
-    SPL_FOG_OF_CONFUSION,
-    SPL_DREAM_OF_CONFUSION,
-    SPL_RESISTMAGICBONUS,
-    SPL_KEEPLOOT,
-    SPL_SCHILDRUNEN,
-    SPL_SONG_RESISTMAGIC,
-    SPL_SONG_SUSCEPTMAGIC,
-    SPL_ANALYSEMAGIC,
-    SPL_ANALYSEDREAM,
-    SPL_UNIT_ANALYSESONG,
-    SPL_OBJ_ANALYSESONG,
-    SPL_TYBIED_DESTROY_MAGIC,
-    SPL_DESTROY_MAGIC,
-    SPL_METEORRAIN,
-    SPL_REDUCESHIELD,
-    SPL_ARMORSHIELD,
-    SPL_DEATHCLOUD,
-    SPL_ORKDREAM,
-    SPL_SUMMONDRAGON,
-    SPL_READMIND,
-    SPL_BABBLER,
-    SPL_MOVECASTLE,
-    SPL_BLESSSTONECIRCLE,
-    SPL_ILLAUN_FAMILIAR,
-    SPL_GWYRRD_FAMILIAR,
-    SPL_DRAIG_FAMILIAR,
-    SPL_CERDDOR_FAMILIAR,
-    SPL_TYBIED_FAMILIAR,
-    SPL_SONG_OF_ENSLAVE,
-    LUASPL_TRUESEEING_GWYRRD,
-    LUASPL_TRUESEEING_DRAIG,
-    LUASPL_TRUESEEING_ILLAUN,
-    LUASPL_TRUESEEING_CERDDOR,
-    LUASPL_TRUESEEING_TYBIED,
-    LUASPL_INVISIBILITY_GWYRRD,
-    LUASPL_INVISIBILITY_DRAIG,
-    LUASPL_INVISIBILITY_ILLAUN,
-    LUASPL_INVISIBILITY_CERDDOR,
-    LUASPL_INVISIBILITY_TYBIED,
-    LUASPL_ARTEFAKT_CHASTITYBELT,
-    LUASPL_ARTEFAKT_RUNESWORD,
-    SPL_FUMBLECURSE,
-    SPL_ICASTLE,
-    SPL_GWYRRD_DESTROY_MAGIC,
-    SPL_DRAIG_DESTROY_MAGIC,
-    SPL_ILLAUN_DESTROY_MAGIC,
-    SPL_CERDDOR_DESTROY_MAGIC,
-    SPL_GWYRRD_ARMORSHIELD,
-    SPL_DRAIG_FUMBLESHIELD,
-    SPL_GWYRRD_FUMBLESHIELD,
-    SPL_CERRDOR_FUMBLESHIELD,
-    SPL_TYBIED_FUMBLESHIELD,
-    SPL_SHADOWKNIGHTS,
-    LUASPL_FIRESWORD,
-    LUASPL_CREATE_TACTICCRYSTAL,
-    SPL_ITEMCLOAK,
-    SPL_FIREWALL,
-    SPL_WISPS,
-    SPL_SPARKLE_CHAOS,
-    SPL_SPARKLE_DREAM,
-    LUASPL_BAG_OF_HOLDING,
-    SPL_PULLASTRAL,
-    SPL_FETCHASTRAL,
-    SPL_ILLAUN_EARN_SILVER,
-    SPL_GWYRRD_EARN_SILVER,
-    SPL_DRAIG_EARN_SILVER,
-    SPL_TYBIED_EARN_SILVER,
-    SPL_CERDDOR_EARN_SILVER,
-    SPL_SHOCKWAVE,
-    SPL_UNDEADHERO,
-    LUASPL_ARTEFAKT_SACK_OF_CONSERVATION,
-    SPL_BECOMEWYRM,
-    SPL_ETERNIZEWALL,
-    SPL_PUTTOREST,
-    SPL_UNHOLYPOWER,
-    SPL_HOLYGROUND,
-    SPL_BLOODSACRIFICE,
-    SPL_MALLORN,
-    SPL_CLONECOPY,
-    SPL_DRAINODEM,		/* 174? */
-    SPL_AURA_OF_FEAR,	/* 175? */
-    SPL_SHADOWCALL,		/* 176? */
-    SPL_MALLORNTREEGROW,
-    LUASPL_INVISIBILITY2_ILLAUN,
-    SPL_BIGRECRUIT,
-    SPL_IMMOLATION,
-    SPL_FIREODEM, /* 181 */
-    SPL_ICEODEM,
-    SPL_ACIDODEM,
-#ifdef WDW_PYRAMIDSPELL
-    SPL_WDWPYRAMID_TRAUM,
-    SPL_WDWPYRAMID_ASTRAL,
-    SPL_WDWPYRAMID_DRUIDE,
-    SPL_WDWPYRAMID_BARDE,
-    SPL_WDWPYRAMID_CHAOS,
-#endif
-  };
-
   /* Prototypen */
 
   void do_shock(struct unit *u, const char *reason);
@@ -230,55 +35,8 @@ extern "C" {
   int sp_antimagiczone(struct castorder *co);
   extern double destr_curse(struct curse* c, int cast_level, double force);
 
-
-
-  /* Kampfzauber */
-  extern int sp_fumbleshield(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_shadowknights(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_combatrosthauch(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_kampfzauber(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_healing(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_keeploot(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_reanimate(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_chaosrow(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_flee(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_berserk(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_tiredsoldiers(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_reeling_arrows(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_denyattack(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_sleep(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_windshield(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_strong_wall(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_versteinern(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_hero(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_frighten(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_mindblast(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_speed(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_wolfhowl(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_dragonodem(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_reduceshield(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_armorshield(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_stun(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_undeadhero(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_shadowcall(struct fighter * fi, int level, double power, struct spell * sp);
-  extern int sp_immolation(struct fighter * fi, int level, double power, struct spell * sp);
-
   /* ------------------------------------------------------------- */
 
-  /* für Feuerwände: in movement muß das noch explizit getestet werden.
-  * besser wäre eine blcok_type::move() routine, die den effekt
-  * der Bewegung auf eine struct unit anwendet.
-  */
-  extern struct border_type bt_chaosgate;
-  extern struct border_type bt_firewall;
-  extern struct border_type bt_wisps;
-  typedef struct wall_data {
-    struct unit * mage;
-    int force;
-    boolean active;
-  } wall_data;
-
-  extern struct attrib_type at_cursewall;
   extern struct attrib_type at_unitdissolve;
 #ifdef WDW_PYRAMIDSPELL
   extern struct attrib_type at_wdwpyramid;
@@ -288,9 +46,115 @@ extern "C" {
   extern void init_spells(void);
   extern void register_spell(struct spell * sp);
   extern struct spell * find_spell(magic_t mtype, const char * name);
-  extern void patzer(struct castorder *co);
 
 #ifdef __cplusplus
 }
 #endif
 #endif
+
+/* ------------------------------------------------------------- */
+/* Erläuterungen zu den Spruchdefinitionen
+ *
+ * Spruchstukturdefinition:
+ * spell{
+ *  id, name,
+ *  beschreibung,
+ *  syntax,
+ *  parameter,
+ *  magietyp,
+ *  sptyp,
+ *  rank,level,
+ *  costtyp, aura,
+ *  komponenten[5][2][faktorart],
+ *  &funktion, patzer}
+ *
+ * id:
+ * SPL_NOSPELL muss der letzte Spruch in der Liste spelldaten sein,
+ * denn nicht auf die Reihenfolge in der Liste sondern auf die id wird
+ * geprüft
+ *
+ * sptyp:
+ * besondere Spruchtypen und Flags
+ *    (Regionszauber, Kampfzauber, Farcastbar, Stufe variable, ..)
+ *
+ * rank:
+ * gibt die Priorität und damit die Reihenfolge an, in der der Spruch
+ * gezaubert wird.
+ * 1: Aura übertragen
+ * 2: Antimagie
+ * 3: Magierverändernde Sprüche (Magic Boost, ..)
+ * 4: Monster erschaffen
+ * 5: Standartlevel
+ * 7: Teleport
+ *
+ * Komponenten[Anzahl mögl. Items][Art:Anzahl:Kostentyp]
+ *
+ * R_AURA:
+ * Grundkosten für einen Zauber. Soviel Mp müssen mindestens investiert
+ * werden, um den Spruch zu wirken. Zusätzliche Mp können unterschiedliche
+ * Auswirkungen haben, die in der Spruchfunktionsroutine definiert werden.
+ *
+ * R_PERMAURA:
+ * Kosten an permantenter Aura
+ *
+ * Komponenten Kostentyp:
+ * SPC_LEVEL == Spruch mit Levelabhängigen Magiekosten. Die angegeben
+ * Kosten müssen für Stufe 1 berechnet sein.
+ * SPC_FIX   == Feste Kosten
+ *
+ * Wenn keine spezielle Syntax angegeben ist, wird die
+ * Syntaxbeschreibung aus sptyp  generiert:
+ * FARCASTING: ZAUBER [REGION x y]
+ * SPELLLEVEL: ZAUBER [STUFE n]
+ * UNITSPELL : ZAUBER <spruchname> <Einheit-Nr> [<Einheit-Nr> ..]
+ * SHIPSPELL : ZAUBER <spruchname> <Schiff-Nr> [<Schiff-Nr> ..]
+ * BUILDINGSPELL: ZAUBER <spruchname> <Gebäude-Nr> [<Gebäude-Nr> ..]
+ * ONETARGET : ZAUBER <spruchname> <target-nr>
+ * PRECOMBATSPELL : KAMPFZAUBER [STUFE n] <spruchname>
+ * COMBATSPELL    : KAMPFZAUBER [STUFE n] <spruchname>
+ * POSTCOMBATSPELL: KAMPFZAUBER [STUFE n] <spruchname>
+ *
+ * Das Parsing
+ *
+ * Der String spell->parameter gibt die Syntax an, nach der die
+ * Parameter des Spruches in add_spellparameter() geparst werden sollen.
+ *
+ * u : eine Einheitennummer
+ * r : hier kommen zwei Regionskoordinaten x y
+ * b : Gebäude- oder Burgnummer
+ * s : Schiffsnummer
+ * c : String, wird ohne Weiterverarbeitung übergeben
+ * i : Zahl (int), wird ohne Weiterverarbeitung übergeben
+ * k : Keywort - dieser String gibt den Paramter an, der folgt. Der
+ *     Parameter wird mit findparam() identifiziert.
+ *     k muss immer von einem c als Platzhalter für das Objekt gefolgt
+ *     werden.
+ *     Ein gutes Beispiel sind hierfür die Sprüche zur Magieanalyse.
+ * + : gibt an, das der vorherige Parameter mehrfach vorkommen kann. Da
+ *     ein Ende nicht definiert werden kann, muss dies immer am Schluss
+ *     kommen.
+ *
+ * Flags für das Parsing:
+ * TESTRESISTANCE : alle Zielobjekte, also alle Parameter vom Typ Unit,
+ *		  Burg, Schiff oder Region, werden auf ihre
+ *		  Magieresistenz überprüft
+ * TESTCANSEE     : jedes Objekt vom Typ Einheit wird auf seine
+ *		  Sichtbarkeit überprüft
+ * SEARCHGLOBAL   : die Zielobjekte werden global anstelle von regional
+ *		  gesucht
+ * REGIONSPELL    : Ziel ist die Region, auch wenn kein Zielobjekt
+ *		  angegeben wird. Ist TESTRESISTANCE gesetzt, so wird
+ *		  die Magieresistenz der Region überprüft
+ *
+ * Bei fehlendem Ziel oder wenn dieses dem Zauber widersteht, wird die
+ * Spruchfunktion nicht aufgerufen.
+ * Sind zu wenig Parameter vorhanden, wird der Zauber ebenfalls nicht
+ * ausgeführt.
+ * Ist eins von mehreren Zielobjekten resistent, so wird das Flag
+ * pa->param[n]->flag == TARGET_RESISTS
+ * Ist eins von mehreren Zielobjekten nicht gefunden worden, so ist
+ * pa->param[n]->flag == TARGET_NOTFOUND
+ *
+ */
+/* ------------------------------------------------------------- */
+

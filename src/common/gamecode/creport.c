@@ -1131,7 +1131,7 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 	}
 	fprintf(F, "%d;Rekrutierungskosten\n", f->race->recruitcost);
 	fprintf(F, "%d;Anzahl Personen\n", count_all(f));
-	fprintf(F, "\"%s\";Magiegebiet\n", neue_gebiete[f->magiegebiet]);
+	fprintf(F, "\"%s\";Magiegebiet\n", magietypen[f->magiegebiet]);
 
 	if (f->race == new_race[RC_HUMAN]) {
 		fprintf(F, "%d;Anzahl Immigranten\n", count_migrants(f));

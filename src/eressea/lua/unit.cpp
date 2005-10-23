@@ -58,12 +58,6 @@ public:
   static spell * value(spell_list * node) { return node->data; }
 };
 
-static eressea::list<spell *, spell_list *, bind_spell_list>
-unit_familiarspells(const unit& u) {
-  spell_list * spells = familiarspells(u.race);
-  return eressea::list<spell *, spell_list *, bind_spell_list>(spells);
-}
-
 class bind_orders {
 public:
   static order * next(order * node) { return node->next; }
@@ -581,7 +575,6 @@ bind_unit(lua_State * L)
     .property("region", &unit_getregion, &unit_setregion)
     .property("is_familiar", &unit_isfamiliar)
     .property("spells", &unit_spells, return_stl_iterator)
-    .property("familiarspells", &unit_familiarspells, return_stl_iterator)
     .property("number", &unit_getnumber, &unit_setnumber)
     .property("race", &unit_getrace, &unit_setrace)
     .property("hp_max", &unit_hpmax)

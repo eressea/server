@@ -58,15 +58,6 @@
 
 const char * g_reportdir;
 
-const char *neue_gebiete[] = {
-	"none",
-	"illaun",
-	"tybied",
-	"cerddor",
-	"gwyrrd",
-	"draig"
-};
-
 const char *coasts[MAXDIRECTIONS] =
 {
 	"coast::nw",

@@ -28,7 +28,6 @@
 #include "pool.h"
 #include "race.h"
 #include "region.h"
-#include "spell.h"
 #include "save.h"
 #include "skill.h"
 #include "unit.h"
@@ -782,64 +781,6 @@ destroy_curse_crystal(attrib **alist, int cast_level, int force)
 #endif
 
 /* ------------------------------------------------------------- */
-/* Kann auch von Nichtmagiern benutzt werden, erzeugt eine
- * Antimagiezone, die zwei Runden bestehen bleibt */
-static void
-use_antimagiccrystal(region * r, unit * mage, int amount, struct order * ord)
-{
-	int i;
-	for (i=0;i!=amount;++i) {
-		int effect, duration = 2;
-    double force;
-		spell *sp = find_spellbyid(SPL_ANTIMAGICZONE);
-		attrib ** ap = &r->attribs;
-		unused(ord);
-
-		/* Reduziert die Stärke jedes Spruchs um effect */
-		effect = sp->level; 
-
-		/* Hält Sprüche bis zu einem summierten Gesamtlevel von power aus.
-		 * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
-		 * um seine Stufe */
-		force = sp->level * 20; /* Stufe 5 =~ 100 */
-
-		/* Regionszauber auflösen */
-		while (*ap && force > 0) {
-			curse * c;
-			attrib * a = *ap;
-			if (!fval(a->type, ATF_CURSE)) {
-				do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
-				continue;
-			}
-			c = (curse*)a->data.v;
-
-			/* Immunität prüfen */
-			if (c->flag & CURSE_IMMUNE) {
-				do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
-				continue;
-			}
-
-			force = destr_curse(c, effect, force);
-			if(c->vigour <= 0) {
-				a_remove(&r->attribs, a);
-			}
-			if(*ap) ap = &(*ap)->next;
-		}
-
-		if(force > 0) {
-      variant var ;
-      var.i = effect;
-			create_curse(mage, &r->attribs, ct_find("antimagiczone"), force, duration, var, 0);
-		}
-
-	}
-	use_pooled(mage, mage->region, R_ANTIMAGICCRYSTAL, amount);
-	add_message(&mage->faction->msgs,
-			new_message(mage->faction, "use_antimagiccrystal%u:unit%r:region", mage, r));
-	return;
-}
-
-/* ------------------------------------------------------------- */
 /* Kann auch von Nichtmagier benutzt werden, modifiziert Taktik für diese
  * Runde um -1 - 4 Punkte. */
 static void
@@ -1011,10 +952,6 @@ static t_item itemdata[MAXITEMS] = {
 	{			/* I_DOLPHIN 62 */
 		{"Delphin", "Delphine", "Delphin", "Delphine"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 5000, 0, FL_ITEM_ANIMAL | FL_ITEM_NOTINBAG | FL_ITEM_NOTLOST, NULL
-	},
-	{			/* I_ANTIMAGICCRYSTAL 63 */
-		{"Antimagiekristall", "Antimagiekristalle", "Amulett", "Amulette"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, &use_antimagiccrystal
 	},
 	{			/* I_RING_OF_NIMBLEFINGER 64 */
 		{"Ring der flinken Finger", "Ringe der flinken Finger", "", ""},
@@ -2030,8 +1967,6 @@ item_score(item_t i)
     case I_RING_OF_NIMBLEFINGER:
     case I_FEENSTIEFEL:
       return 6000;
-    case I_ANTIMAGICCRYSTAL:
-      return 2000;
   }
   return 0;
 }
@@ -2284,7 +2219,6 @@ register_resources(void)
   register_function((pf_generic)use_potion, "usepotion");
   register_function((pf_generic)use_tacticcrystal, "usetacticcrystal");
   register_function((pf_generic)use_birthdayamulet, "usebirthdayamulet");
-  register_function((pf_generic)use_antimagiccrystal, "useantimagiccrystal");
   register_function((pf_generic)use_warmthpotion, "usewarmthpotion");
   register_function((pf_generic)use_bloodpotion, "usebloodpotion");
   register_function((pf_generic)use_foolpotion, "usefoolpotion");

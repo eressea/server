@@ -316,7 +316,7 @@ tower_init(void)
 				b->size = 10;
         if (i!=0) {
           sprintf(buf, "Turm des %s", 
-            LOC(default_locale, mkname("school", neue_gebiete[i])));
+            LOC(default_locale, mkname("school", magietypen[i])));
         }
 				else sprintf(buf, "Turm der Ahnungslosen");
 				set_string(&b->name, buf);
