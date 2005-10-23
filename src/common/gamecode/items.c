@@ -98,7 +98,7 @@ use_speedsail(struct unit * u, const struct item_type * itype, int amount, struc
 static void
 use_antimagiccrystal(region * r, unit * mage, int amount, struct order * ord)
 {
-  const resource_type rt_crystal = NULL;
+  const resource_type * rt_crystal = NULL;
   int i;
 
   if (rt_crystal == NULL) {
