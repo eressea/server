@@ -1977,13 +1977,6 @@ sp_treewalkexit(castorder *co)
   return erfolg;
 }
 
-static void
-creation_message(unit * mage, const item_type * itype)
-{
-  ADDMSG(&mage->faction->msgs, msg_message("item_create_spell", 
-    "mage number item", mage, 1, itype->rtype));
-}
-
 /* ------------------------------------------------------------- */
 /* Name:		   Heiliger Boden
  * Stufe:		   9
