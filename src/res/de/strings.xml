@@ -4531,6 +4531,11 @@
     </string>
   </namespace>
   <namespace name="spellinfo">
+    <string name="create_chastitybelt">
+      <text locale="de">Dieses Amulett in Gestalt einer orkischen Matrone
+      unterdrückt den Fortpflanzungstrieb eines einzelnen Orks sehr zuverlässig.
+      Ein Ork  mit Amulett der Keuschheit wird sich nicht mehr vermehren.</text>
+    </string>
     <string name="break_curse">
       <text locale="de">Dieser Zauber ermöglicht dem Magier, gezielt eine
       bestimmte Verzauberung einer Einheit, eines Schiffes, Gebäudes oder auch
@@ -4992,7 +4997,7 @@
         level.
       </text>
     </string>
-    <string name="kaelteschutz">
+    <string name="cold_protection">
       <text locale="de">Dieser Zauber ermöglicht es dem Magier
         Insekten auf magische Weise vor der lähmenden
         Kälte der Gletscher zu bewahren. Sie können
@@ -5010,7 +5015,7 @@
         the number by additional ten.
       </text>
     </string>
-    <string name="hagel">
+    <string name="hail">
       <text locale="de">Im Kampf ruft der Magier die
         Elementargeister der Kälte an und bindet sie an
         sich. Sodann kann er ihnen befehlen, den Gegner
@@ -6875,6 +6880,7 @@
   </string>
 
 </strings>
+
 
 
 
