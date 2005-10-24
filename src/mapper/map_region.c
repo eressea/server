@@ -196,12 +196,10 @@ showregion(region * r, char full)
 	faction *f;
 	int d,pp=0, ecount[MAXRACES], count[MAXRACES];
 	char str[256];
-#if NEW_RESOURCEGROWTH
 	int iron = -1, ironlevel = -1,
 	    laen = -1, laenlevel = -1,
 			stone = -1, stonelevel = -1;
 	struct rawmaterial *res;
-#endif
 
 	if (reglist) {
 		freelist(reglist);
@@ -231,7 +229,6 @@ showregion(region * r, char full)
 			sncat(buf, "trees", BUFSIZE);
 		adddbllist(&reglist, buf);
 
-#if NEW_RESOURCEGROWTH
 		for(res=r->resources;res;res=res->next) {
 			const item_type * itype = resource2item(res->type->rtype);
 			if(itype == olditemtype[I_IRON]) {
@@ -266,12 +263,6 @@ showregion(region * r, char full)
 			snprintf(buf, BUFSIZE, " %d stone/%d", stone, stonelevel);
 			adddbllist(&reglist, buf);
 		}
-#else
-		if (riron(r) > 0 || rlaen(r) > 0) {
-			sprintf(buf, " %d Eisen, %d Laen", riron(r), rlaen(r));
-			adddbllist(&reglist, buf);
-		}
-#endif
 	}
 	if (fval(r, RF_CHAOTIC)) {
 		adddbllist(&reglist, "chaotisch");
