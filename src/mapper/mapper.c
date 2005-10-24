@@ -325,7 +325,6 @@ alliancehere(region * r, int allied)
 	return false;
 }
 
-#if NEW_RESOURCEGROWTH
 static boolean
 has_laen(region *r)
 {
@@ -336,14 +335,6 @@ has_laen(region *r)
 	}
 	return false;
 }
-#else
-static boolean
-has_laen(region *r)
-{
-	if(rlaen(r) >= 0) return true;
-	return false;
-}
-#endif
 
 static int
 crwritemap(void)
@@ -1666,9 +1657,7 @@ main(int argc, char *argv[])
   init_locales();
   init_attributes();
 
-#if NEW_RESOURCEGROWTH
 	init_rawmaterials();
-#endif
 
 	init_gmcmd();
 

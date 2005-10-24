@@ -1089,7 +1089,6 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	}
 
 	/* iron & stone */
-#if NEW_RESOURCEGROWTH
 	if (partial == 0 && f != (faction *) NULL) {
 		struct rawmaterial * res;
 		for (res=r->resources;res;res=res->next) {
@@ -1121,23 +1120,6 @@ describe(FILE * F, const region * r, int partial, faction * f)
           res->level + itype->construction->minskill - 1);
 			}
 		}
-#else
-	if (partial == 0 && f != (faction *) NULL) {
-		int maxmining = 0;
-		const unit * u;
-		for (u = r->units; u; u = u->next) {
-			if (u->faction == f) {
-				int s = eff_skill(u, SK_MINING, r);
-				maxmining = max(maxmining, s);
-			}
-		}
-		if (riron(r) > 0 && maxmining >= 4) {
-			bufp += sprinf(bufp, ", %d Eisen", riron(r));
-		}
-		if (rlaen(r)>=0 && maxmining >= 7) {
-			bufp += sprintf(bufp, ", %d Laen", rlaen(r));
-		}
-#endif
 	}
 
 	/* peasants & silver */

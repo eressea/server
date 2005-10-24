@@ -236,9 +236,7 @@ game_init(void)
   init_races();
   init_itemtypes();
   init_economy();
-#if NEW_RESOURCEGROWTH
   init_rawmaterials();
-#endif
 
   init_gmcmd();
 #ifdef INFOCMD_MODULE

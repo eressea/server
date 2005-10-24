@@ -70,11 +70,9 @@ const terraindata_t terrain[] = {
 		1000, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LARGE_SHIPS|LAND_REGION,	/* Flags */
 		plain_herbs,
-#if NEW_RESOURCEGROWTH
 		{ { &rm_iron, "2d4-1", "5d8", "2d20+10", 10.0 },
 			{ &rm_stones, "1d4", "5d8", "2d30+20", 15.0 },
 			{ &rm_laen, "1d4", "1d4", "2d20+50", 1.0} }
-#endif
 	},
 	/* T_SWAMP */
 	{
@@ -86,11 +84,9 @@ const terraindata_t terrain[] = {
 		200, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
 		swamp_herbs,
-#if NEW_RESOURCEGROWTH 
 		{ { &rm_iron, "2d4-1", "5d8", "2d20+10", 2.0 },
 			{ &rm_stones, "1d4", "5d8", "2d30+20", 2.0 },
 			{ &rm_laen, "1d4", "1d4", "2d20+50", 2.0} }
-#endif
 	},
 	/* T_DESERT */
 	{
@@ -102,11 +98,9 @@ const terraindata_t terrain[] = {
 		50, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
 		desert_herbs,
-#if NEW_RESOURCEGROWTH
 		{ { &rm_iron, "2d4-1", "5d8", "2d20+10", 15.0 },
 			{ &rm_stones, "1d4", "5d8", "2d30+20", 25.0 },
 			{ &rm_laen, "1d4", "1d4", "2d20+50", 2.5} }
-#endif
 	},
 	/* T_HIGHLAND */
 	{
@@ -118,11 +112,9 @@ const terraindata_t terrain[] = {
 		400, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
 		highland_herbs,
-#if NEW_RESOURCEGROWTH
 		{ { &rm_iron, "2d4-1", "5d8", "2d20+10", 15.0 },
 			{ &rm_stones, "1d4", "5d8", "2d30+20", 20.0 },
 			{ &rm_laen, "1d4", "1d4", "2d20+50", 2.5} }
-#endif
 	},
 	/* T_MOUNTAIN */
 	{
@@ -134,11 +126,9 @@ const terraindata_t terrain[] = {
 		100, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
 		mountain_herbs,
-#if NEW_RESOURCEGROWTH
 		{ { &rm_iron, "1", "50", "50", 100.0 },
 			{ &rm_stones, "1", "100", "100", 100.0 },
 			{ &rm_laen, "1", "4", "100", 5.0} }
-#endif
 	},
 	/* T_GLACIER */
 	{
@@ -150,11 +140,9 @@ const terraindata_t terrain[] = {
 		10, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
 		glacier_herbs,
-#if NEW_RESOURCEGROWTH
 		{ { &rm_iron, "1", "3", "50", 100.0 },
 			{ &rm_stones, "1", "2", "100", 100.0 },
 			{ &rm_laen, "1", "4", "100", 0.5} }
-#endif
 	},
 	/* T_FIREWALL */
 	{
@@ -220,11 +208,9 @@ const terraindata_t terrain[] = {
 		50, 	/* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
 		NULL,
-#if NEW_RESOURCEGROWTH
 		{ { &rm_iron, "1", "50", "50", 50.0 },
 			{ &rm_stones, "1", "100", "100", 50.0 },
 			{ &rm_laen, "1", "4", "100", 7.5} }
-#endif
 	},
 	{
 		"activevolcano", 'V',
@@ -235,11 +221,9 @@ const terraindata_t terrain[] = {
 		50, 	/* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
 		NULL,
-#if NEW_RESOURCEGROWTH
 		{ { &rm_iron, "1", "50", "50", 50.0 },
 			{ &rm_stones, "1", "100", "100", 50.0 },
 			{ &rm_laen, "1", "4", "100", 7.5} }
-#endif
 	},
 	/* T_ICEBERG_SLEEP */
 	{
@@ -251,11 +235,9 @@ const terraindata_t terrain[] = {
 		10, /* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
 		glacier_herbs,
-#if NEW_RESOURCEGROWTH
 		{ { &rm_iron, "1", "3", "50", 100.0 },
 			{ &rm_stones, "1", "2", "100", 100.0 },
 			{ NULL, NULL, NULL, NULL, 100.0 } }
-#endif
 	},
 	/* T_ICEBERG */
 	{
@@ -267,11 +249,9 @@ const terraindata_t terrain[] = {
 		10, 	/* bewirtschaftbare Parzellen */
 		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
 		glacier_herbs,
-#if NEW_RESOURCEGROWTH
 		{ { &rm_iron, "1", "3", "50", 100.0 },
 			{ &rm_stones, "1", "2", "100", 100.0 },
 			{ NULL, NULL, NULL, NULL, 100.0 } }
-#endif
 	},
 	/* T_HALL1 */
 	{

@@ -76,9 +76,6 @@ typedef struct land_region {
   int peasants;
   int newpeasants;
   int money;
-#if NEW_RESOURCEGROWTH == 0
-  int iron;
-#endif
 } land_region;
 
 typedef struct donation {
@@ -108,9 +105,7 @@ typedef struct region {
   struct region *nexthash;
   struct donation * donations;
   terrain_t terrain;
-#if NEW_RESOURCEGROWTH
   struct rawmaterial * resources;
-#endif
 #ifdef FAST_CONNECT
   struct region * connect[MAXDIRECTIONS];
 #endif
@@ -201,12 +196,6 @@ int rhorses(const struct region * r);
 void rsethorses(const struct region * r, int value);
 
 #define rbuildings(r) ((r)->buildings)
-
-#if NEW_RESOURCEGROWTH == 0
-#define riron(r) ((r)->land?(r)->land->iron:0)
-#define rsetiron(r, value) ((r)->land?((r)->land->iron=(value)):(value),0)
-
-#endif /* NEW_RESOURCEGROWTH */
 
 extern int rlaen(const struct region * r);
 extern void rsetlaen(struct region * r, int value);

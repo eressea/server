@@ -1315,9 +1315,7 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 
 				if (sd->mode>=see_unit) {
 					struct demand * dmd = r->land->demands;
-#if NEW_RESOURCEGROWTH
 					struct rawmaterial * res = r->resources;
-#endif
 					fprintf(F, "%d;Silber\n", rmoney(r));
 					fprintf(F, "%d;Unterh\n", entertainmoney(r));
 
@@ -1330,7 +1328,6 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 						fprintf(F, "%d;Lohn\n", fwage(r, f, true));
 					}
 
-#if NEW_RESOURCEGROWTH
 					while (res) {
 						int maxskill = 0;
 						int level = -1;
@@ -1363,26 +1360,6 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 						}
 						res = res->next;
 					}
-#else
-					const unit * u;
-					int maxmining = 0;
-					for (u = r->units; u; u = u->next) {
-						if (u->faction == f) {
-							int s = eff_skill(u, SK_MINING, r);
-							maxmining = max(maxmining, s);
-						}
-					}
-					for (u = r->units; u; u = u->next) {
-						if (u->faction == f) {
-							int s = eff_skill(u, SK_MINING, r);
-							maxmining = max(maxmining, s);
-						}
-					}
-					if (maxmining >= 4 && riron(r) > 0)
-						fprintf(F, "%d;Eisen\n", riron(r));
-					if (maxmining >= 7 && rlaen(r) > 0)
-						fprintf(F, "%d;Laen\n", rlaen(r));
-#endif
 					/* trade */
 					if (!TradeDisabled() && rpeasants(r)/TRADE_FRACTION > 0) {
 						fputs("PREISE\n", F);

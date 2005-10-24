@@ -239,15 +239,11 @@ static int peasants, money, trees, horses, iron, laen, chaotisch;
 
 static int ytrees, seeds;
 
-#if NEW_RESOURCEGROWTH
 static int ironlevel, laenlevel, stone, stonelevel;
-#endif
 
 static void
 get_region(region *r) {
-#if NEW_RESOURCEGROWTH
 	struct rawmaterial *res;
-#endif
 
 	peasants  = rpeasants(r);
 	money     = rmoney(r);
@@ -255,7 +251,6 @@ get_region(region *r) {
 	ytrees    = rtrees(r,1);
 	seeds     = rtrees(r,0);
 	horses    = rhorses(r);
-#if NEW_RESOURCEGROWTH
 	iron = -1;
 	ironlevel = -1;
 	laen = -1;
@@ -275,18 +270,12 @@ get_region(region *r) {
 			stonelevel = res->level + itype->construction->minskill - 1;
 		}
 	}
-#else
-	iron      = riron(r);
-	laen      = rlaen(r);
-#endif
 	chaotisch = fval(r, RF_CHAOTIC);
 }
 
 static void
 put_region(region *r) { 
-#if NEW_RESOURCEGROWTH
 	struct rawmaterial *res;
-#endif
 
 	rsetpeasants(r, peasants);
 	rsetmoney(r,money);
@@ -294,7 +283,7 @@ put_region(region *r) {
 	rsettrees(r,1,ytrees);
 	rsettrees(r,0,seeds);
 	rsethorses(r, horses);
-#if NEW_RESOURCEGROWTH
+
 	for (res=r->resources;res;res=res->next) {
 		const item_type * itype = resource2item(res->type->rtype);
 		if(itype == olditemtype[I_IRON]) {
@@ -308,10 +297,6 @@ put_region(region *r) {
 			res->level = stonelevel - itype->construction->minskill + 1;
 		}
 	}
-#else
-	rsetiron(r, iron);
-	rsetlaen(r, laen);
-#endif
 	if (chaotisch) fset(r, RF_CHAOTIC); else freset(r, RF_CHAOTIC);
 }
 
@@ -338,7 +323,7 @@ create_region_menu(menulist ** menu, region * r)
 		addmenulist(menu, "Seeds", &seeds);
 	}
 	addmenulist(menu, "Horses", &horses);
-#if NEW_RESOURCEGROWTH
+
 /*	if(iron != -1) { */
 		addmenulist(menu, "Iron", &iron);
 		addmenulist(menu, "Ironlevel", &ironlevel);
@@ -351,12 +336,6 @@ create_region_menu(menulist ** menu, region * r)
 		addmenulist(menu, "Stone", &stone);
 		addmenulist(menu, "Stonelevel", &stonelevel);
 /*	} */
-#else
-	if (r->terrain == T_MOUNTAIN || r->terrain == T_GLACIER) {
-		addmenulist(menu, "Iron", &iron);
-		addmenulist(menu, "Laen", &laen);
-	}
-#endif
 	addmenulist(menu, "Chaos-Factor", &chaotisch);
 
 	if (r->planep) {

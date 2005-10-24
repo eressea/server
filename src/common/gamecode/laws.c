@@ -848,27 +848,6 @@ trees(region * r, const int current_season, const int last_weeks_season)
   }
 }
 
-#if NEW_RESOURCEGROWTH == 0
-extern attrib_type at_laen;
-static void
-iron(region * r)
-{
-  if(is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) return;
-
-#ifndef NO_GROWTH
-  if (rterrain(r) == T_MOUNTAIN) {
-    rsetiron(r, riron(r) + IRONPERTURN);
-    if(a_find(r->attribs, &at_laen)) {
-      rsetlaen(r, rlaen(r) + rand() % MAXLAENPERTURN);
-    }
-  } else if (rterrain(r) == T_GLACIER || rterrain(r) == T_ICEBERG_SLEEP) {
-    rsetiron(r, min(MAXGLIRON, riron(r)+GLIRONPERTURN));
-  }
-#endif
-
-}
-#endif /* NEW_RESOURCEGROWTH */
-
 void
 demographics(void)
 {
@@ -910,11 +889,7 @@ demographics(void)
       if(current_season != SEASON_WINTER) {
         trees(r, current_season, last_weeks_season);
       }
-#if NEW_RESOURCEGROWTH
       update_resources(r);
-#else
-      iron(r);
-#endif
       migrate(r);
     }
   }

@@ -1405,7 +1405,6 @@ required(int want, double save)
 	return norders;
 }
 
-#if NEW_RESOURCEGROWTH
 static void
 leveled_allocation(const allocator * self, region * r, allocation * alist)
 {
@@ -1474,7 +1473,6 @@ leveled_allocation(const allocator * self, region * r, allocation * alist)
 		} while (need>0);
 	}
 }
-#endif
 
 static void
 attrib_allocation(const allocator * self, region * r, allocation * alist)
@@ -1537,9 +1535,7 @@ split_allocations(region * r)
 				assert(itype || !"not implemented for non-items");
 				i_change(&al->unit->items, itype, al->get);
 				produceexp(al->unit, itype->construction->skill, al->unit->number);
-#if NEW_RESOURCEGROWTH
 				fset(r, RF_DH);
-#endif
 			}
 			if (al->want==INT_MAX) al->want = al->get;
 			if (fval(al, AFL_LOWSKILL)) {
@@ -3236,18 +3232,12 @@ produce(void)
 void
 init_economy(void)
 {
-	add_allocator(make_allocator(item2resource(olditemtype[I_HORSE]), attrib_allocation));
-	add_allocator(make_allocator(item2resource(olditemtype[I_WOOD]), attrib_allocation));
-	add_allocator(make_allocator(item2resource(olditemtype[I_MALLORN]), attrib_allocation));
-#if NEW_RESOURCEGROWTH
-	add_allocator(make_allocator(item2resource(olditemtype[I_STONE]), leveled_allocation));
-	add_allocator(make_allocator(item2resource(olditemtype[I_IRON]), leveled_allocation));
-	add_allocator(make_allocator(item2resource(olditemtype[I_LAEN]), leveled_allocation));
-	add_allocator(make_allocator(&rt_seed, attrib_allocation));
-	add_allocator(make_allocator(&rt_mallornseed, attrib_allocation));
-#else
-	add_allocator(make_allocator(item2resource(olditemtype[I_STONE]), attrib_allocation));
-	add_allocator(make_allocator(item2resource(olditemtype[I_IRON]), attrib_allocation));
-	add_allocator(make_allocator(item2resource(olditemtype[I_LAEN]), attrib_allocation));
-#endif
+  add_allocator(make_allocator(item2resource(olditemtype[I_HORSE]), attrib_allocation));
+  add_allocator(make_allocator(item2resource(olditemtype[I_WOOD]), attrib_allocation));
+  add_allocator(make_allocator(item2resource(olditemtype[I_MALLORN]), attrib_allocation));
+  add_allocator(make_allocator(item2resource(olditemtype[I_STONE]), leveled_allocation));
+  add_allocator(make_allocator(item2resource(olditemtype[I_IRON]), leveled_allocation));
+  add_allocator(make_allocator(item2resource(olditemtype[I_LAEN]), leveled_allocation));
+  add_allocator(make_allocator(&rt_seed, attrib_allocation));
+  add_allocator(make_allocator(&rt_mallornseed, attrib_allocation));
 }

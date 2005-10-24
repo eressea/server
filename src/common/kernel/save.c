@@ -1388,7 +1388,6 @@ readregion(FILE * F, short x, short y)
 			rsettrees(r, 2, i);
 		}
 		i = ri(F); rsethorses(r, i);
-#if NEW_RESOURCEGROWTH
 		if (global.data_version < NEWRESOURCE_VERSION) {
 			i = ri(F);
 #if RESOURCE_CONVERSION
@@ -1426,9 +1425,6 @@ readregion(FILE * F, short x, short y)
 				pres=&res->next;
 			}
 		}
-#else
-		i = ri(F); rsetiron(r, i);
-#endif
 		if (global.data_version>=ITEMTYPE_VERSION) {
 			rs(F, buf);
 			if (strcmp(buf, "noherb") != 0) {
@@ -1502,9 +1498,7 @@ writeregion(FILE * F, const region * r)
 		wi(F, rtrees(r,1));
 		wi(F, rtrees(r,2));
 		wi(F, rhorses(r));
-#if NEW_RESOURCEGROWTH == 0
-		wi(F, riron(r));
-#elif RELEASE_VERSION>=NEWRESOURCE_VERSION
+#if RELEASE_VERSION>=NEWRESOURCE_VERSION
 		{
 			rawmaterial * res = r->resources;
 			while (res) {

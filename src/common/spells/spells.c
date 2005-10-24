@@ -1686,10 +1686,6 @@ sp_great_drought(castorder *co)
 				break;
 
 			case T_GLACIER:
-#if NEW_RESOURCEGROWTH == 0
-				rsetiron(r, 0);
-				rsetlaen(r, -1);
-#endif
 				if (rand() % 100 < 50){
 					rsetterrain(r, T_SWAMP);
 					destroy_all_roads(r);

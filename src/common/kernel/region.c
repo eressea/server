@@ -511,14 +511,9 @@ attrib_type at_travelunit = {
 	NO_READ
 };
 
-#if NEW_RESOURCEGROWTH
 extern int laen_read(attrib * a, FILE * F);
-# define LAEN_READ laen_read
-# define LAEN_WRITE NULL
-#else
-# define LAEN_READ DEFAULT_READ
-# define LAEN_WRITE DEFAULT_WRITE
-#endif
+#define LAEN_READ laen_read
+#define LAEN_WRITE NULL
 
 /***************/
 /*   at_laen   */
@@ -864,15 +859,12 @@ void
 terraform(region * r, terrain_t t)
 {
 	const struct locale * locale_de = find_locale("de");
-#if NEW_RESOURCEGROWTH
 	rawmaterial  **lrm;
 	int i;
-#endif
 
 	/* defaults: */
 	rsetterrain(r, t);
 
-#if NEW_RESOURCEGROWTH
 	/* Resourcen, die nicht mehr vorkommen können, löschen */
 	lrm = &r->resources;
 	while (*lrm) {
@@ -887,12 +879,7 @@ terraform(region * r, terrain_t t)
 			lrm = &rm->next;
 		}
 	}
-#endif
 
-#if NEW_RESOURCEGROWTH == 0
-	rsetlaen(r, -1);
-	rsetiron(r, 0);
-#endif
 	if (!landregion(t)) {
 		if (r->land) {
 			freeland(r->land);
@@ -902,10 +889,6 @@ terraform(region * r, terrain_t t)
 		rsettrees(r, 1, 0);
 		rsettrees(r, 2, 0);
 		rsethorses(r, 0);
-#if NEW_RESOURCEGROWTH == 0
-		rsetiron(r, 0);
-		rsetlaen(r, -1);
-#endif
 		rsetpeasants(r, 0);
 		rsetmoney(r, 0);
 		freset(r, RF_ENCOUNTER);
@@ -1009,27 +992,13 @@ terraform(region * r, terrain_t t)
 		}
 		break;
 	case T_MOUNTAIN:
-#if NEW_RESOURCEGROWTH == 0
-		rsetiron(r, IRONSTART);
-		if (rand() % 100 < 8) rsetlaen(r, 5 + rand() % 5);
-#endif
 		break;
 
 	case T_GLACIER:
-#if NEW_RESOURCEGROWTH == 0
-		if (riron(r) <= 0){
-			rsetiron(r, GLIRONSTART);
-		}
-#endif
 		break;
 
 	case T_ICEBERG_SLEEP:
 		/* Kann aus Gletscher entstehen und sollte diesem gleichen */
-#if NEW_RESOURCEGROWTH == 0
-		if (riron(r) <= 0){
-			rsetiron(r, GLIRONSTART);
-		}
-#endif
 		break;
 
 	case T_VOLCANO:
@@ -1043,10 +1012,6 @@ terraform(region * r, terrain_t t)
 		rsettrees(r, 1, rtrees(r, 2)/4);
 		rsettrees(r, 0, rtrees(r, 2)/2);
 	}
-
-#if NEW_RESOURCEGROWTH
-	terraform_resources(r);
-#endif
 
 	if (terrain[t].production_max && !fval(r, RF_CHAOTIC)) {
 		int peasants;

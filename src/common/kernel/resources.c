@@ -14,7 +14,6 @@
 #include "eressea.h"
 #include "resources.h"
 
-#if NEW_RESOURCEGROWTH
 /* kernel includes */
 #include "build.h"
 #include "item.h"
@@ -193,27 +192,6 @@ struct rawmaterial_type rm_laen = {
 	visible_default
 };
 
-#if 0
-static struct rawmaterial_type rm_mallorn = {
-	"rm_mallorn",
-	I_MALLORN, NULL,
-	terraform_trees,
-	update_trees,
-	use_trees,
-	NULL
-};
-
-static struct rawmaterial_type rm_trees = {
-	"rm_trees",
-	I_WOOD, NULL,
-	terraform_trees,
-	update_trees,
-	use_trees,
-	NULL
-};
-#endif
-
-
 struct rawmaterial_type * rawmaterialtypes = 0;
 
 struct rawmaterial_type * 
@@ -238,10 +216,4 @@ init_rawmaterials(void)
 	add_rawmaterial(&rm_stones);
 	add_rawmaterial(&rm_iron);
 	add_rawmaterial(&rm_laen);
-#if 0
-	add_rawmaterial(&rm_wood);
-	add_rawmaterial(&rm_mallorn);
-#endif
 }
-
-#endif

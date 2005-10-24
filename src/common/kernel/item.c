@@ -1057,14 +1057,6 @@ limit_oldtypes(const region * r, const resource_type * rtype)
 {
 	if (rtype==oldresourcetype[R_WOOD]) {
 		return rtrees(r,2) + rtrees(r,1);
-#if NEW_RESOURCEGROWTH == 0
-	} else if (rtype==oldresourcetype[R_EOG]) {
-		return rlaen(r);
-	} else if (rtype==oldresourcetype[R_IRON]) {
-		return riron(r);
-	} else if (rtype==oldresourcetype[R_STONE]) {
-		return terrain[rterrain(r)].quarries;
-#endif
 	} else if (rtype==oldresourcetype[R_MALLORN]) {
 		return rtrees(r,2) + rtrees(r,1);
 	} else if (rtype==oldresourcetype[R_HORSE]) {
@@ -1101,16 +1093,6 @@ use_oldresource(region * r, const resource_type * rtype, int norders)
 		} else {
 			woodcounts(r, wcount*2);
 		}
-#if NEW_RESOURCEGROWTH == 0
-	} else if (rtype==oldresourcetype[R_EOG]) {
-		int avail = rlaen(r);
-		assert(norders <= avail);
-		rsetlaen(r, avail-norders);
-	} else if (rtype==oldresourcetype[R_IRON]) {
-		int avail = riron(r);
-		assert(norders <= avail);
-		rsetiron(r, avail-norders);
-#endif
 	} else if (rtype==oldresourcetype[R_HORSE]) {
 		int avail = rhorses(r);
 		assert(norders <= avail);

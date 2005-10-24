@@ -81,7 +81,6 @@ typedef struct terraindata_t {
 	 */
 	unsigned int flags;
 	const char ** herbs;
-#if NEW_RESOURCEGROWTH
 	struct {
 		const struct rawmaterial_type * type;
 		const char *startlevel;
@@ -89,7 +88,6 @@ typedef struct terraindata_t {
 		const char *divisor;
 		double chance;
 	} rawmaterials[3];
-#endif
 } terraindata_t;
 
 extern const terraindata_t terrain[];
