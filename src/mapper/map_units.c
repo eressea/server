@@ -217,7 +217,7 @@ modify_items(unit * u)
 			if (strcmp((*ilast)->str, buf)>0) break;
 			prev = *ilast;
 		}
-		insert_selection(ilast, prev, strdup(buf), (void*)itype);
+		insert_selection(ilast, prev, buf, (void*)itype);
 		itype=itype->next;
 		while (ilist->prev!=NULL) ilist=ilist->prev;
 	}

@@ -18,6 +18,8 @@
 #include <unit.h>
 #include <region.h>
 #include <save.h>
+#include <terrain.h>
+#include <kernel/terrainid.h>
 
 /* util includes */
 #include <base36.h>

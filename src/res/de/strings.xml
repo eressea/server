@@ -263,7 +263,7 @@
   </namespace>
 
   <namespace name="school">
-    <string name="none">
+    <string name="gray">
       <text locale="de">Kein Magiegebiet</text>
       <text locale="en">no magic school</text>
     </string>

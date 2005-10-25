@@ -48,6 +48,8 @@
 #include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/spy.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 /* util includes */
@@ -667,8 +669,8 @@ give_cmd(unit * u, order * ord)
 		if (u->items) {
 			item **itmp=&u->items;
 			while (*itmp) {
-				const herb_type * htype = resource2herb((*itmp)->type->rtype);
-				if (htype && (*itmp)->number>0) {
+				const item_type * itype = (*itmp)->type;
+				if (fval(itype, ITF_HERB) && (*itmp)->number>0) {
 					/* give_item ändert im fall,das man alles übergibt, die
 					* item-liste der unit, darum continue vor pointerumsetzten */
 					if (give_item((*itmp)->number, (*itmp)->type, u, u2, ord)==0) {
@@ -2328,9 +2330,9 @@ static void
 plant(region *r, unit *u, int raw)
 {
 	int n, i, skill, planted = 0;
-	const herb_type * htype;
+	const item_type * itype;
 
-	if (rterrain(r) == T_OCEAN) {
+	if (!fval(r->terrain, LAND_REGION)) {
 		return;
 	}
 	if (rherbtype(r) == NULL) {
@@ -2340,11 +2342,11 @@ plant(region *r, unit *u, int raw)
 
 	/* Skill prüfen */
 	skill = eff_skill(u, SK_HERBALISM, r);
-	htype = rherbtype(r);
+	itype = rherbtype(r);
 	if (skill < 6) {
 		add_message(&u->faction->msgs,
 			msg_feedback(u, u->thisorder, "plant_skills",
-			"skill minskill product", SK_HERBALISM, 6, htype->itype->rtype, 1));
+			"skill minskill product", SK_HERBALISM, 6, itype->rtype, 1));
 		return;
 	}
 	/* Wasser des Lebens prüfen */
@@ -2354,12 +2356,12 @@ plant(region *r, unit *u, int raw)
 			oldresourcetype[R_TREES]));
 		return;
 	}
-	n = new_get_pooled(u, htype->itype->rtype, GET_DEFAULT);
+	n = new_get_pooled(u, itype->rtype, GET_DEFAULT);
 	/* Kräuter prüfen */
 	if (n==0) {
 		add_message(&u->faction->msgs,
 			msg_feedback(u, u->thisorder, "resource_missing", "missing",
-			htype->itype->rtype));
+			itype->rtype));
 		return;
 	}
 
@@ -2373,10 +2375,10 @@ plant(region *r, unit *u, int raw)
 
 	/* Alles ok. Abziehen. */
 	new_use_pooled(u, oldresourcetype[R_TREES], GET_DEFAULT, 1);
-	new_use_pooled(u, htype->itype->rtype, GET_DEFAULT, n);
+	new_use_pooled(u, itype->rtype, GET_DEFAULT, n);
 	rsetherbs(r, rherbs(r)+planted);
 	add_message(&u->faction->msgs, new_message(u->faction,
-		"plant%u:unit%r:region%i:amount%X:herb", u, r, planted, htype->itype->rtype));
+		"plant%u:unit%r:region%i:amount%X:herb", u, r, planted, itype->rtype));
 }
 
 static void
@@ -2385,7 +2387,7 @@ planttrees(region *r, unit *u, int raw)
 	int n, i, skill, planted = 0;
 	const item_type * itype;
 
-	if (rterrain(r) == T_OCEAN) {
+	if (!fval(r->terrain, LAND_REGION)) {
 		return;
 	}
 
@@ -2454,7 +2456,7 @@ breedtrees(region *r, unit *u, int raw)
 		return;
 	}
 
-	if (rterrain(r) == T_OCEAN) {
+	if (!fval(r->terrain, LAND_REGION)) {
 		return;
 	}
 
@@ -2662,12 +2664,12 @@ research_cmd(unit *u, struct order * ord)
   produceexp(u, SK_HERBALISM, u->number);
 
   if (rherbs(r) > 0) {
-    const herb_type *rht = rherbtype(r);
+    const item_type *itype = rherbtype(r);
 
-    if (rht != NULL) {
+    if (itype != NULL) {
       add_message(&u->faction->msgs, new_message(u->faction,
         "researchherb%u:unit%r:region%s:amount%X:herb", u, r,
-        rough_amount(rherbs(r), 100), rht->itype->rtype));
+        rough_amount(rherbs(r), 100), itype->rtype));
     } else {
       add_message(&u->faction->msgs, new_message(u->faction,
         "researchherb_none%u:unit%r:region", u, r));
@@ -2705,7 +2707,7 @@ steal_cmd(unit * u, struct order * ord, request ** stealorders)
   region * r = u->region;
 	faction * f = NULL;
 
-  if (rterrain(r) == T_OCEAN && u->race != new_race[RC_AQUARIAN]) {
+  if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN]) {
     cmistake(u, ord, 242, MSG_INCOME);
     return;
   }
@@ -3144,7 +3146,7 @@ produce(void)
       todo = get_keyword(u->thisorder);
       if (todo == NOKEYWORD) continue;
 
-      if (rterrain(r) == T_OCEAN && u->race != new_race[RC_AQUARIAN]
+      if (fval(r->terrain, SEA_REGION) && u->race != new_race[RC_AQUARIAN]
       && !(u->race->flags & RCF_SWIM)
         && todo != K_STEAL && todo != K_SPY && todo != K_SABOTAGE)
         continue;

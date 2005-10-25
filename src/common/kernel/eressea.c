@@ -55,6 +55,7 @@
 #include "save.h"
 #include "ship.h"
 #include "skill.h"
+#include "terrain.h"
 #include "unit.h"
 
 /* util includes */
@@ -1179,8 +1180,9 @@ update_lighthouse(building * lh)
 		for (y=-d;y<=d;++y) {
 			attrib * a;
 			region * r2 = findregion(x+r->x, y+r->y);
-			if (rterrain(r2)!=T_OCEAN) continue;
-			if (!r2 || distance(r, r2) > d) continue;
+      if (r2==NULL) continue;
+			if (!fval(r2->terrain, SEA_REGION)) continue;
+			if (distance(r, r2) > d) continue;
 			a = a_find(r2->attribs, &at_lighthouse);
 			while (a) {
 				building * b = (building*)a->data.v;
@@ -2008,7 +2010,7 @@ get_lighthouses(const region * r)
   attrib * a;
   unit_list * ulist = NULL;
 
-  if (rterrain(r) != T_OCEAN) return NULL;
+  if (!fval(r->terrain, SEA_REGION)) return NULL;
 
   for (a = a_find(r->attribs, &at_lighthouse);a;a=a->nexttype) {
     building *b = (building *)a->data.v;
@@ -2067,7 +2069,7 @@ check_leuchtturm(region * r, faction * f)
 {
 	attrib * a;
 
-	if (rterrain(r) != T_OCEAN) return false;
+	if (!fval(r->terrain, SEA_REGION)) return false;
 
 	for (a = a_find(r->attribs, &at_lighthouse);a;a=a->nexttype) {
 		building *b = (building *)a->data.v;
@@ -2468,7 +2470,7 @@ unsigned int
 getguard(const unit * u)
 {
 
-	if (u->region->terrain == T_OCEAN) return GUARD_NONE;
+	if (!fval(u->region->terrain, LAND_REGION)) return GUARD_NONE;
   if (fval(u, UFL_GUARD)) {
     attrib * a = a_find(u->attribs, &at_guard);
     if (a) return (unsigned int)a->data.i;
@@ -2848,7 +2850,7 @@ wage(const region *r, const unit *u, boolean img)
 			wage += wagetable[esize][3];
 		}
 	} else {
-		if (rterrain(r) == T_OCEAN) {
+		if (fval(r->terrain, SEA_REGION)) {
 			wage = 11;
 		} else if (fval(r, RF_ORCIFIED)) {
 			wage = wagetable[esize][1];
@@ -2899,7 +2901,7 @@ fwage(const region *r, const faction *f, boolean img)
 			wage += wagetable[esize][3];
 		}
 	} else {
-		if (rterrain(r) == T_OCEAN) {
+		if (fval(r->terrain, SEA_REGION)) {
 			wage = 11;
 		} else if (fval(r, RF_ORCIFIED)) {
 			wage = wagetable[esize][1];

@@ -36,6 +36,7 @@
 #include "region.h"
 #include "ship.h"
 #include "skill.h"
+#include "terrain.h"
 
 #include <attributes/moved.h>
 
@@ -261,7 +262,7 @@ destroy_unit(unit * u)
 	} else {
 		if (u->number) set_number(u, 0);
 		handle_event(&u->attribs, "destroy", u);
-		if (r && rterrain(r) != T_OCEAN)
+		if (r && !fval(r->terrain, SEA_REGION))
 			rsetmoney(r, rmoney(r) + get_money(u));
 		dhash(u->no, u->faction);
 		u_setfaction(u, NULL);
@@ -716,14 +717,14 @@ urace(const struct unit * u)
 boolean
 can_survive(const unit *u, const region *r)
 {
-  if (((terrain[rterrain(r)].flags & WALK_INTO)
+  if ((fval(r->terrain, WALK_INTO)
 			&& (u->race->flags & RCF_WALK)) ||
-			((terrain[rterrain(r)].flags & SWIM_INTO)
+			(fval(r->terrain, SWIM_INTO)
 			&& (u->race->flags & RCF_SWIM)) ||
-			((terrain[rterrain(r)].flags & FLY_INTO)
+			(fval(r->terrain, FLY_INTO)
 			&& (u->race->flags & RCF_FLY))) {
 
-		if (get_item(u, I_HORSE) && !(terrain[rterrain(r)].flags & WALK_INTO))
+		if (get_item(u, I_HORSE) && !fval(r->terrain, WALK_INTO))
 			return false;
 
 		if (fval(u->race, RCF_UNDEAD) && is_cursed(r->attribs, C_HOLYGROUND, 0))

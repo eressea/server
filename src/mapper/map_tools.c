@@ -244,10 +244,10 @@ my_input(WINDOW * win, int x, int y, const char *text, const char *def)
 }
 
 void
-insert_selection(selection ** p_sel, selection * prev, char * str, void * payload)
+insert_selection(selection ** p_sel, selection * prev, const char * str, void * payload)
 {
 	selection * sel = calloc(sizeof(selection), 1);
-	sel->str = str;
+	sel->str = strdup(str);
 	sel->data = payload;
 	if (*p_sel) {
 		selection * s;

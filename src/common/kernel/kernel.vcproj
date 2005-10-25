@@ -402,6 +402,9 @@
 			RelativePath=".\terrain.c">
 		</File>
 		<File
+			RelativePath=".\terrainid.h">
+		</File>
+		<File
 			RelativePath=".\ugroup.c">
 		</File>
 		<File

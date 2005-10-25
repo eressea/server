@@ -1,50 +1,55 @@
 TODO:
 
-Gletscherauflösung 4./5. welt
+Eressea:
+- AI: Nicht mehr als n Wyrme in die gleiche region. Keine 12 auf jeden Fall.
+- Gletscherauflösung 4./5. welt
+- new ITF_NOLOOT für sonnensegel
+- Deathcloud: Magieresistenz des Magiers in das attribut, nicht auflösen wenn magier tot.
 
-make sure every faction has a unique subscription.
+Code cleanup:
+- curse type should contain effect-type
+- sk_ prefixes entfernen
+- mehr itemtypes auslagern
+- getstrtoken() - das static loswerden?
+- readline implementieren
+- Make asserts into release-mode fails.
+- unterschiede in vin3 + wdw per config statt defines?
+- age branch (store birthdate instead of age)
+- give monsters name with lua
+- kick init_oldherbs out (good for terrain)
 
-curse type should contain effect-type
+Larger Features:
+- eressea (b/g)zip reports?
+- mailit-format ändern?
+- NO_RUNNING
 
-ITF_NOLOOT für sonnensegel
+Scripts, etc:
+- format=flowed annahme, eressea
+- english registration confirmation is deutsch!
+- XUL for Eressea
 
-format=flowed annahme, eressea
+Old Terrain still needed:
+- autoseed, qualitätsfunktion
+- random people encounters (get_allies)
+- creating dragons
+- drought curse
+- volcanoes
+- glacier logic
+- make_summary, volcano-count
+- save.c, conversion
+- terraform, old syntax
+- terraform, more horses in plains
+- dragon name
+- arena-module
+- build.c, Strassenbau
+- monster.c, ent movement
+- economy.c, insekten
 
-eressea (b/g)zip reports?
+mailit-format ändern?
 
-itemtypes auslagern
-
-readline implementieren
-
-sk_ prefixes entfernen
-
-XUL for Eressea
-
-[11:01] <Enno`> am besten wäre, wenn mailit nur die optionen, nicht das ganze script enthielte
-[11:01] <Enno`> und ein skript dann mailit als input nähme
-[11:02] <Enno`> also nur enno@eressea.upb.de pka3 BZIP2 nr cr zv
-
-Deathcloud: Magieresistenz des Magiers in das attribut, nicht auflösen wenn magier tot.
-
-english registration confirmation is deutsch!
-
-NO_RUNNING
-
-Cerrdor Zauber Übersetzungen
-
-magiccreate_effect
-
-schattendämonen
-
-Make items in lua
-
-man kann strassen in ozeane bauen!
-
-Make asserts into fails!
-
-getstrtoken() - das static loswerden
-
-R_PERSON fix in vin2?
+  [11:01] <Enno`> am besten wäre, wenn mailit nur die optionen, nicht das ganze script enthielte
+  [11:01] <Enno`> und ein skript dann mailit als input nähme
+  [11:02] <Enno`> also nur enno@eressea.upb.de pka3 BZIP2 nr cr zv
 
 unterschiede in vin3 + wdw per config statt defines?
 
@@ -57,9 +62,3 @@ unterschiede in vin3 + wdw per config statt defines?
 
   #define ARENA_MODULE
   #define WORMHOLE_MODULE
-  
-mailit-format ändern?
-
-age branch mergen
-
-readline()

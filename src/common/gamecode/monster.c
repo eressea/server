@@ -52,6 +52,8 @@
 #include <kernel/region.h>
 #include <kernel/reports.h>
 #include <kernel/skill.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 /* util includes */
@@ -216,19 +218,21 @@ richest_neighbour(region * r, faction * f, int absolut)
 
 	/* finde die region mit dem meisten geld */
 
-	for (i = 0; i != MAXDIRECTIONS; i++)
-		if (rconnect(r, i) && rterrain(rconnect(r, i)) != T_OCEAN) {
-			if (absolut == 1 || rpeasants(r) == 0) {
-				t = (double) all_money(rconnect(r, i), f);
+  for (i = 0; i != MAXDIRECTIONS; i++) {
+    region * rn = rconnect(r, i);
+		if (rn!=NULL && fval(rn->terrain, LAND_REGION)) {
+			if (absolut == 1 || rpeasants(rn) == 0) {
+				t = (double) all_money(rn, f);
 			} else {
-				t = (double) all_money(rconnect(r, i), f) / (double) rpeasants(r);
+				t = (double) all_money(rn, f) / (double) rpeasants(rn);
 			}
 
 			if (t > m) {
 				m = t;
 				d = i;
 			}
-		}
+    }
+  }
 	return d;
 }
 
@@ -656,11 +660,11 @@ scareaway(region * r, int anzahl)
 	assert(p >= 0 && anzahl >= 0);
 	for (n = min(p, anzahl); n; n--) {
 		direction_t dir = (direction_t)(rand() % MAXDIRECTIONS);
-		region * c = rconnect(r, dir);
+		region * rc = rconnect(r, dir);
 
-		if (c && landregion(rterrain(c))) {
+		if (rc && fval(rc->terrain, LAND_REGION)) {
 			++diff;
-			c->land->newpeasants++;
+			rc->land->newpeasants++;
 			emigrants[dir]++;
 		}
 	}
@@ -882,8 +886,7 @@ plan_dragon(unit * u)
     }
     else if (u->race != new_race[RC_FIREDRAGON]) {
       /* neue dracoiden! */
-      terrain_t t = rterrain(r);
-      if (r->land && !(terrain[t].flags & FORBIDDEN_LAND)) {
+      if (r->land && !fval(r->terrain, FORBIDDEN_REGION)) {
         int ra = 20 + rand() % 100;
         if (get_money(u) > ra * 50 + 100 && rand() % 100 < 50) {
           recruit_dracoids(u, ra);

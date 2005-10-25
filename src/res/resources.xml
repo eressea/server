@@ -38,7 +38,7 @@
   </resource>
 
   <resource name="speedsail">
-    <item weight="0">
+    <item weight="0" cursed="yes">
       <function name="use" value="use_speedsail"/>
     </item>
   </resource>

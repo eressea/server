@@ -40,11 +40,17 @@ xml_bvalue(xmlNodePtr node, const char * name, boolean dflt)
   boolean result = dflt;
   xmlChar * property = xmlGetProp(node, BAD_CAST name);
   if (property!=NULL) {
-    if (strcmp((const char*)property, "yes")==0) result = true;
-    if (strcmp((const char*)property, "true")==0) result = true;
-    if (strcmp((const char*)property, "1")==0) {
+    if (strcmp((const char*)property, "no")==0) result = false;
+    else if (strcmp((const char*)property, "yes")==0) result = true;
+    else if (strcmp((const char*)property, "false")==0) result = true;
+    else if (strcmp((const char*)property, "true")==0) result = true;
+    else if (strcmp((const char*)property, "1")==0) {
       log_warning(("boolean value is '1': %s::%s\n", node->name, name));
       result = true;
+    }
+    else if (strcmp((const char*)property, "0")==0) {
+      log_warning(("boolean value is '0': %s::%s\n", node->name, name));
+      result = false;
     }
     xmlFree(property);
   }

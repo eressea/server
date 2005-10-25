@@ -23,21 +23,23 @@
 #include "eressea.h"
 #include "spy.h"
 
+#include "economy.h"
+
 /* kernel includes */
 #include <kernel/build.h>
 #include <kernel/reports.h>
-#include "economy.h"
-#include "item.h"
-#include "karma.h"
-#include "faction.h"
-#include "magic.h"
-#include "message.h"
-#include "movement.h"
-#include "race.h"
-#include "region.h"
-#include "ship.h"
-#include "skill.h"
-#include "unit.h"
+#include <kernel/item.h>
+#include <kernel/karma.h>
+#include <kernel/faction.h>
+#include <kernel/magic.h>
+#include <kernel/message.h>
+#include <kernel/movement.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/ship.h>
+#include <kernel/skill.h>
+#include <kernel/terrain.h>
+#include <kernel/unit.h>
 
 /* attributes includes */
 #include <attributes/racename.h>
@@ -408,18 +410,18 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 	vset_init(&survivors);
 
 	/* figure out what a unit's chances of survival are: */
-        if (rterrain(r) != T_OCEAN) {
-          probability = CANAL_SWIMMER_CHANCE;
-        } else {
-          for (d = 0; d != MAXDIRECTIONS; ++d) {
-            region * rnext = rconnect(r, d);
-            if (rterrain(rnext) != T_OCEAN && !move_blocked(NULL, r, rnext)) {
-              safety = rnext;
-              probability = OCEAN_SWIMMER_CHANCE;
-              break;
-            }
-          }
-        }
+  if (!fval(r->terrain, SEA_REGION)) {
+    probability = CANAL_SWIMMER_CHANCE;
+  } else {
+    for (d = 0; d != MAXDIRECTIONS; ++d) {
+      region * rn = rconnect(r, d);
+      if (!fval(rn->terrain, SEA_REGION) && !move_blocked(NULL, r, rn)) {
+        safety = rn;
+        probability = OCEAN_SWIMMER_CHANCE;
+        break;
+      }
+    }
+  }
 	for (ui = &r->units; *ui; ui = &(*ui)->next) {
 		unit *u = *ui;
 

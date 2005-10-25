@@ -61,7 +61,6 @@ typedef struct resource_type {
 	struct resource_type * next;
 	unsigned int hashkey;
 	struct item_type * itype;
-	struct herb_type * htype;
 	struct potion_type * ptype;
 	struct luxury_type * ltype;
 	struct weapon_type * wtype;
@@ -133,14 +132,6 @@ typedef struct luxury_type {
 } luxury_type;
 extern luxury_type * luxurytypes;
 
-typedef struct herb_type {
-	struct herb_type * next;
-	const struct item_type * itype;
-	terrain_t terrain;
-} herb_type;
-extern herb_type * herbtypes;
-extern const resource_type * newherbtype(herb_t h);
-
 typedef struct potion_type {
 	struct potion_type * next;
 	const item_type * itype;
@@ -211,7 +202,6 @@ typedef struct weapon_type {
 extern void rt_register(resource_type * it);
 extern resource_type * rt_find(const char * name);
 extern item_type * it_find(const char * name);
-extern herb_type * ht_find(const char * name);
 extern luxury_type * lt_find(const char * name);
 extern potion_type * pt_find(const char * name);
 
@@ -224,7 +214,6 @@ extern const resource_type * item2resource(const item_type * i);
 extern const weapon_type * resource2weapon(const resource_type * i);
 extern const potion_type * resource2potion(const resource_type * i);
 extern const luxury_type * resource2luxury(const resource_type * i);
-extern const herb_type * resource2herb(const resource_type * i);
 
 #define weapon2resource(x) ((x)->itype->rtype)
 #define luxury2resource(x) ((x)->itype->rtype)
@@ -250,7 +239,8 @@ extern luxury_type * new_luxurytype(item_type * itype, int price);
 extern weapon_type * new_weapontype(item_type * itype, int wflags, double magres, const char* damage[], int offmod, int defmod, int reload, skill_t sk, int minskill);
 extern armor_type * new_armortype(item_type * itype, double penalty, double magres, int prot, unsigned int flags);
 extern potion_type * new_potiontype(item_type * itype, int level);
-extern herb_type * new_herbtype(item_type * itype, terrain_t terrain);
+
+extern const item_type * oldherbtype(herb_t h);
 
 /* for lack of another file: */
 

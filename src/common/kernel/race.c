@@ -30,16 +30,17 @@
 #include "building.h"
 #include "equipment.h"
 #include "faction.h"
+#include "group.h"
 #include "item.h"
+#include "karma.h"
 #include "magic.h"
-#include "region.h"
-#include "unit.h"
 #include "names.h"
 #include "pathfinder.h"
+#include "region.h"
 #include "ship.h"
 #include "skill.h"
-#include "karma.h"
-#include "group.h"
+#include "terrain.h"
+#include "unit.h"
 
 /* util includes */
 #include <attrib.h>
@@ -137,7 +138,7 @@ rc_find(const char * name)
 boolean
 allowed_dragon(const region * src, const region * target)
 {
-	if (src->terrain==T_GLACIER && target->terrain == T_OCEAN) return false;
+	if (fval(src, ARCTIC_REGION) && fval(target, SEA_REGION)) return false;
 	return allowed_fly(src, target);
 }
 
@@ -245,15 +246,7 @@ give_starting_equipment(struct unit *u)
 boolean
 r_insectstalled(const region * r)
 {
-  switch (rterrain(r)) {
-    case T_GLACIER:
-    case T_ICEBERG_SLEEP:
-    case T_ICEBERG:
-  		return true;
-    default:
-      break;
-  }
-	return false;
+	return fval(r, ARCTIC_REGION);
 }
 
 const char *

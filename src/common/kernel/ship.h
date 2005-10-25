@@ -41,7 +41,7 @@ typedef struct ship_type {
 	int minskill; /* min. skill to sail this (crew) */
 	int sumskill; /* min. sum of crew+captain */
 
-	terrain_t * coast; /* coast that this ship can land on */
+	const struct terrain_type ** coasts; /* coast that this ship can land on */
 
 	struct construction * construction; /* how to build a ship */
 } ship_type;

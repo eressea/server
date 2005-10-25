@@ -45,6 +45,8 @@ typedef struct tagregion {
 
 extern tagregion *Tagged;
 
+extern const struct terrain_type * select_terrain(const struct terrain_type * default_terrain);
+
 void saddstr(char *s);
 struct region *SeedPartei(void);
 void Exit(int level);
@@ -66,7 +68,6 @@ FILE *mapperFopen(const char *defName, const char *mode);
 void adddbllist(dbllist ** S, const char *s);
 void ScrollRegList(int dir);
 void DisplayRegList(int neu);
-char GetTerrain(struct region * r);
 void NeuePartei(struct region * r);
 void RemovePartei(void);
 int ParteiListe(void);
@@ -114,8 +115,8 @@ typedef struct selection {
 
 struct selection * do_selection(struct selection * sel, const char * title, void (*perform)(struct selection *, void *), void * data);
 struct selection ** push_selection(struct selection ** p_sel, char * str, void * payload);
-void insert_selection(struct selection ** p_sel, struct selection * prev, char * str, void * payload);
-void block_create(short x1, short y1, int size, char chaotisch, int special, char terrain);
+void insert_selection(struct selection ** p_sel, struct selection * prev, const char * str, void * payload);
+void block_create(short x1, short y1, int size, char chaotisch, int special, const terrain_type * terrain);
 
 extern void read_orders(const char * filename);
 extern int numnewbies;

@@ -17,6 +17,7 @@
 #include "border.h"
 
 #include "unit.h"
+#include "terrain.h"
 #include "region.h"
 
 /* libc includes */
@@ -424,15 +425,15 @@ b_nameroad(const border * b, const region * r, const struct faction * f, int gfl
 	unused(f);
 	if (gflags & GF_ARTICLE) {
 		if (!(gflags & GF_DETAILED)) strcpy(buffer, "eine Straﬂe");
-		else if (terrain[rterrain(r)].roadreq<=local) {
+		else if (r->terrain->max_road<=local) {
       int remote = (r2==b->from)?b->data.sa[0]:b->data.sa[1];
-			if (terrain[rterrain(r2)].roadreq<=remote) {
+			if (r2->terrain->max_road<=remote) {
 				strcpy(buffer, "eine Straﬂe");
 			} else {
 				strcpy(buffer, "eine unvollst‰ndige Straﬂe");
 			}
 		} else {
-			int percent = max(1, 100*local/terrain[rterrain(r)].roadreq);
+			int percent = max(1, 100*local/r->terrain->max_road);
 			if (local) {
 				sprintf(buffer, "eine zu %d%% vollendete Straﬂe", percent);
 			} else {

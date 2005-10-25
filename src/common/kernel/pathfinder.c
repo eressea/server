@@ -24,28 +24,29 @@
 #include "pathfinder.h"
 
 #include "region.h"
+#include "terrain.h"
 
 #include <limits.h>
 #include <stdlib.h>
 
 boolean
-allowed_swim(const region * src, const region * target)
+allowed_swim(const region * src, const region * r)
 {
-	if (terrain[target->terrain].flags & SWIM_INTO) return true;
+	if (fval(r->terrain, SWIM_INTO)) return true;
 	return false;
 }
 
 boolean
-allowed_walk(const region * src, const region * target)
+allowed_walk(const region * src, const region * r)
 {
-	if (terrain[target->terrain].flags & WALK_INTO) return true;
+	if (fval(r->terrain, WALK_INTO)) return true;
 	return false;
 }
 
 boolean
-allowed_fly(const region * src, const region * target)
+allowed_fly(const region * src, const region * r)
 {
-	if (terrain[target->terrain].flags & FLY_INTO) return true;
+	if (fval(r->terrain, FLY_INTO)) return true;
 	return false;
 }
 

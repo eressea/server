@@ -28,6 +28,7 @@
 #include <region.h>
 #include <ship.h>
 #include <terrain.h>
+#include <terrainid.h>
 #include <unit.h>
 #include <resources.h>
 
@@ -88,7 +89,7 @@ static terrain_t newblock[BLOCKSIZE][BLOCKSIZE];
 static int g_maxluxuries;
 
 void
-block_create(short x1, short y1, int size, char chaotisch, int special, char terrain)
+block_create(short x1, short y1, int size, char chaotisch, int special, const terrain_type * terrain)
 {
 	int local_climate, k;
 	short x, y;
@@ -196,10 +197,10 @@ block_create(short x1, short y1, int size, char chaotisch, int special, char ter
 				if (r==NULL) r = new_region(x1 + x - BLOCKSIZE/2, y1 + y - BLOCKSIZE/2);
 				if (chaotisch) fset(r, RF_CHAOTIC);
 				if (special == 1) {
-					terraform(r, terrain);
+					terraform_region(r, terrain);
 				} else if (special == 2) {
 					if (newblock[x][y] != T_OCEAN)
-						terraform(r, terrain);
+						terraform_region(r, terrain);
 					else
 						terraform(r, T_OCEAN);
 				} else {
@@ -892,6 +893,7 @@ make_new_region(int x, int y)
 	WINDOW *win;
 	int q, z, i;
 	region *r;
+  const terrain_type * terrain = NULL;
 
 	win = openwin(SX - 10, 10, "< Region erzeugen >");
 
@@ -909,30 +911,12 @@ make_new_region(int x, int y)
 		}
 	} else
 		r=new_region(x,y);
-	z = 4;
-	q = 0;
-	wmove(win, z, 4);
-	for (i = 0; i < MAXTERRAINS; i++) {
-		sprintf(buf, "%d=%s; ", i, terrain[i].name);
-		q += strlen(buf);
-		if (q > SX - 20) {
-			q = strlen(buf);
-			z++;
-			wmove(win, z, 4);
-		}
-		wAddstr(buf);
-	}
-	wrefresh(win);
-	terraform(r, (terrain_t) map_input(win, 2, 3, "Terraintyp", 0, MAXTERRAINS-1, 0));
-	for (; z > 3; z--) {
-		wmove(win, z, 2);
-		wclrtoeol(win);
-		wrefresh(win);
-		wmove(win, z, win->_maxx);
-		waddch(win, '|');
-		wrefresh(win);
-	}
-	wmove(win, 4, 3);
+
+  terrain = select_terrain(NULL);
+	terraform_region(r, terrain);
+
+  wrefresh(win);
+  wmove(win, 4, 3);
 	if(yes_no(win, "Chaotische Region?", 'n')) {
 		fset(r, RF_CHAOTIC);
 	} else {
@@ -961,13 +945,36 @@ make_ocean_block(int x, int y)
 	}
 }
 
+const terrain_type *
+select_terrain(const terrain_type * default_terrain)
+{
+  selection *prev, *ilist = NULL, **iinsert;
+  selection *selected = NULL;
+  const terrain_type * terrain = terrains();
+
+  if (!terrain) return NULL;
+  iinsert = &ilist;
+  prev = ilist;
+
+  while (terrain) {
+    insert_selection(iinsert, prev, terrain->_name, (void*)terrain);
+    prev = *iinsert;
+    iinsert = &prev->next;
+  }
+  selected = do_selection(ilist, "Terrain", NULL, NULL);
+  if (selected==NULL) return NULL;
+  return (const terrain_type*)selected->data;
+}
+
 void
 make_new_block(int x, int y)
 {
 	WINDOW *win;
 	int q, z, i, special = 0;
-	char chaos, t = 0;
-	win = openwin(SX - 10, 10, "< Block erzeugen >");
+	char chaos;
+  const terrain_type * terrain = NULL;
+
+  win = openwin(SX - 10, 10, "< Block erzeugen >");
 
 	x = map_input(win, 2, 1, "X-Koordinate innerhalb des Blocks", -999, 999, x);
 	y = map_input(win, 2, 2, "Y-Koordinate innerhalb des Blocks", -999, 999, y);
@@ -990,36 +997,12 @@ make_new_block(int x, int y)
 		wmove(win, ++z, 2);
 		if (yes_no(win, "Nur Wasser?", 'n')) {
 			special = 1;
-			t = T_OCEAN;
+			terrain = newterrain(T_OCEAN);
 		}
 		else {
 			wmove(win, ++z, 2);
 			if (yes_no(win, "1-Terrain-Insel?", 'n')) {
-				special = z;
-				q = 0;
-				wmove(win, ++z, 4);
-				for (i = 0; i < MAXTERRAINS; i++) {
-					sprintf(buf, "%d=%s; ", i, terrain[i].name);
-					q += strlen(buf);
-					if (q > SX - 20) {
-						q = strlen(buf);
-						z++;
-						wmove(win, z, 4);
-					}
-					wAddstr(buf);
-				}
-				wrefresh(win);
-				t = (char) map_input(win, 2, 3, "Terraintyp", 0, MAXTERRAINS - 1,
-						  terrain_create(climate(y)));
-				for (; z > special; z--) {
-					wmove(win, z, 2);
-					wclrtoeol(win);
-					wrefresh(win);
-					wmove(win, z, win->_maxx);
-					waddch(win, '|');
-					wrefresh(win);
-				}
-				special = 2;
+        terrain = select_terrain(NULL);
 			}
 		}
 	}
@@ -1029,7 +1012,7 @@ make_new_block(int x, int y)
 	else
 		chaos = 0;
 
-	block_create(x, y, ISLANDSIZE, chaos, special, t);
+	block_create(x, y, ISLANDSIZE, chaos, special, terrain);
 
 	if (y < MINY)
 		MINY -= 9;
@@ -1040,39 +1023,6 @@ make_new_block(int x, int y)
 	else if (x > MAXX)
 		MAXX += 9;
 	modified = 1;
-}
-
-char
-GetTerrain(region * r)
-{
-	WINDOW *win;
-	int q, y, i;
-	win = newwin(8, SX - 10, 2, 2);
-	wclear(win);
-/*	wborder(win, '|', '|', '-', '-', '.', '.', '`', '\'');*/
-	wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
-	wmove(win, 0, 3);
-	waddnstr(win, "< Terraform Region >", -1);
-	wrefresh(win);
-	q = 0;
-	y = 2;
-	wmove(win, y, 4);
-	for (i = 0; i < MAXTERRAINS; i++) {
-		sprintf(buf, "%d=%s; ", i, terrain[i].name);
-		q += strlen(buf);
-		if (q > SX - 20) {
-			q = strlen(buf);
-			y++;
-			wmove(win, y, 4);
-		}
-		wAddstr(buf);
-	}
-	wrefresh(win);
-	q = map_input(win, 2, 1, "Neuer Terraintyp?", -1, MAXTERRAINS - 1, r->terrain);
-	if (q < 0)
-		return MAXTERRAINS * 2;
-	else
-		return (char) q;
 }
 
 static terrain_t

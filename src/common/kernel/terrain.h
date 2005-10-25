@@ -25,72 +25,61 @@
 extern "C" {
 #endif
 
-#define landregion(t) (t!=T_OCEAN && t!=T_FIREWALL && t!=T_ASTRAL && t!=T_ASTRALB && t!=T_FIREWALL && t!=T_HELL && t!=T_MAGICSTORM)
-enum {
-	T_OCEAN,
-	T_PLAIN,
-	T_SWAMP,
-	T_DESERT,					/* kann aus T_PLAIN entstehen */
-	T_HIGHLAND,
-	T_MOUNTAIN,
-	T_GLACIER,		/* kann aus T_MOUNTAIN entstehen */
-	T_FIREWALL,		/* Unpassierbar */
-	T_HELL,				/* Hölle */
-	T_GRASSLAND,
-	T_ASTRAL,
-	T_ASTRALB,
-	T_VOLCANO,
-	T_VOLCANO_SMOKING,
-	T_ICEBERG_SLEEP,
-	T_ICEBERG,
-	T_HALL1,
-	T_CORRIDOR1,
-	T_MAGICSTORM,
-	T_WALL1,
-	MAXTERRAINS,
-	NOTERRAIN = (terrain_t) - 1
-};
-
 /* diverse Flags */
-#define BUILD_BUILDINGS	(1<<0)		/* man darf Gebäude bauen */
-#define BUILD_SHIPS		  (1<<1)		/* man darf Schiffe bauen */
-/* Strassen können gebaut werden, wenn roadreq > 0 */
-#define WALK_INTO		    (1<<2)		/* man darf hierhin laufen */
-#define SAIL_INTO		    (1<<3)		/* man darf hierhin segeln */
-#define FLY_INTO		    (1<<4)		/* man darf hierhin fliegen */
-#define SWIM_INTO		    (1<<5)		/* man darf hierhin schwimmen */
-#define LARGE_SHIPS		  (1<<6)		/* grosse Schiffe dürfen hinfahren */
-#define FORBIDDEN_LAND	(1<<7)		/* unpassierbare Blockade-struct region */
-#define LAND_REGION     (1<<8)		/* Standard-Land-struct region */
+/* Strassen können gebaut werden, wenn max_road > 0 */
+#define LAND_REGION      (1<<0)		/* Standard-Land-struct region */
+#define SEA_REGION       (1<<1)		/* hier braucht man ein Boot */
+#define FOREST_REGION    (1<<2)		/* Elfen- und Kampfvorteil durch Bäume */
+#define ARCTIC_REGION    (1<<3)   /* Gletscher & co = Keine Insekten! */
+#define CAVALRY_REGION   (1<<4)   /* Gletscher & co = Keine Insekten! */
+/* Achtung: SEA_REGION ist nicht das Gegenteil von LAND_REGION. Die zwei schliessen sich nichtmal aus! */
+#define FORBIDDEN_REGION (1<<5)		/* unpassierbare Blockade-struct region */
+#define SAIL_INTO		     (1<<6)		/* man darf hierhin segeln */
+#define FLY_INTO		     (1<<7)		/* man darf hierhin fliegen */
+#define SWIM_INTO		     (1<<8)		/* man darf hierhin schwimmen */
+#define WALK_INTO		     (1<<9)		/* man darf hierhin laufen */
+#define LARGE_SHIPS		   (1<<10)		/* grosse Schiffe dürfen hinfahren */
 
-#define NORMAL_TERRAIN	(BUILD_BUILDINGS|BUILD_SHIPS|WALK_INTO|SAIL_INTO|FLY_INTO)
+#define NORMAL_TERRAIN	(WALK_INTO|SAIL_INTO|FLY_INTO)
 
-typedef struct terraindata_t {
-	const char *name;              /* "Ozean", "Ebene" etc */
-	char symbol;             /* Merian-Zeichen: '.', 'E', etc */
-	const char *(*trailname)(const struct region * r); /* (im Norden liegt) "der Wald von %s" */
-	const char *roadinto;          /* (eine Strasse fuehrt) "in den Wald von %s" */
-	                         /* ist NULL, wenn kein Strassenbau möglich */
+typedef struct production_rule {
+	char * name;
+	const struct resource_type * rtype;
 
-	int quarries;			/* abbaubare Steine pro Runde */
-	short roadreq;			/* Steine fuer Strasse (-1 = nicht machbar) */
-	int production_max;		/* bebaubare Parzellen (10 Leute pro Parzelle) */
-	/* Achtung: Produktion wird durch Flueche (zB Duerre) beeinflusst.
-	 * Die Funktion production(struct region *r) in economic.c ermittelt den
-	 * aktuellen Stand fuer eine bestimmte struct region.
-	 */
-	unsigned int flags;
-	const char ** herbs;
-	struct {
-		const struct rawmaterial_type * type;
-		const char *startlevel;
-		const char *base;
-		const char *divisor;
-		double chance;
-	} rawmaterials[3];
-} terraindata_t;
+	void (*terraform) (struct production_rule *, const struct region *);
+	void (*update) (struct production_rule *, const struct region *);
+	void (*use) (struct production_rule *, const struct region *, int amount);
+	int (*visible) (const struct production_rule *, int skilllevel);
 
-extern const terraindata_t terrain[];
+	/* no initialization required */
+	struct production_rule * next;
+} production_rule;
+
+typedef struct terrain_production {
+  const struct resource_type * type;
+	const char *startlevel;
+	const char *base;
+	const char *divisor;
+	float chance;
+} terrain_production;
+
+typedef struct terrain_type {
+  char * _name;
+  int size;         /* how many peasants can work? */
+  unsigned int flags;
+  short max_road;   /* this many stones make a full road */
+  struct terrain_production * production;
+  const struct item_type ** herbs; /* zero-terminated array of herbs */
+  const char * (*name)(const struct region * r);
+  const struct terrain_type * next;
+} terrain_type;
+
+extern const terrain_type * terrains(void);
+extern void register_terrain(struct terrain_type * terrain);
+extern const struct terrain_type * get_terrain(const char * name);
+extern const char * terrain_name(const struct region * r);
+
+extern void init_terrains(void);
 
 #ifdef __cplusplus
 }

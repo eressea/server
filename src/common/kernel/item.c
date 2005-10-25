@@ -30,6 +30,7 @@
 #include "region.h"
 #include "save.h"
 #include "skill.h"
+#include "terrain.h"
 #include "unit.h"
 
 /* triggers includes */
@@ -50,7 +51,6 @@
 resource_type * resourcetypes;
 luxury_type * luxurytypes;
 potion_type * potiontypes;
-herb_type * herbtypes;
 
 #define IMAXHASH 127
 static item_type * itemtypes[IMAXHASH];
@@ -291,31 +291,6 @@ new_potiontype(item_type * itype,
 }
 
 
-static void
-ht_register(herb_type * htype)
-{
-	htype->itype->rtype->htype = htype;
-	htype->next = herbtypes;
-	herbtypes = htype;
-}
-
-herb_type *
-new_herbtype(item_type * itype,
-             terrain_t terrain)
-{
-	herb_type * htype;
-
-	assert(resource2herb(itype->rtype)==NULL);
-	assert(itype->flags & ITF_HERB);
-
-	htype = calloc(sizeof(herb_type), 1);
-	htype->itype = itype;
-	htype->terrain = terrain;
-	ht_register(htype);
-
-	return htype;
-}
-
 void
 rt_register(resource_type * rtype)
 {
@@ -339,12 +314,6 @@ const item_type *
 resource2item(const resource_type * rtype)
 {
 	return rtype->itype;
-}
-
-const herb_type *
-resource2herb(const resource_type * rtype)
-{
-	return rtype->htype;
 }
 
 const weapon_type *
@@ -438,18 +407,6 @@ lt_find(const char * name)
 		if (ltype->itype->rtype->hashkey==hash && !strcmp(ltype->itype->rtype->_name[0], name)) break;
 
 	return ltype;
-}
-
-herb_type *
-ht_find(const char * name)
-{
-	unsigned int hash = hashstring(name);
-	herb_type * htype;
-
-	for (htype=herbtypes; htype; htype=htype->next)
-		if (htype->itype->rtype->hashkey==hash && !strcmp(htype->itype->rtype->_name[0], name)) break;
-
-	return htype;
 }
 
 potion_type *
@@ -1350,10 +1307,10 @@ init_oldherbs(void)
 	}
 }
 
-const resource_type *
-newherbtype(herb_t h)
+const item_type *
+oldherbtype(herb_t h)
 {
-  return oldresourcetype[herb2res(h)];
+  return oldresourcetype[herb2res(h)]->itype;
 }
 
 

@@ -61,6 +61,7 @@ struct fighter;
 struct region_list;
 struct race;
 struct ship;
+struct terrain_type;
 struct building;
 struct faction;
 struct party;
@@ -73,7 +74,6 @@ struct resource_type;
 struct item_type;
 struct potion_type;
 struct luxury_type;
-struct herb_type;
 struct weapon_type;
 /* types */
 struct ship_type;
@@ -162,6 +162,7 @@ struct building_type;
 #define BACTION_VERSION 319 /* building action gets a param string */
 #define NOLASTORDER_VERSION 320 /* do not use lastorder */
 #define SPELLNAME_VERSION 321 /* reference spells by name */
+#define TERRAIN_VERSION 322 /* terrains are a full type and saved by name */
 
 #define MIN_VERSION CURSETYPE_VERSION
 #define REGIONOWNERS_VERSION 400
@@ -169,10 +170,8 @@ struct building_type;
 
 #ifdef REGIONOWNERS
 # define RELEASE_VERSION REGIONOWNERS_VERSION
-#elif defined(LASTORDER)
-# define RELEASE_VERSION BACTION_VERSION
 #else
-# define RELEASE_VERSION SPELLNAME_VERSION
+# define RELEASE_VERSION TERRAIN_VERSION
 #endif
 
 #if RESOURCE_CONVERSION
@@ -1129,7 +1128,6 @@ extern const char *localenames[];
 #ifdef _MSC_VER
 #include <stdafx.h>
 #endif
-#include "terrain.h" /* für (bald) alte MAXTERRAINS */
 
 /** compatibility: **/
 extern race_t old_race(const struct race *);

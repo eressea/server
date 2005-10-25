@@ -61,6 +61,8 @@
 #include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/teleport.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 #include <kernel/alliance.h>
 #ifdef USE_UGROUPS
@@ -964,16 +966,15 @@ trailinto(const region * r, const struct locale * lang)
 	char ref[32];
 	const char * s;
 	if (r) {
-		terrain_t t = r->terrain;
+    const char * tname;
 		if (is_cursed(r->attribs, C_MAELSTROM, 0)) {
 			/* das kostet. evtl. wäre ein FL_CURSED gut? */
-			s = locale_string(lang, "maelstrom_trail");
+			tname = "maelstrom";
+		} else {
+      tname = terrain_name(r);
 		}
-		else if (terrain[t].trailname==NULL) {
-			strcat(strcpy(ref, terrain[t].name), "_trail");
-			s = locale_string(lang, ref);
-		}
-		else s = locale_string(lang, terrain[t].trailname(r));
+    strcat(strcpy(ref, tname), "_trail");
+    s = locale_string(lang, ref);
 		if (s && *s) {
 			if (strstr(s, "%s"))	return s;
 		}
@@ -1063,8 +1064,7 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	if(is_cursed(r->attribs,C_MAELSTROM, 0))
 		tname = "maelstrom";
 	else {
-		if (r_isforest(r)) tname = "forest";
-		else tname = terrain[rterrain(r)].name;
+		tname = terrain_name(r);
 	}
 	bufp += strxcpy(bufp, LOC(f->locale, tname));
 
@@ -1314,13 +1314,13 @@ statistics(FILE * F, const region * r, const faction * f)
     rnl(F);
 
     /* Region */
-    if (landregion(rterrain(r)) && rmoney(r)) {
+    if (fval(r->terrain, LAND_REGION) && rmoney(r)) {
       m = msg_message("nr_stat_maxentertainment", "max", entertainmoney(r));
       nr_render(m, f->locale, buf, sizeof(buf), f);
       rps(F, buf);
       msg_release(m);
     }
-    if (production(r) && (!rterrain(r) == T_OCEAN || f->race == new_race[RC_AQUARIAN])) {
+    if (production(r) && (!fval(r->terrain, SEA_REGION) || f->race == new_race[RC_AQUARIAN])) {
       m = msg_message("nr_stat_salary", "max", fwage(r, f, true));
       nr_render(m, f->locale, buf, sizeof(buf), f);
       rps(F, buf);
@@ -2213,7 +2213,7 @@ report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * ad
 
 		if (unit_in_region) {
 			describe(F, r, 0, f);
-			if (!TradeDisabled() && rterrain(r) != T_OCEAN && rpeasants(r)/TRADE_FRACTION > 0) {
+			if (!TradeDisabled() && !fval(r->terrain, SEA_REGION) && rpeasants(r)/TRADE_FRACTION > 0) {
 				rnl(F);
 				prices(F, r, f);
 			}
@@ -2311,7 +2311,7 @@ report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * ad
           sh->damage*100/(sh->size*DAMAGE_SCALE),
           LOC(f->locale, "nr_damaged"));
       }
-      if (rterrain(r) != T_OCEAN) {
+      if (!fval(r->terrain, SEA_REGION)) {
         if (sh->coast != NODIRECTION) {
           scat(", ");
           scat(LOC(f->locale, coasts[sh->coast]));
@@ -2455,7 +2455,7 @@ view_neighbours(struct seen_region ** seen, region * r, faction * f)
 			}
 			if (!b) {
 				if (add_seen(seen, r2, see_far, false)) {
-					if (!(terrain[rterrain(r2)].flags & FORBIDDEN_LAND)) {
+					if (!(fval(r2->terrain, FORBIDDEN_REGION))) {
 						direction_t dir;
 						for (dir=0;dir!=MAXDIRECTIONS;++dir) {
 							region * r3 = rconnect(r2, dir);
@@ -2484,7 +2484,7 @@ recurse_regatta(struct seen_region ** seen, region *center, region *r, faction *
 		region * r2 = rconnect(r, dir);
 		if (r2) {
 			int ndist = distance(center, r2);
-			if (ndist>dist && r2->terrain==T_OCEAN) {
+			if (ndist>dist && fval(r2->terrain, SEA_REGION)) {
 				border * b = get_borders(r, r2);
 				while (b) {
 					if (!b->type->transparent(b, f)) break;
@@ -2623,7 +2623,7 @@ prepare_report(faction * f)
       region_list * rp = rlist;
       while (rp) {
         region * rl = rp->data;
-        if (rterrain(rl) == T_OCEAN) {
+        if (fval(rl->terrain, SEA_REGION)) {
           direction_t d;
           add_seen(seen, rl, see_lighthouse, false);
           for (d=0;d!=MAXDIRECTIONS;++d) {
@@ -3059,7 +3059,7 @@ make_summary(void)
 		s->pferde += rhorses(r);
 		s->schiffe += listlen(r->ships);
 		s->gebaeude += listlen(r->buildings);
-		if (rterrain(r) != T_OCEAN) {
+		if (!fval(r->terrain, SEA_REGION)) {
 			s->landregionen++;
 			if (r->units) {
 				s->landregionen_mit_spielern++;

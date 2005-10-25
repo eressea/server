@@ -21,6 +21,8 @@
 #include <kernel/plane.h>
 #include <kernel/faction.h>
 #include <kernel/race.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 /* util includes */
@@ -224,9 +226,9 @@ read_newfactions(const char * filename)
 }
 
 typedef struct seed_t {
-	struct region * region;
-	struct newfaction * player;
-	struct seed_t * next[MAXDIRECTIONS];
+  struct region * region;
+  struct newfaction * player;
+  struct seed_t * next[MAXDIRECTIONS];
 } seed_t;
 
 double
@@ -266,13 +268,16 @@ double
 get_quality(struct seed_t * seed)
 {
 	double q = 0.0;
-	int nterrains[MAXTERRAINS];
+	int nterrains[T_ASTRAL];
 	direction_t d;
 
 	memset(nterrains, 0, sizeof(nterrains));
 	for (d=0;d!=MAXDIRECTIONS;++d) {
 		seed_t * ns = seed->next[d];
-		if (ns) ++nterrains[rterrain(ns->region)];
+    if (ns) {
+      terrain_t t = rterrain(ns->region);
+      if (t<T_ASTRAL) ++nterrains[t];
+    }
 	}
 	++nterrains[rterrain(seed->region)];
 
@@ -323,7 +328,7 @@ get_quality(struct seed_t * seed)
 	return 2.0;
 }
 
-double
+static double
 recalc(seed_t * seeds, int nseeds, int nplayers)
 {
 	int i, p = 0;
@@ -464,7 +469,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
      */
     for (r=regions;r;r=r->next) {
       struct plane * p = rplane(r);
-      if (r->terrain==T_OCEAN && p==NULL && virgin_region(r)) {
+      if (rterrain(r)==T_OCEAN && p==NULL && virgin_region(r)) {
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * rn = rconnect(r, d);
@@ -510,7 +515,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
      */
     for (r=regions;r;r=r->next) {
       struct plane * p = rplane(r);
-      if (r->terrain==T_OCEAN && p==0 && (rmin==NULL || r->age<=MAXAGEDIFF)) {
+      if (rterrain(r)==T_OCEAN && p==0 && (rmin==NULL || r->age<=MAXAGEDIFF)) {
         direction_t d;
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * rn  = rconnect(r, d);
@@ -575,13 +580,13 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
       isize += REGIONS_PER_FACTION;
       terraform(r, preferred_terrain(nextf->race));
       n = rhorses(r);
-      if (n<terrain[r->terrain].production_max/20) {
-        n = terrain[r->terrain].production_max/20;
+      if (n<r->terrain->size/200) {
+        n = r->terrain->size/200;
         rsethorses(r, n);
       }
       n = rtrees(r, 2);
-      if (n<terrain[r->terrain].production_max/10) {
-        n = terrain[r->terrain].production_max/10;
+      if (n<r->terrain->size/100) {
+        n = r->terrain->size/100;
         rsettrees(r, 2, n);
         rsettrees(r, 2, n/4);
         rsettrees(r, 2, n/2);

@@ -24,6 +24,7 @@
 
 /* kernel includes */
 #include "alchemy.h"
+#include "alliance.h"
 #include "border.h"
 #include "building.h"
 #include "curse.h"
@@ -39,8 +40,9 @@
 #include "region.h"
 #include "ship.h"
 #include "skill.h"
+#include "terrain.h"
+#include "terrainid.h"
 #include "unit.h"
-#include "alliance.h"
 
 /* from libutil */
 #include <attrib.h>
@@ -280,7 +282,7 @@ do_siege(void)
   region *r;
 
   for (r = regions; r; r = r->next) {
-    if (rterrain(r) != T_OCEAN) {
+    if (fval(r->terrain, LAND_REGION)) {
       unit *u;
 
       for (u = r->units; u; u = u->next) {
@@ -408,7 +410,7 @@ destroy_cmd(unit * u, struct order * ord)
       return 0;
     }
 
-    if (rterrain(r) == T_OCEAN) {
+    if (fval(r->terrain, SEA_REGION)) {
       cmistake(u, ord, 14, MSG_EVENT);
       return 0;
     }
@@ -456,9 +458,8 @@ void
 build_road(region * r, unit * u, int size, direction_t d)
 {
   int n, left;
+  terrain_t rt = rterrain(r);
   region * rn = rconnect(r,d);
-  terrain_t rt = T_OCEAN;
-  if (rn) rt = rterrain(rn);
 
   if (!eff_skill(u, SK_ROAD_BUILDING, r)) {
     cmistake(u, u->thisorder, 103, MSG_PRODUCE);
@@ -469,13 +470,12 @@ build_road(region * r, unit * u, int size, direction_t d)
     return;
   }
 
-  if (terrain[rt].roadreq < 0) {
+  if (rn==NULL || rn->terrain->max_road < 0) {
     cmistake(u, u->thisorder, 94, MSG_PRODUCE);
     return;
   }
 
-  rt = rterrain(r);
-  if (terrain[rt].roadreq < 0) {
+  if (r->terrain->max_road < 0) {
     cmistake(u, u->thisorder, 94, MSG_PRODUCE);
     return;
   }
@@ -514,8 +514,8 @@ build_road(region * r, unit * u, int size, direction_t d)
   }
 
   /* left kann man noch bauen */
-  left = terrain[rt].roadreq - rroad(r, d);
-  /* hoffentlich ist r->road <= terrain[rterrain(r)].roadreq, n also >= 0 */
+  left = r->terrain->max_road - rroad(r, d);
+  /* hoffentlich ist r->road <= r->terrain->max_road, n also >= 0 */
   if (left <= 0) {
     sprintf(buf, "In %s gibt es keine Brücken und Straßen "
       "mehr zu bauen", regionname(r, u->faction));
@@ -1150,7 +1150,7 @@ leave_cmd(unit * u, struct order * ord)
 {
   region * r = u->region;
 
-  if (r->terrain == T_OCEAN && u->ship) {
+  if (fval(r->terrain, SEA_REGION) && u->ship) {
     if(!fval(u->race, RCF_SWIM)) {
       cmistake(u, ord, 11, MSG_MOVE);
       return 0;
@@ -1251,7 +1251,7 @@ do_misc(boolean lasttry)
             /* Schwimmer können keine Gebäude betreten, außer diese sind
              * auf dem Ozean */
             if( !fval(u->race, RCF_WALK) && !fval(u->race, RCF_FLY)) {
-              if (rterrain(r) != T_OCEAN){
+              if (!fval(r->terrain, SEA_REGION)) {
                 if (lasttry) cmistake(u, ord, 232, MSG_MOVE);
                 break;
               }

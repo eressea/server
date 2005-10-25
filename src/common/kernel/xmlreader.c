@@ -23,6 +23,7 @@ without prior permission by the authors of Eressea.
 #include "message.h"
 #include "race.h"
 #include "ship.h"
+#include "terrain.h"
 #include "skill.h"
 #include "spell.h"
 #include "calendar.h"
@@ -501,24 +502,17 @@ parse_ships(xmlDocPtr doc)
     result = xmlXPathEvalExpression(BAD_CAST "coast", xpath);
     for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
-      terrain_t t;
 
       if (k==0) {
-        assert(st->coast==NULL);
-        st->coast = malloc(sizeof(terrain_t) * (result->nodesetval->nodeNr+1));
-        st->coast[result->nodesetval->nodeNr] = NOTERRAIN;
+        assert(st->coasts==NULL);
+        st->coasts = (const terrain_type**)malloc(sizeof(const terrain_type*) * (result->nodesetval->nodeNr+1));
+        st->coasts[result->nodesetval->nodeNr] = NULL;
       }
 
       property = xmlGetProp(node, BAD_CAST "terrain");
       assert(property!=NULL);
-      st->coast[k] = NOTERRAIN;
-      for (t=0;t!=MAXTERRAINS;++t) {
-        if (strcmp((const char*)property, terrain[t].name)==0) {
-          st->coast[k] = t;
-          break;
-        }
-      }
-      assert(st->coast[k]!=NOTERRAIN);
+      st->coasts[k] = get_terrain((const char*)property);
+      assert(st->coasts[k]!=NULL);
       xmlFree(property);
     }
     xmlXPathFreeObject(result);
@@ -1422,6 +1416,116 @@ parse_races(xmlDocPtr doc)
 }
 
 static int
+parse_terrains(xmlDocPtr doc)
+{
+  xmlXPathContextPtr xpath;
+  xmlXPathObjectPtr terrains;
+  xmlNodeSetPtr nodes;
+  int i;
+
+  xpath = xmlXPathNewContext(doc);
+
+  /* reading eressea/strings/string */
+  terrains = xmlXPathEvalExpression(BAD_CAST "/eressea/terrains/terrain", xpath);
+  nodes = terrains->nodesetval;
+  for (i=0;i!=nodes->nodeNr;++i) {
+    xmlNodePtr node = nodes->nodeTab[i];
+    terrain_type * terrain = calloc(1, sizeof(terrain_type));
+    xmlChar * property;
+    xmlXPathObjectPtr xpathChildren;
+    xmlNodeSetPtr children;
+
+    property = xmlGetProp(node, BAD_CAST "name");
+    assert(property!=NULL);
+    terrain->_name = strdup((const char *)property);
+    xmlFree(property);
+
+    terrain->max_road = (short)xml_ivalue(node, "road", -1);
+    terrain->size = xml_ivalue(node, "size", 0);
+
+    if (xml_bvalue(node, "forbidden", false)) terrain->flags |= FORBIDDEN_REGION;
+    else {
+      if (xml_bvalue(node, "fly", true)) terrain->flags |= FLY_INTO;
+      if (xml_bvalue(node, "sail", true)) terrain->flags |= SAIL_INTO;
+      if (xml_bvalue(node, "walk", true)) terrain->flags |= WALK_INTO;
+      if (xml_bvalue(node, "swim", false)) terrain->flags |= SWIM_INTO;
+      if (xml_bvalue(node, "shallow", true)) terrain->flags |= LARGE_SHIPS;
+      if (xml_bvalue(node, "cavalry", false)) terrain->flags |= CAVALRY_REGION;
+    }
+    if (xml_bvalue(node, "sea", false)) terrain->flags |= SEA_REGION;
+    if (xml_bvalue(node, "arctic", false)) terrain->flags |= ARCTIC_REGION;
+    if (xml_bvalue(node, "land", true)) terrain->flags |= LAND_REGION;
+    if (xml_bvalue(node, "forest", false)) terrain->flags |= FOREST_REGION;
+
+    xpath->node = node;
+    xpathChildren = xmlXPathEvalExpression(BAD_CAST "herb", xpath);
+    children = xpathChildren->nodesetval;
+    if (children->nodeNr>0) {
+      int k;
+
+      terrain->herbs = malloc((children->nodeNr+1) * sizeof(item_type*));
+      terrain->herbs[children->nodeNr] = NULL;
+      for (k=0;k!=children->nodeNr;++k) {
+        xmlNodePtr nodeHerb = children->nodeTab[k];
+        const struct resource_type * rtype;
+
+        property = xmlGetProp(nodeHerb, BAD_CAST "name");
+        assert(property!=NULL);
+        rtype = rt_find((const char*)property);
+        assert(rtype!=NULL && rtype->itype!=NULL && fval(rtype->itype, ITF_HERB));
+        terrain->herbs[k] = rtype->itype;
+        xmlFree(property);
+      }
+    }
+    xmlXPathFreeObject(xpathChildren);
+
+    xpath->node = node;
+    xpathChildren = xmlXPathEvalExpression(BAD_CAST "resource", xpath);
+    children = xpathChildren->nodesetval;
+    if (children->nodeNr>0) {
+      int k;
+
+      terrain->production = malloc((children->nodeNr+1) * sizeof(terrain_production));
+      terrain->production[children->nodeNr].type = NULL;
+      for (k=0;k!=children->nodeNr;++k) {
+        xmlNodePtr nodeProd = children->nodeTab[k];
+
+        property = xmlGetProp(nodeProd, BAD_CAST "name");
+        assert(property!=NULL);
+        terrain->production[k].type = rt_find((const char*)property);
+        xmlFree(property);
+
+        property = xmlGetProp(nodeProd, BAD_CAST "level");
+        assert(property);
+        terrain->production[k].startlevel = strdup((const char *)property);
+        xmlFree(property);
+
+        property = xmlGetProp(nodeProd, BAD_CAST "base");
+        assert(property);
+        terrain->production[k].base = strdup((const char *)property);
+        xmlFree(property);
+
+        property = xmlGetProp(nodeProd, BAD_CAST "div");
+        assert(property);
+        terrain->production[k].divisor = strdup((const char *)property);
+        xmlFree(property);
+
+        terrain->production[k].chance = (float)xml_fvalue(node, "chance", 0);
+      }
+    }
+    xmlXPathFreeObject(xpathChildren);
+
+    register_terrain(terrain);
+  }
+  xmlXPathFreeObject(terrains);
+
+  xmlXPathFreeContext(xpath);
+
+  init_terrains();
+  return 0;
+}
+
+static int
 parse_messages(xmlDocPtr doc)
 {
   xmlXPathContextPtr xpath;
@@ -1689,8 +1793,9 @@ register_xmlreader(void)
   xml_register_callback(parse_messages);
   xml_register_callback(parse_resources);
 
+  xml_register_callback(parse_terrains); /* requires resources */
   xml_register_callback(parse_buildings); /* requires resources */
-  xml_register_callback(parse_ships); /* requires resources */
+  xml_register_callback(parse_ships); /* requires terrains */
   xml_register_callback(parse_spells); /* requires resources */
   xml_register_callback(parse_equipment); /* requires spells */
   xml_register_callback(parse_races); /* requires spells */

@@ -27,6 +27,7 @@
 #include "reports.h"
 #include "ship.h"
 #include "skill.h"
+#include "terrain.h"
 #include "unit.h"
 
 /* attributes includes */
@@ -300,7 +301,7 @@ give_unit(unit * u, unit * u2, order * ord)
   }
 
   if (u2 == NULL) {
-    if (rterrain(r) == T_OCEAN) {
+    if (fval(r->terrain, SEA_REGION)) {
       cmistake(u, ord, 152, MSG_COMMERCE);
     } else if (getunitpeasants) {
       unit *u3;

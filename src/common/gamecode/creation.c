@@ -22,25 +22,26 @@
 #include <config.h>
 #include "eressea.h"
 #include "creation.h"
+#include "monster.h"
 
 /* kernel includes */
-#include "alchemy.h"
-#include "build.h"
-#include "faction.h"
-#include "goodies.h"
-#include "item.h"
-#include "magic.h"
-#include "monster.h"
-#include "plane.h"
-#include "race.h"
-#include "region.h"
-#include "save.h"
-#include "ship.h"
-#include "unit.h"
+#include <kernel/alchemy.h>
+#include <kernel/build.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/magic.h>
+#include <kernel/plane.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/save.h>
+#include <kernel/ship.h>
+#include <kernel/terrain.h>
+#include <kernel/unit.h>
 
 /* util includes */
-#include <vmap.h>
-#include <vset.h>
+#include <util/goodies.h>
+#include <util/vmap.h>
+#include <util/vset.h>
 
 /* libc includes */
 #include <assert.h>
@@ -113,108 +114,5 @@ armedsymbols(region * r)
 	else
 		return (char) ('1' - 1 + i);
 }
-
-void
-writemap(FILE * F, int mode)
-{
-	int x, y, minx, miny, maxx, maxy, pos, maxpos;
-	region *r;
-
-	minx = INT_MAX;
-	maxx = INT_MIN;
-	miny = INT_MAX;
-	maxy = INT_MIN;
-
-	for (r = regions; r; r = r->next) if (!rplane(r)) {
-		minx = min(minx, r->x);
-		maxx = max(maxx, r->x);
-		miny = min(miny, r->y);
-		maxy = max(maxy, r->y);
-	}
-
-	fputs("\nLegende:\n\n", F);
-	switch (mode) {
-	case M_TERRAIN:
-		for (y = 0; y != MAXTERRAINS; y++)
-			fprintf(F, "%c - %s\n", terrain[y].symbol, terrain[y].name);
-		break;
-
-	case M_FACTIONS:
-		for (y = 0; y != MAXTERRAINS; y++)
-			fprintf(F, "%c - %s\n", terrain[y].symbol, terrain[y].name);
-		fputs("x - mehr als 9 Parteien\n", F);
-		fputs("1-9 - Anzahl Parteien\n", F);
-		break;
-
-	case M_UNARMED:
-		for (y = 0; y != MAXTERRAINS; y++)
-			fprintf(F, "%c - %s\n", terrain[y].symbol, terrain[y].name);
-		fputs("X - mindestens eine bewaffnete Person\n", F);
-		fputs("x - mehr als 9 Personen\n", F);
-		fputs("1-9 - Anzahl unbewaffneter Personen\n", F);
-		break;
-
-	}
-
-	fprintf(F, "\n\nKoordinaten von (%d,%d) bis (%d,%d):\n\n    ",
-			minx, maxy, maxx, miny);
-
-	for (x = minx; x <= maxx; x++) {
-		if (x < 0) {
-			fprintf(F, " -");
-		} else {
-			fprintf(F, "  ");
-		}
-	}
-	fprintf(F, "\n    ");
-	for (x = minx; x <= maxx; x++) {
-		fprintf(F, "%2d", (int) (abs(x) / 10));
-	}
-	fprintf(F, "\n    ");
-	for (x = minx; x <= maxx; x++) {
-		fprintf(F, "%2d", abs(x % 10));
-	}
-	fprintf(F, "\n\n");
-
-	for (y = maxy; y >= miny; y--) {
-		memset(buf, ' ', sizeof buf);
-
-		maxpos=-9999;
-		for (r = regions; r; r = r->next)
-			if (r->y == y) {
-				pos=(r->x - minx + (y/2)) * 2;
-				if (y>0) pos += (y&1);
-				else pos -= (y&1);
-				if (r->units && mode == M_FACTIONS)
-					buf[pos] = factionsymbols(r);
-				else if (r->units && mode == M_UNARMED)
-					buf[pos] = armedsymbols(r);
-				else	/* default: terrain */
-					buf[pos] = terrain[rterrain(r)].symbol;
-				maxpos=max(pos,maxpos);
-			}
-		buf[maxpos+1+(y&1)]=0;
-		fprintf(F,"%3d %s %3d\n",y,buf,y);
-	}
-
-	fprintf(F, "\n    ");
-	for (x = minx; x <= maxx; x++) {
-		if (x < 0) {
-			fprintf(F, " -");
-		} else {
-			fprintf(F, "  ");
-		}
-	}
-	fprintf(F, "\n    ");
-	for (x = minx; x <= maxx; x++) {
-		fprintf(F, "%2d", (int) (abs(x) / 10));
-	}
-	fprintf(F, "\n    ");
-	for (x = minx; x <= maxx; x++) {
-		fprintf(F, "%2d", abs(x % 10));
-	}
-	fprintf(F, "\n\n");
-}
-/* ------------------------------------------------------------- */
 
 /* ------------------------------------------------------------- */

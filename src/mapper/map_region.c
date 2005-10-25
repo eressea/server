@@ -29,6 +29,7 @@
 #include <kernel/region.h>
 #include <kernel/resources.h>
 #include <kernel/ship.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 /* modules includes */
@@ -218,7 +219,7 @@ showregion(region * r, char full)
 
 	sprintf(buf, " %hd turns old:", r->age);
 	adddbllist(&reglist, buf);
-	if (r->terrain != T_OCEAN && r->terrain!=T_FIREWALL) {
+	if (rterrain(r) != T_OCEAN && rterrain(r)!=T_FIREWALL) {
 		sprintf(buf, " %d peasants, %d(%d) silver", rpeasants(r), rmoney(r), count_all_money(r));
 		adddbllist(&reglist, buf);
 		sprintf(buf, " %d horses, %d/%d/%d ",
@@ -278,7 +279,7 @@ showregion(region * r, char full)
 	}
 	NL(reglist);
 
-	if (r->terrain != T_OCEAN) {
+	if (rterrain(r) != T_OCEAN) {
 		strcpy(buf, "buildings:");
 		if (!r->buildings) {
 			sncat(buf, " keine", BUFSIZE);

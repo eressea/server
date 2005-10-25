@@ -54,6 +54,7 @@ extern void write_resources(struct region * r);
 extern struct rawmaterial * rm_get(struct region *, const struct resource_type *);
 extern void init_rawmaterials(void);
 extern struct rawmaterial_type * rmt_find(const char * str);
+extern struct rawmaterial_type * rmt_get(const struct resource_type *);
 
 extern struct rawmaterial_type rm_stones;
 extern struct rawmaterial_type rm_iron;

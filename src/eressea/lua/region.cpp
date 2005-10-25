@@ -8,6 +8,7 @@
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
+#include <kernel/terrain.h>
 #include <kernel/unit.h>
 
 // lua includes
@@ -48,13 +49,13 @@ region_setname(region& r, const char * name) {
 
 static const char *
 region_getterrain(const region& r) {
-  return terrain[r.terrain].name;
+  return r.terrain->_name;
 }
 
 static const char *
 region_getname(const region& r) {
   if (r.land) return r.land->name;
-  return terrain[r.terrain].name;
+  return r.terrain->_name;
 }
 
 static void
@@ -127,44 +128,34 @@ region_setresource(region& r, const char * type, int value)
 static void
 region_setroad(region& r, int dir, lua_Number size)
 {
-  rsetroad(&r, (direction_t)dir, (short)(terrain[rterrain(&r)].roadreq * size));
+  rsetroad(&r, (direction_t)dir, (short)(r.terrain->max_road * size));
 }
 
 static lua_Number
 region_getroad(region& r, int dir)
 {
   lua_Number result = rroad(&r, (direction_t)dir);
-  return terrain[rterrain(&r)].roadreq / result;
+  return r.terrain->max_road / result;
 }
 
 static region *
-terraform_region(short x, short y, const char * tname)
+region_terraform(short x, short y, const char * tname)
 {
-  terrain_t t;
-
-  if (tname==NULL) {
-    t = NOTERRAIN;
-  } else {
-    for (t=0;t!=MAXTERRAINS;++t) {
-      if (strcmp(terrain[t].name, tname)==0) break;
-    }
-    if (t==MAXTERRAINS) return NULL;
-  }
-
+  const terrain_type * terrain = get_terrain(tname);
   region * r = findregion(x, y);
-  if (t==NOTERRAIN) {
+  if (terrain==NULL) {
     if (r!=NULL) {
       if (r->units!=NULL) {
         // TODO: error message
         return r; 
       }
-      terraform(r, T_FIREWALL);
-      // TODO: durch einen NULL-äquivalenten terraintyp ersetzen
+      // TODO: region löschen
+      terraform_region(r, NULL);
     }
     return NULL;
   }
   if (r==NULL) r = new_region(x, y);
-  terraform(r, t);
+  terraform_region(r, terrain);
   return r;
 }
 
@@ -246,7 +237,7 @@ bind_region(lua_State * L)
   module(L)[
     def("regions", &get_regions, return_stl_iterator),
     def("get_region", &findregion),
-    def("terraform", &terraform_region),
+    def("terraform", &region_terraform),
 
     class_<struct region>("region")
     .def(tostring(self))

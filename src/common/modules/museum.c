@@ -190,6 +190,10 @@ create_museum(void)
 	plane *museum = getplanebyid(museum_id);
 	region *r;
 	building *b;
+  const terrain_type * terrain_hall = get_terrain("hall1");
+  const terrain_type * terrain_corridor = get_terrain("corridor1");
+
+  assert(terrain_corridor && terrian_hall);
 
 	if (!museum) {
 		museum = create_new_plane(museum_id, "Museum", 9500, 9550,
@@ -199,7 +203,7 @@ create_museum(void)
 	if(findregion(9525, 9525) == NULL) {
 		/* Eingangshalle */
 		r = new_region(9525, 9525);
-		terraform(r, T_HALL1);
+		terraform_region(r, terrain_hall);
 		r->planep  = museum;
 		rsetname(r, "Eingangshalle");
 		rsethorses(r, 0);
@@ -212,7 +216,7 @@ create_museum(void)
 	if(!r) {
 		/* Lounge */
 		r = new_region(9526, 9525);
-		terraform(r, T_HALL1);
+		terraform_region(r, terrain_hall);
 		r->planep  = museum;
 		rsetname(r, "Lounge");
 		rsethorses(r, 0);
@@ -256,7 +260,7 @@ create_museum(void)
 	r = findregion(9524, 9526);
 	if(!r) {
 		r = new_region(9524, 9526);
-		terraform(r, T_CORRIDOR1);
+		terraform_region(r, terrain_corridor);
 		r->planep  = museum;
 		rsetname(r, "Nördliche Promenade");
 		rsethorses(r, 0);
@@ -267,7 +271,7 @@ create_museum(void)
 	r = findregion(9525, 9524);
 	if(!r) {
 		r = new_region(9525, 9524);
-		terraform(r, T_CORRIDOR1);
+		terraform_region(r, terrain_corridor);
 		r->planep  = museum;
 		rsetname(r, "Südliche Promenade");
 		rsethorses(r, 0);

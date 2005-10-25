@@ -48,6 +48,7 @@ extern void ct_register(const struct curse_type * ct);
 #include <kernel/spy.h>
 #include <kernel/teleport.h>
 #include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 /* spells includes */
@@ -587,7 +588,8 @@ sp_summon_familiar(castorder *co)
 		coasts = rand()%coasts;
 		dh = -1;
 		for(d=0; d<MAXDIRECTIONS; d++) {
-			if(rconnect(r,d)->terrain == T_OCEAN) {
+      region * rn = rconnect(r,d);
+			if (rn && fval(rn->terrain, SEA_REGION)) {
 				dh++;
 				if(dh == coasts) break;
 			}
@@ -881,7 +883,7 @@ sp_magicstreet(castorder *co)
   region *r = co->rt;
   unit *mage = (unit *)co->magician;
 
-  if (!landregion(rterrain(r))) {
+  if (!fval(r->terrain, LAND_REGION)) {
     cmistake(mage, co->order, 186, MSG_MAGIC);
     return 0;
   }
@@ -1029,7 +1031,7 @@ sp_maelstrom(castorder *co)
   variant effect;
 	int duration = (int)power+1;
 
-	if(rterrain(r) != T_OCEAN) {
+	if (!fval(r->terrain, SEA_REGION)) {
 		cmistake(mage, co->order, 205, MSG_MAGIC);
 		/* nur auf ozean */
 		return 0;
@@ -1072,7 +1074,7 @@ sp_mallorn(castorder *co)
 	int cast_level = co->level;
 	unit *mage = (unit *)co->magician;
 
-	if(!landregion(rterrain(r))) {
+	if (!fval(r->terrain, LAND_REGION)) {
 		cmistake(mage, co->order, 290, MSG_MAGIC);
 		return 0;
 	}
@@ -1521,7 +1523,7 @@ sp_create_irongolem(castorder *co)
   int number = lovar(force*8*RESOURCE_QUANTITY);
   if (number<1) number = 1;
 
-  if (rterrain(r) == T_SWAMP){
+  if (rterrain(r) == T_SWAMP) {
 		cmistake(mage, co->order, 188, MSG_MAGIC);
 		return 0;
 	}
@@ -1583,7 +1585,7 @@ sp_create_stonegolem(castorder *co)
   int number = lovar(co->force*5*RESOURCE_QUANTITY);
   if (number<1) number = 1;
 
-	if (rterrain(r) == T_SWAMP){
+	if (rterrain(r) == T_SWAMP) {
 		cmistake(mage, co->order, 188, MSG_MAGIC);
 		return 0;
 	}
@@ -1648,7 +1650,7 @@ sp_great_drought(castorder *co)
 	int duration = 2;
   variant effect;
 
-	if(rterrain(r) == T_OCEAN ) {
+	if(fval(r->terrain, SEA_REGION) ) {
 		cmistake(mage, co->order, 189, MSG_MAGIC);
 		/* TODO: vielleicht einen netten Patzer hier? */
 		return 0;
@@ -1669,22 +1671,22 @@ sp_great_drought(castorder *co)
 	if (rand() % 100 < 25){
 		terraform = true;
 
-		switch(rterrain(r)){
+		switch(rterrain(r)) {
 			case T_PLAIN:
-			   rsetterrain(r, T_GRASSLAND);
+			  /* rsetterrain(r, T_GRASSLAND); */
 				destroy_all_roads(r);
 				break;
 
 			case T_SWAMP:
-			   rsetterrain(r, T_GRASSLAND);
+			  /* rsetterrain(r, T_GRASSLAND); */
 				destroy_all_roads(r);
 				break;
-
+/*
 			case T_GRASSLAND:
 				rsetterrain(r, T_DESERT);
 				destroy_all_roads(r);
 				break;
-
+*/
 			case T_GLACIER:
 				if (rand() % 100 < 50){
 					rsetterrain(r, T_SWAMP);
@@ -1721,7 +1723,7 @@ sp_great_drought(castorder *co)
 			sprintf(buf, "%s ruft das Feuer der Sonne auf %s hinab.",
 					cansee(u->faction, r, mage, 0)? unitname(mage) : "Jemand",
 					regionname(r, u->faction));
-			if (rterrain(r) != T_OCEAN){
+			if (!fval(r->terrain, SEA_REGION)){
 				if(rterrain(r) == T_SWAMP && terraform){
 						scat(" Eis schmilzt und verwandelt sich in Morast. Reißende "
 								"Ströme spülen die mageren Felder weg und ersäufen "
@@ -2093,7 +2095,7 @@ sp_drought(castorder *co)
 	double power = co->force;
 	int duration = (int)power+1;
 
-	if(rterrain(r) == T_OCEAN ) {
+	if(fval(r->terrain, SEA_REGION) ) {
 		cmistake(mage, co->order, 189, MSG_MAGIC);
 		/* TODO: vielleicht einen netten Patzer hier? */
 		return 0;
@@ -2172,7 +2174,7 @@ sp_fog_of_confusion(castorder *co)
 		curse * c;
     variant effect;
 
-    if(rterrain(rl2->data) != T_OCEAN
+    if (!fval(rl2->data->terrain, SEA_REGION)
 				&& !r_isforest(rl2->data)) continue;
 
 		/* Magieresistenz jeder Region prüfen */
@@ -3029,8 +3031,8 @@ wisps_move(const border * b, struct unit * u, struct region * from, struct regio
     region * rl = rconnect(from, (direction_t)((reldir+MAXDIRECTIONS-1)%MAXDIRECTIONS));
     region * rr = rconnect(from, (direction_t)((reldir+1)%MAXDIRECTIONS));
     int j = rand() % 3;
-    if (j==1 && rl && landregion(rterrain(rl))==landregion(rterrain(next))) return rl;
-    if (j==2 && rr && landregion(rterrain(rr))==landregion(rterrain(next))) return rr;
+    if (j==1 && rl && fval(rl->terrain, LAND_REGION)==fval(next, LAND_REGION)) return rl;
+    if (j==2 && rr && fval(rr->terrain, LAND_REGION)==fval(next, LAND_REGION)) return rr;
   }
   return next;
 }
@@ -6513,7 +6515,7 @@ sp_movecastle(castorder *co)
 
 	target_region = rconnect(r,dir);
 
-	if(!(terrain[target_region->terrain].flags & LAND_REGION)) {
+	if(!(target_region->terrain->flags & LAND_REGION)) {
 		sprintf(buf, "%s in %s: 'ZAUBER %s': Der Erdelementar "
 				"weigert sich, nach %s zu gehen.",
 			unitname(mage), regionname(mage->region, mage->faction),

@@ -50,7 +50,7 @@ void
 herbsearch(region * r, unit * u, int max)
 {
 	int herbsfound;
-	const herb_type * whichherb;
+	const item_type * whichherb;
 
 	if (eff_skill(u, SK_HERBALISM, r) == 0) {
 		cmistake(u, u->thisorder, 59, MSG_PRODUCE);
@@ -77,10 +77,9 @@ herbsearch(region * r, unit * u, int max)
 
 	if (herbsfound) {
 		produceexp(u, SK_HERBALISM, u->number);
-		i_change(&u->items, whichherb->itype, herbsfound);
-		add_message(&u->faction->msgs, new_message(u->faction,
-			"herbfound%u:unit%r:region%i:amount%X:herb", u, r, herbsfound,
-			herb2resource(whichherb)));
+		i_change(&u->items, whichherb, herbsfound);
+		ADDMSG(&u->faction->msgs, msg_message("herbfound", 
+      "unit region amount herb", u, r, herbsfound, whichherb->rtype));
 	} else {
 		add_message(&u->faction->msgs, new_message(u->faction,
 			"researchherb_none%u:unit%r:region", u, u->region));

@@ -27,6 +27,7 @@
 #include <race.h>
 #include <region.h>
 #include <skill.h>
+#include <terrain.h>
 #include <unit.h>
 
 /* util includes */
@@ -93,13 +94,15 @@ make_dungeon(const dungeon * data)
 	region *r, *center;
 	region * rnext;
 	region_list * iregion, * rlist = NULL;
+  const terrain_type * terrain_hell = get_terrain("hell");
 
+  assert(terrain_hell!=NULL);
 	sprintf(name, "Die Höhlen von %s", bossrace->generate_name(NULL));
 	p = gm_addplane(data->radius, flags, name);
 
 	center = findregion(p->minx+(p->maxx-p->minx)/2, p->miny+(p->maxy-p->miny)/2);
 	assert(center);
-	terraform(center, T_HELL);
+	terraform_region(center, terrain_hell);
 	add_regionlist(&rlist, center);
 	rnext = r = center;
 	while (size>0 && iterations--) {
@@ -107,26 +110,25 @@ make_dungeon(const dungeon * data)
 		for (d=0;d!=3;++d) {
 			int index = (d+o) % 3;
 			region * rn = findregion(r->x+nb[n][index][0], r->y+nb[n][index][1]);
-			assert(r->terrain==T_HELL);
+			assert(r->terrain==terrain_hell);
 			if (rn) {
-				switch (rn->terrain) {
-				case T_OCEAN:
+				if (rn->terrain==terrain_hell) {
+          rnext = rn;
+        } else if (fval(rn->terrain, SEA_REGION)) {
 					if (rand() % 100 < data->connect*100) {
-						terraform(rn, T_HELL);
+						terraform_region(rn, terrain_hell);
 						--size;
 						rnext = rn;
 						add_regionlist(&rlist, rn);
 					}
 					else terraform(rn, T_FIREWALL);
-					break;
-				case T_HELL:
-					rnext = rn;
-					break;
 				}
 				if (size == 0) break;
 			}
 			rn = findregion(r->x+nb[(n+1)%2][index][0], r->y+nb[(n+1)%2][index][1]);
-			if (rn && rn->terrain==T_OCEAN) terraform(rn, T_FIREWALL);
+      if (rn && fval(rn->terrain, SEA_REGION)) {
+        terraform(rn, T_FIREWALL);
+      }
 		}
 		if (size==0) break;
 		if (r==rnext) {

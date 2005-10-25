@@ -20,6 +20,8 @@
 #include "region.h"
 #include "terrain.h"
 
+#include <util/rand.h>
+
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -61,29 +63,31 @@ void
 terraform_resources(region * r)
 {
 	int i;
-	const terraindata_t * tdata = &terrain[rterrain(r)];
+	const terrain_type * terrain = r->terrain;
 
-	for (i=0;i!=3 && tdata->rawmaterials[i].type; ++i) {
+	for (i=0;terrain->production[i].type; ++i) {
 		rawmaterial *rm;
+    const terrain_production * production = terrain->production+i;
+    const resource_type * rtype = production->type;
 
-		for(rm=r->resources; rm; rm=rm->next) {
-			if(rm->type == tdata->rawmaterials[i].type) break;
+		for (rm=r->resources; rm; rm=rm->next) {
+			if (rm->type->rtype == rtype) break;
 		}
-		if(rm) continue;
+		if (rm) continue;
 
-		if (rand()%100 < tdata->rawmaterials[i].chance) {
-			struct rawmaterial * res = calloc(sizeof(struct rawmaterial), 1);
+		if (chance(production->chance)) {
+			rm = calloc(sizeof(struct rawmaterial), 1);
 
-			res->next = r->resources;
-			r->resources = res;
-			res->level      = dice_rand(tdata->rawmaterials[i].startlevel);
-			res->startlevel = res->level;
-			res->base       = dice_rand(tdata->rawmaterials[i].base);
-			res->divisor    = dice_rand(tdata->rawmaterials[i].divisor);
-			res->flags      = 0;
-			res->type       = tdata->rawmaterials[i].type;
-                        update_resource(res, 1.0);
-			res->type->terraform(res, r);
+			rm->next = r->resources;
+			r->resources = rm;
+			rm->level      = dice_rand(production->startlevel);
+			rm->startlevel = rm->level;
+			rm->base       = dice_rand(production->base);
+			rm->divisor    = dice_rand(production->divisor);
+			rm->flags      = 0;
+			rm->type       = rmt_get(production->type);
+      update_resource(rm, 1.0);
+			rm->type->terraform(rm, r);
 		}
 	}
 }
@@ -139,17 +143,14 @@ visible_default(const rawmaterial *res, int skilllevel)
 static void 
 use_default(rawmaterial *res, const region * r, int amount)
 {
-  const terraindata_t * tdata = &terrain[rterrain(r)];
   assert(res->amount>0 && amount>=0 && amount <= res->amount);
   res->amount-=amount;
   while (res->amount==0) {
     double modifier = 1.0 + ((rand() % (SHIFT*2+1)) - SHIFT) * ((rand() % (SHIFT*2+1)) - SHIFT) / 10000.0;
     int i;
 
-    for (i=0; i!=3; ++i) {
-      const rawmaterial_type * rmtype = tdata->rawmaterials[i].type;
-      assert(rmtype);
-      if (rmtype==res->type) break;
+    for (i=0;r->terrain->production[i].type;++i) {
+      if (res->type->rtype == r->terrain->production[i].type) break;
     }
 
     ++res->level;
@@ -200,6 +201,14 @@ rmt_find(const char * str)
 	rawmaterial_type * rmt = rawmaterialtypes;
 	while (rmt && strcmp(rmt->name, str)!=0) rmt = rmt->next;
 	return rmt;
+}
+
+struct rawmaterial_type * 
+rmt_get(const struct resource_type * rtype)
+{
+  rawmaterial_type * rmt = rawmaterialtypes;
+  while (rmt && rmt->rtype!=rtype) rmt = rmt->next;
+  return rmt;
 }
 
 static void

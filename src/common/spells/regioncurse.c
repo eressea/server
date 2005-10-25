@@ -16,17 +16,18 @@
 #include "regioncurse.h"
 
 /* kernel includes */
-#include <region.h>
-#include <message.h>
-#include <nrmessage.h>
-#include <objtypes.h>
-#include <curse.h>
-#include <unit.h>
-#include <magic.h>
+#include <kernel/curse.h>
+#include <kernel/magic.h>
+#include <kernel/message.h>
+#include <kernel/objtypes.h>
+#include <kernel/region.h>
+#include <kernel/terrain.h>
+#include <kernel/unit.h>
 
 /* util includes */
-#include <message.h>
-#include <functions.h>
+#include <util/nrmessage.h>
+#include <util/message.h>
+#include <util/functions.h>
 
 /* libc includes */
 #include <string.h>
@@ -75,10 +76,10 @@ cinfo_cursed_by_the_gods(const struct locale * lang, const void * obj, typ_t typ
 
 	assert(typ == TYP_REGION);
 	r = (region *)obj;
-	if (rterrain(r)!=T_OCEAN){
-		msg = msg_message("curseinfo::godcurse", "id", c->no);
+	if (fval(r->terrain, SEA_REGION)) {
+    msg = msg_message("curseinfo::godcurseocean", "id", c->no);
 	} else {
-		msg = msg_message("curseinfo::godcurseocean", "id", c->no);
+    msg = msg_message("curseinfo::godcurse", "id", c->no);
 	}
   if (msg!=NULL) {
     nr_render(msg, lang, buf, sizeof(buf), NULL);

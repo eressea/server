@@ -191,6 +191,7 @@ find_spellbyid(spellid_t id)
     { LUASPL_ARTEFAKT_OF_POWER, "create_rop", M_ASTRAL },
     { LUASPL_BAG_OF_HOLDING, "create_bagofholding", M_ASTRAL },
     { LUASPL_INVISIBILITY2_ILLAUN, "create_invisibility_sphere", M_TRAUM },
+    { LUASPL_ARTEFAKT_CHASTITYBELT, "create_chastitybelt", M_GRAU },
     { 0, NULL, 0 }
   };
   spell_list * slist;

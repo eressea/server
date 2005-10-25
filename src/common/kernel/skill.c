@@ -23,12 +23,14 @@
 #include "eressea.h"
 #include "skill.h"
 
-#include "unit.h"
+#include "curse.h"
 #include "item.h"
 #include "magic.h"
 #include "race.h"
-#include "curse.h"
 #include "region.h"
+#include "terrain.h"
+#include "terrainid.h"
+#include "unit.h"
 #include "karma.h"
 
 #include <util/attrib.h>
@@ -145,20 +147,20 @@ skillmod(const attrib * a, const unit * u, const region * r, skill_t sk, int val
 }
 
 int
-skill_mod(const race * rc, skill_t sk, terrain_t t)
+skill_mod(const race * rc, skill_t sk, const struct terrain_type * terrain)
 {
 	int result = 0;
 
 	result = rc->bonus[sk];
 
-	switch (sk) {
-	case SK_TACTICS:
-		if (rc == new_race[RC_DWARF]) {
-			if (t == T_MOUNTAIN || t == T_GLACIER || t == T_ICEBERG_SLEEP) ++result;
-		}
-		break;
-	}
-	if (rc == new_race[RC_INSECT]) {
+  if (rc == new_race[RC_DWARF]) {
+    if (sk==SK_TACTICS) {
+      terrain_t t = oldterrain(terrain);
+      if (t == T_MOUNTAIN || t == T_GLACIER || t == T_ICEBERG_SLEEP) ++result;
+    }
+  }
+	else if (rc == new_race[RC_INSECT]) {
+    terrain_t t = oldterrain(terrain);
 		if (t == T_MOUNTAIN || t == T_GLACIER || t == T_ICEBERG_SLEEP || t == T_ICEBERG)
 			--result;
 		else if (t == T_DESERT || t == T_SWAMP)
@@ -169,6 +171,7 @@ skill_mod(const race * rc, skill_t sk, terrain_t t)
 }
 
 #define RCMODMAXHASH 31
+#ifdef FASTER_SKILLMOD
 static struct skillmods {
 	struct skillmods * next;
 	const struct race * race;
@@ -187,24 +190,28 @@ init_skills(const race * rc)
 	for (t=0;t!=MAXTERRAINS;++t) {
 		skill_t sk;
 		for (sk=0;sk!=MAXSKILLS;++sk) {
-			mods->mod[t].value[sk] = skill_mod(rc, sk, t);
+			mods->mod[t].value[sk] = skill_mod(rc, sk, newterrain(t));
 		}
 	}
 	return mods;
 }
+#endif
 
 int
 rc_skillmod(const struct race * rc, const region *r, skill_t sk)
 {
 	int mods;
-	unsigned int index = hashstring(rc->_name[0]) % RCMODMAXHASH;
+#ifdef FASTER_SKILLMOD
+  unsigned int index = hashstring(rc->_name[0]) % RCMODMAXHASH;
 	struct skillmods **imods = &modhash[index];
 	while (*imods && (*imods)->race!=rc) imods = &(*imods)->next;
 	if (*imods==NULL) {
 		*imods = init_skills(rc);
 	}
 	mods = (*imods)->mod[rterrain(r)].value[sk];
-
+#else
+  mods = skill_mod(rc, sk, r->terrain);
+#endif
 	if (rc == new_race[RC_ELF] && r_isforest(r)) switch (sk) {
 	case SK_OBSERVATION:
 		++mods;
@@ -228,6 +235,7 @@ skill_init(void)
 void
 skill_done(void)
 {
+#ifdef FASTER_SKILLMOD
 	int i;
 	for (i = 0;i!=RCMODMAXHASH;++i) {
 		while (modhash[i]) {
@@ -236,6 +244,7 @@ skill_done(void)
 			free(mods);
 		}
 	}
+#endif
 }
 
 int

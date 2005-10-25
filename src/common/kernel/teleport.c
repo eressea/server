@@ -28,6 +28,7 @@
 #include "region.h"
 #include "race.h"
 #include "skill.h"
+#include "terrain.h"
 #include "faction.h"
 #include "plane.h"
 
@@ -95,7 +96,7 @@ r_standard_to_astral(const region *r)
   if (rplane(r) != get_normalplane()) return NULL;
 
   r2 = tpregion(r);
-  if (rterrain(r2) != T_ASTRAL) return NULL;
+  if (fval(r2->terrain, FORBIDDEN_REGION)) return NULL;
 
   return r2;
 }
@@ -146,7 +147,7 @@ spawn_braineaters(float chance)
   if (f0==NULL) return;
 
   for (r = regions; r; r = r->next) {
-    if (rplane(r) != get_astralplane() || rterrain(r) != T_ASTRAL) continue;
+    if (rplane(r) != get_astralplane() || fval(r->terrain, FORBIDDEN_REGION)) continue;
 
     /* Neues Monster ? */
     if (next-- == 0) {
@@ -188,6 +189,13 @@ create_teleport_plane(void)
   region *r;
   plane * aplane = get_astralplane();
 
+  const terrain_type * fog = get_terrain("fog");
+  const terrain_type * thickfog = get_terrain("thickfog");
+
+  if (fog==0 || thickfog==0) {
+    log_warning(("cannot find terrain-types for astral space.\n"));
+    return;
+  }
   /* Regionsbereich aufbauen. */
   /* wichtig: das muß auch für neue regionen gemacht werden.
   * Evtl. bringt man es besser in new_region() unter, und
@@ -205,11 +213,12 @@ create_teleport_plane(void)
       if (pl==aplane) {
         ra = new_region(x, y);
         
-        rsetterrain(ra, T_ASTRAL);
-        ra->planep = aplane;
-        if (terrain[rterrain(r)].flags & FORBIDDEN_LAND) {
-          rsetterrain(ra, T_ASTRALB);
+        if (fval(r->terrain, FORBIDDEN_REGION)) {
+          terraform_region(ra, thickfog);
+        } else {
+          terraform_region(ra, fog);
         }
+        ra->planep = aplane;
       }
     }
   }
@@ -218,5 +227,5 @@ create_teleport_plane(void)
 boolean 
 inhabitable(const region * r)
 {
-  return landregion(rterrain(r));
+  return fval(r->terrain, LAND_REGION);
 }

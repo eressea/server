@@ -147,8 +147,7 @@ report_item(const unit * owner, const item * i, const faction * viewer, const ch
 		if (name) *name = locale_string(viewer->locale, resourcename(i->type->rtype, NMF_APPEARANCE|((i->number!=1 && !singular)?GR_PLURAL:0)));
 		if (basename) *basename = resourcename(i->type->rtype, NMF_APPEARANCE);
 		if (number) {
-			const herb_type * htype = resource2herb(i->type->rtype);
-			if (htype!=NULL) *number = 1;
+			if (fval(i->type, ITF_HERB)) *number = 1;
 			else *number = i->number;
 		}
 	}

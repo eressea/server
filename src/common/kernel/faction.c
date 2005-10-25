@@ -17,13 +17,14 @@
 #include "faction.h"
 
 #include "equipment.h"
-#include "unit.h"
-#include "race.h"
-#include "region.h"
+#include "group.h"
+#include "item.h"
 #include "message.h"
 #include "plane.h"
-#include "item.h"
-#include "group.h"
+#include "race.h"
+#include "region.h"
+#include "terrain.h"
+#include "unit.h"
 
 /* util includes */
 #include <util/base36.h>
@@ -196,7 +197,7 @@ destroyfaction(faction * f)
   for (u=f->units;u;u=u->nextF) {
     region * r = u->region;
     distribute_items(u);
-    if (rterrain(r) != T_OCEAN && !!playerrace(u->race)) {
+    if (!fval(r->terrain, SEA_REGION) && !!playerrace(u->race)) {
       const race * rc = u->race;
       int p = rpeasants(u->region);
       int m = rmoney(u->region);

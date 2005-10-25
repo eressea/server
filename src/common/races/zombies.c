@@ -37,7 +37,7 @@ age_undead(unit *u)
 	int n = 0;
 
 #if UNDEAD_REPRODUCTION > 0
-	if(landregion(rterrain(r))) {
+	if(fval(r->terrain, LAND_REGION)) {
 		int m;
 #ifndef SLOW_UNDEADS
 		if (u->number>100) {

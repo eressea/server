@@ -60,6 +60,8 @@
 #include <kernel/skill.h>
 #include <kernel/spy.h>
 #include <kernel/teleport.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h> /* for volcanoes in emigration (needs a flag) */
 #include <kernel/unit.h>
 #ifdef USE_UGROUPS
 #  include <kernel/ugroup.h>
@@ -406,12 +408,12 @@ calculate_emigration(region *r)
     region *rc = rconnect(r,i);
     int w;
 
-    if (rc == NULL || rterrain(rc) == T_OCEAN) {
+    if (rc == NULL || !fval(rc->terrain, LAND_REGION)) {
       w = 0;
     } else {
       w = rpeasants(rc) - maxworkingpeasants(rc);
       w = max(0,w);
-      if(rterrain(rc) == T_VOLCANO || rterrain(rc) == T_VOLCANO_SMOKING) {
+      if (rterrain(rc) == T_VOLCANO || rterrain(rc) == T_VOLCANO_SMOKING) {
         w = w/10;
       }
     }
@@ -420,8 +422,8 @@ calculate_emigration(region *r)
   }
 
   if (weightall !=0 ) for (i = 0; i != MAXDIRECTIONS; i++) {
-    region *rc;
-    if((rc = rconnect(r,i)) != NULL) {
+    region *rc = rconnect(r, i);
+    if (rc != NULL) {
       int wandering_peasants = (overpopulation * weight[i])/weightall;
       if (wandering_peasants > 0) {
         r->land->newpeasants -= wandering_peasants;
@@ -453,10 +455,10 @@ calculate_emigration(region *r)
   /* calculate emigration for all directions independently */
 
   for (i = 0; i != MAXDIRECTIONS; i++) {
-    region * c = rconnect(r, i);
-    if (!c) continue;
-    if (fval(r, RF_ORCIFIED)==fval(c, RF_ORCIFIED)) {
-      if (landregion(rterrain(c)) && landregion(rterrain(r))) {
+    region * rc = rconnect(r, i);
+    if (!rc) continue;
+    if (fval(r, RF_ORCIFIED)==fval(rc, RF_ORCIFIED)) {
+      if (fval(rc->terrain, LAND_REGION) && fval(r->terrain, LAND_REGION)) {
         int wandering_peasants;
         double vfactor;
 
@@ -465,14 +467,14 @@ calculate_emigration(region *r)
          * Never let more than PEASANTSWANDER_WEIGHT per cent wander off in one
          * direction. */
         wfactor = ((double) rpeasants(r) / maxpeasants_here -
-          ((double) rpeasants(c) / maxpeasants[i]));
+          ((double) rpeasants(rc) / maxpeasants[i]));
         wfactor = max(wfactor, 0);
         wfactor = min(wfactor, 1);
 
         /* Now let's handle the greedy peasants. gfactor indicates the
          * difference of per-head-wealth. Never let more than
          * PEASANTSGREED_WEIGHT per cent wander off in one direction. */
-        gfactor = (((double) rmoney(c) / max(rpeasants(c), 1)) -
+        gfactor = (((double) rmoney(rc) / max(rpeasants(rc), 1)) -
                ((double) rmoney(r) / max(rpeasants(r), 1))) / 500;
         gfactor = max(gfactor, 0);
         gfactor = min(gfactor, 1);
@@ -480,14 +482,14 @@ calculate_emigration(region *r)
         /* This calculates the influence of volcanos on peasant
          * migration. */
 
-        if(rterrain(c) == T_VOLCANO || rterrain(c) == T_VOLCANO_SMOKING) {
+        if(rterrain(rc) == T_VOLCANO || rterrain(rc) == T_VOLCANO_SMOKING) {
             vfactor = 0.10;
         } else {
             vfactor = 1.00;
         }
 
         for(j=0; j != MAXDIRECTIONS; j++) {
-          region *rv = rconnect(c, j);
+          region *rv = rconnect(rc, j);
           if(rv && (rterrain(rv) == T_VOLCANO || rterrain(rv) == T_VOLCANO_SMOKING)) {
             vfactor *= 0.5;
             break;
@@ -498,7 +500,7 @@ calculate_emigration(region *r)
             * vfactor * PEASANTSWANDER_WEIGHT / 100.0);
 
         r->land->newpeasants -= wandering_peasants;
-        c->land->newpeasants += wandering_peasants;
+        rc->land->newpeasants += wandering_peasants;
       }
     }
   }
@@ -681,7 +683,7 @@ horses(region * r)
 
   for(n = 0; n != MAXDIRECTIONS; n++) {
     region * r2 = rconnect(r, n);
-    if(r2 && (terrain[r2->terrain].flags & WALK_INTO)) {
+    if (r2 && fval(r2->terrain, WALK_INTO)) {
       int pt = (rhorses(r) * HORSEMOVE)/100;
       pt = (int)normalvariate(pt, pt/4.0);
       pt = max(0, pt);
@@ -766,14 +768,14 @@ trees(region * r, const int current_season, const int last_weeks_season)
     seeds = (rtrees(r, 2) * FORESTGROWTH * 3)/1000000;
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * r2 = rconnect(r, d);
-      if (r2 && (terrain[r2->terrain].flags & WALK_INTO)) {
+      if (r2 && fval(r2->terrain, LAND_REGION) && r2->terrain->size) {
         /* Eine Landregion, wir versuchen Samen zu verteilen:
          * Die Chance, das Samen ein Stück Boden finden, in dem sie
          * keimen können, hängt von der Bewuchsdichte und der
          * verfügbaren Fläche ab. In Gletschern gibt es weniger
          * Möglichkeiten als in Ebenen. */
         sprout = 0;
-        seedchance = (100 * maxworkingpeasants(r2)) / terrain[r2->terrain].production_max;
+        seedchance = (1000 * maxworkingpeasants(r2)) / r2->terrain->size;
         for(i=0; i<seeds/MAXDIRECTIONS; i++) {
           if(rand()%10000 < seedchance) sprout++;
         }
@@ -861,14 +863,11 @@ demographics(void)
   }
 
   for (r = regions; r; r = r->next) {
-    if (r->age>0 || rterrain(r)!=T_OCEAN) {
-      /* oceans get their initial age in frame_regions() */
-      ++r->age;
-    }
+    ++r->age; /* also oceans. no idea why we didn't always do that */
     live(r);
     /* check_split_dragons(); */
 
-    if (rterrain(r) != T_OCEAN) {
+    if (!fval(r->terrain, SEA_REGION)) {
       /* die Nachfrage nach Produkten steigt. */
       struct demand * dmd;
       if (r->land) for (dmd=r->land->demands;dmd;dmd=dmd->next) {
@@ -904,7 +903,7 @@ demographics(void)
 
   puts(" - Einwanderung...");
   for (r = regions; r; r = r->next) {
-    if (landregion(rterrain(r))) {
+    if (fval(r->terrain, LAND_REGION)) {
       int rp = rpeasants(r) + r->land->newpeasants;
       rsetpeasants(r, max(0, rp));
       /* Wenn keine Bauer da ist, soll auch kein Geld da sein */
@@ -972,7 +971,7 @@ restart_cmd(unit * u, struct order * ord)
   init_tokens(ord);
   skip_token(); /* skip keyword */
 
-  if (!landregion(rterrain(u->region))) {
+  if (!fval(u->region->terrain, LAND_REGION)) {
     cmistake(u, ord, 242, MSG_EVENT);
   } else {
     const char * s_race = getstrtoken(), * s_pass;
@@ -2783,8 +2782,12 @@ guard_on_cmd(unit * u, struct order * ord)
   /* GUARD NOT is handled in goard_off_cmd earlier in the turn */
   if (getparam(u->faction->locale) == P_NOT) return 0;
 
-  if (rterrain(u->region) != T_OCEAN) {
-    if (!fval(u, RCF_ILLUSIONARY) && u->race != new_race[RC_SPELL]) {
+  if (fval(u->region->terrain, SEA_REGION)) {
+    cmistake(u, ord, 2, MSG_EVENT);
+  } else {
+    if (fval(u, RCF_ILLUSIONARY) || u->race == new_race[RC_SPELL]) {
+      cmistake(u, ord, 95, MSG_EVENT);
+    } else {
       /* Monster der Monsterpartei dürfen immer bewachen */
       if (u->faction == findfaction(MONSTER_FACTION)) {
         guard(u, GUARD_ALL);
@@ -2793,11 +2796,7 @@ guard_on_cmd(unit * u, struct order * ord)
       } else {
         guard(u, GUARD_ALL);
       }
-    } else {
-      cmistake(u, ord, 95, MSG_EVENT);
     }
-  } else {
-    cmistake(u, ord, 2, MSG_EVENT);
   }
   return 0;
 }
@@ -2812,7 +2811,7 @@ sinkships(void)
     ship *sh;
 
     list_foreach(ship, r->ships, sh) {
-      if (rterrain(r) == T_OCEAN && (!enoughsailors(sh, r) || get_captain(sh)==NULL)) {
+      if (fval(r->terrain, SEA_REGION) && (!enoughsailors(sh, r) || get_captain(sh)==NULL)) {
         /* Schiff nicht seetüchtig */
         damage_ship(sh, 0.30);
       }
@@ -3676,7 +3675,9 @@ monthly_healing(void)
       if (fval(u, UFL_HUNGER)) continue;
       if (fspecial(u->faction, FS_UNDEAD)) continue;
 
-      if (rterrain(r)==T_OCEAN && u->ship==NULL && !(canswim(u) || canfly(u))) continue;
+      if (fval(r->terrain, SEA_REGION) && u->ship==NULL && !(canswim(u) || canfly(u))) {
+        continue;
+      }
 
       if(fspecial(u->faction, FS_REGENERATION)) {
         u->hp = umhp;

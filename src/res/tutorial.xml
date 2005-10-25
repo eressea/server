@@ -16,6 +16,7 @@
   <xi:include href="calendar.xml"/>
   <xi:include href="equipment.xml"/>
   <xi:include href="spells.xml"/>
+  <xi:include href="terrains.xml"/>
 
   <game name="Tutorial" welcome="tutorial">
     <comment>Game specific</comment>

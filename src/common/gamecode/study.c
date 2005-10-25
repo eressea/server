@@ -26,25 +26,26 @@
 #include "eressea.h"
 #include "study.h"
 
-#include "alchemy.h"
-#include "building.h"
-#include "faction.h"
-#include "item.h"
-#include "karma.h"
-#include "magic.h"
-#include "message.h"
-#include "movement.h"
-#include "order.h"
-#include "plane.h"
-#include "pool.h"
-#include "race.h"
-#include "rand.h"
-#include "region.h"
-#include "skill.h"
-#include "unit.h"
+#include <kernel/alchemy.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/karma.h>
+#include <kernel/magic.h>
+#include <kernel/message.h>
+#include <kernel/movement.h>
+#include <kernel/order.h>
+#include <kernel/plane.h>
+#include <kernel/pool.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/skill.h>
+#include <kernel/terrain.h>
+#include <kernel/unit.h>
 
 /* util includes */
-#include <base36.h>
+#include <util/base36.h>
+#include <util/rand.h>
 
 /* libc includes */
 #include <assert.h>
@@ -454,7 +455,7 @@ learn(void)
   for (r = regions; r; r = r->next) {
     for (u = r->units; u; u = u->next) {
       int days;
-      if (rterrain(r) == T_OCEAN){
+      if (fval(r->terrain, SEA_REGION)) {
         /* sonderbehandlung aller die auf Ozeanen lernen können */
         if (u->race!=new_race[RC_AQUARIAN] && !(u->race->flags & RCF_SWIM)) {
           continue;
@@ -756,7 +757,7 @@ teaching(void)
 			if (u->race == new_race[RC_SPELL] || fval(u, UFL_LONGACTION))
 				continue;
 
-			if (rterrain(r) == T_OCEAN
+			if (fval(r->terrain, SEA_REGION)
 					&& u->race != new_race[RC_AQUARIAN]
 					&& !(u->race->flags & RCF_SWIM))
 					continue;

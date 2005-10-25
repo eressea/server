@@ -57,27 +57,28 @@
 #include <gamecode/items.h>
 #include <gamecode/laws.h>
 #include <gamecode/monster.h>
+#include <gamecode/creport.h>
 
 /* kernel includes */
 #include <kernel/xmlreader.h>
 #include <kernel/spell.h>
-#include <building.h>
-#include <creport.h>
-#include <faction.h>
-#include <message.h>
-#include <plane.h>
-#include <race.h>
-#include <skill.h>
-#include <teleport.h>
-#include <unit.h>
-#include <region.h>
-#include <reports.h>
-#include <resources.h>
-#include <save.h>
-#include <ship.h>
-#include <border.h>
-#include <region.h>
-#include <item.h>
+#include <kernel/building.h>
+#include <kernel/faction.h>
+#include <kernel/message.h>
+#include <kernel/plane.h>
+#include <kernel/race.h>
+#include <kernel/skill.h>
+#include <kernel/teleport.h>
+#include <kernel/unit.h>
+#include <kernel/region.h>
+#include <kernel/reports.h>
+#include <kernel/resources.h>
+#include <kernel/save.h>
+#include <kernel/ship.h>
+#include <kernel/border.h>
+#include <kernel/region.h>
+#include <kernel/terrain.h>
+#include <kernel/item.h>
 
 /* util includes */
 #include <rand.h>
@@ -133,7 +134,6 @@ extern int fuzzy_hits;
 static char * orders = NULL;
 static int nowrite = 0;
 static boolean g_writemap = false;
-static boolean g_killeiswald = false;
 static boolean opt_reportonly = false;
 extern boolean opt_cr_absolute_coords;
 
@@ -390,7 +390,6 @@ usage(const char * prog, const char * arg)
 		"-o reportdir     : gibt das reportverzeichnis an\n"
 		"-l logfile       : specify an alternative logfile\n"
 		"-R               : erstellt nur die Reports neu\n"
-		"--noeiswald      : beruhigt ungemein\n"
 		"--lomem          : keine Messages (RAM sparen)\n"
 		"--nobattle       : keine Kämpfe\n"
 		"--nomonsters     : keine monster KI\n"
@@ -428,7 +427,6 @@ read_args(int argc, char **argv)
 			else if (strcmp(argv[i]+2, "nonr")==0) nonr = true;
       else if (strcmp(argv[i]+2, "nosh")==0) nosh = true;
 			else if (strcmp(argv[i]+2, "lomem")==0) lomem = true;
-			else if (strcmp(argv[i]+2, "noeiswald")==0) g_killeiswald = true;
 			else if (strcmp(argv[i]+2, "nobattle")==0) nobattle = true;
 			else if (strcmp(argv[i]+2, "nomonsters")==0) nomonsters = true;
 			else if (strcmp(argv[i]+2, "nodebug")==0) nobattledebug = true;
@@ -622,15 +620,6 @@ main(int argc, char *argv[])
 	}
 #endif
 	writepasswd();
-	if (g_killeiswald) {
-		region * r = findregion(0, 25);
-		if (r) {
-			/* mach sie alle zur schnecke... */
-			unit * u;
-			terraform(r, T_OCEAN);
-			for (u=r->units;u;u=u->next) scale_number(u, 1);
-		}
-	}
 
 	if (opt_reportonly) {
 		reports();

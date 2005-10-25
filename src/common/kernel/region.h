@@ -69,7 +69,7 @@ typedef struct land_region {
     const struct luxury_type * type;
     int value;
   } * demands;
-  const struct herb_type * herbtype;
+  const struct item_type * herbtype;
   short herbs;
   int trees[3]; /* 0 -> Samen, 1 -> Sprößlinge, 2 -> Bäume */
   int horses;
@@ -104,7 +104,7 @@ typedef struct region {
   struct attrib *attribs;
   struct region *nexthash;
   struct donation * donations;
-  terrain_t terrain;
+  const struct terrain_type * terrain;
   struct rawmaterial * resources;
 #ifdef FAST_CONNECT
   struct region * connect[MAXDIRECTIONS];
@@ -207,11 +207,9 @@ extern void rsetlaen(struct region * r, int value);
 #define rsetherbs(r, value) ((r)->land?((r)->land->herbs=(short)(value)):(value),0)
 
 extern boolean r_isforest(const struct region * r);
-extern boolean r_issea(const struct region * r);
-extern boolean r_isglacier(const struct region * r);
 
-#define rterrain(r) (terrain_t)((r)?(r)->terrain:T_FIREWALL)
-#define rsetterrain(r, value) (r->terrain=value)
+#define rterrain(r) (oldterrain((r)->terrain))
+#define rsetterrain(r, t) ((r)->terrain = newterrain(t))
 
 extern const char * rname(const struct region * r, const struct locale * lang);
 #define rsetname(r, str) (set_string(&(r)->land->name, str))
@@ -225,6 +223,7 @@ extern const char * regionname(const struct region * r, const struct faction * f
 extern void * resolve_region(variant data);
 extern struct region * new_region(short x, short y);
 extern void terraform(struct region * r, terrain_t terrain);
+extern void terraform_region(struct region * r, const struct terrain_type * terrain);
 
 extern const short delta_x[MAXDIRECTIONS];
 extern const short delta_y[MAXDIRECTIONS];

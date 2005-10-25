@@ -55,6 +55,7 @@
 #include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/teleport.h>
+#include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/save.h>
 
@@ -587,7 +588,7 @@ cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const fa
 	}
 	/* shore */
 	w = NODIRECTION;
-	if (rterrain(r) != T_OCEAN) w = sh->coast;
+	if (fval(r->terrain, SEA_REGION)) w = sh->coast;
 	if (w != NODIRECTION)
 		fprintf(F, "%d;Kueste\n", w);
 
@@ -1060,7 +1061,7 @@ cr_borders(seen_region ** seen, const region * r, const faction * f, int seemode
 				if (!b->type->transparent(b, f)) fputs("1;opaque\n", F);
 				/* pfusch: */
 				if (b->type==&bt_road) {
-					int p = rroad(r, d)*100/terrain[rterrain(r)].roadreq;
+					int p = rroad(r, d)*100/r->terrain->max_road;
 					fprintf(F, "%d;prozent\n", p);
 				}
 			}
@@ -1260,8 +1261,7 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 		if (is_cursed(r->attribs,C_MAELSTROM, 0))
 			tname = "maelstrom";
 		else {
-			if (r_isforest(r)) tname = "forest";
-			else tname = terrain[rterrain(r)].name;
+			tname = terrain_name(r);
 		}
 
 		fprintf(F, "\"%s\";Terrain\n", add_translation(tname, locale_string(f->locale, tname)));
@@ -1291,7 +1291,7 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 			if (r->display && strlen(r->display))
 				fprintf(F, "\"%s\";Beschr\n", r->display);
 #endif
-			if (landregion(rterrain(r))) {
+			if (fval(r->terrain, LAND_REGION)) {
 				int trees = rtrees(r, 2);
 				int ytrees = rtrees(r, 1);
 # ifdef RESOURCECOMPAT
@@ -1488,7 +1488,7 @@ crwritemap(const char * filename)
   for (r=regions;r;r=r->next) {
     plane * p = rplane(r);
     fprintf(F, "REGION %d %d %d\n", r->x, r->y, p?p->id:0);
-    fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale), LOC(default_locale, terrain[rterrain(r)].name));
+    fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale), LOC(default_locale, terrain_name(r)));
   }
   fclose(F);
 	return 0;

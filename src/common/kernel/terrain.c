@@ -22,6 +22,7 @@
 #include <config.h>
 #include "eressea.h"
 #include "terrain.h"
+#include "terrainid.h"
 
 /* kernel includes */
 #include "curse.h"
@@ -40,271 +41,111 @@ static const char * highland_herbs[] = {"Windbeutel", "Fjordwuchs", "Alraune", N
 static const char * mountain_herbs[] = {"Steinbeißer", "Spaltwachs", "Höhlenglimm", NULL};
 static const char * glacier_herbs[] = {"Eisblume", "Weißer Wüterich", "Schneekristall", NULL};
 
-static const char *
-trailintoplain(const region * r)
+#define MAXTERRAINS 20
+
+const char * terraindata[] = {
+	"ocean",
+	"plain",
+	"swamp",
+	"desert",
+	"highland",
+	"mountain",
+	"glacier",
+	"firewall",
+	"hell", /* dungeon module */
+  "plain",  /* former grassland */
+  "fog",
+  "thickfog",
+  "volcano",
+	"activevolcano",
+  "iceberg_sleep",
+  "iceberg",
+  
+  "hall1", /* museum module */
+  "corridor1", /* museum module */
+  "plain", /* former magicstorm */
+  "wall1", /* museum module */
+  NULL
+};
+
+static terrain_type * registered_terrains;
+
+const terrain_type * 
+terrains(void)
 {
-	assert(r->terrain==T_PLAIN);
-	if (r_isforest(r)) return "forest_trail";
-	return "plain_trail";
+  return registered_terrains;
 }
 
-const terraindata_t terrain[] = {
-	/* T_OCEAN */
-	{
-		"ocean", '.',
-		NULL,
-		NULL,
-		0, /* Steine pro Runde */
-		-1,	/* Steine fuer Strasse */
-		10, /* bewirtschaftbare Parzellen */
-		SAIL_INTO|FLY_INTO|LARGE_SHIPS|SWIM_INTO,	/* Flags */
-		NULL
-	},
-	/* T_PLAIN */
-	{
-		"plain", 'P',
-		trailintoplain,
-		"in die Ebene von %s",
-		0, /* Steine pro Runde */
-		50,	/* Steine fuer Strasse */
-		1000, /* bewirtschaftbare Parzellen */
-		NORMAL_TERRAIN|LARGE_SHIPS|LAND_REGION,	/* Flags */
-		plain_herbs,
-		{ { &rm_iron, "2d4-1", "5d8", "2d20+10", 10.0 },
-			{ &rm_stones, "1d4", "5d8", "2d30+20", 15.0 },
-			{ &rm_laen, "1d4", "1d4", "2d20+50", 1.0} }
-	},
-	/* T_SWAMP */
-	{
-		"swamp", 'S',
-		NULL,
-		"in den Sumpf von %s",
-		0, /* Steine pro Runde */
-		75,	/* Steine fuer Strasse - nur mit Damm */
-		200, /* bewirtschaftbare Parzellen */
-		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		swamp_herbs,
-		{ { &rm_iron, "2d4-1", "5d8", "2d20+10", 2.0 },
-			{ &rm_stones, "1d4", "5d8", "2d30+20", 2.0 },
-			{ &rm_laen, "1d4", "1d4", "2d20+50", 2.0} }
-	},
-	/* T_DESERT */
-	{
-		"desert", 'D',
-		NULL,
-		"durch die Wüste von %s",
-		0, /* Steine pro Runde */
-		100,	/* Steine fuer Strasse - nur mit Karawanserei */
-		50, /* bewirtschaftbare Parzellen */
-		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		desert_herbs,
-		{ { &rm_iron, "2d4-1", "5d8", "2d20+10", 15.0 },
-			{ &rm_stones, "1d4", "5d8", "2d30+20", 25.0 },
-			{ &rm_laen, "1d4", "1d4", "2d20+50", 2.5} }
-	},
-	/* T_HIGHLAND */
-	{
-		"highland", 'H',
-		NULL,
-		"auf das Hochland von %s",
-		0, /* Steine pro Runde */
-		100,	/* Steine fuer Strasse */
-		400, /* bewirtschaftbare Parzellen */
-		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		highland_herbs,
-		{ { &rm_iron, "2d4-1", "5d8", "2d20+10", 15.0 },
-			{ &rm_stones, "1d4", "5d8", "2d30+20", 20.0 },
-			{ &rm_laen, "1d4", "1d4", "2d20+50", 2.5} }
-	},
-	/* T_MOUNTAIN */
-	{
-		"mountain", 'M',
-		NULL,
-		"in die Berge von %s",
-		100, /* Steine pro Runde */
-		250,	/* Steine fuer Strasse */
-		100, /* bewirtschaftbare Parzellen */
-		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		mountain_herbs,
-		{ { &rm_iron, "1", "50", "50", 100.0 },
-			{ &rm_stones, "1", "100", "100", 100.0 },
-			{ &rm_laen, "1", "4", "100", 5.0} }
-	},
-	/* T_GLACIER */
-	{
-		"glacier", 'G',
-		NULL,
-		"auf den Gletscher von %s",
-		1, /* Steine pro Runde */
-		250,	/* Steine fuer Strasse - nur mit Tunnel */
-		10, /* bewirtschaftbare Parzellen */
-		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		glacier_herbs,
-		{ { &rm_iron, "1", "3", "50", 100.0 },
-			{ &rm_stones, "1", "2", "100", 100.0 },
-			{ &rm_laen, "1", "4", "100", 0.5} }
-	},
-	/* T_FIREWALL */
-	{
-		"firewall", '@',
-		NULL,
-		NULL,
-		0, /* Steine pro Runde */
-		-1,	/* Steine fuer Strasse */
-		0, /* bewirtschaftbare Parzellen */
-		FORBIDDEN_LAND,	/* Flags */
-		NULL
-	},
-	/* T_HELL */
-	{
-		"hell", '&',
-		NULL,
-		NULL,
-		0, /* Steine pro Runde */
-		-1,	/* Steine fuer Strasse */
-		0, /* bewirtschaftbare Parzellen */
-		WALK_INTO,	/* Flags */
-		NULL
-	},
-	/* T_GRASSLAND */
-	{
-		"grassland", 'L',
-		NULL,
-		"in die Steppe von %s",
-		0, /* Steine pro Runde */
-		125,	/* Steine fuer Strasse */
-		500, /* bewirtschaftbare Parzellen */
-		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		highland_herbs,
-	},
-	/* T_ASTRAL */
-	{
-		"fog", '%',
-		NULL,
-		NULL,
-		0, /* Steine pro Runde */
-		-1,	/* Steine fuer Strasse */
-		0, /* bewirtschaftbare Parzellen */
-		WALK_INTO|SWIM_INTO|FLY_INTO,	/* Flags */
-		NULL
-	},
-	/* T_ASTRALB */
-	{
-		"thickfog", '*',
-		NULL,
-		NULL,
-		0, /* Steine pro Runde */
-		-1,	/* Steine fuer Strasse */
-		0, /* bewirtschaftbare Parzellen */
-		FORBIDDEN_LAND,	/* Flags */
-		NULL
-	},
-	{
-		"volcano", 'v',
-		NULL,
-		"zum Vulkan von %s",
-		50,		/* Steine pro Runde */
-		250,	/* Steine fuer Strasse */
-		50, 	/* bewirtschaftbare Parzellen */
-		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		NULL,
-		{ { &rm_iron, "1", "50", "50", 50.0 },
-			{ &rm_stones, "1", "100", "100", 50.0 },
-			{ &rm_laen, "1", "4", "100", 7.5} }
-	},
-	{
-		"activevolcano", 'V',
-		NULL,
-		"zum aktiven Vulkan von %s",
-		50,		/* Steine pro Runde */
-		250,	/* Steine fuer Strasse */
-		50, 	/* bewirtschaftbare Parzellen */
-		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		NULL,
-		{ { &rm_iron, "1", "50", "50", 50.0 },
-			{ &rm_stones, "1", "100", "100", 50.0 },
-			{ &rm_laen, "1", "4", "100", 7.5} }
-	},
-	/* T_ICEBERG_SLEEP */
-	{
-		"iceberg_sleep", 'i',
-		NULL,
-		"auf den Gletscher von %s",
-		1, /* Steine pro Runde */
-		250,	/* Steine fuer Strasse - nur mit Tunnel */
-		10, /* bewirtschaftbare Parzellen */
-		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		glacier_herbs,
-		{ { &rm_iron, "1", "3", "50", 100.0 },
-			{ &rm_stones, "1", "2", "100", 100.0 },
-			{ NULL, NULL, NULL, NULL, 100.0 } }
-	},
-	/* T_ICEBERG */
-	{
-		"iceberg", 'I',
-		NULL,
-		"auf einen Eisberg",
-		0,		/* Steine pro Runde */
-		-1,	/* Steine fuer Strasse */
-		10, 	/* bewirtschaftbare Parzellen */
-		NORMAL_TERRAIN|LAND_REGION,	/* Flags */
-		glacier_herbs,
-		{ { &rm_iron, "1", "3", "50", 100.0 },
-			{ &rm_stones, "1", "2", "100", 100.0 },
-			{ NULL, NULL, NULL, NULL, 100.0 } }
-	},
-	/* T_HALL1 */
-	{
-		"hall1", '%',
-		NULL,
-		NULL,
-		0,		/* Steine pro Runde */
-		0,		/* Steine fuer Strasse */
-		0, 		/* bewirtschaftbare Parzellen */
-		WALK_INTO|LAND_REGION,	/* Flags */
-		NULL
-	},
-	/* T_CORRIDOR1 */
-	{
-		"corridor1", '%',
-		NULL,
-		NULL,
-		0,		/* Steine pro Runde */
-		0,		/* Steine fuer Strasse */
-		0, 		/* bewirtschaftbare Parzellen */
-		WALK_INTO|LAND_REGION,	/* Flags */
-		NULL
-	},
-	/* T_MAGICSTORM */
-	{
-		"magicstorm", '%',
-		NULL,
-		"in einen gewaltigen magischen Sturm",
-		0,		/* Steine pro Runde */
-		-1,		/* Steine fuer Strasse */
-		0, 		/* bewirtschaftbare Parzellen */
-		FORBIDDEN_LAND,	/* Flags */
-		NULL
-	},
-	/* T_WALL1 */
-	{
-		"wall1", '#',
-		NULL,
-		NULL,
-		0,		/* Steine pro Runde */
-		0,		/* Steine fuer Strasse */
-		0, 		/* bewirtschaftbare Parzellen */
-		FORBIDDEN_LAND,	/* Flags */
-		NULL
-	},
-	/*** sentinel - must be last ***/
-	{
-		NULL, 'X',
-		NULL,
-		NULL,
-		0, /* Steine pro Runde */
-		-1,	/* Steine fuer Strasse */
-		0, /* bewirtschaftbare Parzellen */
-		0,	/* Flags */
-	}
-};
+static const char *
+plain_name(const struct region * r)
+{
+  /* TODO: xml defined */
+  if (r_isforest(r)) return "forest";
+  return r->terrain->_name;
+}
+
+void
+register_terrain(struct terrain_type * terrain)
+{
+  assert(terrain->next==NULL),
+  terrain->next = registered_terrains;
+  registered_terrains = terrain;
+  if (strcmp("plain", terrain->_name)==0) 
+    terrain->name = &plain_name;
+}
+
+const struct terrain_type *
+get_terrain(const char * name)
+{
+  const struct terrain_type * terrain;
+  for (terrain=registered_terrains;terrain;terrain=terrain->next) {
+    if (strcmp(terrain->_name, name)==0) break;
+  }
+  return terrain;
+}
+
+static const terrain_type * newterrains[MAXTERRAINS];
+
+const struct terrain_type *
+newterrain(terrain_t t)
+{
+  if (t==NOTERRAIN) return NULL;
+  assert(t>=0);
+  assert(t<MAXTERRAINS);
+  return newterrains[t];
+}
+
+terrain_t
+oldterrain(const struct terrain_type * terrain)
+{
+  terrain_t t;
+  if (terrain==NULL) return NOTERRAIN;
+  for (t=0;t!=MAXTERRAINS;++t) {
+    if (newterrains[t]==terrain) return t;
+  }
+  log_warning(("%s is not a classic terrain", terrain->_name));
+  return NOTERRAIN;
+}
+
+const char *
+terrain_name(const struct region * r)
+{
+  if (r->terrain->name!=NULL) return r->terrain->name(r);
+  return r->terrain->_name;
+}
+
+void
+init_terrains(void)
+{
+  terrain_t t;
+  for (t=0;t!=MAXTERRAINS;++t) {
+    const terrain_type * newterrain = newterrains[t];
+    if (newterrain!=NULL) continue;
+    newterrain = get_terrain(terraindata[t]);
+    if (newterrain!=NULL) {
+      newterrains[t] = newterrain;
+    } else {
+      log_error(("missing classic terrain %s\n", terraindata[t]));
+    }
+  }
+}

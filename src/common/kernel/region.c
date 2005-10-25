@@ -33,6 +33,8 @@
 #include "plane.h"
 #include "region.h"
 #include "resources.h"
+#include "terrain.h"
+#include "terrainid.h"
 #include "unit.h"
 
 /* util includes */
@@ -42,6 +44,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <limits.h>
+#include <rand.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -594,26 +597,12 @@ rroad(const region * r, direction_t d)
 boolean
 r_isforest(const region * r)
 {
-	if (r->terrain==T_PLAIN && rtrees(r,2) + rtrees(r,1) >= 600) return true;
-	return false;
-}
-
-boolean
-r_issea(const region * r)
-{
-	direction_t d;
-
-	for(d=0; d < MAXDIRECTIONS; d++) {
-		region *rc = rconnect(r,d);
-		if(rc && rterrain(rc) == T_OCEAN) return false;
-	}
-	return true;
-}
-
-boolean
-r_isglacier(const region * r)
-{
-	if (r->terrain==T_GLACIER || r->terrain==T_ICEBERG_SLEEP) return true;
+  if (fval(r->terrain, FOREST_REGION)) {
+    /* needs to be covered with at leas 48% trees */
+    int mincover = (int)(r->terrain->size * 0.48);
+    int trees = rtrees(r, 2) + rtrees(r, 1);
+    return (trees*TREESIZE >= mincover);
+  }
 	return false;
 }
 
@@ -624,7 +613,8 @@ is_coastregion(region *r)
 	int res = 0;
 
 	for(i=0;i<MAXDIRECTIONS;i++) {
-		if(rconnect(r,i) && rconnect(r,i)->terrain == T_OCEAN) res++;
+    region * rn = rconnect(r,i);
+		if (rn && fval(rn->terrain, SEA_REGION)) res++;
 	}
 	return res;
 }
@@ -693,7 +683,7 @@ const char *
 rname(const region * r, const struct locale * lang) {
 	if (r->land)
 		return r->land->name;
-	return locale_string(lang, terrain[rterrain(r)].name);
+	return locale_string(lang, terrain_name(r));
 }
 
 int
@@ -858,29 +848,38 @@ setluxuries(region * r, const luxury_type * sale)
 void
 terraform(region * r, terrain_t t)
 {
-	const struct locale * locale_de = find_locale("de");
-	rawmaterial  **lrm;
-	int i;
+  terraform_region(r, newterrain(t));
+}
 
-	/* defaults: */
-	rsetterrain(r, t);
-
+void
+terraform_region(region * r, const terrain_type * terrain)
+{
 	/* Resourcen, die nicht mehr vorkommen können, löschen */
-	lrm = &r->resources;
-	while (*lrm) {
-		rawmaterial *rm = *lrm;
-		for (i=0; i!=3; ++i) {
-			if(terrain[r->terrain].rawmaterials[i].type == rm->type) break;
-		}
-		if (i==3) {
-			*lrm = rm->next;
-			free(rm);
-		} else {
-			lrm = &rm->next;
-		}
-	}
+  rawmaterial  **lrm = &r->resources;
+  while (*lrm) {
+    rawmaterial *rm = *lrm;
+    const resource_type * rtype = NULL;
 
-	if (!landregion(t)) {
+    if (terrain->production!=NULL) {
+      int i;
+      for (i=0;terrain->production[i].type;++i) {
+        if (rm->type->rtype == terrain->production[i].type) {
+          rtype = rm->type->rtype;
+          break;
+        }
+      }
+    }
+    if (rtype==NULL) {
+      *lrm = rm->next;
+      free(rm);
+    } else {
+      lrm = &rm->next;
+    }
+  }
+
+  r->terrain = terrain;
+
+	if (!fval(terrain, LAND_REGION)) {
 		if (r->land) {
 			freeland(r->land);
 			r->land = NULL;
@@ -956,17 +955,15 @@ terraform(region * r, terrain_t t)
 		}
 	}
 	
-	if (landregion(t)) {
-		const char *name = NULL;
-		if (terrain[r->terrain].herbs) {
+	if (fval(terrain, LAND_REGION)) {
+		const item_type * itype = NULL;
+		if (r->terrain->herbs) {
 			int len=0;
-			while (terrain[r->terrain].herbs[len]) ++len;
-			if (len) name = terrain[r->terrain].herbs[rand()%len];
+			while (r->terrain->herbs[len]) ++len;
+			if (len) itype = r->terrain->herbs[rand()%len];
 		}
-		if (name != NULL) {
-			const item_type * itype = finditemtype(name, locale_de);
-			const herb_type * htype = resource2herb(itype->rtype);
-			rsetherbtype(r, htype);
+		if (itype!=NULL) {
+			rsetherbtype(r, itype);
 			rsetherbs(r, (short)(50+rand()%31));
 		}
 		else {
@@ -982,43 +979,25 @@ terraform(region * r, terrain_t t)
 	else
 		freset(r, RF_MALLORN);
 
-	switch (t) {
-	case T_PLAIN:
-		rsethorses(r, rand() % (terrain[t].production_max / 5));
-		if(rand()%100 < 40) {
-			rsettrees(r, 2, terrain[t].production_max * (30+rand()%40)/100);
-			rsettrees(r, 1, rtrees(r, 2)/4);
-			rsettrees(r, 0, rtrees(r, 2)/2);
-		}
-		break;
-	case T_MOUNTAIN:
-		break;
-
-	case T_GLACIER:
-		break;
-
-	case T_ICEBERG_SLEEP:
-		/* Kann aus Gletscher entstehen und sollte diesem gleichen */
-		break;
-
-	case T_VOLCANO:
-	case T_VOLCANO_SMOKING:
-		break;
-	}
-
-	/* Initialisierung irgendwann über rm_-Mechamismus machen */
-	if(t != T_PLAIN && rand()%100 < 20) {
-		rsettrees(r, 2, terrain[t].production_max * (30 + rand() % 40) / 100);
+  if (oldterrain(terrain)==T_PLAIN) {
+    rsethorses(r, rand() % (terrain->size / 50));
+    if(rand()%100 < 40) {
+      rsettrees(r, 2, terrain->size * (30+rand()%40)/1000);
+      rsettrees(r, 1, rtrees(r, 2)/4);
+      rsettrees(r, 0, rtrees(r, 2)/2);
+    }
+	} else if (chance(0.2)) {
+		rsettrees(r, 2, terrain->size * (30 + rand() % 40) / 1000);
 		rsettrees(r, 1, rtrees(r, 2)/4);
 		rsettrees(r, 0, rtrees(r, 2)/2);
 	}
 
-	if (terrain[t].production_max && !fval(r, RF_CHAOTIC)) {
+	if (terrain->size>0 && !fval(r, RF_CHAOTIC)) {
 		int peasants;
 #if REDUCED_PEASANTGROWTH == 1
 		peasants = (maxworkingpeasants(r) * (20+dice_rand("6d10")))/100;
 #else
-		peasants = MAXPEASANTS_PER_AREA * (rand() % (terrain[t].production_max / 2));
+		peasants = MAXPEASANTS_PER_AREA * (rand() % (terrain->size / MAXPEASANTS_PER_AREA / 2));
 #endif
 		rsetpeasants(r, max(100, peasants));
 		rsetmoney(r, rpeasants(r) * ((wage(r, NULL, false)+1) + rand() % 5));
@@ -1034,8 +1013,8 @@ terraform(region * r, terrain_t t)
 int
 production(const region *r)
 {
-	/* muß r->terrain sein, nicht rterrain() wegen rekursion */
-	int p = terrain[r->terrain].production_max;
+	/* muß rterrain(r) sein, nicht rterrain() wegen rekursion */
+  int p = r->terrain->size / MAXPEASANTS_PER_AREA;
 	if (curse_active(get_curse(r->attribs, ct_find("drought")))) p /= 2;
 
 	return p;

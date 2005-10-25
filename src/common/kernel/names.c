@@ -29,6 +29,8 @@
 #include "faction.h"
 #include "magic.h"
 #include "race.h"
+#include "terrain.h"
+#include "terrainid.h"
 
 /* libc includes */
 #include <ctype.h>

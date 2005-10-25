@@ -31,6 +31,7 @@
 #include <plane.h>
 #include <region.h>
 #include <terrain.h>
+#include <terrainid.h>
 #include <unit.h>
 
 /* util includes */
@@ -212,8 +213,9 @@ gm_terraform(const tnode * tnext, const char * str, void * data, struct order * 
 	short y = rel_to_abs(p, u->faction, (short)atoi(getstrtoken()), 1);
 	const char * c = getstrtoken();
 	region * r = findregion(x, y);
-	terrain_t t;
-	if (r==NULL || p!=rplane(r)) {
+	const terrain_type * terrain;
+
+  if (r==NULL || p!=rplane(r)) {
 		mistake(u, ord, "Diese Region kann die Einheit nicht umwandeln.\n", 0);
 		return;
 	} else {
@@ -221,10 +223,12 @@ gm_terraform(const tnode * tnext, const char * str, void * data, struct order * 
 		attrib * permissions = a_find(u->faction->attribs, &at_permissions);
 		if (!permissions || !has_permission(permissions, atoi36("gmterf"))) return;
 	}
-	for (t=0;t!=MAXTERRAINS;++t) {
-		if (!strcasecmp(locale_string(u->faction->locale, terrain[t].name), c)) break;
+	for (terrain=terrains();terrain!=NULL;terrain=terrain->next) {
+    if (!strcasecmp(locale_string(u->faction->locale, terrain->_name), c)) {
+      terraform_region(r, terrain);
+      break;
+    }
 	}
-	if (t!=MAXTERRAINS) terraform(r, t);
 }
 
 /**

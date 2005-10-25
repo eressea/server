@@ -53,6 +53,7 @@
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/teleport.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 #include <kernel/xmlreader.h>
 
@@ -211,6 +212,10 @@ RegionColor(const region *r) {
 	return COLOR_PAIR(rterrain(r));
 }
 
+const char terrainsymbol[] = {
+  '.', 'P', 'S', 'D', 'H', 'M', 'G', '@', '&', 'L', '%', '*', 'v', 'V', 'i', 'I', '%', '%', '%', '#', 'X', 0
+};
+
 chtype
 RegionSymbol(const region *r) {
 	chtype rs;
@@ -236,7 +241,7 @@ RegionSymbol(const region *r) {
 			else if (p>0)
 				rs = (chtype)(p+48);
 			else {
-				rs = terrain[rterrain(r)].symbol;
+				rs = terrainsymbol[rterrain(r)];
 				if(rs == 'P' && r_isforest(r)) rs = 'F';
 			}
 		}
@@ -244,7 +249,7 @@ RegionSymbol(const region *r) {
 	case 2:
 		{
 			if(r->land == NULL || r->land->demands == NULL) {
-				rs = terrain[rterrain(r)].symbol;
+				rs = terrainsymbol[rterrain(r)];
 			} else {
 				const luxury_type *sale=NULL;
 				struct demand *dmd;
@@ -254,7 +259,7 @@ RegionSymbol(const region *r) {
 				}
 
 				if(sale == NULL) {	/* Kann nur bei einem Bug passieren */
-					rs = terrain[rterrain(r)].symbol;
+					rs = terrainsymbol[rterrain(r)];
 				} else {
 					rs = resourcename(sale->itype->rtype, 0)[0];
 				}
@@ -263,9 +268,9 @@ RegionSymbol(const region *r) {
 		break;
 	case 3:
 		{
-			const herb_type *herb = rherbtype(r);
-			if(herb) {
-				const char *c = resourcename(herb2resource(herb),0);
+			const item_type *herb = rherbtype(r);
+			if (herb) {
+				const char *c = resourcename(herb->rtype,0);
 				int h = atoi(c+1);
 				if(h < 10) {
 					rs = '0'+h;
@@ -273,7 +278,7 @@ RegionSymbol(const region *r) {
 					rs = 'a'+(h-10);
 				}
 			} else {
-				rs = terrain[rterrain(r)].symbol;
+				rs = terrainsymbol[rterrain(r)];
 			}
 		}
 		break;
@@ -284,12 +289,12 @@ RegionSymbol(const region *r) {
 				rs = '0';
 				for (dmd=r->land->demands;dmd;dmd=dmd->next) rs++;
 			} else {
-				rs = terrain[rterrain(r)].symbol;
+				rs = terrainsymbol[rterrain(r)];
 			}
 		}
 		break;
 	default:
-		rs = terrain[rterrain(r)].symbol;
+		rs = terrainsymbol[rterrain(r)];
 		if(rs == 'P' && r_isforest(r)) rs = 'F';
 	}
 	return rs;
@@ -344,7 +349,7 @@ crwritemap(void)
   for (r=regions;r;r=r->next) {
     plane * p = rplane(r);
     fprintf(F, "REGION %d %d %d\n", r->x, r->y, p?p->id:0);
-    fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale), LOC(default_locale, terrain[rterrain(r)].name));
+    fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale), LOC(default_locale, terrain_name(r)));
   }
   fclose(F);
 	return 0;
@@ -873,11 +878,11 @@ movearound(short rx, short ry) {
 				} else {
 					region * r = findregion(rx, ry);
 					if (r) {
-						int terrai = 0;
-						while (terrai!=MAXTERRAINS && tolower(terrain[terrai].symbol)!=tolower(ch)) ++terrai;
-						if (terrai!=MAXTERRAINS) {
-							edit=1;
-							terraform(r, (terrain_t)terrai);
+						terrain_t t = 0;
+						while (terrainsymbol[t] && tolower(terrainsymbol[t])!=tolower(ch)) ++t;
+						if (terrainsymbol[t]) {
+							edit = 1;
+							terraform(r, t);
 						}
 					}
 				}
@@ -931,46 +936,50 @@ movearound(short rx, short ry) {
 				case 'T':
 					if (r==NULL) break;
 					if (!Tagged) {
+            const terrain_type * terrain = select_terrain(r->terrain);
 						if (hx>-1) {
 							int Rx,Ry;
 							Rx=rx; Ry=ry;
 							if (rx>Hx) { a=Hx; Hx=Rx; rx=a; }
 							if (ry>Hy) { a=Hy; Hy=Ry; ry=a; }
-							ch = GetTerrain(r);
-							for (a=Rx; a<=Hx; a++)
-								for (b=Ry; b<=Hy; b++) {
-									c=findregion(a,b);
-									if (c) terraform(c, (terrain_t) ch);
-								}
+              for (a=Rx; a<=Hx; a++) {
+                for (b=Ry; b<=Hy; b++) {
+                  c = findregion(a,b);
+                  if (c) terraform_region(c, terrain);
+                }
+              }
 						} else
-							terraform(r, GetTerrain(r));
+							terraform_region(r, terrain);
 					} else {
-						ch = GetTerrain(r);
+            const terrain_type * terrain = select_terrain(r->terrain);
 						for (tag=Tagged; tag; tag=tag->next)
-							terraform(tag->r, (terrain_t) ch);
+							terraform(tag->r, terrain);
 					}
 					ch = -9;
 					modified = 1;
 					break;
 				case 'Z':
 					if (!Tagged) {
+            const terrain_type * terrain = select_terrain(r->terrain);
 						if (hx>-1) {
 							int Rx,Ry;
 							Rx=rx; Ry=ry;
 							if (rx>Hx) { a=Hx; Hx=Rx; rx=a; }
 							if (ry>Hy) { a=Hy; Hy=Ry; ry=a; }
-							ch = GetTerrain(r);
-							for (a=Rx; a<=Hx; a++)
-								for (b=Ry; b<=Hy; b++) {
-									c=findregion(a,b);
-									if (c) rsetterrain(c, (terrain_t) ch);
-								}
-						} else
-							terraform(r, GetTerrain(r));
+              for (a=Rx; a<=Hx; a++) {
+                for (b=Ry; b<=Hy; b++) {
+                  c = findregion(a,b);
+                  if (c) c->terrain = terrain;
+                }
+              }
+            } else {
+              r->terrain = terrain;
+            }
 					} else {
-						ch = GetTerrain(r);
-						for (tag=Tagged; tag; tag=tag->next)
-							rsetterrain(tag->r, (terrain_t) ch);
+            const terrain_type * terrain = select_terrain(r->terrain);
+            for (tag=Tagged; tag; tag=tag->next) {
+              tag->r->terrain = terrain;
+            }
 					}
 					ch = -9;
 					modified = 1;
@@ -1021,14 +1030,10 @@ movearound(short rx, short ry) {
 						if(mapFile) {
 							tag=Tagged;
 							while(tag) {
-								fprintf(mapFile, "REGION %d %d\n",tag->r->x, tag->r->y);
-								if(r_isforest(tag->r)) {
-									tname = "forest";
-								} else {
-									tname = terrain[rterrain(tag->r)].name;
-								}
+								fprintf(mapFile, "REGION %d %d\n", tag->r->x, tag->r->y);
+								tname = terrain_name(tag->r);
 								fprintf(mapFile, "\"%s\"; Terrain\n", locale_string(NULL, tname));
-								tag=tag->next;
+								tag = tag->next;
 							}
 							fclose(mapFile);
 						}

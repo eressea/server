@@ -41,6 +41,8 @@
 #include <kernel/region.h>
 #include <kernel/reports.h>
 #include <kernel/skill.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 /* util include */
@@ -310,7 +312,7 @@ tower_init(void)
 		region * r = tower_region[i] = findregion(arena_center->x+delta_x[i]*3, arena_center->y+delta_y[i]*3);
         if (r) {
 			start_region[i] = findregion(arena_center->x+delta_x[i]*2, arena_center->y+delta_y[i]*2);
-			if (r->terrain!=T_DESERT) terraform(r, T_DESERT);
+			if (rterrain(r)!=T_DESERT) terraform(r, T_DESERT);
 			if (!r->buildings) {
 				building * b = new_building(bt_find("castle"), r, NULL);
 				b->size = 10;
@@ -365,7 +367,7 @@ guardian_faction(plane * pl, int id)
 	}
 	f->lastorders = turn;
 	f->alive = true;
-	for (r=regions;r;r=r->next) if (getplane(r)==pl && r->terrain!=T_FIREWALL)
+	for (r=regions;r;r=r->next) if (getplane(r)==pl && rterrain(r)!=T_FIREWALL)
 	{
 		unit * u;
 		freset(r, RF_ENCOUNTER);
@@ -481,7 +483,7 @@ init_volcano(void)
 	building * b;
 	region * r = arena_center;
 	assert(arena_center);
-	if (r->terrain!=T_DESERT) return; /* been done before */
+	if (rterrain(r)!=T_DESERT) return; /* been done before */
 	terraform(arena_center, T_VOLCANO_SMOKING);
 	b = new_building(bt_find("caldera"), r, NULL);
 	b->size = 1;

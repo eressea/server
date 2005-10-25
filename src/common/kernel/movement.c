@@ -40,6 +40,7 @@
 #include "render.h"
 #include "ship.h"
 #include "skill.h"
+#include "terrain.h"
 #include "teleport.h"
 #include "unit.h"
 
@@ -191,7 +192,7 @@ entrance_allowed(const struct unit * u, const struct region * r)
 {
 #ifdef REGIONOWNERS
   unit * owner = region_owner(r);
-  if (owner==NULL || u->faction==owner->faction) return true;
+  if (owner == NULL || u->faction == owner->faction) return true;
   if (alliedunit(owner, u->faction, HELP_TRAVEL)) return true;
   if (is_enemy(u->faction, owner->faction)) return true;
   return false;
@@ -416,7 +417,7 @@ cansail(const region * r, ship * sh)
 	int n = 0, p = 0;
 
 	 /* sonst ist construction:: size nicht ship_type::maxsize */
-	assert(!sh->type->construction || sh->type->construction->improvement==NULL);
+	assert(!sh->type->construction || sh->type->construction->improvement == NULL);
 
 	if (sh->type->construction && sh->size!=sh->type->construction->maxsize)
 	  return false;
@@ -521,7 +522,7 @@ leave_trail(ship * sh, region * from, region_list *route)
         a = a->nexttype;
       }
 
-      if (a==NULL) {
+      if (a == NULL) {
         a = a_add(&(r->attribs), a_new(&at_shiptrail));
         td = (traveldir *)a->data.v;
         td->no = sh->no;
@@ -550,7 +551,7 @@ move_ship(ship * sh, region * from, region * to, region_list * route)
 {
   unit **iunit = &from->units;
   unit **ulist = &to->units;
-  boolean trail = (route==NULL);
+  boolean trail = (route == NULL);
 
   if (from!=to) {
     translist(&from->ships, &to->ships, sh);
@@ -559,7 +560,7 @@ move_ship(ship * sh, region * from, region * to, region_list * route)
 
   while (*iunit!=NULL) {
     unit *u = *iunit;
-    assert(u->region==from);
+    assert(u->region == from);
 
     if (u->ship == sh) {
       if (!trail) {
@@ -577,18 +578,8 @@ move_ship(ship * sh, region * from, region * to, region_list * route)
         produceexp(u, SK_SAILING, u->number);
       }
     }
-    if (*iunit==u) iunit=&u->next;
+    if (*iunit == u) iunit=&u->next;
   }
-  
-#ifndef NDEBUG
-  if (rterrain(sh->region)!=T_OCEAN && sh->coast!=NODIRECTION) {
-    region * rcoast = rconnect(sh->region, sh->coast);
-    if (rterrain(rcoast)!=T_OCEAN) {
-      log_error(("ship %s sailed into a coast with no ocean neighbours.\n",
-                 shipid(sh)));
-    }
-  }
-#endif
   
   return sh;
 }
@@ -621,10 +612,9 @@ static boolean
 ship_allowed(const struct ship * sh, const region * r)
 {
   int c = 0;
-  terrain_t t = rterrain(r);
   static const building_type * bt_harbour=NULL;
 
-  if (bt_harbour==NULL) bt_harbour=bt_find("harbour");
+  if (bt_harbour == NULL) bt_harbour=bt_find("harbour");
 
   if (r_insectstalled(r)) {
     /* insekten dürfen nicht hier rein. haben wir welche? */
@@ -644,8 +634,8 @@ ship_allowed(const struct ship * sh, const region * r)
   }
 
   if (check_working_buildingtype(r, bt_harbour)) return true;
-  for (c=0;sh->type->coast[c]!=NOTERRAIN;++c) {
-    if (sh->type->coast[c]==t) return true;
+  for (c=0;sh->type->coasts[c]!=NULL;++c) {
+    if (sh->type->coasts[c] == r->terrain) return true;
   }
 
   return false;
@@ -662,9 +652,9 @@ flying_ship(const ship * sh)
 static void
 set_coast(ship * sh, region * r, region * rnext)
 {
-  if (rnext->terrain != T_OCEAN && !flying_ship(sh)) {
+  if (!fval(rnext->terrain, SEA_REGION) && !flying_ship(sh)) {
     sh->coast = reldirection(rnext, r);
-    assert(rterrain(r)==T_OCEAN);
+    assert(fval(r->terrain, SEA_REGION));
   } else {
     sh->coast = NODIRECTION;
   }
@@ -675,7 +665,7 @@ drifting_ships(region * r)
 {
   direction_t d;
 
-  if (rterrain(r) == T_OCEAN) {
+  if (fval(r->terrain, SEA_REGION)) {
     ship** shp = &r->ships;
     while (*shp) {
       ship * sh = *shp;
@@ -700,8 +690,8 @@ drifting_ships(region * r)
       /* Kapitän da? Beschädigt? Genügend Matrosen?
       * Genügend leicht? Dann ist alles OK. */
 
-      assert(sh->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
-      if (captain && sh->size==sh->type->construction->maxsize && enoughsailors(sh, r) && cansail(r, sh)) {
+      assert(sh->type->construction->improvement == NULL); /* sonst ist construction::size nicht ship_type::maxsize */
+      if (captain && sh->size == sh->type->construction->maxsize && enoughsailors(sh, r) && cansail(r, sh)) {
         shp = &sh->next;
         continue;
       }
@@ -711,14 +701,13 @@ drifting_ships(region * r)
       d_offset = rand() % MAXDIRECTIONS;
       for (d = 0; d != MAXDIRECTIONS; ++d) {
         region * rn = rconnect(r, (direction_t)((d + d_offset) % MAXDIRECTIONS));
-        terrain_t t = rterrain(rn);
-        if (rn!=NULL && (terrain[t].flags & SAIL_INTO) && ship_allowed(sh, rn)) {
+        if (rn!=NULL && fval(rn->terrain, SAIL_INTO) && ship_allowed(sh, rn)) {
           rnext = rn;
-          if (t!=T_OCEAN) break;
+          if (!fval(rnext->terrain, SEA_REGION)) break;
         }
       }
 
-      if (rnext==NULL) {
+      if (rnext == NULL) {
         shp = &sh->next;
         continue;
       }
@@ -792,7 +781,7 @@ bewegung_blockiert_von(unit * reisender, region * r)
 		if (getguard(u) & GUARD_TRAVELTHRU) {
 			int sk = eff_skill(u, SK_OBSERVATION, r);
 			if (invisible(reisender, u) >= reisender->number) continue;
-			if (u->faction==reisender->faction) contact = true;
+			if (u->faction == reisender->faction) contact = true;
       else if (ucontact(u, reisender)) contact = true;
 			else if (alliedunit(u, reisender->faction, HELP_GUARD)) contact = true;
 			else if (sk>=perception) {
@@ -818,7 +807,7 @@ is_guardian(unit * u2, unit *u, unsigned int mask)
 {
 	if (u2->faction == u->faction) return false;
 	if ((getguard(u2) & mask) == 0) return false;
-  if (u2->number==0) return false;
+  if (u2->number == 0) return false;
   if (alliedunit(u2, u->faction, HELP_GUARD)) return false;
   if (ucontact(u2, u)) return false;
   if (besieged(u2)) return false;
@@ -875,7 +864,7 @@ cycle_route(order * ord, unit *u, int gereist)
 		d = finddirection(token, lang);
 		if(d == D_PAUSE) {
 			pause = true;
-		} else if (d==NODIRECTION) {
+		} else if (d == NODIRECTION) {
 			break;
 		}
 		if (cm<gereist) {
@@ -884,7 +873,7 @@ cycle_route(order * ord, unit *u, int gereist)
 			if (!pause) strcat(strcat(tail, " "), LOC(lang, shortdirections[d]));
 		}
 		else if (strlen(neworder)>sizeof(neworder)/2) break;
-		else if (cm==gereist && !paused && pause) {
+		else if (cm == gereist && !paused && pause) {
 			strcat(strcat(tail, " "), LOC(lang, parameters[P_PAUSE]));
 			paused=true;
 		}
@@ -913,7 +902,7 @@ transport(unit * ut, unit * u)
 {
   order * ord;
 
-  if (LongHunger(u) || ut->region->terrain==T_OCEAN) {
+  if (LongHunger(u) || fval(ut->region->terrain, SEA_REGION)) {
     return false;
   }
 
@@ -955,7 +944,7 @@ init_transportation(void)
         init_tokens(u->thisorder);
         skip_token();
         ut = getunit(r, u->faction);
-        if (ut==NULL) {
+        if (ut == NULL) {
           cmistake(u, u->thisorder, 63, MSG_MOVE);
           continue;
         }
@@ -983,7 +972,7 @@ init_transportation(void)
           init_tokens(ord);
           skip_token();
           ut = getunit(r, u->faction);
-          if (ut==NULL) continue;
+          if (ut == NULL) continue;
 
           if (get_keyword(ut->thisorder) == K_DRIVE && can_move(u) && !fval(ut, UFL_LONGACTION) && !LongHunger(ut)) {
             init_tokens(ut->thisorder);
@@ -1008,7 +997,7 @@ roadto(const region * r, direction_t dir)
   region * r2;
   static const curse_type * roads_ct = NULL;
 
-  if (roads_ct==NULL) roads_ct = ct_find("magicstreet"); 
+  if (roads_ct == NULL) roads_ct = ct_find("magicstreet"); 
   if (roads_ct!=NULL) {
     curse *c = get_curse(r->attribs, roads_ct);
     if (c!=NULL) return true;
@@ -1016,12 +1005,12 @@ roadto(const region * r, direction_t dir)
   
   if (dir>=MAXDIRECTIONS || dir<0) return false;
   r2 = rconnect(r, dir);
-  if (r==NULL || r2==NULL) return false;
+  if (r == NULL || r2 == NULL) return false;
 
-  if (terrain[rterrain(r)].roadreq==0) return false;
-  if (terrain[rterrain(r2)].roadreq==0) return false;
-  if (rroad(r, dir) < terrain[rterrain(r)].roadreq) return false;
-  if (rroad(r2, dir_invert(dir)) < terrain[rterrain(r2)].roadreq) return false;
+  if (r->terrain->max_road == 0) return false;
+  if (r2->terrain->max_road == 0) return false;
+  if (rroad(r, dir) < r->terrain->max_road) return false;
+  if (rroad(r2, dir_invert(dir)) < r2->terrain->max_road) return false;
   return true;
 }
 
@@ -1098,7 +1087,7 @@ make_route(unit * u, order * ord, region_list ** routep)
   while (next!=NULL) {
     direction_t reldir;
 
-    if (current==next) {
+    if (current == next) {
       /* PAUSE */
       break;
     }
@@ -1177,7 +1166,7 @@ movement_speed(unit * u)
     if (fspecial(u->faction, FS_QUICK)) mp = BP_RIDING;
 
     /* Siebenmeilentee */
-    if (u->region->terrain!=T_OCEAN && get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
+    if (!fval(u->region->terrain, SEA_REGION) && get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
       mp *= 2;
       change_effect(u, oldpotiontype[P_FAST], -u->number);
     }
@@ -1233,17 +1222,17 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
     /* check movement from/to oceans. 
      * aquarian special, flying units, horses, the works */
     if ((u->race->flags & RCF_FLY) == 0) {
-      if (rterrain(current)==T_OCEAN && rterrain(next) != T_OCEAN) {
+      if (fval(current->terrain, SEA_REGION) && !fval(next->terrain, SEA_REGION)) {
         int moving = u->race->flags & (RCF_SWIM|RCF_WALK|RCF_COASTAL);
         /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
-        if (moving != (RCF_SWIM|RCF_WALK) && (moving|RCF_COASTAL)==0) {
+        if (moving != (RCF_SWIM|RCF_WALK) && (moving|RCF_COASTAL) == 0) {
           /* can't swim+walk and isn't allowed to enter coast from sea */
           if (ord!=NULL) cmistake(u, ord, 44, MSG_MOVE);
           break;
         }
       }
 
-      if (rterrain(current)==T_OCEAN || rterrain(next) == T_OCEAN) {
+      if (fval(current->terrain, SEA_REGION) || fval(next->terrain, SEA_REGION)) {
         /* trying to enter or exit ocean with horses, are we? */
         if (get_item(u, I_HORSE) > 0 || get_item(u, I_UNICORN) > 0) {
           /* tries to do it with horses */
@@ -1254,7 +1243,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
 
       /* Ozeanfelder können nur von Einheiten mit Schwimmen und ohne
        * Pferde betreten werden. */
-      if (rterrain(next) == T_OCEAN) {
+      if (fval(next->terrain, SEA_REGION)) {
         if (!(canswim(u) || canfly(u))) {
           ADDMSG(&u->faction->msgs, msg_message("detectocean",
             "unit region", u, next));
@@ -1290,14 +1279,14 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
     }
 
     /* terrain is marked as forbidden (curse, etc) */
-    if (terrain[rterrain(next)].flags & FORBIDDEN_LAND) {
+    if (fval(next->terrain, FORBIDDEN_REGION)) {
       ADDMSG(&u->faction->msgs, msg_message("detectforbidden", 
         "unit region", u, next));
       break;
     }
 
     /* unit is an insect and cannot move into a glacier */
-    if (u->race==new_race[RC_INSECT]) {
+    if (u->race == new_race[RC_INSECT]) {
       if (r_insectstalled(next) && is_freezing(u)) {
         ADDMSG(&u->faction->msgs, msg_message("detectforbidden",
           "unit region", u, next));
@@ -1316,7 +1305,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
     current = next;
     iroute = iroute->next;
     ++steps;
-    if (u->number==0) break;
+    if (u->number == 0) break;
   }
 
   if (iroute!=route_begin) {
@@ -1329,7 +1318,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
     setguard(u, GUARD_NONE);
     cycle_route(ord, u, steps);
 
-    if (mode==TRAVEL_RUNNING) {
+    if (mode == TRAVEL_RUNNING) {
       walkmode = 0;
     } if (canride(u)) {
       walkmode = 1;
@@ -1346,7 +1335,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
         MSG(("travelthru_trail", "region", next), 
           p, sizeof(buf) - (p-buf), u->faction->locale, u->faction);
         if (rlist->data!=current) {
-          if (rlist->next->data==current) scat(" und ");
+          if (rlist->next->data == current) scat(" und ");
           else scat(", ");
         }
         p += strlen(p);
@@ -1366,7 +1355,7 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
   }
   fset(u, UFL_LONGACTION);
   setguard(u, GUARD_NONE);
-  assert(u->region==current);
+  assert(u->region == current);
   return iroute;
 }
 
@@ -1384,7 +1373,7 @@ ship_ready(const region * r, unit * u)
 		mistake(u, u->thisorder, buf, MSG_MOVE);
 		return false;
 	}
-	assert(u->ship->type->construction->improvement==NULL); /* sonst ist construction::size nicht ship_type::maxsize */
+	assert(u->ship->type->construction->improvement == NULL); /* sonst ist construction::size nicht ship_type::maxsize */
 	if (u->ship->size!=u->ship->type->construction->maxsize) {
 		cmistake(u, u->thisorder, 15, MSG_MOVE);
 		return false;
@@ -1444,7 +1433,7 @@ buildingtype_exists(const region * r, const building_type * bt)
 static boolean
 check_takeoff(ship *sh, region *from, region *to)
 {
-  if (rterrain(from)!=T_OCEAN && sh->coast != NODIRECTION) {
+  if (!fval(from->terrain, SEA_REGION) && sh->coast != NODIRECTION) {
     direction_t coast = sh->coast;
     direction_t dir   = reldirection(from, to);
     direction_t coastr  = (direction_t)((coast+1) % MAXDIRECTIONS);
@@ -1505,14 +1494,14 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
   while (next_point && current_point!=next_point && step < k) {
     const char * token;
     int error;
-    terrain_t tthis = rterrain(current_point);
+    const terrain_type * tthis = current_point->terrain;
     /* these values need to be updated if next_point changes (due to storms): */
-    terrain_t tnext = rterrain(next_point); 
+    const terrain_type * tnext = next_point->terrain;
     direction_t dir = reldirection(current_point, next_point);
 
-    assert(sh==u->ship || !"ship has sunk, but we didn't notice it");
+    assert(sh == u->ship || !"ship has sunk, but we didn't notice it");
 
-    if (terrain[tnext].flags & FORBIDDEN_LAND) {
+    if (fval(next_point->terrain, FORBIDDEN_REGION)) {
       plane *pl = getplane(next_point);
       if (pl && fval(pl, PFL_NOCOORDS)) {
         ADDMSG(&f->msgs,  msg_message("sailforbiddendir", 
@@ -1528,7 +1517,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
       static int stormyness = -1;
       int stormchance;
 
-      if (stormyness==-1) {
+      if (stormyness == -1) {
         int thismonth = get_gamedate(turn, 0)->month;
         stormyness = storms[thismonth] * 5;
       }
@@ -1537,7 +1526,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
       stormchance = stormyness / shipspeed(sh, u);
       if (check_leuchtturm(next_point, NULL)) stormchance /= 3;
 
-      if (rand()%10000 < stormchance && current_point->terrain == T_OCEAN) {
+      if (rand()%10000 < stormchance && fval(current_point->terrain, SEA_REGION)) {
         if (!is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
           region * rnext = NULL;
           boolean storm = true;
@@ -1549,10 +1538,8 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
             region * rn = rconnect(current_point, dnext);
 
             if (rn!=NULL) {
-              terrain_t t = rterrain(rn);
-
-              if (terrain[t].flags & FORBIDDEN_LAND) continue;
-              if (t!=T_OCEAN) {
+              if (fval(rn->terrain, FORBIDDEN_REGION)) continue;
+              if (!fval(rn->terrain, SEA_REGION)) {
                 storm = false;
                 break;
               }
@@ -1569,14 +1556,14 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
 
             next_point = rnext;
             /* these values need to be updated if next_point changes (due to storms): */
-            tnext = rterrain(next_point); 
+            tnext = next_point->terrain;
             dir = reldirection(current_point, next_point);
           }
         }
       }
 
-      if (tthis != T_OCEAN) {
-        if (tnext != T_OCEAN) {
+      if (!fval(tthis, SEA_REGION)) {
+        if (!fval(tnext, SEA_REGION)) {
           if (!move_on_land) {
             /* check that you're not traveling from one land region to another. */
             ADDMSG(&u->faction->msgs, msg_message("shipnoshore",
@@ -1590,7 +1577,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
             break;
           }
         }
-      } else if (tnext==T_OCEAN) {
+      } else if (fval(tnext, SEA_REGION)) {
         /* target region is an ocean, and we're not leaving a shore */
         if (!(sh->type->flags & SFL_OPENSEA)) {
           /* ship can only stay close to shore */
@@ -1598,9 +1585,9 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
           
           for (d=0;d!=MAXDIRECTIONS;++d) {
             region * rc = rconnect(next_point, d);
-            if (rterrain(rc) != T_OCEAN) break;
+            if (!fval(rc->terrain, SEA_REGION)) break;
           }
-          if (d==MAXDIRECTIONS) {
+          if (d == MAXDIRECTIONS) {
             /* Schiff kann nicht aufs offene Meer */
             cmistake(u, ord, 249, MSG_MOVE);
             break;
@@ -1620,7 +1607,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
       }
 
       if (is_cursed(next_point->attribs, C_MAELSTROM, 0)) {
-        if (do_maelstrom(next_point, u)==NULL) break;
+        if (do_maelstrom(next_point, u) == NULL) break;
       }
 
     } /* !flying_ship */
@@ -1642,10 +1629,10 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
     last_point = current_point;
     current_point = next_point;
 
-    if (rterrain(current_point) != T_OCEAN && !is_cursed(sh->attribs, C_SHIP_FLYING, 0)) break;
+    if (!fval(current_point->terrain, SEA_REGION) && !is_cursed(sh->attribs, C_SHIP_FLYING, 0)) break;
     token = getstrtoken();
     error = movewhere(u, token, current_point, &next_point);
-    if (error || next_point==NULL) {
+    if (error || next_point == NULL) {
       message * msg = movement_error(u, token, ord, error);
       if (msg!=NULL) {
         add_message(&u->faction->msgs, msg);
@@ -1725,7 +1712,7 @@ sail(unit * u, order * ord, boolean move_on_land, region_list **routep)
         sprintf(buf, "%s erhielt ", hafenmeister->name);
         for (itm = trans; itm; itm=itm->next) {
           if (!first) {
-            if (itm->next!=NULL && itm->next->next==NULL) {
+            if (itm->next!=NULL && itm->next->next == NULL) {
               scat(" und ");
             } else {
               scat(", ");
@@ -1864,10 +1851,10 @@ travel(unit * u, region_list ** routep)
   if (routep) *routep = NULL;
 
   /* a few pre-checks that need not be done for each step: */
-  if (rterrain(r)!=T_OCEAN) {
+  if (!fval(r->terrain, SEA_REGION)) {
     ship * sh = u->ship;
     /* An Land kein NACH wenn in dieser Runde Schiff VERLASSEN! */
-    if (sh==NULL) {
+    if (sh == NULL) {
       sh = leftship(u);
       if (sh && sh->region!=u->region) sh = NULL;
     }
@@ -1902,7 +1889,7 @@ travel(unit * u, region_list ** routep)
     free(followers);
     followers = fnext;
 
-    if (uf->region==r) {
+    if (uf->region == r) {
       order * follow_order;
       char str[32];
 
@@ -2022,7 +2009,7 @@ piracy_cmd(unit *u, struct order * ord)
 		const faction * p = data->pirate;
     const faction * t = data->target;
 
-		if (alliedunit(u, p, HELP_FIGHT) && (il==0 || intlist_find(il, t->no))) {
+		if (alliedunit(u, p, HELP_FIGHT) && (il == 0 || intlist_find(il, t->no))) {
 			target_dir = data->dir;
 			break;
 		}
@@ -2039,7 +2026,7 @@ piracy_cmd(unit *u, struct order * ord)
 			region *rc = rconnect(r, dir);
 			aff[dir].value = 0;
       aff[dir].target = 0;
-			if (rc && (terrain[rterrain(rc)].flags & SWIM_INTO)
+			if (rc && fval(rc->terrain, SWIM_INTO)
 					&& check_takeoff(sh, r, rc) == true) {
 
 				for (sh2 = rc->ships; sh2; sh2 = sh2->next) {
@@ -2047,7 +2034,7 @@ piracy_cmd(unit *u, struct order * ord)
           if (cap) {
             faction * f = visible_faction(cap->faction, cap);
             if (alliedunit(u, f, HELP_FIGHT)) continue;
-            if (il==0 || intlist_find(il, cap->faction->no)) {
+            if (il == 0 || intlist_find(il, cap->faction->no)) {
               ++aff[dir].value;
               if (rand() % aff[dir].value == 0) {
                 aff[dir].target = f;
@@ -2137,7 +2124,7 @@ hunt(unit *u)
 
   if (fval(u, UFL_LONGACTION)) {
     return 0;
-  } else if (u->ship==NULL) {
+  } else if (u->ship == NULL) {
     cmistake(u, u->thisorder, 144, MSG_MOVE);
     fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
     return 0;
@@ -2167,7 +2154,7 @@ hunt(unit *u)
 
   if (dir == NODIRECTION) {
     ship * sh = findship(id);
-    if (sh==NULL || sh->region!=rc) {
+    if (sh == NULL || sh->region!=rc) {
       cmistake(u, u->thisorder, 20, MSG_MOVE);
     }
     fset(u, UFL_LONGACTION); /* FOLGE SCHIFF ist immer lang */
@@ -2327,7 +2314,7 @@ move_hunters(void)
           }
         }
       }
-      if (*up==u) up=&u->next;
+      if (*up == u) up=&u->next;
     }
   }
 }
@@ -2351,7 +2338,7 @@ move_pirates(void)
         fset(u, UFL_LONGACTION);
       }
 
-      if (*up==u) {
+      if (*up == u) {
         /* not moved, use next unit */
         up = &u->next;
       } else if (*up && (*up)->region!=r) {
@@ -2406,7 +2393,7 @@ movement(void)
                 move(u, false);
               }
             } else {
-              if (u->ship==NULL || !fval(u, UFL_OWNER)) {
+              if (u->ship == NULL || !fval(u, UFL_OWNER)) {
                 init_tokens(u->thisorder);
                 skip_token();
                 move(u, false);
@@ -2415,7 +2402,7 @@ movement(void)
           }
           break;
         }
-        if (u->region==r) {
+        if (u->region == r) {
           /* not moved, use next unit */
           up = &u->next;
         } else {
@@ -2431,7 +2418,7 @@ movement(void)
         /* else *up is already the next unit */
       }
       if (repeat) continue;
-      if (ships==0) {
+      if (ships == 0) {
         /* Abtreiben von beschädigten, unterbemannten, überladenen Schiffen */
         drifting_ships(r);
       }
@@ -2515,7 +2502,7 @@ follow_unit(void)
           attrib * a2 = a_find(u2->attribs, &at_follow);
           if (a2!=NULL) {
             unit * u3 = a2->data.v;
-            follow = (u3 && u2->region==u2->region);
+            follow = (u3 && u2->region == u2->region);
           }
         }
         if (follow) {

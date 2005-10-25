@@ -57,6 +57,8 @@
 #include <kernel/spellid.h>
 #include <kernel/study.h>
 #include <kernel/teleport.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 /* util includes */
@@ -95,7 +97,7 @@ curse_emptiness(void)
 		unit * u = r->units;
 		if (r->land==NULL) continue;
 		if (fval(r, RF_CHAOTIC)) continue;
-		if (r->terrain==T_GLACIER) continue;
+		if (rterrain(r)==T_GLACIER) continue;
 		if (r->age<=200) continue;
 		if (get_curse(r->attribs, ct)) continue;
 		while (u && u->faction->no==MONSTER_FACTION) u=u->next;
@@ -493,77 +495,6 @@ fix_icastles(void)
 	}
 }
 
-#if 0
-static void
-fix_herbs(void)
-{
-	const char * plain_herbs[] = {"Flachwurz", "Würziger Wagemut", "Eulenauge", "Grüner Spinnerich", "Blauer Baumringel", "Elfenlieb"};
-	const herb_type * htypes[6];
-	int herbs[6];
-	int hneed[6];
-	region *r;
-	int i, hsum = 0, left = 0;
-
-	for (i=0;i!=6;++i) {
-		htypes[i] = resource2herb(finditemtype(plain_herbs[i], NULL)->rtype);
-		herbs[i] = 0;
-	}
-
-	for (r=regions; r; r=r->next) if (rterrain(r) == T_PLAIN) {
-		const herb_type *htype = rherbtype(r);
-		if (htype==NULL) {
-			htype = htypes[i];
-			rsetherbtype(r, htype);
-		}
-		for (i=0;i!=6;++i) if (htypes[i]==htype) break;
-		assert(i!=6);
-		herbs[i]++;
-		hsum++;
-	}
-
-	for (i=0;i!=6;++i) {
-		int hwant = hsum / (6-i);
-		hneed[i] = hwant - herbs[i];
-		if (hneed[i]>0) left += hneed[i];
-		hsum -= hwant;
-	}
-
-	for (r=regions; r; r=r->next) if (rterrain(r) == T_PLAIN) {
-		const herb_type *htype = rherbtype(r);
-		assert(htype);
-		for (i=0;i!=6;++i) if (htypes[i]==htype) break;
-		assert(i!=6);
-		if (hneed[i]<0) {
-			int p;
-			int k = rand() % left;
-			for (p=0;p!=6;++p) if (hneed[p]>0) {
-				k-=hneed[p];
-				if (k<0) break;
-			}
-			assert(p!=6);
-			hneed[p]--;
-			hneed[i]++;
-			left--;
-			rsetherbtype(r, htypes[p]);
-		}
-		hsum++;
-	}
-
-	for (i=0;i!=6;++i) herbs[i] = 0;
-
-	for (r=regions; r; r=r->next) if (rterrain(r) == T_PLAIN) {
-		const herb_type *htype = rherbtype(r);
-		assert(htype);
-		for (i=0;i!=6;++i) if (htypes[i]==htype) break;
-		assert(i!=6);
-		herbs[i]++;
-	}
-	for (i=0;i!=6;++i) {
-		fprintf(stderr, "%s : %d\n", locale_string(NULL, resourcename(htypes[i]->itype->rtype, 0)), herbs[i]);
-	}
-}
-#endif
-
 #include <triggers/timeout.h>
 #include <triggers/changerace.h>
 #include <triggers/changefaction.h>
@@ -777,7 +708,7 @@ road_decay(void)
 
     if (half) {
       direction_t d;
-      short maxt = terrain[rterrain(r)].roadreq;
+      short maxt = r->terrain->max_road;
       /* Falls Karawanserei, Damm oder Tunnel einstürzen, wird die schon
        * gebaute Straße zur Hälfte vernichtet */
       for (d=0;d!=MAXDIRECTIONS;++d) {
@@ -819,7 +750,7 @@ frame_regions(void)
 #endif
     if (r->age<16) continue;
     if (r->planep) continue;
-    if (r->terrain==T_FIREWALL) continue;
+    if (rterrain(r)==T_FIREWALL) continue;
 
     for (d=0;d!=MAXDIRECTIONS;++d) {
       region * rn = rconnect(r, d);
@@ -843,7 +774,7 @@ iceberg(region * r)
   for (d=0;d!=MAXDIRECTIONS;++d) {
     region * rn = rconnect(r, d);
     if (rn!=NULL) {
-      terrain_t rt = rn->terrain;
+      terrain_t rt = rterrain(rn);
       if (rt!=T_ICEBERG && rt!=T_ICEBERG_SLEEP && rt!=T_GLACIER && rt!=T_OCEAN) {
         break;
       }
@@ -860,16 +791,16 @@ global_warming(void)
   region * r;
   for (r=regions;r;r=r->next) {
     if (r->age<GLOBAL_WARMING) continue;
-    if (r->terrain==T_GLACIER) {
+    if (rterrain(r)==T_GLACIER) {
       /* 1% chance that an existing glacier gets unstable */
       if (chance(0.01)) {
         iceberg(r);
       }
-    } else if (r->terrain==T_ICEBERG || r->terrain==T_ICEBERG_SLEEP) {
+    } else if (rterrain(r)==T_ICEBERG || rterrain(r)==T_ICEBERG_SLEEP) {
       direction_t d;
       for (d=0;d!=MAXDIRECTIONS;++d) {
         region * rn = rconnect(r, d);
-        if (rn && rn->terrain==T_GLACIER && chance(0.10)) {
+        if (rn && rterrain(rn)==T_GLACIER && chance(0.10)) {
           /* 10% chance that a glacier next to an iceberg gets unstable */
           iceberg(rn);
         }
@@ -896,8 +827,8 @@ fix_astralplane(void)
   for (r=regions;r;r=r->next) if (rplane(r)==astralplane) {
     region * ra = r_standard_to_astral(r);
     if (ra==NULL) continue;
-    if (r->terrain!=T_FIREWALL) continue;
-    if (ra->terrain==T_ASTRALB) continue;
+    if (rterrain(r)!=T_FIREWALL) continue;
+    if (rterrain(ra)==T_ASTRALB) continue;
     if (ra->units!=NULL) {
       add_regionlist(&rlist, ra);
     }
@@ -912,7 +843,7 @@ fix_astralplane(void)
     for (dir=0;dir!=MAXDIRECTIONS;++dir) {
       region * rnext = rconnect(r, dir);
       if (rnext==NULL) continue;
-      if (rnext->terrain!=T_ASTRAL) continue;
+      if (rterrain(rnext)!=T_ASTRAL) continue;
       while (r->units) {
         unit * u = r->units;
         move_unit(u, rnext, NULL);
@@ -987,8 +918,8 @@ fix_road_borders(void)
           r2 = findregion(x2, y2);
 
           if (r1->land == NULL || r2->land == NULL
-            || terrain[r1->terrain].roadreq == 0
-            || terrain[r2->terrain].roadreq == 0) 
+            || r1->terrain->max_road<=0
+            || r2->terrain->max_road<=0) 
           {
             deleted[i++] = b;
           }
@@ -1174,7 +1105,7 @@ fix_astral_firewalls(void)
 {
   region * r;
   for (r = regions; r; r=r->next) {
-    if (r->planep==get_astralplane() && r->terrain==T_FIREWALL) {
+    if (r->planep==get_astralplane() && rterrain(r)==T_FIREWALL) {
       terraform(r, T_ASTRALB);
     }
   }

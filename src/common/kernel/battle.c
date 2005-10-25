@@ -37,6 +37,7 @@
 #include "reports.h"
 #include "ship.h"
 #include "skill.h"
+#include "terrain.h"
 #include "unit.h"
 
 /* attributes includes */
@@ -142,7 +143,7 @@ fleeregion(const unit * u)
 	int c = 0;
 	direction_t i;
 
-	if (u->ship && landregion(rterrain(r)))
+	if (u->ship && !fval(r->terrain, SEA_REGION))
 		return NULL;
 
 	if (u->ship &&
@@ -3035,9 +3036,8 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 	fig->magic = eff_skill(u, SK_MAGIC, r);
 
 	if (fig->horses) {
-		if ((r->terrain != T_PLAIN && r->terrain != T_HIGHLAND
-				&& r->terrain != T_DESERT) || r_isforest(r)
-				|| eff_skill(u, SK_RIDING, r) < 2 || u->race == new_race[RC_TROLL] || fval(u, UFL_WERE))
+		if (!fval(r->terrain, CAVALRY_REGION) || r_isforest(r) 
+      || eff_skill(u, SK_RIDING, r) < 2 || u->race == new_race[RC_TROLL] || fval(u, UFL_WERE))
 			fig->horses = 0;
 	}
 
@@ -3552,7 +3552,7 @@ init_battle(region * r, battle **bp)
 
           if (is_guarded(r, u, GUARD_TRAVELTHRU)) {
             /* Fehler: "Das Schiff muß erst verlassen werden" */
-            if (u->ship != NULL && rterrain(r) != T_OCEAN) {
+            if (u->ship != NULL && !fval(r->terrain, SEA_REGION)) {
               cmistake(u, ord, 19, MSG_BATTLE);
               continue;
             }

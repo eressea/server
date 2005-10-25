@@ -47,6 +47,8 @@
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/skill.h>
+#include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 /* attributes includes */
@@ -453,7 +455,7 @@ encounters(void)
 	int i;
 
 	for (r = regions; r; r = r->next) {
-		if (rterrain(r) != T_OCEAN && fval(r, RF_ENCOUNTER)) {
+		if (!fval(r->terrain, SEA_REGION) && fval(r, RF_ENCOUNTER)) {
 			c = 0;
 			for (u = r->units; u; u = u->next) {
 				c += u->number;
@@ -473,6 +475,30 @@ encounters(void)
 	}
 }
 
+static const terrain_type *
+chaosterrain(void) 
+{
+  static const terrain_type ** types;
+  static int numtypes;
+
+  if (numtypes==0) {
+    const terrain_type * terrain;
+    for (terrain=terrains();terrain!=NULL;terrain=terrain->next) {
+      if (fval(terrain, LAND_REGION) && terrain->herbs) {
+        ++numtypes;
+      }
+    }
+    types = malloc(sizeof(terrain_type)*numtypes);
+    numtypes = 0;
+    for (terrain=terrains();terrain!=NULL;terrain=terrain->next) {
+      if (fval(terrain, LAND_REGION) && terrain->herbs) {
+        types[numtypes++] = terrain;
+      }
+    }
+  }
+  return types[rand() % numtypes];
+}
+
 void
 chaos(region * r)
 {
@@ -482,7 +508,7 @@ chaos(region * r)
 	if (rand() % 100 < 8) {
 		switch (rand() % 3) {
 		case 0:				/* Untote */
-			if (rterrain(r) != T_OCEAN) {
+			if (!fval(r->terrain, SEA_REGION)) {
 				u = random_unit(r);
 				if (u && playerrace(u->race)) {
 					sprintf(buf, "%s scheint von einer seltsamen Krankheit befallen.",
@@ -529,11 +555,12 @@ chaos(region * r)
         fset(u, UFL_ISNEW|UFL_MOVED);
 			}
 		case 2:	/* Terrainveränderung */
-			if (!(terrain[rterrain(r)].flags & FORBIDDEN_LAND)) {
-				if (rterrain(r) != T_OCEAN) {
+			if (!fval(r->terrain, FORBIDDEN_REGION)) {
+				if (!fval(r->terrain, SEA_REGION)) {
 					direction_t dir;
 					for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-						if (rconnect(r, dir) && rterrain(rconnect(r, dir)) == T_OCEAN) break;
+            region * rn = rconnect(r, dir);
+						if (rn && fval(rn->terrain, SEA_REGION)) break;
 					}
 					if (dir!=MAXDIRECTIONS) {
 						ship * sh = r->ships;
@@ -563,29 +590,11 @@ chaos(region * r)
 				} else {
 					direction_t dir;
 					for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-						if (rconnect(r, dir) && rterrain(rconnect(r, dir)) != T_OCEAN) break;
+            region * rn = rconnect(r, dir);
+            if (rn && fval(rn->terrain, SEA_REGION)) break;
 					}
 					if (dir!=MAXDIRECTIONS) {
-						switch (rand() % 8) {
-						case 0:
-							terraform(r, T_PLAIN);
-							break;
-						case 1:
-							terraform(r, T_HIGHLAND);
-							break;
-						case 2:
-							terraform(r, T_MOUNTAIN);
-							break;
-						case 3:
-							terraform(r, T_GLACIER);
-							break;
-						case 4:
-							terraform(r, T_DESERT);
-							break;
-						default:
-							terraform(r, T_SWAMP);
-							break;
-						}
+						terraform_region(r, chaosterrain());
 					}
 				}
 			}
@@ -695,7 +704,7 @@ damage_unit(unit *u, const char *dam, boolean physical, boolean magic)
 void
 drown(region *r)
 {
-	if (rterrain(r) == T_OCEAN) {
+	if (fval(r->terrain, SEA_REGION)) {
 		unit ** up = up=&r->units;
 		while (*up) {
 			unit *u = *up;
@@ -894,9 +903,8 @@ move_iceberg(region *r)
 
 	rc = rconnect(r, dir);
 
-	if (rc && rterrain(rc) != T_GLACIER && rterrain(rc) != T_ICEBERG
-			&& rterrain(rc) != T_ICEBERG_SLEEP) {
-		if (rterrain(rc) == T_OCEAN) {	/* Eisberg treibt */
+	if (rc && !fval(rc->terrain, ARCTIC_REGION)) {
+		if (fval(rc->terrain, SEA_REGION)) {	/* Eisberg treibt */
 			ship *sh, *shn;
 			unit *u;
 			short x, y;
@@ -1021,7 +1029,7 @@ create_icebergs(void)
       freset(r, RF_DH);
       for (dir=0; dir < MAXDIRECTIONS; dir++) {
         rc = rconnect(r, dir);
-        if (rc && rterrain(rc) == T_OCEAN) {
+        if (rc && fval(rc->terrain, SEA_REGION)) {
           has_ocean_neighbour = true;
           break;
         }
@@ -1051,8 +1059,8 @@ godcurse(void)
 {
   region *r;
 
-  for(r=regions; r; r=r->next) {
-    if(is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+  for (r=regions; r; r=r->next) {
+    if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
       unit * u;
       for(u=r->units; u; u=u->next) {
         skill * sv = u->skills;
@@ -1062,23 +1070,23 @@ godcurse(void)
           ++sv;
         }
       }
+      if (fval(r->terrain, SEA_REGION)) {
+        ship *sh;
+        for (sh = r->ships; sh;) {
+          ship *shn = sh->next;
+          damage_ship(sh, 0.10);
+          if (sh->damage>=sh->size * DAMAGE_SCALE) {
+            unit * u = shipowner(sh);
+            if (u) ADDMSG(&u->faction->msgs,
+              msg_message("godcurse_destroy_ship", "ship", sh));
+            destroy_ship(sh);
+          }
+          sh = shn;
+        }
+      }
     }
   }
 
-  if (rterrain(r) == T_OCEAN) {
-    ship *sh;
-    for (sh = r->ships; sh;) {
-      ship *shn = sh->next;
-      damage_ship(sh, 0.10);
-      if (sh->damage>=sh->size * DAMAGE_SCALE) {
-        unit * u = shipowner(sh);
-        if (u) ADDMSG(&u->faction->msgs,
-          msg_message("godcurse_destroy_ship", "ship", sh));
-        destroy_ship(sh);
-      }
-      sh = shn;
-    }
-  }
 }
 
 static unit *
@@ -1361,7 +1369,7 @@ randomevents(void)
 	for (r = regions; r; r = r->next) {
 		unit * u;
 		message * msg;
-		if (rterrain(r) == T_OCEAN && rand()%10000 < 1) {
+		if (fval(r->terrain, SEA_REGION) && rand()%10000 < 1) {
 			u = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_SEASERPENT]);
       fset(u, UFL_ISNEW|UFL_MOVED);
 			set_level(u, SK_MAGIC, 4);
@@ -1563,10 +1571,9 @@ randomevents(void)
 
 			while (*itmp) {
 				item * itm = *itmp;
-				const herb_type * htype = resource2herb(itm->type->rtype);
 				int n = itm->number;
 				double k = n*rot_chance/100.0;
-				if  (htype!=NULL) {
+				if (fval(itm->type, ITF_HERB)) {
 					n = (int)(min(n, normalvariate(k, k/4)));
 					i_change(itmp, itm->type, -n);
 				}

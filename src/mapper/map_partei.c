@@ -171,7 +171,7 @@ select_newfaction(const struct race * rc)
 	newfaction *player = newfactions;
 
 	if (!player) return NULL;
-	insert_selection(&ilist, NULL, strdup("new player"), NULL);
+	insert_selection(&ilist, NULL, "new player", NULL);
 	iinsert=&ilist->next;
 	prev = ilist;
 
@@ -183,7 +183,7 @@ select_newfaction(const struct race * rc)
       } else {
         snprintf(str, 70, "%s %s %s", player->bonus?"!":" ", locale_string(default_locale, rc_name(player->race, 0)), player->email);
       }
-			insert_selection(iinsert, prev, strdup(str), (void*)player);
+			insert_selection(iinsert, prev, str, (void*)player);
 			prev = *iinsert;
 			iinsert = &prev->next;
 		}

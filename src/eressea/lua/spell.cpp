@@ -63,7 +63,7 @@ init_familiar(unit * u)
   luabind::object fun = globals.at(fname);
   if (fun.is_valid()) {
     if (fun.type()!=LUA_TFUNCTION) {
-      log_error(("Lua global object %s is not a function, type is %u\n", fname, fun.type()));
+      log_warning(("Lua global object %s is not a function, type is %u\n", fname, fun.type()));
     } else {
       try {
         luabind::call_function<int>(luaState, fname, u);

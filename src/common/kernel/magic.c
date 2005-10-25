@@ -40,6 +40,7 @@
 #include "skill.h"
 #include "spell.h"
 #include "spellid.h"
+#include "terrain.h"
 #include "unit.h"
 
 #include <triggers/timeout.h>
@@ -2526,7 +2527,7 @@ magic(void)
           /* Auf dem Ozean Zaubern als quasi-langer Befehl können
           * normalerweise nur Meermenschen, ausgenommen explizit als
           * OCEANCASTABLE deklarierte Sprüche */
-          if (rterrain(r) == T_OCEAN) {
+          if (fval(r->terrain, SEA_REGION)) {
             if (u->race != new_race[RC_AQUARIAN]
               && !fval(u->race, RCF_SWIM)
               && !(sp->sptyp & OCEANCASTABLE)) {

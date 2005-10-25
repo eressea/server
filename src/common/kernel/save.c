@@ -22,12 +22,13 @@
 #include "eressea.h"
 #include "save.h"
 
-#include "alliance.h"
 #include "alchemy.h"
+#include "alliance.h"
 #include "attrib.h"
 #include "border.h"
 #include "building.h"
 #include "faction.h"
+#include "group.h"
 #include "item.h"
 #include "karma.h"
 #include "magic.h"
@@ -43,8 +44,9 @@
 #include "ship.h"
 #include "skill.h"
 #include "spell.h"
+#include "terrain.h"
+#include "terrainid.h" /* only for conversion code */
 #include "unit.h"
-#include "group.h"
 
 #ifdef USE_UGROUPS
 #include "ugroup.h"
@@ -1199,7 +1201,7 @@ readunit(FILE * F)
 		}
 
 		while ((herb = (herb_t) ri(F)) >= 0) {
-			i_change(&u->items, newherbtype(herb)->itype, ri(F));
+			i_change(&u->items, oldherbtype(herb), ri(F));
 		}
 	}
 	u->hp = ri(F);
@@ -1320,7 +1322,7 @@ region *
 readregion(FILE * F, short x, short y)
 {
 	region * r = findregion(x, y);
-	int ter;
+	const terrain_type * terrain;
 
 	if (r==NULL) {
 		r = new_region(x, y);
@@ -1340,12 +1342,19 @@ readregion(FILE * F, short x, short y)
 	}
   if (lomem) rds(F, 0);
   else rds(F, &r->display);
-
-  ter = ri(F);
-	if (global.data_version < NOFOREST_VERSION) {
-		if (ter>T_PLAIN) --ter;
-	}
-	rsetterrain(r, (terrain_t)ter);
+  
+  if (global.data_version < TERRAIN_VERSION) {
+    int ter = ri(F);
+    if (global.data_version < NOFOREST_VERSION) {
+      if (ter>T_PLAIN) --ter;
+    }
+    terrain = newterrain((terrain_t)ter);
+  } else {
+    char name[64];
+    rs(F, name);
+    terrain = get_terrain(name);
+  }
+	r->terrain = terrain;
 	r->flags = (char) ri(F);
 
 	if (global.data_version >= REGIONAGE_VERSION)
@@ -1353,7 +1362,7 @@ readregion(FILE * F, short x, short y)
 	else
 		r->age = 0;
 
-	if (landregion(rterrain(r))) {
+	if (fval(r->terrain, LAND_REGION)) {
 		r->land = calloc(1, sizeof(land_region));
 		rds(F, &r->land->name);
 #ifndef NDEBUG
@@ -1412,13 +1421,13 @@ readregion(FILE * F, short x, short y)
 					res->divisor = ri(F);
 				} else {
 					int i;
-					res->startlevel = 1;
-					for (i=0; i<3; i++) {
-						if(res->type == terrain[rterrain(r)].rawmaterials[i].type) break;
+					for (i=0;r->terrain->production[i].type;++i) {
+						if (res->type->rtype == r->terrain->production[i].type) break;
 					}
-					assert(i<=2);
-					res->base = dice_rand(terrain[rterrain(r)].rawmaterials[i].base);
-					res->divisor = dice_rand(terrain[rterrain(r)].rawmaterials[i].divisor);
+
+          res->base = dice_rand(r->terrain->production[i].base);
+					res->divisor = dice_rand(r->terrain->production[i].divisor);
+          res->startlevel = 1;
 				}
 
 				*pres = res;
@@ -1428,26 +1437,28 @@ readregion(FILE * F, short x, short y)
 		if (global.data_version>=ITEMTYPE_VERSION) {
 			rs(F, buf);
 			if (strcmp(buf, "noherb") != 0) {
-				rsetherbtype(r, ht_find(buf));
+        const resource_type * rtype = rt_find(buf);
+        assert(rtype && rtype->itype && fval(rtype->itype, ITF_HERB));
+        rsetherbtype(r, rtype->itype);
 			} else {
 				rsetherbtype(r, NULL);
 			}
 			rsetherbs(r, (short)ri(F));
 		} else {
 			int i = ri(F);
-			terrain_t ter = rterrain(r);
-			if (ter == T_ICEBERG || ter == T_ICEBERG_SLEEP) ter = T_GLACIER;
-			if (ter > T_GLACIER || ter == T_OCEAN)
+
+			if (r->terrain->herbs==NULL)
 				rsetherbtype(r, NULL);
-			else
-				rsetherbtype(r, newherbtype((i-1)+3*(ter-1))->htype);
+      else {
+        rsetherbtype(r, r->terrain->herbs[i % 3]);
+      }
 			rsetherbs(r, (short)ri(F));
 		}
 		rsetpeasants(r, ri(F));
 		rsetmoney(r, ri(F));
 	}
 
-	assert(rterrain(r) != NOTERRAIN);
+	assert(r->terrain!=NULL);
 	assert(rhorses(r) >= 0);
 	assert(rpeasants(r) >= 0);
 	assert(rmoney(r) >= 0);
@@ -1483,13 +1494,14 @@ void
 writeregion(FILE * F, const region * r)
 {
   ws(F, r->display?r->display:"");
-	wi(F, rterrain(r));
+	ws(F, r->terrain->_name);
 	wi(F, r->flags & RF_SAVEMASK);
 	wi(F, r->age);
 	wnl(F);
-	if (landregion(rterrain(r))) {
-		const herb_type *rht;
+	if (fval(r->terrain, LAND_REGION)) {
+		const item_type *rht;
 		struct demand * demand;
+    rawmaterial * res = r->resources;
 		ws(F, r->land->name);
 		assert(rtrees(r,0)>=0);
 		assert(rtrees(r,1)>=0);
@@ -1498,26 +1510,21 @@ writeregion(FILE * F, const region * r)
 		wi(F, rtrees(r,1));
 		wi(F, rtrees(r,2));
 		wi(F, rhorses(r));
-#if RELEASE_VERSION>=NEWRESOURCE_VERSION
-		{
-			rawmaterial * res = r->resources;
-			while (res) {
-				ws(F, res->type->name);
-				wi(F, res->level);
-				wi(F, res->amount);
-				wi(F, res->startlevel);
-				wi(F, res->base);
-				wi(F, res->divisor);
-				res = res->next;
-			}
-			fputs("end ", F);
+
+    while (res) {
+      ws(F, res->type->name);
+			wi(F, res->level);
+			wi(F, res->amount);
+			wi(F, res->startlevel);
+			wi(F, res->base);
+			wi(F, res->divisor);
+			res = res->next;
 		}
-#else
-		assert(!"invalid defines");
-#endif
-		rht =  rherbtype(r);
+		fputs("end ", F);
+
+    rht = rherbtype(r);
 		if (rht) {
-			ws(F, resourcename(rht->itype->rtype, 0));
+			ws(F, resourcename(rht->rtype, 0));
 		} else {
 			ws(F, "noherb");
 		}

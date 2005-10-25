@@ -15,6 +15,8 @@
   <xi:include href="eressea/calendar.xml"/>
   <xi:include href="equipment.xml"/>
   <xi:include href="spells.xml"/>
+  <xi:include href="terrains.xml"/>
+  <xi:include href="dungeons.xml"/>
 
   <game name="Eressea" welcome="eressea">
     <comment>Game specific</comment>
