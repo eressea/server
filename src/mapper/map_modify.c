@@ -66,7 +66,7 @@ climate(int y)
 }
 
 #define MAXSEEDSIZE 17
-static char maxseeds[MAXCLIMATES][MAXTERRAINS] =
+static char maxseeds[MAXCLIMATES][8] =
 {
 	{0, 1, 3, 3, 0, 3, 3, 4,},	/* Summe muß MAXSEEDSIZE sein */
 	{0, 5, 4, 2, 0, 2, 3, 1,},
@@ -155,8 +155,8 @@ block_create(short x1, short y1, int size, char chaotisch, int special, const te
 		int c = (int) fringe.data[rand() % fringe.size];
 		direction_t d;
 
-		x = (c & 0xFFFF0000) >> 16;
-		y = (c & 0xFFFF);
+		x = (short)(c >> 16);
+		y = (short)(c & 0xFFFF);
 		assert(newblock[x][y] == T_OCEAN);
 		newblock[x][y] = terrain_create(local_climate);
 		vset_erase(&fringe, (void *) c);
@@ -193,7 +193,7 @@ block_create(short x1, short y1, int size, char chaotisch, int special, const te
 			for (y = 0; y != BLOCKSIZE; y++) {
 				const luxury_type * sale = (rand()%2)?p1:p2;
 				r = findregion(x1 + x - BLOCKSIZE/2, y1 + y - BLOCKSIZE/2);
-				if (r && r->terrain!=T_OCEAN) continue;
+				if (r && !fval(r->terrain, SEA_REGION)) continue;
 				if (r==NULL) r = new_region(x1 + x - BLOCKSIZE/2, y1 + y - BLOCKSIZE/2);
 				if (chaotisch) fset(r, RF_CHAOTIC);
 				if (special == 1) {
@@ -858,7 +858,7 @@ modify_region(region * r)
 		case 'T':
 
 		case 'B':
-			if (r->terrain != T_OCEAN) {
+			if (fval(r->terrain, LAND_REGION)) {
 				NeueBurg(r);
 				return 1;
 			} else
@@ -888,17 +888,16 @@ modify_region(region * r)
 }
 
 void
-make_new_region(int x, int y)
+make_new_region(short x, short y)
 {
 	WINDOW *win;
-	int q, z, i;
 	region *r;
   const terrain_type * terrain = NULL;
 
 	win = openwin(SX - 10, 10, "< Region erzeugen >");
 
-	x = map_input(win, 2, 1, "X-Koordinate", -999, 999, x);
-	y = map_input(win, 2, 2, "Y-Koordinate", -999, 999, y);
+	x = (short)map_input(win, 2, 1, "X-Koordinate", -999, 999, x);
+	y = (short)map_input(win, 2, 2, "Y-Koordinate", -999, 999, y);
 	wmove(win, 3, 2);
 	if ((r=findregion(x, y))!=NULL) {
 		if (!yes_no(win, "Dort ist schon etwas! Überschreiben?", 'n'))
@@ -928,15 +927,15 @@ make_new_region(int x, int y)
 #define BLOCK_RADIUS 6
 
 void
-make_ocean_block(int x, int y)
+make_ocean_block(short x, short y)
 {
-	int cx, cy;
+	short cx, cy;
 	region *r;
 
 	for(cx = x - BLOCK_RADIUS; cx < x+BLOCK_RADIUS; cx++) {
 		for(cy = y - BLOCK_RADIUS; cy < y+BLOCK_RADIUS; cy++) {
 			if(koor_distance(cx, cy, x, y) < BLOCK_RADIUS) {
-				if(!findregion(cx, cy)) {
+				if (!findregion(cx, cy)) {
 					r = new_region(cx, cy);
 					terraform(r, T_OCEAN);
 				}
@@ -970,7 +969,7 @@ void
 make_new_block(int x, int y)
 {
 	WINDOW *win;
-	int q, z, i, special = 0;
+	int z, special = 0;
 	char chaos;
   const terrain_type * terrain = NULL;
 
@@ -1176,16 +1175,17 @@ settg(region *r)
 }
 
 boolean
-Create_Island(region *r, int * n, terrain_t t, int x, int y) {
+Create_Island(region *r, int * n, const terrain_type * terrain, int x, int y) {
+  terrain_t t = oldterrain(terrain);
 	if (!r) return false;
 	if (*n == 0) return true;
 
 	if((t == T_MOUNTAIN || t == T_GLACIER) && rand()%100 < 5) {
 		terraform(r,T_VOLCANO);
 	} else {
-		terraform(r,t);
+		terraform_region(r, terrain);
 	}
-	if(r->land) settg(r);
+	if (r->land) settg(r);
 	(*n)--;
 
 	return false;
@@ -1194,7 +1194,7 @@ Create_Island(region *r, int * n, terrain_t t, int x, int y) {
 void
 create_island(region *r, int n, terrain_t t) 
 {
-	int sx=r->x, sy=r->y, i, x = 0, y = 0;
+	short sx=r->x, sy=r->y, i, x = 0, y = 0;
 	direction_t d;
 	boolean abbruch=false;
 	region *r2;
@@ -1241,7 +1241,7 @@ create_island(region *r, int n, terrain_t t)
 				break;
 			}
 			r2 = findregion(x,y);
-			if(r2 && r2->terrain == T_OCEAN ) {
+			if (r2 && fval(r2->terrain, SEA_REGION)) {
 				r2->msgs = (void *)d;
 				push(r2);
 				abbruch=Create_Island(r2,&n,choose_terrain(r->terrain),sx,sy);

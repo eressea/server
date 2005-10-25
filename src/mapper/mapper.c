@@ -953,7 +953,7 @@ movearound(short rx, short ry) {
 					} else {
             const terrain_type * terrain = select_terrain(r->terrain);
 						for (tag=Tagged; tag; tag=tag->next)
-							terraform(tag->r, terrain);
+							terraform_region(tag->r, terrain);
 					}
 					ch = -9;
 					modified = 1;
