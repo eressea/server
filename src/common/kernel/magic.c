@@ -718,12 +718,12 @@ spellcost(unit *u, const spell * sp)
 	int k, aura = 0;
 	int count = countspells(u, 0);
 
-	for (k = 0; k < MAXINGREDIENT; k++) {
-		if (sp->komponenten[k][0] == R_AURA) {
-			aura = sp->komponenten[k][1];
-		}
+	for (k = 0; sp->components[k].type; k++) {
+		if (sp->components[k].type == r_aura) {
+			aura = sp->components[k].amount;
+    }
 	}
-	aura *= (int)pow(2.0,(double)count);
+	aura *= (1<<count);
 	return aura;
 }
 
@@ -740,16 +740,16 @@ spl_costtyp(const spell * sp)
 	int k;
 	int costtyp = SPC_FIX;
 
-	for (k = 0; k < MAXINGREDIENT; k++) {
+	for (k = 0; sp->components[k].type; k++) {
 		if (costtyp == SPC_LINEAR) return SPC_LINEAR;
 
-		if (sp->komponenten[k][2] == SPC_LINEAR) {
+		if (sp->components[k].cost == SPC_LINEAR) {
 			return SPC_LINEAR;
 		}
 
 		/* wenn keine Fixkosten, Typ übernehmen */
-		if (sp->komponenten[k][2] != SPC_FIX) {
-			costtyp = sp->komponenten[k][2];
+		if (sp->components[k].cost != SPC_FIX) {
+			costtyp = sp->components[k].cost;
 		}
 	}
 	return costtyp;
@@ -770,32 +770,32 @@ eff_spelllevel(unit *u, const spell * sp, int cast_level, int range)
 	int needplevel;
 	int costtyp = SPC_FIX;
 
-	for (k = 0; k < MAXINGREDIENT; k++) {
+	for (k = 0; sp->components[k].type; k++) {
 		if (cast_level == 0)
 			return 0;
 
-		if (sp->komponenten[k][1] > 0) {
+		if (sp->components[k].amount > 0) {
 			/* Die Kosten für Aura sind auch von der Zahl der bereits
 			 * gezauberten Sprüche abhängig */
-			if (sp->komponenten[k][0] == R_AURA) {
+			if (sp->components[k].type == r_aura) {
 				needplevel = spellcost(u, sp) * range;
 			} else {
-				needplevel = sp->komponenten[k][1] * range;
+				needplevel = sp->components[k].amount * range;
 			}
-			maxlevel = get_pooled(u, u->region, sp->komponenten[k][0])/needplevel;
+			maxlevel = new_get_pooled(u, sp->components[k].type, GET_DEFAULT)/needplevel;
 
 			/* sind die Kosten fix, so muss die Komponente nur einmal vorhanden
 			 * sein und der cast_level ändert sich nicht */
-			if (sp->komponenten[k][2] == SPC_FIX) {
+			if (sp->components[k].cost == SPC_FIX) {
 				if (maxlevel < 1) cast_level = 0;
 			/* ansonsten wird das Minimum aus maximal möglicher Stufe und der
 			 * gewünschten gebildet */
-			} else if (sp->komponenten[k][2] == SPC_LEVEL) {
+			} else if (sp->components[k].cost == SPC_LEVEL) {
 				costtyp = SPC_LEVEL;
 				cast_level = min(cast_level, maxlevel);
 			/* bei Typ Linear müssen die Kosten in Höhe der Stufe vorhanden
 			 * sein, ansonsten schlägt der Spruch fehl */
-			} else if (sp->komponenten[k][2] == SPC_LINEAR) {
+			} else if (sp->components[k].cost == SPC_LINEAR) {
 				costtyp = SPC_LINEAR;
 				if (maxlevel < cast_level) cast_level = 0;
 			}
@@ -823,20 +823,20 @@ pay_spell(unit * u, const spell * sp, int cast_level, int range)
 	int k;
 	int resuse;
 
-	for (k = 0; k != MAXINGREDIENT; k++) {
-		if (sp->komponenten[k][0] == R_AURA) {
+	for (k = 0; sp->components[k].type; k++) {
+		if (sp->components[k].type == r_aura) {
 			resuse = spellcost(u, sp) * range;
 		} else {
-			resuse = sp->komponenten[k][1] * range;
+			resuse = sp->components[k].amount * range;
 		}
 
-		if (sp->komponenten[k][2] == SPC_LINEAR
-				|| sp->komponenten[k][2] == SPC_LEVEL)
+		if (sp->components[k].cost == SPC_LINEAR
+				|| sp->components[k].cost == SPC_LEVEL)
 		{
 			resuse *= cast_level;
 		}
 
-		use_pooled(u, u->region, sp->komponenten[k][0], resuse);
+		new_use_pooled(u, sp->components[k].type, resuse, GET_DEFAULT);
 	}
 }
 
@@ -888,7 +888,6 @@ boolean
 cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
 {
 	int k;
-	resource_t res;
 	int itemanz;
 	boolean b = true;
 
@@ -904,21 +903,21 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
 		return false;
 	}
 
-	for (k = 0; k < MAXINGREDIENT; k++) {
-		if (sp->komponenten[k][1] > 0) {
-			res = sp->komponenten[k][0];
+	for (k = 0; sp->components[k].type; ++k) {
+		if (sp->components[k].amount > 0) {
+			const resource_type * rtype = sp->components[k].type;
 
 			/* Die Kosten für Aura sind auch von der Zahl der bereits
 			 * gezauberten Sprüche abhängig */
-			if (sp->komponenten[k][0] == R_AURA) {
+			if (rtype == r_aura) {
 				itemanz = spellcost(u, sp) * range;
 			} else {
-				itemanz = sp->komponenten[k][1] * range;
+				itemanz = sp->components[k].amount * range;
 			}
 
 			/* sind die Kosten stufenabhängig, so muss itemanz noch mit dem
 			 * level multipliziert werden */
-			switch(sp->komponenten[k][2]) {
+			switch(sp->components[k].cost) {
 				case SPC_LEVEL:
 				case SPC_LINEAR:
 					itemanz *= level;
@@ -928,7 +927,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
 					break;
 			}
 
-			if (get_pooled(u, u->region, res) < itemanz) {
+			if (new_get_pooled(u, rtype, GET_DEFAULT) < itemanz) {
 				if (b == false) {
 					/* es fehlte schon eine andere Komponente, wir basteln die
 					 * Meldung weiter zusammen */
@@ -939,7 +938,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
         }
 				icat(itemanz);
         scat(" ");
-				scat(LOC(u->faction->locale, resname(res, itemanz!=1)));
+        scat(LOC(u->faction->locale, resourcename(rtype, (itemanz!=1)?NMF_PLURAL:0)));
 			}
 		}
 	}
@@ -2755,10 +2754,7 @@ magic(void)
 const char *
 spell_info(const spell * sp, const struct locale * lang)
 {
-	if (sp->info==NULL) {
-		return LOC(lang, mkname("spellinfo", sp->sname));
-	}
-	return sp->info;
+	return LOC(lang, mkname("spellinfo", sp->sname));
 }
 
 const char *

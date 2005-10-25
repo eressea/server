@@ -100,10 +100,7 @@ use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 		return ECUSTOM;
 	}
 
-	if (ptype->use) {
-		int nRetval = ptype->use(u, ptype, amount, ord);
-		if (nRetval) return nRetval;
-	} else if (ptype==oldpotiontype[P_LIFE]) {
+	if (ptype==oldpotiontype[P_LIFE]) {
 		region * r = u->region;
 		int holz = 0;
 

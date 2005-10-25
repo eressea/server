@@ -145,17 +145,22 @@ typedef int (*cspell_f) (struct fighter*, int, double, const struct spell * sp);
 /* zauber-patzer: */
 typedef void (*pspell_f) (castorder *);
 
+typedef struct spell_component {
+  const struct resource_type * type;
+  int amount;
+  int cost;
+} spell_component;
+
 typedef struct spell {
 	spellid_t id;
-	const char *sname;
-	const char *info;
-	const char *syntax;
-	const char *parameter;
+	char *sname;
+	char *syntax;
+	char *parameter;
 	magic_t magietyp;
 	int sptyp;
 	char rank;  /* Reihenfolge der Zauber */
 	int level;  /* Stufe des Zaubers */
-	resource_t komponenten[MAXINGREDIENT][3];
+	struct spell_component * components;
 	spell_f sp_function;
 	void (*patzer) (castorder*);
 } spell;

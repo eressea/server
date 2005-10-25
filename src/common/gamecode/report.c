@@ -402,7 +402,6 @@ static void
 report_spell(FILE * F, spellid_t id, const struct locale * lang)
 {
 	int k, itemanz, costtyp;
-  resource_t res;
 	int dh = 0;
 	spell *sp = find_spellbyid(id);
   char * bufp;
@@ -430,13 +429,13 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
 
 	strcpy(buf, "Komponenten:");
 	rps(F, buf);
-	for (k = 0; k < MAXINGREDIENT; k++) {
-		res = sp->komponenten[k][0];
-		itemanz = sp->komponenten[k][1];
-		costtyp = sp->komponenten[k][2];
-		if(itemanz > 0){
+	for (k = 0; sp->components[k].type; ++k) {
+		const resource_type * rtype = sp->components[k].type;
+		itemanz = sp->components[k].amount;
+		costtyp = sp->components[k].cost;
+		if (itemanz > 0){
       if (sp->sptyp & SPELLLEVEL) {
-        bufp = buf + sprintf(buf, "  %d %s", itemanz, LOC(lang, resname(res, itemanz!=1)));
+        bufp = buf + sprintf(buf, "  %d %s", itemanz, LOC(lang, resourcename(rtype, itemanz!=1)));
         if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR ) {
           bufp += strxcpy(bufp, " * Stufe");
         }
@@ -444,7 +443,7 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
         if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR ) {
           itemanz *= sp->level;
         }
-        sprintf(buf, "  %d %s", itemanz, LOC(lang, resname(res, itemanz!=1)));
+        sprintf(buf, "  %d %s", itemanz, LOC(lang, resourcename(rtype, itemanz!=1)));
       }
 			rps(F, buf);
 		}

@@ -52,32 +52,6 @@ enum {
 	NOPOTION = (potion_t) - 1
 };
 
-enum {
-	H_PLAIN_1,
-	H_PLAIN_2,
-	H_PLAIN_3,
-	H_FOREST_1,
-	H_FOREST_2,
-	H_FOREST_3,
-	H_SWAMP_1,
-	H_SWAMP_2,
-	H_SWAMP_3,
-	H_DESERT_1,
-	H_DESERT_2,
-	H_DESERT_3,
-	H_HIGHLAND_1,
-	H_HIGHLAND_2,
-	H_HIGHLAND_3,
-	H_MOUNTAIN_1,
-	H_MOUNTAIN_2,
-	H_MOUNTAIN_3,
-	H_GLACIER_1,
-	H_GLACIER_2,
-	H_GLACIER_3,
-	MAX_HERBS,
-	NOHERB = (herb_t) - 1
-};
-
 herb_t rherb2herb(struct region *r);
 void herbsearch(struct region * r, struct unit * u, int max);
 int use_potion(struct unit * u, const struct item_type * itype, int amount, struct order *);

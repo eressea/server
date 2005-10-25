@@ -55,6 +55,32 @@ potion_type * potiontypes;
 #define IMAXHASH 127
 static item_type * itemtypes[IMAXHASH];
 
+enum {
+  H_PLAIN_1,
+  H_PLAIN_2,
+  H_PLAIN_3,
+  H_FOREST_1,
+  H_FOREST_2,
+  H_FOREST_3,
+  H_SWAMP_1,
+  H_SWAMP_2,
+  H_SWAMP_3,
+  H_DESERT_1,
+  H_DESERT_2,
+  H_DESERT_3,
+  H_HIGHLAND_1,
+  H_HIGHLAND_2,
+  H_HIGHLAND_3,
+  H_MOUNTAIN_1,
+  H_MOUNTAIN_2,
+  H_MOUNTAIN_3,
+  H_GLACIER_1,
+  H_GLACIER_2,
+  H_GLACIER_3,
+  MAX_HERBS,
+  NOHERB = (herb_t) - 1
+};
+
 static int
 res_changeaura(unit * u, const resource_type * rtype, int delta)
 {
@@ -351,8 +377,9 @@ rt_find(const char * name)
 	unsigned int hash = hashstring(name);
 	resource_type * rtype;
 
-	for (rtype=resourcetypes; rtype; rtype=rtype->next)
-		if (rtype->hashkey==hash && !strcmp(rtype->_name[0], name)) break;
+  for (rtype=resourcetypes; rtype; rtype=rtype->next) {
+    if (rtype->hashkey==hash && !strcmp(rtype->_name[0], name)) break;
+  }
 
 	return rtype;
 }
@@ -1198,285 +1225,11 @@ init_olditems(void)
 	}
 }
 
-const char *herbdata[3][MAXHERBS] =
-{
-	{
-		"Flachwurz",           /* PLAIN_1 */
-		"Würziger Wagemut",    /* PLAIN_2 */
-		"Eulenauge",           /* PLAIN_3 */
-		"Grüner Spinnerich",   /* H_FOREST_1 */
-		"Blauer Baumringel",
-		"Elfenlieb",
-		"Gurgelkraut",         /* SWAMP_1 */
-		"Knotiger Saugwurz",
-		"Blasenmorchel",		   /* SWAMP_3 */
-		"Wasserfinder",
-		"Kakteenschwitz",
-		"Sandfäule",
-		"Windbeutel",			/* HIGHLAND_1 */
-		"Fjordwuchs",
-		"Alraune",
-		"Steinbeißer",	/* MOUNTAIN_1 */
-		"Spaltwachs",
-		"Höhlenglimm",
-		"Eisblume",	/* GLACIER_1 */
-		"Weißer Wüterich",
-		"Schneekristall"
-	},
-	{
-		"Flachwurz",
-		"Würzige Wagemut",
-		"Eulenaugen",
-		"Grüne Spinneriche",
-		"Blaue Baumringel",
-		"Elfenlieb",
-		"Gurgelkräuter",
-		"Knotige Saugwurze",
-		"Blasenmorcheln",
-		"Wasserfinder",
-		"Kakteenschwitze",
-		"Sandfäulen",
-		"Windbeutel",
-		"Fjordwuchse",
-		"Alraunen",
-		"Steinbeißer",
-		"Spaltwachse",
-		"Höhlenglimme",
-		"Eisblumen",
-		"Weiße Wüteriche",
-		"Schneekristalle"
-	},
-	{
-		"4",
-		"10",
-		"7",
-		"2",
-		"4",
-		"1",
-		"5",
-		"5",
-		"4",
-		"3",
-		"3",
-		"5",
-		"4",
-		"6",
-		"1",
-		"3",
-		"1",
-		"5",
-		"1",
-		"1",
-		"3"
-	}
-};
-
-void
-init_oldherbs(void)
-{
-	herb_t h;
-	const char * names[2];
-	const char * appearance[2] = { "herbbag", "herbbag" };
-
-	const struct locale * lang = find_locale("de");
-	assert(lang);
-
-	for (h=0;h!=MAXHERBS;++h) {
-		item_type * itype;
-		resource_type * rtype;
-
-		names[0] = NULL;
-		{
-			int ci;
-			for (ci=0;translation[ci][0];++ci) {
-				if (!strcmp(translation[ci][0], herbdata[0][h])) {
-					names[0] = translation[ci][1];
-					names[1] = translation[ci][2];
-				}
-			}
-		}
-		if (!names[0]) {
-			names[0] = reverse_lookup(lang, herbdata[0][h]);
-			names[1] = reverse_lookup(lang, herbdata[1][h]);
-		}
-
-		rtype = new_resourcetype(names, appearance, RTF_ITEM|RTF_POOLED);
-		itype = new_itemtype(rtype, ITF_HERB, 0, 0);
-
-		oldresourcetype[herb2res(h)] = rtype;
-	}
-}
-
 const item_type *
 oldherbtype(herb_t h)
 {
   return oldresourcetype[herb2res(h)]->itype;
 }
-
-
-static const char *potionnames[3][MAXPOTIONS] =
-{
-	{
-		/* Stufe 1: */
-		"Siebenmeilentee",
-		"Goliathwasser",
-		"Wasser des Lebens",
-		/* Stufe 2: */
-		"Schaffenstrunk",
-		"Wundsalbe",
-		"Bauernblut",
-		/* Stufe 3: */
-		"Gehirnschmalz",
-		"Dumpfbackenbrot",
-		"Nestwärme",
-		"Pferdeglück",
-		"Berserkerblut",
-		/* Stufe 4: */
-		"Bauernlieb",
-		"Trank der Wahrheit",
-		"Elixier der Macht",
-		"Heiltrank"
-	},
-	{
-		/* Stufe 1: */
-		"Siebenmeilentees",
-		"Goliathwasser",
-		"Wasser des Lebens",
-		/* Stufe 2: */
-		"Schaffenstrünke",
-		"Wundsalben",
-		"Bauernblut",
-		/* Stufe 3: */
-		"Gehirnschmalz",
-		"Dumpfbackenbrote",
-		"Nestwärme",
-		"Pferdeglück",
-		"Berserkerblut",
-		/* Stufe 4: */
-		"Bauernlieb",
-		"Tränke der Wahrheit",
-		"Elixiere der Macht",
-		"Heiltränke"
-	},
-	{
-		/* Stufe 1: */
-		"einen Siebenmeilentee",
-		"ein Goliathwasser",
-		"ein Wasser des Lebens",
-		/* Stufe 2: */
-		"einen Schaffenstrunk",
-		"eine Wundsalbe",
-		"ein Bauernblut",
-		/* Stufe 3: */
-		"ein Gehirnschmalz",
-		"ein Dumpfbackenbrot",
-		"eine Nestwärme",
-		"ein Pferdeglück",
-		"ein Berserkerblut",
-		/* Stufe 4: */
-		"ein Bauernlieb",
-		"ein Trank der Wahrheit",
-		"ein Elixier der Macht",
-		"einen Heiltrank"
-	}
-};
-
-int potionlevel[MAXPOTIONS] =
-{
-	1,
-	1,
-	1,
-	2,
-	2,
-	2,
-	3,
-	3,
-	3,
-	3,
-	3,
-	4,
-	1,
-	4,
-	4
-};
-
-#ifdef NEW_RECEIPIES
-herb_t potionherbs[MAXPOTIONS][MAXHERBSPERPOTION] =
-{								/* Benötigte Kräuter */
-	/* Stufe 1: */
-	/* Siebenmeilentee: */
-	{H_FOREST_2, H_HIGHLAND_1, NOHERB, NOHERB, NOHERB, NOHERB},
-	/* Goliathwasser: */
-	{H_SWAMP_1, H_HIGHLAND_2, NOHERB, NOHERB, NOHERB, NOHERB},
-	/* Wasser des Lebens: */
-	{H_FOREST_3, H_SWAMP_2, NOHERB, NOHERB, NOHERB, NOHERB},
-	/* Stufe 2: */
-	/* Schaffenstrunk: */
-	{H_HIGHLAND_3, H_MOUNTAIN_2, H_PLAIN_2, NOHERB, NOHERB, NOHERB},
-	/* Wundsalbe: */
-	{H_GLACIER_2, H_FOREST_2, H_PLAIN_2, NOHERB, NOHERB, NOHERB},
-	/* Bauernblut: */
-	{H_MOUNTAIN_3, H_HIGHLAND_2, H_FOREST_2, NOHERB, NOHERB, NOHERB},
-	/* Stufe 3: */
-	/* Gehirnschmalz: */
-	{H_DESERT_1, H_MOUNTAIN_1, H_HIGHLAND_1, H_SWAMP_1, NOHERB, NOHERB},
-	/* Dumpfbackenbrote: */
-	{H_PLAIN_3, H_FOREST_1, H_MOUNTAIN_3, H_HIGHLAND_2, NOHERB, NOHERB},
-	/* Nestwärme: */
-	{H_GLACIER_1, H_FOREST_1, H_MOUNTAIN_2, H_DESERT_2, NOHERB, NOHERB},
-	/* Pferdeglueck: */
-	{H_FOREST_2, H_DESERT_3, H_DESERT_2, H_SWAMP_2, NOHERB, NOHERB},
-	/* Berserkerblut: */
-	{H_GLACIER_2, H_HIGHLAND_3, H_PLAIN_1, H_DESERT_3, NOHERB, NOHERB},
-	/* Stufe 4: */
-	/* Bauernlieb: */
-	{H_HIGHLAND_3, H_GLACIER_3, H_MOUNTAIN_1, H_SWAMP_3, H_FOREST_3, NOHERB},
-	/* Trank der Wahrheit: */
-	{H_PLAIN_1, H_HIGHLAND_2, NOHERB, NOHERB, NOHERB, NOHERB},
-	/* Elixier der Macht: */
-	{H_FOREST_3, H_DESERT_1, H_HIGHLAND_1, H_FOREST_1, H_SWAMP_3, NOHERB},
-	/* Heiltrank: */
-	{H_SWAMP_1, H_HIGHLAND_1, H_GLACIER_1, H_FOREST_3, H_MOUNTAIN_2, NOHERB}
-};
-#else
-herb_t potionherbs[MAXPOTIONS][MAXHERBSPERPOTION] =
-{								/* Benötigte Kräuter */
-	/* Stufe 1: */
-	/* Siebenmeilentee: */
-	{H_PLAIN_2, H_FOREST_1, H_HIGHLAND_1, NOHERB, NOHERB, NOHERB},
-	/* Goliathwasser: */
-	{H_PLAIN_1, H_SWAMP_3, H_HIGHLAND_2, NOHERB, NOHERB, NOHERB},
-	/* Wasser des Lebens: */
-	{H_FOREST_2, H_PLAIN_1, H_SWAMP_2, NOHERB, NOHERB, NOHERB},
-	/* Stufe 2: */
-	/* Schaffenstrunk: */
-	{H_PLAIN_1, H_HIGHLAND_2, H_MOUNTAIN_1, H_PLAIN_2, NOHERB, NOHERB},
-	/* Scheusalsbier/Wundsalbe: */
-	{H_FOREST_2, H_MOUNTAIN_3, H_FOREST_1, H_PLAIN_3, NOHERB, NOHERB},
-	/* Duft der Rose/Bauernblut: */
-	{H_MOUNTAIN_1, H_HIGHLAND_1, H_FOREST_2, H_PLAIN_2, NOHERB, NOHERB},
-	/* Stufe 3: */
-	/* Gehirnschmalz: */
-	{H_FOREST_1, H_DESERT_1, H_MOUNTAIN_3, H_HIGHLAND_1, H_SWAMP_1, NOHERB},
-	/* Dumpfbackenbrote: */
-	{H_PLAIN_1, H_FOREST_1, H_MOUNTAIN_2, H_SWAMP_2, H_HIGHLAND_1, NOHERB},
-	/* Stahlpasten/Nestwärme: */
-	{H_GLACIER_3, H_FOREST_2, H_MOUNTAIN_3, H_DESERT_1, H_SWAMP_3, NOHERB},
-	/* Pferdeglueck: */
-	{H_FOREST_3, H_DESERT_2, H_HIGHLAND_1, H_MOUNTAIN_1, H_SWAMP_3, NOHERB},
-	/* Berserkerblut: */
-	{H_GLACIER_2, H_MOUNTAIN_1, H_HIGHLAND_1, H_PLAIN_2, H_DESERT_2, NOHERB},
-	/* Stufe 4: */
-	/* Bauernlieb: */
- {H_FOREST_1, H_HIGHLAND_2, H_GLACIER_3, H_MOUNTAIN_2, H_SWAMP_3, H_FOREST_3},
-	/* Riesengras/Trank der Wahrheit: */
-	{H_PLAIN_1, H_SWAMP_3, H_HIGHLAND_1, NOHERB, NOHERB, NOHERB},
-	/* Faulobstschnaps/Elixier der Macht: */
-	{H_FOREST_2, H_DESERT_3, H_HIGHLAND_3, H_FOREST_1, H_SWAMP_2, H_SWAMP_1},
-	/* Heiltrank: */
-	{H_SWAMP_1, H_PLAIN_3, H_HIGHLAND_3, H_GLACIER_1, H_FOREST_1, H_MOUNTAIN_3}
-};
-#endif
 
 static const char *potiontext[MAXPOTIONS] =
 {
@@ -1609,7 +1362,7 @@ heal(unit * user, int effect)
 }
 
 static int
-use_healingpotion(struct unit *user, const struct potion_type *ptype, int amount, struct order * ord)
+use_healingpotion(struct unit *user, const struct item_type *itype, int amount, struct order * ord)
 {
 	int effect = amount * 400;
 	unit * u = user->region->units;
@@ -1620,13 +1373,17 @@ use_healingpotion(struct unit *user, const struct potion_type *ptype, int amount
 		}
 		u = u->next;
 	}
+  new_use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
+  usetpotionuse(user, itype->rtype->ptype);
+
+  ADDMSG(&user->faction->msgs, msg_message("usepotion",
+    "unit potion", user, itype->rtype));
 	return 0;
 }
 
 static int
-use_warmthpotion(struct unit *u, const struct potion_type *ptype, int amount, struct order * ord)
+use_warmthpotion(struct unit *u, const struct item_type *itype, int amount, struct order * ord)
 {
-	assert(ptype==oldpotiontype[P_WARMTH]);
 	if (u->faction->race == new_race[RC_INSECT]) {
 		fset(u, UFL_WARMTH);
 	} else {
@@ -1634,8 +1391,12 @@ use_warmthpotion(struct unit *u, const struct potion_type *ptype, int amount, st
 		cmistake(u, ord, 163, MSG_EVENT);
 		return ECUSTOM;
 	}
-	unused(ptype);
-	return 0;
+  new_use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
+  usetpotionuse(u, itype->rtype->ptype);
+
+  ADDMSG(&u->faction->msgs, msg_message("usepotion",
+    "unit potion", u, itype->rtype));
+  return 0;
 }
 
 static int
@@ -1652,19 +1413,17 @@ use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int 
 	}
 	ADDMSG(&u->faction->msgs, msg_message("givedumb", 
 		"unit recipient amount", u, target, amount));
-	assert(oldpotiontype[P_FOOL]->itype==itype);
-	change_effect(target, oldpotiontype[P_FOOL], amount);
+
+  change_effect(target, itype->rtype->ptype, amount);
 	new_use_pooled(u, itype->rtype, GET_DEFAULT, amount);
 	return 0;
 }
 
 static int
-use_bloodpotion(struct unit *u, const struct potion_type *ptype, int amount, struct order * ord)
+use_bloodpotion(struct unit *u, const struct item_type *itype, int amount, struct order * ord)
 {
-	assert(ptype==oldpotiontype[P_BAUERNBLUT]);
-	unused(ptype);
 	if (u->race == new_race[RC_DAEMON]  ) {
-    change_effect(u, ptype, 100*amount);
+    change_effect(u, itype->rtype->ptype, 100*amount);
 	} else {
     trigger * trestore = trigger_changerace(u, u->race, u->irace);
     int duration = 2 + rand() % 8;
@@ -1672,6 +1431,11 @@ use_bloodpotion(struct unit *u, const struct potion_type *ptype, int amount, str
     add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
     u->irace = u->race = new_race[RC_TOAD];
   }
+  new_use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
+  usetpotionuse(u, itype->rtype->ptype);
+
+  ADDMSG(&u->faction->msgs, msg_message("usepotion",
+    "unit potion", u, itype->rtype));
 	return 0;
 }
 
@@ -1728,85 +1492,17 @@ use_snowball(struct unit * user, const struct item_type * itype, int amount, str
 static void
 init_oldpotions(void)
 {
+  const char * potionnames[MAX_POTIONS] = {
+    "p0", "goliathwater", "p2", "p3", "p4", "peasantblood", "p6", 
+    "p7", "nestwarmth", "p9", "p10", "p11", "truthpotion", "p13",  "p14"
+  };
 	potion_t p;
-	const char * names[2];
-	const char * appearance[2] = { "vial", "vial_p" };
 
-	const struct locale * lang = find_locale("de");
-	assert(lang);
-
-	for (p=0;p!=MAXPOTIONS;++p) {
-		item_type * itype;
-		resource_type * rtype;
-		construction * con = calloc(sizeof(construction), 1);
-		int i = 0;
-		while (i!=MAXHERBSPERPOTION && potionherbs[p][i]!=NOHERB) ++i;
-		if (p==P_BAUERNBLUT || p==P_MACHT) ++i;
-
-		con->materials = calloc(sizeof(requirement), i + 1);
-		for (i=0;i!=MAXHERBSPERPOTION && potionherbs[p][i]!=NOHERB;++i) {
-#ifdef NO_OLD_ITEMS
-                  con->materials[i].rtype = oldresourcetype[herb2res(potionherbs[p][i])];
-#else
-			con->materials[i].type = herb2res(potionherbs[p][i]);
-#endif
-			con->materials[i].number = 1;
-			con->materials[i].recycle = 0;
-		}
-		if (p == P_BAUERNBLUT) {
-			con->materials[i].number = 1;
-			con->materials[i].recycle = 0;
-#ifdef NO_OLD_ITEMS
-			con->materials[i].rtype = oldresourcetype[R_PEASANTS];
-#else
-			con->materials[i].type = R_PEASANTS;
-#endif
-			++i;
-		}
-		else if (p == P_MACHT) {
-			con->materials[i].number = 1;
-			con->materials[i].recycle = 0;
-#ifdef NO_OLD_ITEMS
-			con->materials[i].rtype = oldresourcetype[R_DRACHENBLUT];
-#else
-			con->materials[i].type = R_DRACHENBLUT;
-#endif
-			++i;
-		}
-		con->skill = SK_ALCHEMY;
-		con->minskill = potionlevel[p]*2;
-		con->maxsize = -1;
-		con->reqsize = 1;
-
-		names[0] = NULL;
-		{
-			int ci;
-			for (ci=0;translation[ci][0];++ci) {
-				if (!strcmp(translation[ci][0], potionnames[0][p])) {
-					names[0] = translation[ci][1];
-					names[1] = translation[ci][2];
-				}
-			}
-		}
-		if (!names[0]) {
-			names[0] = reverse_lookup(lang, potionnames[0][p]);
-			names[1] = reverse_lookup(lang, potionnames[1][p]);
-		}
-
-		rtype = new_resourcetype(names, appearance, RTF_ITEM|RTF_POOLED);
-		if (p==P_FOOL) rtype->flags |= RTF_SNEAK;
-		oldresourcetype[potion2res(p)] = rtype;
-		itype = new_itemtype(rtype, ITF_POTION, 0, 0);
-		itype->construction = con;
-		itype->use = use_potion;
-		oldpotiontype[p] = new_potiontype(itype, (terrain_t)p/3);
-		oldpotiontype[p]->level = potionlevel[p];
-		oldpotiontype[p]->text = potiontext[p];
-		if (p==P_FOOL) itype->useonother = &use_foolpotion;
+  for (p=0;p!=MAXPOTIONS;++p) {
+		item_type * itype = it_find(potionnames[p]);
+    itype->rtype->ptype->text = potiontext[p];
+    oldpotiontype[p] = itype->rtype->ptype;
 	}
-	oldpotiontype[P_WARMTH]->use = &use_warmthpotion;
-	oldpotiontype[P_HEILWASSER]->use = &use_healingpotion;
-	oldpotiontype[P_BAUERNBLUT]->use = &use_bloodpotion;	
 }
 
 resource_type * r_silver;
@@ -1924,7 +1620,6 @@ init_resources(void)
 
   /* alte typen registrieren: */
   init_olditems();
-  init_oldherbs();
   init_oldpotions();
   init_oldscores();
 }
@@ -2127,6 +1822,7 @@ register_resources(void)
   register_function((pf_generic)use_birthdayamulet, "usebirthdayamulet");
   register_function((pf_generic)use_warmthpotion, "usewarmthpotion");
   register_function((pf_generic)use_bloodpotion, "usebloodpotion");
+  register_function((pf_generic)use_healingpotion, "usehealingpotion");
   register_function((pf_generic)use_foolpotion, "usefoolpotion");
   register_function((pf_generic)use_mistletoe, "usemistletoe");
   register_function((pf_generic)use_magicboost, "usemagicboost");

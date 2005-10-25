@@ -130,6 +130,22 @@ xml_cleanup_string(xmlChar * str)
   return str;
 }
 
+static const resource_type *
+rt_findorcreate(const char * name)
+{
+  resource_type * rtype = rt_find(name);
+  if (rtype==NULL) {
+    const char * names[2];
+    char * namep = strcat(strcpy((char*)malloc(strlen(name)+3), name), "_p");
+    /* we'll make a placeholder */
+    names[0] = name;
+    names[1] = namep;
+    rtype = new_resourcetype(names, NULL, RTF_NONE);
+    free(namep);
+  }
+  return rtype;
+}
+
 static void
 xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
 {
@@ -147,12 +163,11 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
     const resource_type * rtype;
     resource_t type;
 
-    radd->number = xml_ivalue(node, "quantity", 0);
+    radd->number = xml_ivalue(node, "quantity", 1);
     radd->recycle = xml_fvalue(node, "recycle", 0.0);
 
     property = xmlGetProp(node, BAD_CAST "type");
-    rtype = rt_find((const char*)property);
-    assert(rtype!=NULL);
+    rtype = rt_findorcreate((const char*)property);
     for (type=0;type!=MAX_RESOURCES;++type) {
       if (oldresourcetype[type]==rtype) {
         radd->type = type;
@@ -563,6 +578,16 @@ race_compat(void)
   }
 }
 
+static potion_type *
+xml_readpotion(xmlXPathContextPtr xpath, item_type * itype)
+{
+  int level = xml_ivalue(xpath->node, "level", 0);
+
+  assert(level>0);
+  return new_potiontype(itype, level);
+}
+
+
 static armor_type *
 xml_readarmor(xmlXPathContextPtr xpath, item_type * itype)
 {
@@ -693,6 +718,7 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
 
   if (xml_bvalue(node, "cursed", false)) flags |= ITF_CURSED;
   if (xml_bvalue(node, "notlost", false)) flags |= ITF_NOTLOST;
+  if (xml_bvalue(node, "herb", false)) flags |= ITF_HERB;
   if (xml_bvalue(node, "big", false)) flags |= ITF_BIG;
   if (xml_bvalue(node, "animal", false)) flags |= ITF_ANIMAL;
   itype = new_itemtype(rtype, flags, weight, capacity);
@@ -714,6 +740,17 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     itype->flags |= ITF_WEAPON;
     xpath->node = result->nodesetval->nodeTab[0];
     rtype->wtype = xml_readweapon(xpath, itype);
+  }
+  xmlXPathFreeObject(result);
+
+  /* reading item/potion */
+  xpath->node = node;
+  result = xmlXPathEvalExpression(BAD_CAST "potion", xpath);
+  assert(result->nodesetval->nodeNr<=1);
+  if (result->nodesetval->nodeNr!=0) {
+    itype->flags |= ITF_POTION;
+    xpath->node = result->nodesetval->nodeTab[0];
+    rtype->ptype = xml_readpotion(xpath, itype);
   }
   xmlXPathFreeObject(result);
 
@@ -770,43 +807,56 @@ parse_resources(xmlDocPtr doc)
   xmlNodeSetPtr nodes;
   int i;
 
-  /* make sure old items (used in requirements) are available */
-  init_resources();
-
   /* reading eressea/resources/resource */
   resources = xmlXPathEvalExpression(BAD_CAST "/eressea/resources/resource", xpath);
   nodes = resources->nodesetval;
   for (i=0;i!=nodes->nodeNr;++i) {
     xmlNodePtr node = nodes->nodeTab[i];
-    xmlChar * property;
-    char *names[2], *appearance[2];
+    xmlChar *property, *name, *appearance;
+    const char *names[2], *appearances[2];
+    char * namep = NULL, * appearancep = NULL;
     resource_type * rtype;
     unsigned int flags = RTF_NONE;
     xmlXPathObjectPtr result;
     int k;
 
     if (xml_bvalue(node, "pooled", true)) flags |= RTF_POOLED;
+    if (xml_bvalue(node, "sneak", true)) flags |= RTF_SNEAK;
 
-    property = xmlGetProp(node, BAD_CAST "name");
-    assert(property!=NULL);
-    names[0] = strdup((const char*)property);
-    names[1] = strcat(strcpy((char*)malloc(strlen(names[0])+3), names[0]), "_p");
-    xmlFree(property);
+    name = xmlGetProp(node, BAD_CAST "name");
+    appearance = xmlGetProp(node, BAD_CAST "appearance");
+    assert(name!=NULL);
 
-    property = xmlGetProp(node, BAD_CAST "appearance");
-    if (property!=NULL) {
-      assert(property!=NULL);
-      appearance[0] = strdup((const char*)property);
-      appearance[1] = strcat(strcpy((char*)malloc(strlen(appearance[0])+3), appearance[0]), "_p");
-      rtype = new_resourcetype((const char**)names, (const char**)appearance, flags);
-      xmlFree(property);
-      free(appearance[0]);
-      free(appearance[1]);
-    } else {
-      rtype = new_resourcetype((const char**)names, NULL, flags);
+    if (appearance!=NULL) {
+      appearancep = strcat(strcpy((char*)malloc(strlen((char*)appearance)+3), (char*)appearance), "_p");
     }
-    free(names[0]);
-    free(names[1]);
+
+    rtype = rt_find((const char *)name);
+    if (rtype!=NULL) {
+      /* dependency from another item, was created earlier */
+      rtype->flags |= flags;
+      if (appearance) {
+        rtype->_appearance[0] = strdup((const char*)appearance);
+        rtype->_appearance[1] = appearancep;
+        free(appearancep);
+      }
+    } else {
+      namep = strcat(strcpy((char*)malloc(strlen((char*)name)+3), (char*)name), "_p");
+      names[0] = (const char*)name;
+      names[1] = namep;
+      if (appearance) {
+        appearances[0] = (const char*)appearance;
+        appearances[1] = appearancep;
+        rtype = new_resourcetype((const char**)names, (const char**)appearances, flags);
+        free(appearancep);
+      } else {
+        rtype = new_resourcetype(names, NULL, flags);
+      }
+      free(namep);
+    }
+
+    if (name) xmlFree(name);
+    if (appearance) xmlFree(appearance);
 
     if (gamecode_enabled) {
       /* reading eressea/resources/resource/function */
@@ -891,6 +941,9 @@ parse_resources(xmlDocPtr doc)
   xmlXPathFreeObject(resources);
 
   xmlXPathFreeContext(xpath);
+
+  /* make sure old items (used in requirements) are available */
+  init_resources();
 
   /* old resources now extern (for spells */
   oldresourcetype[R_SWORD] = rt_find("sword");
@@ -1158,32 +1211,29 @@ parse_spells(xmlDocPtr doc)
     /* reading eressea/spells/spell/resource */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "resource", xpath);
-    for (k=0;k!=result->nodesetval->nodeNr && k!=MAXINGREDIENT;++k) {
+    if (result->nodesetval->nodeNr) {
+      sp->components = malloc(sizeof(spell_component)*(result->nodesetval->nodeNr+1));
+      sp->components[result->nodesetval->nodeNr].type = 0;
+    }
+    for (k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
-      resource_t res;
-      sp->komponenten[k][0] = 0;
       property = xmlGetProp(node, BAD_CAST "name");
       assert(property);
-      for (res=0;res!=MAX_RESOURCES;++res) {
-        if (strcmp(oldresourcetype[res]->_name[0], (const char *)property)==0) {
-          sp->komponenten[k][0] = res;
-          break;
-        }
-      }
+      sp->components[k].type = rt_find((const char *)property);
+      assert(sp->components[k].type);
       xmlFree(property);
-      sp->komponenten[k][1] = (resource_t)xml_ivalue(node, "amount", 1);
-      sp->komponenten[k][2] = SPC_FIX;
+      sp->components[k].amount = (resource_t)xml_ivalue(node, "amount", 1);
+      sp->components[k].cost = SPC_FIX;
       property = xmlGetProp(node, BAD_CAST "cost");
       if (property!=NULL) {
         if (strcmp((const char *)property, "linear")==0) {
-          sp->komponenten[k][2] = SPC_LINEAR;
+          sp->components[k].cost = SPC_LINEAR;
         } else if (strcmp((const char *)property, "level")==0) {
-          sp->komponenten[k][2] = SPC_LEVEL;
+          sp->components[k].cost = SPC_LEVEL;
         }
         xmlFree(property);
       }
     }
-    if (k<MAXINGREDIENT) sp->komponenten[k][0] = 0;
     xmlXPathFreeObject(result);
     sp->id = 0; 
     register_spell(sp);
@@ -1496,6 +1546,7 @@ parse_terrains(xmlDocPtr doc)
         property = xmlGetProp(nodeProd, BAD_CAST "name");
         assert(property!=NULL);
         terrain->production[k].type = rt_find((const char*)property);
+        assert(terrain->production[k].type);
         xmlFree(property);
 
         property = xmlGetProp(nodeProd, BAD_CAST "level");

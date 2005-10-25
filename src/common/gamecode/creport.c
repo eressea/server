@@ -983,12 +983,12 @@ cr_reportspell(FILE * F, spellid_t id, const struct locale * lang)
 	if (!(sp->sptyp & NOTFAMILIARCAST)) fputs("1;familiar\n", F);
 	fputs("KOMPONENTEN\n", F);
 
-	for (k = 0; k < MAXINGREDIENT; k++) {
-		resource_t res = sp->komponenten[k][0];
-		int itemanz = sp->komponenten[k][1];
-		int costtyp = sp->komponenten[k][2];
+	for (k = 0; sp->components[k].type; ++k) {
+		const resource_type * rtype = sp->components[k].type;
+		int itemanz = sp->components[k].amount;
+		int costtyp = sp->components[k].cost;
 		if (itemanz > 0) {
-			const char * name = resname(res, 0);
+			const char * name = resourcename(rtype, 0);
 			fprintf(F, "%d %d;%s\n", itemanz, costtyp == SPC_LEVEL || costtyp == SPC_LINEAR,
 				add_translation(name, LOC(lang, name)));
 		}

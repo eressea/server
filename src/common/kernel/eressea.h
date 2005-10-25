@@ -99,7 +99,6 @@ struct building_type;
 /* feature-dis/en-able */
 #define NEW_DRIVE     /* Neuer Algorithmus Transportiere/Fahre */
 #define PARTIAL_STUDY /* Wenn nicht genug Silber vorhanden, wird ein Talent anteilig gelernt */
-#define NEW_RECEIPIES /* Vereinfachte, besser verteilte Kräuterzutaten für Tränke */
 #define GOBLINKILL
 
 #define MONSTER_FACTION 0 /* Die Partei, in der die Monster sind. */

@@ -49,8 +49,8 @@ typedef int (*rtype_uget)(const struct unit * user, const struct resource_type *
 typedef char * (*rtype_name)(const struct resource_type * rtype, int flags);
 typedef struct resource_type {
 	/* --- constants --- */
-	const char * _name[2]; /* wie es heißt */
-	const char * _appearance[2]; /* wie es für andere aussieht */
+	char * _name[2]; /* wie es heißt */
+	char * _appearance[2]; /* wie es für andere aussieht */
 	unsigned int flags;
 	/* --- functions --- */
 	rtype_uchange uchange;
@@ -137,7 +137,6 @@ typedef struct potion_type {
 	const item_type * itype;
 	int level;
 	const char * text;
-	int (*use)(struct unit *, const struct potion_type *, int, struct order *);
 } potion_type;
 extern potion_type * potiontypes;
 
