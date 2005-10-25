@@ -1242,9 +1242,10 @@ create_island(region *r, int n, terrain_t t)
 			}
 			r2 = findregion(x,y);
 			if (r2 && fval(r2->terrain, SEA_REGION)) {
+        terrain_t t = choose_terrain(oldterrain(r2->terrain));
 				r2->msgs = (void *)d;
 				push(r2);
-				abbruch=Create_Island(r2,&n,choose_terrain(r->terrain),sx,sy);
+				abbruch = Create_Island(r2, &n, newterrain(t), sx, sy);
 			}
 			if (abbruch) break;
 		}
