@@ -30,7 +30,6 @@ enum {
 void createmonsters(void);
 void addunit(void);
 void makeblock(int x1, int y1, char chaos);
-void listnames(void);
 void writemap(FILE * F, int mode);
 
 void regionspells(void);

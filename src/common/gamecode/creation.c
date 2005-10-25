@@ -74,35 +74,6 @@ createmonsters(void)
   fhash(f);
 }
 
-/* ------------------------------------------------------------- */
-
-void
-listnames(void)
-{
-	region *r;
-	size_t i;
-
-	puts("Die Liste der benannten Regionen ist:");
-
-	i = 0;
-	for (r = regions; r; r = r->next)
-		if (rterrain(r) != T_OCEAN) {
-			printf("%s,", rname(r, NULL));
-			i += strlen(rname(r, NULL)) + 1;
-
-			while (i % 15) {
-				printf(" ");
-				i++;
-			}
-
-			if (i > 60) {
-				printf("\n");
-				i = 0;
-			}
-		}
-	printf("\n");
-}
-
 static char
 factionsymbols(region * r)
 {
