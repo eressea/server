@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+
+<terrains>
+  <!-- defaults: walk="yes" sail="yes" fly="yes" shallow="yes" swim="no" forest="no" sea="no" land="yes" forbidden="no" arctic="no" cavalry="no" -->
+  <terrain name="hell" fly="no" sail="no" size="0" land="no"/>
+</terrains>
