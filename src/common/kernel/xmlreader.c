@@ -471,7 +471,7 @@ parse_ships(xmlDocPtr doc)
     xmlChar * property;
     ship_type * st = calloc(sizeof(ship_type), 1);
     xmlXPathObjectPtr result;
-    int k;
+    int k, c;
 
     property = xmlGetProp(node, BAD_CAST "name");
     assert(property!=NULL);
@@ -500,7 +500,7 @@ parse_ships(xmlDocPtr doc)
 	/* reading eressea/ships/ship/coast */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "coast", xpath);
-    for (k=0;k!=result->nodesetval->nodeNr;) {
+    for (c=0,k=0;k!=result->nodesetval->nodeNr;++k) {
       xmlNodePtr node = result->nodesetval->nodeTab[k];
 
       if (k==0) {
@@ -511,8 +511,8 @@ parse_ships(xmlDocPtr doc)
 
       property = xmlGetProp(node, BAD_CAST "terrain");
       assert(property!=NULL);
-      st->coasts[k] = get_terrain((const char*)property);
-      if (st->coasts[k]!=NULL) ++k;
+      st->coasts[c] = get_terrain((const char*)property);
+      if (st->coasts[c]!=NULL) ++c;
       else {
         log_warning(("ship %s mentions a non-existing terrain %s.\n", st->name[0], property));
       }
