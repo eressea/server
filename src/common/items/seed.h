@@ -19,12 +19,10 @@ extern "C" {
 #endif
 
 
-extern struct item_type it_seed;
-extern struct resource_type rt_seed;
+extern struct resource_type * rt_seed;
 extern void register_seed(void);
 
-extern struct item_type it_mallornseed;
-extern struct resource_type rt_mallornseed;
+extern struct resource_type * rt_mallornseed;
 extern void register_mallornseed(void);
 
 #ifdef __cplusplus

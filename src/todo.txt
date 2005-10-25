@@ -16,6 +16,7 @@ Code cleanup:
 - age branch (store birthdate instead of age)
 - give monsters name with lua
 - kick init_oldherbs out (good for terrain)
+- allocators aus economy nach XML
 
 Larger Features:
 - eressea (b/g)zip reports?

@@ -27,37 +27,20 @@
 /* libc includes */
 #include <assert.h>
 
-resource_type rt_seed = {
-	{ "seed", "seed_p" },
-	{ "seed", "seed_p" },
-	RTF_ITEM|RTF_LIMITED,
-	&res_changeitem
-};
-
-static construction con_seed = {
-	SK_HERBALISM, 3,  /* skill, minskill */
-	-1, 1             /* maxsize, reqsize [,materials] */
-};
-
-item_type it_seed = {
-	&rt_seed,    /* resourcetype */
-	0, 10, 0,    /* flags, weight, capacity */
-	&con_seed,   /* construction */
-	NULL,        /* use */
-	NULL         /* give */
-};
+resource_type * rt_seed = 0;
+resource_type * rt_mallornseed = 0;
 
 static void
 produce_seeds(region * r, const resource_type * rtype, int norders)
 {
-	assert(rtype==&rt_seed && r->land && r->land->trees[0] >= norders);
+	assert(rtype==rt_seed && r->land && r->land->trees[0] >= norders);
 	r->land->trees[0] -= norders;
 }
 
 static int
 limit_seeds(const region * r, const resource_type * rtype)
 {
-	assert(rtype==&rt_seed);
+	assert(rtype==rt_seed);
 	if(fval(r, RF_MALLORN)) return 0;
 	return r->land?r->land->trees[0]:0;
 }
@@ -66,46 +49,24 @@ void
 register_seed(void)
 {
 	attrib * a;
+  resource_limit * rdata;
 
-	it_register(&it_seed);
-	it_seed.rtype->flags |= RTF_LIMITED;
-	it_seed.rtype->itype->flags |= ITF_NOBUILDBESIEGED;
-	it_seed.rtype->flags |= RTF_POOLED;
+	rt_seed = rt_find("seed");
+  assert(rt_seed!=NULL);
+	rt_seed->itype->flags |= ITF_NOBUILDBESIEGED;
 
-	a = a_add(&it_seed.rtype->attribs, a_new(&at_resourcelimit));
-	{
-		resource_limit * rdata = (resource_limit*)a->data.v;
-		rdata->limit = limit_seeds;
-		rdata->use = produce_seeds;
-	}
+	a = a_add(&rt_seed->attribs, a_new(&at_resourcelimit));
+	rdata = (resource_limit*)a->data.v;
+	rdata->limit = limit_seeds;
+	rdata->use = produce_seeds;
 }
 
 /* mallorn */
 
-resource_type rt_mallornseed = {
-	{ "mallornseed", "mallornseed_p" },
-	{ "mallornseed", "mallornseed_p" },
-	RTF_ITEM|RTF_LIMITED,
-	&res_changeitem
-};
-
-static construction con_mallornseed = {
-	SK_HERBALISM, 4,  /* skill, minskill */
-	-1, 1             /* maxsize, reqsize [,materials] */
-};
-
-item_type it_mallornseed = {
-	&rt_mallornseed,    /* resourcetype */
-	0, 10, 0,    /* flags, weight, capacity */
-	&con_mallornseed,   /* construction */
-	NULL,        /* use */
-	NULL         /* give */
-};
-
 static void
 produce_mallornseeds(region * r, const resource_type * rtype, int norders)
 {
-	assert(rtype==&rt_mallornseed && r->land && r->land->trees[0] >= norders);
+	assert(rtype==rt_mallornseed && r->land && r->land->trees[0] >= norders);
 	assert(fval(r, RF_MALLORN));
 	r->land->trees[0] -= norders;
 }
@@ -113,8 +74,8 @@ produce_mallornseeds(region * r, const resource_type * rtype, int norders)
 static int
 limit_mallornseeds(const region * r, const resource_type * rtype)
 {
-	assert(rtype==&rt_mallornseed);
-	if(! fval(r, RF_MALLORN)) {
+	assert(rtype==rt_mallornseed);
+	if (!fval(r, RF_MALLORN)) {
 		return 0;
 	}
 	return r->land?r->land->trees[0]:0;
@@ -124,20 +85,16 @@ void
 register_mallornseed(void)
 {
 	attrib * a;
+  resource_limit * rdata;
 
-	it_register(&it_mallornseed);
-	it_mallornseed.rtype->flags |= RTF_LIMITED;
-	it_mallornseed.rtype->itype->flags |= ITF_NOBUILDBESIEGED;
-	it_mallornseed.rtype->flags |= RTF_POOLED;
-	register_function((pf_generic)limit_seeds, "limit_seeds");
-	register_function((pf_generic)produce_seeds, "produce_seeds");
-	register_function((pf_generic)limit_mallornseeds, "limit_mallornseeds");
-	register_function((pf_generic)produce_mallornseeds, "produce_mallornseeds");
+	rt_mallornseed = rt_find("mallornseed");
+  assert(rt_mallornseed!=NULL);
+	rt_mallornseed->flags |= RTF_LIMITED;
+	rt_mallornseed->itype->flags |= ITF_NOBUILDBESIEGED;
+	rt_mallornseed->flags |= RTF_POOLED;
 	
-	a = a_add(&it_mallornseed.rtype->attribs, a_new(&at_resourcelimit));
-	{
-		resource_limit * rdata = (resource_limit*)a->data.v;
-		rdata->limit = limit_mallornseeds;
-		rdata->use = produce_mallornseeds;
-	}
+	a = a_add(&rt_mallornseed->attribs, a_new(&at_resourcelimit));
+	rdata = (resource_limit*)a->data.v;
+	rdata->limit = limit_mallornseeds;
+	rdata->use = produce_mallornseeds;
 }

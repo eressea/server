@@ -2385,7 +2385,7 @@ static void
 planttrees(region *r, unit *u, int raw)
 {
 	int n, i, skill, planted = 0;
-	const item_type * itype;
+	const resource_type * rtype;
 
 	if (!fval(r->terrain, LAND_REGION)) {
 		return;
@@ -2393,9 +2393,9 @@ planttrees(region *r, unit *u, int raw)
 
 	/* Mallornbäume kann man nur in Mallornregionen züchten */
 	if (fval(r, RF_MALLORN)) {
-		itype = &it_mallornseed;
+		rtype = rt_mallornseed;
 	} else {
-		itype = &it_seed;
+		rtype = rt_seed;
 	}
 
 	/* Skill prüfen */
@@ -2403,22 +2403,21 @@ planttrees(region *r, unit *u, int raw)
 	if (skill < 6) {
 		add_message(&u->faction->msgs,
 			msg_feedback(u, u->thisorder, "plant_skills",
-			"skill minskill product", SK_HERBALISM, 6, itype->rtype, 1));
+			"skill minskill product", SK_HERBALISM, 6, rtype, 1));
 		return;
 	}
 	if (fval(r, RF_MALLORN) && skill < 7 ) {
 		add_message(&u->faction->msgs,
 			msg_feedback(u, u->thisorder, "plant_skills",
-			"skill minskill product", SK_HERBALISM, 7, itype->rtype, 1));
+			"skill minskill product", SK_HERBALISM, 7, rtype, 1));
 		return;
 	}
 
-	n = new_get_pooled(u, itype->rtype, GET_DEFAULT);
+	n = new_get_pooled(u, rtype, GET_DEFAULT);
 	/* Samen prüfen */
 	if (n==0) {
 		add_message(&u->faction->msgs,
-			msg_feedback(u, u->thisorder, "resource_missing", "missing",
-			itype->rtype));
+			msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
 		return;
 	}
 
@@ -2434,10 +2433,10 @@ planttrees(region *r, unit *u, int raw)
 
 	/* Alles ok. Abziehen. */
 	produceexp(u, SK_HERBALISM, u->number);
-	new_use_pooled(u, itype->rtype, GET_DEFAULT, n);
+	new_use_pooled(u, rtype, GET_DEFAULT, n);
 
 	ADDMSG(&u->faction->msgs, msg_message("plant",
-		"unit region amount herb", u, r, planted, itype->rtype));
+		"unit region amount herb", u, r, planted, rtype));
 }
 
 /* züchte bäume */
@@ -2445,7 +2444,7 @@ static void
 breedtrees(region *r, unit *u, int raw)
 {
 	int n, i, skill, planted = 0;
-	const item_type * itype;
+	const resource_type * rtype;
 	static int current_season = -1;
   
   if (current_season<0) current_season = get_gamedate(turn, NULL)->season;
@@ -2462,9 +2461,9 @@ breedtrees(region *r, unit *u, int raw)
 
 	/* Mallornbäume kann man nur in Mallornregionen züchten */
 	if (fval(r, RF_MALLORN)) {
-		itype = &it_mallornseed;
+		rtype = rt_mallornseed;
 	} else {
-		itype = &it_seed;
+		rtype = rt_seed;
 	}
 
 	/* Skill prüfen */
@@ -2473,12 +2472,11 @@ breedtrees(region *r, unit *u, int raw)
 		planttrees(r, u, raw);
 		return;
 	}
-	n = new_get_pooled(u, itype->rtype, GET_DEFAULT);
+	n = new_get_pooled(u, rtype, GET_DEFAULT);
 	/* Samen prüfen */
 	if (n==0) {
 		add_message(&u->faction->msgs,
-			msg_feedback(u, u->thisorder, "resource_missing", "missing",
-			itype->rtype));
+			msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
 		return;
 	}
 
@@ -2494,10 +2492,10 @@ breedtrees(region *r, unit *u, int raw)
 
 	/* Alles ok. Abziehen. */
 	produceexp(u, SK_HERBALISM, u->number);
-	new_use_pooled(u, itype->rtype, GET_DEFAULT, n);
+	new_use_pooled(u, rtype, GET_DEFAULT, n);
 
 	add_message(&u->faction->msgs, new_message(u->faction,
-		"plant%u:unit%r:region%i:amount%X:herb", u, r, planted, itype->rtype));
+		"plant%u:unit%r:region%i:amount%X:herb", u, r, planted, rtype));
 }
 
 static void
@@ -2507,7 +2505,7 @@ plant_cmd(unit *u, struct order * ord)
 	int m;
 	const char *s;
 	param_t p;
-	const item_type * itype = NULL;
+	const resource_type * rtype = NULL;
 
   if (r->land==NULL) {
     /* TODO: error message here */
@@ -2527,11 +2525,11 @@ plant_cmd(unit *u, struct order * ord)
 		m = INT_MAX;
 	}
 
-	if(!s[0]){
+	if (!s[0]) {
 		p = P_ANY;
 	} else {
 		p = findparam(s, u->faction->locale);
-		itype = finditemtype(s, u->faction->locale);
+		rtype = findresourcetype(s, u->faction->locale);
 	}
 
 	if (p==P_HERBS){
@@ -2542,8 +2540,8 @@ plant_cmd(unit *u, struct order * ord)
 		breedtrees(r, u, m);
 		return;
 	}
-	else if (itype!=NULL){
-		if (itype==&it_mallornseed || itype==&it_seed) {
+	else if (rtype!=NULL){
+		if (rtype==rt_mallornseed || rtype==rt_seed) {
 			breedtrees(r, u, m);
 			return;
 		}
@@ -3240,6 +3238,6 @@ init_economy(void)
   add_allocator(make_allocator(item2resource(olditemtype[I_STONE]), leveled_allocation));
   add_allocator(make_allocator(item2resource(olditemtype[I_IRON]), leveled_allocation));
   add_allocator(make_allocator(item2resource(olditemtype[I_LAEN]), leveled_allocation));
-  add_allocator(make_allocator(&rt_seed, attrib_allocation));
-  add_allocator(make_allocator(&rt_mallornseed, attrib_allocation));
+  add_allocator(make_allocator(rt_seed, attrib_allocation));
+  add_allocator(make_allocator(rt_mallornseed, attrib_allocation));
 }
