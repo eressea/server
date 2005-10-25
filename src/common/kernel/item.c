@@ -663,41 +663,6 @@ change_item(unit * u, item_t it, int value)
 	return i->number;
 }
 
-/*** alte herbs ***/
-
-int
-get_herb(const unit * u, herb_t h)
-{
-	const item_type * type = oldherbtype[h]->itype;
-	item * it = *i_find((item**)&u->items, type);
-	return it?it->number:0;
-}
-
-int
-set_herb(unit * u, herb_t h, int value)
-{
-	const item_type * type = oldherbtype[h]->itype;
-	item * i = *i_find((item**)&u->items, type);
-	if (!i) i = i_add(&u->items, i_new(type, value));
-	else i->number = value;
-	return value;
-}
-
-int
-change_herb(unit * u, herb_t h, int value)
-{
-	const item_type * type = oldherbtype[h]->itype;
-	item * i = *i_find(&u->items, type);
-	if (!i) {
-		if (!value) return 0;
-		assert(value>0);
-		i = i_add(&u->items, i_new(type, value));
-	} else {
-		i->number += value;
-	}
-	return i->number;
-}
-
 /*** alte potions ***/
 
 int

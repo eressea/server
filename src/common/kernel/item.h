@@ -457,10 +457,6 @@ int get_item(const struct unit *, item_t);
 int set_item(struct unit *, item_t, int);
 int change_item(struct unit *, item_t, int);
 
-int get_herb(const struct unit *, herb_t);
-int set_herb(struct unit *, herb_t, int);
-int change_herb(struct unit *, herb_t, int);
-
 int get_potion(const struct unit *, potion_t);
 
 int get_money(const struct unit *);

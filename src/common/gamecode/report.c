@@ -3231,35 +3231,6 @@ writemonument(void)
 
 	fclose(F);
 
-#ifdef OLD_ITEMS
-	{
-		char zText[MAX_PATH];
-		sprintf(zText, "%s/news-silly", basepath());
-		F = cfopen(zText, "w");
-		if (!F) return;
-	}
-	for (f=factions;f;f=f->next) {
-		unit * u;
-		int k;
-		int count = 0;
-		for (u=f->units;u;u=u->nextF) {
-			count += get_herb(u, h);
-		}
-		for (i=0;i!=3;++i) if (count<fjord[i].size) break;
-		if (i) {
-			for (k=0;k<i-1;++k) fjord[k] = fjord[k+1];
-			fjord[i-1].size=count;
-			fjord[i-1].f=f;
-		}
-	}
-	fprintf(F, "\n\nBesitzer der größten %shaufen:\n", herbdata[0][h]);
-	for (i=0;i!=3;++i) {
-		fprintf(F, "  %s (%d Stück)\n", factionname(fjord[2-i].f), fjord[2-i].size);
-	}
-	fclose(F);
-#else
-	printf("!! news-silly not implemented\n");
-#endif
 }
 
 static void
