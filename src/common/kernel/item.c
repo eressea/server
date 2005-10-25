@@ -620,7 +620,6 @@ give_horses(const unit * s, const unit * d, const item_type * itype, int n, stru
 
 item_type * olditemtype[MAXITEMS+1];
 resource_type * oldresourcetype[MAXRESOURCES+1];
-herb_type * oldherbtype[MAXHERBS+1];
 luxury_type * oldluxurytype[MAXLUXURIES+1];
 potion_type * oldpotiontype[MAXPOTIONS+1];
 
@@ -1327,7 +1326,6 @@ init_oldherbs(void)
 
 	for (h=0;h!=MAXHERBS;++h) {
 		item_type * itype;
-		terrain_t t;
 		resource_type * rtype;
 
 		names[0] = NULL;
@@ -1348,12 +1346,16 @@ init_oldherbs(void)
 		rtype = new_resourcetype(names, appearance, RTF_ITEM|RTF_POOLED);
 		itype = new_itemtype(rtype, ITF_HERB, 0, 0);
 
-		t = (terrain_t)(h/3+1);
-		if (t>T_PLAIN) --t;
-		oldherbtype[h] = new_herbtype(itype, t);
 		oldresourcetype[herb2res(h)] = rtype;
 	}
 }
+
+const resource_type *
+newherbtype(herb_t h)
+{
+  return oldresourcetype[herb2res(h)];
+}
+
 
 static const char *potionnames[3][MAXPOTIONS] =
 {
@@ -1787,7 +1789,7 @@ init_oldpotions(void)
 		con->materials = calloc(sizeof(requirement), i + 1);
 		for (i=0;i!=MAXHERBSPERPOTION && potionherbs[p][i]!=NOHERB;++i) {
 #ifdef NO_OLD_ITEMS
-			con->materials[i].rtype = oldherbtype[potionherbs[p][i]]->itype->rtype;
+                  con->materials[i].rtype = oldresourcetype[herb2res(potionherbs[p][i])];
 #else
 			con->materials[i].type = herb2res(potionherbs[p][i]);
 #endif

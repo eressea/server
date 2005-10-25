@@ -1199,7 +1199,7 @@ readunit(FILE * F)
 		}
 
 		while ((herb = (herb_t) ri(F)) >= 0) {
-			i_change(&u->items, oldherbtype[herb]->itype, ri(F));
+			i_change(&u->items, newherbtype(herb)->itype, ri(F));
 		}
 	}
 	u->hp = ri(F);
@@ -1440,7 +1440,7 @@ readregion(FILE * F, short x, short y)
 			if (ter > T_GLACIER || ter == T_OCEAN)
 				rsetherbtype(r, NULL);
 			else
-				rsetherbtype(r, oldherbtype[(i-1)+3*(ter-1)]);
+				rsetherbtype(r, newherbtype((i-1)+3*(ter-1))->htype);
 			rsetherbs(r, (short)ri(F));
 		}
 		rsetpeasants(r, ri(F));

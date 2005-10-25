@@ -139,6 +139,7 @@ typedef struct herb_type {
 	terrain_t terrain;
 } herb_type;
 extern herb_type * herbtypes;
+extern const resource_type * newherbtype(herb_t h);
 
 typedef struct potion_type {
 	struct potion_type * next;
@@ -451,7 +452,6 @@ extern struct luxury_type * oldluxurytype[];
 extern struct potion_type * oldpotiontype[];
 extern struct item_type * olditemtype[];
 extern struct resource_type * oldresourcetype[];
-extern struct herb_type * oldherbtype[];
 
 int get_item(const struct unit *, item_t);
 int set_item(struct unit *, item_t, int);
