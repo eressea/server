@@ -193,7 +193,7 @@ create_museum(void)
   const terrain_type * terrain_hall = get_terrain("hall1");
   const terrain_type * terrain_corridor = get_terrain("corridor1");
 
-  assert(terrain_corridor && terrian_hall);
+  assert(terrain_corridor && terrain_hall);
 
 	if (!museum) {
 		museum = create_new_plane(museum_id, "Museum", 9500, 9550,

@@ -34,13 +34,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char * plain_herbs[] = {"Flachwurz", "Würziger Wagemut", "Eulenauge", "Grüner Spinnerich", "Blauer Baumringel", "Elfenlieb", NULL};
-static const char * swamp_herbs[] = {"Gurgelkraut", "Knotiger Saugwurz", "Blasenmorchel", NULL};
-static const char * desert_herbs[] = {"Wasserfinder", "Kakteenschwitz", "Sandfäule", NULL};
-static const char * highland_herbs[] = {"Windbeutel", "Fjordwuchs", "Alraune", NULL};
-static const char * mountain_herbs[] = {"Steinbeißer", "Spaltwachs", "Höhlenglimm", NULL};
-static const char * glacier_herbs[] = {"Eisblume", "Weißer Wüterich", "Schneekristall", NULL};
-
 #define MAXTERRAINS 20
 
 const char * terraindata[] = {

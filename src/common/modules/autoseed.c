@@ -225,13 +225,14 @@ read_newfactions(const char * filename)
   return newfactions;
 }
 
+#ifdef SEED_QUALITY /* does this work? */
 typedef struct seed_t {
   struct region * region;
   struct newfaction * player;
   struct seed_t * next[MAXDIRECTIONS];
 } seed_t;
 
-double
+static double
 get_influence(struct seed_t * seed, struct seed_t * target)
 {
 	double q = 0.0;
@@ -264,7 +265,7 @@ get_influence(struct seed_t * seed, struct seed_t * target)
 	return q;
 }
 
-double
+static double
 get_quality(struct seed_t * seed)
 {
 	double q = 0.0;
@@ -347,6 +348,7 @@ recalc(seed_t * seeds, int nseeds, int nplayers)
 
 	return quality + q;
 }
+#endif
 
 extern int numnewbies;
 
