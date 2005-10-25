@@ -22,7 +22,7 @@ function call_igjarjuk()
   wyrm.hp = 10000
   wyrm.status = 1
   wyrm.magic = "nomagic"
-  wyrm:set_skill("sk_magic", 20)
+  wyrm:set_skill("magic", 20)
   wyrm.aura = 1000
   wyrm.faction:set_policy(laoris.faction, "fight", true)
   wyrm.faction:set_policy(get_faction(atoi36("dpen")), "fight", true)

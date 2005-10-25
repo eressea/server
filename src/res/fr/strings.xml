@@ -1323,91 +1323,91 @@
   </string>
 
   <comment>  Skills</comment>
-  <string name="sk_alchemy">
+  <string name="alchemy">
     <text locale="fr">alchimie</text>
   </string>
-  <string name="sk_armorer">
+  <string name="armorer">
     <text locale="fr">armurier</text>
   </string>
-  <string name="sk_bow">
+  <string name="bow">
     <text locale="fr">arc</text>
   </string>
-  <string name="sk_building">
+  <string name="building">
     <text locale="fr">maçon</text>
   </string>
-  <string name="sk_cartmaking">
+  <string name="cartmaking">
     <text locale="fr">charron</text>
   </string>
-  <string name="sk_catapult">
+  <string name="catapult">
     <text locale="fr">catapulte</text>
   </string>
-  <string name="sk_crossbow">
+  <string name="crossbow">
     <text locale="fr">arbalète</text>
   </string>
-  <string name="sk_entertainment">
+  <string name="entertainment">
     <text locale="fr">divertissement</text>
   </string>
-  <string name="sk_espionage">
+  <string name="espionage">
     <text locale="fr">espionnage</text>
   </string>
-  <string name="sk_forestry">
+  <string name="forestry">
     <text locale="fr">bucheron</text>
   </string>
-  <string name="sk_herbalism">
+  <string name="herbalism">
     <text locale="fr">herboriste</text>
   </string>
-  <string name="sk_magic">
+  <string name="magic">
     <text locale="fr">magie</text>
   </string>
-  <string name="sk_melee">
+  <string name="melee">
     <text locale="fr">mêlée</text>
   </string>
-  <string name="sk_mining">
+  <string name="mining">
     <text locale="fr">mineur</text>
   </string>
-  <string name="sk_perception">
+  <string name="perception">
     <text locale="fr">observation</text>
   </string>
-  <string name="sk_polearm">
+  <string name="polearm">
     <text locale="fr">hast</text>
   </string>
-  <string name="sk_quarrying">
+  <string name="quarrying">
     <text locale="fr">perrayeur</text>
   </string>
-  <string name="sk_riding">
+  <string name="riding">
     <text locale="fr">équitation</text>
   </string>
-  <string name="sk_roadwork">
+  <string name="roadwork">
     <text locale="fr">cantonnier</text>
   </string>
-  <string name="sk_sailing">
+  <string name="sailing">
     <text locale="fr">navigation</text>
   </string>
-  <string name="sk_shipcraft">
+  <string name="shipcraft">
     <text locale="fr">charpentier</text>
   </string>
-  <string name="sk_stamina">
+  <string name="stamina">
     <text locale="fr">endurance</text>
   </string>
-  <string name="sk_stealth">
+  <string name="stealth">
     <text locale="fr">discrétion</text>
   </string>
-  <string name="sk_tactics">
+  <string name="tactics">
     <text locale="fr">tactique</text>
   </string>
-  <string name="sk_taxation">
+  <string name="taxation">
     <text locale="fr">percepteur</text>
   </string>
-  <string name="sk_trade">
+  <string name="trade">
     <text locale="fr">commerce</text>
   </string>
-  <string name="sk_training">
+  <string name="training">
     <text locale="fr">dresseur</text>
   </string>
-  <string name="sk_unarmed">
+  <string name="unarmed">
     <text locale="fr">mains-nues</text>
   </string>
-  <string name="sk_weaponsmithing">
+  <string name="weaponsmithing">
     <text locale="fr">fourbisseur</text>
   </string>
 

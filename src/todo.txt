@@ -8,7 +8,6 @@ Eressea:
 
 Code cleanup:
 - curse type should contain effect-type
-- sk_ prefixes entfernen
 - mehr itemtypes auslagern
 - getstrtoken() - das static loswerden?
 - readline implementieren
@@ -29,7 +28,6 @@ Scripts, etc:
 - XUL for Eressea
 
 Old Terrain still needed:
-- autoseed, qualitätsfunktion
 - random people encounters (get_allies)
 - creating dragons
 - drought curse

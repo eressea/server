@@ -1711,7 +1711,7 @@ use_magicboost(struct unit * user, const struct item_type * itype, int amount, s
   new_use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
   
   a_add(&f->attribs, make_key(atoi36("mbst")));
-  set_level(user, sk_find("sk_magic"), 3);
+  set_level(user, sk_find("magic"), 3);
 
   ADDMSG(&user->faction->msgs, msg_message("use_item",
     "unit item", user, itype->rtype));

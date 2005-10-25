@@ -2024,91 +2024,91 @@
   </string>
 
   <!--Talente: -->
-  <string name="sk_alchemy">
+  <string name="alchemy">
     <text locale="de">Alchemie</text>
   </string>
-  <string name="sk_crossbow">
+  <string name="crossbow">
     <text locale="de">Armbrustschießen</text>
   </string>
-  <string name="sk_stamina">
+  <string name="stamina">
     <text locale="de">Ausdauer</text>
   </string>
-  <string name="sk_mining">
+  <string name="mining">
     <text locale="de">Bergbau</text>
   </string>
-  <string name="sk_bow">
+  <string name="bow">
     <text locale="de">Bogenschießen</text>
   </string>
-  <string name="sk_building">
+  <string name="building">
     <text locale="de">Burgenbau</text>
   </string>
-  <string name="sk_trade">
+  <string name="trade">
     <text locale="de">Handeln</text>
   </string>
-  <string name="sk_melee">
+  <string name="melee">
     <text locale="de">Hiebwaffen</text>
   </string>
-  <string name="sk_forestry">
+  <string name="forestry">
     <text locale="de">Holzfällen</text>
   </string>
-  <string name="sk_catapult">
+  <string name="catapult">
     <text locale="de">Katapultbedienung</text>
   </string>
-  <string name="sk_herbalism">
+  <string name="herbalism">
     <text locale="de">Kräuterkunde</text>
   </string>
-  <string name="sk_magic">
+  <string name="magic">
     <text locale="de">Magie</text>
   </string>
-  <string name="sk_training">
+  <string name="training">
     <text locale="de">Pferdedressur</text>
   </string>
-  <string name="sk_riding">
+  <string name="riding">
     <text locale="de">Reiten</text>
   </string>
-  <string name="sk_armorer">
+  <string name="armorer">
     <text locale="de">Rüstungsbau</text>
   </string>
-  <string name="sk_shipcraft">
+  <string name="shipcraft">
     <text locale="de">Schiffbau</text>
   </string>
-  <string name="sk_sailing">
+  <string name="sailing">
     <text locale="de">Segeln</text>
   </string>
-  <string name="sk_espionage">
+  <string name="espionage">
     <text locale="de">Spionage</text>
   </string>
-  <string name="sk_polearm">
+  <string name="polearm">
     <text locale="de">Stangenwaffen</text>
   </string>
-  <string name="sk_quarrying">
+  <string name="quarrying">
     <text locale="de">Steinbau</text>
   </string>
-  <string name="sk_taxation">
+  <string name="taxation">
     <text locale="de">Steuereintreiben</text>
   </string>
-  <string name="sk_roadwork">
+  <string name="roadwork">
     <text locale="de">Straßenbau</text>
   </string>
-  <string name="sk_tactics">
+  <string name="tactics">
     <text locale="de">Taktik</text>
   </string>
-  <string name="sk_stealth">
+  <string name="stealth">
     <text locale="de">Tarnung</text>
   </string>
-  <string name="sk_entertainment">
+  <string name="entertainment">
     <text locale="de">Unterhaltung</text>
   </string>
-  <string name="sk_weaponsmithing">
+  <string name="weaponsmithing">
     <text locale="de">Waffenbau</text>
   </string>
-  <string name="sk_unarmed">
+  <string name="unarmed">
     <text locale="de">Waffenloser Kampf</text>
   </string>
-  <string name="sk_cartmaking">
+  <string name="cartmaking">
     <text locale="de">Wagenbau</text>
   </string>
-  <string name="sk_perception">
+  <string name="perception">
     <text locale="de">Wahrnehmung</text>
   </string>
 

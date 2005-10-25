@@ -44,35 +44,35 @@
 
 static const char *skillnames[MAXSKILLS] =
 {
-	"sk_alchemy",
-	"sk_crossbow",
-	"sk_mining",
-	"sk_bow",
-	"sk_building",
-	"sk_trade",
-	"sk_forestry",
-	"sk_catapult",
-	"sk_herbalism",
-	"sk_magic",
-	"sk_training",
-	"sk_riding",
-	"sk_armorer",
-	"sk_shipcraft",
-	"sk_melee",
-	"sk_sailing",
-	"sk_polearm",
-	"sk_espionage",
-	"sk_quarrying",
-	"sk_roadwork",
-	"sk_tactics",
-	"sk_stealth",
-	"sk_entertainment",
-	"sk_weaponsmithing",
-	"sk_cartmaking",
-	"sk_perception",
-	"sk_taxation",
-	"sk_stamina",
-	"sk_unarmed"
+	"alchemy",
+	"crossbow",
+	"mining",
+	"bow",
+	"building",
+	"trade",
+	"forestry",
+	"catapult",
+	"herbalism",
+	"magic",
+	"training",
+	"riding",
+	"armorer",
+	"shipcraft",
+	"melee",
+	"sailing",
+	"polearm",
+	"espionage",
+	"quarrying",
+	"roadwork",
+	"tactics",
+	"stealth",
+	"entertainment",
+	"weaponsmithing",
+	"cartmaking",
+	"perception",
+	"taxation",
+	"stamina",
+	"unarmed"
 };
 
 const char * 
@@ -86,6 +86,7 @@ sk_find(const char * name)
 {
 	skill_t i;
 	if (name==NULL) return NOSKILL;
+  if (strncmp(name, "sk_", 3)==0) name+=3;
 	for (i=0;i!=MAXSKILLS;++i) {
 		if (strcmp(name, skillnames[i])==0) return i;
 	}
