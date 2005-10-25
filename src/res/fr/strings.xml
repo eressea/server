@@ -1322,94 +1322,95 @@
     <text locale="fr">SORTS</text>
   </string>
 
-  <comment>  Skills</comment>
-  <string name="alchemy">
-    <text locale="fr">alchimie</text>
-  </string>
-  <string name="armorer">
-    <text locale="fr">armurier</text>
-  </string>
-  <string name="bow">
-    <text locale="fr">arc</text>
-  </string>
-  <string name="building">
-    <text locale="fr">maçon</text>
-  </string>
-  <string name="cartmaking">
-    <text locale="fr">charron</text>
-  </string>
-  <string name="catapult">
-    <text locale="fr">catapulte</text>
-  </string>
-  <string name="crossbow">
-    <text locale="fr">arbalète</text>
-  </string>
-  <string name="entertainment">
-    <text locale="fr">divertissement</text>
-  </string>
-  <string name="espionage">
-    <text locale="fr">espionnage</text>
-  </string>
-  <string name="forestry">
-    <text locale="fr">bucheron</text>
-  </string>
-  <string name="herbalism">
-    <text locale="fr">herboriste</text>
-  </string>
-  <string name="magic">
-    <text locale="fr">magie</text>
-  </string>
-  <string name="melee">
-    <text locale="fr">mêlée</text>
-  </string>
-  <string name="mining">
-    <text locale="fr">mineur</text>
-  </string>
-  <string name="perception">
-    <text locale="fr">observation</text>
-  </string>
-  <string name="polearm">
-    <text locale="fr">hast</text>
-  </string>
-  <string name="quarrying">
-    <text locale="fr">perrayeur</text>
-  </string>
-  <string name="riding">
-    <text locale="fr">équitation</text>
-  </string>
-  <string name="roadwork">
-    <text locale="fr">cantonnier</text>
-  </string>
-  <string name="sailing">
-    <text locale="fr">navigation</text>
-  </string>
-  <string name="shipcraft">
-    <text locale="fr">charpentier</text>
-  </string>
-  <string name="stamina">
-    <text locale="fr">endurance</text>
-  </string>
-  <string name="stealth">
-    <text locale="fr">discrétion</text>
-  </string>
-  <string name="tactics">
-    <text locale="fr">tactique</text>
-  </string>
-  <string name="taxation">
-    <text locale="fr">percepteur</text>
-  </string>
-  <string name="trade">
-    <text locale="fr">commerce</text>
-  </string>
-  <string name="training">
-    <text locale="fr">dresseur</text>
-  </string>
-  <string name="unarmed">
-    <text locale="fr">mains-nues</text>
-  </string>
-  <string name="weaponsmithing">
-    <text locale="fr">fourbisseur</text>
-  </string>
+  <namespace name="skill">
+    <string name="alchemy">
+      <text locale="fr">alchimie</text>
+    </string>
+    <string name="armorer">
+      <text locale="fr">armurier</text>
+    </string>
+    <string name="bow">
+      <text locale="fr">arc</text>
+    </string>
+    <string name="building">
+      <text locale="fr">maçon</text>
+    </string>
+    <string name="cartmaking">
+      <text locale="fr">charron</text>
+    </string>
+    <string name="catapult">
+      <text locale="fr">catapulte</text>
+    </string>
+    <string name="crossbow">
+      <text locale="fr">arbalète</text>
+    </string>
+    <string name="entertainment">
+      <text locale="fr">divertissement</text>
+    </string>
+    <string name="espionage">
+      <text locale="fr">espionnage</text>
+    </string>
+    <string name="forestry">
+      <text locale="fr">bucheron</text>
+    </string>
+    <string name="herbalism">
+      <text locale="fr">herboriste</text>
+    </string>
+    <string name="magic">
+      <text locale="fr">magie</text>
+    </string>
+    <string name="melee">
+      <text locale="fr">mêlée</text>
+    </string>
+    <string name="mining">
+      <text locale="fr">mineur</text>
+    </string>
+    <string name="perception">
+      <text locale="fr">observation</text>
+    </string>
+    <string name="polearm">
+      <text locale="fr">hast</text>
+    </string>
+    <string name="quarrying">
+      <text locale="fr">perrayeur</text>
+    </string>
+    <string name="riding">
+      <text locale="fr">équitation</text>
+    </string>
+    <string name="roadwork">
+      <text locale="fr">cantonnier</text>
+    </string>
+    <string name="sailing">
+      <text locale="fr">navigation</text>
+    </string>
+    <string name="shipcraft">
+      <text locale="fr">charpentier</text>
+    </string>
+    <string name="stamina">
+      <text locale="fr">endurance</text>
+    </string>
+    <string name="stealth">
+      <text locale="fr">discrétion</text>
+    </string>
+    <string name="tactics">
+      <text locale="fr">tactique</text>
+    </string>
+    <string name="taxation">
+      <text locale="fr">percepteur</text>
+    </string>
+    <string name="trade">
+      <text locale="fr">commerce</text>
+    </string>
+    <string name="training">
+      <text locale="fr">dresseur</text>
+    </string>
+    <string name="unarmed">
+      <text locale="fr">mains-nues</text>
+    </string>
+    <string name="weaponsmithing">
+      <text locale="fr">fourbisseur</text>
+    </string>
+  </namespace>
 
   <comment>  Keywords</comment>
   <string name="//">

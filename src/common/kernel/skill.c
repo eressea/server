@@ -78,7 +78,7 @@ static const char *skillnames[MAXSKILLS] =
 const char * 
 skillname(skill_t sk, const struct locale * lang)
 {
-	return locale_string(lang, skillnames[sk]);
+	return locale_string(lang, mkname("skill", skillnames[sk]));
 }
 
 skill_t

@@ -2023,94 +2023,95 @@
     <text locale="en">XELAEN</text>
   </string>
 
-  <!--Talente: -->
-  <string name="alchemy">
-    <text locale="de">Alchemie</text>
-  </string>
-  <string name="crossbow">
-    <text locale="de">Armbrustschießen</text>
-  </string>
-  <string name="stamina">
-    <text locale="de">Ausdauer</text>
-  </string>
-  <string name="mining">
-    <text locale="de">Bergbau</text>
-  </string>
-  <string name="bow">
-    <text locale="de">Bogenschießen</text>
-  </string>
-  <string name="building">
-    <text locale="de">Burgenbau</text>
-  </string>
-  <string name="trade">
-    <text locale="de">Handeln</text>
-  </string>
-  <string name="melee">
-    <text locale="de">Hiebwaffen</text>
-  </string>
-  <string name="forestry">
-    <text locale="de">Holzfällen</text>
-  </string>
-  <string name="catapult">
-    <text locale="de">Katapultbedienung</text>
-  </string>
-  <string name="herbalism">
-    <text locale="de">Kräuterkunde</text>
-  </string>
-  <string name="magic">
-    <text locale="de">Magie</text>
-  </string>
-  <string name="training">
-    <text locale="de">Pferdedressur</text>
-  </string>
-  <string name="riding">
-    <text locale="de">Reiten</text>
-  </string>
-  <string name="armorer">
-    <text locale="de">Rüstungsbau</text>
-  </string>
-  <string name="shipcraft">
-    <text locale="de">Schiffbau</text>
-  </string>
-  <string name="sailing">
-    <text locale="de">Segeln</text>
-  </string>
-  <string name="espionage">
-    <text locale="de">Spionage</text>
-  </string>
-  <string name="polearm">
-    <text locale="de">Stangenwaffen</text>
-  </string>
-  <string name="quarrying">
-    <text locale="de">Steinbau</text>
-  </string>
-  <string name="taxation">
-    <text locale="de">Steuereintreiben</text>
-  </string>
-  <string name="roadwork">
-    <text locale="de">Straßenbau</text>
-  </string>
-  <string name="tactics">
-    <text locale="de">Taktik</text>
-  </string>
-  <string name="stealth">
-    <text locale="de">Tarnung</text>
-  </string>
-  <string name="entertainment">
-    <text locale="de">Unterhaltung</text>
-  </string>
-  <string name="weaponsmithing">
-    <text locale="de">Waffenbau</text>
-  </string>
-  <string name="unarmed">
-    <text locale="de">Waffenloser Kampf</text>
-  </string>
-  <string name="cartmaking">
-    <text locale="de">Wagenbau</text>
-  </string>
-  <string name="perception">
-    <text locale="de">Wahrnehmung</text>
-  </string>
+  <namespace name="skill">
+    <string name="alchemy">
+      <text locale="de">Alchemie</text>
+    </string>
+    <string name="crossbow">
+      <text locale="de">Armbrustschießen</text>
+    </string>
+    <string name="stamina">
+      <text locale="de">Ausdauer</text>
+    </string>
+    <string name="mining">
+      <text locale="de">Bergbau</text>
+    </string>
+    <string name="bow">
+      <text locale="de">Bogenschießen</text>
+    </string>
+    <string name="building">
+      <text locale="de">Burgenbau</text>
+    </string>
+    <string name="trade">
+      <text locale="de">Handeln</text>
+    </string>
+    <string name="melee">
+      <text locale="de">Hiebwaffen</text>
+    </string>
+    <string name="forestry">
+      <text locale="de">Holzfällen</text>
+    </string>
+    <string name="catapult">
+      <text locale="de">Katapultbedienung</text>
+    </string>
+    <string name="herbalism">
+      <text locale="de">Kräuterkunde</text>
+    </string>
+    <string name="magic">
+      <text locale="de">Magie</text>
+    </string>
+    <string name="training">
+      <text locale="de">Pferdedressur</text>
+    </string>
+    <string name="riding">
+      <text locale="de">Reiten</text>
+    </string>
+    <string name="armorer">
+      <text locale="de">Rüstungsbau</text>
+    </string>
+    <string name="shipcraft">
+      <text locale="de">Schiffbau</text>
+    </string>
+    <string name="sailing">
+      <text locale="de">Segeln</text>
+    </string>
+    <string name="espionage">
+      <text locale="de">Spionage</text>
+    </string>
+    <string name="polearm">
+      <text locale="de">Stangenwaffen</text>
+    </string>
+    <string name="quarrying">
+      <text locale="de">Steinbau</text>
+    </string>
+    <string name="taxation">
+      <text locale="de">Steuereintreiben</text>
+    </string>
+    <string name="roadwork">
+      <text locale="de">Straßenbau</text>
+    </string>
+    <string name="tactics">
+      <text locale="de">Taktik</text>
+    </string>
+    <string name="stealth">
+      <text locale="de">Tarnung</text>
+    </string>
+    <string name="entertainment">
+      <text locale="de">Unterhaltung</text>
+    </string>
+    <string name="weaponsmithing">
+      <text locale="de">Waffenbau</text>
+    </string>
+    <string name="unarmed">
+      <text locale="de">Waffenloser Kampf</text>
+    </string>
+    <string name="cartmaking">
+      <text locale="de">Wagenbau</text>
+    </string>
+    <string name="perception">
+      <text locale="de">Wahrnehmung</text>
+    </string>
+  </namespace>
 
   <!--Befehle -->
   <string name="//">
