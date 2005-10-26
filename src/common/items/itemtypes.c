@@ -14,7 +14,6 @@
 #include <eressea.h>
 #include "itemtypes.h"
 
-#include "demonseye.h"
 #include "xerewards.h"
 #include "artrewards.h"
 #include "weapons.h"
@@ -24,7 +23,6 @@ void
 init_itemtypes(void)
 {
   register_weapons();
-  register_demonseye();
   register_xerewards();
   register_artrewards();
 	init_weapons();

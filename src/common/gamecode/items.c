@@ -19,6 +19,8 @@
 #include <kernel/study.h>
 #include <kernel/unit.h>
 
+#include <items/demonseye.h>
+
 #include <util/attrib.h>
 #include <util/functions.h>
 #include <util/rand.h>
@@ -260,6 +262,7 @@ use_aurapotion50(struct unit * u, const struct item_type * itype,
 void
 register_itemfunctions(void)
 {
+  register_demonseye();
   register_function((pf_generic)use_antimagiccrystal, "use_antimagiccrystal");
   register_function((pf_generic)use_instantartsculpture, "use_instantartsculpture");
   register_function((pf_generic)use_studypotion, "use_studypotion");
