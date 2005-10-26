@@ -8,13 +8,15 @@
   </resource>
 
   <resource name="seed" limited="yes">
-    <item weight="10" score="50"/>
-    <construction skill="herbalism" minskill="3" reqsize="1"/>
+    <item weight="10" score="50">
+      <construction skill="herbalism" minskill="3" reqsize="1"/>
+    </item>
   </resource>
 
   <resource name="mallornseed" limited="yes">
-    <item weight="10" score="100"/>
-    <construction skill="herbalism" minskill="4" reqsize="1"/>
+    <item weight="10" score="100">
+      <construction skill="herbalism" minskill="4" reqsize="1"/>
+    </item>
   </resource>
 
   <resource name="antimagic" appearance="amulet">
