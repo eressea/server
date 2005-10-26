@@ -16,8 +16,7 @@ without prior permission by the authors of Eressea.
 extern "C" {
 #endif
 
-  extern void register_itemimplementations(void);
-  extern void init_itemimplementations(void);
+  extern void register_itemfunctions(void);
 
 #ifdef __cplusplus
 }

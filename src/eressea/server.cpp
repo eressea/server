@@ -209,8 +209,7 @@ game_init(void)
   register_resources();
   register_buildings();
   register_ships();
-  register_itemimplementations();
-  register_itemtypes();
+  register_itemfunctions();
   register_spells();
 #ifdef DUNGEON_MODULE
   register_dungeon();

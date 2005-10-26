@@ -1643,7 +1643,6 @@ main(int argc, char *argv[])
 	register_resources();
 	register_buildings();
 	register_ships();
-	register_itemtypes();
 	register_spells();
 #ifdef MUSEUM_MODULE
 	register_museum();

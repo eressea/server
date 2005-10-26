@@ -83,6 +83,36 @@ init_familiar(unit * u)
   equip_unit(u, get_equipment(fname));
 }
 
+static int
+use_item(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
+{
+  int retval = 0;
+  char fname[64];
+  snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name[0]);
+
+  luabind::object globals = luabind::get_globals(luaState);
+  luabind::object fun = globals.at(fname);
+  if (fun.is_valid()) {
+    if (fun.type()!=LUA_TFUNCTION) {
+      log_warning(("Lua global object %s is not a function, type is %u\n", fname, fun.type()));
+    } else {
+      try {
+        retval = luabind::call_function<int>(luaState, fname, u, amount);
+      }
+      catch (luabind::error& e) {
+        lua_State* L = e.state();
+        const char* error = lua_tostring(L, -1);
+        log_error(("An exception occured while %s tried to call '%s': %s.\n",
+          unitname(u), fname, error));
+        lua_pop(L, 1);
+        std::terminate();
+      }
+    }
+  }
+  return retval;
+}
+
+
 void
 bind_spell(lua_State * L) 
 {
@@ -95,4 +125,5 @@ bind_spell(lua_State * L)
   ];
   register_function((pf_generic)&call_spell, "luaspell");
   register_function((pf_generic)&init_familiar, "luafamiliar");
+  register_function((pf_generic)&use_item, "luaitem");
 }

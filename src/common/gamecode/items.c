@@ -258,7 +258,7 @@ use_aurapotion50(struct unit * u, const struct item_type * itype,
 
 
 void
-register_itemimplementations(void)
+register_itemfunctions(void)
 {
   register_function((pf_generic)use_antimagiccrystal, "use_antimagiccrystal");
   register_function((pf_generic)use_instantartsculpture, "use_instantartsculpture");
