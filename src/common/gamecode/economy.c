@@ -1203,7 +1203,7 @@ allocate_resource(unit * u, const resource_type * rtype, int want)
 
 	/* momentan kann man keine ressourcen abbauen, wenn man dafür
 	* Materialverbrauch hat: */
-	assert(itype!=NULL && itype->construction->materials==NULL);
+	assert(itype!=NULL && (itype->construction==NULL || itype->construction->materials==NULL));
 
 	if (itype == olditemtype[I_WOOD] && fval(r, RF_MALLORN)) {
 		cmistake(u, u->thisorder, 92, MSG_PRODUCE);
