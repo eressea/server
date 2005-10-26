@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <resources>
 
-  <resource name="demonseye">
+  <resource name="ao_daemon">
     <!-- summons igjarjuk -->
     <item weight="0" score="6000" notlost="true" cursed="true">
       <function name="use" value="useigjarjuk"/>
