@@ -138,7 +138,7 @@
   </set>
 
   <set name="uruk">
-    <skill name="spear" level="4"/>
+    <skill name="polearm" level="4"/>
     <skill name="melee" level="4"/>
     <skill name="crossbow" level="4"/>
     <skill name="catapult" level="4"/>
@@ -198,7 +198,7 @@
 
   <set name="random_swamp">
     <skill name="stealth" level="d3+1"/>
-    <skill name="spear" level="d3+1"/>
+    <skill name="polearm" level="d3+1"/>
     <item name="spear" amount="1"/>
     <item name="money" amount="d20+9"/>
   </set>
@@ -259,7 +259,7 @@
   </set>
 
   <set name="random_spear">
-    <skill name="spear" level="d3"/>
+    <skill name="polearm" level="d3"/>
     <item name="spear" amount="1"/>
   </set>
 
@@ -285,7 +285,7 @@
 
   <set name="recruited_dracoid">
     <!-- dracoiden, von drachen rekrutiert -->
-    <skill name="spear" level="d4+2"/>
+    <skill name="polearm" level="d4+2"/>
     <skill name="melee" level="d4+2"/>
     <skill name="bow" level="d3+1"/>
     <subset>
