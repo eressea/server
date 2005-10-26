@@ -100,22 +100,6 @@ leave_arena(struct unit * u, const struct item_type * itype, int amount, order *
 	return 0;
 }
 
-static resource_type rt_gryphonwing = {
-	{ "griphonwing", "griphonwing_p" },
-	{ "griphonwing", "griphonwing_p" },
-	RTF_ITEM,
-	&res_changeitem
-};
-
-static item_type it_gryphonwing = {
-	&rt_gryphonwing,           /* resourcetype */
-	ITF_NOTLOST|ITF_CURSED, 0, 0,       /* flags, weight, capacity */
-	NULL,                     /* construction, score */
-	&leave_arena,
-	NULL,
-	&give_igjarjuk
-};
-
 static int
 enter_fail(unit * u) {
 	sprintf(buf, "In %s erklingt die Stimme des Torwächters: 'Nur wer ohne materielle Güter und noch lernbegierig ist, der darf die Ebene der Herausforderung betreten. Und vergiß nicht mein Trinkgeld.'. %s erhielt keinen Einlaß.", regionname(u->region, u->faction), unitname(u));
@@ -161,27 +145,13 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
 	}
 	sprintf(buf, "In %s öffnet sich ein Portal. Eine Stimme ertönt, und spricht: 'Willkommen in der Ebene der Herausforderung'. %s durchschreitet das Tor zu einer anderen Welt.", regionname(u->region, u->faction), unitname(u));
 	addmessage(NULL, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
-	new_use_pooled(u, &rt_gryphonwing, GET_SLACK|GET_RESERVE, 1);
+	new_use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE, 1);
 	use_pooled(u, r, R_SILVER, fee);
 	set_money(u, 109);
 	fset(u, UFL_PARTEITARNUNG);
 	move_unit(u, start_region[rand() % 6], NULL);
 	return 0;
 }
-
-static resource_type rt_arenagate = {
-	{ "eyeofdragon", "eyeofdragon_p" },
-	{ "eyeofdragon", "eyeofdragon_p" },
-	RTF_ITEM,
-	&res_changeitem
-};
-
-static item_type it_arenagate = {
-	&rt_arenagate,           /* resourcetype */
-	ITF_NONE, 0, 0,          /* flags, weight, capacity */
-	NULL,                   /* construction, score */
-	&enter_arena
-};
 
 /***
  ** Szepter der Tränen, Demo-Item
@@ -308,6 +278,9 @@ static void
 tower_init(void)
 {
 	int i, first = newarena;
+  item_type * it_demonseye = it_find("demonseye");
+  item_type * it_griphonwing = it_find("griphonwing");
+  assert(it_griphonwing && it_demonseye);
 	for (i=0;i!=6;++i) {
 		region * r = tower_region[i] = findregion(arena_center->x+delta_x[i]*3, arena_center->y+delta_y[i]*3);
         if (r) {
@@ -330,8 +303,8 @@ tower_init(void)
 		attrib * a;
 		item * items;
 
-		i_add(&items, i_new(&it_gryphonwing, 1));
-		i_add(&items, i_new(&it_demonseye, 1));
+		i_add(&items, i_new(it_griphonwing, 1));
+		i_add(&items, i_new(it_demonseye, 1));
 		a = a_add(&b->attribs, make_giveitem(b, items));
 
 		b->size = 10;
@@ -548,9 +521,6 @@ void
 register_arena(void)
 {
 	at_register(&at_hurting);
-	register_demonseye();
-	it_register(&it_arenagate);
-	it_register(&it_gryphonwing);
 	register_function((pf_generic)use_wand_of_tears, "use_wand_of_tears");
 	register_function((pf_generic)enter_arena, "enter_arena");
 	register_function((pf_generic)leave_arena, "leave_arena");

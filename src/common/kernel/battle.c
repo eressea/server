@@ -2811,6 +2811,13 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 	const group * g = NULL;
 	const attrib *a = a_find(u->attribs, &at_otherfaction);
 	const faction *stealthfaction = a?get_otherfaction(a):NULL;
+  static const struct item_type * it_demonseye;
+  static boolean init = false;
+
+  if (!init) {
+    it_demonseye = it_find("demonseye");
+    init=true;
+  }
 
   if (fval(u, UFL_GROUP)) {
     const attrib * agroup = a_find(u->attribs, &at_group);
@@ -2986,7 +2993,7 @@ make_fighter(battle * b, unit * u, side * s1, boolean attack)
 		}
 	}
 
-	if (i_get(u->items, &it_demonseye)) {
+	if (it_demonseye && i_get(u->items, it_demonseye)) {
 		char lbuf[80];
 		const char * s = LOC(default_locale, rc_name(u->race, 3));
 		char * c = lbuf;

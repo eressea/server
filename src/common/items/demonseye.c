@@ -45,15 +45,7 @@ summon_igjarjuk(struct unit * u, const struct item_type * itype, int amount, str
 	}
 }
 
-static resource_type rt_demonseye = {
-	{ "ao_daemon", "ao_daemon_p" },
-	{ "ao_daemon", "ao_daemon_p" },
-	RTF_ITEM,
-	&res_changeitem
-};
-
-
-boolean
+static boolean
 give_igjarjuk(const struct unit * src, const struct unit * d, const struct item_type * itype, int n, struct order * ord)
 {
 	sprintf(buf, "Eine höhere Macht hindert %s daran, das Objekt zu übergeben. "
@@ -62,19 +54,9 @@ give_igjarjuk(const struct unit * src, const struct unit * d, const struct item_
 	return false;
 }
 
-item_type it_demonseye = {
-	&rt_demonseye,           /* resourcetype */
-	ITF_NOTLOST|ITF_CURSED, 0, 0,       /* flags, weight, capacity */
-	NULL,                    /* construction */
-	&summon_igjarjuk,
-	NULL,
-	&give_igjarjuk
-};
-
 void
 register_demonseye(void)
 {
-	it_register(&it_demonseye);
 	register_function((pf_generic)summon_igjarjuk, "useigjarjuk");
 	register_function((pf_generic)give_igjarjuk, "giveigjarjuk");
 }

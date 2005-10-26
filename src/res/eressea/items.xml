@@ -1,50 +1,65 @@
 <?xml version="1.0"?>
 <resources>
 
+  <resource name="demonseye">
+    <!-- summons igjarjuk -->
+    <item weight="0" score="6000" notlost="true" cursed="true">
+      <function name="use" value="useigjarjuk"/>
+      <function name="give" value="giveigjarjuk"/>
+    </item>
+  </resource>
+
+  <resource name="griphonwing">
+    <!-- this lets you leave the arena -->
+    <item weight="0" score="6000" notlost="true" cursed="true">
+      <function name="use" value="leave_arena"/>
+      <function name="give" value="giveigjarjuk"/>
+    </item>
+  </resource>
+
+  <resource name="eyeofdragon">
+    <!-- the arena gate, for one-time entry -->
+    <item weight="0" score="0">
+      <function name="use" value="enter_arena"/>
+    </item>
+  </resource>
+
   <resource name="questkey1" appearance="key">
     <!-- Key for an old quest. placeholder item -->
-    <function name="change" value="changeitem"/>
     <item notlost="yes" weight="1" />
   </resource>
 
   <resource name="questkey2" appearance="key">
     <!-- Key for an old quest. placeholder item -->
-    <function name="change" value="changeitem"/>
     <item notlost="yes" weight="1" />
   </resource>
 
   <resource name="jadee_ring" appearance="ring">
     <!-- Wedding ring for Jadee -->
-    <function name="change" value="changeitem"/>
     <item cursed="yes" notlost="yes" weight="0" />
   </resource>
 
   <resource name="wente_ring" appearance="ring">
     <!-- Wedding ring for Wildente -->
-    <function name="change" value="changeitem"/>
     <item cursed="yes" notlost="yes" weight="0" />
   </resource>
 
   <resource name="jadee_dress">
     <!-- Wedding dress for Jadee -->
-    <function name="change" value="changeitem"/>
     <item cursed="yes" notlost="yes" weight="0" />
   </resource>
 
   <resource name="wente_dress">
     <!-- Wedding dress for Wildente -->
-    <function name="change" value="changeitem"/>
     <item cursed="yes" notlost="yes" weight="0" />
   </resource>
 
   <resource name="lmsreward">
     <!-- LMS reward -->
-    <function name="change" value="changeitem"/>
     <item cursed="yes" notlost="yes" weight="0" />
   </resource>
 
   <resource name="greatbow">
-    <function name="change" value="changeitem"/>
     <item weight="100">
       <construction skill="weaponsmithing" minskill="5" reqsize="1">
         <modifier function="mod_elves_only"/>

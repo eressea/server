@@ -56,8 +56,6 @@ a_readgive(attrib * a, FILE * F)
 	variant var;
 	char zText[32];
 
-	if (global.data_version<ITEMTYPE_VERSION) return a_readdefault(a, F);
-
 	fscanf(F, "%s ", zText);
 	var.i = atoi36(zText);
 	gdata->building = findbuilding(var.i);

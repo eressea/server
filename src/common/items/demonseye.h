@@ -18,10 +18,7 @@
 extern "C" {
 #endif
 
-extern struct item_type it_demonseye;
-
 extern void register_demonseye(void);
-extern boolean give_igjarjuk(const struct unit *, const struct unit *, const struct item_type *, int, struct order *);
 
 #ifdef __cplusplus
 }

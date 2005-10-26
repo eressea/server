@@ -599,8 +599,6 @@ give_horses(const unit * s, const unit * d, const item_type * itype, int n, stru
 #define MAXLUXURIES (LASTLUXURY - FIRSTLUXURY)
 
 #define item2res(itm) (resource_t)(itm+R_MINITEM)
-#define herb2res(itm) (resource_t)(itm+R_MINHERB)
-#define potion2res(itm) (resource_t)(itm+R_MINPOTION)
 
 item_type * olditemtype[MAXITEMS+1];
 resource_type * oldresourcetype[MAXRESOURCES+1];
@@ -1223,12 +1221,6 @@ init_olditems(void)
 		olditemtype[i] = itype;
 		oldresourcetype[item2res(i)] = rtype;
 	}
-}
-
-const item_type *
-oldherbtype(herb_t h)
-{
-  return oldresourcetype[herb2res(h)]->itype;
 }
 
 static const char *potiontext[MAXPOTIONS] =

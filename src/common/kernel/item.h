@@ -214,11 +214,6 @@ extern const weapon_type * resource2weapon(const resource_type * i);
 extern const potion_type * resource2potion(const resource_type * i);
 extern const luxury_type * resource2luxury(const resource_type * i);
 
-#define weapon2resource(x) ((x)->itype->rtype)
-#define luxury2resource(x) ((x)->itype->rtype)
-#define herb2resource(x) ((x)->itype->rtype)
-#define potion2resource(x) ((x)->itype->rtype)
-
 extern item ** i_find(item ** pi, const item_type * it);
 extern item * i_add(item ** pi, item * it);
 extern void i_merge(item ** pi, item ** si);
@@ -238,8 +233,6 @@ extern luxury_type * new_luxurytype(item_type * itype, int price);
 extern weapon_type * new_weapontype(item_type * itype, int wflags, double magres, const char* damage[], int offmod, int defmod, int reload, skill_t sk, int minskill);
 extern armor_type * new_armortype(item_type * itype, double penalty, double magres, int prot, unsigned int flags);
 extern potion_type * new_potiontype(item_type * itype, int level);
-
-extern const item_type * oldherbtype(herb_t h);
 
 /* for lack of another file: */
 
@@ -379,48 +372,7 @@ enum {
 	R_SACK_OF_CONSERVATION,
 
 	/* POTIONS: */
-	R_FAST,
-	R_STRONG,
 	R_TREES,
-	R_DOMORE,
-	R_UGLY,
-#ifdef INSECT_POTION
-	R_WARMTH,
-#else
-	R_STEEL,
-#endif
-	R_WISE,
-	R_FOOL,
-	R_ROSE,
-	R_HORSEPOTION,
-	R_BERSERK,
-	R_PEOPLE,
-	R_GRASS,
-	R_ILL,
-	R_HEAL,
-
-	/* HERBS */
-	R_PLAIN_1, /* Flachwurz */
-	R_PLAIN_2, /* Würziger Wagemut */
-	R_PLAIN_3, /* Eulenauge */
-	R_FOREST_1, /* Grüner Spinnerich */
-	R_FOREST_2, /* Blauer Baumringel */
-	R_FOREST_3, /* Elfenlieb */
-	R_SWAMP_1,  /* Gurgelkraut */
-	R_SWAMP_2,  /* Knotiger Saugwurz */
-	R_SWAMP_3,  /* Blasenmorchel */
-	R_DESERT_1, /* Wasserfinder */
-	R_DESERT_2, /* Kakteenschwitz */
-	R_DESERT_3, /* Sandfäule */
-	R_HIGHLAND_1, /* Windbeutel */
-	R_HIGHLAND_2, /* Fjordwuchs */
-	R_HIGHLAND_3, /* Alraune */
-	R_MOUNTAIN_1, /* Steinbeißer */
-	R_MOUNTAIN_2, /* Spaltwachs */
-	R_MOUNTAIN_3, /* Höhlenglimm */
-	R_GLACIER_1,  /* Eisblume */
-	R_GLACIER_2,  /* Weißer Wüterich */
-	R_GLACIER_3,  /* Schneekristall */
 
 	/* SONSTIGE */
 	R_SILVER,
@@ -429,9 +381,7 @@ enum {
 	R_HITPOINTS, /* Trefferpunkte */
 	R_PEASANTS,  /* Regionsbauern */
 
-
 	R_UNIT, /* Einheit (gib x einheit) */
-  R_SWORD, /* for spells */
 
 	MAX_RESOURCES, /* do not use outside item.c ! */
 	NORESOURCE = (resource_t) - 1

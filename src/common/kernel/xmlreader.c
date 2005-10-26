@@ -946,9 +946,6 @@ parse_resources(xmlDocPtr doc)
   /* make sure old items (used in requirements) are available */
   init_resources();
 
-  /* old resources now extern (for spells */
-  oldresourcetype[R_SWORD] = rt_find("sword");
-
   return 0;
 }
 

@@ -1027,9 +1027,6 @@ unit *
 readunit(FILE * F)
 {
 	skill_t sk;
-	item_t item;
-	herb_t herb;
-	potion_t potion;
 	unit * u;
 	int number, n, p;
   order ** orderp;
@@ -1061,8 +1058,6 @@ readunit(FILE * F)
   if (u->display && strlen(u->display)>=DISPLAYSIZE) u->display[DISPLAYSIZE] = 0;
 #endif
   number = ri(F);
-  if (global.data_version<ITEMTYPE_VERSION)
-      set_money(u, ri(F));
   u->age = (short)ri(F);
   if (global.data_version<NEWRACE_VERSION) {
     u->race = new_race[(race_t)ri(F)];
@@ -1189,21 +1184,7 @@ readunit(FILE * F)
 			}
 		}
 	}
-	if (global.data_version>=ITEMTYPE_VERSION) {
-		read_items(F, &u->items);
-	} else {
-		while ((item = (item_t) ri(F)) >= 0) {
-			i_change(&u->items, olditemtype[item], ri(F));
-		}
-
-		while ((potion = (potion_t) ri(F)) >= 0) {
-			i_change(&u->items, oldpotiontype[potion]->itype, ri(F));
-		}
-
-		while ((herb = (herb_t) ri(F)) >= 0) {
-			i_change(&u->items, oldherbtype(herb), ri(F));
-		}
-	}
+	read_items(F, &u->items);
 	u->hp = ri(F);
 	if (u->hp < u->number) {
 		log_error(("Einheit %s hat %u Personen, und %u Trefferpunkte\n", itoa36(u->no),
@@ -1434,26 +1415,15 @@ readregion(FILE * F, short x, short y)
 				pres=&res->next;
 			}
 		}
-		if (global.data_version>=ITEMTYPE_VERSION) {
-			rs(F, buf);
-			if (strcmp(buf, "noherb") != 0) {
-        const resource_type * rtype = rt_find(buf);
-        assert(rtype && rtype->itype && fval(rtype->itype, ITF_HERB));
-        rsetherbtype(r, rtype->itype);
-			} else {
-				rsetherbtype(r, NULL);
-			}
-			rsetherbs(r, (short)ri(F));
+		rs(F, buf);
+		if (strcmp(buf, "noherb") != 0) {
+      const resource_type * rtype = rt_find(buf);
+      assert(rtype && rtype->itype && fval(rtype->itype, ITF_HERB));
+      rsetherbtype(r, rtype->itype);
 		} else {
-			int i = ri(F);
-
-			if (r->terrain->herbs==NULL)
-				rsetherbtype(r, NULL);
-      else {
-        rsetherbtype(r, r->terrain->herbs[i % 3]);
-      }
-			rsetherbs(r, (short)ri(F));
+			rsetherbtype(r, NULL);
 		}
+		rsetherbs(r, (short)ri(F));
 		rsetpeasants(r, ri(F));
 		rsetmoney(r, ri(F));
 	}
@@ -1464,25 +1434,10 @@ readregion(FILE * F, short x, short y)
 	assert(rmoney(r) >= 0);
 
 	if (r->land) {
-		if (global.data_version<ITEMTYPE_VERSION) {
-			int i, p = 0;
-			for (i = 0; oldluxurytype[i]!=NULL; i++) {
-				int k = ri(F);
-				r_setdemand(r, oldluxurytype[i], k);
-				if (k==0) {
-					/* Prüfung ob nur ein Luxusgut verkauft wird. */
-					if (p == 1) {
-						/* Zuviele ... Wir setzen den Demand. */
-						r_setdemand(r, oldluxurytype[i], (char) (1 + rand() % 5));
-					} else ++p;
-				}
-			}
-		} else {
-			for (;;) {
-				rs(F, buf);
-				if (!strcmp(buf, "end")) break;
-				r_setdemand(r, lt_find(buf), ri(F));
-			}
+		for (;;) {
+			rs(F, buf);
+			if (!strcmp(buf, "end")) break;
+			r_setdemand(r, lt_find(buf), ri(F));
 		}
 	}
 	a_read(F, &r->attribs);
@@ -1831,10 +1786,6 @@ readgame(const char * filename, int backup)
   }
   if (global.data_version >= GLOBAL_ATTRIB_VERSION) {
     a_read(F, &global.attribs);
-  }
-  if (global.data_version < ITEMTYPE_VERSION) {
-    fprintf(stderr, "kann keine alten datenfiles einlesen");
-    exit(-1);
   }
   global.data_turn = turn = ri(F);
   ri(F); /* max_unique_id = */ 
