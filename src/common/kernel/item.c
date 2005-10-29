@@ -1112,7 +1112,6 @@ init_olditems(void)
   for (i=0; i!=MAXITEMS; ++i) {
     int iflags = ITF_NONE;
     int rflags = RTF_ITEM|RTF_POOLED;
-    int m, n;
     const char * name[2];
     const char * appearance[2];
     int weight = itemdata[i].gewicht;
@@ -1120,33 +1119,7 @@ init_olditems(void)
     int price;
     attrib * a;
     item_type * itype;
-    construction * con = calloc(sizeof(construction), 1);
 
-    con->minskill = itemdata[i].minskill;
-    if (i==I_LAEN && SkillCap(SK_QUARRYING)) {
-      /* at least 4 levels on which you can mine laen */
-      con->minskill = SkillCap(SK_QUARRYING)-3;
-    }
-    con->skill = itemdata[i].skill;
-    con->maxsize = -1;
-    con->reqsize = 1;
-    con->improvement = NULL;
-
-    for (m=0, n=0;m!=M_MAX_MAT;++m)
-      if (itemdata[i].material[m]>0) ++n;
-    if (n>0) {
-      con->materials = calloc(sizeof(requirement), n+1);
-      for (m=0, n=0;m!=M_MAX_MAT;++m) {
-	if (itemdata[i].material[m]>0) {
-	  con->materials[n].rtype = oldresourcetype[matresource[m]];
-	  con->materials[n].number = itemdata[i].material[m];
-	  con->materials[n].recycle = 0.0;
-	  ++n;
-	  if (m==M_EISEN) {
-	  }
-	}
-      }
-    }
     if (itemdata[i].flags & FL_ITEM_CURSED) iflags |= ITF_CURSED;
     if (itemdata[i].flags & FL_ITEM_NOTLOST) iflags |= ITF_NOTLOST;
     if (itemdata[i].flags & FL_ITEM_NOTINBAG) iflags |= ITF_BIG;
@@ -1157,12 +1130,12 @@ init_olditems(void)
     {
       int ci;
       for (ci=0;translation[ci][0];++ci) {
-	if (!strcmp(translation[ci][0], itemdata[i].name[0])) {
-	  name[0] = translation[ci][1];
-	  name[1] = translation[ci][2];
-	  appearance[0] = translation[ci][3];
-	  appearance[1] = translation[ci][4];
-	}
+        if (!strcmp(translation[ci][0], itemdata[i].name[0])) {
+          name[0] = translation[ci][1];
+          name[1] = translation[ci][2];
+          appearance[0] = translation[ci][3];
+          appearance[1] = translation[ci][4];
+        }
       }
     }
     if (name[0]==NULL) {
@@ -1208,18 +1181,51 @@ init_olditems(void)
       itype->flags |= ITF_NOBUILDBESIEGED;
       a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
       {
-	resource_limit * rdata = (resource_limit*)a->data.v;
-	rdata->limit = limit_oldtypes;
-	rdata->use = use_oldresource;
+        resource_limit * rdata = (resource_limit*)a->data.v;
+        rdata->limit = limit_oldtypes;
+        rdata->use = use_oldresource;
       }
       break;
     }
     if (itemdata[i].benutze_funktion) {
       itype->use = use_olditem;
     }
-    itype->construction = con;
     olditemtype[i] = itype;
     oldresourcetype[item2res(i)] = rtype;
+  }
+
+  for (i=0; i!=MAXITEMS; ++i) {
+    construction * con = calloc(sizeof(construction), 1);
+    item_type * itype = olditemtype[i];
+    int m, n;
+
+    con->minskill = itemdata[i].minskill;
+    if (i==I_LAEN && SkillCap(SK_QUARRYING)) {
+      /* at least 4 levels on which you can mine laen */
+      con->minskill = SkillCap(SK_QUARRYING)-3;
+    }
+    con->skill = itemdata[i].skill;
+    con->maxsize = -1;
+    con->reqsize = 1;
+    con->improvement = NULL;
+    for (m=0, n=0;m!=M_MAX_MAT;++m)
+      if (itemdata[i].material[m]>0) ++n;
+    if (n>0) {
+      con->materials = calloc(sizeof(requirement), n+1);
+      for (m=0, n=0;m!=M_MAX_MAT;++m) {
+        if (itemdata[i].material[m]>0) {
+          assert(oldresourcetype[matresource[m]]);
+          con->materials[n].rtype = oldresourcetype[matresource[m]];
+          con->materials[n].number = itemdata[i].material[m];
+          con->materials[n].recycle = 0.0;
+          ++n;
+          if (m==M_EISEN) {
+          }
+        }
+      }
+    }
+
+    itype->construction = con;
   }
 }
 
