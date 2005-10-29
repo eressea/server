@@ -1,5 +1,49 @@
 <?xml version="1.0"?>
 <resources>
+
+  <resource name="aog">
+    <!-- Amulett des Treffens -->
+    <item notlost="yes" weight="0"/>
+  </resource>
+
+<!-- museum items -->
+  <resource name="museumexitticket">
+    <!-- you get your stuff back when leaving the museum -->
+    <item notlost="yes" weight="0">
+      <function name="use" value="use_museumexitticket"/>
+    </item>
+  </resource>
+
+  <resource name="museumticket">
+    <!-- you get your stuff back when leaving the museum -->
+    <item weight="0">
+      <function name="use" value="use_museumticket"/>
+    </item>
+  </resource>
+
+<!-- XE items -->
+  <resource name="skillpotion">
+    <!-- gives user one free learning attempt -->
+    <item weight="0">
+      <function name="use" value="useskillpotion"/>
+    </item>
+  </resource>
+
+  <resource name="manacrystal">
+    <!-- gives user free aura -->
+    <item weight="0">
+      <function name="use" value="usemanacrystal"/>
+    </item>
+  </resource>
+
+<!-- HSE items -->
+  <resource name="studypotion">
+    <item weight="0">
+      <function name="use" value="use_studypotion"/>
+    </item>
+  </resource>
+
+<!-- xmas items -->
   <resource name="mistletoe">
     <!-- Sets the chance of escape in a fight to 100 percent -->
     <item notlost="yes" weight="0">
@@ -7,6 +51,25 @@
     </item>
   </resource>
 
+  <resource name="speedsail">
+    <item weight="0" cursed="yes">
+      <function name="use" value="use_speedsail"/>
+    </item>
+  </resource>
+
+  <resource name="snowball">
+    <!-- xmas gimmik -->
+    <item notlost="yes" weight="0">
+      <function name="use" value="usesnowball"/>
+    </item>
+  </resource>
+
+  <resource name="snowman">
+    <!-- xmas gimmik -->
+    <item notlost="yes" weight="1"/>
+  </resource>
+
+<!-- items -->
   <resource name="seed" limited="yes">
     <item weight="10" score="50">
       <construction skill="herbalism" minskill="3" reqsize="1"/>
@@ -29,35 +92,6 @@
     <item notlost="yes" weight="1">
       <function name="use" value="use_wand_of_tears"/>
     </item>
-  </resource>
-
-  <resource name="aog">
-    <!-- Amulett des Treffens -->
-    <item notlost="yes" weight="0"/>
-  </resource>
-
-  <resource name="snowball">
-    <!-- xmas gimmik -->
-    <item notlost="yes" weight="0">
-      <function name="use" value="usesnowball"/>
-    </item>
-  </resource>
-
-  <resource name="studypotion">
-    <item weight="0">
-      <function name="use" value="use_studypotion"/>
-    </item>
-  </resource>
-
-  <resource name="speedsail">
-    <item weight="0" cursed="yes">
-      <function name="use" value="use_speedsail"/>
-    </item>
-  </resource>
-
-  <resource name="snowman">
-    <!-- xmas gimmik -->
-    <item notlost="yes" weight="1"/>
   </resource>
 
   <resource name="mallornbow">

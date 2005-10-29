@@ -332,20 +332,6 @@ use_museumexitticket(unit *u, const struct item_type *itype, int amount, order *
 	return 0;
 }
 
-resource_type rt_museumexitticket = {
-  { "museumexitticket", "museumexitticket_p"},
-  { "museumexitticket", "museumexitticket_p"},
-  RTF_ITEM,
-  &res_changeitem
-};
-
-item_type it_museumexitticket = {
-  &rt_museumexitticket,
-    ITF_CURSED, 0, 0,
-    NULL,
-    &use_museumexitticket
-};
-
 static int
 use_museumticket(unit *u, const struct item_type *itype, int amount, order * ord)
 {
@@ -382,24 +368,10 @@ use_museumticket(unit *u, const struct item_type *itype, int amount, order * ord
   i_change(&u->items, itype, -1);
 
   /* Benutzer ein Exitticket geben */
-  i_change(&u->items, &it_museumexitticket, 1);
+  i_change(&u->items, itype, 1);
 
   return 0;
 }
-
-resource_type rt_museumticket = {
-  { "museumticket", "museumticket_p"},
-  { "museumticket", "museumticket_p"},
-  RTF_ITEM,
-  &res_changeitem
-};
-
-item_type it_museumticket = {
-  &rt_museumticket,
-    ITF_NONE, 0, 0,
-    NULL,
-    &use_museumticket
-};
 
 void
 register_museum(void)
@@ -409,14 +381,8 @@ register_museum(void)
 	at_register(&at_museumgivebackcookie);
 	at_register(&at_museumgiveback);
 
-	rt_register(&rt_museumticket);
-	it_register(&it_museumticket);
-
-	rt_register(&rt_museumexitticket);
-	it_register(&it_museumexitticket);
-
-	register_function((pf_generic)use_museumticket, "usemuseumticket");
-	register_function((pf_generic)use_museumexitticket, "usemuseumexitticket");
+	register_function((pf_generic)use_museumticket, "use_museumticket");
+	register_function((pf_generic)use_museumexitticket, "use_museumexitticket");
 }
 
 #endif

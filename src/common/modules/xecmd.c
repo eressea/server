@@ -65,7 +65,7 @@ xe_givepotion(unit *u, struct order *ord)
 		cmistake(u, ord, 63, MSG_EVENT);
 		return;
 	}
-	i_change(&u2->items, &it_skillpotion, 1);
+	i_change(&u2->items, it_find("skillpotion"), 1);
 }
 
 static void

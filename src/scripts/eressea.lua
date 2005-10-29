@@ -24,7 +24,7 @@ end
 function run_scripts()
   scripts = { 
     "spells.lua",
-    "familiars.lua",
+    "extensions.lua",
     "eternath.lua",
     "wedding-jadee.lua", 
     "ponnuki.lua"

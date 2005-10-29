@@ -18,8 +18,6 @@
 extern "C" {
 #endif
 
-extern struct item_type it_skillpotion;
-extern struct item_type it_astralcrystal;
 extern void register_xerewards(void);
 
 #ifdef __cplusplus

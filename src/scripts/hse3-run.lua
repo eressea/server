@@ -1,7 +1,7 @@
 function run_scripts()
   scripts = { 
     "spells.lua",
-    "familiars.lua",
+    "extensions.lua",
     "hse-portals.lua",
     "hse-stats.lua"
   }

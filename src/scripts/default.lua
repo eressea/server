@@ -72,6 +72,7 @@ if orderfile==nil then
   print "you must specify an orderfile"
 else
   loadscript("spells.lua")
+  loadscript("extensions.lua")
   process(orderfile)
 end
 

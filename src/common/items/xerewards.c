@@ -36,6 +36,11 @@
 static int
 use_skillpotion(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
 {
+  /* the problem with making this a lua function is that there's no way
+   * to get the list of skills for a unit. and with the way skills are 
+   * currently saved, it doesn't look likely (can't make eressea::list 
+   * from them)
+   */
 	int i;
 	for (i=0;i!=amount;++i) {
 		skill * sv = u->skills;
@@ -51,23 +56,6 @@ use_skillpotion(struct unit * u, const struct item_type * itype, int amount, str
 	res_changeitem(u, itype->rtype, -amount);
 	return 0;
 }
-
-static resource_type rt_skillpotion = {
-	{ "skillpotion", "skillpotion_p" },
-	{ "skillpotion", "skillpotion_p" },
-	RTF_ITEM,
-	&res_changeitem
-};
-
-item_type it_skillpotion = {
-	&rt_skillpotion,        /* resourcetype */
-	0, 0, 0,		/* flags, weight, capacity */
-	NULL,                   /* construction */
-	&use_skillpotion,
-	NULL,
-	NULL
-};
-
 
 static int
 use_manacrystal(struct unit * u, const struct item_type * itype, int amount, struct order * ord)
@@ -91,28 +79,9 @@ use_manacrystal(struct unit * u, const struct item_type * itype, int amount, str
 	return 0;
 }
 
-static resource_type rt_manacrystal = {
-	{ "manacrystal", "manacrystal_p" },
-	{ "manacrystal", "manacrystal_p" },
-	RTF_ITEM,
-	&res_changeitem
-};
-
-item_type it_manacrystal = {
-	&rt_manacrystal,        /* resourcetype */
-	0, 0, 0,		/* flags, weight, capacity */
-	NULL,                   /* construction */
-	&use_manacrystal,
-	NULL,
-	NULL
-};
-
-
 void
 register_xerewards(void)
 {
-	it_register(&it_skillpotion);
-	it_register(&it_manacrystal);
 	register_function((pf_generic)use_skillpotion, "useskillpotion");
 	register_function((pf_generic)use_manacrystal, "usemanacrystal");
 }

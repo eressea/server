@@ -21,6 +21,7 @@
 #include <kernel/race.h>
 #include <kernel/reports.h>
 #include <kernel/save.h>
+#include <kernel/skill.h>
 #include <kernel/teleport.h>
 #include <kernel/unit.h>
 
@@ -217,6 +218,15 @@ lua_equipunit(unit& u, const char * eqname)
   equip_unit(&u, get_equipment(eqname));
 }
 
+static void
+lua_learnskill(unit& u, const char * skname, float chances)
+{
+  skill_t sk = sk_find(skname);
+  if (sk!=NOSKILL) {
+    learn_skill(&u, sk, chances);
+  }
+}
+
 void
 bind_eressea(lua_State * L)
 {
@@ -239,6 +249,7 @@ bind_eressea(lua_State * L)
     def("remove_empty_units", &remove_empty_units),
 
     def("equip_unit", &lua_equipunit),
+    def("learn_skill", &lua_learnskill),
 
     /* scripted monsters */
     def("plan_monsters", &lua_planmonsters),
