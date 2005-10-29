@@ -446,7 +446,7 @@ destroy_cmd(unit * u, struct order * ord)
       const requirement * rq = con->materials+c;
       int recycle = (int)(rq->recycle * rq->number * size/con->reqsize);
       if (recycle)
-        new_change_resource(u, rq->rtype, recycle);
+        change_resource(u, rq->rtype, recycle);
     }
   }
 #endif

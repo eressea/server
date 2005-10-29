@@ -40,11 +40,11 @@ int new_use_pooled(struct unit * u, const struct resource_type * res, int mode, 
 	 * von der Einheit reservierten Resourcen
 	 */
 
-int new_get_resource(const struct unit * u, const struct resource_type * res);
-int new_change_resource(struct unit * u, const struct resource_type * res, int change);
+int get_resource(const struct unit * u, const struct resource_type * res);
+int change_resource(struct unit * u, const struct resource_type * res, int change);
 
-int new_get_resvalue(const struct unit * u, const struct resource_type * res);
-int new_change_resvalue(struct unit * u, const struct resource_type * res, int value);
+int get_reservation(const struct unit * u, const struct resource_type * res);
+int change_reservation(struct unit * u, const struct resource_type * res, int value);
 
 void init_pool(void);
 

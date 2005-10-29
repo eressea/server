@@ -117,10 +117,10 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
       i_change(&dest->items, itype, n);
 #ifdef RESERVE_GIVE
 #ifdef RESERVE_DONATIONS
-      new_change_resvalue(dest, item2resource(itype), n);
+      change_reservation(dest, item2resource(itype), n);
 #else
       if (src->faction==dest->faction) {
-        new_change_resvalue(dest, item2resource(itype), n);
+        change_reservation(dest, item2resource(itype), n);
       }
 #endif
 #endif
