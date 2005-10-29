@@ -1229,7 +1229,7 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 		fprintf(F, "ZUTATEN\n");
 
 		while (m->number) {
-			ch = resourcename(oldresourcetype[m->type], 0);
+			ch = resourcename(m->rtype, 0);
 			fprintf(F, "\"%s\"\n", add_translation(ch, locale_string(f->locale, ch)));
 			m++;
 		}

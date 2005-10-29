@@ -446,7 +446,7 @@ destroy_cmd(unit * u, struct order * ord)
       const requirement * rq = con->materials+c;
       int recycle = (int)(rq->recycle * rq->number * size/con->reqsize);
       if (recycle)
-        change_resource(u, rq->type, recycle);
+        new_change_resource(u, rq->rtype, recycle);
     }
   }
 #endif
@@ -716,17 +716,17 @@ build(unit * u, const construction * ctype, int completed, int want)
     }
 
     if (type->materials) for (c=0;n>0 && type->materials[c].number;c++) {
-      resource_t rtype = type->materials[c].type;
+      const struct resource_type * rtype = type->materials[c].rtype;
       int need;
-      int have = get_pooled(u, NULL, rtype);
+      int have = new_get_pooled(u, rtype, GET_DEFAULT);
       int prebuilt;
       int canuse = have;
       if (inside_building(u)) {
-        canuse = matmod(u->building->type->attribs, u, oldresourcetype[rtype], canuse);
+        canuse = matmod(u->building->type->attribs, u, rtype, canuse);
 #if 0
       /* exploit-check */
       } else if (u->building) {
-        int abuse = matmod(u->building->type->attribs, u, oldresourcetype[rtype], canuse);
+        int abuse = matmod(u->building->type->attribs, u, rtype, canuse);
         if (abuse>canuse) {
         log_printf("ABUSE: %s saves %u %s through exploit\n",
                itoa36(u->faction->no), abuse-canuse,
@@ -735,7 +735,7 @@ build(unit * u, const construction * ctype, int completed, int want)
 #endif
       }
       if (canuse<0) return canuse; /* pass errors to caller */
-      canuse = matmod(type->attribs, u, oldresourcetype[rtype], canuse);
+      canuse = matmod(type->attribs, u, rtype, canuse);
       if (type->reqsize>1) {
         prebuilt = required(completed, type->reqsize, type->materials[c].number);
         for (;n;) {
@@ -753,20 +753,20 @@ build(unit * u, const construction * ctype, int completed, int want)
       else break;
     }
     if (type->materials) for (c=0;type->materials[c].number;c++) {
-      resource_t rtype = type->materials[c].type;
+      const struct resource_type * rtype = type->materials[c].rtype;
       int prebuilt = required(completed, type->reqsize, type->materials[c].number);
       int need = required(completed + n, type->reqsize, type->materials[c].number);
       int multi = 1;
       int canuse = 100; /* normalization */
-      if (inside_building(u)) canuse = matmod(u->building->type->attribs, u, oldresourcetype[rtype], canuse);
+      if (inside_building(u)) canuse = matmod(u->building->type->attribs, u, rtype, canuse);
       if (canuse<0) return canuse; /* pass errors to caller */
-      canuse = matmod(type->attribs, u, oldresourcetype[rtype], canuse);
+      canuse = matmod(type->attribs, u, rtype, canuse);
 
       assert(canuse % 100 == 0 || !"only constant multipliers are implemented in build()");
       multi = canuse/100;
       if (canuse<0) return canuse; /* pass errors to caller */
 
-      use_pooled(u, NULL, rtype, (need-prebuilt+multi-1)/multi);
+      new_use_pooled(u, rtype, (need-prebuilt+multi-1)/multi, GET_DEFAULT);
     }
     made += n;
     skills -= n * type->minskill;
@@ -787,8 +787,8 @@ maxbuild(const unit * u, const construction * cons)
   int c;
   int maximum = INT_MAX;
   for (c=0;cons->materials[c].number;c++) {
-    resource_t rtype = cons->materials[c].type;
-    int have = get_pooled(u, NULL, rtype);
+    const resource_type * rtype = cons->materials[c].rtype;
+    int have = new_get_pooled(u, rtype, GET_DEFAULT);
     int need = required(1, cons->reqsize, cons->materials[c].number);
     if (have<need) {
       cmistake(u, u->thisorder, 88, MSG_PRODUCE);
@@ -898,7 +898,7 @@ build_building(unit * u, const building_type * btype, int want, order * ord)
       if (c!=0) strcat(ch++, ",");
       n = cons->materials[c].number / cons->reqsize;
       sprintf(ch, " %d %s", n?n:1,
-        LOC(lang, resname(cons->materials[c].type, cons->materials[c].number!=1)));
+        LOC(lang, resourcename(cons->materials[c].rtype, cons->materials[c].number!=1)));
       ch = ch+strlen(ch);
     }
     ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "build_required",

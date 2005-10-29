@@ -909,233 +909,233 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
 #ifdef SMALL_BATTLE_MESSAGES
   char smallbuf[512];
 #endif
-	item ** pitm;
-	fighter *df = dt.fighter;
-	fighter *af = at.fighter;
-	unit *au = af->unit;
-	unit *du = df->unit;
-	battle *b = df->side->battle;
-	int heiltrank = 0;
-	int faerie_level;
-	char debugbuf[512];
+  item ** pitm;
+  fighter *df = dt.fighter;
+  fighter *af = at.fighter;
+  unit *au = af->unit;
+  unit *du = df->unit;
+  battle *b = df->side->battle;
+  int heiltrank = 0;
+  int faerie_level;
+  char debugbuf[512];
 
-	/* Schild */
-	void **si;
-	side *ds = df->side;
-	int hp;
+  /* Schild */
+  void **si;
+  side *ds = df->side;
+  int hp;
 
-	int ar = 0, an, am;
-	const armor_type * armor = select_armor(dt, true);
-	const armor_type * shield = select_armor(dt, false);
+  int ar = 0, an, am;
+  const armor_type * armor = select_armor(dt, true);
+  const armor_type * shield = select_armor(dt, false);
 
-	const weapon_type *dwtype = NULL;
-	const weapon_type *awtype = NULL;
-	const weapon * weapon;
+  const weapon_type *dwtype = NULL;
+  const weapon_type *awtype = NULL;
+  const weapon * weapon;
 
-	int rda, sk = 0, sd;
-	boolean magic = false;
-	int da = dice_rand(damage);
+  int rda, sk = 0, sd;
+  boolean magic = false;
+  int da = dice_rand(damage);
 
 #ifdef SHOW_KILLS
   ++at.fighter->hits;
 #endif
 
   if (fval(au, UFL_WERE)) {
-		int level = fspecial(du->faction, FS_LYCANTROPE);
-		da += level;
-	}
+    int level = fspecial(du->faction, FS_LYCANTROPE);
+    da += level;
+  }
 
-	switch (type) {
-	case AT_STANDARD:
-		weapon = select_weapon(at, true, missile);
-		sk = weapon_effskill(at, dt, weapon, true, missile);
-		if (weapon) awtype = weapon->type;
-		if (awtype && fval(awtype, WTF_MAGICAL)) magic = true;
-		break;
-	case AT_NATURAL:
-		sk = weapon_effskill(at, dt, NULL, true, missile);
-		break;
-	case AT_SPELL:
-	case AT_COMBATSPELL:
-		magic = true;
-		break;
-	default:
-		break;
-	}
-	weapon = select_weapon(dt, false, true); /* missile=true to get the unmodified best weapon she has */
-	sd = weapon_effskill(dt, at, weapon, false, false);
-	if (weapon!=NULL) dwtype=weapon->type;
+  switch (type) {
+  case AT_STANDARD:
+    weapon = select_weapon(at, true, missile);
+    sk = weapon_effskill(at, dt, weapon, true, missile);
+    if (weapon) awtype = weapon->type;
+    if (awtype && fval(awtype, WTF_MAGICAL)) magic = true;
+    break;
+  case AT_NATURAL:
+    sk = weapon_effskill(at, dt, NULL, true, missile);
+    break;
+  case AT_SPELL:
+  case AT_COMBATSPELL:
+    magic = true;
+    break;
+  default:
+    break;
+  }
+  weapon = select_weapon(dt, false, true); /* missile=true to get the unmodified best weapon she has */
+  sd = weapon_effskill(dt, at, weapon, false, false);
+  if (weapon!=NULL) dwtype=weapon->type;
 
-	if (armor) ar += armor->prot;
-	if (shield) ar += shield->prot;
+  if (armor) ar += armor->prot;
+  if (shield) ar += shield->prot;
 
-	/* natürliche Rüstung */
-	an = du->race->armor;
+  /* natürliche Rüstung */
+  an = du->race->armor;
 
-	/* magische Rüstung durch Artefakte oder Sprüche */
-	/* Momentan nur Trollgürtel und Werwolf-Eigenschaft */
-	am = select_magicarmor(dt);
-	if(fval(du, UFL_WERE)) {
-		/* this counts as magical armor */
-		int level = fspecial(du->faction, FS_LYCANTROPE);
-		am += level;
-	}
+  /* magische Rüstung durch Artefakte oder Sprüche */
+  /* Momentan nur Trollgürtel und Werwolf-Eigenschaft */
+  am = select_magicarmor(dt);
+  if(fval(du, UFL_WERE)) {
+    /* this counts as magical armor */
+    int level = fspecial(du->faction, FS_LYCANTROPE);
+    am += level;
+  }
 
 #if CHANGED_CROSSBOWS == 1
-	if(awtype && fval(awtype,WTF_ARMORPIERCING)) {
-		/* crossbows */
-		ar /= 2;
-		an /= 2;
-	}
+  if(awtype && fval(awtype,WTF_ARMORPIERCING)) {
+    /* crossbows */
+    ar /= 2;
+    an /= 2;
+  }
 #endif
 
-	/* natürliche Rüstung ist halbkumulativ */
-	if (ar>0) {
-		ar += an/2;
-	} else {
-		ar = an;
-	}
-	ar += am;
+  /* natürliche Rüstung ist halbkumulativ */
+  if (ar>0) {
+    ar += an/2;
+  } else {
+    ar = an;
+  }
+  ar += am;
 
-	if (type!=AT_COMBATSPELL && type!=AT_SPELL) /* Kein Zauber, normaler Waffenschaden */
-	{
-    double kritchance = (sk * 3 - sd) / 200.0;
-		kritchance = max(kritchance, 0.005);
-    kritchance = min(0.9, kritchance);
+  if (type!=AT_COMBATSPELL && type!=AT_SPELL) /* Kein Zauber, normaler Waffenschaden */
+    {
+      double kritchance = (sk * 3 - sd) / 200.0;
+      kritchance = max(kritchance, 0.005);
+      kritchance = min(0.9, kritchance);
 
-    while (chance(kritchance)) {
-			sprintf(debugbuf,
-				"%s/%d landet einen kritischen Treffer", unitid(au), at.index);
-			battledebug(debugbuf);
-			da += dice_rand(damage);
-		}
+      while (chance(kritchance)) {
+	sprintf(debugbuf,
+		"%s/%d landet einen kritischen Treffer", unitid(au), at.index);
+	battledebug(debugbuf);
+	da += dice_rand(damage);
+      }
 
-		da += rc_specialdamage(au->race, du->race, awtype);
+      da += rc_specialdamage(au->race, du->race, awtype);
 #ifdef KARMA_MODULE
-		da += jihad(au->faction, du->race);
+      da += jihad(au->faction, du->race);
 #endif
-		faerie_level = fspecial(du->faction, FS_FAERIE);
-		if (type == AT_STANDARD && faerie_level) {
-			int c;
+      faerie_level = fspecial(du->faction, FS_FAERIE);
+      if (type == AT_STANDARD && faerie_level) {
+	int c;
 
-			for (c=0;weapon->type->itype->construction->materials[c].number; c++) {
-				if(weapon->type->itype->construction->materials[c].type == R_IRON) {
-					da += faerie_level;
-					break;
-				}
-			}
-		}
-
-		if (awtype!=NULL && fval(awtype, WTF_MISSILE)) {
-			/* Fernkampfschadenbonus */
-			da += af->person[at.index].damage_rear;
-		} else if (awtype==NULL) {
-			/* Waffenloser kampf, bonus von talentwert*/
-			da += effskill(au, SK_WEAPONLESS);
-		} else {
-			/* Nahkampfschadensbonus */
-			da += af->person[at.index].damage;
-		}
-
-		/* Skilldifferenzbonus */
-		da += max(0, (sk-sd)/DAMAGE_QUOTIENT);
+	for (c=0;weapon->type->itype->construction->materials[c].number; c++) {
+	  if(weapon->type->itype->construction->materials[c].rtype == oldresourcetype[R_IRON]) {
+	    da += faerie_level;
+	    break;
+	  }
 	}
+      }
+
+      if (awtype!=NULL && fval(awtype, WTF_MISSILE)) {
+	/* Fernkampfschadenbonus */
+	da += af->person[at.index].damage_rear;
+      } else if (awtype==NULL) {
+	/* Waffenloser kampf, bonus von talentwert*/
+	da += effskill(au, SK_WEAPONLESS);
+      } else {
+	/* Nahkampfschadensbonus */
+	da += af->person[at.index].damage;
+      }
+
+      /* Skilldifferenzbonus */
+      da += max(0, (sk-sd)/DAMAGE_QUOTIENT);
+    }
 
 
-	if (magic) /* Magischer Schaden durch Spruch oder magische Waffe */
-	{
-		double res = 1.0;
+  if (magic) /* Magischer Schaden durch Spruch oder magische Waffe */
+    {
+      double res = 1.0;
 
-		/* magic_resistance gib x% Resistenzbonus zurück */
-		res -= magic_resistance(du)*3.0;
+      /* magic_resistance gib x% Resistenzbonus zurück */
+      res -= magic_resistance(du)*3.0;
 
-		if (du->race->battle_flags & BF_EQUIPMENT) {
+      if (du->race->battle_flags & BF_EQUIPMENT) {
 #ifdef TODO_RUNESWORD
-			/* Runenschwert gibt im Kampf 80% Resistenzbonus */
-			if (dwp == WP_RUNESWORD) res -= 0.80;
+	/* Runenschwert gibt im Kampf 80% Resistenzbonus */
+	if (dwp == WP_RUNESWORD) res -= 0.80;
 #endif
-			/* der Effekt von Laen steigt nicht linear */
-      if (armor && fval(armor, ATF_LAEN)) res *= (1-armor->magres);
-			if (shield && fval(shield, ATF_LAEN)) res *= (1-shield->magres);
-			if (dwtype) res *= (1-dwtype->magres);
-		}
+	/* der Effekt von Laen steigt nicht linear */
+	if (armor && fval(armor, ATF_LAEN)) res *= (1-armor->magres);
+	if (shield && fval(shield, ATF_LAEN)) res *= (1-shield->magres);
+	if (dwtype) res *= (1-dwtype->magres);
+      }
 
-		if (res > 0) {
-			da = (int) (max(da * res, 0));
-		}
-		/* gegen Magie wirkt nur natürliche und magische Rüstung */
-		ar = an+am;
-	}
+      if (res > 0) {
+	da = (int) (max(da * res, 0));
+      }
+      /* gegen Magie wirkt nur natürliche und magische Rüstung */
+      ar = an+am;
+    }
 
-	rda = max(da - ar,0);
+  rda = max(da - ar,0);
 
-	if ((du->race->battle_flags & BF_INV_NONMAGIC) && !magic) rda = 0;
-	else {
-		unsigned int i = 0;
-		if (du->race->battle_flags & BF_RES_PIERCE) i |= WTF_PIERCE;
-		if (du->race->battle_flags & BF_RES_CUT) i |= WTF_CUT;
-		if (du->race->battle_flags & BF_RES_BASH) i |= WTF_BLUNT;
+  if ((du->race->battle_flags & BF_INV_NONMAGIC) && !magic) rda = 0;
+  else {
+    unsigned int i = 0;
+    if (du->race->battle_flags & BF_RES_PIERCE) i |= WTF_PIERCE;
+    if (du->race->battle_flags & BF_RES_CUT) i |= WTF_CUT;
+    if (du->race->battle_flags & BF_RES_BASH) i |= WTF_BLUNT;
 
-		if (i && awtype && fval(awtype, i)) rda /= 2;
+    if (i && awtype && fval(awtype, i)) rda /= 2;
 
-		/* Schilde */
-		for (si = b->meffects.begin; si != b->meffects.end; ++si) {
-			meffect *meffect = *si;
-			if (meffect_protection(b, meffect, ds) != 0) {
-				assert(0 <= rda); /* rda sollte hier immer mindestens 0 sein */
+    /* Schilde */
+    for (si = b->meffects.begin; si != b->meffects.end; ++si) {
+      meffect *meffect = *si;
+      if (meffect_protection(b, meffect, ds) != 0) {
+	assert(0 <= rda); /* rda sollte hier immer mindestens 0 sein */
 				/* jeder Schaden wird um effect% reduziert bis der Schild duration
 				 * Trefferpunkte aufgefangen hat */
-				if (meffect->typ == SHIELD_REDUCE) {
-					hp = rda * (meffect->effect/100);
-					rda -= hp;
-					meffect->duration -= hp;
-				}
+	if (meffect->typ == SHIELD_REDUCE) {
+	  hp = rda * (meffect->effect/100);
+	  rda -= hp;
+	  meffect->duration -= hp;
+	}
 				/* gibt Rüstung +effect für duration Treffer */
-				if (meffect->typ == SHIELD_ARMOR) {
-					rda = max(rda - meffect->effect, 0);
-					meffect->duration--;
-				}
-			}
-		}
+	if (meffect->typ == SHIELD_ARMOR) {
+	  rda = max(rda - meffect->effect, 0);
+	  meffect->duration--;
 	}
+      }
+    }
+  }
 
-	sprintf(debugbuf, "Verursacht %dTP, Rüstung %d: %d -> %d HP",
-		da, ar, df->person[dt.index].hp, df->person[dt.index].hp - rda);
+  sprintf(debugbuf, "Verursacht %dTP, Rüstung %d: %d -> %d HP",
+	  da, ar, df->person[dt.index].hp, df->person[dt.index].hp - rda);
 
 #ifdef SMALL_BATTLE_MESSAGES
-	if (b->small) {
-		if (rda > 0) {
-			sprintf(smallbuf, "Der Treffer verursacht %s",
-				rel_dam(rda, df->person[dt.index].hp));
-		} else {
-			sprintf(smallbuf, "Der Treffer verursacht keinen Schaden");
-		}
-	}
+  if (b->small) {
+    if (rda > 0) {
+      sprintf(smallbuf, "Der Treffer verursacht %s",
+	      rel_dam(rda, df->person[dt.index].hp));
+    } else {
+      sprintf(smallbuf, "Der Treffer verursacht keinen Schaden");
+    }
+  }
 #endif
 
-	assert(dt.index<du->number);
-	df->person[dt.index].hp -= rda;
+  assert(dt.index<du->number);
+  df->person[dt.index].hp -= rda;
 
-	if (df->person[dt.index].hp > 0) {	/* Hat überlebt */
-		battledebug(debugbuf);
-		if (au->race == new_race[RC_DAEMON]) {
+  if (df->person[dt.index].hp > 0) {	/* Hat überlebt */
+    battledebug(debugbuf);
+    if (au->race == new_race[RC_DAEMON]) {
 #ifdef TODO_RUNESWORD
-			if (select_weapon(dt, 0, -1) == WP_RUNESWORD) continue;
+      if (select_weapon(dt, 0, -1) == WP_RUNESWORD) continue;
 #endif
-			if (!(df->person[dt.index].flags & (FL_COURAGE|FL_DAZZLED))) {
-				df->person[dt.index].flags |= FL_DAZZLED;
-				df->person[dt.index].defence--;
-			}
-		}
-		df->person[dt.index].flags = (df->person[dt.index].flags & ~FL_SLEEPING);
+      if (!(df->person[dt.index].flags & (FL_COURAGE|FL_DAZZLED))) {
+	df->person[dt.index].flags |= FL_DAZZLED;
+	df->person[dt.index].defence--;
+      }
+    }
+    df->person[dt.index].flags = (df->person[dt.index].flags & ~FL_SLEEPING);
 #ifdef SMALL_BATTLE_MESSAGES
-		if (b->small) {
-			strcat(smallbuf, ".");
-			battlerecord(b, smallbuf);
-		}
+    if (b->small) {
+      strcat(smallbuf, ".");
+      battlerecord(b, smallbuf);
+    }
 #endif
-		return false;
-	}
+    return false;
+  }
 #ifdef SHOW_KILLS
   ++at.fighter->kills;
 #endif
@@ -1146,8 +1146,8 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   }
 #endif
 
-	/* Sieben Leben */
-	if (du->race == new_race[RC_CAT] && (chance(1.0 / 7))) {
+  /* Sieben Leben */
+  if (du->race == new_race[RC_CAT] && (chance(1.0 / 7))) {
 #ifdef SMALL_BATTLE_MESSAGES
     if (b->small) {
       strcat(smallbuf, ", doch die Katzengöttin ist gnädig");
@@ -1157,52 +1157,52 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     assert(dt.index>=0 && dt.index<du->number);
     df->person[dt.index].hp = unit_max_hp(du);
     return false;
-	}
+  }
 
-	/* Heiltrank schluerfen und hoffen */
-	if (get_effect(du, oldpotiontype[P_HEAL]) > 0) {
-		change_effect(du, oldpotiontype[P_HEAL], -1);
-		heiltrank = 1;
-	} else if (i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0) {
-		i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
-		change_effect(du, oldpotiontype[P_HEAL], 3);
-		heiltrank = 1;
-	}
-	if (heiltrank && (chance(0.50))) {
+  /* Heiltrank schluerfen und hoffen */
+  if (get_effect(du, oldpotiontype[P_HEAL]) > 0) {
+    change_effect(du, oldpotiontype[P_HEAL], -1);
+    heiltrank = 1;
+  } else if (i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0) {
+    i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
+    change_effect(du, oldpotiontype[P_HEAL], 3);
+    heiltrank = 1;
+  }
+  if (heiltrank && (chance(0.50))) {
 #ifdef SMALL_BATTLE_MESSAGES
-		if (b->small) {
-			strcat(smallbuf, ", doch ein Heiltrank bringt Rettung");
-			battlerecord(b, smallbuf);
-		} else 
+    if (b->small) {
+      strcat(smallbuf, ", doch ein Heiltrank bringt Rettung");
+      battlerecord(b, smallbuf);
+    } else 
 #endif
-    {
-      message * m = msg_message("battle::potionsave", "unit", du);
-      message_faction(b, du->faction, m);
-      msg_release(m);
-    }
+      {
+	message * m = msg_message("battle::potionsave", "unit", du);
+	message_faction(b, du->faction, m);
+	msg_release(m);
+      }
     assert(dt.index>=0 && dt.index<du->number);
     df->person[dt.index].hp = du->race->hitpoints;
     return false;
   }
 
-	strcat(debugbuf, ", tot");
-	battledebug(debugbuf);
+  strcat(debugbuf, ", tot");
+  battledebug(debugbuf);
 #ifdef SMALL_BATTLE_MESSAGES
-	if (b->small) {
-		strcat(smallbuf, ".");
-		battlerecord(b, smallbuf);
-	}
+  if (b->small) {
+    strcat(smallbuf, ".");
+    battlerecord(b, smallbuf);
+  }
 #endif
-	for (pitm=&du->items; *pitm; pitm=&(*pitm)->next) {
-		const item_type * itype = (*pitm)->type;
-		if (!itype->flags & ITF_CURSED && dt.index < (*pitm)->number) {
-			/* 25% Grundchance, das ein Item kaputtgeht. */
-			if (rand() % 4 < 1) i_change(pitm, itype, -1);
-		}
-	}
-	remove_troop(dt);
+  for (pitm=&du->items; *pitm; pitm=&(*pitm)->next) {
+    const item_type * itype = (*pitm)->type;
+    if (!itype->flags & ITF_CURSED && dt.index < (*pitm)->number) {
+      /* 25% Grundchance, das ein Item kaputtgeht. */
+      if (rand() % 4 < 1) i_change(pitm, itype, -1);
+    }
+  }
+  remove_troop(dt);
 
-	return true;
+  return true;
 }
 
 static int

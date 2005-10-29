@@ -76,13 +76,14 @@
 static void
 reduce_weight(unit * u)
 {
-  int horses = get_resource(u,R_HORSE);
+  int horses = new_get_resource(u, oldresourcetype[R_HORSE]);
   int capacity = walkingcapacity(u);
   item ** itmp = &u->items;
   int weight = 0;
 
   if (horses > 0) {
-    change_resource(u, R_HORSE, - min(horses,(u->number*2)));
+    horses = min(horses, (u->number*2));
+    new_change_resource(u, oldresourcetype[R_HORSE], - horses);
   }
 
   /* 1. get rid of anything that isn't silver or really lightweight or helpful in combat */

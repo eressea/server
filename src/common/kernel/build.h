@@ -32,11 +32,7 @@ extern "C" {
 struct xml_tag;
 
 typedef struct requirement {
-#ifdef NO_OLD_ITEMS
-	resource_type * rtype;
-#else
-	resource_t type;
-#endif
+	const struct resource_type * rtype;
 	int number;
 	double recycle; /* recycling quota */
 } requirement;

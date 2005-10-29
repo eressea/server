@@ -80,12 +80,6 @@ int get_slack(const struct unit * u, resource_t itm);
  * aus den nicht-reservierten Objekten der Einheit.
  */
 
-int get_resource(const struct unit * u, resource_t res);
-int change_resource(struct unit * u, resource_t res, int change);
-
-int get_resvalue(const struct unit * u, resource_t resource);
-int change_resvalue(struct unit * u, resource_t resource, int value);
-
 int new_get_pooled(const struct unit * u, const struct resource_type * res, int mode);
 int new_use_pooled(struct unit * u, const struct resource_type * res, int mode, int count);
 	/** use_pooled

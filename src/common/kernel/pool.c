@@ -271,70 +271,6 @@ new_use_pooled(unit * u, const resource_type * rtype, int mode, int count)
 }
 
 int
-get_resource(const unit * u, resource_t res)
-{
-  return new_get_resource(u, oldresourcetype[res]);
-}
-
-int
-change_resource(unit * u, resource_t res, int change)
-{
-  int i = 0;
-  const item_type * itype = resource2item(oldresourcetype[res]);
-
-  if (!rc_stonegolem) init_static();
-
-  if (res==R_STONE && u->race==rc_stonegolem) {
-    i = u->number - (change+GOLEM_STONE-1)/GOLEM_STONE;
-    scale_number(u, i);
-  }
-  else if (res==R_IRON && u->race==rc_irongolem) {
-    i = u->number - (change+GOLEM_IRON-1)/GOLEM_IRON;
-    scale_number(u, i);
-  }
-  else if (itype!=NULL) {
-    item * it = i_change(&u->items, itype, change);
-    if (it==NULL) return 0;
-    return it->number;
-  }
-  else if (res == R_AURA)
-    i = change_spellpoints(u, change);
-  else if (res == R_PERMAURA)
-    i = change_maxspellpoints(u, change);
-  else if (res == R_HITPOINTS)
-    i = change_hitpoints(u, change);
-  else if (res == R_PEASANTS) {
-    i = rpeasants(u->region) + change;
-    if(i < 0) i = 0;
-    rsetpeasants(u->region, i);
-  }
-  else
-    assert(!"unbekannte ressource entdeckt");
-  assert(i >= 0 && (i < 1000000));  /* Softer Test, daß kein Unfug
-                     * * passiert */
-  return i;
-}
-
-int
-get_resvalue(const unit * u, resource_t resource)
-{
-  const resource_type * rtype = oldresourcetype[resource];
-  return new_get_resvalue(u, rtype);
-}
-
-static int
-set_resvalue(unit * u, resource_t resource, int value)
-{
-  return new_set_resvalue(u, oldresourcetype[resource], value);
-}
-
-int
-change_resvalue(unit * u, resource_t resource, int value)
-{
-  return set_resvalue(u, resource, get_resvalue(u, resource) + value);
-}
-
-int
 get_reserved(const unit * u, resource_t resource)
 {
   return new_get_pooled(u, oldresourcetype[resource], GET_RESERVE);
@@ -369,7 +305,7 @@ get_pooled(const unit * u, const region * r, resource_t resource)
 int
 use_pooled(unit * u, region * r, resource_t resource, int count)
 {
-  return new_use_pooled(u, oldresourcetype[resource], GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, count);
+  return new_use_pooled(u, oldresourcetype[resource], GET_DEFAULT, count);
 }
 
 int

@@ -325,7 +325,7 @@ sp_combatrosthauch(fighter * fi, int level, double power, spell * sp)
 					requirement * mat = wp->type->itype->construction->materials;
 					boolean iron = false;
 					while (mat && mat->number>0) {
-						if (mat->type==R_IRON) {
+						if (mat->rtype==oldresourcetype[R_IRON]) {
 							iron = true;
 							break;
 						}

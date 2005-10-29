@@ -1884,7 +1884,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
       assert(ctype->materials != NULL);
 
       for (c=0;ctype->materials[c].number;c++) {
-        resource_t rtype = ctype->materials[c].type;
+        const resource_type * rtype = ctype->materials[c].rtype;
         int number = ctype->materials[c].number;
 
         if(c > 0) {
@@ -1892,9 +1892,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
         }
         icat(number);
         scat(" ");
-        scat(locale_string(lang,
-            resourcename(oldresourcetype[rtype],
-            number!=1?GR_PLURAL:0)));
+        scat(locale_string(lang, resourcename(rtype, number!=1?GR_PLURAL:0)));
       }
 
       scat(".");
@@ -2153,7 +2151,7 @@ report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * ad
 		  rnl(F);
 		  sprintf(buf, "%s: ", LOC(f->locale, "nr_herbsrequired"));
 		  while (m->number) {
-			  scat(LOC(f->locale, resourcename(oldresourcetype[m->type], 0)));
+			  scat(LOC(f->locale, resourcename(m->rtype, 0)));
 			  ++m;
 			  if (m->number) scat(", ");
 		  }

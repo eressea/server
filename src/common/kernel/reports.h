@@ -86,8 +86,6 @@ extern void seen_done(struct seen_region * seehash[]);
 extern void free_seen(void);
 extern void get_seen_interval(struct seen_region ** seen, struct region ** first, struct region ** last);
   
-extern const char* resname(resource_t res, int i);
-
 extern void report_item(const struct unit * owner, const struct item * i, const struct faction * viewer, const char ** name, const char ** basename, int * number, boolean singular);
 extern void report_building(FILE *F, const struct region * r, const struct building * b, const struct faction * f, int mode);
 extern int bufunit(const struct faction * f, const struct unit * u, int indent, int mode);

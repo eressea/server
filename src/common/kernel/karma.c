@@ -387,7 +387,7 @@ sacrifice_cmd(unit * u, struct order * ord)
       cmistake(u, ord, 51, MSG_EVENT);
       return 0;
     }
-    change_resource(u, R_SILVER, n);
+    new_change_resource(u, oldresourcetype[R_SILVER], n);
     karma = n/10000;
     u->faction->karma += karma;
     break;

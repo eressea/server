@@ -334,7 +334,7 @@ init_oldweapons(void)
     if (itype->construction->materials==NULL) {
       itype->score = 6000;
     } else for (m=0;itype->construction->materials[m].number;++m) {
-      const resource_type * rtype = oldresourcetype[itype->construction->materials[m].type];
+      const resource_type * rtype = itype->construction->materials[m].rtype;
       int score = rtype->itype?rtype->itype->score:5;
       itype->score = 2*itype->construction->materials[m].number * score;
     }

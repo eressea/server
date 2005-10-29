@@ -2,9 +2,12 @@ C++ = g++-3.3 ;
 CC = gcc-3.3 ;
 LINK = gcc-3.3 ;
 
+#CC = tcc ;
+#LINK = tcc ;
+
 # ECHO $(JAMUNAME) ;
 
-LINKFLAGS += -rdynamic ;
+# LINKFLAGS += -rdynamic ;
 
 if $(MSPACES) {
   CCFLAGS += -DMSPACES ;

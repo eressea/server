@@ -1103,124 +1103,124 @@ static translate_t translation[] = {
 static void
 init_olditems(void)
 {
-	item_t i;
-	resource_type * rtype;
+  item_t i;
+  resource_type * rtype;
 
-	const struct locale * lang = find_locale("de");
-	assert(lang);
+  const struct locale * lang = find_locale("de");
+  assert(lang);
 
-	for (i=0; i!=MAXITEMS; ++i) {
-		int iflags = ITF_NONE;
-		int rflags = RTF_ITEM|RTF_POOLED;
-		int m, n;
-		const char * name[2];
-		const char * appearance[2];
-		int weight = itemdata[i].gewicht;
-		int capacity = 0;
-		int price;
-		attrib * a;
-		item_type * itype;
-		construction * con = calloc(sizeof(construction), 1);
+  for (i=0; i!=MAXITEMS; ++i) {
+    int iflags = ITF_NONE;
+    int rflags = RTF_ITEM|RTF_POOLED;
+    int m, n;
+    const char * name[2];
+    const char * appearance[2];
+    int weight = itemdata[i].gewicht;
+    int capacity = 0;
+    int price;
+    attrib * a;
+    item_type * itype;
+    construction * con = calloc(sizeof(construction), 1);
 
-		con->minskill = itemdata[i].minskill;
-		if (i==I_LAEN && SkillCap(SK_QUARRYING)) {
-			/* at least 4 levels on which you can mine laen */
-			con->minskill = SkillCap(SK_QUARRYING)-3;
-		}
-		con->skill = itemdata[i].skill;
-		con->maxsize = -1;
-		con->reqsize = 1;
-		con->improvement = NULL;
+    con->minskill = itemdata[i].minskill;
+    if (i==I_LAEN && SkillCap(SK_QUARRYING)) {
+      /* at least 4 levels on which you can mine laen */
+      con->minskill = SkillCap(SK_QUARRYING)-3;
+    }
+    con->skill = itemdata[i].skill;
+    con->maxsize = -1;
+    con->reqsize = 1;
+    con->improvement = NULL;
 
-		for (m=0, n=0;m!=M_MAX_MAT;++m)
-			if (itemdata[i].material[m]>0) ++n;
-		if (n>0) {
-			con->materials = calloc(sizeof(requirement), n+1);
-			for (m=0, n=0;m!=M_MAX_MAT;++m) {
-				if (itemdata[i].material[m]>0) {
-					con->materials[n].type = matresource[m];
-					con->materials[n].number = itemdata[i].material[m];
-					con->materials[n].recycle = 0.0;
-					++n;
-					if (m==M_EISEN) {
-					}
-				}
-			}
-		}
-		if (itemdata[i].flags & FL_ITEM_CURSED) iflags |= ITF_CURSED;
-		if (itemdata[i].flags & FL_ITEM_NOTLOST) iflags |= ITF_NOTLOST;
-		if (itemdata[i].flags & FL_ITEM_NOTINBAG) iflags |= ITF_BIG;
-		if (itemdata[i].typ == IS_LUXURY) iflags |= ITF_LUXURY;
-		if (itemdata[i].flags & FL_ITEM_ANIMAL) iflags |= ITF_ANIMAL;
-
-		name[0]=NULL;
-		{
-			int ci;
-			for (ci=0;translation[ci][0];++ci) {
-				if (!strcmp(translation[ci][0], itemdata[i].name[0])) {
-					name[0] = translation[ci][1];
-					name[1] = translation[ci][2];
-					appearance[0] = translation[ci][3];
-					appearance[1] = translation[ci][4];
-				}
-			}
-		}
-		if (name[0]==NULL) {
-			name[0] = reverse_lookup(lang, itemdata[i].name[0]);
-			name[1] = reverse_lookup(lang, itemdata[i].name[1]);
-			appearance[0] = reverse_lookup(lang, itemdata[i].name[2]);
-			appearance[1] = reverse_lookup(lang, itemdata[i].name[3]);
-		}
-		rtype = new_resourcetype(name, appearance, rflags);
-		itype = new_itemtype(rtype, iflags, weight, capacity);
-
-		switch (i) {
-		case I_HORSE:
-    case I_UNICORN:
-			itype->capacity = HORSECAPACITY;
-			itype->give = give_horses;
-			break;
-		case I_WAGON:
-			itype->capacity = WAGONCAPACITY;
-			break;
-		case I_BAG_OF_HOLDING:
-			itype->capacity = BAGCAPACITY;
-			break;
-		case I_TROLLBELT:
-			/* This is wrong. according to the item description it multiplies
-			 * the strength of the wearer by a factor of
-			 * 50 (STRENGTHMULTIPLIER), not add a fixed 50000 */
-			/* only used in battle.c for items of type ITF_ANIMAL */
-			itype->capacity = STRENGTHCAPACITY;
-			break;
-		default:
-			if (itemdata[i].flags & FL_ITEM_MOUNT) itype->capacity = HORSECAPACITY;
-		}
-
-		/* itemdata::typ Analyse. IS_PRODUCT und IS_MAGIC sind so gut wie egal. */
-		switch (itemdata[i].typ) {
-		case IS_LUXURY:
-			price = itemdata[i].preis;
-			oldluxurytype[i-FIRSTLUXURY] = new_luxurytype(itype, price);
-			break;
-		case IS_RESOURCE:
-			rtype->flags |= RTF_LIMITED;
-			itype->flags |= ITF_NOBUILDBESIEGED;
-			a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
-			{
-				resource_limit * rdata = (resource_limit*)a->data.v;
-				rdata->limit = limit_oldtypes;
-				rdata->use = use_oldresource;
-			}
-			break;
-		}
-		if (itemdata[i].benutze_funktion) {
-			itype->use = use_olditem;
-		}
-		itype->construction = con;
-		olditemtype[i] = itype;
-		oldresourcetype[item2res(i)] = rtype;
+    for (m=0, n=0;m!=M_MAX_MAT;++m)
+      if (itemdata[i].material[m]>0) ++n;
+    if (n>0) {
+      con->materials = calloc(sizeof(requirement), n+1);
+      for (m=0, n=0;m!=M_MAX_MAT;++m) {
+	if (itemdata[i].material[m]>0) {
+	  con->materials[n].rtype = oldresourcetype[matresource[m]];
+	  con->materials[n].number = itemdata[i].material[m];
+	  con->materials[n].recycle = 0.0;
+	  ++n;
+	  if (m==M_EISEN) {
+	  }
 	}
+      }
+    }
+    if (itemdata[i].flags & FL_ITEM_CURSED) iflags |= ITF_CURSED;
+    if (itemdata[i].flags & FL_ITEM_NOTLOST) iflags |= ITF_NOTLOST;
+    if (itemdata[i].flags & FL_ITEM_NOTINBAG) iflags |= ITF_BIG;
+    if (itemdata[i].typ == IS_LUXURY) iflags |= ITF_LUXURY;
+    if (itemdata[i].flags & FL_ITEM_ANIMAL) iflags |= ITF_ANIMAL;
+
+    name[0]=NULL;
+    {
+      int ci;
+      for (ci=0;translation[ci][0];++ci) {
+	if (!strcmp(translation[ci][0], itemdata[i].name[0])) {
+	  name[0] = translation[ci][1];
+	  name[1] = translation[ci][2];
+	  appearance[0] = translation[ci][3];
+	  appearance[1] = translation[ci][4];
+	}
+      }
+    }
+    if (name[0]==NULL) {
+      name[0] = reverse_lookup(lang, itemdata[i].name[0]);
+      name[1] = reverse_lookup(lang, itemdata[i].name[1]);
+      appearance[0] = reverse_lookup(lang, itemdata[i].name[2]);
+      appearance[1] = reverse_lookup(lang, itemdata[i].name[3]);
+    }
+    rtype = new_resourcetype(name, appearance, rflags);
+    itype = new_itemtype(rtype, iflags, weight, capacity);
+
+    switch (i) {
+    case I_HORSE:
+    case I_UNICORN:
+      itype->capacity = HORSECAPACITY;
+      itype->give = give_horses;
+      break;
+    case I_WAGON:
+      itype->capacity = WAGONCAPACITY;
+      break;
+    case I_BAG_OF_HOLDING:
+      itype->capacity = BAGCAPACITY;
+      break;
+    case I_TROLLBELT:
+      /* This is wrong. according to the item description it multiplies
+       * the strength of the wearer by a factor of
+       * 50 (STRENGTHMULTIPLIER), not add a fixed 50000 */
+      /* only used in battle.c for items of type ITF_ANIMAL */
+      itype->capacity = STRENGTHCAPACITY;
+      break;
+    default:
+      if (itemdata[i].flags & FL_ITEM_MOUNT) itype->capacity = HORSECAPACITY;
+    }
+
+    /* itemdata::typ Analyse. IS_PRODUCT und IS_MAGIC sind so gut wie egal. */
+    switch (itemdata[i].typ) {
+    case IS_LUXURY:
+      price = itemdata[i].preis;
+      oldluxurytype[i-FIRSTLUXURY] = new_luxurytype(itype, price);
+      break;
+    case IS_RESOURCE:
+      rtype->flags |= RTF_LIMITED;
+      itype->flags |= ITF_NOBUILDBESIEGED;
+      a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
+      {
+	resource_limit * rdata = (resource_limit*)a->data.v;
+	rdata->limit = limit_oldtypes;
+	rdata->use = use_oldresource;
+      }
+      break;
+    }
+    if (itemdata[i].benutze_funktion) {
+      itype->use = use_olditem;
+    }
+    itype->construction = con;
+    olditemtype[i] = itype;
+    oldresourcetype[item2res(i)] = rtype;
+  }
 }
 
 static const char *potiontext[MAXPOTIONS] =
@@ -1772,27 +1772,6 @@ attrib_type at_resourcelimit = {
 	init_resourcelimit,
 	finalize_resourcelimit,
 };
-
-const char*
-resname(resource_t res, int index)
-{
-	const item_type * itype = resource2item(oldresourcetype[res]);
-	if (itype!=NULL) {
-		return locale_string(NULL, resourcename(oldresourcetype[res], index));
-	}
-	else if (res == R_AURA) {
-		return index?"aura_p":"aura";
-	} else if (res == R_PERMAURA) {
-		return index?"permaura_p":"permaura";
-	} else if (res == R_PEASANTS) {
-		return index?"peasant_p":"peasant";
-	} else if (res == R_UNIT) {
-		return index?"unit_p":"unit";
-	} else if (res == R_HITPOINTS) {
-		return index?"hp_p":"hp";
-	}
-	return NULL;
-}
 
 void
 register_resources(void)

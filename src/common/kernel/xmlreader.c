@@ -160,20 +160,12 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
   for (req=0;req!=nodeNr;++req) {
     xmlNodePtr node = nodeTab[req];
     xmlChar * property;
-    const resource_type * rtype;
-    resource_t type;
 
     radd->number = xml_ivalue(node, "quantity", 1);
     radd->recycle = xml_fvalue(node, "recycle", 0.0);
 
     property = xmlGetProp(node, BAD_CAST "type");
-    rtype = rt_findorcreate((const char*)property);
-    for (type=0;type!=MAX_RESOURCES;++type) {
-      if (oldresourcetype[type]==rtype) {
-        radd->type = type;
-        break;
-      }
-    }
+    radd->rtype = rt_findorcreate((const char*)property);
     xmlFree(property);
 
     ++radd;

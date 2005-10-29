@@ -551,8 +551,6 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 }
 /* ------------------------------------------------------------- */
 
-extern const char* resname(resource_t res, int i);
-
 static void
 give_cmd(unit * u, order * ord)
 {
@@ -1148,12 +1146,13 @@ manufacture(unit * u, const item_type * itype, int want)
         char * ch = buf+strlen(buf);
         assert(cons);
         for (c=0;cons->materials[c].number; c++) {
+	  requirement * m = cons->materials+c;
           if (c!=0)
             strcat(ch++, ",");
-          n=cons->materials[c].number / cons->reqsize;
+          n = m->number / cons->reqsize;
           sprintf(ch, " %d %s", n?n:1,
             locale_string(u->faction->locale,
-            resname(cons->materials[c].type, cons->materials[c].number!=1)));
+            resourcename(m->rtype, m->number!=1)));
           ch = ch+strlen(ch);
         }
         mistake(u, u->thisorder, buf, MSG_PRODUCE);
@@ -1584,12 +1583,13 @@ create_potion(unit * u, const potion_type * ptype, int want)
 				char * ch = buf+strlen(buf);
 				assert(cons);
 				for (c=0;cons->materials[c].number; c++) {
+				  const requirement * m = cons->materials+c;
 					if (c!=0)
 						strcat(ch++, ",");
-					n=cons->materials[c].number / cons->reqsize;
+					n = m->number / cons->reqsize;
 					sprintf(ch, " %d %s", n?n:1,
-						locale_string(u->faction->locale,
-						resname(cons->materials[c].type, cons->materials[c].number!=1)));
+						LOC(u->faction->locale,
+						resourcename(m->rtype, m->number!=1)));
 					ch = ch+strlen(ch);
 				}
 				strcat(ch,".");
