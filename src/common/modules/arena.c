@@ -120,7 +120,7 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
 	if (fee>2000) fee = 2000;
 	if (getplane(r)==arena) return -1;
 	if (u->number!=1 && enter_fail(u)) return -1;
-	if (get_pooled(u, r, R_SILVER) < fee && enter_fail(u)) return -1;
+	if (new_get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT) < fee && enter_fail(u)) return -1;
 	for (sk=0;sk!=MAXSKILLS;++sk) {
 		if (get_level(u, sk)>1 && enter_fail(u)) return -1;
 	}
@@ -146,8 +146,8 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
 	sprintf(buf, "In %s öffnet sich ein Portal. Eine Stimme ertönt, und spricht: 'Willkommen in der Ebene der Herausforderung'. %s durchschreitet das Tor zu einer anderen Welt.", regionname(u->region, u->faction), unitname(u));
 	addmessage(NULL, u->faction, buf, MSG_MESSAGE, ML_IMPORTANT);
 	new_use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE, 1);
-	use_pooled(u, r, R_SILVER, fee);
-	set_money(u, 109);
+  new_use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, fee);
+  set_money(u, 109);
 	fset(u, UFL_PARTEITARNUNG);
 	move_unit(u, start_region[rand() % 6], NULL);
 	return 0;

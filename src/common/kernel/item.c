@@ -747,7 +747,7 @@ use_tacticcrystal(region * r, unit * u, int amount, struct order * ord)
 		c->data.i = SK_TACTICS;
 		unused(ord);
 	}
-	use_pooled(u, u->region, R_TACTICCRYSTAL, amount);
+  new_use_pooled(u, oldresourcetype[R_TACTICCRYSTAL], GET_DEFAULT, amount);
 	add_message(&u->faction->msgs,
 			new_message(u->faction, "use_tacticcrystal%u:unit%r:region", u, r));
 	return;
@@ -1219,8 +1219,6 @@ init_olditems(void)
           con->materials[n].number = itemdata[i].material[m];
           con->materials[n].recycle = 0.0;
           ++n;
-          if (m==M_EISEN) {
-          }
         }
       }
     }

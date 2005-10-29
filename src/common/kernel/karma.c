@@ -331,7 +331,7 @@ buy_special(unit *u, struct order * ord, fspecial_t special)
 
 	/* Alles ok, attribut geben */
 
-	if(a2) {
+	if (a2) {
 		if(a2->data.sa[1] < fspecials[special].maxlevel) {
 			a2->data.sa[1]++;
 			add_message(&f->msgs, new_message(f,
@@ -364,7 +364,6 @@ fspecial(const faction *f, fspecial_t special)
 static int
 sacrifice_cmd(unit * u, struct order * ord)
 {
-	region *r = u->region;
   int   n = 1, karma;
   const char *s;
   
@@ -382,7 +381,7 @@ sacrifice_cmd(unit * u, struct order * ord)
 
   switch(findparam(s, u->faction->locale)) {
   case P_SILVER:
-    n = use_pooled(u, r, R_SILVER, n);
+    n = new_use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, n);
     if(n < 10000) {
       cmistake(u, ord, 51, MSG_EVENT);
       return 0;

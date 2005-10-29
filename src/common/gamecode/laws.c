@@ -2509,7 +2509,7 @@ promotion_cmd(unit * u, struct order * ord)
       u->race));
     return 0;
   }
-  money = get_all(u, i_silver->rtype);
+  money = new_get_pooled(u, i_silver->rtype, GET_ALL);
   people = count_all(u->faction) * u->number;
 
   if (people>money) {
@@ -2517,7 +2517,7 @@ promotion_cmd(unit * u, struct order * ord)
       people, money));
     return 0;
   }
-  use_all(u, i_silver->rtype, people);
+  new_use_pooled(u, i_silver->rtype, GET_ALL, people);
   fset(u, UFL_HERO);
   ADDMSG(&u->faction->msgs, msg_message("hero_promotion", "unit cost",
     u, people));

@@ -508,7 +508,7 @@ build_road(region * r, unit * u, int size, direction_t d)
       return;
     }
   }
-  if (!get_pooled(u, r, R_STONE) && u->race != new_race[RC_STONEGOLEM]) {
+  if (!new_get_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT) && u->race != new_race[RC_STONEGOLEM]) {
     cmistake(u, u->thisorder, 151, MSG_PRODUCE);
     return;
   }
@@ -527,7 +527,7 @@ build_road(region * r, unit * u, int size, direction_t d)
   if (u->race == new_race[RC_STONEGOLEM]){
     n = u->number * GOLEM_STONE;
   } else {
-    n = get_pooled(u, r, R_STONE);
+    n = new_get_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT);
   }
   left = min(n, left);
   if (size>0) left = min(size, left);
@@ -568,7 +568,7 @@ build_road(region * r, unit * u, int size, direction_t d)
     }
     scale_number(u, u->number - golemsused);
   } else {
-    use_pooled(u, r, R_STONE, n);
+    new_use_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT, n);
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
     produceexp(u, SK_ROAD_BUILDING, min(n, u->number));
   }

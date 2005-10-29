@@ -18,22 +18,6 @@
 extern "C" {
 #endif
 
-int get_pooled(const struct unit * u, const struct region * r, resource_t itm);
-int use_pooled(struct unit * u, struct region * r, resource_t itm, int count);
-int use_pooled_give(struct unit * u, struct region * r, resource_t itm, int count);
-
-/** use_pooled
- * verbraucht 'count' Objekte der resource 'itm'
- * unter zuhilfenahme des Pools der struct region und Aufbrauch des
- * von der Einheit reservierten Resourcen
- *
- * use_pooled_give
- * verbraucht 'count' Objekte der resource 'itm' wie use_pooled, jedoch
- * zuerst vom nicht reservierten.
- * (wichtig bei gib, da sonst beim zweiten GIB des selben Gegenstandes
- * jede Reservierung gelöscht wird)
- */
-
 /* bitfield values for get/use/change operations */
 #define GET_SLACK      0x01
 #define GET_RESERVE    0x02
@@ -46,39 +30,7 @@ int use_pooled_give(struct unit * u, struct region * r, resource_t itm, int coun
 
 /* for convenience: */
 #define GET_DEFAULT (GET_RESERVE|GET_SLACK|GET_POOLED_SLACK)
-
-
-extern int get_all(const struct unit * u, const struct resource_type * rtype);
-extern int use_all(struct unit * u, const struct resource_type * rtype, int count);
-
-/** use_all
- * verbraucht 'count' Objekte der resource 'itm'
- * unter zuhilfenahme aller Einheiten der struct region
- */
-
-int get_allied(const struct unit * u, struct region * r, resource_t itm);
-int use_allied(struct unit * u, struct region * r, resource_t itm, int count);
-
-/** use_allied
- * verbraucht 'count' Objekte der resource 'itm'
- * unter zuhilfenahme des alliierten in der struct region
- */
-
-int get_reserved(const struct unit * u, resource_t itm);
-int use_reserved(struct unit * u, resource_t itm, int count);
-
-/** use_reserved
- * verbraucht 'count' Objekte der resource 'itm'
- * aus den reservierten Objekten der Einheit.
- */
-
-int use_slack(struct unit * u, resource_t itm, int count);
-int get_slack(const struct unit * u, resource_t itm);
-
-/** use_slack
- * verbraucht 'count' Objekte der resource 'itm'
- * aus den nicht-reservierten Objekten der Einheit.
- */
+#define GET_ALL (GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE)
 
 int new_get_pooled(const struct unit * u, const struct resource_type * res, int mode);
 int new_use_pooled(struct unit * u, const struct resource_type * res, int mode, int count);

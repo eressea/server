@@ -270,64 +270,6 @@ new_use_pooled(unit * u, const resource_type * rtype, int mode, int count)
   return count-use;
 }
 
-int
-get_reserved(const unit * u, resource_t resource)
-{
-  return new_get_pooled(u, oldresourcetype[resource], GET_RESERVE);
-}
-
-int
-use_reserved(unit * u, resource_t resource, int count)
-{
-  return new_use_pooled(u, oldresourcetype[resource], GET_RESERVE, count);
-}
-
-int
-get_slack(const unit * u, resource_t resource)
-{
-  return new_get_pooled(u, oldresourcetype[resource], GET_SLACK);
-}
-
-int
-use_slack(unit * u, resource_t resource, int count)
-{
-  return new_use_pooled(u, oldresourcetype[resource], GET_SLACK, count);
-}
-
-
-int
-get_pooled(const unit * u, const region * r, resource_t resource)
-{
-  return new_get_pooled(u, oldresourcetype[resource], GET_DEFAULT);
-}
-
-
-int
-use_pooled(unit * u, region * r, resource_t resource, int count)
-{
-  return new_use_pooled(u, oldresourcetype[resource], GET_DEFAULT, count);
-}
-
-int
-use_pooled_give(unit * u, region * r, resource_t resource, int count)
-{
-  int use = count;
-  use -= new_use_pooled(u, oldresourcetype[resource], GET_SLACK, use);
-  if (use>0) use -= new_use_pooled(u, oldresourcetype[resource], GET_RESERVE|GET_POOLED_SLACK, use);
-  return count-use;
-}
-
-int
-get_all(const unit * u, const resource_type * rtype)
-{
-  return new_get_pooled(u, rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE);
-}
-
-int
-use_all(unit * u, const resource_type * rtype, int count)
-{
-  return new_use_pooled(u, rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE, count);
-}
 
 void
 init_pool(void)
