@@ -95,23 +95,6 @@ use_hornofdancing(struct unit * u, const struct item_type * itype,
   return 0;
 }
 
-static resource_type rt_hornofdancing = {
-  { "hornofdancing", "hornofdancing_p" },
-  { "hornofdancing", "hornofdancing_p" },
-  RTF_ITEM,
-  &res_changeitem
-};
-
-item_type it_hornofdancing = {
-  &rt_hornofdancing,        /* resourcetype */
-    0, 1, 0,                  /* flags, weight, capacity */
-    NULL,                     /* construction */
-    &use_hornofdancing,
-    NULL,
-    NULL
-};
-
-
 #define SPEEDUP 2
 
 static int
@@ -147,29 +130,10 @@ use_trappedairelemental(struct unit * u, int shipId,
   return 0;
 }
 
-static resource_type rt_trappedairelemental = {
-  { "trappedairelemental", "trappedairelemental_p" },
-  { "trappedairelemental", "trappedairelemental_p" },
-  RTF_ITEM,
-  &res_changeitem
-};
-
-item_type it_trappedairelemental = {
-  &rt_trappedairelemental,        /* resourcetype */
-    0, 1, 0,                        /* flags, weight, capacity */
-    NULL,                           /* construction */
-    NULL,
-    &use_trappedairelemental,
-    NULL
-};
-
-
 void
 register_artrewards(void)
 {
   at_register(&at_peaceimmune);
-  it_register(&it_hornofdancing);
-  register_function((pf_generic)use_hornofdancing, "usehornofdancing");
-  it_register(&it_trappedairelemental);
-  register_function((pf_generic)use_trappedairelemental, "trappedairelemental");
+  register_function((pf_generic)use_hornofdancing, "use_hornofdancing");
+  register_function((pf_generic)use_trappedairelemental, "use_trappedairelemental");
 }

@@ -38,4 +38,11 @@
     </item>
   </resource>
 
+<!-- HSE items -->
+  <resource name="studypotion">
+    <item weight="0">
+      <function name="use" value="use_studypotion"/>
+    </item>
+  </resource>
+
 </resources>

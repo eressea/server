@@ -1,6 +1,40 @@
 <?xml version="1.0"?>
 <resources>
 
+<!-- art rewards -->
+  <resource name="trappedairelemental">
+    <item weight="1">
+      <function name="use" value="use_trappedairelemental"/>
+    </item>
+  </resource>
+
+  <resource name="hornofdancing">
+    <item weight="1">
+      <function name="use" value="use_hornofdancing"/>
+    </item>
+  </resource>
+
+<!-- museum items -->
+  <resource name="museumexitticket">
+    <!-- you get your stuff back when leaving the museum -->
+    <item notlost="yes" weight="0">
+      <function name="use" value="use_museumexitticket"/>
+    </item>
+  </resource>
+
+  <resource name="museumticket">
+    <!-- you get your stuff back when leaving the museum -->
+    <item weight="0">
+      <function name="use" value="use_museumticket"/>
+    </item>
+  </resource>
+
+<!-- gimmicks, etc. -->
+  <resource name="aog">
+    <!-- Amulett des Treffens -->
+    <item notlost="yes" weight="0"/>
+  </resource>
+
   <resource name="ao_daemon">
     <!-- summons igjarjuk -->
     <item weight="0" score="6000" notlost="true" cursed="true">

@@ -1,11 +1,6 @@
 <?xml version="1.0"?>
 <resources>
 
-  <resource name="aog">
-    <!-- Amulett des Treffens -->
-    <item notlost="yes" weight="0"/>
-  </resource>
-
 <!-- museum items -->
   <resource name="museumexitticket">
     <!-- you get your stuff back when leaving the museum -->
@@ -33,13 +28,6 @@
     <!-- gives user free aura -->
     <item weight="0">
       <function name="use" value="usemanacrystal"/>
-    </item>
-  </resource>
-
-<!-- HSE items -->
-  <resource name="studypotion">
-    <item weight="0">
-      <function name="use" value="use_studypotion"/>
     </item>
   </resource>
 

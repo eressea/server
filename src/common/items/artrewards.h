@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-extern struct item_type it_hornofdancing;
-extern struct item_type it_trappedairelemental;
-
 extern void register_artrewards(void);
 
 #ifdef __cplusplus
