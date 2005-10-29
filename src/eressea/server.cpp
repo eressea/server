@@ -297,6 +297,7 @@ lua_init(void)
   luaopen_table(luaState);
   luabind::open(luaState);
   bind_eressea(luaState);
+  bind_script(luaState);
   bind_spell(luaState);
   bind_alliance(luaState);
   bind_region(luaState);

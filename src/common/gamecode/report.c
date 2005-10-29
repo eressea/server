@@ -1123,14 +1123,15 @@ describe(FILE * F, const region * r, int partial, faction * f)
 
 	/* peasants & silver */
 	if (rpeasants(r)) {
-		bufp += sprintf(bufp, ", %d", rpeasants(r));
+    int n = rpeasants(r);
+		bufp += sprintf(bufp, ", %d", n);
 
 		if(fval(r, RF_ORCIFIED)) {
 			strcpy(bufp++, " ");
-			bufp += strxcpy(bufp, LOC(f->locale, rpeasants(r)==1?"rc_orc":"rc_orc_p"));
+			bufp += strxcpy(bufp, LOC(f->locale, n==1?"rc_orc":"rc_orc_p"));
 		} else {
 			strcpy(bufp++, " ");
-			bufp += strxcpy(bufp, LOC(f->locale, resourcename(oldresourcetype[R_PEASANTS], rpeasants(r)!=1)));
+			bufp += strxcpy(bufp, LOC(f->locale, n==1?"peasant":"peasant_p"));
 		}
 
 		if (rmoney(r) && partial == 0) {

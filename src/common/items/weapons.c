@@ -59,7 +59,6 @@ enum {
 	WP_LONGBOW,
 	WP_SPEAR,
 	WP_LANCE,
-	WP_RUSTY_HALBERD,
 	WP_NONE,
 	WP_MAX
 };
@@ -112,8 +111,6 @@ static weapondata weapontable[WP_MAX + 1] =
 	{0.00, "1d10+0", "1d12+2", I_SPEAR, SK_SPEAR, 0, 0, false, false, { RL_NONE, 0}, PIERCE },
 	/* Lanze */
 	{0.00, "1d5", "2d6+5", I_LANCE, SK_SPEAR, 0, -2, false, false, { RL_NONE, 0}, PIERCE },
-	/* Rostige Hellebarde */
-	{0.00, "2d6", "2d6", I_RUSTY_HALBERD, SK_SPEAR, -2, 1, false, false, { RL_NONE, 0}, CUT },
 	/* Unbewaffnet */
 	{0.00, "1d5+0", "1d6+0", I_WOOD, SK_MELEE, 0, 0, false, false, { RL_NONE, 0}, BASH },
 	/* Dummy */
@@ -238,47 +235,6 @@ attack_catapult(const troop * at, int * casualties, int row)
 	return false; /* keine weitren attacken */
 }
 
-enum {
-  AR_PLATE,
-  AR_CHAIN,
-  AR_RUSTY_CHAIN,
-  AR_SHIELD,
-  AR_RUSTY_SHIELD,
-  AR_MAX
-};
-
-typedef struct armordata {
-  double penalty;
-  double magres;
-  int prot;
-  boolean shield;
-  item_t item;
-} armordata;
-
-static armordata armortable[] =
-/* penalty; magres; prot; shield; item; */
-{
-  { 0.30, 0.00, 5, 0, I_PLATE_ARMOR},
-  { 0.15, 0.00, 3, 0, I_CHAIN_MAIL},
-  { 0.30, 0.00, 3, 0, I_RUSTY_CHAIN_MAIL},
-  {-0.15, 0.00, 1, 1, I_SHIELD},
-  { 0.00, 0.00, 1, 1, I_RUSTY_SHIELD},
-  { 0.00, 0.00, 0, 0, MAX_ITEMS }
-};
-
-static void
-init_oldarmor(void)
-{
-  armordata * ad = armortable;
-  for (;ad->item!=MAX_ITEMS;++ad) {
-    item_type * itype = olditemtype[ad->item];
-    unsigned int flags = 0;
-    
-    if (ad->shield) flags |= ATF_SHIELD;
-    new_armortype(itype, ad->penalty, ad->magres, ad->prot, flags);
-  }
-}
-
 static void
 init_oldweapons(void)
 {
@@ -352,5 +308,4 @@ void
 init_weapons(void)
 {
 	init_oldweapons();
-  init_oldarmor();
 }

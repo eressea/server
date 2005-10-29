@@ -140,7 +140,6 @@ lucky_magic_item(const unit *u)
 		olditemtype[I_RING_OF_NIMBLEFINGER],
 		olditemtype[I_TROLLBELT],
 		olditemtype[I_TACTICCRYSTAL],
-		olditemtype[I_RING_OF_REGENERATION],
 		olditemtype[I_SACK_OF_CONSERVATION],
 	};
 

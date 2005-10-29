@@ -240,7 +240,6 @@ extern potion_type * new_potiontype(item_type * itype, int level);
 extern resource_type * r_silver;
 extern resource_type * r_aura;
 extern resource_type * r_permaura;
-extern resource_type * r_peasants;
 extern resource_type * r_unit;
 extern resource_type * r_hp;
 
@@ -267,8 +266,6 @@ enum {
 	I_CATAPULT,
 	I_SPEAR,
 	I_LONGBOW,
-	I_CHAIN_MAIL,			/* 10 */
-	I_PLATE_ARMOR,
 	I_BALM,
 	I_SPICES,
 	I_JEWELERY,
@@ -286,7 +283,6 @@ enum {
 	I_CHASTITY_BELT, /* bleibt */
 	I_LAENSWORD,
 	I_LAEN,
-	I_SHIELD,
 	I_LANCE,
 	I_MALLORN,
 	I_DRACHENBLUT,
@@ -301,22 +297,11 @@ enum {
 	I_RUNESWORD,
 	I_AURAKULUM,
 	I_SEASERPENTHEAD,
+  I_SPHERE_OF_INVISIBILITY,
+  I_TOADSLIME,
+  I_BAG_OF_HOLDING,
+  I_SACK_OF_CONSERVATION,
 	I_TACTICCRYSTAL,
-	I_RING_OF_REGENERATION,
-	I_TOADSLIME,
-	I_BAG_OF_HOLDING,
-	I_RUSTY_SHIELD,
-	I_RUSTY_CHAIN_MAIL,
-	I_SACK_OF_CONSERVATION,
-	I_SPHERE_OF_INVISIBILITY,
-	I_RUSTY_HALBERD,
-#ifdef COMPATIBILITY
-  I_STAB_DES_SCHICKSALS,
-  I_STAB_DER_VERDAMMNIS,
-  I_STAB_DES_TODES,
-  I_STAB_DES_CHAOS,
-  I_STECKEN_DER_MACHT,
-#endif
 	MAX_ITEMS /* do not use outside item.c ! */
 };
 
@@ -330,8 +315,6 @@ enum {
 	R_CATAPULT,
 	R_SPEAR,
 	R_LONGBOW,
-	R_CHAIN_MAIL,
-	R_PLATE_ARMOR,
 	R_BALM,
 	R_SPICES,
 	R_JEWELERY,
@@ -348,7 +331,6 @@ enum {
 	R_CHASTITY_BELT,
 	R_EOGSWORD,
 	R_EOG,
-	R_SHIELD,
 	R_LANCE,
 	R_MALLORN,
 	R_DRACHENBLUT,
@@ -363,13 +345,11 @@ enum {
 	R_RUNESWORD,
 	R_AURAKULUM,
 	R_SEASERPENTHEAD,
+  R_SPHERE_OF_INVISIBILITY,
+  R_TOADSLIME,
+  R_BAG_OF_HOLDING,
+  R_SACK_OF_CONSERVATION,
 	R_TACTICCRYSTAL,
-	R_RING_OF_REGENERATION,
-	R_TOADSLIME,
-	R_BAG_OF_HOLDING,
-	R_RUSTY_SHIELD,
-	R_RUSTY_CHAIN_MAIL,
-	R_SACK_OF_CONSERVATION,
 
 	/* POTIONS: */
 	R_TREES,
@@ -378,10 +358,6 @@ enum {
 	R_SILVER,
 	R_AURA,      /* Aura */
 	R_PERMAURA,  /* Permanente Aura */
-	R_HITPOINTS, /* Trefferpunkte */
-	R_PEASANTS,  /* Regionsbauern */
-
-	R_UNIT, /* Einheit (gib x einheit) */
 
 	MAX_RESOURCES, /* do not use outside item.c ! */
 	NORESOURCE = (resource_t) - 1

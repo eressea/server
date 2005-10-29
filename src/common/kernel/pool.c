@@ -82,10 +82,6 @@ get_resource(const unit * u, const resource_type * rtype)
     return get_spellpoints(u);
   if (rtype == oldresourcetype[R_PERMAURA])
     return max_spellpoints(u->region, u);
-  if (rtype == oldresourcetype[R_HITPOINTS])
-    return u->hp;
-  if (rtype == oldresourcetype[R_PEASANTS])
-    return rpeasants(u->region);
   assert(!"unbekannte ressource entdeckt");
   return 0;
 }
@@ -101,13 +97,6 @@ change_resource(unit * u, const resource_type * rtype, int change)
     i = change_spellpoints(u, change);
   else if (rtype == oldresourcetype[R_PERMAURA])
     i = change_maxspellpoints(u, change);
-  else if (rtype == oldresourcetype[R_HITPOINTS])
-    i = change_hitpoints(u, change);
-  else if (rtype == oldresourcetype[R_PEASANTS]) {
-    i = rpeasants(u->region) + change;
-    if (i < 0) i = 0;
-    rsetpeasants(u->region, i);
-  }
   else
     assert(!"undefined resource detected. rtype->uchange not initialized.");
   assert(i >= 0 && (i < 100000000));  /* Softer Test, daß kein Unfug

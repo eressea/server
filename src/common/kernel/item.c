@@ -584,7 +584,6 @@ give_horses(const unit * s, const unit * d, const item_type * itype, int n, stru
 	return true;
 }
 
-#define R_MAXUNITRESOURCE R_HITPOINTS
 #define R_MINOTHER R_SILVER
 #define R_MINHERB R_PLAIN_1
 #define R_MINPOTION R_FAST
@@ -788,14 +787,6 @@ static t_item itemdata[MAXITEMS] = {
 		{"Bogen", "Bögen", "Bogen", "Bögen"},
 		IS_PRODUCT, SK_WEAPONSMITH, 2, {0, 1, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
-	{			/* I_CHAIN_MAIL */
-		{"Kettenhemd", "Kettenhemden", "Kettenhemd", "Kettenhemden"},
-		IS_PRODUCT, SK_ARMORER, 3, {3, 0, 0, 0, 0, 0}, 200, 0, 0, NULL
-	},
-	{			/* I_PLATE_ARMOR */
-		{"Plattenpanzer", "Plattenpanzer", "Plattenpanzer", "Plattenpanzer"},
-		IS_PRODUCT, SK_ARMORER, 4, {5, 0, 0, 0, 0, 0}, 400, 0, 0, NULL
-	},
 	{			/* I_BALM */
 		{"Balsam", "Balsam", "Balsam", "Balsam"},
 		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 200, 4, 0, NULL
@@ -863,10 +854,6 @@ static t_item itemdata[MAXITEMS] = {
 		{"Laen", "Laen", "Laen", "Laen"},
 		IS_RESOURCE, SK_MINING, 7, {0, 0, 0, 0, 0, 0}, 200, 0, 0, NULL
 	},
-	{			/* I_SHIELD 42 */
-		{"Schild", "Schilde", "Schild", "Schilde"},
-		IS_PRODUCT, SK_ARMORER, 2, {1, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
-	},
 	{			/* I_LANCE 44 */
 		{"Lanze", "Lanzen", "Lanze", "Lanzen"},
 		IS_PRODUCT, SK_WEAPONSMITH, 2, {0, 2, 0, 0, 0, 0}, 200, 0, 0, NULL
@@ -925,45 +912,28 @@ static t_item itemdata[MAXITEMS] = {
 			"Seeschlangenkopf", "Seeschlangenköpfe"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 500, 0, 0, NULL
 	},
+  {			/* I_SPHERE_OF_INVISIBILITY */
+    {"Sphäre der Unsichtbarkeit", "Sphären der Unsichtbarkeit", "", ""},
+      IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
+  },
+  {			/* I_TOADSLIME 73 */
+    {"Tiegel mit Krötenschleim", "Tiegel mit Krötenschleim",
+      "", ""},
+      IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
+  },
+  { /* I_BAG_OF_HOLDING */
+    {"Zauberbeutel", "Zauberbeutel", "Zauberbeutel", "Zauberbeutel"},
+      IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, FL_ITEM_NOTINBAG|FL_ITEM_NOTLOST, NULL
+  },
+  { /* I_SACK_OF_CONSERVATION */
+    {"Magischer Kräuterbeutel", "Magische Kräuterbeutel", "", ""},
+      IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
+  },
 	{			/* I_TACTICCRYSTAL 71 */
 		{"Traumauge", "Traumaugen",
 			"", ""},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, &use_tacticcrystal
 	},
-	{			/* I_RING_OF_REGENERATION 72 */
-		{"Ring der Regeneration", "Ringe der Regeneration",
-			"", ""},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
-	},
-	{			/* I_TOADSLIME 73 */
-		{"Tiegel mit Krötenschleim", "Tiegel mit Krötenschleim",
-			"", ""},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
-	},
-	{
-		{"Zauberbeutel", "Zauberbeutel", "Zauberbeutel", "Zauberbeutel"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, FL_ITEM_NOTINBAG|FL_ITEM_NOTLOST, NULL
-	},
-	{	/* I_RUSTY_SHIELD 42 */
-		{"Rostiger Schild", "Rostige Schilde", "Rostiger Schild", "Rostige Schilde"},
-		IS_PRODUCT, SK_ARMORER, 2, {1, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
-	},
-	{			/* I_RUSTY_CHAIN_MAIL */
-		{"Rostiges Kettenhemd", "Rostige Kettenhemden", "Rostiges Kettenhemd", "Rostige Kettenhemden"},
-		IS_PRODUCT, SK_ARMORER, 3, {3, 0, 0, 0, 0, 0}, 200, 0, 0, NULL
-	},
-	{			/* I_SACK_OF_CONSERVATION */
-		{"Magischer Kräuterbeutel", "Magische Kräuterbeutel", "", ""},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
-	},
-	{			/* I_SPHERE_OF_INVISIBILITY */
-		{"Sphäre der Unsichtbarkeit", "Sphären der Unsichtbarkeit", "", ""},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
-	},
-	{			/* I_RUSTY_HALBERD */
-		{"Rostige Hellebarde", "Rostige Hellebarden", "Rostige Hellebarde", "Rostige Hellebarden"},
-		IS_PRODUCT, SK_WEAPONSMITH, 3, {1, 1, 0, 0, 0, 0}, 200, 0, 0, NULL
-	}
 };
 
 const item_t matresource[] = {
@@ -1504,7 +1474,6 @@ init_oldpotions(void)
 resource_type * r_silver;
 resource_type * r_aura;
 resource_type * r_permaura;
-resource_type * r_peasants;
 resource_type * r_unit;
 resource_type * r_hp;
 
@@ -1538,14 +1507,8 @@ item_score(item_t i)
       return 100;
     case I_WAGON:
       return 60;
-    case I_SHIELD:
-      return 30;
     case I_LAENSWORD:
       return 400;
-    case I_CHAIN_MAIL:
-      return 40;
-    case I_PLATE_ARMOR:
-      return 60;
     case I_BALM:
     case I_SPICES:
     case I_JEWELERY:
@@ -1598,9 +1561,6 @@ init_resources(void)
 	r_hp = new_resourcetype(&names[6], NULL, RTF_NONE);
 	r_hp->uchange = res_changehp;
 
-	r_peasants = new_resourcetype(&names[8], NULL, RTF_NONE);
-	r_peasants->uchange = res_changepeasants;
-
 	r_aura = new_resourcetype(&names[10], NULL, RTF_NONE);
 	r_aura->uchange = res_changeaura;
 
@@ -1610,9 +1570,6 @@ init_resources(void)
 	oldresourcetype[R_SILVER] = r_silver;
 	oldresourcetype[R_AURA] = r_aura;
 	oldresourcetype[R_PERMAURA] = r_permaura;
-	oldresourcetype[R_HITPOINTS] = r_hp;
-	oldresourcetype[R_PEASANTS] = r_peasants;
-	oldresourcetype[R_UNIT] = r_unit;
 
   /* alte typen registrieren: */
   init_olditems();
@@ -1806,5 +1763,5 @@ register_resources(void)
   register_function((pf_generic)give_horses, "givehorses");
 
   /* make sure noone has deleted an I_ tpe without deleting the R_ type that goes with it! */
-  assert((int)I_SACK_OF_CONSERVATION == (int)R_SACK_OF_CONSERVATION);
+  assert((int)I_TACTICCRYSTAL == (int)R_TACTICCRYSTAL);
 }

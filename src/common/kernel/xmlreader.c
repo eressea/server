@@ -1212,7 +1212,7 @@ parse_spells(xmlDocPtr doc)
       sp->components[k].type = rt_find((const char *)property);
       assert(sp->components[k].type);
       xmlFree(property);
-      sp->components[k].amount = (resource_t)xml_ivalue(node, "amount", 1);
+      sp->components[k].amount = xml_ivalue(node, "amount", 1);
       sp->components[k].cost = SPC_FIX;
       property = xmlGetProp(node, BAD_CAST "cost");
       if (property!=NULL) {
