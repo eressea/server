@@ -20,10 +20,10 @@ extern "C" {
 
 
 extern struct resource_type * rt_seed;
-extern void register_seed(void);
+extern void init_seed(void);
 
 extern struct resource_type * rt_mallornseed;
-extern void register_mallornseed(void);
+extern void init_mallornseed(void);
 
 #ifdef __cplusplus
 }

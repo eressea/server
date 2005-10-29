@@ -1,25 +1,18 @@
 <?xml version="1.0"?>
 <resources>
 
-<!-- luxury items -->
-  <resource name="oil">
-    <item weight="0">
-      <function name="use" value="useskillpotion"/>
-    </item>
-  </resource>
-
 <!-- XE items -->
   <resource name="skillpotion">
     <!-- gives user one free learning attempt -->
     <item weight="0">
-      <function name="use" value="useskillpotion"/>
+      <function name="use" value="use_skillpotion"/>
     </item>
   </resource>
 
   <resource name="manacrystal">
     <!-- gives user free aura -->
     <item weight="0">
-      <function name="use" value="usemanacrystal"/>
+      <function name="use" value="use_manacrystal"/>
     </item>
   </resource>
 

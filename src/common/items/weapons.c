@@ -276,7 +276,8 @@ init_oldweapons(void)
 }
 
 void
-register_weapons(void) {
+register_weapons(void)
+{
 	register_function((pf_generic)attack_catapult, "attack_catapult");
 	register_function((pf_generic)attack_firesword, "attack_firesword");
 }

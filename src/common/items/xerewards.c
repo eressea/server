@@ -82,7 +82,7 @@ use_manacrystal(struct unit * u, const struct item_type * itype, int amount, str
 void
 register_xerewards(void)
 {
-	register_function((pf_generic)use_skillpotion, "useskillpotion");
-	register_function((pf_generic)use_manacrystal, "usemanacrystal");
+	register_function((pf_generic)use_skillpotion, "use_skillpotion");
+	register_function((pf_generic)use_manacrystal, "use_manacrystal");
 }
 

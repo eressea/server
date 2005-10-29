@@ -224,6 +224,7 @@ game_init(void)
   register_wormholes();
 #endif
 
+  register_itemtypes();
   register_xmlreader();
   enable_xml_gamecode();
   init_data(xmlfile);

@@ -579,6 +579,13 @@ xml_readpotion(xmlXPathContextPtr xpath, item_type * itype)
   return new_potiontype(itype, level);
 }
 
+static luxury_type *
+xml_readluxury(xmlXPathContextPtr xpath, item_type * itype)
+{
+  int price = xml_ivalue(xpath->node, "price", 0);
+  return new_luxurytype(itype, price);
+}
+
 
 static armor_type *
 xml_readarmor(xmlXPathContextPtr xpath, item_type * itype)
@@ -771,6 +778,17 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     itype->flags |= ITF_POTION;
     xpath->node = result->nodesetval->nodeTab[0];
     rtype->ptype = xml_readpotion(xpath, itype);
+  }
+  xmlXPathFreeObject(result);
+
+  /* reading item/luxury */
+  xpath->node = node;
+  result = xmlXPathEvalExpression(BAD_CAST "luxury", xpath);
+  assert(result->nodesetval->nodeNr<=1);
+  if (result->nodesetval->nodeNr!=0) {
+    itype->flags |= ITF_LUXURY;
+    xpath->node = result->nodesetval->nodeTab[0];
+    rtype->ltype = xml_readluxury(xpath, itype);
   }
   xmlXPathFreeObject(result);
 

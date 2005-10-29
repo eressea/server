@@ -20,12 +20,18 @@
 #include "seed.h"
 
 void
-init_itemtypes(void)
+register_itemtypes(void)
 {
+  /* registering misc. functions */
   register_weapons();
   register_xerewards();
   register_artrewards();
+}
+
+void
+init_itemtypes(void)
+{
 	init_weapons();
-  register_seed();
-  register_mallornseed();
+  init_seed();
+  init_mallornseed();
 }

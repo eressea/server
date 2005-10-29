@@ -1128,6 +1128,7 @@ init_olditems(void)
     switch (itemdata[i].typ) {
     case IS_LUXURY:
       price = itemdata[i].preis;
+      rtype->ltype = new_luxurytype(itype, price);
       break;
     case IS_RESOURCE:
       rtype->flags |= RTF_LIMITED;
