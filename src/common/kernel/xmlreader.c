@@ -692,6 +692,34 @@ xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
   }
   xmlXPathFreeObject(result);
 
+  if (gamecode_enabled) {
+    /* reading weapon/function */
+    xpath->node = node;
+    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+    for (k=0;k!=result->nodesetval->nodeNr;++k) {
+      xmlNodePtr node = result->nodesetval->nodeTab[k];
+      xmlChar * property;
+      pf_generic fun;
+
+      parse_function(node, &fun, &property);
+      if (fun==NULL) {
+        log_error(("unknown function name '%s' for item '%s'\n",
+          (const char*)property, itype->rtype->_name[0]));
+        xmlFree(property);
+        continue;
+      }
+      assert(property!=NULL);
+      if (strcmp((const char*)property, "attack")==0) {
+        wtype->attack = (boolean (*)(const struct troop*, const struct weapon_type *, int*, int))fun;
+      } else {
+        log_error(("unknown function type '%s' for item '%s'\n",
+          (const char*)property, itype->rtype->_name[0]));
+      }
+      xmlFree(property);
+    }
+    xmlXPathFreeObject(result);
+  }
+
   xpath->node = node;
   return wtype;
 }

@@ -195,7 +195,7 @@ typedef struct weapon_type {
 	int reload; /* time to reload this weapon */
 	weapon_mod * modifiers;
 	/* --- functions --- */
-	boolean (*attack)(const struct troop *, int *deaths, int row);
+	boolean (*attack)(const struct troop *, const struct weapon_type *, int *deaths, int row);
 } weapon_type;
 
 extern void rt_register(resource_type * it);
@@ -265,7 +265,6 @@ enum {
 	I_WAGON,
 	I_CATAPULT,
 	I_SPEAR,
-	I_LONGBOW,
 	I_BALM,
 	I_SPICES,
 	I_JEWELERY,
@@ -278,7 +277,6 @@ enum {
 	I_AMULET_OF_TRUE_SEEING,
 	I_RING_OF_INVISIBILITY,
 	I_RING_OF_POWER,
-	I_FIRESWORD, /* Runenschwert ersetzen durch Flammenschwert */
 	I_DRAGONHEAD,
 	I_CHASTITY_BELT, /* bleibt */
 	I_LAENSWORD,
@@ -294,7 +292,6 @@ enum {
 	I_RING_OF_NIMBLEFINGER,
 	I_TROLLBELT,
 	I_PRESSCARD,
-	I_RUNESWORD,
 	I_AURAKULUM,
 	I_SEASERPENTHEAD,
   I_SPHERE_OF_INVISIBILITY,
@@ -314,19 +311,19 @@ enum {
 	R_WAGON,
 	R_CATAPULT,
 	R_SPEAR,
-	R_LONGBOW,
-	R_BALM,
+  /* luxury */
+  R_BALM,
 	R_SPICES,
 	R_JEWELERY,
 	R_MYRRH,
 	R_OIL,
 	R_SILK,
 	R_INCENSE,
+  /**/
 	R_AMULET_OF_HEALING,
 	R_AMULET_OF_TRUE_SEEING,
 	R_RING_OF_INVISIBILITY,
 	R_RING_OF_POWER,
-	R_FIRESWORD,
 	R_DRAGONHEAD,
 	R_CHASTITY_BELT,
 	R_EOGSWORD,
@@ -342,7 +339,6 @@ enum {
 	R_RING_OF_NIMBLEFINGER,
 	R_TROLLBELT,
 	R_PRESSCARD,
-	R_RUNESWORD,
 	R_AURAKULUM,
 	R_SEASERPENTHEAD,
   R_SPHERE_OF_INVISIBILITY,
@@ -360,10 +356,9 @@ enum {
 	R_PERMAURA,  /* Permanente Aura */
 
 	MAX_RESOURCES, /* do not use outside item.c ! */
-	NORESOURCE = (resource_t) - 1
+	NORESOURCE = -1
 };
 
-extern struct luxury_type * oldluxurytype[];
 extern struct potion_type * oldpotiontype[];
 extern struct item_type * olditemtype[];
 extern struct resource_type * oldresourcetype[];

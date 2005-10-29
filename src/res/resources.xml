@@ -1,18 +1,10 @@
 <?xml version="1.0"?>
 <resources>
 
-<!-- museum items -->
-  <resource name="museumexitticket">
-    <!-- you get your stuff back when leaving the museum -->
-    <item notlost="yes" weight="0">
-      <function name="use" value="use_museumexitticket"/>
-    </item>
-  </resource>
-
-  <resource name="museumticket">
-    <!-- you get your stuff back when leaving the museum -->
+<!-- luxury items -->
+  <resource name="oil">
     <item weight="0">
-      <function name="use" value="use_museumticket"/>
+      <function name="use" value="useskillpotion"/>
     </item>
   </resource>
 
@@ -110,6 +102,26 @@
     </item>
   </resource>
 
+  <resource name="runesword">
+    <item weight="100">
+      <weapon minskill="7" cut="true" magical="yes" skill="melee" offmod="2" defmod="2">
+        <function name="attack" value="attack_firesword"/>
+        <damage type="rider" value="3d10+10"/>
+        <damage type="footman" value="3d10+10"/>
+      </weapon>
+    </item>
+  </resource>
+
+  <resource name="firesword">
+    <item weight="100">
+      <weapon minskill="7" magres="0.3" cut="true" skill="melee" offmod="1" defmod="1">
+        <function name="attack" value="attack_firesword"/>
+        <damage type="rider" value="3d6+10"/>
+        <damage type="footman" value="3d6+10"/>
+      </weapon>
+    </item>
+  </resource>
+
   <resource name="greatsword">
     <item weight="200">
       <construction skill="weaponsmithing" minskill="4" reqsize="1">
@@ -191,6 +203,19 @@
       <weapon cut="true" skill="melee" offmod="0" defmod="-3">
         <damage type="rider" value="2d6"/>
         <damage type="footman" value="2d6"/>
+      </weapon>
+    </item>
+  </resource>
+
+  <resource name="bow">
+    <item weight="100">
+      <construction skill="weaponsmithing" minskill="2" reqsize="1">
+        <requirement type="log" quantity="1"/>
+      </construction>
+      <weapon pierce="true" missile="true" skill="bow" offmod="0" defmod="0" reload="0">
+        <damage type="rider" value="1d11+1"/>
+        <damage type="footman" value="1d11+1"/>
+        <modifier type="missile_target" value="2"/>
       </weapon>
     </item>
   </resource>

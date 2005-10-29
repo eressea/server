@@ -2990,7 +2990,6 @@ int * age = NULL;
 typedef struct summary {
 	int waffen;
 	int factions;
-	int artefakte;
 	int ruestungen;
 	int schiffe;
 	int gebaeude;
@@ -3105,12 +3104,6 @@ make_summary(void)
               s->ruestungen += itm->number;
             }
           }
-					s->artefakte += get_item(u, I_AMULET_OF_TRUE_SEEING);
-					s->artefakte += get_item(u, I_RING_OF_INVISIBILITY);
-					s->artefakte += get_item(u, I_SPHERE_OF_INVISIBILITY);
-					s->artefakte += get_item(u, I_SACK_OF_CONSERVATION);
-					s->artefakte += get_item(u, I_RING_OF_POWER);
-					s->artefakte += get_item(u, I_RUNESWORD);
 
 					s->spielerpferde += get_item(u, I_HORSE);
 
@@ -3426,7 +3419,6 @@ report_summary(summary * s, summary * o, boolean full)
 		fprintf(F, "ungezähmte Pferde:    %s\n", pcomp(s->pferde, o->pferde));
 		fprintf(F, "gezähmte Pferde:      %s\n",
 				pcomp(s->spielerpferde,o->spielerpferde));
-		fprintf(F, "Artefakte:            %s\n", pcomp(s->artefakte,o->artefakte));
 		fprintf(F, "Schiffe:              %s\n", pcomp(s->schiffe, o->schiffe));
 		fprintf(F, "Gebäude:              %s\n", pcomp(s->gebaeude, o->gebaeude));
 

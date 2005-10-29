@@ -30,11 +30,6 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static weapon_mod wm_bow[] = {
-	{ 2, WMF_MISSILE_TARGET },
-	{ 0, 0 }
-};
-
 static weapon_mod wm_catapult[] = {
 	{ 4, WMF_MISSILE_TARGET },
 	{ 0, 0 }
@@ -52,11 +47,8 @@ static weapon_mod wm_lance[] = {
 };
 
 enum {
-	WP_RUNESWORD,
-	WP_FIRESWORD,
 	WP_EOGSWORD,
 	WP_CATAPULT,
-	WP_LONGBOW,
 	WP_SPEAR,
 	WP_LANCE,
 	WP_NONE,
@@ -97,16 +89,9 @@ static weapondata weapontable[WP_MAX + 1] =
 /* MagRes, Schaden/Fuß, Schaden/Pferd, Item, Skill, OffMod, DefMod,
  * missile, is_magic */
 {
-	/* Runenschwert */
-	{0.00, "3d10+10", "3d10+10", I_RUNESWORD, SK_MELEE, 2, 2, false, true, { RL_NONE, 0}, CUT },
-	/* Flammenschwert */
-	{0.30, "3d6+10", "3d6+10", I_FIRESWORD, SK_MELEE, 1, 1, false, false, { RL_NONE, 0}, CUT },
-	/* Laenschwert */
 	{0.30, "3d6+10", "3d6+10", I_LAENSWORD, SK_MELEE, 1, 1, false, false, { RL_NONE, 0}, CUT },
 	/* Katapult */
 	{0.00, "3d10+5", "3d10+5", I_CATAPULT, SK_CATAPULT, 0, 0, true, false, { RL_CATAPULT, 5 }, BASH },
-	/* Langbogen */
-	{0.00, "1d11+1", "1d11+1", I_LONGBOW, SK_LONGBOW, 0, 0, true, false, { RL_NONE, 0 }, PIERCE },
 	/* Speer */
 	{0.00, "1d10+0", "1d12+2", I_SPEAR, SK_SPEAR, 0, 0, false, false, { RL_NONE, 0}, PIERCE },
 	/* Lanze */
@@ -120,7 +105,7 @@ static weapondata weapontable[WP_MAX + 1] =
 weapon_type * oldweapontype[WP_MAX];
 
 static boolean
-attack_firesword(const troop * at, int *casualties, int row)
+attack_firesword(const troop * at, const struct weapon_type * wtype, int *casualties, int row)
 {
 	fighter *fi = at->fighter;
 	troop dt;
@@ -144,7 +129,7 @@ attack_firesword(const troop * at, int *casualties, int row)
 		int i, k=0;
 		for (i=0;i<=at->index;++i) {
 			struct weapon * wp = fi->person[i].melee;
-			if (wp!=NULL && wp->type == oldweapontype[WP_FIRESWORD]) ++k;
+			if (wp!=NULL && wp->type == wtype) ++k;
 		}
 		sprintf(buf, "%d Kämpfer aus %s benutz%s Flammenschwert%s:", k, unitname(fi->unit),
 			(k==1)?"t sein ":"en ihre",(k==1)?"":"er");
@@ -165,7 +150,7 @@ attack_firesword(const troop * at, int *casualties, int row)
 #define CATAPULT_ATTACKS 6
 
 static boolean
-attack_catapult(const troop * at, int * casualties, int row)
+attack_catapult(const troop * at, const struct weapon_type * wtype, int * casualties, int row)
 {
 	fighter *af = at->fighter;
 	unit *au = af->unit;
@@ -184,7 +169,7 @@ attack_catapult(const troop * at, int * casualties, int row)
     /* probiere noch weitere attacken, kann nicht schiessen */
     return true;
 	}
-	assert(wp->type->itype==olditemtype[I_CATAPULT]);
+	assert(wp->type==wtype);
 	assert(af->person[at->index].reload==0);
 
   if (it_catapultammo!=NULL) {
@@ -245,14 +230,9 @@ init_oldweapons(void)
 		int minskill = 1, wflags = WTF_NONE;
     int m;
 		weapon_mod * modifiers = NULL;
-		boolean (*attack)(const troop *, int * deaths, int row) = NULL;
+		boolean (*attack)(const troop *, const struct weapon_type *, int *, int) = NULL;
 
 		switch (w) {
-		case WP_RUNESWORD:
-		case WP_FIRESWORD:
-			attack = attack_firesword;
-			minskill = 7;
-			break;
 		case WP_LANCE:
 			modifiers = wm_lance;
 			break;
@@ -262,9 +242,6 @@ init_oldweapons(void)
 			break;
 		case WP_SPEAR:
 			modifiers = wm_spear;
-			break;
-		case WP_LONGBOW:
-			modifiers = wm_bow;
 			break;
 		}
 

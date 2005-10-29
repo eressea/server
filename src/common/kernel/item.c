@@ -597,11 +597,8 @@ give_horses(const unit * s, const unit * d, const item_type * itype, int n, stru
 #define LASTLUXURY      (I_INCENSE +1)
 #define MAXLUXURIES (LASTLUXURY - FIRSTLUXURY)
 
-#define item2res(itm) (resource_t)(itm+R_MINITEM)
-
 item_type * olditemtype[MAXITEMS+1];
 resource_type * oldresourcetype[MAXRESOURCES+1];
-luxury_type * oldluxurytype[MAXLUXURIES+1];
 potion_type * oldpotiontype[MAXPOTIONS+1];
 
 /*** alte items ***/
@@ -783,10 +780,6 @@ static t_item itemdata[MAXITEMS] = {
 		{"Speer", "Speere", "Speer", "Speere"},
 		IS_PRODUCT, SK_WEAPONSMITH, 2, {0, 1, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
-	{			/* I_LONGBOW */
-		{"Bogen", "Bögen", "Bogen", "Bögen"},
-		IS_PRODUCT, SK_WEAPONSMITH, 2, {0, 1, 0, 0, 0, 0}, 100, 0, 0, NULL
-	},
 	{			/* I_BALM */
 		{"Balsam", "Balsam", "Balsam", "Balsam"},
 		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 200, 4, 0, NULL
@@ -831,11 +824,6 @@ static t_item itemdata[MAXITEMS] = {
 	{			/* I_RING_OF_POWER 25 */
 		{"Ring der Macht", "Ringe der Macht", "", ""},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, 0, NULL
-	},
-	{			/* I_FIRESWORD */
-		{"Flammenschwert", "Flammenschwerter",
-		 "Flammenschwert", "Flammenschwerter"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_DRAGONHEAD 33 */
 		{"Drachenkopf", "Drachenköpfe", "Drachenkopf", "Drachenköpfe"},
@@ -898,10 +886,6 @@ static t_item itemdata[MAXITEMS] = {
 		{"Akkredition des Xontormia-Expreß", "Akkreditionen des Xontormia-Expreß",
 		 "Akkredition des Xontormia-Expreß", "Akkreditionen des Xontormia-Expreß"},
 		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 0, 0, FL_ITEM_CURSED, NULL
-	},
-	{			/* I_RUNESWORD 68 */
-		{"Runenschwert", "Runenschwerter", "Runenschwert", "Runenschwerter"},
-		IS_MAGIC, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 0, 0, NULL
 	},
 	{			/* I_AURAKULUM 69 */
 		{"Aurafocus", "Aurafocuse", "Amulett", "Amulette"},
@@ -1144,7 +1128,6 @@ init_olditems(void)
     switch (itemdata[i].typ) {
     case IS_LUXURY:
       price = itemdata[i].preis;
-      oldluxurytype[i-FIRSTLUXURY] = new_luxurytype(itype, price);
       break;
     case IS_RESOURCE:
       rtype->flags |= RTF_LIMITED;
@@ -1161,7 +1144,7 @@ init_olditems(void)
       itype->use = use_olditem;
     }
     olditemtype[i] = itype;
-    oldresourcetype[item2res(i)] = rtype;
+    oldresourcetype[i] = rtype;
   }
 
   for (i=0; i!=MAXITEMS; ++i) {

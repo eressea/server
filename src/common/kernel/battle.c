@@ -1964,7 +1964,7 @@ attack(battle *b, troop ta, const att *a, int numattack)
          * sonst helden mit feuerschwertern zu mächtig */
 				if (numattack==0 && wp && wp->type->attack) {
 					int dead = 0;
-					standard_attack = wp->type->attack(&ta, &dead, row);
+					standard_attack = wp->type->attack(&ta, wp->type, &dead, row);
           if (!standard_attack) reload = true;
 					af->catmsg += dead;
 					if (!standard_attack && af->person[ta.index].last_action < b->turn) {

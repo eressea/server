@@ -51,7 +51,6 @@ extern "C" {
 #define luxury_t short
 #define weapon_t short
 #define item_t short
-#define resource_t short
 #define spellid_t unsigned int
 #else
 typedef short order_t;
@@ -66,7 +65,6 @@ typedef short potion_t;
 typedef short luxury_t;
 typedef short weapon_t;
 typedef short item_t;
-typedef short resource_t;
 typedef unsigned int spellid_t;
 #endif
 
