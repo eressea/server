@@ -24,7 +24,7 @@
     <resource name="laen" chance="0.02" level="1d4" base="1d4" div="2d20+50"/>
   </terrain>
 
-  <terrain name="desert" size="1000" road="50" cavalry="yes">
+  <terrain name="desert" size="1000" road="100" cavalry="yes">
     <herb name="h9"/>
     <herb name="h10"/>
     <herb name="h11"/>
