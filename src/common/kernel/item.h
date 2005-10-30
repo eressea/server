@@ -101,41 +101,41 @@ typedef struct resource_limit {
 #define EUNUSABLE -4;
 
 typedef struct itemtype_list {
-	struct itemtype_list * next;
-	const struct item_type * type;
+  struct itemtype_list * next;
+  const struct item_type * type;
 } itemtype_list;
 
 typedef struct item_type {
-	resource_type * rtype;
-	/* --- constants --- */
-	unsigned int flags;
-	int weight;
-	int capacity;
-	struct construction * construction;
-	/* --- functions --- */
-	int (*use)(struct unit * user, const struct item_type * itype, int amount, struct order * ord);
-	int (*useonother)(struct unit * user, int targetno, const struct item_type * itype, int amount, struct order * ord);
-	boolean (*give)(const struct unit * src, const struct unit * dest, const struct item_type * itm, int number, struct order * ord);
+  resource_type * rtype;
+  /* --- constants --- */
+  unsigned int flags;
+  int weight;
+  int capacity;
+  struct construction * construction;
+  /* --- functions --- */
+  int (*use)(struct unit * user, const struct item_type * itype, int amount, struct order * ord);
+  int (*useonother)(struct unit * user, int targetno, const struct item_type * itype, int amount, struct order * ord);
+  boolean (*give)(const struct unit * src, const struct unit * dest, const struct item_type * itm, int number, struct order * ord);
 #ifdef SCORE_MODULE
   int score;
 #endif
-	struct item_type * next;
+  struct item_type * next;
 } item_type;
 
 extern const item_type * finditemtype(const char * name, const struct locale * lang);
 extern void init_itemnames(void);
 
 typedef struct luxury_type {
-	struct luxury_type * next;
-	const item_type * itype;
-	int price;
+  struct luxury_type * next;
+  const item_type * itype;
+  int price;
 } luxury_type;
 extern luxury_type * luxurytypes;
 
 typedef struct potion_type {
-	struct potion_type * next;
-	const item_type * itype;
-	int level;
+  struct potion_type * next;
+  const item_type * itype;
+  int level;
 } potion_type;
 extern potion_type * potiontypes;
 
@@ -183,18 +183,18 @@ typedef struct armor_type {
 #define WTF_ARMORPIERCING 0x40 /* armor has only half value */
 
 typedef struct weapon_type {
-	const item_type * itype;
-	const char * damage[2];
-	unsigned int flags;
-	skill_t skill;
-	int minskill;
-	int offmod;
-	int defmod;
-	double magres;
-	int reload; /* time to reload this weapon */
-	weapon_mod * modifiers;
-	/* --- functions --- */
-	boolean (*attack)(const struct troop *, const struct weapon_type *, int *deaths, int row);
+  const item_type * itype;
+  const char * damage[2];
+  unsigned int flags;
+  skill_t skill;
+  int minskill;
+  int offmod;
+  int defmod;
+  double magres;
+  int reload; /* time to reload this weapon */
+  weapon_mod * modifiers;
+  /* --- functions --- */
+  boolean (*attack)(const struct troop *, const struct weapon_type *, int *deaths, int row);
 } weapon_type;
 
 extern void rt_register(resource_type * it);
@@ -264,13 +264,6 @@ enum {
 	I_WAGON,
 	I_CATAPULT,
 	I_SPEAR,
-	I_BALM,
-	I_SPICES,
-	I_JEWELERY,
-	I_MYRRH,
-	I_OIL,
-	I_SILK,
-	I_INCENSE,
 	/* alte Artefakte */
 	I_AMULET_OF_HEALING,
 	I_AMULET_OF_TRUE_SEEING,
@@ -310,14 +303,6 @@ enum {
 	R_WAGON,
 	R_CATAPULT,
 	R_SPEAR,
-  /* luxury */
-  R_BALM,
-	R_SPICES,
-	R_JEWELERY,
-	R_MYRRH,
-	R_OIL,
-	R_SILK,
-	R_INCENSE,
   /**/
 	R_AMULET_OF_HEALING,
 	R_AMULET_OF_TRUE_SEEING,

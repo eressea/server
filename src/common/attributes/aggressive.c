@@ -18,10 +18,10 @@
 #include <attrib.h>
 
 attrib_type at_aggressive = {
-	"aggressive",
-	NULL,
-	NULL,
-	NULL,
+  "aggressive",
+  NULL,
+  NULL,
+  NULL,
   a_writedefault,
   a_readdefault,
   ATF_UNIQUE

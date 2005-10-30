@@ -655,7 +655,6 @@ void use_birthdayamulet(region * r, unit * magician, int amount, struct order * 
 enum {
 	IS_RESOURCE,
 	IS_PRODUCT,
-	IS_LUXURY,
 	IS_MAGIC,
  /* wird für ZEIGE gebraucht */
 	IS_ITEM,
@@ -726,34 +725,6 @@ static t_item itemdata[MAXITEMS] = {
 	{			/* I_SPEAR */
 		{"Speer", "Speere", "Speer", "Speere"},
 		IS_PRODUCT, SK_WEAPONSMITH, 2, {0, 1, 0, 0, 0, 0}, 100, 0, 0, NULL
-	},
-	{			/* I_BALM */
-		{"Balsam", "Balsam", "Balsam", "Balsam"},
-		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 200, 4, 0, NULL
-	},
-	{			/* I_SPICES */
-		{"Gewürz", "Gewürz", "Gewürz", "Gewürz"},
-		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 200, 5, 0, NULL
-	},
-	{			/* I_JEWELERY */
-		{"Juwel", "Juwelen", "Juwel", "Juwelen"},
-		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 100, 7, 0, NULL
-	},
-	{			/* I_MYRRH */
-		{"Myrrhe", "Myrrhe", "Myrrhe", "Myrrhe"},
-		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 200, 5, 0, NULL
-	},
-	{			/* I_OIL */
-		{"Öl", "Öl", "Öl", "Öl"},
-		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 300, 3, 0, NULL
-	},
-	{			/* I_SILK */
-		{"Seide", "Seide", "Seide", "Seide"},
-		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 300, 6, 0, NULL
-	},
-	{			/* I_INCENSE */
-		{"Weihrauch", "Weihrauch", "Weihrauch", "Weihrauch"},
-		IS_LUXURY, 0, 0, {0, 0, 0, 0, 0, 0}, 200, 4, 0, NULL
 	},
 	{			/* I_AMULET_OF_HEALING */
 		{"Amulett der Heilung", "Amulette der Heilung", "Amulett", "Amulette"},
@@ -1017,14 +988,12 @@ init_olditems(void)
     const char * appearance[2];
     int weight = itemdata[i].gewicht;
     int capacity = 0;
-    int price;
     attrib * a;
     item_type * itype;
 
     if (itemdata[i].flags & FL_ITEM_CURSED) iflags |= ITF_CURSED;
     if (itemdata[i].flags & FL_ITEM_NOTLOST) iflags |= ITF_NOTLOST;
     if (itemdata[i].flags & FL_ITEM_NOTINBAG) iflags |= ITF_BIG;
-    if (itemdata[i].typ == IS_LUXURY) iflags |= ITF_LUXURY;
     if (itemdata[i].flags & FL_ITEM_ANIMAL) iflags |= ITF_ANIMAL;
 
     name[0]=NULL;
@@ -1073,10 +1042,6 @@ init_olditems(void)
 
     /* itemdata::typ Analyse. IS_PRODUCT und IS_MAGIC sind so gut wie egal. */
     switch (itemdata[i].typ) {
-    case IS_LUXURY:
-      price = itemdata[i].preis;
-      rtype->ltype = new_luxurytype(itype, price);
-      break;
     case IS_RESOURCE:
       rtype->flags |= RTF_LIMITED;
       itype->flags |= ITF_NOBUILDBESIEGED;
@@ -1422,8 +1387,6 @@ static const char * names[] = {
 static int 
 item_score(item_t i)
 {
-  const luxury_type * ltype;
-
   switch (i) {
     case I_IRON:
     case I_WOOD:
@@ -1438,16 +1401,6 @@ item_score(item_t i)
       return 60;
     case I_LAENSWORD:
       return 400;
-    case I_BALM:
-    case I_SPICES:
-    case I_JEWELERY:
-    case I_MYRRH:
-    case I_OIL:
-    case I_SILK:
-    case I_INCENSE:
-      ltype = resource2luxury(olditemtype[i]->rtype);
-      if (ltype) return ltype->price / 5;
-      return 0;
     case I_AMULET_OF_HEALING:
     case I_AMULET_OF_TRUE_SEEING:
     case I_RING_OF_INVISIBILITY:
