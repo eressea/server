@@ -166,7 +166,7 @@ new_set_resvalue(unit * u, const resource_type * rtype, int value)
 }
 
 int
-new_get_pooled(const unit * u, const resource_type * rtype, int mode)
+new_get_pooled(const unit * u, const resource_type * rtype, unsigned int mode)
 {
   const faction * f = u->faction;
   unit *v;
@@ -209,7 +209,7 @@ new_get_pooled(const unit * u, const resource_type * rtype, int mode)
 }
 
 int
-new_use_pooled(unit * u, const resource_type * rtype, int mode, int count)
+new_use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
 {
   const faction *f = u->faction;
   unit *v;

@@ -756,7 +756,7 @@ build(unit * u, const construction * ctype, int completed, int want)
       multi = canuse/100;
       if (canuse<0) return canuse; /* pass errors to caller */
 
-      new_use_pooled(u, rtype, (need-prebuilt+multi-1)/multi, GET_DEFAULT);
+      new_use_pooled(u, rtype, GET_DEFAULT, (need-prebuilt+multi-1)/multi);
     }
     made += n;
     skills -= n * type->minskill;

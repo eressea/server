@@ -32,8 +32,8 @@ extern "C" {
 #define GET_DEFAULT (GET_RESERVE|GET_SLACK|GET_POOLED_SLACK)
 #define GET_ALL (GET_SLACK|GET_RESERVE|GET_POOLED_SLACK|GET_POOLED_RESERVE|GET_POOLED_FORCE)
 
-int new_get_pooled(const struct unit * u, const struct resource_type * res, int mode);
-int new_use_pooled(struct unit * u, const struct resource_type * res, int mode, int count);
+int new_get_pooled(const struct unit * u, const struct resource_type * res, unsigned int mode);
+int new_use_pooled(struct unit * u, const struct resource_type * res, unsigned int mode, int count);
 	/** use_pooled
 	 * verbraucht 'count' Objekte der resource 'itm'
 	 * unter zuhilfenahme des Pools der struct region und Aufbrauch des

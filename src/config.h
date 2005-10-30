@@ -79,7 +79,7 @@ extern "C" {
 #  define _BSD_SOURCE
 #  define __USE_BSD
 # endif
-# include <features.h>
+/* # include <features.h> */
 # include <strings.h>	/* strncasecmp-Prototyp */
 #endif
 

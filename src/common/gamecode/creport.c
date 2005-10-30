@@ -588,7 +588,7 @@ cr_output_ship(FILE * F, const ship * sh, const unit * u, int fcaptain, const fa
 	}
 	/* shore */
 	w = NODIRECTION;
-	if (fval(r->terrain, SEA_REGION)) w = sh->coast;
+	if (!fval(r->terrain, SEA_REGION)) w = sh->coast;
 	if (w != NODIRECTION)
 		fprintf(F, "%d;Kueste\n", w);
 

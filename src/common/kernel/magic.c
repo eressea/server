@@ -836,7 +836,7 @@ pay_spell(unit * u, const spell * sp, int cast_level, int range)
 			resuse *= cast_level;
 		}
 
-		new_use_pooled(u, sp->components[k].type, resuse, GET_DEFAULT);
+		new_use_pooled(u, sp->components[k].type, GET_DEFAULT, resuse);
 	}
 }
 
