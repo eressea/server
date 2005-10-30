@@ -221,7 +221,7 @@ siege_cmd(unit * u, order * ord)
   /* schaden durch katapulte */
 
   d = min(u->number,
-    min(new_get_pooled(u, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK), get_item(u, I_CATAPULT)));
+    min(get_pooled(u, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK), get_item(u, I_CATAPULT)));
   if (eff_skill(u, SK_CATAPULT, r) >= 1) {
     katapultiere = d;
     d *= eff_skill(u, SK_CATAPULT, r);
@@ -255,7 +255,7 @@ siege_cmd(unit * u, order * ord)
   /* meldung, schaden anrichten */
   if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {
     b->size -= d;
-    new_use_pooled(u, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, d);
+    use_pooled(u, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, d);
     d = 100 * d / b->size;
   } else d = 0;
 
@@ -508,7 +508,7 @@ build_road(region * r, unit * u, int size, direction_t d)
       return;
     }
   }
-  if (!new_get_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT) && u->race != new_race[RC_STONEGOLEM]) {
+  if (!get_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT) && u->race != new_race[RC_STONEGOLEM]) {
     cmistake(u, u->thisorder, 151, MSG_PRODUCE);
     return;
   }
@@ -527,7 +527,7 @@ build_road(region * r, unit * u, int size, direction_t d)
   if (u->race == new_race[RC_STONEGOLEM]){
     n = u->number * GOLEM_STONE;
   } else {
-    n = new_get_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT);
+    n = get_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT);
   }
   left = min(n, left);
   if (size>0) left = min(size, left);
@@ -568,7 +568,7 @@ build_road(region * r, unit * u, int size, direction_t d)
     }
     scale_number(u, u->number - golemsused);
   } else {
-    new_use_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT, n);
+    use_pooled(u, oldresourcetype[R_STONE], GET_DEFAULT, n);
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
     produceexp(u, SK_ROAD_BUILDING, min(n, u->number));
   }
@@ -718,7 +718,7 @@ build(unit * u, const construction * ctype, int completed, int want)
     if (type->materials) for (c=0;n>0 && type->materials[c].number;c++) {
       const struct resource_type * rtype = type->materials[c].rtype;
       int need;
-      int have = new_get_pooled(u, rtype, GET_DEFAULT);
+      int have = get_pooled(u, rtype, GET_DEFAULT);
       int prebuilt;
       int canuse = have;
       if (inside_building(u)) {
@@ -756,7 +756,7 @@ build(unit * u, const construction * ctype, int completed, int want)
       multi = canuse/100;
       if (canuse<0) return canuse; /* pass errors to caller */
 
-      new_use_pooled(u, rtype, GET_DEFAULT, (need-prebuilt+multi-1)/multi);
+      use_pooled(u, rtype, GET_DEFAULT, (need-prebuilt+multi-1)/multi);
     }
     made += n;
     skills -= n * type->minskill;
@@ -778,7 +778,7 @@ maxbuild(const unit * u, const construction * cons)
   int maximum = INT_MAX;
   for (c=0;cons->materials[c].number;c++) {
     const resource_type * rtype = cons->materials[c].rtype;
-    int have = new_get_pooled(u, rtype, GET_DEFAULT);
+    int have = get_pooled(u, rtype, GET_DEFAULT);
     int need = required(1, cons->reqsize, cons->materials[c].number);
     if (have<need) {
       cmistake(u, u->thisorder, 88, MSG_PRODUCE);

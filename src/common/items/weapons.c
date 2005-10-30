@@ -173,7 +173,7 @@ attack_catapult(const troop * at, const struct weapon_type * wtype, int * casual
 	assert(af->person[at->index].reload==0);
 
   if (it_catapultammo!=NULL) {
-    if (new_get_pooled(au, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK) <= 0) {
+    if (get_pooled(au, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK) <= 0) {
       /* No ammo. Use other weapon if available. */
       return true;
     }
@@ -194,7 +194,7 @@ attack_catapult(const troop * at, const struct weapon_type * wtype, int * casual
 	n = min(CATAPULT_ATTACKS, count_enemies(b, af->side, minrow, maxrow, true));
 
   if (it_catapultammo!=NULL) {
-    new_use_pooled(au, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1);
+    use_pooled(au, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 1);
   }
 
 	while (--n >= 0) {

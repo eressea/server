@@ -153,7 +153,7 @@ use_antimagiccrystal(unit * u, const struct item_type * itype, int amount, struc
       create_curse(u, &r->attribs, ct_find("antimagiczone"), force, duration, var, 0);
     }
   }
-  new_use_pooled(u, rt_crystal, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
+  use_pooled(u, rt_crystal, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
   ADDMSG(&u->faction->msgs, msg_message("use_antimagiccrystal", 
     "unit region", u, r));
   return 0;

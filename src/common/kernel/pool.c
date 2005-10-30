@@ -166,7 +166,7 @@ new_set_resvalue(unit * u, const resource_type * rtype, int value)
 }
 
 int
-new_get_pooled(const unit * u, const resource_type * rtype, unsigned int mode)
+get_pooled(const unit * u, const resource_type * rtype, unsigned int mode)
 {
   const faction * f = u->faction;
   unit *v;
@@ -202,14 +202,14 @@ new_get_pooled(const unit * u, const resource_type * rtype, unsigned int mode)
       }
       else if (alliedunit(v, f, HELP_MONEY)) mask = (mode >> 6) & (GET_SLACK|GET_RESERVE);
       else continue;
-      use += new_get_pooled(v, rtype, mask);
+      use += get_pooled(v, rtype, mask);
     }
   }
   return use;
 }
 
 int
-new_use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
+use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
 {
   const faction *f = u->faction;
   unit *v;
@@ -253,7 +253,7 @@ new_use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int cou
       }
       else if (alliedunit(v, f, HELP_MONEY)) mask = (mode >> 6) & (GET_SLACK|GET_RESERVE);
       else continue;
-      use -= new_use_pooled(v, rtype, mask, use);
+      use -= use_pooled(v, rtype, mask, use);
     }
   }
   return count-use;
@@ -284,7 +284,7 @@ init_pool(void)
           if (rtype == NULL) continue;
 
           new_set_resvalue(u, rtype, 0);  /* make sure the pool is empty */
-          use = new_use_pooled(u, rtype, GET_DEFAULT, count);
+          use = use_pooled(u, rtype, GET_DEFAULT, count);
           if (use) {
             new_set_resvalue(u, rtype, use);
             change_resource(u, rtype, use);

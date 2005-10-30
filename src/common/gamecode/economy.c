@@ -345,9 +345,9 @@ do_recruiting(recruitment * recruits, int available)
 
       number = min(req->qty, get / multi);
       if (rc->recruitcost) {
-        int afford = new_get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT) / rc->recruitcost;
+        int afford = get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT) / rc->recruitcost;
         number = min(number, afford);
-        new_use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, rc->recruitcost*number);
+        use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, rc->recruitcost*number);
       }
       add_recruits(u, number, req->qty);
       if ((rc->ec_flags & ECF_REC_ETHEREAL)==0) {
@@ -504,7 +504,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 			return;
 		}
 
-		if (new_get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT) < recruitcost) {
+		if (get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT) < recruitcost) {
       cmistake(u, ord, 142, MSG_EVENT);
 			return;
 		}
@@ -536,7 +536,7 @@ recruit(unit * u, struct order * ord, request ** recruitorders)
 		cmistake(u, ord, 156, MSG_EVENT);
 		return;
 	}
-	if (recruitcost) n = min(n, new_get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT) / recruitcost);
+	if (recruitcost) n = min(n, get_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT) / recruitcost);
 
 	u->wants = n;
 
@@ -904,15 +904,15 @@ maintain(building * b, boolean first)
 			/* first ist im ersten versuch true, im zweiten aber false! Das
 			* bedeutet, das in der Runde in die Region geschafften Resourcen
 			* nicht genutzt werden können, weil die reserviert sind! */
-			if (!first) need -= new_get_pooled(u, m->rtype, GET_ALL);
-			else need -= new_get_pooled(u, m->rtype, GET_DEFAULT);
+			if (!first) need -= get_pooled(u, m->rtype, GET_ALL);
+			else need -= get_pooled(u, m->rtype, GET_DEFAULT);
 			if (!first && need > 0) {
 				unit * ua;
 				for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FL_DH);
 				fset(u->faction, FL_DH); /* hat schon */
 				for (ua=r->units;ua;ua=ua->next) {
 					if (!fval(ua->faction, FL_DH) && (ua->faction == u->faction || alliedunit(ua, u->faction, HELP_MONEY))) {
-						need -= new_get_pooled(ua, m->rtype, GET_ALL);
+						need -= get_pooled(ua, m->rtype, GET_ALL);
 						fset(ua->faction, FL_DH);
 						if (need<=0) break;
 					}
@@ -945,15 +945,15 @@ maintain(building * b, boolean first)
 			if (!fval(m, MTF_VITAL) && !work) continue;
 			if (fval(m, MTF_VARIABLE)) cost = cost * b->size;
 
-			if (!first) cost -= new_use_pooled(u, m->rtype, GET_ALL, cost);
-			else cost -= new_use_pooled(u, m->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, cost);
+			if (!first) cost -= use_pooled(u, m->rtype, GET_ALL, cost);
+			else cost -= use_pooled(u, m->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, cost);
 			if (!first && cost > 0) {
 				unit * ua;
 				for (ua=r->units;ua;ua=ua->next) freset(ua->faction, FL_DH);
 				fset(u->faction, FL_DH); /* hat schon */
 				for (ua=r->units;ua;ua=ua->next) {
 					if (!fval(ua->faction, FL_DH) && alliedunit(ua, u->faction, HELP_MONEY)) {
-						int give = new_use_pooled(ua, m->rtype, GET_ALL, cost);
+						int give = use_pooled(ua, m->rtype, GET_ALL, cost);
 						if (!give) continue;
 						cost -= give;
 						fset(ua->faction, FL_DH);
@@ -1804,7 +1804,7 @@ expandbuying(region * r, request * buyorders)
 		if (trade->number + 1 > max_products) ++multi;
 		price = ltype->price * multi;
 
-		if (new_get_pooled(oa[j].unit, oldresourcetype[R_SILVER], GET_DEFAULT) >= price) {
+		if (get_pooled(oa[j].unit, oldresourcetype[R_SILVER], GET_DEFAULT) >= price) {
 			unit * u = oa[j].unit;
 
 			/* litems zählt die Güter, die verkauft wurden, u->n das Geld, das
@@ -1815,7 +1815,7 @@ expandbuying(region * r, request * buyorders)
 			if (a==NULL) a = a_add(&u->attribs, a_new(&at_luxuries));
 			i_change((item**)&a->data.v, ltype->itype, 1);
 			i_change(&oa[j].unit->items, ltype->itype, 1);
-			new_use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, price);
+			use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, price);
 			if (u->n < 0)
 				u->n = 0;
 			u->n += price;
@@ -2096,9 +2096,9 @@ expandselling(region * r, request * sellorders, int limit)
 		}
 		if (use>0) {
 #ifdef NDEBUG
-			new_use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
+			use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
 #else
-			/* int i = */ new_use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
+			/* int i = */ use_pooled(oa[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
 			/* assert(i==use); */
 #endif
 		}
@@ -2229,13 +2229,13 @@ sell(unit * u, request ** sellorders, struct order * ord)
 			cmistake(u, ord, 263, MSG_COMMERCE);
 			return false;
 		}
-		available = new_get_pooled(u, itype->rtype, GET_DEFAULT);
+		available = get_pooled(u, itype->rtype, GET_DEFAULT);
 
 		/* Wenn andere Einheiten das selbe verkaufen, muß ihr Zeug abgezogen
 		* werden damit es nicht zweimal verkauft wird: */
 		for (o=*sellorders;o;o=o->next) {
 			if (o->type.ltype==ltype && o->unit->faction == u->faction) {
-				int fpool = o->qty - new_get_pooled(o->unit, itype->rtype, GET_RESERVE);
+				int fpool = o->qty - get_pooled(o->unit, itype->rtype, GET_RESERVE);
 				available -= max(0, fpool);
 			}
 		}
@@ -2296,7 +2296,7 @@ expandstealing(region * r, request * stealorders)
 	for (i = 0; i != norders && oa[i].unit->n <= oa[i].unit->wants; i++) {
 		unit *u = findunitg(oa[i].no, r);
 		int n = 0;
-		if (u && u->region==r) n = new_get_pooled(u, r_silver, GET_ALL);
+		if (u && u->region==r) n = get_pooled(u, r_silver, GET_ALL);
 #ifndef GOBLINKILL
 		if (oa[i].type.goblin) { /* Goblin-Spezialklau */
 			int uct = 0;
@@ -2314,7 +2314,7 @@ expandstealing(region * r, request * stealorders)
 		}
 		if (n > 0) {
 			n = min(n, oa[i].unit->wants);
-			new_use_pooled(u, r_silver, GET_ALL, n);
+			use_pooled(u, r_silver, GET_ALL, n);
 			oa[i].unit->n = n;
 			change_money(oa[i].unit, n);
 			ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount", u, u->region, n));
@@ -2353,12 +2353,12 @@ plant(region *r, unit *u, int raw)
 		return;
 	}
 	/* Wasser des Lebens prüfen */
-	if (new_get_pooled(u, rt_water, GET_DEFAULT) == 0) {
+	if (get_pooled(u, rt_water, GET_DEFAULT) == 0) {
 		add_message(&u->faction->msgs,
 			msg_feedback(u, u->thisorder, "resource_missing", "missing", rt_water));
 		return;
 	}
-	n = new_get_pooled(u, itype->rtype, GET_DEFAULT);
+	n = get_pooled(u, itype->rtype, GET_DEFAULT);
 	/* Kräuter prüfen */
 	if (n==0) {
 		add_message(&u->faction->msgs,
@@ -2376,8 +2376,8 @@ plant(region *r, unit *u, int raw)
 	produceexp(u, SK_HERBALISM, u->number);
 
 	/* Alles ok. Abziehen. */
-	new_use_pooled(u, rt_water, GET_DEFAULT, 1);
-	new_use_pooled(u, itype->rtype, GET_DEFAULT, n);
+	use_pooled(u, rt_water, GET_DEFAULT, 1);
+	use_pooled(u, itype->rtype, GET_DEFAULT, n);
 	rsetherbs(r, rherbs(r)+planted);
 	ADDMSG(&u->faction->msgs, msg_message("plant", "unit region amount herb", 
     u, r, planted, itype->rtype));
@@ -2415,7 +2415,7 @@ planttrees(region *r, unit *u, int raw)
 		return;
 	}
 
-	n = new_get_pooled(u, rtype, GET_DEFAULT);
+	n = get_pooled(u, rtype, GET_DEFAULT);
 	/* Samen prüfen */
 	if (n==0) {
 		add_message(&u->faction->msgs,
@@ -2435,7 +2435,7 @@ planttrees(region *r, unit *u, int raw)
 
 	/* Alles ok. Abziehen. */
 	produceexp(u, SK_HERBALISM, u->number);
-	new_use_pooled(u, rtype, GET_DEFAULT, n);
+	use_pooled(u, rtype, GET_DEFAULT, n);
 
 	ADDMSG(&u->faction->msgs, msg_message("plant",
 		"unit region amount herb", u, r, planted, rtype));
@@ -2474,7 +2474,7 @@ breedtrees(region *r, unit *u, int raw)
 		planttrees(r, u, raw);
 		return;
 	}
-	n = new_get_pooled(u, rtype, GET_DEFAULT);
+	n = get_pooled(u, rtype, GET_DEFAULT);
 	/* Samen prüfen */
 	if (n==0) {
 		add_message(&u->faction->msgs,
@@ -2494,7 +2494,7 @@ breedtrees(region *r, unit *u, int raw)
 
 	/* Alles ok. Abziehen. */
 	produceexp(u, SK_HERBALISM, u->number);
-	new_use_pooled(u, rtype, GET_DEFAULT, n);
+	use_pooled(u, rtype, GET_DEFAULT, n);
 
 	add_message(&u->faction->msgs, new_message(u->faction,
 		"plant%u:unit%r:region%i:amount%X:herb", u, r, planted, rtype));

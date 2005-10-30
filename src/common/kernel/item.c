@@ -690,7 +690,7 @@ use_tacticcrystal(region * r, unit * u, int amount, struct order * ord)
 		c->data.i = SK_TACTICS;
 		unused(ord);
 	}
-  new_use_pooled(u, oldresourcetype[R_TACTICCRYSTAL], GET_DEFAULT, amount);
+  use_pooled(u, oldresourcetype[R_TACTICCRYSTAL], GET_DEFAULT, amount);
 	add_message(&u->faction->msgs,
 			new_message(u->faction, "use_tacticcrystal%u:unit%r:region", u, r));
 	return;
@@ -1266,7 +1266,7 @@ use_healingpotion(struct unit *user, const struct item_type *itype, int amount, 
 		}
 		u = u->next;
 	}
-  new_use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
+  use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
   usetpotionuse(user, itype->rtype->ptype);
 
   ADDMSG(&user->faction->msgs, msg_message("usepotion",
@@ -1284,7 +1284,7 @@ use_warmthpotion(struct unit *u, const struct item_type *itype, int amount, stru
 		cmistake(u, ord, 163, MSG_EVENT);
 		return ECUSTOM;
 	}
-  new_use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
+  use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
   usetpotionuse(u, itype->rtype->ptype);
 
   ADDMSG(&u->faction->msgs, msg_message("usepotion",
@@ -1308,7 +1308,7 @@ use_foolpotion(struct unit *u, int targetno, const struct item_type *itype, int 
 		"unit recipient amount", u, target, amount));
 
   change_effect(target, itype->rtype->ptype, amount);
-	new_use_pooled(u, itype->rtype, GET_DEFAULT, amount);
+	use_pooled(u, itype->rtype, GET_DEFAULT, amount);
 	return 0;
 }
 
@@ -1324,7 +1324,7 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount, struc
     add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
     u->irace = u->race = new_race[RC_TOAD];
   }
-  new_use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
+  use_pooled(u, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
   usetpotionuse(u, itype->rtype->ptype);
 
   ADDMSG(&u->faction->msgs, msg_message("usepotion",
@@ -1336,14 +1336,14 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount, struc
 static int
 use_mistletoe(struct unit * user, const struct item_type * itype, int amount, struct order * ord)
 {
-	int mtoes = new_get_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK);
+	int mtoes = get_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK);
 
 	if (user->number>mtoes) {
 		ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
 			"unit item region command", user, itype->rtype, user->region, ord));
 		return -1;
 	}
-	new_use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
+	use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
 	a_add(&user->attribs, make_fleechance((float)1.0));
 		ADDMSG(&user->faction->msgs, msg_message("use_item",
 			"unit item", user, itype->rtype));
@@ -1354,7 +1354,7 @@ use_mistletoe(struct unit * user, const struct item_type * itype, int amount, st
 static int
 use_magicboost(struct unit * user, const struct item_type * itype, int amount, struct order * ord)
 {
-  int mtoes = new_get_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK);
+  int mtoes = get_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK);
   faction * f = user->faction;
   if (user->number>mtoes) {
     ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
@@ -1365,7 +1365,7 @@ use_magicboost(struct unit * user, const struct item_type * itype, int amount, s
     cmistake(user, user->thisorder, 214, MSG_EVENT);
     return -1;
   }
-  new_use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
+  use_pooled(user, itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, user->number);
   
   a_add(&f->attribs, make_key(atoi36("mbst")));
   set_level(user, sk_find("magic"), 3);

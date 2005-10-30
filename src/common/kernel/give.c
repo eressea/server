@@ -96,7 +96,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
   int n;
 
   assert(itype!=NULL);
-  n = new_get_pooled(src, item2resource(itype), GET_DEFAULT);
+  n = get_pooled(src, item2resource(itype), GET_DEFAULT);
   n = min(want, n);
   if (dest && src->faction != dest->faction && src->faction->age < GiveRestriction()) {
 		if (ord!=NULL) {
@@ -111,8 +111,8 @@ give_item(int want, const item_type * itype, unit * src, unit * dest, struct ord
   } else if (itype->give && !itype->give(src, dest, itype, n, ord)) {
     return -1;
   } else {
-    int use = new_use_pooled(src, item2resource(itype), GET_SLACK, n);
-    if (use<n) use += new_use_pooled(src, item2resource(itype), GET_RESERVE|GET_POOLED_SLACK, n-use);
+    int use = use_pooled(src, item2resource(itype), GET_SLACK, n);
+    if (use<n) use += use_pooled(src, item2resource(itype), GET_RESERVE|GET_POOLED_SLACK, n-use);
     if (dest) {
       i_change(&dest->items, itype, n);
 #ifdef RESERVE_GIVE

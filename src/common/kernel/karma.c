@@ -381,7 +381,7 @@ sacrifice_cmd(unit * u, struct order * ord)
 
   switch(findparam(s, u->faction->locale)) {
   case P_SILVER:
-    n = new_use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, n);
+    n = use_pooled(u, oldresourcetype[R_SILVER], GET_DEFAULT, n);
     if(n < 10000) {
       cmistake(u, ord, 51, MSG_EVENT);
       return 0;

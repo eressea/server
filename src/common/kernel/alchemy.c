@@ -106,10 +106,10 @@ use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 
 		/* für die Aufforstung von Mallornwäldern braucht man Mallorn */
 		if (fval(r, RF_MALLORN)) {
-			holz = new_use_pooled(u, oldresourcetype[R_MALLORN], 
+			holz = use_pooled(u, oldresourcetype[R_MALLORN], 
 					GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10*amount);
 		} else {
-			holz = new_use_pooled(u, oldresourcetype[R_WOOD], 
+			holz = use_pooled(u, oldresourcetype[R_WOOD], 
 					GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, 10*amount);
 		}
 	  if (r->land==0) holz=0;
@@ -139,7 +139,7 @@ use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 	} else {
 		change_effect(u, ptype, 10*amount);
 	}
-	new_use_pooled(u, ptype->itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
+	use_pooled(u, ptype->itype->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK, amount);
 	usetpotionuse(u, ptype);
 
 	ADDMSG(&u->faction->msgs, msg_message("usepotion",

@@ -782,7 +782,7 @@ eff_spelllevel(unit *u, const spell * sp, int cast_level, int range)
 			} else {
 				needplevel = sp->components[k].amount * range;
 			}
-			maxlevel = new_get_pooled(u, sp->components[k].type, GET_DEFAULT)/needplevel;
+			maxlevel = get_pooled(u, sp->components[k].type, GET_DEFAULT)/needplevel;
 
 			/* sind die Kosten fix, so muss die Komponente nur einmal vorhanden
 			 * sein und der cast_level ändert sich nicht */
@@ -836,7 +836,7 @@ pay_spell(unit * u, const spell * sp, int cast_level, int range)
 			resuse *= cast_level;
 		}
 
-		new_use_pooled(u, sp->components[k].type, GET_DEFAULT, resuse);
+		use_pooled(u, sp->components[k].type, GET_DEFAULT, resuse);
 	}
 }
 
@@ -927,7 +927,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
 					break;
 			}
 
-			if (new_get_pooled(u, rtype, GET_DEFAULT) < itemanz) {
+			if (get_pooled(u, rtype, GET_DEFAULT) < itemanz) {
 				if (b == false) {
 					/* es fehlte schon eine andere Komponente, wir basteln die
 					 * Meldung weiter zusammen */
