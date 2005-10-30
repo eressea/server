@@ -3782,6 +3782,13 @@
     </string>
   </namespace>
   <namespace name="potion">
+    <string name="p0">
+      <text locale="de">Für den Siebenmeilentee koche man einen Blauen
+      Baumringel auf und gieße dieses Gebräu in einen Windbeutel. Das
+      heraustropfende Wasser fange man auf, filtere es und verabreiche es
+      alsdann. Durch diesen Tee können bis zu zehn Menschen schnell wie ein
+      Pferd laufen.</text>
+    </string>
     <string name="truthpotion">
       <text locale="de">Dieses wirkungsvolle einfache Gebräu
       schärft die Sinne des Trinkenden derart, daß er in der
@@ -6884,6 +6891,7 @@
   </string>
 
 </strings>
+
 
 
 

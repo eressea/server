@@ -1205,7 +1205,7 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 	for (a=a_find(f->attribs, &at_showitem);a;a=a->nexttype) {
 		const potion_type * ptype = resource2potion(((const item_type*)a->data.v)->rtype);
 		requirement * m;
-		const char * ch, * description;
+		const char * ch, * description = NULL;
 
     if (ptype==NULL) continue;
 		m = ptype->itype->construction->materials;
@@ -1214,15 +1214,10 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 		fprintf(F, "\"%s\";Name\n", add_translation(ch, locale_string(f->locale, ch)));
 		fprintf(F, "%d;Stufe\n", ptype->level);
 
-    description = ptype->text;
-    if (description==NULL || f->locale!=find_locale("de")) {
+    if (description==NULL) {
       const char * pname = resourcename(ptype->itype->rtype, 0);
       const char * potiontext = mkname("potion", pname);
       description = LOC(f->locale, potiontext);
-      if (strcmp(description, potiontext)==0) {
-        /* string not found */
-        description = ptype->text;
-      }
     }
     
     fprintf(F, "\"%s\";Beschr\n", description);

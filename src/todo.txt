@@ -22,6 +22,7 @@ Larger Features:
 - eressea (b/g)zip reports?
 - mailit-format ändern?
 - NO_RUNNING
+- ZERSTÖRE - Man sollte alle Materialien zurückkriegen können:
 
 Scripts, etc:
 - format=flowed annahme, eressea

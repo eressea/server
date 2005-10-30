@@ -723,16 +723,6 @@ build(unit * u, const construction * ctype, int completed, int want)
       int canuse = have;
       if (inside_building(u)) {
         canuse = matmod(u->building->type->attribs, u, rtype, canuse);
-#if 0
-      /* exploit-check */
-      } else if (u->building) {
-        int abuse = matmod(u->building->type->attribs, u, rtype, canuse);
-        if (abuse>canuse) {
-        log_printf("ABUSE: %s saves %u %s through exploit\n",
-               itoa36(u->faction->no), abuse-canuse,
-               oldresourcetype[rtype]->_name[0]);
-        }
-#endif
       }
       if (canuse<0) return canuse; /* pass errors to caller */
       canuse = matmod(type->attribs, u, rtype, canuse);
@@ -976,11 +966,6 @@ build_ship(unit * u, ship * sh, int want)
   const construction * construction = sh->type->construction;
   int size = (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;
   int n;
-#if 0
-  int can = u->number * effskill(u, SK_SHIPBUILDING) / construction->minskill;
-  if (want > 0) can = min(want, can);
-  can = min(can, construction->maxsize+sh->damage); /* 100% bauen + 100% reparieren */
-#endif
   int can = build(u, construction, size, want);
 
   if ((n=construction->maxsize - sh->size)>0 && can>0) {

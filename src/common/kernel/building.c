@@ -509,7 +509,7 @@ destroy_building(building * b)
     }
   }
 
-#if 0	/* Memoryleak. Aber ohne klappt das Rendern nicht! */
+#if 0	/* TODO: Memoryleak. Aber ohne klappt das Rendern nicht! */
 	removelist(&b->region->buildings, b);
 #endif
 	/* Stattdessen nur aus Liste entfernen, aber im Speicher halten. */

@@ -456,34 +456,6 @@ ParteiListe(void)
 	addstr("generiere Liste...");
 	refresh();
 
-	/* Momentan unnötig und zeitraubend */
-#if 0
-	for (f = factions; f; f = f->next) {
-		f->num_people = f->nunits = f->nregions = f->money = 0;
-	}
-
-	x=0;
-	for (r = regions; r; r = r->next) {
-		int q=0; char mark[]="_-¯-";
-		for (f = factions; f; f = f->next)
-			freset(f, FL_DH);
-		if (++x & 256) {
-			x=0; move(20,1); q++; addch(mark[q&3]);
-		}
-		for (u = r->units; u; u = u->next) {
-			if (u->faction->no != MONSTER_FACTION) {	/* Monster nicht */
-				if (!fval(u->faction, FL_DH)) {
-					fset(u->faction, FL_DH);
-					u->faction->nregions++;
-				}
-				u->faction->nunits++;
-        u->faction->num_people += u->number;
-				u->faction->money += get_money(u);
-			}
-		}
-	}
-#endif
-
 	for (f = factions; f; f = f->next) {
 	  if (SX > 104)
 		sprintf(buf, "%4s: %-30.30s %-12.12s %-24.24s", factionid(f),

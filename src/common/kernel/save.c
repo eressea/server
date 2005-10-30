@@ -1082,12 +1082,8 @@ readunit(FILE * F)
   }
 	if (u->faction == NULL) {
 		log_error(("unit %s has faction == NULL\n", unitname(u)));
-#if 0
-		abort();
-#else
 		u_setfaction(u, findfaction(MONSTER_FACTION));
 		set_number(u, 0);
-#endif
 	}
 	if (playerrace(u->race)) {
 		u->faction->no_units++;

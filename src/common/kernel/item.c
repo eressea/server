@@ -669,59 +669,6 @@ enum {
 #define FL_ITEM_ANIMAL	(1<<3)	/* ist ein Tier */
 #define FL_ITEM_MOUNT	((1<<4) | FL_ITEM_ANIMAL)	/* ist ein Reittier */
 
-#if 0
-/* ------------------------------------------------------------- */
-/*   Sprüche auf Artefakten                                      */
-/* Benutzung magischer Gegenstände                               */
-/* ------------------------------------------------------------- */
-
-/* ------------------------------------------------------------- */
-/* Antimagie - curse auflösen  - für Kristall */
-/* ------------------------------------------------------------- */
-static int
-destroy_curse_crystal(attrib **alist, int cast_level, int force)
-{
-	attrib ** ap = alist;
-
-	while (*ap && force > 0) {
-		curse * c;
-		attrib * a = *ap;
-		if (!fval(a->type, ATF_CURSE)) {
-			do { ap = &(*ap)->next; } while (*ap && a->type==(*ap)->type);
-			continue;
-		}
-		c = (curse*)a->data.v;
-
-		/* Immunität prüfen */
-		if (c->flag & CURSE_IMMUN);
-
-		if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
-      /* pro Stufe Unterschied -20% */
-			double probability = 1 + (cast_level - c->vigour) * 0.2;
-			if (chance(probability)) {
-				if (c->type->change_vigour)
-					c->type->change_vigour(c, -2);
-				force -= c->vigour;
-				c->vigour -= 2;
-				if(c->vigour <= 0) {
-					a_remove(alist, a);
-				}
-			}
-		} else { /* Zauber ist stärker als curse */
-			if (force >= c->vigour){ /* reicht die Kraft noch aus? */
-				force -= c->vigour;
-				if (c->type->change_vigour)
-					c->type->change_vigour(c, -c->vigour);
-				a_remove(alist, a);
-			}
-		}
-		if(*ap) ap = &(*ap)->next;
-	}
-
-	return force;
-}
-#endif
-
 /* ------------------------------------------------------------- */
 /* Kann auch von Nichtmagier benutzt werden, modifiziert Taktik für diese
  * Runde um -1 - 4 Punkte. */
@@ -1184,11 +1131,7 @@ init_olditems(void)
 static const char *potiontext[MAXPOTIONS] =
 {
 	/* Stufe 1: */
-  "Für den Siebenmeilentee koche man einen Blauen Baumringel auf und "
-  "gieße dieses Gebräu in einen Windbeutel. Das heraustropfende Wasser "
-  "fange man auf, filtere es und verabreiche es alsdann. Durch diesen "
-  "Tee können bis zu zehn Menschen schnell wie ein Pferd laufen.",
-  
+  NULL,
   NULL,
 
 	"Das 'Wasser des Lebens' ist in der Lage, aus gefällten Baumstämmen "
@@ -1449,8 +1392,10 @@ init_oldpotions(void)
 	potion_t p;
 
   for (p=0;p!=MAXPOTIONS;++p) {
-		item_type * itype = it_find(potionnames[p]);
-    itype->rtype->ptype->text = potiontext[p];
+    item_type * itype = it_find(potionnames[p]);
+    if (potiontext[p]) {
+      locale_setstring(default_locale, mkname("potion", potionnames[p]), potiontext[p]);
+    }
     oldpotiontype[p] = itype->rtype->ptype;
 	}
 }

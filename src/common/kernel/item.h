@@ -136,7 +136,6 @@ typedef struct potion_type {
 	struct potion_type * next;
 	const item_type * itype;
 	int level;
-	const char * text;
 } potion_type;
 extern potion_type * potiontypes;
 
@@ -346,9 +345,6 @@ enum {
   R_BAG_OF_HOLDING,
   R_SACK_OF_CONSERVATION,
 	R_TACTICCRYSTAL,
-
-	/* POTIONS: */
-	R_TREES,
 
 	/* SONSTIGE */
 	R_SILVER,

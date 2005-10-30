@@ -2158,14 +2158,9 @@ report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * ad
 		  }
 		  centre(F, buf, true);
 		  rnl(F);
-      description = ptype->text;
-      if (description==NULL || f->locale!=find_locale("de")) {
+      if (description==NULL) {
         const char * potiontext = mkname("potion", pname);
         description = LOC(f->locale, potiontext);
-        if (strcmp(description, potiontext)==0) {
-          /* string not found */
-          description = ptype->text;
-        }
       }
 		  centre(F, description, true);
     }

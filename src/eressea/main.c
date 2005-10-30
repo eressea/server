@@ -307,17 +307,6 @@ game_done(void)
 
 	free(used_faction_ids);
 	for (r = regions; r; r = r2) {
-#if 0
-		msg * m = r->msgs;
-		while (m) {
-			msg * x = m;
-			m = m->next;
-			if (x->type->finalize) x->type->finalize(x);
-			free(x);
-		}
-			rm = rm->next;
-		}
-#endif
 		for (u = r->units; u; u = u2) {
 			u2 = u->next;
 			stripunit(u);

@@ -2330,8 +2330,11 @@ static void
 plant(region *r, unit *u, int raw)
 {
 	int n, i, skill, planted = 0;
-	const item_type * itype;
+  const item_type * itype;
+  static const resource_type * rt_water = NULL;
+  if (rt_water==NULL) rt_water = rt_find("p2");
 
+  assert(rt_water!=NULL);
 	if (!fval(r->terrain, LAND_REGION)) {
 		return;
 	}
@@ -2350,10 +2353,9 @@ plant(region *r, unit *u, int raw)
 		return;
 	}
 	/* Wasser des Lebens prüfen */
-	if (new_get_pooled(u, oldresourcetype[R_TREES], GET_DEFAULT) == 0) {
+	if (new_get_pooled(u, rt_water, GET_DEFAULT) == 0) {
 		add_message(&u->faction->msgs,
-			msg_feedback(u, u->thisorder, "resource_missing", "missing",
-			oldresourcetype[R_TREES]));
+			msg_feedback(u, u->thisorder, "resource_missing", "missing", rt_water));
 		return;
 	}
 	n = new_get_pooled(u, itype->rtype, GET_DEFAULT);
@@ -2374,11 +2376,11 @@ plant(region *r, unit *u, int raw)
 	produceexp(u, SK_HERBALISM, u->number);
 
 	/* Alles ok. Abziehen. */
-	new_use_pooled(u, oldresourcetype[R_TREES], GET_DEFAULT, 1);
+	new_use_pooled(u, rt_water, GET_DEFAULT, 1);
 	new_use_pooled(u, itype->rtype, GET_DEFAULT, n);
 	rsetherbs(r, rherbs(r)+planted);
-	add_message(&u->faction->msgs, new_message(u->faction,
-		"plant%u:unit%r:region%i:amount%X:herb", u, r, planted, itype->rtype));
+	ADDMSG(&u->faction->msgs, msg_message("plant", "unit region amount herb", 
+    u, r, planted, itype->rtype));
 }
 
 static void
