@@ -846,6 +846,9 @@
   <string name="herbbag">
     <text locale="de">Kräuterbeutel</text>
   </string>
+  <string name="herbbag_p">
+    <text locale="de">Kräuterbeutel</text>
+  </string>
   <string name="vial">
     <text locale="de">Phiole</text>
   </string>
