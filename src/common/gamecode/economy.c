@@ -2572,7 +2572,7 @@ breedhorses(region *r, unit *u)
 
 	for (c = 0; c < n; c++) {
 		if (rand() % 100 < eff_skill(u, SK_HORSE_TRAINING, r)) {
-			change_item(u, I_HORSE, 1);
+			i_change(&u->items, olditemtype[I_HORSE], 1);
 			gezuechtet++;
 		}
 	}

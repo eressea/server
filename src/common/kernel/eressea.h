@@ -47,7 +47,6 @@ extern "C" {
 #define skill_t short
 #define typ_t short
 #define herb_t short
-#define potion_t short
 #define luxury_t short
 #define weapon_t short
 #define item_t short

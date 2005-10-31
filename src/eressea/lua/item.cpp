@@ -26,8 +26,8 @@ lua_useitem(struct unit * u, const struct item_type * itype,
   strcat(strcpy(fname, iname), "_use");
 
   {
-    luabind::object globals = luabind::get_globals(L);
-    if (globals.at(fname).type()!=LUA_TFUNCTION) return -1;
+    luabind::object globals = luabind::globals(L);
+    if (type(globals[fname])!=LUA_TFUNCTION) return -1;
   }
 
   retval = luabind::call_function<int>(L, fname, *u, amount);

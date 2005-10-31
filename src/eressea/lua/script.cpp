@@ -37,7 +37,7 @@ static lua_State * luaState;
 static void 
 free_script(attrib * a) {
   if (a->data.v!=NULL) {
-	luabind::functor<void> * f = (luabind::functor<void> *)a->data.v;
+    luabind::object * f = (luabind::object *)a->data.v;
     delete f;
   }
 }
@@ -54,7 +54,7 @@ call_script(struct unit * u)
   const attrib * a = a_findc(u->attribs, &at_script);
   if (a==NULL) a = a_findc(u->race->attribs, &at_script);
   if (a!=NULL && a->data.v!=NULL) {
-    luabind::functor<void> * func = (luabind::functor<void> *)a->data.v;
+    luabind::object * func = (luabind::object *)a->data.v;
     try {	
       func->operator()(u);
     }
@@ -76,7 +76,7 @@ setscript(struct attrib ** ap, void * fptr)
   if (a == NULL) {
     a = a_add(ap, a_new(&at_script));
   } else if (a->data.v!=NULL) {
-    luabind::functor<void> * f = (luabind::functor<void> *)a->data.v;
+    luabind::object * f = (luabind::object *)a->data.v;
     delete f;
   }
   a->data.v = fptr;
@@ -116,11 +116,11 @@ lua_useitem(struct unit * u, const struct item_type * itype, int amount, struct 
   char fname[64];
   snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name[0]);
 
-  luabind::object globals = luabind::get_globals(luaState);
-  luabind::object fun = globals.at(fname);
+  luabind::object globals = luabind::globals(luaState);
+  luabind::object fun = globals[fname];
   if (fun.is_valid()) {
-    if (fun.type()!=LUA_TFUNCTION) {
-      log_warning(("Lua global object %s is not a function, type is %u\n", fname, fun.type()));
+    if (luabind::type(fun)!=LUA_TFUNCTION) {
+      log_warning(("Lua global object %s is not a function, type is %u\n", fname, luabind::type(fun)));
     } else {
       try {
         retval = luabind::call_function<int>(luaState, fname, u, amount);
@@ -145,11 +145,11 @@ lua_initfamiliar(unit * u)
   char fname[64];
   snprintf(fname, sizeof(fname), "initfamiliar_%s", u->race->_name[0]);
 
-  luabind::object globals = luabind::get_globals(luaState);
-  luabind::object fun = globals.at(fname);
+  luabind::object globals = luabind::globals(luaState);
+  luabind::object fun = globals[fname];
   if (fun.is_valid()) {
-    if (fun.type()!=LUA_TFUNCTION) {
-      log_warning(("Lua global object %s is not a function, type is %u\n", fname, fun.type()));
+    if (luabind::type(fun)!=LUA_TFUNCTION) {
+      log_warning(("Lua global object %s is not a function, type is %u\n", fname, luabind::type(fun)));
     } else {
       try {
         luabind::call_function<int>(luaState, fname, u);
@@ -176,11 +176,11 @@ lua_changeresource(unit * u, const struct resource_type * rtype, int delta)
   snprintf(fname, sizeof(fname), "%s_changeresource", rtype->_name[0]);
   int retval = -1;
 
-  luabind::object globals = luabind::get_globals(luaState);
-  luabind::object fun = globals.at(fname);
+  luabind::object globals = luabind::globals(luaState);
+  luabind::object fun = globals[fname];
   if (fun.is_valid()) {
-    if (fun.type()!=LUA_TFUNCTION) {
-      log_warning(("Lua global object %s is not a function, type is %u\n", fname, fun.type()));
+    if (luabind::type(fun)!=LUA_TFUNCTION) {
+      log_warning(("Lua global object %s is not a function, type is %u\n", fname, luabind::type(fun)));
     } else {
       try {
         retval = luabind::call_function<int>(luaState, fname, u, delta);
@@ -206,11 +206,11 @@ lua_getresource(unit * u, const struct resource_type * rtype)
   snprintf(fname, sizeof(fname), "%s_getresource", rtype->_name[0]);
   int retval = -1;
 
-  luabind::object globals = luabind::get_globals(luaState);
-  luabind::object fun = globals.at(fname);
+  luabind::object globals = luabind::globals(luaState);
+  luabind::object fun = globals[fname];
   if (fun.is_valid()) {
-    if (fun.type()!=LUA_TFUNCTION) {
-      log_warning(("Lua global object %s is not a function, type is %u\n", fname, fun.type()));
+    if (luabind::type(fun)!=LUA_TFUNCTION) {
+      log_warning(("Lua global object %s is not a function, type is %u\n", fname, luabind::type(fun)));
     } else {
       try {
         retval = luabind::call_function<int>(luaState, fname, u);

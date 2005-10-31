@@ -429,9 +429,9 @@ unit_clearorders(unit& u)
 }
 
 static void 
-unit_setscript(struct unit& u, const functor<void>& f)
+unit_setscript(struct unit& u, const luabind::object& f)
 {
-  luabind::functor<void> * fptr = new luabind::functor<void>(f);
+  luabind::object * fptr = new luabind::object(f);
   setscript(&u.attribs, fptr);
 }
 
@@ -443,7 +443,7 @@ unit_weight(const struct unit& u)
 
 typedef struct fctr_data {
   unit * target;
-  luabind::functor<void> * fptr;
+  luabind::object * fptr;
 } fctr_data;
 
 #include <exception>
@@ -489,9 +489,9 @@ static struct trigger_type tt_functor = {
 };
 
 static trigger *
-trigger_functor(struct unit& u, const functor<void>& f)
+trigger_functor(struct unit& u, const object& f)
 {
-  luabind::functor<void> * fptr = new luabind::functor<void>(f);
+  luabind::object * fptr = new luabind::object(f);
   trigger * t = t_new(&tt_functor);
   fctr_data * td = (fctr_data*)t->data.v;
   td->target = &u;
@@ -500,7 +500,7 @@ trigger_functor(struct unit& u, const functor<void>& f)
 }
 
 static void
-unit_addhandler(struct unit& u, const char * event, const functor<void>& f)
+unit_addhandler(struct unit& u, const char * event, const object& f)
 {
   add_trigger(&u.attribs, event, trigger_functor(u, f));
 }

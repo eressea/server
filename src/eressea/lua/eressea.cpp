@@ -159,11 +159,11 @@ lua_planmonsters(void)
 }
 
 static void 
-race_setscript(const char * rcname, const functor<void>& f)
+race_setscript(const char * rcname, const luabind::object& f)
 {
   race * rc = rc_find(rcname);
   if (rc!=NULL) {
-    luabind::functor<void> * fptr = new luabind::functor<void>(f);
+    luabind::object * fptr = new luabind::object(f);
     setscript(&rc->attribs, fptr);
   }
 }

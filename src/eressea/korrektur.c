@@ -559,7 +559,7 @@ update_gmquests(void)
 	faction * f = findfaction(atoi36("gm04"));
 	if (f) {
 		unit * u = f->units;
-		potion_t p;
+		int p;
 		attrib * permissions = a_find(f->attribs, &at_permissions);
 
 		if (u!=NULL) {

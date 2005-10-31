@@ -3249,7 +3249,7 @@ age_building(building * b)
           int n, unicorns = 0;
           for (n=0; n!=u->number; ++n) {
             if (chance(0.02)) {
-              change_item(u, I_UNICORN, 1);
+              i_change(&u->items, olditemtype[I_UNICORN], 1);
               ++unicorns;
             }
             if (unicorns) {

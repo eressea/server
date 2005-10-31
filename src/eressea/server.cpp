@@ -487,14 +487,14 @@ usage(const char * prog, const char * arg)
 static void
 setLuaString(lua_State * luaState, const char * name, const char * value)
 {
-  luabind::object globals = luabind::get_globals(luaState);
+  luabind::object globals = luabind::globals(luaState);
   globals[name] = value;
 }
 
 static void
 setLuaNumber(lua_State * luaState, const char * name, double value)
 {
-  luabind::object globals = luabind::get_globals(luaState);
+  luabind::object globals = luabind::globals(luaState);
   globals[name] = value;
 }
 

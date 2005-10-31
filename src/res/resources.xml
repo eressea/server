@@ -236,6 +236,20 @@
     </item>
   </resource>
 
+  <resource name="catapult">
+    <item weight="4000">
+      <construction skill="cartmaking" minskill="1" reqsize="1">
+        <requirement type="log" quantity="5"/>
+      </construction>
+      <weapon bash="true" missile="true" skill="catapult" offmod="0" defmod="0" reload="5">
+        <damage type="rider" value="3d10+5"/>
+        <damage type="footman" value="3d10+5"/>
+        <modifier type="missile_target" value="4"/>
+        <function name="attack" value="attack_catapult"/>
+      </weapon>
+    </item>
+  </resource>
+
   <resource name="crossbow">
     <item weight="100">
       <construction skill="weaponsmithing" minskill="3" reqsize="1">

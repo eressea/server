@@ -43,14 +43,14 @@ lc_age(struct attrib * a)
   if (fname==NULL) return -1;
 
   try {
-    luabind::object globals = luabind::get_globals(L);
-    luabind::object fun = globals.at(fname);
+    luabind::object globals = luabind::globals(L);
+    luabind::object fun = globals[fname];
     if (!fun.is_valid()) {
       log_error(("Could not index function %s\n", fname));
       return -1;
     }
-    if (fun.type()!=LUA_TFUNCTION) {
-      log_error(("Lua global object %s is not a function, type is %u\n", fname, fun.type()));
+    if (type(fun)!=LUA_TFUNCTION) {
+      log_error(("Lua global object %s is not a function, type is %u\n", fname, type(fun)));
       return -1;
     }
   }

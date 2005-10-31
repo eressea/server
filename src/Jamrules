@@ -1,9 +1,9 @@
-C++ = g++-3.3 ;
-CC = gcc-3.3 ;
-LINK = gcc-3.3 ;
-
-#CC = tcc ;
-#LINK = tcc ;
+#C++ = g++-3.3 ;
+#CC = gcc-3.3 ;
+#LINK = gcc-3.3 ;
+C++ = g++ ;
+CC = gcc ;
+LINK = gcc ;
 
 # ECHO $(JAMUNAME) ;
 

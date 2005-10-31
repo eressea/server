@@ -30,11 +30,6 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static weapon_mod wm_catapult[] = {
-	{ 4, WMF_MISSILE_TARGET },
-	{ 0, 0 }
-};
-
 static weapon_mod wm_spear[] = {
 	{ 1, WMF_SKILL|WMF_RIDING|WMF_AGAINST_ANYONE|WMF_OFFENSIVE },
 	{ 1, WMF_SKILL|WMF_WALKING|WMF_AGAINST_RIDING|WMF_DEFENSIVE },
@@ -48,17 +43,10 @@ static weapon_mod wm_lance[] = {
 
 enum {
 	WP_EOGSWORD,
-	WP_CATAPULT,
 	WP_SPEAR,
 	WP_LANCE,
 	WP_NONE,
 	WP_MAX
-};
-
-enum {
-	RL_CATAPULT,
-	RL_MAX,
-	RL_NONE
 };
 
 /* damage types */
@@ -89,17 +77,15 @@ static weapondata weapontable[WP_MAX + 1] =
 /* MagRes, Schaden/Fuﬂ, Schaden/Pferd, Item, Skill, OffMod, DefMod,
  * missile, is_magic */
 {
-	{0.30, "3d6+10", "3d6+10", I_LAENSWORD, SK_MELEE, 1, 1, false, false, { RL_NONE, 0}, CUT },
-	/* Katapult */
-	{0.00, "3d10+5", "3d10+5", I_CATAPULT, SK_CATAPULT, 0, 0, true, false, { RL_CATAPULT, 5 }, BASH },
+	{0.30, "3d6+10", "3d6+10", I_LAENSWORD, SK_MELEE, 1, 1, false, false, { 0, 0}, CUT },
 	/* Speer */
-	{0.00, "1d10+0", "1d12+2", I_SPEAR, SK_SPEAR, 0, 0, false, false, { RL_NONE, 0}, PIERCE },
+	{0.00, "1d10+0", "1d12+2", I_SPEAR, SK_SPEAR, 0, 0, false, false, { 0, 0}, PIERCE },
 	/* Lanze */
-	{0.00, "1d5", "2d6+5", I_LANCE, SK_SPEAR, 0, -2, false, false, { RL_NONE, 0}, PIERCE },
+	{0.00, "1d5", "2d6+5", I_LANCE, SK_SPEAR, 0, -2, false, false, { 0, 0}, PIERCE },
 	/* Unbewaffnet */
-	{0.00, "1d5+0", "1d6+0", I_WOOD, SK_MELEE, 0, 0, false, false, { RL_NONE, 0}, BASH },
+	{0.00, "1d5+0", "1d6+0", I_WOOD, SK_MELEE, 0, 0, false, false, { 0, 0}, BASH },
 	/* Dummy */
-	{0.00, "0d0+0", "0d0+0", I_WOOD, SK_MELEE, 0, 0, false, false, { RL_NONE, 0}, 0 }
+	{0.00, "0d0+0", "0d0+0", I_WOOD, SK_MELEE, 0, 0, false, false, { 0, 0}, 0 }
 };
 
 weapon_type * oldweapontype[WP_MAX];
@@ -236,10 +222,6 @@ init_oldweapons(void)
 		case WP_LANCE:
 			modifiers = wm_lance;
 			break;
-		case WP_CATAPULT:
-			modifiers = wm_catapult;
-			attack = attack_catapult;
-			break;
 		case WP_SPEAR:
 			modifiers = wm_spear;
 			break;
@@ -278,12 +260,12 @@ init_oldweapons(void)
 void
 register_weapons(void)
 {
-	register_function((pf_generic)attack_catapult, "attack_catapult");
-	register_function((pf_generic)attack_firesword, "attack_firesword");
+  register_function((pf_generic)attack_catapult, "attack_catapult");
+  register_function((pf_generic)attack_firesword, "attack_firesword");
 }
 
 void
 init_weapons(void)
 {
-	init_oldweapons();
+  init_oldweapons();
 }

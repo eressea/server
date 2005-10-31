@@ -625,31 +625,6 @@ set_item(unit * u, item_t it, int value)
 	return value;
 }
 
-int
-change_item(unit * u, item_t it, int value)
-{
-	const item_type * type = olditemtype[it];
-	item * i = *i_find(&u->items, type);
-	if (!i) {
-		if (!value) return 0;
-		assert(value>0);
-		i = i_add(&u->items, i_new(type, value));
-	} else {
-		i->number += value;
-	}
-	return i->number;
-}
-
-/*** alte potions ***/
-
-int
-get_potion(const unit * u, potion_t p)
-{
-	const item_type * type = oldpotiontype[p]->itype;
-	item * it = *i_find((item**)&u->items, type);
-	return it?it->number:0;
-}
-
 void use_birthdayamulet(region * r, unit * magician, int amount, struct order * ord);
 
 enum {
@@ -717,10 +692,6 @@ static t_item itemdata[MAXITEMS] = {
 	{			/* I_WAGON */
 		{"Wagen", "Wagen", "Wagen", "Wagen"},
 		IS_PRODUCT, SK_CARTMAKER, 1, {0, 5, 0, 0, 0, 0}, 4000, 0, FL_ITEM_NOTINBAG, NULL
-	},
-	{			/* I_CATAPULT */
-		{"Katapult", "Katapulte", "Katapult", "Katapulte"},
-		IS_PRODUCT, SK_CARTMAKER, 5, {0, 10, 0, 0, 0, 0}, 10000, 0, FL_ITEM_NOTINBAG, NULL
 	},
 	{			/* I_SPEAR */
 		{"Speer", "Speere", "Speer", "Speere"},
@@ -1354,7 +1325,7 @@ init_oldpotions(void)
     "p0", "goliathwater", "p2", "p3", "p4", "peasantblood", "p6", 
     "p7", "nestwarmth", "p9", "p10", "p11", "truthpotion", "p13",  "p14"
   };
-	potion_t p;
+  int p;
 
   for (p=0;p!=MAXPOTIONS;++p) {
     item_type * itype = it_find(potionnames[p]);

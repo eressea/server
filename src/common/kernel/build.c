@@ -197,10 +197,12 @@ siege_cmd(unit * u, order * ord)
   static boolean init = false;
   static const curse_type * magicwalls_ct;
   static item_type * it_catapultammo = NULL;
+  static item_type * it_catapult = NULL;
   if (!init) {
     init = true; 
     magicwalls_ct = ct_find("magicwalls");
     it_catapultammo = it_find("catapultammo");
+    it_catapult = it_find("catapult");
   }
   /* gibt es ueberhaupt Burgen? */
 
@@ -220,8 +222,8 @@ siege_cmd(unit * u, order * ord)
   }
   /* schaden durch katapulte */
 
-  d = min(u->number,
-    min(get_pooled(u, it_catapultammo->rtype, GET_SLACK|GET_RESERVE|GET_POOLED_SLACK), get_item(u, I_CATAPULT)));
+  d = min(u->number, i_get(u->items, it_catapult));
+  d = min(get_pooled(u, it_catapultammo->rtype, GET_DEFAULT), d);
   if (eff_skill(u, SK_CATAPULT, r) >= 1) {
     katapultiere = d;
     d *= eff_skill(u, SK_CATAPULT, r);

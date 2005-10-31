@@ -262,7 +262,6 @@ enum {
 	I_STONE,
 	I_HORSE,
 	I_WAGON,
-	I_CATAPULT,
 	I_SPEAR,
 	/* alte Artefakte */
 	I_AMULET_OF_HEALING,
@@ -301,7 +300,6 @@ enum {
 	R_STONE,
 	R_HORSE,
 	R_WAGON,
-	R_CATAPULT,
 	R_SPEAR,
   /**/
 	R_AMULET_OF_HEALING,
@@ -346,9 +344,6 @@ extern struct resource_type * oldresourcetype[];
 
 int get_item(const struct unit *, item_t);
 int set_item(struct unit *, item_t, int);
-int change_item(struct unit *, item_t, int);
-
-int get_potion(const struct unit *, potion_t);
 
 int get_money(const struct unit *);
 int set_money(struct unit *, int);
