@@ -447,7 +447,7 @@
     <item weight="0" score="30">
       <function name="use" value="usepotion"/>
       <potion level="1"/>
-      <construction skill="herbalism" minskill="2" reqsize="1">
+      <construction skill="alchemy" minskill="2" reqsize="1">
         <requirement type="h4"/>
         <requirement type="h12"/>
       </construction>
@@ -458,7 +458,7 @@
     <item weight="0" score="30">
       <function name="use" value="usepotion"/>
       <potion level="1"/>
-      <construction skill="herbalism" minskill="2" reqsize="1">
+      <construction skill="alchemy" minskill="2" reqsize="1">
         <requirement type="h6"/>
         <requirement type="h13"/>
       </construction>
@@ -469,7 +469,7 @@
     <item weight="0" score="30">
       <function name="use" value="usepotion"/>
       <potion level="1"/>
-      <construction skill="herbalism" minskill="2" reqsize="1">
+      <construction skill="alchemy" minskill="2" reqsize="1">
         <requirement type="h0"/>
         <requirement type="h13"/>
       </construction>
