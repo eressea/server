@@ -93,6 +93,7 @@
 
 /* lua includes */
 #include "lua/bindings.h"
+#include <boost/version.hpp>
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 

@@ -26,6 +26,7 @@
 #include <util/attrib.h>
 #include <util/functions.h>
 
+#include <boost/version.hpp>
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 
