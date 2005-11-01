@@ -37,8 +37,7 @@ typedef struct item {
 #define RTF_SNEAK    (1<<1) /* can be sneaked to another struct unit, e.g. P_FOOL */
 #define RTF_LIMITED  (1<<2) /* a resource that's freely available, but in
                              * limited supply */
-#define RTF_DYNAMIC  (1<<3) /* dynamic type, must be saved */
-#define RTF_POOLED   (1<<4) /* resource is available in pool */
+#define RTF_POOLED   (1<<3) /* resource is available in pool */
 
 /* flags for resource_type::name() */
 #define NMF_PLURAL     0x01
@@ -84,15 +83,10 @@ typedef struct resource_limit {
 /* bitfield values for item_type::flags */
 #define ITF_NONE             0x0000
 #define ITF_HERB             0x0001 /* this item is a herb */
-#define ITF_WEAPON           0x0002 /* this item is a weapon */
-#define ITF_LUXURY           0x0004 /* this item is a luxury item */
-#define ITF_POTION           0x0008 /* this item is a potion */
 #define ITF_CURSED           0x0010 /* cursed object, cannot be given away */
 #define ITF_NOTLOST          0x0020 /* special object (quests), cannot be lost through death etc. */
 #define ITF_BIG              0x0040 /* big item, e.g. does not fit in a bag of holding */
 #define ITF_ANIMAL           0x0080 /* an animal */
-#define ITF_NOBUILDBESIEGED  0x0100 /* cannot be built under siege */
-#define ITF_DYNAMIC          0x0200 /* dynamic type, must be saved */
 
 /* error codes for item_type::use */
 #define ECUSTOM   -1;
@@ -200,8 +194,6 @@ typedef struct weapon_type {
 extern void rt_register(resource_type * it);
 extern resource_type * rt_find(const char * name);
 extern item_type * it_find(const char * name);
-extern luxury_type * lt_find(const char * name);
-extern potion_type * pt_find(const char * name);
 
 extern void it_register(item_type * it);
 extern void wt_register(weapon_type * wt);

@@ -181,27 +181,6 @@ use_wand_of_tears(unit * user, const struct item_type * itype, int amount, order
 	return 0;
 }
 
-static void
-init_wand_of_tears(void)
-{
-	const char * names[2] = {"wand_of_tears", "wand_of_tears_p"};
-	const char * appearances[2] = {"wand", "wand_p"};
-	item_type * itype = it_find(names[0]);
-	int i;
-
-	if (itype==NULL) {
-		/* Dieser Teil kann, nachdem sie ausgeteilt wurden, gänzlich verschwinden. */
-		resource_type * rtype = new_resourcetype(names, appearances, RTF_DYNAMIC|RTF_ITEM);
-		itype = new_itemtype(rtype, ITF_DYNAMIC|ITF_NOTLOST, 1, 0);
-		itype->use = use_wand_of_tears;
-		for (i=0;i!=6;++i) {
-			unit * u = tower_region[i]->units;
-			if (u==NULL) continue;
-			i_change(&u->items, itype, 1);
-		}
-	}
-}
-
 /**
  * Tempel der Schreie, Demo-Gebäude **/
 
@@ -514,7 +493,6 @@ create_arena(void)
 	rsetmoney(arena_center, 0);
 	rsetpeasants(arena_center, 0);
 	tower_init();
-	init_wand_of_tears();
 }
 
 void

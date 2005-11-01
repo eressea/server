@@ -2,6 +2,7 @@
 #include <cstring>
 #include <eressea.h>
 #include "list.h"
+#include "script.h"
 
 // kernel includes
 #include <building.h>
@@ -33,41 +34,34 @@ add_building(region * r, const char * name)
 static int
 lc_age(struct attrib * a)
 {
-  lua_State * L = (lua_State *)global.vm_state;
   building_action * data = (building_action*)a->data.v;
   const char * fname = data->fname;
   const char * fparam = data->param;
   building * b = data->b;
+  int retval = -1;
 
   assert(b!=NULL);
   if (fname==NULL) return -1;
 
-  try {
-    luabind::object globals = luabind::globals(L);
-    luabind::object fun = globals[fname];
-    if (!fun.is_valid()) {
-      log_error(("Could not index function %s\n", fname));
-      return -1;
+  lua_State * L = (lua_State *)global.vm_state;
+  if (is_function(L, fname)) {
+    try {
+      if (fparam) {
+        retval = luabind::call_function<int>(L, fname, *b, fparam);
+      } else {
+        retval = luabind::call_function<int>(L, fname, *b);
+      }
     }
-    if (type(fun)!=LUA_TFUNCTION) {
-      log_error(("Lua global object %s is not a function, type is %u\n", fname, type(fun)));
-      return -1;
+    catch (luabind::error& e) {
+      lua_State* L = e.state();
+      const char* error = lua_tostring(L, -1);
+      log_error(("An exception occured while %b tried to call '%s': %s.\n",
+        buildingname(b), fname, error));
+      lua_pop(L, 1);
+      std::terminate();
     }
   }
-  catch (luabind::error& e) {
-    lua_State* L = e.state();
-    const char* error = lua_tostring(L, -1);
-    
-    log_error((error));
-    lua_pop(L, 1);
-    std::terminate();
-  }
-
-  if (fparam) {
-    return luabind::call_function<int>(L, fname, *b, fparam);
-  } else {
-    return luabind::call_function<int>(L, fname, *b);
-  }
+  return retval;
 }
 
 static int

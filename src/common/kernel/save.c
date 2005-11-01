@@ -1431,9 +1431,12 @@ readregion(FILE * F, short x, short y)
 
 	if (r->land) {
 		for (;;) {
+      const struct item_type * itype;
 			rs(F, buf);
 			if (!strcmp(buf, "end")) break;
-			r_setdemand(r, lt_find(buf), ri(F));
+      itype = it_find(buf);
+      assert(itype->rtype->ltype);
+			r_setdemand(r, itype->rtype->ltype, ri(F));
 		}
 	}
 	a_read(F, &r->attribs);

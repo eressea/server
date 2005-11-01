@@ -15,4 +15,6 @@
 extern int call_script(struct unit * u);
 extern void setscript(struct attrib ** ap, void * fptr);
 
+extern bool is_function(struct lua_State * luaState, const char * fname);
+
 #endif

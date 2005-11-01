@@ -174,13 +174,15 @@ static int
 a_readeffect(attrib *a, FILE *f)
 {
 	int power;
-	const potion_type * ptype;
+  const item_type * itype;
 	effect_data * edata = (effect_data*)a->data.v;
 	char zText[32];
 	fscanf(f, "%s %d", zText, &power);
-	ptype = pt_find(zText);
-	if (ptype==NULL || power<=0) return AT_READ_FAIL;
-	edata->type = ptype;
+	itype = it_find(zText);
+  if (itype==NULL || itype->rtype==NULL || itype->rtype->ptype==NULL || power<=0) {
+    return AT_READ_FAIL;
+  }
+	edata->type = itype->rtype->ptype;
 	edata->value = power;
 	return AT_READ_OK;
 }

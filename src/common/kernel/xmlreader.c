@@ -764,7 +764,6 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
   result = xmlXPathEvalExpression(BAD_CAST "weapon", xpath);
   assert(result->nodesetval->nodeNr<=1);
   if (result->nodesetval->nodeNr!=0) {
-    itype->flags |= ITF_WEAPON;
     xpath->node = result->nodesetval->nodeTab[0];
     rtype->wtype = xml_readweapon(xpath, itype);
   }
@@ -775,7 +774,6 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
   result = xmlXPathEvalExpression(BAD_CAST "potion", xpath);
   assert(result->nodesetval->nodeNr<=1);
   if (result->nodesetval->nodeNr!=0) {
-    itype->flags |= ITF_POTION;
     xpath->node = result->nodesetval->nodeTab[0];
     rtype->ptype = xml_readpotion(xpath, itype);
   }
@@ -786,7 +784,6 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
   result = xmlXPathEvalExpression(BAD_CAST "luxury", xpath);
   assert(result->nodesetval->nodeNr<=1);
   if (result->nodesetval->nodeNr!=0) {
-    itype->flags |= ITF_LUXURY;
     xpath->node = result->nodesetval->nodeTab[0];
     rtype->ltype = xml_readluxury(xpath, itype);
   }
@@ -797,7 +794,6 @@ xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
   result = xmlXPathEvalExpression(BAD_CAST "armor", xpath);
   assert(result->nodesetval->nodeNr<=1);
   if (result->nodesetval->nodeNr!=0) {
-    itype->flags |= ITF_WEAPON;
     xpath->node = result->nodesetval->nodeTab[0];
     rtype->atype = xml_readarmor(xpath, itype);
   }

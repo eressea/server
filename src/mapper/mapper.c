@@ -496,7 +496,7 @@ drawmap(boolean maponly) {
 				addch(rs);
 		}
 		addch(' ');
-		q--; y1--; y2++; x1+=(s&1); s--;
+		q--; y1--; y2++; if (s--&1) ++x1;
 	} while (q);
 
 	if(maponly == false) {
@@ -545,7 +545,7 @@ mark_region(int x1, int y1, int x2, int y2)
 }
 
 void
-mark(int x, int y, int rx, int ry) {
+mark(short x, short y, short rx, short ry) {
 	int q;
 	char num[6];
 
@@ -962,7 +962,7 @@ movearound(short rx, short ry) {
 					if (!Tagged) {
             const terrain_type * terrain = select_terrain(r->terrain);
 						if (hx>-1) {
-							int Rx,Ry;
+							short Rx,Ry;
 							Rx=rx; Ry=ry;
 							if (rx>Hx) { a=Hx; Hx=Rx; rx=a; }
 							if (ry>Hy) { a=Hy; Hy=Ry; ry=a; }

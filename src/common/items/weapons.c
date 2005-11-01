@@ -229,8 +229,6 @@ init_oldweapons(void)
 
 		assert(itype!=NULL || !"item not initialized");
 
-		itype->flags |= ITF_WEAPON;
-
 		if (weapontable[w].rear) wflags |= WTF_MISSILE;
 		if (weapontable[w].is_magic) wflags |= WTF_MAGICAL;
 		if (weapontable[w].damage_type & CUT) wflags |= WTF_CUT;

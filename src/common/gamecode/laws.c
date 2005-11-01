@@ -252,21 +252,26 @@ get_food(region *r)
       while (donor!=NULL && hungry>0) {
         /* always start with the first known unit that may have some blood */
         static const struct potion_type * pt_blood;
-        if (pt_blood==NULL) pt_blood = pt_find("peasantblood");
-        while (donor!=NULL) {
-          if (donor->race==new_race[RC_DAEMON]) {
-            if (get_effect(donor, pt_blood)) {
-              /* if he's in our faction, drain him: */
-              if (donor->faction==u->faction) break;
-            }
-          }
-          donor = donor->next;
+        if (pt_blood==NULL) {
+          const item_type * it_blood = it_find("peasantblood");
+          if (it_blood) pt_blood = it_blood->rtype->ptype;
         }
-        if (donor != NULL) {
-          int blut = get_effect(donor, pt_blood);
-          blut = min(blut, hungry);
-          change_effect(donor, pt_blood, -blut);
-          hungry -= blut;
+        if (pt_blood!=NULL) {
+          while (donor!=NULL) {
+            if (donor->race==new_race[RC_DAEMON]) {
+              if (get_effect(donor, pt_blood)) {
+                /* if he's in our faction, drain him: */
+                if (donor->faction==u->faction) break;
+              }
+            }
+            donor = donor->next;
+          }
+          if (donor != NULL) {
+            int blut = get_effect(donor, pt_blood);
+            blut = min(blut, hungry);
+            change_effect(donor, pt_blood, -blut);
+            hungry -= blut;
+          }
         }
       }
       if (r->planep == NULL || !fval(r->planep, PFL_NOFEED)) {

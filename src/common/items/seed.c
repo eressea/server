@@ -53,7 +53,6 @@ init_seed(void)
 
 	rt_seed = rt_find("seed");
   assert(rt_seed!=NULL);
-	rt_seed->itype->flags |= ITF_NOBUILDBESIEGED;
 
 	a = a_add(&rt_seed->attribs, a_new(&at_resourcelimit));
 	rdata = (resource_limit*)a->data.v;
@@ -90,7 +89,6 @@ init_mallornseed(void)
 	rt_mallornseed = rt_find("mallornseed");
   assert(rt_mallornseed!=NULL);
 	rt_mallornseed->flags |= RTF_LIMITED;
-	rt_mallornseed->itype->flags |= ITF_NOBUILDBESIEGED;
 	rt_mallornseed->flags |= RTF_POOLED;
 	
 	a = a_add(&rt_mallornseed->attribs, a_new(&at_resourcelimit));

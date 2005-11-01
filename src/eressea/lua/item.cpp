@@ -1,6 +1,8 @@
 #include <config.h>
 #include <eressea.h>
 
+#include "script.h"
+
 // kernel includes
 #include <kernel/unit.h>
 #include <kernel/item.h>
@@ -18,19 +20,26 @@ lua_useitem(struct unit * u, const struct item_type * itype,
             int amount, struct order *ord)
 {
   char fname[64];
-  lua_State * L = (lua_State *)global.vm_state;
-  int retval;
+  int retval = -1;
   const char * iname = itype->rtype->_name[0];
 
   assert(u!=NULL);
   strcat(strcpy(fname, iname), "_use");
 
-  {
-    luabind::object globals = luabind::globals(L);
-    if (type(globals[fname])!=LUA_TFUNCTION) return -1;
+  lua_State * L = (lua_State *)global.vm_state;
+  if (is_function(L, fname)) {
+    try {
+      retval = luabind::call_function<int>(L, fname, u, amount);
+    }
+    catch (luabind::error& e) {
+      lua_State* L = e.state();
+      const char* error = lua_tostring(L, -1);
+      log_error(("An exception occured while %s tried to call '%s': %s.\n",
+        unitname(u), fname, error));
+      lua_pop(L, 1);
+      std::terminate();
+    }
   }
-
-  retval = luabind::call_function<int>(L, fname, *u, amount);
   return retval;
 }
 

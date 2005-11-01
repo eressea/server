@@ -234,7 +234,6 @@ new_luxurytype(item_type * itype, int price)
 	luxury_type * ltype;
 
 	assert(resource2luxury(itype->rtype) == NULL);
-	assert(itype->flags & ITF_LUXURY);
 
 	ltype = calloc(sizeof(luxury_type), 1);
 	ltype->itype = itype;
@@ -251,7 +250,6 @@ new_weapontype(item_type * itype,
 	weapon_type * wtype;
 
 	assert(resource2weapon(itype->rtype)==NULL);
-	assert(itype->flags & ITF_WEAPON);
 
 	wtype = calloc(sizeof(weapon_type), 1);
 	if (damage) {
@@ -306,7 +304,6 @@ new_potiontype(item_type * itype,
 	potion_type * ptype;
 
 	assert(resource2potion(itype->rtype)==NULL);
-	assert(itype->flags & ITF_POTION);
 
 	ptype = calloc(sizeof(potion_type), 1);
 	ptype->itype = itype;
@@ -422,30 +419,6 @@ it_find(const char * zname)
     }
   }
 	return itype;
-}
-
-luxury_type *
-lt_find(const char * name)
-{
-	unsigned int hash = hashstring(name);
-	luxury_type * ltype;
-
-	for (ltype=luxurytypes; ltype; ltype=ltype->next)
-		if (ltype->itype->rtype->hashkey==hash && !strcmp(ltype->itype->rtype->_name[0], name)) break;
-
-	return ltype;
-}
-
-potion_type *
-pt_find(const char * name)
-{
-	unsigned int hash = hashstring(name);
-	potion_type * ptype;
-
-	for (ptype=potiontypes; ptype; ptype=ptype->next)
-		if (ptype->itype->rtype->hashkey==hash && !strcmp(ptype->itype->rtype->_name[0], name)) break;
-
-	return ptype;
 }
 
 item **
@@ -1015,7 +988,6 @@ init_olditems(void)
     switch (itemdata[i].typ) {
     case IS_RESOURCE:
       rtype->flags |= RTF_LIMITED;
-      itype->flags |= ITF_NOBUILDBESIEGED;
       a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
       {
         resource_limit * rdata = (resource_limit*)a->data.v;
