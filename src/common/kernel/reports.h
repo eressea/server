@@ -85,6 +85,17 @@ extern struct seen_region ** seen_init(void);
 extern void seen_done(struct seen_region * seehash[]);
 extern void free_seen(void);
 extern void get_seen_interval(struct seen_region ** seen, struct region ** first, struct region ** last);
+
+typedef struct report_context {
+	struct faction * f;
+	struct faction_list * addresses;
+	struct seen_region ** seen;
+	time_t report_time;
+	void * userdata;
+} report_context;
+
+typedef void (*report_fun)(FILE * F, report_context * ctx);
+extern void register_reporttype(const char * extension, report_fun write, int flag);
   
 extern void report_item(const struct unit * owner, const struct item * i, const struct faction * viewer, const char ** name, const char ** basename, int * number, boolean singular);
 extern void report_building(FILE *F, const struct region * r, const struct building * b, const struct faction * f, int mode);
@@ -96,6 +107,8 @@ extern int bufunit_ugroupleader(const struct faction * f, const struct unit * u,
 extern const char * reportpath(void);
 extern struct faction_list * get_addresses(struct faction * f, struct seen_region * seehash[]);
 extern const char * trailinto(const struct region * r, const struct locale * lang);
+
+extern void reports_init(void);
 
 #ifdef __cplusplus
 }

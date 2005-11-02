@@ -9,18 +9,14 @@
  This program may not be used, modified or distributed 
  without prior permission by the authors of Eressea.
 */
-#ifndef H_GC_CREPORT
-#define H_GC_CREPORT
+#ifndef H_GC_REPORT
+#define H_GC_REPORT
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <time.h>
-
-extern void creport_cleanup(void);
-extern void creport_init(void);
-
-extern int crwritemap(const char * filename);
+  extern void report_init(void);
+  extern void report_cleanup(void);
 
 #ifdef __cplusplus
 }

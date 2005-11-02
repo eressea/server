@@ -835,28 +835,6 @@ forget_cmd(unit * u, order * ord)
   return 0;
 }
 
-/* ------------------------------------------------------------- */
-
-void
-report_donations(void)
-{
-  region * r;
-  for (r=regions;r;r=r->next) {
-    while (r->donations) {
-      donation * sp = r->donations;
-		  if (sp->amount > 0) {
-			  struct message * msg = msg_message("donation",
-				  "from to amount", sp->f1, sp->f2, sp->amount);
-			  r_addmessage(r, sp->f1, msg);
-			  r_addmessage(r, sp->f2, msg);
-			  msg_release(msg);
-		  }
-      r->donations = sp->next;
-      free(sp);
-	  }
-  }
-}
-
 void
 add_spende(faction * f1, faction * f2, int amount, region * r)
 {

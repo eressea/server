@@ -200,6 +200,9 @@
 			<File
 				RelativePath=".\randenc.h">
 			</File>
+			<File
+				RelativePath=".\report.h">
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\creation.c">

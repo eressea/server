@@ -56,6 +56,7 @@
 
 /* gamecode includes */
 #include <gamecode/creport.h>
+#include <gamecode/report.h>
 #include <gamecode/economy.h>
 #include <gamecode/items.h>
 #include <gamecode/laws.h>
@@ -202,6 +203,8 @@ game_init(void)
 {
   init_triggers();
   init_xmas();
+
+  reports_init();
   report_init();
   creport_init();
 

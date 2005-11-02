@@ -22,39 +22,44 @@
 #include "reports.h"
 
 /* kernel includes */
-#include "building.h"
-#include "faction.h"
-#include "group.h"
-#include "item.h"
-#include "karma.h"
-#include "magic.h"
-#include "message.h"
-#include "order.h"
-#include "plane.h"
-#include "race.h"
-#include "region.h"
-#include "ship.h"
-#include "skill.h"
-#include "unit.h"
+#include <kernel/building.h>
+#include <kernel/border.h>
+#include <kernel/terrain.h>
+#include <kernel/faction.h>
+#include <kernel/group.h>
+#include <kernel/item.h>
+#include <kernel/karma.h>
+#include <kernel/magic.h>
+#include <kernel/message.h>
+#include <kernel/order.h>
+#include <kernel/plane.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/ship.h>
+#include <kernel/skill.h>
+#include <kernel/unit.h>
 #ifdef USE_UGROUPS
-# include "ugroup.h"
+# include <kernel/ugroup.h>
 # include <attributes/ugroup.h>
 #endif
 
 /* util includes */
 #include <util/bsdstring.h>
 #include <util/base36.h>
+#include <util/functions.h>
 #include <util/goodies.h>
 
 /* libc includes */
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 /* attributes includes */
 #include <attributes/follow.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
+#include <attributes/viewrange.h>
 
 const char * g_reportdir;
 
@@ -1250,3 +1255,469 @@ add_seen(struct seen_region * seehash[], struct region * r, unsigned char mode, 
 	return true;
 }
 
+typedef struct report_type {
+	struct report_type * next;
+	report_fun write;
+	const char * extension;
+	int flag;
+} report_type;
+
+static report_type * report_types;
+
+void 
+register_reporttype(const char * extension, report_fun write, int flag)
+{
+	report_type * type = malloc(sizeof(report_type));
+	type->extension = extension;
+	type->write = write;
+	type->flag = flag;
+	type->next = report_types;
+	report_types = type;
+}
+
+static region_list *
+get_regions_distance(region * root, int radius)
+{
+  region_list * rptr, * rlist = NULL;
+  region_list ** rp = &rlist;
+  add_regionlist(rp, root);
+  fset(root, FL_MARK);
+  while (*rp) {
+    region_list * r = *rp;
+    direction_t d;
+    rp = &r->next;
+    for (d=0;d!=MAXDIRECTIONS;++d) {
+      region * rn = rconnect(r->data, d);
+      if (rn!=NULL && !fval(rn, FL_MARK) && distance(rn, root)<=radius) {
+        add_regionlist(rp, rn);
+        fset(rn, FL_MARK);
+      }
+    }
+  }
+  for (rptr=rlist;rptr;rptr=rptr->next) {
+    freset(rptr->data, FL_MARK);
+  }
+  return rlist;
+}
+
+static void
+view_default(struct seen_region ** seen, region *r, faction *f)
+{
+  direction_t dir;
+  for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+    region * r2 = rconnect(r, dir);
+    if (r2) {
+      border * b = get_borders(r, r2);
+      while (b) {
+        if (!b->type->transparent(b, f)) break;
+        b = b->next;
+      }
+      if (!b) add_seen(seen, r2, see_neighbour, false);
+    }
+  }
+}
+
+static void
+view_neighbours(struct seen_region ** seen, region * r, faction * f)
+{
+  direction_t dir;
+  for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+    region * r2 = rconnect(r, dir);
+    if (r2) {
+      border * b = get_borders(r, r2);
+      while (b) {
+        if (!b->type->transparent(b, f)) break;
+        b = b->next;
+      }
+      if (!b) {
+        if (add_seen(seen, r2, see_far, false)) {
+          if (!(fval(r2->terrain, FORBIDDEN_REGION))) {
+            direction_t dir;
+            for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+              region * r3 = rconnect(r2, dir);
+              if (r3) {
+                border * b = get_borders(r2, r3);
+                while (b) {
+                  if (!b->type->transparent(b, f)) break;
+                  b = b->next;
+                }
+                if (!b) add_seen(seen, r3, see_neighbour, false);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+static void
+recurse_regatta(struct seen_region ** seen, region *center, region *r, faction *f, int maxdist)
+{
+  direction_t dir;
+  int dist = distance(center, r);
+  for (dir=0;dir!=MAXDIRECTIONS;++dir) {
+    region * r2 = rconnect(r, dir);
+    if (r2) {
+      int ndist = distance(center, r2);
+      if (ndist>dist && fval(r2->terrain, SEA_REGION)) {
+        border * b = get_borders(r, r2);
+        while (b) {
+          if (!b->type->transparent(b, f)) break;
+          b = b->next;
+        }
+        if (!b) {
+          if (ndist<maxdist) {
+            if (add_seen(seen, r2, see_far, false)) {
+              recurse_regatta(seen, center, r2, f, maxdist);
+            }
+          } else add_seen(seen, r2, see_neighbour, false);
+        }
+      }
+    }
+  }
+}
+
+static void
+view_regatta(struct seen_region ** seen, region * r, faction * f)
+{
+  unit *u;
+  int skill = 0;
+  for (u=r->units; u; u=u->next) {
+    if (u->faction==f) {
+      int es = effskill(u, SK_OBSERVATION);
+      if (es>skill) skill=es;
+    }
+  }
+  recurse_regatta(seen, r, r, f, skill/2);
+}
+
+static struct seen_region **
+prepare_report(faction * f)
+{
+  region * r;
+  region * end = lastregion(f);
+  struct seen_region ** seen = seen_init();
+
+  static const struct building_type * bt_lighthouse = NULL;
+  if (bt_lighthouse==NULL) bt_lighthouse = bt_find("lighthouse");
+
+  for (r = firstregion(f); r != end; r = r->next) {
+    attrib *ru;
+    unit * u;
+    plane * p = rplane(r);
+    unsigned char mode = see_none;
+    boolean dis = false;
+    int light = 0;
+
+    if (p) {
+      watcher * w = p->watchers;
+      while (w) {
+        if (f==w->faction) {
+          mode = w->mode;
+          break;
+        }
+        w = w->next;
+      }
+    }
+
+    for (u = r->units; u; u = u->next) {
+      if (u->faction == f) {
+        if (u->building && u->building->type==bt_lighthouse) {
+          int r = lighthouse_range(u->building, f);
+          if (r>light) light = r;
+        }
+        if (u->race != new_race[RC_SPELL] || u->number == RS_FARVISION) {
+          mode = see_unit;
+          if (fval(u, UFL_DISBELIEVES)) {
+            dis = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (light) {
+      /* we are in a lighthouse. add the others! */
+      region_list * rlist = get_regions_distance(r, light);
+      region_list * rp = rlist;
+      while (rp) {
+        region * rl = rp->data;
+        if (fval(rl->terrain, SEA_REGION)) {
+          direction_t d;
+          add_seen(seen, rl, see_lighthouse, false);
+          for (d=0;d!=MAXDIRECTIONS;++d) {
+            region * rn = rconnect(rl, d);
+            if (rn!=NULL) {
+              add_seen(seen, rn, see_neighbour, false);
+            }
+          }
+        }
+        rp = rp->next;
+      }
+      free_regionlist(rlist);
+    }
+
+    if (mode<see_travel && fval(r, RF_TRAVELUNIT)) {
+      for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
+        unit * u = (unit*)ru->data.v;
+        if (u->faction == f) {
+          mode = see_travel;
+          break;
+        }
+      }
+    }
+
+    if (mode == see_none)
+      continue;
+
+    add_seen(seen, r, mode, dis);
+    /* nicht, wenn Verwirrung herrscht: */
+    if (!is_cursed(r->attribs, C_REGCONF, 0)) {
+      void (*view)(struct seen_region **, region * r, faction * f) = view_default;
+      if (p && fval(p, PFL_SEESPECIAL)) {
+        attrib * a = a_find(p->attribs, &at_viewrange);
+        if (a) view = (void (*)(struct seen_region **, region * r, faction * f))a->data.f;
+      }
+      view(seen, r, f);
+    }
+  }
+  return seen;
+}
+
+int
+write_reports(faction * f, time_t ltime)
+{
+  boolean gotit = false;
+  struct seen_region ** seen = prepare_report(f);
+  faction_list * addresses = get_addresses(f, seen);
+  report_type * rtype = report_types;
+  struct report_context ctx;
+
+  ctx.f = f;
+  ctx.addresses = addresses;
+  ctx.report_time	= time(NULL);
+  ctx.seen = seen;
+  ctx.userdata = NULL;
+
+  printf("Reports für %s: ", factionname(f));
+  fflush(stdout);
+
+  for (;rtype!=NULL;rtype=rtype->next) {
+    if (f->options & rtype->flag) {
+      FILE * F;
+      sprintf(buf, "%s/%d-%s.%s", reportpath(), turn, factionid(f), rtype->extension);
+      F = fopen(buf, "wt");
+      if (F!=NULL) {
+        rtype->write(F, &ctx);
+        fclose(F);
+        gotit = true;
+      } else {
+        perror(buf);
+      }
+    }
+  }
+
+  printf("Reports for %s: DONE\n", factionname(f));
+  if (!gotit) {
+    log_warning(("No report for faction %s!\n", factionid(f)));
+  }
+
+  freelist(addresses);
+  seen_done(seen);
+  return 0;
+}
+
+static void
+nmr_warnings(void)
+{
+  faction *f,*fa;
+#define FRIEND (HELP_GUARD|HELP_MONEY)
+  for (f=factions;f;f=f->next) {
+    if (f->no != MONSTER_FACTION && (turn-f->lastorders) >= 2) {
+      message * msg = NULL;
+      for (fa=factions;fa;fa=fa->next) {
+        if (alliedfaction(NULL, f, fa, FRIEND) && alliedfaction(NULL, fa, f, FRIEND)) {
+          if (msg==NULL) {
+            sprintf(buf, "Achtung: %s hat einige Zeit keine "
+              "Züge eingeschickt und könnte dadurch in Kürze aus dem "
+              "Spiel ausscheiden.", factionname(f));
+            msg = msg_message("msg_event", "string", buf);
+          }
+          add_message(&fa->msgs, msg);
+        }
+      }
+      if (msg!=NULL) msg_release(msg);
+    }
+  }
+}
+
+static void
+report_donations(void)
+{
+  region * r;
+  for (r=regions;r;r=r->next) {
+    while (r->donations) {
+      donation * sp = r->donations;
+      if (sp->amount > 0) {
+        struct message * msg = msg_message("donation",
+          "from to amount", sp->f1, sp->f2, sp->amount);
+        r_addmessage(r, sp->f1, msg);
+        r_addmessage(r, sp->f2, msg);
+        msg_release(msg);
+      }
+      r->donations = sp->next;
+      free(sp);
+    }
+  }
+}
+
+static const char*
+MailitPath(void)
+{
+  static const char * value = NULL;
+  if (value==NULL) {
+    value = get_param(global.parameters, "report.mailit");
+  }
+  return value;
+}
+
+static void
+write_script(FILE * F, const faction * f)
+{
+  report_type * rtype;
+
+  fprintf(F, "faction=%s:email=%s", factionid(f), f->email);
+  if (f->options & (1<<O_BZIP2)) fputs(":compression=bz2", F);
+  else fputs(":compression=zip", F);
+
+  fputs(":reports=", F);
+  buf[0] = 0;
+  for (rtype=report_types;rtype!=NULL;rtype=rtype->next) {
+    if (f->options&rtype->flag) {
+      if (buf[0]) strcat(buf, ",");
+      strcat(buf, rtype->extension);
+    }
+  }
+  fputs(buf, F);
+  fputc('\n', F);
+}
+
+#if 0
+static void
+global_report(const char * filename)
+{
+  FILE * F = fopen(filename, "w");
+  region * r;
+  faction * f;
+  faction * monsters = findfaction(MONSTER_FACTION);
+  faction_list * addresses = NULL;
+  struct seen_region ** seen;
+
+  if (!monsters) return;
+  if (!F) return;
+
+  /* list of all addresses */
+  for (f=factions;f;f=f->next) {
+    faction_list * flist = calloc(1, sizeof(faction_list));
+    flist->data = f;
+    flist->next = addresses;
+    addresses = flist;
+  }
+
+  seen = seen_init();
+  for (r = regions; r; r = r->next) {
+    add_seen(seen, r, see_unit, true);
+  }
+  report_computer(F, monsters, seen, addresses, time(NULL));
+  freelist(addresses);
+  seen_done(seen);
+  fclose(F);
+}
+#endif
+
+int
+reports(void)
+{
+  faction *f;
+  FILE *mailit;
+  time_t ltime = time(NULL);
+  const char * str;
+  int retval = 0;
+
+  nmr_warnings();
+  report_donations();
+  remove_empty_units();
+
+  sprintf(buf, "%s/reports.txt", reportpath());
+  mailit = fopen(buf, "w");
+  if (mailit == NULL) {
+    log_error(("%s konnte nicht geöffnet werden!\n", buf));
+  }
+
+  for (f = factions; f; f = f->next) {
+    int error = write_reports(f, ltime);
+    if (error) retval = error;
+    if (mailit) write_script(mailit, f);
+  }
+  if (mailit) fclose(mailit);
+  free_seen();
+  str = get_param(global.parameters, "globalreport"); 
+#if 0
+  if (str!=NULL) {
+    sprintf(buf, "%s/%s.%u.cr", reportpath(), str, turn);
+    global_report(buf);
+  }
+#endif
+  return retval;
+}
+
+static variant
+var_copy_string(variant x)
+{
+  x.v = strdup((const char*)x.v);
+  return x;
+}
+
+static void
+var_free_string(variant x)
+{
+  free(x.v);
+}
+
+static variant
+var_copy_order(variant x)
+{
+  x.v = copy_order((order*)x.v);
+  return x;
+}
+
+static void
+var_free_order(variant x)
+{
+  free_order(x.v);
+}
+
+void
+reports_init(void)
+{
+  /* register datatypes for the different message objects */
+  register_argtype("alliance", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("building", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("direction", NULL, NULL, VAR_INT);
+  register_argtype("faction", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("race", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("region", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("resource", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("ship", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("skill", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("spell", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("unit", NULL, NULL, VAR_VOIDPTR);
+  register_argtype("int", NULL, NULL, VAR_INT);
+  register_argtype("string", var_free_string, var_copy_string, VAR_VOIDPTR);
+  register_argtype("order", var_free_order, var_copy_order, VAR_VOIDPTR);
+
+  /* register alternative visibility functions */
+  register_function((pf_generic)view_neighbours, "view_neighbours");
+  register_function((pf_generic)view_regatta, "view_regatta");
+}

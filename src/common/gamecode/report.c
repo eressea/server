@@ -71,7 +71,6 @@
 
 /* util includes */
 #include <util/bsdstring.h>
-#include <functions.h>
 #include <goodies.h>
 #include <base36.h>
 #include <nrmessage.h>
@@ -111,16 +110,6 @@ strxcpy(char * dst, const char * src) {
   size_t s = 0;
   while ((*dst++ = *src++)!=0) ++s;
   return s;
-}
-
-static const char*
-MailitPath(void)
-{
-  static const char * value = NULL;
-  if (value==NULL) {
-    value = get_param(global.parameters, "report.mailit");
-  }
-  return value;
 }
 
 int
@@ -529,26 +518,6 @@ report_spell(FILE * F, spellid_t id, const struct locale * lang)
 	}
 	rps(F, buf);
 	rnl(F);
-}
-
-void
-nmr_warnings(void)
-
-{
-	faction *f,*fa;
-#define FRIEND (HELP_GUARD|HELP_MONEY)
-	for(f=factions;f;f=f->next) {
-		if(f->no != MONSTER_FACTION && (turn-f->lastorders) >= 2) {
-			for(fa=factions;fa;fa=fa->next) {
-				if (alliedfaction(NULL, f, fa, FRIEND) && alliedfaction(NULL, fa, f, FRIEND)) {
-					sprintf(buf, "Achtung: %s hat einige Zeit keine "
-						"Züge eingeschickt und könnte dadurch in Kürze aus dem "
-						"Spiel ausscheiden.", factionname(f));
-					addmessage(0, fa, buf, MSG_EVENT, ML_WARN);
-				}
-			}
-		}
-	}
 }
 
 void
@@ -1448,8 +1417,9 @@ buildingmaintenance(const building * b, const resource_type * rtype)
 }
 
 static int
-order_template(FILE * F, faction * f)
+report_template(FILE * F, report_context * ctx)
 {
+  faction * f = ctx->f;
   region *r;
   plane *pl;
   region *last = lastregion(f);
@@ -1923,28 +1893,27 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 			rpunit(F, f, u, 6, mode);
 }
 
-static int
-report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * addresses,
-	const char * pzTime)
+int
+report_plaintext(FILE *F, report_context * ctx)
 {
 	int flag = 0;
 	char ch;
 	int dh;
 	int anyunits;
 	const struct region *r;
-  region * last = lastregion(f);
+  faction * f = ctx->f;
 	building *b;
 	ship *sh;
 	unit *u;
+  char pzTime[64];
 	attrib *a;
 	message * m;
-	int wants_stats;
-	int ix;
 	unsigned char op;
-	char buf2[80];
-	ix = Pow(O_STATISTICS);
-	wants_stats = (f->options & ix);
-
+  region * last = lastregion(f);
+  int ix = Pow(O_STATISTICS);
+	int wants_stats = (f->options & ix);
+  
+  strftime(pzTime, 64, "%A, %d. %B %Y, %H:%M", localtime(&ctx->report_time));
   m = msg_message("nr_header_date", "game date", global.gamename, pzTime);
   nr_render(m, f->locale, buf, sizeof(buf), f);
   msg_release(m);
@@ -1963,7 +1932,8 @@ report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * ad
 
 	buf[0] = 0;
 	dh = 0;
-	for(a=a_find(f->attribs, &at_faction_special); a; a=a->nexttype) {
+	for (a=a_find(f->attribs, &at_faction_special); a; a=a->nexttype) {
+    char buf2[80];
 		dh++;
 		if(fspecials[a->data.sa[0]].maxlevel != 100) {
 			sprintf(buf2, "%s (%d)", fspecials[a->data.sa[0]].name, a->data.sa[1]);
@@ -2182,7 +2152,7 @@ report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * ad
 		boolean unit_in_region = false;
 		boolean durchgezogen_in_region = false;
 		int turm_sieht_region = false;
-    seen_region * sd = find_seen(seen, r);
+    seen_region * sd = find_seen(ctx->seen, r);
     if (sd==NULL) continue;
 
 		switch (sd->mode) {
@@ -2345,59 +2315,11 @@ report(FILE *F, faction * f, struct seen_region ** seen, const faction_list * ad
       rnl(F);
       rparagraph(F, LOC(f->locale, "nr_youaredead"), 0, 0);
     } else {
-      list_address(F, f, addresses);
+      list_address(F, f, ctx->addresses);
     }
   }
   return 0;
 }
-
-FILE *
-openbatch(void)
-{
-  faction *f;
-  FILE * BAT = NULL;
-
-  /* falls und mind. ein internet spieler gefunden wird, schreibe den
-  * header des batch files. ab nun kann BAT verwendet werden, um zu
-  * pruefen, ob netspieler vorhanden sind und ins mailit batch
-  * geschrieben werden darf. */
-
-  for (f = factions; f; f = f->next) {
-
-    /* bei "internet:" verschicken wir die mail per batchfile. für
-    * unix kann man alles in EIN batchfile schreiben, als
-    * sogenanntes "herefile". Konnte der batchfile nicht geoeffnet
-    * werden, schreiben wir die reports einzeln. der BAT file wird
-    * nur gemacht, wenn es auch internet benutzer gibt. */
-
-    if (f->email) {
-      sprintf(buf, "%s/mailit", reportpath());
-      if ((BAT = fopen(buf, "w")) == NULL)
-        log_error(("mailit konnte nicht geöffnet werden!\n"));
-      else
-        fprintf(BAT,
-        "#!/bin/sh\n\n"
-        "# MAILIT shell file, vom Eressea Host generiert\n#\n"
-        "# Verwendung: nohup mailit &\n#\n\n"
-        "PATH=%s\n\n"
-        "chmod 755 *.sh\n"
-        "\n", MailitPath());
-      break;
-
-    }
-  }
-  return BAT;
-}
-
-void
-closebatch(FILE * BAT)
-{
-  if (BAT) {
-    fputs("\n", BAT);
-    fclose(BAT);
-  }
-}
-
 
 void
 base36conversion(void)
@@ -2413,249 +2335,6 @@ base36conversion(void)
 			}
 		}
 	}
-}
-
-extern void init_intervals(void);
-
-static void
-view_default(struct seen_region ** seen, region *r, faction *f)
-{
-	direction_t dir;
-	for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-		region * r2 = rconnect(r, dir);
-		if (r2) {
-			border * b = get_borders(r, r2);
-			while (b) {
-				if (!b->type->transparent(b, f)) break;
-				b = b->next;
-			}
-			if (!b) add_seen(seen, r2, see_neighbour, false);
-		}
-	}
-}
-
-static void
-view_neighbours(struct seen_region ** seen, region * r, faction * f)
-{
-	direction_t dir;
-	for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-		region * r2 = rconnect(r, dir);
-		if (r2) {
-			border * b = get_borders(r, r2);
-			while (b) {
-				if (!b->type->transparent(b, f)) break;
-				b = b->next;
-			}
-			if (!b) {
-				if (add_seen(seen, r2, see_far, false)) {
-					if (!(fval(r2->terrain, FORBIDDEN_REGION))) {
-						direction_t dir;
-						for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-							region * r3 = rconnect(r2, dir);
-							if (r3) {
-								border * b = get_borders(r2, r3);
-								while (b) {
-									if (!b->type->transparent(b, f)) break;
-									b = b->next;
-								}
-								if (!b) add_seen(seen, r3, see_neighbour, false);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-static void
-recurse_regatta(struct seen_region ** seen, region *center, region *r, faction *f, int maxdist)
-{
-	direction_t dir;
-	int dist = distance(center, r);
-	for (dir=0;dir!=MAXDIRECTIONS;++dir) {
-		region * r2 = rconnect(r, dir);
-		if (r2) {
-			int ndist = distance(center, r2);
-			if (ndist>dist && fval(r2->terrain, SEA_REGION)) {
-				border * b = get_borders(r, r2);
-				while (b) {
-					if (!b->type->transparent(b, f)) break;
-					b = b->next;
-				}
-				if (!b) {
-					if (ndist<maxdist) {
-						if (add_seen(seen, r2, see_far, false)) {
-							recurse_regatta(seen, center, r2, f, maxdist);
-						}
-					} else add_seen(seen, r2, see_neighbour, false);
-				}
-			}
-		}
-	}
-}
-
-static void
-view_regatta(struct seen_region ** seen, region * r, faction * f)
-{
-	unit *u;
-	int skill = 0;
-	for (u=r->units; u; u=u->next) {
-		if (u->faction==f) {
-			int es = effskill(u, SK_OBSERVATION);
-			if (es>skill) skill=es;
-		}
-	}
-	recurse_regatta(seen, r, r, f, skill/2);
-}
-
-static void
-global_report(const char * filename)
-{
-  FILE * F = fopen(filename, "w");
-  region * r;
-  faction * f;
-  faction * monsters = findfaction(MONSTER_FACTION);
-  faction_list * addresses = NULL;
-  struct seen_region ** seen;
-
-  if (!monsters) return;
-  if (!F) return;
-
-  /* list of all addresses */
-  for (f=factions;f;f=f->next) {
-    faction_list * flist = calloc(1, sizeof(faction_list));
-    flist->data = f;
-    flist->next = addresses;
-    addresses = flist;
-  }
-
-  seen = seen_init();
-  for (r = regions; r; r = r->next) {
-    add_seen(seen, r, see_unit, true);
-  }
-  report_computer(F, monsters, seen, addresses, time(NULL));
-  freelist(addresses);
-  seen_done(seen);
-  fclose(F);
-}
-
-region_list *
-get_regions_distance(region * root, int radius)
-{
-  region_list * rptr, * rlist = NULL;
-  region_list ** rp = &rlist;
-  add_regionlist(rp, root);
-  fset(root, FL_MARK);
-  while (*rp) {
-    region_list * r = *rp;
-    direction_t d;
-    rp = &r->next;
-    for (d=0;d!=MAXDIRECTIONS;++d) {
-      region * rn = rconnect(r->data, d);
-      if (rn!=NULL && !fval(rn, FL_MARK) && distance(rn, root)<=radius) {
-        add_regionlist(rp, rn);
-        fset(rn, FL_MARK);
-      }
-    }
-  }
-  for (rptr=rlist;rptr;rptr=rptr->next) {
-    freset(rptr->data, FL_MARK);
-  }
-  return rlist;
-}
-
-static struct seen_region **
-prepare_report(faction * f)
-{
-  region * r;
-  region * end = lastregion(f);
-  struct seen_region ** seen = seen_init();
-
-  static const struct building_type * bt_lighthouse = NULL;
-  if (bt_lighthouse==NULL) bt_lighthouse = bt_find("lighthouse");
-
-  for (r = firstregion(f); r != end; r = r->next) {
-		attrib *ru;
-		unit * u;
-		plane * p = rplane(r);
-		unsigned char mode = see_none;
-		boolean dis = false;
-    int light = 0;
-
-		if (p) {
-			watcher * w = p->watchers;
-			while (w) {
-				if (f==w->faction) {
-					mode = w->mode;
-					break;
-				}
-				w = w->next;
-			}
-		}
-
-    for (u = r->units; u; u = u->next) {
-      if (u->faction == f) {
-        if (u->building && u->building->type==bt_lighthouse) {
-          int r = lighthouse_range(u->building, f);
-          if (r>light) light = r;
-        }
-				if (u->race != new_race[RC_SPELL] || u->number == RS_FARVISION) {
-					mode = see_unit;
-					if (fval(u, UFL_DISBELIEVES)) {
-						dis = true;
-						break;
-					}
-				}
-			}
-		}
-
-    if (light) {
-      /* we are in a lighthouse. add the others! */
-      region_list * rlist = get_regions_distance(r, light);
-      region_list * rp = rlist;
-      while (rp) {
-        region * rl = rp->data;
-        if (fval(rl->terrain, SEA_REGION)) {
-          direction_t d;
-          add_seen(seen, rl, see_lighthouse, false);
-          for (d=0;d!=MAXDIRECTIONS;++d) {
-            region * rn = rconnect(rl, d);
-            if (rn!=NULL) {
-              add_seen(seen, rn, see_neighbour, false);
-            }
-          }
-        }
-        rp = rp->next;
-      }
-      free_regionlist(rlist);
-    }
-
-    if (mode<see_travel && fval(r, RF_TRAVELUNIT)) {
-      for (ru = a_find(r->attribs, &at_travelunit); ru; ru = ru->nexttype) {
-  			unit * u = (unit*)ru->data.v;
-	  		if (u->faction == f) {
-		  		mode = see_travel;
-			  	break;
-        }
-			}
-		}
-
-		if (mode == see_none)
-			continue;
-
-		add_seen(seen, r, mode, dis);
-		/* nicht, wenn Verwirrung herrscht: */
-		if (!is_cursed(r->attribs, C_REGCONF, 0)) {
-			void (*view)(struct seen_region **, region * r, faction * f) = view_default;
-			if (p && fval(p, PFL_SEESPECIAL)) {
-				attrib * a = a_find(p->attribs, &at_viewrange);
-				if (a) view = (void (*)(struct seen_region **, region * r, faction * f))a->data.f;
-			}
-			view(seen, r, f);
-		}
-	}
-  return seen;
 }
 
 #define FMAXHASH 1021
@@ -2677,81 +2356,6 @@ struct fsee {
 #define REPORT_BZIP2 (1 << O_BZIP2)
 
 int
-write_reports(faction * f, time_t ltime)
-{
-  FILE * F;
-  boolean gotit = false;
-  faction_list * addresses;
-  char zTime[64];
-  struct seen_region ** seen = prepare_report(f);
-
-  strftime(zTime, sizeof(zTime), "%A, %d. %B %Y, %H:%M", localtime(&ltime));
-  printf("Reports for %s: \r", factionname(f));
-  fflush(stdout);
-  addresses = get_addresses(f, seen);
-
-  /* NR schreiben: */
-  if (!nonr && (f->options & REPORT_NR)) {
-    fprintf(stdout, "Reports for %s: NR\r", factionname(f));
-    fflush(stdout);
-
-    sprintf(buf, "%s/%d-%s.nr", reportpath(), turn, factionid(f));
-    F = cfopen(buf, "wt");
-    if (F) {
-      int status = report(F, f, seen, addresses, zTime);
-      fclose(F);
-      gotit = true;
-      if (status!=0) {
-        seen_done(seen);
-        return status; /* catch errors */
-      }
-    }
-  }
-  /* CR schreiben: */
-  if (!nocr && (f->options & REPORT_CR || f->age<3)) {
-    fprintf(stdout, "Reports for %s: CR\r", factionname(f));
-    fflush(stdout);
-
-    sprintf(buf, "%s/%d-%s.cr", reportpath(), turn, factionid(f));
-    F = cfopen(buf, "wt");
-    if (F) {
-      int status = report_computer(F, f, seen, addresses, ltime);
-      fclose(F);
-      gotit = true;
-      if (status!=0) {
-        seen_done(seen);
-        return status; /* catch errors */
-      }
-    }
-  }
-  /* ZV schreiben: */
-  if (f->options & REPORT_ZV) {
-    fprintf(stdout, "Reports for %s: ZV\r", factionname(f));
-    fflush(stdout);
-
-    sprintf(buf, "%s/%d-%s.txt", reportpath(), turn, factionid(f));
-    F = cfopen(buf, "wt");
-    if (F) {
-      int status = order_template(F, f);
-      fclose(F);
-      if (status!=0) {
-        seen_done(seen);
-        return status; /* catch errors */
-      }
-    }
-  }
-  fprintf(stdout, "Reports for %s: DONE\n", factionname(f));
-
-  if (!gotit) {
-    log_warning(("No report for faction %s!\n", factionid(f)));
-  }
-  freelist(addresses);
-
-  seen_done(seen);
-  return 0;
-}
-
-int
 init_reports(void)
 {
   update_intervals();
@@ -2771,136 +2375,6 @@ init_reports(void)
   return 0;
 }
 
-int
-reports(void)
-{
-  faction *f;
-  FILE *shfp, *BAT;
-  time_t ltime = time(NULL);
-  const char * str;
-  int retval = 0;
-
-  nmr_warnings();
-  report_donations();
-  remove_empty_units();
-
-  BAT = openbatch();
-  for (f = factions; f; f = f->next) {
-    int error = write_reports(f, ltime);
-    if (error) retval = error;
-    if (!nosh && f->email && strlen(f->email) && BAT) {
-      sprintf(buf, "%s/%s.sh", reportpath(), factionid(f));
-      shfp = fopen(buf, "w");
-      fprintf(shfp,"#!/bin/sh\n\nPATH=%s\n\n",MailitPath());
-      fprintf(shfp,"if [ $# -ge 1 ]; then\n");
-      fprintf(shfp,"\taddr=$1\n");
-      fprintf(shfp,"else\n");
-      fprintf(shfp,"\taddr=%s\n", f->email);
-      fprintf(shfp,"fi\n\n");
-      
-      fprintf(BAT, "\n\ndate;echo %s\n", f->email);
-
-      if (f->options & REPORT_ZIP) {
-
-        fprintf(BAT, "ls %d-%s.nr %d-%s.txt %d-%s.cr | zip -m -j -9 -@ %d-%s.zip\n",
-                turn, factionid(f), 
-                turn, factionid(f), 
-                turn, factionid(f), 
-                turn, factionid(f));
-        if (f->age == 1) {
-          fprintf(BAT, "zip -j -9 %d-%s.zip %s/%s/%s/welcome.txt\n", 
-                  turn, factionid(f), resourcepath(), global.welcomepath, locale_name(f->locale));
-        }
-        
-        fprintf(shfp, "eresseamail.zipped $addr \"%s %s\" \"%d-%s.zip\" "
-                "%d-%s.zip\n", global.gamename, gamedate_short(f->locale), 
-                turn, factionid(f), 
-                turn, factionid(f));
-        
-      } else if(f->options & REPORT_BZIP2) {
-        
-        fprintf(BAT, "bzip2 -9v `ls %d-%s.nr %d-%s.txt %d-%s.cr`\n",
-                turn, factionid(f), 
-                turn, factionid(f), 
-                turn, factionid(f));
-        
-        fprintf(shfp, "eresseamail.bzip2 $addr \"%s %s\"", global.gamename, gamedate_short(f->locale));
-        
-        if (!nonr && f->options & REPORT_NR)
-            fprintf(shfp,
-                    " \\\n\t\"application/x-bzip2\" \"Report\" %d-%s.nr.bz2",
-                    turn,factionid(f));
-        
-        if (f->options & (1 << O_ZUGVORLAGE))
-            fprintf(shfp,
-                    " \\\n\t\"application/x-bzip2\" \"Zugvorlage\" %d-%s.txt.bz2",
-                    turn,factionid(f));
-        
-        if (!nocr && (f->options & REPORT_CR || f->age<3))
-            fprintf(shfp,
-                    " \\\n\t\"application/x-bzip2\" \"Computer-Report\" %d-%s.cr.bz2",
-                    turn, factionid(f));
-
-        if (f->age == 1) {
-          fprintf(shfp,
-            " \\\n\t\"text/plain\" \"Willkommen\" %s/%s/%s/welcome.txt", 
-            resourcepath(), global.welcomepath, locale_name(f->locale));
-        }
-
-      } else {
-        
-        fprintf(shfp, MAIL " $addr \"%s %s\"", global.gamename, gamedate_short(f->locale));
-        
-        if (!nonr && f->options & REPORT_NR)
-            fprintf(shfp,
-                    " \\\n\t\"text/plain\" \"Report\" %d-%s.nr",
-                    turn, factionid(f));
-        
-        if (f->options & (1 << O_ZUGVORLAGE))
-            fprintf(shfp,
-                    " \\\n\t\"text/plain\" \"Zugvorlage\" %d-%s.txt",
-                    turn, factionid(f));
-        
-        if (!nocr && (f->options & REPORT_CR || f->age<3))
-            fprintf(shfp,
-                    " \\\n\t\"text/x-eressea-cr\" \"Computer-Report\" %d-%s.cr",
-                    turn, factionid(f));
-
-        if (f->age == 1) {
-          fprintf(shfp,
-            " \\\n\t\"text/plain\" \"Willkommen\" %s/%s/%s/welcome.txt", 
-            resourcepath(), global.welcomepath, locale_name(f->locale));
-        }
-
-      }
-      
-      fprintf(BAT, ". %s.sh %s\n", factionid(f), f->email);
-      fclose(shfp);
-    }
-  }
-  str = get_param(global.parameters, "globalreport"); 
-  if (str!=NULL) {
-    sprintf(buf, "%s/%s.%u.cr", reportpath(), str, turn);
-    global_report(buf);
-  }
-  /* schliesst BAT und verschickt Zeitungen und Kommentare */
-  closebatch(BAT);
-  free_seen();
-  return retval;
-}
-
-void
-report_cleanup(void)
-{
-	int i;
-	for (i=0;i!=FMAXHASH;++i) {
-		while (fsee[i]) {
-			struct fsee * fs = fsee[i]->nexthash;
-			free(fsee[i]);
-			fsee[i] = fs;
-		}
-	}
-}
 
 unit *
 can_find(faction * f, faction * f2)
@@ -3737,35 +3211,10 @@ eval_int36(struct opstack ** stack, const void * userdata)
 	unused(userdata);
 }
 
-static variant
-var_copy_string(variant x)
-{
-  x.v = strdup((const char*)x.v);
-  return x;
-}
-
-static void
-var_free_string(variant x)
-{
-  free(x.v);
-}
-
-static variant
-var_copy_order(variant x)
-{
-  x.v = copy_order((order*)x.v);
-  return x;
-}
-
-static void
-var_free_order(variant x)
-{
-  free_order(x.v);
-}
-
 void
 report_init(void)
 {
+  /* register functions that turn message contents to readable strings */
 	add_function("alliance", &eval_alliance);
 	add_function("region", &eval_region);
   add_function("weight", &eval_weight);
@@ -3784,21 +3233,20 @@ report_init(void)
 	add_function("trail", &eval_trail);
   add_function("spell", &eval_spell);
 
-  register_argtype("alliance", NULL, NULL, VAR_VOIDPTR);
-  register_argtype("building", NULL, NULL, VAR_VOIDPTR);
-  register_argtype("direction", NULL, NULL, VAR_INT);
-  register_argtype("faction", NULL, NULL, VAR_VOIDPTR);
-  register_argtype("race", NULL, NULL, VAR_VOIDPTR);
-  register_argtype("region", NULL, NULL, VAR_VOIDPTR);
-  register_argtype("resource", NULL, NULL, VAR_VOIDPTR);
-  register_argtype("ship", NULL, NULL, VAR_VOIDPTR);
-  register_argtype("skill", NULL, NULL, VAR_VOIDPTR);
-  register_argtype("spell", NULL, NULL, VAR_VOIDPTR);
-  register_argtype("unit", NULL, NULL, VAR_VOIDPTR);
-  register_argtype("int", NULL, NULL, VAR_INT);
-  register_argtype("string", var_free_string, var_copy_string, VAR_VOIDPTR);
-  register_argtype("order", var_free_order, var_copy_order, VAR_VOIDPTR);
-
-  register_function((pf_generic)view_neighbours, "view_neighbours");
-	register_function((pf_generic)view_regatta, "view_regatta");
+  register_reporttype("nr", &report_plaintext, 1<<O_REPORT);
+  register_reporttype("txt", &report_template, 1<<O_ZUGVORLAGE);
 }
+
+void
+report_cleanup(void)
+{
+  int i;
+  for (i=0;i!=FMAXHASH;++i) {
+    while (fsee[i]) {
+      struct fsee * fs = fsee[i]->nexthash;
+      free(fsee[i]);
+      fsee[i] = fs;
+    }
+  }
+}
+

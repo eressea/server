@@ -404,37 +404,6 @@ cr_spell(variant var, char * buffer, const void * userdata)
   return 0;
 }
 
-void
-creport_init(void)
-{
-  tsf_register("report", &cr_ignore);
-  tsf_register("string", &cr_string);
-  tsf_register("order", &cr_order);
-  tsf_register("spell", &cr_spell);
-  tsf_register("int", &cr_int);
-  tsf_register("unit", &cr_unit);
-  tsf_register("region", &cr_region);
-  tsf_register("faction", &cr_faction);
-  tsf_register("ship", &cr_ship);
-  tsf_register("building", &cr_building);
-  tsf_register("skill", &cr_skill);
-  tsf_register("resource", &cr_resource);
-  tsf_register("race", &cr_race);
-  tsf_register("direction", &cr_int);
-  tsf_register("alliance", &cr_alliance);
-}
-
-void
-creport_cleanup(void)
-{
-  while (junkyard) {
-    translation * t = junkyard;
-    junkyard = junkyard->next;
-    free(t);
-  }
-  junkyard = 0;
-}
-
 /*static int msgno; */
 
 #define MTMAXHASH 1021
@@ -1071,11 +1040,11 @@ cr_borders(seen_region ** seen, const region * r, const faction * f, int seemode
 }
 
 /* main function of the creport. creates the header and traverses all regions */
-int
-report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction_list * addresses, 
-                const time_t report_time)
+static int
+report_computer(FILE * F, report_context * ctx)
 {
   int i;
+  faction * f = ctx->f;
   item * itm;
   const char * prefix;
   region * r;
@@ -1090,14 +1059,14 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 #endif
 
   /* must call this to get all the neighbour regions */
-  get_seen_interval(seen, &first, &last);
+  get_seen_interval(ctx->seen, &first, &last);
   /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
   /* initialisations, header and lists */
 
   fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
   fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
 	fprintf(F, "%d;noskillpoints\n", 1);
-	fprintf(F, "%ld;date\n", report_time);
+	fprintf(F, "%ld;date\n", ctx->report_time);
 	fprintf(F, "\"%s\";Spiel\n", global.gamename);
 	fprintf(F, "\"%s\";Konfiguration\n", "Standard");
 	fprintf(F, "\"%s\";Koordinaten\n", "Hex");
@@ -1196,7 +1165,7 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 		}
 	}
 
-	cr_find_address(F, f, addresses);
+	cr_find_address(F, f, ctx->addresses);
 	a = a_find(f->attribs, &at_reportspell);
 	while (a) {
 		cr_reportspell(F, (spellid_t)a->data.i, f->locale);
@@ -1234,7 +1203,7 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
   for (r=first;r!=last;r=r->next) {
     int modifier = 0;
     const char * tname;
-    const seen_region * sd = find_seen(seen, r);
+    const seen_region * sd = find_seen(ctx->seen, r);
     
     if (sd==NULL) continue;
 		
@@ -1278,7 +1247,7 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
       }
     }
 		if (sd->mode == see_neighbour) {
-			cr_borders(seen, r, f, sd->mode, F);
+			cr_borders(ctx->seen, r, f, sd->mode, F);
 		} else {
 #define RESOURCECOMPAT
 			char cbuf[8192], *pos = cbuf;
@@ -1371,7 +1340,7 @@ report_computer(FILE * F, faction * f, struct seen_region ** seen, const faction
 				if (pos!=cbuf) fputs(cbuf, F);
 			}
 			print_curses(F, f, r, TYP_REGION);
-			cr_borders(seen, r, f, sd->mode, F);
+			cr_borders(ctx->seen, r, f, sd->mode, F);
 			if (sd->mode==see_unit && rplane(r)==get_astralplane() && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
 			{
 				/* Sonderbehandlung Teleport-Ebene */
@@ -1487,5 +1456,38 @@ crwritemap(const char * filename)
   }
   fclose(F);
 	return 0;
+}
+
+void
+creport_init(void)
+{
+  tsf_register("report", &cr_ignore);
+  tsf_register("string", &cr_string);
+  tsf_register("order", &cr_order);
+  tsf_register("spell", &cr_spell);
+  tsf_register("int", &cr_int);
+  tsf_register("unit", &cr_unit);
+  tsf_register("region", &cr_region);
+  tsf_register("faction", &cr_faction);
+  tsf_register("ship", &cr_ship);
+  tsf_register("building", &cr_building);
+  tsf_register("skill", &cr_skill);
+  tsf_register("resource", &cr_resource);
+  tsf_register("race", &cr_race);
+  tsf_register("direction", &cr_int);
+  tsf_register("alliance", &cr_alliance);
+
+  register_reporttype("cr", &report_computer, 1<<O_COMPUTER);
+}
+
+void
+creport_cleanup(void)
+{
+  while (junkyard) {
+    translation * t = junkyard;
+    junkyard = junkyard->next;
+    free(t);
+  }
+  junkyard = 0;
 }
 
