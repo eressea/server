@@ -57,6 +57,7 @@
 #include <gamecode/items.h>
 #include <gamecode/laws.h>
 #include <gamecode/monster.h>
+#include <gamecode/report.h>
 #include <gamecode/creport.h>
 
 /* kernel includes */
