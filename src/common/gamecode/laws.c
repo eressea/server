@@ -97,6 +97,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 
 #include <attributes/otherfaction.h>
 
@@ -3826,8 +3827,16 @@ use_cmd(unit * u, struct order * ord)
   t = getstrtoken();
   n = atoi(t);
   if (n==0) {
-    n = 1;
+    if (findparam(t, u->faction->locale) == P_ANY) {
+      /* BENUTZE ALLES Yanxspirit */
+      n = INT_MAX;
+      t = getstrtoken();
+    } else {
+      /* BENUTZE Yanxspirit */
+      n = 1;
+    }
   } else {
+    /* BENUTZE 42 Yanxspirit */
     t = getstrtoken();
   }
   itype = finditemtype(t, u->faction->locale);

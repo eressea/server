@@ -1572,16 +1572,6 @@ report_donations(void)
   }
 }
 
-static const char*
-MailitPath(void)
-{
-  static const char * value = NULL;
-  if (value==NULL) {
-    value = get_param(global.parameters, "report.mailit");
-  }
-  return value;
-}
-
 static void
 write_script(FILE * F, const faction * f)
 {
