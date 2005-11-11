@@ -855,6 +855,8 @@ void
 terraform_region(region * r, const terrain_type * terrain)
 {
 	/* Resourcen, die nicht mehr vorkommen können, löschen */
+  const terrain_type * oldterrain = r->terrain;
+
   rawmaterial  **lrm = &r->resources;
   while (*lrm) {
     rawmaterial *rm = *lrm;
@@ -880,7 +882,7 @@ terraform_region(region * r, const terrain_type * terrain)
   r->terrain = terrain;
 
 	if (!fval(terrain, LAND_REGION)) {
-		if (r->land) {
+		if (r->land!=NULL) {
 			freeland(r->land);
 			r->land = NULL;
 		}
@@ -969,38 +971,39 @@ terraform_region(region * r, const terrain_type * terrain)
 		else {
 			rsetherbtype(r, NULL);
 		}
+    if (!fval(oldterrain, LAND_REGION)) {
+      if (rand() % 100 < 3) fset(r, RF_MALLORN);
+      else freset(r, RF_MALLORN);
+      if (rand() % 100 < ENCCHANCE) {
+        fset(r, RF_ENCOUNTER);
+      }
+    }
 	}
 
-	if (rand() % 100 < ENCCHANCE) {
-		fset(r, RF_ENCOUNTER);
-	}
-	if (rand() % 100 < 3)
-		fset(r, RF_MALLORN);
-	else
-		freset(r, RF_MALLORN);
-
-  if (oldterrain(terrain)==T_PLAIN) {
-    rsethorses(r, rand() % (terrain->size / 50));
-    if(rand()%100 < 40) {
-      rsettrees(r, 2, terrain->size * (30+rand()%40)/1000);
+  if (terrain->size!=oldterrain->size) {
+    if (terrain==newterrain(T_PLAIN)) {
+      rsethorses(r, rand() % (terrain->size / 50));
+      if(rand()%100 < 40) {
+        rsettrees(r, 2, terrain->size * (30+rand()%40)/1000);
+        rsettrees(r, 1, rtrees(r, 2)/4);
+        rsettrees(r, 0, rtrees(r, 2)/2);
+      }
+    } else if (chance(0.2)) {
+      rsettrees(r, 2, terrain->size * (30 + rand() % 40) / 1000);
       rsettrees(r, 1, rtrees(r, 2)/4);
       rsettrees(r, 0, rtrees(r, 2)/2);
     }
-	} else if (chance(0.2)) {
-		rsettrees(r, 2, terrain->size * (30 + rand() % 40) / 1000);
-		rsettrees(r, 1, rtrees(r, 2)/4);
-		rsettrees(r, 0, rtrees(r, 2)/2);
-	}
 
-	if (terrain->size>0 && !fval(r, RF_CHAOTIC)) {
-		int peasants;
+    if (!fval(r, RF_CHAOTIC)) {
+		  int peasants;
 #if REDUCED_PEASANTGROWTH == 1
-		peasants = (maxworkingpeasants(r) * (20+dice_rand("6d10")))/100;
+		  peasants = (maxworkingpeasants(r) * (20+dice_rand("6d10")))/100;
 #else
-		peasants = MAXPEASANTS_PER_AREA * (rand() % (terrain->size / MAXPEASANTS_PER_AREA / 2));
+		  peasants = MAXPEASANTS_PER_AREA * (rand() % (terrain->size / MAXPEASANTS_PER_AREA / 2));
 #endif
-		rsetpeasants(r, max(100, peasants));
-		rsetmoney(r, rpeasants(r) * ((wage(r, NULL, false)+1) + rand() % 5));
+		  rsetpeasants(r, max(100, peasants));
+		  rsetmoney(r, rpeasants(r) * ((wage(r, NULL, false)+1) + rand() % 5));
+    }
 	}
 }
 
