@@ -971,7 +971,7 @@ terraform_region(region * r, const terrain_type * terrain)
 		else {
 			rsetherbtype(r, NULL);
 		}
-    if (!fval(oldterrain, LAND_REGION)) {
+    if (oldterrain==NULL || !fval(oldterrain, LAND_REGION)) {
       if (rand() % 100 < 3) fset(r, RF_MALLORN);
       else freset(r, RF_MALLORN);
       if (rand() % 100 < ENCCHANCE) {
@@ -980,7 +980,7 @@ terraform_region(region * r, const terrain_type * terrain)
     }
 	}
 
-  if (terrain->size!=oldterrain->size) {
+  if (oldterrain==NULL || terrain->size!=oldterrain->size) {
     if (terrain==newterrain(T_PLAIN)) {
       rsethorses(r, rand() % (terrain->size / 50));
       if(rand()%100 < 40) {
