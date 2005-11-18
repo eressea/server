@@ -843,6 +843,18 @@ plan_dragon(unit * u)
     move |= (r->land==0 || r->land->money==0); /* when no money, move */
   }
   move |= chance(0.04); /* 4% chance to change your mind */
+
+  if (u->race==new_race[RC_WYRM] && !move) {
+    unit * u2;
+    for (u2=r->units;u2;u2=u2->next) {
+      /* wyrme sind einzelgänger */
+      if (u2!=u && u2->race==u->race && chance(0.5)) {
+        move = true;
+        break;
+      }
+    }
+  }
+
   if (move) {
     /* dragon gets bored and looks for a different place to go */
     ta = set_new_dragon_target(u, u->region, DRAGON_RANGE);
