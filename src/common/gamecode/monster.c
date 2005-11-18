@@ -848,6 +848,10 @@ plan_dragon(unit * u)
     unit * u2;
     for (u2=r->units;u2;u2=u2->next) {
       /* wyrme sind einzelgänger */
+      if (u2==u) {
+        /* we do not make room for newcomers, so we don't need to look at them */
+        break;
+      }
       if (u2!=u && u2->race==u->race && chance(0.5)) {
         move = true;
         break;
