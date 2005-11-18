@@ -95,7 +95,7 @@ typedef struct report_context {
 	void * userdata;
 } report_context;
 
-typedef int (*report_fun)(FILE * F, report_context * ctx);
+typedef int (*report_fun)(const char * filename, report_context * ctx);
 extern void register_reporttype(const char * extension, report_fun write, int flag);
   
 extern void report_item(const struct unit * owner, const struct item * i, const struct faction * viewer, const char ** name, const char ** basename, int * number, boolean singular);
