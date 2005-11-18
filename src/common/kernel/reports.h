@@ -85,6 +85,7 @@ extern struct seen_region ** seen_init(void);
 extern void seen_done(struct seen_region * seehash[]);
 extern void free_seen(void);
 extern void get_seen_interval(struct seen_region ** seen, struct region ** first, struct region ** last);
+extern const char * visibility[];
 
 typedef struct report_context {
 	struct faction * f;

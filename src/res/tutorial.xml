@@ -19,7 +19,7 @@
   <xi:include href="terrains.xml"/>
 
   <game name="Tutorial" welcome="tutorial">
-    <comment>Game specific</comment>
+    <!-- Game specific settings -->
     <order name="EMAIL" disable="yes"></order>
     <order name="MEINUNG" disable="yes"></order>
     <order name="MAGIEGEBIET" disable="yes"></order>
@@ -28,10 +28,8 @@
     <param name="nmr.timeout" value="2"></param>
     <param name="nmr.removenewbie" value="1"></param>
     <param name="GiveRestriction" value="3"></param>
-    <param name="database.gameid" value="1"></param>
     <param name="hunger.long" value="1"></param>
     <param name="MaxAge" value="8"></param>
-    <param name="report.mailit" value="/usr/sbin:$HOME/eressea/bin:/bin:/usr/bin:/usr/local/bin"/>
   </game>
   <xi:include file="tutorial/de/strings.xml"/>
   <xi:include file="tutorial/en/strings.xml"/>

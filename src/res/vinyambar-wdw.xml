@@ -18,7 +18,7 @@
   <xi:include href="terrains.xml"/>
 
   <game name="Wettstreit der Weisen" unitsperalliance="yes" units="1000" welcome="vinyambar">
-    <comment>Game specific</comment>
+    <!-- Game specific settings -->
     <order name="ARBEITEN" disable="yes"/>
     <order name="MEINUNG" disable="yes"/>
     <order name="MAGIEGEBIET" disable="yes"/>
@@ -27,7 +27,6 @@
     <param name="nmr.timeout" value="5"/>
     <param name="nmr.removenewbie" value="0"/>
     <param name="GiveRestriction" value="0"/>
-    <param name="database.gameid" value="3"/>
     <param name="hunger.long" value="0"/>
     <param name="atsroi.ats" value="2"/>
     <param name="atsroi.roi" value="4"/>

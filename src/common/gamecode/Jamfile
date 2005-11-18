@@ -18,6 +18,7 @@ SOURCES =
  report.c
  spy.c
  study.c
+ xmlreport.c
  ;
 
 Library gamecode : $(SOURCES) ;

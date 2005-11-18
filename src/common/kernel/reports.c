@@ -62,6 +62,15 @@
 #include <attributes/viewrange.h>
 
 const char * g_reportdir;
+const char * visibility[] = {
+  "none",
+  "neighbour",
+  "lighthouse",
+  "travel",
+  "far",
+  "unit",
+  "battle"
+};
 
 const char *coasts[MAXDIRECTIONS] =
 {
@@ -1505,16 +1514,13 @@ write_reports(faction * f, time_t ltime)
 
   for (;rtype!=NULL;rtype=rtype->next) {
     if (f->options & rtype->flag) {
-      FILE * F;
+      char * filename;
       sprintf(buf, "%s/%d-%s.%s", reportpath(), turn, factionid(f), rtype->extension);
-      F = fopen(buf, "wt");
-      if (F!=NULL) {
-        rtype->write(F, &ctx);
-        fclose(F);
+      filename = strdup(buf);
+      if (rtype->write(filename, &ctx)==0) {
         gotit = true;
-      } else {
-        perror(buf);
       }
+      free(filename);
     }
   }
 

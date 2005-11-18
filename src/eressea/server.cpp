@@ -56,6 +56,7 @@
 
 /* gamecode includes */
 #include <gamecode/creport.h>
+#include <gamecode/xmlreport.h>
 #include <gamecode/report.h>
 #include <gamecode/economy.h>
 #include <gamecode/items.h>
@@ -207,6 +208,7 @@ game_init(void)
   reports_init();
   report_init();
   creport_init();
+  xmlreport_init();
 
   debug_language("locales.log");
   register_races();

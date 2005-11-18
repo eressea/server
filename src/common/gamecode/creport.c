@@ -1041,7 +1041,7 @@ cr_borders(seen_region ** seen, const region * r, const faction * f, int seemode
 
 /* main function of the creport. creates the header and traverses all regions */
 static int
-report_computer(FILE * F, report_context * ctx)
+report_computer(const char * filename, report_context * ctx)
 {
   int i;
   faction * f = ctx->f;
@@ -1057,6 +1057,11 @@ report_computer(FILE * F, report_context * ctx)
 #ifdef SCORE_MODULE
   int score = 0, avgscore = 0;
 #endif
+  FILE * F = fopen(filename, "wt");
+  if (F==NULL) {
+    perror(filename);
+    return -1;
+  }
 
   /* must call this to get all the neighbour regions */
   get_seen_interval(ctx->seen, &first, &last);
@@ -1229,17 +1234,8 @@ report_computer(FILE * F, report_context * ctx)
 		}
 
 		fprintf(F, "\"%s\";Terrain\n", add_translation(tname, locale_string(f->locale, tname)));
-		switch (sd->mode) {
-		case see_far:
-			fputs("\"neighbourhood\";visibility\n", F);
-			break;
-		case see_lighthouse:
-			fputs("\"lighthouse\";visibility\n", F);
-			break;
-		case see_travel:
-			fputs("\"travel\";visibility\n", F);
-			break;
-		}
+    if (sd->mode!=see_unit) fprintf(F, "\"%s\";visibility\n", visibility[sd->mode]);
+
     {
       unit * owner = region_owner(r);
       if (owner) {
@@ -1441,6 +1437,7 @@ report_computer(FILE * F, report_context * ctx)
     log_error(("%s\n", strerror(errno)));
     errno = 0;
   }
+  fclose(F);
   return 0;
 }
 

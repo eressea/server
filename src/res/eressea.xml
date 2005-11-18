@@ -19,7 +19,7 @@
   <xi:include href="dungeons.xml"/>
 
   <game name="Eressea" welcome="eressea">
-    <comment>Game specific</comment>
+    <!-- Game specific settings -->
     <order name="MEINUNG" disable="yes"/>
     <order name="MAGIEGEBIET" disable="yes"/>
     <param name="entertain.base" value="0"/>
@@ -28,9 +28,7 @@
     <param name="nmr.removenewbie" value="2"/>
     <param name="GiveRestriction" value="3"/>
     <param name="hunger.long" value="1"/>
-    <param name="database.gameid" value="0"/>
     <param name="rules.check_overload" value="0"/>
-    <param name="report.mailit" value="/usr/sbin:$HOME/eressea/bin:/bin:/usr/bin:/usr/local/bin"/>
   </game>
   <xi:include href="eressea/de/strings.xml"/>
   <xi:include href="eressea/en/strings.xml"/>

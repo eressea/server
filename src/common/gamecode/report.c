@@ -1417,12 +1417,17 @@ buildingmaintenance(const building * b, const resource_type * rtype)
 }
 
 static int
-report_template(FILE * F, report_context * ctx)
+report_template(const char * filename, report_context * ctx)
 {
   faction * f = ctx->f;
   region *r;
   plane *pl;
   region *last = lastregion(f);
+  FILE * F = fopen(filename, "wt");
+  if (F==NULL) {
+    perror(filename);
+    return -1;
+  }
 
   rps_nowrap(F, "");
   rnl(F);
@@ -1538,6 +1543,7 @@ report_template(FILE * F, report_context * ctx)
   sprintf(buf, LOC(f->locale, parameters[P_NEXT]));
   rps_nowrap(F, buf);
   rnl(F);
+  fclose(F);
   return 0;
 }
 
@@ -1894,7 +1900,7 @@ report_building(FILE *F, const region * r, const building * b, const faction * f
 }
 
 int
-report_plaintext(FILE *F, report_context * ctx)
+report_plaintext(const char * filename, report_context * ctx)
 {
 	int flag = 0;
 	char ch;
@@ -1912,6 +1918,11 @@ report_plaintext(FILE *F, report_context * ctx)
   region * last = lastregion(f);
   int ix = Pow(O_STATISTICS);
 	int wants_stats = (f->options & ix);
+  FILE * F = fopen(filename, "wt");
+  if (F==NULL) {
+    perror(filename);
+    return -1;
+  }
   
   strftime(pzTime, 64, "%A, %d. %B %Y, %H:%M", localtime(&ctx->report_time));
   m = msg_message("nr_header_date", "game date", global.gamename, pzTime);
@@ -2318,6 +2329,7 @@ report_plaintext(FILE *F, report_context * ctx)
       list_address(F, f, ctx->addresses);
     }
   }
+  fclose(F);
   return 0;
 }
 

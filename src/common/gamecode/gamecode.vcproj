@@ -203,6 +203,9 @@
 			<File
 				RelativePath=".\report.h">
 			</File>
+			<File
+				RelativePath=".\xmlreport.h">
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\creation.c">
@@ -236,6 +239,9 @@
 		</File>
 		<File
 			RelativePath=".\study.c">
+		</File>
+		<File
+			RelativePath=".\xmlreport.c">
 		</File>
 	</Files>
 	<Globals>

@@ -447,7 +447,8 @@ const char *options[MAXOPTIONS] =
 	"ADRESSEN",
 	"BZIP2",
 	"PUNKTE",
-	"SHOWSKCHANGE"
+	"SHOWSKCHANGE",
+  "XML"
 };
 
 static int 
