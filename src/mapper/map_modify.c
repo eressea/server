@@ -959,6 +959,7 @@ select_terrain(const terrain_type * default_terrain)
     insert_selection(iinsert, prev, terrain->_name, (void*)terrain);
     prev = *iinsert;
     iinsert = &prev->next;
+    terrain = terrain->next;
   }
   selected = do_selection(ilist, "Terrain", NULL, NULL);
   if (selected==NULL) return NULL;
