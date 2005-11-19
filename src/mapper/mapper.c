@@ -937,23 +937,29 @@ movearound(short rx, short ry) {
 					if (r==NULL) break;
 					if (!Tagged) {
             const terrain_type * terrain = select_terrain(r->terrain);
-						if (hx>-1) {
-							int Rx,Ry;
-							Rx=rx; Ry=ry;
-							if (rx>Hx) { a=Hx; Hx=Rx; rx=a; }
-							if (ry>Hy) { a=Hy; Hy=Ry; ry=a; }
-              for (a=Rx; a<=Hx; a++) {
-                for (b=Ry; b<=Hy; b++) {
-                  c = findregion(a,b);
-                  if (c) terraform_region(c, terrain);
+            if (terrain!=NULL) {
+						  if (hx>-1) {
+							  int Rx,Ry;
+							  Rx=rx; Ry=ry;
+							  if (rx>Hx) { a=Hx; Hx=Rx; rx=a; }
+							  if (ry>Hy) { a=Hy; Hy=Ry; ry=a; }
+                for (a=Rx; a<=Hx; a++) {
+                  for (b=Ry; b<=Hy; b++) {
+                    c = findregion(a,b);
+                    if (c) terraform_region(c, terrain);
+                  }
                 }
+              } else {
+                terraform_region(r, terrain);
               }
-						} else
-							terraform_region(r, terrain);
+            }
 					} else {
             const terrain_type * terrain = select_terrain(r->terrain);
-						for (tag=Tagged; tag; tag=tag->next)
-							terraform_region(tag->r, terrain);
+            if (terrain!=NULL) {
+              for (tag=Tagged; tag; tag=tag->next) {
+                terraform_region(tag->r, terrain);
+              }
+            }
 					}
 					ch = -9;
 					modified = 1;
@@ -961,24 +967,28 @@ movearound(short rx, short ry) {
 				case 'Z':
 					if (!Tagged) {
             const terrain_type * terrain = select_terrain(r->terrain);
-						if (hx>-1) {
-							short Rx,Ry;
-							Rx=rx; Ry=ry;
-							if (rx>Hx) { a=Hx; Hx=Rx; rx=a; }
-							if (ry>Hy) { a=Hy; Hy=Ry; ry=a; }
-              for (a=Rx; a<=Hx; a++) {
-                for (b=Ry; b<=Hy; b++) {
-                  c = findregion(a,b);
-                  if (c) c->terrain = terrain;
+            if (terrain!=NULL) {
+              if (hx>-1) {
+                short Rx,Ry;
+                Rx=rx; Ry=ry;
+                if (rx>Hx) { a=Hx; Hx=Rx; rx=a; }
+                if (ry>Hy) { a=Hy; Hy=Ry; ry=a; }
+                for (a=Rx; a<=Hx; a++) {
+                  for (b=Ry; b<=Hy; b++) {
+                    c = findregion(a,b);
+                    if (c) c->terrain = terrain;
+                  }
                 }
+              } else {
+                r->terrain = terrain;
               }
-            } else {
-              r->terrain = terrain;
             }
 					} else {
             const terrain_type * terrain = select_terrain(r->terrain);
-            for (tag=Tagged; tag; tag=tag->next) {
-              tag->r->terrain = terrain;
+            if (terrain!=NULL) {
+              for (tag=Tagged; tag; tag=tag->next) {
+                tag->r->terrain = terrain;
+              }
             }
 					}
 					ch = -9;
