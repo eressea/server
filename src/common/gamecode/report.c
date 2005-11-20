@@ -214,18 +214,6 @@ gamedate2(const struct locale * lang)
   return buf;
 }
 
-static char *
-gamedate_short(const struct locale * lang)
-{
-	static char buf[256];
-  gamedate gd;
-
-  get_gamedate(turn, &gd);
-	sprintf(buf, "%d/%s/%d", gd.week+1, LOC(lang, monthnames[gd.month]), gd.year);
-
-	return buf;
-}
-
 static void
 rpsnr(FILE * F, const char * s, int offset)
 {

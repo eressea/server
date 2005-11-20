@@ -1095,6 +1095,7 @@ region_setowner(struct region * r, struct faction * owner)
 #ifdef REGIONOWNERS
   r->owner = owner;
 #else
-  unused(r, owner);
+  unused(r);
+  unused(owner);
 #endif
 }

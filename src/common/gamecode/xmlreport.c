@@ -88,7 +88,7 @@ xml_s(const char * str)
   char * outbuf = buffer;
   size_t inbytes = strlen(str)+1;
   size_t outbytes = sizeof(buffer);
-  iconv(utf8, (const char**)&inbuf, &inbytes, (char**)&outbuf, &outbytes);
+  iconv(utf8, (char**)&inbuf, &inbytes, (char**)&outbuf, &outbytes);
   return (xmlChar*)buffer;
 }
 
