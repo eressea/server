@@ -95,7 +95,7 @@ typedef struct faction {
 	struct unit * units;
 	struct attrib *attribs;
 	struct message_list * msgs;
-#ifdef REGIONOWNERS
+#ifdef ENEMIES
   struct faction_list * enemies;
 #endif
 	struct bmsg {
@@ -124,7 +124,7 @@ extern void destroyfaction(faction * f);
 extern void set_alliance(struct faction * a, struct faction * b, int status);
 extern int get_alliance(const struct faction * a, const struct faction * b);
 
-#ifdef REGIONOWNERS
+#ifdef ENEMIES
 extern boolean is_enemy(const struct faction * f, const struct faction * enemy);
 extern void add_enemy(struct faction * f, struct faction * enemy);
 extern void remove_enemy(struct faction * f, struct faction * enemy);

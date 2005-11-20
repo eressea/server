@@ -1126,10 +1126,10 @@ describe(FILE * F, const region * r, int partial, faction * f)
 	}
 
   {
-    const unit * u = region_owner(r);
-    if (u) {
+    const faction * owner = region_owner(r);
+    if (owner!=NULL) {
       bufp += strxcpy(bufp, " Die Region ist im Besitz von ");
-      bufp += strxcpy(bufp, factionname(u->faction));
+      bufp += strxcpy(bufp, factionname(owner));
       strcpy(bufp++, ".");
     }
   }
@@ -1290,7 +1290,7 @@ statistics(FILE * F, const region * r, const faction * f)
       msg_release(m);
     }
     if (production(r) && (!fval(r->terrain, SEA_REGION) || f->race == new_race[RC_AQUARIAN])) {
-      m = msg_message("nr_stat_salary", "max", fwage(r, f, true));
+      m = msg_message("nr_stat_salary", "max", wage(r, f, f->race));
       nr_render(m, f->locale, buf, sizeof(buf), f);
       rps(F, buf);
       msg_release(m);
@@ -1470,7 +1470,7 @@ report_template(const char * filename, report_context * ctx)
           }
           rps_nowrap(F, buf);
           rnl(F);
-          sprintf(buf,"; ECheck Lohn %d", fwage(r,f,true));
+          sprintf(buf,"; ECheck Lohn %d", wage(r, f, f->race));
           rps_nowrap(F, buf);
           rnl(F);
           rps_nowrap(F, "");
@@ -1655,7 +1655,7 @@ allies(FILE * F, const faction * f)
 	}
 }
 
-#ifdef REGIONOWNERS
+#ifdef ENEMIES
 static void
 enemies(FILE * F, const faction * f)
 {
@@ -2150,7 +2150,7 @@ report_plaintext(const char * filename, report_context * ctx)
 	centre(F, LOC(f->locale, "nr_alliances"), false);
 	rnl(F);
 
-#ifdef REGIONOWNERS
+#ifdef ENEMIES
   enemies(F, f);
 #endif
 	allies(F, f);

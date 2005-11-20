@@ -181,8 +181,8 @@ struct building_type;
 #define REGIONOWNERS_VERSION 400
 #define UGROUPS_VERSION 500 /* nicht aktivieren, nicht fertig */
 
-#ifdef REGIONOWNERS
-# define RELEASE_VERSION REGIONOWNERS_VERSION
+#ifdef ENEMIES
+# define RELEASE_VERSION ENEMIES_VERSION
 #else
 # define RELEASE_VERSION TERRAIN_VERSION
 #endif
@@ -1121,8 +1121,7 @@ extern int lifestyle(const struct unit*);
 extern int besieged(const struct unit * u);
 extern int maxworkingpeasants(const struct region * r);
 
-extern int wage(const struct region *r, const struct unit *u, boolean img);
-extern int fwage(const struct region *r, const struct faction *f, boolean img);
+extern int wage(const struct region *r, const struct faction *f, const struct race * rc);
 extern int movewhere(const struct unit *u, const char * token, struct region * r, struct region** resultp);
 extern struct message * movement_error(struct unit * u, const char * token, struct order * ord, int error_code);
 extern boolean move_blocked(const struct unit * u, const struct region *src, const struct region *dest);
@@ -1159,6 +1158,7 @@ typedef struct settings {
   boolean disabled[MAXKEYWORDS];
   struct param * parameters;
   void * vm_state;
+
 } settings;
 extern settings global;
 

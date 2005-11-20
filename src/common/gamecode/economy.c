@@ -2884,7 +2884,7 @@ expandwork(region * r)
 	/* n: verbleibende Einnahmen */
 	/* m: maximale Arbeiter */
 	int m = maxworkingpeasants(r);
-	int p_wage = wage(r,NULL,false);
+	int p_wage = wage(r, NULL, NULL);
 	int verdienst = 0;
 	request *o;
 
@@ -2902,7 +2902,7 @@ expandwork(region * r)
 
 		assert(workers>=0);
 
-		u->n = workers * wage(u->region, u, false);
+		u->n = workers * wage(u->region, u->faction, u->race);
 
 		m -= workers;
 		assert(m>=0);
@@ -2954,7 +2954,7 @@ work(unit * u, order * ord)
 		cmistake(u, ord, 69, MSG_INCOME);
 		return;
 	}
-	w = wage(r,u,false);
+	w = wage(r, u->faction, u->race);
 	u->wants = u->number * w;
 	o = nextworker++;
 	o->unit = u;

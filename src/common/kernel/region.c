@@ -1002,7 +1002,7 @@ terraform_region(region * r, const terrain_type * terrain)
 		  peasants = MAXPEASANTS_PER_AREA * (rand() % (terrain->size / MAXPEASANTS_PER_AREA / 2));
 #endif
 		  rsetpeasants(r, max(100, peasants));
-		  rsetmoney(r, rpeasants(r) * ((wage(r, NULL, false)+1) + rand() % 5));
+		  rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL)+1) + rand() % 5));
     }
 	}
 }
@@ -1079,24 +1079,22 @@ r_addmessage(struct region * r, const struct faction * viewer, struct message * 
 	return add_message(&imsg->msgs, msg);
 }
 
-struct unit * 
+struct faction * 
 region_owner(const struct region * r)
 {
 #ifdef REGIONOWNERS
-  struct unit * owner = NULL;
-  int maxsize = 0;
-  building * b = r->buildings;
-  for (;b!=NULL;b=b->next) {
-    if (b->size>maxsize) {
-      struct unit * u = buildingowner(r, b);
-      if (u) {
-        owner = u;
-        maxsize=b->size;
-      }
-    }
-  }
-  return owner;
+  return r->owner;
 #else
   return NULL;
+#endif
+}
+
+void
+region_setowner(struct region * r, struct faction * owner)
+{
+#ifdef REGIONOWNERS
+  r->owner = owner;
+#else
+  unused(r, owner);
 #endif
 }

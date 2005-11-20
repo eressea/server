@@ -220,7 +220,7 @@ extern char * strdup(const char *s);
 #endif
 #endif
 
-#define unused(var) var = var
+#define unused(var) (var)
 
 
 /****                      ****

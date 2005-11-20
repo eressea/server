@@ -32,7 +32,7 @@ void demographics(void);
 void last_orders(void);
 void stripunit(struct unit * u);
 void find_address(void);
-void remove_unequipped_guarded(void);
+void update_guards(void);
 
 /* eressea-specific. put somewhere else, please. */
 #include "resolve.h"

@@ -425,11 +425,11 @@ getbuf(FILE * F)
 	return buf;
 }
 
-#ifdef REGIONOWNERS
+#ifdef ENEMIES
 static void
 read_enemies(FILE * F, faction * f)
 {
-  if (global.data_version<REGIONOWNERS_VERSION) return;
+  if (global.data_version<ENEMIES_VERSION) return;
   f->enemies = NULL;
   for (;;) {
     char zText[32];
@@ -448,12 +448,10 @@ read_enemies(FILE * F, faction * f)
 static void
 write_enemies(FILE * F, const faction_list * flist)
 {
-#if RELEASE_VERSION>=REGIONOWNERS_VERSION
   while (flist) {
     fprintf(F, "%s ", itoa36(flist->data->no));
   }
   fputs("end \n", F);
-#endif
 }
 #endif
 
@@ -1666,7 +1664,7 @@ readfaction(FILE * F)
     }
   }
   read_groups(F, f);
-#ifdef REGIONOWNERS
+#ifdef ENEMIES
   read_enemies(F, f);
 #endif
   return f;
@@ -1731,7 +1729,7 @@ writefaction(FILE * F, const faction * f)
 	fprintf(F, "end ");
 	wnl(F);
 	write_groups(F, f->groups);
-#ifdef REGIONOWNERS
+#ifdef ENEMIES
   write_enemies(F, f->enemies);
 #endif
 }

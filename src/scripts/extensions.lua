@@ -1,7 +1,3 @@
-function initfamiliar_lynx(u)
-  print("a lynx is born :-)")
-end
-
 function peasant_getresource(u)
   return u.region:get_resource("peasant")
 end

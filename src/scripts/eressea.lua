@@ -81,6 +81,8 @@ function process(orders)
   spawn_braineaters(0.25)
   plan_monsters()
   process_orders()
+  update_guards()
+  update_scores()
 
   change_locales()
   
@@ -97,6 +99,11 @@ function process(orders)
     print("could not write game")
     return -1
   end
+end
+
+-- demo: how to add a special familiars-constructor
+function initfamiliar_lynx(u)
+  print("a lynx is born ;-)")
 end
 
 

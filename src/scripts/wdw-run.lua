@@ -18,7 +18,8 @@ function process(orders)
   -- (no more braineaters) spawn_braineaters(0.25)
   plan_monsters()
   process_orders()
-  outfile = "" .. get_turn()
+  update_guards()
+  update_scores()
 
   -- write out the initial reports (no need to run a turn)
   write_passwords()
@@ -28,6 +29,7 @@ function process(orders)
   write_standings()
 
   -- save the game
+  outfile = "" .. get_turn()
   if write_game(outfile)~=0 then 
     print("could not write game")
     return -1

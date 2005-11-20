@@ -191,13 +191,16 @@ static boolean
 entrance_allowed(const struct unit * u, const struct region * r)
 {
 #ifdef REGIONOWNERS
-  unit * owner = region_owner(r);
-  if (owner == NULL || u->faction == owner->faction) return true;
-  if (alliedunit(owner, u->faction, HELP_TRAVEL)) return true;
-  if (is_enemy(u->faction, owner->faction)) return true;
-  return false;
+  faction * owner = region_owner(r);
+  if (owner == NULL || u->faction == owner) return true;
+  if (alliedfaction(r->planep, owner, u->faction, HELP_TRAVEL)) return true;
+#ifdef ENEMIES
+  if (is_enemy(u->faction, owner)) return true;
 #endif
+  return false;
+#else
   return true;
+#endif
 }
 
 int

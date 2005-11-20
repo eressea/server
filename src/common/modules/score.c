@@ -22,6 +22,7 @@
 #include <config.h>
 #include "eressea.h"
 #ifdef SCORE_MODULE
+#include "score.h"
 
 /* kernel includes */
 #include <kernel/alliance.h>

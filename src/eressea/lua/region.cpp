@@ -4,6 +4,7 @@
 
 // kernel includes
 #include <kernel/building.h>
+#include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
@@ -56,6 +57,16 @@ static const char *
 region_getname(const region& r) {
   if (r.land) return r.land->name;
   return r.terrain->_name;
+}
+
+static void
+lua_region_setowner(region& r, faction * f) {
+  region_setowner(&r, f);
+}
+
+static faction *
+lua_region_getowner(const region& r) {
+  return region_owner(&r);
 }
 
 static void
@@ -244,6 +255,7 @@ bind_region(lua_State * L)
     .def(self == region())
     .property("name", &region_getname, &region_setname)
     .property("info", &region_getinfo, &region_setinfo)
+    .property("owner", &lua_region_getowner, &lua_region_setowner)
     .property("terrain", &region_getterrain)
     .def("add_notice", &region_addnotice)
     .def("add_direction", &region_adddirection)

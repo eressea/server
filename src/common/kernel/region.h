@@ -106,6 +106,9 @@ typedef struct region {
   struct donation * donations;
   const struct terrain_type * terrain;
   struct rawmaterial * resources;
+#ifdef REGIONOWNERS
+  struct faction * owner;
+#endif
 #ifdef FAST_CONNECT
   struct region * connect[MAXDIRECTIONS];
 #endif
@@ -232,7 +235,9 @@ extern int production(const struct region *r);
 extern int read_region_reference(struct region ** r, FILE * F);
 extern void write_region_reference(const struct region * r, FILE * F);
 
-extern struct unit * region_owner(const struct region * r);
+void region_setowner(struct region * r, struct faction * owner);
+extern struct faction * region_owner(const struct region * r);
+
 extern struct region * r_connect(const struct region *, direction_t dir);
 #ifdef FAST_CONNECT
 # define rconnect(r, dir) ((r)->connect[dir]?(r)->connect[dir]:r_connect(r, dir))

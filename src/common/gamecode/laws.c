@@ -2764,7 +2764,7 @@ instant_orders(void)
 /* Beachten: einige Monster sollen auch unbewaffent die Region bewachen
  * können */
 void
-remove_unequipped_guarded(void)
+update_guards(void)
 {
   region *r;
   unit *u;
@@ -3038,7 +3038,7 @@ evict(void)
 }
 #endif
 
-#ifdef REGIONOWNERS
+#ifdef ENEMIES
 static void
 declare_war(void)
 {
@@ -4037,7 +4037,7 @@ processorders (void)
 #ifdef ALLIANCEJOIN
   alliancejoin();
 #endif
-#ifdef REGIONOWNERS
+#ifdef ENEMIES
   puts(" - Krieg & Frieden");
   declare_war();
 #endif

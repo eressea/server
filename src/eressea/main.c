@@ -268,7 +268,7 @@ processturn(char *filename)
     autoseed(&players, k, true);
   }
 	score();
-	remove_unequipped_guarded();
+	update_guards();
 	if (!noreports) reports();
 	free_units();
 	puts(" - Beseitige leere Parteien");

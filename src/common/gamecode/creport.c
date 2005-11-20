@@ -866,7 +866,7 @@ show_allies(FILE * F, const faction * f, const ally * sf)
 	}
 }
 
-#ifdef REGIONOWNERS
+#ifdef ENEMIES
 static void
 show_enemies(FILE * F, const faction_list* flist)
 {
@@ -1137,7 +1137,7 @@ report_computer(const char * filename, report_context * ctx)
 	for (i=0;i!=MAXOPTIONS;++i) {
 		fprintf(F, "%d;%s\n", (f->options&want(i))?1:0, options[i]);
 	}
-#ifdef REGIONOWNERS
+#ifdef ENEMIES
   show_enemies(F, f->enemies);
 #endif
 	show_allies(F, f, f->allies);
@@ -1237,9 +1237,9 @@ report_computer(const char * filename, report_context * ctx)
     if (sd->mode!=see_unit) fprintf(F, "\"%s\";visibility\n", visibility[sd->mode]);
 
     {
-      unit * owner = region_owner(r);
+      faction * owner = region_owner(r);
       if (owner) {
-        fprintf(F, "%d;owner\n", owner->faction->no);
+        fprintf(F, "%d;owner\n", owner->no);
       }
     }
 		if (sd->mode == see_neighbour) {
@@ -1285,7 +1285,7 @@ report_computer(const char * filename, report_context * ctx)
 						fprintf(F, "%d;Rekruten\n", rpeasants(r) / RECRUITFRACTION);
 					}
 					if (production(r)) {
-						fprintf(F, "%d;Lohn\n", fwage(r, f, true));
+						fprintf(F, "%d;Lohn\n", wage(r, NULL, NULL));
 					}
 
 					while (res) {

@@ -314,7 +314,7 @@ update_interval(struct faction * f, struct region * r)
 }
 #endif
 
-#ifdef REGIONOWNERS
+#ifdef ENEMIES
 boolean
 is_enemy(const struct faction * f, const struct faction * enemy)
 {

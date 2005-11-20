@@ -2784,7 +2784,7 @@ plagues(region * r, boolean ismagic)
 	/* Seuchenwahrscheinlichkeit in % */
 
 	prob = pow((double) rpeasants(r) /
-	  (mwp * (((double)wage(r,NULL,false)) / 10.0) * 1.3), 4.0)
+	  (mwp * (((double)wage(r, NULL, NULL)) / 10.0) * 1.3), 4.0)
 		* (double) SEUCHE;
 
 	if (rand() % 100 >= (int)prob && !ismagic) return;
@@ -2823,43 +2823,46 @@ static const int wagetable[7][4] = {
 	{15, 13, 16,  2}		 	/* Zitadelle */
 };
 
+/* Gibt Arbeitslohn für entsprechende Rasse zurück, oder für
+* die Bauern wenn f == NULL. */
 int
-wage(const region *r, const unit *u, boolean img)
-	/* Gibt Arbeitslohn für entsprechende Rasse zurück, oder für
-	 * die Bauern wenn ra == NORACE. */
+wage(const region *r, const faction * f, const race * rc)
 {
-	building *b = largestbuilding(r, img);
-	int      esize = 0;
-	curse * c;
-	int      wage;
-	attrib	 *a;
+  building *b = largestbuilding(r, false);
+  int      esize = 0;
+  curse * c;
+  int      wage;
+  attrib   *a;
   const building_type *artsculpture_type = bt_find("artsculpture");
-	static const curse_type * drought_ct, * blessedharvest_ct;
-	static boolean init;
+  static const curse_type * drought_ct, * blessedharvest_ct;
+  static boolean init;
 
-	if (!init) {
-		init = true;
-		drought_ct = ct_find("drought");
-		blessedharvest_ct = ct_find("blessedharvest");
-	}
+  if (!init) {
+    init = true;
+    drought_ct = ct_find("drought");
+    blessedharvest_ct = ct_find("blessedharvest");
+  }
 
-	if (b) esize = buildingeffsize(b, img);
+  if (b!=NULL) {
+    /* TODO: this reveals imaginary castles */
+    esize = buildingeffsize(b, false);
+  }
 
-	if (u) {
-		wage = wagetable[esize][u->race == new_race[RC_ORC] || u->race == new_race[RC_SNOTLING] || u->race == new_race[RC_URUK]];
-		if (fspecial(u->faction, FS_URBAN)) {
-			wage += wagetable[esize][3];
-		}
-	} else {
-		if (fval(r->terrain, SEA_REGION)) {
-			wage = 11;
-		} else if (fval(r, RF_ORCIFIED)) {
-			wage = wagetable[esize][1];
-		} else {
-			wage = wagetable[esize][2];
-		}
-		wage += curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
-	}
+  if (f!=NULL) {
+    wage = wagetable[esize][rc == new_race[RC_ORC]];
+    if (fspecial(f, FS_URBAN)) {
+      wage += wagetable[esize][3];
+    }
+  } else {
+    if (fval(r->terrain, SEA_REGION)) {
+      wage = 11;
+    } else if (fval(r, RF_ORCIFIED)) {
+      wage = wagetable[esize][1];
+    } else {
+      wage = wagetable[esize][2];
+    }
+    wage += curse_geteffect(get_curse(r->attribs, blessedharvest_ct));
+  }
 
   /* Artsculpture: Income +5 */
   for(b=r->buildings; b; b=b->next) {
@@ -2868,63 +2871,21 @@ wage(const region *r, const unit *u, boolean img)
     }
   }
 
-	/* Godcurse: Income -10 */
-	if (curse_active(get_curse(r->attribs, ct_find("godcursezone")))) {
-		wage = max(0,wage-10);
-	}
+  /* Godcurse: Income -10 */
+  if (curse_active(get_curse(r->attribs, ct_find("godcursezone")))) {
+    wage = max(0,wage-10);
+  }
 
-	/* Bei einer Dürre verdient man nur noch ein Viertel  */
-	if (drought_ct) {
-		c = get_curse(r->attribs, drought_ct);
-		if (curse_active(c)) wage /= curse_geteffect(c);
-	}
+  /* Bei einer Dürre verdient man nur noch ein Viertel  */
+  if (drought_ct) {
+    c = get_curse(r->attribs, drought_ct);
+    if (curse_active(c)) wage /= curse_geteffect(c);
+  }
 
-	a = a_find(r->attribs, &at_reduceproduction);
-	if (a) wage = (wage * a->data.sa[0])/100;
+  a = a_find(r->attribs, &at_reduceproduction);
+  if (a) wage = (wage * a->data.sa[0])/100;
 
-	return wage;
-}
-
-int
-fwage(const region *r, const faction *f, boolean img)
-{
-	building *b = largestbuilding(r, img);
-	int      esize = 0;
-	int      wage;
-	attrib   *a;
-	curse * c;
-
-	if (b) esize = buildingeffsize(b, img);
-
-	if (f) {
-		wage = wagetable[esize][f->race == new_race[RC_ORC]];
-		if (fspecial(f, FS_URBAN)) {
-			wage += wagetable[esize][3];
-		}
-	} else {
-		if (fval(r->terrain, SEA_REGION)) {
-			wage = 11;
-		} else if (fval(r, RF_ORCIFIED)) {
-			wage = wagetable[esize][1];
-		} else {
-			wage = wagetable[esize][2];
-		}
-		wage += curse_geteffect(get_curse(r->attribs, ct_find("blessedharvest")));
-	}
-
-	/* Godcurse: Income -10 */
-	if (curse_active(get_curse(r->attribs, ct_find("godcursezone")))) {
-		wage = max(0,wage-10);
-	}
-
-	/* Bei einer Dürre verdient man nur noch ein Viertel  */
-	c = get_curse(r->attribs, ct_find("drought"));
-	if (curse_active(c)) wage /= curse_geteffect(c);
-
-	a = a_find(r->attribs, &at_reduceproduction);
-	if (a) wage = (wage * a->data.sa[0])/100;
-
-	return wage;
+  return wage;
 }
 
 static region *

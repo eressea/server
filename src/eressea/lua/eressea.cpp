@@ -6,6 +6,7 @@
 
 #include <attributes/key.h>
 #include <modules/autoseed.h>
+#include <modules/score.h>
 
 // gamecode includes
 #include <gamecode/laws.h>
@@ -219,6 +220,40 @@ lua_equipunit(unit& u, const char * eqname)
 }
 
 static void
+update_subscriptions(void)
+{
+  FILE * F;
+  char zText[MAX_PATH];
+  faction * f;
+  strcat(strcpy(zText, basepath()), "/subscriptions");
+  F = fopen(zText, "r");
+  if (F==NULL) {
+    log_info((0, "could not open %s.\n", zText));
+    return;
+  }
+  for (;;) {
+    char zFaction[5];
+    int subscription, fno;
+    if (fscanf(F, "%d %s", &subscription, zFaction)<=0) break;
+    fno = atoi36(zFaction);
+    f = findfaction(fno);
+    if (f!=NULL) {
+      f->subscription=subscription;
+    }
+  }
+  fclose(F);
+
+  sprintf(zText, "subscriptions.%u", turn);
+  F = fopen(zText, "w");
+  for (f=factions;f!=NULL;f=f->next) {
+    fprintf(F, "%s:%u:%s:%s:%s:%u:\n",
+      itoa36(f->no), f->subscription, f->email, f->override,
+      dbrace(f->race), f->lastorders);
+  }
+  fclose(F);
+}
+
+static void
 lua_learnskill(unit& u, const char * skname, float chances)
 {
   skill_t sk = sk_find(skname);
@@ -247,6 +282,10 @@ bind_eressea(lua_State * L)
     def("equipment_setitem", &lua_addequipment),
     def("get_turn", &get_turn),
     def("remove_empty_units", &remove_empty_units),
+
+    def("update_subscriptions", &update_subscriptions),
+    def("update_guards", &update_guards),
+    def("update_scores", &score),
 
     def("equip_unit", &lua_equipunit),
     def("learn_skill", &lua_learnskill),
