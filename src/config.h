@@ -220,8 +220,15 @@ extern char * strdup(const char *s);
 #endif
 #endif
 
-#define unused(var) (var)
-
+#if defined (ghs) || defined (__GNUC__) || defined (__hpux) || defined (__sgi) || defined (__DECCXX) || defined (__KCC) || defined (__rational__) || defined (__USLC__) || defined (ACE_RM544)
+// Some compilers complain about "statement with no effect" with (a).
+// This eliminates the warnings, and no code is generated for the null
+// conditional statement.  NOTE: that may only be true if -O is enabled,
+// such as with GreenHills (ghs) 1.8.8.
+# define unused(a) do {/* null */} while (&a == 0)
+#else /* ghs || __GNUC__ || ..... */
+# define unused(a) (a)
+#endif /* ghs || __GNUC__ || ..... */
 
 /****                      ****
  ** The Eressea boolean type **
