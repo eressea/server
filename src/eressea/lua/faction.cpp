@@ -242,6 +242,25 @@ faction_setorigin(faction& f, int x, int y)
   y = 0;
 }
 
+int 
+faction_getorigin_x(const faction& f) {
+  return f.ursprung->x;
+}
+void
+faction_setorigin_x(faction& f, int x) {
+  f.ursprung->x = x;
+}
+
+int 
+faction_getorigin_y(const faction& f) {
+  return f.ursprung->y;
+}
+void
+faction_setorigin_y(faction& f, int y) {
+  f.ursprung->y = y;
+}
+
+
 void
 bind_faction(lua_State * L) 
 {
@@ -268,6 +287,8 @@ bind_faction(lua_State * L)
 
     .def("add_item", &faction_additem)
     .property("items", &faction_items, return_stl_iterator)
+    .property("x", &faction_getorigin_x, &faction_setorigin_x)
+    .property("y", &faction_getorigin_y, &faction_setorigin_y)
     //.property("origin", &faction_getorigin, &faction_setorigin, pure_out_value(_2) + pure_out_value(_3), copy)
 
     .def("add_notice", &faction_addnotice)
