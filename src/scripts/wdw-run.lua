@@ -24,6 +24,8 @@ function process(orders)
   -- write out the initial reports (no need to run a turn)
   write_passwords()
   write_reports()
+  write_emails()
+  write_summary()
 
   -- siegbedingungen ausgeben
   write_standings()
