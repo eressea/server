@@ -1301,10 +1301,12 @@ init_oldpotions(void)
 
   for (p=0;p!=MAXPOTIONS;++p) {
     item_type * itype = it_find(potionnames[p]);
-    if (potiontext[p]) {
-      locale_setstring(default_locale, mkname("potion", potionnames[p]), potiontext[p]);
+    if (itype!=NULL) {
+      if (potiontext[p]) {
+        locale_setstring(default_locale, mkname("potion", potionnames[p]), potiontext[p]);
+      }
+      oldpotiontype[p] = itype->rtype->ptype;
     }
-    oldpotiontype[p] = itype->rtype->ptype;
 	}
 }
 
