@@ -1875,7 +1875,7 @@ buy(unit * u, request ** buyorders, struct order * ord)
 
 	if (u->race == new_race[RC_INSECT]) {
 		/* entweder man ist insekt, oder... */
-		if (rterrain(r) != T_SWAMP && rterrain(r) != T_DESERT && !rbuildings(r)) {
+		if (r->terrain != newterrain(T_SWAMP) && rterrain(r) != T_DESERT && !rbuildings(r)) {
 			cmistake(u, ord, 119, MSG_COMMERCE);
 			return;
 		}
@@ -2165,7 +2165,7 @@ sell(unit * u, request ** sellorders, struct order * ord)
 	/* In der Region muß es eine Burg geben. */
 
 	if (u->race == new_race[RC_INSECT]) {
-		if (rterrain(r) != T_SWAMP && rterrain(r) != T_DESERT && !rbuildings(r)) {
+		if (r->terrain != newterrain(T_SWAMP) && rterrain(r) != T_DESERT && !rbuildings(r)) {
 			cmistake(u, ord, 119, MSG_COMMERCE);
 			return false;
 		}

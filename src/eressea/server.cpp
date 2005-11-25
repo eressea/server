@@ -457,23 +457,23 @@ usage(const char * prog, const char * arg)
 static void
 setLuaString(lua_State * luaState, const char * name, const char * value)
 {
-#ifdef LUBIND_OLD
-  luabind::object globals = luabind::get_globals(luaState);
+#ifdef LUABIND_OLD
+  luabind::object g = luabind::get_globals(luaState);
 #else
-  luabind::object globals = luabind::globals(luaState);
+  luabind::object g = luabind::globals(luaState);
 #endif
-  globals[name] = value;
+  g[name] = value;
 }
 
 static void
 setLuaNumber(lua_State * luaState, const char * name, double value)
 {
-#if BOOST_VERSION > 103002
-  luabind::object globals = luabind::globals(luaState);
+#ifdef LUABIND_OLD
+  luabind::object g = luabind::get_globals(luaState);
 #else
-  luabind::object globals = luabind::get_globals(luaState);
+  luabind::object g = luabind::globals(luaState);
 #endif
-  globals[name] = value;
+  g[name] = value;
 }
 
 static int

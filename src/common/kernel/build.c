@@ -460,7 +460,6 @@ void
 build_road(region * r, unit * u, int size, direction_t d)
 {
   int n, left;
-  terrain_t rt = rterrain(r);
   region * rn = rconnect(r,d);
 
   if (!eff_skill(u, SK_ROAD_BUILDING, r)) {
@@ -482,7 +481,7 @@ build_road(region * r, unit * u, int size, direction_t d)
     return;
   }
 
-  if (rt == T_SWAMP) {
+  if (r->terrain == newterrain(T_SWAMP)) {
     /* wenn kein Damm existiert */
     static const struct building_type * bt_dam;
     if (!bt_dam) bt_dam = bt_find("dam");
@@ -491,7 +490,7 @@ build_road(region * r, unit * u, int size, direction_t d)
       cmistake(u, u->thisorder, 132, MSG_PRODUCE);
       return;
     }
-  } else if (rt == T_DESERT) {
+  } else if (r->terrain == newterrain(T_DESERT)) {
     static const struct building_type * bt_caravan;
     if (!bt_caravan) bt_caravan = bt_find("caravan");
     assert(bt_caravan);
@@ -500,7 +499,7 @@ build_road(region * r, unit * u, int size, direction_t d)
       cmistake(u, u->thisorder, 133, MSG_PRODUCE);
       return;
     }
-  } else if (rt == T_GLACIER) {
+  } else if (r->terrain == newterrain(T_GLACIER)) {
     static const struct building_type * bt_tunnel;
     if (!bt_tunnel) bt_tunnel = bt_find("tunnel");
     assert(bt_tunnel);

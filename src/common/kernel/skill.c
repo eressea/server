@@ -176,15 +176,14 @@ skill_mod(const race * rc, skill_t sk, const struct terrain_type * terrain)
 
   if (rc == new_race[RC_DWARF]) {
     if (sk==SK_TACTICS) {
-      terrain_t t = oldterrain(terrain);
-      if (t == T_MOUNTAIN || t == T_GLACIER || t == T_ICEBERG_SLEEP) ++result;
+      if (terrain == newterrain(T_MOUNTAIN) || fval(terrain, ARCTIC_REGION))
+        ++result;
     }
   }
 	else if (rc == new_race[RC_INSECT]) {
-    terrain_t t = oldterrain(terrain);
-		if (t == T_MOUNTAIN || t == T_GLACIER || t == T_ICEBERG_SLEEP || t == T_ICEBERG)
+		if (terrain == newterrain(T_MOUNTAIN) || fval(terrain, ARCTIC_REGION))
 			--result;
-		else if (t == T_DESERT || t == T_SWAMP)
+		else if (terrain == newterrain(T_DESERT) || terrain == newterrain(T_SWAMP))
 			++result;
 	}
 	

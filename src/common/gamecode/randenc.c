@@ -1379,7 +1379,7 @@ randomevents(void)
 			set_string(&u->name, "Seeschlange");
 		}
 
-		if ((rterrain(r) == T_GLACIER || rterrain(r) == T_SWAMP || rterrain(r) == T_DESERT) && rand() % 10000 < (5 + 100 * chaosfactor(r))) 
+		if ((rterrain(r) == T_GLACIER || r->terrain == newterrain(T_SWAMP) || rterrain(r) == T_DESERT) && rand() % 10000 < (5 + 100 * chaosfactor(r))) 
     {
       if (chance(0.80)) {
 				u = createunit(r, findfaction(MONSTER_FACTION), nrand(60, 20) + 1, new_race[RC_FIREDRAGON]);

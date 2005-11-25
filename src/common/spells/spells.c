@@ -1523,7 +1523,7 @@ sp_create_irongolem(castorder *co)
   int number = lovar(force*8*RESOURCE_QUANTITY);
   if (number<1) number = 1;
 
-  if (rterrain(r) == T_SWAMP) {
+  if (r->terrain == newterrain(T_SWAMP)) {
 		cmistake(mage, co->order, 188, MSG_MAGIC);
 		return 0;
 	}
@@ -1585,7 +1585,7 @@ sp_create_stonegolem(castorder *co)
   int number = lovar(co->force*5*RESOURCE_QUANTITY);
   if (number<1) number = 1;
 
-	if (rterrain(r) == T_SWAMP) {
+	if (r->terrain == newterrain(T_SWAMP)) {
 		cmistake(mage, co->order, 188, MSG_MAGIC);
 		return 0;
 	}
@@ -1724,7 +1724,7 @@ sp_great_drought(castorder *co)
 					cansee(u->faction, r, mage, 0)? unitname(mage) : "Jemand",
 					regionname(r, u->faction));
 			if (!fval(r->terrain, SEA_REGION)){
-				if(rterrain(r) == T_SWAMP && terraform){
+        if (r->terrain == newterrain(T_SWAMP) && terraform) {
 						scat(" Eis schmilzt und verwandelt sich in Morast. Reißende "
 								"Ströme spülen die mageren Felder weg und ersäufen "
 								"Mensch und Tier. Was an Bauten nicht den Fluten zum Opfer "
@@ -2676,7 +2676,7 @@ sp_summondragon(castorder *co)
 
 	f = findfaction(MONSTER_FACTION);
 
-	if(rterrain(r) != T_SWAMP && rterrain(r) != T_DESERT
+	if (r->terrain != newterrain(T_SWAMP) && rterrain(r) != T_DESERT
 			&& rterrain(r) != T_GLACIER){
 		report_failure(mage, co->order);
 		return 0;

@@ -687,7 +687,7 @@ road_decay(void)
 
   for (r=regions;r;r=r->next) {
     boolean half = false;
-    if (rterrain(r) == T_SWAMP) {
+    if (r->terrain == newterrain(T_SWAMP)) {
       /* wenn kein Damm existiert */
       if (!buildingtype_exists(r, bt_dam)) {
         half = true;

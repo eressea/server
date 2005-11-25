@@ -565,7 +565,6 @@ race_compat(void)
       }
     } else {
       log_error(("could not find old race %s\n", oldracenames[i]));
-      assert(rc);
     }
   }
 }
