@@ -25,9 +25,9 @@ function run_scripts()
   scripts = { 
     "spells.lua",
     "extensions.lua",
-    "eternath.lua",
-    "wedding-jadee.lua", 
-    "ponnuki.lua"
+    "eressea/eternath.lua",
+    "eressea/wedding-jadee.lua", 
+    "eressea/ponnuki.lua"
   }
   for index in scripts do
     loadscript(scripts[index])
@@ -69,7 +69,7 @@ function process(orders)
   init_summary()
 
   -- kill multi-players (external script)
-  loadscript("eressea-multis.lua")
+  loadscript("eressea/multis.lua")
 
   -- run the turn:
   if read_orders(orders) ~= 0 then

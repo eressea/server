@@ -1,16 +1,8 @@
-function run_scripts()
-  scripts = { 
-    "spells.lua",
-    "extensions.lua",
-    "hse/portals.lua",
-    "hse/stats.lua"
-  }
-  for index in scripts do
-    local script = scriptpath .. "/" .. scripts[index]
-    print("- loading " .. script)
-    if pcall(dofile, script)==0 then
-      print("Could not load " .. script)
-    end
+function loadscript(name)
+  local script = scriptpath .. "/" .. name
+  print("- loading " .. script)
+  if pcall(dofile, script)==0 then
+    print("Could not load " .. script)
   end
 end
 
@@ -34,9 +26,22 @@ function write_emails()
   end
 end
 
-function refresh_pool()
-  for f in factions() do
-    f:add_item("money", 50)
+function update_owners()
+-- update the region's owners. currently uses the owner of
+-- the largest castle.
+  local r
+  for r in regions() do
+    local lb = nil
+    for b in r.buildings do
+      if b.type=="castle" and (lb==nil or b.size>lb.size) then
+        lb = b
+      end
+    end
+    local u
+    u = b.units()
+    if u~=nil and u.faction~=r.owner then
+      r.owner = u.faction
+    end
   end
 end
 
@@ -46,29 +51,28 @@ function process(orders)
     print("could not read game")
     return -1
   end
+  init_summary()
 
   -- run the turn:
-  read_orders(orders)
-  run_scripts()
+  read_orders(orders)  
 
-  spawn_braineaters(0.25)
-  plan_monsters()
+  -- DISABLED: plan_monsters()
   process_orders()
+  update_owners()
   
-  refresh_pool()
-  
+  -- use newfactions file to place out new players
+  autoseed(basepath .. "/newfactions", true)
+
   write_passwords()
   write_reports()
-
   write_emails()
+  write_summary()
 
   file = "" .. get_turn()
   if write_game(file)~=0 then 
     print("could not write game")
     return -1
   end
-
-  write_stats("grails.txt")
 end
 
 
@@ -80,6 +84,9 @@ end
 if orderfile==nil then
   print "you must specify an orderfile"
 else
+  -- loadscript("spells.lua")
+  loadscript("extensions.lua")
+  loadscript("kingdoms/extensions.lua")
   process(orderfile)
 end
 

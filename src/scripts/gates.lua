@@ -1,3 +1,6 @@
+-- implements gates and travel between them
+-- used in HSE and Eressea
+
 function gate_travel(b, units)
   -- we've found which units we want to exchange, now swap them:
   local u

@@ -1,6 +1,6 @@
-dofile(scriptpath .. "/hse-grails.lua")
-dofile(scriptpath .. "/hse-spoils.lua")
-dofile(scriptpath .. "/hse-buildings.lua")
+dofile(scriptpath .. "/hse/grails.lua")
+dofile(scriptpath .. "/hse/spoils.lua")
+dofile(scriptpath .. "/hse/buildings.lua")
 
 function write_stats(filename)
   local file = io.open(reportpath .. "/" .. filename, "w")
