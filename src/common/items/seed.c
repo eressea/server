@@ -52,12 +52,12 @@ init_seed(void)
   resource_limit * rdata;
 
 	rt_seed = rt_find("seed");
-  assert(rt_seed!=NULL);
-
-	a = a_add(&rt_seed->attribs, a_new(&at_resourcelimit));
-	rdata = (resource_limit*)a->data.v;
-	rdata->limit = limit_seeds;
-	rdata->use = produce_seeds;
+  if (rt_seed!=NULL) {
+    a = a_add(&rt_seed->attribs, a_new(&at_resourcelimit));
+    rdata = (resource_limit*)a->data.v;
+    rdata->limit = limit_seeds;
+    rdata->use = produce_seeds;
+  }
 }
 
 /* mallorn */
