@@ -11,11 +11,14 @@
 */
 
 #include <config.h>
+#include <boost/version.hpp>
+#include <lua.hpp>
 #include "eressea.h"
 #include "script.h"
 
 // kernel includes
 #include <kernel/equipment.h>
+#include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -26,8 +29,6 @@
 #include <util/attrib.h>
 #include <util/functions.h>
 
-#include <boost/version.hpp>
-#include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/object.hpp>
 
@@ -192,8 +193,8 @@ bool
 is_function(struct lua_State * luaState, const char * fname)
 {
 #ifndef LUABIND_OLD
-  object globals = globals(luaState);
-  object fun = globals[fname];
+  object g = globals(luaState);
+  object fun = g[fname];
   if (fun.is_valid()) {
     if (type(fun)==LUA_TFUNCTION) {
       return true;
@@ -201,8 +202,8 @@ is_function(struct lua_State * luaState, const char * fname)
     log_warning(("Lua global object %s is not a function, type is %u\n", fname, type(fun)));
   }
 #else
-  object globals = get_globals(luaState);
-  object fun = globals[fname];
+  object g = get_globals(luaState);
+  object fun = g[fname];
   if (fun.is_valid()) {
     if (fun.type()==LUA_TFUNCTION) {
       return true;
@@ -257,7 +258,8 @@ lua_wage(const region * r, const faction * f, const race * rc)
 
   assert(interface.wage);
   try {
-    retval = object_cast<int>(interface.wage->operator()(r, f, rc));
+    object o = interface.wage->operator()(r, f, rc);
+    retval = object_cast<int>(o);
   }
   catch (error& e) {
     lua_State* L = e.state();
@@ -276,7 +278,8 @@ lua_maintenance(const unit * u)
   assert(interface.maintenance);
 
   try {
-    retval = object_cast<int>(interface.maintenance->operator()(u));
+    object o = interface.maintenance->operator()(u);
+    retval = object_cast<int>(o);
   }
   catch (error& e) {
     lua_State* L = e.state();
