@@ -35,10 +35,11 @@ variant
 opstack_pop(opstack ** stackp)
 {
   opstack * stack = *stackp;
+  variant v = *(--stack->top);
   
   assert(stack);
   assert(stack->top>stack->begin);
-	return *(--stack->top);
+  return v;
 }
 
 void

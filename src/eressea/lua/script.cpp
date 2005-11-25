@@ -191,7 +191,7 @@ lua_changeresource(unit * u, const struct resource_type * rtype, int delta)
 bool
 is_function(struct lua_State * luaState, const char * fname)
 {
-#if BOOST_VERSION > 103002
+#ifndef LUABIND_OLD
   object globals = globals(luaState);
   object fun = globals[fname];
   if (fun.is_valid()) {
