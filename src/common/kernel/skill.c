@@ -75,10 +75,28 @@ static const char *skillnames[MAXSKILLS] =
 	"unarmed"
 };
 
+static boolean skill_enabled[MAXSKILLS];
+
 const char * 
 skillname(skill_t sk, const struct locale * lang)
 {
-	return locale_string(lang, mkname("skill", skillnames[sk]));
+  if (skill_enabled[sk]) {
+    return locale_string(lang, mkname("skill", skillnames[sk]));
+  }
+  return NULL;
+}
+
+void
+enable_skill(const char * skname, boolean value)
+{
+  skill_t sk;
+  for (sk=0;sk!=MAXSKILLS) {
+    if (strcmp(skillnames[sk], skname)==0) {
+      skill_enabled[sk] = value;
+      return;
+    }
+  }
+  log_error(("Trying to set unknown skill %s to %u", skname, value));
 }
 
 skill_t
@@ -88,7 +106,9 @@ sk_find(const char * name)
 	if (name==NULL) return NOSKILL;
   if (strncmp(name, "sk_", 3)==0) name+=3;
 	for (i=0;i!=MAXSKILLS;++i) {
-		if (strcmp(name, skillnames[i])==0) return i;
+    if (skill_enabled[i]) {
+      if (strcmp(name, skillnames[i])==0) return i;
+    }
 	}
 	return NOSKILL;
 }

@@ -23,6 +23,37 @@
     <order name="EMAIL" disable="yes"></order>
     <order name="MEINUNG" disable="yes"></order>
     <order name="MAGIEGEBIET" disable="yes"></order>
+
+    <skill name="alchemy" enable="true"/>
+    <skill name="crossbow" enable="true"/>
+    <skill name="mining" enable="true"/>
+    <skill name="bow" enable="true"/>
+    <skill name="building" enable="true"/>
+    <skill name="trade" enable="true"/>
+    <skill name="forestry" enable="true"/>
+    <skill name="catapult" enable="true"/>
+    <skill name="herbalism" enable="true"/>
+    <skill name="magic" enable="true"/>
+    <skill name="training" enable="true"/>
+    <skill name="riding" enable="true"/>
+    <skill name="armorer" enable="true"/>
+    <skill name="shipcraft" enable="true"/>
+    <skill name="melee" enable="true"/>
+    <skill name="sailing" enable="true"/>
+    <skill name="polearm" enable="true"/>
+    <skill name="espionage" enable="true"/>
+    <skill name="quarrying" enable="true"/>
+    <skill name="roadwork" enable="true"/>
+    <skill name="tactics" enable="true"/>
+    <skill name="stealth" enable="true"/>
+    <skill name="entertainment" enable="true"/>
+    <skill name="weaponsmithing" enable="true"/>
+    <skill name="cartmaking" enable="true"/>
+    <skill name="perception" enable="true"/>
+    <skill name="taxation" enable="true"/>
+    <skill name="stamina" enable="true"/>
+    <skill name="unarmed" enable="true"/>
+
     <param name="entertain.base" value="0"></param>
     <param name="entertain.perlevel" value="20"></param>
     <param name="nmr.timeout" value="2"></param>

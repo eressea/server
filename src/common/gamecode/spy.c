@@ -396,12 +396,10 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 	const char *spy_discovered_msg = "%s entdeckte %s beim versenken von %s.";
 	unit **ui;
 	region *safety = r;
-	faction *f;
 	int i;
 	direction_t d;
 	unsigned int index;
 	double probability = 0.0;
-	int money, count;
 	char buffer[DISPLAYSIZE + 1];
 	vset informed;
 	vset survivors;
@@ -469,23 +467,22 @@ sink_ship(region * r, ship * sh, const char *name, char spy, unit * saboteur)
 	 * amount: */
 	while (informed.size != 0) {
 		unit *lastunit = 0;
+    int money = 0, maintain = 0;
+		faction * f = (faction *) informed.data[0];
 
-		f = (faction *) informed.data[0];
-		money = 0;
-		count = 0;
-		/* find out how much money this faction still has: */
+    /* find out how much money this faction still has: */
 		for (index = 0; index != survivors.size; ++index) {
 			unit *u = (unit *) survivors.data[index];
 
 			if (u->faction == f) {
-				count += u->number;
+				maintain += maintenance_cost(u);
 				money += get_money(u);
 				lastunit = u;
 			}
 		}
 		/* 'money' shall be the maintenance-surplus of the survivng
 		 * units: */
-		money = money - count * MAINTENANCE;
+		money = money - maintain;
 		for (index = 0; money > 0; ++index) {
 			int remove;
 			unit *u = (unit *) survivors.data[index];

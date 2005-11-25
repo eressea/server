@@ -59,14 +59,15 @@
 #include "unit.h"
 
 /* util includes */
-#include <base36.h>
-#include <event.h>
-#include <umlaut.h>
-#include <translation.h>
-#include <crmessage.h>
-#include <log.h>
-#include <sql.h>
-#include <xml.h>
+#include <util/base36.h>
+#include <util/crmessage.h>
+#include <util/event.h>
+#include <util/functions.h>
+#include <util/log.h>
+#include <util/sql.h>
+#include <util/translation.h>
+#include <util/umlaut.h>
+#include <util/xml.h>
 
 /* libxml includes */
 #include <libxml/tree.h>
@@ -2334,8 +2335,11 @@ init_locale(const struct locale * lang)
 	}
 	for (i=0;i!=MAXSKILLS;++i) {
 		if (i!=SK_TRADE || !TradeDisabled()) {
-      var.i = i;
-			addtoken(&lnames->skillnames, skillname((skill_t)i, lang), var);
+      const char * skname = skillname((skill_t)i, lang);
+      if (skname!=NULL) {
+        var.i = i;
+        addtoken(&lnames->skillnames, skname, var);
+      }
 		}
 	}
   for (i=0;i!=MAXKEYWORDS;++i) {
@@ -2709,7 +2713,7 @@ lifestyle(const unit * u)
 
 	if (u->faction->no == MONSTER_FACTION) return 0;
 
-	need = u->number * u->race->maintenance;
+	need = maintenance_cost(u);
 
 	if (!astralspace) {
 		astralspace = getplanebyname("Astralraum");
@@ -2823,10 +2827,8 @@ static const int wagetable[7][4] = {
 	{15, 13, 16,  2}		 	/* Zitadelle */
 };
 
-/* Gibt Arbeitslohn für entsprechende Rasse zurück, oder für
-* die Bauern wenn f == NULL. */
-int
-wage(const region *r, const faction * f, const race * rc)
+static int
+default_wage(const region *r, const faction * f, const race * rc)
 {
   building *b = largestbuilding(r, false);
   int      esize = 0;
@@ -2888,6 +2890,18 @@ wage(const region *r, const faction * f, const race * rc)
   return wage;
 }
 
+/* Gibt Arbeitslohn für entsprechende Rasse zurück, oder für
+* die Bauern wenn f == NULL. */
+int
+wage(const region *r, const faction * f, const race * rc)
+{
+  if (global.functions.wage) {
+    return global.functions.wage(r, f, rc);
+  }
+  return default_wage(r, f, rc);
+}
+
+
 static region *
 findspecialdirection(const region *r, const char *token)
 {
@@ -2904,6 +2918,18 @@ findspecialdirection(const region *r, const char *token)
   }
 
   return NULL;
+}
+
+#define MAINTENANCE 10
+int
+maintenance_cost(const struct unit * u)
+{
+  if (u==NULL) return MAINTENANCE;
+  if (global.functions.maintenance) {
+    int retval = global.functions.maintenance(u);
+    if (retval>=0) return retval;
+  }
+  return u->race->maintenance * u->number;
 }
 
 message *

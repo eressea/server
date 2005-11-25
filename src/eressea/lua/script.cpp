@@ -29,14 +29,17 @@
 #include <boost/version.hpp>
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
+#include <luabind/object.hpp>
 
 #include <cstdio>
 #include <cstring>
 
+using namespace luabind;
+
 static void 
 free_script(attrib * a) {
   if (a->data.v!=NULL) {
-    luabind::object * f = (luabind::object *)a->data.v;
+    object * f = (object *)a->data.v;
     delete f;
   }
 }
@@ -53,11 +56,11 @@ call_script(struct unit * u)
   const attrib * a = a_findc(u->attribs, &at_script);
   if (a==NULL) a = a_findc(u->race->attribs, &at_script);
   if (a!=NULL && a->data.v!=NULL) {
-    luabind::object * func = (luabind::object *)a->data.v;
+    object * func = (object *)a->data.v;
     try {	
       func->operator()(u);
     }
-    catch (luabind::error& e) {
+    catch (error& e) {
       lua_State* L = e.state();
       const char* error = lua_tostring(L, -1);
       log_error((error));
@@ -75,7 +78,7 @@ setscript(struct attrib ** ap, void * fptr)
   if (a == NULL) {
     a = a_add(ap, a_new(&at_script));
   } else if (a->data.v!=NULL) {
-    luabind::object * f = (luabind::object *)a->data.v;
+    object * f = (object *)a->data.v;
     delete f;
   }
   a->data.v = fptr;
@@ -96,9 +99,9 @@ lua_callspell(castorder *co)
   lua_State * L = (lua_State *)global.vm_state;
   if (is_function(L, fname)) {
     try {
-      retval = luabind::call_function<int>(L, fname, co->rt, mage, co->level, co->force);
+      retval = call_function<int>(L, fname, co->rt, mage, co->level, co->force);
     }
-    catch (luabind::error& e) {
+    catch (error& e) {
       lua_State* L = e.state();
       const char* error = lua_tostring(L, -1);
       log_error(("An exception occured while %s tried to call '%s': %s.\n",
@@ -121,9 +124,9 @@ lua_useitem(struct unit * u, const struct item_type * itype, int amount, struct 
   lua_State * L = (lua_State *)global.vm_state;
   if (is_function(L, fname)) {
     try {
-      retval = luabind::call_function<int>(L, fname, u, amount);
+      retval = call_function<int>(L, fname, u, amount);
     }
-    catch (luabind::error& e) {
+    catch (error& e) {
       lua_State* L = e.state();
       const char* error = lua_tostring(L, -1);
       log_error(("An exception occured while %s tried to call '%s': %s.\n",
@@ -145,9 +148,9 @@ lua_initfamiliar(unit * u)
   lua_State * L = (lua_State *)global.vm_state;
   if (is_function(L, fname)) {
     try {
-      luabind::call_function<int>(L, fname, u);
+      call_function<int>(L, fname, u);
     }
-    catch (luabind::error& e) {
+    catch (error& e) {
       lua_State* L = e.state();
       const char* error = lua_tostring(L, -1);
       log_error(("An exception occured while %s tried to call '%s': %s.\n",
@@ -171,9 +174,9 @@ lua_changeresource(unit * u, const struct resource_type * rtype, int delta)
   lua_State * L = (lua_State *)global.vm_state;
   if (is_function(L, fname)) {
     try {
-      retval = luabind::call_function<int>(L, fname, u, delta);
+      retval = call_function<int>(L, fname, u, delta);
     }
-    catch (luabind::error& e) {
+    catch (error& e) {
       lua_State* L = e.state();
       const char* error = lua_tostring(L, -1);
       log_error(("An exception occured while %s tried to call '%s': %s.\n",
@@ -189,17 +192,17 @@ bool
 is_function(struct lua_State * luaState, const char * fname)
 {
 #if BOOST_VERSION > 103002
-  luabind::object globals = luabind::globals(luaState);
-  luabind::object fun = globals[fname];
+  object globals = globals(luaState);
+  object fun = globals[fname];
   if (fun.is_valid()) {
-    if (luabind::type(fun)==LUA_TFUNCTION) {
+    if (type(fun)==LUA_TFUNCTION) {
       return true;
     }
-    log_warning(("Lua global object %s is not a function, type is %u\n", fname, luabind::type(fun)));
+    log_warning(("Lua global object %s is not a function, type is %u\n", fname, type(fun)));
   }
 #else
-  luabind::object globals = luabind::get_globals(luaState);
-  luabind::object fun = globals[fname];
+  object globals = get_globals(luaState);
+  object fun = globals[fname];
   if (fun.is_valid()) {
     if (fun.type()==LUA_TFUNCTION) {
       return true;
@@ -220,9 +223,9 @@ lua_getresource(unit * u, const struct resource_type * rtype)
   lua_State * L = (lua_State *)global.vm_state;
   if (is_function(L, fname)) {
     try {
-      retval = luabind::call_function<int>(L, fname, u);
+      retval = call_function<int>(L, fname, u);
     }
-    catch (luabind::error& e) {
+    catch (error& e) {
       lua_State* L = e.state();
       const char* error = lua_tostring(L, -1);
       log_error(("An exception occured while %s tried to call '%s': %s.\n",
@@ -234,6 +237,69 @@ lua_getresource(unit * u, const struct resource_type * rtype)
   return retval;
 }
 
+struct script_interface {
+  void destroy() {
+    delete wage;
+    wage = 0;
+    delete maintenance;
+    maintenance = 0;
+  }
+  object * wage;
+  object * maintenance;
+};
+
+static script_interface interface;
+
+static int
+lua_wage(const region * r, const faction * f, const race * rc)
+{
+  int retval = -1;
+
+  assert(interface.wage);
+  try {
+    retval = object_cast<int>(interface.wage->operator()(r, f, rc));
+  }
+  catch (error& e) {
+    lua_State* L = e.state();
+    const char* error = lua_tostring(L, -1);
+    log_error(("An exception occured in interface 'wage': %s.\n", error));
+    lua_pop(L, 1);
+    std::terminate();
+  }
+  return retval;
+}
+
+static int
+lua_maintenance(const unit * u)
+{
+  int retval = -1;
+  assert(interface.maintenance);
+
+  try {
+    retval = object_cast<int>(interface.maintenance->operator()(u));
+  }
+  catch (error& e) {
+    lua_State* L = e.state();
+    const char* error = lua_tostring(L, -1);
+    log_error(("An exception occured in interface 'maintenance': %s.\n", error));
+    lua_pop(L, 1);
+    std::terminate();
+  }
+  return retval;
+}
+
+static void
+overload(const char * name, const object& f)
+{
+  if (strcmp(name, "wage")==0) {
+    global.functions.wage = &lua_wage;
+    interface.wage = new object(f);;
+  } else if (strcmp(name, "maintenance")==0) {
+    global.functions.maintenance = &lua_maintenance;
+    interface.maintenance = new object(f);;
+  }
+}
+
 void
 bind_script(lua_State * L) 
 {
@@ -242,4 +308,14 @@ bind_script(lua_State * L)
   register_function((pf_generic)&lua_useitem, "lua_useitem");
   register_function((pf_generic)&lua_getresource, "lua_getresource");
   register_function((pf_generic)&lua_changeresource, "lua_changeresource");
+
+  module(L)[
+    def("overload", &overload)
+  ];
+}
+
+void
+reset_scripts()
+{
+  interface.destroy();
 }

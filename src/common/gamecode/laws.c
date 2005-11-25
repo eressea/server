@@ -176,6 +176,7 @@ get_food(region *r)
 {
   unit *u;
   int peasantfood = rpeasants(r)*10;
+  faction * owner = region_owner(r);
 
   /* 1. Versorgung von eigenen Einheiten. Das vorhandene Silber
    * wird zunächst so auf die Einheiten aufgeteilt, dass idealerweise
@@ -186,6 +187,15 @@ get_food(region *r)
 
     /* Erstmal zurücksetzen */
     freset(u, UFL_HUNGER);
+
+    /* if the region is owned, and the owner is nice, then we'll get 
+     * food from the peasants */
+    if (owner!=NULL && (get_alliance(owner, u->faction) & HELP_MONEY)) {
+      int rm = rmoney(r);
+      int use = min(rm, need);
+      rsetmoney(r, rm-use);
+      need -= use;
+    }
 
     need -= get_money(u);
     if (need > 0) {
@@ -569,8 +579,8 @@ peasants(region * r)
   /* Alle werden satt, oder halt soviele für die es auch Geld gibt */
 
   money = rmoney(r);
-  satiated = min(peasants, money / MAINTENANCE);
-  rsetmoney(r, money - satiated * MAINTENANCE);
+  satiated = min(peasants, money / maintenance_cost(NULL));
+  rsetmoney(r, money - satiated * maintenance_cost(NULL));
 
   /* Von denjenigen, die nicht satt geworden sind, verhungert der
    * Großteil. dead kann nie größer als rpeasants(r) - satiated werden,

@@ -1865,6 +1865,18 @@ parse_main(xmlDocPtr doc)
   }
   xmlXPathFreeObject(result);
 
+  /* reading eressea/game/skill */
+  result = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
+  nodes = result->nodesetval;
+  for (i=0;i!=nodes->nodeNr;++i) {
+    xmlNodePtr node = nodes->nodeTab[i];
+    xmlChar * name = xmlGetProp(node, BAD_CAST "name");
+    boolean enable = xml_bvalue(node, "enable", true);
+    enable_skill((const char*)name, enable);
+    xmlFree(name);
+  }
+  xmlXPathFreeObject(result);
+
   xmlXPathFreeContext(xpath);
   return 0;
 }

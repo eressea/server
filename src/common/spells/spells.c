@@ -4616,7 +4616,7 @@ sp_seduce(castorder *co)
 	/* Erfolgsmeldung */
 	sprintf(buf, "%s schenkt %s ", unitname(target), unitname(mage));
 
-	loot = min(cast_level * 1000, get_money(target) - (MAINTENANCE*target->number));
+	loot = min(cast_level * 1000, get_money(target) - (maintenance_cost(target)));
 	loot = max(loot, 0);
 	change_money(mage, loot);
 	change_money(target, -loot);

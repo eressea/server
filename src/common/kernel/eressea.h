@@ -366,7 +366,6 @@ extern void plagues(struct region * r, boolean ismagic);
 #define STARTMONEY          5000
 
 #define PRODUCEEXP          10
-#define MAINTENANCE         10
 #define TAVERN_MAINTENANCE  14
 /* Man gibt in einer Taverne mehr Geld aus! */
 
@@ -1122,6 +1121,7 @@ extern int besieged(const struct unit * u);
 extern int maxworkingpeasants(const struct region * r);
 
 extern int wage(const struct region *r, const struct faction *f, const struct race * rc);
+extern int maintenance_cost(const struct unit * u);
 extern int movewhere(const struct unit *u, const char * token, struct region * r, struct region** resultp);
 extern struct message * movement_error(struct unit * u, const char * token, struct order * ord, int error_code);
 extern boolean move_blocked(const struct unit * u, const struct region *src, const struct region *dest);
@@ -1159,6 +1159,10 @@ typedef struct settings {
   struct param * parameters;
   void * vm_state;
 
+  struct global_functions {
+    int (*wage)(const struct region *r, const struct faction * f, const struct race * rc);
+    int (*maintenance)(const struct unit * u);
+  } functions;
 } settings;
 extern settings global;
 

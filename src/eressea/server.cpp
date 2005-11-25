@@ -94,6 +94,7 @@
 
 /* lua includes */
 #include "lua/bindings.h"
+#include "lua/script.h"
 #include <boost/version.hpp>
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
@@ -320,6 +321,7 @@ lua_init(void)
 void
 lua_done(lua_State * luaState)
 {
+  reset_scripts();
   lua_close(luaState);
 }
 

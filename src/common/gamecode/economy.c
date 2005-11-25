@@ -2280,10 +2280,12 @@ expandstealing(region * r, request * stealorders)
 			int uct = 0;
 			unit *u2;
 			assert(effskill(oa[i].unit, SK_STEALTH)>=4 || !"this goblin\'s talent is too low");
-			for (u2 = r->units; u2; u2 = u2->next)
-				if (u2->faction == u->faction)
-					uct += u2->number;
-			n -= uct * 2 * MAINTENANCE;
+      for (u2 = r->units; u2; u2 = u2->next) {
+        if (u2->faction == u->faction) {
+          uct += maintenance_cost(u2);
+        }
+      }
+			n -= uct * 2;
 		}
 #endif
 		if (n>10 && rplane(r) && (rplane(r)->flags & PFL_NOALLIANCES)) {
