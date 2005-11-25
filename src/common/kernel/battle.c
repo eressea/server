@@ -2080,14 +2080,6 @@ attack(battle *b, troop ta, const att *a, int numattack)
 		}
 	}
 
-	/* Der letzte Katapultschütze setzt die
-	 * Ladezeit neu und generiert die Meldung. */
-	if (af->catmsg>=0 && ta.index==0) {
-		sprintf(buf, "%d Opfer wurde%s getötet.",
-				af->catmsg, af->catmsg<=1?"":"n");
-		battlerecord(b, buf);
-		af->catmsg = -1;
-	}
 }
 
 void
@@ -2130,6 +2122,14 @@ do_attack(fighter * af)
         attack(b, ta, &(au->race->attack[a]), apr);
       }
     }
+  }
+  /* Der letzte Katapultschütze setzt die
+  * Ladezeit neu und generiert die Meldung. */
+  if (af->catmsg>=0) {
+    struct message * m = msg_message("battle::killed", "unit dead", au, af->catmsg);
+    message_all(b, m);
+    msg_release(m);
+    af->catmsg = -1;
   }
 }
 
