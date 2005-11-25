@@ -90,7 +90,7 @@ void
 enable_skill(const char * skname, boolean value)
 {
   skill_t sk;
-  for (sk=0;sk!=MAXSKILLS) {
+  for (sk=0;sk!=MAXSKILLS;++sk) {
     if (strcmp(skillnames[sk], skname)==0) {
       skill_enabled[sk] = value;
       return;
