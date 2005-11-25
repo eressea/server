@@ -1047,6 +1047,9 @@ fix_familiars(void)
 										 unitid(u), racename(lang, u, u->race), unitid(mage), 
 										 factionid(u->faction)));
         }
+        if (has_skill(u, SK_MAGIC) && !is_mage(u)) {
+          create_mage(u, M_GRAU);
+        }
       }
     }
   }
