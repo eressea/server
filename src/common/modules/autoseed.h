@@ -36,6 +36,7 @@ extern int autoseed(newfaction ** players, int nsize, boolean new_island);
 extern newfaction * read_newfactions(const char * filename);
 extern void get_island(struct region * root, struct region_list ** rlist);
 extern int fix_demand(struct region *r);
+extern const struct terrain_type * random_terrain(unsigned int flags);
 
 #ifdef __cplusplus
 }

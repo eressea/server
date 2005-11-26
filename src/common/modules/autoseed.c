@@ -37,6 +37,28 @@
 #include <string.h>
 #include <stdlib.h>
 
+const terrain_type *
+random_terrain(unsigned int flags)
+{
+  static int nterrains;
+  const terrain_type * terrain;
+  int n;
+  if (nterrains==0) {
+    for (terrain=terrains();terrain;terrain=terrain->next) {
+      if (fval(terrain, flags)==flags) {
+        ++nterrains;
+      }
+    }
+  }
+  n = rand() % nterrains;
+  for (terrain=terrains();n;terrain=terrain->next) {
+    if (fval(terrain, flags)==flags) {
+      --n;
+    }
+  }
+  return terrain;
+}
+
 
 static int
 count_demand(const region *r)
@@ -622,7 +644,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
       --isize;
       if (psize>=PLAYERS_PER_ISLAND) break;
     } else {
-      terraform(r, (terrain_t)((rand() % T_GLACIER)+1));
+      terraform_region(r, random_terrain(NORMAL_TERRAIN));
       --isize;
     }
   }
@@ -655,15 +677,15 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
         for (d=0;d!=MAXDIRECTIONS;++d) {
           region * rn = rconnect(r, d);
           if (rn==NULL) {
-            terrain_t terrain = T_OCEAN;
+            const struct terrain_type * terrain = newterrain(T_OCEAN);
             rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
             if (rand() % SPECIALCHANCE < special) {
-              terrain = (terrain_t)(1 + rand() % T_GLACIER);
+              terrain = random_terrain(NORMAL_TERRAIN);
               special = SPECIALCHANCE / 3; /* 33% chance auf noch eines */
             } else {
               special = 1;
             }
-						terraform(rn, terrain);
+						terraform_region(rn, terrain);
             /* the new region has an extra 15% chance to have laen */
             if (rand() % 100 < 15) rsetlaen(r, 5 + rand() % 5);
             /* the new region has an extra 20% chance to have mallorn */

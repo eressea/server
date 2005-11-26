@@ -1153,19 +1153,7 @@ movearound(short rx, short ry) {
 				case 'I':
 					a=map_input(0,0,0,"Wieviele Regionen?",0,500,0);
 					if (a) {
-            const terrain_type * terrain;
-            int nterrains;
-            for (terrain=terrains();terrain;terrain=terrain->next) {
-              if (fval(terrain, NORMAL_TERRAIN)) {
-                ++nterrains;
-              }
-            }
-            nterrains = rand() % nterrains;
-            for (terrain=terrains();nterrains;terrain=terrain->next) {
-              if (fval(terrain, NORMAL_TERRAIN)) {
-                --nterrains;
-              }
-            }
+            const terrain_type * terrain = random_terrain(NORMAL_TERRAIN);
 						create_island(r, a, terrain);
 						modified=1;
 					}
