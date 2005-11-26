@@ -6,11 +6,11 @@
   <xi:include href="de/strings.xml"/>
   <xi:include href="en/strings.xml"/>
 
-  <xi:include href="knigdoms/resources.xml"/>
-  <xi:include href="knigdoms/races.xml"/>
+  <xi:include href="kingdoms/resources.xml"/>
+  <xi:include href="kingdoms/races.xml"/>
   <xi:include href="prefixes.xml"/>
   <xi:include href="calendar.xml"/>
-  <xi:include href="knigdoms/terrains.xml"/>
+  <xi:include href="kingdoms/terrains.xml"/>
 
   <equipment>
     <set name="new_faction">
@@ -19,7 +19,7 @@
     </set>
   </equipment>
 
-  <game name="knigdoms" welcome="kingdoms">
+  <game name="kingdoms" welcome="kingdoms">
     <!-- Game specific settings -->
     <order name="ARBEITEN" disable="yes"/>
     <order name="BEKLAUEN" disable="yes"/>
@@ -101,12 +101,12 @@
   </game>
   <strings>
     <string name="newbie_info_1">
-      <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff ERESSEA BEFEHLE an knigdoms-server@eressea.de zu senden. Am besten, du verwendest die Befehlsvorlage am Ende des Reports.</text>
-      <text locale="en">Remember to send your orders to knigdoms-server@eressea.de with the subject ERESSEA ORDERS.</text>
+      <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff ERESSEA BEFEHLE an kingdoms-server@eressea.de zu senden. Am besten, du verwendest die Befehlsvorlage am Ende des Reports.</text>
+      <text locale="en">Remember to send your orders to kingdoms-server@eressea.de with the subject ERESSEA ORDERS.</text>
     </string>
     <string name="mailto">
-      <text locale="de">koe-server@eressea.de</text>
-      <text locale="en">koe-server@eressea.de</text>
+      <text locale="de">kingdoms-server@eressea.de</text>
+      <text locale="en">kingdoms-server@eressea.de</text>
     </string>
     <string name="mailcmd">
       <text locale="de">ERESSEA BEFEHLE</text>
