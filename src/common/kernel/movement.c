@@ -60,7 +60,7 @@
 /* attributes includes */
 #include <attributes/follow.h>
 #include <attributes/targetregion.h>
-#include <attributes/at_movement.h>
+#include <attributes/movement.h>
 #include <attributes/otherfaction.h>
 
 int * storms;

@@ -17,34 +17,42 @@
 #include "attributes.h"
 
 /* attributes includes */
-#include "key.h"
-#include "gm.h"
-#include "targetregion.h"
-#include "orcification.h"
-#include "reduceproduction.h"
 #include "follow.h"
-#include "iceberg.h"
+#include "gm.h"
 #include "hate.h"
-#include "overrideroads.h"
+#include "iceberg.h"
+#include "key.h"
+#include "moved.h"
+#include "movement.h"
+#include "object.h"
+#include "orcification.h"
 #include "otherfaction.h"
+#include "overrideroads.h"
 #include "racename.h"
 #include "raceprefix.h"
+#include "reduceproduction.h"
 #include "synonym.h"
-#include "at_movement.h"
+#include "targetregion.h"
+#include "variable.h"
 #ifdef USE_UGROUPS
-#  include "ugroup.h"
+# include "ugroup.h"
 #endif
 #ifdef AT_OPTION
 # include "option.h"
 #endif
-#include "moved.h"
-#include "variable.h"
 #ifdef WDW_PYRAMID
-#include "alliance.h"
+# include "alliance.h"
 #endif
 
+/* kernel includes */
+#include <kernel/unit.h>
+#include <kernel/faction.h>
+#include <kernel/region.h>
+#include <kernel/ship.h>
+#include <kernel/building.h>
+
 /* util includes */
-#include <attrib.h>
+#include <util/attrib.h>
 
 /*
  * library initialization
@@ -53,6 +61,7 @@
 void
 init_attributes(void)
 {
+  at_register(&at_object);
 	at_register(&at_overrideroads);
 	at_register(&at_raceprefix);
 

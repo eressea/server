@@ -33,7 +33,7 @@
 #include <unit.h>
 #include <base36.h>
 
-#include <attributes/at_movement.h>
+#include <attributes/movement.h>
 
 /* libc includes */
 #include <ctype.h>

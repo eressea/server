@@ -15,7 +15,7 @@
 #include <config.h>
 #include <eressea.h>
 #include <attrib.h>
-#include "at_movement.h"
+#include "movement.h"
 
 static void
 write_movement(const attrib * a, FILE * F)

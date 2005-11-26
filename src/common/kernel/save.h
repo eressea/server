@@ -56,9 +56,6 @@ extern void write_items(FILE *f, struct item *it);
 extern void a_read(FILE * f, struct attrib ** attribs);
 extern void a_write(FILE * f, const struct attrib * attribs);
 
-extern void write_faction_reference(const struct faction * f, FILE * F);
-extern int read_faction_reference(struct faction ** f, FILE * F);
-
 extern const char * datapath(void);
 
 #if RESOURCE_CONVERSION

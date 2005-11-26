@@ -10,7 +10,6 @@ SubDirHdrs $(SUBDIR)/../.. ;
 SOURCES =
  aggressive.c
  alliance.c
- at_movement.c
  attributes.c
  fleechance.c
  follow.c
@@ -20,7 +19,9 @@ SOURCES =
  iceberg.c
  key.c
  matmod.c
+ movement.c
  moved.c
+ object.c
  option.c
  orcification.c
  otherfaction.c

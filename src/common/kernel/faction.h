@@ -130,6 +130,10 @@ extern void add_enemy(struct faction * f, struct faction * enemy);
 extern void remove_enemy(struct faction * f, struct faction * enemy);
 #endif
 
+extern void write_faction_reference(const struct faction * f, FILE * F);
+extern int read_faction_reference(struct faction ** f, FILE * F);
+
+
 #ifdef SMART_INTERVALS
 extern void update_interval(struct faction * f, struct region * r);
 #endif

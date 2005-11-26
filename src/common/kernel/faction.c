@@ -30,6 +30,7 @@
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/goodies.h>
+#include <util/resolve.h>
 #include <util/variant.h>
 
 #include <attributes/otherfaction.h>
@@ -176,6 +177,33 @@ checkpasswd(const faction * f, const char * passwd, boolean shortp)
   if (strcasecmp(f->passw, passwd)==0) return true;
   if (strcasecmp(f->override, passwd)==0) return true;
   return false;
+}
+
+
+int
+read_faction_reference(faction ** f, FILE * F)
+{
+  variant id;
+  if (global.data_version >= BASE36IDS_VERSION) {
+    char zText[10];
+    fscanf(F, "%s ", zText);
+    id.i = atoi36(zText);
+  } else {
+    fscanf(F, "%d ", &id.i);
+  }
+  if (id.i<0) {
+    *f = NULL;
+    return AT_READ_FAIL;
+  }
+  *f = findfaction(id.i);
+  if (*f==NULL) ur_add(id, (void**)f, resolve_faction);
+  return AT_READ_OK;
+}
+
+void
+write_faction_reference(const faction * f, FILE * F)
+{
+  fprintf(F, "%s ", itoa36(f->no));
 }
 
 void
