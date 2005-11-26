@@ -20,6 +20,7 @@ LUASERVER_SOURCES =
  <lua>event.cpp
  <lua>faction.cpp
  <lua>message.cpp
+ <lua>objects.cpp
  <lua>region.cpp
  <lua>script.cpp
  <lua>ship.cpp

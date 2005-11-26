@@ -1,6 +1,7 @@
 #include <config.h>
 #include <eressea.h>
 #include "list.h"
+#include "objects.h"
 #include "script.h"
 #include "event.h"
 
@@ -578,5 +579,6 @@ bind_unit(lua_State * L)
     .property("number", &unit_getnumber, &unit_setnumber)
     .property("race", &unit_getrace, &unit_setrace)
     .property("hp_max", &unit_hpmax)
+    .property("objects", &eressea::get_objects<unit>)
   ];
 }

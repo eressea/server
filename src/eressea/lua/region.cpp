@@ -1,6 +1,7 @@
 #include <config.h>
 #include <eressea.h>
 #include "list.h"
+#include "objects.h"
 
 // kernel includes
 #include <kernel/building.h>
@@ -242,6 +243,12 @@ region_move(region& r, short x, short y)
   rhash(&r);
 }
 
+eressea::objects
+region_objects(const region& r)
+{
+  return eressea::objects(&const_cast<attrib *>(r.attribs));
+}
+
 void
 bind_region(lua_State * L) 
 {
@@ -279,5 +286,6 @@ bind_region(lua_State * L)
     .property("units", &region_units, return_stl_iterator)
     .property("buildings", &region_buildings, return_stl_iterator)
     .property("ships", &region_ships, return_stl_iterator)
+    .property("objects", &eressea::get_objects<region>)
   ];
 }

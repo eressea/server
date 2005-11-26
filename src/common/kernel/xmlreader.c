@@ -247,102 +247,103 @@ parse_buildings(xmlDocPtr doc)
 {
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
   xmlXPathObjectPtr buildings;
-  xmlNodeSetPtr nodes;
   int i;
 
   /* reading eressea/buildings/building */
   buildings = xmlXPathEvalExpression(BAD_CAST "/eressea/buildings/building", xpath);
-  nodes = buildings->nodesetval;
-  for (i=0;i!=nodes->nodeNr;++i) {
-    xmlNodePtr node = nodes->nodeTab[i];
-    xmlChar * property;
-    building_type * bt = calloc(sizeof(building_type), 1);
-    xmlXPathObjectPtr result;
-    int k;
+  if (buildings->nodesetval!=NULL) {
+    xmlNodeSetPtr nodes = buildings->nodesetval;
+    for (i=0;i!=nodes->nodeNr;++i) {
+      xmlNodePtr node = nodes->nodeTab[i];
+      xmlChar * property;
+      building_type * bt = calloc(sizeof(building_type), 1);
+      xmlXPathObjectPtr result;
+      int k;
 
-    property = xmlGetProp(node, BAD_CAST "name");
-    assert(property!=NULL);
-    bt->_name = strdup((const char *)property);
-    xmlFree(property);
-
-    bt->capacity = xml_ivalue(node, "capacity", -1);
-    bt->maxcapacity = xml_ivalue(node, "maxcapacity", -1);
-    bt->maxsize = xml_ivalue(node, "maxsize", -1);
-
-    bt->magres = xml_ivalue(node, "magres", 0);
-    bt->magresbonus = xml_ivalue(node, "magresbonus", 0);
-    bt->fumblebonus = xml_ivalue(node, "fumblebonus", 0);
-    bt->auraregen = xml_fvalue(node, "auraregen", 1.0);
-
-    if (xml_bvalue(node, "nodestroy", false)) bt->flags |= BTF_INDESTRUCTIBLE;
-    if (xml_bvalue(node, "oneperturn", false)) bt->flags |= BTF_ONEPERTURN;
-    if (xml_bvalue(node, "nobuild", false)) bt->flags |= BTF_NOBUILD;
-    if (xml_bvalue(node, "unique", false)) bt->flags |= BTF_UNIQUE;
-    if (xml_bvalue(node, "decay", false)) bt->flags |= BTF_DECAY;
-    if (xml_bvalue(node, "magic", false)) bt->flags |= BTF_MAGIC;
-    if (xml_bvalue(node, "protection", false)) bt->flags |= BTF_PROTECTION;
-
-    /* reading eressea/buildings/building/construction */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-    xml_readconstruction(xpath, result->nodesetval->nodeTab, result->nodesetval->nodeNr, &bt->construction);
-    xmlXPathFreeObject(result);
-
-    if (gamecode_enabled) {
-      /* reading eressea/buildings/building/function */
-      xpath->node = node;
-      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-      for (k=0;k!=result->nodesetval->nodeNr;++k) {
-        xmlNodePtr node = result->nodesetval->nodeTab[k];
-        pf_generic fun;
-        parse_function(node, &fun, &property);
-
-        if (fun==NULL) {
-          log_error(("unknown function name '%s' for building %s\n",
-            (const char*)property, bt->_name));
-          xmlFree(property);
-          continue;
-        }
-        assert(property!=NULL);
-        if (strcmp((const char*)property, "name")==0) {
-          bt->name = (const char * (*)(int size))fun;
-        } else if (strcmp((const char*)property, "init")==0) {
-          bt->init = (void (*)(struct building_type*))fun;
-        } else {
-          log_error(("unknown function type '%s' for building %s\n",
-            (const char*)property, bt->_name));
-        }
-        xmlFree(property);
-      }
-      xmlXPathFreeObject(result);
-    }
-
-    /* reading eressea/buildings/building/maintenance */
-    result = xmlXPathEvalExpression(BAD_CAST "maintenance", xpath);
-    for (k=0;k!=result->nodesetval->nodeNr;++k) {
-      xmlNodePtr node = result->nodesetval->nodeTab[k];
-      maintenance * mt;
-
-      if (bt->maintenance==NULL) {
-        bt->maintenance = calloc(sizeof(struct maintenance), result->nodesetval->nodeNr+1);
-      }
-      mt = bt->maintenance + k;
-      mt->number = xml_ivalue(node, "amount", 0);
-
-      property = xmlGetProp(node, BAD_CAST "type");
+      property = xmlGetProp(node, BAD_CAST "name");
       assert(property!=NULL);
-      mt->rtype = rt_find((const char*)property);
-      assert(mt->rtype!=NULL);
+      bt->_name = strdup((const char *)property);
       xmlFree(property);
 
-      if (xml_bvalue(node, "variable", false)) mt->flags |= MTF_VARIABLE;
-      if (xml_bvalue(node, "vital", false)) mt->flags |= MTF_VITAL;
+      bt->capacity = xml_ivalue(node, "capacity", -1);
+      bt->maxcapacity = xml_ivalue(node, "maxcapacity", -1);
+      bt->maxsize = xml_ivalue(node, "maxsize", -1);
 
+      bt->magres = xml_ivalue(node, "magres", 0);
+      bt->magresbonus = xml_ivalue(node, "magresbonus", 0);
+      bt->fumblebonus = xml_ivalue(node, "fumblebonus", 0);
+      bt->auraregen = xml_fvalue(node, "auraregen", 1.0);
+
+      if (xml_bvalue(node, "nodestroy", false)) bt->flags |= BTF_INDESTRUCTIBLE;
+      if (xml_bvalue(node, "oneperturn", false)) bt->flags |= BTF_ONEPERTURN;
+      if (xml_bvalue(node, "nobuild", false)) bt->flags |= BTF_NOBUILD;
+      if (xml_bvalue(node, "unique", false)) bt->flags |= BTF_UNIQUE;
+      if (xml_bvalue(node, "decay", false)) bt->flags |= BTF_DECAY;
+      if (xml_bvalue(node, "magic", false)) bt->flags |= BTF_MAGIC;
+      if (xml_bvalue(node, "protection", false)) bt->flags |= BTF_PROTECTION;
+
+      /* reading eressea/buildings/building/construction */
+      xpath->node = node;
+      result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
+      xml_readconstruction(xpath, result->nodesetval->nodeTab, result->nodesetval->nodeNr, &bt->construction);
+      xmlXPathFreeObject(result);
+
+      if (gamecode_enabled) {
+        /* reading eressea/buildings/building/function */
+        xpath->node = node;
+        result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+        for (k=0;k!=result->nodesetval->nodeNr;++k) {
+          xmlNodePtr node = result->nodesetval->nodeTab[k];
+          pf_generic fun;
+          parse_function(node, &fun, &property);
+
+          if (fun==NULL) {
+            log_error(("unknown function name '%s' for building %s\n",
+              (const char*)property, bt->_name));
+            xmlFree(property);
+            continue;
+          }
+          assert(property!=NULL);
+          if (strcmp((const char*)property, "name")==0) {
+            bt->name = (const char * (*)(int size))fun;
+          } else if (strcmp((const char*)property, "init")==0) {
+            bt->init = (void (*)(struct building_type*))fun;
+          } else {
+            log_error(("unknown function type '%s' for building %s\n",
+              (const char*)property, bt->_name));
+          }
+          xmlFree(property);
+        }
+        xmlXPathFreeObject(result);
+      }
+
+      /* reading eressea/buildings/building/maintenance */
+      result = xmlXPathEvalExpression(BAD_CAST "maintenance", xpath);
+      for (k=0;k!=result->nodesetval->nodeNr;++k) {
+        xmlNodePtr node = result->nodesetval->nodeTab[k];
+        maintenance * mt;
+
+        if (bt->maintenance==NULL) {
+          bt->maintenance = calloc(sizeof(struct maintenance), result->nodesetval->nodeNr+1);
+        }
+        mt = bt->maintenance + k;
+        mt->number = xml_ivalue(node, "amount", 0);
+
+        property = xmlGetProp(node, BAD_CAST "type");
+        assert(property!=NULL);
+        mt->rtype = rt_find((const char*)property);
+        assert(mt->rtype!=NULL);
+        xmlFree(property);
+
+        if (xml_bvalue(node, "variable", false)) mt->flags |= MTF_VARIABLE;
+        if (xml_bvalue(node, "vital", false)) mt->flags |= MTF_VITAL;
+
+      }
+      xmlXPathFreeObject(result);
+
+      /* finally, register the new building type */
+      bt_register(bt);
     }
-    xmlXPathFreeObject(result);
-
-    /* finally, register the new building type */
-    bt_register(bt);
   }
   xmlXPathFreeObject(buildings);
 
@@ -467,68 +468,69 @@ parse_ships(xmlDocPtr doc)
 {
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
   xmlXPathObjectPtr ships;
-  xmlNodeSetPtr nodes;
   int i;
 
   /* reading eressea/ships/ship */
   ships = xmlXPathEvalExpression(BAD_CAST "/eressea/ships/ship", xpath);
-  nodes = ships->nodesetval;
-  for (i=0;i!=nodes->nodeNr;++i) {
-    xmlNodePtr node = nodes->nodeTab[i];
-    xmlChar * property;
-    ship_type * st = calloc(sizeof(ship_type), 1);
-    xmlXPathObjectPtr result;
-    int k, c;
+  if (ships->nodesetval!=NULL) {
+    xmlNodeSetPtr nodes = ships->nodesetval;
+    for (i=0;i!=nodes->nodeNr;++i) {
+      xmlNodePtr node = nodes->nodeTab[i];
+      xmlChar * property;
+      ship_type * st = calloc(sizeof(ship_type), 1);
+      xmlXPathObjectPtr result;
+      int k, c;
 
-    property = xmlGetProp(node, BAD_CAST "name");
-    assert(property!=NULL);
-    st->name[0] = strdup((const char *)property);
-    st->name[1] = strcat(strcpy(malloc(strlen(st->name[0])+3), st->name[0]),"_a");
-    xmlFree(property);
-
-    st->cabins = xml_ivalue(node, "cabins", 0);
-    st->cargo = xml_ivalue(node, "cargo", 0);
-    st->combat = xml_ivalue(node, "combat", 0);
-    st->cptskill = xml_ivalue(node, "cptskill", 0);
-    st->damage = xml_fvalue(node, "damage", 0.0);
-    if (xml_bvalue(node, "fly", false)) st->flags |= SFL_FLY;
-    if (xml_bvalue(node, "opensea", false)) st->flags |= SFL_OPENSEA;
-    st->minskill = xml_ivalue(node, "minskill", 0);
-    st->range = xml_ivalue(node, "range", 0);
-    st->storm = xml_fvalue(node, "storm", 1.0);
-    st->sumskill = xml_ivalue(node, "sumskill", 0);
-
-	/* reading eressea/ships/ship/construction */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-    xml_readconstruction(xpath, result->nodesetval->nodeTab, result->nodesetval->nodeNr, &st->construction);
-    xmlXPathFreeObject(result);
-
-	/* reading eressea/ships/ship/coast */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "coast", xpath);
-    for (c=0,k=0;k!=result->nodesetval->nodeNr;++k) {
-      xmlNodePtr node = result->nodesetval->nodeTab[k];
-
-      if (k==0) {
-        assert(st->coasts==NULL);
-        st->coasts = (const terrain_type**)malloc(sizeof(const terrain_type*) * (result->nodesetval->nodeNr+1));
-        st->coasts[result->nodesetval->nodeNr] = NULL;
-      }
-
-      property = xmlGetProp(node, BAD_CAST "terrain");
+      property = xmlGetProp(node, BAD_CAST "name");
       assert(property!=NULL);
-      st->coasts[c] = get_terrain((const char*)property);
-      if (st->coasts[c]!=NULL) ++c;
-      else {
-        log_warning(("ship %s mentions a non-existing terrain %s.\n", st->name[0], property));
-      }
+      st->name[0] = strdup((const char *)property);
+      st->name[1] = strcat(strcpy(malloc(strlen(st->name[0])+3), st->name[0]),"_a");
       xmlFree(property);
-    }
-    xmlXPathFreeObject(result);
 
-    /* finally, register the new building type */
-    st_register(st);
+      st->cabins = xml_ivalue(node, "cabins", 0);
+      st->cargo = xml_ivalue(node, "cargo", 0);
+      st->combat = xml_ivalue(node, "combat", 0);
+      st->cptskill = xml_ivalue(node, "cptskill", 0);
+      st->damage = xml_fvalue(node, "damage", 0.0);
+      if (xml_bvalue(node, "fly", false)) st->flags |= SFL_FLY;
+      if (xml_bvalue(node, "opensea", false)) st->flags |= SFL_OPENSEA;
+      st->minskill = xml_ivalue(node, "minskill", 0);
+      st->range = xml_ivalue(node, "range", 0);
+      st->storm = xml_fvalue(node, "storm", 1.0);
+      st->sumskill = xml_ivalue(node, "sumskill", 0);
+
+	  /* reading eressea/ships/ship/construction */
+      xpath->node = node;
+      result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
+      xml_readconstruction(xpath, result->nodesetval->nodeTab, result->nodesetval->nodeNr, &st->construction);
+      xmlXPathFreeObject(result);
+
+	  /* reading eressea/ships/ship/coast */
+      xpath->node = node;
+      result = xmlXPathEvalExpression(BAD_CAST "coast", xpath);
+      for (c=0,k=0;k!=result->nodesetval->nodeNr;++k) {
+        xmlNodePtr node = result->nodesetval->nodeTab[k];
+
+        if (k==0) {
+          assert(st->coasts==NULL);
+          st->coasts = (const terrain_type**)malloc(sizeof(const terrain_type*) * (result->nodesetval->nodeNr+1));
+          st->coasts[result->nodesetval->nodeNr] = NULL;
+        }
+
+        property = xmlGetProp(node, BAD_CAST "terrain");
+        assert(property!=NULL);
+        st->coasts[c] = get_terrain((const char*)property);
+        if (st->coasts[c]!=NULL) ++c;
+        else {
+          log_warning(("ship %s mentions a non-existing terrain %s.\n", st->name[0], property));
+        }
+        xmlFree(property);
+      }
+      xmlXPathFreeObject(result);
+
+      /* finally, register the new building type */
+      st_register(st);
+    }
   }
   xmlXPathFreeObject(ships);
 
@@ -1175,99 +1177,101 @@ parse_spells(xmlDocPtr doc)
 {
   xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
   xmlXPathObjectPtr spells;
-  xmlNodeSetPtr nodes;
-  int i;
 
   /* reading eressea/spells/spell */
   spells = xmlXPathEvalExpression(BAD_CAST "/eressea/spells/spell", xpath);
-  nodes = spells->nodesetval;
-  for (i=0;i!=nodes->nodeNr;++i) {
-    xmlXPathObjectPtr result;
-    xmlNodePtr node = nodes->nodeTab[i];
-    xmlChar * property;
-    int k;
-    spell * sp = calloc(1, sizeof(spell));
+  if (spells->nodesetval!=NULL) {
+    xmlNodeSetPtr nodes = spells->nodesetval;
+    int i;
 
-    /* spellname */
-    property = xmlGetProp(node, BAD_CAST "name");
-    assert(property!=NULL);
-    sp->sname = strdup((const char*)property);
-    xmlFree(property);
+    for (i=0;i!=nodes->nodeNr;++i) {
+      xmlXPathObjectPtr result;
+      xmlNodePtr node = nodes->nodeTab[i];
+      xmlChar * property;
+      int k;
+      spell * sp = calloc(1, sizeof(spell));
 
-    /* magic type */
-    property = xmlGetProp(node, BAD_CAST "type");
-    assert(property!=NULL);
-    for (sp->magietyp=0;sp->magietyp!=MAXMAGIETYP;++sp->magietyp) {
-      if (strcmp(magietypen[sp->magietyp], (const char *)property)==0) break;
-    }
-    assert(sp->magietyp!=MAXMAGIETYP);
-    xmlFree(property);
+      /* spellname */
+      property = xmlGetProp(node, BAD_CAST "name");
+      assert(property!=NULL);
+      sp->sname = strdup((const char*)property);
+      xmlFree(property);
 
-    /* level, rank and flags */
-    sp->level = xml_ivalue(node, "level", -1);
-    sp->rank = (char)xml_ivalue(node, "rank", -1);
-    if (xml_bvalue(node, "ship", false)) sp->sptyp |= ONSHIPCAST;
-    if (xml_bvalue(node, "ocean", false)) sp->sptyp |= OCEANCASTABLE;
-    if (xml_bvalue(node, "far", false)) sp->sptyp |= FARCASTING;
+      /* magic type */
+      property = xmlGetProp(node, BAD_CAST "type");
+      assert(property!=NULL);
+      for (sp->magietyp=0;sp->magietyp!=MAXMAGIETYP;++sp->magietyp) {
+        if (strcmp(magietypen[sp->magietyp], (const char *)property)==0) break;
+      }
+      assert(sp->magietyp!=MAXMAGIETYP);
+      xmlFree(property);
 
-    if (gamecode_enabled) {
-      /* reading eressea/spells/spell/function */
+      /* level, rank and flags */
+      sp->level = xml_ivalue(node, "level", -1);
+      sp->rank = (char)xml_ivalue(node, "rank", -1);
+      if (xml_bvalue(node, "ship", false)) sp->sptyp |= ONSHIPCAST;
+      if (xml_bvalue(node, "ocean", false)) sp->sptyp |= OCEANCASTABLE;
+      if (xml_bvalue(node, "far", false)) sp->sptyp |= FARCASTING;
+
+      if (gamecode_enabled) {
+        /* reading eressea/spells/spell/function */
+        xpath->node = node;
+        result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+        for (k=0;k!=result->nodesetval->nodeNr;++k) {
+          xmlNodePtr node = result->nodesetval->nodeTab[k];
+          pf_generic fun;
+
+          parse_function(node, &fun, &property);
+          if (fun==NULL) {
+            log_error(("unknown function name '%s' for spell '%s'\n",
+              (const char*)property, sp->sname));
+            xmlFree(property);
+            continue;
+          }
+          assert(property!=NULL);
+          if (strcmp((const char*)property, "cast")==0) {
+            sp->sp_function = (spell_f)fun;
+          } else if (strcmp((const char*)property, "fumble")==0) {
+            sp->patzer = (pspell_f)fun;
+          } else {
+            log_error(("unknown function type '%s' for spell %s\n", 
+              (const char*)property, sp->sname));
+          }
+          xmlFree(property);
+        }
+        xmlXPathFreeObject(result);
+      }
+
+      /* reading eressea/spells/spell/resource */
       xpath->node = node;
-      result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+      result = xmlXPathEvalExpression(BAD_CAST "resource", xpath);
+      if (result->nodesetval->nodeNr) {
+        sp->components = malloc(sizeof(spell_component)*(result->nodesetval->nodeNr+1));
+        sp->components[result->nodesetval->nodeNr].type = 0;
+      }
       for (k=0;k!=result->nodesetval->nodeNr;++k) {
         xmlNodePtr node = result->nodesetval->nodeTab[k];
-        pf_generic fun;
-
-        parse_function(node, &fun, &property);
-        if (fun==NULL) {
-          log_error(("unknown function name '%s' for spell '%s'\n",
-            (const char*)property, sp->sname));
-          xmlFree(property);
-          continue;
-        }
-        assert(property!=NULL);
-        if (strcmp((const char*)property, "cast")==0) {
-          sp->sp_function = (spell_f)fun;
-        } else if (strcmp((const char*)property, "fumble")==0) {
-          sp->patzer = (pspell_f)fun;
-        } else {
-          log_error(("unknown function type '%s' for spell %s\n", 
-            (const char*)property, sp->sname));
-        }
+        property = xmlGetProp(node, BAD_CAST "name");
+        assert(property);
+        sp->components[k].type = rt_find((const char *)property);
+        assert(sp->components[k].type);
         xmlFree(property);
+        sp->components[k].amount = xml_ivalue(node, "amount", 1);
+        sp->components[k].cost = SPC_FIX;
+        property = xmlGetProp(node, BAD_CAST "cost");
+        if (property!=NULL) {
+          if (strcmp((const char *)property, "linear")==0) {
+            sp->components[k].cost = SPC_LINEAR;
+          } else if (strcmp((const char *)property, "level")==0) {
+            sp->components[k].cost = SPC_LEVEL;
+          }
+          xmlFree(property);
+        }
       }
       xmlXPathFreeObject(result);
+      sp->id = 0; 
+      register_spell(sp);
     }
-
-    /* reading eressea/spells/spell/resource */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "resource", xpath);
-    if (result->nodesetval->nodeNr) {
-      sp->components = malloc(sizeof(spell_component)*(result->nodesetval->nodeNr+1));
-      sp->components[result->nodesetval->nodeNr].type = 0;
-    }
-    for (k=0;k!=result->nodesetval->nodeNr;++k) {
-      xmlNodePtr node = result->nodesetval->nodeTab[k];
-      property = xmlGetProp(node, BAD_CAST "name");
-      assert(property);
-      sp->components[k].type = rt_find((const char *)property);
-      assert(sp->components[k].type);
-      xmlFree(property);
-      sp->components[k].amount = xml_ivalue(node, "amount", 1);
-      sp->components[k].cost = SPC_FIX;
-      property = xmlGetProp(node, BAD_CAST "cost");
-      if (property!=NULL) {
-        if (strcmp((const char *)property, "linear")==0) {
-          sp->components[k].cost = SPC_LINEAR;
-        } else if (strcmp((const char *)property, "level")==0) {
-          sp->components[k].cost = SPC_LEVEL;
-        }
-        xmlFree(property);
-      }
-    }
-    xmlXPathFreeObject(result);
-    sp->id = 0; 
-    register_spell(sp);
   }
 
   xmlXPathFreeObject(spells);

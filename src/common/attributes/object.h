@@ -27,7 +27,8 @@ typedef enum {
 extern attrib_type at_object;
 
 extern struct attrib * object_create(const char * name, object_type type, variant value);
-extern void object_get(const struct attrib * a, variant * value, object_type * type);
+extern void object_get(const struct attrib * a, object_type * type, variant * value);
+extern void object_set(struct attrib * a, object_type type, variant value);
 extern const char * object_name(const struct attrib * a);
 
 #ifdef __cplusplus

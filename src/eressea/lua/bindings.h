@@ -13,5 +13,6 @@ extern void bind_item(struct lua_State * L);
 extern void bind_event(struct lua_State * L);
 extern void bind_message(struct lua_State * L);
 extern void bind_script(struct lua_State * L);
+extern void bind_objects(struct lua_State * L);
 
 #endif

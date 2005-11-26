@@ -1,5 +1,6 @@
 #include <config.h>
 #include <eressea.h>
+#include "objects.h"
 
 // kernel includes
 #include <build.h>
@@ -68,5 +69,6 @@ bind_ship(lua_State * L)
     .def_readwrite("damage", &ship::damage)
     .def_readwrite("size", &ship::size)
     .def_readwrite("coast", &ship::coast)
+    .property("objects", &eressea::get_objects<ship>)
   ];
 }

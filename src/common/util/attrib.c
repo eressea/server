@@ -30,9 +30,8 @@ __at_hashkey(const char* s)
 	int key = 0;
 	size_t i = strlen(s);
 
-	while (i) {
-		--i;
-		key = ((key & 1) << 31) ^ (key >> 1) ^ s[i];
+	while (i>0) {
+    key = (s[--i] + key*37);
 	}
 	return key & 0x7fffffff;
 }

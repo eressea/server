@@ -2,6 +2,7 @@
 #include <cstring>
 #include <eressea.h>
 #include "list.h"
+#include "objects.h"
 #include "script.h"
 
 // kernel includes
@@ -175,5 +176,6 @@ bind_building(lua_State * L)
     .def_readonly("id", &building::no)
     .def_readwrite("size", &building::size)
     .def("add_action", &building_addaction)
+    .property("objects", &eressea::get_objects<building>)
   ];
 }

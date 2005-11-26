@@ -49,8 +49,17 @@ object_write(const attrib *a, FILE *F)
 {
   const object_data * data = (object_data *)a->data.v;
   int type = (int)data->type;
-  fprintf(F, "%s %d", data->name, type);
+  fprintf(F, "%s %d ", data->name, type);
   switch (data->type) {
+    case TINTEGER:
+      fprintf(F, "%d ", data->data.i);
+      break;
+    case TREAL:
+      fprintf(F, "%lf ", data->data.real);
+      break;
+    case TSTRING:
+      fwritestr(F, data->data.str);
+      break;
     case TUNIT:
       write_unit_reference(data->data.u, F);
       break;
@@ -79,22 +88,33 @@ object_read(attrib *a, FILE *F)
 {
   object_data * data = (object_data *)a->data.v;
   int type;
-  char name[64];
-  fscanf(F, "%s %d", name, &type);
+  char buffer[128];
+  fscanf(F, "%s %d", buffer, &type);
+  data->name = strdup(buffer);
   data->type = (object_type)type;
   switch (data->type) {
+    case TINTEGER:
+      fscanf(F, "%d", &data->data.i);
+      break;
+    case TREAL:
+      fscanf(F, "%lf", &data->data.real);
+      break;
+    case TSTRING:
+      freadstr(F, buffer, sizeof(buffer));
+      data->data.str = strdup(buffer);
+      break;
+    case TBUILDING:
+      return read_building_reference(&data->data.b, F);
     case TUNIT:
       return read_unit_reference(&data->data.u, F);
     case TFACTION:
       return read_faction_reference(&data->data.f, F);
-    case TBUILDING:
-      return read_building_reference(&data->data.b, F);
+    case TREGION:
+      return read_region_reference(&data->data.r, F);
     case TSHIP:
       /* return read_ship_reference(&data->data.sh, F); */
       assert(!"not implemented");
       break;
-    case TREGION:
-      return read_region_reference(&data->data.r, F);
     case TNONE:
       break;
     default:
@@ -117,6 +137,7 @@ object_done(attrib * a)
 {
   object_data * data = (object_data *)a->data.v;
   if (data->type == TSTRING) free(data->data.str);
+  free(data->name);
   free(a->data.v);
 }
 
@@ -137,9 +158,19 @@ object_create(const char * name, object_type type, variant value)
 {
   attrib * a = a_new(&at_object);
   object_data * data = (object_data *)a->data.v;
-
-  data->type = type;
   data->name = strdup(name);
+
+  object_set(a, type, value);
+  return a;
+}
+
+void
+object_set(attrib * a, object_type type, variant value)
+{
+  object_data * data = (object_data *)a->data.v;
+
+  if (data->type==TSTRING) free(data->data.str);
+  data->type = type;
   switch (type) {
     case TSTRING:
       data->data.str = strdup(value.v);
@@ -171,7 +202,42 @@ object_create(const char * name, object_type type, variant value)
       assert(!"invalid object-type");
       break;
   }
-  return a;
 }
 
-extern void object_get(const struct attrib * a, variant * value, object_type * type);
+void
+object_get(const struct attrib * a, object_type * type, variant * value)
+{
+  object_data * data = (object_data *)a->data.v;
+  *type = data->type;
+  switch (data->type) {
+    case TSTRING:
+      value->v = data->data.str;
+      break;
+    case TINTEGER:
+      value->i = data->data.i;
+      break;
+    case TREAL:
+      value->f = (float)data->data.real;
+      break;
+    case TREGION:
+      value->v = data->data.r;
+      break;
+    case TBUILDING:
+      value->v = data->data.b;
+      break;
+    case TFACTION:
+      value->v = data->data.f;
+      break;
+    case TUNIT:
+      value->v = data->data.u;
+      break;
+    case TSHIP:
+      value->v = data->data.sh;
+      break;
+    case TNONE:
+      break;
+    default:
+      assert(!"invalid object-type");
+      break;
+  }
+}

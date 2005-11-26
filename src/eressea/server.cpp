@@ -303,6 +303,7 @@ lua_init(void)
   luaopen_io(luaState);
   luaopen_table(luaState);
   luabind::open(luaState);
+  bind_objects(luaState);
   bind_eressea(luaState);
   bind_script(luaState);
   bind_spell(luaState);

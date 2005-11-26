@@ -1,6 +1,7 @@
 #include <config.h>
 #include <eressea.h>
 #include "list.h"
+#include "objects.h"
 
 // kernel includes
 #include <kernel/alliance.h>
@@ -298,5 +299,6 @@ bind_faction(lua_State * L)
     .property("units", &faction_units, return_stl_iterator)
     .property("alliance", &faction_getalliance, &faction_setalliance)
     .property("race", &faction_getrace, &faction_setrace)
+    .property("objects", &eressea::get_objects<faction>)
   ];
 }
