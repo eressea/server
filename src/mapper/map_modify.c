@@ -1158,15 +1158,14 @@ void
 settg(region *r)
 {
 	const luxury_type * ltype;
-	int g=0;
+	int g = get_maxluxuries();
 	if (tradegood==NULL) tradegood = luxurytypes;
 
 	for (ltype=luxurytypes; ltype; ltype=ltype->next) {
 		if (ltype!=tradegood) r_setdemand(r, ltype, 1 + rand() % 5);
-		++g;
 	}
 	r_setdemand(r, tradegood, 0);
-	if (rand()%100 < 20) {
+	if (g>0 && chance(0.2)) {
 		int t = rand() % g;
 
 		for (tradegood = luxurytypes;t;--t) {
