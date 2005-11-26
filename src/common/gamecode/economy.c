@@ -2067,8 +2067,9 @@ expandselling(region * r, request * sellorders, int limit)
 
 			if (++counter[i] > max_products) {
 				int d = r_demand(r, ltype);
-				if (d > 1)
-					r_setdemand(r, ltype, d-1);
+        if (d > 1) {
+          r_setdemand(r, ltype, d-1);
+        }
 				counter[i] = 0;
 			}
 		}

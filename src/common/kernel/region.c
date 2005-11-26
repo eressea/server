@@ -670,6 +670,9 @@ void
 r_setdemand(region * r, const luxury_type * ltype, int value)
 {
 	struct demand * d, ** dp = &r->land->demands;
+
+  if (ltype==NULL) return;
+
 	while (*dp && (*dp)->type != ltype) dp = &(*dp)->next;
 	d = *dp;
 	if (!d) {
