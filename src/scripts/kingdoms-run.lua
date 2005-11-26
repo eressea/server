@@ -38,9 +38,11 @@ function update_owners()
       end
     end
     local u
-    u = b.units()
-    if u~=nil and u.faction~=r.owner then
-      r.owner = u.faction
+    if b ~=nil then
+      u = b.units()
+      if u~=nil and u.faction~=r.owner then
+        r.owner = u.faction
+      end
     end
   end
 end
