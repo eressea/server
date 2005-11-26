@@ -957,7 +957,7 @@ terraform_region(region * r, const terrain_type * terrain)
 				i-=srd->value;
 				srd=srd->next;
 			}
-			setluxuries(r, srd->type);
+			if (srd->type) setluxuries(r, srd->type);
 			while (srd->next!=NULL) srd=srd->next;
 			srd->next=trash;
 			trash = nb;

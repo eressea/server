@@ -91,12 +91,10 @@ recurse_regions(region *r, region_list **rlist, boolean(*fun)(const region *r))
   }
 }
 
-static int maxluxuries = 0;
-
 static boolean
 f_nolux(const region * r)
 {
-  if (r->land && count_demand(r) != maxluxuries) return true;
+  if (r->land && count_demand(r) != get_maxluxuries()) return true;
   return false;
 }
 
@@ -107,10 +105,9 @@ fix_demand(region *r)
   static const struct luxury_type **mlux = 0, ** ltypes;
   const luxury_type *sale = NULL;
   int maxlux = 0;
+  int maxluxuries = get_maxluxuries();
   
-  if (maxluxuries==0) for (sale=luxurytypes;sale;sale=sale->next) {
-    ++maxluxuries;
-  }
+  if (maxluxuries==0) return 0;
   recurse_regions(r, &rlist, f_nolux);
   if (mlux==0) {
     int i = 0;
@@ -162,14 +159,15 @@ fix_demand(region *r)
         }
       } while (j!=i);
     }
-    maxlux=2;
+    maxlux = 2;
   }
   for (rl=rlist;rl;rl=rl->next) {
     region * r = rl->data;
     if (!fval(r, RF_CHAOTIC)) {
       log_warning(("fixing demand in %s\n", regionname(r, NULL)));
     }
-    setluxuries(r, mlux[rand() % maxlux]);
+    sale = mlux[rand() % maxlux];
+    if (sale) setluxuries(r, sale);
   }
   while (rlist) {
     rl = rlist->next;

@@ -205,7 +205,7 @@ block_create(short x1, short y1, int size, char chaotisch, int special, const te
 				} else {
 					terraform(r, newblock[x][y]);
 				}
-				if (r->land) setluxuries(r, sale);
+				if (r->land && sale) setluxuries(r, sale);
 			}
 		}
 	}
