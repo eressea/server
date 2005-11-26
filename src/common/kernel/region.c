@@ -51,8 +51,17 @@
 
 extern int dice_rand(const char *s);
 
-static int g_maxluxuries = 0;
-
+int
+get_maxluxuries()
+{
+  static int maxluxuries = -1;
+  if (maxluxuries==-1) {
+    const luxury_type * ltype;
+    maxluxuries = 0;
+    for (ltype = luxurytypes;ltype;ltype=ltype->next) ++maxluxuries;
+  }
+  return maxluxuries;
+}
 const short delta_x[MAXDIRECTIONS] =
 {
   -1, 0, 1, 1, 0, -1
@@ -904,7 +913,7 @@ terraform_region(region * r, const terrain_type * terrain)
 			const luxury_type * type;
 			int value;
 		} *trash =NULL, *nb = NULL;
-		const luxury_type * ltype;
+		const luxury_type * ltype = NULL;
 		direction_t d;
 		int mnr = 0;
 
@@ -935,13 +944,12 @@ terraform_region(region * r, const terrain_type * terrain)
 			}
 		}
 		if (!nb) {
-			int i;
-			if (g_maxluxuries==0) {
-				for (ltype = luxurytypes;ltype;ltype=ltype->next) ++g_maxluxuries;
-			}
-			i = rand() % g_maxluxuries;
-			ltype = luxurytypes;
-			while (i--) ltype=ltype->next; 
+			int i = get_maxluxuries();
+      if (i>0) {
+        i = rand() % i;
+        ltype = luxurytypes;
+        while (i--) ltype=ltype->next; 
+      }
 		} else {
 			int i = rand() % mnr;
 			struct surround * srd = nb;

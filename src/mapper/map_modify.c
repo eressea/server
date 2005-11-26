@@ -86,7 +86,6 @@ terrain_create(int climate)
 }
 
 static terrain_t newblock[BLOCKSIZE][BLOCKSIZE];
-static int g_maxluxuries;
 
 void
 block_create(short x1, short y1, int size, char chaotisch, int special, const terrain_type * terrain)
@@ -173,16 +172,16 @@ block_create(short x1, short y1, int size, char chaotisch, int special, const te
 		 * Landstriche werden benannt und bevoelkert, und die produkte
 		 * p1 und p2 des Kontinentes werden gesetzt. */
 		region *r;
-		int i, i1, i2;
+		int i, i1 = -1, i2 = -1;
 		const luxury_type *ltype, *p1 = NULL, *p2=NULL;
-		if (g_maxluxuries==0) {
-			for (ltype = luxurytypes;ltype;ltype=ltype->next) ++g_maxluxuries;
-		}
-		i1 = (item_t)(rand() % g_maxluxuries);
-		do {
-			i2 = (item_t)(rand() % g_maxluxuries);
-		}
-		while (i2 == i1);
+    int maxlux = get_maxluxuries();
+    if (maxlux>0) {
+      i1 = (item_t)(rand() % maxlux);
+      do {
+        i2 = (item_t)(rand() % maxlux);
+      }
+      while (i2 == i1);
+    }
 		ltype = luxurytypes;
 		for (i=0;!p1 || !p2;++i) {
 			if (i==i1) p1=ltype;

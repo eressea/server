@@ -182,6 +182,7 @@ void deathcounts(struct region * r, int delta);
 void chaoscounts(struct region * r, int delta);
 
 void setluxuries(struct region * r, const struct luxury_type * sale);
+extern int get_maxluxuries();
 
 short rroad(const struct region * r, direction_t d);
 void rsetroad(struct region * r, direction_t d, short value);
