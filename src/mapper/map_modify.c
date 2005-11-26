@@ -1165,7 +1165,7 @@ settg(region *r)
 		if (ltype!=tradegood) r_setdemand(r, ltype, 1 + rand() % 5);
 	}
 	r_setdemand(r, tradegood, 0);
-	if (g>0 && chance(0.2)) {
+	if (g>0 && (rand()%10)<2) {
 		int t = rand() % g;
 
 		for (tradegood = luxurytypes;t;--t) {
