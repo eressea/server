@@ -1007,11 +1007,7 @@ terraform_region(region * r, const terrain_type * terrain)
 
     if (!fval(r, RF_CHAOTIC)) {
 		  int peasants;
-#if REDUCED_PEASANTGROWTH == 1
 		  peasants = (maxworkingpeasants(r) * (20+dice_rand("6d10")))/100;
-#else
-		  peasants = MAXPEASANTS_PER_AREA * (rand() % (terrain->size / MAXPEASANTS_PER_AREA / 2));
-#endif
 		  rsetpeasants(r, max(100, peasants));
 		  rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL)+1) + rand() % 5));
     }

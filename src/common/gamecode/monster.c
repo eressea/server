@@ -1038,3 +1038,157 @@ plan_monsters(void)
   }
   pathfinder_cleanup();
 }
+
+static double
+chaosfactor(region * r)
+{
+  attrib * a = a_find(r->attribs, &at_chaoscount);
+  if (!a) return 0;
+  return ((double) a->data.i / 1000.0);
+}
+
+static int
+nrand(int start, int sub)
+{
+  int res = 0;
+
+  do {
+    if (rand() % 100 < start)
+      res++;
+    start -= sub;
+  } while (start > 0);
+
+  return res;
+}
+
+/** Drachen und Seeschlangen können entstehen */
+void
+spawn_dragons(void)
+{
+  region * r;
+
+  for (r = regions; r; r = r->next) {
+    unit * u;
+    message * msg;
+
+    if (fval(r->terrain, SEA_REGION) && rand()%10000 < 1) {
+      u = createunit(r, findfaction(MONSTER_FACTION), 1, new_race[RC_SEASERPENT]);
+      fset(u, UFL_ISNEW|UFL_MOVED);
+      set_level(u, SK_MAGIC, 4);
+      set_level(u, SK_OBSERVATION, 3);
+      set_level(u, SK_STEALTH, 2);
+      set_level(u, SK_AUSDAUER, 1);
+      set_string(&u->name, "Seeschlange");
+    }
+
+    if ((rterrain(r) == T_GLACIER || r->terrain == newterrain(T_SWAMP) || rterrain(r) == T_DESERT) && rand() % 10000 < (5 + 100 * chaosfactor(r))) 
+    {
+      if (chance(0.80)) {
+        u = createunit(r, findfaction(MONSTER_FACTION), nrand(60, 20) + 1, new_race[RC_FIREDRAGON]);
+      } else {
+        u = createunit(r, findfaction(MONSTER_FACTION), nrand(30, 20) + 1, new_race[RC_DRAGON]);
+      }
+      fset(u, UFL_ISNEW|UFL_MOVED);
+
+      set_money(u, u->number * (rand() % 500 + 100));
+      set_level(u, SK_MAGIC, 4);
+      set_level(u, SK_OBSERVATION, 1+rand()%3);
+      set_level(u, SK_STEALTH, 1);
+      set_level(u, SK_AUSDAUER, 1);
+      log_printf("%d %s in %s.\n", u->number,
+        LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
+
+      name_unit(u);
+
+      /* add message to the region */
+      ADDMSG(&r->msgs,
+        msg_message("sighting", "region race number", 
+        NULL, u->race, u->number));
+      /* create new message to add to units */
+      msg = msg_message("sighting", "region race number",
+        u->region, u->race, u->number);
+      for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
+      for (u=r->units;u;u=u->next) {
+        faction * f = u->faction;
+        if (!fval(f, FL_DH)) {
+          add_message(&f->msgs, msg);
+          fset(f, FL_DH);
+        }
+      }
+      msg_release(msg);
+    }
+  }
+}
+
+/** Untote können entstehen */
+void
+spawn_undead(void)
+{
+  region * r;
+
+  for (r = regions; r; r = r->next) {
+    int unburied = deathcount(r);
+
+    if(is_cursed(r->attribs, C_HOLYGROUND, 0)) continue;
+
+    /* Chance 0.1% * chaosfactor */
+    if (r->land && unburied > r->land->peasants / 20 && rand() % 10000 < (100 + 100 * chaosfactor(r))) {
+      unit * u;
+      /* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen.
+      * Lieber sammeln lassen, bis sie mindestens 5% der Bevölkerung sind, und
+      * dann erst auferstehen. */
+      int undead = unburied / (rand() % 2 + 1);
+      const race * rc = NULL;
+      int i;
+      if (r->age<100) undead = undead * 100 / r->age; /* newbie-regionen kriegen weniger ab */
+
+      if (!undead || r->age < 20) continue;
+
+      switch(rand()%3) {
+      case 0:
+        rc = new_race[RC_SKELETON]; break;
+      case 1:
+        rc = new_race[RC_ZOMBIE]; break;
+      default:
+        rc = new_race[RC_GHOUL]; break;
+      }
+
+      u = createunit(r, findfaction(MONSTER_FACTION), undead, rc);
+      fset(u, UFL_ISNEW|UFL_MOVED);
+      if ((rc == new_race[RC_SKELETON] || rc == new_race[RC_ZOMBIE]) && rand()%10 < 4) {
+        equip_unit(u, get_equipment("rising_undead"));
+      }
+
+      for (i=0;i < MAXSKILLS;i++) {
+        if (rc->bonus[i] >= 1) {
+          set_level(u, (skill_t)i, 1);
+        }
+      }
+      u->hp = unit_max_hp(u) * u->number;
+
+      deathcounts(r, -undead);
+      name_unit(u);
+
+      log_printf("%d %s in %s.\n", u->number,
+        LOC(default_locale, rc_name(u->race, u->number!=1)), regionname(r, NULL));
+
+      {
+        message * msg = msg_message("undeadrise", "region", r);
+        add_message(&r->msgs, msg);
+        for (u=r->units;u;u=u->next) freset(u->faction, FL_DH);
+        for (u=r->units;u;u=u->next) {
+          if (fval(u->faction, FL_DH)) continue;
+          fset(u->faction, FL_DH);
+          add_message(&u->faction->msgs, msg);
+        }
+        msg_release(msg);
+      }
+    } else {
+      int i = deathcount(r);
+      if (i) {
+        /* Gräber verwittern, 3% der Untoten finden die ewige Ruhe */
+        deathcounts(r, (int)(-i*0.03));
+      }
+    }
+  }
+}

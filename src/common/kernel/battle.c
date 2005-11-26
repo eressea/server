@@ -2285,6 +2285,28 @@ seematrix(const faction * f, const side * s)
 	return true;
 }
 
+static double
+PopulationDamage(void)
+{
+  static double value = -1.0;
+  if (value<0) {
+    const char * str = get_param(global.parameters, "battle.populationdamage");
+    value = str?atof(str):BATTLE_KILLS_PEASANTS;
+  }
+  return value;
+}
+
+
+static void
+battle_effects(battle * b, int dead_players)
+{
+  region * r = b->region;
+  int dead_peasants = min(rpeasants(r), (int)(dead_players*PopulationDamage()));
+  deathcounts(r, dead_peasants + dead_players);
+  chaoscounts(r, dead_peasants / 2);
+  rsetpeasants(r, rpeasants(r) - dead_peasants);
+}
+
 static void
 aftermath(battle * b)
 {
@@ -2294,9 +2316,8 @@ aftermath(battle * b)
   side *s;
   cvector *fighters = &b->fighters;
   void **fi;
-  int is = 0;
+  int dead_players = 0;
   bfaction * bf;
-  int dead_peasants;
   boolean battle_was_relevant = (boolean)(b->turn+(b->has_tactics_turn?1:0)>2);
 
 #ifdef TROLLSAVE
@@ -2481,7 +2502,7 @@ aftermath(battle * b)
       if (playerrace(du->race)) {
         /* tote im kampf werden zu regionsuntoten:
         * for each of them, a peasant will die as well */
-        is += dead;
+        dead_players += dead;
       }
       if (du->hp < du->number) {
         log_error(("%s has less hitpoints (%u) than people (%u)\n",
@@ -2492,10 +2513,8 @@ aftermath(battle * b)
     s->alive+=s->healed;
     assert(snumber==s->flee+s->alive+s->dead);
   } cv_next(s);
-  dead_peasants = min(rpeasants(r), (is*BATTLE_KILLS_PEASANTS)/100);
-  deathcounts(r, dead_peasants + is);
-  chaoscounts(r, dead_peasants / 2);
-  rsetpeasants(r, rpeasants(r) - dead_peasants);
+
+  battle_effects(b, dead_players);
 
   cv_foreach(s, b->sides) {
     message * seen = msg_message("battle::army_report", 

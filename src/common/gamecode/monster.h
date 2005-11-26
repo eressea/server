@@ -33,6 +33,9 @@ void monsters_kill_peasants(void);
 void plan_monsters(void);
 struct unit *random_unit(const struct region * r);
 
+extern void spawn_undead(void);
+extern void spawn_dragons(void);
+
 #ifdef __cplusplus
 }
 #endif

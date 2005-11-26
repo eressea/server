@@ -232,18 +232,6 @@ extern void read_laen(struct region * r, int laen);
 #define DMRISE         10
 #define DMRISEHAFEN    20
 
-/* Vermehrungsrate Bauern in 1/10000.
- * Evt. Berechnungsfehler, reale Vermehrungsraten scheinen höher. */
-#if REDUCED_PEASANTGROWTH == 1
-#define PEASANTGROWTH		10
-#define BATTLE_KILLS_PEASANTS 20
-#define PEASANTLUCK			10
-#else
-#define PEASANTGROWTH   100
-#define BATTLE_KILLS_PEASANTS 100
-#define PEASANTLUCK			1
-#endif
-
 /* Vermehrung trotz 90% Auslastung */
 #define PEASANTFORCE   75
 
