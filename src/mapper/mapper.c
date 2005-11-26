@@ -1514,7 +1514,7 @@ makemonsters(void)
 {
 	faction * f = calloc(sizeof(faction), 1);
 	f->next=factions;
-	f->race=new_race[RC_TEMPLATE];
+	f->race = new_race[RC_TEMPLATE];
 	f->alive=1;
   set_email(&f->email, "");
 	f->lastorders=0;
