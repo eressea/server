@@ -1192,7 +1192,7 @@ Create_Island(region *r, int * n, const terrain_type * terrain, int x, int y) {
 }
 
 void
-create_island(region *r, int n, terrain_t t) 
+create_island(region *r, int n, const struct terrain_type * terrain) 
 {
 	short sx=r->x, sy=r->y, i, x = 0, y = 0;
 	direction_t d;
@@ -1203,7 +1203,7 @@ create_island(region *r, int n, terrain_t t)
 		r2->msgs = (void *)0;
 	}
 	tradegood = NULL;
-	terraform(r,t);
+	terraform_region(r, terrain);
 	if(r->land) settg(r);
 	r->msgs = (void *)(rand()%6);
 

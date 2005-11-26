@@ -55,7 +55,7 @@ void showregion(struct region * r, char full);
 int modify_region(struct region * r);
 void NeueBurg(struct region * r);
 void NeuesSchiff(struct region * r);
-void create_island(struct region *r, int n, terrain_t t);
+void create_island(struct region *r, int n, const struct terrain_type * t);
 void make_ocean_block(short x, short y);
 void make_new_block(int x, int y);
 void moveln(const int x);
