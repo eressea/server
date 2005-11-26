@@ -1028,11 +1028,12 @@ static terrain_t
 choose_terrain(terrain_t t) {
 	int q;
 
-	if(rand()%100 < 50) return t;
-	if(rand()%100 < 10) return T_OCEAN;
+	if (rand()%100 < 50) return t;
+	if (rand()%100 < 10) return T_OCEAN;
 
-	q=rand()%100;
-	switch(t) {
+	q = rand()%100;
+
+	switch (t) {
 		case T_OCEAN:
 			if(rand()%100 < 60) return T_OCEAN;
 			switch(rand()%6) {
@@ -1242,10 +1243,14 @@ create_island(region *r, int n, const struct terrain_type * terrain)
 			}
 			r2 = findregion(x,y);
 			if (r2 && fval(r2->terrain, SEA_REGION)) {
-        terrain_t t = choose_terrain(oldterrain(r2->terrain));
+        const terrain_type * terrain = NULL;
+        do {
+          terrain_t t = choose_terrain(oldterrain(r2->terrain));
+          terrain = newterrain(t);
+        } while (terrain==NULL);
 				r2->msgs = (void *)d;
 				push(r2);
-				abbruch = Create_Island(r2, &n, newterrain(t), sx, sy);
+				abbruch = Create_Island(r2, &n, terrain, sx, sy);
 			}
 			if (abbruch) break;
 		}
