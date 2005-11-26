@@ -292,8 +292,10 @@ bind_eressea(lua_State * L)
 
     /* scripted monsters */
     def("plan_monsters", &lua_planmonsters),
-    def("spawn_braineaters", &spawn_braineaters),
     def("set_brain", &race_setscript),
+    def("spawn_braineaters", &spawn_braineaters),
+    def("spawn_undead", &spawn_undead),
+    def("spawn_dragons", &spawn_dragons),
 
     /* map making */
     def("autoseed", lua_autoseed),

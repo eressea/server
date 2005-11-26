@@ -96,6 +96,8 @@
     <param name="NewbieImmunity" value="4"/>
     <param name="hunger.long" value="1"/>
     <param name="rules.check_overload" value="0"/>
+    <param name="battle.populationdamage" value="0"/>
+
     <param name="functions.wage" value="get_wage"/>
     <param name="functions.maintenance" value="get_maintenance"/>
   </game>

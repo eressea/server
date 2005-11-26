@@ -43,9 +43,18 @@ function process(orders)
   -- run the turn:
   read_orders(orders)  
 
+  -- create new monsters:
+  spawn_dragons()
+  spawn_undead()
   spawn_braineaters(0.25)
+
   plan_monsters()
   process_orders()
+
+  -- post-turn updates:
+  update_guards()
+  update_scores()
+
   
   -- use newfactions file to place out new players
   autoseed(basepath .. "/newfactions", true)

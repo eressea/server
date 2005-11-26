@@ -15,9 +15,16 @@ function process(orders)
   sphinx_weekly()
 
   -- run the turn:
+
+  -- create new monsters:
+  spawn_dragons()
+  spawn_undead()
   -- (no more braineaters) spawn_braineaters(0.25)
+
   plan_monsters()
   process_orders()
+
+  -- post-turn updates:
   update_guards()
   update_scores()
 

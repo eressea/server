@@ -78,9 +78,15 @@ function process(orders)
   end
   run_scripts()
 
+  -- create new monsters:
+  spawn_dragons()
+  spawn_undead()
   spawn_braineaters(0.25)
+
   plan_monsters()
   process_orders()
+
+  -- post-turn updates:
   update_guards()
   update_scores()
 
