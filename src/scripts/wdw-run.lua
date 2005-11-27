@@ -54,6 +54,7 @@ print("- Running wdw-run.lua")
 scripts = {
   "spells.lua",
   "extensions.lua",
+  "write_emails.lua",
   "wdw/sphinx.lua",
   "wdw/standings.lua"
 }
