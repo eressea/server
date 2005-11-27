@@ -243,12 +243,6 @@ region_move(region& r, short x, short y)
   rhash(&r);
 }
 
-eressea::objects
-region_objects(const region& r)
-{
-  return eressea::objects(&const_cast<attrib *>(r.attribs));
-}
-
 void
 bind_region(lua_State * L) 
 {

@@ -2,12 +2,9 @@
 #define LUA_OBJECTS_H
 
 #include <attributes/object.h>
+#include <luabind/object.hpp>
 
 struct lua_State;
-
-namespace luabind {
-  class object;
-};
 
 namespace eressea {
 
@@ -28,7 +25,7 @@ namespace eressea {
   template<class T> eressea::objects
   get_objects(const T& parent)
   {
-    return eressea::objects(&const_cast<attrib *>(parent.attribs));
+    return eressea::objects(&const_cast<attrib *&>(parent.attribs));
   }
 };
 
