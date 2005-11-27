@@ -5,6 +5,7 @@ function process(orders)
     print("could not read game")
     return -1
   end
+  init_summary()
 
   -- read the orders file
   read_orders(orders)

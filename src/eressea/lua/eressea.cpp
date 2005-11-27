@@ -85,6 +85,8 @@ init_summary()
 static int
 write_summary()
 {
+  assert(sum_begin
+      || !"init_summary must be called before before write_summary");
   if (sum_begin) {
     summary * sum_end = make_summary();
     report_summary(sum_end, sum_begin, false);
