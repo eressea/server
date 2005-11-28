@@ -2291,7 +2291,7 @@ PopulationDamage(void)
   static double value = -1.0;
   if (value<0) {
     const char * str = get_param(global.parameters, "battle.populationdamage");
-    value = str?atof(str):BATTLE_KILLS_PEASANTS;
+    value = str?atof(str):(BATTLE_KILLS_PEASANTS/100.0);
   }
   return value;
 }
