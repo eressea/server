@@ -1000,19 +1000,19 @@ alliedfaction(const struct plane * pl, const struct faction * f,
 int
 alliedunit(const unit * u, const faction * f2, int mode)
 {
-	ally * sf;
-	const plane * pl = getplane(u->region);
-	int automode;
+  ally * sf;
+  const plane * pl = getplane(u->region);
+  int automode;
 
-	if (u->faction == f2) return mode;
-	if (u->faction == NULL || f2==NULL) return 0;
+  if (u->faction == f2) return mode;
+  if (u->faction == NULL || f2==NULL) return 0;
 
-	automode = mode & autoalliance(pl, u->faction, f2);
+  automode = mode & autoalliance(pl, u->faction, f2);
 
-	if (pl!=NULL && (pl->flags & PFL_NOALLIANCES))
-		mode = (mode & automode) | (mode & HELP_GIVE);
+  if (pl!=NULL && (pl->flags & PFL_NOALLIANCES))
+    mode = (mode & automode) | (mode & HELP_GIVE);
 
-	sf = u->faction->allies;
+  sf = u->faction->allies;
   if (fval(u, UFL_GROUP)) {
     const attrib * a = a_findc(u->attribs, &at_group);
     if (a!=NULL) sf = ((group*)a->data.v)->allies;

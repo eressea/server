@@ -555,266 +555,266 @@ static void
 give_cmd(unit * u, order * ord)
 {
   region * r = u->region;
-	unit *u2;
-	const char *s;
-	int i, n;
-	const item_type * itype;
-	int notfound_error = 63;
+  unit *u2;
+  const char *s;
+  int i, n;
+  const item_type * itype;
+  int notfound_error = 63;
 
   init_tokens(ord);
   skip_token();
-	u2 = getunit(r, u->faction);
+  u2 = getunit(r, u->faction);
 
-	if (!u2 && !getunitpeasants) {
-		cmistake(u, ord, notfound_error, MSG_COMMERCE);
-		return;
-	}
+  if (!u2 && !getunitpeasants) {
+    cmistake(u, ord, notfound_error, MSG_COMMERCE);
+    return;
+  }
 
-	/* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
-	if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !cansee(u->faction,r,u2,0) && !ucontact(u2, u) && !fval(u2, UFL_TAKEALL)) {
-		cmistake(u, ord, notfound_error, MSG_COMMERCE);
-		return;
-	}
-	if (u == u2) {
-		cmistake(u, ord, 8, MSG_COMMERCE);
-		return;
-	}
+  /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
+  if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !cansee(u->faction,r,u2,0) && !ucontact(u2, u) && !fval(u2, UFL_TAKEALL)) {
+    cmistake(u, ord, notfound_error, MSG_COMMERCE);
+    return;
+  }
+  if (u == u2) {
+    cmistake(u, ord, 8, MSG_COMMERCE);
+    return;
+  }
 
-	/* UFL_TAKEALL ist ein grober Hack. Generalisierung tut not, ist aber nicht
-	* wirklich einfach. */
-	if (r->planep && fval(r->planep, PFL_NOGIVE) && (!u2 || !fval(u2, UFL_TAKEALL))) {
-		cmistake(u, ord, 268, MSG_COMMERCE);
-		return;
-	}
+  /* UFL_TAKEALL ist ein grober Hack. Generalisierung tut not, ist aber nicht
+  * wirklich einfach. */
+  if (r->planep && fval(r->planep, PFL_NOGIVE) && (!u2 || !fval(u2, UFL_TAKEALL))) {
+    cmistake(u, ord, 268, MSG_COMMERCE);
+    return;
+  }
 
-	s = getstrtoken();
+  s = getstrtoken();
 
-	if (findparam(s, u->faction->locale) == P_CONTROL) {
-		if (!u2) {
-			cmistake(u, ord, notfound_error, MSG_EVENT);
-			return;
-		}
-		if (!u->building && !u->ship) {
-			cmistake(u, ord, 140, MSG_EVENT);
-			return;
-		}
-		if (u->building && u2->building != u->building) {
-			cmistake(u, ord, 33, MSG_EVENT);
-			return;
-		}
-		if (u->ship && u2->ship != u->ship) {
-			cmistake(u, ord, 32, MSG_EVENT);
-			return;
-		}
-		if (!fval(u, UFL_OWNER)) {
-			cmistake(u, ord, 49, MSG_EVENT);
-			return;
-		}
-		if (!alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
-			cmistake(u, ord, 40, MSG_EVENT);
-			return;
-		}
-		freset(u, UFL_OWNER);
-		fset(u2, UFL_OWNER);
+  if (findparam(s, u->faction->locale) == P_CONTROL) {
+    if (!u2) {
+      cmistake(u, ord, notfound_error, MSG_EVENT);
+      return;
+    }
+    if (!u->building && !u->ship) {
+      cmistake(u, ord, 140, MSG_EVENT);
+      return;
+    }
+    if (u->building && u2->building != u->building) {
+      cmistake(u, ord, 33, MSG_EVENT);
+      return;
+    }
+    if (u->ship && u2->ship != u->ship) {
+      cmistake(u, ord, 32, MSG_EVENT);
+      return;
+    }
+    if (!fval(u, UFL_OWNER)) {
+      cmistake(u, ord, 49, MSG_EVENT);
+      return;
+    }
+    if (!alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
+      cmistake(u, ord, 40, MSG_EVENT);
+      return;
+    }
+    freset(u, UFL_OWNER);
+    fset(u2, UFL_OWNER);
 
-		ADDMSG(&u->faction->msgs,
-			msg_message("givecommand", "unit receipient", u, u2));
-		if (u->faction != u2->faction) {
-			ADDMSG(&u2->faction->msgs,
-				msg_message("givecommand", "unit receipient",
-				ucansee(u2->faction, u, u_unknown()), u2));
-		}
-		return;
-	}
-	if (u2 && u2->race == new_race[RC_SPELL]) {
-		cmistake(u, ord, notfound_error, MSG_COMMERCE);
-		return;
-	}
+    ADDMSG(&u->faction->msgs,
+      msg_message("givecommand", "unit receipient", u, u2));
+    if (u->faction != u2->faction) {
+      ADDMSG(&u2->faction->msgs,
+        msg_message("givecommand", "unit receipient",
+        ucansee(u2->faction, u, u_unknown()), u2));
+    }
+    return;
+  }
+  if (u2 && u2->race == new_race[RC_SPELL]) {
+    cmistake(u, ord, notfound_error, MSG_COMMERCE);
+    return;
+  }
 
-	/* if ((u->race->ec_flags & NOGIVE) || fval(u,UFL_LOCKED)) {*/
-	if (u->race->ec_flags & NOGIVE && u2!=NULL) {
-		ADDMSG(&u->faction->msgs,
-			msg_feedback(u, ord, "race_nogive", "race", u->race));
-		return;
-	}
-	/* sperrt hier auch personenübergaben!
-	if (u2 && !(u2->race->ec_flags & GETITEM)) {
-	ADDMSG(&u->faction->msgs,
-	msg_feedback(u, ord, "race_notake", "race", u2->race));
-	return;
-	}
-	*/
+  /* if ((u->race->ec_flags & NOGIVE) || fval(u,UFL_LOCKED)) {*/
+  if (u->race->ec_flags & NOGIVE && u2!=NULL) {
+    ADDMSG(&u->faction->msgs,
+      msg_feedback(u, ord, "race_nogive", "race", u->race));
+    return;
+  }
+  /* sperrt hier auch personenübergaben!
+  if (u2 && !(u2->race->ec_flags & GETITEM)) {
+  ADDMSG(&u->faction->msgs,
+  msg_feedback(u, ord, "race_notake", "race", u2->race));
+  return;
+  }
+  */
 
-	/* Übergabe aller Kräuter */
-	if (findparam(s, u->faction->locale) == P_HERBS) {
-		boolean given = false;
-		if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
-			ADDMSG(&u->faction->msgs,
-				msg_feedback(u, ord, "race_nogive", "race", u->race));
-			return;
-		}
-		if (u2 && !(u2->race->ec_flags & GETITEM)) {
-			ADDMSG(&u->faction->msgs,
-				msg_feedback(u, ord, "race_notake", "race", u2->race));
-			return;
-		}
-		if (!u2) {
-			if (!getunitpeasants) {
-				cmistake(u, ord, notfound_error, MSG_COMMERCE);
-				return;
-			}
-		}
-		if (u->items) {
-			item **itmp=&u->items;
-			while (*itmp) {
-				const item_type * itype = (*itmp)->type;
-				if (fval(itype, ITF_HERB) && (*itmp)->number>0) {
-					/* give_item ändert im fall,das man alles übergibt, die
-					* item-liste der unit, darum continue vor pointerumsetzten */
-					if (give_item((*itmp)->number, (*itmp)->type, u, u2, ord)==0) {
-						given = true;
-						continue;
-					}
-				}
-				itmp = &(*itmp)->next;
-			}
-		}
-		if (!given) cmistake(u, ord, 38, MSG_COMMERCE);
-		return;
-	}
-	if (findparam(s, u->faction->locale) == P_ZAUBER) {
-		cmistake(u, ord, 7, MSG_COMMERCE);
-		/* geht nimmer */
-		return;
-	}
-	if (findparam(s, u->faction->locale) == P_UNIT) {	/* Einheiten uebergeben */
-		if (!(u->race->ec_flags & GIVEUNIT)) {
-			cmistake(u, ord, 167, MSG_COMMERCE);
-			return;
-		}
-
-		if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
-			cmistake(u, ord, 40, MSG_COMMERCE);
-			return;
-		}
-		give_unit(u, u2, ord);
-		return;
-	}
-	if (findparam(s, u->faction->locale) == P_ANY) { /* Alle Gegenstände übergeben */
-		const char * s = getstrtoken();
+  /* Übergabe aller Kräuter */
+  if (findparam(s, u->faction->locale) == P_HERBS) {
+    boolean given = false;
+    if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
+      ADDMSG(&u->faction->msgs,
+        msg_feedback(u, ord, "race_nogive", "race", u->race));
+      return;
+    }
+    if (u2 && !(u2->race->ec_flags & GETITEM)) {
+      ADDMSG(&u->faction->msgs,
+        msg_feedback(u, ord, "race_notake", "race", u2->race));
+      return;
+    }
+    if (!u2) {
+      if (!getunitpeasants) {
+        cmistake(u, ord, notfound_error, MSG_COMMERCE);
+        return;
+      }
+    }
+    if (u->items) {
+      item **itmp=&u->items;
+      while (*itmp) {
+        const item_type * itype = (*itmp)->type;
+        if (fval(itype, ITF_HERB) && (*itmp)->number>0) {
+          /* give_item ändert im fall,das man alles übergibt, die
+          * item-liste der unit, darum continue vor pointerumsetzten */
+          if (give_item((*itmp)->number, (*itmp)->type, u, u2, ord)==0) {
+            given = true;
+            continue;
+          }
+        }
+        itmp = &(*itmp)->next;
+      }
+    }
+    if (!given) cmistake(u, ord, 38, MSG_COMMERCE);
+    return;
+  }
+  if (findparam(s, u->faction->locale) == P_ZAUBER) {
+    cmistake(u, ord, 7, MSG_COMMERCE);
+    /* geht nimmer */
+    return;
+  }
+  if (findparam(s, u->faction->locale) == P_UNIT) {	/* Einheiten uebergeben */
+    if (!(u->race->ec_flags & GIVEUNIT)) {
+      cmistake(u, ord, 167, MSG_COMMERCE);
+      return;
+    }
 
     if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
-			cmistake(u, ord, 40, MSG_COMMERCE);
-			return;
-		}
+      cmistake(u, ord, 40, MSG_COMMERCE);
+      return;
+    }
+    give_unit(u, u2, ord);
+    return;
+  }
+  if (findparam(s, u->faction->locale) == P_ANY) { /* Alle Gegenstände übergeben */
+    const char * s = getstrtoken();
 
-		if (*s == 0) {
-			if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
-				ADDMSG(&u->faction->msgs,
-					msg_feedback(u, ord, "race_nogive", "race", u->race));
-				return;
-			}
-			if (u2 && !(u2->race->ec_flags & GETITEM)) {
-				ADDMSG(&u->faction->msgs,
-					msg_feedback(u, ord, "race_notake", "race", u2->race));
-				return;
-			}
+    if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
+      cmistake(u, ord, 40, MSG_COMMERCE);
+      return;
+    }
 
-			/* für alle items einmal prüfen, ob wir mehr als von diesem Typ
-			* reserviert ist besitzen und diesen Teil dann übergeben */
-			if (u->items) {
-				item **itmp=&u->items;
-				while (*itmp) {
-					if ((*itmp)->number > 0
-						&& (*itmp)->number - get_reservation(u, (*itmp)->type->rtype) > 0) {
-							n = (*itmp)->number - get_reservation(u, (*itmp)->type->rtype);
-							if (give_item(n, (*itmp)->type, u, u2, ord)==0) continue;
-						}
-						itmp = &(*itmp)->next;
-				}
-			}
-			return;
-		}
-		i = findparam(s, u->faction->locale);
-		if (i == P_PERSON) {
-			if (!(u->race->ec_flags & GIVEPERSON)) {
-				ADDMSG(&u->faction->msgs,
-					msg_feedback(u, ord, "race_noregroup", "race", u->race));
-				return;
-			}
-			n = u->number;
-			give_men(n, u, u2, ord);
-			return;
-		}
+    if (*s == 0) {
+      if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
+        ADDMSG(&u->faction->msgs,
+          msg_feedback(u, ord, "race_nogive", "race", u->race));
+        return;
+      }
+      if (u2 && !(u2->race->ec_flags & GETITEM)) {
+        ADDMSG(&u->faction->msgs,
+          msg_feedback(u, ord, "race_notake", "race", u2->race));
+        return;
+      }
 
-		if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
-			ADDMSG(&u->faction->msgs,
-				msg_feedback(u, ord, "race_nogive", "race", u->race));
-			return;
-		}
-		if (u2 && !(u2->race->ec_flags & GETITEM)) {
-			ADDMSG(&u->faction->msgs,
-				msg_feedback(u, ord, "race_notake", "race", u2->race));
-			return;
-		}
+      /* für alle items einmal prüfen, ob wir mehr als von diesem Typ
+      * reserviert ist besitzen und diesen Teil dann übergeben */
+      if (u->items) {
+        item **itmp=&u->items;
+        while (*itmp) {
+          if ((*itmp)->number > 0
+            && (*itmp)->number - get_reservation(u, (*itmp)->type->rtype) > 0) {
+              n = (*itmp)->number - get_reservation(u, (*itmp)->type->rtype);
+              if (give_item(n, (*itmp)->type, u, u2, ord)==0) continue;
+            }
+            itmp = &(*itmp)->next;
+        }
+      }
+      return;
+    }
+    i = findparam(s, u->faction->locale);
+    if (i == P_PERSON) {
+      if (!(u->race->ec_flags & GIVEPERSON)) {
+        ADDMSG(&u->faction->msgs,
+          msg_feedback(u, ord, "race_noregroup", "race", u->race));
+        return;
+      }
+      n = u->number;
+      give_men(n, u, u2, ord);
+      return;
+    }
 
-		itype = finditemtype(s, u->faction->locale);
-		if (itype!=NULL) {
-			item * i = *i_find(&u->items, itype);
-			if (i!=NULL) {
-				n = i->number - get_reservation(u, itype->rtype);
-				give_item(n, itype, u, u2, ord);
-				return;
-			}
-		}
-	}
+    if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
+      ADDMSG(&u->faction->msgs,
+        msg_feedback(u, ord, "race_nogive", "race", u->race));
+      return;
+    }
+    if (u2 && !(u2->race->ec_flags & GETITEM)) {
+      ADDMSG(&u->faction->msgs,
+        msg_feedback(u, ord, "race_notake", "race", u2->race));
+      return;
+    }
 
-	n = atoip(s);		/* n: anzahl */
-	s = getstrtoken();
+    itype = finditemtype(s, u->faction->locale);
+    if (itype!=NULL) {
+      item * i = *i_find(&u->items, itype);
+      if (i!=NULL) {
+        n = i->number - get_reservation(u, itype->rtype);
+        give_item(n, itype, u, u2, ord);
+        return;
+      }
+    }
+  }
 
-	if (s == NULL) {
-		cmistake(u, ord, 113, MSG_COMMERCE);
-		return;
-	}
+  n = atoip(s);		/* n: anzahl */
+  s = getstrtoken();
+
+  if (s == NULL) {
+    cmistake(u, ord, 113, MSG_COMMERCE);
+    return;
+  }
 
   if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
-		const resource_type * rtype = findresourcetype(s, u->faction->locale);
-		if (rtype==NULL || !fval(rtype, RTF_SNEAK))
-		{
-			cmistake(u, ord, 40, MSG_COMMERCE);
-			return;
-		}
-	}
-	i = findparam(s, u->faction->locale);
-	if (i == P_PERSON) {
-		if (!(u->race->ec_flags & GIVEPERSON)) {
-			ADDMSG(&u->faction->msgs,
-				msg_feedback(u, ord, "race_noregroup", "race", u->race));
-			return;
-		}
-		give_men(n, u, u2, ord);
-		return;
-	}
+    const resource_type * rtype = findresourcetype(s, u->faction->locale);
+    if (rtype==NULL || !fval(rtype, RTF_SNEAK))
+    {
+      cmistake(u, ord, 40, MSG_COMMERCE);
+      return;
+    }
+  }
+  i = findparam(s, u->faction->locale);
+  if (i == P_PERSON) {
+    if (!(u->race->ec_flags & GIVEPERSON)) {
+      ADDMSG(&u->faction->msgs,
+        msg_feedback(u, ord, "race_noregroup", "race", u->race));
+      return;
+    }
+    give_men(n, u, u2, ord);
+    return;
+  }
 
-	if (u2!=NULL) {
-		if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
-			ADDMSG(&u->faction->msgs,
-				msg_feedback(u, ord, "race_nogive", "race", u->race));
-			return;
-		}
-		if (!(u2->race->ec_flags & GETITEM)) {
-			ADDMSG(&u->faction->msgs,
-				msg_feedback(u, ord, "race_notake", "race", u2->race));
-			return;
-		}
-	}
+  if (u2!=NULL) {
+    if (!(u->race->ec_flags & GIVEITEM) && u2!=NULL) {
+      ADDMSG(&u->faction->msgs,
+        msg_feedback(u, ord, "race_nogive", "race", u->race));
+      return;
+    }
+    if (!(u2->race->ec_flags & GETITEM)) {
+      ADDMSG(&u->faction->msgs,
+        msg_feedback(u, ord, "race_notake", "race", u2->race));
+      return;
+    }
+  }
 
-	itype = finditemtype(s, u->faction->locale);
-	if (itype!=NULL) {
-		give_item(n, itype, u, u2, ord);
-		return;
-	}
-	cmistake(u, ord, 123, MSG_COMMERCE);
+  itype = finditemtype(s, u->faction->locale);
+  if (itype!=NULL) {
+    give_item(n, itype, u, u2, ord);
+    return;
+  }
+  cmistake(u, ord, 123, MSG_COMMERCE);
 }
 
 static int
