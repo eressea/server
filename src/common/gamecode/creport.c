@@ -1285,7 +1285,7 @@ report_computer(const char * filename, report_context * ctx)
 						fprintf(F, "%d;Rekruten\n", rpeasants(r) / RECRUITFRACTION);
 					}
 					if (production(r)) {
-						fprintf(F, "%d;Lohn\n", wage(r, NULL, NULL));
+						fprintf(F, "%d;Lohn\n", wage(r, f, f->race));
 					}
 
 					while (res) {
