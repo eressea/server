@@ -51,9 +51,9 @@ random_terrain(unsigned int flags)
     }
   }
   n = rand() % nterrains;
-  for (terrain=terrains();n;terrain=terrain->next) {
+  for (terrain=terrains();terrain;terrain=terrain->next) {
     if (fval(terrain, flags)==flags) {
-      --n;
+      if (n--==0) break;
     }
   }
   return terrain;

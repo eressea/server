@@ -1151,13 +1151,15 @@ movearound(short rx, short ry) {
 					ch=-9;
 					break;
 				case 'I':
-					a=map_input(0,0,0,"Wieviele Regionen?",0,500,0);
-					if (a) {
-            const terrain_type * terrain = random_terrain(NORMAL_TERRAIN);
-						create_island(r, a, terrain);
-						modified=1;
-					}
-					ch = -9;
+          if (r!=NULL) {
+            a = map_input(0,0,0,"Wieviele Regionen?",0,500,0);
+            if (a) {
+              const terrain_type * terrain = random_terrain(NORMAL_TERRAIN);
+              create_island(r, a, terrain);
+              modified=1;
+            }
+            ch = -9;
+          }
 					break;
 				case 0x2:
 					make_ocean_block(rx, ry);
