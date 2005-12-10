@@ -546,6 +546,7 @@ bind_unit(lua_State * L)
     .def("set_flag", &set_flag)
     .def("get_flag", &get_flag)
     .def_readwrite("flags", &unit::flags)
+    .def_readwrite("age", &unit::age)
 
     // items:
     .def("get_item", &unit_getitem)
