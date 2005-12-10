@@ -1140,7 +1140,7 @@ spawn_undead(void)
       int undead = unburied / (rand() % 2 + 1);
       const race * rc = NULL;
       int i;
-      if (r->age<100) undead = undead * 100 / r->age; /* newbie-regionen kriegen weniger ab */
+      if (r->age<100) undead = undead * r->age / 100; /* newbie-regionen kriegen weniger ab */
 
       if (!undead || r->age < 20) continue;
 
