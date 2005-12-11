@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<equipment>
+
+  <set name="some_stone">
+    <item name="stone" amount="1d10*1d2"/>
+  </set>
+
+  <set name="some_log">
+    <item name="log" amount="1d10*1d2"/>
+  </set>
+
+  <set name="terrain_mountain">
+    <subset chance="0.9">
+      <set name="some_stone"/>
+    </subset>
+    <subset chance="0.3">
+      <set name="some_log"/>
+    </subset>
+  </set>
+
+  <set name="terrain_plain">
+    <subset chance="0.1">
+      <set name="some_stone"/>
+    </subset>
+    <subset chance="0.5">
+      <set name="some_log"/>
+    </subset>
+  </set>
+
+</equipment>

@@ -11,6 +11,7 @@
   <xi:include href="prefixes.xml"/>
   <xi:include href="calendar.xml"/>
   <xi:include href="kingdoms/terrains.xml"/>
+  <xi:include href="kingdoms/equipment.xml"/>
 
   <equipment>
     <set name="new_faction">
