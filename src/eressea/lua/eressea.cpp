@@ -34,6 +34,7 @@
 // util includes
 #include <util/language.h>
 #include <util/base36.h>
+#include <util/rand.h>
 
 #include <cstring>
 #include <ctime>
@@ -275,6 +276,7 @@ bind_eressea(lua_State * L)
     def("write_game", &write_game),
     def("write_passwords", &writepasswd),
     def("init_reports", &init_reports),
+    def("dice_roll", &dice_rand),
     def("write_reports", &lua_writereports),
     def("write_report", &lua_writereport),
     def("init_summary", &init_summary),

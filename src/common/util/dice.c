@@ -49,13 +49,14 @@ int
 dice_rand(const char *s)
 {
   const char *c = s;
-  int m = 0, d = 0, k = 0, multi = 1;
+  int m = 0, d = 0, k = 0, term = 1, multi = 1;
   int state = 1;
 
   for (;;) {
     if (isdigit((int)*c)) {
       k = k*10+(*c-'0');
-    } else if (*c=='+' || *c=='-' || *c==0) {
+    } 
+    else if (*c=='+' || *c=='-' || *c==0 || *c=='*') {
       if (state==1) /* konstante k addieren */
         m+=k*multi;
       else if (state==2) { /* dDk */
@@ -64,6 +65,10 @@ dice_rand(const char *s)
         for (i=0;i!=d;++i) m += (1 + rand() % k)*multi;
       }
       else assert(!"dice_rand: illegal token");
+      if (*c=='*') {
+        term *= m;
+        m = 0;
+      }
       k = d = 0;
       state = 1;
       multi = (*c=='-')?-1:1;
@@ -77,5 +82,5 @@ dice_rand(const char *s)
     if (*c==0) break;
     c++;
   }
-  return m;
+  return m*term;
 }

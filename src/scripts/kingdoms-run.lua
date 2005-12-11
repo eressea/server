@@ -26,6 +26,24 @@ function write_emails()
   end
 end
 
+function update_resources()
+-- remaining contents of region pool rots
+-- wood falls from trees
+  local r
+  for r in regions() do
+    local item
+    for item in r.items do
+      local num = math.ceil(r:get_item(item)/2)
+      r:add_item(item, -num)
+    end
+
+    local wood = math.floor(r:get_resource("tree")/20)
+    if wood>0 then
+      r.add_item("log", wood)
+    end
+  end
+end
+
 function update_owners()
 -- update the region's owners. currently uses the owner of
 -- the largest castle.
@@ -60,6 +78,7 @@ function process(orders)
 
   process_orders()
   update_owners()
+  update_resources()
   
   -- use newfactions file to place out new players
   autoseed(basepath .. "/newfactions", true)

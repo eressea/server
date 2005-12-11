@@ -155,3 +155,34 @@ equip_unit(struct unit * u, const struct equipment * eq)
     }
   }
 }
+
+void
+equip_items(struct item ** items, const struct equipment * eq)
+{
+  if (eq) {
+    itemdata * idata;
+
+    for (idata=eq->items;idata!=NULL;idata=idata->next) {
+      int i = dice_rand(idata->value);
+      if (i>0) {
+        i_add(items, i_new(idata->itype, i));
+      }
+    }
+    if (eq->subsets) {
+      int i;
+      for (i=0;eq->subsets[i].sets;++i) {
+        if (chance(eq->subsets[i].chance)) {
+          float rnd = 1000.0f / (1+rand() % 1000);
+          int k;
+          for (k=0;eq->subsets[i].sets[k].set;++k) {
+            if (rnd<=eq->subsets[i].sets[k].chance) {
+              equip_items(items, eq->subsets[i].sets[k].set);
+              break;
+            }
+            rnd -= eq->subsets[i].sets[k].chance;
+          }
+        }
+      }
+    }
+  }
+}

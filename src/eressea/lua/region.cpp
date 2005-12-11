@@ -124,10 +124,14 @@ static int
 region_getresource(const region& r, const char * type)
 {
 	const resource_type * rtype = rt_find(type);
-  if (rtype==rt_find("money")) return rmoney(&r);
-  if (rtype==rt_find("peasant")) return rpeasants(&r);
-  if (strcmp(type, "grave")==0) return deathcount(&r);
-  if (strcmp(type, "chaos")==0) return chaoscount(&r);
+  if (rtype!=NULL) {
+    if (rtype==rt_find("money")) return rmoney(&r);
+    if (rtype==rt_find("peasant")) return rpeasants(&r);
+  } else {
+    if (strcmp(type, "tree")==0) return rtrees(&r, 2);
+    if (strcmp(type, "grave")==0) return deathcount(&r);
+    if (strcmp(type, "chaos")==0) return chaoscount(&r);
+  }
 	return 0;
 }
 
@@ -135,15 +139,19 @@ static void
 region_setresource(region& r, const char * type, int value)
 {
   const resource_type * rtype = rt_find(type);
-  if (rtype==rt_find("money")) rsetmoney(&r, value);
-  if (rtype==rt_find("peasant")) return rsetpeasants(&r, value);
-  if (strcmp(type, "grave")==0) {
-    int fallen = value-deathcount(&r);
-    deathcounts(&r, fallen);
-  }
-  if (strcmp(type, "chaos")==0) {
-    int fallen = value-chaoscount(&r);
-    chaoscounts(&r, fallen);
+  if (rtype!=NULL) {
+    if (rtype==rt_find("money")) rsetmoney(&r, value);
+    if (rtype==rt_find("peasant")) return rsetpeasants(&r, value);
+  } else {
+    if (strcmp(type, "tree")==0) {
+      rsettrees(&r, 2, value);
+    } else if (strcmp(type, "grave")==0) {
+      int fallen = value-deathcount(&r);
+      deathcounts(&r, fallen);
+    } else if (strcmp(type, "chaos")==0) {
+      int fallen = value-chaoscount(&r);
+      chaoscounts(&r, fallen);
+    }
   }
 }
 
@@ -253,6 +261,26 @@ region_move(region& r, short x, short y)
   rhash(&r);
 }
 
+static eressea::list<std::string, item *, eressea::bind_items>
+region_items(const region& r) {
+  if (r.land) {
+    return eressea::list<std::string, item *, eressea::bind_items>(r.land->items);
+  } else {
+    return eressea::list<std::string, item *, eressea::bind_items>(NULL);
+  }
+}
+
+static int
+region_additem(region& r, const char * iname, int number)
+{
+  const item_type * itype = it_find(iname);
+  if (itype!=NULL && r.land) {
+    item * i = i_change(&r.land->items, itype, number);
+    return i?i->number:0;
+  } // if (itype!=NULL)
+  return -1;
+}
+
 void
 bind_region(lua_State * L) 
 {
@@ -286,6 +314,8 @@ bind_region(lua_State * L)
     .def_readonly("x", &region::x)
     .def_readonly("y", &region::y)
     .def_readwrite("age", &region::age)
+    .def("add_item", &region_additem)
+    .property("items", &region_items, return_stl_iterator)
     .property("plane_id", &region_plane)
     .property("units", &region_units, return_stl_iterator)
     .property("buildings", &region_buildings, return_stl_iterator)

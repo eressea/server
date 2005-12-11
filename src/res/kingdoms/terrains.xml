@@ -6,4 +6,7 @@
   <terrain name="plain" size="1000" shallow="no">
   </terrain>
 
+  <terrain name="mountain" size="200" shallow="yes">
+  </terrain>
+
 </terrains>

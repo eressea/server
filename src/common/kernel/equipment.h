@@ -59,6 +59,7 @@ extern "C" {
   extern void equipment_addspell(struct equipment * eq, struct spell * sp);
 
   extern void equip_unit(struct unit * u, const struct equipment * eq);
+  extern void equip_items(struct item ** items, const struct equipment * eq);
 
 #ifdef __cplusplus
 }

@@ -526,13 +526,13 @@ i_free(item * i) {
 }
 
 void
-i_freeall(item *i) {
+i_freeall(item **i) {
 	item *in;
 
-	while(i) {
-		in = i->next;
-		free(i);
-		i = in;
+	while(*i) {
+		in = (*i)->next;
+		free(*i);
+		*i = in;
 	}
 }
 

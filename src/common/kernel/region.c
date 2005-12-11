@@ -27,6 +27,7 @@
 #include "border.h"
 #include "building.h"
 #include "curse.h"
+#include "equipment.h"
 #include "faction.h"
 #include "item.h"
 #include "message.h"
@@ -895,6 +896,7 @@ terraform_region(region * r, const terrain_type * terrain)
 
 	if (!fval(terrain, LAND_REGION)) {
 		if (r->land!=NULL) {
+      i_freeall(&r->land->items);
 			freeland(r->land);
 			r->land = NULL;
 		}
@@ -910,7 +912,9 @@ terraform_region(region * r, const terrain_type * terrain)
 		return;
 	}
 
-	if (!r->land) {
+	if (r->land) {
+    i_freeall(&r->land->items);
+  } else {
 		static struct surround {
 			struct surround * next;
 			const luxury_type * type;
@@ -970,7 +974,13 @@ terraform_region(region * r, const terrain_type * terrain)
 	
 	if (fval(terrain, LAND_REGION)) {
 		const item_type * itype = NULL;
-		if (r->terrain->herbs) {
+    char equip_hash[64];
+
+    /* TODO: put the equipment in struct terrain, faster */
+    sprintf(equip_hash, "terrain_%s", terrain->_name);
+    equip_items(&r->land->items, get_equipment(equip_hash));
+
+    if (r->terrain->herbs) {
 			int len=0;
 			while (r->terrain->herbs[len]) ++len;
 			if (len) itype = r->terrain->herbs[rand()%len];

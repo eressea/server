@@ -210,7 +210,7 @@ extern item * i_add(item ** pi, item * it);
 extern void i_merge(item ** pi, item ** si);
 extern item * i_remove(item ** pi, item * it);
 extern void i_free(item * i);
-extern void i_freeall(item * i);
+extern void i_freeall(item ** i);
 extern item * i_new(const item_type * it, int number);
 
 /* convenience: */

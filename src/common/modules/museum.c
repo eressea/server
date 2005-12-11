@@ -102,7 +102,8 @@ a_initmuseumgiveback(attrib *a)
 static void
 a_finalizemuseumgiveback(attrib *a)
 {
-	i_freeall(((museumgiveback *)(a->data.v))->items);
+  museumgiveback *gb = (museumgiveback *)a->data.v;
+	i_freeall(&gb->items);
 	free(a->data.v);
 }
 

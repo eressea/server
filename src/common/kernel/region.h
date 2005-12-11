@@ -76,6 +76,7 @@ typedef struct land_region {
   int peasants;
   int newpeasants;
   int money;
+  struct item * items; /* items that can be claimed */
 } land_region;
 
 typedef struct donation {

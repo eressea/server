@@ -712,7 +712,7 @@ stripfaction (faction * f)
 
   while (f->attribs) a_remove (&f->attribs, f->attribs);
 
-  i_freeall(f->items);
+  i_freeall(&f->items);
 
   freelist(f->ursprung);
   funhash(f);

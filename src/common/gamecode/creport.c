@@ -162,6 +162,19 @@ reset_translations(void)
 #include "objtypes.h"
 
 static void
+print_items(FILE * F, item * items, const struct locale * lang)
+{
+  item * itm;
+
+  for (itm=items; itm; itm=itm->next) {
+    int in = itm->number;
+    const char * ic = resourcename(itm->type->rtype, in);
+    if (itm==items) fputs("GEGENSTAENDE\n", F);
+    fprintf(F, "%d;%s\n", in, add_translation(ic, LOC(lang, ic)));
+  }
+}
+
+static void
 print_curses(FILE * F, const faction * viewer, const void * obj, typ_t typ)
 {
 	boolean header = false;
@@ -1045,7 +1058,6 @@ report_computer(const char * filename, report_context * ctx)
 {
   int i;
   faction * f = ctx->f;
-  item * itm;
   const char * prefix;
   region * r;
   building *b;
@@ -1127,12 +1139,7 @@ report_computer(const char * filename, report_context * ctx)
   fprintf(F, "\"%s\";Parteiname\n", f->name);
 	fprintf(F, "\"%s\";email\n", f->email);
 	fprintf(F, "\"%s\";banner\n", f->banner);
-  for (itm=f->items; itm; itm=itm->next) {
-    int in = itm->number;
-    const char * ic = resourcename(itm->type->rtype, in);
-    if (itm==f->items) fputs("GEGENSTAENDE\n", F);
-    fprintf(F, "%d;%s\n", in, add_translation(ic, LOC(f->locale, ic)));
-  }
+  print_items(F, f->items, f->locale);
 	fputs("OPTIONEN\n", F);
 	for (i=0;i!=MAXOPTIONS;++i) {
 		fprintf(F, "%d;%s\n", (f->options&want(i))?1:0, options[i]);
@@ -1335,6 +1342,9 @@ report_computer(const char * filename, report_context * ctx)
 				}
 				if (pos!=cbuf) fputs(cbuf, F);
 			}
+      if (r->land) {
+        print_items(F, r->land->items, f->locale);
+      }
 			print_curses(F, f, r, TYP_REGION);
 			cr_borders(ctx->seen, r, f, sd->mode, F);
 			if (sd->mode==see_unit && rplane(r)==get_astralplane() && !is_cursed(r->attribs, C_ASTRALBLOCK, 0))
