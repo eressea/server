@@ -141,7 +141,7 @@ equip_unit(struct unit * u, const struct equipment * eq)
       int i;
       for (i=0;eq->subsets[i].sets;++i) {
         if (chance(eq->subsets[i].chance)) {
-          float rnd = 1000.0f / (1+rand() % 1000);
+          float rnd = (1+rand() % 1000) / 1000.0f;
           int k;
           for (k=0;eq->subsets[i].sets[k].set;++k) {
             if (rnd<=eq->subsets[i].sets[k].chance) {
@@ -172,7 +172,7 @@ equip_items(struct item ** items, const struct equipment * eq)
       int i;
       for (i=0;eq->subsets[i].sets;++i) {
         if (chance(eq->subsets[i].chance)) {
-          float rnd = 1000.0f / (1+rand() % 1000);
+          float rnd = (1+rand() % 1000) / 1000.0f;
           int k;
           for (k=0;eq->subsets[i].sets[k].set;++k) {
             if (rnd<=eq->subsets[i].sets[k].chance) {

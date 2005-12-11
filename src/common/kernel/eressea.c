@@ -1172,11 +1172,15 @@ update_lighthouse(building * lh)
 	region * r = lh->region;
 	short d = (short)log10(lh->size) + 1;
 	short x, y;
-	static const struct building_type * bt_lighthouse;
-	if (!bt_lighthouse) bt_lighthouse = bt_find("lighthouse");
-	assert(bt_lighthouse);
+  static boolean init_lighthouse = false;
+	static const struct building_type * bt_lighthouse = 0;
 
-	if (lh->type!=bt_lighthouse) return;
+  if (!init_lighthouse) {
+    bt_lighthouse = bt_find("lighthouse");
+    init_lighthouse = true;
+  }
+
+	if (bt_lighthouse==NULL || lh->type!=bt_lighthouse) return;
 
 	for (x=-d;x<=d;++x) {
 		for (y=-d;y<=d;++y) {
