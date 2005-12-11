@@ -175,11 +175,12 @@ const char *
 buildingtype(const building_type * btype, const building * b, int bsize)
 {
 	const char * s = NULL;
+  static boolean init_generic = false;
 	static const struct building_type * bt_generic;
 
-  if (!bt_generic) {
+  if (!init_generic) {
+    init_generic = true;
     bt_generic = bt_find("generic");
-    assert(bt_generic);
   }
 
   if (btype == bt_generic) {
