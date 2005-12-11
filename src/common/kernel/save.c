@@ -1410,6 +1410,9 @@ readregion(FILE * F, short x, short y)
       assert(itype->rtype->ltype);
 			r_setdemand(r, itype->rtype->ltype, ri(F));
 		}
+    if (global.data_version>=REGIONITEMS_VERSION) {
+      read_items(F, &r->land->items);
+    }
 	}
 	a_read(F, &r->attribs);
 
@@ -1462,6 +1465,10 @@ writeregion(FILE * F, const region * r)
 			wi(F, demand->value);
 		}
 		fputs("end \n", F);
+#if RELEASE_VERSION>=REGIONITEMS_VERSION
+    write_items(F, r->land->items);
+    wnl(F);
+#endif
 	}
 	a_write(F, r->attribs);
 	wnl(F);
