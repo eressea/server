@@ -110,8 +110,8 @@ bind_objects(struct lua_State * L)
       .def("set", (void(objects::*)(const char*, building&))&objects::set<building&, TBUILDING>)
       .def("set", (void(objects::*)(const char*, ship&))&objects::set<ship&, TSHIP>)
       // POD:
-      .def("set", (void(objects::*)(const char*, int))&objects::set<int, TINTEGER>)
-      .def("set", (void(objects::*)(const char*, double))&objects::set<double, TREAL>)
+//      .def("set", (void(objects::*)(const char*, int))&objects::set<int, TINTEGER>)
+      .def("set", (void(objects::*)(const char*, double))&objects::set<lua_Number, TREAL>)
       .def("set", (void(objects::*)(const char*, const char *))&objects::set<const char *, TSTRING>)
   ];
 }
