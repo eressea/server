@@ -41,14 +41,10 @@ dice(int count, int value)
   return d;
 }
 
-/** Parses a string of the form "2d6+8"
-* Kann nur simple Strings der Form "xdy[+-]z" parsen!
-* Schöner wäre eine flexibele Routine, die z.B. auch Sachen wie 2d6+3d4-1
-* parsen kann. */
-int
-dice_rand(const char *s)
+static int
+term_eval(const char **sptr)
 {
-  const char *c = s;
+  const char *c = *sptr;
   int m = 0, d = 0, k = 0, term = 1, multi = 1;
   int state = 1;
 
@@ -56,7 +52,7 @@ dice_rand(const char *s)
     if (isdigit((int)*c)) {
       k = k*10+(*c-'0');
     } 
-    else if (*c=='+' || *c=='-' || *c==0 || *c=='*') {
+    else if (*c=='+' || *c=='-' || *c==0 || *c=='*' || *c==')' || *c=='(') {
       if (state==1) /* konstante k addieren */
         m+=k*multi;
       else if (state==2) { /* dDk */
@@ -72,15 +68,29 @@ dice_rand(const char *s)
       k = d = 0;
       state = 1;
       multi = (*c=='-')?-1:1;
+
+      if (*c=='(') {
+        ++c;
+        k = term_eval(&c);
+      }
+      else if (*c==0 || *c==')') {
+        break;
+      }
     } else if (*c=='d' || *c=='D') {
       if (k==0) k = 1; /* d9 == 1d9 */
       assert(state==1 || !"dice_rand: illegal token");
       d = k;
       k = 0;
       state=2;
-    } else assert(!"dice_rand: illegal token");
-    if (*c==0) break;
+    }
     c++;
   }
+  *sptr = c;
   return m*term;
+}
+
+int
+dice_rand(const char *s)
+{
+  return term_eval(&s);
 }
