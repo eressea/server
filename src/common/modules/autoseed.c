@@ -189,17 +189,19 @@ read_newfactions(const char * filename)
     faction * f;
     char race[20], email[64], lang[8], password[16];
     newfaction *nf, **nfi;
-    int bonus, subscription;
+    int bonus = 0, subscription = 0;
     int alliance = 0;
 
-    if (alliances!=NULL) {
-      /* email;race;locale;startbonus;subscription;alliance */
-      if (fscanf(F, "%s %s %s %d %d %s %d", email, race, lang, &bonus, 
-                 &subscription, password, &alliance)<=0) break;
-    } else {
-      /* email;race;locale;startbonus;subscription */
-      if (fscanf(F, "%s %s %s %d %d %s", email, race, lang, &bonus, 
-                 &subscription, password)<=0) break;
+    if (fgets(buf, sizeof(buf), F)==NULL) break;
+
+    email[0] = '\0';
+    password[0] = '\0';
+
+    sscanf(buf, "%s %s %s %d %d %s %d", email, race, lang, &bonus, &subscription, password, &alliance);
+    if (email[0]=='\0') break;
+    if (password[0]=='\0') {
+      strcpy(password, itoa36(rand()));
+      strcat(password, itoa36(rand()));
     }
     for (f=factions;f;f=f->next) {
       if (strcmp(f->email, email)==0 && f->subscription && f->age<MINAGE_MULTI) break;
