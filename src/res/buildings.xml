@@ -166,7 +166,7 @@
     </construction>
   </building>
 
-  <building name="castle" capacity="1" maxcapacity="4">
+  <building name="castle" capacity="1">
     <function name="name" value="castle_name"/>
     <construction skill="building" minskill="1" maxsize="2" reqsize="1">
       <requirement type="stone" quantity="1" recycle="0.5"/>

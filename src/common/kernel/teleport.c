@@ -96,7 +96,7 @@ r_standard_to_astral(const region *r)
   if (rplane(r) != get_normalplane()) return NULL;
 
   r2 = tpregion(r);
-  if (fval(r2->terrain, FORBIDDEN_REGION)) return NULL;
+  if (r2==NULL || fval(r2->terrain, FORBIDDEN_REGION)) return NULL;
 
   return r2;
 }
@@ -112,7 +112,7 @@ r_astral_to_standard(const region *r)
   y = (r->y-TE_CENTER_Y)*TP_DISTANCE;
 
   r2 = findregion(x,y);
-  if (rplane(r2)!=get_normalplane()) return NULL;
+  if (r2==NULL || rplane(r2)!=get_normalplane()) return NULL;
 
   return r2;
 }

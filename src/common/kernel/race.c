@@ -219,10 +219,13 @@ give_starting_equipment(struct unit *u)
     break;
   case RC_HUMAN:
     {
-      building *b = new_building(bt_find("castle"), r, u->faction->locale);
-      b->size = 10;
-      u->building = b;
-      fset(u, UFL_OWNER);
+      const building_type * btype = bt_find("castle");
+      if (btype!=NULL) {
+        building *b = new_building(btype, r, u->faction->locale);
+        b->size = 10;
+        u->building = b;
+        fset(u, UFL_OWNER);
+      }
     }
     break;
   case RC_CAT:
