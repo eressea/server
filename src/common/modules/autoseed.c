@@ -483,6 +483,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
   int rsize, tsize = 0;
   int isize = REGIONS_PER_FACTION; /* target size for the island */
   int psize = 0; /* players on this island */
+  const terrain_type * volcano_terrain = get_terrain("volcano");
 
   if (listlen(*players)<MINFACTIONS) return 0;
 
@@ -593,8 +594,8 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
         ++rsize;
       }
     }
-    if (rand() % VOLCANO_CHANCE == 0) {
-      terraform(r, T_VOLCANO);
+    if (volcano_terrain!=NULL && (rand() % VOLCANO_CHANCE == 0)) {
+      terraform_region(r, volcano_terrain);
     } else if (nsize && (rand() % isize == 0 || rsize==0)) {
       newfaction ** nfp, * nextf = *players;
       faction * f;

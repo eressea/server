@@ -173,7 +173,7 @@ race_setscript(const char * rcname, const luabind::object& f)
 }
 
 #define ISLANDSIZE 20
-#define TURNS_PER_ISLAND 3
+#define TURNS_PER_ISLAND 4
 static void 
 lua_autoseed(const char * filename, bool new_island)
 {
