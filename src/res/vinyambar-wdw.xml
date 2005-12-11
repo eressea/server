@@ -91,7 +91,7 @@
   <resources>
     <resource name="phoenixfeather">
       <function name="change" value="changeitem"/>
-      <item weight="1"/>
+      <item weight="0"/>
     </resource>
   </resources>
 

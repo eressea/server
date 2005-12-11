@@ -1,15 +1,22 @@
 <?xml version="1.0"?>
 <resources>
 
+<!-- ambassador rewards -->
+  <resource name="seashell">
+    <item cursed="true" weight="0">
+      <function name="use" value="lua_useitem"/>
+    </item>
+  </resource>
+
 <!-- art rewards -->
   <resource name="trappedairelemental">
-    <item weight="1">
+    <item weight="0">
       <function name="use" value="use_trappedairelemental"/>
     </item>
   </resource>
 
   <resource name="hornofdancing">
-    <item weight="1">
+    <item weight="0">
       <function name="use" value="use_hornofdancing"/>
     </item>
   </resource>
@@ -32,7 +39,7 @@
 <!-- gimmicks, etc. -->
   <resource name="aog">
     <!-- Amulett des Treffens -->
-    <item notlost="yes" weight="0"/>
+    <item notlost="yes" cursed="true" weight="0"/>
   </resource>
 
   <resource name="ao_daemon">
@@ -60,12 +67,12 @@
 
   <resource name="questkey1" appearance="key">
     <!-- Key for an old quest. placeholder item -->
-    <item notlost="yes" weight="1" />
+    <item notlost="yes" weight="0" />
   </resource>
 
   <resource name="questkey2" appearance="key">
     <!-- Key for an old quest. placeholder item -->
-    <item notlost="yes" weight="1" />
+    <item notlost="yes" weight="0" />
   </resource>
 
   <resource name="jadee_ring" appearance="ring">

@@ -85,7 +85,7 @@
   </resource>
 
   <resource name="wand_of_tears">
-    <item notlost="yes" weight="1">
+    <item notlost="yes" weight="0">
       <function name="use" value="use_wand_of_tears"/>
     </item>
   </resource>

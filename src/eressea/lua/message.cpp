@@ -140,6 +140,15 @@ public:
     return E_OK;
   }
 
+  int send_region(region& r) {
+    if (mtype==0) return E_INVALID_MESSAGE;
+    if (msg==NULL) {
+      msg = msg_create(mtype, args);
+    }
+    add_message(&r.msgs, msg);
+    return E_OK;
+  }
+
 protected:
   int get_param(const char * param) {
     for (int i=0;i!=mtype->nparameters;++i) {
@@ -177,5 +186,6 @@ bind_message(lua_State * L)
       .def("set_int", &lua_message::set_int)
       .def("set_string", &lua_message::set_string)
       .def("send_faction", &lua_message::send_faction)
+      .def("send_region", &lua_message::send_region)
   ];
 }
