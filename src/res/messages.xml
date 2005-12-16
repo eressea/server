@@ -6532,7 +6532,7 @@
     <text locale="en">"$unit($unit) in $region($region): $int($amount) $resource($item,$amount) turn to dust."</text>
   </message>
 
-  <message name="curseinfo::magicrunes_building" section="events">
+  <message name="curseinfo::magicrunes_building" section="magic">
     <type>
       <arg name="building" type="building"/>
       <arg name="id" type="int"/>
@@ -6541,7 +6541,7 @@
     <text locale="en">"The walls of $building($building) are inscribed with strange runes. ($int36($id))"</text>
   </message>
 
-  <message name="item_create_spell" section="events">
+  <message name="item_create_spell" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="item" type="resource"/>
@@ -6551,7 +6551,7 @@
     <text locale="en">"$unit($mage) creates $int($number) $resource($item,$number)."</text>
   </message>
 
-  <message name="curseinfo::magicrunes_ship" section="events">
+  <message name="curseinfo::magicrunes_ship" section="magic">
     <type>
       <arg name="ship" type="ship"/>
       <arg name="id" type="int"/>
