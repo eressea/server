@@ -1605,11 +1605,9 @@ name_cmd(unit * u, struct order * ord)
         }
       }
       if (cansee(f, r, u, 0)) {
-        add_message(&f->msgs, new_message(f,
-          "renamed_faction_seen%u:renamer%r:region", u, r));
+        ADDMSG(&f->msgs, msg_message("renamed_faction_seen", "unit region", u, r));
       } else {
-        add_message(&f->msgs, new_message(f,
-          "renamed_faction_notseen%r:region", r));
+        ADDMSG(&f->msgs, msg_message("renamed_faction_notseen", "", r));
       }
       s = &f->name;
     } else {
