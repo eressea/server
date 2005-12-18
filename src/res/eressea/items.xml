@@ -8,6 +8,13 @@
     </item>
   </resource>
 
+<!-- xmas 2005 -->
+  <resource name="stardust" appearance="vial">
+    <item weight="0">
+      <function name="use" value="lua_useitem"/>
+    </item>
+  </resource>
+
 <!-- art rewards -->
   <resource name="trappedairelemental">
     <item weight="0">

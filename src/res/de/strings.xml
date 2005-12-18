@@ -871,6 +871,14 @@
     <text locale="de">Sonnensegel</text>
     <text locale="en">solar sails</text>
   </string>
+  <string name="stardust">
+    <text locale="de">Sternenstaub</text>
+    <text locale="en">stardust</text>
+  </string>
+  <string name="stardust_p">
+    <text locale="de">Sternenstaub</text>
+    <text locale="en">stardust</text>
+  </string>
   <string name="papyrus">
     <text locale="de">Papyrus</text>
     <text locale="en">papyrus</text>
@@ -6802,6 +6810,18 @@
     pulled by 8 young dragons flies through the stary night and presents
     your faction with a solar sail. (To claim this item, one of your units
     must issue the order 'CLAIM 1 solar sail'.
+    </text>
+  </string>
+
+  <string name="santa2005">
+    <text locale="de">'Ho ho ho!' Ein dicker Gnom fliegt auf einem von
+    8 Jungdrachen gezogenen Schlitten durch die Nacht und vermacht Deiner
+    Partei eine Phiole mit Sternenstaub. (Informationen dazu gibt es mit
+    BEANSPRUCHE und ZEIGE).</text>
+    <text locale="en">'Ho ho ho!' A fat little gnome Gnom on a sled
+    pulled by 8 young dragons flies through the stary night and presents
+    your faction with a vial of stardust. (To get more information about
+    this item, use the CLAIM and SHOW commands).
     </text>
   </string>
 

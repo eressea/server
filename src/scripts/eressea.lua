@@ -29,6 +29,7 @@ function run_scripts()
     "eressea/eternath.lua",
     "eressea/wedding-jadee.lua", 
     "eressea/ponnuki.lua",
+    "eressea/xmas2005.lua",
     "eressea/embassy.lua"
   }
   for index in scripts do
