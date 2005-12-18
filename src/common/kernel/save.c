@@ -718,16 +718,15 @@ typus2race(unsigned char typus)
 void
 create_backup(char *file)
 {
-#if defined(HAVE_ACCESS)
-	char bfile[MAX_PATH];
-	char command[MAX_PATH*2+10];
-	int c = 1;
-	do {
-		sprintf(bfile, "%s.backup%d", file, c);
-		c++;
-	} while(access(bfile, R_OK) == 0);
-	sprintf(command, "cp %s %s", file, bfile);
-	system(command);
+#ifdef HAVE_UNISTD_H
+  char bfile[MAX_PATH];
+  char command[MAX_PATH*2+10];
+  int c = 1;
+  do {
+    sprintf(bfile, "%s.backup%d", file, c);
+    c++;
+  } while(access(bfile, R_OK) == 0);
+  link(file, bfile);
 #endif
 }
 
@@ -2017,6 +2016,12 @@ writegame(const char *filename, char quiet)
 #endif
 
   sprintf(buf, "%s/%s", datapath(), filename);
+#ifdef HAVE_UNISTD_H
+  if (access(buf, R_OK) == 0) {
+    /* make sure we don't overwrite some hardlinkedfile */
+    unlink(buf);
+  }
+#endif
   F = cfopen(buf, "w");
   if (F==NULL)
     return -1;

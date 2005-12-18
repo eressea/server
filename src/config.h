@@ -94,6 +94,7 @@ extern "C" {
 
 #if defined(__USE_SVID) || defined(_BSD_SOURCE) || defined(__USE_XOPEN_EXTENDED) || defined(_BE_SETUP_H) || defined(CYGWIN)
 # include <unistd.h>
+# define HAVE_UNISTD_H
 # define HAVE_STRCASECMP
 # define HAVE_STRNCASECMP
 # define HAVE_ACCESS

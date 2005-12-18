@@ -8,7 +8,7 @@ end
 
 function change_locales()
   -- local localechange = { }
-  local localechange = { de = { "2xwr" } }
+  local localechange = { de = { "bLub" } }
   
   for loc, flist in localechange do
     for index, name in flist do

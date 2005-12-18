@@ -154,28 +154,28 @@ static struct curse_type ct_slavery = { "slavery",
 static int
 cinfo_calm(const struct locale * lang, const void * obj, typ_t typ, struct curse *c, int self)
 {
-	unit *u;
-	const struct race * rc;
-	faction *f;
-	unused(typ);
+  unit *u;
+  const struct race * rc;
+  faction *f;
+  unused(typ);
 
-	assert(typ == TYP_UNIT);
-	u = (unit *)obj;
-	if (c->magician){
-		rc = c->magician->irace;
-		f = c->magician->faction;
-		if (self != 0) {
-			sprintf(buf, "%s mag %s", u->name, factionname(f));
-		} else {
-			sprintf(buf, "%s scheint %s zu mögen", u->name, LOC(f->locale, rc_name(rc, 1)));
-		}
-		scat(". (");
-		scat(itoa36(c->no));
-		scat(")");
-
-		return 1;
-	}
-	return 0;
+  assert(typ == TYP_UNIT);
+  u = (unit *)obj;
+  if (c->magician && c->magician->faction) {
+    rc = c->magician->irace;
+    f = c->magician->faction;
+    if (f!=NULL && self != 0) {
+      sprintf(buf, "%s mag %s", u->name, factionname(f));
+    } else {
+      sprintf(buf, "%s scheint %s zu mögen", u->name, LOC(lang, rc_name(rc, 1)));
+    }
+    scat(". (");
+    scat(itoa36(c->no));
+    scat(")");
+    
+    return 1;
+  }
+  return 0;
 }
 static struct curse_type ct_calmmonster = { "calmmonster",
 	CURSETYP_NORM, CURSE_SPREADNEVER, NO_MERGE,
