@@ -1599,7 +1599,7 @@ parse_terrains(xmlDocPtr doc)
         terrain->production[k].divisor = strdup((const char *)property);
         xmlFree(property);
 
-        terrain->production[k].chance = (float)xml_fvalue(node, "chance", 1.0);
+        terrain->production[k].chance = (float)xml_fvalue(nodeProd, "chance", 1.0);
       }
     }
     xmlXPathFreeObject(xpathChildren);
