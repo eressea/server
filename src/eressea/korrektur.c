@@ -1060,15 +1060,23 @@ fix_familiars(void)
 static int 
 fix_resources(void)
 {
+  boolean started = false;
   int retval = 0;
   region * r;
 
   for (r=regions;r;r=r->next) {
     if (r->terrain->production!=NULL && r->resources==NULL) {
-      terraform_resources(r);
-      if (r->resources!=NULL) {
-        log_warning(("fixing resources in '%s'\n", regionname(r, NULL)));
-        retval = -1;
+      if (!started) {
+        terrain_production * prod = r->terrain->production;
+        while (prod->type && prod->chance<1.0) ++prod;
+        if (prod->type) started = true;
+      }
+      if (started) {
+        terraform_resources(r);
+        if (r->resources!=NULL) {
+          log_warning(("fixing resources in '%s'\n", regionname(r, NULL)));
+          retval = -1;
+        }
       }
     }
   }
