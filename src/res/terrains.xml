@@ -64,8 +64,8 @@
     <herb name="h15"/>
     <herb name="h16"/>
     <herb name="h17"/>
-    <resource name="iron" chance="1.0" level="1" base="3" div="50"/>
-    <resource name="stone" chance="1.0" level="1" base="2" div="100"/>
+    <resource name="iron" chance="0.9" level="1" base="3" div="50"/>
+    <resource name="stone" chance="0.9" level="1" base="2" div="100"/>
     <resource name="laen" chance="0.05" level="1" base="4" div="100"/>
   </terrain>
 
@@ -73,8 +73,8 @@
     <herb name="h15"/>
     <herb name="h16"/>
     <herb name="h17"/>
-    <resource name="iron" chance="1.0" level="1" base="3" div="50"/>
-    <resource name="stone" chance="1.0" level="1" base="2" div="100"/>
+    <resource name="iron" chance="0.9" level="1" base="3" div="50"/>
+    <resource name="stone" chance="0.9" level="1" base="2" div="100"/>
   </terrain>
 
   <terrain name="firewall" size="100" road="250" land="no" walk="no" sail="no" fly="no" forbidden="yes"/>
