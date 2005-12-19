@@ -893,6 +893,7 @@ terraform_region(region * r, const terrain_type * terrain)
   }
 
   r->terrain = terrain;
+  terraform_resources(r);
 
 	if (!fval(terrain, LAND_REGION)) {
 		if (r->land!=NULL) {

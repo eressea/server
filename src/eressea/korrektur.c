@@ -179,13 +179,14 @@ verify_owners(boolean bOnce)
 }
 
 /* make sure that this is done only once! */
-#define do_once(magic, fun) \
-{ \
-	attrib * a = find_key(global.attribs, atoi36(magic)); \
-	if (!a) { \
-		log_warning(("[do_once] a unique fix %d=\"%s\" was applied.\n", atoi36(magic), magic)); \
-		if (fun == 0) a_add(&global.attribs, make_key(atoi36(magic))); \
-	} \
+static void
+do_once(const char * magic, int fresult) 
+{
+  attrib * a = find_key(global.attribs, atoi36(magic));
+  if (!a) {
+    log_warning(("[do_once] a unique fix %d=\"%s\" was applied.\n", atoi36(magic), magic));
+    if (fresult == 0) a_add(&global.attribs, make_key(atoi36(magic)));
+  }
 }
 
 int
@@ -1056,6 +1057,24 @@ fix_familiars(void)
   return 0;
 }
 
+static int 
+fix_resources(void)
+{
+  int retval = 0;
+  region * r;
+
+  for (r=regions;r;r=r->next) {
+    if (r->terrain->production!=NULL && r->resources==NULL) {
+      terraform_resources(r);
+      if (r->resources!=NULL) {
+        log_warning(("fixing resources in '%s'\n", regionname(r, NULL)));
+        retval = -1;
+      }
+    }
+  }
+  return retval;
+}
+
 #define REPORT_NR (1 << O_REPORT)
 #define REPORT_CR (1 << O_COMPUTER)
 #define REPORT_ZV (1 << O_ZUGVORLAGE)
@@ -1185,6 +1204,7 @@ korrektur(void)
   fix_demands();
   fix_otherfaction();
   fix_familiars();
+  do_once("tfrs", fix_resources());
   /* trade_orders(); */
   
   /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
