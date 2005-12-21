@@ -62,34 +62,35 @@ update_resource(struct rawmaterial * res, double modifier)
 void
 terraform_resources(region * r)
 {
-	int i;
-	const terrain_type * terrain = r->terrain;
+  int i;
+  const terrain_type * terrain = r->terrain;
 
-	for (i=0;terrain->production[i].type; ++i) {
-		rawmaterial *rm;
+  if (terrain->production==NULL) return;
+  for (i=0;terrain->production[i].type; ++i) {
+    rawmaterial *rm;
     const terrain_production * production = terrain->production+i;
     const resource_type * rtype = production->type;
 
-		for (rm=r->resources; rm; rm=rm->next) {
-			if (rm->type->rtype == rtype) break;
-		}
-		if (rm) continue;
-
-		if (chance(production->chance)) {
-			rm = calloc(sizeof(struct rawmaterial), 1);
-
-			rm->next = r->resources;
-			r->resources = rm;
-			rm->level      = dice_rand(production->startlevel);
-			rm->startlevel = rm->level;
-			rm->base       = dice_rand(production->base);
-			rm->divisor    = dice_rand(production->divisor);
-			rm->flags      = 0;
-			rm->type       = rmt_get(production->type);
+    for (rm=r->resources; rm; rm=rm->next) {
+      if (rm->type->rtype == rtype) break;
+    }
+    if (rm) continue;
+    
+    if (chance(production->chance)) {
+      rm = calloc(sizeof(struct rawmaterial), 1);
+      
+      rm->next = r->resources;
+      r->resources = rm;
+      rm->level      = dice_rand(production->startlevel);
+      rm->startlevel = rm->level;
+      rm->base       = dice_rand(production->base);
+      rm->divisor    = dice_rand(production->divisor);
+      rm->flags      = 0;
+      rm->type       = rmt_get(production->type);
       update_resource(rm, 1.0);
-			rm->type->terraform(rm, r);
-		}
-	}
+      rm->type->terraform(rm, r);
+    }
+  }
 }
 
 static void
