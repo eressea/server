@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <strings>
+  <namespace name="iteminfo">
+    <string name="seashell">
+      <text locale="en">
+         This badge pronounces its wearer an official visitor to the
+         region of Muschelplateau.
+      </text>
+      <text locale="de">
+        Dieses Abzeichen identifiziert die Partei seines Träger offiziell
+        als einen Bescuher der Botschafterregion 'Muschelplateau'.
+      </text>
+    </string>
+    <string name="stardust">
+      <text locale="de">
+         Dieser magische Staub ist aus einem im Winter vom Himmel gefallenen
+         Stern gewonnen worden, und ihm werden aphrodisiakische Eigenschaften
+         nachgesagt.
+      </text>
+      <text locale="en">
+        This vial of dust, made from the remains of a star that fell from
+        the sky one cold winter night, is said to have aphrodisiacal powers.
+      </text>
+    </string>
+  </namespace>
   <string name="seashell">
     <text locale="de">Muschel</text>
     <text locale="en">seashell</text>
