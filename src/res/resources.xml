@@ -53,18 +53,6 @@
     </item>
   </resource>
 
-  <resource name="snowball">
-    <!-- xmas gimmik -->
-    <item notlost="yes" weight="0">
-      <function name="use" value="usesnowball"/>
-    </item>
-  </resource>
-
-  <resource name="snowman">
-    <!-- xmas gimmik -->
-    <item notlost="yes" weight="1"/>
-  </resource>
-
 <!-- items -->
   <resource name="seed" limited="yes">
     <item weight="10" score="50">

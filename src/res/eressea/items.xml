@@ -1,6 +1,19 @@
 <?xml version="1.0"?>
 <resources>
 
+<!-- xmas gimmicks -->
+  <resource name="snowball">
+    <item notlost="yes" weight="0">
+      <function name="use" value="lua_useitem"/>
+    </item>
+  </resource>
+
+  <resource name="snowman">
+    <item notlost="yes" weight="1">
+      <function name="use" value="lua_useitem"/>
+    </item>
+  </resource>
+
 <!-- ambassador rewards -->
   <resource name="seashell">
     <item cursed="true" weight="0">

@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <strings>
+  <namespace name="race">
+    <string name="snowman">
+      <text locale="de">Schneemann</text>
+      <text locale="en">snowman</text>
+    </string>
+    <string name="snowman_p">
+      <text locale="de">Schneemänner</text>
+      <text locale="en">snowmen</text>
+    </string>
+  </namespace>
   <namespace name="iteminfo">
     <string name="seashell">
       <text locale="en">
