@@ -2237,7 +2237,18 @@ display_item(faction *f, unit *u, const item_type * itype)
   char * bufp = buf;
   size_t size = sizeof(buf), rsize;
 
-  if (u && *i_find(&u->items, itype) == NULL) return false;
+  if (u!=NULL) {
+    int i = i_get(u->items, itype);
+    if (i==0) {
+      if (u->region->land!=NULL) {
+        i = i_get(u->region->land->items, itype);
+      }
+      if (i==0) {
+        i = i_get(u->faction->items, itype);
+        if (i==0) return false;
+      }
+    }
+  }
 
   name = resourcename(itype->rtype, 0);
   key = mkname("iteminfo", name);

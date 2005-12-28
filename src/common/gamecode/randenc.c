@@ -623,6 +623,10 @@ damage_unit(unit *u, const char *dam, boolean physical, boolean magic)
   int   h;
   int   i, dead = 0, hp_rem = 0, heiltrank;
 
+  if (fval(u, RCF_ILLUSIONARY) || u->race == new_race[RC_SPELL]) {
+    return 0;
+  }
+
   if (u->number==0) return 0;
   h = u->hp/u->number;
   /* HP verteilen */
