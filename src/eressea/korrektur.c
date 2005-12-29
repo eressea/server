@@ -180,12 +180,12 @@ verify_owners(boolean bOnce)
 
 /* make sure that this is done only once! */
 static void
-do_once(const char * magic, int fresult) 
+do_once(const char * magic, int (*fptr)(void))
 {
   attrib * a = find_key(global.attribs, atoi36(magic));
   if (!a) {
     log_warning(("[do_once] a unique fix %d=\"%s\" was applied.\n", atoi36(magic), magic));
-    if (fresult == 0) a_add(&global.attribs, make_key(atoi36(magic)));
+    if (fptr() == 0) a_add(&global.attribs, make_key(atoi36(magic)));
   }
 }
 
@@ -535,74 +535,15 @@ get_timeout(trigger * td, trigger * tfind)
 	return t;
 }
 
-#include <modules/gmcmd.h>
-
-static int
-secondfaction(faction * pf)
-{
-	unit * u = findunit(atoi36("5q9w"));
-	if (u!=NULL) {
-		plane * p = rplane(u->region);
-		if (p!=NULL) {
-			region * center = findregion((p->maxx-p->minx)/2, (p->maxy-p->miny)/2);
-			if (center!=NULL) {
-				gm_addfaction(pf->email, p, center);
-				return 0;
-			}
-		}
-	}
-	return -1;
-}
-
-static void
-update_gmquests(void)
-{
-	faction * f = findfaction(atoi36("gm04"));
-	if (f) {
-		unit * u = f->units;
-		int p;
-		attrib * permissions = a_find(f->attribs, &at_permissions);
-
-		if (u!=NULL) {
-			plane * p = rplane(u->region);
-			/* gm04 will keine Orks */
-			if (p!=NULL) p->flags |= PFL_NOORCGROWTH;
-			/* gm04 will keine Monster */
-			if (p!=NULL) p->flags |= PFL_NOMONSTERS;
-		}
-		for (p=0;p!=MAX_POTIONS;++p) {
-			attrib * a = a_find((attrib*)permissions->data.v, &at_gmcreate);
-			while (a && a->data.v!=(void*)oldpotiontype[p]->itype) a=a->nexttype;
-			if (!a) a_add((attrib**)&permissions->data.v, make_atgmcreate(oldpotiontype[p]->itype));
-		}
-		do_once("et02", secondfaction(f));
-	}
-}
-
-#define TEST_LOCALES 0
-#if TEST_LOCALES
-static void
-setup_locales(void)
-{
-	locale * lang = find_locale("en");
-	faction * f = factions;
-	while (f) {
-		f->locale = lang;
-		f = f->next;
-	}
-}
-#endif
-
 #include <triggers/shock.h>
 #include <triggers/killunit.h>
-
 
 #if RESOURCE_CONVERSION
 extern struct attrib_type at_resources;
 void
 init_resourcefix(void)
 {
-	at_register(&at_resources);
+  at_register(&at_resources);
 }
 
 #endif
@@ -1178,24 +1119,27 @@ fix_chaosgates(void)
   return 0;
 }
 
+void print_keys(const attrib * alist);
+
 void
 korrektur(void)
 {
   check_dissolve();
-	french_testers();
+  french_testers();
 #if TEST_LOCALES
-	setup_locales();
+  setup_locales();
 #endif
   if (turn>400) {
-    do_once("zvrm", disable_templates());
+    print_keys(global.attribs);
+    do_once("zvrm", &disable_templates);
   } else {
-    do_once("zvrm", nothing());
+    do_once("zvrm", &nothing);
   }
-  do_once("rdec", road_decay());
+  do_once("rdec", &road_decay);
 
-  do_once("chgt", fix_chaosgates());
-  do_once("atrx", fix_attribflags());
-  do_once("asfi", fix_astral_firewalls());
+  do_once("chgt", &fix_chaosgates);
+  do_once("atrx", &fix_attribflags);
+  do_once("asfi", &fix_astral_firewalls);
   frame_regions();
 #ifdef GLOBAL_WARMING
   global_warming();
@@ -1211,7 +1155,6 @@ korrektur(void)
     no_teurefremde(true);
   }
   fix_allies();
-  update_gmquests(); /* test gm quests */
   /* fix_unitrefs(); */
   warn_password();
   fix_road_borders();
@@ -1222,7 +1165,7 @@ korrektur(void)
   fix_demands();
   fix_otherfaction();
   fix_familiars();
-  do_once("tfrs", fix_resources());
+  do_once("tfrs", &fix_resources);
   /* trade_orders(); */
   
   /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
