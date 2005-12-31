@@ -1302,12 +1302,29 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
     /* check movement from/to oceans. 
      * aquarian special, flying units, horses, the works */
     if ((u->race->flags & RCF_FLY) == 0) {
-      if (fval(current->terrain, SEA_REGION) && !fval(next->terrain, SEA_REGION)) {
-        int moving = u->race->flags & (RCF_SWIM|RCF_WALK|RCF_COASTAL);
-        /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
-        if (moving != (RCF_SWIM|RCF_WALK) && (moving|RCF_COASTAL) == 0) {
-          /* can't swim+walk and isn't allowed to enter coast from sea */
-          if (ord!=NULL) cmistake(u, ord, 44, MSG_MOVE);
+      if (!fval(next->terrain, SEA_REGION)) {
+        /* next region is land */
+        if (fval(current->terrain, SEA_REGION)) {
+          int moving = u->race->flags & (RCF_SWIM|RCF_WALK|RCF_COASTAL);
+          /* Die Einheit kann nicht fliegen, ist im Ozean, und will an Land */
+          if (moving != (RCF_SWIM|RCF_WALK) && (moving|RCF_COASTAL) == 0) {
+            /* can't swim+walk and isn't allowed to enter coast from sea */
+            if (ord!=NULL) cmistake(u, ord, 44, MSG_MOVE);
+            break;
+          }
+        } else if ((u->race->flags & RCF_WALK) == 0) {
+          /* Spezialeinheiten, die nicht laufen können. */
+          int moving = u->race->flags & (RCF_SWIM|RCF_WALK|RCF_COASTAL);
+          ADDMSG(&u->faction->msgs, msg_message("detectocean",
+            "unit region", u, next));
+          break;
+        }
+      } else {
+        /* Ozeanfelder können nur von Einheiten mit Schwimmen und ohne
+         * Pferde betreten werden. */
+        if (!(canswim(u) || canfly(u))) {
+          ADDMSG(&u->faction->msgs, msg_message("detectocean",
+            "unit region", u, next));
           break;
         }
       }
@@ -1317,16 +1334,6 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
         if (get_item(u, I_HORSE) > 0 || get_item(u, I_UNICORN) > 0) {
           /* tries to do it with horses */
           if (ord!=NULL) cmistake(u, ord, 67, MSG_MOVE);
-          break;
-        }
-      }
-
-      /* Ozeanfelder können nur von Einheiten mit Schwimmen und ohne
-       * Pferde betreten werden. */
-      if (fval(next->terrain, SEA_REGION)) {
-        if (!(canswim(u) || canfly(u))) {
-          ADDMSG(&u->faction->msgs, msg_message("detectocean",
-            "unit region", u, next));
           break;
         }
       }

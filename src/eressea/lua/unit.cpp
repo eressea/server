@@ -175,6 +175,7 @@ unit_setrace(unit& u, const char * rcname)
 {
   race * rc = rc_find(rcname);
   if (rc!=NULL) {
+    if (u.irace==u.race) u.irace = rc;
     u.race = rc;
   }
 }
