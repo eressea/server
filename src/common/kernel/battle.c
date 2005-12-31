@@ -977,75 +977,75 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
   }
   ar += am;
 
-  if (type!=AT_COMBATSPELL && type!=AT_SPELL) /* Kein Zauber, normaler Waffenschaden */
-    {
-      double kritchance = (sk * 3 - sd) / 200.0;
-      kritchance = max(kritchance, 0.005);
-      kritchance = min(0.9, kritchance);
+  if (type!=AT_COMBATSPELL && type!=AT_SPELL) {
+    /* Kein Zauber, normaler Waffenschaden */
+    double kritchance = (sk * 3 - sd) / 200.0;
+    kritchance = max(kritchance, 0.005);
+    kritchance = min(0.9, kritchance);
 
-      while (chance(kritchance)) {
-	sprintf(debugbuf,
-		"%s/%d landet einen kritischen Treffer", unitid(au), at.index);
-	battledebug(debugbuf);
-	da += dice_rand(damage);
-      }
+    while (chance(kritchance)) {
+      sprintf(debugbuf,
+        "%s/%d landet einen kritischen Treffer", unitid(au), at.index);
+      battledebug(debugbuf);
+      da += dice_rand(damage);
+    }
 
-      da += rc_specialdamage(au->race, du->race, awtype);
+    da += rc_specialdamage(au->race, du->race, awtype);
 #ifdef KARMA_MODULE
-      da += jihad(au->faction, du->race);
+    da += jihad(au->faction, du->race);
 #endif
-      faerie_level = fspecial(du->faction, FS_FAERIE);
-      if (type == AT_STANDARD && faerie_level) {
-	int c;
+    faerie_level = fspecial(du->faction, FS_FAERIE);
+    if (type == AT_STANDARD && faerie_level) {
+      int c;
 
-	for (c=0;weapon->type->itype->construction->materials[c].number; c++) {
-	  if(weapon->type->itype->construction->materials[c].rtype == oldresourcetype[R_IRON]) {
-	    da += faerie_level;
-	    break;
-	  }
-	}
+      for (c=0;weapon->type->itype->construction->materials[c].number; c++) {
+        if(weapon->type->itype->construction->materials[c].rtype == oldresourcetype[R_IRON]) {
+          da += faerie_level;
+          break;
+        }
       }
-
-      if (awtype!=NULL && fval(awtype, WTF_MISSILE)) {
-	/* Fernkampfschadenbonus */
-	da += af->person[at.index].damage_rear;
-      } else if (awtype==NULL) {
-	/* Waffenloser kampf, bonus von talentwert*/
-	da += effskill(au, SK_WEAPONLESS);
-      } else {
-	/* Nahkampfschadensbonus */
-	da += af->person[at.index].damage;
-      }
-
-      /* Skilldifferenzbonus */
-      da += max(0, (sk-sd)/DAMAGE_QUOTIENT);
     }
 
+    if (awtype!=NULL && fval(awtype, WTF_MISSILE)) {
+      /* Fernkampfschadenbonus */
+      da += af->person[at.index].damage_rear;
+    } else if (awtype==NULL) {
+      /* Waffenloser kampf, bonus von talentwert*/
+      da += effskill(au, SK_WEAPONLESS);
+    } else {
+      /* Nahkampfschadensbonus */
+      da += af->person[at.index].damage;
+    }
 
-  if (magic) /* Magischer Schaden durch Spruch oder magische Waffe */
-    {
-      double res = 1.0;
+    /* Skilldifferenzbonus */
+    da += max(0, (sk-sd)/DAMAGE_QUOTIENT);
+  }
 
-      /* magic_resistance gib x% Resistenzbonus zurück */
-      res -= magic_resistance(du)*3.0;
 
-      if (du->race->battle_flags & BF_EQUIPMENT) {
+  if (magic) {
+    /* Magischer Schaden durch Spruch oder magische Waffe */
+    double res = 1.0;
+
+    /* magic_resistance gib x% Resistenzbonus zurück */
+    res -= magic_resistance(du)*3.0;
+
+    if (du->race->battle_flags & BF_EQUIPMENT) {
 #ifdef TODO_RUNESWORD
-	/* Runenschwert gibt im Kampf 80% Resistenzbonus */
-	if (dwp == WP_RUNESWORD) res -= 0.80;
+      /* Runenschwert gibt im Kampf 80% Resistenzbonus */
+      if (dwp == WP_RUNESWORD) res -= 0.80;
 #endif
-	/* der Effekt von Laen steigt nicht linear */
-	if (armor && fval(armor, ATF_LAEN)) res *= (1-armor->magres);
-	if (shield && fval(shield, ATF_LAEN)) res *= (1-shield->magres);
-	if (dwtype) res *= (1-dwtype->magres);
-      }
-
-      if (res > 0) {
-	da = (int) (max(da * res, 0));
-      }
-      /* gegen Magie wirkt nur natürliche und magische Rüstung */
-      ar = an+am;
+      /* der Effekt von Laen steigt nicht linear */
+      if (armor && fval(armor, ATF_LAEN)) res *= (1-armor->magres);
+      if (shield && fval(shield, ATF_LAEN)) res *= (1-shield->magres);
+      if (dwtype) res *= (1-dwtype->magres);
     }
+
+    if (res > 0) {
+      da = (int) (max(da * res, 0));
+    }
+    /* gegen Magie wirkt nur natürliche und magische Rüstung */
+    ar = an+am;
+  }
 
   rda = max(da - ar,0);
 
@@ -1062,31 +1062,31 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
     for (si = b->meffects.begin; si != b->meffects.end; ++si) {
       meffect *meffect = *si;
       if (meffect_protection(b, meffect, ds) != 0) {
-	assert(0 <= rda); /* rda sollte hier immer mindestens 0 sein */
-				/* jeder Schaden wird um effect% reduziert bis der Schild duration
-				 * Trefferpunkte aufgefangen hat */
-	if (meffect->typ == SHIELD_REDUCE) {
-	  hp = rda * (meffect->effect/100);
-	  rda -= hp;
-	  meffect->duration -= hp;
-	}
-				/* gibt Rüstung +effect für duration Treffer */
-	if (meffect->typ == SHIELD_ARMOR) {
-	  rda = max(rda - meffect->effect, 0);
-	  meffect->duration--;
-	}
+        assert(0 <= rda); /* rda sollte hier immer mindestens 0 sein */
+        /* jeder Schaden wird um effect% reduziert bis der Schild duration
+        * Trefferpunkte aufgefangen hat */
+        if (meffect->typ == SHIELD_REDUCE) {
+          hp = rda * (meffect->effect/100);
+          rda -= hp;
+          meffect->duration -= hp;
+        }
+        /* gibt Rüstung +effect für duration Treffer */
+        if (meffect->typ == SHIELD_ARMOR) {
+          rda = max(rda - meffect->effect, 0);
+          meffect->duration--;
+        }
       }
     }
   }
 
   sprintf(debugbuf, "Verursacht %dTP, Rüstung %d: %d -> %d HP",
-	  da, ar, df->person[dt.index].hp, df->person[dt.index].hp - rda);
+    da, ar, df->person[dt.index].hp, df->person[dt.index].hp - rda);
 
 #ifdef SMALL_BATTLE_MESSAGES
   if (b->small) {
     if (rda > 0) {
       sprintf(smallbuf, "Der Treffer verursacht %s",
-	      rel_dam(rda, df->person[dt.index].hp));
+        rel_dam(rda, df->person[dt.index].hp));
     } else {
       sprintf(smallbuf, "Der Treffer verursacht keinen Schaden");
     }
@@ -1103,8 +1103,8 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
       if (select_weapon(dt, 0, -1) == WP_RUNESWORD) continue;
 #endif
       if (!(df->person[dt.index].flags & (FL_COURAGE|FL_DAZZLED))) {
-	df->person[dt.index].flags |= FL_DAZZLED;
-	df->person[dt.index].defence--;
+        df->person[dt.index].flags |= FL_DAZZLED;
+        df->person[dt.index].defence--;
       }
     }
     df->person[dt.index].flags = (df->person[dt.index].flags & ~FL_SLEEPING);
@@ -1155,11 +1155,11 @@ terminate(troop dt, troop at, int type, const char *damage, boolean missile)
       battlerecord(b, smallbuf);
     } else 
 #endif
-      {
-	message * m = msg_message("battle::potionsave", "unit", du);
-	message_faction(b, du->faction, m);
-	msg_release(m);
-      }
+    {
+      message * m = msg_message("battle::potionsave", "unit", du);
+      message_faction(b, du->faction, m);
+      msg_release(m);
+    }
     assert(dt.index>=0 && dt.index<du->number);
     df->person[dt.index].hp = du->race->hitpoints;
     return false;
