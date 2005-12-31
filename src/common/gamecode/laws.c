@@ -523,62 +523,45 @@ calculate_emigration(region *r)
 }
 #endif
 
-/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
+/** Bauern vermehren sich */
 
 static void
 peasants(region * r)
 {
-
-  int glueck;
-
-  /* Das Geld, daß die Bauern erwirtschaftet haben unter expandwork, gibt
-   * den Bauern genug für 11 Bauern pro Ebene ohne Wald. Der Wald
-   * breitet sich nicht in Gebiete aus, die bebaut werden. */
-
-  int peasants, n, i, satiated, money;
-#if PEASANTS_DO_NOT_STARVE == 0
-  int dead;
-#endif
-  attrib * a;
-
-  /* Bauern vermehren sich */
+  int glueck = 0;
+  int peasants = rpeasants(r);
+  int money = rmoney(r);
+  int maxp = production(r) * MAXPEASANTS_PER_AREA;
+  int n, satiated;
+  int dead = 0;
+  attrib * a = a_find(r->attribs, &at_peasantluck);
 
   /* Bis zu 1000 Bauern können Zwillinge bekommen oder 1000 Bauern
    * wollen nicht! */
 
-  a = a_find(r->attribs, &at_peasantluck);
-  if (!a) {
-    glueck = 0;
-  } else {
+  if (a!=NULL) {
     glueck = a->data.i * 1000;
   }
 
-  peasants = rpeasants(r);
-
   for (n = peasants; n; n--) {
+    int i;
+
     if (glueck >= 0) {    /* Sonst keine Vermehrung */
       if (rand() % 10000 < PEASANTGROWTH) {
-        if ((float) peasants
-          / ((float) production(r) * MAXPEASANTS_PER_AREA)
-          < 0.9 || rand() % 100 < PEASANTFORCE) {
-          peasants++;
+        if (peasants/(float)maxp < 0.9 || rand() % 100 < PEASANTFORCE) {
+          ++peasants;
         }
       }
-    } else
-      glueck++;
+      --glueck;
+    }
 
-    if (glueck > 0) {   /* Doppelvermehrung */
-      for(i=0; i<PEASANTLUCK; i++) {
-        if (rand() % 10000 < PEASANTGROWTH)
-          peasants++;
-      }
-      glueck--;
+    for (i=0; i!=PEASANTLUCK; i++) {
+      if (rand() % 10000 < PEASANTGROWTH) ++peasants;
     }
   }
 
   /* Alle werden satt, oder halt soviele für die es auch Geld gibt */
 
-  money = rmoney(r);
   satiated = min(peasants, money / maintenance_cost(NULL));
   rsetmoney(r, money - satiated * maintenance_cost(NULL));
 
@@ -588,18 +571,15 @@ peasants(region * r)
 
   /* Es verhungert maximal die unterernährten Bevölkerung. */
 
-#if PEASANTS_DO_NOT_STARVE == 0
-  dead = 0;
-  for (n = min((peasants - satiated), rpeasants(r)); n; n--)
-    if (rand() % 100 > STARVATION_SURVIVAL)
-      dead++;
+  for (n = min((peasants - satiated), rpeasants(r)); n; n--) {
+    if (rand() % 100 > STARVATION_SURVIVAL) ++dead;
+  }
 
-  if(dead > 0) {
+  if (dead > 0) {
     message * msg = add_message(&r->msgs, msg_message("phunger", "dead", dead));
     msg_release(msg);
     peasants -= dead;
   }
-#endif
 
   rsetpeasants(r, peasants);
 }

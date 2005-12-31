@@ -17,6 +17,7 @@ Code cleanup:
 - give monsters name with lua
 - kick init_oldherbs out (good for terrain)
 - allocators aus economy nach XML
+- reporting units: http://eressea.upb.de/mantis/view.php?id=781
 
 Larger Features:
 - eressea (b/g)zip reports?
