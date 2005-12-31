@@ -366,6 +366,13 @@
 				</FileConfiguration>
 			</File>
 		</Filter>
+		<Filter
+			Name="XML files"
+			Filter="">
+			<File
+				RelativePath="..\res\terrains.xml">
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\console.c">
 		</File>

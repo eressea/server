@@ -38,9 +38,8 @@ extern "C" {
 #define FLY_INTO		     (1<<7)		/* man darf hierhin fliegen */
 #define SWIM_INTO		     (1<<8)		/* man darf hierhin schwimmen */
 #define WALK_INTO		     (1<<9)		/* man darf hierhin laufen */
-#define LARGE_SHIPS		   (1<<10)		/* grosse Schiffe dürfen hinfahren */
-
-#define NORMAL_TERRAIN	(WALK_INTO|SAIL_INTO|FLY_INTO)
+#define LARGE_SHIPS		   (1<<10)	/* grosse Schiffe dürfen hinfahren */
+#define AUTO_TERRAIN     (1<<11)  /* used by autoseed */
 
 typedef struct production_rule {
 	char * name;

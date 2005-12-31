@@ -1539,6 +1539,7 @@ parse_terrains(xmlDocPtr doc)
       if (xml_bvalue(node, "swim", false)) terrain->flags |= SWIM_INTO;
       if (xml_bvalue(node, "shallow", true)) terrain->flags |= LARGE_SHIPS;
       if (xml_bvalue(node, "cavalry", false)) terrain->flags |= CAVALRY_REGION;
+      if (xml_bvalue(node, "seed", true)) terrain->flags |= AUTO_TERRAIN;
     }
     if (xml_bvalue(node, "sea", false)) terrain->flags |= SEA_REGION;
     if (xml_bvalue(node, "arctic", false)) terrain->flags |= ARCTIC_REGION;

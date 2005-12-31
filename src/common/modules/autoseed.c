@@ -645,7 +645,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
       --isize;
       if (psize>=PLAYERS_PER_ISLAND) break;
     } else {
-      terraform_region(r, random_terrain(NORMAL_TERRAIN));
+      terraform_region(r, random_terrain(AUTO_TERRAIN));
       --isize;
     }
   }
@@ -681,7 +681,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
             const struct terrain_type * terrain = newterrain(T_OCEAN);
             rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
             if (rand() % SPECIALCHANCE < special) {
-              terrain = random_terrain(NORMAL_TERRAIN);
+              terrain = random_terrain(AUTO_TERRAIN);
               special = SPECIALCHANCE / 3; /* 33% chance auf noch eines */
             } else {
               special = 1;
