@@ -1545,7 +1545,7 @@ parse_terrains(xmlDocPtr doc)
     if (xml_bvalue(node, "land", true)) terrain->flags |= LAND_REGION;
     if (xml_bvalue(node, "forest", false)) terrain->flags |= FOREST_REGION;
 
-    terrain->distribution = (short)xml_ivalue(node, "seed", 0) terrain->flags |= AUTO_TERRAIN;
+    terrain->distribution = (short)xml_ivalue(node, "seed", 0);
 
     xpath->node = node;
     xpathChildren = xmlXPathEvalExpression(BAD_CAST "herb", xpath);
