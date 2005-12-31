@@ -718,7 +718,7 @@ enum {
 	D_WEST,
 	MAXDIRECTIONS,
 	D_PAUSE,
-        D_SPECIAL,
+  D_SPECIAL,
 	NODIRECTION = (direction_t) - 1
 };
 

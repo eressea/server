@@ -1037,10 +1037,87 @@ cap_route(region * r, region_list * route, region_list * route_end, int speed)
   return iroute;
 }
 
+static boolean
+is_disoriented(unit *u)
+{
+  static boolean init = false;
+  static const curse_type * shipconf_ct, * regconf_ct;
+  if (!init) { 
+    init = true; 
+    regconf_ct = ct_find("disorientationzone"); 
+    shipconf_ct = ct_find("shipdisorientation"); 
+  }
+  if (u->ship && curse_active(get_curse(u->ship->attribs, shipconf_ct)))
+    return true;
+
+  if (curse_active(get_curse(u->region->attribs, regconf_ct)))
+    return true;
+
+  return false;
+}
+
+/** ships regain their orientation
+ * Das Schiff bekommt seine Orientierung zurück, wenn es: 
+ * a) An Land treibt,
+ * b) Glück hat, oder
+ * c) in einer Region mit einem nicht verwirrten alliierten
+ * 		Schiff steht.
+ */
+static void
+regain_orientation(region * r)
+{
+  ship *sh;
+  static int thismonth = -1;
+  static const curse_type * shipconf_ct, * regconf_ct;
+  static boolean init = false;
+
+  if (!init) { 
+    init = true; 
+    regconf_ct = ct_find("disorientationzone"); 
+    shipconf_ct = ct_find("shipdisorientation"); 
+  }
+
+  if (thismonth<0) thismonth = get_gamedate(turn, 0)->month;
+
+  for (sh = r->ships; sh; sh = sh->next) {
+    unit * u, *cap;
+    curse * c = get_curse(sh->attribs, shipconf_ct);
+    if (c==NULL) continue;
+
+    cap = shipowner(sh);
+    if (cap==NULL) continue;
+
+    if (!fval(r->terrain, SEA_REGION) || rand() % 10 >= storms[thismonth]) {
+      remove_curse(&sh->attribs, c);
+      ADDMSG(&cap->faction->msgs, msg_message("shipnoconf", "ship", sh));
+      continue;
+    }
+
+    for (u=r->units; u; u=u->next) {
+      /* we get help if u helps the faction of cap and isn't disoriented */
+      if (u != cap && alliedunit(u, cap->faction, HELP_GUARD) && !is_disoriented(u)) {
+        remove_curse(&sh->attribs, c);
+        ADDMSG(&cap->faction->msgs, msg_message("shipnoconf", "ship", sh));
+        break;
+      }
+    }
+  }
+}
+
 static region *
 next_region(unit * u, region * current, region * next)
 {
-  border * b = get_borders(current, next);
+  border * b;
+
+  if (is_disoriented(u)) {
+    direction_t d = reldirection(current, next);
+    if (d<MAXDIRECTIONS) {
+      d = (direction_t)(((d+MAXDIRECTIONS-1)+rand()%3)%MAXDIRECTIONS);
+      next = rconnect(current, d);
+    }
+  }
+
+  b = get_borders(current, next);
   while (b!=NULL) {
     if (b->type->move) {
       region * rto = b->type->move(b, u, current, next, true);
@@ -1064,7 +1141,7 @@ reroute(unit * u, region_list * route, region_list * route_end)
   while (route!=route_end) {
     region * next = next_region(u, current, route->data);
     if (next!=route->data) break;
-    route=route->next;
+    route = route->next;
   }
   return route;
 }
@@ -2203,67 +2280,6 @@ destroy_damaged_ships(void)
 	}
 }
 
-#ifdef TODO /* Wenn Feature ausgearbeitet */
-
-static boolean
-is_disorientated(unit *u)
-{
-  static boolean init = false;
-  static const curse_type * shipconf_ct, * regconf_ct;
-  if (!init) { 
-    init = true; 
-    regconf_ct = ct_find("disorientationzone"); 
-    shipconf_ct = ct_find("shipdisorientation"); 
-  }
-  if (u->ship && curse_active(get_curse(u->ship->attribs, shipconf_ct)))
-    return true;
-
-  if (curse_active(get_curse(u->region->attribs, regconf_ct)))
-    return true;
-
-  return false;
-}
-
-void
-regain_orientation(region * r)
-{
-	ship *sh;
-	curse *c;
-	unit *u, *cap;
-  static int thismonth = get_gamedate(turn, 0)->month;
-
-	for (sh = r->ships; sh; sh = sh->next) {
-		c = get_curse(sh->attribs, C_DISORIENTATION, 0);
-		if(!c) continue;
-
-		/* Das Schiff bekommt seine Orientierung zurück, wenn es:
-		 * a) An Land treibt.
-		 * b) Glück hat.
-		 * c) In einer Region mit einem nicht verwirrten alliierten
-		 * 		Schiff steht.
-		 */
-
-		cap = shipowner(r, sh);
-
-		if (r->terrain != T_OCEAN || rand() % 10 >= storms[thismonth]) {
-			remove_curse(&sh->attribs, C_DISORIENTATION, 0);
-				ADDMSG(&cap->faction->msgs, msg_message("shipnoconf", "ship", sh));
-        continue;
-		}
-
-		for(u=r->units;u;u=u->next) {
-			if(u != cap
-					&& allied(cap, u->faction, HELP_GUARD)
-					&& is_disorientated(u) == false) {
-				remove_curse(&sh->attribs, C_DISORIENTATION, 0);
-				ADDMSG(&cap->faction->msgs, msg_message("shipnoconf", "ship", sh));
-				break;
-			}
-		}
-	}
-}
-#endif
-
 /* Bewegung, Verfolgung, Piraterie */
 
 /** ships that folow other ships
@@ -2374,6 +2390,11 @@ movement(void)
     while (r!=NULL) {
       unit ** up = &r->units;
       boolean repeat = false;
+
+      if (ships==0) {
+        /* first thing before moving: restore orientation if we can */
+        regain_orientation(r);
+      }
 
       while (*up) {
         unit *u = *up;

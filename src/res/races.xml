@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="iso-8859-1" ?>
 <races>
   <race name="kraken" magres="0.000000" maxaura="0.000000" regaura="0.000000" recruitcost="50" weight="500" capacity="200" speed="2.000000" hp="300" damage="2d10" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" coastal="yes" swim="yes" teach="no" giveitem="yes" getitem="yes">
     <ai splitsize="5000"/>
