@@ -283,6 +283,8 @@ bind_faction(lua_State * L)
     .def_readonly("name", &faction::name)
     .def_readonly("id", &faction::no)
     .def_readwrite("age", &faction::age)
+    .def_readwrite("options", &faction::options)
+    .def_readwrite("flags", &faction::flags)
     .def_readwrite("subscription", &faction::subscription)
     .def_readwrite("lastturn", &faction::lastorders)
 
