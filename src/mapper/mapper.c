@@ -1154,7 +1154,7 @@ movearound(short rx, short ry) {
           if (r!=NULL) {
             a = map_input(0,0,0,"Wieviele Regionen?",0,500,0);
             if (a) {
-              const terrain_type * terrain = random_terrain(AUTO_TERRAIN);
+              const terrain_type * terrain = random_terrain(false);
               create_island(r, a, terrain);
               modified=1;
             }

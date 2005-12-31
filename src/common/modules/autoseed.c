@@ -38,23 +38,23 @@
 #include <stdlib.h>
 
 const terrain_type *
-random_terrain(unsigned int flags)
+random_terrain(boolean distribution)
 {
   static int nterrains;
+  static int ndistribution;
   const terrain_type * terrain;
   int n;
   if (nterrains==0) {
     for (terrain=terrains();terrain;terrain=terrain->next) {
-      if (fval(terrain, flags)==flags) {
-        ++nterrains;
-      }
+      ndistribution += terrain->distribution;
+      ++nterrains;
     }
   }
-  n = rand() % nterrains;
+
+  n = rand() % distribution?ndistribution:nterrains;
   for (terrain=terrains();terrain;terrain=terrain->next) {
-    if (fval(terrain, flags)==flags) {
-      if (n--==0) break;
-    }
+    n -= distribution?terrain->distribution:1;
+    if (n<0) break;
   }
   return terrain;
 }
@@ -645,7 +645,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
       --isize;
       if (psize>=PLAYERS_PER_ISLAND) break;
     } else {
-      terraform_region(r, random_terrain(AUTO_TERRAIN));
+      terraform_region(r, random_terrain(true));
       --isize;
     }
   }
@@ -681,7 +681,7 @@ autoseed(newfaction ** players, int nsize, boolean new_island)
             const struct terrain_type * terrain = newterrain(T_OCEAN);
             rn = new_region(r->x + delta_x[d], r->y + delta_y[d]);
             if (rand() % SPECIALCHANCE < special) {
-              terrain = random_terrain(AUTO_TERRAIN);
+              terrain = random_terrain(true);
               special = SPECIALCHANCE / 3; /* 33% chance auf noch eines */
             } else {
               special = 1;

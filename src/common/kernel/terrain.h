@@ -67,6 +67,7 @@ typedef struct terrain_type {
   int size;         /* how many peasants can work? */
   unsigned int flags;
   short max_road;   /* this many stones make a full road */
+  short distribution; /* multiplier used for seeding */
   struct terrain_production * production;
   const struct item_type ** herbs; /* zero-terminated array of herbs */
   const char * (*name)(const struct region * r);

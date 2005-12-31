@@ -1539,12 +1539,13 @@ parse_terrains(xmlDocPtr doc)
       if (xml_bvalue(node, "swim", false)) terrain->flags |= SWIM_INTO;
       if (xml_bvalue(node, "shallow", true)) terrain->flags |= LARGE_SHIPS;
       if (xml_bvalue(node, "cavalry", false)) terrain->flags |= CAVALRY_REGION;
-      if (xml_bvalue(node, "seed", true)) terrain->flags |= AUTO_TERRAIN;
     }
     if (xml_bvalue(node, "sea", false)) terrain->flags |= SEA_REGION;
     if (xml_bvalue(node, "arctic", false)) terrain->flags |= ARCTIC_REGION;
     if (xml_bvalue(node, "land", true)) terrain->flags |= LAND_REGION;
     if (xml_bvalue(node, "forest", false)) terrain->flags |= FOREST_REGION;
+
+    terrain->distribution = (short)xml_ivalue(node, "seed", 0) terrain->flags |= AUTO_TERRAIN;
 
     xpath->node = node;
     xpathChildren = xmlXPathEvalExpression(BAD_CAST "herb", xpath);
