@@ -11,6 +11,27 @@
     </string>
   </namespace>
   <namespace name="iteminfo">
+    <string name="snowman">
+      <text locale="en">
+        Orange nose, black hat, frosty character. A snowman.
+        He'll make a fine guard if you use him in a cold place. (USE 1 snowman)
+      </text>
+      <text locale="de">
+        Rübennase, schwarzer Hut, kaltes Herz. Ein Schneemann. Er gibt
+        einen prima Wachmann ab, wenn er in einem Gletscher belebt wird
+        (BENUTZE 1 Schneemann).
+      </text>
+    </string>
+    <string name="snowball">
+      <text locale="en">
+        These items stay frozen all year round. There seem to be bits of
+        ice in them - in the right hands, these might put an eye out!
+      </text>
+      <text locale="de">
+        Ein Schneeball. Es scheinen kleine Eissplitter darin zu sein. In
+        den richtigen Händen können sie sicher weh tun.
+      </text>
+    </string>
     <string name="seashell">
       <text locale="en">
          This badge pronounces its wearer an official visitor to the

@@ -5,8 +5,8 @@
   <resource name="snowball">
     <item notlost="yes" weight="0">
       <weapon bash="true" missile="true" skill="unarmed" offmod="0" defmod="0" reload="0" magres="0.0">
-        <damage type="rider" value="3d6+4"/>
-        <damage type="footman" value="3d6+4"/>
+        <damage type="rider" value="3d8+8"/>
+        <damage type="footman" value="3d8+8"/>
         <modifier type="missile_target" value="2"/>
         <modifier type="skill" value="-90"/>
         <modifier type="skill" value="100">

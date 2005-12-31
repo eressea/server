@@ -107,25 +107,6 @@
         fortzubewegen, wenn er zu Fuß reist.
       </text>
     </string>
-    <string name="snowman">
-      <text locale="en">
-        Orange nose, black hat, frosty character. A snowman.
-      </text>
-      <text locale="de">
-        Rübennase, schwarzer Hut, kaltes Herz. Ein Schneemann.
-      </text>
-    </string>
-    <string name="snowball">
-      <text locale="en">
-        These items stay frozen all year round. Nobody knows what they
-        are good for.
-      </text>
-      <text locale="de">
-        Schneebälle sind leider noch nicht vollständig implementiert.
-        Frohe Weihnachten und einen guten Rutsch ins Jahr 2003 wünscht
-        das Eressea-Team!
-      </text>
-    </string>
     <string name="firesword">
       <text locale="en">
         The flaming sword gives its bearer an attack of 3d6+10 plus

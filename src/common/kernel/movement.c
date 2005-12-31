@@ -1314,7 +1314,6 @@ travel_route(unit * u, region_list * route_begin, region_list * route_end, order
           }
         } else if ((u->race->flags & RCF_WALK) == 0) {
           /* Spezialeinheiten, die nicht laufen können. */
-          int moving = u->race->flags & (RCF_SWIM|RCF_WALK|RCF_COASTAL);
           ADDMSG(&u->faction->msgs, msg_message("detectocean",
             "unit region", u, next));
           break;
