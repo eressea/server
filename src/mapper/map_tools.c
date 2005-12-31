@@ -372,6 +372,16 @@ do_selection(selection * sel, const char * title, void (*perform)(selection *, v
 				return current;
 			}
 			break;
+    default:
+      s = current->next;
+      while (s!=current) {
+        if (tolower(s->str[0])==tolower(input)) {
+          current = s;
+          update = true;
+        } else {
+          s = s->next;
+        }
+      }
 		}
 	}
 }
