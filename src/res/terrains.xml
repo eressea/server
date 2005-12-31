@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<terrains xmlns="http://tempuri.org/terrains.xsd">
+<terrains>
     <!-- defaults: walk="yes" sail="yes" fly="yes" shallow="yes" swim="no" forest="no" sea="no" land="yes" forbidden="no" arctic="no" cavalry="no" -->
     <terrain name="ocean" size="100" shallow="no" walk="no" swim="yes" land="no" sea="yes" />
     <terrain name="plain" size="10000" road="50" shallow="no" forest="yes" cavalry="yes" seed="3">

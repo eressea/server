@@ -720,8 +720,8 @@ create_backup(char *file)
 {
 #ifdef HAVE_UNISTD_H
   char bfile[MAX_PATH];
-  char command[MAX_PATH*2+10];
   int c = 1;
+
   do {
     sprintf(bfile, "%s.backup%d", file, c);
     c++;
@@ -1301,22 +1301,26 @@ readregion(FILE * F, short x, short y)
     char name[64];
     rs(F, name);
     terrain = get_terrain(name);
+    if (terrain==NULL) {
+      log_error(("Unknown terrain '%s'\n", name));
+      assert(!"unknown terrain");
+    }
   }
-	r->terrain = terrain;
-	r->flags = (char) ri(F);
+  r->terrain = terrain;
+  r->flags = (char) ri(F);
 
-	if (global.data_version >= REGIONAGE_VERSION)
-		r->age = (unsigned short) ri(F);
-	else
-		r->age = 0;
+  if (global.data_version >= REGIONAGE_VERSION)
+      r->age = (unsigned short) ri(F);
+  else
+      r->age = 0;
 
-	if (fval(r->terrain, LAND_REGION)) {
-		r->land = calloc(1, sizeof(land_region));
-		rds(F, &r->land->name);
+  if (fval(r->terrain, LAND_REGION)) {
+    r->land = calloc(1, sizeof(land_region));
+    rds(F, &r->land->name);
 #ifndef NDEBUG
     if (strlen(r->land->name)>=NAMESIZE) r->land->name[NAMESIZE] = 0;
 #endif
-	}
+  }
 	if (r->land) {
 		int i;
 		if(global.data_version < GROWTREE_VERSION) {
