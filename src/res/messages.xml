@@ -6566,7 +6566,7 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Kompassnadel springt wild hin und her und es laesst sich keine Richtung erkennen."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Die Kompassnadel springt wild hin und her und es lässt sich keine Richtung erkennen."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The needle jumps wildly and there is no specific direction recognizable."</text>
     <text locale="fr">"$unit($unit) in $region($region): '$order($command)' - The needle jumps wildly and there is no specific direction recognizable."</text>
   </message>

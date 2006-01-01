@@ -143,11 +143,11 @@
     <text locale="en">trapped air elementals</text>
   </string>
   <string name="phoenixcompass">
-    <text locale="de">Phoenixkompass</text>
+    <text locale="de">Phönixkompass</text>
     <text locale="en">phoenixcompass</text>
   </string>
   <string name="phoenixcompass_p">
-    <text locale="de">Phoenixkompasse</text>
+    <text locale="de">Phönixkompasse</text>
     <text locale="en">phoenix compasses</text>
   </string>
 </strings>
