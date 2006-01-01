@@ -14,7 +14,6 @@ function use_stardust(u, amount)
 end
 
 function xmas2005()
-  print(get_gamename())
   if get_gamename() == "Eressea" then
     if not get_flag("xm05") then
       print("Es weihnachtet sehr (2005)")

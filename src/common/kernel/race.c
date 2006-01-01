@@ -109,13 +109,16 @@ rc_new(const char * zName)
 race *
 rc_add(race * rc)
 {
-	rc->next = races;
-	return races = rc;
+  rc->next = races;
+  if (rc->init_familiar!=NULL) {
+    racelist_insert(&familiarraces, rc);
+  }
+  return races = rc;
 }
 
 static const char * racealias[2][2] = {
-	{ "skeletton lord", "skeleton lord" },
-	{ NULL, NULL }
+  { "skeletton lord", "skeleton lord" },
+  { NULL, NULL }
 };
 
 race *
@@ -132,10 +135,7 @@ rc_find(const char * name)
 		}
 	}
 	while (rc && !strcmp(rname, rc->_name[0])==0) rc = rc->next;
-  if (rc->init_familiar!=NULL) {
-    racelist_insert(&familiarraces, rc);
-  }
-	return rc;
+  return rc;
 }
 
 /** dragon movement **/

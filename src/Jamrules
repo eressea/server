@@ -44,8 +44,8 @@ if $(DMALLOC) {
 
 if $(PROFILE) = 1 {
   Echo Compiling with profiler ;
-  CCFLAGS += -pg -g ;
-  LINKFLAGS += -pg -g ;
+  CCFLAGS += -pg -ggdb ;
+  LINKFLAGS += -pg -ggdb ;
 }
 
 CCFLAGS += -Wall ;
@@ -121,8 +121,8 @@ rule TargetDirectory
         LOCATE_TARGET = $(ALL_LOCATE_TARGET) $(path) ;
         SOURCE_GRIST = $(path) ;
         if $(DEBUG) = 1 {
-            SubDirCcFlags -g ;
-            SubDirC++Flags -g ;
+            SubDirCcFlags -ggdb -O0 ;
+            SubDirC++Flags -ggdb -O0 ;
         }
         else {
             SubDirCcFlags -DNDEBUG -O2 ;
