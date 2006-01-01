@@ -735,6 +735,7 @@ new_region(short x, short y)
 	r = calloc(1, sizeof(region));
 	r->x = x;
 	r->y = y;
+  r->age = 1;
 	r->planep = findplane(x, y);
 	set_string(&r->display, "");
 	rhash(r);
