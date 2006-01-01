@@ -22,10 +22,10 @@ namespace eressea {
 
   object
   objects::get(const char * name) {
+    lua_State * L = (lua_State *)global.vm_state;
     attrib * a = a_find(*mAttribPtr, &at_object);
     for (;a;a=a->nexttype) {
       if (strcmp(object_name(a), name)==0) {
-        lua_State * L = (lua_State *)global.vm_state;
         variant val;
         object_type type;
 
@@ -52,7 +52,7 @@ namespace eressea {
         }
       }
     }
-    return object(); // nil
+    return object(L); // nil
   }
 
   static void set_object(attrib **attribs, const char * name, object_type type, variant val) {

@@ -51,7 +51,7 @@ random_terrain(boolean distribution)
     }
   }
 
-  n = rand() % distribution?ndistribution:nterrains;
+  n = rand() % (distribution?ndistribution:nterrains);
   for (terrain=terrains();terrain;terrain=terrain->next) {
     n -= distribution?terrain->distribution:1;
     if (n<0) break;
