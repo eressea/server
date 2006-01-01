@@ -71,13 +71,7 @@ xml_spell(xmlNode * node, const char * name)
   const spell * sp = NULL;
   xmlChar * property = xmlGetProp(node, BAD_CAST name);
   if (property!=NULL) {
-    int i = atoi((const char *)property);
-    if (i>0) {
-      sp = find_spellbyid((spellid_t)i);
-    }
-    if (sp==NULL) {
-      sp = find_spell(M_NONE, (const char *)property);
-    }
+    sp = find_spell(M_NONE, (const char *)property);
     assert(sp);
     xmlFree(property);
   }

@@ -942,10 +942,9 @@ cr_find_address(FILE * F, const faction * uf, const faction_list * addresses)
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
 static void
-cr_reportspell(FILE * F, spellid_t id, const struct locale * lang)
+cr_reportspell(FILE * F, 	spell *sp, const struct locale * lang)
 {
 	int k;
-	spell *sp = find_spellbyid(id);
 	const char * name = add_translation(mkname("spell", sp->sname), spell_name(sp, lang));
 
 	fprintf(F, "ZAUBER %d\n", hashstring(spell_name(sp, default_locale)));
@@ -1180,7 +1179,8 @@ report_computer(const char * filename, report_context * ctx)
 	cr_find_address(F, f, ctx->addresses);
 	a = a_find(f->attribs, &at_reportspell);
 	while (a) {
-		cr_reportspell(F, (spellid_t)a->data.i, f->locale);
+    spell *sp = find_spellbyid((spellid_t)a->data.i);
+		cr_reportspell(F, sp, f->locale);
 		a = a->nexttype;
 	}
 	for (a=a_find(f->attribs, &at_showitem);a;a=a->nexttype) {
